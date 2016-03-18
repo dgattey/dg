@@ -1,17 +1,7 @@
 import { Injectable } from 'angular2/core';
 
-interface ProjectType {
-	id: number;
-	title: string;
-	location: string;
-	links: Object;
-	date: Date;
-	content: string;
-	// TODO: media or media links
-}
-
 @Injectable()
-export class Project implements ProjectType {
+export class Project {
 	id: number;
 	title: string;
 	location: string;
