@@ -2,26 +2,33 @@
   "name": "dylan-gattey",
   "version": "0.0.1",
   "scripts": {
-    "postinstall": "npm run typings install",
     "tsc": "tsc",
     "tsc:w": "tsc -w",
-    "lite": "lite-server",
-    "start": "concurrent \"npm run tsc:w\" \"npm run lite\" ",
-    "typings": "typings"
+    "typings": "typings",
+    "tslint": "tslint -c tslint.json app/**/*.ts",
+    "postinstall": "typings install"
   },
   "dependencies": {
-    "angular2": "2.0.0-beta.10",
-    "systemjs": "0.19.22",
+    "angular2": "^2.0.0-beta.10",
     "es6-promise": "^3.0.2",
-    "es6-shim": "^0.33.3",
+    "es6-shim": "^0.33.13",
+    "immutable": "^3.7.6",
+    "node-uuid": "^1.4.7",
     "reflect-metadata": "0.1.2",
-    "rxjs": "5.0.0-beta.2",
-    "zone.js": "0.5.15"
+    "rxjs": "^5.0.0-beta.2",
+    "systemjs": "^0.19.24",
+    "zone.js": "^0.6.4"
   },
   "devDependencies": {
-    "concurrently": "^2.0.0",
-    "lite-server": "^2.1.0",
-    "typescript": "^1.8.2",
-    "typings": "^0.6.8"
+    "browser-sync": "^2.10.0",
+    "del": "^2.1.0",
+    "gulp": "^3.9.0",
+    "gulp-sourcemaps": "^1.6.0",
+    "gulp-tslint": "^4.3.3",
+    "gulp-typescript": "^2.8.0",
+    "tsconfig-glob": "^0.4.1",
+    "typings": "^0.7.5",
+    "tslint": "^3.2.1",
+    "typescript": "^1.8.7"
   }
 }

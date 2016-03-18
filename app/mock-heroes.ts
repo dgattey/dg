@@ -1,14 +1,16 @@
-import { Hero } from './hero.service';
+import { Hero } from './hero';
+import { List } from 'immutable';
+import uuid from 'node-uuid';
 
-export var HEROES: Hero[] = [
-	{"id": 11, "name": "Mr. Nice"},
-	{"id": 12, "name": "Narco"},
-	{"id": 13, "name": "Bombasto"},
-	{"id": 14, "name": "Celeritas"},
-	{"id": 15, "name": "Magneta"},
-	{"id": 16, "name": "RubberMan"},
-	{"id": 17, "name": "Dynama"},
-	{"id": 18, "name": "Dr IQ"},
-	{"id": 19, "name": "Magma"},
-	{"id": 20, "name": "Tornado"}
-];
+export var HEROES = List<Hero>([
+  {'id': uuid.v4(), 'name': 'Mr. Nice'},
+  {'id': uuid.v4(), 'name': 'Narco'},
+  {'id': uuid.v4(), 'name': 'Bombasto'},
+  {'id': uuid.v4(), 'name': 'Celeritas'},
+  {'id': uuid.v4(), 'name': 'Magneta'},
+  {'id': uuid.v4(), 'name': 'RubberMan'},
+  {'id': uuid.v4(), 'name': 'Dynama'},
+  {'id': uuid.v4(), 'name': 'Dr IQ'},
+  {'id': uuid.v4(), 'name': 'Magma'},
+  {'id': uuid.v4(), 'name': 'Tornado'}
+]);

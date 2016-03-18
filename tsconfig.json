@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "outDir": "dist/app",
+    "target": "ES5",
     "module": "system",
     "sourceMap": true,
     "emitDecoratorMetadata": true,
@@ -10,9 +11,26 @@
     "noImplicitAny": true,
     "suppressImplicitAnyIndexErrors": true
   },
-  "exclude": [
-    "node_modules",
-    "typings/main.d.ts",
-    "typings/main"
+  "filesGlob": [
+    "app/**/*.ts",
+    "typings/**/*.d.ts",
+    "node_modules/immutable/dist/immutable.d.ts"
+  ],
+  "files": [
+    "app/app.component.ts",
+    "app/boot.ts",
+    "app/dashboard.component.ts",
+    "app/hero-detail.component.ts",
+    "app/hero.service.ts",
+    "app/hero.ts",
+    "app/heroes.component.ts",
+    "app/mock-heroes.ts",
+    "typings/node-uuid/node-uuid-base.d.ts",
+    "typings/node-uuid/node-uuid-cjs.d.ts",
+    "typings/node-uuid/node-uuid-global.d.ts",
+    "typings/node-uuid/node-uuid.d.ts",
+    "typings/node/node.d.ts",
+    "typings/tsd.d.ts",
+    "node_modules/immutable/dist/immutable.d.ts"
   ]
 }
