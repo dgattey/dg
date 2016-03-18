@@ -1,33 +1,23 @@
-import {Component} from 'angular2/core';
-import {RouteConfig, ROUTER_DIRECTIVES} from 'angular2/router';
-import {HeroesComponent} from './heroes.component';
-import {HeroDetailComponent} from './hero-detail.component';
-import {DashboardComponent} from './dashboard.component';
-import {HeroService} from './hero.service';
+import { Component } from 'angular2/core';
+import { HTTP_PROVIDERS } from 'angular2/http';
+import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from 'angular2/router';
+
+import { CharactersComponent } from './characters.component';
+import { DashboardComponent } from './dashboard.component';
+import { CharacterService } from './character.service';
 
 @Component({
   selector: 'my-app',
   template: `
-    <h1>{{title}}</h1>
     <a [routerLink]="['Dashboard']">Dashboard</a>
-    <a [routerLink]="['Heroes']">Heroes</a>
+    <a [routerLink]="['Characters']">Characters</a>
     <router-outlet></router-outlet>
-  `,
-  styles: [`
-    a {padding: 5px;text-decoration: none;}
-    a:visited, a:link {color: #444;}
-    a:hover {color: white; background-color: #1171a3;}
-    a.router-link-active {color: white; background-color: #62b9e9;}
-  `],
+    `,
   directives: [ROUTER_DIRECTIVES],
-  providers: [HeroService]
+  providers: [HTTP_PROVIDERS, ROUTER_PROVIDERS, CharacterService]
 })
 @RouteConfig([
-  {path: '/', redirectTo: ['Dashboard'] },
-  {path: '/dashboard', name: 'Dashboard', component: DashboardComponent, useAsDefault: true},
-  {path: '/heroes', name: 'Heroes', component: HeroesComponent},
-  {path: '/detail/:id', name: 'HeroDetail', component: HeroDetailComponent}
+  { path: '/dashboard', as: 'Dashboard', component: DashboardComponent, useAsDefault: true },
+  { path: '/characters', as: 'Characters', component: CharactersComponent }
 ])
-export class AppComponent {
-  public title = 'Dylan Gattey';
-}
+export class AppComponent { }

@@ -2,32 +2,31 @@
 <html>
 
 <head>
+  <title>Dylan Gattey</title>
+
   <base href="/">
+
+  <title>Dylan Gattey</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <link rel="stylesheet" href="styles.css">
-  <script src="lib/angular2-polyfills.js"></script>
-  <script src="lib/system.src.js"></script>
-  <script src="lib/Rx.js"></script>
-  <script src="lib/angular2.dev.js"></script>
-  <script src="lib/router.dev.js"></script>
+
+  <!-- 1. Load libraries -->
+  <!-- IE required polyfills, in this exact order -->
+  <script src="node_modules/es6-shim/es6-shim.min.js"></script>
+  <script src="node_modules/systemjs/dist/system-polyfills.js"></script>
+  <script src="node_modules/angular2/es6/dev/src/testing/shims_for_IE.js"></script>
+
+  <script src="node_modules/angular2/bundles/angular2-polyfills.js"></script>
+  <script src="node_modules/systemjs/dist/system.src.js"></script>
+  <script src="node_modules/rxjs/bundles/Rx.js"></script>
+  <script src="node_modules/angular2/bundles/angular2.dev.js"></script>
+  <script src="node_modules/angular2/bundles/router.dev.js"></script>
+  <script src="node_modules/angular2/bundles/http.dev.js"></script>
+
   <script>
-      System.config({
-        packages: {
-          app: {
-            format: 'register',
-            defaultExtension: 'js'
-          },
-          'node-uuid': {
-            map: {
-              crypto: '@empty'
-            }
-          }
-        },
-        map: {
-          immutable: 'lib/immutable.js',
-          'node-uuid': 'lib/uuid.js'
-        }
-      });
-      System.import('app/boot')
+    System.config({packages: {app: {format: 'register',defaultExtension: 'js'}}});
+      System.import('app/main')
             .then(null, console.error.bind(console));
   </script>
 </head>
