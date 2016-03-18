@@ -2,6 +2,7 @@ import { Component, OnInit } from 'angular2/core';
 import { Router } from 'angular2/router';
 
 import { Character, CharacterService } from '../services/character.service';
+import { Project } from '../models/project.model';
 import { WPService } from '../services/wp.service';
 
 @Component({
@@ -17,13 +18,8 @@ export class CharactersComponent implements OnInit {
 
 	ngOnInit() {
 		this.characters = this.getCharacters();
-
-		var me = this;
-		this._wpService.getProjects(function(proj: JSON) {
+		this._wpService.getProjects(function(proj: Array<Project>) {
 			console.log(proj);
-			me._wpService.getProjects(function(proj: JSON){
-				console.log("Done!", proj);
-			});
 		});
 	}
 

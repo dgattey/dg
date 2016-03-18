@@ -2,6 +2,8 @@ import { Injectable } from 'angular2/core';
 import { Http, Headers, HTTP_PROVIDERS } from 'angular2/http';
 import 'rxjs/add/operator/map';
 
+import { Project } from '../models/project.model';
+
 @Injectable()
 export class WPService {
 	private _endpoint: string;
@@ -20,22 +22,32 @@ export class WPService {
 		this.getRoutes(() => void{});
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	// Public API
+	//////////////////////////////////////////////////////////////////////////
+
 	// Simply returns all projects
-	// TODO: Make project type in another file and map each array to a Project
-	getProjects(callback: (proj: JSON) => void) {
+	getProjects(callback: (proj: Array<Project>) => void) {
 		var me = this;
+		var transform = function(data: JSON): Array<Project> {
+			var projs: Array<Project> = new Array<Project>();
+			for (var i in data){
+				projs.push(new Project(data[i]));
+			}
+			return projs;
+		};
 		this.getRoutes(function(routes: Object) {
 			me._http.get(routes['projects'])
 			.map(res => res.json())
 			.subscribe(
-				data => callback(data), 
+				data => callback(transform(data)), 
 				err => console.error(err)
 			);
 		});
 	}
 
 	///////////////////////////////////////////////////////////////////////////
-	
+
 	// Sets up routes for whole API. As the WP API is self describing,
 	// it should tell us about all the possible routes, and we only care
 	// about a subset we specified above.
