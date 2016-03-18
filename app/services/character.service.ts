@@ -2,7 +2,7 @@ import { Injectable } from 'angular2/core';
 import { Http } from 'angular2/http';
 import 'rxjs/add/operator/map';
 
-import { Character } from './character.service';
+import { Character } from '../services/character.service';
 
 export interface Character {
 	id: number;

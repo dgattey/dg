@@ -4,7 +4,8 @@ import { RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS } from 'angular2/route
 
 import { CharactersComponent } from './characters.component';
 import { DashboardComponent } from './dashboard.component';
-import { CharacterService } from './character.service';
+import { CharacterService } from '../services/character.service';
+import { WPService } from '../services/wp.service';
 
 @Component({
   selector: 'my-app',
@@ -14,7 +15,7 @@ import { CharacterService } from './character.service';
     <router-outlet></router-outlet>
     `,
   directives: [ROUTER_DIRECTIVES],
-  providers: [HTTP_PROVIDERS, ROUTER_PROVIDERS, CharacterService]
+  providers: [HTTP_PROVIDERS, ROUTER_PROVIDERS, CharacterService, WPService]
 })
 @RouteConfig([
   { path: '/dashboard', as: 'Dashboard', component: DashboardComponent, useAsDefault: true },

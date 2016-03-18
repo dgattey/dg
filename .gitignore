@@ -1,5 +1,6 @@
-*/*.js
-*/*.js.map
+**/*.js
+**/*.js.map
 node_modules
 typings
 dist
+*.sublime-workspace

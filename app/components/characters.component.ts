@@ -1,18 +1,19 @@
 import { Component, OnInit } from 'angular2/core';
 import { Router } from 'angular2/router';
 
-import { Character, CharacterService } from './character.service';
+import { Character, CharacterService } from '../services/character.service';
+import { WPService } from '../services/wp.service';
 
 @Component({
   selector: 'my-characters',
-  templateUrl: 'app/characters.component.html',
-  styleUrls: ['app/characters.component.css']
+  templateUrl: 'app/static/characters.component.html',
+  styleUrls: ['app/styles/characters.component.css']
 })
 export class CharactersComponent implements OnInit {
   characters: Character[];
   currentCharacter: Character;
 
-  constructor(private _characterService: CharacterService) { }
+  constructor(private _characterService: CharacterService, private _wpService: WPService) { }
 
   ngOnInit() {
     this.characters = this.getCharacters();
