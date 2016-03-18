@@ -5,35 +5,42 @@ import { Character, CharacterService } from '../services/character.service';
 import { WPService } from '../services/wp.service';
 
 @Component({
-  selector: 'my-characters',
-  templateUrl: 'app/static/characters.component.html',
-  styleUrls: ['app/styles/characters.component.css']
+	selector: 'my-characters',
+	templateUrl: 'app/static/characters.component.html',
+	styleUrls: ['app/styles/characters.component.css']
 })
 export class CharactersComponent implements OnInit {
-  characters: Character[];
-  currentCharacter: Character;
+	characters: Character[];
+	currentCharacter: Character;
 
-  constructor(private _characterService: CharacterService, private _wpService: WPService) { }
+	constructor(private _characterService: CharacterService, private _wpService: WPService) { }
 
-  ngOnInit() {
-    this.characters = this.getCharacters();
-  }
+	ngOnInit() {
+		this.characters = this.getCharacters();
 
-  onSelect(character: Character) {
-    // this.currentCharacter = character;
-    this._characterService.getCharacter(character.id)
-      .subscribe(character => this.currentCharacter = character);
-  }
+		var me = this;
+		this._wpService.getProjects(function(proj: JSON) {
+			console.log(proj);
+			me._wpService.getProjects(function(proj: JSON){
+				console.log("Done!", proj);
+			});
+		});
+	}
 
-  /////////////////
+	onSelect(character: Character) {
+		this._characterService.getCharacter(character.id)
+		.subscribe(character => this.currentCharacter = character);
+	}
 
-  getCharacters() {
-    this.currentCharacter = undefined;
-    this.characters = [];
+	/////////////////
 
-    this._characterService.getCharacters()
-      .subscribe(characters => this.characters = characters);
+	getCharacters() {
+		this.currentCharacter = undefined;
+		this.characters = [];
 
-    return this.characters;
-  }
+		this._characterService.getCharacters()
+		.subscribe(characters => this.characters = characters);
+
+		return this.characters;
+	}
 }
