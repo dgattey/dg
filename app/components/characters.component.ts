@@ -11,10 +11,10 @@ import {WPService} from '../services/wp.service';
 })
 export class CharactersComponent implements OnInit {
 
-	constructor(private _wpService: WPService) { }
+	constructor(private wp: WPService) { }
 
 	ngOnInit() {
-		this._wpService.getProjects()
+		this.wp.getProjects()
 		.subscribe(projects => console.log(projects));
 	}
 }

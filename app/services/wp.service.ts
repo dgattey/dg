@@ -49,6 +49,11 @@ export class WPService {
 		.catch(this.handleError);
 	}
 
+	getMedia(): Observable<any> {
+		return this.getRoutes()
+			.flatMap(routes => this._http.get(routes['media'] + '/655')); // TODO: authenticate...
+	}
+
 	///////////////////////////////////////////////////////////
 
 	// Sets up routes for whole API. As the WP API is self describing,
