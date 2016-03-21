@@ -14,7 +14,8 @@ export class WPService {
 		this._routes = {
 			'projects': '',
 			'pages': '',
-			'posts': ''
+			'posts': '',
+			'media': ''
 		}
 
 		// Fetches routes
