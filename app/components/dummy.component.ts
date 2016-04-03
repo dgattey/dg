@@ -1,10 +1,10 @@
 import { Component } from 'angular2/core';
 
 @Component({
-  selector: 'my-dashboard',
-	templateUrl: 'app/static/dashboard.component.html'
+  selector: 'dummy-placeholder',
+	templateUrl: 'app/static/dummy.component.html'
 })
-export class DashboardComponent {
+export class DummyComponent {
 	name = 'john';
 	message = '';
 
