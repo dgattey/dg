@@ -6,14 +6,15 @@ import 'rxjs/add/operator/mergeMap';
 import 'rxjs/add/operator/catch';
 
 import { Project } from '../models/project.model';
+import { Media } from '../models/media.model';
 
 @Injectable()
-export class WPService {
+	export class WPService {
 	private _endpoint: string;
 	private _routes: JSON;
 	private _routesReady: boolean;
 	constructor(private _http: Http) {
-		this._endpoint = 'https://dylangattey.com/wp-json/';
+		this._endpoint = 'https://dylangattey.com/backend/wp-json/';
 		
 		// Sets up route structure - lazily initialized
 		let routes: any = {
@@ -40,22 +41,35 @@ export class WPService {
 		.map(data => {
 			let projs: Array<Project> = new Array<Project>();
 			for (var i in data){
-				projs.push(new Project(data[i]));
+				let proj = new Project(data[i]);
+				if (proj.mediaLink) {
+					this.getMedia(proj)
+					.subscribe(medias => proj.media = medias);
+				}
+				projs.push(proj);
 			}
 			return projs;
-		})
-
-		// Error?
-		.catch(this.handleError);
+		});
 	}
 
-	getMedia(): Observable<any> {
-		return this.getRoutes()
-			.flatMap(routes => this._http.get(routes['media'] + '/655')); // TODO: authenticate...
+	// Grabs media for a given project
+	getMedia(proj: Project): Observable<Array<Media>> {		
+		return this._http.get(proj.mediaLink)
+		.map((res: Response) => res.json())
+
+		// Take raw media data and create array of medias
+		.map(data => {
+			let medias: Array<Media> = new Array<Media>();
+			for (var i in data){
+				let m = new Media(data[i]);
+				medias.push(m);
+			}
+			return medias;
+		});
 	}
 
 	///////////////////////////////////////////////////////////
-
+	
 	// Sets up routes for whole API. As the WP API is self describing,
 	// it should tell us about all the possible routes, and we only care
 	// about a subset we specified above.
@@ -70,13 +84,7 @@ export class WPService {
 		// Fetch the routes
 		return this._http.get(this._endpoint)
 			.map(res => res.json())
-			.map(json => this.associateRoutes(json['routes']))
-			.catch(this.handleError);
-	}
-
-	private handleError(error: Response) {
-		console.error(error);
-		return Observable.throw(error.json().error || 'Server error');
+			.map(json => this.associateRoutes(json['routes']));
 	}
 
 	// For possible routes, it associates them with a matching saved one
