@@ -7,9 +7,10 @@ import 'rxjs/add/operator/catch';
 
 import { Project } from '../models/project.model';
 import { Media } from '../models/media.model';
+import { Category } from '../models/category.model';
 
 @Injectable()
-	export class WPService {
+export class WPService {
 	private _endpoint: string;
 	private _routes: JSON;
 	private _routesReady: boolean;
@@ -19,8 +20,6 @@ import { Media } from '../models/media.model';
 		// Sets up route structure - lazily initialized
 		let routes: any = {
 			'projects': '',
-			'pages': '',
-			'posts': '',
 			'media': ''
 		};
 		this._routes = <JSON>routes;
@@ -41,30 +40,39 @@ import { Media } from '../models/media.model';
 		.map(data => {
 			let projs: Array<Project> = new Array<Project>();
 			for (var i in data){
-				let proj = new Project(data[i]);
-				if (proj.mediaLink) {
-					this.getMedia(proj)
-					.subscribe(medias => proj.media = medias);
-				}
-				projs.push(proj);
+				projs.push(this.createProject(data[i]));
 			}
 			return projs;
 		});
 	}
 
 	// Grabs media for a given project
-	getMedia(proj: Project): Observable<Array<Media>> {		
-		return this._http.get(proj.mediaLink)
+	getMedia(proj: Project): Observable<Array<Media>> {
+		return this._http.get(proj.mediaLink())
 		.map((res: Response) => res.json())
 
 		// Take raw media data and create array of medias
 		.map(data => {
 			let medias: Array<Media> = new Array<Media>();
 			for (var i in data){
-				let m = new Media(data[i]);
-				medias.push(m);
+				medias.push(new Media(data[i]));
 			}
 			return medias;
+		});
+	}
+
+	// Grabs categories for a given project
+	getTerms(proj: Project): Observable<Array<Category>> {
+		return this._http.get(proj.termsLink())
+		.map((res: Response) => res.json())
+		
+		// Take raw category data and create array of medias
+		.map(data => {
+			let terms: Array<Category> = new Array<Category>();
+			for (var i in data){
+				terms.push(new Category(data[i]));
+			}
+			return terms;
 		});
 	}
 
@@ -111,5 +119,27 @@ import { Media } from '../models/media.model';
 		// Callback!
 		this._routesReady = true;
 		return this._routes;
+	}
+
+	// Helper to create a project and associate media 
+	// and terms with it
+	private createProject(data: JSON): Project {
+		let proj = new Project(data);
+
+		// Load media async if has it
+		if (proj.hasMedia()) {
+			this.getMedia(proj).subscribe(medias => {
+				proj.media = medias;
+			});
+		}
+
+		// Load terms
+		this.getTerms(proj).subscribe(terms => {
+			if (terms.length > 0) {
+				proj.terms = terms;
+			}
+		});
+
+		return proj;
 	}
 }

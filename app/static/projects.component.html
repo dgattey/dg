@@ -1,9 +1,13 @@
-<h2>Select a Character</h2>
-<ul class="characters">
-  <li *ngFor="#character of characters" (click)="onSelect(character)">
-    <span class="badge">{{character.id}}</span> {{character.name}}
-  </li>
-</ul>
-<h2 *ngIf="currentCharacter">
-  {{currentCharacter.name | uppercase}} is my character
-</h2>
+<div class="code-projects">
+	<!-- Individual Project card -->
+	<div *ngFor="#proj of projects" (click)="highlight(proj)" class="project">
+		<h2>{{proj.title}}</h2>
+		<p>{{proj.excerpt}}</p>
+		<ul>
+			<li *ngFor="#term of proj.terms">
+				#{{term.slug}}
+			</li>
+		</ul>
+		<img *ngIf="proj.hasMedia()" src="{{proj.getMedia(0, 'thumbnail')}}">
+	</div>
+</div>
