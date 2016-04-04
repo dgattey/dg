@@ -2,7 +2,7 @@
 	<!-- Individual Project card -->
 	<div *ngFor="#proj of projects" (click)="highlight(proj)" class="project">
 		<h2>{{proj.title}}</h2>
-		<p>{{proj.excerpt}}</p>
+		<p>{{proj.excerpt | escapeP}}</p> 
 		<ul>
 			<li *ngFor="#term of proj.terms">
 				#{{term.slug}}
