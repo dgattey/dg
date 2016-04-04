@@ -15,10 +15,20 @@ class EscapePPipe implements PipeTransform {
 }
 
 @Component({
+	selector: 'project-card',
+	templateUrl: 'app/static/projectCard.component.html',
+	inputs: ['model'],
+	pipes: [EscapePPipe]
+})
+export class ProjectCardComponent {
+	model: Project;
+}
+
+@Component({
 	selector: 'projects',
 	templateUrl: 'app/static/projects.component.html',
 	styleUrls: ['app/styles/projects.component.css'],
-	pipes: [EscapePPipe]
+	directives: [ProjectCardComponent]
 })
 export class ProjectsComponent implements OnInit {
 	projects: Array<Project>;
@@ -27,8 +37,7 @@ export class ProjectsComponent implements OnInit {
 
 	ngOnInit() {
 		// TODO: Cache, check cache instead of loading
-		this.wp.getProjects()
-		.subscribe(projects => {
+		this.wp.getProjects().subscribe(projects => {
 			this.projects = projects;
 			console.log('Loaded Projects!', this.projects);
 		});

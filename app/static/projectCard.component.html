@@ -1,0 +1,6 @@
+<h2>{{model.title}}</h2>
+<p>{{model.excerpt | escapeP}}</p> 
+<ul *ngIf="model.terms">
+	<li *ngFor="#term of model.terms">#{{term.slug}}</li>
+</ul>
+<img *ngIf="model.hasMedia()" src="{{model.getMedia(0, 'thumbnail')}}">

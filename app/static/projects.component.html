@@ -1,13 +1,2 @@
-<div class="code-projects">
-	<!-- Individual Project card -->
-	<div *ngFor="#proj of projects" (click)="highlight(proj)" class="project">
-		<h2>{{proj.title}}</h2>
-		<p>{{proj.excerpt | escapeP}}</p> 
-		<ul>
-			<li *ngFor="#term of proj.terms">
-				#{{term.slug}}
-			</li>
-		</ul>
-		<img *ngIf="proj.hasMedia()" src="{{proj.getMedia(0, 'thumbnail')}}">
-	</div>
-</div>
+<!-- Just repeat individual Project card -->
+<project-card *ngFor="#proj of projects" (click)="highlight(proj)" [model]="proj"></project-card>
