@@ -1,5 +1,15 @@
-<a [routerLink]="['Code']">Code</a>
-<a [routerLink]="['Graphics']">Graphics</a>
-<a [routerLink]="['About']">About</a>
-<a [routerLink]="['Contact']">Contact</a>
+<div class="header">
+	<img src="logo.png" class="logo">
+	<nav>
+		<a [routerLink]="['Code']">Code</a>
+		<a [routerLink]="['Graphics']">Graphics</a>
+		<a [routerLink]="['About']">About</a>
+		<a [routerLink]="['Contact']">Contact</a>
+	</nav>
+</div>
+
+<!-- Intro component -->
+<intro-area></intro-area>
+
+<!-- Where the component shows up -->
 <router-outlet></router-outlet>

@@ -4,12 +4,13 @@ import {RouteConfig, ROUTER_DIRECTIVES, ROUTER_PROVIDERS} from 'angular2/router'
 
 import {ProjectsComponent} from './projects.component';
 import {DummyComponent} from './dummy.component';
+import {IntroComponent} from './intro.component';
 import {WPService} from '../services/wp.service';
 
 @Component({
   selector: 'dg-app',
   templateUrl: 'app/static/nav.component.html',
-  directives: [ROUTER_DIRECTIVES],
+  directives: [ROUTER_DIRECTIVES, IntroComponent],
   providers: [HTTP_PROVIDERS, ROUTER_PROVIDERS, WPService]
 })
 @RouteConfig([

@@ -15,6 +15,7 @@ export class ProjectsComponent implements OnInit {
 	constructor(private wp: WPService) { }
 
 	ngOnInit() {
+		// TODO: Cache, check cache instead of loading
 		this.wp.getProjects()
 		.subscribe(projects => {
 			this.projects = projects;
