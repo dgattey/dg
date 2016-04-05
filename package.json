@@ -6,9 +6,11 @@
     "postinstall": "npm run typings install",
     "tsc": "tsc",
     "typings": "typings",
-    "compile": "tsc -w",
+    "build-js": "tsc -w",
+    "build-css": "node-sass -w app/styles/ -o app/styles/",
     "serve": "lite-server",
-    "start": "concurrent \"npm run compile\" \"npm run serve\" "
+    "compile": "concurrent \"npm run build-js\" \"npm run build-css\" ",
+    "start": "concurrent \"npm run build-js\" \"npm run build-css\" \"npm run serve\" "
   },
   "dependencies": {
     "angular2": "2.0.0-beta.7",
@@ -22,6 +24,8 @@
   "devDependencies": {
     "concurrently": "^1.0.0",
     "lite-server": "^2.1.0",
+    "node-sass": "^3.4.2",
+    "susy": "^2.2.12",
     "typescript": "^1.8.2",
     "typings": "^0.6.8"
   }

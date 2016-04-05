@@ -2,6 +2,6 @@
 	"folders":[{
 		"path": "/Users/dgattey/Dropbox/dev/projects/dg",
 		"folder_exclude_patterns": ["node_modules", "typings"],
-		"file_exclude_patterns": ["LICENSE", "app/*.js", "app/**/*.js", "app/**/*.js.map", "app/*.js.map", "*.sublime-workspace"]
+		"file_exclude_patterns": ["LICENSE", "app/*.js", "app/**/*.js", "app/**/*.css", "app/**/*.js.map", "app/*.js.map", "*.sublime-workspace"]
 	}]
 }

@@ -27,7 +27,7 @@ export class ProjectCardComponent {
 @Component({
 	selector: 'projects',
 	templateUrl: 'app/static/projects.component.html',
-	styleUrls: ['app/styles/projects.component.css'],
+	// styleUrls: ['app/styles/projects.component.css'],
 	directives: [ProjectCardComponent]
 })
 export class ProjectsComponent implements OnInit {
