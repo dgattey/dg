@@ -1,0 +1,33 @@
+/*
+ * Colors for app
+ */
+
+// Raw color values
+$color-dim: #000000;
+$color-deep: #6C6A69;
+$color-muted: #C0C0C0;
+$color-bright: #F5F5F5;
+
+$color-primary-dim: #18B58F;
+$color-primary-bright: #1CD1A5;
+
+// Applied color values
+$color-bg: $color-bright;
+$color-text-dark: $color-deep;
+$color-text-light: $color-bright;
+$color-text-muted: $color-muted;
+$color-text-active: $color-primary-dim;
+
+/* 
+ * Measurements and values
+ */
+
+// Basic units
+$bg-transparency: 0.5;
+$header-height: 100px;
+
+
+/*
+ * Third party config
+ */
+
