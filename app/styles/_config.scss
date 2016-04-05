@@ -4,7 +4,7 @@
 
 // Raw color values
 $color-dim: #000000;
-$color-deep: #6C6A69;
+$color-deep: #615853; //in Sketch: #6C6A69???;
 $color-muted: #C0C0C0;
 $color-bright: #F5F5F5;
 
@@ -22,10 +22,23 @@ $color-text-active: $color-primary-dim;
  * Measurements and values
  */
 
-// Basic units
-$bg-transparency: 0.5;
+// Basic pixel measurements
+$inset: 20px;
 $header-height: 100px;
+$intro-max-width: 600px;
+$intro-text-width: 430px;
+$intro-inset-top: 1.5 * $inset;
+$intro-inset-bottom: 2.5 * $inset;
 
+// Text measurements
+$font-weight-nav: 500;
+$font-weight-semibold: 600;
+$font-size-h1: 1.8em;
+$font-size-default: 1.1em;
+$font-line-height: 1.5em;
+
+// Unitless config measurements
+$bg-transparency: 0.5;
 
 /*
  * Third party config

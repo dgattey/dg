@@ -1,0 +1,16 @@
+// For IntroComponent - included only with that IntroComponent
+intro-area {
+	display: block;
+	margin: $intro-inset-top auto $intro-inset-bottom auto;
+	max-width: $intro-max-width;
+	img {
+		display: inline-block;
+		width: $intro-max-width - $intro-text-width - 5px; // TODO: max-width
+		height: 100%; // TODO: take out
+	}
+
+	.text {
+		display: inline-block;
+		max-width: $intro-text-width;
+	}
+}

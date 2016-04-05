@@ -1,0 +1,18 @@
+/*
+ * Mixins and extensions to be used globally
+ */
+
+ .fake-underline {
+	content: '';
+	position: absolute;
+	left: 0;
+	display: inline-block;
+	height: 1.5em;
+	width: 100%;
+	border-bottom: 2px solid;
+	margin-top: 5px;
+}
+
+@mixin anim($property) {
+	transition: $property 0.2s;
+}
