@@ -42,9 +42,7 @@ export class ProjectsComponent implements OnInit {
 			// Fake adding more
 			this.projects.push(projects[0])
 			this.projects.push(projects[1])
-			this.projects.push(projects[0])
 			this.projects.push(projects[1])
-			this.projects.push(projects[0])
 			console.log('Loaded Projects!', this.projects);
 		});
 	}

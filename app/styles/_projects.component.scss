@@ -1,21 +1,20 @@
 /* Styles targeting the project grid */
 projects {
 	@include container;
-	background: #666;
-	display: block;
 }
 
 project-card {
+	@include anim(all);
 	display: block;
 	position: relative;
-	max-height: 500px;
-	@include anim(all);
+	max-height: 500px; // TODO: fix better?
+	background: $color-primary-dim;
 
 	// Default on largest screen is 3 column grid of projects
 	@include span(1 of 3 inside no-gutters);
-	&:last-child {
-		@include last;
-	} // TODO: Fix for only two projects in row (doesn't show right)
+	&:nth-child(3n+2) {
+		@include last; // TODO: needed? Check with real projects
+	}
 
 	// Featured top two projects, rather than three
 	&:nth-child(1) {
@@ -24,46 +23,37 @@ project-card {
 	&:nth-child(2) {
 		@include span(1 of 2 last inside no-gutters);
 	}
+
+	// Hover changes
 	&:hover {
+		@include box-shadow(0, 0, 6px, rgba(0,0,0,0.8));
 		z-index: 999;
-		-webkit-box-shadow: 0 0 6px 0px rgba(0,0,0,0.8);
-		-moz-box-shadow: 0 0 6px 0px rgba(0,0,0,0.8);
-		box-shadow: 0 0 6px 0px rgba(0,0,0,0.8);
 		img {
+			@include dim-image($bg-transparency);
 			transform: translateY(-25px);
-			-webkit-filter: brightness(.5);
-	    	filter: brightness(.5);
 		}
 		.movement {
 			bottom: 15px;
 		}
 		ul, p {
-			opacity: 1.0;
+			@extend .show;
 		}
 	}
 
 	img {
-		margin: 0;
-		padding: 0;
-		max-width: 100%;
-		height: auto;
-		display: block;
 		@include anim(all);
+		@extend .fill-parent;
 	}
 
 	.details {
 		@include container;
-		position: absolute;
-		left: 0;
-		bottom: 0;
-		width: 100%;
 	}
-	.movement {
+	.movement, .details {
+		@include anim(bottom)
 		position: absolute;
 		left: 0;
-		width: 100%;
 		bottom: 0;
-		@include anim(bottom)
+		width: 100%;
 	}
 
 	h2 {
@@ -72,15 +62,15 @@ project-card {
 		font-weight: 400;
 	}
 	p {
-		width: 100%;
+		@include anim(all);
+		@extend .hide;
 		background: $color_primary_dim;
 		margin: 0;
 		padding: 0;
+		width: 100%;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		opacity: 0;
-		@include anim(all);
 	}
 	h2, p {
 		padding-left: 10px;
@@ -88,19 +78,20 @@ project-card {
 		float: left;
 	}
 
-	li {
-		color: $color-text-muted;
-		list-style-type: none;
-		display: inline-block;
-		margin: 0 5px;
-		float: right;
-	}
 	ul {
 		@include span(6 of 12 no-gutters last);
+		@include anim(opacity);
+		@extend .hide;
 		float: right;
 		padding-right: 10px;
 		padding-top: 5px;
-		opacity: 0;
-		@include anim(opacity);
+
+		li {
+			color: $color-text-muted;
+			list-style-type: none;
+			display: inline-block;
+			margin: 0 5px;
+			float: inherit;
+		}
 	}
 }
