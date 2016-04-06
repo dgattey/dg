@@ -46,7 +46,7 @@ $bg-transparency: 0.5;
 
 /* Changing Susy default global settings */
 $susy: (
-  // columns: 12,
-  container: 1120px, // max-width
+  columns: 12,
+  // container: 1320px, // max-width
   global-box-sizing: border-box 
  );

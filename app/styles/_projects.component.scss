@@ -7,8 +7,9 @@ projects {
 
 project-card {
 	display: block;
-	border: 1px solid #888;
-	background: white;
+	position: relative;
+	overflow: hidden;
+	max-height: 500px;
 
 	// Default on largest screen is 3 column grid of projects
 	@include span(1 of 3 inside no-gutters);
@@ -22,5 +23,72 @@ project-card {
 	}
 	&:nth-child(2) {
 		@include span(1 of 2 last inside no-gutters);
+	}
+	&:hover {
+		img {
+			transform: translateY(-20px);
+			-webkit-filter: brightness(.5);
+	    	filter: brightness(.5);
+		}
+		.details {
+			bottom: 0;
+		}
+		ul {
+			opacity: 1.0;
+		}
+	}
+
+	img {
+		margin: 0;
+		padding: 0;
+		min-width: 100%;
+		height: auto;
+		display: block;
+		@include anim(all);
+	}
+
+	.details {
+		@include container;
+		position: absolute;
+		left: 0;
+		width: 100%;
+		bottom: -35px;
+		@include anim(bottom)
+	}
+
+	h2 {
+		@include span(6 of 12 no-gutters);
+		text-shadow: 0 1px 7px rgba(150, 150, 150, 1);
+	}
+	p {
+		width: 100%;
+		background: $color_primary_dim;
+		bottom: 0;
+		margin: 0;
+		padding: 0;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+	}
+	h2, p {
+		padding-left: 10px;
+		color: white;
+		float: left;
+	}
+
+	li {
+		color: white;
+		list-style-type: none;
+		display: inline-block;
+		margin: 0 5px;
+		float: right;
+	}
+	ul {
+		@include span(6 of 12 no-gutters last);
+		float: right;
+		padding-right: 10px;
+		padding-top: 5px;
+		opacity: 0;
+		@include anim(opacity);
 	}
 }

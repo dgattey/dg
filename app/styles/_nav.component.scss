@@ -1,8 +1,13 @@
 // Contains styles for navigation of app
 nav {
+	@include container;
 	display: block;
 	height: $header-height - $inset - $inset;
 	padding: $inset;
+
+	.wrapper {
+		@include span(12 of 12);
+	}
 
 	img {
 		float: left;

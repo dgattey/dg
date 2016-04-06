@@ -1,6 +1,9 @@
-<h2>{{model.title}}</h2>
-<p>{{model.excerpt | escapeP}}</p> 
-<ul *ngIf="model.terms">
-	<li *ngFor="#term of model.terms">#{{term.slug}}</li>
-</ul>
-<img *ngIf="model.hasMedia()" src="{{model.getMedia(0, 'thumbnail')}}">
+<img *ngIf="!model.hasMedia()" src="https://source.unsplash.com/random/800x500">
+<img *ngIf="model.hasMedia()" src="{{model.getMedia(0, 'medium')}}">
+<div class="details">
+	<h2>{{model.title}}</h2>
+	<ul *ngIf="model.terms">
+		<li *ngFor="#term of model.terms">#{{term.slug}}</li>
+	</ul>
+	<p>{{model.excerpt | escapeP}}</p>
+</div>
