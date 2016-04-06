@@ -8,8 +8,8 @@ projects {
 project-card {
 	display: block;
 	position: relative;
-	overflow: hidden;
 	max-height: 500px;
+	@include anim(all);
 
 	// Default on largest screen is 3 column grid of projects
 	@include span(1 of 3 inside no-gutters);
@@ -25,15 +25,19 @@ project-card {
 		@include span(1 of 2 last inside no-gutters);
 	}
 	&:hover {
+		z-index: 999;
+		-webkit-box-shadow: 0 0 6px 0px rgba(0,0,0,0.8);
+		-moz-box-shadow: 0 0 6px 0px rgba(0,0,0,0.8);
+		box-shadow: 0 0 6px 0px rgba(0,0,0,0.8);
 		img {
-			transform: translateY(-20px);
+			transform: translateY(-25px);
 			-webkit-filter: brightness(.5);
 	    	filter: brightness(.5);
 		}
-		.details {
-			bottom: 0;
+		.movement {
+			bottom: 15px;
 		}
-		ul {
+		ul, p {
 			opacity: 1.0;
 		}
 	}
@@ -41,7 +45,7 @@ project-card {
 	img {
 		margin: 0;
 		padding: 0;
-		min-width: 100%;
+		max-width: 100%;
 		height: auto;
 		display: block;
 		@include anim(all);
@@ -51,33 +55,41 @@ project-card {
 		@include container;
 		position: absolute;
 		left: 0;
+		bottom: 0;
 		width: 100%;
-		bottom: -35px;
+	}
+	.movement {
+		position: absolute;
+		left: 0;
+		width: 100%;
+		bottom: 0;
 		@include anim(bottom)
 	}
 
 	h2 {
 		@include span(6 of 12 no-gutters);
 		text-shadow: 0 1px 7px rgba(150, 150, 150, 1);
+		font-weight: 400;
 	}
 	p {
 		width: 100%;
 		background: $color_primary_dim;
-		bottom: 0;
 		margin: 0;
 		padding: 0;
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
+		opacity: 0;
+		@include anim(all);
 	}
 	h2, p {
 		padding-left: 10px;
-		color: white;
+		color: $color-text-light;
 		float: left;
 	}
 
 	li {
-		color: white;
+		color: $color-text-muted;
 		list-style-type: none;
 		display: inline-block;
 		margin: 0 5px;

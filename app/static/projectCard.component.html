@@ -1,9 +1,11 @@
-<img *ngIf="!model.hasMedia()" src="https://source.unsplash.com/random/800x500">
-<img *ngIf="model.hasMedia()" src="{{model.getMedia(0, 'medium')}}">
+<img *ngIf="!model.hasMedia()" src="https://source.unsplash.com/random/1200x800">
+<img *ngIf="model.hasMedia()" src="{{model.getMedia(0, 'large')}}">
 <div class="details">
-	<h2>{{model.title}}</h2>
-	<ul *ngIf="model.terms">
-		<li *ngFor="#term of model.terms">#{{term.slug}}</li>
-	</ul>
-	<p>{{model.excerpt | escapeP}}</p>
+	<div class="movement">
+		<h2>{{model.title}}</h2>
+		<ul *ngIf="model.terms">
+			<li *ngFor="#term of model.terms">#{{term.slug}}</li>
+		</ul>
+	</div>
+	<p class="excerpt">{{model.excerpt | escapeP}}</p>
 </div>
