@@ -27,7 +27,6 @@ export class ProjectCardComponent {
 @Component({
 	selector: 'projects',
 	templateUrl: 'app/static/projects.component.html',
-	// styleUrls: ['app/styles/projects.component.css'],
 	directives: [ProjectCardComponent]
 })
 export class ProjectsComponent implements OnInit {
@@ -39,6 +38,13 @@ export class ProjectsComponent implements OnInit {
 		// TODO: Cache, check cache instead of loading
 		this.wp.getProjects().subscribe(projects => {
 			this.projects = projects;
+
+			// Fake adding more
+			this.projects.push(projects[0])
+			this.projects.push(projects[1])
+			this.projects.push(projects[0])
+			this.projects.push(projects[1])
+			this.projects.push(projects[0])
 			console.log('Loaded Projects!', this.projects);
 		});
 	}

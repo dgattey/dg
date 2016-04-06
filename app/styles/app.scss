@@ -4,6 +4,9 @@
 @import '../../node_modules/node-normalize-scss/normalize';
 @import '../../node_modules/susy/sass/susy';
 
+// For Susy, border box sizing
+@include border-box-sizing;
+
 body {
 	background: $color-bg;
 }
@@ -23,3 +26,4 @@ p {
 // Import components
 @import 'nav.component';
 @import 'intro.component';
+@import 'projects.component';

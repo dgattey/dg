@@ -1,0 +1,26 @@
+/* Styles targeting the project grid */
+projects {
+	@include container;
+	background: #666;
+	display: block;
+}
+
+project-card {
+	display: block;
+	border: 1px solid #888;
+	background: white;
+
+	// Default on largest screen is 3 column grid of projects
+	@include span(1 of 3 inside no-gutters);
+	&:last-child {
+		@include last;
+	} // TODO: Fix for only two projects in row (doesn't show right)
+
+	// Featured top two projects, rather than three
+	&:nth-child(1) {
+		@include span(1 of 2 inside no-gutters);
+	}
+	&:nth-child(2) {
+		@include span(1 of 2 last inside no-gutters);
+	}
+}
