@@ -1,15 +1,23 @@
 // For IntroComponent - included only with that IntroComponent
 intro-area {
+	@extend %container;
 	display: block;
-	margin: $intro-inset-thin auto $intro-inset-wide auto;
-	max-width: $intro-max-width;
-	img {
-		display: inline-block;
-		margin-right: $intro-inset-wide;
-	}
+	margin: $intro--inset-thin auto $intro--inset-wide auto;
 
+	.content {
+		@include span($intro--col-content nest);
+		@include push($intro--col-off);
+    	position:relative;
+	}
+	img {
+		position: absolute;
+		top: 0;
+		bottom: 0;
+		margin: auto;
+		margin-left: 2em;
+	}
+	
 	.text {
-		display: inline-block;
-		max-width: $intro-text-width;
+		@include span($intro--col-text last);
 	}
 }

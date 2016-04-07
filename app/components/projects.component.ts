@@ -21,7 +21,8 @@ export class ProjectsComponent implements OnInit {
 			this.projects = projects;
 
 			// Fake adding more
-			for (var i = 0; i < 10; ++i) {
+			for (var i = 0; i < 5; ++i) {
+				this.projects.push(projects[0])
 				this.projects.push(projects[0])
 				this.projects.push(projects[1])
 			}

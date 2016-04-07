@@ -17,58 +17,64 @@ $color-text-dark: $color-deep;
 $color-text-light: $color-bright;
 $color-text-muted: $color-muted;
 $color-text-active: $color-primary-dim;
-$color-shadow: $color-dim;
 
 /* 
  * Measurements and values
  */
 
  // General unitless measurements
+$col: 18;
+
+// TODO: refactor
 $bg-transparency: 0.5;
-$shadow-transparency: 0.8;
 $z-top: 999;
+$inset: 20px;
+
+// Shared app measurements
+$app--fweight-h1: 600;
+$app--fsize-h1: 2.5em;
+$app--fsize-p: 1.1em;
+$app--flineh-p: 1.5em;
+
+// Nav component measurements
+$nav--header-height: 100px;
+$nav--fweight-text: 500;
+$nav--fsize-text: 1.1em;
 
 // Intro component measurements
-$inset: 20px;
-$header-height: 100px;
-$intro-max-width: 600px;
-$intro-text-width: 430px;
-$intro-inset-thin: 2.5 * $inset;
-$intro-inset-wide: 2.5 * $inset;
+$intro--inset-thin: 2.5 * $inset;
+$intro--inset-wide: 2.5 * $inset;
+$intro--col-content: 10;
+$intro--col-off: ($col - $intro--col-content)/2;
+$intro--col-text: 13;
 
 // Project card component measurements
-$proj-per-row: 3;
-$proj-shadow-amt: 6px;
-$proj-shadow-off: 1px;
-$proj-shadow-color: transparentize($color-shadow, $shadow-transparency);
-$proj-hover-img: 30px;
-$proj-hover-text: 2.2vw;
-$proj-hover-scale: 1.1;
-$proj-thumb-pad: 2vw;
-$proj-text-margin: 10px;
-$proj-term-pad: 4px;
-$font-weight-proj-title: 500;
-$font-weight-proj-desc: 400;
-$font-weight-proj-term: 600;
-$font-size-proj-desc: 0.95em;
-$font-size-proj-term: 0.8em;
-$font-line-proj-desc: $proj-hover-text;
-
-// Other font measurements
-$font-weight-nav: 500;
-$font-weight-semibold: 600;
-$font-size-h1: 1.8em;
-$font-size-default: 1.1em;
-$font-line-height: 1.5em;
+$proj-card--per-row-feature: 3;
+$proj-card--per-row: 4;
+$proj-card--col-title: 13;
+$proj-card--shadow-amt: 6px;
+$proj-card--shadow-off: 1px;
+$proj-card--shadow-color: transparentize($color-dim, 0.8);
+$proj-card--hover-img: 30px; // TODO: rename
+$proj-card--hover-text: 2.2vw; // TODO: rename
+$proj-card--hover-scale: 1.05;
+$proj-card--inset-pad: 2vw; // TODO: rename
+$proj-card--text-margin: 10px; // TODO: rename
+$proj-card--term-pad: 4px;
+$proj-card--fweight-title: 500;
+$proj-card--fweight-desc: 400;
+$proj-card--fweight-term: 600;
+$proj-card--fsize-desc: 0.95em;
+$proj-card--fsize-term: 0.8em;
+$proj-card--flineh-desc: $proj-card--hover-text;
 
 /*
  * Third party config
  */
 
 /* Changing Susy default global settings */
-$columns: 12;
 $susy: (
-  columns: $columns,
-  // container: 1320px, // max-width
-  global-box-sizing: border-box 
- );
+  columns: $col,
+  container: 1280px, // max-width
+  global-box-sizing: border-box
+);

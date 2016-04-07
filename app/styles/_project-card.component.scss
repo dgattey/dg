@@ -3,83 +3,91 @@ project-card {
 	display: block;
 	position: relative;
 	background: $color-primary-dim;
+	margin-bottom: gutter();
+
+	// Features 3 projects at top
+	&:nth-child(1), &:nth-child(2) {
+		@include span($col/$proj-card--per-row-feature nest);
+	}
+	&:nth-child(3) {
+		@include span($col/$proj-card--per-row-feature nest last);
+	}
 
 	// Num projects per row
-	@include span($columns/$proj-per-row inside no-gutters);
+	@include span($col/$proj-card--per-row nest);
+	&:nth-child(#{$proj-card--per-row}n+#{$proj-card--per-row-feature+1}) {
+		@include span($col/$proj-card--per-row nest last);
+	}
 
 	// Proj to top layer, shadowed, img & text moved up
 	&:hover {
-		@include box-shadow($proj-shadow-color, $blur: $proj-shadow-amt);
+		@include box-shadow($proj-card--shadow-color, $blur: $proj-card--shadow-amt);
 		z-index: $z-top;
-		@include transform(scale($proj-hover-scale));
+		@include transform(scale($proj-card--hover-scale));
 		img {
 			@include dim-image($bg-transparency);
 		}
 		.proj-data-visible {
-			@include transform(translateY(-$proj-hover-text));
+			@include transform(translateY(-$proj-card--hover-text));
 		}
 		.proj-terms, .proj-desc {
-			@extend .show;
+			@extend %show;
 		}
 	}
 
 	img {
 		@include anim(all);
-		@extend .flush-width;
+		@extend %flush-width;
 		display: block;
 		height: auto;
 	}
 
 	.proj-data-visible, .proj-data {
 		@include anim(all);
-		@extend .sticky-bottom;
-		@extend .flush-width;
-	}
-	.proj-data {
-		@include container;
+		@extend %sticky-bottom;
+		@extend %flush-width;
 	}
 	.proj-data-visible {
-		margin: $proj-text-margin 0;
+		margin: $proj-card--text-margin 0;
 	}
 
 	.proj-title {
-		@include span(6 no-gutters);
-		text-shadow: $proj-shadow-off $proj-shadow-off $proj-shadow-amt $proj-shadow-color;
-		font-weight: $font-weight-proj-title;
+		@include span($proj-card--col-title no-gutters);
+		text-shadow: $proj-card--shadow-off $proj-card--shadow-off $proj-card--shadow-amt $proj-card--shadow-color;
+		font-weight: $proj-card--fweight-title;
 		margin: 0;
 	}
 	.proj-desc {
 		@include anim(all);
-		@extend .hide;
-		@extend .flush-width;
-		@extend .text-more;
-		font-weight: $font-weight-proj-desc;
-		font-size: $font-size-proj-desc;
-		line-height: $font-line-proj-desc;
+		@extend %hide;
+		@extend %flush-width;
+		@extend %text-more;
+		font-weight: $proj-card--fweight-desc;
+		font-size: $proj-card--fsize-desc;
+		line-height: $proj-card--flineh-desc;
 		background: $color-primary-dim;
 	}
 	.proj-title, .proj-desc {
-		padding-left: $proj-thumb-pad;
-		float: left;
+		padding-left: $proj-card--inset-pad;
 		color: $color-text-light;
 	}
 
 	.proj-terms {
-		// TODO: max width of 6 of 12
-		// TODO: flush to bottom
+		@include span($col -$proj-card--col-title no-gutters);
 		@include anim(opacity);
-		@extend .hide;
+		@extend %hide;
+		text-align: right;
 		float: right;
 		margin: 0;
-		padding-right: $proj-thumb-pad;
-		font-weight: $font-weight-proj-term;
-		font-size: $font-size-proj-term;
+		padding-right: $proj-card--inset-pad;
+		font-weight: $proj-card--fweight-term;
+		font-size: $proj-card--fsize-term;
 
 		li {
 			color: $color-text-muted;
 			list-style-type: none;
 			display: inline-block;
-			margin: 0 $proj-term-pad;
+			margin: 0 $proj-card--term-pad;
 		}
 	}
 }

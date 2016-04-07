@@ -2,7 +2,11 @@
  * Mixins and extensions to be used globally
  */
 
- .fake-underline {
+%container {
+	@include container;
+}
+
+%fake-underline {
 	content: '';
 	position: absolute;
 	left: 0;
@@ -13,30 +17,30 @@
 	margin-top: 5px;
 }
 
-.show {
+%show {
 	opacity: 1.0;
 }
 
-.hide {
+%hide {
 	opacity: 0;
 }
 
 // Sticks to the bottom of parent
-.sticky-bottom {
+%sticky-bottom {
 	position: absolute;
 	left: 0;
 	bottom: 0;
 }
 
 // Width of parent
-.flush-width {
+%flush-width {
 	margin: 0;
 	padding: 0;
 	width: 100%;
 }
 
 // Makes text truncate and show ...
-.text-more {
+%text-more {
 	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
@@ -51,6 +55,13 @@
 	transition: $property $duration $style;
 }
 
+// Vertically aligns anything
+@mixin vertical-align($position: relative) {
+  position: $position;
+  top: 50%;
+  @include transform(translateY(-50%));
+}
+
 // TODO: text-shadow prefixin
 
 // Box shadows prefixin
@@ -60,8 +71,10 @@
 	box-shadow: $x $y $blur 0px $color;
 }
 
-// TODO: prefixes
+// Prefixes transforms
 @mixin transform($val...) {
+	-webkit-transform: $val;
+	-ms-transform: $val;
 	transform: $val;
 }
 

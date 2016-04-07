@@ -1,13 +1,9 @@
 // Contains styles for navigation of app
 nav {
-	@include container;
+	@extend %container;
 	display: block;
-	height: $header-height - $inset - $inset;
+	height: $nav--header-height -$inset*2;
 	padding: $inset;
-
-	.wrapper {
-		@include span(12 of 12);
-	}
 
 	img {
 		float: left;
@@ -25,25 +21,25 @@ nav {
 				color: inherit;
 				position: relative;
 				text-decoration: none;
-				font-weight: $font-weight-nav;
-				font-size: $font-size-default;
+				font-weight: $nav--fweight-text;
+				font-size: $nav--fsize-text;
 
 				&:after {
 					@include anim(opacity);
-					@extend .fake-underline;
-					opacity: 0;
+					@extend %fake-underline;
+					@extend %hide;
 				}
 
 				&:hover {
 					color: $color-text-dark;
 					&:after {
-						opacity: 1.0;
+						@extend %show;
 					}
 				}
 				&.router-link-active {
 					color: $color-text-active;
 					&:after {
-						opacity: 1.0;
+						@extend %show;
 					}
 				}					
 			}
