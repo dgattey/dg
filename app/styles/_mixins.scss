@@ -21,18 +21,29 @@
 	opacity: 0;
 }
 
-.fill-parent {
+// Sticks to the bottom of parent
+.sticky-bottom {
+	position: absolute;
+	left: 0;
+	bottom: 0;
+}
+
+// Width of parent
+.flush-width {
 	margin: 0;
 	padding: 0;
-	display: block;
-	max-width: 100%;
-	height: auto;
+	width: 100%;
+}
+
+// Makes text truncate and show ...
+.text-more {
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 // Animates transitions
-@mixin anim($property) {
-	$style: ease-out;
-	$duration: 0.3s;
+@mixin anim($property, $duration: 0.2s, $style: ease-out) {
 	-webkit-transition: $property $duration $style;
 	-moz-transition: $property $duration $style;
 	-ms-transition: $property $duration $style;
@@ -41,7 +52,7 @@
 }
 
 // Box shadows prefixin
-@mixin box-shadow($x, $y, $blur, $color) {
+@mixin box-shadow($color, $x: 0, $y: 0, $blur: 0) {
 	-webkit-box-shadow: $x $y $blur 0px $color;
 	-moz-box-shadow: $x $y $blur 0px $color;
 	box-shadow: $x $y $blur 0px $color;

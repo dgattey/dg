@@ -40,9 +40,10 @@ export class ProjectsComponent implements OnInit {
 			this.projects = projects;
 
 			// Fake adding more
-			this.projects.push(projects[0])
-			this.projects.push(projects[1])
-			this.projects.push(projects[1])
+			for (var i = 0; i < 10; ++i) {
+				this.projects.push(projects[0])
+				this.projects.push(projects[1])
+			}
 			console.log('Loaded Projects!', this.projects);
 		});
 	}

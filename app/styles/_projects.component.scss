@@ -7,33 +7,21 @@ project-card {
 	@include anim(all);
 	display: block;
 	position: relative;
-	max-height: 500px; // TODO: fix better?
 	background: $color-primary-dim;
 
-	// Default on largest screen is 3 column grid of projects
-	@include span(1 of 3 inside no-gutters);
-	&:nth-child(3n+2) {
-		@include last; // TODO: needed? Check with real projects
-	}
+	// Num projects per row
+	@include span($columns/$proj-per-row inside no-gutters);
 
-	// Featured top two projects, rather than three
-	&:nth-child(1) {
-		@include span(1 of 2 inside no-gutters);
-	}
-	&:nth-child(2) {
-		@include span(1 of 2 last inside no-gutters);
-	}
-
-	// Hover changes
+	// Proj to top layer, shadowed, img & text moved up
 	&:hover {
-		@include box-shadow(0, 0, 6px, rgba(0,0,0,0.8));
-		z-index: 999;
+		z-index: $z-top;
 		img {
 			@include dim-image($bg-transparency);
-			transform: translateY(-25px);
+			@include box-shadow($proj-shadow-color, $blur: $proj-shadow-amt);
+			transform: scale(1.12);
 		}
 		.movement {
-			bottom: 15px;
+			bottom: $proj-hover-text;
 		}
 		ul, p {
 			@extend .show;
@@ -41,8 +29,10 @@ project-card {
 	}
 
 	img {
-		@include anim(all);
-		@extend .fill-parent;
+		@include anim(all, 0.15s);
+		@extend .flush-width;
+		display: block;
+		height: auto;
 	}
 
 	.details {
@@ -50,47 +40,43 @@ project-card {
 	}
 	.movement, .details {
 		@include anim(bottom)
-		position: absolute;
-		left: 0;
-		bottom: 0;
-		width: 100%;
+		@extend .sticky-bottom;
+		@extend .flush-width;
 	}
 
 	h2 {
-		@include span(6 of 12 no-gutters);
-		text-shadow: 0 1px 7px rgba(150, 150, 150, 1);
-		font-weight: 400;
+		@include span(6 no-gutters);
+		text-shadow: $proj-shadow-off $proj-shadow-off $proj-shadow-amt $proj-shadow-color;
+		font-weight: $font-weight-proj-title;
 	}
 	p {
 		@include anim(all);
 		@extend .hide;
-		background: $color_primary_dim;
-		margin: 0;
-		padding: 0;
-		width: 100%;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
+		@extend .flush-width;
+		@extend .text-more;
+		font-size: 0.9em;
+	}
+	h2, ul {
+		margin: $proj-thumb-pad 0;
 	}
 	h2, p {
-		padding-left: 10px;
-		color: $color-text-light;
+		padding-left: $proj-thumb-pad;
 		float: left;
+		color: $color-text-light;
 	}
 
 	ul {
-		@include span(6 of 12 no-gutters last);
+		@include span(6 no-gutters last);
 		@include anim(opacity);
 		@extend .hide;
 		float: right;
-		padding-right: 10px;
-		padding-top: 5px;
+		padding-right: $proj-thumb-pad;
 
 		li {
 			color: $color-text-muted;
 			list-style-type: none;
 			display: inline-block;
-			margin: 0 5px;
+			margin: 0 $proj-thumb-pad;
 			float: inherit;
 		}
 	}

@@ -17,6 +17,7 @@ $color-text-dark: $color-deep;
 $color-text-light: $color-bright;
 $color-text-muted: $color-muted;
 $color-text-active: $color-primary-dim;
+$color-shadow: $color-dim;
 
 /* 
  * Measurements and values
@@ -29,9 +30,15 @@ $intro-max-width: 600px;
 $intro-text-width: 430px;
 $intro-inset-thin: 2.5 * $inset;
 $intro-inset-wide: 2.5 * $inset;
+$proj-shadow-amt: 6px;
+$proj-shadow-off: 1px;
+$proj-hover-img: 30px;
+$proj-hover-text: 30px;
+$proj-thumb-pad: 10px;
 
 // Text measurements
 $font-weight-nav: 500;
+$font-weight-proj-title: 400;
 $font-weight-semibold: 600;
 $font-size-h1: 1.8em;
 $font-size-default: 1.1em;
@@ -39,14 +46,21 @@ $font-line-height: 1.5em;
 
 // Unitless config measurements
 $bg-transparency: 0.5;
+$shadow-transparency: 0.8;
+$proj-per-row: 3;
+$z-top: 999;
+
+// Computed properties
+$proj-shadow-color: transparentize($color-shadow, $shadow-transparency);
 
 /*
  * Third party config
  */
 
 /* Changing Susy default global settings */
+$columns: 12;
 $susy: (
-  columns: 12,
+  columns: $columns,
   // container: 1320px, // max-width
   global-box-sizing: border-box 
  );
