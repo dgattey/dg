@@ -51,6 +51,8 @@
 	transition: $property $duration $style;
 }
 
+// TODO: text-shadow prefixin
+
 // Box shadows prefixin
 @mixin box-shadow($color, $x: 0, $y: 0, $blur: 0) {
 	-webkit-box-shadow: $x $y $blur 0px $color;
@@ -58,7 +60,13 @@
 	box-shadow: $x $y $blur 0px $color;
 }
 
+// TODO: prefixes
+@mixin transform($val...) {
+	transform: $val;
+}
+
 // Filters an image
+// TODO: more prefixes
 @mixin dim-image($amt) {
 	-webkit-filter: brightness($amt);
 	filter: brightness($amt);

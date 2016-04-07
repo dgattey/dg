@@ -23,35 +23,43 @@ $color-shadow: $color-dim;
  * Measurements and values
  */
 
-// Basic pixel measurements
+ // General unitless measurements
+$bg-transparency: 0.5;
+$shadow-transparency: 0.8;
+$z-top: 999;
+
+// Intro component measurements
 $inset: 20px;
 $header-height: 100px;
 $intro-max-width: 600px;
 $intro-text-width: 430px;
 $intro-inset-thin: 2.5 * $inset;
 $intro-inset-wide: 2.5 * $inset;
+
+// Project card component measurements
+$proj-per-row: 3;
 $proj-shadow-amt: 6px;
 $proj-shadow-off: 1px;
+$proj-shadow-color: transparentize($color-shadow, $shadow-transparency);
 $proj-hover-img: 30px;
-$proj-hover-text: 30px;
-$proj-thumb-pad: 10px;
+$proj-hover-text: 2.2vw;
+$proj-hover-scale: 1.1;
+$proj-thumb-pad: 2vw;
+$proj-text-margin: 10px;
+$proj-term-pad: 4px;
+$font-weight-proj-title: 500;
+$font-weight-proj-desc: 400;
+$font-weight-proj-term: 600;
+$font-size-proj-desc: 0.95em;
+$font-size-proj-term: 0.8em;
+$font-line-proj-desc: $proj-hover-text;
 
-// Text measurements
+// Other font measurements
 $font-weight-nav: 500;
-$font-weight-proj-title: 400;
 $font-weight-semibold: 600;
 $font-size-h1: 1.8em;
 $font-size-default: 1.1em;
 $font-line-height: 1.5em;
-
-// Unitless config measurements
-$bg-transparency: 0.5;
-$shadow-transparency: 0.8;
-$proj-per-row: 3;
-$z-top: 999;
-
-// Computed properties
-$proj-shadow-color: transparentize($color-shadow, $shadow-transparency);
 
 /*
  * Third party config

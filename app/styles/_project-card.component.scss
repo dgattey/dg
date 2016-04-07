@@ -1,0 +1,85 @@
+project-card {
+	@include anim(all);
+	display: block;
+	position: relative;
+	background: $color-primary-dim;
+
+	// Num projects per row
+	@include span($columns/$proj-per-row inside no-gutters);
+
+	// Proj to top layer, shadowed, img & text moved up
+	&:hover {
+		@include box-shadow($proj-shadow-color, $blur: $proj-shadow-amt);
+		z-index: $z-top;
+		@include transform(scale($proj-hover-scale));
+		img {
+			@include dim-image($bg-transparency);
+		}
+		.proj-data-visible {
+			@include transform(translateY(-$proj-hover-text));
+		}
+		.proj-terms, .proj-desc {
+			@extend .show;
+		}
+	}
+
+	img {
+		@include anim(all);
+		@extend .flush-width;
+		display: block;
+		height: auto;
+	}
+
+	.proj-data-visible, .proj-data {
+		@include anim(all);
+		@extend .sticky-bottom;
+		@extend .flush-width;
+	}
+	.proj-data {
+		@include container;
+	}
+	.proj-data-visible {
+		margin: $proj-text-margin 0;
+	}
+
+	.proj-title {
+		@include span(6 no-gutters);
+		text-shadow: $proj-shadow-off $proj-shadow-off $proj-shadow-amt $proj-shadow-color;
+		font-weight: $font-weight-proj-title;
+		margin: 0;
+	}
+	.proj-desc {
+		@include anim(all);
+		@extend .hide;
+		@extend .flush-width;
+		@extend .text-more;
+		font-weight: $font-weight-proj-desc;
+		font-size: $font-size-proj-desc;
+		line-height: $font-line-proj-desc;
+		background: $color-primary-dim;
+	}
+	.proj-title, .proj-desc {
+		padding-left: $proj-thumb-pad;
+		float: left;
+		color: $color-text-light;
+	}
+
+	.proj-terms {
+		// TODO: max width of 6 of 12
+		// TODO: flush to bottom
+		@include anim(opacity);
+		@extend .hide;
+		float: right;
+		margin: 0;
+		padding-right: $proj-thumb-pad;
+		font-weight: $font-weight-proj-term;
+		font-size: $font-size-proj-term;
+
+		li {
+			color: $color-text-muted;
+			list-style-type: none;
+			display: inline-block;
+			margin: 0 $proj-term-pad;
+		}
+	}
+}
