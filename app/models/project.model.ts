@@ -51,12 +51,12 @@ export class Project {
 		if (!this.hasMedia()) {
 			return null;
 		}
-		return this.link('https://api.w.org/attachment');
+		return this.link('wp:attachment');
 	}
 
 	// Gives link to get all categories
 	termsLink(): string {
-		return this.link('https://api.w.org/term');
+		return this.link('wp:term');
 	}
 
 	// Gives link to external site
