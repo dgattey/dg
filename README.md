@@ -1,3 +1,4 @@
+[![Code Climate](https://codeclimate.com/github/dgattey/dg/badges/gpa.svg)](https://codeclimate.com/github/dgattey/dg) [![Issue Count](https://codeclimate.com/github/dgattey/dg/badges/issue_count.svg)](https://codeclimate.com/github/dgattey/dg)
 # Dylan Gattey
 
 I'm redesigning my site to use [Angular 2](https://angular.io/) and the [Wordpress JSON API](http://v2.wp-api.org/) rather than a slow, non-customizable Wordpress theme. Currently very much a work in progress, but I'm having fun and teaching myself [Typescript](https://www.typescriptlang.org/) in the process! It's meant to be a simpler version of the site with much of the same content, but updated for 2k16 instead of 2013 (when I last did anything significant design-wise on my site). Cleaner, sparser layout with larger, clearer font + more professional images, an updated logo, and more of my own voice in the writing.
