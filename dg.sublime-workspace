@@ -1,0 +1,1024 @@
+{
+	"auto_complete":
+	{
+		"selected_items":
+		[
+			[
+				"text",
+				"text-size"
+			],
+			[
+				"conten",
+				"content-size"
+			],
+			[
+				"conte",
+				"content-size"
+			],
+			[
+				"for",
+				"for	for (…) {…}"
+			],
+			[
+				"proj-sh",
+				"proj-shadow-color"
+			],
+			[
+				"bo",
+				"box-shadow"
+			],
+			[
+				"list",
+				"list:n	list-style-type:none"
+			],
+			[
+				"pro",
+				"projects	parameter"
+			],
+			[
+				"includ",
+				"include	@include"
+			],
+			[
+				"intro",
+				"intro-inset-top"
+			],
+			[
+				"intr",
+				"intro-text-width"
+			],
+			[
+				"sy",
+				"styleUrls	property"
+			],
+			[
+				"trans",
+				"transition"
+			],
+			[
+				"mixin",
+				"mixin	@mixin"
+			],
+			[
+				"mix",
+				"mixin	@mixin"
+			],
+			[
+				"incl",
+				"include	@include"
+			],
+			[
+				"include",
+				"include	@include"
+			],
+			[
+				"he",
+				"header-inset"
+			],
+			[
+				"color-prima",
+				"color-primary-dim"
+			],
+			[
+				"Proj",
+				"ProjectComponent	class"
+			],
+			[
+				"pr",
+				"projects	property"
+			],
+			[
+				"t",
+				"throw	Throw Exception"
+			],
+			[
+				"_",
+				"_routes	property"
+			],
+			[
+				"Ob",
+				"Observable	alias"
+			],
+			[
+				"p",
+				"push	method"
+			],
+			[
+				"const",
+				"constructor	keyword"
+			],
+			[
+				"c",
+				"concat	method"
+			],
+			[
+				"_rout",
+				"_routesReady	property"
+			],
+			[
+				"get",
+				"getRoutes	method"
+			],
+			[
+				"ge",
+				"getRoutes	method"
+			],
+			[
+				"_rou",
+				"_routes	property"
+			],
+			[
+				"_r",
+				"_routesReady	property"
+			],
+			[
+				"print",
+				"printable"
+			],
+			[
+				"cur",
+				"currTag"
+			],
+			[
+				"currM",
+				"currMu"
+			],
+			[
+				"cu",
+				"curr"
+			],
+			[
+				"best",
+				"bestMu"
+			],
+			[
+				"curr",
+				"currMu"
+			],
+			[
+				"St",
+				"Stop"
+			],
+			[
+				"prev",
+				"previousMus"
+			],
+			[
+				"st",
+				"string"
+			],
+			[
+				"preV",
+				"prevMu"
+			],
+			[
+				"pre",
+				"previousMus"
+			],
+			[
+				"cou",
+				"countsYX"
+			],
+			[
+				"cal",
+				"calculateSigmas"
+			],
+			[
+				"sig",
+				"sigmas"
+			],
+			[
+				"calu",
+				"calculateTaus"
+			],
+			[
+				"count",
+				"countsYX"
+			],
+			[
+				"Co",
+				"CorpusA"
+			],
+			[
+				"incre",
+				"incrementFrequencies"
+			],
+			[
+				"corp",
+				"corpusA"
+			],
+			[
+				"freque",
+				"frequencies"
+			],
+			[
+				"Word",
+				"WordPairMap"
+			],
+			[
+				"cor",
+				"corpusB"
+			],
+			[
+				"nex",
+				"nextIdx"
+			],
+			[
+				"ne",
+				"nextIdx"
+			],
+			[
+				"Fi",
+				"FingerTable"
+			],
+			[
+				"finge",
+				"fingerMath"
+			],
+			[
+				"Fin",
+				"FingerEntry"
+			],
+			[
+				"Fing",
+				"FingerEntry"
+			],
+			[
+				"R",
+				"RLock"
+			],
+			[
+				"Remote",
+				"RemoteSelf"
+			],
+			[
+				"clien",
+				"clientErrors"
+			],
+			[
+				"send",
+				"SendMsg"
+			],
+			[
+				"E",
+				"ERROR"
+			],
+			[
+				"Shu",
+				"ShutdownStatus"
+			],
+			[
+				"Wh",
+				"WhatsUpMsg"
+			],
+			[
+				"activeObj",
+				"getActiveObject"
+			],
+			[
+				"delete",
+				"delete(${0:Object})	Object"
+			],
+			[
+				"color_gr",
+				"color_gray_med"
+			],
+			[
+				"u",
+				"ul	Tag"
+			],
+			[
+				"value",
+				"value	Angular.js"
+			],
+			[
+				"color_gra",
+				"color_gray_dark"
+			],
+			[
+				"parentN",
+				"parentNode()	TreeWalker"
+			],
+			[
+				"hover",
+				"hovering_buttons"
+			],
+			[
+				"color_g",
+				"color_gray_dark"
+			],
+			[
+				"color_",
+				"color_gray_med"
+			],
+			[
+				"color_gray",
+				"color_gray"
+			],
+			[
+				"proto",
+				"prototype"
+			],
+			[
+				"gra",
+				"color_gray_light"
+			],
+			[
+				"margin",
+				"margin-bottom"
+			],
+			[
+				"color",
+				"color_gray_dark"
+			],
+			[
+				"font-",
+				"font-size"
+			],
+			[
+				"bor",
+				"border"
+			],
+			[
+				"border",
+				"border-radius"
+			],
+			[
+				"col",
+				"color_gray_dark"
+			],
+			[
+				"font",
+				"font_body"
+			],
+			[
+				"colo",
+				"color_gray"
+			],
+			[
+				"font-s",
+				"font-size"
+			],
+			[
+				"color_bg_gray",
+				"color_bg_gray_light"
+			],
+			[
+				"margi",
+				"margin-bottom"
+			],
+			[
+				"footer",
+				"footer_height"
+			],
+			[
+				"foot",
+				"footer_height"
+			],
+			[
+				"start",
+				"startWeekOffset"
+			],
+			[
+				"week",
+				"weekOffset"
+			],
+			[
+				"calcula",
+				"calculateBlockStyle"
+			],
+			[
+				"sche",
+				"schedLocationMain"
+			],
+			[
+				"schedule",
+				"scheduleLoader"
+			],
+			[
+				"inse",
+				"inset_below_padding"
+			],
+			[
+				"ins",
+				"inset_below_padding"
+			],
+			[
+				"card",
+				"card_box-shadow"
+			],
+			[
+				"i",
+				"inset_above"
+			],
+			[
+				"grayL",
+				"grayLight_trans"
+			],
+			[
+				"marg",
+				"margin-bottom"
+			],
+			[
+				"body",
+				"body_tc"
+			],
+			[
+				"tit",
+				"title_tc"
+			],
+			[
+				"tran",
+				"transition"
+			],
+			[
+				"na",
+				"navbar"
+			],
+			[
+				"media",
+				"media portrait	portrait"
+			],
+			[
+				"med",
+				"media query iphone 4	iphone 4"
+			],
+			[
+				"fo",
+				"for	for (…) {…} (Improved Native For-Loop)"
+			],
+			[
+				"gray",
+				"grayLight"
+			],
+			[
+				"gre",
+				"green_light1"
+			],
+			[
+				"gr",
+				"green_dark"
+			],
+			[
+				"font-st",
+				"font-style"
+			],
+			[
+				"fonst",
+				"fontstack_header"
+			],
+			[
+				"head",
+				"header_height"
+			],
+			[
+				"max",
+				"max-height"
+			],
+			[
+				"header_",
+				"header_inset"
+			],
+			[
+				"backg",
+				"background"
+			],
+			[
+				"abs",
+				"absolute"
+			],
+			[
+				"li-st",
+				"list-style"
+			],
+			[
+				"timeo",
+				"angular: $timeout"
+			],
+			[
+				"post",
+				"postQueryOptions"
+			],
+			[
+				"deta",
+				"detailState"
+			],
+			[
+				"tplNam",
+				"tplNames"
+			],
+			[
+				"tplN",
+				"tplNames"
+			],
+			[
+				"home",
+				"homeDetail2"
+			]
+		]
+	},
+	"buffers":
+	[
+	],
+	"build_system": "",
+	"command_palette":
+	{
+		"height": 400.0,
+		"selected_items":
+		[
+			[
+				"instal",
+				"Package Control: Install Package"
+			],
+			[
+				"insta",
+				"Package Control: Install Package"
+			],
+			[
+				"package",
+				"Package Control: Remove Package"
+			],
+			[
+				"sass",
+				"SassBeautify"
+			],
+			[
+				"install",
+				"Package Control: Install Package"
+			],
+			[
+				"inst",
+				"Package Control: Install Package"
+			],
+			[
+				"enab",
+				"Package Control: Enable Package"
+			],
+			[
+				"disab",
+				"Package Control: Disable Package"
+			],
+			[
+				"disable",
+				"Package Control: Disable Package"
+			],
+			[
+				"dis",
+				"Package Control: Disable Package"
+			],
+			[
+				"pack",
+				"Package Control: Disable Package"
+			],
+			[
+				"ins",
+				"Package Control: Install Package"
+			],
+			[
+				"pac",
+				"Package Control: Install Package"
+			],
+			[
+				"remove",
+				"Package Control: Remove Package"
+			],
+			[
+				"mark",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"ma",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"markdown",
+				"Markdown Preview: Preview in Browser"
+			],
+			[
+				"packa",
+				"Package Control: List Packages"
+			],
+			[
+				"pretty",
+				"HTMLPrettify"
+			],
+			[
+				"package up",
+				"Package Control: Upgrade Package"
+			]
+		],
+		"width": 437.0
+	},
+	"console":
+	{
+		"height": 0.0
+	},
+	"distraction_free":
+	{
+		"menu_visible": true,
+		"show_minimap": false,
+		"show_open_files": false,
+		"show_tabs": false,
+		"side_bar_visible": false,
+		"status_bar_visible": false
+	},
+	"file_history":
+	[
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/styles/_projects.component.scss",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/styles/_project-card.component.scss",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/styles/_config.scss",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/components/projects.component.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/static/projects.component.html",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/styles/_nav.component.scss",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/static/intro.component.html",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/styles/app.scss",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/styles/_intro.component.scss",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/styles/_mixins.scss",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/static/nav.component.html",
+		"/Users/dgattey/Dropbox/dev/projects/dg/index.html",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/static/projectCard.component.html",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/components/project-card.component.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/components/intro.component.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/components/app.component.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/components/dummy.component.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/models/category.model.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/models/media.model.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/models/project.model.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/services/wp.service.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/package.json",
+		"/Users/dgattey/Dropbox/dev/projects/dg/.gitignore",
+		"/Users/dgattey/Dropbox/dev/projects/dg/dg.sublime-project",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/styles/projects.component.css",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/static/project.component.html",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/static/dummy.component.html",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/components/characters.component.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/README.md",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/data/project.model.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/main.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/services/character.service.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/styles/characters.component.css",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/components/dashboard.component.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/npm-debug.log",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/dashboard.component.html",
+		"/Users/dgattey/Dropbox/dev/projects/dg/dg.sublime-workspace",
+		"/Users/dgattey/Dropbox/dev/projects/dg/tsconfig.json",
+		"/Users/dgattey/Dropbox/dev/projects/dg/dist/main.js",
+		"/Users/dgattey/Dropbox/dev/projects/dg/styles.css",
+		"/Users/dgattey/Dropbox/dev/projects/dg/gulpfile.js",
+		"/Users/dgattey/Dropbox/dev/projects/dg/typings.json",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/app.component.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/mock-heroes.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/app/boot.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/typings/main.d.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/LICENSE",
+		"/Users/dgattey/Dropbox/dev/projects/dg/src/main.ts",
+		"/Users/dgattey/Dropbox/dev/projects/dg/src/index.html",
+		"/Users/dgattey/Dropbox/dev/projects/dg/src/component",
+		"/Users/dgattey/Dropbox/College/current/cs146/pos/data/wsj22.txt",
+		"/Users/dgattey/Dropbox/College/current/cs146/pos/output.txt",
+		"/Users/dgattey/Dropbox/College/current/cs146/pos/pos/data.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/pos/output2.txt",
+		"/Users/dgattey/Dropbox/College/current/cs146/pos/better_tag",
+		"/Users/dgattey/Dropbox/College/current/cs146/pos/tag",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/em/wordpair.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/pos/data/wsj2-21.txt",
+		"/Users/dgattey/Dropbox/College/current/cs146/pos/score",
+		"/Users/dgattey/Dropbox/College/current/cs146/pos/util/files.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/util/files.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/pos/util/scans.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/noisychannel",
+		"/Users/dgattey/Dropbox/College/current/cs146/hw3/hw3-draft",
+		"/Users/dgattey/Dropbox/College/current/cs146/hw3/hw3.tex",
+		"/Users/dgattey/Dropbox/College/current/cs138/hw2/hw2.tex",
+		"/Users/dgattey/Downloads/SwiftString-master/README.md",
+		"/Users/dgattey/Library/Application Support/com.bohemiancoding.sketch3/.license",
+		"/private/etc/hosts",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/util/scans.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/mt.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/langmod/unigramlm.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/langmod/bigramlm.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/langmod/lm.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/langmod/prob.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/langmod/langmod.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/verydumb",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/decode/dumb.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/em/em.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/mt/README",
+		"/Users/dgattey/Dropbox/College/current/cs146/langmod/util/util.go",
+		"/Users/dgattey/Dropbox/College/current/cs146/langmod/util/files.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/s16-dgattey-avanhatt/chord/chord/kv_store.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/s16-dgattey-avanhatt/chord/chord/finger.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/s16-dgattey-avanhatt/chord/chord/node_rpc_impl.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/s16-dgattey-avanhatt/chord/chord/node_rpc_api.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/s16-dgattey-avanhatt/chord/chord/chord.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/s16-dgattey-avanhatt/chord/chord/node_local_impl.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/s16-dgattey-avanhatt/chord/chord/util.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/chord/chord/chord.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/chord/chord/chord/node_rpc_api.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/chord/chord/chord/node_local_impl.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/chord/chord/chord/node_rpc_impl.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/chord/chord/chord/chord.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/chord/chord/chord/util.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/chord/chord/chord/kv_store.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/chord/chord/cli",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/chord/chord/chord/finger.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/chord/chord/01intro.pdf",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/chord/chord/chord/logging.go",
+		"/Users/dgattey/Dropbox/College/current/dist-systems/chord/chord/cli.go",
+		"/Users/dgattey/Dropbox/College/current/comp-lang/counts/counts.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/server/server_test.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/client/client.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/README.md",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/server/server.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/whatsup/util.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/whatsup/proto.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/server/err.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/client/err.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/chat.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/errors/serverErr.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/errors/clientErr.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/errors/clientError.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/whatsup/client.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/whatsup/listener_test.go",
+		"/Users/dgattey/Dropbox/College/current/go/src/whatsup/whatsup/listener.go",
+		"/Users/dgattey/Dropbox/College/current/go/bin/whatsup",
+		"/Users/dgattey/Dropbox/College/go/src/whatsup/client/client.go",
+		"/Users/dgattey/Dropbox/College/go/src/whatsup/chat.go",
+		"/Users/dgattey/Dropbox/College/go/src/whatsup/whatsup/listener.go",
+		"/Users/dgattey/Dropbox/College/go/src/whatsup/whatsup/util.go",
+		"/Users/dgattey/Dropbox/College/go/src/whatsup/server/server.go",
+		"/Users/dgattey/Library/Application Support/Sublime Text 2/Packages/User/Preferences.sublime-settings",
+		"/Users/dgattey/Dropbox/dev/projects/consult-gui/src/app/app.js",
+		"/Users/dgattey/Dropbox/dev/projects/dgattey-labs/scss/main.scss",
+		"/Users/dgattey/Dropbox/dev/projects/dgattey-labs/main.css",
+		"/Users/dgattey/Dropbox/dev/projects/homebase/build.config.js"
+	],
+	"find":
+	{
+		"height": 32.0
+	},
+	"find_in_files":
+	{
+		"height": 104.0,
+		"where_history":
+		[
+			"*",
+			"*.go",
+			"/Users/dgattey/Dropbox/dev/projects/advocate/dev/src/*",
+			"/Users/dgattey/Dropbox/dev/projects/advocate/dev/src/",
+			"<open folders>",
+			"/Users/dgattey/Dropbox/dev/projects/advocate/dev/src/",
+			"/Users/dgattey/Dropbox/dev/projects/advocate/dev/src"
+		]
+	},
+	"find_state":
+	{
+		"case_sensitive": false,
+		"find_history":
+		[
+			"size",
+			"1px",
+			"ease-out",
+			"0.3s",
+			"height",
+			"margin: 0;\n		padding: 0;",
+			"margin: 0;",
+			"10px",
+			"2px 2px",
+			"0 0",
+			"rgba(0,0,0,0.5);",
+			"2px 2px",
+			"styleUrl",
+			"//st",
+			"header-inset",
+			"proj",
+			"projs",
+			"Project",
+			"rawProjects",
+			"data",
+			"transform",
+			"data",
+			"{}",
+			": ",
+			"data[i]",
+			"possibleRoutes",
+			"path",
+			"checkRoute",
+			"routes",
+			"pRoute",
+			"tsd",
+			"tscConfig",
+			"content",
+			"sentence",
+			"*UNK*",
+			"UNK*",
+			"UNK",
+			"START",
+			" 1$",
+			"1$",
+			" 1$",
+			" 1",
+			"1",
+			" 1",
+			"1.0",
+			"1 ",
+			"1\\n",
+			"1",
+			"Pair",
+			"Counts",
+			"counts",
+			"calculateTaus",
+			"calculateSigmas",
+			"calculateTaus",
+			"e",
+			"UNK",
+			"*UNK",
+			"UNK*",
+			"UNK",
+			"pos",
+			"word",
+			"content",
+			"3. ",
+			"\n2. ",
+			"1. ",
+			". ",
+			"model",
+			"lm",
+			"fmt.P",
+			"fmt",
+			"foreign",
+			"wpm",
+			"WordPairMap",
+			"wpm",
+			"WordPairMap",
+			"fmt",
+			"val",
+			"amt",
+			"existing",
+			"foreignCorpus",
+			"nativeCorpus",
+			"incrementFrequencies",
+			"exists",
+			"val",
+			"Freq",
+			"pair",
+			"model.Freq.increment",
+			"model.Taus.get",
+			"firstIterationGet",
+			"iteration",
+			"pair",
+			"Freq",
+			"freq",
+			"Freq",
+			"taus",
+			"doEStep",
+			"frequencies",
+			"WordPair{",
+			"WordPair",
+			"corpusB",
+			"corpusA",
+			"string",
+			"sentence2",
+			"sentence1",
+			"scanner2",
+			"scanner1",
+			"I",
+			"i",
+			"}\n",
+			"find_pred",
+			"_",
+			"BYTE",
+			"BYTES\n",
+			"TODO",
+			"initfinger",
+			"init",
+			"TODO",
+			"n_",
+			"_{",
+			"M",
+			"TODO",
+			"Get",
+			"todo",
+			"a",
+			"TODO",
+			"notify_rpc",
+			"notifyReq",
+			"notifyRec"
+		],
+		"highlight": false,
+		"in_selection": false,
+		"preserve_case": false,
+		"regex": false,
+		"replace_history":
+		[
+			"B_1",
+			"$color_muted",
+			"$color_primary",
+			"'",
+			"unhighlightHour",
+			"highlightHour",
+			"\"",
+			"'",
+			"color_hover",
+			"color_text_hover",
+			"color_text_mute",
+			"color_text",
+			"color_text_dim",
+			"color_text_light",
+			"color_accent",
+			"color_bg_light",
+			"color_bg"
+		],
+		"reverse": false,
+		"show_context": true,
+		"use_buffer2": true,
+		"whole_word": false,
+		"wrap": true
+	},
+	"groups":
+	[
+		{
+			"sheets":
+			[
+			]
+		},
+		{
+			"sheets":
+			[
+			]
+		}
+	],
+	"incremental_find":
+	{
+		"height": 0.0
+	},
+	"input":
+	{
+		"height": 29.0
+	},
+	"layout":
+	{
+		"cells":
+		[
+			[
+				0,
+				0,
+				1,
+				1
+			],
+			[
+				1,
+				0,
+				2,
+				1
+			]
+		],
+		"cols":
+		[
+			0.0,
+			0.443218846798,
+			1.0
+		],
+		"rows":
+		[
+			0.0,
+			1.0
+		]
+	},
+	"menu_visible": true,
+	"output.doc":
+	{
+		"height": 0.0
+	},
+	"output.markdown":
+	{
+		"height": 98.0
+	},
+	"replace":
+	{
+		"height": 66.0
+	},
+	"save_all_on_build": true,
+	"select_file":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"select_project":
+	{
+		"height": 0.0,
+		"selected_items":
+		[
+		],
+		"width": 0.0
+	},
+	"show_minimap": false,
+	"show_open_files": false,
+	"show_tabs": true,
+	"side_bar_visible": true,
+	"side_bar_width": 152.0,
+	"status_bar_visible": true
+}

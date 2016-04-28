@@ -1,38 +1,23 @@
-<!DOCTYPE html>
-<html>
+---
+layout: default
+---
 
-<head>
-  <title>Dylan Gattey</title>
+<div class="home">
 
-  <base href="/">
+  <h1 class="page-heading">Posts</h1>
 
-  <title>Dylan Gattey</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <ul class="post-list">
+    {% for post in site.posts %}
+      <li>
+        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
 
-  <link rel="stylesheet" href="app/styles/app.css">
+        <h2>
+          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+        </h2>
+      </li>
+    {% endfor %}
+  </ul>
 
-  <!-- 1. Load libraries -->
-  <!-- IE required polyfills, in this exact order -->
-  <script src="node_modules/es6-shim/es6-shim.min.js"></script>
-  <script src="node_modules/systemjs/dist/system-polyfills.js"></script>
-  <script src="node_modules/angular2/es6/dev/src/testing/shims_for_IE.js"></script>
+  <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
 
-  <script src="node_modules/angular2/bundles/angular2-polyfills.js"></script>
-  <script src="node_modules/systemjs/dist/system.src.js"></script>
-  <script src="node_modules/rxjs/bundles/Rx.js"></script>
-  <script src="node_modules/angular2/bundles/angular2.dev.js"></script>
-  <script src="node_modules/angular2/bundles/router.dev.js"></script>
-  <script src="node_modules/angular2/bundles/http.dev.js"></script>
-
-  <script>
-    System.config({packages: {app: {format: 'register',defaultExtension: 'js'}}});
-      System.import('app/main')
-            .then(null, console.error.bind(console));
-  </script>
-</head>
-
-<body>
-  <dg-app>Loading...</dg-app>
-</body>
-
-</html>
+</div>

@@ -5,17 +5,9 @@ project-card {
 	background: $color-primary-dim;
 	margin-bottom: gutter();
 
-	// Features 3 projects at top
-	&:nth-child(1), &:nth-child(2) {
-		@include span($col/$proj-card--per-row-feature nest);
-	}
-	&:nth-child(3) {
-		@include span($col/$proj-card--per-row-feature nest last);
-	}
-
 	// Num projects per row
 	@include span($col/$proj-card--per-row nest);
-	&:nth-child(#{$proj-card--per-row}n+#{$proj-card--per-row-feature+1}) {
+	&:nth-child(#{$proj-card--per-row}n) {
 		@include span($col/$proj-card--per-row nest last);
 	}
 
