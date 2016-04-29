@@ -1,0 +1,104 @@
+/*
+ * Colors for app
+ */
+
+// Raw color values
+$color-dim: #000000;
+$color-deep: #615853; //in Sketch: #6C6A69???;
+$color-muted: #C0C0C0;
+$color-bright: #F5F5F5;
+
+$color-primary-dim: #18B58F;
+$color-primary-bright: #1CD1A5;
+
+// Applied color values
+$color-bg: $color-bright;
+$color-text-dark: $color-deep;
+$color-text-light: $color-bright;
+$color-text-muted: $color-muted;
+$color-text-active: $color-primary-dim;
+
+/* 
+ * Measurements and values
+ */
+
+ // General unitless measurements
+$col: 18;
+
+// TODO: refactor
+$bg-transparency: 0.5;
+$z-top: 999;
+$inset: 20px;
+
+// Shared app measurements
+$app--fweight-h1: 600;
+$app--fsize-h1: 2.5em;
+$app--fsize-p: 1.1em;
+$app--flineh-p: 1.5em;
+
+// Nav component measurements
+$nav--header-height: 100px;
+$nav--fweight-text: 500;
+$nav--fsize-text: 1.1em;
+
+// Intro component measurements
+$intro--inset-thin: 2.5 * $inset;
+$intro--inset-wide: 2.5 * $inset;
+$intro--col-content: 10;
+$intro--col-off: ($col - $intro--col-content)/2;
+$intro--col-text: 13;
+
+// Project card component measurements
+$proj-card--per-row: 4;
+$proj-card--col-title: 13;
+$proj-card--shadow-amt: 6px;
+$proj-card--shadow-off: 1px;
+$proj-card--shadow-color: transparentize($color-dim, 0.8);
+$proj-card--hover-img: 30px; // TODO: rename
+$proj-card--hover-text: 2.2vw; // TODO: rename
+$proj-card--hover-scale: 1.05;
+$proj-card--inset-pad: 2vw; // TODO: rename
+$proj-card--text-margin: 10px; // TODO: rename
+$proj-card--term-pad: 4px;
+$proj-card--fweight-title: 500;
+$proj-card--fweight-desc: 400;
+$proj-card--fweight-term: 600;
+$proj-card--fsize-desc: 0.95em;
+$proj-card--fsize-term: 0.8em;
+$proj-card--flineh-desc: $proj-card--hover-text;
+
+// TODO: Figure out what of this I need:
+// Our variables
+$base-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+$base-font-size:   16px;
+$base-font-weight: 400;
+$small-font-size:  $base-font-size * 0.875;
+$base-line-height: 1.5;
+
+$spacing-unit:     30px;
+
+$text-color:       #111;
+$background-color: #fdfdfd;
+$brand-color:      #2a7ae2;
+
+$grey-color:       #828282;
+$grey-color-light: lighten($grey-color, 40%);
+$grey-color-dark:  darken($grey-color, 25%);
+
+// Width of the content area
+$content-width:    800px;
+
+$on-palm:          600px;
+$on-laptop:        800px;
+////////////////////////////////
+
+/*
+ * Third party config
+ */
+
+/* Changing Susy default global settings */
+$susy: (
+  columns: $col,
+  container: 1280px, // max-width
+  global-box-sizing: border-box
+);

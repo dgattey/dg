@@ -3,51 +3,42 @@
 ---
 @charset "utf-8";
 
+// Import our config, susy, normalize
+@import 'config';
+// TODO: import susy and normalize module
+// @import '../../node_modules/node-normalize-scss/normalize';
+// @import '../../node_modules/susy/sass/susy';
+@import 'mixins';
 
+// For Susy, border box sizing
+// TODO: @include border-box-sizing;
 
-// Our variables
-$base-font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-$base-font-size:   16px;
-$base-font-weight: 400;
-$small-font-size:  $base-font-size * 0.875;
-$base-line-height: 1.5;
-
-$spacing-unit:     30px;
-
-$text-color:       #111;
-$background-color: #fdfdfd;
-$brand-color:      #2a7ae2;
-
-$grey-color:       #828282;
-$grey-color-light: lighten($grey-color, 40%);
-$grey-color-dark:  darken($grey-color, 25%);
-
-// Width of the content area
-$content-width:    800px;
-
-$on-palm:          600px;
-$on-laptop:        800px;
-
-
-
-// Use media queries like this:
-// @include media-query($on-palm) {
-//     .wrapper {
-//         padding-right: $spacing-unit / 2;
-//         padding-left: $spacing-unit / 2;
-//     }
-// }
-@mixin media-query($device) {
-    @media screen and (max-width: $device) {
-        @content;
-    }
+html, body {
+	background: $color-bg;
 }
-
-
+p, h1, h2, h3, h4, h5, h6 {
+	font-family: 'Whitney HTF'; // TODO: fix to be real!
+	color: $color-text-dark;
+}
+h1 {
+	font-weight: $app--fweight-h1;
+	font-size: $app--fsize-h1;
+}
+p {
+	font-size: $app--fsize-p;
+	line-height: $app--flineh-p;
+}
 
 // Import partials from `sass_dir` (defaults to `_sass`)
 @import
-        "base",
-        "layout",
-        "syntax-highlighting"
+	// TODO: get rid of these imports
+        'base',
+        'layout',
+        'syntax-highlighting',
+
+        // Components
+        'intro',
+        'nav',
+        'project-card',
+        'projects'
 ;

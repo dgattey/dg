@@ -1,0 +1,88 @@
+.proj-card {
+	@include anim(all);
+	display: block;
+	position: relative;
+	background: $color-primary-dim;
+	margin-bottom: gutter();
+
+	// Num projects per row
+	// TODO:
+	// @include span($col/$proj-card--per-row nest);
+	&:nth-child(#{$proj-card--per-row}n) {
+		// @include span($col/$proj-card--per-row nest last);
+	}
+
+	// Proj to top layer, shadowed, img & text moved up
+	&:hover {
+		@include box-shadow($proj-card--shadow-color, $blur: $proj-card--shadow-amt);
+		z-index: $z-top;
+		@include transform(scale($proj-card--hover-scale));
+		img {
+			@include dim-image($bg-transparency);
+		}
+		.proj-data-visible {
+			@include transform(translateY(-$proj-card--hover-text));
+		}
+		.proj-terms, .proj-desc {
+			@extend %show;
+		}
+	}
+
+	img {
+		@include anim(all);
+		@extend %flush-width;
+		display: block;
+		height: auto;
+	}
+
+	.proj-data-visible, .proj-data {
+		@include anim(all);
+		@extend %sticky-bottom;
+		@extend %flush-width;
+	}
+	.proj-data-visible {
+		margin: $proj-card--text-margin 0;
+	}
+
+	.proj-title {
+		// TODO
+		// @include span($proj-card--col-title no-gutters);
+		text-shadow: $proj-card--shadow-off $proj-card--shadow-off $proj-card--shadow-amt $proj-card--shadow-color;
+		font-weight: $proj-card--fweight-title;
+		margin: 0;
+	}
+	.proj-desc {
+		@include anim(all);
+		@extend %hide;
+		@extend %flush-width;
+		@extend %text-more;
+		font-weight: $proj-card--fweight-desc;
+		font-size: $proj-card--fsize-desc;
+		line-height: $proj-card--flineh-desc;
+		background: $color-primary-dim;
+	}
+	.proj-title, .proj-desc {
+		padding-left: $proj-card--inset-pad;
+		color: $color-text-light;
+	}
+
+	.proj-terms {
+		// TODO:
+		// @include span($col -$proj-card--col-title no-gutters);
+		@include anim(opacity);
+		@extend %hide;
+		text-align: right;
+		float: right;
+		margin: 0;
+		padding-right: $proj-card--inset-pad;
+		font-weight: $proj-card--fweight-term;
+		font-size: $proj-card--fsize-term;
+
+		li {
+			color: $color-text-muted;
+			list-style-type: none;
+			display: inline-block;
+			margin: 0 $proj-card--term-pad;
+		}
+	}
+}
