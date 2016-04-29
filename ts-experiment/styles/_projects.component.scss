@@ -1,8 +1,0 @@
-/* Styles targeting the project grid */
-projects {
-	@include span($col)
-
-	.proj-grid {
-		@include container;
-	}
-}

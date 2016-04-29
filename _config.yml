@@ -24,3 +24,4 @@ markdown: kramdown
 source: dg
 destination: build
 incremental: true
+markdown: kramdownm
