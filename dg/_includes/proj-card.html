@@ -1,20 +1,22 @@
-<div class="proj-card">
-  <img src="/img/{{post.thumb)}}">
+<a href="{{post.url}}">
+  <div class="proj-card">
+    <img src="/img/{{post.thumb)}}">
 
-  <!-- Text overlay on the images -->
-  <div class="proj-data">
+    <!-- Text overlay on the images -->
+    <div class="proj-data">
 
-    <!-- The section that moves up -->
-    <div class="proj-data-visible">
-      <h2 class="proj-title">{{post.title}}</h2>
-      <ul class="proj-terms">
-        {% for tag in post.tags %}
-        <li><a href="/projects/{{ tag }}">#{{ tag }}</a></li>
-        {% endfor %}
-      </ul>
+      <!-- The section that moves up -->
+      <div class="proj-data-visible">
+        <h2 class="proj-title">{{post.title}}</h2>
+        <ul class="proj-terms">
+          {% for tag in post.tags %}
+          <li><a href="/projects/{{ tag }}">#{{ tag }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Excerpt description at bottom -->
+      <p class="proj-desc">{{ post.desc }}</p>
     </div>
-
-    <!-- Excerpt description at bottom -->
-    <p class="proj-desc">{{ post.desc }}</p>
   </div>
-</div>
+</a>

@@ -8,16 +8,19 @@
 # Site settings
 title: Dylan Gattey
 email: dylan.gattey@gmail.com
-description: > # this means to ignore newlines until "baseurl:"
+description: >
     The portfolio site of a coder/designer based out of San Francisco.
     I make things look nice. I also write words on screens so you 
     can use that hunk of metal in your pocket. Current property of 
     Brown University. When not coding or designing, I run so I can cook 
     way too much good food.
-baseurl: "" # the subpath of your site, e.g. /blog
-url: "https://dylangattey.com" # the base hostname & protocol for your site
 twitter_username: dgattey
 github_username:  dgattey
+
+# Site config
+url: "https://dylangattey.com" # the base hostname & protocol for your site
+permalink: /projects/:year/:title/
+baseurl: ""
 
 # Build settings
 markdown: kramdown

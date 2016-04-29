@@ -5,8 +5,8 @@
       <ul>
         {% assign pages = site.pages | sort:"weight"  %}
         {% for pg in pages %}
-          {% if pg.pageTitle %}
-          <li><a href="{{ pg.url | prepend: site.baseurl }}">{{ pg.pageTitle }}</a></li>
+          {% if pg.title %}
+          <li><a href="{{ pg.url | prepend: site.baseurl }}">{{ pg.title }}</a></li>
           {% endif %}
         {% endfor %}
       </ul>
