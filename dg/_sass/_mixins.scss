@@ -50,10 +50,6 @@
 
 // Animates transitions
 @mixin anim($property, $duration: 0.2s, $style: ease-out) {
-	-webkit-transition: $property $duration $style;
-	-moz-transition: $property $duration $style;
-	-ms-transition: $property $duration $style;
-	-o-transition: $property $duration $style;
 	transition: $property $duration $style;
 }
 
@@ -61,29 +57,18 @@
 @mixin vertical-align($position: relative) {
   position: $position;
   top: 50%;
-  @include transform(translateY(-50%));
+  transform: translateY(-50%);
 }
 
-// TODO: text-shadow prefixin
+// TODO: settings for autoprefixer
 
 // Box shadows prefixin
 @mixin box-shadow($color, $x: 0, $y: 0, $blur: 0) {
-	-webkit-box-shadow: $x $y $blur 0px $color;
-	-moz-box-shadow: $x $y $blur 0px $color;
 	box-shadow: $x $y $blur 0px $color;
 }
 
-// Prefixes transforms
-@mixin transform($val...) {
-	-webkit-transform: $val;
-	-ms-transform: $val;
-	transform: $val;
-}
-
 // Filters an image
-// TODO: more prefixes
 @mixin dim-image($amt) {
-	-webkit-filter: brightness($amt);
 	filter: brightness($amt);
 }
 

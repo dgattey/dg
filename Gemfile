@@ -6,4 +6,5 @@ group :jekyll_plugins do
   gem 'emoji_for_jekyll' 
   gem 'hawkins'
   gem 'jekyll-press'
+  gem 'jekyll-autoprefixer' 
 end

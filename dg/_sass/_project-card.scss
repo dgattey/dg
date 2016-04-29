@@ -16,12 +16,12 @@
 	&:hover {
 		@include box-shadow($proj-card--shadow-color, $blur: $proj-card--shadow-amt);
 		z-index: $z-top;
-		@include transform(scale($proj-card--hover-scale));
+		transform: scale($proj-card--hover-scale);
 		img {
 			@include dim-image($bg-transparency);
 		}
 		.proj-data-visible {
-			@include transform(translateY(-$proj-card--hover-text));
+			transform: translateY(-$proj-card--hover-text);
 		}
 		.proj-terms, .proj-desc {
 			@extend %show;
