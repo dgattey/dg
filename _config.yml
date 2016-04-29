@@ -21,3 +21,6 @@ github_username:  dgattey
 
 # Build settings
 markdown: kramdown
+source: dg
+destination: build
+incremental: true

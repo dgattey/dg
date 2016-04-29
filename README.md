@@ -6,6 +6,7 @@ I'm redesigning my site to be a lightweight, mobile-friendly, up to date exhibit
 
 ### Development
 Coming soon.
+Build the site to an output folder with `jekyll build`. Build and serve on `http://localhost:4000/` with `jekyll serve`.
 
 ### Status
 There are lots of todos left. There's a public Trello board with my progress and ideas at https://trello.com/b/MJdtje7y/dylangattey-com. Working on finalizing the design for project grid, and starting to do the project detail pages.
