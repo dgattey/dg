@@ -3,3 +3,5 @@ _site
 .jekyll-metadata
 build
 design
+.bundle
+Gemfile.lock

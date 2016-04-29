@@ -1,9 +1,10 @@
 ---
 layout: post
-title:  "Welcome to Jekyll 3!"
+title:  "Forest Park PDX"
 date:   2016-04-18 01:24:58 -0400
-tags: "jekyll update app web"
+tags: "web ios"
 thumb: fppdx1.jpg
+desc: "An iOS app to explore beautiful Forest Park in Portland, Oregon"
 ---
 You’ll find this post in your `_posts` directory. Go ahead and edit it and re-build the site to see your changes. You can rebuild the site in many different ways, but the most common way is to run `jekyll serve`, which launches a web server and auto-regenerates your site when a file is updated.
 
