@@ -1,6 +1,7 @@
 ---
 layout: page
-title: About
+title: About | Dylan Gattey
+pageTitle : About
 permalink: /about/
 weight: 3
 ---

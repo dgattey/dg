@@ -23,4 +23,4 @@ github_username:  dgattey
 markdown: kramdown
 source: dg
 destination: build
-incremental: true
+#incremental: true
