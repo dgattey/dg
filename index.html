@@ -7,19 +7,30 @@ weight: 1
 {% include intro.html %}
 <div class="home">
 
-  <h1 class="page-heading">Posts</h1>
+  <h1 class="page-heading">Projects</h1>
 
-  <ul class="post-list">
-    {% for post in site.posts %}
-      <li>
-        <span class="post-meta">{{ post.date | date: "%b %-d, %Y" }}</span>
+  {% for post in site.posts %}
+  <div class="proj-card">
+    <img src="/img/{{post.thumb)}}">
 
-        <h2>
-          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
-        </h2>
-      </li>
-    {% endfor %}
-  </ul>
+    <!-- Text overlay on the images -->
+    <div class="proj-data">
+
+      <!-- The section that moves up -->
+      <div class="proj-data-visible">
+        <h2 class="proj-title">{{post.title}}</h2>
+        <ul class="proj-terms">
+          {% for term in site.terms %}
+          <li>#{{term}}</li>
+          {% endfor %}
+        </ul>
+      </div>
+
+      <!-- Excerpt description at bottom -->
+      <p class="proj-desc">{{post.desc}}</p>
+    </div>
+  </div>
+  {% endfor %}
 
   <p class="rss-subscribe">subscribe <a href="{{ "/feed.xml" | prepend: site.baseurl }}">via RSS</a></p>
 
