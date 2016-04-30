@@ -14,7 +14,6 @@ html, body {
     font-feature-settings: "kern" 1;
     font-kerning: normal;
     font-size: $base-font-size;
-    line-height: $base-line-height;
 }
 
 /**
@@ -22,6 +21,11 @@ html, body {
  */
 h1, h2, h3, h4, h5, h6 {
     font-weight: $heading-font-weight;
+    line-height: $base-line-height;
+}
+
+p {
+    line-height: $base-line-height;
 }
 
 a {

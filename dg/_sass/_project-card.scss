@@ -1,30 +1,15 @@
 .proj-card {
 	@include anim(all);
-	display: block;
+	display: flex;
+    align-items: center;
 	position: relative;
 	background: $color-primary-dim;
 	margin-bottom: gutter();
 
-	// Num projects per row
-	@include span($col/$proj-card--per-row nest);
-	&:nth-child(#{$proj-card--per-row}n) {
-		@include span($col/$proj-card--per-row nest last);
-	}
-
-	// Proj to top layer, shadowed, img & text moved up
-	&:hover {
-		@include box-shadow($proj-card--shadow-color, $blur: $proj-card--shadow-amt);
-		z-index: $z-top;
-		transform: scale($proj-card--hover-scale);
-		img {
-			@include dim-image($bg-transparency);
-		}
-		.proj-data-visible {
-			transform: translateY(-$proj-card--hover-text);
-		}
-		.proj-terms, .proj-desc {
-			@extend %show;
-		}
+	// Layout of project cards
+	@include span($col/$cards-per-row nest);
+	&:nth-child(#{$cards-per-row}n) {
+		@include span($col/$cards-per-row nest last);
 	}
 
 	img {
@@ -34,52 +19,49 @@
 		height: auto;
 	}
 
-	.proj-data-visible, .proj-data {
+	.data {
+		background: transparentize($color-primary-dim, $card-transparency);
 		@include anim(all);
-		@extend %sticky-bottom;
-		@extend %flush-width;
-	}
-	.proj-data-visible {
-		margin: $proj-card--text-margin 0;
+		@extend %overlay;
+		@extend %hide;
+		padding: $card-edge-padding;
+		text-align: center;
 	}
 
-	.proj-title {
-		@include span($proj-card--col-title no-gutters);
-		text-shadow: $proj-card--shadow-off $proj-card--shadow-off $proj-card--shadow-amt $proj-card--shadow-color;
-		font-weight: $proj-card--fweight-title;
-		margin: 0;
-	}
-	.proj-desc {
-		@include anim(all);
-		@extend %hide;
-		@extend %flush-width;
-		@extend %text-more;
-		font-weight: $proj-card--fweight-desc;
-		font-size: $proj-card--fsize-desc;
-		line-height: $proj-card--flineh-desc;
-		background: $color-primary-dim;
-	}
-	.proj-title, .proj-desc {
-		padding-left: $proj-card--inset-pad;
+	h2, p, a {
 		color: $color-text-light;
+		margin: 0;
+		// TODO: hover
 	}
 
-	.proj-terms {
-		@include span($col -$proj-card--col-title no-gutters);
-		@include anim(opacity);
-		@extend %hide;
-		text-align: right;
-		float: right;
-		margin: 0;
-		padding-right: $proj-card--inset-pad;
-		font-weight: $proj-card--fweight-term;
-		font-size: $proj-card--fsize-term;
+	h2 {
+		margin-top: 0.25em;
+	}
 
-		li {
-			color: $color-text-muted;
-			list-style-type: none;
-			display: inline-block;
-			margin: 0 $proj-card--term-pad;
+	p {
+		margin: $card-text-margin;
+		font-size: $card-font-size;
+	}
+
+	ul {
+		margin: $card-text-margin;
+		padding: 0;
+	}
+
+	li {
+		padding: $card-tag-padding;
+		font-size: $card-small-font-size;
+		list-style-type: none;
+		display: inline-block;
+	}
+
+	// Hover state
+	&:hover {
+		@include box-shadow($card-shadow-color, $blur: $card-shadow-blur);
+		z-index: $card-top-layer;
+		transform: scale($card-hover-scale);
+		.data {
+			@extend %show;
 		}
 	}
 }

@@ -25,11 +25,13 @@
 	opacity: 0;
 }
 
-// Sticks to the bottom of parent
-%sticky-bottom {
+// Sticks over top of parent
+%overlay {
 	position: absolute;
-	left: 0;
+	top: 0;
 	bottom: 0;
+	left: 0;
+	right: 0;
 }
 
 // Width of parent

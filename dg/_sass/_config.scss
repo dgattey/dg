@@ -28,17 +28,14 @@ $color-text-active: $color-primary-dim;
 $col: 18;
 
 // TODO: refactor
-$bg-transparency: 0.5;
-$z-top: 999;
 $inset: 20px;
 
 // Shared font data
 $base-font-family: 'Whitney HTF', Helvetica, Arial, sans-serif; // TODO: import families
 $base-font-size:   18px;
-$small-font-size:  $base-font-size * 0.875;
 $base-font-weight: 400;
-$heading-font-weight: 600;
-$base-line-height: 1.5;
+$base-line-height: 1.5em;
+$heading-font-weight: 500;
 
 // Nav component measurements
 $nav-height: 100px;
@@ -52,23 +49,17 @@ $intro--col-off: ($col - $intro--col-content)/2;
 $intro--col-text: 13;
 
 // Project card component measurements
-$proj-card--per-row: 3;
-$proj-card--col-title: 13;
-$proj-card--shadow-amt: 6px;
-$proj-card--shadow-off: 1px;
-$proj-card--shadow-color: transparentize($color-dim, 0.8);
-$proj-card--hover-img: 30px; // TODO: rename
-$proj-card--hover-text: 2.2vw; // TODO: rename
-$proj-card--hover-scale: 1.05;
-$proj-card--inset-pad: 2vw; // TODO: rename
-$proj-card--text-margin: 10px; // TODO: rename
-$proj-card--term-pad: 4px;
-$proj-card--fweight-title: 500;
-$proj-card--fweight-desc: 400;
-$proj-card--fweight-term: 600;
-$proj-card--fsize-desc: 0.95em;
-$proj-card--fsize-term: 0.8em;
-$proj-card--flineh-desc: $proj-card--hover-text;
+$cards-per-row: 3;
+$card-transparency: 0.2;
+$card-shadow-blur: 6px;
+$card-shadow-color: transparentize($color-dim, 0.8);
+$card-hover-scale: 1.05;
+$card-top-layer: 999;
+$card-font-size: 0.85em;
+$card-small-font-size: 0.7em;
+$card-tag-padding: 0.5em;
+$card-edge-padding: 15%;
+$card-text-margin: $card-tag-padding 0;
 
 
 // Spacing and viewports
@@ -83,6 +74,6 @@ $on-laptop:        800px;
 /* Changing Susy default global settings */
 $susy: (
   columns: $col,
-  container: 1200px, // max-width
+  container: 1110px, // max-width
   global-box-sizing: border-box
 );
