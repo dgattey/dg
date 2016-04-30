@@ -42,11 +42,10 @@ $nav-height: 100px;
 $nav-font-weight: 500;
 
 // Intro component measurements
-$intro--inset-thin: 2.5 * $inset;
-$intro--inset-wide: 2.5 * $inset;
-$intro--col-content: 10;
-$intro--col-off: ($col - $intro--col-content)/2;
-$intro--col-text: 13;
+$intro-inset: 2.5 * $inset;
+$intro-content-width: 10;
+$intro-offset-width: ($col - $intro-content-width)/2;
+$intro-text-width: 13;
 
 // Project card component measurements
 $cards-per-row: 3;

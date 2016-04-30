@@ -2,11 +2,11 @@
 .intro {
 	@extend %container;
 	display: block;
-	margin: $intro--inset-thin auto $intro--inset-wide auto;
+	margin: $intro-inset auto;
 
 	.content {
-		@include span($intro--col-content nest);
-		@include push($intro--col-off);
+		@include span($intro-content-width nest);
+		@include push($intro-offset-width);
     	position:relative;
 	}
 	img {
@@ -18,6 +18,6 @@
 	}
 	
 	.text {
-		@include span($intro--col-text last);
+		@include span($intro-text-width last);
 	}
 }
