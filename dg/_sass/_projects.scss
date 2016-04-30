@@ -1,7 +1,6 @@
 /* Styles targeting the project grid */
-projects {
-	// TODO:
-	// @include span($col)
+.projects {
+	@include span($col);
 
 	.proj-grid {
 		@extend %container;

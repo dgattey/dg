@@ -6,10 +6,9 @@
 	margin-bottom: gutter();
 
 	// Num projects per row
-	// TODO:
-	// @include span($col/$proj-card--per-row nest);
+	@include span($col/$proj-card--per-row nest);
 	&:nth-child(#{$proj-card--per-row}n) {
-		// @include span($col/$proj-card--per-row nest last);
+		@include span($col/$proj-card--per-row nest last);
 	}
 
 	// Proj to top layer, shadowed, img & text moved up
@@ -45,8 +44,7 @@
 	}
 
 	.proj-title {
-		// TODO
-		// @include span($proj-card--col-title no-gutters);
+		@include span($proj-card--col-title no-gutters);
 		text-shadow: $proj-card--shadow-off $proj-card--shadow-off $proj-card--shadow-amt $proj-card--shadow-color;
 		font-weight: $proj-card--fweight-title;
 		margin: 0;
@@ -67,8 +65,7 @@
 	}
 
 	.proj-terms {
-		// TODO:
-		// @include span($col -$proj-card--col-title no-gutters);
+		@include span($col -$proj-card--col-title no-gutters);
 		@include anim(opacity);
 		@extend %hide;
 		text-align: right;

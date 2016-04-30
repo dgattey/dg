@@ -5,8 +5,8 @@
 	margin: $intro--inset-thin auto $intro--inset-wide auto;
 
 	.content {
-		// @include span($intro--col-content nest);
-		// @include push($intro--col-off);
+		@include span($intro--col-content nest);
+		@include push($intro--col-off);
     	position:relative;
 	}
 	img {
@@ -18,7 +18,6 @@
 	}
 	
 	.text {
-		// TODO:
-		// @include span($intro--col-text last);
+		@include span($intro--col-text last);
 	}
 }

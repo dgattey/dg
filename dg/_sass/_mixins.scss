@@ -3,9 +3,7 @@
  */
 
 %container {
-	background-color:clear;
-	// TODO: Susy
-	// @include container;
+	@include container;
 }
 
 %fake-underline {

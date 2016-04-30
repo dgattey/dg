@@ -3,8 +3,12 @@
 source "https://rubygems.org"
 
 group :jekyll_plugins do
-  gem 'emoji_for_jekyll' 
-  gem 'hawkins'
-  gem 'jekyll-press'
-  gem 'jekyll-autoprefixer' 
+  gem 'emoji_for_jekyll'    # emoji support 💁
+  gem 'hawkins'             # live reload!
+  gem 'jekyll-press'        # minifies everything
+
+  # CSS/SASS gems
+  gem 'jekyll-autoprefixer' # autoprefixes css
+  gem 'susy'                # Susy SASS framework
+  gem 'normalize-scss'   # normalizes the scss
 end
