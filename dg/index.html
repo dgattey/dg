@@ -5,9 +5,9 @@ weight: 1
 ---
 
 {% include intro.html %}
-<div class="home">
-  <h1 class="page-heading">Projects</h1>
-  {% for post in site.posts %}
-  {% include proj-card.html %}
-  {% endfor %}
+<h2>Projects</h2>
+<div class="projects">
+	{% for post in site.posts %}
+	{% include proj-card.html %}
+	{% endfor %}
 </div>

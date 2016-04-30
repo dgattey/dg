@@ -46,6 +46,10 @@
 	text-overflow: ellipsis;
 }
 
+%vertical-rhythm {
+    margin-bottom: $spacing-unit / 2;
+}
+
 // Animates transitions
 @mixin anim($property, $duration: 0.2s, $style: ease-out) {
 	transition: $property $duration $style;

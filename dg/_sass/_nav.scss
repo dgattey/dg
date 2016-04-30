@@ -2,8 +2,8 @@
 nav {
 	@extend %container;
 	display: block;
-	height: $nav--header-height -$inset*2;
-	padding: $inset;
+	height: $nav-height -$inset*2;
+	padding: $inset 0;
 
 	img {
 		float: left;
@@ -11,38 +11,32 @@ nav {
 
 	ul {
 		float: right;
-		li {
-			display: inline-block;
-			margin: 0 $inset;
-			color: $color-text-muted;
-			a {
-				@include anim(color);
-				display: inherit;
-				color: inherit;
-				position: relative;
-				text-decoration: none;
-				font-weight: $nav--fweight-text;
-				font-size: $nav--fsize-text;
+	}
 
-				&:after {
-					@include anim(opacity);
-					@extend %fake-underline;
-					@extend %hide;
-				}
+	li {
+		display: inline-block;
+		margin: 0 $inset;
+	}
 
-				&:hover {
-					color: $color-text-dark;
-					&:after {
-						@extend %show;
-					}
-				}
-				&.router-link-active {
-					color: $color-text-active;
-					&:after {
-						@extend %show;
-					}
-				}					
-			}
+	a {
+		@include anim(color);
+		color: $color-text-muted;
+		position: relative;
+		text-decoration: none;
+		font-weight: $nav-font-weight;
+
+		&:after {
+			@include anim(opacity);
+			@extend %fake-underline;
+			@extend %hide;
 		}
+
+		&:hover:after, &.active:after {
+			@extend %show;
+		}
+
+		&.active {
+			color: $color-text-active;
+		}				
 	}
 }

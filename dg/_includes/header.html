@@ -1,15 +1,19 @@
 <header>
   <nav>
-    <div class="wrapper">
-      <a href="{{ site.baseurl }}/"><img src="/img/DG.png" class="logo"></a>
-      <ul>
-        {% assign pages = site.pages | sort:"weight"  %}
-        {% for pg in pages %}
-          {% if pg.title %}
-          <li><a href="{{ pg.url | prepend: site.baseurl }}">{{ pg.title }}</a></li>
-          {% endif %}
-        {% endfor %}
-      </ul>
-    </div>
+    <a href="{{ site.baseurl }}/"><img src="/img/DG.png" class="logo"></a>
+    <ul>
+      {% assign pages = site.pages | sort:"weight"  %}
+      {% for pg in pages %}
+      {% assign current = '' %}
+      {% if page.url == pg.url %}
+        {% assign current = 'active' %}
+      {% endif %}
+      {% if pg.title %}
+      <li>
+        <a class="{{ current }}" href="{{ pg.url | prepend: site.baseurl }}">{{ pg.title }}</a>
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
   </nav>
 </header>
