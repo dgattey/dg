@@ -1,18 +1,17 @@
-<a href="{{post.url}}">
-  <div class="proj-card">
-    <img src="/img/{{post.thumb)}}">
+<div class="proj-card">
+  <img src="/img/{{post.thumb)}}">
 
-    <!-- Overlay when hovered -->
-    <div class="data">
-      <h2>{{ post.title }}</h2>
-      <p>{{ post.desc }}</p>
-      <ul>
-        {% for tag in post.tags %}
-        <li>
-          <a href="/projects/{{ tag }}">#{{ tag }}</a>
-        </li>
-        {% endfor %}
-      </ul>
-    </div>
+  <!-- Overlay when hovered -->
+  <div class="data">
+    <h2>{{ post.title }}</h2>
+    <p>{{ post.desc }}</p>
+    <ul>
+      {% for tag in post.tags %}
+      <li>#{{ tag }}</li>
+      {% endfor %}
+    </ul>
+    <a href="{{ post.url }}">
+      <span class="link-spanner"></span>
+    </a>
   </div>
-</a>
+</div>

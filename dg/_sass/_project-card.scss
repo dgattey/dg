@@ -28,14 +28,14 @@
 		text-align: center;
 	}
 
-	h2, p, a {
+	h2, p, li {
 		color: $color-text-light;
 		margin: 0;
 		// TODO: hover
 	}
 
 	h2 {
-		margin-top: 0.25em;
+		margin-top: $card-tag-padding/2;
 	}
 
 	p {
