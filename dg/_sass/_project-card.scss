@@ -6,10 +6,20 @@
 	background: $color-primary-dim;
 	margin-bottom: gutter();
 
-	// Layout of project cards
+	// Default layout of project cards
 	@include span($col/$cards-per-row nest);
 	&:nth-child(#{$cards-per-row}n) {
 		@include span($col/$cards-per-row nest last);
+	}
+
+	// Two wide
+	&.wide {
+		@include span($col/$cards-per-row*2 nest);
+	}
+
+	// Two tall
+	&.tall {
+		@include span($col/$cards-per-row*2 nest);
 	}
 
 	img {
