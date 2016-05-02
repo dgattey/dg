@@ -2,7 +2,6 @@
 layout: post
 title:  "Former"
 tags: "web extension"
-thumb: fppdx1.jpg
+thumb: blank-tall.jpg
 desc: "Reloaded the page right before clicking submit? Former saves your sanity"
-attr: "tall"
 ---

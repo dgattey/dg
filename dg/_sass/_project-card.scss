@@ -1,22 +1,27 @@
 .proj-card {
 	@include anim(all);
-	display: flex;
-    align-items: center;
+	display: block;
 	position: relative;
 	background: $color-primary-dim;
 	margin-bottom: gutter();
 
-	// Default layout of project cards
-	@include gallery($col/$cards-per-row);
-
-	// Two wide
-	&.wide {
-		border: 1px solid blue;
+	// TODO: remove literals?
+	// Default layout
+	@include span($col/$cards-per-row);
+	
+	// Default last
+	&:nth-child(2), &:nth-child(5), &:nth-child(12) {
+		@include span($col/$cards-per-row last);
 	}
 
-	// Two tall
-	&.tall {
-		border: 1px solid red;
+	// Wide
+	&:nth-child(1) {
+		@include span($col/$cards-per-row * 2);
+	}
+
+	// Wide last
+	&:nth-child(9) {
+		@include span($col/$cards-per-row * 2 last);
 	}
 
 	img {
@@ -31,12 +36,17 @@
 		@extend %hide;
 		padding: $card-edge-padding;
 		text-align: center;
+		transform-style: preserve-3d;
+		height: 100%;
+
+		div {
+			@extend %vertically-centered;
+		}
 	}
 
 	h2, p, li {
 		color: $color-text-light;
 		margin: 0;
-		// TODO: hover
 	}
 
 	h2 {

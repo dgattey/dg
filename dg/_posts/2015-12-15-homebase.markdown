@@ -2,6 +2,6 @@
 layout: post
 title:  "Homebase"
 tags: "leap gesture web"
-thumb: fppdx1.jpg
+thumb: fppdx-thumb.jpg
 desc: "Control your home automation system with gestures (proof of concept)"
 ---

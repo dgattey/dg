@@ -73,6 +73,7 @@ $on-laptop:        800px;
 /* Changing Susy default global settings */
 $susy: (
   columns: $col,
+  gutters: 1/4,
   container: 1110px, // max-width
   global-box-sizing: border-box
 );

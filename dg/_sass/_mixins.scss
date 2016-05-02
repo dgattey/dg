@@ -52,6 +52,13 @@
     margin-bottom: $spacing-unit / 2;
 }
 
+// Assumes parent is height:100%
+%vertically-centered {
+	position: relative;
+	top: 50%;
+	transform: translateY(-50%);
+}
+
 // When applied to empty span within <a></a>, overlays link
 .link-spanner {
 	@extend %flush-width;
