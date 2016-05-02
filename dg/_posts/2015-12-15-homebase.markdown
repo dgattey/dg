@@ -1,0 +1,7 @@
+---
+layout: post
+title:  "Homebase"
+tags: "leap gesture web"
+thumb: fppdx1.jpg
+desc: "Control your home automation system with gestures (proof of concept)"
+---

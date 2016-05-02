@@ -1,0 +1,8 @@
+---
+layout: post
+title:  "Former"
+tags: "web extension"
+thumb: fppdx1.jpg
+desc: "Reloaded the page right before clicking submit? Former saves your sanity"
+attr: "tall"
+---

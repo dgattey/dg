@@ -7,26 +7,21 @@
 	margin-bottom: gutter();
 
 	// Default layout of project cards
-	@include span($col/$cards-per-row nest);
-	&:nth-child(#{$cards-per-row}n) {
-		@include span($col/$cards-per-row nest last);
-	}
+	@include gallery($col/$cards-per-row);
 
 	// Two wide
 	&.wide {
-		@include span($col/$cards-per-row*2 nest);
+		border: 1px solid blue;
 	}
 
 	// Two tall
 	&.tall {
-		@include span($col/$cards-per-row*2 nest);
+		border: 1px solid red;
 	}
 
 	img {
 		@include anim(all);
 		@extend %flush-width;
-		display: block;
-		height: auto;
 	}
 
 	.data {
