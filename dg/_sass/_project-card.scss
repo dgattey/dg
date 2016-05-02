@@ -5,22 +5,15 @@
 	background: $color-primary-dim;
 	margin-bottom: gutter();
 
-	// TODO: remove literals?
-	// Default layout
+	// All possible layouts
 	@include span($col/$cards-per-row);
-	
-	// Default last
-	&:nth-child(2), &:nth-child(5), &:nth-child(12) {
+	&.last {
 		@include span($col/$cards-per-row last);
 	}
-
-	// Wide
-	&:nth-child(1) {
+	&.wide {
 		@include span($col/$cards-per-row * 2);
 	}
-
-	// Wide last
-	&:nth-child(9) {
+	&.wide-last {
 		@include span($col/$cards-per-row * 2 last);
 	}
 
