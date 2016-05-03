@@ -1,6 +1,6 @@
 <header>
   <nav>
-    <a href="{{ site.baseurl }}/"><img src="/img/DG.png" class="logo"></a>
+    <a href="{{ site.baseurl }}/"><img src="{{'/img/DG.png' | prepend:site.baseurl }}" class="logo"></a>
     <ul>
       {% assign pages = site.pages | sort:"weight"  %}
       {% for pg in pages %}

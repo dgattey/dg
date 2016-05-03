@@ -1,29 +1,25 @@
-# Welcome to Jekyll!
-#
-# This config file is meant for settings that affect your whole blog, values
-# which you are expected to set up once and rarely need to edit after that.
-# For technical reasons, this file is *NOT* reloaded automatically when you use
-# 'jekyll serve'. If you change this file, please restart the server process.
+# Configuration and information used across the site
+# Remember: not reloaded automatically when changed.
 
-# Site settings
+# Site data
 title: Dylan Gattey
 email: dylan.gattey@gmail.com
 description: >
-    The portfolio site of a coder/designer based out of San Francisco.
-    I make things look nice. I also write words on screens so you 
-    can use that hunk of metal in your pocket. Current property of 
-    Brown University. When not coding or designing, I run so I can cook 
-    way too much good food.
-twitter_username: dgattey
-github_username:  dgattey
+    I'm a software developer @ LinkedIn + amateur designer 
+    based out of San Francisco, passionate about making 
+    things look nice, crafting clean interfaces, and 
+    architecting efficient code. When not working, I run 
+    through the hills of SF and find farmer's markets so I
+    can cook delicious food.
+twitter: dgattey
+github:  dgattey
 
-# Site config
-url: "https://dylangattey.com" # the base hostname & protocol for your site
-permalink: /projects/:year/:title/
+# Configuration for site
+url: "https://dylangattey.com"
+permalink: /projects/:year/:title/ #posts
 baseurl: ""
 
 # Build settings
 markdown: kramdown
 source: dg
 destination: build
-#incremental: true

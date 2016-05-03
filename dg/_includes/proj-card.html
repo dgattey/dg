@@ -1,5 +1,5 @@
 <div class="proj-card {{post.style}}">
-  <img src="/img/{{post.thumb)}}">
+  <img src="{{post.thumb | prepend:'/img/' | prepend:site.baseurl }}">
 
   <!-- Overlay when hovered -->
   <div class="data">
