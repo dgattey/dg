@@ -106,14 +106,21 @@ pre {
  */
 .icon {
 
+    &:hover > svg {
+        path {
+            fill: $color-primary-dim;
+        }
+    }
+
     > svg {
         display: inline-block;
-        width: 16px;
-        height: 16px;
+        width: 32px;
+        height: 32px;
         vertical-align: middle;
 
         path {
-            fill: $color-gray;
+            @include anim(fill);
+            fill: $color-primary-bright;
         }
     }
 }

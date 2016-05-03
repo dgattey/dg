@@ -1,0 +1,19 @@
+footer {
+	float: left;
+	padding: 10px 0;
+	margin: 50px 0;
+	width: 100%;
+	border-top: 1px solid $color-primary-dim;
+	.copy, ul {
+		display: inline-block;
+	}
+	.copy {
+	}
+	ul {
+		float: right;
+	}
+	li {
+		display: inline-block;
+		padding: 0 10px;
+	}
+}
