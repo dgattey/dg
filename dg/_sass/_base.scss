@@ -5,15 +5,20 @@
  * Main html and body styling
  */
 html, body {
-    @extend %container;
     background: $color-bg;
     color: $color-text-dark;
-
     font-family: $base-font-family;
     -webkit-text-size-adjust: 100%;
     font-feature-settings: "kern" 1;
     font-kerning: normal;
     font-size: $base-font-size;
+    overflow-x: hidden;
+}
+html {
+    @extend %container;
+}
+body {
+    @include span($col of $col 1 inside);
 }
 
 /**

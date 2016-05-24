@@ -17,6 +17,27 @@
 		@include span($col/$cards-per-row * 2 last);
 	}
 
+	// Switch to 2 column grid
+	@include media-query($on-laptop) {
+		@include span($col/$cards-per-row-small);
+		&.last, &.last-sm {
+			@include span($col/$cards-per-row-small last);
+		}
+		&.wide {
+			@include span($col/$cards-per-row-small * 2);
+		}
+		&.wide-last {
+			@include span($col/$cards-per-row-small * 2 last);
+		}
+	}
+
+	// Reset to full width
+	@include media-query($on-palm) {
+		&, &.last, &.last-sm, &.wide, &.wide-last {
+			@include span($col last);
+		}
+	}
+
 	img {
 		@include anim(all);
 		@extend %flush-width;

@@ -20,4 +20,11 @@
 	.text {
 		@include span($intro-text-width last);
 	}
+
+	@include media-query($on-laptop) {
+		.content {
+			@include span($col);
+			@include push(0);
+		}
+	}
 }

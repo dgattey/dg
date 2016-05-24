@@ -43,12 +43,13 @@ $nav-font-weight: 500;
 
 // Intro component measurements
 $intro-inset: 2.5 * $inset;
-$intro-content-width: 10;
+$intro-content-width: 12;
 $intro-offset-width: ($col - $intro-content-width)/2;
 $intro-text-width: 13;
 
 // Project card component measurements
 $cards-per-row: 3;
+$cards-per-row-small: 2;
 $card-transparency: 0.2;
 $card-shadow-blur: 6px;
 $card-shadow-color: transparentize($color-dim, 0.8);
@@ -63,7 +64,7 @@ $card-text-margin: $card-tag-padding 0;
 
 // Spacing and viewports
 $spacing-unit:     30px;
-$on-palm:          600px;
+$on-palm:          500px;
 $on-laptop:        800px;
 
 /*
