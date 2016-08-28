@@ -4,13 +4,14 @@
   
   <!-- Overlay -->
   <div class="data">
-    <h2>{{ post.title }}</h2>
-    <p>{{ post.desc }}</p>
-    <ul>
+    <h3>{% if post.short-title %}{{ post.short-title }} {% else %} {{ post.title }}{% endif %}</h3>
+    <!-- <ul>
       {% for tag in post.tags %}
       <li>#{{ tag }}</li>
       {% endfor %}
-    </ul>
+    </ul> -->
+
+    <p>{{ post.desc }}</p>
 
     <!-- Link that spans the whole thing -->
     <a href="{{ post.url }}">

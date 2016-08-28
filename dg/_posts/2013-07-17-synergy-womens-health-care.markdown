@@ -1,5 +1,6 @@
 ---
 layout: post
+short-title:  "Synergy WHC"
 title:  "Synergy Women's Health Care"
 tags: "web brand"
 thumb: blank.jpg

@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Connected"
+title:  "Connected (+Citizen)"
 tags: "data web native visualization"
 thumb: blank.jpg
-desc: "A visualization of the future of the connected car for +Citizen"
+desc: "A visualization of the future of the connected car"
 ---

@@ -8,6 +8,7 @@
 
 .proj-card {
 	position: relative;
+	height: 24vw;
 	@include anim(transform);
 
 	// Grids
@@ -27,8 +28,18 @@
 
 	.data {
 		position: relative;
-		padding: $edge-padding;
+		height: 100%;
+		padding: $edge-padding/2 $edge-padding;
 		color: $color-text-light;
+		h3 {
+			@include span(2*$col/3);
+		}
+		p {
+			@include span($col/2);
+			position: absolute;
+			bottom: 0;
+			font-size: 1em;
+		}
 	}
 
 	ul {
