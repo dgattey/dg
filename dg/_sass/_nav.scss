@@ -22,6 +22,12 @@ nav {
 		color: $color-text-muted;
 		position: relative;
 		text-decoration: none;
+		font-size: 1.3em;
+
+		// Dark background, so light text
+		header.background & {
+			color: $color-text-light;
+		}
 
 		&:after {
 			@include anim(opacity);

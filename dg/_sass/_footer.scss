@@ -1,8 +1,7 @@
 footer {
 	@extend %container;
 	padding: 10px 0;
-	margin-top: 50px;
-	margin-bottom: 50px;
+	margin: $edge-padding;
 	border-top: 1px solid $color-primary-dim;
 	.copy, ul {
 		display: inline-block;
