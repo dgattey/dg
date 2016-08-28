@@ -1,0 +1,65 @@
+html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    font-feature-settings: "kern" 1;
+    font-kerning: normal;
+    font-family: "Hind", sans-serif;
+}
+
+// Shared header styles
+h1, h2, h3 {
+    font-family: "Playfair Display", serif;
+    margin-top: 30px;
+    line-height: 1.4;
+}
+
+// Shared other styles
+h2, h3, p {
+    font-weight: 400;
+}
+
+// Headers
+h1 {
+    font-size: 5em;
+    font-weight: 700;
+    line-height: 1.5;
+    margin-top: 0px;
+    margin-bottom: 10px;
+    letter-spacing: -0.70px;
+}
+
+h2 {
+    font-size: 2.8em;
+    opacity: 0.95;
+    margin-bottom: 6px;
+    letter-spacing: -0.55px;
+}
+
+h3 {
+    font-size: 1.9em;
+    opacity: 0.90;
+    margin-bottom: 5px;
+    letter-spacing: -0.35px;
+}
+
+// Body
+p {
+    font-size: 20px;
+    line-height: 1.60;
+    opacity: 0.65;
+    margin-top: 5px;
+    margin-bottom: 30px;
+    letter-spacing: -0.15px;
+    word-spacing: -0.10px;
+}
+
+// Links
+a {
+    color: $color-primary-bright;
+    text-decoration: none;
+
+    &:hover {
+        color: $color-primary-dim;
+    }
+}

@@ -4,53 +4,16 @@
 /**
  * Main html and body styling
  */
-html, body {
+html {
     background: $color-bg;
     color: $color-text-dark;
-    font-family: $base-font-family;
-    -webkit-text-size-adjust: 100%;
-    font-feature-settings: "kern" 1;
-    font-kerning: normal;
-    font-size: $base-font-size;
     overflow-x: hidden;
+    border: 0.5vw solid $color-bright;
 }
-html {
-    @extend %container;
-}
-body {
-    @include span($col of $col 1 inside);
-}
-
-/**
- * Fonts/text
- */
-h1, h2, h3, h4, h5, h6 {
-    font-weight: $heading-font-weight;
-    line-height: $base-line-height;
-}
-
-p {
-    line-height: $base-line-height;
-}
-
-a {
-    color: $color-primary-bright;
-    text-decoration: none;
-
-    &:hover {
-        color: $color-primary-dim;
-    }
-}
-
 
 /**
  * Spacing
  */
-h1, h2, h3, h4, h5, h6,
-p, blockquote, pre,
-ul, ol, dl, figure {
-    @extend %vertical-rhythm;
-}
 
 img {
     max-width: 100%;

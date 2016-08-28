@@ -1,39 +1,26 @@
+// TODO: REMOVE
+@for $i from 1 through 20 {
+	.proj-card:nth-child(#{$i}) .data {
+		background-color: hsla(random(365), random(80), 30, 1);
+	}
+}
+/////
+
 .proj-card {
 	@include anim(all);
 	display: block;
 	position: relative;
 	background: $color-primary-dim;
-	margin-bottom: gutter();
 
 	// All possible layouts
 	@include span($col/$cards-per-row);
-	&.last {
-		@include span($col/$cards-per-row last);
-	}
 	&.wide {
 		@include span($col/$cards-per-row * 2);
 	}
-	&.wide-last {
-		@include span($col/$cards-per-row * 2 last);
-	}
-
-	// Switch to 2 column grid
-	@include media-query($on-laptop) {
-		@include span($col/$cards-per-row-small);
-		&.last, &.last-sm {
-			@include span($col/$cards-per-row-small last);
-		}
-		&.wide {
-			@include span($col/$cards-per-row-small * 2);
-		}
-		&.wide-last {
-			@include span($col/$cards-per-row-small * 2 last);
-		}
-	}
 
 	// Reset to full width
-	@include media-query($on-palm) {
-		&, &.last, &.last-sm, &.wide, &.wide-last {
+	@include media-query($one-column) {
+		&, &.wide {
 			@include span($col last);
 		}
 	}
@@ -44,32 +31,10 @@
 	}
 
 	.data {
-		background: transparentize($color-primary-dim, $card-transparency);
 		@include anim(all);
 		@extend %overlay;
-		@extend %hide;
-		padding: $card-edge-padding;
-		text-align: center;
-		transform-style: preserve-3d;
-		height: 100%;
-
-		div {
-			@extend %vertically-centered;
-		}
-	}
-
-	h2, p, li {
+		padding: $edge-padding;
 		color: $color-text-light;
-		margin: 0;
-	}
-
-	h2 {
-		margin-top: $card-tag-padding/2;
-	}
-
-	p {
-		margin: $card-text-margin;
-		font-size: $card-font-size;
 	}
 
 	ul {
@@ -79,7 +44,6 @@
 
 	li {
 		padding: $card-tag-padding;
-		font-size: $card-small-font-size;
 		list-style-type: none;
 		display: inline-block;
 	}
@@ -87,10 +51,7 @@
 	// Hover state
 	&:hover {
 		@include box-shadow($card-shadow-color, $blur: $card-shadow-blur);
-		z-index: $card-top-layer;
 		transform: scale($card-hover-scale);
-		.data {
-			@extend %show;
-		}
 	}
+
 }

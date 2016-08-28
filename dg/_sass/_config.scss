@@ -4,8 +4,8 @@
 
 // Raw color values
 $color-dim: #000000;
-$color-deep: #615853; //in Sketch: #6C6A69???;
-$color-muted: #C0C0C0;
+$color-deep: #433D3A;
+$color-muted: #ACACAC;
 $color-bright: #F5F5F5;
 $color-gray: darken($color-bright, 20%);
 
@@ -24,22 +24,15 @@ $color-text-active: $color-primary-dim;
  * Measurements and values
  */
 
- // General unitless measurements
+// General measurements
 $col: 18;
+$edge-padding: 4vw;
 
 // TODO: refactor
 $inset: 20px;
 
-// Shared font data
-$base-font-family: 'Whitney HTF', Helvetica, Arial, sans-serif; // TODO: import families
-$base-font-size:   18px;
-$base-font-weight: 400;
-$base-line-height: 1.5em;
-$heading-font-weight: 500;
-
 // Nav component measurements
 $nav-height: 100px;
-$nav-font-weight: 500;
 
 // Intro component measurements
 $intro-inset: 2.5 * $inset;
@@ -48,24 +41,23 @@ $intro-offset-width: ($col - $intro-content-width)/2;
 $intro-text-width: 13;
 
 // Project card component measurements
-$cards-per-row: 3;
-$cards-per-row-small: 2;
+$cards-per-row: 2;
 $card-transparency: 0.2;
 $card-shadow-blur: 6px;
 $card-shadow-color: transparentize($color-dim, 0.8);
-$card-hover-scale: 1.05;
-$card-top-layer: 999;
-$card-font-size: 0.85em;
-$card-small-font-size: 0.7em;
+$card-hover-scale: 0.98;
 $card-tag-padding: 0.5em;
-$card-edge-padding: 15%;
 $card-text-margin: $card-tag-padding 0;
 
 
 // Spacing and viewports
 $spacing-unit:     30px;
-$on-palm:          500px;
-$on-laptop:        800px;
+$one-column:       800px;
+
+/*
+ * Images used as background images
+ */
+$intro-img: "/img/haily.jpg";
 
 /*
  * Third party config
@@ -74,7 +66,7 @@ $on-laptop:        800px;
 /* Changing Susy default global settings */
 $susy: (
   columns: $col,
-  gutters: 1/4,
-  container: 1110px, // max-width
+  gutters: 0,
+  container: 2000px, // max-width
   global-box-sizing: border-box
 );

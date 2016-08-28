@@ -2,6 +2,7 @@
 layout: post
 title:  "Chipmunk"
 tags: "web"
-thumb: blank.jpg
+thumb: blank-wide.jpg
 desc: "Planning a road trip across the US? We can get you meals on a schedule"
+style: wide
 ---

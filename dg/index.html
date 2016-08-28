@@ -2,11 +2,17 @@
 layout: default
 title: Code
 weight: 1
+header: >
+    <div class="intro">
+    <h1>Hello! I'm Dylan.</h1>
+    <p>I'm a software developer @LinkedIn in San Francisco, passionate about designing beautiful interfaces and crafting clean code.</p>
+    </div>
 ---
-
-{% include intro.html %}
-<div class="projects">
-	{% for post in site.posts %}
-	{% include proj-card.html %}
-	{% endfor %}
+<div class="page full">
+	<h1>Projects</h1>
+	<div class="projects">
+		{% for post in site.posts %}
+		{% include proj-card.html %}
+		{% endfor %}
+	</div>
 </div>

@@ -1,0 +1,17 @@
+<nav>
+  <a href="{{ site.baseurl }}/"><img src="{{'/img/DG.png' | prepend:site.baseurl }}" class="logo"></a>
+  <ul>
+    {% assign pages = site.pages | sort:"weight"  %}
+    {% for pg in pages %}
+    {% assign current = '' %}
+    {% if page.url == pg.url %}
+    {% assign current = 'active' %}
+    {% endif %}
+    {% if pg.title %}
+    <li>
+      <a class="{{ current }}" href="{{ pg.url | prepend: site.baseurl }}">{{ pg.title }}</a>
+    </li>
+    {% endif %}
+    {% endfor %}
+  </ul>
+</nav>

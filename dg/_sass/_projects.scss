@@ -1,4 +1,15 @@
 /* Styles targeting the project grid */
+.page {
+	@extend %container;
+	padding: $edge-padding;
+	&.full {
+		padding: inherit;
+		h1 {
+			padding: $edge-padding;
+		}
+	}
+}
+
 .projects {
 	@include span($col);
 

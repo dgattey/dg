@@ -4,13 +4,6 @@
 # Site data
 title: Dylan Gattey
 email: dylan.gattey@gmail.com
-description: >
-    I'm a software developer @ LinkedIn + amateur designer 
-    based out of San Francisco, passionate about making 
-    things look nice, crafting clean interfaces, and 
-    architecting efficient code. When not working, I run 
-    through the hills of SF and find farmer's markets so I
-    can cook delicious food.
 twitter: dgattey
 github:  dgattey
 
@@ -23,3 +16,6 @@ baseurl: ""
 markdown: kramdown
 source: dg
 destination: build
+
+# Older
+#<!-- Alternates: I make things look nice. I also write words on screens so you can use that hunk of metal in your pocket. Current property of Brown University. When not coding or designing, I run so I can cook way too much good food.  I'm a software developer based out of San Francisco, passionate about designing beautiful interfaces and crafting clean code. When not working, I run long distances so I can cook delicious food. Current property of @LinkedIn.Currently @ LinkedIn's beautiful new office in SOMA. -->

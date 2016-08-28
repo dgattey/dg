@@ -1,8 +1,8 @@
 footer {
-	float: left;
+	@extend %container;
 	padding: 10px 0;
-	margin: 50px 0;
-	width: 100%;
+	margin-top: 50px;
+	margin-bottom: 50px;
 	border-top: 1px solid $color-primary-dim;
 	.copy, ul {
 		display: inline-block;

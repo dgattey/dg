@@ -1,30 +1,21 @@
 // For the main intro in index.html
+header {
+	padding: $edge-padding;
+	&.background {
+		background: url($intro-img) no-repeat center center;
+		-webkit-background-size: cover;
+		-moz-background-size: cover;
+		-o-background-size: cover;
+		background-size: cover;
+	}
+}
+
 .intro {
 	@extend %container;
 	display: block;
-	margin: $intro-inset auto;
-
-	.content {
-		@include span($intro-content-width nest);
-		@include push($intro-offset-width);
-    	position:relative;
-	}
-	img {
-		position: absolute;
-		top: 0;
-		bottom: 0;
-		margin: auto;
-		margin-left: 2em;
-	}
-	
-	.text {
-		@include span($intro-text-width last);
-	}
-
-	@include media-query($on-laptop) {
-		.content {
-			@include span($col);
-			@include push(0);
-		}
+	padding: 18vw 0;
+	color: $color-bright;
+	h1, p {
+		@include span(1 of 2 1/4);
 	}
 }

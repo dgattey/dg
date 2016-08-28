@@ -2,8 +2,7 @@
 nav {
 	@extend %container;
 	display: block;
-	height: $nav-height -$inset*2;
-	padding: $inset 0;
+	height: $nav-height;
 
 	img {
 		float: left;
@@ -23,7 +22,6 @@ nav {
 		color: $color-text-muted;
 		position: relative;
 		text-decoration: none;
-		font-weight: $nav-font-weight;
 
 		&:after {
 			@include anim(opacity);
