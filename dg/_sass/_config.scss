@@ -41,18 +41,18 @@ $intro-offset-width: ($col - $intro-content-width)/2;
 $intro-text-width: 13;
 
 // Project card component measurements
-$cards-per-row: 2;
-$card-transparency: 0.2;
-$card-shadow-blur: 6px;
-$card-shadow-color: transparentize($color-dim, 0.8);
+$cards-per-row: 3;
+$cards-per-row-small: 2;
+$card-shadow-blur: 4px;
+$card-shadow-color: transparentize($color-dim, 0.4);
 $card-hover-scale: 0.98;
 $card-tag-padding: 0.5em;
 $card-text-margin: $card-tag-padding 0;
 
-
 // Spacing and viewports
 $spacing-unit:     30px;
-$one-column:       800px;
+$one-column:       750px;
+$two-column:       1200px;
 
 /*
  * Images used as background images

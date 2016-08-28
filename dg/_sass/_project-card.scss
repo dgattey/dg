@@ -1,38 +1,32 @@
-// TODO: REMOVE
-@for $i from 1 through 20 {
-	.proj-card:nth-child(#{$i}) .data {
-		background-color: hsla(random(365), random(80), 30, 1);
+// Helper for properly flowing project cards
+@mixin cards-per($num) {
+	width: span($col/$num);
+	&.wide {
+		width: span($col/$num * 2);
 	}
 }
-/////
 
 .proj-card {
-	@include anim(all);
-	display: block;
 	position: relative;
-	background: $color-primary-dim;
+	@include anim(transform);
 
-	// All possible layouts
-	@include span($col/$cards-per-row);
-	&.wide {
-		@include span($col/$cards-per-row * 2);
+	// Grids
+	@include cards-per($cards-per-row); // regular grid
+	@include media-query($two-column) {
+		@include cards-per($cards-per-row-small); // smaller grid
 	}
-
-	// Reset to full width
 	@include media-query($one-column) {
-		&, &.wide {
-			@include span($col last);
-		}
+		@include cards-per(1); // full width
 	}
 
 	img {
-		@include anim(all);
 		@extend %flush-width;
+		position: absolute;
+		height: 100%;
 	}
 
 	.data {
-		@include anim(all);
-		@extend %overlay;
+		position: relative;
 		padding: $edge-padding;
 		color: $color-text-light;
 	}
