@@ -18,7 +18,7 @@ nav {
 	}
 
 	a {
-		@include anim(color);
+		@include transition(color);
 		color: $color-text-muted;
 		position: relative;
 		text-decoration: none;
@@ -30,7 +30,7 @@ nav {
 		}
 
 		&:after {
-			@include anim(opacity);
+			@include transition(opacity);
 			@extend %fake-underline;
 			@extend %hide;
 		}

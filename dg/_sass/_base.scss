@@ -87,7 +87,7 @@ pre {
         vertical-align: middle;
 
         path {
-            @include anim(fill);
+            @include transition(fill);
             fill: $color-primary-bright;
         }
     }

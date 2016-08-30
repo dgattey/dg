@@ -9,7 +9,14 @@
 .proj-card {
 	position: relative;
 	height: 24vw;
-	@include anim(transform);
+
+	// Pops in each with a delay at beginning
+	@extend %animate-pop-in;
+	@for $i from 1 through 20 {
+	 	&:nth-child(#{$i}) {
+	 		animation-delay: $pop-in-delay * ($i+1);
+	 	}
+	}
 
 	// Grids
 	@include cards-per($cards-per-row); // regular grid
@@ -20,13 +27,25 @@
 		@include cards-per(1); // full width
 	}
 
+	// Hover state
+	&:hover {
+		.data, img {
+			transform: scale($card-hover-scale);
+		}
+		img {
+			@include box-shadow($card-shadow-color, $blur: $card-shadow-blur);
+		}
+	}
+
 	img {
+		@include transition(transform);
 		@extend %flush-width;
 		position: absolute;
 		height: 100%;
 	}
 
 	.data {
+		@include transition(box-shadow, transform);
 		position: relative;
 		height: 100%;
 		padding: $edge-padding/2 $edge-padding;

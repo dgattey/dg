@@ -15,4 +15,5 @@
 	p {
 		@include span(1 of 2);
 	}
+	@extend %animate-fade-in;
 }

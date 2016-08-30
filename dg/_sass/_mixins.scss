@@ -63,11 +63,6 @@
 	z-index: 1;
 }
 
-// Animates transitions
-@mixin anim($property, $duration: 0.2s, $style: ease-out) {
-	transition: $property $duration $style;
-}
-
 // Vertically aligns anything
 @mixin vertical-align($position: relative) {
   position: $position;
