@@ -5,6 +5,7 @@
  * Main html and body styling
  */
 html {
+    @extend %container;
     background: $color-bg;
     color: $color-text-dark;
     overflow-x: hidden;
@@ -23,7 +24,6 @@ img {
 ul, ol {
     margin-left: $spacing-unit;
 }
-
 
 /**
  * Blockquotes

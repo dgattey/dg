@@ -34,12 +34,6 @@ $inset: 20px;
 // Nav component measurements
 $nav-height: 100px;
 
-// Intro component measurements
-$intro-inset: 2.5 * $inset;
-$intro-content-width: 12;
-$intro-offset-width: ($col - $intro-content-width)/2;
-$intro-text-width: 13;
-
 // Project card component measurements
 $cards-per-row: 3;
 $cards-per-row-small: 2;
@@ -67,6 +61,6 @@ $intro-img: "/img/haily.jpg";
 $susy: (
   columns: $col,
   gutters: 0,
-  container: 2000px, // max-width
+  container: 1300px, // max-width
   global-box-sizing: border-box
 );

@@ -5,13 +5,14 @@
 @import 
 	'normalize/import-now', // normalizing css
 	
-	'config',	// our configuration
-	'susy', 	// Susy framework
-	'mixins',	// Mixins for use below
-
-	// Shared/base components
-    'base',
+	'config',      // our configuration
+	'susy',
+	'mixins',
+    'animations', 
     'fonts',
+    'base',
+
+    // Shared components
     // TODO: reenable 'syntax-highlighting',
     'nav',
     'footer',

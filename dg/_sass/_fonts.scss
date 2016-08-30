@@ -21,7 +21,7 @@ h2, h3, p {
 
 // Headers
 h1 {
-    font-size: 5em;
+    font-size: 4.8em;
     font-weight: 700;
     line-height: 1.5;
     margin-top: 0px;
@@ -30,7 +30,7 @@ h1 {
 }
 
 h2 {
-    font-size: 2.8em;
+    font-size: 3em;
     opacity: 0.95;
     margin-bottom: 6px;
     letter-spacing: -0.55px;
@@ -43,15 +43,21 @@ h3 {
     letter-spacing: -0.35px;
 }
 
+h4 {
+    font-size: 1.5em;
+    opacity: 0.90;
+    letter-spacing: -0.2px;
+}
+
 // Body
 p {
-    font-size: 20px;
-    line-height: 1.60;
+    font-size: 1.2em;
+    line-height: 1.6;
     opacity: 0.65;
     margin-top: 5px;
     margin-bottom: 30px;
-    letter-spacing: -0.15px;
-    word-spacing: -0.10px;
+    letter-spacing: -0.1px;
+    word-spacing: -0.1px;
 }
 
 // Links

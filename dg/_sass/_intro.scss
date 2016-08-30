@@ -1,21 +1,18 @@
 // For the main intro in index.html
-header {
-	padding: $edge-padding;
-	&.background {
-		background: url($intro-img) no-repeat center center;
-		-webkit-background-size: cover;
-		-moz-background-size: cover;
-		-o-background-size: cover;
-		background-size: cover;
-	}
-}
-
 .intro {
 	@extend %container;
 	display: block;
-	padding: 18vw 0;
+	padding: 10vw $edge-padding;
 	color: $color-bright;
-	h1, p {
-		@include span(1 of 2 1/4);
+	background: url($intro-img) no-repeat center center;
+	-webkit-background-size: cover;
+	-moz-background-size: cover;
+	-o-background-size: cover;
+	background-size: cover;
+	h1 {
+		@include span(3 of 4);
+	}
+	p {
+		@include span(1 of 2);
 	}
 }

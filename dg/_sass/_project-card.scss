@@ -41,22 +41,4 @@
 			font-size: 1em;
 		}
 	}
-
-	ul {
-		margin: $card-text-margin;
-		padding: 0;
-	}
-
-	li {
-		padding: $card-tag-padding;
-		list-style-type: none;
-		display: inline-block;
-	}
-
-	// Hover state
-	&:hover {
-		@include box-shadow($card-shadow-color, $blur: $card-shadow-blur);
-		transform: scale($card-hover-scale);
-	}
-
 }

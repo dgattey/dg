@@ -2,17 +2,17 @@
 layout: default
 title: Code
 weight: 1
-header: >
-    <div class="intro">
-    <h1>Hello! I'm Dylan,</h1>
-    <p>A software developer at LinkedIn in San Francisco, passionate about designing beautiful interfaces and crafting clean code. Take a look at some of my work, or read more about me.</p>
-    </div>
 ---
 <div class="page">
-	<div class="header">
-		<h1>Projects</h1>
+	<div class="intro">
+		<h1>Hello! I'm Dylan.</h1>
+		<p>I'm a software developer working for LinkedIn in San Francisco, passionate about designing beautiful interfaces and crafting clean code. Take a look at some of what I've coded up!</p>
 	</div>
-	<div class="projects">
+	<!-- <div class="proj-grid-header">
+		<h2>Featured Work</h2>
+		<h4>Web and iOS projects I've coded</h4>
+	</div> -->
+	<div class="proj-grid">
 		{% for post in site.posts %}
 		{% include proj-card.html %}
 		{% endfor %}
