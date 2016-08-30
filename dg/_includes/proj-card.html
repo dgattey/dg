@@ -6,6 +6,7 @@
   <div class="data">
     <h3>{% if post.short-title %}{{ post.short-title }} {% else %} {{ post.title }}{% endif %}</h3>
     <p>{{ post.desc }}</p>
+    <p class="arr">&#10142;</p>
 
     <!-- Link that spans the whole thing -->
     <a href="{{ post.url }}">
