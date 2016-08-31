@@ -1,18 +1,22 @@
 footer {
+	$border-weight: 1px;
+	$height: $icon-size;
+	$padding: $height/2;
+
 	@extend %container;
-	padding: 10px 0;
-	margin: $edge-padding;
-	border-top: 1px solid $color-primary-dim;
-	.copy, ul {
+	margin: $edge-padding 0;
+	border-top: $border-weight solid $color-primary-dim;
+	.copy, ul, li {
 		display: inline-block;
 	}
-	.copy {
+	p, ul {
+		height: $height;
+		margin: $padding 0;
 	}
 	ul {
 		float: right;
 	}
 	li {
-		display: inline-block;
-		padding: 0 10px;
+		padding: 0 $padding;
 	}
 }

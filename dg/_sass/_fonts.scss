@@ -1,71 +1,94 @@
 html {
+    // Config for font files
+    $fam-body: "Hind", sans-serif;
+    $fam-head: "Playfair Display", Times, serif;
+    $line-height: 1.4;
+    $h1-height: 1.5;
+    $weight: 400;
+    $bold-weight: 700;
+    $font-size: 1.2em;
+    $h1-size: 4.6em;
+    $h2-size: 2.8em;
+    $h3-size: 1.8em;
+    $h4-size: 1.4em;
+    $h-top: 30px;
+    $h1-bottom: 10px;
+    $h2-bottom: 6px;
+    $h3-bottom: 5px;
+    $p-top: $h3-bottom;
+    $p-bottom: $h-top;
+    $word: -0.1px;
+    $letter: $word;
+    $h1-letter: $letter*7;
+    $h2-letter: $letter*5;
+    $h3-letter: $letter*3;
+    $h4-letter: $letter*2;
+    $opacity: 0.9;
+    $h2-opacity: 0.95;
+    $p-opacity: 0.65;
+
+    // HTML specific styles
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
     font-feature-settings: "kern" 1;
     font-kerning: normal;
-    font-family: "Hind", sans-serif;
-}
+    font-family: $fam-body;
+    font-weight: $weight;
+    font-size: $font-size;
+    line-height: $line-height;
+    letter-spacing: $letter;
+    word-spacing: $word;
 
-// Shared header styles
-h1, h2, h3 {
-    font-family: "Playfair Display", serif;
-    margin-top: 30px;
-    line-height: 1.4;
-}
+    // Shared header styles
+    h1, h2, h3 {
+        font-family: $fam-head;
+        font-weight: $weight;
+        margin-top: $h-top;
+        line-height: $line-height;
+    }
 
-// Shared other styles
-h2, h3, p {
-    font-weight: 400;
-}
+    // Headers
+    h1 {
+        font-size: $h1-size;
+        font-weight: $bold-weight;
+        line-height: $h1-height;
+        margin-top: 0;
+        margin-bottom: $h1-bottom;
+        letter-spacing: $h1-letter;
+    }
+    h2 {
+        font-size: $h2-size;
+        opacity: $h2-opacity;
+        margin-bottom: $h2-bottom;
+        letter-spacing: $h2-letter;
+    }
+    h3 {
+        font-size: $h3-size;
+        opacity: $opacity;
+        margin-bottom: $h3-bottom;
+        letter-spacing: $h3-letter;
+    }
+    h4 {
+        font-size: $h4-size;
+        opacity: $opacity;
+        letter-spacing: $h4-letter;
+    }
 
-// Headers
-h1 {
-    font-size: 4.8em;
-    font-weight: 700;
-    line-height: 1.5;
-    margin-top: 0px;
-    margin-bottom: 10px;
-    letter-spacing: -0.70px;
-}
+    // Body
+    p {
+        opacity: $p-opacity;
+        margin-top: $p-top;
+        margin-bottom: $p-bottom;
+    }
 
-h2 {
-    font-size: 3em;
-    opacity: 0.95;
-    margin-bottom: 6px;
-    letter-spacing: -0.55px;
-}
+    // Links
+    a {
+        color: $color-primary-bright;
+        text-decoration: none;
 
-h3 {
-    font-size: 2em;
-    opacity: 0.90;
-    margin-bottom: 5px;
-    letter-spacing: -0.35px;
-}
-
-h4 {
-    font-size: 1.5em;
-    opacity: 0.90;
-    letter-spacing: -0.2px;
-}
-
-// Body
-p {
-    font-size: 1.2em;
-    line-height: 1.6;
-    opacity: 0.65;
-    margin-top: 5px;
-    margin-bottom: 30px;
-    letter-spacing: -0.1px;
-    word-spacing: -0.1px;
-}
-
-// Links
-a {
-    color: $color-primary-bright;
-    text-decoration: none;
-
-    &:hover {
-        color: $color-primary-dim;
+        &:hover {
+            color: $color-primary-dim;
+        }
     }
 }

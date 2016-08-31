@@ -2,12 +2,8 @@
 <html>
 {% include head.html %}
 <body>
-	<!-- Header with any additional content spliced in -->
-	{% if page.header %}
-	<header class="background">
-	{% else %}
+	<!-- Header and navigation -->
 	<header>
-	{% endif %}
 		{% include nav.html %}
 		{{ page.header }}
 	</header>

@@ -9,13 +9,15 @@ github:  dgattey
 
 # Configuration for site
 url: "https://dylangattey.com"
-permalink: /projects/:year/:title/ #posts
+permalink: /projects/:title/ #posts
 baseurl: ""
 
 # Build settings
 markdown: kramdown
 source: dg
 destination: build
+sass:
+  style: compressed
 
 # Older
 #<!-- Alternates: I make things look nice. I also write words on screens so you can use that hunk of metal in your pocket. Current property of Brown University. When not coding or designing, I run so I can cook way too much good food.  I'm a software developer based out of San Francisco, passionate about designing beautiful interfaces and crafting clean code. When not working, I run long distances so I can cook delicious food. Current property of @LinkedIn.Currently @ LinkedIn's beautiful new office in SOMA. -->

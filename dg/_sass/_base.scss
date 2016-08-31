@@ -1,94 +1,80 @@
 // For Susy
 @include border-box-sizing;
 
-/**
- * Main html and body styling
- */
 html {
+    $html-border-width: 1vw;
+    $left-spacing: $icon-size;
+
     @extend %container;
     background: $color-bg;
     color: $color-text-dark;
     overflow-x: hidden;
-    border: 1vw solid $color-bright;
-}
+    border: $html-border-width solid $color-bright;
 
-/**
- * Spacing
- */
-
-img {
-    max-width: 100%;
-    vertical-align: middle;
-}
-
-ul, ol {
-    margin-left: $spacing-unit;
-}
-
-/**
- * Blockquotes
- */
-blockquote {
-    color: $color-text-muted;
-    border-left: 4px solid $color-text-dark;
-    padding-left: $spacing-unit / 2;
-    font-size: 18px;
-    letter-spacing: -1px;
-    font-style: italic;
-
-    > :last-child {
-        margin-bottom: 0;
+    // Images should fill parent from middle
+    img {
+        max-width: 100%;
+        vertical-align: middle;
     }
-}
 
-
-/**
- * Code formatting
- */
-pre,
-code {
-    font-size: 15px;
-    border: 1px solid $color-text-dark;
-    border-radius: 3px;
-    background-color: $color-bg-code;
-}
-
-code {
-    padding: 1px 5px;
-}
-
-pre {
-    padding: 8px 12px;
-    overflow-x: auto;
-
-    > code {
-        border: 0;
-        padding-right: 0;
-        padding-left: 0;
+    // Make sure margins align with spacing
+    ul, ol {
+        margin-left: $left-spacing;
     }
-}
 
-
-/**
- * Icons
- */
-.icon {
-
-    &:hover > svg {
-        path {
+    // Icons
+    .icon {
+        &:hover > svg path {
             fill: $color-primary-dim;
         }
-    }
-
-    > svg {
-        display: inline-block;
-        width: 32px;
-        height: 32px;
-        vertical-align: middle;
-
-        path {
-            @include transition(fill);
-            fill: $color-primary-bright;
+        > svg {
+            display: inline-block;
+            width: $icon-size;
+            height: $icon-size;
+            vertical-align: middle;
+            path {
+                @include transition(fill);
+                fill: $color-primary-bright;
+            }
         }
     }
+
+    // // TODO: come back to Blockquotes looking nice
+    // blockquote {
+    //     color: $color-text-muted;
+    //     border-left: 4px solid $color-text-dark;
+    //     padding-left: $left-spacing / 2;
+    //     font-size: 18px;
+    //     letter-spacing: -1px;
+    //     font-style: italic;
+
+    //     > :last-child {
+    //         margin-bottom: 0;
+    //     }
+    // }
+
+
+    // // TODO: come back to Code formatting
+    // pre,
+    // code {
+    //     font-size: 15px;
+    //     border: 1px solid $color-text-dark;
+    //     border-radius: 3px;
+    //     background-color: $color-bg-code;
+    // }
+
+    // code {
+    //     padding: 1px 5px;
+    // }
+
+    // pre {
+    //     padding: 8px 12px;
+    //     overflow-x: auto;
+
+    //     > code {
+    //         border: 0;
+    //         padding-right: 0;
+    //         padding-left: 0;
+    //     }
+    // }
 }

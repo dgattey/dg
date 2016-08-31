@@ -2,18 +2,19 @@
 # Imports all needed scss files from their various locations
 ---
 @charset "utf-8";
-@import 
-	'normalize/import-now', // normalizing css
+@import
+    // Normalizes css
+	'normalize/import-now',
 	
-	'config',      // our configuration
-	'susy',
-	'mixins',
+    // Configuration and base
+	'config',      // shared configuration
+	'susy',        // framework for grids
     'animations', 
+    'mixins',
     'fonts',
-    'base',
 
     // Shared components
-    // TODO: reenable 'syntax-highlighting',
+    'base', // TODO: rename or get rid of it
     'nav',
     'footer',
 

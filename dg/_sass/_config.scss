@@ -1,7 +1,3 @@
-/*
- * Colors for app
- */
-
 // Raw color values
 $color-dim: #000000;
 $color-deep: #433D3A;
@@ -20,42 +16,12 @@ $color-text-light: $color-bright;
 $color-text-muted: $color-muted;
 $color-text-active: $color-primary-dim;
 
-/* 
- * Measurements and values
- */
-
-// General measurements
+// Spacing and viewports
 $col: 18;
 $edge-padding: 3vw;
-
-// TODO: refactor
-$inset: 20px;
-
-// Nav component measurements
-$nav-height: 100px;
-
-// Project card component measurements
-$cards-per-row: 3;
-$cards-per-row-small: 2;
-$card-shadow-blur: 4px;
-$card-shadow-color: transparentize($color-dim, 0.4);
-$card-hover-scale: 0.96;
-$card-tag-padding: 0.5em;
-$card-text-margin: $card-tag-padding 0;
-
-// Spacing and viewports
-$spacing-unit:     30px;
-$one-column:       750px;
-$two-column:       1200px;
-
-/*
- * Images used as background images
- */
-$intro-img: "/img/haily.jpg";
-
-/*
- * Third party config
- */
+$icon-size: 32px;
+$one-column: 750px;
+$two-column: 1200px;
 
 /* Changing Susy default global settings */
 $susy: (

@@ -6,22 +6,35 @@
 	}
 }
 
+// Project card component
 .proj-card {
+	$max-cards: 12;
+	$card-height: 24vw;
+	$n-per-row: 3;
+	$n-per-row-small: 2;
+	$shadow-blur: 4px;
+	$shadow-color: transparentize($color-dim, 0.4);
+	$hover-scale: 0.96;
+	$tag-padding: 0.5em;
+	$text-margin: $tag-padding 0;
+	$desc-size: 0.9em;
+	$arr-size: 2.0em;
+
 	position: relative;
-	height: 24vw;
+	height: $card-height;
 
 	// Pops in each with a delay at beginning
 	@extend %animate-pop-in;
-	@for $i from 1 through 20 {
+	@for $i from 1 through $max-cards {
 	 	&:nth-child(#{$i}) {
 	 		animation-delay: $pop-in-delay * ($i+1);
 	 	}
 	}
 
 	// Grids
-	@include cards-per($cards-per-row); // regular grid
+	@include cards-per($n-per-row); // regular grid
 	@include media-query($two-column) {
-		@include cards-per($cards-per-row-small); // smaller grid
+		@include cards-per($n-per-row-small); // smaller grid
 	}
 	@include media-query($one-column) {
 		@include cards-per(1); // full width
@@ -30,18 +43,17 @@
 	// Hover state
 	&:hover {
 		.data, img {
-			transform: scale($card-hover-scale);
+			transform: scale($hover-scale);
 		}
 		img {
-			@include box-shadow($card-shadow-color, $blur: $card-shadow-blur);
+			@include box-shadow($shadow-color, $blur: $shadow-blur);
 		}
 	}
 
 	img {
 		@include transition(transform);
-		@extend %flush-width;
-		position: absolute;
-		height: 100%;
+		@extend %flush;
+		@extend %overlay;
 	}
 
 	.data {
@@ -57,10 +69,10 @@
 			@include span($col/2);
 			position: absolute;
 			bottom: 0;
-			font-size: 1em;
+			font-size: $desc-size;
 			&.arr {
 				@include span($col);
-				font-size: 2.0em;
+				font-size: $arr-size;
 				text-align: right;
 				right: 0;
 				margin-right: $edge-padding;

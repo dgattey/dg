@@ -22,6 +22,7 @@
 }
 
 %hide {
+	@include transition(opacity);
 	opacity: 0;
 }
 
@@ -34,11 +35,12 @@
 	right: 0;
 }
 
-// Width of parent
-%flush-width {
+// Size of parent
+%flush {
 	margin: 0;
 	padding: 0;
 	width: 100%;
+	height: 100%;
 }
 
 // Makes text truncate and show ...
@@ -57,9 +59,8 @@
 
 // When applied to empty span within <a></a>, overlays link
 .link-spanner {
-	@extend %flush-width;
+	@extend %flush;
 	@extend %overlay;
-	height: 100%;
 	z-index: 1;
 }
 
@@ -70,25 +71,12 @@
   transform: translateY(-50%);
 }
 
-// TODO: settings for autoprefixer
-
-// Box shadows prefixin
+// Simpler to leave off properties
 @mixin box-shadow($color, $x: 0, $y: 0, $blur: 0) {
 	box-shadow: $x $y $blur 0px $color;
 }
 
-// Filters an image
-@mixin dim-image($amt) {
-	filter: brightness($amt);
-}
-
-// Use media queries like this:
-// @include media-query($on-palm) {
-//     .wrapper {
-//         padding-right: $spacing-unit / 2;
-//         padding-left: $spacing-unit / 2;
-//     }
-// }
+// Helps with media queries to reduce typing
 @mixin media-query($device) {
     @media screen and (max-width: $device) {
         @content;

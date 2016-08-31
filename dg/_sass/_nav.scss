@@ -1,5 +1,8 @@
 // Styles for navigation
 nav {
+	$nav-height: 100px;
+	$nav-spacing: 20px;
+
 	@extend %container;
 	display: block;
 	height: $nav-height;
@@ -14,7 +17,7 @@ nav {
 
 	li {
 		display: inline-block;
-		margin: 0 $inset;
+		margin: 0 $nav-spacing;
 	}
 
 	a {
@@ -22,7 +25,6 @@ nav {
 		color: $color-text-muted;
 		position: relative;
 		text-decoration: none;
-		font-size: 1.3em;
 
 		// Dark background, so light text
 		header.background & {
@@ -30,7 +32,6 @@ nav {
 		}
 
 		&:after {
-			@include transition(opacity);
 			@extend %fake-underline;
 			@extend %hide;
 		}

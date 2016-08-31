@@ -1,13 +1,12 @@
 // For the main intro in index.html
 .intro {
+	$intro-img: "/img/haily.jpg";
+	
 	@extend %container;
 	display: block;
-	padding: 10vw $edge-padding;
+	padding: $edge-padding*4 $edge-padding;
 	color: $color-bright;
 	background: url($intro-img) no-repeat center center;
-	-webkit-background-size: cover;
-	-moz-background-size: cover;
-	-o-background-size: cover;
 	background-size: cover;
 	h1 {
 		@include span(3 of 4);
