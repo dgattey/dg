@@ -2,7 +2,7 @@
 layout: post
 title:  "Groups/LIDelight"
 tags: "ios interaction"
-thumb: blank-wide.jpg
+thumb: groups.png
 desc: "An iOS app for LinkedIn Groups + interface delights"
 style: wide
 ---

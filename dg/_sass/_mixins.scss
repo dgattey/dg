@@ -77,8 +77,8 @@
 }
 
 // Helps with media queries to reduce typing
-@mixin media-query($device) {
-    @media screen and (max-width: $device) {
+@mixin bp($size) {
+    @media screen and (max-width: $size) {
         @content;
     }
 }

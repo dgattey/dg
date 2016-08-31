@@ -16,17 +16,22 @@ $color-text-light: $color-bright;
 $color-text-muted: $color-muted;
 $color-text-active: $color-primary-dim;
 
-// Spacing and viewports
+// Spacing
 $col: 18;
-$edge-padding: 3vw;
+$edge-padding: 40px;
 $icon-size: 32px;
-$one-column: 750px;
-$two-column: 1200px;
+
+// Breakpoints
+$smallest-bp: 450px;
+$small-bp: 600px;
+$medium-bp: 800px;
+$large-bp: 1000px;
+$largest-bp: 1400px;
 
 /* Changing Susy default global settings */
 $susy: (
   columns: $col,
   gutters: 0,
-  container: 1300px, // max-width
+  container: $largest-bp, // max-width
   global-box-sizing: border-box
 );

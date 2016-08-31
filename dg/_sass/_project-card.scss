@@ -9,9 +9,7 @@
 // Project card component
 .proj-card {
 	$max-cards: 12;
-	$card-height: 24vw;
-	$n-per-row: 3;
-	$n-per-row-small: 2;
+	$card-height: 320px;
 	$shadow-blur: 4px;
 	$shadow-color: transparentize($color-dim, 0.4);
 	$hover-scale: 0.96;
@@ -32,11 +30,11 @@
 	}
 
 	// Grids
-	@include cards-per($n-per-row); // regular grid
-	@include media-query($two-column) {
-		@include cards-per($n-per-row-small); // smaller grid
+	@include cards-per(3); // regular grid
+	@include bp($large-bp) {
+		@include cards-per(2); // smaller grid
 	}
-	@include media-query($one-column) {
+	@include bp($small-bp) {
 		@include cards-per(1); // full width
 	}
 
