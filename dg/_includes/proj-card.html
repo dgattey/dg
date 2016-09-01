@@ -1,12 +1,11 @@
 <div class="proj-card {{post.style}}">
   <!-- Image -->
-  <img src="{{post.thumb | prepend:'/img/' | prepend:site.baseurl }}">
+  <img src="{{post.thumb | prepend:'/img/thumbs/' | prepend:site.baseurl }}">
   
   <!-- Overlay -->
   <div class="data">
     <h3>{% if post.short-title %}{{ post.short-title }} {% else %} {{ post.title }}{% endif %}</h3>
     <p>{{ post.desc }}</p>
-    <p class="arr">&#10142;</p>
 
     <!-- Link that spans the whole thing -->
     <a href="{{ post.url }}">

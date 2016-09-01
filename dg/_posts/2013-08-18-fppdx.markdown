@@ -2,7 +2,7 @@
 layout: post
 title:  "Forest Park PDX"
 tags: "web ios brand"
-thumb: blank-wide.jpg
+thumb: blank.jpg
 desc: "An iOS app for exploring the great outdoors of Portland"
 style: wide
 ---
