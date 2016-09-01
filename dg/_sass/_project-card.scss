@@ -16,7 +16,6 @@
 	$tag-padding: 0.5em;
 	$text-margin: $tag-padding 0;
 	$desc-size: 0.9em;
-	$arr-size: 2.0em;
 
 	position: relative;
 	height: $card-height;
@@ -46,6 +45,9 @@
 		img {
 			@include box-shadow($shadow-color, $blur: $shadow-blur);
 		}
+		.data p {
+			opacity: 1;
+		}
 	}
 
 	img {
@@ -64,17 +66,12 @@
 			@include span(2*$col/3);
 		}
 		p {
+			opacity: 0;
+			@include transition(opacity);
 			@include span($col/2);
 			position: absolute;
 			bottom: 0;
 			font-size: $desc-size;
-			&.arr {
-				@include span($col);
-				font-size: $arr-size;
-				text-align: right;
-				right: 0;
-				margin-right: $edge-padding;
-			}
 		}
 	}
 }
