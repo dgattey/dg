@@ -31,7 +31,7 @@ $largest-bp: 1380px;
 /* Changing Susy default global settings */
 $susy: (
   columns: $col,
-  gutters: 0,
+  gutters: 1/4,
   container: $largest-bp, // max-width
   global-box-sizing: border-box
 );

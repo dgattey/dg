@@ -4,6 +4,12 @@
 	&.wide {
 		@include span($col/$num * 2);
 	}
+	&.last {
+		@include span($col/$num last);
+	}
+	&.wide-last {
+		@include span($col/$num * 2 last);
+	}
 }
 
 // Project card component
@@ -19,6 +25,7 @@
 
 	position: relative;
 	height: $card-height;
+	margin-bottom: gutter();
 
 	// Pops in each with a delay at beginning
 	@extend %animate-pop-in;
@@ -45,7 +52,7 @@
 		img {
 			@include box-shadow($shadow-color, $blur: $shadow-blur);
 		}
-		.data p {
+		.data p, .data h3 {
 			opacity: 1;
 		}
 	}
@@ -63,7 +70,9 @@
 		padding: $edge-padding/2 $edge-padding;
 		color: $color-text-light;
 		h3 {
-			@include span(2*$col/3);
+			opacity: 0;
+			@include transition(opacity);
+			@include span($col/2);
 		}
 		p {
 			opacity: 0;
