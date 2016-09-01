@@ -1,8 +1,8 @@
 // Helper for properly flowing project cards
 @mixin cards-per($num) {
-	width: span($col/$num);
+	@include span($col/$num);
 	&.wide {
-		width: span($col/$num * 2);
+		@include span($col/$num * 2);
 	}
 }
 
