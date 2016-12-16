@@ -1,6 +1,19 @@
-/* Styles targeting the project grid */
-.proj-grid-header {
+.bubble-list {
+	&, .bubble {
+		display: inline-block;
+		margin: 0;
+	}
+	.bubble a {
+		color: $color-primary-bright;
+		@include transition(background);
+		padding: $item-spacing-1 $item-spacing-2;
+		border-radius: $item-spacing-4;
+		&:hover {
+			background: white;
+		}
+	}
 }
+
 .proj-grid {
 	display: flex;
 	flex-wrap: wrap;
