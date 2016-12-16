@@ -51,7 +51,7 @@
 	.data {
 		position: relative;
 		height: 100%;
-		padding: $edge-padding/2 $edge-padding;
+		padding: $item-spacing-2 $item-spacing-3;
 		color: $color-text-light;
 		h3 {
 			@extend %hide;

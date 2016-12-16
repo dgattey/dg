@@ -4,7 +4,8 @@
 	
 	@extend %container;
 	display: block;
-	padding: $edge-padding*4 $edge-padding;
+	padding: $item-spacing-6 $item-spacing-5;
+	margin-bottom: $item-spacing-3;
 	color: $color-deep;
 	background: url($intro-img) no-repeat center right;
 	background-size: contain;

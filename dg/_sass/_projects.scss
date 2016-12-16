@@ -1,11 +1,5 @@
 /* Styles targeting the project grid */
 .proj-grid-header {
-	padding-top: $edge-padding;
-	padding-bottom: $edge-padding;
-	h2, h4 {
-		text-align: center;
-		margin: 0;
-	}
 }
 .proj-grid {
 	display: flex;
