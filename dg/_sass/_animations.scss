@@ -1,22 +1,6 @@
 // Constants for animations and transitions
 $animation-duration: 350ms;
-$transition-duration: 200ms;
-
-// Animation to pop in cards
-$pop-in-orig-scale: 0.5;
-$pop-in-scale: 1.05;
-$pop-in-delay: 50ms;
-@keyframes popin {
-  0%	{ opacity: 0; transform: scale($pop-in-orig-scale); }
-  45%	{ opacity: 1; }
-  50%	{ transform: scale($pop-in-scale); }
-  100%	{ transform: none; }
-}
-%animate-pop-in {
-	transform: scale(0);
-	animation: popin $animation-duration $pop-in-delay 1 forwards;
-	animation-timing-function: ease-in-out;
-}
+$transition-duration: 150ms;
 
 // Animation to fade in anything
 @keyframes fadein {
@@ -30,5 +14,24 @@ $pop-in-delay: 50ms;
 
 // Transitions from state to state
 @mixin transition($properties...) {
-	transition: $properties $transition-duration ease-out;
+	transition: $properties $transition-duration ease-in-out;
+}
+
+%show {
+	opacity: 1.0;
+}
+
+%hide {
+	@include transition(opacity);
+	opacity: 0;
+}
+
+// Gives pseudo box shadow on hover, animated
+%shadow-on-hover {
+	@include transition(all);
+	&:hover {
+		$shadow-blur: $item-spacing-2;
+		$shadow-color: transparentize($color-dim, 0.6);
+		@include box-shadow($shadow-color, $blur: $shadow-blur);
+	}
 }

@@ -17,15 +17,6 @@
 	margin-top: 5px;
 }
 
-%show {
-	opacity: 1.0;
-}
-
-%hide {
-	@include transition(opacity);
-	opacity: 0;
-}
-
 // Sticks over top of parent
 %overlay {
 	position: absolute;

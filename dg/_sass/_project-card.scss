@@ -16,9 +16,7 @@
 .proj-card {
 	$max-cards: 12;
 	$card-height: 380px;
-	$shadow-blur: 4px;
-	$shadow-color: transparentize($color-dim, 0.4);
-	$hover-scale: 0.96;
+	$hover-scale: 1.02;
 	$tag-padding: 0.5em;
 	$text-margin: $tag-padding 0;
 	$desc-size: 0.9em;
@@ -26,14 +24,6 @@
 	position: relative;
 	height: $card-height;
 	margin-bottom: gutter();
-
-	// Pops in each with a delay at beginning
-	@extend %animate-pop-in;
-	@for $i from 1 through $max-cards {
-	 	&:nth-child(#{$i}) {
-	 		animation-delay: $pop-in-delay * ($i+1);
-	 	}
-	}
 
 	// Grids
 	@include cards-per(3); // regular grid
@@ -45,38 +35,30 @@
 	}
 
 	// Hover state
+	@extend %shadow-on-hover;
 	&:hover {
-		.data, img {
-			transform: scale($hover-scale);
-		}
-		img {
-			@include box-shadow($shadow-color, $blur: $shadow-blur);
-		}
+		transform: scale($hover-scale);
 		.data p, .data h3 {
-			opacity: 1;
+			@extend %show;
 		}
 	}
 
 	img {
-		@include transition(transform);
 		@extend %flush;
 		@extend %overlay;
 	}
 
 	.data {
-		@include transition(box-shadow, transform);
 		position: relative;
 		height: 100%;
 		padding: $edge-padding/2 $edge-padding;
 		color: $color-text-light;
 		h3 {
-			opacity: 0;
-			@include transition(opacity);
+			@extend %hide;
 			@include span($col/2);
 		}
 		p {
-			opacity: 0;
-			@include transition(opacity);
+			@extend %hide;
 			@include span($col/2);
 			position: absolute;
 			bottom: 0;

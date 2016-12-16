@@ -23,8 +23,8 @@ html {
     $h2-letter: $letter*5;
     $h3-letter: $letter*3;
     $h4-letter: $letter*2;
-    $opacity: 0.9;
-    $h2-opacity: 0.95;
+    $opacity: 0.75;
+    $h2-opacity: 0.8;
     $p-opacity: 0.65;
 
     // HTML specific styles
@@ -43,7 +43,7 @@ html {
     // Shared header styles
     h1, h2, h3 {
         font-family: $fam-head;
-        font-weight: $weight;
+        font-weight: $bold-weight;
         margin-top: $h-top;
         line-height: $line-height;
     }
@@ -51,7 +51,6 @@ html {
     // Headers
     h1 {
         font-size: $h1-size;
-        font-weight: $bold-weight;
         line-height: $h1-height;
         margin-top: 0;
         margin-bottom: $h1-bottom;
@@ -65,6 +64,7 @@ html {
     }
     h3 {
         font-size: $h3-size;
+        font-weight: $weight;
         opacity: $opacity;
         margin-bottom: $h3-bottom;
         letter-spacing: $h3-letter;
