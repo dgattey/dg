@@ -1,11 +1,7 @@
 ---
 layout: default
-title: Code
+title: Projects
 weight: 1
 ---
 {% include intro.html %}
-<div class="proj-grid">
-	{% for post in site.posts %}
-	{% include proj-card.html %}
-	{% endfor %}
-</div>
+{% include proj-grid.html %}
