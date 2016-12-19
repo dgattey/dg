@@ -1,0 +1,39 @@
+$bottom-offset: $item-spacing-4 + $item-spacing-3;
+$header-height: $bottom-offset + $item-spacing-7 + $item-spacing-4;
+.post {
+	@extend %container;
+	margin-top: $item-spacing-3;
+}
+
+.post-fg-light {
+	color: $color-bright;
+}
+
+.post-header {
+	@include span($col);
+	margin-bottom: $item-spacing-2;
+	height: $header-height;
+}
+
+.post-ios {
+	.post-image {
+		max-width: span($col/3);
+		margin-left: span(3*$col/5);
+		margin-top: -$item-spacing-4;
+		margin-bottom: -$header-height -$bottom-offset;
+	}
+	.post-title, .post-desc {
+		@extend %header-content-reset
+	}
+}
+
+.post-content {
+	@include span($col);
+}
+
+// Helper to inset content left
+%header-content-reset {
+	$left-inset: 1;
+	@include span(2*$col/3 - $left-inset);
+	margin-left: span($left-inset);
+}

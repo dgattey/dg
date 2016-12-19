@@ -3,13 +3,19 @@ layout: default
 ---
 <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
-  <header class="post-header">
-    <h1 class="post-title" itemprop="name headline">{{ page.title }}</h1>
-    <p class="post-meta"><time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">{{ page.date | date: "%b %-d, %Y" }}</time>{% if page.author %} • <span itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">{{ page.author }}</span></span>{% endif %}</p>
-  </header>
+	<header class="post-header post-fg-{{ page.foreground }} post-{{ page.tags[0] }}" style="background-color: {{ page.background }};">
+		<img src="{{page.header-img | prepend:'/img/header/' | prepend:site.baseurl }}" class="post-image">
+		<h1 class="post-title" itemprop="name headline">{{ page.title }}</h1>
+		<h5 class="post-desc">{{ page.desc }}</h5>
+		<p class="post-desc">
+			{% for tag in page.tags %}
+			<a href="/tag/{{ tag }}">#{{ tag }}</a>
+			{% endfor %}
+		</p>
+	</header>
 
-  <div class="post-content" itemprop="articleBody">
-    {{ content }}
-  </div>
+	<div class="post-content" itemprop="articleBody">
+		{{ content }}
+	</div>
 
 </article>

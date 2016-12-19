@@ -11,6 +11,7 @@ html {
     $h2-size: 2.8em;
     $h3-size: 1.8em;
     $h4-size: 1.4em;
+    $h5-size: 1.1em;
     $h-top: 30px;
     $h1-bottom: 10px;
     $h2-bottom: 6px;
@@ -23,6 +24,7 @@ html {
     $h2-letter: $letter*5;
     $h3-letter: $letter*3;
     $h4-letter: $letter*2;
+    $h5-letter: $letter;
     $opacity: 0.75;
     $h2-opacity: 0.8;
     $p-opacity: 0.65;
@@ -73,6 +75,12 @@ html {
         font-size: $h4-size;
         opacity: $opacity;
         letter-spacing: $h4-letter;
+    }
+
+    h5 {
+        font-size: $h5-size;
+        opacity: $opacity;
+        letter-spacing: $h5-letter;
     }
 
     // Body
