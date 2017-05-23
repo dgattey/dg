@@ -1,0 +1,31 @@
+.proj-list {
+	display: flex;
+	flex-wrap: wrap;
+	margin-top: gutter();
+}
+
+// Project card component
+.proj-list-card {
+	$card-height: 380px;
+	$hover-scale: 1.02;
+	$desc-size: 0.9em;
+
+	margin-bottom: gutter();
+	height: $card-height;
+
+	img {
+		@include span($col/2);
+		@extend %shadow-on-hover;
+		&:hover {
+			transform: scale($hover-scale);
+		}
+	}
+	.data {
+		@include span($col/2);
+		.post-title {
+		}
+		.post-desc {
+			font-size: $desc-size;
+		}
+	}
+}
