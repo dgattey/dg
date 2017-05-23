@@ -6,7 +6,7 @@ tags:
 - interaction
 thumb: groups.jpg
 header-img: groups-ios.png
-desc: "An iOS app for LinkedIn Groups + interface delights"
+desc: "An iOS app for LinkedIn Groups with interface delights"
 style: wide
 background: "#0077B5"
 foreground: light
