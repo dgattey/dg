@@ -5,4 +5,5 @@ tags: "web"
 thumb: chipmunk.jpg
 desc: "Planning a road trip across the US? We can get you meals on a schedule"
 style: wide
+featured: true
 ---

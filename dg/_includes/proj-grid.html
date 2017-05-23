@@ -11,6 +11,8 @@
 </div>
 <div class="proj-grid">
 	{% for post in site.posts %}
-	{% include proj-card.html %}
+		{% if post.featured %}
+			{% include proj-card.html %}
+		{% endif %}
 	{% endfor %}
 </div>

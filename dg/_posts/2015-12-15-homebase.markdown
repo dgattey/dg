@@ -4,5 +4,6 @@ title:  "Homebase"
 tags: "leap gesture web concept"
 thumb: homebase.jpg
 desc: "Control your home automation system with gestures"
+featured: true
 ---
 Proof of concept
