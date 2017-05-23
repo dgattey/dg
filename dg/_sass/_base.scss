@@ -2,7 +2,7 @@
 @include border-box-sizing;
 
 html {
-    $html-border-width: 15px;
+    $html-border-width: 2em;
     $left-spacing: $icon-size;
 
     @extend %container;

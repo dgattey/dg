@@ -1,15 +1,13 @@
 <div class="proj-card {{post.style}}">
-  <!-- Image -->
-  <img src="{{post.thumb | prepend:'/img/thumbs/' | prepend:site.baseurl }}">
-  
   <!-- Overlay -->
   <div class="data">
     <h3>{% if post.short-title %}{{ post.short-title }} {% else %} {{ post.title }}{% endif %}</h3>
     <p>{{ post.desc }}</p>
-
     <!-- Link that spans the whole thing -->
-    <a href="{{ post.url }}">
-      <span class="link-spanner"></span>
-    </a>
+    <a href="{{ post.url }}"><span class="link-spanner"></span></a>
   </div>
+  <!-- Image -->
+  <img src="{{post.thumb | prepend:'/img/thumbs/' | prepend:site.baseurl }}">
+  <!-- Link that spans the whole thing -->
+  <a href="{{ post.url }}"><span class="link-spanner"></span></a>
 </div>

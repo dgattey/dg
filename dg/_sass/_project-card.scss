@@ -1,15 +1,10 @@
 // Helper for properly flowing project cards
 @mixin cards-per($num) {
-	@include span($col/$num);
-	&.wide {
-		@include span($col/$num * 2);
-	}
-	&.last {
+	&:nth-child(#{$num}n) {
+		// TODO: @dgattey fix the 2 per grid case - it's because this takes precedent
 		@include span($col/$num last);
 	}
-	&.wide-last {
-		@include span($col/$num * 2 last);
-	}
+	@include span($col/$num);
 }
 
 // Project card component
@@ -17,13 +12,13 @@
 	$max-cards: 12;
 	$card-height: 380px;
 	$hover-scale: 1.02;
-	$tag-padding: 0.5em;
-	$text-margin: $tag-padding 0;
 	$desc-size: 0.9em;
+	$corner-radius: 4px;
 
 	position: relative;
-	height: $card-height;
+	height: 100%;
 	margin-bottom: gutter();
+	border-radius: $corner-radius;
 
 	// Grids
 	@include cards-per(3); // regular grid
@@ -38,28 +33,34 @@
 	@extend %shadow-on-hover;
 	&:hover {
 		transform: scale($hover-scale);
-		.data p, .data h3 {
+		img {
+			filter: brightness(60%);
+		}
+		.data {
 			@extend %show;
 		}
 	}
 
 	img {
 		@extend %flush;
-		@extend %overlay;
+		@include transition(filter);
+		border-radius: $corner-radius;
 	}
 
 	.data {
-		position: relative;
+		@extend %hide;
+		position: absolute;
 		height: 100%;
 		padding: $item-spacing-2 $item-spacing-3;
 		color: $color-text-light;
+		z-index: 999;
 		h3 {
-			@extend %hide;
-			@include span($col/2);
+			@include span($col);
+			opacity: 1.0;
 		}
 		p {
-			@extend %hide;
-			@include span($col/2);
+			@include span($col);
+			opacity: 1.0;
 			position: absolute;
 			bottom: 0;
 			font-size: $desc-size;
