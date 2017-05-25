@@ -2,7 +2,3 @@
 	@extend %container;
 	margin-top: $item-spacing-3;
 }
-
-.post-content {
-	@include span($col);
-}

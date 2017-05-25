@@ -1,0 +1,15 @@
+// The image hangs down into the paragraph below, so adjust the sizes
+.tagged-ios {
+
+	.leading-image {
+		margin: span($col/12);
+		margin-top: $item-spacing-4;
+		width: span($col/3);
+	}
+
+	.leading-paragraph {
+		width: span($col);
+		padding-right: span($col/2);
+	}
+
+}

@@ -1,9 +1,9 @@
 ---
 layout: default
 ---
-<article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+<article class="post tagged-{{ page.tags[0] }}" itemscope itemtype="http://schema.org/BlogPosting">
 
-	<header class="post-header post-fg-{{ page.foreground }} post-{{ page.tags[0] }}" style="background-color: {{ page.background }};">
+	<header class="post-header post-fg-{{ page.foreground }}" style="background-color: {{ page.background }};">
 		<div class="meta">
 			<h1 class="title" itemprop="name headline">{{ page.title }}</h1>
 			<h5 class="desc">{{ page.desc }}</h5>
