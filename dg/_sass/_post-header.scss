@@ -1,0 +1,27 @@
+$bottom-offset: $item-spacing-4 + $item-spacing-3;
+$header-height: $bottom-offset + $item-spacing-7 + $item-spacing-3;
+
+.post-fg-light {
+	color: $color-bright;
+}
+
+.post-header {
+	@include span($col);
+	padding: $item-spacing-4;
+	margin-bottom: $item-spacing-2;
+	height: $header-height;
+
+	.meta {
+		@extend %vertically-centered;
+		@include span($col/2);
+	}
+
+	.leading-image {
+		@extend %vertically-centered;
+		width: span($col/2);
+	}
+
+	.tag {
+		margin-right: $item-spacing-2;
+	}
+}

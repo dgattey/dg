@@ -41,7 +41,7 @@
 	text-overflow: ellipsis;
 }
 
-// Assumes parent is height:100%
+// Assumes parent is height:100% or absolutely sized
 %vertically-centered {
 	position: relative;
 	top: 50%;
@@ -53,13 +53,6 @@
 	@extend %flush;
 	@extend %overlay;
 	z-index: 1;
-}
-
-// Vertically aligns anything
-@mixin vertical-align($position: relative) {
-  position: $position;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 // Simpler to leave off properties

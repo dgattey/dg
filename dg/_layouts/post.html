@@ -4,14 +4,18 @@ layout: default
 <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
 	<header class="post-header post-fg-{{ page.foreground }} post-{{ page.tags[0] }}" style="background-color: {{ page.background }};">
-		<img src="{{page.header-img | prepend:'/img/header/' | prepend:site.baseurl }}" class="post-image">
-		<h1 class="post-title" itemprop="name headline">{{ page.title }}</h1>
-		<h5 class="post-desc">{{ page.desc }}</h5>
-		<p class="post-desc">
-			{% for tag in page.tags %}
-			<a href="/tag/{{ tag }}">#{{ tag }}</a>
-			{% endfor %}
-		</p>
+		<div class="meta">
+			<h1 class="title" itemprop="name headline">{{ page.title }}</h1>
+			<h5 class="desc">{{ page.desc }}</h5>
+			<p class="tags">
+				{% for tag in page.tags %}
+				<a class="tag" href="/tag/{{ tag }}">#{{ tag }}</a>
+				{% endfor %}
+			</p>
+		</div>
+		{% if page.header-img %}
+		<img src="{{page.header-img | prepend:'/img/header/' | prepend:site.baseurl }}" class="leading-image">
+		{% endif %}
 	</header>
 
 	<div class="post-content" itemprop="articleBody">

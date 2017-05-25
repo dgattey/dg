@@ -1,9 +1,14 @@
 ---
 layout: post
 title:  "Connected"
-tags: "data web native visualization"
+tags:
+- web
+- data
+- native
+- visualization
 thumb: connected.jpg
 desc: "A visualization of the future of the connected car"
-style: last
+background: "#000000"
+foreground: light
 featured: true
 ---
