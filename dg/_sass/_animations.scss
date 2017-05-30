@@ -26,9 +26,13 @@ $transition-duration: 150ms;
 	opacity: 0;
 }
 
+%transition-all {
+	@include transition(all);
+}
+
 // Gives pseudo box shadow on hover, animated
 %shadow-on-hover {
-	@include transition(all);
+	@extend %transition-all;
 	&:hover {
 		$shadow-blur: $item-spacing-2;
 		$shadow-color: transparentize($color-dim, 0.6);

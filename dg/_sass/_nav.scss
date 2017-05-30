@@ -6,6 +6,7 @@ header>nav {
 nav {
 	$nav-height: 100px;
 	$nav-spacing: 20px;
+	$hover-scale: 1.05;
 
 	@extend %container;
 	display: block;
@@ -13,6 +14,10 @@ nav {
 
 	img {
 		float: left;
+		@extend %transition-all;
+		&:hover {
+			@include random-rotate(scale($hover-scale));
+		}
 	}
 
 	ul {

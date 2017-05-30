@@ -7,16 +7,6 @@
 	@include span($col/$num);
 }
 
-@mixin random-rotate($other-transforms...) {
-	$variations: 6;
-	$degree-variation: 5;
-	@for $i from 1 through $variations {
-		&:nth-child(#{$i}n) {
-			transform: rotate(#{random($degree-variation)-$degree-variation/2.0}deg) $other-transforms;
-		}
-	}
-}
-
 // Project card component
 .proj-card {
 	$max-cards: 12;
