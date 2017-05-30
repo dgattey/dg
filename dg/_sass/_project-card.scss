@@ -53,6 +53,7 @@
 
 	img {
 		@extend %flush;
+		vertical-align: middle;
 		@include transition(filter);
 		border-radius: $corner-radius;
 	}
