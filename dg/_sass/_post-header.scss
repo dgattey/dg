@@ -6,7 +6,9 @@ $header-height: $offset + $item-spacing-7 + $item-spacing-2;
 }
 
 .post-header {
-	padding: $offset;
+	@extend %full-inset;
+	padding-top: $offset;
+	padding-bottom: $offset;
 	margin-top: $offset;
 	margin-bottom: $offset;
 	height: $header-height;

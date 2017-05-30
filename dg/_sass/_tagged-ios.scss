@@ -7,9 +7,10 @@
 		width: span($col/3);
 	}
 
-	.leading-paragraph {
-		width: span($col);
+	// Make first paragraph large text and left fit
+	.post-content>section:nth-child(1) {
 		padding-right: span($col/2);
+		font-size: 1.05em;
 	}
 
 }
