@@ -28,6 +28,7 @@ html {
     $h5-letter: $letter;
     $opacity: 0.75;
     $h2-opacity: 0.8;
+    $h-opacity: 0.7;
     $p-opacity: 0.65;
 
     // HTML specific styles
@@ -68,19 +69,19 @@ html {
     h3 {
         font-size: $h3-size;
         font-weight: $weight;
-        opacity: $opacity;
+        opacity: $h-opacity;
         margin-bottom: $h3-bottom;
         letter-spacing: $h3-letter;
     }
     h4 {
         font-size: $h4-size;
-        opacity: $opacity;
+        opacity: $h-opacity;
         letter-spacing: $h4-letter;
     }
 
     h5 {
         font-size: $h5-size;
-        opacity: $opacity;
+        opacity: $h-opacity;
         letter-spacing: $h5-letter;
     }
 
