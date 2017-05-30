@@ -1,4 +1,8 @@
 // Styles for navigation
+header>nav {
+	@extend %standard-inset;
+}
+
 nav {
 	$nav-height: 100px;
 	$nav-spacing: 20px;

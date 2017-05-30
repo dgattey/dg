@@ -4,7 +4,8 @@ footer {
 	$padding: $height/2;
 
 	@extend %container;
-	margin: $item-spacing-3 0;
+	@extend %standard-inset;
+	margin-top: $item-spacing-3;
 	border-top: $border-weight solid $color-primary-dim;
 	.copy, ul, li {
 		display: inline-block;

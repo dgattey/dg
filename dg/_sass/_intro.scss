@@ -1,4 +1,7 @@
 // For the main intro in index.html
+.homepage-content {
+	@extend %standard-inset;
+}
 .intro {
 	$intro-img: "/img/dg-portrait.jpg";
 	

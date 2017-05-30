@@ -1,14 +1,14 @@
-$bottom-offset: $item-spacing-4;
-$header-height: $bottom-offset + $item-spacing-7 + $item-spacing-2;
+$offset: $item-spacing-4;
+$header-height: $offset + $item-spacing-7 + $item-spacing-2;
 
 .post-fg-light {
 	color: $color-bright;
 }
 
 .post-header {
-	@include span($col);
-	padding: $item-spacing-4;
-	margin-bottom: $bottom-offset;
+	padding: $offset;
+	margin-top: $offset;
+	margin-bottom: $offset;
 	height: $header-height;
 
 	.meta {

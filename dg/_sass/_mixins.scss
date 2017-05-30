@@ -6,6 +6,16 @@
 	@include container;
 }
 
+%standard-inset {
+	margin-left: $page-padding;
+	margin-right: $page-padding;
+}
+
+%full-inset {
+	padding-left: $page-padding;
+	padding-right: $page-padding;
+}
+
 %fake-underline {
 	content: '';
 	position: absolute;
