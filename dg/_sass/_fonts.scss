@@ -1,6 +1,7 @@
 html {
     // Config for font files
     $fam-body: "Hind", sans-serif;
+    // TODO: @dgattey use system fonts?
     $fam-head: "Playfair Display", Times, serif;
     $line-height: 1.4;
     $h1-height: 1.5;
@@ -19,7 +20,7 @@ html {
     $p-top: $h3-bottom;
     $p-bottom: $h-top;
     $word: -0.1px;
-    $letter: $word;
+    $letter: -0.2px;
     $h1-letter: $letter*7;
     $h2-letter: $letter*5;
     $h3-letter: $letter*3;
@@ -98,5 +99,14 @@ html {
         &:hover {
             color: $color-primary-dim;
         }
+    }
+
+    code {
+        background-color: $color-bg-code;
+        font-size: 0.9em;
+        $vertical-padding: 0;
+        $horizontal-padding: 0.3em;
+        border: 1px solid $color-border-code;
+        padding: $vertical-padding $horizontal-padding;
     }
 }
