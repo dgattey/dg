@@ -1,16 +1,43 @@
 .post-content {
+	&.post-fg-light section.colorized {
+		& code {
+			color: $color-text-dark;
+			background-color: $color-light-transparent;
+		}
+		color: $color-bright;
+	}
 
 	section {
 		@extend %standard-inset;
+		@extend %container;
 
-		&:nth-child(3n-1) {
+		&.colorized {
 			margin-left: 0;
 			margin-right: 0;
 			@extend %full-inset;
 			padding-top: $item-spacing-2;
 			padding-bottom: $item-spacing-2;
-			background: $color-primary-bright;
+			opacity: 0.8;
 		}
+
+		h2, p {
+			@include push($col/4);
+		}
+
+		h2 {
+			@include span(2*$col/3);
+		}
+
+		p {
+			&:nth-child(1) {
+				font-size: 1.1em;
+			}
+			@include span($col/2);
+		}
+	}
+
+	code {
+		border-radius: $item-spacing-1;
 	}
 
 }

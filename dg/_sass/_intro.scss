@@ -12,10 +12,12 @@
 	color: $color-deep;
 	background: url($intro-img) no-repeat center right;
 	background-size: contain;
-	h1 {
+	.head-text {
 		@include span(3 of 4);
+		@include random-rotate();
 	}
-	p {
+	.detail {
 		@include span(1 of 2);
+		@include random-rotate();
 	}
 }

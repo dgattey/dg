@@ -1,26 +1,18 @@
-$offset: $item-spacing-4;
-$header-height: $offset + $item-spacing-7 + $item-spacing-2;
-
-.post-fg-light {
-	color: $color-bright;
-}
-
 .post-header {
+	$bottom-offset: $item-spacing-3;
+	$header-height: $bottom-offset + $item-spacing-7;
+
 	@extend %full-inset;
-	padding-top: $offset;
-	padding-bottom: $offset;
-	margin-top: $offset;
-	margin-bottom: $offset;
+	margin-bottom: $bottom-offset;
 	height: $header-height;
 
-	.meta {
-		@extend %vertically-centered;
-		@include span($col/2);
+	&.post-fg-light {
+		color: $color-bright;
 	}
 
-	.leading-image {
+	.meta, .leading-image {
 		@extend %vertically-centered;
-		width: span($col/2);
+		@include span($col/2);
 	}
 
 	.tag {

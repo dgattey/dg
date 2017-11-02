@@ -19,6 +19,7 @@
 	height: 100%;
 	margin-bottom: gutter();
 	border-radius: $corner-radius;
+	@include random-translate();
 
 	// Grids
 	@include cards-per(3); // regular grid
@@ -32,7 +33,7 @@
 	// Hover state
 	@extend %shadow-on-hover;
 	&:hover {
-		@include random-rotate(scale($hover-scale));
+		@include random-rotate-hover(scale($hover-scale));
 		img {
 			filter: brightness(60%);
 		}

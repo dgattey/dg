@@ -2,15 +2,16 @@
 .tagged-ios {
 
 	.leading-image {
-		margin: span($col/12);
-		margin-top: $item-spacing-4;
-		width: span($col/3);
+		@include span($col/3);
+		margin-top: $item-spacing-5;
+		margin-bottom: -$item-spacing-5;
+		float: right;
 	}
 
-	// Make first paragraph large text and left fit
-	.post-content>section:nth-child(1) {
-		padding-right: span($col/2);
-		font-size: 1.05em;
+	// Make sure we don't push over the leading paragraph
+	.post-content section:nth-child(1) {
+		& h2, p {
+			@include push(0);
+		}
 	}
-
 }
