@@ -12,7 +12,6 @@
 
 	.meta, .leading-image {
 		@extend %vertically-centered;
-		@include span($col/2);
 	}
 
 	.tag {

@@ -3,7 +3,6 @@ footer {
 	$height: $icon-size;
 	$padding: $height/2;
 
-	@extend %container;
 	@extend %standard-inset;
 	margin-top: $item-spacing-3;
 	border-top: $border-weight solid $color-primary-dim;

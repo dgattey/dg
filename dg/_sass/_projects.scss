@@ -1,5 +1,7 @@
 .proj-grid, .proj-list {
-	display: flex;
-	flex-wrap: wrap;
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	grid-column-gap: $item-spacing-3;
+	grid-row-gap: $item-spacing-3;
 	margin-top: gutter();
 }

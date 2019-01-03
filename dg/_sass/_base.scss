@@ -1,8 +1,4 @@
-// For Susy
-@include border-box-sizing;
-
 html {
-    @extend %container;
     background: $color-bg;
     color: $color-text-dark;
     overflow-x: hidden;

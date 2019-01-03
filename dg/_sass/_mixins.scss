@@ -2,10 +2,6 @@
  * Mixins and extensions to be used globally
  */
 
-%container {
-	@include container;
-}
-
 %standard-inset {
 	margin-left: $page-padding;
 	margin-right: $page-padding;
@@ -63,38 +59,6 @@
 	@extend %flush;
 	@extend %overlay;
 	z-index: 1;
-}
-
-// Rotates a small random amount for all the children of this element
-@mixin random-rotate($other-transforms...) {
-	$variations: 6;
-	$degree-variation: 2;
-	@for $i from 1 through $variations {
-		&:nth-child(#{$i}n) {
-			transform: rotate(#{random($degree-variation)-$degree-variation/2.0}deg) $other-transforms;
-		}
-	}
-}
-
-@mixin random-translate($other-transforms...) {
-	$variations: 6;
-	$pixel-variation: 25;
-	@for $i from 1 through $variations {
-		&:nth-child(#{$i}n) {
-			transform: translate(#{random($pixel-variation)-$pixel-variation/2.0}px, #{random($pixel-variation)-$pixel-variation/2.0}px) $other-transforms;
-		}
-	}
-}
-
-// Rotates a random amount for all the children of this element
-@mixin random-rotate-hover($other-transforms...) {
-	$variations: 6;
-	$degree-variation: 4;
-	@for $i from 1 through $variations {
-		&:nth-child(#{$i}n) {
-			transform: rotate(#{random($degree-variation)-$degree-variation/2.0}deg) $other-transforms;
-		}
-	}
 }
 
 // Simpler to leave off properties

@@ -2,16 +2,9 @@
 .tagged-ios {
 
 	.leading-image {
-		@include span($col/3);
 		margin-top: $item-spacing-5;
 		margin-bottom: -$item-spacing-5;
 		float: right;
 	}
 
-	// Make sure we don't push over the leading paragraph
-	.post-content section:nth-child(1) {
-		& h2, p {
-			@include push(0);
-		}
-	}
 }

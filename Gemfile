@@ -9,6 +9,5 @@ group :jekyll_plugins do
 
   # CSS/SASS gems
   gem 'jekyll-autoprefixer' # autoprefixes css
-  gem 'susy'                # Susy SASS framework
   gem 'normalize-scss'		# normalizes the scss
 end

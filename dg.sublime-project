@@ -1,7 +1,8 @@
 {
-	"folders":[{
-		"path": "/Users/dgattey/Dropbox/dev/projects/dg",
-		"folder_exclude_patterns": [".bundle", ".sass-cache"],
-		"file_exclude_patterns": [".jekyll-metadata", "Gemfile.lock", "*.sublime-workspace"]
-	}]
+	"folders":
+	[
+		{
+			"path": "."
+		}
+	]
 }

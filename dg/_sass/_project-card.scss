@@ -1,12 +1,3 @@
-// Helper for properly flowing project cards
-@mixin cards-per($num) {
-	&:nth-child(#{$num}n) {
-		// TODO: @dgattey fix the 2 per grid case - it's because this takes precedent
-		@include span($col/$num last);
-	}
-	@include span($col/$num);
-}
-
 // Project card component
 .proj-card {
 	$max-cards: 12;
@@ -19,24 +10,11 @@
 	height: 100%;
 	margin-bottom: gutter();
 	border-radius: $corner-radius;
-	@include random-translate();
-
-	// Grids
-	@include cards-per(3); // regular grid
-	@include bp($large-bp) {
-		@include cards-per(2); // smaller grid
-	}
-	@include bp($small-bp) {
-		@include cards-per(1); // full width
-	}
 
 	// Hover state
 	@extend %shadow-on-hover;
 	&:hover {
-		@include random-rotate-hover(scale($hover-scale));
-		img {
-			filter: brightness(60%);
-		}
+		transform: scale($hover-scale);
 		.data {
 			@extend %show;
 		}
@@ -57,11 +35,9 @@
 		color: $color-text-light;
 		z-index: 999;
 		h3 {
-			@include span($col);
 			opacity: 1.0;
 		}
 		p {
-			@include span($col);
 			opacity: 1.0;
 			position: absolute;
 			bottom: 0;

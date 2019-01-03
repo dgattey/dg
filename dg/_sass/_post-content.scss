@@ -9,7 +9,6 @@
 
 	section {
 		@extend %standard-inset;
-		@extend %container;
 
 		&.colorized {
 			margin-left: 0;
@@ -20,19 +19,10 @@
 			opacity: 0.8;
 		}
 
-		h2, p {
-			@include push($col/4);
-		}
-
-		h2 {
-			@include span(2*$col/3);
-		}
-
 		p {
 			&:nth-child(1) {
 				font-size: 1.1em;
 			}
-			@include span($col/2);
 		}
 	}
 

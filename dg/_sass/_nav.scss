@@ -8,7 +8,6 @@ nav {
 	$nav-spacing: 20px;
 	$hover-scale: 1.05;
 
-	@extend %container;
 	display: block;
 	height: $nav-height;
 
@@ -16,7 +15,7 @@ nav {
 		float: left;
 		@extend %transition-all;
 		&:hover {
-			@include random-rotate(scale($hover-scale));
+			transform: scale($hover-scale);
 		}
 	}
 

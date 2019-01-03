@@ -8,16 +8,12 @@
 	height: $card-height;
 
 	img {
-		@include span($col/2);
 		@extend %shadow-on-hover;
 		&:hover {
 			transform: scale($hover-scale);
 		}
 	}
 	.data {
-		@include span($col/2);
-		.post-title {
-		}
 		.post-desc {
 			font-size: $desc-size;
 		}
