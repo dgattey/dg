@@ -1,7 +1,6 @@
 .header-nav {
-	$nav-underline-spacing: 4px;
+	$underline-height: 4px;
 	$hover-scale: 1.05;
-	$grid-cols: 8;
 
 	nav {
 		z-index: $z-max;
@@ -24,10 +23,13 @@
 		font-size: 2.3em;
 		line-height: 1;
 		letter-spacing: -0.12em;
-		// TODO: @dgattey revisit performance of this... here and elsewhere;
-		@extend %transition-all;
-		&:hover {
-			transform: scale($hover-scale);
+		.animatable {
+			display: inline-block;
+			// TODO: @dgattey revisit performance of this... here and elsewhere;
+			@extend %transition-all;
+			&:hover {
+				transform: scale($hover-scale);
+			}
 		}
 	}
 
@@ -63,17 +65,17 @@
 				bottom: -$item-spacing-1;
 				left: 0;
 				right: 0;
-				height: 4px;
+				height: $underline-height;
 				background-color: $color-primary-bright;
 			}
 			&:before {
 				@extend %hide;
-				transform: translateY(- $nav-underline-spacing);
+				transform: translateY(- $underline-height);
 				transition: transform 0s $ease-out-back, opacity 0s;
 			}
 			&:after {
 				@extend %hide;
-				transform: translateY($nav-underline-spacing/2);
+				transform: translateY($underline-height/2);
 				transition: transform $transition-duration $ease-out-back, opacity $transition-duration;
 			}
 			&:hover,
