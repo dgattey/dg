@@ -4,7 +4,7 @@
 
 	nav {
 		z-index: $z-max;
-		background: $color-bright;
+		background: $color-bg;
 		@extend %standard-padded-inset;
 		width: calc(100% - #{2*$page-padding});
 		position: fixed;

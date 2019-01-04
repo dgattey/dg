@@ -6,12 +6,11 @@ $bold-weight: 700;
 html {
     // Config for font files
     $line-height: 1.4;
-    $h1-height: 1.5;
     $font-size: 1.2em;
     $h1-size: 4.8em;
     $h2-size: 3.8em;
-    $h3-size: 2em;
-    $h4-size: 1.4em;
+    $h3-size: 2.4em;
+    $h4-size: 1.5em;
     $h5-size: 1.1em;
     $h-top: 30px;
     $h1-bottom: 10px;
@@ -26,9 +25,6 @@ html {
     $h3-letter: $letter*3;
     $h4-letter: $letter*2;
     $h5-letter: $letter;
-    $h2-opacity: 0.85;
-    $h-opacity: 0.7;
-    $p-opacity: 0.65;
 
     // HTML specific styles
     -webkit-font-smoothing: antialiased;
@@ -44,7 +40,7 @@ html {
     word-spacing: $word;
 
     // Shared header styles
-    h1, h2, h3 {
+    h1, h2, h3, h4, h5, h6 {
         font-family: $fam-head;
         font-weight: $bold-weight;
         margin-top: $h-top;
@@ -54,38 +50,32 @@ html {
     // Headers
     h1 {
         font-size: $h1-size;
-        line-height: $h1-height;
         margin-top: 0;
         margin-bottom: $h1-bottom;
         letter-spacing: $h1-letter;
     }
     h2 {
         font-size: $h2-size;
-        opacity: $h2-opacity;
         margin-bottom: $h2-bottom;
         letter-spacing: $h2-letter;
     }
     h3 {
         font-size: $h3-size;
-        opacity: $h-opacity;
         margin-bottom: $h3-bottom;
         letter-spacing: $h3-letter;
     }
     h4 {
         font-size: $h4-size;
-        opacity: $h-opacity;
         letter-spacing: $h4-letter;
     }
 
     h5 {
         font-size: $h5-size;
-        opacity: $h-opacity;
         letter-spacing: $h5-letter;
     }
 
     // Body
     p {
-        opacity: $p-opacity;
         margin-top: $p-top;
         margin-bottom: $p-bottom;
     }

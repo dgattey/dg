@@ -1,17 +1,17 @@
 ---
 layout: post
 title:  "Groups"
+identifier: "groups"
+type: "iOS App"
+desc: "An iOS app for LinkedIn Groups with interface delights"
 thumb: groups.jpg
 header-img: groups-ios.png
-desc: "An iOS app for LinkedIn Groups with interface delights"
-background: "#0077B5"
-foreground: light
 ---
 <section>
 	<p>As an intern at LinkedIn, I helped craft the newest iteration of LinkedIn Groups for iOS. When I arrived, the app was partially built, so I explored what I could most effectively finish as a new hire new to Swift. I worked on interface "delights" to make Groups top of the line. Over the course of the summer, I polished up some slick transition animators and built custom UI components to be styled & reused inside LinkedIn's iOS app sphere.</p>
 </section>
 
-<section class="colorized" style="background-color: {{ page.background }}">
+<section class="colorized">
 	<h2>Transforming those transitions</h2>
 	<p>Our transitions were a bit of a mess. Sometimes screens popped up vertically, other times we shoved things in from the right. Groups had cards, pages, navigation controllers, and more. We needed standards. A consistent experience would guarantee better usability for our users, and less work developing/designing.</p>
 	<p>I worked extensively with just-released Apple APIs like <code>UIViewControllerInteractiveTransitioning</code> and <code>UIViewControllerAnimatedTransitioning</code>to make it so. A key part of these "delightful" transitions were also making them interactive. I introduced hierarchies of layers, so the top-most view "pops back" to present a new page. Other less emphasized pages disappear into the ether.</p>
