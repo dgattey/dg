@@ -1,16 +1,7 @@
 // Constants for animations and transitions
 $animation-duration: 350ms;
 $transition-duration: 150ms;
-
-// Animation to fade in anything
-@keyframes fadein {
-	0%	{ opacity: 0; }
-	100% { opacity: 1; }
-}
-%animate-fade-in {
-	animation: fadein $animation-duration forwards;
-	animation-timing-function: ease-in-out;
-}
+$ease-out-back: cubic-bezier(0.175, 0.885, 0.320, 1.275);
 
 // Transitions from state to state
 @mixin transition($properties...) {

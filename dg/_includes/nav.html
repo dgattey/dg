@@ -1,15 +1,15 @@
 <nav>
-  <a href="{{ site.baseurl }}/"><img src="{{'/img/logo.png' | prepend:site.baseurl }}" class="logo"></a>
-  <ul>
+  <a class="logo" href="{{ site.baseurl }}/">dg.</a>
+  <ul class="nav-items">
     {% assign pages = site.pages | sort:"weight" %}
     {% for pg in pages %}
-    {% assign current = '' %}
+    {% assign current = 'inactive' %}
     {% if page.url == pg.url %}
     {% assign current = 'active' %}
     {% endif %}
     {% if pg.title and pg.weight %}
-    <li>
-      <a class="{{ current }}" href="{{ pg.url | prepend: site.baseurl }}">{{ pg.title }}</a>
+    <li class="nav-item">
+      <a class="nav-link {{ current }}" href="{{ pg.url | prepend: site.baseurl }}">{{ pg.title }}</a>
     </li>
     {% endif %}
     {% endfor %}

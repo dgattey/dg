@@ -7,20 +7,9 @@
 	margin-right: $page-padding;
 }
 
-%full-inset {
+%standard-padded-inset {
 	padding-left: $page-padding;
 	padding-right: $page-padding;
-}
-
-%fake-underline {
-	content: '';
-	position: absolute;
-	left: 0;
-	display: inline-block;
-	height: 1.5em;
-	width: 100%;
-	border-bottom: 2px solid;
-	margin-top: 5px;
 }
 
 // Sticks over top of parent
@@ -58,7 +47,7 @@
 .link-spanner {
 	@extend %flush;
 	@extend %overlay;
-	z-index: 1;
+	z-index: $z-low;
 }
 
 // Simpler to leave off properties

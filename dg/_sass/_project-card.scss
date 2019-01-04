@@ -33,7 +33,7 @@
 		height: 100%;
 		padding: $item-spacing-2 $item-spacing-3;
 		color: $color-text-light;
-		z-index: 999;
+		z-index: $z-med;
 		h3 {
 			opacity: 1.0;
 		}

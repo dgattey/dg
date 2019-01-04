@@ -2,7 +2,7 @@
 	$bottom-offset: $item-spacing-3;
 	$header-height: $bottom-offset + $item-spacing-7;
 
-	@extend %full-inset;
+	@extend %standard-padded-inset;
 	margin-bottom: $bottom-offset;
 	height: $header-height;
 

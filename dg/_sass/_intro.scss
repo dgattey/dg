@@ -3,7 +3,6 @@
 	@extend %standard-inset;
 }
 .intro {
-
 	display: grid;
 	grid-template-columns: repeat(8, 1fr);
 	grid-template-rows: repeat(2, 1fr);
@@ -11,8 +10,12 @@
 	margin-bottom: $item-spacing-3;
 	color: $color-deep;
 	.head-text {
+		background-image: linear-gradient(to bottom, $color-primary-bright, $color-primary-dim);
+		background-clip: text;
+		color: transparent;
+		margin-bottom: 0;
 		align-self: end;
-		grid-column: 2 / 6;
+		grid-column: 2 / 7;
 		grid-row: 1 / 2;
 	}
 	.detail {

@@ -7,7 +7,7 @@ $color-brightest: #FFFFFF;
 $color-gray: darken($color-bright, 20%);
 $color-light-transparent: rgba(255, 255, 255, 0.6);
 
-$color-primary-dim: #18B58F;
+$color-primary-dim: #0c9976;
 $color-primary-bright: #1CD1A5;
 
 // Applied color values
@@ -28,7 +28,10 @@ $item-spacing-5: 6em;
 $item-spacing-6: 12em;
 $item-spacing-7: 24em;
 $icon-size: $item-spacing-3;
-$page-padding: $item-spacing-3;
+
+$nav-padding: $item-spacing-2;
+$page-padding: $item-spacing-4;
+$content-top-padding: $page-padding + $nav-padding * 2;
 
 // Breakpoints
 $smallest-bp: 450px;
@@ -36,3 +39,10 @@ $small-bp: 600px;
 $medium-bp: 800px;
 $large-bp: 1000px;
 $largest-bp: 1380px;
+
+// Z-indices
+$z-max: 999;
+$z-high: 900;
+$z-med: 600;
+$z-low: 400;
+$z-min: 0;

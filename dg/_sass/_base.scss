@@ -2,8 +2,11 @@ html {
     background: $color-bg;
     color: $color-text-dark;
     overflow-x: hidden;
-    margin-top: $page-padding;
-    margin-bottom: $page-padding;
+
+    // Pad content by default to account for sticky header
+    .content {
+        margin-top: $content-top-padding;
+    }
 
     // Make sure margins align with spacing
     ul, ol {

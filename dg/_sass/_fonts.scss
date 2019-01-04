@@ -1,13 +1,14 @@
+$fam-body: "Hind", sans-serif;
+$fam-head: "Heebo", sans-serif;
+$weight: 400;
+$bold-weight: 700;
+
 html {
     // Config for font files
-    $fam-body: "Hind", sans-serif;
-    $fam-head: "Playfair Display", Times, serif;
     $line-height: 1.4;
     $h1-height: 1.5;
-    $weight: 400;
-    $bold-weight: 700;
     $font-size: 1.2em;
-    $h1-size: 4.6em;
+    $h1-size: 4.8em;
     $h2-size: 2.8em;
     $h3-size: 1.9em;
     $h4-size: 1.4em;
@@ -20,7 +21,7 @@ html {
     $p-bottom: $h-top;
     $word: -0.1px;
     $letter: -0.2px;
-    $h1-letter: $letter*7;
+    $h1-letter: $letter*8;
     $h2-letter: $letter*5;
     $h3-letter: $letter*3;
     $h4-letter: $letter*2;
