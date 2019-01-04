@@ -25,8 +25,7 @@
 		letter-spacing: -0.12em;
 		.animatable {
 			display: inline-block;
-			// TODO: @dgattey revisit performance of this... here and elsewhere;
-			@extend %transition-all;
+			@include transition(color, transform);
 			&:hover {
 				transform: scale($hover-scale);
 			}
@@ -48,7 +47,6 @@
 	}
 
 	.nav-link {
-		@extend %transition-all;
 		color: $color-text-dark;
 		position: relative;
 

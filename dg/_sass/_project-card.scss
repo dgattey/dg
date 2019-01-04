@@ -12,7 +12,7 @@
 	border-radius: $corner-radius;
 
 	// Hover state
-	@extend %shadow-on-hover;
+	@include transition(transform);
 	&:hover {
 		transform: scale($hover-scale);
 		.data {
