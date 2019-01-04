@@ -1,7 +1,5 @@
-<div class="proj-card {{ post.identifier }}">
+<a href="{{ post.url }}" class="proj-card {{ post.identifier }}">
   <h5 class="type">{{ post.type }}</h5>
   <h3 class="title">{{ post.title }}</h3>
   <p class="desc">{{ post.desc }}</p>
-  <!-- Link that spans the whole thing -->
-  <a href="{{ post.url }}"><span class="link-spanner"></span></a>
-</div>
+</a>

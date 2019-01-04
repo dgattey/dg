@@ -1,5 +1,5 @@
 .header-nav {
-	$underline-height: 4px;
+	$underline-height: 3px;
 	$hover-scale: 1.05;
 
 	nav {
@@ -14,7 +14,7 @@
 		font-family: $fam-head;
 		font-weight: 700;
 		display: grid;
-		grid-template-columns: repeat(8, 1fr);
+		grid-template-columns: repeat($standard-grid-cols, 1fr);
 		grid-column-gap: $item-spacing-3;
 	}
 
@@ -32,18 +32,23 @@
 		}
 	}
 
-	// This has to span all of columns 2-9
+	// This has to span all of columns 2 through end
 	.nav-items {
+		$inline-grid-cols: 2 * ($standard-grid-cols - 1);
 		margin: 0;
 		padding: 0;
-		grid-column: 2 / 9;
+		grid-column: 2 / -1;
 		align-self: center;
+		display: inline-grid;
+		grid-template-columns: repeat($inline-grid-cols, 1fr);
+		grid-column-gap: $item-spacing-3;
 	}
 
 	.nav-item {
 		text-transform: uppercase;
 		display: inline-block;
-		margin: 0 $item-spacing-3 0 0;
+		margin: 0;
+		grid-column-end: span 3;
 	}
 
 	.nav-link {

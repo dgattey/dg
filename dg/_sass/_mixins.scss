@@ -29,11 +29,12 @@
 	height: 100%;
 }
 
-// Makes text truncate and show ...
-%text-more {
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+// Green gradient on whatever text this is applied to
+%gradient-words {
+	background-image: linear-gradient(to bottom, $color-primary-bright, $color-primary-dim);
+	background-clip: text;
+	-webkit-background-clip: text;
+	color: transparent;
 }
 
 // Assumes parent is height:100% or absolutely sized
@@ -41,18 +42,6 @@
 	position: relative;
 	top: 50%;
 	transform: translateY(-50%);
-}
-
-// When applied to empty span within <a></a>, overlays link
-.link-spanner {
-	@extend %flush;
-	@extend %overlay;
-	z-index: $z-low;
-}
-
-// Simpler to leave off properties
-@mixin box-shadow($color, $x: 0, $y: 0, $blur: 0) {
-	box-shadow: $x $y $blur 0px $color;
 }
 
 // Helps with media queries to reduce typing

@@ -1,9 +1,9 @@
 .proj-grid {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
-	grid-gap: $item-spacing-3;
+	grid-gap: $item-spacing-5;
 
 	.showcase {
-		margin-bottom: $item-spacing-1;
+		margin-bottom: $item-spacing-2;
 	}
 }
