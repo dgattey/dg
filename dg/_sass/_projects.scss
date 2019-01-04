@@ -1,6 +1,6 @@
-.proj-grid, .proj-list {
+.proj-grid {
 	display: grid;
-	grid-template-columns: repeat(3, 1fr);
+	grid-template-columns: repeat(4, 1fr);
 	grid-column-gap: $item-spacing-3;
 	grid-row-gap: $item-spacing-3;
 	margin-top: gutter();

@@ -1,18 +1,8 @@
 <div class="proj-grid-header">
-	<h3 class="page-title">These are some things I've made</h3>
-	<!-- <ul class="bubble-list">
-		{% assign sorted_tags = site.filter_tags | sort %}
-		{% for tag in sorted_tags %}
-		<li class="bubble">
-			<a href="/tag/{{ tag }}">{{ tag }}</a>
-		</li>
-		{% endfor %}
-	</ul> -->
+	<h2 class="page-title">Showcase</h2>
 </div>
 <div class="proj-grid">
 	{% for post in site.posts %}
-		{% if post.featured %}
-			{% include proj-card.html %}
-		{% endif %}
+		{% include proj-card.html %}
 	{% endfor %}
 </div>

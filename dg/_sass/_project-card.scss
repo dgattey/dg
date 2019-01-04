@@ -1,10 +1,7 @@
 // Project card component
 .proj-card {
-	$max-cards: 12;
-	$card-height: 380px;
 	$hover-scale: 1.02;
-	$desc-size: 0.9em;
-	$corner-radius: 4px;
+	$corner-radius: $item-spacing-1;
 
 	position: relative;
 	height: 100%;
@@ -15,33 +12,15 @@
 	@include transition(transform);
 	&:hover {
 		transform: scale($hover-scale);
-		.data {
-			@extend %show;
-		}
 	}
 
 	img {
-		@extend %flush;
 		vertical-align: middle;
 		@include transition(filter);
 		border-radius: $corner-radius;
 	}
 
 	.data {
-		@extend %hide;
-		position: absolute;
-		height: 100%;
 		padding: $item-spacing-2 $item-spacing-3;
-		color: $color-text-light;
-		z-index: $z-med;
-		h3 {
-			opacity: 1.0;
-		}
-		p {
-			opacity: 1.0;
-			position: absolute;
-			bottom: 0;
-			font-size: $desc-size;
-		}
 	}
 }

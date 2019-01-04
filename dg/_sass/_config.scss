@@ -29,16 +29,10 @@ $item-spacing-6: 12em;
 $item-spacing-7: 24em;
 $icon-size: $item-spacing-3;
 
+// Page padding
 $nav-padding: $item-spacing-2;
-$page-padding: $item-spacing-4;
+$page-padding: $item-spacing-5;
 $content-top-padding: $page-padding + $nav-padding * 2;
-
-// Breakpoints
-$smallest-bp: 450px;
-$small-bp: 600px;
-$medium-bp: 800px;
-$large-bp: 1000px;
-$largest-bp: 1380px;
 
 // Z-indices
 $z-max: 999;

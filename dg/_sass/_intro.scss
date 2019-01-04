@@ -1,13 +1,14 @@
 // For the main intro in index.html
 .homepage-content {
 	@extend %standard-inset;
+	margin-top: $item-spacing-5 + $item-spacing-3;
 }
 .intro {
 	display: grid;
 	grid-template-columns: repeat(8, 1fr);
 	grid-template-rows: repeat(2, 1fr);
 	grid-column-gap: $item-spacing-3;
-	margin-bottom: $item-spacing-3;
+	margin-bottom: $item-spacing-6 + $item-spacing-2;
 	color: $color-deep;
 	.head-text {
 		background-image: linear-gradient(to bottom, $color-primary-bright, $color-primary-dim);

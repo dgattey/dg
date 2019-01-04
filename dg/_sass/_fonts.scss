@@ -9,8 +9,8 @@ html {
     $h1-height: 1.5;
     $font-size: 1.2em;
     $h1-size: 4.8em;
-    $h2-size: 2.8em;
-    $h3-size: 1.9em;
+    $h2-size: 3.8em;
+    $h3-size: 2em;
     $h4-size: 1.4em;
     $h5-size: 1.1em;
     $h-top: 30px;
@@ -26,8 +26,7 @@ html {
     $h3-letter: $letter*3;
     $h4-letter: $letter*2;
     $h5-letter: $letter;
-    $opacity: 0.75;
-    $h2-opacity: 0.8;
+    $h2-opacity: 0.85;
     $h-opacity: 0.7;
     $p-opacity: 0.65;
 
@@ -68,7 +67,6 @@ html {
     }
     h3 {
         font-size: $h3-size;
-        font-weight: $weight;
         opacity: $h-opacity;
         margin-bottom: $h3-bottom;
         letter-spacing: $h3-letter;

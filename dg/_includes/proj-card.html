@@ -1,13 +1,6 @@
-<div class="proj-card {{post.style}}">
-  <!-- Overlay -->
-  <div class="data">
-    <h3>{% if post.short-title %}{{ post.short-title }} {% else %} {{ post.title }}{% endif %}</h3>
-    <p>{{ post.desc }}</p>
-    <!-- Link that spans the whole thing -->
-    <a href="{{ post.url }}"><span class="link-spanner"></span></a>
-  </div>
-  <!-- Image -->
-  <img src="{{post.thumb | prepend:'/img/thumbs/' | prepend:site.baseurl }}">
+<div class="proj-card">
+  <h3>{{ post.title }}</h3>
+  <p>{{ post.desc }}</p>
   <!-- Link that spans the whole thing -->
   <a href="{{ post.url }}"><span class="link-spanner"></span></a>
 </div>
