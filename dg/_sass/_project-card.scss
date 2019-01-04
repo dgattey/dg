@@ -28,19 +28,19 @@
 
 	// Post specific styling
 	&.groups {
-		background: #ee5050;
+		background: $color-red;
 	}
 
 	&.connected {
 		color: $color-text-dark;
-		background: #e5e8ee;
+		background: $color-bright;
 	}
 
 	&.swhc {
-		background: #04a5e5;
+		background: $color-blue;
 	}
 
 	&.fppdx {
-		background: $color-primary-bright;
+		background: $color-green;
 	}
 }

@@ -29,7 +29,7 @@
 	height: 100%;
 }
 
-// Green gradient on whatever text this is applied to
+// Primary color gradient on whatever text this is applied to
 %gradient-words {
 	background-image: linear-gradient(to bottom, $color-primary-bright, $color-primary-dim);
 	background-clip: text;
