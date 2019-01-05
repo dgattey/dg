@@ -1,0 +1,25 @@
+---
+permalink: manifest.json
+---
+
+{
+  "short_name": "{{ site.short_title }}",
+  "name": "{{ site.title }}",
+  "short_url": "{{ site.baseurl }}/",
+  "lang": "{{ site.lang }}",
+  "background_color": "#{{ site.app_background_color }}",
+  "display": "{{ site.app_display }}",
+  "theme_color": "#{{ site.app_theme_color }}",
+  "icons": [
+    {
+    "src": "/img/icons-192.png",
+    "type": "image/png",
+    "sizes": "192x192"
+  },
+  {
+    "src": "/img/icons-512.png",
+    "type": "image/png",
+    "sizes": "512x512"
+  }
+  ]
+}

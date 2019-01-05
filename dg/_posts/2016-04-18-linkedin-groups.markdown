@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Groups"
+title:  "LinkedIn Groups"
 identifier: "groups"
 type: "iOS App"
 desc: "An iOS app for LinkedIn Groups with interface delights"

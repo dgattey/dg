@@ -11,12 +11,16 @@
   	{% endif %}
   </title>
   <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+  <meta name="theme-color" content="#{{ site.app_theme_color }}">
 
   <!-- TODO: Verify ownership for Google Search Console -->
   <meta name="google-site-verification" content="j807R0YPXqS5L68mTk3QgVwq-0HZoCDmJqd_5_B1YoQ">
 
-  <!-- Fonts and CSS includes -->
+  <!-- Static assets, fonts and CSS includes -->
+  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com">
   <link href="https://fonts.googleapis.com/css?family=Hind:400|Heebo:700" rel="stylesheet">
+  <link rel="manifest" href="/manifest.json">
   <link href="{{ "/css/main.css" | prepend: site.baseurl }}" rel="stylesheet">
 
   <!-- TODO: Favicons -->

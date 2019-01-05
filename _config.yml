@@ -4,8 +4,8 @@
 # Site data
 title: Dylan Gattey
 email: dylan.gattey@gmail.com
-twitter: dgattey
 github:  dgattey
+description: "Hello! I'm Dylan. I'm a full-stack software engineer + technical lead working for LinkedIn in San Francisco, passionate about well-designed interfaces and clean code."
 
 # Configuration for site
 url: "https://dylangattey.com"
@@ -15,10 +15,18 @@ filter_tags:
   - ios
   - web
 
+# Manifest
+lang: en
+app_theme_color: 1CD1A5
+app_background_color: FFFFFF
+app_display: standalone
+short_title: dg
+
 # Build settings
 markdown: kramdown
 source: dg
 destination: build
+include: [static]
 sass:
   style:  expanded
   deploy_style: compressed
