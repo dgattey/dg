@@ -1,10 +1,10 @@
 <head>
+  <!-- Compatibility -->
   <meta charset="utf-8">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>{% if page.title %}{{ page.title | escape }} | {{ site.title }}{% else %}{{ site.title | escape }}{% endif %}</title>
-  <meta name="description" content="{% if page.excerpt %}{{ page.excerpt | strip_html | strip_newlines | truncate: 160 }}{% else %}{{ site.description }}{% endif %}">
+  <!-- PWA/Mobile -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#{{ site.app_theme_color }}">
 
   <!-- Static assets, fonts and CSS includes -->
@@ -26,11 +26,8 @@
   <link href="/path/to/favicon-192.png" rel="icon" sizes="192x192" type="image/png"> -->
   <!-- More info: https://bitsofco.de/all-about-favicons-and-touch-icons/ -->
 
-  <!-- TODO: Open Graph: http://ogp.me/ -->
-
   <!-- TODO: Apple pinned site -->
-  <link href="/path/to/icon.svg" rel="mask-icon" color="red">
+  <link href="/path/to/icon.svg" rel="mask-icon" color="#{{ site.app_theme_color }}">
 
-  <!-- Canonical Links -->
-  <link href="{{ page.url | replace:'index.html','' | prepend: site.baseurl | prepend: site.url }}" rel="canonical">
+  {% seo %}
 </head>
