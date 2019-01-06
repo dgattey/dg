@@ -4,13 +4,20 @@
 # Site data
 title: Dylan Gattey
 email: dylan.gattey@gmail.com
+author: dgattey
 github:  dgattey
 description: "Hello! I'm Dylan. I'm a full-stack software engineer + technical lead working for LinkedIn in San Francisco, passionate about well-designed interfaces and clean code."
+logo: /img/logo-512x512.png
+social:
+  links:
+    - https://www.linkedin.com/in/dgattey
+    - https://github.com/dgattey
 
 # Configuration for site
 url: "https://dylangattey.com"
 permalink: /projects/:title/ #posts
 baseurl: ""
+google_site_verification: U6mU3aPeTRaCoewYQype946HD1HrM9vY96GoEHKCAnc
 
 # Manifest
 lang: en
@@ -28,9 +35,9 @@ jekyll_analytics:
 defaults:
   -
     scope:
-      path:            "google*.html"
+      path: "google*.html"
     values:
-      sitemap:         false
+      sitemap:  false
 
 # Build settings
 markdown: kramdown

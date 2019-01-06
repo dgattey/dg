@@ -3,7 +3,7 @@ layout: post
 title:  "LinkedIn Groups"
 identifier: "groups"
 type: "iOS App"
-desc: "An iOS app for LinkedIn Groups with interface delights"
+description: "An iOS app for LinkedIn Groups with interface delights"
 thumb: groups.jpg
 header-img: groups-ios.png
 ---
