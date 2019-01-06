@@ -6,6 +6,7 @@ group :jekyll_plugins do
     # Features
     gem 'emoji_for_jekyll'      # emoji support 💁
     gem 'jekyll-analytics'      # Google Analytics built in
+    gem 'jekyll-sitemap'        # Generated Sitemap
 
     # Optimization
     gem 'jekyll-minifier'       # minifies everything

@@ -24,13 +24,24 @@ jekyll_analytics:
   GoogleAnalytics:
     id: UA-25241680-2
 
+# Sitemap config - excludes google analytics html file
+defaults:
+  -
+    scope:
+      path:            "google*.html"
+    values:
+      sitemap:         false
+
 # Build settings
 markdown: kramdown
 source: dg
 destination: build
 include: [static]
-plugins:
-  - jekyll-analytics
 sass:
   style:  expanded
   deploy_style: compressed
+
+# Plugins
+plugins:
+  - jekyll-sitemap
+  - jekyll-analytics
