@@ -4,6 +4,5 @@ _site
 build
 design
 .bundle
-Gemfile.lock
 dg.sublime-workspace
 current_uploaded

@@ -10,3 +10,18 @@ To build for server, use `JEKYLL_ENV=production jekyll build` (I think).
 
 ### Status
 Trello board tracking at https://trello.com/b/MJdtje7y/dylangattey-com.
+
+### Dependencies
+- `brew` for Mac
+- `ruby`
+- `gem`
+- `ImageMagick` (test for it with `convert --version` and make sure `webp` appears under delegates)
+
+### Integrations
+- Google Analytics: plugin-based, with some config in `_config.yml` for the user info
+- Google Search Console: uploaded a `google*.html` file to the root, plus fallback through the SEO plugin + a value in `_config.yml`
+- Sitemap: through a plugin, excluding the `google*.html` file via blob in the config
+- Minification: plugin based, runs on production env or `build --deploy`
+- Autoprefixer: plugin + asset plugin based
+- SEO: plugin based
+- Assets: plugin based

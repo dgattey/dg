@@ -4,7 +4,6 @@ source "https://rubygems.org"
 
 group :jekyll_plugins do
     # Features
-    gem 'emoji_for_jekyll'      # emoji support 💁
     gem 'jekyll-analytics'      # Google Analytics built in
     gem 'jekyll-sitemap'        # Generated Sitemap
     gem 'jekyll-seo-tag'        # Generated SEO (title, canonical url, etc)
@@ -12,8 +11,9 @@ group :jekyll_plugins do
     # Optimization
     gem 'jekyll-minifier'       # minifies everything
 
-    # CSS/SASS
-    gem 'jekyll-autoprefixer'   # autoprefixes css
+    # CSS/SASS & Assets
+    gem 'autoprefixer-rails'    # autoprefixes css
+    gem 'jekyll-assets'         # helps with autoprefixing + assets
     gem 'normalize-scss'	    # normalizes the scss
 
     # Dev Environment
