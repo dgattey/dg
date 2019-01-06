@@ -3,11 +3,17 @@
 source "https://rubygems.org"
 
 group :jekyll_plugins do
-  gem 'emoji_for_jekyll'    # emoji support 💁
-  gem 'hawkins'             # live reload!
-  gem 'octopress-minify-html' # minifies everything
+    # Features
+    gem 'emoji_for_jekyll'      # emoji support 💁
+    gem 'jekyll-analytics'      # Google Analytics built in
 
-  # CSS/SASS gems
-  gem 'jekyll-autoprefixer' # autoprefixes css
-  gem 'normalize-scss'		# normalizes the scss
+    # Optimization
+    gem 'jekyll-minifier'       # minifies everything
+
+    # CSS/SASS
+    gem 'jekyll-autoprefixer'   # autoprefixes css
+    gem 'normalize-scss'	    # normalizes the scss
+
+    # Dev Environment
+    gem 'hawkins'               # live reload
 end

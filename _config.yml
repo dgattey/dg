@@ -11,9 +11,6 @@ description: "Hello! I'm Dylan. I'm a full-stack software engineer + technical l
 url: "https://dylangattey.com"
 permalink: /projects/:title/ #posts
 baseurl: ""
-filter_tags:
-  - ios
-  - web
 
 # Manifest
 lang: en
@@ -22,11 +19,18 @@ app_background_color: FFFFFF
 app_display: standalone
 short_title: dg
 
+# Analytics
+jekyll_analytics:
+  GoogleAnalytics:
+    id: UA-25241680-2
+
 # Build settings
 markdown: kramdown
 source: dg
 destination: build
 include: [static]
+plugins:
+  - jekyll-analytics
 sass:
   style:  expanded
   deploy_style: compressed
