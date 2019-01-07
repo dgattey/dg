@@ -13,10 +13,5 @@ if convert --version > /dev/null; then
 else
   brew install imagemagick
 fi
-if brew ls --versions imageoptim-cli > /dev/null; then
-  echo "ImageOptim CLI already installed; skipping"
-else
-  brew install imageoptim-cli
-fi
 echo "$(tput setaf 2)Done setting up!$(tput sgr0)"
 
