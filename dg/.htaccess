@@ -230,7 +230,9 @@ RewriteRule \.(gif|jpe?g?|png)$ - [F,NC,L]
 #AIOWPS_PREVENT_IMAGE_HOTLINKS_END
 # END All In One WP Security
 
-# For SSL!
+####################
+# Turns on SSL
+####################
 <IfModule mod_rewrite.c>
 RewriteEngine on 
 RewriteCond %{SERVER_PORT} !^443$ 
@@ -241,19 +243,13 @@ RewriteRule ^(.*)?$ https://%{SERVER_NAME}%{REQUEST_URI} [L,R]
 </IfModule>
 
 ####################
-# Attempt to redirect images to WebP if one exists
-# and the client supports the file format
+# Turns on caching of content
 ####################
-# check if browser accepts webp
-RewriteCond %{HTTP_ACCEPT} image/webp
-
-# check if file is jpg or png
-RewriteCond %{REQUEST_FILENAME} (.*)\.(jpe?g|png)$
-
-# check if corresponding webp file exists image.png -> image.webp
-RewriteCond %1\.webp -f
-
-# serve up webp instead
-RewriteRule (.+)\.(jpe?g|png)$ $1.webp [T=image/webp,E=accept:1]
-
-AddType image/webp .webp
+<IfModule mod_expires.c>
+  ExpiresActive On
+  ExpiresDefault "access plus 1 year"
+  # Pages
+  ExpiresByType text/html  "access plus 15 minutes"
+  # RSS feed
+  ExpiresByType text/xml  "access plus 120 minutes"
+</IfModule>
