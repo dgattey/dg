@@ -35,3 +35,4 @@ Trello board tracking at https://trello.com/b/MJdtje7y/dylangattey-com.
 - Autoprefixer: plugin + asset plugin based
 - SEO: plugin based
 - Assets: plugin based
+- Cloudflare: set up remotely to proxy DNS
