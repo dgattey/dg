@@ -7,7 +7,7 @@ description: "An iOS app for LinkedIn Groups with interface delights"
 thumb: groups.jpg
 ---
 <section>
-	{% asset header/groups-ios.png class="leading-image" @pic %}
+	{% asset groups-ios.png class="leading-image" @pic %}
 </section>
 <section>
 	<p>As an intern at LinkedIn, I helped craft the newest iteration of LinkedIn Groups for iOS. When I arrived, the app was partially built, so I explored what I could most effectively finish as a new hire new to Swift. I worked on interface "delights" to make Groups top of the line. Over the course of the summer, I polished up some slick transition animators and built custom UI components to be styled & reused inside LinkedIn's iOS app sphere.</p>
