@@ -23,8 +23,9 @@ $color-text-light: $color-bright;
 $color-text-muted: $color-muted;
 $color-text-active: $color-primary-dim;
 
-// Grids
+// Grids + breakpoints
 $standard-grid-cols: 12;
+$max-width: 1400px;
 
 // Spacing
 $item-spacing-1: 0.375em;
