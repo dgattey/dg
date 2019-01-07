@@ -22,7 +22,7 @@ Once the above are installed, you can simply run `./setup` to get the rest impor
 Add an entry to the Gemfile, add to `plugins` in `_config.yml` as needed and rerun the above. You generally need to add it to the `plugins` list, but documentation will have the full details.
 
 ### Changing/adding images?
-Use `./optimize` to do so. It'll copy & create versions of all images as needed. Will handle minification of files, plus conversion of those to WebP versions.
+Use `./process-images` after doing so. It will optimize/minify all jpg/png files. Additionally, it will convert those files to WebP versions and put them back in the same folders. This allows `jekyll-assets` to properly copy all those files on build, unlike other solutions explored that failed to process all files before build. It can take FOREVER to run ImageOptim, so try again and again until it's finished.
 
 ### Deploying to a server?
 Use the handy script `./deploy` to do so. It'll optimize all images, execute `jekyll build` to create the necessary files, then (coming eventually) attempt to upload the files to a production server.

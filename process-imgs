@@ -1,0 +1,51 @@
+#! /bin/bash
+set -e
+
+# --------------------------
+# CONSTANTS
+# --------------------------
+ASSETS=./dg/_assets/img
+FILETYPES=("jpg" "png")
+
+# --------------------------
+# FUNCTIONS
+# --------------------------
+
+# Echo an error message before exiting
+err_report() {
+    echo "$(tput setaf 1)optimize: error on line $1$(tput sgr0)"
+}
+trap 'err_report $LINENO' ERR
+
+# First arg is filename extension of the original file
+convert_files() {
+echo "$(tput setaf 6)Beginning conversion of ${1}s...$(tput sgr0)"
+for file in ${ASSETS}/*.$1; do
+    fbname=$(basename "$file" .$1)
+    output_file="${ASSETS}/${fbname}.webp"
+    convert "${file}" ${output_file}
+    echo "Created ${output_file}"
+done
+}
+
+# First arg is filetype to optimize
+optimize_imgs() {
+    echo "$(tput setaf 6)Optimizing all $1 images...$(tput sgr0)"
+    /Applications/ImageOptim.app/Contents/MacOS/ImageOptim ${ASSETS}/*.${1}
+}
+
+# --------------------------
+# MAIN
+# --------------------------
+# Executes some image minification scripts
+# and also converts all files to WebP
+for FILETYPE in "${FILETYPES[@]}"
+do
+	optimize_imgs $FILETYPE
+done
+for FILETYPE in "${FILETYPES[@]}"
+do
+    convert_files $FILETYPE
+done
+echo "$(tput setaf 2)Done with image processing!$(tput sgr0)"
+echo "$(tput setaf 3)Note: If you don't see \"Skipping <file> because it has been optimized before\", you should re-run this script to continue optimizing your photos. Optimization may take a few passes.$(tput sgr0)"
