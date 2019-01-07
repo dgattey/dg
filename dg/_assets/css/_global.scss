@@ -3,6 +3,13 @@ html {
     color: $color-text-dark;
     overflow-x: hidden;
 
+    // Max sizing on body
+    body {
+        max-width: $bp-max-width;
+        width: 100%;
+        margin: 0 auto;
+    }
+
     // Pad content by default to account for sticky header
     .content {
         @extend %standard-inset;
@@ -68,10 +75,4 @@ html {
     //         padding-left: 0;
     //     }
     // }
-}
-
-body {
-    max-width: $max-width;
-    width: 100%;
-    margin: 0 auto;
 }

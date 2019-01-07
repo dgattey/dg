@@ -3,7 +3,8 @@
  */
  
 html {
-	@mixin template-body($page-padding, $nav-padding) {
+	@mixin template-body($page-padding) {
+		$nav-padding: $item-spacing-2;
 		%standard-inset {
 			margin-top: $page-padding + $nav-padding * 2;
 			margin-left: $page-padding;
@@ -20,15 +21,15 @@ html {
 
 	// For different breakpoints
 	@include for-phone-only {
-		@include template-body($item-spacing-5, $item-spacing-2);
+		@include template-body($item-spacing-2);
 	}
 	@include for-tablet-portrait-up {
-		@include template-body($item-spacing-5, $item-spacing-2);
+		@include template-body($item-spacing-3);
 	}
 	@include for-tablet-landscape-up {
-		@include template-body($item-spacing-5, $item-spacing-2);
+		@include template-body($item-spacing-4);
 	}
 	@include for-desktop-up {
-		@include template-body($item-spacing-5, $item-spacing-2);
+		@include template-body($item-spacing-5);
 	}
 }

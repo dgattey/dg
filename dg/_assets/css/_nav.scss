@@ -1,6 +1,12 @@
+/*
+ * Styles the global site nav (implemented as a sticky fixed header at the top of every
+ * page). Handles animations across it too.
+ */
+
 .header-nav {
 	$underline-height: 3px;
 	$hover-scale: 1.05;
+	$inline-grid-cols: 2 * ($standard-grid-cols - 1);
 
 	nav {
 		z-index: $z-max;
@@ -31,7 +37,6 @@
 
 	// This has to span all of columns 2 through end
 	.nav-items {
-		$inline-grid-cols: 2 * ($standard-grid-cols - 1);
 		margin: 0;
 		padding: 0;
 		grid-column: 2 / -1;
@@ -39,13 +44,36 @@
 		display: inline-grid;
 		grid-template-columns: repeat($inline-grid-cols, 1fr);
 		grid-column-gap: $item-spacing-3;
+
+		@include for-phone-only {
+			justify-self: center;
+		}
+		@include for-tablet-portrait-up {
+			justify-self: center;
+		}
+		@include for-tablet-landscape-up {
+			justify-self: start;
+		}
 	}
 
 	.nav-item {
 		text-transform: uppercase;
 		display: inline-block;
 		margin: 0;
-		grid-column-end: span 3;
+		@include for-phone-only {
+			grid-column-end: span 7;
+			justify-self: center;
+		}
+		@include for-tablet-portrait-up {
+			grid-column-end: span 6;
+			justify-self: center;
+		}
+		@include for-tablet-landscape-up {
+			grid-column-end: span 4;
+		}
+		@include for-desktop-up {
+			grid-column-end: span 3;
+		}
 	}
 
 	.nav-link {

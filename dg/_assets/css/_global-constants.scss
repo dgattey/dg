@@ -1,0 +1,59 @@
+/*
+ * Allllll the global constants anything can access
+ */
+ 
+// Raw white - black color values
+$color-dim: #000000;
+$color-deep: #433D3A;
+$color-muted: #ACACAC;
+$color-bright: #eceff1; // OR #f1eafb;
+$color-brightest: #FFFFFF;
+$color-gray: darken($color-bright, 20%);
+$color-light-transparent: rgba(255, 255, 255, 0.6);
+
+// Colorful raw color values
+$color-green: #1CD1A5;
+$color-red: #ee5050;
+$color-blue: #04a5e5;
+
+// Fonts
+$fam-body: "Hind", sans-serif;
+$fam-head: "Heebo", sans-serif;
+$weight: 400;
+$bold-weight: 700;
+
+// Applied color values (primary, bg, border, text)
+$color-primary-bright: $color-green;
+$color-primary-dim: darken($color-primary-bright, 12%);
+$color-bg: $color-brightest;
+$color-bg-code: $color-bright;
+$color-border-code: $color-muted;
+$color-text-dark: $color-deep;
+$color-text-light: $color-bright;
+$color-text-muted: $color-muted;
+$color-text-active: $color-primary-dim;
+
+// Grids + breakpoints
+$standard-grid-cols: 12;
+$bp-max-phone: 599px;
+$bp-min-tablet: 600px;
+$bp-min-tablet-landscape: 900px;
+$bp-min-desktop: 1200px;
+$bp-max-width: 1400px;
+
+// Spacing
+$item-spacing-1: 0.375em;
+$item-spacing-2: 0.75em;
+$item-spacing-3: 1.5em;
+$item-spacing-4: 3em;
+$item-spacing-5: 6em;
+$item-spacing-6: 12em;
+$item-spacing-7: 24em;
+$icon-size: $item-spacing-3;
+
+// Z-indices
+$z-max: 999;
+$z-high: 900;
+$z-med: 600;
+$z-low: 400;
+$z-min: 0;
