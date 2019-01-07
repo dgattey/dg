@@ -3,20 +3,32 @@
  */
  
 html {
-	$nav-padding: $item-spacing-2;
-	$page-padding: $item-spacing-5;
-
-	%standard-inset {
-		margin-top: $page-padding + $nav-padding * 2;
-		margin-left: $page-padding;
-		margin-right: $page-padding;
+	@mixin template-body($page-padding, $nav-padding) {
+		%standard-inset {
+			margin-top: $page-padding + $nav-padding * 2;
+			margin-left: $page-padding;
+			margin-right: $page-padding;
+		}
+		%nav-padding {
+			padding-left: $page-padding;
+			padding-right: $page-padding;
+			padding-top: $nav-padding;
+			padding-bottom: $nav-padding;
+			width: calc(100% - #{2*$page-padding});
+		}
 	}
 
-	%nav-padding {
-		padding-left: $page-padding;
-		padding-right: $page-padding;
-		padding-top: $nav-padding;
-		padding-bottom: $nav-padding;
-		width: calc(100% - #{2*$page-padding});
+	// For different breakpoints
+	@include for-phone-only {
+		@include template-body($item-spacing-5, $item-spacing-2);
+	}
+	@include for-tablet-portrait-up {
+		@include template-body($item-spacing-5, $item-spacing-2);
+	}
+	@include for-tablet-landscape-up {
+		@include template-body($item-spacing-5, $item-spacing-2);
+	}
+	@include for-desktop-up {
+		@include template-body($item-spacing-5, $item-spacing-2);
 	}
 }
