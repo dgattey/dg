@@ -3,7 +3,7 @@
 # Dylan Gattey
 This is a redesign of https://dylangattey.com to a lightweight, mobile-friendly, polished exhibition of my projects/experiments. It's been a slow, unchanging Wordpress site for years. Using [Jekyll](https://jekyllrb.com/) to build it, with some smart plugins.
 
-### Dependencies (macOS) & setup
+## Dependencies (macOS) & setup
 Core dependencies
 - `HomeBrew` for Mac
 - `Ruby >= 2.5.0` (`rvm` is a great tool for managing versions)
@@ -14,17 +14,20 @@ Once the above are installed, you can simply run `./setup` to get the rest impor
 - `ImageMagick`: install with `setup` script (make sure `webp` appears under delegates) or via brew
 - `ImageOptim CLI`: install with `setup` script or via brew
 
-### Development
+## Development
 1. Install the necessary gems with `bundle install`
 2. Build & serve the site with `bundle exec jekyll serve` (or `bundle exec jekyll liveserve` if you want autoreload). The site files will exist under `build` and be served on `http://localhost:4000/`.
 
-**Adding a new dependency?** Add an entry to the Gemfile, add to `plugins` in `_config.yml` as needed and rerun the above. You generally need to add it to the `plugins` list, but documentation will have the full details.
+### Adding a new dependency?
+Add an entry to the Gemfile, add to `plugins` in `_config.yml` as needed and rerun the above. You generally need to add it to the `plugins` list, but documentation will have the full details.
 
-**Changing/adding images?** Use `./optimize` to do so. It'll copy & create versions of all images as needed
+### Changing/adding images?
+Use `./optimize` to do so. It'll copy & create versions of all images as needed. Will handle minification of files, plus conversion of those to WebP versions.
 
-**Deploying to a server?** Use the handy script `./deploy` to do so. It'll optimize all images, execute `jekyll build` to create the necessary files, then (coming eventually) attempt to upload the files to a production server.
+### Deploying to a server?
+Use the handy script `./deploy` to do so. It'll optimize all images, execute `jekyll build` to create the necessary files, then (coming eventually) attempt to upload the files to a production server.
 
-### Status
+## Project Status
 Trello board tracking at https://trello.com/b/MJdtje7y/dylangattey-com.
 
 ### Current integrations (mostly up to date)
