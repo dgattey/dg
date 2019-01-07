@@ -1,0 +1,13 @@
+#! /bin/bash
+set -e
+
+
+# Echo an error message before exiting
+err_report() {
+    echo "$(tput setaf 1)optimize: error on line $1$(tput sgr0)"
+}
+trap 'err_report $LINENO' ERR
+
+# Executes some image minification scripts
+echo "$(tput setaf 6)Optimizing images...$(tput sgr0)"
+echo "$(tput setaf 2)Done optimizing!$(tput sgr0)"

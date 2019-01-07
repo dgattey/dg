@@ -4,18 +4,19 @@ source "https://rubygems.org"
 
 group :jekyll_plugins do
     # Features
-    gem 'jekyll-analytics'      # Google Analytics built in
-    gem 'jekyll-sitemap'        # Generated Sitemap
-    gem 'jekyll-seo-tag'        # Generated SEO (title, canonical url, etc)
+    gem 'jekyll-analytics'  # Google Analytics built in
+    gem 'jekyll-sitemap'    # Generated Sitemap
+    gem 'jekyll-seo-tag'    # Generated SEO (title, canonical url, etc)
 
     # Optimization
-    gem 'jekyll-minifier'       # minifies everything
+    gem 'jekyll-minifier'   # minifies everything
 
     # CSS/SASS & Assets
     gem 'autoprefixer-rails'    # autoprefixes css
     gem 'jekyll-assets'         # asset management
     gem 'normalize-scss'	    # normalizes the scss
+    gem 'mini_magick'           # command line based img conversion
 
     # Dev Environment
-    gem 'hawkins'               # live reload
+    gem 'hawkins'   # live reload
 end

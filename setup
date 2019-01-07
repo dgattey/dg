@@ -1,0 +1,22 @@
+#! /bin/bash
+set -e
+
+# Installs dependencies
+echo "$(tput setaf 6)Installing dependencies...$(tput sgr0)"
+if gem list -i "^bundler" > /dev/null; then
+    echo "Bundler already installed; skipping"
+else
+    gem install bundler
+fi
+if convert --version > /dev/null; then
+  echo "ImageMagick already installed; skipping"
+else
+  brew install imagemagick
+fi
+if brew ls --versions imageoptim-cli > /dev/null; then
+  echo "ImageOptim CLI already installed; skipping"
+else
+  brew install imageoptim-cli
+fi
+echo "$(tput setaf 2)Done setting up!$(tput sgr0)"
+

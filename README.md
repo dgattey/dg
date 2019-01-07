@@ -1,23 +1,33 @@
 [![Code Climate](https://codeclimate.com/github/dgattey/dg/badges/gpa.svg?style=flat)](https://codeclimate.com/github/dgattey/dg) [![Issue Count](https://codeclimate.com/github/dgattey/dg/badges/issue_count.svg?style=flat)](https://codeclimate.com/github/dgattey/dg)
 
 # Dylan Gattey
-I'm redesigning my site to be a lightweight, mobile-friendly, up to date exhibition of my projects and experiments rather than be the same slow, non-customizable Wordpress grid it's been for years. Currently very much a work in progress, but I'm having fun and teaching myself how to use [Jekyll](https://jekyllrb.com/) in the process! It's meant to be a simpler version of the site with much of the same content, but updated for 2019 instead of 2013 (when I last did anything significant design-wise on my site). Cleaner, sparser layout with larger, clearer font + more professional images, an updated logo, and more of my own voice in the writing.
+This is a redesign of https://dylangattey.com to a lightweight, mobile-friendly, polished exhibition of my projects/experiments. It's been a slow, unchanging Wordpress site for years. Using [Jekyll](https://jekyllrb.com/) to build it, with some smart plugins.
+
+### Dependencies (macOS) & setup
+Core dependencies
+- `HomeBrew` for Mac
+- `Ruby >= 2.5.0` (`rvm` is a great tool for managing versions)
+- `RubyGems`
+
+Once the above are installed, you can simply run `./setup` to get the rest imported. It will do the following:
+- `Bundler`: install with `setup` script or `gem install bundler`
+- `ImageMagick`: install with `setup` script (make sure `webp` appears under delegates) or via brew
+- `ImageOptim CLI`: install with `setup` script or via brew
 
 ### Development
-Assuming you have Ruby and RubyGems installed, you'll need to install Jekyll & Bundler to start, with `gem install bundler jekyll`. To bundle & run, execute `bundle exec jekyll serve` If you add a new dependency to the Gemfile, rerun that command. Build the site to an output folder with `jekyll build`, or build and serve on `http://localhost:4000/` with `jekyll liveserve`. It'll livereload for you!
+1. Install the necessary gems with `bundle install`
+2. Build & serve the site with `bundle exec jekyll serve` (or `bundle exec jekyll liveserve` if you want autoreload). The site files will exist under `build` and be served on `http://localhost:4000/`.
 
-To build for server, use `JEKYLL_ENV=production jekyll build` (I think).
+**Changing/adding images?** Use `./optimize` to do so. It'll copy & create versions of all images as needed
+
+**Adding a new dependency?** Add an entry to the Gemfile, add to `plugins` in `_config.yml` as needed and rerun the above. You generally need to add it to the `plugins` list, but documentation will have the full details.
+
+**Deploying to a server?** Use the handy script `./deploy` to do so. It'll optimize all images, execute `jekyll build` to create the necessary files, then (coming eventually) attempt to upload the files to a production server.
 
 ### Status
 Trello board tracking at https://trello.com/b/MJdtje7y/dylangattey-com.
 
-### Dependencies
-- `brew` for Mac
-- `ruby`
-- `gem`
-- `ImageMagick` (test for it with `convert --version` and make sure `webp` appears under delegates)
-
-### Integrations
+### Current integrations (mostly up to date)
 - Google Analytics: plugin-based, with some config in `_config.yml` for the user info
 - Google Search Console: uploaded a `google*.html` file to the root, plus fallback through the SEO plugin + a value in `_config.yml`
 - Sitemap: through a plugin, excluding the `google*.html` file via blob in the config
