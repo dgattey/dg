@@ -15,7 +15,6 @@ group :jekyll_plugins do
     gem 'autoprefixer-rails'    # autoprefixes css
     gem 'jekyll-assets'         # asset management
     gem 'normalize-scss'	    # normalizes the scss
-    gem 'mini_magick'           # command line based img conversion
 
     # Dev Environment
     gem 'hawkins'   # live reload
