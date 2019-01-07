@@ -1,20 +1,3 @@
 .post-header {
-	$bottom-offset: $item-spacing-3;
-	$header-height: $bottom-offset + $item-spacing-7;
-
-	@extend %standard-padded-inset;
-	margin-bottom: $bottom-offset;
-	height: $header-height;
-
-	&.post-fg-light {
-		color: $color-bright;
-	}
-
-	.meta, .leading-image {
-		@extend %vertically-centered;
-	}
-
-	.tag {
-		margin-right: $item-spacing-2;
-	}
+	margin-bottom: $item-spacing-3;
 }

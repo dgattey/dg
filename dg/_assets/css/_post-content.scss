@@ -1,24 +1,5 @@
 .post-content {
-	&.post-fg-light section.colorized {
-		& code {
-			color: $color-text-dark;
-			background-color: $color-light-transparent;
-		}
-		color: $color-bright;
-	}
-
 	section {
-		@extend %standard-inset;
-
-		&.colorized {
-			margin-left: 0;
-			margin-right: 0;
-			@extend %standard-padded-inset;
-			padding-top: $item-spacing-2;
-			padding-bottom: $item-spacing-2;
-			opacity: 0.8;
-		}
-
 		p {
 			&:nth-child(1) {
 				font-size: 1.1em;
