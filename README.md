@@ -18,9 +18,9 @@ Once the above are installed, you can simply run `./setup` to get the rest impor
 1. Install the necessary gems with `bundle install`
 2. Build & serve the site with `bundle exec jekyll serve` (or `bundle exec jekyll liveserve` if you want autoreload). The site files will exist under `build` and be served on `http://localhost:4000/`.
 
-**Changing/adding images?** Use `./optimize` to do so. It'll copy & create versions of all images as needed
-
 **Adding a new dependency?** Add an entry to the Gemfile, add to `plugins` in `_config.yml` as needed and rerun the above. You generally need to add it to the `plugins` list, but documentation will have the full details.
+
+**Changing/adding images?** Use `./optimize` to do so. It'll copy & create versions of all images as needed
 
 **Deploying to a server?** Use the handy script `./deploy` to do so. It'll optimize all images, execute `jekyll build` to create the necessary files, then (coming eventually) attempt to upload the files to a production server.
 
