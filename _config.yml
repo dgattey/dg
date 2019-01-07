@@ -50,7 +50,7 @@ defaults:
 markdown: kramdown
 source: dg
 destination: build
-include: [static]
+include: [static, .htaccess]
 sass:
   style:  expanded
   deploy_style: compressed
