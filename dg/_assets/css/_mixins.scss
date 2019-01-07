@@ -45,8 +45,15 @@
 }
 
 // Helps with media queries to reduce typing
-@mixin bp($size) {
-    @media screen and (max-width: $size) {
-        @content;
-    }
+@mixin for-phone-only {
+  @media (max-width: $bp-min-end) { @content; }
+}
+@mixin for-tablet-portrait-up {
+  @media (min-width: $bp-med-start) { @content; }
+}
+@mixin for-tablet-landscape-up {
+  @media (min-width: $bp-med-end) { @content; }
+}
+@mixin for-desktop-up {
+  @media (min-width: $bp-lg-start) { @content; }
 }

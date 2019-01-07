@@ -31,6 +31,12 @@ $color-text-active: $color-primary-dim;
 // Grids + breakpoints
 $standard-grid-cols: 12;
 $max-width: 1400px;
+$bp-min-end: 599px;
+$bp-med-start: 600px;
+$bp-med-end: 899px;
+$bp-lg-start: 900px;
+$bp-lg-end: 1199px;
+$bp-max-start: 1200px;
 
 // Spacing
 $item-spacing-1: 0.375em;
