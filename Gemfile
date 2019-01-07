@@ -13,7 +13,7 @@ group :jekyll_plugins do
 
     # CSS/SASS & Assets
     gem 'autoprefixer-rails'    # autoprefixes css
-    gem 'jekyll-assets'         # helps with autoprefixing + assets
+    gem 'jekyll-assets'         # asset management
     gem 'normalize-scss'	    # normalizes the scss
 
     # Dev Environment
