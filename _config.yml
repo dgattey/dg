@@ -31,6 +31,13 @@ jekyll_analytics:
   GoogleAnalytics:
     id: UA-25241680-2
 
+# Assets
+assets:
+  autoprefixer:
+    browsers:
+    - "last 2 versions"
+    - "IE > 9"
+
 # Sitemap config - excludes google analytics html file
 defaults:
   -
@@ -53,3 +60,5 @@ plugins:
   - jekyll-sitemap
   - jekyll-analytics
   - jekyll-seo-tag
+  - jekyll-assets
+  - autoprefixer-rails
