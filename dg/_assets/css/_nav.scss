@@ -5,14 +5,11 @@
 	nav {
 		z-index: $z-max;
 		background: $color-bg;
-		@extend %standard-padded-inset;
-		width: calc(100% - #{2*$page-padding});
+		@extend %nav-padding;
 		position: fixed;
 		top: 0;
-		padding-top: $nav-padding;
-		padding-bottom: $nav-padding;
 		font-family: $fam-head;
-		font-weight: 700;
+		font-weight: $bold-weight;
 		display: grid;
 		grid-template-columns: repeat($standard-grid-cols, 1fr);
 		grid-column-gap: $item-spacing-3;

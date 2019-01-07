@@ -2,8 +2,7 @@ footer {
 	$border-weight: 1px;
 	$height: $icon-size;
 	$padding: $height/2;
-	margin-left: $page-padding;
-	margin-right: $page-padding;
+	@extend %standard-inset;
 	margin-top: $item-spacing-3;
 	border-top: $border-weight solid $color-primary-dim;
 	.copy, ul, li {

@@ -5,7 +5,7 @@ html {
 
     // Pad content by default to account for sticky header
     .content {
-        margin-top: $content-top-padding;
+        @extend %standard-inset;
     }
 
     // Make sure margins align with spacing

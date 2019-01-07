@@ -1,0 +1,22 @@
+/*
+ * Padding mixins to be used globally (wrapped in a tag to keep values local)
+ */
+ 
+html {
+	$nav-padding: $item-spacing-2;
+	$page-padding: $item-spacing-5;
+
+	%standard-inset {
+		margin-top: $page-padding + $nav-padding * 2;
+		margin-left: $page-padding;
+		margin-right: $page-padding;
+	}
+
+	%nav-padding {
+		padding-left: $page-padding;
+		padding-right: $page-padding;
+		padding-top: $nav-padding;
+		padding-bottom: $nav-padding;
+		width: calc(100% - #{2*$page-padding});
+	}
+}

@@ -2,16 +2,6 @@
  * Mixins and extensions to be used globally
  */
 
-%standard-inset {
-	margin-left: $page-padding;
-	margin-right: $page-padding;
-}
-
-%standard-padded-inset {
-	padding-left: $page-padding;
-	padding-right: $page-padding;
-}
-
 // Sticks over top of parent
 %overlay {
 	position: absolute;

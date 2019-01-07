@@ -1,8 +1,4 @@
 // For the main intro in index.html
-.homepage-content {
-	@extend %standard-inset;
-	margin-top: $item-spacing-5 + $item-spacing-3;
-}
 .intro {
 	$end-before-photo: 7;
 	display: grid;

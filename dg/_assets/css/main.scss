@@ -48,11 +48,6 @@ $item-spacing-6: 12em;
 $item-spacing-7: 24em;
 $icon-size: $item-spacing-3;
 
-// Page padding
-$nav-padding: $item-spacing-2;
-$page-padding: $item-spacing-5;
-$content-top-padding: $page-padding + $nav-padding * 2;
-
 // Z-indices
 $z-max: 999;
 $z-high: 900;
@@ -65,10 +60,11 @@ $z-min: 0;
     // Normalizes css
 	'normalize/import-now',
 
-	// Configuration and base
-    'mixins',
-    'animations',
+	// Configuration
     'fonts',
+    'mixins',
+    'padding',
+    'animations',
 
     // Shared components
     'base',
