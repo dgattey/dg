@@ -1,3 +1,7 @@
+html, body {
+    font-size: $base-font-size; // Base font size to make everything else flow right
+}
+
 html {
     background: $color-bg;
     color: $color-text-dark;

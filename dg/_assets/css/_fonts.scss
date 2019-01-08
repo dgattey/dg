@@ -3,27 +3,8 @@
  */
 
 html {
-    // Config for font files
-    $line-height: 1.4;
-    $font-size: 1.2em;
-    $h1-size: 4.8em;
-    $h2-size: 3.8em;
-    $h3-size: 2.4em;
-    $h4-size: 1.5em;
-    $h5-size: 1.1em;
-    $h-top: 30px;
-    $h1-bottom: 10px;
-    $h2-bottom: 6px;
-    $h3-bottom: 5px;
-    $p-top: $h3-bottom;
-    $p-bottom: $h-top;
-    $word: -0.1px;
-    $letter: -0.2px;
-    $h1-letter: $letter*8;
-    $h2-letter: $letter*5;
-    $h3-letter: $letter*3;
-    $h4-letter: $letter*2;
-    $h5-letter: $letter;
+    $default-line-height: 2.5rem;
+    $default-margin-bottom: 2.5rem;
 
     // HTML specific styles
     -webkit-font-smoothing: antialiased;
@@ -31,69 +12,66 @@ html {
     -webkit-text-size-adjust: 100%;
     font-feature-settings: "kern" 1;
     font-kerning: normal;
-    font-family: $fam-body;
-    font-weight: $weight;
-    font-size: $font-size;
-    line-height: $line-height;
-    letter-spacing: $letter;
-    word-spacing: $word;
 
-    // Shared header styles
-    h1, h2, h3, h4, h5, h6 {
+    // Display weights
+    h1, h2, h3 {
+        font-family: $fam-head;
+        font-weight: $weight-display;
+    }
+
+    // Regular header weight
+    h4, h5, h6 {
+        font-family: $fam-head;
         font-weight: $weight-head;
-        margin-top: $h-top;
-        line-height: $line-height;
+    }
+
+    // Shared styles
+    h1, h2, h3, h4, h5, h6, p {
+        font-style: normal;
+        letter-spacing: 0em;
+        margin-bottom: $default-margin-bottom;
     }
 
     // Headers
     h1 {
-        font-family: $fam-display;
-        font-weight: $weight-display;
-        font-size: $h1-size;
-        margin-top: 0;
-        margin-bottom: $h1-bottom;
-        letter-spacing: $h1-letter;
+        font-size: 9.5367431640625em;
+        line-height: 10rem;
     }
     h2 {
-        font-family: $fam-display;
-        font-weight: $weight-display;
-        font-size: $h2-size;
-        margin-bottom: $h2-bottom;
-        letter-spacing: $h2-letter;
+        font-size: 6.103515625em;
+        line-height: 7.5rem;
     }
     h3 {
-        font-family: $fam-head;
-        font-size: $h3-size;
-        margin-bottom: $h3-bottom;
-        letter-spacing: $h3-letter;
+        font-size: 4.39453125em;
+        line-height: 5rem;
     }
     h4 {
-        font-family: $fam-head;
-        font-size: $h4-size;
-        letter-spacing: $h4-letter;
+        font-size: 3.515625em;
+        line-height: 5rem;
     }
 
     h5 {
-        font-family: $fam-head;
-        font-size: $h5-size;
-        letter-spacing: $h5-letter;
+        font-size: 2.8125em;
+        line-height: 5rem;
     }
 
     h6 {
-        font-family: $fam-head;
+        font-size: 2.25em;
+        line-height: $default-line-height;
     }
 
     // Body
     p {
-        margin-top: $p-top;
-        margin-bottom: $p-bottom;
+        font-family: $fam-body;
+        font-weight: $weight;
+        font-size: 1.8em;
+        line-height: $default-line-height;
     }
 
     // Links
     a {
         color: $color-primary-bright;
         text-decoration: none;
-
         &:hover {
             color: $color-primary-dim;
         }
@@ -101,7 +79,6 @@ html {
 
     code {
         background-color: $color-bg-code;
-        font-size: 0.9em;
         $vertical-padding: 0;
         $horizontal-padding: 0.3em;
         border: 1px solid $color-border-code;
