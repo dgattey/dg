@@ -60,9 +60,13 @@
 		text-transform: uppercase;
 		display: inline-block;
 		margin: 0;
+		@include transition-out(transform);
 		@include for-phone-only {
 			grid-column-end: span 7;
 			justify-self: center;
+		}
+		&:hover {
+			transform: translateY(- $underline-height / 2);
 		}
 		@include for-tablet-portrait-up {
 			grid-column-end: span 6;
@@ -104,7 +108,7 @@
 			&:after {
 				@extend %hide;
 				transform: translateY($underline-height/2);
-				transition: transform $transition-duration $ease-out-back, opacity $transition-duration;
+				transition: transform $animation-duration $ease-out-back, opacity $animation-duration;
 			}
 			&:hover,
 			&:focus {
@@ -114,10 +118,10 @@
 					transform: translateY(0);
 				}
 				&:before {
-					transition: transform $transition-duration $ease-out-back, opacity $transition-duration;
+					transition: transform $animation-duration $ease-out-back, opacity $animation-duration;
 				}
 				&:after {
-					transition: transform 0s $transition-duration $ease-out-back, opacity 0s $transition-duration;
+					transition: transform 0s $animation-duration $ease-out-back, opacity 0s $animation-duration;
 				}
 			}
 		}
