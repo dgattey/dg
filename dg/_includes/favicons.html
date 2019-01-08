@@ -1,0 +1,23 @@
+<!-- Generic icons -->
+{% for size in site.favicons.generic %}
+<link rel="icon" href={% asset "favicon-{{ size }}.png" @path %} sizes="{{ size }}x{{ size }}">
+{% endfor %}
+{% for size in site.favicons.thumbnail %}
+<meta name="thumbnail" content={% asset "favicon-{{ size }}.png" @path %}>
+{% endfor %}
+
+<!-- Android -->
+{% for size in site.favicons.android %}
+<link rel="shortcut icon" href={% asset "favicon-{{ size }}.png" @path %} sizes="{{ size }}x{{ size }}">
+{% endfor %}
+
+<!-- iOS -->
+{% for size in site.favicons.ios %}
+<link rel="apple-touch icon" href={% asset "favicon-{{ size }}.png" @path %} sizes="{{ size }}x{{ size }}">
+{% endfor %}
+
+<!-- Windows -->
+<meta name="msapplication-TileColor" content="#{{ site.app_background_color }}">
+{% for size in site.favicons.windows %}
+<meta name="msapplication-TileImage" content={% asset "favicon-{{ size }}.png" @path %} sizes="{{ size }}x{{ size }}">
+{% endfor %}

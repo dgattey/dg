@@ -33,10 +33,18 @@ jekyll_analytics:
 
 # Assets
 assets:
+  sources:
+    - _assets/icons
   autoprefixer:
     browsers:
     - "last 2 versions"
     - "IE > 9"
+favicons:
+  generic: [32, 57, 76, 96, 128, 196, 228]
+  android: [196]
+  ios: [120, 152, 180]
+  windows: [144]
+  thumbnail: [152]
 
 # Sitemap config - excludes google analytics html file
 defaults:

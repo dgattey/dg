@@ -12,12 +12,12 @@ permalink: manifest.json
   "theme_color": "#{{ site.app_theme_color }}",
   "icons": [
     {
-    "src": "/img/icons-192.png",
+    "src": "{% asset favicon-196.png @path %}",
     "type": "image/png",
     "sizes": "192x192"
   },
   {
-    "src": "/img/icons-512.png",
+    "src": "{% asset favicon-512.png @path %}",
     "type": "image/png",
     "sizes": "512x512"
   }
