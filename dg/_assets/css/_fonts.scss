@@ -40,45 +40,47 @@ html {
 
     // Shared header styles
     h1, h2, h3, h4, h5, h6 {
-        font-family: $fam-head;
-        font-weight: $bold-weight;
+        font-weight: $weight-head;
         margin-top: $h-top;
         line-height: $line-height;
     }
 
     // Headers
     h1 {
+        font-family: $fam-display;
+        font-weight: $weight-display;
         font-size: $h1-size;
         margin-top: 0;
         margin-bottom: $h1-bottom;
         letter-spacing: $h1-letter;
     }
     h2 {
+        font-family: $fam-display;
+        font-weight: $weight-display;
         font-size: $h2-size;
         margin-bottom: $h2-bottom;
         letter-spacing: $h2-letter;
     }
     h3 {
+        font-family: $fam-head;
         font-size: $h3-size;
         margin-bottom: $h3-bottom;
         letter-spacing: $h3-letter;
     }
     h4 {
+        font-family: $fam-head;
         font-size: $h4-size;
         letter-spacing: $h4-letter;
     }
 
     h5 {
-        @include for-phone-only {
-            font-size: $h3-size;
-        }
-        @include for-tablet-portrait-up {
-            font-size: $h4-size;
-        }
-        @include for-desktop-up {
-            font-size: $h5-size;
-        }
+        font-family: $fam-head;
+        font-size: $h5-size;
         letter-spacing: $h5-letter;
+    }
+
+    h6 {
+        font-family: $fam-head;
     }
 
     // Body

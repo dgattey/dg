@@ -34,6 +34,8 @@
 		grid-column-end: $end-before-photo;
 		grid-row: 2 / -1;
 		font-size: 1.1em;
+		opacity: 0.85;
+		letter-spacing: -0.5px;
 	}
 	picture, img {
 		object-fit: cover;

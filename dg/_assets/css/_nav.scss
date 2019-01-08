@@ -15,7 +15,7 @@
 		position: fixed;
 		top: 0;
 		font-family: $fam-head;
-		font-weight: $bold-weight;
+		font-weight: $weight-head;
 		display: grid;
 		grid-template-columns: repeat($standard-grid-cols, 1fr);
 		grid-column-gap: $item-spacing-3;
