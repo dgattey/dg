@@ -2,91 +2,92 @@
  * Defines standard font styles & sizes across the full site.
  */
 
+// HTML niceties
 html {
-    $default-line-height: 2.5rem;
-    $default-margin-bottom: 2.5rem;
-
-    // HTML specific styles
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
     font-feature-settings: "kern" 1;
     font-kerning: normal;
+}
 
-    // Display weights
-    h1, h2, h3 {
-        font-family: $fam-head;
-        font-weight: $weight-display;
-    }
+// Display weights
+h1, h2, h3 {
+    font-family: $fam-head;
+    font-weight: $weight-display;
+}
 
-    // Regular header weight
-    h4, h5, h6 {
-        font-family: $fam-head;
-        font-weight: $weight-head;
-    }
+// Regular header weight
+h4, h5, h6 {
+    font-family: $fam-head;
+    font-weight: $weight-head;
+}
 
-    // Shared styles
-    h1, h2, h3, h4, h5, h6, p {
-        font-style: normal;
-        letter-spacing: 0em;
-        margin-bottom: $default-margin-bottom;
-    }
+// Shared styles
+h1, h2, h3, h4, h5, h6, p {
+    font-style: normal;
+    letter-spacing: 0em;
+    margin-bottom: 2.5rem;
+}
 
-    // Headers
-    h1 {
+// Headers
+h1 {
+    font-size: 7.62939453125em;
+    line-height: 10rem;
+    &.emphasized {
         font-size: 9.5367431640625em;
-        line-height: 10rem;
     }
-    h2 {
-        font-size: 6.103515625em;
-        line-height: 7.5rem;
-    }
-    h3 {
-        font-size: 4.39453125em;
-        line-height: 5rem;
-    }
-    h4 {
-        font-size: 3.515625em;
-        line-height: 5rem;
-    }
+}
+h2 {
+    font-size: 6.103515625em;
+    line-height: 7.5rem;
+}
+h3 {
+    font-size: 4.39453125em;
+    line-height: 5rem;
+}
+h4 {
+    font-size: 3.515625em;
+    line-height: 5rem;
+}
 
-    h5 {
-        font-size: 2.8125em;
-        line-height: 5rem;
-    }
+h5 {
+    font-size: 2.8125em;
+    line-height: 5rem;
+}
 
-    h6 {
-        font-size: 2.25em;
-        line-height: $default-line-height;
-    }
+h6 {
+    font-size: 2.25em;
+    line-height: 2.5rem;
+}
 
-    // Body
-    p {
-        font-family: $fam-body;
-        font-weight: $weight;
-        font-size: 1.8em;
-        line-height: $default-line-height;
+// Body
+p {
+    font-family: $fam-body;
+    font-weight: $weight;
+    font-size: 1.8em;
+    line-height: 2.5rem;
 
-        &.leading {
-            font-size: 2em;
-            opacity: 0.8;
-        }
+    &.emphasized {
+        font-size: 2em;
+        line-height: 3rem;
+        opacity: 0.8;
     }
+}
 
-    // Links
-    a {
-        color: $color-primary-bright;
-        text-decoration: none;
-        &:hover {
-            color: $color-primary-dim;
-        }
+// Links
+a {
+    color: $color-primary-bright;
+    text-decoration: none;
+    &:hover {
+        color: $color-primary-dim;
     }
+}
 
-    code {
-        background-color: $color-bg-code;
-        $vertical-padding: 0;
-        $horizontal-padding: 0.3em;
-        border: 1px solid $color-border-code;
-        padding: $vertical-padding $horizontal-padding;
-    }
+code {
+    background-color: $color-bg-code;
+    $vertical-padding: 0;
+    $horizontal-padding: 0.3em;
+    border: 1px solid $color-border-code;
+    padding: $vertical-padding $horizontal-padding;
 }

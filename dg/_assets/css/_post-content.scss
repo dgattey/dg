@@ -4,16 +4,4 @@
  */
 
 .post-content {
-	section {
-		p {
-			&:nth-child(1) {
-				font-size: 1.1em;
-			}
-		}
-	}
-
-	code {
-		border-radius: $item-spacing-1;
-	}
-
 }
