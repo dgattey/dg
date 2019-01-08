@@ -38,14 +38,17 @@ h1 {
         font-size: 9.5367431640625em;
     }
 }
+
 h2 {
     font-size: 6.103515625em;
     line-height: 7.5rem;
 }
+
 h3 {
     font-size: 4.39453125em;
     line-height: 5rem;
 }
+
 h4 {
     font-size: 3.515625em;
     line-height: 5rem;
@@ -61,8 +64,8 @@ h6 {
     line-height: 2.5rem;
 }
 
-// Body
-p {
+// Body text
+p, .body {
     font-family: $fam-body;
     font-weight: $weight;
     font-size: 1.8em;
