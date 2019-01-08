@@ -69,7 +69,15 @@ html {
     }
 
     h5 {
-        font-size: $h5-size;
+        @include for-phone-only {
+            font-size: $h3-size;
+        }
+        @include for-tablet-portrait-up {
+            font-size: $h4-size;
+        }
+        @include for-desktop-up {
+            font-size: $h5-size;
+        }
         letter-spacing: $h5-letter;
     }
 
