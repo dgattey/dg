@@ -66,6 +66,11 @@ html {
         font-weight: $weight;
         font-size: 1.8em;
         line-height: $default-line-height;
+
+        &.leading {
+            font-size: 2em;
+            opacity: 0.8;
+        }
     }
 
     // Links

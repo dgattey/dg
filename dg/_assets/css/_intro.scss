@@ -13,7 +13,6 @@
 	color: $color-deep;
 	.head-text {
 		@extend %gradient-words;
-		margin-bottom: 0;
 		align-self: end;
 		grid-column: 2 / -1;
 		grid-row: 1 / 2;
@@ -33,9 +32,6 @@
 		grid-column-start: 2;
 		grid-column-end: $end-before-photo;
 		grid-row: 2 / -1;
-		font-size: 1.1em;
-		opacity: 0.85;
-		letter-spacing: -0.5px;
 	}
 	picture, img {
 		object-fit: cover;
