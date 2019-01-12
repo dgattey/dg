@@ -22,4 +22,20 @@ footer {
 	li {
 		padding: 0 $padding;
 	}
+
+	.icon {
+	    &:hover > svg path {
+	        fill: $color-primary-dim;
+	    }
+	    > svg {
+	        display: inline-block;
+	        width: $icon-size;
+	        height: $icon-size;
+	        vertical-align: middle;
+	        path {
+	            @include transition(fill);
+	            fill: $color-primary-bright;
+	        }
+	    }
+	}
 }

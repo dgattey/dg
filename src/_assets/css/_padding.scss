@@ -1,35 +1,39 @@
 /*
- * Padding mixins to be used globally (wrapped in a tag to keep values local)
+ * Padding mixins to be used globally
  */
- 
-html {
-	@mixin template-body($page-padding, $top-padding) {
-		$nav-padding: $item-spacing-3;
-		%standard-inset {
-			margin-top: $top-padding + $nav-padding * 2;
-			margin-left: $page-padding;
-			margin-right: $page-padding;
-		}
-		%nav-padding {
-			padding-left: $page-padding;
-			padding-right: $page-padding;
-			padding-top: $nav-padding;
-			padding-bottom: $nav-padding;
-		}
-	}
 
-	// For different breakpoints
-	$tablet-top-padding: $item-spacing-4 + $item-spacing-3;
-	@include for-phone-only {
-		@include template-body($item-spacing-2, $item-spacing-5);
+%max-width-element {
+	max-width: $bp-max-width;
+	width: 100%;
+	margin: 0 auto;
+}
+
+@mixin template-body($page-padding, $top-padding) {
+	$nav-padding: $item-spacing-3;
+	%standard-inset {
+		margin-top: $top-padding + $nav-padding * 2;
+		margin-left: $page-padding;
+		margin-right: $page-padding;
 	}
-	@include for-tablet-portrait-up {
-		@include template-body($item-spacing-3, $tablet-top-padding);
+	%nav-padding {
+		padding-left: $page-padding;
+		padding-right: $page-padding;
+		padding-top: $nav-padding;
+		padding-bottom: $nav-padding;
 	}
-	@include for-tablet-landscape-up {
-		@include template-body($item-spacing-4, $tablet-top-padding);
-	}
-	@include for-desktop-up {
-		@include template-body($item-spacing-5, $item-spacing-5);
-	}
+}
+
+// For different breakpoints
+$tablet-top-padding: $item-spacing-4 + $item-spacing-3;
+@include for-phone-only {
+	@include template-body($item-spacing-2, $item-spacing-5);
+}
+@include for-tablet-portrait-up {
+	@include template-body($item-spacing-3, $tablet-top-padding);
+}
+@include for-tablet-landscape-up {
+	@include template-body($item-spacing-4, $tablet-top-padding);
+}
+@include for-desktop-up {
+	@include template-body($item-spacing-5, $item-spacing-5);
 }

@@ -1,25 +1,35 @@
-/*
+/**
  * Defines standard font styles & sizes across the full site.
  */
 
-// HTML niceties
 html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     -webkit-text-size-adjust: 100%;
     font-feature-settings: "kern" 1;
     font-kerning: normal;
+    letter-spacing: 0.02em;
 }
 
+h1, h2, h3, h4, h5, h6, p {
+    font-style: normal;
+    letter-spacing: 0em;
+    margin-bottom: 2.5rem;
+}
+
+/**
+ * Header styling
+ */
+
 %head-font-style {
-    font-family: $fam-head;
-    font-weight: $weight-head;
+    font-family: $font-family-head;
+    font-weight: $font-weight-head;
 }
 
 // Display weights
 h1, h2, h3 {
-    font-family: $fam-head;
-    font-weight: $weight-display;
+    font-family: $font-family-head;
+    font-weight: $font-weight-display;
 }
 
 // Regular header weight
@@ -27,14 +37,6 @@ h4, h5, h6 {
     @extend %head-font-style;
 }
 
-// Shared styles
-h1, h2, h3, h4, h5, h6, p {
-    font-style: normal;
-    letter-spacing: 0em;
-    margin-bottom: 2.5rem;
-}
-
-// Headers
 h1 {
     font-size: 7.62939453125em;
     line-height: 10rem;
@@ -68,17 +70,20 @@ h6 {
     line-height: 2.5rem;
 }
 
-// Body text
+/**
+ * Regular (non-header) text styling
+ */
+
 %regular-text-size {
     font-size: 1.8em;
 }
 %regular-text {
-    font-family: $fam-body;
-    font-weight: $weight;
+    font-family: $font-family-body;
+    font-weight: $font-weight-body;
     line-height: 2.5rem;
 }
 
-p {
+p, input, button, select, textarea {
     @extend %regular-text;
     @extend %regular-text-size;
     &.emphasized {
@@ -88,7 +93,10 @@ p {
     }
 }
 
-// Links
+/**
+ * Links
+ */
+
 a {
     color: $color-primary-bright;
     text-decoration: none;
@@ -96,6 +104,10 @@ a {
         color: $color-primary-dim;
     }
 }
+
+/**
+ * Code
+ */
 
 code {
     background-color: $color-bg-code;

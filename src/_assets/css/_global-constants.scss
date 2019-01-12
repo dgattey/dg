@@ -1,4 +1,4 @@
-/*
+/**
  * Allllll the global constants anything can access
  */
  
@@ -17,12 +17,12 @@ $color-red: #ee5050;
 $color-blue: #04a5e5;
 
 // Fonts
-$fam-body: "Hind", sans-serif;
-$fam-head: "Heebo", sans-serif;
-$weight: 400;
-$weight-head: 700;
-$weight-display: 900;
-$base-font-size: 10px;
+$font-family-body: "Hind", sans-serif;
+$font-family-head: "Heebo", sans-serif;
+$font-weight-body: 400;
+$font-weight-head: 700;
+$font-weight-display: 900;
+$font-size-base: 10px;
 
 // Applied color values (primary, bg, border, text)
 $color-primary-bright: $color-green;
@@ -36,7 +36,7 @@ $color-text-muted: $color-muted;
 $color-text-active: $color-primary-dim;
 
 // Grids + breakpoints
-$standard-grid-cols: 12;
+$grid-standard-columns: 12;
 $bp-max-phone: 599px;
 $bp-min-tablet: 600px;
 $bp-min-tablet-landscape: 900px;
@@ -54,8 +54,8 @@ $item-spacing-7: 24em;
 $icon-size: $item-spacing-3;
 
 // Z-indices
-$z-max: 999;
-$z-high: 900;
-$z-med: 600;
-$z-low: 400;
-$z-min: 0;
+$depth-4: 999;
+$depth-3: 300;
+$depth-2: 200;
+$depth-1: 100;
+$depth-0: 0;

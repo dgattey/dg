@@ -6,16 +6,15 @@
 .header-nav {
 	$underline-height: 3px;
 	$hover-scale: 1.05;
-	$inner-grid-cols: 3 * ($standard-grid-cols - 1);
+	$inner-grid-cols: 3 * ($grid-standard-columns - 1);
 
 	@extend %head-font-style;
-	max-width: $bp-max-width;
-	z-index: $z-max;
+	@extend %max-width-element;
+	z-index: $depth-4;
 	position: fixed;
 	top: 0;
 	left: 0;
 	right: 0;
-	margin: auto;
 
 	%nav-grid {
 		display: grid;
@@ -36,7 +35,7 @@
 		background: $color-bg;
 		@extend %nav-padding;
 		@extend %nav-grid;
-		grid-template-columns: repeat($standard-grid-cols, 1fr);
+		grid-template-columns: repeat($grid-standard-columns, 1fr);
 	}
 
 	// Ensures uniform text size on nav items to follow body

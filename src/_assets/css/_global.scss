@@ -1,82 +1,39 @@
+/**
+ * Global, base styles to ensure the rest is applied correctly
+ */
+
 html, body {
-    font-size: $base-font-size; // Base font size to make everything else flow right
+    /**
+     * Ensures that the font size scales correctly across the site
+     */
+    font-size: $font-size-base;
 }
 
 html {
     background: $color-bg;
     color: $color-text-dark;
     overflow-x: hidden;
+}
 
-    // Max sizing on body
-    body {
-        max-width: $bp-max-width;
-        width: 100%;
-        margin: 0 auto;
-    }
+body { 
+    @extend %max-width-element;
+}
 
-    // Pad content by default to account for sticky header
-    .content {
-        @extend %standard-inset;
-    }
+.content {
+    /**
+     * Accounts for sticky header by pushing all content down
+     */
+    @extend %standard-inset;
+}
 
-    // Make sure margins align with spacing
-    ul, ol {
-        margin-left: $icon-size;
-    }
+/**
+ * Text selection
+ */
 
-    // Icons
-    .icon {
-        &:hover > svg path {
-            fill: $color-primary-dim;
-        }
-        > svg {
-            display: inline-block;
-            width: $icon-size;
-            height: $icon-size;
-            vertical-align: middle;
-            path {
-                @include transition(fill);
-                fill: $color-primary-bright;
-            }
-        }
-    }
+::-moz-selection { 
+    background: $color-primary-dim;
+}
 
-    // // TODO: come back to Blockquotes looking nice
-    // blockquote {
-    //     color: $color-text-muted;
-    //     border-left: 4px solid $color-text-dark;
-    //     padding-left: $icon-size / 2;
-    //     font-size: 18px;
-    //     letter-spacing: -1px;
-    //     font-style: italic;
-
-    //     > :last-child {
-    //         margin-bottom: 0;
-    //     }
-    // }
-
-
-    // // TODO: come back to Code formatting
-    // pre,
-    // code {
-    //     font-size: 15px;
-    //     border: 1px solid $color-text-dark;
-    //     border-radius: 3px;
-    //     background-color: $color-bg-code;
-    // }
-
-    // code {
-    //     padding: 1px 5px;
-    // }
-
-    // pre {
-    //     padding: 8px 12px;
-    //     overflow-x: auto;
-
-    //     > code {
-    //         border: 0;
-    //         padding-right: 0;
-    //         padding-left: 0;
-    //     }
-    // }
+::selection {
+    background: $color-primary-dim;
 }

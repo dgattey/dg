@@ -6,7 +6,7 @@
 .intro {
 	$end-before-photo: 7;
 	display: grid;
-	grid-template-columns: repeat($standard-grid-cols, 1fr);
+	grid-template-columns: repeat($grid-standard-columns, 1fr);
 	grid-template-rows: repeat(2, 1fr);
 	grid-column-gap: $item-spacing-3;
 	margin-bottom: $item-spacing-6 + $item-spacing-1;
