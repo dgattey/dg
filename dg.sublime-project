@@ -2,7 +2,19 @@
 	"folders":
 	[
 		{
-			"path": "."
+			"path": "build"
+		},
+		{
+			"path": "src"
+		},
+		{
+			// The other files inside the main folder
+			"path": ".",
+			"folder_exclude_patterns": ["build", "design", "src", ".*-cache"]
+		},
+		{
+			"name": "design-assets",
+			"path": "design"
 		}
 	]
 }

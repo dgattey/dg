@@ -56,7 +56,7 @@ defaults:
 
 # Build settings
 markdown: kramdown
-source: dg
+source: src
 destination: build
 include: [static, .htaccess]
 sass:

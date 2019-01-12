@@ -4,7 +4,7 @@ set -e
 # --------------------------
 # CONSTANTS
 # --------------------------
-ASSETS=./dg/_assets/img
+ASSETS=./src/_assets/img
 FILETYPES=("jpg" "png")
 
 # --------------------------
