@@ -18,11 +18,11 @@
 
 	%nav-grid {
 		display: grid;
-		@include for-phone-only {
+		@include for-phone-up {
 			grid-column-gap: $item-spacing-4;
 			grid-row-gap: $item-spacing-3;
 		}
-		@include for-tablet-portrait-up {
+		@include for-tablet-small-up {
 			grid-column-gap: $item-spacing-4;
 		}
 		@include for-desktop-up {
@@ -76,10 +76,10 @@
 		&:hover {
 			transform: translateY(- $underline-height / 2);
 		}
-		@include for-phone-only {
+		@include for-phone-up {
 			grid-column-end: span $inner-grid-cols;
 		}
-		@include for-tablet-portrait-up {
+		@include for-tablet-small-up {
 			grid-column-end: span 4;
 		}
 	}

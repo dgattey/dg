@@ -2,23 +2,6 @@
  * Mixins and extensions to be used globally
  */
 
-// Sticks over top of parent
-%overlay {
-	position: absolute;
-	top: 0;
-	bottom: 0;
-	left: 0;
-	right: 0;
-}
-
-// Size of parent
-%flush {
-	margin: 0;
-	padding: 0;
-	width: 100%;
-	height: 100%;
-}
-
 // Primary color gradient on whatever text this is applied to
 %gradient-words {
 	background-image: linear-gradient(to bottom, $color-primary-bright, $color-primary-dim);
@@ -27,23 +10,16 @@
 	color: rgba(0, 0, 0,0);
 }
 
-// Assumes parent is height:100% or absolutely sized
-%vertically-centered {
-	position: relative;
-	top: 50%;
-	transform: translateY(-50%);
-}
-
 // Helps with media queries to reduce typing
-@mixin for-phone-only {
-  @media (max-width: $bp-max-phone) { @content; }
+@mixin for-phone-up {
+  @media (min-width: $breakpoint-min-phone) { @content; }
 }
-@mixin for-tablet-portrait-up {
-  @media (min-width: $bp-min-tablet) { @content; }
+@mixin for-tablet-small-up {
+  @media (min-width: $breakpoint-min-tablet) { @content; }
 }
-@mixin for-tablet-landscape-up {
-  @media (min-width: $bp-min-tablet-landscape) { @content; }
+@mixin for-tablet-large-up {
+  @media (min-width: $breakpoint-min-tablet-landscape) { @content; }
 }
 @mixin for-desktop-up {
-  @media (min-width: $bp-min-desktop) { @content; }
+  @media (min-width: $breakpoint-min-desktop) { @content; }
 }

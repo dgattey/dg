@@ -37,11 +37,11 @@ $color-text-active: $color-primary-dim;
 
 // Grids + breakpoints
 $grid-standard-columns: 12;
-$bp-max-phone: 599px;
-$bp-min-tablet: 600px;
-$bp-min-tablet-landscape: 900px;
-$bp-min-desktop: 1200px;
-$bp-max-width: 1400px;
+$breakpoint-min-phone: 0px;
+$breakpoint-min-tablet: 600px;
+$breakpoint-min-tablet-landscape: 900px;
+$breakpoint-min-desktop: 1200px;
+$breakpoint-max-width: 1400px;
 
 // Spacing
 $item-spacing-1: 0.375em;

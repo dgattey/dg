@@ -3,7 +3,7 @@
  */
 
 %max-width-element {
-	max-width: $bp-max-width;
+	max-width: $breakpoint-max-width;
 	width: 100%;
 	margin: 0 auto;
 }
@@ -25,13 +25,13 @@
 
 // For different breakpoints
 $tablet-top-padding: $item-spacing-4 + $item-spacing-3;
-@include for-phone-only {
+@include for-phone-up {
 	@include template-body($item-spacing-2, $item-spacing-5);
 }
-@include for-tablet-portrait-up {
+@include for-tablet-small-up {
 	@include template-body($item-spacing-3, $tablet-top-padding);
 }
-@include for-tablet-landscape-up {
+@include for-tablet-large-up {
 	@include template-body($item-spacing-4, $tablet-top-padding);
 }
 @include for-desktop-up {
