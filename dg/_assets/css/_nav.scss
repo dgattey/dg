@@ -6,77 +6,82 @@
 .header-nav {
 	$underline-height: 3px;
 	$hover-scale: 1.05;
-	$inline-grid-cols: 2 * ($standard-grid-cols - 1);
+	$inner-grid-cols: 3 * ($standard-grid-cols - 1);
 
-	nav {
-		z-index: $z-max;
-		background: $color-bg;
-		@extend %nav-padding;
-		position: fixed;
-		top: 0;
-		font-family: $fam-head;
-		font-weight: $weight-head;
+	@extend %head-font-style;
+	max-width: $bp-max-width;
+	z-index: $z-max;
+	position: fixed;
+	top: 0;
+	left: 0;
+	right: 0;
+	margin: auto;
+
+	%nav-grid {
 		display: grid;
-		grid-template-columns: repeat($standard-grid-cols, 1fr);
-		grid-column-gap: $item-spacing-3;
+		@include for-phone-only {
+			grid-column-gap: $item-spacing-4;
+			grid-row-gap: $item-spacing-3;
+		}
+		@include for-tablet-portrait-up {
+			grid-column-gap: $item-spacing-4;
+		}
+		@include for-desktop-up {
+			grid-column-gap: $item-spacing-3;
+		}
 	}
 
-	// Just column 1
+	// Colors & padding
+	nav {
+		background: $color-bg;
+		@extend %nav-padding;
+		@extend %nav-grid;
+		grid-template-columns: repeat($standard-grid-cols, 1fr);
+	}
+
+	// Ensures uniform text size on nav items to follow body
+	.logo-wrapper, .nav-item {
+		// If this is set on nav itself, it changes padding
+		@extend %regular-text-size;
+		align-self: center;
+	}
+
 	.logo {
 		font-size: 2.3em;
 		line-height: 1;
 		letter-spacing: -0.12em;
-		.animatable {
-			display: inline-block;
-			@include transition(color, transform);
-			&:hover {
-				transform: scale($hover-scale);
-			}
+		display: inline-block;
+		@include transition(color, transform);
+		&:hover {
+			transform: scale($hover-scale);
 		}
 	}
 
-	// This has to span all of columns 2 through end
 	.nav-items {
 		margin: 0;
 		padding: 0;
 		grid-column: 2 / -1;
-		align-self: center;
-		display: inline-grid;
-		grid-template-columns: repeat($inline-grid-cols, 1fr);
-		grid-column-gap: $item-spacing-3;
 
-		@include for-phone-only {
-			justify-self: center;
-		}
-		@include for-tablet-portrait-up {
-			justify-self: center;
-		}
-		@include for-tablet-landscape-up {
-			justify-self: start;
-		}
+		// Inner grid
+		@extend %nav-grid;
+		grid-template-columns: repeat($inner-grid-cols, 1fr);
 	}
 
 	.nav-item {
 		text-transform: uppercase;
 		display: inline-block;
 		margin: 0;
+		justify-self: start;
+		align-self: center;
 		@include transition-out(transform);
-		@include for-phone-only {
-			grid-column-end: span 7;
-			justify-self: center;
-		}
 		&:hover {
 			transform: translateY(- $underline-height / 2);
 		}
+		@include for-phone-only {
+			grid-column-end: span $inner-grid-cols;
+		}
 		@include for-tablet-portrait-up {
-			grid-column-end: span 6;
-			justify-self: center;
-		}
-		@include for-tablet-landscape-up {
 			grid-column-end: span 4;
-		}
-		@include for-desktop-up {
-			grid-column-end: span 3;
 		}
 	}
 

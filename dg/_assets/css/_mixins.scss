@@ -24,7 +24,7 @@
 	background-image: linear-gradient(to bottom, $color-primary-bright, $color-primary-dim);
 	background-clip: text;
 	-webkit-background-clip: text;
-	color: transparent;
+	color: rgba(0, 0, 0,0);
 }
 
 // Assumes parent is height:100% or absolutely sized

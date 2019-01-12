@@ -11,6 +11,11 @@ html {
     font-kerning: normal;
 }
 
+%head-font-style {
+    font-family: $fam-head;
+    font-weight: $weight-head;
+}
+
 // Display weights
 h1, h2, h3 {
     font-family: $fam-head;
@@ -19,8 +24,7 @@ h1, h2, h3 {
 
 // Regular header weight
 h4, h5, h6 {
-    font-family: $fam-head;
-    font-weight: $weight-head;
+    @extend %head-font-style;
 }
 
 // Shared styles
@@ -65,12 +69,18 @@ h6 {
 }
 
 // Body text
-p, .body {
+%regular-text-size {
+    font-size: 1.8em;
+}
+%regular-text {
     font-family: $fam-body;
     font-weight: $weight;
-    font-size: 1.8em;
     line-height: 2.5rem;
+}
 
+p {
+    @extend %regular-text;
+    @extend %regular-text-size;
     &.emphasized {
         font-size: 2em;
         line-height: 3rem;
