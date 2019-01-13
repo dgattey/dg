@@ -12,7 +12,7 @@
 
 // Helps with media queries to reduce typing
 @mixin for-phone-up {
-  @media (min-width: $breakpoint-min-phone) { @content; }
+  @content;
 }
 @mixin for-tablet-small-up {
   @media (min-width: $breakpoint-min-tablet) { @content; }

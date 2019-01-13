@@ -37,46 +37,91 @@ h4, h5, h6 {
     @extend %head-font-style;
 }
 
-@mixin font-body($element, $line-height, $small, $standard, $large: null, $large-line-height: null) {
-    #{$element} {
-        @include for-phone-up {
-            font-size: $small;
-            @if $large != null {
-                &.emphasized {
-                    @if $large-line-height != null {
-                        line-height: $large-line-height;
-                    }
-                    font-size: $standard;
-                }
+@mixin emphasized($font-size: null, $line-height: null) {
+    @if $font-size != null {
+        &.emphasized {
+            @if $line-height != null {
+                line-height: $line-height;
             }
+            font-size: $font-size;
         }
-        @include for-tablet-large-up {
-            font-size: $standard;
-            @if $large != null {
-                &.emphasized {
-                    @if $large-line-height != null {
-                        line-height: $large-line-height;
-                    }
-                    font-size: $large;
-                }
-            }
-        }
-        line-height: $line-height;
     }
 }
 
-@include font-body(h1, 10rem, 6.103515625em, 7.62939453125em, 9.5367431640625em);
-@include font-body(h2, 7.5rem, 4.39453125em, 6.103515625em);
-@include font-body(h3, 5rem, 3.515625em, 4.39453125em);
-@include font-body(h4, 5rem, 2.8125em, 3.515625em);
-@include font-body(h5, 5rem, 2.25em, 2.8125em);
-@include font-body(h6, 2.5rem, 2em, 2.25em);
+@mixin font-body($element, $line-height, $phone, $tablet, $standard, $emphasized: null, $emphasized-line-height: null) {
+
+    #{$element} {
+        @include for-phone-up {
+            font-size: $phone;
+            line-height: $line-height;
+            @include emphasized($tablet, $line-height);
+        }
+        @include for-tablet-small-up {
+            font-size: $tablet;
+            line-height: $line-height;
+            @include emphasized($standard, $line-height);
+        }
+        @include for-desktop-up {
+            font-size: $standard;
+            line-height: $line-height;
+            @include emphasized($emphasized, $emphasized-line-height);
+        }
+    }
+}
+// TODO: @dgattey add arguments for line height to each item
+// TODO: @dgattey autogenerate the different sizes based on standard? Only emphasized ones are p and h1 so that could work well
+// TODO: @dgattey also generate the line heights based off rhythm of rest of the items
+
+@include font-body(
+    h1,
+    $line-height: 10rem,
+    $phone: 5.4931640625em,
+    $tablet: 6.103515625em,
+    $standard: 7.62939453125em,
+    $emphasized: 9.5367431640625em);
+@include font-body(
+    h2,
+    $line-height: 7.5rem,
+    $phone: 4.39453125em,
+    $tablet: 5.4931640625em,
+    $standard: 6.103515625em);
+@include font-body(
+    h3,
+    $line-height: 5rem,
+    $phone: 2.8125em,
+    $tablet: 3.515625em,
+    $standard: 4.39453125em);
+@include font-body(
+    h4,
+    $line-height: 5rem,
+    $phone: 2.25em,
+    $tablet: 2.8125em,
+    $standard: 3.515625em);
+@include font-body(
+    h5,
+    $line-height: 5rem,
+    $phone: 2em,
+    $tablet: 2.25em,
+    $standard: 2.8125em);
+@include font-body(
+    h6,
+    $line-height: 2.5rem,
+    $phone: 2em,
+    $tablet: 2em,
+    $standard: 2.25em);
 
 /**
  * Regular (non-header) text styling
  */
 
-@include font-body("%regular-text-size", 2.5rem, 1.6em, 1.8em, $large: 2em, $large-line-height: 3rem);
+@include font-body(
+    "%regular-text-size",
+    $line-height: 2.5rem,
+    $phone: 1.6em,
+    $tablet: 1.6em,
+    $standard: 1.8em,
+    $emphasized: 2em,
+    $emphasized-line-height: 3rem);
 
 %regular-text {
     font-family: $font-family-body;
