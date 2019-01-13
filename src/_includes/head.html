@@ -12,9 +12,11 @@
   <meta name="theme-color" content="#{{ site.app_theme_color }}">
 
   <!-- Static assets, fonts and CSS includes -->
-  <link rel="dns-prefetch" href="https://fonts.gstatic.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Hind:400|Heebo:700,900">
+  <link rel="dns-prefetch" href="{{ site.font_preload_url }}">
+  <link rel="preconnect" href="{{ site.font_preload_url }}">
+  {% if site.use_font_loader == false %}
+  <link rel="stylesheet" href="{{ site.font_url }}{{ site.font_body }}|{{ site.font_head }}">
+  {% endif %}
   <link rel="manifest" href="/manifest.json">
   {% asset main.css %}
   {% include favicons.html %}

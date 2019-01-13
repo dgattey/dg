@@ -1,0 +1,26 @@
+{% if site.use_font_loader %}
+<script>
+  // Do this only after we've displayed the initial text.
+  document.body.onload = function() {
+  	var url = '{{ site.font_url }}{{ site.font_body }}|{{ site.font_head }}';
+  	loadStyles(url);
+  }
+
+  function loadStyles (url) {
+  	var xhr = new XMLHttpRequest();
+  	xhr.open('GET', url, true);
+  	xhr.onreadystatechange = function () {
+  		if (xhr.readyState == 4 && xhr.status == 200) {
+  			let css = xhr.responseText;
+  			css = css.replace(/}/g, 'font-display: fallback; }');
+
+  			const head = document.getElementsByTagName('head')[0];
+  			const style = document.createElement('style');
+  			style.appendChild(document.createTextNode(css));
+  			head.appendChild(style);
+  		}
+  	};
+  	xhr.send();
+  }
+</script>
+{% endif %}

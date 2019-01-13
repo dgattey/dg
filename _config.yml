@@ -13,6 +13,13 @@ social:
     - https://www.linkedin.com/in/dgattey
     - https://github.com/dgattey
 
+# Fonts - if changing these, change the SCSS variables too!!
+font_body: Hind:400
+font_head: Heebo:700,900
+font_url: https://fonts.googleapis.com/css?family=
+font_preload_url: https://fonts.gstatic.com
+use_font_loader: true # whether or not to use async JS to load font
+
 # Configuration for site
 url: "https://dylangattey.com"
 permalink: /projects/:title/ #posts
