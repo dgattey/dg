@@ -37,50 +37,50 @@ h4, h5, h6 {
     @extend %head-font-style;
 }
 
-h1 {
-    font-size: 7.62939453125em;
-    line-height: 10rem;
-    &.emphasized {
-        font-size: 9.5367431640625em;
+@mixin font-body($element, $line-height, $small, $standard, $large: null, $large-line-height: null) {
+    #{$element} {
+        @include for-phone-up {
+            font-size: $small;
+            @if $large != null {
+                &.emphasized {
+                    @if $large-line-height != null {
+                        line-height: $large-line-height;
+                    }
+                    font-size: $standard;
+                }
+            }
+        }
+        @include for-tablet-large-up {
+            font-size: $standard;
+            @if $large != null {
+                &.emphasized {
+                    @if $large-line-height != null {
+                        line-height: $large-line-height;
+                    }
+                    font-size: $large;
+                }
+            }
+        }
+        line-height: $line-height;
     }
 }
 
-h2 {
-    font-size: 6.103515625em;
-    line-height: 7.5rem;
-}
-
-h3 {
-    font-size: 4.39453125em;
-    line-height: 5rem;
-}
-
-h4 {
-    font-size: 3.515625em;
-    line-height: 5rem;
-}
-
-h5 {
-    font-size: 2.8125em;
-    line-height: 5rem;
-}
-
-h6 {
-    font-size: 2.25em;
-    line-height: 2.5rem;
-}
+@include font-body(h1, 10rem, 6.103515625em, 7.62939453125em, 9.5367431640625em);
+@include font-body(h2, 7.5rem, 4.39453125em, 6.103515625em);
+@include font-body(h3, 5rem, 3.515625em, 4.39453125em);
+@include font-body(h4, 5rem, 2.8125em, 3.515625em);
+@include font-body(h5, 5rem, 2.25em, 2.8125em);
+@include font-body(h6, 2.5rem, 2em, 2.25em);
 
 /**
  * Regular (non-header) text styling
  */
 
-%regular-text-size {
-    font-size: 1.8em;
-}
+@include font-body("%regular-text-size", 2.5rem, 1.6em, 1.8em, $large: 2em, $large-line-height: 3rem);
+
 %regular-text {
     font-family: $font-family-body;
     font-weight: $font-weight-body;
-    line-height: 2.5rem;
     max-width: 36em;
 }
 
@@ -88,8 +88,6 @@ p, input, button, select, textarea {
     @extend %regular-text;
     @extend %regular-text-size;
     &.emphasized {
-        font-size: 2em;
-        line-height: 3rem;
         opacity: 0.8;
     }
 }
