@@ -19,13 +19,13 @@
 
 	.title {
 		@extend %gradient-words;
-		align-self: end;
 		grid-row: 1 / 2;
 
 		@include for-phone-up {
-			grid-column: 2 / -1;
+			grid-column: 1 / -1;
 		}
 		@include for-tablet-up {
+			align-self: end;
 			grid-column: 2 / #{$end-before-photo};
 		}
 		@include for-desktop-up {
@@ -37,7 +37,7 @@
 		grid-row: 2 / 3;
 
 		@include for-phone-up {
-			grid-column: 2 / -1;
+			grid-column: 1 / -1;
 		}
 		@include for-tablet-up {
 			grid-column: 2 / #{$end-before-photo};
