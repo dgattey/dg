@@ -26,14 +26,11 @@
 // For different breakpoints
 $tablet-top-padding: $item-spacing-4 + $item-spacing-3;
 @include for-phone-up {
-	@include template-body($item-spacing-2, $item-spacing-5);
+	@include template-body($item-spacing-4, $item-spacing-5 + $item-spacing-4);
 }
 @include for-tablet-small-up {
-	@include template-body($item-spacing-3, $tablet-top-padding);
-}
-@include for-tablet-large-up {
-	@include template-body($item-spacing-4, $tablet-top-padding);
+	@include template-body($item-spacing-4, $item-spacing-5 + $item-spacing-4);
 }
 @include for-desktop-up {
-	@include template-body($item-spacing-5, $item-spacing-5);
+	@include template-body($item-spacing-5, $item-spacing-6);
 }
