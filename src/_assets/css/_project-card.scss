@@ -8,11 +8,15 @@
 
 	color: $color-text-light;
 	padding: $item-spacing-4;
-	grid-row-end: span 2;
 
-	&:nth-child(2) {
-		grid-row-start: 1;
+	// Pulls showcase to the right
+	@include for-tablet-up {
+		grid-row-end: span 2;
+		&:nth-child(2) {
+			grid-row-start: 1;
+		}
 	}
+	
 
 	.type {
 		text-transform: uppercase;

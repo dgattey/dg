@@ -8,12 +8,16 @@
 	display: grid;
 	grid-template-columns: repeat($grid-standard-columns, 1fr);
 	grid-column-gap: $item-spacing-3;
-	margin-bottom: $item-spacing-6 + $item-spacing-1;
 	color: $color-deep;
 	@include for-phone-up {
+		margin-bottom: $item-spacing-5 + $item-spacing-4;
 		grid-template-rows: repeat(3, auto);
 	}
+	@include for-tablet-up {
+		margin-bottom: $item-spacing-6;
+	}
 	@include for-desktop-up {
+		margin-bottom: $item-spacing-6 + $item-spacing-1;
 		grid-template-rows: repeat(2, 1fr);
 	}
 
