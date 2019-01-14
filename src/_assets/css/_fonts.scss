@@ -1,4 +1,76 @@
 /**
+ * Font-specific variables & mixins (defined here for ease of use below)
+ */
+
+$font-size-proportion: 1.1;
+$line-height-proportion: 1.08;
+$header-multiplier: 2.5;
+$base-font-size: 1.6em;
+$base-line-height: 2.5rem;
+
+@function pow($number, $power) {
+    $value: 1;
+    @if $power > 0 {
+        @for $i from 1 through $power {
+            $value: $value * $number;
+        }
+    }
+    @return $value;
+}
+
+@function calculate-level($level, $is-header) {
+    @if $is-header {
+        @return round($level * $header-multiplier);
+    }
+    @return $level;
+}
+
+/**
+ * Generates font size and line height declarations for a particular element using
+ * a standard rhythm and the configurable level dictating how many levels larger than
+ * normal the font should be.
+ *
+ * @param $level how many sizes larger than mobile the font & line sizes should be
+ */
+@mixin text-body($level) {
+    $font-size: $base-font-size * pow($font-size-proportion, $level);
+    $line-height: $base-line-height * pow($line-height-proportion, $level);
+    font-size: $font-size;
+    line-height: $line-height;
+    &.emphasized {
+        $font-size: $base-font-size * pow($font-size-proportion, $level + 1);
+        $line-height: $base-line-height * pow($line-height-proportion, $level + 1);
+        font-size: $font-size;
+        line-height: $line-height;
+    }
+}
+
+/**
+ * Generates font size and line height declarations for a particular element using
+ * a standard rhythm and the configurable level dictating how many levels larger than
+ * normal the font should be. If it's a header, the level will get increased a bit.
+ * This mixin generates the above for all screen sizes.
+ *
+ * @param $element The element on which to operate
+ * @param $level The level to generate
+ * @param $is-header If it's a header element
+ */
+@mixin text($element, $level, $is-header: false) {
+    $level: calculate-level($level, $is-header);
+    #{$element} {
+        @include for-phone-up {
+            @include text-body($level);
+        }
+        @include for-tablet-small-up {
+            @include text-body($level + 1);
+        }
+        @include for-tablet-large-up {
+            @include text-body($level + 2);
+        }
+    }
+}
+
+/**
  * Defines standard font styles & sizes across the full site.
  */
 
@@ -8,13 +80,12 @@ html {
     -webkit-text-size-adjust: 100%;
     font-feature-settings: "kern" 1;
     font-kerning: normal;
-    letter-spacing: 0.02em;
 }
 
 h1, h2, h3, h4, h5, h6, p {
     font-style: normal;
-    letter-spacing: 0em;
-    margin-bottom: 2.5rem;
+    letter-spacing: 0.02em;
+    margin-bottom: $base-line-height;
 }
 
 /**
@@ -37,91 +108,17 @@ h4, h5, h6 {
     @extend %head-font-style;
 }
 
-@mixin emphasized($font-size: null, $line-height: null) {
-    @if $font-size != null {
-        &.emphasized {
-            @if $line-height != null {
-                line-height: $line-height;
-            }
-            font-size: $font-size;
-        }
-    }
+// Text styling for the headers
+@for $header-level from 1 through 6 {
+    $level: -1 * ($header-level - 6);
+    @include text(h#{$header-level}, $level, $is-header: true);
 }
-
-@mixin font-body($element, $line-height, $phone, $tablet, $standard, $emphasized: null, $emphasized-line-height: null) {
-
-    #{$element} {
-        @include for-phone-up {
-            font-size: $phone;
-            line-height: $line-height;
-            @include emphasized($tablet, $line-height);
-        }
-        @include for-tablet-small-up {
-            font-size: $tablet;
-            line-height: $line-height;
-            @include emphasized($standard, $line-height);
-        }
-        @include for-desktop-up {
-            font-size: $standard;
-            line-height: $line-height;
-            @include emphasized($emphasized, $emphasized-line-height);
-        }
-    }
-}
-// TODO: @dgattey add arguments for line height to each item
-// TODO: @dgattey autogenerate the different sizes based on standard? Only emphasized ones are p and h1 so that could work well
-// TODO: @dgattey also generate the line heights based off rhythm of rest of the items
-
-@include font-body(
-    h1,
-    $line-height: 10rem,
-    $phone: 5.4931640625em,
-    $tablet: 6.103515625em,
-    $standard: 7.62939453125em,
-    $emphasized: 9.5367431640625em);
-@include font-body(
-    h2,
-    $line-height: 7.5rem,
-    $phone: 4.39453125em,
-    $tablet: 5.4931640625em,
-    $standard: 6.103515625em);
-@include font-body(
-    h3,
-    $line-height: 5rem,
-    $phone: 2.8125em,
-    $tablet: 3.515625em,
-    $standard: 4.39453125em);
-@include font-body(
-    h4,
-    $line-height: 5rem,
-    $phone: 2.25em,
-    $tablet: 2.8125em,
-    $standard: 3.515625em);
-@include font-body(
-    h5,
-    $line-height: 5rem,
-    $phone: 2em,
-    $tablet: 2.25em,
-    $standard: 2.8125em);
-@include font-body(
-    h6,
-    $line-height: 2.5rem,
-    $phone: 2em,
-    $tablet: 2em,
-    $standard: 2.25em);
 
 /**
  * Regular (non-header) text styling
  */
 
-@include font-body(
-    "%regular-text-size",
-    $line-height: 2.5rem,
-    $phone: 1.6em,
-    $tablet: 1.6em,
-    $standard: 1.8em,
-    $emphasized: 2em,
-    $emphasized-line-height: 3rem);
+@include text("%regular-text-size", 0);
 
 %regular-text {
     font-family: $font-family-body;
@@ -129,12 +126,13 @@ h4, h5, h6 {
     max-width: 36em;
 }
 
+p.emphasized {
+    opacity: 0.8;
+}
+
 p, input, button, select, textarea {
     @extend %regular-text;
     @extend %regular-text-size;
-    &.emphasized {
-        opacity: 0.8;
-    }
 }
 
 /**
