@@ -28,7 +28,7 @@ $tablet-top-padding: $item-spacing-4 + $item-spacing-3;
 @include for-phone-up {
 	@include template-body($item-spacing-4, $item-spacing-5 + $item-spacing-4);
 }
-@include for-tablet-small-up {
+@include for-tablet-up {
 	@include template-body($item-spacing-4, $item-spacing-5 + $item-spacing-4);
 }
 @include for-desktop-up {

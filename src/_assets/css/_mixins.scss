@@ -14,12 +14,12 @@
 @mixin for-phone-up {
   @content;
 }
-@mixin for-tablet-small-up {
+@mixin for-tablet-up {
   @media (min-width: $breakpoint-min-tablet) { @content; }
-}
-@mixin for-tablet-large-up {
-  @media (min-width: $breakpoint-min-tablet-landscape) { @content; }
 }
 @mixin for-desktop-up {
   @media (min-width: $breakpoint-min-desktop) { @content; }
+}
+@mixin for-max-size-only {
+  @media (min-width: $breakpoint-max-width) { @content; }
 }

@@ -61,10 +61,10 @@ $base-line-height: 2.5rem;
         @include for-phone-up {
             @include text-body($level);
         }
-        @include for-tablet-small-up {
+        @include for-tablet-up {
             @include text-body($level + 1);
         }
-        @include for-tablet-large-up {
+        @include for-desktop-up {
             @include text-body($level + 2);
         }
     }

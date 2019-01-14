@@ -22,7 +22,7 @@
 			grid-column-gap: $item-spacing-4;
 			grid-row-gap: $item-spacing-3;
 		}
-		@include for-tablet-small-up {
+		@include for-tablet-up {
 			grid-column-gap: $item-spacing-4;
 		}
 		@include for-desktop-up {
@@ -79,7 +79,7 @@
 		@include for-phone-up {
 			grid-column-end: span $inner-grid-cols;
 		}
-		@include for-tablet-small-up {
+		@include for-tablet-up {
 			grid-column-end: span 4;
 		}
 	}
