@@ -152,10 +152,10 @@ a {
  */
 
 code, pre {
-    letter-spacing: -0.02em;
-    font-family: $font-family-code;
-    color: $color-primary-dim;
+    @extend %regular-text-size;
     background: $color-bright;
+    overflow: auto;
+    font-family: $font-family-code;
     @include for-phone-up {
         word-break: break-all;
     }
@@ -164,13 +164,25 @@ code, pre {
     }
 }
 
-code {
+.highlighter-rouge, pre {
+    font-size: 85%;
+}
+
+.highlight {
+    margin: 2em 0;
+}
+
+// Inline code highlighting
+.highlighter-rouge {
+    color: $color-primary-dim;
+    letter-spacing: -0.02em;
     padding: 0.4rem 0.8rem;
-    font-size: 90%;
     border-radius: 0.6rem;
-    overflow-x: auto;
 }
 
 pre {
-
+    max-width: 76em;
+    border-radius: 1em;
+    padding: 3em;
+    background: #f0f2f4;
 }
