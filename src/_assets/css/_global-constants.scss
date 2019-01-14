@@ -19,6 +19,7 @@ $color-blue: #04a5e5;
 // Fonts
 $font-family-body: "Hind", sans-serif;
 $font-family-head: "Heebo", sans-serif;
+$font-family-code: "Source Code Pro", "Andale Mono", monospace;
 $font-weight-body: 400;
 $font-weight-head: 700;
 $font-weight-display: 900;
@@ -28,8 +29,6 @@ $font-size-base: 10px;
 $color-primary-bright: $color-green;
 $color-primary-dim: darken($color-primary-bright, 12%);
 $color-bg: $color-brightest;
-$color-bg-code: $color-bright;
-$color-border-code: $color-muted;
 $color-text-dark: $color-deep;
 $color-text-light: $color-bright;
 $color-text-muted: $color-muted;

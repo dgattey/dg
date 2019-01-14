@@ -84,7 +84,7 @@ html {
 
 h1, h2, h3, h4, h5, h6, p {
     font-style: normal;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.02px;
     margin-bottom: $base-line-height;
 }
 
@@ -151,11 +151,26 @@ a {
  * Code
  */
 
+code, pre {
+    letter-spacing: -0.02em;
+    font-family: $font-family-code;
+    color: $color-primary-dim;
+    background: $color-bright;
+    @include for-phone-up {
+        word-break: break-all;
+    }
+    @include for-tablet-up {
+        word-break: break-word;
+    }
+}
+
 code {
-    background-color: $color-bg-code;
-    $vertical-padding: 0;
-    $horizontal-padding: 0.3em;
-    word-break: break-all;
-    border: 1px solid $color-border-code;
-    padding: $vertical-padding $horizontal-padding;
+    padding: 0.4rem 0.8rem;
+    font-size: 90%;
+    border-radius: 0.6rem;
+    overflow-x: auto;
+}
+
+pre {
+
 }
