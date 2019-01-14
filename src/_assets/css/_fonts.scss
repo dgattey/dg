@@ -155,6 +155,7 @@ code {
     background-color: $color-bg-code;
     $vertical-padding: 0;
     $horizontal-padding: 0.3em;
+    word-break: break-all;
     border: 1px solid $color-border-code;
     padding: $vertical-padding $horizontal-padding;
 }
