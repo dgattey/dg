@@ -40,6 +40,7 @@
 	}
 
 	.detail {
+		color: $color-text-muted;
 		grid-row: 2 / 3;
 
 		@include for-phone-up {

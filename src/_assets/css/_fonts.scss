@@ -133,10 +133,6 @@ h4, h5, h6 {
     max-width: 36em;
 }
 
-p.emphasized {
-    opacity: 0.8;
-}
-
 p, input, button, select, textarea {
     @extend %regular-text;
     @extend %regular-text-size;
