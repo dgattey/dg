@@ -153,7 +153,6 @@ a {
 
 code, pre {
     @extend %regular-text-size;
-    background: $color-bright;
     overflow: auto;
     font-family: $font-family-code;
     @include for-phone-up {
@@ -164,25 +163,13 @@ code, pre {
     }
 }
 
-.highlighter-rouge, pre {
+code.highlighter-rouge, pre {
     font-size: 85%;
 }
 
 .highlight {
-    margin: 2em 0;
-}
-
-// Inline code highlighting
-.highlighter-rouge {
-    color: $color-primary-dim;
-    letter-spacing: -0.02em;
     padding: 0.4rem 0.8rem;
-    border-radius: 0.6rem;
-}
-
-pre {
-    max-width: 76em;
+    max-width: 64em;
     border-radius: 1em;
-    padding: 3em;
-    background: #f0f2f4;
+    padding: 2em;
 }

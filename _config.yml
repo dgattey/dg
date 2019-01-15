@@ -70,6 +70,10 @@ markdown: kramdown
 source: src
 destination: build
 include: [static, .htaccess]
+highlighter: rouge
+kramdown:
+  input: GFM
+  syntax_highlighter: rouge
 sass:
   style:  expanded
   deploy_style: compressed

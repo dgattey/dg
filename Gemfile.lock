@@ -122,8 +122,10 @@ DEPENDENCIES
   jekyll-minifier
   jekyll-seo-tag
   jekyll-sitemap
+  kramdown
   mini_magick
   normalize-scss
+  rouge
 
 BUNDLED WITH
    2.0.1

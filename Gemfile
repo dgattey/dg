@@ -7,6 +7,7 @@ group :jekyll_plugins do
     gem 'jekyll-analytics'  # Google Analytics built in
     gem 'jekyll-sitemap'    # Generated Sitemap
     gem 'jekyll-seo-tag'    # Generated SEO (title, canonical url, etc)
+    gem 'rouge'             # Highlighter of code
 
     # Assets
     gem 'jekyll-minifier'       # Minifies everything
@@ -19,4 +20,5 @@ group :jekyll_plugins do
 
     # Dev Environment
     gem 'hawkins'   # Live reload
+    gem 'kramdown'  # Markdown support
 end
