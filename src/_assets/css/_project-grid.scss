@@ -16,6 +16,7 @@
 }
 
 .showcase {
+	@extend %head-font-style;
 	@include for-phone-up {
 		margin-bottom: 0;
 	}	

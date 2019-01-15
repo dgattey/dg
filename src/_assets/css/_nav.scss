@@ -39,9 +39,9 @@
 
 	// Ensures uniform text size on nav items to follow body
 	.logo-wrapper, .nav-item {
-		// If this is set on nav itself, it changes padding
 		@extend %regular-text-size;
 		align-self: center;
+        margin-bottom: 0; // resets the inherited value
 	}
 
 	.logo {

@@ -3,8 +3,9 @@
  */
 
 $font-size-proportion: 1.1;
-$line-height-proportion: 1.08;
+$line-height-proportion: 1.09;
 $header-multiplier: 2.5;
+$bottom-margin-divisor: 2;
 $base-font-size: 1.6em;
 $base-line-height: 2.5rem;
 
@@ -37,11 +38,13 @@ $base-line-height: 2.5rem;
     $line-height: $base-line-height * pow($line-height-proportion, $level);
     font-size: $font-size;
     line-height: $line-height;
+    margin-bottom: $line-height / $bottom-margin-divisor;
     &.emphasized {
         $font-size: $base-font-size * pow($font-size-proportion, $level + 1);
         $line-height: $base-line-height * pow($line-height-proportion, $level + 1);
         font-size: $font-size;
         line-height: $line-height;
+        margin-bottom: $line-height / $bottom-margin-divisor;
     }
 }
 
@@ -85,7 +88,6 @@ html {
 h1, h2, h3, h4, h5, h6, p {
     font-style: normal;
     letter-spacing: 0.02px;
-    margin-bottom: $base-line-height;
 }
 
 /**
@@ -97,22 +99,27 @@ h1, h2, h3, h4, h5, h6, p {
     font-weight: $font-weight-head;
 }
 
-// Display weights
-h1, h2, h3 {
+%display-font-style {
     font-family: $font-family-head;
     font-weight: $font-weight-display;
 }
 
-// Regular header weight
+h1, h2, h3 {
+    @extend %display-font-style;
+}
+
 h4, h5, h6 {
     @extend %head-font-style;
 }
 
 // Text styling for the headers
-@for $header-level from 1 through 6 {
+@for $header-level from 2 through 6 {
     $level: -1 * ($header-level - 6);
     @include text(h#{$header-level}, $level, $is-header: true);
 }
+
+// LARGE h1
+@include text(h1, 6, $is-header: true);
 
 /**
  * Regular (non-header) text styling
