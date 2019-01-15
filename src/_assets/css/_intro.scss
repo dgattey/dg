@@ -11,7 +11,7 @@
 	color: $color-deep;
 	@include for-phone-up {
 		margin-bottom: $item-spacing-5 + $item-spacing-4;
-		grid-template-rows: repeat(3, auto);
+		grid-template-rows: repeat(4, auto);
 	}
 	@include for-tablet-up {
 		margin-bottom: $item-spacing-6;
@@ -21,16 +21,44 @@
 		grid-template-rows: repeat(2, 1fr);
 	}
 
-	.title {
-		@extend %gradient-words;
-		font-weight: $font-weight-head;
-		margin-bottom: 0;
+	.mobile {
+		grid-column: 1 / -1;
 		grid-row: 1 / 2;
-
-		@include for-phone-up {
+		@include for-phone-only {
+			font-size: 4vw;
+			& * {
+				line-height: 22vw;
+			}
 			grid-column: 1 / -1;
 		}
 		@include for-tablet-up {
+			font-size: 1.75vw;
+			& * {
+				line-height: 12.4vw;
+			}
+			grid-column: 1 / #{$end-before-photo};
+		}
+		@include for-desktop-up {
+			display: none;
+		}
+	}
+
+	.desktop {
+		display: none;
+		@include for-desktop-up {
+			display: initial;
+		}
+	}
+
+	.title, .subtitle {
+		@extend %gradient-words;
+		margin-bottom: 0;
+		@include for-phone-up {
+			text-align: center;
+			grid-column: 1 / -1;
+		}
+		@include for-tablet-up {
+			text-align: left;
 			align-self: end;
 			grid-column: 2 / #{$end-before-photo};
 		}
@@ -39,14 +67,33 @@
 		}
 	}
 
+	.title {
+		font-weight: $font-weight-head;
+		grid-row: 1 / 2;
+	}
+
+	.subtitle {
+		margin-top: 0;
+		@include for-phone-up {
+			grid-row: 2 / 3;
+		}
+		@include for-desktop-up {
+			display: none;
+		}
+	}
+
 	.detail {
 		color: $color-text-muted;
-		grid-row: 2 / 3;
 
 		@include for-phone-up {
 			grid-column: 1 / -1;
+			grid-row: 3 / 4;
 		}
 		@include for-tablet-up {
+			grid-column: 1 / #{$end-before-photo};
+		}
+		@include for-desktop-up {
+			grid-row: 2 / -1;
 			grid-column: 2 / #{$end-before-photo};
 		}
 	}
@@ -57,7 +104,7 @@
 		height: 100%;
 		@include for-phone-up {
 			grid-column: 1 / -1;
-			grid-row: 3 / -1;
+			grid-row: 4 / -1;
 		}
 		@include for-tablet-up {
 			grid-column: #{$end-before-photo} / -1;

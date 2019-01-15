@@ -14,6 +14,9 @@
 @mixin for-phone-up {
   @content;
 }
+@mixin for-phone-only {
+  @media (max-width: $breakpoint-min-tablet - 1) { @content; }
+}
 @mixin for-tablet-up {
   @media (min-width: $breakpoint-min-tablet) { @content; }
 }
