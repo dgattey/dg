@@ -23,6 +23,8 @@
 
 	.title {
 		@extend %gradient-words;
+		font-weight: $font-weight-head;
+		margin-bottom: 0;
 		grid-row: 1 / 2;
 
 		@include for-phone-up {
