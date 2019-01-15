@@ -8,14 +8,15 @@ group :jekyll_plugins do
     gem 'jekyll-sitemap'    # Generated Sitemap
     gem 'jekyll-seo-tag'    # Generated SEO (title, canonical url, etc)
 
-    # Optimization
-    gem 'jekyll-minifier'   # minifies everything
+    # Assets
+    gem 'jekyll-minifier'       # Minifies everything
+    gem 'jekyll-assets'         # Asset management
+    gem 'mini_magick'           # Image conversion
 
-    # CSS/SASS & Assets
-    gem 'autoprefixer-rails'    # autoprefixes css
-    gem 'jekyll-assets'         # asset management
-    gem 'normalize-scss'	    # normalizes the scss
+    # CSS/SASS
+    gem 'autoprefixer-rails'    # Autoprefixes css
+    gem 'normalize-scss'	    # Normalizes the scss
 
     # Dev Environment
-    gem 'hawkins'   # live reload
+    gem 'hawkins'   # Live reload
 end

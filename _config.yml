@@ -20,6 +20,10 @@ font_url: https://fonts.googleapis.com/css?family=
 font_preload_urls: ["https://fonts.gstatic.com", "https://fonts.googleapis.com"]
 use_font_loader: true # whether or not to use async JS to load font
 
+# Breakpoints - if changing these, change the SCSS variables too!!
+breakpoint_min_tablet: 600px
+breakpoint_min_desktop: 900px
+
 # Configuration for site
 url: "https://dylangattey.com"
 permalink: /projects/:title/ #posts

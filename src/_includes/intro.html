@@ -1,30 +1,5 @@
 <section class="intro">
-	{% asset dg-portrait.jpg class="portrait" alt="Portrait of Dylan Gattey" @pic
-	srcset:min-width="900 2x"
-    srcset:min-width="601 1.5x"
-    srcset:="1x"
-    %}
-    <!-- TODO: Emulate the below: differently sized images for the different px resolutions, webp, and a fallback -->
-    <!-- <picture>
-	 <source
-	   media="(min-width: 900px)"
-	   srcset="image-lg_1x.webp 1x, image-lg_2x.webp 2x"
-	   type="image/webp" >
-	 <source
-	   media="(min-width: 601px)"
-	   srcset="image-md_1x.webp 1x, image-md_2x.webp 2x"
-	   type="image/webp" >
-	 <source
-	   srcset="image-sm_1x.webp 1x, image-sm_2x.webp 2x"
-	   type="image/webp" >
-	 <img 
-	   srcset="image-sm_1x.jpg 600w,
-	   image-md_1x.jpg 900w,
-	   image-lg_1x.jpg 1440w"
-	   src="image_lg_1x.jpg"
-	   type="image/jpeg"
-	   alt="image description">
-	</picture> -->
+	{% include picture.html src="dg-portrait" alt="Portrait of Dylan Gattey" %}
 	<h1 class="emphasized title">Hello! I'm Dylan.</h1>
 	<p class="emphasized detail">I'm a full-stack software engineer + technical lead working for LinkedIn in San Francisco, passionate about well-designed interfaces and clean code.</p>
 </section>
