@@ -3,26 +3,27 @@
 ---
 @charset "utf-8";
 @import
-    // Normalizes css
+	// Normalizes css
 	'normalize/import-now',
 
 	// Configuration/shared objects
-    'global-constants',
-    'mixins',
-    'fonts',
-    'padding',
-    'animations',
+	'global-constants',
+	'mixins',
+	'fonts',
+	'syntax',
+	'padding',
+	'animations',
 
-    // Templates appearing on multiple pages
-    'global',
-    'nav',
-    'footer',
-    'post',
-    'post-header',
-    'post-content',
+	// Templates appearing on multiple pages
+	'global',
+	'nav',
+	'footer',
+	'post',
+	'post-header',
+	'post-content',
 
-    // index.html
-    'intro',
-    'project-grid',
-    'project-card'
+	// index.html
+	'intro',
+	'project-grid',
+	'project-card'
 ;

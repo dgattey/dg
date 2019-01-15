@@ -3,11 +3,14 @@
  */
 
 .post {
-	margin-top: $item-spacing-3;
 	p {
 		color: $color-text-muted;
 	}
 	.title {
 		margin-bottom: 0em;
+	}
+	.description {
+		margin-top: 0;
+		margin-bottom: 3em;
 	}
 }
