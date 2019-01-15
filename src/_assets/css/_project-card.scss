@@ -16,16 +16,19 @@
 			grid-row-start: 1;
 		}
 	}
-	
 
 	.type {
 		text-transform: uppercase;
 		font-variant: small-caps;
-		letter-spacing: 2.5px;
+		margin-top: 0.75em;
+	}
+
+	.title {
+		margin-top: 0.5em;
 	}
 
 	.desc {
-		margin-top: 1.2em;
+		margin-top: 5em;
 	}
 
 	// Hover state
