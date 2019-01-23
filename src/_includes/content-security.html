@@ -1,6 +1,3 @@
----
-# This compiles the content security policies from a data file
----
 {% assign csp = "" %}
 {% for entry in site.data.content-security %}
 {% assign arguments = entry | join: " " %}
