@@ -3,13 +3,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  <meta http-equiv="Content-Security-Policy" content="
-  default-src 'self'; 
-  script-src 'self' www.google-analytics.com 'nonce-{{'font-loader.html' | base64_encode}}';
-  img-src 'self' www.google-analytics.com;
-  connect-src 'self' fonts.googleapis.com;
-  style-src 'self' 'unsafe-inline';
-  font-src 'self' fonts.gstatic.com">
+  {% include content-security.html %}
   <base href={{ site.url }}>
 
   <!-- PWA/Mobile -->

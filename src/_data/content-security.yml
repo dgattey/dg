@@ -1,0 +1,17 @@
+default-src:
+  - "'none'"
+img-src:
+  - &self "'self'"
+  - &google-analytics https://*.google-analytics.com
+script-src:
+  - *self
+  - *google-analytics
+  # This is for the font-loader script
+  - "'sha256-xXkeCOd4qqYaG8F+aZPKXacPfCWyAHihzqN9OqgGAds='"
+connect-src:
+  - https://fonts.googleapis.com
+style-src:
+  - *self
+  - "'unsafe-inline'"
+font-src:
+  - https://fonts.gstatic.com
