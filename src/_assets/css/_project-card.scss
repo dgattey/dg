@@ -8,6 +8,8 @@
 
 	color: $color-text-light;
 	padding: $item-spacing-4;
+	@extend %round-corners;
+	@extend %shadowed;
 
 	// Pulls showcase to the right
 	@include for-tablet-up {
@@ -32,7 +34,7 @@
 	}
 
 	// Hover state
-	@include transition(transform);
+	@include transition(transform, box-shadow);
 	&:hover {
 		color: $color-text-light;
 		transform: scale($hover-scale);
@@ -44,8 +46,7 @@
 	}
 
 	&.connected {
-		color: $color-text-dark;
-		background: $color-bright;
+		background: $color-muted;
 	}
 
 	&.swhc {

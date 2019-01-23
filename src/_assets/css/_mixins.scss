@@ -2,12 +2,25 @@
  * Mixins and extensions to be used globally
  */
 
+%shadowed {
+	$y-offset: $item-spacing-3;
+	$spread: $item-spacing-4 + $item-spacing-3;
+	box-shadow: 0 $y-offset $spread rgba(0,0,0,.15);
+	&:hover {
+		box-shadow: 0 $y-offset $spread rgba(0,0,0,.1);
+	}
+}
+
 // Primary color gradient on whatever text this is applied to
 %gradient-words {
 	background-image: linear-gradient(to bottom, $color-primary-bright, $color-primary-dim);
 	background-clip: text;
 	-webkit-background-clip: text;
 	color: rgba(0, 0, 0,0);
+}
+
+%round-corners {
+	border-radius: $item-spacing-1;
 }
 
 // Helps with media queries to reduce typing
