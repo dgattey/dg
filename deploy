@@ -2,6 +2,21 @@
 set -e
 
 # Executes some image minification scripts, then uses jekyll with the passed args
-./optimize
+./process-imgs
+echo
+
+# Builds the site
+echo $(tput setaf 4)Building site...$(tput sgr0)
 JEKYLL_ENV=production bundle exec jekyll build
 echo $(tput setaf 2)Your site is built successfully!$(tput sgr0)
+echo
+
+# Post processing - copies .htaccess into each subdirectory
+BUILD=./build
+BUILD_SUBDIRECTORIES=$(find $BUILD -maxdepth 5 -mindepth 1 -type d)
+echo $(tput setaf 4)Copying .htaccess to $BUILD_SUBDIRECTORIES $(tput sgr0)
+for d in $BUILD_SUBDIRECTORIES
+do
+  cp $BUILD/.htaccess $d
+done
+echo $(tput setaf 2)Copied .htaccess to all subdirectories$(tput sgr0)
