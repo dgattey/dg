@@ -4,7 +4,7 @@
  */
 
 .header-nav {
-	@include transition(box-shadow);
+	@include transition-quick-linear(box-shadow);
 	@extend %head-font-style;
 	position: fixed;
 	top: 0;

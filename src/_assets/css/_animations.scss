@@ -3,7 +3,8 @@
  */
 
 // Constants for animations and transitions
-$animation-duration: 350ms;
+$quick-animation-duration: 167ms;
+$animation-duration: 334ms;
 $ease-out-back: cubic-bezier(0.175, 0.885, 0.32, 1.275);
 $ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 
@@ -12,6 +13,15 @@ $ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 	$final: ();
 	@each $item in $properties {
 		$final: append($final, ($item $animation-duration $ease-in-out-back unquote(",")));
+	}
+	transition: $final;
+}
+
+// Adds support for adding multiple types of transitions
+@mixin transition-quick-linear($properties...) {
+	$final: ();
+	@each $item in $properties {
+		$final: append($final, ($item $quick-animation-duration linear unquote(",")));
 	}
 	transition: $final;
 }
