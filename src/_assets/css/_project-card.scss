@@ -8,8 +8,6 @@
 
 	color: $color-text-light;
 	padding: $item-spacing-4;
-	@extend %round-corners;
-	@extend %shadowed;
 
 	// Pulls showcase to the right
 	@include for-tablet-up {

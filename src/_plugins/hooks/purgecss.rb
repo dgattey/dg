@@ -9,7 +9,8 @@ Jekyll::Hooks.register(:site, :post_write) do |_site|
 	# Wildcard glob of the site's HTML files.
 	content: ['build/**/*.html'],
 	# CSS file in the expected output directory.
-	css: [Dir.glob('build/assets/*.css').first]
+	css: [Dir.glob('build/assets/*.css').first],
+	whitelist: %w(shadow-weak)
 	}.stringify_keys.to_json}"""
 	# Write configuration file & run command
 	File.open(config_file, 'w+') { |f| f.write(config_text) }

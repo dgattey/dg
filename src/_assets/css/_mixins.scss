@@ -1,14 +1,20 @@
 /*
  * Mixins and extensions to be used globally
  */
+$spread: $item-spacing-4 + $item-spacing-3;
+$strong-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.15);
+$weak-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.1);
 
-%shadowed {
-	$y-offset: $item-spacing-3;
-	$spread: $item-spacing-4 + $item-spacing-3;
-	box-shadow: 0 $y-offset $spread rgba(0,0,0,.15);
-	&:hover {
-		box-shadow: 0 $y-offset $spread rgba(0,0,0,.1);
-	}
+.shadow-strong {
+	box-shadow: $strong-shadow;
+}
+
+.shadow-weak, .shadow-strong:hover {
+	box-shadow: $weak-shadow;
+}
+
+.round-corners {
+	border-radius: $item-spacing-1;
 }
 
 // Primary color gradient on whatever text this is applied to
@@ -17,10 +23,6 @@
 	background-clip: text;
 	-webkit-background-clip: text;
 	color: rgba(0, 0, 0,0);
-}
-
-%round-corners {
-	border-radius: $item-spacing-1;
 }
 
 // Helps with media queries to reduce typing

@@ -4,17 +4,20 @@
  */
 
 .header-nav {
-	$underline-height: 3px;
-	$hover-scale: 1.05;
-	$inner-grid-cols: 2 * ($grid-standard-columns - 1);
-
+	@include transition(box-shadow);
 	@extend %head-font-style;
-	@extend %max-width-element;
-	z-index: $depth-4;
 	position: fixed;
 	top: 0;
 	left: 0;
 	right: 0;
+	z-index: $depth-4;
+}
+
+nav {
+	$underline-height: 3px;
+	$hover-scale: 1.05;
+	$inner-grid-cols: 2 * ($grid-standard-columns - 1);
+	@extend %max-width-element;
 
 	%nav-grid {
 		display: grid;
@@ -30,7 +33,7 @@
 	}
 
 	// Colors & padding
-	nav {
+	.nav-content {
 		background: $color-bg;
 		@extend %nav-padding;
 		@extend %nav-grid;

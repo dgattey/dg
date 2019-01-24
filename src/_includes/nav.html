@@ -1,17 +1,19 @@
 <nav>
-  <div class="logo-wrapper"><a class="logo" href="{{ site.baseurl }}/">dg.</a></div>
-  <ul class="nav-items">
-    {% assign pages = site.pages | sort:"weight" %}
-    {% for pg in pages %}
-    {% assign current = 'inactive' %}
-    {% if page.url == pg.url %}
-    {% assign current = 'active' %}
-    {% endif %}
-    {% if pg.title and pg.weight %}
-    <li class="nav-item">
-      <a class="nav-link {{ current }}" href="{{ pg.url | prepend: site.baseurl }}">{{ pg.title }}</a>
-    </li>
-    {% endif %}
-    {% endfor %}
-  </ul>
+  <div class="nav-content">
+    <div class="logo-wrapper"><a class="logo" href="{{ site.baseurl }}/">dg.</a></div>
+    <ul class="nav-items">
+      {% assign pages = site.pages | sort:"weight" %}
+      {% for pg in pages %}
+      {% assign current = 'inactive' %}
+      {% if page.url == pg.url %}
+      {% assign current = 'active' %}
+      {% endif %}
+      {% if pg.title and pg.weight %}
+      <li class="nav-item">
+        <a class="nav-link {{ current }}" href="{{ pg.url | prepend: site.baseurl }}">{{ pg.title }}</a>
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+  </div>
 </nav>
