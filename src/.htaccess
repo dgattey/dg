@@ -215,19 +215,6 @@ RewriteCond %{REQUEST_URI} !^/\.well-known/pki-validation/[A-F0-9]{32}\.txt(?:\ 
 RewriteRule .* http://127.0.0.1 [L]
 </IfModule>
 #AIOWPS_BLOCK_SPAMBOTS_END
-#AIOWPS_PREVENT_IMAGE_HOTLINKS_START
-<IfModule mod_rewrite.c>
-RewriteEngine on
-RewriteCond %{HTTP_REFERER} !^$
-RewriteCond %{REQUEST_FILENAME} -f
-RewriteCond %{REQUEST_FILENAME} \.(gif|jpe?g?|png)$ [NC]
-RewriteCond %{HTTP_REFERER} !^http(s)?://dylangattey\.com [NC]
-RewriteCond %{REQUEST_URI} !^/[0-9]+\..+\.cpaneldcv$
-RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/[0-9a-zA-Z_-]+$
-RewriteCond %{REQUEST_URI} !^/\.well-known/pki-validation/[A-F0-9]{32}\.txt(?:\ Comodo\ DCV)?$
-RewriteRule \.(gif|jpe?g?|png)$ - [F,NC,L]
-</IfModule>
-#AIOWPS_PREVENT_IMAGE_HOTLINKS_END
 # END All In One WP Security
 
 ####################
@@ -243,16 +230,28 @@ RewriteRule ^(.*)?$ https://%{SERVER_NAME}%{REQUEST_URI} [L,R]
 </IfModule>
 
 ####################
-# Turns on caching of content
+# Turns on/off caching of content
 ####################
 <IfModule mod_expires.c>
   ExpiresActive On
   ExpiresDefault "access plus 1 year"
   # Pages
-  ExpiresByType text/html  "access plus 15 minutes"
+  ExpiresByType text/html  "access plus 60 minutes"
   # RSS feed
-  ExpiresByType text/xml  "access plus 120 minutes"
+  ExpiresByType text/xml  "access plus 240 minutes"
 </IfModule>
+# One year for image files
+<filesMatch ".(jpg|jpeg|png|gif|ico|webp)$">
+Header set Cache-Control "max-age=31536000, public"
+</filesMatch>
+# One month for css and js
+<filesMatch ".(css|js)$">
+Header set Cache-Control "max-age=2628000, public"
+</filesMatch>
+# Don't cache service worker
+<filesMatch "sw.js$">
+Header set Cache-Control "max-age=0, no-cache"
+</filesMatch>
 
 ####################
 # Customize what Apache returns to the client in case of an error.
