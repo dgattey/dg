@@ -106,6 +106,10 @@ workbox.routing.setDefaultHandler(
 	workbox.strategies.staleWhileRevalidate()
 );
 workbox.routing.setCatchHandler(({event}) => {
+	if (event.request.cache === 'only-if-cached' &&
+		event.request.mode !== 'same-origin') {
+		return;
+	}
 	switch (event.request.destination) {
 	case 'document':
 		return caches.match('/offline/index.html');
