@@ -1,7 +1,7 @@
 default-src:
-  - "'none'"
-img-src:
   - &self "'self'"
+img-src:
+  - *self
   - &google-analytics https://*.google-analytics.com
 script-src:
   - *self
@@ -15,6 +15,7 @@ connect-src:
 style-src:
   - *self
   - "'unsafe-inline'"
+  - https://fonts.googleapis.com/css
 font-src:
   - https://fonts.gstatic.com
 manifest-src:
