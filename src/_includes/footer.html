@@ -1,22 +1,16 @@
 <footer>
-  <p class="copy">Copyright &copy; 2010-{{ site.time | date: '%Y' }} • {{ site.title }}</p>
+  <p class="copy">&copy; {{ site.time | date: '%Y' }} {{ site.title }}</p>
   <ul>
     <li>
-      <a href="{{site.baseurl}}/about">
-        <p>About</p>
-      </a>
+      <a href="{{site.baseurl}}/about"><p>About</p></a>
     </li>
 
     <li>
-      <a class="icon" href="https://github.com/{{site.github}}" aria-label="Link to Github">
-        {% include icon-github.svg %}
-      </a>
+      <a class="icon" href="https://github.com/{{site.github}}" aria-label="Link to Github">{% include icon-github.svg %}</a>
     </li>
 
     <li>
-      <a href="mailto:{{ site.email }}">
-        <p>Email</p>
-      </a>
+      <a href="mailto:{{ site.email }}"><p>Email</p></a>
     </li>
   </ul>
 </footer>
