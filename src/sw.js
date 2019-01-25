@@ -9,6 +9,8 @@
 
 workbox.core.setCacheNameDetails({
 	precache: 'precache',
+	prefix: 'dgsw',
+	suffix: 'v1',
 	runtime: 'dg'
 });
 workbox.skipWaiting();
