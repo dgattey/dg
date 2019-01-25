@@ -44,7 +44,6 @@ jekyll_analytics:
 
 # Assets
 assets:
-  gzip: true
   sources:
     - _assets/icons
   autoprefixer:
@@ -57,13 +56,17 @@ favicons:
   ios: [120, 152, 180]
   windows: [144]
   thumbnail: [152]
+jekyll-minifier:
+  # Because Google Analytics is already minified, we
+  # must disable Uglify cause it doesn't play well
+  # with an already minified script :(
+  compress_javascript: false
 
 # Workbox settings for Service worker
 workbox:
   precache_glob_directory: /
   precache_glob_patterns:
     - "assets/*.{js,css,svg,json}"
-    - "assets/favicon*"
     - index.html
     - "/404/*"
     - "/offline/*"
@@ -94,6 +97,7 @@ sass:
 
 # Plugins
 plugins:
+  - jekyll-minifier
   - jekyll-sitemap
   - jekyll-analytics
   - jekyll-seo-tag

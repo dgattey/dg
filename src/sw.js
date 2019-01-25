@@ -83,7 +83,7 @@ workbox.routing.registerRoute(
   }),
 );
 workbox.routing.registerRoute(
-  /projects/*$/,
+  /projects\/*/,
   workbox.strategies.cacheFirst({
 	cacheName: 'projects',
 	plugins: [
