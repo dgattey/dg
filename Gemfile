@@ -14,6 +14,9 @@ group :jekyll_plugins do
     gem 'jekyll-minifier'       # Minifies everything
     gem 'jekyll-assets'         # Asset management
     gem 'mini_magick'           # Image conversion
+    gem "sprockets", "~> 4.0.beta", { # Used for jekyll-assets to get ES6
+        require: false
+    }
 
     # CSS/SASS
     gem 'autoprefixer-rails'    # Autoprefixes css

@@ -44,6 +44,7 @@ jekyll_analytics:
 
 # Assets
 assets:
+  gzip: true
   sources:
     - _assets/icons
   autoprefixer:
