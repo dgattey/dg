@@ -4,10 +4,11 @@ source "https://rubygems.org"
 
 group :jekyll_plugins do
     # Features
-    gem 'jekyll-analytics'  # Google Analytics built in
-    gem 'jekyll-sitemap'    # Generated Sitemap
-    gem 'jekyll-seo-tag'    # Generated SEO (title, canonical url, etc)
-    gem 'rouge'             # Highlighter of code
+    gem 'jekyll-analytics'      # Google Analytics built in
+    gem 'jekyll-sitemap'        # Generated Sitemap
+    gem 'jekyll-seo-tag'        # Generated SEO (title, canonical url, etc)
+    gem 'rouge'                 # Highlighter of code
+    gem 'jekyll-workbox-plugin' # Service worker capabilities
 
     # Assets
     gem 'jekyll-minifier'       # Minifies everything

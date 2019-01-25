@@ -6,6 +6,8 @@ img-src:
 script-src:
   - *self
   - *google-analytics
+  # Service worker loader
+  - "'sha256-RmXl0MpBXcNVsGLFwVYjT2P4dKBj2Efku7klsp6GACE='"
   # This is for the font-loader script
   - "'sha256-xXkeCOd4qqYaG8F+aZPKXacPfCWyAHihzqN9OqgGAds='"
 connect-src:

@@ -70,6 +70,7 @@ GEM
       jekyll (~> 3.3)
     jekyll-watch (2.1.2)
       listen (~> 3.0)
+    jekyll-workbox-plugin (0.0.1)
     kramdown (1.17.0)
     liquid (4.0.1)
     liquid-tag-parser (1.9.0)
@@ -122,6 +123,7 @@ DEPENDENCIES
   jekyll-minifier
   jekyll-seo-tag
   jekyll-sitemap
+  jekyll-workbox-plugin
   kramdown
   mini_magick
   normalize-scss

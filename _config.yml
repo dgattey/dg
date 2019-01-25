@@ -84,4 +84,5 @@ plugins:
   - jekyll-analytics
   - jekyll-seo-tag
   - jekyll-assets
+  - jekyll-workbox-plugin
   - autoprefixer-rails
