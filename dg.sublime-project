@@ -2,7 +2,8 @@
 	"folders":
 	[
 		{
-			"path": "build"
+			"path": "build",
+			"binary_file_patterns": ["*"]
 		},
 		{
 			"path": "src"
