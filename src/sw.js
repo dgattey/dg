@@ -84,17 +84,6 @@ workbox.routing.registerRoute(
 	],
   }),
 );
-workbox.routing.registerRoute(
-  /projects\/*/,
-  workbox.strategies.cacheFirst({
-	cacheName: 'projects',
-	plugins: [
-	  new workbox.expiration.Plugin({
-		maxAgeSeconds: 60 * 60 * 24 * 30,
-	  }),
-	],
-  }),
-);
 
 /**
  * Default handler & catch handler
