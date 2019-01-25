@@ -17,3 +17,5 @@ style-src:
   - "'unsafe-inline'"
 font-src:
   - https://fonts.gstatic.com
+manifest-src:
+  - *self

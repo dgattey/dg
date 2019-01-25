@@ -5,7 +5,7 @@ permalink: manifest.json
 {
   "short_name": "{{ site.short_title }}",
   "name": "{{ site.title }}",
-  "short_url": "{{ site.baseurl }}/",
+  "start_url": "{{ site.baseurl }}/?utm_source=a2hs",
   "lang": "{{ site.lang }}",
   "background_color": "#{{ site.app_background_color }}",
   "display": "{{ site.app_display }}",
