@@ -1,32 +1,50 @@
-// Set names for precache & runtime cache
+'use strict';
+
+/**
+ * Configuration & setup
+ * - Set name for precache & runtime cache
+ * - Skip waiting and claim clients so we take over from any old workers
+ * - Also make sure that if we are an old worker, we reload the page to get freshest stuff
+ */
+
 workbox.core.setCacheNameDetails({
-	prefix: 'dg',
-	suffix: 'v1',
 	precache: 'precache',
-	runtime: 'runtime-cache'
+	runtime: 'dg'
 });
-
-workbox.core.setLogLevel(workbox.core.LOG_LEVELS.debug);
-
-// Let Service Worker take control ASAP
 workbox.skipWaiting();
 workbox.clientsClaim();
+var isRefreshing;
+self.addEventListener('controllerchange',
+	function() {
+		if (isRefreshing) {
+			return;
+		}
+		isRefreshing = true;
+		window.location.reload();
+	}
+);
 
-// Let the jekyll plugin for workbox handle precache based on files
+/**
+ * Precaching all the things!
+ * - All data is specified in _config.yml
+ * - This empty array will be filled out via jekyll
+ */
 workbox.precaching.precacheAndRoute([]);
 
-// Offline Analytics
-workbox.googleAnalytics.initialize();
-
-// Stale while revalidate for all static assets
+/**
+ * Routing for different filetypes & endpoints
+ * - Stale while revalidate for js, css, and json
+ * - State while revalidate for Google Fonts stylesheets
+ * - Cache Google Fonts font files for 120 days
+ * - Cache up to 60 images for 30 days
+ * - Cache projects for 30 days
+ */
 workbox.routing.registerRoute(
 	/\.(?:js|css|json)$/,
 	workbox.strategies.staleWhileRevalidate({
 		cacheName: 'static'
 	})
 );
-
-// Stale while revalidate Google Font stylesheets
 workbox.routing.registerRoute(
 	/^https?:\/\/fonts\.googleapis\.com/,
 	workbox.strategies.staleWhileRevalidate({
@@ -38,8 +56,6 @@ workbox.routing.registerRoute(
 		],
 	})
 );
-
-// Cache Google Font fonts for a year
 workbox.routing.registerRoute(
 	/^https?:\/\/fonts\.gstatic\.com/,
 	workbox.strategies.cacheFirst({
@@ -49,13 +65,11 @@ workbox.routing.registerRoute(
 				statuses: [0, 200],
 			}),
 			new workbox.expiration.Plugin({
-				maxAgeSeconds: 60 * 60 * 24 * 365,
+				maxAgeSeconds: 60 * 60 * 24 * 120,
 			}),
 		],
 	})
 );
-
-// Cache up to 60 images for up to 30 days
 workbox.routing.registerRoute(
   /\.(?:png|gif|jpg|jpeg|svg|webp)$/,
   workbox.strategies.cacheFirst({
@@ -63,26 +77,43 @@ workbox.routing.registerRoute(
 	plugins: [
 	  new workbox.expiration.Plugin({
 		maxEntries: 60,
-		maxAgeSeconds: 30 * 24 * 60 * 60, // 30 Days
+		maxAgeSeconds: 60 * 60 * 24 * 30,
+	  }),
+	],
+  }),
+);
+workbox.routing.registerRoute(
+  /projects/*$/,
+  workbox.strategies.cacheFirst({
+	cacheName: 'projects',
+	plugins: [
+	  new workbox.expiration.Plugin({
+		maxAgeSeconds: 60 * 60 * 24 * 30,
 	  }),
 	],
   }),
 );
 
-// Use stale while revalidate so that we can respond to offline pages gracefully
+/**
+ * Default handler & catch handler
+ * - By default, we use stale while revalidate to use caches
+ * - The catch handler is set up to return an offline page if we can't find something that matches
+ * - Otherwise, we'll return an error response
+ */
 workbox.routing.setDefaultHandler(
-  workbox.strategies.staleWhileRevalidate()
+	workbox.strategies.staleWhileRevalidate()
 );
-
-// This lets us fallback to an offline URL if not in cache
 workbox.routing.setCatchHandler(({event}) => {
-  switch (event.request.destination) {
-    case 'document':
-      return caches.match('/offline/index.html');
-    break;
-
-    default:
-      // If we don't have a fallback, just return an error response.
-      return Response.error();
-  }
+	switch (event.request.destination) {
+	case 'document':
+		return caches.match('/offline/index.html');
+	default:
+		return Response.error();
+	}
 });
+
+/**
+ * Google Analytics
+ * - Now available while offline! It'll send when back online
+ */
+workbox.googleAnalytics.initialize();
