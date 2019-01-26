@@ -18,7 +18,7 @@ $ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 // Adds support for adding multiple types of transitions
-@mixin transition-quick-linear($properties...) {
+@mixin transition-linear($properties...) {
 	$final: ();
 	@each $item in $properties {
 		$final: append($final, ($item $quick-animation-duration linear unquote(",")));
@@ -27,12 +27,34 @@ $ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 // Adds support for adding multiple types of transitions, with out-back timing function
-@mixin transition-out($properties...) {
+@mixin transition-bounce($properties...) {
 	$final: ();
 	@each $item in $properties {
 		$final: append($final, ($item $animation-duration $ease-out-back unquote(",")));
 	}
 	transition: $final;
+}
+
+.transition-shape {
+	@include transition(transform, color);
+}
+
+.transition-bounce {
+	@include transition-bounce(transform, box-shadow);
+}
+
+.scale-down-on-hover {
+	$hover-scale: 0.96;
+	&:hover {
+		transform: scale($hover-scale);
+	}
+}
+
+.scale-up-on-hover {
+	$hover-scale: 1.04;
+	&:hover {
+		transform: scale($hover-scale);
+	}
 }
 
 %show {

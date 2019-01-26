@@ -4,9 +4,8 @@
  */
 
 .proj-card {
-	$hover-scale: 0.96;
 
-	color: $color-text-light;
+	color: $color-brightest;
 	padding: $item-spacing-4;
 
 	// Pulls showcase to the right
@@ -32,10 +31,8 @@
 	}
 
 	// Hover state
-	@include transition(transform, box-shadow);
 	&:hover {
-		color: $color-text-light;
-		transform: scale($hover-scale);
+		color: $color-brightest;
 	}
 
 	// Post specific styling

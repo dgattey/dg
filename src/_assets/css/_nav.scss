@@ -4,7 +4,6 @@
  */
 
 .header-nav {
-	@include transition-quick-linear(box-shadow);
 	@extend %head-font-style;
 	position: fixed;
 	top: 0;
@@ -15,7 +14,6 @@
 
 nav {
 	$underline-height: 3px;
-	$hover-scale: 1.05;
 	$inner-grid-cols: 2 * ($grid-standard-columns - 1);
 	@extend %max-width-element;
 
@@ -52,10 +50,6 @@ nav {
 		line-height: 1;
 		letter-spacing: -0.12em;
 		display: inline-block;
-		@include transition(color, transform);
-		&:hover {
-			transform: scale($hover-scale);
-		}
 	}
 
 	.nav-items {
@@ -74,7 +68,7 @@ nav {
 		margin: 0;
 		justify-self: start;
 		align-self: center;
-		@include transition-out(transform);
+		@include transition-bounce(transform);
 		&:hover {
 			transform: translateY(- $underline-height / 2);
 		}
