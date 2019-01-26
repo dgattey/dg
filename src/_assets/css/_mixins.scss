@@ -17,14 +17,6 @@ $weak-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.1);
 	border-radius: $item-spacing-1;
 }
 
-// Primary color gradient on whatever text this is applied to
-%gradient-words {
-	background-image: linear-gradient(to bottom, $color-primary-bright, $color-primary-dim);
-	background-clip: text;
-	-webkit-background-clip: text;
-	color: rgba(0, 0, 0,0);
-}
-
 // Helps with media queries to reduce typing
 @mixin for-phone-up {
   @content;

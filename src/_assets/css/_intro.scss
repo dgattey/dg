@@ -51,7 +51,7 @@
 	}
 
 	.title, .subtitle {
-		@extend %gradient-words;
+		color: $color-primary-bright;
 		margin-bottom: 0;
 		@include for-phone-up {
 			text-align: center;
@@ -73,6 +73,7 @@
 	}
 
 	.subtitle {
+		font-weight: $font-weight-head;
 		margin-top: 0;
 		@include for-phone-up {
 			grid-row: 2 / 3;
