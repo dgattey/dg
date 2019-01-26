@@ -1,17 +1,19 @@
-<nav>
-  <ul class="nav-items">
-    <div class="logo-wrapper"><a class="logo scale-up-on-hover transition-shape" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></div>
-    {% assign pages = site.pages | sort:"weight" %}
-    {% for pg in pages %}
-    {% assign current = 'inactive' %}
-    {% if page.url == pg.url %}
-    {% assign current = 'active' %}
-    {% endif %}
-    {% if pg.title and pg.weight %}
-    <li class="nav-item">
-      <a class="nav-link {{ current }}" href="{{ pg.url | prepend: site.baseurl }}">{{ pg.title }}</a>
-    </li>
-    {% endif %}
-    {% endfor %}
-  </ul>
-</nav>
+<header class="header-nav transition-linear-shadow">
+  <nav>
+    <ul class="nav-items">
+      <div class="logo-wrapper"><a class="logo scale-up-on-hover transition-shape" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></div>
+      {% assign pages = site.pages | sort:"weight" %}
+      {% for pg in pages %}
+      {% assign current = 'inactive' %}
+      {% if page.url == pg.url %}
+      {% assign current = 'active' %}
+      {% endif %}
+      {% if pg.title and pg.weight %}
+      <li class="nav-item">
+        <a class="nav-link {{ current }}" href="{{ pg.url | prepend: site.baseurl }}">{{ pg.title }}</a>
+      </li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+  </nav>
+</header>

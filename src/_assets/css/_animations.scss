@@ -43,6 +43,10 @@ $ease-in-out-back: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 	@include transition-bounce(transform, box-shadow);
 }
 
+.transition-linear-shadow {
+	@include transition-linear(box-shadow);
+}
+
 .scale-down-on-hover {
 	$hover-scale: 0.96;
 	&:hover {
