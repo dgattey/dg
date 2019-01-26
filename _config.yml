@@ -44,6 +44,9 @@ jekyll_analytics:
 
 # Assets
 assets:
+  digest: true
+  compression: true
+  source_maps: false
   sources:
     - _assets/icons
   autoprefixer:
@@ -68,10 +71,10 @@ workbox:
   precache_glob_patterns:
     - "assets/*.{js,css,svg,json}"
     - index.html
+    - about/index.html
     - "/404/*"
     - "/offline/*"
     - "favicon*"
-  precache_glob_ignores: []
 
 # Sitemap config - excludes google analytics html file
 defaults:

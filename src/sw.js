@@ -4,14 +4,14 @@
  * Configuration & setup
  * - Set name for precache & runtime cache
  * - Skip waiting and claim clients so we take over from any old workers
- * - Also make sure that if we are an old worker, we reload the page to get freshest stuff
+ * - Also make sure that if we are an old worker, we force reload the page to get freshest stuff
  */
-
+const offlinePage = '/offline/index.html';
 workbox.core.setCacheNameDetails({
 	precache: 'precache',
-	prefix: 'dgsw',
+	prefix: 'dg',
 	suffix: 'v1',
-	runtime: 'dg'
+	runtime: 'runtime',
 });
 workbox.skipWaiting();
 workbox.clientsClaim();
@@ -39,7 +39,6 @@ workbox.precaching.precacheAndRoute([]);
  * - State while revalidate for Google Fonts stylesheets
  * - Cache Google Fonts font files for 120 days
  * - Cache up to 60 images for 30 days
- * - Cache projects for 30 days
  */
 workbox.routing.registerRoute(
 	/\.(?:js|css|json)$/,
@@ -87,13 +86,20 @@ workbox.routing.registerRoute(
 
 /**
  * Default handler & catch handler
- * - By default, we use stale while revalidate to use caches
- * - The catch handler is set up to return an offline page if we can't find something that matches
- * - Otherwise, we'll return an error response
+ * - There's a default handler here that will fetch using networkFirst, but
+ *   if offline, will try to return an offline page
+ * - The regular catch handler is set up to return an offline page if we can't find something that matches.
+ *   Otherwise, we'll return an error response
  */
-workbox.routing.setDefaultHandler(
-	workbox.strategies.staleWhileRevalidate()
-);
+const fetchWithOfflineFallback = async (args) => {
+	try {
+		const response = await workbox.strategies.networkFirst().handle(args);
+		return response || await caches.match(offlinePage);
+	} catch (error) {
+		return await caches.match(offlinePage);
+	}
+};
+workbox.routing.setDefaultHandler(fetchWithOfflineFallback);
 workbox.routing.setCatchHandler(({event}) => {
 	if (event.request.cache === 'only-if-cached' &&
 		event.request.mode !== 'same-origin') {
@@ -101,7 +107,7 @@ workbox.routing.setCatchHandler(({event}) => {
 	}
 	switch (event.request.destination) {
 	case 'document':
-		return caches.match('/offline/index.html');
+		return caches.match(offlinePage);
 	default:
 		return Response.error();
 	}
