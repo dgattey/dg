@@ -16,7 +16,7 @@
  */
 {% endcomment %}
 {% assign sizes = include.sizes | default: 'sm' %}
-<picture>
+<picture class={{include.class}}>
 	{% if sizes contains 'lg' %}
 	<!-- Desktop images -->
 	{% assign bp = site.breakpoint_min_desktop %}
