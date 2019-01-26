@@ -39,6 +39,9 @@ nav {
 
 	.logo-wrapper {
 		grid-column-end: span 2;
+		margin: 0;
+		justify-self: start;
+		align-self: center;
 	}
 
 	.logo {
@@ -52,7 +55,10 @@ nav {
 		background: $color-bg;
 		margin: 0;
 		@extend %nav-padding;
-		grid-column: 2 / -1;
+
+		& * {
+			list-style: none;
+		}
 
 		// Standard grid
 		@extend %nav-grid;
