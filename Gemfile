@@ -4,6 +4,7 @@ source "https://rubygems.org"
 
 group :jekyll_plugins do
     # Experience
+    gem 'jekyll'                # This one's obvious
     gem 'rouge'                 # Highlighter of code
 
     # Services & Integrations
