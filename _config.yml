@@ -71,7 +71,6 @@ workbox:
     - "/404/*"
     - "/offline/*"
     - "favicon*"
-  precache_recent_posts_num: 5
   precache_glob_ignores: []
 
 # Sitemap config - excludes google analytics html file
