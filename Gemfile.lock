@@ -122,6 +122,7 @@ PLATFORMS
 DEPENDENCIES
   autoprefixer-rails
   hawkins
+  jekyll
   jekyll-analytics
   jekyll-assets
   jekyll-minifier
