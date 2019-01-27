@@ -1,13 +1,16 @@
 default-src:
   - &self "'self'"
+  - &netlify https://*.cloudfront.net/*
 img-src:
   - *self
+  - *netlify
   - &google-analytics https://www.google-analytics.com
   - https://google-analytics.com
   - https://www.google.com/ads/*
   - https://stats.g.doubleclick.net/*
 script-src:
   - *self
+  - *netlify
   - *google-analytics
   - https://google-analytics.com
   - "'sha256-AP5dd2QsbU3QOEJPw+ytEwxizO0kXXheCb4T/H9jz4I='"
@@ -15,13 +18,17 @@ script-src:
   # If async google fonts is on, this is it
   #- "'sha256-xXkeCOd4qqYaG8F+aZPKXacPfCWyAHihzqN9OqgGAds='"
 connect-src:
+  - *netlify
   - https://fonts.googleapis.com
   - https://www.google-analytics.com
 style-src:
   - *self
+  - *netlify
   - "'unsafe-inline'"
   - https://fonts.googleapis.com/css
 font-src:
+  - *netlify
   - https://fonts.gstatic.com
 manifest-src:
+  - *netlify
   - *self
