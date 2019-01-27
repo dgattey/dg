@@ -1,4 +1,5 @@
 'use strict';
+/*global workbox:true*/
 
 /**
  * Configuration & setup
@@ -103,7 +104,7 @@ workbox.routing.setDefaultHandler(fetchWithOfflineFallback);
 workbox.routing.setCatchHandler(({event}) => {
 	if (event.request.cache === 'only-if-cached' &&
 		event.request.mode !== 'same-origin') {
-		return;
+		return new Response();
 	}
 	switch (event.request.destination) {
 	case 'document':
