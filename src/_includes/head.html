@@ -16,7 +16,7 @@
   <link rel="preconnect" href="{{ url }}">
   {% endfor %}
   {% if site.use_font_loader == false %}
-  <link rel="stylesheet" href="{{ site.font_url }}{{ site.font_body }}|{{ site.font_head }}">
+  <link rel="stylesheet" crossorigin="anonymous" href="{{ site.font_url }}{{ site.font_body }}|{{ site.font_head }}">
   {% endif %}
   <link rel="manifest" href="/manifest.json">
   {% asset main.scss !integrity %}
