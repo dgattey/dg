@@ -1,6 +1,6 @@
 default-src:
   - &self "'self'"
-  - &netlify https://*.cloudfront.net/*
+  - &netlify https://d33wubrfki0l68.cloudfront.net/*
 img-src:
   - *self
   - *netlify
