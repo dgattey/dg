@@ -1,5 +1,6 @@
-'use strict';
 /*global workbox:true*/
+/*eslint no-undef: "error"*/
+'use strict';
 
 /**
  * Configuration & setup
