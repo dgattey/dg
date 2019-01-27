@@ -1,13 +1,13 @@
 default-src:
   - &self "'self'"
-  - &netlify https://d33wubrfki0l68.cloudfront.net/*
+  - &netlify https://d33wubrfki0l68.cloudfront.net/
 img-src:
   - *self
   - *netlify
   - &google-analytics https://www.google-analytics.com
   - https://google-analytics.com
-  - https://www.google.com/ads/*
-  - https://stats.g.doubleclick.net/*
+  - https://www.google.com/ads/
+  - https://stats.g.doubleclick.net/
 script-src:
   - *self
   - *netlify
