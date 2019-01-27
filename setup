@@ -6,7 +6,7 @@ echo "$(tput setaf 6)Installing dependencies...$(tput sgr0)"
 if gem list -i "^bundler" > /dev/null; then
     echo "Bundler already installed; skipping"
 else
-    gem install bundler
+    gem install bundler -v '< 2.0'
 fi
 if convert --version > /dev/null; then
   echo "ImageMagick already installed; skipping"
