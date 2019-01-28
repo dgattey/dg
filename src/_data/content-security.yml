@@ -1,9 +1,11 @@
 default-src:
   - &self "'self'"
-  - &netlify https://d33wubrfki0l68.cloudfront.net/
+  - &netlify-cdn https://d33wubrfki0l68.cloudfront.net/
+  - &netlify https://dgattey.netlify.com/
 img-src:
   - *self
   - *netlify
+  - *netlify-cdn
   - &google-analytics https://www.google-analytics.com
   - https://google-analytics.com
   - https://www.google.com/ads/
@@ -11,6 +13,7 @@ img-src:
 script-src:
   - *self
   - *netlify
+  - *netlify-cdn
   - *google-analytics
   - https://google-analytics.com
   - "'sha256-AP5dd2QsbU3QOEJPw+ytEwxizO0kXXheCb4T/H9jz4I='"
@@ -19,16 +22,21 @@ script-src:
   #- "'sha256-xXkeCOd4qqYaG8F+aZPKXacPfCWyAHihzqN9OqgGAds='"
 connect-src:
   - *netlify
+  - *netlify-cdn
   - https://fonts.googleapis.com
   - https://www.google-analytics.com
 style-src:
   - *self
   - *netlify
+  - *netlify-cdn
   - "'unsafe-inline'"
   - https://fonts.googleapis.com/css
 font-src:
+  - *self
   - *netlify
+  - *netlify-cdn
   - https://fonts.gstatic.com
 manifest-src:
-  - *netlify
   - *self
+  - *netlify
+  - *netlify-cdn
