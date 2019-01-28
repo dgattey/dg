@@ -23,7 +23,6 @@ group :jekyll_plugins do
     gem 'normalize-scss'	    # Normalizes the scss
 
     # Dev Environment
-    gem 'hawkins'                   # Live reload
-    gem 'kramdown'                  # Markdown support
-    gem 'jekyll-netlify-redirects'  # _redirects file generation
+    gem 'hawkins'               # Live reload
+    gem 'kramdown'              # Markdown support
 end
