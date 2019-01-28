@@ -95,6 +95,9 @@ kramdown:
 sass:
   style:  expanded
   deploy_style: compressed
+netlify:
+  redirects:
+    - https://dgattey.netlify.com/* https://dylangattey.com/:splat  301!
 
 # Plugins
 plugins:
