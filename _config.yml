@@ -87,7 +87,7 @@ defaults:
 markdown: kramdown
 source: src
 destination: build
-include: [static, .htaccess, _redirects]
+include: [static, .htaccess]
 highlighter: rouge
 kramdown:
   input: GFM
@@ -95,6 +95,9 @@ kramdown:
 sass:
   style:  expanded
   deploy_style: compressed
+netlify:
+  redirects:
+    - https://dgattey.netlify.com/* https://dylangattey.com/:splat  301!
 
 # Plugins
 plugins:
