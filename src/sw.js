@@ -119,4 +119,8 @@ workbox.routing.setCatchHandler(({event}) => {
  * Google Analytics
  * - Now available while offline! It'll send when back online
  */
-workbox.googleAnalytics.initialize();
+try {
+	workbox.googleAnalytics.initialize();
+} catch {
+	console.log('Couldn\'t register GA');
+}
