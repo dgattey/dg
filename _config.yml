@@ -25,7 +25,7 @@ breakpoint_min_tablet: 600px
 breakpoint_min_desktop: 900px
 
 # Configuration for site
-url: "https://dgattey.netlify.com"
+url: "https://dylangattey.com"
 permalink: /projects/:title/ #posts
 baseurl: ""
 google_site_verification: U6mU3aPeTRaCoewYQype946HD1HrM9vY96GoEHKCAnc
@@ -72,9 +72,8 @@ workbox:
     - "assets/*.{js,css,svg,json}"
     - index.html
     - about/index.html
-    - "/404/*"
-    - "/offline/*"
-    - "favicon*"
+    - /404/index.html
+    - /offline/index.html
 
 # Sitemap config - excludes google analytics html file
 defaults:
