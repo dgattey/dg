@@ -9,12 +9,10 @@ Core dependencies
 - `Ruby >= 2.5.0` (`rvm` is a great tool for managing versions)
 - `RubyGems`
 - `ImageOptim`
-- `npm` to install `PurgeCSS`
 
 Once the above are installed, you can simply run `./setup` to get the rest imported. It will do the following:
 - `Bundler`: install with `setup` script or `gem install bundler`
 - `ImageMagick`: install with `setup` script (make sure `webp` appears under delegates) or via brew
-- `PurgeCSS`: install with `setup` script or with NPM
 
 ## Development
 1. Install the necessary gems with `bundle install`

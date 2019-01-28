@@ -13,10 +13,5 @@ if convert --version > /dev/null; then
 else
   brew install imagemagick
 fi
-if npm -g --parseable list purgecss > /dev/null; then
-	echo "purgecss already installed; skipping"
-else
-	npm install -g purgecss
-fi
 echo "$(tput setaf 2)Done setting up!$(tput sgr0)"
 
