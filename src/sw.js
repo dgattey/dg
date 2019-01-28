@@ -121,6 +121,6 @@ workbox.routing.setCatchHandler(({event}) => {
  */
 try {
 	workbox.googleAnalytics.initialize();
-} catch {
-	console.log('Couldn\'t register GA');
+} catch(error) {
+	// Fail silently
 }
