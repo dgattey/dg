@@ -1,0 +1,2 @@
+# Redirects from the netlify.com site to main dylangattey.com site
+https://dgattey.netlify.com/* https://dylangattey.com/:splat 301!

@@ -87,7 +87,7 @@ defaults:
 markdown: kramdown
 source: src
 destination: build
-include: [static, .htaccess]
+include: [static, .htaccess, _redirects]
 highlighter: rouge
 kramdown:
   input: GFM
