@@ -14,15 +14,6 @@ $color-green: #1CD1A5;
 $color-red: #ee5050;
 $color-blue: #04a5e5;
 
-// Fonts
-$font-family-body: "Hind", sans-serif;
-$font-family-head: "Heebo", sans-serif;
-$font-family-code: "Source Code Pro", "Andale Mono", monospace;
-$font-weight-body: 400;
-$font-weight-head: 700;
-$font-weight-display: 400;
-$font-size-base: 10px;
-
 // Applied color values (primary, bg, border, text)
 $color-primary-bright: $color-green;
 $color-primary-dim: darken($color-primary-bright, 12%);
