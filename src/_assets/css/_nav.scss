@@ -4,7 +4,6 @@
  */
 
 .header-nav {
-	@extend %head-font-style;
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -32,7 +31,7 @@ nav {
 
 	// Ensures uniform text size on nav items to follow body
 	.logo-wrapper, .nav-item {
-		@extend %regular-text-size;
+		@extend .body-font-style-size;
 		align-self: center;
         margin-bottom: 0; // resets the inherited value
 	}

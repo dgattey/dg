@@ -2,13 +2,37 @@
  * Font-specific variables & mixins (defined here for ease of use below)
  */
 
-$font-size-proportion: 1.1;
+html {
+    // Families
+    --font-family-body: lft-etica, sans-serif;
+    --font-family-display: lft-etica, sans-serif;
+    --font-family-nav: lft-etica, sans-serif;
+    --font-family-head: lft-etica, sans-serif;
+    --font-family-code: source-code-pro, monospace;
+
+    // Weights
+    --font-weight-body: 400;
+    --font-weight-display: 600;
+    --font-weight-nav: 700;
+    --font-weight-head: 800;
+    --font-weight-code: 400;
+}
+
+// Base variables
+$html-font-size: 10px;
+$base-font-size: 1.5rem;
+$base-line-height-proportion: 1.5;
+$base-margin-bottom: 2.5rem;
+$text-max-width: 36em;
+
+// Proportions used in the `level` calculations.
+$font-size-proportion: 1.09;
 $line-height-proportion: 1.09;
 $header-multiplier: 2.5;
-$bottom-margin-divisor: 2;
-$base-font-size: 1.6em;
-$base-line-height: 2.5rem;
 
+/**
+ * Raises a number to a power
+ */
 @function pow($number, $power) {
     $value: 1;
     @if $power > 0 {
@@ -19,6 +43,9 @@ $base-line-height: 2.5rem;
     @return $value;
 }
 
+/**
+ * Calculates the level, given a level and is header flag to apply a multiplier.
+ */
 @function calculate-level($level, $is-header) {
     @if $is-header {
         @return round($level * $header-multiplier);
@@ -27,49 +54,56 @@ $base-line-height: 2.5rem;
 }
 
 /**
- * Generates font size and line height declarations for a particular element using
- * a standard rhythm and the configurable level dictating how many levels larger than
- * normal the font should be.
- *
- * @param $level how many sizes larger than mobile the font & line sizes should be
+ * Generates font size and line height declarations when included in an element, using
+ * a standard rhythm. The configurable level dictates how many levels larger than
+ * normal the font should be, and an additional modifier to add onto the level.
  */
-@mixin text-body($level) {
-    $font-size: $base-font-size * pow($font-size-proportion, $level);
-    $line-height: $base-line-height * pow($line-height-proportion, $level);
-    font-size: $font-size;
-    line-height: $line-height;
-    margin-bottom: $line-height / $bottom-margin-divisor;
+@mixin text-body($level, $level-modifier: 0) {
+    $base-line-height: $base-font-size * $base-line-height-proportion;
+    font-size: $base-font-size * pow($font-size-proportion, $level + $level-modifier);
+    line-height: $base-line-height * pow($line-height-proportion, $level + $level-modifier);
+    margin-bottom: $base-margin-bottom;
+}
+
+/**
+ * Includes `text-body` for both normal level and emphasized (adds one level).
+ */
+@mixin text-body-with-emphasized($level) {
+    @include text-body($level);
     &.emphasized {
-        $font-size: $base-font-size * pow($font-size-proportion, $level + 1);
-        $line-height: $base-line-height * pow($line-height-proportion, $level + 1);
-        font-size: $font-size;
-        line-height: $line-height;
-        margin-bottom: $line-height / $bottom-margin-divisor;
+        @include text-body($level + 1);
     }
 }
 
 /**
- * Generates font size and line height declarations for a particular element using
- * a standard rhythm and the configurable level dictating how many levels larger than
- * normal the font should be. If it's a header, the level will get increased a bit.
- * This mixin generates the above for all screen sizes.
- *
- * @param $element The element on which to operate
- * @param $level The level to generate
- * @param $is-header If it's a header element
+ * Includes `text-body-with-emphasized` on the `element`, with a particular `level` and
+ * `header` modifier.
  */
 @mixin text($element, $level, $is-header: false) {
     $level: calculate-level($level, $is-header);
     #{$element} {
         @include for-phone-up {
-            @include text-body($level);
+            @include text-body-with-emphasized($level);
         }
         @include for-tablet-up {
-            @include text-body($level + 1);
+            @include text-body-with-emphasized($level + 1);
         }
         @include for-desktop-up {
-            @include text-body($level + 2);
+            @include text-body-with-emphasized($level + 2);
         }
+    }
+}
+
+/**
+ * Includes all the font styles, using CSS variables
+ */
+$font-styles: 'display' 'nav' 'head' 'body' 'code';
+@each $type in $font-styles {
+    $fam: "--font-family-#{$type}";
+    $weight: "--font-weight-#{$type}";
+    .#{$type}-font-style {
+        font-family: var(unquote($fam));
+        font-weight: var(unquote($weight));
     }
 }
 
@@ -85,57 +119,37 @@ html {
     font-kerning: normal;
 }
 
-h1, h2, h3, h4, h5, h6, p {
-    font-style: normal;
-    letter-spacing: 0.02px;
-}
-
 /**
  * Header styling
  */
-
-%head-font-style {
-    font-family: $font-family-head;
-    font-weight: $font-weight-head;
-}
-
-%display-font-style {
-    font-family: $font-family-head;
-    font-weight: $font-weight-display;
-}
-
-h1, h2, h3 {
-    @extend %display-font-style;
+h1, h2, h3, {
+    @extend .display-font-style;
 }
 
 h4, h5, h6 {
-    @extend %head-font-style;
+    @extend .head-font-style;
 }
 
-// Text styling for the headers
 @for $header-level from 1 through 6 {
     $level: -1 * ($header-level - 6);
     @include text(h#{$header-level}, $level, $is-header: true);
 }
-
-// LARGE h1
 @include text(h1, 6, $is-header: true);
 
 /**
  * Regular (non-header) text styling
  */
 
-@include text("%regular-text-size", 0);
+@include text(".body-font-style-size", 0);
+@include text(".code-font-size", -1);
 
-%regular-text {
-    font-family: $font-family-body;
-    font-weight: $font-weight-body;
-    max-width: 36em;
+.body-font-style-size {
+    max-width: $text-max-width;
 }
 
 p, input, button, select, textarea {
-    @extend %regular-text;
-    @extend %regular-text-size;
+    @extend .body-font-style;
+    @extend .body-font-style-size;
 }
 
 /**
@@ -155,24 +169,19 @@ a {
  */
 
 code, pre {
-    @extend %regular-text-size;
+    @extend .code-font-style;
+    @extend .code-font-size;
     overflow: auto;
-    font-family: $font-family-code;
     @include for-phone-up {
         word-break: break-all;
     }
     @include for-tablet-up {
-        word-break: break-word;
+        word-break: normal;
     }
 }
 
-code.highlighter-rouge, pre {
-    font-size: 85%;
-}
-
 .highlight {
-    padding: 0.4rem 0.8rem;
-    max-width: 64em;
+    padding: 1rem;
+    max-width: 64rem;
     border-radius: 1em;
-    padding: 2em;
 }
