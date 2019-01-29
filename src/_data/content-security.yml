@@ -23,19 +23,18 @@ script-src:
 connect-src:
   - *netlify
   - *netlify-cdn
-  - https://fonts.googleapis.com
   - https://www.google-analytics.com
 style-src:
   - *self
   - *netlify
   - *netlify-cdn
-  - "'unsafe-inline'"
-  - https://fonts.googleapis.com/css
+  - https://use.typekit.net/
+  - https://p.typekit.net/
 font-src:
   - *self
   - *netlify
   - *netlify-cdn
-  - https://fonts.gstatic.com
+  - https://use.typekit.net/
 manifest-src:
   - *self
   - *netlify
