@@ -13,11 +13,9 @@ social:
     - https://www.linkedin.com/in/dgattey
     - https://github.com/dgattey
 
-# Fonts - if changing these, change the SCSS variables too!!
-font_body: Hind:400
-font_head: Heebo:700,400
-font_url: https://fonts.googleapis.com/css?family=
-font_preload_urls: ["https://fonts.gstatic.com", "https://fonts.googleapis.com"]
+# Fonts - if changing this, change the SCSS variables too!!
+font_url: https://use.typekit.net/ytv4uxf.css
+font_preload_urls: ["https://use.typekit.net"]
 use_font_loader: false # whether or not to use async JS to load font
 
 # Breakpoints - if changing these, change the SCSS variables too!!
