@@ -1,11 +1,11 @@
-[![Maintainability](https://api.codeclimate.com/v1/badges/333adb209e1ac3086303/maintainability)](https://codeclimate.com/github/dgattey/dg/maintainability)[![codebeat badge](https://codebeat.co/badges/7af102f5-2b3e-4068-8678-6ed819c4397d)](https://codebeat.co/projects/github-com-dgattey-dg-master)
+[![Maintainability](https://api.codeclimate.com/v1/badges/333adb209e1ac3086303/maintainability)](https://codeclimate.com/github/dgattey/dg/maintainability)  [![codebeat badge](https://codebeat.co/badges/7af102f5-2b3e-4068-8678-6ed819c4397d)](https://codebeat.co/projects/github-com-dgattey-dg-master)
 
 # Dylan Gattey
-This is a redesign of https://dylangattey.com to a lightweight, mobile-friendly, polished exhibition of my projects/experiments. It's been a slow, unchanging Wordpress site for years. Using [Jekyll](https://jekyllrb.com/) to build it, with some modern integrations.
+This is a redesign of https://dylangattey.com to a lightweight, mobile-friendly, polished exhibition of my projects/experiments. It's been a slow, unchanging Wordpress site for years. I'm using a static site generator, [Jekyll](https://jekyllrb.com/), to build it. It's hosted on [Netlify](https://netlify.com), backed by [Cloudflare](https://cloudflare.com), with continuous integration based off this repo.
 
 ## Initial Setup
 ### Development Dependencies
-You have to have the following already installed:
+You must have the following already installed:
 - `HomeBrew`
 - `Ruby` & `RubyGems` (`rvm` is a great tool for managing versions)
 - `ImageOptim`
@@ -25,7 +25,7 @@ If you want autoreload, use `bundle exec jekyll liveserve`. The site files will 
 Add an entry to the Gemfile, add to `plugins` in `_config.yml` as needed and rerun `bundle install`.
 
 ### Changing/adding images?
-Use the `process-images` script after doing so. It will optimize/minify all jpg/png files. Additionally, it will convert those files to WebP versions and put them back in the same folders. This allows `jekyll-assets` to properly copy all those files on build. It can take FOREVER to run ImageOptim, so be patient. Also, you may need to run the script multiple times to get the best results.
+Use the `process-images` script after doing so. It will optimize/minify all jpg/png files. Additionally, it will convert those files to WebP versions and put them back in the same folders. This allows `jekyll-assets` to properly copy all those files on build. It can take _FOREVER_ to run ImageOptim, so be patient. Also, you may need to run the script multiple times to get the best results.
 
 ## DNS, CDN, and Deployment
 We're set up with [Cloudflare](https://cloudflare.com) managing DNS & [Netlify](https://netlify.com) as the CDN and CI server that hosts the site. Cloudflare's MX records point to [ZohoMail](https://zoho.com/mail), and points to Netlify as the site source.
@@ -39,6 +39,7 @@ The project and its status is on Trello at https://trello.com/b/MJdtje7y/dylanga
 ### Current integrations
 - Google Analytics: setup through Jekyll plugin
 - Google Search Console: uploaded a `google*.html` file to the root, plus fallback through the SEO plugin + a value in `_config.yml`
+- Adobe Fonts (née Typekit)
 - Sitemap: through a plugin, excluding the `google*.html` file via blob in the config
 - Autoprefixer: plugin + asset plugin based
 - SEO: plugin based
