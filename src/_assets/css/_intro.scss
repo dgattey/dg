@@ -25,16 +25,16 @@
 		grid-column: 1 / -1;
 		grid-row: 1 / 2;
 		@include for-phone-only {
-			font-size: 4vw;
+			font-size: 8vw;
 			& * {
-				line-height: 22vw;
+				line-height: 18vw;
 			}
 			grid-column: 1 / -1;
 		}
 		@include for-tablet-up {
-			font-size: 1.75vw;
+			font-size: 2vw;
 			& * {
-				line-height: 12.4vw;
+				line-height: 8vw;
 			}
 			grid-column: 1 / #{$end-before-photo};
 		}
@@ -68,12 +68,10 @@
 	}
 
 	.title {
-		font-weight: $font-weight-head;
 		grid-row: 1 / 2;
 	}
 
 	.subtitle {
-		font-weight: $font-weight-head;
 		margin-top: 0;
 		@include for-phone-up {
 			grid-row: 2 / 3;
