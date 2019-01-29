@@ -9,11 +9,13 @@ You have to have the following already installed:
 - `HomeBrew`
 - `Ruby` & `RubyGems` (`rvm` is a great tool for managing versions)
 - `ImageOptim`
+- `npm` to install `PurgeCSS`
 
 ### Setup script
 Once the above are manually installed, you can simply run the `setup` script to install the following:
 - `Bundler`
 - `ImageMagick` (make sure `webp` appears under delegates, if not and you're on Linux, try [this guide](https://github.com/rosell-dk/webp-convert/wiki/Installing-Imagick-extension))
+- `PurgeCSS`
 
 ## Local Development
 ### Workflow
@@ -43,3 +45,4 @@ The project and its status is on Trello at https://trello.com/b/MJdtje7y/dylanga
 - Autoprefixer: plugin + asset plugin based
 - SEO: plugin based
 - Assets: plugin based
+- PurgeCSS: intalled on Netlify via build task
