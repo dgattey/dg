@@ -38,8 +38,7 @@ workbox.precaching.precacheAndRoute([]);
 /**
  * Routing for different filetypes & endpoints
  * - Stale while revalidate for js, css, and json
- * - State while revalidate for Google Fonts stylesheets
- * - Cache Google Fonts font files for 120 days
+ * - State while revalidate for fonts stylesheets
  * - Cache up to 60 images for 30 days
  */
 workbox.routing.registerRoute(
@@ -49,9 +48,9 @@ workbox.routing.registerRoute(
 	})
 );
 workbox.routing.registerRoute(
-	/^https?:\/\/fonts\.googleapis\.com/,
+	/^https?:\/\/use\.typekit\.net/,
 	workbox.strategies.staleWhileRevalidate({
-		cacheName: 'googleapis',
+		cacheName: 'typekit',
 		plugins: [
 			new workbox.cacheableResponse.Plugin({
 				statuses: [0, 200],
@@ -60,9 +59,9 @@ workbox.routing.registerRoute(
 	})
 );
 workbox.routing.registerRoute(
-	/^https?:\/\/fonts\.gstatic\.com/,
+	/^https?:\/\/p\.typekit\.net/,
 	workbox.strategies.cacheFirst({
-		cacheName: 'gstatic',
+		cacheName: 'typekit-static',
 		plugins: [
 			new workbox.cacheableResponse.Plugin({
 				statuses: [0, 200],
