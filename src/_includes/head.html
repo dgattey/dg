@@ -7,8 +7,7 @@
   <base href={{ site.url }}>
 
   <!-- Static assets, fonts and CSS includes -->
-  {% for url in site.font_preload_urls %}
-  <link rel="dns-prefetch" href="{{ url }}">
+  {% for url in site.preconnect %}
   <link rel="preconnect" href="{{ url }}">
   {% endfor %}
   {% if site.use_font_loader == false %}

@@ -10,5 +10,5 @@ var addOrRemoveClass = function() {
 	}
 }
 // On scroll and load, add the class specified
-window.addEventListener('scroll', addOrRemoveClass());
-window.addEventListener('load', addOrRemoveClass());
+window.addEventListener('scroll', addOrRemoveClass);
+window.addEventListener('load', addOrRemoveClass);
