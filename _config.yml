@@ -27,9 +27,10 @@ permalink: /projects/:title/ #posts
 baseurl: ""
 google_site_verification: U6mU3aPeTRaCoewYQype946HD1HrM9vY96GoEHKCAnc
 preconnect: 
-  - "https://use.typekit.net"
-  - "https://www.google-analytics.com"
-  - "https://d33wubrfki0l68.cloudfront.net"
+  - https://use.typekit.net
+  - https://p.typekit.net
+  - https://www.google-analytics.com
+  - https://d33wubrfki0l68.cloudfront.net
 
 # Manifest
 lang: en
