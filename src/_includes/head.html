@@ -3,7 +3,7 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <meta http-equiv="x-ua-compatible" content="ie=edge">
-  {% include content-security.html %}
+  {% include_cached content-security.html %}
   <base href={{ site.url }}>
 
   <!-- PWA/Mobile -->
@@ -19,7 +19,7 @@
   {% endif %}
   <link rel="manifest" href="/manifest.json">
   {% asset main.scss !integrity %}
-  {% include favicons.html %}
+  {% include_cached favicons.html %}
 
   <!-- SEO -->
   {% seo %}

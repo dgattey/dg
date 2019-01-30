@@ -11,11 +11,11 @@
 	</div>
 
 	<!-- Footer of page -->
-	{% include footer.html %}
+	{% include_cached footer.html %}
 
 	<!-- Service worker, font loader, & sticky header -->
-	{% include service-worker.html %}
-	{% include font-loader.html %}
+	{% include_cached service-worker.html %}
+	{% include_cached font-loader.html %}
 	{% asset sticky-header.js async %}
 </body>
 </html>
