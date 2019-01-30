@@ -258,7 +258,7 @@ Header set Cache-Control "max-age=0, no-cache"
 # https://httpd.apache.org/docs/current/mod/core.html#errordocument
 ####################
 
-ErrorDocument 404 /error-pages/404.html
+ErrorDocument 404 /404.html
 
 # Disable the pattern matching based on filenames.
 #
