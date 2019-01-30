@@ -25,4 +25,5 @@ group :jekyll_plugins do
     # Dev Environment
     gem 'hawkins'               # Live reload
     gem 'kramdown'              # Markdown support
+    gem 'jekyll-include-cache'  # Allows for caching of includes
 end
