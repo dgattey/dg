@@ -3,3 +3,18 @@ from = "https://dgattey.netlify.com/*"
 to = "https://dylangattey.com/:splat"
 status = 301
 force = true
+[[redirects]]
+from = "https://dylangattey.com/projects/fppdx/"
+to = "/404/index.html"
+status = 404
+force = false
+[[redirects]]
+from = "https://dylangattey.com/projects/connected-car-citizen/"
+to = "/404/index.html"
+status = 404
+force = false
+[[redirects]]
+from = "https://dylangattey.com/projects/synergy-womens-health-care/"
+to = "/404/index.html"
+status = 404
+force = false
