@@ -4,8 +4,9 @@ source "https://rubygems.org"
 
 group :jekyll_plugins do
     # Experience
-    gem 'jekyll'                # This one's obvious
-    gem 'rouge'                 # Highlighter of code
+    gem 'jekyll'                    # This one's obvious
+    gem 'rouge'                     # Highlighter of code
+    gem 'jekyll-last-modified-at'   # Better last modified date
 
     # Services & Integrations
     gem 'jekyll-analytics'      # Google Analytics built in
@@ -25,4 +26,5 @@ group :jekyll_plugins do
     # Dev Environment
     gem 'hawkins'               # Live reload
     gem 'kramdown'              # Markdown support
+    gem 'jekyll-include-cache'  # Allows for caching of includes
 end

@@ -76,14 +76,6 @@ workbox:
     - /404.html
     - /offline/index.html
 
-# Sitemap config - excludes google analytics html file
-defaults:
-  -
-    scope:
-      path: "google*.html"
-    values:
-      sitemap:  false
-
 # Build settings
 markdown: kramdown
 source: src
