@@ -12,7 +12,7 @@
   <link rel="preconnect" href="{{ url }}">
   {% endfor %}
   {% if site.use_font_loader == false %}
-  <link rel="stylesheet" href="{{ site.font_url }}" async>
+  <link rel="preload" href="{{ site.font_url }}" onload="this.rel='stylesheet'">
   {% endif %}
   {% asset main.scss !integrity %}
   {% include favicons.html %}
