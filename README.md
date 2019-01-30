@@ -29,14 +29,23 @@ Add an entry to the Gemfile, add to `plugins` in `_config.yml` as needed and rer
 ### Changing/adding images?
 Use the `process-images` script after doing so. It will optimize/minify all jpg/png files. Additionally, it will convert those files to WebP versions and put them back in the same folders. This allows `jekyll-assets` to properly copy all those files on build. It can take _FOREVER_ to run ImageOptim, so be patient. Also, you may need to run the script multiple times to get the best results.
 
+### Committing something?
+We use feature branches in this repo + pull requests. [Create a PR](https://github.com/dgattey/dg/pulls), optionally referencing an [issue](https://github.com/dgattey/dg/issues), and we'll review it. We use [labels](https://github.com/dgattey/dg/labels) to categorize, and [milestones](https://github.com/dgattey/dg/milestones) to track dependencies. Make sure to label properly.
+
 ## DNS, CDN, and Deployment
 We're set up with [Cloudflare](https://cloudflare.com) managing DNS & [Netlify](https://netlify.com) as the CDN and CI server that hosts the site. Cloudflare's MX records point to [ZohoMail](https://zoho.com/mail), and points to Netlify as the site source.
 
 ### Ready to deploy?
 Every commit to `master` branch triggers a new deploy & publish on Netlify :tada:. By default, it uses `JEKYLL_ENV=production bundle exec jekyll build`. If you want a manual deploy, you can log in to Netlify and trigger one.
 
-## Project Status
-The project and its status is on Trello at https://trello.com/b/MJdtje7y/dylangattey-com.
+## Pull Requests, Issues, and Status
+The project is tracked by this repo. All gaps in content and bugs are captured in [issues](https://github.com/dgattey/dg/issues), with the appropriate labels. To merge code, you must [create a PR](https://github.com/dgattey/dg/pulls) using a feature branch, get your code reviewed, and run the automated checks. Once finished, you can rebase on master, push, and delete the branch directly from the PR. Status is tracked under the [main project](https://github.com/dgattey/dg/projects/2), with [milestones](https://github.com/dgattey/dg/milestones) to keep track of progress.
+
+Versions/milestones are as follows:
+- ~[1.0 (Marrow)](https://github.com/dgattey/dg/milestone/2): basic site up on Netlify/Cloudflare with barebones homepage~
+- [1.5 (Steak)](https://github.com/dgattey/dg/milestone/1): the "meat" 😉 of the site, where all content is done, most styles done, and site is secure for the most part
+- [2.0 (Cherry)](https://github.com/dgattey/dg/milestone/3): putting the cherry on top! Polish, security, optimizations are all finished and site is done
+- [3.0 (Moon Grape)](https://github.com/dgattey/dg/milestone/3): future work, tracking aspirations and ideas
 
 ### Current integrations
 - Google Analytics: setup through Jekyll plugin
