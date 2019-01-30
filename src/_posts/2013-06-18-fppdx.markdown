@@ -5,5 +5,6 @@ identifier: fppdx
 type: "iOS App"
 description: "An iOS app for exploring the great outdoors of Portland"
 link: https://www.forestparkconservancy.org/forest-park/
+sitemap: false
 ---
 
