@@ -15,30 +15,6 @@ deny from all
 #AIOWPS_DISABLE_INDEX_VIEWS_START
 Options -Indexes
 #AIOWPS_DISABLE_INDEX_VIEWS_END
-#AIOWPS_DISABLE_TRACE_TRACK_START
-RewriteEngine On
-RewriteCond %{REQUEST_METHOD} ^(TRACE|TRACK)
-RewriteCond %{REQUEST_URI} !^/[0-9]+\..+\.cpaneldcv$
-RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/[0-9a-zA-Z_-]+$
-RewriteCond %{REQUEST_URI} !^/\.well-known/pki-validation/[A-F0-9]{32}\.txt(?:\ Comodo\ DCV)?$
-RewriteRule .* - [F]
-#AIOWPS_DISABLE_TRACE_TRACK_END
-#AIOWPS_FORBID_PROXY_COMMENTS_START
-RewriteCond %{REQUEST_METHOD} ^POST
-RewriteCond %{HTTP:VIA} !^$ [OR]
-RewriteCond %{HTTP:FORWARDED} !^$ [OR]
-RewriteCond %{HTTP:USERAGENT_VIA} !^$ [OR]
-RewriteCond %{HTTP:X_FORWARDED_FOR} !^$ [OR]
-RewriteCond %{HTTP:X_FORWARDED_HOST} !^$ [OR]
-RewriteCond %{HTTP:PROXY_CONNECTION} !^$ [OR]
-RewriteCond %{HTTP:XPROXY_CONNECTION} !^$ [OR]
-RewriteCond %{HTTP:HTTP_PC_REMOTE_ADDR} !^$ [OR]
-RewriteCond %{HTTP:HTTP_CLIENT_IP} !^$
-RewriteCond %{REQUEST_URI} !^/[0-9]+\..+\.cpaneldcv$
-RewriteCond %{REQUEST_URI} !^/\.well-known/acme-challenge/[0-9a-zA-Z_-]+$
-RewriteCond %{REQUEST_URI} !^/\.well-known/pki-validation/[A-F0-9]{32}\.txt(?:\ Comodo\ DCV)?$
-RewriteRule wp-comments-post\.php - [F]
-#AIOWPS_FORBID_PROXY_COMMENTS_END
 #AIOWPS_DENY_BAD_QUERY_STRINGS_START
 RewriteCond %{QUERY_STRING} tag=     [NC,OR]
 RewriteCond %{QUERY_STRING} ftp:     [NC,OR]
@@ -236,7 +212,7 @@ RewriteRule ^(.*)?$ https://%{SERVER_NAME}%{REQUEST_URI} [L,R]
   ExpiresActive On
   ExpiresDefault "access plus 1 year"
   # Pages
-  ExpiresByType text/html  "access plus 60 minutes"
+  ExpiresByType text/html  "access plus 120 minutes"
   # RSS feed
   ExpiresByType text/xml  "access plus 240 minutes"
 </IfModule>
