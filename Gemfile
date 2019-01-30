@@ -4,8 +4,9 @@ source "https://rubygems.org"
 
 group :jekyll_plugins do
     # Experience
-    gem 'jekyll'                # This one's obvious
-    gem 'rouge'                 # Highlighter of code
+    gem 'jekyll'                    # This one's obvious
+    gem 'rouge'                     # Highlighter of code
+    gem 'jekyll-last-modified-at'   # Better last modified date
 
     # Services & Integrations
     gem 'jekyll-analytics'      # Google Analytics built in
