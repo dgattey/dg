@@ -6,20 +6,20 @@
   {% include_cached content-security.html %}
   <base href={{ site.url }}>
 
-  <!-- PWA/Mobile -->
-  <meta name="application-name" content="{{ site.title }}">
-  <meta name="theme-color" content="#{{ site.app_theme_color }}">
-
   <!-- Static assets, fonts and CSS includes -->
   {% for url in site.preconnect %}
   <link rel="preconnect" href="{{ url }}">
   {% endfor %}
   {% if site.use_font_loader == false %}
-  <link rel="stylesheet" crossorigin="anonymous" href="{{ site.font_url }}">
+  <link rel="stylesheet" href="{{ site.font_url }}" async>
   {% endif %}
-  <link rel="manifest" href="/manifest.json">
   {% asset main.scss !integrity %}
   {% include_cached favicons.html %}
+
+  <!-- PWA/Mobile -->
+  <link rel="manifest" href="/manifest.json" async>
+  <meta name="application-name" content="{{ site.title }}">
+  <meta name="theme-color" content="#{{ site.app_theme_color }}">
 
   <!-- SEO -->
   {% seo %}
