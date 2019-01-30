@@ -15,7 +15,6 @@ social:
 
 # Fonts - if changing this, change the SCSS variables too!!
 font_url: https://use.typekit.net/ytv4uxf.css
-font_preload_urls: ["https://use.typekit.net"]
 use_font_loader: false # whether or not to use async JS to load font
 
 # Breakpoints - if changing these, change the SCSS variables too!!
@@ -27,6 +26,10 @@ url: "https://dylangattey.com"
 permalink: /projects/:title/ #posts
 baseurl: ""
 google_site_verification: U6mU3aPeTRaCoewYQype946HD1HrM9vY96GoEHKCAnc
+preconnect: 
+  - "https://use.typekit.net"
+  - "https://www.google-analytics.com"
+  - "https://d33wubrfki0l68.cloudfront.net"
 
 # Manifest
 lang: en
