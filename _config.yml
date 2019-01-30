@@ -70,7 +70,7 @@ workbox:
     - "assets/*.{js,css,svg,json}"
     - index.html
     - about/index.html
-    - /404/index.html
+    - /404.html
     - /offline/index.html
 
 # Sitemap config - excludes google analytics html file
