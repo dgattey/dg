@@ -5,6 +5,13 @@
 	status = 301
 	force = true
 
+# Hide offline page from user access
+[[redirects]]
+	from = "https://dylangattey.com/offline/"
+	to = "/404.html"
+	status = 404
+	force = false
+
 # Redirects all projects to 404 page for now
 [[redirects]]
 	from = "https://dylangattey.com/projects/fppdx/"
