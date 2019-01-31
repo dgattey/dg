@@ -44,3 +44,7 @@
 		X-XSS-Protection = "1; mode=block"
 		Referrer-Policy = "no-referrer"
 		X-Content-Type-Options = "nosniff"
+		# Images need to be sized well, no sync xhr
+		Feature-Policy = "unsized-media 'none'"
+		Feature-Policy = "sync-xhr 'none'"
+		Feature-Policy = "unoptimized-images 'none'"
