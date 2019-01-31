@@ -48,3 +48,6 @@
 		Feature-Policy = "unsized-media 'none'"
 		Feature-Policy = "sync-xhr 'none'"
 		Feature-Policy = "unoptimized-images 'none'"
+		Expect-CT = "max-age=0, report-uri=\"https://dgattey.report-uri.com/r/d/ct/reportOnly\""
+
+
