@@ -38,11 +38,11 @@
 
 # This ensures that content security doesn't block requests to dylangattey.com on deploy previews
 [context.production]
-	environment = { ADDITIONAL_CSP_SITES = "", CSP_ORIGIN = "'none'" }
+	environment = { ADDITIONAL_CSP_SITES = "" }
 [context.deploy-preview]
-	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com", CSP_ORIGIN = "https://dylangattey.com" }
+	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com" }
 [build]
-	command = 'sed -i s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g netlify.toml && sed -i s+CSP_ORIGIN_PLACEHOLDER+${CSP_ORIGIN}+g netlify.toml && npm i -g purgecss && jekyll build --verbose --trace --profile'
+	command = 'sed -i s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g netlify.toml && npm i -g purgecss && jekyll build --verbose --trace --profile'
 
 [[headers]]
 	for = "/*"
@@ -60,6 +60,8 @@
 	# Expect-CT to report uri
 	Expect-CT = "max-age=0, report-uri=\"https://dgattey.report-uri.com/r/d/ct/reportOnly\""
 
-	# Content security policies
-	Access-Control-Allow-Origin = "CSP_ORIGIN_PLACEHOLDER"
-	Content-Security-Policy = "base-uri CSP_ORIGIN_PLACEHOLDER; upgrade-insecure-requests; block-all-mixed-content; report-uri https://dgattey.report-uri.com/r/d/csp/enforce; default-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/ https://*.google-analytics.com/; img-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ https://www.google.com/ads/ https://stats.g.doubleclick.net/; script-src 'self' 'strict-dynamic' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ 'sha256-AP5dd2QsbU3QOEJPw+ytEwxizO0kXXheCb4T/H9jz4I=' 'sha256-E0EZj2xhUMF2eiGjBZ7EEtOpOdVx9Ia2ykjanm799ww='; style-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/; font-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/; manifest-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/; object-src 'none'"
+	# Content security & reporting policies
+	Report-To = '{"group":"default","max_age":31536000,"endpoints":[{"url":"https://dgattey.report-uri.com/a/d/g"}],"include_subdomains":true}'
+	NEL = '{"report_to":"default","max_age":31536000,"include_subdomains":true}'
+	Access-Control-Allow-Origin = "https://dylangattey.com"
+	Content-Security-Policy = "base-uri 'self' ADDITIONAL_CSP_PLACEHOLDER; upgrade-insecure-requests; block-all-mixed-content; report-uri https://dgattey.report-uri.com/r/d/csp/wizard; default-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/ https://*.google-analytics.com/; img-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ https://www.google.com/ads/ https://stats.g.doubleclick.net/; script-src 'self' 'strict-dynamic' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ 'sha256-AP5dd2QsbU3QOEJPw+ytEwxizO0kXXheCb4T/H9jz4I=' 'sha256-E0EZj2xhUMF2eiGjBZ7EEtOpOdVx9Ia2ykjanm799ww='; style-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/; font-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/; manifest-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/; object-src 'none'"
