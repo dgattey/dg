@@ -81,7 +81,7 @@ workbox:
 markdown: kramdown
 source: src
 destination: build
-include: [static, .htaccess]
+include: [static]
 highlighter: rouge
 kramdown:
   input: GFM
