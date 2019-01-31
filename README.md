@@ -33,7 +33,7 @@ Use the `process-images` script after doing so. It will optimize/minify all jpg/
 We use feature branches in this repo + pull requests. [Create a PR](https://github.com/dgattey/dg/pulls), using a provided template if possible. If possible, referencing an [issue](https://github.com/dgattey/dg/issues) that tracks the problem is optimal. We use [labels](https://github.com/dgattey/dg/labels) to categorize, and [milestones](https://github.com/dgattey/dg/milestones) to track dependencies. Please follow the [Contribution Guidelines](https://github.com/dgattey/dg/blob/master/CONTRIBUTING.md) at all times.
 
 ## DNS, CDN, and Deployment
-We're set up with [Cloudflare](https://cloudflare.com) managing DNS & [Netlify](https://netlify.com) as the CDN and CI server that hosts the site. Cloudflare's MX records point to [ZohoMail](https://zoho.com/mail), and points to Netlify as the site source.
+We're set up with [Cloudflare](https://cloudflare.com) managing DNS & [Netlify](https://netlify.com) as the CDN and CI server that hosts the site. Cloudflare's MX records point to [ZohoMail](https://zoho.com/mail), and points to Netlify as the site source. Headers/redirects are set up via `netlify.toml` rules.
 
 ### Ready to deploy?
 Every commit to `master` branch triggers a new deploy & publish on Netlify :tada:. By default, it uses `JEKYLL_ENV=production bundle exec jekyll build`. Merging a PR to `master` will trigger a build for you. If you want a manual deploy, you can log in to Netlify and trigger one.
