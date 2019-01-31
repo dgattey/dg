@@ -56,9 +56,10 @@
 	Expect-CT = "max-age=0, report-uri=\"https://dgattey.report-uri.com/r/d/ct/reportOnly\""
 
 	# Content security policies
-	Content-Security-Policy = "default-src 'self' https://dgattey.netlify.com/ https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/ https://*.google-analytics.com/;"
-	Content-Security-Policy = "img-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ https://www.google.com/ads/ https://stats.g.doubleclick.net/;"
-	Content-Security-Policy = "script-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ 'sha256-AP5dd2QsbU3QOEJPw+ytEwxizO0kXXheCb4T/H9jz4I=' 'sha256-E0EZj2xhUMF2eiGjBZ7EEtOpOdVx9Ia2ykjanm799ww=';"
-	Content-Security-Policy = "style-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/;"
-	Content-Security-Policy = "font-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/;"
-	Content-Security-Policy = "manifest-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/"
+	Content-Security-Policy = "upgrade-insecure-requests; block-all-mixed-content; disown-opener; reflected-xss block; report-uri https://dgattey.report-uri.com/r/d/csp/enforce; "
+	Content-Security-Policy = "default-src 'self' https://dgattey.netlify.com/ https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/ https://*.google-analytics.com/; "
+	Content-Security-Policy = "img-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ https://www.google.com/ads/ https://stats.g.doubleclick.net/; "
+	Content-Security-Policy = "script-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ 'sha256-AP5dd2QsbU3QOEJPw+ytEwxizO0kXXheCb4T/H9jz4I=' 'sha256-E0EZj2xhUMF2eiGjBZ7EEtOpOdVx9Ia2ykjanm799ww='; "
+	Content-Security-Policy = "style-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/; "
+	Content-Security-Policy = "font-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/; "
+	Content-Security-Policy = "manifest-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/; "
