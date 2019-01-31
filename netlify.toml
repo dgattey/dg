@@ -1,20 +1,32 @@
+# Redirects dgattey.netlify.com to dylangattey.com
 [[redirects]]
-from = "https://dgattey.netlify.com/*"
-to = "https://dylangattey.com/:splat"
-status = 301
-force = true
+	from = "https://dgattey.netlify.com/*"
+	to = "https://dylangattey.com/:splat"
+	status = 301
+	force = true
+
+# Redirects all projects to 404 page for now
 [[redirects]]
-from = "https://dylangattey.com/projects/fppdx/"
-to = "/404.html"
-status = 404
-force = false
+	from = "https://dylangattey.com/projects/fppdx/"
+	to = "/404.html"
+	status = 404
+	force = false
 [[redirects]]
-from = "https://dylangattey.com/projects/connected-car-citizen/"
-to = "/404.html"
-status = 404
-force = false
+	from = "https://dylangattey.com/projects/connected-car-citizen/"
+	to = "/404.html"
+	status = 404
+	force = false
 [[redirects]]
-from = "https://dylangattey.com/projects/synergy-womens-health-care/"
-to = "/404.html"
-status = 404
-force = false
+	from = "https://dylangattey.com/projects/synergy-womens-health-care/"
+	to = "/404.html"
+	status = 404
+	force = false
+
+# Security headers
+[[headers]]
+	for = "/*"
+	[headers.values]
+		X-Frame-Options = "DENY"
+		X-XSS-Protection = "1; mode=block"
+		Referrer-Policy = "no-referrer"
+		X-Content-Type-Options = "nosniff"
