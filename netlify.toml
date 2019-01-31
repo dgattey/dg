@@ -42,7 +42,7 @@
 [context.deploy-preview]
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com" }
 [build]
-	command = "npm i -g purgecss && sed -i s/ADDITIONAL_CSP_PLACEHOLDER/${ADDITIONAL_CSP_SITES}/g netlify.toml && jekyll build --verbose --trace --profile"
+	command = "npm i -g purgecss && sed s/ADDITIONAL_CSP_PLACEHOLDER/${ADDITIONAL_CSP_SITES}/g netlify.toml && jekyll build --verbose --trace --profile"
 
 [[headers]]
 	for = "/*"
