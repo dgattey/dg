@@ -36,6 +36,13 @@
 	status = 404
 	force = false
 
+# This ensures that content security doesn't block requests to dylangattey.com on deploy previews
+[context.production]
+	environment = { ADDITIONAL_CSP_SITES = "" }
+[context.deploy-preview]
+	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com" }
+[build]
+	command = "npm i -g purgecss && sed -i s/ADDITIONAL_CSP_PLACEHOLDER/${ADDITIONAL_CSP_SITES}/g netlify.toml && jekyll build --verbose --trace --profile"
 
 [[headers]]
 	for = "/*"
@@ -54,4 +61,4 @@
 	Expect-CT = "max-age=0, report-uri=\"https://dgattey.report-uri.com/r/d/ct/reportOnly\""
 
 	# Content security policies
-	Content-Security-Policy = "upgrade-insecure-requests; block-all-mixed-content; disown-opener; reflected-xss block; report-uri https://dgattey.report-uri.com/r/d/csp/enforce; default-src 'self' https://dgattey.netlify.com/ https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/ https://*.google-analytics.com/; img-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ https://www.google.com/ads/ https://stats.g.doubleclick.net/; script-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ 'sha256-AP5dd2QsbU3QOEJPw+ytEwxizO0kXXheCb4T/H9jz4I=' 'sha256-E0EZj2xhUMF2eiGjBZ7EEtOpOdVx9Ia2ykjanm799ww='; style-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/; font-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/; manifest-src 'self' https://dgattey.netlify.com https://d33wubrfki0l68.cloudfront.net/"
+	Content-Security-Policy = "upgrade-insecure-requests; block-all-mixed-content; report-uri https://dgattey.report-uri.com/r/d/csp/enforce; default-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/ https://*.google-analytics.com/; img-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ https://www.google.com/ads/ https://stats.g.doubleclick.net/; script-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ 'sha256-AP5dd2QsbU3QOEJPw+ytEwxizO0kXXheCb4T/H9jz4I=' 'sha256-E0EZj2xhUMF2eiGjBZ7EEtOpOdVx9Ia2ykjanm799ww='; style-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/; font-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/; manifest-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/"
