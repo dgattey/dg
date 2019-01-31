@@ -55,7 +55,7 @@
 	Referrer-Policy = "no-referrer"
 
 	# Feature policies
-	Feature-Policy = "unsized-media 'none'; sync-xhr 'none'; unoptimized-images 'none'"
+	Feature-Policy = "sync-xhr 'none'; unoptimized-images 'none'"
 
 	# Expect-CT to report uri
 	Expect-CT = "max-age=0, report-uri=\"https://dgattey.report-uri.com/r/d/ct/reportOnly\""
