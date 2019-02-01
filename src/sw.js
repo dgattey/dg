@@ -12,8 +12,8 @@ const offlinePage = '/offline.html';
 workbox.core.setCacheNameDetails({
 	precache: 'precache',
 	prefix: 'dg',
-	suffix: 'v1',
-	runtime: 'runtime',
+	suffix: 'prod',
+	runtime: 'site',
 });
 workbox.skipWaiting();
 workbox.clientsClaim();
@@ -29,6 +29,19 @@ self.addEventListener('controllerchange',
 );
 
 /**
+ * Enables navigation preload which we use in our default handler
+ */
+workbox.navigationPreload.enable();
+
+/**
+ * Google Analytics
+ * - Now available while offline! It'll send when back online
+ */
+workbox.googleAnalytics.initialize({
+	cacheName: 'google-analytics'
+});
+
+/**
  * Precaching all the things!
  * - All data is specified in _config.yml
  * - This empty array will be filled out via jekyll
@@ -38,19 +51,28 @@ workbox.precaching.precacheAndRoute([]);
 /**
  * Routing for different filetypes & endpoints
  * - Stale while revalidate for js, css, and json
+ * - Make sure we force all analytics calls to network only
  * - State while revalidate for fonts stylesheets
  * - Cache up to 60 images for 30 days
  */
 workbox.routing.registerRoute(
-	/\.(?:js|css|json)$/,
+	/.*\.(?:js|css|json)$/,
 	workbox.strategies.staleWhileRevalidate({
 		cacheName: 'static'
 	})
 );
 workbox.routing.registerRoute(
+	/^https?:\/\/www\.google-analytics\.com/,
+	workbox.strategies.networkOnly()
+);
+workbox.routing.registerRoute(
+	/^https?:\/\/*google*\.com/,
+	workbox.strategies.networkOnly()
+);
+workbox.routing.registerRoute(
 	/^https?:\/\/use\.typekit\.net/,
 	workbox.strategies.staleWhileRevalidate({
-		cacheName: 'typekit',
+		cacheName: 'static',
 		plugins: [
 			new workbox.cacheableResponse.Plugin({
 				statuses: [0, 200],
@@ -61,7 +83,7 @@ workbox.routing.registerRoute(
 workbox.routing.registerRoute(
 	/^https?:\/\/p\.typekit\.net/,
 	workbox.strategies.cacheFirst({
-		cacheName: 'typekit-static',
+		cacheName: 'fonts-static',
 		plugins: [
 			new workbox.cacheableResponse.Plugin({
 				statuses: [0, 200],
@@ -94,6 +116,14 @@ workbox.routing.registerRoute(
  */
 const fetchWithOfflineFallback = async (args) => {
 	try {
+		// Use the preloaded response, if it's there
+		console.log(args);
+		const preloadResponse = await args.preloadResponse;
+		if (preloadResponse) {
+			return preloadResponse;
+		}
+
+		// Otherwise, try network first with a fallback to the offline page
 		const response = await workbox.strategies.networkFirst().handle(args);
 		return response || await caches.match(offlinePage);
 	} catch (error) {
@@ -113,13 +143,3 @@ workbox.routing.setCatchHandler(({event}) => {
 		return Response.error();
 	}
 });
-
-/**
- * Google Analytics
- * - Now available while offline! It'll send when back online
- */
-try {
-	workbox.googleAnalytics.initialize();
-} catch(error) {
-	// Fail silently
-}
