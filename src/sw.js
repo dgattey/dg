@@ -29,6 +29,14 @@ self.addEventListener('controllerchange',
 );
 
 /**
+ * Google Analytics
+ * - Now available while offline! It'll send when back online
+ */
+workbox.googleAnalytics.initialize({
+	cacheName: 'google-analytics'
+});
+
+/**
  * Precaching all the things!
  * - All data is specified in _config.yml
  * - This empty array will be filled out via jekyll
@@ -38,14 +46,23 @@ workbox.precaching.precacheAndRoute([]);
 /**
  * Routing for different filetypes & endpoints
  * - Stale while revalidate for js, css, and json
+ * - Make sure we force all analytics calls to network only
  * - State while revalidate for fonts stylesheets
  * - Cache up to 60 images for 30 days
  */
 workbox.routing.registerRoute(
-	/\.(?:js|css|json)$/,
+	/.*\.(?:js|css|json)$/,
 	workbox.strategies.staleWhileRevalidate({
 		cacheName: 'static'
 	})
+);
+workbox.routing.registerRoute(
+	/^https?:\/\/www\.google-analytics\.com/,
+	workbox.strategies.networkOnly()
+);
+workbox.routing.registerRoute(
+	/^https?:\/\/*google*\.com/,
+	workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
 	/^https?:\/\/use\.typekit\.net/,
@@ -113,13 +130,3 @@ workbox.routing.setCatchHandler(({event}) => {
 		return Response.error();
 	}
 });
-
-/**
- * Google Analytics
- * - Now available while offline! It'll send when back online
- */
-try {
-	workbox.googleAnalytics.initialize();
-} catch(error) {
-	// Fail silently
-}
