@@ -71,8 +71,8 @@ jekyll-minifier:
 workbox:
   precache_glob_directory: /
   precache_glob_patterns:
-    - 'index.html' #: ['/', 'projects/']
-    - 'about/index.html' #: about/
+    - 'index.html': ['/', 'projects/']
+    - 'about/index.html': about/
     - /404.html
     - /offline.html
 

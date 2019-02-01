@@ -76,7 +76,7 @@ GEM
       jekyll (~> 3.3)
     jekyll-watch (2.1.2)
       listen (~> 3.0)
-    jekyll-workbox-plugin (0.0.1)
+    jekyll-workbox-plugin (0.0.2)
     json (2.1.0)
     json-minify (0.0.3)
       json (> 0)
