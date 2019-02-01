@@ -74,7 +74,7 @@ workbox:
     - 'index.html' #: ['/', 'projects/']
     - 'about/index.html' #: about/
     - /404.html
-    - /offline/index.html
+    - /offline.html
 
 # Build settings
 markdown: kramdown
