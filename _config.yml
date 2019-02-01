@@ -71,7 +71,6 @@ jekyll-minifier:
 workbox:
   precache_glob_directory: /
   precache_glob_patterns:
-    - "assets/*.{js,css,svg,json}"
     - index.html
     - about/index.html
     - /404.html
