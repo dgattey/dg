@@ -114,7 +114,7 @@ $font-styles: 'display' 'nav' 'head' 'body' 'code';
 html {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
     font-feature-settings: "kern" 1;
     font-kerning: normal;
 }
