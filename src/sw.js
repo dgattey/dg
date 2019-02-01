@@ -29,6 +29,11 @@ self.addEventListener('controllerchange',
 );
 
 /**
+ * Enables navigation preload which we use in our default handler
+ */
+workbox.navigationPreload.enable();
+
+/**
  * Google Analytics
  * - Now available while offline! It'll send when back online
  */
@@ -111,6 +116,14 @@ workbox.routing.registerRoute(
  */
 const fetchWithOfflineFallback = async (args) => {
 	try {
+		// Use the preloaded response, if it's there
+		console.log(args);
+		const preloadResponse = await args.preloadResponse;
+		if (preloadResponse) {
+			return preloadResponse;
+		}
+
+		// Otherwise, try network first with a fallback to the offline page
 		const response = await workbox.strategies.networkFirst().handle(args);
 		return response || await caches.match(offlinePage);
 	} catch (error) {
