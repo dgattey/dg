@@ -8,7 +8,7 @@
  * - Skip waiting and claim clients so we take over from any old workers
  * - Also make sure that if we are an old worker, we force reload the page to get freshest stuff
  */
-const offlinePage = '/offline/index.html';
+const offlinePage = '/offline.html';
 workbox.core.setCacheNameDetails({
 	precache: 'precache',
 	prefix: 'dg',
