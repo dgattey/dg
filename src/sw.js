@@ -12,8 +12,8 @@ const offlinePage = '/offline/index.html';
 workbox.core.setCacheNameDetails({
 	precache: 'precache',
 	prefix: 'dg',
-	suffix: 'v1',
-	runtime: 'runtime',
+	suffix: 'prod',
+	runtime: 'site',
 });
 workbox.skipWaiting();
 workbox.clientsClaim();
@@ -50,7 +50,7 @@ workbox.routing.registerRoute(
 workbox.routing.registerRoute(
 	/^https?:\/\/use\.typekit\.net/,
 	workbox.strategies.staleWhileRevalidate({
-		cacheName: 'typekit',
+		cacheName: 'static',
 		plugins: [
 			new workbox.cacheableResponse.Plugin({
 				statuses: [0, 200],
@@ -61,7 +61,7 @@ workbox.routing.registerRoute(
 workbox.routing.registerRoute(
 	/^https?:\/\/p\.typekit\.net/,
 	workbox.strategies.cacheFirst({
-		cacheName: 'typekit-static',
+		cacheName: 'fonts-static',
 		plugins: [
 			new workbox.cacheableResponse.Plugin({
 				statuses: [0, 200],
