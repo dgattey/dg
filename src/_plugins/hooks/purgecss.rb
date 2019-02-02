@@ -1,18 +1,23 @@
-# Assumes site is under `build`
+# frozen_string_literal: true
+
+@config_file = '.tmp/purgecss.js'
+@build_directory = 'build'
+@temp_directory = '.tmp'
+
 Jekyll::Hooks.register(:site, :post_write) do |_site|
-	config_file = '.tmp/purgecss.js'
-	# Make sure we delete the config file
-	FileUtils.mkdir('.tmp') unless Dir.exist?('.tmp')
-	File.delete(config_file) if File.exist?(config_file)
-	# Configuration JS to write to the file. (Docs: https://www.purgecss.com/configuration)
-	config_text = """module.exports = #{{
-	# Wildcard glob of the site's HTML files.
-	content: ['build/**/*.html'],
-	# CSS file in the expected output directory.
-	css: [Dir.glob('build/assets/*.css').first],
-	whitelist: %w(shadow-weak)
-	}.stringify_keys.to_json}"""
-	# Write configuration file & run command
-	File.open(config_file, 'w+') { |f| f.write(config_text) }
-	system("purgecss --config #{config_file} --out build/assets")
+  FileUtils.mkdir(@temp_directory) unless Dir.exist?(@temp_directory)
+
+  # Make sure we delete the config file
+  File.delete(@config_file) if File.exist?(@config_file)
+
+  # Configuration JS to write to the file. (Docs: https://www.purgecss.com/configuration)
+  config_text = ''"module.exports = #{{
+  content: [@build_directory + '/**/*.html'],
+  css: [Dir.glob(@build_directory + '/assets/*.css').first],
+  whitelist: %w[shadow-weak]
+  }.stringify_keys.to_json}"''
+
+  # Write configuration file & run command
+  File.open(@config_file, 'w+') { |f| f.write(config_text) }
+  system("purgecss --config #{@config_file} --out #{@build_directory}/assets")
 end
