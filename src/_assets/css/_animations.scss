@@ -48,7 +48,7 @@ $ease-in-out-back: cubic-bezier(.68, -.55, .265, 1.55);
 }
 
 .scale-down-on-hover {
-  $hover-scale: 0.96;
+  $hover-scale: .96;
 
   &:hover {
     transform: scale($hover-scale);

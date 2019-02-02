@@ -4,7 +4,7 @@
 
 html,
 body {
-  /*! Ensures that the font size scales correctly across the site **/
+  // Ensures that the font size scales correctly across the site
   font-size: $html-font-size;
 }
 
@@ -19,7 +19,7 @@ body {
 }
 
 .content {
-  /*! Accounts for sticky header by pushing all content down **/
+  // Accounts for sticky header by pushing all content down
   @extend %standard-inset;
 }
 
