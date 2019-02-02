@@ -22,5 +22,6 @@ Please note we have a code of conduct, please follow it in all your interactions
    merge it for you.
 
 ## Code of Conduct
+
 All your interactions with `dg` must abide by the code of conduct. Take a look at the 
 [Code of Conduct](https://github.com/dgattey/dg/blob/master/CODE_OF_CONDUCT.md) before contributing.

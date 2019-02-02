@@ -8,19 +8,24 @@ assignees: dgattey
 ---
 
 # Describe the bug
+
 <!--- A clear and concise description of what the bug is. -->
 
 ## To Reproduce
-<!--- Steps to reproduce the behavior: -->
-1. <!-- Visit page X, scroll down, click, etc -->
 
-# Expected behavior
+<!--- Steps to reproduce the behavior: -->
+<!-- Visit page X, scroll down, click, etc -->
+
+## Expected behavior
+
 <!-- A clear and concise description of what you expected to happen. -->
 
-# Screenshots
+## Screenshots
+
 <!-- If applicable, add screenshots to help explain your problem. -->
 
-# Metadata if applicable:
+## Metadata if applicable:
+
  <!-- OS: [e.g. iOS] -->
  <!-- Browser [e.g. chrome, safari] -->
  <!-- Browser version [e.g. 64.6] -->
