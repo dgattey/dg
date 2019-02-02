@@ -9,7 +9,7 @@ assignees: dgattey
 
 # Describe the slowdown or manifestation of the problem
 
-<!-- A clear and concise description of what the sitespeed problem is. Ex. CSS isn't minified, which [...] -->
+<!-- A clear and concise description of the sitespeed regression/problem -->
 
 ## Describe the solution you'd like
 
