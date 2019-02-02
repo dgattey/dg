@@ -8,10 +8,10 @@
   padding: $item-spacing-4;
 
   @include for-tablet-up {
-    // Pulls showcase to the right
     grid-row-end: span 2;
+
     &:nth-child(2) {
-      grid-row-start: 1;
+      grid-row-start: 1; // Pulls showcase to the right
     }
   }
 

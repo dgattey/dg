@@ -9,7 +9,14 @@ linters:
     extra_properties:
       - grid-column-gap
       - grid-row-gap
+      - grid-gap
       - grid-template-columns
       - grid-template-rows
+      - grid-column-start
+      - grid-row-start
       - grid-column-end
       - grid-row-end
+  PropertyUnits:
+    enabled: true
+    properties:
+      grid-template-columns: ['fr']
