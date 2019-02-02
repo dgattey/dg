@@ -114,9 +114,13 @@ $font-styles: 'display' 'nav' 'head' 'body' 'code';
   $fam: '--font-family-#{$type}';
   $weight: '--font-weight-#{$type}';
 
-  .#{$type}-font-style {
+  %#{$type}-font-style {
     font-family: var(unquote($fam));
     font-weight: var(unquote($weight));
+  }
+
+  .#{$type}-font-style {
+    @extend %#{$type}-font-style;
   }
 }
 
@@ -139,13 +143,13 @@ html {
 h1,
 h2,
 h3 {
-  @extend .display-font-style;
+  @extend %display-font-style;
 }
 
 h4,
 h5,
 h6 {
-  @extend .head-font-style;
+  @extend %head-font-style;
 }
 
 @for $header-level from 1 through 6 {
@@ -158,10 +162,10 @@ h6 {
 // Regular (non-header) text styling
 // =====
 
-@include text('.body-font-style-size', 0);
-@include text('.code-font-size', -1);
+@include text('%body-font-style-size', 0);
+@include text('%code-font-size', -1);
 
-.body-font-style-size {
+%body-font-style-size {
   max-width: $text-max-width;
 }
 
@@ -170,8 +174,8 @@ input,
 button,
 select,
 textarea {
-  @extend .body-font-style;
-  @extend .body-font-style-size;
+  @extend %body-font-style;
+  @extend %body-font-style-size;
 }
 
 // =====
@@ -193,8 +197,8 @@ a {
 
 code,
 pre {
-  @extend .code-font-style;
-  @extend .code-font-size;
+  @extend %code-font-style;
+  @extend %code-font-size;
   overflow: auto;
 
   @include for-phone-up {
@@ -207,7 +211,7 @@ pre {
 }
 
 .highlight {
-  padding: 1rem;
-  max-width: 64rem;
   border-radius: 1em;
+  max-width: 64rem;
+  padding: 1rem;
 }

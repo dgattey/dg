@@ -3,14 +3,15 @@
 // =====
 
 $spread: $item-spacing-4 + $item-spacing-3;
-$strong-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.15);
-$weak-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.1);
+$strong-shadow: 0 $item-spacing-3 $spread rgba(0, 0, 0, .15);
+$weak-shadow: 0 $item-spacing-3 $spread rgba(0, 0, 0, .1);
 
 .shadow-strong {
   box-shadow: $strong-shadow;
 }
 
-.shadow-weak, .shadow-strong:hover {
+.shadow-weak,
+.shadow-strong:hover {
   box-shadow: $weak-shadow;
 }
 

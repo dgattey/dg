@@ -3,14 +3,14 @@
 // =====
 
 // Raw white - black color values
-$color-dim: #000000;
-$color-deep: #433D3A;
+$color-dim: #000;
+$color-deep: #433d3a;
 $color-muted: lighten($color-deep, 12%);
 $color-bright: #eceff1; // OR #f1eafb;
-$color-brightest: #FFFFFF;
+$color-brightest: #fff;
 
 // Colorful raw color values
-$color-green: #1CD1A5;
+$color-green: #1cd1a5;
 $color-red: #ee5050;
 $color-blue: #04a5e5;
 

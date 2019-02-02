@@ -37,7 +37,7 @@ nav {
 .logo-wrapper,
 .nav-item {
   // Ensures uniform text size on nav items to follow body
-  @extend .body-font-style-size;
+  @extend %body-font-style-size;
   align-self: center;
   margin-bottom: 0; // resets the inherited value
 }

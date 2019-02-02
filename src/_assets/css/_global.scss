@@ -27,11 +27,6 @@ body {
 // Text selection
 // =====
 
-::-moz-selection {
-  background: $color-primary-dim;
-  color: $color-text-light;
-}
-
 ::selection {
   background: $color-primary-dim;
   color: $color-text-light;
