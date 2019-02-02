@@ -1,0 +1,9 @@
+rules:
+  mixins-before-declarations:
+    -
+      exclude:
+        - for-phone-only
+        - for-phone-up
+        - for-tablet-up
+        - for-desktop-up
+        - for-max-size-only
