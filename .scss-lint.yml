@@ -1,4 +1,7 @@
 linters:
   LeadingZero:
     enabled: true
-    style: include_zero # or 'exclude_zero'
+    style: exclude_zero # or 'include_zero'
+  StringQuotes:
+    enabled: true
+    style: single_quotes # or double_quotes
