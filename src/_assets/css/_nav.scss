@@ -85,10 +85,18 @@ nav {
 .nav-link {
   color: $color-text-dark;
   position: relative;
+
+  &:hover {
+    color: $color-text-dark;
+  }
 }
 
 .nav-active {
   color: $color-primary-bright;
+
+  &:hover {
+    color: $color-primary-bright;
+  }
 }
 
 .nav-inactive {

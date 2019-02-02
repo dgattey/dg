@@ -2,20 +2,27 @@
 // Font-specific variables & mixins (defined here for ease of use below)
 // =====
 
+// Sass lint doesn't support root properties right - here's a workaround
+@mixin root-prop($prop: null, $values...) {
+  @if ($prop) {
+    #{$prop}: $values;
+  }
+}
+
 :root {
   // Families
-  --font-family-body: lft-etica, sans-serif;
-  --font-family-code: source-code-pro, monospace;
-  --font-family-display: lft-etica, sans-serif;
-  --font-family-head: lft-etica, sans-serif;
-  --font-family-nav: lft-etica, sans-serif;
+  @include root-prop(--font-family-body, lft-etica, sans-serif);
+  @include root-prop(--font-family-code, source-code-pro, monospace);
+  @include root-prop(--font-family-display, lft-etica, sans-serif);
+  @include root-prop(--font-family-head, lft-etica, sans-serif);
+  @include root-prop(--font-family-nav, lft-etica, sans-serif);
 
   // Weights
-  --font-weight-body: 400;
-  --font-weight-code: 400;
-  --font-weight-display: 600;
-  --font-weight-head: 800;
-  --font-weight-nav: 700;
+  @include root-prop(--font-weight-body, 400);
+  @include root-prop(--font-weight-code, 400);
+  @include root-prop(--font-weight-display, 600);
+  @include root-prop(--font-weight-head, 800);
+  @include root-prop(--font-weight-nav, 700);
 }
 
 // Base variables
