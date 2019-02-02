@@ -9,7 +9,7 @@ assignees: dgattey
 
 # Problem prompting this feature request if any
 
-<!-- A clear and concise description of what the problem is. Ex. I'm always frustrated when [...] -->
+<!-- A clear and concise description of the problem -->
 
 ## Describe the solution you'd like
 
@@ -17,8 +17,8 @@ assignees: dgattey
 
 ## Alternatives you've considered
 
-<!-- A clear and concise description of any alternative solutions or features you've considered. -->
+<!-- A clear and concise description of any alternative solutions -->
 
 ## Additional context
 
-<!-- Add any other context or screenshots about the feature request here. -->
+<!-- Add any other context or screenshots here. -->
