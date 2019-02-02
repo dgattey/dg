@@ -1,6 +1,6 @@
-/*!
- * Animation & transition support as mixins and includes
-**/
+// =====
+// Animation & transition support as mixins and includes
+// =====
 
 // Constants for animations and transitions
 $quick-animation-duration: 167ms;
@@ -50,7 +50,7 @@ $ease-in-out-back: cubic-bezier(.68, -.55, .265, 1.55);
 .scale-down-on-hover {
   $hover-scale: .96;
 
-  &::hover {
+  &:hover {
     transform: scale($hover-scale);
   }
 }
@@ -58,7 +58,7 @@ $ease-in-out-back: cubic-bezier(.68, -.55, .265, 1.55);
 .scale-up-on-hover {
   $hover-scale: 1.05;
 
-  &::hover {
+  &:hover {
     transform: scale($hover-scale);
   }
 }

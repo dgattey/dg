@@ -1,6 +1,7 @@
-/*!
- * Mixins and extensions to be used globally
-**/
+// =====
+// Mixins and extensions to be used globally
+// =====
+
 $spread: $item-spacing-4 + $item-spacing-3;
 $strong-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.15);
 $weak-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.1);
@@ -17,7 +18,10 @@ $weak-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.1);
   border-radius: $item-spacing-1;
 }
 
-// Helps with media queries to reduce typing
+// =====
+// Breakpoints
+// =====
+
 @mixin for-phone-up {
   @content;
 }

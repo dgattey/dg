@@ -1,6 +1,6 @@
-/*!
- * Global, base styles to ensure the rest is applied correctly
-**/
+// =====
+// Global, base styles to ensure the rest is applied correctly
+// =====
 
 html,
 body {
@@ -23,9 +23,9 @@ body {
   @extend %standard-inset;
 }
 
-/*!
- * Text selection
-**/
+// =====
+// Text selection
+// =====
 
 ::-moz-selection {
   background: $color-primary-dim;

@@ -1,6 +1,6 @@
-/*!
- * Footer styling for the global footer that appears on every page.
-**/
+// =====
+// Footer styling for the global footer that appears on every page.
+// =====
 
 footer {
   $border-weight: 1px;
@@ -30,7 +30,7 @@ footer {
     padding: 0 $padding;
   }
 
-  &::hover > path {
+  &:hover > path {
     fill: $color-primary-dim;
   }
 

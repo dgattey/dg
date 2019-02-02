@@ -1,15 +1,15 @@
-  /*!
- * Styles the global site nav (implemented as a sticky fixed header at the top of every
- * page). Handles animations across it too.
-**/
+// =====
+// Styles the global site nav (implemented as a sticky fixed header at the top of every
+// page). Handles animations across it too.
+// =====
 
 $nav-grid-columns: 2 * ($grid-standard-columns - 1);
 $underline-height: 3px;
 
 .header-nav {
   left: 0;
-  right: 0;
   position: fixed;
+  right: 0;
   top: 0;
   z-index: $depth-4;
 }
@@ -77,7 +77,7 @@ nav {
   margin: 0;
   text-transform: uppercase;
 
-  &::hover {
+  &:hover {
     transform: translateY(- $underline-height / 2);
   }
 }
@@ -100,8 +100,8 @@ nav {
     content: '';
     height: $underline-height;
     left: 0;
-    right: 0;
     position: absolute;
+    right: 0;
   }
 
   &::before {
@@ -116,8 +116,8 @@ nav {
     transition: transform $animation-duration $ease-out-back, opacity $animation-duration;
   }
 
-  &::hover,
-  &::focus {
+  &:hover,
+  &:focus {
     &::before,
     &::after {
       @extend %show;

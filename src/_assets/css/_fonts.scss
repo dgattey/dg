@@ -1,6 +1,6 @@
-/*!
- * Font-specific variables & mixins (defined here for ease of use below)
-**/
+// =====
+// Font-specific variables & mixins (defined here for ease of use below)
+// =====
 
 :root {
   // Families
@@ -30,9 +30,9 @@ $font-size-proportion: 1.09;
 $line-height-proportion: 1.09;
 $header-multiplier: 2.5;
 
-/*!
- * Raises a number to a power
-**/
+// =====
+// Raises a number to a power
+// =====
 @function pow($number, $power) {
   $value: 1;
   @if $power > 0 {
@@ -43,9 +43,9 @@ $header-multiplier: 2.5;
   @return $value;
 }
 
-/*!
- * Calculates the level, given a level and is header flag to apply a multiplier.
-**/
+// =====
+// Calculates the level, given a level and is header flag to apply a multiplier.
+// =====
 @function calculate-level($level, $is-header) {
   @if $is-header {
     @return round($level * $header-multiplier);
@@ -53,11 +53,11 @@ $header-multiplier: 2.5;
   @return $level;
 }
 
-/*!
- * Generates font size and line height declarations when included in an element, using
- * a standard rhythm. The configurable level dictates how many levels larger than
- * normal the font should be, and an additional modifier to add onto the level.
-**/
+// =====
+// Generates font size and line height declarations when included in an element, using
+// a standard rhythm. The configurable level dictates how many levels larger than
+// normal the font should be, and an additional modifier to add onto the level.
+// =====
 @mixin text-body($level, $level-modifier: 0) {
   $base-line-height: $base-font-size * $base-line-height-proportion;
   font-size: $base-font-size * pow($font-size-proportion, $level + $level-modifier);
@@ -65,9 +65,9 @@ $header-multiplier: 2.5;
   margin-bottom: $base-margin-bottom;
 }
 
-/*!
- * Includes `text-body` for both normal level and emphasized (adds one level).
-**/
+// =====
+// Includes `text-body` for both normal level and emphasized (adds one level).
+// =====
 @mixin text-body-with-emphasized($level) {
   @include text-body($level);
 
@@ -76,10 +76,10 @@ $header-multiplier: 2.5;
   }
 }
 
-/*!
- * Includes `text-body-with-emphasized` on the `element`, with a particular `level` and
- * `header` modifier.
-**/
+// =====
+// Includes `text-body-with-emphasized` on the `element`, with a particular `level` and
+// `header` modifier.
+// =====
 @mixin text($element, $level, $is-header: false) {
   $level: calculate-level($level, $is-header);
 
@@ -98,9 +98,10 @@ $header-multiplier: 2.5;
   }
 }
 
-/*!
- * Includes all the font styles, using CSS variables
-**/
+// =====
+// Includes all the font styles, using CSS variables
+// =====
+
 $font-styles: 'display' 'nav' 'head' 'body' 'code';
 @each $type in $font-styles {
   $fam: '--font-family-#{$type}';
@@ -112,9 +113,9 @@ $font-styles: 'display' 'nav' 'head' 'body' 'code';
   }
 }
 
-/*!
- * Defines standard font styles & sizes across the full site.
-**/
+// =====
+// Defines standard font styles & sizes across the full site.
+// =====
 
 html {
   font-feature-settings: 'kern' 1;
@@ -124,9 +125,10 @@ html {
   text-size-adjust: 100%;
 }
 
-/*!
- * Header styling
-**/
+// =====
+// Header styling
+// =====
+
 h1,
 h2,
 h3 {
@@ -145,9 +147,9 @@ h6 {
 }
 @include text(h1, 6, $is-header: true);
 
-/*!
- * Regular (non-header) text styling
-**/
+// =====
+// Regular (non-header) text styling
+// =====
 
 @include text('.body-font-style-size', 0);
 @include text('.code-font-size', -1);
@@ -165,22 +167,22 @@ textarea {
   @extend .body-font-style-size;
 }
 
-/*!
- * Links
-**/
+// =====
+// Links
+// =====
 
 a {
   color: $color-primary-bright;
   text-decoration: none;
 
-  &::hover {
+  &:hover {
     color: $color-primary-dim;
   }
 }
 
-/*!
- * Code
-**/
+// =====
+// Code
+// =====
 
 code,
 pre {

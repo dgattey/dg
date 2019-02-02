@@ -1,7 +1,7 @@
-/*!
- * Styles the project card component on the the main index page as nested under project-grid
- * - pages: index.html
-**/
+// =====
+// Styles the project card component on the the main index page as nested under project-grid
+// - pages: index.html
+// =====
 
 .proj-card {
   color: $color-brightest;
@@ -30,7 +30,7 @@
   }
 
   // Hover state
-  &::hover {
+  &:hover {
     color: $color-brightest;
   }
 
