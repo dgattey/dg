@@ -1,6 +1,6 @@
 /*global workbox:true*/
 /*eslint no-undef: "error"*/
-'use strict';
+"use strict";
 
 /**
  * Configuration & setup
@@ -8,17 +8,21 @@
  * - Skip waiting and claim clients so we take over from any old workers
  * - Also make sure that if we are an old worker, we force reload the page to get freshest stuff
  */
-const offlinePage = '/offline.html';
+const staticCacheName = "static";
+const fontCacheName = "fonts-static";
+const imageCacheName = "images";
+const analyticsCacheName = "google-analytics";
+const offlinePage = "/offline.html";
 workbox.core.setCacheNameDetails({
-	precache: 'precache',
-	prefix: 'dg',
-	suffix: 'prod',
-	runtime: 'site',
+	precache: "precache",
+	prefix: "dg",
+	suffix: "prod",
+	runtime: "site",
 });
 workbox.skipWaiting();
 workbox.clientsClaim();
 var isRefreshing;
-self.addEventListener('controllerchange',
+self.addEventListener("controllerchange",
 	function() {
 		if (isRefreshing) {
 			return;
@@ -38,7 +42,7 @@ workbox.navigationPreload.enable();
  * - Now available while offline! It'll send when back online
  */
 workbox.googleAnalytics.initialize({
-	cacheName: 'google-analytics'
+	cacheName: analyticsCacheName
 });
 
 /**
@@ -58,7 +62,7 @@ workbox.precaching.precacheAndRoute([]);
 workbox.routing.registerRoute(
 	/.*\.(?:js|css|json)$/,
 	workbox.strategies.staleWhileRevalidate({
-		cacheName: 'static'
+		cacheName: staticCacheName
 	})
 );
 workbox.routing.registerRoute(
@@ -72,7 +76,7 @@ workbox.routing.registerRoute(
 workbox.routing.registerRoute(
 	/^https?:\/\/use\.typekit\.net/,
 	workbox.strategies.staleWhileRevalidate({
-		cacheName: 'static',
+		cacheName: staticCacheName,
 		plugins: [
 			new workbox.cacheableResponse.Plugin({
 				statuses: [0, 200],
@@ -83,7 +87,7 @@ workbox.routing.registerRoute(
 workbox.routing.registerRoute(
 	/^https?:\/\/p\.typekit\.net/,
 	workbox.strategies.cacheFirst({
-		cacheName: 'fonts-static',
+		cacheName: fontCacheName,
 		plugins: [
 			new workbox.cacheableResponse.Plugin({
 				statuses: [0, 200],
@@ -95,16 +99,16 @@ workbox.routing.registerRoute(
 	})
 );
 workbox.routing.registerRoute(
-  /\.(?:png|gif|jpg|jpeg|svg|webp)$/,
-  workbox.strategies.cacheFirst({
-	cacheName: 'images',
-	plugins: [
-	  new workbox.expiration.Plugin({
-		maxEntries: 60,
-		maxAgeSeconds: 60 * 60 * 24 * 30,
-	  }),
-	],
-  }),
+	/\.(?:png|gif|jpg|jpeg|svg|webp)$/,
+	workbox.strategies.cacheFirst({
+		cacheName: imageCacheName,
+		plugins: [
+			new workbox.expiration.Plugin({
+				maxEntries: 60,
+				maxAgeSeconds: 60 * 60 * 24 * 30,
+			}),
+		],
+	}),
 );
 
 /**
@@ -117,7 +121,6 @@ workbox.routing.registerRoute(
 const fetchWithOfflineFallback = async (args) => {
 	try {
 		// Use the preloaded response, if it's there
-		console.log(args);
 		const preloadResponse = await args.preloadResponse;
 		if (preloadResponse) {
 			return preloadResponse;
@@ -132,12 +135,12 @@ const fetchWithOfflineFallback = async (args) => {
 };
 workbox.routing.setDefaultHandler(fetchWithOfflineFallback);
 workbox.routing.setCatchHandler(({event}) => {
-	if (event.request.cache === 'only-if-cached' &&
-		event.request.mode !== 'same-origin') {
+	if (event.request.cache === "only-if-cached" &&
+		event.request.mode !== "same-origin") {
 		return new Response();
 	}
 	switch (event.request.destination) {
-	case 'document':
+	case "document":
 		return caches.match(offlinePage);
 	default:
 		return Response.error();
