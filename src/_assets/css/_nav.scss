@@ -4,134 +4,133 @@
  */
 
 .header-nav {
-	position: fixed;
-	top: 0;
-	left: 0;
-	right: 0;
-	z-index: $depth-4;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: $depth-4;
 }
 
 nav {
-	$underline-height: 3px;
-	$nav-grid-columns: 2 * ($grid-standard-columns - 1);
-	@extend %max-width-element;
+    $underline-height: 3px;
+    $nav-grid-columns: 2 * ($grid-standard-columns - 1);
+    @extend %max-width-element;
 
-	%nav-grid {
-		display: grid;
+    %nav-grid {
+        display: grid;
 
-		@include for-phone-up {
-			grid-column-gap: $item-spacing-4;
-		}
+        @include for-phone-up {
+            grid-column-gap: $item-spacing-4;
+        }
 
-		@include for-tablet-up {
-			grid-column-gap: $item-spacing-4;
-		}
+        @include for-tablet-up {
+            grid-column-gap: $item-spacing-4;
+        }
 
-		@include for-desktop-up {
-			grid-column-gap: $item-spacing-3;
-		}
-	}
+        @include for-desktop-up {
+            grid-column-gap: $item-spacing-3;
+        }
+    }
 
-	// Ensures uniform text size on nav items to follow body
-	.logo-wrapper,
-	.nav-item {
-		@extend .body-font-style-size;
-		align-self: center;
-		margin-bottom: 0; // resets the inherited value
-	}
+    // Ensures uniform text size on nav items to follow body
+    .logo-wrapper,
+    .nav-item {
+        @extend .body-font-style-size;
+        align-self: center;
+        margin-bottom: 0; // resets the inherited value
+    }
 
-	.logo-wrapper {
-		grid-column-end: span 2;
-		margin: 0;
-		justify-self: start;
-		align-self: center;
-	}
+    .logo-wrapper {
+        grid-column-end: span 2;
+        margin: 0;
+        justify-self: start;
+        align-self: center;
+    }
 
-	.logo {
-		font-size: 2.3em;
-		line-height: 1;
-		letter-spacing: -.12em;
-		display: inline-block; // This is to allow it to scale on hover
-	}
+    .logo {
+        font-size: 2.3em;
+        line-height: 1;
+        letter-spacing: -.12em;
+        display: inline-block; // This is to allow it to scale on hover
+    }
 
-	.nav-items {
-		background: $color-bg;
-		margin: 0;
-		@extend %nav-padding;
-		@extend %nav-grid;
-		grid-template-columns: repeat($nav-grid-columns, 1fr);
+    .nav-items {
+        background: $color-bg;
+        margin: 0;
+        @extend %nav-padding;
+        @extend %nav-grid;
+        grid-template-columns: repeat($nav-grid-columns, 1fr);
 
-		& * {
-			list-style: none;
-		}
-	}
+        & * {
+            list-style: none;
+        }
+    }
 
-	.nav-item {
-		text-transform: uppercase;
-		display: inline-block;
-		margin: 0;
-		justify-self: start;
-		align-self: center;
-		@include transition-bounce(transform);
-		grid-column-end: span 4;
+    .nav-item {
+        text-transform: uppercase;
+        display: inline-block;
+        margin: 0;
+        justify-self: start;
+        align-self: center;
+        @include transition-bounce(transform);
+        grid-column-end: span 4;
 
-		&:hover {
-			transform: translateY(- $underline-height / 2);
-		}
-	}
+        &:hover {
+            transform: translateY(- $underline-height / 2);
+        }
+    }
 
-	.nav-link {
-		color: $color-text-dark;
-		position: relative;
+    .nav-link {
+        color: $color-text-dark;
+        position: relative;
 
-		&.active {
-			color: $color-primary-bright;
-		}
+        &.active {
+            color: $color-primary-bright;
+        }
 
-		// Animation of the underlines
-		&.inactive {
+        // Animation of the underlines
+        &.inactive {
 
-			&:before,
-			&:after {
-				content: '';
-				position: absolute;
-				bottom: -$item-spacing-1;
-				left: 0;
-				right: 0;
-				height: $underline-height;
-				background-color: $color-primary-bright;
-			}
+            &:before,
+            &:after {
+                content: '';
+                position: absolute;
+                bottom: -$item-spacing-1;
+                left: 0;
+                right: 0;
+                height: $underline-height;
+                background-color: $color-primary-bright;
+            }
 
-			&:before {
-				@extend %hide;
-				transform: translateY(- $underline-height);
-				transition: transform 0s $ease-out-back, opacity 0s;
-			}
+            &:before {
+                @extend %hide;
+                transform: translateY(- $underline-height);
+                transition: transform 0s $ease-out-back, opacity 0s;
+            }
 
-			&:after {
-				@extend %hide;
-				transform: translateY($underline-height/2);
-				transition: transform $animation-duration $ease-out-back, opacity $animation-duration;
-			}
+            &:after {
+                @extend %hide;
+                transform: translateY($underline-height/2);
+                transition: transform $animation-duration $ease-out-back, opacity $animation-duration;
+            }
 
-			&:hover,
-			&:focus {
+            &:hover,
+            &:focus {
 
-				&:before,
-				&:after {
-					@extend %show;
-					transform: translateY(0);
-				}
+                &:before,
+                &:after {
+                    @extend %show;
+                    transform: translateY(0);
+                }
 
-				&:before {
-					transition: transform $animation-duration $ease-out-back, opacity $animation-duration;
-				}
+                &:before {
+                    transition: transform $animation-duration $ease-out-back, opacity $animation-duration;
+                }
 
-				&:after {
-					transition: transform 0s $animation-duration $ease-out-back, opacity 0s $animation-duration;
-				}
-			}
-		}
-	}
+                &:after {
+                    transition: transform 0s $animation-duration $ease-out-back, opacity 0s $animation-duration;
+                }
+            }
+        }
+    }
 }
-

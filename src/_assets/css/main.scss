@@ -3,27 +3,27 @@
 ---
 @charset 'utf-8';
 @import
-	// Normalizes css
-	'normalize/import-now',
+    // Normalizes css
+    'normalize/import-now',
 
-	// Configuration/shared objects
-	'global-constants',
-	'animations',
-	'mixins',
-	'fonts',
-	'syntax',
-	'padding',
+    // Configuration/shared objects
+    'global-constants',
+    'animations',
+    'mixins',
+    'fonts',
+    'syntax',
+    'padding',
 
-	// Templates appearing on multiple pages
-	'global',
-	'nav',
-	'footer',
-	'post',
-	'post-header',
-	'post-content',
+    // Templates appearing on multiple pages
+    'global',
+    'nav',
+    'footer',
+    'post',
+    'post-header',
+    'post-content',
 
-	// index.html
-	'intro',
-	'project-grid',
-	'project-card'
+    // index.html
+    'intro',
+    'project-grid',
+    'project-card'
 ;

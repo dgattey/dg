@@ -10,64 +10,64 @@ $ease-in-out-back: cubic-bezier(.68, -.55, .265, 1.55);
 
 // Adds support for adding multiple types of transitions
 @mixin transition($properties...) {
-	$final: ();
-	@each $item in $properties {
-		$final: append($final, ($item $animation-duration $ease-in-out-back unquote(',')));
-	}
-	transition: $final;
+    $final: ();
+    @each $item in $properties {
+        $final: append($final, ($item $animation-duration $ease-in-out-back unquote(',')));
+    }
+    transition: $final;
 }
 
 // Adds support for adding multiple types of transitions
 @mixin transition-linear($properties...) {
-	$final: ();
-	@each $item in $properties {
-		$final: append($final, ($item $quick-animation-duration linear unquote(',')));
-	}
-	transition: $final;
+    $final: ();
+    @each $item in $properties {
+        $final: append($final, ($item $quick-animation-duration linear unquote(',')));
+    }
+    transition: $final;
 }
 
 // Adds support for adding multiple types of transitions, with out-back timing function
 @mixin transition-bounce($properties...) {
-	$final: ();
-	@each $item in $properties {
-		$final: append($final, ($item $animation-duration $ease-out-back unquote(',')));
-	}
-	transition: $final;
+    $final: ();
+    @each $item in $properties {
+        $final: append($final, ($item $animation-duration $ease-out-back unquote(',')));
+    }
+    transition: $final;
 }
 
 .transition-shape {
-	@include transition(transform, color);
+    @include transition(transform, color);
 }
 
 .transition-bounce {
-	@include transition-bounce(transform, box-shadow);
+    @include transition-bounce(transform, box-shadow);
 }
 
 .transition-linear-shadow {
-	@include transition-linear(box-shadow);
+    @include transition-linear(box-shadow);
 }
 
 .scale-down-on-hover {
-	$hover-scale: .96;
+    $hover-scale: .96;
 
-	&:hover {
-		transform: scale($hover-scale);
-	}
+    &:hover {
+        transform: scale($hover-scale);
+    }
 }
 
 .scale-up-on-hover {
-	$hover-scale: 1.05;
+    $hover-scale: 1.05;
 
-	&:hover {
-		transform: scale($hover-scale);
-	}
+    &:hover {
+        transform: scale($hover-scale);
+    }
 }
 
 %show {
-	opacity: 1.0;
+    opacity: 1.0;
 }
 
 %hide {
-	@include transition(opacity);
-	opacity: 0;
+    @include transition(opacity);
+    opacity: 0;
 }
