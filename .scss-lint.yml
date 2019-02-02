@@ -11,3 +11,5 @@ linters:
       - grid-row-gap
       - grid-template-columns
       - grid-template-rows
+      - grid-column-end
+      - grid-row-end
