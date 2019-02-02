@@ -2,28 +2,27 @@
 // Imports all needed scss files from their various locations and defines config
 // =====
 @charset "UTF-8";
-@import
-    // Normalizes css
-    'normalize/import-now',
 
-    // Configuration/shared objects
-    'global-constants',
-    'animations',
-    'mixins',
-    'fonts',
-    'syntax',
-    'padding',
+// Normalizes css
+@import 'normalize/import-now';
 
-    // Templates appearing on multiple pages
-    'global',
-    'nav',
-    'footer',
-    'post',
-    'post-header',
-    'post-content',
+// Configuration/shared objects
+@import 'global-constants';
+@import 'animations';
+@import 'mixins';
+@import 'fonts';
+@import 'syntax';
+@import 'padding';
 
-    // index.html
-    'intro',
-    'project-grid',
-    'project-card'
-;
+// Templates appearing on multiple page
+@import 'global';
+@import 'nav';
+@import 'footer';
+@import 'post';
+@import 'post-header';
+@import 'post-content';
+
+// Index page
+@import 'intro';
+@import 'project-grid';
+@import 'project-card';

@@ -2,12 +2,12 @@
 
 # Dylan Gattey
 
-This is a redesign of <https://dylangattey.com> to a lightweight, mobile-friendly,
-polished exhibition of my projects/experiments. It's been a slow, unchanging 
-Wordpress site for years. I'm using a static site generator, 
-[Jekyll](https://jekyllrb.com/), to build it. It's hosted on 
-[Netlify](https://netlify.com), backed by [Cloudflare](https://cloudflare.com), with 
-continuous integration based off this repo.
+This is a redesign of <https://dylangattey.com> to a lightweight,
+mobile-friendly, polished exhibition of my projects/experiments. It's been
+a slow, unchanging Wordpress site for years. I'm using a static site
+generator, [Jekyll](https://jekyllrb.com/), to build it. It's hosted on
+[Netlify](https://netlify.com), backed by [Cloudflare](https://cloudflare.com),
+with continuous integration based off this repo.
 
 ## Initial Setup
 

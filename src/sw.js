@@ -9,7 +9,6 @@
  * - Also make sure that if we are an old worker, we force reload the page to get freshest stuff
  */
 const staticCacheName = "static";
-const fontCacheName = "fonts-static";
 const imageCacheName = "images";
 const analyticsCacheName = "google-analytics";
 const offlinePage = "/offline.html";
@@ -87,7 +86,7 @@ workbox.routing.registerRoute(
 workbox.routing.registerRoute(
 	/^https?:\/\/p\.typekit\.net/,
 	workbox.strategies.cacheFirst({
-		cacheName: fontCacheName,
+		cacheName: staticCacheName,
 		plugins: [
 			new workbox.cacheableResponse.Plugin({
 				statuses: [0, 200],
