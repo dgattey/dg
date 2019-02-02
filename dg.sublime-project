@@ -18,6 +18,7 @@
     {
         "tab_size": 4,
         "translate_tabs_to_spaces": true,
-        "use_tab_stops": true
+        "use_tab_stops": true,
+        "rulers": [80, 100, 120],
     },
 }
