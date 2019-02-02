@@ -1,35 +1,54 @@
-/*
- * Mixins and extensions to be used globally
- */
+// =====
+// Mixins and extensions to be used globally
+// =====
+
+$strong-shadow-color: rgba(0, 0, 0, .15);
+$weak-shadow-color: rgba(0, 0, 0, .1);
 $spread: $item-spacing-4 + $item-spacing-3;
-$strong-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.15);
-$weak-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.1);
+$strong-shadow: 0 $item-spacing-3 $spread $strong-shadow-color;
+$weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
 
 .shadow-strong {
-	box-shadow: $strong-shadow;
+  box-shadow: $strong-shadow;
 }
 
-.shadow-weak, .shadow-strong:hover {
-	box-shadow: $weak-shadow;
+.shadow-weak,
+.shadow-strong:hover {
+  box-shadow: $weak-shadow;
 }
 
 .round-corners {
-	border-radius: $item-spacing-1;
+  border-radius: $item-spacing-1;
 }
 
-// Helps with media queries to reduce typing
+// =====
+// Breakpoints
+// =====
+
 @mixin for-phone-up {
   @content;
 }
+
 @mixin for-phone-only {
-  @media (max-width: $breakpoint-min-tablet - 1) { @content; }
+  @media (max-width: $breakpoint-min-tablet - 1) {
+    @content;
+  }
 }
+
 @mixin for-tablet-up {
-  @media (min-width: $breakpoint-min-tablet) { @content; }
+  @media (min-width: $breakpoint-min-tablet) {
+    @content;
+  }
 }
+
 @mixin for-desktop-up {
-  @media (min-width: $breakpoint-min-desktop) { @content; }
+  @media (min-width: $breakpoint-min-desktop) {
+    @content;
+  }
 }
+
 @mixin for-max-size-only {
-  @media (min-width: $breakpoint-max-width) { @content; }
+  @media (min-width: $breakpoint-max-width) {
+    @content;
+  }
 }

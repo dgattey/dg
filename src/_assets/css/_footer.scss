@@ -1,41 +1,48 @@
-/*
- * Footer styling for the global footer that appears on every page.
- */
+// =====
+// Footer styling for the global footer that appears on every page.
+// =====
 
 footer {
-	$border-weight: 1px;
-	$height: $icon-size;
-	$padding: $height/2;
-	@extend %standard-inset;
-	margin-top: $item-spacing-3;
-	border-top: $border-weight solid $color-primary-dim;
-	.copy, ul, li {
-		display: inline-block;
-	}
-	p, ul {
-		height: $height;
-		margin: $padding 0;
-	}
-	ul {
-		float: right;
-	}
-	li {
-		padding: 0 $padding;
-	}
+  $border-weight: 1px;
+  $height: $icon-size;
+  $padding: $height / 2;
+  @extend %standard-inset;
+  border-top: $border-weight solid $color-primary-dim;
+  margin-top: $item-spacing-3;
 
-	.icon {
-	    &:hover > svg path {
-	        fill: $color-primary-dim;
-	    }
-	    > svg {
-	        display: inline-block;
-	        width: $icon-size;
-	        height: $icon-size;
-	        vertical-align: middle;
-	        path {
-	            @include transition(fill);
-	            fill: $color-primary-bright;
-	        }
-	    }
-	}
+  .copy,
+  ul,
+  li {
+    display: inline-block;
+  }
+
+  p,
+  ul {
+    height: $height;
+    margin: $padding 0;
+  }
+
+  ul {
+    float: right;
+  }
+
+  li {
+    padding: 0 $padding;
+  }
+
+  &:hover > path {
+    fill: $color-primary-dim;
+  }
+
+  .icon-github {
+    display: inline-block;
+    height: $icon-size;
+    vertical-align: middle;
+    width: $icon-size;
+  }
+
+  path {
+    @include transition(fill);
+    fill: $color-primary-bright;
+  }
 }

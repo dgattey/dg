@@ -26,7 +26,7 @@ url: "https://dylangattey.com"
 permalink: /projects/:title/ #posts
 baseurl: ""
 google_site_verification: U6mU3aPeTRaCoewYQype946HD1HrM9vY96GoEHKCAnc
-preconnect: 
+preconnect:
   - https://use.typekit.net
   - https://p.typekit.net
   - https://www.google-analytics.com
