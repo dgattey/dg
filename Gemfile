@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Gemfile for DG
-source "https://rubygems.org"
+source 'https://rubygems.org'
 
 group :jekyll_plugins do
   gem 'autoprefixer-rails'      # Autoprefixes css

@@ -34,12 +34,15 @@ $color-fff0f0: #fff0f0;
   background-color: $color-bright;
 }
 
-table td {
-  padding: 5px;
-}
+table {
 
-table pre {
-  margin: 0;
+  td {
+    padding: 5px;
+  }
+
+  pre {
+    margin: 0;
+  }
 }
 
 .c,

@@ -1,0 +1,6 @@
+engines:
+  markdownlint:
+    enabled: true
+    checks:
+      MD033:
+        enabled: false # Disables inline html for use in projects

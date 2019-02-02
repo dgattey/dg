@@ -8,7 +8,8 @@ var addOrRemoveClass = function() {
 	} else {
 		header.classList.remove(scrolledClass);
 	}
-}
+};
+
 // On scroll and load, add the class specified
 window.addEventListener("scroll", addOrRemoveClass);
 window.addEventListener("load", addOrRemoveClass);
