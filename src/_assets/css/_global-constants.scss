@@ -1,16 +1,16 @@
-/**
- * Allllll the global constants anything can access
- */
- 
+// =====
+// Allllll the global constants anything can access
+// =====
+
 // Raw white - black color values
-$color-dim: #000000;
-$color-deep: #433D3A;
+$color-dim: #000;
+$color-deep: #433d3a;
 $color-muted: lighten($color-deep, 12%);
 $color-bright: #eceff1; // OR #f1eafb;
-$color-brightest: #FFFFFF;
+$color-brightest: #fff;
 
 // Colorful raw color values
-$color-green: #1CD1A5;
+$color-green: #1cd1a5;
 $color-red: #ee5050;
 $color-blue: #04a5e5;
 
@@ -25,14 +25,14 @@ $color-text-active: $color-primary-dim;
 
 // Grids + breakpoints
 $grid-standard-columns: 12;
-$breakpoint-min-phone: 0px;
+$breakpoint-min-phone: 0;
 $breakpoint-min-tablet: 600px;
 $breakpoint-min-desktop: 900px;
 $breakpoint-max-width: 1200px;
 
 // Spacing
-$item-spacing-1: 0.375em;
-$item-spacing-2: 0.75em;
+$item-spacing-1: .375em;
+$item-spacing-2: .75em;
 $item-spacing-3: 1.5em;
 $item-spacing-4: 3em;
 $item-spacing-5: 6em;

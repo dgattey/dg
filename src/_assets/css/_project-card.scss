@@ -1,54 +1,53 @@
-/*
- * Styles the project card component on the the main index page as nested under project-grid
- * - pages: index.html
- */
+// =====
+// Styles the project card component on the the main index page as nested under project-grid
+// - pages: index.html
+// =====
 
 .proj-card {
+  color: $color-brightest;
+  padding: $item-spacing-4;
 
-	color: $color-brightest;
-	padding: $item-spacing-4;
+  @include for-tablet-up {
+    grid-row-end: span 2;
 
-	// Pulls showcase to the right
-	@include for-tablet-up {
-		grid-row-end: span 2;
-		&:nth-child(2) {
-			grid-row-start: 1;
-		}
-	}
+    &:nth-child(2) {
+      grid-row-start: 1; // Pulls showcase to the right
+    }
+  }
 
-	.type {
-		text-transform: uppercase;
-		font-variant: small-caps;
-		margin-top: 0.75em;
-	}
+  .type {
+    font-variant: small-caps;
+    margin-top: .75em;
+    text-transform: uppercase;
+  }
 
-	.title {
-		margin-top: 0.5em;
-	}
+  .title {
+    margin-top: .5em;
+  }
 
-	.desc {
-		margin-top: 5em;
-	}
+  .desc {
+    margin-top: 5em;
+  }
 
-	// Hover state
-	&:hover {
-		color: $color-brightest;
-	}
+  // Hover state
+  &:hover {
+    color: $color-brightest;
+  }
 
-	// Post specific styling
-	&.groups {
-		background: $color-red;
-	}
+  // Post specific styling
+  &.groups {
+    background: $color-red;
+  }
 
-	&.connected {
-		background: $color-muted;
-	}
+  &.connected {
+    background: $color-muted;
+  }
 
-	&.swhc {
-		background: $color-blue;
-	}
+  &.swhc {
+    background: $color-blue;
+  }
 
-	&.fppdx {
-		background: $color-green;
-	}
+  &.fppdx {
+    background: $color-green;
+  }
 }

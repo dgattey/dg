@@ -1,20 +1,22 @@
-/*
- * Styles the projects section of the main index page
- * - pages: index.html
- */
+// =====
+// Styles the projects section of the main index page
+// - pages: index.html
+// =====
 
 .proj-grid {
-	display: grid;
-	@include for-phone-up {
-		grid-gap: $item-spacing-4;
-		grid-template-columns: 1fr;
-	}
-	@include for-tablet-up {
-		grid-gap: $item-spacing-5;
-		grid-template-columns: repeat(2, 1fr);
-	}
+  display: grid;
+
+  @include for-phone-up {
+    grid-gap: $item-spacing-4;
+    grid-template-columns: 1fr;
+  }
+
+  @include for-tablet-up {
+    grid-gap: $item-spacing-5;
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 .showcase {
-	margin-bottom: 0;
+  margin-bottom: 0;
 }

@@ -1,149 +1,251 @@
+// =====
+// Styles the code blocks highlighted across the site
+// =====
+
+$color-000000: #000;
+$color-0000dd: #00d;
+$color-003366: #036;
+$color-003388: #038;
+$color-0044dd: #04d;
+$color-0066bb: #06b;
+$color-008800: #080;
+$color-22bb22: #2b2;
+$color-333333: #333;
+$color-3333bb: #33b;
+$color-336699: #369;
+$color-555555: #555;
+$color-666666: #666;
+$color-888888: #888;
+$color-a61717: #a61717;
+$color-aa0000: #a00;
+$color-aa6600: #a60;
+$color-bb0066: #b06;
+$color-bbbbbb: #bbb;
+$color-cc0000: #c00;
+$color-dd2200: #d20;
+$color-dd7700: #d70;
+$color-ddffdd: #dfd;
+$color-e3d2d2: #e3d2d2;
+$color-f0fff0: #f0fff0;
+$color-ffdddd: #fdd;
+$color-fff0f0: #fff0f0;
+
 .highlight {
-	background-color: $color-bright;
+  background-color: $color-bright;
 }
-.highlight table td { padding: 5px; }
-.highlight table pre { margin: 0; }
-.highlight .c, .highlight .cd, .highlight .cm, .highlight .c1 {
-	color: #888888;
+
+table td {
+  padding: 5px;
 }
-.highlight .cp {
-	color: #cc0000;
-	font-weight: bold;
+
+table pre {
+  margin: 0;
 }
-.highlight .cs {
-	color: #cc0000;
-	background-color: #fff0f0;
-	font-weight: bold;
+
+.c,
+.cd,
+.cm,
+.c1 {
+  color: $color-888888;
 }
-.highlight .err {
-	color: #a61717;
-	background-color: #e3d2d2;
+
+.cp {
+  color: $color-cc0000;
+  font-weight: bold;
 }
-.highlight .gr {
-	color: #aa0000;
+
+.cs {
+  background-color: $color-fff0f0;
+  color: $color-cc0000;
+  font-weight: bold;
 }
-.highlight .gh {
-	color: #333333;
+
+.err {
+  background-color: $color-e3d2d2;
+  color: $color-a61717;
 }
-.highlight .gu {
-	color: #666666;
+
+.gr {
+  color: $color-aa0000;
 }
-.highlight .gd {
-	color: #000000;
-	background-color: #ffdddd;
+
+.gh {
+  color: $color-333333;
 }
-.highlight .gi {
-	color: #000000;
-	background-color: #ddffdd;
+
+.gu {
+  color: $color-666666;
 }
-.highlight .ge {
-	font-style: italic;
+
+.gd {
+  background-color: $color-ffdddd;
+  color: $color-000000;
 }
-.highlight .gs {
-	font-weight: bold;
+
+.gi {
+  background-color: $color-ddffdd;
+  color: $color-000000;
 }
-.highlight .gl {
-	color: #888888;
+
+.ge {
+  font-style: italic;
 }
-.highlight .go {
-	color: #888888;
+
+.gs {
+  font-weight: bold;
 }
-.highlight .gp {
-	color: #555555;
+
+.gl {
+  color: $color-888888;
 }
-.highlight .gt {
-	color: #aa0000;
+
+.go {
+  color: $color-888888;
 }
-.highlight .k, .highlight .kc, .highlight .kd, .highlight .kn, .highlight .kr, .highlight .kv {
-	color: #008800;
-	font-weight: bold;
+
+.gp {
+  color: $color-555555;
 }
-.highlight .kp {
-	color: #008800;
+
+.gt {
+  color: $color-aa0000;
 }
-.highlight .kt {
-	color: #888888;
-	font-weight: bold;
+
+.k,
+.kc,
+.kd,
+.kn,
+.kr,
+.kv {
+  color: $color-008800;
+  font-weight: bold;
 }
-.highlight .m, .highlight .mf, .highlight .mh, .highlight .mi, .highlight .il, .highlight .mo, .highlight .mb, .highlight .mx {
-	color: #0000dd;
-	font-weight: bold;
+
+.kp {
+  color: $color-008800;
 }
-.highlight .s, .highlight .sb, .highlight .sc, .highlight .sd, .highlight .s2, .highlight .sh, .highlight .s1 {
-	color: #dd2200;
-	background-color: #fff0f0;
+
+.kt {
+  color: $color-888888;
+  font-weight: bold;
 }
-.highlight .se {
-	color: #0044dd;
-	background-color: #fff0f0;
+
+.m,
+.mf,
+.mh,
+.mi,
+.il,
+.mo,
+.mb,
+.mx {
+  color: $color-0000dd;
+  font-weight: bold;
 }
-.highlight .si {
-	color: #3333bb;
-	background-color: #fff0f0;
+
+.s,
+.sb,
+.sc,
+.sd,
+.s2,
+.sh,
+.s1 {
+  background-color: $color-fff0f0;
+  color: $color-dd2200;
 }
-.highlight .sx {
-	color: #22bb22;
-	background-color: #f0fff0;
+
+.se {
+  background-color: $color-fff0f0;
+  color: $color-0044dd;
 }
-.highlight .sr {
-	color: #008800;
+
+.si {
+  background-color: $color-fff0f0;
+  color: $color-3333bb;
 }
-.highlight .ss {
-	color: #aa6600;
-	background-color: #fff0f0;
+
+.sx {
+  background-color: $color-f0fff0;
+  color: $color-22bb22;
 }
-.highlight .na {
-	color: #336699;
+
+.sr {
+  color: $color-008800;
 }
-.highlight .nb, .highlight .bp {
-	color: #003388;
+
+.ss {
+  background-color: $color-fff0f0;
+  color: $color-aa6600;
 }
-.highlight .nc {
-	color: #bb0066;
-	font-weight: bold;
+
+.na {
+  color: $color-336699;
 }
-.highlight .no {
-	color: #003366;
-	font-weight: bold;
+
+.nb,
+.bp {
+  color: $color-003388;
 }
-.highlight .nd {
-	color: #555555;
+
+.nc {
+  color: $color-bb0066;
+  font-weight: bold;
 }
-.highlight .ne {
-	color: #bb0066;
-	font-weight: bold;
+
+.no {
+  color: $color-003366;
+  font-weight: bold;
 }
-.highlight .nf {
-	color: #0066bb;
-	font-weight: bold;
+
+.nd {
+  color: $color-555555;
 }
-.highlight .nl {
-	color: #336699;
+
+.ne {
+  color: $color-bb0066;
+  font-weight: bold;
 }
-.highlight .nn {
-	color: #bb0066;
-	font-weight: bold;
+
+.nf {
+  color: $color-0066bb;
+  font-weight: bold;
 }
-.highlight .py {
-	color: #336699;
-	font-weight: bold;
+
+.nl {
+  color: $color-336699;
 }
-.highlight .nt {
-	color: #bb0066;
-	font-weight: bold;
+
+.nn {
+  color: $color-bb0066;
+  font-weight: bold;
 }
-.highlight .nv, .highlight .vc {
-	color: #336699;
+
+.py {
+  color: $color-336699;
+  font-weight: bold;
 }
-.highlight .vg {
-	color: #dd7700;
+
+.nt {
+  color: $color-bb0066;
+  font-weight: bold;
 }
-.highlight .vi {
-	color: #3333bb;
+
+.nv,
+.vc {
+  color: $color-336699;
 }
-.highlight .ow {
-	color: #008800;
+
+.vg {
+  color: $color-dd7700;
 }
-.highlight .w {
-	color: #bbbbbb;
+
+.vi {
+  color: $color-3333bb;
+}
+
+.ow {
+  color: $color-008800;
+}
+
+.w {
+  color: $color-bbbbbb;
 }
