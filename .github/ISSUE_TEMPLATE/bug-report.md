@@ -24,7 +24,7 @@ assignees: dgattey
 
 <!-- If applicable, add screenshots to help explain your problem. -->
 
-## Metadata if applicable:
+## Metadata if applicable
 
  <!-- OS: [e.g. iOS] -->
  <!-- Browser [e.g. chrome, safari] -->
