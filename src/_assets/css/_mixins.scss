@@ -23,17 +23,25 @@ $weak-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.1);
 }
 
 @mixin for-phone-only {
-	@media (max-width: $breakpoint-min-tablet - 1) { @content; }
+	@media (max-width: $breakpoint-min-tablet - 1) {
+		@content;
+	}
 }
 
 @mixin for-tablet-up {
-	@media (min-width: $breakpoint-min-tablet) { @content; }
+	@media (min-width: $breakpoint-min-tablet) {
+		@content;
+	}
 }
 
 @mixin for-desktop-up {
-	@media (min-width: $breakpoint-min-desktop) { @content; }
+	@media (min-width: $breakpoint-min-desktop) {
+		@content;
+	}
 }
 
 @mixin for-max-size-only {
-	@media (min-width: $breakpoint-max-width) { @content; }
+	@media (min-width: $breakpoint-max-width) {
+		@content;
+	}
 }
