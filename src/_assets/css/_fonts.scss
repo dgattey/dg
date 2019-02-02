@@ -129,10 +129,10 @@ $font-styles: 'display' 'nav' 'head' 'body' 'code';
 // =====
 
 html {
-  font-feature-settings: 'kern' 1;
-  font-kerning: normal;
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
+  font-feature-settings: 'kern' 1;
+  font-kerning: normal;
   text-size-adjust: 100%;
 }
 

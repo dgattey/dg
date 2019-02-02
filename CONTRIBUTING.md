@@ -12,16 +12,16 @@ with the project.
 1. Ensure any install or build dependencies are removed before you open a
    request, based off one of the existing templates if possible.
 
-2. Update the README.md with details of changes to the interface, this includes
+1. Update the README.md with details of changes to the interface, this includes
    new gems, integrations, details about the process, variables, and useful
    file locations.
 
-3. Reference an issue if applicable (and most PRs should reference one).
+1. Reference an issue if applicable (and most PRs should reference one).
 
-4. Add the appropriate labels, milestones, and projects as necessary. Assign
+1. Add the appropriate labels, milestones, and projects as necessary. Assign
    to Dylan Gattey.
 
-5. You may merge the Pull Request in once you have the sign-off of a developer,
+1. You may merge the Pull Request in once you have the sign-off of a developer,
    or  if you do not have permission to do that, you may request the reviewer
    to merge it for you.
 

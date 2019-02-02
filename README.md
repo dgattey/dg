@@ -38,17 +38,17 @@ to install the following:
 ### Workflow
 
 1. Install the necessary gems with `bundle install`
-2. Build & serve the site with `bundle exec jekyll serve`
+1. Build & serve the site with `bundle exec jekyll serve`
 
 If you want autoreload, use `bundle exec jekyll liveserve`. The site files will
 live in `build` and be served on `http://localhost:4000/`.
 
-### Adding a new dependency?
+### Adding a new dependency
 
 Add an entry to the Gemfile, add to `plugins` in `_config.yml` as needed and
 rerun `bundle install`.
 
-### Changing/adding images?
+### Changing/adding images
 
 Use the `process-images` script after doing so. It will optimize/minify all jpg/png
 files. Additionally, it will convert those files to WebP versions and put them back
@@ -56,7 +56,7 @@ in the same folders. This allows `jekyll-assets` to properly copy all those file
 on build. It can take _FOREVER_ to run ImageOptim, so be patient. Also, you may need
 to run the script multiple times to get the best results.
 
-### Committing something?
+### Committing something
 
 We use feature branches in this repo + pull requests.
 [Create a PR](https://github.com/dgattey/dg/pulls), using a provided template
@@ -75,7 +75,7 @@ We're set up with [Cloudflare](https://cloudflare.com) managing DNS &
 Cloudflare's MX records point to [ZohoMail](https://zoho.com/mail), and points to
 Netlify as the site source. Headers/redirects are set up via `netlify.toml` rules.
 
-### Ready to deploy?
+### Deployment
 
 Every commit to `master` branch triggers a new deploy & publish on Netlify :tada:.
 By default, it uses `JEKYLL_ENV=production bundle exec jekyll build`. Merging a
