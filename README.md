@@ -1,5 +1,5 @@
 [![Netlify][nlfy-img]][nlfy] [![Codacy][cdy-img]][cdy] [![Factor][fcr-img]][fcr]
-[![Climate][cc-img]][cc] [![Scan][deep-img]][deep] [![LGTM][lgtm-img]][lgtm]
+[![Climate][cc-img]][cc] [![Scan][deep-img]][deep]
 
 # Dylan Gattey
 
@@ -140,5 +140,3 @@ Versions/milestones are as follows:
 [fcr]: https://www.codefactor.io/repository/github/dgattey/dg
 [deep-img]: https://deepscan.io/api/teams/2858/projects/4266/branches/34746/badge/grade.svg
 [deep]: https://deepscan.io/dashboard#view=project&tid=2858&pid=4266&bid=34746
-[lgtm-img]: https://img.shields.io/lgtm/alerts/g/dgattey/dg.svg?logo=lgtm&logoWidth=18
-[lgtm]: https://lgtm.com/projects/g/dgattey/dg/alerts/
