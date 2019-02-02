@@ -5,17 +5,17 @@
 :root {
   // Families
   --font-family-body: lft-etica, sans-serif;
-  --font-family-display: lft-etica, sans-serif;
-  --font-family-nav: lft-etica, sans-serif;
-  --font-family-head: lft-etica, sans-serif;
   --font-family-code: source-code-pro, monospace;
+  --font-family-display: lft-etica, sans-serif;
+  --font-family-head: lft-etica, sans-serif;
+  --font-family-nav: lft-etica, sans-serif;
 
   // Weights
   --font-weight-body: 400;
-  --font-weight-display: 600;
-  --font-weight-nav: 700;
-  --font-weight-head: 800;
   --font-weight-code: 400;
+  --font-weight-display: 600;
+  --font-weight-head: 800;
+  --font-weight-nav: 700;
 }
 
 // Base variables
@@ -33,7 +33,7 @@ $header-multiplier: 2.5;
 /*!
  * Raises a number to a power
 **/
- @function pow($number, $power) {
+@function pow($number, $power) {
   $value: 1;
   @if $power > 0 {
     @for $i from 1 through $power {
@@ -46,7 +46,7 @@ $header-multiplier: 2.5;
 /*!
  * Calculates the level, given a level and is header flag to apply a multiplier.
 **/
- @function calculate-level($level, $is-header) {
+@function calculate-level($level, $is-header) {
   @if $is-header {
     @return round($level * $header-multiplier);
   }
@@ -58,7 +58,7 @@ $header-multiplier: 2.5;
  * a standard rhythm. The configurable level dictates how many levels larger than
  * normal the font should be, and an additional modifier to add onto the level.
 **/
- @mixin text-body($level, $level-modifier: 0) {
+@mixin text-body($level, $level-modifier: 0) {
   $base-line-height: $base-font-size * $base-line-height-proportion;
   font-size: $base-font-size * pow($font-size-proportion, $level + $level-modifier);
   line-height: $base-line-height * pow($line-height-proportion, $level + $level-modifier);
@@ -68,7 +68,7 @@ $header-multiplier: 2.5;
 /*!
  * Includes `text-body` for both normal level and emphasized (adds one level).
 **/
- @mixin text-body-with-emphasized($level) {
+@mixin text-body-with-emphasized($level) {
   @include text-body($level);
 
   &.emphasized {
@@ -80,7 +80,7 @@ $header-multiplier: 2.5;
  * Includes `text-body-with-emphasized` on the `element`, with a particular `level` and
  * `header` modifier.
 **/
- @mixin text($element, $level, $is-header: false) {
+@mixin text($element, $level, $is-header: false) {
   $level: calculate-level($level, $is-header);
 
   #{$element} {
@@ -101,10 +101,10 @@ $header-multiplier: 2.5;
 /*!
  * Includes all the font styles, using CSS variables
 **/
- $font-styles: 'display' 'nav' 'head' 'body' 'code';
- @each $type in $font-styles {
-  $fam: "--font-family-#{$type}";
-  $weight: "--font-weight-#{$type}";
+$font-styles: 'display' 'nav' 'head' 'body' 'code';
+@each $type in $font-styles {
+  $fam: '--font-family-#{$type}';
+  $weight: '--font-weight-#{$type}';
 
   .#{$type}-font-style {
     font-family: var(unquote($fam));
@@ -116,20 +116,20 @@ $header-multiplier: 2.5;
  * Defines standard font styles & sizes across the full site.
 **/
 
- html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-size-adjust: 100%;
-  font-feature-settings: "kern" 1;
+html {
+  font-feature-settings: 'kern' 1;
   font-kerning: normal;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  text-size-adjust: 100%;
 }
 
 /*!
  * Header styling
 **/
- h1,
- h2,
- h3 {
+h1,
+h2,
+h3 {
   @extend .display-font-style;
 }
 
@@ -149,10 +149,10 @@ h6 {
  * Regular (non-header) text styling
 **/
 
- @include text(".body-font-style-size", 0);
- @include text(".code-font-size", -1);
+@include text('.body-font-style-size', 0);
+@include text('.code-font-size', -1);
 
- .body-font-style-size {
+.body-font-style-size {
   max-width: $text-max-width;
 }
 
@@ -169,11 +169,11 @@ textarea {
  * Links
 **/
 
- a {
+a {
   color: $color-primary-bright;
   text-decoration: none;
 
-  &:hover {
+  &::hover {
     color: $color-primary-dim;
   }
 }
@@ -182,8 +182,8 @@ textarea {
  * Code
 **/
 
- code,
- pre {
+code,
+pre {
   @extend .code-font-style;
   @extend .code-font-size;
   overflow: auto;

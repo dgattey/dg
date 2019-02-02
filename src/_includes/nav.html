@@ -4,9 +4,9 @@
       <li class="logo-wrapper"><a class="logo scale-up-on-hover transition-shape" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></li>
       {% assign pages = site.pages | sort:"weight" %}
       {% for pg in pages %}
-      {% assign current = 'inactive' %}
+      {% assign current = 'nav-inactive' %}
       {% if page.url == pg.url %}
-      {% assign current = 'active' %}
+      {% assign current = 'nav-active' %}
       {% endif %}
       {% if pg.title and pg.weight %}
       <li class="nav-item">

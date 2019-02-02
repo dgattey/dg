@@ -28,11 +28,11 @@ body {
 **/
 
 ::-moz-selection {
-  color: $color-text-light;
   background: $color-primary-dim;
+  color: $color-text-light;
 }
 
 ::selection {
-  color: $color-text-light;
   background: $color-primary-dim;
+  color: $color-text-light;
 }

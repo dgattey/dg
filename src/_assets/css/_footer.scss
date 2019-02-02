@@ -5,7 +5,7 @@
 footer {
   $border-weight: 1px;
   $height: $icon-size;
-  $padding: $height/2;
+  $padding: $height / 2;
   @extend %standard-inset;
   border-top: $border-weight solid $color-primary-dim;
   margin-top: $item-spacing-3;
@@ -30,22 +30,19 @@ footer {
     padding: 0 $padding;
   }
 
-  .icon {
+  &::hover > path {
+    fill: $color-primary-dim;
+  }
 
-    &:hover > svg path {
-      fill: $color-primary-dim;
-    }
+  .icon-github {
+    display: inline-block;
+    height: $icon-size;
+    vertical-align: middle;
+    width: $icon-size;
+  }
 
-    > svg {
-      display: inline-block;
-      width: $icon-size;
-      height: $icon-size;
-      vertical-align: middle;
-
-      path {
-        @include transition(fill);
-        fill: $color-primary-bright;
-      }
-    }
+  path {
+    @include transition(fill);
+    fill: $color-primary-bright;
   }
 }

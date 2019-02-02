@@ -5,3 +5,9 @@ linters:
   StringQuotes:
     enabled: true
     style: single_quotes # or double_quotes
+  PropertySpelling:
+    extra_properties:
+      - grid-column-gap
+      - grid-row-gap
+      - grid-template-columns
+      - grid-template-rows
