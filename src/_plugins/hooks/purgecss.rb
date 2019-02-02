@@ -12,9 +12,9 @@ Jekyll::Hooks.register(:site, :post_write) do |_site|
 
   # Configuration JS to write to the file. (Docs: https://www.purgecss.com/configuration)
   config_text = ''"module.exports = #{{
-  content: [@build_directory + '/**/*.html'],
-  css: [Dir.glob(@build_directory + '/assets/*.css').first],
-  whitelist: %w[shadow-weak]
+    content: [@build_directory + '/**/*.html'],
+    css: [Dir.glob(@build_directory + '/assets/*.css').first],
+    whitelist: %w[shadow-weak]
   }.stringify_keys.to_json}"''
 
   # Write configuration file & run command
