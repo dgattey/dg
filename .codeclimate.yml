@@ -1,6 +1,40 @@
+version: "2"
+plugins:
+  bundler-audit:
+    enabled: true
+  csslint:
+    enabled: true
+  editorconfig:
+    enabled: true
+  eslint:
+    enabled: true
+  fixme:
+    enabled: true
+  git-legal:
+    enabled: true
+  markdownlint:
+    enabled: true
+  nodesecurity:
+    enabled: true
+  radon:
+    enabled: true
+  reek:
+    enabled: true
+  rubocop:
+    enabled: true
+  sass-lint:
+    enabled: true
+  shellcheck:
+    enabled: true
+  scss-lint:
+    enabled: true
+  stylelint:
+    enabled: true
 engines:
   markdownlint:
     enabled: true
     checks:
       MD033:
         enabled: false # Disables inline html for use in projects
+      MD002:
+        enabled: false # Disables h1 missing check cause projects
