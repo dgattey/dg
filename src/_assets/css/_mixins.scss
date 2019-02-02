@@ -1,6 +1,6 @@
-/*
+/*!
  * Mixins and extensions to be used globally
- */
+**/
 $spread: $item-spacing-4 + $item-spacing-3;
 $strong-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.15);
 $weak-shadow: 0 $item-spacing-3 $spread rgba(0,0,0,.1);

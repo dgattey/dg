@@ -1,21 +1,21 @@
-/**
+/*!*
  * Font-specific variables & mixins (defined here for ease of use below)
- */
+**/
 
 :root {
-    // Families
-    --font-family-body: lft-etica, sans-serif;
-    --font-family-display: lft-etica, sans-serif;
-    --font-family-nav: lft-etica, sans-serif;
-    --font-family-head: lft-etica, sans-serif;
-    --font-family-code: source-code-pro, monospace;
+  // Families
+  --font-family-body: lft-etica, sans-serif;
+  --font-family-display: lft-etica, sans-serif;
+  --font-family-nav: lft-etica, sans-serif;
+  --font-family-head: lft-etica, sans-serif;
+  --font-family-code: source-code-pro, monospace;
 
-    // Weights
-    --font-weight-body: 400;
-    --font-weight-display: 600;
-    --font-weight-nav: 700;
-    --font-weight-head: 800;
-    --font-weight-code: 400;
+  // Weights
+  --font-weight-body: 400;
+  --font-weight-display: 600;
+  --font-weight-nav: 700;
+  --font-weight-head: 800;
+  --font-weight-code: 400;
 }
 
 // Base variables
@@ -30,130 +30,130 @@ $font-size-proportion: 1.09;
 $line-height-proportion: 1.09;
 $header-multiplier: 2.5;
 
-/**
+/*!*
  * Raises a number to a power
- */
-@function pow($number, $power) {
-    $value: 1;
-    @if $power > 0 {
-        @for $i from 1 through $power {
-            $value: $value * $number;
-        }
+**/
+ @function pow($number, $power) {
+  $value: 1;
+  @if $power > 0 {
+    @for $i from 1 through $power {
+      $value: $value * $number;
     }
-    @return $value;
+  }
+  @return $value;
 }
 
-/**
+/*!*
  * Calculates the level, given a level and is header flag to apply a multiplier.
- */
-@function calculate-level($level, $is-header) {
-    @if $is-header {
-        @return round($level * $header-multiplier);
-    }
-    @return $level;
+**/
+ @function calculate-level($level, $is-header) {
+  @if $is-header {
+    @return round($level * $header-multiplier);
+  }
+  @return $level;
 }
 
-/**
+/*!*
  * Generates font size and line height declarations when included in an element, using
  * a standard rhythm. The configurable level dictates how many levels larger than
  * normal the font should be, and an additional modifier to add onto the level.
- */
-@mixin text-body($level, $level-modifier: 0) {
-    $base-line-height: $base-font-size * $base-line-height-proportion;
-    font-size: $base-font-size * pow($font-size-proportion, $level + $level-modifier);
-    line-height: $base-line-height * pow($line-height-proportion, $level + $level-modifier);
-    margin-bottom: $base-margin-bottom;
+**/
+ @mixin text-body($level, $level-modifier: 0) {
+  $base-line-height: $base-font-size * $base-line-height-proportion;
+  font-size: $base-font-size * pow($font-size-proportion, $level + $level-modifier);
+  line-height: $base-line-height * pow($line-height-proportion, $level + $level-modifier);
+  margin-bottom: $base-margin-bottom;
 }
 
-/**
+/*!*
  * Includes `text-body` for both normal level and emphasized (adds one level).
- */
-@mixin text-body-with-emphasized($level) {
-    @include text-body($level);
+**/
+ @mixin text-body-with-emphasized($level) {
+  @include text-body($level);
 
-    &.emphasized {
-        @include text-body($level + 1);
-    }
+  &.emphasized {
+    @include text-body($level + 1);
+  }
 }
 
-/**
+/*!*
  * Includes `text-body-with-emphasized` on the `element`, with a particular `level` and
  * `header` modifier.
- */
-@mixin text($element, $level, $is-header: false) {
-    $level: calculate-level($level, $is-header);
+**/
+ @mixin text($element, $level, $is-header: false) {
+  $level: calculate-level($level, $is-header);
 
-    #{$element} {
-        @include for-phone-up {
-            @include text-body-with-emphasized($level);
-        }
-
-        @include for-tablet-up {
-            @include text-body-with-emphasized($level + 1);
-        }
-
-        @include for-desktop-up {
-            @include text-body-with-emphasized($level + 2);
-        }
+  #{$element} {
+    @include for-phone-up {
+      @include text-body-with-emphasized($level);
     }
+
+    @include for-tablet-up {
+      @include text-body-with-emphasized($level + 1);
+    }
+
+    @include for-desktop-up {
+      @include text-body-with-emphasized($level + 2);
+    }
+  }
 }
 
-/**
+/*!*
  * Includes all the font styles, using CSS variables
- */
-$font-styles: 'display' 'nav' 'head' 'body' 'code';
-@each $type in $font-styles {
-    $fam: "--font-family-#{$type}";
-    $weight: "--font-weight-#{$type}";
+**/
+ $font-styles: 'display' 'nav' 'head' 'body' 'code';
+ @each $type in $font-styles {
+  $fam: "--font-family-#{$type}";
+  $weight: "--font-weight-#{$type}";
 
-    .#{$type}-font-style {
-        font-family: var(unquote($fam));
-        font-weight: var(unquote($weight));
-    }
+  .#{$type}-font-style {
+    font-family: var(unquote($fam));
+    font-weight: var(unquote($weight));
+  }
 }
 
-/**
+/*!*
  * Defines standard font styles & sizes across the full site.
- */
+**/
 
-html {
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-size-adjust: 100%;
-    font-feature-settings: "kern" 1;
-    font-kerning: normal;
+ html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-size-adjust: 100%;
+  font-feature-settings: "kern" 1;
+  font-kerning: normal;
 }
 
-/**
+/*!*
  * Header styling
- */
-h1,
-h2,
-h3 {
-    @extend .display-font-style;
+**/
+ h1,
+ h2,
+ h3 {
+  @extend .display-font-style;
 }
 
 h4,
 h5,
 h6 {
-    @extend .head-font-style;
+  @extend .head-font-style;
 }
 
 @for $header-level from 1 through 6 {
-    $level: -1 * ($header-level - 6);
-    @include text(h#{$header-level}, $level, $is-header: true);
+  $level: -1 * ($header-level - 6);
+  @include text(h#{$header-level}, $level, $is-header: true);
 }
 @include text(h1, 6, $is-header: true);
 
-/**
+/*!*
  * Regular (non-header) text styling
- */
+**/
 
-@include text(".body-font-style-size", 0);
-@include text(".code-font-size", -1);
+ @include text(".body-font-style-size", 0);
+ @include text(".code-font-size", -1);
 
-.body-font-style-size {
-    max-width: $text-max-width;
+ .body-font-style-size {
+  max-width: $text-max-width;
 }
 
 p,
@@ -161,44 +161,44 @@ input,
 button,
 select,
 textarea {
-    @extend .body-font-style;
-    @extend .body-font-style-size;
+  @extend .body-font-style;
+  @extend .body-font-style-size;
 }
 
-/**
+/*!*
  * Links
- */
+**/
 
-a {
-    color: $color-primary-bright;
-    text-decoration: none;
+ a {
+  color: $color-primary-bright;
+  text-decoration: none;
 
-    &:hover {
-        color: $color-primary-dim;
-    }
+  &:hover {
+    color: $color-primary-dim;
+  }
 }
 
-/**
+/*!*
  * Code
- */
+**/
 
-code,
-pre {
-    @extend .code-font-style;
-    @extend .code-font-size;
-    overflow: auto;
+ code,
+ pre {
+  @extend .code-font-style;
+  @extend .code-font-size;
+  overflow: auto;
 
-    @include for-phone-up {
-        word-break: break-all;
-    }
+  @include for-phone-up {
+    word-break: break-all;
+  }
 
-    @include for-tablet-up {
-        word-break: normal;
-    }
+  @include for-tablet-up {
+    word-break: normal;
+  }
 }
 
 .highlight {
-    padding: 1rem;
-    max-width: 64rem;
-    border-radius: 1em;
+  padding: 1rem;
+  max-width: 64rem;
+  border-radius: 1em;
 }

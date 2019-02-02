@@ -1,7 +1,7 @@
-/*
+/*!
  * Styles the project card component on the the main index page as nested under project-grid
  * - pages: index.html
- */
+**/
 
 .proj-card {
 
@@ -19,11 +19,11 @@
     .type {
         text-transform: uppercase;
         font-variant: small-caps;
-        margin-top: .75em;
+        margin-top: 0.75em;
     }
 
     .title {
-        margin-top: .5em;
+        margin-top: 0.5em;
     }
 
     .desc {
