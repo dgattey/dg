@@ -1,4 +1,5 @@
-[![Netlify Status][netlify-img]][netlify] [![Codacy Badge][codacy-img]][codacy] [![Maintainability][climate-img]][climate] [![CodeFactor][factor-img]][factor] [![DeepScan][deep-img]][deep] [![LGTM][lgtm-img]][lgtm]
+[![Netlify][nlfy-img]][nlfy] [![Codacy][cdy-img]][cdy] [![Factor][fcr-img]][fcr]
+[![Climate][cc-img]][cc] [![Scan][deep-img]][deep] [![LGTM][lgtm-img]][lgtm]
 
 # Dylan Gattey
 
@@ -27,7 +28,7 @@ to install the following:
 
 - `Bundler`
 
-- `ImageMagick` (make sure `webp` appears under delegates, if not and you're 
+- `ImageMagick` (make sure `webp` appears under delegates, if not and you're
   on Linux, try [this guide](https://github.com/rosell-dk/webp-convert/wiki/Installing-Imagick-extension))
 
 - `PurgeCSS`
@@ -59,11 +60,11 @@ to run the script multiple times to get the best results.
 
 We use feature branches in this repo + pull requests.
 [Create a PR](https://github.com/dgattey/dg/pulls), using a provided template
-if possible. If possible, referencing an 
+if possible. If possible, referencing an
 [issue](https://github.com/dgattey/dg/issues) that tracks the problem is optimal.
 We use [labels](https://github.com/dgattey/dg/labels) to categorize, and
 [milestones](https://github.com/dgattey/dg/milestones) to track dependencies.
-Please follow the 
+Please follow the
 [Contribution Guidelines](https://github.com/dgattey/dg/blob/master/CONTRIBUTING.md)
 at all times.
 
@@ -129,14 +130,14 @@ Versions/milestones are as follows:
 
 - Linting: through a **bunch** of Github integrations
 
-[netlify-img]: https://api.netlify.com/api/v1/badges/45e36541-7c61-4931-bd4e-3a654b199044/deploy-status
-[netlify]: https://app.netlify.com/sites/dgattey/deploys
-[codacy-img]: https://api.codacy.com/project/badge/Grade/2b996737e14d4377ac4b03f7dc84f125
-[codacy]: https://www.codacy.com/app/dgattey/dg?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dgattey/dg&amp;utm_campaign=Badge_Grade
-[climate-img]: https://api.codeclimate.com/v1/badges/333adb209e1ac3086303/maintainability
-[climate]: https://codeclimate.com/github/dgattey/dg/maintainability
-[factor-img]: https://www.codefactor.io/repository/github/dgattey/dg/badge
-[factor]: https://www.codefactor.io/repository/github/dgattey/dg
+[nlfy-img]: https://api.netlify.com/api/v1/badges/45e36541-7c61-4931-bd4e-3a654b199044/deploy-status
+[nlfy]: https://app.netlify.com/sites/dgattey/deploys
+[cdy-img]: https://api.codacy.com/project/badge/Grade/2b996737e14d4377ac4b03f7dc84f125
+[cdy]: https://www.codacy.com/app/dgattey/dg?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dgattey/dg&amp;utm_campaign=Badge_Grade
+[cc-img]: https://api.codeclimate.com/v1/badges/333adb209e1ac3086303/maintainability
+[cc]: https://codeclimate.com/github/dgattey/dg/maintainability
+[fcr-img]: https://www.codefactor.io/repository/github/dgattey/dg/badge
+[fcr]: https://www.codefactor.io/repository/github/dgattey/dg
 [deep-img]: https://deepscan.io/api/teams/2858/projects/4266/branches/34746/badge/grade.svg
 [deep]: https://deepscan.io/dashboard#view=project&tid=2858&pid=4266&bid=34746
 [lgtm-img]: https://img.shields.io/lgtm/alerts/g/dgattey/dg.svg?logo=lgtm&logoWidth=18
