@@ -1,4 +1,4 @@
-/*!*
+/*!
  * Font-specific variables & mixins (defined here for ease of use below)
 **/
 
@@ -30,7 +30,7 @@ $font-size-proportion: 1.09;
 $line-height-proportion: 1.09;
 $header-multiplier: 2.5;
 
-/*!*
+/*!
  * Raises a number to a power
 **/
  @function pow($number, $power) {
@@ -43,7 +43,7 @@ $header-multiplier: 2.5;
   @return $value;
 }
 
-/*!*
+/*!
  * Calculates the level, given a level and is header flag to apply a multiplier.
 **/
  @function calculate-level($level, $is-header) {
@@ -53,7 +53,7 @@ $header-multiplier: 2.5;
   @return $level;
 }
 
-/*!*
+/*!
  * Generates font size and line height declarations when included in an element, using
  * a standard rhythm. The configurable level dictates how many levels larger than
  * normal the font should be, and an additional modifier to add onto the level.
@@ -65,7 +65,7 @@ $header-multiplier: 2.5;
   margin-bottom: $base-margin-bottom;
 }
 
-/*!*
+/*!
  * Includes `text-body` for both normal level and emphasized (adds one level).
 **/
  @mixin text-body-with-emphasized($level) {
@@ -76,7 +76,7 @@ $header-multiplier: 2.5;
   }
 }
 
-/*!*
+/*!
  * Includes `text-body-with-emphasized` on the `element`, with a particular `level` and
  * `header` modifier.
 **/
@@ -98,7 +98,7 @@ $header-multiplier: 2.5;
   }
 }
 
-/*!*
+/*!
  * Includes all the font styles, using CSS variables
 **/
  $font-styles: 'display' 'nav' 'head' 'body' 'code';
@@ -112,7 +112,7 @@ $header-multiplier: 2.5;
   }
 }
 
-/*!*
+/*!
  * Defines standard font styles & sizes across the full site.
 **/
 
@@ -124,7 +124,7 @@ $header-multiplier: 2.5;
   font-kerning: normal;
 }
 
-/*!*
+/*!
  * Header styling
 **/
  h1,
@@ -145,7 +145,7 @@ h6 {
 }
 @include text(h1, 6, $is-header: true);
 
-/*!*
+/*!
  * Regular (non-header) text styling
 **/
 
@@ -165,7 +165,7 @@ textarea {
   @extend .body-font-style-size;
 }
 
-/*!*
+/*!
  * Links
 **/
 
@@ -178,7 +178,7 @@ textarea {
   }
 }
 
-/*!*
+/*!
  * Code
 **/
 

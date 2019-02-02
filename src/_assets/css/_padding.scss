@@ -3,38 +3,38 @@
 **/
 
 %max-width-element {
-    max-width: $breakpoint-max-width;
-    width: 100%;
-    margin: 0 auto;
+  max-width: $breakpoint-max-width;
+  width: 100%;
+  margin: 0 auto;
 }
 
 @mixin template-body($page-padding, $top-padding) {
-    $nav-padding: $item-spacing-3;
+  $nav-padding: $item-spacing-3;
 
-    %standard-inset {
-        margin-top: $top-padding + $nav-padding * 2;
-        margin-left: $page-padding;
-        margin-right: $page-padding;
-    }
+  %standard-inset {
+    margin-top: $top-padding + $nav-padding * 2;
+    margin-left: $page-padding;
+    margin-right: $page-padding;
+  }
 
-    %nav-padding {
-        padding-left: $page-padding;
-        padding-right: $page-padding;
-        padding-top: $nav-padding;
-        padding-bottom: $nav-padding;
-    }
+  %nav-padding {
+    padding-left: $page-padding;
+    padding-right: $page-padding;
+    padding-top: $nav-padding;
+    padding-bottom: $nav-padding;
+  }
 }
 
 // For different breakpoints
 $tablet-top-padding: $item-spacing-4 + $item-spacing-3;
 @include for-phone-up {
-    @include template-body($item-spacing-4, $item-spacing-5);
+  @include template-body($item-spacing-4, $item-spacing-5);
 }
 
 @include for-tablet-up {
-    @include template-body($item-spacing-4, $item-spacing-5 + $item-spacing-4);
+  @include template-body($item-spacing-4, $item-spacing-5 + $item-spacing-4);
 }
 
 @include for-desktop-up {
-    @include template-body($item-spacing-5, $item-spacing-6);
+  @include template-body($item-spacing-5, $item-spacing-6);
 }

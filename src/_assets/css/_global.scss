@@ -1,40 +1,38 @@
-/*!*
+/*!
  * Global, base styles to ensure the rest is applied correctly
 **/
 
 html,
 body {
-    /*!*
-     * Ensures that the font size scales correctly across the site
-    **/
-    font-size: $html-font-size;
+  /*! Ensures that the font size scales correctly across the site **/
+  font-size: $html-font-size;
 }
 
 html {
-    background: $color-bg;
-    color: $color-text-dark;
-    overflow-x: hidden;
+  background: $color-bg;
+  color: $color-text-dark;
+  overflow-x: hidden;
 }
 
 body {
-    @extend %max-width-element;
+  @extend %max-width-element;
 }
 
 .content {
-    /*! Accounts for sticky header by pushing all content down**/
-    @extend %standard-inset;
+  /*! Accounts for sticky header by pushing all content down **/
+  @extend %standard-inset;
 }
 
-/*!*
+/*!
  * Text selection
 **/
 
 ::-moz-selection {
-    color: $color-text-light;
-    background: $color-primary-dim;
+  color: $color-text-light;
+  background: $color-primary-dim;
 }
 
 ::selection {
-    color: $color-text-light;
-    background: $color-primary-dim;
+  color: $color-text-light;
+  background: $color-primary-dim;
 }
