@@ -1,0 +1,4 @@
+linters:
+  LeadingZero:
+    enabled: true
+    style: include_zero # or 'exclude_zero'
