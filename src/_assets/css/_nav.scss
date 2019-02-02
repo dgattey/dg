@@ -18,22 +18,26 @@ nav {
 
 	%nav-grid {
 		display: grid;
+
 		@include for-phone-up {
 			grid-column-gap: $item-spacing-4;
 		}
+
 		@include for-tablet-up {
 			grid-column-gap: $item-spacing-4;
 		}
+
 		@include for-desktop-up {
 			grid-column-gap: $item-spacing-3;
 		}
 	}
 
 	// Ensures uniform text size on nav items to follow body
-	.logo-wrapper, .nav-item {
+	.logo-wrapper,
+	.nav-item {
 		@extend .body-font-style-size;
 		align-self: center;
-        margin-bottom: 0; // resets the inherited value
+		margin-bottom: 0; // resets the inherited value
 	}
 
 	.logo-wrapper {
@@ -46,7 +50,7 @@ nav {
 	.logo {
 		font-size: 2.3em;
 		line-height: 1;
-		letter-spacing: -0.12em;
+		letter-spacing: -.12em;
 		display: inline-block; // This is to allow it to scale on hover
 	}
 
@@ -54,14 +58,12 @@ nav {
 		background: $color-bg;
 		margin: 0;
 		@extend %nav-padding;
+		@extend %nav-grid;
+		grid-template-columns: repeat($nav-grid-columns, 1fr);
 
 		& * {
 			list-style: none;
 		}
-
-		// Standard grid
-		@extend %nav-grid;
-		grid-template-columns: repeat($nav-grid-columns, 1fr);
 	}
 
 	.nav-item {
@@ -71,10 +73,11 @@ nav {
 		justify-self: start;
 		align-self: center;
 		@include transition-bounce(transform);
+		grid-column-end: span 4;
+
 		&:hover {
 			transform: translateY(- $underline-height / 2);
 		}
-		grid-column-end: span 4;
 	}
 
 	.nav-link {
@@ -87,6 +90,7 @@ nav {
 
 		// Animation of the underlines
 		&.inactive {
+
 			&:before,
 			&:after {
 				content: '';
@@ -97,26 +101,32 @@ nav {
 				height: $underline-height;
 				background-color: $color-primary-bright;
 			}
+
 			&:before {
 				@extend %hide;
 				transform: translateY(- $underline-height);
 				transition: transform 0s $ease-out-back, opacity 0s;
 			}
+
 			&:after {
 				@extend %hide;
 				transform: translateY($underline-height/2);
 				transition: transform $animation-duration $ease-out-back, opacity $animation-duration;
 			}
+
 			&:hover,
 			&:focus {
+
 				&:before,
 				&:after {
 					@extend %show;
 					transform: translateY(0);
 				}
+
 				&:before {
 					transition: transform $animation-duration $ease-out-back, opacity $animation-duration;
 				}
+
 				&:after {
 					transition: transform 0s $animation-duration $ease-out-back, opacity 0s $animation-duration;
 				}

@@ -3,14 +3,17 @@
  */
 
 .post {
+
 	p {
 		color: $color-text-muted;
 	}
+
 	.title {
-		margin-bottom: 0em;
+		margin-bottom: 0;
 	}
+
 	.description {
-		margin-top: 0;
 		margin-bottom: 3em;
+		margin-top: 0;
 	}
 }

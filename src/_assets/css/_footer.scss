@@ -7,35 +7,45 @@ footer {
 	$height: $icon-size;
 	$padding: $height/2;
 	@extend %standard-inset;
-	margin-top: $item-spacing-3;
 	border-top: $border-weight solid $color-primary-dim;
-	.copy, ul, li {
+	margin-top: $item-spacing-3;
+
+	.copy,
+	ul,
+	li {
 		display: inline-block;
 	}
-	p, ul {
+
+	p,
+	ul {
 		height: $height;
 		margin: $padding 0;
 	}
+
 	ul {
 		float: right;
 	}
+
 	li {
 		padding: 0 $padding;
 	}
 
 	.icon {
-	    &:hover > svg path {
-	        fill: $color-primary-dim;
-	    }
-	    > svg {
-	        display: inline-block;
-	        width: $icon-size;
-	        height: $icon-size;
-	        vertical-align: middle;
-	        path {
-	            @include transition(fill);
-	            fill: $color-primary-bright;
-	        }
-	    }
+
+		&:hover > svg path {
+			fill: $color-primary-dim;
+		}
+
+		> svg {
+			display: inline-block;
+			width: $icon-size;
+			height: $icon-size;
+			vertical-align: middle;
+
+			path {
+				@include transition(fill);
+				fill: $color-primary-bright;
+			}
+		}
 	}
 }
