@@ -55,8 +55,6 @@ GEM
       nokogiri (~> 1.8)
       pathutil (~> 0.16)
       sprockets (>= 3.3, < 4.1.beta)
-    jekyll-include-cache (0.1.0)
-      jekyll (~> 3.3)
     jekyll-last-modified-at (1.0.1)
       jekyll (~> 3.3)
       posix-spawn (~> 0.3.9)
@@ -131,7 +129,6 @@ DEPENDENCIES
   jekyll
   jekyll-analytics
   jekyll-assets
-  jekyll-include-cache
   jekyll-last-modified-at
   jekyll-minifier
   jekyll-seo-tag
