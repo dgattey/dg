@@ -10,7 +10,6 @@ group :jekyll_plugins do
   gem 'jekyll-analytics'        # Google Analytics built in
   gem 'jekyll-assets'           # Asset management
   gem 'jekyll-last-modified-at' # Better last modified date
-  gem 'jekyll-minifier'         # Minifies everything
   gem 'jekyll-seo-tag'          # Generated SEO (title, canonical url, etc)
   gem 'jekyll-sitemap'          # Generated Sitemap
   gem 'jekyll-workbox-plugin'   # Google Workbox service worker
