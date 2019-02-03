@@ -90,7 +90,7 @@ Ready for a code review? Follow these steps:
 1. Your request will kick off quality, safety, and linting automated checks from
    [CodeClimate](https://codeclimate.com/), [Codacy](https://codacy.com),
    [CodeFactor](https://www.codefactor.io), [DeepScan](https://deepscan.io),
-   [Hound CI](https://houndci.com), and [Stickler CI](https://stickler-ci.com/)
+   and [Stickler CI](https://stickler-ci.com/)
 
 1. Once all checks pass and a human reviews your code, it will be rebased and
    merged onto `master` and the branch deleted! :tada:
