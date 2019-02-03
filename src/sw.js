@@ -51,8 +51,8 @@ workbox.precaching.precacheAndRoute([]);
  * - Force 404 page to network only since we don't need it offline
  * - Force all analytics calls to network only
  * - Cache the actual font files (use.typekit.net/af) for 120 days
- * - State while revalidate for fonts stylesheets
- * - Stale while revalidate for js, css, and json
+ * - Cache fonts stylesheets for an hour
+ * - Cache js, css, and json for an hour
  * - Cache up to 60 images for 30 days
  */
 workbox.routing.registerRoute(
@@ -83,23 +83,32 @@ workbox.routing.registerRoute(
 );
 workbox.routing.registerRoute(
 	/^https?:\/\/.*.typekit\.net/,
-	workbox.strategies.staleWhileRevalidate({
+	workbox.strategies.cacheFirst({
 		cacheName: vendorCacheName,
 		plugins: [
 			new workbox.cacheableResponse.Plugin({
 				statuses: [0, 200],
 			}),
+			new workbox.expiration.Plugin({
+				maxAgeSeconds: 60 * 60,
+			}),
+
 		],
 	})
 );
 workbox.routing.registerRoute(
 	/.*\.(?:js|css|json)$/,
-	workbox.strategies.staleWhileRevalidate({
-		cacheName: staticCacheName
+	workbox.strategies.cacheFirst({
+		cacheName: staticCacheName,
+		plugins: [
+			new workbox.expiration.Plugin({
+				maxAgeSeconds: 60 * 60,
+			}),
+		]
 	})
 );
 workbox.routing.registerRoute(
-	/\.(?:png|gif|jpg|jpeg|svg|webp)$/,
+	/\.(?:png|gif|jpg|jpeg|svg|webp|ico)$/,
 	workbox.strategies.cacheFirst({
 		cacheName: imageCacheName,
 		plugins: [
