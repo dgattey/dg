@@ -1,8 +1,8 @@
-const header = document.querySelector(".header-nav");
-const headerHeight = header.offsetHeight;
-const scrolledClass = "shadow-weak";
+const header = document.querySelector(".header-nav"),
+    headerHeight = header.offsetHeight,
+    scrolledClass = "shadow-weak";
 
-var addOrRemoveClass = function() {
+const addOrRemoveClass = function() {
 	if (window.scrollY >= headerHeight) {
 		header.classList.add(scrolledClass);
 	} else {
