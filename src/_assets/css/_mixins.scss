@@ -10,10 +10,13 @@ $weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
 
 .shadow-strong {
   box-shadow: $strong-shadow;
+
+  &:hover {
+    box-shadow: $weak-shadow;
+  }
 }
 
-.shadow-weak,
-.shadow-strong:hover {
+.shadow-weak {
   box-shadow: $weak-shadow;
 }
 
