@@ -57,15 +57,17 @@ workbox.precaching.precacheAndRoute([]);
  */
 
 const vendorRouteConfiguration = function(hours) {
-	cacheName: vendorCacheName,
-	plugins: [
-		new workbox.cacheableResponse.Plugin({
-			statuses: [0, 200],
-		}),
-		new workbox.expiration.Plugin({
-			maxAgeSeconds: 60 * hours,
-		}),
-	],
+	return {
+		cacheName: vendorCacheName,
+		plugins: [
+			new workbox.cacheableResponse.Plugin({
+				statuses: [0, 200],
+			}),
+			new workbox.expiration.Plugin({
+				maxAgeSeconds: 60 * hours,
+			}),
+		],
+	}
 };
 
 workbox.routing.registerRoute(
