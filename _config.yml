@@ -61,11 +61,6 @@ favicons:
   ios: [120, 152, 180]
   windows: [144]
   thumbnail: [152]
-jekyll-minifier:
-  # Because Google Analytics is already minified, we
-  # must disable Uglify cause it doesn't play well
-  # with an already minified script :(
-  compress_javascript: false
 
 # Workbox settings for Service worker
 workbox:
@@ -90,7 +85,6 @@ sass:
 
 # Plugins
 plugins:
-  - jekyll-minifier
   - jekyll-sitemap
   - jekyll-analytics
   - jekyll-seo-tag
