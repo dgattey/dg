@@ -71,10 +71,9 @@ jekyll-minifier:
 workbox:
   precache_glob_directory: /
   precache_glob_patterns:
-    - 'index.html': ['/', 'projects/']
-    - 'about/index.html': about/
-    - /404.html
+    - 'index.html': '/'
     - /offline.html
+    - favicon.ico
 
 # Build settings
 markdown: kramdown
