@@ -10,7 +10,6 @@
  */
 const staticCacheName = "static",
 	imageCacheName = "images",
-	analyticsCacheName = "google-analytics",
 	offlinePage = "/offline.html";
 
 workbox.core.setCacheNameDetails({
@@ -38,14 +37,6 @@ self.addEventListener("controllerchange", refreshWindow);
  * Enables navigation preload which we use in our default handler
  */
 workbox.navigationPreload.enable();
-
-/**
- * Google Analytics
- * - Now available while offline! It'll send when back online
- */
-workbox.googleAnalytics.initialize({
-	cacheName: analyticsCacheName
-});
 
 /**
  * Precaching all the things!
