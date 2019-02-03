@@ -23,6 +23,7 @@ workbox.skipWaiting();
 workbox.clientsClaim();
 
 var isRefreshing = false;
+
 var refreshWindow = function() {
 	if (isRefreshing) {
 		return;
@@ -30,6 +31,7 @@ var refreshWindow = function() {
 	isRefreshing = true;
 	window.location.reload();
 };
+
 self.addEventListener("controllerchange", refreshWindow);
 
 /**
