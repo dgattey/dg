@@ -14,6 +14,11 @@ plugins:
     enabled: true
   markdownlint:
     enabled: true
+    checks:
+      MD033:
+        enabled: false # Disables inline html for use in projects
+      MD002:
+        enabled: false # Disables h1 missing check cause projects
   nodesecurity:
     enabled: true
   radon:
@@ -24,17 +29,34 @@ plugins:
     enabled: true
   sass-lint:
     enabled: true
+    checks:
+      mixins-before-declarations:
+        enabled: false
   shellcheck:
     enabled: true
   scss-lint:
     enabled: true
+    checks:
+      LeadingZero:
+        enabled: true
+        style: exclude_zero # or 'include_zero'
+      StringQuotes:
+        enabled: true
+        style: single_quotes # or double_quotes
+      PropertySpelling:
+        extra_properties:
+          - grid-column-gap
+          - grid-row-gap
+          - grid-gap
+          - grid-template-columns
+          - grid-template-rows
+          - grid-column-start
+          - grid-row-start
+          - grid-column-end
+          - grid-row-end
+      PropertyUnits:
+        enabled: true
+        properties:
+          grid-template-columns: ['fr']
   stylelint:
     enabled: true
-engines:
-  markdownlint:
-    enabled: true
-    checks:
-      MD033:
-        enabled: false # Disables inline html for use in projects
-      MD002:
-        enabled: false # Disables h1 missing check cause projects

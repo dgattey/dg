@@ -3,10 +3,10 @@
 // =====
 
 footer {
+  @extend %standard-inset;
   $border-weight: 1px;
   $height: $icon-size;
   $padding: $height / 2;
-  @extend %standard-inset;
   border-top: $border-weight solid $color-primary-dim;
   margin-top: $item-spacing-3;
 
