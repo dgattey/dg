@@ -1,9 +1,11 @@
+---
 linters:
-  csslint: {  }
   rubocop:
     fixer: true
   shellcheck:
     shell: bash
+  yamllint:
+    config: ./yamllint.conf
 files:
   ignore:
     - 'bower_components/*'
