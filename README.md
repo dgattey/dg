@@ -98,13 +98,18 @@ Ready for a code review? Follow these steps:
 Please follow the [Contribution Guidelines](CONTRIBUTING.md)
 at all times.
 
-## Deployment
+## Continuous Integration
 
-> We're set up with [Cloudflare](https://cloudflare.com) managing DNS &
-> [Netlify](https://netlify.com) as the CDN and CI server that hosts the site.
-> Cloudflare's MX records point to [ZohoMail](https://zoho.com/mail), and points
-> to Netlify as the site source. Headers/redirects are set up via `netlify.toml`
-> rules.
+### DNS/CDN
+
+We're set up with [Cloudflare](https://cloudflare.com) managing DNS &
+[Netlify](https://netlify.com) as the CDN and CI server that hosts the site.
+Cloudflare's MX records point to [ZohoMail](https://zoho.com/mail), and points
+to Netlify as the site source. Headers/redirects are set up via `netlify.toml`
+rules. There are other CDNs used, mostly Google's for analytics and Adobe Fonts
+for the webfont files.
+
+### Deployment
 
 Every commit to `master` triggers a new deploy & publish on Netlify
 :tada:. By default, it uses `JEKYLL_ENV=production bundle exec jekyll build`
@@ -129,19 +134,19 @@ Project status is tracked under the
 [main project](https://github.com/dgattey/dg/projects/2). Our milestones reflect
 our version tags and are as follows.
 
-- [x][1.0 (Marrow)](https://github.com/dgattey/dg/milestone/2): basic site up
+- [x] [1.0 (Marrow)](https://github.com/dgattey/dg/milestone/2): basic site up
   on Netlify/Cloudflare with barebones homepage
 
-- [ ][1.5 (Steak)](https://github.com/dgattey/dg/milestone/1): the "meat" 😉 of
+- [ ] [1.5 (Steak)](https://github.com/dgattey/dg/milestone/1): the "meat" 😉 of
   the site, where all content is done, most styles done, and site is secure for
   the most part
 
-- [ ][2.0 (Cherry)](https://github.com/dgattey/dg/milestone/3): putting the
+- [ ] [2.0 (Cherry)](https://github.com/dgattey/dg/milestone/3): putting the
   cherry on top! Polish, security, optimizations are all finished and site is
   done
 
-- [ ][3.0 (Moon Grape)](https://github.com/dgattey/dg/milestone/3): future work,
-  tracking aspirations and ideas
+- [ ] [3.0 (Moon Grape)](https://github.com/dgattey/dg/milestone/3): future
+  work, tracking aspirations and ideas
 
 ### Current integrations
 
