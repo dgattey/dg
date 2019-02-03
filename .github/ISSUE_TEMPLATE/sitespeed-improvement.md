@@ -9,8 +9,8 @@ assignees: dgattey
 
 # Describe the slowdown or manifestation of the problem
 
-<!-- A clear and concise description of the sitespeed regression/problem -->
+<!-- Clear and concise description of the sitespeed regression -->
 
-## Describe the solution you'd like
+## Describe the solution you would like
 
-<!-- A clear and concise description of how to improve speed. -->
+<!-- Clear and concise description of how to improve speed. -->
