@@ -57,57 +57,90 @@ all those files on build. It can take _FOREVER_ to run ImageOptim, so be
 patient. Also, you may need to run the script multiple times to get the best
 results.
 
-### Committing something
+## Committing Code
 
-We use feature branches in this repo + pull requests.
-[Create a PR](https://github.com/dgattey/dg/pulls), using a provided template
-if possible. If possible, referencing an
-[issue](https://github.com/dgattey/dg/issues) that tracks the problem is
-optimal. We use [labels](https://github.com/dgattey/dg/labels) to categorize,
-and [milestones](https://github.com/dgattey/dg/milestones) to track
-dependencies. Please follow the [Contribution Guidelines](CONTRIBUTING.md)
+We exclusively use branch-based development in this repo, combined with pull
+requests that run automated checks.
+
+### Branches
+
+The main branch is `master`, which is unpushable without a pull request. New
+branches are created on the fly for various PRs.
+
+### Pull Requests
+
+Ready for a code review? Follow these steps:
+
+1. Commit code on a local branch with a descriptive name
+
+1. Push to a remote branch with the same name
+
+1. Make sure there's an [issue](https://github.com/dgattey/dg/issues) tracking
+   something you're fixing with this pull request
+
+1. [Create a pull request](https://github.com/dgattey/dg/pulls) using a provided
+   template if there's one that matches what you need
+
+1. Ensure the assignee is correct, that the
+   [labels](https://github.com/dgattey/dg/labels) on the pull request reflect
+   the change, and that the appropriate
+   [milestone](https://github.com/dgattey/dg/milestones) is set. Also ensure
+   the [project](https://github.com/dgattey/dg/projects/) reflects the change.
+
+1. Your request will kick off quality, safety, and linting automated checks from
+   [CodeClimate](https://codeclimate.com/), [Codacy](https://codacy.com),
+   [CodeFactor](https://www.codefactor.io), [DeepScan](https://deepscan.io),
+   [Hound CI](https://houndci.com), and [Stickler CI](https://stickler-ci.com/)
+
+1. Once all checks pass and a human reviews your code, it will be rebased and
+   merged onto `master` and the branch deleted! :tada:
+
+Please follow the [Contribution Guidelines](CONTRIBUTING.md)
 at all times.
 
-## DNS, CDN, and Deployment
+## Deployment
 
-We're set up with [Cloudflare](https://cloudflare.com) managing DNS &
-[Netlify](https://netlify.com) as the CDN and CI server that hosts the site.
-Cloudflare's MX records point to [ZohoMail](https://zoho.com/mail), and points
-to Netlify as the site source. Headers/redirects are set up via `netlify.toml`
-rules.
+> We're set up with [Cloudflare](https://cloudflare.com) managing DNS &
+> [Netlify](https://netlify.com) as the CDN and CI server that hosts the site.
+> Cloudflare's MX records point to [ZohoMail](https://zoho.com/mail), and points
+> to Netlify as the site source. Headers/redirects are set up via `netlify.toml`
+> rules.
 
-### Deployment
+Every commit to `master` triggers a new deploy & publish on Netlify
+:tada:. By default, it uses `JEKYLL_ENV=production bundle exec jekyll build`
+with some nice defaults. Merging a PR to `master` will trigger a build for you.
+If you want a manual deploy, you can log in to Netlify and trigger one.
 
-Every commit to `master` branch triggers a new deploy & publish on Netlify
-:tada:. By default, it uses `JEKYLL_ENV=production bundle exec jekyll build`.
-Merging a PR to `master` will trigger a build for you. If you want a manual
-deploy, you can log in to Netlify and trigger one.
+## Issues
 
-## Pull Requests, Issues, and Status
+The currently open [issues](https://github.com/dgattey/dg/issues) reflect the
+top priority tasks. Each one has appropriate
+[labels](https://github.com/dgattey/dg/labels) set and are categorized into an
+appropriate [milestone](https://github.com/dgattey/dg/milestones).
 
-The project is tracked by this repo. All gaps in content and bugs are captured
-in [issues](https://github.com/dgattey/dg/issues), with the appropriate labels.
-To merge code, you must [create a PR](https://github.com/dgattey/dg/pulls)
-using a feature branch, get your code reviewed, and run the automated checks.
-Once finished, you can rebase on master, push, and delete the branch directly
-from the PR. Status is tracked under the
-[main project](https://github.com/dgattey/dg/projects/2), with
-[milestones](https://github.com/dgattey/dg/milestones) to keep track of
-progress.
+To [open a new issue](https://github.com/dgattey/dg/issues/new/choose), use
+one of the existing templates for clarity. This should set most of the
+properties for you. Add relevant details and the project/milestone, and you're
+all set. Issues are a requirement for a new pull request.
 
-Versions/milestones are as follows:
+## Project Status
 
-- ~[1.0 (Marrow)](https://github.com/dgattey/dg/milestone/2): basic site up on
-  Netlify/Cloudflare with barebones homepage~
+Project status is tracked under the
+[main project](https://github.com/dgattey/dg/projects/2). Our milestones reflect
+our version tags and are as follows.
 
-- [1.5 (Steak)](https://github.com/dgattey/dg/milestone/1): the "meat" 😉 of
+- [x][1.0 (Marrow)](https://github.com/dgattey/dg/milestone/2): basic site up
+  on Netlify/Cloudflare with barebones homepage
+
+- [ ][1.5 (Steak)](https://github.com/dgattey/dg/milestone/1): the "meat" 😉 of
   the site, where all content is done, most styles done, and site is secure for
   the most part
 
-- [2.0 (Cherry)](https://github.com/dgattey/dg/milestone/3): putting the cherry
-  on top! Polish, security, optimizations are all finished and site is done
+- [ ][2.0 (Cherry)](https://github.com/dgattey/dg/milestone/3): putting the
+  cherry on top! Polish, security, optimizations are all finished and site is
+  done
 
-- [3.0 (Moon Grape)](https://github.com/dgattey/dg/milestone/3): future work,
+- [ ][3.0 (Moon Grape)](https://github.com/dgattey/dg/milestone/3): future work,
   tracking aspirations and ideas
 
 ### Current integrations
