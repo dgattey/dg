@@ -9,6 +9,7 @@
  * - Also make sure that if we are an old worker, we force reload the page to get freshest stuff
  */
 const staticCacheName = "static",
+	vendorCacheName = "vendor-static",
 	imageCacheName = "images",
 	offlinePage = "/offline.html";
 
@@ -47,16 +48,16 @@ workbox.precaching.precacheAndRoute([]);
 
 /**
  * Routing for different filetypes & endpoints
- * - Stale while revalidate for js, css, and json
- * - Make sure we force all analytics calls to network only
+ * - Force 404 page to network only since we don't need it offline
+ * - Force all analytics calls to network only
+ * - Cache the actual font files (use.typekit.net/af) for 120 days
  * - State while revalidate for fonts stylesheets
+ * - Stale while revalidate for js, css, and json
  * - Cache up to 60 images for 30 days
  */
 workbox.routing.registerRoute(
-	/.*\.(?:js|css|json)$/,
-	workbox.strategies.staleWhileRevalidate({
-		cacheName: staticCacheName
-	})
+	/404.html/,
+	workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
 	/^https?:\/\/www\.google-analytics\.com/,
@@ -67,20 +68,9 @@ workbox.routing.registerRoute(
 	workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
-	/^https?:\/\/use\.typekit\.net/,
-	workbox.strategies.staleWhileRevalidate({
-		cacheName: staticCacheName,
-		plugins: [
-			new workbox.cacheableResponse.Plugin({
-				statuses: [0, 200],
-			}),
-		],
-	})
-);
-workbox.routing.registerRoute(
-	/^https?:\/\/p\.typekit\.net/,
+	/^https?:\/\/.*.typekit\.net\/af/,
 	workbox.strategies.cacheFirst({
-		cacheName: staticCacheName,
+		cacheName: vendorCacheName,
 		plugins: [
 			new workbox.cacheableResponse.Plugin({
 				statuses: [0, 200],
@@ -89,6 +79,23 @@ workbox.routing.registerRoute(
 				maxAgeSeconds: 60 * 60 * 24 * 120,
 			}),
 		],
+	})
+);
+workbox.routing.registerRoute(
+	/^https?:\/\/.*.typekit\.net/,
+	workbox.strategies.staleWhileRevalidate({
+		cacheName: vendorCacheName,
+		plugins: [
+			new workbox.cacheableResponse.Plugin({
+				statuses: [0, 200],
+			}),
+		],
+	})
+);
+workbox.routing.registerRoute(
+	/.*\.(?:js|css|json)$/,
+	workbox.strategies.staleWhileRevalidate({
+		cacheName: staticCacheName
 	})
 );
 workbox.routing.registerRoute(
