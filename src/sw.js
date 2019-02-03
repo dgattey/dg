@@ -8,10 +8,11 @@
  * - Skip waiting and claim clients so we take over from any old workers
  * - Also make sure that if we are an old worker, we force reload the page to get freshest stuff
  */
-const staticCacheName = "static";
-const imageCacheName = "images";
-const analyticsCacheName = "google-analytics";
-const offlinePage = "/offline.html";
+const staticCacheName = "static",
+	imageCacheName = "images",
+	analyticsCacheName = "google-analytics",
+	offlinePage = "/offline.html";
+
 workbox.core.setCacheNameDetails({
 	precache: "precache",
 	prefix: "dg",
@@ -20,16 +21,16 @@ workbox.core.setCacheNameDetails({
 });
 workbox.skipWaiting();
 workbox.clientsClaim();
-var isRefreshing;
-self.addEventListener("controllerchange",
-	function() {
-		if (isRefreshing) {
-			return;
-		}
-		isRefreshing = true;
-		window.location.reload();
+
+var isRefreshing = false;
+var refreshWindow = function() {
+	if (isRefreshing) {
+		return;
 	}
-);
+	isRefreshing = true;
+	window.location.reload();
+};
+self.addEventListener("controllerchange", refreshWindow);
 
 /**
  * Enables navigation preload which we use in our default handler
@@ -121,17 +122,20 @@ const fetchWithOfflineFallback = async (args) => {
 	try {
 		// Use the preloaded response, if it's there
 		const preloadResponse = await args.preloadResponse;
+
 		if (preloadResponse) {
 			return preloadResponse;
 		}
 
 		// Otherwise, try network first with a fallback to the offline page
 		const response = await workbox.strategies.networkFirst().handle(args);
+
 		return response || await caches.match(offlinePage);
 	} catch (error) {
 		return await caches.match(offlinePage);
 	}
 };
+
 workbox.routing.setDefaultHandler(fetchWithOfflineFallback);
 workbox.routing.setCatchHandler(({event}) => {
 	if (event.request.cache === "only-if-cached" &&
