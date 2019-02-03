@@ -5,7 +5,7 @@ linters:
   shellcheck:
     shell: bash
   yamllint:
-    config: ./yamllint.conf
+    config: .yamllint.yml
 files:
   ignore:
     - 'bower_components/*'
