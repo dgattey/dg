@@ -131,22 +131,22 @@ all set. Issues are a requirement for a new pull request.
 ## Project Status
 
 Project status is tracked under the
-[main project](https://github.com/dgattey/dg/projects/2). Our milestones reflect
-our version tags and are as follows.
+[main project](https://github.com/dgattey/dg/projects/2). Our milestones are
+reflected in our version tags on particular commits and are as follows.
 
 - [x] [1.0 (Marrow)](https://github.com/dgattey/dg/milestone/2): basic site up
-  on Netlify/Cloudflare with barebones homepage
+  on Netlify/Cloudflare with barebones homepage.
 
 - [ ] [1.5 (Steak)](https://github.com/dgattey/dg/milestone/1): the "meat" 😉 of
   the site, where all content is done, most styles done, and site is secure for
-  the most part
+  the most part.
 
 - [ ] [2.0 (Cherry)](https://github.com/dgattey/dg/milestone/3): putting the
   cherry on top! Polish, security, optimizations are all finished and site is
-  done
+  done.
 
-- [ ] [3.0 (Moon Grape)](https://github.com/dgattey/dg/milestone/3): future
-  work, tracking aspirations and ideas
+- [ ] [3.0 (Moon Grape)](https://github.com/dgattey/dg/milestone/4): future
+  work, tracking aspirations and ideas.
 
 ### Current integrations
 
