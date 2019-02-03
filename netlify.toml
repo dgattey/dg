@@ -50,6 +50,23 @@
 	[headers.values]
 		Cache-Control = "no-cache"
 
+# Cache Typekit CSS for 1 day, fonts for 120 days
+[[headers]]
+	for = "https://use.typekit.net/*.css"
+	[headers.values]
+		Cache-Control = "max-age=86400, public"
+[[headers]]
+	for = "https://use.typekit.net/af/*"
+	[headers.values]
+		Cache-Control = "max-age=10368000, public"
+
+# Cache Google Analytics for 1 day
+[[headers]]
+	for = "https://www.google-analytics.com/*"
+	[headers.values]
+		Cache-Control = "max-age=86400, public"
+
+# Everything else
 [[headers]]
 	for = "/*"
 	[headers.values]

@@ -56,14 +56,14 @@ workbox.precaching.precacheAndRoute([]);
  * - Cache up to 60 images for 30 days
  */
 
-const vendorRouteConfiguration = {
+const vendorRouteConfiguration = function(hours) {
 	cacheName: vendorCacheName,
 	plugins: [
 		new workbox.cacheableResponse.Plugin({
 			statuses: [0, 200],
 		}),
 		new workbox.expiration.Plugin({
-			maxAgeSeconds: 60 * 60 * 24 * 120,
+			maxAgeSeconds: 60 * hours,
 		}),
 	],
 };
@@ -82,11 +82,11 @@ workbox.routing.registerRoute(
 );
 workbox.routing.registerRoute(
 	/^https?:\/\/.*.typekit\.net\/af/,
-	workbox.strategies.cacheFirst(vendorRouteConfiguration)
+	workbox.strategies.cacheFirst(vendorRouteConfiguration(60 * 120))
 );
 workbox.routing.registerRoute(
 	/^https?:\/\/.*.typekit\.net/,
-	workbox.strategies.cacheFirst(vendorRouteConfiguration)
+	workbox.strategies.cacheFirst(vendorRouteConfiguration(60))
 );
 workbox.routing.registerRoute(
 	/.*\.(?:js|css|json)$/,
