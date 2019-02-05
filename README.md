@@ -23,7 +23,7 @@ You must have the following already installed:
 
 ### Setup script
 
-Once the above are manually installed, you can simply run the `setup` script
+Once the above are manually installed, you can simply run the `setup.sh` script
 to install the following:
 
 - `Bundler`
@@ -50,7 +50,7 @@ rerun `bundle install`.
 
 ### Changing/adding images
 
-Use the `process-images` script after doing so. It will optimize/minify all
+Use the `process-images.sh` script after doing so. It will optimize/minify all
 jpg/png files. Additionally, it will convert those files to WebP versions and
 put them back in the same folders. This allows `jekyll-assets` to properly copy
 all those files on build. It can take _FOREVER_ to run ImageOptim, so be
