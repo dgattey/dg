@@ -1,7 +1,9 @@
 // =====
 // Imports all needed scss files from their various locations and defines config
 // =====
+// sass-lint:disable quotes
 @charset "UTF-8";
+// sass-lint:enable quotes
 
 // Normalizes css
 @import 'normalize/import-now';
