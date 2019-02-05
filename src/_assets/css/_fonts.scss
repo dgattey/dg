@@ -129,8 +129,10 @@ $font-styles: 'display' 'nav' 'head' 'body' 'code';
 // =====
 
 html {
+  // sass-lint:disable no-vendor-prefixes
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
+  // sass-lint:enable no-vendor-prefixes
   font-feature-settings: 'kern' 1;
   font-kerning: normal;
   text-size-adjust: 100%;

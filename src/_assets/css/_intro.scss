@@ -80,11 +80,15 @@ $end-before-photo: 7;
     }
   }
 
-  .portrait,
-  .portrait img {
+  .portrait {
     height: 100%;
     object-fit: cover;
     width: 100%;
+
+    img {
+      height: 100%;
+      width: 100%;
+    }
 
     @include for-phone-up {
       grid-column: 1 / -1;
