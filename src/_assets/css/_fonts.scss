@@ -23,6 +23,17 @@
   @include root-prop(--font-weight-display, 600);
   @include root-prop(--font-weight-head, 800);
   @include root-prop(--font-weight-nav, 700);
+
+  // For when fonts are un-loaded
+  letter-spacing: -0.002em;
+  word-spacing: -0.02em;
+
+  // For when fonts have loaded
+  .wf-active,
+  .wf-inactive {
+    letter-spacing: 0;
+    word-spacing: 0;
+  }
 }
 
 // Base variables

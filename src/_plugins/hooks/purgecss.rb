@@ -14,7 +14,7 @@ Jekyll::Hooks.register(:site, :post_write) do |_site|
   config_text = ''"module.exports = #{{
     content: [@build_directory + '/**/*.html'],
     css: [Dir.glob(@build_directory + '/assets/*.css').first],
-    whitelist: %w[shadow-weak]
+    whitelist: %w[shadow-weak, wf-active, wf-inactive]
   }.stringify_keys.to_json}"''
 
   # Write configuration file & run command
