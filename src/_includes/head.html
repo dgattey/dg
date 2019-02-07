@@ -9,9 +9,17 @@
   {% for url in site.preconnect %}
   <link rel="preconnect" href="{{ url }}">
   {% endfor %}
+
   {% if site.use_font_loader == false %}
+  <link rel="preload" href="{{ site.font_url }}" as="style">
   <link rel="stylesheet" href="{{ site.font_url }}">
+  {% else %}
+  {% capture fontscript %}
+    {% include font-loader.js %}
+  {% endcapture %}
+  <script type="text/javascript" crossorigin="anonymous" async>{{ fontscript | strip }}</script>
   {% endif %}
+
   {% asset main.scss !integrity %}
   {% include favicons.html %}
 
