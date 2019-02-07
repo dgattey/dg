@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Connected"
-identifier: "connected"
-type: "Javascript App"
-description: "A visualization of the future of the connected car"
+title: Connected
+type: Node.js App
+description: Visualizing the future of the connected car ecosystem
+color: muted
 link: https://studio.ey.com/studios/portland/
 sitemap: false
 ---

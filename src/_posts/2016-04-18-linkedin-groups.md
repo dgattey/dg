@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "LinkedIn Groups"
-identifier: "groups"
-type: "iOS App"
-description: "An iOS app for LinkedIn Groups with interface delights"
+title: LinkedIn Groups
+type: iOS App
+description: Connecting and empowering the world's professionals
+color: red
 ---
 <section>
 <p class="emphasized">As an intern at LinkedIn, I helped craft LinkedIn Groups

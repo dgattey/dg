@@ -17,12 +17,8 @@
 
   .type {
     font-variant: small-caps;
-    margin-top: .75em;
-    text-transform: uppercase;
-  }
-
-  .title {
     margin-top: .5em;
+    text-transform: uppercase;
   }
 
   .desc {
@@ -34,20 +30,4 @@
     color: $color-brightest;
   }
 
-  // Post specific styling
-  &.groups {
-    background: $color-red;
-  }
-
-  &.connected {
-    background: $color-muted;
-  }
-
-  &.swhc {
-    background: $color-blue;
-  }
-
-  &.fppdx {
-    background: $color-green;
-  }
 }
