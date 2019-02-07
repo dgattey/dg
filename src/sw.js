@@ -69,7 +69,7 @@ const vendorRouteConfiguration = function(hours) {
 				maxAgeSeconds: 60 * hours,
 			}),
 		],
-	}
+	};
 };
 
 workbox.routing.registerRoute(
