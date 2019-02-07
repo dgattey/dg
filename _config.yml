@@ -15,7 +15,7 @@ social:
 
 # Fonts - if changing this, change the SCSS variables too!!
 font_url: https://use.typekit.net/ytv4uxf.css
-use_font_loader: false # whether or not to use async JS to load font
+use_font_loader: true # whether or not to use async JS to load font
 
 # Breakpoints - if changing these, change the SCSS variables too!!
 breakpoint_min_tablet: 600px

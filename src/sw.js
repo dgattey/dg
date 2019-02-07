@@ -50,9 +50,11 @@ workbox.precaching.precacheAndRoute([]);
  * Routing for different filetypes & endpoints
  * - Force 404 page to network only since we don't need it offline
  * - Force all analytics calls to network only
+ * - Force all p.gif calls (Adobe's check to see if you can use the font) to
+ *   network only. If this is cached, the cache grows and grows
  * - Cache the actual font files (use.typekit.net/af) for 120 days
- * - Cache fonts stylesheets for an hour
- * - Cache js, css, and json for an hour
+ * - Cache fonts stylesheets for one day
+ * - Cache js, css, and json for six hours
  * - Cache up to 60 images for 30 days
  */
 
@@ -67,7 +69,7 @@ const vendorRouteConfiguration = function(hours) {
 				maxAgeSeconds: 60 * hours,
 			}),
 		],
-	}
+	};
 };
 
 workbox.routing.registerRoute(
@@ -83,12 +85,16 @@ workbox.routing.registerRoute(
 	workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
+	/^https?:\/\/.*.typekit\.net\/p\.gif/,
+	workbox.strategies.networkOnly()
+);
+workbox.routing.registerRoute(
 	/^https?:\/\/.*.typekit\.net\/af/,
-	workbox.strategies.cacheFirst(vendorRouteConfiguration(60 * 120))
+	workbox.strategies.cacheFirst(vendorRouteConfiguration(60 * 24 * 120))
 );
 workbox.routing.registerRoute(
 	/^https?:\/\/.*.typekit\.net/,
-	workbox.strategies.cacheFirst(vendorRouteConfiguration(60))
+	workbox.strategies.cacheFirst(vendorRouteConfiguration(60 * 24))
 );
 workbox.routing.registerRoute(
 	/.*\.(?:js|css|json)$/,
@@ -96,7 +102,7 @@ workbox.routing.registerRoute(
 		cacheName: staticCacheName,
 		plugins: [
 			new workbox.expiration.Plugin({
-				maxAgeSeconds: 60 * 60,
+				maxAgeSeconds: 60 * 60 * 6,
 			}),
 		]
 	})
@@ -141,10 +147,6 @@ const fetchWithOfflineFallback = async (args) => {
 
 workbox.routing.setDefaultHandler(fetchWithOfflineFallback);
 workbox.routing.setCatchHandler(({event}) => {
-	if (event.request.cache === "only-if-cached" &&
-		event.request.mode !== "same-origin") {
-		return new Response();
-	}
 	switch (event.request.destination) {
 	case "document":
 		return caches.match(offlinePage);

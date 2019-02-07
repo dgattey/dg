@@ -11,11 +11,11 @@
 
 :root {
   // Families
-  @include root-prop(--font-family-body, lft-etica, sans-serif);
-  @include root-prop(--font-family-code, source-code-pro, monospace);
-  @include root-prop(--font-family-display, lft-etica, sans-serif);
-  @include root-prop(--font-family-head, lft-etica, sans-serif);
-  @include root-prop(--font-family-nav, lft-etica, sans-serif);
+  @include root-prop(--font-family-body, lft-etica, Arial, sans-serif);
+  @include root-prop(--font-family-code, source-code-pro, Monaco, monospace);
+  @include root-prop(--font-family-display, lft-etica, Arial, sans-serif);
+  @include root-prop(--font-family-head, lft-etica, Arial, sans-serif);
+  @include root-prop(--font-family-nav, lft-etica, Arial, sans-serif);
 
   // Weights
   @include root-prop(--font-weight-body, 400);
@@ -23,6 +23,17 @@
   @include root-prop(--font-weight-display, 600);
   @include root-prop(--font-weight-head, 800);
   @include root-prop(--font-weight-nav, 700);
+
+  // For when fonts are un-loaded
+  letter-spacing: -.002em;
+  word-spacing: -.02em;
+
+  // For when fonts have loaded
+  .wf-active,
+  .wf-inactive {
+    letter-spacing: 0;
+    word-spacing: 0;
+  }
 }
 
 // Base variables
