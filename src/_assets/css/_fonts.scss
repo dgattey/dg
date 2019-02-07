@@ -25,8 +25,8 @@
   @include root-prop(--font-weight-nav, 700);
 
   // For when fonts are un-loaded
-  letter-spacing: -0.002em;
-  word-spacing: -0.02em;
+  letter-spacing: -.002em;
+  word-spacing: -.02em;
 
   // For when fonts have loaded
   .wf-active,
