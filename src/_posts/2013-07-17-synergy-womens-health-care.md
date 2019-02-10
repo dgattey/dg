@@ -1,9 +1,9 @@
 ---
 layout: post
-title:  "Synergy Women's Health Care"
-identifier: swhc
-type: "Website + Brand"
-description: "A new office for women's health needs a clean, welcoming website"
+title: Synergy Women's Health Care
+type: Website + Brand
+description: Streamlining and encouraging access to quality care
+color: blue
 link: https://synergypdx.com
 sitemap: false
 ---

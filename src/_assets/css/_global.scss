@@ -31,3 +31,22 @@ body {
   background: $color-primary-dim;
   color: $color-text-light;
 }
+
+// =====
+// Colors
+// =====
+.background-red {
+  background-color: $color-red;
+}
+
+.background-green {
+  background-color: $color-green;
+}
+
+.background-blue {
+  background-color: $color-blue;
+}
+
+.background-muted {
+  background-color: $color-muted;
+}

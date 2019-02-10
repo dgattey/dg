@@ -3,8 +3,8 @@
 {% else %}
 {% assign postlink = post.url %}
 {% endif %}
-<a href="{{ postlink }}" class="proj-card round-corners shadow-strong transition-bounce scale-down-on-hover {{ post.identifier }}">
-	<h6 class="type">{{ post.type }}</h6>
+<a href="{{ postlink }}" class="proj-card round-corners shadow-strong transition-bounce scale-down-on-hover background-{{ post.color }}">
 	<h3 class="title">{{ post.title }}</h3>
+    <h6 class="type">{{ post.type }}</h6>
 	<p class="desc">{{ post.description }}</p>
 </a>
