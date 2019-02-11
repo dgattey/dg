@@ -71,6 +71,13 @@ workbox:
     - /offline.html
     - favicon.ico
 
+# Compression settings for the HTML
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  startings: [html, head, body]
+
 # Build settings
 markdown: kramdown
 source: src
