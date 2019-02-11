@@ -48,13 +48,12 @@ jekyll_analytics:
 assets:
   digest: true
   compression: true
-  source_maps: false
+  gzip: true
   sources:
     - _assets/icons
   autoprefixer:
     browsers:
     - "last 2 versions"
-    - "IE > 9"
 favicons:
   generic: [32, 144, 192, 228]
   android: [96, 128, 144, 192, 196, 512]
@@ -79,6 +78,11 @@ compress_html:
   endings: all
   startings: [html, head]
 
+# Compression settings for the JS
+jekyll-minifier:
+  uglifier_args:
+    harmony: true
+
 # Build settings
 markdown: kramdown
 source: src
@@ -94,9 +98,10 @@ sass:
 
 # Plugins
 plugins:
-  - jekyll-sitemap
-  - jekyll-analytics
-  - jekyll-seo-tag
-  - jekyll-assets
-  - jekyll-workbox-plugin
   - autoprefixer-rails
+  - jekyll-analytics
+  - jekyll-assets
+  - jekyll-minifier
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-workbox-plugin
