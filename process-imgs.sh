@@ -1,18 +1,11 @@
 #! /bin/bash
-set -e
-
-# Echo an error message before exiting
-err_report() {
-    echo "$(tput setaf 1)optimize: error on line $1$(tput sgr0)"
-}
-trap 'err_report $LINENO' ERR
+source ./helper.sh
 
 # --------------------------
 # CONSTANTS
 # --------------------------
 IMAGE_OPTIM=/Applications/ImageOptim.app/Contents/MacOS/ImageOptim
 OPTIM_OUTPUT_FILE=".tmp/optimoutput"
-ERASE="\r\033[K"
 
 IMAGE_ASSET_PATH=./src/_assets/img
 IMAGE_FILETYPES=("jpg" "png")
@@ -21,56 +14,8 @@ ICON_FILETYPES=("png" "svg")
 CONVERSION_FILETYPE="webp"
 
 # --------------------------
-# PRINT FUNCTIONS
+# PRINT
 # --------------------------
-
-# Echos a simple status message, linebreaking the previous content
-print_status_message() {
-    local message=$1
-
-    echo ""
-    echo -e "$(tput setaf 6)${message}$(tput sgr0)"
-}
-
-# Prints a success message with a green checkmark
-print_success_message() {
-    local message=$1
-
-    echo -en "$ERASE"
-    echo -en "$message "
-    echo -e "$(tput setaf 2)√$(tput sgr0)"
-}
-
-# Prints a "working" message with iteration count
-print_working_message() {
-    local spin='-\|/'
-
-    local filename=$1
-    local iteration_count=$2
-    local overall_spin_iteration=$3
-    local mode=$4
-    local spin_iteration=$((overall_spin_iteration%4))
-
-    local message
-    if [ "$overall_spin_iteration" -lt 10 ] && [ "$mode" = "optimize" ]; then
-        message="being verified"
-    elif [ "$mode" = "optimize" ]; then
-        message="being optimized - pass $iteration_count"
-    elif [ "$mode" = "convert" ]; then
-        message="being converted"
-    fi
-
-    echo -en "$ERASE"
-    echo -en "$filename "
-    print_progress "$message"
-    printf " %s" "${spin:$spin_iteration:1}"
-}
-
-# Prints a "(pass 3)" type of string in yellow with given message content
-print_progress() {
-    local message=$1
-    echo -en "$(tput setaf 3)$message$(tput sgr0)"
-}
 
 # Prints either already optimized or now optimized with pass count,
 # given the iteration number
@@ -79,7 +24,7 @@ print_end_iteration_result() {
     local iteration_count=$2
 
     if [ "$iteration_count" -lt 2 ]; then
-        print_success_message "$filename already optimized"
+        print_success_message "$filename already optimized "
     else
         local iteration_message
         local passes_message
@@ -91,8 +36,8 @@ print_end_iteration_result() {
         else
             passes_message="passes"
         fi
-        iteration_message=$(print_progress "(finished in $iteration_count $passes_message)")
-        print_success_message "$filename now optimized $iteration_message"
+        iteration_message=$(print_information_message "(finished in $iteration_count $passes_message)")
+        print_success_message "$filename now optimized $iteration_message "
     fi
 }
 
@@ -112,18 +57,8 @@ convert_files() {
         local output_file="$directory/$filename.$output_filetype"
 
         convert "$file" "$output_file" &
-        local convertPID=$!
-
-        # Prints a message that moves so we show progress
-        local spin_iteration=0
-        while kill -0 $convertPID 2>/dev/null
-        do
-          spin_iteration=$((spin_iteration+1))
-          print_working_message "$filename" "$iteration_count" "$spin_iteration" "convert"
-          sleep .15
-        done
-
-        print_success_message "$filename.$output_filetype created"
+        print_progress_indicator "$filename being converted "
+        print_success_message "$filename.$output_filetype created "
     done
 }
 
@@ -137,6 +72,7 @@ convert_filetypes_until_done() {
     # Rest of arguments are all the filetypes
     for filetype in "$@"
     do
+        echo ""
         print_status_message "Beginning conversion of ${filetype}s"
         convert_files "$filetype" "$directory" "$output_filetype"
     done
@@ -153,16 +89,7 @@ optimize_image() {
     local iteration_count="$3"
 
     $IMAGE_OPTIM "$file" 2>"$OPTIM_OUTPUT_FILE" &
-    local optimizePID=$!
-
-    # Prints a message that moves so we show progress
-    local spin_iteration=0
-    while kill -0 $optimizePID 2>/dev/null
-    do
-      spin_iteration=$((spin_iteration+1))
-      print_working_message "$filename" "$iteration_count" "$spin_iteration" "optimize"
-      sleep .15
-    done
+    print_progress_indicator "$filename being optimized - pass $iteration_count " "$filename being verified "
 }
 
 # Optimizes a given image until done
@@ -181,12 +108,7 @@ optimize_until_done() {
 
         # Make sure there's not something wrong and we've reached a ton of iterations
         if [ "$iteration_count" -gt 9 ]; then
-            echo -en "$ERASE"
-            echo -en "$(tput setaf 1)"
-            echo -en "Couldn't optimize ${filename}  "
-            echo -en $'\xE2\x98\xA0' # Skull and crossbones
-            print_progress "tried $iteration_count passes"
-            echo ""
+            print_error_message "Couldn't optimize $filename" "  (tried $iteration_count passes)"
             return
         fi
 
@@ -216,6 +138,7 @@ optimize_filetypes_until_done() {
     # Rest of arguments are filetypes
     for filetype in "$@"
     do
+        echo ""
         print_status_message "Optimizing all $filetype images"
         optimize_directory_until_done "$filetype" "$directory"
     done
