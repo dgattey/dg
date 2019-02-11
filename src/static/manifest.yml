@@ -1,45 +1,22 @@
 ---
+# This is for Android/Chrome only so the icons are all prerounded
 permalink: manifest.json
 ---
 
 {
-  "short_name": "{{ site.short_title }}",
   "name": "{{ site.title }}",
-  "start_url": "{{ site.baseurl }}/?utm_source=a2hs",
+  "short_name": "{{ site.short_title }}",
+  "start_url": "{{ site.url }}/?utm_source=a2hs",
   "lang": "{{ site.lang }}",
   "background_color": "#{{ site.app_background_color }}",
-  "display": "{{ site.app_display }}",
   "theme_color": "#{{ site.app_theme_color }}",
+  "display": "{{ site.app_display }}",
   "icons": [
-    {
-      "src": "{% asset favicon-32.png @path %}",
+    {% for size in site.favicons.manifest %}{
+      "src": {% asset prerounded-"{{ size }}".png @path %},
       "type": "image/png",
-      "sizes": "32x32"
+      "sizes": "{{ size }}x{{ size }}"
     },
-    {
-      "src": "{% asset favicon-76.png @path %}",
-      "type": "image/png",
-      "sizes": "76x76"
-    },
-    {
-      "src": "{% asset favicon-120.png @path %}",
-      "type": "image/png",
-      "sizes": "120x120"
-    },
-    {
-    "src": "{% asset favicon-196.png @path %}",
-    "type": "image/png",
-    "sizes": "196x196"
-    },
-    {
-    "src": "{% asset favicon-228.png @path %}",
-    "type": "image/png",
-    "sizes": "228x228"
-    },
-    {
-      "src": "{% asset favicon-512.png @path %}",
-      "type": "image/png",
-      "sizes": "512x512"
-    }
+    {% endfor %}
   ]
 }

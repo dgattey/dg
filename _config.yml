@@ -34,8 +34,8 @@ preconnect:
 
 # Manifest
 lang: en
-app_theme_color: 1CD1A5
-app_background_color: FFFFFF
+app_theme_color: 16ac7e
+app_background_color: ffffff
 app_display: standalone
 short_title: dg
 
@@ -56,11 +56,13 @@ assets:
     - "last 2 versions"
     - "IE > 9"
 favicons:
-  generic: [32, 57, 76, 96, 128, 196, 228]
-  android: [196]
-  ios: [120, 152, 180]
+  generic: [32, 144, 192, 228]
+  android: [96, 128, 144, 192, 196, 512]
+  manifest: [128, 192, 512]
+  ios: [57, 76, 120, 152, 167, 180, 512, 1024]
   windows: [144]
   thumbnail: [152]
+  mask: ["safari-pinned-tab.svg"]
 
 # Workbox settings for Service worker
 workbox:
@@ -69,6 +71,13 @@ workbox:
     - 'index.html': '/'
     - /offline.html
     - favicon.ico
+
+# Compression settings for the HTML
+compress_html:
+  clippings: all
+  comments: all
+  endings: all
+  startings: [html, head]
 
 # Build settings
 markdown: kramdown

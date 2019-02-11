@@ -3,17 +3,20 @@
 <link rel="icon" href={% asset "favicon-{{ size }}.png" @path %} sizes="{{ size }}x{{ size }}">
 {% endfor %}
 {% for size in site.favicons.thumbnail %}
-<meta name="thumbnail" content={% asset "favicon-{{ size }}.png" @path %}>
+<meta name="thumbnail" content={% asset "touch-icon-{{ size }}.png" @path %}>
 {% endfor %}
 
 <!-- Android -->
 {% for size in site.favicons.android %}
-<link rel="shortcut icon" href={% asset "favicon-{{ size }}.png" @path %} sizes="{{ size }}x{{ size }}">
+<link rel="shortcut icon" href={% asset "prerounded-{{ size }}.png" @path %} sizes="{{ size }}x{{ size }}">
 {% endfor %}
 
 <!-- iOS -->
 {% for size in site.favicons.ios %}
-<link rel="apple-touch icon" href={% asset "favicon-{{ size }}.png" @path %} sizes="{{ size }}x{{ size }}">
+<link rel="apple-touch-icon" href={% asset "touch-icon-{{ size }}.png" @path %} sizes="{{ size }}x{{ size }}">
+{% endfor %}
+{% for icon in site.favicons.mask %}
+<link rel="mask-icon" href={% asset "{{ icon }}" @path %} color="#{{ site.app_theme_color }}">
 {% endfor %}
 
 <!-- Windows -->
