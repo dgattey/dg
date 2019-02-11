@@ -2,7 +2,7 @@
 # This is for Android/Chrome only so the icons are all prerounded
 permalink: manifest.json
 ---
-
+{% assign limit = site.favicons.manifest.size %}{% assign counter = 0 %}
 {
   "name": "{{ site.title }}",
   "short_name": "{{ site.short_title }}",
@@ -12,11 +12,10 @@ permalink: manifest.json
   "theme_color": "#{{ site.app_theme_color }}",
   "display": "{{ site.app_display }}",
   "icons": [
-    {% for size in site.favicons.manifest %}{
-      "src": {% asset prerounded-"{{ size }}".png @path %},
+    {% for size in site.favicons.manifest %}{% assign counter = counter | plus: 1 %}{
+      "src": "{% asset prerounded-"{{ size }}".png @path %}",
       "type": "image/png",
       "sizes": "{{ size }}x{{ size }}"
-    },
-    {% endfor %}
+    }{% if counter < limit %},{% endif %}{% endfor %}
   ]
 }
