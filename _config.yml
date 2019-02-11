@@ -56,9 +56,10 @@ assets:
     - "last 2 versions"
     - "IE > 9"
 favicons:
-  generic: [32, 57, 76, 96, 128, 196, 228]
-  android: [196]
-  ios: [120, 152, 180]
+  generic: [32, 144, 192, 228]
+  android: [96, 128, 144, 192, 196, 512]
+  manifest: [128, 192, 512]
+  ios: [57, 76, 120, 152, 167, 180, 512, 1024]
   windows: [144]
   thumbnail: [152]
   mask: ["safari-pinned-tab.svg"]
