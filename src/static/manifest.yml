@@ -12,14 +12,34 @@ permalink: manifest.json
   "theme_color": "#{{ site.app_theme_color }}",
   "icons": [
     {
+      "src": "{% asset favicon-32.png @path %}",
+      "type": "image/png",
+      "sizes": "32x32"
+    },
+    {
+      "src": "{% asset favicon-76.png @path %}",
+      "type": "image/png",
+      "sizes": "76x76"
+    },
+    {
+      "src": "{% asset favicon-120.png @path %}",
+      "type": "image/png",
+      "sizes": "120x120"
+    },
+    {
     "src": "{% asset favicon-196.png @path %}",
     "type": "image/png",
-    "sizes": "192x192"
-  },
-  {
-    "src": "{% asset favicon-512.png @path %}",
+    "sizes": "196x196"
+    },
+    {
+    "src": "{% asset favicon-228.png @path %}",
     "type": "image/png",
-    "sizes": "512x512"
-  }
+    "sizes": "228x228"
+    },
+    {
+      "src": "{% asset favicon-512.png @path %}",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
   ]
 }

@@ -1,18 +1,11 @@
 #! /bin/bash
-set -e
-
-# Echo an error message before exiting
-err_report() {
-    echo "$(tput setaf 1)optimize: error on line $1$(tput sgr0)"
-}
-trap 'err_report $LINENO' ERR
+source ./helper.sh
 
 # --------------------------
 # CONSTANTS
 # --------------------------
 IMAGE_OPTIM=/Applications/ImageOptim.app/Contents/MacOS/ImageOptim
 OPTIM_OUTPUT_FILE=".tmp/optimoutput"
-ERASE="\r\033[K"
 
 IMAGE_ASSET_PATH=./src/_assets/img
 IMAGE_FILETYPES=("jpg" "png")
@@ -21,60 +14,30 @@ ICON_FILETYPES=("png" "svg")
 CONVERSION_FILETYPE="webp"
 
 # --------------------------
-# PRINT FUNCTIONS
+# PRINT
 # --------------------------
-
-# Echos a simple status message, linebreaking the previous content
-print_status_message() {
-	local message=$1
-
-	echo -e "\n$(tput setaf 6)${message}$(tput sgr0)"
-}
-
-# Prints a success message with a green checkmark
-print_success_message() {
-	local message=$1
-
-	echo -en "$ERASE"
-	echo -en "$(tput setaf 2)√$(tput sgr0)\t"
-	echo -en "$message"
-}
-
-# Prints a tool icon "working" message with iteration count
-print_iteration_working_message() {
-	local filename=$1
-	local iteration_count=$2
-
-	echo -en "$ERASE"
-	echo -en $'\xF0\x9f\x9b\xa0' # Tool icon
-	echo -en "\tWorking on ${filename}"
-	print_iteration "$iteration_count" "pass"
-}
-
-# Prints a "(pass 3)" type of string in yellow with given message content
-print_iteration() {
-	local iteration_count=$1
-	local prepend_string=$2
-	local append_string=$3
-
-	echo -en " $(tput setaf 3)"
-	echo -en "(${prepend_string} ${iteration_count}${append_string})"
-	echo -en "$(tput sgr0)"
-}
 
 # Prints either already optimized or now optimized with pass count,
 # given the iteration number
 print_end_iteration_result() {
-	local filename=$1
-	local iteration_count=$2
+    local filename=$1
+    local iteration_count=$2
 
-	print_success_message "$filename"
-	if [ "$iteration_count" -lt 2 ]; then
-		echo " already optimized"
-	else
-		echo -n " now optimized"
-    	print_iteration "$iteration_count" "took" " passes"
-    	echo -en "\n"
+    if [ "$iteration_count" -lt 2 ]; then
+        print_success_message "$filename already optimized "
+    else
+        local iteration_message
+        local passes_message
+
+        # Subtract one since 1x is just verifying it worked
+        iteration_count=$((iteration_count-1))
+        if [ "$iteration_count" -eq 1 ]; then
+            passes_message="pass"
+        else
+            passes_message="passes"
+        fi
+        iteration_message=$(print_information_message "(finished in $iteration_count $passes_message)")
+        print_success_message "$filename now optimized $iteration_message "
     fi
 }
 
@@ -84,33 +47,35 @@ print_end_iteration_result() {
 
 # Converts the files in the directory that match an extension to an extension
 convert_files() {
-	local filetype=$1
-	local directory=$2
-	local output_filetype=$3
+    local filetype=$1
+    local directory=$2
+    local output_filetype=$3
 
-	for file in "${directory}"/*."${filetype}"; do
-		local filename
+    for file in "${directory}"/*."${filetype}"; do
+        local filename
         filename=$(basename "$file" ."$1")
-		local output_file="${directory}/${filename}.${output_filetype}"
+        local output_file="$directory/$filename.$output_filetype"
 
-		convert "${file}" "${output_file}"
-		print_success_message "Created ${filename}.${output_filetype}\n"
-	done
+        convert "$file" "$output_file" &
+        print_progress_indicator "$filename being converted "
+        print_success_message "$filename.$output_filetype created "
+    done
 }
 
 # Converts all filetypes in a given directory to a filetype
 convert_filetypes_until_done() {
-	local directory=$1
-	local output_filetype=$2
-	shift
-	shift
+    local directory=$1
+    local output_filetype=$2
+    shift
+    shift
 
     # Rest of arguments are all the filetypes
-	for filetype in "$@"
-	do
-		print_status_message "Beginning conversion of ${filetype}s"
-	    convert_files "$filetype" "$directory" "$output_filetype"
-	done
+    for filetype in "$@"
+    do
+        echo ""
+        print_status_message "Beginning conversion of ${filetype}s"
+        convert_files "$filetype" "$directory" "$output_filetype"
+    done
 }
 
 # --------------------------
@@ -119,40 +84,36 @@ convert_filetypes_until_done() {
 
 # Optimizes one image
 optimize_image() {
-	local file="$1"
+    local file="$1"
+    local filename="$2"
+    local iteration_count="$3"
 
-	$IMAGE_OPTIM "$file" 2>"$OPTIM_OUTPUT_FILE"
+    $IMAGE_OPTIM "$file" 2>"$OPTIM_OUTPUT_FILE" &
+    print_progress_indicator "$filename being optimized - pass $iteration_count " "$filename being verified "
 }
 
 # Optimizes a given image until done
 optimize_until_done() {
-	local file="$1"
-	local iteration_count=1
-	local filename
+    local file="$1"
+    local iteration_count=1
+    local filename
     filename=$(basename "$file")
 
-	# First optimize check
-	print_iteration_working_message "$filename" "$iteration_count"
-	optimize_image "$file"
+    # First optimize check
+    optimize_image "$file" "$filename" "$iteration_count"
 
-	# Optimize until there's output from the command (it means there's content)
-	while [ "$(head -c1 "$OPTIM_OUTPUT_FILE" | wc -c)" -eq 0 ]; do
-    	((iteration_count+=1))
+    # Optimize until the command outputs "it has been optimized before"
+    while [ "$(grep "it has been optimized before" "$OPTIM_OUTPUT_FILE" | wc -c)" -eq 0 ]; do
+        ((iteration_count+=1))
 
-    	# Make sure there's not something wrong and we've reached a ton of iterations
-    	if [ "$iteration_count" -gt 9 ]; then
-    		echo -en "$ERASE"
-    		echo -en "$(tput setaf 1)"
-    		echo -en $'\xE2\x98\xA0' # Skull and crossbones
-    		echo -en "\tCouldn't optimize ${filename}"
-    		print_iteration "$iteration_count" "tried" " times"
-    		echo -en "\n"
-    		return
-    	fi
+        # Make sure there's not something wrong and we've reached a ton of iterations
+        if [ "$iteration_count" -gt 9 ]; then
+            print_error_message "Couldn't optimize $filename" "  (tried $iteration_count passes)"
+            return
+        fi
 
-    	# Replace the content of the line to mark that it's actually optimizing
-    	print_iteration_working_message "$filename" "$iteration_count"
-    	optimize_image "$file"
+        # Replace the content of the line to mark that it's actually optimizing
+        optimize_image "$file" "$filename" "$iteration_count"
     done
 
     # Overwrite last message to show that we're done
@@ -161,25 +122,26 @@ optimize_until_done() {
 
 # Optimizes a given filetype in a folder until done
 optimize_directory_until_done() {
-	local filetype="$1"
-	local directory="$2"
+    local filetype="$1"
+    local directory="$2"
 
-	for file in "${directory}"/*."${filetype}"; do
-		optimize_until_done "$file"
-	done
+    for file in "${directory}"/*."${filetype}"; do
+        optimize_until_done "$file"
+    done
 }
 
 # Optimizes given filetypes until done
 optimize_filetypes_until_done() {
-	local directory="${1}"
-	shift
+    local directory="${1}"
+    shift
 
     # Rest of arguments are filetypes
-	for filetype in "$@"
-	do
-	    print_status_message "Optimizing all $filetype images"
-		optimize_directory_until_done "$filetype" "$directory"
-	done
+    for filetype in "$@"
+    do
+        echo ""
+        print_status_message "Optimizing all $filetype images"
+        optimize_directory_until_done "$filetype" "$directory"
+    done
 }
 
 # --------------------------
