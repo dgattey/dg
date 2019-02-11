@@ -61,6 +61,7 @@ favicons:
   ios: [120, 152, 180]
   windows: [144]
   thumbnail: [152]
+  mask: ["safari-pinned-tab.svg"]
 
 # Workbox settings for Service worker
 workbox:
