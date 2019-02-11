@@ -145,7 +145,7 @@ reflected in our version tags on particular commits and are as follows.
   cherry on top! Polish, security, optimizations are all finished and site is
   done.
 
-- [ ] [3.0 (Moon Grape)](https://github.com/dgattey/dg/milestone/4): future
+- [ ] [3.0 (Rocket)](https://github.com/dgattey/dg/milestone/4): future
   work, tracking aspirations and ideas.
 
 ### Current integrations
