@@ -13,7 +13,7 @@
 
 <!-- iOS -->
 {% for size in site.favicons.ios %}
-<link rel="apple-touch icon" href={% asset "favicon-{{ size }}.png" @path %} sizes="{{ size }}x{{ size }}">
+<link rel="apple-touch-icon" href={% asset "favicon-{{ size }}.png" @path %} sizes="{{ size }}x{{ size }}">
 {% endfor %}
 {% for icon in site.favicons.mask %}
 <link rel="mask-icon" href={% asset "{{ icon }}" @path %} color="#{{ site.app_theme_color }}">

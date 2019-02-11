@@ -5,7 +5,7 @@ permalink: manifest.json
 {
   "short_name": "{{ site.short_title }}",
   "name": "{{ site.title }}",
-  "start_url": "{{ site.baseurl }}/?utm_source=a2hs",
+  "start_url": "{{ site.url }}/?utm_source=a2hs",
   "lang": "{{ site.lang }}",
   "background_color": "#{{ site.app_background_color }}",
   "display": "{{ site.app_display }}",
@@ -17,29 +17,19 @@ permalink: manifest.json
       "sizes": "32x32"
     },
     {
-      "src": "{% asset favicon-76.png @path %}",
+      "src": "{% asset favicon-196.png @path %}",
       "type": "image/png",
-      "sizes": "76x76"
-    },
-    {
-      "src": "{% asset favicon-120.png @path %}",
-      "type": "image/png",
-      "sizes": "120x120"
-    },
-    {
-    "src": "{% asset favicon-196.png @path %}",
-    "type": "image/png",
-    "sizes": "196x196"
-    },
-    {
-    "src": "{% asset favicon-228.png @path %}",
-    "type": "image/png",
-    "sizes": "228x228"
+      "sizes": "196x196"
     },
     {
       "src": "{% asset favicon-512.png @path %}",
       "type": "image/png",
       "sizes": "512x512"
+    },
+    {
+      "src": "{% asset favicon-1024.png @path %}",
+      "type": "image/png",
+      "sizes": "1024x1024"
     }
   ]
 }

@@ -34,8 +34,8 @@ preconnect:
 
 # Manifest
 lang: en
-app_theme_color: 1CD1A5
-app_background_color: FFFFFF
+app_theme_color: 16ac7e
+app_background_color: ffffff
 app_display: standalone
 short_title: dg
 
