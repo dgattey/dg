@@ -17,4 +17,5 @@
 	{% endif %}
 	srcset="{% asset {{include.src}}.{{include.type}} @path %} 1x, {% asset {{include.src}}@2x.{{include.type}} @path %} 2x"
 	type="image/{{mimetype}}"
-	alt="{{ include.alt }}">
+	alt="{{ include.alt }}"
+    class="{{ include.class }}">
