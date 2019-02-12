@@ -23,9 +23,6 @@ GEM
     fastimage (2.1.5)
     ffi (1.10.0)
     forwardable-extended (2.6.0)
-    hawkins (2.0.5)
-      em-websocket (~> 0.5)
-      jekyll (~> 3.1)
     htmlcompressor (0.4.0)
     http_parser.rb (0.6.0)
     i18n (0.9.5)
@@ -125,7 +122,6 @@ PLATFORMS
 
 DEPENDENCIES
   autoprefixer-rails
-  hawkins
   jekyll
   jekyll-analytics
   jekyll-assets

@@ -5,7 +5,6 @@ source 'https://rubygems.org'
 
 group :jekyll_plugins do
   gem 'autoprefixer-rails'      # Autoprefixes css
-  gem 'hawkins'                 # Live reload
   gem 'jekyll'                  # This one's obvious
   gem 'jekyll-analytics'        # Google Analytics built in
   gem 'jekyll-assets'           # Asset management
