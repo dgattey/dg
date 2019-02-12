@@ -40,8 +40,8 @@ to install the following:
 1. Install the necessary gems with `bundle install`
 1. Build & serve the site with `bundle exec jekyll serve`
 
-If you want autoreload, use `bundle exec jekyll liveserve`. The site files will
-live in `build` and be served on `http://localhost:4000/`.
+The site files will live in `build` and be served on
+`http://localhost:4000/`.
 
 ### Adding a new dependency
 
