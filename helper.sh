@@ -11,6 +11,9 @@ trap 'err_report $LINENO' ERR
 # CONSTANTS
 # --------------------------
 ERASE="\\r\\033[K"
+TEMP=".tmp"
+SETUP_OUTPUT_FILE="$TEMP/setup_output"
+OPTIM_OUTPUT_FILE="$TEMP/optim_output"
 
 # --------------------------
 # PRINT FUNCTIONS
@@ -93,3 +96,12 @@ print_progress_indicator() {
       sleep .15
     done
 }
+
+# --------------------------
+# MAIN
+# --------------------------
+
+# Simply creates the temp directory
+mkdir -p $TEMP
+touch $SETUP_OUTPUT_FILE
+touch $OPTIM_OUTPUT_FILE

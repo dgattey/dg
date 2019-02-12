@@ -2,11 +2,6 @@
 source ./helper.sh
 
 # --------------------------
-# CONSTANTS
-# --------------------------
-OUTPUT_FILE=".tmp/installoutput"
-
-# --------------------------
 # FUNCTIONS
 # --------------------------
 
@@ -17,11 +12,11 @@ install_if_needed() {
     local is_installed_check_result=$3
     local install_command=$4
 
-    eval "$check_command > $OUTPUT_FILE 2>/dev/null" &
+    eval "$check_command > $SETUP_OUTPUT_FILE 2>/dev/null" &
     print_progress_indicator "$name: checking for installation "
 
     # Check to see if item is installed
-    if [ "$(grep "$is_installed_check_result" "$OUTPUT_FILE" | wc -c)" -ne 0 ]; then
+    if [ "$(grep "$is_installed_check_result" "$SETUP_OUTPUT_FILE" | wc -c)" -ne 0 ]; then
         print_success_message "$name already installed "
         return
     fi
