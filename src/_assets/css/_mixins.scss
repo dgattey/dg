@@ -7,22 +7,7 @@ $weak-shadow-color: rgba(0, 0, 0, .1);
 $spread: $item-spacing-4 + $item-spacing-3;
 $strong-shadow: 0 $item-spacing-3 $spread $strong-shadow-color;
 $weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
-
-.shadow-strong {
-  box-shadow: $strong-shadow;
-
-  &:hover {
-    box-shadow: $weak-shadow;
-  }
-}
-
-.shadow-weak {
-  box-shadow: $weak-shadow;
-}
-
-.round-corners {
-  border-radius: $item-spacing-1;
-}
+$card-padding: $item-spacing-4;
 
 // =====
 // Breakpoints
@@ -44,6 +29,12 @@ $weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
   }
 }
 
+@mixin for-tablet-down {
+  @media (max-width: $breakpoint-min-desktop - 1) {
+    @content;
+  }
+}
+
 @mixin for-desktop-up {
   @media (min-width: $breakpoint-min-desktop) {
     @content;
@@ -53,5 +44,51 @@ $weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
 @mixin for-max-size-only {
   @media (min-width: $breakpoint-max-width) {
     @content;
+  }
+}
+
+// =====
+// Utility classes
+// =====
+
+.shadow-strong {
+  box-shadow: $strong-shadow;
+}
+
+.shadow-weak {
+  box-shadow: $weak-shadow;
+}
+
+.shadow-weak-on-hover {
+  &:hover {
+    box-shadow: $weak-shadow;
+  }
+}
+
+.shadow-weak-on-hovered {
+  :hover > & {
+    box-shadow: $weak-shadow;
+  }
+}
+
+.round-corners {
+  border-radius: $item-spacing-1;
+}
+
+.card {
+  margin: 0 $item-spacing-4;
+}
+
+.card-pull-right {
+  margin-left: $card-padding;
+}
+
+.card-overhang-parent {
+  @include for-phone-up {
+    margin-bottom: 0;
+  }
+
+  @include for-tablet-up {
+    margin-bottom: -$card-padding;
   }
 }

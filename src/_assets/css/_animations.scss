@@ -47,19 +47,35 @@ $ease-in-out-back: cubic-bezier(.68, -.55, .265, 1.55);
   @include transition-linear(box-shadow);
 }
 
+$scale-down-hover: .96;
 .scale-down-on-hover {
-  $hover-scale: .96;
-
   &:hover {
-    transform: scale($hover-scale);
+    transform: scale($scale-down-hover);
   }
 }
 
+$scale-up-hover: 1.06;
 .scale-up-on-hover {
-  $hover-scale: 1.05;
-
   &:hover {
-    transform: scale($hover-scale);
+    transform: scale($scale-up-hover);
+  }
+}
+
+.scale-up-on-hovered {
+  :hover > & {
+    transform: scale($scale-up-hover);
+  }
+}
+
+.scale-down-on-hovered {
+  :hover > & {
+    transform: scale($scale-down-hover);
+  }
+}
+
+.pull-right-on-hovered {
+  :hover > & {
+    transform: translateX($item-spacing-3);
   }
 }
 
