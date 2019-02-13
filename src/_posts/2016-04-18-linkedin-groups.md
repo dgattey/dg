@@ -1,10 +1,12 @@
 ---
 layout: post
-title: LinkedIn Groups
 type: iOS App
 description: Connecting and empowering the world's professionals
 color: red
 ---
+
+# LinkedIn Groups
+
 <section>
 <p class="emphasized">As an intern at LinkedIn, I helped craft LinkedIn Groups
 2.0 for iOS. Interface "delights" to make Groups smooth and attractive were
