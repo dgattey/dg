@@ -52,6 +52,7 @@ GEM
       nokogiri (~> 1.8)
       pathutil (~> 0.16)
       sprockets (>= 3.3, < 4.1.beta)
+    jekyll-email-protect (1.1.0)
     jekyll-last-modified-at (1.0.1)
       jekyll (~> 3.3)
       posix-spawn (~> 0.3.9)
@@ -130,6 +131,7 @@ DEPENDENCIES
   jekyll
   jekyll-analytics
   jekyll-assets
+  jekyll-email-protect
   jekyll-last-modified-at
   jekyll-minifier
   jekyll-optional-front-matter
