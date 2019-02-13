@@ -71,6 +71,11 @@ workbox:
     - /offline.html
     - favicon.ico
 
+# For auto-inferring post titles
+titles_from_headings:
+  strip_title: true
+  collections: true
+
 # Compression settings for the HTML
 compress_html:
   clippings: all
