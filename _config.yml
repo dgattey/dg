@@ -100,13 +100,3 @@ kramdown:
 sass:
   style:  expanded
   deploy_style: compressed
-
-# Plugins
-plugins:
-  - autoprefixer-rails
-  - jekyll-analytics
-  - jekyll-assets
-  - jekyll-minifier
-  - jekyll-seo-tag
-  - jekyll-sitemap
-  - jekyll-workbox-plugin

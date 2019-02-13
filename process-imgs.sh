@@ -5,7 +5,6 @@ source ./helper.sh
 # CONSTANTS
 # --------------------------
 IMAGE_OPTIM=/Applications/ImageOptim.app/Contents/MacOS/ImageOptim
-OPTIM_OUTPUT_FILE=".tmp/optimoutput"
 
 IMAGE_ASSET_PATH=./src/_assets/img
 IMAGE_FILETYPES=("jpg" "png")

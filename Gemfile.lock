@@ -52,6 +52,7 @@ GEM
       nokogiri (~> 1.8)
       pathutil (~> 0.16)
       sprockets (>= 3.3, < 4.1.beta)
+    jekyll-email-protect (1.1.0)
     jekyll-last-modified-at (1.0.1)
       jekyll (~> 3.3)
       posix-spawn (~> 0.3.9)
@@ -61,6 +62,8 @@ GEM
       jekyll (>= 3.5)
       json-minify (~> 0.0.3)
       uglifier (~> 4.1)
+    jekyll-optional-front-matter (0.3.0)
+      jekyll (~> 3.0)
     jekyll-sanity (1.2.0)
       jekyll (~> 3.1)
     jekyll-sass-converter (1.5.2)
@@ -74,6 +77,7 @@ GEM
     jekyll-watch (2.1.2)
       listen (~> 3.0)
     jekyll-workbox-plugin (0.0.2)
+    jekyll_version_plugin (2.0.0)
     json (2.1.0)
     json-minify (0.0.3)
       json (> 0)
@@ -127,12 +131,15 @@ DEPENDENCIES
   jekyll
   jekyll-analytics
   jekyll-assets
+  jekyll-email-protect
   jekyll-last-modified-at
   jekyll-minifier
+  jekyll-optional-front-matter
   jekyll-seo-tag
   jekyll-sitemap
   jekyll-titles-from-headings
   jekyll-workbox-plugin
+  jekyll_version_plugin
   kramdown
   mini_magick
   normalize-scss

@@ -1,8 +1,10 @@
 <footer>
-  <p class="copy">&copy; {{ site.time | date: '%Y' }} {{ site.title }}</p>
+  {% capture version %}{% project_version tag short %}{% endcapture %}
+  {% assign short_version = version | split: "-" | first %}
+  <p class="copy">&copy; {{ site.time | date: '%Y' }} {{ site.title }} | {{ version }}</p>
   <ul>
     <li>
-      <a href="{{site.baseurl}}/about"><p>About</p></a>
+      <a href="{{ site.baseurl }}/about"><p>About</p></a>
     </li>
 
     <li>
@@ -10,7 +12,7 @@
     </li>
 
     <li>
-      <a href="mailto:{{ site.email }}"><p>Email</p></a>
+      <a href="mailto:{{ site.email | encode_email }}"><p>Email</p></a>
     </li>
   </ul>
 </footer>
