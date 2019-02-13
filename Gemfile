@@ -14,6 +14,7 @@ group :jekyll_plugins do
   gem 'jekyll-seo-tag'                # Generates SEO <head> content
   gem 'jekyll-sitemap'                # Generates Sitemap XML
   gem 'jekyll-titles-from-headings'   # Infers title from heading
+  gem 'jekyll_version_plugin'         # Grabs version from Github tags
   gem 'jekyll-workbox-plugin'         # Google Workbox service worker
   gem 'kramdown'                      # Translates Markdown to HTML
   gem 'mini_magick'                   # Automated image conversion
