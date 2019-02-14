@@ -148,6 +148,32 @@ reflected in our version tags on particular commits and are as follows.
 - [ ] [3.0 (Rocket)](https://github.com/dgattey/dg/milestone/4): future
   work, tracking aspirations and ideas.
 
+### Semver Tagging
+
+Nothing useful was out there to automate semver tagging of commits to a repo
+so I built something myself. Using [Hook.io](https://hook.io), I created a
+webhook that runs automatically on push events from this repo. When that push
+happens, I run a small Node.js app, `autotag.js` [(from this Gist)][gist] to
+do the processing.
+
+Bumping works by parsing the commit message:
+
+- **Major**: bumped if "bumps major version" appears in the message
+- **Minor**: bumped if "bumps minor version" appears in the message
+- **Patch**: bumped by default in all other cases
+
+On a new push to (protected) `master`, the webhook will trigger and autotag will
+
+1. Verify it's a push to master
+1. Grab the latest tag from the repo
+1. Confirm the tag is a semver tag
+1. Increment the tag's version based on the commit message
+1. Push the new tag to master
+
+The speed of it means that Netlify will probably read this new tag by the time
+it tries to build the site, meaning that the version tag on the site will
+actually be up to date :tada:.
+
 ### Current integrations
 
 - Google Analytics: setup through Jekyll plugin
@@ -170,6 +196,7 @@ reflected in our version tags on particular commits and are as follows.
 
 - Linting: through a **bunch** of Github integrations
 
+[gist]: https://gist.github.com/dgattey/ed969ae192d1335e1e04924b7721d5f5
 [nlfy-img]: https://api.netlify.com/api/v1/badges/45e36541-7c61-4931-bd4e-3a654b199044/deploy-status
 [nlfy]: https://app.netlify.com/sites/dgattey/deploys
 [cdy-img]: https://api.codacy.com/project/badge/Grade/2b996737e14d4377ac4b03f7dc84f125
