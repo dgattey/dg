@@ -14,6 +14,7 @@ group :jekyll_plugins do
   gem 'jekyll-optional-front-matter'  # Doesn't force you to include FM
   gem 'jekyll-seo-tag'                # Generates SEO <head> content
   gem 'jekyll-sitemap'                # Generates Sitemap XML
+  gem 'jekyll-timeago'                # Allows for relative dates
   gem 'jekyll-titles-from-headings'   # Infers title from heading
   gem 'jekyll-workbox-plugin'         # Google Workbox service worker
   gem 'jekyll_version_plugin'         # Grabs version from Github tags
