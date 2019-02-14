@@ -1,3 +1,5 @@
+# Contains configs for netlify remote builds
+
 # Redirects dgattey.netlify.com to dylangattey.com
 [[redirects]]
 	from = "https://dgattey.netlify.com/*"
