@@ -1,3 +1,5 @@
+# Contains configs for netlify remote builds
+
 # Redirects dgattey.netlify.com to dylangattey.com
 [[redirects]]
 	from = "https://dgattey.netlify.com/*"
@@ -41,8 +43,6 @@
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com" }
 [context.deploy-preview]
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com dgattey.netlify.com" }
-[build]
-	command = 'sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml && npm i -g purgecss && jekyll build --verbose --trace --profile'
 
 # No caching of service worker
 [[headers]]
