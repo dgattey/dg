@@ -1,11 +1,13 @@
-_site
+# Caches
 .sass-cache
-.jekyll-metadata
 .jekyll-cache
 .tmp
+
+# Temporary files
 *.swp
+
+# Build directories
 build
-design
-.bundle
+
+# Instance specific files
 dg.sublime-workspace
-current_uploaded
