@@ -50,12 +50,17 @@ rerun `bundle install`.
 
 ### Changing/adding images
 
-Use the `process-images.sh` script after doing so. It will optimize/minify all
-jpg/png files. Additionally, it will convert those files to WebP versions and
-put them back in the same folders. This allows `jekyll-assets` to properly copy
-all those files on build. It can take _FOREVER_ to run ImageOptim, so be
-patient. Also, you may need to run the script multiple times to get the best
-results.
+The `design` folder contains all the project's Sketch files with some
+screenshots/other types of files that are design related. If adding new images,
+please add the source files to `design`. All assets for site usage should be
+created into `src/_assets/img` or `src/_assets/icons`, then processed.
+
+Use the `process-images.sh` script after adding an image. It will
+optimize/minify all image files. Additionally, it will convert those files
+to WebP versions and put them back in the same folders. This allows
+`jekyll-assets` to properly copy all those files on build. It can take
+_FOREVER_ to run ImageOptim, so be patient. Running the script once will
+optimize or re-optimize all images.
 
 ## Committing Code
 
