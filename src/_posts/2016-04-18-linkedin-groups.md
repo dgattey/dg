@@ -3,6 +3,11 @@ layout: post
 type: iOS App
 description: Connecting and empowering the world's professionals
 color: red
+two_column: normal
+thumbnail: 
+  src: groups-thumb
+  filetype: png
+  container_class: "overhang-parent"
 ---
 
 # LinkedIn Groups
