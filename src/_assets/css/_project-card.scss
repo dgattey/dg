@@ -33,26 +33,18 @@
     @include for-tablet-down {
       margin-top: 0;
     }
-
-    @include for-desktop-up {
-      justify-self: end;
-      text-align: right;
-    }
   }
 
 }
 
-.project-card-header {
-  display: grid;
-
-  @include for-phone-up {
-    grid-template-columns: 1fr;
+.card-component-on-hover-scale-up {
+  .project-card:hover & {
+    transform: scale($scale-up-hover);
   }
+}
 
-  @include for-desktop-up {
-    grid-gap: $item-spacing-2;
-    grid-template-columns: 2fr 1fr;
-    align-items: center;
-    justify-items: start;
+.card-component-on-hover-pull-right {
+  .project-card:hover & {
+    transform: translateX($item-spacing-3);
   }
 }

@@ -65,30 +65,65 @@ $card-padding: $item-spacing-4;
   }
 }
 
-.shadow-weak-on-hovered {
-  :hover > & {
-    box-shadow: $weak-shadow;
-  }
-}
-
 .round-corners {
   border-radius: $item-spacing-1;
 }
 
 .card {
-  margin: 0 $item-spacing-4;
+  padding: 0 $item-spacing-4;
+}
+
+.grid {
+  display: grid;
+
+  @include for-phone-up {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-two-one-column {
+  @include for-desktop-up {
+    grid-gap: $item-spacing-2;
+    grid-template-columns: 2fr 1fr;
+    align-items: center;
+    justify-items: start;
+  }
+}
+
+.grid-two-column {
+  grid-gap: $item-spacing-2;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  justify-items: start;
 }
 
 .card-pull-right {
   margin-left: $card-padding;
 }
 
-.card-overhang-parent {
+.overhang-parent {
   @include for-phone-up {
-    margin-bottom: 0;
+    &.bottom {
+      margin-bottom: 0;
+    }
+    &.top {
+      margin-top: 0;
+    }
   }
 
   @include for-tablet-up {
-    margin-bottom: -$card-padding;
+    &.bottom {
+      margin-bottom: -$card-padding;
+    }
+    &.top {
+      margin-top: -$card-padding;
+    }
+  }
+}
+
+.desktop-align-right {
+  @include for-desktop-up {
+    justify-self: end;
+    text-align: right;
   }
 }

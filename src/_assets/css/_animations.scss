@@ -7,6 +7,8 @@ $quick-animation-duration: 167ms;
 $animation-duration: 334ms;
 $ease-out-back: cubic-bezier(.175, .885, .32, 1.275);
 $ease-in-out-back: cubic-bezier(.68, -.55, .265, 1.55);
+$scale-down-hover: .96;
+$scale-up-hover: 1.06;
 
 // Adds support for adding multiple types of transitions
 @mixin transition($properties...) {
@@ -47,35 +49,15 @@ $ease-in-out-back: cubic-bezier(.68, -.55, .265, 1.55);
   @include transition-linear(box-shadow);
 }
 
-$scale-down-hover: .96;
 .scale-down-on-hover {
   &:hover {
     transform: scale($scale-down-hover);
   }
 }
 
-$scale-up-hover: 1.06;
 .scale-up-on-hover {
   &:hover {
     transform: scale($scale-up-hover);
-  }
-}
-
-.scale-up-on-hovered {
-  :hover > & {
-    transform: scale($scale-up-hover);
-  }
-}
-
-.scale-down-on-hovered {
-  :hover > & {
-    transform: scale($scale-down-hover);
-  }
-}
-
-.pull-right-on-hovered {
-  :hover > & {
-    transform: translateX($item-spacing-3);
   }
 }
 
