@@ -19,11 +19,19 @@
 
   &:hover {
     color: $color-brightest;
+
+    .card-component-on-hover-scale-up {
+      transform: scale($scale-up-hover);
+    }
+
+    .card-component-on-hover-pull-right {
+      transform: translateX($item-spacing-3);
+    }
   }
 
   img {
-    width: 100%;
     height: 100%;
+    width: 100%;
   }
 
   .type {
@@ -35,16 +43,4 @@
     }
   }
 
-}
-
-.card-component-on-hover-scale-up {
-  .project-card:hover & {
-    transform: scale($scale-up-hover);
-  }
-}
-
-.card-component-on-hover-pull-right {
-  .project-card:hover & {
-    transform: translateX($item-spacing-3);
-  }
 }

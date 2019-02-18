@@ -18,8 +18,8 @@ Jekyll::Hooks.register(:site, :post_write) do |_site|
       content: [@build_directory + '/**/*.html'],
       css: [Dir.glob(@build_directory + '/assets/*.css').first],
       whitelist: %w[overhang-parent card-pull-right round-corners
-        shadow-weak wf-active wf-inactive grid grid-two-column
-        grid-two-one-column]
+                    shadow-weak wf-active wf-inactive grid grid-two-column
+                    grid-two-one-column]
     }.stringify_keys.to_json}"''
 
     # Write configuration file & run command

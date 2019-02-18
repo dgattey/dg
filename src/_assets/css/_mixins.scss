@@ -83,17 +83,17 @@ $card-padding: $item-spacing-4;
 
 .grid-two-one-column {
   @include for-desktop-up {
+    align-items: center;
     grid-gap: $item-spacing-2;
     grid-template-columns: 2fr 1fr;
-    align-items: center;
     justify-items: start;
   }
 }
 
 .grid-two-column {
+  align-items: center;
   grid-gap: $item-spacing-2;
   grid-template-columns: 1fr 1fr;
-  align-items: center;
   justify-items: start;
 }
 
@@ -106,6 +106,7 @@ $card-padding: $item-spacing-4;
     &.bottom {
       margin-bottom: 0;
     }
+
     &.top {
       margin-top: 0;
     }
@@ -115,6 +116,7 @@ $card-padding: $item-spacing-4;
     &.bottom {
       margin-bottom: -$card-padding;
     }
+
     &.top {
       margin-top: -$card-padding;
     }
