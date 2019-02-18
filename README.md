@@ -142,7 +142,7 @@ reflected in our version tags on particular commits and are as follows.
 - [x] [1.0 (Marrow)](https://github.com/dgattey/dg/milestone/2): basic site up
   on Netlify/Cloudflare with barebones homepage.
 
-- [ ] [1.5 (Steak)](https://github.com/dgattey/dg/milestone/1): the "meat" 😉 of
+- [ ] [1.6 (Steak)](https://github.com/dgattey/dg/milestone/1): the "meat" 😉 of
   the site, where all content is done, most styles done, and site is secure for
   the most part.
 
