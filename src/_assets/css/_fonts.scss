@@ -165,7 +165,7 @@ h6 {
   @extend %head-font-style;
 }
 
-@for $header-level from 1 through 6 {
+@for $header-level from 2 through 6 {
   $level: -1 * ($header-level - 6);
   @include text(h#{$header-level}, $level, $is-header: true);
 }

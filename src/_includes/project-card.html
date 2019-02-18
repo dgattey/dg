@@ -1,0 +1,20 @@
+{% if post.link %}
+{% assign postlink = post.link %}
+{% else %}
+{% assign postlink = post.url %}
+{% endif %}
+<a href="{{ postlink }}" class="project-card round-corners shadow-strong shadow-weak-on-hover transition-bounce scale-down-on-hover background-{{ post.color }}">
+    <section class="grid grid-two-one-column card">
+        <h3>{{ post.title }}</h3>
+        <h6 class="type desktop-align-right">{{ post.type }}</h6>
+    </section>
+    <section class="card transition-bounce card-component-on-hover-pull-right">
+        <p>{{ post.description }}</p>
+    </section>
+    {% if post.thumbnail %}
+    <section class="transition-bounce card-component-on-hover-scale-up {{ post.thumbnail.container_class }}">
+        {% capture alttext %}{{ post.title }} thumbnail{% endcapture %}
+        {% include picture.html src=post.thumbnail.src alt=alttext filetype=post.thumbnail.filetype class=post.thumbnail.class %}
+    </section>
+    {% endif %}
+</a>

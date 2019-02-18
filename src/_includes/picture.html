@@ -11,26 +11,32 @@
  * show `src`. The fallback will always be desktop sized. `lg` is on by
  * default.
  *
- * All images will have a webp & jpg version for each item. Autogenerate
+ * All images will have a webp & jpg/png version for each item. Autogenerate
  * with the image processing script.
  */
 {% endcomment %}
 {% assign sizes = include.sizes | default: 'sm' %}
-<picture class={{include.class}}>
+{% assign filetype = include.filetype | default: 'jpg' %}
+{% if filetype == 'jpg' %}
+{% assign mimetype = 'jpeg' %}
+{% else %}
+{% assign mimetype = filetype %}
+{% endif %}
+<picture class="{{include.class}}">
 	{% if sizes contains 'lg' %}
 	<!-- Desktop images -->
 	{% assign bp = site.breakpoint_min_desktop %}
 	{% assign file = include.src | append: '-lg' %}
-	{% include picture-element.html type="webp" src=file alt=include.alt bp=bp %}
-	{% include picture-element.html type="jpg" src=file alt=include.alt bp=bp %}
+	{% include picture-element.html type="webp" src=file alt=include.alt bp=bp class=include.class %}
+	{% include picture-element.html type=filetype src=file alt=include.alt bp=bp class=include.class %}
 	{% endif %}
 
 	{% if sizes contains 'md' %}
 	<!-- Tablet images -->
 	{% assign bp = site.breakpoint_min_tablet %}
 	{% assign file = include.src | append: '-md' %}
-	{% include picture-element.html type="webp" src=file alt=include.alt bp=bp %}
-	{% include picture-element.html type="jpg" src=file alt=include.alt bp=bp %}
+	{% include picture-element.html type="webp" src=file alt=include.alt bp=bp class=include.class %}
+	{% include picture-element.html type=filetype src=file alt=include.alt bp=bp class=include.class %}
 	{% endif %}
 
 	{% if sizes contains 'sm' %}
@@ -41,10 +47,10 @@
 	<!-- Fallback fullsize images -->
 	{% endunless %}
 	{% assign file = include.src %}
-	{% include picture-element.html type="webp" src=file alt=include.alt %}
-	{% include picture-element.html type="jpg" src=file alt=include.alt %}
+	{% include picture-element.html type="webp" src=file alt=include.alt class=include.class %}
+	{% include picture-element.html type=filetype src=file alt=include.alt class=include.class %}
 	{% endif %}
 
-	<!-- Fallback: desktop-sized jpg -->
-	<img type="image/jpeg" src={% asset {{include.src}}.jpg @path %} alt="{{ include.alt }}">
+	<!-- Fallback: desktop-sized filetype -->
+	<img type="image/{{mimetype}}" src={% asset {{include.src}}.{{filetype}} @path %} class="{{ include.class }}" alt="{{ include.alt }}">
 </picture>

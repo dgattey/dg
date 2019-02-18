@@ -147,9 +147,9 @@ optimize_filetypes_until_done() {
 # MAIN
 # --------------------------
 
+# Convert all non-icons to WebP
+convert_filetypes_until_done $IMAGE_ASSET_PATH $CONVERSION_FILETYPE "${IMAGE_FILETYPES[@]}"
+
 # Executes some image minification scripts on images and icons
 optimize_filetypes_until_done $IMAGE_ASSET_PATH "${IMAGE_FILETYPES[@]}"
 optimize_filetypes_until_done $ICON_ASSET_PATH "${ICON_FILETYPES[@]}"
-
-# Convert all non-icons to WebP
-convert_filetypes_until_done $IMAGE_ASSET_PATH $CONVERSION_FILETYPE "${IMAGE_FILETYPES[@]}"

@@ -35,18 +35,15 @@ body {
 // =====
 // Colors
 // =====
-.background-red {
-  background-color: $color-red;
-}
-
-.background-green {
-  background-color: $color-green;
-}
-
-.background-blue {
-  background-color: $color-blue;
-}
-
-.background-muted {
-  background-color: $color-muted;
+$background-colors: (
+  'red': $color-red,
+  'green': $color-green,
+  'blue': $color-blue,
+  'dim': $color-dim,
+  'forest-green': $color-forest-green
+);
+@each $name, $color in $background-colors {
+  .background-#{$name} {
+    background-color: $color;
+  }
 }

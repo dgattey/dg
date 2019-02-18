@@ -7,22 +7,7 @@ $weak-shadow-color: rgba(0, 0, 0, .1);
 $spread: $item-spacing-4 + $item-spacing-3;
 $strong-shadow: 0 $item-spacing-3 $spread $strong-shadow-color;
 $weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
-
-.shadow-strong {
-  box-shadow: $strong-shadow;
-
-  &:hover {
-    box-shadow: $weak-shadow;
-  }
-}
-
-.shadow-weak {
-  box-shadow: $weak-shadow;
-}
-
-.round-corners {
-  border-radius: $item-spacing-1;
-}
+$card-padding: $item-spacing-4;
 
 // =====
 // Breakpoints
@@ -44,6 +29,12 @@ $weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
   }
 }
 
+@mixin for-tablet-down {
+  @media (max-width: $breakpoint-min-desktop - 1) {
+    @content;
+  }
+}
+
 @mixin for-desktop-up {
   @media (min-width: $breakpoint-min-desktop) {
     @content;
@@ -53,5 +44,88 @@ $weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
 @mixin for-max-size-only {
   @media (min-width: $breakpoint-max-width) {
     @content;
+  }
+}
+
+// =====
+// Utility classes
+// =====
+
+.shadow-strong {
+  box-shadow: $strong-shadow;
+}
+
+.shadow-weak {
+  box-shadow: $weak-shadow;
+}
+
+.shadow-weak-on-hover {
+  &:hover {
+    box-shadow: $weak-shadow;
+  }
+}
+
+.round-corners {
+  border-radius: $item-spacing-1;
+}
+
+.card {
+  padding: 0 $item-spacing-4;
+}
+
+.grid {
+  display: grid;
+
+  @include for-phone-up {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-two-one-column {
+  @include for-desktop-up {
+    align-items: center;
+    grid-gap: $item-spacing-2;
+    grid-template-columns: 2fr 1fr;
+    justify-items: start;
+  }
+}
+
+.grid-two-column {
+  align-items: center;
+  grid-gap: $item-spacing-2;
+  grid-template-columns: 1fr 1fr;
+  justify-items: start;
+}
+
+.card-pull-right {
+  margin-left: $card-padding;
+}
+
+.overhang-parent {
+  @include for-phone-up {
+    &.bottom {
+      margin-bottom: 0;
+    }
+
+    &.top {
+      margin-top: 0;
+    }
+  }
+
+  @include for-tablet-up {
+    &.bottom {
+      margin-bottom: -$card-padding;
+    }
+
+    &.top {
+      margin-top: -$card-padding;
+    }
+  }
+}
+
+.desktop-align-right {
+  @include for-desktop-up {
+    justify-self: end;
+    text-align: right;
   }
 }

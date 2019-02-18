@@ -3,9 +3,11 @@
 // - pages: index.html
 // =====
 
-.proj-card {
+.project-card {
+  align-content: space-around;
   color: $color-brightest;
-  padding: $item-spacing-4;
+  display: grid;
+  grid-gap: $item-spacing-3;
 
   @include for-tablet-up {
     grid-row-end: span 2;
@@ -15,19 +17,30 @@
     }
   }
 
-  .type {
-    font-variant: small-caps;
-    margin-top: .5em;
-    text-transform: uppercase;
-  }
-
-  .desc {
-    margin-top: 5em;
-  }
-
-  // Hover state
   &:hover {
     color: $color-brightest;
+
+    .card-component-on-hover-scale-up {
+      transform: scale($scale-up-hover);
+    }
+
+    .card-component-on-hover-pull-right {
+      transform: translateX($item-spacing-3);
+    }
+  }
+
+  img {
+    height: 100%;
+    width: 100%;
+  }
+
+  .type {
+    font-variant: small-caps;
+    text-transform: uppercase;
+
+    @include for-tablet-down {
+      margin-top: 0;
+    }
   }
 
 }

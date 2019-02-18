@@ -1,0 +1,10 @@
+<section class="project-grid">
+	<h2 class="showcase emphasized head-font-style">Showcase</h2>
+	{% for post in site.posts %}
+        {% if post.two_column %}
+            {% include project-card-two-column.html %}
+        {% else %}
+    		{% include project-card.html %}
+        {% endif %}
+	{% endfor %}
+</section>
