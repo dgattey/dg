@@ -1,8 +1,9 @@
 ---
 layout: page
-weight: 2
+title: About
+weight: 1
 ---
 
-# About
+# Hiii
 
 Find me on [LinkedIn](https://www.linkedin.com/in/dgattey/)! More coming soon.
