@@ -45,6 +45,9 @@
 [context.deploy-preview]
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com dgattey.netlify.com" }
 	command = "./go-netlify.sh deploy-preview"
+[context.branch-deploy]
+	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com dgattey.netlify.com" }
+	command = "./go-netlify.sh deploy-preview"
 
 # No caching of service worker
 [[headers]]
