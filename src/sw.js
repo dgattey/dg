@@ -66,7 +66,7 @@ const vendorRouteConfiguration = function(hours) {
 				statuses: [0, 200],
 			}),
 			new workbox.expiration.Plugin({
-				maxAgeSeconds: 60 * hours,
+				maxAgeSeconds: 60 * 60 * hours,
 			}),
 		],
 	};
@@ -90,11 +90,11 @@ workbox.routing.registerRoute(
 );
 workbox.routing.registerRoute(
 	/^https?:\/\/.*.typekit\.net\/af/,
-	workbox.strategies.cacheFirst(vendorRouteConfiguration(60 * 24 * 120))
+	workbox.strategies.cacheFirst(vendorRouteConfiguration(24 * 120))
 );
 workbox.routing.registerRoute(
 	/^https?:\/\/.*.typekit\.net/,
-	workbox.strategies.cacheFirst(vendorRouteConfiguration(60 * 24))
+	workbox.strategies.cacheFirst(vendorRouteConfiguration(24))
 );
 workbox.routing.registerRoute(
 	/.*\.(?:js|css|json)$/,
@@ -124,23 +124,33 @@ workbox.routing.registerRoute(
  * Default handler & catch handler
  * - There's a default handler here that will fetch using networkFirst, but
  *   if offline, will try to return an offline page
+ * - If it's a POST request, it'll default to networkOnly
  * - The regular catch handler is set up to return an offline page if we can't find something that matches.
  *   Otherwise, we'll return an error response
  */
-const fetchWithOfflineFallback = async (args) => {
+const fetchWithOfflineFallback = async (context) => {
+	const defaultStrategy = workbox.strategies.networkFirst();
+	const postStrategy = workbox.strategies.networkOnly();
+
 	try {
+		// If it's a POST request, use networkOnly
+		if (context.event.request.method === 'POST') {
+			return await postStrategy.handle(context);
+		}
+
 		// Use the preloaded response, if it's there
-		const preloadResponse = await args.preloadResponse;
+		const preloadResponse = await context.preloadResponse;
 
 		if (preloadResponse) {
 			return preloadResponse;
 		}
 
 		// Otherwise, try network first with a fallback to the offline page
-		const response = await workbox.strategies.networkFirst().handle(args);
+		const response = await defaultStrategy.handle(context);
 
 		return response || await caches.match(offlinePage);
 	} catch (error) {
+		// Try one last time to grab the offline page
 		return await caches.match(offlinePage);
 	}
 };
