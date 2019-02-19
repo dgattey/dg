@@ -41,13 +41,54 @@
 # This ensures that content security doesn't block requests to dylangattey.com on deploy previews
 [context.production]
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com" }
-	command = "./go-netlify.sh production"
+	command = """
+	sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml \
+	&& sed -i "s+BASE_URI+${URL}+g" netlify.toml \
+
+	&& npm i -g purgecss \
+
+	&& echo "Fetching tags..." \
+	&& git fetch "https://dgattey:${GITHUB_ACCESS_TOKEN}@github.com/dgattey/dg/" --tags \
+
+	&& echo -n "Head is at: " \
+	&& git describe HEAD --tags --always \
+
+	&& jekyll build --trace --profile
+	"""
 [context.deploy-preview]
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com dgattey.netlify.com" }
-	command = "./go-netlify.sh deploy-preview"
+	command = """
+	sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml \
+	&& sed -i "s+BASE_URI+${DEPLOY_PRIME_URL}+g" netlify.toml \
+    && sed -i "s+https://dylangattey.com+${DEPLOY_PRIME_URL}+g" _config.yml \
+
+	&& npm i -g purgecss \
+
+	&& echo "Fetching tags..." \
+	&& git fetch "https://dgattey:${GITHUB_ACCESS_TOKEN}@github.com/dgattey/dg/" --tags \
+
+	&& echo -n "Head is at: " \
+	&& git describe HEAD --tags --always \
+
+	&& jekyll build --trace --profile
+	"""
 [context.branch-deploy]
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com dgattey.netlify.com" }
-	command = "./go-netlify.sh deploy-preview"
+	command = """
+	sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml \
+	&& sed -i "s+BASE_URI+${DEPLOY_PRIME_URL}+g" netlify.toml \
+    && sed -i "s+https://dylangattey.com+${DEPLOY_PRIME_URL}+g" _config.yml \
+
+	&& npm i -g purgecss \
+
+	&& echo "Fetching tags..." \
+	&& git fetch "https://dgattey:${GITHUB_ACCESS_TOKEN}@github.com/dgattey/dg/" --tags \
+
+	&& echo -n "Head is at: " \
+	&& git describe HEAD --tags --always \
+
+	&& jekyll build --trace --profile
+	"""
 
 # No caching of service worker
 [[headers]]
