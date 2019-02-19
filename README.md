@@ -1,5 +1,5 @@
-[![Netlify][nlfy-img]][nlfy] [![Codacy][cdy-img]][cdy] [![Factor][fcr-img]][fcr]
-[![Climate][cc-img]][cc] [![Scan][deep-img]][deep]
+[![Netlify][nlfy-img]][nlfy] [![Factor][fcr-img]][fcr] [![Climate][cc-img]][cc]
+[![Scan][deep-img]][deep]
 
 # Dylan Gattey
 
@@ -76,15 +76,18 @@ branches are created on the fly for various PRs.
 
 Ready for a code review? Follow these steps:
 
-1. Commit code on a local branch with a descriptive name
+1. Create a feature branch (`git checkout -b feature-name`)
 
-1. Push to a remote branch with the same name
+1. Commit code on a local branch with a descriptive name (`git commit -am 'Adds
+   a great new feature'`)
 
-1. Make sure there's an [issue](https://github.com/dgattey/dg/issues) tracking
-   something you're fixing with this pull request
+1. Push to the branch (`git push origin feature-name`)
 
-1. [Create a pull request](https://github.com/dgattey/dg/pulls) using a provided
-   template if there's one that matches what you need
+1. Try to make sure there's an [issue](https://github.com/dgattey/dg/issues)
+   tracking something you're fixing with this pull request (encouraged)
+
+1. [Create a new pull request](https://github.com/dgattey/dg/pulls) using a
+   provided template if there's one that matches what you need
 
 1. Ensure the assignee is correct, that the
    [labels](https://github.com/dgattey/dg/labels) on the pull request reflect
@@ -93,7 +96,7 @@ Ready for a code review? Follow these steps:
    the [project](https://github.com/dgattey/dg/projects/) reflects the change.
 
 1. Your request will kick off quality, safety, and linting automated checks from
-   [CodeClimate](https://codeclimate.com/), [Codacy](https://codacy.com),
+   [CodeClimate](https://codeclimate.com/),
    [CodeFactor](https://www.codefactor.io), [DeepScan](https://deepscan.io),
    and [Stickler CI](https://stickler-ci.com/)
 
@@ -139,18 +142,18 @@ Project status is tracked under the
 [main project](https://github.com/dgattey/dg/projects/2). Our milestones are
 reflected in our version tags on particular commits and are as follows.
 
-- [x] [1.0 (Marrow)](https://github.com/dgattey/dg/milestone/2): basic site up
+- [x] [1.0](https://github.com/dgattey/dg/milestone/2): basic site up
   on Netlify/Cloudflare with barebones homepage.
 
-- [ ] [1.6 (Steak)](https://github.com/dgattey/dg/milestone/1): the "meat" 😉 of
-  the site, where all content is done, most styles done, and site is secure for
+- [ ] [2.0](https://github.com/dgattey/dg/milestone/1): the meat of
+  the site, where all content is done, most styling done, and site is secure for
   the most part.
 
-- [ ] [2.0 (Cherry)](https://github.com/dgattey/dg/milestone/3): putting the
+- [ ] [2.x](https://github.com/dgattey/dg/milestone/3): putting the
   cherry on top! Polish, security, optimizations are all finished and site is
   done.
 
-- [ ] [3.0 (Rocket)](https://github.com/dgattey/dg/milestone/4): future
+- [ ] [3.0](https://github.com/dgattey/dg/milestone/4): future
   work, tracking aspirations and ideas.
 
 ### Semver Tagging
@@ -158,7 +161,7 @@ reflected in our version tags on particular commits and are as follows.
 Nothing useful was out there to automate semver tagging of commits to a repo
 so I built something myself. Using [Hook.io](https://hook.io), I created a
 webhook that runs automatically on push events from this repo. When that push
-happens, I run a small Node.js app, `autotag.js` [(from this Gist)][gist] to
+happens, I run a small Node.js app, `autotag.js` [(from this Gist)][autotag] to
 do the processing.
 
 Bumping works by parsing the commit message:
@@ -201,11 +204,9 @@ actually be up to date :tada:.
 
 - Linting: through a **bunch** of Github integrations
 
-[gist]: https://gist.github.com/dgattey/ed969ae192d1335e1e04924b7721d5f5
+[autotag]: https://gist.github.com/dgattey/ed969ae192d1335e1e04924b7721d5f5
 [nlfy-img]: https://api.netlify.com/api/v1/badges/45e36541-7c61-4931-bd4e-3a654b199044/deploy-status
 [nlfy]: https://app.netlify.com/sites/dgattey/deploys
-[cdy-img]: https://api.codacy.com/project/badge/Grade/2b996737e14d4377ac4b03f7dc84f125
-[cdy]: https://www.codacy.com/app/dgattey/dg?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=dgattey/dg&amp;utm_campaign=Badge_Grade
 [cc-img]: https://api.codeclimate.com/v1/badges/333adb209e1ac3086303/maintainability
 [cc]: https://codeclimate.com/github/dgattey/dg/maintainability
 [fcr-img]: https://www.codefactor.io/repository/github/dgattey/dg/badge
