@@ -1,0 +1,12 @@
+---
+layout: page
+nav_title: About
+title: Hello!
+weight: 1
+---
+<div class="grid grid-two-column">
+    <section>
+        {% capture about_me %}{% include about_me.md %}{% endcapture %}
+        {{ about_me | markdownify }}
+    </section>
+</div>

@@ -83,7 +83,6 @@ $card-padding: $item-spacing-4;
 
 .grid-two-one-column {
   @include for-desktop-up {
-    align-items: center;
     grid-gap: $item-spacing-2;
     grid-template-columns: 2fr 1fr;
     justify-items: start;
@@ -91,10 +90,13 @@ $card-padding: $item-spacing-4;
 }
 
 .grid-two-column {
-  align-items: center;
   grid-gap: $item-spacing-2;
   grid-template-columns: 1fr 1fr;
   justify-items: start;
+}
+
+.grid-align-center {
+  align-items: center;
 }
 
 .card-pull-right {
