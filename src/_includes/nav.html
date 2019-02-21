@@ -2,17 +2,22 @@
   <nav>
     <ul class="nav-items">
       <li class="logo-wrapper"><a class="logo scale-up-on-hover transition-shape" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></li>
-      {% assign pages = site.pages | sort:"weight" %}
-      {% for pg in pages %}
-      {% assign current = 'nav-inactive' %}
-      {% if page.url == pg.url %}
-      {% assign current = 'nav-active' %}
+      {% assign sorted_pages = site.pages | sort:"weight" %}
+      {% for nav_page in sorted_pages %}
+
+      {% assign nav_class = 'nav-inactive' %}
+      {% if page.url == nav_page.url %}
+      {% assign nav_class = 'nav-active' %}
       {% endif %}
-      {% if pg.title and pg.weight %}
+
+      {% assign nav_title = nav_page.nav_title | default nav_page.title %}
+
+      {% if nav_title and nav_page.weight %}
       <li class="nav-item">
-        <a class="nav-link {{ current }}" href="{{ pg.url | prepend: site.baseurl }}">{{ pg.title }}</a>
+        <a class="nav-link {{ nav_class }}" href="{{ nav_page.url }}">{{ nav_title }}</a>
       </li>
       {% endif %}
+
       {% endfor %}
     </ul>
   </nav>
