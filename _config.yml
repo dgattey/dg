@@ -91,7 +91,6 @@ jekyll-minifier:
 # Build settings
 markdown: kramdown
 source: src
-destination: build
 include: [static]
 highlighter: rouge
 kramdown:

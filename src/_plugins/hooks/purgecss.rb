@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 @config_file = '.tmp/purgecss.js'
-@build_directory = 'build'
+@build_directory = '_site'
 @temp_directory = '.tmp'
 
 Jekyll::Hooks.register(:site, :post_write) do |_site|

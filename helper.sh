@@ -1,4 +1,5 @@
 #! /bin/bash
+# shellcheck disable=SC2034
 set -e
 
 # Echo an error message before exiting
@@ -14,6 +15,8 @@ ERASE="\\r\\033[K"
 TEMP=".tmp"
 SETUP_OUTPUT_FILE="$TEMP/setup_output"
 OPTIM_OUTPUT_FILE="$TEMP/optim_output"
+TESTING_COMMAND_OUTPUT_FILE="$TEMP/testing_command_output"
+IMAGE_OPTIM_PATH=/Applications/ImageOptim.app/Contents/MacOS/ImageOptim
 
 # --------------------------
 # PRINT FUNCTIONS
@@ -95,6 +98,34 @@ print_progress_indicator() {
       print_working_message "$spin_iteration" "$message" "$verification_message"
       sleep .15
     done
+}
+
+# --------------------------
+# OTHER FUNCTIONS
+# --------------------------
+
+# Installs a given named dependency if needed
+install_if_needed() {
+    local name=$1
+    local check_command=$2
+    local is_installed_check_result=$3
+    local install_command=$4
+
+    eval "$check_command > $SETUP_OUTPUT_FILE 2>/dev/null" &
+    print_progress_indicator "$name: checking for installation "
+
+    # Check to see if item is installed
+    if [ "$(grep "$is_installed_check_result" "$SETUP_OUTPUT_FILE" | wc -c)" -ne 0 ]; then
+        print_success_message "$name already installed "
+        return
+    fi
+
+    # We can assume we need to install it - let's show progress
+    erase_line
+    print_information_message "$name: installing... "
+    echo ""
+    eval "$install_command"
+    print_success_message "$name now installed "
 }
 
 # --------------------------
