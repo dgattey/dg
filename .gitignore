@@ -7,7 +7,7 @@
 *.swp
 
 # Build directories
-build
+_site
 
 # Instance specific files
 dg.sublime-workspace

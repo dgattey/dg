@@ -2,7 +2,7 @@
 	"folders":
 	[
 		{
-			"path": "build",
+			"path": "_site",
 			"binary_file_patterns": ["*"]
 		},
 		{
@@ -11,7 +11,7 @@
 		{
 			// The other files inside the main folder
 			"path": ".",
-			"folder_exclude_patterns": ["build", "design", "src", ".*-cache"]
+			"folder_exclude_patterns": ["_site", "design", "src", ".*-cache"]
 		}
 	],
 	"settings":

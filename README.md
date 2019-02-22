@@ -40,7 +40,7 @@ to install the following:
 1. Install the necessary gems with `bundle install`
 1. Build & serve the site with `bundle exec jekyll serve`
 
-The site files will live in `build` and be served on
+The site files will live in `_site` and be served on
 `http://localhost:4000/`.
 
 ### Adding a new dependency
