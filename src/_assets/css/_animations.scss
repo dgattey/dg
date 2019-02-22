@@ -37,6 +37,10 @@ $scale-up-hover: 1.06;
   transition: $final;
 }
 
+.transition-fill {
+  @include transition(fill);
+}
+
 .transition-shape {
   @include transition(transform, color);
 }
@@ -45,7 +49,7 @@ $scale-up-hover: 1.06;
   @include transition-bounce(transform, box-shadow);
 }
 
-.transition-linear-shadow {
+.transition-box-shadow {
   @include transition-linear(box-shadow);
 }
 

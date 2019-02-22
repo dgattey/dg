@@ -69,7 +69,6 @@ nav {
 }
 
 .nav-item {
-  @include transition-bounce(transform);
   align-self: center;
   display: inline-block;
   grid-column-end: span 4;

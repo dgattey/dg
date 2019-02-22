@@ -1,4 +1,4 @@
-<header class="header-nav nav-font-style transition-linear-shadow">
+<header class="header-nav nav-font-style transition-box-shadow">
   <nav>
     <ul class="nav-items">
       <li class="logo-wrapper"><a class="logo scale-up-on-hover transition-shape" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></li>
@@ -13,7 +13,7 @@
       {% assign nav_title = nav_page.nav_title | default nav_page.title %}
 
       {% if nav_title and nav_page.weight %}
-      <li class="nav-item">
+      <li class="nav-item transition-bounce">
         <a class="nav-link {{ nav_class }}" href="{{ nav_page.url }}">{{ nav_title }}</a>
       </li>
       {% endif %}

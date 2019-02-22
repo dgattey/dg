@@ -41,7 +41,6 @@ footer {
   }
 
   path {
-    @include transition(fill);
     fill: $color-primary-bright;
   }
 }
