@@ -4,8 +4,7 @@ source ./helper.sh
 # --------------------------
 # CONSTANTS
 # --------------------------
-IMAGE_OPTIM=/Applications/ImageOptim.app/Contents/MacOS/ImageOptim
-
+SETUP_SCRIPT=./setup.sh
 IMAGE_ASSET_PATH=./src/_assets/img
 IMAGE_FILETYPES=("jpg" "png")
 ICON_ASSET_PATH=./src/_assets/icons
@@ -87,7 +86,7 @@ optimize_image() {
     local filename="$2"
     local iteration_count="$3"
 
-    $IMAGE_OPTIM "$file" 2>"$OPTIM_OUTPUT_FILE" &
+    $IMAGE_OPTIM_PATH "$file" 2>"$OPTIM_OUTPUT_FILE" &
     print_progress_indicator "$filename being optimized - pass $iteration_count " "$filename being verified "
 }
 
@@ -146,6 +145,17 @@ optimize_filetypes_until_done() {
 # --------------------------
 # MAIN
 # --------------------------
+
+# Make sure the tools we need are installed
+install_if_needed "ImageOptim" \
+    "ls $IMAGE_OPTIM_PATH" \
+    "$IMAGE_OPTIM_PATH" \
+    "$SETUP_SCRIPT"
+
+install_if_needed "ImageMagick 7" \
+    "convert --version" \
+    "Version: ImageMagick 7" \
+    "$SETUP_SCRIPT"
 
 # Convert all non-icons to WebP
 convert_filetypes_until_done $IMAGE_ASSET_PATH $CONVERSION_FILETYPE "${IMAGE_FILETYPES[@]}"
