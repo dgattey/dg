@@ -10,44 +10,6 @@ $weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
 $card-padding: $item-spacing-4;
 
 // =====
-// Breakpoints
-// =====
-
-@mixin for-phone-up {
-  @content;
-}
-
-@mixin for-phone-only {
-  @media (max-width: $breakpoint-min-tablet - 1) {
-    @content;
-  }
-}
-
-@mixin for-tablet-up {
-  @media (min-width: $breakpoint-min-tablet) {
-    @content;
-  }
-}
-
-@mixin for-tablet-down {
-  @media (max-width: $breakpoint-min-desktop - 1) {
-    @content;
-  }
-}
-
-@mixin for-desktop-up {
-  @media (min-width: $breakpoint-min-desktop) {
-    @content;
-  }
-}
-
-@mixin for-max-size-only {
-  @media (min-width: $breakpoint-max-width) {
-    @content;
-  }
-}
-
-// =====
 // Utility classes
 // =====
 

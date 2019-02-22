@@ -1,0 +1,42 @@
+// =====
+// Breakpoints
+// =====
+
+$breakpoint-min-phone: 0;
+$breakpoint-min-tablet: 600px;
+$breakpoint-min-desktop: 900px;
+$breakpoint-max-width: 1200px;
+
+@mixin for-phone-up {
+  @content;
+}
+
+@mixin for-phone-only {
+  @media (max-width: $breakpoint-min-tablet - 1) {
+    @content;
+  }
+}
+
+@mixin for-tablet-up {
+  @media (min-width: $breakpoint-min-tablet) {
+    @content;
+  }
+}
+
+@mixin for-tablet-down {
+  @media (max-width: $breakpoint-min-desktop - 1) {
+    @content;
+  }
+}
+
+@mixin for-desktop-up {
+  @media (min-width: $breakpoint-min-desktop) {
+    @content;
+  }
+}
+
+@mixin for-max-size-only {
+  @media (min-width: $breakpoint-max-width) {
+    @content;
+  }
+}
