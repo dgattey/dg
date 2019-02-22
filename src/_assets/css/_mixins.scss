@@ -131,3 +131,8 @@ $card-padding: $item-spacing-4;
     text-align: right;
   }
 }
+
+.size-to-parent {
+  max-height: 100%;
+  max-width: 100%;
+}
