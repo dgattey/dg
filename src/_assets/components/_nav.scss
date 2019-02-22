@@ -6,32 +6,8 @@
 $nav-grid-columns: 2 * ($grid-standard-columns - 1);
 $underline-height: 3px;
 
-.header-nav {
-  left: 0;
-  position: fixed;
-  right: 0;
-  top: 0;
-  z-index: $depth-4;
-}
-
 nav {
   @extend %max-width-element;
-
-  %nav-grid {
-    display: grid;
-
-    @include for-phone-up {
-      grid-column-gap: $item-spacing-4;
-    }
-
-    @include for-tablet-up {
-      grid-column-gap: $item-spacing-4;
-    }
-
-    @include for-desktop-up {
-      grid-column-gap: $item-spacing-3;
-    }
-  }
 }
 
 .logo-wrapper,
@@ -46,6 +22,7 @@ nav {
   align-self: center;
   grid-column-end: span 2;
   justify-self: start;
+  list-style: none;
   margin: 0;
 }
 
@@ -58,13 +35,17 @@ nav {
 
 .nav-items {
   @extend %nav-padding;
-  @extend %nav-grid;
   background: $color-bg;
+  display: grid;
   grid-template-columns: repeat($nav-grid-columns, 1fr);
   margin: 0;
 
-  * {
-    list-style: none;
+  @include for-phone-up {
+    grid-column-gap: $item-spacing-4;
+  }
+
+  @include for-desktop-up {
+    grid-column-gap: $item-spacing-3;
   }
 }
 
@@ -73,6 +54,7 @@ nav {
   display: inline-block;
   grid-column-end: span 4;
   justify-self: start;
+  list-style: none;
   margin: 0;
   text-transform: uppercase;
 
@@ -99,7 +81,6 @@ nav {
 }
 
 .nav-inactive {
-  &::before,
   &::after {
     // Animation of the underlines
     background-color: $color-primary-bright;
@@ -111,32 +92,18 @@ nav {
     right: 0;
   }
 
-  &::before {
-    @extend %hide;
-    transform: translateY(- $underline-height);
-    transition: transform 0s $ease-out-back, opacity 0s;
-  }
-
   &::after {
-    @extend %hide;
+    @include transition(opacity);
+    opacity: 0;
     transform: translateY($underline-height / 2);
     transition: transform $animation-duration $ease-out-back, opacity $animation-duration;
   }
 
   &:hover,
   &:focus {
-    &::before,
     &::after {
-      @extend %show;
+      opacity: 1;
       transform: translateY(0);
-    }
-
-    &::before {
-      transition: transform $animation-duration $ease-out-back, opacity $animation-duration;
-    }
-
-    &::after {
-      transition: transform 0s $animation-duration $ease-out-back, opacity 0s $animation-duration;
     }
   }
 }

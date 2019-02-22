@@ -1,0 +1,18 @@
+// =====
+// Generic positioning of elements
+// =====
+
+// Z-indices
+$depth-4: 999;
+$depth-3: 300;
+$depth-2: 200;
+$depth-1: 100;
+$depth-0: 0;
+
+.fixed-header {
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: $depth-4;
+}

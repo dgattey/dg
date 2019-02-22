@@ -57,12 +57,3 @@ $scale-down-hover: .96;
     transform: scale($scale-down-hover);
   }
 }
-
-%show {
-  opacity: 1;
-}
-
-%hide {
-  @include transition(opacity);
-  opacity: 0;
-}
