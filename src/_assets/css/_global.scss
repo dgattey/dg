@@ -14,6 +14,10 @@ html {
   overflow-x: hidden;
 }
 
+// =====
+// Padding
+// =====
+
 body {
   @extend %max-width-element;
 }
@@ -47,27 +51,40 @@ $tablet-top-padding: $item-spacing-4 + $item-spacing-3;
   @include page-body($item-spacing-5, $item-spacing-6);
 }
 
+@mixin page-body($page-padding, $top-padding) {
+  $nav-padding: $item-spacing-3;
+
+  %standard-inset {
+    margin-left: $page-padding;
+    margin-right: $page-padding;
+    margin-top: $top-padding + $nav-padding * 2;
+  }
+
+  %nav-padding {
+    padding: $nav-padding $page-padding;
+  }
+}
+
+// For different breakpoints
+$tablet-top-padding: $item-spacing-4 + $item-spacing-3;
+
+@include for-phone-up {
+  @include page-body($item-spacing-4, $item-spacing-5);
+}
+
+@include for-tablet-up {
+  @include page-body($item-spacing-4, $item-spacing-5 + $item-spacing-4);
+}
+
+@include for-desktop-up {
+  @include page-body($item-spacing-5, $item-spacing-6);
+}
+
 // =====
-// Text selection
+// Selection of anything
 // =====
 
 ::selection {
   background: $color-primary-dim;
   color: $color-text-light;
-}
-
-// =====
-// Colors
-// =====
-$background-colors: (
-  'red': $color-red,
-  'green': $color-green,
-  'blue': $color-blue,
-  'dim': $color-dim,
-  'forest-green': $color-forest-green
-);
-@each $name, $color in $background-colors {
-  .background-#{$name} {
-    background-color: $color;
-  }
 }

@@ -1,0 +1,38 @@
+// =====
+// Colors
+// =====
+
+// Raw white - black color values
+$color-dim: #000;
+$color-deep: #433d3a;
+$color-muted: lighten($color-deep, 12%);
+$color-bright: #eceff1;
+$color-brightest: #fff;
+
+// Colorful raw color values
+$color-green: #16ac7e;
+$color-forest-green: #015500;
+$color-red: #bb2821;
+$color-blue: #237fad;
+
+// Applied color values (primary, bg, border, text)
+$color-primary-bright: $color-green;
+$color-primary-dim: darken($color-primary-bright, 12%);
+$color-bg: $color-brightest;
+$color-text-dark: $color-deep;
+$color-text-muted: $color-muted;
+$color-text-light: $color-bright;
+$color-text-active: $color-primary-dim;
+
+$background-colors: (
+  'red': $color-red,
+  'green': $color-green,
+  'blue': $color-blue,
+  'dim': $color-dim,
+  'forest-green': $color-forest-green
+);
+@each $name, $color in $background-colors {
+  .background-#{$name} {
+    background-color: $color;
+  }
+}
