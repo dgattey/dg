@@ -8,7 +8,6 @@ $animation-duration: 334ms;
 $ease-out-back: cubic-bezier(.175, .885, .32, 1.275);
 $ease-in-out-back: cubic-bezier(.68, -.55, .265, 1.55);
 $scale-down-hover: .96;
-$scale-up-hover: 1.06;
 
 // Adds support for adding multiple types of transitions
 @mixin transition($properties...) {
@@ -56,12 +55,6 @@ $scale-up-hover: 1.06;
 .scale-down-on-hover {
   &:hover {
     transform: scale($scale-down-hover);
-  }
-}
-
-.scale-up-on-hover {
-  &:hover {
-    transform: scale($scale-up-hover);
   }
 }
 
