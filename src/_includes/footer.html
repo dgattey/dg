@@ -1,4 +1,4 @@
-<footer>
+<footer class="standard-inset">
   {% capture version %}{% project_version tag short %}{% endcapture %}
   {% assign short_version = version | split: "-" | first %}
   <p class="copy">&copy; {{ site.time | date: '%Y' }} {{ site.title }} | {{ version }}</p>

@@ -6,15 +6,9 @@ layout: compress
 <html lang="{{ site.lang }}">
 {% include head.html %}
 <body>
-	<!-- Header and navigation -->
+	<!-- Navigation, content, footer -->
 	{% include nav.html %}
-
-	<!-- Actual content -->
-	<div class="content" role="main">
-		{{ content }}
-	</div>
-
-	<!-- Footer of page -->
+	{{ content }}
 	{% include footer.html %}
 
 	<!-- Service worker, font loader, & sticky header -->

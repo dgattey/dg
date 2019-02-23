@@ -1,15 +1,14 @@
 ---
 layout: default
 ---
-<article class="post" itemscope itemtype="http://schema.org/BlogPosting">
-	<header class="post-header">
-		<div class="meta">
-			<h1 class="title" itemprop="name headline">{{ page.title }}</h1>
-			<h5 class="description">{{ page.description }}</h5>
-		</div>
+<article class="standard-inset" itemscope itemtype="http://schema.org/BlogPosting" role="main">
+
+    <header>
+		<h1 class="title" itemprop="name headline">{{ page.title }}</h1>
+		<h5 class="description" itemprop="description">{{ page.description }}</h5>
 	</header>
 
-	<div class="post-content" itemprop="articleBody">
+	<div itemprop="articleBody">
 		{{ content }}
 	</div>
 
