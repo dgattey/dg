@@ -35,32 +35,6 @@ $card-padding: $item-spacing-4;
   padding: 0 $item-spacing-4;
 }
 
-.grid {
-  display: grid;
-
-  @include for-phone-up {
-    grid-template-columns: 1fr;
-  }
-}
-
-.grid-two-one-column {
-  @include for-desktop-up {
-    grid-gap: $item-spacing-2;
-    grid-template-columns: 2fr 1fr;
-    justify-items: start;
-  }
-}
-
-.grid-two-column {
-  grid-gap: $item-spacing-2;
-  grid-template-columns: 1fr 1fr;
-  justify-items: start;
-}
-
-.grid-align-center {
-  align-items: center;
-}
-
 .card-pull-right {
   margin-left: $card-padding;
 }
@@ -94,7 +68,17 @@ $card-padding: $item-spacing-4;
   }
 }
 
-.size-to-parent {
-  max-height: 100%;
-  max-width: 100%;
+.fill-parent {
+  height: 100%;
+  width: 100%;
+}
+
+.cover-parent {
+  object-fit: cover;
+}
+
+.text-center-phone-only {
+  @include for-phone-only {
+    text-align: center;
+  }
 }

@@ -1,0 +1,59 @@
+// =====
+// Grid-related content
+// =====
+
+$grid-standard-columns: 12;
+
+.grid {
+  display: grid;
+}
+
+.grid-standard-columns {
+  grid-template-columns: repeat($grid-standard-columns, 1fr);
+}
+
+.grid-two-column-tablet {
+  @include for-tablet-up {
+    grid-gap: $item-spacing-2;
+    grid-template-columns: 1fr 1fr;
+    justify-items: start;
+  }
+}
+
+.grid-two-one-column-desktop {
+  @include for-desktop-up {
+    grid-gap: $item-spacing-2;
+    grid-template-columns: 2fr 1fr;
+    justify-items: start;
+  }
+}
+
+.grid-rows-2 {
+  grid-template-rows: repeat(2, auto);
+}
+
+.grid-span-full-phone {
+  @include for-phone-up {
+    grid-column: 1 / -1;
+  }
+}
+
+.grid-span-7-tablet {
+  @include for-tablet-up {
+    grid-column: 1 / 7;
+  }
+}
+
+.grid-span-offset-1-desktop {
+  @include for-desktop-up {
+    grid-column-start: 2;
+  }
+}
+
+.grid-align-center {
+  align-items: center;
+}
+
+.grid-gap-3 {
+  grid-column-gap: $item-spacing-3;
+}

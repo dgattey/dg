@@ -7,8 +7,6 @@
   $scale-up-hover: 1.06;
   align-content: space-around;
   color: $color-brightest;
-  display: grid;
-  grid-gap: $item-spacing-3;
 
   @include for-tablet-up {
     grid-row-end: span 2;

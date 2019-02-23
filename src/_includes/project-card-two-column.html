@@ -30,7 +30,7 @@
     {% if post.two_column == "description-only" %}
     <section class="card">{{ title_content }}</section>
     {% endif %}
-    <div class="card grid grid-two-column grid-align-center">
+    <div class="card grid grid-two-column-tablet grid-align-center">
         {% if post.two_column == "mirrored" %}
         {{ data_section }}{{ thumbnail_section }}
         {% elsif post.two_column == "description-only" %}

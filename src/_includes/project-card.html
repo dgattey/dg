@@ -3,8 +3,8 @@
 {% else %}
 {% assign postlink = post.url %}
 {% endif %}
-<a href="{{ postlink }}" class="project-card round-corners shadow-strong shadow-weak-on-hover transition-bounce scale-down-on-hover background-{{ post.color }}">
-    <section class="grid grid-two-one-column grid-align-center card">
+<a href="{{ postlink }}" class="grid grid-gap-3 project-card round-corners shadow-strong shadow-weak-on-hover transition-bounce scale-down-on-hover background-{{ post.color }}">
+    <section class="grid grid-two-one-column-desktop grid-align-center card">
         <h3>{{ post.title }}</h3>
         <h6 class="type desktop-align-right">{{ post.type }}</h6>
     </section>

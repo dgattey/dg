@@ -3,136 +3,42 @@
 // - pages: index.html
 // =====
 
-$end-before-photo: 7;
 
 .intro {
-  color: $color-deep;
-  display: grid;
-  grid-column-gap: $item-spacing-3;
-  grid-template-columns: repeat($grid-standard-columns, 1fr);
 
   @include for-phone-up {
-    grid-template-rows: repeat(4, auto);
-    margin-bottom: $item-spacing-5 + $item-spacing-4;
+    margin-bottom: $item-spacing-5 + $item-spacing-3;
   }
 
   @include for-tablet-up {
     margin-bottom: $item-spacing-6;
   }
 
-  @include for-desktop-up {
-    grid-template-rows: repeat(2, 1fr);
-    margin-bottom: $item-spacing-6 + $item-spacing-1;
-  }
-
-  .title,
-  .subtitle {
-    color: $color-primary-bright;
-    margin-bottom: 0;
-
-    @include for-phone-up {
-      grid-column: 1 / -1;
-      text-align: center;
-    }
-
-    @include for-tablet-up {
-      align-self: end;
-      grid-column: 2 / #{$end-before-photo};
-      text-align: left;
-    }
-
-    @include for-desktop-up {
-      grid-column: 2 / -1;
-    }
-  }
-
   .title {
     grid-row: 1 / 2;
-  }
-
-  .subtitle {
-    margin-top: 0;
-
-    @include for-phone-up {
-      grid-row: 2 / 3;
-    }
+    align-self: end;
 
     @include for-desktop-up {
-      display: none;
+      grid-column-end: -1;
     }
+  
   }
 
   .detail {
-    color: $color-text-muted;
-
-    @include for-phone-up {
-      grid-column: 1 / -1;
-      grid-row: 3 / 4;
-    }
-
-    @include for-tablet-up {
-      grid-column: 1 / #{$end-before-photo};
-    }
+    grid-row: 2 / 3;
 
     @include for-desktop-up {
-      grid-column: 2 / #{$end-before-photo};
-      grid-row: 2 / -1;
+      grid-column-end: 7;
     }
+
   }
 
   .portrait {
-    height: 100%;
-    object-fit: cover;
-    width: 100%;
-
-    img {
-      height: 100%;
-      width: 100%;
-    }
-
-    @include for-phone-up {
-      grid-column: 1 / -1;
-      grid-row: 4 / -1;
-    }
 
     @include for-tablet-up {
-      grid-column: #{$end-before-photo} / -1;
-      grid-row: 1 / -1;
+      grid-row: 1 / 3;
+      grid-column: 7 / -1;
     }
-  }
-}
 
-.intro-mobile {
-  grid-column: 1 / -1;
-  grid-row: 1 / 2;
-
-  @include for-phone-only {
-    font-size: 9vw;
-    grid-column: 1 / -1;
-
-    * {
-      line-height: 18vw;
-    }
-  }
-
-  @include for-tablet-up {
-    font-size: 2vw;
-    grid-column: 1 / #{$end-before-photo};
-
-    * {
-      line-height: 8vw;
-    }
-  }
-
-  @include for-desktop-up {
-    display: none;
-  }
-}
-
-.intro-desktop {
-  display: none;
-
-  @include for-desktop-up {
-    display: initial;
   }
 }
