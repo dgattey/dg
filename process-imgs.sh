@@ -147,15 +147,11 @@ optimize_filetypes_until_done() {
 # --------------------------
 
 # Make sure the tools we need are installed
-install_if_needed "ImageOptim" \
-    "ls $IMAGE_OPTIM_PATH" \
-    "$IMAGE_OPTIM_PATH" \
-    "$SETUP_SCRIPT"
+install_if_needed "ImageOptim" "ls $IMAGE_OPTIM_PATH" "$IMAGE_OPTIM_PATH" \
+    "$SETUP_SCRIPT" "skip"
 
-install_if_needed "ImageMagick 7" \
-    "convert --version" \
-    "Version: ImageMagick 7" \
-    "$SETUP_SCRIPT"
+install_if_needed "ImageMagick 7" "convert --version" "Version: ImageMagick 7" \
+    "$SETUP_SCRIPT" "skip"
 
 # Convert all non-icons to WebP
 convert_filetypes_until_done $IMAGE_ASSET_PATH $CONVERSION_FILETYPE "${IMAGE_FILETYPES[@]}"

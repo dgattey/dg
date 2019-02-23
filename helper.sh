@@ -11,7 +11,8 @@ trap 'err_report $LINENO' ERR
 # --------------------------
 # CONSTANTS
 # --------------------------
-ERASE="\\r\\033[K"
+BEGINNING_OF_LINE="\\r"
+ERASE="$BEGINNING_OF_LINE\\033[K"
 TEMP=".tmp"
 SETUP_OUTPUT_FILE="$TEMP/setup_output"
 OPTIM_OUTPUT_FILE="$TEMP/optim_output"
@@ -24,6 +25,10 @@ IMAGE_OPTIM_PATH=/Applications/ImageOptim.app/Contents/MacOS/ImageOptim
 
 erase_line() {
     echo -en "$ERASE"
+}
+
+reset_cursor() {
+    echo -en "$BEGINNING_OF_LINE"
 }
 
 # Echos a simple status message
@@ -60,6 +65,7 @@ print_working_message() {
     erase_line
     print_information_message "$message"
     printf "%s" "${spin:$spin_iteration:1}"
+    reset_cursor
 }
 
 # Prints a "(pass 3)" type of string in yellow with given message content
@@ -106,13 +112,13 @@ print_progress_indicator() {
 
 # Installs a given named dependency if needed
 install_if_needed() {
-    local name=$1
+    local name="$1"
     local check_command=$2
-    local is_installed_check_result=$3
+    local is_installed_check_result="$3"
     local install_command=$4
+    local skip_printing="$5"
 
-    eval "$check_command > $SETUP_OUTPUT_FILE 2>/dev/null" &
-    print_progress_indicator "$name: checking for installation "
+    eval "$check_command >$SETUP_OUTPUT_FILE 2>$SETUP_OUTPUT_FILE"
 
     # Check to see if item is installed
     if [ "$(grep "$is_installed_check_result" "$SETUP_OUTPUT_FILE" | wc -c)" -ne 0 ]; then
@@ -121,11 +127,15 @@ install_if_needed() {
     fi
 
     # We can assume we need to install it - let's show progress
-    erase_line
-    print_information_message "$name: installing... "
-    echo ""
-    eval "$install_command"
-    print_success_message "$name now installed "
+    if [[ "$skip_printing" == "" ]]; then
+        erase_line
+        print_information_message "$name: installing... "
+        echo ""
+    fi
+    $install_command
+    if [[ "$skip_printing" == "" ]]; then
+        print_success_message "$name now installed "
+    fi
 }
 
 # --------------------------
