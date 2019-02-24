@@ -68,7 +68,8 @@ workbox:
   precache_glob_directory: /
   precache_glob_patterns:
     - 'index.html': '/'
-    - /offline.html
+    - 500.html
+    - 503.html
     - favicon.ico
 
 # For auto-inferring post titles
@@ -91,7 +92,7 @@ jekyll-minifier:
 # Build settings
 markdown: kramdown
 source: src
-include: [static]
+include: [_static, _errors]
 highlighter: rouge
 kramdown:
   input: GFM
