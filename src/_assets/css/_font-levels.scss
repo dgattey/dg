@@ -1,0 +1,64 @@
+// =====
+// Font level generation
+// =====
+
+// =====
+// Raises a number to a power
+// =====
+@function pow($number, $power) {
+  $value: 1;
+  @if $power > 0 {
+    @for $i from 1 through $power {
+      $value: $value * $number;
+    }
+  }
+  @return $value;
+}
+
+// =====
+// Generates font size and line height declarations when included in an element
+// using a standard rhythm. The configurable level dictates how many levels
+// larger than normal the font should be.
+// =====
+@mixin generate-font-level-content($level) {
+  // Base variables
+  $base-font-size: 1.38rem;
+  $base-line-height-proportion: 1.58;
+  $base-margin-bottom: 2.5rem;
+
+  // Proportions used in calculation.
+  $font-size-proportion: 1.09;
+  $line-height-proportion: 1.08;
+
+  $base-line-height: $base-font-size * $base-line-height-proportion;
+  font-size: $base-font-size * pow($font-size-proportion, $level);
+  line-height: $base-line-height * pow($line-height-proportion, $level);
+  margin-bottom: $base-margin-bottom;
+}
+
+// =====
+// Includes the generated font body on font-size-$level with a particular level
+// =====
+@mixin generate-font-level($level) {
+  .font-size-#{$level} {
+    @include for-phone-up {
+      @include generate-font-level-content($level);
+    }
+
+    @include for-tablet-up {
+      @include generate-font-level-content($level + 1);
+    }
+
+    @include for-desktop-up {
+      @include generate-font-level-content($level + 2);
+    }
+  }
+}
+
+// =====
+// Actually generates all the font levels for use elsewhere
+// =====
+$font-levels: 18;
+@for $level from 0 through $font-levels {
+  @include generate-font-level($level);
+}

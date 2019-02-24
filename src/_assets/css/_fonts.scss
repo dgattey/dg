@@ -2,27 +2,19 @@
 // Font-specific variables & mixins (defined here for ease of use below)
 // =====
 
-// Sass lint doesn't support root properties right - here's a workaround
-@mixin root-prop($prop: null, $values...) {
-  @if ($prop) {
-    #{$prop}: $values;
-  }
-}
-
 :root {
   // Families
-  @include root-prop(--font-family-body, lft-etica, Arial, sans-serif);
-  @include root-prop(--font-family-code, source-code-pro, Monaco, monospace);
-  @include root-prop(--font-family-display, lft-etica, Arial, sans-serif);
-  @include root-prop(--font-family-head, lft-etica, Arial, sans-serif);
-  @include root-prop(--font-family-nav, lft-etica, Arial, sans-serif);
+  --font-family-body: lft-etica, Arial, sans-serif;
+  --font-family-code: source-code-pro, Monaco, monospace;
 
   // Weights
-  @include root-prop(--font-weight-body, 400);
-  @include root-prop(--font-weight-code, 400);
-  @include root-prop(--font-weight-display, 600);
-  @include root-prop(--font-weight-head, 800);
-  @include root-prop(--font-weight-nav, 700);
+  --font-weight-normal: 400;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+  --font-weight-black: 800;
+
+  // Sizes
+  --font-base-size: 10px;
 
   // For when fonts are un-loaded
   letter-spacing: -.002em;
@@ -36,172 +28,99 @@
   }
 }
 
-// Base variables
-$html-font-size: 10px;
-$base-font-size: 1.5rem;
-$base-line-height-proportion: 1.5;
-$base-margin-bottom: 2.5rem;
-$text-max-width: 36em;
-
-// Proportions used in the `level` calculations.
-$font-size-proportion: 1.09;
-$line-height-proportion: 1.09;
-$header-multiplier: 2.5;
-
-// =====
-// Raises a number to a power
-// =====
-@function pow($number, $power) {
-  $value: 1;
-  @if $power > 0 {
-    @for $i from 1 through $power {
-      $value: $value * $number;
-    }
-  }
-  @return $value;
-}
-
-// =====
-// Calculates the level, given a level and is header flag to apply a multiplier.
-// =====
-@function calculate-level($level, $is-header) {
-  @if $is-header {
-    @return round($level * $header-multiplier);
-  }
-  @return $level;
-}
-
-// =====
-// Generates font size and line height declarations when included in an element, using
-// a standard rhythm. The configurable level dictates how many levels larger than
-// normal the font should be, and an additional modifier to add onto the level.
-// =====
-@mixin text-body($level, $level-modifier: 0) {
-  $base-line-height: $base-font-size * $base-line-height-proportion;
-  font-size: $base-font-size * pow($font-size-proportion, $level + $level-modifier);
-  line-height: $base-line-height * pow($line-height-proportion, $level + $level-modifier);
-  margin-bottom: $base-margin-bottom;
-}
-
-// =====
-// Includes `text-body` for both normal level and emphasized (adds one level).
-// =====
-@mixin text-body-with-emphasized($level) {
-  @include text-body($level);
-
-  &.emphasized {
-    @include text-body($level + 1);
-  }
-}
-
-// =====
-// Includes `text-body-with-emphasized` on the `element`, with a particular `level` and
-// `header` modifier.
-// =====
-@mixin text($element, $level, $is-header: false) {
-  $level: calculate-level($level, $is-header);
-
-  #{$element} {
-    @include for-phone-up {
-      @include text-body-with-emphasized($level);
-    }
-
-    @include for-tablet-up {
-      @include text-body-with-emphasized($level + 1);
-    }
-
-    @include for-desktop-up {
-      @include text-body-with-emphasized($level + 2);
-    }
-  }
-}
-
-// =====
-// Includes all the font styles, using CSS variables
-// =====
-
-$font-styles: 'display' 'nav' 'head' 'body' 'code';
-@each $type in $font-styles {
-  $fam: '--font-family-#{$type}';
-  $weight: '--font-weight-#{$type}';
-
-  %#{$type}-font-style {
-    font-family: var(unquote($fam));
-    font-weight: var(unquote($weight));
-  }
-
-  .#{$type}-font-style {
-    @extend %#{$type}-font-style;
-  }
-}
-
 // =====
 // Defines standard font styles & sizes across the full site.
 // =====
 
 html {
+  @extend .font-weight-normal;
   // sass-lint:disable no-vendor-prefixes
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   // sass-lint:enable no-vendor-prefixes
+  font-family: var(--font-family-body);
+  font-size: var(--font-base-size);
   font-feature-settings: 'kern' 1;
   font-kerning: normal;
   text-size-adjust: 100%;
 }
 
 // =====
+// Families
+// =====
+
+.font-family-code {
+  font-family: var(--font-family-code);
+}
+
+// =====
+// Weights
+// =====
+
+.font-weight-normal {
+  font-weight: var(--font-weight-normal);
+}
+
+.font-weight-bold {
+  font-weight: var(--font-weight-bold);
+}
+
+.font-weight-semibold {
+  font-weight: var(--font-weight-semibold);
+}
+
+.font-weight-black {
+  font-weight: var(--font-weight-black);
+}
+
+// =====
 // Header styling
 // =====
 
-h1,
-h2,
+h1 {
+  @extend .font-weight-semibold;
+  @extend .font-size-16;
+}
+
+h2 {
+  @extend .font-weight-semibold;
+  @extend .font-size-11;
+}
+
 h3 {
-  @extend %display-font-style;
+  @extend .font-weight-semibold;
+  @extend .font-size-8;
 }
 
-h4,
-h5,
+h4 {
+  @extend .font-weight-black;
+  @extend .font-size-5;
+}
+
+h5 {
+  @extend .font-weight-black;
+  @extend .font-size-3;
+}
+
 h6 {
-  @extend %head-font-style;
+  @extend .font-weight-black;
+  @extend .font-size-1;
 }
-
-@for $header-level from 2 through 6 {
-  $level: -1 * ($header-level - 6);
-  @include text(h#{$header-level}, $level, $is-header: true);
-}
-@include text(h1, 6, $is-header: true);
 
 // =====
 // Regular (non-header) text styling
 // =====
 
-@include text('%body-font-style-size', 0);
-@include text('%code-font-size', -1);
-
-%body-font-style-size {
-  max-width: $text-max-width;
+p {
+  max-width: 36em;
+  @extend .font-size-1;
 }
 
-p,
 input,
 button,
 select,
 textarea {
-  @extend %body-font-style;
-  @extend %body-font-style-size;
-}
-
-// =====
-// Links
-// =====
-
-a {
-  color: $color-primary-bright;
-  text-decoration: none;
-
-  &:hover {
-    color: $color-primary-dim;
-  }
+  @extend .font-size-1;
 }
 
 // =====
@@ -210,8 +129,8 @@ a {
 
 code,
 pre {
-  @extend %code-font-style;
-  @extend %code-font-size;
+  @extend .font-family-code;
+  @extend .font-size-0;
   overflow: auto;
 
   @include for-phone-up {
@@ -221,10 +140,4 @@ pre {
   @include for-tablet-up {
     word-break: normal;
   }
-}
-
-.highlight {
-  border-radius: 1em;
-  max-width: 64rem;
-  padding: 1rem;
 }

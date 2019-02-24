@@ -36,7 +36,7 @@ $icon-size: $item-spacing-3;
   }
 }
 
-.overhang-parent-bottom-4-tablet-4-tablet {
+.overhang-parent-bottom-4-tablet {
   @include for-phone-up {
     margin-bottom: 0;
   }

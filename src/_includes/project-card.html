@@ -4,9 +4,9 @@
 {% assign postlink = post.url %}
 {% endif %}
 <a href="{{ postlink }}" class="link-undecorated grid grid-gap-3 project-card round-corners shadow-strong shadow-weak-on-hover transition-bounce scale-down-on-hover background-{{ post.color }}">
-    <section class="grid grid-two-one-column-desktop grid-align-center card">
-        <h3>{{ post.title }}</h3>
-        <h6 class="type flush-top-tablet-down desktop-align-right">{{ post.type }}</h6>
+    <section class="grid grid-columns-2-1-desktop grid-align-center card">
+        <h3 class="font-size-9">{{ post.title }}</h3>
+        <h4 class="type flush-top-tablet-down desktop-align-right font-size-1">{{ post.type }}</h4>
     </section>
     <section class="card transition-bounce card-component-on-hover-pull-right">
         <p>{{ post.description }}</p>

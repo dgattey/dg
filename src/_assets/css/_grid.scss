@@ -2,29 +2,25 @@
 // Grid-related content
 // =====
 
-$grid-standard-columns: 12;
+$grid-columns-standard: 12;
 
 .grid {
   display: grid;
 }
 
-.grid-standard-columns {
-  grid-template-columns: repeat($grid-standard-columns, 1fr);
+.grid-columns-standard {
+  grid-template-columns: repeat($grid-columns-standard, 1fr);
 }
 
-.grid-two-column-tablet {
+.grid-columns-2-tablet {
   @include for-tablet-up {
-    grid-gap: $item-spacing-2;
-    grid-template-columns: 1fr 1fr;
-    justify-items: start;
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-.grid-two-one-column-desktop {
+.grid-columns-2-1-desktop {
   @include for-desktop-up {
-    grid-gap: $item-spacing-2;
     grid-template-columns: 2fr 1fr;
-    justify-items: start;
   }
 }
 
@@ -32,26 +28,48 @@ $grid-standard-columns: 12;
   grid-template-rows: repeat(2, auto);
 }
 
-.grid-span-full-phone {
-  @include for-phone-up {
-    grid-column: 1 / -1;
-  }
+.grid-rows-3 {
+  grid-template-rows: repeat(2, auto);
 }
 
-.grid-span-7-tablet {
+.grid-span-col-full {
+  grid-column: 1 / -1;
+}
+
+.grid-span-col-7-tablet {
   @include for-tablet-up {
     grid-column: 1 / 7;
   }
 }
 
-.grid-span-offset-1-desktop {
+.grid-span-col-offset-desktop {
   @include for-desktop-up {
     grid-column-start: 2;
   }
 }
 
+.grid-span-col-offset {
+  grid-column-start: 2;
+}
+
+.grid-span-row-1 {
+  grid-row: span 1;
+}
+
 .grid-align-center {
   align-items: center;
+}
+
+.grid-item-align-right {
+  justify-self: end;
+}
+
+.grid-item-align-bottom {
+  align-self: end;
+}
+
+.grid-gap-2 {
+  grid-gap: $item-spacing-2;
 }
 
 .grid-gap-3 {

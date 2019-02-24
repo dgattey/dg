@@ -3,7 +3,7 @@
 // page). Handles animations across it too.
 // =====
 
-$nav-grid-columns: 2 * ($grid-standard-columns - 1);
+$nav-grid-columns: 2 * ($grid-columns-standard - 1);
 $underline-height: 3px;
 
 nav {
@@ -12,8 +12,6 @@ nav {
 
 .logo-wrapper,
 .nav-item {
-  // Ensures uniform text size on nav items to follow body
-  @extend %body-font-style-size;
   align-self: center;
 }
 

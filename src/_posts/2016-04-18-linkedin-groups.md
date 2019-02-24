@@ -13,7 +13,7 @@ thumbnail:
 # LinkedIn Groups
 
 <section>
-<p class="emphasized">As an intern at LinkedIn, I helped craft LinkedIn Groups
+<p class="font-size-2">As an intern at LinkedIn, I helped craft LinkedIn Groups
 2.0 for iOS. Interface "delights" to make Groups smooth and attractive were
 my main focus. From slick transition animators to custom UI components, I
 created UI to be styled & reused inside all of LinkedIn's iOS apps.</p>
