@@ -4,15 +4,15 @@
   <p class="copy">&copy; {{ site.time | date: '%Y' }} {{ site.title }} | {{ version }}</p>
   <ul>
     <li>
-      <a href="{{ site.baseurl }}/about"><p>About</p></a>
+      <a class="link-undecorated" href="{{ site.baseurl }}/about"><p>About</p></a>
     </li>
 
     <li>
-      <a class="icon" href="https://github.com/{{site.github}}" aria-label="Link to Github">{% include icon-github.svg %}</a>
+      <a class="link-undecorated icon" href="https://github.com/{{site.github}}" aria-label="Link to Github">{% include icon-github.svg %}</a>
     </li>
 
     <li>
-      <a href="mailto:{{ site.email | encode_email }}"><p>Email</p></a>
+      <a class="link-undecorated" href="mailto:{{ site.email | encode_email }}"><p>Email</p></a>
     </li>
   </ul>
 </footer>

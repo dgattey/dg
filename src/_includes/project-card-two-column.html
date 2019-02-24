@@ -3,7 +3,7 @@
 {% else %}
 {% assign postlink = post.url %}
 {% endif %}
-<a href="{{ postlink }}" class="project-card round-corners shadow-strong shadow-weak-on-hover transition-bounce scale-down-on-hover background-{{ post.color }}">
+<a href="{{ postlink }}" class="link-undecorated project-card round-corners shadow-strong shadow-weak-on-hover transition-bounce scale-down-on-hover background-{{ post.color }}">
     {% capture thumbnail_section %}
     <section class="transition-bounce card-component-on-hover-scale-up {{ post.thumbnail.container_class }}">
         {% capture alttext %}{{ post.title }} thumbnail{% endcapture %}

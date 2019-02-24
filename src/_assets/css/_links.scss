@@ -1,0 +1,20 @@
+// =====
+// All styling related to links
+// =====
+
+
+a {
+  @include transition-linear(color);
+  border-bottom: 2px solid currentColor;
+  color: $color-primary-bright;
+  display: inline-block;
+  text-decoration: none;
+
+  &:hover {
+    color: $color-primary-dim;
+  }
+}
+
+.link-undecorated {
+  border-bottom: none;
+}
