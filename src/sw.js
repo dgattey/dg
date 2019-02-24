@@ -11,7 +11,8 @@
 const staticCacheName = "static",
 	vendorCacheName = "vendor-static",
 	imageCacheName = "images",
-	offlinePage = "/offline.html";
+	offlinePage = "/503.html",
+	genericErrorPage = "/500.html";
 
 workbox.core.setCacheNameDetails({
 	precache: "precache",
@@ -48,7 +49,6 @@ workbox.precaching.precacheAndRoute([]);
 
 /**
  * Routing for different filetypes & endpoints
- * - Force 404 page to network only since we don't need it offline
  * - Force all analytics calls to network only
  * - Force all p.gif calls (Adobe's check to see if you can use the font) to
  *   network only. If this is cached, the cache grows and grows
@@ -117,23 +117,33 @@ workbox.routing.registerRoute(
 );
 
 /**
- * Default handler & catch handler
- * - There's a default handler here that will fetch using networkFirst, but
- *   if offline, will try to return an offline page
- * - If it's a POST request, it'll default to networkOnly
- * - The regular catch handler is set up to return an offline page if we can't find something that matches.
- *   Otherwise, we'll return an error response
+ * Returns a generic error page from cache, replacing the error content with
+ * status and the actual page URL.
  */
-const offlinePageWithName = async (pageURL) => {
-	const cachedResponse = await caches.match(offlinePage);
+const errorPageForURL = async (pageURL) => {
+	const cachedResponse = await caches.match(genericErrorPage);
 
-	return responseWithReplacedURL(cachedResponse, pageURL, 503)
+	return responseWithReplacedErrorContent(cachedResponse, pageURL, 500);
 };
 
 /**
- * Takes a page and replaces "{url}" with the page's URL
+ * Returns the offline page from cache, replacing the error content with a 503
+ * status and the actual page URL.
  */
-const responseWithReplacedURL = async (existingResponse, pageURL, status) => {
+const offlinePageForURL = async (pageURL) => {
+	const cachedResponse = await caches.match(offlinePage);
+
+	return responseWithReplacedErrorContent(cachedResponse, pageURL, 503);
+};
+
+/**
+ * Takes an existing response and replaces some error content. Specifically:
+ * - Replaces "<error>"" or "</error>" with the actual status code
+ * - Replaces "? page" with the actual pageURL
+ *
+ * Note that the status code falls back to the response's status if not defined.
+ */
+const responseWithReplacedErrorContent = async (existingResponse, pageURL, status) => {
 	if (!status) {
 		status = existingResponse.status;
 	}
@@ -157,48 +167,73 @@ const responseWithReplacedURL = async (existingResponse, pageURL, status) => {
 	});
 };
 
-const fetchWithOfflineFallback = async (context) => {
-	const defaultStrategy = workbox.strategies.networkFirst();
-	const postStrategy = workbox.strategies.networkOnly();
+/**
+ * Handles a standard network response. There are two main components here:
+ * - If the response 404'd, we need to replace the placeholder error content
+ * - Otherwise, check if we're requesting a document
+ * - If a document, return the response or fall back to the offline page
+ * - Otherwise, just return the response
+ */
+const handleResponse = async (response, pageURL, destination) => {
+	// If the response 404'd, we should replace the page URL and return it
+	if (response && response.status == 404) {
+		return responseWithReplacedErrorContent(response, pageURL);
+	}
 
-	try {
-		// If it's a POST request, use networkOnly
-		if (context.event.request.method === 'POST') {
-			return await postStrategy.handle(context);
-		}
-
-		const pageURL = context.event.request.url;
-
-		// Use the preloaded response, if it's there
-		const preloadResponse = await context.preloadResponse;
-
-		if (preloadResponse) {
-			return preloadResponse;
-		}
-
-		// Otherwise, try network first with a fallback to the 404 page
-		const response = await defaultStrategy.handle(context);
-
-		// If the response 404'd, we should replace the page URL and return it
-		if (response && response.status == 404) {
-			return responseWithReplacedURL(response, pageURL);
-		}
-
-		// Otherwise, let's return the response or an offline page
-		return response || offlinePageWithName(pageURL);
-	} catch (error) {
-		console.log("ERROR! ", error);
-		// Try one last time to grab the offline page
-		return offlinePageWithName(context.event.request.url);
+	// Check if we should try returning offline page if response fails
+	switch (destination) {
+	case "document":
+		return response || offlinePageForURL(pageURL);
+	default:
+		return response;
 	}
 };
 
-workbox.routing.setDefaultHandler(fetchWithOfflineFallback);
-workbox.routing.setCatchHandler(({event}) => {
-	switch (event.request.destination) {
+/**
+ * Fetches a page, doing all the work to handle edge cases. Specifically:
+ * - For not-GET methods, uses networkOnly to not cache them
+ * - If there's a preload response, just use that
+ * - Everything else is run through handleResponse with networkFirst strategy
+ */
+const fetchPage = async (context) => {
+	const nonGetStrategy = workbox.strategies.networkOnly();
+
+	// If it's non GET request, use networkOnly
+	if (context.event.request.method !== 'GET') {
+		return await nonGetStrategy.handle(context);
+	}
+
+	// Use the preloaded response, if it's there
+	const preloadResponse = await context.preloadResponse;
+
+	if (preloadResponse) {
+		return preloadResponse;
+	}
+
+	// Otherwise, fetch and handle the response
+	const pageURL = context.event.request.url;
+	const destination = context.event.request.destination;
+	const defaultStrategy = workbox.strategies.networkFirst();
+	const response = await defaultStrategy.handle(context);
+
+	return handleResponse(response, pageURL, destination);
+};
+
+/**
+ * If it's a document, it fetches the fallback error page if possible, or
+ * returns a generic response error if not.
+ */
+const fetchErrorPage = async (context) => {
+	const pageURL = context.event.request.url;
+	const destination = context.event.request.destination;
+
+	switch (destination) {
 	case "document":
-		return offlinePageWithName(event.request.url);
+		return errorPageForURL(pageURL);
 	default:
 		return Response.error();
 	}
-});
+};
+
+workbox.routing.setDefaultHandler(fetchPage);
+workbox.routing.setCatchHandler(fetchErrorPage);
