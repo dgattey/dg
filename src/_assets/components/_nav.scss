@@ -15,7 +15,6 @@ nav {
   // Ensures uniform text size on nav items to follow body
   @extend %body-font-style-size;
   align-self: center;
-  margin-bottom: 0; // resets the inherited value
 }
 
 .logo-wrapper {
@@ -23,7 +22,6 @@ nav {
   grid-column-end: span 2;
   justify-self: start;
   list-style: none;
-  margin: 0;
 }
 
 .logo {
@@ -38,7 +36,6 @@ nav {
   background: $color-bg;
   display: grid;
   grid-template-columns: repeat($nav-grid-columns, 1fr);
-  margin: 0;
 
   @include for-phone-up {
     grid-column-gap: $item-spacing-4;
@@ -55,7 +52,6 @@ nav {
   grid-column-end: span 4;
   justify-self: start;
   list-style: none;
-  margin: 0;
   text-transform: uppercase;
 
   &:hover {

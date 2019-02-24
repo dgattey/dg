@@ -3,6 +3,10 @@
 // - pages: index.html
 // =====
 
+.card {
+  padding: 0 $item-spacing-4;
+}
+
 .project-card {
   $scale-up-hover: 1.06;
   align-content: space-around;
@@ -36,10 +40,6 @@
   .type {
     font-variant: small-caps;
     text-transform: uppercase;
-
-    @include for-tablet-down {
-      margin-top: 0;
-    }
   }
 
 }

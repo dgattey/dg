@@ -1,7 +1,7 @@
 <header class="global-nav fixed-header nav-font-style transition-box-shadow">
   <nav>
-    <ul class="nav-items">
-      <li class="logo-wrapper"><a class="logo scale-down-on-hover transition-shape" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></li>
+    <ul class="nav-items flush">
+      <li class="logo-wrapper font-size-0 flush-bottom"><a class="logo scale-down-on-hover transition-shape" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></li>
       {% assign sorted_pages = site.pages | sort:"weight" %}
       {% for nav_page in sorted_pages %}
 
@@ -13,7 +13,7 @@
       {% assign nav_title = nav_page.nav_title | default nav_page.title %}
 
       {% if nav_title and nav_page.weight %}
-      <li class="nav-item transition-bounce">
+      <li class="nav-item font-size-0 flush transition-bounce">
         <a class="nav-link {{ nav_class }}" href="{{ nav_page.url }}">{{ nav_title }}</a>
       </li>
       {% endif %}

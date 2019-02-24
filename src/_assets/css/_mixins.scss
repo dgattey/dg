@@ -5,60 +5,13 @@
 $strong-shadow-color: rgba(0, 0, 0, .15);
 $weak-shadow-color: rgba(0, 0, 0, .1);
 $spread: $item-spacing-4 + $item-spacing-3;
-$strong-shadow: 0 $item-spacing-3 $spread $strong-shadow-color;
-$weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
-$card-padding: $item-spacing-4;
 
 // =====
 // Utility classes
 // =====
 
-.shadow-strong {
-  box-shadow: $strong-shadow;
-}
-
-.shadow-weak {
-  box-shadow: $weak-shadow;
-}
-
-.shadow-weak-on-hover {
-  &:hover {
-    box-shadow: $weak-shadow;
-  }
-}
-
 .round-corners {
   border-radius: $item-spacing-1;
-}
-
-.card {
-  padding: 0 $item-spacing-4;
-}
-
-.card-pull-right {
-  margin-left: $card-padding;
-}
-
-.overhang-parent {
-  @include for-phone-up {
-    &.bottom {
-      margin-bottom: 0;
-    }
-
-    &.top {
-      margin-top: 0;
-    }
-  }
-
-  @include for-tablet-up {
-    &.bottom {
-      margin-bottom: -$card-padding;
-    }
-
-    &.top {
-      margin-top: -$card-padding;
-    }
-  }
 }
 
 .desktop-align-right {

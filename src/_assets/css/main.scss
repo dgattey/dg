@@ -8,19 +8,19 @@
 // Normalizes css
 @import 'normalize/import-now';
 
-// Constants
-@import 'global-constants';
-
-// Utility CSS
+// Base utility CSS
 @import 'animations';
 @import 'breakpoints';
 @import 'colors';
+@import 'depth';
 @import 'fonts';
+@import 'spacing';
+
+// Utility CSS
 @import 'global';
 @import 'grid';
 @import 'mixins';
-@import 'padding';
-@import 'positioning';
+@import 'shadows';
 @import 'syntax';
 
 // Components

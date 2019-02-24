@@ -8,7 +8,7 @@ sitemap: false
 thumbnail:
   src: synergy-thumb
   filetype: png
-  container_class: "overhang-parent bottom card-pull-right round-corners shadow-weak"
+  container_class: "overhang-parent-bottom-4-tablet flush-left-4 round-corners shadow-weak"
   class: "round-corners"
 ---
 
