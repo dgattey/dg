@@ -73,10 +73,6 @@ const vendorRouteConfiguration = function(hours) {
 };
 
 workbox.routing.registerRoute(
-	/404.html/,
-	workbox.strategies.networkOnly()
-);
-workbox.routing.registerRoute(
 	/^https?:\/\/www\.google-analytics\.com/,
 	workbox.strategies.networkOnly()
 );
@@ -128,6 +124,39 @@ workbox.routing.registerRoute(
  * - The regular catch handler is set up to return an offline page if we can't find something that matches.
  *   Otherwise, we'll return an error response
  */
+const offlinePageWithName = async (pageURL) => {
+	const cachedResponse = await caches.match(offlinePage);
+
+	return responseWithReplacedURL(cachedResponse, pageURL, 503)
+};
+
+/**
+ * Takes a page and replaces "{url}" with the page's URL
+ */
+const responseWithReplacedURL = async (existingResponse, pageURL, status) => {
+	if (!status) {
+		status = existingResponse.status;
+	}
+
+	const constructedResponse = {
+		status: status,
+		statusText: existingResponse.statusText,
+		headers: existingResponse.headers
+	};
+
+	// Replace the requisite strings in the page with the real URL and status.
+	return existingResponse.text().then(function(body) {
+		const left = "&lt;"
+		const right = status + "&gt;";
+
+		var newContent = body.replace(/\? page/, pageURL);
+		newContent = newContent.replace(/&lt;error&gt;/, left + right);
+		newContent = newContent.replace(/&lt;\/error&gt;/, left + "/" + right);
+
+		return new Response(newContent, constructedResponse);
+	});
+};
+
 const fetchWithOfflineFallback = async (context) => {
 	const defaultStrategy = workbox.strategies.networkFirst();
 	const postStrategy = workbox.strategies.networkOnly();
@@ -138,6 +167,8 @@ const fetchWithOfflineFallback = async (context) => {
 			return await postStrategy.handle(context);
 		}
 
+		const pageURL = context.event.request.url;
+
 		// Use the preloaded response, if it's there
 		const preloadResponse = await context.preloadResponse;
 
@@ -145,13 +176,20 @@ const fetchWithOfflineFallback = async (context) => {
 			return preloadResponse;
 		}
 
-		// Otherwise, try network first with a fallback to the offline page
+		// Otherwise, try network first with a fallback to the 404 page
 		const response = await defaultStrategy.handle(context);
 
-		return response || await caches.match(offlinePage);
+		// If the response 404'd, we should replace the page URL and return it
+		if (response && response.status == 404) {
+			return responseWithReplacedURL(response, pageURL);
+		}
+
+		// Otherwise, let's return the response or an offline page
+		return response || offlinePageWithName(pageURL);
 	} catch (error) {
+		console.log("ERROR! ", error);
 		// Try one last time to grab the offline page
-		return await caches.match(offlinePage);
+		return offlinePageWithName(context.event.request.url);
 	}
 };
 
@@ -159,7 +197,7 @@ workbox.routing.setDefaultHandler(fetchWithOfflineFallback);
 workbox.routing.setCatchHandler(({event}) => {
 	switch (event.request.destination) {
 	case "document":
-		return caches.match(offlinePage);
+		return offlinePageWithName(event.request.url);
 	default:
 		return Response.error();
 	}
