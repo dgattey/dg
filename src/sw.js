@@ -1,5 +1,5 @@
-/*global workbox:true*/
-/*eslint no-undef: "error"*/
+/* global workbox:true */
+/* eslint no-undef: "error" */
 "use strict";
 
 /**
@@ -9,16 +9,16 @@
  * - Also make sure that if we are an old worker, we force reload the page to get freshest stuff
  */
 const staticCacheName = "static",
-	vendorCacheName = "vendor-static",
-	imageCacheName = "images",
-	offlinePage = "/503.html",
-	genericErrorPage = "/500.html";
+  vendorCacheName = "vendor-static",
+  imageCacheName = "images",
+  offlinePage = "/503.html",
+  genericErrorPage = "/500.html";
 
 workbox.core.setCacheNameDetails({
-	precache: "precache",
-	prefix: "dg",
-	suffix: "prod",
-	runtime: "site",
+  precache: "precache",
+  prefix: "dg",
+  suffix: "prod",
+  runtime: "site"
 });
 workbox.skipWaiting();
 workbox.clientsClaim();
@@ -26,11 +26,11 @@ workbox.clientsClaim();
 var isRefreshing = false;
 
 var refreshWindow = function() {
-	if (isRefreshing) {
-		return;
-	}
-	isRefreshing = true;
-	window.location.reload();
+  if (isRefreshing) {
+    return;
+  }
+  isRefreshing = true;
+  window.location.reload();
 };
 
 self.addEventListener("controllerchange", refreshWindow);
@@ -59,81 +59,81 @@ workbox.precaching.precacheAndRoute([]);
  */
 
 const vendorRouteConfiguration = function(hours) {
-	return {
-		cacheName: vendorCacheName,
-		plugins: [
-			new workbox.cacheableResponse.Plugin({
-				statuses: [0, 200],
-			}),
-			new workbox.expiration.Plugin({
-				maxAgeSeconds: 60 * 60 * hours,
-			}),
-		],
-	};
+  return {
+    cacheName: vendorCacheName,
+    plugins: [
+      new workbox.cacheableResponse.Plugin({
+        statuses: [0, 200]
+      }),
+      new workbox.expiration.Plugin({
+        maxAgeSeconds: 60 * 60 * hours
+      })
+    ]
+  };
 };
 
 workbox.routing.registerRoute(
-	/^https?:\/\/www\.google-analytics\.com/,
-	workbox.strategies.networkOnly()
+  /^https?:\/\/www\.google-analytics\.com/,
+  workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
-	/^https?:\/\/*google*\.com/,
-	workbox.strategies.networkOnly()
+  /^https?:\/\/*google*\.com/,
+  workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
-	/^https?:\/\/.*.typekit\.net\/p\.gif/,
-	workbox.strategies.networkOnly()
+  /^https?:\/\/.*.typekit\.net\/p\.gif/,
+  workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
-	/^https?:\/\/.*.typekit\.net\/af/,
-	workbox.strategies.cacheFirst(vendorRouteConfiguration(24 * 120))
+  /^https?:\/\/.*.typekit\.net\/af/,
+  workbox.strategies.cacheFirst(vendorRouteConfiguration(24 * 120))
 );
 workbox.routing.registerRoute(
-	/^https?:\/\/.*.typekit\.net/,
-	workbox.strategies.cacheFirst(vendorRouteConfiguration(24))
+  /^https?:\/\/.*.typekit\.net/,
+  workbox.strategies.cacheFirst(vendorRouteConfiguration(24))
 );
 workbox.routing.registerRoute(
-	/.*\.(?:js|css|json)$/,
-	workbox.strategies.cacheFirst({
-		cacheName: staticCacheName,
-		plugins: [
-			new workbox.expiration.Plugin({
-				maxAgeSeconds: 60 * 60 * 6,
-			}),
-		]
-	})
+  /.*\.(?:js|css|json)$/,
+  workbox.strategies.cacheFirst({
+    cacheName: staticCacheName,
+    plugins: [
+      new workbox.expiration.Plugin({
+        maxAgeSeconds: 60 * 60 * 6
+      })
+    ]
+  })
 );
 workbox.routing.registerRoute(
-	/\.(?:png|gif|jpg|jpeg|svg|webp|ico)$/,
-	workbox.strategies.cacheFirst({
-		cacheName: imageCacheName,
-		plugins: [
-			new workbox.expiration.Plugin({
-				maxEntries: 60,
-				maxAgeSeconds: 60 * 60 * 24 * 30,
-			}),
-		],
-	}),
+  /\.(?:png|gif|jpg|jpeg|svg|webp|ico)$/,
+  workbox.strategies.cacheFirst({
+    cacheName: imageCacheName,
+    plugins: [
+      new workbox.expiration.Plugin({
+        maxEntries: 60,
+        maxAgeSeconds: 60 * 60 * 24 * 30
+      })
+    ]
+  })
 );
 
 /**
  * Returns a generic error page from cache, replacing the error content with
  * status and the actual page URL.
  */
-const errorPageForURL = async (pageURL) => {
-	const cachedResponse = await caches.match(genericErrorPage);
+const errorPageForURL = async(pageURL) => {
+  const cachedResponse = await caches.match(genericErrorPage);
 
-	return responseWithReplacedErrorContent(cachedResponse, pageURL, 500);
+  return responseWithReplacedErrorContent(cachedResponse, pageURL, 500);
 };
 
 /**
  * Returns the offline page from cache, replacing the error content with a 503
  * status and the actual page URL.
  */
-const offlinePageForURL = async (pageURL) => {
-	const cachedResponse = await caches.match(offlinePage);
+const offlinePageForURL = async(pageURL) => {
+  const cachedResponse = await caches.match(offlinePage);
 
-	return responseWithReplacedErrorContent(cachedResponse, pageURL, 503);
+  return responseWithReplacedErrorContent(cachedResponse, pageURL, 503);
 };
 
 /**
@@ -143,29 +143,29 @@ const offlinePageForURL = async (pageURL) => {
  *
  * Note that the status code falls back to the response's status if not defined.
  */
-const responseWithReplacedErrorContent = async (existingResponse, pageURL, status) => {
-	if (!status) {
-		status = existingResponse.status;
-	}
+function responseWithReplacedErrorContent(existingResponse, pageURL, status) {
+  if (!status) {
+    status = existingResponse.status;
+  }
 
-	const constructedResponse = {
-		status: status,
-		statusText: existingResponse.statusText,
-		headers: existingResponse.headers
-	};
+  const constructedResponse = {
+    status: status,
+    statusText: existingResponse.statusText,
+    headers: existingResponse.headers
+  };
 
-	// Replace the requisite strings in the page with the real URL and status.
-	return existingResponse.text().then(function(body) {
-		const left = "&lt;"
-		const right = status + "&gt;";
+  // Replace the requisite strings in the page with the real URL and status.
+  return existingResponse.text().then(function(body) {
+    const left = "&lt;";
+    const right = status + "&gt;";
 
-		var newContent = body.replace(/\? page/, pageURL);
-		newContent = newContent.replace(/&lt;error&gt;/, left + right);
-		newContent = newContent.replace(/&lt;\/error&gt;/, left + "/" + right);
+    var newContent = body.replace(/\? page/, pageURL);
+    newContent = newContent.replace(/&lt;error&gt;/, left + right);
+    newContent = newContent.replace(/&lt;\/error&gt;/, left + "/" + right);
 
-		return new Response(newContent, constructedResponse);
-	});
-};
+    return new Response(newContent, constructedResponse);
+  });
+}
 
 /**
  * Handles a standard network response. There are two main components here:
@@ -174,20 +174,20 @@ const responseWithReplacedErrorContent = async (existingResponse, pageURL, statu
  * - If a document, return the response or fall back to the offline page
  * - Otherwise, just return the response
  */
-const handleResponse = async (response, pageURL, destination) => {
-	// If the response 404'd, we should replace the page URL and return it
-	if (response && response.status == 404) {
-		return responseWithReplacedErrorContent(response, pageURL);
-	}
+function handleResponse(response, pageURL, destination) {
+  // If the response 404'd, we should replace the page URL and return it
+  if (response && response.status === 404) {
+    return responseWithReplacedErrorContent(response, pageURL);
+  }
 
-	// Check if we should try returning offline page if response fails
-	switch (destination) {
-	case "document":
-		return response || offlinePageForURL(pageURL);
-	default:
-		return response;
-	}
-};
+  // Check if we should try returning offline page if response fails
+  switch (destination) {
+    case "document":
+      return response || offlinePageForURL(pageURL);
+    default:
+      return response;
+  }
+}
 
 /**
  * Fetches a page, doing all the work to handle edge cases. Specifically:
@@ -195,45 +195,45 @@ const handleResponse = async (response, pageURL, destination) => {
  * - If there's a preload response, just use that
  * - Everything else is run through handleResponse with networkFirst strategy
  */
-const fetchPage = async (context) => {
-	const nonGetStrategy = workbox.strategies.networkOnly();
+const fetchPage = async(context) => {
+  const nonGetStrategy = workbox.strategies.networkOnly();
 
-	// If it's non GET request, use networkOnly
-	if (context.event.request.method !== 'GET') {
-		return await nonGetStrategy.handle(context);
-	}
+  // If it's non GET request, use networkOnly
+  if (context.event.request.method !== "GET") {
+    return nonGetStrategy.handle(context);
+  }
 
-	// Use the preloaded response, if it's there
-	const preloadResponse = await context.preloadResponse;
+  // Use the preloaded response, if it's there
+  const preloadResponse = await context.preloadResponse;
 
-	if (preloadResponse) {
-		return preloadResponse;
-	}
+  if (preloadResponse) {
+    return preloadResponse;
+  }
 
-	// Otherwise, fetch and handle the response
-	const pageURL = context.event.request.url;
-	const destination = context.event.request.destination;
-	const defaultStrategy = workbox.strategies.networkFirst();
-	const response = await defaultStrategy.handle(context);
+  // Otherwise, fetch and handle the response
+  const pageURL = context.event.request.url;
+  const destination = context.event.request.destination;
+  const defaultStrategy = workbox.strategies.networkFirst();
+  const response = await defaultStrategy.handle(context);
 
-	return handleResponse(response, pageURL, destination);
+  return handleResponse(response, pageURL, destination);
 };
 
 /**
  * If it's a document, it fetches the fallback error page if possible, or
  * returns a generic response error if not.
  */
-const fetchErrorPage = async (context) => {
-	const pageURL = context.event.request.url;
-	const destination = context.event.request.destination;
+function fetchErrorPage(context) {
+  const pageURL = context.event.request.url;
+  const destination = context.event.request.destination;
 
-	switch (destination) {
-	case "document":
-		return errorPageForURL(pageURL);
-	default:
-		return Response.error();
-	}
-};
+  switch (destination) {
+    case "document":
+      return errorPageForURL(pageURL);
+    default:
+      return Response.error();
+  }
+}
 
 workbox.routing.setDefaultHandler(fetchPage);
 workbox.routing.setCatchHandler(fetchErrorPage);

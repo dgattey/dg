@@ -5,7 +5,7 @@ description: Visualizing the future of the connected car ecosystem
 color: dim
 link: https://studio.ey.com/studios/portland/
 sitemap: false
-thumbnail: 
+thumbnail:
   src: connected-thumb
   filetype: png
 ---

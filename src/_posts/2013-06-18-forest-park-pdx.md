@@ -6,7 +6,7 @@ color: forest-green
 link: https://www.forestparkconservancy.org/forest-park/
 sitemap: false
 two_column: mirrored
-thumbnail: 
+thumbnail:
   src: forest-park-pdx-thumb
   filetype: png
   container_class: "overhang-parent top"

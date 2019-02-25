@@ -1,1 +1,3 @@
-ignore-front-matter true
+ignore_front_matter true
+show_kramdown_warnings true
+rules "~MD033"
