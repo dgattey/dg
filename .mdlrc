@@ -1,1 +1,4 @@
-ignore-front-matter true
+{
+    "default": true,
+    "ignore-front-matter": true
+}

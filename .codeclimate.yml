@@ -22,8 +22,6 @@ plugins:
         enabled: false # Disables inline html for use in projects
       MD002:
         enabled: false # Disables h1 missing check cause projects
-  nodesecurity:
-    enabled: true
   reek:
     enabled: true
   rubocop:
