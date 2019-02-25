@@ -1,5 +1,5 @@
 // =====
-// Imports all needed scss files from their various locations and defines config
+// Puts together the partials
 // =====
 // sass-lint:disable quotes
 @charset "UTF-8";
@@ -8,20 +8,26 @@
 // Normalizes css
 @import 'normalize/import-now';
 
-// Configuration/shared objects
-@import 'global-constants';
+// Base utility CSS
 @import 'animations';
-@import 'mixins';
+@import 'breakpoints';
+@import 'colors';
+@import 'depth';
+@import 'font-levels';
 @import 'fonts';
-@import 'syntax';
-@import 'padding';
+@import 'lists';
+@import 'spacing';
+@import 'links';
 
-// Templates appearing on multiple page
+// Utility CSS
 @import 'global';
-@import 'nav';
-@import 'footer';
+@import 'grid';
+@import 'mixins';
+@import 'shadows';
+@import 'syntax';
 
-// Index page
+// Components
+@import 'footer';
 @import 'intro';
-@import 'project-grid';
+@import 'nav';
 @import 'project-card';

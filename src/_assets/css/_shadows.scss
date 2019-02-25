@@ -1,0 +1,20 @@
+// =====
+// Shadows
+// =====
+
+$strong-shadow: 0 $item-spacing-3 $spread $strong-shadow-color;
+$weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
+
+.shadow-strong {
+  box-shadow: $strong-shadow;
+}
+
+.shadow-weak {
+  box-shadow: $weak-shadow;
+}
+
+.shadow-weak-on-hover {
+  &:hover {
+    box-shadow: $weak-shadow;
+  }
+}

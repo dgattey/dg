@@ -3,15 +3,17 @@
 // - pages: index.html
 // =====
 
+.card {
+  padding: 0 $item-spacing-4;
+}
+
 .project-card {
+  $scale-up-hover: 1.06;
+
   align-content: space-around;
   color: $color-brightest;
-  display: grid;
-  grid-gap: $item-spacing-3;
 
   @include for-tablet-up {
-    grid-row-end: span 2;
-
     &:nth-child(2) {
       grid-row-start: 1; // Pulls showcase to the right
     }
@@ -28,19 +30,4 @@
       transform: translateX($item-spacing-3);
     }
   }
-
-  img {
-    height: 100%;
-    width: 100%;
-  }
-
-  .type {
-    font-variant: small-caps;
-    text-transform: uppercase;
-
-    @include for-tablet-down {
-      margin-top: 0;
-    }
-  }
-
 }

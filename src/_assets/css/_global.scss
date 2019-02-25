@@ -2,17 +2,15 @@
 // Global, base styles to ensure the rest is applied correctly
 // =====
 
-html,
-body {
-  // Ensures that the font size scales correctly across the site
-  font-size: $html-font-size;
-}
-
 html {
   background: $color-bg;
   color: $color-text-dark;
   overflow-x: hidden;
 }
+
+// =====
+// Padding
+// =====
 
 body {
   @extend %max-width-element;
@@ -48,26 +46,10 @@ $tablet-top-padding: $item-spacing-4 + $item-spacing-3;
 }
 
 // =====
-// Text selection
+// Selection of anything
 // =====
 
 ::selection {
   background: $color-primary-dim;
   color: $color-text-light;
-}
-
-// =====
-// Colors
-// =====
-$background-colors: (
-  'red': $color-red,
-  'green': $color-green,
-  'blue': $color-blue,
-  'dim': $color-dim,
-  'forest-green': $color-forest-green
-);
-@each $name, $color in $background-colors {
-  .background-#{$name} {
-    background-color: $color;
-  }
 }

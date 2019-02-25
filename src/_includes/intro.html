@@ -1,9 +1,5 @@
-<section class="intro">
-	{% include picture.html src="dg-portrait" alt="Portrait of Dylan Gattey" class="portrait" %}
-	<h1 class="intro-desktop emphasized title head-font-style">Hello! I'm Dylan.</h1>
-	<div class="intro-mobile">
-		<h1 class="emphasized title head-font-style">Hello!</h1>
-		<h2 class="subtitle">I'm Dylan.</h2>
-	</div>
-	<p class="emphasized detail">I'm a full-stack software engineer + technical lead working for LinkedIn in San Francisco, passionate about well-designed interfaces and clean code.</p>
+<section class="intro grid grid-columns-standard grid-rows-2 grid-column-gap-3">
+	<h1 class="flush-bottom depth-1 title text-center-phone-only color-primary-bright grid-span-col-full grid-span-col-7-tablet grid-span-col-offset-desktop font-weight-black">Hello! I'm Dylan.</h1>
+	<p class="font-size-2 detail grid-span-col-full grid-span-col-7-tablet grid-span-col-offset-desktop">I'm a full-stack software engineer + technical lead working for LinkedIn in San Francisco, passionate about well-designed interfaces and clean code.</p>
+	{% include picture.html src="dg-portrait" alt="Portrait of Dylan Gattey" container_class="portrait fill-parent grid-span-col-full" class="fill-parent cover-parent" %}
 </section>

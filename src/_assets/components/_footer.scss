@@ -6,6 +6,7 @@ footer {
   $border-weight: 1px;
   $height: $icon-size;
   $padding: $height / 2;
+
   border-top: $border-weight solid $color-primary-dim;
   margin-top: $item-spacing-3;
 
@@ -41,7 +42,6 @@ footer {
   }
 
   path {
-    @include transition(fill);
     fill: $color-primary-bright;
   }
 }

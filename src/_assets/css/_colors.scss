@@ -1,5 +1,5 @@
 // =====
-// Allllll the global constants anything can access
+// Colors
 // =====
 
 // Raw white - black color values
@@ -18,32 +18,32 @@ $color-blue: #237fad;
 // Applied color values (primary, bg, border, text)
 $color-primary-bright: $color-green;
 $color-primary-dim: darken($color-primary-bright, 12%);
+
 $color-bg: $color-brightest;
+
 $color-text-dark: $color-deep;
 $color-text-muted: $color-muted;
 $color-text-light: $color-bright;
 $color-text-active: $color-primary-dim;
 
-// Grids + breakpoints
-$grid-standard-columns: 12;
-$breakpoint-min-phone: 0;
-$breakpoint-min-tablet: 600px;
-$breakpoint-min-desktop: 900px;
-$breakpoint-max-width: 1200px;
+$color-link: $color-primary-bright;
+$color-link-hover: $color-primary-dim;
+$color-link-focus: $color-blue;
 
-// Spacing
-$item-spacing-1: .375em;
-$item-spacing-2: .75em;
-$item-spacing-3: 1.5em;
-$item-spacing-4: 3em;
-$item-spacing-5: 6em;
-$item-spacing-6: 12em;
-$item-spacing-7: 24em;
-$icon-size: $item-spacing-3;
+$background-colors: (
+  'red': $color-red,
+  'green': $color-green,
+  'blue': $color-blue,
+  'dim': $color-dim,
+  'forest-green': $color-forest-green
+);
 
-// Z-indices
-$depth-4: 999;
-$depth-3: 300;
-$depth-2: 200;
-$depth-1: 100;
-$depth-0: 0;
+@each $name, $color in $background-colors {
+  .background-#{$name} {
+    background-color: $color;
+  }
+}
+
+.color-primary-bright {
+  color: $color-primary-bright;
+}

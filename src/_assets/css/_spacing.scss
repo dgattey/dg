@@ -1,0 +1,57 @@
+// =====
+// Spacing mixins to be used globally
+// =====
+
+// Constants
+$item-spacing-1: .375em;
+$item-spacing-2: .75em;
+$item-spacing-3: 1.5em;
+$item-spacing-4: 3em;
+$item-spacing-5: 6em;
+$item-spacing-6: 12em;
+$item-spacing-7: 24em;
+$icon-size: $item-spacing-3;
+
+%max-width-element {
+  margin: 0 auto;
+  max-width: $breakpoint-max-width;
+  width: 100%;
+}
+
+.flush {
+  margin: 0;
+}
+
+.flush-bottom {
+  margin-bottom: 0;
+}
+
+.flush-left-4 {
+  margin-left: $item-spacing-4;
+}
+
+.flush-top-tablet-down {
+  @include for-tablet-down {
+    margin-top: 0;
+  }
+}
+
+.overhang-parent-bottom-4-tablet {
+  @include for-phone-up {
+    margin-bottom: 0;
+  }
+
+  @include for-tablet-up {
+    margin-bottom: -$item-spacing-4;
+  }
+}
+
+.overhang-parent-top-4-tablet {
+  @include for-phone-up {
+    margin-top: 0;
+  }
+
+  @include for-tablet-up {
+    margin-top: -$item-spacing-4;
+  }
+}

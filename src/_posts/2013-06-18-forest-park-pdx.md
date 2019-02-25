@@ -9,7 +9,7 @@ two_column: mirrored
 thumbnail:
   src: forest-park-pdx-thumb
   filetype: png
-  container_class: "overhang-parent top"
+  container_class: "overhang-parent-bottom-4-tablet overhang-parent-top-4-tablet"
 ---
 
 # Forest Park PDX

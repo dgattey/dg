@@ -5,124 +5,13 @@
 $strong-shadow-color: rgba(0, 0, 0, .15);
 $weak-shadow-color: rgba(0, 0, 0, .1);
 $spread: $item-spacing-4 + $item-spacing-3;
-$strong-shadow: 0 $item-spacing-3 $spread $strong-shadow-color;
-$weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
-$card-padding: $item-spacing-4;
-
-// =====
-// Breakpoints
-// =====
-
-@mixin for-phone-up {
-  @content;
-}
-
-@mixin for-phone-only {
-  @media (max-width: $breakpoint-min-tablet - 1) {
-    @content;
-  }
-}
-
-@mixin for-tablet-up {
-  @media (min-width: $breakpoint-min-tablet) {
-    @content;
-  }
-}
-
-@mixin for-tablet-down {
-  @media (max-width: $breakpoint-min-desktop - 1) {
-    @content;
-  }
-}
-
-@mixin for-desktop-up {
-  @media (min-width: $breakpoint-min-desktop) {
-    @content;
-  }
-}
-
-@mixin for-max-size-only {
-  @media (min-width: $breakpoint-max-width) {
-    @content;
-  }
-}
 
 // =====
 // Utility classes
 // =====
 
-.shadow-strong {
-  box-shadow: $strong-shadow;
-}
-
-.shadow-weak {
-  box-shadow: $weak-shadow;
-}
-
-.shadow-weak-on-hover {
-  &:hover {
-    box-shadow: $weak-shadow;
-  }
-}
-
 .round-corners {
   border-radius: $item-spacing-1;
-}
-
-.card {
-  padding: 0 $item-spacing-4;
-}
-
-.grid {
-  display: grid;
-
-  @include for-phone-up {
-    grid-template-columns: 1fr;
-  }
-}
-
-.grid-two-one-column {
-  @include for-desktop-up {
-    grid-gap: $item-spacing-2;
-    grid-template-columns: 2fr 1fr;
-    justify-items: start;
-  }
-}
-
-.grid-two-column {
-  grid-gap: $item-spacing-2;
-  grid-template-columns: 1fr 1fr;
-  justify-items: start;
-}
-
-.grid-align-center {
-  align-items: center;
-}
-
-.card-pull-right {
-  margin-left: $card-padding;
-}
-
-.overhang-parent {
-  @include for-phone-up {
-    &.bottom {
-      margin-bottom: 0;
-    }
-
-    &.top {
-      margin-top: 0;
-    }
-  }
-
-  @include for-tablet-up {
-    &.bottom {
-      margin-bottom: -$card-padding;
-    }
-
-    &.top {
-      margin-top: -$card-padding;
-    }
-  }
 }
 
 .desktop-align-right {
@@ -132,7 +21,17 @@ $card-padding: $item-spacing-4;
   }
 }
 
-.size-to-parent {
-  max-height: 100%;
-  max-width: 100%;
+.fill-parent {
+  height: 100%;
+  width: 100%;
+}
+
+.cover-parent {
+  object-fit: cover;
+}
+
+.text-center-phone-only {
+  @include for-phone-only {
+    text-align: center;
+  }
 }
