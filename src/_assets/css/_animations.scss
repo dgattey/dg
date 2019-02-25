@@ -11,18 +11,22 @@ $scale-down-hover: .96;
 // Adds support for adding multiple types of transitions
 @mixin transition-quick($properties...) {
   $final: ();
+
   @each $item in $properties {
     $final: append($final, ($item $quick-animation-duration ease-in-out unquote(',')));
   }
+
   transition: $final;
 }
 
 // Adds support for adding multiple types of transitions, with out-back timing function
 @mixin transition-shadow-transform($properties...) {
   $final: ();
+
   @each $item in $properties {
     $final: append($final, ($item $animation-duration $ease-out-back unquote(',')));
   }
+
   transition: $final;
 }
 

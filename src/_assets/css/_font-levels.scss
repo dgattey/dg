@@ -7,11 +7,13 @@
 // =====
 @function pow($number, $power) {
   $value: 1;
+
   @if $power > 0 {
     @for $i from 1 through $power {
       $value: $value * $number;
     }
   }
+
   @return $value;
 }
 
@@ -30,7 +32,9 @@
   $font-size-proportion: 1.09;
   $line-height-proportion: 1.08;
 
+  // Calculation
   $base-line-height: $base-font-size * $base-line-height-proportion;
+
   font-size: $base-font-size * pow($font-size-proportion, $level);
   line-height: $base-line-height * pow($line-height-proportion, $level);
   margin-bottom: $base-margin-bottom;
@@ -58,7 +62,7 @@
 // =====
 // Actually generates all the font levels for use elsewhere
 // =====
-$font-levels: 18;
-@for $level from 0 through $font-levels {
+
+@for $level from 0 through 18 {
   @include generate-font-level($level);
 }

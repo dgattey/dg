@@ -21,6 +21,7 @@
   word-spacing: -.02em;
 
   // For when fonts have loaded
+
   .wf-active,
   .wf-inactive {
     letter-spacing: 0;
@@ -118,6 +119,7 @@ h6 {
 
 p {
   max-width: 36em;
+
   @extend .font-size-1;
 }
 
@@ -136,6 +138,7 @@ code,
 pre {
   @extend .font-family-code;
   @extend .font-size-0;
+
   overflow: auto;
 
   @include for-phone-up {

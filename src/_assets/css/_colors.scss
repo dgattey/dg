@@ -37,6 +37,7 @@ $background-colors: (
   'dim': $color-dim,
   'forest-green': $color-forest-green
 );
+
 @each $name, $color in $background-colors {
   .background-#{$name} {
     background-color: $color;

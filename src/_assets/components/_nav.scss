@@ -15,5 +15,6 @@ nav {
 
 .nav-items {
   @extend %nav-padding;
+
   background: $color-bg;
 }

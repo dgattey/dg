@@ -2,15 +2,14 @@
 // All styling related to lists
 // =====
 
-
 %link-underline-normal {
-  $underline-height: 0.1em;
+  $underline-height: .1em;
 
   background-size: $underline-height $underline-height;
 }
 
 %link-underline-hovered {
-  $underline-height-hovered: 0.2em;
+  $underline-height-hovered: .2em;
 
   background-size: $underline-height-hovered $underline-height-hovered;
   transform: translateY(- $underline-height-hovered / 2);
@@ -25,9 +24,11 @@
 // - Displays as a block to show it, no text decoration
 // - Changes the color, increases underline height, and
 //   moves the whole link itself up a bit on hover
+
 a {
   @extend .transition-quick-background-color-transform;
   @extend %link-underline-normal;
+
   background-image: linear-gradient(to bottom, currentColor 0%, currentColor 100%);
   background-position-y: 100%;
   background-repeat: repeat-x;
@@ -37,21 +38,25 @@ a {
 
   &:hover {
     @extend %link-underline-hovered;
+
     color: $color-link-hover;
   }
 
   &:focus {
     @extend %link-underline-hovered;
+
     color: $color-link-focus;
   }
 }
 
 // Only shows the underline on hover
+
 .link-underline-on-hover {
   @extend %link-underline-hidden;
 }
 
 // Never shows the underline
+
 .link-no-decoration {
   @extend %link-underline-hidden;
 
@@ -63,6 +68,7 @@ a {
 
 // Will still have translation on hover effect + underline,
 // but the link color will always be $color-text-dark
+
 .link-text-dark {
   color: $color-text-dark;
 

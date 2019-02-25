@@ -9,6 +9,7 @@
 
 .project-card {
   $scale-up-hover: 1.06;
+
   align-content: space-around;
   color: $color-brightest;
 
@@ -29,5 +30,4 @@
       transform: translateX($item-spacing-3);
     }
   }
-
 }
