@@ -18,7 +18,7 @@ Jekyll::Hooks.register(:site, :post_write) do |_site|
       content: [@build_directory + '/**/*.html'],
       css: [Dir.glob(@build_directory + '/assets/*.css').first],
       whitelist: %w[overhang-parent-top-4-tablet overhang-parent-bottom-4-tablet
-                    flush-left-4 round-corners
+                    flush-left-4 round-corners underline-on-hover link-no-hover
                     shadow-weak wf-active wf-inactive]
     }.stringify_keys.to_json}"''
 

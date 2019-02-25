@@ -6,29 +6,19 @@
 $quick-animation-duration: 167ms;
 $animation-duration: 334ms;
 $ease-out-back: cubic-bezier(.175, .885, .32, 1.275);
-$ease-in-out-back: cubic-bezier(.68, -.55, .265, 1.55);
 $scale-down-hover: .96;
 
 // Adds support for adding multiple types of transitions
-@mixin transition($properties...) {
+@mixin transition-quick($properties...) {
   $final: ();
   @each $item in $properties {
-    $final: append($final, ($item $animation-duration $ease-in-out-back unquote(',')));
-  }
-  transition: $final;
-}
-
-// Adds support for adding multiple types of transitions
-@mixin transition-linear($properties...) {
-  $final: ();
-  @each $item in $properties {
-    $final: append($final, ($item $quick-animation-duration linear unquote(',')));
+    $final: append($final, ($item $quick-animation-duration ease-in-out unquote(',')));
   }
   transition: $final;
 }
 
 // Adds support for adding multiple types of transitions, with out-back timing function
-@mixin transition-bounce($properties...) {
+@mixin transition-shadow-transform($properties...) {
   $final: ();
   @each $item in $properties {
     $final: append($final, ($item $animation-duration $ease-out-back unquote(',')));
@@ -36,20 +26,20 @@ $scale-down-hover: .96;
   transition: $final;
 }
 
-.transition-fill {
-  @include transition(fill);
+.transition-shadow-transform {
+  @include transition-shadow-transform(box-shadow, transform);
 }
 
-.transition-shape {
-  @include transition(transform, color);
+.transition-color-transform {
+  @include transition-shadow-transform(color, transform);
 }
 
-.transition-bounce {
-  @include transition-bounce(transform, box-shadow);
+.transition-quick-shadow {
+  @include transition-quick(box-shadow);
 }
 
-.transition-box-shadow {
-  @include transition-linear(box-shadow);
+.transition-quick-background-color-transform {
+  @include transition-quick(background, color, transform);
 }
 
 .scale-down-on-hover {

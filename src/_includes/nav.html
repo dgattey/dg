@@ -1,20 +1,21 @@
-<header class="global-nav fixed-header font-weight-bold transition-box-shadow">
+<header class="global-nav fixed-header font-weight-bold transition-quick-shadow">
   <nav>
-    <ul class="nav-items flush">
-      <li class="logo-wrapper font-size-1 flush-bottom"><a class="logo link-undecorated scale-down-on-hover transition-shape" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></li>
+    <ul class="nav-items grid grid-columns-standard grid-gap-5 grid-gap-3-desktop flush">
+      <li class="list-block grid-item-align-center font-size-1 flush-bottom"><a class="logo link-no-decoration scale-down-on-hover transition-color-transform" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></li>
       {% assign sorted_pages = site.pages | sort:"weight" %}
       {% for nav_page in sorted_pages %}
-
-      {% assign nav_class = 'nav-inactive' %}
+      
       {% if page.url == nav_page.url %}
-      {% assign nav_class = 'nav-active' %}
+      {% assign nav_class = 'link-no-decoration link-text-dark' %}
+      {% else %}
+      {% assign nav_class = 'link-underline-on-hover' %}
       {% endif %}
 
       {% assign nav_title = nav_page.nav_title | default nav_page.title %}
 
       {% if nav_title and nav_page.weight %}
-      <li class="nav-item font-size-1 flush transition-bounce">
-        <a class="link-undecorated nav-link {{ nav_class }}" href="{{ nav_page.url }}">{{ nav_title }}</a>
+      <li class="list-block grid-item-align-center grid-span-cols-2 font-size-1 font-variant-heavy flush">
+        <a class="{{ nav_class }}" href="{{ nav_page.url }}">{{ nav_title }}</a>
       </li>
       {% endif %}
 

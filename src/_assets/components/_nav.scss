@@ -3,27 +3,11 @@
 // page). Handles animations across it too.
 // =====
 
-$nav-grid-columns: 2 * ($grid-columns-standard - 1);
-$underline-height: 3px;
-
 nav {
   @extend %max-width-element;
 }
 
-.logo-wrapper,
-.nav-item {
-  align-self: center;
-}
-
-.logo-wrapper {
-  align-self: center;
-  grid-column-end: span 2;
-  justify-self: start;
-  list-style: none;
-}
-
 .logo {
-  display: inline-block; // This is to allow it to scale on hover
   font-size: 2.3em;
   letter-spacing: -.12em;
   line-height: 1;
@@ -32,72 +16,4 @@ nav {
 .nav-items {
   @extend %nav-padding;
   background: $color-bg;
-  display: grid;
-  grid-template-columns: repeat($nav-grid-columns, 1fr);
-
-  @include for-phone-up {
-    grid-column-gap: $item-spacing-4;
-  }
-
-  @include for-desktop-up {
-    grid-column-gap: $item-spacing-3;
-  }
-}
-
-.nav-item {
-  align-self: center;
-  display: inline-block;
-  grid-column-end: span 4;
-  justify-self: start;
-  list-style: none;
-  text-transform: uppercase;
-
-  &:hover {
-    transform: translateY(- $underline-height / 2);
-  }
-}
-
-.nav-link {
-  color: $color-text-dark;
-  position: relative;
-
-  &:hover {
-    color: $color-text-dark;
-  }
-}
-
-.nav-active {
-  color: $color-primary-bright;
-
-  &:hover {
-    color: $color-primary-bright;
-  }
-}
-
-.nav-inactive {
-  &::after {
-    // Animation of the underlines
-    background-color: $color-primary-bright;
-    bottom: -$item-spacing-1;
-    content: '';
-    height: $underline-height;
-    left: 0;
-    position: absolute;
-    right: 0;
-  }
-
-  &::after {
-    @include transition(opacity);
-    opacity: 0;
-    transform: translateY($underline-height / 2);
-    transition: transform $animation-duration $ease-out-back, opacity $animation-duration;
-  }
-
-  &:hover,
-  &:focus {
-    &::after {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
 }

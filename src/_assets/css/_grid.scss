@@ -3,6 +3,7 @@
 // =====
 
 $grid-columns-standard: 12;
+$grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
 
 .grid {
   display: grid;
@@ -52,8 +53,14 @@ $grid-columns-standard: 12;
   grid-column-start: 2;
 }
 
-.grid-span-row-1 {
-  grid-row: span 1;
+.grid-span-cols-2 {
+  grid-column-end: span 2;
+}
+
+.grid-span-rows-2-tablet {
+  @include for-tablet-up {
+    grid-row-end: span 2;
+  }
 }
 
 .grid-align-center {
@@ -68,10 +75,40 @@ $grid-columns-standard: 12;
   align-self: end;
 }
 
+.grid-item-align-center {
+  align-self: center;
+}
+
 .grid-gap-2 {
   grid-gap: $item-spacing-2;
 }
 
-.grid-gap-3 {
+.grid-gap-4 {
+  grid-gap: $item-spacing-4;
+}
+
+.grid-gap-5 {
+  grid-gap: $item-spacing-5;
+}
+
+.grid-gap-3-tablet {
+  @include for-tablet-up {
+    grid-gap: $item-spacing-3;
+  }
+}
+
+.grid-gap-3-desktop {
+  @include for-desktop-up {
+    grid-gap: $item-spacing-3;
+  }
+}
+
+.grid-gap-5-tablet {
+  @include for-tablet-up {
+    grid-gap: $item-spacing-5;
+  }
+}
+
+.grid-column-gap-3 {
   grid-column-gap: $item-spacing-3;
 }

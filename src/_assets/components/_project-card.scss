@@ -13,8 +13,6 @@
   color: $color-brightest;
 
   @include for-tablet-up {
-    grid-row-end: span 2;
-
     &:nth-child(2) {
       grid-row-start: 1; // Pulls showcase to the right
     }
@@ -30,16 +28,6 @@
     .card-component-on-hover-pull-right {
       transform: translateX($item-spacing-3);
     }
-  }
-
-  img {
-    height: 100%;
-    width: 100%;
-  }
-
-  .type {
-    font-variant: small-caps;
-    text-transform: uppercase;
   }
 
 }

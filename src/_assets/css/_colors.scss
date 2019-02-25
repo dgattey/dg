@@ -18,11 +18,17 @@ $color-blue: #237fad;
 // Applied color values (primary, bg, border, text)
 $color-primary-bright: $color-green;
 $color-primary-dim: darken($color-primary-bright, 12%);
+
 $color-bg: $color-brightest;
+
 $color-text-dark: $color-deep;
 $color-text-muted: $color-muted;
 $color-text-light: $color-bright;
 $color-text-active: $color-primary-dim;
+
+$color-link: $color-primary-bright;
+$color-link-hover: $color-primary-dim;
+$color-link-focus: $color-blue;
 
 $background-colors: (
   'red': $color-red,
