@@ -3,7 +3,7 @@
 {% else %}
 {% assign postlink = post.url %}
 {% endif %}
-<a href="{{ postlink }}" class="link-no-decoration grid grid-column-gap-3 grid-span-rows-2-tablet project-card color-link-inverse round-corners shadow-strong shadow-weak-on-hover transition-color-shadow-transform scale-down-on-hover background-{{ post.color }}">
+<a href="{{ postlink }}" class="link-no-decoration grid grid-column-gap-3 grid-span-rows-2-tablet project-card color-link-inverse round-corners shadow-strong shadow-weak-on-hover transition-color-shadow-transform scale-down-on-hover background-{{ post.background }}">
     {% capture thumbnail_section %}
     <section class="transition-shadow-transform card-component-on-hover-scale-up {{ post.thumbnail.container_class }}">
         {% capture alttext %}{{ post.title }} thumbnail{% endcapture %}

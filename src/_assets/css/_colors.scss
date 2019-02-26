@@ -11,7 +11,7 @@ $colors: (
   bright: #eceff1,
   brightest: #fff,
   aquagreen: #16ac7e,
-  forest: #015500,
+  forest: #006331,
   wine: #bb2821,
   sky: #237fad
 );
@@ -36,15 +36,11 @@ $colors: (
   background: var(--color-background);
 }
 
-.background-red {
+.background-wine {
   background-color: var(--color-wine);
 }
 
-.background-green {
-  background-color: var(--color-aquagreen);
-}
-
-.background-blue {
+.background-sky {
   background-color: var(--color-sky);
 }
 
@@ -52,7 +48,7 @@ $colors: (
   background-color: var(--color-dim);
 }
 
-.background-forest-green {
+.background-forest {
   background-color: var(--color-forest);
 }
 
