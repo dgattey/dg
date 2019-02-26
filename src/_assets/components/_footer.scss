@@ -4,10 +4,12 @@
 
 .footer-copy {
   grid-column: 1 / 6;
+  margin: $item-spacing-4 0;
 }
 
 .footer-links {
   grid-column: 6 / -1;
+  margin: $item-spacing-4 0;
 }
 
 .footer-icon {
