@@ -56,8 +56,18 @@ $colors: (
 // Color classes
 // =====
 
-.color-primary-bright {
-  color: var(--color-primary-bright);
+.fill-primary {
+  fill: var(--color-primary);
+}
+
+.fill-seconday-hover {
+  &:hover {
+    fill: var(--color-secondary);
+  }
+}
+
+.color-primary {
+  color: var(--color-primary);
 }
 
 .color-link-inverse {
@@ -87,7 +97,7 @@ html {
 }
 
 a {
-  color: var(--color-primary-bright);
+  color: var(--color-primary);
 
   &:hover {
     color: var(--color-secondary);
@@ -114,7 +124,7 @@ a {
 .theme-light {
   @extend .background-default;
 
-  --color-primary-bright: var(--color-aquagreen);
+  --color-primary: var(--color-aquagreen);
   --color-secondary: var(--color-aquagreen-dark);
   --color-tertiary: var(--color-aquagreen-light);
   --color-background: var(--color-brightest);
