@@ -1,49 +1,130 @@
 // =====
-// Colors
+// Raw colors
 // =====
 
-// Raw white - black color values
-$color-dim: #000;
-$color-deep: #433d3a;
-$color-muted: lighten($color-deep, 12%);
-$color-bright: #eceff1;
-$color-brightest: #fff;
+// Some of this isn't expressable via pure CSS so
+// there's going to be some SASS variables here
 
-// Colorful raw color values
-$color-green: #16ac7e;
-$color-forest-green: #015500;
-$color-red: #bb2821;
-$color-blue: #237fad;
-
-// Applied color values (primary, bg, border, text)
-$color-primary-bright: $color-green;
-$color-primary-dim: darken($color-primary-bright, 12%);
-
-$color-bg: $color-brightest;
-
-$color-text-dark: $color-deep;
-$color-text-muted: $color-muted;
-$color-text-light: $color-bright;
-$color-text-active: $color-primary-dim;
-
-$color-link: $color-primary-bright;
-$color-link-hover: $color-primary-dim;
-$color-link-focus: $color-blue;
-
-$background-colors: (
-  'red': $color-red,
-  'green': $color-green,
-  'blue': $color-blue,
-  'dim': $color-dim,
-  'forest-green': $color-forest-green
+$colors: (
+  dim: #000,
+  deep: #433d3a,
+  bright: #eceff1,
+  brightest: #fff,
+  aquagreen: #16ac7e,
+  forest: #015500,
+  wine: #bb2821,
+  sky: #237fad
 );
 
-@each $name, $color in $background-colors {
-  .background-#{$name} {
-    background-color: $color;
+:root {
+  @each $name, $color in $colors {
+    --color-#{$name}: #{$color};
+  }
+
+  // These can't be expressable via the map above, so doing it here
+
+  --color-muted: #{lighten(map-get($colors, deep), 12%)};
+  --color-aquagreen-dark: #{darken(map-get($colors, aquagreen), 12%)};
+  --color-aquagreen-light: #{lighten(map-get($colors, aquagreen), 12%)};
+}
+
+// =====
+// Background colors
+// =====
+
+.background-default {
+  background: var(--color-background);
+}
+
+.background-red {
+  background-color: var(--color-wine);
+}
+
+.background-green {
+  background-color: var(--color-aquagreen);
+}
+
+.background-blue {
+  background-color: var(--color-sky);
+}
+
+.background-dim {
+  background-color: var(--color-dim);
+}
+
+.background-forest-green {
+  background-color: var(--color-forest);
+}
+
+// =====
+// Color classes
+// =====
+
+.color-primary-bright {
+  color: var(--color-primary-bright);
+}
+
+.color-link-inverse {
+  color: var(--color-text-inverse);
+
+  &:hover,
+  &:focus {
+    color: var(--color-text-inverse-muted);
   }
 }
 
-.color-primary-bright {
-  color: $color-primary-bright;
+.color-link-reset {
+  color: var(--color-text);
+
+  &:hover,
+  &:focus {
+    color: var(--color-text);
+  }
+}
+
+// =====
+// Main elements
+// =====
+
+html {
+  color: var(--color-text);
+}
+
+a {
+  color: var(--color-primary-bright);
+
+  &:hover {
+    color: var(--color-secondary);
+  }
+
+  &:focus {
+    color: var(--color-tertiary);
+  }
+}
+
+::selection {
+  background: var(--color-secondary);
+  color: var(--color-text-inverse);
+}
+
+.highlight {
+  background-color: var(--color-background-secondary);
+}
+
+// =====
+// Theming classes - associates raw colors with variables
+// =====
+
+.theme-light {
+  @extend .background-default;
+
+  --color-primary-bright: var(--color-aquagreen);
+  --color-secondary: var(--color-aquagreen-dark);
+  --color-tertiary: var(--color-aquagreen-light);
+  --color-background: var(--color-brightest);
+  --color-background-secondary: var(--color-bright);
+  --color-text: var(--color-deep);
+  --color-text-muted: var(--color-muted);
+  --color-text-inverse: var(--color-brightest);
+  --color-text-inverse-muted: var(--color-bright);
 }

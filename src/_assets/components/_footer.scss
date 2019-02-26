@@ -7,7 +7,6 @@ footer {
   $height: $icon-size;
   $padding: $height / 2;
 
-  border-top: $border-weight solid $color-primary-dim;
   margin-top: $item-spacing-3;
 
   .copy,
@@ -30,18 +29,10 @@ footer {
     padding: 0 $padding;
   }
 
-  &:hover > path {
-    fill: $color-primary-dim;
-  }
-
   .icon-github {
     display: inline-block;
     height: $icon-size;
     vertical-align: middle;
     width: $icon-size;
-  }
-
-  path {
-    fill: $color-primary-bright;
   }
 }
