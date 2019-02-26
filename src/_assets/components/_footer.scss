@@ -2,37 +2,24 @@
 // Footer styling for the global footer that appears on every page.
 // =====
 
-footer {
-  $border-weight: 1px;
-  $height: $icon-size;
-  $padding: $height / 2;
+.footer-copy {
+  grid-column: 1 / 6;
+}
 
-  margin-top: $item-spacing-3;
+.footer-links {
+  grid-column: 6 / -1;
+}
 
-  .copy,
-  ul,
-  li {
-    display: inline-block;
-  }
+.footer-icon {
+  margin: 0;
+}
 
-  p,
-  ul {
-    height: $height;
-    margin: $padding 0;
-  }
+.footer-icon svg {
+  height: $icon-size;
+  vertical-align: middle;
+  width: $icon-size;
+}
 
-  ul {
-    float: right;
-  }
-
-  li {
-    padding: 0 $padding;
-  }
-
-  .icon-github {
-    display: inline-block;
-    height: $icon-size;
-    vertical-align: middle;
-    width: $icon-size;
-  }
+.footer-item {
+  padding: 0 $icon-size / 2;
 }
