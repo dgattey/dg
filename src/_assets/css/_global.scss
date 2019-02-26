@@ -3,8 +3,6 @@
 // =====
 
 html {
-  background: $color-bg;
-  color: $color-text-dark;
   overflow-x: hidden;
 }
 
@@ -43,13 +41,4 @@ $tablet-top-padding: $item-spacing-4 + $item-spacing-3;
 
 @include for-desktop-up {
   @include page-body($item-spacing-5, $item-spacing-6);
-}
-
-// =====
-// Selection of anything
-// =====
-
-::selection {
-  background: $color-primary-dim;
-  color: $color-text-light;
 }

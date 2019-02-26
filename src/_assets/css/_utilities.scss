@@ -1,13 +1,5 @@
 // =====
-// Mixins and extensions to be used globally
-// =====
-
-$strong-shadow-color: rgba(0, 0, 0, .15);
-$weak-shadow-color: rgba(0, 0, 0, .1);
-$spread: $item-spacing-4 + $item-spacing-3;
-
-// =====
-// Utility classes
+// Generic utility classes
 // =====
 
 .round-corners {

@@ -20,7 +20,7 @@ $scale-down-hover: .96;
 }
 
 // Adds support for adding multiple types of transitions, with out-back timing function
-@mixin transition-shadow-transform($properties...) {
+@mixin transition-bouncy($properties...) {
   $final: ();
 
   @each $item in $properties {
@@ -31,11 +31,15 @@ $scale-down-hover: .96;
 }
 
 .transition-shadow-transform {
-  @include transition-shadow-transform(box-shadow, transform);
+  @include transition-bouncy(box-shadow, transform);
+}
+
+.transition-color-shadow-transform {
+  @include transition-bouncy(color, box-shadow, transform);
 }
 
 .transition-color-transform {
-  @include transition-shadow-transform(color, transform);
+  @include transition-bouncy(color, transform);
 }
 
 .transition-quick-shadow {

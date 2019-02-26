@@ -32,20 +32,15 @@ a {
   background-image: linear-gradient(to bottom, currentColor 0%, currentColor 100%);
   background-position-y: 100%;
   background-repeat: repeat-x;
-  color: $color-link;
   display: inline-block;
   text-decoration: none;
 
   &:hover {
     @extend %link-underline-hovered;
-
-    color: $color-link-hover;
   }
 
   &:focus {
     @extend %link-underline-hovered;
-
-    color: $color-link-focus;
   }
 }
 
@@ -63,16 +58,5 @@ a {
   &:hover,
   &:focus {
     @extend %link-underline-hidden;
-  }
-}
-
-// Will still have translation on hover effect + underline,
-// but the link color will always be $color-text-dark
-
-.link-text-dark {
-  color: $color-text-dark;
-
-  &:hover {
-    color: $color-text-dark;
   }
 }

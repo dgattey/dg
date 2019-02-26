@@ -2,7 +2,7 @@
 layout: post
 type: iOS App + Website
 description: Making Portland's great outdoor sights more accessible
-color: forest-green
+background: forest
 link: https://www.forestparkconservancy.org/forest-park/
 sitemap: false
 two_column: mirrored

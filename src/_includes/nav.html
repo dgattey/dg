@@ -1,12 +1,12 @@
 <header class="global-nav fixed-header font-weight-bold transition-quick-shadow">
   <nav>
-    <ul class="nav-items grid grid-columns-standard grid-gap-5 grid-gap-3-desktop flush">
+    <ul class="nav-items background-default grid grid-columns-standard grid-gap-5 grid-gap-3-desktop flush">
       <li class="list-block grid-item-align-center font-size-1 flush-bottom"><a class="logo link-no-decoration scale-down-on-hover transition-color-transform" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></li>
       {% assign sorted_pages = site.pages | sort:"weight" %}
       {% for nav_page in sorted_pages %}
       
       {% if page.url == nav_page.url %}
-      {% assign nav_class = 'link-no-decoration link-text-dark' %}
+      {% assign nav_class = 'link-no-decoration color-link-reset' %}
       {% else %}
       {% assign nav_class = 'link-underline-on-hover' %}
       {% endif %}
