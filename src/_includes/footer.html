@@ -1,18 +1,18 @@
-<footer class="standard-inset">
+<footer class="standard-inset grid grid-columns-standard grid-align-center margin-top-4">
   {% capture version %}{% project_version tag short %}{% endcapture %}
-  {% assign short_version = version | split: "-" | first %}
-  <p class="copy">&copy; {{ site.time | date: '%Y' }} {{ site.title }} | {{ version }}</p>
-  <ul>
-    <li>
-      <a class="link-no-decoration" href="{{ site.baseurl }}/about"><p>About</p></a>
+
+  <p class="footer-copy">&copy; {{ site.time | date: '%Y' }} {{ site.title }} | {{ version }}</p>
+  <ul class="footer-links grid-item-align-right">
+    <li class="footer-item list-block">
+      <a class="link-no-decoration font-size-1 fill-primary fill-seconday-hover transition-fill-transform footer-icon" href="mailto:{{ site.email | encode_email }}" aria-label="Email me">{% include icon-email.svg %}</a>
     </li>
 
-    <li>
-      <a class="link-no-decoration icon" href="https://github.com/{{site.github}}" aria-label="Link to Github">{% include icon-github.svg %}</a>
+    <li class="footer-item list-block">
+      <a class="link-no-decoration font-size-1 fill-primary fill-seconday-hover transition-fill-transform footer-icon" href="https://github.com/{{site.github}}" aria-label="Link to Github">{% include icon-github.svg %}</a>
     </li>
 
-    <li>
-      <a class="link-no-decoration" href="mailto:{{ site.email | encode_email }}"><p>Email</p></a>
+    <li class="footer-item list-block">
+      <a class="link-no-decoration font-size-1 fill-primary fill-seconday-hover transition-fill-transform footer-icon" href="{{ site.baseurl }}/about" aria-label="About me">{% include icon-question.svg %}</a>
     </li>
   </ul>
 </footer>

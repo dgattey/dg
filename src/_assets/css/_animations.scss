@@ -42,6 +42,10 @@ $scale-down-hover: .96;
   @include transition-bouncy(color, transform);
 }
 
+.transition-fill-transform {
+  @include transition-quick(fill, transform);
+}
+
 .transition-quick-shadow {
   @include transition-quick(box-shadow);
 }

@@ -20,6 +20,9 @@ body {
   .standard-inset {
     margin-left: $page-padding;
     margin-right: $page-padding;
+  }
+
+  .standard-inset-top {
     margin-top: $top-padding + $nav-padding * 2;
   }
 
