@@ -33,6 +33,13 @@ def export_constants()
   ]
 end
 
+# Prints a filesize in KB for a given file
+def print_filesize(filename, message)
+  filesize = '%.2f' % (File.size(filename).to_f / 1000 )
+  print @leading_space
+  puts "  [#{filesize}KB] #{message}"
+end
+
 # Computes a hashed filepath in the temp folder from a filename
 def get_temporary_filepath(name)
   hashed_name = Digest::MD5.hexdigest name
@@ -43,8 +50,10 @@ end
 def run_purge_on_file(filename)
   # Print out which file we're purging in-place
   print @leading_space
-  print 'purging CSS: '
-  puts filename
+  puts 'purging unused css from: '
+  print @leading_space
+  puts '  ' + filename
+  print_filesize(filename, 'before purging')
 
   # JS config (Docs: https://www.purgecss.com/configuration)
   config_text = ''"module.exports = #{{
@@ -59,6 +68,9 @@ def run_purge_on_file(filename)
   end
   system("purgecss --config #{@config_file} --out #{@output_folder}")
   File.delete(@config_file)
+
+  # Show progress
+  print_filesize(filename, 'after purging')
 end
 
 # Recreates an empty temp folder on init
