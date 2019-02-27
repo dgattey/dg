@@ -1,7 +1,7 @@
 # Caches
 .sass-cache
 .jekyll-cache
-.tmp
+.purgecss
 
 # Temporary files
 *.swp
