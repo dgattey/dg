@@ -5,7 +5,7 @@
 # We want to run purgecss on our CSS files only after they're
 # written out entirely. This plugin accomplishes that by hooking
 # into JekyllAssets:env:after_init and JekyllAssets:env:after_write
-# 
+#
 # I've written an optimization to make sure we don't re-run purgecss
 # on files that are already done. It makes use of temporary files
 # that have a hash of the css file contents in it to compute whether
@@ -14,28 +14,40 @@
 # writes a new version of the file. It prints to console too to
 # show what's happening.
 
-# Simply exposes the constants because they can't be truly global
-def export_constants()
-  @build_folder = '_site'
-  @temporary_folder = '.purgecss'
-  @hash_suffix = '.pcss'
-  @config_file = @temporary_folder + '/config.js'
-  @output_folder = @build_folder + '/assets'
-  @html_glob = @build_folder + '/**/*.html'
-  @css_glob = @build_folder + '/**/*.css'
-  @temporary_files = @temporary_folder + '/*' + @hash_suffix
-  @leading_space = '                    '
-
-  # These are the selectors that are JS added and can't be inferred
+# These are the purgecss selectors that are JS added and can't
+# be inferred. We must define them here
+def export_whitelist
   @selector_whitelist = [
     'wf-active',
     'wf-inactive'
   ]
 end
 
+def export_temp_constants
+  @temporary_folder = '.purgecss'
+  @hash_suffix = '.pcss'
+  @temporary_files = @temporary_folder + '/*' + @hash_suffix
+  @config_file = @temporary_folder + '/config.js'
+end
+
+def export_build_constants
+  @build_folder = '_site'
+  @output_folder = @build_folder + '/assets'
+  @html_glob = @build_folder + '/**/*.html'
+  @css_glob = @build_folder + '/**/*.css'
+end
+
+# Simply exposes the constants because they can't be truly global
+def export_constants
+  export_temp_constants
+  export_build_constants
+  export_whitelist
+  @leading_space = '                    '
+end
+
 # Prints a filesize in KB for a given file
 def print_filesize(filename, message)
-  filesize = '%.2f' % (File.size(filename).to_f / 1000 )
+  filesize = format('%.2f', (File.size(filename).to_f / 1000))
   print @leading_space
   puts "  [#{filesize}KB] #{message}"
 end
@@ -43,18 +55,11 @@ end
 # Computes a hashed filepath in the temp folder from a filename
 def get_temporary_filepath(name)
   hashed_name = Digest::MD5.hexdigest name
-  return @temporary_folder + '/' + hashed_name + @hash_suffix
+  @temporary_folder + '/' + hashed_name + @hash_suffix
 end
 
-# Runs PurgeCSS on a file
-def run_purge_on_file(filename)
-  # Print out which file we're purging in-place
-  print @leading_space
-  puts 'purging unused css from: '
-  print @leading_space
-  puts '  ' + filename
-  print_filesize(filename, 'before purging')
-
+# Actually runs the system command for purgecss
+def run_system_purgecss(filename)
   # JS config (Docs: https://www.purgecss.com/configuration)
   config_text = ''"module.exports = #{{
     content: [@html_glob],
@@ -62,12 +67,22 @@ def run_purge_on_file(filename)
     whitelist: @selector_whitelist
   }.stringify_keys.to_json}"''
 
-  # Write configuration file for purgecss, run command, and delete it
   File.open(@config_file, 'w') do |file|
     file.write(config_text)
   end
   system("purgecss --config #{@config_file} --out #{@output_folder}")
   File.delete(@config_file)
+end
+
+# Runs PurgeCSS on a file
+def purge(filename)
+  # Print out which file we're purging in-place
+  puts "#{@leading_space}purging unused css from: "
+  puts "#{@leading_space}  " + filename
+  print_filesize(filename, 'before purging')
+
+  # Write configuration file for purgecss, run command, and delete it
+  run_system_purgecss filename
 
   # Show progress
   print_filesize(filename, 'after purging')
@@ -101,7 +116,7 @@ Jekyll::Assets::Hook.register :env, :after_write do
     # Get temporary filepath and save that we're processing this one
     temp_filepath = get_temporary_filepath css_file
     processed_files[temp_filepath] = 1
-  
+
     # Contents of the CSS file we'll be using, hashed, for comparison
     contents = Digest::SHA512.file css_file
 
@@ -114,7 +129,7 @@ Jekyll::Assets::Hook.register :env, :after_write do
     next unless needs_purge
 
     # Run purge on the file
-    run_purge_on_file css_file
+    purge css_file
 
     # Write the hashed contents of the css file now for next time
     purged_contents = Digest::SHA512.file css_file
@@ -126,6 +141,6 @@ Jekyll::Assets::Hook.register :env, :after_write do
   # There may be extra files laying around for stuff that got deleted
   # so let's delete everything else we didn't process in this run
   Dir.glob(@temporary_files).each do |file|
-    File.delete(file) if processed_files[file] == 0
+    File.delete(file) if (processed_files[file]).zero?
   end
 end
