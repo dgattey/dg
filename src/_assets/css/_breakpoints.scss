@@ -65,9 +65,3 @@ $form-factors: (
     @content;
   }
 }
-
-@mixin for-max-size-only {
-  @media (min-width: $breakpoint-max-width) {
-    @content;
-  }
-}

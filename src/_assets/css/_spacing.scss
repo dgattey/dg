@@ -23,17 +23,27 @@ $spacing: (
   @return map-get($spacing, $name);
 }
 
-%max-width-element {
-  margin: 0 auto;
-  max-width: $breakpoint-max-width;
-  width: 100%;
+// Globals
+
+html {
+  overflow-x: hidden;
 }
+
+// Alignment
 
 .vertical-align-middle {
   vertical-align: middle;
 }
 
 // Height and width
+
+.max-width-max {
+  max-width: $breakpoint-max-width;
+}
+
+.width-full {
+  width: 100%;
+}
 
 @each $name, $value in $spacing {
   .height-#{$name} {
@@ -46,6 +56,11 @@ $spacing: (
 }
 
 // Margin classes
+
+.margin-horizontal-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
 
 @each $form, $suffix in $form-factors {
   @include breakpoint($form) {
