@@ -39,6 +39,7 @@ end
 
 # Simply exposes the constants because they can't be truly global
 def export_constants
+  @should_run = true
   export_temp_constants
   export_build_constants
   export_whitelist
@@ -107,6 +108,9 @@ end
 # Runs PurgeCSS if necessary
 Jekyll::Assets::Hook.register :env, :after_write do
   export_constants
+  if !@should_run
+    next
+  end
 
   # Save a list of all the hash files we've used
   processed_files = Hash.new(0)
