@@ -7,6 +7,37 @@ $breakpoint-min-tablet: 600px;
 $breakpoint-min-desktop: 900px;
 $breakpoint-max-width: 1200px;
 
+$form-factors: (
+  phone: '',
+  tablet: '-tablet',
+  tablet-down: '-tablet-down',
+  desktop: '-desktop'
+);
+
+@mixin breakpoint($form) {
+  @if $form == 'phone' {
+    @content;
+  }
+
+  @else if $form == 'tablet' {
+    @include for-tablet-up {
+      @content;
+    }
+  }
+
+  @else if $form == 'tablet-down' {
+    @include for-tablet-down {
+      @content;
+    }
+  }
+
+  @else if $form == 'desktop' {
+    @include for-desktop-up {
+      @content;
+    }
+  }
+}
+
 @mixin for-phone-up {
   @content;
 }
@@ -31,12 +62,6 @@ $breakpoint-max-width: 1200px;
 
 @mixin for-desktop-up {
   @media (min-width: $breakpoint-min-desktop) {
-    @content;
-  }
-}
-
-@mixin for-max-size-only {
-  @media (min-width: $breakpoint-max-width) {
     @content;
   }
 }

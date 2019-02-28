@@ -4,9 +4,9 @@
 
 $strong-shadow-color: rgba(0, 0, 0, .15);
 $weak-shadow-color: rgba(0, 0, 0, .1);
-$spread: $item-spacing-4 + $item-spacing-3;
-$strong-shadow: 0 $item-spacing-3 $spread $strong-shadow-color;
-$weak-shadow: 0 $item-spacing-3 $spread $weak-shadow-color;
+$spread: spacing(5) + spacing(4);
+$strong-shadow: 0 spacing(4) $spread $strong-shadow-color;
+$weak-shadow: 0 spacing(4) $spread $weak-shadow-color;
 
 .shadow-strong {
   box-shadow: $strong-shadow;

@@ -3,25 +3,9 @@
 // =====
 
 .footer-copy {
-  grid-column: 1 / 6;
-  margin: $item-spacing-4 0;
+  grid-column: 1 / 8;
 }
 
 .footer-links {
-  grid-column: 6 / -1;
-  margin: $item-spacing-4 0;
-}
-
-.footer-icon {
-  margin: 0;
-}
-
-.footer-icon svg {
-  height: $icon-size;
-  vertical-align: middle;
-  width: $icon-size;
-}
-
-.footer-item {
-  padding: 0 $icon-size / 2;
+  grid-column: 8 / -1;
 }

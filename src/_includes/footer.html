@@ -1,18 +1,18 @@
-<footer class="standard-inset grid grid-columns-standard grid-align-center margin-top-4">
+<footer class="margin-horizontal-5 margin-horizontal-6-desktop grid grid-columns-standard grid-align-center margin-top-5">
   {% capture version %}{% project_version tag short %}{% endcapture %}
 
-  <p class="footer-copy">&copy; {{ site.time | date: '%Y' }} {{ site.title }} | {{ version }}</p>
-  <ul class="footer-links grid-item-align-right">
-    <li class="footer-item list-block">
-      <a class="link-no-decoration font-size-1 fill-primary fill-seconday-hover transition-fill-transform footer-icon" href="mailto:{{ site.email | encode_email }}" aria-label="Email me">{% include icon-email.svg %}</a>
+  <p class="footer-copy margin-vertical-5">&copy; {{ site.time | date: '%Y' }} {{ site.title }} | {{ version }}</p>
+  <ul class="footer-links margin-vertical-5 grid-item-align-right">
+    <li class="padding-left-4 list-block">
+      <a class="link-no-decoration font-size-1 fill-primary fill-seconday-hover transition-fill-transform margin-0" href="mailto:{{ site.email | encode_email }}" aria-label="Email me">{% include icon-email.svg %}</a>
     </li>
 
-    <li class="footer-item list-block">
-      <a class="link-no-decoration font-size-1 fill-primary fill-seconday-hover transition-fill-transform footer-icon" href="https://github.com/{{site.github}}" aria-label="Link to Github">{% include icon-github.svg %}</a>
+    <li class="padding-left-4 list-block">
+      <a class="link-no-decoration font-size-1 fill-primary fill-seconday-hover transition-fill-transform margin-0" href="https://github.com/{{site.github}}" aria-label="Link to Github">{% include icon-github.svg %}</a>
     </li>
 
-    <li class="footer-item list-block">
-      <a class="link-no-decoration font-size-1 fill-primary fill-seconday-hover transition-fill-transform footer-icon" href="{{ site.baseurl }}/about" aria-label="About me">{% include icon-question.svg %}</a>
+    <li class="padding-left-4 list-block">
+      <a class="link-no-decoration font-size-1 fill-primary fill-seconday-hover transition-fill-transform margin-0" href="{{ site.baseurl }}/about" aria-label="About me">{% include icon-question.svg %}</a>
     </li>
   </ul>
 </footer>

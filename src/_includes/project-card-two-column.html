@@ -3,7 +3,7 @@
 {% else %}
 {% assign postlink = post.url %}
 {% endif %}
-<a href="{{ postlink }}" class="link-no-decoration grid grid-column-gap-3 grid-span-rows-2-tablet project-card color-link-inverse round-corners shadow-strong shadow-weak-on-hover transition-color-shadow-transform scale-down-on-hover {{ post.class }}">
+<a href="{{ postlink }}" class="link-no-decoration grid grid-column-gap-4 grid-span-rows-2-tablet project-card color-link-inverse corners-2 shadow-strong shadow-weak-on-hover transition-color-shadow-transform scale-down-on-hover {{ post.class }}">
     {% capture thumbnail_section %}
     <section class="transition-shadow-transform card-component-on-hover-scale-up {{ post.thumbnail.container_class }}">
         {% capture alttext %}{{ post.title }} thumbnail{% endcapture %}
@@ -30,9 +30,9 @@
     {% endcapture %}
 
     {% if post.two_column == "description-only" %}
-    <section class="card">{{ title_content }}</section>
+    <section class="padding-horizontal-5">{{ title_content }}</section>
     {% endif %}
-    <div class="card grid grid-columns-2-tablet grid-gap-2 grid-align-center">
+    <div class="padding-horizontal-5 grid grid-columns-2-tablet grid-gap-3 grid-align-center">
         {% if post.two_column == "mirrored" %}
         {{ data_section }}{{ thumbnail_section }}
         {% elsif post.two_column == "description-only" %}

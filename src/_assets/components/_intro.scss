@@ -4,14 +4,6 @@
 // =====
 
 .intro {
-  @include for-phone-up {
-    margin-bottom: $item-spacing-5 + $item-spacing-3;
-  }
-
-  @include for-tablet-up {
-    margin-bottom: $item-spacing-6;
-  }
-
   .title {
     grid-row: 1 / 2;
     align-self: end;

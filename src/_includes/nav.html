@@ -1,7 +1,7 @@
 <header class="global-nav fixed-header font-weight-bold transition-quick-shadow">
-  <nav>
-    <ul class="nav-items background-default grid grid-columns-standard grid-gap-5 grid-gap-3-desktop flush">
-      <li class="list-block grid-item-align-center font-size-1 flush-bottom"><a class="logo link-no-decoration scale-down-on-hover transition-color-transform" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></li>
+  <nav class="margin-horizontal-auto max-width-max width-full">
+    <ul class="background-default grid grid-columns-standard grid-gap-6 grid-gap-4-desktop margin-0 padding-vertical-4 padding-horizontal-5 padding-horizontal-6-desktop">
+      <li class="list-block grid-item-align-center font-size-1 margin-bottom-0"><a class="logo link-no-decoration scale-down-on-hover transition-color-transform" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></li>
       {% assign sorted_pages = site.pages | sort:"weight" %}
       {% for nav_page in sorted_pages %}
       
@@ -14,7 +14,7 @@
       {% assign nav_title = nav_page.nav_title | default nav_page.title %}
 
       {% if nav_title and nav_page.weight %}
-      <li class="list-block grid-item-align-center grid-span-cols-2 font-size-1 font-variant-heavy flush">
+      <li class="list-block grid-item-align-center grid-span-cols-2 font-size-1 font-variant-heavy margin-0">
         <a class="{{ nav_class }}" href="{{ nav_page.url }}">{{ nav_title }}</a>
       </li>
       {% endif %}

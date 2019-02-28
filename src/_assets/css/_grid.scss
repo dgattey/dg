@@ -79,36 +79,18 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
   align-self: center;
 }
 
-.grid-gap-2 {
-  grid-gap: $item-spacing-2;
-}
+// Grid gaps
 
-.grid-gap-4 {
-  grid-gap: $item-spacing-4;
-}
+@each $form, $suffix in $form-factors {
+  @include breakpoint($form) {
+    @each $name, $value in $spacing {
+      .grid-gap-#{$name}#{$suffix} {
+        grid-gap: $value;
+      }
 
-.grid-gap-5 {
-  grid-gap: $item-spacing-5;
-}
-
-.grid-gap-3-tablet {
-  @include for-tablet-up {
-    grid-gap: $item-spacing-3;
+      .grid-column-gap-#{$name}#{$suffix} {
+        grid-column-gap: $value;
+      }
+    }
   }
-}
-
-.grid-gap-3-desktop {
-  @include for-desktop-up {
-    grid-gap: $item-spacing-3;
-  }
-}
-
-.grid-gap-5-tablet {
-  @include for-tablet-up {
-    grid-gap: $item-spacing-5;
-  }
-}
-
-.grid-column-gap-3 {
-  grid-column-gap: $item-spacing-3;
 }

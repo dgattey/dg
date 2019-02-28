@@ -2,60 +2,144 @@
 // Spacing mixins to be used globally
 // =====
 
-// Constants
-$item-spacing-1: .375em;
-$item-spacing-2: .75em;
-$item-spacing-3: 1.5em;
-$item-spacing-4: 3em;
-$item-spacing-5: 6em;
-$item-spacing-6: 12em;
-$item-spacing-7: 24em;
-$icon-size: $item-spacing-3;
+// Some of this isn't expressable via pure CSS so
+// there's going to be some SASS variables here
 
-%max-width-element {
-  margin: 0 auto;
+$spacing: (
+  0: 0,
+  1: .0975em,
+  2: .375em,
+  3: .75em,
+  4: 1.5em,
+  5: 3em,
+  6: 6em,
+  7: 12em,
+  8: 24em
+);
+
+// Provides ability to reference spacing by name, though due
+// to sass limitation, use it like this in a CSS var: #{spacing(x)}
+@function spacing($name) {
+  @return map-get($spacing, $name);
+}
+
+// Globals
+
+html {
+  overflow-x: hidden;
+}
+
+// Alignment
+
+.vertical-align-middle {
+  vertical-align: middle;
+}
+
+// Height and width
+
+.max-width-max {
   max-width: $breakpoint-max-width;
+}
+
+.width-full {
   width: 100%;
 }
 
-.margin-top-4 {
-  margin-top: $item-spacing-4;
-}
+@each $name, $value in $spacing {
+  .height-#{$name} {
+    height: $value;
+  }
 
-.flush {
-  margin: 0;
-}
-
-.flush-bottom {
-  margin-bottom: 0;
-}
-
-.flush-left-4 {
-  margin-left: $item-spacing-4;
-}
-
-.flush-top-tablet-down {
-  @include for-tablet-down {
-    margin-top: 0;
+  .width-#{$name} {
+    width: $value;
   }
 }
 
-.overhang-parent-bottom-4-tablet {
-  @include for-phone-up {
-    margin-bottom: 0;
-  }
+// Margin classes
 
+.margin-horizontal-auto {
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@each $form, $suffix in $form-factors {
+  @include breakpoint($form) {
+    @each $name, $value in $spacing {
+      .margin-#{$name}#{$suffix} {
+        margin: $value;
+      }
+
+      .margin-vertical-#{$name}#{$suffix} {
+        margin-top: $value;
+        margin-bottom: $value;
+      }
+
+      .margin-horizontal-#{$name}#{$suffix} {
+        margin-left: $value;
+        margin-right: $value;
+      }
+
+      .margin-top-#{$name}#{$suffix} {
+        margin-top: $value;
+      }
+
+      .margin-left-#{$name}#{$suffix} {
+        margin-left: $value;
+      }
+
+      .margin-bottom-#{$name}#{$suffix} {
+        margin-bottom: $value;
+      }
+
+      .margin-right-#{$name}#{$suffix} {
+        margin-right: $value;
+      }
+
+      // Padding classes
+
+      .padding-#{$name}#{$suffix} {
+        padding: $value;
+      }
+
+      .padding-vertical-#{$name}#{$suffix} {
+        padding-top: $value;
+        padding-bottom: $value;
+      }
+
+      .padding-horizontal-#{$name}#{$suffix} {
+        padding-left: $value;
+        padding-right: $value;
+      }
+
+      .padding-top-#{$name}#{$suffix} {
+        padding-top: $value;
+      }
+
+      .padding-left-#{$name}#{$suffix} {
+        padding-left: $value;
+      }
+
+      .padding-bottom-#{$name}#{$suffix} {
+        padding-bottom: $value;
+      }
+
+      .padding-right-#{$name}#{$suffix} {
+        padding-right: $value;
+      }
+    }
+  }
+}
+
+// Special cases - these are negative
+
+.margin-bottom-5-tablet-overhang {
   @include for-tablet-up {
-    margin-bottom: -$item-spacing-4;
+    margin-bottom: -1 * spacing(5);
   }
 }
 
-.overhang-parent-top-4-tablet {
-  @include for-phone-up {
-    margin-top: 0;
-  }
-
+.margin-top-5-tablet-overhang {
   @include for-tablet-up {
-    margin-top: -$item-spacing-4;
+    margin-top: -1 * spacing(5);
   }
 }

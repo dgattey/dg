@@ -7,7 +7,7 @@ two_column: normal
 thumbnail:
   src: groups-thumb
   filetype: png
-  container_class: "overhang-parent-top-4-tablet overhang-parent-bottom-4-tablet"
+  container_class: "margin-top-5-tablet-overhang margin-bottom-5-tablet-overhang margin-vertical-0"
 ---
 
 # LinkedIn Groups
