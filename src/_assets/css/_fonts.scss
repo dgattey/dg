@@ -5,10 +5,11 @@
 :root {
   // Families
   --font-family-body: lft-etica, Arial, sans-serif;
-  --font-family-code: source-code-pro, Monaco, monospace;
+  --font-family-code: roboto-mono, Monaco, monospace;
 
   // Weights
   --font-weight-normal: 400;
+  --font-weight-medium: 500;
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
   --font-weight-black: 800;
@@ -139,13 +140,10 @@ pre {
   @extend .font-family-code;
   @extend .font-size-0;
 
+  font-weight: var(--font-weight-medium);
   overflow: auto;
 
-  @include for-phone-up {
+  @include for-phone-only {
     word-break: break-all;
-  }
-
-  @include for-tablet-up {
-    word-break: normal;
   }
 }
