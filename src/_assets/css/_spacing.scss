@@ -29,11 +29,35 @@ $spacing: (
   width: 100%;
 }
 
+.vertical-align-middle {
+  vertical-align: middle;
+}
+
+// Height and width
+
+@each $name, $value in $spacing {
+  .height-#{$name} {
+    height: $value;
+  }
+
+  .width-#{$name} {
+    width: $value;
+  }
+}
+
 // Margin classes
 
 @each $name, $value in $spacing {
   .margin-#{$name} {
     margin: $value;
+  }
+
+  .margin-vertical-#{$name} {
+    margin: $value 0;
+  }
+
+  .margin-horizontal-#{$name} {
+    margin: 0 $value;
   }
 
   .margin-top-#{$name} {
@@ -58,6 +82,14 @@ $spacing: (
 @each $name, $value in $spacing {
   .padding-#{$name} {
     padding: $value;
+  }
+
+  .padding-vertical-#{$name} {
+    padding: $value 0;
+  }
+
+  .padding-horizontal-#{$name} {
+    padding: 0 $value;
   }
 
   .padding-top-#{$name} {
