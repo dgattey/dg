@@ -86,32 +86,32 @@ html {
 
 h1 {
   @extend .font-weight-semibold;
-  @extend .font-size-16;
+  @extend .font-size-17;
 }
 
 h2 {
   @extend .font-weight-semibold;
-  @extend .font-size-11;
+  @extend .font-size-12;
 }
 
 h3 {
   @extend .font-weight-semibold;
-  @extend .font-size-8;
+  @extend .font-size-9;
 }
 
 h4 {
   @extend .font-weight-black;
-  @extend .font-size-5;
+  @extend .font-size-6;
 }
 
 h5 {
   @extend .font-weight-black;
-  @extend .font-size-3;
+  @extend .font-size-4;
 }
 
 h6 {
   @extend .font-weight-black;
-  @extend .font-size-1;
+  @extend .font-size-2;
 }
 
 // =====
@@ -121,22 +121,21 @@ h6 {
 p {
   max-width: 36em;
 
-  @extend .font-size-1;
+  @extend .font-size-2;
 }
 
 input,
 button,
 select,
 textarea {
-  @extend .font-size-1;
+  @extend .font-size-2;
 }
 
 // =====
 // Code
 // =====
 
-code,
-pre {
+code {
   @extend .font-family-code;
   @extend .font-size-0;
 

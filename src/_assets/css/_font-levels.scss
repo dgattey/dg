@@ -24,7 +24,7 @@
 // =====
 @mixin generate-font-level-content($level) {
   // Base variables
-  $base-font-size: 1.38rem;
+  $base-font-size: 1.26rem;
   $base-line-height-proportion: 1.58;
   $base-margin-bottom: 2.5rem;
 
@@ -63,6 +63,6 @@
 // Actually generates all the font levels for use elsewhere
 // =====
 
-@for $level from 0 through 18 {
+@for $level from 0 through 20 {
   @include generate-font-level($level);
 }

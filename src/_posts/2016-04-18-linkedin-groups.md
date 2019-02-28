@@ -12,14 +12,17 @@ thumbnail:
 
 # LinkedIn Groups
 
+{::options parse_block_html="true" /}
+
 <section>
-<p class="font-size-2">As an intern at LinkedIn, I helped craft LinkedIn Groups
+As an intern at LinkedIn, I helped craft LinkedIn Groups
 2.0 for iOS. Interface "delights" to make Groups smooth and attractive were
 my main focus. From slick transition animators to custom UI components, I
-created UI to be styled & reused inside all of LinkedIn's iOS apps.</p>
+created UI to be styled & reused inside all of LinkedIn's iOS apps.
+{: .font-size-3 }
 </section>
 
-<section markdown="1">
+<section>
 
 ## Transformations
 
@@ -42,7 +45,7 @@ radiates outward when you tap on it to uncover the compose screen hiding
 
 </section>
 
-<section markdown="1">
+<section>
 
 ## Modular Components
 
