@@ -2,7 +2,7 @@
 layout: post
 type: iOS App
 description: Connecting and empowering the world's professionals
-background: wine
+class: background-red5
 two_column: normal
 thumbnail:
   src: groups-thumb
