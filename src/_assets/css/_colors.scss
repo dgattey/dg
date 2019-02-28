@@ -6,50 +6,174 @@
 // there's going to be some SASS variables here
 
 $colors: (
-  dim: #000,
-  deep: #433d3a,
-  bright: #eceff1,
-  brightest: #fff,
-  aquagreen: #16ac7e,
-  forest: #006331,
-  wine: #bb2821,
-  sky: #237fad
+  darkest: #000,
+  lightest: #f8f9f9,
+  gray0: #ebeceb,
+  gray1: #d5d8d6,
+  gray2: #bbc0bd,
+  gray3: #9da49f,
+  gray4: #768078,
+  gray5: #334237,
+  gray6: #2d3a31,
+  gray7: #27322a,
+  gray8: #1f2821,
+  gray9: #141a16,
+  teal0: #e4f5f0,
+  teal1: #c7ebdf,
+  teal2: #a6dfcd,
+  teal3: #80d1b8,
+  teal4: #52c19e,
+  teal5: #16ac7d,
+  teal6: #139b70,
+  teal7: #118862,
+  teal8: #0e7051,
+  teal9: #0a503a,
+  cyan0: #e5f2f5,
+  cyan1: #c8e4eb,
+  cyan2: #a7d5df,
+  cyan3: #82c3d2,
+  cyan4: #54adc2,
+  cyan5: #1690ac,
+  cyan6: #13819b,
+  cyan7: #117187,
+  cyan8: #0e5d70,
+  cyan9: #0a424f,
+  blue0: #e8edf6,
+  blue1: #cfd9ee,
+  blue2: #b2c1e3,
+  blue3: #8fa6d7,
+  blue4: #6282c7,
+  blue5: #1645ac,
+  blue6: #133d9a,
+  blue7: #113585,
+  blue8: #0d2b6c,
+  blue9: #091d4a,
+  indigo0: #edeaf7,
+  indigo1: #d8d3ef,
+  indigo2: #c1b9e6,
+  indigo3: #a599da,
+  indigo4: #7f6ecb,
+  indigo5: #3116ac,
+  indigo6: #2b139a,
+  indigo7: #261185,
+  indigo8: #1e0d6c,
+  indigo9: #140949,
+  violet0: #f3e9f7,
+  violet1: #e6d2ef,
+  violet2: #d6b6e5,
+  violet3: #c495d9,
+  violet4: #ab69c9,
+  violet5: #7d16ac,
+  violet6: #70139a,
+  violet7: #611186,
+  violet8: #500e6e,
+  violet9: #37094c,
+  fuschia0: #f7e9f4,
+  fuschia1: #efd2e9,
+  fuschia2: #e5b6dc,
+  fuschia3: #d995cc,
+  fuschia4: #c969b7,
+  fuschia5: #ac1690,
+  fuschia6: #9b1381,
+  fuschia7: #871171,
+  fuschia8: #6f0e5d,
+  fuschia9: #4e0a42,
+  pink0: #f7eaee,
+  pink1: #efd2db,
+  pink2: #e5b7c5,
+  pink3: #d996ab,
+  pink4: #ca6a88,
+  pink5: #ac1645,
+  pink6: #9b133e,
+  pink7: #871136,
+  pink8: #6f0e2c,
+  pink9: #4e0a1f,
+  red0: #f6ebe8,
+  red1: #eed5cf,
+  red2: #e3bbb2,
+  red3: #d79d8f,
+  red4: #c77562,
+  red5: #ac3216,
+  red6: #9a2d13,
+  red7: #872711,
+  red8: #6e200e,
+  red9: #4d1609,
+  orange0: #f5efe3,
+  orange1: #eadfc5,
+  orange2: #decca4,
+  orange3: #d1b77e,
+  orange4: #c09d50,
+  orange5: #ac7d16,
+  orange6: #9b7013,
+  orange7: #876211,
+  orange8: #6f510e,
+  orange9: #4f390a,
+  yellow0: #f1f4e1,
+  yellow1: #e1e9c2,
+  yellow2: #d1dc9f,
+  yellow3: #bece78,
+  yellow4: #a9be4b,
+  yellow5: #90ac16,
+  yellow6: #829b13,
+  yellow7: #728811,
+  yellow8: #5e700e,
+  yellow9: #43500a,
+  lime0: #e9f5e3,
+  lime1: #d1eac5,
+  lime2: #b6dea4,
+  lime3: #98d17e,
+  lime4: #73c050,
+  lime5: #45ac16,
+  lime6: #3e9b13,
+  lime7: #368811,
+  lime8: #2d700e,
+  lime9: #20500a,
+  green0: #e5f5e8,
+  green1: #c8ebcf,
+  green2: #a8e0b2,
+  green3: #82d291,
+  green4: #54c268,
+  green5: #16ac32,
+  green6: #139b2d,
+  green7: #118827,
+  green8: #0e7020,
+  green9: #0a5017
 );
 
-:root {
-  @each $name, $color in $colors {
-    --color-#{$name}: #{$color};
-  }
+// Provides ability to reference colors by name, though due
+// to sass limitation, use it like this in a CSS var: #{color(x)}
+@function color($name) {
+  @return map-get($colors, $name);
+}
 
-  // These can't be expressable via the map above, so doing it here
+// =====
+// Theming classes - associates raw colors with variables
+// =====
 
-  --color-muted: #{lighten(map-get($colors, deep), 12%)};
-  --color-aquagreen-dark: #{darken(map-get($colors, aquagreen), 12%)};
-  --color-aquagreen-light: #{lighten(map-get($colors, aquagreen), 12%)};
+.theme-light {
+  --color-primary: #{color(teal5)};
+  --color-secondary: #{color(teal7)};
+  --color-tertiary: #{color(teal8)};
+  --color-background: #{color(lightest)};
+  --color-background-secondary: #{color(gray2)};
+  --color-text: #{color(gray5)};
+  --color-text-muted: #{color(gray3)};
+  --color-text-inverse: #{color(gray0)};
+  --color-text-inverse-muted: #{color(gray1)};
 }
 
 // =====
 // Background colors
 // =====
 
+@each $name, $color in $colors {
+  .background-#{$name} {
+    background-color: $color;
+  }
+}
+
 .background-default {
-  background: var(--color-background);
-}
-
-.background-wine {
-  background-color: var(--color-wine);
-}
-
-.background-sky {
-  background-color: var(--color-sky);
-}
-
-.background-dim {
-  background-color: var(--color-dim);
-}
-
-.background-forest {
-  background-color: var(--color-forest);
+  background-color: var(--color-background);
 }
 
 // =====
@@ -60,7 +184,7 @@ $colors: (
   fill: var(--color-primary);
 }
 
-.fill-seconday-hover {
+.fill-secondary {
   &:hover {
     fill: var(--color-secondary);
   }
@@ -93,6 +217,7 @@ $colors: (
 // =====
 
 html {
+  background-color: var(--color-background);
   color: var(--color-text);
 }
 
@@ -115,22 +240,4 @@ a {
 
 .highlight {
   background-color: var(--color-background-secondary);
-}
-
-// =====
-// Theming classes - associates raw colors with variables
-// =====
-
-.theme-light {
-  @extend .background-default;
-
-  --color-primary: var(--color-aquagreen);
-  --color-secondary: var(--color-aquagreen-dark);
-  --color-tertiary: var(--color-aquagreen-light);
-  --color-background: var(--color-brightest);
-  --color-background-secondary: var(--color-bright);
-  --color-text: var(--color-deep);
-  --color-text-muted: var(--color-muted);
-  --color-text-inverse: var(--color-brightest);
-  --color-text-inverse-muted: var(--color-bright);
 }

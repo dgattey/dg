@@ -2,7 +2,7 @@
 layout: post
 type: Website + Brand
 description: Streamlining and encouraging access to quality care
-background: sky
+class: background-cyan7
 link: https://synergypdx.com
 sitemap: false
 thumbnail:
