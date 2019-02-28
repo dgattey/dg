@@ -3,9 +3,11 @@ layout: default
 ---
 <article class="margin-horizontal-5 margin-horizontal-6-desktop margin-top-7" itemscope itemtype="http://schema.org/WebPage" role="main">
 
+    {% if page.show_header != false %}
     <header>
         <h1 itemprop="name headline">{{ page.title }}</h1>
     </header>
+    {% endif %}
 
     <div itemprop="text">
         {{ content }}

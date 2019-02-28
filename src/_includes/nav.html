@@ -1,6 +1,6 @@
-<header class="global-nav fixed-header font-weight-bold transition-quick-shadow">
+<header class="global-nav fixed-header font-weight-bold transition-quick-shadow background-default">
   <nav class="margin-horizontal-auto max-width-max width-full">
-    <ul class="background-default grid grid-columns-standard grid-gap-6 grid-gap-4-desktop margin-0 padding-vertical-4 padding-horizontal-5 padding-horizontal-6-desktop">
+    <ul class="grid grid-columns-standard grid-gap-6 grid-gap-4-desktop margin-0 padding-vertical-4 padding-horizontal-5 padding-horizontal-6-desktop">
       <li class="list-block grid-item-align-center font-size-2 margin-bottom-0"><a class="logo link-no-decoration scale-down-on-hover transition-color-transform" href="{{ site.baseurl }}/" aria-label="Homepage">dg.</a></li>
       {% assign sorted_pages = site.pages | sort:"weight" %}
       {% for nav_page in sorted_pages %}
