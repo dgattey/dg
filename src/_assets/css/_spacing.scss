@@ -47,89 +47,86 @@ $spacing: (
 
 // Margin classes
 
-@each $name, $value in $spacing {
-  .margin-#{$name} {
-    margin: $value;
-  }
+$form-factors: (
+  phone: '',
+  tablet: '-tablet',
+  tablet-down: '-tablet-down',
+  desktop: '-desktop'
+);
 
-  .margin-vertical-#{$name} {
-    margin: $value 0;
-  }
+@each $form, $suffix in $form-factors {
+  @include breakpoint($form) {
+    @each $name, $value in $spacing {
+      .margin-#{$name}#{$suffix} {
+        margin: $value;
+      }
 
-  .margin-horizontal-#{$name} {
-    margin: 0 $value;
-  }
+      .margin-vertical-#{$name}#{$suffix} {
+        margin: $value 0;
+      }
 
-  .margin-top-#{$name} {
-    margin-top: $value;
-  }
+      .margin-horizontal-#{$name}#{$suffix} {
+        margin: 0 $value;
+      }
 
-  .margin-left-#{$name} {
-    margin-left: $value;
-  }
+      .margin-top-#{$name}#{$suffix} {
+        margin-top: $value;
+      }
 
-  .margin-bottom-#{$name} {
-    margin-bottom: $value;
-  }
+      .margin-left-#{$name}#{$suffix} {
+        margin-left: $value;
+      }
 
-  .margin-right-#{$name} {
-    margin-right: $value;
+      .margin-bottom-#{$name}#{$suffix} {
+        margin-bottom: $value;
+      }
+
+      .margin-right-#{$name}#{$suffix} {
+        margin-right: $value;
+      }
+
+      // Padding classes
+
+      .padding-#{$name}#{$suffix} {
+        padding: $value;
+      }
+
+      .padding-vertical-#{$name}#{$suffix} {
+        padding: $value 0;
+      }
+
+      .padding-horizontal-#{$name}#{$suffix} {
+        padding: 0 $value;
+      }
+
+      .padding-top-#{$name}#{$suffix} {
+        padding-top: $value;
+      }
+
+      .padding-left-#{$name}#{$suffix} {
+        padding-left: $value;
+      }
+
+      .padding-bottom-#{$name}#{$suffix} {
+        padding-bottom: $value;
+      }
+
+      .padding-right-#{$name}#{$suffix} {
+        padding-right: $value;
+      }
+    }
   }
 }
 
-// Padding classes
+// Special cases - these are negative
 
-@each $name, $value in $spacing {
-  .padding-#{$name} {
-    padding: $value;
-  }
-
-  .padding-vertical-#{$name} {
-    padding: $value 0;
-  }
-
-  .padding-horizontal-#{$name} {
-    padding: 0 $value;
-  }
-
-  .padding-top-#{$name} {
-    padding-top: $value;
-  }
-
-  .padding-left-#{$name} {
-    padding-left: $value;
-  }
-
-  .padding-bottom-#{$name} {
-    padding-bottom: $value;
-  }
-
-  .padding-right-#{$name} {
-    padding-right: $value;
-  }
-}
-
-.flush-top-tablet-down {
-  @include for-tablet-down {
-    margin-top: 0;
-  }
-}
-
-.overhang-parent-bottom-5-tablet {
-  @include for-phone-up {
-    margin-bottom: 0;
-  }
-
+.margin-bottom-5-tablet-overhang {
   @include for-tablet-up {
     margin-bottom: -1 * spacing(5);
   }
 }
 
-.overhang-parent-top-5-tablet {
-  @include for-phone-up {
-    margin-top: 0;
-  }
-
+.margin-top-5-tablet-overhang {
   @include for-tablet-up {
     margin-top: -1 * spacing(5);
   }

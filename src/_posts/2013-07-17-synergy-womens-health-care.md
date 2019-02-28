@@ -8,7 +8,7 @@ sitemap: false
 thumbnail:
   src: synergy-thumb
   filetype: png
-  container_class: "overhang-parent-bottom-5-tablet margin-left-5 corners-2 shadow-weak"
+  container_class: "margin-bottom-5-tablet-overhang margin-bottom-0 margin-left-5 corners-2 shadow-weak"
   class: corners-2
 ---
 

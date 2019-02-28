@@ -4,10 +4,6 @@
 // =====
 
 .intro {
-  @include for-phone-up {
-    margin-bottom: spacing(6) + spacing(4);
-  }
-
   @include for-tablet-up {
     margin-bottom: spacing(7);
   }
