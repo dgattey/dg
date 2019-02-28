@@ -30,9 +30,9 @@
     {% endcapture %}
 
     {% if post.two_column == "description-only" %}
-    <section class="card">{{ title_content }}</section>
+    <section class="padding-horizontal-5">{{ title_content }}</section>
     {% endif %}
-    <div class="card grid grid-columns-2-tablet grid-gap-3 grid-align-center">
+    <div class="padding-horizontal-5 grid grid-columns-2-tablet grid-gap-3 grid-align-center">
         {% if post.two_column == "mirrored" %}
         {{ data_section }}{{ thumbnail_section }}
         {% elsif post.two_column == "description-only" %}

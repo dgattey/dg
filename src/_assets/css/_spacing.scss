@@ -47,13 +47,6 @@ $spacing: (
 
 // Margin classes
 
-$form-factors: (
-  phone: '',
-  tablet: '-tablet',
-  tablet-down: '-tablet-down',
-  desktop: '-desktop'
-);
-
 @each $form, $suffix in $form-factors {
   @include breakpoint($form) {
     @each $name, $value in $spacing {
@@ -62,11 +55,13 @@ $form-factors: (
       }
 
       .margin-vertical-#{$name}#{$suffix} {
-        margin: $value 0;
+        margin-top: $value;
+        margin-bottom: $value;
       }
 
       .margin-horizontal-#{$name}#{$suffix} {
-        margin: 0 $value;
+        margin-left: $value;
+        margin-right: $value;
       }
 
       .margin-top-#{$name}#{$suffix} {
@@ -92,11 +87,13 @@ $form-factors: (
       }
 
       .padding-vertical-#{$name}#{$suffix} {
-        padding: $value 0;
+        padding-top: $value;
+        padding-bottom: $value;
       }
 
       .padding-horizontal-#{$name}#{$suffix} {
-        padding: 0 $value;
+        padding-left: $value;
+        padding-right: $value;
       }
 
       .padding-top-#{$name}#{$suffix} {

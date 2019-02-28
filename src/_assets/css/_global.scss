@@ -15,19 +15,12 @@ body {
 }
 
 @mixin page-body($page-padding, $top-padding) {
-  $nav-padding: spacing(4);
-
-  .standard-inset {
-    margin-left: $page-padding;
-    margin-right: $page-padding;
-  }
-
   .standard-inset-top {
-    margin-top: $top-padding + $nav-padding * 2;
+    margin-top: $top-padding + spacing(4) * 2;
   }
 
   %nav-padding {
-    padding: $nav-padding $page-padding;
+    padding: spacing(4) $page-padding;
   }
 }
 

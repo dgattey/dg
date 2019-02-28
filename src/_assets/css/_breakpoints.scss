@@ -7,6 +7,13 @@ $breakpoint-min-tablet: 600px;
 $breakpoint-min-desktop: 900px;
 $breakpoint-max-width: 1200px;
 
+$form-factors: (
+  phone: '',
+  tablet: '-tablet',
+  tablet-down: '-tablet-down',
+  desktop: '-desktop'
+);
+
 @mixin breakpoint($form) {
   @if $form == 'phone' {
     @content;

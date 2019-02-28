@@ -4,11 +4,11 @@
 {% assign postlink = post.url %}
 {% endif %}
 <a href="{{ postlink }}" class="project-card color-link-inverse link-no-decoration grid grid-column-gap-4 grid-span-rows-2-tablet corners-2 shadow-strong shadow-weak-on-hover transition-color-shadow-transform scale-down-on-hover {{ post.class }}">
-    <section class="grid grid-columns-2-1-desktop grid-align-center card">
+    <section class="grid grid-columns-2-1-desktop grid-align-center padding-horizontal-5">
         <h3 class="font-size-9">{{ post.title }}</h3>
         <h4 class="font-variant-heavy margin-top-0-tablet-down desktop-align-right font-size-1">{{ post.type }}</h4>
     </section>
-    <section class="card transition-shadow-transform">
+    <section class="padding-horizontal-5 transition-shadow-transform">
         <p>{{ post.description }}</p>
     </section>
     {% if post.thumbnail %}

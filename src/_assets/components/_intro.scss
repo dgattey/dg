@@ -4,10 +4,6 @@
 // =====
 
 .intro {
-  @include for-tablet-up {
-    margin-bottom: spacing(7);
-  }
-
   .title {
     grid-row: 1 / 2;
     align-self: end;
