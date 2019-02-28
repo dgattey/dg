@@ -2,15 +2,26 @@
 // Spacing mixins to be used globally
 // =====
 
-// Constants
-$item-spacing-1: .375em;
-$item-spacing-2: .75em;
-$item-spacing-3: 1.5em;
-$item-spacing-4: 3em;
-$item-spacing-5: 6em;
-$item-spacing-6: 12em;
-$item-spacing-7: 24em;
-$icon-size: $item-spacing-3;
+// Some of this isn't expressable via pure CSS so
+// there's going to be some SASS variables here
+
+$spacing: (
+  0: 0,
+  1: .0975em,
+  2: .375em,
+  3: .75em,
+  4: 1.5em,
+  5: 3em,
+  6: 6em,
+  7: 12em,
+  8: 24em
+);
+
+// Provides ability to reference spacing by name, though due
+// to sass limitation, use it like this in a CSS var: #{spacing(x)}
+@function spacing($name) {
+  @return map-get($spacing, $name);
+}
 
 %max-width-element {
   margin: 0 auto;
@@ -18,20 +29,52 @@ $icon-size: $item-spacing-3;
   width: 100%;
 }
 
-.margin-top-4 {
-  margin-top: $item-spacing-4;
+// Margin classes
+
+@each $name, $value in $spacing {
+  .margin-#{$name} {
+    margin: $value;
+  }
+
+  .margin-top-#{$name} {
+    margin-top: $value;
+  }
+
+  .margin-left-#{$name} {
+    margin-left: $value;
+  }
+
+  .margin-bottom-#{$name} {
+    margin-bottom: $value;
+  }
+
+  .margin-right-#{$name} {
+    margin-right: $value;
+  }
 }
 
-.flush {
-  margin: 0;
-}
+// Padding classes
 
-.flush-bottom {
-  margin-bottom: 0;
-}
+@each $name, $value in $spacing {
+  .padding-#{$name} {
+    padding: $value;
+  }
 
-.flush-left-4 {
-  margin-left: $item-spacing-4;
+  .padding-top-#{$name} {
+    padding-top: $value;
+  }
+
+  .padding-left-#{$name} {
+    padding-left: $value;
+  }
+
+  .padding-bottom-#{$name} {
+    padding-bottom: $value;
+  }
+
+  .padding-right-#{$name} {
+    padding-right: $value;
+  }
 }
 
 .flush-top-tablet-down {
@@ -40,22 +83,22 @@ $icon-size: $item-spacing-3;
   }
 }
 
-.overhang-parent-bottom-4-tablet {
+.overhang-parent-bottom-5-tablet {
   @include for-phone-up {
     margin-bottom: 0;
   }
 
   @include for-tablet-up {
-    margin-bottom: -$item-spacing-4;
+    margin-bottom: -1 * spacing(5);
   }
 }
 
-.overhang-parent-top-4-tablet {
+.overhang-parent-top-5-tablet {
   @include for-phone-up {
     margin-top: 0;
   }
 
   @include for-tablet-up {
-    margin-top: -$item-spacing-4;
+    margin-top: -1 * spacing(5);
   }
 }

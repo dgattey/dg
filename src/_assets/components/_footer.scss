@@ -2,14 +2,16 @@
 // Footer styling for the global footer that appears on every page.
 // =====
 
+$footer-icon-dimension: spacing(4);
+
 .footer-copy {
   grid-column: 1 / 6;
-  margin: $item-spacing-4 0;
+  margin: spacing(5) 0;
 }
 
 .footer-links {
   grid-column: 6 / -1;
-  margin: $item-spacing-4 0;
+  margin: spacing(5) 0;
 }
 
 .footer-icon {
@@ -17,11 +19,11 @@
 }
 
 .footer-icon svg {
-  height: $icon-size;
+  height: $footer-icon-dimension;
   vertical-align: middle;
-  width: $icon-size;
+  width: $footer-icon-dimension;
 }
 
 .footer-item {
-  padding: 0 $icon-size / 2;
+  padding: 0 $footer-icon-dimension / 2;
 }

@@ -15,7 +15,7 @@ body {
 }
 
 @mixin page-body($page-padding, $top-padding) {
-  $nav-padding: $item-spacing-3;
+  $nav-padding: spacing(4);
 
   .standard-inset {
     margin-left: $page-padding;
@@ -31,17 +31,14 @@ body {
   }
 }
 
-// For different breakpoints
-$tablet-top-padding: $item-spacing-4 + $item-spacing-3;
-
 @include for-phone-up {
-  @include page-body($item-spacing-4, $item-spacing-5);
+  @include page-body(spacing(5), spacing(6));
 }
 
 @include for-tablet-up {
-  @include page-body($item-spacing-4, $item-spacing-5 + $item-spacing-4);
+  @include page-body(spacing(5), spacing(6) + spacing(5));
 }
 
 @include for-desktop-up {
-  @include page-body($item-spacing-5, $item-spacing-6);
+  @include page-body(spacing(6), spacing(7));
 }

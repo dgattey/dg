@@ -1,0 +1,9 @@
+// =====
+// Border-related mixins to be used globally
+// =====
+
+@each $name, $value in $spacing {
+  .corners-#{$name} {
+    border-radius: $value;
+  }
+}

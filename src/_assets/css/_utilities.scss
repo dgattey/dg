@@ -2,10 +2,6 @@
 // Generic utility classes
 // =====
 
-.round-corners {
-  border-radius: $item-spacing-1;
-}
-
 .desktop-align-right {
   @include for-desktop-up {
     justify-self: end;

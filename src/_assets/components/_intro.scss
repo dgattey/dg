@@ -5,11 +5,11 @@
 
 .intro {
   @include for-phone-up {
-    margin-bottom: $item-spacing-5 + $item-spacing-3;
+    margin-bottom: spacing(6) + spacing(4);
   }
 
   @include for-tablet-up {
-    margin-bottom: $item-spacing-6;
+    margin-bottom: spacing(7);
   }
 
   .title {
