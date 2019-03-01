@@ -23,12 +23,6 @@ $spacing: (
   @return map-get($spacing, $name);
 }
 
-// Globals
-
-html {
-  overflow-x: hidden;
-}
-
 // Alignment
 
 .vertical-align-middle {
