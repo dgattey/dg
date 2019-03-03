@@ -105,7 +105,6 @@
     "string-quotes": "single",
     "no-duplicate-selectors": true,
     "color-named": "never",
-    "selector-no-qualifying-type": true,
     "selector-combinator-space-after": "always",
     "selector-attribute-quotes": "always",
     "selector-attribute-operator-space-before": "always",
