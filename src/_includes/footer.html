@@ -1,8 +1,8 @@
-<footer class="margin-horizontal-5 margin-horizontal-6-desktop grid grid-columns-standard grid-align-center margin-top-5">
+<footer class="margin-horizontal-5 margin-horizontal-6-desktop grid grid-columns-standard grid-align-center margin-top-6">
   {% capture version %}{% project_version tag short %}{% endcapture %}
 
-  <p class="footer-copy margin-vertical-5">&copy; {{ site.time | date: '%Y' }} {{ site.title }} | {{ version }}</p>
-  <ul class="footer-links margin-vertical-5 grid-item-align-right">
+  <p class="footer-copy margin-vertical-6">&copy; {{ site.time | date: '%Y' }} {{ site.title }} | {{ version }}</p>
+  <ul class="footer-links margin-vertical-6 grid-item-align-right">
     <li class="padding-left-4 list-block">
       <a class="link-no-decoration font-size-1 fill-primary fill-seconday-hover transition-fill-transform margin-0" href="mailto:{{ site.email | encode_email }}" aria-label="Email me">{% include icon-email.svg %}</a>
     </li>

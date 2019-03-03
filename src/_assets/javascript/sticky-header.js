@@ -1,4 +1,4 @@
-const header = document.querySelector(".global-nav"),
+const header = document.querySelector("#global-nav"),
   headerHeight = header.offsetHeight,
   scrolledClass = "shadow-weak";
 

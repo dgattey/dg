@@ -7,26 +7,20 @@
 
 $spacing: (
   0: 0,
-  1: .0975em,
-  2: .375em,
-  3: .75em,
-  4: 1.5em,
-  5: 3em,
-  6: 6em,
-  7: 12em,
-  8: 24em
+  1: .0975rem,
+  2: .375rem,
+  3: .75rem,
+  4: 1.5rem,
+  5: 3rem,
+  6: 6rem,
+  7: 12rem,
+  8: 24rem
 );
 
 // Provides ability to reference spacing by name, though due
 // to sass limitation, use it like this in a CSS var: #{spacing(x)}
 @function spacing($name) {
   @return map-get($spacing, $name);
-}
-
-// Globals
-
-html {
-  overflow-x: hidden;
 }
 
 // Alignment

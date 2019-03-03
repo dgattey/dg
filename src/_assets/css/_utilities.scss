@@ -2,6 +2,10 @@
 // Generic utility classes
 // =====
 
+.overflow-x-hidden {
+  overflow-x: hidden;
+}
+
 .desktop-align-right {
   @include for-desktop-up {
     justify-self: end;
@@ -21,5 +25,29 @@
 .text-center-phone-only {
   @include for-phone-only {
     text-align: center;
+  }
+}
+
+// This is useful when there's an element that is nested
+// within body that should span full width. It uses some
+// resets to apply the appropriate CSS to make it appear
+// as the rest of the body content does.
+
+.span-viewport {
+  left: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  right: 50%;
+
+  > :first-child {
+    @extend .margin-horizontal-auto;
+    @extend .max-width-max;
+    @extend .width-full;
+
+    > :first-child {
+      @extend .padding-horizontal-5;
+      @extend .padding-horizontal-6-desktop;
+      @extend .padding-vertical-5;
+    }
   }
 }

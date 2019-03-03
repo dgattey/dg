@@ -90,13 +90,18 @@ jekyll-minifier:
     harmony: true
 
 # Build settings
-markdown: kramdown
 source: src
 include: [_static, _errors]
+markdown: kramdown
 highlighter: rouge
 kramdown:
   input: GFM
   syntax_highlighter: rouge
+  syntax_highlighter_opts: {
+    guess_lang: true,
+    default_lang: objectivec,
+    css_class: ''
+  }
 sass:
   style:  expanded
   deploy_style: compressed
