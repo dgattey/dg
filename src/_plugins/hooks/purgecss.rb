@@ -108,9 +108,7 @@ end
 # Runs PurgeCSS if necessary
 Jekyll::Assets::Hook.register :env, :after_write do
   export_constants
-  if !@should_run
-    next
-  end
+  next unless @should_run
 
   # Save a list of all the hash files we've used
   processed_files = Hash.new(0)
