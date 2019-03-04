@@ -127,7 +127,9 @@ p {
 input,
 button,
 select,
-textarea {
+textarea,
+ul,
+ol {
   @extend .font-size-2;
 }
 

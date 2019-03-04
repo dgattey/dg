@@ -19,7 +19,8 @@
 def export_whitelist
   @selector_whitelist = [
     'wf-active',
-    'wf-inactive'
+    'wf-inactive',
+    'gr_grid_book_container'
   ]
 end
 

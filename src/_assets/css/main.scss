@@ -26,8 +26,13 @@
 @import 'syntax';
 @import 'utilities';
 
-// Components
+// Components - all pages
 @import 'footer';
-@import 'intro';
 @import 'nav';
+
+// Components - index.html
+@import 'intro';
 @import 'project-card';
+
+// Components - about.html
+@import 'goodreads';
