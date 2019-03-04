@@ -1,0 +1,14 @@
+// =====
+// For styling the goodreads widget for the about page
+// =====
+
+.gr_grid_book_container {
+  @extend .padding-2;
+
+  float: left;
+  overflow: hidden;
+
+  a {
+    @extend .link-no-decoration;
+  }
+}
