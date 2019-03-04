@@ -2,6 +2,7 @@
 .sass-cache
 .jekyll-cache
 .purgecss
+.tmp
 
 # Temporary files
 *.swp

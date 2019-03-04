@@ -1,12 +1,20 @@
 ---
 layout: page
 nav_title: About
-title: Hello!
+title: Hey there and welcome!
 weight: 1
 ---
-<div class="grid grid-columns-2-tablet grid-gap-3">
-    <section>
-        {% capture about_me %}{% include about_me.md %}{% endcapture %}
-        {{ about_me | markdownify }}
-    </section>
+{% capture about_me %}{% include about_me.md %}{% endcapture %}
+{% capture skills %}{% include skills.md %}{% endcapture %}
+{% capture reading_list %}{% include reading-list.md %}{% endcapture %}
+<div itemprop="text" class="grid grid-columns-2-1-tablet grid-gap-4">
+  <section>
+    <header>
+      <h1 itemprop="name headline">{{ page.title }}</h1>
+    </header>
+    {{ about_me | markdownify }}
+  </section>
+  <section class="grid-item-align-center">
+    {% include picture.html src="me" alt="Photo of Dylan Gattey" class="fill-parent-width" %}
+  </section>
 </div>
