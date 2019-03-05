@@ -1,9 +1,8 @@
-Hey there! I'm Dylan Gattey, an iOS/API/web/everything engineer who calls San Francisco
-home.
-{: .font-size-7 }
+# Hey there! I'm Dylan Gattey, an iOS/API/web/everything engineer who calls San Francisco home.
+{: .font-size-7 .font-weight-normal }
 
-**I develop, design, teach, and learn.**
-{: .font-size-7 }
+## I develop, design, teach, and learn.
+{: .font-size-7 .font-weight-bold }
 
 My favorite thing is experimentation - I love testing things out and tinkering
 away to solve problems. Open source is great for that. I try to make the
