@@ -35,23 +35,13 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
   grid-template-rows: repeat(2, auto);
 }
 
-.grid-rows-3 {
-  grid-template-rows: repeat(2, auto);
-}
-
 .grid-span-col-full {
   grid-column: 1 / -1;
 }
 
-.grid-span-col-7-tablet {
+.grid-span-col-8-tablet {
   @include for-tablet-up {
-    grid-column: 1 / 7;
-  }
-}
-
-.grid-span-col-offset-desktop {
-  @include for-desktop-up {
-    grid-column-start: 2;
+    grid-column: 1 / 8;
   }
 }
 
