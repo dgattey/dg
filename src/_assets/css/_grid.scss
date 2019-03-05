@@ -49,6 +49,12 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
   grid-column-start: 2;
 }
 
+.grid-span-col-start-8-tablet {
+  @include for-tablet-up {
+    grid-column-start: 8;
+  }
+}
+
 .grid-span-cols-2 {
   grid-column-end: span 2;
 }
