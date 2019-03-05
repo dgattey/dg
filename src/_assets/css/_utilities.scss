@@ -26,6 +26,10 @@
   object-fit: cover;
 }
 
+.fit-within-parent {
+  object-fit: scale-down;
+}
+
 .text-center-phone-only {
   @include for-phone-only {
     text-align: center;
