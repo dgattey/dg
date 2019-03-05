@@ -1,5 +1,5 @@
 ## Reading List
-{: .font-size-7 }
+{: .font-size-9 }
 
 * WaitButWhy: [Taming the Mammoth: stop caring what other people think](https://waitbutwhy.com/2014/06/taming-mammoth-let-peoples-opinions-run-life.html)
 

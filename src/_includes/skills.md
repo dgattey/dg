@@ -1,5 +1,5 @@
 ## My skills
-{: .font-size-7 }
+{: .font-size-9 }
 
 ### Apps
 {: .font-size-4 }

@@ -1,7 +1,7 @@
 ---
 layout: page
 nav_title: About
-title: Hey there and welcome!
+title: About Me
 weight: 1
 ---
 {% capture about_me %}{% include about_me.md %}{% endcapture %}
@@ -9,9 +9,6 @@ weight: 1
 {% capture reading_list %}{% include reading-list.md %}{% endcapture %}
 <div itemprop="text" class="grid grid-columns-2-1-tablet grid-gap-4">
   <section>
-    <header>
-      <h1 itemprop="name headline">{{ page.title }}</h1>
-    </header>
     {{ about_me | markdownify }}
   </section>
   <section class="grid-item-align-center">
