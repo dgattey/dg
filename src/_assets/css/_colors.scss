@@ -159,6 +159,7 @@ $colors: (
   --color-text-muted: #{color(gray3)};
   --color-text-inverse: #{color(gray0)};
   --color-text-inverse-muted: #{color(gray1)};
+  --color-title: #{color(teal7)};
 }
 
 // =====
@@ -218,6 +219,10 @@ $colors: (
 html {
   background-color: var(--color-background);
   color: var(--color-text);
+}
+
+h1 {
+  color: var(--color-title);
 }
 
 a {
