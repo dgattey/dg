@@ -9,7 +9,13 @@
 
 # Hide offline page from user access if hitting it directly
 [[redirects]]
-	from = "https://dylangattey.com/offline/"
+	from = "https://dylangattey.com/503/"
+	to = "/404.html"
+	status = 404
+	force = false
+# Hide error page from user access if hitting it directly
+[[redirects]]
+	from = "https://dylangattey.com/500/"
 	to = "/404.html"
 	status = 404
 	force = false
@@ -22,11 +28,6 @@
 	force = true
 
 # Redirects all projects to 404 page for now
-[[redirects]]
-	from = "https://dylangattey.com/projects/forest-park-pdx/"
-	to = "/404.html"
-	status = 404
-	force = false
 [[redirects]]
 	from = "https://dylangattey.com/projects/connected-car-citizen/"
 	to = "/404.html"
