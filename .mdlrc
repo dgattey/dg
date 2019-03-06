@@ -1,3 +1,3 @@
 ignore_front_matter true
 show_kramdown_warnings true
-rules "~MD033"
+rules "~MD033", "~MD022", "~MD002", "~MD026"
