@@ -16,7 +16,7 @@
 
 # These are the purgecss selectors that are JS added and can't
 # be inferred. We must define them here
-def export_whitelist
+def generate_whitelist
   @selector_whitelist = [
     'wf-active',
     'wf-inactive',
@@ -24,14 +24,14 @@ def export_whitelist
   ]
 end
 
-def export_temp_constants
+def generate_temp_constants
   @temporary_folder = '.purgecss'
   @hash_suffix = '.pcss'
   @temporary_files = @temporary_folder + '/*' + @hash_suffix
   @config_file = @temporary_folder + '/config.js'
 end
 
-def export_build_constants
+def generate_build_constants
   @build_folder = '_site'
   @output_folder = @build_folder + '/assets'
   @html_glob = @build_folder + '/**/*.html'
@@ -39,11 +39,10 @@ def export_build_constants
 end
 
 # Simply exposes the constants because they can't be truly global
-def export_constants
-  @should_run = true
-  export_temp_constants
-  export_build_constants
-  export_whitelist
+def generate_constants
+  generate_temp_constants
+  generate_build_constants
+  generate_whitelist
   @leading_space = '                    '
 end
 
@@ -90,9 +89,28 @@ def purge(filename)
   print_filesize(filename, 'after purging')
 end
 
+# Reads in config values to set purgecss enabled or not
+Jekyll::Hooks.register :site, :after_init do |site|
+  generate_constants
+
+  config_value = site.config['use_purge_css']
+  site_env = ENV['JEKYLL_ENV'] || 'development'
+  env_value = site_env == 'production'
+  should_run = config_value unless config_value.nil?
+  should_run = env_value if config_value.nil?
+
+  # Print out if we'll be running
+  $purgecss_should_run = should_run
+  print '          purgecss: '
+  print 'enabled' if $purgecss_should_run
+  print 'disabled' unless $purgecss_should_run
+  puts ' (config)' unless config_value.nil?
+  puts " (#{site_env} environment)" if config_value.nil?
+end
+
 # Recreates an empty temp folder on init
 Jekyll::Assets::Hook.register :env, :after_init do
-  export_constants
+  generate_constants
 
   # Create the temp dir if it doesn't exist
   FileUtils.mkdir(@temporary_folder) unless Dir.exist?(@temporary_folder)
@@ -108,8 +126,8 @@ end
 
 # Runs PurgeCSS if necessary
 Jekyll::Assets::Hook.register :env, :after_write do
-  export_constants
-  next unless @should_run
+  generate_constants
+  next unless $purgecss_should_run
 
   # Save a list of all the hash files we've used
   processed_files = Hash.new(0)
