@@ -14,8 +14,8 @@ module PurgeCSS
 
       # Compare a saved hash from the cached file to the current hash of a file
       # and return if they're equal
-      def have_same_hash?(source_file:, saved_hash_file:)
-        hashed_contents = contents_of(file: source_file)
+      def same_hash?(src_file:, saved_hash_file:)
+        hashed_contents = contents_of(file: src_file)
         same_hash = false
         File.open(saved_hash_file, 'a+') do |file|
           same_hash = hashed_contents == file.read
@@ -24,10 +24,11 @@ module PurgeCSS
       end
 
       private
-        # Consistently hashes the contents of a file and returns it
-        def contents_of(file:)
-          Digest::SHA512.file file
-        end      
+
+      # Consistently hashes the contents of a file and returns it
+      def contents_of(file:)
+        Digest::SHA512.file file
+      end
     end
   end
 end

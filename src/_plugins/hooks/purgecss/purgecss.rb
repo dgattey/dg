@@ -22,6 +22,7 @@ require_relative 'temporarydata'
 require_relative 'hasher'
 require_relative 'hooks'
 
+# Contains all logic for purging css using purgecss
 module PurgeCSS
   class << PurgeCSS
     BUILT_CSS_GLOB = BUILD_FOLDER + '/**/*.css'
@@ -31,36 +32,39 @@ module PurgeCSS
     def run
       processed_files = Hash.new(0)
       purge_all_css_files(processed_files: processed_files)
-      TemporaryData::clean(processed_files)
+      TemporaryData.clean(processed_files)
     end
 
     private
-      # Runs purgecss on all css files, as needed
-      def purge_all_css_files(processed_files:)
-        Printer.message('starting purge process')
-        Dir.glob(BUILT_CSS_GLOB).each do |css_file|
+
+    # Runs purgecss on all css files, as needed
+    def purge_all_css_files(processed_files:)
+      Printer.message('starting purge process')
+      Dir.glob(BUILT_CSS_GLOB).each do |css_file|
         purge_file_if_needed(css_file, processed_files: processed_files)
-        end
-        Printer.message('finished purging')
       end
+      Printer.message('finished purging')
+    end
 
-      # Marks that we're processing this css file and runs purgecss if we should
-      # run it on this file given the hashes
-      def purge_file_if_needed(css_file, processed_files:)
-        temp_file = TemporaryData::generate_filepath css_file
-        processed_files[temp_file] = 1
-        return if Hasher::have_same_hash?(source_file: css_file, saved_hash_file: temp_file)
-        purge_file(css_file: css_file, cached_output_file: temp_file)
-      end
+    # Marks that we're processing this css file and runs purgecss if we should
+    # run it on this file given the hashes
+    def purge_file_if_needed(css_file, processed_files:)
+      temp_file = TemporaryData.generate_filepath css_file
+      processed_files[temp_file] = 1
+      same = Hasher.same_hash?(src_file: css_file, saved_hash_file: temp_file)
+      return if same
 
-      # Prints out file size before/after, runs purgecss on an individual file,
-      # and saves the file hash
-      def purge_file(css_file:, cached_output_file:)
-        Printer.filesize(css_file, 'was originally')
-        config_file = Config.write(css_file)
-        system("purgecss --config #{config_file} --out #{ASSET_OUTPUT_FOLDER}")
-        Printer.filesize(css_file, 'is now')
-        Hasher::save_file_hash_of(css_file, to_file: cached_output_file)
-      end
+      purge_file(css_file: css_file, cached_output_file: temp_file)
+    end
+
+    # Prints out file size before/after, runs purgecss on an individual file,
+    # and saves the file hash
+    def purge_file(css_file:, cached_output_file:)
+      Printer.filesize(css_file, 'was originally')
+      config_file = Config.write(css_file)
+      system("purgecss --config #{config_file} --out #{ASSET_OUTPUT_FOLDER}")
+      Printer.filesize(css_file, 'is now')
+      Hasher.save_file_hash_of(css_file, to_file: cached_output_file)
+    end
   end
 end
