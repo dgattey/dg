@@ -15,23 +15,18 @@ module PurgeCSS
         return is_enabled(config_value, env_value), config_value, jekyll_env
       end
 
-      # TODO: @dgattey try to remove this
-      # Returns the filename for the config file
-      def filename
-        CONFIG_FILE
-      end
-
       # Writes the purgecss config to file
       def write(filename)
         config_text = purgecss_config_text(filename)
         File.open(CONFIG_FILE, 'w') do |file|
           file.write(config_text)
         end
+        CONFIG_FILE
       end  
 
       # Deletes the config file
-      def delete
-        File.delete(CONFIG_FILE)
+      def clean
+        File.delete(CONFIG_FILE) if File.exist?(CONFIG_FILE)
       end
 
       private

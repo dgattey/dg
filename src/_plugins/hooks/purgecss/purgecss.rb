@@ -23,11 +23,10 @@ require_relative 'hasher'
 require_relative 'hooks'
 
 module PurgeCSS
-  # TODO: @dgattey move these
-  ASSET_OUTPUT_FOLDER = BUILD_FOLDER + '/assets'
-  BUILT_CSS_GLOB = BUILD_FOLDER + '/**/*.css'
-
   class << PurgeCSS
+    BUILT_CSS_GLOB = BUILD_FOLDER + '/**/*.css'
+    ASSET_OUTPUT_FOLDER = BUILD_FOLDER + '/assets'
+
     # Run purgecss and delete the files we didn't already process
     def run
       processed_files = Hash.new(0)
@@ -37,10 +36,10 @@ module PurgeCSS
 
     private
       # Runs purgecss on all css files, as needed
-      def purge_all_css_files(processed_files: processed_files)
+      def purge_all_css_files(processed_files:)
         Printer.message('starting purge process')
         Dir.glob(BUILT_CSS_GLOB).each do |css_file|
-          purge_file_if_needed(css_file, processed_files: processed_files)
+        purge_file_if_needed(css_file, processed_files: processed_files)
         end
         Printer.message('finished purging')
       end
@@ -58,16 +57,10 @@ module PurgeCSS
       # and saves the file hash
       def purge_file(css_file:, cached_output_file:)
         Printer.filesize(css_file, 'was originally')
-        run_configured_system_command(file: css_file)
+        config_file = Config.write(css_file)
+        system("purgecss --config #{config_file} --out #{ASSET_OUTPUT_FOLDER}")
         Printer.filesize(css_file, 'is now')
         Hasher::save_file_hash_of(css_file, to_file: cached_output_file)
-      end
-
-      # Actually runs the system command for purgecss, creating and deleting config
-      def run_configured_system_command(file:)
-        config_text = Config.write(file)
-        system("purgecss --config #{Config.filename} --out #{ASSET_OUTPUT_FOLDER}")
-        Config.delete
       end
   end
 end

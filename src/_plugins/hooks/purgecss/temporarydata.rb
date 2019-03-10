@@ -17,8 +17,16 @@ module PurgeCSS
 
       # Create the temp dir if it doesn't exist
       def create_folder
+        return if Dir.exist?(TEMP_FOLDER)
         Printer.message('creating temporary folder', TEMP_FOLDER)
-        FileUtils.mkdir(TEMP_FOLDER) unless Dir.exist?(TEMP_FOLDER)
+        FileUtils.mkdir(TEMP_FOLDER)
+      end
+
+      # Deletes the temp dir if it exists
+      def delete_folder
+        return unless Dir.exist?(TEMP_FOLDER)
+        Printer.message('deleting temporary folder', TEMP_FOLDER)
+        FileUtils.remove_dir(TEMP_FOLDER)
       end
 
       # Computes a hashed filepath in the temp folder from a filename
