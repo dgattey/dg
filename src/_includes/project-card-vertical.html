@@ -1,8 +1,10 @@
 <div class="padding-horizontal-5 grid grid-columns-2 grid-gap-3 grid-align-center">
     {% include project-card-section-thumb.html %}
     <section>
-        <h3 class="font-size-10 margin-bottom-2-tablet-down">{{ post.title }}</h3>
-        <h4 class="font-variant-heavy margin-vertical-3-tablet-down font-size-2">{{ post.type }}</h4>
+        <div>
+          <h3 class="font-size-10 margin-top-5 margin-bottom-2">{{ post.title }}</h3>
+          <h4 class="font-variant-heavy margin-top-5 margin-bottom-2 margin-vertical-3-tablet-down font-size-2">{{ post.type }}</h4>
+        </div>
         <p class="transition-shadow-transform">{{ post.description }}</p>
     </section>
 </div>
