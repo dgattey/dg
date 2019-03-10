@@ -49,6 +49,7 @@ workbox.precaching.precacheAndRoute([]);
 
 /**
  * Routing for different filetypes & endpoints
+ * - Force all ReportURI to network only
  * - Force all goodreads, google analytics calls to network only
  * - Force all p.gif calls (Adobe's check to see if you can use the font) to
  *   network only. If this is cached, the cache grows and grows
@@ -72,6 +73,10 @@ const vendorRouteConfiguration = function(hours) {
   };
 };
 
+workbox.routing.registerRoute(
+  /.*report-uri\.com/,
+  workbox.strategies.networkOnly()
+);
 workbox.routing.registerRoute(
   /.*images\.gr-assets\.com/,
   workbox.strategies.networkOnly()
