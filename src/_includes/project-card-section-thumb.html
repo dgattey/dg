@@ -1,0 +1,4 @@
+<section class="transition-shadow-transform card-component-on-hover-scale-up {{ post.thumbnail.container_class }}">
+    {% capture alttext %}{{ post.title }} thumbnail{% endcapture %}
+    {% include picture.html src=post.thumbnail.src alt=alttext filetype=post.thumbnail.filetype class=post.thumbnail.class %}
+</section>

@@ -8,11 +8,11 @@ module PurgeCSS
       # prints status, and creates the temporary folder, or cleans up if not
       # enabled
       def setup(site)
-        @plugin_enabled, config_value, jekyll_env = Config.plugin_status site
+        @plugin_enabled, message = Config.plugin_status site
         if plugin_enabled
-          setup_when_enabled(config_value, jekyll_env)
+          setup_when_enabled(message)
         else
-          setup_when_disabled(config_value, jekyll_env)
+          setup_when_disabled(message)
         end
         Config.clean
       end
@@ -30,15 +30,15 @@ module PurgeCSS
       end
 
       # Does setup when the plugin's enabled
-      def setup_when_enabled(config_value, jekyll_env)
-        Printer.plugin_status('enabled', config_value, jekyll_env)
+      def setup_when_enabled(message)
+        Printer.plugin_status('enabled', message)
         TemporaryData.create_folder
         TemporaryData.clean
       end
 
       # Does setup when the plugin's disabled
-      def setup_when_disabled(config_value, jekyll_env)
-        Printer.plugin_status('disabled', config_value, jekyll_env)
+      def setup_when_disabled(message)
+        Printer.plugin_status('disabled', message)
         TemporaryData.delete_folder
       end
     end

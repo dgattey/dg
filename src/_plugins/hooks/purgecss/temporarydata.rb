@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'constants'
+
 module PurgeCSS
   # Contains logic for temporary data wrangling
   class TemporaryData

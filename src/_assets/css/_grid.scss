@@ -13,6 +13,10 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
   grid-template-columns: repeat($grid-columns-standard, 1fr);
 }
 
+.grid-columns-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
 .grid-columns-2-tablet {
   @include for-tablet-up {
     grid-template-columns: repeat(2, 1fr);
@@ -71,6 +75,12 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
 
 .grid-item-align-right {
   justify-self: end;
+}
+
+.grid-item-align-right-tablet {
+  @include for-tablet-up {
+    justify-self: end;
+  }
 }
 
 .grid-item-align-bottom {

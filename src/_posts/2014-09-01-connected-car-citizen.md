@@ -8,6 +8,7 @@ sitemap: false
 thumbnail:
   src: connected-thumb
   filetype: png
+  class: "fill-parent"
 ---
 
 # Connected

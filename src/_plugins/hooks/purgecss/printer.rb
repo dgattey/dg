@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'constants'
+
 module PurgeCSS
   # Contains logic to print messages for all other modules/classes
   class Printer
@@ -8,11 +10,8 @@ module PurgeCSS
       MESSAGE_MAX_LENGTH = 50
 
       # Prints out the plugin's status based on values
-      def plugin_status(enabled_string, config_value, jekyll_env)
-        print "#{SPACER}#{enabled_string}"
-        empty_config = config_value.empty?
-        puts ' (config)' unless empty_config
-        puts " (#{jekyll_env} environment)" if empty_config
+      def plugin_status(enabled_string, message)
+        puts "#{SPACER}#{enabled_string} (#{message})"
       end
 
       # Prints a filesize in kb with a prepended message
