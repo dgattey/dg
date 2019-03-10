@@ -3,11 +3,12 @@ layout: post
 type: iOS App
 description: Connecting and empowering the world's professionals
 class: background-red5
-two_column: normal
+project_layout: vertical
 thumbnail:
   src: groups-thumb
   filetype: png
   container_class: "margin-top-5-tablet-overhang margin-bottom-5-tablet-overhang margin-vertical-0"
+  class: "fill-parent"
 ---
 
 # LinkedIn Groups
