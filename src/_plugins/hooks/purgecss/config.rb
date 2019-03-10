@@ -10,10 +10,9 @@ module PurgeCSS
 
       # Reads env and config to return plugin status and config value
       def plugin_status(site)
-        config_value = site.config['use_purge_css'] || ''
+        config_value = site.config['use_purge_css'].to_s
         jekyll_env = ENV['JEKYLL_ENV'] || 'development'
-        env_value = jekyll_env == 'production'
-        [enabled?(config_value, env_value), config_value, jekyll_env]
+        enabled?(config_value, jekyll_env)
       end
 
       # Writes the purgecss config to file
@@ -33,11 +32,15 @@ module PurgeCSS
       private
 
       # Figures out whether or not purgecss is enabled based on env/config and
-      # sets the variable showing that
+      # sets the variable showing that and which it was
       def enabled?(config_value, env_value)
-        empty_config = config_value.empty?
-        return config_value unless empty_config
-        return env_value if empty_config
+        unset_config = config_value.empty?
+        if unset_config
+          status = "#{env_value} environment"
+          [env_value == 'production', status]
+        else
+          [config_value == 'true', 'config']
+        end
       end
 
       # Returns a string for the JS config based on the docs at
