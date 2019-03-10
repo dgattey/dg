@@ -6,7 +6,9 @@
   @extend .padding-2;
 
   float: left;
+  height: 150px;
   overflow: hidden;
+  width: 98px;
 
   a {
     @extend .link-no-decoration;
