@@ -16,6 +16,12 @@ module PurgeCSS
         puts " (#{jekyll_env} environment)" if config_value.nil?
       end
 
+      # Prints a filesize in kb with a prepended message
+      def filesize(filename, message)
+        filesize = FileSize.in_kb filename
+        Printer.message("#{message} #{filesize}KB", filename, true)
+      end
+
       # Prints out a status message with leading space and formatting.
       # If a filename is included it'll print out too
       def message(message, filename = '', put_filename_first = false)

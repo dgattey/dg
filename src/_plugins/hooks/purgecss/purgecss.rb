@@ -19,76 +19,55 @@ require_relative 'printer'
 require_relative 'config'
 require_relative 'filesize'
 require_relative 'temporarydata'
+require_relative 'hasher'
 require_relative 'hooks'
 
 module PurgeCSS
   # TODO: @dgattey move these
   ASSET_OUTPUT_FOLDER = BUILD_FOLDER + '/assets'
   BUILT_CSS_GLOB = BUILD_FOLDER + '/**/*.css'
-  TEMP_FILE_SUFFIX = '.pcss'
-  TEMP_FILE_GLOB = TEMP_FOLDER + '/*' + TEMP_FILE_SUFFIX
 
   class << PurgeCSS
-
-    # TODO: @dgattey still to clean below here
-
+    # Run purgecss and delete the files we didn't already process
     def run
-      # Save a list of all the hash files we've used
       processed_files = Hash.new(0)
-
-      Printer.message 'starting to purge all files'
-      # Loop over all CSS files
-      Dir.glob(BUILT_CSS_GLOB).each do |css_file|
-        # Get temporary filepath and save that we're processing this one
-        temp_filepath = TemporaryData::generate_filepath css_file
-        processed_files[temp_filepath] = 1
-
-        # Contents of the CSS file we'll be using, hashed, for comparison
-        contents = Digest::SHA512.file css_file
-
-        # Compare the saved contents from last time to the current
-        # contents - if they're the same, no purging is needed
-        needs_purge = true
-        File.open(temp_filepath, 'a+') do |file|
-          needs_purge = contents != file.read
-        end
-        next unless needs_purge
-
-        # Run purge on the file
-        run_purgecss css_file
-
-        # Write the hashed contents of the css file now for next time
-        purged_contents = Digest::SHA512.file css_file
-        File.open(temp_filepath, 'w') do |file|
-          file.write(purged_contents)
-        end
-      end
-
-      Printer.message 'finished processing'
-
-      # There may be extra files laying around for stuff that got deleted
-      # so let's delete everything else we didn't process in this run
-      Dir.glob(TEMP_FILE_GLOB).each do |file|
-        File.delete(file) if (processed_files[file]).zero?
-      end
+      purge_all_css_files(processed_files: processed_files)
+      TemporaryData::clean(processed_files)
     end
 
     private
-      # Actually runs the system command for purgecss, creating and deleting config
-      def run_configured_purgecss(filename)
-        config_text = Config.write(filename)
-        system("purgecss --config #{Config.filename} --out #{ASSET_OUTPUT_FOLDER}")
-        Config.delete
+      # Runs purgecss on all css files, as needed
+      def purge_all_css_files(processed_files: processed_files)
+        Printer.message('starting purge process')
+        Dir.glob(BUILT_CSS_GLOB).each do |css_file|
+          purge_file_if_needed(css_file, processed_files: processed_files)
+        end
+        Printer.message('finished purging')
       end
 
-      # Write configuration file for purgecss, run command, and delete it with
-      # some status printed out too
-      def run_purgecss(filename)
-        filesize = FileSize.in_kb filename
-        Printer.message("was originally #{filesize}KB", filename, true)
-        run_configured_purgecss filename
-        filesize = FileSize.in_kb filename
-        Printer.message("is now #{filesize}KB", filename, true)
+      # Marks that we're processing this css file and runs purgecss if we should
+      # run it on this file given the hashes
+      def purge_file_if_needed(css_file, processed_files:)
+        temp_file = TemporaryData::generate_filepath css_file
+        processed_files[temp_file] = 1
+        return if Hasher::have_same_hash?(source_file: css_file, saved_hash_file: temp_file)
+        purge_file(css_file: css_file, cached_output_file: temp_file)
+      end
+
+      # Prints out file size before/after, runs purgecss on an individual file,
+      # and saves the file hash
+      def purge_file(css_file:, cached_output_file:)
+        Printer.filesize(css_file, 'was originally')
+        run_configured_system_command(file: css_file)
+        Printer.filesize(css_file, 'is now')
+        Hasher::save_file_hash_of(css_file, to_file: cached_output_file)
+      end
+
+      # Actually runs the system command for purgecss, creating and deleting config
+      def run_configured_system_command(file:)
+        config_text = Config.write(file)
+        system("purgecss --config #{Config.filename} --out #{ASSET_OUTPUT_FOLDER}")
+        Config.delete
       end
   end
 end
