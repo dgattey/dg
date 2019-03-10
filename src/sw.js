@@ -49,11 +49,11 @@ workbox.precaching.precacheAndRoute([]);
 
 /**
  * Routing for different filetypes & endpoints
- * - Force all analytics calls to network only
+ * - Force all goodreads, google analytics calls to network only
  * - Force all p.gif calls (Adobe's check to see if you can use the font) to
  *   network only. If this is cached, the cache grows and grows
  * - Cache the actual font files (use.typekit.net/af) for 120 days
- * - Cache fonts stylesheets for one day
+ * - Force all fonts stylesheets/js to network only for opaque caching probs
  * - Cache js, css, and json for six hours
  * - Cache up to 60 images for 30 days
  */
@@ -73,7 +73,15 @@ const vendorRouteConfiguration = function(hours) {
 };
 
 workbox.routing.registerRoute(
-  /^https?:\/\/www\.google-analytics\.com/,
+  /.*images\.gr-assets\.com/,
+  workbox.strategies.networkOnly()
+);
+workbox.routing.registerRoute(
+  /.*goodreads\.com/,
+  workbox.strategies.networkOnly()
+);
+workbox.routing.registerRoute(
+  /.*google-analytics\.com/,
   workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
@@ -90,7 +98,7 @@ workbox.routing.registerRoute(
 );
 workbox.routing.registerRoute(
   /^https?:\/\/.*.typekit\.net/,
-  workbox.strategies.cacheFirst(vendorRouteConfiguration(24))
+  workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
   /.*\.(?:js|css|json)$/,
