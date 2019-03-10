@@ -15,3 +15,19 @@
   right: 0;
   top: 0;
 }
+
+// This is pretty weird and cool - if we're on a phone
+// that supports backdrop filtering, let's add a content
+// filter and translucent background
+.translucent-header {
+  $filter: blur(24px) saturate(150%);
+
+  @supports (-webkit-backdrop-filter: $filter) {
+    @include for-phone-only {
+      @include background-translucent;
+
+      -webkit-backdrop-filter: $filter;
+      backdrop-filter: $filter;
+    }
+  }
+}

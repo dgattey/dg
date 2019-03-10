@@ -8,6 +8,7 @@
 $colors: (
   darkest: #000,
   lightest: #f8f9f9,
+  lightest-translucent: rgba(#f8f9f9, .78),
   gray0: #ebeceb,
   gray1: #d5d8d6,
   gray2: #bbc0bd,
@@ -155,6 +156,7 @@ $colors: (
   --color-secondary: #{color(teal7)};
   --color-tertiary: #{color(teal8)};
   --color-background: #{color(lightest)};
+  --color-background-translucent: #{color(lightest-translucent)};
   --color-text: #{color(gray5)};
   --color-text-muted: #{color(gray3)};
   --color-text-inverse: #{color(gray0)};
@@ -174,6 +176,10 @@ $colors: (
 
 .background-default {
   background-color: var(--color-background);
+}
+
+@mixin background-translucent {
+  background-color: var(--color-background-translucent);
 }
 
 // =====
