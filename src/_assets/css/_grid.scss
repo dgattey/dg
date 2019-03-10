@@ -73,6 +73,12 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
   justify-self: end;
 }
 
+.grid-item-align-right-tablet {
+  @include for-tablet-up {
+    justify-self: end;
+  }
+}
+
 .grid-item-align-bottom {
   align-self: end;
 }
