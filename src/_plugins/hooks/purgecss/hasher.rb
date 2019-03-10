@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'digest'
+
 module PurgeCSS
   # Contains logic for file hashing
   class Hasher

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'constants'
+
 module PurgeCSS
   # Contains logic to print messages for all other modules/classes
   class Printer

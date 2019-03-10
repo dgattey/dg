@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative 'constants'
+
 module PurgeCSS
   # Logic related to the config of both the plugin itself and the node module
   # config
