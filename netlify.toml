@@ -43,7 +43,9 @@
 [context.production]
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com" }
 	command = """
-	sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml \
+	line="";CONVERTED_CSP="";while read line; do directive=$(echo "$line" | sed 's/:.*//g'); echo "CSP directive found: $directive"; converted_line=$(echo "$line" | sed 's/://g' | sed 's/"//g'); CONVERTED_CSP="$CONVERTED_CSP $converted_line;"; done < src/csp.data \
+	&& sed -i "s%CSP_STRING_PLACEHOLDER%${CONVERTED_CSP}%g" netlify.toml \
+	&& sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml \
 	&& sed -i "s+BASE_URI+${URL}+g" netlify.toml \
 
 	&& npm i -g purgecss \
@@ -59,7 +61,9 @@
 [context.deploy-preview]
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com dgattey.netlify.com" }
 	command = """
-	sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml \
+	line="";CONVERTED_CSP="";while read line; do directive=$(echo "$line" | sed 's/:.*//g'); echo "CSP directive found: $directive"; converted_line=$(echo "$line" | sed 's/://g' | sed 's/"//g'); CONVERTED_CSP="$CONVERTED_CSP $converted_line;"; done < src/csp.data \
+	&& sed -i "s%CSP_STRING_PLACEHOLDER%${CONVERTED_CSP}%g" netlify.toml \
+	&& sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml \
 	&& sed -i "s+BASE_URI+${DEPLOY_PRIME_URL}+g" netlify.toml \
     && sed -i "s+https://dylangattey.com+${DEPLOY_PRIME_URL}+g" _config.yml \
 
@@ -76,7 +80,9 @@
 [context.branch-deploy]
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com dgattey.netlify.com" }
 	command = """
-	sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml \
+	line="";CONVERTED_CSP="";while read line; do directive=$(echo "$line" | sed 's/:.*//g'); echo "CSP directive found: $directive"; converted_line=$(echo "$line" | sed 's/://g' | sed 's/"//g'); CONVERTED_CSP="$CONVERTED_CSP $converted_line;"; done < src/csp.data \
+	&& sed -i "s%CSP_STRING_PLACEHOLDER%${CONVERTED_CSP}%g" netlify.toml \
+	&& sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml \
 	&& sed -i "s+BASE_URI+${DEPLOY_PRIME_URL}+g" netlify.toml \
     && sed -i "s+https://dylangattey.com+${DEPLOY_PRIME_URL}+g" _config.yml \
 
@@ -138,4 +144,4 @@
 	Report-To = '{"group":"default","max_age":31536000,"endpoints":[{"url":"https://dgattey.report-uri.com/a/d/g"}],"include_subdomains":true}'
 	NEL = '{"report_to":"default","max_age":31536000,"include_subdomains":true}'
 	Access-Control-Allow-Origin = "https://dylangattey.com"
-	Content-Security-Policy-Report-Only = "base-uri BASE_URI; upgrade-insecure-requests; block-all-mixed-content; report-uri https://dgattey.report-uri.com/r/d/csp/wizard; default-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/ https://*.google-analytics.com/ dgattey.report-uri.com https://stats.g.doubleclick.net/; img-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.google-analytics.com/ https://www.google.com/ads/ https://stats.g.doubleclick.net/ https://*.typekit.net; script-src 'self' https://storage.googleapis.com/workbox-cdn/ ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://use.typekit.net/ https://*.google-analytics.com/; style-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ https://*.typekit.net/; font-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/ *.typekit.net *.use.typekit.net; manifest-src 'self' ADDITIONAL_CSP_PLACEHOLDER https://d33wubrfki0l68.cloudfront.net/; object-src 'none'"
+	Content-Security-Policy-Report-Only = "CSP_STRING_PLACEHOLDER"
