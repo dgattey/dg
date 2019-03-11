@@ -165,12 +165,16 @@ $colors: (
 }
 
 // =====
-// Background colors
+// Background colors & fills
 // =====
 
 @each $name, $color in $colors {
   .background-#{$name} {
     background-color: $color;
+  }
+
+  .fill-#{$name} {
+    fill: $color;
   }
 }
 

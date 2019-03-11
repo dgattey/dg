@@ -9,12 +9,12 @@ Swift, Objective C, Electron, React
 ### Frontend
 {: .font-size-4 }
 
-Javascript, CSS, HTML, D3, React, Angular, Jekyll, Wordpress
+Javascript, CSS, HTML, Jekyll, D3, React, Angular, Wordpress
 
 ### Other Code
 {: .font-size-4 }
 
-APIs & Backends, Java, Go, NodeJS, Python
+API/Backend, Java, Ruby, Go, NodeJS, Python
 
 ### Design
 {: .font-size-4 }

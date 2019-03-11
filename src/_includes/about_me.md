@@ -17,5 +17,5 @@ CSS, and Go. You should probably check out
 Some random fun facts: soccer is my favorite sport outside of skiing,
 I'm red-green colorblind, my favorite tea is Earl Grey, I was obsessed with Zoo
 Tycoon as a kid (letting out the dinosaurs!) and Sim City 4, I'm a big fan of
-maps and geography, I use hella non-ironically, my favorite restaurant is in
+maps and geography, my favorite restaurant is in
 Mexico City, and I've backpacked to Machu Picchu.
