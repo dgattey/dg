@@ -70,7 +70,8 @@ favicons:
 workbox:
   precache_glob_directory: /
   precache_glob_patterns:
-    - 'index.html': '/'
+    - 'index.html': /
+    - 'about/index.html': /about/
     - 500.html
     - 503.html
     - favicon.ico
