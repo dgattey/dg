@@ -3,8 +3,8 @@ block-all-mixed-content:
 report-uri: "https://dgattey.report-uri.com/r/d/csp/wizard
 connect-src: stats.g.doubleclick.net"
 default-src: "ADDITIONAL_CSP_PLACEHOLDER 'self' cloudfront.net typekit.net google-analytics.com www.google-analytics.com dgattey.report-uri.com stats.g.doubleclick.net images.gr-assets.com www.goodreads.com"
-img-src: "'self' ADDITIONAL_CSP_PLACEHOLDER cloudfront.net google-analytics.com google.com/ads/ stats.g.doubleclick.net typekit.net images.gr-assets.com www.google.co.id www.google.co.uk  www.google.de"
-script-src: "'self' 'sha256-IeR2OXZWuGbl2CWLtvH1EZL4ug0bSuPMj5WvORTbM8c=' 'sha256-kmg53udAL4KP0oP42q1eLLza9Jy7/ypSVE2zgVWXadw=' googleapis.com/workbox-cdn/ ADDITIONAL_CSP_PLACEHOLDER cloudfront.net typekit.net google-analytics.com use.typekit.net www.goodreads.com"
+img-src: "'self' ADDITIONAL_CSP_PLACEHOLDER cloudfront.net google-analytics.com google.com/ads/ stats.g.doubleclick.net typekit.net images.gr-assets.com www.google.co.id www.google.co.uk  www.google.de netlify.com"
+script-src: "'self' 'sha256-IeR2OXZWuGbl2CWLtvH1EZL4ug0bSuPMj5WvORTbM8c=' 'sha256-kmg53udAL4KP0oP42q1eLLza9Jy7/ypSVE2zgVWXadw=' googleapis.com/workbox-cdn/ ADDITIONAL_CSP_PLACEHOLDER cloudfront.net typekit.net google-analytics.com use.typekit.net www.goodreads.com netlify.com"
 script-src-elem: "www.goodreads.com"
 style-src: "'self' ADDITIONAL_CSP_PLACEHOLDER cloudfront.net typekit.net 'sha256-o/UwLpJH8ww4lxwvvMJOHb7M1Eb6gJMn7S0CCC+BkZI=' 'sha256-qJmV17zXuR1eOgR1VgViTjNwFln11ucF/J6wyOqJLo4=' 'sha256-0JrRzb56/yE78NRCJQwckVUofGRtFC1s1Wu4Wtw5rXo='"
 font-src: "'self' ADDITIONAL_CSP_PLACEHOLDER cloudfront.net typekit.net"
