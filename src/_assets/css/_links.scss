@@ -2,21 +2,9 @@
 // All styling related to lists
 // =====
 
-%link-underline-normal {
-  $underline-height: .1em;
-
-  background-size: $underline-height $underline-height;
-}
-
-%link-underline-hovered {
-  $underline-height-hovered: .2em;
-
-  background-size: $underline-height-hovered $underline-height-hovered;
-  transform: translateY(- $underline-height-hovered / 2);
-}
-
 %link-underline-hidden {
   background-size: 0 0;
+  text-decoration: none;
 }
 
 // This is complicated, here's what it's doing:
@@ -25,22 +13,27 @@
 // - Changes the color, increases underline height, and
 //   moves the whole link itself up a bit on hover
 
-a {
-  @extend .transition-quick-background-color-transform;
-  @extend %link-underline-normal;
+p a {
+  @extend .font-weight-semibold;
 
-  background-image: linear-gradient(to bottom, currentColor 0%, currentColor 100%);
-  background-position-y: 100%;
-  background-repeat: repeat-x;
-  display: inline-block;
-  text-decoration: none;
+  display: inline;
 
-  &:hover {
-    @extend %link-underline-hovered;
-  }
-
+  &:hover,
   &:focus {
-    @extend %link-underline-hovered;
+    @extend .font-weight-black;
+  }
+}
+
+a {
+  @extend .transition-color-transform-font-weight;
+
+  display: inline-block;
+  text-decoration: underline;
+
+  &:hover,
+  &:focus {
+    text-decoration: underline;
+    transform: translateY(-.3rem);
   }
 }
 
