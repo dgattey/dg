@@ -23,12 +23,6 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
   }
 }
 
-.grid-columns-2-1-tablet {
-  @include for-tablet-up {
-    grid-template-columns: 2fr 1fr;
-  }
-}
-
 .grid-columns-2-1-desktop {
   @include for-desktop-up {
     grid-template-columns: 2fr 1fr;
@@ -89,6 +83,10 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
 
 .grid-item-align-center {
   align-self: center;
+}
+
+.grid-autoflow-dense {
+  grid-auto-flow: dense;
 }
 
 // Grid gaps
