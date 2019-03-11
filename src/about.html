@@ -13,6 +13,24 @@ weight: 1
   </section>
   <section>
     {% include picture.html src="me-circular" filetype="png" alt="Photo of Dylan Gattey" class="fill-parent-width cover-parent" %}
+    <ul class="padding-0 margin-vertical-5">
+      </li>
+      <li class="padding-2 list-block">
+        <a class="link-no-decoration font-size-1 fill-orange5 fill-secondary transition-fill-transform margin-0" href="mailto:{{ site.email | encode_email }}" aria-label="Email me">{% include icon-email.svg class="height-6 width-6" %}</a>
+      </li>
+      <li class="padding-2 list-block">
+        <a class="link-no-decoration font-size-1 fill-darkest fill-secondary transition-fill-transform margin-0" href="https://github.com/{{site.github}}" aria-label="Link to Github">{% include icon-github.svg class="height-6 width-6" %}</a>
+      </li>
+      <li class="padding-2 list-block">
+        <a class="link-no-decoration font-size-1 fill-pink5 fill-secondary transition-fill-transform margin-0" href="https://www.instagram.com/{{site.instagram}}" aria-label="Link to Instagram">{% include icon-instagram.svg class="height-6 width-6" %}</a>
+      </li>
+      <li class="padding-2 list-block">
+        <a class="link-no-decoration font-size-1 fill-blue5 fill-secondary transition-fill-transform margin-0" href="https://www.linkedin.com/in/{{site.linkedin}}" aria-label="Dylan's LinkedIn">{% include icon-linkedin.svg class="height-6 width-6" %}</a>
+      </li>
+      <li class="padding-2 list-block">
+        <a class="link-no-decoration font-size-1 fill-lime5 fill-secondary transition-fill-transform margin-0" href="https://open.spotify.com/user/{{site.spotify}}?si=yXvHMsSLR9au8bTjdjJsUA" aria-label="Dylan's Spotify">{% include icon-spotify.svg class="height-6 width-6" %}</a>
+      </li>
+    </ul>
   </section>
   <section>
     {{ reading_list | markdownify }}
