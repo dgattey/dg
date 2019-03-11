@@ -92,7 +92,7 @@ jekyll-minifier:
 # Build settings
 source: src
 include: [_static, _errors]
-exclude: [csp.yml]
+exclude: [csp.data]
 markdown: kramdown
 highlighter: rouge
 kramdown:

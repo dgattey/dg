@@ -43,7 +43,7 @@
 [context.production]
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com" }
 	command = """
-	line="";CONVERTED_CSP="";while read line; do directive=$(echo "$line" | sed 's/:.*//g'); echo "CSP directive found: $directive"; converted_line=$(echo "$line" | sed 's/://g' | sed 's/"//g'); CONVERTED_CSP="$CONVERTED_CSP $converted_line;"; done < src/csp.yml \
+	line="";CONVERTED_CSP="";while read line; do directive=$(echo "$line" | sed 's/:.*//g'); echo "CSP directive found: $directive"; converted_line=$(echo "$line" | sed 's/://g' | sed 's/"//g'); CONVERTED_CSP="$CONVERTED_CSP $converted_line;"; done < src/csp.data \
 	&& sed -i "s%CSP_STRING_PLACEHOLDER%${CONVERTED_CSP}%g" netlify.toml \
 	&& sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml \
 	&& sed -i "s+BASE_URI+${URL}+g" netlify.toml \
@@ -61,7 +61,7 @@
 [context.deploy-preview]
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com dgattey.netlify.com" }
 	command = """
-	line="";CONVERTED_CSP="";while read line; do directive=$(echo "$line" | sed 's/:.*//g'); echo "CSP directive found: $directive"; converted_line=$(echo "$line" | sed 's/://g' | sed 's/"//g'); CONVERTED_CSP="$CONVERTED_CSP $converted_line;"; done < src/csp.yml \
+	line="";CONVERTED_CSP="";while read line; do directive=$(echo "$line" | sed 's/:.*//g'); echo "CSP directive found: $directive"; converted_line=$(echo "$line" | sed 's/://g' | sed 's/"//g'); CONVERTED_CSP="$CONVERTED_CSP $converted_line;"; done < src/csp.data \
 	&& sed -i "s%CSP_STRING_PLACEHOLDER%${CONVERTED_CSP}%g" netlify.toml \
 	&& sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml \
 	&& sed -i "s+BASE_URI+${DEPLOY_PRIME_URL}+g" netlify.toml \
@@ -80,7 +80,7 @@
 [context.branch-deploy]
 	environment = { ADDITIONAL_CSP_SITES = "https://dylangattey.com dgattey.netlify.com" }
 	command = """
-	line="";CONVERTED_CSP="";while read line; do directive=$(echo "$line" | sed 's/:.*//g'); echo "CSP directive found: $directive"; converted_line=$(echo "$line" | sed 's/://g' | sed 's/"//g'); CONVERTED_CSP="$CONVERTED_CSP $converted_line;"; done < src/csp.yml \
+	line="";CONVERTED_CSP="";while read line; do directive=$(echo "$line" | sed 's/:.*//g'); echo "CSP directive found: $directive"; converted_line=$(echo "$line" | sed 's/://g' | sed 's/"//g'); CONVERTED_CSP="$CONVERTED_CSP $converted_line;"; done < src/csp.data \
 	&& sed -i "s%CSP_STRING_PLACEHOLDER%${CONVERTED_CSP}%g" netlify.toml \
 	&& sed -i "s+ADDITIONAL_CSP_PLACEHOLDER+${ADDITIONAL_CSP_SITES}+g" netlify.toml \
 	&& sed -i "s+BASE_URI+${DEPLOY_PRIME_URL}+g" netlify.toml \
