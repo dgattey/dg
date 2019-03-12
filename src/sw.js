@@ -15,10 +15,9 @@ const staticCacheName = "static",
   genericErrorPage = "/500.html";
 
 workbox.core.setCacheNameDetails({
-  precache: "precache",
+  precache: "pre",
   prefix: "dg",
-  suffix: "prod",
-  runtime: "site"
+  suffix: "v1"
 });
 workbox.skipWaiting();
 workbox.clientsClaim();
@@ -162,7 +161,7 @@ function responseWithReplacedErrorContent(existingResponse, pageURL, status) {
   }
 
   const constructedResponse = {
-    status: status,
+    status: status === 503 ? 200 : status,
     statusText: existingResponse.statusText,
     headers: existingResponse.headers
   };
