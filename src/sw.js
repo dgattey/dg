@@ -161,7 +161,7 @@ function responseWithReplacedErrorContent(existingResponse, pageURL, status) {
   }
 
   const constructedResponse = {
-    status: status,
+    status: status === 503 ? 200 : status,
     statusText: existingResponse.statusText,
     headers: existingResponse.headers
   };
