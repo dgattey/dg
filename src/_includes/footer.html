@@ -1,7 +1,7 @@
 <footer class="margin-horizontal-5 margin-horizontal-6-desktop grid grid-columns-standard grid-align-center margin-top-6">
   {% capture version %}{% project_version tag short %}{% endcapture %}
 
-  <p class="grid-span-col-full grid-span-col-8-tablet margin-vertical-3 margin-vertical-6-tablet">&copy; {{ site.time | date: '%Y' }} {{ site.title }} | {{ version }}</p>
+  <p class="grid-span-col-full grid-span-col-8-tablet margin-vertical-3 margin-vertical-6-tablet">&copy; {{ site.time | date: '%Y' }} {{ site.title }} | {{ version }} | <a href="/privacy-policy/">Privacy Policy</a></p>
   <ul class="grid-span-col-full grid-span-col-start-8-tablet padding-horizontal-0 margin-vertical-5 margin-vertical-6-tablet grid-item-align-right-tablet">
     <li class="padding-left-4 list-block">
       <a class="link-no-decoration font-size-1 fill-primary fill-secondary transition-fill-transform margin-0" href="mailto:{{ site.email | encode_email }}" aria-label="Email me">{% include icon-email.svg %}</a>
