@@ -20,6 +20,5 @@ group :jekyll_plugins do
   gem 'jekyll_version_plugin'         # Grabs version from Github tags
   gem 'kramdown'                      # Translates Markdown to HTML
   gem 'mini_magick'                   # Automated image conversion
-  gem 'normalize-scss'                # Port of normalize.css to SCSS
   gem 'rouge'                         # Highlights code in HTML
 end

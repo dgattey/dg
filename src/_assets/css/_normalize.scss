@@ -1,0 +1,18 @@
+// =====
+// Normalize CSS resets, customized for dg
+// =====
+
+html {
+  box-sizing: border-box;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: inherit;
+}
+
+// Remove margin in all browsers
+body {
+  margin: 0;
+}

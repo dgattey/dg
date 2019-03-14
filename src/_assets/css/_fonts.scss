@@ -32,6 +32,7 @@ html {
   font-size: var(--fs-base);
   font-feature-settings: 'kern' 1;
   font-kerning: normal;
+  line-height: 1.15;
   text-size-adjust: 100%;
 }
 
@@ -52,12 +53,15 @@ html {
   font-weight: 400;
 }
 
-.font-weight-bold {
-  font-weight: 700;
-}
-
 .font-weight-semibold {
   font-weight: 600;
+}
+
+// Add the correct font weight in Chrome, Edge, and Safari.
+b,
+strong,
+.font-weight-bold {
+  font-weight: 700;
 }
 
 .font-weight-black {
@@ -139,11 +143,17 @@ ol {
 // =====
 
 code {
-  @extend .font-family-code;
-  @extend .font-size-0;
   @extend %font-margin;
 
   overflow: auto;
+
+  // 1. Correct the inheritance and scaling of font size in all browsers.
+  // 2. Correct the odd `em` font sizing in all browsers.
+  pre,
+  & {
+    @extend .font-family-code;
+    @extend .font-size-0;
+  }
 
   @include for-phone-only {
     word-break: break-all;
