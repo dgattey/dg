@@ -3,6 +3,12 @@
 // =====
 
 // =====
+// Constants
+// =====
+$font-size-proportion: 1.09;
+$line-height-proportion: 1.08;
+
+// =====
 // Raises a number to a power
 // =====
 @function pow($number, $power) {
@@ -23,39 +29,40 @@
 // larger than normal the font should be.
 // =====
 @mixin generate-font-level-content($level) {
-  // Base variables
-  $base-font-size: 1.26rem;
-  $base-line-height-proportion: 1.58;
-  $base-margin-bottom: 2.5rem;
+  // Proportions used in calculation
+  $font-size-modifier: pow($font-size-proportion, $level);
+  $line-height-modifier: pow($line-height-proportion, $level);
 
-  // Proportions used in calculation.
-  $font-size-proportion: 1.09;
-  $line-height-proportion: 1.08;
-
-  // Calculation
-  $base-line-height: $base-font-size * $base-line-height-proportion;
-
-  font-size: $base-font-size * pow($font-size-proportion, $level);
-  line-height: $base-line-height * pow($line-height-proportion, $level);
-  margin-bottom: $base-margin-bottom;
+  font-size: calc(var(--font-base) * #{$font-size-modifier});
+  line-height: calc(var(--line-height-base) * #{$line-height-modifier});
 }
 
 // =====
-// Includes the generated font body on font-size-$level with a particular level
+// Sets the base size for the generate to work right
 // =====
-@mixin generate-font-level($level) {
-  .font-size-#{$level} {
-    @include for-phone-up {
-      @include generate-font-level-content($level);
-    }
+:root {
+  $base-font-size: 1.26rem;
+  $base-line-height: 1.58;
 
-    @include for-tablet-up {
-      @include generate-font-level-content($level + 1);
-    }
+  @include for-phone-up {
+    $size: $base-font-size;
 
-    @include for-desktop-up {
-      @include generate-font-level-content($level + 2);
-    }
+    --font-base: #{$size};
+    --line-height-base: #{$size * $base-line-height};
+  }
+
+  @include for-tablet-up {
+    $size: $base-font-size * $font-size-proportion;
+
+    --font-base: #{$size};
+    --line-height-base: #{$size * $base-line-height};
+  }
+
+  @include for-desktop-up {
+    $size: $base-font-size * $font-size-proportion * $font-size-proportion;
+
+    --font-base: #{$size};
+    --line-height-base: #{$size * $base-line-height};
   }
 }
 
@@ -64,5 +71,7 @@
 // =====
 
 @for $level from 0 through 20 {
-  @include generate-font-level($level);
+  .font-size-#{$level} {
+    @include generate-font-level-content($level);
+  }
 }
