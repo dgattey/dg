@@ -152,16 +152,16 @@ $colors: (
 // =====
 
 .theme-light {
-  --color-primary: #{color(teal5)};
-  --color-secondary: #{color(teal7)};
-  --color-tertiary: #{color(teal8)};
-  --color-background: #{color(lightest)};
-  --color-background-translucent: #{color(lightest-translucent)};
-  --color-text: #{color(gray5)};
-  --color-text-muted: #{color(gray3)};
-  --color-text-inverse: #{color(gray0)};
-  --color-text-inverse-muted: #{color(gray1)};
-  --color-title: #{color(teal7)};
+  --c-primary: #{color(teal5)};
+  --c-secondary: #{color(teal7)};
+  --c-tertiary: #{color(teal8)};
+  --c-background: #{color(lightest)};
+  --c-glass: #{color(lightest-translucent)};
+  --c-text: #{color(gray5)};
+  --c-text-muted: #{color(gray3)};
+  --c-text-inverse: #{color(gray0)};
+  --c-text-inverse-muted: #{color(gray1)};
+  --c-title: #{color(teal7)};
 }
 
 // =====
@@ -179,11 +179,11 @@ $colors: (
 }
 
 .background-default {
-  background-color: var(--color-background);
+  background-color: var(--c-background);
 }
 
 @mixin background-translucent {
-  background-color: var(--color-background-translucent);
+  background-color: var(--c-glass);
 }
 
 // =====
@@ -191,34 +191,34 @@ $colors: (
 // =====
 
 .fill-primary {
-  fill: var(--color-primary);
+  fill: var(--c-primary);
 }
 
 .fill-secondary {
   &:hover {
-    fill: var(--color-secondary);
+    fill: var(--c-secondary);
   }
 }
 
 .color-primary {
-  color: var(--color-primary);
+  color: var(--c-primary);
 }
 
 .color-link-inverse {
-  color: var(--color-text-inverse);
+  color: var(--c-text-inverse);
 
   &:hover,
   &:focus {
-    color: var(--color-text-inverse-muted);
+    color: var(--c-text-inverse-muted);
   }
 }
 
 .color-link-reset {
-  color: var(--color-text);
+  color: var(--c-text);
 
   &:hover,
   &:focus {
-    color: var(--color-text);
+    color: var(--c-text);
   }
 }
 
@@ -227,31 +227,31 @@ $colors: (
 // =====
 
 html {
-  background-color: var(--color-background);
-  color: var(--color-text);
+  background-color: var(--c-background);
+  color: var(--c-text);
 }
 
 h1 {
-  color: var(--color-title);
+  color: var(--c-title);
 }
 
 a {
-  color: var(--color-primary);
+  color: var(--c-primary);
 
   &:hover {
-    color: var(--color-secondary);
+    color: var(--c-secondary);
   }
 
   &:focus {
-    color: var(--color-tertiary);
+    color: var(--c-tertiary);
   }
 }
 
 ::selection {
-  background: var(--color-secondary);
-  color: var(--color-text-inverse);
+  background: var(--c-secondary);
+  color: var(--c-text-inverse);
 }
 
 .highlight {
-  background-color: var(--color-background-secondary);
+  background-color: var(--c-background-secondary);
 }
