@@ -3,7 +3,7 @@
 // =====
 
 :root {
-  --font-base-size: 10px;
+  --fs-base: 10px;
 
   // For when fonts are un-loaded
   letter-spacing: -.002em;
@@ -29,7 +29,7 @@ html {
   -webkit-font-smoothing: antialiased;
   // sass-lint:enable no-vendor-prefixes
   font-family: lft-etica, Arial, sans-serif;
-  font-size: var(--font-base-size);
+  font-size: var(--fs-base);
   font-feature-settings: 'kern' 1;
   font-kerning: normal;
   text-size-adjust: 100%;
