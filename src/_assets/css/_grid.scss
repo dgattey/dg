@@ -85,10 +85,6 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
   align-self: center;
 }
 
-.grid-autoflow-dense {
-  grid-auto-flow: dense;
-}
-
 // Grid gaps
 
 @each $form, $suffix in $form-factors {
