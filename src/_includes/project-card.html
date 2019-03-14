@@ -3,7 +3,7 @@
 {% else %}
 {% assign postlink = post.url %}
 {% endif %}
-<a href="{{ postlink }}" class="color-link-inverse corners-2 grid grid-column-gap-4 grid-span-rows-2-tablet link-no-decoration project-card scale-down-on-hover shadow-strong shadow-weak-on-hover transition-color-shadow-transform {{ post.class }}">
+<a href="{{ postlink }}" class="color-link-inverse corners-2 grid grid-column-gap-4 grid-span-rows-2-tablet link-no-decoration project-card scale-down-on-hover shadow-strong shadow-weak-on-hover transition-default {{ post.class }}">
     {% if post.project_layout == 'vertical' %}
       {% include project-card-vertical.html %}
     {% else %}

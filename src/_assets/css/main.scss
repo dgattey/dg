@@ -5,8 +5,8 @@
 @charset "UTF-8";
 // sass-lint:enable quotes
 
-// Normalizes css
-@import 'normalize/import-now';
+// Imports my normalize css (based on normalize.css)
+@import 'normalize';
 
 // Base utility CSS
 @import 'animations';
@@ -21,6 +21,7 @@
 
 // Utility CSS
 @import 'borders';
+@import 'flex';
 @import 'grid';
 @import 'shadows';
 @import 'syntax';

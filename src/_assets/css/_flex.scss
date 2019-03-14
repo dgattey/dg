@@ -1,0 +1,12 @@
+// =====
+// Flexbox-related content
+// =====
+
+.flex {
+  display: flex;
+  flex-wrap: wrap;
+
+  @include for-phone-only {
+    justify-content: center;
+  }
+}

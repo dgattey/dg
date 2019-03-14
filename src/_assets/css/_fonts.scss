@@ -3,19 +3,7 @@
 // =====
 
 :root {
-  // Families
-  --font-family-body: lft-etica, Arial, sans-serif;
-  --font-family-code: roboto-mono, Monaco, monospace;
-
-  // Weights
-  --font-weight-normal: 400;
-  --font-weight-medium: 500;
-  --font-weight-semibold: 600;
-  --font-weight-bold: 700;
-  --font-weight-black: 800;
-
-  // Sizes
-  --font-base-size: 10px;
+  --fs-base: 10px;
 
   // For when fonts are un-loaded
   letter-spacing: -.002em;
@@ -40,10 +28,11 @@ html {
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   // sass-lint:enable no-vendor-prefixes
-  font-family: var(--font-family-body);
-  font-size: var(--font-base-size);
+  font-family: lft-etica, Arial, sans-serif;
+  font-size: var(--fs-base);
   font-feature-settings: 'kern' 1;
   font-kerning: normal;
+  line-height: 1.15;
   text-size-adjust: 100%;
 }
 
@@ -52,7 +41,8 @@ html {
 // =====
 
 .font-family-code {
-  font-family: var(--font-family-code);
+  font-family: roboto-mono, Monaco, monospace;
+  font-weight: 500;
 }
 
 // =====
@@ -60,19 +50,22 @@ html {
 // =====
 
 .font-weight-normal {
-  font-weight: var(--font-weight-normal);
-}
-
-.font-weight-bold {
-  font-weight: var(--font-weight-bold);
+  font-weight: 400;
 }
 
 .font-weight-semibold {
-  font-weight: var(--font-weight-semibold);
+  font-weight: 600;
+}
+
+// Add the correct font weight in Chrome, Edge, and Safari.
+b,
+strong,
+.font-weight-bold {
+  font-weight: 700;
 }
 
 .font-weight-black {
-  font-weight: var(--font-weight-black);
+  font-weight: 800;
 }
 
 .font-variant-heavy {
@@ -84,34 +77,44 @@ html {
 // Header styling
 // =====
 
+%font-margin {
+  margin-bottom: 2.5rem;
+}
+
 h1 {
   @extend .font-weight-semibold;
   @extend .font-size-17;
+  @extend %font-margin;
 }
 
 h2 {
   @extend .font-weight-semibold;
   @extend .font-size-12;
+  @extend %font-margin;
 }
 
 h3 {
   @extend .font-weight-semibold;
   @extend .font-size-9;
+  @extend %font-margin;
 }
 
 h4 {
   @extend .font-weight-black;
   @extend .font-size-6;
+  @extend %font-margin;
 }
 
 h5 {
   @extend .font-weight-black;
   @extend .font-size-4;
+  @extend %font-margin;
 }
 
 h6 {
   @extend .font-weight-black;
   @extend .font-size-2;
+  @extend %font-margin;
 }
 
 // =====
@@ -122,6 +125,7 @@ p {
   max-width: 36em;
 
   @extend .font-size-2;
+  @extend %font-margin;
 }
 
 input,
@@ -131,6 +135,7 @@ textarea,
 ul,
 ol {
   @extend .font-size-2;
+  @extend %font-margin;
 }
 
 // =====
@@ -138,11 +143,17 @@ ol {
 // =====
 
 code {
-  @extend .font-family-code;
-  @extend .font-size-0;
+  @extend %font-margin;
 
-  font-weight: var(--font-weight-medium);
   overflow: auto;
+
+  // 1. Correct the inheritance and scaling of font size in all browsers.
+  // 2. Correct the odd `em` font sizing in all browsers.
+  pre,
+  & {
+    @extend .font-family-code;
+    @extend .font-size-0;
+  }
 
   @include for-phone-only {
     word-break: break-all;

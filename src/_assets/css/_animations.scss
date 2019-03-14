@@ -2,60 +2,39 @@
 // Animation & transition support as mixins and includes
 // =====
 
-// Constants for animations and transitions
-$quick-animation-duration: 167ms;
-$animation-duration: 334ms;
-$ease-out-back: cubic-bezier(.175, .885, .32, 1.275);
-$scale-down-hover: .96;
-
-// Adds support for adding multiple types of transitions
-@mixin transition-quick($properties...) {
+// Adds support for expanding properties and animation types out to the full string
+@function transition($speed, $properties) {
   $final: ();
 
-  @each $item in $properties {
-    $final: append($final, ($item $quick-animation-duration ease-in-out unquote(',')));
+  @for $i from 1 through length($properties) - 1 {
+    $item: nth($properties, $i);
+    $final: append($final, (#{$item} #{$speed}unquote(',')));
   }
+  $last-item: nth($properties, length($properties));
+  $final: append($final, (#{$last-item} #{$speed}));
 
-  transition: $final;
+  @return $final;
 }
 
-// Adds support for adding multiple types of transitions, with out-back timing function
-@mixin transition-bouncy($properties...) {
-  $final: ();
+// =====
+// Provides data through css var
+// =====
 
-  @each $item in $properties {
-    $final: append($final, ($item $animation-duration $ease-out-back unquote(',')));
-  }
-
-  transition: $final;
+:root {
+  --animate-default: #{transition(334ms cubic-bezier(.175, .885, .32, 1.275), (color, box-shadow, transform, font-weight))};
+  --animate-quick: #{transition(167ms 'ease-in-out', (box-shadow, fill, transform))};
 }
 
-.transition-shadow-transform {
-  @include transition-bouncy(box-shadow, transform);
+.transition-default {
+  transition: var(--animate-default);
 }
 
-.transition-color-shadow-transform {
-  @include transition-bouncy(color, box-shadow, transform);
-}
-
-.transition-color-transform {
-  @include transition-bouncy(color, transform);
-}
-
-.transition-color-transform-font-weight {
-  @include transition-bouncy(color, transform, font-weight);
-}
-
-.transition-fill-transform {
-  @include transition-quick(fill, transform);
-}
-
-.transition-quick-shadow {
-  @include transition-quick(box-shadow);
+.transition-quick {
+  transition: var(--animate-quick);
 }
 
 .scale-down-on-hover {
   &:hover {
-    transform: scale($scale-down-hover);
+    transform: scale(.96);
   }
 }
