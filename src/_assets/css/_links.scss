@@ -18,20 +18,18 @@ p a {
 
   display: inline;
 
-  &:hover,
-  &:focus {
+  &:hover {
     @extend .font-weight-black;
   }
 }
 
 a {
-  @extend .transition-color-transform-font-weight;
+  @extend .transition-default;
 
   display: inline-block;
   text-decoration: underline;
 
-  &:hover,
-  &:focus {
+  &:hover {
     text-decoration: underline;
     transform: translateY(-.3rem);
   }
@@ -48,8 +46,7 @@ a {
 .link-no-decoration {
   @extend %link-underline-hidden;
 
-  &:hover,
-  &:focus {
+  &:hover {
     @extend %link-underline-hidden;
   }
 }
