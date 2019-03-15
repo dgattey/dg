@@ -14,7 +14,8 @@ $spacing: (
   5: 3rem,
   6: 6rem,
   7: 12rem,
-  8: 24rem
+  8: 18rem,
+  9: 24rem
 );
 
 // Provides ability to reference spacing by name, though due
@@ -54,6 +55,14 @@ $spacing: (
 .margin-horizontal-auto {
   margin-left: auto;
   margin-right: auto;
+}
+
+.margin-right-auto {
+  margin-right: auto;
+}
+
+.margin-left-auto {
+  margin-left: auto;
 }
 
 @each $form, $suffix in $form-factors {

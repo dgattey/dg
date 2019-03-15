@@ -13,17 +13,11 @@ thumbnail:
 
 # LinkedIn Groups
 
-{::options parse_block_html="true" /}
-
-<section>
 As an intern at LinkedIn, I helped craft LinkedIn Groups
 2.0 for iOS. Interface "delights" to make Groups smooth and attractive were
 my main focus. From slick transition animators to custom UI components, I
 created UI to be styled & reused inside all of LinkedIn's iOS apps.
-{: .font-size-3 }
-</section>
-
-<section>
+{: .font-size-4 }
 
 ## Transformations
 
@@ -44,10 +38,6 @@ into the corners to hit the buttons. Another favorite: the compose button
 radiates outward when you tap on it to uncover the compose screen hiding
 "underneath" the button.
 
-</section>
-
-<section>
-
 ## Modular Components
 
 My second focus was creating standardized, reusable UI components through
@@ -65,5 +55,3 @@ library, all LinkedIn iOS apps could more easily include it in their code. The
 framework, `LIDelight`, is still used to this day. If you open up the main
 flagship consumer LinkedIn app, most dialogs use a `LIAlertController` rather
 than Apple's.
-
-</section>

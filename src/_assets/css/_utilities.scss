@@ -13,6 +13,16 @@
   }
 }
 
+.centered-content {
+  max-width: 64rem;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.text-align-center {
+  text-align: center;
+}
+
 .fill-parent {
   height: 100%;
   width: 100%;
@@ -28,12 +38,6 @@
 
 .fit-within-parent {
   object-fit: scale-down;
-}
-
-.text-center-phone-only {
-  @include for-phone-only {
-    text-align: center;
-  }
 }
 
 // This is useful when there's an element that is nested

@@ -1,14 +1,9 @@
 ---
 layout: default
 ---
-<article class="margin-horizontal-5 margin-horizontal-6-desktop margin-top-7" itemscope itemtype="http://schema.org/BlogPosting" role="main">
-  <header>
-		<h1 class="title" itemprop="name headline">{{ page.title }}</h1>
-		<h5 class="description" itemprop="description">{{ page.description }}</h5>
-	</header>
-
-	<div itemprop="articleBody">
+<article class="margin-horizontal-5 margin-horizontal-6-desktop margin-top-7 margin-top-8-tablet" itemscope itemtype="http://schema.org/BlogPosting" role="main">
+  {% include page-header.html %}
+	<div class="centered-content" itemprop="articleBody">
 		{{ content }}
 	</div>
-
 </article>

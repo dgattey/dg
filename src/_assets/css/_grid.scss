@@ -43,6 +43,12 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
   }
 }
 
+.grid-span-col-9-tablet {
+  @include for-tablet-up {
+    grid-column: 1 / 9;
+  }
+}
+
 .grid-span-col-offset {
   grid-column-start: 2;
 }
@@ -50,6 +56,12 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
 .grid-span-col-start-8-tablet {
   @include for-tablet-up {
     grid-column-start: 8;
+  }
+}
+
+.grid-span-col-start-9-tablet {
+  @include for-tablet-up {
+    grid-column-start: 9;
   }
 }
 
@@ -61,28 +73,6 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
   @include for-tablet-up {
     grid-row-end: span 2;
   }
-}
-
-.grid-align-center {
-  align-items: center;
-}
-
-.grid-item-align-right {
-  justify-self: end;
-}
-
-.grid-item-align-right-tablet {
-  @include for-tablet-up {
-    justify-self: end;
-  }
-}
-
-.grid-item-align-bottom {
-  align-self: end;
-}
-
-.grid-item-align-center {
-  align-self: center;
 }
 
 // Grid gaps

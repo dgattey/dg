@@ -186,6 +186,16 @@ $colors: (
   background-color: var(--c-glass);
 }
 
+.background-primary {
+  background-color: var(--c-primary);
+}
+
+.background-secondary {
+  &:hover {
+    background-color: var(--c-secondary);
+  }
+}
+
 // =====
 // Color classes
 // =====

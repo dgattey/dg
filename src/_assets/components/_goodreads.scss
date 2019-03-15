@@ -4,6 +4,7 @@
 
 .gr_grid_container {
   @extend .flex;
+  @extend .flex-center-phone-only;
 }
 
 .gr_grid_book_container {

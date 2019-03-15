@@ -6,4 +6,8 @@
   .corners-#{$name} {
     border-radius: $value;
   }
+
+  .border-#{$name} {
+    border: $value;
+  }
 }
