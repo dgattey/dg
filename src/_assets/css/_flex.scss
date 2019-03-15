@@ -5,7 +5,9 @@
 .flex {
   display: flex;
   flex-wrap: wrap;
+}
 
+.flex-center-phone-only {
   @include for-phone-only {
     justify-content: center;
   }

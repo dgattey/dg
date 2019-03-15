@@ -1,28 +1,37 @@
 ---
 layout: page
-nav_title: About
 title: About Me
-weight: 1
+nav_title: About
+weight: 2
 ---
 {% capture about_me %}{% include about_me.md %}{% endcapture %}
-{% capture skills %}{% include skills.md %}{% endcapture %}
-{% capture reading_list %}{% include reading-list.md %}{% endcapture %}
-<div itemprop="text" class="grid grid-columns-standard grid-column-gap-4">
-  <section class="grid-span-col-full grid-span-col-8-tablet">
-    {{ about_me | markdownify }}
-  </section>
-  <section class="grid-span-col-full grid-span-col-start-8-tablet">
-    {% include picture.html src="me-circular" filetype="png" alt="Photo of Dylan Gattey" class="fill-parent-width cover-parent" %}
-  </section>
-  <section class="grid-span-col-full">
-    {% include socials.html %}
-  </section>
-  <section class="grid-span-col-full grid-span-col-8-tablet padding-right-5">
-    {{ reading_list | markdownify }}
-    {% include goodreads.html %}
-  </section>
-  <section class="grid-span-col-full grid-span-col-start-8-tablet">
-    {{ skills | markdownify }}
-  </section>
+{% capture technologies %}{% include technologies.md %}{% endcapture %}
+{% capture reading %}{% include reading.md %}{% endcapture %}
+{% capture offline %}{% include offline.md %}{% endcapture %}
+<div itemprop="text">
+  <div class="grid grid-columns-standard grid-column-gap-4">
+    <section class="grid-span-col-full grid-span-col-8-tablet">
+      {{ about_me | markdownify }}
+    </section>
+    <section class="grid-span-col-full grid-span-col-start-8-tablet">
+      {% include picture.html src="me-circular" filetype="png" alt="Photo of Dylan Gattey" class="fill-parent-width cover-parent" %}
+    </section>
+  </div>
+
+  <div class="centered-content">
+    <section class="margin-bottom-5 margin-bottom-6-tablet">
+      {{ technologies | markdownify }}
+    </section>
+    <section class="margin-bottom-5 margin-bottom-6-tablet">
+      {{ reading | markdownify }}
+      {% include goodreads.html %}
+    </section>
+    <section class="margin-bottom-5 margin-bottom-6-tablet">
+      {% include online.html %}
+    </section>
+    <section class="margin-bottom-5 margin-bottom-6-tablet">
+      {{ offline | markdownify }}
+    </section>
+  </div>
   
 </div>
