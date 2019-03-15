@@ -1,7 +1,13 @@
-<h2 class="margin-bottom-4 margin-bottom-6-tablet">Projects</h2>
+---
+layout: page
+title: Projects
+nav_title: Projects
+weight: 1
+---
+<h1 class="margin-bottom-4 margin-bottom-6-tablet">Projects</h1>
 <section class="grid grid-gap-5 grid-columns-2-tablet grid-gap-6-tablet">
   <p class="font-size-4">Here are a few big things I've worked on recently. <a href="https://github.com/dgattey">Check out my Github</a> for even more.</p>
-	{% for post in site.posts %}
+  {% for post in site.posts %}
     {% include project-card.html %}
-	{% endfor %}
+  {% endfor %}
 </section>
