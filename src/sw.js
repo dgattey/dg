@@ -17,7 +17,7 @@ const staticCacheName = "static",
 workbox.core.setCacheNameDetails({
   precache: "pre",
   prefix: "dg",
-  suffix: "v1"
+  suffix: "v2"
 });
 workbox.skipWaiting();
 workbox.clientsClaim();

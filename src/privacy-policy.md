@@ -1,10 +1,9 @@
 ---
 layout: page
 title: Privacy Policy
+centered: true
 permalink: /privacy-policy/
 ---
-# Privacy Policy
-
 **Effective date:** March 1, 2019
 
 {{ site.title }} ("us", "we", or "our") operates the <{{ site.url }}> website
