@@ -8,21 +8,22 @@
 // Imports my normalize css (based on normalize.css)
 @import 'normalize';
 
-// Base utility CSS
-@import 'animations';
+// Base utility CSS (must be imported before the rest)
 @import 'breakpoints';
 @import 'colors';
-@import 'depth';
 @import 'font-levels';
 @import 'fonts';
-@import 'lists';
 @import 'spacing';
-@import 'links';
 
 // Utility CSS
+@import 'animations';
+@import 'alignment';
 @import 'borders';
+@import 'depth';
 @import 'flex';
 @import 'grid';
+@import 'links';
+@import 'lists';
 @import 'shadows';
 @import 'syntax';
 @import 'utilities';
@@ -32,6 +33,8 @@
 
 // Components - index.html
 @import 'intro';
+
+// Components - projects.html
 @import 'project-card';
 
 // Components - about.html
