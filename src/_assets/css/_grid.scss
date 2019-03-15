@@ -43,6 +43,12 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
   }
 }
 
+.grid-span-col-9-tablet {
+  @include for-tablet-up {
+    grid-column: 1 / 9;
+  }
+}
+
 .grid-span-col-offset {
   grid-column-start: 2;
 }
@@ -50,6 +56,12 @@ $grid-columns-double-standard: 2 * ($grid-columns-standard - 1);
 .grid-span-col-start-8-tablet {
   @include for-tablet-up {
     grid-column-start: 8;
+  }
+}
+
+.grid-span-col-start-9-tablet {
+  @include for-tablet-up {
+    grid-column-start: 9;
   }
 }
 
