@@ -56,6 +56,14 @@ $spacing: (
   margin-right: auto;
 }
 
+.margin-right-auto {
+  margin-right: auto;
+}
+
+.margin-left-auto {
+  margin-left: auto;
+}
+
 @each $form, $suffix in $form-factors {
   @include breakpoint($form) {
     @each $name, $value in $spacing {
