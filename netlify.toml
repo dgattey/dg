@@ -20,13 +20,6 @@
 	status = 404
 	force = false
 
-# Redirects main project link to index
-[[redirects]]
-	from = "https://dylangattey.com/projects/"
-	to = "https://dylangattey.com/"
-	status = 301
-	force = true
-
 # Redirects all projects to 404 page for now
 [[redirects]]
 	from = "https://dylangattey.com/projects/connected-car-citizen/"
