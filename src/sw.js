@@ -8,7 +8,7 @@
  * - Skip waiting and claim clients so we take over from any old workers
  * - Also make sure that if we are an old worker, we force reload the page to get freshest stuff
  */
-const version = "v1.18.3",
+const version = "v1.18.4",
   cachePrefix = "dg",
   staticCacheName = cachePrefix + "-static-" + version,
   vendorCacheName = cachePrefix + "-vendor-" + version,
@@ -74,6 +74,16 @@ const vendorRouteConfiguration = function(hours) {
   };
 };
 
+const imageCacheStrategy = workbox.strategies.cacheFirst({
+  cacheName: imageCacheName,
+  plugins: [
+    new workbox.expiration.Plugin({
+      maxEntries: 60,
+      maxAgeSeconds: 60 * 60 * 24 * 30
+    })
+  ]
+});
+
 workbox.routing.registerRoute(
   /.*report-uri\.com/,
   workbox.strategies.networkOnly()
@@ -91,19 +101,19 @@ workbox.routing.registerRoute(
   workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
-  /^https?:\/\/*google*\.com/,
+  /.*google*\..*/,
   workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
-  /^https?:\/\/.*.typekit\.net\/p\.gif/,
+  /.*\.typekit\.net\/p\.gif/,
   workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
-  /^https?:\/\/.*.typekit\.net\/af/,
+  /.*\.typekit\.net\/af/,
   workbox.strategies.cacheFirst(vendorRouteConfiguration(24 * 120))
 );
 workbox.routing.registerRoute(
-  /^https?:\/\/.*.typekit\.net/,
+  /.*\.typekit\.net/,
   workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
@@ -118,16 +128,12 @@ workbox.routing.registerRoute(
   })
 );
 workbox.routing.registerRoute(
+  /.*\.cloudfront\.net\/.*\.(?:png|gif|jpg|jpeg|svg|webp|ico)/,
+  imageCacheStrategy
+);
+workbox.routing.registerRoute(
   /\.(?:png|gif|jpg|jpeg|svg|webp|ico)$/,
-  workbox.strategies.cacheFirst({
-    cacheName: imageCacheName,
-    plugins: [
-      new workbox.expiration.Plugin({
-        maxEntries: 60,
-        maxAgeSeconds: 60 * 60 * 24 * 30
-      })
-    ]
-  })
+  imageCacheStrategy
 );
 
 /**
