@@ -4,18 +4,6 @@
 
 :root {
   --fs-base: 10px;
-
-  // For when fonts are un-loaded
-  letter-spacing: -.002em;
-  word-spacing: -.02em;
-
-  // For when fonts have loaded
-
-  .wf-active,
-  .wf-inactive {
-    letter-spacing: 0;
-    word-spacing: 0;
-  }
 }
 
 // =====

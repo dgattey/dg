@@ -5,6 +5,9 @@
 @charset "UTF-8";
 // sass-lint:enable quotes
 
+// Kicks off font file rendering
+@import 'font-includes';
+
 // Imports my normalize css (based on normalize.css)
 @import 'normalize';
 
