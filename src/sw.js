@@ -128,11 +128,7 @@ workbox.routing.registerRoute(
   })
 );
 workbox.routing.registerRoute(
-  /.*\.cloudfront\.net\/.*\.(?:png|gif|jpg|jpeg|svg|webp|ico)/,
-  imageCacheStrategy
-);
-workbox.routing.registerRoute(
-  /\.(?:png|gif|jpg|jpeg|svg|webp|ico)$/,
+  /.*\.(?:png|gif|jpg|jpeg|svg|webp|ico)/,
   imageCacheStrategy
 );
 
