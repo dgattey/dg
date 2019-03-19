@@ -9,6 +9,7 @@ $breakpoint-max-width: 1200px;
 
 $form-factors: (
   phone: '',
+  phone-only: '-phone-only',
   tablet: '-tablet',
   tablet-down: '-tablet-down',
   desktop: '-desktop'
@@ -16,7 +17,15 @@ $form-factors: (
 
 @mixin breakpoint($form) {
   @if $form == 'phone' {
-    @content;
+    @include for-phone-up {
+      @content;
+    }
+  }
+
+  @else if $form == 'phone-only' {
+    @include for-phone-only {
+      @content;
+    }
   }
 
   @else if $form == 'tablet' {
