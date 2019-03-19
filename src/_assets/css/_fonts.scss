@@ -33,6 +33,10 @@ html {
   font-weight: 500;
 }
 
+.font-family-serif {
+  font-family: carrara, serif;
+}
+
 // =====
 // Weights
 // =====
@@ -65,8 +69,8 @@ strong,
 }
 
 h1 {
-  @extend .font-weight-semibold;
-  @extend .font-size-17;
+  @extend .font-family-serif;
+  @extend .font-size-19;
   @extend %font-margin;
 }
 
