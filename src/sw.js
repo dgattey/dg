@@ -8,16 +8,18 @@
  * - Skip waiting and claim clients so we take over from any old workers
  * - Also make sure that if we are an old worker, we force reload the page to get freshest stuff
  */
-const staticCacheName = "static",
-  vendorCacheName = "vendor-static",
-  imageCacheName = "images",
+const version = "v1.18.3",
+  cachePrefix = "dg",
+  staticCacheName = cachePrefix + "-static-" + version,
+  vendorCacheName = cachePrefix + "-vendor-" + version,
+  imageCacheName = cachePrefix + "-images-" + version,
   offlinePage = "/503.html",
   genericErrorPage = "/500.html";
 
 workbox.core.setCacheNameDetails({
   precache: "pre",
-  prefix: "dg",
-  suffix: "v2"
+  prefix: cachePrefix,
+  suffix: version
 });
 workbox.skipWaiting();
 workbox.clientsClaim();
@@ -151,7 +153,7 @@ const offlinePageForURL = async(pageURL) => {
 /**
  * Takes an existing response and replaces some error content. Specifically:
  * - Replaces "<error>"" or "</error>" with the actual status code
- * - Replaces "? page" with the actual pageURL
+ * - Replaces "unknown page" with the actual pageURL
  *
  * Note that the status code falls back to the response's status if not defined.
  */
@@ -171,7 +173,7 @@ function responseWithReplacedErrorContent(existingResponse, pageURL, status) {
     const left = "&lt;";
     const right = status + "&gt;";
 
-    var newContent = body.replace(/\? page/, pageURL);
+    var newContent = body.replace(/\unknown page/, pageURL);
     newContent = newContent.replace(/&lt;error&gt;/, left + right);
     newContent = newContent.replace(/&lt;\/error&gt;/, left + "/" + right);
 
