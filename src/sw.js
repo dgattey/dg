@@ -8,10 +8,10 @@
  * - Skip waiting and claim clients so we take over from any old workers
  * - Also make sure that if we are an old worker, we force reload the page to get freshest stuff
  */
-const version = "v1.18.5",
+const version = "v1.19.0",
   cachePrefix = "dg",
   staticCacheName = cachePrefix + "-static-" + version,
-  vendorCacheName = cachePrefix + "-vendor-" + version,
+  fontCacheName = cachePrefix + "-font-" + version,
   imageCacheName = cachePrefix + "-images-" + version,
   offlinePage = "/503.html",
   genericErrorPage = "/500.html";
@@ -52,17 +52,15 @@ workbox.precaching.precacheAndRoute([]);
  * Routing for different filetypes & endpoints
  * - Force all ReportURI to network only
  * - Force all goodreads, google analytics calls to network only
- * - Force all p.gif calls (Adobe's check to see if you can use the font) to
- *   network only. If this is cached, the cache grows and grows
- * - Cache the actual font files (use.typekit.net/af) for 120 days
- * - Force all fonts stylesheets/js to network only for opaque caching probs
+ * - Cache the actual font files for 120 days
+ * - Force all fonts count callbacks to network only for opaque caching probs
  * - Cache js, css, and json for six hours
  * - Cache up to 60 images for 30 days
  */
 
-const vendorRouteConfiguration = function(hours) {
+const fontRouteConfiguration = function(hours) {
   return {
-    cacheName: vendorCacheName,
+    cacheName: fontCacheName,
     plugins: [
       new workbox.cacheableResponse.Plugin({
         statuses: [0, 200]
@@ -95,15 +93,11 @@ workbox.routing.registerRoute(
   workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(
-  /.*\.typekit\.net\/p\.gif/,
-  workbox.strategies.networkOnly()
+  /.*\.(?:woff|woff2)$/,
+  workbox.strategies.cacheFirst(fontRouteConfiguration(24 * 120))
 );
 workbox.routing.registerRoute(
-  /.*\.typekit\.net\/af/,
-  workbox.strategies.cacheFirst(vendorRouteConfiguration(24 * 120))
-);
-workbox.routing.registerRoute(
-  /.*\.typekit\.net/,
+  /.*\.myfonts\.net/,
   workbox.strategies.networkOnly()
 );
 workbox.routing.registerRoute(

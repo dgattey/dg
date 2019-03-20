@@ -16,10 +16,6 @@ social:
     - https://www.linkedin.com/in/dgattey
     - https://github.com/dgattey
 
-# Fonts - if changing this, change the SCSS variables too!!
-font_url: https://use.typekit.net/ytv4uxf.css
-use_font_loader: true # whether or not to use async JS to load font
-
 # Breakpoints - if changing these, change the SCSS variables too!!
 breakpoint_min_tablet: 600px
 breakpoint_min_desktop: 900px
@@ -30,10 +26,9 @@ permalink: /projects/:title/ #posts
 baseurl: ""
 google_site_verification: U6mU3aPeTRaCoewYQype946HD1HrM9vY96GoEHKCAnc
 preconnect:
-  - https://use.typekit.net
-  - https://p.typekit.net
   - https://www.google-analytics.com
   - https://d33wubrfki0l68.cloudfront.net
+  - https://hello.myfonts.net
 
 # Manifest
 lang: en

@@ -153,7 +153,7 @@ reflected in our version tags on particular commits and are as follows.
   cherry on top! Polish, security, optimizations are all finished and site is
   done.
 
-- [ ] [3.0](https://github.com/dgattey/dg/milestone/4): future
+- [ ] [Future](https://github.com/dgattey/dg/milestone/4): future
   work, tracking aspirations and ideas.
 
 ### Semver Tagging
@@ -188,8 +188,6 @@ actually be up to date :tada:.
 
 - Google Search Console: uploaded a `google*.html` file to the root, plus
   fallback through the SEO plugin + a value in `_config.yml`
-
-- Adobe Fonts (née Typekit)
 
 - Sitemap: through a plugin, excluding the `google*.html` file via blob
   in the config

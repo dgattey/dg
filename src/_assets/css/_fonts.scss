@@ -4,18 +4,6 @@
 
 :root {
   --fs-base: 10px;
-
-  // For when fonts are un-loaded
-  letter-spacing: -.002em;
-  word-spacing: -.02em;
-
-  // For when fonts have loaded
-
-  .wf-active,
-  .wf-inactive {
-    letter-spacing: 0;
-    word-spacing: 0;
-  }
 }
 
 // =====
@@ -43,6 +31,10 @@ html {
 .font-family-code {
   font-family: roboto-mono, Monaco, monospace;
   font-weight: 500;
+}
+
+.font-family-serif {
+  font-family: carrara, serif;
 }
 
 // =====
@@ -77,8 +69,8 @@ strong,
 }
 
 h1 {
-  @extend .font-weight-semibold;
-  @extend .font-size-17;
+  @extend .font-family-serif;
+  @extend .font-size-19;
   @extend %font-margin;
 }
 
