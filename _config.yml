@@ -28,6 +28,7 @@ google_site_verification: U6mU3aPeTRaCoewYQype946HD1HrM9vY96GoEHKCAnc
 preconnect:
   - https://www.google-analytics.com
   - https://d33wubrfki0l68.cloudfront.net
+  - https://hello.myfonts.net
 
 # Manifest
 lang: en
