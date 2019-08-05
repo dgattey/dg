@@ -1,6 +1,6 @@
 base-uri: "'self' BASE_URI"
 block-all-mixed-content:
-report-uri: "https://dgattey.report-uri.com/r/d/csp/wizard"
+report-uri: "https://dgattey.report-uri.com/r/d/csp/enforce"
 connect-src: "ADDITIONAL_CSP_PLACEHOLDER stats.g.doubleclick.net *.cloudfront.net *.myfonts.net *.netlify.com images.gr-assets.com www.goodreads.com"
 default-src: "ADDITIONAL_CSP_PLACEHOLDER 'self' *.cloudfront.net *.myfonts.net *.google-analytics.com www.google-analytics.com dgattey.report-uri.com stats.g.doubleclick.net images.gr-assets.com www.goodreads.com"
 img-src: "'self' ADDITIONAL_CSP_PLACEHOLDER *.cloudfront.net *.google-analytics.com *.google.com/ads/ stats.g.doubleclick.net *.myfonts.net images.gr-assets.com www.google.co.id www.google.co.uk  www.google.de *.netlify.com"
