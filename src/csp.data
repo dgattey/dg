@@ -3,7 +3,7 @@ block-all-mixed-content:
 report-uri: "https://dgattey.report-uri.com/r/d/csp/enforce"
 connect-src: "ADDITIONAL_CSP_PLACEHOLDER stats.g.doubleclick.net *.cloudfront.net *.myfonts.net *.netlify.com images.gr-assets.com www.goodreads.com"
 default-src: "ADDITIONAL_CSP_PLACEHOLDER 'self' *.cloudfront.net *.myfonts.net *.google-analytics.com www.google-analytics.com dgattey.report-uri.com stats.g.doubleclick.net images.gr-assets.com www.goodreads.com"
-img-src: "'self' ADDITIONAL_CSP_PLACEHOLDER *.cloudfront.net *.google-analytics.com *.google.com/ads/ stats.g.doubleclick.net *.myfonts.net images.gr-assets.com www.google.co.id www.google.co.uk  www.google.de *.netlify.com"
+img-src: "'self' ADDITIONAL_CSP_PLACEHOLDER *.cloudfront.net *.google-analytics.com *.google.com/ads/ stats.g.doubleclick.net *.myfonts.net images.gr-assets.com i.gr-assets.com www.google.co.id www.google.co.uk  www.google.de *.netlify.com"
 script-src: "'self' 'sha256-IeR2OXZWuGbl2CWLtvH1EZL4ug0bSuPMj5WvORTbM8c=' 'sha256-kmg53udAL4KP0oP42q1eLLza9Jy7/ypSVE2zgVWXadw=' *.googleapis.com/workbox-cdn/ ADDITIONAL_CSP_PLACEHOLDER *.cloudfront.net *.myfonts.net *.google-analytics.com *.myfonts.net www.goodreads.com *.netlify.com ajax.cloudflare.com static.cloudflareinsights.com"
 style-src: "'self' ADDITIONAL_CSP_PLACEHOLDER *.cloudfront.net *.myfonts.net 'sha256-o/UwLpJH8ww4lxwvvMJOHb7M1Eb6gJMn7S0CCC+BkZI=' 'sha256-qJmV17zXuR1eOgR1VgViTjNwFln11ucF/J6wyOqJLo4=' 'sha256-0JrRzb56/yE78NRCJQwckVUofGRtFC1s1Wu4Wtw5rXo='"
 font-src: "'self' ADDITIONAL_CSP_PLACEHOLDER *.cloudfront.net *.myfonts.net"
