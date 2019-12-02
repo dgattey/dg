@@ -1,4 +1,4 @@
-I'm Dylan Gattey, a full-stack engineer who calls San Francisco home. I develop,
+I'm Dylan Gattey, a frontend/iOS engineer who calls San Francisco home. I develop,
 design, teach, learn, and experiment.
 {: .font-size-6 }
 
