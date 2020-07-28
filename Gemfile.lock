@@ -80,7 +80,7 @@ GEM
       listen (~> 3.0)
     jekyll-workbox-plugin (0.0.2)
     jekyll_version_plugin (2.0.0)
-    json (2.2.0)
+    json (2.3.1)
     json-minify (0.0.3)
       json (> 0)
     kramdown (1.17.0)
