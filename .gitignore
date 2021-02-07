@@ -1,14 +1,2 @@
-# Caches
-.sass-cache
-.jekyll-cache
-.purgecss
-.tmp
-
 # Temporary files
 *.swp
-
-# Build directories
-_site
-
-# Instance specific files
-dg.sublime-workspace
