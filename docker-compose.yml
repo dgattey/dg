@@ -1,7 +1,4 @@
-version: '3.8'
-
-volumes:
-  node_modules:
+version: '3'
 
 services:
   web:
@@ -11,12 +8,13 @@ services:
       dockerfile: dockerfile.dev
     ports:
       - '8000:8000'
+      # These are for VSCode debug ports
+      - '9929:9929'
+      - '9230:9230'
     user: 'node'
-    working_dir: /home/node/app
     environment:
       - NODE_ENV=development
       - GATSBY_WEBPACK_PUBLICPATH=/
     volumes:
-      - ./:/home/node/app
-      - node_modules:/home/node/app/node_modules
-    command: 'yarn build'
+      - ./src:/home/node/app/src
+      - /home/node/app/node_modules

@@ -1,15 +1,22 @@
-FROM node:15.8
+FROM node:15-slim
 
-RUN apk add --no-cache --virtual .gyp python make g++
-
+# Gotta be global so we can run yarn commands that reference it
 RUN yarn global add gatsby-cli
 
-EXPOSE 8000
+# Also exposing VSCode debug ports in addition to Gatsby's
+EXPOSE 8000 9929 9230
 
+# Make sure our path has the app path in it
 WORKDIR /home/node/app
 ENV PATH /home/node/app/node_modules/.bin:$PATH
 
-COPY package.json yarn.lock /home/node/app
-RUN yarn install && yarn cache clean
+# Copy dependencies, install, and then copy rest
+COPY package.json yarn.lock /home/node/app/
+RUN yarn && yarn cache clean
+COPY gatsby-config.js /home/node/app/
+COPY src /home/node/app/src
 
-CMD ["yarn", "serve"]
+# Set up perms correctly, as we aren't copying whole folder
+RUN chown node /home/node/app/
+
+CMD ["yarn", "develop"]
