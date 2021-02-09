@@ -1,0 +1,22 @@
+version: '3.8'
+
+volumes:
+  node_modules:
+
+services:
+  web:
+    container_name: web
+    build:
+      context: .
+      dockerfile: dockerfile.dev
+    ports:
+      - '8000:8000'
+    user: 'node'
+    working_dir: /home/node/app
+    environment:
+      - NODE_ENV=development
+      - GATSBY_WEBPACK_PUBLICPATH=/
+    volumes:
+      - ./:/home/node/app
+      - node_modules:/home/node/app/node_modules
+    command: 'yarn build'

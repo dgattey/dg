@@ -1,0 +1,14 @@
+{
+  "name": "dg",
+  "version": "2.0.0-alpha",
+  "description": "Dylan Gattey's public website, implemented in Gatsby",
+  "main": "index.js",
+  "repository": "https://github.com/dgattey/dg.git",
+  "homepage": "https://github.com/dgattey/dg#readme",
+  "author": "Dylan Gattey <hi@dylangattey.com>",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "serve": "gatsby develop -H 0.0.0.0"
+  }
+}
