@@ -3,20 +3,15 @@ FROM node:15-slim
 # Gotta be global so we can run yarn commands that reference it
 RUN yarn global add gatsby-cli
 
-# Also exposing VSCode debug ports in addition to Gatsby's
-EXPOSE 8000 9929 9230
-
-# Make sure our path has the app path in it
+# Set up perms correctly, as we aren't copying whole folder
 WORKDIR /home/node/app
-ENV PATH /home/node/app/node_modules/.bin:$PATH
+RUN chown -R node /home/node/app/
 
-# Copy dependencies, install, and then copy rest
+# Copy dependencies, install using yarn 2, and then copy rest
 COPY package.json yarn.lock /home/node/app/
-RUN yarn && yarn cache clean
+RUN yarn set version berry && yarn install
 COPY gatsby-config.js /home/node/app/
 COPY src /home/node/app/src
 
-# Set up perms correctly, as we aren't copying whole folder
-RUN chown node /home/node/app/
-
-CMD ["yarn", "develop"]
+# Fixes permissions from the yarn install
+RUN chown -R node /home/node/app/
