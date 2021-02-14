@@ -1,6 +1,6 @@
 {
   "name": "dg",
-  "version": "2.0.0-alpha",
+  "version": "0.0.0-development",
   "description": "Dylan Gattey's public website, implemented in Gatsby",
   "main": "index.js",
   "repository": "https://github.com/dgattey/dg.git",
@@ -24,16 +24,37 @@
     "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {
+    "@semantic-release/changelog": "^5.0.1",
+    "@semantic-release/git": "^9.0.0",
     "gatsby-cli": "^2.19.1",
-    "prettier": "2.2.1"
+    "prettier": "2.2.1",
+    "semantic-release": "^17.3.9"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ],
+    "plugins": [
+      [
+        "@semantic-release/github",
+        {
+          "assets": [
+            "public/**"
+          ]
+        }
+      ],
+      "@semantic-release/git",
+      "@semantic-release/changelog"
+    ]
   },
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop -H 0.0.0.0",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\" \"*.{js,jsx,ts,tsx,json,md}\" \"!node_modules/**/*\" \"!public/**/*\" \"!.cache/**/*\" \"!jekyll-archive/**/*\"",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,yml}\" \"*.{js,jsx,ts,tsx,json,md,yml}\" \"!node_modules/**/*\" \"!public/**/*\" \"!.cache/**/*\" \"!jekyll-archive/**/*\"",
     "start": "yarn run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1"
+    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
+    "semantic-release": "semantic-release"
   }
 }
