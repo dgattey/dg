@@ -24,12 +24,13 @@
     "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {
+    "gatsby-cli": "^2.19.1",
     "prettier": "2.2.1"
   },
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop -H 0.0.0.0",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\"",
+    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md}\" \"*.{js,jsx,ts,tsx,json,md}\" \"!node_modules/**/*\" \"!public/**/*\" \"!.cache/**/*\" \"!jekyll-archive/**/*\"",
     "start": "yarn run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
