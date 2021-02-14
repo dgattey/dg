@@ -13,17 +13,17 @@ with the project.
    request, based off one of the existing templates if possible.
 
 1. Update the README.md with details of changes to the interface, this includes
-   new gems, integrations, details about the process, variables, and useful
-   file locations.
+   new gems, integrations, details about the process, variables, and useful file
+   locations.
 
 1. Reference an issue if applicable (and most PRs should reference one).
 
-1. Add the appropriate labels, milestones, and projects as necessary. Assign
-   to Dylan Gattey.
+1. Add the appropriate labels, milestones, and projects as necessary. Assign to
+   Dylan Gattey.
 
 1. You may merge the Pull Request in once you have the sign-off of a developer,
-   or  if you do not have permission to do that, you may request the reviewer
-   to merge it for you.
+   or if you do not have permission to do that, you may request the reviewer to
+   merge it for you.
 
 ## Code of Conduct
 

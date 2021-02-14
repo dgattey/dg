@@ -1,10 +1,5 @@
-version: "2"
+version: '2'
 plugins:
-  bundler-audit:
-    enabled: true
-  eslint:
-    enabled: true
-    channel: "eslint-5"
   fixme:
     enabled: true
   git-legal:
@@ -19,14 +14,8 @@ plugins:
         enabled: false # Disables inline html for use in projects
       MD002:
         enabled: false # Disables h1 missing check cause projects
-  reek:
-    enabled: true
-  rubocop:
-    enabled: true
-  stylelint:
-    enabled: true
   shellcheck:
     enabled: true
 exclude_patterns:
-  - ".github"
-  - ".tmp"
+  - '.github'
+  - '.tmp'
