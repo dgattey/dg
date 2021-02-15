@@ -35,14 +35,7 @@
       "main"
     ],
     "plugins": [
-      [
-        "@semantic-release/github",
-        {
-          "assets": [
-            "public/**"
-          ]
-        }
-      ],
+      "@semantic-release/github",
       "@semantic-release/git",
       "@semantic-release/changelog"
     ]
