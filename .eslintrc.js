@@ -28,14 +28,5 @@ module.exports = {
     'react/prop-types': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
   },
-  overrides: [
-    // Override some TypeScript rules just for .js files
-    {
-      files: ['*.js'],
-      rules: {
-        '@typescript-eslint/no-var-requires': 'off',
-      },
-    },
-  ],
   reportUnusedDisableDirectives: true,
 }

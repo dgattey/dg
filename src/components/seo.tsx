@@ -29,7 +29,7 @@ function SEO({ description, lang, meta, title }: SeoPropTypes) {
           }
         }
       }
-    `
+    `,
   )
 
   const metaDescription = description || site.siteMetadata.description

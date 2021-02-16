@@ -201,14 +201,11 @@ actually be up to date :tada:.
 - Linting: through a **bunch** of Github integrations
 
 [autotag]: https://gist.github.com/dgattey/ed969ae192d1335e1e04924b7721d5f5
-[nlfy-img]:
-  https://api.netlify.com/api/v1/badges/45e36541-7c61-4931-bd4e-3a654b199044/deploy-status
+[nlfy-img]: https://api.netlify.com/api/v1/badges/45e36541-7c61-4931-bd4e-3a654b199044/deploy-status
 [nlfy]: https://app.netlify.com/sites/dgattey/deploys
-[cc-img]:
-  https://api.codeclimate.com/v1/badges/333adb209e1ac3086303/maintainability
+[cc-img]: https://api.codeclimate.com/v1/badges/333adb209e1ac3086303/maintainability
 [cc]: https://codeclimate.com/github/dgattey/dg/maintainability
 [fcr-img]: https://www.codefactor.io/repository/github/dgattey/dg/badge
 [fcr]: https://www.codefactor.io/repository/github/dgattey/dg
-[deep-img]:
-  https://deepscan.io/api/teams/2858/projects/4266/branches/34746/badge/grade.svg
+[deep-img]: https://deepscan.io/api/teams/2858/projects/4266/branches/34746/badge/grade.svg
 [deep]: https://deepscan.io/dashboard#view=project&tid=2858&pid=4266&bid=34746
