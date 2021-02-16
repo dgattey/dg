@@ -5,7 +5,7 @@ interface HeaderProps {
   siteTitle: string
 }
 
-const Header = ({ siteTitle }: HeaderProps) => (
+const Header: React.FC<HeaderProps> = ({ siteTitle }) => (
   <header
     style={{
       background: `rebeccapurple`,

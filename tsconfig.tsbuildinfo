@@ -1062,8 +1062,8 @@
         "affectsGlobalScope": false
       },
       "./src/components/header.tsx": {
-        "version": "0eac2d6bf2e4c88a26bea3968d49a1693ad5131fadeafe510926a8db8b930045",
-        "signature": "9040e75a90dedea371754c1e97c82a5bd3949eab89bf258e80290d371e08e9ae",
+        "version": "0d94c32bce43dbad6029e28f13fd0e4b889481a832c5c8d5f42dd22d9c86ea4d",
+        "signature": "97d6cadc96cd0e62b2326a4bbfc3384d404a425581c4cf5fe8391450536545dc",
         "affectsGlobalScope": false
       },
       "./node_modules/gatsby-image/index.d.ts": {
@@ -1072,8 +1072,8 @@
         "affectsGlobalScope": false
       },
       "./src/components/image.tsx": {
-        "version": "795b7b23418821eeead389020ffb7ce8f15e89ad934daa202ee92d5b2ce5e502",
-        "signature": "7090b7e54c654677029476ca3989da6c559a458c924666ddae8a79d593fe9953",
+        "version": "41c965e4ec5d53e339bd3afa7dbee65a22621b1b5cb80cfce5397628898482ea",
+        "signature": "473171e7ada04ff3d353fff0ac56aab40590dc57484897b48e6deb54d0b083d4",
         "affectsGlobalScope": false
       },
       "./src/components/layout.tsx": {
@@ -1604,6 +1604,10 @@
       "strictPropertyInitialization": true,
       "noImplicitThis": true,
       "alwaysStrict": true,
+      "noUnusedParameters": true,
+      "noImplicitReturns": true,
+      "noFallthroughCasesInSwitch": true,
+      "noUncheckedIndexedAccess": true,
       "skipLibCheck": true,
       "forceConsistentCasingInFileNames": true,
       "configFilePath": "./tsconfig.json"
@@ -4251,6 +4255,12 @@
       ],
       "./node_modules/redux/index.d.ts": [
         "./node_modules/symbol-observable/index.d.ts"
+      ],
+      "./src/components/header.tsx": [
+        "./node_modules/@types/react/index.d.ts"
+      ],
+      "./src/components/image.tsx": [
+        "./node_modules/@types/react/index.d.ts"
       ],
       "./src/components/layout.tsx": [
         "./node_modules/@types/prop-types/index.d.ts",

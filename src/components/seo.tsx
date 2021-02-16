@@ -5,8 +5,7 @@
  * See: https://www.gatsbyjs.com/docs/use-static-query/
  */
 
-import React from 'react'
-import PropTypes from 'prop-types'
+import React, { ReactElement } from 'react'
 import { Helmet } from 'react-helmet'
 import { useStaticQuery, graphql } from 'gatsby'
 
@@ -17,7 +16,12 @@ interface SeoPropTypes {
   title: string
 }
 
-function SEO({ description, lang, meta, title }: SeoPropTypes) {
+function SEO({
+  description,
+  lang,
+  meta,
+  title,
+}: SeoPropTypes): ReactElement<SeoPropTypes> {
   const { site } = useStaticQuery(
     graphql`
       query {
