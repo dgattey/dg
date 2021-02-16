@@ -25,6 +25,8 @@
     "regenerator-runtime": "^0.13.7"
   },
   "devDependencies": {
+    "@commitlint/cli": "^11.0.0",
+    "@commitlint/config-conventional": "^11.0.0",
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/git": "^9.0.0",
     "@types/react-helmet": "^6.1.0",
@@ -92,12 +94,8 @@
     "semantic-release": "semantic-release",
     "type-check": "tsc --noEmit",
     "lint": "eslint 'src/**/*.{js,ts,tsx}' --fix",
-    "format": "prettier --write \"**/*.{js,ts,tsx,json,md,yml}\" \"*.{js,ts,tsx,json,md,yml}\" \"!node_modules/**/*\" \"!public/**/*\" \"!.cache/**/*\" \"!jekyll-archive/**/*\""
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "format": "prettier --write \"**/*.{js,ts,tsx,json,md,yml}\" \"*.{js,ts,tsx,json,md,yml}\" \"!node_modules/**/*\" \"!public/**/*\" \"!.cache/**/*\" \"!jekyll-archive/**/*\"",
+    "postinstall": "husky install"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": [
