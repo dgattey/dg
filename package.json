@@ -15,6 +15,7 @@
     "gatsby-plugin-offline": "^3.10.0",
     "gatsby-plugin-react-helmet": "^3.10.0",
     "gatsby-plugin-sharp": "^2.14.1",
+    "gatsby-plugin-typescript": "^2.12.0",
     "gatsby-source-filesystem": "^2.11.0",
     "gatsby-transformer-sharp": "^2.12.0",
     "prop-types": "^15.7.2",
@@ -26,9 +27,20 @@
   "devDependencies": {
     "@semantic-release/changelog": "^5.0.1",
     "@semantic-release/git": "^9.0.0",
+    "@types/react-helmet": "^6.1.0",
+    "@typescript-eslint/eslint-plugin": "^4.15.1",
+    "@typescript-eslint/parser": "^4.15.1",
+    "eslint": "^7.20.0",
+    "eslint-config-prettier": "^7.2.0",
+    "eslint-plugin-prettier": "^3.3.1",
+    "eslint-plugin-react": "^7.22.0",
+    "eslint-plugin-tsc": "^2.0.0",
     "gatsby-cli": "^2.19.1",
+    "husky": "^5.0.9",
+    "lint-staged": "^10.5.4",
     "prettier": "^2.2.1",
-    "semantic-release": "^17.3.9"
+    "semantic-release": "^17.3.9",
+    "typescript": "^4.1.5"
   },
   "release": {
     "branches": [
@@ -73,11 +85,26 @@
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop -H 0.0.0.0",
-    "format": "prettier --write \"**/*.{js,jsx,ts,tsx,json,md,yml}\" \"*.{js,jsx,ts,tsx,json,md,yml}\" \"!node_modules/**/*\" \"!public/**/*\" \"!.cache/**/*\" \"!jekyll-archive/**/*\"",
     "start": "yarn run develop",
     "serve": "gatsby serve",
     "clean": "gatsby clean",
-    "test": "echo \"Write tests! -> https://gatsby.dev/unit-testing\" && exit 1",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint 'src/**/*.{js,ts,tsx}' --fix",
+    "format": "prettier --write \"**/*.{js,ts,tsx,json,md,yml}\" \"*.{js,ts,tsx,json,md,yml}\" \"!node_modules/**/*\" \"!public/**/*\" \"!.cache/**/*\" \"!jekyll-archive/**/*\""
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "eslint --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'",
+      "prettier --write --no-semi"
+    ],
+    "*.{json,md,yml}": [
+      "prettier --write --no-semi"
+    ]
   }
 }
