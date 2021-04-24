@@ -1,0 +1,4 @@
+node_modules/
+jekyll-archive/
+public/
+.cache/
