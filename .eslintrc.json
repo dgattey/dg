@@ -1,0 +1,30 @@
+{
+  "env": {
+    "node": true,
+    "browser": true
+  },
+  "extends": ["eslint:recommended", "plugin:react/recommended", "prettier"],
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "parserOptions": {
+        "project": ["./tsconfig.json"]
+      }
+    }
+  ],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint/eslint-plugin", "react"],
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "project": "./tsconfig.json"
+  },
+  "reportUnusedDisableDirectives": true,
+  "rules": {},
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  }
+}

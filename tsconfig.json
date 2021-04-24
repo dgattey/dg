@@ -1,14 +1,14 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "esnext",
+    "target": "es6",
     "jsx": "preserve",
     "lib": ["dom", "esnext"],
     "strict": true,
     "noEmit": true,
     "isolatedModules": true,
     "esModuleInterop": true,
-    "noUnusedLocals": false,
+    "noUnusedLocals": true,
     "incremental": true,
     "removeComments": true,
     "noImplicitAny": true,
@@ -23,7 +23,12 @@
     "noFallthroughCasesInSwitch": true,
     "noUncheckedIndexedAccess": true,
     "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "node",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "pretty": true
   },
+  "include": ["src", "gatsby-config.*"],
   "exclude": ["node_modules", "public", ".cache"]
 }
