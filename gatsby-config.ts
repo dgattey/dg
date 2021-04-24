@@ -7,6 +7,7 @@ export const siteMetadata = {
 	title: 'Dylan Gattey',
 	description: `Developer, designer, human.`,
 	author: `@dgattey`,
+	siteUrl: 'https://dylangattey.com',
 }
 
 export const plugins = [
