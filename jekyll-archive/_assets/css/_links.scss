@@ -14,13 +14,7 @@
 //   moves the whole link itself up a bit on hover
 
 p a {
-  @extend .font-weight-semibold;
-
   display: inline;
-
-  &:hover {
-    @extend .font-weight-black;
-  }
 }
 
 a {
@@ -31,7 +25,7 @@ a {
 
   &:hover {
     text-decoration: underline;
-    transform: translateY(-.3rem);
+    transform: translateY(-0.3rem);
   }
 }
 

@@ -1,79 +1,19 @@
-/**
- * @license
- * MyFonts Webfont Build ID 3736433, 2019-03-19T19:33:29-0400
- * The fonts listed in this notice are subject to the End User License
- * Agreement(s) entered into by the website owner. All other parties are
- * explicitly restricted from using the Licensed Webfonts(s).
- * You may obtain a valid license at the URLs below.
- *
- * Webfont: LFTEtica-ExtraBold by TypeTogether
- * URL: https://www.myfonts.com/fonts/type-together/etica/lft-etica-extra-bold/
- * Copyright: Copyright (c) 2010 by Leftloft, published by TypeTogether. All rights reserved.
- * Licensed pageviews: 250,000
- *
- * Webfont: LFTEtica-Bold by TypeTogether
- * URL: https://www.myfonts.com/fonts/type-together/etica/lft-etica-bold/
- * Copyright: Copyright (c) 2010 by Leftloft, published by TypeTogether. All rights reserved.
- * Licensed pageviews: 250,000
- *
- * Webfont: LFTEtica-SemiBold by TypeTogether
- * URL: https://www.myfonts.com/fonts/type-together/etica/lft-etica-semi-bold/
- * Copyright: Copyright (c) 2010 by Leftloft, published by TypeTogether. All rights reserved.
- * Licensed pageviews: 250,000
- *
- * Webfont: LFTEtica-Regular by TypeTogether
- * URL: https://www.myfonts.com/fonts/type-together/etica/lft-etica-regular/
- * Copyright: Copyright (c) 2010 by Leftloft, published by TypeTogether. All rights reserved.
- * Licensed pageviews: 250,000
- *
- * Webfont: Carrara-Medium by Hoftype
- * URL: https://www.myfonts.com/fonts/hoftype/carrara/medium/
- * Copyright: Copyright (c) 2015 by Dieter Hofrichter. All rights reserved.
- * Licensed pageviews: 10,000
- *
- * License: https://www.myfonts.com/viewlicense?type=web&buildid=3736433
- *
- * © 2019 MyFonts Inc
- */
-
-@font-face {
-  font-family: 'carrara';
-  font-weight: 600;
-  src: local('Carrara'), local('Carrara-Regular'), asset_url('390371_4_0.woff2') format('woff2'), asset_url('390371_4_0.woff') format('woff');
-  font-display: fallback;
-}
-
-@font-face {
-  font-family: 'lft-etica';
-  font-weight: 800;
-  src: local('LFTEtica-ExtraBold'), asset_url('390371_0_0.woff2') format('woff2'), asset_url('390371_0_0.woff') format('woff');
-  font-display: fallback;
-}
-
-@font-face {
-  font-family: 'lft-etica';
-  font-weight: 700;
-  src: local('LFTEtica-Bold'), asset_url('390371_1_0.woff2') format('woff2'), asset_url('390371_1_0.woff') format('woff');
-  font-display: fallback;
-}
-
-@font-face {
-  font-family: 'lft-etica';
-  font-weight: 600;
-  src: local('LFTEtica-SemiBold'), asset_url('390371_2_0.woff2') format('woff2'), asset_url('390371_2_0.woff') format('woff');
-  font-display: fallback;
-}
-
-@font-face {
-  font-family: 'lft-etica';
-  font-weight: 400;
-  src: local('LFTEtica'), local('LFTEtica-Regular'), asset_url('390371_3_0.woff2') format('woff2'), asset_url('390371_3_0.woff') format('woff');
-  font-display: fallback;
-}
+// TODO: @dgattey import only the weights I need
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
 
 @font-face {
   font-family: 'roboto-mono';
-  font-weight: 500;
-  src: local('Roboto Mono'), local('RobotoMono-Regular'), asset_url('rm-500.woff2') format('woff2'), asset_url('rm-500.woff') format('woff');
+  font-weight: $font-weight-medium;
+  src: local('Roboto Mono'), local('RobotoMono-Regular'),
+    asset_url('rm-500.woff2') format('woff2'),
+    asset_url('rm-500.woff') format('woff');
+  font-display: fallback;
+}
+
+@font-face {
+  font-family: 'source-serif-pro';
+  font-weight: $font-weight-bold;
+  src: asset_url('subset-SourceSerifPro-Black.woff2') format('woff2'),
+    asset_url('subset-SourceSerifPro-Black.woff') format('woff');
   font-display: fallback;
 }
