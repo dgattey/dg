@@ -47,7 +47,7 @@ const plugins = [
 		__key: 'images',
 	},
 	'gatsby-plugin-offline',
-	`gatsby-plugin-graphql-codegen`,
+	`gatsby-plugin-typegen`,
 ]
 
 export default { siteMetadata, plugins } as GatsbyConfig
