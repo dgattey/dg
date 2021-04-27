@@ -1,4 +1,5 @@
 import * as React from 'react'
+import Header from './header'
 
 // styles
 const pageStyles = {
@@ -26,12 +27,15 @@ type PageProps = {
  * @param props An object containing `PageProps`
  * @returns A React.FunctionalComponent for the page itself
  */
-const Page = ({ pageContext: { id } }: PageProps) => (
+const Page = ({ pageContext: { id } }: PageProps): JSX.Element => (
 	// TODO: @dgattey create header and footer
-	<main style={pageStyles}>
-		<title>{id}</title>
-		<h1 style={headingStyles}>{id}</h1>
-	</main>
+	<>
+		<Header></Header>
+		<main style={pageStyles}>
+			<title>{id}</title>
+			<h1 style={headingStyles}>{id}</h1>
+		</main>
+	</>
 )
 
 export default Page
