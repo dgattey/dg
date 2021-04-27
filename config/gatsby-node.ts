@@ -22,7 +22,7 @@ const createPages = async ({
 	graphql,
 	actions: { createPage },
 }: CreatePagesArgs): Promise<void> => {
-	const pageTemplate = require.resolve(`../src/templates/page.tsx`)
+	const pageTemplate = require.resolve(`../src/templates/Page.tsx`)
 	const { errors, data }: AllPagesResult = await graphql(`
 		query AllPages {
 			allContentfulPage {
