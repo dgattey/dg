@@ -1,126 +1,73 @@
 // =====
-// Font-specific variables & mixins (defined here for ease of use below)
-// =====
-
-:root {
-  --fs-base: 10px;
-}
-
-// =====
 // Defines standard font styles & sizes across the full site.
 // =====
 
 html {
-  @extend .font-weight-normal;
   // sass-lint:disable no-vendor-prefixes
   -moz-osx-font-smoothing: grayscale;
   -webkit-font-smoothing: antialiased;
   // sass-lint:enable no-vendor-prefixes
-  font-family: lft-etica, Arial, sans-serif;
-  font-size: var(--fs-base);
   font-feature-settings: 'kern' 1;
   font-kerning: normal;
-  line-height: 1.15;
   text-size-adjust: 100%;
-}
-
-// =====
-// Families
-// =====
-
-.font-family-code {
-  font-family: roboto-mono, Monaco, monospace;
-  font-weight: 500;
-}
-
-.font-family-serif {
-  font-family: carrara, serif;
+  letter-spacing: -0.01em;
 }
 
 // =====
 // Weights
 // =====
 
-.font-weight-normal {
-  font-weight: 400;
+%font-weight-regular {
+  font-weight: $font-weight-regular;
 }
 
-.font-weight-semibold {
-  font-weight: 600;
+%font-weight-medium {
+  font-weight: $font-weight-medium;
+}
+
+%font-weight-bold {
+  font-weight: $font-weight-bold;
 }
 
 // Add the correct font weight in Chrome, Edge, and Safari.
 b,
-strong,
-.font-weight-bold {
-  font-weight: 700;
+strong {
+  @extend %font-weight-bold;
 }
 
-.font-weight-black {
-  font-weight: 800;
+// =====
+// Family styles
+// =====
+
+:root {
+  font-family: $font-family-copy;
+  font-weight: $font-weight-regular;
+  font-size: rem($font-size-base);
+  line-height: $font-line-height-base;
+}
+
+%font-family-code {
+  font-family: $font-family-code;
+  font-weight: $font-weight-medium;
+}
+
+%font-family-header {
+  font-family: $font-family-header;
+
+  @extend %font-weight-bold;
 }
 
 // =====
 // Header styling
 // =====
 
-%font-margin {
-  margin-bottom: 2.5rem;
-}
-
-h1 {
-  @extend .font-family-serif;
-  @extend .font-size-19;
-  @extend %font-margin;
-}
-
-h2 {
-  @extend .font-weight-semibold;
-  @extend .font-size-12;
-  @extend %font-margin;
-}
-
-h3 {
-  @extend .font-weight-semibold;
-  @extend .font-size-9;
-  @extend %font-margin;
-}
-
-h4 {
-  @extend .font-weight-black;
-  @extend .font-size-6;
-  @extend %font-margin;
-}
-
-h5 {
-  @extend .font-weight-black;
-  @extend .font-size-4;
-  @extend %font-margin;
-}
-
+h1,
+h2,
+h3,
+h4,
+h5,
 h6 {
-  @extend .font-weight-black;
-  @extend .font-size-2;
-  @extend %font-margin;
-}
-
-// =====
-// Regular (non-header) text styling
-// =====
-
-p {
-  @extend .font-size-2;
-  @extend %font-margin;
-}
-
-input,
-button,
-select,
-textarea,
-ul,
-ol {
-  @extend .font-size-2;
-  @extend %font-margin;
+  @extend %font-family-header;
 }
 
 // =====
@@ -128,19 +75,12 @@ ol {
 // =====
 
 code {
-  @extend %font-margin;
-
   overflow: auto;
 
   // 1. Correct the inheritance and scaling of font size in all browsers.
   // 2. Correct the odd `em` font sizing in all browsers.
   pre,
   & {
-    @extend .font-family-code;
-    @extend .font-size-0;
-  }
-
-  @include for-phone-only {
-    word-break: break-all;
+    @extend %font-family-code;
   }
 }

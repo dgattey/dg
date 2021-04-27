@@ -1,0 +1,19 @@
+// =====
+// Fonts & text styling constants
+// =====
+
+$font-family-copy: 'Inter', system-ui, -apple-system, BlinkMacSystemFont,
+  'Segoe UI', Roboto, Helvetica, Arial, 'Apple Color Emoji', 'Segoe UI Emoji',
+  'Segoe UI Symbol', sans-serif;
+$font-family-header: source-serif-pro, system-ui, -apple-system,
+  BlinkMacSystemFont, 'Segoe UI', 'Roboto Serif', 'Times New Roman',
+  'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', serif;
+$font-family-code: roboto-mono, 'Roboto Mono', Monaco, monospace;
+
+$font-size-base: 16;
+$font-line-height-base: 1.6;
+$font-line-height-header: 1.2;
+
+$font-weight-regular: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 900;

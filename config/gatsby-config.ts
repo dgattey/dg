@@ -1,25 +1,23 @@
 import { config as environmentConfig } from 'dotenv'
+import { GatsbyConfig } from 'gatsby'
 
 // Make sure we can use environment variables from the env file
 environmentConfig({ path: `.env.${process.env.NODE_ENV}` })
 
-export const siteMetadata = {
+const siteMetadata = {
 	title: 'Dylan Gattey',
 	description: `Developer, designer, human.`,
 	author: `@dgattey`,
 	siteUrl: 'https://dylangattey.com',
 }
 
-export const plugins = [
+const plugins = [
 	{
 		resolve: 'gatsby-source-contentful',
 		options: {
 			accessToken: process.env.CONTENTFUL_TOKEN,
 			spaceId: process.env.CONTENTFUL_SPACE_ID,
-			host:
-				process.env.NODE_ENV == 'development'
-					? `preview.contentful.com`
-					: `cdn.contentful.com`,
+			host: process.env.CONTENTFUL_HOST ?? `cdn.contentful.com`,
 		},
 	},
 	'gatsby-plugin-sass',
@@ -49,4 +47,7 @@ export const plugins = [
 		__key: 'images',
 	},
 	'gatsby-plugin-offline',
+	`gatsby-plugin-typegen`,
 ]
+
+export default { siteMetadata, plugins } as GatsbyConfig

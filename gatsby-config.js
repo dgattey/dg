@@ -1,3 +1,5 @@
 // Reads TS config automatically and use the ts version of the config
-require('ts-node').register()
-module.exports = require('./gatsby-config.ts')
+const { generateConfig } = require('gatsby-plugin-ts-config')
+module.exports = generateConfig({
+	configDir: 'config',
+})

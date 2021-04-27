@@ -6,15 +6,16 @@
 // sass-lint:enable quotes
 
 // Kicks off font file rendering
+@import 'font-constants';
 @import 'font-includes';
 
 // Imports my normalize css (based on normalize.css)
 @import 'normalize';
 
 // Base utility CSS (must be imported before the rest)
+@import 'rem';
 @import 'breakpoints';
 @import 'colors';
-@import 'font-levels';
 @import 'fonts';
 @import 'spacing';
 

@@ -29,6 +29,11 @@
     "emitDecoratorMetadata": true,
     "pretty": true
   },
-  "include": ["src", "gatsby-config.*"],
+  "include": [
+    "./src/**/*",
+    "./config/*.ts",
+    "gatsby-config.js",
+    "graphql-types.ts"
+  ],
   "exclude": ["node_modules", "public", ".cache"]
 }

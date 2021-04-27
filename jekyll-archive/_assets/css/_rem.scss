@@ -1,0 +1,19 @@
+// =====
+// Sizing functions for fonts and such
+// =====
+
+@function em($value) {
+  @if $value == 0 {
+    @return 0;
+  }
+
+  @return $value / $font-size-base + 0em;
+}
+
+@function rem($value) {
+  @if $value == 0 {
+    @return 0;
+  }
+
+  @return $value / $font-size-base + 0rem;
+}
