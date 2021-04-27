@@ -1,6 +1,6 @@
 import { config as environmentConfig } from 'dotenv'
 import { CreatePagesArgs, GatsbyConfig } from 'gatsby'
-import { Query } from 'gatsby-plugin-typegen/types'
+import { Query } from '../src/__generated__/gatsby-types'
 
 // Make sure we can use environment variables from the env file
 environmentConfig({ path: `.env.${process.env.NODE_ENV}` })
