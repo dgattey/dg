@@ -108,11 +108,15 @@
     "lint": "eslint . --cache --fix --ext .js,.ts,.tsx",
     "format": "prettier --loglevel warn --write \"**/*.{js,ts,tsx,scss,css,md,json,yml}\" \"!node_modules/**/*\" \"!public/**/*\" \"!.cache/**/*\" \"!jekyll-archive/**/*\"",
     "prepare": "husky install",
-    "posttest": "yarn run format",
-    "pretest": "yarn run lint && tsc --noEmit"
+    "posttest": "yarn format",
+    "pretest": "yarn lint && yarn type-check"
   },
   "lint-staged": {
-    "*.{js,ts,tsx}": [
+    "*.{ts,tsx}": [
+      "eslint --cache --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'",
+      "prettier --write"
+    ],
+    "*.{js}": [
       "eslint --cache --fix",
       "prettier --write"
     ],

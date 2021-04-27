@@ -33,7 +33,7 @@
     "./src/**/*",
     "./config/*.ts",
     "gatsby-config.js",
-    "graphql-types.ts"
+    "src/__generated__/gatsby-types.d.ts"
   ],
   "exclude": ["node_modules", "public", ".cache"]
 }
