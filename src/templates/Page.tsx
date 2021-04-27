@@ -1,4 +1,5 @@
 import * as React from 'react'
+import SiteFooter from './SiteFooter'
 import SiteHeader from './SiteHeader'
 
 // styles
@@ -29,11 +30,14 @@ type PageProps = {
  */
 const Page = ({ pageContext: { id } }: PageProps): JSX.Element => (
 	<>
-		<SiteHeader />
-		<main style={pageStyles}>
+		<header>
 			<title>{id}</title>
+			<SiteHeader />
+		</header>
+		<main style={pageStyles}>
 			<h1 style={headingStyles}>{id}</h1>
 		</main>
+		<SiteFooter />
 	</>
 )
 
