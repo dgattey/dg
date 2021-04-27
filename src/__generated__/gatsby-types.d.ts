@@ -1036,6 +1036,84 @@ type ContentfulTextSysContentTypeSys = {
   readonly id: Maybe<Scalars['String']>;
 };
 
+type GitCommit = Node & {
+  readonly diff: Maybe<DiffSummary>;
+  readonly hash: Maybe<Scalars['String']>;
+  readonly message: Maybe<Scalars['String']>;
+  readonly refs: Maybe<Scalars['String']>;
+  readonly body: Maybe<Scalars['String']>;
+  readonly date: Maybe<Scalars['Date']>;
+  readonly latest: Maybe<Scalars['Boolean']>;
+  readonly author: Maybe<GitAuthor>;
+  readonly id: Scalars['ID'];
+  readonly parent: Maybe<Node>;
+  readonly children: ReadonlyArray<Node>;
+  readonly internal: Internal;
+};
+
+
+type GitCommit_dateArgs = {
+  formatString: Maybe<Scalars['String']>;
+  fromNow: Maybe<Scalars['Boolean']>;
+  difference: Maybe<Scalars['String']>;
+  locale: Maybe<Scalars['String']>;
+};
+
+type DiffSummary = {
+  readonly changed: Scalars['Int'];
+  readonly files: ReadonlyArray<DiffResultFile>;
+  readonly insertions: Scalars['Int'];
+  readonly deletions: Scalars['Int'];
+};
+
+type DiffResultFile = {
+  readonly file: Scalars['String'];
+  readonly binary: Scalars['Boolean'];
+};
+
+type DiffResultTextFile = DiffResultFile & {
+  readonly file: Scalars['String'];
+  readonly binary: Scalars['Boolean'];
+  readonly changes: Scalars['Int'];
+  readonly insertions: Scalars['Int'];
+  readonly deletions: Scalars['Int'];
+};
+
+type DiffResultBinaryFile = DiffResultFile & {
+  readonly file: Scalars['String'];
+  readonly binary: Scalars['Boolean'];
+  readonly before: Scalars['Int'];
+  readonly after: Scalars['Int'];
+};
+
+type GitBranch = Node & {
+  readonly id: Scalars['ID'];
+  readonly parent: Maybe<Node>;
+  readonly children: ReadonlyArray<Node>;
+  readonly internal: Internal;
+  readonly name: Maybe<Scalars['String']>;
+  readonly commit: Maybe<Scalars['String']>;
+  readonly current: Maybe<Scalars['Boolean']>;
+};
+
+type GitTag = Node & {
+  readonly id: Scalars['ID'];
+  readonly parent: Maybe<Node>;
+  readonly children: ReadonlyArray<Node>;
+  readonly internal: Internal;
+  readonly name: Maybe<Scalars['String']>;
+  readonly latest: Maybe<Scalars['Boolean']>;
+};
+
+type GitAuthor = Node & {
+  readonly id: Scalars['ID'];
+  readonly parent: Maybe<Node>;
+  readonly children: ReadonlyArray<Node>;
+  readonly internal: Internal;
+  readonly name: Maybe<Scalars['String']>;
+  readonly email: Maybe<Scalars['String']>;
+};
+
 type contentfulLinkIconTextNode = Node & {
   readonly id: Scalars['ID'];
   readonly parent: Maybe<Node>;
@@ -1188,6 +1266,14 @@ type Query = {
   readonly allContentfulSection: ContentfulSectionConnection;
   readonly contentfulText: Maybe<ContentfulText>;
   readonly allContentfulText: ContentfulTextConnection;
+  readonly gitCommit: Maybe<GitCommit>;
+  readonly allGitCommit: GitCommitConnection;
+  readonly gitBranch: Maybe<GitBranch>;
+  readonly allGitBranch: GitBranchConnection;
+  readonly gitTag: Maybe<GitTag>;
+  readonly allGitTag: GitTagConnection;
+  readonly gitAuthor: Maybe<GitAuthor>;
+  readonly allGitAuthor: GitAuthorConnection;
   readonly contentfulLinkIconTextNode: Maybe<contentfulLinkIconTextNode>;
   readonly allContentfulLinkIconTextNode: contentfulLinkIconTextNodeConnection;
   readonly contentfulContentType: Maybe<ContentfulContentType>;
@@ -1563,6 +1649,85 @@ type Query_contentfulTextArgs = {
 type Query_allContentfulTextArgs = {
   filter: Maybe<ContentfulTextFilterInput>;
   sort: Maybe<ContentfulTextSortInput>;
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+};
+
+
+type Query_gitCommitArgs = {
+  diff: Maybe<DiffSummaryFilterInput>;
+  hash: Maybe<StringQueryOperatorInput>;
+  message: Maybe<StringQueryOperatorInput>;
+  refs: Maybe<StringQueryOperatorInput>;
+  body: Maybe<StringQueryOperatorInput>;
+  date: Maybe<DateQueryOperatorInput>;
+  latest: Maybe<BooleanQueryOperatorInput>;
+  author: Maybe<GitAuthorFilterInput>;
+  id: Maybe<StringQueryOperatorInput>;
+  parent: Maybe<NodeFilterInput>;
+  children: Maybe<NodeFilterListInput>;
+  internal: Maybe<InternalFilterInput>;
+};
+
+
+type Query_allGitCommitArgs = {
+  filter: Maybe<GitCommitFilterInput>;
+  sort: Maybe<GitCommitSortInput>;
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+};
+
+
+type Query_gitBranchArgs = {
+  id: Maybe<StringQueryOperatorInput>;
+  parent: Maybe<NodeFilterInput>;
+  children: Maybe<NodeFilterListInput>;
+  internal: Maybe<InternalFilterInput>;
+  name: Maybe<StringQueryOperatorInput>;
+  commit: Maybe<StringQueryOperatorInput>;
+  current: Maybe<BooleanQueryOperatorInput>;
+};
+
+
+type Query_allGitBranchArgs = {
+  filter: Maybe<GitBranchFilterInput>;
+  sort: Maybe<GitBranchSortInput>;
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+};
+
+
+type Query_gitTagArgs = {
+  id: Maybe<StringQueryOperatorInput>;
+  parent: Maybe<NodeFilterInput>;
+  children: Maybe<NodeFilterListInput>;
+  internal: Maybe<InternalFilterInput>;
+  name: Maybe<StringQueryOperatorInput>;
+  latest: Maybe<BooleanQueryOperatorInput>;
+};
+
+
+type Query_allGitTagArgs = {
+  filter: Maybe<GitTagFilterInput>;
+  sort: Maybe<GitTagSortInput>;
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+};
+
+
+type Query_gitAuthorArgs = {
+  id: Maybe<StringQueryOperatorInput>;
+  parent: Maybe<NodeFilterInput>;
+  children: Maybe<NodeFilterListInput>;
+  internal: Maybe<InternalFilterInput>;
+  name: Maybe<StringQueryOperatorInput>;
+  email: Maybe<StringQueryOperatorInput>;
+};
+
+
+type Query_allGitAuthorArgs = {
+  filter: Maybe<GitAuthorFilterInput>;
+  sort: Maybe<GitAuthorSortInput>;
   skip: Maybe<Scalars['Int']>;
   limit: Maybe<Scalars['Int']>;
 };
@@ -5561,6 +5726,640 @@ type ContentfulTextSortInput = {
   readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
 };
 
+type DiffSummaryFilterInput = {
+  readonly changed: Maybe<IntQueryOperatorInput>;
+  readonly files: Maybe<DiffResultFileFilterListInput>;
+  readonly insertions: Maybe<IntQueryOperatorInput>;
+  readonly deletions: Maybe<IntQueryOperatorInput>;
+};
+
+type DiffResultFileFilterListInput = {
+  readonly elemMatch: Maybe<DiffResultFileFilterInput>;
+};
+
+type DiffResultFileFilterInput = {
+  readonly file: Maybe<StringQueryOperatorInput>;
+  readonly binary: Maybe<BooleanQueryOperatorInput>;
+};
+
+type GitAuthorFilterInput = {
+  readonly id: Maybe<StringQueryOperatorInput>;
+  readonly parent: Maybe<NodeFilterInput>;
+  readonly children: Maybe<NodeFilterListInput>;
+  readonly internal: Maybe<InternalFilterInput>;
+  readonly name: Maybe<StringQueryOperatorInput>;
+  readonly email: Maybe<StringQueryOperatorInput>;
+};
+
+type GitCommitConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<GitCommitEdge>;
+  readonly nodes: ReadonlyArray<GitCommit>;
+  readonly pageInfo: PageInfo;
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly group: ReadonlyArray<GitCommitGroupConnection>;
+};
+
+
+type GitCommitConnection_distinctArgs = {
+  field: GitCommitFieldsEnum;
+};
+
+
+type GitCommitConnection_groupArgs = {
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  field: GitCommitFieldsEnum;
+};
+
+type GitCommitEdge = {
+  readonly next: Maybe<GitCommit>;
+  readonly node: GitCommit;
+  readonly previous: Maybe<GitCommit>;
+};
+
+type GitCommitFieldsEnum =
+  | 'diff.changed'
+  | 'diff.files'
+  | 'diff.files.file'
+  | 'diff.files.binary'
+  | 'diff.insertions'
+  | 'diff.deletions'
+  | 'hash'
+  | 'message'
+  | 'refs'
+  | 'body'
+  | 'date'
+  | 'latest'
+  | 'author.id'
+  | 'author.parent.id'
+  | 'author.parent.parent.id'
+  | 'author.parent.parent.children'
+  | 'author.parent.children'
+  | 'author.parent.children.id'
+  | 'author.parent.children.children'
+  | 'author.parent.internal.content'
+  | 'author.parent.internal.contentDigest'
+  | 'author.parent.internal.description'
+  | 'author.parent.internal.fieldOwners'
+  | 'author.parent.internal.ignoreType'
+  | 'author.parent.internal.mediaType'
+  | 'author.parent.internal.owner'
+  | 'author.parent.internal.type'
+  | 'author.children'
+  | 'author.children.id'
+  | 'author.children.parent.id'
+  | 'author.children.parent.children'
+  | 'author.children.children'
+  | 'author.children.children.id'
+  | 'author.children.children.children'
+  | 'author.children.internal.content'
+  | 'author.children.internal.contentDigest'
+  | 'author.children.internal.description'
+  | 'author.children.internal.fieldOwners'
+  | 'author.children.internal.ignoreType'
+  | 'author.children.internal.mediaType'
+  | 'author.children.internal.owner'
+  | 'author.children.internal.type'
+  | 'author.internal.content'
+  | 'author.internal.contentDigest'
+  | 'author.internal.description'
+  | 'author.internal.fieldOwners'
+  | 'author.internal.ignoreType'
+  | 'author.internal.mediaType'
+  | 'author.internal.owner'
+  | 'author.internal.type'
+  | 'author.name'
+  | 'author.email'
+  | 'id'
+  | 'parent.id'
+  | 'parent.parent.id'
+  | 'parent.parent.parent.id'
+  | 'parent.parent.parent.children'
+  | 'parent.parent.children'
+  | 'parent.parent.children.id'
+  | 'parent.parent.children.children'
+  | 'parent.parent.internal.content'
+  | 'parent.parent.internal.contentDigest'
+  | 'parent.parent.internal.description'
+  | 'parent.parent.internal.fieldOwners'
+  | 'parent.parent.internal.ignoreType'
+  | 'parent.parent.internal.mediaType'
+  | 'parent.parent.internal.owner'
+  | 'parent.parent.internal.type'
+  | 'parent.children'
+  | 'parent.children.id'
+  | 'parent.children.parent.id'
+  | 'parent.children.parent.children'
+  | 'parent.children.children'
+  | 'parent.children.children.id'
+  | 'parent.children.children.children'
+  | 'parent.children.internal.content'
+  | 'parent.children.internal.contentDigest'
+  | 'parent.children.internal.description'
+  | 'parent.children.internal.fieldOwners'
+  | 'parent.children.internal.ignoreType'
+  | 'parent.children.internal.mediaType'
+  | 'parent.children.internal.owner'
+  | 'parent.children.internal.type'
+  | 'parent.internal.content'
+  | 'parent.internal.contentDigest'
+  | 'parent.internal.description'
+  | 'parent.internal.fieldOwners'
+  | 'parent.internal.ignoreType'
+  | 'parent.internal.mediaType'
+  | 'parent.internal.owner'
+  | 'parent.internal.type'
+  | 'children'
+  | 'children.id'
+  | 'children.parent.id'
+  | 'children.parent.parent.id'
+  | 'children.parent.parent.children'
+  | 'children.parent.children'
+  | 'children.parent.children.id'
+  | 'children.parent.children.children'
+  | 'children.parent.internal.content'
+  | 'children.parent.internal.contentDigest'
+  | 'children.parent.internal.description'
+  | 'children.parent.internal.fieldOwners'
+  | 'children.parent.internal.ignoreType'
+  | 'children.parent.internal.mediaType'
+  | 'children.parent.internal.owner'
+  | 'children.parent.internal.type'
+  | 'children.children'
+  | 'children.children.id'
+  | 'children.children.parent.id'
+  | 'children.children.parent.children'
+  | 'children.children.children'
+  | 'children.children.children.id'
+  | 'children.children.children.children'
+  | 'children.children.internal.content'
+  | 'children.children.internal.contentDigest'
+  | 'children.children.internal.description'
+  | 'children.children.internal.fieldOwners'
+  | 'children.children.internal.ignoreType'
+  | 'children.children.internal.mediaType'
+  | 'children.children.internal.owner'
+  | 'children.children.internal.type'
+  | 'children.internal.content'
+  | 'children.internal.contentDigest'
+  | 'children.internal.description'
+  | 'children.internal.fieldOwners'
+  | 'children.internal.ignoreType'
+  | 'children.internal.mediaType'
+  | 'children.internal.owner'
+  | 'children.internal.type'
+  | 'internal.content'
+  | 'internal.contentDigest'
+  | 'internal.description'
+  | 'internal.fieldOwners'
+  | 'internal.ignoreType'
+  | 'internal.mediaType'
+  | 'internal.owner'
+  | 'internal.type';
+
+type GitCommitGroupConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<GitCommitEdge>;
+  readonly nodes: ReadonlyArray<GitCommit>;
+  readonly pageInfo: PageInfo;
+  readonly field: Scalars['String'];
+  readonly fieldValue: Maybe<Scalars['String']>;
+};
+
+type GitCommitFilterInput = {
+  readonly diff: Maybe<DiffSummaryFilterInput>;
+  readonly hash: Maybe<StringQueryOperatorInput>;
+  readonly message: Maybe<StringQueryOperatorInput>;
+  readonly refs: Maybe<StringQueryOperatorInput>;
+  readonly body: Maybe<StringQueryOperatorInput>;
+  readonly date: Maybe<DateQueryOperatorInput>;
+  readonly latest: Maybe<BooleanQueryOperatorInput>;
+  readonly author: Maybe<GitAuthorFilterInput>;
+  readonly id: Maybe<StringQueryOperatorInput>;
+  readonly parent: Maybe<NodeFilterInput>;
+  readonly children: Maybe<NodeFilterListInput>;
+  readonly internal: Maybe<InternalFilterInput>;
+};
+
+type GitCommitSortInput = {
+  readonly fields: Maybe<ReadonlyArray<Maybe<GitCommitFieldsEnum>>>;
+  readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
+};
+
+type GitBranchConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<GitBranchEdge>;
+  readonly nodes: ReadonlyArray<GitBranch>;
+  readonly pageInfo: PageInfo;
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly group: ReadonlyArray<GitBranchGroupConnection>;
+};
+
+
+type GitBranchConnection_distinctArgs = {
+  field: GitBranchFieldsEnum;
+};
+
+
+type GitBranchConnection_groupArgs = {
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  field: GitBranchFieldsEnum;
+};
+
+type GitBranchEdge = {
+  readonly next: Maybe<GitBranch>;
+  readonly node: GitBranch;
+  readonly previous: Maybe<GitBranch>;
+};
+
+type GitBranchFieldsEnum =
+  | 'id'
+  | 'parent.id'
+  | 'parent.parent.id'
+  | 'parent.parent.parent.id'
+  | 'parent.parent.parent.children'
+  | 'parent.parent.children'
+  | 'parent.parent.children.id'
+  | 'parent.parent.children.children'
+  | 'parent.parent.internal.content'
+  | 'parent.parent.internal.contentDigest'
+  | 'parent.parent.internal.description'
+  | 'parent.parent.internal.fieldOwners'
+  | 'parent.parent.internal.ignoreType'
+  | 'parent.parent.internal.mediaType'
+  | 'parent.parent.internal.owner'
+  | 'parent.parent.internal.type'
+  | 'parent.children'
+  | 'parent.children.id'
+  | 'parent.children.parent.id'
+  | 'parent.children.parent.children'
+  | 'parent.children.children'
+  | 'parent.children.children.id'
+  | 'parent.children.children.children'
+  | 'parent.children.internal.content'
+  | 'parent.children.internal.contentDigest'
+  | 'parent.children.internal.description'
+  | 'parent.children.internal.fieldOwners'
+  | 'parent.children.internal.ignoreType'
+  | 'parent.children.internal.mediaType'
+  | 'parent.children.internal.owner'
+  | 'parent.children.internal.type'
+  | 'parent.internal.content'
+  | 'parent.internal.contentDigest'
+  | 'parent.internal.description'
+  | 'parent.internal.fieldOwners'
+  | 'parent.internal.ignoreType'
+  | 'parent.internal.mediaType'
+  | 'parent.internal.owner'
+  | 'parent.internal.type'
+  | 'children'
+  | 'children.id'
+  | 'children.parent.id'
+  | 'children.parent.parent.id'
+  | 'children.parent.parent.children'
+  | 'children.parent.children'
+  | 'children.parent.children.id'
+  | 'children.parent.children.children'
+  | 'children.parent.internal.content'
+  | 'children.parent.internal.contentDigest'
+  | 'children.parent.internal.description'
+  | 'children.parent.internal.fieldOwners'
+  | 'children.parent.internal.ignoreType'
+  | 'children.parent.internal.mediaType'
+  | 'children.parent.internal.owner'
+  | 'children.parent.internal.type'
+  | 'children.children'
+  | 'children.children.id'
+  | 'children.children.parent.id'
+  | 'children.children.parent.children'
+  | 'children.children.children'
+  | 'children.children.children.id'
+  | 'children.children.children.children'
+  | 'children.children.internal.content'
+  | 'children.children.internal.contentDigest'
+  | 'children.children.internal.description'
+  | 'children.children.internal.fieldOwners'
+  | 'children.children.internal.ignoreType'
+  | 'children.children.internal.mediaType'
+  | 'children.children.internal.owner'
+  | 'children.children.internal.type'
+  | 'children.internal.content'
+  | 'children.internal.contentDigest'
+  | 'children.internal.description'
+  | 'children.internal.fieldOwners'
+  | 'children.internal.ignoreType'
+  | 'children.internal.mediaType'
+  | 'children.internal.owner'
+  | 'children.internal.type'
+  | 'internal.content'
+  | 'internal.contentDigest'
+  | 'internal.description'
+  | 'internal.fieldOwners'
+  | 'internal.ignoreType'
+  | 'internal.mediaType'
+  | 'internal.owner'
+  | 'internal.type'
+  | 'name'
+  | 'commit'
+  | 'current';
+
+type GitBranchGroupConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<GitBranchEdge>;
+  readonly nodes: ReadonlyArray<GitBranch>;
+  readonly pageInfo: PageInfo;
+  readonly field: Scalars['String'];
+  readonly fieldValue: Maybe<Scalars['String']>;
+};
+
+type GitBranchFilterInput = {
+  readonly id: Maybe<StringQueryOperatorInput>;
+  readonly parent: Maybe<NodeFilterInput>;
+  readonly children: Maybe<NodeFilterListInput>;
+  readonly internal: Maybe<InternalFilterInput>;
+  readonly name: Maybe<StringQueryOperatorInput>;
+  readonly commit: Maybe<StringQueryOperatorInput>;
+  readonly current: Maybe<BooleanQueryOperatorInput>;
+};
+
+type GitBranchSortInput = {
+  readonly fields: Maybe<ReadonlyArray<Maybe<GitBranchFieldsEnum>>>;
+  readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
+};
+
+type GitTagConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<GitTagEdge>;
+  readonly nodes: ReadonlyArray<GitTag>;
+  readonly pageInfo: PageInfo;
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly group: ReadonlyArray<GitTagGroupConnection>;
+};
+
+
+type GitTagConnection_distinctArgs = {
+  field: GitTagFieldsEnum;
+};
+
+
+type GitTagConnection_groupArgs = {
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  field: GitTagFieldsEnum;
+};
+
+type GitTagEdge = {
+  readonly next: Maybe<GitTag>;
+  readonly node: GitTag;
+  readonly previous: Maybe<GitTag>;
+};
+
+type GitTagFieldsEnum =
+  | 'id'
+  | 'parent.id'
+  | 'parent.parent.id'
+  | 'parent.parent.parent.id'
+  | 'parent.parent.parent.children'
+  | 'parent.parent.children'
+  | 'parent.parent.children.id'
+  | 'parent.parent.children.children'
+  | 'parent.parent.internal.content'
+  | 'parent.parent.internal.contentDigest'
+  | 'parent.parent.internal.description'
+  | 'parent.parent.internal.fieldOwners'
+  | 'parent.parent.internal.ignoreType'
+  | 'parent.parent.internal.mediaType'
+  | 'parent.parent.internal.owner'
+  | 'parent.parent.internal.type'
+  | 'parent.children'
+  | 'parent.children.id'
+  | 'parent.children.parent.id'
+  | 'parent.children.parent.children'
+  | 'parent.children.children'
+  | 'parent.children.children.id'
+  | 'parent.children.children.children'
+  | 'parent.children.internal.content'
+  | 'parent.children.internal.contentDigest'
+  | 'parent.children.internal.description'
+  | 'parent.children.internal.fieldOwners'
+  | 'parent.children.internal.ignoreType'
+  | 'parent.children.internal.mediaType'
+  | 'parent.children.internal.owner'
+  | 'parent.children.internal.type'
+  | 'parent.internal.content'
+  | 'parent.internal.contentDigest'
+  | 'parent.internal.description'
+  | 'parent.internal.fieldOwners'
+  | 'parent.internal.ignoreType'
+  | 'parent.internal.mediaType'
+  | 'parent.internal.owner'
+  | 'parent.internal.type'
+  | 'children'
+  | 'children.id'
+  | 'children.parent.id'
+  | 'children.parent.parent.id'
+  | 'children.parent.parent.children'
+  | 'children.parent.children'
+  | 'children.parent.children.id'
+  | 'children.parent.children.children'
+  | 'children.parent.internal.content'
+  | 'children.parent.internal.contentDigest'
+  | 'children.parent.internal.description'
+  | 'children.parent.internal.fieldOwners'
+  | 'children.parent.internal.ignoreType'
+  | 'children.parent.internal.mediaType'
+  | 'children.parent.internal.owner'
+  | 'children.parent.internal.type'
+  | 'children.children'
+  | 'children.children.id'
+  | 'children.children.parent.id'
+  | 'children.children.parent.children'
+  | 'children.children.children'
+  | 'children.children.children.id'
+  | 'children.children.children.children'
+  | 'children.children.internal.content'
+  | 'children.children.internal.contentDigest'
+  | 'children.children.internal.description'
+  | 'children.children.internal.fieldOwners'
+  | 'children.children.internal.ignoreType'
+  | 'children.children.internal.mediaType'
+  | 'children.children.internal.owner'
+  | 'children.children.internal.type'
+  | 'children.internal.content'
+  | 'children.internal.contentDigest'
+  | 'children.internal.description'
+  | 'children.internal.fieldOwners'
+  | 'children.internal.ignoreType'
+  | 'children.internal.mediaType'
+  | 'children.internal.owner'
+  | 'children.internal.type'
+  | 'internal.content'
+  | 'internal.contentDigest'
+  | 'internal.description'
+  | 'internal.fieldOwners'
+  | 'internal.ignoreType'
+  | 'internal.mediaType'
+  | 'internal.owner'
+  | 'internal.type'
+  | 'name'
+  | 'latest';
+
+type GitTagGroupConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<GitTagEdge>;
+  readonly nodes: ReadonlyArray<GitTag>;
+  readonly pageInfo: PageInfo;
+  readonly field: Scalars['String'];
+  readonly fieldValue: Maybe<Scalars['String']>;
+};
+
+type GitTagFilterInput = {
+  readonly id: Maybe<StringQueryOperatorInput>;
+  readonly parent: Maybe<NodeFilterInput>;
+  readonly children: Maybe<NodeFilterListInput>;
+  readonly internal: Maybe<InternalFilterInput>;
+  readonly name: Maybe<StringQueryOperatorInput>;
+  readonly latest: Maybe<BooleanQueryOperatorInput>;
+};
+
+type GitTagSortInput = {
+  readonly fields: Maybe<ReadonlyArray<Maybe<GitTagFieldsEnum>>>;
+  readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
+};
+
+type GitAuthorConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<GitAuthorEdge>;
+  readonly nodes: ReadonlyArray<GitAuthor>;
+  readonly pageInfo: PageInfo;
+  readonly distinct: ReadonlyArray<Scalars['String']>;
+  readonly group: ReadonlyArray<GitAuthorGroupConnection>;
+};
+
+
+type GitAuthorConnection_distinctArgs = {
+  field: GitAuthorFieldsEnum;
+};
+
+
+type GitAuthorConnection_groupArgs = {
+  skip: Maybe<Scalars['Int']>;
+  limit: Maybe<Scalars['Int']>;
+  field: GitAuthorFieldsEnum;
+};
+
+type GitAuthorEdge = {
+  readonly next: Maybe<GitAuthor>;
+  readonly node: GitAuthor;
+  readonly previous: Maybe<GitAuthor>;
+};
+
+type GitAuthorFieldsEnum =
+  | 'id'
+  | 'parent.id'
+  | 'parent.parent.id'
+  | 'parent.parent.parent.id'
+  | 'parent.parent.parent.children'
+  | 'parent.parent.children'
+  | 'parent.parent.children.id'
+  | 'parent.parent.children.children'
+  | 'parent.parent.internal.content'
+  | 'parent.parent.internal.contentDigest'
+  | 'parent.parent.internal.description'
+  | 'parent.parent.internal.fieldOwners'
+  | 'parent.parent.internal.ignoreType'
+  | 'parent.parent.internal.mediaType'
+  | 'parent.parent.internal.owner'
+  | 'parent.parent.internal.type'
+  | 'parent.children'
+  | 'parent.children.id'
+  | 'parent.children.parent.id'
+  | 'parent.children.parent.children'
+  | 'parent.children.children'
+  | 'parent.children.children.id'
+  | 'parent.children.children.children'
+  | 'parent.children.internal.content'
+  | 'parent.children.internal.contentDigest'
+  | 'parent.children.internal.description'
+  | 'parent.children.internal.fieldOwners'
+  | 'parent.children.internal.ignoreType'
+  | 'parent.children.internal.mediaType'
+  | 'parent.children.internal.owner'
+  | 'parent.children.internal.type'
+  | 'parent.internal.content'
+  | 'parent.internal.contentDigest'
+  | 'parent.internal.description'
+  | 'parent.internal.fieldOwners'
+  | 'parent.internal.ignoreType'
+  | 'parent.internal.mediaType'
+  | 'parent.internal.owner'
+  | 'parent.internal.type'
+  | 'children'
+  | 'children.id'
+  | 'children.parent.id'
+  | 'children.parent.parent.id'
+  | 'children.parent.parent.children'
+  | 'children.parent.children'
+  | 'children.parent.children.id'
+  | 'children.parent.children.children'
+  | 'children.parent.internal.content'
+  | 'children.parent.internal.contentDigest'
+  | 'children.parent.internal.description'
+  | 'children.parent.internal.fieldOwners'
+  | 'children.parent.internal.ignoreType'
+  | 'children.parent.internal.mediaType'
+  | 'children.parent.internal.owner'
+  | 'children.parent.internal.type'
+  | 'children.children'
+  | 'children.children.id'
+  | 'children.children.parent.id'
+  | 'children.children.parent.children'
+  | 'children.children.children'
+  | 'children.children.children.id'
+  | 'children.children.children.children'
+  | 'children.children.internal.content'
+  | 'children.children.internal.contentDigest'
+  | 'children.children.internal.description'
+  | 'children.children.internal.fieldOwners'
+  | 'children.children.internal.ignoreType'
+  | 'children.children.internal.mediaType'
+  | 'children.children.internal.owner'
+  | 'children.children.internal.type'
+  | 'children.internal.content'
+  | 'children.internal.contentDigest'
+  | 'children.internal.description'
+  | 'children.internal.fieldOwners'
+  | 'children.internal.ignoreType'
+  | 'children.internal.mediaType'
+  | 'children.internal.owner'
+  | 'children.internal.type'
+  | 'internal.content'
+  | 'internal.contentDigest'
+  | 'internal.description'
+  | 'internal.fieldOwners'
+  | 'internal.ignoreType'
+  | 'internal.mediaType'
+  | 'internal.owner'
+  | 'internal.type'
+  | 'name'
+  | 'email';
+
+type GitAuthorGroupConnection = {
+  readonly totalCount: Scalars['Int'];
+  readonly edges: ReadonlyArray<GitAuthorEdge>;
+  readonly nodes: ReadonlyArray<GitAuthor>;
+  readonly pageInfo: PageInfo;
+  readonly field: Scalars['String'];
+  readonly fieldValue: Maybe<Scalars['String']>;
+};
+
+type GitAuthorSortInput = {
+  readonly fields: Maybe<ReadonlyArray<Maybe<GitAuthorFieldsEnum>>>;
+  readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
+};
+
 type contentfulLinkIconTextNodeConnection = {
   readonly totalCount: Scalars['Int'];
   readonly edges: ReadonlyArray<contentfulLinkIconTextNodeEdge>;
@@ -6169,6 +6968,11 @@ type PagesQueryQueryVariables = Exact<{ [key: string]: never; }>;
 
 type PagesQueryQuery = { readonly allSitePage: { readonly nodes: ReadonlyArray<Pick<SitePage, 'path'>> } };
 
+type HeaderQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+type HeaderQuery = { readonly allContentfulSection: { readonly edges: ReadonlyArray<{ readonly node: { readonly blocks: Maybe<ReadonlyArray<Maybe<Pick<ContentfulLink, 'title' | 'url'>>>> } }> } };
+
 type GatsbyImageSharpFixedFragment = Pick<ImageSharpFixed, 'base64' | 'width' | 'height' | 'src' | 'srcSet'>;
 
 type GatsbyImageSharpFixed_tracedSVGFragment = Pick<ImageSharpFixed, 'tracedSVG' | 'width' | 'height' | 'src' | 'srcSet'>;
@@ -6195,10 +6999,18 @@ type GatsbyImageSharpFluid_noBase64Fragment = Pick<ImageSharpFluid, 'aspectRatio
 
 type GatsbyImageSharpFluid_withWebp_noBase64Fragment = Pick<ImageSharpFluid, 'aspectRatio' | 'src' | 'srcSet' | 'srcWebp' | 'srcSetWebp' | 'sizes'>;
 
-type HeaderQueryVariables = Exact<{ [key: string]: never; }>;
+type SiteVersionQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-type HeaderQuery = { readonly allContentfulSection: { readonly edges: ReadonlyArray<{ readonly node: { readonly blocks: Maybe<ReadonlyArray<Maybe<Pick<ContentfulLink, 'title' | 'url'>>>> } }> } };
+type SiteVersionQuery = { readonly gitTag: Maybe<Pick<GitTag, 'name'>> };
+
+type FooterQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+type FooterQuery = { readonly allContentfulSection: { readonly edges: ReadonlyArray<{ readonly node: { readonly blocks: Maybe<ReadonlyArray<Maybe<Pick<ContentfulLink, 'title' | 'url'> | { readonly blocks: Maybe<ReadonlyArray<Maybe<(
+            Pick<ContentfulLink, 'url' | 'title'>
+            & { readonly icon: Maybe<Pick<contentfulLinkIconTextNode, 'icon'>> }
+          )>>> }>>> } }> } };
 
 type GatsbyContentfulFixedFragment = Pick<ContentfulFixed, 'base64' | 'width' | 'height' | 'src' | 'srcSet'>;
 

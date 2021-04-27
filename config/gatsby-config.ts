@@ -21,6 +21,7 @@ const plugins = [
 			useNameForId: false,
 		},
 	},
+	`gatsby-source-local-git`,
 	'gatsby-plugin-sass',
 	'gatsby-plugin-image',
 	'gatsby-plugin-react-helmet',
