@@ -1034,15 +1034,6 @@ declare namespace GatsbyTypes {
 	}
 
 	type SitePluginPluginOptions = {
-		readonly accessToken: Maybe<Scalars['String']>
-		readonly spaceId: Maybe<Scalars['String']>
-		readonly host: Maybe<Scalars['String']>
-		readonly environment: Maybe<Scalars['String']>
-		readonly downloadLocal: Maybe<Scalars['Boolean']>
-		readonly forceFullSync: Maybe<Scalars['Boolean']>
-		readonly pageLimit: Maybe<Scalars['Int']>
-		readonly assetDownloadWorkers: Maybe<Scalars['Int']>
-		readonly useNameForId: Maybe<Scalars['Boolean']>
 		readonly output: Maybe<Scalars['String']>
 		readonly createLinkInHead: Maybe<Scalars['Boolean']>
 		readonly name: Maybe<Scalars['String']>
@@ -1068,6 +1059,15 @@ declare namespace GatsbyTypes {
 		readonly allExtensions: Maybe<Scalars['Boolean']>
 		readonly isTSX: Maybe<Scalars['Boolean']>
 		readonly jsxPragma: Maybe<Scalars['String']>
+		readonly accessToken: Maybe<Scalars['String']>
+		readonly spaceId: Maybe<Scalars['String']>
+		readonly host: Maybe<Scalars['String']>
+		readonly environment: Maybe<Scalars['String']>
+		readonly downloadLocal: Maybe<Scalars['Boolean']>
+		readonly forceFullSync: Maybe<Scalars['Boolean']>
+		readonly pageLimit: Maybe<Scalars['Int']>
+		readonly assetDownloadWorkers: Maybe<Scalars['Int']>
+		readonly useNameForId: Maybe<Scalars['Boolean']>
 	}
 
 	type SitePluginPackageJson = {
@@ -2427,15 +2427,6 @@ declare namespace GatsbyTypes {
 	}
 
 	type SitePluginPluginOptionsFilterInput = {
-		readonly accessToken: Maybe<StringQueryOperatorInput>
-		readonly spaceId: Maybe<StringQueryOperatorInput>
-		readonly host: Maybe<StringQueryOperatorInput>
-		readonly environment: Maybe<StringQueryOperatorInput>
-		readonly downloadLocal: Maybe<BooleanQueryOperatorInput>
-		readonly forceFullSync: Maybe<BooleanQueryOperatorInput>
-		readonly pageLimit: Maybe<IntQueryOperatorInput>
-		readonly assetDownloadWorkers: Maybe<IntQueryOperatorInput>
-		readonly useNameForId: Maybe<BooleanQueryOperatorInput>
 		readonly output: Maybe<StringQueryOperatorInput>
 		readonly createLinkInHead: Maybe<BooleanQueryOperatorInput>
 		readonly name: Maybe<StringQueryOperatorInput>
@@ -2461,6 +2452,15 @@ declare namespace GatsbyTypes {
 		readonly allExtensions: Maybe<BooleanQueryOperatorInput>
 		readonly isTSX: Maybe<BooleanQueryOperatorInput>
 		readonly jsxPragma: Maybe<StringQueryOperatorInput>
+		readonly accessToken: Maybe<StringQueryOperatorInput>
+		readonly spaceId: Maybe<StringQueryOperatorInput>
+		readonly host: Maybe<StringQueryOperatorInput>
+		readonly environment: Maybe<StringQueryOperatorInput>
+		readonly downloadLocal: Maybe<BooleanQueryOperatorInput>
+		readonly forceFullSync: Maybe<BooleanQueryOperatorInput>
+		readonly pageLimit: Maybe<IntQueryOperatorInput>
+		readonly assetDownloadWorkers: Maybe<IntQueryOperatorInput>
+		readonly useNameForId: Maybe<BooleanQueryOperatorInput>
 	}
 
 	type SitePluginPackageJsonFilterInput = {
@@ -2662,15 +2662,6 @@ declare namespace GatsbyTypes {
 		| 'pluginCreator.resolve'
 		| 'pluginCreator.name'
 		| 'pluginCreator.version'
-		| 'pluginCreator.pluginOptions.accessToken'
-		| 'pluginCreator.pluginOptions.spaceId'
-		| 'pluginCreator.pluginOptions.host'
-		| 'pluginCreator.pluginOptions.environment'
-		| 'pluginCreator.pluginOptions.downloadLocal'
-		| 'pluginCreator.pluginOptions.forceFullSync'
-		| 'pluginCreator.pluginOptions.pageLimit'
-		| 'pluginCreator.pluginOptions.assetDownloadWorkers'
-		| 'pluginCreator.pluginOptions.useNameForId'
 		| 'pluginCreator.pluginOptions.output'
 		| 'pluginCreator.pluginOptions.createLinkInHead'
 		| 'pluginCreator.pluginOptions.name'
@@ -2696,6 +2687,15 @@ declare namespace GatsbyTypes {
 		| 'pluginCreator.pluginOptions.allExtensions'
 		| 'pluginCreator.pluginOptions.isTSX'
 		| 'pluginCreator.pluginOptions.jsxPragma'
+		| 'pluginCreator.pluginOptions.accessToken'
+		| 'pluginCreator.pluginOptions.spaceId'
+		| 'pluginCreator.pluginOptions.host'
+		| 'pluginCreator.pluginOptions.environment'
+		| 'pluginCreator.pluginOptions.downloadLocal'
+		| 'pluginCreator.pluginOptions.forceFullSync'
+		| 'pluginCreator.pluginOptions.pageLimit'
+		| 'pluginCreator.pluginOptions.assetDownloadWorkers'
+		| 'pluginCreator.pluginOptions.useNameForId'
 		| 'pluginCreator.nodeAPIs'
 		| 'pluginCreator.browserAPIs'
 		| 'pluginCreator.ssrAPIs'
@@ -5740,15 +5740,6 @@ declare namespace GatsbyTypes {
 		| 'resolve'
 		| 'name'
 		| 'version'
-		| 'pluginOptions.accessToken'
-		| 'pluginOptions.spaceId'
-		| 'pluginOptions.host'
-		| 'pluginOptions.environment'
-		| 'pluginOptions.downloadLocal'
-		| 'pluginOptions.forceFullSync'
-		| 'pluginOptions.pageLimit'
-		| 'pluginOptions.assetDownloadWorkers'
-		| 'pluginOptions.useNameForId'
 		| 'pluginOptions.output'
 		| 'pluginOptions.createLinkInHead'
 		| 'pluginOptions.name'
@@ -5774,6 +5765,15 @@ declare namespace GatsbyTypes {
 		| 'pluginOptions.allExtensions'
 		| 'pluginOptions.isTSX'
 		| 'pluginOptions.jsxPragma'
+		| 'pluginOptions.accessToken'
+		| 'pluginOptions.spaceId'
+		| 'pluginOptions.host'
+		| 'pluginOptions.environment'
+		| 'pluginOptions.downloadLocal'
+		| 'pluginOptions.forceFullSync'
+		| 'pluginOptions.pageLimit'
+		| 'pluginOptions.assetDownloadWorkers'
+		| 'pluginOptions.useNameForId'
 		| 'nodeAPIs'
 		| 'browserAPIs'
 		| 'ssrAPIs'
