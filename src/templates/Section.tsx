@@ -1,5 +1,6 @@
 import * as React from 'react'
 import Link from './Link'
+import Project from './Project'
 import RichTextParagraph from './RichTextParagraph'
 
 /**
@@ -63,7 +64,7 @@ const generateElement = (block: BlockType): JSX.Element => {
 	} else if (isLinkFragment(block)) {
 		return <Link key={block.id} link={block} />
 	} else if (isProjectFragment(block)) {
-		return <p key={block.id}>{block.title}</p>
+		return <Project key={block.id} project={block} />
 	} else {
 		return <Section key={block.id} blocks={block.blocks} />
 	}
