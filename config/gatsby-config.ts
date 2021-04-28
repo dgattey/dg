@@ -18,6 +18,26 @@ const plugins = [
 			accessToken: process.env.CONTENTFUL_TOKEN,
 			spaceId: process.env.CONTENTFUL_SPACE_ID,
 			host: process.env.CONTENTFUL_HOST ?? `cdn.contentful.com`,
+			useNameForId: false,
+		},
+	},
+	{
+		resolve: `gatsby-source-github-api`,
+		options: {
+			token: process.env.GITHUB_AUTHENTICATION_TOKEN,
+			variables: {},
+			graphQLQuery: `{
+				repository(name: "dg", owner: "dgattey") {
+					refs(refPrefix: "refs/tags/", last: 10) {
+						nodes {
+							name
+							target {
+								oid
+							}
+						}
+					}
+				}
+			}`,
 		},
 	},
 	'gatsby-plugin-sass',
@@ -42,12 +62,17 @@ const plugins = [
 		resolve: 'gatsby-source-filesystem',
 		options: {
 			name: 'images',
-			path: './src/images/',
+			path: 'src/images/',
 		},
 		__key: 'images',
 	},
 	'gatsby-plugin-offline',
-	`gatsby-plugin-typegen`,
+	{
+		resolve: `gatsby-plugin-typegen`,
+		options: {
+			outputPath: `src/__generated__/gatsby-types.d.ts`,
+		},
+	},
 ]
 
 export default { siteMetadata, plugins } as GatsbyConfig

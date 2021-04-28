@@ -1,4 +1,6 @@
 import * as React from 'react'
+import SiteFooter from './SiteFooter'
+import SiteHeader from './SiteHeader'
 
 // styles
 const pageStyles = {
@@ -26,12 +28,17 @@ type PageProps = {
  * @param props An object containing `PageProps`
  * @returns A React.FunctionalComponent for the page itself
  */
-const Page = ({ pageContext: { id } }: PageProps) => (
-	// TODO: @dgattey create header and footer
-	<main style={pageStyles}>
-		<title>{id}</title>
-		<h1 style={headingStyles}>{id}</h1>
-	</main>
+const Page = ({ pageContext: { id } }: PageProps): JSX.Element => (
+	<>
+		<header>
+			<title>{id}</title>
+			<SiteHeader />
+		</header>
+		<main style={pageStyles}>
+			<h1 style={headingStyles}>{id}</h1>
+		</main>
+		<SiteFooter />
+	</>
 )
 
 export default Page

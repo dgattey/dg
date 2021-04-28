@@ -22,6 +22,7 @@
     "gatsby-plugin-typegen": "^2.2.4",
     "gatsby-source-contentful": "^5.3.0",
     "gatsby-source-filesystem": "^3.3.0",
+    "gatsby-source-github-api": "^1.0.0",
     "gatsby-transformer-sharp": "^3.3.0",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
@@ -108,11 +109,15 @@
     "lint": "eslint . --cache --fix --ext .js,.ts,.tsx",
     "format": "prettier --loglevel warn --write \"**/*.{js,ts,tsx,scss,css,md,json,yml}\" \"!node_modules/**/*\" \"!public/**/*\" \"!.cache/**/*\" \"!jekyll-archive/**/*\"",
     "prepare": "husky install",
-    "posttest": "yarn run format",
-    "pretest": "yarn run lint && tsc --noEmit"
+    "posttest": "yarn format",
+    "pretest": "yarn lint && yarn type-check"
   },
   "lint-staged": {
-    "*.{js,ts,tsx}": [
+    "*.{ts,tsx}": [
+      "eslint --cache --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'",
+      "prettier --write"
+    ],
+    "*.{js}": [
       "eslint --cache --fix",
       "prettier --write"
     ],

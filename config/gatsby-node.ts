@@ -1,6 +1,5 @@
 import { config as environmentConfig } from 'dotenv'
 import { CreatePagesArgs, GatsbyConfig } from 'gatsby'
-import { Query } from '../src/__generated__/gatsby-types'
 
 // Make sure we can use environment variables from the env file
 environmentConfig({ path: `.env.${process.env.NODE_ENV}` })
@@ -9,8 +8,8 @@ environmentConfig({ path: `.env.${process.env.NODE_ENV}` })
  * Represents a result of the AllPages query for all contentful pages
  */
 type AllPagesResult = {
-	errors?: any
-	data?: Query
+	errors?: Error
+	data?: GatsbyTypes.Query
 }
 
 /**
@@ -23,7 +22,7 @@ const createPages = async ({
 	graphql,
 	actions: { createPage },
 }: CreatePagesArgs): Promise<void> => {
-	const pageTemplate = require.resolve(`../src/templates/page.tsx`)
+	const pageTemplate = require.resolve(`../src/templates/Page.tsx`)
 	const { errors, data }: AllPagesResult = await graphql(`
 		query AllPages {
 			allContentfulPage {

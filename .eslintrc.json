@@ -1,9 +1,22 @@
 {
-  "env": {
-    "node": true,
-    "browser": true
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "jsx": true
+    },
+    "project": "./tsconfig.json"
   },
-  "extends": ["eslint:recommended", "plugin:react/recommended", "prettier"],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "extends": [
+    "plugin:react/recommended",
+    "plugin:@typescript-eslint/recommended",
+    "prettier",
+    "plugin:prettier/recommended"
+  ],
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
@@ -12,19 +25,11 @@
       }
     }
   ],
-  "parser": "@typescript-eslint/parser",
   "plugins": ["@typescript-eslint/eslint-plugin", "react"],
-  "parserOptions": {
-    "ecmaFeatures": {
-      "jsx": true
-    },
-    "project": "./tsconfig.json"
+  "env": {
+    "node": true,
+    "browser": true
   },
   "reportUnusedDisableDirectives": true,
-  "rules": {},
-  "settings": {
-    "react": {
-      "version": "detect"
-    }
-  }
+  "rules": {}
 }
