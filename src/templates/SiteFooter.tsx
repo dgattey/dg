@@ -35,8 +35,7 @@ const SiteFooter = (): JSX.Element => {
 	const version = fetchSiteVersion()
 
 	// Separates footer data into text links and icon links
-	const footerData =
-		fetchFooter().allContentfulSection.edges[0]?.node.blocks ?? []
+	const footerData = fetchFooter().allContentfulSection.nodes[0]?.blocks ?? []
 
 	const textLinks = (footerData.filter(
 		(data) => (data as GatsbyTypes.ContentfulLink)?.url !== undefined
