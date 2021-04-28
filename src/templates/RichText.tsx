@@ -1,8 +1,18 @@
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
 import * as React from 'react'
 
+/**
+ * Shared type for raw text as it comes from Contentful
+ */
+export type RawRichText = GatsbyTypes.Maybe<
+	Pick<GatsbyTypes.ContentfulTextText, 'raw'>
+>
+
+/**
+ * All we need is rich text to display this element
+ */
 type PropTypes = {
-	richText: GatsbyTypes.Maybe<Pick<GatsbyTypes.ContentfulTextText, 'raw'>>
+	richText: RawRichText
 }
 
 /**
@@ -12,11 +22,11 @@ type PropTypes = {
  * @param props An object containing `PropTypes`
  * @returns An element for the rich text, composed of other items inside it
  */
-const RichTextParagraph = ({ richText }: PropTypes): JSX.Element => {
+const RichText = ({ richText }: PropTypes): JSX.Element => {
 	if (!richText || !richText?.raw) {
 		throw TypeError('Malformed rich text')
 	}
 	return <>{documentToReactComponents(JSON.parse(richText.raw))}</>
 }
 
-export default RichTextParagraph
+export default RichText
