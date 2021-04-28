@@ -26,11 +26,9 @@ const createPages = async ({
 	const { errors, data }: AllPagesResult = await graphql(`
 		query AllPages {
 			allContentfulPage {
-				edges {
-					node {
-						id
-						slug
-					}
+				nodes {
+					id
+					slug
 				}
 			}
 		}
@@ -40,12 +38,12 @@ const createPages = async ({
 	}
 
 	// Create an actual page for this edge using the given slug - passing the id for later queries
-	data?.allContentfulPage.edges.forEach((edge) => {
+	data?.allContentfulPage.nodes.forEach((node) => {
 		createPage({
-			path: `${edge.node.slug}`,
+			path: `${node.slug}`,
 			component: pageTemplate,
 			context: {
-				id: edge.node.id,
+				id: node.id,
 			},
 		})
 	})
