@@ -1,5 +1,7 @@
 import * as React from 'react'
 import Link from './Link'
+import Project from './Project'
+import RichTextParagraph from './RichTextParagraph'
 
 /**
  * This is the array of section type that is nested within BlockType
@@ -58,11 +60,11 @@ const generateElement = (block: BlockType): JSX.Element => {
 		throw TypeError("Section wasn't defined")
 	}
 	if (isTextFragment(block)) {
-		return <p key={block.id}>{block.id}</p>
+		return <RichTextParagraph key={block.id} richText={block.text} />
 	} else if (isLinkFragment(block)) {
 		return <Link key={block.id} link={block} />
 	} else if (isProjectFragment(block)) {
-		return <p key={block.id}>{block.title}</p>
+		return <Project key={block.id} project={block} />
 	} else {
 		return <Section key={block.id} blocks={block.blocks} />
 	}
