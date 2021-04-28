@@ -32,7 +32,7 @@ type LinkArray = ReadonlyArray<LinkData>
  * The site footer, with copyright + icon links at right
  */
 const SiteFooter = (): JSX.Element => {
-	const version = fetchSiteVersion().gitTag?.name ?? 'v0.0.0'
+	const version = fetchSiteVersion()
 
 	// Separates footer data into text links and icon links
 	const footerData =

@@ -21,7 +21,25 @@ const plugins = [
 			useNameForId: false,
 		},
 	},
-	`gatsby-source-local-git`,
+	{
+		resolve: `gatsby-source-github-api`,
+		options: {
+			token: process.env.GITHUB_AUTHENTICATION_TOKEN,
+			variables: {},
+			graphQLQuery: `{
+				repository(name: "dg", owner: "dgattey") {
+					refs(refPrefix: "refs/tags/", last: 10) {
+						nodes {
+							name
+							target {
+								oid
+							}
+						}
+					}
+				}
+			}`,
+		},
+	},
 	'gatsby-plugin-sass',
 	'gatsby-plugin-image',
 	'gatsby-plugin-react-helmet',

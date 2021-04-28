@@ -1,15 +1,36 @@
 import { graphql, useStaticQuery } from 'gatsby'
 
 /**
- * Fetches the latest version of the site locally using git (latest tag)
+ * Fetches a version of the site from the Github data. Falls back to
+ * 'v0.0.1' if necessary.
  *
- * @return  {GatsbyTypes.SiteVersionQuery}  The latest version of the site
+ * @return  {string}  The latest version of the site as a string
  */
-export const fetchSiteVersion = (): GatsbyTypes.SiteVersionQuery =>
-	useStaticQuery<GatsbyTypes.SiteVersionQuery>(graphql`
+export const fetchSiteVersion = (): string => {
+	const allVersions = useStaticQuery<GatsbyTypes.SiteVersionQuery>(graphql`
 		query SiteVersion {
-			gitTag(latest: { eq: true }) {
-				name
+			githubData {
+				data {
+					repository {
+						refs {
+							nodes {
+								name
+								target {
+									oid
+								}
+							}
+						}
+					}
+				}
 			}
 		}
 	`)
+	const node = allVersions.githubData?.data?.repository?.refs?.nodes?.find(
+		(item) => item?.target?.oid === process.env.VERCEL_GIT_COMMIT_SHA
+	)
+	console.log(
+		allVersions.githubData?.data?.repository?.refs?.nodes,
+		process.env.VERCEL_GIT_COMMIT_SHA
+	)
+	return node?.name ?? 'v0.0.1'
+}
