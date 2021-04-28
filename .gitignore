@@ -58,3 +58,4 @@ package-lock.json
 tsconfig.tsbuildinfo
 
 .vercel
+src/__generated__/gatsby-types.d.ts
