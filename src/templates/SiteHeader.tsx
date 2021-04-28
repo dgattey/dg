@@ -16,8 +16,8 @@ const headingStyles = {
  */
 const generateLinkElements = () => {
 	const headerData = fetchHeader()
-	return headerData.allContentfulSection.edges
-		.flatMap((edge) => edge.node.blocks)
+	return headerData.allContentfulSection.nodes
+		.flatMap((node) => node.blocks)
 		.map((link) => <LinkListItem key={link?.title} link={link} />)
 }
 

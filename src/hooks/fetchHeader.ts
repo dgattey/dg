@@ -1,21 +1,20 @@
 import { graphql, useStaticQuery } from 'gatsby'
 
 /**
- * Fetches header data when needed and returns it as a header query
+ * Fetches the section corresponding to the header and finds the nodes within it
+ * to transform into links
  *
- * @return  {GatsbyTypes.HeaderQuery}  The return value of the header query
+ * @return  {GatsbyTypes.HeaderQuery}  nodes with blocks of links
  */
 export const fetchHeader = (): GatsbyTypes.HeaderQuery =>
 	useStaticQuery<GatsbyTypes.HeaderQuery>(graphql`
 		query Header {
 			allContentfulSection(filter: { title: { eq: "Header" } }) {
-				edges {
-					node {
-						blocks {
-							... on ContentfulLink {
-								title
-								url
-							}
+				nodes {
+					blocks {
+						... on ContentfulLink {
+							title
+							url
 						}
 					}
 				}
