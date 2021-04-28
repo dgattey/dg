@@ -26,11 +26,7 @@ export const fetchSiteVersion = (): string => {
 		}
 	`)
 	const node = allVersions.githubData?.data?.repository?.refs?.nodes?.find(
-		(item) => item?.target?.oid === process.env.VERCEL_GIT_COMMIT_SHA
-	)
-	console.log(
-		allVersions.githubData?.data?.repository?.refs?.nodes,
-		process.env.VERCEL_GIT_COMMIT_SHA
+		(item) => item?.target?.oid === process.env.GATSBY_VERCEL_GIT_COMMIT_SHA
 	)
 	return node?.name ?? 'v0.0.1'
 }
