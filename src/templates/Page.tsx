@@ -1,5 +1,6 @@
 import { graphql } from 'gatsby'
 import * as React from 'react'
+import Section from './Section'
 import SiteFooter from './SiteFooter'
 import SiteHeader from './SiteHeader'
 
@@ -35,11 +36,17 @@ export const query = graphql`
 		text {
 			raw
 		}
+		internal {
+			type
+		}
 	}
 
 	fragment Section on ContentfulSection {
 		id
 		title
+		internal {
+			type
+		}
 	}
 
 	fragment Project on ContentfulProject {
@@ -53,11 +60,18 @@ export const query = graphql`
 		thumbnail {
 			id
 		}
+		internal {
+			type
+		}
 	}
 
 	fragment Link on ContentfulLink {
+		id
 		title
 		url
+		internal {
+			type
+		}
 	}
 
 	query Page($id: String) {
@@ -108,19 +122,25 @@ export const query = graphql`
 /**
  * A generic render of a page type object, with footer + navigation + content
  * @param props An object containing `PageProps`
- * @returns A React.FunctionalComponent for the page itself
+ * @returns An element for the page itself
  */
-const Page = ({ pageContext: { id } }: PageProps): JSX.Element => (
-	<>
-		<header>
-			<title>{id}</title>
-			<SiteHeader />
-		</header>
-		<main style={pageStyles}>
-			<h1 style={headingStyles}>{id}</h1>
-		</main>
-		<SiteFooter />
-	</>
-)
+const Page = ({ data }: PageProps): JSX.Element => {
+	if (!data.contentfulPage?.title) {
+		throw TypeError('Badly formatted page data')
+	}
+	return (
+		<>
+			<header>
+				<title>{data.contentfulPage.title}</title>
+				<SiteHeader />
+			</header>
+			<main style={pageStyles}>
+				<h1 style={headingStyles}>{data.contentfulPage.title}</h1>
+				<Section blocks={data.contentfulPage?.sections} />
+			</main>
+			<SiteFooter />
+		</>
+	)
+}
 
 export default Page

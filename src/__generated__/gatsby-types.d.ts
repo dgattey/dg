@@ -6440,18 +6440,24 @@ type SitePluginSortInput = {
   readonly order: Maybe<ReadonlyArray<Maybe<SortOrderEnum>>>;
 };
 
-type SectionFragment = Pick<ContentfulSection, 'id' | 'title'>;
+type SectionFragment = (
+  Pick<ContentfulSection, 'id' | 'title'>
+  & { readonly internal: Pick<Internal, 'type'> }
+);
 
 type ProjectFragment = (
   Pick<ContentfulProject, 'id' | 'title' | 'creationDate' | 'type'>
-  & { readonly description: Maybe<Pick<ContentfulProjectDescription, 'raw'>>, readonly thumbnail: Maybe<Pick<ContentfulAsset, 'id'>> }
+  & { readonly description: Maybe<Pick<ContentfulProjectDescription, 'raw'>>, readonly thumbnail: Maybe<Pick<ContentfulAsset, 'id'>>, readonly internal: Pick<Internal, 'type'> }
 );
 
-type LinkFragment = Pick<ContentfulLink, 'title' | 'url'>;
+type LinkFragment = (
+  Pick<ContentfulLink, 'id' | 'title' | 'url'>
+  & { readonly internal: Pick<Internal, 'type'> }
+);
 
 type TextFragment = (
   Pick<ContentfulText, 'id' | 'imageType'>
-  & { readonly text: Maybe<Pick<ContentfulTextText, 'raw'>> }
+  & { readonly text: Maybe<Pick<ContentfulTextText, 'raw'>>, readonly internal: Pick<Internal, 'type'> }
 );
 
 type PageQueryVariables = Exact<{
@@ -6485,6 +6491,19 @@ type FooterQuery = { readonly allContentfulSection: { readonly nodes: ReadonlyAr
           Pick<ContentfulLink, 'url' | 'title'>
           & { readonly icon: Maybe<Pick<contentfulLinkIconTextNode, 'icon'>> }
         )>>> }>>> }> } };
+
+type SiteVersionQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+type SiteVersionQuery = { readonly githubData: Maybe<{ readonly data: Maybe<{ readonly repository: Maybe<{ readonly refs: Maybe<{ readonly nodes: Maybe<ReadonlyArray<Maybe<(
+            Pick<GithubDataDataRepositoryRefsNodes, 'name'>
+            & { readonly target: Maybe<Pick<GithubDataDataRepositoryRefsNodesTarget, 'oid'>> }
+          )>>> }> }> }> }> };
+
+type HeaderQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+type HeaderQuery = { readonly allContentfulSection: { readonly nodes: ReadonlyArray<{ readonly blocks: Maybe<ReadonlyArray<Maybe<Pick<ContentfulLink, 'title' | 'url'>>>> }> } };
 
 type GatsbyContentfulFixedFragment = Pick<ContentfulFixed, 'base64' | 'width' | 'height' | 'src' | 'srcSet'>;
 
@@ -6531,18 +6550,5 @@ type GatsbyImageSharpFluid_withWebp_tracedSVGFragment = Pick<ImageSharpFluid, 't
 type GatsbyImageSharpFluid_noBase64Fragment = Pick<ImageSharpFluid, 'aspectRatio' | 'src' | 'srcSet' | 'sizes'>;
 
 type GatsbyImageSharpFluid_withWebp_noBase64Fragment = Pick<ImageSharpFluid, 'aspectRatio' | 'src' | 'srcSet' | 'srcWebp' | 'srcSetWebp' | 'sizes'>;
-
-type SiteVersionQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-type SiteVersionQuery = { readonly githubData: Maybe<{ readonly data: Maybe<{ readonly repository: Maybe<{ readonly refs: Maybe<{ readonly nodes: Maybe<ReadonlyArray<Maybe<(
-            Pick<GithubDataDataRepositoryRefsNodes, 'name'>
-            & { readonly target: Maybe<Pick<GithubDataDataRepositoryRefsNodesTarget, 'oid'>> }
-          )>>> }> }> }> }> };
-
-type HeaderQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-type HeaderQuery = { readonly allContentfulSection: { readonly nodes: ReadonlyArray<{ readonly blocks: Maybe<ReadonlyArray<Maybe<Pick<ContentfulLink, 'title' | 'url'>>>> }> } };
 
 }
