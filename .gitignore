@@ -56,3 +56,5 @@ Thumbs.db
 *.sublime-workspace
 package-lock.json
 tsconfig.tsbuildinfo
+
+.vercel
