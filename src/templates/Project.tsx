@@ -1,5 +1,6 @@
 import * as React from 'react'
-import RichTextParagraph from './RichTextParagraph'
+import Image from './Image'
+import RichText from './RichText'
 
 /**
  * Top level page has a list of blocks we pass in to start the recursion
@@ -14,14 +15,14 @@ type PageProps = {
  * @returns An element for the project as a wrapper
  */
 const Project = ({ project }: PageProps): JSX.Element => {
-	if (!project.title || !project.type) {
+	if (!project.title || !project.type || !project.thumbnail?.gatsbyImageData) {
 		throw TypeError('Badly formatted project')
 	}
 	return (
 		<>
 			{project.title} | {project.creationDate} | {project.type} |{' '}
-			{project.thumbnail?.id}
-			<RichTextParagraph richText={project.description} />
+			<Image image={project.thumbnail} />
+			<RichText richText={project.description} />
 		</>
 	)
 }

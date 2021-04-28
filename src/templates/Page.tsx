@@ -39,6 +39,12 @@ export const query = graphql`
 		internal {
 			type
 		}
+		image {
+			id
+			gatsbyImageData(placeholder: BLURRED)
+			description
+			title
+		}
 	}
 
 	fragment Section on ContentfulSection {
@@ -59,6 +65,9 @@ export const query = graphql`
 		type
 		thumbnail {
 			id
+			gatsbyImageData(placeholder: BLURRED)
+			description
+			title
 		}
 		internal {
 			type
