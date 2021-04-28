@@ -15,16 +15,16 @@ const plugins = [
 	{
 		resolve: 'gatsby-source-contentful',
 		options: {
-			accessToken: process.env.CONTENTFUL_TOKEN,
-			spaceId: process.env.CONTENTFUL_SPACE_ID,
-			host: process.env.CONTENTFUL_HOST ?? `cdn.contentful.com`,
+			accessToken: process.env.GATSBY_CONTENTFUL_TOKEN,
+			spaceId: process.env.GATSBY_CONTENTFUL_SPACE_ID,
+			host: process.env.GATSBY_CONTENTFUL_HOST ?? `cdn.contentful.com`,
 			useNameForId: false,
 		},
 	},
 	{
 		resolve: `gatsby-source-github-api`,
 		options: {
-			token: process.env.GITHUB_AUTHENTICATION_TOKEN,
+			token: process.env.GATSBY_GITHUB_AUTHENTICATION_TOKEN,
 			variables: {},
 			graphQLQuery: `{
 				repository(name: "dg", owner: "dgattey") {
