@@ -6,49 +6,61 @@
   "homepage": "https://github.com/dgattey/dg#readme",
   "author": "Dylan Gattey <hi@dylangattey.com>",
   "license": "MIT",
-  "private": true,
-  "keywords": [
-    "gatsby"
-  ],
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "semantic-release": "semantic-release",
+    "format": "prettier --loglevel warn --write \"**/*.{js,ts,tsx,css,md,json,yml}\" \"!node_modules/**/*\" \"!public/**/*\" \"!.cache/**/*\" \"!jekyll-archive/**/*\"",
+    "lint": "eslint . --cache --fix --ext .js,.ts,.tsx",
+    "lint-styles": "stylelint 'src/**/*.{ts,tsx,js,jsx}'",
+    "type-check": "tsc --noEmit",
+    "prepare": "husky install",
+    "clean": "rm -r .next"
+  },
   "dependencies": {
-    "gatsby": "^3.13.0",
-    "gatsby-plugin-image": "^1.3.1",
-    "gatsby-plugin-manifest": "^3.3.0",
-    "gatsby-plugin-offline": "^4.3.0",
-    "gatsby-plugin-react-helmet": "^4.3.0",
-    "gatsby-plugin-sass": "^4.3.0",
-    "gatsby-plugin-sharp": "^3.3.1",
-    "gatsby-plugin-sitemap": "^3.3.0",
-    "gatsby-plugin-typegen": "^2.2.4",
-    "gatsby-source-contentful": "^5.3.0",
-    "gatsby-source-filesystem": "^3.3.0",
-    "gatsby-source-github-api": "^1.0.0",
-    "gatsby-transformer-sharp": "^3.3.0",
-    "prop-types": "^15.7.2",
-    "react": "^17.0.2",
-    "react-dom": "^17.0.2",
-    "react-helmet": "^6.1.0",
-    "sass": "^1.32.11"
+    "graphql": "16.0.1",
+    "next": "12.0.4",
+    "react": "17.0.2",
+    "react-dom": "17.0.2",
+    "react-helmet": "6.1.0",
+    "react-is": "17.0.2",
+    "styled-components": "5.3.3"
   },
   "devDependencies": {
-    "@commitlint/cli": "^12.1.1",
-    "@commitlint/config-conventional": "^12.1.1",
-    "@semantic-release/changelog": "^5.0.1",
-    "@semantic-release/git": "^9.0.0",
-    "@types/react-helmet": "^6.1.1",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
-    "@typescript-eslint/parser": "^4.22.0",
-    "eslint": "^7.25.0",
-    "eslint-config-prettier": "^8.2.0",
-    "eslint-plugin-prettier": "^3.4.0",
-    "eslint-plugin-react": "^7.23.2",
-    "eslint-plugin-tsc": "^2.0.0",
-    "gatsby-plugin-ts-config": "^1.1.5",
-    "husky": "^6.0.0",
-    "lint-staged": "^10.5.4",
-    "prettier": "^2.2.1",
-    "semantic-release": "^17.4.2",
-    "typescript": "^4.2.4"
+    "@babel/core": "7.16.0",
+    "@commitlint/cli": "15.0.0",
+    "@commitlint/config-conventional": "15.0.0",
+    "@semantic-release/changelog": "6.0.1",
+    "@semantic-release/git": "10.0.1",
+    "@stylelint/postcss-css-in-js": "0.37.2",
+    "@types/react": "17.0.35",
+    "@types/react-helmet": "6.1.4",
+    "@types/styled-components": "5.1.15",
+    "@typescript-eslint/eslint-plugin": "5.4.0",
+    "@typescript-eslint/parser": "5.4.0",
+    "eslint": "<8.0.0",
+    "eslint-config-airbnb": "19.0.0",
+    "eslint-config-airbnb-typescript": "16.0.0",
+    "eslint-config-next": "12.0.4",
+    "eslint-config-prettier": "8.3.0",
+    "eslint-import-resolver-typescript": "2.5.0",
+    "eslint-plugin-import": "2.25.3",
+    "eslint-plugin-jsx-a11y": "6.5.1",
+    "eslint-plugin-react": "7.27.1",
+    "eslint-plugin-react-hooks": "4.3.0",
+    "eslint-plugin-tsc": "2.0.0",
+    "husky": "7.0.4",
+    "lint-staged": "12.0.3",
+    "postcss": "8.3.11",
+    "postcss-syntax": "0.36.2",
+    "prettier": "2.4.1",
+    "semantic-release": "18.0.0",
+    "stylelint": "14.1.0",
+    "stylelint-config-recommended": "6.0.0",
+    "stylelint-config-styled-components": "0.1.1",
+    "stylelint-processor-styled-components": "1.10.0",
+    "typescript": "4.5.2"
   },
   "release": {
     "branches": [
@@ -96,33 +108,6 @@
       "@semantic-release/release-notes-generator",
       "@semantic-release/github",
       "@semantic-release/git"
-    ]
-  },
-  "scripts": {
-    "develop": "gatsby develop -H 0.0.0.0",
-    "start": "gatsby develop -H 0.0.0.0",
-    "build": "gatsby build",
-    "serve": "gatsby serve",
-    "clean": "gatsby clean",
-    "semantic-release": "semantic-release",
-    "type-check": "tsc --noEmit",
-    "lint": "eslint . --cache --fix --ext .js,.ts,.tsx",
-    "format": "prettier --loglevel warn --write \"**/*.{js,ts,tsx,scss,css,md,json,yml}\" \"!node_modules/**/*\" \"!public/**/*\" \"!.cache/**/*\" \"!jekyll-archive/**/*\"",
-    "prepare": "husky install",
-    "posttest": "yarn format",
-    "pretest": "yarn lint && yarn type-check"
-  },
-  "lint-staged": {
-    "*.{ts,tsx}": [
-      "eslint --cache --fix --plugin tsc --rule 'tsc/config: [2, {configFile: \"./tsconfig.json\"}]'",
-      "prettier --write"
-    ],
-    "*.{js}": [
-      "eslint --cache --fix",
-      "prettier --write"
-    ],
-    "*.{json,md,yml}": [
-      "prettier --write"
     ]
   },
   "engines": {
