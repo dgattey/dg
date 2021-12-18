@@ -6611,6 +6611,11 @@ svg-tags@^1.0.0:
   resolved "https://registry.yarnpkg.com/svg-tags/-/svg-tags-1.0.0.tgz#58f71cee3bd519b59d4b2a843b6c7de64ac04764"
   integrity sha1-WPcc7jvVGbWdSyqEO2x95krAR2Q=
 
+swr@1.1.2-beta.0:
+  version "1.1.2-beta.0"
+  resolved "https://registry.yarnpkg.com/swr/-/swr-1.1.2-beta.0.tgz#4c25f3a8e1f825b15426dd8c62d10cec95429be6"
+  integrity sha512-e7ZcPCrEvGX+s4jDtBwV9c+HKqHzG1secuwU8bYjnnGkSJMneyn7OaabJKtRh922DH5a3k2vvBdhftoSL8bHJQ==
+
 table@^6.0.9, table@^6.7.3:
   version "6.7.3"
   resolved "https://registry.yarnpkg.com/table/-/table-6.7.3.tgz#255388439715a738391bd2ee4cbca89a4d05a9b7"
