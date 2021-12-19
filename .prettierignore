@@ -1,5 +1,4 @@
 node_modules/
-jekyll-archive/
 public/
 .cache/
 **/__generated__/
