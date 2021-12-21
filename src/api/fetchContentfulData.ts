@@ -28,13 +28,7 @@ const fetchContentfulData = async <DataType, VariablesType extends Variables = n
   query: RequestDocument,
   variables?: VariablesType | undefined,
   requestHeaders?: HeadersInit | undefined,
-): Promise<DataType | null> => {
-  try {
-    return await client.request<DataType, VariablesType>(query, variables, requestHeaders);
-  } catch (error) {
-    console.error(error);
-    return null;
-  }
-};
+): Promise<DataType | null> =>
+  client.request<DataType, VariablesType>(query, variables, requestHeaders);
 
 export default fetchContentfulData;
