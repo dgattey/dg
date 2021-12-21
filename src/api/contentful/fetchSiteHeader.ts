@@ -1,20 +1,9 @@
 import { gql } from 'graphql-request';
+import { Link as LinkType, SiteHeaderQuery } from '__generated__/contentful-api';
 import fetchContentfulData from './fetchContentfulData';
+import { isLink } from './typeguards';
 
-type Link = {
-  title: string;
-  url: string;
-};
-
-type RawSiteHeader = {
-  sectionCollection: {
-    items: Array<{
-      blocksCollection: {
-        items: Array<Link>;
-      };
-    }>;
-  };
-};
+type Link = Pick<LinkType, 'title' | 'url'>;
 
 interface SiteHeader {
   /**
@@ -49,9 +38,11 @@ const QUERY = gql`
  * to transform into links
  */
 const fetchSiteHeader = async (): Promise<SiteHeader> => {
-  const data = await fetchContentfulData<RawSiteHeader>(QUERY);
+  const data = await fetchContentfulData<SiteHeaderQuery>(QUERY);
   const links =
-    data?.sectionCollection.items.flatMap((item) => item.blocksCollection.items ?? []) ?? [];
+    data?.sectionCollection?.items?.flatMap(
+      (item) => item?.blocksCollection?.items?.filter(isLink) ?? [],
+    ) ?? [];
   return {
     links,
   };
