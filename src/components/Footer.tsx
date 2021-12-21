@@ -16,17 +16,25 @@ const Footer = () => {
       <p>
         © {new Date().getFullYear()} Dylan Gattey | {version} |{' '}
         {textLinks &&
-          textLinks.map(({ title, url }) => (
-            <Link key={url} href={url}>
-              {title}
-            </Link>
-          ))}
+          textLinks.map(
+            ({ title, url }) =>
+              url &&
+              title && (
+                <Link key={url} href={url}>
+                  {title}
+                </Link>
+              ),
+          )}
         {iconLinks &&
-          iconLinks.map(({ url, icon: iconHtml }) => (
-            <Link key={url} href={url} passHref>
-              <IconLink dangerouslySetInnerHTML={{ __html: iconHtml }} />
-            </Link>
-          ))}
+          iconLinks.map(
+            ({ url, icon: iconHtml }) =>
+              url &&
+              iconHtml && (
+                <Link key={url} href={url} passHref>
+                  <IconLink dangerouslySetInnerHTML={{ __html: iconHtml }} />
+                </Link>
+              ),
+          )}
       </p>
     </footer>
   );

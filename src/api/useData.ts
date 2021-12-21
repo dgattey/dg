@@ -1,6 +1,7 @@
 import useSWR from 'swr';
-import fetchRepoVersion from './fetchRepoVersion';
-import fetchSiteFooter from './fetchSiteFooter';
+import fetchSiteFooter from './contentful/fetchSiteFooter';
+import fetchSiteHeader from './contentful/fetchSiteHeader';
+import fetchRepoVersion from './github/fetchRepoVersion';
 
 /**
  * A type of fetcher - all possible values are here
@@ -34,6 +35,11 @@ const fetchers = {
    * Text and icon links for the site footer
    */
   siteFooter: fetchSiteFooter,
+
+  /**
+   * Text links for the full site header
+   */
+  siteHeader: fetchSiteHeader,
 } as const;
 
 /**

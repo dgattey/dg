@@ -8,7 +8,6 @@ const GH_ENDPOINT = 'https://api.github.com/graphql';
  */
 const client = new GraphQLClient(GH_ENDPOINT, {
   headers: {
-    'content-type': 'application/json',
     authorization: `Bearer ${ACCESS_TOKEN}`,
   },
 });
