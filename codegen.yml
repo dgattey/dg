@@ -1,0 +1,70 @@
+overwrite: true
+config:
+  namingConvention:
+    typeNames: change-case-all#pascalCase
+    transformUnderscore: true
+hooks:
+  afterAllFileWrite:
+    - prettier --write
+generates:
+  src/__generated__/contentful-api.ts:
+    documents: 'src/api/contentful/*.{ts,tsx}'
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+    schema:
+      - https://graphql.contentful.com/content/v1/spaces/${NEXT_PUBLIC_CONTENTFUL_SPACE_ID}:
+          headers:
+            Authorization: Bearer ${NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN}
+    config:
+      avoidOptionals: true
+      constEnums: true
+      enumsAsTypes: true
+      immutableTypes: true
+      defaultScalarType: unknown
+      skipTypename: true
+      useTypeImports: true
+      dedupeFragments: true
+      graphQLTag: documentNodeImportFragments
+      pureMagicComment: true
+      maybeValue: T | undefined
+      scalars:
+        DateTime: string
+        Dimension: number
+        HexColor: string
+        JSON: '{ readonly [Symbol.toStringTag]: string; }'
+        Quality: number
+
+  src/__generated__/github-api.ts:
+    documents: 'src/api/github/*.{ts,tsx}'
+    plugins:
+      - 'typescript'
+      - 'typescript-operations'
+    schema:
+      - https://api.github.com/graphql:
+          headers:
+            Authorization: Bearer ${NEXT_PUBLIC_GITHUB_AUTHENTICATION_TOKEN}
+    config:
+      avoidOptionals: true
+      constEnums: true
+      enumsAsTypes: true
+      onlyOperationTypes: true
+      immutableTypes: true
+      defaultScalarType: unknown
+      skipTypename: true
+      useTypeImports: true
+      dedupeFragments: true
+      graphQLTag: documentNodeImportFragments
+      pureMagicComment: true
+      maybeValue: T | undefined
+      scalars:
+        Base64String: string
+        Date: string
+        DateTime: string
+        GitObjectId: string
+        GitSSHRemote: string
+        GitTimestamp: string
+        HTML: string
+        PreciseDateTime: string
+        URI: string
+        X509Certificate: string

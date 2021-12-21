@@ -1,6 +1,6 @@
 import useSWR from 'swr';
-import fetchRepoVersion from './fetchRepoVersion';
-import fetchSiteFooter from './fetchSiteFooter';
+import fetchSiteFooter from './contentful/fetchSiteFooter';
+import fetchRepoVersion from './github/fetchRepoVersion';
 
 /**
  * A type of fetcher - all possible values are here
