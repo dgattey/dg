@@ -1,6 +1,6 @@
 import useSWR from 'swr';
+import fetchRepoVersion from './fetchRepoVersion';
 import fetchSiteFooter from './fetchSiteFooter';
-import fetchVersion from './fetchVersion';
 
 /**
  * A type of fetcher - all possible values are here
@@ -28,7 +28,7 @@ const fetchers = {
   /**
    * Current version string for the site footer
    */
-  version: fetchVersion,
+  version: fetchRepoVersion,
 
   /**
    * Text and icon links for the site footer
