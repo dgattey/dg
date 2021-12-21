@@ -9,18 +9,19 @@ interface Props {
   /**
    * Provides SWR with fallback version data
    */
-  fallback: Fallback<'version'>;
+  fallback: Fallback<'version' | 'siteFooter'>;
 }
 
 /**
  * Grabs version and returns it as fallback
  */
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  const version = await fetchData('version');
+  const [version, siteFooter] = await Promise.all([fetchData('version'), fetchData('siteFooter')]);
   return {
     props: {
       fallback: {
         version,
+        siteFooter,
       },
     },
   };

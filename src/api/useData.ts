@@ -1,4 +1,5 @@
 import useSWR from 'swr';
+import fetchSiteFooter from './fetchSiteFooter';
 import fetchVersion from './fetchVersion';
 
 /**
@@ -28,6 +29,11 @@ const fetchers = {
    * Current version string for the site footer
    */
   version: fetchVersion,
+
+  /**
+   * Text and icon links for the site footer
+   */
+  siteFooter: fetchSiteFooter,
 } as const;
 
 /**
