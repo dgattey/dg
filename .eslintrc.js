@@ -1,4 +1,4 @@
-const BASE_EXTENSIONS = ['airbnb', 'airbnb/hooks', 'prettier', 'plugin:@next/next/recommended'];
+const BASE_EXTENSIONS = ['airbnb', 'airbnb/hooks', 'prettier', 'next'];
 
 const TYPESCRIPT_EXTENSIONS = [
   ...BASE_EXTENSIONS,
@@ -37,6 +37,15 @@ const TYPESCRIPT_RULES = {
   '@typescript-eslint/restrict-template-expressions': 'off',
   // Type assertions (const x: Type = y as Type) create bugs and mask errors, don't allow them at all
   '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
+  // In Typescript, default props are supported as default arguments
+  'react/require-default-props': 'off',
+  // There's a typescript option `noFallthroughCasesInSwitch` that's more robust and allows for union types to have no default fallthrough. Preferred!
+  'default-case': 'off',
+  // Typescript makes this obsolete, as it'll warn if there's a value returned that's
+  // not what's expected or vice versa
+  'consistent-return': 'off',
+  // This is broken
+  '@typescript-eslint/indent': 'off',
 };
 
 module.exports = {
