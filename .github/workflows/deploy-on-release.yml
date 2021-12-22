@@ -2,8 +2,7 @@
 name: Deploy on Release
 on:
   release:
-    types:
-      - published
+    types: [released]
 jobs:
   vercel:
     name: Deploy Site
@@ -19,7 +18,6 @@ jobs:
           if [[ ${GITHUB_REF} == "refs/heads/main" ]]; then
             prodRun="--prod"
           fi
-
           npx vercel --token ${VERCEL_DEPLOY_TOKEN} $prodRun
         env:
           VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
