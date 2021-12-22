@@ -1,8 +1,4 @@
 overwrite: true
-config:
-  namingConvention:
-    typeNames: change-case-all#pascalCase
-    transformUnderscore: true
 hooks:
   afterAllFileWrite:
     - prettier --write
@@ -75,7 +71,7 @@ generates:
         Base64String: string
         Date: string
         DateTime: string
-        GitObjectId: string
+        GitObjectID: string
         GitSSHRemote: string
         GitTimestamp: string
         HTML: string
