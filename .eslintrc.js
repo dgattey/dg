@@ -48,6 +48,32 @@ const TYPESCRIPT_RULES = {
   '@typescript-eslint/indent': 'off',
 };
 
+const API_TYPESCRIPT_RULES = {
+  ...TYPESCRIPT_RULES,
+  // Disables underscore dangling so we can use `__typename`
+  'no-underscore-dangle': 'off',
+};
+
+const TYPESCRIPT_OVERRIDE = {
+  files: ['src/**/*.{ts,tsx}'],
+  extends: TYPESCRIPT_EXTENSIONS,
+  plugins: TYPESCRIPT_PLUGINS,
+  settings: {
+    'import/resolver': {
+      typescript: {},
+    },
+  },
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    ecmaFeatures: {
+      jsx: true,
+    },
+    sourceType: 'module',
+    project: ['./tsconfig.json'],
+  },
+  rules: TYPESCRIPT_RULES,
+};
+
 module.exports = {
   env: {
     browser: true,
@@ -67,25 +93,12 @@ module.exports = {
   reportUnusedDisableDirectives: true,
   rules: BASE_RULES,
   overrides: [
+    // Typescript files need different overrides
+    TYPESCRIPT_OVERRIDE,
     {
-      files: ['src/**/*.{ts,tsx}'],
-
-      extends: TYPESCRIPT_EXTENSIONS,
-      plugins: TYPESCRIPT_PLUGINS,
-      settings: {
-        'import/resolver': {
-          typescript: {},
-        },
-      },
-      parser: '@typescript-eslint/parser',
-      parserOptions: {
-        ecmaFeatures: {
-          jsx: true,
-        },
-        sourceType: 'module',
-        project: ['./tsconfig.json'],
-      },
-      rules: TYPESCRIPT_RULES,
+      // API files are almost the same as regular typescript files but have different rule overrides
+      ...TYPESCRIPT_OVERRIDE,
+      rules: API_TYPESCRIPT_RULES,
     },
   ],
 };

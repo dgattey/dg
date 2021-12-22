@@ -22,7 +22,7 @@ export type Scalars = {
   /** The 'HexColor' type represents color in `rgb:ffffff` string format. */
   HexColor: string;
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
-  JSON: { readonly [Symbol.toStringTag]: string; };
+  JSON: { readonly [Symbol.toStringTag]: string };
   /** The 'Quality' type represents quality as whole numeric values between `1` and `100`. */
   Quality: number;
 };
@@ -42,12 +42,10 @@ export type Asset = {
   readonly width: Maybe<Scalars['Int']>;
 };
 
-
 /** Represents a binary file in a space. An asset can be any file type. */
 export type AssetLinkedFromArgs = {
   allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
 };
-
 
 /** Represents a binary file in a space. An asset can be any file type. */
 export type AssetUrlArgs = {
@@ -136,7 +134,6 @@ export type AssetLinkingCollections = {
   readonly textCollection: Maybe<TextCollection>;
 };
 
-
 export type AssetLinkingCollectionsEntryCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
@@ -144,14 +141,12 @@ export type AssetLinkingCollectionsEntryCollectionArgs = {
   skip?: InputMaybe<Scalars['Int']>;
 };
 
-
 export type AssetLinkingCollectionsProjectCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
   skip?: InputMaybe<Scalars['Int']>;
 };
-
 
 export type AssetLinkingCollectionsTextCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -193,30 +188,25 @@ export type Book = Entry & {
   readonly title: Maybe<Scalars['String']>;
 };
 
-
 /** All data describing a recent book I've read. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/book) */
 export type BookAuthorArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
-
 
 /** All data describing a recent book I've read. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/book) */
 export type BookCoverImageUrlArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
 
-
 /** All data describing a recent book I've read. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/book) */
 export type BookDescriptionArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
 
-
 /** All data describing a recent book I've read. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/book) */
 export type BookLinkedFromArgs = {
   allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
 };
-
 
 /** All data describing a recent book I've read. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/book) */
 export type BookTitleArgs = {
@@ -285,7 +275,6 @@ export type BookFilter = {
 export type BookLinkingCollections = {
   readonly entryCollection: Maybe<EntryCollection>;
 };
-
 
 export type BookLinkingCollectionsEntryCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -465,24 +454,20 @@ export type Link = Entry & {
   readonly url: Maybe<Scalars['String']>;
 };
 
-
 /** A link to an external site of mine [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/link) */
 export type LinkIconArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
-
 
 /** A link to an external site of mine [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/link) */
 export type LinkLinkedFromArgs = {
   allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
 };
 
-
 /** A link to an external site of mine [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/link) */
 export type LinkTitleArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
-
 
 /** A link to an external site of mine [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/link) */
 export type LinkUrlArgs = {
@@ -529,14 +514,12 @@ export type LinkLinkingCollections = {
   readonly projectCollection: Maybe<ProjectCollection>;
 };
 
-
 export type LinkLinkingCollectionsEntryCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
   skip?: InputMaybe<Scalars['Int']>;
 };
-
 
 export type LinkLinkingCollectionsProjectCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -569,12 +552,10 @@ export type Page = Entry & {
   readonly title: Maybe<Scalars['String']>;
 };
 
-
 /** A page composed of multiple text blocks and other info about it [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/page) */
 export type PageLinkedFromArgs = {
   allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
 };
-
 
 /** A page composed of multiple text blocks and other info about it [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/page) */
 export type PageSectionsCollectionArgs = {
@@ -584,12 +565,10 @@ export type PageSectionsCollectionArgs = {
   skip?: InputMaybe<Scalars['Int']>;
 };
 
-
 /** A page composed of multiple text blocks and other info about it [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/page) */
 export type PageSlugArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
-
 
 /** A page composed of multiple text blocks and other info about it [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/page) */
 export type PageTitleArgs = {
@@ -628,7 +607,6 @@ export type PageFilter = {
 export type PageLinkingCollections = {
   readonly entryCollection: Maybe<EntryCollection>;
 };
-
 
 export type PageLinkingCollectionsEntryCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -671,18 +649,15 @@ export type Project = Entry & {
   readonly type: Maybe<ReadonlyArray<Maybe<Scalars['String']>>>;
 };
 
-
 /** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
 export type ProjectCreationDateArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
 
-
 /** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
 export type ProjectDescriptionArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
-
 
 /** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
 export type ProjectLinkArgs = {
@@ -690,12 +665,10 @@ export type ProjectLinkArgs = {
   preview: InputMaybe<Scalars['Boolean']>;
 };
 
-
 /** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
 export type ProjectLinkedFromArgs = {
   allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
 };
-
 
 /** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
 export type ProjectThumbnailArgs = {
@@ -703,12 +676,10 @@ export type ProjectThumbnailArgs = {
   preview: InputMaybe<Scalars['Boolean']>;
 };
 
-
 /** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
 export type ProjectTitleArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
-
 
 /** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
 export type ProjectTypeArgs = {
@@ -780,7 +751,6 @@ export type ProjectLinkingCollections = {
   readonly entryCollection: Maybe<EntryCollection>;
 };
 
-
 export type ProjectLinkingCollectionsEntryCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
@@ -820,13 +790,11 @@ export type Query = {
   readonly textCollection: Maybe<TextCollection>;
 };
 
-
 export type QueryAssetArgs = {
   id: Scalars['String'];
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
 };
-
 
 export type QueryAssetCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -837,13 +805,11 @@ export type QueryAssetCollectionArgs = {
   where: InputMaybe<AssetFilter>;
 };
 
-
 export type QueryBookArgs = {
   id: Scalars['String'];
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
 };
-
 
 export type QueryBookCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -854,7 +820,6 @@ export type QueryBookCollectionArgs = {
   where: InputMaybe<BookFilter>;
 };
 
-
 export type QueryEntryCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
@@ -864,13 +829,11 @@ export type QueryEntryCollectionArgs = {
   where: InputMaybe<EntryFilter>;
 };
 
-
 export type QueryLinkArgs = {
   id: Scalars['String'];
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
 };
-
 
 export type QueryLinkCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -881,13 +844,11 @@ export type QueryLinkCollectionArgs = {
   where: InputMaybe<LinkFilter>;
 };
 
-
 export type QueryPageArgs = {
   id: Scalars['String'];
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
 };
-
 
 export type QueryPageCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -898,13 +859,11 @@ export type QueryPageCollectionArgs = {
   where: InputMaybe<PageFilter>;
 };
 
-
 export type QueryProjectArgs = {
   id: Scalars['String'];
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
 };
-
 
 export type QueryProjectCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -915,13 +874,11 @@ export type QueryProjectCollectionArgs = {
   where: InputMaybe<ProjectFilter>;
 };
 
-
 export type QuerySectionArgs = {
   id: Scalars['String'];
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
 };
-
 
 export type QuerySectionCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -932,13 +889,11 @@ export type QuerySectionCollectionArgs = {
   where: InputMaybe<SectionFilter>;
 };
 
-
 export type QueryTextArgs = {
   id: Scalars['String'];
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
 };
-
 
 export type QueryTextCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -958,7 +913,6 @@ export type Section = Entry & {
   readonly title: Maybe<Scalars['String']>;
 };
 
-
 /** A section containing references to other blocks. Based on the content of the section, may appear differently on different pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
 export type SectionBlocksCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -967,12 +921,10 @@ export type SectionBlocksCollectionArgs = {
   skip?: InputMaybe<Scalars['Int']>;
 };
 
-
 /** A section containing references to other blocks. Based on the content of the section, may appear differently on different pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
 export type SectionLinkedFromArgs = {
   allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
 };
-
 
 /** A section containing references to other blocks. Based on the content of the section, may appear differently on different pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
 export type SectionTitleArgs = {
@@ -1011,7 +963,6 @@ export type SectionFilter = {
 export type SectionLinkingCollections = {
   readonly entryCollection: Maybe<EntryCollection>;
 };
-
 
 export type SectionLinkingCollectionsEntryCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -1089,12 +1040,10 @@ export type Text = Entry & {
   readonly text: Maybe<TextText>;
 };
 
-
 /** Rich text together with an optional image, used in sections and pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/text) */
 export type TextIdentifierArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
-
 
 /** Rich text together with an optional image, used in sections and pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/text) */
 export type TextImageArgs = {
@@ -1102,18 +1051,15 @@ export type TextImageArgs = {
   preview: InputMaybe<Scalars['Boolean']>;
 };
 
-
 /** Rich text together with an optional image, used in sections and pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/text) */
 export type TextImageTypeArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
 
-
 /** Rich text together with an optional image, used in sections and pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/text) */
 export type TextLinkedFromArgs = {
   allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
 };
-
 
 /** Rich text together with an optional image, used in sections and pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/text) */
 export type TextTextArgs = {
@@ -1155,7 +1101,6 @@ export type TextFilter = {
 export type TextLinkingCollections = {
   readonly entryCollection: Maybe<EntryCollection>;
 };
-
 
 export type TextLinkingCollectionsEntryCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
@@ -1226,13 +1171,3 @@ export type CfLinkNestedFilter = {
   readonly url_not_contains: InputMaybe<Scalars['String']>;
   readonly url_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
 };
-
-export type SiteFooterQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type SiteFooterQuery = { readonly sectionCollection: { readonly items: ReadonlyArray<{ readonly blocksCollection: { readonly items: ReadonlyArray<{ readonly title: string | undefined, readonly url: string | undefined } | { readonly blocksCollection: { readonly items: ReadonlyArray<{ readonly title: string | undefined, readonly url: string | undefined, readonly icon: string | undefined } | {} | undefined> } | undefined } | {} | undefined> } | undefined } | undefined> } | undefined };
-
-export type SiteHeaderQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type SiteHeaderQuery = { readonly sectionCollection: { readonly items: ReadonlyArray<{ readonly blocksCollection: { readonly items: ReadonlyArray<{ readonly title: string | undefined, readonly url: string | undefined } | {} | undefined> } | undefined } | undefined> } | undefined };
