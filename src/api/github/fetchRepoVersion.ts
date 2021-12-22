@@ -1,5 +1,5 @@
+import fetchGraphQLData from 'api/fetchGraphQLData';
 import { gql } from 'graphql-request';
-import fetchGithubData from './fetchGithubData';
 import { DgRepoLatestReleaseQuery } from './generated/fetchRepoVersion.generated';
 
 const QUERY = gql`
@@ -30,7 +30,7 @@ const fetchRepoVersion = async () => {
     return undefined;
   }
 
-  const data = await fetchGithubData<DgRepoLatestReleaseQuery>(QUERY);
+  const data = await fetchGraphQLData<DgRepoLatestReleaseQuery>('/api/github', QUERY);
   const releases = data?.repository?.releases?.nodes;
   const filteredReleases =
     releases?.filter((release) => release?.tagCommit?.oid === commitSha?.trim()) ?? [];

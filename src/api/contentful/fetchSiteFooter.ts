@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request';
-import fetchContentfulData from './fetchContentfulData';
+import fetchGraphQLData from '../fetchGraphQLData';
 import { Link } from './generated/api.generated';
 import { SiteFooterQuery } from './generated/fetchSiteFooter.generated';
 import { isDefinedItem, isLink, isLinkCollection, isSection } from './typeguards';
@@ -53,7 +53,7 @@ const QUERY = gql`
  * out the text and icon links separately
  */
 const fetchSiteFooter = async (): Promise<SiteFooter> => {
-  const data = await fetchContentfulData<SiteFooterQuery>(QUERY);
+  const data = await fetchGraphQLData<SiteFooterQuery>('/api/content', QUERY);
   const items =
     data?.sectionCollection?.items.flatMap((item) => item?.blocksCollection?.items ?? []) ?? [];
   const iconLinks = items
