@@ -7,15 +7,15 @@ hooks:
   afterAllFileWrite:
     - prettier --write
 generates:
-  src/__generated__/contentful-api.ts:
+  # Creates the base Contentful API types in a api.generated.ts file
+  src/api/contentful/generated/api.generated.ts:
     documents: 'src/api/contentful/*.{ts,tsx}'
-    plugins:
-      - 'typescript'
-      - 'typescript-operations'
     schema:
       - https://graphql.contentful.com/content/v1/spaces/${NEXT_PUBLIC_CONTENTFUL_SPACE_ID}:
           headers:
             Authorization: Bearer ${NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN}
+    plugins:
+      - 'typescript'
     config:
       avoidOptionals: true
       constEnums: true
@@ -24,9 +24,6 @@ generates:
       defaultScalarType: unknown
       skipTypename: true
       useTypeImports: true
-      dedupeFragments: true
-      graphQLTag: documentNodeImportFragments
-      pureMagicComment: true
       maybeValue: T | undefined
       scalars:
         DateTime: string
@@ -35,15 +32,35 @@ generates:
         JSON: '{ readonly [Symbol.toStringTag]: string; }'
         Quality: number
 
-  src/__generated__/github-api.ts:
-    documents: 'src/api/github/*.{ts,tsx}'
+  # Creates generated types for each operation in Contentful API files
+  src/api/contentful/:
+    documents: 'src/api/contentful/*.{ts,tsx}'
+    schema:
+      - https://graphql.contentful.com/content/v1/spaces/${NEXT_PUBLIC_CONTENTFUL_SPACE_ID}:
+          headers:
+            Authorization: Bearer ${NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN}
     plugins:
-      - 'typescript'
       - 'typescript-operations'
+    preset: near-operation-file
+    presetConfig:
+      baseTypesPath: generated/api.generated.ts
+      folder: generated
+    config:
+      avoidOptionals: true
+      immutableTypes: true
+      skipTypename: true
+      useTypeImports: true
+      maybeValue: T | undefined
+
+  # Creates the base Github API types in a api.generated.ts file
+  src/api/github/generated/api.generated.ts:
+    documents: 'src/api/github/*.{ts,tsx}'
     schema:
       - https://api.github.com/graphql:
           headers:
             Authorization: Bearer ${NEXT_PUBLIC_GITHUB_AUTHENTICATION_TOKEN}
+    plugins:
+      - 'typescript'
     config:
       avoidOptionals: true
       constEnums: true
@@ -53,9 +70,6 @@ generates:
       defaultScalarType: unknown
       skipTypename: true
       useTypeImports: true
-      dedupeFragments: true
-      graphQLTag: documentNodeImportFragments
-      pureMagicComment: true
       maybeValue: T | undefined
       scalars:
         Base64String: string
@@ -68,3 +82,23 @@ generates:
         PreciseDateTime: string
         URI: string
         X509Certificate: string
+
+  # Creates generated types for each operation in Github API files
+  src/api/github/:
+    documents: 'src/api/github/*.{ts,tsx}'
+    schema:
+      - https://api.github.com/graphql:
+          headers:
+            Authorization: Bearer ${NEXT_PUBLIC_GITHUB_AUTHENTICATION_TOKEN}
+    plugins:
+      - 'typescript-operations'
+    preset: near-operation-file
+    presetConfig:
+      baseTypesPath: generated/api.generated.ts
+      folder: generated
+    config:
+      avoidOptionals: true
+      immutableTypes: true
+      skipTypename: true
+      useTypeImports: true
+      maybeValue: T | undefined

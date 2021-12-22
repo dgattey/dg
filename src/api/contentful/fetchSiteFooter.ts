@@ -1,6 +1,7 @@
 import { gql } from 'graphql-request';
-import { Link, SiteFooterQuery } from '__generated__/contentful-api';
 import fetchContentfulData from './fetchContentfulData';
+import { Link } from './generated/api.generated';
+import { SiteFooterQuery } from './generated/fetchSiteFooter.generated';
 import { isDefinedItem, isLink, isLinkCollection, isSection } from './typeguards';
 
 interface SiteFooter {
@@ -55,8 +56,9 @@ const fetchSiteFooter = async (): Promise<SiteFooter> => {
   const data = await fetchContentfulData<SiteFooterQuery>(QUERY);
   const items =
     data?.sectionCollection?.items.flatMap((item) => item?.blocksCollection?.items ?? []) ?? [];
+  console.log(items);
   const iconLinks = items
-    ?.filter(isSection)
+    .filter(isSection)
     .flatMap((section) => section.blocksCollection)
     .filter(isLinkCollection)
     .flatMap((collection) => collection.items.filter(isDefinedItem) ?? []);

@@ -1,4 +1,4 @@
-import type { Link, LinkCollection, Section } from '__generated__/contentful-api';
+import type { Link, LinkCollection, Section } from './generated/api.generated';
 
 /**
  * Type guard to get a section out

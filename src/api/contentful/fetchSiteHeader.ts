@@ -1,9 +1,8 @@
 import { gql } from 'graphql-request';
-import { Link as LinkType, SiteHeaderQuery } from '__generated__/contentful-api';
 import fetchContentfulData from './fetchContentfulData';
+import { Link } from './generated/api.generated';
+import { SiteHeaderQuery } from './generated/fetchSiteHeader.generated';
 import { isLink } from './typeguards';
-
-type Link = Pick<LinkType, 'title' | 'url'>;
 
 interface SiteHeader {
   /**

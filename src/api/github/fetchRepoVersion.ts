@@ -1,6 +1,6 @@
 import { gql } from 'graphql-request';
-import { DgRepoLatestReleaseQuery } from '__generated__/github-api';
 import fetchGithubData from './fetchGithubData';
+import { DgRepoLatestReleaseQuery } from './generated/fetchRepoVersion.generated';
 
 const QUERY = gql`
   query DgRepoLatestRelease {
@@ -17,7 +17,7 @@ const QUERY = gql`
  */
 const fetchRepoVersion = async () => {
   const data = await fetchGithubData<DgRepoLatestReleaseQuery>(QUERY);
-  return data?.repository?.latestRelease?.name ?? null;
+  return data?.repository?.latestRelease?.name;
 };
 
 export default fetchRepoVersion;
