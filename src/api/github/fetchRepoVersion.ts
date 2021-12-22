@@ -24,20 +24,18 @@ const QUERY = gql`
  * to run on client, but it'll gracefully fallback to the fallback.
  */
 const fetchRepoVersion = async () => {
-  const data = await fetchGithubData<DgRepoLatestReleaseQuery>(QUERY);
-  const releases = data?.repository?.releases?.nodes;
-  try {
-    const { promisify } = await import('util');
-    const exec = promisify((await import('child_process')).exec);
-    const { stdout: commitSha } = await exec('git rev-parse HEAD');
-    const filteredReleases =
-      releases?.filter((release) => release?.tagCommit?.oid === commitSha.trim()) ?? [];
-    // If we have a release that matched, return it, otherwise the last release
-    const fallbackValue = `${releases?.[(releases?.length ?? 0) - 1]?.name}-ra2d71g12339`;
-    return filteredReleases[0]?.name ?? fallbackValue;
-  } catch {
+  const commitSha = process.env.VERCEL_GIT_COMMIT_SHA;
+  if (!commitSha && !process.env.NODE_ENV) {
+    // Fallback for browser only
     return undefined;
   }
+
+  const data = await fetchGithubData<DgRepoLatestReleaseQuery>(QUERY);
+  const releases = data?.repository?.releases?.nodes;
+  const filteredReleases =
+    releases?.filter((release) => release?.tagCommit?.oid === commitSha?.trim()) ?? [];
+  // If we have a release that matched, return it, otherwise a fallback
+  return filteredReleases[0]?.name ?? 'vX.Y.Z';
 };
 
 export default fetchRepoVersion;
