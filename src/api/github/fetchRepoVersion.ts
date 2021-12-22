@@ -32,7 +32,9 @@ const fetchRepoVersion = async () => {
     const { stdout: commitSha } = await exec('git rev-parse HEAD');
     const filteredReleases =
       releases?.filter((release) => release?.tagCommit?.oid === commitSha.trim()) ?? [];
-    return filteredReleases[0]?.name ?? null;
+    // If we have a release that matched, return it, otherwise the last release
+    const fallbackValue = `${releases?.[(releases?.length ?? 0) - 1]?.name}-ra2d71g12339`;
+    return filteredReleases[0]?.name ?? fallbackValue;
   } catch {
     return undefined;
   }
