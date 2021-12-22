@@ -24,7 +24,7 @@ jobs:
           if [[ ${GITHUB_REF} == "refs/heads/main" ]]; then
             prodRun="--prod"
           fi
-          npx vercel --token ${VERCEL_DEPLOY_TOKEN} $prodRun
+          npx vercel --token ${VERCEL_DEPLOY_TOKEN} $prodRun --build-env NEXT_PUBLIC_VERSION=${GITHUB_SHA} NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA=${GITHUB_SHA}
         env:
           VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
