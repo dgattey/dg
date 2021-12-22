@@ -56,7 +56,6 @@ const fetchSiteFooter = async (): Promise<SiteFooter> => {
   const data = await fetchContentfulData<SiteFooterQuery>(QUERY);
   const items =
     data?.sectionCollection?.items.flatMap((item) => item?.blocksCollection?.items ?? []) ?? [];
-  console.log(items);
   const iconLinks = items
     .filter(isSection)
     .flatMap((section) => section.blocksCollection)

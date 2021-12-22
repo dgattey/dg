@@ -4,6 +4,18 @@ export type DgRepoLatestReleaseQueryVariables = Types.Exact<{ [key: string]: nev
 
 export type DgRepoLatestReleaseQuery = {
   readonly repository:
-    | { readonly latestRelease: { readonly name: string | undefined } | undefined }
+    | {
+        readonly releases: {
+          readonly nodes:
+            | ReadonlyArray<
+                | {
+                    readonly name: string | undefined;
+                    readonly tagCommit: { readonly oid: any } | undefined;
+                  }
+                | undefined
+              >
+            | undefined;
+        };
+      }
     | undefined;
 };
