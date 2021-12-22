@@ -24,7 +24,7 @@ const QUERY = gql`
  * to run on client, but it'll gracefully fallback to the fallback.
  */
 const fetchRepoVersion = async () => {
-  const commitSha = process.env.VERCEL_GIT_COMMIT_SHA;
+  const commitSha = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
   if (!commitSha && !process.env.NODE_ENV) {
     // Fallback for browser only
     return undefined;
