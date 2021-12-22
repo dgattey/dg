@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request';
-import fetchContentfulData from './fetchContentfulData';
+import fetchGraphQLData from '../fetchGraphQLData';
 import { Link } from './generated/api.generated';
 import { SiteHeaderQuery } from './generated/fetchSiteHeader.generated';
 import { isLink } from './typeguards';
@@ -37,7 +37,7 @@ const QUERY = gql`
  * to transform into links
  */
 const fetchSiteHeader = async (): Promise<SiteHeader> => {
-  const data = await fetchContentfulData<SiteHeaderQuery>(QUERY);
+  const data = await fetchGraphQLData<SiteHeaderQuery>('/api/content', QUERY);
   const links =
     data?.sectionCollection?.items?.flatMap(
       (item) => item?.blocksCollection?.items?.filter(isLink) ?? [],
