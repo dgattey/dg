@@ -1,4 +1,4 @@
-[![GitHub version](https://badgen.net/github/release/dgattey/dg)](https://github.com/dgattey/dg) [![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=dg)](https://vercel.com/dgattey/dg) [![Factor][fcr-img]][fcr] [![Climate][cc-img]][cc] [![Lines of Code](https://badgen.net/codeclimate/loc/dgattey/dg)][cc] [![Scan](https://snyk.io/test/github/dgattey/dg/badge.svg)](https://snyk.io/test/github/dgattey/dg)
+[![GitHub version](https://badgen.net/github/release/dgattey/dg?cache=600)](https://github.com/dgattey/dg) [![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=dg)](https://vercel.com/dgattey/dg) [![Factor][fcr-img]][fcr] [![Climate][cc-img]][cc] [![Lines of Code](https://badgen.net/codeclimate/loc/dgattey/dg)][cc] [![Scan](https://snyk.io/test/github/dgattey/dg/badge.svg)](https://snyk.io/test/github/dgattey/dg)
 
 # Dylan Gattey
 
