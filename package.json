@@ -32,6 +32,7 @@
     "mapbox-gl": "^2.6.1",
     "next": "^12.0.8",
     "pages": "link:./src/pages::locator=dg%40workspace%3A.",
+    "planetscale-node": "^0.3.0",
     "postcss": "^8.4.5",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
