@@ -13,29 +13,36 @@ const Footer = () => {
   const { textLinks, iconLinks } = siteFooter ?? {};
   return (
     <footer>
-      <p>
-        © {new Date().getFullYear()} Dylan Gattey | {version} |{' '}
-        {textLinks &&
-          textLinks.map(
-            ({ title, url }) =>
-              url &&
-              title && (
-                <Link key={url} href={url}>
-                  {title}
-                </Link>
-              ),
-          )}
-        {iconLinks &&
-          iconLinks.map(
-            ({ url, icon: iconHtml }) =>
-              url &&
-              iconHtml && (
-                <Link key={url} href={url} passHref>
-                  <IconLink dangerouslySetInnerHTML={{ __html: iconHtml }} />
-                </Link>
-              ),
-          )}
-      </p>
+      <nav>
+        <ul>
+          <li>© {new Date().getFullYear()} Dylan Gattey</li>
+          <li>{version}</li>
+        </ul>
+        <ul>
+          {textLinks &&
+            textLinks.map(
+              ({ title, url }) =>
+                url &&
+                title && (
+                  <li key={url}>
+                    <Link href={url}>{title}</Link>
+                  </li>
+                ),
+            )}
+          {iconLinks &&
+            iconLinks.map(
+              ({ url, icon: iconHtml }) =>
+                url &&
+                iconHtml && (
+                  <li key={url}>
+                    <Link href={url} passHref>
+                      <IconLink dangerouslySetInnerHTML={{ __html: iconHtml }} />
+                    </Link>
+                  </li>
+                ),
+            )}
+        </ul>
+      </nav>
     </footer>
   );
 };

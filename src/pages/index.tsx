@@ -1,6 +1,7 @@
 import { Fallback, fetchData } from 'api/useData';
-import Footer from 'components/Footer';
-import Header from 'components/Header';
+import ContentCard from 'components/ContentCard';
+import ContentGrid from 'components/ContentGrid';
+import Layout from 'components/Layout';
 import Meta from 'components/Meta';
 import { GetStaticProps, InferGetStaticPropsType } from 'next/types';
 import React from 'react';
@@ -14,7 +15,8 @@ interface Props {
 }
 
 /**
- * Grabs version and returns it as fallback
+ * Grabs all data necessary to render all components on the homepage to
+ * provide a fallback for the server side rendering done elsewhere.
  */
 export const getStaticProps: GetStaticProps<Props> = async () => {
   const [version, siteFooter, siteHeader] = await Promise.all([
@@ -39,12 +41,22 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 const Home = ({ fallback }: InferGetStaticPropsType<typeof getStaticProps>) => (
   <SWRConfig value={{ fallback }}>
     <Meta
-      title="Product-focused engineer"
+      title="Engineer, Human"
       description="I'm Dylan, an engineer focused on building top-notch user experiences. I'm interested in React, Product Design, Sustainability, Startups, Music, and Cycling."
     />
-    <Header />
-    <main>Main body</main>
-    <Footer />
+    <Layout>
+      <ContentGrid>
+        <ContentCard>test</ContentCard>
+        <ContentCard>test 2</ContentCard>
+        <ContentCard>test 3</ContentCard>
+        <ContentCard>test 4</ContentCard>
+        <ContentCard>test 5</ContentCard>
+        <ContentCard>test 6</ContentCard>
+        <ContentCard>test 7</ContentCard>
+        <ContentCard>test 8</ContentCard>
+        <ContentCard>test 9</ContentCard>
+      </ContentGrid>
+    </Layout>
   </SWRConfig>
 );
 
