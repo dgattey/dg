@@ -1,8 +1,8 @@
 import '@picocss/pico/css/pico.min.css';
 import { createGlobalStyle } from 'styled-components';
 
-const CONTENT_GRID_DIMENSION = 12;
-const CONTENT_GRID_GAP = 1;
+const CONTENT_GRID_DIMENSION = 13;
+const CONTENT_GRID_GAP = 1.5;
 
 /**
  * Applies styles to the full app
