@@ -46,15 +46,17 @@ const Home = ({ fallback }: InferGetStaticPropsType<typeof getStaticProps>) => (
     />
     <Layout>
       <ContentGrid>
-        <ContentCard>test</ContentCard>
-        <ContentCard>test 2</ContentCard>
-        <ContentCard>test 3</ContentCard>
-        <ContentCard>test 4</ContentCard>
-        <ContentCard>test 5</ContentCard>
-        <ContentCard>test 6</ContentCard>
-        <ContentCard>test 7</ContentCard>
-        <ContentCard>test 8</ContentCard>
-        <ContentCard>test 9</ContentCard>
+        <ContentCard>Hi</ContentCard>
+        <ContentCard verticalSpan={2}>Spans wide</ContentCard>
+        <ContentCard horizontalSpan={2}>Spans tall</ContentCard>
+        <ContentCard>I&apos;m regular</ContentCard>
+        <ContentCard isClickable>Here is card 5</ContentCard>
+        <ContentCard verticalSpan={2}>Sixth element</ContentCard>
+        <ContentCard>Third to last (7)</ContentCard>
+        <ContentCard horizontalSpan={2} isClickable>
+          8
+        </ContentCard>
+        <ContentCard>Ninth and last</ContentCard>
       </ContentGrid>
     </Layout>
   </SWRConfig>
