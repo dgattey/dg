@@ -1,0 +1,80 @@
+import styled, { css } from 'styled-components';
+
+interface Props {
+  /**
+   * How many columns the card spans, defaults to 1
+   */
+  horizontalSpan?: number;
+
+  /**
+   * How many rows the card spans, defaults to 1
+   */
+  verticalSpan?: number;
+
+  /**
+   * Determines whether the card can be clicked on to load/do something.
+   * Adds visual styling only.
+   */
+  isClickable?: boolean;
+}
+
+interface CardProps {
+  /**
+   * The number of columns to span horizontally
+   */
+  $hSpan: number;
+
+  /**
+   * The number of columns to span vertically. Used to calculate
+   * height as well, adding space for the grid gap as needed.
+   */
+  $vSpan: number;
+
+  /**
+   * If the card is visually clickable
+   */
+  $isClickable: boolean;
+}
+
+// Card component that spans an arbitrary number of rows/cols
+const Card = styled.article<CardProps>`
+  border: var(--border-width) solid var(--secondary-focus);
+  overflow: hidden;
+  margin: inherit;
+  ${({ $isClickable }) =>
+    $isClickable &&
+    css`
+      cursor: pointer;
+      transition: transform var(--transition);
+      &:hover {
+        transform: scale(1.02);
+      }
+    `}
+
+  ${({ $hSpan }) => css`
+    grid-column-start: span ${$hSpan};
+  `};
+  ${({ $vSpan }) =>
+    css`
+      height: calc(
+        var(--content-grid-dimension-em) * ${$vSpan} + ${$vSpan - 1} * var(--content-grid-gap-em)
+      );
+      grid-row-start: span ${$vSpan};
+    `}
+`;
+
+/**
+ * Wraps content in a card for the content grid
+ */
+const ContentCard = ({
+  horizontalSpan,
+  verticalSpan,
+  isClickable,
+  children,
+}: Pick<React.ComponentProps<'article'>, 'children'> & Props) => (
+  <Card $hSpan={horizontalSpan ?? 1} $vSpan={verticalSpan ?? 1} $isClickable={isClickable ?? false}>
+    {children}
+  </Card>
+);
+
+export default ContentCard;
