@@ -1,6 +1,14 @@
-import '@picocss/pico/css/pico.min.css';
+import AppStyle from 'components/AppStyle';
 import { AppProps } from 'next/app';
 
-const App = ({ Component, pageProps }: AppProps) => <Component {...pageProps} />;
+/**
+ * Adds styles to the basic component here
+ */
+const App = ({ Component, pageProps }: AppProps) => (
+  <>
+    <AppStyle />
+    <Component {...pageProps} />
+  </>
+);
 
 export default App;
