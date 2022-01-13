@@ -5,6 +5,12 @@ const CONTENT_GRID_DIMENSION = 13;
 const CONTENT_GRID_GAP = 1.5;
 
 /**
+ * Creates a card size in em from a span
+ */
+export const cardSizeInEm = (span = 1) =>
+  CONTENT_GRID_DIMENSION * span + (span - 1) * CONTENT_GRID_GAP;
+
+/**
  * Applies styles to the full app
  */
 const AppStyle = createGlobalStyle`
@@ -13,9 +19,7 @@ const AppStyle = createGlobalStyle`
       --border-radius: 1rem;
       
       /* Below here are new variables */
-      --content-grid-dimension: ${CONTENT_GRID_DIMENSION};
       --content-grid-dimension-em: ${CONTENT_GRID_DIMENSION}em;
-      --content-grid-gap: ${CONTENT_GRID_GAP};
       --content-grid-gap-em: ${CONTENT_GRID_GAP}em;
   }
 `;

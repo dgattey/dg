@@ -1,4 +1,5 @@
 import styled, { css } from 'styled-components';
+import { cardSizeInEm } from './AppStyle';
 
 interface Props {
   /**
@@ -38,13 +39,16 @@ interface CardProps {
 
 // Card component that spans an arbitrary number of rows/cols
 const Card = styled.article<CardProps>`
+  position: relative;
   border: var(--border-width) solid var(--secondary-focus);
   overflow: hidden;
   margin: inherit;
+  padding: 0;
   ${({ $isClickable }) =>
     $isClickable &&
     css`
       cursor: pointer;
+      -webkit-transform-style: preserve-3d;
       transition: transform var(--transition);
       &:hover {
         transform: scale(1.02);
@@ -56,9 +60,7 @@ const Card = styled.article<CardProps>`
   `};
   ${({ $vSpan }) =>
     css`
-      height: calc(
-        var(--content-grid-dimension-em) * ${$vSpan} + ${$vSpan - 1} * var(--content-grid-gap-em)
-      );
+      height: ${cardSizeInEm($vSpan)}em;
       grid-row-start: span ${$vSpan};
     `}
 `;
