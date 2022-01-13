@@ -2,19 +2,9 @@ import { gql } from 'graphql-request';
 import fetchGraphQLData from '../fetchGraphQLData';
 import { Link } from './generated/api.generated';
 import { SiteFooterQuery } from './generated/fetchSiteFooter.generated';
-import { isDefinedItem, isLink, isLinkCollection, isSection } from './typeguards';
+import { isDefinedItem, isLink } from './typeguards';
 
-interface SiteFooter {
-  /**
-   * An array of all the text links to show
-   */
-  textLinks: Array<Link>;
-
-  /**
-   * An array of all the icon links to show
-   */
-  iconLinks: Array<Link>;
-}
+type SiteFooter = Array<Link>;
 
 /**
  * Grabs the contentful sections with the title of footer. Should
@@ -29,17 +19,7 @@ const QUERY = gql`
             ... on Link {
               title
               url
-            }
-            ... on Section {
-              blocksCollection {
-                items {
-                  ... on Link {
-                    title
-                    url
-                    icon
-                  }
-                }
-              }
+              icon
             }
           }
         }
@@ -56,15 +36,7 @@ const fetchSiteFooter = async (): Promise<SiteFooter> => {
   const data = await fetchGraphQLData<SiteFooterQuery>('/api/content', QUERY);
   const items =
     data?.sectionCollection?.items.flatMap((item) => item?.blocksCollection?.items ?? []) ?? [];
-  const iconLinks = items
-    .filter(isSection)
-    .flatMap((section) => section.blocksCollection)
-    .filter(isLinkCollection)
-    .flatMap((collection) => collection.items.filter(isDefinedItem) ?? []);
-  return {
-    textLinks: items.filter(isLink),
-    iconLinks,
-  };
+  return items.filter(isLink).filter(isDefinedItem);
 };
 
 export default fetchSiteFooter;

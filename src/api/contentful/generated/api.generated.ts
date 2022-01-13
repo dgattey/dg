@@ -131,7 +131,6 @@ export type AssetFilter = {
 export type AssetLinkingCollections = {
   readonly entryCollection: Maybe<EntryCollection>;
   readonly projectCollection: Maybe<ProjectCollection>;
-  readonly textCollection: Maybe<TextCollection>;
 };
 
 export type AssetLinkingCollectionsEntryCollectionArgs = {
@@ -142,13 +141,6 @@ export type AssetLinkingCollectionsEntryCollectionArgs = {
 };
 
 export type AssetLinkingCollectionsProjectCollectionArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  locale: InputMaybe<Scalars['String']>;
-  preview: InputMaybe<Scalars['Boolean']>;
-  skip?: InputMaybe<Scalars['Int']>;
-};
-
-export type AssetLinkingCollectionsTextCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
@@ -274,9 +266,17 @@ export type BookFilter = {
 
 export type BookLinkingCollections = {
   readonly entryCollection: Maybe<EntryCollection>;
+  readonly sectionCollection: Maybe<SectionCollection>;
 };
 
 export type BookLinkingCollectionsEntryCollectionArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  locale: InputMaybe<Scalars['String']>;
+  preview: InputMaybe<Scalars['Boolean']>;
+  skip?: InputMaybe<Scalars['Int']>;
+};
+
+export type BookLinkingCollectionsSectionCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
@@ -512,6 +512,7 @@ export type LinkFilter = {
 export type LinkLinkingCollections = {
   readonly entryCollection: Maybe<EntryCollection>;
   readonly projectCollection: Maybe<ProjectCollection>;
+  readonly sectionCollection: Maybe<SectionCollection>;
 };
 
 export type LinkLinkingCollectionsEntryCollectionArgs = {
@@ -522,6 +523,13 @@ export type LinkLinkingCollectionsEntryCollectionArgs = {
 };
 
 export type LinkLinkingCollectionsProjectCollectionArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  locale: InputMaybe<Scalars['String']>;
+  preview: InputMaybe<Scalars['Boolean']>;
+  skip?: InputMaybe<Scalars['Int']>;
+};
+
+export type LinkLinkingCollectionsSectionCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
@@ -541,100 +549,6 @@ export type LinkOrder =
   | 'title_DESC'
   | 'url_ASC'
   | 'url_DESC';
-
-/** A page composed of multiple text blocks and other info about it [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/page) */
-export type Page = Entry & {
-  readonly contentfulMetadata: ContentfulMetadata;
-  readonly linkedFrom: Maybe<PageLinkingCollections>;
-  readonly sectionsCollection: Maybe<PageSectionsCollection>;
-  readonly slug: Maybe<Scalars['String']>;
-  readonly sys: Sys;
-  readonly title: Maybe<Scalars['String']>;
-};
-
-/** A page composed of multiple text blocks and other info about it [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/page) */
-export type PageLinkedFromArgs = {
-  allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
-};
-
-/** A page composed of multiple text blocks and other info about it [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/page) */
-export type PageSectionsCollectionArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  locale: InputMaybe<Scalars['String']>;
-  preview: InputMaybe<Scalars['Boolean']>;
-  skip?: InputMaybe<Scalars['Int']>;
-};
-
-/** A page composed of multiple text blocks and other info about it [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/page) */
-export type PageSlugArgs = {
-  locale: InputMaybe<Scalars['String']>;
-};
-
-/** A page composed of multiple text blocks and other info about it [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/page) */
-export type PageTitleArgs = {
-  locale: InputMaybe<Scalars['String']>;
-};
-
-export type PageCollection = {
-  readonly items: ReadonlyArray<Maybe<Page>>;
-  readonly limit: Scalars['Int'];
-  readonly skip: Scalars['Int'];
-  readonly total: Scalars['Int'];
-};
-
-export type PageFilter = {
-  readonly AND: InputMaybe<ReadonlyArray<InputMaybe<PageFilter>>>;
-  readonly OR: InputMaybe<ReadonlyArray<InputMaybe<PageFilter>>>;
-  readonly contentfulMetadata: InputMaybe<ContentfulMetadataFilter>;
-  readonly sectionsCollection_exists: InputMaybe<Scalars['Boolean']>;
-  readonly slug: InputMaybe<Scalars['String']>;
-  readonly slug_contains: InputMaybe<Scalars['String']>;
-  readonly slug_exists: InputMaybe<Scalars['Boolean']>;
-  readonly slug_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
-  readonly slug_not: InputMaybe<Scalars['String']>;
-  readonly slug_not_contains: InputMaybe<Scalars['String']>;
-  readonly slug_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
-  readonly sys: InputMaybe<SysFilter>;
-  readonly title: InputMaybe<Scalars['String']>;
-  readonly title_contains: InputMaybe<Scalars['String']>;
-  readonly title_exists: InputMaybe<Scalars['Boolean']>;
-  readonly title_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
-  readonly title_not: InputMaybe<Scalars['String']>;
-  readonly title_not_contains: InputMaybe<Scalars['String']>;
-  readonly title_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
-};
-
-export type PageLinkingCollections = {
-  readonly entryCollection: Maybe<EntryCollection>;
-};
-
-export type PageLinkingCollectionsEntryCollectionArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  locale: InputMaybe<Scalars['String']>;
-  preview: InputMaybe<Scalars['Boolean']>;
-  skip?: InputMaybe<Scalars['Int']>;
-};
-
-export type PageOrder =
-  | 'slug_ASC'
-  | 'slug_DESC'
-  | 'sys_firstPublishedAt_ASC'
-  | 'sys_firstPublishedAt_DESC'
-  | 'sys_id_ASC'
-  | 'sys_id_DESC'
-  | 'sys_publishedAt_ASC'
-  | 'sys_publishedAt_DESC'
-  | 'sys_publishedVersion_ASC'
-  | 'sys_publishedVersion_DESC'
-  | 'title_ASC'
-  | 'title_DESC';
-
-export type PageSectionsCollection = {
-  readonly items: ReadonlyArray<Maybe<Entry>>;
-  readonly limit: Scalars['Int'];
-  readonly skip: Scalars['Int'];
-  readonly total: Scalars['Int'];
-};
 
 /** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
 export type Project = Entry & {
@@ -749,9 +663,17 @@ export type ProjectFilter = {
 
 export type ProjectLinkingCollections = {
   readonly entryCollection: Maybe<EntryCollection>;
+  readonly sectionCollection: Maybe<SectionCollection>;
 };
 
 export type ProjectLinkingCollectionsEntryCollectionArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  locale: InputMaybe<Scalars['String']>;
+  preview: InputMaybe<Scalars['Boolean']>;
+  skip?: InputMaybe<Scalars['Int']>;
+};
+
+export type ProjectLinkingCollectionsSectionCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
@@ -780,14 +702,10 @@ export type Query = {
   readonly entryCollection: Maybe<EntryCollection>;
   readonly link: Maybe<Link>;
   readonly linkCollection: Maybe<LinkCollection>;
-  readonly page: Maybe<Page>;
-  readonly pageCollection: Maybe<PageCollection>;
   readonly project: Maybe<Project>;
   readonly projectCollection: Maybe<ProjectCollection>;
   readonly section: Maybe<Section>;
   readonly sectionCollection: Maybe<SectionCollection>;
-  readonly text: Maybe<Text>;
-  readonly textCollection: Maybe<TextCollection>;
 };
 
 export type QueryAssetArgs = {
@@ -844,21 +762,6 @@ export type QueryLinkCollectionArgs = {
   where: InputMaybe<LinkFilter>;
 };
 
-export type QueryPageArgs = {
-  id: Scalars['String'];
-  locale: InputMaybe<Scalars['String']>;
-  preview: InputMaybe<Scalars['Boolean']>;
-};
-
-export type QueryPageCollectionArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  locale: InputMaybe<Scalars['String']>;
-  order: InputMaybe<ReadonlyArray<InputMaybe<PageOrder>>>;
-  preview: InputMaybe<Scalars['Boolean']>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where: InputMaybe<PageFilter>;
-};
-
 export type QueryProjectArgs = {
   id: Scalars['String'];
   locale: InputMaybe<Scalars['String']>;
@@ -889,21 +792,6 @@ export type QuerySectionCollectionArgs = {
   where: InputMaybe<SectionFilter>;
 };
 
-export type QueryTextArgs = {
-  id: Scalars['String'];
-  locale: InputMaybe<Scalars['String']>;
-  preview: InputMaybe<Scalars['Boolean']>;
-};
-
-export type QueryTextCollectionArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  locale: InputMaybe<Scalars['String']>;
-  order: InputMaybe<ReadonlyArray<InputMaybe<TextOrder>>>;
-  preview: InputMaybe<Scalars['Boolean']>;
-  skip?: InputMaybe<Scalars['Int']>;
-  where: InputMaybe<TextFilter>;
-};
-
 /** A section containing references to other blocks. Based on the content of the section, may appear differently on different pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
 export type Section = Entry & {
   readonly blocksCollection: Maybe<SectionBlocksCollection>;
@@ -932,11 +820,13 @@ export type SectionTitleArgs = {
 };
 
 export type SectionBlocksCollection = {
-  readonly items: ReadonlyArray<Maybe<Entry>>;
+  readonly items: ReadonlyArray<Maybe<SectionBlocksItem>>;
   readonly limit: Scalars['Int'];
   readonly skip: Scalars['Int'];
   readonly total: Scalars['Int'];
 };
+
+export type SectionBlocksItem = Book | Link | Project | Section;
 
 export type SectionCollection = {
   readonly items: ReadonlyArray<Maybe<Section>>;
@@ -962,9 +852,17 @@ export type SectionFilter = {
 
 export type SectionLinkingCollections = {
   readonly entryCollection: Maybe<EntryCollection>;
+  readonly sectionCollection: Maybe<SectionCollection>;
 };
 
 export type SectionLinkingCollectionsEntryCollectionArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  locale: InputMaybe<Scalars['String']>;
+  preview: InputMaybe<Scalars['Boolean']>;
+  skip?: InputMaybe<Scalars['Int']>;
+};
+
+export type SectionLinkingCollectionsSectionCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
@@ -1027,121 +925,6 @@ export type SysFilter = {
   readonly publishedVersion_lte: InputMaybe<Scalars['Float']>;
   readonly publishedVersion_not: InputMaybe<Scalars['Float']>;
   readonly publishedVersion_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['Float']>>>;
-};
-
-/** Rich text together with an optional image, used in sections and pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/text) */
-export type Text = Entry & {
-  readonly contentfulMetadata: ContentfulMetadata;
-  readonly identifier: Maybe<Scalars['String']>;
-  readonly image: Maybe<Asset>;
-  readonly imageType: Maybe<Scalars['String']>;
-  readonly linkedFrom: Maybe<TextLinkingCollections>;
-  readonly sys: Sys;
-  readonly text: Maybe<TextText>;
-};
-
-/** Rich text together with an optional image, used in sections and pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/text) */
-export type TextIdentifierArgs = {
-  locale: InputMaybe<Scalars['String']>;
-};
-
-/** Rich text together with an optional image, used in sections and pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/text) */
-export type TextImageArgs = {
-  locale: InputMaybe<Scalars['String']>;
-  preview: InputMaybe<Scalars['Boolean']>;
-};
-
-/** Rich text together with an optional image, used in sections and pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/text) */
-export type TextImageTypeArgs = {
-  locale: InputMaybe<Scalars['String']>;
-};
-
-/** Rich text together with an optional image, used in sections and pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/text) */
-export type TextLinkedFromArgs = {
-  allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
-};
-
-/** Rich text together with an optional image, used in sections and pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/text) */
-export type TextTextArgs = {
-  locale: InputMaybe<Scalars['String']>;
-};
-
-export type TextCollection = {
-  readonly items: ReadonlyArray<Maybe<Text>>;
-  readonly limit: Scalars['Int'];
-  readonly skip: Scalars['Int'];
-  readonly total: Scalars['Int'];
-};
-
-export type TextFilter = {
-  readonly AND: InputMaybe<ReadonlyArray<InputMaybe<TextFilter>>>;
-  readonly OR: InputMaybe<ReadonlyArray<InputMaybe<TextFilter>>>;
-  readonly contentfulMetadata: InputMaybe<ContentfulMetadataFilter>;
-  readonly identifier: InputMaybe<Scalars['String']>;
-  readonly identifier_contains: InputMaybe<Scalars['String']>;
-  readonly identifier_exists: InputMaybe<Scalars['Boolean']>;
-  readonly identifier_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
-  readonly identifier_not: InputMaybe<Scalars['String']>;
-  readonly identifier_not_contains: InputMaybe<Scalars['String']>;
-  readonly identifier_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
-  readonly imageType: InputMaybe<Scalars['String']>;
-  readonly imageType_contains: InputMaybe<Scalars['String']>;
-  readonly imageType_exists: InputMaybe<Scalars['Boolean']>;
-  readonly imageType_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
-  readonly imageType_not: InputMaybe<Scalars['String']>;
-  readonly imageType_not_contains: InputMaybe<Scalars['String']>;
-  readonly imageType_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
-  readonly image_exists: InputMaybe<Scalars['Boolean']>;
-  readonly sys: InputMaybe<SysFilter>;
-  readonly text_contains: InputMaybe<Scalars['String']>;
-  readonly text_exists: InputMaybe<Scalars['Boolean']>;
-  readonly text_not_contains: InputMaybe<Scalars['String']>;
-};
-
-export type TextLinkingCollections = {
-  readonly entryCollection: Maybe<EntryCollection>;
-};
-
-export type TextLinkingCollectionsEntryCollectionArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  locale: InputMaybe<Scalars['String']>;
-  preview: InputMaybe<Scalars['Boolean']>;
-  skip?: InputMaybe<Scalars['Int']>;
-};
-
-export type TextOrder =
-  | 'identifier_ASC'
-  | 'identifier_DESC'
-  | 'imageType_ASC'
-  | 'imageType_DESC'
-  | 'sys_firstPublishedAt_ASC'
-  | 'sys_firstPublishedAt_DESC'
-  | 'sys_id_ASC'
-  | 'sys_id_DESC'
-  | 'sys_publishedAt_ASC'
-  | 'sys_publishedAt_DESC'
-  | 'sys_publishedVersion_ASC'
-  | 'sys_publishedVersion_DESC';
-
-export type TextText = {
-  readonly json: Scalars['JSON'];
-  readonly links: TextTextLinks;
-};
-
-export type TextTextAssets = {
-  readonly block: ReadonlyArray<Maybe<Asset>>;
-  readonly hyperlink: ReadonlyArray<Maybe<Asset>>;
-};
-
-export type TextTextEntries = {
-  readonly block: ReadonlyArray<Maybe<Entry>>;
-  readonly hyperlink: ReadonlyArray<Maybe<Entry>>;
-  readonly inline: ReadonlyArray<Maybe<Entry>>;
-};
-
-export type TextTextLinks = {
-  readonly assets: TextTextAssets;
-  readonly entries: TextTextEntries;
 };
 
 export type CfLinkNestedFilter = {
