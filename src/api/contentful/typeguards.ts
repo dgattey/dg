@@ -1,20 +1,4 @@
-import type { Link, LinkCollection, Section } from './generated/api.generated';
-
-/**
- * Type guard to get a section out
- */
-export const isSection = (item: Section | undefined | Record<string, unknown>): item is Section =>
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  !!(item as Section)?.blocksCollection?.items;
-
-/**
- * Type guard to get a link collection out
- */
-export const isLinkCollection = (
-  item: LinkCollection | undefined | Record<string, unknown>,
-): item is LinkCollection =>
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  !!(item as LinkCollection)?.items?.some?.((collectionItem) => !!collectionItem?.icon);
+import type { Link } from './generated/api.generated';
 
 /**
  * Type guard to get a link out

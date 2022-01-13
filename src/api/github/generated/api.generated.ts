@@ -1643,6 +1643,8 @@ export type FundingPlatform =
   | 'ISSUEHUNT'
   /** Ko-fi funding platform. */
   | 'KO_FI'
+  /** LFX Crowdfunding funding platform. */
+  | 'LFX_CROWDFUNDING'
   /** Liberapay funding platform. */
   | 'LIBERAPAY'
   /** Open Collective funding platform. */
@@ -2141,6 +2143,19 @@ export type OrgCreateAuditEntryBillingPlan =
   | 'TIERED_PER_SEAT'
   /** Legacy Unlimited Plan */
   | 'UNLIMITED';
+
+/** Ordering options for an organization's enterprise owner connections. */
+export type OrgEnterpriseOwnerOrder = {
+  /** The ordering direction. */
+  readonly direction: OrderDirection;
+  /** The field to order enterprise owners by. */
+  readonly field: OrgEnterpriseOwnerOrderField;
+};
+
+/** Properties by which enterprise owners can be ordered. */
+export type OrgEnterpriseOwnerOrderField =
+  /** Order enterprise owners by login. */
+  'LOGIN';
 
 /** The reason a billing manager was removed from an Organization. */
 export type OrgRemoveBillingManagerAuditEntryReason =

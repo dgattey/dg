@@ -10,7 +10,11 @@ export type SiteFooterQuery = {
               readonly blocksCollection:
                 | {
                     readonly items: ReadonlyArray<
-                      | { readonly title: string | undefined; readonly url: string | undefined }
+                      | {
+                          readonly title: string | undefined;
+                          readonly url: string | undefined;
+                          readonly icon: string | undefined;
+                        }
                       | {
                           readonly blocksCollection:
                             | {
