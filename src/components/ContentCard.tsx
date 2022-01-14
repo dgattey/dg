@@ -55,11 +55,16 @@ const Card = styled.article<CardProps>`
     `}
 
   ${({ $hSpan }) => css`
-    grid-column-start: span ${$hSpan};
+    @media (min-width: 768px) {
+      width: ${cardSizeInEm($hSpan)}em;
+      grid-column-start: span ${$hSpan};
+    }
   `};
   ${({ $vSpan }) =>
     css`
-      height: ${cardSizeInEm($vSpan)}em;
+      @media (min-width: 768px) {
+        height: ${cardSizeInEm($vSpan)}em;
+      }
       grid-row-start: span ${$vSpan};
     `}
 `;
