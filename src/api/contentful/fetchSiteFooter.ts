@@ -12,7 +12,7 @@ type SiteFooter = Array<Link>;
  */
 const QUERY = gql`
   query SiteFooter {
-    sectionCollection(limit: 1, where: { title: "Footer" }) {
+    sectionCollection(limit: 1, where: { slug: "footer" }) {
       items {
         blocksCollection(limit: 100) {
           items {
