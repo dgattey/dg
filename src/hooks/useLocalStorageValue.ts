@@ -7,7 +7,7 @@ export type LocalStorageKey = 'colorScheme';
  */
 const useLocalStorageValue = <Value>(key: LocalStorageKey, initialValue: Value) => {
   const resolvedKey = `com.dg.${key}`;
-  const [storedValue, setStoredValue] = useState<Value>(() => {
+  const [storedValue, setStoredValue] = useState<Value | null>(() => {
     try {
       const item = window.localStorage.getItem(resolvedKey);
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -30,7 +30,22 @@ const useLocalStorageValue = <Value>(key: LocalStorageKey, initialValue: Value) 
       return false;
     }
   };
-  return [storedValue, setValue] as const;
+
+  /**
+   * Deletes the value from local storage, returning if it was deleted
+   * successfully.
+   */
+  const deleteValue = () => {
+    try {
+      setStoredValue(null);
+      window.localStorage.removeItem(resolvedKey);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
+  return [storedValue, setValue, deleteValue] as const;
 };
 
 export default useLocalStorageValue;
