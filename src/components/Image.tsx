@@ -23,8 +23,8 @@ const Image = ({ url, width, height, layout = 'responsive', title, alt, classNam
     className={className}
     src={url}
     alt={alt ?? title}
-    width={width}
-    height={height}
+    width={layout !== 'fill' ? width : undefined}
+    height={layout !== 'fill' ? height : undefined}
     layout={layout}
   />
 );

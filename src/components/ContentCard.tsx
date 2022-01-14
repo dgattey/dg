@@ -48,9 +48,11 @@ const Card = styled.article<CardProps>`
     css`
       cursor: pointer;
       -webkit-transform-style: preserve-3d;
-      transition: transform var(--transition);
+      /* Not as performant as using pseudo element + opacity for shadow, but that doesn't work with overflow: hidden */
+      transition: transform var(--transition), box-shadow var(--transition);
       &:hover {
-        transform: scale(1.02);
+        transform: scale(1.05);
+        box-shadow: var(--card-hovered-box-shadow);
       }
     `}
 

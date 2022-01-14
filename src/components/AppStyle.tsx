@@ -17,6 +17,8 @@ export const cardSizeInEm = (span = 1) =>
 const darkModeVariables = css`
   --contrast-overlay: var(--contrast-inverse);
   --contrast-overlay-inverse: var(--contrast);
+  --card-hovered-box-shadow: 0 0.125rem 2rem rgba(0, 0, 0, 0.06),
+    0 0.125rem 4rem rgba(0, 0, 0, 0.12), 0 0 0 0.125rem rgba(0, 0, 0, 0.036);
 `;
 
 /**
@@ -26,6 +28,8 @@ const darkModeVariables = css`
 const lightModeVariables = css`
   --contrast-overlay: var(--secondary);
   --contrast-overlay-inverse: var(--secondary-inverse);
+  --card-hovered-box-shadow: 0 0.125rem 2rem rgba(27, 40, 50, 0.04),
+    0 0.125rem 4rem rgba(27, 40, 50, 0.08), 0 0 0 0.125rem rgba(27, 40, 50, 0.024);
 `;
 
 /**
