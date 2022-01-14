@@ -43,13 +43,49 @@ export type Asset = {
 };
 
 /** Represents a binary file in a space. An asset can be any file type. */
+export type AssetContentTypeArgs = {
+  locale: InputMaybe<Scalars['String']>;
+};
+
+/** Represents a binary file in a space. An asset can be any file type. */
+export type AssetDescriptionArgs = {
+  locale: InputMaybe<Scalars['String']>;
+};
+
+/** Represents a binary file in a space. An asset can be any file type. */
+export type AssetFileNameArgs = {
+  locale: InputMaybe<Scalars['String']>;
+};
+
+/** Represents a binary file in a space. An asset can be any file type. */
+export type AssetHeightArgs = {
+  locale: InputMaybe<Scalars['String']>;
+};
+
+/** Represents a binary file in a space. An asset can be any file type. */
 export type AssetLinkedFromArgs = {
   allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
 };
 
 /** Represents a binary file in a space. An asset can be any file type. */
+export type AssetSizeArgs = {
+  locale: InputMaybe<Scalars['String']>;
+};
+
+/** Represents a binary file in a space. An asset can be any file type. */
+export type AssetTitleArgs = {
+  locale: InputMaybe<Scalars['String']>;
+};
+
+/** Represents a binary file in a space. An asset can be any file type. */
 export type AssetUrlArgs = {
+  locale: InputMaybe<Scalars['String']>;
   transform: InputMaybe<ImageTransformOptions>;
+};
+
+/** Represents a binary file in a space. An asset can be any file type. */
+export type AssetWidthArgs = {
+  locale: InputMaybe<Scalars['String']>;
 };
 
 export type AssetCollection = {
@@ -739,6 +775,8 @@ export type Query = {
   readonly projectCollection: Maybe<ProjectCollection>;
   readonly section: Maybe<Section>;
   readonly sectionCollection: Maybe<SectionCollection>;
+  readonly textBlock: Maybe<TextBlock>;
+  readonly textBlockCollection: Maybe<TextBlockCollection>;
 };
 
 export type QueryAssetArgs = {
@@ -825,13 +863,28 @@ export type QuerySectionCollectionArgs = {
   where: InputMaybe<SectionFilter>;
 };
 
+export type QueryTextBlockArgs = {
+  id: Scalars['String'];
+  locale: InputMaybe<Scalars['String']>;
+  preview: InputMaybe<Scalars['Boolean']>;
+};
+
+export type QueryTextBlockCollectionArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  locale: InputMaybe<Scalars['String']>;
+  order: InputMaybe<ReadonlyArray<InputMaybe<TextBlockOrder>>>;
+  preview: InputMaybe<Scalars['Boolean']>;
+  skip?: InputMaybe<Scalars['Int']>;
+  where: InputMaybe<TextBlockFilter>;
+};
+
 /** A collection of references to other nodes [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
 export type Section = Entry & {
   readonly blocksCollection: Maybe<SectionBlocksCollection>;
   readonly contentfulMetadata: ContentfulMetadata;
   readonly linkedFrom: Maybe<SectionLinkingCollections>;
+  readonly slug: Maybe<Scalars['String']>;
   readonly sys: Sys;
-  readonly title: Maybe<Scalars['String']>;
 };
 
 /** A collection of references to other nodes [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
@@ -848,7 +901,7 @@ export type SectionLinkedFromArgs = {
 };
 
 /** A collection of references to other nodes [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
-export type SectionTitleArgs = {
+export type SectionSlugArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
 
@@ -873,14 +926,14 @@ export type SectionFilter = {
   readonly OR: InputMaybe<ReadonlyArray<InputMaybe<SectionFilter>>>;
   readonly blocksCollection_exists: InputMaybe<Scalars['Boolean']>;
   readonly contentfulMetadata: InputMaybe<ContentfulMetadataFilter>;
+  readonly slug: InputMaybe<Scalars['String']>;
+  readonly slug_contains: InputMaybe<Scalars['String']>;
+  readonly slug_exists: InputMaybe<Scalars['Boolean']>;
+  readonly slug_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+  readonly slug_not: InputMaybe<Scalars['String']>;
+  readonly slug_not_contains: InputMaybe<Scalars['String']>;
+  readonly slug_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
   readonly sys: InputMaybe<SysFilter>;
-  readonly title: InputMaybe<Scalars['String']>;
-  readonly title_contains: InputMaybe<Scalars['String']>;
-  readonly title_exists: InputMaybe<Scalars['Boolean']>;
-  readonly title_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
-  readonly title_not: InputMaybe<Scalars['String']>;
-  readonly title_not_contains: InputMaybe<Scalars['String']>;
-  readonly title_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
 };
 
 export type SectionLinkingCollections = {
@@ -895,6 +948,8 @@ export type SectionLinkingCollectionsEntryCollectionArgs = {
 };
 
 export type SectionOrder =
+  | 'slug_ASC'
+  | 'slug_DESC'
   | 'sys_firstPublishedAt_ASC'
   | 'sys_firstPublishedAt_DESC'
   | 'sys_id_ASC'
@@ -902,9 +957,7 @@ export type SectionOrder =
   | 'sys_publishedAt_ASC'
   | 'sys_publishedAt_DESC'
   | 'sys_publishedVersion_ASC'
-  | 'sys_publishedVersion_DESC'
-  | 'title_ASC'
-  | 'title_DESC';
+  | 'sys_publishedVersion_DESC';
 
 export type Sys = {
   readonly environmentId: Scalars['String'];
@@ -951,6 +1004,98 @@ export type SysFilter = {
   readonly publishedVersion_not: InputMaybe<Scalars['Float']>;
   readonly publishedVersion_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['Float']>>>;
 };
+
+/** A block of rich text, for use with things like Privacy Policy/introduction paragraph/etc [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/textBlock) */
+export type TextBlock = Entry & {
+  readonly content: Maybe<TextBlockContent>;
+  readonly contentfulMetadata: ContentfulMetadata;
+  readonly linkedFrom: Maybe<TextBlockLinkingCollections>;
+  readonly slug: Maybe<Scalars['String']>;
+  readonly sys: Sys;
+};
+
+/** A block of rich text, for use with things like Privacy Policy/introduction paragraph/etc [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/textBlock) */
+export type TextBlockContentArgs = {
+  locale: InputMaybe<Scalars['String']>;
+};
+
+/** A block of rich text, for use with things like Privacy Policy/introduction paragraph/etc [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/textBlock) */
+export type TextBlockLinkedFromArgs = {
+  allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+};
+
+/** A block of rich text, for use with things like Privacy Policy/introduction paragraph/etc [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/textBlock) */
+export type TextBlockSlugArgs = {
+  locale: InputMaybe<Scalars['String']>;
+};
+
+export type TextBlockCollection = {
+  readonly items: ReadonlyArray<Maybe<TextBlock>>;
+  readonly limit: Scalars['Int'];
+  readonly skip: Scalars['Int'];
+  readonly total: Scalars['Int'];
+};
+
+export type TextBlockContent = {
+  readonly json: Scalars['JSON'];
+  readonly links: TextBlockContentLinks;
+};
+
+export type TextBlockContentAssets = {
+  readonly block: ReadonlyArray<Maybe<Asset>>;
+  readonly hyperlink: ReadonlyArray<Maybe<Asset>>;
+};
+
+export type TextBlockContentEntries = {
+  readonly block: ReadonlyArray<Maybe<Entry>>;
+  readonly hyperlink: ReadonlyArray<Maybe<Entry>>;
+  readonly inline: ReadonlyArray<Maybe<Entry>>;
+};
+
+export type TextBlockContentLinks = {
+  readonly assets: TextBlockContentAssets;
+  readonly entries: TextBlockContentEntries;
+};
+
+export type TextBlockFilter = {
+  readonly AND: InputMaybe<ReadonlyArray<InputMaybe<TextBlockFilter>>>;
+  readonly OR: InputMaybe<ReadonlyArray<InputMaybe<TextBlockFilter>>>;
+  readonly content_contains: InputMaybe<Scalars['String']>;
+  readonly content_exists: InputMaybe<Scalars['Boolean']>;
+  readonly content_not_contains: InputMaybe<Scalars['String']>;
+  readonly contentfulMetadata: InputMaybe<ContentfulMetadataFilter>;
+  readonly slug: InputMaybe<Scalars['String']>;
+  readonly slug_contains: InputMaybe<Scalars['String']>;
+  readonly slug_exists: InputMaybe<Scalars['Boolean']>;
+  readonly slug_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+  readonly slug_not: InputMaybe<Scalars['String']>;
+  readonly slug_not_contains: InputMaybe<Scalars['String']>;
+  readonly slug_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+  readonly sys: InputMaybe<SysFilter>;
+};
+
+export type TextBlockLinkingCollections = {
+  readonly entryCollection: Maybe<EntryCollection>;
+};
+
+export type TextBlockLinkingCollectionsEntryCollectionArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  locale: InputMaybe<Scalars['String']>;
+  preview: InputMaybe<Scalars['Boolean']>;
+  skip?: InputMaybe<Scalars['Int']>;
+};
+
+export type TextBlockOrder =
+  | 'slug_ASC'
+  | 'slug_DESC'
+  | 'sys_firstPublishedAt_ASC'
+  | 'sys_firstPublishedAt_DESC'
+  | 'sys_id_ASC'
+  | 'sys_id_DESC'
+  | 'sys_publishedAt_ASC'
+  | 'sys_publishedAt_DESC'
+  | 'sys_publishedVersion_ASC'
+  | 'sys_publishedVersion_DESC';
 
 export type CfLinkNestedFilter = {
   readonly AND: InputMaybe<ReadonlyArray<InputMaybe<CfLinkNestedFilter>>>;

@@ -1,4 +1,5 @@
 import useSWR from 'swr';
+import fetchIntroBlock from './contentful/fetchIntroBlock';
 import fetchProjects from './contentful/fetchProjects';
 import fetchSiteFooter from './contentful/fetchSiteFooter';
 import fetchSiteHeader from './contentful/fetchSiteHeader';
@@ -46,6 +47,11 @@ const fetchers = {
    * All projects to list on home page
    */
   projects: fetchProjects,
+
+  /**
+   * The introduction rich text block for the homepage
+   */
+  introBlock: fetchIntroBlock,
 } as const;
 
 /**

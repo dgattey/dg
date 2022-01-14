@@ -1,6 +1,6 @@
 import useData from 'api/useData';
-import Link from 'next/link';
 import styled from 'styled-components';
+import Link from './Link';
 
 const SpacedHeader = styled.header`
   margin-top: var(--block-spacing-vertical);
@@ -10,8 +10,17 @@ const SpacedHeader = styled.header`
  * Creates the site header component - shows header links
  */
 const Header = () => {
-  const { data: siteHeader } = useData('siteHeader');
-  const { links } = siteHeader ?? {};
+  const { data: headerLinks } = useData('siteHeader');
+  const linkElements = headerLinks && (
+    <ul>
+      {headerLinks.map((link) => (
+        <li key={link.url}>
+          <Link {...link} />
+        </li>
+      ))}
+    </ul>
+  );
+
   return (
     <SpacedHeader>
       <nav>
@@ -20,19 +29,7 @@ const Header = () => {
             <strong>Dylan Gattey</strong>
           </li>
         </ul>
-        {links && (
-          <ul>
-            {links.map(
-              ({ title, url }) =>
-                url &&
-                title && (
-                  <li key={url}>
-                    <Link href={url}>{title}</Link>
-                  </li>
-                ),
-            )}
-          </ul>
-        )}
+        {linkElements}
       </nav>
     </SpacedHeader>
   );

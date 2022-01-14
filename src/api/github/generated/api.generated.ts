@@ -2553,6 +2553,8 @@ export type PullRequestState =
 
 /** The possible item types found in a timeline. */
 export type PullRequestTimelineItemsItemType =
+  /** Represents a 'added_to_merge_queue' event on a given pull request. */
+  | 'ADDED_TO_MERGE_QUEUE_EVENT'
   /** Represents a 'added_to_project' event on a given issue or pull request. */
   | 'ADDED_TO_PROJECT_EVENT'
   /** Represents an 'assigned' event on any assignable object. */
@@ -2635,6 +2637,8 @@ export type PullRequestTimelineItemsItemType =
   | 'READY_FOR_REVIEW_EVENT'
   /** Represents a 'referenced' event on a given `ReferencedSubject`. */
   | 'REFERENCED_EVENT'
+  /** Represents a 'removed_from_merge_queue' event on a given pull request. */
+  | 'REMOVED_FROM_MERGE_QUEUE_EVENT'
   /** Represents a 'removed_from_project' event on a given issue or pull request. */
   | 'REMOVED_FROM_PROJECT_EVENT'
   /** Represents a 'renamed' event on a given issue or pull request */

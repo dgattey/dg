@@ -10,7 +10,7 @@ interface Props {
   /**
    * Provides SWR with fallback version data
    */
-  fallback: Fallback<'version' | 'siteFooter' | 'siteHeader' | 'projects'>;
+  fallback: Fallback<'version' | 'siteFooter' | 'siteHeader' | 'projects' | 'introBlock'>;
 }
 
 /**
@@ -18,11 +18,12 @@ interface Props {
  * provide a fallback for the server side rendering done elsewhere.
  */
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  const [version, siteFooter, siteHeader, projects] = await Promise.all([
+  const [version, siteFooter, siteHeader, projects, introBlock] = await Promise.all([
     fetchData('version'),
     fetchData('siteFooter'),
     fetchData('siteHeader'),
     fetchData('projects'),
+    fetchData('introBlock'),
   ]);
   return {
     props: {
@@ -31,6 +32,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
         siteFooter,
         siteHeader,
         projects,
+        introBlock,
       },
     },
   };
