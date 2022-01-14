@@ -15,21 +15,6 @@ export type SiteFooterQuery = {
                           readonly url: string | undefined;
                           readonly icon: string | undefined;
                         }
-                      | {
-                          readonly blocksCollection:
-                            | {
-                                readonly items: ReadonlyArray<
-                                  | {
-                                      readonly title: string | undefined;
-                                      readonly url: string | undefined;
-                                      readonly icon: string | undefined;
-                                    }
-                                  | {}
-                                  | undefined
-                                >;
-                              }
-                            | undefined;
-                        }
                       | {}
                       | undefined
                     >;

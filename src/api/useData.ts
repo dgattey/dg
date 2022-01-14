@@ -1,4 +1,5 @@
 import useSWR from 'swr';
+import fetchProjects from './contentful/fetchProjects';
 import fetchSiteFooter from './contentful/fetchSiteFooter';
 import fetchSiteHeader from './contentful/fetchSiteHeader';
 import fetchRepoVersion from './github/fetchRepoVersion';
@@ -40,6 +41,11 @@ const fetchers = {
    * Text links for the full site header
    */
   siteHeader: fetchSiteHeader,
+
+  /**
+   * All projects to list on home page
+   */
+  projects: fetchProjects,
 } as const;
 
 /**

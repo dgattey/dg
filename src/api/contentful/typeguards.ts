@@ -1,4 +1,4 @@
-import type { Link } from './generated/api.generated';
+import type { Link, Project } from './generated/api.generated';
 
 /**
  * Type guard to get a link out
@@ -6,6 +6,13 @@ import type { Link } from './generated/api.generated';
 export const isLink = (item: Link | undefined | Record<string, unknown>): item is Link =>
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   !!(item as Link)?.title;
+
+/**
+ * Type guard to get a project out
+ */
+export const isProject = (item: Project | undefined | Record<string, unknown>): item is Project =>
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  !!(item as Project)?.creationDate && !!(item as Project)?.thumbnail;
 
 /**
  * Type guard to filter out null or undefined items

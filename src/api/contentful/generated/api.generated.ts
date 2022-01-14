@@ -129,8 +129,16 @@ export type AssetFilter = {
 };
 
 export type AssetLinkingCollections = {
+  readonly bookCollection: Maybe<BookCollection>;
   readonly entryCollection: Maybe<EntryCollection>;
   readonly projectCollection: Maybe<ProjectCollection>;
+};
+
+export type AssetLinkingCollectionsBookCollectionArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  locale: InputMaybe<Scalars['String']>;
+  preview: InputMaybe<Scalars['Boolean']>;
+  skip?: InputMaybe<Scalars['Int']>;
 };
 
 export type AssetLinkingCollectionsEntryCollectionArgs = {
@@ -173,9 +181,10 @@ export type AssetOrder =
 export type Book = Entry & {
   readonly author: Maybe<Scalars['String']>;
   readonly contentfulMetadata: ContentfulMetadata;
-  readonly coverImageUrl: Maybe<Scalars['String']>;
+  readonly coverImage: Maybe<Asset>;
   readonly description: Maybe<BookDescription>;
   readonly linkedFrom: Maybe<BookLinkingCollections>;
+  readonly readDate: Maybe<Scalars['DateTime']>;
   readonly sys: Sys;
   readonly title: Maybe<Scalars['String']>;
 };
@@ -186,8 +195,9 @@ export type BookAuthorArgs = {
 };
 
 /** All data describing a recent book I've read. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/book) */
-export type BookCoverImageUrlArgs = {
+export type BookCoverImageArgs = {
   locale: InputMaybe<Scalars['String']>;
+  preview: InputMaybe<Scalars['Boolean']>;
 };
 
 /** All data describing a recent book I've read. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/book) */
@@ -198,6 +208,11 @@ export type BookDescriptionArgs = {
 /** All data describing a recent book I've read. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/book) */
 export type BookLinkedFromArgs = {
   allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+};
+
+/** All data describing a recent book I've read. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/book) */
+export type BookReadDateArgs = {
+  locale: InputMaybe<Scalars['String']>;
 };
 
 /** All data describing a recent book I've read. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/book) */
@@ -244,16 +259,19 @@ export type BookFilter = {
   readonly author_not_contains: InputMaybe<Scalars['String']>;
   readonly author_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
   readonly contentfulMetadata: InputMaybe<ContentfulMetadataFilter>;
-  readonly coverImageUrl: InputMaybe<Scalars['String']>;
-  readonly coverImageUrl_contains: InputMaybe<Scalars['String']>;
-  readonly coverImageUrl_exists: InputMaybe<Scalars['Boolean']>;
-  readonly coverImageUrl_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
-  readonly coverImageUrl_not: InputMaybe<Scalars['String']>;
-  readonly coverImageUrl_not_contains: InputMaybe<Scalars['String']>;
-  readonly coverImageUrl_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+  readonly coverImage_exists: InputMaybe<Scalars['Boolean']>;
   readonly description_contains: InputMaybe<Scalars['String']>;
   readonly description_exists: InputMaybe<Scalars['Boolean']>;
   readonly description_not_contains: InputMaybe<Scalars['String']>;
+  readonly readDate: InputMaybe<Scalars['DateTime']>;
+  readonly readDate_exists: InputMaybe<Scalars['Boolean']>;
+  readonly readDate_gt: InputMaybe<Scalars['DateTime']>;
+  readonly readDate_gte: InputMaybe<Scalars['DateTime']>;
+  readonly readDate_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['DateTime']>>>;
+  readonly readDate_lt: InputMaybe<Scalars['DateTime']>;
+  readonly readDate_lte: InputMaybe<Scalars['DateTime']>;
+  readonly readDate_not: InputMaybe<Scalars['DateTime']>;
+  readonly readDate_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['DateTime']>>>;
   readonly sys: InputMaybe<SysFilter>;
   readonly title: InputMaybe<Scalars['String']>;
   readonly title_contains: InputMaybe<Scalars['String']>;
@@ -286,8 +304,8 @@ export type BookLinkingCollectionsSectionCollectionArgs = {
 export type BookOrder =
   | 'author_ASC'
   | 'author_DESC'
-  | 'coverImageUrl_ASC'
-  | 'coverImageUrl_DESC'
+  | 'readDate_ASC'
+  | 'readDate_DESC'
   | 'sys_firstPublishedAt_ASC'
   | 'sys_firstPublishedAt_DESC'
   | 'sys_id_ASC'
@@ -555,6 +573,7 @@ export type Project = Entry & {
   readonly contentfulMetadata: ContentfulMetadata;
   readonly creationDate: Maybe<Scalars['DateTime']>;
   readonly description: Maybe<ProjectDescription>;
+  readonly layout: Maybe<Scalars['String']>;
   readonly link: Maybe<Link>;
   readonly linkedFrom: Maybe<ProjectLinkingCollections>;
   readonly sys: Sys;
@@ -570,6 +589,11 @@ export type ProjectCreationDateArgs = {
 
 /** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
 export type ProjectDescriptionArgs = {
+  locale: InputMaybe<Scalars['String']>;
+};
+
+/** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
+export type ProjectLayoutArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
 
@@ -644,6 +668,13 @@ export type ProjectFilter = {
   readonly description_contains: InputMaybe<Scalars['String']>;
   readonly description_exists: InputMaybe<Scalars['Boolean']>;
   readonly description_not_contains: InputMaybe<Scalars['String']>;
+  readonly layout: InputMaybe<Scalars['String']>;
+  readonly layout_contains: InputMaybe<Scalars['String']>;
+  readonly layout_exists: InputMaybe<Scalars['Boolean']>;
+  readonly layout_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+  readonly layout_not: InputMaybe<Scalars['String']>;
+  readonly layout_not_contains: InputMaybe<Scalars['String']>;
+  readonly layout_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
   readonly link: InputMaybe<CfLinkNestedFilter>;
   readonly link_exists: InputMaybe<Scalars['Boolean']>;
   readonly sys: InputMaybe<SysFilter>;
@@ -683,6 +714,8 @@ export type ProjectLinkingCollectionsSectionCollectionArgs = {
 export type ProjectOrder =
   | 'creationDate_ASC'
   | 'creationDate_DESC'
+  | 'layout_ASC'
+  | 'layout_DESC'
   | 'sys_firstPublishedAt_ASC'
   | 'sys_firstPublishedAt_DESC'
   | 'sys_id_ASC'
@@ -792,7 +825,7 @@ export type QuerySectionCollectionArgs = {
   where: InputMaybe<SectionFilter>;
 };
 
-/** A section containing references to other blocks. Based on the content of the section, may appear differently on different pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
+/** A collection of references to other nodes [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
 export type Section = Entry & {
   readonly blocksCollection: Maybe<SectionBlocksCollection>;
   readonly contentfulMetadata: ContentfulMetadata;
@@ -801,7 +834,7 @@ export type Section = Entry & {
   readonly title: Maybe<Scalars['String']>;
 };
 
-/** A section containing references to other blocks. Based on the content of the section, may appear differently on different pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
+/** A collection of references to other nodes [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
 export type SectionBlocksCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
@@ -809,12 +842,12 @@ export type SectionBlocksCollectionArgs = {
   skip?: InputMaybe<Scalars['Int']>;
 };
 
-/** A section containing references to other blocks. Based on the content of the section, may appear differently on different pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
+/** A collection of references to other nodes [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
 export type SectionLinkedFromArgs = {
   allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
 };
 
-/** A section containing references to other blocks. Based on the content of the section, may appear differently on different pages. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
+/** A collection of references to other nodes [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
 export type SectionTitleArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
@@ -826,7 +859,7 @@ export type SectionBlocksCollection = {
   readonly total: Scalars['Int'];
 };
 
-export type SectionBlocksItem = Book | Link | Project | Section;
+export type SectionBlocksItem = Book | Link | Project;
 
 export type SectionCollection = {
   readonly items: ReadonlyArray<Maybe<Section>>;
@@ -852,17 +885,9 @@ export type SectionFilter = {
 
 export type SectionLinkingCollections = {
   readonly entryCollection: Maybe<EntryCollection>;
-  readonly sectionCollection: Maybe<SectionCollection>;
 };
 
 export type SectionLinkingCollectionsEntryCollectionArgs = {
-  limit?: InputMaybe<Scalars['Int']>;
-  locale: InputMaybe<Scalars['String']>;
-  preview: InputMaybe<Scalars['Boolean']>;
-  skip?: InputMaybe<Scalars['Int']>;
-};
-
-export type SectionLinkingCollectionsSectionCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
