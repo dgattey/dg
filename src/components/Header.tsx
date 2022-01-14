@@ -10,8 +10,21 @@ const SpacedHeader = styled.header`
  * Creates the site header component - shows header links
  */
 const Header = () => {
-  const { data: siteHeader } = useData('siteHeader');
-  const { links } = siteHeader ?? {};
+  const { data: headerLinks } = useData('siteHeader');
+  const linkElements = headerLinks && (
+    <ul>
+      {headerLinks.map(
+        ({ title, url }) =>
+          url &&
+          title && (
+            <li key={url}>
+              <Link href={url}>{title}</Link>
+            </li>
+          ),
+      )}
+    </ul>
+  );
+
   return (
     <SpacedHeader>
       <nav>
@@ -20,19 +33,7 @@ const Header = () => {
             <strong>Dylan Gattey</strong>
           </li>
         </ul>
-        {links && (
-          <ul>
-            {links.map(
-              ({ title, url }) =>
-                url &&
-                title && (
-                  <li key={url}>
-                    <Link href={url}>{title}</Link>
-                  </li>
-                ),
-            )}
-          </ul>
-        )}
+        {linkElements}
       </nav>
     </SpacedHeader>
   );
