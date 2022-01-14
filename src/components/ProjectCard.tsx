@@ -1,8 +1,8 @@
 import { Project } from 'api/contentful/generated/api.generated';
-import Image from 'next/image';
 import styled from 'styled-components';
 import ContentCard from './ContentCard';
 import ContentWrappingLink from './ContentWrappingLink';
+import Image from './Image';
 import ProjectIcon from './ProjectIcon';
 import Stack from './Stack';
 
@@ -61,15 +61,7 @@ const ProjectCard = ({ title, layout, link, thumbnail, type }: Props) => {
   return (
     <Card verticalSpan={verticalSpan} horizontalSpan={horizontalSpan} isClickable={!!link}>
       <ContentWrappingLink link={link}>
-        {thumbnail && (
-          <Image
-            src={thumbnail?.url}
-            alt={title}
-            layout="responsive"
-            width={thumbnail?.width}
-            height={thumbnail?.height}
-          />
-        )}
+        {thumbnail && <Image {...thumbnail} alt={title} />}
         <TitleStack>
           <TitleText>{title}</TitleText>
           <ProjectIconWithBackground type={type} />
