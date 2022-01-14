@@ -1,8 +1,8 @@
 import '@picocss/pico/css/pico.min.css';
 import { createGlobalStyle } from 'styled-components';
 
-const CONTENT_GRID_DIMENSION = 13;
-const CONTENT_GRID_GAP = 1.5;
+const CONTENT_GRID_DIMENSION = 17;
+const CONTENT_GRID_GAP = 2.5;
 
 /**
  * Creates a card size in em from a span
