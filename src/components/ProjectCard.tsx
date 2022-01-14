@@ -1,8 +1,8 @@
 import { Project } from 'api/contentful/generated/api.generated';
 import Image from 'next/image';
-import Link from 'next/link';
 import styled from 'styled-components';
 import ContentCard from './ContentCard';
+import ContentWrappingLink from './ContentWrappingLink';
 import ProjectIcon from './ProjectIcon';
 import Stack from './Stack';
 
@@ -58,29 +58,24 @@ const ProjectCard = ({ title, layout, link, thumbnail, type }: Props) => {
   const verticalSpan = layout === 'tall' ? 2 : 1;
   const horizontalSpan = layout === 'wide' ? 2 : 1;
 
-  if (!link?.url) {
-    return null;
-  }
   return (
-    <Link passHref href={link.url}>
-      <Card verticalSpan={verticalSpan} horizontalSpan={horizontalSpan} isClickable={!!link}>
-        <a href={link.url}>
-          {thumbnail && (
-            <Image
-              src={thumbnail?.url}
-              alt={title}
-              layout="responsive"
-              width={thumbnail?.width}
-              height={thumbnail?.height}
-            />
-          )}
-          <TitleStack>
-            <TitleText>{title}</TitleText>
-            <ProjectIconWithBackground type={type} />
-          </TitleStack>
-        </a>
-      </Card>
-    </Link>
+    <Card verticalSpan={verticalSpan} horizontalSpan={horizontalSpan} isClickable={!!link}>
+      <ContentWrappingLink link={link}>
+        {thumbnail && (
+          <Image
+            src={thumbnail?.url}
+            alt={title}
+            layout="responsive"
+            width={thumbnail?.width}
+            height={thumbnail?.height}
+          />
+        )}
+        <TitleStack>
+          <TitleText>{title}</TitleText>
+          <ProjectIconWithBackground type={type} />
+        </TitleStack>
+      </ContentWrappingLink>
+    </Card>
   );
 };
 

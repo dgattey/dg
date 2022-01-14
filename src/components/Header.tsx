@@ -1,6 +1,6 @@
 import useData from 'api/useData';
-import Link from 'next/link';
 import styled from 'styled-components';
+import Link from './Link';
 
 const SpacedHeader = styled.header`
   margin-top: var(--block-spacing-vertical);
@@ -13,15 +13,11 @@ const Header = () => {
   const { data: headerLinks } = useData('siteHeader');
   const linkElements = headerLinks && (
     <ul>
-      {headerLinks.map(
-        ({ title, url }) =>
-          url &&
-          title && (
-            <li key={url}>
-              <Link href={url}>{title}</Link>
-            </li>
-          ),
-      )}
+      {headerLinks.map((link) => (
+        <li key={link.url}>
+          <Link {...link} />
+        </li>
+      ))}
     </ul>
   );
 
