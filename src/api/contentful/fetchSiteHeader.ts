@@ -17,7 +17,7 @@ interface SiteHeader {
  */
 const QUERY = gql`
   query SiteHeader {
-    sectionCollection(limit: 1, where: { title: "Header" }) {
+    sectionCollection(limit: 1, where: { slug: "header" }) {
       items {
         blocksCollection(limit: 100) {
           items {
