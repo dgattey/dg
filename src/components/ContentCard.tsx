@@ -41,7 +41,6 @@ interface CardProps {
 const Card = styled.article<CardProps>`
   position: relative;
   border: var(--border-width) solid var(--secondary-focus);
-  overflow: hidden;
   margin: inherit;
   padding: 0;
   ${({ $isClickable }) =>
@@ -73,8 +72,14 @@ const ContentCard = ({
   verticalSpan,
   isClickable,
   children,
-}: Pick<React.ComponentProps<'article'>, 'children'> & Props) => (
-  <Card $hSpan={horizontalSpan ?? 1} $vSpan={verticalSpan ?? 1} $isClickable={isClickable ?? false}>
+  className,
+}: Pick<React.ComponentProps<'article'>, 'children' | 'className'> & Props) => (
+  <Card
+    className={className}
+    $hSpan={horizontalSpan ?? 1}
+    $vSpan={verticalSpan ?? 1}
+    $isClickable={isClickable ?? false}
+  >
     {children}
   </Card>
 );
