@@ -1,5 +1,6 @@
 import useData from 'api/useData';
 import React from 'react';
+import { FiUser } from 'react-icons/fi';
 import styled from 'styled-components';
 import ColorSchemeToggleCard from './ColorSchemeToggleCard';
 import ContentCard from './ContentCard';
@@ -38,10 +39,18 @@ const IntroCard = styled(ContentCard)`
 const HomepageGrid = () => {
   const { data: projects } = useData('projects');
   const { data: introBlock } = useData('introBlock');
+  const { data: footerLinks } = useData('siteFooter');
 
   const introCards = introBlock?.textBlock?.content
     ? [
-        <ImageCard key="image">
+        <ImageCard
+          key="image"
+          link={footerLinks?.find((item) => item.title?.includes('LinkedIn'))}
+          overlay={{
+            alwaysVisible: <FiUser />,
+            hiddenUntilHover: <strong>About</strong>,
+          }}
+        >
           <Image {...introBlock.image} alt={introBlock.image.title} layout="fill" />
         </ImageCard>,
         <IntroCard key="text-content">
