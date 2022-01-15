@@ -17,7 +17,14 @@ interface Props {
  * provide a fallback for the server side rendering done elsewhere.
  */
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  const data = await fetchData(['version', 'siteFooter', 'siteHeader', 'projects', 'introBlock']);
+  const data = await fetchData([
+    'version',
+    'siteFooter',
+    'siteHeader',
+    'projects',
+    'introBlock',
+    'myLocation',
+  ]);
   return {
     props: {
       fallback: {
