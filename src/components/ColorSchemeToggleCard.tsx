@@ -75,17 +75,24 @@ const Button = styled.button<{ $visible: boolean }>`
 `;
 
 // Reset the state that tooltips give to the element since it acts as a button here.
-const ClickableIcon = styled.span`
+const ClickableIcon = styled.span<{ $disabled: boolean }>`
   && {
-    cursor: pointer;
+    ${({ $disabled }) =>
+      $disabled
+        ? css`
+            cursor: not-allowed;
+          `
+        : css`
+            cursor: pointer;
+            & svg:hover {
+              transform: rotate(45deg);
+            }
+          `}
     border-bottom: none;
     & svg {
       font-size: 1.5em;
       transition: transform var(--transition);
       transform-origin: center;
-      :hover {
-        transform: rotate(45deg);
-      }
     }
   }
 `;
@@ -111,7 +118,11 @@ const ColorSchemeToggleCard = () => {
   return (
     <Card>
       <ContentStack $gap="1em">
-        <ClickableIcon onClick={setLightScheme} data-tooltip="Sun, up!">
+        <ClickableIcon
+          $disabled={!isInitializedWithSystemScheme}
+          onClick={isInitializedWithSystemScheme ? setLightScheme : undefined}
+          data-tooltip={isInitializedWithSystemScheme ? 'Sun, up!' : undefined}
+        >
           <FiSun color="var(--yellow)" />
         </ClickableIcon>
         <ColorSchemeSwitch
@@ -120,7 +131,11 @@ const ColorSchemeToggleCard = () => {
           onChange={setInvertedScheme}
           checked={isInitializedWithSystemScheme && colorScheme === 'dark'}
         />
-        <ClickableIcon onClick={setDarkScheme} data-tooltip="Lights out">
+        <ClickableIcon
+          $disabled={!isInitializedWithSystemScheme}
+          onClick={isInitializedWithSystemScheme ? setDarkScheme : undefined}
+          data-tooltip={isInitializedWithSystemScheme ? 'Lights out' : undefined}
+        >
           <FiMoon color="var(--secondary)" />
         </ClickableIcon>
       </ContentStack>
