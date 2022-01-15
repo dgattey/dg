@@ -1,7 +1,6 @@
 import { Fallback, fetchData } from 'api/useData';
-import HomepageGrid from 'components/HomepageGrid';
+import Homepage from 'components/Homepage';
 import Layout from 'components/Layout';
-import Meta from 'components/Meta';
 import { GetStaticProps, InferGetStaticPropsType } from 'next/types';
 import React from 'react';
 import { SWRConfig } from 'swr';
@@ -35,16 +34,12 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 };
 
 /**
- * Homepage, 'shows' projects + other cards in a grid
+ * Fallback for all data used in Homepage + its descendents, plus the homepage itself.
  */
 const Home = ({ fallback }: InferGetStaticPropsType<typeof getStaticProps>) => (
   <SWRConfig value={{ fallback }}>
-    <Meta
-      title="Engineer, Human"
-      description="I'm Dylan, an engineer focused on building top-notch user experiences. I'm interested in React, Product Design, Sustainability, Startups, Music, and Cycling."
-    />
     <Layout>
-      <HomepageGrid />
+      <Homepage />
     </Layout>
   </SWRConfig>
 );

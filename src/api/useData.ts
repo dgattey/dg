@@ -1,6 +1,5 @@
 import useSWR from 'swr';
 import fetchIntroBlock from './contentful/fetchIntroBlock';
-import fetchMyLocation from './contentful/fetchMyLocation';
 import fetchProjects from './contentful/fetchProjects';
 import fetchSiteFooter from './contentful/fetchSiteFooter';
 import fetchSiteHeader from './contentful/fetchSiteHeader';
@@ -73,11 +72,6 @@ const fetchers = {
    * The introduction rich text block for the homepage
    */
   introBlock: fetchIntroBlock,
-
-  /**
-   * Dylan's location (approx) for display on a map
-   */
-  myLocation: fetchMyLocation,
 } as const;
 
 /**

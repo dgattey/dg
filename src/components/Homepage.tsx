@@ -6,6 +6,7 @@ import ColorSchemeToggleCard from './ColorSchemeToggleCard';
 import ContentCard from './ContentCard';
 import ContentGrid from './ContentGrid';
 import Image from './Image';
+import Meta from './Meta';
 import ProjectCard from './ProjectCard';
 import RichText from './RichText';
 
@@ -36,7 +37,7 @@ const IntroCard = styled(ContentCard)`
  * interspersed with `introBlock` data, and dark/light mode
  * toggle.
  */
-const HomepageGrid = () => {
+const Homepage = () => {
   const { data: projects } = useData('projects');
   const { data: introBlock } = useData('introBlock');
   const { data: footerLinks } = useData('siteFooter');
@@ -51,7 +52,7 @@ const HomepageGrid = () => {
             hiddenUntilHover: <strong>About</strong>,
           }}
         >
-          <Image {...introBlock.image} alt={introBlock.image.title} layout="fill" />
+          <Image {...introBlock.image} alt={introBlock.image.title} layout="intrinsic" />
         </ImageCard>,
         <IntroCard key="text-content">
           <RichText {...introBlock.textBlock.content} />
@@ -70,7 +71,18 @@ const HomepageGrid = () => {
     ...projectCards.slice(2),
   ];
 
-  return <ContentGrid>{cards}</ContentGrid>;
+  // Metadata for the homepage + the content grid of cards
+  const firstParagraph =
+    introBlock?.textBlock.content?.json.content
+      ?.find((item) => item.nodeType === 'paragraph')
+      ?.content?.find((item) => item.nodeType === 'text')?.value ??
+    "I'm Dylan, an engineer focused on building top-notch user experiences. I'm interested in React, sustainability, startups, music, and cycling.";
+  return (
+    <>
+      <Meta title="Engineer. Problem Solver." description={firstParagraph} />
+      <ContentGrid>{cards}</ContentGrid>
+    </>
+  );
 };
 
-export default HomepageGrid;
+export default Homepage;
