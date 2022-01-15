@@ -1,4 +1,4 @@
-import { Link, Maybe } from 'api/contentful/generated/api.generated';
+import { Link } from 'api/contentful/generated/api.generated';
 import styled, { css } from 'styled-components';
 import { cardSizeInEm } from './AppStyle';
 import ContentWrappingLink from './ContentWrappingLink';
@@ -14,12 +14,6 @@ interface Props {
    * How many rows the card spans, defaults to 1
    */
   verticalSpan?: number;
-
-  /**
-   * Determines whether the card can be clicked on to load/do something.
-   * Adds visual styling only.
-   */
-  isClickable?: boolean;
 
   /**
    * If anything is specified here, it appears in an overlay
@@ -42,7 +36,7 @@ interface Props {
    * If provided, a link to follow upon click anywhere on the
    * card
    */
-  link?: Maybe<Link>;
+  link?: Link;
 }
 
 interface CardProps {
@@ -134,7 +128,6 @@ const Card = styled.article<CardProps>`
 const ContentCard = ({
   horizontalSpan,
   verticalSpan,
-  isClickable,
   children,
   className,
   overlay,
@@ -151,7 +144,7 @@ const ContentCard = ({
       className={className}
       $hSpan={horizontalSpan ?? 1}
       $vSpan={verticalSpan ?? 1}
-      $isClickable={isClickable ?? false}
+      $isClickable={!!link ?? false}
     >
       {link ? (
         <ContentWrappingLink link={link}>

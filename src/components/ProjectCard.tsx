@@ -27,7 +27,7 @@ const ProjectCard = ({ title, layout, link, thumbnail, type }: Props) => {
     <ContentCard
       verticalSpan={verticalSpan}
       horizontalSpan={horizontalSpan}
-      isClickable={!!link}
+      link={link}
       overlay={{
         alwaysVisible: <ProjectIconWithBackground type={type} />,
         hiddenUntilHover: <TitleText>{title}</TitleText>,
