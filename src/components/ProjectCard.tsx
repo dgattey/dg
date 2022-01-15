@@ -29,7 +29,7 @@ const TitleText = styled.strong`
   white-space: nowrap;
   transition: opacity var(--transition), transform var(--transition);
   opacity: 0;
-  transform-origin: right;
+  transform-origin: left;
   transform: translateX(100%);
 `;
 

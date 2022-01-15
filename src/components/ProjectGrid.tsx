@@ -1,6 +1,7 @@
 import useData from 'api/useData';
 import React from 'react';
 import styled from 'styled-components';
+import ColorSchemeToggleCard from './ColorSchemeToggleCard';
 import ContentCard from './ContentCard';
 import ContentGrid from './ContentGrid';
 import Image from './Image';
@@ -35,23 +36,30 @@ const IntroCard = styled(ContentCard)`
 const ProjectGrid = () => {
   const { data: projects } = useData('projects');
   const { data: introBlock } = useData('introBlock');
-  return (
-    <ContentGrid>
-      {introBlock?.textBlock?.content && (
-        <>
-          <ImageCard>
-            <Image {...introBlock.image} alt={introBlock.image.title} layout="fill" />
-          </ImageCard>
-          <IntroCard>
-            <RichText {...introBlock.textBlock.content} />
-          </IntroCard>
-        </>
-      )}
-      {projects?.map((project) => (
-        <ProjectCard key={project.title} {...project} />
-      ))}
-    </ContentGrid>
-  );
+
+  const introCards = introBlock?.textBlock?.content
+    ? [
+        <ImageCard key="image">
+          <Image {...introBlock.image} alt={introBlock.image.title} layout="fill" />
+        </ImageCard>,
+        <IntroCard key="text-content">
+          <RichText {...introBlock.textBlock.content} />
+        </IntroCard>,
+      ]
+    : [];
+
+  const projectCards =
+    projects?.map((project) => <ProjectCard key={project.title} {...project} />) ?? [];
+
+  // Insert the light/dark mode toggle into the grid a few into the project cards
+  const cards = [
+    ...introCards,
+    ...projectCards.slice(0, 2),
+    <ColorSchemeToggleCard key="theme-toggle" />,
+    ...projectCards.slice(2),
+  ];
+
+  return <ContentGrid>{cards}</ContentGrid>;
 };
 
 export default ProjectGrid;
