@@ -91,7 +91,6 @@ const Card = styled.article<CardProps>`
     $isClickable &&
     css`
       cursor: pointer;
-      -webkit-transform-style: preserve-3d;
       /* Not as performant as using pseudo element + opacity for shadow, but that doesn't work with overflow: hidden */
       transition: transform var(--transition), box-shadow var(--transition);
       &:hover {
