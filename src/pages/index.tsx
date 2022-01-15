@@ -1,5 +1,5 @@
 import { Fallback, fetchData } from 'api/useData';
-import Homepage from 'components/Homepage';
+import Homepage from 'components/homepage/Homepage';
 import Layout from 'components/Layout';
 import { GetStaticProps, InferGetStaticPropsType } from 'next/types';
 import React from 'react';

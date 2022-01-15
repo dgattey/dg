@@ -1,7 +1,7 @@
 import { Project } from 'api/contentful/generated/api.generated';
+import ContentCard from 'components/ContentCard';
+import Image from 'components/Image';
 import styled from 'styled-components';
-import ContentCard from './ContentCard';
-import Image from './Image';
 import ProjectIcon from './ProjectIcon';
 
 type Props = Project;

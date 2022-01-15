@@ -3,9 +3,9 @@ import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import type { Asset, Entry, TextBlockContent } from 'api/contentful/generated/api.generated';
 import { isDefinedItem, isLink, isProject } from 'api/contentful/typeguards';
+import ProjectCard from 'components/homepage/ProjectCard';
 import Image from './Image';
 import Link from './Link';
-import ProjectCard from './ProjectCard';
 
 type Props = TextBlockContent;
 

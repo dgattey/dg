@@ -1,8 +1,8 @@
+import ContentCard from 'components/ContentCard';
+import Stack from 'components/Stack';
 import useColorScheme, { ColorScheme } from 'hooks/useColorScheme';
 import { FiMoon, FiSun } from 'react-icons/fi';
 import styled, { css } from 'styled-components';
-import ContentCard from './ContentCard';
-import Stack from './Stack';
 
 // Stack items in center
 const Card = styled(ContentCard)`
