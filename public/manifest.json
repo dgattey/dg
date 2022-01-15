@@ -1,0 +1,41 @@
+{
+  "name": "Dylan Gattey",
+  "short_name": "DG",
+  "start_url": "https://dylangattey.com/?utm_source=manifest",
+  "lang": "en",
+  "background_color": "#ffffff",
+  "theme_color": "#16ac7e",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/icons/prerounded-96.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+    {
+      "src": "/icons/prerounded-128.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    },
+    {
+      "src": "/icons/prerounded-144.png",
+      "type": "image/png",
+      "sizes": "144x144"
+    },
+    {
+      "src": "/icons/prerounded-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icons/prerounded-196.png",
+      "type": "image/png",
+      "sizes": "196x196"
+    },
+    {
+      "src": "/icons/prerounded-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}
