@@ -115,6 +115,7 @@ const ColorSchemeToggleCard = () => {
           <FiSun color="var(--yellow)" />
         </ClickableIcon>
         <ColorSchemeSwitch
+          disabled={!isInitializedWithSystemScheme}
           $colorScheme={!isInitializedWithSystemScheme ? null : colorScheme}
           onChange={setInvertedScheme}
           checked={isInitializedWithSystemScheme && colorScheme === 'dark'}
