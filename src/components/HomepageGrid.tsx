@@ -31,9 +31,11 @@ const IntroCard = styled(ContentCard)`
 `;
 
 /**
- * Puts all projects into a grid using `projects` data
+ * Puts all projects into a grid using `projects` data,
+ * interspersed with `introBlock` data, and dark/light mode
+ * toggle.
  */
-const ProjectGrid = () => {
+const HomepageGrid = () => {
   const { data: projects } = useData('projects');
   const { data: introBlock } = useData('introBlock');
 
@@ -51,7 +53,7 @@ const ProjectGrid = () => {
   const projectCards =
     projects?.map((project) => <ProjectCard key={project.title} {...project} />) ?? [];
 
-  // Insert the light/dark mode toggle into the grid a few into the project cards
+  // Insert the statically-placed cards between the project cards at strategic positions
   const cards = [
     ...introCards,
     ...projectCards.slice(0, 2),
@@ -62,4 +64,4 @@ const ProjectGrid = () => {
   return <ContentGrid>{cards}</ContentGrid>;
 };
 
-export default ProjectGrid;
+export default HomepageGrid;

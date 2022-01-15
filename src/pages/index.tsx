@@ -1,7 +1,7 @@
 import { Fallback, fetchData } from 'api/useData';
+import HomepageGrid from 'components/HomepageGrid';
 import Layout from 'components/Layout';
 import Meta from 'components/Meta';
-import ProjectGrid from 'components/ProjectGrid';
 import { GetStaticProps, InferGetStaticPropsType } from 'next/types';
 import React from 'react';
 import { SWRConfig } from 'swr';
@@ -48,7 +48,7 @@ const Home = ({ fallback }: InferGetStaticPropsType<typeof getStaticProps>) => (
       description="I'm Dylan, an engineer focused on building top-notch user experiences. I'm interested in React, Product Design, Sustainability, Startups, Music, and Cycling."
     />
     <Layout>
-      <ProjectGrid />
+      <HomepageGrid />
     </Layout>
   </SWRConfig>
 );
