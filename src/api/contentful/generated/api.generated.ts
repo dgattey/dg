@@ -22,7 +22,40 @@ export type Scalars = {
   /** The 'HexColor' type represents color in `rgb:ffffff` string format. */
   HexColor: string;
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
-  JSON: { readonly [Symbol.toStringTag]: string };
+  JSON: {
+    nodeType: string;
+    data: Record<string, unknown> | undefined;
+    value: string | undefined;
+    content:
+      | Array<{
+          nodeType: string;
+          data: Record<string, unknown> | undefined;
+          value: string | undefined;
+          content:
+            | Array<{
+                nodeType: string;
+                data: Record<string, unknown> | undefined;
+                value: string | undefined;
+                content:
+                  | Array<{
+                      nodeType: string;
+                      data: Record<string, unknown> | undefined;
+                      value: string | undefined;
+                      content:
+                        | Array<{
+                            nodeType: string;
+                            data: Record<string, unknown> | undefined;
+                            value: string | undefined;
+                            content: Array<unknown> | undefined;
+                          }>
+                        | undefined;
+                    }>
+                  | undefined;
+              }>
+            | undefined;
+        }>
+      | undefined;
+  };
   /** The 'Quality' type represents quality as whole numeric values between `1` and `100`. */
   Quality: number;
 };

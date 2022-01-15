@@ -25,7 +25,9 @@ generates:
         DateTime: string
         Dimension: number
         HexColor: string
-        JSON: '{ readonly [Symbol.toStringTag]: string; }'
+        # This is fucking rough. Basically there's no good way to import a type here so I personally define a lot of layers of possible
+        # nesting that might occur in the JSON data. Basically, content is recursive.
+        JSON: '{ nodeType: string, data: Record<string, unknown> | undefined, value: string | undefined, content: Array<{ nodeType: string, data: Record<string, unknown> | undefined, value: string | undefined, content: Array<{ nodeType: string, data: Record<string, unknown> | undefined, value: string | undefined, content: Array<{ nodeType: string, data: Record<string, unknown> | undefined, value: string | undefined, content: Array<{ nodeType: string, data: Record<string, unknown> | undefined, value: string | undefined, content: Array<unknown> | undefined }> | undefined }> | undefined }> | undefined }> | undefined }'
         Quality: number
 
   # Creates generated types for each operation in Contentful API files
