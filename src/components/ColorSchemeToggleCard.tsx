@@ -1,6 +1,6 @@
 import useColorScheme, { ColorScheme } from 'hooks/useColorScheme';
 import { FiMoon, FiSun } from 'react-icons/fi';
-import styled, { css, FlattenSimpleInterpolation } from 'styled-components';
+import styled, { css } from 'styled-components';
 import ContentCard from './ContentCard';
 import Stack from './Stack';
 
@@ -19,33 +19,29 @@ const ContentStack = styled(Stack)`
   margin-top: calc(var(--stack-gap) + 2.5em);
 `;
 
-// Provides color scheme specific css for the switch - unknown is basically just server-rendered
-const SWITCH_COLOR_SCHEME_CSS: Record<ColorScheme | 'unknown', FlattenSimpleInterpolation> = {
-  unknown: css`
-    --switch-background-color: var(--secondary);
-  `,
-  light: css`
-    --switch-background-color: var(--yellow);
-  `,
-  dark: css`
-    --switch-background-color: var(--navy);
-    --calculated-margin: calc(var(--switch-width) - var(--switch-height));
-    &&& {
-      --border-color: var(--switch-background-color);
-      --background-color: var(--switch-background-color);
-    }
-    &&&:before {
-      margin-left: var(--calculated-margin);
-      margin-inline-start: var(--calculated-margin);
-    }
-  `,
+// Provides color scheme specific variable names for the switch - unknown is basically just server-rendered
+const SWITCH_COLOR_SCHEME_CSS: Record<ColorScheme | 'unknown', string> = {
+  unknown: '--secondary',
+  light: '--yellow',
+  dark: '--navy',
 };
 
 // Combo of CSS + $colorScheme to set two separate states, using a lot of Pico CSS switch variables
 const ColorSchemeSwitch = styled.input.attrs({ role: 'switch', type: 'checkbox' })<{
   $colorScheme: ColorScheme | null;
 }>`
-  ${({ $colorScheme }) => SWITCH_COLOR_SCHEME_CSS[$colorScheme ?? 'unknown']};
+  ${({ $colorScheme }) => css`
+    --switch-background-color: var(${SWITCH_COLOR_SCHEME_CSS[$colorScheme ?? 'unknown']});
+  `};
+  &&:checked {
+    --calculated-margin: calc(var(--switch-width) - var(--switch-height));
+    --border-color: var(--switch-background-color);
+    --background-color: var(--switch-background-color);
+    &:before {
+      margin-left: var(--calculated-margin);
+      margin-inline-start: var(--calculated-margin);
+    }
+  }
   && {
     --border-width: 6px;
     --switch-height: 2em;
