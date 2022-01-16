@@ -6,6 +6,11 @@ import useLocalStorageValue from './useLocalStorageValue';
  */
 export type ColorScheme = 'dark' | 'light';
 
+/**
+ * Function to update a nullable color scheme
+ */
+export type SetColorScheme = (value: ColorScheme | null) => void;
+
 // Name of the attribute for theme we add on `html`
 const THEME_ATTRIBUTE = 'data-theme';
 
@@ -25,7 +30,7 @@ const useColorScheme = () => {
   // The value of these will be different on server vs client - don't use outside a `useEffect`
   const [preferredScheme, updatePreferredScheme, deletePreferredScheme] =
     useLocalStorageValue<ColorScheme | null>('colorScheme', null);
-  const updateOrDeletePreferredScheme = (value: ColorScheme | null) =>
+  const updateOrDeletePreferredScheme: SetColorScheme = (value) =>
     value ? updatePreferredScheme(value) : deletePreferredScheme();
   const [systemScheme, setSystemScheme] = useState<ColorScheme | null>(null);
 
