@@ -78,6 +78,7 @@ const Blob = ({
       className={className}
       onClick={onClick}
       viewBox={`0 0 ${SIZE} ${SIZE}`}
+      preserveAspectRatio="none"
       xmlns="http://www.w3.org/2000/svg"
     >
       <Path d={path} $fill={fill} $hoveredFill={hoveredFill} $isClickable={!!onClick} />
