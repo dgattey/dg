@@ -1,4 +1,5 @@
 import '@picocss/pico/css/pico.min.css';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { createGlobalStyle, css } from 'styled-components';
 
 const CONTENT_GRID_DIMENSION = 17;

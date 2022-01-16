@@ -4,6 +4,7 @@ import React from 'react';
 import ColorSchemeToggleCard from './ColorSchemeToggleCard';
 import HomepageMeta from './HomepageMeta';
 import IntroCard from './IntroCard';
+import MapCard from './MapCard';
 import ProjectCard from './ProjectCard';
 
 /**
@@ -22,7 +23,9 @@ const Homepage = () => {
     <IntroCard key="intro" />,
     ...projectCards.slice(0, 2),
     <ColorSchemeToggleCard key="theme-toggle" />,
-    ...projectCards.slice(2),
+    ...projectCards.slice(2, 4),
+    <MapCard key="map" />,
+    ...projectCards.slice(4),
   ];
 
   return (
