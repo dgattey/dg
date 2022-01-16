@@ -10,6 +10,8 @@ export type Scalars = {
   Boolean: boolean;
   Int: number;
   Float: number;
+  /** The Circle scalar type represents a circle, defined by the coordinates of its center and a radius. The Circle type is used to represent a searchable area together with the '_within_circle' filter. */
+  Circle: unknown;
   /**
    * A date-time string at UTC, such as 2007-12-03T10:15:30Z,
    *     compliant with the 'date-time' format outlined in section 5.6 of
@@ -58,6 +60,8 @@ export type Scalars = {
   };
   /** The 'Quality' type represents quality as whole numeric values between `1` and `100`. */
   Quality: number;
+  /** The Rectangle scalar type represents a rectangle, defined by the coordinates of its top left and bottom right corners. The Rectangle type is used to represent a searchable area together with the '_within_rectangle' filter. */
+  Rectangle: unknown;
 };
 
 /** Represents a binary file in a space. An asset can be any file type. */
@@ -386,6 +390,77 @@ export type BookOrder =
   | 'title_ASC'
   | 'title_DESC';
 
+/** All info needed to render a map with a pin for the given location [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/location) */
+export type ContentTypeLocation = Entry & {
+  readonly contentfulMetadata: ContentfulMetadata;
+  readonly linkedFrom: Maybe<ContentTypeLocationLinkingCollections>;
+  readonly point: Maybe<Location>;
+  readonly slug: Maybe<Scalars['String']>;
+  readonly sys: Sys;
+};
+
+/** All info needed to render a map with a pin for the given location [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/location) */
+export type ContentTypeLocationLinkedFromArgs = {
+  allowedLocales: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+};
+
+/** All info needed to render a map with a pin for the given location [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/location) */
+export type ContentTypeLocationPointArgs = {
+  locale: InputMaybe<Scalars['String']>;
+};
+
+/** All info needed to render a map with a pin for the given location [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/location) */
+export type ContentTypeLocationSlugArgs = {
+  locale: InputMaybe<Scalars['String']>;
+};
+
+export type ContentTypeLocationCollection = {
+  readonly items: ReadonlyArray<Maybe<ContentTypeLocation>>;
+  readonly limit: Scalars['Int'];
+  readonly skip: Scalars['Int'];
+  readonly total: Scalars['Int'];
+};
+
+export type ContentTypeLocationFilter = {
+  readonly AND: InputMaybe<ReadonlyArray<InputMaybe<ContentTypeLocationFilter>>>;
+  readonly OR: InputMaybe<ReadonlyArray<InputMaybe<ContentTypeLocationFilter>>>;
+  readonly contentfulMetadata: InputMaybe<ContentfulMetadataFilter>;
+  readonly point_exists: InputMaybe<Scalars['Boolean']>;
+  readonly point_within_circle: InputMaybe<Scalars['Circle']>;
+  readonly point_within_rectangle: InputMaybe<Scalars['Rectangle']>;
+  readonly slug: InputMaybe<Scalars['String']>;
+  readonly slug_contains: InputMaybe<Scalars['String']>;
+  readonly slug_exists: InputMaybe<Scalars['Boolean']>;
+  readonly slug_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+  readonly slug_not: InputMaybe<Scalars['String']>;
+  readonly slug_not_contains: InputMaybe<Scalars['String']>;
+  readonly slug_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+  readonly sys: InputMaybe<SysFilter>;
+};
+
+export type ContentTypeLocationLinkingCollections = {
+  readonly entryCollection: Maybe<EntryCollection>;
+};
+
+export type ContentTypeLocationLinkingCollectionsEntryCollectionArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  locale: InputMaybe<Scalars['String']>;
+  preview: InputMaybe<Scalars['Boolean']>;
+  skip?: InputMaybe<Scalars['Int']>;
+};
+
+export type ContentTypeLocationOrder =
+  | 'slug_ASC'
+  | 'slug_DESC'
+  | 'sys_firstPublishedAt_ASC'
+  | 'sys_firstPublishedAt_DESC'
+  | 'sys_id_ASC'
+  | 'sys_id_DESC'
+  | 'sys_publishedAt_ASC'
+  | 'sys_publishedAt_DESC'
+  | 'sys_publishedVersion_ASC'
+  | 'sys_publishedVersion_DESC';
+
 export type ContentfulMetadata = {
   readonly tags: ReadonlyArray<Maybe<ContentfulTag>>;
 };
@@ -637,6 +712,11 @@ export type LinkOrder =
   | 'url_ASC'
   | 'url_DESC';
 
+export type Location = {
+  readonly lat: Maybe<Scalars['Float']>;
+  readonly lon: Maybe<Scalars['Float']>;
+};
+
 /** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
 export type Project = Entry & {
   readonly contentfulMetadata: ContentfulMetadata;
@@ -801,6 +881,8 @@ export type Query = {
   readonly assetCollection: Maybe<AssetCollection>;
   readonly book: Maybe<Book>;
   readonly bookCollection: Maybe<BookCollection>;
+  readonly contentTypeLocation: Maybe<ContentTypeLocation>;
+  readonly contentTypeLocationCollection: Maybe<ContentTypeLocationCollection>;
   readonly entryCollection: Maybe<EntryCollection>;
   readonly link: Maybe<Link>;
   readonly linkCollection: Maybe<LinkCollection>;
@@ -840,6 +922,21 @@ export type QueryBookCollectionArgs = {
   preview: InputMaybe<Scalars['Boolean']>;
   skip?: InputMaybe<Scalars['Int']>;
   where: InputMaybe<BookFilter>;
+};
+
+export type QueryContentTypeLocationArgs = {
+  id: Scalars['String'];
+  locale: InputMaybe<Scalars['String']>;
+  preview: InputMaybe<Scalars['Boolean']>;
+};
+
+export type QueryContentTypeLocationCollectionArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  locale: InputMaybe<Scalars['String']>;
+  order: InputMaybe<ReadonlyArray<InputMaybe<ContentTypeLocationOrder>>>;
+  preview: InputMaybe<Scalars['Boolean']>;
+  skip?: InputMaybe<Scalars['Int']>;
+  where: InputMaybe<ContentTypeLocationFilter>;
 };
 
 export type QueryEntryCollectionArgs = {
