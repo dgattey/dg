@@ -22,9 +22,10 @@ const LogoBlobBackground = styled(dynamic(() => import('./Blob'), { ssr: false }
   $isBlobBackgroundVisible: boolean;
 }>`
   position: absolute;
-  top: -15em;
-  left: -11em;
-  width: 20em;
+  top: -400%;
+  left: -550%;
+  width: 900%;
+  height: 600%;
   filter: var(--filter-drop-shadow);
   transition: transform var(--transition), opacity var(--transition);
   opacity: 0;
@@ -35,7 +36,7 @@ const LogoBlobBackground = styled(dynamic(() => import('./Blob'), { ssr: false }
     css`
       opacity: 1;
       :hover {
-        transform: rotate(-15deg);
+        transform: rotate(-10deg);
       }
     `}
 `;
