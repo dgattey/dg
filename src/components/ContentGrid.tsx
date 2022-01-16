@@ -1,17 +1,20 @@
 import styled from 'styled-components';
 
-// Auto fits above 992px, and kept to two columns for tablet. Mobile is one wide only.
+/**
+ * Auto fits densely to properly fill in all gaps at every size. Use
+ * of auto on smallest screens means the items will fill the screen instead
+ * of being small in the center. Once we hit tablet, we swap to using static
+ * widths for our columns to allow 3 or more on bigger screens
+ */
 const Grid = styled.div`
   display: grid;
   gap: var(--content-grid-gap-em);
-  grid: 1fr;
+  grid-template-columns: repeat(auto-fit, auto);
+  grid-auto-flow: dense;
   justify-content: center;
+
   @media (min-width: 768px) {
-    grid: auto-flow dense / 1fr 1fr;
-  }
-  @media (min-width: 992px) {
     grid-template-columns: repeat(auto-fit, var(--content-grid-dimension-em));
-    grid-template-rows: repeat(auto-fit, var(--content-grid-dimension-em));
   }
 `;
 

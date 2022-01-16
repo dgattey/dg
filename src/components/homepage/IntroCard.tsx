@@ -1,14 +1,21 @@
 import useData from 'api/useData';
-import ContentCard from 'components/ContentCard';
+import ContentCard, { OverlayStack } from 'components/ContentCard';
 import Image from 'components/Image';
 import RichText from 'components/RichText';
 import { FiUser } from 'react-icons/fi';
 import styled from 'styled-components';
 
 const ImageCard = styled(ContentCard)`
-  display: none;
-  @media (min-width: 768px) {
+  @media (max-width: 767.96px) {
+    --size: 12em;
+    justify-self: center;
+    width: var(--size);
+    height: var(--size);
     display: flex;
+    border-radius: calc(var(--size) / 2);
+    ${OverlayStack} {
+      opacity: 0;
+    }
   }
 `;
 
