@@ -4,12 +4,19 @@ import { useState } from 'react';
 import MapGL from 'react-map-gl';
 import styled from 'styled-components';
 
+const Card = styled(ContentCard)`
+  min-height: 200px;
+`;
+
 const StyledMap = styled(MapGL)`
   & .mapboxgl-canvas {
     border-radius: var(--border-radius);
   }
 `;
 
+/**
+ * Uses Mapbox to show a canvas-based map of my current location.
+ */
 const MapCard = () => {
   const { data: location } = useData('myLocation');
   const [viewport, setViewport] = useState({
@@ -21,7 +28,7 @@ const MapCard = () => {
   });
 
   return (
-    <ContentCard>
+    <Card>
       <StyledMap
         {...viewport}
         attributionControl={false}
@@ -35,7 +42,7 @@ const MapCard = () => {
         onViewportChange={setViewport}
         mapboxApiAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       />
-    </ContentCard>
+    </Card>
   );
 };
 
