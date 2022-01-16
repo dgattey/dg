@@ -66,7 +66,7 @@ const HiddenElement = styled.span`
 `;
 
 // A stack for an overlay that animates in from slightly offscreen left when hovered
-const OverlayStack = styled(Stack).attrs({ $alignItems: 'center', $gap: '8px' })`
+export const OverlayStack = styled(Stack).attrs({ $alignItems: 'center', $gap: '8px' })`
   overflow: hidden;
   position: absolute;
   bottom: 0.5em;
