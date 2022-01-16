@@ -30,9 +30,17 @@ const TOOLTIPS: Record<ColorScheme, string> = {
 /**
  * Maps color scheme to icon element
  */
-const ICONS: Record<ColorScheme, JSX.Element> = {
+const COLORED_ICONS: Record<ColorScheme, JSX.Element> = {
   dark: <FiMoon color="var(--secondary)" />,
   light: <FiSun color="var(--yellow)" />,
+};
+
+/**
+ * Uncolored icons for use elsewhere
+ */
+export const ICONS: Record<ColorScheme, JSX.Element> = {
+  dark: <FiMoon />,
+  light: <FiSun />,
 };
 
 // Reset the state that tooltips give to the element since it acts as a button here.
@@ -68,7 +76,7 @@ const ColorSchemeIcon = ({ scheme, hasTheme, updatePreferredScheme }: Props) => 
     onClick={hasTheme ? () => updatePreferredScheme(scheme) : undefined}
     data-tooltip={hasTheme ? TOOLTIPS[scheme] : undefined}
   >
-    {ICONS[scheme]}
+    {COLORED_ICONS[scheme]}
   </IconWrapper>
 );
 

@@ -69,7 +69,7 @@ const Blob = ({
 }: Pick<React.ComponentProps<'svg'>, 'className' | 'onClick' | 'fill'> & Props) => {
   const path = blobs.svgPath({
     seed,
-    extraPoints: 7,
+    extraPoints: 5,
     randomness: 2,
     size: SIZE,
   });

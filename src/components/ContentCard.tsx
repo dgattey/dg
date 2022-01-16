@@ -57,6 +57,14 @@ interface CardProps {
   $isClickable: boolean;
 }
 
+// Animates left on hover, as the container animates right, so it appears to stay in place as in comes in
+const HiddenElement = styled.span`
+  transition: opacity var(--transition), transform var(--transition);
+  opacity: 0;
+  transform-origin: left;
+  transform: translateX(100%);
+`;
+
 // A stack for an overlay that animates in from slightly offscreen left when hovered
 const OverlayStack = styled(Stack).attrs({ $alignItems: 'center', $gap: '8px' })`
   overflow: hidden;
@@ -71,14 +79,13 @@ const OverlayStack = styled(Stack).attrs({ $alignItems: 'center', $gap: '8px' })
 
   transition: transform var(--transition);
   transform: translateX(calc(2em - 100%));
-`;
-
-// Animates left on hover, as the container animates right, so it appears to stay in place as in comes in
-const HiddenElement = styled.span`
-  transition: opacity var(--transition), transform var(--transition);
-  opacity: 0;
-  transform-origin: left;
-  transform: translateX(100%);
+  &:hover {
+    transform: initial;
+    ${HiddenElement} {
+      opacity: 1;
+      transform: initial;
+    }
+  }
 `;
 
 // Card component that spans an arbitrary number of rows/cols
