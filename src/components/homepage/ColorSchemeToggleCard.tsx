@@ -1,7 +1,6 @@
 import ContentCard from 'components/ContentCard';
 import Stack from 'components/Stack';
 import useColorScheme, { ColorScheme } from 'hooks/useColorScheme';
-import { FiMoon, FiSun } from 'react-icons/fi';
 import styled, { css } from 'styled-components';
 import ColorSchemeIcon from './ColorSchemeIcon';
 
@@ -94,13 +93,10 @@ const ColorSchemeToggleCard = () => {
     <Card>
       <ContentStack $gap="1em">
         <ColorSchemeIcon
-          tooltip="Sun, up!"
-          inverted="dark"
+          scheme="light"
           hasTheme={hasTheme}
           updatePreferredScheme={updatePreferredScheme}
-        >
-          <FiSun color="var(--yellow)" />
-        </ColorSchemeIcon>
+        />
         <ColorSchemeSwitch
           disabled={!hasTheme}
           $colorScheme={!hasTheme ? null : colorScheme}
@@ -108,13 +104,10 @@ const ColorSchemeToggleCard = () => {
           checked={hasTheme && colorScheme === 'dark'}
         />
         <ColorSchemeIcon
-          tooltip="Lights out"
-          inverted="light"
+          scheme="dark"
           hasTheme={hasTheme}
           updatePreferredScheme={updatePreferredScheme}
-        >
-          <FiMoon color="var(--secondary)" />
-        </ColorSchemeIcon>
+        />
       </ContentStack>
       <Button
         role="button"

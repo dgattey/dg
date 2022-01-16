@@ -1,21 +1,12 @@
 import type { ColorScheme, SetColorScheme } from 'hooks/useColorScheme';
+import { FiMoon, FiSun } from 'react-icons/fi';
 import styled, { css } from 'styled-components';
 
 interface Props {
   /**
-   * Data to show on hover
-   */
-  tooltip: string;
-
-  /**
-   * Children required and only one allowed
-   */
-  children: JSX.Element;
-
-  /**
    * The color to switch to on click
    */
-  inverted: ColorScheme;
+  scheme: ColorScheme;
 
   /**
    * If there's a theme and we want to allow clicks
@@ -27,6 +18,22 @@ interface Props {
    */
   updatePreferredScheme: SetColorScheme;
 }
+
+/**
+ * Tooltips for the different states
+ */
+const TOOLTIPS: Record<ColorScheme, string> = {
+  dark: 'Lights out',
+  light: 'Sunny days!',
+} as const;
+
+/**
+ * Maps color scheme to icon element
+ */
+const ICONS: Record<ColorScheme, JSX.Element> = {
+  dark: <FiMoon color="var(--secondary)" />,
+  light: <FiSun color="var(--yellow)" />,
+};
 
 // Reset the state that tooltips give to the element since it acts as a button here.
 const IconWrapper = styled.span<{ $disabled: boolean }>`
@@ -55,19 +62,13 @@ const IconWrapper = styled.span<{ $disabled: boolean }>`
  * Creates an icon that is clickable to update to a preferred color scheme
  * if we have one that's set already. Otherwise, renders a disabled icon.
  */
-const ColorSchemeIcon = ({
-  tooltip,
-  children,
-  inverted,
-  hasTheme,
-  updatePreferredScheme,
-}: Props) => (
+const ColorSchemeIcon = ({ scheme, hasTheme, updatePreferredScheme }: Props) => (
   <IconWrapper
     $disabled={!hasTheme}
-    onClick={hasTheme ? () => updatePreferredScheme(inverted) : undefined}
-    data-tooltip={hasTheme ? tooltip : undefined}
+    onClick={hasTheme ? () => updatePreferredScheme(scheme) : undefined}
+    data-tooltip={hasTheme ? TOOLTIPS[scheme] : undefined}
   >
-    {children}
+    {ICONS[scheme]}
   </IconWrapper>
 );
 
