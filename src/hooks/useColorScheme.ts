@@ -1,3 +1,4 @@
+import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import useLocalStorageValue from './useLocalStorageValue';
 
@@ -18,6 +19,38 @@ const THEME_ATTRIBUTE = 'data-theme';
 const PREFERS_DARK = '(prefers-color-scheme: dark)';
 
 /**
+ * Generates a media event listener for `PREFERS_DARK` for use inside a `useEffect`
+ */
+const generateMediaEventListener = (
+  setSystemScheme: Dispatch<SetStateAction<ColorScheme | null>>,
+) => {
+  if (!window) {
+    return;
+  }
+  const prefersDark = window.matchMedia(PREFERS_DARK);
+  setSystemScheme(prefersDark.matches ? 'dark' : 'light');
+
+  const listener = (event: MediaQueryListEvent) =>
+    setSystemScheme(event.matches ? 'dark' : 'light');
+  prefersDark.addEventListener('change', listener);
+  return () => {
+    prefersDark.removeEventListener('change', listener);
+  };
+};
+
+/**
+ * Modifies the document's `data-theme` attribute to change the theme itself
+ */
+const updateThemeAttribute = (scheme: ColorScheme, isSystemScheme: boolean) => {
+  const htmlElement = document.documentElement;
+  if (isSystemScheme) {
+    htmlElement.removeAttribute(THEME_ATTRIBUTE);
+    return;
+  }
+  document.documentElement.setAttribute(THEME_ATTRIBUTE, scheme);
+};
+
+/**
  * Hook to fetch the current color scheme based both off a value saved by the
  * user (optional) or the value of the `prefers-color-scheme` media query. For
  * prerendering, it defaults the color scheme to light + using the system
@@ -28,10 +61,10 @@ const PREFERS_DARK = '(prefers-color-scheme: dark)';
  */
 const useColorScheme = () => {
   // The value of these will be different on server vs client - don't use outside a `useEffect`
-  const [preferredScheme, updatePreferredScheme, deletePreferredScheme] =
-    useLocalStorageValue<ColorScheme | null>('colorScheme', null);
-  const updateOrDeletePreferredScheme: SetColorScheme = (value) =>
-    value ? updatePreferredScheme(value) : deletePreferredScheme();
+  const [preferredScheme, changeScheme, deleteScheme] = useLocalStorageValue<ColorScheme | null>(
+    'colorScheme',
+    null,
+  );
   const [systemScheme, setSystemScheme] = useState<ColorScheme | null>(null);
 
   // These values are set in a `useEffect` and can be used for prerendered content safely
@@ -44,38 +77,17 @@ const useColorScheme = () => {
     setIsSystemScheme(preferredScheme === null);
   }, [setColorScheme, systemScheme, preferredScheme]);
 
-  // Adds an attribute on the html element for the page based on current theme
-  useEffect(() => {
-    const htmlElement = document.documentElement;
-    if (isSystemScheme) {
-      htmlElement.removeAttribute(THEME_ATTRIBUTE);
-      return;
-    }
-    document.documentElement.setAttribute(THEME_ATTRIBUTE, colorScheme);
-  }, [colorScheme, isSystemScheme]);
+  // Modifies data-theme attribute for the page based on current theme & listens to `prefers-color-scheme` changes
+  useEffect(() => updateThemeAttribute(colorScheme, isSystemScheme), [colorScheme, isSystemScheme]);
+  useEffect(() => generateMediaEventListener(setSystemScheme), []);
 
-  // Setup event listenter for later changes + set the initial value from `prefers-color-scheme`
-  useEffect(() => {
-    if (!window) {
-      return;
-    }
-    const prefersDark = window.matchMedia(PREFERS_DARK);
-    setSystemScheme(prefersDark.matches ? 'dark' : 'light');
-
-    const listener = (event: MediaQueryListEvent) =>
-      setSystemScheme(event.matches ? 'dark' : 'light');
-    prefersDark.addEventListener('change', listener);
-    return () => {
-      prefersDark.removeEventListener('change', listener);
-    };
-  }, []);
-
-  // The update here actually updates or deletes the local storage value for cleanup
+  // The update here actually changes or deletes the local storage value for cleanup
   return {
     colorScheme,
     isSystemScheme,
     isInitializedWithSystemScheme: systemScheme !== null,
-    updatePreferredScheme: updateOrDeletePreferredScheme,
+    updatePreferredScheme: (value: ColorScheme | null) =>
+      value ? changeScheme(value) : deleteScheme(),
   } as const;
 };
 
