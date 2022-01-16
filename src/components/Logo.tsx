@@ -14,7 +14,10 @@ const THRESHOLD = 80;
  * quite a bit to make it the background of the logo visually. Shows
  * only once we scroll down.
  */
-const LogoBlobBackground = styled(dynamic(() => import('./Blob'), { ssr: false }))<{
+const LogoBlobBackground = styled(dynamic(() => import('./Blob'), { ssr: false })).attrs({
+  fill: 'var(--background-color)',
+  hoveredFill: 'var(--primary)',
+})<{
   $isBlobBackgroundVisible: boolean;
 }>`
   position: absolute;
@@ -109,8 +112,6 @@ const Logo = () => {
     <Container $isBlobBackgroundVisible={isBlobBackgroundVisible}>
       <LogoBlobBackground
         seed={blobSeed}
-        fill="var(--background-color)"
-        hoveredFill="var(--primary)"
         onClick={isBlobBackgroundVisible ? scrollToTop : undefined}
         $isBlobBackgroundVisible={isBlobBackgroundVisible}
       />
