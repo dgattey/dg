@@ -89,7 +89,7 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
  */
 const RichText = ({ json, links }: Props) => (
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  <>{documentToReactComponents(json as unknown as Document, renderOptions(links))}</>
+  <div>{documentToReactComponents(json as unknown as Document, renderOptions(links))}</div>
 );
 
 export default RichText;

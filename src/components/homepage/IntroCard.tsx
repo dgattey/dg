@@ -1,8 +1,10 @@
 import { linkWithName } from 'api/contentful/fetchSiteFooter';
 import useData from 'api/useData';
 import ContentCard, { OverlayStack } from 'components/ContentCard';
+import HoverableContainer from 'components/HoverableContainer';
 import Image from 'components/Image';
 import RichText from 'components/RichText';
+import { useState } from 'react';
 import { FiUser } from 'react-icons/fi';
 import styled from 'styled-components';
 
@@ -41,6 +43,7 @@ const TextCard = styled(ContentCard)`
 const IntroCard = () => {
   const { data: introBlock } = useData('introBlock');
   const { data: footerLinks } = useData('siteFooter');
+  const [isHovered, setIsHovered] = useState(false);
 
   if (!introBlock?.textBlock?.content) {
     return null;
@@ -54,10 +57,14 @@ const IntroCard = () => {
           alwaysVisible: <FiUser />,
           hiddenUntilHover: <strong>About</strong>,
         }}
+        onMouseOver={() => setIsHovered(true)}
+        onMouseOut={() => setIsHovered(false)}
       >
-        <Image {...introBlock.image} alt={introBlock.image.title} layout="intrinsic" />
+        <HoverableContainer isHovered={isHovered}>
+          <Image {...introBlock.image} alt={introBlock.image.title} layout="intrinsic" />
+        </HoverableContainer>
       </ImageCard>
-      <TextCard>
+      <TextCard onExpansion={() => {}}>
         <RichText {...introBlock.textBlock.content} />
       </TextCard>
     </>

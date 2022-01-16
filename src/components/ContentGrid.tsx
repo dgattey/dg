@@ -1,4 +1,8 @@
+import React, { useState } from 'react';
 import styled from 'styled-components';
+
+// In ms, how long to animate grid items
+export const GRID_ANIMATION_DURATION = 300;
 
 // In rem, how big each card in the content grid is
 const CONTENT_GRID_DIMENSION = 16;
@@ -23,20 +27,41 @@ const Grid = styled.div`
   --content-grid-gap: ${CONTENT_GRID_GAP}rem;
   display: grid;
   gap: var(--content-grid-gap);
-  grid-template-columns: repeat(auto-fit, auto);
+  grid-template-columns: 1fr;
   grid-auto-flow: dense;
   justify-content: center;
+  position: relative;
 
   @media (min-width: 768px) {
     grid-template-columns: repeat(auto-fit, var(--content-grid-dimension));
+    grid-auto-rows: minmax(var(--content-grid-dimension), auto);
   }
 `;
 
 /**
- * Displays all our content in a grid
+ * Displays all our content in a grid - on the client it uses `animate-css-grid`
+ * for nice animations when items change in size, which we do when expanding cards.
  */
-const ContentGrid = ({ children }: Pick<React.ComponentProps<'div'>, 'children'>) => (
-  <Grid>{children}</Grid>
-);
+const ContentGrid = ({ children }: Pick<React.ComponentProps<'div'>, 'children'>) => {
+  const [hasBeenAnimated, setHasBeenAnimated] = useState(false);
+
+  // Async imports the animation library and wraps the grid if we're on the client & it hasn't been wrapped
+  const animateGrid = async (grid: HTMLDivElement | null) => {
+    if (hasBeenAnimated || !grid || !('window' in global)) {
+      return;
+    }
+    setHasBeenAnimated(true);
+    const { wrapGrid } = await import('animate-css-grid');
+    if (!hasBeenAnimated) {
+      wrapGrid(grid, {
+        stagger: 10,
+        duration: GRID_ANIMATION_DURATION,
+        easing: 'backOut',
+      });
+    }
+  };
+
+  return <Grid ref={animateGrid}>{children}</Grid>;
+};
 
 export default ContentGrid;

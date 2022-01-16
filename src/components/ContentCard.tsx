@@ -1,10 +1,14 @@
 import { Link } from 'api/contentful/generated/api.generated';
+import React, { useState } from 'react';
 import styled, { css } from 'styled-components';
-import { cardSize } from './ContentGrid';
+import { cardSize, GRID_ANIMATION_DURATION } from './ContentGrid';
 import ContentWrappingLink from './ContentWrappingLink';
 import Stack from './Stack';
 
-interface Props {
+type Props = Pick<
+  React.ComponentProps<'article'>,
+  'children' | 'className' | 'onMouseOver' | 'onMouseOut'
+> & {
   /**
    * How many columns the card spans, defaults to 1
    */
@@ -37,7 +41,13 @@ interface Props {
    * card
    */
   link?: Link;
-}
+
+  /**
+   * If the card should expand to full width when clicked,
+   * provide a function that gets called when that happens.
+   */
+  onExpansion?: (isExpanded: boolean) => void;
+};
 
 interface CardProps {
   /**
@@ -48,8 +58,9 @@ interface CardProps {
   /**
    * The number of columns to span vertically. Used to calculate
    * height as well, adding space for the grid gap as needed.
+   * If missing, lets the item auto-size.
    */
-  $vSpan: number;
+  $vSpan: number | null;
 
   /**
    * If the card is visually clickable
@@ -76,6 +87,7 @@ export const OverlayStack = styled(Stack).attrs({ $alignItems: 'center', $gap: '
   padding: 0.5rem 0.75rem;
   border-radius: var(--border-radius);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.1), 0 0 8px rgba(0, 0, 0, 0.16);
+  z-index: 1;
 
   transition: transform var(--transition);
   transform: translateX(calc((var(--border-radius) / 2) - 100%));
@@ -95,14 +107,18 @@ const Card = styled.article<CardProps>`
   margin: inherit;
   padding: 0;
   will-change: transform;
+  transition: width ${GRID_ANIMATION_DURATION}ms ease, height ${GRID_ANIMATION_DURATION}ms ease,
+    box-shadow var(--transition), border-color var(--transition);
+
+  /* Unfortunately required for the images to animate size correctly. Look into changing this! */
+  & > div {
+    transform: none !important;
+  }
   ${({ $isClickable }) =>
     $isClickable &&
     css`
       cursor: pointer;
-      /* Not as performant as using pseudo element + opacity for shadow, but that doesn't work with overflow: hidden */
-      transition: transform var(--transition), box-shadow var(--transition);
       &:hover {
-        transform: scale(1.05);
         box-shadow: var(--card-hovered-box-shadow);
         ${OverlayStack} {
           transform: initial;
@@ -114,18 +130,24 @@ const Card = styled.article<CardProps>`
       }
     `}
 
-  ${({ $hSpan }) => css`
-    @media (min-width: 768px) {
-      width: ${cardSize($hSpan)};
-      grid-column-start: span ${$hSpan};
-    }
-  `};
+  ${({ $hSpan }) =>
+    $hSpan < 3
+      ? css`
+          @media (min-width: 768px) {
+            width: ${cardSize($hSpan)};
+            grid-column: span ${$hSpan};
+          }
+        `
+      : css`
+          grid-column: 1 / -1;
+        `};
   ${({ $vSpan }) =>
+    $vSpan &&
     css`
       @media (min-width: 768px) {
         height: ${cardSize($vSpan)};
       }
-      grid-row-start: span ${$vSpan};
+      grid-row: span ${$vSpan};
     `}
 `;
 
@@ -139,30 +161,62 @@ const ContentCard = ({
   className,
   overlay,
   link,
-}: Pick<React.ComponentProps<'article'>, 'children' | 'className'> & Props) => {
-  const overlayElements = overlay && (
+  onExpansion,
+  onMouseOver,
+  onMouseOut,
+}: Props) => {
+  const [isExpanded, setIsExpanded] = useState(false);
+  const isSingleChild = React.Children.count(children) === 1;
+  const expandOnClick = !!onExpansion;
+
+  // Swaps the expansion variable and calls the user callback
+  const toggleExpansion = onExpansion
+    ? () => {
+        setIsExpanded(!isExpanded);
+        onExpansion(!isExpanded);
+      }
+    : undefined;
+
+  const overlayContents = overlay ? (
     <OverlayStack>
       <HiddenElement>{overlay.hiddenUntilHover}</HiddenElement>
       {overlay.alwaysVisible}
     </OverlayStack>
-  );
+  ) : null;
+
+  const safelyWrappedChildren =
+    isSingleChild && !overlayContents ? (
+      children
+    ) : (
+      <div>
+        {overlayContents}
+        {children}
+      </div>
+    );
+
+  const contents =
+    (link && (
+      <>
+        {overlayContents}
+        {children}
+      </>
+    )) ??
+    safelyWrappedChildren;
+
   return (
     <Card
       className={className}
-      $hSpan={horizontalSpan ?? 1}
-      $vSpan={verticalSpan ?? 1}
-      $isClickable={!!link ?? false}
+      $hSpan={isExpanded ? 3 : horizontalSpan ?? 1}
+      $vSpan={isExpanded ? null : verticalSpan ?? 1}
+      $isClickable={!!link || expandOnClick || false}
+      onClick={toggleExpansion}
+      onMouseOver={onMouseOver}
+      onMouseOut={onMouseOut}
     >
-      {link ? (
-        <ContentWrappingLink link={link}>
-          {children}
-          {overlayElements}
-        </ContentWrappingLink>
+      {link && !expandOnClick ? (
+        <ContentWrappingLink link={link}>{contents}</ContentWrappingLink>
       ) : (
-        <>
-          {children}
-          {overlayElements}
-        </>
+        contents
       )}
     </Card>
   );
