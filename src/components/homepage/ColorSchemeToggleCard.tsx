@@ -1,8 +1,8 @@
 import ContentCard from 'components/ContentCard';
 import Stack from 'components/Stack';
 import useColorScheme, { ColorScheme } from 'hooks/useColorScheme';
-import { FiMoon, FiSun } from 'react-icons/fi';
 import styled, { css } from 'styled-components';
+import ColorSchemeIcon from './ColorSchemeIcon';
 
 // Stack items in center
 const Card = styled(ContentCard)`
@@ -74,70 +74,40 @@ const Button = styled.button<{ $visible: boolean }>`
   }
 `;
 
-// Reset the state that tooltips give to the element since it acts as a button here.
-const ClickableIcon = styled.span<{ $disabled: boolean }>`
-  && {
-    ${({ $disabled }) =>
-      $disabled
-        ? css`
-            cursor: not-allowed;
-          `
-        : css`
-            cursor: pointer;
-            & svg:hover {
-              transform: rotate(45deg);
-            }
-          `}
-    border-bottom: none;
-    & svg {
-      font-size: 1.5em;
-      transition: transform var(--transition);
-      transform-origin: center;
-    }
-  }
-`;
-
-/**
- * Inverts a "dark" or "light" value to the other
- */
-const inverted = (colorScheme: ColorScheme) => (colorScheme === 'dark' ? 'light' : 'dark');
-
 /**
  * Provides the ability to toggle the page's color scheme between
  * system, light, and dark. Prerendered, `colorScheme` is `light`
  * and `isSystemScheme` is true.
  */
 const ColorSchemeToggleCard = () => {
-  const { colorScheme, isSystemScheme, isInitializedWithSystemScheme, updatePreferredScheme } =
-    useColorScheme();
-  const setLightScheme = () => updatePreferredScheme('light');
-  const setInvertedScheme = () => updatePreferredScheme(inverted(colorScheme));
-  const setDarkScheme = () => updatePreferredScheme('dark');
+  const {
+    colorScheme,
+    isSystemScheme,
+    isInitializedWithSystemScheme: hasTheme,
+    updatePreferredScheme,
+  } = useColorScheme();
+  const setInvertedScheme = () => updatePreferredScheme(colorScheme === 'dark' ? 'light' : 'dark');
   const clearSavedScheme = () => updatePreferredScheme(null);
 
   return (
     <Card>
       <ContentStack $gap="1em">
-        <ClickableIcon
-          $disabled={!isInitializedWithSystemScheme}
-          onClick={isInitializedWithSystemScheme ? setLightScheme : undefined}
-          data-tooltip={isInitializedWithSystemScheme ? 'Sun, up!' : undefined}
-        >
-          <FiSun color="var(--yellow)" />
-        </ClickableIcon>
-        <ColorSchemeSwitch
-          disabled={!isInitializedWithSystemScheme}
-          $colorScheme={!isInitializedWithSystemScheme ? null : colorScheme}
-          onChange={setInvertedScheme}
-          checked={isInitializedWithSystemScheme && colorScheme === 'dark'}
+        <ColorSchemeIcon
+          scheme="light"
+          hasTheme={hasTheme}
+          updatePreferredScheme={updatePreferredScheme}
         />
-        <ClickableIcon
-          $disabled={!isInitializedWithSystemScheme}
-          onClick={isInitializedWithSystemScheme ? setDarkScheme : undefined}
-          data-tooltip={isInitializedWithSystemScheme ? 'Lights out' : undefined}
-        >
-          <FiMoon color="var(--secondary)" />
-        </ClickableIcon>
+        <ColorSchemeSwitch
+          disabled={!hasTheme}
+          $colorScheme={!hasTheme ? null : colorScheme}
+          onChange={setInvertedScheme}
+          checked={hasTheme && colorScheme === 'dark'}
+        />
+        <ColorSchemeIcon
+          scheme="dark"
+          hasTheme={hasTheme}
+          updatePreferredScheme={updatePreferredScheme}
+        />
       </ContentStack>
       <Button
         role="button"

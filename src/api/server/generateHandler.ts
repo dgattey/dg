@@ -23,27 +23,50 @@ type TypedRequest = Omit<NextApiRequest, 'body'> & {
 };
 
 /**
+ * Used for processing requests into responses
+ */
+type Processor = (
+  client: GraphQLClient,
+  request: TypedRequest,
+  response: NextApiResponse,
+) => Promise<void>;
+
+/**
+ * For a POST request, awaits data from the client or returns a 500 if there's no
+ * query specified in the body.
+ */
+const handlePost: Processor = async (client, request, response) => {
+  const { query, variables } = request.body ?? {};
+  if (!query) {
+    response.status(500).end('Missing query');
+    return;
+  }
+  response.json({ data: await client.request<unknown>(query, variables) });
+};
+
+/**
+ * Processes a request and adds the right handlers
+ */
+const processRequest: Processor = async (client, request, response) => {
+  const { method } = request;
+  switch (method) {
+    case 'POST': {
+      await handlePost(client, request, response);
+      break;
+    }
+    default:
+      response.setHeader('Allow', ['POST']);
+      response.status(405).end(`Method ${method} Not Allowed`);
+      break;
+  }
+};
+
+/**
  * Proxy calls to a GraphQL client with a custom request/response to hide
  * where it's calling. Should be exported from an API file as a handler.
  */
 const generateHandler =
-  (client: GraphQLClient) => async (req: TypedRequest, res: NextApiResponse) => {
-    const { method, body } = req;
-    const { query, variables } = body ?? {};
-    switch (method) {
-      case 'POST': {
-        if (!query) {
-          res.status(500).end('Missing query');
-          break;
-        }
-        res.json({ data: await client.request<unknown>(query, variables) });
-        break;
-      }
-      default:
-        res.setHeader('Allow', ['POST']);
-        res.status(405).end(`Method ${method} Not Allowed`);
-        break;
-    }
-  };
+  (client: GraphQLClient) => async (request: TypedRequest, response: NextApiResponse) =>
+    processRequest(client, request, response);
 
 export default generateHandler;

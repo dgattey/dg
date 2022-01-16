@@ -3,19 +3,26 @@ import { useState } from 'react';
 export type LocalStorageKey = 'colorScheme';
 
 /**
+ * Gets a value and returns it. If missing, returns the
+ * initial value instead. On error, also returns initial value.
+ */
+const getValue = <Value>(key: string, initialValue: Value) => {
+  try {
+    const item = window.localStorage.getItem(key);
+    return item ? JSON.parse<Value>(item) : initialValue;
+  } catch {
+    return initialValue;
+  }
+};
+
+/**
  * Uses local storage to fetch/store a given value.
  */
 const useLocalStorageValue = <Value>(key: LocalStorageKey, initialValue: Value) => {
   const resolvedKey = `com.dg.${key}`;
-  const [storedValue, setStoredValue] = useState<Value | null>(() => {
-    try {
-      const item = window.localStorage.getItem(resolvedKey);
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      return item ? (JSON.parse(item) as Value) : initialValue;
-    } catch {
-      return initialValue;
-    }
-  });
+  const [storedValue, setStoredValue] = useState<Value | null>(() =>
+    getValue(resolvedKey, initialValue),
+  );
 
   /**
    * Saves a new value to local storage, returning if it was saved

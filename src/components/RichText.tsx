@@ -70,8 +70,9 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
 
   // Map the inline and block entries
   const entryMap = new Map<string, Entry>();
-  links.entries.block.filter(isDefinedItem).forEach((entry) => entryMap.set(entry.sys.id, entry));
-  links.entries.inline.filter(isDefinedItem).forEach((entry) => entryMap.set(entry.sys.id, entry));
+  [...links.entries.block, ...links.entries.inline]
+    .filter(isDefinedItem)
+    .forEach((entry) => entryMap.set(entry.sys.id, entry));
 
   return {
     renderNode: {
