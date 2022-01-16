@@ -3,6 +3,7 @@ import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from 'react';
 import { FiArrowUp } from 'react-icons/fi';
 import styled, { css } from 'styled-components';
+import Stack from './Stack';
 
 // Amount in px we have to scroll to get the fancy effect on the logo
 const THRESHOLD = 80;
@@ -21,9 +22,9 @@ const LogoBlobBackground = styled(dynamic(() => import('./Blob'), { ssr: false }
   $isBlobBackgroundVisible: boolean;
 }>`
   position: absolute;
-  top: -11em;
-  left: -8em;
-  width: 14em;
+  top: -15em;
+  left: -11em;
+  width: 20em;
   filter: var(--filter-drop-shadow);
   transition: transform var(--transition), opacity var(--transition);
   opacity: 0;
@@ -59,10 +60,12 @@ const Container = styled.div<{ $isBlobBackgroundVisible: boolean }>`
   position: relative;
   font-size: 2.5em;
   color: var(--secondary);
-  transition: color var(--transition);
+  transform-origin: top left;
+  transition: color var(--transition), transform var(--transition);
   ${({ $isBlobBackgroundVisible }) =>
     $isBlobBackgroundVisible &&
     css`
+      transform: scale(0.64);
       &:hover {
         color: #ffffff;
       }
@@ -73,9 +76,11 @@ const Container = styled.div<{ $isBlobBackgroundVisible: boolean }>`
  * Arrow up to show scrollability. Fades in, and is on own layer to
  * prevent jittering as it fades in.
  */
-const ScrollUpIndicator = styled(FiArrowUp)<{ $isBlobBackgroundVisible: boolean }>`
+const ScrollUpIndicator = styled(Stack)<{ $isBlobBackgroundVisible: boolean }>`
   margin-left: 0.25em;
-  font-size: 0.5em;
+  font-size: 0.45em;
+  letter-spacing: 0.03em;
+  font-weight: 600;
   transition: opacity var(--transition);
   will-change: transform;
   ${({ $isBlobBackgroundVisible }) => css`
@@ -116,7 +121,14 @@ const Logo = () => {
         $isBlobBackgroundVisible={isBlobBackgroundVisible}
       />
       <LogoText aria-hidden>dg.</LogoText>
-      <ScrollUpIndicator $isBlobBackgroundVisible={isBlobBackgroundVisible} />
+      <ScrollUpIndicator
+        $isBlobBackgroundVisible={isBlobBackgroundVisible}
+        $gap="2px"
+        $alignItems="center"
+      >
+        To Top
+        <FiArrowUp />
+      </ScrollUpIndicator>
     </Container>
   );
 };
