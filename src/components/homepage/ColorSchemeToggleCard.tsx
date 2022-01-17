@@ -14,8 +14,13 @@ const Card = styled(ContentCard)`
   gap: var(--stack-gap);
 `;
 
-// Magic value to place the switch exactly in the center of the card by offsetting the button height + spacing up
+/**
+ * Magic value to place the switch exactly in the center of the card by
+ * offsetting the button height + spacing up. Makes sure transitions are
+ * always enabled too, so switching color scheme does actually animate.
+ */
 const ContentStack = styled(Stack)`
+  --transition: var(--transition-always-enabled);
   margin-top: calc(var(--stack-gap) + 2.5em);
 `;
 

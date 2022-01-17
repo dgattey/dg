@@ -1,4 +1,5 @@
 import '@picocss/pico/css/pico.min.css';
+import { ANIMATE_ATTRIBUTE } from 'hooks/useColorScheme';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { createGlobalStyle, css } from 'styled-components';
 
@@ -57,6 +58,8 @@ const AppStyle = createGlobalStyle`
       --content-grid-dimension-em: ${CONTENT_GRID_DIMENSION}em;
       --content-grid-gap-em: ${CONTENT_GRID_GAP}em;
 
+      /* We disable all transitions when changing color schemes, except if this is used */
+      --transition-always-enabled: 0.2s ease-in-out;
   }
 
   // When a page/component is set to light or the root has no dark theme applied
@@ -75,6 +78,11 @@ const AppStyle = createGlobalStyle`
     :root:not([data-theme='light']) {
       ${darkModeVariables};
     }
+  }
+
+  // Disable all animations if this is true
+  :root[${ANIMATE_ATTRIBUTE}='false'] {
+    --transition: 0s;
   }
 `;
 
