@@ -28,15 +28,17 @@ const Footer = () => {
     </li>
   ));
   return (
-    <footer>
-      <Navigation>
-        <FlexList>
-          <li>© {new Date().getFullYear()} Dylan Gattey</li>
-          <li>{version}</li>
-        </FlexList>
-        <FlexList>{listedLinkElements}</FlexList>
-      </Navigation>
-    </footer>
+    <section className="container">
+      <footer>
+        <Navigation>
+          <FlexList>
+            <li>© {new Date().getFullYear()} Dylan Gattey</li>
+            <li>{version}</li>
+          </FlexList>
+          <FlexList>{listedLinkElements}</FlexList>
+        </Navigation>
+      </footer>
+    </section>
   );
 };
 
