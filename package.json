@@ -24,7 +24,6 @@
     "@contentful/rich-text-types": "15.11.1",
     "@picocss/pico": "1.4.3",
     "@react-hook/throttle": "2.2.0",
-    "blobs": "2.2.1-beta.1",
     "graphql": "16.2.0",
     "graphql-request": "3.7.0",
     "mapbox-gl": "2.6.1",
