@@ -12,7 +12,7 @@ import Stack from './Stack';
  * background on scroll + scales down a bit.
  */
 const LogoText = styled.article<{ $isScrolled: boolean }>`
-  --padding: 2rem;
+  --padding: 1.5rem;
   --margin: 1rem;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
     Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
@@ -81,7 +81,7 @@ const Logo = () => {
       </Link>
     );
   return (
-    <Stack $gap="1rem" $alignItems="center" $justifyContent="spaceAround">
+    <Stack $gap="1.5rem" $alignItems="center" $justifyContent="spaceAround">
       <LogoText $isScrolled={isScrolled}>{linkedLogoText}</LogoText>
       <SpacedScrollIndicator $isScrolled={isScrolled} />
     </Stack>
