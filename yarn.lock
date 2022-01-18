@@ -21,7 +21,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/core@npm:7.16.7, @babel/core@npm:>=7.9.0, @babel/core@npm:^7.14.0":
+"@babel/core@npm:>=7.9.0, @babel/core@npm:^7.14.0, @babel/core@npm:^7.16.7":
   version: 7.16.7
   resolution: "@babel/core@npm:7.16.7"
   dependencies:
@@ -657,7 +657,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/cli@npm:16.0.2":
+"@commitlint/cli@npm:^16.0.2":
   version: 16.0.2
   resolution: "@commitlint/cli@npm:16.0.2"
   dependencies:
@@ -676,7 +676,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@commitlint/config-conventional@npm:16.0.0":
+"@commitlint/config-conventional@npm:^16.0.0":
   version: 16.0.0
   resolution: "@commitlint/config-conventional@npm:16.0.0"
   dependencies:
@@ -844,7 +844,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@contentful/rich-text-react-renderer@npm:15.11.1":
+"@contentful/rich-text-react-renderer@npm:^15.11.1":
   version: 15.11.1
   resolution: "@contentful/rich-text-react-renderer@npm:15.11.1"
   dependencies:
@@ -856,7 +856,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@contentful/rich-text-types@npm:15.11.1, @contentful/rich-text-types@npm:^15.11.1":
+"@contentful/rich-text-types@npm:^15.11.1":
   version: 15.11.1
   resolution: "@contentful/rich-text-types@npm:15.11.1"
   checksum: 5cd4e21d76e038f8a4d61eef6b00bf7c98efde32d21be5edd25d16361f3ba1f48bca25d98bec32fa2429cf2339f72682d3b38ab99acd0259dc1fe3dbb9ff7361
@@ -959,7 +959,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-codegen/cli@npm:2.3.1":
+"@graphql-codegen/cli@npm:^2.3.1":
   version: 2.3.1
   resolution: "@graphql-codegen/cli@npm:2.3.1"
   dependencies:
@@ -1027,7 +1027,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-codegen/near-operation-file-preset@npm:2.2.3":
+"@graphql-codegen/near-operation-file-preset@npm:^2.2.3":
   version: 2.2.3
   resolution: "@graphql-codegen/near-operation-file-preset@npm:2.2.3"
   dependencies:
@@ -1072,7 +1072,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-codegen/typescript-operations@npm:2.2.2":
+"@graphql-codegen/typescript-operations@npm:^2.2.2":
   version: 2.2.2
   resolution: "@graphql-codegen/typescript-operations@npm:2.2.2"
   dependencies:
@@ -1087,7 +1087,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphql-codegen/typescript@npm:2.4.2, @graphql-codegen/typescript@npm:^2.4.2":
+"@graphql-codegen/typescript@npm:^2.4.2":
   version: 2.4.2
   resolution: "@graphql-codegen/typescript@npm:2.4.2"
   dependencies:
@@ -1990,7 +1990,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@picocss/pico@npm:1.4.4":
+"@picocss/pico@npm:^1.4.4":
   version: 1.4.4
   resolution: "@picocss/pico@npm:1.4.4"
   checksum: b87fcac3cb9644710cea14629e83dab35e82f68d653ef5a04a596b6f057b8940215d1171dce6f4c344a790ddf3202bd9510e10160de77fa1769d9294f650a561
@@ -2018,7 +2018,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/changelog@npm:6.0.1":
+"@semantic-release/changelog@npm:^6.0.1":
   version: 6.0.1
   resolution: "@semantic-release/changelog@npm:6.0.1"
   dependencies:
@@ -2063,7 +2063,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@semantic-release/git@npm:10.0.1":
+"@semantic-release/git@npm:^10.0.1":
   version: 10.0.1
   resolution: "@semantic-release/git@npm:10.0.1"
   dependencies:
@@ -2157,7 +2157,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@stylelint/postcss-css-in-js@npm:0.37.2":
+"@stylelint/postcss-css-in-js@npm:^0.37.2":
   version: 0.37.2
   resolution: "@stylelint/postcss-css-in-js@npm:0.37.2"
   dependencies:
@@ -2327,7 +2327,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/react@npm:*, @types/react@npm:17.0.38":
+"@types/react@npm:*, @types/react@npm:^17.0.38":
   version: 17.0.38
   resolution: "@types/react@npm:17.0.38"
   dependencies:
@@ -2361,7 +2361,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/styled-components@npm:5.1.20":
+"@types/styled-components@npm:^5.1.20":
   version: 5.1.20
   resolution: "@types/styled-components@npm:5.1.20"
   dependencies:
@@ -2390,7 +2390,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/eslint-plugin@npm:5.10.0":
+"@typescript-eslint/eslint-plugin@npm:^5.10.0":
   version: 5.10.0
   resolution: "@typescript-eslint/eslint-plugin@npm:5.10.0"
   dependencies:
@@ -2413,7 +2413,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@typescript-eslint/parser@npm:5.10.0, @typescript-eslint/parser@npm:^5.0.0":
+"@typescript-eslint/parser@npm:^5.0.0, @typescript-eslint/parser@npm:^5.10.0":
   version: 5.10.0
   resolution: "@typescript-eslint/parser@npm:5.10.0"
   dependencies:
@@ -4139,64 +4139,67 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "dg@workspace:."
   dependencies:
-    "@babel/core": 7.16.7
-    "@commitlint/cli": 16.0.2
-    "@commitlint/config-conventional": 16.0.0
-    "@contentful/rich-text-react-renderer": 15.11.1
-    "@contentful/rich-text-types": 15.11.1
-    "@graphql-codegen/cli": 2.3.1
-    "@graphql-codegen/near-operation-file-preset": 2.2.3
-    "@graphql-codegen/typescript": 2.4.2
-    "@graphql-codegen/typescript-operations": 2.2.2
-    "@picocss/pico": 1.4.4
-    "@semantic-release/changelog": 6.0.1
-    "@semantic-release/git": 10.0.1
-    "@stylelint/postcss-css-in-js": 0.37.2
+    "@babel/core": ^7.16.7
+    "@commitlint/cli": ^16.0.2
+    "@commitlint/config-conventional": ^16.0.0
+    "@contentful/rich-text-react-renderer": ^15.11.1
+    "@contentful/rich-text-types": ^15.11.1
+    "@graphql-codegen/cli": ^2.3.1
+    "@graphql-codegen/near-operation-file-preset": ^2.2.3
+    "@graphql-codegen/typescript": ^2.4.2
+    "@graphql-codegen/typescript-operations": ^2.2.2
+    "@picocss/pico": ^1.4.4
+    "@semantic-release/changelog": ^6.0.1
+    "@semantic-release/git": ^10.0.1
+    "@stylelint/postcss-css-in-js": ^0.37.2
     "@types/node": ^17.0.9
-    "@types/react": 17.0.38
-    "@types/styled-components": 5.1.20
-    "@typescript-eslint/eslint-plugin": 5.10.0
-    "@typescript-eslint/parser": 5.10.0
-    api: "link:./src/api"
-    components: "link:./src/components"
-    dotenv: 14.2.0
+    "@types/react": ^17.0.38
+    "@types/styled-components": ^5.1.20
+    "@typescript-eslint/eslint-plugin": ^5.10.0
+    "@typescript-eslint/parser": ^5.10.0
+    api: "link:./src/api::locator=dg%40workspace%3A."
+    components: "link:./src/components::locator=dg%40workspace%3A."
+    dotenv: ^14.2.0
     eslint: ^8.7.0
-    eslint-config-airbnb: 19.0.4
-    eslint-config-airbnb-typescript: 16.1.0
-    eslint-config-next: 12.0.8
-    eslint-config-prettier: 8.3.0
-    eslint-import-resolver-typescript: 2.5.0
+    eslint-config-airbnb: ^19.0.4
+    eslint-config-airbnb-typescript: ^16.1.0
+    eslint-config-next: ^12.0.8
+    eslint-config-prettier: ^8.3.0
+    eslint-import-resolver-typescript: ^2.5.0
     eslint-plugin-import: ^2.25.4
-    eslint-plugin-jsx-a11y: 6.5.1
-    eslint-plugin-react: 7.28.0
-    eslint-plugin-react-hooks: 4.3.0
-    eslint-plugin-tsc: 2.0.0
-    graphql: 16.2.0
-    graphql-request: 3.7.0
-    graphql-tag: 2.12.6
-    hooks: "link:./src/hooks"
-    husky: 7.0.4
-    lint-staged: 12.1.7
-    mapbox-gl: 2.6.1
+    eslint-plugin-jsx-a11y: ^6.5.1
+    eslint-plugin-react: ^7.28.0
+    eslint-plugin-react-hooks: ^4.3.0
+    eslint-plugin-tsc: ^2.0.0
+    graphql: ^15.8.0
+    graphql-request: ^3.7.0
+    graphql-tag: ^2.12.6
+    hooks: "link:./src/hooks::locator=dg%40workspace%3A."
+    husky: ^7.0.4
+    lint-staged: ^12.1.7
+    mapbox-gl: ^2.6.1
     next: 12.0.8
-    pages: "link:./src/pages"
-    postcss: 8.4.5
-    postcss-syntax: 0.36.2
-    prettier: 2.5.1
-    react: 17.0.2
-    react-dom: 17.0.2
-    react-icons: 4.3.1
-    react-intersection-observer: 8.33.1
+    pages: "link:./src/pages::locator=dg%40workspace%3A."
+    postcss: ^8.4.5
+    postcss-syntax: ^0.36.2
+    prettier: ^2.5.1
+    react: ^17.0.2
+    react-dom: ^17.0.2
+    react-icons: ^4.3.1
+    react-intersection-observer: ^8.33.1
     react-is: ^17.0.2
-    react-map-gl: 6.1.18
-    semantic-release: 19.0.2
-    styled-components: 5.3.3
-    stylelint: 14.2.0
-    stylelint-config-recommended: 6.0.0
-    stylelint-config-styled-components: 0.1.1
-    stylelint-processor-styled-components: 1.10.0
-    swr: 1.1.2
+    react-map-gl: ^6.1.18
+    semantic-release: ^19.0.2
+    styled-components: ^5.3.3
+    stylelint: ^14.2.0
+    stylelint-config-recommended: ^6.0.0
+    stylelint-config-styled-components: ^0.1.1
+    stylelint-processor-styled-components: ^1.10.0
+    swr: ^1.1.2
     typescript: ^4.5.4
+  dependenciesMeta:
+    react-dom@17.0.2:
+      unplugged: true
   languageName: unknown
   linkType: soft
 
@@ -4260,17 +4263,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"dotenv@npm:14.2.0":
-  version: 14.2.0
-  resolution: "dotenv@npm:14.2.0"
-  checksum: 85a0e44918ef49e64c278f757dab50a156b9a6ca67f708876fd81d265e575e35b67387fc681d910df99368d6c1edca66cd546edeb0f7db3b499cb876c999233e
-  languageName: node
-  linkType: hard
-
 "dotenv@npm:^10.0.0":
   version: 10.0.0
   resolution: "dotenv@npm:10.0.0"
   checksum: f412c5fe8c24fbe313d302d2500e247ba8a1946492db405a4de4d30dd0eb186a88a43f13c958c5a7de303938949c4231c56994f97d05c4bc1f22478d631b4005
+  languageName: node
+  linkType: hard
+
+"dotenv@npm:^14.2.0":
+  version: 14.2.0
+  resolution: "dotenv@npm:14.2.0"
+  checksum: 85a0e44918ef49e64c278f757dab50a156b9a6ca67f708876fd81d265e575e35b67387fc681d910df99368d6c1edca66cd546edeb0f7db3b499cb876c999233e
   languageName: node
   linkType: hard
 
@@ -4482,7 +4485,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-airbnb-typescript@npm:16.1.0":
+"eslint-config-airbnb-typescript@npm:^16.1.0":
   version: 16.1.0
   resolution: "eslint-config-airbnb-typescript@npm:16.1.0"
   dependencies:
@@ -4494,7 +4497,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-airbnb@npm:19.0.4":
+"eslint-config-airbnb@npm:^19.0.4":
   version: 19.0.4
   resolution: "eslint-config-airbnb@npm:19.0.4"
   dependencies:
@@ -4511,7 +4514,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-next@npm:12.0.8":
+"eslint-config-next@npm:^12.0.8":
   version: 12.0.8
   resolution: "eslint-config-next@npm:12.0.8"
   dependencies:
@@ -4535,7 +4538,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-config-prettier@npm:8.3.0":
+"eslint-config-prettier@npm:^8.3.0":
   version: 8.3.0
   resolution: "eslint-config-prettier@npm:8.3.0"
   peerDependencies:
@@ -4556,7 +4559,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-import-resolver-typescript@npm:2.5.0, eslint-import-resolver-typescript@npm:^2.4.0":
+"eslint-import-resolver-typescript@npm:^2.4.0, eslint-import-resolver-typescript@npm:^2.5.0":
   version: 2.5.0
   resolution: "eslint-import-resolver-typescript@npm:2.5.0"
   dependencies:
@@ -4605,7 +4608,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-jsx-a11y@npm:6.5.1, eslint-plugin-jsx-a11y@npm:^6.5.1":
+"eslint-plugin-jsx-a11y@npm:^6.5.1":
   version: 6.5.1
   resolution: "eslint-plugin-jsx-a11y@npm:6.5.1"
   dependencies:
@@ -4627,7 +4630,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-react-hooks@npm:4.3.0, eslint-plugin-react-hooks@npm:^4.3.0":
+"eslint-plugin-react-hooks@npm:^4.3.0":
   version: 4.3.0
   resolution: "eslint-plugin-react-hooks@npm:4.3.0"
   peerDependencies:
@@ -4636,7 +4639,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-react@npm:7.28.0, eslint-plugin-react@npm:^7.27.0":
+"eslint-plugin-react@npm:^7.27.0, eslint-plugin-react@npm:^7.28.0":
   version: 7.28.0
   resolution: "eslint-plugin-react@npm:7.28.0"
   dependencies:
@@ -4660,7 +4663,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-tsc@npm:2.0.0":
+"eslint-plugin-tsc@npm:^2.0.0":
   version: 2.0.0
   resolution: "eslint-plugin-tsc@npm:2.0.0"
   dependencies:
@@ -5487,7 +5490,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql-request@npm:3.7.0, graphql-request@npm:^3.3.0":
+"graphql-request@npm:^3.3.0, graphql-request@npm:^3.7.0":
   version: 3.7.0
   resolution: "graphql-request@npm:3.7.0"
   dependencies:
@@ -5509,7 +5512,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql-tag@npm:2.12.6, graphql-tag@npm:^2.11.0":
+"graphql-tag@npm:^2.11.0, graphql-tag@npm:^2.12.6":
   version: 2.12.6
   resolution: "graphql-tag@npm:2.12.6"
   dependencies:
@@ -5529,10 +5532,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"graphql@npm:16.2.0":
-  version: 16.2.0
-  resolution: "graphql@npm:16.2.0"
-  checksum: 204b5c9991b82561651a28b13dbb2e0e67514171a6a8c045ca4a527b944087344a14519d0426d661b49f2305584b390591abadc82b942f7b65e64e05cb31a584
+"graphql@npm:^15.0.0, graphql@npm:^15.8.0":
+  version: 15.8.0
+  resolution: "graphql@npm:15.8.0"
+  checksum: 423325271db8858428641b9aca01699283d1fe5b40ef6d4ac622569ecca927019fce8196208b91dd1d8eb8114f00263fe661d241d0eb40c10e5bfd650f86ec5e
   languageName: node
   linkType: hard
 
@@ -5747,7 +5750,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"husky@npm:7.0.4":
+"husky@npm:^7.0.4":
   version: 7.0.4
   resolution: "husky@npm:7.0.4"
   bin:
@@ -6815,7 +6818,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"lint-staged@npm:12.1.7":
+"lint-staged@npm:^12.1.7":
   version: 12.1.7
   resolution: "lint-staged@npm:12.1.7"
   dependencies:
@@ -7215,7 +7218,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mapbox-gl@npm:2.6.1, mapbox-gl@npm:^2.3.0":
+"mapbox-gl@npm:^2.3.0, mapbox-gl@npm:^2.6.1":
   version: 2.6.1
   resolution: "mapbox-gl@npm:2.6.1"
   dependencies:
@@ -8627,7 +8630,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss-syntax@npm:0.36.2":
+"postcss-syntax@npm:^0.36.2":
   version: 0.36.2
   resolution: "postcss-syntax@npm:0.36.2"
   peerDependencies:
@@ -8654,17 +8657,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"postcss@npm:8.4.5, postcss@npm:^8.3.11":
-  version: 8.4.5
-  resolution: "postcss@npm:8.4.5"
-  dependencies:
-    nanoid: ^3.1.30
-    picocolors: ^1.0.0
-    source-map-js: ^1.0.1
-  checksum: b78abdd89c10f7b48f4bdcd376104a19d6e9c7495ab521729bdb3df315af6c211360e9f06887ad3bc0ab0f61a04b91d68ea11462997c79cced58b9ccd66fac07
-  languageName: node
-  linkType: hard
-
 "postcss@npm:^7.0.26":
   version: 7.0.39
   resolution: "postcss@npm:7.0.39"
@@ -8672,6 +8664,17 @@ __metadata:
     picocolors: ^0.2.1
     source-map: ^0.6.1
   checksum: 4ac793f506c23259189064bdc921260d869a115a82b5e713973c5af8e94fbb5721a5cc3e1e26840500d7e1f1fa42a209747c5b1a151918a9bc11f0d7ed9048e3
+  languageName: node
+  linkType: hard
+
+"postcss@npm:^8.3.11, postcss@npm:^8.4.5":
+  version: 8.4.5
+  resolution: "postcss@npm:8.4.5"
+  dependencies:
+    nanoid: ^3.1.30
+    picocolors: ^1.0.0
+    source-map-js: ^1.0.1
+  checksum: b78abdd89c10f7b48f4bdcd376104a19d6e9c7495ab521729bdb3df315af6c211360e9f06887ad3bc0ab0f61a04b91d68ea11462997c79cced58b9ccd66fac07
   languageName: node
   linkType: hard
 
@@ -8696,7 +8699,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prettier@npm:2.5.1":
+"prettier@npm:^2.5.1":
   version: 2.5.1
   resolution: "prettier@npm:2.5.1"
   bin:
@@ -8854,7 +8857,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-dom@npm:17.0.2":
+"react-dom@npm:^17.0.2":
   version: 17.0.2
   resolution: "react-dom@npm:17.0.2"
   dependencies:
@@ -8867,7 +8870,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-icons@npm:4.3.1":
+"react-icons@npm:^4.3.1":
   version: 4.3.1
   resolution: "react-icons@npm:4.3.1"
   peerDependencies:
@@ -8876,7 +8879,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-intersection-observer@npm:8.33.1":
+"react-intersection-observer@npm:^8.33.1":
   version: 8.33.1
   resolution: "react-intersection-observer@npm:8.33.1"
   peerDependencies:
@@ -8899,7 +8902,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-map-gl@npm:6.1.18":
+"react-map-gl@npm:^6.1.18":
   version: 6.1.18
   resolution: "react-map-gl@npm:6.1.18"
   dependencies:
@@ -8924,7 +8927,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react@npm:17.0.2":
+"react@npm:^17.0.2":
   version: 17.0.2
   resolution: "react@npm:17.0.2"
   dependencies:
@@ -9424,7 +9427,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"semantic-release@npm:19.0.2":
+"semantic-release@npm:^19.0.2":
   version: 19.0.2
   resolution: "semantic-release@npm:19.0.2"
   dependencies:
@@ -10033,7 +10036,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"styled-components@npm:5.3.3":
+"styled-components@npm:^5.3.3":
   version: 5.3.3
   resolution: "styled-components@npm:5.3.3"
   dependencies:
@@ -10076,7 +10079,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint-config-recommended@npm:6.0.0":
+"stylelint-config-recommended@npm:^6.0.0":
   version: 6.0.0
   resolution: "stylelint-config-recommended@npm:6.0.0"
   peerDependencies:
@@ -10085,14 +10088,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint-config-styled-components@npm:0.1.1":
+"stylelint-config-styled-components@npm:^0.1.1":
   version: 0.1.1
   resolution: "stylelint-config-styled-components@npm:0.1.1"
   checksum: 1421187a27d11740f9ee224163231a9f3194c8055c27b0cb3204e76742c55a9397004bc70da9b3feee9988d0afe0d3c839186ef01d847a163ba7ad3299a9759a
   languageName: node
   linkType: hard
 
-"stylelint-processor-styled-components@npm:1.10.0":
+"stylelint-processor-styled-components@npm:^1.10.0":
   version: 1.10.0
   resolution: "stylelint-processor-styled-components@npm:1.10.0"
   dependencies:
@@ -10104,7 +10107,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"stylelint@npm:14.2.0":
+"stylelint@npm:^14.2.0":
   version: 14.2.0
   resolution: "stylelint@npm:14.2.0"
   dependencies:
@@ -10267,7 +10270,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"swr@npm:1.1.2":
+"swr@npm:^1.1.2":
   version: 1.1.2
   resolution: "swr@npm:1.1.2"
   peerDependencies:
