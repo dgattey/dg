@@ -4,7 +4,6 @@ import ErrorLayout from 'components/layouts/ErrorLayout';
 import Link from 'components/Link';
 import type { NextApiResponse } from 'next';
 import React from 'react';
-import { SWRConfig } from 'swr';
 
 interface HasStatusCode {
   /**
@@ -13,14 +12,14 @@ interface HasStatusCode {
   statusCode?: number;
 }
 
-type Props = HasStatusCode & {
+export type Props = HasStatusCode & {
   /**
    * Provides SWR with fallback version data
    */
   fallback: FallbackForErrorPages;
 };
 
-type ErrorWithCode = Error & HasStatusCode;
+export type ErrorWithCode = Error & HasStatusCode;
 
 /**
  * If this is on the server, it'll provide a response to use for a status code
@@ -52,7 +51,7 @@ const Contents = ({ statusCode }: HasStatusCode) => {
   const { data: footerLinks } = useData('siteFooter');
   const emailLink = linkWithName(footerLinks, 'Email');
   return (
-    <ErrorLayout>
+    <>
       <h1>😬 This is awkward...</h1>
       <p>
         Looks like I encountered a {statusCode === 404 ? <code>Page Not Found</code> : 'server'}{' '}
@@ -61,7 +60,7 @@ const Contents = ({ statusCode }: HasStatusCode) => {
         {emailLink ? <Link alwaysShowTitle {...emailLink} /> : 'Email Me'} and I&apos;ll see what I
         can do.
       </p>
-    </ErrorLayout>
+    </>
   );
 };
 
@@ -69,9 +68,9 @@ const Contents = ({ statusCode }: HasStatusCode) => {
  * Generic error page, for 500s
  */
 const ErrorPage = ({ statusCode, fallback }: Props) => (
-  <SWRConfig value={{ fallback }}>
+  <ErrorLayout fallback={fallback}>
     <Contents statusCode={statusCode} />
-  </SWRConfig>
+  </ErrorLayout>
 );
 
 export default ErrorPage;

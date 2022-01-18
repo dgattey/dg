@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 import ScrollIndicatorContext from './ScrollIndicatorContext';
@@ -17,7 +18,6 @@ const LogoText = styled.article<{ $isScrolled: boolean }>`
   font-size: 2.5rem;
   font-variation-settings: 'wght' 800;
   letter-spacing: -0.12em;
-  color: var(--logo-color);
 
   display: flex;
   align-items: center;
@@ -63,6 +63,8 @@ const SpacedScrollIndicator = styled(ScrollUpIndicator)<{ $isScrolled: boolean }
     `}
 `;
 
+const StyledLink = styled.a``;
+
 /**
  * Logo + scroll to top button, with certain changes that happen on
  * scroll.
@@ -71,9 +73,11 @@ const Logo = () => {
   const isScrolled = useContext(ScrollIndicatorContext);
   return (
     <Stack $gap="1rem" $alignItems="center" $justifyContent="spaceAround">
-      <LogoText $isScrolled={isScrolled} aria-hidden>
-        dg.
-      </LogoText>
+      <Link href="/" passHref>
+        <StyledLink>
+          <LogoText $isScrolled={isScrolled}>dg.</LogoText>
+        </StyledLink>
+      </Link>
       <SpacedScrollIndicator $isScrolled={isScrolled} />
     </Stack>
   );

@@ -10,7 +10,6 @@ import { createGlobalStyle, css } from 'styled-components';
 const darkModeVariables = css`
   --contrast-overlay: var(--contrast-inverse);
   --contrast-overlay-inverse: var(--contrast);
-  --logo-color: var(--contrast);
 
   // Same as --card-box-shadow with the fade doubled
   --card-hovered-box-shadow: 0 0.125rem 2rem rgba(0, 0, 0, 0.06),
@@ -27,7 +26,6 @@ const darkModeVariables = css`
 const lightModeVariables = css`
   --contrast-overlay: var(--secondary);
   --contrast-overlay-inverse: var(--secondary-inverse);
-  --logo-color: var(--secondary);
 
   // Same as --card-box-shadow with the fade doubled
   --card-hovered-box-shadow: 0 0.125rem 2rem rgba(27, 40, 50, 0.04),

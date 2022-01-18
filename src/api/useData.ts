@@ -46,10 +46,7 @@ export type Fallback = {
 /**
  * Bare essentials, for error pages
  */
-export type FallbackForErrorPages<Key extends FetcherKey = never> = PartialFallback<
-  'siteHeader' | 'siteFooter' | 'version'
-> &
-  PartialFallback<Key>;
+export type FallbackForErrorPages = PartialFallback<'siteHeader' | 'siteFooter' | 'version'>;
 
 /**
  * This maps between API/data fetcher keys for use with SWR, and the

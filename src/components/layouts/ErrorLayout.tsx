@@ -1,6 +1,14 @@
+import { FallbackForErrorPages } from 'api/useData';
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import PageLayout from './PageLayout';
+
+type Props = Pick<React.ComponentProps<'div'>, 'children'> & {
+  /**
+   * Provides SWR with fallback version/header/footer data
+   */
+  fallback: FallbackForErrorPages;
+};
 
 const Button = styled.a.attrs({ role: 'button' })``;
 
@@ -13,8 +21,8 @@ const Container = styled.section`
  * Basic page layout for error pages. Max-width'd content, left aligned,
  * with a go home button at the bottom
  */
-const ErrorLayout = ({ children }: Pick<React.ComponentProps<'div'>, 'children'>) => (
-  <PageLayout>
+const ErrorLayout = ({ children, fallback }: Props) => (
+  <PageLayout fallback={fallback}>
     <Container>
       {children}
       <NextLink passHref href="/">
