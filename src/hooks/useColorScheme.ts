@@ -15,6 +15,9 @@ export type SetColorScheme = (value: ColorScheme | null) => void;
 // Name of the attribute for theme we add on `html`
 const THEME_ATTRIBUTE = 'data-theme';
 
+// If this is true, we disable animations
+export const ANIMATE_ATTRIBUTE = 'data-animations-enabled';
+
 // The media query we'd like to match
 const PREFERS_DARK = '(prefers-color-scheme: dark)';
 
@@ -39,15 +42,21 @@ const generateMediaEventListener = (
 };
 
 /**
- * Modifies the document's `data-theme` attribute to change the theme itself
+ * Modifies the document's `data-theme` attribute to change the theme itself.
+ * Also disables animations around it, so colors don't animate their change.
+ * Only the color scheme switcher should be an exception to that.
  */
 const updateThemeAttribute = (scheme: ColorScheme, isSystemScheme: boolean) => {
   const htmlElement = document.documentElement;
+  htmlElement.setAttribute(ANIMATE_ATTRIBUTE, 'false');
   if (isSystemScheme) {
     htmlElement.removeAttribute(THEME_ATTRIBUTE);
-    return;
+  } else {
+    htmlElement.setAttribute(THEME_ATTRIBUTE, scheme);
   }
-  document.documentElement.setAttribute(THEME_ATTRIBUTE, scheme);
+
+  // Make sure to turn on animations non-synchronously
+  requestAnimationFrame(() => htmlElement.setAttribute(ANIMATE_ATTRIBUTE, 'true'));
 };
 
 /**

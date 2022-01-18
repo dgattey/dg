@@ -14,9 +14,15 @@ const Card = styled(ContentCard)`
   gap: var(--stack-gap);
 `;
 
-// Magic value to place the switch exactly in the center of the card by offsetting the button height + spacing up
+/**
+ * Magic value to place the switch exactly in the center of the card by
+ * offsetting the button height + spacing up. Makes sure transitions are
+ * always enabled too, so switching color scheme does actually animate.
+ */
 const ContentStack = styled(Stack)`
-  margin-top: calc(var(--stack-gap) + 2.5em);
+  --transition: var(--transition-always-enabled);
+  position: relative;
+  margin: 4rem 0;
 `;
 
 // Provides color scheme specific variable names for the switch - unknown is basically just server-rendered
@@ -58,14 +64,19 @@ const ColorSchemeSwitch = styled.input.attrs({ role: 'switch', type: 'checkbox' 
 
 // Inline button that's not very prominent
 const Button = styled.button<{ $visible: boolean }>`
-  --border-radius: 2em;
-  --form-element-spacing-vertical: 0.25em;
-  --form-element-spacing-horizontal: 0.75em;
-  font-size: 0.75em;
-  display: inline-flex;
-  gap: 0.5em;
+  --form-element-spacing-vertical: 0.5rem;
+  --form-element-spacing-horizontal: 1rem;
+  position: absolute;
+  left: 1rem;
+  right: 1rem;
+  bottom: 1rem;
+  margin: 0 auto;
+  font-size: var(--font-size-small);
   width: fit-content;
   transition: opacity var(--transition);
+  @media (min-width: 768px) {
+    bottom: 2rem;
+  }
   && {
     ${({ $visible }) =>
       css`

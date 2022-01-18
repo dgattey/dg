@@ -8,9 +8,13 @@ const Card = styled(ContentCard)`
   min-height: 200px;
 `;
 
+// Make sure the map is also rounded and Mapbox logo doesn't get cut off
 const StyledMap = styled(MapGL)`
   & .mapboxgl-canvas {
     border-radius: var(--border-radius);
+  }
+  & .mapboxgl-ctrl {
+    margin: 1.5rem;
   }
 `;
 

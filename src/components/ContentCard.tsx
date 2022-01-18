@@ -1,6 +1,6 @@
 import { Link } from 'api/contentful/generated/api.generated';
 import styled, { css } from 'styled-components';
-import { cardSizeInEm } from './AppStyle';
+import { cardSize } from './ContentGrid';
 import ContentWrappingLink from './ContentWrappingLink';
 import Stack from './Stack';
 
@@ -69,16 +69,16 @@ const HiddenElement = styled.span`
 export const OverlayStack = styled(Stack).attrs({ $alignItems: 'center', $gap: '8px' })`
   overflow: hidden;
   position: absolute;
-  bottom: 0.5em;
-  left: 0.5em;
+  bottom: 1rem;
+  left: 1rem;
   background: var(--contrast-overlay);
   color: var(--contrast-overlay-inverse);
-  padding: 0.5em 0.75em;
-  border-radius: 2em;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--border-radius);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.1), 0 0 8px rgba(0, 0, 0, 0.16);
 
   transition: transform var(--transition);
-  transform: translateX(calc(2em - 100%));
+  transform: translateX(calc((var(--border-radius) / 2) - 100%));
   &:hover {
     transform: initial;
     ${HiddenElement} {
@@ -94,6 +94,7 @@ const Card = styled.article<CardProps>`
   border: var(--border-width) solid var(--secondary-focus);
   margin: inherit;
   padding: 0;
+  will-change: transform;
   ${({ $isClickable }) =>
     $isClickable &&
     css`
@@ -115,14 +116,14 @@ const Card = styled.article<CardProps>`
 
   ${({ $hSpan }) => css`
     @media (min-width: 768px) {
-      width: ${cardSizeInEm($hSpan)}em;
+      width: ${cardSize($hSpan)};
       grid-column-start: span ${$hSpan};
     }
   `};
   ${({ $vSpan }) =>
     css`
       @media (min-width: 768px) {
-        height: ${cardSizeInEm($vSpan)}em;
+        height: ${cardSize($vSpan)};
       }
       grid-row-start: span ${$vSpan};
     `}

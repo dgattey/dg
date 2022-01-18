@@ -20,18 +20,16 @@ const ImageCard = styled(ContentCard)`
 `;
 
 const TextCard = styled(ContentCard)`
+  overflow: visible;
   display: flex;
   flex-direction: column;
   align-items: center;
-  & h1 {
-    --typography-spacing-vertical: 1.5rem;
-  }
-  & p {
-    font-size: 0.9em;
-  }
   background: none;
   border: none;
   box-shadow: none;
+  & h1 {
+    --typography-spacing-vertical: 1.5rem;
+  }
 `;
 
 /**
