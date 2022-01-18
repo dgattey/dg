@@ -3,15 +3,6 @@ import { ANIMATE_ATTRIBUTE } from 'hooks/useColorScheme';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { createGlobalStyle, css } from 'styled-components';
 
-const CONTENT_GRID_DIMENSION = 17;
-const CONTENT_GRID_GAP = 2.5;
-
-/**
- * Creates a card size in em from a span
- */
-export const cardSizeInEm = (span = 1) =>
-  CONTENT_GRID_DIMENSION * span + (span - 1) * CONTENT_GRID_GAP;
-
 /**
  * Variables specific to dark mode. Anything that appears here needs to have
  * something defined in `lightModeVariables` and vice versa.
@@ -52,14 +43,13 @@ const lightModeVariables = css`
 const AppStyle = createGlobalStyle`
   :root {
       /* These are Pico overrides */
-      --border-radius: 1rem;
-      
-      /* Below here are new variables */
-      --content-grid-dimension-em: ${CONTENT_GRID_DIMENSION}em;
-      --content-grid-gap-em: ${CONTENT_GRID_GAP}em;
+      --border-radius: 3em;
 
       /* We disable all transitions when changing color schemes, except if this is used */
       --transition-always-enabled: 0.2s ease-in-out;
+
+      /* Used for small buttons/etc */
+      --font-size-small: 0.8rem;
   }
 
   // When a page/component is set to light or the root has no dark theme applied
