@@ -1,3 +1,4 @@
+import { linkWithName } from 'api/contentful/fetchSiteFooter';
 import useData from 'api/useData';
 import ContentCard, { OverlayStack } from 'components/ContentCard';
 import Image from 'components/Image';
@@ -48,7 +49,7 @@ const IntroCard = () => {
   return (
     <>
       <ImageCard
-        link={footerLinks?.find((item) => item.title?.includes('LinkedIn'))}
+        link={linkWithName(footerLinks, 'LinkedIn')}
         overlay={{
           alwaysVisible: <FiUser />,
           hiddenUntilHover: <strong>About</strong>,

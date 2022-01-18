@@ -1,6 +1,6 @@
 import { Fallback, fetchData } from 'api/useData';
 import Homepage from 'components/homepage/Homepage';
-import Layout from 'components/Layout';
+import PageLayout from 'components/layouts/PageLayout';
 import { GetStaticProps, InferGetStaticPropsType } from 'next/types';
 import React from 'react';
 import { SWRConfig } from 'swr';
@@ -39,9 +39,9 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
  */
 const Home = ({ fallback }: InferGetStaticPropsType<typeof getStaticProps>) => (
   <SWRConfig value={{ fallback }}>
-    <Layout>
+    <PageLayout>
       <Homepage />
-    </Layout>
+    </PageLayout>
   </SWRConfig>
 );
 
