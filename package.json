@@ -29,7 +29,7 @@
     "graphql-request": "^3.7.0",
     "hooks": "link:./src/hooks::locator=dg%40workspace%3A.",
     "mapbox-gl": "^2.6.1",
-    "next": "12.0.8",
+    "next": "^12.0.8",
     "pages": "link:./src/pages::locator=dg%40workspace%3A.",
     "postcss": "^8.4.5",
     "react": "^17.0.2",
