@@ -9,9 +9,9 @@ import { useInView } from 'react-intersection-observer';
 const useShowScrollIndicator = (thresholdHeight: number) => {
   const { ref, inView } = useInView({
     threshold: 1.0,
-    rootMargin: `-${thresholdHeight}px`,
+    rootMargin: `-${thresholdHeight}px 0px 0px 0px`,
   });
-  return { ref, isIndicatorShown: !inView };
+  return { ref, isIndicatorShown: thresholdHeight > 0 && !inView };
 };
 
 export default useShowScrollIndicator;

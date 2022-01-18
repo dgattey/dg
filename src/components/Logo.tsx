@@ -1,3 +1,5 @@
+import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 import ScrollIndicatorContext from './ScrollIndicatorContext';
@@ -17,7 +19,6 @@ const LogoText = styled.article<{ $isScrolled: boolean }>`
   font-size: 2.5rem;
   font-variation-settings: 'wght' 800;
   letter-spacing: -0.12em;
-  color: var(--logo-color);
 
   display: flex;
   align-items: center;
@@ -25,13 +26,12 @@ const LogoText = styled.article<{ $isScrolled: boolean }>`
   border-radius: 50%;
   vertical-align: middle;
   line-height: 1;
-  margin: var(--margin) 0;
+  margin: var(--margin) calc(-1 * var(--padding));
   padding: var(--padding);
   pointer-events: auto;
   transform-origin: top left;
   transition: box-shadow var(--transition), transform var(--transition),
     background-color var(--transition);
-  transform: translateX(calc(-1 * var(--padding)));
   will-change: transform;
 
   &:before {
@@ -63,17 +63,26 @@ const SpacedScrollIndicator = styled(ScrollUpIndicator)<{ $isScrolled: boolean }
     `}
 `;
 
+const StyledLink = styled.a``;
+
 /**
  * Logo + scroll to top button, with certain changes that happen on
  * scroll.
  */
 const Logo = () => {
+  const router = useRouter();
   const isScrolled = useContext(ScrollIndicatorContext);
+  const linkedLogoText =
+    router.asPath === '/' ? (
+      'dg.'
+    ) : (
+      <Link href="/" passHref>
+        <StyledLink>dg.</StyledLink>
+      </Link>
+    );
   return (
     <Stack $gap="1rem" $alignItems="center" $justifyContent="spaceAround">
-      <LogoText $isScrolled={isScrolled} aria-hidden>
-        dg.
-      </LogoText>
+      <LogoText $isScrolled={isScrolled}>{linkedLogoText}</LogoText>
       <SpacedScrollIndicator $isScrolled={isScrolled} />
     </Stack>
   );

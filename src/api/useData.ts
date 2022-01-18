@@ -44,6 +44,11 @@ export type Fallback = {
 };
 
 /**
+ * Bare essentials, for error pages
+ */
+export type FallbackForErrorPages = PartialFallback<'siteHeader' | 'siteFooter' | 'version'>;
+
+/**
  * This maps between API/data fetcher keys for use with SWR, and the
  * function invoked to fetch the data. As such, must map from a key to
  * a function that returns data (as a promise).

@@ -1,10 +1,7 @@
 import { gql } from 'graphql-request';
 import fetchGraphQLData from '../fetchGraphQLData';
-import { Link } from './generated/api.generated';
 import { SiteFooterQuery } from './generated/fetchSiteFooter.generated';
 import { isDefinedItem, isLink } from './typeguards';
-
-type SiteFooter = Array<Link>;
 
 /**
  * Grabs the contentful sections with the title of footer. Should
@@ -29,14 +26,23 @@ const QUERY = gql`
 `;
 
 /**
+ * Filters footer links by a name contained in the title, if present
+ */
+export const linkWithName = (
+  links: Awaited<ReturnType<typeof fetchSiteFooter>> | undefined,
+  name: string,
+) => links?.find((item) => item.title?.includes(name));
+
+/**
  * Fetches all our site footer blocks from the Contentful API. Parses
  * out the text and icon links separately
  */
-const fetchSiteFooter = async (): Promise<SiteFooter> => {
+const fetchSiteFooter = async () => {
   const data = await fetchGraphQLData<SiteFooterQuery>('/api/content', QUERY);
   const items =
     data?.sectionCollection?.items.flatMap((item) => item?.blocksCollection?.items ?? []) ?? [];
-  return items.filter(isLink).filter(isDefinedItem);
+  const links = items.filter(isLink).filter(isDefinedItem);
+  return links;
 };
 
 export default fetchSiteFooter;
