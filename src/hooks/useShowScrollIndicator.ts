@@ -1,16 +1,17 @@
-import useScrollPosition from 'hooks/useScrollPosition';
-import { useMemo } from 'react';
-
-// Amount in px we have to scroll to show an indicator
-const THRESHOLD = 80;
+import { useInView } from 'react-intersection-observer';
 
 /**
- * Reports if a scroll to top indicator should be visible based on
- * page scroll position
+ * Using IntersectionObserver, returns if we've scrolled far enough down
+ * the page to trigger a scroll indicator to show up. Uses a ref-passed
+ * height to compute where it should swap. Should be the height of the
+ * header.
  */
-const useShowScrollIndicator = () => {
-  const { scrollY } = useScrollPosition();
-  const isVisible = useMemo(() => !!scrollY && scrollY > THRESHOLD, [scrollY]);
-  return isVisible;
+const useShowScrollIndicator = (thresholdHeight: number) => {
+  const { ref, inView } = useInView({
+    threshold: 1.0,
+    rootMargin: `-${thresholdHeight}px`,
+  });
+  return { ref, isIndicatorShown: !inView };
 };
+
 export default useShowScrollIndicator;

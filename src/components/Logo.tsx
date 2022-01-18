@@ -1,5 +1,6 @@
-import useShowScrollIndicator from 'hooks/useShowScrollIndicator';
+import { useContext } from 'react';
 import styled, { css } from 'styled-components';
+import ScrollIndicatorContext from './ScrollIndicatorContext';
 import ScrollUpIndicator from './ScrollUpIndicator';
 import Stack from './Stack';
 
@@ -9,7 +10,8 @@ import Stack from './Stack';
  * background on scroll + scales down a bit.
  */
 const LogoText = styled.article<{ $isScrolled: boolean }>`
-  --padding: 1rem;
+  --padding: 2rem;
+  --margin: 1rem;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu,
     Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 2.5rem;
@@ -20,11 +22,10 @@ const LogoText = styled.article<{ $isScrolled: boolean }>`
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 1em;
   border-radius: 50%;
   vertical-align: middle;
   line-height: 1;
-  margin: var(--padding) 0;
+  margin: var(--margin) 0;
   padding: var(--padding);
   pointer-events: auto;
   transform-origin: top left;
@@ -55,9 +56,9 @@ const SpacedScrollIndicator = styled(ScrollUpIndicator)<{ $isScrolled: boolean }
   ${({ $isScrolled }) =>
     $isScrolled &&
     css`
-      transform: translateY(-0.5rem);
+      margin-top: -1rem;
       &:hover {
-        transform: scale(1.05) translateY(-0.5rem);
+        transform: scale(1.05);
       }
     `}
 `;
@@ -67,7 +68,7 @@ const SpacedScrollIndicator = styled(ScrollUpIndicator)<{ $isScrolled: boolean }
  * scroll.
  */
 const Logo = () => {
-  const isScrolled = useShowScrollIndicator();
+  const isScrolled = useContext(ScrollIndicatorContext);
   return (
     <Stack $gap="1rem" $alignItems="center" $justifyContent="spaceAround">
       <LogoText $isScrolled={isScrolled} aria-hidden>

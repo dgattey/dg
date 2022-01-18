@@ -1,7 +1,10 @@
-import useShowScrollIndicator from 'hooks/useShowScrollIndicator';
+import { useContext } from 'react';
 import { FiArrowUp } from 'react-icons/fi';
 import styled, { css } from 'styled-components';
+import ScrollIndicatorContext from './ScrollIndicatorContext';
 import Stack from './Stack';
+
+type Props = Pick<React.ComponentProps<'div'>, 'className'>;
 
 /**
  * Arrow up to show scrollability. Fades in, and is on own layer to
@@ -10,7 +13,7 @@ import Stack from './Stack';
 const Indicator = styled(Stack)<{ $isVisible: boolean }>`
   position: relative;
   font-weight: 700;
-  font-size: 0.8em;
+  font-size: var(--font-size-small);
   opacity: 0;
   transform: translateY(1.5em);
   color: var(--contrast);
@@ -22,13 +25,14 @@ const Indicator = styled(Stack)<{ $isVisible: boolean }>`
   }
 
   :before {
+    --padding: 1em;
     content: '';
     z-index: -1;
     position: absolute;
-    margin-left: -1em;
-    height: calc(100% + 1em);
-    width: calc(100% + 2em);
-    border-radius: 2em;
+    margin-left: calc(-1 * var(--padding));
+    height: calc(100% + var(--padding));
+    width: calc(100% + var(--padding) * 2);
+    border-radius: var(--border-radius);
     box-shadow: var(--card-box-shadow);
     transition: background-color var(--transition);
     background: var(--background-color);
@@ -51,10 +55,9 @@ const Indicator = styled(Stack)<{ $isVisible: boolean }>`
  * Shows an indicator to scroll to the top of the page, meant to appear
  * floating over everything else
  */
-const ScrollUpIndicator = ({ className }: Pick<React.ComponentProps<'div'>, 'className'>) => {
+const ScrollUpIndicator = ({ className }: Props) => {
+  const isVisible = useContext(ScrollIndicatorContext);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-  const isVisible = useShowScrollIndicator();
-
   return (
     <Indicator
       className={className}
