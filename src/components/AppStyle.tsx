@@ -18,7 +18,7 @@ export const cardSizeInEm = (span = 1) =>
 const darkModeVariables = css`
   --contrast-overlay: var(--contrast-inverse);
   --contrast-overlay-inverse: var(--contrast);
-  --blob-border-width: 0.08px;
+  --logo-color: var(--contrast);
 
   // Same as --card-box-shadow with the fade doubled
   --card-hovered-box-shadow: 0 0.125rem 2rem rgba(0, 0, 0, 0.06),
@@ -35,7 +35,7 @@ const darkModeVariables = css`
 const lightModeVariables = css`
   --contrast-overlay: var(--secondary);
   --contrast-overlay-inverse: var(--secondary-inverse);
-  --blob-border-width: 0;
+  --logo-color: var(--secondary);
 
   // Same as --card-box-shadow with the fade doubled
   --card-hovered-box-shadow: 0 0.125rem 2rem rgba(27, 40, 50, 0.04),
@@ -57,8 +57,6 @@ const AppStyle = createGlobalStyle`
       --content-grid-dimension-em: ${CONTENT_GRID_DIMENSION}em;
       --content-grid-gap-em: ${CONTENT_GRID_GAP}em;
 
-      // Similar to the card box shadow but for filters (much simpler, for perf)
-      --filter-drop-shadow: drop-shadow(0 0.125rem 1rem rgba(27, 40, 50, 0.08));
   }
 
   // When a page/component is set to light or the root has no dark theme applied
