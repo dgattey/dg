@@ -48,16 +48,23 @@ const Link = ({ title, url, icon, alwaysShowTitle }: Props) => {
   }
   const builtInIcon = icon ? BUILT_IN_ICONS[icon] : null;
   const titleOrNull = alwaysShowTitle ? <SpacedTitle>{title}</SpacedTitle> : null;
+  const tooltipTitleOrNull = alwaysShowTitle ? null : title;
+  const iconTooltip = builtInIcon ? tooltipTitleOrNull : title;
+  const iconLinkContents = builtInIcon ? (
+    <IconLink data-tooltip={iconTooltip}>
+      {builtInIcon}
+      {titleOrNull}
+    </IconLink>
+  ) : (
+    <IconLink
+      data-tooltip={iconTooltip}
+      dangerouslySetInnerHTML={icon ? { __html: icon } : undefined}
+    />
+  );
+
   return icon ? (
     <NextLink href={url} passHref>
-      {builtInIcon ? (
-        <IconLink data-tooltip={alwaysShowTitle ? null : title}>
-          {builtInIcon}
-          {titleOrNull}
-        </IconLink>
-      ) : (
-        <IconLink data-tooltip={title} dangerouslySetInnerHTML={{ __html: icon }} />
-      )}
+      {iconLinkContents}
     </NextLink>
   ) : (
     <NextLink href={url}>{title}</NextLink>
