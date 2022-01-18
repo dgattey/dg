@@ -2299,7 +2299,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:*":
+"@types/node@npm:*, @types/node@npm:^17.0.9":
   version: 17.0.9
   resolution: "@types/node@npm:17.0.9"
   checksum: 64a1fa91979e3c37c5f42c6e7836b02aad333f2ed41114b8d975b4754e4f4a7fe3343e77ee4daceed6b5706c6662ade13ec1e955326cd1b1e8bf35800de5faf8
@@ -2729,6 +2729,12 @@ __metadata:
   checksum: 985163db2292fac9e5a1e072bf99f1b5baccf196e4de25a0b0b81865ebddeb3b3eb4480734ef0a2ac8c002845396b91aa89121f5b84f93981a4658164a9ec6e9
   languageName: node
   linkType: hard
+
+"api@link:./src/api::locator=dg%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "api@link:./src/api::locator=dg%40workspace%3A."
+  languageName: node
+  linkType: soft
 
 "aproba@npm:^1.0.3 || ^2.0.0, aproba@npm:^2.0.0":
   version: 2.0.0
@@ -3644,6 +3650,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"components@link:./src/components::locator=dg%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "components@link:./src/components::locator=dg%40workspace%3A."
+  languageName: node
+  linkType: soft
+
 "concat-map@npm:0.0.1":
   version: 0.0.1
   resolution: "concat-map@npm:0.0.1"
@@ -4140,18 +4152,21 @@ __metadata:
     "@semantic-release/changelog": 6.0.1
     "@semantic-release/git": 10.0.1
     "@stylelint/postcss-css-in-js": 0.37.2
+    "@types/node": ^17.0.9
     "@types/react": 17.0.38
     "@types/styled-components": 5.1.20
     "@typescript-eslint/eslint-plugin": 5.10.0
     "@typescript-eslint/parser": 5.10.0
+    api: "link:./src/api"
+    components: "link:./src/components"
     dotenv: 14.2.0
-    eslint: 8.7.0
+    eslint: ^8.7.0
     eslint-config-airbnb: 19.0.4
     eslint-config-airbnb-typescript: 16.1.0
     eslint-config-next: 12.0.8
     eslint-config-prettier: 8.3.0
     eslint-import-resolver-typescript: 2.5.0
-    eslint-plugin-import: 2.25.4
+    eslint-plugin-import: ^2.25.4
     eslint-plugin-jsx-a11y: 6.5.1
     eslint-plugin-react: 7.28.0
     eslint-plugin-react-hooks: 4.3.0
@@ -4159,10 +4174,12 @@ __metadata:
     graphql: 16.2.0
     graphql-request: 3.7.0
     graphql-tag: 2.12.6
+    hooks: "link:./src/hooks"
     husky: 7.0.4
     lint-staged: 12.1.7
     mapbox-gl: 2.6.1
     next: 12.0.8
+    pages: "link:./src/pages"
     postcss: 8.4.5
     postcss-syntax: 0.36.2
     prettier: 2.5.1
@@ -4170,6 +4187,7 @@ __metadata:
     react-dom: 17.0.2
     react-icons: 4.3.1
     react-intersection-observer: 8.33.1
+    react-is: ^17.0.2
     react-map-gl: 6.1.18
     semantic-release: 19.0.2
     styled-components: 5.3.3
@@ -4178,7 +4196,7 @@ __metadata:
     stylelint-config-styled-components: 0.1.1
     stylelint-processor-styled-components: 1.10.0
     swr: 1.1.2
-    typescript: 4.5.4
+    typescript: ^4.5.4
   languageName: unknown
   linkType: soft
 
@@ -4564,7 +4582,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint-plugin-import@npm:2.25.4, eslint-plugin-import@npm:^2.25.2":
+"eslint-plugin-import@npm:^2.25.2, eslint-plugin-import@npm:^2.25.4":
   version: 2.25.4
   resolution: "eslint-plugin-import@npm:2.25.4"
   dependencies:
@@ -4696,7 +4714,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:8.7.0":
+"eslint@npm:^8.7.0":
   version: 8.7.0
   resolution: "eslint@npm:8.7.0"
   dependencies:
@@ -5644,6 +5662,12 @@ __metadata:
   checksum: 1e6051dd3ba89980027f9fe9675874e890958ee416f239d2a83bea6d3a2ae00bdca3da525933036d2b63638bdadd71b74aeb37f9cdb90338e555a0da5b9e74f9
   languageName: node
   linkType: hard
+
+"hooks@link:./src/hooks::locator=dg%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "hooks@link:./src/hooks::locator=dg%40workspace%3A."
+  languageName: node
+  linkType: soft
 
 "hosted-git-info@npm:*, hosted-git-info@npm:^4.0.0, hosted-git-info@npm:^4.0.1":
   version: 4.1.0
@@ -8373,6 +8397,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"pages@link:./src/pages::locator=dg%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "pages@link:./src/pages::locator=dg%40workspace%3A."
+  languageName: node
+  linkType: soft
+
 "param-case@npm:^3.0.4":
   version: 3.0.4
   resolution: "param-case@npm:3.0.4"
@@ -8855,7 +8885,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-is@npm:17.0.2":
+"react-is@npm:17.0.2, react-is@npm:^17.0.2":
   version: 17.0.2
   resolution: "react-is@npm:17.0.2"
   checksum: 9d6d111d8990dc98bc5402c1266a808b0459b5d54830bbea24c12d908b536df7883f268a7868cfaedde3dd9d4e0d574db456f84d2e6df9c4526f99bb4b5344d8
@@ -10610,7 +10640,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:4.5.4, typescript@npm:^4.4.3":
+"typescript@npm:^4.4.3, typescript@npm:^4.5.4":
   version: 4.5.4
   resolution: "typescript@npm:4.5.4"
   bin:
@@ -10620,7 +10650,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@4.5.4#~builtin<compat/typescript>, typescript@patch:typescript@^4.4.3#~builtin<compat/typescript>":
+"typescript@patch:typescript@^4.4.3#~builtin<compat/typescript>, typescript@patch:typescript@^4.5.4#~builtin<compat/typescript>":
   version: 4.5.4
   resolution: "typescript@patch:typescript@npm%3A4.5.4#~builtin<compat/typescript>::version=4.5.4&hash=493e53"
   bin:
