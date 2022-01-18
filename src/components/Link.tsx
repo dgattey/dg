@@ -38,6 +38,27 @@ const BUILT_IN_ICONS: Record<string, JSX.Element> = {
 };
 
 /**
+ * Returns a built in icon + title if needed
+ */
+const BuiltInIcon = ({
+  icon,
+  title,
+  alwaysShowTitle,
+}: Pick<Props, 'icon' | 'title' | 'alwaysShowTitle'>) =>
+  icon ? (
+    <>
+      {BUILT_IN_ICONS[icon]}
+      {alwaysShowTitle && <SpacedTitle>{title}</SpacedTitle>}
+    </>
+  ) : null;
+
+/**
+ * Creates a tooltip for the icon link
+ */
+const iconTooltip = ({ title, alwaysShowTitle }: Pick<Props, 'alwaysShowTitle' | 'title'>) =>
+  alwaysShowTitle ? null : title;
+
+/**
  * Renders a link component from Contentful. Sometimes the icons are
  * just specifications for what to render using an icon library,
  * sometimes they're actual SVG html. When in doubt we assume html.
@@ -46,25 +67,16 @@ const Link = ({ title, url, icon, alwaysShowTitle }: Props) => {
   if (!url) {
     return null;
   }
-  const builtInIcon = icon ? BUILT_IN_ICONS[icon] : null;
-  const titleOrNull = alwaysShowTitle ? <SpacedTitle>{title}</SpacedTitle> : null;
-  const tooltipTitleOrNull = alwaysShowTitle ? null : title;
-  const iconTooltip = builtInIcon ? tooltipTitleOrNull : title;
-  const iconLinkContents = builtInIcon ? (
-    <IconLink data-tooltip={iconTooltip}>
-      {builtInIcon}
-      {titleOrNull}
-    </IconLink>
-  ) : (
-    <IconLink
-      data-tooltip={iconTooltip}
-      dangerouslySetInnerHTML={icon ? { __html: icon } : undefined}
-    />
-  );
+  const builtInIcon = <BuiltInIcon icon={icon} title={title} alwaysShowTitle={alwaysShowTitle} />;
 
   return icon ? (
     <NextLink href={url} passHref>
-      {iconLinkContents}
+      <IconLink
+        data-tooltip={iconTooltip({ title, alwaysShowTitle })}
+        dangerouslySetInnerHTML={!builtInIcon && icon ? { __html: icon } : undefined}
+      >
+        {builtInIcon}
+      </IconLink>
     </NextLink>
   ) : (
     <NextLink href={url}>{title}</NextLink>
