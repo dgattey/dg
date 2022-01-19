@@ -16,7 +16,8 @@ const darkModeVariables = css`
     0 0.125rem 4rem rgba(0, 0, 0, 0.12), 0 0 0 0.125rem rgba(0, 0, 0, 0.036);
 
   --yellow: yellow;
-  --navy: #0a6280;
+  --map-marker: rgba(58, 123, 172, 0.5);
+  --map-marker-border: rgba(166, 189, 206, 0.5);
 `;
 
 /**
@@ -31,8 +32,9 @@ const lightModeVariables = css`
   --card-hovered-box-shadow: 0 0.125rem 2rem rgba(27, 40, 50, 0.04),
     0 0.125rem 4rem rgba(27, 40, 50, 0.08), 0 0 0 0.125rem rgba(27, 40, 50, 0.024);
 
-  --yellow: rgb(222, 197, 29);
-  --navy: #0a6280;
+  --yellow: #dec51d;
+  --map-marker: rgba(58, 123, 172, 0.25);
+  --map-marker-border: rgba(139, 185, 220, 0.75);
 `;
 
 /**
@@ -48,6 +50,8 @@ const AppStyle = createGlobalStyle`
 
       /* Used for small buttons/etc */
       --font-size-small: 0.8rem;
+
+    --navy: #186891;
   }
 
   // When a page/component is set to light or the root has no dark theme applied
