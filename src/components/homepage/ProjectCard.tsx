@@ -1,6 +1,8 @@
 import { Project } from 'api/contentful/generated/api.generated';
 import ContentCard from 'components/ContentCard';
+import HoverableContainer from 'components/HoverableContainer';
 import Image from 'components/Image';
+import { useState } from 'react';
 import styled from 'styled-components';
 import ProjectIcon from './ProjectIcon';
 
@@ -22,6 +24,7 @@ const ProjectIconWithBackground = styled(ProjectIcon)`
 const ProjectCard = ({ title, layout, link, thumbnail, type }: Props) => {
   const verticalSpan = layout === 'tall' ? 2 : 1;
   const horizontalSpan = layout === 'wide' ? 2 : 1;
+  const [isHovered, setIsHovered] = useState(false);
 
   return (
     <ContentCard
@@ -32,8 +35,14 @@ const ProjectCard = ({ title, layout, link, thumbnail, type }: Props) => {
         alwaysVisible: <ProjectIconWithBackground type={type} />,
         hiddenUntilHover: <TitleText>{title}</TitleText>,
       }}
+      onMouseOver={() => setIsHovered(true)}
+      onMouseOut={() => setIsHovered(false)}
     >
-      {thumbnail && <Image {...thumbnail} alt={title} />}
+      {thumbnail && (
+        <HoverableContainer isHovered={isHovered}>
+          <Image {...thumbnail} alt={title} />
+        </HoverableContainer>
+      )}
     </ContentCard>
   );
 };

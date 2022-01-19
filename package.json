@@ -23,6 +23,7 @@
     "@contentful/rich-text-react-renderer": "^15.11.1",
     "@contentful/rich-text-types": "^15.11.1",
     "@picocss/pico": "^1.4.4",
+    "animate-css-grid": "^1.4.3",
     "api": "link:./src/api::locator=dg%40workspace%3A.",
     "components": "link:./src/components::locator=dg%40workspace%3A.",
     "graphql": "^15.8.0",
@@ -37,7 +38,8 @@
     "react-icons": "^4.3.1",
     "react-intersection-observer": "^8.33.1",
     "react-is": "^17.0.2",
-    "react-map-gl": "^6.1.18",
+    "react-map-gl": "^7.0.0-alpha.7",
+    "react-resize-aware": "^3.1.1",
     "styled-components": "^5.3.3",
     "swr": "^1.1.2"
   },

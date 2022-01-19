@@ -102,33 +102,35 @@ const ColorSchemeToggleCard = () => {
 
   return (
     <Card>
-      <ContentStack $gap="1em">
-        <ColorSchemeIcon
-          scheme="light"
-          hasTheme={hasTheme}
-          updatePreferredScheme={updatePreferredScheme}
-        />
-        <ColorSchemeSwitch
-          disabled={!hasTheme}
-          $colorScheme={!hasTheme ? null : colorScheme}
-          onChange={setInvertedScheme}
-          checked={hasTheme && colorScheme === 'dark'}
-        />
-        <ColorSchemeIcon
-          scheme="dark"
-          hasTheme={hasTheme}
-          updatePreferredScheme={updatePreferredScheme}
-        />
-      </ContentStack>
-      <Button
-        role="button"
-        className="secondary outline"
-        disabled={isSystemScheme}
-        onClick={clearSavedScheme}
-        $visible={!isSystemScheme}
-      >
-        Reset to system theme
-      </Button>
+      <div>
+        <ContentStack $gap="1em">
+          <ColorSchemeIcon
+            scheme="light"
+            hasTheme={hasTheme}
+            updatePreferredScheme={updatePreferredScheme}
+          />
+          <ColorSchemeSwitch
+            disabled={!hasTheme}
+            $colorScheme={!hasTheme ? null : colorScheme}
+            onChange={setInvertedScheme}
+            checked={hasTheme && colorScheme === 'dark'}
+          />
+          <ColorSchemeIcon
+            scheme="dark"
+            hasTheme={hasTheme}
+            updatePreferredScheme={updatePreferredScheme}
+          />
+        </ContentStack>
+        <Button
+          role="button"
+          className="secondary outline"
+          disabled={isSystemScheme}
+          onClick={clearSavedScheme}
+          $visible={!isSystemScheme}
+        >
+          Reset to system theme
+        </Button>
+      </div>
     </Card>
   );
 };
