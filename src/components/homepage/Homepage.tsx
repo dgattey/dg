@@ -20,32 +20,22 @@ const Homepage = () => {
 
   // Ensures we only set the static size once so we don't stutter horribly on window resize as the brower tries to repaint the map canvas
   useEffect(() => {
-    if (staticSize.width || staticSize.height) {
-      return;
+    if (!staticSize.width && !staticSize.height) {
+      setStaticSize(size);
     }
-    setStaticSize(size);
   }, [size, staticSize.height, staticSize.width]);
 
   const projectCards =
     projects?.map((project) => <ProjectCard key={project.title} {...project} />) ?? [];
 
-  // Memoized on width so we save on rerenders
-  const mapCard = useMemo(
-    () => <MapCard key="map" gridWidth={staticSize.width} />,
-    [staticSize.width],
-  );
-
-  /**
-   * Represents indexes in the project cards where other data appears
-   */
+  // These index into projectCards to splice in other cards
   const otherCards = useMemo(
-    () =>
-      [
-        { index: 0, element: <IntroCard key="intro" /> },
-        { index: 2, element: <ColorSchemeToggleCard key="color" /> },
-        { index: 3, element: mapCard },
-      ] as const,
-    [mapCard],
+    () => [
+      { index: 0, card: <IntroCard key="intro" /> },
+      { index: 2, card: <ColorSchemeToggleCard key="color" /> },
+      { index: 3, card: <MapCard key="map" gridWidth={staticSize.width} /> },
+    ],
+    [staticSize.width],
   );
 
   return (
@@ -53,10 +43,9 @@ const Homepage = () => {
       <HomepageMeta />
       <ContentGrid>
         {resizer}
-        {otherCards.map(({ index, element }, arrayIndex) => {
-          // Puts in the element and adds on project cards from that array index until the next one
+        {otherCards.map(({ index, card }, arrayIndex) => {
           const nextItem = otherCards[arrayIndex + 1];
-          return [element, ...projectCards.slice(index, nextItem?.index)];
+          return [card, ...projectCards.slice(index, nextItem?.index)];
         })}
       </ContentGrid>
     </>

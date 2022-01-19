@@ -1,14 +1,14 @@
 import { Link } from 'api/contentful/generated/api.generated';
-import React, { useState } from 'react';
+import React, { ReactElement, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { cardSize, GRID_ANIMATION_DURATION } from './ContentGrid';
 import ContentWrappingLink from './ContentWrappingLink';
 import Stack from './Stack';
 
-type Props = Pick<
-  React.ComponentProps<'article'>,
-  'children' | 'className' | 'onMouseOver' | 'onMouseOut'
-> & {
+// Special requirements for children here
+type Children = ReactElement | null | undefined;
+
+type Props = Pick<React.ComponentProps<'article'>, 'className' | 'onMouseOver' | 'onMouseOut'> & {
   /**
    * How many columns the card spans, defaults to 1
    */
@@ -47,6 +47,23 @@ type Props = Pick<
    * provide a function that gets called when that happens.
    */
   onExpansion?: (isExpanded: boolean) => void;
+
+  /**
+   * Children must exist!
+   */
+  children: Children;
+};
+
+type LinkWrappedChildrenProps = Pick<Props, 'link' | 'children'> & {
+  /**
+   * If the card expands when clicked
+   */
+  expandOnClick: boolean;
+
+  /**
+   * The element that overlays the card
+   */
+  overlayContents: JSX.Element | null;
 };
 
 interface CardProps {
@@ -66,6 +83,11 @@ interface CardProps {
    * If the card is visually clickable
    */
   $isClickable: boolean;
+
+  /**
+   * If the card expands
+   */
+  $isExpandable: boolean;
 }
 
 // Animates left on hover, as the container animates right, so it appears to stay in place as in comes in
@@ -114,8 +136,8 @@ const Card = styled.article<CardProps>`
   & > div {
     transform: none !important;
   }
-  ${({ $isClickable }) =>
-    $isClickable &&
+  ${({ $isClickable, $isExpandable }) =>
+    ($isClickable || $isExpandable) &&
     css`
       cursor: pointer;
       &:hover {
@@ -152,6 +174,34 @@ const Card = styled.article<CardProps>`
 `;
 
 /**
+ * Deals with the messiness of safely wrapping children and links so there's
+ * only ever one element that returns from this.
+ */
+const LinkWrappedChildren = ({
+  children,
+  link,
+  overlayContents,
+  expandOnClick,
+}: LinkWrappedChildrenProps) => {
+  const safelyWrappedChildren = !overlayContents ? (
+    children
+  ) : (
+    <div>
+      {overlayContents}
+      {children}
+    </div>
+  );
+  return link && !expandOnClick ? (
+    <ContentWrappingLink link={link}>
+      {overlayContents}
+      {children}
+    </ContentWrappingLink>
+  ) : (
+    safelyWrappedChildren ?? null
+  );
+};
+
+/**
  * Wraps content in a card for the content grid
  */
 const ContentCard = ({
@@ -166,7 +216,6 @@ const ContentCard = ({
   onMouseOut,
 }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
-  const isSingleChild = React.Children.count(children) === 1;
   const expandOnClick = !!onExpansion;
 
   // Swaps the expansion variable and calls the user callback
@@ -184,40 +233,24 @@ const ContentCard = ({
     </OverlayStack>
   ) : null;
 
-  const safelyWrappedChildren =
-    isSingleChild && !overlayContents ? (
-      children
-    ) : (
-      <div>
-        {overlayContents}
-        {children}
-      </div>
-    );
-
-  const contents =
-    (link && (
-      <>
-        {overlayContents}
-        {children}
-      </>
-    )) ??
-    safelyWrappedChildren;
-
   return (
     <Card
       className={className}
       $hSpan={isExpanded ? 3 : horizontalSpan ?? 1}
       $vSpan={isExpanded ? null : verticalSpan ?? 1}
-      $isClickable={!!link || expandOnClick || false}
+      $isClickable={!!link}
+      $isExpandable={expandOnClick}
       onClick={toggleExpansion}
       onMouseOver={onMouseOver}
       onMouseOut={onMouseOut}
     >
-      {link && !expandOnClick ? (
-        <ContentWrappingLink link={link}>{contents}</ContentWrappingLink>
-      ) : (
-        contents
-      )}
+      <LinkWrappedChildren
+        expandOnClick={expandOnClick}
+        overlayContents={overlayContents}
+        link={link}
+      >
+        {children}
+      </LinkWrappedChildren>
     </Card>
   );
 };
