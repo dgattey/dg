@@ -33,6 +33,9 @@ const Wrapper = styled.div<{ $maxWidth: number }>`
   & .mapboxgl-ctrl {
     margin: 2rem;
   }
+  & .mapboxgl-interactive {
+    pointer-events: none;
+  }
 `;
 
 /**
