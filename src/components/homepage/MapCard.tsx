@@ -1,7 +1,8 @@
 import useData from 'api/useData';
 import ContentCard from 'components/ContentCard';
-import { useEffect, useRef, useState } from 'react';
-import { Map, MapRef, ViewState } from 'react-map-gl';
+import type { Props as MapProps } from 'components/maps/Map';
+import dynamic from 'next/dynamic';
+import { useEffect, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 interface Props {
@@ -17,6 +18,10 @@ const MIN_DIMENSION = 320;
 // In px, the height of the expanded card
 const EXPANDED_HEIGHT = 600;
 
+// Dynamically imported since they're not possible to server render anyway
+const Map = dynamic(import('components/maps/Map'));
+const Marker = dynamic(import('components/maps/Marker'));
+
 // Changes between two min heights
 const Card = styled(ContentCard)<{ $height: number }>`
   ${({ $height }) =>
@@ -30,12 +35,6 @@ const Wrapper = styled.div<{ $maxWidth: number }>`
   height: ${EXPANDED_HEIGHT}px;
   width: ${({ $maxWidth }) => $maxWidth}px;
   position: relative;
-  & .mapboxgl-ctrl {
-    margin: 2rem;
-  }
-  & .mapboxgl-interactive {
-    pointer-events: none;
-  }
 `;
 
 /**
@@ -43,26 +42,19 @@ const Wrapper = styled.div<{ $maxWidth: number }>`
  */
 const MapCard = ({ gridWidth }: Props) => {
   const { data: location } = useData('myLocation');
-  const mapRef = useRef<MapRef>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   const [height, setHeight] = useState(MIN_DIMENSION);
 
-  const [viewState, setViewState] = useState<ViewState & { width: number; height: number }>({
-    latitude: location?.lat ?? 0,
-    longitude: location?.lon ?? 0,
-    zoom: 9,
+  const [viewState, setViewState] = useState<MapProps['viewState']>({
     padding: { left: 0, right: 0, top: 0, bottom: 0 },
     width: gridWidth ?? MIN_DIMENSION,
     height: EXPANDED_HEIGHT,
-    bearing: 0,
-    pitch: 0,
   });
 
   // When expansion state changes, set height and view state
   useEffect(() => {
     setHeight(isExpanded ? EXPANDED_HEIGHT : MIN_DIMENSION);
-    setViewState((currentState) => ({
-      ...currentState,
+    setViewState({
       width: gridWidth ?? MIN_DIMENSION,
       height: EXPANDED_HEIGHT,
       padding: {
@@ -71,27 +63,21 @@ const MapCard = ({ gridWidth }: Props) => {
         right: isExpanded || !gridWidth ? 0 : gridWidth - MIN_DIMENSION,
         bottom: isExpanded ? 0 : EXPANDED_HEIGHT - MIN_DIMENSION,
       },
-    }));
+    });
   }, [gridWidth, isExpanded]);
+
+  const homeMarker = location?.point ? (
+    <Marker key="home" point={location.point} image={location.image} />
+  ) : null;
 
   return (
     <Card onExpansion={setIsExpanded} $height={height}>
       <Wrapper $maxWidth={gridWidth ?? 0}>
-        <Map
-          ref={mapRef}
-          viewState={viewState}
-          scrollZoom={false}
-          dragRotate={false}
-          dragPan={false}
-          touchZoomRotate={false}
-          touchPitch={false}
-          doubleClickZoom={false}
-          attributionControl={false}
-          logoPosition="bottom-right"
-          interactive
-          mapStyle="mapbox://styles/dylangattey/ckyfpsonl01w014q8go5wvnh2?optimize=true"
-          mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-        />
+        {location && (
+          <Map location={location} viewState={viewState}>
+            {homeMarker}
+          </Map>
+        )}
       </Wrapper>
     </Card>
   );

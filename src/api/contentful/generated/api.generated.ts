@@ -203,11 +203,19 @@ export type AssetFilter = {
 
 export type AssetLinkingCollections = {
   readonly bookCollection: Maybe<BookCollection>;
+  readonly contentTypeLocationCollection: Maybe<ContentTypeLocationCollection>;
   readonly entryCollection: Maybe<EntryCollection>;
   readonly projectCollection: Maybe<ProjectCollection>;
 };
 
 export type AssetLinkingCollectionsBookCollectionArgs = {
+  limit?: InputMaybe<Scalars['Int']>;
+  locale: InputMaybe<Scalars['String']>;
+  preview: InputMaybe<Scalars['Boolean']>;
+  skip?: InputMaybe<Scalars['Int']>;
+};
+
+export type AssetLinkingCollectionsContentTypeLocationCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']>;
   locale: InputMaybe<Scalars['String']>;
   preview: InputMaybe<Scalars['Boolean']>;
@@ -393,10 +401,24 @@ export type BookOrder =
 /** All info needed to render a map with a pin for the given location [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/location) */
 export type ContentTypeLocation = Entry & {
   readonly contentfulMetadata: ContentfulMetadata;
+  readonly image: Maybe<Asset>;
+  readonly initialZoom: Maybe<Scalars['Float']>;
   readonly linkedFrom: Maybe<ContentTypeLocationLinkingCollections>;
   readonly point: Maybe<Location>;
   readonly slug: Maybe<Scalars['String']>;
   readonly sys: Sys;
+  readonly zoomLevels: Maybe<ReadonlyArray<Maybe<Scalars['String']>>>;
+};
+
+/** All info needed to render a map with a pin for the given location [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/location) */
+export type ContentTypeLocationImageArgs = {
+  locale: InputMaybe<Scalars['String']>;
+  preview: InputMaybe<Scalars['Boolean']>;
+};
+
+/** All info needed to render a map with a pin for the given location [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/location) */
+export type ContentTypeLocationInitialZoomArgs = {
+  locale: InputMaybe<Scalars['String']>;
 };
 
 /** All info needed to render a map with a pin for the given location [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/location) */
@@ -414,6 +436,11 @@ export type ContentTypeLocationSlugArgs = {
   locale: InputMaybe<Scalars['String']>;
 };
 
+/** All info needed to render a map with a pin for the given location [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/location) */
+export type ContentTypeLocationZoomLevelsArgs = {
+  locale: InputMaybe<Scalars['String']>;
+};
+
 export type ContentTypeLocationCollection = {
   readonly items: ReadonlyArray<Maybe<ContentTypeLocation>>;
   readonly limit: Scalars['Int'];
@@ -425,6 +452,16 @@ export type ContentTypeLocationFilter = {
   readonly AND: InputMaybe<ReadonlyArray<InputMaybe<ContentTypeLocationFilter>>>;
   readonly OR: InputMaybe<ReadonlyArray<InputMaybe<ContentTypeLocationFilter>>>;
   readonly contentfulMetadata: InputMaybe<ContentfulMetadataFilter>;
+  readonly image_exists: InputMaybe<Scalars['Boolean']>;
+  readonly initialZoom: InputMaybe<Scalars['Float']>;
+  readonly initialZoom_exists: InputMaybe<Scalars['Boolean']>;
+  readonly initialZoom_gt: InputMaybe<Scalars['Float']>;
+  readonly initialZoom_gte: InputMaybe<Scalars['Float']>;
+  readonly initialZoom_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['Float']>>>;
+  readonly initialZoom_lt: InputMaybe<Scalars['Float']>;
+  readonly initialZoom_lte: InputMaybe<Scalars['Float']>;
+  readonly initialZoom_not: InputMaybe<Scalars['Float']>;
+  readonly initialZoom_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['Float']>>>;
   readonly point_exists: InputMaybe<Scalars['Boolean']>;
   readonly point_within_circle: InputMaybe<Scalars['Circle']>;
   readonly point_within_rectangle: InputMaybe<Scalars['Rectangle']>;
@@ -436,6 +473,10 @@ export type ContentTypeLocationFilter = {
   readonly slug_not_contains: InputMaybe<Scalars['String']>;
   readonly slug_not_in: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
   readonly sys: InputMaybe<SysFilter>;
+  readonly zoomLevels_contains_all: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+  readonly zoomLevels_contains_none: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+  readonly zoomLevels_contains_some: InputMaybe<ReadonlyArray<InputMaybe<Scalars['String']>>>;
+  readonly zoomLevels_exists: InputMaybe<Scalars['Boolean']>;
 };
 
 export type ContentTypeLocationLinkingCollections = {
@@ -450,6 +491,8 @@ export type ContentTypeLocationLinkingCollectionsEntryCollectionArgs = {
 };
 
 export type ContentTypeLocationOrder =
+  | 'initialZoom_ASC'
+  | 'initialZoom_DESC'
   | 'slug_ASC'
   | 'slug_DESC'
   | 'sys_firstPublishedAt_ASC'
