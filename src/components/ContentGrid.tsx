@@ -5,10 +5,10 @@ import styled from 'styled-components';
 export const GRID_ANIMATION_DURATION = 300;
 
 // In rem, how big each card in the content grid is
-const CONTENT_GRID_DIMENSION = 16;
+const CONTENT_GRID_DIMENSION = 16.8;
 
 // In rem, how big the gap between cards is
-const CONTENT_GRID_GAP = 3.75;
+const CONTENT_GRID_GAP = 3;
 
 /**
  * Creates a card size in rem from a span

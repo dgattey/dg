@@ -41,7 +41,7 @@ const lightModeVariables = css`
 const AppStyle = createGlobalStyle`
   :root {
       /* These are Pico overrides */
-      --border-radius: 3em;
+      --border-radius: 2.5em;
 
       /* We disable all transitions when changing color schemes, except if this is used */
       --transition-always-enabled: 0.2s ease-in-out;
