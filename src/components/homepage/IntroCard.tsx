@@ -64,7 +64,7 @@ const IntroCard = () => {
           <Image {...introBlock.image} alt={introBlock.image.title} layout="intrinsic" />
         </HoverableContainer>
       </ImageCard>
-      <TextCard onExpansion={() => {}}>
+      <TextCard>
         <RichText {...introBlock.textBlock.content} />
       </TextCard>
     </>
