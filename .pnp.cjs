@@ -48,6 +48,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@semantic-release/changelog", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:6.0.1"],
             ["@semantic-release/git", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:10.0.1"],
             ["@stylelint/postcss-css-in-js", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:0.37.2"],
+            ["@types/mapbox-gl", "npm:2.6.0"],
             ["@types/node", "npm:17.0.10"],
             ["@types/react", "npm:17.0.38"],
             ["@types/styled-components", "npm:5.1.20"],
@@ -5742,6 +5743,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@semantic-release/changelog", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:6.0.1"],
             ["@semantic-release/git", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:10.0.1"],
             ["@stylelint/postcss-css-in-js", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:0.37.2"],
+            ["@types/mapbox-gl", "npm:2.6.0"],
             ["@types/node", "npm:17.0.10"],
             ["@types/react", "npm:17.0.38"],
             ["@types/styled-components", "npm:5.1.20"],
@@ -11409,6 +11411,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react", "npm:17.0.2"]
           ],
           "packagePeers": [
+            "@types/mapbox-gl",
             "@types/react",
             "mapbox-gl",
             "react"
