@@ -5,15 +5,14 @@ import { gql } from 'graphql-request';
 import type { MyLocationQuery } from './generated/fetchMyLocation.generated';
 
 /**
- * Grabs the contentful sections with the title of header. Should
- * be only one.
+ * Grabs the home location using a known id for it
  */
 const QUERY = gql`
   query MyLocation {
     contentTypeLocation(id: "1RWFWMUzNgSKtL7qzAJ9bz") {
       point {
-        lat
-        lon
+        latitude: lat
+        longitude: lon
       }
       initialZoom
       zoomLevels

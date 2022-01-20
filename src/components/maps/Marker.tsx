@@ -21,7 +21,7 @@ const AreaIndicator = styled.circle.attrs({ r: RADIUS, cx: RADIUS, cy: RADIUS })
  * Creates a standard map marker, centered on a point
  */
 const Marker = ({ point, image }: Props) => (
-  <MapMarker latitude={point?.lat} longitude={point?.lon}>
+  <MapMarker {...point}>
     <svg width={DIMENSION} height={DIMENSION}>
       <AreaIndicator />
       {image && <image width={DIMENSION} height={DIMENSION} href={image.url} />}

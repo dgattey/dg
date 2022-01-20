@@ -1,7 +1,7 @@
 import type { MyLocationQuery } from 'api/contentful/generated/fetchMyLocation.generated';
 import useColorScheme from 'hooks/useColorScheme';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Map as MapGL, MapRef, ViewState } from 'react-map-gl';
+import { AttributionControl, Map as MapGL, MapRef, ViewState } from 'react-map-gl';
 import styled from 'styled-components';
 
 /**
@@ -50,16 +50,18 @@ export type Props = {
   children?: React.ReactElement | Array<React.ReactElement> | null;
 };
 
-const LIGHT_STYLE = 'mapbox://styles/dylangattey/ckyfpsonl01w014q8go5wvnh2';
-const DARK_STYLE = 'mapbox://styles/dylangattey/ckylbbyzc0ok916jx0bvos03d';
+const LIGHT_STYLE = 'mapbox://styles/dylangattey/ckyfpsonl01w014q8go5wvnh2?optimize=true';
+const DARK_STYLE = 'mapbox://styles/dylangattey/ckylbbyzc0ok916jx0bvos03d?optimize=true';
 
-// This wrapper ensures mapbox css is taken care of
+// This wrapper ensures we pad ctrls and re-override Pico's button defaults
 const Wrapper = styled.div`
   position: relative;
   height: 100%;
   width: 100%;
   & .mapboxgl-ctrl {
-    margin: 2rem;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+      'Open Sans', 'Helvetica Neue', sans-serif;
+    margin: 1.25rem;
   }
 `;
 
@@ -80,8 +82,8 @@ const Map = ({ location, viewState: outsideViewState, children }: Props) => {
   // This will be used to set zoom levels, eventually
   const [viewState, setViewState] = useState<MapViewState>({
     ...size,
-    latitude: location?.point?.lat ?? 0,
-    longitude: location?.point?.lon ?? 0,
+    latitude: location?.point?.latitude ?? 0,
+    longitude: location?.point?.longitude ?? 0,
     zoom: location?.initialZoom ?? 0,
     padding: outsideViewState.padding ?? { left: 0, right: 0, top: 0, bottom: 0 },
     bearing: 0,
@@ -104,16 +106,15 @@ const Map = ({ location, viewState: outsideViewState, children }: Props) => {
         minZoom={minZoom}
         maxZoom={maxZoom}
         attributionControl={false}
-        logoPosition="bottom-right"
+        logoPosition="bottom-left"
         interactive
         pitchWithRotate={false}
         touchPitch={false}
-        onZoom={(event) => setViewState({ ...event.viewState, ...size })}
-        onDrag={(event) => setViewState({ ...event.viewState, ...size })}
-        onRotate={(event) => setViewState({ ...event.viewState, ...size })}
+        onMove={(event) => setViewState({ ...event.viewState, ...size })}
         mapStyle={colorScheme === 'dark' ? DARK_STYLE : LIGHT_STYLE}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       >
+        <AttributionControl position="bottom-right" />
         {children}
       </MapGL>
     </Wrapper>

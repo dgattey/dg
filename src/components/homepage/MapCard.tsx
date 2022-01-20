@@ -66,16 +66,12 @@ const MapCard = ({ gridWidth }: Props) => {
     });
   }, [gridWidth, isExpanded]);
 
-  const homeMarker = location?.point ? (
-    <Marker key="home" point={location.point} image={location.image} />
-  ) : null;
-
   return (
     <Card onExpansion={setIsExpanded} $height={height}>
       <Wrapper $maxWidth={gridWidth ?? 0}>
-        {location && (
+        {location?.point && (
           <Map location={location} viewState={viewState}>
-            {homeMarker}
+            <Marker key="home" point={location.point} image={location.image} />
           </Map>
         )}
       </Wrapper>
