@@ -1,4 +1,4 @@
-[![GitHub version](https://badgen.net/github/release/dgattey/dg?cache=600)](https://github.com/dgattey/dg) [![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=dg)](https://vercel.com/dgattey/dg) [![Factor][fcr-img]][fcr] [![Climate][cc-img]][cc] [![Lines of Code](https://badgen.net/codeclimate/loc/dgattey/dg)][cc] [![Scan](https://snyk.io/test/github/dgattey/dg/badge.svg)](https://snyk.io/test/github/dgattey/dg)
+[![GitHub version](https://badgen.net/github/release/dgattey/dg?cache=600)][gh] [![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=dg)](https://vercel.com/dgattey/dg) [![Climate][cc-img]][cc] [![Quality](https://badgen.net//codeclimate/maintainability/dgattey/dg)][cc] [![Lines of Code](https://badgen.net/codeclimate/loc/dgattey/dg)][cc] [![GitHub checks](https://badgen.net/github/checks/dgattey/dg)][gh] [![Last commit](https://badgen.net/github/last-commit/dgattey/dg/main)][gh]
 
 # Dylan Gattey
 
@@ -60,5 +60,4 @@ I use `semantic-release` and standard Conventional Commits for semver versioning
 
 [cc-img]: https://badgen.net/codeclimate/tech-debt/dgattey/dg
 [cc]: https://codeclimate.com/github/dgattey/dg/maintainability
-[fcr-img]: https://www.codefactor.io/repository/github/dgattey/dg/badge
-[fcr]: https://www.codefactor.io/repository/github/dgattey/dg
+[gh]: https://github.com/dgattey/dg
