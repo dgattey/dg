@@ -1,8 +1,10 @@
 import useData from 'api/useData';
 import ContentCard from 'components/ContentCard';
+import Control from 'components/maps/Control';
 import type { Props as MapProps } from 'components/maps/Map';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
+import { FiX } from 'react-icons/fi';
 import styled, { css } from 'styled-components';
 
 interface Props {
@@ -66,16 +68,15 @@ const MapCard = ({ gridWidth }: Props) => {
     });
   }, [gridWidth, isExpanded]);
 
-  const homeMarker = location?.point ? (
-    <Marker key="home" point={location.point} image={location.image} />
-  ) : null;
-
   return (
-    <Card onExpansion={setIsExpanded} $height={height}>
+    <Card onExpansion={!isExpanded ? setIsExpanded : undefined} $height={height}>
       <Wrapper $maxWidth={gridWidth ?? 0}>
-        {location && (
+        {location?.point && (
           <Map location={location} viewState={viewState}>
-            {homeMarker}
+            <Control onClick={() => setIsExpanded(false)} position="top-right">
+              <FiX />
+            </Control>
+            <Marker key="home" point={location.point} image={location.image} />
           </Map>
         )}
       </Wrapper>

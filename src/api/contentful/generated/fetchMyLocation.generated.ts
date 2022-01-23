@@ -8,7 +8,7 @@ export type MyLocationQuery = {
         readonly initialZoom: number | undefined;
         readonly zoomLevels: ReadonlyArray<string | undefined> | undefined;
         readonly point:
-          | { readonly lat: number | undefined; readonly lon: number | undefined }
+          | { readonly latitude: number | undefined; readonly longitude: number | undefined }
           | undefined;
         readonly image:
           | {
