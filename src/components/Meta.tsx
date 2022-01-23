@@ -93,6 +93,7 @@ const Meta = ({ title, description }: Props) => {
       <title>{title ? `Dylan Gattey - ${title}` : 'Dylan Gattey'}</title>
       {truncatedDescription && <meta name="description" content={truncatedDescription} />}
       <link key="favicon" rel="icon" href="/favicon.ico" />
+      <meta name="theme-color" content="var(--background-color)" />
       <meta
         key="msapplication-TileColor"
         name="msapplication-TileColor"

@@ -2,6 +2,7 @@ import { FetcherKey, PartialFallback } from 'api/useData';
 import Footer from 'components/Footer';
 import Header from 'components/Header';
 import ScrollIndicatorContext from 'components/ScrollIndicatorContext';
+import useColorScheme from 'hooks/useColorScheme';
 import useShowScrollIndicator from 'hooks/useShowScrollIndicator';
 import { useRef } from 'react';
 import { SWRConfig } from 'swr';
@@ -21,9 +22,10 @@ type Props<Key extends FetcherKey> = Pick<React.ComponentProps<'div'>, 'children
 /**
  * Basic page layout for every page. Has a sticky, contained header above
  * the main (contained) content, with a (contained) footer below. No wrapper
- * around all items to save on divs.
+ * around all items to save on divs. Ensures color scheme is applied.
  */
 const PageLayout = <Key extends FetcherKey>({ children, fallback }: Props<Key>) => {
+  useColorScheme();
   const headerSizingRef = useRef<HTMLDivElement>(null);
   const { ref, isIndicatorShown } = useShowScrollIndicator(
     headerSizingRef.current?.getBoundingClientRect().height ?? 0,

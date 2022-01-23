@@ -41,6 +41,11 @@ const lightModeVariables = css`
  * Applies styles to the full app
  */
 const AppStyle = createGlobalStyle`
+  // Apply changes from theme faster
+  body {
+    background: var(--background-color);
+  }
+  
   :root {
       /* These are Pico overrides */
       --border-radius: 2.5em;

@@ -39,6 +39,16 @@ const Grid = styled.div`
 `;
 
 /**
+ * Swaps pointer events between being disabled and auto on the children
+ */
+const changePointerEvents = (isOn: boolean) => (animatedChildren: HTMLElement[]) => {
+  animatedChildren.forEach((child) => {
+    // eslint-disable-next-line no-param-reassign
+    child.style.pointerEvents = isOn ? 'auto' : 'none';
+  });
+};
+
+/**
  * Displays all our content in a grid - on the client it uses `animate-css-grid`
  * for nice animations when items change in size, which we do when expanding cards.
  */
@@ -57,6 +67,8 @@ const ContentGrid = ({ children }: Pick<React.ComponentProps<'div'>, 'children'>
         stagger: 10,
         duration: GRID_ANIMATION_DURATION,
         easing: 'backOut',
+        onStart: changePointerEvents(false),
+        onEnd: changePointerEvents(true),
       });
     }
   };
