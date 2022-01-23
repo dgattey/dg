@@ -1,4 +1,5 @@
 import { Map } from 'mapbox-gl';
+import React from 'react';
 import ReactDOM from 'react-dom';
 import { useControl } from 'react-map-gl';
 import ControlContainer, { Props as ContainerProps } from './ControlContainer';
@@ -40,15 +41,25 @@ class DGControl {
   }
 
   /**
-   * Creates a new div that holds a `ControlContainer` for the contents
+   * Creates a new div that holds a `ControlContainer` for the contents. Pass
+   * onClick if there are not multiple children.
    */
   onAdd(map: Map) {
-    const { onClick, children, ...props } = this._containerProps;
+    const { onClick, children, className, ...props } = this._containerProps;
     this._map = map;
     this._container = document.createElement('div');
-    this._container.onclick = onClick;
-    ReactDOM.render(<ControlContainer {...props}>{children}</ControlContainer>, this._container);
-    this._container.className = 'mapboxgl-ctrl';
+    this._container.onclick = onClick ?? null;
+    if (Array.isArray(children)) {
+      ReactDOM.render(<ControlContainer {...props}>{children}</ControlContainer>, this._container);
+    } else {
+      ReactDOM.render(
+        <ControlContainer onClick={onClick} {...props}>
+          {children}
+        </ControlContainer>,
+        this._container,
+      );
+    }
+    this._container.className = `mapboxgl-ctrl ${className ?? ''}`;
     return this._container;
   }
 
@@ -65,8 +76,8 @@ class DGControl {
  * Returns a no-op component that adds a control to the map in a given
  * position of the map (corners).
  */
-const Control = ({ position, children, onClick }: Props) => {
-  useControl(() => new DGControl({ children, onClick }), {
+const Control = ({ position, ...props }: Props) => {
+  useControl(() => new DGControl(props), {
     position,
   });
   return null;

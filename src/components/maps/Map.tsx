@@ -3,6 +3,7 @@ import useColorScheme from 'hooks/useColorScheme';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AttributionControl, Map as MapGL, MapRef, ViewState } from 'react-map-gl';
 import styled from 'styled-components';
+import StandardControls from './StandardControls';
 
 /**
  * Represents a location along with some metadata
@@ -115,6 +116,7 @@ const Map = ({ location, viewState: outsideViewState, children }: Props) => {
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       >
         <AttributionControl position="bottom-right" />
+        <StandardControls mapRef={mapRef} />
         {children}
       </MapGL>
     </Wrapper>
