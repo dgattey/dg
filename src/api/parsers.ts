@@ -1,4 +1,4 @@
-import type { Link, Project, TextBlock } from './generated/api.generated';
+import type { Link, Project, TextBlock } from 'api/types/generated/contentfulApi.generated';
 
 /**
  * Type guard to get a link out
@@ -27,3 +27,10 @@ export const isTextBlock = (
  */
 export const isDefinedItem = <Type>(item: Type | undefined | null): item is Type =>
   item !== undefined && item !== null;
+
+/**
+ * Can be used to find a link that contains a given string somewhere in an array of links.
+ * Most commonly used with header/footer links.
+ */
+export const findLinkWithName = (links: Array<Link> | undefined, name: string): Link | undefined =>
+  links?.find((link) => link.title?.includes(name));

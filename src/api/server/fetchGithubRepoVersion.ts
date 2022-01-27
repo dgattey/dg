@@ -1,9 +1,9 @@
-import fetchGraphQLData from 'api/fetchGraphQLData';
+import type { GithubRepoVersionQuery } from 'api/types/generated/fetchGithubRepoVersion.generated';
 import { gql } from 'graphql-request';
-import { DgRepoLatestReleaseQuery } from './generated/fetchRepoVersion.generated';
+import githubClient from './githubClient';
 
 const QUERY = gql`
-  query DgRepoLatestRelease {
+  query GithubRepoVersion {
     repository(name: "dg", owner: "dgattey") {
       releases(last: 100) {
         nodes {
@@ -23,14 +23,14 @@ const QUERY = gql`
  * see which one matches. If any do, the first is returned. Won't be able
  * to run on client, but it'll gracefully fallback to the fallback.
  */
-const fetchRepoVersion = async () => {
+const fetchGithubRepoVersion = async () => {
   const commitSha = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
   if (!commitSha && !process.env.NODE_ENV) {
     // Fallback for browser only
     return undefined;
   }
 
-  const data = await fetchGraphQLData<DgRepoLatestReleaseQuery>('/api/github', QUERY);
+  const data = await githubClient.request<GithubRepoVersionQuery>(QUERY);
   const releases = data?.repository?.releases?.nodes;
   const filteredReleases =
     releases?.filter((release) => release?.tagCommit?.oid === commitSha?.trim()) ?? [];
@@ -38,4 +38,4 @@ const fetchRepoVersion = async () => {
   return filteredReleases[0]?.name ?? 'vX.Y.Z';
 };
 
-export default fetchRepoVersion;
+export default fetchGithubRepoVersion;
