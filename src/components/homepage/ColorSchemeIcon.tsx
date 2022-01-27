@@ -46,6 +46,11 @@ export const ICONS: Record<ColorScheme, JSX.Element> = {
 // Reset the state that tooltips give to the element since it acts as a button here.
 const IconWrapper = styled.span<{ $disabled: boolean }>`
   && {
+    & svg {
+      font-size: 1.5em;
+      transition: transform var(--transition);
+      transform-origin: center;
+    }
     ${({ $disabled }) =>
       $disabled
         ? css`
@@ -58,11 +63,6 @@ const IconWrapper = styled.span<{ $disabled: boolean }>`
             }
           `}
     border-bottom: none;
-    & svg {
-      font-size: 1.5em;
-      transition: transform var(--transition);
-      transform-origin: center;
-    }
   }
 `;
 

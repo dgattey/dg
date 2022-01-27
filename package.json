@@ -13,7 +13,7 @@
     "semantic-release": "semantic-release",
     "format": "prettier --loglevel warn --write \"**/*.{js,ts,tsx,css,md,json,yml}\" \"!node_modules/**/*\" \"!public/**/*\" \"!.cache/**/*\"",
     "lint": "eslint . --cache --fix --ext .js,.ts,.tsx",
-    "lint-styles": "stylelint 'src/**/*.{ts,tsx,js,jsx}'",
+    "lint-styles": "stylelint 'src/**/*.{ts,tsx,js,jsx}' --fix",
     "type-check": "tsc --noEmit",
     "prepare": "husky install",
     "clean": "rm -r .next",

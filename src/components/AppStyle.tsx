@@ -11,7 +11,7 @@ const darkModeVariables = css`
   --contrast-overlay: var(--contrast-inverse);
   --contrast-overlay-inverse: var(--contrast);
 
-  // Same as --card-box-shadow with the fade doubled
+  /* Same as card-box-shadow with the fade doubled */
   --card-hovered-box-shadow: 0 0.125rem 2rem rgba(0, 0, 0, 0.06),
     0 0.125rem 4rem rgba(0, 0, 0, 0.12), 0 0 0 0.125rem rgba(0, 0, 0, 0.036);
 
@@ -28,7 +28,7 @@ const lightModeVariables = css`
   --contrast-overlay: var(--secondary);
   --contrast-overlay-inverse: var(--secondary-inverse);
 
-  // Same as --card-box-shadow with the fade doubled
+  /* Same as card-box-shadow with the fade doubled */
   --card-hovered-box-shadow: 0 0.125rem 2rem rgba(27, 40, 50, 0.04),
     0 0.125rem 4rem rgba(27, 40, 50, 0.08), 0 0 0 0.125rem rgba(27, 40, 50, 0.024);
 
@@ -41,7 +41,7 @@ const lightModeVariables = css`
  * Applies styles to the full app
  */
 const AppStyle = createGlobalStyle`
-  // Apply changes from theme faster
+  /* Apply changes from theme faster */
   body {
     background: var(--background-color);
   }
@@ -59,25 +59,25 @@ const AppStyle = createGlobalStyle`
     --navy: #186891;
   }
 
-  // When a page/component is set to light or the root has no dark theme applied
+  /* When a page/component is set to light or the root has no dark theme applied */
   [data-theme='light'],
   :root:not([data-theme='dark']) {
-    ${lightModeVariables};
+    ${lightModeVariables}
   }
 
-  // When a page/component is set to dark
+  /* When a page/component is set to dark */
   [data-theme='dark'] {
-    ${darkModeVariables};
+    ${darkModeVariables}
   }
 
-  // When dark mode is on and the root isn't set to light
+  /* When dark mode is on and the root isn't set to light */
   @media only screen and (prefers-color-scheme: dark) {
     :root:not([data-theme='light']) {
-      ${darkModeVariables};
+      ${darkModeVariables}
     }
   }
 
-  // Disable all animations if this is true
+  /* Disable all animations if this is true */
   :root[${ANIMATE_ATTRIBUTE}='false'] {
     --transition: 0s;
   }

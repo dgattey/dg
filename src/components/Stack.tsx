@@ -14,22 +14,22 @@ const Stack = styled.div<{
     $isVertical &&
     css`
       flex-direction: column;
-    `};
+    `}
   ${({ $alignItems }) =>
     $alignItems &&
     css`
       align-items: ${$alignItems};
-    `};
+    `}
   ${({ $justifyContent }) =>
     $justifyContent &&
     css`
       justify-content: ${$justifyContent};
-    `};
+    `}
   ${({ $gap }) =>
     $gap &&
     css`
       gap: ${$gap};
-    `};
+    `}
 `;
 
 export default Stack;

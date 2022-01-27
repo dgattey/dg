@@ -162,7 +162,7 @@ const Card = styled.article<CardProps>`
         `
       : css`
           grid-column: 1 / -1;
-        `};
+        `}
   ${({ $vSpan }) =>
     $vSpan &&
     css`

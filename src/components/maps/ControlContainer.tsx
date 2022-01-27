@@ -42,7 +42,7 @@ const INTERACTIVE_STYLE = css`
 
 // Pads each item and uses onClick from child
 const ItemWrapper = styled.div`
-  ${INTERACTIVE_STYLE};
+  ${INTERACTIVE_STYLE}
 `;
 
 // One single control
@@ -63,7 +63,7 @@ const Container = styled.div<{ $isSingular?: boolean }>`
             display: block;
             padding-top: 100%;
           }
-          ${INTERACTIVE_STYLE};
+          ${INTERACTIVE_STYLE}
         `
       : css``}
 `;

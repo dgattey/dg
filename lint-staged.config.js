@@ -3,7 +3,7 @@ module.exports = {
   'src/**/*.{ts,tsx,js,jsx}': [
     () => 'tsc',
     'eslint --cache --fix --plugin tsc --rule \'tsc/config: [2, {configFile: "./tsconfig.json"}]\' ',
-    'stylelint',
+    'stylelint --fix',
     'prettier --write',
   ],
   // Outside of the project folder or in JSON/etc we just format and call it good

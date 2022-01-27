@@ -38,16 +38,7 @@ const ColorSchemeSwitch = styled.input.attrs({ role: 'switch', type: 'checkbox' 
 }>`
   ${({ $colorScheme }) => css`
     --switch-background-color: var(${SWITCH_COLOR_SCHEME_CSS[$colorScheme ?? 'unknown']});
-  `};
-  &&:checked {
-    --calculated-margin: calc(var(--switch-width) - var(--switch-height));
-    --border-color: var(--switch-background-color);
-    --background-color: var(--switch-background-color);
-    &:before {
-      margin-left: var(--calculated-margin);
-      margin-inline-start: var(--calculated-margin);
-    }
-  }
+  `}
   && {
     --border-width: 6px;
     --switch-height: 2em;
@@ -55,9 +46,20 @@ const ColorSchemeSwitch = styled.input.attrs({ role: 'switch', type: 'checkbox' 
     --switch-track-size: 1.25em;
     width: var(--switch-width);
     height: var(--switch-height);
-    :before {
-      width: calc(var(--switch-height) - (var(--border-width) * 2));
-      transition: margin var(--transition);
+  }
+
+  &&:before {
+    width: calc(var(--switch-height) - (var(--border-width) * 2));
+    transition: margin var(--transition);
+  }
+
+  &&:checked {
+    --calculated-margin: calc(var(--switch-width) - var(--switch-height));
+    --border-color: var(--switch-background-color);
+    --background-color: var(--switch-background-color);
+    &:before {
+      margin-left: var(--calculated-margin);
+      margin-inline-start: var(--calculated-margin);
     }
   }
 `;
@@ -81,7 +83,7 @@ const Button = styled.button<{ $visible: boolean }>`
     ${({ $visible }) =>
       css`
         opacity: ${$visible ? 1 : 0};
-      `};
+      `}
   }
 `;
 
