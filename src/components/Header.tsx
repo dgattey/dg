@@ -29,7 +29,7 @@ const LogoHolder = styled.li`
  * page and shows a logo + header links if they exist.
  */
 const Header = ({ headerRef }: Props) => {
-  const { data: headerLinks } = useData('siteHeader');
+  const { data: headerLinks } = useData('header');
   const headerLinkElements = headerLinks && (
     <ul>
       {headerLinks.map((link) => (

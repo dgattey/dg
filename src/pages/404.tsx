@@ -1,5 +1,6 @@
-import { linkWithName } from 'api/contentful/fetchSiteFooter';
-import useData, { fetchData } from 'api/useData';
+import fetchFallback from 'api/fetchFallback';
+import { findLinkWithName } from 'api/parsers';
+import useData from 'api/useData';
 import ErrorLayout from 'components/layouts/ErrorLayout';
 import Link from 'components/Link';
 import { useRouter } from 'next/router';
@@ -10,7 +11,7 @@ import { Props } from './_error';
  * If this is on the server, it'll provide a response to use for a status code
  */
 export const getStaticProps = async () => {
-  const data = await fetchData(['version', 'siteFooter', 'siteHeader']);
+  const data = await fetchFallback(['version', 'footer', 'header']);
   return {
     props: {
       fallback: {
@@ -25,8 +26,8 @@ export const getStaticProps = async () => {
  */
 const Contents = () => {
   const router = useRouter();
-  const { data: footerLinks } = useData('siteFooter');
-  const emailLink = linkWithName(footerLinks, 'Email');
+  const { data: footerLinks } = useData('footer');
+  const emailLink = findLinkWithName(footerLinks, 'Email');
   return (
     <>
       <h1>😢 Oops, couldn&apos;t find that!</h1>

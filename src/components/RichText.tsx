@@ -1,8 +1,8 @@
 import { documentToReactComponents, Options } from '@contentful/rich-text-react-renderer';
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
-import type { Asset, Entry, TextBlockContent } from 'api/contentful/generated/api.generated';
-import { isDefinedItem, isLink, isProject } from 'api/contentful/typeguards';
+import { isDefinedItem, isLink, isProject } from 'api/parsers';
+import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
 import ProjectCard from 'components/homepage/ProjectCard';
 import Image from './Image';
 import Link from './Link';

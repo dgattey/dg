@@ -43,7 +43,7 @@ const Wrapper = styled.div<{ $maxWidth: number }>`
  * Uses Mapbox to show a canvas-based map of my current location.
  */
 const MapCard = ({ gridWidth }: Props) => {
-  const { data: location } = useData('myLocation');
+  const { data: location } = useData('location');
   const [isExpanded, setIsExpanded] = useState(false);
   const [height, setHeight] = useState(MIN_DIMENSION);
 

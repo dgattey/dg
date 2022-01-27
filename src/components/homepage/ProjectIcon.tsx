@@ -1,4 +1,4 @@
-import { Project } from 'api/contentful/generated/api.generated';
+import type { Project } from 'api/types/generated/contentfulApi.generated';
 import { FiGlobe, FiMonitor, FiSmartphone } from 'react-icons/fi';
 
 type Props = Pick<Project, 'type'>;

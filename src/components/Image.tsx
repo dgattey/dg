@@ -1,4 +1,4 @@
-import { Asset } from 'api/contentful/generated/api.generated';
+import type { Asset } from 'api/types/generated/contentfulApi.generated';
 import NextImage, { ImageProps } from 'next/image';
 
 type Props = Pick<React.ComponentProps<'img'>, 'className'> &

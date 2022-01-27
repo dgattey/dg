@@ -1,22 +1,9 @@
-import type { MyLocationQuery } from 'api/contentful/generated/fetchMyLocation.generated';
+import type { MapLocation } from 'api/types/MapLocation';
 import useColorScheme from 'hooks/useColorScheme';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AttributionControl, Map as MapGL, MapRef, ViewState } from 'react-map-gl';
 import styled from 'styled-components';
 import StandardControls from './StandardControls';
-
-/**
- * Represents a location along with some metadata
- */
-export type MapLocation = Pick<
-  NonNullable<MyLocationQuery['contentTypeLocation']>,
-  'point' | 'initialZoom' | 'image'
-> & {
-  /**
-   * Converts zoom levels to a number array
-   */
-  zoomLevels: Array<number>;
-};
 
 interface Size {
   /**
