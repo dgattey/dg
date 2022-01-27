@@ -21,7 +21,7 @@ const FlexList = styled.ul`
  */
 const Footer = () => {
   const { data: version } = useData('version');
-  const { data: footerLinks } = useData('siteFooter');
+  const { data: footerLinks } = useData('footer');
   const listedLinkElements = footerLinks?.map((link) => (
     <li key={link.url}>
       <Link {...link} />

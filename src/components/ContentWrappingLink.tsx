@@ -1,11 +1,11 @@
-import type { Link as LinkProps } from 'api/contentful/generated/api.generated';
+import type { Link } from 'api/types/generated/contentfulApi.generated';
 import NextLink from 'next/link';
 
 type Props = Pick<React.ComponentProps<'div'>, 'children'> & {
   /**
    * The link whose URL we should render
    */
-  link: LinkProps | undefined;
+  link: Link | undefined;
 };
 
 /**

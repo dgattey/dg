@@ -1,4 +1,4 @@
-import { linkWithName } from 'api/contentful/fetchSiteFooter';
+import { findLinkWithName } from 'api/parsers';
 import useData from 'api/useData';
 import ContentCard, { OverlayStack } from 'components/ContentCard';
 import HoverableContainer from 'components/HoverableContainer';
@@ -41,8 +41,8 @@ const TextCard = styled(ContentCard)`
  * as the data comes from the introBlock.
  */
 const IntroCard = () => {
-  const { data: introBlock } = useData('introBlock');
-  const { data: footerLinks } = useData('siteFooter');
+  const { data: introBlock } = useData('intro');
+  const { data: footerLinks } = useData('footer');
   const [isHovered, setIsHovered] = useState(false);
 
   if (!introBlock?.textBlock?.content) {
@@ -52,7 +52,7 @@ const IntroCard = () => {
   return (
     <>
       <ImageCard
-        link={linkWithName(footerLinks, 'LinkedIn')}
+        link={findLinkWithName(footerLinks, 'LinkedIn')}
         overlay={{
           alwaysVisible: <FiUser />,
           hiddenUntilHover: <strong>About</strong>,

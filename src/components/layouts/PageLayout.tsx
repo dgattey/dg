@@ -1,4 +1,5 @@
-import { FetcherKey, PartialFallback } from 'api/useData';
+import type { EndpointKey } from 'api/endpoints';
+import type { PartialFallback } from 'api/fetchFallback';
 import Footer from 'components/Footer';
 import Header from 'components/Header';
 import ScrollIndicatorContext from 'components/ScrollIndicatorContext';
@@ -10,7 +11,7 @@ import { SWRConfig } from 'swr';
 /**
  * We have props that dictate a fallback for SWRConfig, plus children
  */
-type Props<Key extends FetcherKey> = Pick<React.ComponentProps<'div'>, 'children'> & {
+type Props<Key extends EndpointKey> = Pick<React.ComponentProps<'div'>, 'children'> & {
   /**
    * Fallback data to show, meaning the page must fetch this data in
    * `getStaticProps` and pass it here using props on the page
@@ -24,7 +25,7 @@ type Props<Key extends FetcherKey> = Pick<React.ComponentProps<'div'>, 'children
  * the main (contained) content, with a (contained) footer below. No wrapper
  * around all items to save on divs. Ensures color scheme is applied.
  */
-const PageLayout = <Key extends FetcherKey>({ children, fallback }: Props<Key>) => {
+const PageLayout = <Key extends EndpointKey>({ children, fallback }: Props<Key>) => {
   useColorScheme();
   const headerSizingRef = useRef<HTMLDivElement>(null);
   const { ref, isIndicatorShown } = useShowScrollIndicator(

@@ -2553,7 +2553,7 @@ export type PullRequestState =
 
 /** The possible item types found in a timeline. */
 export type PullRequestTimelineItemsItemType =
-  /** Represents a 'added_to_merge_queue' event on a given pull request. */
+  /** Represents an 'added_to_merge_queue' event on a given pull request. */
   | 'ADDED_TO_MERGE_QUEUE_EVENT'
   /** Represents a 'added_to_project' event on a given issue or pull request. */
   | 'ADDED_TO_PROJECT_EVENT'

@@ -1,8 +1,8 @@
-import { isDefinedItem } from 'api/contentful/typeguards';
-import fetchGraphQLData from 'api/fetchGraphQLData';
-import type { MapLocation } from 'components/maps/Map';
+import { isDefinedItem } from 'api/parsers';
+import type { MyLocationQuery } from 'api/types/generated/fetchContentfulLocation.generated';
+import type { MapLocation } from 'api/types/MapLocation';
 import { gql } from 'graphql-request';
-import type { MyLocationQuery } from './generated/fetchMyLocation.generated';
+import contentfulClient from './contentfulClient';
 
 /**
  * Grabs the home location using a known id for it
@@ -26,11 +26,10 @@ const QUERY = gql`
 `;
 
 /**
- * Fetches the text block corresponding to the introduction rich text
- * for the home page.
+ * Fetches my current location from Contentful.
  */
-const fetchMyLocation = async (): Promise<MapLocation | null> => {
-  const data = await fetchGraphQLData<MyLocationQuery>('/api/content', QUERY);
+const fetchContentfulLocation = async (): Promise<MapLocation | null> => {
+  const data = await contentfulClient.request<MyLocationQuery>(QUERY);
   const location = data?.contentTypeLocation;
   if (!location) {
     return null;
@@ -50,4 +49,4 @@ const fetchMyLocation = async (): Promise<MapLocation | null> => {
   };
 };
 
-export default fetchMyLocation;
+export default fetchContentfulLocation;

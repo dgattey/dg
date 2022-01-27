@@ -1,4 +1,5 @@
-import { Fallback, fetchData } from 'api/useData';
+import type { Fallback } from 'api/fetchFallback';
+import fetchFallback from 'api/fetchFallback';
 import Homepage from 'components/homepage/Homepage';
 import PageLayout from 'components/layouts/PageLayout';
 import { GetStaticProps, InferGetStaticPropsType } from 'next/types';
@@ -16,13 +17,13 @@ interface Props {
  * provide a fallback for the server side rendering done elsewhere.
  */
 export const getStaticProps: GetStaticProps<Props> = async () => {
-  const data = await fetchData([
+  const data = await fetchFallback([
     'version',
-    'siteFooter',
-    'siteHeader',
+    'footer',
+    'header',
     'projects',
-    'introBlock',
-    'myLocation',
+    'intro',
+    'location',
   ]);
   return {
     props: {

@@ -1,8 +1,8 @@
-import type * as Types from './api.generated';
+import type * as Types from './contentfulApi.generated';
 
-export type SiteFooterQueryVariables = Types.Exact<{ [key: string]: never }>;
+export type FooterQueryVariables = Types.Exact<{ [key: string]: never }>;
 
-export type SiteFooterQuery = {
+export type FooterQuery = {
   readonly sectionCollection:
     | {
         readonly items: ReadonlyArray<

@@ -1,4 +1,4 @@
-import { Link } from 'api/contentful/generated/api.generated';
+import type { Link } from 'api/types/generated/contentfulApi.generated';
 import React, { ReactElement, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { cardSize, GRID_ANIMATION_DURATION } from './ContentGrid';

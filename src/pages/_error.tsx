@@ -1,5 +1,7 @@
-import { linkWithName } from 'api/contentful/fetchSiteFooter';
-import useData, { FallbackForErrorPages, fetchData } from 'api/useData';
+import type { ErrorPageFallback } from 'api/fetchFallback';
+import fetchFallback from 'api/fetchFallback';
+import { findLinkWithName } from 'api/parsers';
+import useData from 'api/useData';
 import ErrorLayout from 'components/layouts/ErrorLayout';
 import Link from 'components/Link';
 import type { NextApiResponse } from 'next';
@@ -16,7 +18,7 @@ export type Props = HasStatusCode & {
   /**
    * Provides SWR with fallback version data
    */
-  fallback: FallbackForErrorPages;
+  fallback: ErrorPageFallback;
 };
 
 export type ErrorWithCode = Error & HasStatusCode;
@@ -33,7 +35,7 @@ export const getStaticProps = async ({
 }) => {
   const errorCode = err?.statusCode ?? 404;
   const statusCode = res ? res.statusCode : errorCode;
-  const data = await fetchData(['version', 'siteFooter', 'siteHeader']);
+  const data = await fetchFallback(['version', 'footer', 'header']);
   return {
     props: {
       statusCode,
@@ -48,8 +50,8 @@ export const getStaticProps = async ({
  * Contents of the page in a different element so fallback can work its server-rendered magic
  */
 const Contents = ({ statusCode }: HasStatusCode) => {
-  const { data: footerLinks } = useData('siteFooter');
-  const emailLink = linkWithName(footerLinks, 'Email');
+  const { data: footerLinks } = useData('footer');
+  const emailLink = findLinkWithName(footerLinks, 'Email');
   return (
     <>
       <h1>😬 This is awkward...</h1>

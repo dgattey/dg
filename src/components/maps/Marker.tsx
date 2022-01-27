@@ -1,6 +1,6 @@
+import type { MapLocation } from 'api/types/MapLocation';
 import { Marker as MapMarker } from 'react-map-gl';
 import styled from 'styled-components';
-import type { MapLocation } from './Map';
 
 const DIMENSION = 100;
 const RADIUS = DIMENSION / 2;

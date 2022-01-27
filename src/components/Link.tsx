@@ -1,4 +1,4 @@
-import { Link as LinkProps } from 'api/contentful/generated/api.generated';
+import type { Link as LinkProps } from 'api/types/generated/contentfulApi.generated';
 import NextLink from 'next/link';
 import {
   FaGithubAlt,

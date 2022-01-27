@@ -1,4 +1,4 @@
-import { FallbackForErrorPages } from 'api/useData';
+import { ErrorPageFallback } from 'api/fetchFallback';
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import PageLayout from './PageLayout';
@@ -7,7 +7,7 @@ type Props = Pick<React.ComponentProps<'div'>, 'children'> & {
   /**
    * Provides SWR with fallback version/header/footer data
    */
-  fallback: FallbackForErrorPages;
+  fallback: ErrorPageFallback;
 };
 
 const Button = styled.a.attrs({ role: 'button' })``;

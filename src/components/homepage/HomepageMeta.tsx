@@ -5,7 +5,7 @@ import Meta from 'components/Meta';
  * Creates metadata for the home page from intro data
  */
 const HomepageMeta = () => {
-  const { data: introBlock } = useData('introBlock');
+  const { data: introBlock } = useData('intro');
 
   // Grabs the first text element, essentially.
   const firstParagraph =
