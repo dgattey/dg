@@ -17,7 +17,7 @@
     "type-check": "tsc --noEmit",
     "prepare": "husky install",
     "clean": "rm -r .next",
-    "codegen": "DOTENV_CONFIG_PATH='.env.development.local' graphql-codegen --require dotenv/config --config codegen.yml"
+    "codegen": "DOTENV_CONFIG_PATH='.env.development.local' graphql-codegen --require dotenv/config --config codegen.js"
   },
   "dependencies": {
     "@contentful/rich-text-react-renderer": "^15.11.1",
