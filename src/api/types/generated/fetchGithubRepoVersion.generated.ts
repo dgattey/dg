@@ -1,8 +1,8 @@
-import type * as Types from './api.generated';
+import type * as Types from './githubApi.generated';
 
-export type DgRepoLatestReleaseQueryVariables = Types.Exact<{ [key: string]: never }>;
+export type GithubRepoVersionQueryVariables = Types.Exact<{ [key: string]: never }>;
 
-export type DgRepoLatestReleaseQuery = {
+export type GithubRepoVersionQuery = {
   readonly repository:
     | {
         readonly releases: {

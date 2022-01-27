@@ -1,4 +1,4 @@
-import type * as Types from './api.generated';
+import type * as Types from './contentfulApi.generated';
 
 export type ProjectsQueryVariables = Types.Exact<{ [key: string]: never }>;
 

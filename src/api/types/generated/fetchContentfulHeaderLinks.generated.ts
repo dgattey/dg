@@ -1,8 +1,8 @@
-import type * as Types from './api.generated';
+import type * as Types from './contentfulApi.generated';
 
-export type SiteHeaderQueryVariables = Types.Exact<{ [key: string]: never }>;
+export type HeaderQueryVariables = Types.Exact<{ [key: string]: never }>;
 
-export type SiteHeaderQuery = {
+export type HeaderQuery = {
   readonly sectionCollection:
     | {
         readonly items: ReadonlyArray<
