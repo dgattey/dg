@@ -29,7 +29,7 @@ const Card = styled(ContentCard)<{ $height: number }>`
   ${({ $height }) =>
     css`
       min-height: ${$height}px;
-    `};
+    `}
 `;
 
 // This wrapper fits the MAX size this card will ever be so the map can statically stay that size
