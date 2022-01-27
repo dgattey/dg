@@ -6,6 +6,6 @@ declare function fetch<Type = unknown>(
   init?: RequestInit,
 ): Promise<
   Omit<Response, 'json'> & {
-    json: () => Promise<{ data: Type }>;
+    json: () => Promise<Type>;
   }
 >;
