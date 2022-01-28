@@ -3061,7 +3061,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@prisma/client", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:3.8.1"],
             ["@prisma/engines-version", "npm:3.8.0-43.34df67547cf5598f5a6cd3eb45f14ee70c3fb86f"],
             ["@types/prisma", null],
-            ["prisma", "npm:3.8.1"]
+            ["prisma", "npm:3.8.1"],
+            ["undici", "npm:4.12.2"]
           ],
           "packagePeers": [
             "@types/prisma",

@@ -52,7 +52,7 @@ const getLatestTokenIfValid = async ({ name }: Pick<Prisma.TokenCreateArgs['data
 
   // Return either refresh + access, or just refresh if invalid
   const { refreshToken, accessToken, expiryAt } = token;
-  const isValid = expiryAt && expiryAt > new Date().getMilliseconds();
+  const isValid = expiryAt && expiryAt > Date.now();
   return { refreshToken, accessToken: isValid ? accessToken : null };
 };
 
@@ -60,11 +60,13 @@ const getLatestTokenIfValid = async ({ name }: Pick<Prisma.TokenCreateArgs['data
  * Checks if our access token/key is still valid. If so, returns the access token.
  * Otherwise, grabs a new refresh/access token pair, updates the DB with the new
  * data, and returns the updated access token. May throw an error if something is
- * misconfigured. Should be caught higher up.
+ * misconfigured. Should be caught higher up. If you force refresh, that means
+ * it'll attempt to get a refreshed token even if the current token appears valid.
+ * Should be used in case of 4xx codes from users.
  */
-const refreshTokenIfNeeded = async (name: TokenKey) => {
+const refreshedAccessToken = async (name: TokenKey, forceRefresh?: boolean) => {
   const currentData = await getLatestTokenIfValid({ name });
-  if (currentData.accessToken) {
+  if (currentData.accessToken && !forceRefresh) {
     return currentData.accessToken;
   }
 
@@ -77,4 +79,4 @@ const refreshTokenIfNeeded = async (name: TokenKey) => {
   return accessToken;
 };
 
-export default refreshTokenIfNeeded;
+export default refreshedAccessToken;

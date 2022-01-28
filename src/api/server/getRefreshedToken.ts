@@ -39,6 +39,19 @@ type ApiConfig = {
 };
 
 /**
+ * We "expire" tokens 30 seconds early so we don't run into problems near the end
+ * of the window. Probably unneeded but it's just math.
+ */
+const GRACE_PERIOD_IN_MS = 30000;
+
+/**
+ * Given a number of seconds in which something will expire, this function
+ * creates a timestamp from that in milliseconds at which things expire.
+ */
+const createExpirationInMs = (expiryWindowInSeconds: number) =>
+  Date.now() - GRACE_PERIOD_IN_MS + expiryWindowInSeconds * 1000;
+
+/**
  * All the APIs we support for refreshing tokens
  */
 const API_CONFIGS: Record<TokenKey, ApiConfig> = {
@@ -61,6 +74,7 @@ const API_CONFIGS: Record<TokenKey, ApiConfig> = {
       };
     },
   },
+
   spotify: {
     endpoint: 'https://accounts.spotify.com/api/token',
     headers: {
@@ -74,11 +88,11 @@ const API_CONFIGS: Record<TokenKey, ApiConfig> = {
       if (token_type !== 'Bearer' || !access_token) {
         throw new TypeError('Missing data from Spotify to refresh token');
       }
-      // Spotify refresh tokens don't expire, and we want 30 buffer seconds for expiration
+      // Spotify refresh tokens don't expire + we create our own expiry stamp
       return {
         refreshToken,
         accessToken: access_token,
-        expiryAt: (new Date().getSeconds() - 30 + expires_in) * 1000,
+        expiryAt: createExpirationInMs(expires_in),
       };
     },
   },
@@ -89,13 +103,15 @@ const API_CONFIGS: Record<TokenKey, ApiConfig> = {
  */
 const getRefreshedToken = async (key: TokenKey, refreshToken: string) => {
   const { endpoint, headers, data, validate } = API_CONFIGS[key];
+
   const rawData = await fetch<RawStravaToken | RawSpotifyToken>(endpoint, {
     method: 'POST',
     headers: {
-      'content-type': 'application/x-www-form-urlencoded',
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
       ...headers,
     },
-    body: JSON.stringify({
+    body: new URLSearchParams({
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
       ...data,
