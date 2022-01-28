@@ -6,7 +6,18 @@ Portfolio/project showcase website for Dylan Gattey as a lightweight, mobile-fri
 
 ## Initial Setup
 
-Make sure Node 14+ and `yarn` is installed. Run `yarn` to install all existing dependencies.
+- `yarn dev` starts the development server.
+- `yarn build` runs a prod build after generating new Prisma types
+- `yarn start` runs a server assuming the site has been previously built
+- `yarn format` runs Prettier to format the files
+- `yarn lint` runs ESLint to lint all TS(X) and JS(X) files
+- `yarn lint:styles` runs stylelint on the same files
+- `yarn lint:types` runs tsc to confirm no type errors on the same files
+- `yarn codegen` generates new GraphQL APIs from Github/Contentful
+- `yarn db:local <branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
+- `yarn db:sync` (assuming the db is currently connected) syncs the schemas to the db branch so you can promote to main through PlanetScale
+- `yarn db:generate` (assuming the db is currently connected) generates schema changes locally to the package
+- `yarn release` bumps the site version, run via Github Action
 
 ## Local Development
 

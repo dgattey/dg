@@ -39,3 +39,6 @@ yarn-error.log*
 .vercel
 tsconfig.tsbuildinfo
 .eslintcache
+
+# Generated files from Prisma
+src/api/server/generated
