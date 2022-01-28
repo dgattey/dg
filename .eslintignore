@@ -1,3 +1,8 @@
-node_modules/
 .yarn/
+.cache/
+.next/
+.vscode/
+.vercel/
+node_modules/
 **/*.generated.*
+**/generated/*

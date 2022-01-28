@@ -5,6 +5,18 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 type Processor = (request: NextApiRequest, response: NextApiResponse) => Promise<void>;
 
 /**
+ * A bunch of different ways an error might be encoded. Check in order
+ */
+type ErrorType =
+  | {
+      get?: () => string;
+      message?: string;
+    }
+  | string
+  | undefined
+  | null;
+
+/**
  * Takes a request and transforms the endpoint key out of it, joining any
  * sub paths with forward slashes to form a valid key.
  */
@@ -25,8 +37,19 @@ const handleGet: Processor = async (request, response) => {
     response.status(500).end('Malformed endpoint key');
     return;
   }
-  const data = await endpoints[endpointKey]();
-  response.json(data);
+  try {
+    const data = await endpoints[endpointKey]();
+    response.json(data);
+  } catch (error: unknown) {
+    // Might be a few different ways the error is encoded, try most of the common ones
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const typedError = error as ErrorType;
+    const message =
+      typeof typedError === 'string'
+        ? typedError
+        : typedError?.get?.() ?? typedError?.message ?? 'Error executing the call';
+    response.status(500).end(message);
+  }
 };
 
 /**

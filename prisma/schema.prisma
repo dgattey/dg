@@ -1,0 +1,20 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["referentialIntegrity"]
+  output   = "../src/api/server/generated"
+}
+
+datasource db {
+  provider = "mysql"
+  url = env("DATABASE_URL")
+  referentialIntegrity = "prisma"
+}
+
+// Defines tokens for directly accessing a service. Expires at is a UTC time stamp
+model Token {
+id            Int       @default(autoincrement()) @id
+name          String    @unique
+accessToken   String?
+refreshToken  String?
+expiryAt      Int?
+}
