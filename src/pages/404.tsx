@@ -34,7 +34,8 @@ const Contents = () => {
       <p>
         I didn&apos;t see a page matching the url <code>{router.asPath}</code> on the site. Check
         out the homepage and see if you can find what you were looking for. If not,{' '}
-        {emailLink ? <Link alwaysShowTitle {...emailLink} /> : 'Email Me'} and I can help you out!
+        {emailLink ? <Link layout="plainIconAndText" {...emailLink} /> : 'Email Me'} and I can help
+        you out!
       </p>
     </>
   );

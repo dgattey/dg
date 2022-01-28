@@ -59,8 +59,8 @@ const Contents = ({ statusCode }: HasStatusCode) => {
         Looks like I encountered a {statusCode === 404 ? <code>Page Not Found</code> : 'server'}{' '}
         error, otherwise known as a dreaded {statusCode ?? 500}. Sorry! Try refreshing the page or
         attempting your action again. If it&apos;s still broken,{' '}
-        {emailLink ? <Link alwaysShowTitle {...emailLink} /> : 'Email Me'} and I&apos;ll see what I
-        can do.
+        {emailLink ? <Link layout="plainIconAndText" {...emailLink} /> : 'Email Me'} and I&apos;ll
+        see what I can do.
       </p>
     </>
   );
