@@ -4,19 +4,17 @@ import ContentCard from 'components/ContentCard';
 import Image from 'components/Image';
 import Link from 'components/Link';
 import Stack from 'components/Stack';
-import TimeAgo from 'javascript-time-ago';
-import enLocale from 'javascript-time-ago/locale/en.json';
+import useRelativeTimeFormat from 'hooks/useRelativeTimeFormat';
 import React from 'react';
+import { FaSpotify } from 'react-icons/fa';
 import { FiMusic } from 'react-icons/fi';
 import styled, { css } from 'styled-components';
-
-TimeAgo.addDefaultLocale(enLocale);
-const timeAgo = new TimeAgo('en-US');
 
 const IMAGE_SIZE = 140;
 
 const truncated = (numberOfLines: number) => css`
-  display: box;
+  /* stylelint-disable-next-line */
+  display: -webkit-box;
   -webkit-line-clamp: ${numberOfLines};
   -webkit-box-orient: vertical;
   overflow: hidden;
@@ -28,7 +26,7 @@ const Container = styled.div`
   pointer-events: none;
 `;
 
-const BackgroundLink = styled.a`
+const BackgroundLink = styled(Link)`
   height: 100%;
   width: 100%;
   position: absolute;
@@ -56,6 +54,7 @@ const ImageContainer = styled.article`
 `;
 
 const BigLogoLink = styled(Link)`
+  line-height: 1;
   font-size: 3rem;
   margin: 0;
   pointer-events: auto;
@@ -84,7 +83,7 @@ const ArtistName = styled.h6`
   pointer-events: auto;
 `;
 
-const PlainLink = styled.a`
+const PlainLink = styled(Link)`
   color: inherit;
 `;
 
@@ -105,14 +104,24 @@ const SpotifyCard = () => {
         return spotifyPlayed.items?.[0]?.track;
     }
   })();
+
   const lastPlayed =
     spotifyPlayed?.dataType === 'recent' ? spotifyPlayed.items?.[0]?.played_at : null;
+  const relativeLastPlayed = useRelativeTimeFormat(lastPlayed);
 
   // Copy the icon from the footer links, but create a link that links to the song
   const spotifyIconLink = findLinkWithName(footerLinks, 'Spotify');
   const linkToSong =
     song && spotifyIconLink
       ? { ...spotifyIconLink, title: song.name, url: song.external_urls.spotify }
+      : spotifyIconLink;
+  const linkToArtist = (artistUrl: string | undefined) =>
+    song && spotifyIconLink
+      ? { ...spotifyIconLink, title: song.name, url: artistUrl }
+      : spotifyIconLink;
+  const linkToAlbum =
+    song && spotifyIconLink
+      ? { ...spotifyIconLink, title: song.name, url: song.album.external_urls.spotify }
       : spotifyIconLink;
 
   const albumImage = song?.album?.images.find((image) => image?.width === 300);
@@ -121,7 +130,7 @@ const SpotifyCard = () => {
       <Status>
         <Stack $alignItems="center" $gap="4px">
           {lastPlayed ? (
-            `Played ${timeAgo.format(Date.parse(lastPlayed))}`
+            `Played ${relativeLastPlayed}`
           ) : (
             <>
               Now Playing
@@ -132,7 +141,7 @@ const SpotifyCard = () => {
       </Status>
       <TextGroup>
         <SongTitle>
-          <PlainLink href={song.external_urls.spotify}>{song.name}</PlainLink>
+          {linkToSong ? <PlainLink {...linkToSong}>{song.name}</PlainLink> : song.name}
         </SongTitle>
         <ArtistName>
           {song.artists?.map((artist, index, allArtists) => {
@@ -146,9 +155,10 @@ const SpotifyCard = () => {
               }
               return index < allArtists.length - 2 ? ', ' : ', & ';
             })();
+            const artistLink = linkToArtist(artist.external_urls.spotify);
             return (
               <React.Fragment key={artist.id}>
-                <PlainLink href={artist.external_urls.spotify}>{artist.name}</PlainLink>
+                {artistLink ? <PlainLink {...artistLink}>{artist.name}</PlainLink> : artist.name}
                 <span>{joinText}</span>
               </React.Fragment>
             );
@@ -163,13 +173,17 @@ const SpotifyCard = () => {
   return (
     <ContentCard>
       <Container>
-        {linkToSong && <BackgroundLink href={linkToSong.url} />}
+        {linkToSong && <BackgroundLink layout="empty" {...linkToSong} />}
         <Content>
           <Stack $justifyContent="space-between">
-            {spotifyIconLink && <BigLogoLink {...spotifyIconLink} hideTooltip />}
-            {albumImage && (
-              <ImageContainer>
-                <a href={song?.album.external_urls.spotify}>
+            {linkToSong && (
+              <BigLogoLink {...linkToSong}>
+                <FaSpotify />
+              </BigLogoLink>
+            )}
+            {albumImage && linkToAlbum && (
+              <Link {...linkToAlbum}>
+                <ImageContainer>
                   <Image
                     alt={song?.name}
                     {...albumImage}
@@ -177,8 +191,8 @@ const SpotifyCard = () => {
                     height={IMAGE_SIZE}
                     layout="fixed"
                   />
-                </a>
-              </ImageContainer>
+                </ImageContainer>
+              </Link>
             )}
           </Stack>
           <div>{contents}</div>

@@ -32,9 +32,9 @@ const Homepage = () => {
   // These index into projectCards to splice in other cards
   const otherCards = useMemo(
     () => [
-      { index: 0, card: <SpotifyCard key="spotify" /> },
       { index: 0, card: <IntroCard key="intro" /> },
       { index: 2, card: <ColorSchemeToggleCard key="color" /> },
+      { index: 2, card: <SpotifyCard key="spotify" /> },
       { index: 3, card: <MapCard key="map" gridWidth={staticSize.width} /> },
     ],
     [staticSize.width],
