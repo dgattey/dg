@@ -4,6 +4,7 @@ import fetchContentfulIntroBlock from './server/fetchContentfulIntroBlock';
 import fetchContentfulLocation from './server/fetchContentfulLocation';
 import fetchContentfulProjects from './server/fetchContentfulProjects';
 import fetchGithubRepoVersion from './server/fetchGithubRepoVersion';
+import fetchSpotifyCurrentlyPlaying from './server/fetchSpotifyCurrentlyOrRecentlyPlayed';
 
 /**
  * All possible types of endpoints we could request
@@ -44,6 +45,9 @@ const endpoints = {
 
   // App version via Github
   version: fetchGithubRepoVersion,
+
+  // Last played song via Spotify
+  'current/playing': fetchSpotifyCurrentlyPlaying,
 } as const;
 
 /**

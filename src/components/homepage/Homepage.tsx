@@ -1,5 +1,6 @@
 import useData from 'api/useData';
 import ContentGrid from 'components/ContentGrid';
+import SpotifyCard from 'components/now-playing/SpotifyCard';
 import React, { useEffect, useMemo, useState } from 'react';
 import useResizeAware from 'react-resize-aware';
 import ColorSchemeToggleCard from './ColorSchemeToggleCard';
@@ -31,6 +32,7 @@ const Homepage = () => {
   // These index into projectCards to splice in other cards
   const otherCards = useMemo(
     () => [
+      { index: 0, card: <SpotifyCard key="spotify" /> },
       { index: 0, card: <IntroCard key="intro" /> },
       { index: 2, card: <ColorSchemeToggleCard key="color" /> },
       { index: 3, card: <MapCard key="map" gridWidth={staticSize.width} /> },

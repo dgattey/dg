@@ -49,6 +49,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@semantic-release/changelog", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:6.0.1"],
             ["@semantic-release/git", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:10.0.1"],
             ["@stylelint/postcss-css-in-js", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:0.37.2"],
+            ["@types/javascript-time-ago", "npm:2.0.3"],
             ["@types/mapbox-gl", "npm:2.6.0"],
             ["@types/node", "npm:17.0.10"],
             ["@types/react", "npm:17.0.38"],
@@ -77,6 +78,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["graphql-tag", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:2.12.6"],
             ["hooks", "link:./src/hooks::locator=dg%40workspace%3A."],
             ["husky", "npm:7.0.4"],
+            ["javascript-time-ago", "npm:2.3.11"],
             ["lint-staged", "npm:12.2.1"],
             ["mapbox-gl", "npm:2.6.1"],
             ["next", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:12.0.8"],
@@ -3495,6 +3497,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "linkType": "HARD",
         }]
       ]],
+      ["@types/javascript-time-ago", [
+        ["npm:2.0.3", {
+          "packageLocation": "./.yarn/cache/@types-javascript-time-ago-npm-2.0.3-f9d6d446a1-c2b484686b.zip/node_modules/@types/javascript-time-ago/",
+          "packageDependencies": [
+            ["@types/javascript-time-ago", "npm:2.0.3"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
       ["@types/js-yaml", [
         ["npm:4.0.5", {
           "packageLocation": "./.yarn/cache/@types-js-yaml-npm-4.0.5-bb64d71397-7dcac8c50f.zip/node_modules/@types/js-yaml/",
@@ -6163,6 +6174,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@semantic-release/changelog", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:6.0.1"],
             ["@semantic-release/git", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:10.0.1"],
             ["@stylelint/postcss-css-in-js", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:0.37.2"],
+            ["@types/javascript-time-ago", "npm:2.0.3"],
             ["@types/mapbox-gl", "npm:2.6.0"],
             ["@types/node", "npm:17.0.10"],
             ["@types/react", "npm:17.0.38"],
@@ -6191,6 +6203,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["graphql-tag", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:2.12.6"],
             ["hooks", "link:./src/hooks::locator=dg%40workspace%3A."],
             ["husky", "npm:7.0.4"],
+            ["javascript-time-ago", "npm:2.3.11"],
             ["lint-staged", "npm:12.2.1"],
             ["mapbox-gl", "npm:2.6.1"],
             ["next", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:12.0.8"],
@@ -8924,6 +8937,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/java-properties-npm-1.0.2-5b04acc097-9a08677834.zip/node_modules/java-properties/",
           "packageDependencies": [
             ["java-properties", "npm:1.0.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["javascript-time-ago", [
+        ["npm:2.3.11", {
+          "packageLocation": "./.yarn/cache/javascript-time-ago-npm-2.3.11-7e71cc9499-43ef1a871b.zip/node_modules/javascript-time-ago/",
+          "packageDependencies": [
+            ["javascript-time-ago", "npm:2.3.11"],
+            ["relative-time-format", "npm:1.0.6"]
           ],
           "linkType": "HARD",
         }]
@@ -12256,6 +12279,15 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageDependencies": [
             ["registry-url", "npm:5.1.0"],
             ["rc", "npm:1.2.8"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["relative-time-format", [
+        ["npm:1.0.6", {
+          "packageLocation": "./.yarn/cache/relative-time-format-npm-1.0.6-574fb52d9e-e79e872331.zip/node_modules/relative-time-format/",
+          "packageDependencies": [
+            ["relative-time-format", "npm:1.0.6"]
           ],
           "linkType": "HARD",
         }]

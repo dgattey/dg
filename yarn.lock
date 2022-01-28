@@ -2340,6 +2340,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/javascript-time-ago@npm:^2":
+  version: 2.0.3
+  resolution: "@types/javascript-time-ago@npm:2.0.3"
+  checksum: c2b484686bbe7d3379b476aa05785978c0d307485ac6d2e57c46dd05b91866a8f03aeac3c7da10170a6225c81e8bc419510de896e0e8e520be72ddce0b94fff8
+  languageName: node
+  linkType: hard
+
 "@types/js-yaml@npm:^4.0.0":
   version: 4.0.5
   resolution: "@types/js-yaml@npm:4.0.5"
@@ -4545,6 +4552,7 @@ __metadata:
     "@semantic-release/changelog": ^6.0.1
     "@semantic-release/git": ^10.0.1
     "@stylelint/postcss-css-in-js": ^0.37.2
+    "@types/javascript-time-ago": ^2
     "@types/mapbox-gl": ^2.6.0
     "@types/node": ^17.0.9
     "@types/react": ^17.0.38
@@ -4573,6 +4581,7 @@ __metadata:
     graphql-tag: ^2.12.6
     hooks: "link:./src/hooks::locator=dg%40workspace%3A."
     husky: ^7.0.4
+    javascript-time-ago: ^2.3.11
     lint-staged: ^12.1.7
     mapbox-gl: ^2.6.1
     next: ^12.0.8
@@ -6832,6 +6841,15 @@ __metadata:
   version: 1.0.2
   resolution: "java-properties@npm:1.0.2"
   checksum: 9a086778346e3adbe2395e370f5c779033ed60360055a15e2cead49e3d676d2c73786cf2f6563a1860277dea3dd0a859432e546ed89c03ee08c1f53e31a5d420
+  languageName: node
+  linkType: hard
+
+"javascript-time-ago@npm:^2.3.11":
+  version: 2.3.11
+  resolution: "javascript-time-ago@npm:2.3.11"
+  dependencies:
+    relative-time-format: ^1.0.6
+  checksum: 43ef1a871b707f446ac7ee0f687d3a428475ae3d38e143a6335d682b72a3f8f258a80c4b56ed0493b8524fb280912a80042f8e1d0e5b9a3ce2f346c975c37e76
   languageName: node
   linkType: hard
 
@@ -9715,6 +9733,13 @@ __metadata:
   dependencies:
     rc: ^1.2.8
   checksum: bcea86c84a0dbb66467b53187fadebfea79017cddfb4a45cf27530d7275e49082fe9f44301976eb0164c438e395684bcf3dae4819b36ff9d1640d8cc60c73df9
+  languageName: node
+  linkType: hard
+
+"relative-time-format@npm:^1.0.6":
+  version: 1.0.6
+  resolution: "relative-time-format@npm:1.0.6"
+  checksum: e79e872331420c12e9e78c2c29785069475d8f6ca24f021bdcb3689da864f0de8ac5a8d6488778439a973600b65d82823a32d710800c3cca95ab470465472c86
   languageName: node
   linkType: hard
 

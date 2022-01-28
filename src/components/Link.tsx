@@ -1,5 +1,6 @@
 import type { Link as LinkProps } from 'api/types/generated/contentfulApi.generated';
 import NextLink from 'next/link';
+import React from 'react';
 import {
   FaGithubAlt,
   FaInstagram,
@@ -11,12 +12,18 @@ import {
 } from 'react-icons/fa';
 import styled from 'styled-components';
 
-type Props = LinkProps & {
-  /**
-   * If it's an icon link, also shows the title of the link
-   */
-  alwaysShowTitle?: boolean;
-};
+type Props = LinkProps &
+  Pick<React.ComponentProps<'div'>, 'className'> & {
+    /**
+     * If it's an icon link, also shows the title of the link
+     */
+    alwaysShowTitle?: boolean;
+
+    /**
+     * If the tooltip is hidden when an icon link
+     */
+    hideTooltip?: boolean;
+  };
 
 const IconLink = styled.a``;
 
@@ -63,7 +70,7 @@ const iconTooltip = ({ title, alwaysShowTitle }: Pick<Props, 'alwaysShowTitle' |
  * just specifications for what to render using an icon library,
  * sometimes they're actual SVG html. When in doubt we assume html.
  */
-const Link = ({ title, url, icon, alwaysShowTitle }: Props) => {
+const Link = ({ title, url, icon, alwaysShowTitle, hideTooltip, className }: Props) => {
   if (!url) {
     return null;
   }
@@ -72,7 +79,8 @@ const Link = ({ title, url, icon, alwaysShowTitle }: Props) => {
   return icon ? (
     <NextLink href={url} passHref>
       <IconLink
-        data-tooltip={iconTooltip({ title, alwaysShowTitle })}
+        className={className}
+        data-tooltip={!hideTooltip ? iconTooltip({ title, alwaysShowTitle }) : undefined}
         dangerouslySetInnerHTML={!builtInIcon && icon ? { __html: icon } : undefined}
       >
         {builtInIcon}

@@ -31,7 +31,7 @@ const TextCard = styled(ContentCard)`
   border: none;
   box-shadow: none;
   & h1 {
-    --typography-spacing-vertical: 1.5rem;
+    --typography-spacing-vertical: 1rem;
   }
 `;
 
