@@ -1,6 +1,6 @@
 import authenticatedGraphQLClient from './authenticatedGraphQLClient';
 
-const ACCESS_TOKEN = process.env.NEXT_PUBLIC_GITHUB_AUTHENTICATION_TOKEN;
+const ACCESS_TOKEN = process.env.GITHUB_AUTHENTICATION_TOKEN;
 const ENDPOINT = 'https://api.github.com/graphql';
 
 /**
