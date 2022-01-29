@@ -87,8 +87,8 @@ const createApiGenerator = (name, { schemaEndpoint, token, scalars, onlyOperatio
 
 // For the Contentful API
 const contentfulGenerators = createApiGenerator('contentful', {
-  schemaEndpoint: `https://graphql.contentful.com/content/v1/spaces/${process.env.NEXT_PUBLIC_CONTENTFUL_SPACE_ID}`,
-  token: process.env.NEXT_PUBLIC_CONTENTFUL_ACCESS_TOKEN,
+  schemaEndpoint: `https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}`,
+  token: process.env.CONTENTFUL_ACCESS_TOKEN,
   onlyOperationTypes: false,
   scalars: {
     DateTime: 'string',
@@ -102,7 +102,7 @@ const contentfulGenerators = createApiGenerator('contentful', {
 // For the Github API
 const githubGenerators = createApiGenerator('github', {
   schemaEndpoint: 'https://api.github.com/graphql',
-  token: process.env.NEXT_PUBLIC_GITHUB_AUTHENTICATION_TOKEN,
+  token: process.env.GITHUB_AUTHENTICATION_TOKEN,
   onlyOperationTypes: true,
   scalars: {
     Base64String: 'string',
