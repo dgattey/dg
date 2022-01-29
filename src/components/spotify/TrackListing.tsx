@@ -29,12 +29,13 @@ const Container = styled(Stack).attrs({
   width: 100%;
 `;
 
-// Used to wrap content, the last item truncates on one line instead of 2
+// Used to wrap content, the last item truncates on one line instead of 2 + makes sure there's no change in line height
 const Header = styled.h5`
   --typography-spacing-vertical: 0.25em;
   ${truncated(2)}
   &:last-child {
     ${truncated(1)}
+    height: calc(var(--line-height) * 1rem);
   }
 `;
 
