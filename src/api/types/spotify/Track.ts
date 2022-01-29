@@ -31,6 +31,11 @@ interface ReferenceObject {
 }
 
 /**
+ * An artist is just a reference object
+ */
+export type Artist = ReferenceObject;
+
+/**
  * One album art image of a given size. For safety, it's also
  * possible for this to be undefined, so check it before using!
  */
@@ -43,12 +48,22 @@ type AlbumImage<Size extends number> =
   | undefined;
 
 /**
- * One song/track is this!
+ * An album is a reference object, plus images and release date
+ */
+export type Album = ReferenceObject & {
+  images: [AlbumImage<640>, AlbumImage<300>, AlbumImage<64>];
+  release_date: string;
+};
+
+/**
+ * One song/track is a reference object with artists and an album
  */
 export type Track = ReferenceObject & {
-  artists: Array<ReferenceObject>;
-  album: ReferenceObject & {
-    images: [AlbumImage<640>, AlbumImage<300>, AlbumImage<64>];
-    release_date: string;
-  };
+  artists: Array<Artist>;
+  album: Album;
+
+  /**
+   * May be present, if the right resource is used
+   */
+  played_at?: string;
 };

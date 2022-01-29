@@ -1,6 +1,5 @@
 import useData from 'api/useData';
 import ContentGrid from 'components/ContentGrid';
-import SpotifyCard from 'components/now-playing/SpotifyCard';
 import React, { useEffect, useMemo, useState } from 'react';
 import useResizeAware from 'react-resize-aware';
 import ColorSchemeToggleCard from './ColorSchemeToggleCard';
@@ -8,6 +7,7 @@ import HomepageMeta from './HomepageMeta';
 import IntroCard from './IntroCard';
 import MapCard from './MapCard';
 import ProjectCard from './ProjectCard';
+import SpotifyCard from './SpotifyCard';
 
 /**
  * Puts all projects into a grid using `projects` data,
