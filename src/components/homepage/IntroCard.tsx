@@ -1,9 +1,9 @@
-import { findLinkWithName } from 'api/parsers';
 import useData from 'api/useData';
 import ContentCard, { OverlayStack } from 'components/ContentCard';
 import HoverableContainer from 'components/HoverableContainer';
 import Image from 'components/Image';
 import RichText from 'components/RichText';
+import useLinkWithName from 'hooks/useLinkWithName';
 import { useState } from 'react';
 import { FiUser } from 'react-icons/fi';
 import styled from 'styled-components';
@@ -42,7 +42,7 @@ const TextCard = styled(ContentCard)`
  */
 const IntroCard = () => {
   const { data: introBlock } = useData('intro');
-  const { data: footerLinks } = useData('footer');
+  const linkedInLink = useLinkWithName('LinkedIn');
   const [isHovered, setIsHovered] = useState(false);
 
   if (!introBlock?.textBlock?.content) {
@@ -52,7 +52,7 @@ const IntroCard = () => {
   return (
     <>
       <ImageCard
-        link={findLinkWithName(footerLinks, 'LinkedIn')}
+        link={linkedInLink}
         overlay={{
           alwaysVisible: <FiUser />,
           hiddenUntilHover: <strong>About</strong>,

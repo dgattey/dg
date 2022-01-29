@@ -1,9 +1,8 @@
 import type { ErrorPageFallback } from 'api/fetchFallback';
 import fetchFallback from 'api/fetchFallback';
-import { findLinkWithName } from 'api/parsers';
-import useData from 'api/useData';
 import ErrorLayout from 'components/layouts/ErrorLayout';
 import Link from 'components/Link';
+import useLinkWithName from 'hooks/useLinkWithName';
 import type { NextApiResponse } from 'next';
 import React from 'react';
 
@@ -50,8 +49,7 @@ export const getStaticProps = async ({
  * Contents of the page in a different element so fallback can work its server-rendered magic
  */
 const Contents = ({ statusCode }: HasStatusCode) => {
-  const { data: footerLinks } = useData('footer');
-  const emailLink = findLinkWithName(footerLinks, 'Email');
+  const emailLink = useLinkWithName('Email');
   return (
     <>
       <h1>😬 This is awkward...</h1>

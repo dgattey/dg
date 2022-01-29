@@ -1,8 +1,7 @@
 import fetchFallback from 'api/fetchFallback';
-import { findLinkWithName } from 'api/parsers';
-import useData from 'api/useData';
 import ErrorLayout from 'components/layouts/ErrorLayout';
 import Link from 'components/Link';
+import useLinkWithName from 'hooks/useLinkWithName';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { Props } from './_error';
@@ -26,8 +25,7 @@ export const getStaticProps = async () => {
  */
 const Contents = () => {
   const router = useRouter();
-  const { data: footerLinks } = useData('footer');
-  const emailLink = findLinkWithName(footerLinks, 'Email');
+  const emailLink = useLinkWithName('Email');
   return (
     <>
       <h1>😢 Oops, couldn&apos;t find that!</h1>
