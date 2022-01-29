@@ -2,7 +2,6 @@ import type { Track } from 'api/types/spotify/Track';
 import Image from 'components/Image';
 import Link from 'components/Link';
 import useLinkWithName from 'hooks/useLinkWithName';
-import { useMemo } from 'react';
 import styled from 'styled-components';
 
 type Props = Track;
@@ -33,13 +32,10 @@ const FlexedLink = styled(Link)`
  * Creates an album image that links to the album directly
  */
 const AlbumImage = ({ name, album }: Props) => {
-  const baseLink = useLinkWithName('Spotify');
-  const albumLink = useMemo(() => {
-    if (!baseLink) {
-      return null;
-    }
-    return { ...baseLink, title: name, url: album.external_urls.spotify };
-  }, [baseLink, album.external_urls.spotify, name]);
+  const albumLink = useLinkWithName('Spotify', {
+    title: album.name,
+    url: album.external_urls.spotify,
+  });
   const albumImage = album.images.find((image) => image?.width === API_IMAGE_SIZE);
   const imageComponent = albumImage ? (
     <ImageContainer>

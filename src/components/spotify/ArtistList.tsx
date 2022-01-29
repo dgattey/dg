@@ -16,24 +16,19 @@ const PlainLink = styled(Link)`
 `;
 
 /**
- * Creates an element that's added as a separator after an item
+ * Creates a separator for use after an item at index
  */
-const SeparatorText = ({ index, fullList }: SeparatorProps) => {
-  const isLast = index === fullList.length - 1;
-  const text = () => {
-    if (isLast) {
-      // Nothing after the last item!
-      return null;
-    }
-    if (fullList.length === 2) {
-      // Only two items in the full list means no commas
-      return ' & ';
-    }
-    // Commas separate, or if there's only one item after this, an & sign after comma
-    return index < fullList.length - 2 ? ', ' : ', & ';
-  };
-  // We end with a span regardless, so that we have the right overflow truncation
-  return <span>{text()}</span>;
+const separator = ({ index, fullList }: SeparatorProps) => {
+  if (index === fullList.length - 1) {
+    // Nothing after the last item!
+    return null;
+  }
+  if (fullList.length === 2) {
+    // Only two items in the full list means no commas
+    return ' & ';
+  }
+  // Commas separate, or if there's only one item after this, an & sign after comma
+  return index < fullList.length - 2 ? ', ' : ', & ';
 };
 
 /**
@@ -61,7 +56,7 @@ const ArtistList = ({ artists }: Props) => {
         return (
           <React.Fragment key={artist.id}>
             {link ? <PlainLink {...link}>{artist.name}</PlainLink> : artist.name}
-            <SeparatorText index={index} fullList={artists} />
+            <span>{separator({ index, fullList: artists })}</span>
           </React.Fragment>
         );
       })}

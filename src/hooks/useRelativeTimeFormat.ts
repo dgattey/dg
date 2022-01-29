@@ -2,6 +2,12 @@ import { useMemo } from 'react';
 
 type DateConstructorValue = Date | string | number | null | undefined;
 
+interface RelativeTime {
+  unit: Intl.RelativeTimeFormatUnit;
+  amount: number;
+  formatted: string;
+}
+
 // Value to use as a fallback when all else fails
 const FALLBACK: readonly [Intl.RelativeTimeFormatUnit, number] = ['second', 1000] as const;
 
@@ -33,10 +39,46 @@ const OVERRIDES: Partial<Record<Intl.RelativeTimeFormatUnit, Record<number, stri
 };
 
 /**
+ * Converts a date to a number, defaulting to right now as a fallback
+ */
+const numericDate = (date: DateConstructorValue) => +new Date(date ?? new Date());
+
+/**
  * Typeguard for converting a string to a time format unit if possible
  */
 const isRelativeTimeUnit = (unit: string): unit is Intl.RelativeTimeFormatUnit =>
   Object.keys(UNITS).includes(unit);
+
+/**
+ * From an elapsed amount of milliseconds, grabs a unit and creates a value
+ * from our elapsed ms in that unit that best fits. If the elapsedMs is 100, for example,
+ * it would return { unit: 'second', amount: 0, formatted: '0 seconds ago' }
+ */
+const relativeTimeFromMs = (
+  elapsedMs: number,
+  formatter: Intl.RelativeTimeFormat,
+): RelativeTime => {
+  const [unit, value] =
+    Object.entries(UNITS).find((entry) => Math.abs(elapsedMs) > entry[1]) ?? FALLBACK;
+  const formattedUnit = isRelativeTimeUnit(unit) ? unit : FALLBACK[0];
+  const amount = Math.round(elapsedMs / value);
+  const formatted = formatter.format(amount, formattedUnit);
+  return { unit: formattedUnit, amount, formatted };
+};
+
+/**
+ * If we have an override matching our unit where the amount is under the
+ * threshold, return that string to use as an override.
+ */
+const overriddenFormatString = ({ unit, amount }: RelativeTime) => {
+  const overrides = OVERRIDES[unit];
+  if (!overrides) {
+    return;
+  }
+  return Object.entries(overrides).find(
+    ([threshold]) => Math.abs(amount) <= Number(threshold),
+  )?.[1];
+};
 
 /**
  * Used to create a "6 hours ago" or "last week" type string using
@@ -44,33 +86,12 @@ const isRelativeTimeUnit = (unit: string): unit is Intl.RelativeTimeFormatUnit =
  */
 const useRelativeTimeFormat = (fromDate: DateConstructorValue, toDate?: DateConstructorValue) => {
   const formatter = useMemo(() => new Intl.RelativeTimeFormat('en', { numeric: 'auto' }), []);
-
-  // Converts a date to a number, defaulting to right now as a fallback
-  const numericDate = (date: DateConstructorValue) => +new Date(date ?? new Date());
   const elapsedMs = numericDate(fromDate) - numericDate(toDate);
 
-  /**
-   * Finds the first unit whose window of time is less than the amount of time that's passed,
-   * and use the time formatter to create a relative time format string, or "Just now" if under
-   * 30 seconds. Also shorten
-   */
+  // Kept memoized for perf
   const formattedValue = useMemo(() => {
-    const [unit, value] =
-      Object.entries(UNITS).find((entry) => Math.abs(elapsedMs) > entry[1]) ?? FALLBACK;
-    const formattedUnit = isRelativeTimeUnit(unit) ? unit : FALLBACK[0];
-    const roundedAmount = Math.round(elapsedMs / value);
-    const formattedString = formatter.format(roundedAmount, formattedUnit);
-
-    // Return a custom format if there's something to override
-    const overrides = OVERRIDES[formattedUnit];
-    if (overrides) {
-      const overrideStrings = Object.entries(overrides);
-      return (
-        overrideStrings.find(([threshold]) => Math.abs(roundedAmount) <= Number(threshold))?.[1] ??
-        formattedString
-      );
-    }
-    return formattedString;
+    const relativeTime = relativeTimeFromMs(elapsedMs, formatter);
+    return overriddenFormatString(relativeTime) ?? relativeTime.formatted;
   }, [elapsedMs, formatter]);
 
   return formattedValue;
