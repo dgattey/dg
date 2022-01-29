@@ -11,7 +11,16 @@ const nextConfig = {
     swcFileReading: false,
   },
   images: {
-    domains: ['images.ctfassets.net'],
+    domains: ['images.ctfassets.net', 'i.scdn.co'],
+  },
+
+  // Unfortunately required for Prisma until it upgrades to undici@^4
+  webpack: (config, { isServer }) => {
+    if (isServer) {
+      config.externals.push('_http_common');
+      config.externals.push('encoding');
+    }
+    return config;
   },
 };
 

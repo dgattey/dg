@@ -24,6 +24,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
     'projects',
     'intro',
     'location',
+    'current/playing',
   ]);
   return {
     props: {

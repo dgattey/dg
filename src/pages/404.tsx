@@ -1,8 +1,7 @@
 import fetchFallback from 'api/fetchFallback';
-import { findLinkWithName } from 'api/parsers';
-import useData from 'api/useData';
 import ErrorLayout from 'components/layouts/ErrorLayout';
 import Link from 'components/Link';
+import useLinkWithName from 'hooks/useLinkWithName';
 import { useRouter } from 'next/router';
 import React from 'react';
 import { Props } from './_error';
@@ -26,15 +25,15 @@ export const getStaticProps = async () => {
  */
 const Contents = () => {
   const router = useRouter();
-  const { data: footerLinks } = useData('footer');
-  const emailLink = findLinkWithName(footerLinks, 'Email');
+  const emailLink = useLinkWithName('Email');
   return (
     <>
       <h1>😢 Oops, couldn&apos;t find that!</h1>
       <p>
         I didn&apos;t see a page matching the url <code>{router.asPath}</code> on the site. Check
         out the homepage and see if you can find what you were looking for. If not,{' '}
-        {emailLink ? <Link alwaysShowTitle {...emailLink} /> : 'Email Me'} and I can help you out!
+        {emailLink ? <Link layout="plainIconAndText" {...emailLink} /> : 'Email Me'} and I can help
+        you out!
       </p>
     </>
   );

@@ -73,7 +73,6 @@ const Button = styled.button<{ $visible: boolean }>`
   right: 1rem;
   bottom: 1rem;
   margin: 0 auto;
-  font-size: var(--font-size-small);
   width: fit-content;
   transition: opacity var(--transition);
   @media (min-width: 768px) {
@@ -130,7 +129,7 @@ const ColorSchemeToggleCard = () => {
           onClick={clearSavedScheme}
           $visible={!isSystemScheme}
         >
-          Reset to system theme
+          <small>Reset to system theme</small>
         </Button>
       </div>
     </Card>
