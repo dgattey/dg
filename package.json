@@ -158,7 +158,6 @@
     }
   },
   "resolutions": {
-    "node-fetch": "^3.2.0",
     "ansi-regex": "^5.0.1",
     "postcss": "^8.2.13"
   }
