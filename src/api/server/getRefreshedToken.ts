@@ -1,42 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
+import { RefreshTokenConfig } from 'api/types/RefreshTokenConfig';
 import type { RawSpotifyToken, RawStravaToken, TokenKey } from 'api/types/Token';
-
-/**
- * Any API needs to return this type at the end
- */
-type ValidatedToken = {
-  refreshToken: string;
-  accessToken: string;
-  expiryAt: number;
-};
-
-/**
- * Represents a config for a particular token key
- */
-type ApiConfig = {
-  /**
-   * The URL for the API
-   */
-  endpoint: string;
-
-  /**
-   * This gets encoded into body if existent
-   */
-  data?: Record<string, string | undefined>;
-
-  /**
-   * This gets encoded into headers if existent
-   */
-  headers?: Record<string, string>;
-
-  /**
-   * Throws an error if anything's off about our data, otherwise returns the data
-   */
-  validate: (
-    rawData: RawStravaToken | RawSpotifyToken,
-    existingRefreshToken: string,
-  ) => ValidatedToken;
-};
 
 /**
  * We "expire" tokens 30 seconds early so we don't run into problems near the end
@@ -54,7 +18,7 @@ const createExpirationInMs = (expiryWindowInSeconds: number) =>
 /**
  * All the APIs we support for refreshing tokens
  */
-const API_CONFIGS: Record<TokenKey, ApiConfig> = {
+const REFRESH_TOKEN_CONFIGS: Record<TokenKey, RefreshTokenConfig> = {
   strava: {
     endpoint: 'https://www.strava.com/api/v3/oauth/token',
     data: {
@@ -102,7 +66,7 @@ const API_CONFIGS: Record<TokenKey, ApiConfig> = {
  * When necessary, gets a new access token/refresh token from Strava
  */
 const getRefreshedToken = async (key: TokenKey, refreshToken: string) => {
-  const { endpoint, headers, data, validate } = API_CONFIGS[key];
+  const { endpoint, headers, data, validate } = REFRESH_TOKEN_CONFIGS[key];
 
   const rawData = await fetch<RawStravaToken | RawSpotifyToken>(endpoint, {
     method: 'POST',

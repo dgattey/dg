@@ -1,8 +1,5 @@
 import type { TokenKey } from 'api/types/Token';
 import refreshedAccessToken from './refreshedAccessToken';
-
-type FetchResult<Type> = Omit<Response, 'json'> & { json: () => Promise<Type> };
-
 /**
  * Returns true if we're authed via status code
  */
