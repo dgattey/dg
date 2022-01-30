@@ -29,6 +29,6 @@
     "strictPropertyInitialization": true,
     "target": "es6"
   },
-  "include": ["src"],
+  "include": ["src", "scripts"],
   "exclude": ["node_modules", "src/api/server/generated"]
 }

@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import { Map } from 'mapbox-gl';
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -19,25 +20,26 @@ type Props = ContainerProps & {
  */
 class DGControl {
   /**
-   * What Mapbox uses for the map itself
+   * What Mapbox uses for the map itself - needs to be named this
    */
   _map: Map | undefined;
 
   /**
-   * What Mapbox uses for the container for the element we're adding
+   * What Mapbox uses for the container for the element we're adding -
+   * needs to be named this
    */
   _container: HTMLElement | undefined;
 
   /**
-   * The container's props
+   * The container's props - private
    */
-  _containerProps: ContainerProps;
+  #containerProps: ContainerProps;
 
   /**
    * Saves the props for later
    */
   constructor(props: ContainerProps) {
-    this._containerProps = props;
+    this.#containerProps = props;
   }
 
   /**
@@ -45,7 +47,7 @@ class DGControl {
    * onClick if there are not multiple children.
    */
   onAdd(map: Map) {
-    const { onClick, children, className, ...props } = this._containerProps;
+    const { onClick, children, className, ...props } = this.#containerProps;
     this._map = map;
     this._container = document.createElement('div');
     this._container.onclick = onClick ?? null;

@@ -9,8 +9,6 @@ const TYPESCRIPT_EXTENSIONS = [
 
 const BASE_PLUGINS = ['react'];
 
-const TYPESCRIPT_PLUGINS = [...BASE_PLUGINS, '@typescript-eslint'];
-
 const BASE_RULES = {
   // We want to enable prop spreading (i.e. <Component {...props} />) since it allows us to easily pass props to child components
   'react/jsx-props-no-spreading': 'off',
@@ -48,16 +46,10 @@ const TYPESCRIPT_RULES = {
   '@typescript-eslint/indent': 'off',
 };
 
-const API_TYPESCRIPT_RULES = {
-  ...TYPESCRIPT_RULES,
-  // Disables underscore dangling so we can use `__typename`
-  'no-underscore-dangle': 'off',
-};
-
 const TYPESCRIPT_OVERRIDE = {
-  files: ['src/**/*.{ts,tsx}'],
+  files: ['src/**/*.{ts,tsx}', 'scripts/**/*.ts'],
   extends: TYPESCRIPT_EXTENSIONS,
-  plugins: TYPESCRIPT_PLUGINS,
+  plugins: [...BASE_PLUGINS, '@typescript-eslint'],
   settings: {
     'import/resolver': {
       typescript: {},
@@ -72,6 +64,17 @@ const TYPESCRIPT_OVERRIDE = {
     project: ['./tsconfig.json'],
   },
   rules: TYPESCRIPT_RULES,
+};
+
+// Scripts allow console logging
+const SCRIPTS_OVERRIDE = {
+  ...TYPESCRIPT_OVERRIDE,
+  files: ['scripts/**/*.ts'],
+  rules: {
+    ...TYPESCRIPT_RULES,
+    // Console logging allowed
+    'no-console': 'off',
+  },
 };
 
 module.exports = {
@@ -92,13 +95,5 @@ module.exports = {
   },
   reportUnusedDisableDirectives: true,
   rules: BASE_RULES,
-  overrides: [
-    // Typescript files need different overrides
-    TYPESCRIPT_OVERRIDE,
-    {
-      // API files are almost the same as regular typescript files but have different rule overrides
-      ...TYPESCRIPT_OVERRIDE,
-      rules: API_TYPESCRIPT_RULES,
-    },
-  ],
+  overrides: [TYPESCRIPT_OVERRIDE, SCRIPTS_OVERRIDE],
 };
