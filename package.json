@@ -20,6 +20,12 @@
     "db:local": "pscale connect dg --port 3309",
     "db:sync": "yarn pnpify prisma db push",
     "db:generate": "yarn pnpify prisma generate",
+    "db:ui": "yarn pnpify prisma studio",
+    "webhooks": "NODE_ENV=development esrun scripts/webhooks.ts",
+    "webhooks:local": "cloudflared tunnel run dg",
+    "webhooks:create": "yarn webhooks create",
+    "webhooks:list": "yarn webhooks list",
+    "webhooks:delete": "yarn webhooks delete",
     "clean": "rm -r .next"
   },
   "dependencies": {
