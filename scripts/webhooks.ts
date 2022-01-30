@@ -18,19 +18,13 @@ const standardArgs = {
   }),
 };
 
-// Creates a subscription
-const createCommand = command({
-  name: 'create',
-  args: standardArgs,
-  handler: ({ webhookType }) => createSubscription(webhookType),
-});
-
-// Lists all subscriptions
-const listCommand = command({
-  name: 'list',
-  args: standardArgs,
-  handler: ({ webhookType }) => listSubscriptions(webhookType),
-});
+// Tiny wrapper to create a command
+const commandFrom = (name: string, handler: (type: WebhookType) => Promise<void>) =>
+  command({
+    name,
+    args: standardArgs,
+    handler: ({ webhookType }) => handler(webhookType),
+  });
 
 // Deletes a subscription, with a given id
 const deleteCommand = command({
@@ -51,7 +45,11 @@ const deleteCommand = command({
   run(
     subcommands({
       name: 'yarn webhooks',
-      cmds: { create: createCommand, list: listCommand, delete: deleteCommand },
+      cmds: {
+        create: commandFrom('create', createSubscription),
+        list: commandFrom('list', listSubscriptions),
+        delete: deleteCommand,
+      },
     }),
     process.argv.slice(2),
   ))();
