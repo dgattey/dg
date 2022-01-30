@@ -17,6 +17,11 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 - `yarn db:local <branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
 - `yarn db:sync` (assuming the db is currently connected) syncs the schemas to the db branch so you can promote to main through PlanetScale
 - `yarn db:generate` (assuming the db is currently connected) generates schema changes locally to the package
+- `yarn db:ui` (assuming the db is currently connected) opens Prisma Studio to edit/view DB itself
+- `yarn webhooks:local` (assuming cloudflared is installed via brew) starts a tunnel to dev.dylangattey.com for purposes of testing webhooks
+- `yarn webhooks:create <name>` will create a webhook subscription for the given API - for local dev and requires `webhooks:local` to be running already
+- `yarn webhooks:list <name>` will list that API's webhook subscriptions - for local dev
+- `yarn webhooks:delete <name> <id>` will delete a webhook subscription for that API - for local dev
 - `yarn release` bumps the site version, run via Github Action
 
 ## :beginner: Initial Setup
@@ -75,7 +80,23 @@ Because Spotify + Strava use Oauth and I use their APIs to pull stats/etc, I nee
 
 There's only one table, for the tokens, and it's used from the server only. I grab the latest token, see if it's expired, and if so, fetch new data. That's done via Spotify/Strava's APIs + the saved refresh token. Once I persist the new data, I can then call the APIs with the auth tokens. Nice defaults built in so anything missing gives back the right info as possible.
 
-A note on Strava: DO NOT call it from the client. They have a very restrictive API limit, so build-time only makes sure I don't overwhelm it grabbing new data. It's coupled with a webhook that triggers a new build when things change, so I build only when necessary.
+#### Strava
+
+DO NOT make direct API calls to Strava if you can avoid it. They have a very restrictive API limit. Instead, there are webhooks subscriptions set up to persist new activity data to the db. I then use that data via normal API fetchers, but it never hits their servers outside webhooks.
+
+More annoyingly, each app from Strava only has one possible subscription that it can use. Instead of trying to switch the config every time I want to test locally, there's just two different Strava apps I've created, each used for a different setup. The one connected to my personal Strava account is a test app. The one connected to the +prod account is for the prod app. There's an `/webhooks` API route that handles all the logic when called from a webhook subscription.
+
+Testing locally requires more setup. Cloudflare's Tunnel service is what we use. https://dev.dylangattey.com points to your local (running) Next app if you run `yarn webhooks:local`. Make sure the config in ~/.cloudflared exposes the `dg` tunnel with `url: http://localhost:3000`. And close when done! The dev Strava app is set up to hit `dev.dylangattey.com` at `/api/webhooks`, whereas the main one uses `dylangattey.com`.
+
+#### Webhooks
+
+Strava is the only thing that supports webhooks right now!
+
+1. To create a subscription, first run `yarn webhooks:local` after `yarn dev` starts elsewhere. Then run `yarn webhooks:create strava` to make a new subscription. This fails if one already exists. For local subscription testing - you want to make sure you delete the subscription after you're done testing so Strava doesn't keep pinging an endpoint that's not currently live.
+2. To list existing subscriptions, run `yarn webhooks:list strava` to get the ids
+3. To delete a subscription, run `yarn webhooks:delete strava <id>` with an id from the list script
+4. To test actual event handling, just add a `console.log` in `pages/api/webhooks`. To easily test, change the name of a Strava activity to trigger an event. Details about the events at https://developers.strava.com/docs/webhooks/.
+5. If you need to make changes to the prod webhook subscription instead of the local one, change the env variables in `.env.development.local` for `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `STRAVA_TOKEN_NAME`, and `STRAVA_VERIFY_TOKEN` to match the values on Vercel. Restart everything, and you'll be running against the prod webhook setup. These subscriptions are only ever able to be changed locally with this script, or manually with a curl, to prevent tampering.
 
 ### Versioning
 

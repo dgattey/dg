@@ -913,6 +913,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@digitak/esrun@npm:^3.1.2":
+  version: 3.1.2
+  resolution: "@digitak/esrun@npm:3.1.2"
+  dependencies:
+    anymatch: ^3.1.2
+    chokidar: ^3.5.1
+    esbuild: ^0.12.4
+  bin:
+    esrun: library/bin.js
+  checksum: 71e298d06dffccd5285668f1c94777d90d0f03105ea4972e9f56efca540d588491acb3db8d19a3ad68e43ab4e4ed433590957ce33c25334f712017a2f9d0bac3
+  languageName: node
+  linkType: hard
+
 "@emotion/is-prop-valid@npm:^0.8.8":
   version: 0.8.8
   resolution: "@emotion/is-prop-valid@npm:0.8.8"
@@ -3093,7 +3106,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"anymatch@npm:~3.1.2":
+"anymatch@npm:^3.1.2, anymatch@npm:~3.1.2":
   version: 3.1.2
   resolution: "anymatch@npm:3.1.2"
   dependencies:
@@ -3759,7 +3772,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chokidar@npm:^3.5.2":
+"chokidar@npm:^3.5.1, chokidar@npm:^3.5.2":
   version: 3.5.3
   resolution: "chokidar@npm:3.5.3"
   dependencies:
@@ -3957,6 +3970,18 @@ __metadata:
   dependencies:
     mkdirp-infer-owner: ^2.0.0
   checksum: d25bb57a8accab681bcfc632e085573b9395cdc60aed8d0ce479f988f9ced16720c89732aef81020140e43fd223b6573c22402e5a1c0cbd0149443104df88d68
+  languageName: node
+  linkType: hard
+
+"cmd-ts@npm:^0.9.0":
+  version: 0.9.0
+  resolution: "cmd-ts@npm:0.9.0"
+  dependencies:
+    chalk: ^4.0.0
+    debug: ^4.1.1
+    didyoumean: ^1.2.1
+    strip-ansi: ^6.0.0
+  checksum: 664105cc0d7ae1bc98aaa1cb66633eb3168864c5c7ba898a22b1d7fc0ae06c28b626d76688f34abbf0c88eb33caa8b5cba07c153858540dd4c5a099f281361b8
   languageName: node
   linkType: hard
 
@@ -4357,6 +4382,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"data-uri-to-buffer@npm:^4.0.0":
+  version: 4.0.0
+  resolution: "data-uri-to-buffer@npm:4.0.0"
+  checksum: a010653869abe8bb51259432894ac62c52bf79ad761d418d94396f48c346f2ae739c46b254e8bb5987bded8a653d467db1968db3a69bab1d33aa5567baa5cfc7
+  languageName: node
+  linkType: hard
+
 "dataloader@npm:2.0.0":
   version: 2.0.0
   resolution: "dataloader@npm:2.0.0"
@@ -4580,6 +4612,7 @@ __metadata:
     "@commitlint/config-conventional": ^16.0.0
     "@contentful/rich-text-react-renderer": ^15.11.1
     "@contentful/rich-text-types": ^15.11.1
+    "@digitak/esrun": ^3.1.2
     "@graphql-codegen/cli": ^2.4.0
     "@graphql-codegen/near-operation-file-preset": ^2.2.3
     "@graphql-codegen/typescript": ^2.4.2
@@ -4599,6 +4632,7 @@ __metadata:
     "@yarnpkg/pnpify": ^3.1.1-rc.12
     animate-css-grid: ^1.4.3
     api: "link:./src/api::locator=dg%40workspace%3A."
+    cmd-ts: ^0.9.0
     components: "link:./src/components::locator=dg%40workspace%3A."
     dotenv: ^14.3.2
     eslint: ^8.8.0
@@ -4620,6 +4654,7 @@ __metadata:
     lint-staged: ^12.3.2
     mapbox-gl: ^2.6.1
     next: ^12.0.9
+    node-fetch: ^3.2.0
     pages: "link:./src/pages::locator=dg%40workspace%3A."
     postcss: ^8.4.5
     postcss-syntax: ^0.36.2
@@ -4645,6 +4680,13 @@ __metadata:
       unplugged: true
   languageName: unknown
   linkType: soft
+
+"didyoumean@npm:^1.2.1":
+  version: 1.2.2
+  resolution: "didyoumean@npm:1.2.2"
+  checksum: d5d98719d58b3c2fa59663c4c42ba9716f1fd01245c31d5fce31915bd3aa26e6aac149788e007358f778ebbd68a2256eb5973e8ca6f221df221ba060115acf2e
+  languageName: node
+  linkType: hard
 
 "diff@npm:^4.0.1":
   version: 4.0.2
@@ -4891,6 +4933,15 @@ __metadata:
     is-date-object: ^1.0.1
     is-symbol: ^1.0.2
   checksum: 4ead6671a2c1402619bdd77f3503991232ca15e17e46222b0a41a5d81aebc8740a77822f5b3c965008e631153e9ef0580540007744521e72de8e33599fca2eed
+  languageName: node
+  linkType: hard
+
+"esbuild@npm:^0.12.4":
+  version: 0.12.29
+  resolution: "esbuild@npm:0.12.29"
+  bin:
+    esbuild: bin/esbuild
+  checksum: 06a6e84eff02899b45c7d4441199f7bbc824a9f5a2d0332bfe9873963751213c71bcb03b8db96babbc45ef31c140580ff64317ee7600983fc88b84c2d9788bbf
   languageName: node
   linkType: hard
 
@@ -5458,6 +5509,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fetch-blob@npm:^3.1.2, fetch-blob@npm:^3.1.4":
+  version: 3.1.4
+  resolution: "fetch-blob@npm:3.1.4"
+  dependencies:
+    node-domexception: ^1.0.0
+    web-streams-polyfill: ^3.0.3
+  checksum: 81b074f38a2dbfd546dd58e482cefe14e605abd609e272804bf089d588d84f39e3e95b35640bfb376f71d5038c123d4d41be49d9cdf87e5ec8939d37738df0b6
+  languageName: node
+  linkType: hard
+
 "figures@npm:^1.7.0":
   version: 1.7.0
   resolution: "figures@npm:1.7.0"
@@ -5595,6 +5656,15 @@ __metadata:
     node-domexception: 1.0.0
     web-streams-polyfill: 4.0.0-beta.1
   checksum: e1d7aae7d579775b813ddc8ea4511fee613552715e81b36afb188d3a65b3d4df2ef69017106079ba52d9ab1e3367fea0206862d8ae64c02008ababdb341d2c3d
+  languageName: node
+  linkType: hard
+
+"formdata-polyfill@npm:^4.0.10":
+  version: 4.0.10
+  resolution: "formdata-polyfill@npm:4.0.10"
+  dependencies:
+    fetch-blob: ^3.1.2
+  checksum: 82a34df292afadd82b43d4a740ce387bc08541e0a534358425193017bf9fb3567875dc5f69564984b1da979979b70703aa73dee715a17b6c229752ae736dd9db
   languageName: node
   linkType: hard
 
@@ -8266,7 +8336,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-domexception@npm:1.0.0":
+"node-domexception@npm:1.0.0, node-domexception@npm:^1.0.0":
   version: 1.0.0
   resolution: "node-domexception@npm:1.0.0"
   checksum: ee1d37dd2a4eb26a8a92cd6b64dfc29caec72bff5e1ed9aba80c294f57a31ba4895a60fd48347cf17dd6e766da0ae87d75657dfd1f384ebfa60462c2283f5c7f
@@ -8300,6 +8370,17 @@ __metadata:
     encoding:
       optional: true
   checksum: 8d816ffd1ee22cab8301c7756ef04f3437f18dace86a1dae22cf81db8ef29c0bf6655f3215cb0cdb22b420b6fe141e64b26905e7f33f9377a7fa59135ea3e10b
+  languageName: node
+  linkType: hard
+
+"node-fetch@npm:^3.2.0":
+  version: 3.2.0
+  resolution: "node-fetch@npm:3.2.0"
+  dependencies:
+    data-uri-to-buffer: ^4.0.0
+    fetch-blob: ^3.1.4
+    formdata-polyfill: ^4.0.10
+  checksum: 1c809a0f64dd11cc18b49f990440e22c471da47da2a6d6b3388a83beba9d23ba7eaca1b9bf706a792bd283b824cf1a76777910859b9c28ad33a59f2ae4e44f8e
   languageName: node
   linkType: hard
 
@@ -11615,7 +11696,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"web-streams-polyfill@npm:^3.2.0":
+"web-streams-polyfill@npm:^3.0.3, web-streams-polyfill@npm:^3.2.0":
   version: 3.2.0
   resolution: "web-streams-polyfill@npm:3.2.0"
   checksum: e23ad0649392fa0159dbfc6bb27474c308c3f332d9078cfef3c06c154165bef18732c5814126147c6c712f604216ddc950c171c854e3821f020e0d2d721a5958

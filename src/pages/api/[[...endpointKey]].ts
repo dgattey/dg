@@ -1,20 +1,9 @@
 import endpoints, { isValid } from 'api/endpoints';
+import handleApiError, { methodNotAllowedError } from 'api/handleApiError';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 // Just a shorthand for this function type
 type Processor = (request: NextApiRequest, response: NextApiResponse) => Promise<void>;
-
-/**
- * A bunch of different ways an error might be encoded. Check in order
- */
-type ErrorType =
-  | {
-      get?: () => string;
-      message?: string;
-    }
-  | string
-  | undefined
-  | null;
 
 /**
  * Takes a request and transforms the endpoint key out of it, joining any
@@ -34,21 +23,14 @@ const parseEndpointKey = (request: NextApiRequest) => {
 const handleGet: Processor = async (request, response) => {
   const endpointKey = parseEndpointKey(request);
   if (!isValid(endpointKey)) {
-    response.status(500).end('Malformed endpoint key');
+    handleApiError(response, 'Malformed endpoint key');
     return;
   }
   try {
     const data = await endpoints[endpointKey]();
     response.json(data);
-  } catch (error: unknown) {
-    // Might be a few different ways the error is encoded, try most of the common ones
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const typedError = error as ErrorType;
-    const message =
-      typeof typedError === 'string'
-        ? typedError
-        : typedError?.get?.() ?? typedError?.message ?? 'Error executing the call';
-    response.status(500).end(message);
+  } catch (error) {
+    handleApiError(response, error);
   }
 };
 
@@ -63,8 +45,7 @@ const handler: Processor = async (request, response) => {
       return;
     }
     default:
-      response.setHeader('Allow', ['GET']);
-      response.status(405).end(`Method ${method} Not Allowed`);
+      methodNotAllowedError(request, response, ['GET']);
   }
 };
 
