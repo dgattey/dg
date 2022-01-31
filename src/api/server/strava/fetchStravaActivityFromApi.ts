@@ -1,6 +1,7 @@
 import type { Prisma } from 'api/server/generated';
 import stravaClient from 'api/server/networkClients/stravaClient';
 import type { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
+import paredStravaActivity from './paredStravaActivity';
 
 /**
  * Fetches an activity id from Strava's API. Use sparingly! Cuts into small API
@@ -13,7 +14,8 @@ const fetchStravaActivityFromApi = async (id: number) => {
   if (activity.status !== 200) {
     return null;
   }
-  return activity.json();
+  const allData = await activity.json();
+  return paredStravaActivity(allData);
 };
 
 export default fetchStravaActivityFromApi;

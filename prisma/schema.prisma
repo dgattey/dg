@@ -12,20 +12,29 @@ datasource db {
 
 // Defines tokens for directly accessing a service. Expires at is a UTC time stamp
 model Token {
-  id           Int     @id @unique @default(autoincrement())
-  name         String  @unique
-  accessToken  String? @db.VarChar(1000)
-  refreshToken String? @db.VarChar(1000)
-  expiryAt     BigInt? @db.BigInt
+  // Name of the token, used as an index
+  name String @id @unique
+
+  // Current access token, will expire at expiryAt
+  accessToken String? @db.VarChar(768)
+
+  // Token used to fetch a new accessToken
+  refreshToken String? @db.VarChar(768)
+
+  // Date at which the access token will expire
+  expiryAt DateTime?
 }
 
 model StravaActivity {
-  // This isn't auto generated - it's a Strava activity id
-  id BigInt @id @unique @db.BigInt
+  // This isn't auto generated - it's a Strava activity id and is a large value
+  id BigInt @id @unique @db.UnsignedBigInt
+
+  // When the activity was created - used for sorting
+  activityStartDate DateTime
 
   // This maps to a StravaDetailedActivity
   activityData Json
 
   // When the activity was last updated in db
-  lastUpdate BigInt @db.BigInt
+  lastUpdate DateTime?
 }

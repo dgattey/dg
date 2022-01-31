@@ -10,7 +10,7 @@ const UPDATE_THRESHOLD_IN_MS = 60000;
  * or updates the db row for it. Only fetches/updates if the existing
  * data for the activity in the db hasn't been updated in the last minute.
  */
-const fetchAndUpsertActivityInDb = async (id: number) => {
+const fetchFromApiAndSaveToDb = async (id: number) => {
   const existingActivity = await dbClient.stravaActivity.findUnique({
     where: {
       id,
@@ -21,25 +21,27 @@ const fetchAndUpsertActivityInDb = async (id: number) => {
   });
   if (
     existingActivity?.lastUpdate &&
-    existingActivity.lastUpdate > Date.now() - UPDATE_THRESHOLD_IN_MS
+    +existingActivity.lastUpdate > Date.now() - UPDATE_THRESHOLD_IN_MS
   ) {
     // Last update was too recent
     return;
   }
 
   const latestActivityData = await fetchStravaActivityFromApi(id);
-  if (!latestActivityData) {
+  if (!latestActivityData || !latestActivityData.start_date) {
     throw new Error(`Missing activity data for ${id}`);
   }
   return dbClient.stravaActivity.upsert({
     create: {
       id,
       activityData: latestActivityData,
-      lastUpdate: Date.now(),
+      activityStartDate: new Date(latestActivityData.start_date),
+      lastUpdate: new Date(),
     },
     update: {
       activityData: latestActivityData,
-      lastUpdate: Date.now(),
+      activityStartDate: new Date(latestActivityData.start_date),
+      lastUpdate: new Date(),
     },
     where: {
       id,
@@ -73,10 +75,10 @@ const deleteActivityFromDb = async (id: number) =>
 const syncStravaWebhookUpdateWithDb = async (event: StravaWebhookEvent) => {
   switch (event.aspect_type) {
     case 'create':
-      await fetchAndUpsertActivityInDb(event.object_id);
+      await fetchFromApiAndSaveToDb(event.object_id);
       return;
     case 'update':
-      await fetchAndUpsertActivityInDb(event.object_id);
+      await fetchFromApiAndSaveToDb(event.object_id);
       return;
     case 'delete':
       await deleteActivityFromDb(event.object_id);

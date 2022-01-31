@@ -12,8 +12,8 @@ const GRACE_PERIOD_IN_MS = 30000;
  * Given a number of seconds in which something will expire, this function
  * creates a timestamp from that in milliseconds at which things expire.
  */
-const createExpirationInMs = (expiryWindowInSeconds: number) =>
-  Date.now() - GRACE_PERIOD_IN_MS + expiryWindowInSeconds * 1000;
+const createExpirationDate = (expiryWindowInSeconds: number) =>
+  new Date(Date.now() - GRACE_PERIOD_IN_MS + expiryWindowInSeconds * 1000);
 
 // This is shared
 const STRAVA_REFRESH_TOKEN_CONFIG: RefreshTokenConfig = {
@@ -31,8 +31,8 @@ const STRAVA_REFRESH_TOKEN_CONFIG: RefreshTokenConfig = {
     return {
       refreshToken: refresh_token,
       accessToken: access_token,
-      // expires_at is in seconds!
-      expiryAt: expires_at * 1000,
+      // expires_at is a timestamp in seconds!
+      expiryAt: new Date(expires_at * 1000),
     };
   },
 };
@@ -61,7 +61,7 @@ const REFRESH_TOKEN_CONFIGS: Record<TokenKey, RefreshTokenConfig> = {
       return {
         refreshToken,
         accessToken: access_token,
-        expiryAt: createExpirationInMs(expires_in),
+        expiryAt: createExpirationDate(expires_in),
       };
     },
   },

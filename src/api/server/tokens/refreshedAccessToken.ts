@@ -52,7 +52,7 @@ const getLatestTokenIfValid = async ({ name }: Pick<Prisma.TokenCreateArgs['data
 
   // Return either refresh + access, or just refresh if invalid
   const { refreshToken, accessToken, expiryAt } = token;
-  const isValid = expiryAt && expiryAt > Date.now();
+  const isValid = expiryAt && +expiryAt > Date.now();
   return { refreshToken, accessToken: isValid ? accessToken : null };
 };
 
