@@ -13,7 +13,7 @@ const Card = styled(ContentCard)`
  * Shows a card with the latest data from Spotify
  */
 const SpotifyCard = () => {
-  const { data: track } = useData('current/playing');
+  const { data: track } = useData('latest/track');
   if (!track) {
     return null;
   }

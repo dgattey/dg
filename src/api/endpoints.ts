@@ -5,6 +5,7 @@ import fetchContentfulLocation from './server/fetchContentfulLocation';
 import fetchContentfulProjects from './server/fetchContentfulProjects';
 import fetchGithubRepoVersion from './server/fetchGithubRepoVersion';
 import fetchSpotifyCurrentlyPlaying from './server/fetchSpotifyCurrentlyOrRecentlyPlayed';
+import fetchLatestStravaActivityFromDb from './server/strava/fetchLatestStravaActivityFromDb';
 
 /**
  * All possible types of endpoints we could request
@@ -47,7 +48,10 @@ const endpoints = {
   version: fetchGithubRepoVersion,
 
   // Last played song via Spotify
-  'current/playing': fetchSpotifyCurrentlyPlaying,
+  'latest/track': fetchSpotifyCurrentlyPlaying,
+
+  // Fetches the latest Strava activity I've done
+  'latest/activity': fetchLatestStravaActivityFromDb,
 } as const;
 
 /**

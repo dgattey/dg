@@ -8,6 +8,7 @@ import IntroCard from './IntroCard';
 import MapCard from './MapCard';
 import ProjectCard from './ProjectCard';
 import SpotifyCard from './SpotifyCard';
+import StravaCard from './StravaCard';
 
 /**
  * Puts all projects into a grid using `projects` data,
@@ -36,6 +37,7 @@ const Homepage = () => {
       { index: 2, card: <ColorSchemeToggleCard key="color" /> },
       { index: 2, card: <SpotifyCard key="spotify" /> },
       { index: 3, card: <MapCard key="map" gridWidth={staticSize.width} /> },
+      { index: 6, card: <StravaCard key="strava" /> },
     ],
     [staticSize.width],
   );
