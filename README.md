@@ -86,7 +86,9 @@ DO NOT make direct API calls to Strava if you can avoid it. They have a very res
 
 More annoyingly, each app from Strava only has one possible subscription that it can use. Instead of trying to switch the config every time I want to test locally, there's just two different Strava apps I've created, each used for a different setup. The one connected to my personal Strava account is a test app. The one connected to the +prod account is for the prod app. There's an `/webhooks` API route that handles all the logic when called from a webhook subscription.
 
-Testing locally requires more setup. Cloudflare's Tunnel service is what we use. https://dev.dylangattey.com points to your local (running) Next app if you run `yarn webhooks:local`. Make sure the config in ~/.cloudflared exposes the `dg` tunnel with `url: http://localhost:3000`. And close when done! The dev Strava app is set up to hit `dev.dylangattey.com` at `/api/webhooks`, whereas the main one uses `dylangattey.com`.
+Both use the same DB under the hood, but they use different auth tokens, refresh tokens, and callback URLs. An env variable, `process.env.STRAVA_TOKEN_NAME`, is used to switch between them. Note that if you're testing webhook events locally, you'll want to create another branch in the Planetscale DB probably so you don't clobber the DB with simultaneous updates from the local webhook + the live webhook! Or briefly disconnect the prod webhook, then reconnect when done local testing.
+
+Testing locally requires running Cloudflare's Tunnel service. Via it, https://dev.dylangattey.com points to your local (running) Next app if you run `yarn webhooks:local`. Make sure the config in ~/.cloudflared exposes the `dg` tunnel with `url: http://localhost:3000`. And close when done! The dev Strava app is set up to hit `dev.dylangattey.com` at `/api/webhooks`, whereas the main one uses `dylangattey.com`.
 
 #### Webhooks
 

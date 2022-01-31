@@ -6,6 +6,7 @@ import { isRecord } from '../../api/parsers';
 
 // Just a shorthand for this function type
 type Processor = (request: NextApiRequest, response: NextApiResponse) => void;
+type AsyncProcessor = (request: NextApiRequest, response: NextApiResponse) => Promise<void>;
 
 /**
  * Checks most data to see if it's a webhook event
@@ -36,26 +37,36 @@ const handleGet: Processor = (request, response) => {
  * Processes a new webhook event posted to this endpoint and acknlowedges
  * receipt of it.
  */
-const handleWebhookEvent: Processor = (request, response) => {
+const handleWebhookEvent: AsyncProcessor = async (request, response) => {
   if (!isWebhookEvent(request.body)) {
     handleApiError(response, 'Bad Request', 400);
     return;
   }
-  const webhookEvent = request.body;
+  // Strava requires a quick response, so make sure we respond, then process
   response.status(200).end();
+
+  const webhookEvent = request.body;
+  switch (webhookEvent.object_type) {
+    case 'athlete':
+      // We don't handle auth/deauth events
+      break;
+    case 'activity': {
+      // TODO: await fetchStravaActivityFromApi to fetch + save to db if not in db! Otherwise update existing db value
+    }
+  }
 };
 
 /**
  * Handles gets or posts to the webhooks URL
  */
-const handler: Processor = (request, response) => {
+const handler: Processor = async (request, response) => {
   const { method } = request;
   switch (method) {
     case 'GET':
       handleGet(request, response);
       return;
     case 'POST':
-      handleWebhookEvent(request, response);
+      await handleWebhookEvent(request, response);
       return;
     default:
       methodNotAllowedError(request, response, ['GET', 'POST']);

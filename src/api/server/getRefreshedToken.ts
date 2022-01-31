@@ -15,29 +15,33 @@ const GRACE_PERIOD_IN_MS = 30000;
 const createExpirationInMs = (expiryWindowInSeconds: number) =>
   Date.now() - GRACE_PERIOD_IN_MS + expiryWindowInSeconds * 1000;
 
+// This is shared
+const STRAVA_REFRESH_TOKEN_CONFIG: RefreshTokenConfig = {
+  endpoint: 'https://www.strava.com/api/v3/oauth/token',
+  data: {
+    client_id: process.env.STRAVA_CLIENT_ID,
+    client_secret: process.env.STRAVA_CLIENT_SECRET,
+  },
+  validate: (rawData) => {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const { token_type, refresh_token, access_token, expires_at } = rawData as RawStravaToken;
+    if (token_type !== 'Bearer' || !refresh_token || !access_token || !expires_at) {
+      throw new TypeError('Missing data from Strava to refresh token');
+    }
+    return {
+      refreshToken: refresh_token,
+      accessToken: access_token,
+      expiryAt: expires_at,
+    };
+  },
+};
+
 /**
  * All the APIs we support for refreshing tokens
  */
 const REFRESH_TOKEN_CONFIGS: Record<TokenKey, RefreshTokenConfig> = {
-  strava: {
-    endpoint: 'https://www.strava.com/api/v3/oauth/token',
-    data: {
-      client_id: process.env.STRAVA_CLIENT_ID,
-      client_secret: process.env.STRAVA_CLIENT_SECRET,
-    },
-    validate: (rawData) => {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const { token_type, refresh_token, access_token, expires_at } = rawData as RawStravaToken;
-      if (token_type !== 'Bearer' || !refresh_token || !access_token || !expires_at) {
-        throw new TypeError('Missing data from Strava to refresh token');
-      }
-      return {
-        refreshToken: refresh_token,
-        accessToken: access_token,
-        expiryAt: expires_at,
-      };
-    },
-  },
+  strava: STRAVA_REFRESH_TOKEN_CONFIG,
+  stravaDev: STRAVA_REFRESH_TOKEN_CONFIG,
 
   spotify: {
     endpoint: 'https://accounts.spotify.com/api/token',
