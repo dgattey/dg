@@ -34,3 +34,9 @@ export const isDefinedItem = <Type>(item: Type | undefined | null): item is Type
  */
 export const findLinkWithName = (links: Array<Link> | undefined, name: string): Link | undefined =>
   links?.find((link) => link.title?.includes(name));
+
+/**
+ * Typeguard to narrow to a record from unknown
+ */
+export const isRecord = (input: unknown): input is Record<string, unknown> =>
+  typeof input === 'object' && !!input && !Array.isArray(input);
