@@ -1,7 +1,7 @@
+import type { Prisma } from 'api/server/generated';
+import dbClient from 'api/server/networkClients/dbClient';
 import type { TokenKey } from 'api/types/Token';
-import dbClient from './dbClient';
-import type { Prisma } from './generated';
-import getRefreshedToken from './getRefreshedToken';
+import fetchRefreshedTokenFromApi from './fetchRefreshedTokenFromApi';
 
 /**
  * Creates or updates a possibly-existing token given a unique name and
@@ -71,7 +71,7 @@ const refreshedAccessToken = async (name: TokenKey, forceRefresh?: boolean) => {
   }
 
   // Grab a new token and save it
-  const { refreshToken, accessToken, expiryAt } = await getRefreshedToken(
+  const { refreshToken, accessToken, expiryAt } = await fetchRefreshedTokenFromApi(
     name,
     currentData.refreshToken,
   );

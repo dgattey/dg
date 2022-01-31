@@ -1,7 +1,7 @@
 import { isLink } from 'api/parsers';
 import type { HeaderQuery } from 'api/types/generated/fetchContentfulHeaderLinks.generated';
 import { gql } from 'graphql-request';
-import contentfulClient from './contentfulClient';
+import contentfulClient from './networkClients/contentfulClient';
 
 /**
  * Grabs the contentful sections with the title of header. Should

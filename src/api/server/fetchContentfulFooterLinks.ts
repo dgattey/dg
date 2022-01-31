@@ -1,7 +1,7 @@
 import { isDefinedItem, isLink } from 'api/parsers';
 import type { FooterQuery } from 'api/types/generated/fetchContentfulFooterLinks.generated';
 import { gql } from 'graphql-request';
-import contentfulClient from './contentfulClient';
+import contentfulClient from './networkClients/contentfulClient';
 
 /**
  * Grabs the contentful sections with the title of footer. Should

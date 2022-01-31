@@ -1,5 +1,5 @@
+import refreshedAccessToken from 'api/server/tokens/refreshedAccessToken';
 import type { TokenKey } from 'api/types/Token';
-import refreshedAccessToken from './refreshedAccessToken';
 /**
  * Returns true if we're authed via status code
  */

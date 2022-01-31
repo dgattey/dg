@@ -1,5 +1,5 @@
+import stravaClient from 'api/server/networkClients/stravaClient';
 import type { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
-import stravaClient from './stravaClient';
 
 /**
  * Fetches an activity id from Strava's API. Use sparingly! Cuts into small API

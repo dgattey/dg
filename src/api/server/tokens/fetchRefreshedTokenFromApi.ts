@@ -67,9 +67,9 @@ const REFRESH_TOKEN_CONFIGS: Record<TokenKey, RefreshTokenConfig> = {
 };
 
 /**
- * When necessary, gets a new access token/refresh token from Strava
+ * When necessary, gets a new access token/refresh token from the API
  */
-const getRefreshedToken = async (key: TokenKey, refreshToken: string) => {
+const fetchRefreshedTokenFromApi = async (key: TokenKey, refreshToken: string) => {
   const { endpoint, headers, data, validate } = REFRESH_TOKEN_CONFIGS[key];
 
   const rawData = await fetch<RawStravaToken | RawSpotifyToken>(endpoint, {
@@ -93,4 +93,4 @@ const getRefreshedToken = async (key: TokenKey, refreshToken: string) => {
   return validate(await rawData.json(), refreshToken);
 };
 
-export default getRefreshedToken;
+export default fetchRefreshedTokenFromApi;
