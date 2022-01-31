@@ -34,9 +34,9 @@ const Homepage = () => {
   const otherCards = useMemo(
     () => [
       { index: 0, card: <IntroCard key="intro" /> },
-      { index: 2, card: <ColorSchemeToggleCard key="color" /> },
+      { index: 0, card: <MapCard key="map" gridWidth={staticSize.width} /> },
       { index: 2, card: <SpotifyCard key="spotify" /> },
-      { index: 3, card: <MapCard key="map" gridWidth={staticSize.width} /> },
+      { index: 3, card: <ColorSchemeToggleCard key="color" /> },
       { index: 6, card: <StravaCard key="strava" /> },
     ],
     [staticSize.width],
