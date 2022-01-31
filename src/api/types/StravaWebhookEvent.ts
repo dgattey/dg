@@ -10,7 +10,7 @@ interface ActivityUpdate {
   type: string;
 
   /**
-   * Visibility of the activity=
+   * Visibility of the activity
    */
   private: 'true' | 'false';
 }

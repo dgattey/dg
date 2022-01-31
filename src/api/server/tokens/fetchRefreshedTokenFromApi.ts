@@ -31,7 +31,8 @@ const STRAVA_REFRESH_TOKEN_CONFIG: RefreshTokenConfig = {
     return {
       refreshToken: refresh_token,
       accessToken: access_token,
-      expiryAt: expires_at,
+      // expires_at is in seconds!
+      expiryAt: expires_at * 1000,
     };
   },
 };

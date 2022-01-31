@@ -78,7 +78,12 @@ Pretty standard Next app here. `/public` contains static files, `/src` contains 
 
 Because Spotify + Strava use Oauth and I use their APIs to pull stats/etc, I needed a lightweight DB to store auth tokens. That way, I could redeploy without losing them or the refresh tokens that would allow me to fetch new ones. Planetscale comes from the Vercel team and is super easy to use. I wrap the schema generation/calls with Prisma just to get nice typing around it.
 
-There's only one table, for the tokens, and it's used from the server only. I grab the latest token, see if it's expired, and if so, fetch new data. That's done via Spotify/Strava's APIs + the saved refresh token. Once I persist the new data, I can then call the APIs with the auth tokens. Nice defaults built in so anything missing gives back the right info as possible.
+There's only two tables, one for the tokens and one for the Strava activities, and they're used from the server only.
+
+1. **Token**: I grab the latest token, see if it's expired, and if so, fetch new data. That's done via Spotify/Strava's APIs + the saved refresh token. Once I persist the new data, I can then call the APIs with the auth tokens. Nice defaults built in so anything missing gives back the right info as possible.
+2. **StravaActivity**: I create a row when there's a webhook event with a new activity, and I fetch the whole corresponding activity from Strava's API. If there are data updates, for now I just re-fetch the activity and update the row with new JSON data. I keep track of last update time, so multiple updates in the same time window don't hammer Strava's servers.
+
+To do migrations, update the schema file, then create a new branch on Planetscale's UI. Then reconnect with `yarn db:local`. In a new terminal tab, run `yarn db:sync` to push the schema changes & generate new types locally. If all looks good, you can deploy request from Planetscale, review, merge, and delete the branch. And then reconnect locally to main. Just know this'll update the main deployment so it needs backwards compatibility.
 
 #### Strava
 

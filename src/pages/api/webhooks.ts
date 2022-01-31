@@ -1,8 +1,9 @@
 import handleApiError, { methodNotAllowedError } from 'api/handleApiError';
-import echoStravaChallengeIfValid from 'api/server/echoStravaChallengeIfValid';
+import { isRecord } from 'api/parsers';
+import echoStravaChallengeIfValid from 'api/server/strava/echoStravaChallengeIfValid';
+import syncStravaWebhookUpdateWithDb from 'api/server/strava/syncStravaWebhookUpdateWithDb';
 import type { StravaWebhookEvent } from 'api/types/StravaWebhookEvent';
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { isRecord } from '../../api/parsers';
 
 // Just a shorthand for this function type
 type Processor = (request: NextApiRequest, response: NextApiResponse) => void;
@@ -51,7 +52,8 @@ const handleWebhookEvent: AsyncProcessor = async (request, response) => {
       // We don't handle auth/deauth events
       break;
     case 'activity': {
-      // TODO: await fetchStravaActivityFromApi to fetch + save to db if not in db! Otherwise update existing db value
+      // Get the DB data up to date
+      await syncStravaWebhookUpdateWithDb(request.body);
     }
   }
 };

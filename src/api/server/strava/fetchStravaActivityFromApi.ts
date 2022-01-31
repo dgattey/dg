@@ -1,3 +1,4 @@
+import type { Prisma } from 'api/server/generated';
 import stravaClient from 'api/server/networkClients/stravaClient';
 import type { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
 
@@ -6,7 +7,9 @@ import type { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
  * budget. When in doubt, fall back to DB.
  */
 const fetchStravaActivityFromApi = async (id: number) => {
-  const activity = await stravaClient.fetch<StravaDetailedActivity>(`activities/${id}`);
+  const activity = await stravaClient.fetch<StravaDetailedActivity & Prisma.JsonObject>(
+    `activities/${id}`,
+  );
   if (activity.status !== 200) {
     return null;
   }

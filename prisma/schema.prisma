@@ -1,20 +1,31 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["referentialIntegrity"]
-  output   = "../src/api/server/generated"
+  output          = "../src/api/server/generated"
 }
 
 datasource db {
-  provider = "mysql"
-  url = env("DATABASE_URL")
+  provider             = "mysql"
+  url                  = env("DATABASE_URL")
   referentialIntegrity = "prisma"
 }
 
 // Defines tokens for directly accessing a service. Expires at is a UTC time stamp
 model Token {
-id            Int       @default(autoincrement()) @id
-name          String    @unique 
-accessToken   String?   @db.VarChar(1000)
-refreshToken  String?   @db.VarChar(1000)
-expiryAt      BigInt?   @db.BigInt
+  id           Int     @id @unique @default(autoincrement())
+  name         String  @unique
+  accessToken  String? @db.VarChar(1000)
+  refreshToken String? @db.VarChar(1000)
+  expiryAt     BigInt? @db.BigInt
+}
+
+model StravaActivity {
+  // This isn't auto generated - it's a Strava activity id
+  id BigInt @id @unique @db.BigInt
+
+  // This maps to a StravaDetailedActivity
+  activityData Json
+
+  // When the activity was last updated in db
+  lastUpdate BigInt @db.BigInt
 }
