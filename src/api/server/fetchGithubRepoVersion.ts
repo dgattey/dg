@@ -1,6 +1,6 @@
 import type { GithubRepoVersionQuery } from 'api/types/generated/fetchGithubRepoVersion.generated';
 import { gql } from 'graphql-request';
-import githubClient from './githubClient';
+import githubClient from './networkClients/githubClient';
 
 const QUERY = gql`
   query GithubRepoVersion {

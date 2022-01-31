@@ -1,7 +1,7 @@
 import { isProject } from 'api/parsers';
 import type { ProjectsQuery } from 'api/types/generated/fetchContentfulProjects.generated';
 import { gql } from 'graphql-request';
-import contentfulClient from './contentfulClient';
+import contentfulClient from './networkClients/contentfulClient';
 
 /**
  * Grabs all projects to display

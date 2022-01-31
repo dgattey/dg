@@ -2,7 +2,7 @@ import { isDefinedItem } from 'api/parsers';
 import type { MyLocationQuery } from 'api/types/generated/fetchContentfulLocation.generated';
 import type { MapLocation } from 'api/types/MapLocation';
 import { gql } from 'graphql-request';
-import contentfulClient from './contentfulClient';
+import contentfulClient from './networkClients/contentfulClient';
 
 /**
  * Grabs the home location using a known id for it

@@ -1,5 +1,6 @@
 import type { WebhookType } from 'api/types/WebhookType';
 import type { Response } from 'node-fetch';
+import { isRecord } from '../../src/api/parsers';
 
 /**
  * Strava's API returns errors like this
@@ -9,17 +10,11 @@ type JsonResponseWithErrors = {
 };
 
 /**
- * Typeguard to narrow to a record from unknown
- */
-const isObject = (input: unknown): input is Record<string, unknown> =>
-  typeof input === 'object' && !!input && !Array.isArray(input);
-
-/**
  * Typeguard for checking for an error
  */
 const isJsonWithErrors = (
   json: Record<string, unknown> | unknown | undefined,
-): json is JsonResponseWithErrors => isObject(json) && json?.errors !== undefined;
+): json is JsonResponseWithErrors => isRecord(json) && json?.errors !== undefined;
 
 /**
  * Prints out an error for the user for a given webhook if necessary -

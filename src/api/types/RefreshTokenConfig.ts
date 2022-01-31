@@ -6,7 +6,7 @@ import { RawSpotifyToken, RawStravaToken } from './Token';
 type ValidatedToken = {
   refreshToken: string;
   accessToken: string;
-  expiryAt: number;
+  expiryAt: Date;
 };
 
 /**

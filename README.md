@@ -78,7 +78,12 @@ Pretty standard Next app here. `/public` contains static files, `/src` contains 
 
 Because Spotify + Strava use Oauth and I use their APIs to pull stats/etc, I needed a lightweight DB to store auth tokens. That way, I could redeploy without losing them or the refresh tokens that would allow me to fetch new ones. Planetscale comes from the Vercel team and is super easy to use. I wrap the schema generation/calls with Prisma just to get nice typing around it.
 
-There's only one table, for the tokens, and it's used from the server only. I grab the latest token, see if it's expired, and if so, fetch new data. That's done via Spotify/Strava's APIs + the saved refresh token. Once I persist the new data, I can then call the APIs with the auth tokens. Nice defaults built in so anything missing gives back the right info as possible.
+There's only two tables, one for the tokens and one for the Strava activities, and they're used from the server only.
+
+1. **Token**: I grab the latest token, see if it's expired, and if so, fetch new data. That's done via Spotify/Strava's APIs + the saved refresh token. Once I persist the new data, I can then call the APIs with the auth tokens. Nice defaults built in so anything missing gives back the right info as possible.
+2. **StravaActivity**: I create a row when there's a webhook event with a new activity, and I fetch the whole corresponding activity from Strava's API. If there are data updates, for now I just re-fetch the activity and update the row with new JSON data. I keep track of last update time, so multiple updates in the same time window don't hammer Strava's servers.
+
+To do migrations, update the schema file, then create a new branch on Planetscale's UI. Then reconnect with `yarn db:local`. In a new terminal tab, run `yarn db:sync` to push the schema changes & generate new types locally. If all looks good, you can deploy request from Planetscale, review, merge, and delete the branch. And then reconnect locally to main. Just know this'll update the main deployment so it needs backwards compatibility.
 
 #### Strava
 
@@ -86,7 +91,9 @@ DO NOT make direct API calls to Strava if you can avoid it. They have a very res
 
 More annoyingly, each app from Strava only has one possible subscription that it can use. Instead of trying to switch the config every time I want to test locally, there's just two different Strava apps I've created, each used for a different setup. The one connected to my personal Strava account is a test app. The one connected to the +prod account is for the prod app. There's an `/webhooks` API route that handles all the logic when called from a webhook subscription.
 
-Testing locally requires more setup. Cloudflare's Tunnel service is what we use. https://dev.dylangattey.com points to your local (running) Next app if you run `yarn webhooks:local`. Make sure the config in ~/.cloudflared exposes the `dg` tunnel with `url: http://localhost:3000`. And close when done! The dev Strava app is set up to hit `dev.dylangattey.com` at `/api/webhooks`, whereas the main one uses `dylangattey.com`.
+Both use the same DB under the hood, but they use different auth tokens, refresh tokens, and callback URLs. An env variable, `process.env.STRAVA_TOKEN_NAME`, is used to switch between them. Note that if you're testing webhook events locally, you'll want to create another branch in the Planetscale DB probably so you don't clobber the DB with simultaneous updates from the local webhook + the live webhook! Or briefly disconnect the prod webhook, then reconnect when done local testing.
+
+Testing locally requires running Cloudflare's Tunnel service. Via it, https://dev.dylangattey.com points to your local (running) Next app if you run `yarn webhooks:local`. Make sure the config in ~/.cloudflared exposes the `dg` tunnel with `url: http://localhost:3000`. And close when done! The dev Strava app is set up to hit `dev.dylangattey.com` at `/api/webhooks`, whereas the main one uses `dylangattey.com`.
 
 #### Webhooks
 

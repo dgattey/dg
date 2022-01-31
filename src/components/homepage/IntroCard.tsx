@@ -1,11 +1,10 @@
 import useData from 'api/useData';
-import ContentCard, { OverlayStack } from 'components/ContentCard';
+import ContentCard from 'components/ContentCard';
 import HoverableContainer from 'components/HoverableContainer';
 import Image from 'components/Image';
 import RichText from 'components/RichText';
 import useLinkWithName from 'hooks/useLinkWithName';
 import { useState } from 'react';
-import { FiUser } from 'react-icons/fi';
 import styled from 'styled-components';
 
 const ImageCard = styled(ContentCard)`
@@ -16,9 +15,6 @@ const ImageCard = styled(ContentCard)`
     height: var(--size);
     display: flex;
     border-radius: calc(var(--size) / 2);
-    ${OverlayStack} {
-      opacity: 0;
-    }
   }
 `;
 
@@ -53,10 +49,7 @@ const IntroCard = () => {
     <>
       <ImageCard
         link={linkedInLink}
-        overlay={{
-          alwaysVisible: <FiUser />,
-          hiddenUntilHover: <strong>About</strong>,
-        }}
+        overlay="About"
         onMouseOver={() => setIsHovered(true)}
         onMouseOut={() => setIsHovered(false)}
       >

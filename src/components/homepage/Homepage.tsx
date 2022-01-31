@@ -8,6 +8,7 @@ import IntroCard from './IntroCard';
 import MapCard from './MapCard';
 import ProjectCard from './ProjectCard';
 import SpotifyCard from './SpotifyCard';
+import StravaCard from './StravaCard';
 
 /**
  * Puts all projects into a grid using `projects` data,
@@ -33,9 +34,10 @@ const Homepage = () => {
   const otherCards = useMemo(
     () => [
       { index: 0, card: <IntroCard key="intro" /> },
-      { index: 2, card: <ColorSchemeToggleCard key="color" /> },
+      { index: 0, card: <MapCard key="map" gridWidth={staticSize.width} /> },
       { index: 2, card: <SpotifyCard key="spotify" /> },
-      { index: 3, card: <MapCard key="map" gridWidth={staticSize.width} /> },
+      { index: 3, card: <ColorSchemeToggleCard key="color" /> },
+      { index: 6, card: <StravaCard key="strava" /> },
     ],
     [staticSize.width],
   );

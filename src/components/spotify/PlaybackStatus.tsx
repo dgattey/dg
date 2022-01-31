@@ -21,7 +21,7 @@ const PlaybackStatus = ({ played_at }: Props) => {
   const lastPlayed = played_at ?? null;
   const relativeLastPlayed = useRelativeTimeFormat(lastPlayed);
   return (
-    <Container $alignItems="center" $gap="4px">
+    <Container $alignItems="center" $gap="0.4rem">
       {lastPlayed ? (
         `Played ${relativeLastPlayed}`
       ) : (

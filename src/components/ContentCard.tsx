@@ -1,9 +1,9 @@
 import type { Link } from 'api/types/generated/contentfulApi.generated';
+import truncated from 'helpers/truncated';
 import React, { ReactElement, useState } from 'react';
 import styled, { css } from 'styled-components';
 import { cardSize, GRID_ANIMATION_DURATION } from './ContentGrid';
 import ContentWrappingLink from './ContentWrappingLink';
-import Stack from './Stack';
 
 // Special requirements for children here
 type Children = ReactElement | null | undefined;
@@ -20,21 +20,9 @@ type Props = Pick<React.ComponentProps<'article'>, 'className' | 'onMouseOver' |
   verticalSpan?: number;
 
   /**
-   * If anything is specified here, it appears in an overlay
-   * that slides in on hover
+   * If anything is specified here, it appears in an overlay on top of the card
    */
-  overlay?: {
-    /**
-     * Usually just text for a title
-     */
-    hiddenUntilHover: React.ReactNode;
-
-    /**
-     * Usually just an icon that's always visible as an
-     * indicator
-     */
-    alwaysVisible: React.ReactNode;
-  };
+  overlay?: React.ReactNode;
 
   /**
    * If provided, a link to follow upon click anywhere on the
@@ -63,7 +51,7 @@ type LinkWrappedChildrenProps = Pick<Props, 'link' | 'children'> & {
   /**
    * The element that overlays the card
    */
-  overlayContents: JSX.Element | null;
+  overlayContents: React.ReactNode;
 };
 
 interface CardProps {
@@ -90,36 +78,23 @@ interface CardProps {
   $isExpandable: boolean;
 }
 
-// Animates left on hover, as the container animates right, so it appears to stay in place as in comes in
-const HiddenElement = styled.span`
-  transition: opacity var(--transition), transform var(--transition);
-  opacity: 0;
-  transform-origin: left;
-  transform: translateX(100%);
-`;
-
 // A stack for an overlay that animates in from slightly offscreen left when hovered
-export const OverlayStack = styled(Stack).attrs({ $alignItems: 'center', $gap: '8px' })`
-  overflow: hidden;
+export const OverlayContainer = styled.article`
   position: absolute;
   bottom: 1rem;
   left: 1rem;
-  background: var(--contrast-overlay);
-  color: var(--contrast-overlay-inverse);
+  margin: 0;
   padding: 0.5rem 0.75rem;
-  border-radius: var(--border-radius);
+  background-color: var(--background-color);
+  color: var(--color);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.1), 0 0 8px rgba(0, 0, 0, 0.16);
   z-index: 1;
+`;
 
-  transition: transform var(--transition);
-  transform: translateX(calc((var(--border-radius) / 2) - 100%));
-  &:hover {
-    transform: initial;
-    ${HiddenElement} {
-      opacity: 1;
-      transform: initial;
-    }
-  }
+const OverlayEntry = styled.h5`
+  --typography-spacing-vertical: 0.25em;
+  ${truncated(1)}
+  height: calc(var(--line-height) * 1rem);
 `;
 
 // Card component that spans an arbitrary number of rows/cols
@@ -142,13 +117,6 @@ const Card = styled.article<CardProps>`
       cursor: pointer;
       &:hover {
         box-shadow: var(--card-hovered-box-shadow);
-        ${OverlayStack} {
-          transform: initial;
-        }
-        ${HiddenElement} {
-          opacity: 1;
-          transform: initial;
-        }
       }
     `}
 
@@ -192,10 +160,10 @@ const LinkWrappedChildren = ({
     </div>
   );
   return link && !expandOnClick ? (
-    <ContentWrappingLink link={link}>
+    <div>
       {overlayContents}
-      {children}
-    </ContentWrappingLink>
+      <ContentWrappingLink link={link}>{children}</ContentWrappingLink>
+    </div>
   ) : (
     safelyWrappedChildren ?? null
   );
@@ -227,10 +195,9 @@ const ContentCard = ({
     : undefined;
 
   const overlayContents = overlay ? (
-    <OverlayStack>
-      <HiddenElement>{overlay.hiddenUntilHover}</HiddenElement>
-      {overlay.alwaysVisible}
-    </OverlayStack>
+    <OverlayContainer>
+      <OverlayEntry>{overlay}</OverlayEntry>
+    </OverlayContainer>
   ) : null;
 
   return (

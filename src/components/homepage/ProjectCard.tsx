@@ -3,25 +3,13 @@ import ContentCard from 'components/ContentCard';
 import HoverableContainer from 'components/HoverableContainer';
 import Image from 'components/Image';
 import { useState } from 'react';
-import styled from 'styled-components';
-import ProjectIcon from './ProjectIcon';
 
 type Props = Project;
-
-const TitleText = styled.strong`
-  white-space: nowrap;
-`;
-
-// Adds a background and moves it to its own layer so it covers the text as it animates
-const ProjectIconWithBackground = styled(ProjectIcon)`
-  background: var(--contrast-overlay);
-  z-index: 1;
-`;
 
 /**
  * Uses the `ContentCard` to show a project's details
  */
-const ProjectCard = ({ title, layout, link, thumbnail, type }: Props) => {
+const ProjectCard = ({ title, layout, link, thumbnail }: Props) => {
   const verticalSpan = layout === 'tall' ? 2 : 1;
   const horizontalSpan = layout === 'wide' ? 2 : 1;
   const [isHovered, setIsHovered] = useState(false);
@@ -31,10 +19,7 @@ const ProjectCard = ({ title, layout, link, thumbnail, type }: Props) => {
       verticalSpan={verticalSpan}
       horizontalSpan={horizontalSpan}
       link={link}
-      overlay={{
-        alwaysVisible: <ProjectIconWithBackground type={type} />,
-        hiddenUntilHover: <TitleText>{title}</TitleText>,
-      }}
+      overlay={title}
       onMouseOver={() => setIsHovered(true)}
       onMouseOut={() => setIsHovered(false)}
     >
