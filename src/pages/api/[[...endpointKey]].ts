@@ -1,3 +1,4 @@
+import { withSentry } from '@sentry/nextjs';
 import endpoints, { isValid } from 'api/endpoints';
 import handleApiError, { methodNotAllowedError } from 'api/handleApiError';
 import type { NextApiRequest, NextApiResponse } from 'next';
@@ -49,4 +50,4 @@ const handler: Processor = async (request, response) => {
   }
 };
 
-export default handler;
+export default withSentry(handler);

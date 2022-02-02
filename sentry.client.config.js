@@ -1,0 +1,34 @@
+// This file configures the initialization of Sentry on the browser.
+// The config you add here will be used whenever a page is visited.
+// https://docs.sentry.io/platforms/javascript/guides/nextjs/
+
+import {
+  CaptureConsole as CaptureConsoleIntegration,
+  ExtraErrorData as ExtraErrorDataIntegration,
+  Offline as OfflineIntegration,
+} from '@sentry/integrations';
+import * as Sentry from '@sentry/nextjs';
+
+const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
+
+Sentry.init({
+  dsn: SENTRY_DSN || 'https://934929b7c05f440a93a8ae405c01e791@o1132317.ingest.sentry.io/6177783',
+  tracesSampleRate: 1.0,
+
+  // Sets our release value using the NEXT_PUBLIC_APP_VERSION that's generated on `yarn build`
+  release: `dg@${process.env.NEXT_PUBLIC_APP_VERSION ?? 'unknown'}`,
+
+  // Use our node env to determine environment here
+  environment: process.env.NODE_ENV,
+
+  integrations: [
+    // Rewrites console.x into messages!
+    new CaptureConsoleIntegration(),
+
+    // Captures events that happen offline and replays them when back online
+    new OfflineIntegration(),
+
+    // Adds extra non-native data on Errors to Sentry
+    new ExtraErrorDataIntegration(),
+  ],
+});

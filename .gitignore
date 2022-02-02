@@ -42,3 +42,6 @@ tsconfig.tsbuildinfo
 
 # Generated files from Prisma
 src/api/server/generated
+
+# Sentry
+.sentryclirc

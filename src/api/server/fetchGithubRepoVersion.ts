@@ -24,6 +24,11 @@ const QUERY = gql`
  * to run on client, but it'll gracefully fallback to the fallback.
  */
 const fetchGithubRepoVersion = async () => {
+  if (process.env.NEXT_PUBLIC_APP_VERSION && process.env.NEXT_PUBLIC_APP_VERSION.length) {
+    // Quicker short circuit for when this value exists
+    return process.env.NEXT_PUBLIC_APP_VERSION;
+  }
+
   const commitSha = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
   if (!commitSha && !process.env.NODE_ENV) {
     // Fallback for browser only
