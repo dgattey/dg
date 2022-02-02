@@ -67,6 +67,8 @@ Pretty standard Next app here. `/public` contains static files, `/src` contains 
 
 - [Prisma](https://www.prisma.io) and [PlanetScale](https://planetscale.com) power a distributed DB. This DB is used to persist auth tokens for Spotify/Strava beyond the lifetime of a deploy + refresh the token as needed. Prisma adds some nice typing but doesn't play nicely with Yarn PnP.
 
+- [Sentry](https://sentry.io) is used to capture errors + stack traces both serverside and clientside. Captures console logs too. Integrated with releases so we can see when problems start happening.
+
 ### API
 
 1. All endpoints are strongly typed + synced between Next client + server with `/src/api/endpoints.ts`. No endpoint should ever be used directly from client, but the types in this file can be used!
