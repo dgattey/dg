@@ -43,13 +43,6 @@
     ],
     "@semantic-release/release-notes-generator",
     "@semantic-release/github",
-    "@semantic-release/git",
-    [
-      "@semantic-release/exec",
-      {
-        "publishCmd": "yarn sentry-cli releases new 'dg@${nextRelease.version}' && yarn sentry-cli releases set-commits 'dg@${nextRelease.version}' --auto",
-        "successCmd": "yarn sentry-cli releases finalize 'dg@${nextRelease.version}'"
-      }
-    ]
+    "@semantic-release/git"
   ]
 }

@@ -26,4 +26,9 @@ const nextConfig = {
   },
 };
 
-module.exports = withSentryConfig(nextConfig, { silent: true });
+// Release only when we have real version data
+module.exports = withSentryConfig(nextConfig, {
+  silent: true,
+  release: process.env.NEXT_PUBLIC_APP_VERSION,
+  dryRun: process.env.NEXT_PUBLIC_APP_VERSION === 'vX.Y.Z',
+});
