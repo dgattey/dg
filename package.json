@@ -104,54 +104,6 @@
     "stylelint-processor-styled-components": "^1.10.0",
     "typescript": "^4.5.5"
   },
-  "release": {
-    "branches": [
-      "main"
-    ],
-    "plugins": [
-      [
-        "@semantic-release/commit-analyzer",
-        {
-          "preset": "angular",
-          "releaseRules": [
-            {
-              "type": "chore",
-              "release": "patch"
-            },
-            {
-              "type": "build",
-              "release": "patch"
-            },
-            {
-              "type": "test",
-              "release": "patch"
-            },
-            {
-              "type": "ci",
-              "release": "patch"
-            },
-            {
-              "type": "fix",
-              "release": "patch"
-            },
-            {
-              "type": "feat",
-              "release": "minor"
-            }
-          ],
-          "parserOpts": {
-            "noteKeywords": [
-              "BREAKING CHANGE",
-              "BREAKING CHANGES"
-            ]
-          }
-        }
-      ],
-      "@semantic-release/release-notes-generator",
-      "@semantic-release/github",
-      "@semantic-release/git"
-    ]
-  },
   "engines": {
     "node": ">=14"
   },
