@@ -1,3 +1,4 @@
+import { withSentry } from '@sentry/nextjs';
 import handleApiError, { methodNotAllowedError } from 'api/handleApiError';
 import { isRecord } from 'api/parsers';
 import echoStravaChallengeIfValid from 'api/server/strava/echoStravaChallengeIfValid';
@@ -75,4 +76,4 @@ const handler: Processor = async (request, response) => {
   }
 };
 
-export default handler;
+export default withSentry(handler);

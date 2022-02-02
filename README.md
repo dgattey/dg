@@ -22,6 +22,7 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 - `yarn webhooks:create <name>` will create a webhook subscription for the given API - for local dev and requires `webhooks:local` to be running already
 - `yarn webhooks:list <name>` will list that API's webhook subscriptions - for local dev
 - `yarn webhooks:delete <name> <id>` will delete a webhook subscription for that API - for local dev
+- `yarn version` fetches releases from Github and resolves `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA` to a version! Useful from command line
 - `yarn release` bumps the site version, run via Github Action
 
 ## :beginner: Initial Setup
