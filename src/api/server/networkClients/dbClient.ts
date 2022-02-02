@@ -13,7 +13,7 @@ declare global {
 const dbClient =
   global.dbClient ||
   new PrismaClient({
-    log: ['query'],
+    log: ['error', 'warn'],
   });
 
 if (process.env.NODE_ENV !== 'production') {

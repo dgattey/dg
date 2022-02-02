@@ -44,8 +44,6 @@ const handleWebhookEvent: AsyncProcessor = async (request, response) => {
     handleApiError(response, 'Bad Request', 400);
     return;
   }
-  // Strava requires a quick response, so make sure we respond, then process
-  response.status(200).end();
 
   const webhookEvent = request.body;
   switch (webhookEvent.object_type) {
@@ -57,6 +55,9 @@ const handleWebhookEvent: AsyncProcessor = async (request, response) => {
       await syncStravaWebhookUpdateWithDb(request.body);
     }
   }
+
+  // Make sure to respond to Strava with the result
+  response.status(200).end();
 };
 
 /**
