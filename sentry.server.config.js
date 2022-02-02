@@ -19,9 +19,6 @@ Sentry.init({
   // Sets our release value using the NEXT_PUBLIC_APP_VERSION that's generated on `yarn build`
   release: `dg@${process.env.NEXT_PUBLIC_APP_VERSION ?? 'unknown'}`,
 
-  // Use our node env to determine environment here
-  environment: process.env.NODE_ENV,
-
   integrations: [
     // Rewrites console.x into messages!
     new CaptureConsoleIntegration(),
