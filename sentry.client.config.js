@@ -12,7 +12,8 @@ import * as Sentry from '@sentry/nextjs';
 const SENTRY_DSN = process.env.SENTRY_DSN || process.env.NEXT_PUBLIC_SENTRY_DSN;
 
 Sentry.init({
-  dsn: SENTRY_DSN || 'https://934929b7c05f440a93a8ae405c01e791@o1132317.ingest.sentry.io/6177783',
+  dsn: SENTRY_DSN,
+
   tracesSampleRate: 1.0,
 
   // Sets our release value using the NEXT_PUBLIC_APP_VERSION that's generated on `yarn build`
