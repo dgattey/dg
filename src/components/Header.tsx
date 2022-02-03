@@ -16,7 +16,7 @@ interface Props {
 const StickyContainer = styled.section`
   position: sticky;
   top: 0;
-  z-index: 4;
+  z-index: 1;
   pointer-events: none;
 `;
 

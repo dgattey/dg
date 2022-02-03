@@ -31,7 +31,7 @@ const LogoText = styled.article<{ $isScrolled: boolean }>`
   transition: box-shadow var(--transition), transform var(--transition),
     background-color var(--transition);
   will-change: transform;
-  color: #16ac7e;
+  color: rgb(22, 172, 126);
 
   &:before {
     content: '';

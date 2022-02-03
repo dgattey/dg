@@ -26,8 +26,17 @@ const nextConfig = {
   },
 };
 
-// Release only when we have real version data
-module.exports = withSentryConfig(nextConfig, {
+const productionSentryConfig = {
   release: `dg@${process.env.NEXT_PUBLIC_APP_VERSION}`,
-  dryRun: process.env.NEXT_PUBLIC_APP_VERSION === 'vX.Y.Z',
-});
+  dryRun: !process.env.NEXT_PUBLIC_APP_VERSION || process.env.NEXT_PUBLIC_APP_VERSION === 'vX.Y.Z',
+};
+
+const developmentSentryConfig = {
+  silent: true,
+};
+
+// Release only when we have real version data
+module.exports = withSentryConfig(
+  nextConfig,
+  process.env.NODE_ENV === 'development' ? developmentSentryConfig : productionSentryConfig,
+);

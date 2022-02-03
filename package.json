@@ -99,9 +99,14 @@
     "prisma": "3.8.1",
     "semantic-release": "^19.0.2",
     "stylelint": "^14.3.0",
+    "stylelint-color-format": "^1.1.0",
     "stylelint-config-recommended": "^6.0.0",
     "stylelint-config-styled-components": "^0.1.1",
+    "stylelint-csstree-validator": "^2.0.0",
+    "stylelint-declaration-block-no-ignored-properties": "^2.5.0",
+    "stylelint-no-restricted-syntax": "^2.0.0",
     "stylelint-processor-styled-components": "^1.10.0",
+    "stylelint-z-index-value-constraint": "^1.2.0",
     "typescript": "^4.5.5"
   },
   "engines": {

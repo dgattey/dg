@@ -22,7 +22,7 @@ const ImageContainer = styled.article`
 // Flexes as much as our max image size, and maintains an aspect ratio from height
 const FlexedLink = styled(Link)`
   justify-self: flex-end;
-  aspect-ratio: 1;
+  aspect-ratio: 1 / 1;
   height: 100%;
   max-height: ${IMAGE_SIZE}px;
   transition: max-height var(--transition), height var(--transition);
