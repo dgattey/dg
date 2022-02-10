@@ -8,13 +8,9 @@ import { useMemo } from 'react';
  * title or url by passing an override
  */
 const useLinkWithName = (name: string, override?: Pick<LinkProps, 'title' | 'url'>) => {
-  const { data: headerLinks } = useData('header');
   const { data: footerLinks } = useData('footer');
 
-  const allLinks = useMemo(
-    () => [...(headerLinks ?? []), ...(footerLinks ?? [])],
-    [footerLinks, headerLinks],
-  );
+  const allLinks = useMemo(() => [...(footerLinks ?? [])], [footerLinks]);
 
   const foundLink = useMemo(() => findLinkWithName(allLinks, name), [allLinks, name]);
   return override && foundLink ? { ...foundLink, ...override } : foundLink;

@@ -7,7 +7,7 @@ import { Contents, Props } from './_error';
  * If this is on the server, it'll provide a response to use for a status code
  */
 export const getStaticProps = async () => {
-  const data = await fetchFallback(['version', 'footer', 'header']);
+  const data = await fetchFallback(['version', 'footer']);
   return {
     props: {
       fallback: {

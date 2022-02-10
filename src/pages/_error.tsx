@@ -49,7 +49,7 @@ export const getStaticProps = async (context: NextPageContext) => {
   const { res, err, asPath } = context;
   const errorCode = err?.statusCode ?? 404;
   const statusCode = res ? res.statusCode : errorCode;
-  const data = await fetchFallback(['version', 'footer', 'header']);
+  const data = await fetchFallback(['version', 'footer']);
   const props: Props = {
     ...errorProps,
     statusCode,

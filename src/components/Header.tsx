@@ -1,7 +1,5 @@
-import useData from 'api/useData';
 import React from 'react';
 import styled from 'styled-components';
-import Link from './Link';
 import Logo from './Logo';
 
 interface Props {
@@ -28,32 +26,18 @@ const LogoHolder = styled.li`
  * Creates the site header component. It's a bar that spans across the
  * page and shows a logo + header links if they exist.
  */
-const Header = ({ headerRef }: Props) => {
-  const { data: headerLinks } = useData('header');
-  const headerLinkElements = headerLinks && (
-    <ul>
-      {headerLinks.map((link) => (
-        <li key={link.url}>
-          <Link {...link} />
-        </li>
-      ))}
-    </ul>
-  );
-
-  return (
-    <StickyContainer className="container">
-      <header ref={headerRef}>
-        <nav>
-          <ul>
-            <LogoHolder>
-              <Logo />
-            </LogoHolder>
-          </ul>
-          {headerLinkElements}
-        </nav>
-      </header>
-    </StickyContainer>
-  );
-};
+const Header = ({ headerRef }: Props) => (
+  <StickyContainer className="container">
+    <header ref={headerRef}>
+      <nav>
+        <ul>
+          <LogoHolder>
+            <Logo />
+          </LogoHolder>
+        </ul>
+      </nav>
+    </header>
+  </StickyContainer>
+);
 
 export default Header;
