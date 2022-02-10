@@ -16,9 +16,6 @@ Sentry.init({
 
   tracesSampleRate: 1.0,
 
-  // Sets our release value using the NEXT_PUBLIC_APP_VERSION that's generated on `yarn build`
-  release: `dg@${process.env.NEXT_PUBLIC_APP_VERSION ?? 'vX.Y.Z'}`,
-
   integrations: [
     // Rewrites console.x into messages!
     new CaptureConsoleIntegration(),

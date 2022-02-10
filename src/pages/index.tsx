@@ -20,7 +20,6 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
   const data = await fetchFallback([
     'version',
     'footer',
-    'header',
     'projects',
     'intro',
     'location',

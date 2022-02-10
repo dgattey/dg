@@ -27,8 +27,9 @@ const nextConfig = {
 };
 
 const productionSentryConfig = {
-  release: `dg@${process.env.NEXT_PUBLIC_APP_VERSION}`,
-  dryRun: !process.env.NEXT_PUBLIC_APP_VERSION || process.env.NEXT_PUBLIC_APP_VERSION === 'vX.Y.Z',
+  dryRun:
+    // These are the fallbacks when we can't find an app version, like it's not deployed on a real branch
+    ['vX.Y.Z', 'LOCAL'].includes(process.env.NEXT_PUBLIC_APP_VERSION),
 };
 
 const developmentSentryConfig = {

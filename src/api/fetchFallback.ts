@@ -21,7 +21,7 @@ export type Fallback = {
 /**
  * Describes all the data that error pages need to render
  */
-export type ErrorPageFallback = PartialFallback<'version' | 'footer' | 'header'>;
+export type ErrorPageFallback = PartialFallback<'version' | 'footer'>;
 
 /**
  * Fetches all fallback data specified by the array of endpoint keys.

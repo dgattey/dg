@@ -1,5 +1,4 @@
 import fetchContentfulFooterLinks from './server/fetchContentfulFooterLinks';
-import fetchContentfulHeaderLinks from './server/fetchContentfulHeaderLinks';
 import fetchContentfulIntroBlock from './server/fetchContentfulIntroBlock';
 import fetchContentfulLocation from './server/fetchContentfulLocation';
 import fetchContentfulProjects from './server/fetchContentfulProjects';
@@ -40,9 +39,6 @@ const endpoints = {
 
   // Footer links via Contentful
   footer: fetchContentfulFooterLinks,
-
-  // Header data via Contentful
-  header: fetchContentfulHeaderLinks,
 
   // App version via Github
   version: fetchGithubRepoVersion,
