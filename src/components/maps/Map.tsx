@@ -1,5 +1,6 @@
 import type { MapLocation } from 'api/types/MapLocation';
 import useColorScheme from 'hooks/useColorScheme';
+import 'mapbox-gl/dist/mapbox-gl.css';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { AttributionControl, Map as MapGL, MapRef, ViewState } from 'react-map-gl';
 import styled from 'styled-components';
