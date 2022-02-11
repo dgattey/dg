@@ -1,6 +1,8 @@
+import ColorSchemeContext from 'components/ColorSchemeContext';
 import ContentCard from 'components/ContentCard';
 import Stack from 'components/Stack';
-import useColorScheme, { ColorScheme } from 'hooks/useColorScheme';
+import { ColorScheme } from 'hooks/useColorScheme';
+import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 import ColorSchemeIcon from './ColorSchemeIcon';
 
@@ -97,7 +99,7 @@ const ColorSchemeToggleCard = () => {
     isSystemScheme,
     isInitializedWithSystemScheme: hasTheme,
     updatePreferredScheme,
-  } = useColorScheme();
+  } = useContext(ColorSchemeContext);
   const setInvertedScheme = () => updatePreferredScheme(colorScheme === 'dark' ? 'light' : 'dark');
   const clearSavedScheme = () => updatePreferredScheme(null);
 

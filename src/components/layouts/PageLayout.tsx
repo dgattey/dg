@@ -1,5 +1,6 @@
 import type { EndpointKey } from 'api/endpoints';
 import type { PartialFallback } from 'api/fetchFallback';
+import ColorSchemeContext from 'components/ColorSchemeContext';
 import Footer from 'components/Footer';
 import Header from 'components/Header';
 import ScrollIndicatorContext from 'components/ScrollIndicatorContext';
@@ -26,21 +27,23 @@ type Props<Key extends EndpointKey> = Pick<React.ComponentProps<'div'>, 'childre
  * around all items to save on divs. Ensures color scheme is applied.
  */
 const PageLayout = <Key extends EndpointKey>({ children, fallback }: Props<Key>) => {
-  useColorScheme();
+  const colorSchemeData = useColorScheme();
   const headerSizingRef = useRef<HTMLDivElement>(null);
   const { ref, isIndicatorShown } = useShowScrollIndicator(
     headerSizingRef.current?.getBoundingClientRect().height ?? 0,
   );
   return (
     <SWRConfig value={{ fallback }}>
-      <ScrollIndicatorContext.Provider value={isIndicatorShown}>
-        <Header headerRef={headerSizingRef} />
-        <section className="container">
-          <div ref={ref} style={{ height: 0, width: 0 }} />
-          <main>{children}</main>
-        </section>
-        <Footer />
-      </ScrollIndicatorContext.Provider>
+      <ColorSchemeContext.Provider value={colorSchemeData}>
+        <ScrollIndicatorContext.Provider value={isIndicatorShown}>
+          <Header headerRef={headerSizingRef} />
+          <section className="container">
+            <div ref={ref} style={{ height: 0, width: 0 }} />
+            <main>{children}</main>
+          </section>
+          <Footer />
+        </ScrollIndicatorContext.Provider>
+      </ColorSchemeContext.Provider>
     </SWRConfig>
   );
 };
