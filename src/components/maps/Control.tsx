@@ -1,5 +1,5 @@
 /* eslint-disable no-underscore-dangle */
-import { Map } from 'mapbox-gl';
+import type { Map } from 'mapbox-gl';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { useControl } from 'react-map-gl';

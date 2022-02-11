@@ -1,6 +1,5 @@
 import useData from 'api/useData';
 import ContentCard from 'components/ContentCard';
-import Control from 'components/maps/Control';
 import type { Props as MapProps } from 'components/maps/Map';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
@@ -20,9 +19,10 @@ const MIN_DIMENSION = 320;
 // In px, the height of the expanded card
 const EXPANDED_HEIGHT = 600;
 
-// Dynamically imported since they're not possible to server render anyway
+// Dynamically imported for loading speed
 const Map = dynamic(import('components/maps/Map'));
 const Marker = dynamic(import('components/maps/Marker'));
+const Control = dynamic(import('components/maps/Control'));
 
 // Changes between two min heights
 const Card = styled(ContentCard)<{ $height: number }>`
@@ -40,7 +40,7 @@ const Wrapper = styled.div<{ $maxWidth: number }>`
 `;
 
 /**
- * Uses Mapbox to show a canvas-based map of my current location.
+ * Shows a canvas-based map of my current location.
  */
 const MapCard = ({ gridWidth }: Props) => {
   const { data: location } = useData('location');

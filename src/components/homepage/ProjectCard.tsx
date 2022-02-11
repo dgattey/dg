@@ -1,5 +1,6 @@
 import type { Project } from 'api/types/generated/contentfulApi.generated';
 import ContentCard from 'components/ContentCard';
+import { cardSizeInPx } from 'components/ContentGrid';
 import HoverableContainer from 'components/HoverableContainer';
 import Image from 'components/Image';
 import { useState } from 'react';
@@ -25,7 +26,12 @@ const ProjectCard = ({ title, layout, link, thumbnail }: Props) => {
     >
       {thumbnail && (
         <HoverableContainer isHovered={isHovered}>
-          <Image {...thumbnail} alt={title} />
+          <Image
+            {...thumbnail}
+            alt={title}
+            width={cardSizeInPx(horizontalSpan)}
+            height={cardSizeInPx(verticalSpan)}
+          />
         </HoverableContainer>
       )}
     </ContentCard>

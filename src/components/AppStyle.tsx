@@ -1,6 +1,5 @@
 import '@picocss/pico/css/pico.min.css';
 import { ANIMATE_ATTRIBUTE } from 'hooks/useColorScheme';
-import 'mapbox-gl/dist/mapbox-gl.css';
 import { createGlobalStyle, css } from 'styled-components';
 
 /**

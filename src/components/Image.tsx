@@ -13,19 +13,34 @@ type Props = Pick<React.ComponentProps<'img'>, 'className'> &
      * The image layout, defaulting to responsive
      */
     layout?: ImageProps['layout'];
+
+    /**
+     * For the image that should be the LCP
+     */
+    priority?: boolean;
   };
 
 /**
  * Shows a Next Image with the contents of the Asset. Layout defaults to responsive.
  */
-const Image = ({ url, width, height, layout = 'responsive', title, alt, className }: Props) => (
+const Image = ({
+  url,
+  width,
+  height,
+  layout = 'intrinsic',
+  title,
+  alt,
+  className,
+  priority,
+}: Props) => (
   <NextImage
     className={className}
     src={url}
     alt={alt ?? title}
-    width={layout !== 'fill' ? width : undefined}
-    height={layout !== 'fill' ? height : undefined}
+    width={width}
+    height={height}
     layout={layout}
+    priority={priority}
   />
 );
 

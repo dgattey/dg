@@ -67,6 +67,10 @@ const updateThemeAttribute = (scheme: ColorScheme, isSystemScheme: boolean) => {
  * `colorScheme`/`isSystemScheme` are used for prerendered data, as locally,
  * the page will still reflect the system color but anything using this JS
  * is artifically defaulted to light.
+ *
+ * IMPORTANT: must be called only once to allow proper changing - otherwise
+ * the changes are component-level. Pair with ColorSchemeContext for best
+ * results.
  */
 const useColorScheme = () => {
   // The value of these will be different on server vs client - don't use outside a `useEffect`
