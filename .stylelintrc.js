@@ -21,6 +21,7 @@ module.exports = {
       syntaxExtensions: ['sass'],
     },
     'plugin/declaration-block-no-ignored-properties': true,
+    'function-no-unknown': null,
   },
   overrides: [
     {

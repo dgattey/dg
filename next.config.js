@@ -11,6 +11,9 @@ const nextConfig = {
 
     // Allows Yarn PnP to work right now
     swcFileReading: false,
+
+    // Allows SWR to work right now - until Yarn updates
+    esmExternals: false,
   },
   images: {
     domains: ['images.ctfassets.net', 'i.scdn.co'],
