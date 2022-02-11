@@ -1,5 +1,6 @@
 import useData from 'api/useData';
 import ContentCard from 'components/ContentCard';
+import { cardSizeInPx } from 'components/ContentGrid';
 import HoverableContainer from 'components/HoverableContainer';
 import Image from 'components/Image';
 import RichText from 'components/RichText';
@@ -54,7 +55,13 @@ const IntroCard = () => {
         onMouseOut={() => setIsHovered(false)}
       >
         <HoverableContainer isHovered={isHovered}>
-          <Image {...introBlock.image} alt={introBlock.image.title} width={350} height={350} />
+          <Image
+            {...introBlock.image}
+            alt={introBlock.image.title}
+            width={cardSizeInPx()}
+            height={cardSizeInPx()}
+            priority
+          />
         </HoverableContainer>
       </ImageCard>
       <TextCard>
