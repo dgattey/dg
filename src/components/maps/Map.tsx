@@ -100,6 +100,7 @@ const Map = ({ location, viewState: outsideViewState, children }: Props) => {
         touchPitch={false}
         onMove={(event) => setViewState({ ...event.viewState, ...size })}
         mapStyle={colorScheme === 'dark' ? DARK_STYLE : LIGHT_STYLE}
+        styleDiffing={false}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
       >
         <AttributionControl position="bottom-right" />
