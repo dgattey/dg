@@ -15,8 +15,6 @@ type Props = Pick<MapLocation, 'point'> & Partial<Pick<MapLocation, 'image'>>;
  */
 const AreaIndicator = styled.circle.attrs({ r: RADIUS, cx: RADIUS, cy: RADIUS })`
   fill: var(--map-marker);
-  stroke: var(--map-marker-border);
-  stroke-width: 1px;
 `;
 
 const ImageContainer = styled.span`
@@ -28,22 +26,36 @@ const ImageContainer = styled.span`
 /**
  * Creates a standard map marker, centered on a point
  */
-const Marker = ({ point, image }: Props) => (
-  <MapMarker {...point}>
-    <svg width={DIMENSION} height={DIMENSION}>
-      <AreaIndicator />
-    </svg>
-    {image && (
-      <ImageContainer>
-        <Image
-          width={IMAGE_DIMENSION}
-          height={IMAGE_DIMENSION}
-          url={image.url}
-          alt={`${point?.latitude} ${point?.longitude}`}
+const Marker = ({ point, image }: Props) => {
+  const id = `${point?.latitude},${point?.longitude}`;
+  return (
+    <MapMarker {...point}>
+      <svg width={DIMENSION} height={DIMENSION}>
+        <defs>
+          <AreaIndicator id={id} />
+          <clipPath id="clip">
+            <use xlinkHref={`#${id}`} />
+          </clipPath>
+        </defs>
+        <use
+          xlinkHref={`#${id}`}
+          stroke="var(--map-marker-border)"
+          strokeWidth="2"
+          clipPath="url(#clip)"
         />
-      </ImageContainer>
-    )}
-  </MapMarker>
-);
+      </svg>
+      {image && (
+        <ImageContainer>
+          <Image
+            width={IMAGE_DIMENSION}
+            height={IMAGE_DIMENSION}
+            url={image.url}
+            alt={`${point?.latitude} ${point?.longitude}`}
+          />
+        </ImageContainer>
+      )}
+    </MapMarker>
+  );
+};
 
 export default Marker;
