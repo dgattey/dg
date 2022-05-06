@@ -27,7 +27,7 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 
 ## :beginner: Initial Setup
 
-You need Node 14+ and Yarn 3+ installed. The repo uses Yarn zero installs, so just run `yarn` to get started once you have those two installed.
+You need Node 16+ and Yarn 3+ installed. The repo uses Yarn zero installs, so just run `yarn` to get started once you have those two installed.
 
 ## :memo: Pull Requests
 

@@ -32,16 +32,17 @@ const Image = ({
   alt,
   className,
   priority,
-}: Props) => (
-  <NextImage
-    className={className}
-    src={url}
-    alt={alt ?? title}
-    width={width}
-    height={height}
-    layout={layout}
-    priority={priority}
-  />
-);
+}: Props) =>
+  url ? (
+    <NextImage
+      className={className}
+      src={url}
+      alt={alt ?? title}
+      width={width}
+      height={height}
+      layout={layout}
+      priority={priority}
+    />
+  ) : null;
 
 export default Image;

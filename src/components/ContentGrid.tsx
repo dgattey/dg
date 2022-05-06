@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef } from 'react';
 import styled from 'styled-components';
 
 // In ms, how long to animate grid items
@@ -49,7 +49,9 @@ const Grid = styled.div`
 `;
 
 /**
- * Swaps pointer events between being disabled and auto on the children
+ * Swaps pointer events between being disabled and auto on the children to
+ * avoid slowdowns as the browser tries to compute a hover effect as it
+ * animates.
  */
 const changePointerEvents = (isOn: boolean) => (animatedChildren: HTMLElement[]) => {
   animatedChildren.forEach((child) => {
@@ -63,27 +65,44 @@ const changePointerEvents = (isOn: boolean) => (animatedChildren: HTMLElement[])
  * for nice animations when items change in size, which we do when expanding cards.
  */
 const ContentGrid = ({ children }: Pick<React.ComponentProps<'div'>, 'children'>) => {
-  const [hasBeenAnimated, setHasBeenAnimated] = useState(false);
+  const gridRef = useRef<HTMLDivElement>(null);
+  const hasBeenAnimated = useRef(false);
 
-  // Async imports the animation library and wraps the grid if we're on the client & it hasn't been wrapped
-  const animateGrid = async (grid: HTMLDivElement | null) => {
-    if (hasBeenAnimated || !grid || !('window' in global)) {
+  /**
+   * Uses refs so we can be sure that we wrap the grid with animations exactly once.
+   * Imports the animation library (and this is called from an effect) so we don't
+   * do that on the server where it's unneeded.
+   */
+  const importAnimationLibAndWrapGrid = async () => {
+    if (!gridRef.current) {
+      hasBeenAnimated.current = false;
       return;
     }
-    setHasBeenAnimated(true);
-    const { wrapGrid } = await import('animate-css-grid');
-    if (!hasBeenAnimated) {
-      wrapGrid(grid, {
+    if (hasBeenAnimated.current) {
+      return;
+    }
+    hasBeenAnimated.current = true;
+    try {
+      const { wrapGrid } = await import('animate-css-grid');
+
+      wrapGrid(gridRef.current, {
         stagger: 10,
         duration: GRID_ANIMATION_DURATION,
         easing: 'backOut',
         onStart: changePointerEvents(false),
         onEnd: changePointerEvents(true),
       });
+    } catch {
+      hasBeenAnimated.current = false;
     }
   };
 
-  return <Grid ref={animateGrid}>{children}</Grid>;
+  // Make sure we import the animation lib and wrap the grid with animations once
+  useEffect(() => {
+    (() => importAnimationLibAndWrapGrid())();
+  }, []);
+
+  return <Grid ref={gridRef}>{children}</Grid>;
 };
 
 export default ContentGrid;

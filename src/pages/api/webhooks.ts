@@ -1,9 +1,9 @@
-import { withSentry } from '@sentry/nextjs';
 import handleApiError, { methodNotAllowedError } from 'api/handleApiError';
 import { isRecord } from 'api/parsers';
 import echoStravaChallengeIfValid from 'api/server/strava/echoStravaChallengeIfValid';
 import syncStravaWebhookUpdateWithDb from 'api/server/strava/syncStravaWebhookUpdateWithDb';
 import type { StravaWebhookEvent } from 'api/types/StravaWebhookEvent';
+import withSentry from 'api/withSentry';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 // Just a shorthand for this function type
@@ -63,7 +63,7 @@ const handleWebhookEvent: AsyncProcessor = async (request, response) => {
 /**
  * Handles gets or posts to the webhooks URL
  */
-const handler: Processor = async (request, response) => {
+const handler: AsyncProcessor = async (request, response) => {
   const { method } = request;
   switch (method) {
     case 'GET':

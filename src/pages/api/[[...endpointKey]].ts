@@ -1,6 +1,6 @@
-import { withSentry } from '@sentry/nextjs';
 import endpoints, { isValid } from 'api/endpoints';
 import handleApiError, { methodNotAllowedError } from 'api/handleApiError';
+import withSentry from 'api/withSentry';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 // Just a shorthand for this function type

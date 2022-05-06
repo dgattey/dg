@@ -5,21 +5,21 @@ const { withSentryConfig } = require('@sentry/nextjs');
  * */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
+  compiler: {
     // Enables the styled-components SWC transform
     styledComponents: true,
-
-    // Allows Yarn PnP to work right now
-    swcFileReading: false,
-
-    // Allows SWR to work right now - until Yarn updates
-    esmExternals: false,
+  },
+  api: {
+    /**
+     * To remove a false positive error that appears all the time because of Sentry's `withSentry`
+     * api wrapper (https://github.com/getsentry/sentry-javascript/issues/3852)
+     */
+    externalResolver: true,
   },
   images: {
     domains: ['images.ctfassets.net', 'i.scdn.co'],
   },
-
-  // Unfortunately required for Prisma until it upgrades to undici@^4
+  // Unfortunately required for Prisma until it upgrades to undici@^5
   webpack: (config, { isServer }) => {
     if (isServer) {
       config.externals.push('_http_common');
@@ -39,7 +39,6 @@ const developmentSentryConfig = {
   silent: true,
 };
 
-// Release only when we have real version data
 module.exports = withSentryConfig(
   nextConfig,
   process.env.NODE_ENV === 'development' ? developmentSentryConfig : productionSentryConfig,
