@@ -20,15 +20,21 @@ const MIN_DIMENSION = 320;
 const EXPANDED_HEIGHT = 600;
 
 // Dynamically imported for loading speed
-const Map = dynamic(import('components/maps/Map'));
-const Marker = dynamic(import('components/maps/Marker'));
-const Control = dynamic(import('components/maps/Control'));
+const Map = dynamic(() => import('components/maps/Map'), { ssr: false });
+const Marker = dynamic(() => import('components/maps/Marker'), { ssr: false });
+const Control = dynamic(() => import('components/maps/Control'), { ssr: false });
 
 // Changes between two min heights
-const Card = styled(ContentCard)<{ $height: number }>`
+const Card = styled(ContentCard)<{ $height: number; $backgroundImageUrl?: string }>`
+  border: 1px solid var(--background-color);
   ${({ $height }) =>
     css`
       min-height: ${$height}px;
+    `}
+  ${({ $backgroundImageUrl }) =>
+    $backgroundImageUrl &&
+    css`
+      background-image: url('${$backgroundImageUrl}');
     `}
 `;
 
@@ -69,7 +75,11 @@ const MapCard = ({ gridWidth }: Props) => {
   }, [gridWidth, isExpanded]);
 
   return (
-    <Card onExpansion={!isExpanded ? setIsExpanded : undefined} $height={height}>
+    <Card
+      onExpansion={!isExpanded ? setIsExpanded : undefined}
+      $height={height}
+      $backgroundImageUrl={location?.backupImageUrl}
+    >
       <Wrapper $maxWidth={gridWidth ?? 0}>
         {location?.point && (
           <Map location={location} viewState={viewState}>

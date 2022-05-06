@@ -22,6 +22,9 @@ const QUERY = gql`
         height
       }
     }
+    asset(id: "5PrFVu1gJBLhgJGixRL4Wc") {
+      url
+    }
   }
 `;
 
@@ -31,7 +34,7 @@ const QUERY = gql`
 const fetchContentfulLocation = async (): Promise<MapLocation | null> => {
   const data = await contentfulClient.request<MyLocationQuery>(QUERY);
   const location = data?.contentTypeLocation;
-  if (!location) {
+  if (!location || !data?.asset?.url) {
     return null;
   }
   const zoomLevels = location.zoomLevels?.filter(isDefinedItem)?.map(Number) ?? [];
@@ -46,6 +49,7 @@ const fetchContentfulLocation = async (): Promise<MapLocation | null> => {
     initialZoom: location.initialZoom,
     image: location.image,
     zoomLevels,
+    backupImageUrl: data.asset.url,
   };
 };
 
