@@ -2,7 +2,7 @@ import type { MapLocation } from 'api/types/MapLocation';
 import ColorSchemeContext from 'components/ColorSchemeContext';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { AttributionControl, Map as MapGL, MapRef, ViewState } from 'react-map-gl';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import StandardControls from './StandardControls';
 
 interface Size {
@@ -41,8 +41,17 @@ export type Props = {
 const LIGHT_STYLE = 'mapbox://styles/dylangattey/ckyfpsonl01w014q8go5wvnh2?optimize=true';
 const DARK_STYLE = 'mapbox://styles/dylangattey/ckylbbyzc0ok916jx0bvos03d?optimize=true';
 
-// This wrapper ensures we pad ctrls and re-override Pico's button defaults, plus include all of the relevant Mapbox CSS we need
-const Wrapper = styled.div`
+/**
+ * This wrapper ensures we pad ctrls and re-override Pico's button defaults, plus includes
+ * all of the relevant Mapbox CSS we need. Also hides the map until it's fully loaded so
+ * we can show a fallback image before it's loaded.
+ */
+const Wrapper = styled.div<{ $isLoaded: boolean }>`
+  ${({ $isLoaded }) =>
+    !$isLoaded &&
+    css`
+      visibility: hidden;
+    `}
   position: relative;
   height: 100%;
   width: 100%;
@@ -114,6 +123,7 @@ const Wrapper = styled.div`
  */
 const Map = ({ location, viewState: outsideViewState, children }: Props) => {
   const mapRef = useRef<MapRef>(null);
+  const [isLoaded, setIsLoaded] = useState(false);
   const { colorScheme } = useContext(ColorSchemeContext);
   const size = useMemo(
     () => ({
@@ -143,7 +153,7 @@ const Map = ({ location, viewState: outsideViewState, children }: Props) => {
   }, [outsideViewState]);
 
   return (
-    <Wrapper>
+    <Wrapper $isLoaded={isLoaded}>
       <MapGL
         ref={mapRef}
         viewState={viewState}
@@ -158,6 +168,7 @@ const Map = ({ location, viewState: outsideViewState, children }: Props) => {
         mapStyle={colorScheme === 'dark' ? DARK_STYLE : LIGHT_STYLE}
         styleDiffing={false}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+        onLoad={() => setIsLoaded(true)}
       >
         <AttributionControl position="bottom-right" />
         <StandardControls mapRef={mapRef} />
