@@ -33,8 +33,9 @@ jobs:
         run: yarn ${{ matrix.command }}
       - name: Output changed files
         id: changes
+        # Removes both leading/trailing whitespace after getting diffed files and removing package.json/yarn.lock
         run: |
-          CHANGED="$(git diff --name-only --diff-filter=ACMRT | xargs | sed s/package.json//g | sed s/yarn.lock//g)"
+          CHANGED="$(git diff --name-only --diff-filter=ACMRT | xargs | sed s/package.json//g | sed s/yarn.lock//g | sed s/^[ \t]*//;s/[ \t]*$//)"
           COMMAND_NAME="${{ matrix.command }}"
           OUTPUTNAME="${COMMAND_NAME//:/}"
           echo "Changed files were: $CHANGED"
