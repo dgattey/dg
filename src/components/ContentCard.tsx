@@ -100,6 +100,7 @@ const OverlayEntry = styled.h5`
 // Card component that spans an arbitrary number of rows/cols
 const Card = styled.article<CardProps>`
   position: relative;
+  overflow: hidden;
   border: var(--border-width) solid var(--secondary-focus);
   margin: inherit;
   padding: 0;

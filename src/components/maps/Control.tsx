@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import type { Map } from 'mapbox-gl';
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { createRoot } from 'react-dom/client';
 import { useControl } from 'react-map-gl';
 import ControlContainer, { Props as ContainerProps } from './ControlContainer';
 
@@ -51,14 +51,14 @@ class DGControl {
     this._map = map;
     this._container = document.createElement('div');
     this._container.onclick = onClick ?? null;
+    const root = createRoot(this._container);
     if (Array.isArray(children)) {
-      ReactDOM.render(<ControlContainer {...props}>{children}</ControlContainer>, this._container);
+      root.render(<ControlContainer {...props}>{children}</ControlContainer>);
     } else {
-      ReactDOM.render(
+      root.render(
         <ControlContainer onClick={onClick} {...props}>
           {children}
         </ControlContainer>,
-        this._container,
       );
     }
     this._container.className = `mapboxgl-ctrl ${className ?? ''}`;
