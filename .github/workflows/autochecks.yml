@@ -34,7 +34,7 @@ jobs:
       - name: Output changed files
         id: changes
         run: |
-          CHANGED="$(git diff --name-only --diff-filter=ACMRT | xargs)"
+          CHANGED="$(git diff --name-only --diff-filter=ACMRT | xargs | sed s/package.json//g | sed s/yarn.lock//g)"
           COMMAND_NAME="${{ matrix.command }}"
           OUTPUTNAME="${COMMAND_NAME//:/}"
           echo "Changed files were: $CHANGED"
