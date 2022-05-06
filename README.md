@@ -8,7 +8,8 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 
 - `yarn dev` starts the development server.
 - `yarn build` runs a prod build after generating new Prisma types
-- `yarn start` runs a server assuming the site has been previously built
+- `yarn serve` builds a dev version & runs a server with the built site
+- `yarn analyze` builds + loads bundle analysis for a dev version of the site to see what it'll look like when deployed
 - `yarn format` runs Prettier to format the files
 - `yarn lint` runs ESLint to lint all TS(X) and JS(X) files
 - `yarn lint:styles` runs stylelint on the same files
