@@ -18,58 +18,48 @@ const APP_THEME_COLOR = '#16ac7e';
 const APP_BACKGROUND_COLOR = '#ffffff';
 
 /**
+ * Helps reduce duplication for creation of link elements
+ */
+const linkFromSize = (size: string, fileType: string, rel = 'icon') => (
+  <link
+    key={`${size}${fileType}`}
+    rel={rel}
+    href={`/icons/${fileType}-${size}.png`}
+    sizes={`${size}x${size}`}
+  />
+);
+
+/**
+ * Helps reduce duplication for creation of meta elements
+ */
+const metaFromSize = (size: string, fileType: string, name: string) => (
+  <meta key={`${size}${fileType}`} name={name} content={`/icons/${fileType}-${size}.png`} />
+);
+
+/**
  * Organizes and maps icon file sizes/names to their created elements - keep this
  * up to date with everything in public/icons/*.png
  */
 const ICONS = {
   generic: {
     variants: [32, 144, 192, 228],
-    element: (size: string) => (
-      <link
-        key={`${size}generic`}
-        rel="icon"
-        href={`/icons/favicon-${size}.png`}
-        sizes={`${size}x${size}`}
-      />
-    ),
+    element: (size: string) => linkFromSize(size, 'favicon'),
   },
   android: {
     variants: [96, 128, 144, 192, 196, 512],
-    element: (size: string) => (
-      <link
-        key={`${size}android`}
-        rel="icon"
-        href={`/icons/prerounded-${size}.png`}
-        sizes={`${size}x${size}`}
-      />
-    ),
+    element: (size: string) => linkFromSize(size, 'prerounded'),
   },
   ios: {
     variants: [57, 76, 120, 152, 167, 180, 512, 1024],
-    element: (size: string) => (
-      <link
-        key={`${size}ios`}
-        rel="apple-touch-icon"
-        href={`/icons/touch-icon-${size}.png`}
-        sizes={`${size}x${size}`}
-      />
-    ),
+    element: (size: string) => linkFromSize(size, 'touch-icon', 'apple-touch-icon'),
   },
   windows: {
     variants: [144],
-    element: (size: string) => (
-      <meta
-        key={`${size}windows`}
-        name="msapplication-TileImage"
-        content={`/icons/favicon-${size}.png`}
-      />
-    ),
+    element: (size: string) => metaFromSize(size, 'favicon', 'msapplication-TileImage'),
   },
   thumbnail: {
     variants: [152],
-    element: (size: string) => (
-      <meta key={`${size}thumb`} name="thumbnail" content={`/icons/touch-icon-${size}.png`} />
-    ),
+    element: (size: string) => metaFromSize(size, 'touch-icon', 'thumbnail'),
   },
   mask: {
     variants: ['safari-pinned-tab.svg'],

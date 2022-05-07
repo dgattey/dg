@@ -1,0 +1,12 @@
+version: '2'
+
+# Only the customized checks
+checks:
+  method-lines:
+    config:
+      # This is a lot bigger than default because it includes functional components in typescript
+      threshold: 80
+  complex-logic:
+    config:
+      # Doubles the complexity since 4 is rather low as a default
+      threshold: 8
