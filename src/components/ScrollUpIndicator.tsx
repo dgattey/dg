@@ -15,7 +15,7 @@ const Indicator = styled(Stack)<{ $isVisible: boolean }>`
   font-weight: 700;
   font-size: var(--font-size-small);
   opacity: 0;
-  transform: translateY(1.5em);
+  transform: translateX(100%);
   color: var(--contrast);
   transition: opacity var(--transition), transform var(--transition), color var(--transition);
   will-change: transform;
@@ -29,13 +29,14 @@ const Indicator = styled(Stack)<{ $isVisible: boolean }>`
     content: '';
     z-index: -1;
     position: absolute;
-    margin-left: calc(-1 * var(--padding));
-    height: calc(100% + var(--padding));
-    width: calc(100% + var(--padding) * 2);
+    border: 1px solid var(--card-border-color);
+    margin-left: calc(-4 * var(--padding));
+    height: calc(150% + var(--padding));
+    width: calc(100% + var(--padding) * 5);
     border-radius: var(--border-radius);
     box-shadow: var(--card-box-shadow);
     transition: background-color var(--transition);
-    background: var(--background-color);
+    background: var(--card-background-color);
   }
   :hover:before {
     background: var(--primary);
@@ -63,7 +64,7 @@ const ScrollUpIndicator = ({ className }: Props) => {
       className={className}
       onClick={scrollToTop}
       $isVisible={isVisible}
-      $gap="0.5rem"
+      $gap="0.25rem"
       $alignItems="center"
     >
       To Top

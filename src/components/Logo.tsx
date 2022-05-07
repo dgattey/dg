@@ -11,7 +11,7 @@ import Stack from './Stack';
  * logo. Has background on scroll + scales down a bit.
  */
 const LogoText = styled.article<{ $isScrolled: boolean }>`
-  --padding: 1.5rem;
+  --padding: 1rem;
   --margin: 1rem;
   font-size: 2.5rem;
   font-variation-settings: 'wght' 800, 'wdth' 120;
@@ -29,9 +29,11 @@ const LogoText = styled.article<{ $isScrolled: boolean }>`
   pointer-events: auto;
   transform-origin: top left;
   transition: box-shadow var(--transition), transform var(--transition),
-    background-color var(--transition);
+    background-color var(--transition), border-color var(--transition);
   will-change: transform;
   color: rgb(22, 172, 126);
+  border: 2px solid transparent;
+  z-index: 1;
 
   &:before {
     content: '';
@@ -43,6 +45,7 @@ const LogoText = styled.article<{ $isScrolled: boolean }>`
   ${({ $isScrolled }) =>
     $isScrolled
       ? css`
+          border: 2px solid var(--card-border-color);
           transform: scale(0.75);
         `
       : css`
@@ -55,11 +58,12 @@ const SpacedScrollIndicator = styled(ScrollUpIndicator)<{ $isScrolled: boolean }
   ${({ $isScrolled }) =>
     $isScrolled &&
     css`
-      margin-top: -1rem;
       &:hover {
         transform: scale(1.05);
       }
     `}
+  margin-left: -0.5rem;
+  margin-top: 2rem;
 `;
 
 const StyledLink = styled.a``;
@@ -80,7 +84,7 @@ const Logo = () => {
       </Link>
     );
   return (
-    <Stack $gap="1rem" $alignItems="center" $justifyContent="spaceAround">
+    <Stack $alignItems="flex-start">
       <LogoText $isScrolled={isScrolled}>{linkedLogoText}</LogoText>
       <SpacedScrollIndicator $isScrolled={isScrolled} />
     </Stack>

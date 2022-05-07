@@ -85,7 +85,7 @@ export const OverlayContainer = styled.article`
   left: 1rem;
   margin: 0;
   padding: 0.5rem 0.75rem;
-  background-color: var(--background-color);
+  background-color: var(--card-background-color);
   color: var(--color);
   box-shadow: 0 0 4px rgba(0, 0, 0, 0.1), 0 0 8px rgba(0, 0, 0, 0.16);
   z-index: 1;

@@ -17,6 +17,7 @@ const ImageContainer = styled.article`
   --border-radius: 1.5rem;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 `;
 
 // Flexes as much as our max image size, and maintains an aspect ratio from height
