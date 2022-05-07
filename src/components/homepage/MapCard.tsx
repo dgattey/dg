@@ -1,10 +1,12 @@
 import useData from 'api/useData';
+import type { Props as ContentCardProps } from 'components/ContentCard';
 import ContentCard from 'components/ContentCard';
 import { Expand, X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useState } from 'react';
 import styled, { css } from 'styled-components';
 
+type Props = Pick<ContentCardProps, 'turnOnAnimation'>;
 interface IsExpanded {
   $isExpanded: boolean;
 }
@@ -52,7 +54,7 @@ const ExpandButton = styled(Control)`
 /**
  * Shows a canvas-based map of my current location.
  */
-const MapCard = () => {
+const MapCard = ({ turnOnAnimation }: Props) => {
   const { data: location } = useData('location');
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -61,6 +63,7 @@ const MapCard = () => {
       $isExpanded={isExpanded}
       onExpansion={!isExpanded ? setIsExpanded : undefined}
       $backgroundImageUrl={location?.backupImageUrl}
+      turnOnAnimation={turnOnAnimation}
     >
       {location?.point && (
         <Map location={location} isExpanded={isExpanded}>

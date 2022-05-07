@@ -1,14 +1,18 @@
 import type { Link } from 'api/types/generated/contentfulApi.generated';
 import truncated from 'helpers/truncated';
+import { GRID_ANIMATION_DURATION } from 'hooks/useGridAnimation';
 import React, { ReactElement, useState } from 'react';
 import styled, { css } from 'styled-components';
-import { cardSize, GRID_ANIMATION_DURATION } from './ContentGrid';
+import { cardSize } from './ContentGrid';
 import ContentWrappingLink from './ContentWrappingLink';
 
 // Special requirements for children here
 type Children = ReactElement | null | undefined;
 
-type Props = Pick<React.ComponentProps<'article'>, 'className' | 'onMouseOver' | 'onMouseOut'> & {
+export type Props = Pick<
+  React.ComponentProps<'article'>,
+  'className' | 'onMouseOver' | 'onMouseOut'
+> & {
   /**
    * How many columns the card spans, defaults to 1
    */
@@ -40,6 +44,12 @@ type Props = Pick<React.ComponentProps<'article'>, 'className' | 'onMouseOver' |
    * Children must exist!
    */
   children: Children;
+
+  /**
+   * Function that starts an animation when the card is expanded
+   * and removes the animation once finished.
+   */
+  turnOnAnimation?: () => void;
 };
 
 type LinkWrappedChildrenProps = Pick<Props, 'link' | 'children'> & {
@@ -183,6 +193,7 @@ const ContentCard = ({
   onExpansion,
   onMouseOver,
   onMouseOut,
+  turnOnAnimation,
 }: Props) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const expandOnClick = !!onExpansion;
@@ -190,6 +201,7 @@ const ContentCard = ({
   // Swaps the expansion variable and calls the user callback
   const toggleExpansion = onExpansion
     ? () => {
+        turnOnAnimation?.();
         setIsExpanded(!isExpanded);
         onExpansion(!isExpanded);
       }
