@@ -6,7 +6,7 @@ checks:
     config:
       # This is a lot bigger than default because it includes functional components in typescript
       threshold: 80
-  complex-logic:
+  method-complexity:
     config:
-      # Doubles the complexity since 4 is rather low as a default
-      threshold: 8
+      # Triples the complexity since 5 is rather low as a default
+      threshold: 12
