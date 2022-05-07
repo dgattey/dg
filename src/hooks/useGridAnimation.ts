@@ -76,8 +76,8 @@ const useGridAnimation = (gridRef: React.RefObject<HTMLDivElement>) => {
       duration: GRID_ANIMATION_DURATION,
       easing: 'backOut',
       onStart: changePointerEvents(false),
-      onEnd: () => {
-        changePointerEvents(true);
+      onEnd: (animatedChildren) => {
+        changePointerEvents(true)(animatedChildren);
         turnOffAnimation();
       },
     });
