@@ -949,6 +949,52 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@fortawesome/fontawesome-common-types@npm:6.1.1":
+  version: 6.1.1
+  resolution: "@fortawesome/fontawesome-common-types@npm:6.1.1"
+  checksum: 4db285557dd9d178e313a9596ad1c4ba84e9d47efb53dea3206de1bf98252574e0d95c3a0b114cc3cb5f162e2622a2cf8f037011fc98818ccade7bfb6c0c335b
+  languageName: node
+  linkType: hard
+
+"@fortawesome/fontawesome-svg-core@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "@fortawesome/fontawesome-svg-core@npm:6.1.1"
+  dependencies:
+    "@fortawesome/fontawesome-common-types": 6.1.1
+  checksum: bf3b09a1ec3c5d6be30ea04c83dffb921c5a457c547fb1b99b814591489efabf939f669878cc5b48deb9771ef705209a1bb1b3088e66f6873cc9b34cbf4c781c
+  languageName: node
+  linkType: hard
+
+"@fortawesome/free-brands-svg-icons@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "@fortawesome/free-brands-svg-icons@npm:6.1.1"
+  dependencies:
+    "@fortawesome/fontawesome-common-types": 6.1.1
+  checksum: a878cc764ec74f1d0fe8cf8e6c4e7dd4bf829f614b741a39416b155adb23c37e70f7e077d76b301a269a7f7b28cdcc3af9191460986aa470b31c40d04ee7d59d
+  languageName: node
+  linkType: hard
+
+"@fortawesome/free-solid-svg-icons@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "@fortawesome/free-solid-svg-icons@npm:6.1.1"
+  dependencies:
+    "@fortawesome/fontawesome-common-types": 6.1.1
+  checksum: 9c42f45af9e75410d9e20a110c4262ded1a778887dc3b1200c0576f6b226e6a5568fb85a862090b45b06060f878798ddde60b987ef56aafccbaa1e7a378dd17c
+  languageName: node
+  linkType: hard
+
+"@fortawesome/react-fontawesome@npm:^0.1.18":
+  version: 0.1.18
+  resolution: "@fortawesome/react-fontawesome@npm:0.1.18"
+  dependencies:
+    prop-types: ^15.8.1
+  peerDependencies:
+    "@fortawesome/fontawesome-svg-core": ~1 || ~6
+    react: ">=16.x"
+  checksum: eba711234541928e1877435905bcd94ab6aea1cf228833a55fc7c6a2fc18dd08d3f7f327ca4af0f3ba365188ad0869d7ecd31be5940d27f4e2bbe7e12cbcf520
+  languageName: node
+  linkType: hard
+
 "@gar/promisify@npm:^1.1.3":
   version: 1.1.3
   resolution: "@gar/promisify@npm:1.1.3"
@@ -1576,6 +1622,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@next/bundle-analyzer@npm:^12.1.6":
+  version: 12.1.6
+  resolution: "@next/bundle-analyzer@npm:12.1.6"
+  dependencies:
+    webpack-bundle-analyzer: 4.3.0
+  checksum: cf37be49d45d706aea95df489656341bec64783e567067d15036b25330d7a69204987b2c402277f201b9bf943de588323b120fd8096bb3d6846a054bbb2cdc7e
+  languageName: node
+  linkType: hard
+
 "@next/env@npm:12.1.6":
   version: 12.1.6
   resolution: "@next/env@npm:12.1.6"
@@ -2031,6 +2086,13 @@ __metadata:
   version: 1.5.0
   resolution: "@picocss/pico@npm:1.5.0"
   checksum: d48892232e98b4c40a4fdf7a16fe371d51668d5e0a6e49e78ca459fd12e055fe4cb472f863227ad208b3c7264e67d8cc88bea83d51cf6ad21cc2f551aaad3e69
+  languageName: node
+  linkType: hard
+
+"@polka/url@npm:^1.0.0-next.20":
+  version: 1.0.0-next.21
+  resolution: "@polka/url@npm:1.0.0-next.21"
+  checksum: c7654046d38984257dd639eab3dc770d1b0340916097b2fac03ce5d23506ada684e05574a69b255c32ea6a144a957c8cd84264159b545fca031c772289d88788
   languageName: node
   linkType: hard
 
@@ -2650,7 +2712,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/prop-types@npm:*":
+"@types/prop-types@npm:*, @types/prop-types@npm:^15":
   version: 15.7.5
   resolution: "@types/prop-types@npm:15.7.5"
   checksum: 5b43b8b15415e1f298243165f1d44390403bb2bd42e662bca3b5b5633fdd39c938e91b7fce3a9483699db0f7a715d08cef220c121f723a634972fdf596aec980
@@ -3168,14 +3230,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn-walk@npm:^8.1.1":
+"acorn-walk@npm:^8.0.0, acorn-walk@npm:^8.1.1":
   version: 8.2.0
   resolution: "acorn-walk@npm:8.2.0"
   checksum: 1715e76c01dd7b2d4ca472f9c58968516a4899378a63ad5b6c2d668bba8da21a71976c14ec5f5b75f887b6317c4ae0b897ab141c831d741dc76024d8745f1ad1
   languageName: node
   linkType: hard
 
-"acorn@npm:^8.4.1, acorn@npm:^8.5.0, acorn@npm:^8.7.1":
+"acorn@npm:^8.0.4, acorn@npm:^8.4.1, acorn@npm:^8.5.0, acorn@npm:^8.7.1":
   version: 8.7.1
   resolution: "acorn@npm:8.7.1"
   bin:
@@ -4390,6 +4452,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"commander@npm:^6.2.0":
+  version: 6.2.1
+  resolution: "commander@npm:6.2.1"
+  checksum: d7090410c0de6bc5c67d3ca41c41760d6d268f3c799e530aafb73b7437d1826bbf0d2a3edac33f8b57cc9887b4a986dce307fa5557e109be40eadb7c43b21742
+  languageName: node
+  linkType: hard
+
 "commander@npm:^8.3.0":
   version: 8.3.0
   resolution: "commander@npm:8.3.0"
@@ -4961,10 +5030,15 @@ __metadata:
     "@contentful/rich-text-react-renderer": ^15.12.1
     "@contentful/rich-text-types": ^15.12.1
     "@digitak/esrun": ^3.2.2
+    "@fortawesome/fontawesome-svg-core": ^6.1.1
+    "@fortawesome/free-brands-svg-icons": ^6.1.1
+    "@fortawesome/free-solid-svg-icons": ^6.1.1
+    "@fortawesome/react-fontawesome": ^0.1.18
     "@graphql-codegen/cli": ^2.6.2
     "@graphql-codegen/near-operation-file-preset": ^2.2.11
     "@graphql-codegen/typescript": ^2.4.10
     "@graphql-codegen/typescript-operations": ^2.3.7
+    "@next/bundle-analyzer": ^12.1.6
     "@picocss/pico": ^1.5.0
     "@prisma/client": ^3.13.0
     "@semantic-release/changelog": ^6.0.1
@@ -4974,6 +5048,7 @@ __metadata:
     "@stylelint/postcss-css-in-js": ^0.38.0
     "@types/mapbox-gl": ^2.7.1
     "@types/node": ^16.11.33
+    "@types/prop-types": ^15
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.3
     "@types/styled-components": ^5.1.25
@@ -4981,16 +5056,18 @@ __metadata:
     "@typescript-eslint/parser": ^5.22.0
     "@yarnpkg/pnpify": ^4.0.0-rc.4
     animate-css-grid: ^1.4.3
-    api: "link:./src/api::locator=dg%40workspace%3A."
+    api: "link:./src/api"
     cmd-ts: ^0.10.1
-    components: "link:./src/components::locator=dg%40workspace%3A."
+    components: "link:./src/components"
     dotenv: ^16.0.0
     eslint: ^8.14.0
     eslint-config-airbnb: ^19.0.4
     eslint-config-airbnb-typescript: ^17.0.0
+    eslint-config-dg: "link:./eslint-plugin-dg"
     eslint-config-next: ^12.1.6
     eslint-config-prettier: ^8.5.0
     eslint-import-resolver-typescript: ^2.7.1
+    eslint-plugin-dg: "link:./eslint-plugin-dg"
     eslint-plugin-import: ^2.26.0
     eslint-plugin-jsx-a11y: ^6.5.1
     eslint-plugin-react: ^7.29.4
@@ -4999,20 +5076,21 @@ __metadata:
     graphql: ^16.4.0
     graphql-request: ^4.2.0
     graphql-tag: ^2.12.6
-    hooks: "link:./src/hooks::locator=dg%40workspace%3A."
+    hooks: "link:./src/hooks"
     husky: ^7.0.4
     lint-staged: ^12.4.1
+    lucide-react: ^0.39.0
     mapbox-gl: ^2.8.2
     next: ^12.1.6
     node-fetch: ^3.2.4
-    pages: "link:./src/pages::locator=dg%40workspace%3A."
+    pages: "link:./src/pages"
     postcss: ^8.4.13
     postcss-syntax: ^0.36.2
     prettier: ^2.6.2
     prisma: ^3.13.0
+    prop-types: ^15.8.1
     react: ^18.1.0
     react-dom: ^18.1.0
-    react-icons: ^4.3.1
     react-intersection-observer: ^9.1.0
     react-is: ^18.1.0
     react-map-gl: ^7.0.11
@@ -5129,6 +5207,13 @@ __metadata:
   version: 0.1.4
   resolution: "duplexer3@npm:0.1.4"
   checksum: c2fd6969314607d23439c583699aaa43c4100d66b3e161df55dccd731acc57d5c81a64bb4f250805fbe434ddb1d2623fee2386fb890f5886ca1298690ec53415
+  languageName: node
+  linkType: hard
+
+"duplexer@npm:^0.1.2":
+  version: 0.1.2
+  resolution: "duplexer@npm:0.1.2"
+  checksum: 62ba61a830c56801db28ff6305c7d289b6dc9f859054e8c982abd8ee0b0a14d2e9a8e7d086ffee12e868d43e2bbe8a964be55ddbd8c8957714c87373c7a4f9b0
   languageName: node
   linkType: hard
 
@@ -5379,6 +5464,12 @@ __metadata:
   languageName: node
   linkType: hard
 
+"eslint-config-dg@link:./eslint-plugin-dg::locator=dg%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "eslint-config-dg@link:./eslint-plugin-dg::locator=dg%40workspace%3A."
+  languageName: node
+  linkType: soft
+
 "eslint-config-next@npm:^12.1.6":
   version: 12.1.6
   resolution: "eslint-config-next@npm:12.1.6"
@@ -5449,6 +5540,12 @@ __metadata:
   checksum: 77048263f309167a1e6a1e1b896bfb5ddd1d3859b2e2abbd9c32c432aee13d610d46e6820b1ca81b37fba437cf423a404bc6649be64ace9148a3062d1886a678
   languageName: node
   linkType: hard
+
+"eslint-plugin-dg@link:./eslint-plugin-dg::locator=dg%40workspace%3A.":
+  version: 0.0.0-use.local
+  resolution: "eslint-plugin-dg@link:./eslint-plugin-dg::locator=dg%40workspace%3A."
+  languageName: node
+  linkType: soft
 
 "eslint-plugin-import@npm:^2.25.4, eslint-plugin-import@npm:^2.26.0":
   version: 2.26.0
@@ -6527,6 +6624,15 @@ __metadata:
   version: 1.1.0
   resolution: "grid-index@npm:1.1.0"
   checksum: 0e9d427b606ac644a723719116bb067639c01dccc881f161525e8eddb13b2de3b8a274641ef6d926d7629877ad8ed06b45290d52dd2d8af45532c50ccbbefe43
+  languageName: node
+  linkType: hard
+
+"gzip-size@npm:^6.0.0":
+  version: 6.0.0
+  resolution: "gzip-size@npm:6.0.0"
+  dependencies:
+    duplexer: ^0.1.2
+  checksum: 2df97f359696ad154fc171dcb55bc883fe6e833bca7a65e457b9358f3cb6312405ed70a8da24a77c1baac0639906cd52358dc0ce2ec1a937eaa631b934c94194
   languageName: node
   linkType: hard
 
@@ -8234,6 +8340,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lucide-react@npm:^0.39.0":
+  version: 0.39.0
+  resolution: "lucide-react@npm:0.39.0"
+  peerDependencies:
+    prop-types: ^15.7.2
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0
+  checksum: 17b3af1164b38ff59a2bd2a5283e09ce05c51c0f5fd0007a23abb4bc42420a1fef7ad339988898bbf1f19a53b8b9f6c65a4f18fef1678a3a8df4d26f293b3caa
+  languageName: node
+  linkType: hard
+
 "make-error@npm:^1, make-error@npm:^1.1.1":
   version: 1.3.6
   resolution: "make-error@npm:1.3.6"
@@ -8658,6 +8774,13 @@ __metadata:
   version: 1.0.1
   resolution: "modify-values@npm:1.0.1"
   checksum: 8296610c608bc97b03c2cf889c6cdf4517e32fa2d836440096374c2209f6b7b3e256c209493a0b32584b9cb32d528e99d0dd19dcd9a14d2d915a312d391cc7e9
+  languageName: node
+  linkType: hard
+
+"mrmime@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "mrmime@npm:1.0.0"
+  checksum: 2c72a40942af7c53bc97d1e9e9c5cb0e6541d18f736811c3a1b46fa2a2b2362480d687daa8ae8372523acaacd82426a4f7ce34b0bf1825ea83b3983e8cb91afd
   languageName: node
   linkType: hard
 
@@ -10122,15 +10245,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"react-icons@npm:^4.3.1":
-  version: 4.3.1
-  resolution: "react-icons@npm:4.3.1"
-  peerDependencies:
-    react: "*"
-  checksum: 2cc608acdd3e906aa3aaee290b8398220639677c949382d86e554020e5dab6a9f1ed7484418aa5272cb5c5c018e1fc9a323d433d901697a76530029f9ecb1263
-  languageName: node
-  linkType: hard
-
 "react-intersection-observer@npm:^9.1.0":
   version: 9.1.0
   resolution: "react-intersection-observer@npm:9.1.0"
@@ -10911,6 +11025,17 @@ __metadata:
   dependencies:
     is-arrayish: ^0.3.1
   checksum: a7f3f2ab5c76c4472d5c578df892e857323e452d9f392e1b5cf74b74db66e6294a1e1b8b390b519fa1b96b5b613f2a37db6cffef52c3f1f8f3c5ea64eb2d54c0
+  languageName: node
+  linkType: hard
+
+"sirv@npm:^1.0.7":
+  version: 1.0.19
+  resolution: "sirv@npm:1.0.19"
+  dependencies:
+    "@polka/url": ^1.0.0-next.20
+    mrmime: ^1.0.0
+    totalist: ^1.0.0
+  checksum: c943cfc61baf85f05f125451796212ec35d4377af4da90ae8ec1fa23e6d7b0b4d9c74a8fbf65af83c94e669e88a09dc6451ba99154235eead4393c10dda5b07c
   languageName: node
   linkType: hard
 
@@ -11859,6 +11984,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"totalist@npm:^1.0.0":
+  version: 1.1.0
+  resolution: "totalist@npm:1.1.0"
+  checksum: dfab80c7104a1d170adc8c18782d6c04b7df08352dec452191208c66395f7ef2af7537ddfa2cf1decbdcfab1a47afbbf0dec6543ea191da98c1c6e1599f86adc
+  languageName: node
+  linkType: hard
+
 "tr46@npm:^1.0.1":
   version: 1.0.1
   resolution: "tr46@npm:1.0.1"
@@ -12400,6 +12532,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"webpack-bundle-analyzer@npm:4.3.0":
+  version: 4.3.0
+  resolution: "webpack-bundle-analyzer@npm:4.3.0"
+  dependencies:
+    acorn: ^8.0.4
+    acorn-walk: ^8.0.0
+    chalk: ^4.1.0
+    commander: ^6.2.0
+    gzip-size: ^6.0.0
+    lodash: ^4.17.20
+    opener: ^1.5.2
+    sirv: ^1.0.7
+    ws: ^7.3.1
+  bin:
+    webpack-bundle-analyzer: lib/bin/analyzer.js
+  checksum: 00b7bf4ac9fca17062b66b6897145b94e87153d3ec8815f0e0c05a3b8a1ca75320262db01a5fa634f604ee3d41aecde1ee59838d05b6d03cd5be62eb1addbcf8
+  languageName: node
+  linkType: hard
+
 "webpack-sources@npm:^3.2.3":
   version: 3.2.3
   resolution: "webpack-sources@npm:3.2.3"
@@ -12583,6 +12734,21 @@ __metadata:
     imurmurhash: ^0.1.4
     signal-exit: ^3.0.7
   checksum: 8f780232533ca6223c63c9b9c01c4386ca8c625ebe5017a9ed17d037aec19462ae17109e0aa155bff5966ee4ae7a27b67a99f55caf3f32ffd84155e9da3929fc
+  languageName: node
+  linkType: hard
+
+"ws@npm:^7.3.1":
+  version: 7.5.7
+  resolution: "ws@npm:7.5.7"
+  peerDependencies:
+    bufferutil: ^4.0.1
+    utf-8-validate: ^5.0.2
+  peerDependenciesMeta:
+    bufferutil:
+      optional: true
+    utf-8-validate:
+      optional: true
+  checksum: 5c1f669a166fb57560b4e07f201375137fa31d9186afde78b1508926345ce546332f109081574ddc4e38cc474c5406b5fc71c18d71eb75f6e2d2245576976cba
   languageName: node
   linkType: hard
 

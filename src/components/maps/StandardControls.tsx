@@ -1,5 +1,5 @@
+import { Minus, Plus } from 'lucide-react';
 import type { RefObject } from 'react';
-import { FiMinus, FiPlus } from 'react-icons/fi';
 import type { MapRef } from 'react-map-gl';
 import Control from './Control';
 
@@ -21,8 +21,8 @@ const StandardControls = ({ mapRef }: Props) => {
   };
   return (
     <Control position="top-left">
-      <FiPlus onClick={zoom(true)} />
-      <FiMinus onClick={zoom(false)} />
+      <Plus size="1em" onClick={zoom(true)} />
+      <Minus size="1em" onClick={zoom(false)} />
     </Control>
   );
 };

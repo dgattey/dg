@@ -29,6 +29,6 @@
     "strictPropertyInitialization": true,
     "target": "es2018"
   },
-  "include": ["src", "scripts"],
+  "include": ["src", "scripts", "eslint-plugin-dg"],
   "exclude": ["node_modules", "src/api/server/generated"]
 }

@@ -1,9 +1,9 @@
 import useData from 'api/useData';
 import ContentCard from 'components/ContentCard';
 import type { Props as MapProps } from 'components/maps/Map';
+import { X } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useEffect, useState } from 'react';
-import { FiX } from 'react-icons/fi';
 import styled, { css } from 'styled-components';
 
 interface Props {
@@ -84,7 +84,7 @@ const MapCard = ({ gridWidth }: Props) => {
         {location?.point && (
           <Map location={location} viewState={viewState}>
             <Control onClick={() => setIsExpanded(false)} position="top-right">
-              <FiX />
+              <X size="1em" />
             </Control>
             <Marker key="home" point={location.point} image={location.image} />
           </Map>

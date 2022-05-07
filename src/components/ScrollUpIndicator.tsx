@@ -1,5 +1,5 @@
+import { ArrowUp } from 'lucide-react';
 import { useContext } from 'react';
-import { FiArrowUp } from 'react-icons/fi';
 import styled, { css } from 'styled-components';
 import ScrollIndicatorContext from './ScrollIndicatorContext';
 import Stack from './Stack';
@@ -68,7 +68,7 @@ const ScrollUpIndicator = ({ className }: Props) => {
       $alignItems="center"
     >
       To Top
-      <FiArrowUp />
+      <ArrowUp size="1em" />
     </Indicator>
   );
 };

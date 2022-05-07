@@ -29,17 +29,27 @@ const nextConfig = {
   },
 };
 
-const productionSentryConfig = {
-  dryRun:
-    // These are the fallbacks when we can't find an app version, like it's not deployed on a real branch
-    ['vX.Y.Z', 'LOCAL'].includes(process.env.NEXT_PUBLIC_APP_VERSION),
-};
+/**
+ * Adds bundle analysis if development + with ANALYZE flag set to true
+ */
+const withNextBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
 
-const developmentSentryConfig = {
-  silent: true,
-};
-
-module.exports = withSentryConfig(
-  nextConfig,
-  process.env.NODE_ENV === 'development' ? developmentSentryConfig : productionSentryConfig,
-);
+if (process.env.NODE_ENV === 'development') {
+  // Add bundle analysis + silent sentry on develop
+  module.exports = withNextBundleAnalyzer(
+    withSentryConfig(nextConfig, {
+      silent: true,
+    }),
+  );
+} else {
+  // Dry run if we're running with an invalid version
+  module.exports = withNextBundleAnalyzer(
+    withSentryConfig(nextConfig, {
+      dryRun:
+        // These are the fallbacks when we can't find an app version, like it's not deployed on a real branch
+        ['vX.Y.Z', 'LOCAL'].includes(process.env.NEXT_PUBLIC_APP_VERSION),
+    }),
+  );
+}

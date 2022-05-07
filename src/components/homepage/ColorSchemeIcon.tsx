@@ -1,5 +1,5 @@
 import type { ColorScheme, SetColorScheme } from 'hooks/useColorScheme';
-import { FiMoon, FiSun } from 'react-icons/fi';
+import { Moon, Sun } from 'lucide-react';
 import styled, { css } from 'styled-components';
 
 interface Props {
@@ -31,16 +31,16 @@ const TOOLTIPS: Record<ColorScheme, string> = {
  * Maps color scheme to icon element
  */
 const COLORED_ICONS: Record<ColorScheme, JSX.Element> = {
-  dark: <FiMoon color="var(--secondary)" />,
-  light: <FiSun color="var(--yellow)" />,
+  dark: <Moon color="var(--secondary)" size="1em" />,
+  light: <Sun color="var(--yellow)" size="1em" />,
 };
 
 /**
  * Uncolored icons for use elsewhere
  */
 export const ICONS: Record<ColorScheme, JSX.Element> = {
-  dark: <FiMoon />,
-  light: <FiSun />,
+  dark: <Moon size="1em" />,
+  light: <Sun size="1em" />,
 };
 
 // Reset the state that tooltips give to the element since it acts as a button here.

@@ -1,10 +1,13 @@
+import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
+import { faBicycle } from '@fortawesome/free-solid-svg-icons/faBicycle';
+import { faRunning } from '@fortawesome/free-solid-svg-icons/faRunning';
 import useData from 'api/useData';
 import ContentCard from 'components/ContentCard';
+import FaIcon from 'components/FaIcon';
 import Stack from 'components/Stack';
 import truncated from 'helpers/truncated';
 import useRelativeTimeFormat from 'hooks/useRelativeTimeFormat';
 import React, { useMemo } from 'react';
-import { FaBicycle, FaRunning, FaStrava } from 'react-icons/fa';
 import styled from 'styled-components';
 
 // There are 1600 meters in one mile!
@@ -66,7 +69,7 @@ const StravaCard = () => {
     return null;
   }
   const typeText = activity.type === 'Ride' ? 'Ride' : 'Run';
-  const icon = activity.type === 'Ride' ? <FaBicycle /> : <FaRunning />;
+  const icon = activity.type === 'Ride' ? <FaIcon icon={faBicycle} /> : <FaIcon icon={faRunning} />;
   const url = `https://www.strava.com/activities/${activity.id}`;
   const distance = activity.distance && formatter.format(activity.distance / METERS_TO_MILES);
 
@@ -76,7 +79,7 @@ const StravaCard = () => {
         <Stack $justifyContent="space-between">
           <Stat>
             <Stack $alignItems="center" $gap="0.4rem">
-              <FaStrava />
+              <FaIcon icon={faStrava} />
               {distance} Miles
             </Stack>
           </Stat>
@@ -88,7 +91,7 @@ const StravaCard = () => {
         <Group>
           {activity.type && (
             <StatusText>
-              <Stack $alignItems="center" $gap="0.4rem">
+              <Stack $alignItems="center" $gap="0.5rem">
                 Latest {typeText} {icon}
               </Stack>
             </StatusText>
