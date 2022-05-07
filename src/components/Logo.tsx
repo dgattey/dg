@@ -35,6 +35,10 @@ const LogoText = styled.article<{ $isScrolled: boolean }>`
   border: 2px solid transparent;
   z-index: 1;
 
+  @media (max-width: 767.96px) {
+    --margin: 0.5rem;
+  }
+
   &:before {
     content: '';
     float: left;

@@ -1,5 +1,5 @@
 import useData from 'api/useData';
-import ContentCard from 'components/ContentCard';
+import ContentCard, { OverlayContainer } from 'components/ContentCard';
 import { cardSizeInPx } from 'components/ContentGrid';
 import HoverableContainer from 'components/HoverableContainer';
 import Image from 'components/Image';
@@ -10,11 +10,15 @@ import styled from 'styled-components';
 
 const ImageCard = styled(ContentCard)`
   @media (max-width: 767.96px) {
-    --size: 18em;
+    --size: 14em;
     justify-self: center;
     width: var(--size);
     height: var(--size);
     border-radius: calc(var(--size) / 2);
+
+    ${OverlayContainer} {
+      visibility: hidden;
+    }
   }
 `;
 

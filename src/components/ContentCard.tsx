@@ -146,9 +146,9 @@ const Card = styled.article<CardProps>`
     $vSpan &&
     css`
       @media (min-width: 768px) {
+        grid-row: span ${$vSpan};
         height: ${cardSize($vSpan)};
       }
-      grid-row: span ${$vSpan};
     `}
 `;
 

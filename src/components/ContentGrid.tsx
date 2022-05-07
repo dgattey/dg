@@ -38,7 +38,7 @@ export const cardSize = (span = 1) => `${cardSizeRaw(span)}rem`;
  */
 const Grid = styled.div`
   --content-grid-dimension: ${CONTENT_GRID_DIMENSION}rem;
-  --content-grid-gap: ${CONTENT_GRID_GAP}rem;
+  --content-grid-gap: 2rem;
   display: grid;
   gap: var(--content-grid-gap);
   grid-template-columns: 1fr;
@@ -47,6 +47,7 @@ const Grid = styled.div`
   position: relative;
 
   @media (min-width: 768px) {
+    --content-grid-gap: ${CONTENT_GRID_GAP}rem;
     grid-template-columns: repeat(auto-fit, var(--content-grid-dimension));
     grid-auto-rows: minmax(var(--content-grid-dimension), auto);
   }
