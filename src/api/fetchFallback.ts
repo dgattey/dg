@@ -5,9 +5,11 @@ import endpoints from './endpoints';
  * Returns a type to use as fallback data - this only has some of the fields
  * defined, and should be used in contexts where you want to fetch only some
  * of the data like error pages.
+ *
+ * Has required keys in it
  */
 export type PartialFallback<Key extends EndpointKey> = {
-  [K in Key]: AwaitedType<K>;
+  [K in Key | 'footer' | 'version']: AwaitedType<K>;
 };
 
 /**
