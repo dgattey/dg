@@ -1,6 +1,7 @@
 import fetchContentfulFooterLinks from './server/fetchContentfulFooterLinks';
 import fetchContentfulIntroBlock from './server/fetchContentfulIntroBlock';
 import fetchContentfulLocation from './server/fetchContentfulLocation';
+import fetchContentfulPrivacyBlock from './server/fetchContentfulPrivacyBlock';
 import fetchContentfulProjects from './server/fetchContentfulProjects';
 import fetchGithubRepoVersion from './server/fetchGithubRepoVersion';
 import fetchSpotifyCurrentlyPlaying from './server/fetchSpotifyCurrentlyOrRecentlyPlayed';
@@ -30,6 +31,9 @@ export type AwaitedType<Key extends EndpointKey> = Awaited<EndpointType<Key>>;
 const endpoints = {
   // Intro block of content via Contentful
   intro: fetchContentfulIntroBlock,
+
+  // Privacy block of content via Contentful
+  privacy: fetchContentfulPrivacyBlock,
 
   // My current location via Contentful
   location: fetchContentfulLocation,
