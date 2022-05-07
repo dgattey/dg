@@ -1,7 +1,7 @@
 import type { Track } from 'api/types/spotify/Track';
 import Stack from 'components/Stack';
 import useRelativeTimeFormat from 'hooks/useRelativeTimeFormat';
-import { FiMusic } from 'react-icons/fi';
+import { Music } from 'lucide-react';
 import styled from 'styled-components';
 
 type Props = Track;
@@ -27,7 +27,7 @@ const PlaybackStatus = ({ played_at }: Props) => {
       ) : (
         <>
           Now Playing
-          <FiMusic />
+          <Music size="1em" />
         </>
       )}
     </Container>

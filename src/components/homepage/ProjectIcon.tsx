@@ -1,5 +1,5 @@
 import type { Project } from 'api/types/generated/contentfulApi.generated';
-import { FiGlobe, FiMonitor, FiSmartphone } from 'react-icons/fi';
+import { Globe, Monitor, Smartphone } from 'lucide-react';
 
 type Props = Pick<Project, 'type'>;
 
@@ -15,11 +15,11 @@ const ProjectIcon = ({
   }
   switch (type[0]) {
     case 'Website':
-      return <FiGlobe className={className} />;
+      return <Globe size="1em" className={className} />;
     case 'iOS App':
-      return <FiSmartphone className={className} />;
+      return <Smartphone size="1em" className={className} />;
     case 'macOS App':
-      return <FiMonitor className={className} />;
+      return <Monitor size="1em" className={className} />;
     default:
       return null;
   }

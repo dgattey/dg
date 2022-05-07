@@ -2730,7 +2730,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/prop-types@npm:*":
+"@types/prop-types@npm:*, @types/prop-types@npm:^15":
   version: 15.7.5
   resolution: "@types/prop-types@npm:15.7.5"
   checksum: 5b43b8b15415e1f298243165f1d44390403bb2bd42e662bca3b5b5633fdd39c938e91b7fce3a9483699db0f7a715d08cef220c121f723a634972fdf596aec980
@@ -5067,6 +5067,7 @@ __metadata:
     "@stylelint/postcss-css-in-js": ^0.38.0
     "@types/mapbox-gl": ^2.7.1
     "@types/node": ^16.11.33
+    "@types/prop-types": ^15
     "@types/react": ^18.0.9
     "@types/react-dom": ^18.0.3
     "@types/styled-components": ^5.1.25
@@ -5095,6 +5096,7 @@ __metadata:
     hooks: "link:./src/hooks::locator=dg%40workspace%3A."
     husky: ^7.0.4
     lint-staged: ^12.4.1
+    lucide-react: ^0.39.0
     mapbox-gl: ^2.8.2
     next: ^12.1.6
     node-fetch: ^3.2.4
@@ -5103,9 +5105,9 @@ __metadata:
     postcss-syntax: ^0.36.2
     prettier: ^2.6.2
     prisma: ^3.13.0
+    prop-types: ^15.8.1
     react: ^18.1.0
     react-dom: ^18.1.0
-    react-icons: ^4.3.1
     react-intersection-observer: ^9.1.0
     react-is: ^18.1.0
     react-map-gl: ^7.0.11
@@ -8343,6 +8345,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"lucide-react@npm:^0.39.0":
+  version: 0.39.0
+  resolution: "lucide-react@npm:0.39.0"
+  peerDependencies:
+    prop-types: ^15.7.2
+    react: ^16.5.1 || ^17.0.0 || ^18.0.0
+  checksum: 17b3af1164b38ff59a2bd2a5283e09ce05c51c0f5fd0007a23abb4bc42420a1fef7ad339988898bbf1f19a53b8b9f6c65a4f18fef1678a3a8df4d26f293b3caa
+  languageName: node
+  linkType: hard
+
 "make-error@npm:^1, make-error@npm:^1.1.1":
   version: 1.3.6
   resolution: "make-error@npm:1.3.6"
@@ -10235,15 +10247,6 @@ __metadata:
   peerDependencies:
     react: ^18.1.0
   checksum: bb0d48eeb0b297c79c2a03978baa29f5b3ff7ba3d070b21e34c9af1a6e7fdf0ca8b8d73e41f9214d91ad40eeb6d1f3559f884cbbc338713374a51320637c23df
-  languageName: node
-  linkType: hard
-
-"react-icons@npm:^4.3.1":
-  version: 4.3.1
-  resolution: "react-icons@npm:4.3.1"
-  peerDependencies:
-    react: "*"
-  checksum: 2cc608acdd3e906aa3aaee290b8398220639677c949382d86e554020e5dab6a9f1ed7484418aa5272cb5c5c018e1fc9a323d433d901697a76530029f9ecb1263
   languageName: node
   linkType: hard
 
