@@ -1,24 +1,9 @@
 import type { MapLocation } from 'api/types/MapLocation';
 import ColorSchemeContext from 'components/ColorSchemeContext';
 import { useContext, useEffect, useMemo, useRef, useState } from 'react';
-import { AttributionControl, Map as MapGL, MapRef, ViewState } from 'react-map-gl';
+import { AttributionControl, Map as MapGL, MapRef } from 'react-map-gl';
 import styled, { css } from 'styled-components';
 import StandardControls from './StandardControls';
-
-interface Size {
-  /**
-   * Full width of the component this map sits in, if known
-   */
-  width: number;
-
-  /**
-   * Full height of the component this map sits in, if known
-   */
-  height: number;
-}
-
-// The actual state for the map
-type MapViewState = ViewState & Size;
 
 export type Props = {
   /**
@@ -27,9 +12,9 @@ export type Props = {
   location: MapLocation | null;
 
   /**
-   * Provides state for the map
+   * If the map is a larger height
    */
-  viewState: Pick<MapViewState, 'width' | 'height'> & Partial<Pick<MapViewState, 'padding'>>;
+  isExpanded: boolean;
 
   /**
    * If children exist, they need to be real elements.
@@ -121,42 +106,36 @@ const Wrapper = styled.div<{ $isLoaded: boolean }>`
 /**
  * Uses Mapbox to show a canvas-based map of my current location.
  */
-const Map = ({ location, viewState: outsideViewState, children }: Props) => {
+const Map = ({ location, children, isExpanded }: Props) => {
   const mapRef = useRef<MapRef>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const { colorScheme } = useContext(ColorSchemeContext);
-  const size = useMemo(
-    () => ({
-      width: outsideViewState.width,
-      height: outsideViewState.height,
-    }),
-    [outsideViewState.height, outsideViewState.width],
-  );
+
+  // Ensures we resize when expanding/collapsing so we repaint - needs both resizes to ensure it's done properly
+  useEffect(() => {
+    mapRef.current?.resize();
+    const id = requestAnimationFrame(() => mapRef.current?.resize());
+    return () => cancelAnimationFrame(id);
+  }, [isExpanded]);
 
   // This will be used to set zoom levels, eventually
-  const [viewState, setViewState] = useState<MapViewState>({
-    ...size,
-    latitude: location?.point?.latitude ?? 0,
-    longitude: location?.point?.longitude ?? 0,
-    zoom: location?.initialZoom ?? 0,
-    padding: outsideViewState.padding ?? { left: 0, right: 0, top: 0, bottom: 0 },
-    bearing: 0,
-    pitch: 0,
-  });
+  const initialViewState = useMemo(
+    () => ({
+      latitude: location?.point?.latitude ?? 0,
+      longitude: location?.point?.longitude ?? 0,
+      zoom: location?.initialZoom ?? 0,
+    }),
+    [location?.initialZoom, location?.point?.latitude, location?.point?.longitude],
+  );
   const zoomLevels = location?.zoomLevels ?? [];
   const minZoom = zoomLevels[0];
   const maxZoom = zoomLevels[zoomLevels.length - 1];
-
-  // Updates the view state when a parent changes it
-  useEffect(() => {
-    setViewState((currentState) => ({ ...currentState, ...outsideViewState }));
-  }, [outsideViewState]);
 
   return (
     <Wrapper $isLoaded={isLoaded}>
       <MapGL
         ref={mapRef}
-        viewState={viewState}
+        initialViewState={initialViewState}
         minZoom={minZoom}
         maxZoom={maxZoom}
         attributionControl={false}
@@ -164,13 +143,13 @@ const Map = ({ location, viewState: outsideViewState, children }: Props) => {
         interactive
         pitchWithRotate={false}
         touchPitch={false}
-        onMove={(event) => setViewState({ ...event.viewState, ...size })}
         mapStyle={colorScheme === 'dark' ? DARK_STYLE : LIGHT_STYLE}
         styleDiffing={false}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         onLoad={() => setIsLoaded(true)}
+        reuseMaps
       >
-        <AttributionControl position="bottom-right" />
+        {isExpanded && <AttributionControl position="bottom-right" />}
         <StandardControls mapRef={mapRef} />
         {children}
       </MapGL>

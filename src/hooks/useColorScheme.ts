@@ -56,7 +56,8 @@ const updateThemeAttribute = (scheme: ColorScheme, isSystemScheme: boolean) => {
   }
 
   // Make sure to turn on animations non-synchronously
-  requestAnimationFrame(() => htmlElement.setAttribute(ANIMATE_ATTRIBUTE, 'true'));
+  const id = requestAnimationFrame(() => htmlElement.setAttribute(ANIMATE_ATTRIBUTE, 'true'));
+  return () => cancelAnimationFrame(id);
 };
 
 /**

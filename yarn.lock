@@ -5094,7 +5094,6 @@ __metadata:
     react-intersection-observer: ^9.1.0
     react-is: ^18.1.0
     react-map-gl: ^7.0.11
-    react-resize-aware: ^3.1.1
     semantic-release: ^19.0.2
     sharp: ^0.30.4
     styled-components: ^5.3.5
@@ -10277,15 +10276,6 @@ __metadata:
     mapbox-gl: "*"
     react: ">=16.3.0"
   checksum: 2c1929f86219b88409385c5c6029760ab4e2572856a49fcf649fc97fd8b09b8dede56d9526189cdb4d1c68c851be97260d39595bbcd4b690645c9e7278598e8f
-  languageName: node
-  linkType: hard
-
-"react-resize-aware@npm:^3.1.1":
-  version: 3.1.1
-  resolution: "react-resize-aware@npm:3.1.1"
-  peerDependencies:
-    react: ^16.8.0 || 17.x
-  checksum: 0088849e128403ea66f90d588379d9260089c6f218b46e6254da20fe5e4d39c8d13b64da1e6a24bacd0d808db8b7d26bf9dc72801c58606c0b26e9eb5da1bdc5
   languageName: node
   linkType: hard
 
