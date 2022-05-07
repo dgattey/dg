@@ -16,6 +16,10 @@ const darkModeVariables = css`
   --yellow: rgb(255, 255, 0);
   --map-marker: rgba(58, 123, 172, 0.5);
   --map-marker-border: rgba(166, 189, 206, 0.5);
+
+  /* Slightly lighter so that the contrast is better */
+  --card-background-color: hsl(206, 24%, 18%);
+  --background-color: rgb(17, 25, 31);
 `;
 
 /**
@@ -32,6 +36,10 @@ const lightModeVariables = css`
   --yellow: rgb(222, 197, 29);
   --map-marker: rgba(58, 123, 172, 0.25);
   --map-marker-border: rgba(139, 185, 220, 0.75);
+
+  /* Slightly darker so that the contrast is better */
+  --background-color: hsl(206, 60%, 96%);
+  --card-background-color: rgb(255, 255, 255);
 `;
 
 /**

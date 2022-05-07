@@ -26,7 +26,7 @@ const Control = dynamic(() => import('components/maps/Control'), { ssr: false })
 
 // Changes between two min heights
 const Card = styled(ContentCard)<{ $height: number; $backgroundImageUrl?: string }>`
-  border: 1px solid var(--background-color);
+  border: 1px solid var(--card-background-color);
   ${({ $height }) =>
     css`
       min-height: ${$height}px;
