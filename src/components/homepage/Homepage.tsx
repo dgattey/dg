@@ -36,7 +36,7 @@ const Homepage = () => {
       { index: 3, card: <ColorSchemeToggleCard key="color" /> },
       { index: 6, card: <StravaCard key="strava" /> },
     ],
-    [],
+    [turnOnAnimation],
   );
 
   return (

@@ -67,7 +67,7 @@ const useGridAnimation = (gridRef: React.RefObject<HTMLDivElement>) => {
    * observer, and stopping the animation after it's been used
    * once so that it's not on later.
    */
-  const turnOnAnimation = () => {
+  const turnOnAnimation = useCallback(() => {
     if (!gridRef.current || !wrapGridRef.current) {
       return;
     }
@@ -82,7 +82,7 @@ const useGridAnimation = (gridRef: React.RefObject<HTMLDivElement>) => {
       },
     });
     unwrapGridRef.current = gridWrapResult.unwrapGrid;
-  };
+  }, [gridRef]);
 
   // Make sure we import the library to start with
   useEffect(() => {
