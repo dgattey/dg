@@ -103,7 +103,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-intersection-observer", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:9.1.0"],\
             ["react-is", "npm:18.1.0"],\
             ["react-map-gl", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:7.0.11"],\
-            ["react-resize-aware", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:3.1.1"],\
             ["semantic-release", "npm:19.0.2"],\
             ["sharp", "npm:0.30.4"],\
             ["styled-components", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:5.3.5"],\
@@ -6818,7 +6817,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-intersection-observer", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:9.1.0"],\
             ["react-is", "npm:18.1.0"],\
             ["react-map-gl", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:7.0.11"],\
-            ["react-resize-aware", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:3.1.1"],\
             ["semantic-release", "npm:19.0.2"],\
             ["sharp", "npm:0.30.4"],\
             ["styled-components", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:5.3.5"],\
@@ -12962,28 +12960,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             "@types/mapbox-gl",\
             "@types/react",\
             "mapbox-gl",\
-            "react"\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["react-resize-aware", [\
-        ["npm:3.1.1", {\
-          "packageLocation": "./.yarn/cache/react-resize-aware-npm-3.1.1-598d404fb7-0088849e12.zip/node_modules/react-resize-aware/",\
-          "packageDependencies": [\
-            ["react-resize-aware", "npm:3.1.1"]\
-          ],\
-          "linkType": "SOFT"\
-        }],\
-        ["virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:3.1.1", {\
-          "packageLocation": "./.yarn/__virtual__/react-resize-aware-virtual-0e5e8f0f28/0/cache/react-resize-aware-npm-3.1.1-598d404fb7-0088849e12.zip/node_modules/react-resize-aware/",\
-          "packageDependencies": [\
-            ["react-resize-aware", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:3.1.1"],\
-            ["@types/react", "npm:18.0.9"],\
-            ["react", "npm:18.1.0"]\
-          ],\
-          "packagePeers": [\
-            "@types/react",\
             "react"\
           ],\
           "linkType": "HARD"\

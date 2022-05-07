@@ -1,7 +1,7 @@
 /* eslint-disable no-underscore-dangle */
 import type { Map } from 'mapbox-gl';
-import React from 'react';
-import { createRoot } from 'react-dom/client';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { createRoot, Root } from 'react-dom/client';
 import { useControl } from 'react-map-gl';
 import ControlContainer, { Props as ContainerProps } from './ControlContainer';
 
@@ -13,6 +13,8 @@ type Props = ContainerProps & {
    */
   position: 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right';
 };
+
+const CLASSNAME = 'mapboxgl-ctrl';
 
 /**
  * This class wraps `ControlContainer` to add/remove elements from
@@ -31,6 +33,11 @@ class DGControl {
   _container: HTMLElement | undefined;
 
   /**
+   * Current root, wrapping _container
+   */
+  #root: Root | null;
+
+  /**
    * The container's props - private
    */
   #containerProps: ContainerProps;
@@ -40,6 +47,7 @@ class DGControl {
    */
   constructor(props: ContainerProps) {
     this.#containerProps = props;
+    this.#root = null;
   }
 
   /**
@@ -47,22 +55,34 @@ class DGControl {
    * onClick if there are not multiple children.
    */
   onAdd(map: Map) {
-    const { onClick, children, className, ...props } = this.#containerProps;
     this._map = map;
+    this._container?.parentNode?.removeChild(this._container);
     this._container = document.createElement('div');
-    this._container.onclick = onClick ?? null;
-    const root = createRoot(this._container);
+    this.#root = createRoot(this._container);
+    this.onPropsUpdate(this.#containerProps);
+    return this._container;
+  }
+
+  /**
+   * Renders the control container when the props change
+   */
+  onPropsUpdate(newProps: ContainerProps) {
+    this.#containerProps = newProps;
+    if (!this._container || !this.#root) {
+      return;
+    }
+    const { onClick, children, className, ...props } = newProps;
+    this._container.className = className ?? CLASSNAME;
     if (Array.isArray(children)) {
-      root.render(<ControlContainer {...props}>{children}</ControlContainer>);
+      this.#root.render(<ControlContainer {...props}>{children}</ControlContainer>);
+      this._container.onclick = onClick ?? null;
     } else {
-      root.render(
+      this.#root.render(
         <ControlContainer onClick={onClick} {...props}>
           {children}
         </ControlContainer>,
       );
     }
-    this._container.className = `mapboxgl-ctrl ${className ?? ''}`;
-    return this._container;
   }
 
   /**
@@ -70,6 +90,8 @@ class DGControl {
    */
   onRemove() {
     this._container?.parentNode?.removeChild(this._container);
+    this._container = undefined;
+    this.#root = null;
     this._map = undefined;
   }
 }
@@ -79,9 +101,28 @@ class DGControl {
  * position of the map (corners).
  */
 const Control = ({ position, ...props }: Props) => {
-  useControl(() => new DGControl(props), {
-    position,
-  });
+  const control = useRef<DGControl | null>(null);
+  const properProps = useMemo(
+    () => ({
+      ...props,
+      className: props.className ? `${props.className} ${CLASSNAME}` : CLASSNAME,
+    }),
+    [props],
+  );
+
+  // Make sure to update the children/etc when they change
+  useEffect(() => control.current?.onPropsUpdate(properProps), [properProps]);
+
+  useControl(
+    () => {
+      const newControl = new DGControl(properProps);
+      control.current = newControl;
+      return newControl;
+    },
+    {
+      position,
+    },
+  );
   return null;
 };
 

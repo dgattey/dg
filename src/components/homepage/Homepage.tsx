@@ -1,7 +1,6 @@
 import useData from 'api/useData';
 import ContentGrid from 'components/ContentGrid';
-import React, { useEffect, useMemo, useState } from 'react';
-import useResizeAware from 'react-resize-aware';
+import React, { useMemo } from 'react';
 import ColorSchemeToggleCard from './ColorSchemeToggleCard';
 import HomepageMeta from './HomepageMeta';
 import IntroCard from './IntroCard';
@@ -17,15 +16,6 @@ import StravaCard from './StravaCard';
  */
 const Homepage = () => {
   const { data: projects } = useData('projects');
-  const [resizer, size] = useResizeAware();
-  const [staticSize, setStaticSize] = useState<typeof size>({ width: null, height: null });
-
-  // Ensures we only set the static size once so we don't stutter horribly on window resize as the brower tries to repaint the map canvas
-  useEffect(() => {
-    if (!staticSize.width && !staticSize.height) {
-      setStaticSize(size);
-    }
-  }, [size, staticSize.height, staticSize.width]);
 
   const projectCards =
     projects?.map((project) => <ProjectCard key={project.title} {...project} />) ?? [];
@@ -34,19 +24,18 @@ const Homepage = () => {
   const otherCards = useMemo(
     () => [
       { index: 0, card: <IntroCard key="intro" /> },
-      { index: 0, card: <MapCard key="map" gridWidth={staticSize.width} /> },
+      { index: 0, card: <MapCard key="map" /> },
       { index: 2, card: <SpotifyCard key="spotify" /> },
       { index: 3, card: <ColorSchemeToggleCard key="color" /> },
       { index: 6, card: <StravaCard key="strava" /> },
     ],
-    [staticSize.width],
+    [],
   );
 
   return (
     <>
       <HomepageMeta />
       <ContentGrid>
-        {resizer}
         {otherCards.map(({ index, card }, arrayIndex) => {
           const nextItem = otherCards[arrayIndex + 1];
           return [card, ...projectCards.slice(index, nextItem?.index)];
