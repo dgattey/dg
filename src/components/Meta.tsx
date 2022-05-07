@@ -87,11 +87,21 @@ const Meta = ({ title, description }: Props) => {
     description && description.length > MAX_DESC_LENGTH
       ? `${description.slice(0, MAX_DESC_LENGTH)}...`
       : description;
+  const resolvedTitle = title ? `Dylan Gattey - ${title}` : 'Dylan Gattey';
 
   return (
     <Head>
-      <title>{title ? `Dylan Gattey - ${title}` : 'Dylan Gattey'}</title>
-      {truncatedDescription && <meta name="description" content={truncatedDescription} />}
+      <title>{resolvedTitle}</title>
+      <meta property="og:title" content={resolvedTitle} />
+      <meta property="twitter:title" content={resolvedTitle} />
+      {truncatedDescription && (
+        <>
+          <meta name="description" content={truncatedDescription} />
+          <meta property="og:description" content={truncatedDescription} />
+          <meta property="twitter:description" content={truncatedDescription} />
+        </>
+      )}
+      <meta property="og:type" content="website" />
       <link key="favicon" rel="icon" href="/favicon.ico" />
       <meta name="theme-color" content="var(--background-color)" />
       <meta
