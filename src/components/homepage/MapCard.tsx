@@ -1,10 +1,13 @@
 import useData from 'api/useData';
+import ColorSchemeContext from 'components/ColorSchemeContext';
+import type { Props as ContentCardProps } from 'components/ContentCard';
 import ContentCard from 'components/ContentCard';
-import { Expand, X } from 'lucide-react';
+import { Maximize2, Minimize2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import styled, { css } from 'styled-components';
 
+type Props = Pick<ContentCardProps, 'turnOnAnimation'>;
 interface IsExpanded {
   $isExpanded: boolean;
 }
@@ -26,8 +29,8 @@ const Card = styled(ContentCard)<{ $backgroundImageUrl?: string } & IsExpanded>`
   ${({ $isExpanded }) => css`
     min-height: ${$isExpanded ? EXPANDED_HEIGHT : MIN_DIMENSION}px;
     @media (max-width: 767.99px) {
-      height: 400px;
-      min-height: 400px;
+      min-height: ${$isExpanded ? 360 : 200}px;
+      height: ${$isExpanded ? 360 : 200}px;
     }
   `}
   ${({ $backgroundImageUrl }) =>
@@ -35,41 +38,42 @@ const Card = styled(ContentCard)<{ $backgroundImageUrl?: string } & IsExpanded>`
     css`
       background-image: url('${$backgroundImageUrl}');
       background-repeat: no-repeat;
+      background-position: center;
       background-size: cover;
     `}
-`;
-const HIDDEN_ON_MOBILE = css`
-  visibility: hidden;
-  @media (min-width: 768px) {
-    visibility: visible;
-  }
-`;
-
-const ExpandButton = styled(Control)`
-  ${HIDDEN_ON_MOBILE}
 `;
 
 /**
  * Shows a canvas-based map of my current location.
  */
-const MapCard = () => {
+const MapCard = ({ turnOnAnimation }: Props) => {
   const { data: location } = useData('location');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [hasMapLoaded, setHasMapLoaded] = useState(false);
+  const { colorScheme } = useContext(ColorSchemeContext);
+  const backgroundImageUrl =
+    colorScheme === 'light' ? location?.backupImageUrls.light : location?.backupImageUrls.dark;
 
   return (
     <Card
       $isExpanded={isExpanded}
       onExpansion={!isExpanded ? setIsExpanded : undefined}
-      $backgroundImageUrl={location?.backupImageUrl}
+      $backgroundImageUrl={!hasMapLoaded ? backgroundImageUrl : undefined}
+      turnOnAnimation={turnOnAnimation}
     >
       {location?.point && (
-        <Map location={location} isExpanded={isExpanded}>
-          <ExpandButton
+        <Map
+          location={location}
+          isExpanded={isExpanded}
+          isLoaded={hasMapLoaded}
+          setMapHasLoaded={() => setHasMapLoaded(true)}
+        >
+          <Control
             onClick={isExpanded ? () => setIsExpanded(false) : undefined}
             position="top-right"
           >
-            {isExpanded ? <X size="1em" /> : <Expand size="1em" />}
-          </ExpandButton>
+            {isExpanded ? <Minimize2 size="1em" /> : <Maximize2 size="1em" />}
+          </Control>
           <Marker key="home" point={location.point} image={location.image} />
         </Map>
       )}

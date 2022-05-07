@@ -1,0 +1,61 @@
+version: '2'
+
+checks:
+  argument-count:
+    enabled: true
+    config:
+      threshold: 4
+  complex-logic:
+    enabled: true
+    config:
+      threshold: 4
+  file-lines:
+    enabled: true
+    config:
+      threshold: 250
+  method-count:
+    enabled: true
+    config:
+      threshold: 20
+  nested-control-flow:
+    enabled: true
+    config:
+      threshold: 4
+  return-statements:
+    enabled: true
+    config:
+      threshold: 4
+  similar-code:
+    enabled: true
+  identical-code:
+    enabled: true
+
+  # Only the customized checks
+  method-lines:
+    config:
+      # This is a lot bigger than default because it includes functional components in typescript
+      threshold: 80
+  method-complexity:
+    config:
+      # Triples the complexity since 5 is rather low as a default
+      threshold: 12
+
+# Customized to include .yarn/.pnp/generated/type files
+exclude_patterns:
+  - 'config/'
+  - 'db/'
+  - 'dist/'
+  - 'features/'
+  - '**/node_modules/'
+  - 'script/'
+  - '**/spec/'
+  - '**/test/'
+  - '**/tests/'
+  - 'Tests/'
+  - '**/vendor/'
+  - '**/*_test.go'
+  - '**/*.d.ts'
+  - '**/*generated*'
+  - '**/generated'
+  - '.yarn'
+  - '.pnp*'

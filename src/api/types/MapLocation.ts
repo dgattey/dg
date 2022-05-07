@@ -14,8 +14,8 @@ export type MapLocation = Pick<
   zoomLevels: Array<number>;
 
   /**
-   * An image that should be used to show a backup image before
-   * the MapboxGL package loads
+   * Dark and light mode images that should be used to show a backup
+   * screenshot of the map before the MapboxGL package loads
    */
-  backupImageUrl: Asset['url'];
+  backupImageUrls: { light: Asset['url']; dark: Asset['url'] };
 };
