@@ -1,4 +1,4 @@
-import { faSpotify } from '@fortawesome/free-brands-svg-icons';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import type { Track } from 'api/types/spotify/Track';
 import FaIcon from 'components/FaIcon';
 import Link from 'components/Link';

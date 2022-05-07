@@ -10,7 +10,7 @@
     "prepare": "husky install",
     "dev": "SENTRY_IGNORE_API_RESOLUTION_ERROR=1 next dev",
     "build": "yarn db:generate && NEXT_PUBLIC_APP_VERSION=$(yarn version) next build",
-    "serve": "NODE_ENV=development next build && next start",
+    "serve": "next build && next start",
     "analyze": "ANALYZE=true yarn serve",
     "release": "semantic-release",
     "format": "prettier --loglevel warn --write \"**/*.{js,ts,tsx,css,md,json,yml}\"",

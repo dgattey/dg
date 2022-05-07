@@ -32,10 +32,9 @@ const nextConfig = {
 /**
  * Adds bundle analysis if development + with ANALYZE flag set to true
  */
-const withNextBundleAnalyzer =
-  process.env.NODE_ENV === 'development'
-    ? require('@next/bundle-analyzer')({ enabled: process.env.ANALYZE === 'true' })
-    : null;
+const withNextBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
 
 if (process.env.NODE_ENV === 'development') {
   // Add bundle analysis + silent sentry on develop
@@ -46,9 +45,11 @@ if (process.env.NODE_ENV === 'development') {
   );
 } else {
   // Dry run if we're running with an invalid version
-  module.exports = withSentryConfig(nextConfig, {
-    dryRun:
-      // These are the fallbacks when we can't find an app version, like it's not deployed on a real branch
-      ['vX.Y.Z', 'LOCAL'].includes(process.env.NEXT_PUBLIC_APP_VERSION),
-  });
+  module.exports = withNextBundleAnalyzer(
+    withSentryConfig(nextConfig, {
+      dryRun:
+        // These are the fallbacks when we can't find an app version, like it's not deployed on a real branch
+        ['vX.Y.Z', 'LOCAL'].includes(process.env.NEXT_PUBLIC_APP_VERSION),
+    }),
+  );
 }

@@ -1,11 +1,10 @@
-import {
-  faGithubAlt,
-  faInstagram,
-  faLinkedinIn,
-  faSpotify,
-  faStrava,
-} from '@fortawesome/free-brands-svg-icons';
-import { faPaperPlane, faQuestion } from '@fortawesome/free-solid-svg-icons';
+import { faGithubAlt } from '@fortawesome/free-brands-svg-icons/faGithubAlt';
+import { faInstagram } from '@fortawesome/free-brands-svg-icons/faInstagram';
+import { faLinkedinIn } from '@fortawesome/free-brands-svg-icons/faLinkedinIn';
+import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
+import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
+import { faPaperPlane } from '@fortawesome/free-solid-svg-icons/faPaperPlane';
+import { faQuestion } from '@fortawesome/free-solid-svg-icons/faQuestion';
 import type { Link as LinkProps } from 'api/types/generated/contentfulApi.generated';
 import FaIcon from 'components/FaIcon';
 import NextLink from 'next/link';

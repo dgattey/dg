@@ -1,5 +1,6 @@
-import { faStrava } from '@fortawesome/free-brands-svg-icons';
-import { faBicycle, faRunning } from '@fortawesome/free-solid-svg-icons';
+import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
+import { faBicycle } from '@fortawesome/free-solid-svg-icons/faBicycle';
+import { faRunning } from '@fortawesome/free-solid-svg-icons/faRunning';
 import useData from 'api/useData';
 import ContentCard from 'components/ContentCard';
 import FaIcon from 'components/FaIcon';
