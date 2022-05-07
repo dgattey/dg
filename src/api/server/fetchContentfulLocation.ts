@@ -22,7 +22,10 @@ const QUERY = gql`
         height
       }
     }
-    asset(id: "5PrFVu1gJBLhgJGixRL4Wc") {
+    lightImage: asset(id: "5PrFVu1gJBLhgJGixRL4Wc") {
+      url
+    }
+    darkImage: asset(id: "6bRgM9lkcceJQOE0jSOEfu") {
       url
     }
   }
@@ -34,7 +37,7 @@ const QUERY = gql`
 const fetchContentfulLocation = async (): Promise<MapLocation | null> => {
   const data = await contentfulClient.request<MyLocationQuery>(QUERY);
   const location = data?.contentTypeLocation;
-  if (!location || !data?.asset?.url) {
+  if (!location || !data?.lightImage?.url || !data?.darkImage?.url) {
     return null;
   }
   const zoomLevels = location.zoomLevels?.filter(isDefinedItem)?.map(Number) ?? [];
@@ -49,7 +52,7 @@ const fetchContentfulLocation = async (): Promise<MapLocation | null> => {
     initialZoom: location.initialZoom,
     image: location.image,
     zoomLevels,
-    backupImageUrl: data.asset.url,
+    backupImageUrls: { light: data.lightImage.url, dark: data.darkImage.url },
   };
 };
 

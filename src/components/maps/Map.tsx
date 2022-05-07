@@ -1,6 +1,6 @@
 import type { MapLocation } from 'api/types/MapLocation';
 import ColorSchemeContext from 'components/ColorSchemeContext';
-import { useContext, useEffect, useMemo, useRef, useState } from 'react';
+import { useContext, useEffect, useMemo, useRef } from 'react';
 import { AttributionControl, Map as MapGL, MapRef } from 'react-map-gl';
 import styled, { css } from 'styled-components';
 import StandardControls from './StandardControls';
@@ -21,6 +21,16 @@ export type Props = {
    * Use this to pass layers and features.
    */
   children?: React.ReactElement | Array<React.ReactElement> | null;
+
+  /**
+   * If the map itself has loaded (controlled via state above)
+   */
+  isLoaded: boolean;
+
+  /**
+   * Set that the map has loaded properly
+   */
+  setMapHasLoaded: () => void;
 };
 
 const LIGHT_STYLE = 'mapbox://styles/dylangattey/ckyfpsonl01w014q8go5wvnh2?optimize=true';
@@ -106,9 +116,8 @@ const Wrapper = styled.div<{ $isLoaded: boolean }>`
 /**
  * Uses Mapbox to show a canvas-based map of my current location.
  */
-const Map = ({ location, children, isExpanded }: Props) => {
+const Map = ({ location, children, isExpanded, isLoaded, setMapHasLoaded }: Props) => {
   const mapRef = useRef<MapRef>(null);
-  const [isLoaded, setIsLoaded] = useState(false);
   const { colorScheme } = useContext(ColorSchemeContext);
 
   // Ensures we resize when expanding/collapsing so we repaint - needs both resizes to ensure it's done properly
@@ -146,7 +155,7 @@ const Map = ({ location, children, isExpanded }: Props) => {
         mapStyle={colorScheme === 'dark' ? DARK_STYLE : LIGHT_STYLE}
         styleDiffing={false}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
-        onLoad={() => setIsLoaded(true)}
+        onLoad={setMapHasLoaded}
         reuseMaps
       >
         {isExpanded && <AttributionControl position="bottom-right" />}

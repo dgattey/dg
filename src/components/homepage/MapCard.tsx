@@ -1,9 +1,10 @@
 import useData from 'api/useData';
+import ColorSchemeContext from 'components/ColorSchemeContext';
 import type { Props as ContentCardProps } from 'components/ContentCard';
 import ContentCard from 'components/ContentCard';
 import { Maximize2, Minimize2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 type Props = Pick<ContentCardProps, 'turnOnAnimation'>;
@@ -48,16 +49,25 @@ const Card = styled(ContentCard)<{ $backgroundImageUrl?: string } & IsExpanded>`
 const MapCard = ({ turnOnAnimation }: Props) => {
   const { data: location } = useData('location');
   const [isExpanded, setIsExpanded] = useState(false);
+  const [hasMapLoaded, setHasMapLoaded] = useState(false);
+  const { colorScheme } = useContext(ColorSchemeContext);
+  const backgroundImageUrl =
+    colorScheme === 'light' ? location?.backupImageUrls.light : location?.backupImageUrls.dark;
 
   return (
     <Card
       $isExpanded={isExpanded}
       onExpansion={!isExpanded ? setIsExpanded : undefined}
-      $backgroundImageUrl={location?.backupImageUrl}
+      $backgroundImageUrl={!hasMapLoaded ? backgroundImageUrl : undefined}
       turnOnAnimation={turnOnAnimation}
     >
       {location?.point && (
-        <Map location={location} isExpanded={isExpanded}>
+        <Map
+          location={location}
+          isExpanded={isExpanded}
+          isLoaded={hasMapLoaded}
+          setMapHasLoaded={() => setHasMapLoaded(true)}
+        >
           <Control
             onClick={isExpanded ? () => setIsExpanded(false) : undefined}
             position="top-right"

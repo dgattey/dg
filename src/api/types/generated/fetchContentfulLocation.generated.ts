@@ -19,5 +19,6 @@ export type MyLocationQuery = {
           | undefined;
       }
     | undefined;
-  readonly asset: { readonly url: string | undefined } | undefined;
+  readonly lightImage: { readonly url: string | undefined } | undefined;
+  readonly darkImage: { readonly url: string | undefined } | undefined;
 };
