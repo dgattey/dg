@@ -1,7 +1,8 @@
+import { faSpotify } from '@fortawesome/free-brands-svg-icons';
 import type { Track } from 'api/types/spotify/Track';
+import FaIcon from 'components/FaIcon';
 import Link from 'components/Link';
 import useLinkWithName from 'hooks/useLinkWithName';
-import { FaSpotify } from 'react-icons/fa';
 import styled from 'styled-components';
 
 type Props = Track;
@@ -19,7 +20,7 @@ const Logo = ({ name, external_urls }: Props) => {
   const link = useLinkWithName('Spotify', { title: name, url: external_urls.spotify });
   return link ? (
     <BigLogoLink {...link}>
-      <FaSpotify />
+      <FaIcon icon={faSpotify} />
     </BigLogoLink>
   ) : null;
 };

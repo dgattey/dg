@@ -1,15 +1,15 @@
+import {
+  faGithubAlt,
+  faInstagram,
+  faLinkedinIn,
+  faSpotify,
+  faStrava,
+} from '@fortawesome/free-brands-svg-icons';
+import { faPaperPlane, faQuestion } from '@fortawesome/free-solid-svg-icons';
 import type { Link as LinkProps } from 'api/types/generated/contentfulApi.generated';
+import FaIcon from 'components/FaIcon';
 import NextLink from 'next/link';
 import React from 'react';
-import {
-  FaGithubAlt,
-  FaInstagram,
-  FaLinkedinIn,
-  FaPaperPlane,
-  FaQuestion,
-  FaSpotify,
-  FaStrava,
-} from 'react-icons/fa';
 import styled from 'styled-components';
 
 /**
@@ -37,13 +37,13 @@ type SubProps = Pick<Props, 'title' | 'icon'> & { layout: Layout };
  * All built in mappings for icon name to element
  */
 const BUILT_IN_ICONS: Record<string, JSX.Element> = {
-  strava: <FaStrava />,
-  spotify: <FaSpotify />,
-  github: <FaGithubAlt />,
-  linkedin: <FaLinkedinIn />,
-  instagram: <FaInstagram />,
-  about: <FaQuestion />,
-  email: <FaPaperPlane />,
+  strava: <FaIcon icon={faStrava} />,
+  spotify: <FaIcon icon={faSpotify} />,
+  github: <FaIcon icon={faGithubAlt} />,
+  linkedin: <FaIcon icon={faLinkedinIn} />,
+  instagram: <FaIcon icon={faInstagram} />,
+  about: <FaIcon icon={faQuestion} />,
+  email: <FaIcon icon={faPaperPlane} />,
 };
 
 // Allows us to use with the right props

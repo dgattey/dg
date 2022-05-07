@@ -33,6 +33,10 @@
   "dependencies": {
     "@contentful/rich-text-react-renderer": "^15.12.1",
     "@contentful/rich-text-types": "^15.12.1",
+    "@fortawesome/fontawesome-svg-core": "^6.1.1",
+    "@fortawesome/free-brands-svg-icons": "^6.1.1",
+    "@fortawesome/free-solid-svg-icons": "^6.1.1",
+    "@fortawesome/react-fontawesome": "latest",
     "@picocss/pico": "^1.5.0",
     "@prisma/client": "^3.13.0",
     "@sentry/integrations": "^6.19.7",

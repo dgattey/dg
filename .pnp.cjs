@@ -39,6 +39,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@contentful/rich-text-react-renderer", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:15.12.1"],\
             ["@contentful/rich-text-types", "npm:15.12.1"],\
             ["@digitak/esrun", "npm:3.2.2"],\
+            ["@fortawesome/fontawesome-svg-core", "npm:6.1.1"],\
+            ["@fortawesome/free-brands-svg-icons", "npm:6.1.1"],\
+            ["@fortawesome/free-solid-svg-icons", "npm:6.1.1"],\
+            ["@fortawesome/react-fontawesome", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:0.1.18"],\
             ["@graphql-codegen/cli", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:2.6.2"],\
             ["@graphql-codegen/near-operation-file-preset", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:2.2.11"],\
             ["@graphql-codegen/typescript", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:2.4.10"],\
@@ -1485,6 +1489,72 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["js-yaml", "npm:4.1.0"],\
             ["minimatch", "npm:3.1.2"],\
             ["strip-json-comments", "npm:3.1.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@fortawesome/fontawesome-common-types", [\
+        ["npm:6.1.1", {\
+          "packageLocation": "./.yarn/unplugged/@fortawesome-fontawesome-common-types-npm-6.1.1-4c6a8fd5e4/node_modules/@fortawesome/fontawesome-common-types/",\
+          "packageDependencies": [\
+            ["@fortawesome/fontawesome-common-types", "npm:6.1.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@fortawesome/fontawesome-svg-core", [\
+        ["npm:6.1.1", {\
+          "packageLocation": "./.yarn/unplugged/@fortawesome-fontawesome-svg-core-npm-6.1.1-521ea4a8a9/node_modules/@fortawesome/fontawesome-svg-core/",\
+          "packageDependencies": [\
+            ["@fortawesome/fontawesome-svg-core", "npm:6.1.1"],\
+            ["@fortawesome/fontawesome-common-types", "npm:6.1.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@fortawesome/free-brands-svg-icons", [\
+        ["npm:6.1.1", {\
+          "packageLocation": "./.yarn/unplugged/@fortawesome-free-brands-svg-icons-npm-6.1.1-294dc60d03/node_modules/@fortawesome/free-brands-svg-icons/",\
+          "packageDependencies": [\
+            ["@fortawesome/free-brands-svg-icons", "npm:6.1.1"],\
+            ["@fortawesome/fontawesome-common-types", "npm:6.1.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@fortawesome/free-solid-svg-icons", [\
+        ["npm:6.1.1", {\
+          "packageLocation": "./.yarn/unplugged/@fortawesome-free-solid-svg-icons-npm-6.1.1-ab68dfcd79/node_modules/@fortawesome/free-solid-svg-icons/",\
+          "packageDependencies": [\
+            ["@fortawesome/free-solid-svg-icons", "npm:6.1.1"],\
+            ["@fortawesome/fontawesome-common-types", "npm:6.1.1"]\
+          ],\
+          "linkType": "HARD"\
+        }]\
+      ]],\
+      ["@fortawesome/react-fontawesome", [\
+        ["npm:0.1.18", {\
+          "packageLocation": "./.yarn/cache/@fortawesome-react-fontawesome-npm-0.1.18-106800ea16-eba7112345.zip/node_modules/@fortawesome/react-fontawesome/",\
+          "packageDependencies": [\
+            ["@fortawesome/react-fontawesome", "npm:0.1.18"]\
+          ],\
+          "linkType": "SOFT"\
+        }],\
+        ["virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:0.1.18", {\
+          "packageLocation": "./.yarn/__virtual__/@fortawesome-react-fontawesome-virtual-3928d7cdf1/0/cache/@fortawesome-react-fontawesome-npm-0.1.18-106800ea16-eba7112345.zip/node_modules/@fortawesome/react-fontawesome/",\
+          "packageDependencies": [\
+            ["@fortawesome/react-fontawesome", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:0.1.18"],\
+            ["@fortawesome/fontawesome-svg-core", "npm:6.1.1"],\
+            ["@types/fortawesome__fontawesome-svg-core", null],\
+            ["@types/react", "npm:18.0.9"],\
+            ["prop-types", "npm:15.8.1"],\
+            ["react", "npm:18.1.0"]\
+          ],\
+          "packagePeers": [\
+            "@fortawesome/fontawesome-svg-core",\
+            "@types/fortawesome__fontawesome-svg-core",\
+            "@types/react",\
+            "react"\
           ],\
           "linkType": "HARD"\
         }]\
@@ -6711,6 +6781,10 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@contentful/rich-text-react-renderer", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:15.12.1"],\
             ["@contentful/rich-text-types", "npm:15.12.1"],\
             ["@digitak/esrun", "npm:3.2.2"],\
+            ["@fortawesome/fontawesome-svg-core", "npm:6.1.1"],\
+            ["@fortawesome/free-brands-svg-icons", "npm:6.1.1"],\
+            ["@fortawesome/free-solid-svg-icons", "npm:6.1.1"],\
+            ["@fortawesome/react-fontawesome", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:0.1.18"],\
             ["@graphql-codegen/cli", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:2.6.2"],\
             ["@graphql-codegen/near-operation-file-preset", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:2.2.11"],\
             ["@graphql-codegen/typescript", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:2.4.10"],\
