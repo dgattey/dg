@@ -14,6 +14,11 @@ interface Props {
   description?: string;
 }
 
+interface GraphItemProps {
+  name: string;
+  content?: string;
+}
+
 const MAX_DESC_LENGTH = 300;
 const APP_THEME_COLOR = '#16ac7e';
 const APP_BACKGROUND_COLOR = '#ffffff';
@@ -74,6 +79,17 @@ const ICONS = {
 } as const;
 
 /**
+ * Small component to create og: and twitter: elements for a key + content
+ */
+const GraphMetaItem = ({ name, content }: GraphItemProps) =>
+  content ? (
+    <>
+      <meta key={`og:${name}`} property={`og:${name}`} content={content} />
+      <meta key={`twitter:${name}`} name={`twitter:${name}`} content={content} />
+    </>
+  ) : null;
+
+/**
  * Populates the `<head>` of a given page from the title/description here
  */
 const Meta = ({ title, description }: Props) => {
@@ -86,48 +102,23 @@ const Meta = ({ title, description }: Props) => {
 
   // Construct url with encoded periods too to not confuse the parser
   const imageTitle = title ? encodeURIComponent(title).replace(/\./g, '%2E') : '%20';
-  const imageUrl = `${OG_IMAGE_URL}/${imageTitle}?md=true`;
-  const pageUrl = `${BASE_URL}${asPath}`;
-
-  const titleElements = (
-    <>
-      <title>{resolvedTitle}</title>
-      <meta property="og:title" content={resolvedTitle} />
-      <meta name="twitter:title" content={resolvedTitle} />
-    </>
-  );
-  const descriptionElements = truncatedDescription && (
-    <>
-      <meta name="description" content={truncatedDescription} />
-      <meta property="og:description" content={truncatedDescription} />
-      <meta name="twitter:description" content={truncatedDescription} />
-    </>
-  );
-  const urlElements = (
-    <>
-      <meta property="og:url" content={pageUrl} />
-      <meta name="twitter:url" content={pageUrl} />
-    </>
-  );
-  const imageElements = (
-    <>
-      <meta property="og:image" content={imageUrl} />
-      <meta name="twitter:image" content={imageUrl} />
-    </>
-  );
 
   return (
     <Head>
-      <meta property="og:site_name" content={SITE_NAME} />
-      <meta property="og:locale" content="en_US" />
-      <meta property="og:type" content="website" />
-      <meta name="twitter:card" content="summary_large_image" />
-      {titleElements}
-      {descriptionElements}
-      {urlElements}
-      {imageElements}
+      <meta key="og:site_name" property="og:site_name" content={SITE_NAME} />
+      <meta key="og:locale" property="og:locale" content="en_US" />
+      <meta key="og:type" property="og:type" content="website" />
+      <meta key="twitter:card" name="twitter:card" content="summary_large_image" />
+      <title key="title">{resolvedTitle}</title>
+      {truncatedDescription && (
+        <meta key="description" name="description" content={truncatedDescription} />
+      )}
+      <GraphMetaItem name="title" content={resolvedTitle} />
+      <GraphMetaItem name="description" content={truncatedDescription} />
+      <GraphMetaItem name="url" content={`${BASE_URL}${asPath}`} />
+      <GraphMetaItem name="image" content={`${OG_IMAGE_URL}/${imageTitle}?md=true`} />
       <link key="favicon" rel="icon" href="/favicon.ico" />
-      <meta name="theme-color" content="var(--background-color)" />
+      <meta key="theme-color" name="theme-color" content="var(--background-color)" />
       <meta
         key="msapplication-TileColor"
         name="msapplication-TileColor"
