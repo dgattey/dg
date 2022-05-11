@@ -115,7 +115,7 @@ const ErrorPage = ({ statusCode, fallback, hasStaticPropsRun, err }: Props) => {
     Sentry.captureException(err);
   }
   return (
-    <ErrorLayout fallback={fallback}>
+    <ErrorLayout fallback={fallback} statusCode={statusCode ?? 500}>
       <Contents statusCode={statusCode} />
     </ErrorLayout>
   );

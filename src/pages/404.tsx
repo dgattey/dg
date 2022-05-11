@@ -21,7 +21,7 @@ export const getStaticProps = async () => {
  * Error page, for 404s specifically
  */
 const Error404Page = ({ fallback }: Props) => (
-  <ErrorLayout fallback={fallback}>
+  <ErrorLayout fallback={fallback} statusCode={404}>
     <Contents statusCode={404} />
   </ErrorLayout>
 );
