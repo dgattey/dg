@@ -14,10 +14,11 @@ interface Props {
   description?: string;
 }
 
-interface GraphItemProps {
-  name: string;
-  content?: string;
-}
+/**
+ * Maps from graph item names like "url" for "og:url"/"twitter:url" to their
+ * content, like "https://example" or "undefined"
+ */
+type Graph = Record<string, string | undefined>;
 
 const MAX_DESC_LENGTH = 300;
 const APP_THEME_COLOR = '#16ac7e';
@@ -25,6 +26,7 @@ const APP_BACKGROUND_COLOR = '#ffffff';
 const SITE_NAME = 'Dylan Gattey';
 const BASE_URL = 'https://dylangattey.com';
 const OG_IMAGE_URL = 'https://og.dylangattey.com';
+const GRAPH_PREFIXES = ['og', 'twitter'] as const;
 
 /**
  * Helps reduce duplication for creation of link elements
@@ -79,15 +81,16 @@ const ICONS = {
 } as const;
 
 /**
- * Small component to create og: and twitter: elements for a key + content
+ * Small helper to create og: and twitter: elements for keys + content
  */
-const GraphMetaItem = ({ name, content }: GraphItemProps) =>
-  content ? (
-    <>
-      <meta key={`og:${name}`} property={`og:${name}`} content={content} />
-      <meta key={`twitter:${name}`} name={`twitter:${name}`} content={content} />
-    </>
-  ) : null;
+const graphMetaItems = (graph: Graph) =>
+  Object.entries(graph).map(([name, content]) =>
+    GRAPH_PREFIXES.map((prefix) =>
+      content ? (
+        <meta key={`${prefix}:${name}`} property={`${prefix}:${name}`} content={content} />
+      ) : undefined,
+    ),
+  );
 
 /**
  * Populates the `<head>` of a given page from the title/description here
@@ -102,6 +105,12 @@ const Meta = ({ title, description }: Props) => {
 
   // Construct url with encoded periods too to not confuse the parser
   const imageTitle = title ? encodeURIComponent(title).replace(/\./g, '%2E') : '%20';
+  const graphItems = graphMetaItems({
+    title,
+    description: truncatedDescription,
+    url: `${BASE_URL}${asPath}`,
+    image: `${OG_IMAGE_URL}/${imageTitle}?md=true`,
+  });
 
   return (
     <Head>
@@ -113,10 +122,7 @@ const Meta = ({ title, description }: Props) => {
       {truncatedDescription && (
         <meta key="description" name="description" content={truncatedDescription} />
       )}
-      <GraphMetaItem name="title" content={resolvedTitle} />
-      <GraphMetaItem name="description" content={truncatedDescription} />
-      <GraphMetaItem name="url" content={`${BASE_URL}${asPath}`} />
-      <GraphMetaItem name="image" content={`${OG_IMAGE_URL}/${imageTitle}?md=true`} />
+      {graphItems}
       <link key="favicon" rel="icon" href="/favicon.ico" />
       <meta key="theme-color" name="theme-color" content="var(--background-color)" />
       <meta
