@@ -1,9 +1,9 @@
 import useData from 'api/useData';
 import ContentGrid from 'components/ContentGrid';
+import Meta from 'components/Meta';
 import useGridAnimation from 'hooks/useGridAnimation';
 import React, { useMemo, useRef } from 'react';
 import ColorSchemeToggleCard from './ColorSchemeToggleCard';
-import HomepageMeta from './HomepageMeta';
 import IntroCard from './IntroCard';
 import MapCard from './MapCard';
 import ProjectCard from './ProjectCard';
@@ -17,6 +17,12 @@ import StravaCard from './StravaCard';
  */
 const Homepage = () => {
   const { data: projects } = useData('projects');
+  const { data: introBlock } = useData('intro');
+
+  // Grabs the first intro block text element, essentially.
+  const firstParagraph = introBlock?.textBlock?.content?.json.content
+    ?.find((item) => item.nodeType === 'paragraph')
+    ?.content?.find((item) => item.nodeType === 'text')?.value;
 
   // For animating grid items
   const gridRef = useRef<HTMLDivElement | null>(null);
@@ -41,7 +47,7 @@ const Homepage = () => {
 
   return (
     <>
-      <HomepageMeta />
+      <Meta title="Engineer. Problem Solver." description={firstParagraph} />
       <ContentGrid gridRef={gridRef}>
         {otherCards.map(({ index, card }, arrayIndex) => {
           const nextItem = otherCards[arrayIndex + 1];

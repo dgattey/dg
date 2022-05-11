@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 interface Props {
@@ -16,6 +17,9 @@ interface Props {
 const MAX_DESC_LENGTH = 300;
 const APP_THEME_COLOR = '#16ac7e';
 const APP_BACKGROUND_COLOR = '#ffffff';
+const SITE_NAME = 'Dylan Gattey';
+const BASE_URL = 'https://dylangattey.com';
+const OG_IMAGE_URL = 'https://og.dylangattey.com';
 
 /**
  * Helps reduce duplication for creation of link elements
@@ -73,25 +77,55 @@ const ICONS = {
  * Populates the `<head>` of a given page from the title/description here
  */
 const Meta = ({ title, description }: Props) => {
+  const { asPath } = useRouter();
   const truncatedDescription =
     description && description.length > MAX_DESC_LENGTH
       ? `${description.slice(0, MAX_DESC_LENGTH)}...`
       : description;
-  const resolvedTitle = title ? `Dylan Gattey - ${title}` : 'Dylan Gattey';
+  const resolvedTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
+
+  // Construct url with encoded periods too to not confuse the parser
+  const imageTitle = title ? encodeURIComponent(title).replace(/\./g, '%2E') : '%20';
+  const imageUrl = `${OG_IMAGE_URL}/${imageTitle}?md=true`;
+  const pageUrl = `${BASE_URL}${asPath}`;
+
+  const titleElements = (
+    <>
+      <title>{resolvedTitle}</title>
+      <meta property="og:title" content={resolvedTitle} />
+      <meta name="twitter:title" content={resolvedTitle} />
+    </>
+  );
+  const descriptionElements = truncatedDescription && (
+    <>
+      <meta name="description" content={truncatedDescription} />
+      <meta property="og:description" content={truncatedDescription} />
+      <meta name="twitter:description" content={truncatedDescription} />
+    </>
+  );
+  const urlElements = (
+    <>
+      <meta property="og:url" content={pageUrl} />
+      <meta name="twitter:url" content={pageUrl} />
+    </>
+  );
+  const imageElements = (
+    <>
+      <meta property="og:image" content={imageUrl} />
+      <meta name="twitter:image" content={imageUrl} />
+    </>
+  );
 
   return (
     <Head>
-      <title>{resolvedTitle}</title>
-      <meta property="og:title" content={resolvedTitle} />
-      <meta property="twitter:title" content={resolvedTitle} />
-      {truncatedDescription && (
-        <>
-          <meta name="description" content={truncatedDescription} />
-          <meta property="og:description" content={truncatedDescription} />
-          <meta property="twitter:description" content={truncatedDescription} />
-        </>
-      )}
+      <meta property="og:site_name" content={SITE_NAME} />
+      <meta property="og:locale" content="en_US" />
       <meta property="og:type" content="website" />
+      <meta name="twitter:card" content="summary_large_image" />
+      {titleElements}
+      {descriptionElements}
+      {urlElements}
+      {imageElements}
       <link key="favicon" rel="icon" href="/favicon.ico" />
       <meta name="theme-color" content="var(--background-color)" />
       <meta

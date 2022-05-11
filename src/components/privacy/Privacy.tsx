@@ -1,8 +1,8 @@
 import useData from 'api/useData';
+import Meta from 'components/Meta';
 import RichText from 'components/RichText';
 import React from 'react';
 import styled from 'styled-components';
-import PrivacyMeta from './PrivacyMeta';
 
 const SingleColumn = styled(RichText)`
   max-width: 35em;
@@ -19,9 +19,15 @@ const Privacy = () => {
     return null;
   }
 
+  // Grabs the second text element, since the first is a last updated
+  const secondParagraph = privacyTextBlock?.content?.json.content?.filter(
+    (item) => item.nodeType === 'paragraph',
+  )?.[1];
+  const privacyDescription = secondParagraph?.content?.map((node) => node.value)?.join('');
+
   return (
     <>
-      <PrivacyMeta />
+      <Meta title="Privacy Policy" description={privacyDescription} />
       <SingleColumn {...privacyTextBlock.content} />
     </>
   );
