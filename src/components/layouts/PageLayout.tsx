@@ -3,6 +3,7 @@ import type { PartialFallback } from 'api/fetchFallback';
 import ColorSchemeContext from 'components/ColorSchemeContext';
 import Footer from 'components/Footer';
 import Header from 'components/Header';
+import Meta from 'components/Meta';
 import ScrollIndicatorContext from 'components/ScrollIndicatorContext';
 import useColorScheme from 'hooks/useColorScheme';
 import useShowScrollIndicator from 'hooks/useShowScrollIndicator';
@@ -34,6 +35,7 @@ const PageLayout = <Key extends EndpointKey>({ children, fallback }: Props<Key>)
   );
   return (
     <SWRConfig value={{ fallback }}>
+      <Meta />
       <ColorSchemeContext.Provider value={colorSchemeData}>
         <ScrollIndicatorContext.Provider value={isIndicatorShown}>
           <Header headerRef={headerSizingRef} />

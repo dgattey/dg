@@ -1,4 +1,5 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import React from 'react';
 
 interface Props {
@@ -13,9 +14,19 @@ interface Props {
   description?: string;
 }
 
+/**
+ * Maps from graph item names like "url" for "og:url"/"twitter:url" to their
+ * content, like "https://example" or "undefined"
+ */
+type Graph = Record<string, string | undefined>;
+
 const MAX_DESC_LENGTH = 300;
 const APP_THEME_COLOR = '#16ac7e';
 const APP_BACKGROUND_COLOR = '#ffffff';
+const SITE_NAME = 'Dylan Gattey';
+const BASE_URL = 'https://dylangattey.com';
+const OG_IMAGE_URL = 'https://og.dylangattey.com';
+const GRAPH_PREFIXES = ['og', 'twitter'] as const;
 
 /**
  * Helps reduce duplication for creation of link elements
@@ -70,30 +81,50 @@ const ICONS = {
 } as const;
 
 /**
+ * Small helper to create og: and twitter: elements for keys + content
+ */
+const graphMetaItems = (graph: Graph) =>
+  Object.entries(graph).map(([name, content]) =>
+    GRAPH_PREFIXES.map((prefix) =>
+      content ? (
+        <meta key={`${prefix}:${name}`} property={`${prefix}:${name}`} content={content} />
+      ) : undefined,
+    ),
+  );
+
+/**
  * Populates the `<head>` of a given page from the title/description here
  */
 const Meta = ({ title, description }: Props) => {
+  const { asPath } = useRouter();
   const truncatedDescription =
     description && description.length > MAX_DESC_LENGTH
       ? `${description.slice(0, MAX_DESC_LENGTH)}...`
       : description;
-  const resolvedTitle = title ? `Dylan Gattey - ${title}` : 'Dylan Gattey';
+  const resolvedTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
+
+  // Construct url with encoded periods too to not confuse the parser
+  const imageTitle = title ? encodeURIComponent(title).replace(/\./g, '%2E') : '%20';
+  const graphItems = graphMetaItems({
+    title,
+    description: truncatedDescription,
+    url: `${BASE_URL}${asPath}`,
+    image: `${OG_IMAGE_URL}/${imageTitle}?md=true`,
+  });
 
   return (
     <Head>
-      <title>{resolvedTitle}</title>
-      <meta property="og:title" content={resolvedTitle} />
-      <meta property="twitter:title" content={resolvedTitle} />
+      <meta key="og:site_name" property="og:site_name" content={SITE_NAME} />
+      <meta key="og:locale" property="og:locale" content="en_US" />
+      <meta key="og:type" property="og:type" content="website" />
+      <meta key="twitter:card" name="twitter:card" content="summary_large_image" />
+      <title key="title">{resolvedTitle}</title>
       {truncatedDescription && (
-        <>
-          <meta name="description" content={truncatedDescription} />
-          <meta property="og:description" content={truncatedDescription} />
-          <meta property="twitter:description" content={truncatedDescription} />
-        </>
+        <meta key="description" name="description" content={truncatedDescription} />
       )}
-      <meta property="og:type" content="website" />
+      {graphItems}
       <link key="favicon" rel="icon" href="/favicon.ico" />
-      <meta name="theme-color" content="var(--background-color)" />
+      <meta key="theme-color" name="theme-color" content="var(--background-color)" />
       <meta
         key="msapplication-TileColor"
         name="msapplication-TileColor"

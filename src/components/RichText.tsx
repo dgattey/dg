@@ -7,7 +7,7 @@ import ProjectCard from 'components/homepage/ProjectCard';
 import Image from './Image';
 import Link from './Link';
 
-type Props = TextBlockContent;
+type Props = TextBlockContent & Pick<React.ComponentPropsWithoutRef<'div'>, 'className'>;
 
 /**
  * Defines a Node's Data with actual data
@@ -87,9 +87,13 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
  * Complicated component to render rich text from Contentful's rich
  * text renderer, resolving all items to components
  */
-const RichText = ({ json, links }: Props) => (
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  <div>{documentToReactComponents(json as unknown as Document, renderOptions(links))}</div>
+const RichText = ({ json, links, className }: Props) => (
+  <div className={className}>
+    {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      documentToReactComponents(json as unknown as Document, renderOptions(links))
+    }
+  </div>
 );
 
 export default RichText;

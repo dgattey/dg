@@ -1,7 +1,14 @@
 import useData from 'api/useData';
+import Meta from 'components/Meta';
 import RichText from 'components/RichText';
 import React from 'react';
-import PrivacyMeta from './PrivacyMeta';
+import styled from 'styled-components';
+
+const SingleColumn = styled(RichText)`
+  max-width: 35em;
+  margin-left: auto;
+  margin-right: auto;
+`;
 
 /**
  * Shows the privacy policy on a page alone
@@ -12,10 +19,16 @@ const Privacy = () => {
     return null;
   }
 
+  // Grabs the second text element, since the first is a last updated
+  const secondParagraph = privacyTextBlock?.content?.json.content?.filter(
+    (item) => item.nodeType === 'paragraph',
+  )?.[1];
+  const privacyDescription = secondParagraph?.content?.map((node) => node.value)?.join('');
+
   return (
     <>
-      <PrivacyMeta />
-      <RichText {...privacyTextBlock.content} />
+      <Meta title="Privacy Policy" description={privacyDescription} />
+      <SingleColumn {...privacyTextBlock.content} />
     </>
   );
 };
