@@ -61,6 +61,7 @@ const StravaCard = () => {
     () =>
       Intl.NumberFormat(undefined, {
         compactDisplay: 'long',
+        maximumFractionDigits: 1,
       }),
     [],
   );
