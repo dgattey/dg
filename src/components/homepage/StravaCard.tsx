@@ -47,7 +47,8 @@ const Stat = styled(Text)`
   margin-bottom: 0.25rem;
 `;
 
-const PlainLink = styled.a`
+// Opens link in new tab
+const ExternalLink = styled.a.attrs({ target: '_blank', rel: 'noreferrer' })`
   color: inherit;
 `;
 
@@ -98,13 +99,13 @@ const StravaCard = () => {
             </StatusText>
           )}
           {activity.name && (
-            <PlainLink href={url}>
+            <ExternalLink href={url}>
               <Text>{activity.name}</Text>
-            </PlainLink>
+            </ExternalLink>
           )}
           {activity.description && (
             <Description>
-              <PlainLink href={url}>{activity.description}</PlainLink>
+              <ExternalLink href={url}>{activity.description}</ExternalLink>
             </Description>
           )}
         </Group>

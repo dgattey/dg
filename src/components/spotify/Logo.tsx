@@ -19,7 +19,7 @@ const BigLogoLink = styled(Link)`
 const Logo = ({ name, external_urls }: Props) => {
   const link = useLinkWithName('Spotify', { title: name, url: external_urls.spotify });
   return link ? (
-    <BigLogoLink {...link}>
+    <BigLogoLink {...link} isExternal>
       <FaIcon icon={faSpotify} />
     </BigLogoLink>
   ) : null;

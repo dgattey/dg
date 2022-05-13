@@ -24,7 +24,7 @@ const Footer = () => {
   const { data: footerLinks } = useData('footer');
   const listedLinkElements = footerLinks?.map((link) => (
     <li key={link.url}>
-      <Link {...link} />
+      <Link {...link} isExternal={link.url?.startsWith('http')} />
     </li>
   ));
   return (

@@ -15,7 +15,13 @@ const PlainLink = styled(Link)`
  */
 const TrackTitle = ({ name, external_urls }: Props) => {
   const link = useLinkWithName('Spotify', { title: name, url: external_urls.spotify });
-  return link ? <PlainLink {...link}>{name}</PlainLink> : <span>name</span>;
+  return link ? (
+    <PlainLink isExternal {...link}>
+      {name}
+    </PlainLink>
+  ) : (
+    <span>name</span>
+  );
 };
 
 export default TrackTitle;

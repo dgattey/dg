@@ -55,7 +55,13 @@ const ArtistList = ({ artists }: Props) => {
         const link = artistLink(artist);
         return (
           <React.Fragment key={artist.id}>
-            {link ? <PlainLink {...link}>{artist.name}</PlainLink> : artist.name}
+            {link ? (
+              <PlainLink isExternal {...link}>
+                {artist.name}
+              </PlainLink>
+            ) : (
+              artist.name
+            )}
             <span>{separator({ index, fullList: artists })}</span>
           </React.Fragment>
         );

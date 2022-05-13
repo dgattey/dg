@@ -27,6 +27,12 @@ type Props = Pick<LinkProps, 'title' | 'url' | 'icon'> &
      * Defaults to `text` when there's no icon, or `icon` when one is specified
      */
     layout?: Layout;
+
+    /**
+     * Defaults to false, but can be set to true to add target="_blank" and
+     * rel="noreferrer"
+     */
+    isExternal?: boolean;
   };
 
 // Used a few times, required layout
@@ -81,7 +87,7 @@ const tooltip = ({ title, layout }: SubProps) =>
  * or defaults to `icon` if one is specified, otherwise `text`. Returns
  * null if no link at all.
  */
-const Link = ({ title, url, icon, layout: rawLayout, className, children }: Props) => {
+const Link = ({ title, url, icon, layout: rawLayout, className, children, isExternal }: Props) => {
   const layout = rawLayout ?? (icon && !children ? 'icon' : 'text');
   if (!url) {
     return null;
@@ -91,7 +97,11 @@ const Link = ({ title, url, icon, layout: rawLayout, className, children }: Prop
   const iconElement = createIconElement({ title, icon, layout });
   return (
     <NextLink href={url} passHref>
-      <StyledLink className={className} data-tooltip={tooltip({ title, icon, layout })}>
+      <StyledLink
+        className={className}
+        data-tooltip={tooltip({ title, icon, layout })}
+        {...(isExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
+      >
         {layout === 'empty' ? null : children ?? iconElement ?? title}
       </StyledLink>
     </NextLink>
