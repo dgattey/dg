@@ -50,7 +50,13 @@ const AlbumImage = ({ name, album }: Props) => {
     </ImageContainer>
   ) : null;
 
-  return albumLink ? <FlexedLink {...albumLink}>{imageComponent}</FlexedLink> : imageComponent;
+  return albumLink ? (
+    <FlexedLink isExternal {...albumLink}>
+      {imageComponent}
+    </FlexedLink>
+  ) : (
+    imageComponent
+  );
 };
 
 export default AlbumImage;

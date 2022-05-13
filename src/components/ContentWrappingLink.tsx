@@ -17,7 +17,9 @@ const ContentWrappingLink = ({ link, children }: Props) => {
   }
   return (
     <NextLink passHref href={link.url}>
-      <a href={link.url}>{children}</a>
+      <a href={link.url} target="_blank" rel="noreferrer">
+        {children}
+      </a>
     </NextLink>
   );
 };

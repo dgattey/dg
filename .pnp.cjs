@@ -54,6 +54,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@sentry/cli", "npm:2.0.4"],\
             ["@sentry/integrations", "npm:6.19.7"],\
             ["@sentry/nextjs", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:6.19.7"],\
+            ["@sentry/types", "npm:6.19.7"],\
             ["@stylelint/postcss-css-in-js", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:0.38.0"],\
             ["@types/mapbox-gl", "npm:2.7.1"],\
             ["@types/node", "npm:16.11.33"],\
@@ -6768,6 +6769,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@sentry/cli", "npm:2.0.4"],\
             ["@sentry/integrations", "npm:6.19.7"],\
             ["@sentry/nextjs", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:6.19.7"],\
+            ["@sentry/types", "npm:6.19.7"],\
             ["@stylelint/postcss-css-in-js", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:0.38.0"],\
             ["@types/mapbox-gl", "npm:2.7.1"],\
             ["@types/node", "npm:16.11.33"],\
