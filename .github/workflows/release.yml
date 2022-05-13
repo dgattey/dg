@@ -18,14 +18,21 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: yarn release
+      - uses: actions-ecosystem/action-get-latest-tag@v1
+        name: Get latest version tag
+        with:
+          semver_only: true
+        id: latest-version-tag
       - name: Redeploy on Vercel using latest version
+        if: ${{ steps.latest-version-tag.outputs.tag != '' }}
         run: |
           prodRun=""
           if [[ ${GITHUB_REF} == "refs/heads/main" ]]; then
             prodRun="--prod"
           fi
-          npx vercel --token ${VERCEL_DEPLOY_TOKEN} $prodRun --build-env NEXT_PUBLIC_VERSION=${GITHUB_SHA} --build-env NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA=${GITHUB_SHA} --env NEXT_PUBLIC_VERSION=${GITHUB_SHA} --env NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA=${GITHUB_SHA}
+          npx vercel --token ${VERCEL_DEPLOY_TOKEN} $prodRun --build-env NEXT_PUBLIC_VERSION=${GITHUB_SHA} --build-env NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA=${GITHUB_SHA} --env NEXT_PUBLIC_VERSION=${LATEST_TAG} --env NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA=${GITHUB_SHA}
         env:
+          LATEST_TAG: ${{ steps.latest-version-tag.outputs.tag }}
           VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

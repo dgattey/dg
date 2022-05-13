@@ -5,7 +5,7 @@ import fetchGithubRepoVersion from '../src/api/server/fetchGithubRepoVersion';
  * right data, then writes it to STDOUT for later use.
  */
 const getVersion = async () => {
-  const version = (await fetchGithubRepoVersion()) ?? 'LOCAL';
+  const version = (await fetchGithubRepoVersion()) ?? 'vX.Y.Z';
   process.stdout.write(version);
 };
 

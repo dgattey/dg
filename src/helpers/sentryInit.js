@@ -35,7 +35,7 @@ const sentryInit = () =>
 
     // Make sure we don't enable sending events on local builds or builds where we have no real version set
     enabled:
-      !['vX.Y.Z', 'LOCAL'].includes(String(process.env.NEXT_PUBLIC_APP_VERSION)) &&
+      !'vX.Y.Z'.includes(String(process.env.NEXT_PUBLIC_APP_VERSION)) &&
       !process.env?.DATABASE_URL?.includes('127.0.0.1'),
 
     /**
