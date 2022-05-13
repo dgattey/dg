@@ -4,7 +4,7 @@ import type { Props as ContentCardProps } from 'components/ContentCard';
 import ContentCard from 'components/ContentCard';
 import { Maximize2, Minimize2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
-import { useContext, useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import styled, { css } from 'styled-components';
 
 type Props = Pick<ContentCardProps, 'turnOnAnimation'>;
@@ -53,6 +53,14 @@ const MapCard = ({ turnOnAnimation }: Props) => {
   const { colorScheme } = useContext(ColorSchemeContext);
   const backgroundImageUrl =
     colorScheme === 'light' ? location?.backupImageUrls.light : location?.backupImageUrls.dark;
+  const expansionControl = useMemo(
+    () => (
+      <Control onClick={isExpanded ? () => setIsExpanded(false) : undefined} position="top-right">
+        {isExpanded ? <Minimize2 size="1em" /> : <Maximize2 size="1em" />}
+      </Control>
+    ),
+    [isExpanded],
+  );
 
   return (
     <Card
@@ -68,12 +76,7 @@ const MapCard = ({ turnOnAnimation }: Props) => {
           isLoaded={hasMapLoaded}
           setMapHasLoaded={() => setHasMapLoaded(true)}
         >
-          <Control
-            onClick={isExpanded ? () => setIsExpanded(false) : undefined}
-            position="top-right"
-          >
-            {isExpanded ? <Minimize2 size="1em" /> : <Maximize2 size="1em" />}
-          </Control>
+          {expansionControl}
           <Marker key="home" point={location.point} image={location.image} />
         </Map>
       )}
