@@ -1,6 +1,6 @@
 import Head from 'next/head';
 import { useRouter } from 'next/router';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 interface Props {
   /**
@@ -97,6 +97,7 @@ const graphMetaItems = (graph: Graph) =>
  */
 const Meta = ({ title, description }: Props) => {
   const { asPath } = useRouter();
+  const [graphItems, setGraphItems] = useState<ReturnType<typeof graphMetaItems> | null>(null);
   const truncatedDescription =
     description && description.length > MAX_DESC_LENGTH
       ? `${description.slice(0, MAX_DESC_LENGTH)}...`
@@ -105,12 +106,18 @@ const Meta = ({ title, description }: Props) => {
 
   // Construct url with encoded periods too to not confuse the parser
   const imageTitle = title ? encodeURIComponent(title).replace(/\./g, '%2E') : '%20';
-  const graphItems = graphMetaItems({
-    title,
-    description: truncatedDescription,
-    url: `${BASE_URL}${asPath}`,
-    image: `${OG_IMAGE_URL}/${imageTitle}?md=true`,
-  });
+
+  // This is within an effect so that we don't have mismatched props due to `asPath` between client/server
+  useEffect(() => {
+    setGraphItems(
+      graphMetaItems({
+        title: title ?? SITE_NAME,
+        description: truncatedDescription,
+        url: `${BASE_URL}${asPath}`,
+        image: `${OG_IMAGE_URL}/${imageTitle}?md=true`,
+      }),
+    );
+  }, [asPath, imageTitle, title, truncatedDescription]);
 
   return (
     <Head>
