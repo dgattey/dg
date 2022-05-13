@@ -37,19 +37,21 @@ const withNextBundleAnalyzer = require('@next/bundle-analyzer')({
 });
 
 if (process.env.NODE_ENV === 'development') {
-  // Add bundle analysis + silent sentry on develop
+  // Add silent sentry on develop and make sure it's always a dry run
   module.exports = withNextBundleAnalyzer(
     withSentryConfig(nextConfig, {
       silent: true,
+      dryRun: true,
     }),
   );
 } else {
-  // Dry run if we're running with an invalid version
+  // For prod, dry run if it's running locally/appears local
   module.exports = withNextBundleAnalyzer(
     withSentryConfig(nextConfig, {
       dryRun:
-        // These are the fallbacks when we can't find an app version, like it's not deployed on a real branch
-        ['vX.Y.Z', 'LOCAL'].includes(process.env.NEXT_PUBLIC_APP_VERSION),
+        // If not deployed on a real branch or the db url points to something local, we know we're running a production build locally
+        ['vX.Y.Z', 'LOCAL'].includes(process.env.NEXT_PUBLIC_APP_VERSION) ||
+        process.env?.DATABASE_URL?.includes('127.0.0.1'),
     }),
   );
 }
