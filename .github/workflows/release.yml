@@ -30,7 +30,8 @@ jobs:
           if [[ ${GITHUB_REF} == "refs/heads/main" ]]; then
             prodRun="--prod"
           fi
-          npx vercel --token ${VERCEL_DEPLOY_TOKEN} $prodRun --build-env NEXT_PUBLIC_VERSION=${GITHUB_SHA} --build-env NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA=${GITHUB_SHA} --env NEXT_PUBLIC_VERSION=${LATEST_TAG} --env NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA=${GITHUB_SHA}
+          echo "Latest tag: ${LATEST_TAG}"
+          npx vercel --token ${VERCEL_DEPLOY_TOKEN} $prodRun --build-env NEXT_PUBLIC_VERSION=${LATEST_TAG} --build-env NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA=${GITHUB_SHA} --env NEXT_PUBLIC_VERSION=${LATEST_TAG} --env NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA=${GITHUB_SHA}
         env:
           LATEST_TAG: ${{ steps.latest-version-tag.outputs.tag }}
           VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
