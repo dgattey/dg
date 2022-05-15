@@ -3,6 +3,7 @@ import ContentGrid from 'components/ContentGrid';
 import Meta from 'components/Meta';
 import useGridAnimation from 'hooks/useGridAnimation';
 import React, { useMemo, useRef } from 'react';
+import type { Page } from 'types/Page';
 import ColorSchemeToggleCard from './ColorSchemeToggleCard';
 import IntroCard from './IntroCard';
 import MapCard from './MapCard';
@@ -15,7 +16,7 @@ import StravaCard from './StravaCard';
  * interspersed with `introBlock` data, and dark/light mode
  * toggle.
  */
-const Homepage = () => {
+const Homepage = ({ pageUrl }: Pick<Page, 'pageUrl'>) => {
   const { data: projects } = useData('projects');
   const { data: introBlock } = useData('intro');
 
@@ -47,7 +48,7 @@ const Homepage = () => {
 
   return (
     <>
-      <Meta title="Engineer. Problem Solver." description={firstParagraph} />
+      <Meta pageUrl={pageUrl} title="Engineer. Problem Solver." description={firstParagraph} />
       <ContentGrid gridRef={gridRef}>
         {otherCards.map(({ index, card }, arrayIndex) => {
           const nextItem = otherCards[arrayIndex + 1];

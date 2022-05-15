@@ -3,6 +3,7 @@ import Meta from 'components/Meta';
 import RichText from 'components/RichText';
 import React from 'react';
 import styled from 'styled-components';
+import type { Page } from 'types/Page';
 
 const SingleColumn = styled(RichText)`
   max-width: 35em;
@@ -13,7 +14,7 @@ const SingleColumn = styled(RichText)`
 /**
  * Shows the privacy policy on a page alone
  */
-const Privacy = () => {
+const Privacy = ({ pageUrl }: Pick<Page, 'pageUrl'>) => {
   const { data: privacyTextBlock } = useData('privacy');
   if (!privacyTextBlock?.content) {
     return null;
@@ -27,7 +28,7 @@ const Privacy = () => {
 
   return (
     <>
-      <Meta title="Privacy Policy" description={privacyDescription} />
+      <Meta pageUrl={pageUrl} title="Privacy Policy" description={privacyDescription} />
       <SingleColumn {...privacyTextBlock.content} />
     </>
   );

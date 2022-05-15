@@ -1,25 +1,22 @@
-import type { PartialFallback } from 'api/fetchFallback';
 import fetchFallback from 'api/fetchFallback';
 import PageLayout from 'components/layouts/PageLayout';
 import Privacy from 'components/privacy/Privacy';
-import { GetStaticProps, InferGetStaticPropsType } from 'next/types';
+import { GetServerSideProps } from 'next/types';
 import React from 'react';
+import type { Page } from 'types/Page';
+import getPageUrl from '../helpers/getPageUrl';
 
-interface Props {
-  /**
-   * Provides SWR with fallback version data
-   */
-  fallback: PartialFallback<'privacy'>;
-}
+type Props = Page<'privacy'>;
 
 /**
- * Grabs all data necessary to render all components on the privacy page to
- * provide a fallback for the server side rendering done elsewhere.
+ * Grabs fallback data + page url
  */
-export const getStaticProps: GetStaticProps<Props> = async () => {
+export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
+  const pageUrl = getPageUrl(context);
   const data = await fetchFallback(['footer', 'version', 'privacy']);
   return {
     props: {
+      pageUrl,
       fallback: {
         ...data,
       },
@@ -30,9 +27,9 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 /**
  * Fallback for all data used in privacy page + its descendents
  */
-const PrivacyPage = ({ fallback }: InferGetStaticPropsType<typeof getStaticProps>) => (
-  <PageLayout fallback={fallback}>
-    <Privacy />
+const PrivacyPage = ({ fallback, pageUrl }: Props) => (
+  <PageLayout fallback={fallback} pageUrl={pageUrl}>
+    <Privacy pageUrl={pageUrl} />
   </PageLayout>
 );
 
