@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 type DateConstructorValue = Date | string | number | null | undefined;
 
@@ -82,16 +82,18 @@ const overriddenFormatString = ({ unit, amount }: RelativeTime) => {
 
 /**
  * Used to create a "6 hours ago" or "last week" type string using
- * native date formatting.
+ * native date formatting. Makes sure to return a string on first
+ * render and return the relative time format with an effect to avoid
+ * server/client rendering differences
  */
 const useRelativeTimeFormat = (fromDate: DateConstructorValue, toDate?: DateConstructorValue) => {
   const formatter = useMemo(() => new Intl.RelativeTimeFormat('en', { numeric: 'auto' }), []);
   const elapsedMs = numericDate(fromDate) - numericDate(toDate);
+  const [formattedValue, setFormattedValue] = useState<string>('recently');
 
-  // Kept memoized for perf
-  const formattedValue = useMemo(() => {
+  useEffect(() => {
     const relativeTime = relativeTimeFromMs(elapsedMs, formatter);
-    return overriddenFormatString(relativeTime) ?? relativeTime.formatted;
+    setFormattedValue(overriddenFormatString(relativeTime) ?? relativeTime.formatted);
   }, [elapsedMs, formatter]);
 
   return formattedValue;
