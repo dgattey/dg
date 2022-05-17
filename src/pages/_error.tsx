@@ -31,6 +31,11 @@ export type Props = HasStatusCode & {
    * The error object, for later use
    */
   err: NextPageContext['err'];
+
+  /**
+   * Current page url
+   */
+  pageUrl: string;
 };
 
 export type ErrorWithCode = Error & HasStatusCode;
@@ -53,6 +58,7 @@ export const getStaticProps = async (context: NextPageContext) => {
   const props: Props = {
     ...errorProps,
     statusCode,
+    pageUrl: '',
     fallback: {
       ...data,
     },
@@ -109,13 +115,13 @@ export const Contents = ({ statusCode }: HasStatusCode) => {
 /**
  * Generic error page, for 404s//500s/etc
  */
-const ErrorPage = ({ statusCode, fallback, hasStaticPropsRun, err }: Props) => {
+const ErrorPage = ({ statusCode, fallback, hasStaticPropsRun, err, pageUrl }: Props) => {
   if (!hasStaticPropsRun && err) {
     // Workaround for https://github.com/vercel/next.js/issues/8592
     Sentry.captureException(err);
   }
   return (
-    <ErrorLayout fallback={fallback} statusCode={statusCode ?? 500}>
+    <ErrorLayout pageUrl={pageUrl} fallback={fallback} statusCode={statusCode ?? 500}>
       <Contents statusCode={statusCode} />
     </ErrorLayout>
   );

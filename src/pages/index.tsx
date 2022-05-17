@@ -1,22 +1,18 @@
-import type { PartialFallback } from 'api/fetchFallback';
 import fetchFallback from 'api/fetchFallback';
 import Homepage from 'components/homepage/Homepage';
 import PageLayout from 'components/layouts/PageLayout';
-import { GetStaticProps, InferGetStaticPropsType } from 'next/types';
+import getPageUrl from 'helpers/getPageUrl';
+import type { GetServerSideProps } from 'next/types';
 import React from 'react';
+import type { Page } from 'types/Page';
 
-interface Props {
-  /**
-   * Provides SWR with fallback version data
-   */
-  fallback: PartialFallback<'projects' | 'intro' | 'location' | 'latest/activity' | 'latest/track'>;
-}
+type Props = Page<'projects' | 'intro' | 'location' | 'latest/activity' | 'latest/track'>;
 
 /**
- * Grabs all data necessary to render all components on the homepage to
- * provide a fallback for the server side rendering done elsewhere.
+ * Grabs fallback data + page url
  */
-export const getStaticProps: GetStaticProps<Props> = async () => {
+export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
+  const pageUrl = getPageUrl(context);
   const data = await fetchFallback([
     'version',
     'footer',
@@ -28,6 +24,7 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
   ]);
   return {
     props: {
+      pageUrl,
       fallback: {
         ...data,
       },
@@ -38,9 +35,9 @@ export const getStaticProps: GetStaticProps<Props> = async () => {
 /**
  * Fallback for all data used in Homepage + its descendents, plus the homepage itself.
  */
-const Home = ({ fallback }: InferGetStaticPropsType<typeof getStaticProps>) => (
-  <PageLayout fallback={fallback}>
-    <Homepage />
+const Home = ({ fallback, pageUrl }: Props) => (
+  <PageLayout fallback={fallback} pageUrl={pageUrl}>
+    <Homepage pageUrl={pageUrl} />
   </PageLayout>
 );
 
