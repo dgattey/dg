@@ -9,7 +9,7 @@ const PLUGIN_NAME = 'dg';
  * Here's how to add a new rule:
  * 1. Create a new file in this directory that defines the rule
  * 2. Import + add the rule to `rules` below
- * 3. Run `yarn lint` on failing code and make sure it picks up the error! Run `yarn` if it doesn't show up
+ * 3. Run `pnpm lint` on failing code and make sure it picks up the error! Run `pnpm install` if it doesn't show up
  */
 
 // All possible rules we check for

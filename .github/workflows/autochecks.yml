@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        # Each of these are yarn commands we should run and check output
+        # Each of these are commands we should run and check output
         command: ['lint', 'lint:styles', 'lint:types', 'format']
 
     outputs:
@@ -25,17 +25,17 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v2
         with:
-          node-version: 14
-      - run: yarn install
+          node-version: 16
+      - run: pnpm install
         # Make sure types are generated before running the commmand
-      - run: yarn db:generate
+      - run: pnpm db:generate
       - name: ${{ matrix.command }}
-        run: yarn ${{ matrix.command }}
+        run: pnpm ${{ matrix.command }}
       - name: Output changed files
         id: changes
-        # Removes both leading/trailing whitespace after getting diffed files and removing package.json/yarn.lock
+        # Removes both leading/trailing whitespace after getting diffed files and removing package.json/pnpm.lock
         run: |
-          CHANGED="$(git diff --name-only --diff-filter=ACMRT | xargs | sed 's/package.json//g;s/yarn.lock//g;s/^[ \t]*//g;s/[ \t]*$//g')"
+          CHANGED="$(git diff --name-only --diff-filter=ACMRT | xargs | sed 's/package.json//g;s/pnpm.lock//g;s/^[ \t]*//g;s/[ \t]*$//g')"
           COMMAND_NAME="${{ matrix.command }}"
           OUTPUTNAME="${COMMAND_NAME//:/}"
           echo "Changed files were: $CHANGED"

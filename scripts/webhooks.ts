@@ -44,7 +44,7 @@ const deleteCommand = command({
 (() =>
   run(
     subcommands({
-      name: 'yarn webhooks',
+      name: 'pnpm webhooks',
       cmds: {
         create: commandFrom('create', createSubscription),
         list: commandFrom('list', listSubscriptions),

@@ -4,7 +4,7 @@ import handledError from './handledError';
 import webhookSubscriptionConfigs, { standardParams } from './webhookSubscriptionConfigs';
 
 /**
- * Deletes a subscription with a given id. Use `yarn webhooks:list` to see
+ * Deletes a subscription with a given id. Use `pnpm webhooks:list` to see
  * what's available.
  */
 const deleteSubscription = async (type: WebhookType, subscriptionId: string) => {

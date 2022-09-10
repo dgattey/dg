@@ -21,7 +21,11 @@ type StravaSubscription = {
  * verifies that the STRAVA_VERIFY_TOKEN is actually the verify key that
  * Strava called us with.
  */
-const isSubscription = (query: Record<string, string | string[]>): query is StravaSubscription =>
+const isSubscription = (
+  query: Partial<{
+    [key: string]: string | string[];
+  }>,
+): query is StravaSubscription =>
   query[MODE_KEY] === VALID_MODE && query[VERIFY_KEY] === process.env.STRAVA_VERIFY_TOKEN;
 
 /**
