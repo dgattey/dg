@@ -2,7 +2,7 @@ module.exports = {
   // In the project folder we type check, lint, lint styles, and format
   'src/**/*.{ts,tsx,js,jsx}': [
     () => 'tsc',
-    'eslint --cache --fix --rule \'tsc/config: [2, {configFile: "./tsconfig.json"}]\' ',
+    'eslint --cache --fix',
     'stylelint --fix --allow-empty-input',
     'prettier --loglevel warn --write',
   ],

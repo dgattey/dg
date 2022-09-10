@@ -1,7 +1,6 @@
 import {
   CaptureConsole as CaptureConsoleIntegration,
   ExtraErrorData as ExtraErrorDataIntegration,
-  Offline as OfflineIntegration,
 } from '@sentry/integrations';
 import * as Sentry from '@sentry/nextjs';
 
@@ -60,9 +59,6 @@ const sentryInit = () =>
     integrations: [
       // Rewrites console.x into messages!
       new CaptureConsoleIntegration(),
-
-      // Captures events that happen offline and replays them when back online
-      new OfflineIntegration(),
 
       // Adds extra non-native data on Errors to Sentry
       new ExtraErrorDataIntegration(),
