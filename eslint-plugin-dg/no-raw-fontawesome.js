@@ -60,6 +60,7 @@ const rule = {
     // Only imports need to be linted by this rule
     ImportDeclaration: importDeclarationRule(context),
   }),
+  defaultOptions: [],
   meta: {
     type: 'problem',
     messages: {
