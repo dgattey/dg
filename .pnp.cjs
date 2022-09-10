@@ -48,7 +48,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@graphql-codegen/typescript-operations", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:2.5.3"],\
             ["@next/bundle-analyzer", "npm:12.3.0"],\
             ["@picocss/pico", "npm:1.5.3"],\
-            ["@prisma/client", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:3.13.0"],\
+            ["@prisma/client", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:4.3.1"],\
             ["@semantic-release/changelog", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:6.0.1"],\
             ["@sentry/cli", "npm:2.5.2"],\
             ["@sentry/integrations", "npm:7.12.1"],\
@@ -97,7 +97,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["postcss", "npm:8.4.16"],\
             ["postcss-syntax", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:0.36.2"],\
             ["prettier", "npm:2.7.1"],\
-            ["prisma", "npm:3.13.0"],\
+            ["prisma", "npm:4.3.1"],\
             ["prop-types", "npm:15.8.1"],\
             ["react", "npm:18.2.0"],\
             ["react-dom", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:18.2.0"],\
@@ -5765,20 +5765,20 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@prisma/client", [\
-        ["npm:3.13.0", {\
-          "packageLocation": "./.yarn/unplugged/@prisma-client-virtual-1496b23fc7/node_modules/@prisma/client/",\
+        ["npm:4.3.1", {\
+          "packageLocation": "./.yarn/unplugged/@prisma-client-virtual-40ccd261e7/node_modules/@prisma/client/",\
           "packageDependencies": [\
-            ["@prisma/client", "npm:3.13.0"]\
+            ["@prisma/client", "npm:4.3.1"]\
           ],\
           "linkType": "SOFT"\
         }],\
-        ["virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:3.13.0", {\
-          "packageLocation": "./.yarn/unplugged/@prisma-client-virtual-1496b23fc7/node_modules/@prisma/client/",\
+        ["virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:4.3.1", {\
+          "packageLocation": "./.yarn/unplugged/@prisma-client-virtual-40ccd261e7/node_modules/@prisma/client/",\
           "packageDependencies": [\
-            ["@prisma/client", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:3.13.0"],\
-            ["@prisma/engines-version", "npm:3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b"],\
+            ["@prisma/client", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:4.3.1"],\
+            ["@prisma/engines-version", "npm:4.3.0-32.c875e43600dfe042452e0b868f7a48b817b9640b"],\
             ["@types/prisma", null],\
-            ["prisma", "npm:3.13.0"],\
+            ["prisma", "npm:4.3.1"],\
             ["undici", "npm:4.16.0"]\
           ],\
           "packagePeers": [\
@@ -5789,19 +5789,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["@prisma/engines", [\
-        ["npm:3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b", {\
-          "packageLocation": "./.yarn/unplugged/@prisma-engines-npm-3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b-c8041c50e3/node_modules/@prisma/engines/",\
+        ["npm:4.3.1", {\
+          "packageLocation": "./.yarn/unplugged/@prisma-engines-npm-4.3.1-241ea392c5/node_modules/@prisma/engines/",\
           "packageDependencies": [\
-            ["@prisma/engines", "npm:3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b"]\
+            ["@prisma/engines", "npm:4.3.1"]\
           ],\
           "linkType": "HARD"\
         }]\
       ]],\
       ["@prisma/engines-version", [\
-        ["npm:3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b", {\
-          "packageLocation": "./.yarn/cache/@prisma-engines-version-npm-3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b-3b44863c7c-80238c7783.zip/node_modules/@prisma/engines-version/",\
+        ["npm:4.3.0-32.c875e43600dfe042452e0b868f7a48b817b9640b", {\
+          "packageLocation": "./.yarn/cache/@prisma-engines-version-npm-4.3.0-32.c875e43600dfe042452e0b868f7a48b817b9640b-aeb6ad8109-268eb72da6.zip/node_modules/@prisma/engines-version/",\
           "packageDependencies": [\
-            ["@prisma/engines-version", "npm:3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b"]\
+            ["@prisma/engines-version", "npm:4.3.0-32.c875e43600dfe042452e0b868f7a48b817b9640b"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -9768,7 +9768,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@graphql-codegen/typescript-operations", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:2.5.3"],\
             ["@next/bundle-analyzer", "npm:12.3.0"],\
             ["@picocss/pico", "npm:1.5.3"],\
-            ["@prisma/client", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:3.13.0"],\
+            ["@prisma/client", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:4.3.1"],\
             ["@semantic-release/changelog", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:6.0.1"],\
             ["@sentry/cli", "npm:2.5.2"],\
             ["@sentry/integrations", "npm:7.12.1"],\
@@ -9817,7 +9817,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["postcss", "npm:8.4.16"],\
             ["postcss-syntax", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:0.36.2"],\
             ["prettier", "npm:2.7.1"],\
-            ["prisma", "npm:3.13.0"],\
+            ["prisma", "npm:4.3.1"],\
             ["prop-types", "npm:15.8.1"],\
             ["react", "npm:18.2.0"],\
             ["react-dom", "virtual:76f771601b124a7dfdd081dc93ab70f3ebcf38d24b116fcea6a8b98778652f1f02bdc2695315e10c1d59fab15e410158648f9f32211c761bb97c28a110c96f33#npm:18.2.0"],\
@@ -16503,12 +16503,11 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         }]\
       ]],\
       ["prisma", [\
-        ["npm:3.13.0", {\
-          "packageLocation": "./.yarn/unplugged/prisma-npm-3.13.0-356069a128/node_modules/prisma/",\
+        ["npm:4.3.1", {\
+          "packageLocation": "./.yarn/unplugged/prisma-npm-4.3.1-000685a070/node_modules/prisma/",\
           "packageDependencies": [\
-            ["prisma", "npm:3.13.0"],\
-            ["@prisma/engines", "npm:3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b"],\
-            ["ts-pattern", "npm:4.0.2"]\
+            ["prisma", "npm:4.3.1"],\
+            ["@prisma/engines", "npm:4.3.1"]\
           ],\
           "linkType": "HARD"\
         }]\
@@ -19220,15 +19219,6 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             "@types/swc__wasm",\
             "@types/typescript",\
             "typescript"\
-          ],\
-          "linkType": "HARD"\
-        }]\
-      ]],\
-      ["ts-pattern", [\
-        ["npm:4.0.2", {\
-          "packageLocation": "./.yarn/cache/ts-pattern-npm-4.0.2-fd3a52f722-1156c3dea4.zip/node_modules/ts-pattern/",\
-          "packageDependencies": [\
-            ["ts-pattern", "npm:4.0.2"]\
           ],\
           "linkType": "HARD"\
         }]\

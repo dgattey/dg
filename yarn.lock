@@ -3697,31 +3697,31 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@prisma/client@npm:^3.13.0":
-  version: 3.13.0
-  resolution: "@prisma/client@npm:3.13.0"
+"@prisma/client@npm:4.3.1":
+  version: 4.3.1
+  resolution: "@prisma/client@npm:4.3.1"
   dependencies:
-    "@prisma/engines-version": 3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b
+    "@prisma/engines-version": 4.3.0-32.c875e43600dfe042452e0b868f7a48b817b9640b
   peerDependencies:
     prisma: "*"
   peerDependenciesMeta:
     prisma:
       optional: true
-  checksum: 8c1e6c91208158b71684a9b03a27d8240315002340ca3ad5c298beaedf4ca29fda949e934a55e1f238ff215388c77348acf05f0cea7636f3236d66d6510d0c56
+  checksum: 2e3e6319bb0974f9ab67ab4620b775f82c54e00c4690db59bbd4736967c1afae7b4487ac54a78d221b7f898287b387422c7e8de026dfd66e97c1ca1e79eb06f7
   languageName: node
   linkType: hard
 
-"@prisma/engines-version@npm:3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b":
-  version: 3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b
-  resolution: "@prisma/engines-version@npm:3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b"
-  checksum: 80238c778333eb0d9bc993e933cb83ed82488d53980d2cdc68ff25ef719de1a63ec05a32bb2af505115e4c179ea43389c8650c297c2f8dbda0c122e9c00197ee
+"@prisma/engines-version@npm:4.3.0-32.c875e43600dfe042452e0b868f7a48b817b9640b":
+  version: 4.3.0-32.c875e43600dfe042452e0b868f7a48b817b9640b
+  resolution: "@prisma/engines-version@npm:4.3.0-32.c875e43600dfe042452e0b868f7a48b817b9640b"
+  checksum: 268eb72da6ef70f3e0ce9c43f1b1500af3df24adb0589972f2fbbb949e5f3847c0c2377998537ad425995f78ad59cd06e65e1b07040d0ea937cefe02e441a5d1
   languageName: node
   linkType: hard
 
-"@prisma/engines@npm:3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b":
-  version: 3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b
-  resolution: "@prisma/engines@npm:3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b"
-  checksum: 045e08c6c72891a6e0028357d261ca5995ca5bdc2c6466b294141e37605ec1f1eb72f4d49301adc76680bedcf82d9671221befe40d4746f3e679a4406767adb5
+"@prisma/engines@npm:4.3.1":
+  version: 4.3.1
+  resolution: "@prisma/engines@npm:4.3.1"
+  checksum: a407ecb8e15373890d82fc01682ddb1c473c7a5e81e07b603bdf3064bad936ee7cfa9d3ac68d5c4b845f476df53b92b705e7ec6a24a7364354ac78eb9084cbcc
   languageName: node
   linkType: hard
 
@@ -6941,7 +6941,7 @@ __metadata:
     "@graphql-codegen/typescript-operations": ^2.5.3
     "@next/bundle-analyzer": ^12.3.0
     "@picocss/pico": ^1.5.3
-    "@prisma/client": ^3.13.0
+    "@prisma/client": 4.3.1
     "@semantic-release/changelog": ^6.0.1
     "@sentry/cli": ^2.5.2
     "@sentry/integrations": ^7.12.1
@@ -6990,7 +6990,7 @@ __metadata:
     postcss: ^8.4.16
     postcss-syntax: ^0.36.2
     prettier: ^2.7.1
-    prisma: ^3.13.0
+    prisma: 4.3.1
     prop-types: ^15.8.1
     react: ^18.2.0
     react-dom: ^18.2.0
@@ -12692,16 +12692,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"prisma@npm:^3.13.0":
-  version: 3.13.0
-  resolution: "prisma@npm:3.13.0"
+"prisma@npm:4.3.1":
+  version: 4.3.1
+  resolution: "prisma@npm:4.3.1"
   dependencies:
-    "@prisma/engines": 3.13.0-17.efdf9b1183dddfd4258cd181a72125755215ab7b
-    ts-pattern: ^4.0.1
+    "@prisma/engines": 4.3.1
   bin:
     prisma: build/index.js
     prisma2: build/index.js
-  checksum: cbd59f53eea125cdb14722d16bf21e38a5eb82ed4e5f42f3732c33884158fe014eb576aa8580f670ece403706dfb64e2d6e741f50f3320b7bf08c7e8ec44a4b4
+  checksum: f97133c11ecbb09a40c0ec006af50e8789f3b76376e29d5eb041b1592d2c289af22bcb9b5c49789ffb8bbe0b24f470c1ec668a94194c5859e18b601398cf80c8
   languageName: node
   linkType: hard
 
@@ -14992,13 +14991,6 @@ __metadata:
     ts-node-transpile-only: dist/bin-transpile.js
     ts-script: dist/bin-script-deprecated.js
   checksum: 090adff1302ab20bd3486e6b4799e90f97726ed39e02b39e566f8ab674fd5bd5f727f43615debbfc580d33c6d9d1c6b1b3ce7d8e3cca3e20530a145ffa232c35
-  languageName: node
-  linkType: hard
-
-"ts-pattern@npm:^4.0.1":
-  version: 4.0.2
-  resolution: "ts-pattern@npm:4.0.2"
-  checksum: 1156c3dea42b9b9373d1c7c96bcd24d82a37701ab7fdd399178d58c350153c2322455d27459c8cb0d8fa445958632ffa776ed612fd656ffd35a94c79d5d3d5b8
   languageName: node
   linkType: hard
 
