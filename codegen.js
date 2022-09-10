@@ -37,12 +37,13 @@ const API_CONFIG = {
  * scalars, and endpoint/authorization. That's intentional!
  *
  * @param {String} name The API name (lowercase)
- * @param {{ schemaEndpoint: String, token: String, scalars: Record<string, boolean|string|number>, onlyOperationTypes: boolean }} options all API options
+ * @param {{ schemaEndpoint: string, token: string, scalars: Record<string, boolean|string|number>, onlyOperationTypes: boolean }} options all API options
  *
  * @returns {Record<string, Record<string, unknown>>} The generators to spread
  */
 const createApiGenerator = (name, { schemaEndpoint, token, scalars, onlyOperationTypes }) => {
-  const documents = `${BASE_FOLDER}/fetch${name[0].toUpperCase() + name.slice(1)}*.ts`;
+  const firstLetter = name[0] ?? '';
+  const documents = `${BASE_FOLDER}/fetch${firstLetter.toUpperCase() + name.slice(1)}*.ts`;
   const baseTypesPath = `${GENERATED_FOLDER}/${name}Api.generated.ts`;
   const schemas = [
     {
@@ -88,7 +89,7 @@ const createApiGenerator = (name, { schemaEndpoint, token, scalars, onlyOperatio
 // For the Contentful API
 const contentfulGenerators = createApiGenerator('contentful', {
   schemaEndpoint: `https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}`,
-  token: process.env.CONTENTFUL_ACCESS_TOKEN,
+  token: process.env.CONTENTFUL_ACCESS_TOKEN ?? '',
   onlyOperationTypes: false,
   scalars: {
     DateTime: 'string',
@@ -102,7 +103,7 @@ const contentfulGenerators = createApiGenerator('contentful', {
 // For the Github API
 const githubGenerators = createApiGenerator('github', {
   schemaEndpoint: 'https://api.github.com/graphql',
-  token: process.env.GITHUB_AUTHENTICATION_TOKEN,
+  token: process.env.GITHUB_AUTHENTICATION_TOKEN ?? '',
   onlyOperationTypes: true,
   scalars: {
     Base64String: 'string',

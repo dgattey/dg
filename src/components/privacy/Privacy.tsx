@@ -1,9 +1,8 @@
-import useData from 'api/useData';
-import Meta from 'components/Meta';
-import RichText from 'components/RichText';
-import React from 'react';
+import useData from '@dg/api/useData';
+import Meta from '@dg/components/Meta';
+import RichText from '@dg/components/RichText';
+import type { Page } from '@dg/types/Page';
 import styled from 'styled-components';
-import type { Page } from 'types/Page';
 
 const SingleColumn = styled(RichText)`
   max-width: 35em;

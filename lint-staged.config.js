@@ -2,8 +2,8 @@ module.exports = {
   // In the project folder we type check, lint, lint styles, and format
   'src/**/*.{ts,tsx,js,jsx}': [
     () => 'tsc',
-    'eslint --cache --fix --plugin tsc --rule \'tsc/config: [2, {configFile: "./tsconfig.json"}]\' ',
-    'stylelint --fix',
+    'eslint --cache --fix',
+    'stylelint --fix --allow-empty-input',
     'prettier --loglevel warn --write',
   ],
   // Outside of the project folder or in JSON/etc we just format and call it good

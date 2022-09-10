@@ -1,4 +1,4 @@
-import useColorScheme from 'hooks/useColorScheme';
+import useColorScheme from '@dg/hooks/useColorScheme';
 import { createContext } from 'react';
 
 /**

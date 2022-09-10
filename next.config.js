@@ -5,16 +5,10 @@ const { withSentryConfig } = require('@sentry/nextjs');
  * */
 const nextConfig = {
   reactStrictMode: true,
+  swcMinify: true,
   compiler: {
     // Enables the styled-components SWC transform
     styledComponents: true,
-  },
-  api: {
-    /**
-     * To remove a false positive error that appears all the time because of Sentry's `withSentry`
-     * api wrapper (https://github.com/getsentry/sentry-javascript/issues/3852)
-     */
-    externalResolver: true,
   },
   images: {
     domains: ['images.ctfassets.net', 'i.scdn.co'],
@@ -40,6 +34,7 @@ if (process.env.NODE_ENV === 'development') {
   // Add silent sentry on develop and make sure it's always a dry run
   module.exports = withNextBundleAnalyzer(
     withSentryConfig(nextConfig, {
+      hideSourceMaps: false,
       release: process.env.NEXT_PUBLIC_APP_VERSION,
       silent: true,
       dryRun: true,
@@ -49,6 +44,7 @@ if (process.env.NODE_ENV === 'development') {
   // For prod, dry run if it's running locally/appears local
   module.exports = withNextBundleAnalyzer(
     withSentryConfig(nextConfig, {
+      hideSourceMaps: true,
       release: process.env.NEXT_PUBLIC_APP_VERSION,
       dryRun:
         // If not deployed on a real branch or the db url points to something local, we know we're running a production build locally

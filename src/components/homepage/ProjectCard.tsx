@@ -1,9 +1,9 @@
-import type { Project } from 'api/types/generated/contentfulApi.generated';
-import type { Props as ContentCardProps } from 'components/ContentCard';
-import ContentCard from 'components/ContentCard';
-import { cardSize, cardSizeInPx } from 'components/ContentGrid';
-import HoverableContainer from 'components/HoverableContainer';
-import Image from 'components/Image';
+import type { Project } from '@dg/api/types/generated/contentfulApi.generated';
+import type { Props as ContentCardProps } from '@dg/components/ContentCard';
+import ContentCard from '@dg/components/ContentCard';
+import { cardSize, cardSizeInPx } from '@dg/components/ContentGrid';
+import HoverableContainer from '@dg/components/HoverableContainer';
+import Image from '@dg/components/Image';
 import { useState } from 'react';
 import styled from 'styled-components';
 

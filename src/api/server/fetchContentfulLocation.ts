@@ -1,6 +1,6 @@
-import { isDefinedItem } from 'api/parsers';
-import type { MyLocationQuery } from 'api/types/generated/fetchContentfulLocation.generated';
-import type { MapLocation } from 'api/types/MapLocation';
+import { isDefinedItem } from '@dg/api/parsers';
+import type { MyLocationQuery } from '@dg/api/types/generated/fetchContentfulLocation.generated';
+import type { MapLocation } from '@dg/api/types/MapLocation';
 import { gql } from 'graphql-request';
 import contentfulClient from './networkClients/contentfulClient';
 

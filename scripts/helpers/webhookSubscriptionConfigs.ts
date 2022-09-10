@@ -1,5 +1,5 @@
-import { WebhookSubscriptionConfig } from 'api/types/WebhookSubscriptionConfig';
-import { WebhookType } from 'api/types/WebhookType';
+import { WebhookSubscriptionConfig } from '@dg/api/types/WebhookSubscriptionConfig';
+import { WebhookType } from '@dg/api/types/WebhookType';
 import dotenv from 'dotenv';
 
 // Load env variables from local file

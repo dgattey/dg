@@ -1,5 +1,5 @@
-import { Prisma } from 'api/server/generated';
-import { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
+import { Prisma } from '@dg/api/server/generated';
+import { StravaDetailedActivity } from '@dg/api/types/StravaDetailedActivity';
 
 /**
  * These are the only fields we care about for now

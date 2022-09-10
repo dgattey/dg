@@ -6,29 +6,29 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 
 ## :hammer: Commands
 
-- `yarn dev` starts the development server.
-- `yarn build` runs a prod build after generating new Prisma types
-- `yarn serve` builds a production version & runs a server with the built site
-- `yarn analyze` builds + loads bundle analysis for a production version of the site to see what it'll look like when deployed
-- `yarn format` runs Prettier to format the files
-- `yarn lint` runs ESLint to lint all TS(X) and JS(X) files
-- `yarn lint:styles` runs stylelint on the same files
-- `yarn lint:types` runs tsc to confirm no type errors on the same files
-- `yarn codegen` generates new GraphQL APIs from Github/Contentful
-- `yarn db:local <branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
-- `yarn db:sync` (assuming the db is currently connected) syncs the schemas to the db branch so you can promote to main through PlanetScale
-- `yarn db:generate` (assuming the db is currently connected) generates schema changes locally to the package
-- `yarn db:ui` (assuming the db is currently connected) opens Prisma Studio to edit/view DB itself
-- `yarn webhooks:local` (assuming cloudflared is installed via brew) starts a tunnel to dev.dylangattey.com for purposes of testing webhooks
-- `yarn webhooks:create <name>` will create a webhook subscription for the given API - for local dev and requires `webhooks:local` to be running already
-- `yarn webhooks:list <name>` will list that API's webhook subscriptions - for local dev
-- `yarn webhooks:delete <name> <id>` will delete a webhook subscription for that API - for local dev
-- `yarn version` fetches releases from Github and resolves `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA` to a version! Useful from command line
-- `yarn release` bumps the site version, run via Github Action
+- `pnpm dev` starts the development server.
+- `pnpm build` runs a prod build after generating new Prisma types
+- `pnpm serve` builds a production version & runs a server with the built site
+- `pnpm analyze` builds + loads bundle analysis for a production version of the site to see what it'll look like when deployed
+- `pnpm format` runs Prettier to format the files
+- `pnpm lint` runs ESLint to lint all TS(X) and JS(X) files
+- `pnpm lint:styles` runs stylelint on the same files
+- `pnpm lint:types` runs tsc to confirm no type errors on the same files
+- `pnpm codegen` generates new GraphQL APIs from Github/Contentful
+- `pnpm db:local <branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
+- `pnpm db:sync` (assuming the db is currently connected) syncs the schemas to the db branch so you can promote to main through PlanetScale
+- `pnpm db:generate` (assuming the db is currently connected) generates schema changes locally to the package
+- `pnpm db:ui` (assuming the db is currently connected) opens Prisma Studio to edit/view DB itself
+- `pnpm webhooks:local` (assuming cloudflared is installed via brew) starts a tunnel to dev.dylangattey.com for purposes of testing webhooks
+- `pnpm webhooks:create <name>` will create a webhook subscription for the given API - for local dev and requires `webhooks:local` to be running already
+- `pnpm webhooks:list <name>` will list that API's webhook subscriptions - for local dev
+- `pnpm webhooks:delete <name> <id>` will delete a webhook subscription for that API - for local dev
+- `pnpm version:fetch` fetches releases from Github and resolves `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA` to a version! Useful from command line
+- `pnpm release` bumps the site version, run via Github Action
 
 ## :beginner: Initial Setup
 
-You need Node 16+ and Yarn 3+ installed. The repo uses Yarn zero installs, so just run `yarn` to get started once you have those two installed.
+You need Node 16+ and pnpm 7+ installed. Run `pnpm install` to get started once you have those two installed.
 
 ## :memo: Pull Requests
 
@@ -66,7 +66,7 @@ Pretty standard Next app here. `/public` contains static files, `/src` contains 
 
 - [GraphQL Codegen](https://www.graphql-code-generator.com) makes all the `generated` files. It reads Github + Contentful's API schema + creates types out of them automatically. I run it on command when I write new queries/etc to get their types.
 
-- [Prisma](https://www.prisma.io) and [PlanetScale](https://planetscale.com) power a distributed DB. This DB is used to persist auth tokens for Spotify/Strava beyond the lifetime of a deploy + refresh the token as needed. Prisma adds some nice typing but doesn't play nicely with Yarn PnP.
+- [Prisma](https://www.prisma.io) and [PlanetScale](https://planetscale.com) power a distributed DB. This DB is used to persist auth tokens for Spotify/Strava beyond the lifetime of a deploy + refresh the token as needed.
 
 - [Sentry](https://sentry.io) is used to capture errors + stack traces both serverside and clientside. Captures console logs too. Integrated with releases so we can see when problems start happening.
 
@@ -87,7 +87,7 @@ There's only two tables, one for the tokens and one for the Strava activities, a
 1. **Token**: I grab the latest token, see if it's expired, and if so, fetch new data. That's done via Spotify/Strava's APIs + the saved refresh token. Once I persist the new data, I can then call the APIs with the auth tokens. Nice defaults built in so anything missing gives back the right info as possible.
 2. **StravaActivity**: I create a row when there's a webhook event with a new activity, and I fetch the whole corresponding activity from Strava's API. If there are data updates, for now I just re-fetch the activity and update the row with new JSON data. I keep track of last update time, so multiple updates in the same time window don't hammer Strava's servers.
 
-To do migrations, update the schema file, then create a new branch on Planetscale's UI. Then reconnect with `yarn db:local`. In a new terminal tab, run `yarn db:sync` to push the schema changes & generate new types locally. If all looks good, you can deploy request from Planetscale, review, merge, and delete the branch. And then reconnect locally to main. Just know this'll update the main deployment so it needs backwards compatibility.
+To do migrations, update the schema file, then create a new branch on Planetscale's UI. Then reconnect with `pnpm db:local`. In a new terminal tab, run `pnpm db:sync` to push the schema changes & generate new types locally. If all looks good, you can deploy request from Planetscale, review, merge, and delete the branch. And then reconnect locally to main. Just know this'll update the main deployment so it needs backwards compatibility.
 
 #### Strava
 
@@ -97,15 +97,15 @@ More annoyingly, each app from Strava only has one possible subscription that it
 
 Both use the same DB under the hood, but they use different auth tokens, refresh tokens, and callback URLs. An env variable, `process.env.STRAVA_TOKEN_NAME`, is used to switch between them. Note that if you're testing webhook events locally, you'll want to create another branch in the Planetscale DB probably so you don't clobber the DB with simultaneous updates from the local webhook + the live webhook! Or briefly disconnect the prod webhook, then reconnect when done local testing.
 
-Testing locally requires running Cloudflare's Tunnel service. Via it, https://dev.dylangattey.com points to your local (running) Next app if you run `yarn webhooks:local`. Make sure the config in ~/.cloudflared exposes the `dg` tunnel with `url: http://localhost:3000`. And close when done! The dev Strava app is set up to hit `dev.dylangattey.com` at `/api/webhooks`, whereas the main one uses `dylangattey.com`.
+Testing locally requires running Cloudflare's Tunnel service. Via it, https://dev.dylangattey.com points to your local (running) Next app if you run `pnpm webhooks:local`. Make sure the config in ~/.cloudflared exposes the `dg` tunnel with `url: http://localhost:3000`. And close when done! The dev Strava app is set up to hit `dev.dylangattey.com` at `/api/webhooks`, whereas the main one uses `dylangattey.com`.
 
 #### Webhooks
 
 Strava is the only thing that supports webhooks right now!
 
-1. To create a subscription, first run `yarn webhooks:local` after `yarn dev` starts elsewhere. Then run `yarn webhooks:create strava` to make a new subscription. This fails if one already exists. For local subscription testing - you want to make sure you delete the subscription after you're done testing so Strava doesn't keep pinging an endpoint that's not currently live.
-2. To list existing subscriptions, run `yarn webhooks:list strava` to get the ids
-3. To delete a subscription, run `yarn webhooks:delete strava <id>` with an id from the list script
+1. To create a subscription, first run `pnpm webhooks:local` after `pnpm dev` starts elsewhere. Then run `pnpm webhooks:create strava` to make a new subscription. This fails if one already exists. For local subscription testing - you want to make sure you delete the subscription after you're done testing so Strava doesn't keep pinging an endpoint that's not currently live.
+2. To list existing subscriptions, run `pnpm webhooks:list strava` to get the ids
+3. To delete a subscription, run `pnpm webhooks:delete strava <id>` with an id from the list script
 4. To test actual event handling, just add a `console.log` in `pages/api/webhooks`. To easily test, change the name of a Strava activity to trigger an event. Details about the events at https://developers.strava.com/docs/webhooks/.
 5. If you need to make changes to the prod webhook subscription instead of the local one, change the env variables in `.env.development.local` for `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `STRAVA_TOKEN_NAME`, and `STRAVA_VERIFY_TOKEN` to match the values on Vercel. Restart everything, and you'll be running against the prod webhook setup. These subscriptions are only ever able to be changed locally with this script, or manually with a curl, to prevent tampering.
 

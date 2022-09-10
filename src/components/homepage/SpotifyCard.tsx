@@ -1,7 +1,6 @@
-import useData from 'api/useData';
-import ContentCard from 'components/ContentCard';
-import TrackListing from 'components/spotify/TrackListing';
-import React from 'react';
+import useData from '@dg/api/useData';
+import ContentCard from '@dg/components/ContentCard';
+import TrackListing from '@dg/components/spotify/TrackListing';
 import styled from 'styled-components';
 
 // Stacks content and takes up space of parent

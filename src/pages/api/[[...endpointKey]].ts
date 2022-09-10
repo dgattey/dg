@@ -1,6 +1,6 @@
-import endpoints, { isValid } from 'api/endpoints';
-import handleApiError, { methodNotAllowedError } from 'api/handleApiError';
-import withSentry from 'api/withSentry';
+import endpoints, { isValid } from '@dg/api/endpoints';
+import handleApiError, { methodNotAllowedError } from '@dg/api/handleApiError';
+import withSentry from '@dg/api/withSentry';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 // Just a shorthand for this function type

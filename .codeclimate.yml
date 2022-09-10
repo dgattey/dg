@@ -40,7 +40,7 @@ checks:
       # Triples the complexity since 5 is rather low as a default
       threshold: 12
 
-# Customized to include .yarn/.pnp/generated/type files
+# Customized to include .pnp/generated/type files
 exclude_patterns:
   - 'config/'
   - 'db/'
@@ -57,5 +57,3 @@ exclude_patterns:
   - '**/*.d.ts'
   - '**/*generated*'
   - '**/generated'
-  - '.yarn'
-  - '.pnp*'

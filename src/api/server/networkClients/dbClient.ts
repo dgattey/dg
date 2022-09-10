@@ -1,4 +1,4 @@
-import { PrismaClient } from 'api/server/generated/';
+import { PrismaClient } from '@dg/api/server/generated/';
 
 declare global {
   // eslint-disable-next-line vars-on-top, no-var

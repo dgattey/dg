@@ -1,5 +1,5 @@
-import type { MapLocation } from 'api/types/MapLocation';
-import Image from 'components/Image';
+import type { MapLocation } from '@dg/api/types/MapLocation';
+import Image from '@dg/components/Image';
 import { Marker as MapMarker } from 'react-map-gl';
 import styled from 'styled-components';
 

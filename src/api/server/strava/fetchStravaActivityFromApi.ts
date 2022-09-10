@@ -1,6 +1,6 @@
-import type { Prisma } from 'api/server/generated';
-import stravaClient from 'api/server/networkClients/stravaClient';
-import type { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
+import type { Prisma } from '@dg/api/server/generated';
+import stravaClient from '@dg/api/server/networkClients/stravaClient';
+import type { StravaDetailedActivity } from '@dg/api/types/StravaDetailedActivity';
 import paredStravaActivity from './paredStravaActivity';
 
 /**

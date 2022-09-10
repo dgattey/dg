@@ -1,8 +1,8 @@
-import { ErrorPageFallback } from 'api/fetchFallback';
-import Meta from 'components/Meta';
+import { ErrorPageFallback } from '@dg/api/fetchFallback';
+import Meta from '@dg/components/Meta';
+import { Page } from '@dg/types/Page';
 import NextLink from 'next/link';
 import styled from 'styled-components';
-import { Page } from 'types/Page';
 import PageLayout from './PageLayout';
 
 type Props = Pick<React.ComponentProps<'div'>, 'children'> &
