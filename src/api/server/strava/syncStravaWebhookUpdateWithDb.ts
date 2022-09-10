@@ -1,5 +1,5 @@
-import dbClient from 'api/server/networkClients/dbClient';
-import type { StravaWebhookEvent } from 'api/types/StravaWebhookEvent';
+import dbClient from '@dg/api/server/networkClients/dbClient';
+import type { StravaWebhookEvent } from '@dg/api/types/StravaWebhookEvent';
 import fetchStravaActivityFromApi from './fetchStravaActivityFromApi';
 
 // If an update was applied this number of ms or less ago, drop the update

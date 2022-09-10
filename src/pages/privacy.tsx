@@ -1,9 +1,8 @@
-import fetchFallback from 'api/fetchFallback';
-import PageLayout from 'components/layouts/PageLayout';
-import Privacy from 'components/privacy/Privacy';
+import fetchFallback from '@dg/api/fetchFallback';
+import PageLayout from '@dg/components/layouts/PageLayout';
+import Privacy from '@dg/components/privacy/Privacy';
+import type { Page } from '@dg/types/Page';
 import { GetServerSideProps } from 'next/types';
-import React from 'react';
-import type { Page } from 'types/Page';
 import getPageUrl from '../helpers/getPageUrl';
 
 type Props = Page<'privacy'>;

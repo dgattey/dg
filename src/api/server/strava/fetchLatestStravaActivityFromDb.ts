@@ -1,7 +1,7 @@
-import { isRecord } from 'api/parsers';
-import { Prisma } from 'api/server/generated';
-import dbClient from 'api/server/networkClients/dbClient';
-import { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
+import { isRecord } from '@dg/api/parsers';
+import { Prisma } from '@dg/api/server/generated';
+import dbClient from '@dg/api/server/networkClients/dbClient';
+import { StravaDetailedActivity } from '@dg/api/types/StravaDetailedActivity';
 import paredStravaActivity from './paredStravaActivity';
 
 /**

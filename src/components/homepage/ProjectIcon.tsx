@@ -1,4 +1,4 @@
-import type { Project } from 'api/types/generated/contentfulApi.generated';
+import type { Project } from '@dg/api/types/generated/contentfulApi.generated';
 import { Globe, Monitor, Smartphone } from 'lucide-react';
 
 type Props = Pick<Project, 'type'>;

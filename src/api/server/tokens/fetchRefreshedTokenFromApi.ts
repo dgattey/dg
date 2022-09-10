@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { RefreshTokenConfig } from 'api/types/RefreshTokenConfig';
-import type { RawSpotifyToken, RawStravaToken, TokenKey } from 'api/types/Token';
+import { RefreshTokenConfig } from '@dg/api/types/RefreshTokenConfig';
+import type { RawSpotifyToken, RawStravaToken, TokenKey } from '@dg/api/types/Token';
 
 /**
  * We "expire" tokens 30 seconds early so we don't run into problems near the end

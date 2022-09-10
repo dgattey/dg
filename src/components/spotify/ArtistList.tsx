@@ -1,6 +1,6 @@
-import type { Artist, Track } from 'api/types/spotify/Track';
-import Link from 'components/Link';
-import useLinkWithName from 'hooks/useLinkWithName';
+import type { Artist, Track } from '@dg/api/types/spotify/Track';
+import Link from '@dg/components/Link';
+import useLinkWithName from '@dg/hooks/useLinkWithName';
 import React from 'react';
 import styled from 'styled-components';
 

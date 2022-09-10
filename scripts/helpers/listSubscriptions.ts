@@ -1,4 +1,4 @@
-import type { WebhookType } from 'api/types/WebhookType';
+import type { WebhookType } from '@dg/api/types/WebhookType';
 import fetch from 'node-fetch';
 import handledError from './handledError';
 import webhookSubscriptionConfigs, { standardParams } from './webhookSubscriptionConfigs';

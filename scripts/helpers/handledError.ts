@@ -1,4 +1,4 @@
-import type { WebhookType } from 'api/types/WebhookType';
+import type { WebhookType } from '@dg/api/types/WebhookType';
 import type { Response } from 'node-fetch';
 import { isRecord } from '../../src/api/parsers';
 

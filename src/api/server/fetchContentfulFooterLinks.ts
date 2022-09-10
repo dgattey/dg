@@ -1,5 +1,5 @@
-import { isDefinedItem, isLink } from 'api/parsers';
-import type { FooterQuery } from 'api/types/generated/fetchContentfulFooterLinks.generated';
+import { isDefinedItem, isLink } from '@dg/api/parsers';
+import type { FooterQuery } from '@dg/api/types/generated/fetchContentfulFooterLinks.generated';
 import { gql } from 'graphql-request';
 import contentfulClient from './networkClients/contentfulClient';
 

@@ -1,8 +1,8 @@
+import type { Track } from '@dg/api/types/spotify/Track';
+import FaIcon from '@dg/components/FaIcon';
+import Link from '@dg/components/Link';
+import useLinkWithName from '@dg/hooks/useLinkWithName';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
-import type { Track } from 'api/types/spotify/Track';
-import FaIcon from 'components/FaIcon';
-import Link from 'components/Link';
-import useLinkWithName from 'hooks/useLinkWithName';
 import styled from 'styled-components';
 
 type Props = Track;

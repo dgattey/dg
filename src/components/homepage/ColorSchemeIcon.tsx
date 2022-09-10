@@ -1,4 +1,4 @@
-import type { ColorScheme, SetColorScheme } from 'hooks/useColorScheme';
+import type { ColorScheme, SetColorScheme } from '@dg/hooks/useColorScheme';
 import { Moon, Sun } from 'lucide-react';
 import styled, { css } from 'styled-components';
 

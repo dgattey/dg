@@ -1,4 +1,4 @@
-import useData from 'api/useData';
+import useData from '@dg/api/useData';
 import styled from 'styled-components';
 import Link from './Link';
 

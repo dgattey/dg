@@ -1,4 +1,4 @@
-import { isTokenKey } from 'api/parsers';
+import { isTokenKey } from '@dg/api/parsers';
 import authenticatedRestClient from './authenticatedRestClient';
 
 const BASE_ENDPOINT = 'https://www.strava.com/api/v3';

@@ -1,6 +1,6 @@
-import type { Prisma } from 'api/server/generated';
-import dbClient from 'api/server/networkClients/dbClient';
-import type { TokenKey } from 'api/types/Token';
+import type { Prisma } from '@dg/api/server/generated';
+import dbClient from '@dg/api/server/networkClients/dbClient';
+import type { TokenKey } from '@dg/api/types/Token';
 import fetchRefreshedTokenFromApi from './fetchRefreshedTokenFromApi';
 
 /**

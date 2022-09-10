@@ -1,13 +1,13 @@
+import useData from '@dg/api/useData';
+import ContentCard from '@dg/components/ContentCard';
+import FaIcon from '@dg/components/FaIcon';
+import Stack from '@dg/components/Stack';
+import truncated from '@dg/helpers/truncated';
+import useRelativeTimeFormat from '@dg/hooks/useRelativeTimeFormat';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import { faBicycle } from '@fortawesome/free-solid-svg-icons/faBicycle';
 import { faRunning } from '@fortawesome/free-solid-svg-icons/faRunning';
-import useData from 'api/useData';
-import ContentCard from 'components/ContentCard';
-import FaIcon from 'components/FaIcon';
-import Stack from 'components/Stack';
-import truncated from 'helpers/truncated';
-import useRelativeTimeFormat from 'hooks/useRelativeTimeFormat';
-import React, { useMemo } from 'react';
+import { useMemo } from 'react';
 import styled from 'styled-components';
 
 // There are 1600 meters in one mile!

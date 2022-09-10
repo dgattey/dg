@@ -1,4 +1,4 @@
-import AppStyle from 'components/AppStyle';
+import AppStyle from '@dg/components/AppStyle';
 import BaseApp, { AppContext, AppProps } from 'next/app';
 
 /**
