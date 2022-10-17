@@ -1,6 +1,6 @@
 /* eslint-disable no-underscore-dangle */
 import type { Map } from 'mapbox-gl';
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { useControl } from 'react-map-gl';
 import ControlContainer, { Props as ContainerProps } from './ControlContainer';

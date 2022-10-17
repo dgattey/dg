@@ -1,7 +1,8 @@
 import type { Link } from '@dg/api/types/generated/contentfulApi.generated';
 import truncated from '@dg/helpers/truncated';
 import { GRID_ANIMATION_DURATION } from '@dg/hooks/useGridAnimation';
-import React, { ReactElement, useState } from 'react';
+import { ReactElement, useState } from 'react';
+import * as React from 'react';
 import styled, { css } from 'styled-components';
 import { cardSize } from './ContentGrid';
 import ContentWrappingLink from './ContentWrappingLink';

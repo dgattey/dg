@@ -8,7 +8,7 @@ import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons/faPaperPlane';
 import { faQuestion } from '@fortawesome/free-solid-svg-icons/faQuestion';
 import NextLink from 'next/link';
-import React from 'react';
+import * as React from 'react';
 import styled from 'styled-components';
 
 /**

@@ -1,7 +1,7 @@
 import type { Artist, Track } from '@dg/api/types/spotify/Track';
 import Link from '@dg/components/Link';
 import useLinkWithName from '@dg/hooks/useLinkWithName';
-import React from 'react';
+import { Fragment } from 'react';
 import styled from 'styled-components';
 
 type Props = Track;
@@ -54,7 +54,7 @@ const ArtistList = ({ artists }: Props) => {
       {artists.map((artist, index) => {
         const link = artistLink(artist);
         return (
-          <React.Fragment key={artist.id}>
+          <Fragment key={artist.id}>
             {link ? (
               <PlainLink isExternal {...link}>
                 {artist.name}
@@ -63,7 +63,7 @@ const ArtistList = ({ artists }: Props) => {
               artist.name
             )}
             <span>{separator({ index, fullList: artists })}</span>
-          </React.Fragment>
+          </Fragment>
         );
       })}
     </>
