@@ -15,6 +15,7 @@ const nextConfig = {
   },
   experimental: {
     nextScriptWorkers: true,
+    runtime: 'experimental-edge',
   },
   // Unfortunately required for Prisma until it upgrades to undici@^5
   webpack: (config, { isServer }) => {
