@@ -13,6 +13,9 @@ const nextConfig = {
   images: {
     domains: ['images.ctfassets.net', 'i.scdn.co'],
   },
+  experimental: {
+    nextScriptWorkers: true,
+  },
   // Unfortunately required for Prisma until it upgrades to undici@^5
   webpack: (config, { isServer }) => {
     if (isServer) {
