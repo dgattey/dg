@@ -18,8 +18,6 @@ type Props = Pick<React.ComponentProps<'div'>, 'children'> &
     statusCode: number;
   };
 
-const Button = styled.a.attrs({ role: 'button' })``;
-
 const Container = styled.section`
   max-width: 36em;
   margin-bottom: 8rem;
@@ -36,8 +34,8 @@ const ErrorLayout = ({ children, fallback, statusCode, pageUrl }: Props) => {
       <Meta pageUrl={pageUrl} title={pageTitle} description="An error occurred" />
       <Container>
         {children}
-        <NextLink passHref href="/">
-          <Button>Go Back Home</Button>
+        <NextLink href="/" role="button">
+          Go back home
         </NextLink>
       </Container>
     </PageLayout>

@@ -40,13 +40,7 @@ const AlbumImage = ({ name, album }: Props) => {
   const albumImage = album.images.find((image) => image?.width === API_IMAGE_SIZE);
   const imageComponent = albumImage ? (
     <ImageContainer>
-      <Image
-        alt={name}
-        {...albumImage}
-        width={IMAGE_SIZE}
-        height={IMAGE_SIZE}
-        layout="responsive"
-      />
+      <Image alt={name} {...albumImage} width={IMAGE_SIZE} height={IMAGE_SIZE} />
     </ImageContainer>
   ) : null;
 

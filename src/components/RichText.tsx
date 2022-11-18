@@ -61,7 +61,7 @@ const AssetElement = ({ data, assetMap }: { data: NodeData; assetMap: Map<string
     return null;
   }
   const asset = assetMap.get(data.target.sys.id);
-  return asset ? <Image {...asset} alt={asset.title} /> : null;
+  return asset ? <Image {...asset} alt={asset.title ?? 'Image title'} /> : null;
 };
 
 /**

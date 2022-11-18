@@ -43,7 +43,7 @@ const ProjectCard = ({ title, layout, link, thumbnail, turnOnAnimation }: Props)
         <HoverableContainer isHovered={isHovered}>
           <ProjectImage
             {...thumbnail}
-            alt={title}
+            alt={title ?? 'Project image'}
             width={cardSizeInPx(horizontalSpan)}
             height={cardSizeInPx(verticalSpan)}
           />

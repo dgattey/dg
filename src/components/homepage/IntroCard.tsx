@@ -63,7 +63,7 @@ const IntroCard = () => {
         <HoverableContainer isHovered={isHovered}>
           <Image
             {...introBlock.image}
-            alt={introBlock.image.title}
+            alt={introBlock.image.title ?? 'Introduction image'}
             width={cardSizeInPx()}
             height={cardSizeInPx()}
             priority
