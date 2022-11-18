@@ -70,8 +70,6 @@ const SpacedScrollIndicator = styled(ScrollUpIndicator)<{ $isScrolled: boolean }
   margin-top: 2rem;
 `;
 
-const StyledLink = styled.a``;
-
 /**
  * Logo + scroll to top button, with certain changes that happen on
  * scroll.
@@ -79,14 +77,7 @@ const StyledLink = styled.a``;
 const Logo = () => {
   const router = useRouter();
   const isScrolled = useContext(ScrollIndicatorContext);
-  const linkedLogoText =
-    router.asPath === '/' ? (
-      'dg.'
-    ) : (
-      <Link href="/" passHref>
-        <StyledLink>dg.</StyledLink>
-      </Link>
-    );
+  const linkedLogoText = router.asPath === '/' ? 'dg.' : <Link href="/">dg.</Link>;
   return (
     <Stack $alignItems="flex-start">
       <LogoText $isScrolled={isScrolled}>{linkedLogoText}</LogoText>

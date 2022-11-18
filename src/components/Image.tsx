@@ -7,12 +7,12 @@ type Props = Pick<React.ComponentProps<'img'>, 'className'> &
     /**
      * Alt text, required, but defaults to title
      */
-    alt?: string;
+    alt: string;
 
     /**
-     * The image layout, defaulting to responsive
+     * The image fill layout, defaulting to responsive
      */
-    layout?: ImageProps['layout'];
+    fill?: ImageProps['fill'];
 
     /**
      * For the image that should be the LCP
@@ -23,24 +23,15 @@ type Props = Pick<React.ComponentProps<'img'>, 'className'> &
 /**
  * Shows a Next Image with the contents of the Asset. Layout defaults to responsive.
  */
-const Image = ({
-  url,
-  width,
-  height,
-  layout = 'intrinsic',
-  title,
-  alt,
-  className,
-  priority,
-}: Props) =>
+const Image = ({ url, width, height, fill, title, alt, className, priority }: Props) =>
   url ? (
     <NextImage
       className={className}
       src={url}
-      alt={alt ?? title}
+      alt={title ?? alt}
       width={width}
       height={height}
-      layout={layout}
+      fill={fill}
       priority={priority}
     />
   ) : null;

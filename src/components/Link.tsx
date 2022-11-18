@@ -51,9 +51,6 @@ const BUILT_IN_ICONS: Record<string, JSX.Element> = {
   email: <FaIcon icon={faPaperPlane} />,
 };
 
-// Allows us to use with the right props
-const StyledLink = styled.a``;
-
 // Used for setting internal HTML for a non-built in icon
 const NonBuiltInIcon = styled.span``;
 
@@ -96,14 +93,13 @@ const Link = ({ title, url, icon, layout: rawLayout, className, children, isExte
   // If there's a custom or built in icon, create a link around it
   const iconElement = createIconElement({ title, icon, layout });
   return (
-    <NextLink href={url} passHref>
-      <StyledLink
-        className={className}
-        data-tooltip={tooltip({ title, icon, layout })}
-        {...(isExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
-      >
-        {layout === 'empty' ? null : children ?? iconElement ?? title}
-      </StyledLink>
+    <NextLink
+      href={url}
+      className={className}
+      data-tooltip={tooltip({ title, icon, layout })}
+      {...(isExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
+    >
+      {layout === 'empty' ? null : children ?? iconElement ?? title}
     </NextLink>
   );
 };
