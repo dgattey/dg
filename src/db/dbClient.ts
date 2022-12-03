@@ -4,8 +4,27 @@ import mysql2 from 'mysql2';
 import Token from './models/Token';
 import StravaActivity from './models/StravaActivity';
 
-const databaseUrl = env.DATABASE_URL;
+const SHARED_DB_OPTIONS = {
+  dialect: 'mysql' as const,
+  dialectModule: mysql2, // gets around a Vercel bug where it's missing on edge functions
+};
 
+// Sequelize options applied based on current environment
+const DB_OPTIONS = {
+  development: SHARED_DB_OPTIONS,
+  test: SHARED_DB_OPTIONS,
+  production: {
+    ...SHARED_DB_OPTIONS,
+    ssl: true,
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: true,
+      },
+    },
+  },
+}[env.NODE_ENV || 'development'];
+
+const databaseUrl = env.DATABASE_URL;
 if (!databaseUrl) {
   throw new Error('DATABASE_URL environment variable not set');
 }
@@ -23,17 +42,11 @@ export const db = {
  * through models.Something
  */
 export const dbClient = new Sequelize(databaseUrl, {
-  dialectModule: mysql2, // gets around a Vercel bug where it's missing on edge functions
-  ssl: true,
   models: Object.values(db),
   define: {
     freezeTableName: true,
   },
-  dialectOptions: {
-    ssl: {
-      rejectUnauthorized: true,
-    },
-  },
+  ...DB_OPTIONS,
 });
 
 /**

@@ -1,12 +1,12 @@
 require('dotenv').config();
 
+const SHARED_OPTIONS = {
+  use_env_variable: 'DATABASE_URL',
+  dialect: 'mysql',
+};
+
 module.exports = {
-  development: {
-    use_env_variable: 'DATABASE_URL',
-    dialect: 'mysql',
-  },
-  production: {
-    use_env_variable: 'DATABASE_URL',
-    dialect: 'mysql',
-  },
+  development: SHARED_OPTIONS,
+  test: SHARED_OPTIONS,
+  production: SHARED_OPTIONS,
 };
