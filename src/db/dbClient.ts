@@ -29,6 +29,11 @@ export const dbClient = new Sequelize(databaseUrl, {
   define: {
     freezeTableName: true,
   },
+  dialectOptions: {
+    ssl: {
+      rejectUnauthorized: true,
+    },
+  },
 });
 
 /**
