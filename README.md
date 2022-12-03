@@ -7,17 +7,16 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 ## :hammer: Commands
 
 - `pnpm dev` starts the development server.
-- `pnpm build` runs a prod build after generating new Prisma types
+- `pnpm build` runs a prod build
 - `pnpm build:analyze` builds bundle analysis for a production version of the site to see what it'll look like when deployed
 - `pnpm serve` runs a server with the built site
 - `pnpm format` runs Prettier to format the files
 - `pnpm lint` runs ESLint to lint all TS(X) and JS(X) files
 - `pnpm lint:types` runs tsc to confirm no type errors on the same files
 - `pnpm codegen` generates new GraphQL APIs from Github/Contentful
-- `pnpm db:local <branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
-- `pnpm db:sync` (assuming the db is currently connected) syncs the schemas to the db branch so you can promote to main through PlanetScale
-- `pnpm db:generate` (assuming the db is currently connected) generates schema changes locally to the package
-- `pnpm db:ui` (assuming the db is currently connected) opens Prisma Studio to edit/view DB itself
+- `pnpm db:connect <optional branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
+- `pnpm db:migrate` uses Sequelize to run migrations, and you can list the status of migrations with `pnpm db:migrate:status`. Undo with `pnpm db:migrate:undo`
+- `pnpm db:generate` uses Sequelize to generate a new migration file ready to be populated
 - `pnpm webhooks:local` (assuming cloudflared is installed via brew) starts a tunnel to dev.dylangattey.com for purposes of testing webhooks
 - `pnpm webhooks:create <name>` will create a webhook subscription for the given API - for local dev and requires `webhooks:local` to be running already
 - `pnpm webhooks:list <name>` will list that API's webhook subscriptions - for local dev
@@ -65,7 +64,7 @@ Pretty standard Next app here. `/public` contains static files, `/src` contains 
 
 - [GraphQL Codegen](https://www.graphql-code-generator.com) makes all the `generated` files. It reads Github + Contentful's API schema + creates types out of them automatically. I run it on command when I write new queries/etc to get their types.
 
-- [Prisma](https://www.prisma.io) and [PlanetScale](https://planetscale.com) power a distributed DB. This DB is used to persist auth tokens for Spotify/Strava beyond the lifetime of a deploy + refresh the token as needed.
+- [PlanetScale](https://planetscale.com) powers a distributed DB. This DB is used to persist auth tokens for Spotify/Strava beyond the lifetime of a deploy + refresh the token as needed.
 
 - [Sentry](https://sentry.io) is used to capture errors + stack traces both serverside and clientside. Captures console logs too. Integrated with releases so we can see when problems start happening.
 
@@ -79,14 +78,22 @@ Pretty standard Next app here. `/public` contains static files, `/src` contains 
 
 ### DB
 
-Because Spotify + Strava use Oauth and I use their APIs to pull stats/etc, I needed a lightweight DB to store auth tokens. That way, I could redeploy without losing them or the refresh tokens that would allow me to fetch new ones. Planetscale comes from the Vercel team and is super easy to use. I wrap the schema generation/calls with Prisma just to get nice typing around it.
+Because Spotify + Strava use Oauth and I use their APIs to pull stats/etc, I needed a lightweight DB to store auth tokens. That way, I could redeploy without losing them or the refresh tokens that would allow me to fetch new ones. Planetscale comes from the Vercel team and is super easy to use.
 
 There's only two tables, one for the tokens and one for the Strava activities, and they're used from the server only.
 
 1. **Token**: I grab the latest token, see if it's expired, and if so, fetch new data. That's done via Spotify/Strava's APIs + the saved refresh token. Once I persist the new data, I can then call the APIs with the auth tokens. Nice defaults built in so anything missing gives back the right info as possible.
 2. **StravaActivity**: I create a row when there's a webhook event with a new activity, and I fetch the whole corresponding activity from Strava's API. If there are data updates, for now I just re-fetch the activity and update the row with new JSON data. I keep track of last update time, so multiple updates in the same time window don't hammer Strava's servers.
 
-To do migrations, update the schema file, then create a new branch on Planetscale's UI. Then reconnect with `pnpm db:local`. In a new terminal tab, run `pnpm db:sync` to push the schema changes & generate new types locally. If all looks good, you can deploy request from Planetscale, review, merge, and delete the branch. And then reconnect locally to main. Just know this'll update the main deployment so it needs backwards compatibility.
+To create and run a migration:
+
+1. Run `pnpm db:generate <name>` to create a new migration file
+1. Fill it in with the appropriate `up` and `down` code for what you're doing
+1. Create a new branch on Planetscale's UI to test with
+1. Connect to that branch with `pnpm db:connect <branch>`
+1. In a new terminal tab, run `pnpm db:migrate` to run migrations onto that branch.
+1. If all looks good, you can deploy request from Planetscale, review, merge, and delete the branch.
+1. Migrations can be undone with `pnpm db:migrate:undo`
 
 #### Strava
 

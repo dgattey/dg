@@ -105,5 +105,6 @@ module.exports = {
     'node_modules/',
     '**/*.generated.*',
     '**/generated/*',
+    'migrations/',
   ],
 };

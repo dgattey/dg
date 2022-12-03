@@ -1,4 +1,3 @@
-import { Prisma } from '@dg/api/server/generated';
 import { StravaDetailedActivity } from '@dg/api/types/StravaDetailedActivity';
 
 /**
@@ -34,12 +33,12 @@ const UNTYPED_FIELDS: Array<string> = FIELDS;
  * from the object when we process it.
  */
 const paredStravaActivity = (
-  activity: (StravaDetailedActivity & Prisma.JsonObject) | null | undefined,
+  activity: (StravaDetailedActivity & Record<string, unknown>) | null | undefined,
 ) => {
   if (!activity) {
     return null;
   }
-  const filtered: Partial<StravaDetailedActivity> & Prisma.JsonObject = {};
+  const filtered: Partial<StravaDetailedActivity & Record<string, unknown>> = {};
   Object.keys(activity)
     .filter((key) => UNTYPED_FIELDS.includes(key))
     .forEach((key) => {

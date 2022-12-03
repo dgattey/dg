@@ -30,7 +30,7 @@ npm-debug.log*
 tsconfig.tsbuildinfo
 .eslintcache
 
-# Generated files from Prisma
+# Generated files
 src/api/server/generated
 
 # Sentry
