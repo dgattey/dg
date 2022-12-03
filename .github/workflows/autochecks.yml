@@ -23,8 +23,6 @@ jobs:
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v2
-        with:
-          node-version: 16
       - uses: pnpm/action-setup@v2.2.2
       - run: pnpm install
         # Make sure types are generated before running the commmand
