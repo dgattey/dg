@@ -23,6 +23,8 @@ jobs:
         with:
           fetch-depth: 0
       - uses: actions/setup-node@v2
+        with:
+          node-version: 16
       - uses: pnpm/action-setup@v2.2.2
       - run: pnpm install
       - name: ${{ matrix.command }}
@@ -35,7 +37,7 @@ jobs:
           COMMAND_NAME="${{ matrix.command }}"
           OUTPUTNAME="${COMMAND_NAME//:/}"
           echo "Changed files were: $CHANGED"
-          echo "::set-output name=$OUTPUTNAME::$CHANGED"
+          echo "$OUTPUTNAME=$CHANGED" >> $GITHUB_OUTPUT
 
   # If anything is output, fails this job!
   fail-on-diff:
