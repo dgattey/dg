@@ -24,6 +24,7 @@ export const db = {
  */
 export const dbClient = new Sequelize(databaseUrl, {
   dialectModule: mysql2, // gets around a Vercel bug where it's missing on edge functions
+  ssl: true,
   models: Object.values(db),
   define: {
     freezeTableName: true,
