@@ -8,8 +8,8 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 
 - `pnpm dev` starts the development server.
 - `pnpm build` runs a prod build after generating new Prisma types
-- `pnpm serve` builds a production version & runs a server with the built site
-- `pnpm analyze` builds + loads bundle analysis for a production version of the site to see what it'll look like when deployed
+- `pnpm build:analyze` builds bundle analysis for a production version of the site to see what it'll look like when deployed
+- `pnpm serve` runs a server with the built site
 - `pnpm format` runs Prettier to format the files
 - `pnpm lint` runs ESLint to lint all TS(X) and JS(X) files
 - `pnpm lint:styles` runs stylelint on the same files
