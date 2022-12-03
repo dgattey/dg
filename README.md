@@ -27,7 +27,7 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 
 ## :beginner: Initial Setup
 
-You need Node 16+ and pnpm 7+ installed. Run `pnpm install` to get started once you have those two installed.
+You need Node 18+ and pnpm 7+ installed. Run `pnpm install` to get started once you have those two installed.
 
 ## :memo: Pull Requests
 
