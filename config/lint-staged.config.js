@@ -2,7 +2,7 @@ module.exports = {
   // In the project folder we type check, lint, lint styles, and format
   'src/**/*.{ts,tsx,js,jsx}': [
     () => 'tsc',
-    'eslint --cache --fix',
+    'eslint --cache --fix --no-eslintrc -c config/eslint.config.js',
     'prettier --loglevel warn --write',
   ],
   // Outside of the project folder or in JSON/etc we just format and call it good

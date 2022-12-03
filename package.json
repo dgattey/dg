@@ -14,7 +14,7 @@
     "serve": "next start",
     "release": "semantic-release",
     "format": "prettier --loglevel warn --write \"**/*.{js,ts,tsx,css,md,json,yml}\"",
-    "lint": "eslint . --cache --fix --ext .js,.ts,.tsx",
+    "lint": "eslint . --cache --fix --ext .js,.ts,.tsx --no-eslintrc -c config/eslint.config.js",
     "lint:types": "tsc --noEmit",
     "codegen": "DOTENV_CONFIG_PATH='.env.development.local' graphql-codegen --require dotenv/config --config codegen.js",
     "db:local": "pscale connect dg --port 3309",

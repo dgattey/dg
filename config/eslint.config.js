@@ -96,4 +96,14 @@ module.exports = {
   reportUnusedDisableDirectives: true,
   rules: BASE_RULES,
   overrides: [TYPESCRIPT_OVERRIDE, SCRIPTS_OVERRIDE],
+  ignorePatterns: [
+    '.cache/',
+    '.next/',
+    '.vscode/',
+    '.vercel/',
+    '.turbo/',
+    'node_modules/',
+    '**/*.generated.*',
+    '**/generated/*',
+  ],
 };

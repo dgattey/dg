@@ -1,8 +1,0 @@
-.cache/
-.next/
-.vscode/
-.vercel/
-.turbo/
-node_modules/
-**/*.generated.*
-**/generated/*
