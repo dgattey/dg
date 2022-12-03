@@ -27,6 +27,7 @@
     "webhooks:list": "pnpm -s webhooks list",
     "webhooks:delete": "pnpm -s webhooks delete",
     "version:fetch": "node --require tsm scripts/getVersion.ts",
+    "postinstall": "prisma generate",
     "clean": "rm -r .next"
   },
   "dependencies": {
