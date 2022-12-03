@@ -9,7 +9,7 @@
   "scripts": {
     "prepare": "husky install",
     "dev": "SENTRY_IGNORE_API_RESOLUTION_ERROR=1 next dev",
-    "build": "pnpm db:generate && NEXT_PUBLIC_APP_VERSION=$(pnpm -s version:fetch) next build",
+    "build": "NEXT_PUBLIC_APP_VERSION=$(pnpm -s version:fetch) next build",
     "build:analyze": "ANALYZE=true pnpm build",
     "serve": "next start",
     "release": "semantic-release",
