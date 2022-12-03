@@ -5,7 +5,7 @@ import githubClient from './networkClients/githubClient';
 const QUERY = gql`
   query GithubRepoVersion {
     repository(name: "dg", owner: "dgattey") {
-      releases(last: 100) {
+      releases(first: 10, orderBy: { field: CREATED_AT, direction: DESC }) {
         nodes {
           name
           tagCommit {
@@ -26,7 +26,6 @@ const QUERY = gql`
 const fetchGithubRepoVersion = async () => {
   if (process.env.NEXT_PUBLIC_APP_VERSION && process.env.NEXT_PUBLIC_APP_VERSION.length) {
     // Quicker short circuit for when this value exists
-    console.log(`Using NEXT_PUBLIC_APP_VERSION! "${process.env.NEXT_PUBLIC_APP_VERSION}"`);
     return process.env.NEXT_PUBLIC_APP_VERSION;
   }
 
@@ -41,9 +40,6 @@ const fetchGithubRepoVersion = async () => {
   const filteredReleases =
     releases?.filter((release) => release?.tagCommit?.oid === commitSha?.trim()) ?? [];
   // If we have a release that matched, return it, otherwise a fallback
-  console.log(`Commit SHA: ${commitSha}, filtered releases: ${filteredReleases.length}`);
-  console.log(`All releases: ${JSON.stringify(releases, null, 2)}`);
-  console.log(`All filtered releases: ${JSON.stringify(filteredReleases, null, 2)}`);
   return filteredReleases[0]?.name ?? 'vX.Y.Z';
 };
 
