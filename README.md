@@ -1,4 +1,4 @@
-[![GitHub version](https://badgen.net/github/release/dgattey/dg?cache=600)][gh] [![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=dg)](https://vercel.com/dgattey/dg) [![Climate][cc-img]][cc] [![Quality](https://badgen.net//codeclimate/maintainability/dgattey/dg)][cc] [![Lines of Code](https://badgen.net/codeclimate/loc/dgattey/dg)][cc] [![GitHub checks](https://badgen.net/github/checks/dgattey/dg)][gh] [![Last commit](https://badgen.net/github/last-commit/dgattey/dg/main)][gh]
+[![GitHub version](https://badgen.net/github/release/dgattey/dg?cache=600)][gh] [![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=dg)](https://vercel.com/dgattey/dg) [![GitHub checks](https://badgen.net/github/checks/dgattey/dg)][gh] [![Last commit](https://badgen.net/github/last-commit/dgattey/dg/main)][gh]
 
 # Dylan Gattey
 
@@ -37,7 +37,7 @@ Even though it's just me, I use feature branches that merge onto main:
 
 1. I [create a PR](https://github.com/dgattey/dg/pulls) and make sure there's a label + an [issue](https://github.com/dgattey/dg/issues) the PR "fixes" or "closes".
 
-1. It'll automatically kick off Github Actions for quality, safety, and linting/formatting using [CodeClimate](https://codeclimate.com/) + CodeQL from Github + my own Action for Autochecks.
+1. It'll automatically kick off Github Actions for quality, safety, and linting/formatting using CodeQL from Github + my own actions for Autochecks.
 
 1. Check out the Vercel deploy preview to verify it looks good. Once that's good and checks pass, merge and delete the branch and it'll automatically create a new release + deployment for it! :tada:
 
@@ -132,6 +132,4 @@ The site was originally Wordpress for way too many years! I used a custom theme 
 
 **Version 2.5.0** at the end of 2021 was the swap to Next as a framework + Vercel as a host to deploy it since Netlify had gotten crusty. Also, I made Typescript the language of choice instead of the hybrid mix I'd used with Gatsby. I added features like a map to show my location, light/dark mode (finally), Spotify + Strava to show my latest stats, and new projects I'd worked on since 2019. I released the Next version of the site in spring 2022, with content fully separated from design to make it easier to keep it updated through the years. With Vercel + modern React, I'm much better set up for no design changes for awhile.
 
-[cc-img]: https://badgen.net/codeclimate/tech-debt/dgattey/dg
-[cc]: https://codeclimate.com/github/dgattey/dg/maintainability
 [gh]: https://github.com/dgattey/dg
