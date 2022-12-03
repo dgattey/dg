@@ -5,7 +5,6 @@ import { css } from 'styled-components';
  * lines. Works on any browser, despite the webkit prefixes.
  */
 const truncated = (numberOfLines: number) => css`
-  /* stylelint-disable-next-line */
   display: -webkit-box;
   -webkit-line-clamp: ${numberOfLines};
   -webkit-box-orient: vertical;

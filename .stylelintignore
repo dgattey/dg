@@ -1,7 +1,0 @@
-.cache/
-.next/
-.vscode/
-.vercel/
-node_modules/
-**/*.generated.*
-**/generated/*
