@@ -12,7 +12,6 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 - `pnpm serve` runs a server with the built site
 - `pnpm format` runs Prettier to format the files
 - `pnpm lint` runs ESLint to lint all TS(X) and JS(X) files
-- `pnpm lint:styles` runs stylelint on the same files
 - `pnpm lint:types` runs tsc to confirm no type errors on the same files
 - `pnpm codegen` generates new GraphQL APIs from Github/Contentful
 - `pnpm db:local <branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309

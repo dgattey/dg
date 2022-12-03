@@ -11,7 +11,7 @@ jobs:
     strategy:
       matrix:
         # Each of these are commands we should run and check output
-        command: ['lint', 'lint:styles', 'lint:types', 'format']
+        command: ['lint', 'lint:types', 'format']
 
     outputs:
       lint: ${{ steps.changes.outputs.lint }}

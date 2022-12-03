@@ -3,7 +3,6 @@ module.exports = {
   'src/**/*.{ts,tsx,js,jsx}': [
     () => 'tsc',
     'eslint --cache --fix',
-    'stylelint --fix --allow-empty-input',
     'prettier --loglevel warn --write',
   ],
   // Outside of the project folder or in JSON/etc we just format and call it good
