@@ -5,7 +5,7 @@ import githubClient from './networkClients/githubClient';
 const QUERY = gql`
   query GithubRepoVersion {
     repository(name: "dg", owner: "dgattey") {
-      releases(last: 100) {
+      releases(first: 10, orderBy: { field: CREATED_AT, direction: DESC }) {
         nodes {
           name
           tagCommit {
