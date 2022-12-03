@@ -1,5 +1,5 @@
-import dbClient from '@dg/api/server/networkClients/dbClient';
 import type { StravaWebhookEvent } from '@dg/api/types/StravaWebhookEvent';
+import { db } from 'db/dbClient';
 import fetchStravaActivityFromApi from './fetchStravaActivityFromApi';
 
 // If an update was applied this number of ms or less ago, drop the update
@@ -11,13 +11,9 @@ const UPDATE_THRESHOLD_IN_MS = 60000;
  * data for the activity in the db hasn't been updated in the last minute.
  */
 const fetchFromApiAndSaveToDb = async (id: number) => {
-  const existingActivity = await dbClient.stravaActivity.findUnique({
-    where: {
-      id,
-    },
-    select: {
-      lastUpdate: true,
-    },
+  const existingActivity = await db.StravaActivity.findOne({
+    where: { id },
+    attributes: ['lastUpdate'],
   });
   if (
     existingActivity?.lastUpdate &&
@@ -31,30 +27,20 @@ const fetchFromApiAndSaveToDb = async (id: number) => {
   if (!latestActivityData || !latestActivityData.start_date) {
     throw new Error(`Missing activity data for ${id}`);
   }
-  return dbClient.stravaActivity.upsert({
-    create: {
-      id,
-      activityData: latestActivityData,
-      activityStartDate: new Date(latestActivityData.start_date),
-      lastUpdate: new Date(),
-    },
-    update: {
-      activityData: latestActivityData,
-      activityStartDate: new Date(latestActivityData.start_date),
-      lastUpdate: new Date(),
-    },
-    where: {
-      id,
-    },
+  const updatedActivity = await db.StravaActivity.upsert({
+    id,
+    activityStartDate: new Date(latestActivityData.start_date),
+    activityData: latestActivityData,
+    lastUpdate: new Date(),
   });
+  return updatedActivity[0];
 };
 
 /**
  * Deletes an activity id'd by `id` from the DB if it exists, and
  * it's fine if it doesn't.
  */
-const deleteActivityFromDb = async (id: number) =>
-  dbClient.stravaActivity.delete({ where: { id } });
+const deleteActivityFromDb = async (id: number) => db.StravaActivity.destroy({ where: { id } });
 
 /**
  * Given a new webhook update event, handles it:

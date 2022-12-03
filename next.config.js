@@ -22,14 +22,6 @@ const nextConfig = {
       },
     ],
   },
-  // Unfortunately required for Prisma until it upgrades to undici@^5
-  webpack: (config, { isServer }) => {
-    if (isServer) {
-      config.externals.push('_http_common');
-      config.externals.push('encoding');
-    }
-    return config;
-  },
 };
 
 /**

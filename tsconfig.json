@@ -5,6 +5,8 @@
     "baseUrl": "src",
     "checkJs": true,
     "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "isolatedModules": true,
@@ -30,5 +32,5 @@
     "target": "es2018"
   },
   "include": ["src", "scripts", "eslint-plugin-dg"],
-  "exclude": ["node_modules", "src/api/server/generated"]
+  "exclude": ["node_modules", "src/api/server/generated", "**/migrations/*"]
 }

@@ -1,6 +1,6 @@
-import type { Prisma } from '@dg/api/server/generated';
-import dbClient from '@dg/api/server/networkClients/dbClient';
 import type { TokenKey } from '@dg/api/types/Token';
+import { db } from 'db/dbClient';
+import { CreateTokenProps, FetchTokenProps } from 'db/models/Token';
 import fetchRefreshedTokenFromApi from './fetchRefreshedTokenFromApi';
 
 /**
@@ -12,37 +12,20 @@ const createOrUpdateToken = async ({
   accessToken,
   expiryAt,
   refreshToken,
-}: Omit<Prisma.TokenCreateArgs['data'], 'id'>) =>
-  dbClient.token.upsert({
-    create: {
-      name,
-      accessToken,
-      expiryAt,
-      refreshToken,
-    },
-    update: {
-      accessToken,
-      expiryAt,
-      refreshToken,
-    },
-    where: {
-      name,
-    },
-  });
+}: CreateTokenProps) => {
+  const token = await db.Token.upsert({ name, accessToken, expiryAt, refreshToken });
+  return token[0];
+};
 
 /**
  * Gets a token if still valid/not expired. Throws an error if the token is
  * missing. Returns just the refresh token if invalid. Returns both the refresh
  * and access tokens if valid.
  */
-const getLatestTokenIfValid = async ({ name }: Pick<Prisma.TokenCreateArgs['data'], 'name'>) => {
-  const token = await dbClient.token.findUnique({
+const getLatestTokenIfValid = async ({ name }: FetchTokenProps) => {
+  const token = await db.Token.findOne({
     where: { name },
-    select: {
-      accessToken: true,
-      refreshToken: true,
-      expiryAt: true,
-    },
+    attributes: ['accessToken', 'refreshToken', 'expiryAt'],
   });
 
   // Shouldn't happen unless invalid name, so it's a big error
