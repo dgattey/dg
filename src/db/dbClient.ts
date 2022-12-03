@@ -1,5 +1,6 @@
 import { env } from 'process';
 import { Sequelize } from 'sequelize-typescript';
+import mysql2 from 'mysql2';
 import Token from './models/Token';
 import StravaActivity from './models/StravaActivity';
 
@@ -22,6 +23,7 @@ export const db = {
  * through models.Something
  */
 export const dbClient = new Sequelize(databaseUrl, {
+  dialectModule: mysql2, // gets around a Vercel bug where it's missing on edge functions
   models: Object.values(db),
   define: {
     freezeTableName: true,
