@@ -15,7 +15,6 @@ jobs:
 
     outputs:
       lint: ${{ steps.changes.outputs.lint }}
-      lintstyles: ${{ steps.changes.outputs.lintstyles }}
       linttypes: ${{ steps.changes.outputs.linttypes }}
       format: ${{ steps.changes.outputs.format }}
 
@@ -46,12 +45,11 @@ jobs:
   fail-on-diff:
     runs-on: ubuntu-latest
     needs: autocheck
-    if: ${{ needs.autocheck.outputs.lint || needs.autocheck.outputs.lintstyles || needs.autocheck.outputs.linttypes || needs.autocheck.outputs.format }}
+    if: ${{ needs.autocheck.outputs.lint || needs.autocheck.outputs.linttypes || needs.autocheck.outputs.format }}
     steps:
       - name: Exiting because of changed files
         run: |
           echo "Changed from lint: ${{needs.autocheck.outputs.lint || 'none'}}"
-          echo "Changed from style lint: ${{needs.autocheck.outputs.lintstyles || 'none'}}"
           echo "Type check changed files: ${{needs.autocheck.outputs.linttypes || 'none'}}"
           echo "Files formatted: ${{needs.autocheck.outputs.format || 'none'}}"
           exit 1
