@@ -24,6 +24,15 @@ const nextConfig = {
 };
 
 /**
+ * @type {import('@sentry/nextjs').SentryWebpackPluginOptions}
+ */
+const SENTRY_ARGS = {
+  org: 'dgattey',
+  project: 'dg',
+  release: process.env.NEXT_PUBLIC_APP_VERSION,
+};
+
+/**
  * Adds bundle analysis if development + with ANALYZE flag set to true
  */
 const withNextBundleAnalyzer = require('@next/bundle-analyzer')({
@@ -34,8 +43,8 @@ if (process.env.NODE_ENV === 'development') {
   // Add silent sentry on develop and make sure it's always a dry run
   module.exports = withNextBundleAnalyzer(
     withSentryConfig(nextConfig, {
+      ...SENTRY_ARGS,
       hideSourceMaps: false,
-      release: process.env.NEXT_PUBLIC_APP_VERSION,
       silent: true,
       dryRun: true,
     }),
@@ -44,8 +53,8 @@ if (process.env.NODE_ENV === 'development') {
   // For prod, dry run if it's running locally/appears local
   module.exports = withNextBundleAnalyzer(
     withSentryConfig(nextConfig, {
+      ...SENTRY_ARGS,
       hideSourceMaps: true,
-      release: process.env.NEXT_PUBLIC_APP_VERSION,
       dryRun:
         // If not deployed on a real branch or the db url points to something local, we know we're running a production build locally
         'vX.Y.Z'.includes(process.env.NEXT_PUBLIC_APP_VERSION) ||
