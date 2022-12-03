@@ -26,7 +26,7 @@ const QUERY = gql`
 const fetchGithubRepoVersion = async () => {
   if (process.env.NEXT_PUBLIC_APP_VERSION && process.env.NEXT_PUBLIC_APP_VERSION.length) {
     // Quicker short circuit for when this value exists
-    console.log('Using NEXT_PUBLIC_APP_VERSION', process.env.NEXT_PUBLIC_APP_VERSION);
+    console.log(`Using NEXT_PUBLIC_APP_VERSION! "${process.env.NEXT_PUBLIC_APP_VERSION}"`);
     return process.env.NEXT_PUBLIC_APP_VERSION;
   }
 
@@ -41,14 +41,9 @@ const fetchGithubRepoVersion = async () => {
   const filteredReleases =
     releases?.filter((release) => release?.tagCommit?.oid === commitSha?.trim()) ?? [];
   // If we have a release that matched, return it, otherwise a fallback
-  console.log(
-    'Fetched filtered releases',
-    filteredReleases[0]?.name,
-    'numReleases',
-    releases?.length,
-    'looking for',
-    commitSha?.trim(),
-  );
+  console.log(`Commit SHA: ${commitSha}, filtered releases: ${filteredReleases.length}`);
+  console.log(`All releases: ${JSON.stringify(releases, null, 2)}`);
+  console.log(`All filtered releases: ${JSON.stringify(filteredReleases, null, 2)}`);
   return filteredReleases[0]?.name ?? 'vX.Y.Z';
 };
 
