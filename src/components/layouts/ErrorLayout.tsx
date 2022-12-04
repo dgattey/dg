@@ -1,6 +1,6 @@
-import { ErrorPageFallback } from '@dg/api/fetchFallback';
-import Meta from '@dg/components/Meta';
-import { Page } from '@dg/types/Page';
+import { ErrorPageFallback } from 'api/fetchFallback';
+import Meta from 'components/Meta';
+import { Page } from 'types/Page';
 import NextLink from 'next/link';
 import styled from 'styled-components';
 import PageLayout from './PageLayout';

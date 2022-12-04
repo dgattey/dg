@@ -1,5 +1,5 @@
-import fetchFallback from '@dg/api/fetchFallback';
-import ErrorLayout from '@dg/components/layouts/ErrorLayout';
+import fetchFallback from 'api/fetchFallback';
+import ErrorLayout from 'components/layouts/ErrorLayout';
 import type { GetStaticProps } from 'next/types';
 import { Contents, Props } from './_error';
 

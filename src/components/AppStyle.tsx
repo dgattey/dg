@@ -1,4 +1,4 @@
-import { ANIMATE_ATTRIBUTE } from '@dg/hooks/useColorScheme';
+import { ANIMATE_ATTRIBUTE } from 'hooks/useColorScheme';
 import '@picocss/pico/css/pico.min.css';
 import { createGlobalStyle, css } from 'styled-components';
 

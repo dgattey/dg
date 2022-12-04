@@ -1,12 +1,12 @@
-import type { EndpointKey } from '@dg/api/endpoints';
-import ColorSchemeContext from '@dg/components/ColorSchemeContext';
-import Footer from '@dg/components/Footer';
-import Header from '@dg/components/Header';
-import Meta from '@dg/components/Meta';
-import ScrollIndicatorContext from '@dg/components/ScrollIndicatorContext';
-import useColorScheme from '@dg/hooks/useColorScheme';
-import useShowScrollIndicator from '@dg/hooks/useShowScrollIndicator';
-import type { Page } from '@dg/types/Page';
+import type { EndpointKey } from 'api/endpoints';
+import ColorSchemeContext from 'components/ColorSchemeContext';
+import Footer from 'components/Footer';
+import Header from 'components/Header';
+import Meta from 'components/Meta';
+import ScrollIndicatorContext from 'components/ScrollIndicatorContext';
+import useColorScheme from 'hooks/useColorScheme';
+import useShowScrollIndicator from 'hooks/useShowScrollIndicator';
+import type { Page } from 'types/Page';
 import { useRef } from 'react';
 import { SWRConfig } from 'swr';
 

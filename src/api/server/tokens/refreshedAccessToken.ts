@@ -1,4 +1,4 @@
-import type { TokenKey } from '@dg/api/types/Token';
+import type { TokenKey } from 'api/types/Token';
 import { db } from 'db/dbClient';
 import { CreateTokenProps, FetchTokenProps } from 'db/models/Token';
 import fetchRefreshedTokenFromApi from './fetchRefreshedTokenFromApi';

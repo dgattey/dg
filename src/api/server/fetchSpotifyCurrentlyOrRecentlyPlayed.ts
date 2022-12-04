@@ -1,5 +1,5 @@
-import type { CurrentlyPlaying } from '@dg/api/types/spotify/CurrentlyPlaying';
-import type { RecentlyPlayed } from '@dg/api/types/spotify/RecentlyPlayed';
+import type { CurrentlyPlaying } from 'api/types/spotify/CurrentlyPlaying';
+import type { RecentlyPlayed } from 'api/types/spotify/RecentlyPlayed';
 import spotifyClient from './networkClients/spotifyClient';
 
 const CURRENTLY_PLAYING_RESOURCE = 'me/player/currently-playing';

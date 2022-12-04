@@ -1,6 +1,6 @@
-import type { Track } from '@dg/api/types/spotify/Track';
-import Stack from '@dg/components/Stack';
-import useRelativeTimeFormat from '@dg/hooks/useRelativeTimeFormat';
+import type { Track } from 'api/types/spotify/Track';
+import Stack from 'components/Stack';
+import useRelativeTimeFormat from 'hooks/useRelativeTimeFormat';
 import { Music } from 'lucide-react';
 import styled from 'styled-components';
 

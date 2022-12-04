@@ -1,8 +1,8 @@
-import useData from '@dg/api/useData';
-import ContentGrid from '@dg/components/ContentGrid';
-import Meta from '@dg/components/Meta';
-import useGridAnimation from '@dg/hooks/useGridAnimation';
-import type { Page } from '@dg/types/Page';
+import useData from 'api/useData';
+import ContentGrid from 'components/ContentGrid';
+import Meta from 'components/Meta';
+import useGridAnimation from 'hooks/useGridAnimation';
+import type { Page } from 'types/Page';
 import { useMemo, useRef } from 'react';
 import ColorSchemeToggleCard from './ColorSchemeToggleCard';
 import IntroCard from './IntroCard';

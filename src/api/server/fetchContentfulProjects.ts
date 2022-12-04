@@ -1,5 +1,5 @@
-import { isProject } from '@dg/api/parsers';
-import type { ProjectsQuery } from '@dg/api/types/generated/fetchContentfulProjects.generated';
+import { isProject } from 'api/parsers';
+import type { ProjectsQuery } from 'api/types/generated/fetchContentfulProjects.generated';
 import { gql } from 'graphql-request';
 import contentfulClient from './networkClients/contentfulClient';
 

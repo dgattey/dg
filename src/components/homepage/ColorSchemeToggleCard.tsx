@@ -1,7 +1,7 @@
-import ColorSchemeContext from '@dg/components/ColorSchemeContext';
-import ContentCard from '@dg/components/ContentCard';
-import Stack from '@dg/components/Stack';
-import { ColorScheme } from '@dg/hooks/useColorScheme';
+import ColorSchemeContext from 'components/ColorSchemeContext';
+import ContentCard from 'components/ContentCard';
+import Stack from 'components/Stack';
+import { ColorScheme } from 'hooks/useColorScheme';
 import { useContext } from 'react';
 import styled, { css } from 'styled-components';
 import ColorSchemeIcon from './ColorSchemeIcon';

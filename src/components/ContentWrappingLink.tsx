@@ -1,4 +1,4 @@
-import type { Link } from '@dg/api/types/generated/contentfulApi.generated';
+import type { Link } from 'api/types/generated/contentfulApi.generated';
 import NextLink from 'next/link';
 
 type Props = Pick<React.ComponentProps<'div'>, 'children'> & {

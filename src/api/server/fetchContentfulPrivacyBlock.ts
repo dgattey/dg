@@ -1,5 +1,5 @@
-import { isTextBlock } from '@dg/api/parsers';
-import type { PrivacyBlockQuery } from '@dg/api/types/generated/fetchContentfulPrivacyBlock.generated';
+import { isTextBlock } from 'api/parsers';
+import type { PrivacyBlockQuery } from 'api/types/generated/fetchContentfulPrivacyBlock.generated';
 import { gql } from 'graphql-request';
 import contentfulClient from './networkClients/contentfulClient';
 

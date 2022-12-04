@@ -1,5 +1,5 @@
-import type { MapLocation } from '@dg/api/types/MapLocation';
-import ColorSchemeContext from '@dg/components/ColorSchemeContext';
+import type { MapLocation } from 'api/types/MapLocation';
+import ColorSchemeContext from 'components/ColorSchemeContext';
 import { useContext, useEffect, useMemo, useRef } from 'react';
 import { AttributionControl, Map as MapGL, MapRef } from 'react-map-gl';
 import styled, { css } from 'styled-components';

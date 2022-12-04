@@ -1,6 +1,6 @@
-import { findLinkWithName } from '@dg/api/parsers';
-import type { Link as LinkProps } from '@dg/api/types/generated/contentfulApi.generated';
-import useData from '@dg/api/useData';
+import { findLinkWithName } from 'api/parsers';
+import type { Link as LinkProps } from 'api/types/generated/contentfulApi.generated';
+import useData from 'api/useData';
 import { useMemo } from 'react';
 
 /**

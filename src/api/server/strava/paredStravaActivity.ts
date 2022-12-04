@@ -1,4 +1,4 @@
-import { StravaDetailedActivity } from '@dg/api/types/StravaDetailedActivity';
+import { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
 
 /**
  * These are the only fields we care about for now

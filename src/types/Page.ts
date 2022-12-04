@@ -1,5 +1,5 @@
-import type { EndpointKey } from '@dg/api/endpoints';
-import type { PartialFallback } from '@dg/api/fetchFallback';
+import type { EndpointKey } from 'api/endpoints';
+import type { PartialFallback } from 'api/fetchFallback';
 
 /**
  * Types a Page itself (in pages directory)

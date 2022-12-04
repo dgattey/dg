@@ -1,8 +1,8 @@
-import type { ErrorPageFallback } from '@dg/api/fetchFallback';
-import fetchFallback from '@dg/api/fetchFallback';
-import ErrorLayout from '@dg/components/layouts/ErrorLayout';
-import Link from '@dg/components/Link';
-import useLinkWithName from '@dg/hooks/useLinkWithName';
+import type { ErrorPageFallback } from 'api/fetchFallback';
+import fetchFallback from 'api/fetchFallback';
+import ErrorLayout from 'components/layouts/ErrorLayout';
+import Link from 'components/Link';
+import useLinkWithName from 'hooks/useLinkWithName';
 import * as Sentry from '@sentry/nextjs';
 import type { NextPageContext } from 'next';
 import NextErrorComponent from 'next/error';

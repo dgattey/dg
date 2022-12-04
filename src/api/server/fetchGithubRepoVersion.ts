@@ -1,4 +1,4 @@
-import type { GithubRepoVersionQuery } from '@dg/api/types/generated/fetchGithubRepoVersion.generated';
+import type { GithubRepoVersionQuery } from 'api/types/generated/fetchGithubRepoVersion.generated';
 import { gql } from 'graphql-request';
 import githubClient from './networkClients/githubClient';
 

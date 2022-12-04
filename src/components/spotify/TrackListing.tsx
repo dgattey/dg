@@ -1,6 +1,6 @@
-import { Track } from '@dg/api/types/spotify/Track';
-import Stack from '@dg/components/Stack';
-import truncated from '@dg/helpers/truncated';
+import { Track } from 'api/types/spotify/Track';
+import Stack from 'components/Stack';
+import truncated from 'helpers/truncated';
 import styled from 'styled-components';
 import AlbumImage from './AlbumImage';
 import ArtistList from './ArtistList';
