@@ -1,5 +1,5 @@
-import { Asset } from '@dg/api/types/generated/contentfulApi.generated';
-import type { MyLocationQuery } from '@dg/api/types/generated/fetchContentfulLocation.generated';
+import { Asset } from 'api/types/generated/contentfulApi.generated';
+import type { MyLocationQuery } from 'api/types/generated/fetchContentfulLocation.generated';
 
 /**
  * Represents a location along with some metadata

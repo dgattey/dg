@@ -1,7 +1,7 @@
-import type { MapLocation } from '@dg/api/types/MapLocation';
-import Image from '@dg/components/Image';
+import type { MapLocation } from 'api/types/MapLocation';
+import Image from 'components/Image';
 import { Marker as MapMarker } from 'react-map-gl';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 const DIMENSION = 100;
 const RADIUS = DIMENSION / 2;
@@ -13,7 +13,7 @@ type Props = Pick<MapLocation, 'point'> & Partial<Pick<MapLocation, 'image'>>;
 /**
  * Creates a circle to show
  */
-const AreaIndicator = styled.circle.attrs({ r: RADIUS, cx: RADIUS, cy: RADIUS })`
+const AreaIndicator = styled.circle`
   fill: var(--map-marker);
 `;
 
@@ -26,13 +26,13 @@ const ImageContainer = styled.span`
 /**
  * Creates a standard map marker, centered on a point
  */
-const Marker = ({ point, image }: Props) => {
+function Marker({ point, image }: Props) {
   const id = `${point?.latitude},${point?.longitude}`;
   return (
     <MapMarker {...point}>
       <svg width={DIMENSION} height={DIMENSION}>
         <defs>
-          <AreaIndicator id={id} />
+          <AreaIndicator id={id} r={RADIUS} cx={RADIUS} cy={RADIUS} />
           <clipPath id="clip">
             <use xlinkHref={`#${id}`} />
           </clipPath>
@@ -56,6 +56,6 @@ const Marker = ({ point, image }: Props) => {
       )}
     </MapMarker>
   );
-};
+}
 
 export default Marker;

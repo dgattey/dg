@@ -1,7 +1,7 @@
-import type { Track } from '@dg/api/types/spotify/Track';
-import Link from '@dg/components/Link';
-import useLinkWithName from '@dg/hooks/useLinkWithName';
-import styled from 'styled-components';
+import type { Track } from 'api/types/spotify/Track';
+import Link from 'components/Link';
+import useLinkWithName from 'hooks/useLinkWithName';
+import styled from '@emotion/styled';
 
 type Props = Track;
 
@@ -13,7 +13,7 @@ const PlainLink = styled(Link)`
 /**
  * Creates an element that shows a track title that links to the song
  */
-const TrackTitle = ({ name, external_urls }: Props) => {
+function TrackTitle({ name, external_urls }: Props) {
   const link = useLinkWithName('Spotify', { title: name, url: external_urls.spotify });
   return link ? (
     <PlainLink isExternal {...link}>
@@ -22,6 +22,6 @@ const TrackTitle = ({ name, external_urls }: Props) => {
   ) : (
     <span>name</span>
   );
-};
+}
 
 export default TrackTitle;

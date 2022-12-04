@@ -100,7 +100,7 @@ class DGControl {
  * Returns a no-op component that adds a control to the map in a given
  * position of the map (corners).
  */
-const Control = ({ position, ...props }: Props) => {
+function Control({ position, ...props }: Props) {
   const control = useRef<DGControl | null>(null);
   const properProps = useMemo(
     () => ({
@@ -124,6 +124,6 @@ const Control = ({ position, ...props }: Props) => {
     },
   );
   return null;
-};
+}
 
 export default Control;

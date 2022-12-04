@@ -1,4 +1,4 @@
-import type { StravaWebhookEvent } from '@dg/api/types/StravaWebhookEvent';
+import type { StravaWebhookEvent } from 'api/types/StravaWebhookEvent';
 import { db } from 'db/dbClient';
 import fetchStravaActivityFromApi from './fetchStravaActivityFromApi';
 

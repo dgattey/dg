@@ -1,7 +1,7 @@
-import useData from '@dg/api/useData';
-import ContentCard from '@dg/components/ContentCard';
-import TrackListing from '@dg/components/spotify/TrackListing';
-import styled from 'styled-components';
+import useData from 'api/useData';
+import ContentCard from 'components/ContentCard';
+import TrackListing from 'components/spotify/TrackListing';
+import styled from '@emotion/styled';
 
 // Stacks content and takes up space of parent
 const Card = styled(ContentCard)`
@@ -11,7 +11,7 @@ const Card = styled(ContentCard)`
 /**
  * Shows a card with the latest data from Spotify
  */
-const SpotifyCard = () => {
+function SpotifyCard() {
   const { data: track } = useData('latest/track');
   if (!track) {
     return null;
@@ -22,6 +22,6 @@ const SpotifyCard = () => {
       <TrackListing track={track} hasLogo />
     </Card>
   );
-};
+}
 
 export default SpotifyCard;

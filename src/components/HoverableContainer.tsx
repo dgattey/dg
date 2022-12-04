@@ -1,4 +1,5 @@
-import styled, { css } from 'styled-components';
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 
 /**
  * Adds a transition and transform up on hover. Meant for use with images.

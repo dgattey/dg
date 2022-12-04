@@ -1,9 +1,8 @@
-import handleApiError, { methodNotAllowedError } from '@dg/api/handleApiError';
-import { isRecord } from '@dg/api/parsers';
-import echoStravaChallengeIfValid from '@dg/api/server/strava/echoStravaChallengeIfValid';
-import syncStravaWebhookUpdateWithDb from '@dg/api/server/strava/syncStravaWebhookUpdateWithDb';
-import type { StravaWebhookEvent } from '@dg/api/types/StravaWebhookEvent';
-import withSentry from '@dg/api/withSentry';
+import handleApiError, { methodNotAllowedError } from 'api/handleApiError';
+import { isRecord } from 'api/parsers';
+import echoStravaChallengeIfValid from 'api/server/strava/echoStravaChallengeIfValid';
+import syncStravaWebhookUpdateWithDb from 'api/server/strava/syncStravaWebhookUpdateWithDb';
+import type { StravaWebhookEvent } from 'api/types/StravaWebhookEvent';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 // Just a shorthand for this function type
@@ -77,4 +76,4 @@ const handler: AsyncProcessor = async (request, response) => {
   }
 };
 
-export default withSentry(handler);
+export default handler;

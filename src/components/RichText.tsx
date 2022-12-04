@@ -1,13 +1,9 @@
 import { documentToReactComponents, Options } from '@contentful/rich-text-react-renderer';
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
-import { isDefinedItem, isLink, isProject } from '@dg/api/parsers';
-import type {
-  Asset,
-  Entry,
-  TextBlockContent,
-} from '@dg/api/types/generated/contentfulApi.generated';
-import ProjectCard from '@dg/components/homepage/ProjectCard';
+import { isDefinedItem, isLink, isProject } from 'api/parsers';
+import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
+import ProjectCard from 'components/homepage/ProjectCard';
 import Image from './Image';
 import Link from './Link';
 
@@ -37,7 +33,7 @@ const isDataWithId = (data: NodeData): data is DataWithId =>
 /**
  * Creates an element for a single entry in our rich text
  */
-const EntryElement = ({ data, entryMap }: { data: NodeData; entryMap: Map<string, Entry> }) => {
+function EntryElement({ data, entryMap }: { data: NodeData; entryMap: Map<string, Entry> }) {
   if (!isDataWithId(data)) {
     return null;
   }
@@ -51,18 +47,18 @@ const EntryElement = ({ data, entryMap }: { data: NodeData; entryMap: Map<string
   }
 
   return null;
-};
+}
 
 /**
  * Renders a singular asset element from data in the rich text
  */
-const AssetElement = ({ data, assetMap }: { data: NodeData; assetMap: Map<string, Asset> }) => {
+function AssetElement({ data, assetMap }: { data: NodeData; assetMap: Map<string, Asset> }) {
   if (!isDataWithId(data)) {
     return null;
   }
   const asset = assetMap.get(data.target.sys.id);
   return asset ? <Image {...asset} alt={asset.title ?? 'Image title'} /> : null;
-};
+}
 
 /**
  * Takes links and converts them into rich text through rendering specific types of content.
@@ -91,13 +87,15 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
  * Complicated component to render rich text from Contentful's rich
  * text renderer, resolving all items to components
  */
-const RichText = ({ json, links, className }: Props) => (
-  <div className={className}>
-    {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      documentToReactComponents(json as unknown as Document, renderOptions(links))
-    }
-  </div>
-);
+function RichText({ json, links, className }: Props) {
+  return (
+    <div className={className}>
+      {
+        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+        documentToReactComponents(json as unknown as Document, renderOptions(links))
+      }
+    </div>
+  );
+}
 
 export default RichText;

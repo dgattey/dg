@@ -1,9 +1,8 @@
-import type { ErrorPageFallback } from '@dg/api/fetchFallback';
-import fetchFallback from '@dg/api/fetchFallback';
-import ErrorLayout from '@dg/components/layouts/ErrorLayout';
-import Link from '@dg/components/Link';
-import useLinkWithName from '@dg/hooks/useLinkWithName';
-import * as Sentry from '@sentry/nextjs';
+import type { ErrorPageFallback } from 'api/fetchFallback';
+import fetchFallback from 'api/fetchFallback';
+import ErrorLayout from 'components/layouts/ErrorLayout';
+import Link from 'components/Link';
+import useLinkWithName from 'hooks/useLinkWithName';
 import type { NextPageContext } from 'next';
 import NextErrorComponent from 'next/error';
 import { useRouter } from 'next/router';
@@ -20,16 +19,6 @@ export type Props = HasStatusCode & {
    * Provides SWR with fallback version data
    */
   fallback: ErrorPageFallback;
-
-  /**
-   * Used for getting around https://github.com/vercel/next.js/issues/8592
-   */
-  hasStaticPropsRun: boolean;
-
-  /**
-   * The error object, for later use
-   */
-  err: NextPageContext['err'];
 
   /**
    * Current page url
@@ -61,8 +50,6 @@ export const getStaticProps = async (context: NextPageContext) => {
     fallback: {
       ...data,
     },
-    err: err ?? null,
-    hasStaticPropsRun: true,
   };
 
   // No logging here
@@ -71,17 +58,15 @@ export const getStaticProps = async (context: NextPageContext) => {
   }
 
   // Non 404 captured as is, unless err is missing
-  Sentry.captureException(
-    err ?? new Error(`_error.tsx getStaticProps missing data at path: ${asPath}`),
-  );
-  await Sentry.flush(2000);
+  // eslint-disable-next-line no-console
+  console.error(err ?? new Error(`_error.tsx getStaticProps missing data at path: ${asPath}`));
   return { props };
 };
 
 /**
  * Contents of the page in a different element so fallback can work its server-rendered magic
  */
-export const Contents = ({ statusCode }: HasStatusCode) => {
+export function Contents({ statusCode }: HasStatusCode) {
   const router = useRouter();
   const emailLink = useLinkWithName('Email');
   const descriptions: Record<number | 'fallback', JSX.Element> = {
@@ -109,21 +94,17 @@ export const Contents = ({ statusCode }: HasStatusCode) => {
       </p>
     </>
   );
-};
+}
 
 /**
  * Generic error page, for 404s//500s/etc
  */
-const ErrorPage = ({ statusCode, fallback, hasStaticPropsRun, err, pageUrl }: Props) => {
-  if (!hasStaticPropsRun && err) {
-    // Workaround for https://github.com/vercel/next.js/issues/8592
-    Sentry.captureException(err);
-  }
+function ErrorPage({ statusCode, fallback, pageUrl }: Props) {
   return (
     <ErrorLayout pageUrl={pageUrl} fallback={fallback} statusCode={statusCode ?? 500}>
       <Contents statusCode={statusCode} />
     </ErrorLayout>
   );
-};
+}
 
 export default ErrorPage;

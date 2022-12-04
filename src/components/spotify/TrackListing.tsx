@@ -1,7 +1,7 @@
-import { Track } from '@dg/api/types/spotify/Track';
-import Stack from '@dg/components/Stack';
-import truncated from '@dg/helpers/truncated';
-import styled from 'styled-components';
+import { Track } from 'api/types/spotify/Track';
+import Stack from 'components/Stack';
+import truncated from 'helpers/truncated';
+import styled from '@emotion/styled';
 import AlbumImage from './AlbumImage';
 import ArtistList from './ArtistList';
 import Logo from './Logo';
@@ -20,11 +20,7 @@ interface Props {
   hasLogo?: boolean;
 }
 
-const Container = styled(Stack).attrs({
-  $isVertical: true,
-  $justifyContent: 'space-between',
-  $gap: '0.5rem',
-})`
+const Container = styled(Stack)`
   height: 100%;
   width: 100%;
 `;
@@ -54,7 +50,7 @@ const ShrinkStack = styled(Stack)`
  * plus support for sizing the album art. For responsive album art, this needs to take
  * up the full height of its parent!
  */
-const TrackListing = ({ track, hasLogo }: Props) => {
+function TrackListing({ track, hasLogo }: Props) {
   const metadata = (
     <div>
       <Header>
@@ -71,7 +67,7 @@ const TrackListing = ({ track, hasLogo }: Props) => {
     </div>
   );
   return (
-    <Container>
+    <Container $isVertical $justifyContent="space-between" $gap="0.5rem">
       <ShrinkStack $justifyContent="space-between">
         {hasLogo && <Logo {...track} />}
         <AlbumImage {...track} />
@@ -79,6 +75,6 @@ const TrackListing = ({ track, hasLogo }: Props) => {
       {metadata}
     </Container>
   );
-};
+}
 
 export default TrackListing;

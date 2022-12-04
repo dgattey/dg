@@ -1,12 +1,12 @@
-import type { EndpointKey } from '@dg/api/endpoints';
-import ColorSchemeContext from '@dg/components/ColorSchemeContext';
-import Footer from '@dg/components/Footer';
-import Header from '@dg/components/Header';
-import Meta from '@dg/components/Meta';
-import ScrollIndicatorContext from '@dg/components/ScrollIndicatorContext';
-import useColorScheme from '@dg/hooks/useColorScheme';
-import useShowScrollIndicator from '@dg/hooks/useShowScrollIndicator';
-import type { Page } from '@dg/types/Page';
+import type { EndpointKey } from 'api/endpoints';
+import ColorSchemeContext from 'components/ColorSchemeContext';
+import Footer from 'components/Footer';
+import Header from 'components/Header';
+import Meta from 'components/Meta';
+import ScrollIndicatorContext from 'components/ScrollIndicatorContext';
+import useColorScheme from 'hooks/useColorScheme';
+import useShowScrollIndicator from 'hooks/useShowScrollIndicator';
+import type { Page } from 'types/Page';
 import { useRef } from 'react';
 import { SWRConfig } from 'swr';
 
@@ -20,7 +20,7 @@ type Props<Key extends EndpointKey> = Pick<React.ComponentProps<'div'>, 'childre
  * the main (contained) content, with a (contained) footer below. No wrapper
  * around all items to save on divs. Ensures color scheme is applied.
  */
-const PageLayout = <Key extends EndpointKey>({ children, fallback, pageUrl }: Props<Key>) => {
+function PageLayout<Key extends EndpointKey>({ children, fallback, pageUrl }: Props<Key>) {
   const colorSchemeData = useColorScheme();
   const headerSizingRef = useRef<HTMLDivElement>(null);
   const { ref, isIndicatorShown } = useShowScrollIndicator(
@@ -41,6 +41,6 @@ const PageLayout = <Key extends EndpointKey>({ children, fallback, pageUrl }: Pr
       </ColorSchemeContext.Provider>
     </SWRConfig>
   );
-};
+}
 
 export default PageLayout;

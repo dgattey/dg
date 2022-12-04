@@ -1,4 +1,4 @@
-import type { Asset } from '@dg/api/types/generated/contentfulApi.generated';
+import type { Asset } from 'api/types/generated/contentfulApi.generated';
 import NextImage, { ImageProps } from 'next/image';
 
 type Props = Pick<React.ComponentProps<'img'>, 'className'> &
@@ -23,8 +23,8 @@ type Props = Pick<React.ComponentProps<'img'>, 'className'> &
 /**
  * Shows a Next Image with the contents of the Asset. Layout defaults to responsive.
  */
-const Image = ({ url, width, height, fill, title, alt, className, priority }: Props) =>
-  url ? (
+function Image({ url, width, height, fill, title, alt, className, priority }: Props) {
+  return url ? (
     <NextImage
       className={className}
       src={url}
@@ -35,5 +35,6 @@ const Image = ({ url, width, height, fill, title, alt, className, priority }: Pr
       priority={priority}
     />
   ) : null;
+}
 
 export default Image;

@@ -1,9 +1,10 @@
-import ColorSchemeContext from '@dg/components/ColorSchemeContext';
-import ContentCard from '@dg/components/ContentCard';
-import Stack from '@dg/components/Stack';
-import { ColorScheme } from '@dg/hooks/useColorScheme';
+import ColorSchemeContext from 'components/ColorSchemeContext';
+import ContentCard from 'components/ContentCard';
+import Stack from 'components/Stack';
+import { ColorScheme } from 'hooks/useColorScheme';
 import { useContext } from 'react';
-import styled, { css } from 'styled-components';
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 import ColorSchemeIcon from './ColorSchemeIcon';
 
 // Stack items in center
@@ -35,36 +36,34 @@ const SWITCH_COLOR_SCHEME_CSS: Record<ColorScheme | 'unknown', string> = {
 };
 
 // Combo of CSS + $colorScheme to set two separate states, using a lot of Pico CSS switch variables
-const ColorSchemeSwitch = styled.input.attrs({ role: 'switch', type: 'checkbox' })<{
-  $colorScheme: ColorScheme | null;
-}>`
-  ${({ $colorScheme }) => css`
+const ColorSchemeSwitch = styled.input<{ $colorScheme: ColorScheme | null }>(
+  ({ $colorScheme }) => css`
     --switch-background-color: var(${SWITCH_COLOR_SCHEME_CSS[$colorScheme ?? 'unknown']});
-  `}
-  && {
-    --border-width: 6px;
-    --switch-height: 2em;
-    --switch-width: 4.5em;
-    --switch-track-size: 1.25em;
-    width: var(--switch-width);
-    height: var(--switch-height);
-  }
-
-  &&:before {
-    width: calc(var(--switch-height) - (var(--border-width) * 2));
-    transition: margin var(--transition);
-  }
-
-  &&:checked {
-    --calculated-margin: calc(var(--switch-width) - var(--switch-height));
-    --border-color: var(--switch-background-color);
-    --background-color: var(--switch-background-color);
-    &:before {
-      margin-left: var(--calculated-margin);
-      margin-inline-start: var(--calculated-margin);
+    && {
+      --border-width: 6px;
+      --switch-height: 2em;
+      --switch-width: 4.5em;
+      --switch-track-size: 1.25em;
+      width: var(--switch-width);
+      height: var(--switch-height);
     }
-  }
-`;
+
+    &&:before {
+      width: calc(var(--switch-height) - (var(--border-width) * 2));
+      transition: margin var(--transition);
+    }
+
+    &&:checked {
+      --calculated-margin: calc(var(--switch-width) - var(--switch-height));
+      --border-color: var(--switch-background-color);
+      --background-color: var(--switch-background-color);
+      &:before {
+        margin-left: var(--calculated-margin);
+        margin-inline-start: var(--calculated-margin);
+      }
+    }
+  `,
+);
 
 // Inline button that's not very prominent
 const Button = styled.button<{ $visible: boolean }>`
@@ -93,7 +92,7 @@ const Button = styled.button<{ $visible: boolean }>`
  * system, light, and dark. Prerendered, `colorScheme` is `light`
  * and `isSystemScheme` is true.
  */
-const ColorSchemeToggleCard = () => {
+function ColorSchemeToggleCard() {
   const {
     colorScheme,
     isSystemScheme,
@@ -117,6 +116,8 @@ const ColorSchemeToggleCard = () => {
             $colorScheme={!hasTheme ? null : colorScheme}
             onChange={setInvertedScheme}
             checked={hasTheme && colorScheme === 'dark'}
+            role="switch"
+            type="checkbox"
           />
           <ColorSchemeIcon
             scheme="dark"
@@ -136,6 +137,6 @@ const ColorSchemeToggleCard = () => {
       </div>
     </Card>
   );
-};
+}
 
 export default ColorSchemeToggleCard;

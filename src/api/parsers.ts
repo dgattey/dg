@@ -1,4 +1,4 @@
-import type { Link, Project, TextBlock } from '@dg/api/types/generated/contentfulApi.generated';
+import type { Link, Project, TextBlock } from 'api/types/generated/contentfulApi.generated';
 import { TokenKey } from './types/Token';
 
 /**

@@ -1,8 +1,8 @@
-import { ErrorPageFallback } from '@dg/api/fetchFallback';
-import Meta from '@dg/components/Meta';
-import { Page } from '@dg/types/Page';
+import { ErrorPageFallback } from 'api/fetchFallback';
+import Meta from 'components/Meta';
+import { Page } from 'types/Page';
 import NextLink from 'next/link';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import PageLayout from './PageLayout';
 
 type Props = Pick<React.ComponentProps<'div'>, 'children'> &
@@ -27,7 +27,7 @@ const Container = styled.section`
  * Basic page layout for error pages. Max-width'd content, left aligned,
  * with a go home button at the bottom
  */
-const ErrorLayout = ({ children, fallback, statusCode, pageUrl }: Props) => {
+function ErrorLayout({ children, fallback, statusCode, pageUrl }: Props) {
   const pageTitle = statusCode === 404 ? 'Oops! Page not found' : `Error code ${statusCode}`;
   return (
     <PageLayout fallback={fallback} pageUrl={pageUrl}>
@@ -40,6 +40,6 @@ const ErrorLayout = ({ children, fallback, statusCode, pageUrl }: Props) => {
       </Container>
     </PageLayout>
   );
-};
+}
 
 export default ErrorLayout;

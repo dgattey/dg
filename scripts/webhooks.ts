@@ -1,4 +1,4 @@
-import type { WebhookType } from '@dg/api/types/WebhookType';
+import type { WebhookType } from 'api/types/WebhookType';
 import { command, oneOf, positional, run, string, subcommands } from 'cmd-ts';
 import createSubscription from './helpers/createSubscription';
 import deleteSubscription from './helpers/deleteSubscription';

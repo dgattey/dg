@@ -1,16 +1,18 @@
-import fetchFallback from '@dg/api/fetchFallback';
-import Homepage from '@dg/components/homepage/Homepage';
-import PageLayout from '@dg/components/layouts/PageLayout';
-import getPageUrl from '@dg/helpers/getPageUrl';
-import type { Page } from '@dg/types/Page';
+import fetchFallback from 'api/fetchFallback';
+import Homepage from 'components/homepage/Homepage';
+import PageLayout from 'components/layouts/PageLayout';
+import getPageUrl from 'helpers/getPageUrl';
+import type { Page } from 'types/Page';
 import type { GetServerSideProps } from 'next/types';
 
-type Props = Page<'projects' | 'intro' | 'location' | 'latest/activity' | 'latest/track'>;
+export type HomeProps = Page<
+  'projects' | 'intro' | 'location' | 'latest/activity' | 'latest/track'
+>;
 
 /**
  * Grabs fallback data + page url
  */
-export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
+export const getServerSideProps: GetServerSideProps<HomeProps> = async (context) => {
   const pageUrl = getPageUrl(context);
   const data = await fetchFallback([
     'version',
@@ -34,10 +36,12 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
 /**
  * Fallback for all data used in Homepage + its descendents, plus the homepage itself.
  */
-const Home = ({ fallback, pageUrl }: Props) => (
-  <PageLayout fallback={fallback} pageUrl={pageUrl}>
-    <Homepage pageUrl={pageUrl} />
-  </PageLayout>
-);
+function Home({ fallback, pageUrl }: HomeProps) {
+  return (
+    <PageLayout fallback={fallback} pageUrl={pageUrl}>
+      <Homepage pageUrl={pageUrl} />
+    </PageLayout>
+  );
+}
 
 export default Home;

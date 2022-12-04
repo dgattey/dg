@@ -1,6 +1,5 @@
-import endpoints, { isValid } from '@dg/api/endpoints';
-import handleApiError, { methodNotAllowedError } from '@dg/api/handleApiError';
-import withSentry from '@dg/api/withSentry';
+import endpoints, { isValid } from 'api/endpoints';
+import handleApiError, { methodNotAllowedError } from 'api/handleApiError';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
 // Just a shorthand for this function type
@@ -50,4 +49,4 @@ const handler: Processor = async (request, response) => {
   }
 };
 
-export default withSentry(handler);
+export default handler;

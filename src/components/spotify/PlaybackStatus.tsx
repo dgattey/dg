@@ -1,8 +1,8 @@
-import type { Track } from '@dg/api/types/spotify/Track';
-import Stack from '@dg/components/Stack';
-import useRelativeTimeFormat from '@dg/hooks/useRelativeTimeFormat';
+import type { Track } from 'api/types/spotify/Track';
+import Stack from 'components/Stack';
+import useRelativeTimeFormat from 'hooks/useRelativeTimeFormat';
 import { Music } from 'lucide-react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 type Props = Track;
 
@@ -17,7 +17,7 @@ const Container = styled(Stack)`
  * Creates an element that shows if Spotify is currently playing, or if not,
  * when it last was.
  */
-const PlaybackStatus = ({ played_at }: Props) => {
+function PlaybackStatus({ played_at }: Props) {
   const lastPlayed = played_at ?? null;
   const relativeLastPlayed = useRelativeTimeFormat(lastPlayed);
   return (
@@ -32,6 +32,6 @@ const PlaybackStatus = ({ played_at }: Props) => {
       )}
     </Container>
   );
-};
+}
 
 export default PlaybackStatus;

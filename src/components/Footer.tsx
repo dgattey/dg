@@ -1,5 +1,5 @@
-import useData from '@dg/api/useData';
-import styled from 'styled-components';
+import useData from 'api/useData';
+import styled from '@emotion/styled';
 import Link from './Link';
 
 // Switches to two rows for mobile
@@ -19,7 +19,7 @@ const FlexList = styled.ul`
 /**
  * Creates the site footer component - shows version data + copyright
  */
-const Footer = () => {
+function Footer() {
   const { data: version } = useData('version');
   const { data: footerLinks } = useData('footer');
   const listedLinkElements = footerLinks?.map((link) => (
@@ -40,6 +40,6 @@ const Footer = () => {
       </footer>
     </section>
   );
-};
+}
 
 export default Footer;

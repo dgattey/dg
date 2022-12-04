@@ -1,5 +1,5 @@
-import refreshedAccessToken from '@dg/api/server/tokens/refreshedAccessToken';
-import type { TokenKey } from '@dg/api/types/Token';
+import refreshedAccessToken from 'api/server/tokens/refreshedAccessToken';
+import type { TokenKey } from 'api/types/Token';
 /**
  * Returns true if we're authed via status code
  */

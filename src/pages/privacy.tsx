@@ -1,7 +1,7 @@
-import fetchFallback from '@dg/api/fetchFallback';
-import PageLayout from '@dg/components/layouts/PageLayout';
-import Privacy from '@dg/components/privacy/Privacy';
-import type { Page } from '@dg/types/Page';
+import fetchFallback from 'api/fetchFallback';
+import PageLayout from 'components/layouts/PageLayout';
+import Privacy from 'components/privacy/Privacy';
+import type { Page } from 'types/Page';
 import { GetServerSideProps } from 'next/types';
 import getPageUrl from '../helpers/getPageUrl';
 
@@ -26,10 +26,12 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
 /**
  * Fallback for all data used in privacy page + its descendents
  */
-const PrivacyPage = ({ fallback, pageUrl }: Props) => (
-  <PageLayout fallback={fallback} pageUrl={pageUrl}>
-    <Privacy pageUrl={pageUrl} />
-  </PageLayout>
-);
+function PrivacyPage({ fallback, pageUrl }: Props) {
+  return (
+    <PageLayout fallback={fallback} pageUrl={pageUrl}>
+      <Privacy pageUrl={pageUrl} />
+    </PageLayout>
+  );
+}
 
 export default PrivacyPage;

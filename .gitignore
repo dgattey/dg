@@ -32,6 +32,3 @@ tsconfig.tsbuildinfo
 
 # Generated files
 src/api/server/generated
-
-# Sentry
-.sentryclirc

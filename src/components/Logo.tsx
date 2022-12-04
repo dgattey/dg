@@ -1,7 +1,8 @@
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
-import styled, { css } from 'styled-components';
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 import ScrollIndicatorContext from './ScrollIndicatorContext';
 import ScrollUpIndicator from './ScrollUpIndicator';
 import Stack from './Stack';
@@ -74,7 +75,7 @@ const SpacedScrollIndicator = styled(ScrollUpIndicator)<{ $isScrolled: boolean }
  * Logo + scroll to top button, with certain changes that happen on
  * scroll.
  */
-const Logo = () => {
+function Logo() {
   const router = useRouter();
   const isScrolled = useContext(ScrollIndicatorContext);
   const linkedLogoText = router.asPath === '/' ? 'dg.' : <Link href="/">dg.</Link>;
@@ -84,6 +85,6 @@ const Logo = () => {
       <SpacedScrollIndicator $isScrolled={isScrolled} />
     </Stack>
   );
-};
+}
 
 export default Logo;

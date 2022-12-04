@@ -1,5 +1,5 @@
-import fetchFallback from '@dg/api/fetchFallback';
-import ErrorLayout from '@dg/components/layouts/ErrorLayout';
+import fetchFallback from 'api/fetchFallback';
+import ErrorLayout from 'components/layouts/ErrorLayout';
 import type { GetStaticProps } from 'next/types';
 import { Contents, Props } from './_error';
 
@@ -20,10 +20,12 @@ export const getStaticProps: GetStaticProps = async () => {
 /**
  * Error page, for 404s specifically
  */
-const Error404Page = ({ fallback, pageUrl }: Props) => (
-  <ErrorLayout fallback={fallback} statusCode={404} pageUrl={pageUrl}>
-    <Contents statusCode={404} />
-  </ErrorLayout>
-);
+function Error404Page({ fallback, pageUrl }: Props) {
+  return (
+    <ErrorLayout fallback={fallback} statusCode={404} pageUrl={pageUrl}>
+      <Contents statusCode={404} />
+    </ErrorLayout>
+  );
+}
 
 export default Error404Page;

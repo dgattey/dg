@@ -1,5 +1,5 @@
-import { isTextBlock } from '@dg/api/parsers';
-import type { IntroBlockQuery } from '@dg/api/types/generated/fetchContentfulIntroBlock.generated';
+import { isTextBlock } from 'api/parsers';
+import type { IntroBlockQuery } from 'api/types/generated/fetchContentfulIntroBlock.generated';
 import { gql } from 'graphql-request';
 import contentfulClient from './networkClients/contentfulClient';
 

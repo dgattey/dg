@@ -12,11 +12,11 @@ const BASE_PLUGINS = ['react'];
 const BASE_RULES = {
   // We want to enable prop spreading (i.e. <Component {...props} />) since it allows us to easily pass props to child components
   'react/jsx-props-no-spreading': 'off',
-  // Always prefer arrow functions for component definitions
+  // Never prefer arrow functions for named component definitions
   'react/function-component-definition': [
     'error',
     {
-      namedComponents: 'arrow-function',
+      namedComponents: 'function-declaration',
       unnamedComponents: 'arrow-function',
     },
   ],
@@ -44,6 +44,8 @@ const TYPESCRIPT_RULES = {
   'consistent-return': 'off',
   // This is broken
   '@typescript-eslint/indent': 'off',
+  // Eventually I want this to error if default export, actually
+  'import/prefer-default-export': 'off',
 };
 
 const TYPESCRIPT_OVERRIDE = {

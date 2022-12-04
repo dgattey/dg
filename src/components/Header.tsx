@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 import Logo from './Logo';
 
 interface Props {
@@ -26,18 +26,20 @@ const LogoHolder = styled.li`
  * Creates the site header component. It's a bar that spans across the
  * page and shows a logo + header links if they exist.
  */
-const Header = ({ headerRef }: Props) => (
-  <StickyContainer className="container">
-    <header ref={headerRef}>
-      <nav>
-        <ul>
-          <LogoHolder>
-            <Logo />
-          </LogoHolder>
-        </ul>
-      </nav>
-    </header>
-  </StickyContainer>
-);
+function Header({ headerRef }: Props) {
+  return (
+    <StickyContainer className="container">
+      <header ref={headerRef}>
+        <nav>
+          <ul>
+            <LogoHolder>
+              <Logo />
+            </LogoHolder>
+          </ul>
+        </nav>
+      </header>
+    </StickyContainer>
+  );
+}
 
 export default Header;
