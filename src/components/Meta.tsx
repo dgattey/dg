@@ -1,5 +1,4 @@
 import Head from 'next/head';
-import React from 'react';
 
 interface Props {
   /**
@@ -36,7 +35,7 @@ const GRAPH_PREFIXES = ['og', 'twitter'] as const;
  */
 const linkFromSize = (size: string, fileType: string, rel = 'icon') => (
   <link
-    key={`${size}${fileType}`}
+    key={`${size}${fileType}link`}
     rel={rel}
     href={`/icons/${fileType}-${size}.png`}
     sizes={`${size}x${size}`}
@@ -47,7 +46,7 @@ const linkFromSize = (size: string, fileType: string, rel = 'icon') => (
  * Helps reduce duplication for creation of meta elements
  */
 const metaFromSize = (size: string, fileType: string, name: string) => (
-  <meta key={`${size}${fileType}`} name={name} content={`/icons/${fileType}-${size}.png`} />
+  <meta key={`${size}${fileType}meta`} name={name} content={`/icons/${fileType}-${size}.png`} />
 );
 
 /**
@@ -90,7 +89,7 @@ const graphMetaItems = (graph: Graph) =>
   Object.entries(graph).map(([name, content]) =>
     GRAPH_PREFIXES.map((prefix) =>
       content ? (
-        <meta key={`${prefix}:${name}`} property={`${prefix}:${name}`} content={content} />
+        <meta key={`${prefix}:${name}graphmeta`} property={`${prefix}:${name}`} content={content} />
       ) : undefined,
     ),
   );
@@ -98,7 +97,7 @@ const graphMetaItems = (graph: Graph) =>
 /**
  * Populates the `<head>` of a given page from the title/description here
  */
-const Meta = ({ title, description, pageUrl }: Props) => {
+function Meta({ title, description, pageUrl }: Props) {
   const truncatedDescription =
     description && description.length > MAX_DESC_LENGTH
       ? `${description.slice(0, MAX_DESC_LENGTH)}...`
@@ -136,6 +135,6 @@ const Meta = ({ title, description, pageUrl }: Props) => {
       )}
     </Head>
   );
-};
+}
 
 export default Meta;

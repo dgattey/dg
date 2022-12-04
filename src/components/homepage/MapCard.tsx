@@ -5,7 +5,8 @@ import ContentCard from 'components/ContentCard';
 import { Maximize2, Minimize2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useContext, useMemo, useState } from 'react';
-import styled, { css } from 'styled-components';
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 
 type Props = Pick<ContentCardProps, 'turnOnAnimation'>;
 interface IsExpanded {
@@ -46,7 +47,7 @@ const Card = styled(ContentCard)<{ $backgroundImageUrl?: string } & IsExpanded>`
 /**
  * Shows a canvas-based map of my current location.
  */
-const MapCard = ({ turnOnAnimation }: Props) => {
+function MapCard({ turnOnAnimation }: Props) {
   const { data: location } = useData('location');
   const [isExpanded, setIsExpanded] = useState(false);
   const [hasMapLoaded, setHasMapLoaded] = useState(false);
@@ -82,6 +83,6 @@ const MapCard = ({ turnOnAnimation }: Props) => {
       )}
     </Card>
   );
-};
+}
 
 export default MapCard;

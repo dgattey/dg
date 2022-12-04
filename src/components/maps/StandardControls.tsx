@@ -13,7 +13,7 @@ interface Props {
 /**
  * Creates controls that zoom in/out the map and collapse the map when it's expanded
  */
-const StandardControls = ({ mapRef }: Props) => {
+function StandardControls({ mapRef }: Props) {
   const zoom = (inward: boolean) => (event: React.MouseEvent<SVGElement, MouseEvent>) => {
     (inward ? mapRef.current?.zoomIn : mapRef.current?.zoomOut)?.();
     event.stopPropagation();
@@ -25,6 +25,6 @@ const StandardControls = ({ mapRef }: Props) => {
       <Minus size="1em" onClick={zoom(false)} />
     </Control>
   );
-};
+}
 
 export default StandardControls;

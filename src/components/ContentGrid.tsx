@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 type Props = Pick<React.ComponentProps<'div'>, 'children'> & {
   /**
@@ -57,6 +57,8 @@ const Grid = styled.div`
  * Displays all our content in a grid - on the client it uses `animate-css-grid`
  * for nice animations when items change in size, which we do when expanding cards.
  */
-const ContentGrid = ({ children, gridRef }: Props) => <Grid ref={gridRef}>{children}</Grid>;
+function ContentGrid({ children, gridRef }: Props) {
+  return <Grid ref={gridRef}>{children}</Grid>;
+}
 
 export default ContentGrid;

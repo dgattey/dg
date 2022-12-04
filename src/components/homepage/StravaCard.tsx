@@ -8,7 +8,7 @@ import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import { faBicycle } from '@fortawesome/free-solid-svg-icons/faBicycle';
 import { faRunning } from '@fortawesome/free-solid-svg-icons/faRunning';
 import { useMemo } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 // There are 1600 meters in one mile!
 const METERS_TO_MILES = 1609.344;
@@ -47,15 +47,23 @@ const Stat = styled(Text)`
   margin-bottom: 0.25rem;
 `;
 
-// Opens link in new tab
-const ExternalLink = styled.a.attrs({ target: '_blank', rel: 'noreferrer' })`
+const Link = styled.a`
   color: inherit;
 `;
+
+// Opens link in new tab
+function ExternalLink({ children, ...props }: React.ComponentProps<typeof Link>) {
+  return (
+    <Link {...props} target="_blank" rel="noreferrer">
+      {children}
+    </Link>
+  );
+}
 
 /**
  * Shows a card with the latest activity from Strava
  */
-const StravaCard = () => {
+function StravaCard() {
   const { data: activity } = useData('latest/activity');
   const date = useRelativeTimeFormat(activity?.start_date);
   const formatter = useMemo(
@@ -112,6 +120,6 @@ const StravaCard = () => {
       </Stack>
     </Card>
   );
-};
+}
 
 export default StravaCard;

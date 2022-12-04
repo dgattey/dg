@@ -6,10 +6,7 @@ type Props = Pick<Project, 'type'>;
 /**
  * Returns a Feather icon matching a project type or null
  */
-const ProjectIcon = ({
-  type,
-  className,
-}: Props & Pick<React.ComponentProps<'div'>, 'className'>) => {
+function ProjectIcon({ type, className }: Props & Pick<React.ComponentProps<'div'>, 'className'>) {
   if (!type?.[0]) {
     throw new TypeError('Invalid type for project');
   }
@@ -23,6 +20,6 @@ const ProjectIcon = ({
     default:
       return null;
   }
-};
+}
 
 export default ProjectIcon;

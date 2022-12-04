@@ -29,8 +29,13 @@
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true,
-    "target": "es2018"
+    "target": "es2018",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-  "include": ["src", "scripts", "eslint-plugin-dg"],
+  "include": ["src", "scripts", "eslint-plugin-dg", ".next/types/**/*.ts"],
   "exclude": ["node_modules", "src/api/server/generated", "**/migrations/*"]
 }

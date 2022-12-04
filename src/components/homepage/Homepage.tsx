@@ -16,7 +16,7 @@ import StravaCard from './StravaCard';
  * interspersed with `introBlock` data, and dark/light mode
  * toggle.
  */
-const Homepage = ({ pageUrl }: Pick<Page, 'pageUrl'>) => {
+function Homepage({ pageUrl }: Pick<Page, 'pageUrl'>) {
   const { data: projects } = useData('projects');
   const { data: introBlock } = useData('intro');
 
@@ -57,6 +57,6 @@ const Homepage = ({ pageUrl }: Pick<Page, 'pageUrl'>) => {
       </ContentGrid>
     </>
   );
-};
+}
 
 export default Homepage;

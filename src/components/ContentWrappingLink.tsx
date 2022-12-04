@@ -11,7 +11,7 @@ type Props = Pick<React.ComponentProps<'div'>, 'children'> & {
 /**
  * Renders a link that wraps the given children. Compliant with Next's Link too.
  */
-const ContentWrappingLink = ({ link, children }: Props) => {
+function ContentWrappingLink({ link, children }: Props) {
   if (!link?.url) {
     return null;
   }
@@ -20,6 +20,6 @@ const ContentWrappingLink = ({ link, children }: Props) => {
       {children}
     </NextLink>
   );
-};
+}
 
 export default ContentWrappingLink;

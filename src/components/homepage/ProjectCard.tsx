@@ -5,7 +5,7 @@ import { cardSize, cardSizeInPx } from 'components/ContentGrid';
 import HoverableContainer from 'components/HoverableContainer';
 import Image from 'components/Image';
 import { useState } from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 type Props = Project & Pick<ContentCardProps, 'turnOnAnimation'>;
 
@@ -24,7 +24,7 @@ const Card = styled(ContentCard)`
 /**
  * Uses the `ContentCard` to show a project's details
  */
-const ProjectCard = ({ title, layout, link, thumbnail, turnOnAnimation }: Props) => {
+function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }: Props) {
   const verticalSpan = layout === 'tall' ? 2 : 1;
   const horizontalSpan = layout === 'wide' ? 2 : 1;
   const [isHovered, setIsHovered] = useState(false);
@@ -51,6 +51,6 @@ const ProjectCard = ({ title, layout, link, thumbnail, turnOnAnimation }: Props)
       )}
     </Card>
   );
-};
+}
 
 export default ProjectCard;

@@ -1,6 +1,7 @@
 import type { ColorScheme, SetColorScheme } from 'hooks/useColorScheme';
 import { Moon, Sun } from 'lucide-react';
-import styled, { css } from 'styled-components';
+import styled from '@emotion/styled';
+import { css } from '@emotion/react';
 
 interface Props {
   /**
@@ -70,14 +71,16 @@ const IconWrapper = styled.span<{ $disabled: boolean }>`
  * Creates an icon that is clickable to update to a preferred color scheme
  * if we have one that's set already. Otherwise, renders a disabled icon.
  */
-const ColorSchemeIcon = ({ scheme, hasTheme, updatePreferredScheme }: Props) => (
-  <IconWrapper
-    $disabled={!hasTheme}
-    onClick={hasTheme ? () => updatePreferredScheme(scheme) : undefined}
-    data-tooltip={hasTheme ? TOOLTIPS[scheme] : undefined}
-  >
-    {COLORED_ICONS[scheme]}
-  </IconWrapper>
-);
+function ColorSchemeIcon({ scheme, hasTheme, updatePreferredScheme }: Props) {
+  return (
+    <IconWrapper
+      $disabled={!hasTheme}
+      onClick={hasTheme ? () => updatePreferredScheme(scheme) : undefined}
+      data-tooltip={hasTheme ? TOOLTIPS[scheme] : undefined}
+    >
+      {COLORED_ICONS[scheme]}
+    </IconWrapper>
+  );
+}
 
 export default ColorSchemeIcon;

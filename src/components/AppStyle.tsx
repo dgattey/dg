@@ -1,6 +1,8 @@
+'use client';
+
 import { ANIMATE_ATTRIBUTE } from 'hooks/useColorScheme';
 import '@picocss/pico/css/pico.min.css';
-import { createGlobalStyle, css } from 'styled-components';
+import { Global, css } from '@emotion/react';
 
 /**
  * Variables specific to dark mode. Anything that appears here needs to have
@@ -42,24 +44,21 @@ const lightModeVariables = css`
   --card-background-color: rgb(255, 255, 255);
 `;
 
-/**
- * Applies styles to the full app
- */
-const AppStyle = createGlobalStyle`
+const globalStyle = css`
   /* Apply changes from theme faster */
   body {
     background: var(--background-color);
   }
-  
+
   :root {
-      /* These are Pico overrides */
-      --border-radius: 2.5em;
+    /* These are Pico overrides */
+    --border-radius: 2.5em;
 
-      /* We disable all transitions when changing color schemes, except if this is used */
-      --transition-always-enabled: 0.2s ease-in-out;
+    /* We disable all transitions when changing color schemes, except if this is used */
+    --transition-always-enabled: 0.2s ease-in-out;
 
-      /* Used for small buttons/etc */
-      --font-size-small: 0.8rem;
+    /* Used for small buttons/etc */
+    --font-size-small: 0.8rem;
 
     --navy: rgb(24, 104, 145);
   }
@@ -87,5 +86,12 @@ const AppStyle = createGlobalStyle`
     --transition: 0s;
   }
 `;
+
+/**
+ * Applies styles to the full app
+ */
+function AppStyle() {
+  return <Global styles={globalStyle} />;
+}
 
 export default AppStyle;

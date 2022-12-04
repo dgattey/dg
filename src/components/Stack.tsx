@@ -1,4 +1,6 @@
-import styled, { css, CSSProperties } from 'styled-components';
+import styled from '@emotion/styled';
+import { CSSProperties } from 'react';
+import { css } from '@emotion/react';
 
 /**
  * Stacks content - has a few properities built in as props for convenience
@@ -8,28 +10,26 @@ const Stack = styled.div<{
   $gap?: string;
   $alignItems?: CSSProperties['alignItems'];
   $justifyContent?: CSSProperties['justifyContent'];
-}>`
-  display: flex;
-  ${({ $isVertical }) =>
-    $isVertical &&
+}>(
+  ({ $isVertical, $gap, $alignItems, $justifyContent }) => css`
+    display: flex;
+    ${$isVertical &&
     css`
       flex-direction: column;
     `}
-  ${({ $alignItems }) =>
-    $alignItems &&
+    ${$alignItems &&
     css`
       align-items: ${$alignItems};
     `}
-  ${({ $justifyContent }) =>
-    $justifyContent &&
+  ${$justifyContent &&
     css`
       justify-content: ${$justifyContent};
     `}
-  ${({ $gap }) =>
-    $gap &&
+  ${$gap &&
     css`
       gap: ${$gap};
     `}
-`;
+  `,
+);
 
 export default Stack;

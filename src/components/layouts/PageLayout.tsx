@@ -20,7 +20,7 @@ type Props<Key extends EndpointKey> = Pick<React.ComponentProps<'div'>, 'childre
  * the main (contained) content, with a (contained) footer below. No wrapper
  * around all items to save on divs. Ensures color scheme is applied.
  */
-const PageLayout = <Key extends EndpointKey>({ children, fallback, pageUrl }: Props<Key>) => {
+function PageLayout<Key extends EndpointKey>({ children, fallback, pageUrl }: Props<Key>) {
   const colorSchemeData = useColorScheme();
   const headerSizingRef = useRef<HTMLDivElement>(null);
   const { ref, isIndicatorShown } = useShowScrollIndicator(
@@ -41,6 +41,6 @@ const PageLayout = <Key extends EndpointKey>({ children, fallback, pageUrl }: Pr
       </ColorSchemeContext.Provider>
     </SWRConfig>
   );
-};
+}
 
 export default PageLayout;

@@ -8,6 +8,8 @@ interface Props {
 /**
  * Creates a standard-sized font awesome icon
  */
-const FaIcon = ({ icon }: Props) => <FontAwesomeIcon width="1em" height="1em" icon={icon} />;
+function FaIcon({ icon }: Props) {
+  return <FontAwesomeIcon width="1em" height="1em" icon={icon} />;
+}
 
 export default FaIcon;

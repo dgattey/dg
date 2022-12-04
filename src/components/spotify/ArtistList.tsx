@@ -2,7 +2,7 @@ import type { Artist, Track } from 'api/types/spotify/Track';
 import Link from 'components/Link';
 import useLinkWithName from 'hooks/useLinkWithName';
 import React from 'react';
-import styled from 'styled-components';
+import styled from '@emotion/styled';
 
 type Props = Track;
 
@@ -37,7 +37,7 @@ const separator = ({ index, fullList }: SeparatorProps) => {
  * for best usage with display elsewhere. Shows an underline
  * on hover.
  */
-const ArtistList = ({ artists }: Props) => {
+function ArtistList({ artists }: Props) {
   const baseLink = useLinkWithName('Spotify');
   const artistLink = ({ name, external_urls }: Artist) => {
     if (!baseLink) {
@@ -68,6 +68,6 @@ const ArtistList = ({ artists }: Props) => {
       })}
     </>
   );
-};
+}
 
 export default ArtistList;

@@ -1,4 +1,4 @@
-import { css } from 'styled-components';
+import { css } from '@emotion/react';
 
 /**
  * Returns styling to use to truncate to a specified number of
