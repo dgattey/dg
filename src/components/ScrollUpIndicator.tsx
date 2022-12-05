@@ -9,45 +9,32 @@ import { Stack } from './Stack';
  * Arrow up to show scrollability. Fades in, and is on own layer to
  * prevent jittering as it fades in.
  */
-const Indicator = styled(Stack)<{ $isVisible: boolean }>`
+const Indicator = styled(Stack)<{ $isScrolled: boolean }>`
   position: relative;
   font-weight: 700;
   font-size: var(--font-size-small);
   opacity: 0;
-  transform: translateX(100%);
+  transform: translateY(-200%) translateX(-25%);
   color: var(--contrast);
-  transition: opacity var(--transition), transform var(--transition), color var(--transition);
+  border-radius: var(--border-radius);
+  transition-origin: center;
+  padding: 0.25em 0.75em;
+  transition: opacity var(--transition), transform var(--transition), color var(--transition),
+    background-color var(--transition);
   will-change: transform;
-  :hover {
-    color: var(--contrast-overlay-inverse);
-    transform: scale(1.05);
-  }
 
-  :before {
-    --padding: 1em;
-    content: '';
-    z-index: -1;
-    position: absolute;
-    border: 1px solid var(--card-border-color);
-    margin-left: calc(-4 * var(--padding));
-    height: calc(150% + var(--padding));
-    width: calc(100% + var(--padding) * 5);
-    border-radius: var(--border-radius);
-    box-shadow: var(--card-box-shadow);
-    transition: background-color var(--transition);
-    background: var(--card-background-color);
-  }
-  :hover:before {
-    background: var(--primary);
-  }
-
-  ${({ $isVisible }) =>
-    $isVisible &&
+  ${({ $isScrolled }) =>
+    $isScrolled &&
     css`
       pointer-events: auto;
       cursor: pointer;
       transform: initial;
       opacity: 1;
+      &:hover {
+        background: var(--primary);
+        color: var(--contrast-overlay-inverse);
+        transform: scale(1.05);
+      }
     `}
 `;
 
@@ -56,11 +43,11 @@ const Indicator = styled(Stack)<{ $isVisible: boolean }>`
  * floating over everything else
  */
 export function ScrollUpIndicator() {
-  const isVisible = useContext(ScrollIndicatorContext);
+  const isScrolled = useContext(ScrollIndicatorContext);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
   return (
-    <Indicator onClick={scrollToTop} $isVisible={isVisible} $gap="0.25rem" $alignItems="center">
-      To Top
+    <Indicator onClick={scrollToTop} $isScrolled={isScrolled} $gap="0.25rem" $alignItems="center">
+      To top
       <ArrowUp size="1em" />
     </Indicator>
   );

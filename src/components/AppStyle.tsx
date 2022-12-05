@@ -19,6 +19,7 @@ const darkModeVariables = css`
 
   /* Slightly lighter so that the contrast is better */
   --card-background-color: hsl(206, 24%, 18%);
+  --header-background-color: hsl(206, 24%, 22%);
   --background-color: rgb(17, 25, 31);
 `;
 
@@ -39,6 +40,7 @@ const lightModeVariables = css`
 
   /* Slightly darker so that the contrast is better */
   --background-color: hsl(206, 60%, 96%);
+  --header-background-color: var(--background-color);
   --card-background-color: rgb(255, 255, 255);
 `;
 
