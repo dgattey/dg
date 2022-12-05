@@ -1,18 +1,20 @@
-import fetchFallback from 'api/fetchFallback';
-import PageLayout from 'components/layouts/PageLayout';
-import Privacy from 'components/privacy/Privacy';
-import type { Page } from 'types/Page';
+import { FetchedFallbackData, fetchFallbackData } from 'api/fetchFallbackData';
+import { PageLayout } from 'components/layouts/PageLayout';
+import { Privacy } from 'components/privacy/Privacy';
 import { GetServerSideProps } from 'next/types';
-import getPageUrl from '../helpers/getPageUrl';
+import { getPageUrl } from '../helpers/getPageUrl';
 
-type Props = Page<'privacy'>;
+type PrivacyProps = {
+  fallback: FetchedFallbackData<'footer' | 'version' | 'privacy'>;
+  pageUrl: string;
+};
 
 /**
  * Grabs fallback data + page url
  */
-export const getServerSideProps: GetServerSideProps<Props> = async (context) => {
+export const getServerSideProps: GetServerSideProps<PrivacyProps> = async (context) => {
   const pageUrl = getPageUrl(context);
-  const data = await fetchFallback(['footer', 'version', 'privacy']);
+  const data = await fetchFallbackData(['footer', 'version', 'privacy']);
   return {
     props: {
       pageUrl,
@@ -26,7 +28,7 @@ export const getServerSideProps: GetServerSideProps<Props> = async (context) => 
 /**
  * Fallback for all data used in privacy page + its descendents
  */
-function PrivacyPage({ fallback, pageUrl }: Props) {
+function PrivacyPage({ fallback, pageUrl }: PrivacyProps) {
   return (
     <PageLayout fallback={fallback} pageUrl={pageUrl}>
       <Privacy pageUrl={pageUrl} />

@@ -1,10 +1,9 @@
-import useData from 'api/useData';
-import ContentCard, { OverlayContainer } from 'components/ContentCard';
-import { cardSizeInPx } from 'components/ContentGrid';
-import HoverableContainer from 'components/HoverableContainer';
-import Image from 'components/Image';
-import RichText from 'components/RichText';
-import useLinkWithName from 'hooks/useLinkWithName';
+import { useData } from 'api/useData';
+import { ContentCard } from 'components/ContentCard';
+import { HoverableContainer } from 'components/HoverableContainer';
+import { Image } from 'components/Image';
+import { RichText } from 'components/RichText';
+import { useLinkWithName } from 'hooks/useLinkWithName';
 import { useState } from 'react';
 import styled from '@emotion/styled';
 
@@ -16,7 +15,7 @@ const ImageCard = styled(ContentCard)`
     height: var(--size);
     border-radius: calc(var(--size) / 2);
 
-    ${OverlayContainer} {
+    & article {
       visibility: hidden;
     }
   }
@@ -43,7 +42,7 @@ const TextCard = styled(ContentCard)`
  * as the data comes from the introBlock. The width/height here is for image
  * resizing, and the actual width may be smaller.
  */
-function IntroCard() {
+export function IntroCard() {
   const { data: introBlock } = useData('intro');
   const linkedInLink = useLinkWithName('LinkedIn');
   const [isHovered, setIsHovered] = useState(false);
@@ -64,8 +63,6 @@ function IntroCard() {
           <Image
             {...introBlock.image}
             alt={introBlock.image.title ?? 'Introduction image'}
-            width={cardSizeInPx()}
-            height={cardSizeInPx()}
             priority
           />
         </HoverableContainer>
@@ -76,5 +73,3 @@ function IntroCard() {
     </>
   );
 }
-
-export default IntroCard;

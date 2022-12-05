@@ -1,20 +1,22 @@
-import fetchFallback from 'api/fetchFallback';
-import Homepage from 'components/homepage/Homepage';
-import PageLayout from 'components/layouts/PageLayout';
-import getPageUrl from 'helpers/getPageUrl';
-import type { Page } from 'types/Page';
+import { FetchedFallbackData, fetchFallbackData } from 'api/fetchFallbackData';
+import { Homepage } from 'components/homepage/Homepage';
+import { PageLayout } from 'components/layouts/PageLayout';
+import { getPageUrl } from 'helpers/getPageUrl';
 import type { GetServerSideProps } from 'next/types';
 
-export type HomeProps = Page<
-  'projects' | 'intro' | 'location' | 'latest/activity' | 'latest/track'
->;
+type HomeProps = {
+  fallback: FetchedFallbackData<
+    'version' | 'footer' | 'projects' | 'intro' | 'location' | 'latest/track' | 'latest/activity'
+  >;
+  pageUrl: string;
+};
 
 /**
  * Grabs fallback data + page url
  */
 export const getServerSideProps: GetServerSideProps<HomeProps> = async (context) => {
   const pageUrl = getPageUrl(context);
-  const data = await fetchFallback([
+  const data = await fetchFallbackData([
     'version',
     'footer',
     'projects',

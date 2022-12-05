@@ -1,7 +1,6 @@
-import type { TokenKey } from 'api/types/Token';
 import { db } from 'db/dbClient';
 import { CreateTokenProps, FetchTokenProps } from 'db/models/Token';
-import fetchRefreshedTokenFromApi from './fetchRefreshedTokenFromApi';
+import { fetchRefreshedTokenFromApi } from './fetchRefreshedTokenFromApi';
 
 /**
  * Creates or updates a possibly-existing token given a unique name and
@@ -47,7 +46,7 @@ const getLatestTokenIfValid = async ({ name }: FetchTokenProps) => {
  * it'll attempt to get a refreshed token even if the current token appears valid.
  * Should be used in case of 4xx codes from users.
  */
-const refreshedAccessToken = async (name: TokenKey, forceRefresh?: boolean) => {
+export const refreshedAccessToken = async (name: string, forceRefresh?: boolean) => {
   const currentData = await getLatestTokenIfValid({ name });
   if (currentData.accessToken && !forceRefresh) {
     return currentData.accessToken;
@@ -61,5 +60,3 @@ const refreshedAccessToken = async (name: TokenKey, forceRefresh?: boolean) => {
   await createOrUpdateToken({ name, accessToken, refreshToken, expiryAt });
   return accessToken;
 };
-
-export default refreshedAccessToken;

@@ -44,8 +44,8 @@ importers:
       graphql: 16.6.0
       graphql-request: 5.0.0
       husky: 8.0.2
-      lint-staged: 13.0.4
-      lucide-react: 0.103.0
+      lint-staged: 13.1.0
+      lucide-react: 0.104.0
       mapbox-gl: 2.11.0
       micromatch: 4.0.5
       mysql2: 2.3.3
@@ -88,7 +88,7 @@ importers:
       eslint-plugin-dg: link:eslint-plugin-dg
       graphql: 16.6.0
       graphql-request: 5.0.0_graphql@16.6.0
-      lucide-react: 0.103.0_sh5qlbywuemxd2y3xkrw2y2kr4
+      lucide-react: 0.104.0_sh5qlbywuemxd2y3xkrw2y2kr4
       mapbox-gl: 2.11.0
       mysql2: 2.3.3
       next: 13.0.6_672uxklweod7ene3nqtsh262ca
@@ -127,7 +127,7 @@ importers:
       eslint-plugin-react: 7.31.11_eslint@8.29.0
       eslint-plugin-react-hooks: 4.6.0_eslint@8.29.0
       husky: 8.0.2
-      lint-staged: 13.0.4
+      lint-staged: 13.1.0
       micromatch: 4.0.5
       postcss: 8.4.19
       postcss-syntax: 0.36.2_postcss@8.4.19
@@ -5643,8 +5643,8 @@ packages:
   /lines-and-columns/1.2.4:
     resolution: {integrity: sha512-7ylylesZQ/PV29jhEDl3Ufjo6ZX7gCqJr5F7PKrqc93v7fzSymt1BpwEU8nAUXs8qzzvqhbjhK5QZg6Mt/HkBg==}
 
-  /lint-staged/13.0.4:
-    resolution: {integrity: sha512-HxlHCXoYRsq9QCby5wFozmZW00hMs/9e3l+/dz6Qr8Kle4UH0kJTdABAbqhzG+3pcG6QjL9kz7NgGBfph+a5dw==}
+  /lint-staged/13.1.0:
+    resolution: {integrity: sha512-pn/sR8IrcF/T0vpWLilih8jmVouMlxqXxKuAojmbiGX5n/gDnz+abdPptlj0vYnbfE0SQNl3CY/HwtM0+yfOVQ==}
     engines: {node: ^14.13.1 || >=16.0.0}
     hasBin: true
     dependencies:
@@ -5699,7 +5699,7 @@ packages:
       log-update: 4.0.0
       p-map: 4.0.0
       rfdc: 1.3.0
-      rxjs: 7.5.7
+      rxjs: 7.6.0
       through: 2.3.8
       wrap-ansi: 7.0.0
     dev: true
@@ -5854,8 +5854,8 @@ packages:
       es5-ext: 0.10.62
     dev: true
 
-  /lucide-react/0.103.0_sh5qlbywuemxd2y3xkrw2y2kr4:
-    resolution: {integrity: sha512-TOgyZeFt+5E0YJhk1Spfk2kF7tast2wdFY8xLNrRRIRanzBB2VwR78PL9wZ0pOa1mABQTtt96n0Uz6KWzySZZw==}
+  /lucide-react/0.104.0_sh5qlbywuemxd2y3xkrw2y2kr4:
+    resolution: {integrity: sha512-ShElF954XPuBmcH8tlLBI0jeav1lpsLLDDgpqjrMhwclAU8Q2+n3ile4FgJ48Qkf9zRLWQF3/Dj9MMr5cTauQg==}
     peerDependencies:
       prop-types: ^15.7.2
       react: ^16.5.1 || ^17.0.0 || ^18.0.0
@@ -7176,6 +7176,12 @@ packages:
 
   /rxjs/7.5.7:
     resolution: {integrity: sha512-z9MzKh/UcOqB3i20H6rtrlaE/CgjLOvheWK/9ILrbhROGTweAi1BaFsTT9FbwZi5Trr1qNRs+MXkhmR06awzQA==}
+    dependencies:
+      tslib: 2.4.1
+    dev: true
+
+  /rxjs/7.6.0:
+    resolution: {integrity: sha512-DDa7d8TFNUalGC9VqXvQ1euWNN7sc63TrUCuM9J998+ViviahMIjKSOU7rfcgFOF+FCD71BhDRv4hrFz+ImDLQ==}
     dependencies:
       tslib: 2.4.1
     dev: true

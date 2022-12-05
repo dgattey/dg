@@ -1,22 +1,21 @@
-import useData from 'api/useData';
-import ContentGrid from 'components/ContentGrid';
-import Meta from 'components/Meta';
-import useGridAnimation from 'hooks/useGridAnimation';
-import type { Page } from 'types/Page';
+import { useData } from 'api/useData';
+import { ContentGrid } from 'components/ContentGrid';
+import { MapPreviewCard } from 'components/homepage/MapPreviewCard';
+import { Meta } from 'components/Meta';
+import { useGridAnimation } from 'hooks/useGridAnimation';
 import { useMemo, useRef } from 'react';
-import ColorSchemeToggleCard from './ColorSchemeToggleCard';
-import IntroCard from './IntroCard';
-import MapCard from './MapCard';
-import ProjectCard from './ProjectCard';
-import SpotifyCard from './SpotifyCard';
-import StravaCard from './StravaCard';
+import { ColorSchemeToggleCard } from './ColorSchemeToggleCard';
+import { IntroCard } from './IntroCard';
+import { ProjectCard } from './ProjectCard';
+import { SpotifyCard } from './SpotifyCard';
+import { StravaCard } from './StravaCard';
 
 /**
  * Puts all projects into a grid using `projects` data,
  * interspersed with `introBlock` data, and dark/light mode
  * toggle.
  */
-function Homepage({ pageUrl }: Pick<Page, 'pageUrl'>) {
+export function Homepage({ pageUrl }: { pageUrl: string }) {
   const { data: projects } = useData('projects');
   const { data: introBlock } = useData('intro');
 
@@ -38,7 +37,7 @@ function Homepage({ pageUrl }: Pick<Page, 'pageUrl'>) {
   const otherCards = useMemo(
     () => [
       { index: 0, card: <IntroCard key="intro" /> },
-      { index: 0, card: <MapCard key="map" turnOnAnimation={turnOnAnimation} /> },
+      { index: 0, card: <MapPreviewCard key="map" turnOnAnimation={turnOnAnimation} /> },
       { index: 2, card: <SpotifyCard key="spotify" /> },
       { index: 3, card: <ColorSchemeToggleCard key="color" /> },
       { index: 6, card: <StravaCard key="strava" /> },
@@ -58,5 +57,3 @@ function Homepage({ pageUrl }: Pick<Page, 'pageUrl'>) {
     </>
   );
 }
-
-export default Homepage;

@@ -1,5 +1,5 @@
 import type { MapLocation } from 'api/types/MapLocation';
-import Image from 'components/Image';
+import { Image } from 'components/Image';
 import { Marker as MapMarker } from 'react-map-gl';
 import styled from '@emotion/styled';
 
@@ -8,7 +8,7 @@ const RADIUS = DIMENSION / 2;
 const IMAGE_DIMENSION = DIMENSION * 0.85;
 
 // Required point, optional image
-type Props = Pick<MapLocation, 'point'> & Partial<Pick<MapLocation, 'image'>>;
+type MarkerProps = Pick<MapLocation, 'point'> & Partial<Pick<MapLocation, 'image'>>;
 
 /**
  * Creates a circle to show
@@ -26,7 +26,7 @@ const ImageContainer = styled.span`
 /**
  * Creates a standard map marker, centered on a point
  */
-function Marker({ point, image }: Props) {
+export function Marker({ point, image }: MarkerProps) {
   const id = `${point?.latitude},${point?.longitude}`;
   return (
     <MapMarker {...point}>
@@ -57,5 +57,3 @@ function Marker({ point, image }: Props) {
     </MapMarker>
   );
 }
-
-export default Marker;

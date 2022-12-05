@@ -1,9 +1,9 @@
-import useData from 'api/useData';
-import ContentCard from 'components/ContentCard';
-import FaIcon from 'components/FaIcon';
-import Stack from 'components/Stack';
-import truncated from 'helpers/truncated';
-import useRelativeTimeFormat from 'hooks/useRelativeTimeFormat';
+import { useData } from 'api/useData';
+import { ContentCard } from 'components/ContentCard';
+import { FaIcon } from 'components/FaIcon';
+import { Stack } from 'components/Stack';
+import { truncated } from 'helpers/truncated';
+import { useRelativeTimeFormat } from 'hooks/useRelativeTimeFormat';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import { faBicycle } from '@fortawesome/free-solid-svg-icons/faBicycle';
 import { faRunning } from '@fortawesome/free-solid-svg-icons/faRunning';
@@ -63,7 +63,7 @@ function ExternalLink({ children, ...props }: React.ComponentProps<typeof Link>)
 /**
  * Shows a card with the latest activity from Strava
  */
-function StravaCard() {
+export function StravaCard() {
   const { data: activity } = useData('latest/activity');
   const date = useRelativeTimeFormat(activity?.start_date);
   const formatter = useMemo(
@@ -121,5 +121,3 @@ function StravaCard() {
     </Card>
   );
 }
-
-export default StravaCard;

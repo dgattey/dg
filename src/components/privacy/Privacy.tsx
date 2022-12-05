@@ -1,8 +1,11 @@
-import useData from 'api/useData';
-import Meta from 'components/Meta';
-import RichText from 'components/RichText';
-import type { Page } from 'types/Page';
+import { useData } from 'api/useData';
+import { Meta } from 'components/Meta';
+import { RichText } from 'components/RichText';
 import styled from '@emotion/styled';
+
+type PrivacyProps = {
+  pageUrl: string;
+};
 
 const SingleColumn = styled(RichText)`
   max-width: 35em;
@@ -13,7 +16,7 @@ const SingleColumn = styled(RichText)`
 /**
  * Shows the privacy policy on a page alone
  */
-function Privacy({ pageUrl }: Pick<Page, 'pageUrl'>) {
+export function Privacy({ pageUrl }: PrivacyProps) {
   const { data: privacyTextBlock } = useData('privacy');
   if (!privacyTextBlock?.content) {
     return null;
@@ -32,5 +35,3 @@ function Privacy({ pageUrl }: Pick<Page, 'pageUrl'>) {
     </>
   );
 }
-
-export default Privacy;

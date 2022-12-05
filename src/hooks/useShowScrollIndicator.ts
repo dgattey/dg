@@ -6,12 +6,10 @@ import { useInView } from 'react-intersection-observer';
  * height to compute where it should swap. Should be the height of the
  * header.
  */
-const useShowScrollIndicator = (thresholdHeight: number) => {
+export const useShowScrollIndicator = (thresholdHeight: number) => {
   const { ref, inView, entry } = useInView({
     threshold: 1.0,
     rootMargin: `-${thresholdHeight}px 0px 0px 0px`,
   });
   return { ref, isIndicatorShown: !!entry && thresholdHeight > 0 && !inView };
 };
-
-export default useShowScrollIndicator;

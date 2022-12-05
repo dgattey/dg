@@ -1,6 +1,6 @@
-import useData from 'api/useData';
+import { useData } from 'api/useData';
 import styled from '@emotion/styled';
-import Link from './Link';
+import { Link } from './Link';
 
 // Switches to two rows for mobile
 const Navigation = styled.nav`
@@ -16,10 +16,14 @@ const FlexList = styled.ul`
   flex-wrap: wrap;
 `;
 
+const NoSpaceItem = styled.li`
+  padding: 0;
+`;
+
 /**
  * Creates the site footer component - shows version data + copyright
  */
-function Footer() {
+export function Footer() {
   const { data: version } = useData('version');
   const { data: footerLinks } = useData('footer');
   const listedLinkElements = footerLinks?.map((link) => (
@@ -33,6 +37,7 @@ function Footer() {
         <Navigation>
           <FlexList>
             <li>© {new Date().getFullYear()} Dylan Gattey</li>
+            <NoSpaceItem>•</NoSpaceItem>
             <li>{version}</li>
           </FlexList>
           <FlexList>{listedLinkElements}</FlexList>
@@ -41,5 +46,3 @@ function Footer() {
     </section>
   );
 }
-
-export default Footer;

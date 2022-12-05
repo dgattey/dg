@@ -1,11 +1,11 @@
-import fetchContentfulFooterLinks from './server/fetchContentfulFooterLinks';
-import fetchContentfulIntroBlock from './server/fetchContentfulIntroBlock';
-import fetchContentfulLocation from './server/fetchContentfulLocation';
-import fetchContentfulPrivacyBlock from './server/fetchContentfulPrivacyBlock';
-import fetchContentfulProjects from './server/fetchContentfulProjects';
-import fetchGithubRepoVersion from './server/fetchGithubRepoVersion';
-import fetchSpotifyCurrentlyPlaying from './server/fetchSpotifyCurrentlyOrRecentlyPlayed';
-import fetchLatestStravaActivityFromDb from './server/strava/fetchLatestStravaActivityFromDb';
+import { fetchContentfulFooterLinks } from './server/fetchContentfulFooterLinks';
+import { fetchContentfulIntroBlock } from './server/fetchContentfulIntroBlock';
+import { fetchContentfulLocation } from './server/fetchContentfulLocation';
+import { fetchContentfulPrivacyBlock } from './server/fetchContentfulPrivacyBlock';
+import { fetchContentfulProjects } from './server/fetchContentfulProjects';
+import { fetchGithubRepoVersion } from './server/fetchGithubRepoVersion';
+import { fetchSpotifyCurrentlyPlaying } from './server/fetchSpotifyCurrentlyOrRecentlyPlayed';
+import { fetchLatestStravaActivityFromDb } from './server/strava/fetchLatestStravaActivityFromDb';
 
 /**
  * All possible types of endpoints we could request
@@ -28,7 +28,7 @@ export type AwaitedType<Key extends EndpointKey> = Awaited<EndpointType<Key>>;
  * The keys can have slashes, representing sub paths. Use this ONLY from the
  * server or `getStaticProps`, NOT from the client!
  */
-const endpoints = {
+export const endpoints = {
   // Intro block of content via Contentful
   intro: fetchContentfulIntroBlock,
 
@@ -59,5 +59,3 @@ const endpoints = {
  */
 export const isValid = (possibleKey: string | undefined): possibleKey is EndpointKey =>
   typeof possibleKey === 'string' && Object.keys(endpoints).includes(possibleKey);
-
-export default endpoints;

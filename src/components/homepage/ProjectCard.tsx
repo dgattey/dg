@@ -1,30 +1,25 @@
 import type { Project } from 'api/types/generated/contentfulApi.generated';
-import type { Props as ContentCardProps } from 'components/ContentCard';
-import ContentCard from 'components/ContentCard';
-import { cardSize, cardSizeInPx } from 'components/ContentGrid';
-import HoverableContainer from 'components/HoverableContainer';
-import Image from 'components/Image';
+import type { ContentCardProps } from 'components/ContentCard';
+import { ContentCard } from 'components/ContentCard';
+import { cardSize } from 'components/ContentGrid';
+import { HoverableContainer } from 'components/HoverableContainer';
+import { Image } from 'components/Image';
 import { useState } from 'react';
 import styled from '@emotion/styled';
 
 type Props = Project & Pick<ContentCardProps, 'turnOnAnimation'>;
 
-// Makes sure our images take up full size of parent - this seems to be best way to do it right now
-const ProjectImage = styled(Image)`
-  position: fixed !important;
-`;
-
 // Ensure on mobile, all cards are uniform height (small in height)
 const Card = styled(ContentCard)`
   @media (max-width: 767.99px) {
-    height: ${cardSize(0.67)};
+    max-height: ${cardSize(0.67)};
   }
 `;
 
 /**
  * Uses the `ContentCard` to show a project's details
  */
-function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }: Props) {
+export function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }: Props) {
   const verticalSpan = layout === 'tall' ? 2 : 1;
   const horizontalSpan = layout === 'wide' ? 2 : 1;
   const [isHovered, setIsHovered] = useState(false);
@@ -41,16 +36,9 @@ function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }: Props)
     >
       {thumbnail && (
         <HoverableContainer isHovered={isHovered}>
-          <ProjectImage
-            {...thumbnail}
-            alt={title ?? 'Project image'}
-            width={cardSizeInPx(horizontalSpan)}
-            height={cardSizeInPx(verticalSpan)}
-          />
+          <Image {...thumbnail} alt={title ?? 'Project image'} />
         </HoverableContainer>
       )}
     </Card>
   );
 }
-
-export default ProjectCard;

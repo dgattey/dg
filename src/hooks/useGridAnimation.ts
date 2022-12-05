@@ -20,7 +20,7 @@ const changePointerEvents = (isOn: boolean) => (animatedChildren: HTMLElement[])
  * Hook used to dynamically import the `animate-css-grid` library
  * and animate a ref when necessary.
  */
-const useGridAnimation = (gridRef: React.RefObject<HTMLDivElement>) => {
+export const useGridAnimation = (gridRef: React.RefObject<HTMLDivElement>) => {
   const hasImportedLib = useRef(false);
   const wrapGridRef = useRef<
     | ((container: HTMLElement, args: WrapGridArguments | undefined) => { unwrapGrid: () => void })
@@ -91,5 +91,3 @@ const useGridAnimation = (gridRef: React.RefObject<HTMLDivElement>) => {
 
   return turnOnAnimation;
 };
-
-export default useGridAnimation;

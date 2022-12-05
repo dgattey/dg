@@ -1,19 +1,17 @@
 import type { Link } from 'api/types/generated/contentfulApi.generated';
-import truncated from 'helpers/truncated';
+import { truncated } from 'helpers/truncated';
 import { GRID_ANIMATION_DURATION } from 'hooks/useGridAnimation';
-import React, { ReactElement, useState } from 'react';
+import { useState } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
 import { cardSize } from './ContentGrid';
-import ContentWrappingLink from './ContentWrappingLink';
+import { ContentWrappingLink } from './ContentWrappingLink';
 
-// Special requirements for children here
-type Children = ReactElement | null | undefined;
-
-export type Props = Pick<
+export type ContentCardProps = Pick<
   React.ComponentProps<'article'>,
-  'className' | 'onMouseOver' | 'onMouseOut'
+  'className' | 'onMouseOver' | 'onMouseOut' | 'onTouchStart'
 > & {
+  children?: React.ReactElement;
   /**
    * How many columns the card spans, defaults to 1
    */
@@ -42,18 +40,13 @@ export type Props = Pick<
   onExpansion?: (isExpanded: boolean) => void;
 
   /**
-   * Children must exist!
-   */
-  children: Children;
-
-  /**
    * Function that starts an animation when the card is expanded
    * and removes the animation once finished.
    */
   turnOnAnimation?: () => void;
 };
 
-type LinkWrappedChildrenProps = Pick<Props, 'link' | 'children'> & {
+type LinkWrappedChildrenProps = Pick<ContentCardProps, 'link' | 'children'> & {
   /**
    * If the card expands when clicked
    */
@@ -184,7 +177,7 @@ function LinkWrappedChildren({
 /**
  * Wraps content in a card for the content grid
  */
-function ContentCard({
+export function ContentCard({
   horizontalSpan,
   verticalSpan,
   children,
@@ -192,10 +185,9 @@ function ContentCard({
   overlay,
   link,
   onExpansion,
-  onMouseOver,
-  onMouseOut,
   turnOnAnimation,
-}: Props) {
+  ...props
+}: ContentCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const expandOnClick = !!onExpansion;
 
@@ -222,8 +214,7 @@ function ContentCard({
       $isClickable={!!link}
       $isExpandable={expandOnClick}
       onClick={toggleExpansion}
-      onMouseOver={onMouseOver}
-      onMouseOut={onMouseOut}
+      {...props}
     >
       <LinkWrappedChildren
         expandOnClick={expandOnClick}
@@ -235,5 +226,3 @@ function ContentCard({
     </Card>
   );
 }
-
-export default ContentCard;

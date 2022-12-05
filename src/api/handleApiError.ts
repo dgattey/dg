@@ -22,7 +22,11 @@ const FALLBACK_ERROR = 'Error from API';
  * 500s and tries to parse an error for an API endpoint. There might be a
  * few different ways the error is encoded, try most of the common ones.
  */
-const handleApiError = (response: NextApiResponse, error?: unknown, responseCode?: number) => {
+export const handleApiError = (
+  response: NextApiResponse,
+  error?: unknown,
+  responseCode?: number,
+) => {
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const typedError = error as ErrorType;
   const message =
@@ -44,5 +48,3 @@ export const methodNotAllowedError = (
   response.setHeader('Allow', allowedMethods);
   response.status(405).json({ error: `Method ${method} Not Allowed` });
 };
-
-export default handleApiError;

@@ -1,6 +1,9 @@
-import React from 'react';
+import { css } from '@emotion/react';
 import styled from '@emotion/styled';
-import Logo from './Logo';
+import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
+import { ScrollUpIndicator } from 'components/ScrollUpIndicator';
+import { useContext } from 'react';
+import { Logo } from './Logo';
 
 interface Props {
   /**
@@ -15,31 +18,40 @@ const StickyContainer = styled.section`
   position: sticky;
   top: 0;
   z-index: 1;
-  pointer-events: none;
+  max-width: unset;
 `;
 
-const LogoHolder = styled.li`
-  padding: 0;
-`;
+const Background = styled.div<{ isScrolled: boolean }>(
+  ({ isScrolled }) => css`
+    background-color: ${isScrolled ? 'var(--header-background-color)' : 'var(--background-color)'};
+    box-shadow: ${isScrolled ? 'var(--card-hovered-box-shadow)' : 'none'};
+    transition: background-color var(--transition), box-shadow var(--transition);
+    will-change: box-shadow, background-color;
+  `,
+);
 
 /**
  * Creates the site header component. It's a bar that spans across the
  * page and shows a logo + header links if they exist.
  */
-function Header({ headerRef }: Props) {
+export function Header({ headerRef }: Props) {
+  const isScrolled = useContext(ScrollIndicatorContext);
   return (
-    <StickyContainer className="container">
+    <StickyContainer>
       <header ref={headerRef}>
-        <nav>
-          <ul>
-            <LogoHolder>
-              <Logo />
-            </LogoHolder>
-          </ul>
-        </nav>
+        <Background isScrolled={isScrolled}>
+          <nav className="container">
+            <ul>
+              <li>
+                <Logo />
+              </li>
+              <li>
+                <ScrollUpIndicator />
+              </li>
+            </ul>
+          </nav>
+        </Background>
       </header>
     </StickyContainer>
   );
 }
-
-export default Header;

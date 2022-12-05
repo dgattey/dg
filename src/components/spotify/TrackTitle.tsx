@@ -1,9 +1,12 @@
 import type { Track } from 'api/types/spotify/Track';
-import Link from 'components/Link';
-import useLinkWithName from 'hooks/useLinkWithName';
+import { Link } from 'components/Link';
+import { useLinkWithName } from 'hooks/useLinkWithName';
 import styled from '@emotion/styled';
 
-type Props = Track;
+type TrackTitleProps = {
+  name: Track['name'];
+  external_urls: Track['external_urls'];
+};
 
 // Link should inherit colors from its parent
 const PlainLink = styled(Link)`
@@ -13,7 +16,7 @@ const PlainLink = styled(Link)`
 /**
  * Creates an element that shows a track title that links to the song
  */
-function TrackTitle({ name, external_urls }: Props) {
+export function TrackTitle({ name, external_urls }: TrackTitleProps) {
   const link = useLinkWithName('Spotify', { title: name, url: external_urls.spotify });
   return link ? (
     <PlainLink isExternal {...link}>
@@ -23,5 +26,3 @@ function TrackTitle({ name, external_urls }: Props) {
     <span>name</span>
   );
 }
-
-export default TrackTitle;

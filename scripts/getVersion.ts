@@ -1,4 +1,4 @@
-import fetchGithubRepoVersion from '../src/api/server/fetchGithubRepoVersion';
+import { fetchGithubRepoVersion } from '../src/api/server/fetchGithubRepoVersion';
 
 /**
  * Asynchronously fetches the version of the repo from Github using the

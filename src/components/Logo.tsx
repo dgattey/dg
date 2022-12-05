@@ -3,88 +3,42 @@ import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import ScrollIndicatorContext from './ScrollIndicatorContext';
-import ScrollUpIndicator from './ScrollUpIndicator';
-import Stack from './Stack';
+import { ScrollIndicatorContext } from './ScrollIndicatorContext';
 
 /**
  * Aspect ratio'd 1:1 circle. Big, bold, and squished text for use as
  * logo. Has background on scroll + scales down a bit.
  */
-const LogoText = styled.article<{ $isScrolled: boolean }>`
-  --padding: 1rem;
-  --margin: 1rem;
-  font-size: 2.5rem;
-  font-variation-settings: 'wght' 800, 'wdth' 120;
-  letter-spacing: -0.12em;
+const LogoText = styled.div<{ isScrolled: boolean }>(
+  ({ isScrolled }) => css`
+    font-size: 2.5rem;
+    font-variation-settings: 'wght' 800, 'wdth' 120;
+    letter-spacing: -0.12em;
+    line-height: 0.75; // visually center the text
+    pointer-events: auto;
+    color: rgb(22, 172, 126);
+    padding: 1rem 0;
 
-  overflow: visible;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 50%;
-  vertical-align: middle;
-  line-height: 1;
-  margin: var(--margin) -0.5rem;
-  padding: var(--padding);
-  pointer-events: auto;
-  transform-origin: top left;
-  transition: box-shadow var(--transition), transform var(--transition),
-    background-color var(--transition), border-color var(--transition);
-  will-change: transform;
-  color: rgb(22, 172, 126);
-  border: 2px solid transparent;
-  z-index: 1;
-
-  @media (max-width: 767.96px) {
-    --margin: 0.5rem;
-  }
-
-  &:before {
-    content: '';
-    float: left;
-    width: auto;
-    padding-bottom: 100%;
-  }
-
-  ${({ $isScrolled }) =>
-    $isScrolled
-      ? css`
-          border: 2px solid var(--card-border-color);
-          transform: scale(0.75);
-        `
-      : css`
-          background: var(--background-color);
-          box-shadow: none;
-        `}
-`;
-
-const SpacedScrollIndicator = styled(ScrollUpIndicator)<{ $isScrolled: boolean }>`
-  ${({ $isScrolled }) =>
-    $isScrolled &&
+    transition: font-size var(--transition), padding var(--transition);
+    will-change: font-size;
+    ${isScrolled &&
     css`
       &:hover {
         transform: scale(1.05);
       }
+      font-size: 1.75rem;
+      padding: 0;
     `}
-  margin-left: -0.5rem;
-  margin-top: 2rem;
-`;
+  `,
+);
 
 /**
  * Logo + scroll to top button, with certain changes that happen on
  * scroll.
  */
-function Logo() {
+export function Logo() {
   const router = useRouter();
-  const isScrolled = useContext(ScrollIndicatorContext);
   const linkedLogoText = router.asPath === '/' ? 'dg.' : <Link href="/">dg.</Link>;
-  return (
-    <Stack $alignItems="flex-start">
-      <LogoText $isScrolled={isScrolled}>{linkedLogoText}</LogoText>
-      <SpacedScrollIndicator $isScrolled={isScrolled} />
-    </Stack>
-  );
+  const isScrolled = useContext(ScrollIndicatorContext);
+  return <LogoText isScrolled={isScrolled}>{linkedLogoText}</LogoText>;
 }
-
-export default Logo;

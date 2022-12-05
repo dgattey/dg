@@ -1,8 +1,8 @@
-import React from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
+import { Children } from 'react';
 
-export type Props = Pick<React.ComponentProps<'div'>, 'className'> &
+export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className'> &
   (
     | {
         /**
@@ -74,7 +74,7 @@ const Container = styled.div<{ $isSingular?: boolean }>`
  * to the color scheme. Circular and same width/height. Returns either a single
  * container, or a larger container with multiple children in it if necessary.
  */
-function ControlContainer({ onClick, children, className }: Props) {
+export function ControlContainer({ onClick, children, className }: ControlContainerProps) {
   if (!Array.isArray(children)) {
     return (
       <Container $isSingular onClick={onClick} className={className}>
@@ -85,11 +85,9 @@ function ControlContainer({ onClick, children, className }: Props) {
 
   return (
     <Container className={className}>
-      {React.Children.map(children, (child) => (
+      {Children.map(children, (child) => (
         <ItemWrapper onClick={child.props.onClick}>{child}</ItemWrapper>
       ))}
     </Container>
   );
 }
-
-export default ControlContainer;

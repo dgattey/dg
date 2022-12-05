@@ -1,9 +1,9 @@
-import authenticatedRestClient from './authenticatedRestClient';
+import { authenticatedRestClient } from './authenticatedRestClient';
 
-const BASE_ENDPOINT = 'https://api.spotify.com/v1';
+const ACCESS_TYPE = 'spotify';
+const ENDPOINT = 'https://api.spotify.com/v1';
 
 /**
  * A REST client set up to make authed calls to Spotify
  */
-const spotifyClient = authenticatedRestClient(BASE_ENDPOINT, 'spotify');
-export default spotifyClient;
+export const spotifyClient = authenticatedRestClient(ENDPOINT, ACCESS_TYPE);

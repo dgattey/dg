@@ -1,6 +1,6 @@
 import type { StravaWebhookEvent } from 'api/types/StravaWebhookEvent';
 import { db } from 'db/dbClient';
-import fetchStravaActivityFromApi from './fetchStravaActivityFromApi';
+import { fetchStravaActivityFromApi } from './fetchStravaActivityFromApi';
 
 // If an update was applied this number of ms or less ago, drop the update
 const UPDATE_THRESHOLD_IN_MS = 60000;
@@ -58,7 +58,7 @@ const deleteActivityFromDb = async (id: number) => db.StravaActivity.destroy({ w
  * 3. If it's a delete, delete the db row corresponding to the activity id
  * if it exists. If not, drop the event.
  */
-const syncStravaWebhookUpdateWithDb = async (event: StravaWebhookEvent) => {
+export const syncStravaWebhookUpdateWithDb = async (event: StravaWebhookEvent) => {
   switch (event.aspect_type) {
     case 'create':
       await fetchFromApiAndSaveToDb(event.object_id);
@@ -70,5 +70,3 @@ const syncStravaWebhookUpdateWithDb = async (event: StravaWebhookEvent) => {
       await deleteActivityFromDb(event.object_id);
   }
 };
-
-export default syncStravaWebhookUpdateWithDb;

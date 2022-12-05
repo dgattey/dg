@@ -3,9 +3,9 @@ import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { isDefinedItem, isLink, isProject } from 'api/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
-import ProjectCard from 'components/homepage/ProjectCard';
-import Image from './Image';
-import Link from './Link';
+import { ProjectCard } from 'components/homepage/ProjectCard';
+import { Image } from './Image';
+import { Link } from './Link';
 
 type Props = TextBlockContent & Pick<React.ComponentPropsWithoutRef<'div'>, 'className'>;
 
@@ -87,7 +87,7 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
  * Complicated component to render rich text from Contentful's rich
  * text renderer, resolving all items to components
  */
-function RichText({ json, links, className }: Props) {
+export function RichText({ json, links, className }: Props) {
   return (
     <div className={className}>
       {
@@ -97,5 +97,3 @@ function RichText({ json, links, className }: Props) {
     </div>
   );
 }
-
-export default RichText;

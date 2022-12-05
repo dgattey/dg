@@ -1,7 +1,7 @@
 import { isRecord } from 'api/parsers';
 import { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
 import { db } from 'db/dbClient';
-import paredStravaActivity from './paredStravaActivity';
+import { paredStravaActivity } from './paredStravaActivity';
 
 /**
  * Used to convert a JsonValue into an activity.
@@ -12,7 +12,7 @@ const isStravaActivity = (activity: unknown): activity is StravaDetailedActivity
 /**
  * Fetch latest version of the activity from Strava's API
  */
-const fetchLatestStravaActivityFromDb = async () => {
+export const fetchLatestStravaActivityFromDb = async () => {
   const data = await db.StravaActivity.findOne({
     order: [['activityStartDate', 'DESC']],
     attributes: ['activityData'],
@@ -23,5 +23,3 @@ const fetchLatestStravaActivityFromDb = async () => {
   }
   return null;
 };
-
-export default fetchLatestStravaActivityFromDb;

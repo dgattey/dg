@@ -1,4 +1,4 @@
-import AppStyle from 'components/AppStyle';
+import { AppStyle } from 'components/AppStyle';
 import { AppProps } from 'next/app';
 
 /**

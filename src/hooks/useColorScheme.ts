@@ -1,6 +1,6 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
-import useLocalStorageValue from './useLocalStorageValue';
+import { useLocalStorageValue } from './useLocalStorageValue';
 
 /**
  * The color scheme the system prefers by default
@@ -73,7 +73,7 @@ const updateThemeAttribute = (scheme: ColorScheme, isSystemScheme: boolean) => {
  * the changes are component-level. Pair with ColorSchemeContext for best
  * results.
  */
-const useColorScheme = () => {
+export const useColorScheme = () => {
   // The value of these will be different on server vs client - don't use outside a `useEffect`
   const [preferredScheme, changeScheme, deleteScheme] = useLocalStorageValue<ColorScheme | null>(
     'colorScheme',
@@ -104,5 +104,3 @@ const useColorScheme = () => {
       value ? changeScheme(value) : deleteScheme(),
   } as const;
 };
-
-export default useColorScheme;
