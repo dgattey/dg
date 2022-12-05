@@ -44,7 +44,7 @@ const TYPESCRIPT_RULES = {
   'consistent-return': 'off',
   // This is broken
   '@typescript-eslint/indent': 'off',
-  // Eventually I want this to error if default export, actually
+  // Default exports aren't good for renaming and not really all that useful anyway
   'import/prefer-default-export': 'off',
 };
 
@@ -76,6 +76,8 @@ const SCRIPTS_OVERRIDE = {
     ...TYPESCRIPT_RULES,
     // Console logging allowed
     'no-console': 'off',
+    // Default exports are actually required for scripts
+    'import/prefer-default-export': 'error',
   },
 };
 

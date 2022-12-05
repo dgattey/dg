@@ -1,9 +1,9 @@
 import type { Project } from 'api/types/generated/contentfulApi.generated';
-import type { Props as ContentCardProps } from 'components/ContentCard';
-import ContentCard from 'components/ContentCard';
+import type { ContentCardProps } from 'components/ContentCard';
+import { ContentCard } from 'components/ContentCard';
 import { cardSize, cardSizeInPx } from 'components/ContentGrid';
-import HoverableContainer from 'components/HoverableContainer';
-import Image from 'components/Image';
+import { HoverableContainer } from 'components/HoverableContainer';
+import { Image } from 'components/Image';
 import { useState } from 'react';
 import styled from '@emotion/styled';
 
@@ -24,7 +24,7 @@ const Card = styled(ContentCard)`
 /**
  * Uses the `ContentCard` to show a project's details
  */
-function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }: Props) {
+export function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }: Props) {
   const verticalSpan = layout === 'tall' ? 2 : 1;
   const horizontalSpan = layout === 'wide' ? 2 : 1;
   const [isHovered, setIsHovered] = useState(false);
@@ -52,5 +52,3 @@ function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }: Props)
     </Card>
   );
 }
-
-export default ProjectCard;

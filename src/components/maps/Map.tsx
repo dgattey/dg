@@ -1,10 +1,10 @@
 import type { MapLocation } from 'api/types/MapLocation';
-import ColorSchemeContext from 'components/ColorSchemeContext';
+import { ColorSchemeContext } from 'components/ColorSchemeContext';
 import { useContext, useEffect, useMemo, useRef } from 'react';
 import { AttributionControl, Map as MapGL, MapRef } from 'react-map-gl';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import StandardControls from './StandardControls';
+import { StandardControls } from './StandardControls';
 
 export type Props = {
   /**
@@ -117,7 +117,7 @@ const Wrapper = styled.div<{ $isLoaded: boolean }>`
 /**
  * Uses Mapbox to show a canvas-based map of my current location.
  */
-function Map({ location, children, isExpanded, isLoaded, setMapHasLoaded }: Props) {
+export function Map({ location, children, isExpanded, isLoaded, setMapHasLoaded }: Props) {
   const mapRef = useRef<MapRef>(null);
   const { colorScheme } = useContext(ColorSchemeContext);
 
@@ -166,5 +166,3 @@ function Map({ location, children, isExpanded, isLoaded, setMapHasLoaded }: Prop
     </Wrapper>
   );
 }
-
-export default Map;

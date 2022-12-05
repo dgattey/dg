@@ -1,8 +1,7 @@
-import type { ErrorPageFallback } from 'api/fetchFallback';
-import fetchFallback from 'api/fetchFallback';
-import ErrorLayout from 'components/layouts/ErrorLayout';
-import Link from 'components/Link';
-import useLinkWithName from 'hooks/useLinkWithName';
+import { FetchedFallbackData, fetchFallbackData } from 'api/fetchFallbackData';
+import { ErrorLayout } from 'components/layouts/ErrorLayout';
+import { Link } from 'components/Link';
+import { useLinkWithName } from 'hooks/useLinkWithName';
 import type { NextPageContext } from 'next';
 import NextErrorComponent from 'next/error';
 import { useRouter } from 'next/router';
@@ -14,11 +13,11 @@ interface HasStatusCode {
   statusCode?: number;
 }
 
-export type Props = HasStatusCode & {
+export type ErrorPageProps = HasStatusCode & {
   /**
    * Provides SWR with fallback version data
    */
-  fallback: ErrorPageFallback;
+  fallback: FetchedFallbackData<'version' | 'footer'>;
 
   /**
    * Current page url
@@ -42,14 +41,12 @@ export const getStaticProps = async (context: NextPageContext) => {
   const { res, err, asPath } = context;
   const errorCode = err?.statusCode ?? 404;
   const statusCode = res ? res.statusCode : errorCode;
-  const data = await fetchFallback(['version', 'footer']);
-  const props: Props = {
+  const data = await fetchFallbackData(['version', 'footer']);
+  const props: ErrorPageProps = {
     ...errorProps,
     statusCode,
     pageUrl: '',
-    fallback: {
-      ...data,
-    },
+    fallback: data,
   };
 
   // No logging here
@@ -99,7 +96,7 @@ export function Contents({ statusCode }: HasStatusCode) {
 /**
  * Generic error page, for 404s//500s/etc
  */
-function ErrorPage({ statusCode, fallback, pageUrl }: Props) {
+function ErrorPage({ statusCode, fallback, pageUrl }: ErrorPageProps) {
   return (
     <ErrorLayout pageUrl={pageUrl} fallback={fallback} statusCode={statusCode ?? 500}>
       <Contents statusCode={statusCode} />

@@ -34,7 +34,7 @@ const isSubscription = (
  * returns true if the request's query has a validated Strava subscription
  * within it.
  */
-const echoStravaChallengeIfValid = (request: NextApiRequest, response: NextApiResponse) => {
+export const echoStravaChallengeIfValid = (request: NextApiRequest, response: NextApiResponse) => {
   const { query } = request;
   if (isSubscription(query)) {
     response.status(200).json({
@@ -44,5 +44,3 @@ const echoStravaChallengeIfValid = (request: NextApiRequest, response: NextApiRe
   }
   return false;
 };
-
-export default echoStravaChallengeIfValid;

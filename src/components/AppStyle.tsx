@@ -1,5 +1,3 @@
-'use client';
-
 import { ANIMATE_ATTRIBUTE } from 'hooks/useColorScheme';
 import '@picocss/pico/css/pico.min.css';
 import { Global, css } from '@emotion/react';
@@ -90,8 +88,6 @@ const globalStyle = css`
 /**
  * Applies styles to the full app
  */
-function AppStyle() {
+export function AppStyle() {
   return <Global styles={globalStyle} />;
 }
-
-export default AppStyle;

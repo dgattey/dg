@@ -1,12 +1,12 @@
-import stravaClient from 'api/server/networkClients/stravaClient';
+import { stravaClient } from 'api/server/networkClients/stravaClient';
 import type { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
-import paredStravaActivity from './paredStravaActivity';
+import { paredStravaActivity } from './paredStravaActivity';
 
 /**
  * Fetches an activity id from Strava's API. Use sparingly! Cuts into small API
  * budget. When in doubt, fall back to DB.
  */
-const fetchStravaActivityFromApi = async (id: number) => {
+export const fetchStravaActivityFromApi = async (id: number) => {
   const activity = await stravaClient.fetch<StravaDetailedActivity & Record<string, unknown>>(
     `activities/${id}`,
   );
@@ -16,5 +16,3 @@ const fetchStravaActivityFromApi = async (id: number) => {
   const allData = await activity.json();
   return paredStravaActivity(allData);
 };
-
-export default fetchStravaActivityFromApi;

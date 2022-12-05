@@ -86,7 +86,10 @@ const overriddenFormatString = ({ unit, amount }: RelativeTime) => {
  * render and return the relative time format with an effect to avoid
  * server/client rendering differences
  */
-const useRelativeTimeFormat = (fromDate: DateConstructorValue, toDate?: DateConstructorValue) => {
+export const useRelativeTimeFormat = (
+  fromDate: DateConstructorValue,
+  toDate?: DateConstructorValue,
+) => {
   const formatter = useMemo(() => new Intl.RelativeTimeFormat('en', { numeric: 'auto' }), []);
   const elapsedMs = numericDate(fromDate) - numericDate(toDate);
   const [formattedValue, setFormattedValue] = useState<string>('recently');
@@ -98,5 +101,3 @@ const useRelativeTimeFormat = (fromDate: DateConstructorValue, toDate?: DateCons
 
   return formattedValue;
 };
-
-export default useRelativeTimeFormat;

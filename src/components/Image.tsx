@@ -23,7 +23,7 @@ type Props = Pick<React.ComponentProps<'img'>, 'className'> &
 /**
  * Shows a Next Image with the contents of the Asset. Layout defaults to responsive.
  */
-function Image({ url, width, height, fill, title, alt, className, priority }: Props) {
+export function Image({ url, width, height, fill, title, alt, className, priority }: Props) {
   return url ? (
     <NextImage
       className={className}
@@ -36,5 +36,3 @@ function Image({ url, width, height, fill, title, alt, className, priority }: Pr
     />
   ) : null;
 }
-
-export default Image;

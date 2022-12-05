@@ -12,7 +12,7 @@ export type CreateTokenProps = Pick<Token, 'name' | 'accessToken' | 'expiryAt' |
 export type FetchTokenProps = Pick<Token, 'name'>;
 
 @Table({ modelName: 'Token' })
-export default class Token extends Model {
+export class Token extends Model {
   @PrimaryKey
   @Unique
   @Column(DataType.STRING)

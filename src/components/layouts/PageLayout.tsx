@@ -1,26 +1,38 @@
 import type { EndpointKey } from 'api/endpoints';
-import ColorSchemeContext from 'components/ColorSchemeContext';
-import Footer from 'components/Footer';
-import Header from 'components/Header';
-import Meta from 'components/Meta';
-import ScrollIndicatorContext from 'components/ScrollIndicatorContext';
-import useColorScheme from 'hooks/useColorScheme';
-import useShowScrollIndicator from 'hooks/useShowScrollIndicator';
-import type { Page } from 'types/Page';
+import { FetchedFallbackData } from 'api/fetchFallbackData';
+import { ColorSchemeContext } from 'components/ColorSchemeContext';
+import { Footer } from 'components/Footer';
+import { Header } from 'components/Header';
+import { Meta } from 'components/Meta';
+import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
+import { useColorScheme } from 'hooks/useColorScheme';
+import { useShowScrollIndicator } from 'hooks/useShowScrollIndicator';
 import { useRef } from 'react';
 import { SWRConfig } from 'swr';
 
 /**
  * We have props that dictate a fallback for SWRConfig, plus children
  */
-type Props<Key extends EndpointKey> = Pick<React.ComponentProps<'div'>, 'children'> & Page<Key>;
+type PageLayoutProps<Keys extends EndpointKey> = {
+  children: React.ReactNode;
+  pageUrl: string;
+
+  /**
+   * Provides SWR with fallback version/header/footer data
+   */
+  fallback: FetchedFallbackData<Keys>;
+};
 
 /**
  * Basic page layout for every page. Has a sticky, contained header above
  * the main (contained) content, with a (contained) footer below. No wrapper
  * around all items to save on divs. Ensures color scheme is applied.
  */
-function PageLayout<Key extends EndpointKey>({ children, fallback, pageUrl }: Props<Key>) {
+export function PageLayout<Key extends EndpointKey>({
+  children,
+  fallback,
+  pageUrl,
+}: PageLayoutProps<Key>) {
   const colorSchemeData = useColorScheme();
   const headerSizingRef = useRef<HTMLDivElement>(null);
   const { ref, isIndicatorShown } = useShowScrollIndicator(
@@ -42,5 +54,3 @@ function PageLayout<Key extends EndpointKey>({ children, fallback, pageUrl }: Pr
     </SWRConfig>
   );
 }
-
-export default PageLayout;

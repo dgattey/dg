@@ -5,7 +5,7 @@ import { css } from '@emotion/react';
 /**
  * Stacks content - has a few properities built in as props for convenience
  */
-const Stack = styled.div<{
+export const Stack = styled.div<{
   $isVertical?: boolean;
   $gap?: string;
   $alignItems?: CSSProperties['alignItems'];
@@ -31,5 +31,3 @@ const Stack = styled.div<{
     `}
   `,
 );
-
-export default Stack;

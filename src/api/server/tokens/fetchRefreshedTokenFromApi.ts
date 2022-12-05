@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import { RefreshTokenConfig } from 'api/types/RefreshTokenConfig';
-import type { RawSpotifyToken, RawStravaToken, TokenKey } from 'api/types/Token';
+import type { RawSpotifyToken, RawStravaToken } from 'api/types/RawToken';
 
 /**
  * We "expire" tokens 30 seconds early so we don't run into problems near the end
  * of the window. Probably unneeded but it's just math.
  */
-const GRACE_PERIOD_IN_MS = 30000;
+const GRACE_PERIOD_IN_MS = 30_000;
 
 /**
  * Given a number of seconds in which something will expire, this function
@@ -40,7 +40,7 @@ const STRAVA_REFRESH_TOKEN_CONFIG: RefreshTokenConfig = {
 /**
  * All the APIs we support for refreshing tokens
  */
-const REFRESH_TOKEN_CONFIGS: Record<TokenKey, RefreshTokenConfig> = {
+const REFRESH_TOKEN_CONFIGS: Record<string, RefreshTokenConfig> = {
   strava: STRAVA_REFRESH_TOKEN_CONFIG,
   stravaDev: STRAVA_REFRESH_TOKEN_CONFIG,
 
@@ -70,8 +70,13 @@ const REFRESH_TOKEN_CONFIGS: Record<TokenKey, RefreshTokenConfig> = {
 /**
  * When necessary, gets a new access token/refresh token from the API
  */
-const fetchRefreshedTokenFromApi = async (key: TokenKey, refreshToken: string) => {
-  const { endpoint, headers, data, validate } = REFRESH_TOKEN_CONFIGS[key];
+export const fetchRefreshedTokenFromApi = async (key: string, refreshToken: string) => {
+  const refreshTokenConfig = REFRESH_TOKEN_CONFIGS[key];
+  if (!refreshTokenConfig) {
+    throw new TypeError(`No refresh token config for ${key}`);
+  }
+
+  const { endpoint, headers, data, validate } = refreshTokenConfig;
 
   const rawData = await fetch<RawStravaToken | RawSpotifyToken>(endpoint, {
     method: 'POST',
@@ -93,5 +98,3 @@ const fetchRefreshedTokenFromApi = async (key: TokenKey, refreshToken: string) =
   // Validate we at least have some data and return it if so
   return validate(await rawData.json(), refreshToken);
 };
-
-export default fetchRefreshedTokenFromApi;

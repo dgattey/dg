@@ -1,7 +1,7 @@
-import handleApiError, { methodNotAllowedError } from 'api/handleApiError';
+import { handleApiError, methodNotAllowedError } from 'api/handleApiError';
 import { isRecord } from 'api/parsers';
-import echoStravaChallengeIfValid from 'api/server/strava/echoStravaChallengeIfValid';
-import syncStravaWebhookUpdateWithDb from 'api/server/strava/syncStravaWebhookUpdateWithDb';
+import { echoStravaChallengeIfValid } from 'api/server/strava/echoStravaChallengeIfValid';
+import { syncStravaWebhookUpdateWithDb } from 'api/server/strava/syncStravaWebhookUpdateWithDb';
 import type { StravaWebhookEvent } from 'api/types/StravaWebhookEvent';
 import type { NextApiRequest, NextApiResponse } from 'next';
 

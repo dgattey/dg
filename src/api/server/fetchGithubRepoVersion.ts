@@ -1,6 +1,6 @@
 import type { GithubRepoVersionQuery } from 'api/types/generated/fetchGithubRepoVersion.generated';
 import { gql } from 'graphql-request';
-import githubClient from './networkClients/githubClient';
+import { githubClient } from './networkClients/githubClient';
 
 const QUERY = gql`
   query GithubRepoVersion {
@@ -23,7 +23,7 @@ const QUERY = gql`
  * see which one matches. If any do, the first is returned. Won't be able
  * to run on client, but it'll gracefully fallback to the fallback.
  */
-const fetchGithubRepoVersion = async () => {
+export const fetchGithubRepoVersion = async () => {
   if (process.env.NEXT_PUBLIC_APP_VERSION && process.env.NEXT_PUBLIC_APP_VERSION.length) {
     // Quicker short circuit for when this value exists
     return process.env.NEXT_PUBLIC_APP_VERSION;
@@ -42,5 +42,3 @@ const fetchGithubRepoVersion = async () => {
   // If we have a release that matched, return it, otherwise a fallback
   return filteredReleases[0]?.name ?? 'vX.Y.Z';
 };
-
-export default fetchGithubRepoVersion;

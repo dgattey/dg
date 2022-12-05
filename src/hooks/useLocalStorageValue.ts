@@ -18,7 +18,7 @@ const getValue = <Value>(key: string, initialValue: Value) => {
 /**
  * Uses local storage to fetch/store a given value.
  */
-const useLocalStorageValue = <Value>(key: LocalStorageKey, initialValue: Value) => {
+export const useLocalStorageValue = <Value>(key: LocalStorageKey, initialValue: Value) => {
   const resolvedKey = `com.dg.${key}`;
   const [storedValue, setStoredValue] = useState<Value | null>(() =>
     getValue(resolvedKey, initialValue),
@@ -54,5 +54,3 @@ const useLocalStorageValue = <Value>(key: LocalStorageKey, initialValue: Value) 
 
   return [storedValue, setValue, deleteValue] as const;
 };
-
-export default useLocalStorageValue;

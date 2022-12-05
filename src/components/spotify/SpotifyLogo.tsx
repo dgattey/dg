@@ -1,11 +1,14 @@
 import type { Track } from 'api/types/spotify/Track';
-import FaIcon from 'components/FaIcon';
-import Link from 'components/Link';
-import useLinkWithName from 'hooks/useLinkWithName';
+import { FaIcon } from 'components/FaIcon';
+import { Link } from 'components/Link';
+import { useLinkWithName } from 'hooks/useLinkWithName';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import styled from '@emotion/styled';
 
-type Props = Track;
+type SpotifyLogoProps = {
+  name: string;
+  external_urls: Track['external_urls'];
+};
 
 const BigLogoLink = styled(Link)`
   line-height: 1;
@@ -16,7 +19,7 @@ const BigLogoLink = styled(Link)`
 /**
  * Creates an element that shows a Spotify logo + a link to a track
  */
-function Logo({ name, external_urls }: Props) {
+export function SpotifyLogo({ name, external_urls }: SpotifyLogoProps) {
   const link = useLinkWithName('Spotify', { title: name, url: external_urls.spotify });
   return link ? (
     <BigLogoLink {...link} isExternal>
@@ -24,5 +27,3 @@ function Logo({ name, external_urls }: Props) {
     </BigLogoLink>
   ) : null;
 }
-
-export default Logo;

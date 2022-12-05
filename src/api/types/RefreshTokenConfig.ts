@@ -1,4 +1,4 @@
-import { RawSpotifyToken, RawStravaToken } from './Token';
+import { RawSpotifyToken, RawStravaToken } from './RawToken';
 
 /**
  * Any API needs to return this type at the end

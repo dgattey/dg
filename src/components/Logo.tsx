@@ -3,9 +3,9 @@ import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import ScrollIndicatorContext from './ScrollIndicatorContext';
-import ScrollUpIndicator from './ScrollUpIndicator';
-import Stack from './Stack';
+import { ScrollIndicatorContext } from './ScrollIndicatorContext';
+import { ScrollUpIndicator } from './ScrollUpIndicator';
+import { Stack } from './Stack';
 
 /**
  * Aspect ratio'd 1:1 circle. Big, bold, and squished text for use as
@@ -75,7 +75,7 @@ const SpacedScrollIndicator = styled(ScrollUpIndicator)<{ $isScrolled: boolean }
  * Logo + scroll to top button, with certain changes that happen on
  * scroll.
  */
-function Logo() {
+export function Logo() {
   const router = useRouter();
   const isScrolled = useContext(ScrollIndicatorContext);
   const linkedLogoText = router.asPath === '/' ? 'dg.' : <Link href="/">dg.</Link>;
@@ -86,5 +86,3 @@ function Logo() {
     </Stack>
   );
 }
-
-export default Logo;

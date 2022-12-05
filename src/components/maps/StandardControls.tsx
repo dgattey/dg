@@ -1,7 +1,7 @@
 import { Minus, Plus } from 'lucide-react';
 import type { RefObject } from 'react';
 import type { MapRef } from 'react-map-gl';
-import Control from './Control';
+import { Control } from './Control';
 
 interface Props {
   /**
@@ -13,7 +13,7 @@ interface Props {
 /**
  * Creates controls that zoom in/out the map and collapse the map when it's expanded
  */
-function StandardControls({ mapRef }: Props) {
+export function StandardControls({ mapRef }: Props) {
   const zoom = (inward: boolean) => (event: React.MouseEvent<SVGElement, MouseEvent>) => {
     (inward ? mapRef.current?.zoomIn : mapRef.current?.zoomOut)?.();
     event.stopPropagation();
@@ -26,5 +26,3 @@ function StandardControls({ mapRef }: Props) {
     </Control>
   );
 }
-
-export default StandardControls;

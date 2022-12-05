@@ -10,7 +10,7 @@ import {
 } from 'sequelize-typescript';
 
 @Table({ modelName: 'StravaActivity' })
-export default class StravaActivity extends Model {
+export class StravaActivity extends Model {
   @PrimaryKey
   @Unique
   @Column(DataType.BIGINT)

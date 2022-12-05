@@ -1,11 +1,11 @@
 /* eslint-disable no-underscore-dangle */
 import type { Map } from 'mapbox-gl';
-import React, { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { useControl } from 'react-map-gl';
-import ControlContainer, { Props as ContainerProps } from './ControlContainer';
+import { ControlContainer, ControlContainerProps } from './ControlContainer';
 
-type Props = ContainerProps & {
+type ControlProps = ControlContainerProps & {
   /**
    * Which corner of the map the control appears within. Thanks to quirks of
    * the sizing of the map, no controls but `top-left` appear when the map is
@@ -40,12 +40,12 @@ class DGControl {
   /**
    * The container's props - private
    */
-  #containerProps: ContainerProps;
+  #containerProps: ControlContainerProps;
 
   /**
    * Saves the props for later
    */
-  constructor(props: ContainerProps) {
+  constructor(props: ControlContainerProps) {
     this.#containerProps = props;
     this.#root = null;
   }
@@ -66,7 +66,7 @@ class DGControl {
   /**
    * Renders the control container when the props change
    */
-  onPropsUpdate(newProps: ContainerProps) {
+  onPropsUpdate(newProps: ControlContainerProps) {
     this.#containerProps = newProps;
     if (!this._container || !this.#root) {
       return;
@@ -100,7 +100,7 @@ class DGControl {
  * Returns a no-op component that adds a control to the map in a given
  * position of the map (corners).
  */
-function Control({ position, ...props }: Props) {
+export function Control({ position, ...props }: ControlProps) {
   const control = useRef<DGControl | null>(null);
   const properProps = useMemo(
     () => ({
@@ -125,5 +125,3 @@ function Control({ position, ...props }: Props) {
   );
   return null;
 }
-
-export default Control;

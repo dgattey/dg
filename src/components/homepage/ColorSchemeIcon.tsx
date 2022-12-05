@@ -71,7 +71,7 @@ const IconWrapper = styled.span<{ $disabled: boolean }>`
  * Creates an icon that is clickable to update to a preferred color scheme
  * if we have one that's set already. Otherwise, renders a disabled icon.
  */
-function ColorSchemeIcon({ scheme, hasTheme, updatePreferredScheme }: Props) {
+export function ColorSchemeIcon({ scheme, hasTheme, updatePreferredScheme }: Props) {
   return (
     <IconWrapper
       $disabled={!hasTheme}
@@ -82,5 +82,3 @@ function ColorSchemeIcon({ scheme, hasTheme, updatePreferredScheme }: Props) {
     </IconWrapper>
   );
 }
-
-export default ColorSchemeIcon;

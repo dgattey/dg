@@ -1,5 +1,5 @@
 import type { Link as LinkProps } from 'api/types/generated/contentfulApi.generated';
-import FaIcon from 'components/FaIcon';
+import { FaIcon } from 'components/FaIcon';
 import { faGithubAlt } from '@fortawesome/free-brands-svg-icons/faGithubAlt';
 import { faInstagram } from '@fortawesome/free-brands-svg-icons/faInstagram';
 import { faLinkedinIn } from '@fortawesome/free-brands-svg-icons/faLinkedinIn';
@@ -8,7 +8,7 @@ import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons/faPaperPlane';
 import { faQuestion } from '@fortawesome/free-solid-svg-icons/faQuestion';
 import NextLink from 'next/link';
-import React from 'react';
+
 import styled from '@emotion/styled';
 
 /**
@@ -84,7 +84,15 @@ const tooltip = ({ title, layout }: SubProps) =>
  * or defaults to `icon` if one is specified, otherwise `text`. Returns
  * null if no link at all.
  */
-function Link({ title, url, icon, layout: rawLayout, className, children, isExternal }: Props) {
+export function Link({
+  title,
+  url,
+  icon,
+  layout: rawLayout,
+  className,
+  children,
+  isExternal,
+}: Props) {
   const layout = rawLayout ?? (icon && !children ? 'icon' : 'text');
   if (!url) {
     return null;
@@ -103,5 +111,3 @@ function Link({ title, url, icon, layout: rawLayout, className, children, isExte
     </NextLink>
   );
 }
-
-export default Link;

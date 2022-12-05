@@ -2,7 +2,7 @@ import { isDefinedItem } from 'api/parsers';
 import type { MyLocationQuery } from 'api/types/generated/fetchContentfulLocation.generated';
 import type { MapLocation } from 'api/types/MapLocation';
 import { gql } from 'graphql-request';
-import contentfulClient from './networkClients/contentfulClient';
+import { contentfulClient } from './networkClients/contentfulClient';
 
 /**
  * Grabs the home location using a known id for it
@@ -34,7 +34,7 @@ const QUERY = gql`
 /**
  * Fetches my current location from Contentful.
  */
-const fetchContentfulLocation = async (): Promise<MapLocation | null> => {
+export const fetchContentfulLocation = async (): Promise<MapLocation | null> => {
   const data = await contentfulClient.request<MyLocationQuery>(QUERY);
   const location = data?.contentTypeLocation;
   if (!location || !data?.lightImage?.url || !data?.darkImage?.url) {
@@ -55,5 +55,3 @@ const fetchContentfulLocation = async (): Promise<MapLocation | null> => {
     backupImageUrls: { light: data.lightImage.url, dark: data.darkImage.url },
   };
 };
-
-export default fetchContentfulLocation;

@@ -57,8 +57,6 @@ const Grid = styled.div`
  * Displays all our content in a grid - on the client it uses `animate-css-grid`
  * for nice animations when items change in size, which we do when expanding cards.
  */
-function ContentGrid({ children, gridRef }: Props) {
+export function ContentGrid({ children, gridRef }: Props) {
   return <Grid ref={gridRef}>{children}</Grid>;
 }
-
-export default ContentGrid;

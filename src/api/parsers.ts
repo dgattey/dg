@@ -1,5 +1,4 @@
 import type { Link, Project, TextBlock } from 'api/types/generated/contentfulApi.generated';
-import { TokenKey } from './types/Token';
 
 /**
  * Type guard to get a link out
@@ -41,12 +40,3 @@ export const findLinkWithName = (links: Array<Link> | undefined, name: string): 
  */
 export const isRecord = (input: unknown): input is Record<string, unknown> =>
   typeof input === 'object' && !!input && !Array.isArray(input);
-
-/**
- * Checks to see if a string is indeed a token key
- */
-export const isTokenKey = (key: string | undefined): key is TokenKey => {
-  const allKeys: Array<TokenKey> = ['spotify', 'strava', 'stravaDev'];
-  const untypedKeys: Array<string> = [...allKeys];
-  return !!key && untypedKeys.includes(key);
-};

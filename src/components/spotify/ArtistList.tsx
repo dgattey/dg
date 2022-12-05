@@ -1,10 +1,12 @@
-import type { Artist, Track } from 'api/types/spotify/Track';
-import Link from 'components/Link';
-import useLinkWithName from 'hooks/useLinkWithName';
-import React from 'react';
+import type { Artist } from 'api/types/spotify/Track';
+import { Link } from 'components/Link';
+import { useLinkWithName } from 'hooks/useLinkWithName';
 import styled from '@emotion/styled';
+import { Fragment } from 'react';
 
-type Props = Track;
+type ArtistListProps = {
+  artists: Array<Artist>;
+};
 
 interface SeparatorProps {
   index: number;
@@ -37,7 +39,7 @@ const separator = ({ index, fullList }: SeparatorProps) => {
  * for best usage with display elsewhere. Shows an underline
  * on hover.
  */
-function ArtistList({ artists }: Props) {
+export function ArtistList({ artists }: ArtistListProps) {
   const baseLink = useLinkWithName('Spotify');
   const artistLink = ({ name, external_urls }: Artist) => {
     if (!baseLink) {
@@ -54,7 +56,7 @@ function ArtistList({ artists }: Props) {
       {artists.map((artist, index) => {
         const link = artistLink(artist);
         return (
-          <React.Fragment key={artist.id}>
+          <Fragment key={artist.id}>
             {link ? (
               <PlainLink isExternal {...link}>
                 {artist.name}
@@ -63,11 +65,9 @@ function ArtistList({ artists }: Props) {
               artist.name
             )}
             <span>{separator({ index, fullList: artists })}</span>
-          </React.Fragment>
+          </Fragment>
         );
       })}
     </>
   );
 }
-
-export default ArtistList;

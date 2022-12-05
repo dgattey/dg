@@ -1,5 +1,5 @@
-import refreshedAccessToken from 'api/server/tokens/refreshedAccessToken';
-import type { TokenKey } from 'api/types/Token';
+import { refreshedAccessToken } from 'api/server/tokens/refreshedAccessToken';
+
 /**
  * Returns true if we're authed via status code
  */
@@ -10,11 +10,11 @@ const isAuthedStatus = <Type>({ status }: FetchResult<Type>) => !(status >= 400 
  * token if needed first to use for authentication.
  */
 const fetchWithAuth =
-  (baseApiEndpoint: string, tokenName: TokenKey) =>
+  (baseApiEndpoint: string, accessType: string) =>
   async <Type>(resource: string): Promise<FetchResult<Type | undefined>> => {
     // Actually fetches, forcing a refreshed key if necessary. Passes Bearer auth and requests JSON
     const runFetch = async (forceRefresh: boolean) => {
-      const accessToken = await refreshedAccessToken(tokenName, forceRefresh);
+      const accessToken = await refreshedAccessToken(accessType, forceRefresh);
       return fetch<Type>(`${baseApiEndpoint}/${resource}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
@@ -36,10 +36,8 @@ const fetchWithAuth =
 
 /**
  * Allows creation of an authed rest client via wrapping a base api endpoint and
- * the token name
+ * the access type name
  */
-const authenticatedRestClient = (baseApiEndpoint: string, tokenName: TokenKey) => ({
-  fetch: fetchWithAuth(baseApiEndpoint, tokenName),
+export const authenticatedRestClient = (baseApiEndpoint: string, accessType: string) => ({
+  fetch: fetchWithAuth(baseApiEndpoint, accessType),
 });
-
-export default authenticatedRestClient;

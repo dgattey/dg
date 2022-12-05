@@ -1,6 +1,6 @@
 import type { CurrentlyPlaying } from 'api/types/spotify/CurrentlyPlaying';
 import type { RecentlyPlayed } from 'api/types/spotify/RecentlyPlayed';
-import spotifyClient from './networkClients/spotifyClient';
+import { spotifyClient } from './networkClients/spotifyClient';
 
 const CURRENTLY_PLAYING_RESOURCE = 'me/player/currently-playing';
 const RECENTLY_PLAYED_RESOURCE = 'me/player/recently-played?limit=1';
@@ -10,7 +10,7 @@ const RECENTLY_PLAYED_RESOURCE = 'me/player/recently-played?limit=1';
  * May have no content, which signifies nothing is playing, which is returned
  * as `null`, or returns full JSON.
  */
-const fetchSpotifyCurrentlyPlaying = async () => {
+export const fetchSpotifyCurrentlyPlaying = async () => {
   const currentlyPlaying = await spotifyClient.fetch<CurrentlyPlaying>(CURRENTLY_PLAYING_RESOURCE);
 
   switch (currentlyPlaying.status) {
@@ -33,5 +33,3 @@ const fetchSpotifyCurrentlyPlaying = async () => {
       return null;
   }
 };
-
-export default fetchSpotifyCurrentlyPlaying;

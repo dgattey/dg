@@ -1,11 +1,11 @@
-import ColorSchemeContext from 'components/ColorSchemeContext';
-import ContentCard from 'components/ContentCard';
-import Stack from 'components/Stack';
+import { ColorSchemeContext } from 'components/ColorSchemeContext';
+import { ContentCard } from 'components/ContentCard';
+import { Stack } from 'components/Stack';
 import { ColorScheme } from 'hooks/useColorScheme';
 import { useContext } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import ColorSchemeIcon from './ColorSchemeIcon';
+import { ColorSchemeIcon } from './ColorSchemeIcon';
 
 // Stack items in center
 const Card = styled(ContentCard)`
@@ -92,7 +92,7 @@ const Button = styled.button<{ $visible: boolean }>`
  * system, light, and dark. Prerendered, `colorScheme` is `light`
  * and `isSystemScheme` is true.
  */
-function ColorSchemeToggleCard() {
+export function ColorSchemeToggleCard() {
   const {
     colorScheme,
     isSystemScheme,
@@ -138,5 +138,3 @@ function ColorSchemeToggleCard() {
     </Card>
   );
 }
-
-export default ColorSchemeToggleCard;

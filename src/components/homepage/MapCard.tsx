@@ -1,7 +1,7 @@
-import useData from 'api/useData';
-import ColorSchemeContext from 'components/ColorSchemeContext';
-import type { Props as ContentCardProps } from 'components/ContentCard';
-import ContentCard from 'components/ContentCard';
+import { useData } from 'api/useData';
+import { ColorSchemeContext } from 'components/ColorSchemeContext';
+import type { ContentCardProps } from 'components/ContentCard';
+import { ContentCard } from 'components/ContentCard';
 import { Maximize2, Minimize2 } from 'lucide-react';
 import dynamic from 'next/dynamic';
 import { useContext, useMemo, useState } from 'react';
@@ -20,9 +20,13 @@ const MIN_DIMENSION = 297;
 const EXPANDED_HEIGHT = 600;
 
 // Dynamically imported for loading speed
-const Map = dynamic(() => import('components/maps/Map'), { ssr: false });
-const Marker = dynamic(() => import('components/maps/Marker'), { ssr: false });
-const Control = dynamic(() => import('components/maps/Control'), { ssr: false });
+const Map = dynamic(() => import('components/maps/Map').then((m) => m.Map), { ssr: false });
+const Marker = dynamic(() => import('components/maps/Marker').then((m) => m.Marker), {
+  ssr: false,
+});
+const Control = dynamic(() => import('components/maps/Control').then((m) => m.Control), {
+  ssr: false,
+});
 
 // Changes between two min heights
 const Card = styled(ContentCard)<{ $backgroundImageUrl?: string } & IsExpanded>`

@@ -97,7 +97,7 @@ const graphMetaItems = (graph: Graph) =>
 /**
  * Populates the `<head>` of a given page from the title/description here
  */
-function Meta({ title, description, pageUrl }: Props) {
+export function Meta({ title, description, pageUrl }: Props) {
   const truncatedDescription =
     description && description.length > MAX_DESC_LENGTH
       ? `${description.slice(0, MAX_DESC_LENGTH)}...`
@@ -136,5 +136,3 @@ function Meta({ title, description, pageUrl }: Props) {
     </Head>
   );
 }
-
-export default Meta;

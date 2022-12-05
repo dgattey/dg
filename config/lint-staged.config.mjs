@@ -8,7 +8,7 @@ const lintTypes = 'tsc';
 
 const jobs = {
   // In main project files we type check, lint, lint styles, and format
-  '**/*.{ts,tsx,js,jsx}': (files) => {
+  '**/*.{js,ts,tsx}': (files) => {
     const match = micromatch.not(files, migrationsPath);
     const filteredFiles = match.join(' ');
     return [
@@ -22,7 +22,7 @@ const jobs = {
   [migrationsPath]: format,
 
   // In non js/ts files, just format
-  '*.{mdx,json,md,yml,css}': format,
+  '*.{js,ts,tsx,css,md,json,yml}': format,
 };
 
 export default jobs;

@@ -1,7 +1,7 @@
 import { isTextBlock } from 'api/parsers';
 import type { IntroBlockQuery } from 'api/types/generated/fetchContentfulIntroBlock.generated';
 import { gql } from 'graphql-request';
-import contentfulClient from './networkClients/contentfulClient';
+import { contentfulClient } from './networkClients/contentfulClient';
 
 /**
  * Grabs the contentful sections with the title of header. Should
@@ -59,7 +59,7 @@ const QUERY = gql`
  * Fetches the text block corresponding to the introduction rich text
  * for the home page.
  */
-const fetchContentfulIntroBlock = async () => {
+export const fetchContentfulIntroBlock = async () => {
   const data = await contentfulClient.request<IntroBlockQuery>(QUERY);
   const textBlock = data?.textBlockCollection?.items?.filter(isTextBlock)?.[0];
   const image = data?.asset;
@@ -68,5 +68,3 @@ const fetchContentfulIntroBlock = async () => {
   }
   return null;
 };
-
-export default fetchContentfulIntroBlock;

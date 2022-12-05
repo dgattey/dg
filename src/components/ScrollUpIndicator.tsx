@@ -2,10 +2,8 @@ import { ArrowUp } from 'lucide-react';
 import { useContext } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
-import ScrollIndicatorContext from './ScrollIndicatorContext';
-import Stack from './Stack';
-
-type Props = Pick<React.ComponentProps<'div'>, 'className'>;
+import { ScrollIndicatorContext } from './ScrollIndicatorContext';
+import { Stack } from './Stack';
 
 /**
  * Arrow up to show scrollability. Fades in, and is on own layer to
@@ -57,21 +55,13 @@ const Indicator = styled(Stack)<{ $isVisible: boolean }>`
  * Shows an indicator to scroll to the top of the page, meant to appear
  * floating over everything else
  */
-function ScrollUpIndicator({ className }: Props) {
+export function ScrollUpIndicator() {
   const isVisible = useContext(ScrollIndicatorContext);
   const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
   return (
-    <Indicator
-      className={className}
-      onClick={scrollToTop}
-      $isVisible={isVisible}
-      $gap="0.25rem"
-      $alignItems="center"
-    >
+    <Indicator onClick={scrollToTop} $isVisible={isVisible} $gap="0.25rem" $alignItems="center">
       To Top
       <ArrowUp size="1em" />
     </Indicator>
   );
 }
-
-export default ScrollUpIndicator;

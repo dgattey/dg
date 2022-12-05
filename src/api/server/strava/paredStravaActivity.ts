@@ -32,7 +32,7 @@ const UNTYPED_FIELDS: Array<string> = FIELDS;
  * return values from /api endpoints lean, we delete a bunch of fields
  * from the object when we process it.
  */
-const paredStravaActivity = (
+export const paredStravaActivity = (
   activity: (StravaDetailedActivity & Record<string, unknown>) | null | undefined,
 ) => {
   if (!activity) {
@@ -46,5 +46,3 @@ const paredStravaActivity = (
     });
   return filtered;
 };
-
-export default paredStravaActivity;
