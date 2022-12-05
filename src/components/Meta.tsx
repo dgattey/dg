@@ -1,4 +1,6 @@
 import Head from 'next/head';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
 
 interface Props {
   /**
@@ -10,11 +12,6 @@ interface Props {
    * Description shown to Google/others
    */
   description?: string;
-
-  /**
-   * Current page URL, from serverside props
-   */
-  pageUrl: string;
 }
 
 /**
@@ -97,7 +94,16 @@ const graphMetaItems = (graph: Graph) =>
 /**
  * Populates the `<head>` of a given page from the title/description here
  */
-export function Meta({ title, description, pageUrl }: Props) {
+export function Meta({ title, description }: Props) {
+  const router = useRouter();
+  const [pageUrl, setPageUrl] = useState('');
+
+  useEffect(() => {
+    const { host } = window.location;
+    const baseUrl = `https://${host}`;
+    setPageUrl(`${baseUrl}${router.pathname}`);
+  }, [router.pathname]);
+
   const truncatedDescription =
     description && description.length > MAX_DESC_LENGTH
       ? `${description.slice(0, MAX_DESC_LENGTH)}...`

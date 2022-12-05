@@ -13,11 +13,17 @@ export const fetchFallbackData = async <Key extends EndpointKey>(keys: Array<Key
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const results = {} as { [ResultKey in Key]: AwaitedType<ResultKey> };
   const promisedData = await Promise.all(keys.map((key) => endpoints[key]()));
-  return promisedData.reduce((resolvedPromises, value, index) => {
+  const fallback = promisedData.reduce((resolvedPromises, value, index) => {
     const key = keys[index];
     if (!key) {
       throw new TypeError('Missing key');
     }
     return { ...resolvedPromises, [key]: value };
   }, results);
+
+  return {
+    props: {
+      fallback,
+    },
+  };
 };

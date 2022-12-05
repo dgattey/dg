@@ -18,11 +18,6 @@ export type ErrorPageProps = HasStatusCode & {
    * Provides SWR with fallback version data
    */
   fallback: FetchedFallbackData<'version' | 'footer'>;
-
-  /**
-   * Current page url
-   */
-  pageUrl: string;
 };
 
 export type ErrorWithCode = Error & HasStatusCode;
@@ -41,12 +36,11 @@ export const getStaticProps = async (context: NextPageContext) => {
   const { res, err, asPath } = context;
   const errorCode = err?.statusCode ?? 404;
   const statusCode = res ? res.statusCode : errorCode;
-  const data = await fetchFallbackData(['version', 'footer']);
+  const { props: fallbackProps } = await fetchFallbackData(['version', 'footer']);
   const props: ErrorPageProps = {
+    ...fallbackProps,
     ...errorProps,
     statusCode,
-    pageUrl: '',
-    fallback: data,
   };
 
   // No logging here
@@ -96,9 +90,9 @@ export function Contents({ statusCode }: HasStatusCode) {
 /**
  * Generic error page, for 404s//500s/etc
  */
-function ErrorPage({ statusCode, fallback, pageUrl }: ErrorPageProps) {
+function ErrorPage({ statusCode, fallback }: ErrorPageProps) {
   return (
-    <ErrorLayout pageUrl={pageUrl} fallback={fallback} statusCode={statusCode ?? 500}>
+    <ErrorLayout fallback={fallback} statusCode={statusCode ?? 500}>
       <Contents statusCode={statusCode} />
     </ErrorLayout>
   );

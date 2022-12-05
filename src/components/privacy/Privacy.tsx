@@ -3,10 +3,6 @@ import { Meta } from 'components/Meta';
 import { RichText } from 'components/RichText';
 import styled from '@emotion/styled';
 
-type PrivacyProps = {
-  pageUrl: string;
-};
-
 const SingleColumn = styled(RichText)`
   max-width: 35em;
   margin-left: auto;
@@ -16,7 +12,7 @@ const SingleColumn = styled(RichText)`
 /**
  * Shows the privacy policy on a page alone
  */
-export function Privacy({ pageUrl }: PrivacyProps) {
+export function Privacy() {
   const { data: privacyTextBlock } = useData('privacy');
   if (!privacyTextBlock?.content) {
     return null;
@@ -30,7 +26,7 @@ export function Privacy({ pageUrl }: PrivacyProps) {
 
   return (
     <>
-      <Meta pageUrl={pageUrl} title="Privacy Policy" description={privacyDescription} />
+      <Meta title="Privacy Policy" description={privacyDescription} />
       <SingleColumn {...privacyTextBlock.content} />
     </>
   );

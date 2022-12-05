@@ -15,7 +15,7 @@ import { StravaCard } from './StravaCard';
  * interspersed with `introBlock` data, and dark/light mode
  * toggle.
  */
-export function Homepage({ pageUrl }: { pageUrl: string }) {
+export function Homepage() {
   const { data: projects } = useData('projects');
   const { data: introBlock } = useData('intro');
 
@@ -47,7 +47,7 @@ export function Homepage({ pageUrl }: { pageUrl: string }) {
 
   return (
     <>
-      <Meta pageUrl={pageUrl} title="Engineer. Problem Solver." description={firstParagraph} />
+      <Meta title="Engineer. Problem Solver." description={firstParagraph} />
       <ContentGrid gridRef={gridRef}>
         {otherCards.map(({ index, card }, arrayIndex) => {
           const nextItem = otherCards[arrayIndex + 1];

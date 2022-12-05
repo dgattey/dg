@@ -9,7 +9,6 @@ type MapPreviewCardProps = Pick<ContentCardProps, 'turnOnAnimation'>;
 
 // Only render when you want to start importing this giant component
 const FullMapCard = dynamic(() => import('components/maps/FullMapCard'), {
-  ssr: false,
   suspense: true,
 });
 
