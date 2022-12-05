@@ -12,7 +12,15 @@ const fetchData = async <Key extends EndpointKey>(key: Key): Promise<EndpointTyp
 
 /**
  * For client use only! Exposes a useSWR hook for fetching data
- * from one endpoint key that maps to an /api endpoint.
+ * from one endpoint key that maps to an /api endpoint. Only
+ * revalidates and refetches if the key starts with `latest`.
+ * So other keys like `version` will only be fetched once on build.
  */
-export const useData = <Key extends EndpointKey>(key: Key) =>
-  useSWR<AwaitedType<Key>, Error>(key, fetchData);
+export const useData = <Key extends EndpointKey>(key: Key) => {
+  const isImmutable = !key.startsWith('latest');
+  return useSWR<AwaitedType<Key>, Error>(key, fetchData, {
+    revalidateIfStale: !isImmutable,
+    revalidateOnFocus: !isImmutable,
+    revalidateOnReconnect: !isImmutable,
+  });
+};
