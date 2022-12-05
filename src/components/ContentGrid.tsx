@@ -1,4 +1,3 @@
-import React from 'react';
 import styled from '@emotion/styled';
 
 type Props = Pick<React.ComponentProps<'div'>, 'children'> & {
@@ -15,20 +14,10 @@ const CONTENT_GRID_DIMENSION = 16.5;
 const CONTENT_GRID_GAP = 3.5;
 
 /**
- * Creates a card size in raw rem value from a span
- */
-const cardSizeRaw = (span = 1) => CONTENT_GRID_DIMENSION * span + (span - 1) * CONTENT_GRID_GAP;
-
-/**
- * Creates a card size in px from a span - uses base font size to calculate, but
- * it's not responsive!
- */
-export const cardSizeInPx = (span = 1) => cardSizeRaw(span) * 20;
-
-/**
  * Creates a card size in rem from a span
  */
-export const cardSize = (span = 1) => `${cardSizeRaw(span)}rem`;
+export const cardSize = (span = 1) =>
+  `${CONTENT_GRID_DIMENSION * span + (span - 1) * CONTENT_GRID_GAP}rem`;
 
 /**
  * Auto fits densely to properly fill in all gaps at every size. Use

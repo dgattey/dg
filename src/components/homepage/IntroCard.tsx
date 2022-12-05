@@ -1,6 +1,5 @@
 import { useData } from 'api/useData';
 import { ContentCard } from 'components/ContentCard';
-import { cardSizeInPx } from 'components/ContentGrid';
 import { HoverableContainer } from 'components/HoverableContainer';
 import { Image } from 'components/Image';
 import { RichText } from 'components/RichText';
@@ -64,8 +63,6 @@ export function IntroCard() {
           <Image
             {...introBlock.image}
             alt={introBlock.image.title ?? 'Introduction image'}
-            width={cardSizeInPx()}
-            height={cardSizeInPx()}
             priority
           />
         </HoverableContainer>
