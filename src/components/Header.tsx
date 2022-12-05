@@ -3,8 +3,8 @@ import { ScrollUpIndicator } from 'components/ScrollUpIndicator';
 import { useContext } from 'react';
 import { SxProps, Theme, Box } from '@mui/material';
 import { Section } from 'ui/Section';
+import { Nav, NavGroup, NavItem } from 'ui/Nav';
 import { Logo } from './Logo';
-import { Container } from '../ui/Container';
 
 interface Props {
   /**
@@ -21,39 +21,6 @@ const stickyContainerSx: SxProps<Theme> = {
   zIndex: 1,
   maxWidth: 'unset',
 };
-
-function Group({ children }: { children: React.ReactNode }) {
-  return (
-    <Box
-      component="ul"
-      sx={{
-        display: 'flex',
-        alignItems: 'center',
-        margin: 0,
-        padding: 0,
-        listStyle: 'none',
-      }}
-    >
-      {children}
-    </Box>
-  );
-}
-
-function Item({ children }: { children: React.ReactNode }) {
-  return (
-    <Box
-      component="li"
-      sx={{
-        display: 'inline-block',
-        margin: 0,
-        paddingY: 2,
-        paddingX: 1,
-      }}
-    >
-      {children}
-    </Box>
-  );
-}
 
 /**
  * Creates the site header component. It's a bar that spans across the
@@ -74,22 +41,16 @@ export function Header({ headerRef }: Props) {
             willChange: 'box-shadow, background-color',
           })}
         >
-          <Container
-            component="nav"
-            sx={{
-              justifyContent: 'space-between',
-              display: 'flex',
-            }}
-          >
-            <Group>
-              <Item>
+          <Nav>
+            <NavGroup>
+              <NavItem>
                 <Logo />
-              </Item>
-              <Item>
+              </NavItem>
+              <NavItem>
                 <ScrollUpIndicator />
-              </Item>
-            </Group>
-          </Container>
+              </NavItem>
+            </NavGroup>
+          </Nav>
         </Box>
       </header>
     </Section>

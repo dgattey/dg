@@ -1,3 +1,4 @@
+/* eslint-disable react/no-danger */
 import type { Link as LinkType } from 'api/types/generated/contentfulApi.generated';
 import { FaIcon } from 'components/FaIcon';
 import { faGithubAlt } from '@fortawesome/free-brands-svg-icons/faGithubAlt';
@@ -9,7 +10,7 @@ import { faPaperPlane } from '@fortawesome/free-solid-svg-icons/faPaperPlane';
 import { faQuestion } from '@fortawesome/free-solid-svg-icons/faQuestion';
 import NextLink from 'next/link';
 
-import styled from '@emotion/styled';
+import { Box, SxProps, Theme } from '@mui/material';
 
 /**
  * Renders as a certain type of layout.
@@ -33,6 +34,8 @@ type LinkProps = Pick<LinkType, 'title' | 'url' | 'icon'> &
      * rel="noreferrer"
      */
     isExternal?: boolean;
+
+    sx?: SxProps<Theme>;
   };
 
 // Used a few times, required layout
@@ -51,14 +54,6 @@ const BUILT_IN_ICONS: Record<string, JSX.Element> = {
   email: <FaIcon icon={faPaperPlane} />,
 };
 
-// Used for setting internal HTML for a non-built in icon
-const NonBuiltInIcon = styled.span``;
-
-// When we render the title with an icon, we need some spacing
-const WithIconTitle = styled.span`
-  margin-left: 0.25rem;
-`;
-
 /**
  * If there's an icon, returns it, either built in or not, along with its title if
  * the layout calls for it.
@@ -66,8 +61,12 @@ const WithIconTitle = styled.span`
 const createIconElement = ({ icon, title, layout }: SubProps) =>
   icon && !['empty', 'text'].includes(layout) ? (
     <>
-      {BUILT_IN_ICONS[icon] ?? <NonBuiltInIcon dangerouslySetInnerHTML={{ __html: icon }} />}
-      {layout === 'plainIconAndText' && <WithIconTitle>{title}</WithIconTitle>}
+      {BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />}
+      {layout === 'plainIconAndText' && (
+        <Box component="span" sx={{ marginLeft: 0.25 }}>
+          {title}
+        </Box>
+      )}
     </>
   ) : null;
 
@@ -92,6 +91,7 @@ export function Link({
   className,
   children,
   isExternal,
+  sx,
   ...props
 }: LinkProps & Omit<React.ComponentProps<typeof NextLink>, 'href'>) {
   const layout = rawLayout ?? (icon && !children ? 'icon' : 'text');
@@ -102,14 +102,16 @@ export function Link({
   // If there's a custom or built in icon, create a link around it
   const iconElement = createIconElement({ title, icon, layout });
   return (
-    <NextLink
+    <Box
+      component={NextLink}
       {...props}
       href={url}
       className={className}
       data-tooltip={tooltip({ title, icon, layout })}
       {...(isExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
+      sx={sx}
     >
       {layout === 'empty' ? null : children ?? iconElement ?? title}
-    </NextLink>
+    </Box>
   );
 }

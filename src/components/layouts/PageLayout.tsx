@@ -7,6 +7,8 @@ import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
 import { useShowScrollIndicator } from 'hooks/useShowScrollIndicator';
 import { useRef } from 'react';
 import { SWRConfig } from 'swr';
+import { Section } from '../../ui/Section';
+import { containerSx } from '../../ui/Container';
 
 /**
  * We have props that dictate a fallback for SWRConfig, plus children
@@ -35,10 +37,10 @@ export function PageLayout<Key extends EndpointKey>({ children, fallback }: Page
       <Meta />
       <ScrollIndicatorContext.Provider value={isIndicatorShown}>
         <Header headerRef={headerSizingRef} />
-        <section className="container">
+        <Section sx={containerSx}>
           <div ref={ref} style={{ height: 0, width: 0 }} />
           <main>{children}</main>
-        </section>
+        </Section>
         <Footer />
       </ScrollIndicatorContext.Provider>
     </SWRConfig>
