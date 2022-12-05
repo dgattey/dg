@@ -1,9 +1,9 @@
-import { ThemeProvider } from '@emotion/react';
 import CssBaseline from '@mui/material/CssBaseline';
 import { ColorSchemeContext } from 'components/ColorSchemeContext';
 import { useColorScheme } from 'hooks/useColorScheme';
 import { useMemo } from 'react';
 import { getTheme } from 'ui/theme';
+import { ThemeProvider } from '@mui/material';
 
 /**
  * Applies theming + reset + other global styles to the full app

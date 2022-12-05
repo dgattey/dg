@@ -1,10 +1,10 @@
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
 import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
 import { ScrollUpIndicator } from 'components/ScrollUpIndicator';
 import { useContext } from 'react';
 import { SxProps, Theme, Box } from '@mui/material';
+import { Section } from 'ui/Section';
 import { Logo } from './Logo';
+import { Container } from '../ui/Container';
 
 interface Props {
   /**
@@ -22,14 +22,38 @@ const stickyContainerSx: SxProps<Theme> = {
   maxWidth: 'unset',
 };
 
-const Background = styled.div<{ isScrolled: boolean }>(
-  ({ isScrolled }) => css`
-    background-color: ${isScrolled ? 'var(--header-background-color)' : 'var(--background-color)'};
-    box-shadow: ${isScrolled ? 'var(--card-hovered-box-shadow)' : 'none'};
-    transition: background-color var(--transition), box-shadow var(--transition);
-    will-change: box-shadow, background-color;
-  `,
-);
+function Group({ children }: { children: React.ReactNode }) {
+  return (
+    <Box
+      component="ul"
+      sx={{
+        display: 'flex',
+        alignItems: 'center',
+        margin: 0,
+        padding: 0,
+        listStyle: 'none',
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
+
+function Item({ children }: { children: React.ReactNode }) {
+  return (
+    <Box
+      component="li"
+      sx={{
+        display: 'inline-block',
+        margin: 0,
+        paddingY: 2,
+        paddingX: 1,
+      }}
+    >
+      {children}
+    </Box>
+  );
+}
 
 /**
  * Creates the site header component. It's a bar that spans across the
@@ -38,21 +62,36 @@ const Background = styled.div<{ isScrolled: boolean }>(
 export function Header({ headerRef }: Props) {
   const isScrolled = useContext(ScrollIndicatorContext);
   return (
-    <Box sx={stickyContainerSx}>
+    <Section sx={stickyContainerSx}>
       <header ref={headerRef}>
-        <Background isScrolled={isScrolled}>
-          <nav className="container">
-            <ul>
-              <li>
+        <Box
+          sx={(theme) => ({
+            backgroundColor: isScrolled
+              ? theme.palette.background.paper
+              : theme.palette.background.default,
+            boxShadow: isScrolled ? theme.shadows[2] : 'none',
+            transition: theme.transitions.create(['background-color', 'box-shadow']),
+            willChange: 'box-shadow, background-color',
+          })}
+        >
+          <Container
+            component="nav"
+            sx={{
+              justifyContent: 'space-between',
+              display: 'flex',
+            }}
+          >
+            <Group>
+              <Item>
                 <Logo />
-              </li>
-              <li>
+              </Item>
+              <Item>
                 <ScrollUpIndicator />
-              </li>
-            </ul>
-          </nav>
-        </Background>
+              </Item>
+            </Group>
+          </Container>
+        </Box>
       </header>
-    </Box>
+    </Section>
   );
 }
