@@ -15,7 +15,6 @@ import { SWRConfig } from 'swr';
  */
 type PageLayoutProps<Keys extends EndpointKey> = {
   children: React.ReactNode;
-  pageUrl: string;
 
   /**
    * Provides SWR with fallback version/header/footer data
@@ -28,11 +27,7 @@ type PageLayoutProps<Keys extends EndpointKey> = {
  * the main (contained) content, with a (contained) footer below. No wrapper
  * around all items to save on divs. Ensures color scheme is applied.
  */
-export function PageLayout<Key extends EndpointKey>({
-  children,
-  fallback,
-  pageUrl,
-}: PageLayoutProps<Key>) {
+export function PageLayout<Key extends EndpointKey>({ children, fallback }: PageLayoutProps<Key>) {
   const colorSchemeData = useColorScheme();
   const headerSizingRef = useRef<HTMLDivElement>(null);
   const { ref, isIndicatorShown } = useShowScrollIndicator(
@@ -40,7 +35,7 @@ export function PageLayout<Key extends EndpointKey>({
   );
   return (
     <SWRConfig value={{ fallback }}>
-      <Meta pageUrl={pageUrl} />
+      <Meta />
       <ColorSchemeContext.Provider value={colorSchemeData}>
         <ScrollIndicatorContext.Provider value={isIndicatorShown}>
           <Header headerRef={headerSizingRef} />

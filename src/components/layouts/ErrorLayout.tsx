@@ -7,7 +7,6 @@ import { PageLayout } from './PageLayout';
 
 type ErrorLayoutProps<Keys extends EndpointKey> = {
   children: React.ReactNode;
-  pageUrl: string;
 
   /**
    * Provides SWR with fallback version/header/footer data
@@ -33,12 +32,11 @@ export function ErrorLayout<Keys extends EndpointKey>({
   children,
   fallback,
   statusCode,
-  pageUrl,
 }: ErrorLayoutProps<Keys>) {
   const pageTitle = statusCode === 404 ? 'Oops! Page not found' : `Error code ${statusCode}`;
   return (
-    <PageLayout fallback={fallback} pageUrl={pageUrl}>
-      <Meta pageUrl={pageUrl} title={pageTitle} description="An error occurred" />
+    <PageLayout fallback={fallback}>
+      <Meta title={pageTitle} description="An error occurred" />
       <Container>
         {children}
         <NextLink href="/" role="button">
