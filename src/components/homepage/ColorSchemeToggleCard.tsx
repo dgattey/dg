@@ -35,7 +35,7 @@ const SWITCH_COLOR_SCHEME_CSS: Record<ColorSchemeMode | 'unknown', string> = {
   dark: '--navy',
 };
 
-// Combo of CSS + color scheme mode to set two separate states, using a lot of Pico CSS switch variables
+// Combo of CSS + $colorScheme to set two separate states
 const ColorSchemeSwitch = styled.input<{ $colorSchemeMode: ColorSchemeMode | null }>(
   ({ $colorSchemeMode }) => css`
     --switch-background-color: var(${SWITCH_COLOR_SCHEME_CSS[$colorSchemeMode ?? 'unknown']});

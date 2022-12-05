@@ -3,6 +3,7 @@ import styled from '@emotion/styled';
 import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
 import { ScrollUpIndicator } from 'components/ScrollUpIndicator';
 import { useContext } from 'react';
+import { SxProps, Theme, Box } from '@mui/material';
 import { Logo } from './Logo';
 
 interface Props {
@@ -14,12 +15,12 @@ interface Props {
 }
 
 // Makes the header bar sticky and not responsive to user events by default
-const StickyContainer = styled.section`
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  max-width: unset;
-`;
+const stickyContainerSx: SxProps<Theme> = {
+  position: 'sticky',
+  top: 0,
+  zIndex: 1,
+  maxWidth: 'unset',
+};
 
 const Background = styled.div<{ isScrolled: boolean }>(
   ({ isScrolled }) => css`
@@ -37,7 +38,7 @@ const Background = styled.div<{ isScrolled: boolean }>(
 export function Header({ headerRef }: Props) {
   const isScrolled = useContext(ScrollIndicatorContext);
   return (
-    <StickyContainer>
+    <Box sx={stickyContainerSx}>
       <header ref={headerRef}>
         <Background isScrolled={isScrolled}>
           <nav className="container">
@@ -52,6 +53,6 @@ export function Header({ headerRef }: Props) {
           </nav>
         </Background>
       </header>
-    </StickyContainer>
+    </Box>
   );
 }
