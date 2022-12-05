@@ -1,9 +1,9 @@
-import { fetchGithubRepoVersion } from './server/fetchGithubRepoVersion';
 import { fetchContentfulFooterLinks } from './server/fetchContentfulFooterLinks';
 import { fetchContentfulIntroBlock } from './server/fetchContentfulIntroBlock';
 import { fetchContentfulLocation } from './server/fetchContentfulLocation';
 import { fetchContentfulPrivacyBlock } from './server/fetchContentfulPrivacyBlock';
 import { fetchContentfulProjects } from './server/fetchContentfulProjects';
+import { fetchGithubRepoVersion } from './server/fetchGithubRepoVersion';
 import { fetchSpotifyCurrentlyPlaying } from './server/fetchSpotifyCurrentlyOrRecentlyPlayed';
 import { fetchLatestStravaActivityFromDb } from './server/strava/fetchLatestStravaActivityFromDb';
 

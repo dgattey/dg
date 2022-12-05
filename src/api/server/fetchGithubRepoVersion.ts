@@ -2,10 +2,14 @@ import type { GithubRepoVersionQuery } from 'api/types/generated/fetchGithubRepo
 import { gql } from 'graphql-request';
 import { githubClient } from './networkClients/githubClient';
 
+/**
+ * This, strictly speaking, is usually overkill. We fetch the 100 most recently
+ * created releases from Github for use in later parsing to a version tag.
+ */
 const QUERY = gql`
   query GithubRepoVersion {
     repository(name: "dg", owner: "dgattey") {
-      releases(first: 10, orderBy: { field: CREATED_AT, direction: DESC }) {
+      releases(first: 100, orderBy: { field: CREATED_AT, direction: DESC }) {
         nodes {
           name
           tagCommit {
@@ -18,27 +22,30 @@ const QUERY = gql`
 `;
 
 /**
- * Grabs the last 100 versions from Github, and our HEAD commit SHA from
- * the filesystem. Compare the releases' `oid`s to the current HEAD to
- * see which one matches. If any do, the first is returned. Won't be able
- * to run on client, but it'll gracefully fallback to the fallback.
+ * If `NEXT_PUBLIC_APP_VERSION` is defined, we use it as our version string.
+ * Otherwise, looks for a release whose git `oid` matches build-time-defined
+ * `VERCEL_GIT_COMMIT_SHA`. Falls back to the commit SHA itself if no release
+ * is found.
+ *
+ * On Vercel, `VERCEL_GIT_COMMIT_SHA` is defined always, and `NEXT_PUBLIC_APP_VERSION`
+ * is defined from our `release.yml` script, so we should only see commit SHA before
+ * our release workflow runs (~2 min after a commit is pushed to `main`).
+ *
+ * Locally, we inject `VERCEL_GIT_COMMIT_SHA` via `pnpm dev` so it should work to
+ * help us find the release when running locally. A production build locally won't
+ * have either of these defined, so we'll just return `null`.
  */
 export const fetchGithubRepoVersion = async () => {
-  if (process.env.NEXT_PUBLIC_APP_VERSION && process.env.NEXT_PUBLIC_APP_VERSION.length) {
-    // Quicker short circuit for when this value exists
-    return process.env.NEXT_PUBLIC_APP_VERSION;
+  const version = process.env.NEXT_PUBLIC_APP_VERSION;
+  if (version?.length) {
+    return version;
   }
 
-  const commitSha = process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA;
-  if (!commitSha && !process.env.NODE_ENV) {
-    // Fallback for browser only
-    return undefined;
-  }
-
+  // Looks for a release that matches build-time `VERCEL_GIT_COMMIT_SHA` and compares it to each release's commit SHA
+  const commitSha = process.env.VERCEL_GIT_COMMIT_SHA;
   const data = await githubClient.request<GithubRepoVersionQuery>(QUERY);
   const releases = data?.repository?.releases?.nodes;
   const filteredReleases =
     releases?.filter((release) => release?.tagCommit?.oid === commitSha?.trim()) ?? [];
-  // If we have a release that matched, return it, otherwise a fallback
-  return filteredReleases[0]?.name ?? 'vX.Y.Z';
+  return filteredReleases[0]?.name ?? commitSha?.slice(-12) ?? null;
 };

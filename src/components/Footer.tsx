@@ -16,6 +16,10 @@ const FlexList = styled.ul`
   flex-wrap: wrap;
 `;
 
+const NoSpaceItem = styled.li`
+  padding: 0;
+`;
+
 /**
  * Creates the site footer component - shows version data + copyright
  */
@@ -33,6 +37,7 @@ export function Footer() {
         <Navigation>
           <FlexList>
             <li>© {new Date().getFullYear()} Dylan Gattey</li>
+            <NoSpaceItem>•</NoSpaceItem>
             <li>{version}</li>
           </FlexList>
           <FlexList>{listedLinkElements}</FlexList>

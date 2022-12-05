@@ -21,7 +21,6 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 - `pnpm webhooks:create <name>` will create a webhook subscription for the given API - for local dev and requires `webhooks:local` to be running already
 - `pnpm webhooks:list <name>` will list that API's webhook subscriptions - for local dev
 - `pnpm webhooks:delete <name> <id>` will delete a webhook subscription for that API - for local dev
-- `pnpm version:fetch` fetches releases from Github and resolves `NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA` to a version! Useful from command line
 - `pnpm release` bumps the site version, run via Github Action
 
 ## :beginner: Initial Setup
