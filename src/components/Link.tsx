@@ -1,4 +1,4 @@
-import type { Link as LinkProps } from 'api/types/generated/contentfulApi.generated';
+import type { Link as LinkType } from 'api/types/generated/contentfulApi.generated';
 import { FaIcon } from 'components/FaIcon';
 import { faGithubAlt } from '@fortawesome/free-brands-svg-icons/faGithubAlt';
 import { faInstagram } from '@fortawesome/free-brands-svg-icons/faInstagram';
@@ -21,7 +21,7 @@ import styled from '@emotion/styled';
  */
 type Layout = 'text' | 'icon' | 'plainIcon' | 'plainIconAndText' | 'empty';
 
-type Props = Pick<LinkProps, 'title' | 'url' | 'icon'> &
+type LinkProps = Pick<LinkType, 'title' | 'url' | 'icon'> &
   Pick<React.ComponentProps<'div'>, 'className' | 'children'> & {
     /**
      * Defaults to `text` when there's no icon, or `icon` when one is specified
@@ -36,7 +36,7 @@ type Props = Pick<LinkProps, 'title' | 'url' | 'icon'> &
   };
 
 // Used a few times, required layout
-type SubProps = Pick<Props, 'title' | 'icon'> & { layout: Layout };
+type SubProps = Pick<LinkProps, 'title' | 'icon'> & { layout: Layout };
 
 /**
  * All built in mappings for icon name to element
@@ -92,7 +92,8 @@ export function Link({
   className,
   children,
   isExternal,
-}: Props) {
+  ...props
+}: LinkProps & Omit<React.ComponentProps<typeof NextLink>, 'href'>) {
   const layout = rawLayout ?? (icon && !children ? 'icon' : 'text');
   if (!url) {
     return null;
@@ -102,6 +103,7 @@ export function Link({
   const iconElement = createIconElement({ title, icon, layout });
   return (
     <NextLink
+      {...props}
       href={url}
       className={className}
       data-tooltip={tooltip({ title, icon, layout })}

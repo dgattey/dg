@@ -109,6 +109,7 @@ export function ColorSchemeToggleCard() {
             checked={colorScheme.isInitialized && colorScheme.mode === 'dark'}
             role="switch"
             type="checkbox"
+            aria-label="Change color scheme mode"
           />
           <ColorSchemeIcon mode="dark" />
         </ContentStack>
