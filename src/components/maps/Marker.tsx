@@ -2,10 +2,11 @@ import type { MapLocation } from 'api/types/MapLocation';
 import { Image } from 'components/Image';
 import { Marker as MapMarker } from 'react-map-gl';
 import styled from '@emotion/styled';
+import { MAP_MARKER_IMAGE_SIZE } from 'constants/imageSizes';
 
 const DIMENSION = 100;
 const RADIUS = DIMENSION / 2;
-const IMAGE_DIMENSION = DIMENSION * 0.85;
+const IMAGE_DIMENSION = MAP_MARKER_IMAGE_SIZE;
 
 // Required point, optional image
 type MarkerProps = Pick<MapLocation, 'point'> & Partial<Pick<MapLocation, 'image'>>;
@@ -51,6 +52,10 @@ export function Marker({ point, image }: MarkerProps) {
             height={IMAGE_DIMENSION}
             url={image.url}
             alt={`${point?.latitude} ${point?.longitude}`}
+            sizes={{
+              // Constant size, no need to resize
+              extraLarge: IMAGE_DIMENSION,
+            }}
           />
         </ImageContainer>
       )}

@@ -6,10 +6,10 @@ import styled from '@emotion/styled';
 
 type Props = Track;
 
-// In px, the image size we want from the API. See the types for options
-const API_IMAGE_SIZE = 300;
+// In px, the max image size we want from the API. We should have this be as big as it supports, as Next can resize down.
+const API_IMAGE_SIZE = 640;
 
-// In px, how big our rendered image is at maximum
+// In px, how big our rendered image is. Next resizes the API image to this constant size.
 const IMAGE_SIZE = 150;
 
 // Slightly un-rounds the corners + makes sure it's the right size
@@ -40,7 +40,13 @@ export function AlbumImage({ name, album }: Props) {
   const albumImage = album.images.find((image) => image?.width === API_IMAGE_SIZE);
   const imageComponent = albumImage ? (
     <ImageContainer>
-      <Image alt={name} {...albumImage} width={IMAGE_SIZE} height={IMAGE_SIZE} />
+      <Image
+        alt={name}
+        {...albumImage}
+        width={IMAGE_SIZE}
+        height={IMAGE_SIZE}
+        sizes={{ extraLarge: 150 }}
+      />
     </ImageContainer>
   ) : null;
 

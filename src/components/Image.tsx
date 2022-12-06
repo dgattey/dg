@@ -1,38 +1,91 @@
 import type { Asset } from 'api/types/generated/contentfulApi.generated';
-import NextImage, { ImageProps } from 'next/image';
+import { BREAKPOINT_MAX_SIZES } from 'constants/imageSizes';
+import NextImage from 'next/image';
 
-type Props = Pick<React.ComponentProps<'img'>, 'className'> &
-  Partial<Asset> &
-  Pick<Asset, 'url' | 'width' | 'height'> & {
+type ImageProps = Partial<Asset> & {
+  className?: string;
+  url: Asset['url'];
+
+  /**
+   * Alt text, required, but defaults to title
+   */
+  alt: string;
+
+  /**
+   * For the image that should be the LCP
+   */
+  priority?: boolean;
+
+  /**
+   * Sizes are required and map from breakpoint to image width so
+   * Next can automatically generate us some well-sized images!
+   */
+  sizes: {
     /**
-     * Alt text, required, but defaults to title
+     * Under 576px wide
      */
-    alt: string;
+    tiny?: number;
 
     /**
-     * The image fill layout, defaulting to responsive
+     * Under 768px wide
      */
-    fill?: ImageProps['fill'];
+    small?: number;
 
     /**
-     * For the image that should be the LCP
+     * Under 992px wide
      */
-    priority?: boolean;
+    medium?: number;
+
+    /**
+     * Under 1200px wide
+     */
+    large?: number;
+
+    /**
+     * 1200px+ wide - always required as a fallback!
+     */
+    extraLarge: number;
   };
+} & (
+    | {
+        fill: true;
+        width?: never;
+        height?: never;
+      }
+    | {
+        fill?: never;
+        width: Asset['width'];
+        height: Asset['height'];
+      }
+  );
 
 /**
- * Shows a Next Image with the contents of the Asset. Layout defaults to responsive.
+ * Turns the breakpoint -> width map into a sizes string
  */
-export function Image({ url, width, height, fill, title, alt, className, priority }: Props) {
-  return url ? (
-    <NextImage
-      className={className}
-      src={url}
-      alt={title ?? alt}
-      width={width}
-      height={height}
-      fill={fill}
-      priority={priority}
-    />
-  ) : null;
+const generateSizesString = (sizes: ImageProps['sizes']): string => {
+  const sizesString = Object.entries(sizes)
+    .map(([breakpoint, width]) => {
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+      const maxWidth = BREAKPOINT_MAX_SIZES[breakpoint as keyof typeof BREAKPOINT_MAX_SIZES];
+      if (!maxWidth) {
+        return `${width}px`;
+      }
+      return `(max-width: ${maxWidth}px) ${width}px`;
+    })
+    .join(', ');
+  if (sizesString.length === 0) {
+    throw new Error('No sizes provided for image');
+  }
+  return sizesString;
+};
+
+/**
+ * Shows a Next Image with the contents of the Asset and custom
+ * sizes as needed.
+ */
+export function Image({ url, title, alt, sizes, ...props }: ImageProps) {
+  if (!url) {
+    return null;
+  }
+  return <NextImage src={url} alt={title ?? alt} sizes={generateSizesString(sizes)} {...props} />;
 }

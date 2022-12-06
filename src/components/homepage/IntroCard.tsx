@@ -6,6 +6,7 @@ import { RichText } from 'components/RichText';
 import { useLinkWithName } from 'hooks/useLinkWithName';
 import { useState } from 'react';
 import styled from '@emotion/styled';
+import { PROJECT_IMAGE_SIZES, PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
 
 const ImageCard = styled(ContentCard)`
   @media (max-width: 767.96px) {
@@ -61,9 +62,12 @@ export function IntroCard() {
       >
         <HoverableContainer isHovered={isHovered}>
           <Image
-            {...introBlock.image}
+            url={introBlock.image.url}
+            width={PROJECT_MAX_IMAGE_DIMENSION}
+            height={PROJECT_MAX_IMAGE_DIMENSION}
             alt={introBlock.image.title ?? 'Introduction image'}
             priority
+            sizes={PROJECT_IMAGE_SIZES}
           />
         </HoverableContainer>
       </ImageCard>

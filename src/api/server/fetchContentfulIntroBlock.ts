@@ -1,7 +1,11 @@
 import { isTextBlock } from 'api/parsers';
 import type { IntroBlockQuery } from 'api/types/generated/fetchContentfulIntroBlock.generated';
+import { PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
 import { gql } from 'graphql-request';
 import { contentfulClient } from './networkClients/contentfulClient';
+
+// Account for pixel density
+const IMAGE_SIZE = PROJECT_MAX_IMAGE_DIMENSION * 2;
 
 /**
  * Grabs the contentful sections with the title of header. Should
@@ -10,7 +14,11 @@ import { contentfulClient } from './networkClients/contentfulClient';
 const QUERY = gql`
   query IntroBlock {
     asset(id: "1P5peDFKfzDHjWd6mcytc8") {
-      url
+      url(transform: {
+        width: ${IMAGE_SIZE}
+        height: ${IMAGE_SIZE}
+        format: WEBP
+      })
       width
       height
       title
