@@ -28,7 +28,7 @@ export function Footer() {
   const { data: footerLinks } = useData('footer');
   const listedLinkElements = footerLinks?.map((link) => (
     <li key={link.url}>
-      <Link {...link} isExternal={link.url?.startsWith('http')} />
+      <Link {...link} isExternal={link.url?.startsWith('http')} aria-label={link.title} />
     </li>
   ));
   return (
