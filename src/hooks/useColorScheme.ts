@@ -5,12 +5,12 @@ import { useLocalStorageValue } from './useLocalStorageValue';
 /**
  * The color scheme the system prefers by default
  */
-export type ColorScheme = 'dark' | 'light';
+export type ColorSchemeMode = 'dark' | 'light';
 
 /**
  * Function to update a nullable color scheme
  */
-export type SetColorScheme = (value: ColorScheme | null) => void;
+export type SetColorScheme = (value: ColorSchemeMode | null) => void;
 
 // Name of the attribute for theme we add on `html`
 const THEME_ATTRIBUTE = 'data-theme';
@@ -25,16 +25,15 @@ const PREFERS_DARK = '(prefers-color-scheme: dark)';
  * Generates a media event listener for `PREFERS_DARK` for use inside a `useEffect`
  */
 const generateMediaEventListener = (
-  setSystemScheme: Dispatch<SetStateAction<ColorScheme | null>>,
+  setSystemMode: Dispatch<SetStateAction<ColorSchemeMode | null>>,
 ) => {
   if (!window) {
     return;
   }
   const prefersDark = window.matchMedia(PREFERS_DARK);
-  setSystemScheme(prefersDark.matches ? 'dark' : 'light');
+  setSystemMode(prefersDark.matches ? 'dark' : 'light');
 
-  const listener = (event: MediaQueryListEvent) =>
-    setSystemScheme(event.matches ? 'dark' : 'light');
+  const listener = (event: MediaQueryListEvent) => setSystemMode(event.matches ? 'dark' : 'light');
   prefersDark.addEventListener('change', listener);
   return () => {
     prefersDark.removeEventListener('change', listener);
@@ -46,13 +45,13 @@ const generateMediaEventListener = (
  * Also disables animations around it, so colors don't animate their change.
  * Only the color scheme switcher should be an exception to that.
  */
-const updateThemeAttribute = (scheme: ColorScheme, isSystemScheme: boolean) => {
+const updateThemeAttribute = (mode: ColorSchemeMode, isCustomized: boolean) => {
   const htmlElement = document.documentElement;
   htmlElement.setAttribute(ANIMATE_ATTRIBUTE, 'false');
-  if (isSystemScheme) {
-    htmlElement.removeAttribute(THEME_ATTRIBUTE);
+  if (isCustomized) {
+    htmlElement.setAttribute(THEME_ATTRIBUTE, mode);
   } else {
-    htmlElement.setAttribute(THEME_ATTRIBUTE, scheme);
+    htmlElement.removeAttribute(THEME_ATTRIBUTE);
   }
 
   // Make sure to turn on animations non-synchronously
@@ -74,33 +73,39 @@ const updateThemeAttribute = (scheme: ColorScheme, isSystemScheme: boolean) => {
  * results.
  */
 export const useColorScheme = () => {
+  const [isInitialized, setIsInitialized] = useState(false);
+
   // The value of these will be different on server vs client - don't use outside a `useEffect`
-  const [preferredScheme, changeScheme, deleteScheme] = useLocalStorageValue<ColorScheme | null>(
-    'colorScheme',
-    null,
-  );
-  const [systemScheme, setSystemScheme] = useState<ColorScheme | null>(null);
+  const [preferredMode, changePreferredMode, deletePreferredMode] =
+    useLocalStorageValue<ColorSchemeMode | null>('colorScheme', null);
+  const [systemMode, setSystemMode] = useState<ColorSchemeMode | null>(null);
 
   // These values are set in a `useEffect` and can be used for prerendered content safely
-  const [colorScheme, setColorScheme] = useState<ColorScheme>('light');
-  const [isSystemScheme, setIsSystemScheme] = useState(true);
+  const [mode, setMode] = useState<ColorSchemeMode>('light');
+  const [isCustomized, setIsCustomized] = useState(false);
 
   // Set our locally-rendered values during client hydration
   useEffect(() => {
-    setColorScheme(preferredScheme ?? systemScheme ?? 'light');
-    setIsSystemScheme(preferredScheme === null);
-  }, [setColorScheme, systemScheme, preferredScheme]);
+    const resolvedMode = preferredMode ?? systemMode;
+    if (resolvedMode) {
+      setMode(resolvedMode);
+      setIsCustomized(preferredMode !== null);
+      setIsInitialized(true);
+    }
+  }, [preferredMode, systemMode]);
 
   // Modifies data-theme attribute for the page based on current theme & listens to `prefers-color-scheme` changes
-  useEffect(() => updateThemeAttribute(colorScheme, isSystemScheme), [colorScheme, isSystemScheme]);
-  useEffect(() => generateMediaEventListener(setSystemScheme), []);
+  useEffect(() => updateThemeAttribute(mode, isCustomized), [mode, isCustomized]);
+  useEffect(() => generateMediaEventListener(setSystemMode), []);
 
   // The update here actually changes or deletes the local storage value for cleanup
   return {
-    colorScheme,
-    isSystemScheme,
-    isInitializedWithSystemScheme: systemScheme !== null,
-    updatePreferredScheme: (value: ColorScheme | null) =>
-      value ? changeScheme(value) : deleteScheme(),
+    colorScheme: {
+      mode,
+      isCustomized,
+      isInitialized: isInitialized && systemMode !== null,
+    },
+    updatePreferredMode: (newMode: ColorSchemeMode | null) =>
+      newMode ? changePreferredMode(newMode) : deletePreferredMode(),
   } as const;
 };

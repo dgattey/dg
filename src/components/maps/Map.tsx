@@ -153,7 +153,7 @@ export function Map({ location, children, isExpanded, isLoaded, setMapHasLoaded 
         interactive
         pitchWithRotate={false}
         touchPitch={false}
-        mapStyle={colorScheme === 'dark' ? DARK_STYLE : LIGHT_STYLE}
+        mapStyle={colorScheme.mode === 'dark' ? DARK_STYLE : LIGHT_STYLE}
         styleDiffing={false}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
         onLoad={setMapHasLoaded}
