@@ -18,7 +18,7 @@ const QUERY = gql`
         }
         layout
         thumbnail {
-          url
+          url(transform: { quality: 90, format: WEBP })
           width
           height
         }

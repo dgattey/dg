@@ -35,7 +35,7 @@ const QUERY = gql`
                 sys {
                   id
                 }
-                url
+                url(transform: { width: 640, height: 640, format: WEBP })
                 title
                 width
                 height

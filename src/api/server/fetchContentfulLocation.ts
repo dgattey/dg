@@ -1,8 +1,15 @@
 import { isDefinedItem } from 'api/parsers';
 import type { MyLocationQuery } from 'api/types/generated/fetchContentfulLocation.generated';
 import type { MapLocation } from 'api/types/MapLocation';
+import { MAP_MARKER_IMAGE_SIZE, PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
 import { gql } from 'graphql-request';
 import { contentfulClient } from './networkClients/contentfulClient';
+
+// To account for pixel density, we need double the size!
+const IMAGE_SIZE = MAP_MARKER_IMAGE_SIZE * 2;
+
+// The preview image is a standard project size
+const PREVIEW_IMAGE_SIZE = PROJECT_MAX_IMAGE_DIMENSION * 2;
 
 /**
  * Grabs the home location using a known id for it
@@ -17,16 +24,30 @@ const QUERY = gql`
       initialZoom
       zoomLevels
       image {
-        url
+        url(transform: { 
+          width: ${IMAGE_SIZE}, 
+          height: ${IMAGE_SIZE},
+          format: WEBP
+        })
         width
         height
       }
     }
     lightImage: asset(id: "5PrFVu1gJBLhgJGixRL4Wc") {
-      url
+      url(transform: { 
+          width: ${PREVIEW_IMAGE_SIZE}, 
+          height: ${PREVIEW_IMAGE_SIZE},
+          quality: 80,
+          format: WEBP
+        })
     }
     darkImage: asset(id: "6bRgM9lkcceJQOE0jSOEfu") {
-      url
+      url(transform: { 
+          width: ${PREVIEW_IMAGE_SIZE}, 
+          height: ${PREVIEW_IMAGE_SIZE},
+          quality: 80,
+          format: WEBP
+        })
     }
   }
 `;

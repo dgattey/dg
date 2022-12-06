@@ -4,6 +4,7 @@ import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { isDefinedItem, isLink, isProject } from 'api/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
 import { ProjectCard } from 'components/homepage/ProjectCard';
+import { PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
 import { Image } from './Image';
 import { Link } from './Link';
 
@@ -57,7 +58,16 @@ function AssetElement({ data, assetMap }: { data: NodeData; assetMap: Map<string
     return null;
   }
   const asset = assetMap.get(data.target.sys.id);
-  return asset ? <Image {...asset} alt={asset.title ?? 'Image title'} /> : null;
+  return asset ? (
+    <Image
+      {...asset}
+      alt={asset.title ?? 'Image title'}
+      sizes={{
+        // We don't have any images to test this with, but it should be big enough for most cases...
+        extraLarge: PROJECT_MAX_IMAGE_DIMENSION,
+      }}
+    />
+  ) : null;
 }
 
 /**

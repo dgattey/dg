@@ -1,29 +1,21 @@
-import type { ColorScheme, SetColorScheme } from 'hooks/useColorScheme';
+import type { ColorSchemeMode } from 'hooks/useColorScheme';
 import { Moon, Sun } from 'lucide-react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
+import { ColorSchemeContext } from 'components/ColorSchemeContext';
+import { useContext } from 'react';
 
-interface Props {
+interface ColorSchemeIconProps {
   /**
-   * The color to switch to on click
+   * The color scheme mode to switch to on click
    */
-  scheme: ColorScheme;
-
-  /**
-   * If there's a theme and we want to allow clicks
-   */
-  hasTheme: boolean;
-
-  /**
-   * Function to change the user preferred scheme
-   */
-  updatePreferredScheme: SetColorScheme;
+  mode: ColorSchemeMode;
 }
 
 /**
  * Tooltips for the different states
  */
-const TOOLTIPS: Record<ColorScheme, string> = {
+const TOOLTIPS: Record<ColorSchemeMode, string> = {
   dark: 'Lights out',
   light: 'Sunny days!',
 } as const;
@@ -31,7 +23,7 @@ const TOOLTIPS: Record<ColorScheme, string> = {
 /**
  * Maps color scheme to icon element
  */
-const COLORED_ICONS: Record<ColorScheme, JSX.Element> = {
+const COLORED_ICONS: Record<ColorSchemeMode, JSX.Element> = {
   dark: <Moon color="var(--secondary)" size="1em" />,
   light: <Sun color="var(--yellow)" size="1em" />,
 };
@@ -39,7 +31,7 @@ const COLORED_ICONS: Record<ColorScheme, JSX.Element> = {
 /**
  * Uncolored icons for use elsewhere
  */
-export const ICONS: Record<ColorScheme, JSX.Element> = {
+export const ICONS: Record<ColorSchemeMode, JSX.Element> = {
   dark: <Moon size="1em" />,
   light: <Sun size="1em" />,
 };
@@ -71,14 +63,15 @@ const IconWrapper = styled.span<{ $disabled: boolean }>`
  * Creates an icon that is clickable to update to a preferred color scheme
  * if we have one that's set already. Otherwise, renders a disabled icon.
  */
-export function ColorSchemeIcon({ scheme, hasTheme, updatePreferredScheme }: Props) {
+export function ColorSchemeIcon({ mode }: ColorSchemeIconProps) {
+  const { colorScheme, updatePreferredMode } = useContext(ColorSchemeContext);
   return (
     <IconWrapper
-      $disabled={!hasTheme}
-      onClick={hasTheme ? () => updatePreferredScheme(scheme) : undefined}
-      data-tooltip={hasTheme ? TOOLTIPS[scheme] : undefined}
+      $disabled={!colorScheme.isInitialized}
+      onClick={colorScheme.isInitialized ? () => updatePreferredMode(mode) : undefined}
+      data-tooltip={colorScheme.isInitialized ? TOOLTIPS[mode] : undefined}
     >
-      {COLORED_ICONS[scheme]}
+      {COLORED_ICONS[mode]}
     </IconWrapper>
   );
 }

@@ -1,7 +1,7 @@
 import { ColorSchemeContext } from 'components/ColorSchemeContext';
 import { ContentCard } from 'components/ContentCard';
 import { Stack } from 'components/Stack';
-import { ColorScheme } from 'hooks/useColorScheme';
+import { ColorSchemeMode } from 'hooks/useColorScheme';
 import { useContext } from 'react';
 import styled from '@emotion/styled';
 import { css } from '@emotion/react';
@@ -29,16 +29,16 @@ const ContentStack = styled(Stack)`
 `;
 
 // Provides color scheme specific variable names for the switch - unknown is basically just server-rendered
-const SWITCH_COLOR_SCHEME_CSS: Record<ColorScheme | 'unknown', string> = {
+const SWITCH_COLOR_SCHEME_CSS: Record<ColorSchemeMode | 'unknown', string> = {
   unknown: '--secondary',
   light: '--yellow',
   dark: '--navy',
 };
 
-// Combo of CSS + $colorScheme to set two separate states, using a lot of Pico CSS switch variables
-const ColorSchemeSwitch = styled.input<{ $colorScheme: ColorScheme | null }>(
-  ({ $colorScheme }) => css`
-    --switch-background-color: var(${SWITCH_COLOR_SCHEME_CSS[$colorScheme ?? 'unknown']});
+// Combo of CSS + color scheme mode to set two separate states, using a lot of Pico CSS switch variables
+const ColorSchemeSwitch = styled.input<{ $colorSchemeMode: ColorSchemeMode | null }>(
+  ({ $colorSchemeMode }) => css`
+    --switch-background-color: var(${SWITCH_COLOR_SCHEME_CSS[$colorSchemeMode ?? 'unknown']});
     && {
       --border-width: 6px;
       --switch-height: 2em;
@@ -89,48 +89,35 @@ const Button = styled.button<{ $visible: boolean }>`
 
 /**
  * Provides the ability to toggle the page's color scheme between
- * system, light, and dark. Prerendered, `colorScheme` is `light`
- * and `isSystemScheme` is true.
+ * system, light, and dark. Prerendered, `mode` is `light`.
  */
 export function ColorSchemeToggleCard() {
-  const {
-    colorScheme,
-    isSystemScheme,
-    isInitializedWithSystemScheme: hasTheme,
-    updatePreferredScheme,
-  } = useContext(ColorSchemeContext);
-  const setInvertedScheme = () => updatePreferredScheme(colorScheme === 'dark' ? 'light' : 'dark');
-  const clearSavedScheme = () => updatePreferredScheme(null);
+  const { colorScheme, updatePreferredMode } = useContext(ColorSchemeContext);
+  const setInvertedScheme = () =>
+    updatePreferredMode(colorScheme.mode === 'dark' ? 'light' : 'dark');
+  const clearSavedMode = () => updatePreferredMode(null);
 
   return (
     <Card>
       <div>
         <ContentStack $gap="1em">
-          <ColorSchemeIcon
-            scheme="light"
-            hasTheme={hasTheme}
-            updatePreferredScheme={updatePreferredScheme}
-          />
+          <ColorSchemeIcon mode="light" />
           <ColorSchemeSwitch
-            disabled={!hasTheme}
-            $colorScheme={!hasTheme ? null : colorScheme}
+            disabled={!colorScheme.isInitialized}
+            $colorSchemeMode={colorScheme.isInitialized ? colorScheme.mode : null}
             onChange={setInvertedScheme}
-            checked={hasTheme && colorScheme === 'dark'}
+            checked={colorScheme.isInitialized && colorScheme.mode === 'dark'}
             role="switch"
             type="checkbox"
           />
-          <ColorSchemeIcon
-            scheme="dark"
-            hasTheme={hasTheme}
-            updatePreferredScheme={updatePreferredScheme}
-          />
+          <ColorSchemeIcon mode="dark" />
         </ContentStack>
         <Button
           role="button"
           className="secondary outline"
-          disabled={isSystemScheme}
-          onClick={clearSavedScheme}
-          $visible={!isSystemScheme}
+          disabled={!colorScheme.isCustomized}
+          onClick={clearSavedMode}
+          $visible={colorScheme.isCustomized}
         >
           <small>Reset to system theme</small>
         </Button>

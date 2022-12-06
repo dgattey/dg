@@ -19,9 +19,11 @@ export function MapPreviewCard({ turnOnAnimation }: MapPreviewCardProps) {
   const { data: location } = useData('location');
   const { colorScheme } = useContext(ColorSchemeContext);
   const [showFullMapComponent, setShowFullMapComponent] = useState(false);
+
   const backgroundImageUrl =
-    (colorScheme === 'light' ? location?.backupImageUrls.light : location?.backupImageUrls.dark) ??
-    null;
+    (colorScheme.mode === 'light'
+      ? location?.backupImageUrls.light
+      : location?.backupImageUrls.dark) ?? null;
 
   // Loads the full map card on hover
   const previewCard = (
