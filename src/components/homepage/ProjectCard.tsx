@@ -54,7 +54,7 @@ export function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }:
                 : PROJECT_2X_IMAGE_SIZES[breakpoint]
             }
             alt={title ?? 'Project image'}
-            sizes={PROJECT_IMAGE_SIZES}
+            sizes={horizontalSpan === 1 ? PROJECT_IMAGE_SIZES : PROJECT_2X_IMAGE_SIZES}
           />
         </HoverableContainer>
       )}
