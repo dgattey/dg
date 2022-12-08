@@ -1,5 +1,6 @@
 import type { WebhookType } from 'api/types/WebhookType';
 import { command, oneOf, positional, run, string, subcommands } from 'cmd-ts';
+import { formattedList } from 'helpers/formattedList';
 import createSubscription from './helpers/createSubscription';
 import deleteSubscription from './helpers/deleteSubscription';
 import listSubscriptions from './helpers/listSubscriptions';
@@ -14,7 +15,7 @@ const standardArgs = {
   webhookType: positional({
     displayName: 'Webhook API Type',
     type: oneOf(WEBHOOK_TYPES),
-    description: `The API to use for the command - has to be "${WEBHOOK_TYPES}"`,
+    description: `The API to use for the command - has to be "${formattedList(WEBHOOK_TYPES)}"`,
   }),
 };
 

@@ -28,7 +28,10 @@ const ImageContainer = styled.span`
  * Creates a standard map marker, centered on a point
  */
 export function Marker({ point, image }: MarkerProps) {
-  const id = `${point?.latitude},${point?.longitude}`;
+  if (!point?.latitude || !point?.longitude) {
+    return null;
+  }
+  const id = `${point.latitude},${point.longitude}`;
   return (
     <MapMarker {...point}>
       <svg width={DIMENSION} height={DIMENSION}>
@@ -51,7 +54,7 @@ export function Marker({ point, image }: MarkerProps) {
             width={IMAGE_DIMENSION}
             height={IMAGE_DIMENSION}
             url={image.url}
-            alt={`${point?.latitude} ${point?.longitude}`}
+            alt={id}
             sizes={{
               // Constant size, no need to resize
               extraLarge: IMAGE_DIMENSION,
