@@ -11,7 +11,7 @@ import { ThemeProvider } from '@mui/material';
 export function GlobalStyleProvider({ children }: { children: React.ReactNode }) {
   const colorSchemeData = useColorScheme();
   const appliedTheme = useMemo(
-    () => getTheme(colorSchemeData.colorScheme),
+    () => getTheme(colorSchemeData.colorScheme.mode),
     [colorSchemeData.colorScheme],
   );
 
