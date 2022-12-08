@@ -3,13 +3,14 @@ import { truncated } from 'helpers/truncated';
 import { GRID_ANIMATION_DURATION } from 'hooks/useGridAnimation';
 import { useState } from 'react';
 import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+import { Card, SxProps, Theme } from '@mui/material';
+import { mixinSx } from 'ui/helpers/mixinSx';
 import { cardSize } from './ContentGrid';
 import { ContentWrappingLink } from './ContentWrappingLink';
 
 export type ContentCardProps = Pick<
-  React.ComponentProps<'article'>,
-  'className' | 'onMouseOver' | 'onMouseOut' | 'onTouchStart'
+  React.ComponentProps<'div'>,
+  'onMouseOver' | 'onMouseOut' | 'onTouchStart'
 > & {
   children?: React.ReactElement;
   /**
@@ -44,6 +45,8 @@ export type ContentCardProps = Pick<
    * and removes the animation once finished.
    */
   turnOnAnimation?: () => void;
+
+  sx?: SxProps<Theme>;
 };
 
 type LinkWrappedChildrenProps = Pick<ContentCardProps, 'link' | 'children'> & {
@@ -57,30 +60,6 @@ type LinkWrappedChildrenProps = Pick<ContentCardProps, 'link' | 'children'> & {
    */
   overlayContents: React.ReactNode;
 };
-
-interface CardProps {
-  /**
-   * The number of columns to span horizontally
-   */
-  $hSpan: number;
-
-  /**
-   * The number of columns to span vertically. Used to calculate
-   * height as well, adding space for the grid gap as needed.
-   * If missing, lets the item auto-size.
-   */
-  $vSpan: number | null;
-
-  /**
-   * If the card is visually clickable
-   */
-  $isClickable: boolean;
-
-  /**
-   * If the card expands
-   */
-  $isExpandable: boolean;
-}
 
 // A stack for an overlay that animates in from slightly offscreen left when hovered
 export const OverlayContainer = styled.article`
@@ -102,49 +81,28 @@ const OverlayEntry = styled.h5`
 `;
 
 // Card component that spans an arbitrary number of rows/cols
-const Card = styled.article<CardProps>`
-  position: relative;
-  overflow: hidden;
-  border: var(--border-width) solid var(--secondary-focus);
-  margin: inherit;
-  padding: 0;
-  will-change: transform;
-  transition: width ${GRID_ANIMATION_DURATION}ms ease, height ${GRID_ANIMATION_DURATION}ms ease,
-    box-shadow var(--transition), border-color var(--transition);
-
-  /* Unfortunately required for the images to animate size correctly. Look into changing this! */
-  & > div {
-    transform: none !important;
-  }
-  ${({ $isClickable, $isExpandable }) =>
-    ($isClickable || $isExpandable) &&
-    css`
-      cursor: pointer;
-      &:hover {
-        box-shadow: var(--card-hovered-box-shadow);
-      }
-    `}
-
-  ${({ $hSpan }) =>
-    $hSpan < 3
-      ? css`
-          @media (min-width: 768px) {
-            width: ${cardSize($hSpan)};
-            grid-column: span ${$hSpan};
-          }
-        `
-      : css`
-          grid-column: 1 / -1;
-        `}
-  ${({ $vSpan }) =>
-    $vSpan &&
-    css`
-      @media (min-width: 768px) {
-        grid-row: span ${$vSpan};
-        height: ${cardSize($vSpan)};
-      }
-    `}
-`;
+const cardSx: SxProps<Theme> = {
+  position: 'relative',
+  overflow: 'hidden',
+  borderWidth: 2,
+  borderStyle: 'solid',
+  borderColor: (theme) => theme.palette.secondary.dark,
+  margin: 'inherit',
+  padding: 0,
+  willChange: 'transform',
+  transition: (theme) =>
+    theme.transitions.create(['width, height, box-shadow, border-color'], {
+      duration: GRID_ANIMATION_DURATION,
+      easing: theme.transitions.easing.easeInOut,
+    }),
+  // Unfortunately required for the images to animate size correctly. Look into changing this!
+  '& > div': {
+    transform: 'none !important',
+  },
+  '&:hover': {
+    boxShadow: 'var(--card-hovered-box-shadow)',
+  },
+};
 
 /**
  * Deals with the messiness of safely wrapping children and links so there's
@@ -181,11 +139,11 @@ export function ContentCard({
   horizontalSpan,
   verticalSpan,
   children,
-  className,
   overlay,
   link,
   onExpansion,
   turnOnAnimation,
+  sx,
   ...props
 }: ContentCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -206,13 +164,36 @@ export function ContentCard({
     </OverlayContainer>
   ) : null;
 
+  const actualHSpan = isExpanded ? 3 : horizontalSpan ?? 1;
+  const actualVSpan = isExpanded ? null : verticalSpan ?? 1;
+  const isClickable = !!link || expandOnClick;
+
   return (
     <Card
-      className={className}
-      $hSpan={isExpanded ? 3 : horizontalSpan ?? 1}
-      $vSpan={isExpanded ? null : verticalSpan ?? 1}
-      $isClickable={!!link}
-      $isExpandable={expandOnClick}
+      sx={mixinSx(
+        cardSx,
+        (theme) => ({
+          ...(isClickable && {
+            cursor: 'pointer',
+            '&:hover': {
+              boxShadow: 'var(--card-hovered-box-shadow)',
+            },
+          }),
+          ...(actualHSpan < 3 && {
+            [theme.breakpoints.up('md')]: {
+              width: cardSize(actualHSpan),
+              gridColumn: `span ${actualHSpan}`,
+            },
+          }),
+          ...(actualVSpan && {
+            [theme.breakpoints.up('md')]: {
+              gridRow: `span ${actualVSpan}`,
+              height: cardSize(actualVSpan),
+            },
+          }),
+        }),
+        sx,
+      )}
       onClick={toggleExpansion}
       {...props}
     >
