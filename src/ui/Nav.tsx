@@ -1,5 +1,4 @@
-import { Container } from 'ui/Container';
-import { Box } from '@mui/material';
+import { Box, Container } from '@mui/material';
 import { mixinSx } from './helpers/mixinSx';
 
 /**
@@ -57,6 +56,7 @@ export function NavItem({ sx, children, ...props }: React.ComponentProps<typeof 
 export function Nav({ sx, children, ...props }: React.ComponentProps<typeof Container>) {
   return (
     <Container
+      fixed
       component="nav"
       {...props}
       sx={mixinSx(

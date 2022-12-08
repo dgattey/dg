@@ -1,10 +1,8 @@
 import { useData } from 'api/useData';
 import { Section } from 'ui/Section';
-import { containerSx } from 'ui/Container';
 import { Nav, NavGroup, NavItem } from 'ui/Nav';
-import { SxProps, Theme } from '@mui/material';
+import { Container, SxProps, Theme } from '@mui/material';
 import { Link } from './Link';
-import { mixinSx } from '../ui/helpers/mixinSx';
 
 // Wraps so it can collapse better on mobile
 const navGroupSx: SxProps<Theme> = {
@@ -28,7 +26,7 @@ export function Footer() {
       <Link
         {...link}
         isExternal={link.url?.startsWith('http')}
-aria-label={link.title}
+        aria-label={link.title}
         sx={(theme) => ({
           textDecoration: 'none',
           color: theme.palette.primary.dark,
@@ -41,7 +39,7 @@ aria-label={link.title}
     </NavItem>
   ));
   return (
-    <Section sx={mixinSx(containerSx, { padding: 0 })}>
+    <Container component={Section} fixed sx={{ padding: 0 }}>
       <footer>
         <Nav
           sx={(theme) => ({
@@ -59,6 +57,6 @@ aria-label={link.title}
           <NavGroup sx={navGroupSx}>{listedLinkElements}</NavGroup>
         </Nav>
       </footer>
-    </Section>
+    </Container>
   );
 }
