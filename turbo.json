@@ -1,0 +1,102 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    ".env*",
+    "config/database.config.js",
+    "config/eslint.config.js",
+    "config/lint-staged.config.mjs",
+    ".node-version",
+    ".npmrc",
+    ".sequelizerc",
+    ".pretterrc.js",
+    ".pretterignore",
+    "codegen.js",
+    "next.config.js",
+    "tsconfig.json"
+  ],
+  "globalEnv": [
+    "NEXT_PUBLIC_MAPBOX_TOKEN",
+    "CONTENTFUL_SPACE_ID",
+    "CONTENTFUL_ACCESS_TOKEN",
+    "GITHUB_AUTHENTICATION_TOKEN",
+    "CONTENTFUL_SPACE_ID",
+    "DATABASE_URL",
+    "WEBHOOK_CALLBACK_URL",
+    "STRAVA_CLIENT_ID",
+    "STRAVA_CLIENT_SECRET",
+    "STRAVA_TOKEN_NAME",
+    "STRAVA_VERIFY_TOKEN",
+    "SPOTIFY_CLIENT_ID",
+    "SPOTIFY_CLIENT_SECRET",
+    "SENTRY_AUTH_TOKEN",
+    "NEXT_PUBLIC_SENTRY_DSN"
+  ],
+  "pipeline": {
+    "dev": {
+      "inputs": ["src/**/*"],
+      "cache": false
+    },
+    "build": {
+      "outputs": [".next/**"]
+    },
+    "build:analyze": {
+      "outputs": [".next/**"]
+    },
+    "serve": {
+      "dependsOn": ["build"],
+      "cache": false
+    },
+    "release": {
+      "dependsOn": ["build", "lint", "lint:styles", "lint:types", "format"],
+      "cache": false
+    },
+    "format": {},
+    "lint": {
+      "outputs": []
+    },
+    "lint:types": {
+      "outputs": []
+    },
+    "codegen": {
+      "cache": false,
+      "inputs": ["src/api/server/*"],
+      "outputs": ["src/api/types/generated/*"]
+    },
+    "db": {
+      "cache": false
+    },
+    "db:migrate": {
+      "cache": false
+    },
+    "db:migrate:status": {
+      "cache": false
+    },
+    "db:migrate:undo": {
+      "cache": false
+    },
+    "db:generate": {
+      "cache": false
+    },
+    "db:connect": {
+      "cache": false
+    },
+    "webhooks": {
+      "cache": false
+    },
+    "webhooks:local": {
+      "cache": false
+    },
+    "webhooks:create": {
+      "cache": false
+    },
+    "webhooks:list": {
+      "cache": false
+    },
+    "webhooks:delete": {
+      "cache": false
+    },
+    "clean": {
+      "cache": false
+    }
+  }
+}
