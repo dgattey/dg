@@ -9,6 +9,6 @@ export const authenticatedGraphQLClient = (endpoint: string, accessToken?: strin
   new GraphQLClient(endpoint, {
     headers: {
       'content-type': 'application/json',
-      authorization: `Bearer ${accessToken}`,
+      authorization: `Bearer ${accessToken ?? ''}`,
     },
   });

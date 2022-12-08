@@ -75,7 +75,7 @@ export function StravaCard() {
     [],
   );
 
-  if (!activity) {
+  if (!activity || !activity.id) {
     return null;
   }
   const typeText = activity.type === 'Ride' ? 'Ride' : 'Run';

@@ -9,6 +9,18 @@ import type { RawSpotifyToken, RawStravaToken } from 'api/types/RawToken';
 const GRACE_PERIOD_IN_MS = 30_000;
 
 /**
+ * All the env variables we later use
+ */
+const { SPOTIFY_CLIENT_ID, SPOTIFY_CLIENT_SECRET, STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET } =
+  process.env;
+
+/**
+ * Spotify client needs a string for the client id:secret
+ */
+const SPOTIFY_CLIENT_AUTH =
+  SPOTIFY_CLIENT_ID && SPOTIFY_CLIENT_SECRET ? `${SPOTIFY_CLIENT_ID}:${SPOTIFY_CLIENT_SECRET}` : '';
+
+/**
  * Given a number of seconds in which something will expire, this function
  * creates a timestamp from that in milliseconds at which things expire.
  */
@@ -19,8 +31,8 @@ const createExpirationDate = (expiryWindowInSeconds: number) =>
 const STRAVA_REFRESH_TOKEN_CONFIG: RefreshTokenConfig = {
   endpoint: 'https://www.strava.com/api/v3/oauth/token',
   data: {
-    client_id: process.env.STRAVA_CLIENT_ID,
-    client_secret: process.env.STRAVA_CLIENT_SECRET,
+    client_id: STRAVA_CLIENT_ID,
+    client_secret: STRAVA_CLIENT_SECRET,
   },
   validate: (rawData) => {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
@@ -47,9 +59,7 @@ const REFRESH_TOKEN_CONFIGS: Record<string, RefreshTokenConfig> = {
   spotify: {
     endpoint: 'https://accounts.spotify.com/api/token',
     headers: {
-      Authorization: `Basic ${Buffer.from(
-        `${process.env.SPOTIFY_CLIENT_ID}:${process.env.SPOTIFY_CLIENT_SECRET}`,
-      ).toString('base64')}`,
+      Authorization: `Basic ${Buffer.from(SPOTIFY_CLIENT_AUTH).toString('base64')}`,
     },
     validate: (rawData, refreshToken) => {
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

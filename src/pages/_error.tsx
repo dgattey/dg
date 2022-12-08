@@ -50,7 +50,9 @@ export const getStaticProps = async (context: NextPageContext) => {
 
   // Non 404 captured as is, unless err is missing
   // eslint-disable-next-line no-console
-  console.error(err ?? new Error(`_error.tsx getStaticProps missing data at path: ${asPath}`));
+  console.error(
+    err ?? new Error(`_error.tsx getStaticProps missing data at path: ${asPath ?? 'unknown path'}`),
+  );
   return { props };
 };
 

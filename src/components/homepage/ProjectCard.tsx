@@ -29,7 +29,7 @@ export function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }:
   const verticalSpan = layout === 'tall' ? 2 : 1;
   const horizontalSpan = layout === 'wide' ? 2 : 1;
   const [isHovered, setIsHovered] = useState(false);
-  const { breakpoint } = useBreakpoint(BREAKPOINTS_MIN_SIZES, 'large');
+  const { breakpoint } = useBreakpoint(BREAKPOINTS_MIN_SIZES, 'extraLarge');
   const width =
     horizontalSpan === 1 ? PROJECT_IMAGE_SIZES[breakpoint] : PROJECT_2X_IMAGE_SIZES[breakpoint];
 

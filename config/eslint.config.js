@@ -32,7 +32,7 @@ const TYPESCRIPT_RULES = {
   // useEffect be async. We get around it with an immediately invoked function (a void function)
   '@typescript-eslint/no-floating-promises': ['error', { ignoreIIFE: true }],
   // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/restrict-template-expressions.md
-  '@typescript-eslint/restrict-template-expressions': 'off',
+  '@typescript-eslint/restrict-template-expressions': 'error',
   // Type assertions (const x: Type = y as Type) create bugs and mask errors, don't allow them at all
   '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
   // In Typescript, default props are supported as default arguments
@@ -46,6 +46,19 @@ const TYPESCRIPT_RULES = {
   '@typescript-eslint/indent': 'off',
   // Default exports aren't good for renaming and not really all that useful anyway
   'import/prefer-default-export': 'off',
+  // No duplicate modules in the same file
+  'import/no-duplicates': 'error',
+  // Nothing relative outside imports
+  'import/no-relative-packages': 'error',
+  // Nothing extra, outside what's defined in the package.json
+  'import/no-extraneous-dependencies': 'error',
+  // Condenses extra path segments automatically!
+  'import/no-useless-path-segments': [
+    'error',
+    {
+      noUselessIndex: true,
+    },
+  ],
 };
 
 const TYPESCRIPT_OVERRIDE = {
