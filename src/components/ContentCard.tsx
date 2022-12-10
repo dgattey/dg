@@ -12,7 +12,7 @@ export type ContentCardProps = Pick<
   React.ComponentProps<'div'>,
   'onMouseOver' | 'onMouseOut' | 'onTouchStart'
 > & {
-  children?: React.ReactElement;
+  children?: React.ReactNode;
   /**
    * How many columns the card spans, defaults to 1
    */
@@ -128,7 +128,8 @@ function LinkWrappedChildren({
       <ContentWrappingLink link={link}>{children}</ContentWrappingLink>
     </div>
   ) : (
-    safelyWrappedChildren ?? null
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    <>{safelyWrappedChildren}</> ?? null
   );
 }
 
@@ -176,7 +177,7 @@ export function ContentCard({
           ...(isClickable && {
             cursor: 'pointer',
             '&:hover': {
-              boxShadow: 'var(--card-hovered-box-shadow)',
+              boxShadow: theme.shadows[4],
             },
           }),
           ...(actualHSpan < 3 && {

@@ -1,6 +1,7 @@
 import { documentToReactComponents, Options } from '@contentful/rich-text-react-renderer';
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
+import { Divider, Typography } from '@mui/material';
 import { isDefinedItem, isLink, isProject } from 'api/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
 import { ProjectCard } from 'components/homepage/ProjectCard';
@@ -86,6 +87,14 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
 
   return {
     renderNode: {
+      [BLOCKS.HEADING_1]: (_, children) => <Typography variant="h1">{children}</Typography>,
+      [BLOCKS.HEADING_2]: (_, children) => <Typography variant="h2">{children}</Typography>,
+      [BLOCKS.HEADING_3]: (_, children) => <Typography variant="h3">{children}</Typography>,
+      [BLOCKS.HEADING_4]: (_, children) => <Typography variant="h4">{children}</Typography>,
+      [BLOCKS.HEADING_5]: (_, children) => <Typography variant="h5">{children}</Typography>,
+      [BLOCKS.HEADING_6]: (_, children) => <Typography variant="h6">{children}</Typography>,
+      [BLOCKS.PARAGRAPH]: (_, children) => <Typography variant="body1">{children}</Typography>,
+      [BLOCKS.HR]: () => <Divider />,
       [INLINES.EMBEDDED_ENTRY]: ({ data }) => <EntryElement data={data} entryMap={entryMap} />,
       [BLOCKS.EMBEDDED_ENTRY]: ({ data }) => <EntryElement data={data} entryMap={entryMap} />,
       [BLOCKS.EMBEDDED_ASSET]: ({ data }) => <AssetElement data={data} assetMap={assetMap} />,
