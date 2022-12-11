@@ -31,7 +31,7 @@ export function TrackListing({ track, hasLogo }: TrackListingProps) {
     <Stack
       sx={{
         flex: 1,
-        gap: 2,
+        gap: 1,
         justifyContent: 'space-between',
       }}
     >

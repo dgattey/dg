@@ -5,7 +5,7 @@ import { Image } from 'components/Image';
 import { RichText } from 'components/RichText';
 import { useLinkWithName } from 'hooks/useLinkWithName';
 import { useState } from 'react';
-import { PROJECT_IMAGE_SIZES, PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
+import { useCurrentImageSizes } from 'hooks/useCurrentImageSizes';
 
 /**
  * Width of the intro image on small screens
@@ -22,6 +22,7 @@ export function IntroCard() {
   const { data: introBlock } = useData('intro');
   const linkedInLink = useLinkWithName('LinkedIn');
   const [isHovered, setIsHovered] = useState(false);
+  const { width, height, sizes } = useCurrentImageSizes();
 
   if (!introBlock?.textBlock?.content) {
     return null;
@@ -51,11 +52,11 @@ export function IntroCard() {
         <HoverableContainer isHovered={isHovered}>
           <Image
             url={introBlock.image.url}
-            width={PROJECT_MAX_IMAGE_DIMENSION}
-            height={PROJECT_MAX_IMAGE_DIMENSION}
+            width={width}
+            height={height}
             alt={introBlock.image.title ?? 'Introduction image'}
             priority
-            sizes={PROJECT_IMAGE_SIZES}
+            sizes={sizes}
           />
         </HoverableContainer>
       </ContentCard>

@@ -2,7 +2,8 @@ import type { Artist } from 'api/types/spotify/Track';
 import { Link } from 'components/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
 import { Fragment } from 'react';
-import { Box, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
+import { truncated } from 'helpers/truncated';
 
 type ArtistListProps = {
   artists: Array<Artist>;
@@ -48,7 +49,7 @@ export function ArtistList({ artists }: ArtistListProps) {
   }
 
   return (
-    <Box>
+    <Typography component="span" variant="body2" sx={truncated(1)}>
       {artists.map((artist, index) => {
         const link = artistLink(artist);
         return (
@@ -63,16 +64,12 @@ export function ArtistList({ artists }: ArtistListProps) {
                 {artist.name}
               </Link>
             ) : (
-              <Typography component="span" variant="body2">
-                {artist.name}
-              </Typography>
+              <span>{artist.name}</span>
             )}
-            <Typography component="span" variant="body2">
-              {separator({ index, fullList: artists })}
-            </Typography>
+            <span>{separator({ index, fullList: artists })}</span>
           </Fragment>
         );
       })}
-    </Box>
+    </Typography>
   );
 }

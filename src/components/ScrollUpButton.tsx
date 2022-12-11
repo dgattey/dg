@@ -43,14 +43,7 @@ export function ScrollUpButton() {
         ...(isScrolled && scrolledSx),
       }}
     >
-      <Typography
-        variant="caption"
-        sx={{
-          fontWeight: (theme) => theme.typography.fontWeightBold,
-        }}
-      >
-        To top
-      </Typography>
+      <Typography variant="caption">To top</Typography>
       <ArrowUp size="0.85rem" />
     </Button>
   );

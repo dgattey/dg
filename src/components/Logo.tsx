@@ -13,7 +13,7 @@ const logoTextStyles =
   (isScrolled: boolean): SxProps<Theme> =>
   (theme) => ({
     '&&': {
-      fontSize: '3rem',
+      fontSize: '2.5rem',
     },
     background: 'none',
     boxShadow: 'none',
@@ -42,9 +42,9 @@ const logoTextStyles =
     willChange: 'font-size, transform',
     ...(isScrolled && {
       '&&': {
-        fontSize: '2rem',
+        fontSize: '1.75rem',
       },
-      padding: 0,
+      paddingY: 0.5,
     }),
     transition: theme.transitions.create(['color', 'font-size', 'transform']),
   });

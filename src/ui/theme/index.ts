@@ -22,6 +22,24 @@ export const getTheme = (mode: PaletteMode) => {
       },
     },
     components: {
+      MuiCssBaseline: {
+        styleOverrides: (theme) => ({
+          ':root': {
+            [theme.breakpoints.up('sm')]: {
+              fontSize: 17,
+            },
+            [theme.breakpoints.up('md')]: {
+              fontSize: 18,
+            },
+            [theme.breakpoints.up('lg')]: {
+              fontSize: 19,
+            },
+            [theme.breakpoints.up('xl')]: {
+              fontSize: 20,
+            },
+          },
+        }),
+      },
       MuiContainer: {
         defaultProps: {
           fixed: true,
