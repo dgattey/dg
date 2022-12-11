@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+import { Box, BoxProps, Theme } from '@mui/material';
 import { Children } from 'react';
 
 export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className'> &
@@ -14,6 +13,11 @@ export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className
          * Children need to be defined and not be clickable
          */
         children: React.ReactElement<{ onClick?: never }> | string | boolean;
+
+        /**
+         * We have to pass it through this way because of how we nest the controls
+         */
+        theme: Theme;
       }
     | {
         /**
@@ -25,69 +29,73 @@ export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className
          * If children is an array, they're each responsible for passing their own onClicks!
          */
         children: Array<React.ReactElement<{ onClick: () => void }>>;
+
+        /**
+         * We have to pass it through this way because of how we nest the controls
+         */
+        theme: Theme;
       }
   );
 
-// Applied to anything interactive
-const INTERACTIVE_STYLE = css`
-  padding: 0.5rem;
-  cursor: pointer;
-  color: var(--color);
-  background-color: var(--background-color);
-  transition: color var(--transition), background-color var(--transition);
-  :hover {
-    background-color: var(--secondary-hover);
-    color: var(--secondary-inverse);
-  }
-`;
-
-// Pads each item and uses onClick from child
-const ItemWrapper = styled.div`
-  ${INTERACTIVE_STYLE}
-`;
-
-// One single control
-const Container = styled.div<{ $isSingular?: boolean }>`
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  width: 100%;
-  border-radius: var(--border-radius);
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-  font-size: 1rem;
-  line-height: 1;
-  ${({ $isSingular }) =>
-    $isSingular
-      ? css`
-          :before {
-            content: '';
-            display: block;
-            padding-top: 100%;
-          }
-          ${INTERACTIVE_STYLE}
-        `
-      : css``}
-`;
+/**
+ * Renders one single control
+ */
+function Container({ theme, ...props }: Omit<BoxProps, 'sx'> & { theme: Theme }) {
+  return (
+    <Box
+      {...props}
+      sx={{
+        boxShadow: theme.extraShadows.map.control,
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        width: '100%',
+        borderRadius: theme.borderRadius.card,
+        fontSize: '1rem',
+        lineHeight: '1',
+      }}
+    />
+  );
+}
 
 /**
  * This is what surrounds any control to contain it, automatically responding
  * to the color scheme. Circular and same width/height. Returns either a single
  * container, or a larger container with multiple children in it if necessary.
  */
-export function ControlContainer({ onClick, children, className }: ControlContainerProps) {
-  if (!Array.isArray(children)) {
-    return (
-      <Container $isSingular onClick={onClick} className={className}>
-        {children}
-      </Container>
-    );
-  }
+export function ControlContainer({ onClick, children, className, theme }: ControlContainerProps) {
+  const controlSx = {
+    display: 'flex',
+    fontSize: '1rem',
+    lineHeight: 1,
+    padding: '0.5rem',
+    cursor: 'pointer',
+    color: theme.palette.text.primary,
+    backgroundColor: theme.palette.background.default,
+    transition: theme.transitions.create(['background-color', 'color']),
+    ':hover': {
+      backgroundColor: theme.palette.secondary.main,
+      color: theme.palette.secondary.contrastText,
+    },
+  };
 
   return (
-    <Container className={className}>
-      {Children.map(children, (child) => (
-        <ItemWrapper onClick={child.props.onClick}>{child}</ItemWrapper>
-      ))}
+    <Container
+      className={className}
+      onClick={!Array.isArray(children) ? onClick : undefined}
+      theme={theme}
+    >
+      {Array.isArray(children) ? (
+        Children.map(children, (child) => (
+          <Box sx={controlSx} onClick={child.props.onClick}>
+            {child}
+          </Box>
+        ))
+      ) : (
+        <Box sx={controlSx} onClick={onClick}>
+          {children}
+        </Box>
+      )}
     </Container>
   );
 }

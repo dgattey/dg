@@ -1,4 +1,4 @@
-import { AppStyle } from 'components/AppStyle';
+import { GlobalStyleProvider } from 'ui/theme/GlobalStyle';
 import { AppProps } from 'next/app';
 
 /**
@@ -6,10 +6,9 @@ import { AppProps } from 'next/app';
  */
 function App({ Component, pageProps }: AppProps) {
   return (
-    <>
-      <AppStyle />
+    <GlobalStyleProvider>
       <Component {...pageProps} />
-    </>
+    </GlobalStyleProvider>
   );
 }
 

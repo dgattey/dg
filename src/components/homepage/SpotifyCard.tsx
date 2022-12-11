@@ -1,12 +1,6 @@
 import { useData } from 'api/useData';
 import { ContentCard } from 'components/ContentCard';
 import { TrackListing } from 'components/spotify/TrackListing';
-import styled from '@emotion/styled';
-
-// Stacks content and takes up space of parent
-const Card = styled(ContentCard)`
-  padding: var(--spacing);
-`;
 
 /**
  * Shows a card with the latest data from Spotify
@@ -18,8 +12,13 @@ export function SpotifyCard() {
   }
 
   return (
-    <Card>
+    <ContentCard
+      sx={{
+        padding: 2.5,
+        display: 'flex',
+      }}
+    >
       <TrackListing track={track} hasLogo />
-    </Card>
+    </ContentCard>
   );
 }

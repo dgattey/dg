@@ -1,23 +1,26 @@
-import type { Link } from 'api/types/generated/contentfulApi.generated';
-import NextLink from 'next/link';
+import { SxProps, Theme } from '@mui/material';
+import type { Link as LinkType } from 'api/types/generated/contentfulApi.generated';
+import { Link } from 'components/Link';
 
-type Props = Pick<React.ComponentProps<'div'>, 'children'> & {
+type ContentWrappingLinkProps = Pick<React.ComponentProps<'div'>, 'children'> & {
   /**
    * The link whose URL we should render
    */
-  link: Link | undefined;
+  link: LinkType | undefined;
+
+  sx?: SxProps<Theme>;
 };
 
 /**
  * Renders a link that wraps the given children. Compliant with Next's Link too.
  */
-export function ContentWrappingLink({ link, children }: Props) {
+export function ContentWrappingLink({ link, children, sx }: ContentWrappingLinkProps) {
   if (!link?.url) {
     return null;
   }
   return (
-    <NextLink href={link.url} target="_blank" rel="noreferrer">
+    <Link isExternal href={link.url} sx={sx}>
       {children}
-    </NextLink>
+    </Link>
   );
 }

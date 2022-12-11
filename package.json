@@ -10,11 +10,11 @@
     "prepare": "husky install",
     "dev": "VERCEL_GIT_COMMIT_SHA=$(git rev-parse HEAD) next dev",
     "build": "next build",
-    "build:analyze": "ANALYZE=true pnpm build",
+    "build:analyze": "ANALYZE=true next build",
     "serve": "next start",
     "release": "semantic-release",
-    "format": "prettier --loglevel warn --write \"**/*.{js,ts,tsx,css,md,json,yml}\"",
-    "lint": "eslint . --cache --fix --ext .js,.ts,.tsx --no-eslintrc -c config/eslint.config.js",
+    "format": "prettier --loglevel warn --write \"**/*.{js,ts,tsx,mjs,cjs,css,md,json,yml,yaml}\"",
+    "lint": "eslint . --cache --fix --ext .js,.ts,.tsx,.mjs,.cjs --no-eslintrc -c config/eslint.config.js",
     "lint:types": "tsc --noEmit",
     "codegen": "DOTENV_CONFIG_PATH='.env.development.local' graphql-codegen --require dotenv/config --config codegen.js",
     "db": "sequelize",
@@ -40,8 +40,8 @@
     "@fortawesome/free-brands-svg-icons": "6.2.1",
     "@fortawesome/free-solid-svg-icons": "6.2.1",
     "@fortawesome/react-fontawesome": "0.2.0",
+    "@mui/material": "5.10.16",
     "@next/bundle-analyzer": "13.0.6",
-    "@picocss/pico": "1.5.6",
     "animate-css-grid": "1.4.3",
     "cmd-ts": "0.11.0",
     "dotenv": "16.0.3",
@@ -51,6 +51,7 @@
     "graphql-request": "5.0.0",
     "lucide-react": "0.104.1",
     "mapbox-gl": "2.11.0",
+    "micromatch": "4.0.5",
     "mysql2": "2.3.3",
     "next": "13.0.6",
     "node-fetch": "3.3.0",
@@ -74,6 +75,7 @@
     "@graphql-codegen/typescript-operations": "2.5.8",
     "@semantic-release/changelog": "6.0.2",
     "@types/mapbox-gl": "2.7.10",
+    "@types/micromatch": "4.0.2",
     "@types/node": "18.11.11",
     "@types/react": "18.0.26",
     "@types/react-dom": "18.0.9",
@@ -91,7 +93,6 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "husky": "8.0.2",
     "lint-staged": "13.1.0",
-    "micromatch": "4.0.5",
     "postcss": "8.4.19",
     "postcss-syntax": "0.36.2",
     "prettier": "2.8.0",
@@ -104,5 +105,5 @@
   "engines": {
     "node": ">=16"
   },
-  "packageManager": "pnpm@7.16.1"
+  "packageManager": "pnpm@7.18.1"
 }

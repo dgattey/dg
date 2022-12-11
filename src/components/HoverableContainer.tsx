@@ -1,12 +1,16 @@
-import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+import { Box, BoxProps } from '@mui/material';
 
 /**
  * Adds a transition and transform up on hover. Meant for use with images.
  */
-export const HoverableContainer = styled.div<{ isHovered: boolean }>`
-  ${({ isHovered }) => css`
-    transition: transform var(--transition);
-    transform: scale(${isHovered ? 1.05 : 1});
-  `}
-`;
+export function HoverableContainer({ isHovered, ...props }: BoxProps & { isHovered: boolean }) {
+  return (
+    <Box
+      {...props}
+      sx={(theme) => ({
+        transform: `scale(${isHovered ? 1.05 : 1})`,
+        transition: theme.transitions.create(['transform']),
+      })}
+    />
+  );
+}

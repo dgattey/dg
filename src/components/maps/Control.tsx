@@ -3,6 +3,7 @@ import type { Map } from 'mapbox-gl';
 import { useEffect, useMemo, useRef } from 'react';
 import { createRoot, Root } from 'react-dom/client';
 import { useControl } from 'react-map-gl';
+import { useTheme } from '@mui/material';
 import { ControlContainer, ControlContainerProps } from './ControlContainer';
 
 type ControlProps = ControlContainerProps & {
@@ -73,15 +74,17 @@ class DGControl {
     }
     const { onClick, children, className, ...props } = newProps;
     this._container.className = className ?? CLASSNAME;
+    const controlContainer = Array.isArray(children) ? (
+      <ControlContainer {...props}>{children}</ControlContainer>
+    ) : (
+      <ControlContainer onClick={onClick} {...props}>
+        {children}
+      </ControlContainer>
+    );
+
+    this.#root.render(controlContainer);
     if (Array.isArray(children)) {
-      this.#root.render(<ControlContainer {...props}>{children}</ControlContainer>);
       this._container.onclick = onClick ?? null;
-    } else {
-      this.#root.render(
-        <ControlContainer onClick={onClick} {...props}>
-          {children}
-        </ControlContainer>,
-      );
     }
   }
 
@@ -101,13 +104,15 @@ class DGControl {
  * position of the map (corners).
  */
 export function Control({ position, ...props }: ControlProps) {
+  const theme = useTheme(); // as much of this is class based, we need to grab the theme this way
   const control = useRef<DGControl | null>(null);
   const properProps = useMemo(
     () => ({
       ...props,
+      theme,
       className: props.className ? `${props.className} ${CLASSNAME}` : CLASSNAME,
     }),
-    [props],
+    [props, theme],
   );
 
   // Make sure to update the children/etc when they change

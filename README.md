@@ -59,7 +59,7 @@ Pretty standard Next app here. `/public` contains static files, `/src` contains 
 
 - [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/api/) shows the map on the homepage and is loaded client side only because of speed/browser APIs it uses. It's huge file wise, but also lazy loaded.
 
-- [PicoCSS](https://picocss.com) provides the base CSS styles for the site, with lots of it overridden by me and fun with CSS variables. Notably, dark mode support comes out of the box, and I augment it with some TS to choose the current color scheme and persist that to local storage.
+- [MUI System](https://mui.com/system/getting-started/overview/) provides the styling system for layouts/usages of `sx` on props, running on `emotion` under the hood.
 
 - [GraphQL Codegen](https://www.graphql-code-generator.com) makes all the `generated` files. It reads Github + Contentful's API schema + creates types out of them automatically. I run it on command when I write new queries/etc to get their types.
 

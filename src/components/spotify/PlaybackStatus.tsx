@@ -1,37 +1,34 @@
 import type { Track } from 'api/types/spotify/Track';
-import { Stack } from 'components/Stack';
 import { useRelativeTimeFormat } from 'hooks/useRelativeTimeFormat';
 import { Music } from 'lucide-react';
-import styled from '@emotion/styled';
+import { HorizontalStack } from 'ui/HorizontalStack';
+import { Typography } from '@mui/material';
 
 type PlaybackStatusProps = {
-  played_at?: Track['played_at'];
+  playedAt?: Track['played_at'];
 };
-
-// Small text + icon for the status
-const Container = styled(Stack)`
-  text-transform: uppercase;
-  font-size: 0.65rem;
-  margin-bottom: 0.25rem;
-`;
 
 /**
  * Creates an element that shows if Spotify is currently playing, or if not,
  * when it last was.
  */
-export function PlaybackStatus({ played_at }: PlaybackStatusProps) {
-  const lastPlayed = played_at ?? null;
-  const relativeLastPlayed = useRelativeTimeFormat(lastPlayed);
+export function PlaybackStatus({ playedAt }: PlaybackStatusProps) {
+  const isNowPlaying = !playedAt;
+  const relativeLastPlayed = useRelativeTimeFormat({ fromDate: playedAt, capitalized: true });
   return (
-    <Container $alignItems="center" $gap="0.4rem">
-      {lastPlayed ? (
-        `Played ${relativeLastPlayed}`
-      ) : (
+    <Typography
+      variant="overline"
+      component={HorizontalStack}
+      sx={{ gap: 1, alignItems: 'center' }}
+    >
+      {isNowPlaying ? (
         <>
           Now Playing
-          <Music size="1em" />
+          <Music size="1.25em" />
         </>
+      ) : (
+        `Played ${relativeLastPlayed}`
       )}
-    </Container>
+    </Typography>
   );
 }

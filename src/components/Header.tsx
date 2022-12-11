@@ -1,8 +1,10 @@
-import { css } from '@emotion/react';
-import styled from '@emotion/styled';
 import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
-import { ScrollUpIndicator } from 'components/ScrollUpIndicator';
+import { ScrollUpButton } from 'components/ScrollUpButton';
 import { useContext } from 'react';
+import { SxProps, Theme, Box, alpha } from '@mui/material';
+import { Section } from 'ui/Section';
+import { Nav, NavGroup, NavItem } from 'ui/Nav';
+import { ColorSchemeToggle } from 'components/ColorSchemeToggle';
 import { Logo } from './Logo';
 
 interface Props {
@@ -14,21 +16,12 @@ interface Props {
 }
 
 // Makes the header bar sticky and not responsive to user events by default
-const StickyContainer = styled.section`
-  position: sticky;
-  top: 0;
-  z-index: 1;
-  max-width: unset;
-`;
-
-const Background = styled.div<{ isScrolled: boolean }>(
-  ({ isScrolled }) => css`
-    background-color: ${isScrolled ? 'var(--header-background-color)' : 'var(--background-color)'};
-    box-shadow: ${isScrolled ? 'var(--card-hovered-box-shadow)' : 'none'};
-    transition: background-color var(--transition), box-shadow var(--transition);
-    will-change: box-shadow, background-color;
-  `,
-);
+const stickyContainerSx: SxProps<Theme> = {
+  position: 'sticky',
+  top: 0,
+  zIndex: 1,
+  maxWidth: 'unset',
+};
 
 /**
  * Creates the site header component. It's a bar that spans across the
@@ -37,21 +30,36 @@ const Background = styled.div<{ isScrolled: boolean }>(
 export function Header({ headerRef }: Props) {
   const isScrolled = useContext(ScrollIndicatorContext);
   return (
-    <StickyContainer>
+    <Section sx={stickyContainerSx}>
       <header ref={headerRef}>
-        <Background isScrolled={isScrolled}>
-          <nav className="container">
-            <ul>
-              <li>
+        <Box
+          sx={(theme) => ({
+            backdropFilter: 'blur(16px) saturate(160%) contrast(110%)',
+            backgroundColor: isScrolled
+              ? alpha(theme.palette.card.background, 0.85)
+              : theme.palette.background.default,
+            boxShadow: isScrolled ? theme.extraShadows.card.hovered : 'none',
+            willChange: 'box-shadow, background-color',
+            transition: theme.transitions.create(['background-color', 'box-shadow']),
+          })}
+        >
+          <Nav>
+            <NavGroup>
+              <NavItem>
                 <Logo />
-              </li>
-              <li>
-                <ScrollUpIndicator />
-              </li>
-            </ul>
-          </nav>
-        </Background>
+              </NavItem>
+              <NavItem>
+                <ScrollUpButton />
+              </NavItem>
+            </NavGroup>
+            <NavGroup>
+              <NavItem>
+                <ColorSchemeToggle />
+              </NavItem>
+            </NavGroup>
+          </Nav>
+        </Box>
       </header>
-    </StickyContainer>
+    </Section>
   );
 }

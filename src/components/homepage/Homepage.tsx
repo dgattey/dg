@@ -4,7 +4,6 @@ import { MapPreviewCard } from 'components/homepage/MapPreviewCard';
 import { Meta } from 'components/Meta';
 import { useGridAnimation } from 'hooks/useGridAnimation';
 import { useMemo, useRef } from 'react';
-import { ColorSchemeToggleCard } from './ColorSchemeToggleCard';
 import { IntroCard } from './IntroCard';
 import { ProjectCard } from './ProjectCard';
 import { SpotifyCard } from './SpotifyCard';
@@ -39,7 +38,6 @@ export function Homepage() {
       { index: 0, card: <IntroCard key="intro" /> },
       { index: 0, card: <MapPreviewCard key="map" turnOnAnimation={turnOnAnimation} /> },
       { index: 2, card: <SpotifyCard key="spotify" /> },
-      { index: 3, card: <ColorSchemeToggleCard key="color" /> },
       { index: 6, card: <StravaCard key="strava" /> },
     ],
     [turnOnAnimation],

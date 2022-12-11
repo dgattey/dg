@@ -1,3 +1,4 @@
+import { Typography } from '@mui/material';
 import { FetchedFallbackData, fetchFallbackData } from 'api/fetchFallbackData';
 import { ErrorLayout } from 'components/layouts/ErrorLayout';
 import { Link } from 'components/Link';
@@ -65,8 +66,12 @@ export function Contents({ statusCode }: HasStatusCode) {
   const descriptions: Record<number | 'fallback', JSX.Element> = {
     404: (
       <>
-        I didn&apos;t see a page matching the url <code>{router.asPath}</code> on the site. Check
-        out the homepage and see if you can find what you were looking for. If not,
+        I didn&apos;t see a page matching the url{' '}
+        <Typography variant="code" component="code">
+          {router.asPath}
+        </Typography>{' '}
+        on the site. Check out the homepage and see if you can find what you were looking for. If
+        not,
       </>
     ),
     fallback: (
@@ -79,12 +84,12 @@ export function Contents({ statusCode }: HasStatusCode) {
   };
   return (
     <>
-      <h1>{(statusCode && TITLE[statusCode]) || TITLE.fallback}</h1>
-      <p>
+      <Typography variant="h1">{(statusCode && TITLE[statusCode]) || TITLE.fallback}</Typography>
+      <Typography variant="body1" sx={{ maxWidth: '35em' }}>
         {(statusCode && descriptions[statusCode]) || descriptions.fallback}{' '}
-        {emailLink ? <Link layout="plainIconAndText" {...emailLink} /> : 'Email Me'} and I can help
-        you out!
-      </p>
+        {emailLink ? <Link layout="iconText" {...emailLink} href={emailLink.url} /> : 'Email Me'}{' '}
+        and I can help you out!
+      </Typography>
     </>
   );
 }

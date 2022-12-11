@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 type DateConstructorValue = Date | string | number | null | undefined;
 
@@ -37,6 +37,8 @@ const OVERRIDES: Partial<Record<Intl.RelativeTimeFormatUnit, Record<number, stri
     1: 'an hour ago',
   },
 };
+
+const relativeTimeFormatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
 
 /**
  * Converts a date to a number, defaulting to right now as a fallback
@@ -86,18 +88,25 @@ const overriddenFormatString = ({ unit, amount }: RelativeTime) => {
  * render and return the relative time format with an effect to avoid
  * server/client rendering differences
  */
-export const useRelativeTimeFormat = (
-  fromDate: DateConstructorValue,
-  toDate?: DateConstructorValue,
-) => {
-  const formatter = useMemo(() => new Intl.RelativeTimeFormat('en', { numeric: 'auto' }), []);
+export const useRelativeTimeFormat = ({
+  fromDate,
+  toDate,
+  capitalized,
+}: {
+  fromDate: DateConstructorValue;
+  toDate?: DateConstructorValue;
+  capitalized?: boolean;
+}) => {
   const elapsedMs = numericDate(fromDate) - numericDate(toDate);
   const [formattedValue, setFormattedValue] = useState<string>('recently');
 
   useEffect(() => {
-    const relativeTime = relativeTimeFromMs(elapsedMs, formatter);
+    const relativeTime = relativeTimeFromMs(elapsedMs, relativeTimeFormatter);
     setFormattedValue(overriddenFormatString(relativeTime) ?? relativeTime.formatted);
-  }, [elapsedMs, formatter]);
+  }, [elapsedMs]);
 
+  if (capitalized) {
+    return formattedValue.charAt(0).toUpperCase() + formattedValue.slice(1);
+  }
   return formattedValue;
 };

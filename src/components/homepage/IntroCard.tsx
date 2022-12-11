@@ -5,37 +5,12 @@ import { Image } from 'components/Image';
 import { RichText } from 'components/RichText';
 import { useLinkWithName } from 'hooks/useLinkWithName';
 import { useState } from 'react';
-import styled from '@emotion/styled';
-import { PROJECT_IMAGE_SIZES, PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
+import { useCurrentImageSizes } from 'hooks/useCurrentImageSizes';
 
-const ImageCard = styled(ContentCard)`
-  @media (max-width: 767.96px) {
-    --size: 14em;
-    justify-self: center;
-    width: var(--size);
-    height: var(--size);
-    border-radius: calc(var(--size) / 2);
-
-    & article {
-      visibility: hidden;
-    }
-  }
-`;
-
-const TextCard = styled(ContentCard)`
-  && {
-    overflow: visible;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: none;
-    border: none;
-    box-shadow: none;
-    & h1 {
-      --typography-spacing-vertical: 1rem;
-    }
-  }
-`;
+/**
+ * Width of the intro image on small screens
+ */
+const SMALL_IMAGE_SIZE = '14em';
 
 /**
  * Creates an intro information card for use on the homepage. Technically
@@ -47,6 +22,7 @@ export function IntroCard() {
   const { data: introBlock } = useData('intro');
   const linkedInLink = useLinkWithName('LinkedIn');
   const [isHovered, setIsHovered] = useState(false);
+  const { width, height, sizes } = useCurrentImageSizes();
 
   if (!introBlock?.textBlock?.content) {
     return null;
@@ -54,26 +30,49 @@ export function IntroCard() {
 
   return (
     <>
-      <ImageCard
+      <ContentCard
         link={linkedInLink}
         overlay="About"
         onMouseOver={() => setIsHovered(true)}
         onMouseOut={() => setIsHovered(false)}
+        sx={(theme) => ({
+          [theme.breakpoints.down('md')]: {
+            justifySelf: 'center',
+            width: SMALL_IMAGE_SIZE,
+            height: SMALL_IMAGE_SIZE,
+            borderRadius: `calc(${SMALL_IMAGE_SIZE} / 2)`,
+          },
+        })}
+        overlaySx={(theme) => ({
+          [theme.breakpoints.down('md')]: {
+            visibility: 'hidden',
+          },
+        })}
       >
         <HoverableContainer isHovered={isHovered}>
           <Image
             url={introBlock.image.url}
-            width={PROJECT_MAX_IMAGE_DIMENSION}
-            height={PROJECT_MAX_IMAGE_DIMENSION}
+            width={width}
+            height={height}
             alt={introBlock.image.title ?? 'Introduction image'}
             priority
-            sizes={PROJECT_IMAGE_SIZES}
+            sizes={sizes}
           />
         </HoverableContainer>
-      </ImageCard>
-      <TextCard>
+      </ContentCard>
+      <ContentCard
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          background: 'none',
+          border: 'none',
+          boxShadow: 'none',
+          borderRadius: 0,
+        }}
+      >
         <RichText {...introBlock.textBlock.content} />
-      </TextCard>
+      </ContentCard>
     </>
   );
 }

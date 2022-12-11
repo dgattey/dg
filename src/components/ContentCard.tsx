@@ -1,17 +1,15 @@
 import type { Link } from 'api/types/generated/contentfulApi.generated';
 import { truncated } from 'helpers/truncated';
-import { GRID_ANIMATION_DURATION } from 'hooks/useGridAnimation';
 import { useState } from 'react';
-import styled from '@emotion/styled';
-import { css } from '@emotion/react';
-import { cardSize } from './ContentGrid';
+import { Card, SxProps, Theme, Typography } from '@mui/material';
+import { mixinSx } from 'ui/helpers/mixinSx';
 import { ContentWrappingLink } from './ContentWrappingLink';
 
 export type ContentCardProps = Pick<
-  React.ComponentProps<'article'>,
-  'className' | 'onMouseOver' | 'onMouseOut' | 'onTouchStart'
+  React.ComponentProps<'div'>,
+  'onMouseOver' | 'onMouseOut' | 'onTouchStart'
 > & {
-  children?: React.ReactElement;
+  children?: React.ReactNode;
   /**
    * How many columns the card spans, defaults to 1
    */
@@ -44,6 +42,9 @@ export type ContentCardProps = Pick<
    * and removes the animation once finished.
    */
   turnOnAnimation?: () => void;
+
+  sx?: SxProps<Theme>;
+  overlaySx?: SxProps<Theme>;
 };
 
 type LinkWrappedChildrenProps = Pick<ContentCardProps, 'link' | 'children'> & {
@@ -58,93 +59,46 @@ type LinkWrappedChildrenProps = Pick<ContentCardProps, 'link' | 'children'> & {
   overlayContents: React.ReactNode;
 };
 
-interface CardProps {
-  /**
-   * The number of columns to span horizontally
-   */
-  $hSpan: number;
+/**
+ * Returns style props for the card component, based on
+ */
+function getCardSx(
+  theme: Theme,
+  {
+    isClickable,
+    horizontalSpan,
+    verticalSpan,
+  }: { isClickable: boolean; horizontalSpan: number; verticalSpan: number | null },
+) {
+  return {
+    position: 'relative',
+    overflow: 'hidden',
+    willChange: 'transform',
+    transition: `${theme.transitions.create(['width', 'height', 'box-shadow', 'border-color'])}`,
 
-  /**
-   * The number of columns to span vertically. Used to calculate
-   * height as well, adding space for the grid gap as needed.
-   * If missing, lets the item auto-size.
-   */
-  $vSpan: number | null;
-
-  /**
-   * If the card is visually clickable
-   */
-  $isClickable: boolean;
-
-  /**
-   * If the card expands
-   */
-  $isExpandable: boolean;
+    // Unfortunately required for the images to animate size correctly. Look into changing this!
+    '& > div': {
+      transform: 'none !important',
+    },
+    ...(isClickable && {
+      cursor: 'pointer',
+      '&:hover': {
+        borderColor: theme.palette.card.border,
+        boxShadow: theme.extraShadows.card.hovered,
+      },
+    }),
+    [theme.breakpoints.up('md')]: {
+      ...(verticalSpan && {
+        gridRow: `span ${verticalSpan}`,
+        height: theme.grid.cardSizeInRem(verticalSpan),
+      }),
+      ...(horizontalSpan && {
+        gridColumn: `span ${horizontalSpan}`,
+        width: theme.grid.cardSizeInRem(horizontalSpan),
+      }),
+    },
+  };
 }
-
-// A stack for an overlay that animates in from slightly offscreen left when hovered
-export const OverlayContainer = styled.article`
-  position: absolute;
-  bottom: 1rem;
-  left: 1rem;
-  margin: 0;
-  padding: 0.5rem 0.75rem;
-  background-color: var(--card-background-color);
-  color: var(--color);
-  box-shadow: 0 0 4px rgba(0, 0, 0, 0.1), 0 0 8px rgba(0, 0, 0, 0.16);
-  z-index: 1;
-`;
-
-const OverlayEntry = styled.h5`
-  --typography-spacing-vertical: 0.25em;
-  ${truncated(1)}
-  height: calc(var(--line-height) * 1rem);
-`;
-
-// Card component that spans an arbitrary number of rows/cols
-const Card = styled.article<CardProps>`
-  position: relative;
-  overflow: hidden;
-  border: var(--border-width) solid var(--secondary-focus);
-  margin: inherit;
-  padding: 0;
-  will-change: transform;
-  transition: width ${GRID_ANIMATION_DURATION}ms ease, height ${GRID_ANIMATION_DURATION}ms ease,
-    box-shadow var(--transition), border-color var(--transition);
-
-  /* Unfortunately required for the images to animate size correctly. Look into changing this! */
-  & > div {
-    transform: none !important;
-  }
-  ${({ $isClickable, $isExpandable }) =>
-    ($isClickable || $isExpandable) &&
-    css`
-      cursor: pointer;
-      &:hover {
-        box-shadow: var(--card-hovered-box-shadow);
-      }
-    `}
-
-  ${({ $hSpan }) =>
-    $hSpan < 3
-      ? css`
-          @media (min-width: 768px) {
-            width: ${cardSize($hSpan)};
-            grid-column: span ${$hSpan};
-          }
-        `
-      : css`
-          grid-column: 1 / -1;
-        `}
-  ${({ $vSpan }) =>
-    $vSpan &&
-    css`
-      @media (min-width: 768px) {
-        grid-row: span ${$vSpan};
-        height: ${cardSize($vSpan)};
-      }
-    `}
-`;
 
 /**
  * Deals with the messiness of safely wrapping children and links so there's
@@ -165,12 +119,68 @@ function LinkWrappedChildren({
     </div>
   );
   return link && !expandOnClick ? (
-    <div>
+    <ContentWrappingLink
+      link={link}
+      sx={(theme) => ({
+        display: 'block',
+        // Prevents overflowing links
+        height: '100%',
+        // By default the focus ring is hidden, so pseudo element it
+        '&:focus-visible:before': {
+          content: '""',
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          outline: '-webkit-focus-ring-color auto 1px',
+          borderRadius: theme.borderRadius.card,
+          zIndex: 1,
+        },
+      })}
+    >
       {overlayContents}
-      <ContentWrappingLink link={link}>{children}</ContentWrappingLink>
-    </div>
+      {children}
+    </ContentWrappingLink>
   ) : (
-    safelyWrappedChildren ?? null
+    // eslint-disable-next-line react/jsx-no-useless-fragment
+    <>{safelyWrappedChildren}</> ?? null
+  );
+}
+
+/**
+ * Overlay content if it's defined
+ */
+function OverlayContent({
+  overlay,
+  sx,
+}: {
+  overlay: NonNullable<React.ReactNode>;
+  sx?: SxProps<Theme>;
+}) {
+  return (
+    <Card
+      sx={mixinSx(
+        (theme) => ({
+          position: 'absolute',
+          bottom: theme.spacing(2.5),
+          left: theme.spacing(2.5),
+          margin: 0,
+          paddingLeft: theme.spacing(1.75),
+          paddingRight: theme.spacing(1.75),
+          paddingTop: theme.spacing(1),
+          paddingBottom: theme.spacing(1),
+          boxShadow: theme.extraShadows.card.overlayHovered,
+          '&:hover': {
+            boxShadow: theme.extraShadows.card.overlayHovered,
+          },
+          zIndex: 1,
+        }),
+        sx,
+      )}
+    >
+      <Typography variant="h5" sx={truncated(1)}>
+        {overlay}
+      </Typography>
+    </Card>
   );
 }
 
@@ -181,15 +191,19 @@ export function ContentCard({
   horizontalSpan,
   verticalSpan,
   children,
-  className,
   overlay,
   link,
   onExpansion,
   turnOnAnimation,
+  sx,
+  overlaySx,
   ...props
 }: ContentCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   const expandOnClick = !!onExpansion;
+  const actualHSpan = isExpanded ? 3 : horizontalSpan ?? 1;
+  const actualVSpan = isExpanded ? null : verticalSpan ?? 1;
+  const isClickable = !!link || expandOnClick;
 
   // Swaps the expansion variable and calls the user callback
   const toggleExpansion = onExpansion
@@ -200,25 +214,19 @@ export function ContentCard({
       }
     : undefined;
 
-  const overlayContents = overlay ? (
-    <OverlayContainer>
-      <OverlayEntry>{overlay}</OverlayEntry>
-    </OverlayContainer>
-  ) : null;
-
   return (
     <Card
-      className={className}
-      $hSpan={isExpanded ? 3 : horizontalSpan ?? 1}
-      $vSpan={isExpanded ? null : verticalSpan ?? 1}
-      $isClickable={!!link}
-      $isExpandable={expandOnClick}
+      sx={mixinSx(
+        (theme) =>
+          getCardSx(theme, { isClickable, horizontalSpan: actualHSpan, verticalSpan: actualVSpan }),
+        sx,
+      )}
       onClick={toggleExpansion}
       {...props}
     >
       <LinkWrappedChildren
         expandOnClick={expandOnClick}
-        overlayContents={overlayContents}
+        overlayContents={overlay && <OverlayContent overlay={overlay} sx={overlaySx} />}
         link={link}
       >
         {children}

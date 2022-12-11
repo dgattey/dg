@@ -1,28 +1,34 @@
-import type { Track } from 'api/types/spotify/Track';
+import { SxProps, Typography, Theme } from '@mui/material';
 import { Link } from 'components/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
-import styled from '@emotion/styled';
+import { truncated } from '../../helpers/truncated';
+import { mixinSx } from '../../ui/helpers/mixinSx';
 
 type TrackTitleProps = {
-  name: Track['name'];
-  external_urls: Track['external_urls'];
+  trackTitle: string;
+  url: string;
+  sx?: SxProps<Theme>;
 };
-
-// Link should inherit colors from its parent
-const PlainLink = styled(Link)`
-  color: inherit;
-`;
 
 /**
  * Creates an element that shows a track title that links to the song
  */
-export function TrackTitle({ name, external_urls }: TrackTitleProps) {
-  const link = useLinkWithName('Spotify', { title: name, url: external_urls.spotify });
+export function TrackTitle({ trackTitle, url, sx }: TrackTitleProps) {
+  const link = useLinkWithName('Spotify', { title: trackTitle, url });
+  const mixedSx = mixinSx(truncated(2), sx);
   return link ? (
-    <PlainLink isExternal {...link}>
-      {name}
-    </PlainLink>
+    <Link
+      isExternal
+      {...link}
+      href={link.url}
+      linkProps={{ variant: 'h5', color: 'h5' }}
+      sx={mixedSx}
+    >
+      {trackTitle}
+    </Link>
   ) : (
-    <span>name</span>
+    <Typography variant="h5" component="span" sx={mixedSx}>
+      {trackTitle}
+    </Typography>
   );
 }

@@ -1,6 +1,7 @@
 import { documentToReactComponents, Options } from '@contentful/rich-text-react-renderer';
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
+import { Divider, Stack, SxProps, Theme, Typography } from '@mui/material';
 import { isDefinedItem, isLink, isProject } from 'api/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
 import { ProjectCard } from 'components/homepage/ProjectCard';
@@ -8,7 +9,9 @@ import { PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
 import { Image } from './Image';
 import { Link } from './Link';
 
-type Props = TextBlockContent & Pick<React.ComponentPropsWithoutRef<'div'>, 'className'>;
+type RichTextProps = TextBlockContent & {
+  sx?: SxProps<Theme>;
+};
 
 /**
  * Defines a Node's Data with actual data
@@ -25,11 +28,27 @@ type DataWithId = {
 };
 
 /**
+ * Offsets for fixed header so anchor links look right
+ */
+const HEADING_SX: SxProps<Theme> = {
+  marginBottom: (theme) => theme.spacing(3),
+  marginTop: -12,
+  paddingTop: 12,
+};
+
+/**
  * Typeguard for converting the `any` to a structured object
  */
 const isDataWithId = (data: NodeData): data is DataWithId =>
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   !!(data as DataWithId)?.target?.sys?.id;
+
+/**
+ * Typeguard for converting the `any` to a structured link
+ */
+const isDataWithLink = (data: NodeData): data is { uri: string } =>
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  !!(data as { uri: string })?.uri;
 
 /**
  * Creates an element for a single entry in our rich text
@@ -41,7 +60,7 @@ function EntryElement({ data, entryMap }: { data: NodeData; entryMap: Map<string
   const entry = entryMap.get(data.target.sys.id);
 
   if (isLink(entry)) {
-    return <Link {...entry} />;
+    return <Link {...entry} href={entry.url} />;
   }
   if (isProject(entry)) {
     return <ProjectCard {...entry} />;
@@ -71,6 +90,35 @@ function AssetElement({ data, assetMap }: { data: NodeData; assetMap: Map<string
 }
 
 /**
+ * Converts children to an id for use with anchor links
+ */
+function HeadingWithId({
+  children,
+  variant,
+}: {
+  children: React.ReactNode;
+  variant: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+}) {
+  let id = '';
+  if (typeof children === 'string') {
+    id = children;
+  }
+  if (Array.isArray(children)) {
+    id = children.map((child) => (typeof child === 'string' ? child : '')).join('');
+  }
+  id = id
+    .toLowerCase()
+    .replace(/[^a-z]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '');
+  return (
+    <Typography id={id} variant={variant} sx={HEADING_SX}>
+      {children}
+    </Typography>
+  );
+}
+
+/**
  * Takes links and converts them into rich text through rendering specific types of content.
  */
 const renderOptions = (links: TextBlockContent['links']): Options => {
@@ -86,6 +134,24 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
 
   return {
     renderNode: {
+      [BLOCKS.HEADING_1]: (_, children) => <HeadingWithId variant="h1">{children}</HeadingWithId>,
+      [BLOCKS.HEADING_2]: (_, children) => <HeadingWithId variant="h2">{children}</HeadingWithId>,
+      [BLOCKS.HEADING_3]: (_, children) => <HeadingWithId variant="h3">{children}</HeadingWithId>,
+      [BLOCKS.HEADING_4]: (_, children) => <HeadingWithId variant="h4">{children}</HeadingWithId>,
+      [BLOCKS.HEADING_5]: (_, children) => <HeadingWithId variant="h5">{children}</HeadingWithId>,
+      [BLOCKS.HEADING_6]: (_, children) => <HeadingWithId variant="h6">{children}</HeadingWithId>,
+      [BLOCKS.PARAGRAPH]: (_, children) => (
+        <Typography variant="body1" sx={{ marginBottom: (theme) => theme.spacing(3.5) }}>
+          {children}
+        </Typography>
+      ),
+      [BLOCKS.HR]: () => <Divider />,
+      [INLINES.HYPERLINK]: ({ data }, children) => {
+        if (!isDataWithLink(data)) {
+          return children;
+        }
+        return <Link href={data.uri}>{children}</Link>;
+      },
       [INLINES.EMBEDDED_ENTRY]: ({ data }) => <EntryElement data={data} entryMap={entryMap} />,
       [BLOCKS.EMBEDDED_ENTRY]: ({ data }) => <EntryElement data={data} entryMap={entryMap} />,
       [BLOCKS.EMBEDDED_ASSET]: ({ data }) => <AssetElement data={data} assetMap={assetMap} />,
@@ -97,13 +163,13 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
  * Complicated component to render rich text from Contentful's rich
  * text renderer, resolving all items to components
  */
-export function RichText({ json, links, className }: Props) {
+export function RichText({ json, links, sx }: RichTextProps) {
   return (
-    <div className={className}>
+    <Stack sx={sx}>
       {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         documentToReactComponents(json as unknown as Document, renderOptions(links))
       }
-    </div>
+    </Stack>
   );
 }

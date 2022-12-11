@@ -1,11 +1,12 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
+import { PaletteMode } from '@mui/material';
 import { useLocalStorageValue } from './useLocalStorageValue';
 
 /**
  * The color scheme the system prefers by default
  */
-export type ColorSchemeMode = 'dark' | 'light';
+export type ColorSchemeMode = PaletteMode;
 
 /**
  * Function to update a nullable color scheme

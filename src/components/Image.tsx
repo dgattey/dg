@@ -1,9 +1,9 @@
+import { styled } from '@mui/material';
 import type { Asset } from 'api/types/generated/contentfulApi.generated';
 import { BREAKPOINT_MAX_SIZES } from 'constants/imageSizes';
 import NextImage from 'next/image';
 
 type ImageProps = Partial<Asset> & {
-  className?: string;
   url: Asset['url'];
 
   /**
@@ -60,6 +60,16 @@ type ImageProps = Partial<Asset> & {
   );
 
 /**
+ * All images need to be max width'd for our layouts
+ */
+const MaxWidthImage = styled(NextImage)({
+  display: 'flex',
+  maxWidth: '100%',
+  height: 'auto',
+  borderStyle: 'none',
+});
+
+/**
  * Turns the breakpoint -> width map into a sizes string
  */
 const generateSizesString = (sizes: ImageProps['sizes']): string => {
@@ -87,5 +97,7 @@ export function Image({ url, title, alt, sizes, ...props }: ImageProps) {
   if (!url) {
     return null;
   }
-  return <NextImage src={url} alt={title ?? alt} sizes={generateSizesString(sizes)} {...props} />;
+  return (
+    <MaxWidthImage src={url} alt={title ?? alt} sizes={generateSizesString(sizes)} {...props} />
+  );
 }

@@ -1,8 +1,6 @@
+import { useTheme } from '@mui/material';
 import type { WrapGridArguments } from 'animate-css-grid/dist/types';
 import { useCallback, useEffect, useRef } from 'react';
-
-// In ms, how long to animate grid items
-export const GRID_ANIMATION_DURATION = 300;
 
 /**
  * Swaps pointer events between being disabled and auto on the children to
@@ -21,6 +19,7 @@ const changePointerEvents = (isOn: boolean) => (animatedChildren: HTMLElement[])
  * and animate a ref when necessary.
  */
 export const useGridAnimation = (gridRef: React.RefObject<HTMLDivElement>) => {
+  const theme = useTheme();
   const hasImportedLib = useRef(false);
   const wrapGridRef = useRef<
     | ((container: HTMLElement, args: WrapGridArguments | undefined) => { unwrapGrid: () => void })
@@ -57,10 +56,10 @@ export const useGridAnimation = (gridRef: React.RefObject<HTMLDivElement>) => {
    * Simply stops the animation by removing the library's wrapper
    * around the gridRef
    */
-  const turnOffAnimation = () => {
+  const turnOffAnimation = useCallback(() => {
     unwrapGridRef.current?.();
     unwrapGridRef.current = null;
-  };
+  }, []);
 
   /**
    * Starts the animation by wrapping the grid in a mutation
@@ -73,7 +72,7 @@ export const useGridAnimation = (gridRef: React.RefObject<HTMLDivElement>) => {
     }
     const gridWrapResult = wrapGridRef.current(gridRef.current, {
       stagger: 10,
-      duration: GRID_ANIMATION_DURATION,
+      duration: theme.transitions.duration.standard,
       easing: 'backOut',
       onStart: changePointerEvents(false),
       onEnd: (animatedChildren) => {
@@ -82,7 +81,7 @@ export const useGridAnimation = (gridRef: React.RefObject<HTMLDivElement>) => {
       },
     });
     unwrapGridRef.current = gridWrapResult.unwrapGrid;
-  }, [gridRef]);
+  }, [gridRef, theme.transitions.duration.standard, turnOffAnimation]);
 
   // Make sure we import the library to start with
   useEffect(() => {
