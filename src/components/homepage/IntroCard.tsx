@@ -8,6 +8,11 @@ import { useState } from 'react';
 import { PROJECT_IMAGE_SIZES, PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
 
 /**
+ * Width of the intro image on small screens
+ */
+const SMALL_IMAGE_SIZE = '14em';
+
+/**
  * Creates an intro information card for use on the homepage. Technically
  * creates two cards in a fragment. Also adds meta for the whole Homepage,
  * as the data comes from the introBlock. The width/height here is for image
@@ -31,14 +36,15 @@ export function IntroCard() {
         onMouseOut={() => setIsHovered(false)}
         sx={(theme) => ({
           [theme.breakpoints.down('md')]: {
-            '--size': '14em',
             justifySelf: 'center',
-            width: 'var(--size)',
-            height: 'var(--size)',
-            borderRadius: 'calc(var(--size) / 2)',
-            '& article': {
-              visibility: 'hidden',
-            },
+            width: SMALL_IMAGE_SIZE,
+            height: SMALL_IMAGE_SIZE,
+            borderRadius: `calc(${SMALL_IMAGE_SIZE} / 2)`,
+          },
+        })}
+        overlaySx={(theme) => ({
+          [theme.breakpoints.down('md')]: {
+            visibility: 'hidden',
           },
         })}
       >

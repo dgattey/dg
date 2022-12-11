@@ -53,7 +53,7 @@ export function ColorSchemeToggle() {
               },
             },
           },
-          '& .MuiSwitch-input': {
+          '&& .MuiSwitch-input': {
             width: WIDTH_PX * 2 + TRACK_SIZE_PX,
             height: HEIGHT_PX,
             left: -WIDTH_PX - TRACK_SIZE_PX / 2,

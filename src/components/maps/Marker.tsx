@@ -29,7 +29,7 @@ export function Marker({ point, image }: MarkerProps) {
             r={RADIUS}
             cx={RADIUS}
             cy={RADIUS}
-            sx={{ fill: 'var(--map-marker)' }}
+            sx={{ fill: 'rgba(58, 123, 172, 0.5)' }}
           />
           <clipPath id="clip">
             <use xlinkHref={`#${id}`} />
@@ -37,7 +37,7 @@ export function Marker({ point, image }: MarkerProps) {
         </defs>
         <use
           xlinkHref={`#${id}`}
-          stroke="var(--map-marker-border)"
+          stroke="rgba(166, 189, 206, 0.5)"
           strokeWidth="2"
           clipPath="url(#clip)"
         />

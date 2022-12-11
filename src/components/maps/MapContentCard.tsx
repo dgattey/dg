@@ -6,7 +6,7 @@ import { mixinSx } from 'ui/helpers/mixinSx';
 const MIN_DIMENSION = 297;
 
 // In px, the height of the expanded card
-const EXPANDED_HEIGHT = 600;
+const EXPANDED_HEIGHT = 500;
 
 type MapContentCardProps = {
   isExpanded?: boolean;
@@ -30,6 +30,7 @@ export function MapContentCard({
         (theme) => ({
           border: 'none',
           minHeight: isExpanded ? EXPANDED_HEIGHT : MIN_DIMENSION,
+          height: isExpanded ? EXPANDED_HEIGHT : undefined,
           [theme.breakpoints.down('md')]: {
             minHeight: isExpanded ? 360 : 200,
             height: isExpanded ? 360 : 200,

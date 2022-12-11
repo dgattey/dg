@@ -1,5 +1,4 @@
-import { Box, BoxProps } from '@mui/material';
-import { Theme, SxProps } from '@mui/material/styles';
+import { Box, BoxProps, Theme } from '@mui/material';
 import { Children } from 'react';
 import { mixinSx } from '../../ui/helpers/mixinSx';
 
@@ -15,6 +14,11 @@ export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className
          * Children need to be defined and not be clickable
          */
         children: React.ReactElement<{ onClick?: never }> | string | boolean;
+
+        /**
+         * We have to pass it through this way because of how we nest the controls
+         */
+        theme: Theme;
       }
     | {
         /**
@@ -26,26 +30,18 @@ export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className
          * If children is an array, they're each responsible for passing their own onClicks!
          */
         children: Array<React.ReactElement<{ onClick: () => void }>>;
+
+        /**
+         * We have to pass it through this way because of how we nest the controls
+         */
+        theme: Theme;
       }
   );
-
-// Applied to anything interactive
-const INTERACTIVE_SX: SxProps<Theme> = {
-  padding: '0.5rem',
-  cursor: 'pointer',
-  color: 'var(--color)',
-  backgroundColor: 'var(--background-color)',
-  transition: 'color var(--transition), background-color var(--transition)',
-  ':hover': {
-    backgroundColor: 'var(--secondary-hover)',
-    color: 'var(--secondary-inverse)',
-  },
-};
 
 /**
  * Renders one single control
  */
-function Container({ isSingular, ...props }: { isSingular?: boolean } & BoxProps) {
+function Container({ sx, ...props }: BoxProps) {
   return (
     <Box
       {...props}
@@ -55,23 +51,12 @@ function Container({ isSingular, ...props }: { isSingular?: boolean } & BoxProps
           overflow: 'hidden',
           display: 'flex',
           width: '100%',
-          borderRadius: 'var(--border-radius)',
+          borderRadius: '2.5em',
           boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.1)',
           fontSize: '1rem',
           lineHeight: '1',
-          ...(isSingular &&
-            mixinSx(
-              {
-                ':before': {
-                  content: '""',
-                  display: 'block',
-                  paddingTop: '100%',
-                },
-              },
-              INTERACTIVE_SX,
-            )),
         },
-        props.sx,
+        sx,
       )}
     />
   );
@@ -82,11 +67,28 @@ function Container({ isSingular, ...props }: { isSingular?: boolean } & BoxProps
  * to the color scheme. Circular and same width/height. Returns either a single
  * container, or a larger container with multiple children in it if necessary.
  */
-export function ControlContainer({ onClick, children, className }: ControlContainerProps) {
+export function ControlContainer({ onClick, children, className, theme }: ControlContainerProps) {
+  const controlSx = {
+    display: 'flex',
+    fontSize: '1rem',
+    lineHeight: 1,
+    padding: '0.5rem',
+    cursor: 'pointer',
+    color: theme.palette.text.primary,
+    backgroundColor: theme.palette.background.default,
+    transition: theme.transitions.create(['background-color', 'color']),
+    ':hover': {
+      backgroundColor: theme.palette.secondary.main,
+      color: theme.palette.secondary.contrastText,
+    },
+  };
+
   if (!Array.isArray(children)) {
     return (
-      <Container isSingular onClick={onClick}>
-        {children}
+      <Container className={className} onClick={onClick}>
+        <Box sx={controlSx} onClick={onClick}>
+          {children}
+        </Box>
       </Container>
     );
   }
@@ -94,7 +96,7 @@ export function ControlContainer({ onClick, children, className }: ControlContai
   return (
     <Container className={className}>
       {Children.map(children, (child) => (
-        <Box sx={INTERACTIVE_SX} onClick={child.props.onClick}>
+        <Box sx={controlSx} onClick={child.props.onClick}>
           {child}
         </Box>
       ))}

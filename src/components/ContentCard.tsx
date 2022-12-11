@@ -46,6 +46,7 @@ export type ContentCardProps = Pick<
   turnOnAnimation?: () => void;
 
   sx?: SxProps<Theme>;
+  overlaySx?: SxProps<Theme>;
 };
 
 type LinkWrappedChildrenProps = Pick<ContentCardProps, 'link' | 'children'> & {
@@ -96,7 +97,7 @@ function getCardSx(
         gridRow: `span ${verticalSpan}`,
         height: cardSize(verticalSpan),
       }),
-      ...(horizontalSpan < 3 && {
+      ...(horizontalSpan && {
         gridColumn: `span ${horizontalSpan}`,
         width: cardSize(horizontalSpan),
       }),
@@ -152,10 +153,16 @@ function LinkWrappedChildren({
 /**
  * Overlay content if it's defined
  */
-function OverlayContent({ overlay }: { overlay: NonNullable<React.ReactNode> }) {
+function OverlayContent({
+  overlay,
+  sx,
+}: {
+  overlay: NonNullable<React.ReactNode>;
+  sx?: SxProps<Theme>;
+}) {
   return (
     <Card
-      sx={(theme) => {
+      sx={mixinSx((theme) => {
         const boxShadow = '0 0 4px rgba(0, 0, 0, 0.1), 0 0 8px rgba(0, 0, 0, 0.16)';
         return {
           position: 'absolute',
@@ -172,7 +179,7 @@ function OverlayContent({ overlay }: { overlay: NonNullable<React.ReactNode> }) 
           },
           zIndex: 1,
         };
-      }}
+      }, sx)}
     >
       <Typography variant="h5" sx={truncated(1)}>
         {overlay}
@@ -193,6 +200,7 @@ export function ContentCard({
   onExpansion,
   turnOnAnimation,
   sx,
+  overlaySx,
   ...props
 }: ContentCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
@@ -222,7 +230,7 @@ export function ContentCard({
     >
       <LinkWrappedChildren
         expandOnClick={expandOnClick}
-        overlayContents={overlay && <OverlayContent overlay={overlay} />}
+        overlayContents={overlay && <OverlayContent overlay={overlay} sx={overlaySx} />}
         link={link}
       >
         {children}
