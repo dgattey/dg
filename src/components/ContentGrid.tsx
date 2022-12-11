@@ -33,6 +33,7 @@ export function ContentGrid({ children, gridRef }: Props) {
     <Box
       ref={gridRef}
       sx={(theme) => ({
+        paddingTop: 6,
         display: 'grid',
         gap: '2rem',
         gridTemplateColumns: '1fr',

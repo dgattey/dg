@@ -27,7 +27,7 @@ export function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }:
       turnOnAnimation={turnOnAnimation}
       sx={(theme) => ({
         [theme.breakpoints.down('md')]: {
-          maxHeight: cardSize(1),
+          maxHeight: cardSize(0.75),
         },
       })}
     >

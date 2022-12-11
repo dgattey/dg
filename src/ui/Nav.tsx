@@ -35,14 +35,21 @@ export function NavItem({ sx, children, ...props }: React.ComponentProps<typeof 
       component="li"
       {...props}
       sx={mixinSx(
-        {
+        (theme) => ({
           display: 'inline-block',
           margin: 0,
           paddingY: 2,
           paddingX: 1,
           ':first-of-type': { paddingLeft: 0 },
           ':last-of-type': { paddingRight: 0 },
-        },
+
+          [theme.breakpoints.down('md')]: {
+            paddingX: 0.5,
+          },
+          [theme.breakpoints.down('sm')]: {
+            paddingX: 0.25,
+          },
+        }),
         sx,
       )}
     >

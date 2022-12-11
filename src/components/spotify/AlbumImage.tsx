@@ -51,6 +51,14 @@ export function AlbumImage({ album }: AlbumImageProps) {
           height: '100%',
           maxHeight: `${IMAGE_SIZE}px`,
           transition: theme.transitions.create(['max-height', 'height']),
+          [theme.breakpoints.down('md')]: {
+            maxHeight: `${(2 * IMAGE_SIZE) / 3}px`,
+            borderRadius: 6,
+          },
+          [theme.breakpoints.down('sm')]: {
+            maxHeight: `${IMAGE_SIZE / 2}px`,
+            borderRadius: 4,
+          },
         })}
       >
         <Image
