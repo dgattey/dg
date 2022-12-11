@@ -4,3 +4,4 @@
 .vercel/
 .turbo/
 node_modules/
+pnpm-lock.yaml
