@@ -17,6 +17,10 @@ const lightPalette: PaletteOptions = {
     background: COLORS.LIGHT.CARD_BACKGROUND,
     border: COLORS.LIGHT.CARD_BORDER,
   },
+  code: {
+    background: COLORS.LIGHT.CODE_BACKGROUND,
+    text: COLORS.MUTED_TEXT,
+  },
   background: {
     default: COLORS.LIGHT.DEFAULT_BACKGROUND,
     paper: COLORS.LIGHT.PAPER_BACKGROUND,
@@ -40,6 +44,10 @@ const darkPalette: PaletteOptions = {
   card: {
     background: COLORS.DARK.CARD_BACKGROUND,
     border: COLORS.DARK.CARD_BORDER,
+  },
+  code: {
+    background: COLORS.DARK.CODE_BACKGROUND,
+    text: COLORS.MUTED_TEXT,
   },
   background: {
     default: COLORS.DARK.DEFAULT_BACKGROUND,

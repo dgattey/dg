@@ -119,26 +119,27 @@ function LinkWrappedChildren({
     </div>
   );
   return link && !expandOnClick ? (
-    <div>
+    <ContentWrappingLink
+      link={link}
+      sx={(theme) => ({
+        display: 'block',
+        // Prevents overflowing links
+        height: '100%',
+        // By default the focus ring is hidden, so pseudo element it
+        '&:focus-visible:before': {
+          content: '""',
+          position: 'absolute',
+          width: '100%',
+          height: '100%',
+          outline: '-webkit-focus-ring-color auto 1px',
+          borderRadius: theme.borderRadius.card,
+          zIndex: 1,
+        },
+      })}
+    >
       {overlayContents}
-      <ContentWrappingLink
-        link={link}
-        sx={(theme) => ({
-          // By default the focus ring is hidden, so pseudo element it
-          '&:focus-visible:before': {
-            content: '""',
-            position: 'absolute',
-            width: '100%',
-            height: '100%',
-            outline: '-webkit-focus-ring-color auto 1px',
-            borderRadius: theme.borderRadius.card,
-            zIndex: 1,
-          },
-        })}
-      >
-        {children}
-      </ContentWrappingLink>
-    </div>
+      {children}
+    </ContentWrappingLink>
   ) : (
     // eslint-disable-next-line react/jsx-no-useless-fragment
     <>{safelyWrappedChildren}</> ?? null
@@ -160,8 +161,8 @@ function OverlayContent({
       sx={mixinSx(
         (theme) => ({
           position: 'absolute',
-          bottom: theme.spacing(2),
-          left: theme.spacing(2),
+          bottom: theme.spacing(2.5),
+          left: theme.spacing(2.5),
           margin: 0,
           paddingLeft: theme.spacing(1.75),
           paddingRight: theme.spacing(1.75),

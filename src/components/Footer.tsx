@@ -6,22 +6,12 @@ import type { Link as LinkType } from 'api/types/generated/contentfulApi.generat
 import { HorizontalStack } from 'ui/HorizontalStack';
 import { Link } from './Link';
 
-const LINK_PADDING_X = 2;
-const LINK_PADDING_Y = 1.8;
-
 /**
  * Creates a singular footer link
  */
 function FooterLink({ link }: { link: LinkType }) {
   return (
-    <NavItem
-      sx={(theme) => ({
-        paddingX: LINK_PADDING_X,
-        [theme.breakpoints.down('lg')]: {
-          paddingX: LINK_PADDING_X,
-        },
-      })}
-    >
+    <NavItem sx={{ padding: 0 }}>
       <Link
         title={link.title}
         icon={link.icon}
@@ -33,11 +23,12 @@ function FooterLink({ link }: { link: LinkType }) {
           color: 'secondary',
         }}
         sx={{
-          // Make the clickable area bigger for a11y
-          paddingX: LINK_PADDING_X,
-          paddingY: LINK_PADDING_Y,
-          marginX: -LINK_PADDING_X,
-          marginY: -LINK_PADDING_Y,
+          // Min tap target size
+          minWidth: 48,
+          minHeight: 48,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
         }}
       />
     </NavItem>
@@ -59,7 +50,7 @@ export function Footer() {
           sx={(theme) => ({
             flexDirection: 'row',
             flexWrap: 'wrap-reverse',
-            columnGap: 2,
+            columnGap: 3,
             marginTop: 8,
             [theme.breakpoints.down('sm')]: {
               flexDirection: 'column-reverse',
@@ -77,7 +68,17 @@ export function Footer() {
                 <FooterLink link={link} key={link.url} />
               ))}
             </HorizontalStack>
-            <HorizontalStack component="ul" sx={{ padding: 0, margin: 0 }}>
+            <HorizontalStack
+              component="ul"
+              sx={{
+                padding: 0,
+                margin: 0,
+                flex: 1,
+                marginLeft: -1.5,
+                marginRight: -1.5,
+                justifyContent: 'space-between',
+              }}
+            >
               {iconFooterLinks?.map((link) => (
                 <FooterLink link={link} key={link.url} />
               ))}

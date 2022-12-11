@@ -11,6 +11,10 @@ declare module '@mui/material/styles' {
       background: NonNullableColor;
       border: NonNullableColor;
     };
+    code: {
+      background: NonNullableColor;
+      text: NonNullableColor;
+    };
     map: {
       markerBackground: NonNullableColor;
       markerBorder: NonNullableColor;
@@ -21,6 +25,10 @@ declare module '@mui/material/styles' {
     card: {
       background: NonNullableColor;
       border: NonNullableColor;
+    };
+    code: {
+      background: NonNullableColor;
+      text: NonNullableColor;
     };
     map: {
       markerBackground: NonNullableColor;
@@ -68,5 +76,20 @@ declare module '@mui/material/styles' {
       contentDimension: number;
       cardSizeInRem?: (span: number) => string;
     };
+  }
+  interface TypographyVariants {
+    code: React.CSSProperties;
+  }
+
+  interface TypographyVariantsOptions {
+    code?: React.CSSProperties;
+  }
+}
+
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    code: true;
+    subtitle1: false;
+    subtitle2: false;
   }
 }

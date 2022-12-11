@@ -37,7 +37,7 @@ export function PageLayout<Key extends EndpointKey>({ children, fallback }: Page
       <Meta />
       <ScrollIndicatorContext.Provider value={isIndicatorShown}>
         <Header headerRef={headerSizingRef} />
-        <Container component={Section} fixed>
+        <Container component={Section} sx={{ marginTop: 16 }}>
           <div aria-hidden ref={ref} style={{ height: 0, width: 0 }} />
           <main>{children}</main>
         </Container>

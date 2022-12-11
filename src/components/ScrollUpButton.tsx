@@ -44,7 +44,7 @@ export function ScrollUpButton() {
       }}
     >
       <Typography variant="caption">To top</Typography>
-      <ArrowUp size="0.85rem" />
+      <ArrowUp size={16} />
     </Button>
   );
 }

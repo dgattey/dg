@@ -21,7 +21,7 @@ export function ContentGrid({ children, gridRef }: Props) {
     <Box
       ref={gridRef}
       sx={(theme) => ({
-        paddingTop: 8,
+        marginTop: -4,
         display: 'grid',
         gap: `${theme.grid.gap}rem`,
         gridTemplateColumns: '1fr',

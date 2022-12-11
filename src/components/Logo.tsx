@@ -36,17 +36,15 @@ const logoTextStyles =
     letterSpacing: '-0.12em',
     lineHeight: 0.75, // visually center the text
     color: theme.palette.primary.main,
-    paddingY: 1,
+    paddingY: 2,
     paddingX: 0,
 
     willChange: 'font-size, transform',
     ...(isScrolled && {
-      '&': {
-        fontSize: '1.75em',
-      },
-      paddingY: 0.5,
+      transform: 'scale(0.75)',
+      paddingY: 0,
     }),
-    transition: theme.transitions.create(['color', 'font-size', 'transform']),
+    transition: theme.transitions.create(['color', 'transform', 'padding', 'font-size']),
   });
 
 /**

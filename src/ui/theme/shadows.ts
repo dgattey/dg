@@ -15,7 +15,7 @@ const lightShadows = {
     ...sharedShadows.card,
     main: 'none',
     hovered:
-      '0 0.125rem 2rem rgba(27, 40, 50, 0.04),0 0.125rem 4rem rgba(27, 40, 50, 0.08),0 0 0 0.125rem rgba(27, 40, 50, 0.024)',
+      '0 0.125rem 2rem rgba(27, 40, 50, 0.04),0 0.125rem 4rem rgba(27, 40, 50, 0.08),0 0 0 0.125rem rgba(27, 40, 50, 0.024);',
   },
 } as const;
 

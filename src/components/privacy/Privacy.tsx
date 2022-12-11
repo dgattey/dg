@@ -21,11 +21,16 @@ export function Privacy() {
     <>
       <Meta title="Privacy Policy" description={privacyDescription} />
       <RichText
-        sx={{
-          maxWidth: '35em',
-          marginX: 'auto',
-        }}
         {...privacyTextBlock.content}
+        sx={(theme) => ({
+          marginTop: -6,
+          maxWidth: '100%',
+          marginX: 'auto',
+          [theme.breakpoints.up('md')]: {
+            maxWidth: '35em',
+            marginTop: 0,
+          },
+        })}
       />
     </>
   );

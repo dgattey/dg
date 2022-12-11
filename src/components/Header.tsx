@@ -1,7 +1,7 @@
 import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
 import { ScrollUpButton } from 'components/ScrollUpButton';
 import { useContext } from 'react';
-import { SxProps, Theme, Box } from '@mui/material';
+import { SxProps, Theme, Box, alpha } from '@mui/material';
 import { Section } from 'ui/Section';
 import { Nav, NavGroup, NavItem } from 'ui/Nav';
 import { ColorSchemeToggle } from 'components/ColorSchemeToggle';
@@ -34,14 +34,13 @@ export function Header({ headerRef }: Props) {
       <header ref={headerRef}>
         <Box
           sx={(theme) => ({
+            backdropFilter: 'blur(16px) saturate(160%) contrast(110%)',
             backgroundColor: isScrolled
-              ? theme.palette.background.paper
+              ? alpha(theme.palette.card.background, 0.85)
               : theme.palette.background.default,
             boxShadow: isScrolled ? theme.extraShadows.card.hovered : 'none',
             willChange: 'box-shadow, background-color',
-            ':root[data-animations-enabled=true] &': {
-              transition: theme.transitions.create(['background-color', 'box-shadow']),
-            },
+            transition: theme.transitions.create(['background-color', 'box-shadow']),
           })}
         >
           <Nav>

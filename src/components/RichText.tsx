@@ -1,7 +1,7 @@
 import { documentToReactComponents, Options } from '@contentful/rich-text-react-renderer';
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
-import { Box, Divider, SxProps, Theme, Typography } from '@mui/material';
+import { Divider, Stack, SxProps, Theme, Typography } from '@mui/material';
 import { isDefinedItem, isLink, isProject } from 'api/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
 import { ProjectCard } from 'components/homepage/ProjectCard';
@@ -165,11 +165,11 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
  */
 export function RichText({ json, links, sx }: RichTextProps) {
   return (
-    <Box sx={sx}>
+    <Stack sx={sx}>
       {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         documentToReactComponents(json as unknown as Document, renderOptions(links))
       }
-    </Box>
+    </Stack>
   );
 }

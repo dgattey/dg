@@ -29,6 +29,12 @@ export function ColorSchemeToggle() {
         aria-hidden
         tabIndex={-1}
         sx={(theme) => ({
+          // Overrides our "animations off" code in theme/index.ts since we do always want the switch to animate
+          '&&& *': {
+            transition: theme.transitions.create('', {
+              duration: theme.transitions.duration.complex,
+            }),
+          },
           height: HEIGHT_PX,
           width: WIDTH_PX,
           margin: 0,

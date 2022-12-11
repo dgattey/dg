@@ -1,11 +1,11 @@
-import { PaletteMode } from '@mui/material';
+import { PaletteMode, Theme } from '@mui/material';
 import { TypographyOptions } from '@mui/material/styles/createTypography';
 import { COLORS } from 'ui/theme/color';
 
 /**
  * Get typography styles for a certain color mode.
  */
-export const getTypography = (mode: PaletteMode): TypographyOptions => {
+export const getTypography = (mode: PaletteMode, theme: Theme): TypographyOptions => {
   const scopedColors = mode === 'light' ? COLORS.LIGHT : COLORS.DARK;
   return {
     fontFamily: [
@@ -71,6 +71,20 @@ export const getTypography = (mode: PaletteMode): TypographyOptions => {
     caption: {
       fontSize: 13,
       fontWeight: 600,
+    },
+    button: {
+      fontSize: 17,
+      fontWeight: 600,
+    },
+    code: {
+      fontSize: 16,
+      lineHeight: 1.875, // 30px
+      fontFamily:
+        '"Menlo","Consolas","Roboto Mono","Ubuntu Monospace","Noto Mono","Oxygen Mono","Liberation Mono",monospace,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',
+      padding: theme.spacing(0.75, 1),
+      background: theme.palette.code.background,
+      color: theme.palette.code.text,
+      borderRadius: theme.spacing(2),
     },
   };
 };

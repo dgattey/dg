@@ -2,6 +2,8 @@ import { Meta } from 'components/Meta';
 import { FetchedFallbackData } from 'api/fetchFallbackData';
 import type { EndpointKey } from 'api/endpoints';
 import { Link } from 'components/Link';
+import { Section } from 'ui/Section';
+import { Stack } from '@mui/material';
 import { PageLayout } from './PageLayout';
 
 type ErrorLayoutProps<Keys extends EndpointKey> = {
@@ -31,18 +33,20 @@ export function ErrorLayout<Keys extends EndpointKey>({
   return (
     <PageLayout fallback={fallback}>
       <Meta title={pageTitle} description="An error occurred" />
-      {children}
-      <Link
-        isButton
-        buttonProps={{
-          color: 'secondary',
-        }}
-        href="/"
-        title="Home"
-        sx={{ alignSelf: 'flex-start' }}
-      >
-        Go back home
-      </Link>
+      <Stack component={Section} sx={{ gap: 3, marginTop: -6 }}>
+        {children}
+        <Link
+          isButton
+          buttonProps={{
+            color: 'secondary',
+          }}
+          href="/"
+          title="Home"
+          sx={{ alignSelf: 'flex-start', marginTop: 3 }}
+        >
+          Go back home
+        </Link>
+      </Stack>
     </PageLayout>
   );
 }

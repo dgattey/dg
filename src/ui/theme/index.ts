@@ -1,4 +1,5 @@
-import { createTheme, PaletteMode, responsiveFontSizes } from '@mui/material';
+import { createTheme, PaletteMode, responsiveFontSizes, ThemeOptions } from '@mui/material';
+import { getGrid } from 'ui/theme/grid';
 import { getPalette } from 'ui/theme/palette';
 import { getTypography } from 'ui/theme/typography';
 import { getShadows } from './shadows';
@@ -7,19 +8,12 @@ import { getShadows } from './shadows';
  * Our MUI theme, customized, and dark/light mode compatible.
  */
 export const getTheme = (mode: PaletteMode) => {
-  const shadows = getShadows(mode);
-  const themeWithColorMode = createTheme({
+  const minimalThemeOptions: ThemeOptions = {
     palette: getPalette(mode),
-    typography: getTypography(mode),
-    extraShadows: shadows,
+    extraShadows: getShadows(mode),
+    grid: getGrid(),
     borderRadius: {
       card: '2.5em',
-    },
-    grid: {
-      gap: 2,
-      gapLarge: 3.35,
-      contentDimension: 16.5,
-      cardSizeInRem: undefined, // set below
     },
     breakpoints: {
       values: {
@@ -30,10 +24,23 @@ export const getTheme = (mode: PaletteMode) => {
         xl: 1200,
       },
     },
+  };
+  const minimalTheme = createTheme(minimalThemeOptions);
+
+  // Now we can inject in a basic theme for colors/spacing
+  const typography = getTypography(mode, minimalTheme);
+  const themeWithColorMode = createTheme({
+    ...minimalThemeOptions,
+    typography,
     components: {
       MuiCssBaseline: {
         styleOverrides: (theme) => ({
           ':root': {
+            wordBreak: 'break-word',
+            // Ensure while swapping themes, we have no animations
+            ':root[data-animations-enabled="false"] *': {
+              transition: 'none',
+            },
             [theme.breakpoints.up('sm')]: {
               fontSize: 17,
             },
@@ -127,7 +134,7 @@ export const getTheme = (mode: PaletteMode) => {
             borderColor: theme.palette.card.border,
             borderWidth: 1,
             borderStyle: 'solid',
-            boxShadow: shadows.card.main,
+            boxShadow: theme.extraShadows.card.main,
           }),
         },
       },
@@ -149,14 +156,20 @@ export const getTheme = (mode: PaletteMode) => {
     },
   });
 
-  /**
-   * Creates a card size in rem from a span
-   */
-  themeWithColorMode.grid.cardSizeInRem = (span = 1) =>
-    `${
-      themeWithColorMode.grid.contentDimension * span +
-      (span - 1) * themeWithColorMode.grid.gapLarge
-    }rem`;
-
-  return responsiveFontSizes(themeWithColorMode);
+  return responsiveFontSizes(themeWithColorMode, {
+    variants: [
+      'h1',
+      'h2',
+      'h3',
+      'h4',
+      'h5',
+      'h6',
+      'caption',
+      'overline',
+      'body1',
+      'body2',
+      'code',
+      'button',
+    ],
+  });
 };
