@@ -64,12 +64,12 @@ export const getTypography = (mode: PaletteMode): TypographyOptions => {
       color: COLORS.MUTED_TEXT,
     },
     overline: {
-      fontSize: 11.125,
+      fontSize: 12,
       textTransform: 'uppercase',
       fontWeight: 600,
     },
     caption: {
-      fontSize: 12.75,
+      fontSize: 13,
       fontWeight: 600,
     },
   };

@@ -40,6 +40,7 @@
       "outputs": [".next/**"]
     },
     "build:analyze": {
+      "cache": false,
       "outputs": [".next/**"]
     },
     "serve": {
