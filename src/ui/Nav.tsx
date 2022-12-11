@@ -2,7 +2,8 @@ import { Box, Container, Typography } from '@mui/material';
 import { mixinSx } from './helpers/mixinSx';
 
 /**
- * This group of items in a nav will group items together
+ * This group of items in a nav will group items together.
+ * Condenses to a full width group on mobile.
  */
 export function NavGroup({ sx, children, ...props }: React.ComponentProps<typeof Box>) {
   return (
@@ -10,13 +11,18 @@ export function NavGroup({ sx, children, ...props }: React.ComponentProps<typeof
       component="ul"
       {...props}
       sx={mixinSx(
-        {
+        (theme) => ({
           display: 'flex',
           alignItems: 'center',
           margin: 0,
           padding: 0,
           listStyle: 'none',
-        },
+          flexWrap: 'wrap',
+          [theme.breakpoints.down('xs')]: {
+            flexGrow: 1,
+            justifyContent: 'space-between',
+          },
+        }),
         sx,
       )}
     >

@@ -1,27 +1,26 @@
 import { useData } from 'api/useData';
 import { Section } from 'ui/Section';
 import { Nav, NavGroup, NavItem } from 'ui/Nav';
-import { SxProps, Theme, Container } from '@mui/material';
+import { Container } from '@mui/material';
+import type { Link as LinkType } from 'api/types/generated/contentfulApi.generated';
+import { HorizontalStack } from 'ui/HorizontalStack';
 import { Link } from './Link';
 
-// Wraps so it can collapse better on mobile
-const navGroupSx: SxProps<Theme> = {
-  display: 'flex',
-  flexWrap: 'wrap',
-};
+const LINK_PADDING_X = 2;
+const LINK_PADDING_Y = 1.8;
 
 /**
- * Creates the site footer component - shows version data + copyright
+ * Creates a singular footer link
  */
-export function Footer() {
-  const { data: version } = useData('version');
-  const { data: footerLinks } = useData('footer');
-  const listedLinkElements = footerLinks?.map((link) => (
+function FooterLink({ link }: { link: LinkType }) {
+  return (
     <NavItem
-      key={link.url}
-      sx={{
-        paddingX: 1.15,
-      }}
+      sx={(theme) => ({
+        paddingX: LINK_PADDING_X,
+        [theme.breakpoints.down('lg')]: {
+          paddingX: LINK_PADDING_X,
+        },
+      })}
     >
       <Link
         title={link.title}
@@ -33,26 +32,57 @@ export function Footer() {
         linkProps={{
           color: 'secondary',
         }}
+        sx={{
+          // Make the clickable area bigger for a11y
+          paddingX: LINK_PADDING_X,
+          paddingY: LINK_PADDING_Y,
+          marginX: -LINK_PADDING_X,
+          marginY: -LINK_PADDING_Y,
+        }}
       />
     </NavItem>
-  ));
+  );
+}
+
+/**
+ * Creates the site footer component - shows version data + copyright
+ */
+export function Footer() {
+  const { data: version } = useData('version');
+  const { data: footerLinks } = useData('footer');
+  const nonIconFooterLinks = footerLinks?.filter((link) => !link.icon);
+  const iconFooterLinks = footerLinks?.filter((link) => link.icon);
   return (
     <Container component={Section} sx={{ padding: 0 }}>
       <footer>
         <Nav
           sx={(theme) => ({
-            flexDirection: 'column',
-            [theme.breakpoints.up('md')]: {
-              flexDirection: 'row',
+            flexDirection: 'row',
+            flexWrap: 'wrap-reverse',
+            columnGap: 2,
+            marginTop: 8,
+            [theme.breakpoints.down('sm')]: {
+              flexDirection: 'column-reverse',
             },
           })}
         >
-          <NavGroup sx={navGroupSx}>
+          <NavGroup>
             <NavItem>© {new Date().getFullYear()} Dylan Gattey</NavItem>
             <NavItem sx={{ padding: 0 }}>•</NavItem>
             <NavItem>{version}</NavItem>
           </NavGroup>
-          <NavGroup sx={navGroupSx}>{listedLinkElements}</NavGroup>
+          <NavGroup sx={{ columnGap: 4 }} component="div">
+            <HorizontalStack component="ul" sx={{ padding: 0, margin: 0 }}>
+              {nonIconFooterLinks?.map((link) => (
+                <FooterLink link={link} key={link.url} />
+              ))}
+            </HorizontalStack>
+            <HorizontalStack component="ul" sx={{ padding: 0, margin: 0 }}>
+              {iconFooterLinks?.map((link) => (
+                <FooterLink link={link} key={link.url} />
+              ))}
+            </HorizontalStack>
+          </NavGroup>
         </Nav>
       </footer>
     </Container>

@@ -147,7 +147,7 @@ export function Link({
     sx,
   };
   return (
-    <Tooltip title={tooltipTitle}>
+    <Tooltip title={tooltipTitle} placement="top">
       {isButton ? (
         <Button {...buttonProps} {...sharedProps}>
           {contents}

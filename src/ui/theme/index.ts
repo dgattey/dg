@@ -17,7 +17,7 @@ export const getTheme = (mode: PaletteMode) => {
     },
     grid: {
       gap: 2,
-      gapLarge: 3.5,
+      gapLarge: 3.35,
       contentDimension: 16.5,
       cardSizeInRem: undefined, // set below
     },

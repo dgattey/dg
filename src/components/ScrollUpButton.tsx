@@ -34,7 +34,7 @@ export function ScrollUpButton() {
         gap: 0.5,
         alignItems: 'center',
         opacity: 0,
-        transform: 'translateY(-200%) translateX(-25%)',
+        transform: 'translateY(-200%)',
         paddingX: 1.25,
         paddingY: 0.5,
         transition: (theme) =>
