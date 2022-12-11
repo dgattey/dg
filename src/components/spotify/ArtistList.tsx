@@ -1,8 +1,8 @@
 import type { Artist } from 'api/types/spotify/Track';
 import { Link } from 'components/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
-import styled from '@emotion/styled';
 import { Fragment } from 'react';
+import { Box, Typography } from '@mui/material';
 
 type ArtistListProps = {
   artists: Array<Artist>;
@@ -12,10 +12,6 @@ interface SeparatorProps {
   index: number;
   fullList: Array<unknown>;
 }
-
-const PlainLink = styled(Link)`
-  color: inherit;
-`;
 
 /**
  * Creates a separator for use after an item at index
@@ -52,22 +48,31 @@ export function ArtistList({ artists }: ArtistListProps) {
   }
 
   return (
-    <>
+    <Box>
       {artists.map((artist, index) => {
         const link = artistLink(artist);
         return (
           <Fragment key={artist.id}>
             {link ? (
-              <PlainLink isExternal {...link}>
+              <Link
+                isExternal
+                {...link}
+                href={link.url}
+                linkProps={{ variant: 'body2', color: 'body2' }}
+              >
                 {artist.name}
-              </PlainLink>
+              </Link>
             ) : (
-              artist.name
+              <Typography component="span" variant="body2">
+                {artist.name}
+              </Typography>
             )}
-            <span>{separator({ index, fullList: artists })}</span>
+            <Typography component="span" variant="body2">
+              {separator({ index, fullList: artists })}
+            </Typography>
           </Fragment>
         );
       })}
-    </>
+    </Box>
   );
 }

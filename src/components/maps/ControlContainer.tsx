@@ -1,5 +1,4 @@
-import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+import { styled, css } from '@mui/material/styles';
 import { Children } from 'react';
 
 export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className'> &
@@ -42,12 +41,12 @@ const INTERACTIVE_STYLE = css`
 `;
 
 // Pads each item and uses onClick from child
-const ItemWrapper = styled.div`
+const ItemWrapper = styled('div')`
   ${INTERACTIVE_STYLE}
 `;
 
 // One single control
-const Container = styled.div<{ $isSingular?: boolean }>`
+const Container = styled('div')<{ $isSingular?: boolean }>`
   position: relative;
   overflow: hidden;
   display: flex;

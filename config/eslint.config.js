@@ -59,6 +59,24 @@ const TYPESCRIPT_RULES = {
       noUselessIndex: true,
     },
   ],
+  // I don't care about this - I only ever nest two levels deep
+  'no-nested-ternary': 'off',
+  'no-restricted-imports': [
+    'error',
+    {
+      paths: [
+        {
+          name: '@mui/material',
+          importNames: ['Link'],
+          message: 'Please use the local version of Link instead.',
+        },
+        {
+          name: 'next/link',
+          message: 'Please use the local version of Link instead.',
+        },
+      ],
+    },
+  ],
 };
 
 const TYPESCRIPT_OVERRIDE = {

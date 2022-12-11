@@ -4,7 +4,6 @@ import { ContentCard } from 'components/ContentCard';
 import { cardSize } from 'components/ContentGrid';
 import { HoverableContainer } from 'components/HoverableContainer';
 import { useState } from 'react';
-import styled from '@emotion/styled';
 import {
   BREAKPOINTS_MIN_SIZES,
   PROJECT_2X_IMAGE_SIZES,
@@ -14,13 +13,6 @@ import useBreakpoint from 'use-breakpoint';
 import { Image } from 'components/Image';
 
 type Props = Project & Pick<ContentCardProps, 'turnOnAnimation'>;
-
-// Ensure on mobile, all cards are uniform height (small in height)
-const Card = styled(ContentCard)`
-  @media (max-width: 767.99px) {
-    max-height: ${cardSize(1)};
-  }
-`;
 
 /**
  * Uses the `ContentCard` to show a project's details
@@ -34,7 +26,7 @@ export function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }:
     horizontalSpan === 1 ? PROJECT_IMAGE_SIZES[breakpoint] : PROJECT_2X_IMAGE_SIZES[breakpoint];
 
   return (
-    <Card
+    <ContentCard
       verticalSpan={verticalSpan}
       horizontalSpan={horizontalSpan}
       link={link}
@@ -42,6 +34,11 @@ export function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }:
       onMouseOver={() => setIsHovered(true)}
       onMouseOut={() => setIsHovered(false)}
       turnOnAnimation={turnOnAnimation}
+      sx={(theme) => ({
+        [theme.breakpoints.down('md')]: {
+          maxHeight: cardSize(1),
+        },
+      })}
     >
       {thumbnail && (
         <HoverableContainer isHovered={isHovered}>
@@ -58,6 +55,6 @@ export function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }:
           />
         </HoverableContainer>
       )}
-    </Card>
+    </ContentCard>
   );
 }

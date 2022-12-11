@@ -1,8 +1,9 @@
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
-import { SxProps, Theme, Box } from '@mui/material';
+import { SxProps, Theme, Button } from '@mui/material';
+import { mixinSx } from 'ui/helpers/mixinSx';
 import { ScrollIndicatorContext } from './ScrollIndicatorContext';
+import { Link } from './Link';
 
 /**
  * Aspect ratio'd 1:1 circle. Big, bold, and squished text for use as
@@ -11,20 +12,41 @@ import { ScrollIndicatorContext } from './ScrollIndicatorContext';
 const logoTextStyles =
   (isScrolled: boolean): SxProps<Theme> =>
   (theme) => ({
-    fontSize: '3rem',
+    '&&': {
+      fontSize: '3rem',
+    },
+    background: 'none',
+    boxShadow: 'none',
+    border: 'none',
+    borderRadius: 1,
+    '&:hover': {
+      background: 'none',
+      boxShadow: 'none',
+      border: 'none',
+      color: theme.palette.primary.dark,
+      transform: 'scale(1.05)',
+    },
+    '&:focus-visible': {
+      outline: '-webkit-focus-ring-color auto 1px',
+      background: 'none',
+      boxShadow: 'none',
+      border: 'none',
+    },
     fontVariationSettings: "'wght' 800, 'wdth' 120",
     letterSpacing: '-0.12em',
     lineHeight: 0.75, // visually center the text
-    color: 'rgb(22, 172, 126)',
+    color: theme.palette.primary.main,
     paddingY: 1,
     paddingX: 0,
 
-    transition: theme.transitions.create(['font-size', 'transform']),
     willChange: 'font-size, transform',
     ...(isScrolled && {
-      fontSize: '2rem',
+      '&&': {
+        fontSize: '2rem',
+      },
       padding: 0,
     }),
+    transition: theme.transitions.create(['color', 'font-size', 'transform']),
   });
 
 /**
@@ -33,7 +55,28 @@ const logoTextStyles =
  */
 export function Logo() {
   const router = useRouter();
-  const linkedLogoText = router.asPath === '/' ? 'dg.' : <Link href="/">dg.</Link>;
   const isScrolled = useContext(ScrollIndicatorContext);
-  return <Box sx={logoTextStyles(isScrolled)}>{linkedLogoText}</Box>;
+  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (router.asPath === '/') {
+    return (
+      <Button sx={logoTextStyles(isScrolled)} disableRipple onClick={scrollToTop}>
+        dg.
+      </Button>
+    );
+  }
+
+  return (
+    <Link
+      href="/"
+      linkProps={{ underline: 'none' }}
+      sx={mixinSx(
+        {
+          display: 'block',
+        },
+        logoTextStyles(isScrolled),
+      )}
+    >
+      dg.
+    </Link>
+  );
 }

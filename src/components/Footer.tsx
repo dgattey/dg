@@ -1,7 +1,7 @@
 import { useData } from 'api/useData';
 import { Section } from 'ui/Section';
 import { Nav, NavGroup, NavItem } from 'ui/Nav';
-import { Container, SxProps, Theme } from '@mui/material';
+import { SxProps, Theme, Container } from '@mui/material';
 import { Link } from './Link';
 
 // Wraps so it can collapse better on mobile
@@ -24,22 +24,20 @@ export function Footer() {
       }}
     >
       <Link
-        {...link}
+        title={link.title}
+        icon={link.icon}
+        layout="icon" // the ones that have no icon will resolve to just text
+        href={link.url}
         isExternal={link.url?.startsWith('http')}
         aria-label={link.title}
-        sx={(theme) => ({
-          textDecoration: 'none',
-          color: theme.palette.primary.dark,
-          transition: theme.transitions.create('color'),
-          '&:hover': {
-            color: theme.palette.primary.main,
-          },
-        })}
+        linkProps={{
+          color: 'secondary',
+        }}
       />
     </NavItem>
   ));
   return (
-    <Container component={Section} fixed sx={{ padding: 0 }}>
+    <Container component={Section} sx={{ padding: 0 }}>
       <footer>
         <Nav
           sx={(theme) => ({

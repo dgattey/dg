@@ -1,4 +1,4 @@
-import { GlobalStyleProvider } from 'ui/GlobalStyle';
+import { GlobalStyleProvider } from 'ui/theme/GlobalStyle';
 import { AppProps } from 'next/app';
 
 /**

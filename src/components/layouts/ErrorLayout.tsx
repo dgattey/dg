@@ -1,8 +1,7 @@
 import { Meta } from 'components/Meta';
-import NextLink from 'next/link';
-import styled from '@emotion/styled';
 import { FetchedFallbackData } from 'api/fetchFallbackData';
 import type { EndpointKey } from 'api/endpoints';
+import { Link } from 'components/Link';
 import { PageLayout } from './PageLayout';
 
 type ErrorLayoutProps<Keys extends EndpointKey> = {
@@ -19,11 +18,6 @@ type ErrorLayoutProps<Keys extends EndpointKey> = {
   statusCode: number;
 };
 
-const Container = styled.section`
-  max-width: 36em;
-  margin-bottom: 8rem;
-`;
-
 /**
  * Basic page layout for error pages. Max-width'd content, left aligned,
  * with a go home button at the bottom
@@ -37,12 +31,18 @@ export function ErrorLayout<Keys extends EndpointKey>({
   return (
     <PageLayout fallback={fallback}>
       <Meta title={pageTitle} description="An error occurred" />
-      <Container>
-        {children}
-        <NextLink href="/" role="button">
-          Go back home
-        </NextLink>
-      </Container>
+      {children}
+      <Link
+        isButton
+        buttonProps={{
+          color: 'secondary',
+        }}
+        href="/"
+        title="Home"
+        sx={{ alignSelf: 'flex-start' }}
+      >
+        Go back home
+      </Link>
     </PageLayout>
   );
 }

@@ -5,37 +5,7 @@ import { Image } from 'components/Image';
 import { RichText } from 'components/RichText';
 import { useLinkWithName } from 'hooks/useLinkWithName';
 import { useState } from 'react';
-import styled from '@emotion/styled';
 import { PROJECT_IMAGE_SIZES, PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
-
-const ImageCard = styled(ContentCard)`
-  @media (max-width: 767.96px) {
-    --size: 14em;
-    justify-self: center;
-    width: var(--size);
-    height: var(--size);
-    border-radius: calc(var(--size) / 2);
-
-    & article {
-      visibility: hidden;
-    }
-  }
-`;
-
-const TextCard = styled(ContentCard)`
-  && {
-    overflow: visible;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    background: none;
-    border: none;
-    box-shadow: none;
-    & h1 {
-      --typography-spacing-vertical: 1rem;
-    }
-  }
-`;
 
 /**
  * Creates an intro information card for use on the homepage. Technically
@@ -54,11 +24,23 @@ export function IntroCard() {
 
   return (
     <>
-      <ImageCard
+      <ContentCard
         link={linkedInLink}
         overlay="About"
         onMouseOver={() => setIsHovered(true)}
         onMouseOut={() => setIsHovered(false)}
+        sx={(theme) => ({
+          [theme.breakpoints.down('md')]: {
+            '--size': '14em',
+            justifySelf: 'center',
+            width: 'var(--size)',
+            height: 'var(--size)',
+            borderRadius: 'calc(var(--size) / 2)',
+            '& article': {
+              visibility: 'hidden',
+            },
+          },
+        })}
       >
         <HoverableContainer isHovered={isHovered}>
           <Image
@@ -70,10 +52,20 @@ export function IntroCard() {
             sizes={PROJECT_IMAGE_SIZES}
           />
         </HoverableContainer>
-      </ImageCard>
-      <TextCard>
+      </ContentCard>
+      <ContentCard
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          background: 'none',
+          border: 'none',
+          boxShadow: 'none',
+          borderRadius: 0,
+        }}
+      >
         <RichText {...introBlock.textBlock.content} />
-      </TextCard>
+      </ContentCard>
     </>
   );
 }

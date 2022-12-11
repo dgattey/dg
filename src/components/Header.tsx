@@ -1,9 +1,10 @@
 import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
-import { ScrollUpIndicator } from 'components/ScrollUpIndicator';
+import { ScrollUpButton } from 'components/ScrollUpButton';
 import { useContext } from 'react';
 import { SxProps, Theme, Box } from '@mui/material';
 import { Section } from 'ui/Section';
 import { Nav, NavGroup, NavItem } from 'ui/Nav';
+import { ColorSchemeToggle } from 'components/ColorSchemeToggle';
 import { Logo } from './Logo';
 
 interface Props {
@@ -36,9 +37,11 @@ export function Header({ headerRef }: Props) {
             backgroundColor: isScrolled
               ? theme.palette.background.paper
               : theme.palette.background.default,
-            boxShadow: isScrolled ? theme.shadows[2] : 'none',
-            transition: theme.transitions.create(['background-color', 'box-shadow']),
+            boxShadow: isScrolled ? theme.extraShadows.card.hovered : 'none',
             willChange: 'box-shadow, background-color',
+            ':root[data-animations-enabled=true] &': {
+              transition: theme.transitions.create(['background-color', 'box-shadow']),
+            },
           })}
         >
           <Nav>
@@ -47,7 +50,12 @@ export function Header({ headerRef }: Props) {
                 <Logo />
               </NavItem>
               <NavItem>
-                <ScrollUpIndicator />
+                <ScrollUpButton />
+              </NavItem>
+            </NavGroup>
+            <NavGroup>
+              <NavItem>
+                <ColorSchemeToggle />
               </NavItem>
             </NavGroup>
           </Nav>

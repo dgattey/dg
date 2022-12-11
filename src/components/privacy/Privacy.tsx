@@ -1,13 +1,6 @@
 import { useData } from 'api/useData';
 import { Meta } from 'components/Meta';
 import { RichText } from 'components/RichText';
-import styled from '@emotion/styled';
-
-const SingleColumn = styled(RichText)`
-  max-width: 35em;
-  margin-left: auto;
-  margin-right: auto;
-`;
 
 /**
  * Shows the privacy policy on a page alone
@@ -27,7 +20,13 @@ export function Privacy() {
   return (
     <>
       <Meta title="Privacy Policy" description={privacyDescription} />
-      <SingleColumn {...privacyTextBlock.content} />
+      <RichText
+        sx={{
+          maxWidth: '35em',
+          marginX: 'auto',
+        }}
+        {...privacyTextBlock.content}
+      />
     </>
   );
 }

@@ -2,8 +2,7 @@ import type { MapLocation } from 'api/types/MapLocation';
 import { ColorSchemeContext } from 'components/ColorSchemeContext';
 import { useContext, useEffect, useMemo, useRef } from 'react';
 import { AttributionControl, Map as MapGL, MapRef } from 'react-map-gl';
-import styled from '@emotion/styled';
-import { css } from '@emotion/react';
+import { styled, css } from '@mui/material/styles';
 import { StandardControls } from './StandardControls';
 
 export type Props = {
@@ -42,7 +41,7 @@ const DARK_STYLE = 'mapbox://styles/dylangattey/ckylbbyzc0ok916jx0bvos03d?optimi
  * all of the relevant Mapbox CSS we need. Also hides the map until it's fully loaded so
  * we can show a fallback image before it's loaded.
  */
-const Wrapper = styled.div<{ $isLoaded: boolean }>`
+const Wrapper = styled('div')<{ $isLoaded: boolean }>`
   ${({ $isLoaded }) =>
     !$isLoaded &&
     css`

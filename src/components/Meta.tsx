@@ -1,3 +1,4 @@
+import { Theme, useTheme } from '@mui/material';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -21,8 +22,6 @@ interface Props {
 type Graph = Record<string, string | undefined>;
 
 const MAX_DESC_LENGTH = 300;
-const APP_THEME_COLOR = '#16ac7e';
-const APP_BACKGROUND_COLOR = '#ffffff';
 const SITE_NAME = 'Dylan Gattey';
 const OG_IMAGE_URL = 'https://og.dylangattey.com';
 const GRAPH_PREFIXES = ['og', 'twitter'] as const;
@@ -73,8 +72,13 @@ const ICONS = {
   },
   mask: {
     variants: ['safari-pinned-tab.svg'],
-    element: (name: string) => (
-      <link key={`${name}mask`} rel="mask-icon" href={`/icons/${name}`} color={APP_THEME_COLOR} />
+    element: (name: string, theme: Theme) => (
+      <link
+        key={`${name}mask`}
+        rel="mask-icon"
+        href={`/icons/${name}`}
+        color={theme.palette.primary.main}
+      />
     ),
   },
 } as const;
@@ -112,6 +116,7 @@ export function Meta({ title, description }: Props) {
 
   // Construct url with encoded periods too to not confuse the parser
   const imageTitle = title ? encodeURIComponent(title).replace(/\./g, '%2E') : '%20';
+  const theme = useTheme();
 
   return (
     <Head>
@@ -130,14 +135,14 @@ export function Meta({ title, description }: Props) {
         image: `${OG_IMAGE_URL}/${imageTitle}?md=true`,
       })}
       <link key="favicon" rel="icon" href="/favicon.ico" />
-      <meta key="theme-color" name="theme-color" content="var(--background-color)" />
+      <meta key="theme-color" name="theme-color" content={theme.palette.background.default} />
       <meta
         key="msapplication-TileColor"
         name="msapplication-TileColor"
-        content={APP_BACKGROUND_COLOR}
+        content={theme.palette.background.default}
       />
       {Object.values(ICONS).flatMap(({ variants, element }) =>
-        variants.map((variant) => element(String(variant))),
+        variants.map((variant) => element(String(variant), theme)),
       )}
     </Head>
   );

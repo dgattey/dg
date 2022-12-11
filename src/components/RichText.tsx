@@ -1,7 +1,7 @@
 import { documentToReactComponents, Options } from '@contentful/rich-text-react-renderer';
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
-import { Divider, Typography } from '@mui/material';
+import { Box, Divider, SxProps, Theme, Typography } from '@mui/material';
 import { isDefinedItem, isLink, isProject } from 'api/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
 import { ProjectCard } from 'components/homepage/ProjectCard';
@@ -9,7 +9,9 @@ import { PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
 import { Image } from './Image';
 import { Link } from './Link';
 
-type Props = TextBlockContent & Pick<React.ComponentPropsWithoutRef<'div'>, 'className'>;
+type RichTextProps = TextBlockContent & {
+  sx?: SxProps<Theme>;
+};
 
 /**
  * Defines a Node's Data with actual data
@@ -24,6 +26,8 @@ type DataWithId = {
     };
   };
 };
+
+const HEADING_SX: SxProps<Theme> = { marginBottom: '1rem' };
 
 /**
  * Typeguard for converting the `any` to a structured object
@@ -42,7 +46,7 @@ function EntryElement({ data, entryMap }: { data: NodeData; entryMap: Map<string
   const entry = entryMap.get(data.target.sys.id);
 
   if (isLink(entry)) {
-    return <Link {...entry} />;
+    return <Link {...entry} href={entry.url} />;
   }
   if (isProject(entry)) {
     return <ProjectCard {...entry} />;
@@ -87,13 +91,41 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
 
   return {
     renderNode: {
-      [BLOCKS.HEADING_1]: (_, children) => <Typography variant="h1">{children}</Typography>,
-      [BLOCKS.HEADING_2]: (_, children) => <Typography variant="h2">{children}</Typography>,
-      [BLOCKS.HEADING_3]: (_, children) => <Typography variant="h3">{children}</Typography>,
-      [BLOCKS.HEADING_4]: (_, children) => <Typography variant="h4">{children}</Typography>,
-      [BLOCKS.HEADING_5]: (_, children) => <Typography variant="h5">{children}</Typography>,
-      [BLOCKS.HEADING_6]: (_, children) => <Typography variant="h6">{children}</Typography>,
-      [BLOCKS.PARAGRAPH]: (_, children) => <Typography variant="body1">{children}</Typography>,
+      [BLOCKS.HEADING_1]: (_, children) => (
+        <Typography variant="h1" sx={HEADING_SX}>
+          {children}
+        </Typography>
+      ),
+      [BLOCKS.HEADING_2]: (_, children) => (
+        <Typography variant="h2" sx={HEADING_SX}>
+          {children}
+        </Typography>
+      ),
+      [BLOCKS.HEADING_3]: (_, children) => (
+        <Typography variant="h3" sx={HEADING_SX}>
+          {children}
+        </Typography>
+      ),
+      [BLOCKS.HEADING_4]: (_, children) => (
+        <Typography variant="h4" sx={HEADING_SX}>
+          {children}
+        </Typography>
+      ),
+      [BLOCKS.HEADING_5]: (_, children) => (
+        <Typography variant="h5" sx={HEADING_SX}>
+          {children}
+        </Typography>
+      ),
+      [BLOCKS.HEADING_6]: (_, children) => (
+        <Typography variant="h6" sx={HEADING_SX}>
+          {children}
+        </Typography>
+      ),
+      [BLOCKS.PARAGRAPH]: (_, children) => (
+        <Typography variant="body1" sx={{ marginBottom: '1.5rem' }}>
+          {children}
+        </Typography>
+      ),
       [BLOCKS.HR]: () => <Divider />,
       [INLINES.EMBEDDED_ENTRY]: ({ data }) => <EntryElement data={data} entryMap={entryMap} />,
       [BLOCKS.EMBEDDED_ENTRY]: ({ data }) => <EntryElement data={data} entryMap={entryMap} />,
@@ -106,13 +138,13 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
  * Complicated component to render rich text from Contentful's rich
  * text renderer, resolving all items to components
  */
-export function RichText({ json, links, className }: Props) {
+export function RichText({ json, links, sx }: RichTextProps) {
   return (
-    <div className={className}>
+    <Box sx={sx}>
       {
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
         documentToReactComponents(json as unknown as Document, renderOptions(links))
       }
-    </div>
+    </Box>
   );
 }

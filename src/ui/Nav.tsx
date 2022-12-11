@@ -1,4 +1,4 @@
-import { Box, Container } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import { mixinSx } from './helpers/mixinSx';
 
 /**
@@ -30,7 +30,8 @@ export function NavGroup({ sx, children, ...props }: React.ComponentProps<typeof
  */
 export function NavItem({ sx, children, ...props }: React.ComponentProps<typeof Box>) {
   return (
-    <Box
+    <Typography
+      variant="body2"
       component="li"
       {...props}
       sx={mixinSx(
@@ -46,7 +47,7 @@ export function NavItem({ sx, children, ...props }: React.ComponentProps<typeof 
       )}
     >
       {children}
-    </Box>
+    </Typography>
   );
 }
 

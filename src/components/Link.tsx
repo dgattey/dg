@@ -1,5 +1,3 @@
-/* eslint-disable react/no-danger */
-import type { Link as LinkType } from 'api/types/generated/contentfulApi.generated';
 import { FaIcon } from 'components/FaIcon';
 import { faGithubAlt } from '@fortawesome/free-brands-svg-icons/faGithubAlt';
 import { faInstagram } from '@fortawesome/free-brands-svg-icons/faInstagram';
@@ -8,38 +6,55 @@ import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons/faPaperPlane';
 import { faQuestion } from '@fortawesome/free-solid-svg-icons/faQuestion';
+// eslint-disable-next-line no-restricted-imports
 import NextLink from 'next/link';
 
-import { Box, SxProps, Theme } from '@mui/material';
+import {
+  SxProps,
+  Theme,
+  // eslint-disable-next-line no-restricted-imports
+  Link as MuiLink,
+  LinkProps as MuiLinkProps,
+  Tooltip,
+  ButtonProps,
+  Button,
+} from '@mui/material';
+
+type BaseLinkProps = {
+  title?: string;
+  href: string | undefined;
+  icon?: string;
+
+  /**
+   * Can be missing for icon-only links
+   */
+  children?: React.ReactNode;
+  sx?: SxProps<Theme>;
+
+  /**
+   * Renders as a certain type of layout.
+   * 1. 'text' renders just plain text
+   * 2. 'icon' renders the icon with a tooltip
+   * 3. 'iconText' renders the icon without a tooltip, next to text
+   * 5. 'children' renders just some children
+   */
+  layout?: 'text' | 'icon' | 'iconText';
+
+  /**
+   * Defaults to false, but can be set to true to add target="_blank" and
+   * rel="noreferrer"
+   */
+  isExternal?: boolean;
+};
 
 /**
- * Renders as a certain type of layout.
- * 1. 'text' renders just plain text
- * 2. 'icon' renders the icon with a tooltip
- * 4. 'plainIcon' renders just the icon, but without a tooltip
- * 3. 'plainIconAndText' renders the icon without a tooltip, next to text
- * 5. 'empty' renders a link without content - usually coupled with spanning the parent
+ * Either provides MUI link or button props depending on type
  */
-type Layout = 'text' | 'icon' | 'plainIcon' | 'plainIconAndText' | 'empty';
-
-type LinkProps = Pick<LinkType, 'title' | 'url' | 'icon'> &
-  Pick<React.ComponentProps<'div'>, 'className' | 'children'> & {
-    /**
-     * Defaults to `text` when there's no icon, or `icon` when one is specified
-     */
-    layout?: Layout;
-
-    /**
-     * Defaults to false, but can be set to true to add target="_blank" and
-     * rel="noreferrer"
-     */
-    isExternal?: boolean;
-
-    sx?: SxProps<Theme>;
-  };
-
-// Used a few times, required layout
-type SubProps = Pick<LinkProps, 'title' | 'icon'> & { layout: Layout };
+type LinkProps = BaseLinkProps &
+  (
+    | { isButton: true; buttonProps?: ButtonProps; linkProps?: never }
+    | { isButton?: never; linkProps?: MuiLinkProps; buttonProps?: never }
+  );
 
 /**
  * All built in mappings for icon name to element
@@ -58,23 +73,11 @@ const BUILT_IN_ICONS: Record<string, JSX.Element> = {
  * If there's an icon, returns it, either built in or not, along with its title if
  * the layout calls for it.
  */
-const createIconElement = ({ icon, title, layout }: SubProps) =>
-  icon && !['empty', 'text'].includes(layout) ? (
-    <>
-      {BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />}
-      {layout === 'plainIconAndText' && (
-        <Box component="span" sx={{ marginLeft: 0.25 }}>
-          {title}
-        </Box>
-      )}
-    </>
-  ) : null;
-
-/**
- * Creates the tooltip contents if the layout calls for it
- */
-const tooltip = ({ title, layout }: SubProps) =>
-  layout === 'icon' ? title ?? undefined : undefined;
+const createIconElement = ({ icon, layout = 'text' }: Pick<BaseLinkProps, 'icon' | 'layout'>) =>
+  icon && !['children', 'text'].includes(layout)
+    ? // eslint-disable-next-line react/no-danger
+      BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />
+    : null;
 
 /**
  * Renders a link component from Contentful. Sometimes the icons are
@@ -85,33 +88,75 @@ const tooltip = ({ title, layout }: SubProps) =>
  */
 export function Link({
   title,
-  url,
+  href,
   icon,
-  layout: rawLayout,
-  className,
   children,
+  isButton,
   isExternal,
+  layout: initialLayout = 'text',
   sx,
-  ...props
-}: LinkProps & Omit<React.ComponentProps<typeof NextLink>, 'href'>) {
-  const layout = rawLayout ?? (icon && !children ? 'icon' : 'text');
-  if (!url) {
+  linkProps,
+  buttonProps,
+}: LinkProps) {
+  /**
+   * Generates a layout enum for use in computing the contents
+   */
+  const layout = (() => {
+    if (children) {
+      return 'children';
+    }
+    if (initialLayout === 'text' && title) {
+      return 'text';
+    }
+    if (['icon', 'iconText'].includes(initialLayout) && icon) {
+      return initialLayout;
+    }
+    return 'text';
+  })();
+
+  if (!href || !layout) {
     return null;
   }
 
+  // Tooltip shows up when there's just an icon, otherwise not needed
+  const tooltipTitle = layout === 'icon' ? title : null;
+
   // If there's a custom or built in icon, create a link around it
-  const iconElement = createIconElement({ title, icon, layout });
+  const contents = (() => {
+    switch (layout) {
+      case 'icon':
+        return createIconElement({ icon, layout });
+      case 'iconText':
+        return (
+          <>
+            {createIconElement({ icon, layout })}
+            <span style={{ marginLeft: 4 }}>{title}</span>
+          </>
+        );
+      case 'text':
+        return title;
+      case 'children':
+        return children;
+    }
+  })();
+  const sharedProps = {
+    component: NextLink,
+    href,
+    'aria-label': title,
+    ...(isExternal ? { target: '_blank', rel: 'noreferrer' } : {}),
+    sx,
+  };
   return (
-    <Box
-      component={NextLink}
-      {...props}
-      href={url}
-      className={className}
-      data-tooltip={tooltip({ title, icon, layout })}
-      {...(isExternal ? { target: '_blank', rel: 'noreferrer' } : {})}
-      sx={sx}
-    >
-      {layout === 'empty' ? null : children ?? iconElement ?? title}
-    </Box>
+    <Tooltip title={tooltipTitle}>
+      {isButton ? (
+        <Button {...buttonProps} {...sharedProps}>
+          {contents}
+        </Button>
+      ) : (
+        <MuiLink {...linkProps} {...sharedProps}>
+          {contents}
+        </MuiLink>
+      )}
+    </Tooltip>
   );
 }

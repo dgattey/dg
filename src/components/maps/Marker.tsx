@@ -1,7 +1,7 @@
 import type { MapLocation } from 'api/types/MapLocation';
 import { Image } from 'components/Image';
 import { Marker as MapMarker } from 'react-map-gl';
-import styled from '@emotion/styled';
+import { styled } from '@mui/material/styles';
 import { MAP_MARKER_IMAGE_SIZE } from 'constants/imageSizes';
 
 const DIMENSION = 100;
@@ -14,11 +14,11 @@ type MarkerProps = Pick<MapLocation, 'point'> & Partial<Pick<MapLocation, 'image
 /**
  * Creates a circle to show
  */
-const AreaIndicator = styled.circle`
+const AreaIndicator = styled('circle')`
   fill: var(--map-marker);
 `;
 
-const ImageContainer = styled.span`
+const ImageContainer = styled('span')`
   position: absolute;
   left: ${(DIMENSION - IMAGE_DIMENSION) / 2}px;
   top: ${(DIMENSION - IMAGE_DIMENSION) / 2}px;
