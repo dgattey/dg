@@ -1,8 +1,8 @@
 import type { MapLocation } from 'api/types/MapLocation';
 import { Image } from 'components/Image';
 import { Marker as MapMarker } from 'react-map-gl';
-import { styled } from '@mui/material/styles';
 import { MAP_MARKER_IMAGE_SIZE } from 'constants/imageSizes';
+import { Box } from '@mui/material';
 
 const DIMENSION = 100;
 const RADIUS = DIMENSION / 2;
@@ -10,19 +10,6 @@ const IMAGE_DIMENSION = MAP_MARKER_IMAGE_SIZE;
 
 // Required point, optional image
 type MarkerProps = Pick<MapLocation, 'point'> & Partial<Pick<MapLocation, 'image'>>;
-
-/**
- * Creates a circle to show
- */
-const AreaIndicator = styled('circle')`
-  fill: var(--map-marker);
-`;
-
-const ImageContainer = styled('span')`
-  position: absolute;
-  left: ${(DIMENSION - IMAGE_DIMENSION) / 2}px;
-  top: ${(DIMENSION - IMAGE_DIMENSION) / 2}px;
-`;
 
 /**
  * Creates a standard map marker, centered on a point
@@ -36,7 +23,14 @@ export function Marker({ point, image }: MarkerProps) {
     <MapMarker {...point}>
       <svg width={DIMENSION} height={DIMENSION}>
         <defs>
-          <AreaIndicator id={id} r={RADIUS} cx={RADIUS} cy={RADIUS} />
+          <Box
+            component="circle"
+            id={id}
+            r={RADIUS}
+            cx={RADIUS}
+            cy={RADIUS}
+            sx={{ fill: 'var(--map-marker)' }}
+          />
           <clipPath id="clip">
             <use xlinkHref={`#${id}`} />
           </clipPath>
@@ -49,7 +43,14 @@ export function Marker({ point, image }: MarkerProps) {
         />
       </svg>
       {image && (
-        <ImageContainer>
+        <Box
+          component="span"
+          sx={{
+            position: 'absolute',
+            left: `${(DIMENSION - IMAGE_DIMENSION) / 2}px`,
+            top: `${(DIMENSION - IMAGE_DIMENSION) / 2}px`,
+          }}
+        >
           <Image
             width={IMAGE_DIMENSION}
             height={IMAGE_DIMENSION}
@@ -60,7 +61,7 @@ export function Marker({ point, image }: MarkerProps) {
               extraLarge: IMAGE_DIMENSION,
             }}
           />
-        </ImageContainer>
+        </Box>
       )}
     </MapMarker>
   );

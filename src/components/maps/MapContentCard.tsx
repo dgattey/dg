@@ -14,7 +14,7 @@ type MapContentCardProps = {
 };
 
 /**
- * MapContentCard is a styled ContentCard that has a background image and
+ * MapContentCard is a ContentCard that has a background image and
  * expandable support.
  */
 export function MapContentCard({

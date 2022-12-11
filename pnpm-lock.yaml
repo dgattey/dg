@@ -8,7 +8,6 @@ importers:
       '@contentful/rich-text-types': 16.0.2
       '@emotion/cache': 11.10.5
       '@emotion/react': 11.10.5
-      '@emotion/styled': 11.10.5
       '@fortawesome/fontawesome-svg-core': 6.2.1
       '@fortawesome/free-brands-svg-icons': 6.2.1
       '@fortawesome/free-solid-svg-icons': 6.2.1
@@ -77,12 +76,11 @@ importers:
       '@contentful/rich-text-types': 16.0.2
       '@emotion/cache': 11.10.5
       '@emotion/react': 11.10.5_xl5my4wapvq2ctl7qwehtbgorq
-      '@emotion/styled': 11.10.5_3djhvnr4jirfvebjqpipo7gthy
       '@fortawesome/fontawesome-svg-core': 6.2.1
       '@fortawesome/free-brands-svg-icons': 6.2.1
       '@fortawesome/free-solid-svg-icons': 6.2.1
       '@fortawesome/react-fontawesome': 0.2.0_z27bm67dtmuyyvss23ckjdrcuy
-      '@mui/material': 5.10.16_lskpmcsdi7ipu6qpuapyu56ihm
+      '@mui/material': 5.10.16_tat3kdnzjvbyqbisj2gf62sngm
       '@next/bundle-analyzer': 13.0.6
       animate-css-grid: 1.4.3
       cmd-ts: 0.11.0
@@ -850,31 +848,6 @@ packages:
 
   /@emotion/sheet/1.2.1:
     resolution: {integrity: sha512-zxRBwl93sHMsOj4zs+OslQKg/uhF38MB+OMKoCrVuS0nyTkqnau+BM3WGEoOptg9Oz45T/aIGs1qbVAsEFo3nA==}
-    dev: false
-
-  /@emotion/styled/11.10.5_3djhvnr4jirfvebjqpipo7gthy:
-    resolution: {integrity: sha512-8EP6dD7dMkdku2foLoruPCNkRevzdcBaY6q0l0OsbyJK+x8D9HWjX27ARiSIKNF634hY9Zdoedh8bJCiva8yZw==}
-    peerDependencies:
-      '@babel/core': ^7.0.0
-      '@emotion/react': ^11.0.0-rc.0
-      '@types/react': '*'
-      react: '>=16.8.0'
-    peerDependenciesMeta:
-      '@babel/core':
-        optional: true
-      '@types/react':
-        optional: true
-    dependencies:
-      '@babel/core': 7.20.5
-      '@babel/runtime': 7.20.6
-      '@emotion/babel-plugin': 11.10.5_@babel+core@7.20.5
-      '@emotion/is-prop-valid': 1.2.0
-      '@emotion/react': 11.10.5_xl5my4wapvq2ctl7qwehtbgorq
-      '@emotion/serialize': 1.1.1
-      '@emotion/use-insertion-effect-with-fallbacks': 1.0.0_react@18.2.0
-      '@emotion/utils': 1.2.0
-      '@types/react': 18.0.26
-      react: 18.2.0
     dev: false
 
   /@emotion/unitless/0.8.0:
@@ -1700,7 +1673,7 @@ packages:
     resolution: {integrity: sha512-eK9+olw2ZbXX+vGrtKnN01/vLP1aX0Lq0xok35bqWM1aB93Dcmky/xPNf8h31oJ/C+IzJBjZaZMEDzVZg4Qc0A==}
     dev: false
 
-  /@mui/material/5.10.16_lskpmcsdi7ipu6qpuapyu56ihm:
+  /@mui/material/5.10.16_tat3kdnzjvbyqbisj2gf62sngm:
     resolution: {integrity: sha512-JSHcDQQ+k30NKkCM/0KX6jq4F5LOrbFKZpS+cEl7scZWOCJpUPH5ccAT5a7O8wzrgNZ8Y9PnwzNvWBrfShpJFw==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
@@ -1719,10 +1692,9 @@ packages:
     dependencies:
       '@babel/runtime': 7.20.6
       '@emotion/react': 11.10.5_xl5my4wapvq2ctl7qwehtbgorq
-      '@emotion/styled': 11.10.5_3djhvnr4jirfvebjqpipo7gthy
       '@mui/base': 5.0.0-alpha.108_ib3m5ricvtkl2cll7qpr2f6lvq
       '@mui/core-downloads-tracker': 5.10.16
-      '@mui/system': 5.10.16_ogriz7mfahdh34qnfautfro5yu
+      '@mui/system': 5.10.16_qvatmowesywn4ye42qoh247szu
       '@mui/types': 7.2.2_@types+react@18.0.26
       '@mui/utils': 5.10.16_react@18.2.0
       '@types/react': 18.0.26
@@ -1753,7 +1725,7 @@ packages:
       react: 18.2.0
     dev: false
 
-  /@mui/styled-engine/5.10.16_dovxhg2tvkkxkdnqyoum6wzcxm:
+  /@mui/styled-engine/5.10.16_hp5f5nkljdiwilp4rgxyefcplu:
     resolution: {integrity: sha512-ZMSjXvtiGwGDKqrSlXhpxK2voUaF2/lpC/pSTfFmZvKH9j9a9h1/iwo3ybgjFVYGgbfNeW4h0xEchiRohu9xsw==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
@@ -1769,13 +1741,12 @@ packages:
       '@babel/runtime': 7.20.6
       '@emotion/cache': 11.10.5
       '@emotion/react': 11.10.5_xl5my4wapvq2ctl7qwehtbgorq
-      '@emotion/styled': 11.10.5_3djhvnr4jirfvebjqpipo7gthy
       csstype: 3.1.1
       prop-types: 15.8.1
       react: 18.2.0
     dev: false
 
-  /@mui/system/5.10.16_ogriz7mfahdh34qnfautfro5yu:
+  /@mui/system/5.10.16_qvatmowesywn4ye42qoh247szu:
     resolution: {integrity: sha512-OqI9B1jZ9zQ/dmoqseku4CzdEs9DbLiiMOaWxC3WeAJxM1UavlCgXz0encqm93LIlmSL7TjuHN1/rW8BJCnU8A==}
     engines: {node: '>=12.0.0'}
     peerDependencies:
@@ -1793,9 +1764,8 @@ packages:
     dependencies:
       '@babel/runtime': 7.20.6
       '@emotion/react': 11.10.5_xl5my4wapvq2ctl7qwehtbgorq
-      '@emotion/styled': 11.10.5_3djhvnr4jirfvebjqpipo7gthy
       '@mui/private-theming': 5.10.16_kzbn2opkn2327fwg5yzwzya5o4
-      '@mui/styled-engine': 5.10.16_dovxhg2tvkkxkdnqyoum6wzcxm
+      '@mui/styled-engine': 5.10.16_hp5f5nkljdiwilp4rgxyefcplu
       '@mui/types': 7.2.2_@types+react@18.0.26
       '@mui/utils': 5.10.16_react@18.2.0
       '@types/react': 18.0.26

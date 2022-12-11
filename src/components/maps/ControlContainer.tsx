@@ -1,5 +1,7 @@
-import { styled, css } from '@mui/material/styles';
+import { Box, BoxProps } from '@mui/material';
+import { Theme, SxProps } from '@mui/material/styles';
 import { Children } from 'react';
+import { mixinSx } from '../../ui/helpers/mixinSx';
 
 export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className'> &
   (
@@ -28,45 +30,52 @@ export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className
   );
 
 // Applied to anything interactive
-const INTERACTIVE_STYLE = css`
-  padding: 0.5rem;
-  cursor: pointer;
-  color: var(--color);
-  background-color: var(--background-color);
-  transition: color var(--transition), background-color var(--transition);
-  :hover {
-    background-color: var(--secondary-hover);
-    color: var(--secondary-inverse);
-  }
-`;
+const INTERACTIVE_SX: SxProps<Theme> = {
+  padding: '0.5rem',
+  cursor: 'pointer',
+  color: 'var(--color)',
+  backgroundColor: 'var(--background-color)',
+  transition: 'color var(--transition), background-color var(--transition)',
+  ':hover': {
+    backgroundColor: 'var(--secondary-hover)',
+    color: 'var(--secondary-inverse)',
+  },
+};
 
-// Pads each item and uses onClick from child
-const ItemWrapper = styled('div')`
-  ${INTERACTIVE_STYLE}
-`;
-
-// One single control
-const Container = styled('div')<{ $isSingular?: boolean }>`
-  position: relative;
-  overflow: hidden;
-  display: flex;
-  width: 100%;
-  border-radius: var(--border-radius);
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
-  font-size: 1rem;
-  line-height: 1;
-  ${({ $isSingular }) =>
-    $isSingular
-      ? css`
-          :before {
-            content: '';
-            display: block;
-            padding-top: 100%;
-          }
-          ${INTERACTIVE_STYLE}
-        `
-      : css``}
-`;
+/**
+ * Renders one single control
+ */
+function Container({ isSingular, ...props }: { isSingular?: boolean } & BoxProps) {
+  return (
+    <Box
+      {...props}
+      sx={mixinSx(
+        {
+          position: 'relative',
+          overflow: 'hidden',
+          display: 'flex',
+          width: '100%',
+          borderRadius: 'var(--border-radius)',
+          boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.1)',
+          fontSize: '1rem',
+          lineHeight: '1',
+          ...(isSingular &&
+            mixinSx(
+              {
+                ':before': {
+                  content: '""',
+                  display: 'block',
+                  paddingTop: '100%',
+                },
+              },
+              INTERACTIVE_SX,
+            )),
+        },
+        props.sx,
+      )}
+    />
+  );
+}
 
 /**
  * This is what surrounds any control to contain it, automatically responding
@@ -76,7 +85,7 @@ const Container = styled('div')<{ $isSingular?: boolean }>`
 export function ControlContainer({ onClick, children, className }: ControlContainerProps) {
   if (!Array.isArray(children)) {
     return (
-      <Container $isSingular onClick={onClick} className={className}>
+      <Container isSingular onClick={onClick}>
         {children}
       </Container>
     );
@@ -85,7 +94,9 @@ export function ControlContainer({ onClick, children, className }: ControlContai
   return (
     <Container className={className}>
       {Children.map(children, (child) => (
-        <ItemWrapper onClick={child.props.onClick}>{child}</ItemWrapper>
+        <Box sx={INTERACTIVE_SX} onClick={child.props.onClick}>
+          {child}
+        </Box>
       ))}
     </Container>
   );
