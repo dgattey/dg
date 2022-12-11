@@ -9,14 +9,16 @@ import { ThemeProvider } from '@mui/material';
  * Applies theming + reset + other global styles to the full app
  */
 export function GlobalStyleProvider({ children }: { children: React.ReactNode }) {
-  const colorSchemeData = useColorScheme();
-  const appliedTheme = useMemo(
-    () => getTheme(colorSchemeData.colorScheme.mode),
-    [colorSchemeData.colorScheme],
-  );
+  const value = useColorScheme();
+  const appliedTheme = useMemo(() => getTheme(value.colorScheme.mode), [value.colorScheme]);
+
+  // Ensure we don't see a flash of light theme, then swap to dark
+  if (!value.colorScheme.isInitialized) {
+    return null;
+  }
 
   return (
-    <ColorSchemeContext.Provider value={colorSchemeData}>
+    <ColorSchemeContext.Provider value={value}>
       <ThemeProvider theme={appliedTheme}>
         <CssBaseline enableColorScheme />
         {children}
