@@ -12,8 +12,8 @@ import { Link } from './Link';
 const logoTextStyles =
   (isScrolled: boolean): SxProps<Theme> =>
   (theme) => ({
-    '&&': {
-      fontSize: '2.5rem',
+    '&': {
+      fontSize: '2.5em',
     },
     background: 'none',
     boxShadow: 'none',
@@ -41,8 +41,8 @@ const logoTextStyles =
 
     willChange: 'font-size, transform',
     ...(isScrolled && {
-      '&&': {
-        fontSize: '1.75rem',
+      '&': {
+        fontSize: '1.75em',
       },
       paddingY: 0.5,
     }),

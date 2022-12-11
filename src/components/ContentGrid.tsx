@@ -7,18 +7,6 @@ type Props = Pick<React.ComponentProps<'div'>, 'children'> & {
   gridRef: React.RefObject<HTMLDivElement>;
 };
 
-// In rem, how big each card in the content grid is
-const CONTENT_GRID_DIMENSION = 16.5;
-
-// In rem, how big the gap between cards is
-const CONTENT_GRID_GAP = 3.5;
-
-/**
- * Creates a card size in rem from a span
- */
-export const cardSize = (span = 1) =>
-  `${CONTENT_GRID_DIMENSION * span + (span - 1) * CONTENT_GRID_GAP}rem`;
-
 /**
  * Displays all our content in a grid - on the client it uses `animate-css-grid`
  * for nice animations when items change in size, which we do when expanding cards.
@@ -35,15 +23,15 @@ export function ContentGrid({ children, gridRef }: Props) {
       sx={(theme) => ({
         paddingTop: 6,
         display: 'grid',
-        gap: '2rem',
+        gap: `${theme.grid.gap}rem`,
         gridTemplateColumns: '1fr',
         gridAutoFlow: 'dense',
         justifyContent: 'center',
         position: 'relative',
         [theme.breakpoints.up('md')]: {
-          gap: `${CONTENT_GRID_GAP}rem`,
-          gridTemplateColumns: `repeat(auto-fit, ${CONTENT_GRID_DIMENSION}rem)`,
-          gridAutoRows: `minmax(${CONTENT_GRID_DIMENSION}rem, auto)`,
+          gap: `${theme.grid.gapLarge}rem`,
+          gridTemplateColumns: `repeat(auto-fit, ${theme.grid.contentDimension}rem)`,
+          gridAutoRows: `minmax(${theme.grid.contentDimension}rem, auto)`,
         },
       })}
     >

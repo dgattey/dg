@@ -19,6 +19,10 @@ export const COLORS = {
     H4: '#374956',
     H5: '#415462',
     H6: '#4d606d',
+    MAP: {
+      MARKER_BACKGROUND: 'rgba(58, 123, 172, 0.25)',
+      MARKER_BORDER: 'rgba(139, 185, 220, 0.75)',
+    },
   },
   DARK: {
     DEFAULT_BACKGROUND: 'rgb(17, 25, 31)',
@@ -33,5 +37,9 @@ export const COLORS = {
     H4: '#c8d1d8',
     H5: '#bbc6ce',
     H6: '#afbbc4',
+    MAP: {
+      MARKER_BACKGROUND: 'rgba(58, 123, 172, 0.5)',
+      MARKER_BORDER: 'rgba(166, 189, 206, 0.5)',
+    },
   },
 };

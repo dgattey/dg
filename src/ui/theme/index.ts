@@ -12,6 +12,15 @@ export const getTheme = (mode: PaletteMode) => {
     palette: getPalette(mode),
     typography: getTypography(mode),
     extraShadows: shadows,
+    borderRadius: {
+      card: '2.5em',
+    },
+    grid: {
+      gap: 2,
+      gapLarge: 3.5,
+      contentDimension: 16.5,
+      cardSizeInRem: undefined, // set below
+    },
     breakpoints: {
       values: {
         xs: 0,
@@ -105,7 +114,7 @@ export const getTheme = (mode: PaletteMode) => {
         styleOverrides: {
           root: ({ theme }) => ({
             textTransform: 'initial',
-            borderRadius: '2.5em',
+            borderRadius: theme.borderRadius.card,
             padding: theme.spacing(1, 3),
           }),
         },
@@ -114,7 +123,7 @@ export const getTheme = (mode: PaletteMode) => {
         styleOverrides: {
           root: ({ theme }) => ({
             background: theme.palette.card.background,
-            borderRadius: '2.5em',
+            borderRadius: theme.borderRadius.card,
             borderColor: theme.palette.card.border,
             borderWidth: 1,
             borderStyle: 'solid',
@@ -127,7 +136,7 @@ export const getTheme = (mode: PaletteMode) => {
           tooltip: ({ theme }) => ({
             ...theme.typography.caption,
             background: theme.palette.card.background,
-            borderRadius: '2.5em',
+            borderRadius: theme.borderRadius.card,
             borderColor: theme.palette.card.border,
             borderWidth: 1,
             borderStyle: 'solid',
@@ -139,6 +148,15 @@ export const getTheme = (mode: PaletteMode) => {
       },
     },
   });
+
+  /**
+   * Creates a card size in rem from a span
+   */
+  themeWithColorMode.grid.cardSizeInRem = (span = 1) =>
+    `${
+      themeWithColorMode.grid.contentDimension * span +
+      (span - 1) * themeWithColorMode.grid.gapLarge
+    }rem`;
 
   return responsiveFontSizes(themeWithColorMode);
 };

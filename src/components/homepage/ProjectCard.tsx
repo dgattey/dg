@@ -1,7 +1,6 @@
 import type { Project } from 'api/types/generated/contentfulApi.generated';
 import type { ContentCardProps } from 'components/ContentCard';
 import { ContentCard } from 'components/ContentCard';
-import { cardSize } from 'components/ContentGrid';
 import { HoverableContainer } from 'components/HoverableContainer';
 import { useState } from 'react';
 import { Image } from 'components/Image';
@@ -27,7 +26,7 @@ export function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }:
       turnOnAnimation={turnOnAnimation}
       sx={(theme) => ({
         [theme.breakpoints.down('md')]: {
-          maxHeight: cardSize(0.75),
+          maxHeight: theme.grid.cardSizeInRem(0.75),
         },
       })}
     >

@@ -29,17 +29,20 @@ export function Marker({ point, image }: MarkerProps) {
             r={RADIUS}
             cx={RADIUS}
             cy={RADIUS}
-            sx={{ fill: 'rgba(58, 123, 172, 0.5)' }}
+            sx={(theme) => ({ fill: theme.palette.map.markerBackground })}
           />
           <clipPath id="clip">
             <use xlinkHref={`#${id}`} />
           </clipPath>
         </defs>
-        <use
+        <Box
+          component="use"
           xlinkHref={`#${id}`}
-          stroke="rgba(166, 189, 206, 0.5)"
           strokeWidth="2"
           clipPath="url(#clip)"
+          sx={{
+            stroke: (theme) => theme.palette.map.markerBorder,
+          }}
         />
       </svg>
       {image && (

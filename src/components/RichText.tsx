@@ -27,7 +27,7 @@ type DataWithId = {
   };
 };
 
-const HEADING_SX: SxProps<Theme> = { marginBottom: '1rem' };
+const HEADING_SX: SxProps<Theme> = { marginBottom: (theme) => theme.spacing(3) };
 
 /**
  * Typeguard for converting the `any` to a structured object
@@ -122,7 +122,7 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
         </Typography>
       ),
       [BLOCKS.PARAGRAPH]: (_, children) => (
-        <Typography variant="body1" sx={{ marginBottom: '1.5rem' }}>
+        <Typography variant="body1" sx={{ marginBottom: (theme) => theme.spacing(3.5) }}>
           {children}
         </Typography>
       ),

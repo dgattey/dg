@@ -1,6 +1,5 @@
 import { Box, BoxProps, Theme } from '@mui/material';
 import { Children } from 'react';
-import { mixinSx } from '../../ui/helpers/mixinSx';
 
 export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className'> &
   (
@@ -41,23 +40,20 @@ export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className
 /**
  * Renders one single control
  */
-function Container({ sx, ...props }: BoxProps) {
+function Container({ theme, ...props }: Omit<BoxProps, 'sx'> & { theme: Theme }) {
   return (
     <Box
       {...props}
-      sx={mixinSx(
-        {
-          position: 'relative',
-          overflow: 'hidden',
-          display: 'flex',
-          width: '100%',
-          borderRadius: '2.5em',
-          boxShadow: '0 0 0 2px rgba(0, 0, 0, 0.1)',
-          fontSize: '1rem',
-          lineHeight: '1',
-        },
-        sx,
-      )}
+      sx={{
+        boxShadow: theme.extraShadows.map.control,
+        position: 'relative',
+        overflow: 'hidden',
+        display: 'flex',
+        width: '100%',
+        borderRadius: theme.borderRadius.card,
+        fontSize: '1rem',
+        lineHeight: '1',
+      }}
     />
   );
 }
@@ -83,23 +79,23 @@ export function ControlContainer({ onClick, children, className, theme }: Contro
     },
   };
 
-  if (!Array.isArray(children)) {
-    return (
-      <Container className={className} onClick={onClick}>
+  return (
+    <Container
+      className={className}
+      onClick={!Array.isArray(children) ? onClick : undefined}
+      theme={theme}
+    >
+      {Array.isArray(children) ? (
+        Children.map(children, (child) => (
+          <Box sx={controlSx} onClick={child.props.onClick}>
+            {child}
+          </Box>
+        ))
+      ) : (
         <Box sx={controlSx} onClick={onClick}>
           {children}
         </Box>
-      </Container>
-    );
-  }
-
-  return (
-    <Container className={className}>
-      {Children.map(children, (child) => (
-        <Box sx={controlSx} onClick={child.props.onClick}>
-          {child}
-        </Box>
-      ))}
+      )}
     </Container>
   );
 }

@@ -3,7 +3,6 @@ import { truncated } from 'helpers/truncated';
 import { useState } from 'react';
 import { Card, SxProps, Theme, Typography } from '@mui/material';
 import { mixinSx } from 'ui/helpers/mixinSx';
-import { cardSize } from './ContentGrid';
 import { ContentWrappingLink } from './ContentWrappingLink';
 
 export type ContentCardProps = Pick<
@@ -91,11 +90,11 @@ function getCardSx(
     [theme.breakpoints.up('md')]: {
       ...(verticalSpan && {
         gridRow: `span ${verticalSpan}`,
-        height: cardSize(verticalSpan),
+        height: theme.grid.cardSizeInRem(verticalSpan),
       }),
       ...(horizontalSpan && {
         gridColumn: `span ${horizontalSpan}`,
-        width: cardSize(horizontalSpan),
+        width: theme.grid.cardSizeInRem(horizontalSpan),
       }),
     },
   };
@@ -124,7 +123,7 @@ function LinkWrappedChildren({
       {overlayContents}
       <ContentWrappingLink
         link={link}
-        sx={{
+        sx={(theme) => ({
           // By default the focus ring is hidden, so pseudo element it
           '&:focus-visible:before': {
             content: '""',
@@ -132,10 +131,10 @@ function LinkWrappedChildren({
             width: '100%',
             height: '100%',
             outline: '-webkit-focus-ring-color auto 1px',
-            borderRadius: '2.5rem', // matches the Card's
+            borderRadius: theme.borderRadius.card,
             zIndex: 1,
           },
-        }}
+        })}
       >
         {children}
       </ContentWrappingLink>
@@ -158,24 +157,24 @@ function OverlayContent({
 }) {
   return (
     <Card
-      sx={mixinSx((theme) => {
-        const boxShadow = '0 0 4px rgba(0, 0, 0, 0.1), 0 0 8px rgba(0, 0, 0, 0.16)';
-        return {
+      sx={mixinSx(
+        (theme) => ({
           position: 'absolute',
-          bottom: '1rem',
-          left: '1rem',
+          bottom: theme.spacing(2),
+          left: theme.spacing(2),
           margin: 0,
-          paddingLeft: theme.spacing(1.5),
-          paddingRight: theme.spacing(1.5),
-          paddingTop: theme.spacing(0.75),
-          paddingBottom: theme.spacing(0.75),
-          boxShadow,
+          paddingLeft: theme.spacing(1.75),
+          paddingRight: theme.spacing(1.75),
+          paddingTop: theme.spacing(1),
+          paddingBottom: theme.spacing(1),
+          boxShadow: theme.extraShadows.card.overlayHovered,
           '&:hover': {
-            boxShadow,
+            boxShadow: theme.extraShadows.card.overlayHovered,
           },
           zIndex: 1,
-        };
-      }, sx)}
+        }),
+        sx,
+      )}
     >
       <Typography variant="h5" sx={truncated(1)}>
         {overlay}

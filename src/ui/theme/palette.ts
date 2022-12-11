@@ -28,6 +28,10 @@ const lightPalette: PaletteOptions = {
   text: {
     primary: COLORS.LIGHT.TEXT,
   },
+  map: {
+    markerBackground: COLORS.LIGHT.MAP.MARKER_BACKGROUND,
+    markerBorder: COLORS.LIGHT.MAP.MARKER_BORDER,
+  },
 };
 
 const darkPalette: PaletteOptions = {
@@ -47,6 +51,10 @@ const darkPalette: PaletteOptions = {
   },
   text: {
     primary: COLORS.DARK.TEXT,
+  },
+  map: {
+    markerBackground: COLORS.DARK.MAP.MARKER_BACKGROUND,
+    markerBorder: COLORS.DARK.MAP.MARKER_BORDER,
   },
 };
 

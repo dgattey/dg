@@ -85,7 +85,7 @@ function Wrapper({ isLoaded, children }: { isLoaded: boolean; children: React.Re
           left: 0,
         },
         '& .mapboxgl-ctrl': {
-          margin: '1.25rem',
+          margin: theme.spacing(3.25),
           pointerEvents: 'auto',
         },
         '& .mapboxgl-ctrl.mapboxgl-ctrl-attrib': {
@@ -95,14 +95,11 @@ function Wrapper({ isLoaded, children }: { isLoaded: boolean; children: React.Re
           a: {
             ...theme.typography.caption,
             color: theme.palette.text.secondary,
+            textDecoration: 'none',
           },
         },
         '& .mapboxgl-ctrl-attrib-button': {
           display: 'none',
-        },
-        '& .mapboxgl-ctrl-attrib a': {
-          color: 'hsla(0, 0%, 0%, 0.75)',
-          textDecoration: 'none',
         },
         '& .mapboxgl-ctrl-logo': {
           width: '88px',
