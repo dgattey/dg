@@ -1,32 +1,23 @@
-import { Typography } from '@mui/material';
 import { FetchedFallbackData, fetchFallbackData } from 'api/fetchFallbackData';
+import { ErrorPageContents } from 'components/errors/ErrorPageContents';
 import { ErrorLayout } from 'components/layouts/ErrorLayout';
-import { Link } from 'components/Link';
-import { useLinkWithName } from 'hooks/useLinkWithName';
+import { PageLayout } from 'components/layouts/PageLayout';
 import type { NextPageContext } from 'next';
 import NextErrorComponent from 'next/error';
-import { useRouter } from 'next/router';
+import type { GetLayout } from 'types/Page';
 
-interface HasStatusCode {
+export type PageProps = {
   /**
    * What kind of error we encountered
    */
   statusCode?: number;
-}
+};
 
-export type ErrorPageProps = HasStatusCode & {
+type LayoutProps = PageProps & {
   /**
    * Provides SWR with fallback version data
    */
   fallback: FetchedFallbackData<'version' | 'footer'>;
-};
-
-export type ErrorWithCode = Error & HasStatusCode;
-
-// Error codes to title of page
-const TITLE: Record<number | 'fallback', string> = {
-  404: "😢 Oops, couldn't find that!",
-  fallback: '😬 This is awkward...',
 };
 
 /**
@@ -38,7 +29,7 @@ export const getStaticProps = async (context: NextPageContext) => {
   const errorCode = err?.statusCode ?? 404;
   const statusCode = res ? res.statusCode : errorCode;
   const { props: fallbackProps } = await fetchFallbackData(['version', 'footer']);
-  const props: ErrorPageProps = {
+  const props: PageProps = {
     ...fallbackProps,
     ...errorProps,
     statusCode,
@@ -58,51 +49,18 @@ export const getStaticProps = async (context: NextPageContext) => {
 };
 
 /**
- * Contents of the page in a different element so fallback can work its server-rendered magic
+ * Generic error page, for 500s/etc
  */
-export function Contents({ statusCode }: HasStatusCode) {
-  const router = useRouter();
-  const emailLink = useLinkWithName('Email');
-  const descriptions: Record<number | 'fallback', JSX.Element> = {
-    404: (
-      <>
-        I didn&apos;t see a page matching the url{' '}
-        <Typography variant="code" component="code">
-          {router.asPath}
-        </Typography>{' '}
-        on the site. Check out the homepage and see if you can find what you were looking for. If
-        not,
-      </>
-    ),
-    fallback: (
-      <>
-        Looks like I encountered a serverside error, otherwise known as a dreaded{' '}
-        {statusCode ?? 500}. Sorry! Try refreshing the page or attempting your action again. If
-        it&apos;s still broken,
-      </>
-    ),
-  };
-  return (
-    <>
-      <Typography variant="h1">{(statusCode && TITLE[statusCode]) || TITLE.fallback}</Typography>
-      <Typography variant="body1" sx={{ maxWidth: '35em' }}>
-        {(statusCode && descriptions[statusCode]) || descriptions.fallback}{' '}
-        {emailLink ? <Link layout="iconText" {...emailLink} href={emailLink.url} /> : 'Email Me'}{' '}
-        and I can help you out!
-      </Typography>
-    </>
-  );
+function Page({ statusCode }: PageProps) {
+  return <ErrorPageContents statusCode={statusCode} />;
 }
 
-/**
- * Generic error page, for 404s//500s/etc
- */
-function ErrorPage({ statusCode, fallback }: ErrorPageProps) {
-  return (
-    <ErrorLayout fallback={fallback} statusCode={statusCode ?? 500}>
-      <Contents statusCode={statusCode} />
-    </ErrorLayout>
-  );
-}
+const getLayout: GetLayout<LayoutProps> = (page, pageProps) => (
+  <PageLayout fallback={pageProps.fallback}>
+    <ErrorLayout statusCode={pageProps.statusCode ?? 500}>{page}</ErrorLayout>
+  </PageLayout>
+);
 
-export default ErrorPage;
+Page.getLayout = getLayout;
+
+export default Page;

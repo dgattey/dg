@@ -2,14 +2,15 @@ import { FetchedFallbackData, fetchFallbackData } from 'api/fetchFallbackData';
 import { Homepage } from 'components/homepage/Homepage';
 import { PageLayout } from 'components/layouts/PageLayout';
 import type { GetStaticProps } from 'next/types';
+import type { GetLayout } from 'types/Page';
 
-type HomeProps = {
+type PageProps = {
   fallback: FetchedFallbackData<
     'version' | 'footer' | 'projects' | 'intro' | 'location' | 'latest/track' | 'latest/activity'
   >;
 };
 
-export const getStaticProps: GetStaticProps<HomeProps> = async () =>
+export const getStaticProps: GetStaticProps<PageProps> = async () =>
   fetchFallbackData([
     'version',
     'footer',
@@ -20,12 +21,14 @@ export const getStaticProps: GetStaticProps<HomeProps> = async () =>
     'latest/activity',
   ]);
 
-function Home({ fallback }: HomeProps) {
-  return (
-    <PageLayout fallback={fallback}>
-      <Homepage />
-    </PageLayout>
-  );
+function Page() {
+  return <Homepage />;
 }
 
-export default Home;
+const getLayout: GetLayout<PageProps> = (page, pageProps) => (
+  <PageLayout fallback={pageProps.fallback}>{page}</PageLayout>
+);
+
+Page.getLayout = getLayout;
+
+export default Page;
