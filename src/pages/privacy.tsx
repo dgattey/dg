@@ -1,21 +1,24 @@
 import { FetchedFallbackData, fetchFallbackData } from 'api/fetchFallbackData';
 import { PageLayout } from 'components/layouts/PageLayout';
 import { Privacy } from 'components/privacy/Privacy';
-import { GetStaticProps } from 'next/types';
+import type { GetStaticProps } from 'next/types';
+import type { GetLayout } from 'types/Page';
 
-type PrivacyProps = {
+type PageProps = {
   fallback: FetchedFallbackData<'footer' | 'version' | 'privacy'>;
 };
 
-export const getStaticProps: GetStaticProps<PrivacyProps> = async () =>
+export const getStaticProps: GetStaticProps<PageProps> = async () =>
   fetchFallbackData(['footer', 'version', 'privacy']);
 
-function PrivacyPage({ fallback }: PrivacyProps) {
-  return (
-    <PageLayout fallback={fallback}>
-      <Privacy />
-    </PageLayout>
-  );
+function Page() {
+  return <Privacy />;
 }
 
-export default PrivacyPage;
+const getLayout: GetLayout<PageProps> = (page, pageProps) => (
+  <PageLayout fallback={pageProps.fallback}>{page}</PageLayout>
+);
+
+Page.getLayout = getLayout;
+
+export default Page;

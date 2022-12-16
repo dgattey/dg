@@ -1,19 +1,30 @@
-import { fetchFallbackData } from 'api/fetchFallbackData';
+import { FetchedFallbackData, fetchFallbackData } from 'api/fetchFallbackData';
+import { ErrorPageContents } from 'components/errors/ErrorPageContents';
 import { ErrorLayout } from 'components/layouts/ErrorLayout';
+import { PageLayout } from 'components/layouts/PageLayout';
 import type { GetStaticProps } from 'next/types';
-import { Contents, ErrorPageProps } from './_error';
+import type { GetLayout } from 'types/Page';
 
-export const getStaticProps: GetStaticProps = async () => fetchFallbackData(['version', 'footer']);
+type PageProps = {
+  fallback: FetchedFallbackData<'footer' | 'version'>;
+};
+
+export const getStaticProps: GetStaticProps<PageProps> = async () =>
+  fetchFallbackData(['version', 'footer']);
 
 /**
  * Error page, for 404s specifically
  */
-function Error404Page({ fallback }: ErrorPageProps) {
-  return (
-    <ErrorLayout fallback={fallback} statusCode={404}>
-      <Contents statusCode={404} />
-    </ErrorLayout>
-  );
+function Page() {
+  return <ErrorPageContents statusCode={404} />;
 }
 
-export default Error404Page;
+const getLayout: GetLayout<PageProps> = (page, pageProps) => (
+  <PageLayout fallback={pageProps.fallback}>
+    <ErrorLayout statusCode={404}>{page}</ErrorLayout>
+  </PageLayout>
+);
+
+Page.getLayout = getLayout;
+
+export default Page;
