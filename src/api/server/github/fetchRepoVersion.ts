@@ -1,6 +1,6 @@
-import type { GithubRepoVersionQuery } from 'api/types/generated/fetchGithubRepoVersion.generated';
+import type { GithubRepoVersionQuery } from 'api/types/generated/fetchRepoVersion.generated';
 import { gql } from 'graphql-request';
-import { githubClient } from './networkClients/githubClient';
+import { githubClient } from '../networkClients/githubClient';
 
 /**
  * This, strictly speaking, is usually overkill. We fetch the 100 most recently
@@ -35,7 +35,7 @@ const QUERY = gql`
  * help us find the release when running locally. A production build locally won't
  * have either of these defined, so we'll just return `null`.
  */
-export const fetchGithubRepoVersion = async () => {
+export async function fetchRepoVersion(): Promise<string | null> {
   const version = process.env.NEXT_PUBLIC_APP_VERSION;
   if (version?.length) {
     return version;
@@ -48,4 +48,4 @@ export const fetchGithubRepoVersion = async () => {
   const filteredReleases =
     releases?.filter((release) => release?.tagCommit?.oid === commitSha?.trim()) ?? [];
   return filteredReleases[0]?.name ?? commitSha?.slice(-12) ?? null;
-};
+}

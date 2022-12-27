@@ -1,10 +1,10 @@
-import { fetchContentfulFooterLinks } from './server/fetchContentfulFooterLinks';
-import { fetchContentfulIntroBlock } from './server/fetchContentfulIntroBlock';
-import { fetchContentfulLocation } from './server/fetchContentfulLocation';
-import { fetchContentfulPrivacyBlock } from './server/fetchContentfulPrivacyBlock';
-import { fetchContentfulProjects } from './server/fetchContentfulProjects';
-import { fetchGithubRepoVersion } from './server/fetchGithubRepoVersion';
-import { fetchSpotifyCurrentlyPlaying } from './server/fetchSpotifyCurrentlyOrRecentlyPlayed';
+import { fetchFooterLinks } from './server/contentful/fetchFooterLinks';
+import { fetchIntroContent } from './server/contentful/fetchIntroContent';
+import { fetchCurrentLocation } from './server/contentful/fetchCurrentLocation';
+import { fetchPrivacyContent } from './server/contentful/fetchPrivacyContent';
+import { fetchProjects } from './server/contentful/fetchProjects';
+import { fetchRepoVersion } from './server/github/fetchRepoVersion';
+import { fetchRecentlyPlayed } from './server/spotify/fetchRecentlyPlayed';
 import { fetchLatestStravaActivityFromDb } from './server/strava/fetchLatestStravaActivityFromDb';
 
 /**
@@ -30,25 +30,25 @@ export type AwaitedType<Key extends EndpointKey> = Awaited<EndpointType<Key>>;
  */
 export const endpoints = {
   // Intro block of content via Contentful
-  intro: fetchContentfulIntroBlock,
+  intro: fetchIntroContent,
 
   // Privacy block of content via Contentful
-  privacy: fetchContentfulPrivacyBlock,
+  privacy: fetchPrivacyContent,
 
   // My current location via Contentful
-  location: fetchContentfulLocation,
+  location: fetchCurrentLocation,
 
   // All projects via Contentful
-  projects: fetchContentfulProjects,
+  projects: fetchProjects,
 
   // Footer links via Contentful
-  footer: fetchContentfulFooterLinks,
+  footer: fetchFooterLinks,
 
   // App version via Github
-  version: fetchGithubRepoVersion,
+  version: fetchRepoVersion,
 
   // Last played song via Spotify
-  'latest/track': fetchSpotifyCurrentlyPlaying,
+  'latest/track': fetchRecentlyPlayed,
 
   // Fetches the latest Strava activity I've done
   'latest/activity': fetchLatestStravaActivityFromDb,

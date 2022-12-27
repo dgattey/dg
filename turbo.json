@@ -10,7 +10,7 @@
     ".sequelizerc",
     ".pretterrc.js",
     ".pretterignore",
-    "codegen.js",
+    "codegen.ts",
     "next.config.js",
     "tsconfig.json"
   ],

@@ -1,7 +1,8 @@
 import { isTextBlock } from 'api/parsers';
-import type { PrivacyBlockQuery } from 'api/types/generated/fetchContentfulPrivacyBlock.generated';
 import { gql } from 'graphql-request';
-import { contentfulClient } from './networkClients/contentfulClient';
+import type { PrivacyBlockQuery } from 'api/types/generated/fetchPrivacyContent.generated';
+import { contentfulClient } from '../networkClients/contentfulClient';
+import { TextBlock } from '../../types/generated/contentfulApi.generated';
 
 /**
  * Grabs the Contentful text block for the privacy page - should be
@@ -53,7 +54,7 @@ const QUERY = gql`
  * Fetches the text block corresponding to the privacy rich text
  * for the privacy page.
  */
-export const fetchContentfulPrivacyBlock = async () => {
+export async function fetchPrivacyContent(): Promise<TextBlock | null> {
   const data = await contentfulClient.request<PrivacyBlockQuery>(QUERY);
-  return data?.textBlockCollection?.items?.filter(isTextBlock)?.[0];
-};
+  return data?.textBlockCollection?.items?.filter(isTextBlock)?.[0] ?? null;
+}
