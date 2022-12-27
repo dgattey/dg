@@ -16,7 +16,7 @@
     "format": "prettier --loglevel warn --write \"**/*.{js,ts,tsx,mjs,cjs,css,md,json,yml,yaml}\"",
     "lint": "eslint . --cache --fix --ext .js,.ts,.tsx,.mjs,.cjs --no-eslintrc -c config/eslint.config.js",
     "lint:types": "tsc --noEmit",
-    "codegen": "DOTENV_CONFIG_PATH='.env.development.local' graphql-codegen --require dotenv/config --config codegen.js",
+    "codegen": "DOTENV_CONFIG_PATH='.env.development.local' graphql-codegen --require dotenv/config --config codegen.ts",
     "db": "sequelize",
     "db:migrate": "sequelize db:migrate",
     "db:migrate:status": "sequelize db:migrate:status",

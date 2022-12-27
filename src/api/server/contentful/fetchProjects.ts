@@ -1,7 +1,8 @@
 import { isProject } from 'api/parsers';
-import type { ProjectsQuery } from 'api/types/generated/fetchContentfulProjects.generated';
+import { Project } from 'api/types/generated/contentfulApi.generated';
+import type { ProjectsQuery } from 'api/types/generated/fetchProjects.generated';
 import { gql } from 'graphql-request';
-import { contentfulClient } from './networkClients/contentfulClient';
+import { contentfulClient } from '../networkClients/contentfulClient';
 
 /**
  * Grabs all projects to display
@@ -33,7 +34,7 @@ const QUERY = gql`
 /**
  * Fetches all projects sorted by newest first.
  */
-export const fetchContentfulProjects = async () => {
+export async function fetchProjects(): Promise<Array<Project>> {
   const data = await contentfulClient.request<ProjectsQuery>(QUERY);
   return data?.projectCollection?.items.filter(isProject) ?? [];
-};
+}

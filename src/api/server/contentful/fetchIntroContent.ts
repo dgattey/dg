@@ -1,11 +1,8 @@
 import { isTextBlock } from 'api/parsers';
-import type { IntroBlockQuery } from 'api/types/generated/fetchContentfulIntroBlock.generated';
-import { PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
+import type { TextBlock } from 'api/types/generated/contentfulApi.generated';
+import type { IntroBlockQuery } from 'api/types/generated/fetchIntroContent.generated';
 import { gql } from 'graphql-request';
-import { contentfulClient } from './networkClients/contentfulClient';
-
-// Account for pixel density
-const IMAGE_SIZE = PROJECT_MAX_IMAGE_DIMENSION * 2;
+import { contentfulClient } from '../networkClients/contentfulClient';
 
 /**
  * Grabs the contentful sections with the title of header. Should
@@ -14,11 +11,13 @@ const IMAGE_SIZE = PROJECT_MAX_IMAGE_DIMENSION * 2;
 const QUERY = gql`
   query IntroBlock {
     asset(id: "1P5peDFKfzDHjWd6mcytc8") {
-      url(transform: {
-        width: ${IMAGE_SIZE}
-        height: ${IMAGE_SIZE}
-        format: WEBP
-      })
+      url(
+        transform: {
+          width: 660 # PROJECT_MAX_IMAGE_DIMENSION * 2
+          height: 660 # PROJECT_MAX_IMAGE_DIMENSION * 2
+          format: WEBP
+        }
+      )
       width
       height
       title
@@ -67,7 +66,15 @@ const QUERY = gql`
  * Fetches the text block corresponding to the introduction rich text
  * for the home page.
  */
-export const fetchContentfulIntroBlock = async () => {
+export async function fetchIntroContent(): Promise<null | {
+  textBlock: TextBlock;
+  image: {
+    url: string | undefined;
+    width: number | undefined;
+    height: number | undefined;
+    title: string | undefined;
+  };
+}> {
   const data = await contentfulClient.request<IntroBlockQuery>(QUERY);
   const textBlock = data?.textBlockCollection?.items?.filter(isTextBlock)?.[0];
   const image = data?.asset;
@@ -75,4 +82,4 @@ export const fetchContentfulIntroBlock = async () => {
     return { textBlock, image };
   }
   return null;
-};
+}

@@ -1,3 +1,6 @@
+// eslint-disable-next-line import/no-extraneous-dependencies
+import { CodegenConfig } from '@graphql-codegen/cli';
+
 require('dotenv').config();
 
 // Where all our documents to parse live by default
@@ -35,15 +38,22 @@ const API_CONFIG = {
  *
  * You'll notice that every API has the same configuration except for the name,
  * scalars, and endpoint/authorization. That's intentional!
- *
- * @param {String} name The API name (lowercase)
- * @param {{ schemaEndpoint: string, token: string, scalars: Record<string, boolean|string|number>, onlyOperationTypes: boolean }} options all API options
- *
- * @returns {Record<string, Record<string, unknown>>} The generators to spread
  */
-const createApiGenerator = (name, { schemaEndpoint, token, scalars, onlyOperationTypes }) => {
-  const firstLetter = name[0] ?? '';
-  const documents = `${BASE_FOLDER}/fetch${firstLetter.toUpperCase() + name.slice(1)}*.ts`;
+const createApiGenerator = (
+  name: string,
+  {
+    schemaEndpoint,
+    token,
+    scalars,
+    onlyOperationTypes,
+  }: {
+    schemaEndpoint: string;
+    token: string;
+    scalars: Record<string, unknown>;
+    onlyOperationTypes: boolean;
+  },
+): CodegenConfig['generates'] => {
+  const documents = `${BASE_FOLDER}/${name}/*.ts`;
   const baseTypesPath = `${GENERATED_FOLDER}/${name}Api.generated.ts`;
   const schemas = [
     {
@@ -76,7 +86,7 @@ const createApiGenerator = (name, { schemaEndpoint, token, scalars, onlyOperatio
       preset: 'near-operation-file',
       presetConfig: {
         baseTypesPath: `../${baseTypesPath}`,
-        folder: GENERATED_FOLDER,
+        folder: `../${GENERATED_FOLDER}`,
       },
       config: {
         ...SHARED_CONFIG,
@@ -124,7 +134,7 @@ const githubGenerators = createApiGenerator('github', {
  * prettier after running generation for Contentful and Github,
  * and overwrite existing files.
  */
-module.exports = {
+const config: CodegenConfig = {
   overwrite: true,
   hooks: {
     afterAllFileWrite: ['prettier --write'],
@@ -134,3 +144,5 @@ module.exports = {
     ...githubGenerators,
   },
 };
+
+export default config;

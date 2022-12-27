@@ -1,15 +1,8 @@
 import { isDefinedItem } from 'api/parsers';
-import type { MyLocationQuery } from 'api/types/generated/fetchContentfulLocation.generated';
+import type { MyLocationQuery } from 'api/types/generated/fetchCurrentLocation.generated';
 import type { MapLocation } from 'api/types/MapLocation';
-import { MAP_MARKER_IMAGE_SIZE, PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
 import { gql } from 'graphql-request';
-import { contentfulClient } from './networkClients/contentfulClient';
-
-// To account for pixel density, we need double the size!
-const IMAGE_SIZE = MAP_MARKER_IMAGE_SIZE * 2;
-
-// The preview image is a standard project size
-const PREVIEW_IMAGE_SIZE = PROJECT_MAX_IMAGE_DIMENSION * 2;
+import { contentfulClient } from '../networkClients/contentfulClient';
 
 /**
  * Grabs the home location using a known id for it
@@ -24,30 +17,36 @@ const QUERY = gql`
       initialZoom
       zoomLevels
       image {
-        url(transform: { 
-          width: ${IMAGE_SIZE}, 
-          height: ${IMAGE_SIZE},
-          format: WEBP
-        })
+        url(
+          transform: {
+            width: 170 # MAP_MARKER_IMAGE_SIZE * 2
+            height: 170 # MAP_MARKER_IMAGE_SIZE * 2
+            format: WEBP
+          }
+        )
         width
         height
       }
     }
     lightImage: asset(id: "5PrFVu1gJBLhgJGixRL4Wc") {
-      url(transform: { 
-          width: ${PREVIEW_IMAGE_SIZE}, 
-          height: ${PREVIEW_IMAGE_SIZE},
-          quality: 80,
+      url(
+        transform: {
+          width: 660 # PROJECT_MAX_IMAGE_DIMENSION * 2
+          height: 660 # PROJECT_MAX_IMAGE_DIMENSION * 2
+          quality: 80
           format: WEBP
-        })
+        }
+      )
     }
     darkImage: asset(id: "6bRgM9lkcceJQOE0jSOEfu") {
-      url(transform: { 
-          width: ${PREVIEW_IMAGE_SIZE}, 
-          height: ${PREVIEW_IMAGE_SIZE},
-          quality: 80,
+      url(
+        transform: {
+          width: 660 # PROJECT_MAX_IMAGE_DIMENSION * 2
+          height: 660 # PROJECT_MAX_IMAGE_DIMENSION * 2
+          quality: 80
           format: WEBP
-        })
+        }
+      )
     }
   }
 `;
@@ -55,7 +54,7 @@ const QUERY = gql`
 /**
  * Fetches my current location from Contentful.
  */
-export const fetchContentfulLocation = async (): Promise<MapLocation | null> => {
+export async function fetchCurrentLocation(): Promise<MapLocation | null> {
   const data = await contentfulClient.request<MyLocationQuery>(QUERY);
   const location = data?.contentTypeLocation;
   if (!location || !data?.lightImage?.url || !data?.darkImage?.url) {
@@ -75,4 +74,4 @@ export const fetchContentfulLocation = async (): Promise<MapLocation | null> => 
     zoomLevels,
     backupImageUrls: { light: data.lightImage.url, dark: data.darkImage.url },
   };
-};
+}

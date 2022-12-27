@@ -47,6 +47,7 @@ function Wrapper({ isLoaded, children }: { isLoaded: boolean; children: React.Re
       sx={(theme) => ({
         ...(!isLoaded && { visibility: 'hidden' }),
         position: 'relative',
+        pointerEvents: 'visible',
         height: '100%',
         width: '100%',
         '& .mapboxgl-map': {
