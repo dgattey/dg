@@ -15,8 +15,13 @@ export function ActivityTypeWithIcon() {
     return null;
   }
 
-  const typeText = activity.type === 'Ride' ? 'Ride' : 'Run';
-  const icon = <FaIcon size="1.25em" icon={activity.type === 'Ride' ? faBicycle : faRunning} />;
+  // Split on capital letters to split an enum-like value
+  const typeText = activity.type.includes('Ride')
+    ? activity.type.replace(/(?<=[a-z])(?=[A-Z])/, ' ')
+    : 'Run';
+  const icon = (
+    <FaIcon size="1.25em" icon={activity.type.includes('Ride') ? faBicycle : faRunning} />
+  );
 
   return (
     <Typography
