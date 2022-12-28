@@ -1,6 +1,6 @@
 import { ColorSchemeContext } from 'components/ColorSchemeContext';
 import { useContext } from 'react';
-import { Stack, Switch } from '@mui/material';
+import { Stack, Switch, switchClasses } from '@mui/material';
 import { ColorSchemeIcon } from 'components/ColorSchemeIcon';
 
 const HEIGHT_PX = 24;
@@ -40,18 +40,13 @@ export function ColorSchemeToggle() {
           margin: 0,
           padding: 0,
 
-          '& .Mui-focusVisible': {
-            outlineColor: '-webkit-focus-ring-color',
-            outlineStyle: 'solid',
-            outlineWidth: 'medium',
-          },
-          '&& .MuiSwitch-switchBase': {
+          [`&& .${switchClasses.switchBase}`]: {
             margin: PADDING,
             padding: 0,
 
-            '&.Mui-checked': {
+            [`&.${switchClasses.checked}`]: {
               transform: `translateX(${WIDTH_PX - TRACK_SIZE_PX - 2 * PADDING_PX}px)`,
-              '&& + .MuiSwitch-track': {
+              [`&& + .${switchClasses.track}`]: {
                 opacity: 1,
                 backgroundColor: colorScheme.isCustomized
                   ? theme.palette.active.main
@@ -59,18 +54,18 @@ export function ColorSchemeToggle() {
               },
             },
           },
-          '&& .MuiSwitch-input': {
+          [`&& .${switchClasses.input}`]: {
             width: WIDTH_PX * 2 + TRACK_SIZE_PX,
             height: HEIGHT_PX,
             left: -WIDTH_PX - TRACK_SIZE_PX / 2,
             top: -PADDING_PX,
           },
-          '& .MuiSwitch-thumb': {
+          [`& .${switchClasses.thumb}`]: {
             backgroundColor: theme.palette.common.white,
             width: TRACK_SIZE_PX,
             height: TRACK_SIZE_PX,
           },
-          '&& .MuiSwitch-track': {
+          [`&& .${switchClasses.track}`]: {
             opacity: 1,
             backgroundColor: colorScheme.isCustomized
               ? theme.palette.active.main
