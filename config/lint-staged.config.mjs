@@ -26,7 +26,7 @@ const jobs = {
   [migrationsPath]: format,
 
   // In non js/ts files, just format
-  '*.{js,ts,tsx,css,md,json,yml,yaml}': format,
+  '*.{css,md,json,yml,yaml}': format,
 };
 
 export default jobs;
