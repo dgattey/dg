@@ -1,3 +1,5 @@
+import 'ui/theme/classNameSetupOnImport';
+
 import { GlobalStyleProvider } from 'ui/theme/GlobalStyle';
 import { AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
