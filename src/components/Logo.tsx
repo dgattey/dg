@@ -24,7 +24,7 @@ const logoTextStyles =
       background: 'none',
       boxShadow: 'none',
       border: 'none',
-      color: theme.palette.primary.dark,
+      color: theme.vars.palette.primary.dark,
       transform: 'scale(1.05)',
     },
     '&:focus-visible': {
@@ -36,7 +36,7 @@ const logoTextStyles =
     fontVariationSettings: "'wght' 800, 'wdth' 120",
     letterSpacing: '-0.12em',
     lineHeight: 0.75, // visually center the text
-    color: theme.palette.primary.main,
+    color: theme.vars.palette.primary.main,
     paddingY: 2,
     paddingX: 0,
 

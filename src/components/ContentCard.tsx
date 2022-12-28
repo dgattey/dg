@@ -84,7 +84,7 @@ function getCardSx(
     ...(isClickable && {
       cursor: 'pointer',
       '&:hover': {
-        borderColor: theme.palette.card.border,
+        borderColor: theme.vars.palette.card.border,
         boxShadow: theme.extraShadows.card.hovered,
       },
     }),

@@ -169,7 +169,7 @@ export const getTheme = (mode: PaletteMode) => {
             }
             const paletteColor =
               // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-              theme.palette[color as 'primary' | 'secondary' | 'warning' | 'info' | 'success'];
+              theme.vars.palette[color as 'primary' | 'secondary' | 'warning' | 'info' | 'success'];
             if (!paletteColor) {
               return {};
             }
@@ -198,9 +198,9 @@ export const getTheme = (mode: PaletteMode) => {
       MuiCard: {
         styleOverrides: {
           root: ({ theme }) => ({
-            background: theme.palette.card.background,
+            background: theme.vars.palette.card.background,
             borderRadius: theme.borderRadius.card,
-            borderColor: theme.palette.card.border,
+            borderColor: theme.vars.palette.card.border,
             borderWidth: 1,
             borderStyle: 'solid',
             boxShadow: theme.extraShadows.card.main,
@@ -211,14 +211,14 @@ export const getTheme = (mode: PaletteMode) => {
         styleOverrides: {
           tooltip: ({ theme }) => ({
             ...theme.typography.caption,
-            background: theme.palette.card.background,
+            background: theme.vars.palette.card.background,
             borderRadius: theme.borderRadius.card,
-            borderColor: theme.palette.card.border,
+            borderColor: theme.vars.palette.card.border,
             borderWidth: 1,
             borderStyle: 'solid',
             boxShadow: theme.shadows[2],
             padding: theme.spacing(0.5, 1.5),
-            color: theme.palette.text.primary,
+            color: theme.vars.palette.text.primary,
           }),
         },
       },

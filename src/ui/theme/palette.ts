@@ -1,18 +1,13 @@
 import { PaletteOptions, PaletteMode } from '@mui/material';
 import { COLORS } from 'ui/theme/color';
 
-const sharedPalette: Partial<PaletteOptions> & { secondary: { main: string } } = {
+const lightPalette: PaletteOptions = {
   primary: {
     main: COLORS.PRIMARY,
   },
   secondary: {
     main: COLORS.SECONDARY,
   },
-};
-
-const lightPalette: PaletteOptions = {
-  ...sharedPalette,
-  mode: 'light',
   card: {
     background: COLORS.LIGHT.CARD_BACKGROUND,
     border: COLORS.LIGHT.CARD_BORDER,
@@ -46,8 +41,12 @@ const lightPalette: PaletteOptions = {
 };
 
 const darkPalette: PaletteOptions = {
-  ...sharedPalette,
-  mode: 'dark',
+  primary: {
+    main: COLORS.PRIMARY,
+  },
+  secondary: {
+    main: COLORS.SECONDARY,
+  },
   card: {
     background: COLORS.DARK.CARD_BACKGROUND,
     border: COLORS.DARK.CARD_BORDER,
@@ -62,7 +61,7 @@ const darkPalette: PaletteOptions = {
   },
   warning: { main: COLORS.DARK.YELLOW },
   active: {
-    main: sharedPalette.secondary.main,
+    main: COLORS.SECONDARY,
   },
   text: {
     primary: COLORS.DARK.TEXT,

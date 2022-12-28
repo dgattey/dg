@@ -70,12 +70,12 @@ export function ControlContainer({ onClick, children, className, theme }: Contro
     lineHeight: 1,
     padding: '0.5rem',
     cursor: 'pointer',
-    color: theme.palette.text.primary,
-    backgroundColor: theme.palette.background.default,
+    color: theme.vars.palette.text.primary,
+    backgroundColor: theme.vars.palette.background.default,
     transition: theme.transitions.create(['background-color', 'color']),
     ':hover': {
-      backgroundColor: theme.palette.secondary.main,
-      color: theme.palette.secondary.contrastText,
+      backgroundColor: theme.vars.palette.secondary.main,
+      color: theme.vars.palette.secondary.contrastText,
     },
   };
 

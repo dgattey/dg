@@ -48,8 +48,8 @@ export function ColorSchemeToggle() {
               [`&& + .${switchClasses.track}`]: {
                 opacity: 1,
                 backgroundColor: colorScheme.isCustomized
-                  ? theme.palette.active.main
-                  : theme.palette.card.border,
+                  ? theme.vars.palette.active.main
+                  : theme.vars.palette.card.border,
               },
             },
           },
@@ -60,15 +60,15 @@ export function ColorSchemeToggle() {
             top: -PADDING_PX,
           },
           [`& .${switchClasses.thumb}`]: {
-            backgroundColor: theme.palette.common.white,
+            backgroundColor: theme.vars.palette.common.white,
             width: TRACK_SIZE_PX,
             height: TRACK_SIZE_PX,
           },
-          [`&& .${switchClasses.track}`]: {
+          [`&&& .${switchClasses.track}`]: {
             opacity: 1,
             backgroundColor: colorScheme.isCustomized
-              ? theme.palette.active.main
-              : theme.palette.card.border,
+              ? theme.vars.palette.active.main
+              : theme.vars.palette.card.border,
             borderRadius: HEIGHT_PX / 2,
             transition: theme.transitions.create('background-color'),
           },

@@ -39,9 +39,9 @@ export function ColorSchemeIcon({ mode }: ColorSchemeIconProps) {
   );
   const iconColor = (theme: Theme) => {
     if (isResetMode) {
-      return theme.palette.text.secondary;
+      return theme.vars.palette.text.secondary;
     }
-    return mode === 'dark' ? theme.palette.secondary.light : theme.palette.warning.main;
+    return mode === 'dark' ? theme.vars.palette.secondary.light : theme.vars.palette.warning.main;
   };
 
   const updateMode = colorScheme.isInitialized ? () => updatePreferredMode(mode) : undefined;

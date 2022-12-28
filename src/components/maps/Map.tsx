@@ -91,11 +91,11 @@ function Wrapper({ isLoaded, children }: { isLoaded: boolean; children: React.Re
         },
         '& .mapboxgl-ctrl.mapboxgl-ctrl-attrib': {
           padding: theme.spacing(0.25, 1.5),
-          backgroundColor: theme.palette.background.paper,
+          backgroundColor: theme.vars.palette.background.paper,
           borderRadius: 8,
           a: {
             ...theme.typography.caption,
-            color: theme.palette.text.secondary,
+            color: theme.vars.palette.text.secondary,
             textDecoration: 'none',
           },
         },

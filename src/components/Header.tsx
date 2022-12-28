@@ -40,7 +40,7 @@ export function Header({ headerRef }: Props) {
             backdropFilter: 'blur(16px) saturate(160%) contrast(110%)',
             backgroundColor: isScrolled
               ? alpha(theme.palette.card.background, 0.85)
-              : theme.palette.background.default,
+              : theme.vars.palette.background.default,
             boxShadow: isScrolled ? theme.extraShadows.card.hovered : 'none',
             willChange: 'box-shadow, background-color',
             transition: theme.transitions.create(['background-color', 'box-shadow']),

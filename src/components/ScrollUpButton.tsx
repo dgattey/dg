@@ -9,7 +9,7 @@ const scrolledSx: SxProps = {
   cursor: 'pointer',
   opacity: 1,
   '&:hover': {
-    background: (theme) => theme.palette.secondary.dark,
+    background: (theme) => theme.vars.palette.secondary.dark,
     color: (theme) => theme.palette.getContrastText(theme.palette.secondary.dark),
     transform: 'scale(1.05)',
   },
@@ -30,7 +30,7 @@ export function ScrollUpButton() {
       color="secondary"
       onClick={scrollToTop}
       sx={{
-        color: (theme) => theme.palette.text.primary,
+        color: (theme) => theme.vars.palette.text.primary,
         display: 'flex',
         gap: 0.5,
         alignItems: 'center',
