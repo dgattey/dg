@@ -23,16 +23,15 @@ export function ColorSchemeToggle() {
       <Switch
         onChange={setInvertedScheme}
         checked={colorScheme.isInitialized && colorScheme.mode === 'dark'}
-        value={colorScheme.isInitialized ? colorScheme.mode : ''}
         aria-label="Change color scheme mode"
         aria-hidden
         tabIndex={-1}
         sx={(theme) => ({
-          // Overrides our "animations off" code in theme/index.ts since we do always want the switch to animate
-          '&&& *': {
-            transition: theme.transitions.create('', {
+          // Overrides our "animations off" for color scheme changes since we do always want the switch to animate
+          '& *': {
+            transition: `${theme.transitions.create('all', {
               duration: theme.transitions.duration.complex,
-            }),
+            })} !important`,
           },
           height: HEIGHT_PX,
           width: WIDTH_PX,
@@ -40,6 +39,7 @@ export function ColorSchemeToggle() {
           padding: 0,
 
           [`&& .${switchClasses.switchBase}`]: {
+            cursor: colorScheme.isInitialized ? 'pointer' : 'not-allowed',
             margin: PADDING,
             padding: 0,
 

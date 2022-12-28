@@ -15,7 +15,7 @@ interface ColorSchemeIconProps {
 const TOOLTIPS: Record<ColorSchemeMode | 'reset', string> = {
   light: 'Turn on light mode',
   dark: 'Enter dark mode',
-  reset: 'Reset to system color mode',
+  reset: 'Use system color mode',
 } as const;
 
 const ICON_SIZE = 16;
@@ -38,14 +38,14 @@ export function ColorSchemeIcon({ mode }: ColorSchemeIconProps) {
     <Sun size={ICON_SIZE} />
   );
   const iconColor = (theme: Theme) => {
+    if (!colorScheme.isInitialized) {
+      return theme.vars.palette.text.secondary;
+    }
     if (isResetMode) {
       return theme.vars.palette.text.secondary;
     }
     return mode === 'dark' ? theme.vars.palette.secondary.light : theme.vars.palette.warning.main;
   };
-
-  const updateMode = colorScheme.isInitialized ? () => updatePreferredMode(mode) : undefined;
-  const resetMode = colorScheme.isInitialized ? () => updatePreferredMode(null) : undefined;
 
   const tooltip = TOOLTIPS[isResetMode ? 'reset' : mode];
 
@@ -58,7 +58,7 @@ export function ColorSchemeIcon({ mode }: ColorSchemeIconProps) {
     >
       <span>
         <IconButton
-          onClick={isResetMode ? resetMode : updateMode}
+          onClick={() => updatePreferredMode(isResetMode ? null : mode)}
           disabled={!colorScheme.isInitialized}
           aria-label={tooltip}
           sx={(theme) => ({

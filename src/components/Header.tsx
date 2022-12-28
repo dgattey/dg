@@ -43,7 +43,9 @@ export function Header({ headerRef }: Props) {
               : theme.vars.palette.background.default,
             boxShadow: isScrolled ? theme.extraShadows.card.hovered : 'none',
             willChange: 'box-shadow, background-color',
-            transition: theme.transitions.create(['background-color', 'box-shadow']),
+            transition: colorScheme.isInitialized
+              ? theme.transitions.create(['background-color', 'box-shadow'])
+              : undefined,
           })}
         >
           <Nav>
