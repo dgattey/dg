@@ -1,6 +1,6 @@
-import { SxProps, Theme } from '@mui/material';
 import type { Link as LinkType } from 'api/types/generated/contentfulApi.generated';
 import { Link } from 'components/Link';
+import { SxProps } from 'ui/theme';
 
 type ContentWrappingLinkProps = Pick<React.ComponentProps<'div'>, 'children'> & {
   /**
@@ -8,7 +8,7 @@ type ContentWrappingLinkProps = Pick<React.ComponentProps<'div'>, 'children'> & 
    */
   link: LinkType | undefined;
 
-  sx?: SxProps<Theme>;
+  sx?: SxProps;
 };
 
 /**

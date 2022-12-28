@@ -1,7 +1,6 @@
-import type { Dispatch, SetStateAction } from 'react';
 import { useEffect, useState } from 'react';
 import { PaletteMode } from '@mui/material';
-import { useLocalStorageValue } from './useLocalStorageValue';
+import { useColorScheme as useMuiColorScheme } from '@mui/material/styles';
 
 /**
  * The color scheme the system prefers by default
@@ -13,100 +12,26 @@ export type ColorSchemeMode = PaletteMode;
  */
 export type SetColorScheme = (value: ColorSchemeMode | null) => void;
 
-// Name of the attribute for theme we add on `html`
-const THEME_ATTRIBUTE = 'data-theme';
-
-// If this is true, we disable animations
-export const ANIMATE_ATTRIBUTE = 'data-animations-enabled';
-
-// The media query we'd like to match
-const PREFERS_DARK = '(prefers-color-scheme: dark)';
-
 /**
- * Generates a media event listener for `PREFERS_DARK` for use inside a `useEffect`
+ * Hook to fetch the current color scheme from MUI and update it
  */
-const generateMediaEventListener = (
-  setSystemMode: Dispatch<SetStateAction<ColorSchemeMode | null>>,
-) => {
-  if (!window) {
-    return;
-  }
-  const prefersDark = window.matchMedia(PREFERS_DARK);
-  setSystemMode(prefersDark.matches ? 'dark' : 'light');
-
-  const listener = (event: MediaQueryListEvent) => setSystemMode(event.matches ? 'dark' : 'light');
-  prefersDark.addEventListener('change', listener);
-  return () => {
-    prefersDark.removeEventListener('change', listener);
-  };
-};
-
-/**
- * Modifies the document's `data-theme` attribute to change the theme itself.
- * Also disables animations around it, so colors don't animate their change.
- * Only the color scheme switcher should be an exception to that.
- */
-const updateThemeAttribute = (mode: ColorSchemeMode, isCustomized: boolean) => {
-  const htmlElement = document.documentElement;
-  htmlElement.setAttribute(ANIMATE_ATTRIBUTE, 'false');
-  if (isCustomized) {
-    htmlElement.setAttribute(THEME_ATTRIBUTE, mode);
-  } else {
-    htmlElement.removeAttribute(THEME_ATTRIBUTE);
-  }
-
-  // Make sure to turn on animations non-synchronously
-  const id = requestAnimationFrame(() => htmlElement.setAttribute(ANIMATE_ATTRIBUTE, 'true'));
-  return () => cancelAnimationFrame(id);
-};
-
-/**
- * Hook to fetch the current color scheme based both off a value saved by the
- * user (optional) or the value of the `prefers-color-scheme` media query. For
- * prerendering, it defaults the color scheme to light + using the system
- * scheme. May result in bugs if Javascript is off + the values of
- * `colorScheme`/`isSystemScheme` are used for prerendered data, as locally,
- * the page will still reflect the system color but anything using this JS
- * is artifically defaulted to light.
- *
- * IMPORTANT: must be called only once to allow proper changing - otherwise
- * the changes are component-level. Pair with ColorSchemeContext for best
- * results.
- */
-export const useColorScheme = () => {
+export function useColorScheme(): Readonly<{
+  colorScheme: { mode: ColorSchemeMode; isCustomized: boolean; isInitialized: boolean };
+  updatePreferredMode: SetColorScheme;
+}> {
+  const { mode, setMode, systemMode } = useMuiColorScheme();
+  const resolvedMode = mode === 'system' ? systemMode : mode;
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // The value of these will be different on server vs client - don't use outside a `useEffect`
-  const [preferredMode, changePreferredMode, deletePreferredMode] =
-    useLocalStorageValue<ColorSchemeMode | null>('colorScheme', null);
-  const [systemMode, setSystemMode] = useState<ColorSchemeMode | null>(null);
+  // Make sure we set initialized before we try to render
+  useEffect(() => setIsInitialized(true), []);
 
-  // These values are set in a `useEffect` and can be used for prerendered content safely
-  const [mode, setMode] = useState<ColorSchemeMode>('light');
-  const [isCustomized, setIsCustomized] = useState(false);
-
-  // Set our locally-rendered values during client hydration
-  useEffect(() => {
-    const resolvedMode = preferredMode ?? systemMode;
-    if (resolvedMode) {
-      setMode(resolvedMode);
-      setIsCustomized(preferredMode !== null);
-      setIsInitialized(true);
-    }
-  }, [preferredMode, systemMode]);
-
-  // Modifies data-theme attribute for the page based on current theme & listens to `prefers-color-scheme` changes
-  useEffect(() => updateThemeAttribute(mode, isCustomized), [mode, isCustomized]);
-  useEffect(() => generateMediaEventListener(setSystemMode), []);
-
-  // The update here actually changes or deletes the local storage value for cleanup
   return {
     colorScheme: {
-      mode,
-      isCustomized,
-      isInitialized: isInitialized && systemMode !== null,
+      mode: resolvedMode ?? 'light',
+      isCustomized: isInitialized && mode !== 'system',
+      isInitialized,
     },
-    updatePreferredMode: (newMode: ColorSchemeMode | null) =>
-      newMode ? changePreferredMode(newMode) : deletePreferredMode(),
+    updatePreferredMode: setMode,
   } as const;
-};
+}

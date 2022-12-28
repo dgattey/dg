@@ -1,8 +1,6 @@
-import type { ColorSchemeMode } from 'hooks/useColorScheme';
+import { ColorSchemeMode, useColorScheme } from 'hooks/useColorScheme';
 import { Moon, Sun, RefreshCw } from 'lucide-react';
-import { Box, IconButton, Tooltip, Theme } from '@mui/material';
-import { ColorSchemeContext } from 'components/ColorSchemeContext';
-import { useContext } from 'react';
+import { Box, IconButton, Theme, Tooltip } from '@mui/material';
 
 interface ColorSchemeIconProps {
   /**
@@ -28,7 +26,7 @@ const DELAY_MS = 300;
  * if we have one that's set already. Otherwise, renders a disabled icon.
  */
 export function ColorSchemeIcon({ mode }: ColorSchemeIconProps) {
-  const { colorScheme, updatePreferredMode } = useContext(ColorSchemeContext);
+  const { colorScheme, updatePreferredMode } = useColorScheme();
   const isCurrentMode = mode === colorScheme.mode;
   const isResetMode = colorScheme.isCustomized && isCurrentMode;
 

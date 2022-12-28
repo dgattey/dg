@@ -1,9 +1,9 @@
 import { useData } from 'api/useData';
-import { ColorSchemeContext } from 'components/ColorSchemeContext';
 import type { ContentCardProps } from 'components/ContentCard';
-import { Suspense, useContext, useState } from 'react';
+import { Suspense, useState } from 'react';
 import dynamic from 'next/dynamic';
 import { MapContentCard } from 'components/maps/MapContentCard';
+import { useColorScheme } from 'hooks/useColorScheme';
 
 type MapPreviewCardProps = Pick<ContentCardProps, 'turnOnAnimation'>;
 
@@ -17,7 +17,7 @@ const FullMapCard = dynamic(() => import('components/maps/FullMapCard'), {
  */
 export function MapPreviewCard({ turnOnAnimation }: MapPreviewCardProps) {
   const { data: location } = useData('location');
-  const { colorScheme } = useContext(ColorSchemeContext);
+  const { colorScheme } = useColorScheme();
   const [showFullMapComponent, setShowFullMapComponent] = useState(false);
 
   const backgroundImageUrl =

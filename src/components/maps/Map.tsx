@@ -1,8 +1,8 @@
 import type { MapLocation } from 'api/types/MapLocation';
-import { ColorSchemeContext } from 'components/ColorSchemeContext';
-import { useContext, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 import { AttributionControl, Map as MapGL, MapRef } from 'react-map-gl';
 import { Box, useTheme } from '@mui/material';
+import { useColorScheme } from 'hooks/useColorScheme';
 import { StandardControls } from './StandardControls';
 
 export type Props = {
@@ -126,7 +126,7 @@ function Wrapper({ isLoaded, children }: { isLoaded: boolean; children: React.Re
 export function Map({ location, children, isExpanded, isLoaded, setMapHasLoaded }: Props) {
   const theme = useTheme();
   const mapRef = useRef<MapRef>(null);
-  const { colorScheme } = useContext(ColorSchemeContext);
+  const { colorScheme } = useColorScheme();
 
   /**
    * Ensures we resize when expanding/collapsing so we repaint the canvas. Otherwise it'll appear

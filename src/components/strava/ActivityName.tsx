@@ -1,13 +1,13 @@
 import { useData } from 'api/useData';
-import { SxProps, Theme } from '@mui/material';
 import { truncated } from 'helpers/truncated';
 import { Link } from 'components/Link';
 import { mixinSx } from 'ui/helpers/mixinSx';
+import { SxProps } from 'ui/theme';
 
 /**
  * Formatted link for the activity name
  */
-export function ActivityName({ url, sx }: { url: string; sx?: SxProps<Theme> }) {
+export function ActivityName({ url, sx }: { url: string; sx?: SxProps }) {
   const { data: activity } = useData('latest/activity');
   if (!activity?.name) {
     return null;

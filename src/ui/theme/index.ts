@@ -1,8 +1,20 @@
-import { createTheme, PaletteMode, responsiveFontSizes, ThemeOptions } from '@mui/material';
+import { responsiveFontSizes, Theme, SxProps as MuiSxProps } from '@mui/material';
+import {
+  CssVarsTheme,
+  CssVarsThemeOptions,
+  experimental_extendTheme as extendTheme,
+} from '@mui/material/styles';
 import { getGrid } from 'ui/theme/grid';
 import { getPalette } from 'ui/theme/palette';
 import { getTypography } from 'ui/theme/typography';
 import { getShadows } from './shadows';
+
+type AugmentedTheme = Omit<Theme, 'palette' | 'components'> & CssVarsTheme;
+
+/**
+ * Use this everywhere where theme support is needed.
+ */
+export type SxProps = MuiSxProps<AugmentedTheme>;
 
 /**
  * Our MUI theme, customized, and dark/light mode compatible.

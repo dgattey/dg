@@ -1,7 +1,8 @@
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
-import { SxProps, Theme, Button } from '@mui/material';
+import { Button } from '@mui/material';
 import { mixinSx } from 'ui/helpers/mixinSx';
+import { SxProps } from 'ui/theme';
 import { ScrollIndicatorContext } from './ScrollIndicatorContext';
 import { Link } from './Link';
 
@@ -10,7 +11,7 @@ import { Link } from './Link';
  * logo. Has background on scroll + scales down a bit.
  */
 const logoTextStyles =
-  (isScrolled: boolean): SxProps<Theme> =>
+  (isScrolled: boolean): SxProps =>
   (theme) => ({
     '&': {
       fontSize: '2.5em',

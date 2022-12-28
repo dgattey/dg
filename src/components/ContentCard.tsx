@@ -1,8 +1,9 @@
 import type { Link } from 'api/types/generated/contentfulApi.generated';
 import { truncated } from 'helpers/truncated';
 import { useState } from 'react';
-import { Card, SxProps, Theme, Typography } from '@mui/material';
+import { Card, Theme, Typography } from '@mui/material';
 import { mixinSx } from 'ui/helpers/mixinSx';
+import { SxProps } from 'ui/theme';
 import { ContentWrappingLink } from './ContentWrappingLink';
 
 export type ContentCardProps = Pick<
@@ -43,8 +44,8 @@ export type ContentCardProps = Pick<
    */
   turnOnAnimation?: () => void;
 
-  sx?: SxProps<Theme>;
-  overlaySx?: SxProps<Theme>;
+  sx?: SxProps;
+  overlaySx?: SxProps;
 };
 
 type LinkWrappedChildrenProps = Pick<ContentCardProps, 'link' | 'children'> & {
@@ -149,13 +150,7 @@ function LinkWrappedChildren({
 /**
  * Overlay content if it's defined
  */
-function OverlayContent({
-  overlay,
-  sx,
-}: {
-  overlay: NonNullable<React.ReactNode>;
-  sx?: SxProps<Theme>;
-}) {
+function OverlayContent({ overlay, sx }: { overlay: NonNullable<React.ReactNode>; sx?: SxProps }) {
   return (
     <Card
       sx={mixinSx(

@@ -1,7 +1,6 @@
-import { ColorSchemeContext } from 'components/ColorSchemeContext';
-import { useContext } from 'react';
 import { Stack, Switch, switchClasses } from '@mui/material';
 import { ColorSchemeIcon } from 'components/ColorSchemeIcon';
+import { useColorScheme } from 'hooks/useColorScheme';
 
 const HEIGHT_PX = 24;
 const WIDTH_PX = 48;
@@ -14,7 +13,7 @@ const TRACK_SIZE_PX = HEIGHT_PX - 2 * PADDING_PX;
  * system, light, and dark. Prerendered, `mode` is `light`.
  */
 export function ColorSchemeToggle() {
-  const { colorScheme, updatePreferredMode } = useContext(ColorSchemeContext);
+  const { colorScheme, updatePreferredMode } = useColorScheme();
   const setInvertedScheme = () =>
     updatePreferredMode(colorScheme.mode === 'dark' ? 'light' : 'dark');
 
