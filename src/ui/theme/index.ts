@@ -39,8 +39,8 @@ export const getTheme = (mode: PaletteMode) => {
   };
   const minimalTheme = createTheme(minimalThemeOptions);
 
-  // Now we can inject in a basic theme for colors/spacing
-  const typography = getTypography(mode, minimalTheme);
+  // Now we can inject in a basic theme for spacing
+  const typography = getTypography(minimalTheme);
   const themeWithColorMode = createTheme({
     ...minimalThemeOptions,
     typography,
@@ -92,6 +92,63 @@ export const getTheme = (mode: PaletteMode) => {
         },
       },
       MuiTypography: {
+        variants: [
+          {
+            props: { variant: 'code' },
+            style: ({ theme }) => ({
+              background: theme.vars.palette.code.background,
+              color: theme.vars.palette.code.text,
+            }),
+          },
+          {
+            props: { variant: 'h1' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h1,
+            }),
+          },
+          {
+            props: { variant: 'h2' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h2,
+            }),
+          },
+          {
+            props: { variant: 'h3' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h3,
+            }),
+          },
+          {
+            props: { variant: 'h4' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h4,
+            }),
+          },
+          {
+            props: { variant: 'h5' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h5,
+            }),
+          },
+          {
+            props: { variant: 'h6' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h6,
+            }),
+          },
+          {
+            props: { variant: 'body1' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.primary,
+            }),
+          },
+          {
+            props: { variant: 'body2' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.secondary,
+            }),
+          },
+        ],
         styleOverrides: {
           root: {
             // Resets the original value

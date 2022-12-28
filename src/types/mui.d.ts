@@ -84,6 +84,16 @@ declare module '@mui/material/styles' {
   interface TypographyVariantsOptions {
     code?: React.CSSProperties;
   }
+
+  interface TypeText {
+    primary: string;
+    h1: string;
+    h2: string;
+    h3: string;
+    h4: string;
+    h5: string;
+    h6: string;
+  }
 }
 
 declare module '@mui/material/Typography' {

@@ -31,6 +31,13 @@ const lightPalette: PaletteOptions = {
   },
   text: {
     primary: COLORS.LIGHT.TEXT,
+    secondary: COLORS.MUTED_TEXT,
+    h1: COLORS.LIGHT.H1,
+    h2: COLORS.LIGHT.H2,
+    h3: COLORS.LIGHT.H3,
+    h4: COLORS.LIGHT.H4,
+    h5: COLORS.LIGHT.H5,
+    h6: COLORS.LIGHT.H6,
   },
   map: {
     markerBackground: COLORS.LIGHT.MAP.MARKER_BACKGROUND,
@@ -59,6 +66,13 @@ const darkPalette: PaletteOptions = {
   },
   text: {
     primary: COLORS.DARK.TEXT,
+    secondary: COLORS.MUTED_TEXT,
+    h1: COLORS.DARK.H1,
+    h2: COLORS.DARK.H2,
+    h3: COLORS.DARK.H3,
+    h4: COLORS.DARK.H4,
+    h5: COLORS.DARK.H5,
+    h6: COLORS.DARK.H6,
   },
   map: {
     markerBackground: COLORS.DARK.MAP.MARKER_BACKGROUND,
