@@ -23,15 +23,15 @@ export function ContentGrid({ children, gridRef }: Props) {
       sx={(theme) => ({
         marginTop: -4,
         display: 'grid',
-        gap: `${theme.grid.gap}rem`,
+        gap: `${theme.shape.gridGap}rem`,
         gridTemplateColumns: '1fr',
         gridAutoFlow: 'dense',
         justifyContent: 'center',
         position: 'relative',
         [theme.breakpoints.up('md')]: {
-          gap: `${theme.grid.gapLarge}rem`,
-          gridTemplateColumns: `repeat(auto-fit, ${theme.grid.contentDimension}rem)`,
-          gridAutoRows: `minmax(${theme.grid.contentDimension}rem, auto)`,
+          gap: `${theme.shape.gridGapLarge}rem`,
+          gridTemplateColumns: `repeat(auto-fit, ${theme.shape.gridItemDimension}rem)`,
+          gridAutoRows: `minmax(${theme.shape.gridItemDimension}rem, auto)`,
         },
       })}
     >

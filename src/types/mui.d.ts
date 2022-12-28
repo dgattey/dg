@@ -5,78 +5,70 @@ type NonNullableBoxShadow = NonNullable<React.CSSProperties['boxShadow']>;
 type NonNullableBorderRadius = NonNullable<React.CSSProperties['borderRadius']>;
 
 declare module '@mui/material/styles' {
-  interface Palette {
-    active: Palette['primary'];
+  /**
+   * Adds custom shadow types defined in `ui/theme/shadows.ts`
+   */
+  type ExtraShadows = {
     card: {
-      background: NonNullableColor;
-      border: NonNullableColor;
-    };
-    code: {
-      background: NonNullableColor;
-      text: NonNullableColor;
+      main: NonNullableBoxShadow;
+      hovered: NonNullableBoxShadow;
+      overlayHovered: NonNullableBoxShadow;
     };
     map: {
-      markerBackground: NonNullableColor;
-      markerBorder: NonNullableColor;
+      control: NonNullableBoxShadow;
     };
+  };
+
+  type CardColors = {
+    background: NonNullableColor;
+    border: NonNullableColor;
+  };
+  type CodeColors = {
+    background: NonNullableColor;
+    text: NonNullableColor;
+  };
+  type MapColors = {
+    markerBackground: NonNullableColor;
+    markerBorder: NonNullableColor;
+  };
+
+  interface Palette {
+    active: Palette['primary'];
+    card: CardColors;
+    code: CodeColors;
+    map: MapColors;
   }
   interface PaletteOptions {
     active: PaletteOptions['primary'];
-    card: {
-      background: NonNullableColor;
-      border: NonNullableColor;
-    };
-    code: {
-      background: NonNullableColor;
-      text: NonNullableColor;
-    };
-    map: {
-      markerBackground: NonNullableColor;
-      markerBorder: NonNullableColor;
-    };
+    card: CardColors;
+    code: CodeColors;
+    map: MapColors;
   }
   interface Theme {
-    extraShadows: {
-      card: {
-        main: NonNullableBoxShadow;
-        hovered: NonNullableBoxShadow;
-        overlayHovered: NonNullableBoxShadow;
-      };
-      map: {
-        control: NonNullableBoxShadow;
-      };
-    };
-    borderRadius: {
-      card: NonNullableBorderRadius;
-    };
-    grid: {
-      gap: number;
-      gapLarge: number;
-      contentDimension: number;
-      cardSizeInRem: (span: number) => string;
+    shape: {
+      gridGap: number;
+      gridGapLarge: number;
+      gridItemDimension: number;
+      gridItemSize: (span: number) => string;
     };
   }
   interface ThemeOptions {
-    extraShadows: {
-      card: {
-        main: NonNullableBoxShadow;
-        hovered: NonNullableBoxShadow;
-        overlayHovered: NonNullableBoxShadow;
-      };
-      map: {
-        control: NonNullableBoxShadow;
-      };
-    };
-    borderRadius: {
-      card: NonNullableBorderRadius;
-    };
-    grid: {
-      gap: number;
-      gapLarge: number;
-      contentDimension: number;
-      cardSizeInRem?: (span: number) => string;
+    shape: {
+      gridGap: number;
+      gridGapLarge: number;
+      gridItemDimension: number;
+      gridItemSize?: (span: number) => string;
     };
   }
+
+  interface ThemeVars {
+    extraShadows: ExtraShadows;
+  }
+
+  interface ColorSystemOptions {
+    extraShadows: ExtraShadows;
+  }
+
   interface TypographyVariants {
     code: React.CSSProperties;
   }

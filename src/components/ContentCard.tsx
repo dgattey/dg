@@ -85,17 +85,17 @@ function getCardSx(
       cursor: 'pointer',
       '&:hover': {
         borderColor: theme.vars.palette.card.border,
-        boxShadow: theme.extraShadows.card.hovered,
+        boxShadow: theme.vars.extraShadows.card.hovered,
       },
     }),
     [theme.breakpoints.up('md')]: {
       ...(verticalSpan && {
         gridRow: `span ${verticalSpan}`,
-        height: theme.grid.cardSizeInRem(verticalSpan),
+        height: theme.shape.gridItemSize(verticalSpan),
       }),
       ...(horizontalSpan && {
         gridColumn: `span ${horizontalSpan}`,
-        width: theme.grid.cardSizeInRem(horizontalSpan),
+        width: theme.shape.gridItemSize(horizontalSpan),
       }),
     },
   };
@@ -133,7 +133,7 @@ function LinkWrappedChildren({
           width: '100%',
           height: '100%',
           outline: '-webkit-focus-ring-color auto 1px',
-          borderRadius: theme.borderRadius.card,
+          borderRadius: theme.spacing(6),
           zIndex: 1,
         },
       })}
@@ -163,9 +163,9 @@ function OverlayContent({ overlay, sx }: { overlay: NonNullable<React.ReactNode>
           paddingRight: theme.spacing(1.75),
           paddingTop: theme.spacing(1),
           paddingBottom: theme.spacing(1),
-          boxShadow: theme.extraShadows.card.overlayHovered,
+          boxShadow: theme.vars.extraShadows.card.overlayHovered,
           '&:hover': {
-            boxShadow: theme.extraShadows.card.overlayHovered,
+            boxShadow: theme.vars.extraShadows.card.overlayHovered,
           },
           zIndex: 1,
         }),

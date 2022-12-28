@@ -5,9 +5,9 @@ import {
   CssVarsThemeOptions,
   experimental_extendTheme as extendTheme,
 } from '@mui/material/styles';
-import { getGrid } from 'ui/theme/grid';
+import { getShape } from 'ui/theme/shape';
 import { getTypography } from 'ui/theme/typography';
-import { getShadows } from './shadows';
+import { getShadows } from './extraShadows';
 import { getPalette } from './palette';
 
 type AugmentedTheme = Omit<Theme, 'palette' | 'components'> & CssVarsTheme;
@@ -23,20 +23,17 @@ export type SxProps = MuiSxProps<AugmentedTheme>;
 export function getTheme(): Theme {
   const minimalThemeOptions: CssVarsThemeOptions = {
     cssVarPrefix: '',
-    // TODO: @dgattey fix
-    extraShadows: getShadows('light'),
     colorSchemes: {
       light: {
         palette: getPalette('light'),
+        extraShadows: getShadows('light'),
       },
       dark: {
         palette: getPalette('dark'),
+        extraShadows: getShadows('dark'),
       },
     },
-    grid: getGrid(),
-    borderRadius: {
-      card: '2.5em',
-    },
+    shape: getShape(),
     breakpoints: {
       values: {
         xs: 0,
@@ -200,7 +197,7 @@ export function getTheme(): Theme {
         styleOverrides: {
           root: ({ theme }) => ({
             textTransform: 'initial',
-            borderRadius: theme.borderRadius.card,
+            borderRadius: theme.spacing(6),
             padding: theme.spacing(1, 3),
           }),
         },
@@ -209,11 +206,11 @@ export function getTheme(): Theme {
         styleOverrides: {
           root: ({ theme }) => ({
             background: theme.vars.palette.card.background,
-            borderRadius: theme.borderRadius.card,
+            borderRadius: theme.spacing(6),
             borderColor: theme.vars.palette.card.border,
             borderWidth: 1,
             borderStyle: 'solid',
-            boxShadow: theme.extraShadows.card.main,
+            boxShadow: theme.vars.extraShadows.card.main,
           }),
         },
       },
@@ -222,7 +219,7 @@ export function getTheme(): Theme {
           tooltip: ({ theme }) => ({
             ...theme.typography.caption,
             background: theme.vars.palette.card.background,
-            borderRadius: theme.borderRadius.card,
+            borderRadius: theme.spacing(6),
             borderColor: theme.vars.palette.card.border,
             borderWidth: 1,
             borderStyle: 'solid',
@@ -236,19 +233,6 @@ export function getTheme(): Theme {
   });
 
   return responsiveFontSizes(themeWithColorMode, {
-    variants: [
-      'h1',
-      'h2',
-      'h3',
-      'h4',
-      'h5',
-      'h6',
-      'caption',
-      'overline',
-      'body1',
-      'body2',
-      'code',
-      'button',
-    ],
+    variants: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'caption', 'overline', 'body1', 'body2', 'code'],
   });
 }

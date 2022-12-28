@@ -41,7 +41,7 @@ export function Header({ headerRef }: Props) {
             backgroundColor: isScrolled
               ? alpha(theme.palette.card.background, 0.85)
               : theme.vars.palette.background.default,
-            boxShadow: isScrolled ? theme.extraShadows.card.hovered : 'none',
+            boxShadow: isScrolled ? theme.vars.extraShadows.card.hovered : 'none',
             willChange: 'box-shadow, background-color',
             transition: colorScheme.isInitialized
               ? theme.transitions.create(['background-color', 'box-shadow'])
