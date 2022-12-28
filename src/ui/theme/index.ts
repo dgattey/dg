@@ -1,3 +1,4 @@
+import type {} from '@mui/material/themeCssVarsAugmentation';
 import { responsiveFontSizes, Theme, SxProps as MuiSxProps } from '@mui/material';
 import {
   CssVarsTheme,
@@ -5,9 +6,9 @@ import {
   experimental_extendTheme as extendTheme,
 } from '@mui/material/styles';
 import { getGrid } from 'ui/theme/grid';
-import { getPalette } from 'ui/theme/palette';
 import { getTypography } from 'ui/theme/typography';
 import { getShadows } from './shadows';
+import { getPalette } from './palette';
 
 type AugmentedTheme = Omit<Theme, 'palette' | 'components'> & CssVarsTheme;
 
@@ -19,10 +20,19 @@ export type SxProps = MuiSxProps<AugmentedTheme>;
 /**
  * Our MUI theme, customized, and dark/light mode compatible.
  */
-export const getTheme = (mode: PaletteMode) => {
-  const minimalThemeOptions: ThemeOptions = {
-    palette: getPalette(mode),
-    extraShadows: getShadows(mode),
+export function getTheme(): Theme {
+  const minimalThemeOptions: CssVarsThemeOptions = {
+    cssVarPrefix: '',
+    // TODO: @dgattey fix
+    extraShadows: getShadows('light'),
+    colorSchemes: {
+      light: {
+        palette: getPalette('light'),
+      },
+      dark: {
+        palette: getPalette('dark'),
+      },
+    },
     grid: getGrid(),
     borderRadius: {
       card: '2.5em',
@@ -37,11 +47,11 @@ export const getTheme = (mode: PaletteMode) => {
       },
     },
   };
-  const minimalTheme = createTheme(minimalThemeOptions);
+  const minimalTheme = extendTheme(minimalThemeOptions);
 
   // Now we can inject in a basic theme for spacing
   const typography = getTypography(minimalTheme);
-  const themeWithColorMode = createTheme({
+  const themeWithColorMode = extendTheme({
     ...minimalThemeOptions,
     typography,
     components: {
@@ -241,4 +251,4 @@ export const getTheme = (mode: PaletteMode) => {
       'button',
     ],
   });
-};
+}
