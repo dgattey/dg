@@ -28,7 +28,7 @@ jobs:
       - uses: pnpm/action-setup@v2.2.2
       - run: pnpm install
       - name: ${{ matrix.command }}
-        run: pnpm ${{ matrix.command }}
+        run: NODE_OPTIONS=--max_old_space_size=8192 pnpm turbo ${{ matrix.command }}
       - name: Output changed files
         id: changes
         # Removes both leading/trailing whitespace after getting diffed files and removing package.json/pnpm.lock

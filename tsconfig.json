@@ -36,6 +36,6 @@
       }
     ]
   },
-  "include": ["src", "scripts", "eslint-plugin-dg", ".next/types/**/*.ts", "config"],
+  "include": ["src", "scripts", "eslint-plugin-dg", "config"],
   "exclude": ["node_modules", "src/api/server/generated", "**/migrations/*"]
 }
