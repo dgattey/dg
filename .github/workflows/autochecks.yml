@@ -19,13 +19,16 @@ jobs:
       format: ${{ steps.changes.outputs.format }}
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: actions/setup-node@v2
+      - uses: pnpm/action-setup@v2
+        with:
+          version: 7
+      - uses: actions/setup-node@v3
         with:
           node-version: 16
-      - uses: pnpm/action-setup@v2.2.2
+          cache: 'pnpm'
       - run: pnpm install
       - name: ${{ matrix.command }}
         run: NODE_OPTIONS=--max_old_space_size=8192 pnpm turbo ${{ matrix.command }}

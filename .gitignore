@@ -3,17 +3,14 @@
 .turbo
 
 # dependencies
-/node_modules
-
-# testing
-/coverage
+node_modules
 
 # next.js
-/.next/
-/out/
+.next
+out
 
 # production
-/build
+build
 
 # misc
 .DS_Store
@@ -31,4 +28,4 @@ tsconfig.tsbuildinfo
 .eslintcache
 
 # Generated files
-src/api/server/generated
+*/api/server/generated
