@@ -37,5 +37,12 @@
     ]
   },
   "include": ["src", "scripts", "eslint-plugin-dg", "config"],
-  "exclude": ["node_modules", "src/api/server/generated", "**/migrations/*"]
+  "exclude": [
+    "node_modules",
+    "**/*/dist",
+    "**/*/build",
+    "**/*/.next",
+    "**/api/server/generated",
+    "**/migrations"
+  ]
 }
