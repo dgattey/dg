@@ -17,7 +17,7 @@ export function ActivityTypeWithIcon() {
 
   // Split on capital letters to split an enum-like value
   const typeText = activity.type.includes('Ride')
-    ? activity.type.replace(/(?<=[a-z])(?=[A-Z])/, ' ')
+    ? activity.type.replace(/([A-Z][a-z]+)/g, ' $1')
     : 'Run';
   const icon = (
     <FaIcon size="1.25em" icon={activity.type.includes('Ride') ? faBicycle : faRunning} />
@@ -32,7 +32,7 @@ export function ActivityTypeWithIcon() {
         alignItems: 'center',
       }}
     >
-      <>Latest {typeText}</> {icon}
+      <>Latest {typeText.trim()}</> {icon}
     </Typography>
   );
 }
