@@ -8,6 +8,7 @@
   "license": "MIT",
   "scripts": {
     "prepare": "husky install",
+    "preinstall": "npx only-allow pnpm",
     "dev": "VERCEL_GIT_COMMIT_SHA=$(git rev-parse HEAD) next dev",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
