@@ -1,16 +1,17 @@
 import { documentToReactComponents, Options } from '@contentful/rich-text-react-renderer';
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
-import { Divider, Stack, SxProps, Theme, Typography } from '@mui/material';
+import { Divider, Stack, Typography } from '@mui/material';
 import { isDefinedItem, isLink, isProject } from 'api/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
 import { ProjectCard } from 'components/homepage/ProjectCard';
 import { PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
+import { SxProps } from 'ui/theme';
 import { Image } from './Image';
 import { Link } from './Link';
 
 type RichTextProps = TextBlockContent & {
-  sx?: SxProps<Theme>;
+  sx?: SxProps;
 };
 
 /**
@@ -30,7 +31,7 @@ type DataWithId = {
 /**
  * Offsets for fixed header so anchor links look right
  */
-const HEADING_SX: SxProps<Theme> = {
+const HEADING_SX: SxProps = {
   marginBottom: (theme) => theme.spacing(3),
   marginTop: -12,
   paddingTop: 12,

@@ -1,20 +1,39 @@
-import { createTheme, PaletteMode, responsiveFontSizes, ThemeOptions } from '@mui/material';
-import { getGrid } from 'ui/theme/grid';
-import { getPalette } from 'ui/theme/palette';
+import type {} from '@mui/material/themeCssVarsAugmentation';
+import { responsiveFontSizes, Theme, SxProps as MuiSxProps } from '@mui/material';
+import {
+  CssVarsTheme,
+  CssVarsThemeOptions,
+  experimental_extendTheme as extendTheme,
+} from '@mui/material/styles';
+import { getShape } from 'ui/theme/shape';
 import { getTypography } from 'ui/theme/typography';
-import { getShadows } from './shadows';
+import { getShadows } from './extraShadows';
+import { getPalette } from './palette';
+
+type AugmentedTheme = Omit<Theme, 'palette' | 'components'> & CssVarsTheme;
+
+/**
+ * Use this everywhere where theme support is needed.
+ */
+export type SxProps = MuiSxProps<AugmentedTheme>;
 
 /**
  * Our MUI theme, customized, and dark/light mode compatible.
  */
-export const getTheme = (mode: PaletteMode) => {
-  const minimalThemeOptions: ThemeOptions = {
-    palette: getPalette(mode),
-    extraShadows: getShadows(mode),
-    grid: getGrid(),
-    borderRadius: {
-      card: '2.5em',
+export function getTheme(): Theme {
+  const minimalThemeOptions: CssVarsThemeOptions = {
+    cssVarPrefix: '',
+    colorSchemes: {
+      light: {
+        palette: getPalette('light'),
+        extraShadows: getShadows('light'),
+      },
+      dark: {
+        palette: getPalette('dark'),
+        extraShadows: getShadows('dark'),
+      },
     },
+    shape: getShape(),
     breakpoints: {
       values: {
         xs: 0,
@@ -25,11 +44,11 @@ export const getTheme = (mode: PaletteMode) => {
       },
     },
   };
-  const minimalTheme = createTheme(minimalThemeOptions);
+  const minimalTheme = extendTheme(minimalThemeOptions);
 
-  // Now we can inject in a basic theme for colors/spacing
-  const typography = getTypography(mode, minimalTheme);
-  const themeWithColorMode = createTheme({
+  // Now we can inject in a basic theme for spacing
+  const typography = getTypography(minimalTheme);
+  const themeWithColorMode = extendTheme({
     ...minimalThemeOptions,
     typography,
     components: {
@@ -80,6 +99,63 @@ export const getTheme = (mode: PaletteMode) => {
         },
       },
       MuiTypography: {
+        variants: [
+          {
+            props: { variant: 'code' },
+            style: ({ theme }) => ({
+              background: theme.vars.palette.code.background,
+              color: theme.vars.palette.code.text,
+            }),
+          },
+          {
+            props: { variant: 'h1' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h1,
+            }),
+          },
+          {
+            props: { variant: 'h2' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h2,
+            }),
+          },
+          {
+            props: { variant: 'h3' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h3,
+            }),
+          },
+          {
+            props: { variant: 'h4' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h4,
+            }),
+          },
+          {
+            props: { variant: 'h5' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h5,
+            }),
+          },
+          {
+            props: { variant: 'h6' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h6,
+            }),
+          },
+          {
+            props: { variant: 'body1' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.primary,
+            }),
+          },
+          {
+            props: { variant: 'body2' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.secondary,
+            }),
+          },
+        ],
         styleOverrides: {
           root: {
             // Resets the original value
@@ -100,7 +176,7 @@ export const getTheme = (mode: PaletteMode) => {
             }
             const paletteColor =
               // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-              theme.palette[color as 'primary' | 'secondary' | 'warning' | 'info' | 'success'];
+              theme.vars.palette[color as 'primary' | 'secondary' | 'warning' | 'info' | 'success'];
             if (!paletteColor) {
               return {};
             }
@@ -121,7 +197,7 @@ export const getTheme = (mode: PaletteMode) => {
         styleOverrides: {
           root: ({ theme }) => ({
             textTransform: 'initial',
-            borderRadius: theme.borderRadius.card,
+            borderRadius: theme.spacing(6),
             padding: theme.spacing(1, 3),
           }),
         },
@@ -129,12 +205,12 @@ export const getTheme = (mode: PaletteMode) => {
       MuiCard: {
         styleOverrides: {
           root: ({ theme }) => ({
-            background: theme.palette.card.background,
-            borderRadius: theme.borderRadius.card,
-            borderColor: theme.palette.card.border,
+            background: theme.vars.palette.card.background,
+            borderRadius: theme.spacing(6),
+            borderColor: theme.vars.palette.card.border,
             borderWidth: 1,
             borderStyle: 'solid',
-            boxShadow: theme.extraShadows.card.main,
+            boxShadow: theme.vars.extraShadows.card.main,
           }),
         },
       },
@@ -142,14 +218,14 @@ export const getTheme = (mode: PaletteMode) => {
         styleOverrides: {
           tooltip: ({ theme }) => ({
             ...theme.typography.caption,
-            background: theme.palette.card.background,
-            borderRadius: theme.borderRadius.card,
-            borderColor: theme.palette.card.border,
+            background: theme.vars.palette.card.background,
+            borderRadius: theme.spacing(6),
+            borderColor: theme.vars.palette.card.border,
             borderWidth: 1,
             borderStyle: 'solid',
             boxShadow: theme.shadows[2],
             padding: theme.spacing(0.5, 1.5),
-            color: theme.palette.text.primary,
+            color: theme.vars.palette.text.primary,
           }),
         },
       },
@@ -157,19 +233,6 @@ export const getTheme = (mode: PaletteMode) => {
   });
 
   return responsiveFontSizes(themeWithColorMode, {
-    variants: [
-      'h1',
-      'h2',
-      'h3',
-      'h4',
-      'h5',
-      'h6',
-      'caption',
-      'overline',
-      'body1',
-      'body2',
-      'code',
-      'button',
-    ],
+    variants: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'caption', 'overline', 'body1', 'body2', 'code'],
   });
-};
+}

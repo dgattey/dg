@@ -1,14 +1,15 @@
 import { ArrowUp } from 'lucide-react';
 import { useContext } from 'react';
-import { Button, SxProps, Theme, Typography } from '@mui/material';
+import { Button, Typography } from '@mui/material';
+import { SxProps } from 'ui/theme';
 import { ScrollIndicatorContext } from './ScrollIndicatorContext';
 
-const scrolledSx: SxProps<Theme> = {
+const scrolledSx: SxProps = {
   transform: 'initial',
   cursor: 'pointer',
   opacity: 1,
   '&:hover': {
-    background: (theme) => theme.palette.secondary.dark,
+    background: (theme) => theme.vars.palette.secondary.dark,
     color: (theme) => theme.palette.getContrastText(theme.palette.secondary.dark),
     transform: 'scale(1.05)',
   },
@@ -29,7 +30,7 @@ export function ScrollUpButton() {
       color="secondary"
       onClick={scrollToTop}
       sx={{
-        color: (theme) => theme.palette.text.primary,
+        color: (theme) => theme.vars.palette.text.primary,
         display: 'flex',
         gap: 0.5,
         alignItems: 'center',

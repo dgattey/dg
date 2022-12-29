@@ -1,3 +1,4 @@
+/* eslint-disable no-restricted-imports */
 import { FaIcon } from 'components/FaIcon';
 import { faGithubAlt } from '@fortawesome/free-brands-svg-icons/faGithubAlt';
 import { faInstagram } from '@fortawesome/free-brands-svg-icons/faInstagram';
@@ -6,19 +7,15 @@ import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons/faPaperPlane';
 import { faQuestion } from '@fortawesome/free-solid-svg-icons/faQuestion';
-// eslint-disable-next-line no-restricted-imports
 import NextLink from 'next/link';
-
 import {
-  SxProps,
-  Theme,
-  // eslint-disable-next-line no-restricted-imports
   Link as MuiLink,
   LinkProps as MuiLinkProps,
   Tooltip,
   ButtonProps,
   Button,
 } from '@mui/material';
+import { SxProps } from 'ui/theme';
 
 type BaseLinkProps = {
   title?: string;
@@ -29,7 +26,7 @@ type BaseLinkProps = {
    * Can be missing for icon-only links
    */
   children?: React.ReactNode;
-  sx?: SxProps<Theme>;
+  sx?: SxProps;
 
   /**
    * Renders as a certain type of layout.

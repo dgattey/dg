@@ -1,7 +1,6 @@
-import { ColorSchemeContext } from 'components/ColorSchemeContext';
-import { useContext } from 'react';
-import { Stack, Switch } from '@mui/material';
+import { Stack, Switch, switchClasses } from '@mui/material';
 import { ColorSchemeIcon } from 'components/ColorSchemeIcon';
+import { useColorScheme } from 'hooks/useColorScheme';
 
 const HEIGHT_PX = 24;
 const WIDTH_PX = 48;
@@ -14,7 +13,7 @@ const TRACK_SIZE_PX = HEIGHT_PX - 2 * PADDING_PX;
  * system, light, and dark. Prerendered, `mode` is `light`.
  */
 export function ColorSchemeToggle() {
-  const { colorScheme, updatePreferredMode } = useContext(ColorSchemeContext);
+  const { colorScheme, updatePreferredMode } = useColorScheme();
   const setInvertedScheme = () =>
     updatePreferredMode(colorScheme.mode === 'dark' ? 'light' : 'dark');
 
@@ -24,57 +23,52 @@ export function ColorSchemeToggle() {
       <Switch
         onChange={setInvertedScheme}
         checked={colorScheme.isInitialized && colorScheme.mode === 'dark'}
-        value={colorScheme.isInitialized ? colorScheme.mode : ''}
         aria-label="Change color scheme mode"
         aria-hidden
         tabIndex={-1}
         sx={(theme) => ({
-          // Overrides our "animations off" code in theme/index.ts since we do always want the switch to animate
-          '&&& *': {
-            transition: theme.transitions.create('', {
+          // Overrides our "animations off" for color scheme changes since we do always want the switch to animate
+          '& *': {
+            transition: `${theme.transitions.create('all', {
               duration: theme.transitions.duration.complex,
-            }),
+            })} !important`,
           },
           height: HEIGHT_PX,
           width: WIDTH_PX,
           margin: 0,
           padding: 0,
 
-          '& .Mui-focusVisible': {
-            outlineColor: '-webkit-focus-ring-color',
-            outlineStyle: 'solid',
-            outlineWidth: 'medium',
-          },
-          '&& .MuiSwitch-switchBase': {
+          [`&& .${switchClasses.switchBase}`]: {
+            cursor: colorScheme.isInitialized ? 'pointer' : 'not-allowed',
             margin: PADDING,
             padding: 0,
 
-            '&.Mui-checked': {
+            [`&.${switchClasses.checked}`]: {
               transform: `translateX(${WIDTH_PX - TRACK_SIZE_PX - 2 * PADDING_PX}px)`,
-              '&& + .MuiSwitch-track': {
+              [`&& + .${switchClasses.track}`]: {
                 opacity: 1,
                 backgroundColor: colorScheme.isCustomized
-                  ? theme.palette.active.main
-                  : theme.palette.card.border,
+                  ? theme.vars.palette.active.main
+                  : theme.vars.palette.card.border,
               },
             },
           },
-          '&& .MuiSwitch-input': {
+          [`&& .${switchClasses.input}`]: {
             width: WIDTH_PX * 2 + TRACK_SIZE_PX,
             height: HEIGHT_PX,
             left: -WIDTH_PX - TRACK_SIZE_PX / 2,
             top: -PADDING_PX,
           },
-          '& .MuiSwitch-thumb': {
-            backgroundColor: theme.palette.common.white,
+          [`& .${switchClasses.thumb}`]: {
+            backgroundColor: theme.vars.palette.common.white,
             width: TRACK_SIZE_PX,
             height: TRACK_SIZE_PX,
           },
-          '&& .MuiSwitch-track': {
+          [`&&& .${switchClasses.track}`]: {
             opacity: 1,
             backgroundColor: colorScheme.isCustomized
-              ? theme.palette.active.main
-              : theme.palette.card.border,
+              ? theme.vars.palette.active.main
+              : theme.vars.palette.card.border,
             borderRadius: HEIGHT_PX / 2,
             transition: theme.transitions.create('background-color'),
           },

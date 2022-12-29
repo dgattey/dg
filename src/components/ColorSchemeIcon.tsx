@@ -1,8 +1,6 @@
-import type { ColorSchemeMode } from 'hooks/useColorScheme';
+import { ColorSchemeMode, useColorScheme } from 'hooks/useColorScheme';
 import { Moon, Sun, RefreshCw } from 'lucide-react';
-import { Box, IconButton, Tooltip, Theme } from '@mui/material';
-import { ColorSchemeContext } from 'components/ColorSchemeContext';
-import { useContext } from 'react';
+import { Box, IconButton, Theme, Tooltip } from '@mui/material';
 
 interface ColorSchemeIconProps {
   /**
@@ -17,7 +15,7 @@ interface ColorSchemeIconProps {
 const TOOLTIPS: Record<ColorSchemeMode | 'reset', string> = {
   light: 'Turn on light mode',
   dark: 'Enter dark mode',
-  reset: 'Reset to system color mode',
+  reset: 'Use system color mode',
 } as const;
 
 const ICON_SIZE = 16;
@@ -28,7 +26,7 @@ const DELAY_MS = 300;
  * if we have one that's set already. Otherwise, renders a disabled icon.
  */
 export function ColorSchemeIcon({ mode }: ColorSchemeIconProps) {
-  const { colorScheme, updatePreferredMode } = useContext(ColorSchemeContext);
+  const { colorScheme, updatePreferredMode } = useColorScheme();
   const isCurrentMode = mode === colorScheme.mode;
   const isResetMode = colorScheme.isCustomized && isCurrentMode;
 
@@ -40,14 +38,14 @@ export function ColorSchemeIcon({ mode }: ColorSchemeIconProps) {
     <Sun size={ICON_SIZE} />
   );
   const iconColor = (theme: Theme) => {
-    if (isResetMode) {
-      return theme.palette.text.secondary;
+    if (!colorScheme.isInitialized) {
+      return theme.vars.palette.text.secondary;
     }
-    return mode === 'dark' ? theme.palette.secondary.light : theme.palette.warning.main;
+    if (isResetMode) {
+      return theme.vars.palette.text.secondary;
+    }
+    return mode === 'dark' ? theme.vars.palette.secondary.light : theme.vars.palette.warning.main;
   };
-
-  const updateMode = colorScheme.isInitialized ? () => updatePreferredMode(mode) : undefined;
-  const resetMode = colorScheme.isInitialized ? () => updatePreferredMode(null) : undefined;
 
   const tooltip = TOOLTIPS[isResetMode ? 'reset' : mode];
 
@@ -60,7 +58,7 @@ export function ColorSchemeIcon({ mode }: ColorSchemeIconProps) {
     >
       <span>
         <IconButton
-          onClick={isResetMode ? resetMode : updateMode}
+          onClick={() => updatePreferredMode(isResetMode ? null : mode)}
           disabled={!colorScheme.isInitialized}
           aria-label={tooltip}
           sx={(theme) => ({

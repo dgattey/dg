@@ -1,7 +1,8 @@
-import { Box, SxProps, Theme } from '@mui/material';
+import { Box } from '@mui/material';
+import { SxProps } from 'ui/theme';
 import { mixinSx } from './helpers/mixinSx';
 
-export const sectionSx: SxProps<Theme> = (theme) => ({
+export const sectionSx: SxProps = (theme) => ({
   [theme.breakpoints.up('sm')]: {
     marginBottom: 5.3125,
   },

@@ -77,7 +77,7 @@ const ICONS = {
         key={`${name}mask`}
         rel="mask-icon"
         href={`/icons/${name}`}
-        color={theme.palette.primary.main}
+        color={theme.vars.palette.primary.main}
       />
     ),
   },
@@ -135,11 +135,11 @@ export function Meta({ title, description }: Props) {
         image: `${OG_IMAGE_URL}/${imageTitle}?md=true`,
       })}
       <link key="favicon" rel="icon" href="/favicon.ico" />
-      <meta key="theme-color" name="theme-color" content={theme.palette.background.default} />
+      <meta key="theme-color" name="theme-color" content={theme.vars.palette.background.default} />
       <meta
         key="msapplication-TileColor"
         name="msapplication-TileColor"
-        content={theme.palette.background.default}
+        content={theme.vars.palette.background.default}
       />
       {Object.values(ICONS).flatMap(({ variants, element }) =>
         variants.map((variant) => element(String(variant), theme)),

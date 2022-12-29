@@ -1,10 +1,12 @@
 import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
 import { ScrollUpButton } from 'components/ScrollUpButton';
 import { useContext } from 'react';
-import { SxProps, Theme, Box, alpha } from '@mui/material';
+import { Box, alpha } from '@mui/material';
 import { Section } from 'ui/Section';
 import { Nav, NavGroup, NavItem } from 'ui/Nav';
 import { ColorSchemeToggle } from 'components/ColorSchemeToggle';
+import { SxProps } from 'ui/theme';
+import { useColorScheme } from 'hooks/useColorScheme';
 import { Logo } from './Logo';
 
 interface Props {
@@ -16,7 +18,7 @@ interface Props {
 }
 
 // Makes the header bar sticky and not responsive to user events by default
-const stickyContainerSx: SxProps<Theme> = {
+const stickyContainerSx: SxProps = {
   position: 'sticky',
   top: 0,
   zIndex: 1,
@@ -29,6 +31,7 @@ const stickyContainerSx: SxProps<Theme> = {
  */
 export function Header({ headerRef }: Props) {
   const isScrolled = useContext(ScrollIndicatorContext);
+  const { colorScheme } = useColorScheme();
   return (
     <Section sx={stickyContainerSx}>
       <header ref={headerRef}>
@@ -37,10 +40,12 @@ export function Header({ headerRef }: Props) {
             backdropFilter: 'blur(16px) saturate(160%) contrast(110%)',
             backgroundColor: isScrolled
               ? alpha(theme.palette.card.background, 0.85)
-              : theme.palette.background.default,
-            boxShadow: isScrolled ? theme.extraShadows.card.hovered : 'none',
+              : theme.vars.palette.background.default,
+            boxShadow: isScrolled ? theme.vars.extraShadows.card.hovered : 'none',
             willChange: 'box-shadow, background-color',
-            transition: theme.transitions.create(['background-color', 'box-shadow']),
+            transition: colorScheme.isInitialized
+              ? theme.transitions.create(['background-color', 'box-shadow'])
+              : undefined,
           })}
         >
           <Nav>
