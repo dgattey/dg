@@ -24,7 +24,7 @@ type Graph = Record<string, string | undefined>;
 const MAX_DESC_LENGTH = 300;
 const SITE_NAME = 'Dylan Gattey';
 export const HOMEPAGE_TITLE = 'Engineer. Problem Solver.';
-const OG_IMAGE_URL = '/api/og';
+const OG_IMAGE_URL = 'https://dylangattey.com/api/og';
 const GRAPH_PREFIXES = ['og', 'twitter'] as const;
 
 /**

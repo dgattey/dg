@@ -38,6 +38,7 @@ export function OpenGraphImage({ text, subtitle }: { text: string; subtitle: str
         display: 'flex',
         flexDirection: 'column',
         padding: 64,
+        paddingTop: 96,
         height: '100%',
         width: '100%',
         background: COLORS.DARK.DEFAULT_BACKGROUND,
