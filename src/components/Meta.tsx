@@ -24,7 +24,7 @@ type Graph = Record<string, string | undefined>;
 const MAX_DESC_LENGTH = 300;
 const SITE_NAME = 'Dylan Gattey';
 export const HOMEPAGE_TITLE = 'Engineer. Problem Solver.';
-const OG_IMAGE_URL = 'https://dylangattey.com/api/og';
+const OG_IMAGE_API_ROUTE = 'api/og';
 const GRAPH_PREFIXES = ['og', 'twitter'] as const;
 
 /**
@@ -102,11 +102,13 @@ const graphMetaItems = (graph: Graph) =>
 export function Meta({ title, description }: Props) {
   const router = useRouter();
   const [pageUrl, setPageUrl] = useState('');
+  const [baseUrl, setBaseUrl] = useState('');
 
   useEffect(() => {
     const { host } = window.location;
-    const baseUrl = `https://${host}`;
-    setPageUrl(`${baseUrl}${router.pathname}`);
+    const newBaseUrl = `https://${host}`;
+    setBaseUrl(newBaseUrl);
+    setPageUrl(`${newBaseUrl}${router.pathname}`);
   }, [router.pathname]);
 
   const truncatedDescription =
@@ -115,11 +117,9 @@ export function Meta({ title, description }: Props) {
       : description;
   const resolvedTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
 
-  // Construct url with encoded periods too to not confuse the parser
-  const imageTitle = encodeURIComponent(title ?? SITE_NAME).replace(/\./g, '%2E');
-  const imageSubtitle = encodeURIComponent(
-    title === HOMEPAGE_TITLE ? SITE_NAME : HOMEPAGE_TITLE,
-  ).replace(/\./g, '%2E');
+  // Construct url-encoded title and subtitle for the og image
+  const imageTitle = encodeURIComponent(title ?? SITE_NAME);
+  const imageSubtitle = encodeURIComponent(title === HOMEPAGE_TITLE ? SITE_NAME : HOMEPAGE_TITLE);
   const theme = useTheme();
 
   return (
@@ -136,7 +136,7 @@ export function Meta({ title, description }: Props) {
         title: title ?? SITE_NAME,
         description: truncatedDescription,
         url: pageUrl,
-        image: `${OG_IMAGE_URL}/${imageTitle}?subtitle=${imageSubtitle}`,
+        image: `${baseUrl}/${OG_IMAGE_API_ROUTE}/${imageTitle}?subtitle=${imageSubtitle}`,
       })}
       <link key="favicon" rel="icon" href="/favicon.ico" />
       <meta key="theme-color" name="theme-color" content={theme.vars.palette.background.default} />
