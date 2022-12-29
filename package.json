@@ -43,6 +43,7 @@
     "@fortawesome/react-fontawesome": "0.2.0",
     "@mui/material": "5.10.16",
     "@next/bundle-analyzer": "13.0.6",
+    "@vercel/og": "0.0.21",
     "animate-css-grid": "1.4.3",
     "cmd-ts": "0.11.0",
     "dotenv": "16.0.3",

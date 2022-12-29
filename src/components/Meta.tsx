@@ -23,7 +23,8 @@ type Graph = Record<string, string | undefined>;
 
 const MAX_DESC_LENGTH = 300;
 const SITE_NAME = 'Dylan Gattey';
-const OG_IMAGE_URL = 'https://og.dylangattey.com';
+export const HOMEPAGE_TITLE = 'Engineer. Problem Solver.';
+const OG_IMAGE_URL = '/api/og';
 const GRAPH_PREFIXES = ['og', 'twitter'] as const;
 
 /**
@@ -115,7 +116,10 @@ export function Meta({ title, description }: Props) {
   const resolvedTitle = title ? `${title} | ${SITE_NAME}` : SITE_NAME;
 
   // Construct url with encoded periods too to not confuse the parser
-  const imageTitle = title ? encodeURIComponent(title).replace(/\./g, '%2E') : '%20';
+  const imageTitle = encodeURIComponent(title ?? SITE_NAME).replace(/\./g, '%2E');
+  const imageSubtitle = encodeURIComponent(
+    title === HOMEPAGE_TITLE ? SITE_NAME : HOMEPAGE_TITLE,
+  ).replace(/\./g, '%2E');
   const theme = useTheme();
 
   return (
@@ -132,7 +136,7 @@ export function Meta({ title, description }: Props) {
         title: title ?? SITE_NAME,
         description: truncatedDescription,
         url: pageUrl,
-        image: `${OG_IMAGE_URL}/${imageTitle}?md=true`,
+        image: `${OG_IMAGE_URL}/${imageTitle}?subtitle=${imageSubtitle}`,
       })}
       <link key="favicon" rel="icon" href="/favicon.ico" />
       <meta key="theme-color" name="theme-color" content={theme.vars.palette.background.default} />
