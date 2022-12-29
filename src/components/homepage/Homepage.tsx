@@ -1,7 +1,7 @@
 import { useData } from 'api/useData';
 import { ContentGrid } from 'components/ContentGrid';
 import { MapPreviewCard } from 'components/homepage/MapPreviewCard';
-import { Meta } from 'components/Meta';
+import { HOMEPAGE_TITLE, Meta } from 'components/Meta';
 import { useGridAnimation } from 'hooks/useGridAnimation';
 import { useMemo, useRef } from 'react';
 import { IntroCard } from './IntroCard';
@@ -45,7 +45,7 @@ export function Homepage() {
 
   return (
     <>
-      <Meta title="Engineer. Problem Solver." description={firstParagraph} />
+      <Meta title={HOMEPAGE_TITLE} description={firstParagraph} />
       <ContentGrid gridRef={gridRef}>
         {otherCards.map(({ index, card }, arrayIndex) => {
           const nextItem = otherCards[arrayIndex + 1];
