@@ -4,7 +4,7 @@
 assert_lefthook_installed: true
 
 pre-commit:
-  parallel: true
+  piped: true # needs to be run in order, not parallel!
   commands:
     lint:
       glob: '**/*.{js,ts,tsx,mjs,cjs}'
