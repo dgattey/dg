@@ -59,6 +59,10 @@ const createApiGenerator = (
     {
       [schemaEndpoint]: {
         headers: {
+          /**
+           * Required for Github to generate properly
+           */
+          'User-Agent': 'dylangattey.com',
           Authorization: `Bearer ${token}`,
         },
       },
