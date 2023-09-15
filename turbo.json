@@ -4,7 +4,6 @@
     ".env*",
     "config/database.config.js",
     "config/eslint.config.js",
-    "config/lint-staged.config.mjs",
     ".node-version",
     ".npmrc",
     ".sequelizerc",
