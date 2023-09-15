@@ -1,9 +1,9 @@
 import type { NextApiRequest } from 'next';
-import { ImageResponse } from '@vercel/og';
+import { ImageResponse } from 'next/server';
 import { LOGO_FONT, OpenGraphImage, TEXT_FONT } from 'og/OpenGraphImage';
 
 export const config = {
-  runtime: 'experimental-edge',
+  runtime: 'edge',
 };
 
 const normalFont = fetch(new URL('../../../og/SFProText.ttf', import.meta.url)).then((res) =>
