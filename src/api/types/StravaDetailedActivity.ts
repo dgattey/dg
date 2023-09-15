@@ -1,4 +1,7 @@
-type ActivityType = 'Ride' | 'Run' | string;
+/**
+ * Could be anything but is most commonly 'Ride' or 'Run'
+ */
+type ActivityType = string;
 
 interface Athlete {
   /**

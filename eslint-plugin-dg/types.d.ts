@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import type { rules } from '@typescript-eslint/eslint-plugin';
 
 type ValueOf<T> = T[keyof T];
@@ -12,20 +13,54 @@ export type Rule = ValueOf<typeof rules>;
  */
 export type Create = Rule['create'];
 
+type Range = [number, number];
+
+/**
+ * A node for all of these rules
+ */
+export type ESLintNode = {
+  range: Range;
+  importKind?: 'type' | 'value';
+  source: {
+    value: string;
+  };
+  specifiers: Array<{
+    type: 'ImportSpecifier';
+    local: {
+      name: string;
+    };
+    imported: {
+      name: string;
+    };
+  }>;
+};
+
+type FixResult = {
+  range: Range;
+  text: string;
+};
+
+/**
+ * The fixer function to change a node
+ */
+export type Fixer = (fixer: {
+  insertTextAfterRange: (range: Range, text: string) => FixResult;
+  removeRange: (range: Range) => FixResult;
+}) => Array<FixResult>;
+
 /**
  * The context used in the Create function
  */
-export type Context = Parameters<Create>[0];
-
-/**
- * Type of the listener that's returned by create
- */
-export type RuleListener = ReturnType<Create>;
-
-/**
- * The main argument passed to `context.report`, with loc undefined to
- * allow us to always use `node`
- */
-export type ReportArguments = Parameters<Context['report']>[0] & {
-  loc: undefined;
+export type Context = {
+  report: (args: {
+    node: ESLintNode;
+    messageId: string;
+    data?: Record<string, string>;
+    fix?: Fixer;
+  }) => void;
 };
+
+/**
+ * A rule that uses an import declaration
+ */
+export type ImportDeclarationRule = (node: ESLintNode) => void;

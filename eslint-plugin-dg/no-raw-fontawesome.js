@@ -8,7 +8,7 @@ const ALL_ICON_LIBS = ['@fortawesome/free-brands-svg-icons', '@fortawesome/free-
  * font-awesome package since it prevents tree shaking.
  *
  * @param {import('./types').Context } context
- * @returns {import('./types').RuleListener['ImportDeclaration']}
+ * @returns {import('./types').ImportDeclarationRule}
  */
 const importDeclarationRule = (context) => (node) => {
   const { range } = node;
@@ -21,7 +21,7 @@ const importDeclarationRule = (context) => (node) => {
   /**
    * Actually fixes a node by inserting import statements that have the icon import in
    * the package name (making sure to handle multiple imports from one icon package).
-   * @type {import('./types').ReportArguments['fix']}
+   * @type {import('./types').Fixer}
    */
   const fix = (fixer) => {
     const replacements = node.specifiers.map((specifier, index) => {
@@ -56,6 +56,9 @@ const importDeclarationRule = (context) => (node) => {
  * @type {import('./types').Rule}
  */
 const rule = {
+  /**
+   * @param {import('./types').Context } context
+   */
   create: (context) => ({
     // Only imports need to be linted by this rule
     ImportDeclaration: importDeclarationRule(context),
