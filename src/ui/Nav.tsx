@@ -1,11 +1,18 @@
-import { Box, Container, Typography } from '@mui/material';
+import {
+  Box,
+  BoxProps,
+  Container,
+  ContainerProps,
+  Typography,
+  TypographyProps,
+} from '@mui/material';
 import { mixinSx } from './helpers/mixinSx';
 
 /**
  * This group of items in a nav will group items together.
  * Condenses to a full width group on mobile.
  */
-export function NavGroup({ sx, children, ...props }: React.ComponentProps<typeof Box>) {
+export function NavGroup({ sx, children, ...props }: BoxProps) {
   return (
     <Box
       component="ul"
@@ -34,7 +41,7 @@ export function NavGroup({ sx, children, ...props }: React.ComponentProps<typeof
 /**
  * Each of these must be contained within a NavGroup
  */
-export function NavItem({ sx, children, ...props }: React.ComponentProps<typeof Box>) {
+export function NavItem({ sx, children, ...props }: TypographyProps) {
   return (
     <Typography
       variant="body2"
@@ -67,7 +74,7 @@ export function NavItem({ sx, children, ...props }: React.ComponentProps<typeof 
 /**
  * Semantic Nav, for a footer or header/etc
  */
-export function Nav({ sx, children, ...props }: React.ComponentProps<typeof Container>) {
+export function Nav({ sx, children, ...props }: ContainerProps) {
   return (
     <Container
       fixed
