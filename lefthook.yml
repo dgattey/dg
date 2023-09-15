@@ -1,0 +1,19 @@
+# Refer for explanation to following link:
+# https://github.com/evilmartians/lefthook/blob/master/docs/full_guide.md
+
+assert_lefthook_installed: true
+
+pre-commit:
+  piped: true # needs to be run in order, not parallel!
+  commands:
+    lint:
+      glob: '**/*.{js,ts,tsx,mjs,cjs}'
+      exclude: '**/migrations/*'
+      run: pnpm turbo lint -- {staged_files}
+    lint-types:
+      glob: '**/*.{js,ts,tsx,mjs,cjs}'
+      exclude: '**/migrations/*'
+      run: pnpm turbo lint:types
+    format:
+      glob: '{**/*.{js,ts,tsx,mjs,cjs},*.{css,md,json,yml,yaml}}'
+      run: pnpm turbo format -- {staged_files}
