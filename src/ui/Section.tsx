@@ -1,4 +1,4 @@
-import { Box } from '@mui/material';
+import { Box, BoxProps } from '@mui/material';
 import { SxProps } from 'ui/theme';
 import { mixinSx } from './helpers/mixinSx';
 
@@ -20,6 +20,6 @@ export const sectionSx: SxProps = (theme) => ({
 /**
  * Large, semantically meaningful section on a page, with padding.
  */
-export function Section({ sx, ...props }: React.ComponentProps<typeof Box>) {
+export function Section({ sx, ...props }: BoxProps) {
   return <Box component="section" {...props} sx={mixinSx(sectionSx, sx)} />;
 }
