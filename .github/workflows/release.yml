@@ -20,7 +20,7 @@ jobs:
           node-version-file: .node-version
           cache: 'pnpm'
       - name: Get pnpm store directory
-        shell: zsh
+        shell: bash
         run: |
           echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
       - uses: actions/cache@v3
