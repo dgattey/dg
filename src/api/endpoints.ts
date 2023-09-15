@@ -15,7 +15,7 @@ export type EndpointKey = keyof typeof endpoints;
 /**
  * Returns the endpoint's return type given a generic `EndpointKey`
  */
-export type EndpointType<Key extends EndpointKey> = ReturnType<typeof endpoints[Key]>;
+export type EndpointType<Key extends EndpointKey> = ReturnType<(typeof endpoints)[Key]>;
 
 /**
  * Convenience type for the awaited version of the endpoint's return type

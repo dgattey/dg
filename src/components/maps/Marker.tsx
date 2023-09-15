@@ -20,7 +20,7 @@ export function Marker({ point, image }: MarkerProps) {
   }
   const id = `${point.latitude},${point.longitude}`;
   return (
-    <MapMarker {...point}>
+    <MapMarker latitude={point.latitude} longitude={point.longitude}>
       <svg width={DIMENSION} height={DIMENSION}>
         <defs>
           <Box

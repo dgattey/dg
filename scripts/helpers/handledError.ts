@@ -12,9 +12,8 @@ type JsonResponseWithErrors = {
 /**
  * Typeguard for checking for an error
  */
-const isJsonWithErrors = (
-  json: Record<string, unknown> | unknown | undefined,
-): json is JsonResponseWithErrors => isRecord(json) && json?.errors !== undefined;
+const isJsonWithErrors = (json: unknown): json is JsonResponseWithErrors =>
+  isRecord(json) && json?.errors !== undefined;
 
 /**
  * Prints out an error for the user for a given webhook if necessary -
