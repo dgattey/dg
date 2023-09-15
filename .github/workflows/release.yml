@@ -11,6 +11,7 @@ concurrency:
 
 jobs:
   release:
+    timeout-minutes: 10
     name: Release
     runs-on: ubuntu-latest
     steps:
