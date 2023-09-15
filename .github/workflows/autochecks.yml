@@ -23,10 +23,19 @@ jobs:
         with:
           fetch-depth: 0
       - uses: pnpm/action-setup@v2
+        with:
+          run_install: false
       - uses: actions/setup-node@v3
         with:
           node-version-file: .node-version
           cache: 'pnpm'
+      - uses: actions/cache@v3
+        name: Setup pnpm cache
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
       - run: pnpm install
       - name: ${{ matrix.command }}
         run: NODE_OPTIONS=--max_old_space_size=8192 pnpm turbo ${{ matrix.command }}
