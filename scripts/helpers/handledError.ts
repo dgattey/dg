@@ -1,6 +1,6 @@
 import type { WebhookType } from 'api/types/WebhookType';
 import type { Response } from 'node-fetch';
-import { isRecord } from '../../src/api/parsers';
+import { isRecord } from '../../apps/web/src/api/parsers';
 
 /**
  * Strava's API returns errors like this

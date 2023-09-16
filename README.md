@@ -6,22 +6,23 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 
 ## :hammer: Commands
 
-- `pnpm dev` starts the development server.
-- `pnpm build` runs a prod build
-- `pnpm build:analyze` builds bundle analysis for a production version of the site to see what it'll look like when deployed
-- `pnpm serve` runs a server with the built site
-- `pnpm format` runs Prettier to format the files
-- `pnpm lint` runs ESLint to lint all TS(X) and JS(X) files
-- `pnpm lint:types` runs tsc to confirm no type errors on the same files
+- `turbo dev` starts the development server + db connection to your local db
+- `turbo build` runs a prod build
+- `turbo build:analyze` builds bundle analysis for a production version of the site to see what it'll look like when deployed
+- `turbo serve` runs a server with the built site
+- `turbo format` runs Prettier to format the files
+- `turbo lint` runs ESLint to lint all TS(X) and JS(X) files
+- `turbo lint:types` runs tsc to confirm no type errors on the same files
 - `pnpm codegen` generates new GraphQL APIs from Github/Contentful
-- `pnpm db:connect <optional branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
-- `pnpm db:migrate` uses Sequelize to run migrations, and you can list the status of migrations with `pnpm db:migrate:status`. Undo with `pnpm db:migrate:undo`
-- `pnpm db:generate` uses Sequelize to generate a new migration file ready to be populated
+- `turbo db:connect <optional branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
+- `turbo db:migrate` uses Sequelize to run migrations, and you can list the status of migrations with `turbo db:migrate:status`. Undo with `turbo db:migrate:undo`
+- `turbo db:generate` uses Sequelize to generate a new migration file ready to be populated
 - `pnpm webhooks:local` (assuming cloudflared is installed via brew) starts a tunnel to dev.dylangattey.com for purposes of testing webhooks
 - `pnpm webhooks:create <name>` will create a webhook subscription for the given API - for local dev and requires `webhooks:local` to be running already
 - `pnpm webhooks:list <name>` will list that API's webhook subscriptions - for local dev
 - `pnpm webhooks:delete <name> <id>` will delete a webhook subscription for that API - for local dev
 - `pnpm release` bumps the site version, run via Github Action
+- `turbo clean` cleans up any built files like Next caches
 
 ## :beginner: Initial Setup
 

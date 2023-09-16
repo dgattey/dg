@@ -1,25 +1,13 @@
 {
-  "name": "dg",
-  "version": "0.0.0-development",
-  "description": "Dylan Gattey's public website, implemented in NextJS",
-  "repository": "https://github.com/dgattey/dg.git",
-  "homepage": "https://github.com/dgattey/dg#readme",
-  "author": "Dylan Gattey <hi@dylangattey.com>",
-  "license": "MIT",
-  "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "postinstall": "lefthook install",
-    "release": "semantic-release",
-    "format": "turbo format",
-    "lint": "turbo lint",
-    "lint:types": "turbo lint:types",
-    "codegen": "DOTENV_CONFIG_PATH='.env.development.local' graphql-codegen --require dotenv/config --config codegen.ts",
-    "webhooks": "NODE_ENV=development node --require tsm scripts/webhooks.ts",
-    "webhooks:local": "cloudflared tunnel run dg",
-    "webhooks:create": "pnpm -s webhooks create",
-    "webhooks:list": "pnpm -s webhooks list",
-    "webhooks:delete": "pnpm -s webhooks delete"
-  },
+  "name": "tsconfig",
+  "description": "Configuration for the tsconfig file, implemented modularly",
+  "version": "0.0.0",
+  "private": true,
+  "files": [
+    "base.json",
+    "nextjs.json",
+    "react.json"
+  ],
   "dependencies": {
     "@contentful/rich-text-react-renderer": "15.17.2",
     "@contentful/rich-text-types": "16.3.0",
@@ -35,8 +23,8 @@
     "animate-css-grid": "1.5.1",
     "cmd-ts": "0.13.0",
     "dotenv": "16.3.1",
-    "eslint-config-dg": "workspace:*",
-    "eslint-plugin-dg": "workspace:*",
+    "eslint-config-dg": "link:./eslint-plugin-dg",
+    "eslint-plugin-dg": "link:./eslint-plugin-dg",
     "graphql": "16.8.0",
     "graphql-request": "6.1.0",
     "lefthook": "1.4.11",
@@ -86,13 +74,8 @@
     "prettier": "3.0.3",
     "semantic-release": "21.1.1",
     "sequelize-cli": "6.6.1",
-    "tsconfig": "workspace:*",
     "tsm": "2.3.0",
     "turbo": "1.10.14",
     "typescript": "5.2.2"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "packageManager": "pnpm@8.7.5"
+  }
 }

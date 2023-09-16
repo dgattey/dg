@@ -4,7 +4,7 @@ import { CodegenConfig } from '@graphql-codegen/cli';
 require('dotenv').config();
 
 // Where all our documents to parse live by default
-const BASE_FOLDER = 'src/api/server';
+const BASE_FOLDER = 'apps/web/src/api/server';
 
 // Relative to BASE_FOLDER, where our generated files live
 const GENERATED_FOLDER = '../types/generated';

@@ -3,7 +3,7 @@
   "globalDependencies": [
     ".env*",
     "config/database.config.js",
-    "config/eslint.config.js",
+    "packages/eslint-config-dg/eslint.config.js",
     ".node-version",
     ".npmrc",
     ".sequelizerc",
@@ -32,7 +32,7 @@
   ],
   "pipeline": {
     "dev": {
-      "inputs": ["src/**/*"],
+      "inputs": ["apps/**/*", "packages/**/*"],
       "cache": false
     },
     "build": {
@@ -59,8 +59,8 @@
     },
     "codegen": {
       "cache": false,
-      "inputs": ["src/api/server/*"],
-      "outputs": ["src/api/types/generated/*"]
+      "inputs": ["apps/web/src/api/server/*"],
+      "outputs": ["apps/web/src/api/types/generated/*"]
     },
     "db": {
       "cache": false

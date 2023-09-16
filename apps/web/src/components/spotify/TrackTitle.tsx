@@ -2,8 +2,8 @@ import { Typography } from '@mui/material';
 import { Link } from 'components/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
 import { SxProps } from 'ui/theme';
-import { truncated } from '../../helpers/truncated';
-import { mixinSx } from '../../ui/helpers/mixinSx';
+import { truncated } from 'helpers/truncated';
+import { mixinSx } from 'ui/helpers/mixinSx';
 
 type TrackTitleProps = {
   trackTitle: string;

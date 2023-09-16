@@ -1,5 +1,5 @@
 {
-  "name": "dg",
+  "name": "web",
   "version": "0.0.0-development",
   "description": "Dylan Gattey's public website, implemented in NextJS",
   "repository": "https://github.com/dgattey/dg.git",
@@ -7,18 +7,14 @@
   "author": "Dylan Gattey <hi@dylangattey.com>",
   "license": "MIT",
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "postinstall": "lefthook install",
-    "release": "semantic-release",
-    "format": "turbo format",
-    "lint": "turbo lint",
-    "lint:types": "turbo lint:types",
-    "codegen": "DOTENV_CONFIG_PATH='.env.development.local' graphql-codegen --require dotenv/config --config codegen.ts",
-    "webhooks": "NODE_ENV=development node --require tsm scripts/webhooks.ts",
-    "webhooks:local": "cloudflared tunnel run dg",
-    "webhooks:create": "pnpm -s webhooks create",
-    "webhooks:list": "pnpm -s webhooks list",
-    "webhooks:delete": "pnpm -s webhooks delete"
+    "dev": "VERCEL_GIT_COMMIT_SHA=$(git rev-parse HEAD) next dev",
+    "build": "next build",
+    "build:analyze": "ANALYZE=true next build",
+    "serve": "next start",
+    "format": "prettier --log-level warn --write \"**/*.{js,ts,tsx,mjs,cjs,css,md,json,yml,yaml}\"",
+    "lint": "eslint . --cache --fix --ext .js,.ts,.tsx,.mjs,.cjs --no-eslintrc -c config/eslint.config.js",
+    "lint:types": "tsc",
+    "clean": "rm -rf .next"
   },
   "dependencies": {
     "@contentful/rich-text-react-renderer": "15.17.2",
@@ -36,7 +32,6 @@
     "cmd-ts": "0.13.0",
     "dotenv": "16.3.1",
     "eslint-config-dg": "workspace:*",
-    "eslint-plugin-dg": "workspace:*",
     "graphql": "16.8.0",
     "graphql-request": "6.1.0",
     "lefthook": "1.4.11",
@@ -90,9 +85,5 @@
     "tsm": "2.3.0",
     "turbo": "1.10.14",
     "typescript": "5.2.2"
-  },
-  "engines": {
-    "node": ">=18"
-  },
-  "packageManager": "pnpm@8.7.5"
+  }
 }
