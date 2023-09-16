@@ -1,0 +1,21 @@
+{
+  "name": "Dylan Gattey",
+  "short_name": "DG",
+  "start_url": "https://dylangattey.com/?utm_source=manifest",
+  "lang": "en",
+  "background_color": "#ffffff",
+  "theme_color": "#16ac7e",
+  "display": "standalone",
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ]
+}

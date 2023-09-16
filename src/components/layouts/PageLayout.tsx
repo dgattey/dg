@@ -2,13 +2,14 @@ import type { EndpointKey } from 'api/endpoints';
 import { FetchedFallbackData } from 'api/fetchFallbackData';
 import { Footer } from 'components/Footer';
 import { Header } from 'components/Header';
-import { Meta } from 'components/Meta';
 import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
 import { useShowScrollIndicator } from 'hooks/useShowScrollIndicator';
 import { useRef } from 'react';
 import { SWRConfig } from 'swr';
 import { Container } from '@mui/material';
 import { Section } from 'ui/Section';
+import { Metadata } from 'next';
+import { baseMetadata } from 'helpers/generateMetadataFromTitleAndDescription';
 
 /**
  * We have props that dictate a fallback for SWRConfig, plus children
@@ -23,6 +24,11 @@ type PageLayoutProps<Keys extends EndpointKey> = {
 };
 
 /**
+ * Static metadata described across all pages
+ */
+export const metadata: Metadata = baseMetadata;
+
+/**
  * Basic page layout for every page. Has a sticky, contained header above
  * the main (contained) content, with a (contained) footer below. No wrapper
  * around all items to save on divs. Ensures color scheme is applied.
@@ -34,7 +40,6 @@ export function PageLayout<Key extends EndpointKey>({ children, fallback }: Page
   );
   return (
     <SWRConfig value={{ fallback }}>
-      <Meta />
       <ScrollIndicatorContext.Provider value={isIndicatorShown}>
         <Header headerRef={headerSizingRef} />
         <Container component={Section} sx={{ marginTop: 16 }}>

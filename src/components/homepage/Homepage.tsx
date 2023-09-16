@@ -1,13 +1,21 @@
 import { useData } from 'api/useData';
 import { ContentGrid } from 'components/ContentGrid';
 import { MapPreviewCard } from 'components/homepage/MapPreviewCard';
-import { HOMEPAGE_TITLE, Meta } from 'components/Meta';
 import { useGridAnimation } from 'hooks/useGridAnimation';
 import { useMemo, useRef } from 'react';
 import { IntroCard } from './IntroCard';
 import { ProjectCard } from './ProjectCard';
 import { SpotifyCard } from './SpotifyCard';
 import { StravaCard } from './StravaCard';
+
+// TODO: @dgattey finish creating this but I can't use a hook here. Also need to update other spots that still reference `Meta` to use this function
+export function generateMetadata(): Promise<Metadata> {
+  const { data: introBlock } = useData('intro');
+
+  // Grabs the first intro block text element, essentially.
+  const firstParagraph = introBlock?.textBlock?.content?.json.content;
+  return generateMetadataFromTitleAndDescription({ description: firstParagraph });
+}
 
 /**
  * Puts all projects into a grid using `projects` data,
@@ -44,14 +52,11 @@ export function Homepage() {
   );
 
   return (
-    <>
-      <Meta title={HOMEPAGE_TITLE} description={firstParagraph} />
-      <ContentGrid gridRef={gridRef}>
-        {otherCards.map(({ index, card }, arrayIndex) => {
-          const nextItem = otherCards[arrayIndex + 1];
-          return [card, ...projectCards.slice(index, nextItem?.index)];
-        })}
-      </ContentGrid>
-    </>
+    <ContentGrid gridRef={gridRef}>
+      {otherCards.map(({ index, card }, arrayIndex) => {
+        const nextItem = otherCards[arrayIndex + 1];
+        return [card, ...projectCards.slice(index, nextItem?.index)];
+      })}
+    </ContentGrid>
   );
 }

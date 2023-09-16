@@ -1,4 +1,4 @@
-import { Meta } from 'components/Meta';
+import { Meta } from 'helpers/generateMetadataFromTitleAndDescription';
 import { Link } from 'components/Link';
 import { Section } from 'ui/Section';
 import { Stack } from '@mui/material';

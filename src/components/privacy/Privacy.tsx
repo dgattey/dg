@@ -1,5 +1,5 @@
 import { useData } from 'api/useData';
-import { Meta } from 'components/Meta';
+import { Meta } from 'helpers/generateMetadataFromTitleAndDescription';
 import { RichText } from 'components/RichText';
 
 /**
