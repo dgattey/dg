@@ -9,11 +9,11 @@ pre-commit:
     lint:
       glob: '**/*.{js,ts,tsx,mjs,cjs}'
       exclude: '**/migrations/*'
-      run: turbo lint -- {staged_files}
+      run: turbo lint
     lint-types:
       glob: '**/*.{js,ts,tsx,mjs,cjs}'
       exclude: '**/migrations/*'
       run: turbo lint:types
     format:
       glob: '{**/*.{js,ts,tsx,mjs,cjs},*.{css,md,json,yml,yaml}}'
-      run: turbo format -- {staged_files}
+      run: turbo format
