@@ -8,6 +8,11 @@
     "nextjs.json",
     "react.json"
   ],
+  "scripts": {
+    "format": "prettier --log-level warn --write \"**/*.{js,ts,tsx,mjs,cjs,css,md,json,yml,yaml}\"",
+    "lint": "eslint . --cache --fix",
+    "lint:types": "tsc"
+  },
   "dependencies": {
     "@contentful/rich-text-react-renderer": "15.17.2",
     "@contentful/rich-text-types": "16.3.0",

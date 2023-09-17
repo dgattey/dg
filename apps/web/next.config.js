@@ -1,3 +1,5 @@
+require('dotenv-mono').config();
+
 /**
  * Adds bundle analysis if development + with ANALYZE flag set to true
  */

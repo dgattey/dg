@@ -1,4 +1,4 @@
-const BASE_EXTENSIONS = ['airbnb', 'airbnb/hooks', 'prettier', 'next', 'plugin:dg/all'];
+const BASE_EXTENSIONS = ['airbnb', 'airbnb/hooks', 'prettier', 'plugin:dg/all'];
 
 const TYPESCRIPT_EXTENSIONS = [
   ...BASE_EXTENSIONS,
@@ -80,7 +80,7 @@ const TYPESCRIPT_RULES = {
 };
 
 const TYPESCRIPT_OVERRIDE = {
-  files: ['src/**/*.{ts,tsx}', 'scripts/**/*.ts'],
+  files: ['*.{ts,tsx}', '*.ts'],
   extends: TYPESCRIPT_EXTENSIONS,
   plugins: [...BASE_PLUGINS, '@typescript-eslint'],
   settings: {
@@ -112,34 +112,36 @@ const SCRIPTS_OVERRIDE = {
   },
 };
 
-module.exports = {
-  env: {
-    browser: true,
-    es2021: true,
-  },
-  extends: BASE_EXTENSIONS,
-  parserOptions: {
-    ecmaFeatures: {
-      jsx: true,
+export default [
+  {
+    env: {
+      browser: true,
+      es2021: true,
     },
-    sourceType: 'module',
+    extends: BASE_EXTENSIONS,
+    parserOptions: {
+      ecmaFeatures: {
+        jsx: true,
+      },
+      sourceType: 'module',
+    },
+    plugins: BASE_PLUGINS,
+    globals: {
+      React: 'readable',
+    },
+    reportUnusedDisableDirectives: true,
+    rules: BASE_RULES,
+    overrides: [TYPESCRIPT_OVERRIDE, SCRIPTS_OVERRIDE],
+    ignorePatterns: [
+      '.cache/',
+      '.next/',
+      '.vscode/',
+      '.vercel/',
+      '.turbo/',
+      'node_modules/',
+      '**/*.generated.*',
+      '**/generated/*',
+      'migrations/',
+    ],
   },
-  plugins: BASE_PLUGINS,
-  globals: {
-    React: 'readable',
-  },
-  reportUnusedDisableDirectives: true,
-  rules: BASE_RULES,
-  overrides: [TYPESCRIPT_OVERRIDE, SCRIPTS_OVERRIDE],
-  ignorePatterns: [
-    '.cache/',
-    '.next/',
-    '.vscode/',
-    '.vercel/',
-    '.turbo/',
-    'node_modules/',
-    '**/*.generated.*',
-    '**/generated/*',
-    'migrations/',
-  ],
-};
+];

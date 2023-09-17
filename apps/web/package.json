@@ -12,7 +12,7 @@
     "build:analyze": "ANALYZE=true next build",
     "serve": "next start",
     "format": "prettier --log-level warn --write \"**/*.{js,ts,tsx,mjs,cjs,css,md,json,yml,yaml}\"",
-    "lint": "eslint . --cache --fix --ext .js,.ts,.tsx,.mjs,.cjs --no-eslintrc -c config/eslint.config.js",
+    "lint": "eslint . --cache --fix",
     "lint:types": "tsc",
     "clean": "rm -rf .next"
   },

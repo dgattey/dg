@@ -1,5 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDotEnv": [
+    ".env.development.local",
+    ".env.strava-webhooks-prod.local",
+    ".env.production.local",
+    ".env"
+  ],
   "globalDependencies": [
     ".env*",
     "config/database.config.js",

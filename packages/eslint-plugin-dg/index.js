@@ -31,7 +31,7 @@ const configs = {
   },
 };
 
-module.exports = {
+export default {
   rules,
   configs,
 };

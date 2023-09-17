@@ -8,7 +8,10 @@
     "db:migrate:status": "sequelize db:migrate:status",
     "db:migrate:undo": "sequelize db:migrate:undo",
     "db:generate": "sequelize migration:generate",
-    "db:connect": "pscale connect dg --port 3309"
+    "db:connect": "pscale connect dg --port 3309",
+    "format": "prettier --log-level warn --write \"**/*.{js,ts,tsx,mjs,cjs,css,md,json,yml,yaml}\"",
+    "lint": "eslint . --cache --fix",
+    "lint:types": "tsc"
   },
   "dependencies": {
     "@contentful/rich-text-react-renderer": "15.17.2",
