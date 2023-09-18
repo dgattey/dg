@@ -42,6 +42,8 @@ export async function fetchRepoVersion(): Promise<string | null> {
   }
 
   // Looks for a release that matches build-time `VERCEL_GIT_COMMIT_SHA` and compares it to each release's commit SHA
+  // We disable a rule here otherwise the caching gets busted every time
+  // eslint-disable-next-line turbo/no-undeclared-env-vars
   const commitSha = process.env.VERCEL_GIT_COMMIT_SHA;
   const data = await githubClient.request<GithubRepoVersionQuery>(QUERY);
   const releases = data.repository?.releases.nodes;

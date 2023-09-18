@@ -9,7 +9,7 @@
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "postinstall": "lefthook install"
+    "postinstall": "[ $CI -ne 1 ] && true || lefthook install"
   },
   "dependencies": {
     "dotenv-mono": "github:dgattey/dotenv-mono#dgattey--fix-priority",
