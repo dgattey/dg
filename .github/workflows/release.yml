@@ -40,7 +40,7 @@ jobs:
       - name: Release new repo version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: turbo release
+        run: pnpm turbo release
       - uses: actions-ecosystem/action-get-latest-tag@v1
         name: Get latest version tag
         with:
