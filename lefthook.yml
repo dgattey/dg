@@ -3,6 +3,10 @@
 
 assert_lefthook_installed: true
 
+skip_output:
+  - execution_info
+  - meta
+
 pre-commit:
   piped: true # needs to be run in order, not parallel!
   commands:
@@ -15,5 +19,5 @@ pre-commit:
       exclude: '**/migrations/*'
       run: turbo lint:types
     format:
-      glob: '{**/*.{js,ts,tsx,mjs,cjs},*.{css,md,json,yml,yaml}}'
+      glob: '**/*.{js,ts,tsx,mjs,cjs,css,md,json,yml,yaml}'
       run: turbo format

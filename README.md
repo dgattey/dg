@@ -7,21 +7,21 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 ## :hammer: Commands
 
 - `turbo dev` starts the development server + db connection to your local db
-- `turbo build` runs a prod build
-- `turbo build:analyze` builds bundle analysis for a production version of the site to see what it'll look like when deployed
-- `turbo serve` runs a server with the built site
+- `turbo build` runs a prod build without a db connection (for CI)
+- `turbo build:serve` runs a prod build + db connection to your local db + serves it all once built (for local testing)
+- `turbo build:analyze` builds shows bundle sizes for a prod build (for verification)
 - `turbo format` runs Prettier to format the files
 - `turbo lint` runs ESLint to lint all TS(X) and JS(X) files
 - `turbo lint:types` runs tsc to confirm no type errors on the same files
-- `pnpm codegen` generates new GraphQL APIs from Github/Contentful
-- `turbo db:connect <optional branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
-- `turbo db:migrate` uses Sequelize to run migrations, and you can list the status of migrations with `turbo db:migrate:status`. Undo with `turbo db:migrate:undo`
-- `turbo db:generate` uses Sequelize to generate a new migration file ready to be populated
-- `pnpm webhooks:local` (assuming cloudflared is installed via brew) starts a tunnel to dev.dylangattey.com for purposes of testing webhooks
-- `pnpm webhooks:create <name>` will create a webhook subscription for the given API - for local dev and requires `webhooks:local` to be running already
-- `pnpm webhooks:list <name>` will list that API's webhook subscriptions - for local dev
-- `pnpm webhooks:delete <name> <id>` will delete a webhook subscription for that API - for local dev
-- `pnpm release` bumps the site version, run via Github Action
+- `turbo codegen` generates new GraphQL APIs from Github/Contentful
+- `turbo connect <optional branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
+- `turbo db -- db:migrate` uses Sequelize to run migrations, and you can list the status of migrations with `turbo db -- db:migrate:status`. Undo with `turbo db:migrate:undo`
+- `turbo db -- db:generate` uses Sequelize to generate a new migration file ready to be populated
+- `turbo webhooks:local` (assuming cloudflared is installed via brew) starts a tunnel to dev.dylangattey.com for purposes of testing webhooks
+- `turbo webhooks:create <name>` will create a webhook subscription for the given API - for local dev and requires `webhooks:local` to be running already
+- `turbo webhooks:list <name>` will list that API's webhook subscriptions - for local dev
+- `turbo webhooks:delete <name> <id>` will delete a webhook subscription for that API - for local dev
+- `turbo release` bumps the site version, run via Github Action
 - `turbo clean` cleans up any built files like Next caches
 
 ## :beginner: Initial Setup

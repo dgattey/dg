@@ -9,6 +9,16 @@ const SHARED_DB_OPTIONS = {
   dialectModule: mysql2, // gets around a Vercel bug where it's missing on edge functions
 };
 
+const databaseUrl = env.DATABASE_URL;
+if (!databaseUrl) {
+  throw new Error('DATABASE_URL environment variable not set');
+}
+
+// If running a production build locally we turn off SSL so we can actually make a build!
+const isRunningLocalProdBuild = ['127.0.0.1', 'localhost'].some((host) =>
+  databaseUrl.includes(host),
+);
+
 // Sequelize options applied based on current environment
 const DB_OPTIONS = {
   development: SHARED_DB_OPTIONS,
@@ -22,12 +32,7 @@ const DB_OPTIONS = {
       },
     },
   },
-}[env.NODE_ENV];
-
-const databaseUrl = env.DATABASE_URL;
-if (!databaseUrl) {
-  throw new Error('DATABASE_URL environment variable not set');
-}
+}[isRunningLocalProdBuild ? 'development' : env.NODE_ENV];
 
 /**
  * These are all the models a user might possibly use

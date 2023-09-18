@@ -187,6 +187,9 @@ importers:
       sequelize:
         specifier: 6.33.0
         version: 6.33.0(mysql2@3.6.1)
+      sequelize-cli:
+        specifier: 6.6.1
+        version: 6.6.1
       sequelize-typescript:
         specifier: 2.1.5
         version: 2.1.5(@types/node@18.17.1)(@types/validator@13.11.1)(reflect-metadata@0.1.13)(sequelize@6.33.0)

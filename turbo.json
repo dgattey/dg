@@ -40,36 +40,45 @@
     "VERCEL_GIT_COMMIT_SHA"
   ],
   "pipeline": {
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
     "dev": {
+      "dependsOn": ["topo"],
+      "inputs": ["apps/**/*", "packages/**/*"],
+      "cache": false,
+      "persistent": true
+    },
+    "connect": {
       "inputs": ["apps/**/*", "packages/**/*"],
       "cache": false,
       "persistent": true
     },
     "build": {
+      "dependsOn": ["^build", "topo", "lint", "lint:types", "format"],
       "outputs": [".next/**"]
     },
     "build:analyze": {
-      "cache": false,
+      "dependsOn": ["^build", "topo"],
       "outputs": [".next/**"]
     },
-    "serve": {
+    "build:serve": {
       "dependsOn": ["build"],
       "cache": false
     },
-    "release": {
-      "dependsOn": ["build", "lint", "lint:styles", "lint:types", "format"],
-      "cache": false
-    },
     "format": {
-      "outputMode": "new-only"
+      "outputMode": "new-only",
+      "dependsOn": ["topo"]
     },
     "lint": {
       "outputs": [],
-      "outputMode": "new-only"
+      "outputMode": "new-only",
+      "dependsOn": ["topo"]
     },
     "lint:types": {
       "outputs": [],
-      "outputMode": "new-only"
+      "outputMode": "new-only",
+      "dependsOn": ["topo"]
     },
     "codegen": {
       "cache": false,
@@ -95,6 +104,10 @@
       "cache": false
     },
     "clean": {
+      "cache": false
+    },
+    "release": {
+      "dependsOn": ["build"],
       "cache": false
     }
   }

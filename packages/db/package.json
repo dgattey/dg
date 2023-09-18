@@ -3,16 +3,16 @@
   "description": "For right now, just a package to run db commands",
   "version": "0.0.0",
   "scripts": {
-    "dev": "turbo db:connect",
-    "db:migrate": "sequelize db:migrate",
-    "db:migrate:status": "sequelize db:migrate:status",
-    "db:migrate:undo": "sequelize db:migrate:undo",
-    "db:generate": "sequelize migration:generate",
-    "db:connect": "pscale connect dg --port 3309",
-    "format": "prettier --log-level warn --write \"**/*.{js,ts,tsx,mjs,cjs,css,md,json,yml,yaml}\""
+    "dev": "pscale connect dg --port 3309",
+    "connect": "pscale connect dg --port 3309",
+    "build:serve": "pscale connect dg --port 3309",
+    "build:analyze": "pscale connect dg --port 3309",
+    "db": "sequelize",
+    "format": "prettier --write ."
   },
   "devDependencies": {
     "sequelize": "6.33.0",
+    "sequelize-cli": "6.6.1",
     "sequelize-typescript": "2.1.5"
   }
 }

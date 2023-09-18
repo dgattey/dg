@@ -10,7 +10,7 @@
     "dev": "VERCEL_GIT_COMMIT_SHA=$(git rev-parse HEAD) next dev",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
-    "serve": "next start",
+    "build:serve": "next start",
     "format": "prettier --write .",
     "lint": "eslint . --cache --fix",
     "lint:types": "tsc",
