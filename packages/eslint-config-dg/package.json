@@ -1,0 +1,21 @@
+{
+  "name": "eslint-config-dg",
+  "private": true,
+  "files": [
+    "common.js",
+    "library.js",
+    "next.js"
+  ],
+  "scripts": {
+    "format": "prettier --write .",
+    "lint": "eslint . --cache --fix",
+    "lint:types": "tsc"
+  },
+  "devDependencies": {
+    "@vercel/style-guide": "5.0.1",
+    "eslint-config-turbo": "1.10.14",
+    "globals": "13.21.0",
+    "tsconfig": "workspace:*",
+    "typescript": "5.2.2"
+  }
+}

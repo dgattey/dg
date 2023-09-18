@@ -1,0 +1,27 @@
+{
+  "name": "db",
+  "private": true,
+  "scripts": {
+    "dev": "pscale connect dg --port 3309",
+    "connect": "pscale connect dg --port 3309",
+    "build:serve": "pscale connect dg --port 3309",
+    "build:analyze": "pscale connect dg --port 3309",
+    "db": "sequelize",
+    "format": "prettier --write .",
+    "lint": "eslint . --cache --fix",
+    "lint:types": "tsc"
+  },
+  "dependencies": {
+    "dotenv-mono": "github:dgattey/dotenv-mono#dgattey--fix-priority",
+    "mysql2": "3.6.1",
+    "sequelize": "6.33.0",
+    "sequelize-typescript": "2.1.5"
+  },
+  "devDependencies": {
+    "eslint-config-dg": "workspace:*",
+    "pg-hstore": "2.3.4",
+    "sequelize-cli": "6.6.1",
+    "tsconfig": "workspace:*",
+    "typescript": "5.2.2"
+  }
+}

@@ -1,9 +1,15 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDotEnv": [
+    ".env.development.local",
+    ".env.strava-webhooks-prod.local",
+    ".env.production.local",
+    ".env"
+  ],
   "globalDependencies": [
     ".env*",
     "config/database.config.js",
-    "config/eslint.config.js",
+    "packages/eslint-config-dg/eslint.config.js",
     ".node-version",
     ".npmrc",
     ".sequelizerc",
@@ -14,6 +20,7 @@
     "tsconfig.json"
   ],
   "globalEnv": [
+    "ANALYZE",
     "NEXT_PUBLIC_MAPBOX_TOKEN",
     "CONTENTFUL_SPACE_ID",
     "CONTENTFUL_ACCESS_TOKEN",
@@ -28,74 +35,66 @@
     "SPOTIFY_CLIENT_ID",
     "SPOTIFY_CLIENT_SECRET",
     "SENTRY_AUTH_TOKEN",
-    "NEXT_PUBLIC_SENTRY_DSN"
+    "NEXT_PUBLIC_SENTRY_DSN",
+    "NEXT_PUBLIC_APP_VERSION",
+    "VERCEL_GIT_COMMIT_SHA"
   ],
   "pipeline": {
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
     "dev": {
-      "inputs": ["src/**/*"],
-      "cache": false
+      "dependsOn": ["topo"],
+      "inputs": ["apps/**/*", "packages/**/*"],
+      "cache": false,
+      "persistent": true
+    },
+    "connect": {
+      "inputs": ["apps/**/*", "packages/**/*"],
+      "cache": false,
+      "persistent": true
     },
     "build": {
+      "dependsOn": ["^build", "topo", "lint", "lint:types", "format"],
       "outputs": [".next/**"]
     },
     "build:analyze": {
-      "cache": false,
+      "dependsOn": ["^build", "topo"],
       "outputs": [".next/**"]
     },
-    "serve": {
+    "build:serve": {
       "dependsOn": ["build"],
       "cache": false
     },
-    "release": {
-      "dependsOn": ["build", "lint", "lint:styles", "lint:types", "format"],
-      "cache": false
+    "format": {
+      "outputMode": "new-only",
+      "dependsOn": ["topo"]
     },
-    "format": {},
     "lint": {
-      "outputs": []
+      "outputs": [],
+      "outputMode": "new-only",
+      "dependsOn": ["topo"]
     },
     "lint:types": {
-      "outputs": []
+      "outputs": [],
+      "outputMode": "new-only",
+      "dependsOn": ["topo"]
     },
     "codegen": {
       "cache": false,
-      "inputs": ["src/api/server/*"],
-      "outputs": ["src/api/types/generated/*"]
+      "inputs": ["apps/web/src/api/server/*"],
+      "outputs": ["apps/web/src/api/types/generated/*"]
+    },
+    "webhook": {
+      "cache": false
+    },
+    "clean": {
+      "cache": false
     },
     "db": {
       "cache": false
     },
-    "db:migrate": {
-      "cache": false
-    },
-    "db:migrate:status": {
-      "cache": false
-    },
-    "db:migrate:undo": {
-      "cache": false
-    },
-    "db:generate": {
-      "cache": false
-    },
-    "db:connect": {
-      "cache": false
-    },
-    "webhooks": {
-      "cache": false
-    },
-    "webhooks:local": {
-      "cache": false
-    },
-    "webhooks:create": {
-      "cache": false
-    },
-    "webhooks:list": {
-      "cache": false
-    },
-    "webhooks:delete": {
-      "cache": false
-    },
-    "clean": {
+    "release": {
       "cache": false
     }
   }

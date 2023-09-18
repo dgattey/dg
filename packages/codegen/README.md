@@ -1,0 +1,1 @@
+This holds code generators that run through the Github and Spotify APIs and create Typescript types out of it that are checked in. This also generates types from GQL queries and puts them in place next to the operation files themselves.

@@ -1,0 +1,12 @@
+{
+  "name": "tsconfig",
+  "private": true,
+  "files": [
+    "base.json",
+    "nextjs.json",
+    "react.json"
+  ],
+  "scripts": {
+    "format": "prettier --write ."
+  }
+}
