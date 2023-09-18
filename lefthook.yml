@@ -9,6 +9,7 @@ skip_output:
 
 pre-commit:
   piped: true # needs to be run in order, not parallel!
+  stage_fixed: true
   commands:
     lint:
       glob: '**/*.{js,ts,tsx,mjs,cjs}'
