@@ -1,5 +1,5 @@
+import { db } from 'db/src/client';
 import type { StravaWebhookEvent } from 'api/types/StravaWebhookEvent';
-import { db } from 'db/dbClient';
 import { fetchStravaActivityFromApi } from './fetchStravaActivityFromApi';
 
 // If an update was applied this number of ms or less ago, drop the update

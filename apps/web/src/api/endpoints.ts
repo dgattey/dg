@@ -48,7 +48,7 @@ export const endpoints = {
   version: fetchRepoVersion,
 
   // Last played song via Spotify
-  'latest/track': fetchRecentlyPlayed,
+  'latest/song': fetchRecentlyPlayed,
 
   // Fetches the latest Strava activity I've done
   'latest/activity': fetchLatestStravaActivityFromDb,

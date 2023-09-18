@@ -30,7 +30,7 @@ const nextConfig = {
     defaultLocale: 'en',
   },
   // Have to do this for each of the packages we import
-  transpilePackages: ['shared-core'],
+  transpilePackages: ['shared-core', 'db'],
   experimental: {
     scrollRestoration: true,
   },

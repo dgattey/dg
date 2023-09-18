@@ -18,6 +18,7 @@ if (!databaseUrl) {
 const isRunningLocalProdBuild = ['127.0.0.1', 'localhost'].some((host) =>
   databaseUrl.includes(host),
 );
+const nodeEnv = isRunningLocalProdBuild ? 'development' : env.NODE_ENV || 'development';
 
 // Sequelize options applied based on current environment
 const DB_OPTIONS = {
@@ -32,7 +33,7 @@ const DB_OPTIONS = {
       },
     },
   },
-}[isRunningLocalProdBuild ? 'development' : env.NODE_ENV];
+}[nodeEnv];
 
 /**
  * These are all the models a user might possibly use

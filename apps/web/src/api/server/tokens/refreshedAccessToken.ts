@@ -1,5 +1,5 @@
-import { db } from 'db/dbClient';
-import type { CreateTokenProps, FetchTokenProps } from 'db/models/Token';
+import { db } from 'db/src/client';
+import type { CreateTokenProps, FetchTokenProps } from 'db/src/models/Token';
 import { fetchRefreshedTokenFromApi } from './fetchRefreshedTokenFromApi';
 
 /**

@@ -1,1 +1,1 @@
-Right now this just holds some commands for connecting to the database (hosted on Planetscale), and commands for running migrations with Sequelize.
+This holds some commands for connecting to the database (hosted on Planetscale), commands for running migrations with Sequelize, and db code. The code exposes a client for use in server code in the app itself, plus all the model types.

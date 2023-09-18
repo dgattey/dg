@@ -24,6 +24,9 @@ module.exports = {
   parserOptions: {
     project,
   },
+  globals: {
+    ...require('globals').node,
+  },
   reportUnusedDisableDirectives: true,
   settings: {
     'import/resolver': {

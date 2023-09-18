@@ -1,4 +1,4 @@
-import type { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
+import type { StravaDetailedActivity } from 'db/src/models/StravaDetailedActivity';
 
 /**
  * These are the only fields we care about for now
