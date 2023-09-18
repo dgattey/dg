@@ -10,7 +10,6 @@
     "preinstall": "npx only-allow pnpm",
     "postinstall": "lefthook install",
     "release": "semantic-release",
-    "codegen": "DOTENV_CONFIG_PATH='.env.development.local' graphql-codegen --require dotenv-mono/config --config codegen.ts",
     "webhooks": "NODE_ENV=development node --require tsm scripts/webhooks.ts",
     "webhooks:local": "cloudflared tunnel run dg",
     "webhooks:create": "pnpm -s webhooks create",
@@ -24,10 +23,6 @@
     "node-fetch": "3.3.2"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "5.0.0",
-    "@graphql-codegen/near-operation-file-preset": "2.5.0",
-    "@graphql-codegen/typescript": "4.0.1",
-    "@graphql-codegen/typescript-operations": "4.0.1",
     "@semantic-release/changelog": "6.0.3",
     "@types/node": "18.17.1",
     "prettier": "3.0.3",

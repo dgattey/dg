@@ -1,0 +1,15 @@
+{
+  "name": "codegen",
+  "description": "For right now, just a package to run db commands",
+  "version": "0.0.0",
+  "scripts": {
+    "codegen": "graphql-codegen --config config.ts",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@graphql-codegen/cli": "5.0.0",
+    "@graphql-codegen/near-operation-file-preset": "2.5.0",
+    "@graphql-codegen/typescript": "4.0.1",
+    "@graphql-codegen/typescript-operations": "4.0.1"
+  }
+}

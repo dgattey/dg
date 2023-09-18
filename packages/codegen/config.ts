@@ -1,10 +1,15 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { CodegenConfig } from '@graphql-codegen/cli';
+import path from 'node:path';
 
 require('dotenv-mono').config();
 
+// Get path from package root to `apps/web/src` folder
+const ROOT = __dirname.split('/').slice(0, -2).join('/');
+
 // Where all our documents to parse live by default
-const BASE_FOLDER = 'apps/web/src/api/server';
+const BASE_FOLDER = path.join(ROOT, 'apps/web/src/api/server');
+console.log(BASE_FOLDER);
 
 // Relative to BASE_FOLDER, where our generated files live
 const GENERATED_FOLDER = '../types/generated';
