@@ -259,6 +259,9 @@ importers:
 
   packages/webhooks:
     devDependencies:
+      '@graphql-codegen/cli':
+        specifier: 5.0.0
+        version: 5.0.0(@types/node@18.17.1)(graphql@16.8.0)(typescript@5.2.2)
       cmd-ts:
         specifier: 0.13.0
         version: 0.13.0

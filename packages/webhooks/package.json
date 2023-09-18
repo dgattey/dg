@@ -9,6 +9,7 @@
     "lint:types": "tsc"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "5.0.0",
     "cmd-ts": "0.13.0",
     "dotenv-mono": "github:dgattey/dotenv-mono#dgattey--fix-priority",
     "eslint-config-dg": "workspace:*",
