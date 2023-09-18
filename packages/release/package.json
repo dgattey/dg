@@ -1,0 +1,18 @@
+{
+  "name": "release",
+  "private": true,
+  "files": [
+    "base.json",
+    "nextjs.json",
+    "react.json"
+  ],
+  "scripts": {
+    "release": "semantic-release",
+    "format": "prettier --write ."
+  },
+  "devDependencies": {
+    "@semantic-release/changelog": "6.0.3",
+    "semantic-release": "21.1.1",
+    "typescript": "5.2.2"
+  }
+}

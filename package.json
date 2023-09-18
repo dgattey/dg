@@ -9,18 +9,15 @@
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "postinstall": "lefthook install",
-    "release": "semantic-release"
+    "postinstall": "lefthook install"
   },
   "dependencies": {
     "dotenv-mono": "github:dgattey/dotenv-mono#dgattey--fix-priority",
     "lefthook": "1.4.11"
   },
   "devDependencies": {
-    "@semantic-release/changelog": "6.0.3",
     "@types/node": "18.17.1",
     "prettier": "3.0.3",
-    "semantic-release": "21.1.1",
     "tsconfig": "workspace:*",
     "turbo": "1.10.14",
     "typescript": "5.2.2"
