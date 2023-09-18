@@ -1,8 +1,8 @@
 import { WebhookSubscriptionConfig } from 'api/types/WebhookSubscriptionConfig';
 import { WebhookType } from 'api/types/WebhookType';
-import dotenv from 'dotenv-mono';
+import { dotenvLoad } from 'dotenv-mono';
 
-dotenv.config();
+dotenvLoad();
 
 /**
  * These are the standard parameters that go into the body of

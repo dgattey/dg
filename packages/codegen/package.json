@@ -4,12 +4,16 @@
   "version": "0.0.0",
   "scripts": {
     "codegen": "graphql-codegen --config config.ts",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "lint": "eslint . --cache --fix",
+    "lint:types": "tsc"
   },
   "devDependencies": {
     "@graphql-codegen/cli": "5.0.0",
     "@graphql-codegen/near-operation-file-preset": "2.5.0",
     "@graphql-codegen/typescript": "4.0.1",
-    "@graphql-codegen/typescript-operations": "4.0.1"
+    "@graphql-codegen/typescript-operations": "4.0.1",
+    "dotenv-mono": "github:dgattey/dotenv-mono#dgattey--fix-priority",
+    "eslint-config-dg": "workspace:*"
   }
 }

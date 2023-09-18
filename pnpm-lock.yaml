@@ -87,9 +87,6 @@ importers:
       dotenv-mono:
         specifier: github:dgattey/dotenv-mono#dgattey--fix-priority
         version: github.com/dgattey/dotenv-mono/653223d8ba5a69a8ef0a3d67133551672b9068f6
-      eslint-config-dg:
-        specifier: workspace:*
-        version: link:../../packages/eslint-config-dg
       graphql:
         specifier: 16.8.0
         version: 16.8.0
@@ -157,6 +154,9 @@ importers:
       '@types/react-dom':
         specifier: 18.2.7
         version: 18.2.7
+      eslint-config-dg:
+        specifier: workspace:*
+        version: link:../../packages/eslint-config-dg
       prettier:
         specifier: 3.0.3
         version: 3.0.3
@@ -184,6 +184,12 @@ importers:
       '@graphql-codegen/typescript-operations':
         specifier: 4.0.1
         version: 4.0.1(graphql@16.8.0)
+      dotenv-mono:
+        specifier: github:dgattey/dotenv-mono#dgattey--fix-priority
+        version: github.com/dgattey/dotenv-mono/653223d8ba5a69a8ef0a3d67133551672b9068f6
+      eslint-config-dg:
+        specifier: workspace:*
+        version: link:../eslint-config-dg
 
   packages/db:
     devDependencies:
@@ -4084,7 +4090,6 @@ packages:
   /dotenv-expand@10.0.0:
     resolution: {integrity: sha512-GopVGCpVS1UKH75VKHGuQFqS1Gusej0z4FyQkPdwjil2gNIv+LNsqBlboOzpJFZKVT95GkCyWJbBSdFEFUWI2A==}
     engines: {node: '>=12'}
-    dev: false
 
   /dotenv@16.0.3:
     resolution: {integrity: sha512-7GO6HghkA5fYG9TYnNxi14/7K9f5occMlp3zXAuSxn7CKCxt9xbNWG7yF8hTCSUchlfWSe3uLmlPfigevRItzQ==}
@@ -9597,4 +9602,3 @@ packages:
     dependencies:
       dotenv: 16.3.1
       dotenv-expand: 10.0.0
-    dev: false
