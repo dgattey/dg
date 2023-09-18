@@ -6,7 +6,7 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 
 ## :hammer: Commands
 
-- `turbo dev` starts the development server + db connection to your local db
+- `turbo dev` starts the development server + db connection to your local db + (assuming cloudflared is installed via brew) a tunnel to dev.dylangattey.com for purposes of testing webhooks
 - `turbo build` runs a prod build without a db connection (for CI)
 - `turbo build:serve` runs a prod build + db connection to your local db + serves it all once built (for local testing)
 - `turbo build:analyze` builds shows bundle sizes for a prod build (for verification)
@@ -17,16 +17,15 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 - `turbo connect <optional branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
 - `turbo db -- db:migrate` uses Sequelize to run migrations, and you can list the status of migrations with `turbo db -- db:migrate:status`. Undo with `turbo db:migrate:undo`
 - `turbo db -- db:generate` uses Sequelize to generate a new migration file ready to be populated
-- `turbo webhooks:local` (assuming cloudflared is installed via brew) starts a tunnel to dev.dylangattey.com for purposes of testing webhooks
-- `turbo webhooks:create <name>` will create a webhook subscription for the given API - for local dev and requires `webhooks:local` to be running already
-- `turbo webhooks:list <name>` will list that API's webhook subscriptions - for local dev
-- `turbo webhooks:delete <name> <id>` will delete a webhook subscription for that API - for local dev
+- `turbo webhook -- create <name>` will create a webhook subscription for the given API - for local dev and requires `dev` to be running already
+- `turbo webhook -- list <name>` will list that API's webhook subscriptions - for local dev
+- `turbo webhook -- delete <name> <id>` will delete a webhook subscription for that API - for local dev
 - `turbo release` bumps the site version, run via Github Action
 - `turbo clean` cleans up any built files like Next caches
 
 ## :beginner: Initial Setup
 
-You need Node 18+ and pnpm 7+ installed. Run `pnpm install` to get started once you have those two installed.
+You need Node 18+ and pnpm 7+ installed. Run `pnpm install` to get started once you have those two installed. Most later commands are run via `turbo`.
 
 ## :memo: Pull Requests
 
@@ -85,13 +84,13 @@ There's only two tables, one for the tokens and one for the Strava activities, a
 
 To create and run a migration:
 
-1. Run `pnpm db:generate <name>` to create a new migration file
+1. Run `turbo db:generate <name>` to create a new migration file
 1. Fill it in with the appropriate `up` and `down` code for what you're doing
 1. Create a new branch on Planetscale's UI to test with
-1. Connect to that branch with `pnpm db:connect <branch>`
-1. In a new terminal tab, run `pnpm db:migrate` to run migrations onto that branch.
+1. Connect to that branch with `turbo db:connect <branch>`
+1. In a new terminal tab, run `turbo db:migrate` to run migrations onto that branch.
 1. If all looks good, you can deploy request from Planetscale, review, merge, and delete the branch.
-1. Migrations can be undone with `pnpm db:migrate:undo`
+1. Migrations can be undone with `turbo db:migrate:undo`
 
 #### Strava
 
@@ -101,15 +100,15 @@ More annoyingly, each app from Strava only has one possible subscription that it
 
 Both use the same DB under the hood, but they use different auth tokens, refresh tokens, and callback URLs. An env variable, `process.env.STRAVA_TOKEN_NAME`, is used to switch between them. Note that if you're testing webhook events locally, you'll want to create another branch in the Planetscale DB probably so you don't clobber the DB with simultaneous updates from the local webhook + the live webhook! Or briefly disconnect the prod webhook, then reconnect when done local testing.
 
-Testing locally requires running Cloudflare's Tunnel service. Via it, https://dev.dylangattey.com points to your local (running) Next app if you run `pnpm webhooks:local`. Make sure the config in ~/.cloudflared exposes the `dg` tunnel with `url: http://localhost:3000`. And close when done! The dev Strava app is set up to hit `dev.dylangattey.com` at `/api/webhooks`, whereas the main one uses `dylangattey.com`.
+Testing locally requires running Cloudflare's Tunnel service. Via it, https://dev.dylangattey.com points to your local (running) Next app if you run `turbo dev`. Make sure the config in ~/.cloudflared exposes the `dg` tunnel with `url: http://localhost:3000`. And close when done! The dev Strava app is set up to hit `dev.dylangattey.com` at `/api/webhooks`, whereas the main one uses `dylangattey.com`.
 
 #### Webhooks
 
 Strava is the only thing that supports webhooks right now!
 
-1. To create a subscription, first run `pnpm webhooks:local` after `pnpm dev` starts elsewhere. Then run `pnpm webhooks:create strava` to make a new subscription. This fails if one already exists. For local subscription testing - you want to make sure you delete the subscription after you're done testing so Strava doesn't keep pinging an endpoint that's not currently live.
-2. To list existing subscriptions, run `pnpm webhooks:list strava` to get the ids
-3. To delete a subscription, run `pnpm webhooks:delete strava <id>` with an id from the list script
+1. To create a subscription, first run `turbo dev` starts elsewhere. Then run `turbo webhook -- create strava` to make a new subscription. This fails if one already exists. For local subscription testing - you want to make sure you delete the subscription after you're done testing so Strava doesn't keep pinging an endpoint that's not currently live.
+2. To list existing subscriptions, run `turbo webhook -- list strava` to get the ids
+3. To delete a subscription, run `turbo webhook -- delete strava <id>` with an id from the list script
 4. To test actual event handling, just add a `console.log` in `pages/api/webhooks`. To easily test, change the name of a Strava activity to trigger an event. Details about the events at https://developers.strava.com/docs/webhooks/.
 5. If you need to make changes to the prod webhook subscription instead of the local one, change the env variables in `.env.development.local` for `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `STRAVA_TOKEN_NAME`, and `STRAVA_VERIFY_TOKEN` to match the values on Vercel. Restart everything, and you'll be running against the prod webhook setup. These subscriptions are only ever able to be changed locally with this script, or manually with a curl, to prevent tampering.
 

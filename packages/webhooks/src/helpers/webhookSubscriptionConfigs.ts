@@ -1,6 +1,6 @@
-import { WebhookSubscriptionConfig } from 'api/types/WebhookSubscriptionConfig';
-import { WebhookType } from 'api/types/WebhookType';
 import { dotenvLoad } from 'dotenv-mono';
+import type { WebhookSubscriptionConfig } from 'types/WebhookSubscriptionConfig';
+import type { WebhookType } from 'types/WebhookType';
 
 dotenvLoad();
 
@@ -22,7 +22,7 @@ export const standardParams = (config: WebhookSubscriptionConfig) => {
 /**
  * Configurations for the webhooks using mostly just env variables
  */
-const webhookSubscriptionConfigs: Record<WebhookType, WebhookSubscriptionConfig> = {
+export const webhookSubscriptionConfigs: Record<WebhookType, WebhookSubscriptionConfig> = {
   strava: {
     endpoint: 'https://www.strava.com/api/v3/push_subscriptions',
     id: process.env.STRAVA_CLIENT_ID,
@@ -35,5 +35,3 @@ const webhookSubscriptionConfigs: Record<WebhookType, WebhookSubscriptionConfig>
     },
   },
 };
-
-export default webhookSubscriptionConfigs;

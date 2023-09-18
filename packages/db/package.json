@@ -1,7 +1,6 @@
 {
   "name": "db",
-  "description": "For right now, just a package to run db commands",
-  "version": "0.0.0",
+  "private": true,
   "scripts": {
     "dev": "pscale connect dg --port 3309",
     "connect": "pscale connect dg --port 3309",

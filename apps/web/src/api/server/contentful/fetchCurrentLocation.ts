@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request';
-import { isDefinedItem } from 'api/parsers';
+import { isNotNullish } from 'shared-core/src/typeguards';
 import type { MyLocationQuery } from 'api/types/generated/fetchCurrentLocation.generated';
 import type { MapLocation } from 'api/types/MapLocation';
 import { contentfulClient } from '../networkClients/contentfulClient';
@@ -60,7 +60,7 @@ export async function fetchCurrentLocation(): Promise<MapLocation | null> {
   if (!location || !data.lightImage?.url || !data.darkImage?.url) {
     return null;
   }
-  const zoomLevels = location.zoomLevels?.filter(isDefinedItem)?.map(Number) ?? [];
+  const zoomLevels = location.zoomLevels?.filter(isNotNullish)?.map(Number) ?? [];
   zoomLevels.sort((a, b) => {
     if (a === b) {
       return 0;

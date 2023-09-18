@@ -1,4 +1,4 @@
-import { isRecord } from 'api/parsers';
+import { isRecord } from 'shared-core/src/typeguards';
 import type { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
 import { db } from 'db/dbClient';
 import { paredStravaActivity } from './paredStravaActivity';

@@ -31,7 +31,7 @@ const QUERY = gql`
  * is defined from our `release.yml` script, so we should only see commit SHA before
  * our release workflow runs (~2 min after a commit is pushed to `main`).
  *
- * Locally, we inject `VERCEL_GIT_COMMIT_SHA` via `pnpm dev` so it should work to
+ * Locally, we inject `VERCEL_GIT_COMMIT_SHA` via `turbo dev` so it should work to
  * help us find the release when running locally. A production build locally won't
  * have either of these defined, so we'll just return `null`.
  */

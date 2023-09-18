@@ -1,6 +1,6 @@
-import type { WebhookType } from 'api/types/WebhookType';
 import type { Response } from 'node-fetch';
-import { isRecord } from '../../apps/web/src/api/parsers';
+import { isRecord } from 'shared-core/src/typeguards';
+import type { WebhookType } from 'types/WebhookType';
 
 /**
  * Strava's API returns errors like this
@@ -13,13 +13,13 @@ type JsonResponseWithErrors = {
  * Typeguard for checking for an error
  */
 const isJsonWithErrors = (json: unknown): json is JsonResponseWithErrors =>
-  isRecord(json) && json?.errors !== undefined;
+  isRecord(json) && json.errors !== undefined;
 
 /**
  * Prints out an error for the user for a given webhook if necessary -
  * and returns if it handled the error successfully.
  */
-const handledError = async (webhookType: WebhookType, data: Response) => {
+export const handledError = async (webhookType: WebhookType, data: Response) => {
   if (data.status >= 200 && data.status < 300) {
     return false;
   }
@@ -32,5 +32,3 @@ const handledError = async (webhookType: WebhookType, data: Response) => {
   console.error(`🚨 Error from ${webhookType} (${data.status}):`, json.errors);
   return true;
 };
-
-export default handledError;

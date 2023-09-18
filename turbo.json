@@ -85,25 +85,13 @@
       "inputs": ["apps/web/src/api/server/*"],
       "outputs": ["apps/web/src/api/types/generated/*"]
     },
-    "db": {
-      "cache": false
-    },
-    "webhooks": {
-      "cache": false
-    },
-    "webhooks:local": {
-      "cache": false
-    },
-    "webhooks:create": {
-      "cache": false
-    },
-    "webhooks:list": {
-      "cache": false
-    },
-    "webhooks:delete": {
+    "webhook": {
       "cache": false
     },
     "clean": {
+      "cache": false
+    },
+    "db": {
       "cache": false
     },
     "release": {

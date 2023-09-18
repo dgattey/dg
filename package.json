@@ -1,26 +1,20 @@
 {
   "name": "dg",
   "version": "0.0.0-development",
-  "description": "Dylan Gattey's public website, implemented in NextJS",
+  "description": "Dylan Gattey's public website, implemented in NextJS in a monorepo",
   "repository": "https://github.com/dgattey/dg.git",
   "homepage": "https://github.com/dgattey/dg#readme",
   "author": "Dylan Gattey <hi@dylangattey.com>",
   "license": "MIT",
+  "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
     "postinstall": "lefthook install",
-    "release": "semantic-release",
-    "webhooks": "NODE_ENV=development node --require tsm scripts/webhooks.ts",
-    "webhooks:local": "cloudflared tunnel run dg",
-    "webhooks:create": "pnpm -s webhooks create",
-    "webhooks:list": "pnpm -s webhooks list",
-    "webhooks:delete": "pnpm -s webhooks delete"
+    "release": "semantic-release"
   },
   "dependencies": {
-    "cmd-ts": "0.13.0",
     "dotenv-mono": "github:dgattey/dotenv-mono#dgattey--fix-priority",
-    "lefthook": "1.4.11",
-    "node-fetch": "3.3.2"
+    "lefthook": "1.4.11"
   },
   "devDependencies": {
     "@semantic-release/changelog": "6.0.3",
@@ -28,7 +22,6 @@
     "prettier": "3.0.3",
     "semantic-release": "21.1.1",
     "tsconfig": "workspace:*",
-    "tsm": "2.3.0",
     "turbo": "1.10.14",
     "typescript": "5.2.2"
   },

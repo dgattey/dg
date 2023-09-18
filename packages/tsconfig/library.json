@@ -4,8 +4,8 @@
   "extends": "./base.json",
   "compilerOptions": {
     "target": "es2018",
-    "jsx": "preserve",
     "lib": ["esnext"],
-    "module": "esnext"
+    "module": "esnext",
+    "jsx": "preserve"
   }
 }

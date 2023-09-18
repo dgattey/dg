@@ -1,12 +1,12 @@
-import type { WebhookType } from 'api/types/WebhookType';
 import fetch from 'node-fetch';
-import handledError from './handledError';
-import webhookSubscriptionConfigs, { standardParams } from './webhookSubscriptionConfigs';
+import type { WebhookType } from 'types/WebhookType';
+import { handledError } from 'helpers/handledError';
+import { webhookSubscriptionConfigs, standardParams } from 'helpers/webhookSubscriptionConfigs';
 
 /**
  * Lists all current subscriptions for a webhook type
  */
-const listSubscriptions = async (type: WebhookType) => {
+export const listSubscriptions = async (type: WebhookType) => {
   const config = webhookSubscriptionConfigs[type];
   const { endpoint, headers } = config;
 
@@ -23,5 +23,3 @@ const listSubscriptions = async (type: WebhookType) => {
   }
   console.log('👉 Current subscriptions: ', await data.json());
 };
-
-export default listSubscriptions;

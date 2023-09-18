@@ -1,7 +1,5 @@
 {
   "name": "tsconfig",
-  "description": "Configuration for the tsconfig file, implemented modularly",
-  "version": "0.0.0",
   "private": true,
   "files": [
     "base.json",

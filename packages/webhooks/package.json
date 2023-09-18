@@ -1,20 +1,21 @@
 {
-  "name": "codegen",
+  "name": "webhooks",
   "private": true,
   "scripts": {
-    "codegen": "graphql-codegen --config config.ts",
+    "dev": "cloudflared tunnel run dg",
+    "webhook": "NODE_ENV=development tsx src/webhookCommand.ts",
     "format": "prettier --write .",
     "lint": "eslint . --cache --fix",
     "lint:types": "tsc"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "5.0.0",
-    "@graphql-codegen/near-operation-file-preset": "2.5.0",
-    "@graphql-codegen/typescript": "4.0.1",
-    "@graphql-codegen/typescript-operations": "4.0.1",
+    "cmd-ts": "0.13.0",
     "dotenv-mono": "github:dgattey/dotenv-mono#dgattey--fix-priority",
     "eslint-config-dg": "workspace:*",
+    "node-fetch": "3.3.2",
+    "shared-core": "workspace:*",
     "tsconfig": "workspace:*",
+    "tsx": "3.12.10",
     "typescript": "5.2.2"
   }
 }

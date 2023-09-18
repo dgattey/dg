@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
+import { isRecord } from 'shared-core/src/typeguards';
 import { handleApiError, methodNotAllowedError } from 'api/handleApiError';
-import { isRecord } from 'api/parsers';
 import { echoStravaChallengeIfValid } from 'api/server/strava/echoStravaChallengeIfValid';
 import { syncStravaWebhookUpdateWithDb } from 'api/server/strava/syncStravaWebhookUpdateWithDb';
 import type { StravaWebhookEvent } from 'api/types/StravaWebhookEvent';
@@ -60,7 +60,7 @@ const handleWebhookEvent: AsyncProcessor = async (request, response) => {
 };
 
 /**
- * Handles gets or posts to the webhooks URL
+ * Handles gets or posts to the webhook URL
  */
 const handler: AsyncProcessor = async (request, response) => {
   const { method } = request;

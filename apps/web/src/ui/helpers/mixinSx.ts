@@ -1,4 +1,4 @@
-import { isNotNullish } from 'helpers/isNotNullish';
+import { isNotNullish } from 'shared-core/src/typeguards';
 import type { SxProps } from 'ui/theme';
 
 /**

@@ -1,5 +1,6 @@
 import { gql } from 'graphql-request';
-import { isDefinedItem, isLink } from 'api/parsers';
+import { isNotNullish } from 'shared-core/src/typeguards';
+import { isLink } from 'api/parsers';
 import type { Link } from 'api/types/generated/contentfulApi.generated';
 import type { FooterQuery } from 'api/types/generated/fetchFooterLinks.generated';
 import { contentfulClient } from '../networkClients/contentfulClient';
@@ -33,6 +34,6 @@ export async function fetchFooterLinks(): Promise<Array<Link>> {
   const data = await contentfulClient.request<FooterQuery>(QUERY);
   const items =
     data.sectionCollection?.items.flatMap((item) => item?.blocksCollection?.items ?? []) ?? [];
-  const links = items.filter(isLink).filter(isDefinedItem);
+  const links = items.filter(isLink).filter(isNotNullish);
   return links;
 }

@@ -21,6 +21,7 @@
     "noUnusedLocals": false,
     "noUnusedParameters": false,
     "preserveWatchOutput": true,
+    "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "strictBindCallApply": true,
@@ -28,5 +29,5 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true
   },
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "**/*/dist", "**/*/build"]
 }

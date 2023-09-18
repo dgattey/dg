@@ -3,8 +3,9 @@ import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { Divider, Stack, Typography } from '@mui/material';
+import { isNotNullish } from 'shared-core/src/typeguards';
 import { PROJECT_MAX_IMAGE_DIMENSION } from 'appConstants/imageSizes';
-import { isDefinedItem, isLink, isProject } from 'api/parsers';
+import { isLink, isProject } from 'api/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
 import { ProjectCard } from 'components/homepage/ProjectCard';
 import type { SxProps } from 'ui/theme';
@@ -126,12 +127,12 @@ function HeadingWithId({
 const renderOptions = (links: TextBlockContent['links']): Options => {
   // Map the assets
   const assetMap = new Map<string, Asset>();
-  links.assets.block.filter(isDefinedItem).forEach((asset) => assetMap.set(asset.sys.id, asset));
+  links.assets.block.filter(isNotNullish).forEach((asset) => assetMap.set(asset.sys.id, asset));
 
   // Map the inline and block entries
   const entryMap = new Map<string, Entry>();
   [...links.entries.block, ...links.entries.inline]
-    .filter(isDefinedItem)
+    .filter(isNotNullish)
     .forEach((entry) => entryMap.set(entry.sys.id, entry));
 
   return {

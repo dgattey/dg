@@ -1,13 +1,13 @@
-import type { WebhookType } from 'api/types/WebhookType';
 import fetch from 'node-fetch';
-import handledError from './handledError';
-import webhookSubscriptionConfigs, { standardParams } from './webhookSubscriptionConfigs';
+import type { WebhookType } from 'types/WebhookType';
+import { handledError } from 'helpers/handledError';
+import { webhookSubscriptionConfigs, standardParams } from 'helpers/webhookSubscriptionConfigs';
 
 /**
- * Deletes a subscription with a given id. Use `pnpm webhooks:list` to see
+ * Deletes a subscription with a given id. Use the `list` command to see
  * what's available.
  */
-const deleteSubscription = async (type: WebhookType, subscriptionId: string) => {
+export const deleteSubscription = async (type: WebhookType, subscriptionId: string) => {
   const config = webhookSubscriptionConfigs[type];
   const { endpoint, headers } = config;
 
@@ -24,5 +24,3 @@ const deleteSubscription = async (type: WebhookType, subscriptionId: string) => 
   }
   console.log(`✅ Deleted subscription with id '${subscriptionId}': `, await data.text());
 };
-
-export default deleteSubscription;

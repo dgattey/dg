@@ -1,9 +1,9 @@
-import type { WebhookType } from 'api/types/WebhookType';
 import { command, oneOf, positional, run, string, subcommands } from 'cmd-ts';
-import { formattedList } from 'helpers/formattedList';
-import createSubscription from './helpers/createSubscription';
-import deleteSubscription from './helpers/deleteSubscription';
-import listSubscriptions from './helpers/listSubscriptions';
+import { formattedList } from 'shared-core/src/formattedList';
+import type { WebhookType } from './types/WebhookType';
+import { createSubscription } from './helpers/createSubscription';
+import { deleteSubscription } from './helpers/deleteSubscription';
+import { listSubscriptions } from './helpers/listSubscriptions';
 
 /**
  * Only Strava is supported as a subscription right now
@@ -45,7 +45,7 @@ const deleteCommand = command({
 (() =>
   run(
     subcommands({
-      name: 'pnpm webhooks',
+      name: 'turbo webhook',
       cmds: {
         create: commandFrom('create', createSubscription),
         list: commandFrom('list', listSubscriptions),

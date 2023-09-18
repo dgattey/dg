@@ -1,5 +1,5 @@
 {
-  "name": "codegen",
+  "name": "shared-core",
   "private": true,
   "scripts": {
     "codegen": "graphql-codegen --config config.ts",
