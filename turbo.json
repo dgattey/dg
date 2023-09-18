@@ -36,8 +36,7 @@
     "SPOTIFY_CLIENT_SECRET",
     "SENTRY_AUTH_TOKEN",
     "NEXT_PUBLIC_SENTRY_DSN",
-    "NEXT_PUBLIC_APP_VERSION",
-    "VERCEL_GIT_COMMIT_SHA"
+    "NEXT_PUBLIC_APP_VERSION"
   ],
   "pipeline": {
     "topo": {
@@ -55,8 +54,7 @@
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build", "topo", "lint", "lint:types", "format"],
-      "outputs": [".next/**"]
+      "dependsOn": ["^build", "topo", "lint", "lint:types", "format"]
     },
     "build:analyze": {
       "dependsOn": ["^build", "topo"],
