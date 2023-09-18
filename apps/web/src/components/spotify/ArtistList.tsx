@@ -1,18 +1,21 @@
+// Need to get rid of this when I clean up API
+/* eslint-disable camelcase */
+
+import { Fragment } from 'react';
+import { Typography } from '@mui/material';
 import type { Artist } from 'api/types/spotify/Track';
 import { Link } from 'components/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
-import { Fragment } from 'react';
-import { Typography } from '@mui/material';
 import { truncated } from 'helpers/truncated';
 
 type ArtistListProps = {
   artists: Array<Artist>;
 };
 
-interface SeparatorProps {
+type SeparatorProps = {
   index: number;
   fullList: Array<unknown>;
-}
+};
 
 /**
  * Creates a separator for use after an item at index
@@ -44,12 +47,9 @@ export function ArtistList({ artists }: ArtistListProps) {
     }
     return { ...baseLink, title: name, url: external_urls.spotify };
   };
-  if (!artists) {
-    return null;
-  }
 
   return (
-    <Typography component="span" variant="body2" sx={truncated(1)}>
+    <Typography component="span" sx={truncated(1)} variant="body2">
       {artists.map((artist, index) => {
         const link = artistLink(artist);
         return (

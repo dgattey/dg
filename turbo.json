@@ -20,6 +20,7 @@
     "tsconfig.json"
   ],
   "globalEnv": [
+    "ANALYZE",
     "NEXT_PUBLIC_MAPBOX_TOKEN",
     "CONTENTFUL_SPACE_ID",
     "CONTENTFUL_ACCESS_TOKEN",
@@ -34,12 +35,15 @@
     "SPOTIFY_CLIENT_ID",
     "SPOTIFY_CLIENT_SECRET",
     "SENTRY_AUTH_TOKEN",
-    "NEXT_PUBLIC_SENTRY_DSN"
+    "NEXT_PUBLIC_SENTRY_DSN",
+    "NEXT_PUBLIC_APP_VERSION",
+    "VERCEL_GIT_COMMIT_SHA"
   ],
   "pipeline": {
     "dev": {
       "inputs": ["apps/**/*", "packages/**/*"],
-      "cache": false
+      "cache": false,
+      "persistent": true
     },
     "build": {
       "outputs": [".next/**"]
@@ -56,12 +60,16 @@
       "dependsOn": ["build", "lint", "lint:styles", "lint:types", "format"],
       "cache": false
     },
-    "format": {},
+    "format": {
+      "outputMode": "new-only"
+    },
     "lint": {
-      "outputs": []
+      "outputs": [],
+      "outputMode": "new-only"
     },
     "lint:types": {
-      "outputs": []
+      "outputs": [],
+      "outputMode": "new-only"
     },
     "codegen": {
       "cache": false,
@@ -69,21 +77,6 @@
       "outputs": ["apps/web/src/api/types/generated/*"]
     },
     "db": {
-      "cache": false
-    },
-    "db:migrate": {
-      "cache": false
-    },
-    "db:migrate:status": {
-      "cache": false
-    },
-    "db:migrate:undo": {
-      "cache": false
-    },
-    "db:generate": {
-      "cache": false
-    },
-    "db:connect": {
       "cache": false
     },
     "webhooks": {

@@ -1,10 +1,10 @@
+import { useState } from 'react';
 import { useData } from 'api/useData';
 import { ContentCard } from 'components/ContentCard';
 import { HoverableContainer } from 'components/HoverableContainer';
 import { Image } from 'components/Image';
 import { RichText } from 'components/RichText';
 import { useLinkWithName } from 'hooks/useLinkWithName';
-import { useState } from 'react';
 import { useCurrentImageSizes } from 'hooks/useCurrentImageSizes';
 
 /**
@@ -24,7 +24,7 @@ export function IntroCard() {
   const [isHovered, setIsHovered] = useState(false);
   const { width, height, sizes } = useCurrentImageSizes();
 
-  if (!introBlock?.textBlock?.content) {
+  if (!introBlock?.textBlock.content) {
     return null;
   }
 
@@ -32,9 +32,18 @@ export function IntroCard() {
     <>
       <ContentCard
         link={linkedInLink}
+        onMouseOut={() => {
+          setIsHovered(false);
+        }}
+        onMouseOver={() => {
+          setIsHovered(true);
+        }}
         overlay="About"
-        onMouseOver={() => setIsHovered(true)}
-        onMouseOut={() => setIsHovered(false)}
+        overlaySx={(theme) => ({
+          [theme.breakpoints.down('md')]: {
+            visibility: 'hidden',
+          },
+        })}
         sx={(theme) => ({
           [theme.breakpoints.down('md')]: {
             justifySelf: 'center',
@@ -43,20 +52,15 @@ export function IntroCard() {
             borderRadius: `calc(${SMALL_IMAGE_SIZE} / 2)`,
           },
         })}
-        overlaySx={(theme) => ({
-          [theme.breakpoints.down('md')]: {
-            visibility: 'hidden',
-          },
-        })}
       >
         <HoverableContainer isHovered={isHovered}>
           <Image
-            url={introBlock.image.url}
-            width={width}
-            height={height}
             alt={introBlock.image.title ?? 'Introduction image'}
+            height={height}
             priority
             sizes={sizes}
+            url={introBlock.image.url}
+            width={width}
           />
         </HoverableContainer>
       </ContentCard>

@@ -13,11 +13,11 @@ export function ActivityDescription({ url }: { url: string }) {
 
   return (
     <Link
-      isExternal
       href={url}
-      title={activity.name}
-      sx={truncated(3)}
+      isExternal
       linkProps={{ variant: 'body2', color: 'body2' }}
+      sx={truncated(3)}
+      title={activity.name}
     >
       {activity.description}
     </Link>

@@ -1,8 +1,5 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
   "eslint.workingDirectories": [{ "mode": "auto" }],
-  "eslint.options": {
-    "overrideConfigFile": "eslint.config.js"
-  },
   "typescript.enablePromptUseWorkspaceTsdk": true
 }

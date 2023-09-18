@@ -18,7 +18,7 @@ export function SpotifyCard() {
         display: 'flex',
       }}
     >
-      <TrackListing track={track} hasLogo />
+      <TrackListing hasLogo track={track} />
     </ContentCard>
   );
 }

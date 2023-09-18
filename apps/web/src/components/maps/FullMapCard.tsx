@@ -1,11 +1,11 @@
-import type { ContentCardProps } from 'components/ContentCard';
 import { Maximize2, Minimize2 } from 'lucide-react';
 import { useMemo, useState } from 'react';
+import { useTheme } from '@mui/material';
+import type { ContentCardProps } from 'components/ContentCard';
 import { Map } from 'components/maps/Map';
 import { Marker } from 'components/maps/Marker';
 import { Control } from 'components/maps/Control';
-import { MapLocation } from 'api/types/MapLocation';
-import { useTheme } from '@mui/material';
+import type { MapLocation } from 'api/types/MapLocation';
 import { MapContentCard } from './MapContentCard';
 
 type FullMapCardProps = Pick<ContentCardProps, 'turnOnAnimation'> & {
@@ -24,7 +24,13 @@ function FullMapCard({ turnOnAnimation, location, backgroundImageUrl }: FullMapC
   const expansionControl = useMemo(
     () => (
       <Control
-        onClick={isExpanded ? () => setIsExpanded(false) : undefined}
+        onClick={
+          isExpanded
+            ? () => {
+                setIsExpanded(false);
+              }
+            : undefined
+        }
         position="top-right"
         theme={theme}
       >
@@ -36,25 +42,28 @@ function FullMapCard({ turnOnAnimation, location, backgroundImageUrl }: FullMapC
 
   return (
     <MapContentCard
+      backgroundImageUrl={backgroundImageUrl}
       isExpanded={isExpanded}
       onExpansion={!isExpanded ? setIsExpanded : undefined}
-      backgroundImageUrl={backgroundImageUrl}
       turnOnAnimation={turnOnAnimation}
     >
-      {location.point && (
+      {location.point ? (
         <Map
-          location={location}
           isExpanded={isExpanded}
           isLoaded={hasMapLoaded}
-          setMapHasLoaded={() => setHasMapLoaded(true)}
+          location={location}
+          setMapHasLoaded={() => {
+            setHasMapLoaded(true);
+          }}
         >
           {expansionControl}
-          <Marker key="home" point={location.point} image={location.image} />
+          <Marker image={location.image} key="home" point={location.point} />
         </Map>
-      )}
+      ) : null}
     </MapContentCard>
   );
 }
 
-// Enables dynamic import
+// Enables dynamic import - needs to be default
+// eslint-disable-next-line import/no-default-export
 export default FullMapCard;

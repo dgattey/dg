@@ -1,4 +1,4 @@
-import { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
+import type { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
 
 /**
  * These are the only fields we care about for now

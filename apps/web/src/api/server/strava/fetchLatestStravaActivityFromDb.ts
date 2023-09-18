@@ -1,5 +1,5 @@
 import { isRecord } from 'api/parsers';
-import { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
+import type { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
 import { db } from 'db/dbClient';
 import { paredStravaActivity } from './paredStravaActivity';
 

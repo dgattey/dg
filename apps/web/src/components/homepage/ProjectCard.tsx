@@ -1,8 +1,8 @@
+import { useState } from 'react';
 import type { Project } from 'api/types/generated/contentfulApi.generated';
 import type { ContentCardProps } from 'components/ContentCard';
 import { ContentCard } from 'components/ContentCard';
 import { HoverableContainer } from 'components/HoverableContainer';
-import { useState } from 'react';
 import { Image } from 'components/Image';
 import { useCurrentImageSizes } from 'hooks/useCurrentImageSizes';
 
@@ -17,30 +17,34 @@ export function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }:
 
   return (
     <ContentCard
-      verticalSpan={verticalSpan}
       horizontalSpan={horizontalSpan}
       link={link}
+      onMouseOut={() => {
+        setIsHovered(false);
+      }}
+      onMouseOver={() => {
+        setIsHovered(true);
+      }}
       overlay={title}
-      onMouseOver={() => setIsHovered(true)}
-      onMouseOut={() => setIsHovered(false)}
-      turnOnAnimation={turnOnAnimation}
       sx={(theme) => ({
         [theme.breakpoints.down('md')]: {
           maxHeight: theme.shape.gridItemSize(0.75),
         },
       })}
+      turnOnAnimation={turnOnAnimation}
+      verticalSpan={verticalSpan}
     >
-      {thumbnail && (
+      {thumbnail ? (
         <HoverableContainer isHovered={isHovered}>
           <Image
+            alt={title ?? 'Project image'}
+            height={height}
+            sizes={sizes}
             url={thumbnail.url}
             width={width}
-            height={height}
-            alt={title ?? 'Project image'}
-            sizes={sizes}
           />
         </HoverableContainer>
-      )}
+      ) : null}
     </ContentCard>
   );
 }

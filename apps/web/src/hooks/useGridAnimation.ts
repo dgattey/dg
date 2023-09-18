@@ -7,9 +7,8 @@ import { useCallback, useEffect, useRef } from 'react';
  * avoid slowdowns as the browser tries to compute a hover effect as it
  * animates.
  */
-const changePointerEvents = (isOn: boolean) => (animatedChildren: HTMLElement[]) => {
+const changePointerEvents = (isOn: boolean) => (animatedChildren: Array<HTMLElement>) => {
   animatedChildren.forEach((child) => {
-    // eslint-disable-next-line no-param-reassign
     child.style.pointerEvents = isOn ? 'auto' : 'none';
   });
 };

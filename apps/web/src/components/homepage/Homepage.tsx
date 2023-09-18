@@ -1,9 +1,9 @@
+import { useMemo, useRef } from 'react';
 import { useData } from 'api/useData';
 import { ContentGrid } from 'components/ContentGrid';
 import { MapPreviewCard } from 'components/homepage/MapPreviewCard';
 import { HOMEPAGE_TITLE, Meta } from 'components/Meta';
 import { useGridAnimation } from 'hooks/useGridAnimation';
-import { useMemo, useRef } from 'react';
 import { IntroCard } from './IntroCard';
 import { ProjectCard } from './ProjectCard';
 import { SpotifyCard } from './SpotifyCard';
@@ -19,7 +19,7 @@ export function Homepage() {
   const { data: introBlock } = useData('intro');
 
   // Grabs the first intro block text element, essentially.
-  const firstParagraph = introBlock?.textBlock?.content?.json.content
+  const firstParagraph = introBlock?.textBlock.content?.json.content
     ?.find((item) => item.nodeType === 'paragraph')
     ?.content?.find((item) => item.nodeType === 'text')?.value;
 
@@ -45,7 +45,7 @@ export function Homepage() {
 
   return (
     <>
-      <Meta title={HOMEPAGE_TITLE} description={firstParagraph} />
+      <Meta description={firstParagraph} title={HOMEPAGE_TITLE} />
       <ContentGrid gridRef={gridRef}>
         {otherCards.map(({ index, card }, arrayIndex) => {
           const nextItem = otherCards[arrayIndex + 1];

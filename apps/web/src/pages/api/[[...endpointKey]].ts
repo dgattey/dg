@@ -1,6 +1,6 @@
+import type { NextApiRequest, NextApiResponse } from 'next';
 import { endpoints, isValid } from 'api/endpoints';
 import { handleApiError, methodNotAllowedError } from 'api/handleApiError';
-import type { NextApiRequest, NextApiResponse } from 'next';
 
 // Just a shorthand for this function type
 type Processor = (request: NextApiRequest, response: NextApiResponse) => Promise<void>;

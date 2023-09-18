@@ -1,9 +1,9 @@
-import { useData } from 'api/useData';
-import { FaIcon } from 'components/FaIcon';
-import { HorizontalStack } from 'ui/HorizontalStack';
 import { faBicycle } from '@fortawesome/free-solid-svg-icons/faBicycle';
 import { faRunning } from '@fortawesome/free-solid-svg-icons/faRunning';
 import { Typography } from '@mui/material';
+import { useData } from 'api/useData';
+import { FaIcon } from 'components/FaIcon';
+import { HorizontalStack } from 'ui/HorizontalStack';
 
 /**
  * Shows the latest activity type and an icon to depict
@@ -17,20 +17,20 @@ export function ActivityTypeWithIcon() {
 
   // Split on capital letters to split an enum-like value
   const typeText = activity.type.includes('Ride')
-    ? activity.type.replace(/([A-Z][a-z]+)/g, ' $1')
+    ? activity.type.replace(/(?:[A-Z][a-z]+)/g, ' $1')
     : 'Run';
   const icon = (
-    <FaIcon size="1.25em" icon={activity.type.includes('Ride') ? faBicycle : faRunning} />
+    <FaIcon icon={activity.type.includes('Ride') ? faBicycle : faRunning} size="1.25em" />
   );
 
   return (
     <Typography
-      variant="overline"
       component={HorizontalStack}
       sx={{
         gap: 1,
         alignItems: 'center',
       }}
+      variant="overline"
     >
       <>Latest {typeText.trim()}</> {icon}
     </Typography>

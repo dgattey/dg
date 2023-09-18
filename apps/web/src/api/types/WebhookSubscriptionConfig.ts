@@ -1,4 +1,4 @@
-export interface WebhookSubscriptionConfig {
+export type WebhookSubscriptionConfig = {
   /**
    * Which api endpoint this webhook corresponds to
    */
@@ -28,4 +28,4 @@ export interface WebhookSubscriptionConfig {
    * Standard HTTP headers for the endpoint
    */
   headers: Record<string, string>;
-}
+};

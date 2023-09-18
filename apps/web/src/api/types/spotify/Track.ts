@@ -1,7 +1,7 @@
 /**
  * Used for artists, albums, tracks, etc
  */
-interface ReferenceObject {
+type ReferenceObject = {
   external_urls: {
     /**
      * URL accessible by non-API users
@@ -28,7 +28,7 @@ interface ReferenceObject {
    * Resource identifier, more readable than the id
    */
   uri: string;
-}
+};
 
 /**
  * An artist is just a reference object

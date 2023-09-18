@@ -14,18 +14,18 @@ const TRACK_SIZE_PX = HEIGHT_PX - 2 * PADDING_PX;
  */
 export function ColorSchemeToggle() {
   const { colorScheme, updatePreferredMode } = useColorScheme();
-  const setInvertedScheme = () =>
+  const setInvertedScheme = () => {
     updatePreferredMode(colorScheme.mode === 'dark' ? 'light' : 'dark');
+  };
 
   return (
     <Stack sx={{ flexDirection: 'row', alignItems: 'center' }}>
       <ColorSchemeIcon mode="light" />
       <Switch
-        onChange={setInvertedScheme}
-        checked={colorScheme.isInitialized && colorScheme.mode === 'dark'}
-        aria-label="Change color scheme mode"
         aria-hidden
-        tabIndex={-1}
+        aria-label="Change color scheme mode"
+        checked={colorScheme.isInitialized ? colorScheme.mode === 'dark' : false}
+        onChange={setInvertedScheme}
         sx={(theme) => ({
           // Overrides our "animations off" for color scheme changes since we do always want the switch to animate
           '& *': {
@@ -73,6 +73,7 @@ export function ColorSchemeToggle() {
             transition: theme.transitions.create('background-color'),
           },
         })}
+        tabIndex={-1}
       />
       <ColorSchemeIcon mode="dark" />
     </Stack>

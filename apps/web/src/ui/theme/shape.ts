@@ -1,4 +1,4 @@
-import { ThemeOptions } from '@mui/material';
+import type { ThemeOptions } from '@mui/material';
 
 /**
  * Sets up the spacing features for the grid in rem units

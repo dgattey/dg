@@ -1,8 +1,8 @@
+import { Card } from '@mui/material';
 import type { Track } from 'api/types/spotify/Track';
 import { Image } from 'components/Image';
 import { Link } from 'components/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
-import { Card } from '@mui/material';
 
 type AlbumImageProps = {
   album: Track['album'];
@@ -64,9 +64,9 @@ export function AlbumImage({ album }: AlbumImageProps) {
         <Image
           alt={album.name}
           {...albumImage}
-          width={IMAGE_SIZE}
           height={IMAGE_SIZE}
           sizes={{ extraLarge: IMAGE_SIZE }}
+          width={IMAGE_SIZE}
         />
       </Card>
     </Link>

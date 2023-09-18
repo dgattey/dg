@@ -1,4 +1,5 @@
-import { Box, BoxProps } from '@mui/material';
+import type { BoxProps } from '@mui/material';
+import { Box } from '@mui/material';
 
 /**
  * Adds a transition and transform up on hover. Meant for use with images.

@@ -1,5 +1,6 @@
-import { Box, BoxProps } from '@mui/material';
-import { SxProps } from 'ui/theme';
+import type { BoxProps } from '@mui/material';
+import { Box } from '@mui/material';
+import type { SxProps } from 'ui/theme';
 import { mixinSx } from './helpers/mixinSx';
 
 export const sectionSx: SxProps = (theme) => ({

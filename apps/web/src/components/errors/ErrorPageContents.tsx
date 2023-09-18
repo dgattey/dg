@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
+import { useRouter } from 'next/router';
 import { Link } from 'components/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
-import { useRouter } from 'next/router';
 
 export type HasStatusCode = {
   /**
@@ -26,7 +26,7 @@ export function ErrorPageContents({ statusCode }: HasStatusCode) {
     404: (
       <>
         I didn&apos;t see a page matching the url{' '}
-        <Typography variant="code" component="code">
+        <Typography component="code" variant="code">
           {router.asPath}
         </Typography>{' '}
         on the site. Check out the homepage and see if you can find what you were looking for. If
@@ -46,7 +46,7 @@ export function ErrorPageContents({ statusCode }: HasStatusCode) {
       <Typography variant="h1">
         {(statusCode && TITLE_TEXT[statusCode]) || TITLE_TEXT.fallback}
       </Typography>
-      <Typography variant="body1" sx={{ maxWidth: '35em' }}>
+      <Typography sx={{ maxWidth: '35em' }} variant="body1">
         {(statusCode && descriptions[statusCode]) || descriptions.fallback}{' '}
         {emailLink ? <Link layout="iconText" {...emailLink} href={emailLink.url} /> : 'Email Me'}{' '}
         and I can help you out!

@@ -1,10 +1,8 @@
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import { responsiveFontSizes, Theme, SxProps as MuiSxProps } from '@mui/material';
-import {
-  CssVarsTheme,
-  CssVarsThemeOptions,
-  experimental_extendTheme as extendTheme,
-} from '@mui/material/styles';
+import type { Theme, SxProps as MuiSxProps } from '@mui/material';
+import { responsiveFontSizes } from '@mui/material';
+import type { CssVarsTheme, CssVarsThemeOptions } from '@mui/material/styles';
+import { experimental_extendTheme as extendTheme } from '@mui/material/styles';
 import { getShape } from 'ui/theme/shape';
 import { getTypography } from 'ui/theme/typography';
 import { getShadows } from './extraShadows';
@@ -175,8 +173,12 @@ export function getTheme(): Theme {
               return {};
             }
             const paletteColor =
-              // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-              theme.vars.palette[color as 'primary' | 'secondary' | 'warning' | 'info' | 'success'];
+              color in theme.vars.palette
+                ? theme.vars.palette[
+                    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+                    color as 'primary' | 'secondary' | 'warning' | 'info' | 'success'
+                  ]
+                : null;
             if (!paletteColor) {
               return {};
             }

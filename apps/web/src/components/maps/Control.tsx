@@ -1,10 +1,11 @@
-/* eslint-disable no-underscore-dangle */
 import type { Map } from 'mapbox-gl';
 import { useEffect, useMemo, useRef } from 'react';
-import { createRoot, Root } from 'react-dom/client';
+import type { Root } from 'react-dom/client';
+import { createRoot } from 'react-dom/client';
 import { useControl } from 'react-map-gl';
 import { useTheme } from '@mui/material';
-import { ControlContainer, ControlContainerProps } from './ControlContainer';
+import type { ControlContainerProps } from './ControlContainer';
+import { ControlContainer } from './ControlContainer';
 
 type ControlProps = ControlContainerProps & {
   /**

@@ -1,5 +1,5 @@
-import isNotNullish from 'helpers/isNotNullish';
-import { SxProps } from 'ui/theme';
+import { isNotNullish } from 'helpers/isNotNullish';
+import type { SxProps } from 'ui/theme';
 
 /**
  * Used to _safely_ mix together multiple SxProps objects.

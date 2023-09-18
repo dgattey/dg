@@ -1,5 +1,4 @@
 /* eslint-disable no-restricted-imports */
-import { FaIcon } from 'components/FaIcon';
 import { faGithubAlt } from '@fortawesome/free-brands-svg-icons/faGithubAlt';
 import { faInstagram } from '@fortawesome/free-brands-svg-icons/faInstagram';
 import { faLinkedinIn } from '@fortawesome/free-brands-svg-icons/faLinkedinIn';
@@ -8,14 +7,10 @@ import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import { faPaperPlane } from '@fortawesome/free-solid-svg-icons/faPaperPlane';
 import { faQuestion } from '@fortawesome/free-solid-svg-icons/faQuestion';
 import NextLink from 'next/link';
-import {
-  Link as MuiLink,
-  LinkProps as MuiLinkProps,
-  Tooltip,
-  ButtonProps,
-  Button,
-} from '@mui/material';
-import { SxProps } from 'ui/theme';
+import type { LinkProps as MuiLinkProps, ButtonProps } from '@mui/material';
+import { Link as MuiLink, Tooltip, Button } from '@mui/material';
+import { FaIcon } from 'components/FaIcon';
+import type { SxProps } from 'ui/theme';
 
 type BaseLinkProps = {
   title?: string;
@@ -72,8 +67,7 @@ const BUILT_IN_ICONS: Record<string, JSX.Element> = {
  */
 const createIconElement = ({ icon, layout = 'text' }: Pick<BaseLinkProps, 'icon' | 'layout'>) =>
   icon && !['children', 'text'].includes(layout)
-    ? // eslint-disable-next-line react/no-danger
-      BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />
+    ? BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />
     : null;
 
 /**
@@ -111,7 +105,7 @@ export function Link({
     return 'text';
   })();
 
-  if (!href || !layout) {
+  if (!href) {
     return null;
   }
 
@@ -144,7 +138,7 @@ export function Link({
     sx,
   };
   return (
-    <Tooltip title={tooltipTitle} placement="top">
+    <Tooltip placement="top" title={tooltipTitle}>
       {isButton ? (
         <Button {...buttonProps} {...sharedProps}>
           {contents}

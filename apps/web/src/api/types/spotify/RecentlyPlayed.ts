@@ -1,4 +1,4 @@
-import { Track } from './Track';
+import type { Track } from './Track';
 
 /**
  * Represents the return value of the recently played endpoint from Spotify

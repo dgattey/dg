@@ -17,14 +17,14 @@ const fetchFromApiAndSaveToDb = async (id: number) => {
   });
   if (
     existingActivity?.lastUpdate &&
-    +existingActivity.lastUpdate > Date.now() - UPDATE_THRESHOLD_IN_MS
+    Number(existingActivity.lastUpdate) > Date.now() - UPDATE_THRESHOLD_IN_MS
   ) {
     // Last update was too recent
     return;
   }
 
   const latestActivityData = await fetchStravaActivityFromApi(id);
-  if (!latestActivityData || !latestActivityData.start_date) {
+  if (!latestActivityData?.start_date) {
     throw new Error(`Missing activity data for ${id}`);
   }
   const updatedActivity = await db.StravaActivity.upsert({

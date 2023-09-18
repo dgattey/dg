@@ -1,4 +1,4 @@
-import { Asset } from 'api/types/generated/contentfulApi.generated';
+import type { Asset } from 'api/types/generated/contentfulApi.generated';
 import type { MyLocationQuery } from 'api/types/generated/fetchCurrentLocation.generated';
 
 /**

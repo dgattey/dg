@@ -1,9 +1,9 @@
 import 'ui/theme/classNameSetupOnImport';
 
-import { GlobalStyleProvider } from 'ui/theme/GlobalStyleProvider';
-import { AppProps } from 'next/app';
+import type { AppProps } from 'next/app';
 import type { ReactElement, ReactNode } from 'react';
 import type { NextPage } from 'next';
+import { GlobalStyleProvider } from 'ui/theme/GlobalStyleProvider';
 
 export type PageProps = Record<string, unknown>;
 

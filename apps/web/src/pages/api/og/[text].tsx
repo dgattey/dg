@@ -25,8 +25,8 @@ export default async function handler(request: NextApiRequest) {
       return new ImageResponse(
         (
           <OpenGraphImage
-            text={params.get('text') ?? 'Dylan Gattey'}
             subtitle={params.get('subtitle') ?? ''}
+            text={params.get('text') ?? 'Dylan Gattey'}
           />
         ),
         {

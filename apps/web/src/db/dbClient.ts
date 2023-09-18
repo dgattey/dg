@@ -1,4 +1,4 @@
-import { env } from 'process';
+import { env } from 'node:process';
 import { Sequelize } from 'sequelize-typescript';
 import mysql2 from 'mysql2';
 import { Token } from './models/Token';
@@ -22,7 +22,7 @@ const DB_OPTIONS = {
       },
     },
   },
-}[env.NODE_ENV || 'development'];
+}[env.NODE_ENV];
 
 const databaseUrl = env.DATABASE_URL;
 if (!databaseUrl) {

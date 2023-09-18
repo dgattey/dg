@@ -1,8 +1,8 @@
+import { Marker as MapMarker } from 'react-map-gl';
+import { Box } from '@mui/material';
+import { MAP_MARKER_IMAGE_SIZE } from 'appConstants/imageSizes';
 import type { MapLocation } from 'api/types/MapLocation';
 import { Image } from 'components/Image';
-import { Marker as MapMarker } from 'react-map-gl';
-import { MAP_MARKER_IMAGE_SIZE } from 'constants/imageSizes';
-import { Box } from '@mui/material';
 
 const DIMENSION = 100;
 const RADIUS = DIMENSION / 2;
@@ -15,20 +15,20 @@ type MarkerProps = Pick<MapLocation, 'point'> & Partial<Pick<MapLocation, 'image
  * Creates a standard map marker, centered on a point
  */
 export function Marker({ point, image }: MarkerProps) {
-  if (!point?.latitude || !point?.longitude) {
+  if (!point?.latitude || !point.longitude) {
     return null;
   }
   const id = `${point.latitude},${point.longitude}`;
   return (
     <MapMarker latitude={point.latitude} longitude={point.longitude}>
-      <svg width={DIMENSION} height={DIMENSION}>
+      <svg height={DIMENSION} width={DIMENSION}>
         <defs>
           <Box
             component="circle"
-            id={id}
-            r={RADIUS}
             cx={RADIUS}
             cy={RADIUS}
+            id={id}
+            r={RADIUS}
             sx={(theme) => ({ fill: theme.vars.palette.map.markerBackground })}
           />
           <clipPath id="clip">
@@ -36,16 +36,16 @@ export function Marker({ point, image }: MarkerProps) {
           </clipPath>
         </defs>
         <Box
-          component="use"
-          xlinkHref={`#${id}`}
-          strokeWidth="2"
           clipPath="url(#clip)"
+          component="use"
+          strokeWidth="2"
           sx={{
             stroke: (theme) => theme.vars.palette.map.markerBorder,
           }}
+          xlinkHref={`#${id}`}
         />
       </svg>
-      {image && (
+      {image ? (
         <Box
           component="span"
           sx={{
@@ -55,17 +55,17 @@ export function Marker({ point, image }: MarkerProps) {
           }}
         >
           <Image
-            width={IMAGE_DIMENSION}
-            height={IMAGE_DIMENSION}
-            url={image.url}
             alt={id}
+            height={IMAGE_DIMENSION}
             sizes={{
               // Constant size, no need to resize
               extraLarge: IMAGE_DIMENSION,
             }}
+            url={image.url}
+            width={IMAGE_DIMENSION}
           />
         </Box>
-      )}
+      ) : null}
     </MapMarker>
   );
 }

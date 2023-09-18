@@ -1,15 +1,10 @@
-const BASE_EXTENSIONS = ['airbnb', 'airbnb/hooks', 'prettier', 'plugin:dg/all'];
-
-const TYPESCRIPT_EXTENSIONS = [
-  ...BASE_EXTENSIONS,
-  'airbnb-typescript',
-  'plugin:@typescript-eslint/recommended',
-  'plugin:@typescript-eslint/recommended-requiring-type-checking',
-];
-
-const BASE_PLUGINS = ['react'];
-
-const BASE_RULES = {
+/** @type {import('eslint').Linter.Config['rules']} */
+const rules = {
+  // Incorrectly makes me kebab case and my naming is intentional
+  'unicorn/filename-case': 'off',
+  // Too much hassle/overhead with these on
+  '@typescript-eslint/explicit-function-return-type': 'off',
+  'eslint-comments/require-description': 'off',
   // We want to enable prop spreading (i.e. <Component {...props} />) since it allows us to easily pass props to child components
   'react/jsx-props-no-spreading': 'off',
   // Never prefer arrow functions for named component definitions
@@ -20,10 +15,8 @@ const BASE_RULES = {
       unnamedComponents: 'arrow-function',
     },
   ],
-};
-
-const TYPESCRIPT_RULES = {
-  ...BASE_RULES,
+  // Arrays should always be the generic kind
+  '@typescript-eslint/array-type': ['error', { default: 'generic' }],
   // The typescript version of no-return-await takes over to add a few okay cases
   'no-return-await': 'off',
   // This needs to be turned on to take over from `no-return-await`
@@ -35,6 +28,8 @@ const TYPESCRIPT_RULES = {
   '@typescript-eslint/restrict-template-expressions': 'error',
   // Type assertions (const x: Type = y as Type) create bugs and mask errors, don't allow them at all
   '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
+  // We always want types since we run into errors with interfaces and type guards otherwise
+  '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
   // In Typescript, default props are supported as default arguments
   'react/require-default-props': 'off',
   // There's a typescript option `noFallthroughCasesInSwitch` that's more robust and allows for union types to have no default fallthrough. Preferred!
@@ -50,8 +45,6 @@ const TYPESCRIPT_RULES = {
   'import/no-duplicates': 'error',
   // Nothing relative outside imports
   'import/no-relative-packages': 'error',
-  // Nothing extra, outside what's defined in the package.json
-  'import/no-extraneous-dependencies': 'error',
   // Condenses extra path segments automatically!
   'import/no-useless-path-segments': [
     'error',
@@ -79,69 +72,6 @@ const TYPESCRIPT_RULES = {
   ],
 };
 
-const TYPESCRIPT_OVERRIDE = {
-  files: ['*.{ts,tsx}', '*.ts'],
-  extends: TYPESCRIPT_EXTENSIONS,
-  plugins: [...BASE_PLUGINS, '@typescript-eslint'],
-  settings: {
-    'import/resolver': {
-      typescript: {},
-    },
-  },
-  parser: '@typescript-eslint/parser',
-  parserOptions: {
-    ecmaFeatures: {
-      jsx: true,
-    },
-    sourceType: 'module',
-    project: ['./tsconfig.json'],
-  },
-  rules: TYPESCRIPT_RULES,
+module.exports = {
+  rules,
 };
-
-// Scripts allow console logging
-const SCRIPTS_OVERRIDE = {
-  ...TYPESCRIPT_OVERRIDE,
-  files: ['scripts/**/*.ts'],
-  rules: {
-    ...TYPESCRIPT_RULES,
-    // Console logging allowed
-    'no-console': 'off',
-    // Default exports are actually required for scripts
-    'import/prefer-default-export': 'error',
-  },
-};
-
-export default [
-  {
-    env: {
-      browser: true,
-      es2021: true,
-    },
-    extends: BASE_EXTENSIONS,
-    parserOptions: {
-      ecmaFeatures: {
-        jsx: true,
-      },
-      sourceType: 'module',
-    },
-    plugins: BASE_PLUGINS,
-    globals: {
-      React: 'readable',
-    },
-    reportUnusedDisableDirectives: true,
-    rules: BASE_RULES,
-    overrides: [TYPESCRIPT_OVERRIDE, SCRIPTS_OVERRIDE],
-    ignorePatterns: [
-      '.cache/',
-      '.next/',
-      '.vscode/',
-      '.vercel/',
-      '.turbo/',
-      'node_modules/',
-      '**/*.generated.*',
-      '**/generated/*',
-      'migrations/',
-    ],
-  },
-];

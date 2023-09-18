@@ -1,5 +1,7 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-import { RefreshTokenConfig } from 'api/types/RefreshTokenConfig';
+// There's a lot of camelcase thanks to Spotify
+/* eslint-disable camelcase */
+
+import type { RefreshTokenConfig } from 'api/types/RefreshTokenConfig';
 import type { RawSpotifyToken, RawStravaToken } from 'api/types/RawToken';
 
 /**

@@ -1,8 +1,8 @@
+import { Music } from 'lucide-react';
+import { Typography } from '@mui/material';
 import type { Track } from 'api/types/spotify/Track';
 import { useRelativeTimeFormat } from 'hooks/useRelativeTimeFormat';
-import { Music } from 'lucide-react';
 import { HorizontalStack } from 'ui/HorizontalStack';
-import { Typography } from '@mui/material';
 
 type PlaybackStatusProps = {
   playedAt?: Track['played_at'];
@@ -17,9 +17,9 @@ export function PlaybackStatus({ playedAt }: PlaybackStatusProps) {
   const relativeLastPlayed = useRelativeTimeFormat({ fromDate: playedAt, capitalized: true });
   return (
     <Typography
-      variant="overline"
       component={HorizontalStack}
       sx={{ gap: 1, alignItems: 'center' }}
+      variant="overline"
     >
       {isNowPlaying ? (
         <>

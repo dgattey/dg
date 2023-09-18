@@ -1,4 +1,4 @@
-interface ActivityUpdate {
+type ActivityUpdate = {
   /**
    * Name of the activity
    */
@@ -13,14 +13,14 @@ interface ActivityUpdate {
    * Visibility of the activity
    */
   private: 'true' | 'false';
-}
+};
 
-interface AthleteUpdate {
+type AthleteUpdate = {
   /**
    * This happens on deauthorization events
    */
   authorized: 'false';
-}
+};
 
 /**
  * This is the event that Strava sends when we're subscribed to a webhook

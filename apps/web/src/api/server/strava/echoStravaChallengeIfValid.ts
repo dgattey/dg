@@ -1,4 +1,4 @@
-import { NextApiRequest, NextApiResponse } from 'next';
+import type { NextApiRequest, NextApiResponse } from 'next';
 
 const MODE_KEY = 'hub.mode';
 const CHALLENGE_KEY = 'hub.challenge';
@@ -22,9 +22,7 @@ type StravaSubscription = {
  * Strava called us with.
  */
 const isSubscription = (
-  query: Partial<{
-    [key: string]: string | string[];
-  }>,
+  query: Partial<Record<string, string | Array<string>>>,
 ): query is StravaSubscription =>
   query[MODE_KEY] === VALID_MODE && query[VERIFY_KEY] === process.env.STRAVA_VERIFY_TOKEN;
 

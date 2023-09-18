@@ -1,4 +1,4 @@
-import { Track } from './Track';
+import type { Track } from './Track';
 
 /**
  * This reflects what I care about from Spotify's currently playing endpoint.

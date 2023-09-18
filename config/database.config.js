@@ -1,4 +1,4 @@
-require('dotenv').config();
+require('dotenv-mono').config();
 
 const SHARED_OPTIONS = {
   use_env_variable: 'DATABASE_URL',

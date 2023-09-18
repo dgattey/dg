@@ -1,4 +1,4 @@
-import { SxProps } from 'ui/theme';
+import type { SxProps } from 'ui/theme';
 
 /**
  * Returns styling to use to truncate to a specified number of

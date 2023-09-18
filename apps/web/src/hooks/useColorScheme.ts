@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { PaletteMode } from '@mui/material';
+import type { PaletteMode } from '@mui/material';
 import { useColorScheme as useMuiColorScheme } from '@mui/material/styles';
 
 /**
@@ -24,7 +24,9 @@ export function useColorScheme(): Readonly<{
   const [isInitialized, setIsInitialized] = useState(false);
 
   // Make sure we set initialized before we try to render
-  useEffect(() => setIsInitialized(true), []);
+  useEffect(() => {
+    setIsInitialized(true);
+  }, []);
 
   return {
     colorScheme: {

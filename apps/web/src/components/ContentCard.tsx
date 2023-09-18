@@ -1,9 +1,10 @@
+import { useState } from 'react';
+import type { Theme } from '@mui/material';
+import { Card, Typography } from '@mui/material';
 import type { Link } from 'api/types/generated/contentfulApi.generated';
 import { truncated } from 'helpers/truncated';
-import { useState } from 'react';
-import { Card, Theme, Typography } from '@mui/material';
 import { mixinSx } from 'ui/helpers/mixinSx';
-import { SxProps } from 'ui/theme';
+import type { SxProps } from 'ui/theme';
 import { ContentWrappingLink } from './ContentWrappingLink';
 
 export type ContentCardProps = Pick<
@@ -142,8 +143,7 @@ function LinkWrappedChildren({
       {children}
     </ContentWrappingLink>
   ) : (
-    // eslint-disable-next-line react/jsx-no-useless-fragment
-    <>{safelyWrappedChildren}</> ?? null
+    <>{safelyWrappedChildren}</>
   );
 }
 
@@ -172,7 +172,7 @@ function OverlayContent({ overlay, sx }: { overlay: NonNullable<React.ReactNode>
         sx,
       )}
     >
-      <Typography variant="h5" sx={truncated(1)}>
+      <Typography sx={truncated(1)} variant="h5">
         {overlay}
       </Typography>
     </Card>
@@ -195,10 +195,10 @@ export function ContentCard({
   ...props
 }: ContentCardProps) {
   const [isExpanded, setIsExpanded] = useState(false);
-  const expandOnClick = !!onExpansion;
+  const expandOnClick = Boolean(onExpansion);
   const actualHSpan = isExpanded ? 3 : horizontalSpan ?? 1;
   const actualVSpan = isExpanded ? null : verticalSpan ?? 1;
-  const isClickable = !!link || expandOnClick;
+  const isClickable = Boolean(link) || expandOnClick;
 
   // Swaps the expansion variable and calls the user callback
   const toggleExpansion = onExpansion
@@ -211,18 +211,18 @@ export function ContentCard({
 
   return (
     <Card
+      onClick={toggleExpansion}
       sx={mixinSx(
         (theme) =>
           getCardSx(theme, { isClickable, horizontalSpan: actualHSpan, verticalSpan: actualVSpan }),
         sx,
       )}
-      onClick={toggleExpansion}
       {...props}
     >
       <LinkWrappedChildren
         expandOnClick={expandOnClick}
-        overlayContents={overlay && <OverlayContent overlay={overlay} sx={overlaySx} />}
         link={link}
+        overlayContents={overlay ? <OverlayContent overlay={overlay} sx={overlaySx} /> : null}
       >
         {children}
       </LinkWrappedChildren>

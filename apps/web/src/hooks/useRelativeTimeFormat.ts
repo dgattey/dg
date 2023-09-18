@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react';
 
 type DateConstructorValue = Date | string | number | null | undefined;
 
-interface RelativeTime {
+type RelativeTime = {
   unit: Intl.RelativeTimeFormatUnit;
   amount: number;
   formatted: string;
-}
+};
 
 // Value to use as a fallback when all else fails
 const FALLBACK: readonly [Intl.RelativeTimeFormatUnit, number] = ['second', 1000] as const;
@@ -43,7 +43,7 @@ const relativeTimeFormatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto
 /**
  * Converts a date to a number, defaulting to right now as a fallback
  */
-const numericDate = (date: DateConstructorValue) => +new Date(date ?? new Date());
+const numericDate = (date: DateConstructorValue) => Number(new Date(date ?? new Date()));
 
 /**
  * Typeguard for converting a string to a time format unit if possible
@@ -54,7 +54,7 @@ const isRelativeTimeUnit = (unit: string): unit is Intl.RelativeTimeFormatUnit =
 /**
  * From an elapsed amount of milliseconds, grabs a unit and creates a value
  * from our elapsed ms in that unit that best fits. If the elapsedMs is 100, for example,
- * it would return { unit: 'second', amount: 0, formatted: '0 seconds ago' }
+ * it would return `{ unit: 'second', amount: 0, formatted: '0 seconds ago' }`
  */
 const relativeTimeFromMs = (
   elapsedMs: number,

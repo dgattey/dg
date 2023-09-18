@@ -1,4 +1,5 @@
-import { BoxProps, Stack, StackProps } from '@mui/material';
+import type { BoxProps, StackProps } from '@mui/material';
+import { Stack } from '@mui/material';
 import { mixinSx } from 'ui/helpers/mixinSx';
 
 /**

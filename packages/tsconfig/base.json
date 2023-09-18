@@ -12,6 +12,7 @@
     "inlineSources": false,
     "isolatedModules": true,
     "moduleResolution": "node",
+    "noEmit": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noImplicitReturns": true,
@@ -27,5 +28,5 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true
   },
-  "exclude": ["node _modules"]
+  "exclude": ["node_modules"]
 }

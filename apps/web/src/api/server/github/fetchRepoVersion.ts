@@ -1,5 +1,5 @@
-import type { GithubRepoVersionQuery } from 'api/types/generated/fetchRepoVersion.generated';
 import { gql } from 'graphql-request';
+import type { GithubRepoVersionQuery } from 'api/types/generated/fetchRepoVersion.generated';
 import { githubClient } from '../networkClients/githubClient';
 
 /**
@@ -44,7 +44,7 @@ export async function fetchRepoVersion(): Promise<string | null> {
   // Looks for a release that matches build-time `VERCEL_GIT_COMMIT_SHA` and compares it to each release's commit SHA
   const commitSha = process.env.VERCEL_GIT_COMMIT_SHA;
   const data = await githubClient.request<GithubRepoVersionQuery>(QUERY);
-  const releases = data?.repository?.releases?.nodes;
+  const releases = data.repository?.releases.nodes;
   const filteredReleases =
     releases?.filter((release) => release?.tagCommit?.oid === commitSha?.trim()) ?? [];
   return filteredReleases[0]?.name ?? commitSha?.slice(-12) ?? null;

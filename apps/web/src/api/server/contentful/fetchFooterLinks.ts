@@ -1,7 +1,7 @@
+import { gql } from 'graphql-request';
 import { isDefinedItem, isLink } from 'api/parsers';
 import type { Link } from 'api/types/generated/contentfulApi.generated';
 import type { FooterQuery } from 'api/types/generated/fetchFooterLinks.generated';
-import { gql } from 'graphql-request';
 import { contentfulClient } from '../networkClients/contentfulClient';
 
 /**
@@ -32,7 +32,7 @@ const QUERY = gql`
 export async function fetchFooterLinks(): Promise<Array<Link>> {
   const data = await contentfulClient.request<FooterQuery>(QUERY);
   const items =
-    data?.sectionCollection?.items.flatMap((item) => item?.blocksCollection?.items ?? []) ?? [];
+    data.sectionCollection?.items.flatMap((item) => item?.blocksCollection?.items ?? []) ?? [];
   const links = items.filter(isLink).filter(isDefinedItem);
   return links;
 }

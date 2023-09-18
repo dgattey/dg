@@ -1,7 +1,8 @@
-import { FetchedFallbackData, fetchFallbackData } from 'api/fetchFallbackData';
+import type { GetStaticProps } from 'next/types';
+import type { FetchedFallbackData } from 'api/fetchFallbackData';
+import { fetchFallbackData } from 'api/fetchFallbackData';
 import { Homepage } from 'components/homepage/Homepage';
 import { PageLayout } from 'components/layouts/PageLayout';
-import type { GetStaticProps } from 'next/types';
 import type { GetLayout } from 'types/Page';
 
 type PageProps = {

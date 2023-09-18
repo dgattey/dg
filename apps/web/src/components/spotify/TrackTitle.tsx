@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
 import { Link } from 'components/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
-import { SxProps } from 'ui/theme';
+import type { SxProps } from 'ui/theme';
 import { truncated } from 'helpers/truncated';
 import { mixinSx } from 'ui/helpers/mixinSx';
 
@@ -28,7 +28,7 @@ export function TrackTitle({ trackTitle, url, sx }: TrackTitleProps) {
       {trackTitle}
     </Link>
   ) : (
-    <Typography variant="h5" component="span" sx={mixedSx}>
+    <Typography component="span" sx={mixedSx} variant="h5">
       {trackTitle}
     </Typography>
   );

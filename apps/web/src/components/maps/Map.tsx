@@ -1,11 +1,12 @@
-import type { MapLocation } from 'api/types/MapLocation';
 import { useEffect, useMemo, useRef } from 'react';
-import { AttributionControl, Map as MapGL, MapRef } from 'react-map-gl';
+import type { MapRef } from 'react-map-gl';
+import { AttributionControl, Map as MapGL } from 'react-map-gl';
 import { Box, useTheme } from '@mui/material';
+import type { MapLocation } from 'api/types/MapLocation';
 import { useColorScheme } from 'hooks/useColorScheme';
 import { StandardControls } from './StandardControls';
 
-export type Props = {
+export type MapProps = {
   /**
    * Where we're centered and zoomed
    */
@@ -123,7 +124,7 @@ function Wrapper({ isLoaded, children }: { isLoaded: boolean; children: React.Re
 /**
  * Uses Mapbox to show a canvas-based map of my current location.
  */
-export function Map({ location, children, isExpanded, isLoaded, setMapHasLoaded }: Props) {
+export function Map({ location, children, isExpanded, isLoaded, setMapHasLoaded }: MapProps) {
   const theme = useTheme();
   const mapRef = useRef<MapRef>(null);
   const { colorScheme } = useColorScheme();
@@ -160,22 +161,22 @@ export function Map({ location, children, isExpanded, isLoaded, setMapHasLoaded 
   return (
     <Wrapper isLoaded={isLoaded}>
       <MapGL
-        ref={mapRef}
-        initialViewState={initialViewState}
-        minZoom={minZoom}
-        maxZoom={maxZoom}
         attributionControl={false}
-        logoPosition="bottom-left"
+        initialViewState={initialViewState}
         interactive
-        pitchWithRotate={false}
-        touchPitch={false}
+        logoPosition="bottom-left"
         mapStyle={colorScheme.mode === 'dark' ? DARK_STYLE : LIGHT_STYLE}
-        styleDiffing={false}
         mapboxAccessToken={process.env.NEXT_PUBLIC_MAPBOX_TOKEN}
+        maxZoom={maxZoom}
+        minZoom={minZoom}
         onLoad={setMapHasLoaded}
+        pitchWithRotate={false}
+        ref={mapRef}
         reuseMaps
+        styleDiffing={false}
+        touchPitch={false}
       >
-        {isExpanded && <AttributionControl position="bottom-right" />}
+        {isExpanded ? <AttributionControl position="bottom-right" /> : null}
         <StandardControls mapRef={mapRef} />
         {children}
       </MapGL>

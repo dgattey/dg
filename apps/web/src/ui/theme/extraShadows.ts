@@ -1,4 +1,4 @@
-import { PaletteMode } from '@mui/material';
+import type { PaletteMode } from '@mui/material';
 
 const sharedShadows = {
   map: {
@@ -7,7 +7,7 @@ const sharedShadows = {
   card: {
     overlayHovered: '0 0 4px rgba(0, 0, 0, 0.1), 0 0 8px rgba(0, 0, 0, 0.16)',
   },
-};
+} as const;
 
 const lightShadows = {
   ...sharedShadows,

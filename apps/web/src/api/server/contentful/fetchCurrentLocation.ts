@@ -1,7 +1,7 @@
+import { gql } from 'graphql-request';
 import { isDefinedItem } from 'api/parsers';
 import type { MyLocationQuery } from 'api/types/generated/fetchCurrentLocation.generated';
 import type { MapLocation } from 'api/types/MapLocation';
-import { gql } from 'graphql-request';
 import { contentfulClient } from '../networkClients/contentfulClient';
 
 /**
@@ -56,8 +56,8 @@ const QUERY = gql`
  */
 export async function fetchCurrentLocation(): Promise<MapLocation | null> {
   const data = await contentfulClient.request<MyLocationQuery>(QUERY);
-  const location = data?.contentTypeLocation;
-  if (!location || !data?.lightImage?.url || !data?.darkImage?.url) {
+  const location = data.contentTypeLocation;
+  if (!location || !data.lightImage?.url || !data.darkImage?.url) {
     return null;
   }
   const zoomLevels = location.zoomLevels?.filter(isDefinedItem)?.map(Number) ?? [];

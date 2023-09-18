@@ -1,9 +1,8 @@
 import { WebhookSubscriptionConfig } from 'api/types/WebhookSubscriptionConfig';
 import { WebhookType } from 'api/types/WebhookType';
-import dotenv from 'dotenv';
+import dotenv from 'dotenv-mono';
 
-// Load env variables from local file
-dotenv.config({ path: `.env.${process.env.NODE_ENV}.local` });
+dotenv.config();
 
 /**
  * These are the standard parameters that go into the body of

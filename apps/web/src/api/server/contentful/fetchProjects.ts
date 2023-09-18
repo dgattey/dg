@@ -1,7 +1,7 @@
-import { isProject } from 'api/parsers';
-import { Project } from 'api/types/generated/contentfulApi.generated';
-import type { ProjectsQuery } from 'api/types/generated/fetchProjects.generated';
 import { gql } from 'graphql-request';
+import { isProject } from 'api/parsers';
+import type { Project } from 'api/types/generated/contentfulApi.generated';
+import type { ProjectsQuery } from 'api/types/generated/fetchProjects.generated';
 import { contentfulClient } from '../networkClients/contentfulClient';
 
 /**
@@ -36,5 +36,5 @@ const QUERY = gql`
  */
 export async function fetchProjects(): Promise<Array<Project>> {
   const data = await contentfulClient.request<ProjectsQuery>(QUERY);
-  return data?.projectCollection?.items.filter(isProject) ?? [];
+  return data.projectCollection?.items.filter(isProject) ?? [];
 }

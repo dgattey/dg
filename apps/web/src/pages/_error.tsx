@@ -1,9 +1,10 @@
-import { FetchedFallbackData, fetchFallbackData } from 'api/fetchFallbackData';
+import type { NextPageContext } from 'next';
+import NextErrorComponent from 'next/error';
+import type { FetchedFallbackData } from 'api/fetchFallbackData';
+import { fetchFallbackData } from 'api/fetchFallbackData';
 import { ErrorPageContents } from 'components/errors/ErrorPageContents';
 import { ErrorLayout } from 'components/layouts/ErrorLayout';
 import { PageLayout } from 'components/layouts/PageLayout';
-import type { NextPageContext } from 'next';
-import NextErrorComponent from 'next/error';
 import type { GetLayout } from 'types/Page';
 
 export type PageProps = {

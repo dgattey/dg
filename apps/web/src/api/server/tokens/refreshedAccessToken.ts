@@ -1,5 +1,5 @@
 import { db } from 'db/dbClient';
-import { CreateTokenProps, FetchTokenProps } from 'db/models/Token';
+import type { CreateTokenProps, FetchTokenProps } from 'db/models/Token';
 import { fetchRefreshedTokenFromApi } from './fetchRefreshedTokenFromApi';
 
 /**
@@ -28,13 +28,13 @@ const getLatestTokenIfValid = async ({ name }: FetchTokenProps) => {
   });
 
   // Shouldn't happen unless invalid name, so it's a big error
-  if (!token || !token.refreshToken) {
+  if (!token?.refreshToken) {
     throw new TypeError('Missing token');
   }
 
   // Return either refresh + access, or just refresh if invalid
   const { refreshToken, accessToken, expiryAt } = token;
-  const isValid = expiryAt && +expiryAt > Date.now();
+  const isValid = expiryAt && Number(expiryAt) > Date.now();
   return { refreshToken, accessToken: isValid ? accessToken : null };
 };
 

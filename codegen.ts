@@ -1,7 +1,7 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { CodegenConfig } from '@graphql-codegen/cli';
 
-require('dotenv').config();
+require('dotenv-mono').config();
 
 // Where all our documents to parse live by default
 const BASE_FOLDER = 'apps/web/src/api/server';

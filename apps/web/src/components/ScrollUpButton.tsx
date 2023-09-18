@@ -1,7 +1,7 @@
 import { ArrowUp } from 'lucide-react';
 import { useContext } from 'react';
 import { Button, Typography } from '@mui/material';
-import { SxProps } from 'ui/theme';
+import type { SxProps } from 'ui/theme';
 import { ScrollIndicatorContext } from './ScrollIndicatorContext';
 
 const scrolledSx: SxProps = {
@@ -21,13 +21,14 @@ const scrolledSx: SxProps = {
  */
 export function ScrollUpButton() {
   const isScrolled = useContext(ScrollIndicatorContext);
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
 
   return (
     <Button
-      disabled={!isScrolled}
-      variant="text"
       color="secondary"
+      disabled={!isScrolled}
       onClick={scrollToTop}
       sx={{
         color: (theme) => theme.vars.palette.text.primary,
@@ -43,6 +44,7 @@ export function ScrollUpButton() {
         willChange: 'transform',
         ...(isScrolled && scrolledSx),
       }}
+      variant="text"
     >
       <Typography variant="caption">To top</Typography>
       <ArrowUp size={16} />

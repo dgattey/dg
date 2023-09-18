@@ -6,14 +6,14 @@ import { COLORS } from 'ui/theme/color';
 export function BackgroundPattern() {
   return (
     <svg
-      width="1200"
+      fill={COLORS.DARK.DEFAULT_BACKGROUND}
       height="630"
       preserveAspectRatio="none"
-      viewBox="0 0 1200 630"
-      fill={COLORS.DARK.DEFAULT_BACKGROUND}
       stroke={COLORS.DARK.CARD_BACKGROUND}
       strokeWidth={4}
       style={{ position: 'absolute' }}
+      viewBox="0 0 1200 630"
+      width="1200"
     >
       <path
         d="m52.2-39.7c12 13.1 15.9 34.6 10.4 52.2-5.4 17.6-20.2 31.2-37.8 40.1s-38 13-53.9 6-27.3-25.1-30.1-43.3c-2.8-18.3 3.1-36.8 14.4-49.7s28.1-20.2 46.5-21.5c18.4-1.4 38.5 3.2 50.5 16.2z"

@@ -1,12 +1,13 @@
-import { documentToReactComponents, Options } from '@contentful/rich-text-react-renderer';
+import type { Options } from '@contentful/rich-text-react-renderer';
+import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { Divider, Stack, Typography } from '@mui/material';
+import { PROJECT_MAX_IMAGE_DIMENSION } from 'appConstants/imageSizes';
 import { isDefinedItem, isLink, isProject } from 'api/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
 import { ProjectCard } from 'components/homepage/ProjectCard';
-import { PROJECT_MAX_IMAGE_DIMENSION } from 'constants/imageSizes';
-import { SxProps } from 'ui/theme';
+import type { SxProps } from 'ui/theme';
 import { Image } from './Image';
 import { Link } from './Link';
 
@@ -42,14 +43,14 @@ const HEADING_SX: SxProps = {
  */
 const isDataWithId = (data: NodeData): data is DataWithId =>
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  !!(data as DataWithId)?.target?.sys?.id;
+  Boolean((data as DataWithId).target.sys.id);
 
 /**
  * Typeguard for converting the `any` to a structured link
  */
 const isDataWithLink = (data: NodeData): data is { uri: string } =>
   // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-  !!(data as { uri: string })?.uri;
+  Boolean((data as { uri: string }).uri);
 
 /**
  * Creates an element for a single entry in our rich text
@@ -113,7 +114,7 @@ function HeadingWithId({
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
   return (
-    <Typography id={id} variant={variant} sx={HEADING_SX}>
+    <Typography id={id} sx={HEADING_SX} variant={variant}>
       {children}
     </Typography>
   );
@@ -142,7 +143,7 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
       [BLOCKS.HEADING_5]: (_, children) => <HeadingWithId variant="h5">{children}</HeadingWithId>,
       [BLOCKS.HEADING_6]: (_, children) => <HeadingWithId variant="h6">{children}</HeadingWithId>,
       [BLOCKS.PARAGRAPH]: (_, children) => (
-        <Typography variant="body1" sx={{ marginBottom: (theme) => theme.spacing(3.5) }}>
+        <Typography sx={{ marginBottom: (theme) => theme.spacing(3.5) }} variant="body1">
           {children}
         </Typography>
       ),
@@ -155,7 +156,7 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
       },
       [INLINES.EMBEDDED_ENTRY]: ({ data }) => <EntryElement data={data} entryMap={entryMap} />,
       [BLOCKS.EMBEDDED_ENTRY]: ({ data }) => <EntryElement data={data} entryMap={entryMap} />,
-      [BLOCKS.EMBEDDED_ASSET]: ({ data }) => <AssetElement data={data} assetMap={assetMap} />,
+      [BLOCKS.EMBEDDED_ASSET]: ({ data }) => <AssetElement assetMap={assetMap} data={data} />,
     },
   };
 };

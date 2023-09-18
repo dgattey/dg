@@ -1,6 +1,6 @@
 import type { Link as LinkType } from 'api/types/generated/contentfulApi.generated';
 import { Link } from 'components/Link';
-import { SxProps } from 'ui/theme';
+import type { SxProps } from 'ui/theme';
 
 type ContentWrappingLinkProps = Pick<React.ComponentProps<'div'>, 'children'> & {
   /**
@@ -19,7 +19,7 @@ export function ContentWrappingLink({ link, children, sx }: ContentWrappingLinkP
     return null;
   }
   return (
-    <Link isExternal href={link.url} sx={sx}>
+    <Link href={link.url} isExternal sx={sx}>
       {children}
     </Link>
   );

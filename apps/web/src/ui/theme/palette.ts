@@ -1,4 +1,4 @@
-import { PaletteOptions, PaletteMode } from '@mui/material';
+import type { PaletteOptions, PaletteMode } from '@mui/material';
 import { COLORS } from 'ui/theme/color';
 
 const lightPalette: PaletteOptions = {

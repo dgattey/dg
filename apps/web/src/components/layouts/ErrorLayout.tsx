@@ -1,7 +1,7 @@
+import { Stack } from '@mui/material';
 import { Meta } from 'components/Meta';
 import { Link } from 'components/Link';
 import { Section } from 'ui/Section';
-import { Stack } from '@mui/material';
 
 type ErrorLayoutProps = {
   children: React.ReactNode;
@@ -20,17 +20,17 @@ export function ErrorLayout({ children, statusCode }: ErrorLayoutProps) {
   const pageTitle = statusCode === 404 ? 'Oops! Page not found' : `Error code ${statusCode}`;
   return (
     <>
-      <Meta title={pageTitle} description="An error occurred" />
+      <Meta description="An error occurred" title={pageTitle} />
       <Stack component={Section} sx={{ gap: 3, marginTop: -6 }}>
         {children}
         <Link
-          isButton
           buttonProps={{
             color: 'secondary',
           }}
           href="/"
-          title="Home"
+          isButton
           sx={{ alignSelf: 'flex-start', marginTop: 3 }}
+          title="Home"
         >
           Go back home
         </Link>

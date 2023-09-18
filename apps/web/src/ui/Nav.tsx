@@ -1,11 +1,5 @@
-import {
-  Box,
-  BoxProps,
-  Container,
-  ContainerProps,
-  Typography,
-  TypographyProps,
-} from '@mui/material';
+import type { BoxProps, ContainerProps, TypographyProps } from '@mui/material';
+import { Box, Container, Typography } from '@mui/material';
 import { mixinSx } from './helpers/mixinSx';
 
 /**
@@ -44,8 +38,8 @@ export function NavGroup({ sx, children, ...props }: BoxProps) {
 export function NavItem({ sx, children, ...props }: TypographyProps) {
   return (
     <Typography
-      variant="body2"
       component="li"
+      variant="body2"
       {...props}
       sx={mixinSx(
         (theme) => ({
@@ -77,8 +71,8 @@ export function NavItem({ sx, children, ...props }: TypographyProps) {
 export function Nav({ sx, children, ...props }: ContainerProps) {
   return (
     <Container
-      fixed
       component="nav"
+      fixed
       {...props}
       sx={mixinSx(
         {

@@ -1,4 +1,5 @@
-import { Box, BoxProps, Theme } from '@mui/material';
+import type { BoxProps, Theme } from '@mui/material';
+import { Box } from '@mui/material';
 import { Children } from 'react';
 
 export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className'> &
@@ -87,12 +88,12 @@ export function ControlContainer({ onClick, children, className, theme }: Contro
     >
       {Array.isArray(children) ? (
         Children.map(children, (child) => (
-          <Box sx={controlSx} onClick={child.props.onClick}>
+          <Box onClick={child.props.onClick} sx={controlSx}>
             {child}
           </Box>
         ))
       ) : (
-        <Box sx={controlSx} onClick={onClick}>
+        <Box onClick={onClick} sx={controlSx}>
           {children}
         </Box>
       )}

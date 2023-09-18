@@ -1,7 +1,7 @@
-import { useData } from 'api/useData';
-import type { ContentCardProps } from 'components/ContentCard';
 import { Suspense, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { useData } from 'api/useData';
+import type { ContentCardProps } from 'components/ContentCard';
 import { MapContentCard } from 'components/maps/MapContentCard';
 import { useColorScheme } from 'hooks/useColorScheme';
 
@@ -30,18 +30,22 @@ export function MapPreviewCard({ turnOnAnimation }: MapPreviewCardProps) {
   const previewCard = (
     <MapContentCard
       backgroundImageUrl={backgroundImageUrl}
+      onMouseOver={() => {
+        setShowFullMapComponent(true);
+      }}
+      onTouchStart={() => {
+        setShowFullMapComponent(true);
+      }}
       turnOnAnimation={turnOnAnimation}
-      onMouseOver={() => setShowFullMapComponent(true)}
-      onTouchStart={() => setShowFullMapComponent(true)}
     />
   );
 
   return showFullMapComponent && location ? (
     <Suspense fallback={previewCard}>
       <FullMapCard
-        turnOnAnimation={turnOnAnimation}
-        location={location}
         backgroundImageUrl={backgroundImageUrl}
+        location={location}
+        turnOnAnimation={turnOnAnimation}
       />
     </Suspense>
   ) : (

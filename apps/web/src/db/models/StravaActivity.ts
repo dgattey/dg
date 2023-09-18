@@ -1,4 +1,3 @@
-import type { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
 import {
   Table,
   Column,
@@ -8,6 +7,7 @@ import {
   DataType,
   AllowNull,
 } from 'sequelize-typescript';
+import type { StravaDetailedActivity } from 'api/types/StravaDetailedActivity';
 
 @Table({ modelName: 'StravaActivity' })
 export class StravaActivity extends Model {

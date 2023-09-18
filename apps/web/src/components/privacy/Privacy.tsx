@@ -12,14 +12,14 @@ export function Privacy() {
   }
 
   // Grabs the second text element, since the first is a last updated
-  const secondParagraph = privacyTextBlock?.content?.json.content?.filter(
+  const secondParagraph = privacyTextBlock.content.json.content?.filter(
     (item) => item.nodeType === 'paragraph',
   )?.[1];
   const privacyDescription = secondParagraph?.content?.map((node) => node.value)?.join('');
 
   return (
     <>
-      <Meta title="Privacy Policy" description={privacyDescription} />
+      <Meta description={privacyDescription} title="Privacy Policy" />
       <RichText
         {...privacyTextBlock.content}
         sx={(theme) => ({

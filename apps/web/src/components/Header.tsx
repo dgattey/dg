@@ -1,21 +1,21 @@
-import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
-import { ScrollUpButton } from 'components/ScrollUpButton';
 import { useContext } from 'react';
 import { Box, alpha } from '@mui/material';
+import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
+import { ScrollUpButton } from 'components/ScrollUpButton';
 import { Section } from 'ui/Section';
 import { Nav, NavGroup, NavItem } from 'ui/Nav';
 import { ColorSchemeToggle } from 'components/ColorSchemeToggle';
-import { SxProps } from 'ui/theme';
+import type { SxProps } from 'ui/theme';
 import { useColorScheme } from 'hooks/useColorScheme';
 import { Logo } from './Logo';
 
-interface Props {
+type HeaderProps = {
   /**
    * If provided, sets the ref on the `header` element for
    * sizing/whatever else is needed
    */
   headerRef?: React.RefObject<HTMLDivElement>;
-}
+};
 
 // Makes the header bar sticky and not responsive to user events by default
 const stickyContainerSx: SxProps = {
@@ -29,7 +29,7 @@ const stickyContainerSx: SxProps = {
  * Creates the site header component. It's a bar that spans across the
  * page and shows a logo + header links if they exist.
  */
-export function Header({ headerRef }: Props) {
+export function Header({ headerRef }: HeaderProps) {
   const isScrolled = useContext(ScrollIndicatorContext);
   const { colorScheme } = useColorScheme();
   return (

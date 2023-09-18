@@ -1,13 +1,15 @@
-import { ColorSchemeMode, useColorScheme } from 'hooks/useColorScheme';
 import { Moon, Sun, RefreshCw } from 'lucide-react';
-import { Box, IconButton, Theme, Tooltip } from '@mui/material';
+import type { Theme } from '@mui/material';
+import { Box, IconButton, Tooltip } from '@mui/material';
+import { useColorScheme } from 'hooks/useColorScheme';
+import type { ColorSchemeMode } from 'hooks/useColorScheme';
 
-interface ColorSchemeIconProps {
+type ColorSchemeIconProps = {
   /**
    * The color scheme mode to switch to on click
    */
   mode: ColorSchemeMode;
-}
+};
 
 /**
  * Tooltips for the different states
@@ -51,16 +53,18 @@ export function ColorSchemeIcon({ mode }: ColorSchemeIconProps) {
 
   return (
     <Tooltip
-      title={tooltip}
       enterDelay={DELAY_MS}
-      enterTouchDelay={DELAY_MS}
       enterNextDelay={DELAY_MS}
+      enterTouchDelay={DELAY_MS}
+      title={tooltip}
     >
       <span>
         <IconButton
-          onClick={() => updatePreferredMode(isResetMode ? null : mode)}
-          disabled={!colorScheme.isInitialized}
           aria-label={tooltip}
+          disabled={!colorScheme.isInitialized}
+          onClick={() => {
+            updatePreferredMode(isResetMode ? null : mode);
+          }}
           sx={(theme) => ({
             '& svg': {
               transition: theme.transitions.create('transform'),

@@ -1,4 +1,4 @@
-interface JSON {
+type JSON = {
   /**
    * By default, JSON returns `any` from `parse`. This was a thing in ES5 but is no
    * longer necessary with `unknown` now a feature of Typescript. Instead of having to
@@ -7,8 +7,8 @@ interface JSON {
    * result in a runtime error if `JSON.parse` returns an unknown object type instead
    * of the `DataType` you expect. ALWAYS surround this in a try/catch!
    */
-  parse<DataType>(
+  parse: <DataType>(
     text: string,
     reviver?: (this: unknown, key: string, value: unknown) => unknown,
-  ): DataType;
-}
+  ) => DataType;
+};

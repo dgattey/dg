@@ -1,6 +1,6 @@
 import type { CurrentlyPlaying } from 'api/types/spotify/CurrentlyPlaying';
 import type { RecentlyPlayed } from 'api/types/spotify/RecentlyPlayed';
-import { Track } from 'api/types/spotify/Track';
+import type { Track } from 'api/types/spotify/Track';
 import { spotifyClient } from '../networkClients/spotifyClient';
 
 const CURRENTLY_PLAYING_RESOURCE = 'me/player/currently-playing';
@@ -26,8 +26,8 @@ export async function fetchRecentlyPlayed(): Promise<null | Track> {
         return null;
       }
       const data = await recentlyPlayed.json();
-      const item = data?.items?.[0];
-      return item ? { ...item?.track, played_at: item.played_at } : null;
+      const item = data?.items[0];
+      return item ? { ...item.track, played_at: item.played_at } : null;
     }
     default:
       // This could be rate limiting, or auth problems, etc.

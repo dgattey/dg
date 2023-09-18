@@ -1,5 +1,5 @@
-import { Theme } from '@mui/material';
-import { TypographyOptions } from '@mui/material/styles/createTypography';
+import type { Theme } from '@mui/material';
+import type { TypographyOptions } from '@mui/material/styles/createTypography';
 
 /**
  * Get typography styles for a certain color mode.

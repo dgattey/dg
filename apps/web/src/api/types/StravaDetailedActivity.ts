@@ -3,20 +3,20 @@
  */
 type ActivityType = string;
 
-interface Athlete {
+type Athlete = {
   /**
    * Always my id
    */
   id: number;
-}
+};
 
-interface PolylineMap {
+type PolylineMap = {
   id: string;
   polyline: string;
   summary_polyline: string;
-}
+};
 
-interface Gear {
+type Gear = {
   id: string;
 
   /**
@@ -28,9 +28,9 @@ interface Gear {
    * Distance in miles
    */
   converted_distance: number;
-}
+};
 
-interface PhotoSummary {
+type PhotoSummary = {
   count: number;
   primary: {
     unique_id: string;
@@ -40,15 +40,15 @@ interface PhotoSummary {
      */
     urls: Record<string, string>;
   };
-}
+};
 
 /**
  * An instance of an activity with detail from Strava. Only
  * uses all the simple types I might use - not everything
  * everything!
- * @link https://developers.strava.com/docs/reference/#api-models-DetailedActivity
+ * {@link https://developers.strava.com/docs/reference/#api-models-DetailedActivity}
  */
-export interface StravaDetailedActivity {
+export type StravaDetailedActivity = {
   achievement_count: number;
   athlete_count: number;
   athlete: Athlete;
@@ -111,4 +111,4 @@ export interface StravaDetailedActivity {
   utc_offset: number;
   visibility: string;
   workout_type: number;
-}
+};

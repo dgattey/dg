@@ -1,9 +1,10 @@
-import { Theme, useTheme } from '@mui/material';
+import type { Theme } from '@mui/material';
+import { useTheme } from '@mui/material';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-interface Props {
+type MetaProps = {
   /**
    * Tab/window title that shows in a browser
    */
@@ -13,7 +14,7 @@ interface Props {
    * Description shown to Google/others
    */
   description?: string;
-}
+};
 
 /**
  * Maps from graph item names like "url" for "og:url"/"twitter:url" to their
@@ -32,9 +33,9 @@ const GRAPH_PREFIXES = ['og', 'twitter'] as const;
  */
 const linkFromSize = (size: string, fileType: string, rel = 'icon') => (
   <link
+    href={`/icons/${fileType}-${size}.png`}
     key={`${size}${fileType}link`}
     rel={rel}
-    href={`/icons/${fileType}-${size}.png`}
     sizes={`${size}x${size}`}
   />
 );
@@ -43,7 +44,7 @@ const linkFromSize = (size: string, fileType: string, rel = 'icon') => (
  * Helps reduce duplication for creation of meta elements
  */
 const metaFromSize = (size: string, fileType: string, name: string) => (
-  <meta key={`${size}${fileType}meta`} name={name} content={`/icons/${fileType}-${size}.png`} />
+  <meta content={`/icons/${fileType}-${size}.png`} key={`${size}${fileType}meta`} name={name} />
 );
 
 /**
@@ -75,10 +76,10 @@ const ICONS = {
     variants: ['safari-pinned-tab.svg'],
     element: (name: string, theme: Theme) => (
       <link
+        color={theme.vars.palette.primary.main}
+        href={`/icons/${name}`}
         key={`${name}mask`}
         rel="mask-icon"
-        href={`/icons/${name}`}
-        color={theme.vars.palette.primary.main}
       />
     ),
   },
@@ -91,7 +92,7 @@ const graphMetaItems = (graph: Graph) =>
   Object.entries(graph).map(([name, content]) =>
     GRAPH_PREFIXES.map((prefix) =>
       content ? (
-        <meta key={`${prefix}:${name}graphmeta`} property={`${prefix}:${name}`} content={content} />
+        <meta content={content} key={`${prefix}:${name}graphmeta`} property={`${prefix}:${name}`} />
       ) : undefined,
     ),
   );
@@ -99,7 +100,7 @@ const graphMetaItems = (graph: Graph) =>
 /**
  * Populates the `<head>` of a given page from the title/description here
  */
-export function Meta({ title, description }: Props) {
+export function Meta({ title, description }: MetaProps) {
   const router = useRouter();
   const [pageUrl, setPageUrl] = useState('');
   const [baseUrl, setBaseUrl] = useState('');
@@ -124,26 +125,26 @@ export function Meta({ title, description }: Props) {
 
   return (
     <Head>
-      <meta key="og:site_name" property="og:site_name" content={SITE_NAME} />
-      <meta key="og:locale" property="og:locale" content="en_US" />
-      <meta key="og:type" property="og:type" content="website" />
-      <meta key="twitter:card" name="twitter:card" content="summary_large_image" />
+      <meta content={SITE_NAME} key="og:site_name" property="og:site_name" />
+      <meta content="en_US" key="og:locale" property="og:locale" />
+      <meta content="website" key="og:type" property="og:type" />
+      <meta content="summary_large_image" key="twitter:card" name="twitter:card" />
       <title key="title">{resolvedTitle}</title>
-      {truncatedDescription && (
-        <meta key="description" name="description" content={truncatedDescription} />
-      )}
+      {truncatedDescription ? (
+        <meta content={truncatedDescription} key="description" name="description" />
+      ) : null}
       {graphMetaItems({
         title: title ?? SITE_NAME,
         description: truncatedDescription,
         url: pageUrl,
         image: `${baseUrl}/${OG_IMAGE_API_ROUTE}/${imageTitle}?subtitle=${imageSubtitle}`,
       })}
-      <link key="favicon" rel="icon" href="/favicon.ico" />
-      <meta key="theme-color" name="theme-color" content={theme.vars.palette.background.default} />
+      <link href="/favicon.ico" key="favicon" rel="icon" />
+      <meta content={theme.vars.palette.background.default} key="theme-color" name="theme-color" />
       <meta
+        content={theme.vars.palette.background.default}
         key="msapplication-TileColor"
         name="msapplication-TileColor"
-        content={theme.vars.palette.background.default}
       />
       {Object.values(ICONS).flatMap(({ variants, element }) =>
         variants.map((variant) => element(String(variant), theme)),

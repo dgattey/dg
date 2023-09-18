@@ -1,5 +1,5 @@
-import { Track } from 'api/types/spotify/Track';
 import { Stack } from '@mui/material';
+import type { Track } from 'api/types/spotify/Track';
 import { HorizontalStack } from 'ui/HorizontalStack';
 import { AlbumImage } from './AlbumImage';
 import { ArtistList } from './ArtistList';
@@ -7,7 +7,7 @@ import { SpotifyLogo } from './SpotifyLogo';
 import { PlaybackStatus } from './PlaybackStatus';
 import { TrackTitle } from './TrackTitle';
 
-interface TrackListingProps {
+type TrackListingProps = {
   /**
    * Has to exist, the track to list
    */
@@ -17,7 +17,7 @@ interface TrackListingProps {
    * If this is true, it puts a logo to the left of the album art
    */
   hasLogo?: boolean;
-}
+};
 
 /**
  * Shows a listing for one track, with an optional logo to the left of the album art,
@@ -40,12 +40,12 @@ export function TrackListing({ track, hasLogo }: TrackListingProps) {
           justifyContent: 'space-between',
         }}
       >
-        {hasLogo && <SpotifyLogo url={trackUrl} trackTitle={trackTitle} />}
+        {hasLogo ? <SpotifyLogo trackTitle={trackTitle} url={trackUrl} /> : null}
         <AlbumImage album={track.album} />
       </HorizontalStack>
       <Stack>
         <PlaybackStatus playedAt={track.played_at} />
-        <TrackTitle trackTitle={trackTitle} url={trackUrl} sx={{ marginBottom: 1 }} />
+        <TrackTitle sx={{ marginBottom: 1 }} trackTitle={trackTitle} url={trackUrl} />
         <ArtistList artists={track.artists} />
       </Stack>
     </Stack>

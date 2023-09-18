@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import { useContext } from 'react';
 import { Button } from '@mui/material';
 import { mixinSx } from 'ui/helpers/mixinSx';
-import { SxProps } from 'ui/theme';
+import type { SxProps } from 'ui/theme';
 import { ScrollIndicatorContext } from './ScrollIndicatorContext';
 import { Link } from './Link';
 
@@ -55,10 +55,12 @@ const logoTextStyles =
 export function Logo() {
   const router = useRouter();
   const isScrolled = useContext(ScrollIndicatorContext);
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const scrollToTop = () => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
   if (router.asPath === '/') {
     return (
-      <Button sx={logoTextStyles(isScrolled)} disableRipple onClick={scrollToTop}>
+      <Button disableRipple onClick={scrollToTop} sx={logoTextStyles(isScrolled)}>
         dg.
       </Button>
     );

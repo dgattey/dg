@@ -1,7 +1,7 @@
+import { Container } from '@mui/material';
 import { useData } from 'api/useData';
 import { Section } from 'ui/Section';
 import { Nav, NavGroup, NavItem } from 'ui/Nav';
-import { Container } from '@mui/material';
 import type { Link as LinkType } from 'api/types/generated/contentfulApi.generated';
 import { HorizontalStack } from 'ui/HorizontalStack';
 import { Link } from './Link';
@@ -13,12 +13,11 @@ function FooterLink({ link }: { link: LinkType }) {
   return (
     <NavItem sx={{ padding: 0 }}>
       <Link
-        title={link.title}
-        icon={link.icon}
-        layout="icon" // the ones that have no icon will resolve to just text
-        href={link.url}
-        isExternal={link.url?.startsWith('http')}
         aria-label={link.title}
+        href={link.url}
+        icon={link.icon}
+        isExternal={link.url?.startsWith('http')}
+        layout="icon" // the ones that have no icon will resolve to just text
         linkProps={{
           color: 'secondary',
         }}
@@ -30,6 +29,7 @@ function FooterLink({ link }: { link: LinkType }) {
           alignItems: 'center',
           justifyContent: 'center',
         }}
+        title={link.title}
       />
     </NavItem>
   );
@@ -62,9 +62,9 @@ export function Footer() {
             <NavItem sx={{ padding: 0 }}>•</NavItem>
             <NavItem>{version}</NavItem>
           </NavGroup>
-          <NavGroup sx={{ columnGap: 4 }} component="div">
+          <NavGroup component="div" sx={{ columnGap: 4 }}>
             <HorizontalStack component="ul" sx={{ padding: 0, margin: 0 }}>
-              {nonIconFooterLinks?.map((link) => <FooterLink link={link} key={link.url} />)}
+              {nonIconFooterLinks?.map((link) => <FooterLink key={link.url} link={link} />)}
             </HorizontalStack>
             <HorizontalStack
               component="ul"
@@ -77,7 +77,7 @@ export function Footer() {
                 justifyContent: 'space-between',
               }}
             >
-              {iconFooterLinks?.map((link) => <FooterLink link={link} key={link.url} />)}
+              {iconFooterLinks?.map((link) => <FooterLink key={link.url} link={link} />)}
             </HorizontalStack>
           </NavGroup>
         </Nav>

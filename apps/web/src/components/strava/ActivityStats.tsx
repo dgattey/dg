@@ -1,8 +1,8 @@
+import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
+import { Typography } from '@mui/material';
 import { useData } from 'api/useData';
 import { FaIcon } from 'components/FaIcon';
 import { useRelativeTimeFormat } from 'hooks/useRelativeTimeFormat';
-import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
-import { Typography } from '@mui/material';
 import { HorizontalStack } from 'ui/HorizontalStack';
 import { useFormattedDistance } from 'hooks/useFormattedDistance';
 
@@ -18,7 +18,7 @@ export function ActivityStats() {
   });
   const formattedDistance = useFormattedDistance({ distanceInMeters: activity?.distance });
 
-  if (!activity?.start_date || !activity?.distance) {
+  if (!activity?.start_date || !activity.distance) {
     return null;
   }
 

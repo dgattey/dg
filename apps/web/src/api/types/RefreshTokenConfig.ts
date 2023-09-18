@@ -1,9 +1,9 @@
-import { RawSpotifyToken, RawStravaToken } from './RawToken';
+import type { RawSpotifyToken, RawStravaToken } from './RawToken';
 
 /**
  * Any API needs to return this type at the end
  */
-type ValidatedToken = {
+export type ValidatedToken = {
   refreshToken: string;
   accessToken: string;
   expiryAt: Date;
