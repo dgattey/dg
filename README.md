@@ -15,8 +15,8 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 - `turbo lint:types` runs tsc to confirm no type errors on the same files
 - `turbo codegen` generates new GraphQL APIs from Github/Contentful
 - `turbo connect <optional branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
-- `turbo db -- db:migrate` uses Sequelize to run migrations, and you can list the status of migrations with `turbo db -- db:migrate:status`. Undo with `turbo db:migrate:undo`
-- `turbo db -- db:generate` uses Sequelize to generate a new migration file ready to be populated
+- `turbo db -- db:migrate` uses Sequelize to run migrations, and you can list the status of migrations with `turbo db -- db:migrate:status`. Undo with `turbo db -- db:migrate:undo`
+- `turbo db -- migration:generate --name <name>` uses Sequelize to generate a new migration file ready to be populated
 - `turbo webhook -- create <name>` will create a webhook subscription for the given API - for local dev and requires `dev` to be running already
 - `turbo webhook -- list <name>` will list that API's webhook subscriptions - for local dev
 - `turbo webhook -- delete <name> <id>` will delete a webhook subscription for that API - for local dev
@@ -84,13 +84,13 @@ There's only two tables, one for the tokens and one for the Strava activities, a
 
 To create and run a migration:
 
-1. Run `turbo db:generate <name>` to create a new migration file
+1. Run `turbo db -- migration:generate --name <name>` to create a new migration file
 1. Fill it in with the appropriate `up` and `down` code for what you're doing
 1. Create a new branch on Planetscale's UI to test with
-1. Connect to that branch with `turbo db:connect <branch>`
-1. In a new terminal tab, run `turbo db:migrate` to run migrations onto that branch.
+1. Connect to that branch with `turbo connect -- <branch>` and then start a new server with `turbo dev`
+1. In a new terminal tab, run `turbo db -- db:migrate` to run migrations onto that branch.
 1. If all looks good, you can deploy request from Planetscale, review, merge, and delete the branch.
-1. Migrations can be undone with `turbo db:migrate:undo`
+1. Migrations can be undone with `turbo db -- db:migrate:undo`
 
 #### Strava
 
