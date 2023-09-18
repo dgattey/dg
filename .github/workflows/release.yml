@@ -54,9 +54,11 @@ jobs:
             prodRun="--prod"
           fi
           echo "Latest tag: ${LATEST_TAG}"
-          npx vercel --cwd apps/web --token ${VERCEL_DEPLOY_TOKEN} $prodRun -b NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}" -e NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}"
+          npx vercel --token ${VERCEL_DEPLOY_TOKEN} $prodRun -b NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}" -e NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}"
         env:
           LATEST_TAG: ${{ steps.latest-version-tag.outputs.tag }}
           VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+          TURBO_TEAM: ${{ vars.TURBO_TEAM }}
