@@ -9,8 +9,8 @@ importers:
   .:
     dependencies:
       dotenv-mono:
-        specifier: github:dgattey/dotenv-mono#dgattey--fix-priority
-        version: github.com/dgattey/dotenv-mono/653223d8ba5a69a8ef0a3d67133551672b9068f6
+        specifier: github:marcocesarato/dotenv-mono#v1.3.12
+        version: github.com/marcocesarato/dotenv-mono/5b0f6ed57156025046f72f2e83dc3186a5bed877
       lefthook:
         specifier: 1.4.11
         version: 1.4.11
@@ -73,8 +73,8 @@ importers:
         specifier: workspace:*
         version: link:../../packages/db
       dotenv-mono:
-        specifier: github:dgattey/dotenv-mono#dgattey--fix-priority
-        version: github.com/dgattey/dotenv-mono/653223d8ba5a69a8ef0a3d67133551672b9068f6
+        specifier: github:marcocesarato/dotenv-mono#v1.3.12
+        version: github.com/marcocesarato/dotenv-mono/5b0f6ed57156025046f72f2e83dc3186a5bed877
       graphql:
         specifier: 16.8.0
         version: 16.8.0
@@ -161,8 +161,8 @@ importers:
         specifier: 4.0.1
         version: 4.0.1(graphql@16.8.0)
       dotenv-mono:
-        specifier: github:dgattey/dotenv-mono#dgattey--fix-priority
-        version: github.com/dgattey/dotenv-mono/653223d8ba5a69a8ef0a3d67133551672b9068f6
+        specifier: github:marcocesarato/dotenv-mono#v1.3.12
+        version: github.com/marcocesarato/dotenv-mono/5b0f6ed57156025046f72f2e83dc3186a5bed877
       eslint-config-dg:
         specifier: workspace:*
         version: link:../eslint-config-dg
@@ -176,8 +176,8 @@ importers:
   packages/db:
     dependencies:
       dotenv-mono:
-        specifier: github:dgattey/dotenv-mono#dgattey--fix-priority
-        version: github.com/dgattey/dotenv-mono/653223d8ba5a69a8ef0a3d67133551672b9068f6
+        specifier: github:marcocesarato/dotenv-mono#v1.3.12
+        version: github.com/marcocesarato/dotenv-mono/5b0f6ed57156025046f72f2e83dc3186a5bed877
       mysql2:
         specifier: 3.6.1
         version: 3.6.1
@@ -249,8 +249,8 @@ importers:
         specifier: 4.0.1
         version: 4.0.1(graphql@16.8.0)
       dotenv-mono:
-        specifier: github:dgattey/dotenv-mono#dgattey--fix-priority
-        version: github.com/dgattey/dotenv-mono/653223d8ba5a69a8ef0a3d67133551672b9068f6
+        specifier: github:marcocesarato/dotenv-mono#v1.3.12
+        version: github.com/marcocesarato/dotenv-mono/5b0f6ed57156025046f72f2e83dc3186a5bed877
       eslint-config-dg:
         specifier: workspace:*
         version: link:../eslint-config-dg
@@ -272,8 +272,8 @@ importers:
         specifier: 0.13.0
         version: 0.13.0
       dotenv-mono:
-        specifier: github:dgattey/dotenv-mono#dgattey--fix-priority
-        version: github.com/dgattey/dotenv-mono/653223d8ba5a69a8ef0a3d67133551672b9068f6
+        specifier: github:marcocesarato/dotenv-mono#v1.3.12
+        version: github.com/marcocesarato/dotenv-mono/5b0f6ed57156025046f72f2e83dc3186a5bed877
       eslint-config-dg:
         specifier: workspace:*
         version: link:../eslint-config-dg
@@ -9738,10 +9738,10 @@ packages:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
     dev: false
 
-  github.com/dgattey/dotenv-mono/653223d8ba5a69a8ef0a3d67133551672b9068f6:
-    resolution: {tarball: https://codeload.github.com/dgattey/dotenv-mono/tar.gz/653223d8ba5a69a8ef0a3d67133551672b9068f6}
+  github.com/marcocesarato/dotenv-mono/5b0f6ed57156025046f72f2e83dc3186a5bed877:
+    resolution: {tarball: https://codeload.github.com/marcocesarato/dotenv-mono/tar.gz/5b0f6ed57156025046f72f2e83dc3186a5bed877}
     name: dotenv-mono
-    version: 1.3.11
+    version: 1.3.12
     prepare: true
     requiresBuild: true
     dependencies:
