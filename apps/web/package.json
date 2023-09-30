@@ -26,7 +26,7 @@
     "animate-css-grid": "1.5.1",
     "db": "workspace:*",
     "dotenv-mono": "github:marcocesarato/dotenv-mono#v1.3.12",
-    "graphql": "16.8.0",
+    "graphql": "16.8.1",
     "graphql-request": "6.1.0",
     "lucide-react": "0.277.0",
     "mapbox-gl": "2.15.0",
