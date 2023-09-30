@@ -16,7 +16,7 @@
     "node-fetch": "3.3.2",
     "shared-core": "workspace:*",
     "tsconfig": "workspace:*",
-    "tsx": "3.12.10",
+    "tsx": "3.13.0",
     "typescript": "5.2.2"
   }
 }
