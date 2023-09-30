@@ -12,7 +12,7 @@
     "lint:types": "tsc"
   },
   "dependencies": {
-    "dotenv-mono": "github:dgattey/dotenv-mono#dgattey--fix-priority",
+    "dotenv-mono": "github:marcocesarato/dotenv-mono#v1.3.12",
     "mysql2": "3.6.1",
     "sequelize": "6.33.0",
     "sequelize-typescript": "2.1.5"

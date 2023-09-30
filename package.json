@@ -9,10 +9,10 @@
   "private": true,
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "postinstall": "[ $CI -ne 1 ] && true || lefthook install"
+    "postinstall": "lefthook install"
   },
   "dependencies": {
-    "dotenv-mono": "github:dgattey/dotenv-mono#dgattey--fix-priority",
+    "dotenv-mono": "github:marcocesarato/dotenv-mono#v1.3.12",
     "lefthook": "1.4.11"
   },
   "devDependencies": {
