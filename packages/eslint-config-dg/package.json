@@ -14,7 +14,7 @@
   "devDependencies": {
     "@vercel/style-guide": "5.0.1",
     "eslint-config-turbo": "1.10.14",
-    "globals": "13.21.0",
+    "globals": "13.22.0",
     "tsconfig": "workspace:*",
     "typescript": "5.2.2"
   }

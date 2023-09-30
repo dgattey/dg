@@ -13,7 +13,7 @@
   },
   "dependencies": {
     "dotenv-mono": "github:marcocesarato/dotenv-mono#v1.3.12",
-    "lefthook": "1.4.11"
+    "lefthook": "1.5.0"
   },
   "devDependencies": {
     "@types/node": "18.17.1",
