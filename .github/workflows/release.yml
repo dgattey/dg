@@ -56,17 +56,17 @@ jobs:
 
       - name: Install Vercel CLI
         if: ${{ steps.latest-version-tag.outputs.tag != '' }}
-        run: npm install --global vercel@latest
+        run: pnpm install --global vercel@latest
       - name: Pull Vercel Environment Information
         if: ${{ steps.latest-version-tag.outputs.tag != '' }}
-        run: vercel pull --yes --environment=production --token=${{ env.VERCEL_TOKEN }}
+        run: vercel pull --yes --environment=production --token=${{ env.VERCEL_DEPLOY_TOKEN }}
       - name: Build Project Artifacts with latest version
         if: ${{ steps.latest-version-tag.outputs.tag != '' }}
         run: |
           echo "Latest tag: ${LATEST_TAG}"
-          vercel build --prod --token=${{ env.VERCEL_TOKEN }} NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}" -e NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}"
+          vercel build --prod --token=${{ env.VERCEL_DEPLOY_TOKEN }} NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}" -e NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}"
         env:
           LATEST_TAG: ${{ steps.latest-version-tag.outputs.tag }}
       - name: Deploy Project Artifacts to Vercel
         if: ${{ steps.latest-version-tag.outputs.tag != '' }}
-        run: vercel deploy --prebuilt --prod --token=${{ env.VERCEL_TOKEN }}
+        run: vercel deploy --prebuilt --prod --token=${{ env.VERCEL_DEPLOY_TOKEN }}
