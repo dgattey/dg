@@ -54,7 +54,8 @@
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build", "topo", "lint", "lint:types", "format"]
+      "dependsOn": ["^build", "topo", "lint", "lint:types", "format"],
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "build:analyze": {
       "dependsOn": ["^build", "topo"],
