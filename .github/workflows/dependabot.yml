@@ -1,5 +1,10 @@
 name: Dependabot Automerge
 on: pull_request
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
 jobs:
   worker:
     runs-on: ubuntu-latest
