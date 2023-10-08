@@ -29,9 +29,7 @@ jobs:
       format: ${{ steps.changes.outputs.format }}
 
     steps:
-      - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v2
         with:
           run_install: false
