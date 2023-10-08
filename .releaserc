@@ -24,7 +24,7 @@
             "release": "patch"
           },
           {
-            "body": "**",
+            "header": "**",
             "release": "patch"
           }
         ],
