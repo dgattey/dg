@@ -6,13 +6,14 @@
     [
       "@semantic-release/commit-analyzer",
       {
+        "preset": "eslint",
         "releaseRules": [
           {
             "message": "*breaking*",
             "release": "major"
           },
           {
-            "type": "feat",
+            "tag": "feat",
             "release": "minor"
           },
           {
@@ -20,7 +21,8 @@
             "release": "minor"
           },
           {
-            "subject": "*",
+            "message": "*",
+            "tag": "*",
             "release": "patch"
           }
         ],
