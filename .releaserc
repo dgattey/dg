@@ -12,7 +12,7 @@
             "release": "major"
           },
           {
-            "type": "feat",
+            "tag": "feat",
             "release": "minor"
           },
           {
@@ -20,7 +20,7 @@
             "release": "minor"
           },
           {
-            "subject": "*",
+            "message": "**",
             "release": "patch"
           }
         ],
