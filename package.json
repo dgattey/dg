@@ -13,13 +13,14 @@
   },
   "dependencies": {
     "dotenv-mono": "github:marcocesarato/dotenv-mono#v1.3.12",
-    "lefthook": "1.5.0"
+    "lefthook": "1.5.1",
+    "vercel": "32.4.1"
   },
   "devDependencies": {
     "@types/node": "18.17.1",
     "prettier": "3.0.3",
     "tsconfig": "workspace:*",
-    "turbo": "1.10.14",
+    "turbo": "1.10.15",
     "typescript": "5.2.2"
   },
   "engines": {
