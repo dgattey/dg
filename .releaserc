@@ -26,10 +26,6 @@
           {
             "header": "**",
             "release": "patch"
-          },
-          {
-            "merge": "**",
-            "release": "patch"
           }
         ],
         "parserOpts": {
