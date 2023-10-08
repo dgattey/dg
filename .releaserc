@@ -22,6 +22,14 @@
           {
             "message": "**",
             "release": "patch"
+          },
+          {
+            "subject": "**",
+            "release": "patch"
+          },
+          {
+            "tag": "**",
+            "release": "patch"
           }
         ],
         "parserOpts": {
