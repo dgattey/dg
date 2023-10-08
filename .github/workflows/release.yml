@@ -27,11 +27,10 @@ jobs:
         with:
           node-version-file: .node-version
           cache: 'pnpm'
-      - run: pnpm install
       - name: Print new version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm turbo release -- --dry-run -- --branches="*"
+        run: pnpm dlx semantic-release --dry-run --branches="*"
 
   release:
     timeout-minutes: 5
