@@ -24,11 +24,7 @@
             "release": "patch"
           },
           {
-            "subject": "**",
-            "release": "patch"
-          },
-          {
-            "tag": "**",
+            "body": "**",
             "release": "patch"
           }
         ],
