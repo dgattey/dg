@@ -230,9 +230,6 @@ importers:
       '@semantic-release/changelog':
         specifier: 6.0.3
         version: 6.0.3(semantic-release@22.0.5)
-      conventional-changelog-eslint:
-        specifier: 5.0.0
-        version: 5.0.0
       semantic-release:
         specifier: 22.0.5
         version: 22.0.5(typescript@5.2.2)
@@ -4454,11 +4451,6 @@ packages:
     engines: {node: '>=16'}
     dependencies:
       compare-func: 2.0.0
-    dev: true
-
-  /conventional-changelog-eslint@5.0.0:
-    resolution: {integrity: sha512-6JtLWqAQIeJLn/OzUlYmzd9fKeNSWmQVim9kql+v4GrZwLx807kAJl3IJVc3jTYfVKWLxhC3BGUxYiuVEcVjgA==}
-    engines: {node: '>=16'}
     dev: true
 
   /conventional-changelog-writer@7.0.1:
