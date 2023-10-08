@@ -1,9 +1,7 @@
-# Releases a new version on a push to main
-name: Release
+# Tests a build and deploy to Vercel
+name: Build and deploy to Vercel
 on:
-  push:
-    branches:
-      - main
+  - push
 
 env:
   VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
@@ -32,22 +30,7 @@ jobs:
         with:
           node-version-file: .node-version
           cache: 'pnpm'
-      - name: Get pnpm store directory
-        shell: bash
-        run: |
-          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-      - uses: actions/cache@v3
-        name: Setup pnpm cache
-        with:
-          path: ${{ env.STORE_PATH }}
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-pnpm-store-
       - run: pnpm install
-      - name: Release new repo version
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm turbo release
       - uses: actions-ecosystem/action-get-latest-tag@v1
         name: Get latest version tag
         with:
