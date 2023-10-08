@@ -21,8 +21,7 @@
             "release": "minor"
           },
           {
-            "message": "*",
-            "tag": "*",
+            "message": "**",
             "release": "patch"
           }
         ],
