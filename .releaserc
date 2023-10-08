@@ -6,31 +6,22 @@
     [
       "@semantic-release/commit-analyzer",
       {
-        "preset": "angular",
         "releaseRules": [
           {
-            "type": "chore",
-            "release": "patch"
-          },
-          {
-            "type": "build",
-            "release": "patch"
-          },
-          {
-            "type": "test",
-            "release": "patch"
-          },
-          {
-            "type": "ci",
-            "release": "patch"
-          },
-          {
-            "type": "fix",
-            "release": "patch"
+            "message": "*breaking*",
+            "release": "major"
           },
           {
             "type": "feat",
             "release": "minor"
+          },
+          {
+            "message": "*feat*",
+            "release": "minor"
+          },
+          {
+            "subject": "*",
+            "release": "patch"
           }
         ],
         "parserOpts": {
