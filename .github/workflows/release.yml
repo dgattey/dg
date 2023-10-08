@@ -2,10 +2,7 @@
 # On other branches, will dry-run the release version to see what we'll release when deployed
 name: Release
 on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
+  - push
 
 env:
   VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
