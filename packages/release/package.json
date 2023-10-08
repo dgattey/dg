@@ -11,6 +11,7 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "conventional-changelog-eslint": "5.0.0",
     "@semantic-release/changelog": "6.0.3",
     "semantic-release": "22.0.5",
     "typescript": "5.2.2"
