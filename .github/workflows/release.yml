@@ -34,7 +34,7 @@ jobs:
       - name: Print new version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm turbo release --dry-run
+        run: pnpm turbo release -- --dry-run
 
   release:
     timeout-minutes: 5
