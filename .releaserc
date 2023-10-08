@@ -6,7 +6,6 @@
     [
       "@semantic-release/commit-analyzer",
       {
-        "preset": "eslint",
         "releaseRules": [
           {
             "message": "*breaking*",
