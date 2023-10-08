@@ -15,9 +15,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  release:
+  build-deploy:
     timeout-minutes: 10
-    name: Release
+    name: Build & deploy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -39,14 +39,14 @@ jobs:
 
       - name: Pull Vercel Environment Information
         if: ${{ steps.latest-version-tag.outputs.tag != '' }}
-        run: pnpm vercel pull --yes --cwd apps/web --environment=production --token=${{ env.VERCEL_DEPLOY_TOKEN }}
+        run: pnpm vercel pull --yes --environment=production --token=${{ env.VERCEL_DEPLOY_TOKEN }}
       - name: Build Project Artifacts with latest version
         if: ${{ steps.latest-version-tag.outputs.tag != '' }}
         run: |
           echo "Latest tag: ${LATEST_TAG}"
-          pnpm vercel build --prod --cwd apps/web --token=${{ env.VERCEL_DEPLOY_TOKEN }} NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}" -d
+          pnpm vercel build --prod --token=${{ env.VERCEL_DEPLOY_TOKEN }} NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}" -d
         env:
           LATEST_TAG: ${{ steps.latest-version-tag.outputs.tag }}
       - name: Deploy Project Artifacts to Vercel
         if: ${{ steps.latest-version-tag.outputs.tag != '' }}
-        run: pnpm vercel deploy --prebuilt --prod --cwd apps/web --token=${{ env.VERCEL_DEPLOY_TOKEN }}
+        run: pnpm vercel deploy --prebuilt --prod --token=${{ env.VERCEL_DEPLOY_TOKEN }}
