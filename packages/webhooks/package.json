@@ -2,7 +2,7 @@
   "name": "webhooks",
   "private": true,
   "scripts": {
-    "dev": "cloudflared --loglevel fatal tunnel run dg",
+    "dev": "brew upgrade cloudflared && cloudflared --loglevel fatal tunnel run dg",
     "webhook": "NODE_ENV=development tsx src/webhookCommand.ts",
     "format": "prettier --write .",
     "lint": "eslint . --cache --fix",
@@ -16,7 +16,7 @@
     "node-fetch": "3.3.2",
     "shared-core": "workspace:*",
     "tsconfig": "workspace:*",
-    "tsx": "3.13.0",
+    "tsx": "4.1.4",
     "typescript": "5.2.2"
   }
 }
