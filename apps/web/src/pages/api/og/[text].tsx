@@ -1,5 +1,5 @@
 import type { NextApiRequest } from 'next';
-import { ImageResponse } from 'next/server';
+import { ImageResponse } from 'next/og';
 import { LOGO_FONT, OpenGraphImage, TEXT_FONT } from 'og/OpenGraphImage';
 
 export const config = {

@@ -12,8 +12,8 @@
     "lint:types": "tsc"
   },
   "devDependencies": {
-    "@vercel/style-guide": "5.0.1",
-    "eslint-config-turbo": "1.10.15",
+    "@vercel/style-guide": "5.1.0",
+    "eslint-config-turbo": "1.10.16",
     "globals": "13.23.0",
     "tsconfig": "workspace:*",
     "typescript": "5.2.2"
