@@ -1,6 +1,6 @@
 import type { BoxProps, ContainerProps, TypographyProps } from '@mui/material';
 import { Box, Container, Typography } from '@mui/material';
-import { mixinSx } from './helpers/mixinSx';
+import { mixinSx } from '../helpers/mixinSx';
 
 /**
  * This group of items in a nav will group items together.

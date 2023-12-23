@@ -1,6 +1,6 @@
 import { Stack } from '@mui/material';
+import { HorizontalStack } from 'ui/core/HorizontalStack';
 import type { Track } from 'api/types/spotify/Track';
-import { HorizontalStack } from 'ui/HorizontalStack';
 import { AlbumImage } from './AlbumImage';
 import { ArtistList } from './ArtistList';
 import { SpotifyLogo } from './SpotifyLogo';

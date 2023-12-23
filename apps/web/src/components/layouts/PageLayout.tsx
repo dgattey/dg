@@ -1,6 +1,7 @@
 import { useRef } from 'react';
 import { SWRConfig } from 'swr';
 import { Container } from '@mui/material';
+import { Section } from 'ui/core/Section';
 import type { EndpointKey } from 'api/endpoints';
 import type { FetchedFallbackData } from 'api/fetchFallbackData';
 import { Footer } from 'components/Footer';
@@ -8,7 +9,6 @@ import { Header } from 'components/Header';
 import { Meta } from 'components/Meta';
 import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
 import { useShowScrollIndicator } from 'hooks/useShowScrollIndicator';
-import { Section } from 'ui/Section';
 
 /**
  * We have props that dictate a fallback for SWRConfig, plus children

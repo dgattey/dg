@@ -241,7 +241,6 @@ export type AssetLinkingCollections = {
 export type AssetLinkingCollectionsBookCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   locale: InputMaybe<Scalars['String']['input']>;
-  order: InputMaybe<ReadonlyArray<InputMaybe<AssetLinkingCollectionsBookCollectionOrder>>>;
   preview: InputMaybe<Scalars['Boolean']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -249,9 +248,6 @@ export type AssetLinkingCollectionsBookCollectionArgs = {
 export type AssetLinkingCollectionsContentTypeLocationCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   locale: InputMaybe<Scalars['String']['input']>;
-  order: InputMaybe<
-    ReadonlyArray<InputMaybe<AssetLinkingCollectionsContentTypeLocationCollectionOrder>>
-  >;
   preview: InputMaybe<Scalars['Boolean']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -266,56 +262,9 @@ export type AssetLinkingCollectionsEntryCollectionArgs = {
 export type AssetLinkingCollectionsProjectCollectionArgs = {
   limit?: InputMaybe<Scalars['Int']['input']>;
   locale: InputMaybe<Scalars['String']['input']>;
-  order: InputMaybe<ReadonlyArray<InputMaybe<AssetLinkingCollectionsProjectCollectionOrder>>>;
   preview: InputMaybe<Scalars['Boolean']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
 };
-
-export type AssetLinkingCollectionsBookCollectionOrder =
-  | 'author_ASC'
-  | 'author_DESC'
-  | 'readDate_ASC'
-  | 'readDate_DESC'
-  | 'sys_firstPublishedAt_ASC'
-  | 'sys_firstPublishedAt_DESC'
-  | 'sys_id_ASC'
-  | 'sys_id_DESC'
-  | 'sys_publishedAt_ASC'
-  | 'sys_publishedAt_DESC'
-  | 'sys_publishedVersion_ASC'
-  | 'sys_publishedVersion_DESC'
-  | 'title_ASC'
-  | 'title_DESC';
-
-export type AssetLinkingCollectionsContentTypeLocationCollectionOrder =
-  | 'initialZoom_ASC'
-  | 'initialZoom_DESC'
-  | 'slug_ASC'
-  | 'slug_DESC'
-  | 'sys_firstPublishedAt_ASC'
-  | 'sys_firstPublishedAt_DESC'
-  | 'sys_id_ASC'
-  | 'sys_id_DESC'
-  | 'sys_publishedAt_ASC'
-  | 'sys_publishedAt_DESC'
-  | 'sys_publishedVersion_ASC'
-  | 'sys_publishedVersion_DESC';
-
-export type AssetLinkingCollectionsProjectCollectionOrder =
-  | 'creationDate_ASC'
-  | 'creationDate_DESC'
-  | 'layout_ASC'
-  | 'layout_DESC'
-  | 'sys_firstPublishedAt_ASC'
-  | 'sys_firstPublishedAt_DESC'
-  | 'sys_id_ASC'
-  | 'sys_id_DESC'
-  | 'sys_publishedAt_ASC'
-  | 'sys_publishedAt_DESC'
-  | 'sys_publishedVersion_ASC'
-  | 'sys_publishedVersion_DESC'
-  | 'title_ASC'
-  | 'title_DESC';
 
 export type AssetOrder =
   | 'contentType_ASC'
@@ -413,6 +362,8 @@ export type BookDescriptionLinks = {
 
 export type BookDescriptionResources = {
   readonly block: ReadonlyArray<ResourceLink>;
+  readonly hyperlink: ReadonlyArray<ResourceLink>;
+  readonly inline: ReadonlyArray<ResourceLink>;
 };
 
 export type BookFilter = {
@@ -983,6 +934,8 @@ export type ProjectDescriptionLinks = {
 
 export type ProjectDescriptionResources = {
   readonly block: ReadonlyArray<ResourceLink>;
+  readonly hyperlink: ReadonlyArray<ResourceLink>;
+  readonly inline: ReadonlyArray<ResourceLink>;
 };
 
 export type ProjectFilter = {
@@ -1417,6 +1370,8 @@ export type TextBlockContentLinks = {
 
 export type TextBlockContentResources = {
   readonly block: ReadonlyArray<ResourceLink>;
+  readonly hyperlink: ReadonlyArray<ResourceLink>;
+  readonly inline: ReadonlyArray<ResourceLink>;
 };
 
 export type TextBlockFilter = {

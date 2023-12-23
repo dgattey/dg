@@ -1,5 +1,5 @@
 import type { PaletteOptions, PaletteMode } from '@mui/material';
-import { COLORS } from 'ui/theme/color';
+import { COLORS } from './color';
 
 const lightPalette: PaletteOptions = {
   primary: {

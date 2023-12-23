@@ -1,6 +1,6 @@
 import type { BoxProps, StackProps } from '@mui/material';
 import { Stack } from '@mui/material';
-import { mixinSx } from 'ui/helpers/mixinSx';
+import { mixinSx } from '../helpers/mixinSx';
 
 /**
  * Simple version of a horizontal stack using MUI's Box component
