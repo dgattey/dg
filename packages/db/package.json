@@ -1,6 +1,8 @@
 {
   "name": "db",
   "private": true,
+  "main": "client.ts",
+  "types": "client.ts",
   "scripts": {
     "dev": "pscale connect dg --port 3309",
     "connect": "pscale connect dg --port 3309",

@@ -1,6 +1,6 @@
 import { dotenvLoad } from 'dotenv-mono';
-import type { WebhookSubscriptionConfig } from 'types/WebhookSubscriptionConfig';
-import type { WebhookType } from 'types/WebhookType';
+import type { WebhookSubscriptionConfig } from '../types/WebhookSubscriptionConfig';
+import type { WebhookType } from '../types/WebhookType';
 
 dotenvLoad();
 

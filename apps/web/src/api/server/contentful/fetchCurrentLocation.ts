@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request';
-import { isNotNullish } from 'shared-core/src/typeguards';
+import { isNotNullish } from 'shared-core/helpers/typeguards';
 import type { MyLocationQuery } from 'api/types/generated/fetchCurrentLocation.generated';
 import type { MapLocation } from 'api/types/MapLocation';
 import { contentfulClient } from '../networkClients/contentfulClient';

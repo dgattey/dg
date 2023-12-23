@@ -1,6 +1,6 @@
 import type { Response } from 'node-fetch';
-import { isRecord } from 'shared-core/src/typeguards';
-import type { WebhookType } from 'types/WebhookType';
+import { isRecord } from 'shared-core/helpers/typeguards';
+import type { WebhookType } from '../types/WebhookType';
 
 /**
  * Strava's API returns errors like this

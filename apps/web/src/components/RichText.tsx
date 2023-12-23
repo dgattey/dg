@@ -3,7 +3,7 @@ import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { Divider, Stack, Typography } from '@mui/material';
-import { isNotNullish } from 'shared-core/src/typeguards';
+import { isNotNullish } from 'shared-core/helpers/typeguards';
 import { PROJECT_MAX_IMAGE_DIMENSION } from 'appConstants/imageSizes';
 import { isLink, isProject } from 'api/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
