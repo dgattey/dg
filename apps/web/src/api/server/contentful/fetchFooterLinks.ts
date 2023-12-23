@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request';
-import { isNotNullish } from 'shared-core/src/typeguards';
+import { isNotNullish } from 'shared-core/helpers/typeguards';
 import { isLink } from 'api/parsers';
 import type { Link } from 'api/types/generated/contentfulApi.generated';
 import type { FooterQuery } from 'api/types/generated/fetchFooterLinks.generated';

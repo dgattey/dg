@@ -1,4 +1,4 @@
-import type { StravaDetailedActivity } from 'db/src/models/StravaDetailedActivity';
+import type { StravaDetailedActivity } from 'db/models/StravaDetailedActivity';
 import { stravaClient } from 'api/server/networkClients/stravaClient';
 import { paredStravaActivity } from './paredStravaActivity';
 

@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { isRecord } from 'shared-core/src/typeguards';
+import { isRecord } from 'shared-core/helpers/typeguards';
 import { handleApiError, methodNotAllowedError } from 'api/handleApiError';
 import { echoStravaChallengeIfValid } from 'api/server/strava/echoStravaChallengeIfValid';
 import { syncStravaWebhookUpdateWithDb } from 'api/server/strava/syncStravaWebhookUpdateWithDb';

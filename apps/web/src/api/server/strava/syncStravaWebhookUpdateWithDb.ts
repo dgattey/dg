@@ -1,4 +1,4 @@
-import { db } from 'db/src/client';
+import { db } from 'db';
 import type { StravaWebhookEvent } from 'api/types/StravaWebhookEvent';
 import { fetchStravaActivityFromApi } from './fetchStravaActivityFromApi';
 
