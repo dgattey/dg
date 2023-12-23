@@ -9,8 +9,8 @@ import { faQuestion } from '@fortawesome/free-solid-svg-icons/faQuestion';
 import NextLink from 'next/link';
 import type { LinkProps as MuiLinkProps, ButtonProps } from '@mui/material';
 import { Link as MuiLink, Tooltip, Button } from '@mui/material';
-import { FaIcon } from 'components/FaIcon';
 import type { SxProps } from 'ui/theme';
+import { FaIcon } from 'components/FaIcon';
 
 type BaseLinkProps = {
   title?: string;

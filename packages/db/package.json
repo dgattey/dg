@@ -10,7 +10,7 @@
     "build:analyze": "pscale connect dg --port 3309",
     "db": "sequelize",
     "format": "prettier --write .",
-    "lint": "eslint . --cache --fix",
+    "lint": "eslint . --fix",
     "lint:types": "tsc"
   },
   "dependencies": {

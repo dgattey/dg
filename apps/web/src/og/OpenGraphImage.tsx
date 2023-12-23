@@ -1,5 +1,5 @@
-import { BackgroundPattern } from 'og/BackgroundPattern';
 import { COLORS } from 'ui/theme/color';
+import { BackgroundPattern } from 'og/BackgroundPattern';
 
 export const TEXT_FONT = 'SF Pro Text';
 export const LOGO_FONT = 'SF Pro Text Black';

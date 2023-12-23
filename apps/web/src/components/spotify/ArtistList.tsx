@@ -3,10 +3,10 @@
 
 import { Fragment } from 'react';
 import { Typography } from '@mui/material';
+import { truncated } from 'ui/helpers/truncated';
 import type { Artist } from 'api/types/spotify/Track';
 import { Link } from 'components/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
-import { truncated } from 'helpers/truncated';
 
 type ArtistListProps = {
   artists: Array<Artist>;

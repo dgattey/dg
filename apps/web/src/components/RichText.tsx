@@ -4,11 +4,11 @@ import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { Divider, Stack, Typography } from '@mui/material';
 import { isNotNullish } from 'shared-core/helpers/typeguards';
+import type { SxProps } from 'ui/theme';
 import { PROJECT_MAX_IMAGE_DIMENSION } from 'appConstants/imageSizes';
 import { isLink, isProject } from 'api/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/types/generated/contentfulApi.generated';
 import { ProjectCard } from 'components/homepage/ProjectCard';
-import type { SxProps } from 'ui/theme';
 import { Image } from './Image';
 import { Link } from './Link';
 
