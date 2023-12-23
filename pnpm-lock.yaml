@@ -152,6 +152,25 @@ importers:
         specifier: 5.3.3
         version: 5.3.3
 
+  packages/api:
+    dependencies:
+      shared-core:
+        specifier: workspace:*
+        version: link:../shared-core
+    devDependencies:
+      dotenv-mono:
+        specifier: 1.3.13
+        version: 1.3.13
+      eslint-config-dg:
+        specifier: workspace:*
+        version: link:../eslint-config-dg
+      tsconfig:
+        specifier: workspace:*
+        version: link:../tsconfig
+      typescript:
+        specifier: 5.3.3
+        version: 5.3.3
+
   packages/codegen:
     devDependencies:
       '@graphql-codegen/cli':
