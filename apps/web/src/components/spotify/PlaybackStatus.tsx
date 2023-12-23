@@ -1,8 +1,8 @@
 import { Music } from 'lucide-react';
 import { Typography } from '@mui/material';
+import { HorizontalStack } from 'ui/core/HorizontalStack';
 import type { Track } from 'api/types/spotify/Track';
 import { useRelativeTimeFormat } from 'hooks/useRelativeTimeFormat';
-import { HorizontalStack } from 'ui/HorizontalStack';
 
 type PlaybackStatusProps = {
   playedAt?: Track['played_at'];

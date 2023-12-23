@@ -3,8 +3,8 @@ import type { Theme, SxProps as MuiSxProps } from '@mui/material';
 import { responsiveFontSizes } from '@mui/material';
 import type { CssVarsTheme, CssVarsThemeOptions } from '@mui/material/styles';
 import { experimental_extendTheme as extendTheme } from '@mui/material/styles';
-import { getShape } from 'ui/theme/shape';
-import { getTypography } from 'ui/theme/typography';
+import { getShape } from './shape';
+import { getTypography } from './typography';
 import { getShadows } from './extraShadows';
 import { getPalette } from './palette';
 

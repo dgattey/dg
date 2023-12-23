@@ -1,7 +1,7 @@
 import { Stack } from '@mui/material';
+import { Section } from 'ui/core/Section';
 import { Meta } from 'components/Meta';
 import { Link } from 'components/Link';
-import { Section } from 'ui/Section';
 
 type ErrorLayoutProps = {
   children: React.ReactNode;

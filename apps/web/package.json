@@ -39,6 +39,7 @@
     "shared-core": "workspace:*",
     "sharp": "0.33.1",
     "swr": "2.2.4",
+    "ui": "workspace:*",
     "use-breakpoint": "4.0.1",
     "webpack": "5.89.0"
   },

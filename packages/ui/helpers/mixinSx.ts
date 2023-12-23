@@ -1,5 +1,5 @@
 import { isNotNullish } from 'shared-core/helpers/typeguards';
-import type { SxProps } from 'ui/theme';
+import type { SxProps } from '../theme';
 
 /**
  * Used to _safely_ mix together multiple SxProps objects.

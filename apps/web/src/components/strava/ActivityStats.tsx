@@ -1,9 +1,9 @@
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import { Typography } from '@mui/material';
+import { HorizontalStack } from 'ui/core/HorizontalStack';
 import { useData } from 'api/useData';
 import { FaIcon } from 'components/FaIcon';
 import { useRelativeTimeFormat } from 'hooks/useRelativeTimeFormat';
-import { HorizontalStack } from 'ui/HorizontalStack';
 import { useFormattedDistance } from 'hooks/useFormattedDistance';
 
 /**

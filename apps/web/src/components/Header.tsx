@@ -1,11 +1,11 @@
 import { useContext } from 'react';
 import { Box, alpha } from '@mui/material';
+import { Section } from 'ui/core/Section';
+import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
+import type { SxProps } from 'ui/theme';
 import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
 import { ScrollUpButton } from 'components/ScrollUpButton';
-import { Section } from 'ui/Section';
-import { Nav, NavGroup, NavItem } from 'ui/Nav';
 import { ColorSchemeToggle } from 'components/ColorSchemeToggle';
-import type { SxProps } from 'ui/theme';
 import { useColorScheme } from 'hooks/useColorScheme';
 import { Logo } from './Logo';
 

@@ -1,6 +1,6 @@
 import CssBaseline from '@mui/material/CssBaseline';
 import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
-import { getTheme } from 'ui/theme';
+import { getTheme } from '.';
 
 /**
  * Created just once per app lifecycle
