@@ -14,7 +14,7 @@ export class StravaActivity extends Model {
   @PrimaryKey
   @Unique
   @Column(DataType.BIGINT)
-  id!: number;
+  declare id: number;
 
   @Column(DataType.DATE)
   activityStartDate!: Date;
