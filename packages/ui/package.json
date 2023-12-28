@@ -3,13 +3,14 @@
   "private": true,
   "scripts": {
     "format": "prettier --write .",
-    "lint": "eslint . --cache --fix",
+    "lint": "eslint . --fix",
     "lint:types": "tsc"
   },
   "dependencies": {
     "@mui/material": "5.15.1",
     "react": "18.2.0",
-    "shared-core": "workspace:*"
+    "shared-core": "workspace:*",
+    "use-breakpoint": "4.0.1"
   },
   "devDependencies": {
     "@types/react": "18.2.45",

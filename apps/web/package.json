@@ -7,7 +7,7 @@
     "build:analyze": "ANALYZE=true next build",
     "build:serve": "next start",
     "format": "prettier --write .",
-    "lint": "eslint . --cache --fix",
+    "lint": "eslint . --fix",
     "lint:types": "tsc",
     "clean": "rm -rf .next"
   },
@@ -40,7 +40,6 @@
     "sharp": "0.33.1",
     "swr": "2.2.4",
     "ui": "workspace:*",
-    "use-breakpoint": "4.0.1",
     "webpack": "5.89.0"
   },
   "devDependencies": {

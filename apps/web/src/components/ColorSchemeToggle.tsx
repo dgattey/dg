@@ -1,6 +1,6 @@
 import { Stack, Switch, switchClasses } from '@mui/material';
+import { useColorScheme } from 'ui/theme/useColorScheme';
 import { ColorSchemeIcon } from 'components/ColorSchemeIcon';
-import { useColorScheme } from 'hooks/useColorScheme';
 
 const HEIGHT_PX = 24;
 const WIDTH_PX = 48;

@@ -1,9 +1,9 @@
 import { Suspense, useState } from 'react';
 import dynamic from 'next/dynamic';
+import { useColorScheme } from 'ui/theme/useColorScheme';
 import { useData } from 'api/useData';
 import type { ContentCardProps } from 'components/ContentCard';
 import { MapContentCard } from 'components/maps/MapContentCard';
-import { useColorScheme } from 'hooks/useColorScheme';
 
 type MapPreviewCardProps = Pick<ContentCardProps, 'turnOnAnimation'>;
 

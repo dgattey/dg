@@ -1,10 +1,10 @@
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import { Typography } from '@mui/material';
 import { HorizontalStack } from 'ui/core/HorizontalStack';
+import { formattedDistance } from 'shared-core/helpers/formattedDistance';
 import { useData } from 'api/useData';
 import { FaIcon } from 'components/FaIcon';
 import { useRelativeTimeFormat } from 'hooks/useRelativeTimeFormat';
-import { useFormattedDistance } from 'hooks/useFormattedDistance';
 
 /**
  * Shows a horizontal stack of stats for the latest strava activity
@@ -16,7 +16,7 @@ export function ActivityStats() {
     fromDate: activity?.start_date,
     capitalized: true,
   });
-  const formattedDistance = useFormattedDistance({ distanceInMeters: activity?.distance });
+  const distance = formattedDistance({ distanceInMeters: activity?.distance });
 
   if (!activity?.start_date || !activity.distance) {
     return null;
@@ -36,7 +36,7 @@ export function ActivityStats() {
         }}
       >
         <FaIcon icon={faStrava} />
-        <Typography variant="caption">{formattedDistance}</Typography>
+        <Typography variant="caption">{distance}</Typography>
       </HorizontalStack>
       <Typography variant="caption">{formattedDate}</Typography>
     </HorizontalStack>

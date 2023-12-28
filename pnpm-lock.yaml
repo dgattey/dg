@@ -120,9 +120,6 @@ importers:
       ui:
         specifier: workspace:*
         version: link:../../packages/ui
-      use-breakpoint:
-        specifier: 4.0.1
-        version: 4.0.1(react-dom@18.2.0)(react@18.2.0)
       webpack:
         specifier: 5.89.0
         version: 5.89.0
@@ -287,6 +284,9 @@ importers:
       shared-core:
         specifier: workspace:*
         version: link:../shared-core
+      use-breakpoint:
+        specifier: 4.0.1
+        version: 4.0.1(react-dom@18.2.0)(react@18.2.0)
     devDependencies:
       '@types/react':
         specifier: 18.2.45

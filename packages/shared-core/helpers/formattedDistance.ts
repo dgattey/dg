@@ -14,7 +14,7 @@ function metersToMiles(value: number) {
  * Converts meters to miles and outputs a nicely formatted string
  * for display usage.
  */
-export function useFormattedDistance({
+export function formattedDistance({
   distanceInMeters,
 }: {
   distanceInMeters: number | undefined | null;

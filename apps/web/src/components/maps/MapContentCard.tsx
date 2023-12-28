@@ -1,7 +1,7 @@
 import type { CardProps } from '@mui/material';
+import { mixinSx } from 'ui/helpers/mixinSx';
 import type { ContentCardProps } from 'components/ContentCard';
 import { ContentCard } from 'components/ContentCard';
-import { mixinSx } from 'ui/helpers/mixinSx';
 
 // In px, the min/max size of the card - matches standard size
 const MIN_DIMENSION = 297;

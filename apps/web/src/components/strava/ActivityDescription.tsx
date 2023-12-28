@@ -1,5 +1,5 @@
+import { truncated } from 'ui/helpers/truncated';
 import { useData } from 'api/useData';
-import { truncated } from 'helpers/truncated';
 import { Link } from 'components/Link';
 
 /**

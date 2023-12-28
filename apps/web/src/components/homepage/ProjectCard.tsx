@@ -1,10 +1,10 @@
 import { useState } from 'react';
+import { useCurrentImageSizes } from 'ui/helpers/useCurrentImageSizes';
 import type { Project } from 'api/types/generated/contentfulApi.generated';
 import type { ContentCardProps } from 'components/ContentCard';
 import { ContentCard } from 'components/ContentCard';
 import { HoverableContainer } from 'components/HoverableContainer';
 import { Image } from 'components/Image';
-import { useCurrentImageSizes } from 'hooks/useCurrentImageSizes';
 
 type ProjectCardProps = Project & Pick<ContentCardProps, 'turnOnAnimation'>;
 

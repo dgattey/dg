@@ -1,9 +1,5 @@
 import { useBreakpoint } from 'use-breakpoint';
-import {
-  BREAKPOINTS_MIN_SIZES,
-  PROJECT_2X_IMAGE_SIZES,
-  PROJECT_IMAGE_SIZES,
-} from 'appConstants/imageSizes';
+import { BREAKPOINTS_MIN_SIZES, PROJECT_2X_IMAGE_SIZES, PROJECT_IMAGE_SIZES } from './imageSizes';
 
 /**
  * Grabs the current breakpoint and returns the appropriate image sizes for the current
