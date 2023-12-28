@@ -50,16 +50,21 @@ jobs:
           echo "Changed files were: $CHANGED"
           echo "$OUTPUTNAME=$CHANGED" >> $GITHUB_OUTPUT
 
-  # If anything is output, fails this job!
-  fail-on-diff:
+  # This will output error if any of the above steps changed files
+  diff-output:
+    name: Diff files after autochecks
     timeout-minutes: 5
     runs-on: ubuntu-latest
     needs: autocheck
-    if: ${{ needs.autocheck.outputs.lint || needs.autocheck.outputs.linttypes || needs.autocheck.outputs.format }}
     steps:
-      - name: Exiting because of changed files
+      - name: Autochecked files changed output
+        if: ${{ needs.autocheck.outputs.lint || needs.autocheck.outputs.linttypes || needs.autocheck.outputs.format }}
         run: |
           echo "Changed from lint: ${{needs.autocheck.outputs.lint || 'none'}}"
           echo "Type check changed files: ${{needs.autocheck.outputs.linttypes || 'none'}}"
           echo "Files formatted: ${{needs.autocheck.outputs.format || 'none'}}"
           exit 1
+      - name: No changes found
+        if: ${{ !needs.autocheck.outputs.lint && !needs.autocheck.outputs.linttypes && !needs.autocheck.outputs.format }}
+        run: |
+          echo "No changes from autochecks"
