@@ -2,8 +2,8 @@ import { useEffect, useMemo, useRef } from 'react';
 import type { MapRef } from 'react-map-gl';
 import { AttributionControl, Map as MapGL } from 'react-map-gl';
 import { Box, useTheme } from '@mui/material';
+import { useColorScheme } from 'ui/theme/useColorScheme';
 import type { MapLocation } from 'api/types/MapLocation';
-import { useColorScheme } from 'hooks/useColorScheme';
 import { StandardControls } from './StandardControls';
 
 export type MapProps = {

@@ -1,6 +1,6 @@
 import { Marker as MapMarker } from 'react-map-gl';
 import { Box } from '@mui/material';
-import { MAP_MARKER_IMAGE_SIZE } from 'appConstants/imageSizes';
+import { MAP_MARKER_IMAGE_SIZE } from 'ui/helpers/imageSizes';
 import type { MapLocation } from 'api/types/MapLocation';
 import { Image } from 'components/Image';
 

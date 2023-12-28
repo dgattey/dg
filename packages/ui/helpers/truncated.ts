@@ -1,4 +1,4 @@
-import type { SxProps } from '../theme';
+import type { SxProps } from '@mui/material';
 
 /**
  * Returns styling to use to truncate to a specified number of
