@@ -7,6 +7,6 @@
     "target": "ESNext",
     "lib": ["ESNext"],
     "module": "ESNext",
-    "jsx": "preserve"
+    "jsx": "react-jsx"
   }
 }
