@@ -7,13 +7,13 @@
     "lint:types": "tsc"
   },
   "dependencies": {
-    "@mui/material": "5.15.1",
+    "@mui/material": "5.15.2",
     "react": "18.2.0",
     "shared-core": "workspace:*",
     "use-breakpoint": "4.0.1"
   },
   "devDependencies": {
-    "@types/react": "18.2.45",
+    "@types/react": "18.2.46",
     "dotenv-mono": "1.3.13",
     "eslint-config-dg": "workspace:*",
     "tsconfig": "workspace:*",
