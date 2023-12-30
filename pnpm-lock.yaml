@@ -129,6 +129,9 @@ importers:
       webpack:
         specifier: 5.89.0
         version: 5.89.0
+      wretch:
+        specifier: 2.8.0
+        version: 2.8.0
     devDependencies:
       '@next/eslint-plugin-next':
         specifier: 14.0.4
@@ -185,6 +188,9 @@ importers:
       shared-core:
         specifier: workspace:*
         version: link:../shared-core
+      wretch:
+        specifier: 2.8.0
+        version: 2.8.0
     devDependencies:
       dotenv-mono:
         specifier: 1.3.13
@@ -11408,6 +11414,11 @@ packages:
 
   /wrappy@1.0.2:
     resolution: {integrity: sha512-l4Sp/DRseor9wL6EvV2+TuQn63dMkPjZ/sp9XkghTEbV9KlPS1xUsZ3u7/IQO4wxtcFB4bgpQPRcR3QCvezPcQ==}
+
+  /wretch@2.8.0:
+    resolution: {integrity: sha512-MNYh+lukFfFgcmVpvxv0KsQt2LtAPvKFfLNcLGpCMiHTD3ndSoQ3/k5fGOCPI1J7CgN1mYAbp9mhPFFUGTzUeg==}
+    engines: {node: '>=14'}
+    dev: false
 
   /ws@7.5.9:
     resolution: {integrity: sha512-F+P9Jil7UiSKSkppIiD94dN07AwvFixvLIj1Og1Rl9GGMuNipJnV9JzjD6XuqmAeiswGvUmNLjr5cFuXwNS77Q==}
