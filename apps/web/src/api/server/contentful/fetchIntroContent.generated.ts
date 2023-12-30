@@ -1,4 +1,4 @@
-import type * as Types from './contentfulApi.generated';
+import type * as Types from './api.generated';
 
 export type IntroBlockQueryVariables = Types.Exact<{ [key: string]: never }>;
 

@@ -2,7 +2,7 @@ import { Container } from '@mui/material';
 import { Section } from 'ui/core/Section';
 import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
 import { HorizontalStack } from 'ui/core/HorizontalStack';
-import type { Link as LinkType } from 'api/types/generated/contentfulApi.generated';
+import type { Link as LinkType } from 'api/server/contentful/api.generated';
 import { useData } from 'api/useData';
 import { Link } from './Link';
 

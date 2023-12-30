@@ -81,8 +81,7 @@
     },
     "codegen": {
       "cache": false,
-      "inputs": ["apps/web/src/api/server/*"],
-      "outputs": ["apps/web/src/api/types/generated/*"]
+      "inputs": ["apps/web/src/api/server/*"]
     },
     "webhook": {
       "cache": false

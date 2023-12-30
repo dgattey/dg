@@ -120,7 +120,7 @@ export function Meta({ title, description }: MetaProps) {
 
   // Construct url-encoded title and subtitle for the og image
   const imageTitle = encodeURIComponent(title ?? SITE_NAME);
-  const imageSubtitle = encodeURIComponent(title === HOMEPAGE_TITLE ? SITE_NAME : HOMEPAGE_TITLE);
+  const imageSubtitle = encodeURIComponent(title ? SITE_NAME : HOMEPAGE_TITLE);
   const theme = useTheme();
 
   return (

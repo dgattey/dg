@@ -1,4 +1,4 @@
-import type * as Types from './githubApi.generated';
+import type * as Types from './api.generated';
 
 export type GithubRepoVersionQueryVariables = Types.Exact<{ [key: string]: never }>;
 

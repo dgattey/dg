@@ -1,6 +1,6 @@
 import { gql } from 'graphql-request';
-import type { GithubRepoVersionQuery } from 'api/types/generated/fetchRepoVersion.generated';
 import { githubClient } from '../networkClients/githubClient';
+import type { GithubRepoVersionQuery } from './fetchRepoVersion.generated';
 
 /**
  * This, strictly speaking, is usually overkill. We fetch the 100 most recently

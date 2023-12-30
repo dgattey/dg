@@ -48,7 +48,6 @@ module.exports = {
     '.vercel/',
     '.turbo/',
     '**/*.generated.*',
-    '**/generated/*',
     'migrations/',
   ],
   rules,

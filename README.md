@@ -61,7 +61,7 @@ Pretty standard Next app here. `/public` contains static files, `/src` contains 
 
 - [MUI System](https://mui.com/system/getting-started/overview/) provides the styling system for layouts/usages of `sx` on props, running on `emotion` under the hood.
 
-- [GraphQL Codegen](https://www.graphql-code-generator.com) makes all the `generated` files. It reads Github + Contentful's API schema + creates types out of them automatically. I run it on command when I write new queries/etc to get their types.
+- [GraphQL Codegen](https://www.graphql-code-generator.com) makes all the `*.generated.ts` files. It reads Github + Contentful's API schema + creates types out of them automatically. I run it on command when I write new queries/etc to get their types.
 
 - [PlanetScale](https://planetscale.com) powers a distributed DB. This DB is used to persist auth tokens for Spotify/Strava beyond the lifetime of a deploy + refresh the token as needed.
 

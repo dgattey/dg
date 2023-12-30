@@ -26,6 +26,3 @@ npm-debug.log*
 .vercel
 tsconfig.tsbuildinfo
 .eslintcache
-
-# Generated files
-*/api/server/generated
