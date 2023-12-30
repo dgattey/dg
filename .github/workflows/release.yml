@@ -29,7 +29,7 @@ jobs:
           node-version-file: .node-version
           cache: 'pnpm'
       - run: pnpm install
-      - name: Print new version
+      - name: Dry run release onto main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: pnpm turbo release -- --dry-run --branches="main"
