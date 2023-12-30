@@ -6,7 +6,7 @@ import { Divider, Stack, Typography } from '@mui/material';
 import { isNotNullish } from 'shared-core/helpers/typeguards';
 import type { SxProps } from 'ui/theme';
 import { PROJECT_MAX_IMAGE_DIMENSION } from 'ui/helpers/imageSizes';
-import { isLink, isProject } from 'api/parsers';
+import { isLink, isProject } from 'api/server/contentful/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/server/contentful/api.generated';
 import { ProjectCard } from 'components/homepage/ProjectCard';
 import { Image } from './Image';

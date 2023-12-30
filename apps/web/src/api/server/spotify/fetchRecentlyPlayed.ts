@@ -1,7 +1,7 @@
-import type { CurrentlyPlaying } from 'api/types/spotify/CurrentlyPlaying';
-import type { RecentlyPlayed } from 'api/types/spotify/RecentlyPlayed';
-import type { Track } from 'api/types/spotify/Track';
 import { spotifyClient } from '../networkClients/spotifyClient';
+import type { CurrentlyPlaying } from './CurrentlyPlaying';
+import type { RecentlyPlayed } from './RecentlyPlayed';
+import type { Track } from './Track';
 
 const CURRENTLY_PLAYING_RESOURCE = 'me/player/currently-playing';
 const RECENTLY_PLAYED_RESOURCE = 'me/player/recently-played?limit=1';

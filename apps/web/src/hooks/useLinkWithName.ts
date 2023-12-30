@@ -1,5 +1,5 @@
 import { useMemo } from 'react';
-import { findLinkWithName } from 'api/parsers';
+import { findLinkWithName } from 'api/server/contentful/parsers';
 import type { Link as LinkProps } from 'api/server/contentful/api.generated';
 import { useData } from 'api/useData';
 

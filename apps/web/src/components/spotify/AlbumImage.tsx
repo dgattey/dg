@@ -1,5 +1,5 @@
 import { Card } from '@mui/material';
-import type { Track } from 'api/types/spotify/Track';
+import type { Track } from 'api/server/spotify/Track';
 import { Image } from 'components/Image';
 import { Link } from 'components/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';

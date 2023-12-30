@@ -1,8 +1,8 @@
 // There's a lot of camelcase thanks to Spotify
 /* eslint-disable camelcase */
 
-import type { RefreshTokenConfig } from 'api/types/RefreshTokenConfig';
-import type { RawSpotifyToken, RawStravaToken } from 'api/types/RawToken';
+import type { RefreshTokenConfig } from './RefreshTokenConfig';
+import type { RawSpotifyToken, RawStravaToken } from './RawToken';
 
 /**
  * We "expire" tokens 30 seconds early so we don't run into problems near the end

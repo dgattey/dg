@@ -5,7 +5,7 @@ import type { ContentCardProps } from 'components/ContentCard';
 import { Map } from 'components/maps/Map';
 import { Marker } from 'components/maps/Marker';
 import { Control } from 'components/maps/Control';
-import type { MapLocation } from 'api/types/MapLocation';
+import type { MapLocation } from 'api/server/contentful/MapLocation';
 import { MapContentCard } from './MapContentCard';
 
 type FullMapCardProps = Pick<ContentCardProps, 'turnOnAnimation'> & {

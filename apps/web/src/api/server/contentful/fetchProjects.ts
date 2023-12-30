@@ -1,6 +1,6 @@
 import { gql } from 'graphql-request';
-import { isProject } from 'api/parsers';
 import { contentfulClient } from '../networkClients/contentfulClient';
+import { isProject } from './parsers';
 import type { Project } from './api.generated';
 import type { ProjectsQuery } from './fetchProjects.generated';
 
