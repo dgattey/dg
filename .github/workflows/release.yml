@@ -32,7 +32,7 @@ jobs:
       - name: Dry run release onto main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm turbo release -- --dry-run --branches="${{ github.ref_name }}"
+        run: pnpm turbo release -- --dry-run --branches="main, ${{ github.ref_name }}"
 
   release:
     timeout-minutes: 5
