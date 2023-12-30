@@ -1,6 +1,6 @@
 import { gql } from 'graphql-request';
-import { isTextBlock } from 'api/parsers';
-import { contentfulClient } from '../networkClients/contentfulClient';
+import { contentfulClient } from './contentfulClient';
+import { isTextBlock } from './parsers';
 import type { TextBlock } from './api.generated';
 import type { IntroBlockQuery } from './fetchIntroContent.generated';
 

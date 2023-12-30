@@ -3,6 +3,7 @@
   "display": "Next.js",
   "extends": "./base.json",
   "compilerOptions": {
+    "baseUrl": ".",
     "target": "ESNext",
     "lib": ["dom", "dom.iterable", "ESNext"],
     "allowJs": true,
@@ -17,6 +18,6 @@
       }
     ]
   },
-  "include": ["src", "next-env.d.ts"],
+  "include": ["src", "next.config.js", "next-env.d.ts"],
   "exclude": ["node_modules", "**/*/dist", "**/*/build", "**/*/.next"]
 }

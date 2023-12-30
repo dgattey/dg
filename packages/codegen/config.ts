@@ -1,13 +1,19 @@
 import type { CodegenConfig } from '@graphql-codegen/cli';
 import { dotenvLoad } from 'dotenv-mono';
+import { invariant } from 'shared-core/helpers/invariant';
 import { createApiGenerator } from './createApiGenerator';
 
 dotenvLoad();
 
+const { CONTENTFUL_ACCESS_TOKEN, CONTENTFUL_SPACE_ID, GITHUB_AUTHENTICATION_TOKEN } = process.env;
+invariant(CONTENTFUL_ACCESS_TOKEN, 'Missing CONTENTFUL_ACCESS_TOKEN env variable');
+invariant(CONTENTFUL_SPACE_ID, 'Missing CONTENTFUL_SPACE_ID env variable');
+invariant(GITHUB_AUTHENTICATION_TOKEN, 'Missing GITHUB_AUTHENTICATION_TOKEN env variable');
+
 // For the Contentful API
 const contentfulGenerators = createApiGenerator('contentful', {
-  schemaEndpoint: `https://graphql.contentful.com/content/v1/spaces/${process.env.CONTENTFUL_SPACE_ID}`,
-  token: process.env.CONTENTFUL_ACCESS_TOKEN ?? '',
+  schemaEndpoint: `https://graphql.contentful.com/content/v1/spaces/${CONTENTFUL_SPACE_ID}`,
+  token: CONTENTFUL_ACCESS_TOKEN,
   onlyOperationTypes: false,
   scalars: {
     DateTime: 'string',
@@ -21,7 +27,7 @@ const contentfulGenerators = createApiGenerator('contentful', {
 // For the Github API
 const githubGenerators = createApiGenerator('github', {
   schemaEndpoint: 'https://api.github.com/graphql',
-  token: process.env.GITHUB_AUTHENTICATION_TOKEN ?? '',
+  token: GITHUB_AUTHENTICATION_TOKEN,
   onlyOperationTypes: true,
   scalars: {
     Base64String: 'string',

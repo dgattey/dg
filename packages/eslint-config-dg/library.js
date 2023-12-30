@@ -5,8 +5,7 @@ const project = resolve(process.cwd(), 'tsconfig.json');
 
 /*
  * This is a custom ESLint configuration for use with
- * internal (bundled by their consumer) libraries
- * that utilize React.
+ * internal (bundled by their consumer) libraries.
  *
  * This config extends the Vercel Engineering Style Guide.
  * For more information, see https://github.com/vercel/style-guide
@@ -15,11 +14,9 @@ const project = resolve(process.cwd(), 'tsconfig.json');
 
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
-  extends: [
-    '@vercel/style-guide/eslint/browser',
-    '@vercel/style-guide/eslint/typescript',
-    '@vercel/style-guide/eslint/react',
-  ].map((importPath) => require.resolve(importPath)),
+  extends: ['@vercel/style-guide/eslint/browser', '@vercel/style-guide/eslint/typescript'].map(
+    (importPath) => require.resolve(importPath),
+  ),
   parser: '@typescript-eslint/parser',
   parserOptions: {
     project,

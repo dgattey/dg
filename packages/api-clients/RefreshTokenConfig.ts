@@ -1,20 +1,18 @@
-import type { RawSpotifyToken, RawStravaToken } from './RawToken';
-
 /**
  * Any API needs to return this type at the end
  */
-export type ValidatedToken = {
+export type ValidatedToken = Readonly<{
   refreshToken: string;
   accessToken: string;
   expiryAt: Date;
-};
+}>;
 
 /**
  * Represents a config for a particular token key
  */
-export type RefreshTokenConfig = {
+export type RefreshTokenConfig = Readonly<{
   /**
-   * The URL for the API
+   * The URL for the refresh token endpoint on the API
    */
   endpoint: string;
 
@@ -31,8 +29,5 @@ export type RefreshTokenConfig = {
   /**
    * Throws an error if anything's off about our data, otherwise returns the data
    */
-  validate: (
-    rawData: RawStravaToken | RawSpotifyToken,
-    existingRefreshToken: string,
-  ) => ValidatedToken;
-};
+  validate: (rawData: unknown, existingRefreshToken: string) => ValidatedToken;
+}>;

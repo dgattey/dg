@@ -5,16 +5,6 @@ const rules = {
   // Too much hassle/overhead with these on
   '@typescript-eslint/explicit-function-return-type': 'off',
   'eslint-comments/require-description': 'off',
-  // We want to enable prop spreading (i.e. <Component {...props} />) since it allows us to easily pass props to child components
-  'react/jsx-props-no-spreading': 'off',
-  // Never prefer arrow functions for named component definitions
-  'react/function-component-definition': [
-    'error',
-    {
-      namedComponents: 'function-declaration',
-      unnamedComponents: 'arrow-function',
-    },
-  ],
   // Arrays should always be the generic kind
   '@typescript-eslint/array-type': ['error', { default: 'generic' }],
   // The typescript version of no-return-await takes over to add a few okay cases
@@ -30,8 +20,6 @@ const rules = {
   '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
   // We always want types since we run into errors with interfaces and type guards otherwise
   '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
-  // In Typescript, default props are supported as default arguments
-  'react/require-default-props': 'off',
   // There's a typescript option `noFallthroughCasesInSwitch` that's more robust and allows for union types to have no default fallthrough. Preferred!
   'default-case': 'off',
   // Typescript makes this obsolete, as it'll warn if there's a value returned that's
@@ -72,6 +60,23 @@ const rules = {
   ],
 };
 
+/** @type {import('eslint').Linter.Config['rules']} */
+const reactRules = {
+  // We want to enable prop spreading (i.e. <Component {...props} />) since it allows us to easily pass props to child components
+  'react/jsx-props-no-spreading': 'off',
+  // Never prefer arrow functions for named component definitions
+  'react/function-component-definition': [
+    'error',
+    {
+      namedComponents: 'function-declaration',
+      unnamedComponents: 'arrow-function',
+    },
+  ],
+  // In Typescript, default props are supported as default arguments
+  'react/require-default-props': 'off',
+};
+
 module.exports = {
+  reactRules,
   rules,
 };

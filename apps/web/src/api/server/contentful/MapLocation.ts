@@ -1,5 +1,5 @@
-import type { Asset } from 'api/server/contentful/api.generated';
-import type { MyLocationQuery } from 'api/server/contentful/fetchCurrentLocation.generated';
+import type { Asset } from './api.generated';
+import type { MyLocationQuery } from './fetchCurrentLocation.generated';
 
 /**
  * Represents a location along with some metadata
