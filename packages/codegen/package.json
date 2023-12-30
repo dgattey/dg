@@ -8,6 +8,9 @@
     "lint": "eslint . --fix",
     "lint:types": "tsc"
   },
+  "dependencies": {
+    "shared-core": "workspace:*"
+  },
   "devDependencies": {
     "@graphql-codegen/cli": "5.0.0",
     "@graphql-codegen/near-operation-file-preset": "3.0.0",

@@ -1,0 +1,15 @@
+import { createClient } from 'api-clients/authenticatedGraphQLClient';
+import { invariant } from 'shared-core/helpers/invariant';
+
+const SPACE_ID = process.env.CONTENTFUL_SPACE_ID;
+const ACCESS_TOKEN = process.env.CONTENTFUL_ACCESS_TOKEN;
+invariant(SPACE_ID, 'Missing CONTENTFUL_SPACE_ID env variable');
+invariant(ACCESS_TOKEN, 'Missing CONTENTFUL_ACCESS_TOKEN env variable');
+
+/**
+ * Use this GraphQL client to make requests to Contentful from the server.
+ */
+export const contentfulClient = createClient({
+  endpoint: `https://graphql.contentful.com/content/v1/spaces/${SPACE_ID}`,
+  accessToken: ACCESS_TOKEN,
+});

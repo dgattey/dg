@@ -1,5 +1,5 @@
 import { gql } from 'graphql-request';
-import { githubClient } from '../networkClients/githubClient';
+import { githubClient } from './githubClient';
 import type { GithubRepoVersionQuery } from './fetchRepoVersion.generated';
 
 /**

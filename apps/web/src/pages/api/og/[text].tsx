@@ -22,9 +22,12 @@ export default async function handler(request: NextApiRequest) {
       return generateOpenGraphImage({ url: request.url, normalFont, boldFont });
     }
     default: {
-      return new Response(JSON.stringify({ error: `Method ${method ?? ''} Not Allowed` }), {
-        status: 405,
-      });
+      return new Response(
+        JSON.stringify({ error: `Method ${method ?? '<Unknown>'} Not Allowed` }),
+        {
+          status: 405,
+        },
+      );
     }
   }
 }

@@ -1,4 +1,4 @@
-import { spotifyClient } from '../networkClients/spotifyClient';
+import { spotifyClient } from './spotifyClient';
 import type { CurrentlyPlaying } from './CurrentlyPlaying';
 import type { RecentlyPlayed } from './RecentlyPlayed';
 import type { Track } from './Track';

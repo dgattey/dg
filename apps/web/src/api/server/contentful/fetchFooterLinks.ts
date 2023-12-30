@@ -1,6 +1,6 @@
 import { gql } from 'graphql-request';
 import { isNotNullish } from 'shared-core/helpers/typeguards';
-import { contentfulClient } from '../networkClients/contentfulClient';
+import { contentfulClient } from './contentfulClient';
 import { isLink } from './parsers';
 import type { Link } from './api.generated';
 import type { FooterQuery } from './fetchFooterLinks.generated';

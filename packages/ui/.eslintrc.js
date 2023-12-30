@@ -1,7 +1,7 @@
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
   root: true,
-  extends: ['dg/library'],
+  extends: ['dg/library-react'],
   rules: {
     // This must be here otherwise the package dir it looks at is wrong
     'import/no-extraneous-dependencies': [

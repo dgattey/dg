@@ -1,4 +1,5 @@
 import { ImageResponse } from '@vercel/og';
+import { invariant } from 'shared-core/helpers/invariant';
 import { LOGO_FONT, OpenGraphImage, TEXT_FONT } from './OpenGraphImage';
 
 /**
@@ -13,8 +14,9 @@ export async function generateOpenGraphImage({
   normalFont: Promise<ArrayBuffer>;
   boldFont: Promise<ArrayBuffer>;
 }) {
+  invariant(url, 'URL is required');
   const [normalFontData, boldFontData] = await Promise.all([normalFont, boldFont]);
-  const params = new URL(url ?? '').searchParams;
+  const params = new URL(url).searchParams;
   return new ImageResponse(
     (
       <OpenGraphImage
