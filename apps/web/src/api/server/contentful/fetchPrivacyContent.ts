@@ -1,8 +1,8 @@
 import { gql } from 'graphql-request';
 import { isTextBlock } from 'api/parsers';
-import type { PrivacyBlockQuery } from 'api/types/generated/fetchPrivacyContent.generated';
 import { contentfulClient } from '../networkClients/contentfulClient';
-import type { TextBlock } from '../../types/generated/contentfulApi.generated';
+import type { TextBlock } from './api.generated';
+import type { PrivacyBlockQuery } from './fetchPrivacyContent.generated';
 
 /**
  * Grabs the Contentful text block for the privacy page - should be

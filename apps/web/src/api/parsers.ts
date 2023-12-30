@@ -1,4 +1,4 @@
-import type { Link, Project, TextBlock } from 'api/types/generated/contentfulApi.generated';
+import type { Link, Project, TextBlock } from 'api/server/contentful/api.generated';
 
 /**
  * Type guard to get a link out

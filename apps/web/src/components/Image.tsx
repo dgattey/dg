@@ -1,7 +1,7 @@
 import { styled } from '@mui/material';
 import NextImage from 'next/image';
 import { BREAKPOINT_MAX_SIZES } from 'ui/helpers/imageSizes';
-import type { Asset } from 'api/types/generated/contentfulApi.generated';
+import type { Asset } from 'api/server/contentful/api.generated';
 
 type ImageProps = Partial<Asset> & {
   url: Asset['url'];
