@@ -44,10 +44,10 @@ function createExpirationDate(expiryDistanceInSeconds: number) {
  * A REST client set up to make authed calls to Spotify
  */
 export const spotifyClient = createClient({
-  endpoint: 'https://api.spotify.com/v1',
+  endpoint: 'https://api.spotify.com/v1/',
   accessKey: 'spotify',
   refreshTokenConfig: {
-    endpoint: 'https://accounts.spotify.com/api/token',
+    endpoint: 'https://accounts.spotify.com/api/token/',
     headers: {
       Authorization: `Basic ${SPOTIFY_CLIENT_AUTH}`,
     },

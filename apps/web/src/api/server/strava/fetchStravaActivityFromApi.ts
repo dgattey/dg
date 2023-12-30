@@ -7,12 +7,10 @@ import { paredStravaActivity } from './paredStravaActivity';
  * budget. When in doubt, fall back to DB.
  */
 export const fetchStravaActivityFromApi = async (id: number) => {
-  const activity = await stravaClient.fetch<StravaDetailedActivity & Record<string, unknown>>(
-    `activities/${id}`,
-  );
-  if (activity.status !== 200) {
+  const { response, status } = await stravaClient.get(`activities/${id}`);
+  if (status !== 200) {
     return null;
   }
-  const allData = await activity.json();
+  const allData = await response.json<StravaDetailedActivity & Record<string, unknown>>();
   return paredStravaActivity(allData);
 };

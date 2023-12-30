@@ -1,13 +1,16 @@
 import useSWR from 'swr';
+import wretch from 'wretch';
 import type { AwaitedType, EndpointKey, EndpointType } from './endpoints';
+
+const api = wretch('/api/');
 
 /**
  * Uses a well-typed `fetch` to call an API endpoint using the api
  * key given, then grabs the JSON data from it.
  */
 const fetchData = async <Key extends EndpointKey>(key: Key): Promise<EndpointType<Key>> => {
-  const result = await fetch<EndpointType<Key>>(`/api/${key}`);
-  return result.json();
+  const result = api.get(key);
+  return result.json<EndpointType<Key>>();
 };
 
 /**

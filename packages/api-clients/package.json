@@ -9,7 +9,8 @@
   "dependencies": {
     "db": "workspace:*",
     "graphql-request": "6.1.0",
-    "shared-core": "workspace:*"
+    "shared-core": "workspace:*",
+    "wretch": "2.8.0"
   },
   "devDependencies": {
     "dotenv-mono": "1.3.13",

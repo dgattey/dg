@@ -21,10 +21,10 @@ invariant(STRAVA_CLIENT_SECRET, 'Missing Strava client secret');
  * A REST client set up to make authed calls to Strava
  */
 export const stravaClient = createClient({
-  endpoint: 'https://www.strava.com/api/v3',
+  endpoint: 'https://www.strava.com/api/v3/',
   accessKey: STRAVA_TOKEN_NAME,
   refreshTokenConfig: {
-    endpoint: 'https://www.strava.com/api/v3/oauth/token',
+    endpoint: 'https://www.strava.com/api/v3/oauth/token/',
     data: {
       client_id: STRAVA_CLIENT_ID,
       client_secret: STRAVA_CLIENT_SECRET,
