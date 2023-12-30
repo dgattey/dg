@@ -7,6 +7,9 @@
     "lint:types": "tsc"
   },
   "dependencies": {
+    "api-clients": "workspace:*",
+    "db": "workspace:*",
+    "graphql-request": "6.1.0",
     "shared-core": "workspace:*"
   },
   "devDependencies": {

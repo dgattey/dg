@@ -1,11 +1,11 @@
-import { fetchFooterLinks } from './server/contentful/fetchFooterLinks';
-import { fetchIntroContent } from './server/contentful/fetchIntroContent';
-import { fetchCurrentLocation } from './server/contentful/fetchCurrentLocation';
-import { fetchPrivacyContent } from './server/contentful/fetchPrivacyContent';
-import { fetchProjects } from './server/contentful/fetchProjects';
-import { fetchRepoVersion } from './server/github/fetchRepoVersion';
-import { fetchRecentlyPlayed } from './server/spotify/fetchRecentlyPlayed';
-import { fetchLatestStravaActivityFromDb } from './server/strava/fetchLatestStravaActivityFromDb';
+import { fetchFooterLinks } from 'api/contentful/fetchFooterLinks';
+import { fetchIntroContent } from 'api/contentful/fetchIntroContent';
+import { fetchCurrentLocation } from 'api/contentful/fetchCurrentLocation';
+import { fetchPrivacyContent } from 'api/contentful/fetchPrivacyContent';
+import { fetchProjects } from 'api/contentful/fetchProjects';
+import { fetchRepoVersion } from 'api/github/fetchRepoVersion';
+import { fetchRecentlyPlayed } from 'api/spotify/fetchRecentlyPlayed';
+import { fetchLatestStravaActivityFromDb } from 'api/strava/fetchLatestStravaActivityFromDb';
 
 /**
  * All possible types of endpoints we could request

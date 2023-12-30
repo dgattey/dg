@@ -72,6 +72,9 @@ importers:
       animate-css-grid:
         specifier: 1.5.1
         version: 1.5.1
+      api:
+        specifier: workspace:*
+        version: link:../../packages/api
       api-clients:
         specifier: workspace:*
         version: link:../../packages/api-clients
@@ -160,6 +163,15 @@ importers:
 
   packages/api:
     dependencies:
+      api-clients:
+        specifier: workspace:*
+        version: link:../api-clients
+      db:
+        specifier: workspace:*
+        version: link:../db
+      graphql-request:
+        specifier: 6.1.0
+        version: 6.1.0(graphql@16.8.1)
       shared-core:
         specifier: workspace:*
         version: link:../shared-core
