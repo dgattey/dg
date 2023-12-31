@@ -2,18 +2,18 @@
 
 # Dylan Gattey
 
-Hi :wave:! This is an overengineered way to show off my past projects/info about me/experiment with new technology. It's a pretty lightweight, mobile-friendly React app, powered by [Next](https://nextjs.org/docs/getting-started) and hosted on [Vercel](https://vercel.com). And it's all Typescript, because we like type safety!
+Hi :wave: This is an overengineered way to show off my past projects/info about me/experiment with new technology. It's a lightweight, mobile-friendly React app, powered by [Next](https://nextjs.org/docs/getting-started) and hosted on [Vercel](https://vercel.com). And it's all Typescript, because we like type safety. It's set up as a monorepo, using [pnpm](https://pnpm.io) workspaces and [Turbo](https://turbo.run) as a command runner
 
 ## :hammer: Commands
 
-- `turbo dev` starts the development server + db connection to your local db + (assuming cloudflared is installed via brew) a tunnel to dev.dylangattey.com for purposes of testing webhooks
+- `turbo dev --concurrency 1000` starts the development server + db connection to your local db + (assuming cloudflared is installed via brew) a tunnel to dev.dylangattey.com for purposes of testing webhooks
 - `turbo build` runs a prod build without a db connection (for CI)
 - `turbo build:serve` runs a prod build + db connection to your local db + serves it all once built (for local testing)
 - `turbo build:analyze` builds shows bundle sizes for a prod build (for verification)
 - `turbo format` runs Prettier to format the files
 - `turbo lint` runs ESLint to lint all TS(X) and JS(X) files
 - `turbo lint:types` runs tsc to confirm no type errors on the same files
-- `turbo codegen` generates new GraphQL APIs from Github/Contentful
+- `turbo codegen` generates new GraphQL APIs from Github/Contentful + operation file types from the queries/mutations
 - `turbo connect <optional branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
 - `turbo db -- db:migrate` uses Sequelize to run migrations, and you can list the status of migrations with `turbo db -- db:migrate:status`. Undo with `turbo db -- db:migrate:undo`
 - `turbo db -- migration:generate --name <name>` uses Sequelize to generate a new migration file ready to be populated
@@ -21,7 +21,8 @@ Hi :wave:! This is an overengineered way to show off my past projects/info about
 - `turbo webhook -- list <name>` will list that API's webhook subscriptions - for local dev
 - `turbo webhook -- delete <name> <id>` will delete a webhook subscription for that API - for local dev
 - `turbo release` bumps the site version, run via Github Action
-- `turbo clean` cleans up any built files like Next caches
+- `turbo clean` cleans up any built files like Next caches + codegen'd files
+- `turbo topo --graph=graph.html ` generates a graph of the monorepo dependencies for visualization
 
 ## :beginner: Initial Setup
 
