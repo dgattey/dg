@@ -50,7 +50,7 @@ export function Header({ headerRef }: HeaderProps) {
         >
           <Nav>
             <NavGroup>
-              <NavItem>
+              <NavItem variant="body2">
                 <Logo />
               </NavItem>
               <NavItem>

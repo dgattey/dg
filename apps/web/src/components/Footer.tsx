@@ -1,4 +1,4 @@
-import { Container } from '@mui/material';
+import { Container, Divider } from '@mui/material';
 import { Section } from 'ui/core/Section';
 import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
 import { HorizontalStack } from 'ui/core/HorizontalStack';
@@ -20,14 +20,16 @@ function FooterLink({ link }: { link: LinkType }) {
         layout="icon" // the ones that have no icon will resolve to just text
         linkProps={{
           color: 'secondary',
+          variant: 'caption',
         }}
         sx={{
           // Min tap target size
-          minWidth: 48,
-          minHeight: 48,
+          minWidth: 40,
+          minHeight: 40,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          fontSize: link.icon ? '1.25em' : undefined,
         }}
         title={link.title}
       />
@@ -44,14 +46,14 @@ export function Footer() {
   const nonIconFooterLinks = footerLinks?.filter((link) => !link.icon);
   const iconFooterLinks = footerLinks?.filter((link) => link.icon);
   return (
-    <Container component={Section} sx={{ padding: 0 }}>
+    <Container component={Section} sx={{ padding: 0, marginTop: 12 }}>
       <footer>
+        <Divider sx={{ marginBottom: 3 }} />
         <Nav
           sx={(theme) => ({
             flexDirection: 'row',
             flexWrap: 'wrap-reverse',
             columnGap: 3,
-            marginTop: 8,
             [theme.breakpoints.down('sm')]: {
               flexDirection: 'column-reverse',
             },
@@ -72,7 +74,7 @@ export function Footer() {
                 padding: 0,
                 margin: 0,
                 flex: 1,
-                marginLeft: -1.5,
+                marginLeft: -2.5,
                 marginRight: -1.5,
                 justifyContent: 'space-between',
               }}

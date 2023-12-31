@@ -1,8 +1,6 @@
-import { faBicycle } from '@fortawesome/free-solid-svg-icons/faBicycle';
-import { faRunning } from '@fortawesome/free-solid-svg-icons/faRunning';
 import { Typography } from '@mui/material';
 import { HorizontalStack } from 'ui/core/HorizontalStack';
-import { FaIcon } from 'ui/icons/FaIcon';
+import { Bike, Dumbbell } from 'lucide-react';
 import { useData } from 'api/useData';
 
 /**
@@ -19,9 +17,7 @@ export function ActivityTypeWithIcon() {
   const typeText = activity.type.includes('Ride')
     ? activity.type.replace(/(?<rideType>[A-Z][a-z]+)/g, ' $1')
     : 'Run';
-  const icon = (
-    <FaIcon icon={activity.type.includes('Ride') ? faBicycle : faRunning} size="1.25em" />
-  );
+  const icon = activity.type.includes('Ride') ? <Bike size="1.25em" /> : <Dumbbell size="1.25em" />;
 
   return (
     <Typography

@@ -5,16 +5,16 @@ import { mixinSx } from '../helpers/mixinSx';
 
 export const sectionSx: SxProps = (theme) => ({
   [theme.breakpoints.up('sm')]: {
-    marginBottom: 5.3125,
+    marginBottom: 3,
   },
   [theme.breakpoints.up('md')]: {
-    marginBottom: 6.375,
+    marginBottom: 3.6,
   },
   [theme.breakpoints.up('lg')]: {
-    marginBottom: 7.4375,
+    marginBottom: 4.32,
   },
   [theme.breakpoints.up('xl')]: {
-    marginBottom: 8.5,
+    marginBottom: 5.184,
   },
 });
 
