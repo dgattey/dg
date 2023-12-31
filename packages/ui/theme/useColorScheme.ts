@@ -16,7 +16,11 @@ export type SetColorScheme = (value: ColorSchemeMode | null) => void;
  * Hook to fetch the current color scheme from MUI and update it
  */
 export function useColorScheme(): Readonly<{
-  colorScheme: { mode: ColorSchemeMode; isCustomized: boolean; isInitialized: boolean };
+  colorScheme: {
+    mode: ColorSchemeMode;
+    isCustomized: boolean;
+    isInitialized: boolean;
+  };
   updatePreferredMode: SetColorScheme;
 }> {
   const { mode, setMode, systemMode } = useMuiColorScheme();

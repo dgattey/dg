@@ -39,7 +39,7 @@ export function NavItem({ sx, children, ...props }: TypographyProps) {
   return (
     <Typography
       component="li"
-      variant="body2"
+      variant="caption"
       {...props}
       sx={mixinSx(
         (theme) => ({

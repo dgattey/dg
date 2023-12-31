@@ -51,10 +51,10 @@ type LinkProps = BaseLinkProps &
 const BUILT_IN_ICONS: Record<string, JSX.Element> = {
   strava: <FaIcon icon={faStrava} />,
   spotify: <FaIcon icon={faSpotify} />,
-  github: <Github />,
+  github: <Github size="1em" />,
   linkedin: <FaIcon icon={faLinkedinIn} />,
-  instagram: <Instagram />,
-  email: <Send />,
+  instagram: <Instagram size="1em" />,
+  email: <Send size="1em" />,
 };
 
 /**
