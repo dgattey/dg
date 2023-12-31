@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import type { MapRef } from 'react-map-gl';
-import { AttributionControl, Map as MapGL } from 'react-map-gl';
-import { Box, useTheme } from '@mui/material';
+import { Map as MapGL } from 'react-map-gl';
+import { Box } from '@mui/material';
 import { useColorScheme } from 'ui/theme/useColorScheme';
 import type { MapLocation } from 'api/contentful/MapLocation';
 import { StandardControls } from './StandardControls';
@@ -11,11 +11,6 @@ export type MapProps = {
    * Where we're centered and zoomed
    */
   location: MapLocation | null;
-
-  /**
-   * If the map is a larger height
-   */
-  isExpanded: boolean;
 
   /**
    * If children exist, they need to be real elements.
@@ -124,26 +119,9 @@ function Wrapper({ isLoaded, children }: { isLoaded: boolean; children: React.Re
 /**
  * Uses Mapbox to show a canvas-based map of my current location.
  */
-export function Map({ location, children, isExpanded, isLoaded, setMapHasLoaded }: MapProps) {
-  const theme = useTheme();
+export function Map({ location, children, isLoaded, setMapHasLoaded }: MapProps) {
   const mapRef = useRef<MapRef>(null);
   const { colorScheme } = useColorScheme();
-
-  /**
-   * Ensures we resize when expanding/collapsing so we repaint the canvas. Otherwise it'll appear
-   * very stretched until you interact with the map. It ensures we wait the animation duration,
-   * then repaint.
-   */
-  useEffect(() => {
-    let animationId: number;
-    const timeoutId = setTimeout(() => {
-      animationId = requestAnimationFrame(() => mapRef.current?.resize());
-    }, theme.transitions.duration.standard);
-    return () => {
-      clearTimeout(timeoutId);
-      cancelAnimationFrame(animationId);
-    };
-  }, [isExpanded, theme.transitions.duration.standard]);
 
   // This will be used to set zoom levels, eventually
   const initialViewState = useMemo(
@@ -176,7 +154,6 @@ export function Map({ location, children, isExpanded, isLoaded, setMapHasLoaded 
         styleDiffing={false}
         touchPitch={false}
       >
-        {isExpanded ? <AttributionControl position="bottom-right" /> : null}
         <StandardControls mapRef={mapRef} />
         {children}
       </MapGL>

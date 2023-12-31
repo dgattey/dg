@@ -1,9 +1,8 @@
 import { useMemo, useRef } from 'react';
+import { ContentGrid } from 'ui/core/ContentGrid';
 import { useData } from 'api/useData';
-import { ContentGrid } from 'components/ContentGrid';
 import { MapPreviewCard } from 'components/homepage/MapPreviewCard';
 import { HOMEPAGE_TITLE, Meta } from 'components/Meta';
-import { useGridAnimation } from 'hooks/useGridAnimation';
 import { IntroCard } from './IntroCard';
 import { ProjectCard } from './ProjectCard';
 import { SpotifyCard } from './SpotifyCard';
@@ -25,22 +24,19 @@ export function Homepage() {
 
   // For animating grid items
   const gridRef = useRef<HTMLDivElement | null>(null);
-  const turnOnAnimation = useGridAnimation(gridRef);
 
   const projectCards =
-    projects?.map((project) => (
-      <ProjectCard key={project.title} {...project} turnOnAnimation={turnOnAnimation} />
-    )) ?? [];
+    projects?.map((project) => <ProjectCard key={project.title} {...project} />) ?? [];
 
   // These index into projectCards to splice in other cards
   const otherCards = useMemo(
     () => [
       { index: 0, card: <IntroCard key="intro" /> },
-      { index: 0, card: <MapPreviewCard key="map" turnOnAnimation={turnOnAnimation} /> },
+      { index: 0, card: <MapPreviewCard key="map" /> },
       { index: 2, card: <SpotifyCard key="spotify" /> },
       { index: 6, card: <StravaCard key="strava" /> },
     ],
-    [turnOnAnimation],
+    [],
   );
 
   return (

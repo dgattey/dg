@@ -3,8 +3,8 @@ import { Section } from 'ui/core/Section';
 import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
 import { HorizontalStack } from 'ui/core/HorizontalStack';
 import type { Link as LinkType } from 'api/contentful/api.generated';
+import { Link } from 'ui/dependent/Link';
 import { useData } from 'api/useData';
-import { Link } from './Link';
 
 /**
  * Creates a singular footer link

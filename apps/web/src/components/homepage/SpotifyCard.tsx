@@ -1,5 +1,5 @@
+import { ContentCard } from 'ui/dependent/ContentCard';
 import { useData } from 'api/useData';
-import { ContentCard } from 'components/ContentCard';
 import { TrackListing } from 'components/spotify/TrackListing';
 
 /**

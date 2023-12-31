@@ -8,8 +8,7 @@ type Props = Pick<React.ComponentProps<'div'>, 'children'> & {
 };
 
 /**
- * Displays all our content in a grid - on the client it uses `animate-css-grid`
- * for nice animations when items change in size, which we do when expanding cards.
+ * Displays all our content in a grid.
  *
  * Auto fits densely to properly fill in all gaps at every size. Use
  * of auto on smallest screens means the items will fill the screen instead

@@ -1,17 +1,16 @@
 import { useState } from 'react';
 import { useCurrentImageSizes } from 'ui/helpers/useCurrentImageSizes';
 import type { Project } from 'api/contentful/api.generated';
-import type { ContentCardProps } from 'components/ContentCard';
-import { ContentCard } from 'components/ContentCard';
-import { HoverableContainer } from 'components/HoverableContainer';
-import { Image } from 'components/Image';
+import { ContentCard } from 'ui/dependent/ContentCard';
+import { HoverableContainer } from 'ui/core/HoverableContainer';
+import { Image } from 'ui/dependent/Image';
 
-type ProjectCardProps = Project & Pick<ContentCardProps, 'turnOnAnimation'>;
+type ProjectCardProps = Project;
 
 /**
  * Uses the `ContentCard` to show a project's details
  */
-export function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }: ProjectCardProps) {
+export function ProjectCard({ title, layout, link, thumbnail }: ProjectCardProps) {
   const [isHovered, setIsHovered] = useState(false);
   const { width, height, sizes, verticalSpan, horizontalSpan } = useCurrentImageSizes(layout);
 
@@ -31,7 +30,6 @@ export function ProjectCard({ title, layout, link, thumbnail, turnOnAnimation }:
           maxHeight: theme.shape.gridItemSize(0.75),
         },
       })}
-      turnOnAnimation={turnOnAnimation}
       verticalSpan={verticalSpan}
     >
       {thumbnail ? (

@@ -1,8 +1,8 @@
 import { ArrowUp } from 'lucide-react';
 import { useContext } from 'react';
 import { Button, Typography } from '@mui/material';
-import type { SxProps } from 'ui/theme';
-import { ScrollIndicatorContext } from './ScrollIndicatorContext';
+import type { SxProps } from '../theme';
+import { ScrollIndicatorContext } from '../core/ScrollIndicatorContext';
 
 const scrolledSx: SxProps = {
   transform: 'initial',

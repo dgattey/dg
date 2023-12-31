@@ -1,10 +1,9 @@
-import { useState } from 'react';
 import type { Theme } from '@mui/material';
 import { Card, Typography } from '@mui/material';
-import { mixinSx } from 'ui/helpers/mixinSx';
-import type { SxProps } from 'ui/theme';
-import { truncated } from 'ui/helpers/truncated';
 import type { Link } from 'api/contentful/api.generated';
+import { mixinSx } from '../helpers/mixinSx';
+import type { SxProps } from '../theme';
+import { truncated } from '../helpers/truncated';
 import { ContentWrappingLink } from './ContentWrappingLink';
 
 export type ContentCardProps = Pick<
@@ -33,28 +32,11 @@ export type ContentCardProps = Pick<
    */
   link?: Link;
 
-  /**
-   * If the card should expand to full width when clicked,
-   * provide a function that gets called when that happens.
-   */
-  onExpansion?: (isExpanded: boolean) => void;
-
-  /**
-   * Function that starts an animation when the card is expanded
-   * and removes the animation once finished.
-   */
-  turnOnAnimation?: () => void;
-
   sx?: SxProps;
   overlaySx?: SxProps;
 };
 
 type LinkWrappedChildrenProps = Pick<ContentCardProps, 'link' | 'children'> & {
-  /**
-   * If the card expands when clicked
-   */
-  expandOnClick: boolean;
-
   /**
    * The element that overlays the card
    */
@@ -76,7 +58,7 @@ function getCardSx(
     position: 'relative',
     overflow: 'hidden',
     willChange: 'transform',
-    transition: `${theme.transitions.create(['width', 'height', 'box-shadow', 'border-color'])}`,
+    transition: theme.transitions.create(['width', 'height', 'box-shadow', 'border-color']),
 
     // Unfortunately required for the images to animate size correctly. Look into changing this!
     '& > div': {
@@ -106,12 +88,7 @@ function getCardSx(
  * Deals with the messiness of safely wrapping children and links so there's
  * only ever one element that returns from this.
  */
-function LinkWrappedChildren({
-  children,
-  link,
-  overlayContents,
-  expandOnClick,
-}: LinkWrappedChildrenProps) {
+function LinkWrappedChildren({ children, link, overlayContents }: LinkWrappedChildrenProps) {
   const safelyWrappedChildren = !overlayContents ? (
     children
   ) : (
@@ -120,7 +97,7 @@ function LinkWrappedChildren({
       {children}
     </div>
   );
-  return link && !expandOnClick ? (
+  return link ? (
     <ContentWrappingLink
       link={link}
       sx={(theme) => ({
@@ -183,44 +160,22 @@ function OverlayContent({ overlay, sx }: { overlay: NonNullable<React.ReactNode>
  * Wraps content in a card for the content grid
  */
 export function ContentCard({
-  horizontalSpan,
-  verticalSpan,
+  horizontalSpan = 1,
+  verticalSpan = 1,
   children,
   overlay,
   link,
-  onExpansion,
-  turnOnAnimation,
   sx,
   overlaySx,
   ...props
 }: ContentCardProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const expandOnClick = Boolean(onExpansion);
-  const actualHSpan = isExpanded ? 3 : horizontalSpan ?? 1;
-  const actualVSpan = isExpanded ? null : verticalSpan ?? 1;
-  const isClickable = Boolean(link) || expandOnClick;
-
-  // Swaps the expansion variable and calls the user callback
-  const toggleExpansion = onExpansion
-    ? () => {
-        turnOnAnimation?.();
-        setIsExpanded(!isExpanded);
-        onExpansion(!isExpanded);
-      }
-    : undefined;
-
+  const isClickable = Boolean(link);
   return (
     <Card
-      onClick={toggleExpansion}
-      sx={mixinSx(
-        (theme) =>
-          getCardSx(theme, { isClickable, horizontalSpan: actualHSpan, verticalSpan: actualVSpan }),
-        sx,
-      )}
+      sx={mixinSx((theme) => getCardSx(theme, { isClickable, horizontalSpan, verticalSpan }), sx)}
       {...props}
     >
       <LinkWrappedChildren
-        expandOnClick={expandOnClick}
         link={link}
         overlayContents={overlay ? <OverlayContent overlay={overlay} sx={overlaySx} /> : null}
       >

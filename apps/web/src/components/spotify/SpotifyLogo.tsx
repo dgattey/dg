@@ -1,6 +1,6 @@
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
-import { FaIcon } from 'components/FaIcon';
-import { Link } from 'components/Link';
+import { FaIcon } from 'ui/icons/FaIcon';
+import { Link } from 'ui/dependent/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
 
 type SpotifyLogoProps = {

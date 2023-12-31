@@ -2,8 +2,8 @@ import { faBicycle } from '@fortawesome/free-solid-svg-icons/faBicycle';
 import { faRunning } from '@fortawesome/free-solid-svg-icons/faRunning';
 import { Typography } from '@mui/material';
 import { HorizontalStack } from 'ui/core/HorizontalStack';
+import { FaIcon } from 'ui/icons/FaIcon';
 import { useData } from 'api/useData';
-import { FaIcon } from 'components/FaIcon';
 
 /**
  * Shows the latest activity type and an icon to depict
