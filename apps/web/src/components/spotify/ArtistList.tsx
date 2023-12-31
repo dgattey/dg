@@ -5,7 +5,7 @@ import { Fragment } from 'react';
 import { Typography } from '@mui/material';
 import { truncated } from 'ui/helpers/truncated';
 import type { Artist } from 'api/spotify/Track';
-import { Link } from 'components/Link';
+import { Link } from 'ui/dependent/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
 
 type ArtistListProps = {

@@ -1,8 +1,8 @@
 import { Moon, Sun, RefreshCw } from 'lucide-react';
 import type { Theme } from '@mui/material';
 import { Box, IconButton, Tooltip } from '@mui/material';
-import { useColorScheme } from 'ui/theme/useColorScheme';
-import type { ColorSchemeMode } from 'ui/theme/useColorScheme';
+import { useColorScheme } from '../theme/useColorScheme';
+import type { ColorSchemeMode } from '../theme/useColorScheme';
 
 type ColorSchemeIconProps = {
   /**

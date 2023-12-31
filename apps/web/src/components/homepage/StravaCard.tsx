@@ -1,6 +1,6 @@
 import { Stack } from '@mui/material';
+import { ContentCard } from 'ui/dependent/ContentCard';
 import { useData } from 'api/useData';
-import { ContentCard } from 'components/ContentCard';
 import { ActivityStats } from 'components/strava/ActivityStats';
 import { ActivityTypeWithIcon } from 'components/strava/ActivityTypeWithIcon';
 import { ActivityName } from 'components/strava/ActivityName';

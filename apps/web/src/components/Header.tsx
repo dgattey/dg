@@ -4,9 +4,9 @@ import { Section } from 'ui/core/Section';
 import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
 import type { SxProps } from 'ui/theme';
 import { useColorScheme } from 'ui/theme/useColorScheme';
-import { ScrollIndicatorContext } from 'components/ScrollIndicatorContext';
-import { ScrollUpButton } from 'components/ScrollUpButton';
-import { ColorSchemeToggle } from 'components/ColorSchemeToggle';
+import { ScrollIndicatorContext } from 'ui/core/ScrollIndicatorContext';
+import { ScrollUpButton } from 'ui/dependent/ScrollUpButton';
+import { ColorSchemeToggle } from 'ui/core/ColorSchemeToggle';
 import { Logo } from './Logo';
 
 type HeaderProps = {

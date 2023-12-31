@@ -1,6 +1,6 @@
-import type { SxProps } from 'ui/theme';
 import type { Link as LinkType } from 'api/contentful/api.generated';
-import { Link } from 'components/Link';
+import type { SxProps } from '../theme';
+import { Link } from './Link';
 
 type ContentWrappingLinkProps = Pick<React.ComponentProps<'div'>, 'children'> & {
   /**

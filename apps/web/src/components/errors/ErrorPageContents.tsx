@@ -1,6 +1,6 @@
 import { Typography } from '@mui/material';
 import { useRouter } from 'next/router';
-import { Link } from 'components/Link';
+import { Link } from 'ui/dependent/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
 
 export type HasStatusCode = {

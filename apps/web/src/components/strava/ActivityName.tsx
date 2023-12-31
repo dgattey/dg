@@ -1,7 +1,7 @@
 import { truncated } from 'ui/helpers/truncated';
 import { mixinSx } from 'ui/helpers/mixinSx';
 import type { SxProps } from 'ui/theme';
-import { Link } from 'components/Link';
+import { Link } from 'ui/dependent/Link';
 import { useData } from 'api/useData';
 
 /**

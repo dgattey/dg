@@ -1,16 +1,13 @@
 /* eslint-disable no-restricted-imports */
-import { faGithubAlt } from '@fortawesome/free-brands-svg-icons/faGithubAlt';
-import { faInstagram } from '@fortawesome/free-brands-svg-icons/faInstagram';
 import { faLinkedinIn } from '@fortawesome/free-brands-svg-icons/faLinkedinIn';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
-import { faPaperPlane } from '@fortawesome/free-solid-svg-icons/faPaperPlane';
-import { faQuestion } from '@fortawesome/free-solid-svg-icons/faQuestion';
 import NextLink from 'next/link';
 import type { LinkProps as MuiLinkProps, ButtonProps } from '@mui/material';
 import { Link as MuiLink, Tooltip, Button } from '@mui/material';
-import type { SxProps } from 'ui/theme';
-import { FaIcon } from 'components/FaIcon';
+import { Github, Instagram, Send } from 'lucide-react';
+import type { SxProps } from '../theme';
+import { FaIcon } from '../icons/FaIcon';
 
 type BaseLinkProps = {
   title?: string;
@@ -54,11 +51,10 @@ type LinkProps = BaseLinkProps &
 const BUILT_IN_ICONS: Record<string, JSX.Element> = {
   strava: <FaIcon icon={faStrava} />,
   spotify: <FaIcon icon={faSpotify} />,
-  github: <FaIcon icon={faGithubAlt} />,
+  github: <Github />,
   linkedin: <FaIcon icon={faLinkedinIn} />,
-  instagram: <FaIcon icon={faInstagram} />,
-  about: <FaIcon icon={faQuestion} />,
-  email: <FaIcon icon={faPaperPlane} />,
+  instagram: <Instagram />,
+  email: <Send />,
 };
 
 /**

@@ -8,9 +8,9 @@ import type { SxProps } from 'ui/theme';
 import { PROJECT_MAX_IMAGE_DIMENSION } from 'ui/helpers/imageSizes';
 import { isLink, isProject } from 'api/contentful/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/contentful/api.generated';
+import { Image } from 'ui/dependent/Image';
+import { Link } from 'ui/dependent/Link';
 import { ProjectCard } from 'components/homepage/ProjectCard';
-import { Image } from './Image';
-import { Link } from './Link';
 
 type RichTextProps = TextBlockContent & {
   sx?: SxProps;

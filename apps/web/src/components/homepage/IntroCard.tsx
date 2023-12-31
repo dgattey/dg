@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { useCurrentImageSizes } from 'ui/helpers/useCurrentImageSizes';
+import { ContentCard } from 'ui/dependent/ContentCard';
+import { HoverableContainer } from 'ui/core/HoverableContainer';
+import { Image } from 'ui/dependent/Image';
 import { useData } from 'api/useData';
-import { ContentCard } from 'components/ContentCard';
-import { HoverableContainer } from 'components/HoverableContainer';
-import { Image } from 'components/Image';
 import { RichText } from 'components/RichText';
 import { useLinkWithName } from 'hooks/useLinkWithName';
 
