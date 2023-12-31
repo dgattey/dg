@@ -13,6 +13,7 @@
     "shared-core": "workspace:*"
   },
   "devDependencies": {
+    "@types/node": "20.10.6",
     "dotenv-mono": "1.3.13",
     "eslint-config-dg": "workspace:*",
     "tsconfig": "workspace:*",

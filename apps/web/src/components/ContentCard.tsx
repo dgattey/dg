@@ -76,7 +76,7 @@ function getCardSx(
     position: 'relative',
     overflow: 'hidden',
     willChange: 'transform',
-    transition: `${theme.transitions.create(['width', 'height', 'box-shadow', 'border-color'])}`,
+    transition: theme.transitions.create(['width', 'height', 'box-shadow', 'border-color']),
 
     // Unfortunately required for the images to animate size correctly. Look into changing this!
     '& > div': {
