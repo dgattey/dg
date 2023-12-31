@@ -1,4 +1,4 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
+type Query = Partial<Record<string, string | Array<string>>>;
 
 const MODE_KEY = 'hub.mode';
 const CHALLENGE_KEY = 'hub.challenge';
@@ -21,9 +21,7 @@ type StravaSubscription = {
  * verifies that the STRAVA_VERIFY_TOKEN is actually the verify key that
  * Strava called us with.
  */
-const isSubscription = (
-  query: Partial<Record<string, string | Array<string>>>,
-): query is StravaSubscription =>
+const isSubscription = (query: Query): query is StravaSubscription =>
   query[MODE_KEY] === VALID_MODE && query[VERIFY_KEY] === process.env.STRAVA_VERIFY_TOKEN;
 
 /**
@@ -32,13 +30,16 @@ const isSubscription = (
  * returns true if the request's query has a validated Strava subscription
  * within it.
  */
-export const echoStravaChallengeIfValid = (request: NextApiRequest, response: NextApiResponse) => {
+export const echoStravaChallengeIfValid = (
+  request: { query: Query },
+  response: { status: (value: number) => { json: (value: Record<string, string>) => void } },
+) => {
   const { query } = request;
-  if (isSubscription(query)) {
-    response.status(200).json({
-      [CHALLENGE_KEY]: query[CHALLENGE_KEY],
-    });
-    return true;
+  if (!isSubscription(query)) {
+    return false;
   }
-  return false;
+  response.status(200).json({
+    [CHALLENGE_KEY]: query[CHALLENGE_KEY],
+  });
+  return true;
 };
