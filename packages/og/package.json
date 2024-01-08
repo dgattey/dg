@@ -7,13 +7,13 @@
     "lint:types": "tsc"
   },
   "dependencies": {
-    "@vercel/og": "0.6.1",
+    "@vercel/og": "0.6.2",
     "react": "18.2.0",
     "shared-core": "workspace:*",
     "ui": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "18.2.46",
+    "@types/react": "18.2.47",
     "dotenv-mono": "1.3.13",
     "eslint-config-dg": "workspace:*",
     "tsconfig": "workspace:*",
