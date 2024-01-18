@@ -3,6 +3,6 @@
   "extends": "tsconfig/library.json",
   "compilerOptions": {
     "baseUrl": ".",
-    "lib": ["dom", "dom.iterable", "ESNext"]
-  }
+    "lib": ["dom", "dom.iterable", "ESNext"],
+  },
 }
