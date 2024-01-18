@@ -24,11 +24,18 @@ export const stravaClient = createClient({
   endpoint: 'https://www.strava.com/api/v3/',
   accessKey: STRAVA_TOKEN_NAME,
   refreshTokenConfig: {
-    endpoint: 'https://www.strava.com/api/v3/oauth/token/',
-    data: {
+    // Note: it's REALLY FUCKING IMPORTANT that this doesn't have a slash at the end. It returns empty otherwise
+    endpoint: 'https://www.strava.com/api/v3/oauth/token',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
+    },
+    body: (refreshToken) => ({
       client_id: STRAVA_CLIENT_ID,
       client_secret: STRAVA_CLIENT_SECRET,
-    },
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    }),
     validate: (rawData) => {
       const {
         token_type: tokenType,

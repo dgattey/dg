@@ -1,3 +1,4 @@
+const { withLogtail } = require('@logtail/next');
 require('dotenv-mono').config();
 
 /**
@@ -36,4 +37,4 @@ const nextConfig = {
   },
 };
 
-module.exports = withNextBundleAnalyzer(nextConfig);
+module.exports = withNextBundleAnalyzer(withLogtail(nextConfig));

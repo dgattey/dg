@@ -1,4 +1,5 @@
 import { db } from 'db';
+import { log } from '@logtail/next';
 import type { StravaWebhookEvent } from './StravaWebhookEvent';
 import { fetchStravaActivityFromApi } from './fetchStravaActivityFromApi';
 
@@ -19,12 +20,18 @@ const fetchFromApiAndSaveToDb = async (id: number) => {
     existingActivity?.lastUpdate &&
     Number(existingActivity.lastUpdate) > Date.now() - UPDATE_THRESHOLD_IN_MS
   ) {
+    log.info('Dropping Strava webhook update - last update was too recent', {
+      id,
+      lastUpdate: existingActivity.lastUpdate,
+      threshold: Date.now() - UPDATE_THRESHOLD_IN_MS,
+    });
     // Last update was too recent
     return;
   }
 
   const latestActivityData = await fetchStravaActivityFromApi(id);
   if (!latestActivityData?.start_date) {
+    log.error('Missing activity data', { id, latestActivityData });
     throw new Error(`Missing activity data for ${id}`);
   }
   const updatedActivity = await db.StravaActivity.upsert({
@@ -33,6 +40,7 @@ const fetchFromApiAndSaveToDb = async (id: number) => {
     activityData: latestActivityData,
     lastUpdate: new Date(),
   });
+  log.info('Upserted Strava activity', { updatedActivity });
   return updatedActivity[0];
 };
 

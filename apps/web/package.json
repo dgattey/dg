@@ -19,6 +19,7 @@
     "@emotion/styled": "11.11.0",
     "@fortawesome/free-brands-svg-icons": "6.5.1",
     "@fortawesome/free-solid-svg-icons": "6.5.1",
+    "@logtail/next": "0.1.4",
     "@mui/material": "5.15.5",
     "@next/bundle-analyzer": "14.0.4",
     "@vercel/analytics": "1.1.1",

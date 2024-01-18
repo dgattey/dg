@@ -17,14 +17,14 @@ export type RefreshTokenConfig = Readonly<{
   endpoint: string;
 
   /**
-   * This gets encoded into body if existent
+   * This gets encoded into body
    */
-  data?: Record<string, string | undefined>;
+  body: (refreshToken: string) => Record<string, string>;
 
   /**
-   * This gets encoded into headers if existent
+   * This gets encoded into headers
    */
-  headers?: Record<string, string>;
+  headers: Record<string, string>;
 
   /**
    * Throws an error if anything's off about our data, otherwise returns the data

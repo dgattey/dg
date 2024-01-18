@@ -54,6 +54,9 @@ importers:
       '@fortawesome/free-solid-svg-icons':
         specifier: 6.5.1
         version: 6.5.1
+      '@logtail/next':
+        specifier: 0.1.4
+        version: 0.1.4(next@14.0.4)
       '@mui/material':
         specifier: 5.15.5
         version: 5.15.5(@emotion/react@11.11.3)(@emotion/styled@11.11.0)(@types/react@18.2.48)(react-dom@18.2.0)(react@18.2.0)
@@ -124,6 +127,9 @@ importers:
 
   packages/api:
     dependencies:
+      '@logtail/next':
+        specifier: 0.1.4
+        version: 0.1.4(next@14.0.4)
       api-clients:
         specifier: workspace:*
         version: link:../api-clients
@@ -155,6 +161,9 @@ importers:
 
   packages/api-clients:
     dependencies:
+      '@logtail/next':
+        specifier: 0.1.4
+        version: 0.1.4(next@14.0.4)
       db:
         specifier: workspace:*
         version: link:../db
@@ -2523,6 +2532,16 @@ packages:
   /@kamilkisiela/fast-url-parser@1.1.4:
     resolution: {integrity: sha512-gbkePEBupNydxCelHCESvFSFM8XPh1Zs/OAVRW/rKpEqPAl5PbOM90Si8mv9bvnR53uPD2s/FiRxdvSejpRJew==}
     dev: true
+
+  /@logtail/next@0.1.4(next@14.0.4):
+    resolution: {integrity: sha512-pqNqeZAJwUn99+w4ywjCd1j2AP/B3/gCUFJwC0L+7GiQz9n6AiqK3vomPJ1jnTWc6m0pqsWkoTt1TShnfEpUBQ==}
+    engines: {node: '>=15'}
+    peerDependencies:
+      next: ^12.1.4 || ^13 || ^14
+    dependencies:
+      next: 14.0.4(react-dom@18.2.0)(react@18.2.0)
+      whatwg-fetch: 3.6.20
+    dev: false
 
   /@mapbox/geojson-rewind@0.5.2:
     resolution: {integrity: sha512-tJaT+RbYGJYStt7wI3cq4Nl4SXxG8W7JDG5DMJu97V25RnbNg3QtQtf+KD+VLjNpWKYsRvXDNmNrBgEETr1ifA==}
@@ -10943,6 +10962,10 @@ packages:
       - '@swc/core'
       - esbuild
       - uglify-js
+    dev: false
+
+  /whatwg-fetch@3.6.20:
+    resolution: {integrity: sha512-EqhiFU6daOA8kpjOWTL0olhVOF3i7OrFzSYiGsEMB8GcXS+RrzauAERX65xMeNWVqxA6HXH2m69Z9LaKKdisfg==}
     dev: false
 
   /whatwg-url@5.0.0:

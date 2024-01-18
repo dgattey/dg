@@ -3,6 +3,7 @@ import { isRecord } from 'shared-core/helpers/typeguards';
 import { echoStravaChallengeIfValid } from 'api/strava/echoStravaChallengeIfValid';
 import { syncStravaWebhookUpdateWithDb } from 'api/strava/syncStravaWebhookUpdateWithDb';
 import type { StravaWebhookEvent } from 'api/strava/StravaWebhookEvent';
+import { log } from '@logtail/next';
 import { handleApiError, methodNotAllowedError } from 'api/handleApiError';
 
 // Just a shorthand for this function type
@@ -13,6 +14,7 @@ type AsyncProcessor = (request: NextApiRequest, response: NextApiResponse) => Pr
  * Checks most data to see if it's a webhook event
  */
 const isWebhookEvent = (body: unknown): body is StravaWebhookEvent => {
+  log.info('Is this a webhook event?', { body });
   if (!isRecord(body)) {
     return false;
   }
@@ -28,6 +30,7 @@ const isWebhookEvent = (body: unknown): body is StravaWebhookEvent => {
  * fail with a 400.
  */
 const handleGet: Processor = (request, response) => {
+  log.info('Received Strava webhook GET');
   if (echoStravaChallengeIfValid(request, response)) {
     return;
   }
@@ -39,12 +42,15 @@ const handleGet: Processor = (request, response) => {
  * receipt of it.
  */
 const handleWebhookEvent: AsyncProcessor = async (request, response) => {
+  log.info('Received Strava webhook event');
   if (!isWebhookEvent(request.body)) {
+    log.error('Received invalid Strava webhook event');
     handleApiError(response, 'Bad Request', 400);
     return;
   }
 
   const webhookEvent = request.body;
+  log.info('Got webhook event', { webhookEvent });
   switch (webhookEvent.object_type) {
     case 'athlete':
       // We don't handle auth/deauth events
