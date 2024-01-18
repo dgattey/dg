@@ -121,6 +121,8 @@ Standard semver versioning is done via `semantic-release` and Conventional Commi
 - **Minor**: bumped if "feat:" appears in the message
 - **Patch**: bumped by default in all other cases ("chore:"/"fix:"/etc)
 
+Test a dry run with `GITHUB_TOKEN=* pnpm turbo release -- --dry-run --branches={branch here}` after filling in the token.
+
 ### History
 
 The site was originally Wordpress for way too many years! I used a custom theme + had a bunch of optimizations starting way back in ~2011.

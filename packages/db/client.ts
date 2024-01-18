@@ -1,6 +1,7 @@
 import { env } from 'node:process';
 import { Sequelize } from 'sequelize-typescript';
 import mysql2 from 'mysql2';
+import { log } from '@logtail/next';
 import { Token } from './models/Token';
 import { StravaActivity } from './models/StravaActivity';
 
@@ -10,6 +11,7 @@ const SHARED_DB_OPTIONS = {
 };
 
 const databaseUrl = env.DATABASE_URL;
+log.info('Database url', { databaseUrl });
 if (!databaseUrl) {
   throw new Error('DATABASE_URL environment variable not set');
 }
@@ -18,7 +20,8 @@ if (!databaseUrl) {
 const isRunningLocalProdBuild = ['127.0.0.1', 'localhost'].some((host) =>
   databaseUrl.includes(host),
 );
-const nodeEnv = isRunningLocalProdBuild ? 'development' : env.NODE_ENV || 'development';
+const nodeEnv = isRunningLocalProdBuild ? 'development' : env.NODE_ENV;
+log.info('Node env', { nodeEnv });
 
 // Sequelize options applied based on current environment
 const DB_OPTIONS = {
