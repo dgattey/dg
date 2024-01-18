@@ -60,6 +60,9 @@ importers:
       '@next/bundle-analyzer':
         specifier: 14.0.4
         version: 14.0.4
+      '@vercel/speed-insights':
+        specifier: 1.0.4
+        version: 1.0.4
       api:
         specifier: workspace:*
         version: link:../../packages/api
@@ -3727,6 +3730,11 @@ packages:
 
   /@vercel/ruby@2.0.4:
     resolution: {integrity: sha512-EpZyfF6wFGzFDmubFIh/EZtYpKindmXx/69xSfKEBTVU0afgljyOOICbyZePe5tvigfOEBLSLgrt/2nN+MlLtA==}
+    dev: false
+
+  /@vercel/speed-insights@1.0.4:
+    resolution: {integrity: sha512-Q7O0bnV11KUqNKAKA984YWIGxCjqgOuJdwH1cdItqlkUVTLbIm8BhObro6hJobGMSUHm+z7xjQ0YbC8ps1ekDg==}
+    requiresBuild: true
     dev: false
 
   /@vercel/static-build@2.0.17:
