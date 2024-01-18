@@ -12,7 +12,7 @@
   },
   "devDependencies": {
     "@semantic-release/changelog": "6.0.3",
-    "semantic-release": "22.0.12",
+    "semantic-release": "23.0.0",
     "typescript": "5.3.3"
   }
 }

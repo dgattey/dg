@@ -49,8 +49,14 @@ export const spotifyClient = createClient({
   refreshTokenConfig: {
     endpoint: 'https://accounts.spotify.com/api/token/',
     headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      Accept: 'application/json',
       Authorization: `Basic ${SPOTIFY_CLIENT_AUTH}`,
     },
+    body: (refreshToken) => ({
+      grant_type: 'refresh_token',
+      refresh_token: refreshToken,
+    }),
     validate: (rawData, refreshToken) => {
       const { token_type: tokenType, access_token: accessToken, expires_in: expiresIn } =
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions

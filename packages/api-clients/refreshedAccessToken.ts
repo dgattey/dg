@@ -1,5 +1,6 @@
 import { db } from 'db';
 import type { CreateTokenProps, FetchTokenProps } from 'db/models/Token';
+import { log } from '@logtail/next';
 import type { RefreshTokenConfig } from './RefreshTokenConfig';
 
 /**
@@ -45,25 +46,31 @@ async function fetchRefreshedTokenFromApi(
   refreshTokenConfig: RefreshTokenConfig,
   refreshToken: string,
 ) {
-  const { endpoint, headers, data, validate } = refreshTokenConfig;
+  const { endpoint, headers, body, validate } = refreshTokenConfig;
+  const encodedBody = new URLSearchParams(body(refreshToken));
+  log.info('Fetching refreshed token from API', {
+    endpoint,
+    headers,
+    encodedBody: [...encodedBody],
+  });
 
   const rawData = await fetch(endpoint, {
     method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Accept: 'application/json',
-      ...headers,
-    },
-    body: new URLSearchParams({
-      grant_type: 'refresh_token',
-      refresh_token: refreshToken,
-      ...data,
-    }),
+    headers,
+    body: encodedBody,
   });
+  const data: unknown = await rawData.json();
   if (!rawData.ok) {
+    log.error('Failed to fetch refreshed token', {
+      status: rawData.status,
+      data,
+    });
     throw new TypeError('Token was not fetched properly');
   }
-  return validate(await rawData.json(), refreshToken);
+  log.info('Successfully refreshed token!', {
+    status: rawData.status,
+  });
+  return validate(data, refreshToken);
 }
 
 /**

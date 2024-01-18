@@ -2,6 +2,6 @@
   "$schema": "https://json.schemastore.org/tsconfig.json",
   "extends": "tsconfig/library.json",
   "compilerOptions": {
-    "baseUrl": "."
-  }
+    "baseUrl": ".",
+  },
 }
