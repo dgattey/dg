@@ -16,7 +16,7 @@
     "next": "14.0.4",
     "react": "18.2.0",
     "shared-core": "workspace:*",
-    "sharp": "0.33.1",
+    "sharp": "0.33.2",
     "use-breakpoint": "4.0.1"
   },
   "devDependencies": {
