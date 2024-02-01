@@ -50,7 +50,7 @@ jobs:
       - name: Release new repo version
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm turbo release --branches="main"
+        run: pnpm turbo release -- --branches="main"
 
   redeploy:
     timeout-minutes: 5
