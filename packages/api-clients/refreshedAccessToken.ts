@@ -87,15 +87,20 @@ export async function refreshedAccessToken(
   forceRefresh?: boolean,
 ) {
   const currentData = await getLatestTokenIfValid({ name });
+  log.info('Got latest token data', { currentData, forceRefresh });
   if (currentData.accessToken && !forceRefresh) {
+    log.info('Returning current access token', { currentData });
     return currentData.accessToken;
   }
 
   // Grab a new token and save it
+  log.info('Fetching refreshed token', { currentData });
   const { refreshToken, accessToken, expiryAt } = await fetchRefreshedTokenFromApi(
     refreshTokenConfig,
     currentData.refreshToken,
   );
+  log.info('Fetched refreshed token', { refreshToken, accessToken, expiryAt });
   await createOrUpdateToken({ name, accessToken, refreshToken, expiryAt });
+  log.info('Updated token in db, returning', { name, accessToken, refreshToken, expiryAt });
   return accessToken;
 }

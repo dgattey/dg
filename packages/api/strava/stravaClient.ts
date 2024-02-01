@@ -36,26 +36,37 @@ export const stravaClient = createClient({
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
     }),
-    validate: (rawData) => {
-      const {
-        token_type: tokenType,
-        refresh_token: refreshToken,
-        access_token: accessToken,
-        expires_at: expiresAt,
-      } =
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        rawData as RawStravaRefreshToken;
-      invariant(tokenType === 'Bearer', `Invalid token type from Strava ${tokenType}`);
-      invariant(refreshToken, 'Missing refresh token from Strava');
-      invariant(accessToken, 'Missing access token from Strava');
-      invariant(expiresAt, 'Missing expires at from Strava');
-
-      return {
-        refreshToken,
-        accessToken,
-        // expiresAt is a timestamp in seconds!
-        expiryAt: new Date(expiresAt * 1000),
-      };
-    },
+    validate: validateRawDataToToken,
   },
 });
+
+/**
+ * Parses raw data to a token/access token from expected data
+ */
+export function validateRawDataToToken(rawData: unknown): {
+  refreshToken: string;
+  accessToken: string;
+  expiryAt: Date;
+} {
+  invariant(rawData !== null && typeof rawData === 'object', `Not an object from Strava`);
+
+  const {
+    token_type: tokenType,
+    refresh_token: refreshToken,
+    access_token: accessToken,
+    expires_at: expiresAt,
+  } =
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    rawData as RawStravaRefreshToken;
+  invariant(tokenType === 'Bearer', `Invalid token type from Strava ${tokenType}`);
+  invariant(refreshToken, 'Missing refresh token from Strava');
+  invariant(accessToken, 'Missing access token from Strava');
+  invariant(expiresAt, 'Missing expires at from Strava');
+
+  return {
+    refreshToken,
+    accessToken,
+    // expiresAt is a timestamp in seconds!
+    expiryAt: new Date(expiresAt * 1000),
+  };
+}
