@@ -1,7 +1,7 @@
 import type { StravaDetailedActivity } from 'db/models/StravaDetailedActivity';
+import { log } from '@logtail/next';
 import { stravaClient } from './stravaClient';
 import { paredStravaActivity } from './paredStravaActivity';
-import { log } from '@logtail/next';
 
 /**
  * Fetches an activity id from Strava's API. Use sparingly! Cuts into small API

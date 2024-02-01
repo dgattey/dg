@@ -1,5 +1,4 @@
 const { withLogtail } = require('@logtail/next');
-
 require('dotenv-mono').config();
 
 /**
