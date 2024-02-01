@@ -6,7 +6,7 @@ Hi :wave: This is an overengineered way to show off my past projects/info about 
 
 ## :hammer: Commands
 
-- `turbo dev --concurrency 1000` starts the development server + db connection to your local db + (assuming cloudflared is installed via brew) a tunnel to dev.dylangattey.com for purposes of testing webhooks
+- `turbo dev --concurrency 1000` starts the development server + db connection to your local db
 - `turbo build` runs a prod build without a db connection (for CI)
 - `turbo build:serve` runs a prod build + db connection to your local db + serves it all once built (for local testing)
 - `turbo build:analyze` builds shows bundle sizes for a prod build (for verification)
@@ -26,7 +26,7 @@ Hi :wave: This is an overengineered way to show off my past projects/info about 
 
 ## :beginner: Initial Setup
 
-You need Node 18+ and pnpm 7+ installed. Run `pnpm install` to get started once you have those two installed. Most later commands are run via `turbo`.
+You need Node 20+ and pnpm 8+ installed. Run `pnpm install` to get started once you have those two installed. Most later commands are run via `turbo`.
 
 ## :memo: Pull Requests
 
@@ -101,7 +101,13 @@ More annoyingly, each app from Strava only has one possible subscription that it
 
 Both use the same DB under the hood, but they use different auth tokens, refresh tokens, and callback URLs. An env variable, `process.env.STRAVA_TOKEN_NAME`, is used to switch between them. Note that if you're testing webhook events locally, you'll want to create another branch in the Planetscale DB probably so you don't clobber the DB with simultaneous updates from the local webhook + the live webhook! Or briefly disconnect the prod webhook, then reconnect when done local testing.
 
-Testing locally requires running Cloudflare's Tunnel service. Via it, https://dev.dylangattey.com points to your local (running) Next app if you run `turbo dev`. Make sure the config in ~/.cloudflared exposes the `dg` tunnel with `url: http://localhost:3000`. And close when done! The dev Strava app is set up to hit `dev.dylangattey.com` at `/api/webhooks`, whereas the main one uses `dylangattey.com`.
+##### Cloudflare Tunnels
+
+Testing locally requires running Cloudflare's Tunnel service. Via it, https://dev.dylangattey.com/api/webhooks points to your local (running) Next app if you run `turbo dev`. Here's how it works:
+
+1. Visit the tunnel's [config page](https://one.dash.cloudflare.com/737867b500ec8ef1d7e5c9650e5dbfdb/networks/tunnels/cfd_tunnel/60e09136-a10f-499c-8925-bcef7570677d/edit?tab=overview) and use the "Install and run a connector" section to start a persistent service. Change it here if `api/webhooks` ever moves.
+1. That will enable a persistent service on your device that will kep the tunnel open.
+1. To debug prod, you can temporarily change the `STRAVA` env variables to the prod values (except the callback url!) and log into Strava and change the accepted domain to the `dev` subdomain. Then, delete the current subscription, recreate, and try editing. Visit the `api/webhooks` to restart the oauth flow on dev.
 
 #### Webhooks
 

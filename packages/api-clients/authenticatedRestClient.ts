@@ -1,5 +1,7 @@
 import type { Wretch } from 'wretch';
 import wretch from 'wretch';
+import { log } from '@logtail/next';
+import { getStatus } from './getStatus';
 import type { RefreshTokenConfig } from './RefreshTokenConfig';
 import { refreshedAccessToken } from './refreshedAccessToken';
 
@@ -34,7 +36,9 @@ export function createClient({ endpoint, accessKey, refreshTokenConfig }: Client
     request: Self & Wretch<Self, Chain, Resolver>,
     forceRefresh: boolean,
   ) {
+    log.info('Adding auth', { forceRefresh });
     const accessToken = await refreshedAccessToken(accessKey, refreshTokenConfig, forceRefresh);
+    log.info('Got access token', { accessToken });
     return request.auth(`Bearer ${accessToken}`);
   }
 
@@ -44,14 +48,19 @@ export function createClient({ endpoint, accessKey, refreshTokenConfig }: Client
    */
   async function getWithAuth(resource: string) {
     const authedApi = await addAuth(api, false);
+    log.info('Fetching resource', { resource });
     const response = authedApi.get(resource).unauthorized(async (_error, req) => {
       // Renew credentials once and try to fetch again but fail if we hit another unauthorized
+      log.info('Unauthorized request, refreshing access token', { resource });
       const authedReq = await addAuth(req, false);
       return authedReq.get(resource).unauthorized((err) => {
+        log.info('Failed to refresh access token', { resource });
         throw err;
       });
     });
-    const { status } = await response.res().catch((err: { status: number }) => err);
+    const respOrError = await response.res().catch((err: unknown) => err);
+    log.info('Fetched resource', { resource, respOrError });
+    const status = getStatus(respOrError);
     return {
       response,
       status,

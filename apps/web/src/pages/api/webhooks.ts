@@ -4,6 +4,11 @@ import { echoStravaChallengeIfValid } from 'api/strava/echoStravaChallengeIfVali
 import { syncStravaWebhookUpdateWithDb } from 'api/strava/syncStravaWebhookUpdateWithDb';
 import type { StravaWebhookEvent } from 'api/strava/StravaWebhookEvent';
 import { log } from '@logtail/next';
+import {
+  exchangeCodeForToken,
+  getOauthTokenInitLink,
+  getStravaExchangeCodeForTokenRequest,
+} from 'api/strava/runOauthFlow';
 import { handleApiError, methodNotAllowedError } from 'api/handleApiError';
 
 // Just a shorthand for this function type
@@ -34,6 +39,19 @@ const handleGet: Processor = (request, response) => {
   if (echoStravaChallengeIfValid(request, response)) {
     return;
   }
+  if (process.env.NODE_ENV === 'development') {
+    log.info('Received Strava webhook GET in development mode');
+    const html = `
+      <h1>Development mode shortcuts</h1>
+      <h2>Strava</h2>
+      <a href="${getOauthTokenInitLink()}">Start OAuth flow</a>
+    `;
+    response.status(200).setHeader('Content-Type', 'text/html').end(html);
+    return;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  log.info('Invalid Strava webhook GET', { body: request.body as unknown });
   handleApiError(response, 'Bad Request', 400);
 };
 
@@ -42,7 +60,8 @@ const handleGet: Processor = (request, response) => {
  * receipt of it.
  */
 const handleWebhookEvent: AsyncProcessor = async (request, response) => {
-  log.info('Received Strava webhook event');
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+  log.info('Received Strava webhook event', { body: request.body as unknown });
   if (!isWebhookEvent(request.body)) {
     log.error('Received invalid Strava webhook event');
     handleApiError(response, 'Bad Request', 400);
@@ -66,12 +85,39 @@ const handleWebhookEvent: AsyncProcessor = async (request, response) => {
 };
 
 /**
+ * Processes a token exchange if necessary.
+ */
+async function handleTokenExchange(
+  request: NextApiRequest,
+  response: NextApiResponse,
+): Promise<boolean> {
+  const code = getStravaExchangeCodeForTokenRequest(request.query);
+  if (!code) {
+    // Just means we have a normal webhook event
+    return false;
+  }
+
+  log.info('Received token exchange webhook event', { code });
+  try {
+    const html = await exchangeCodeForToken(code);
+    response.status(200).setHeader('Content-Type', 'text/html').end(html);
+  } catch (error) {
+    log.error('Failed to exchange code for token', { error });
+    handleApiError(response, 'Could not generate oauth token', 500);
+  }
+  return true;
+}
+
+/**
  * Handles gets or posts to the webhook URL
  */
 const handler: AsyncProcessor = async (request, response) => {
   const { method } = request;
   switch (method) {
     case 'GET':
+      if (await handleTokenExchange(request, response)) {
+        return;
+      }
       handleGet(request, response);
       return;
     case 'POST':

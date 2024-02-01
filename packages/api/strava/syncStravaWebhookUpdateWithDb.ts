@@ -32,6 +32,7 @@ const fetchFromApiAndSaveToDb = async (id: number) => {
   const latestActivityData = await fetchStravaActivityFromApi(id);
   if (!latestActivityData?.start_date) {
     log.error('Missing activity data', { id, latestActivityData });
+    await log.flush();
     throw new Error(`Missing activity data for ${id}`);
   }
   const updatedActivity = await db.StravaActivity.upsert({
