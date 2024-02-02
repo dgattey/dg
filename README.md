@@ -129,20 +129,4 @@ Standard semver versioning is done via `semantic-release` and Conventional Commi
 
 Test a dry run with `GITHUB_TOKEN=* pnpm turbo release -- --dry-run --branches={branch here}` after filling in the token.
 
-### History
-
-The site was originally Wordpress for way too many years! I used a custom theme + had a bunch of optimizations starting way back in ~2011.
-
-**Version 0** + this repo appeared in spring 2016, with Gulp + Angular 1 (yikes :yikes:) + Wordpress JSON as a content API. The templates were very hand-written, with separate CSS/HTML files. Shockingly, there was some Typescript for the data models, even way back then. RXJS made an appearance for some functional programming!
-
-**Version 0.1** marked me getting fed up with Angular + the delicateness of build systems in summer 2016. Most of the app wasn't JS-necessary, so I swapped to HTML + Liquid templates + a really basic app using Jekyll. I put the content right in the repo instead of using Wordpress still. Getting things optimized was a little rough, but there were some plugins to make it work. That got me through a few years with mostly content updates.
-
-**Version 0.4** was me changing the design in Jan 2019 cause I got bored of the static grid there once was and I like tweaking. I focused on speed and added plugins/optimized my way to a good Lighthouse score. But once I started getting an asset pipeline with automatic webp image generation/etc, it got hairy. I had a TON of fun with Content Security Policy and eventually scrapped that since it was so brittle. Getting a service worker actually serving offline data was pretty cool though! Around this time, I swapped from a manual script that ran the Jekyll build to Netlify + using an automated deploy. Night and day!
-
-**Version 1.0.0** in spring 2019 was where I relaunched the Jekyll site on Netlify, then promptly tweaked CSP + the service worker for another month. I added linters + wrote a little webhook script to automatically bump the version. I kept redesigning the grid to make it more interactive + added a more complicated About page + tweaked CSP further. By this point I had multiple layers of caching, JS + HTML + SCSS + a custom image pipeline script. Way too much for Jekyll alone. At the end of 2019 I stopped working on the site for awhile.
-
-**Version 2.0.0** marked me getting semantic-release implemented + swapping to Gatbsy in spring 2021 as I converted the site to a JS based workflow that used Contentful to pull data to create the actual site. Ultimately Gatbsy was buggy + tediously slow to use, even though its GraphQL usage was sick.
-
-**Version 2.5.0** at the end of 2021 was the swap to Next as a framework + Vercel as a host to deploy it since Netlify had gotten crusty. Also, I made Typescript the language of choice instead of the hybrid mix I'd used with Gatsby. I added features like a map to show my location, light/dark mode (finally), Spotify + Strava to show my latest stats, and new projects I'd worked on since 2019. I released the Next version of the site in spring 2022, with content fully separated from design to make it easier to keep it updated through the years. With Vercel + modern React, I'm much better set up for no design changes for awhile.
-
 [gh]: https://github.com/dgattey/dg
