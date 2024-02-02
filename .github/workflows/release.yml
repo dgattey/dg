@@ -80,7 +80,7 @@ jobs:
         if: ${{ steps.latest-version-tag.outputs.tag != '' }}
         run: |
           echo "Latest tag: ${LATEST_TAG}"
-          pnpm vercel build --prod --token=${{ env.VERCEL_DEPLOY_TOKEN }} NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}"
+          NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}" pnpm vercel build --prod --token=${{ env.VERCEL_DEPLOY_TOKEN }}
         env:
           LATEST_TAG: ${{ steps.latest-version-tag.outputs.tag }}
       - name: Deploy Project Artifacts to Vercel
