@@ -56,5 +56,5 @@ const QUERY = gql`
  */
 export async function fetchPrivacyContent(): Promise<TextBlock | null> {
   const data = await contentfulClient.request<PrivacyBlockQuery>(QUERY);
-  return data.textBlockCollection?.items.filter(isTextBlock)?.[0] ?? null;
+  return data.textBlockCollection?.items.filter(isTextBlock)[0] ?? null;
 }

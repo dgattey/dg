@@ -76,7 +76,7 @@ export async function fetchIntroContent(): Promise<null | {
   };
 }> {
   const data = await contentfulClient.request<IntroBlockQuery>(QUERY);
-  const textBlock = data.textBlockCollection?.items.filter(isTextBlock)?.[0];
+  const textBlock = data.textBlockCollection?.items.filter(isTextBlock)[0];
   const image = data.asset;
   if (textBlock && image) {
     return { textBlock, image };
