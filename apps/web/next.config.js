@@ -1,5 +1,5 @@
 const { withLogtail } = require('@logtail/next');
-require('dotenv-mono').config();
+require('dotenv-mono').config({ override: true });
 
 /**
  * Adds bundle analysis if development + with ANALYZE flag set to true

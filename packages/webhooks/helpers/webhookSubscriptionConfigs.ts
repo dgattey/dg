@@ -2,7 +2,7 @@ import { dotenvLoad } from 'dotenv-mono';
 import type { WebhookSubscriptionConfig } from '../types/WebhookSubscriptionConfig';
 import type { WebhookType } from '../types/WebhookType';
 
-dotenvLoad();
+dotenvLoad({ override: true });
 
 /**
  * These are the standard parameters that go into the body of

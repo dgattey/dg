@@ -1027,6 +1027,7 @@ export type ProjectOrder =
   | 'title_DESC';
 
 export type Query = {
+  readonly _node: Maybe<_Node>;
   readonly asset: Maybe<Asset>;
   readonly assetCollection: Maybe<AssetCollection>;
   readonly book: Maybe<Book>;
@@ -1042,6 +1043,12 @@ export type Query = {
   readonly sectionCollection: Maybe<SectionCollection>;
   readonly textBlock: Maybe<TextBlock>;
   readonly textBlockCollection: Maybe<TextBlockCollection>;
+};
+
+export type Query_NodeArgs = {
+  id: Scalars['ID']['input'];
+  locale: InputMaybe<Scalars['String']['input']>;
+  preview: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type QueryAssetArgs = {
@@ -1413,6 +1420,10 @@ export type TextBlockOrder =
   | 'sys_publishedAt_DESC'
   | 'sys_publishedVersion_ASC'
   | 'sys_publishedVersion_DESC';
+
+export type _Node = {
+  readonly _id: Scalars['ID']['output'];
+};
 
 export type CfLinkNestedFilter = {
   readonly AND: InputMaybe<ReadonlyArray<InputMaybe<CfLinkNestedFilter>>>;

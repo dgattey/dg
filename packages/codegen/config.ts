@@ -3,7 +3,7 @@ import { dotenvLoad } from 'dotenv-mono';
 import { invariant } from 'shared-core/helpers/invariant';
 import { createApiGenerator } from './createApiGenerator';
 
-dotenvLoad();
+dotenvLoad({ override: true });
 
 const { CONTENTFUL_ACCESS_TOKEN, CONTENTFUL_SPACE_ID, GITHUB_AUTHENTICATION_TOKEN } = process.env;
 invariant(CONTENTFUL_ACCESS_TOKEN, 'Missing CONTENTFUL_ACCESS_TOKEN env variable');
