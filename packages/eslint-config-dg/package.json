@@ -13,10 +13,10 @@
   },
   "devDependencies": {
     "@types/node": "20.11.5",
-    "@vercel/style-guide": "5.1.0",
-    "eslint-config-turbo": "1.11.3",
-    "globals": "13.24.0",
+    "@vercel/style-guide": "6.0.0",
+    "eslint-config-turbo": "1.13.2",
+    "globals": "15.0.0",
     "tsconfig": "workspace:*",
-    "typescript": "5.3.3"
+    "typescript": "5.4.4"
   }
 }
