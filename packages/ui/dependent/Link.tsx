@@ -63,7 +63,7 @@ const BUILT_IN_ICONS: Record<string, JSX.Element> = {
  */
 const createIconElement = ({ icon, layout = 'text' }: Pick<BaseLinkProps, 'icon' | 'layout'>) =>
   icon && !['children', 'text'].includes(layout)
-    ? BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />
+    ? (BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />)
     : null;
 
 /**

@@ -45,9 +45,9 @@ function PreviewCard({
 }) {
   const { colorScheme } = useColorScheme();
   const backgroundImageUrl = colorScheme.isInitialized
-    ? (colorScheme.mode === 'light'
+    ? ((colorScheme.mode === 'light'
         ? location?.backupImageUrls.light
-        : location?.backupImageUrls.dark) ?? null
+        : location?.backupImageUrls.dark) ?? null)
     : null;
   return (
     <ContentCard

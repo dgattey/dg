@@ -32,7 +32,7 @@ export const handleApiError = (
   const message =
     typeof typedError === 'string'
       ? typedError
-      : typedError?.get?.() ?? typedError?.message ?? FALLBACK_ERROR;
+      : (typedError?.get?.() ?? typedError?.message ?? FALLBACK_ERROR);
   response.status(responseCode ?? 500).json({ error: message });
 };
 

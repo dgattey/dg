@@ -8,7 +8,14 @@ import { StravaActivity } from './models/StravaActivity';
 const SHARED_DB_OPTIONS = {
   dialect: 'postgres' as const,
   dialectModule: postgres, // gets around a Vercel bug where it's missing on edge functions
-  dialectOptions: { ssl: { require: true } },
+  dialectOptions: {
+    ssl: true,
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: true,
+      },
+    },
+  },
 };
 
 const databaseUrl = env.DATABASE_URL;
@@ -17,26 +24,14 @@ if (!databaseUrl) {
   throw new Error('DATABASE_URL environment variable not set');
 }
 
-// If running a production build locally we turn off SSL so we can actually make a build!
-const isRunningLocalProdBuild = ['127.0.0.1', 'localhost'].some((host) =>
-  databaseUrl.includes(host),
-);
-const nodeEnv = isRunningLocalProdBuild ? 'development' : env.NODE_ENV;
-log.info('Node env', { nodeEnv });
+const nodeEnv = env.NODE_ENV;
+log.info('Node env from env variable', { nodeEnv });
 
 // Sequelize options applied based on current environment
 const DB_OPTIONS = {
   development: SHARED_DB_OPTIONS,
   test: SHARED_DB_OPTIONS,
-  production: {
-    ...SHARED_DB_OPTIONS,
-    ssl: true,
-    dialectOptions: {
-      ssl: {
-        rejectUnauthorized: true,
-      },
-    },
-  },
+  production: SHARED_DB_OPTIONS,
 }[nodeEnv];
 
 /**
