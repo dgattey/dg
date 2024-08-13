@@ -2,7 +2,7 @@
   "$schema": "https://json.schemastore.org/tsconfig.json",
   "extends": "tsconfig/nextjs.json",
   "compilerOptions": {
-    "baseUrl": "src",
+    "baseUrl": "src"
   },
-  "include": ["src", "next.config.js", "next-env.d.ts"],
+  "include": ["src", "next.config.js", "next-env.d.ts"]
 }
