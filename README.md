@@ -6,7 +6,7 @@ Hi :wave: This is an overengineered way to show off my past projects/info about 
 
 ## :hammer: Commands
 
-- `turbo dev --concurrency 1000` starts the development server + db connection to your local db
+- `turbo dev --concurrency 1000` starts the development server + db connection to the prod DB (be careful!)
 - `turbo build` runs a prod build without a db connection (for CI)
 - `turbo build:serve` runs a prod build + db connection to your local db + serves it all once built (for local testing)
 - `turbo build:analyze` builds shows bundle sizes for a prod build (for verification)
@@ -14,7 +14,6 @@ Hi :wave: This is an overengineered way to show off my past projects/info about 
 - `turbo lint` runs ESLint to lint all TS(X) and JS(X) files
 - `turbo lint:types` runs tsc to confirm no type errors on the same files
 - `turbo codegen` generates new GraphQL APIs from Github/Contentful + operation file types from the queries/mutations
-- `turbo connect <optional branch>` (assuming you have `pscale` installed locally) connects you to the DB branch specified on port 3309
 - `turbo db -- db:migrate` uses Sequelize to run migrations, and you can list the status of migrations with `turbo db -- db:migrate:status`. Undo with `turbo db -- db:migrate:undo`
 - `turbo db -- migration:generate --name <name>` uses Sequelize to generate a new migration file ready to be populated
 - `turbo webhook -- create <name>` will create a webhook subscription for the given API - for local dev and requires `dev` to be running already
@@ -26,7 +25,7 @@ Hi :wave: This is an overengineered way to show off my past projects/info about 
 
 ## :beginner: Initial Setup
 
-You need Node 20+ and pnpm 8+ installed. Run `pnpm install` to get started once you have those two installed. Most later commands are run via `turbo`.
+You need Node 20+ and pnpm 8+ installed. Run `pnpm install` to get started once you have those two installed. You also need `neonctl` installed globally, with `brew install neonctl`. Most later commands are run via `turbo`.
 
 ## :memo: Pull Requests
 
@@ -64,7 +63,9 @@ Pretty standard Next app here. `/public` contains static files, `/src` contains 
 
 - [GraphQL Codegen](https://www.graphql-code-generator.com) makes all the `*.generated.ts` files. It reads Github + Contentful's API schema + creates types out of them automatically. I run it on command when I write new queries/etc to get their types.
 
-- [PlanetScale](https://planetscale.com) powers a distributed DB. This DB is used to persist auth tokens for Spotify/Strava beyond the lifetime of a deploy + refresh the token as needed.
+- [Neon](https://neon.tech) powers a distributed DB. This DB is used to persist auth tokens for Spotify/Strava beyond the lifetime of a deploy + refresh the token as needed.
+
+- [Sequelize](https://sequelize.org) is used to run migrations on the DB + interact with it. It's a lightweight ORM that makes sure my DB tables have the right shapes and fields.
 
 ### API
 
@@ -76,7 +77,7 @@ Pretty standard Next app here. `/public` contains static files, `/src` contains 
 
 ### DB
 
-Because Spotify + Strava use Oauth and I use their APIs to pull stats/etc, I needed a lightweight DB to store auth tokens. That way, I could redeploy without losing them or the refresh tokens that would allow me to fetch new ones. Planetscale comes from the Vercel team and is super easy to use.
+Because Spotify + Strava use Oauth and I use their APIs to pull stats/etc, I needed a lightweight DB to store auth tokens. I use Neon + Sequelize for this.
 
 There's only two tables, one for the tokens and one for the Strava activities, and they're used from the server only.
 
@@ -87,10 +88,10 @@ To create and run a migration:
 
 1. Run `turbo db -- migration:generate --name <name>` to create a new migration file
 1. Fill it in with the appropriate `up` and `down` code for what you're doing
-1. Create a new branch on Planetscale's UI to test with
+1. Create a new branch on Neon's UI to test with
 1. Connect to that branch with `turbo connect -- <branch>` and then start a new server with `turbo dev`
 1. In a new terminal tab, run `turbo db -- db:migrate` to run migrations onto that branch.
-1. If all looks good, you can deploy request from Planetscale, review, merge, and delete the branch.
+1. If all looks good, you can deploy request from Neon, review, merge, and delete the branch.
 1. Migrations can be undone with `turbo db -- db:migrate:undo`
 
 #### Strava
@@ -99,7 +100,7 @@ DO NOT make direct API calls to Strava if you can avoid it. They have a very res
 
 More annoyingly, each app from Strava only has one possible subscription that it can use. Instead of trying to switch the config every time I want to test locally, there's just two different Strava apps I've created, each used for a different setup. The one connected to my personal Strava account is a test app. The one connected to the +prod account is for the prod app. There's an `/webhooks` API route that handles all the logic when called from a webhook subscription.
 
-Both use the same DB under the hood, but they use different auth tokens, refresh tokens, and callback URLs. An env variable, `process.env.STRAVA_TOKEN_NAME`, is used to switch between them. Note that if you're testing webhook events locally, you'll want to create another branch in the Planetscale DB probably so you don't clobber the DB with simultaneous updates from the local webhook + the live webhook! Or briefly disconnect the prod webhook, then reconnect when done local testing.
+Both use the same DB under the hood, but they use different auth tokens, refresh tokens, and callback URLs. An env variable, `process.env.STRAVA_TOKEN_NAME`, is used to switch between them. Note that if you're testing webhook events locally, you'll want to create another branch in the Neon DB probably so you don't clobber the DB with simultaneous updates from the local webhook + the live webhook! Or briefly disconnect the prod webhook, then reconnect when done local testing.
 
 ##### Cloudflare Tunnels
 

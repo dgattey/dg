@@ -1,13 +1,14 @@
 import { env } from 'node:process';
 import { Sequelize } from 'sequelize-typescript';
-import mysql2 from 'mysql2';
+import postgres from 'pg';
 import { log } from '@logtail/next';
 import { Token } from './models/Token';
 import { StravaActivity } from './models/StravaActivity';
 
 const SHARED_DB_OPTIONS = {
-  dialect: 'mysql' as const,
-  dialectModule: mysql2, // gets around a Vercel bug where it's missing on edge functions
+  dialect: 'postgres' as const,
+  dialectModule: postgres, // gets around a Vercel bug where it's missing on edge functions
+  dialectOptions: { ssl: { require: true } },
 };
 
 const databaseUrl = env.DATABASE_URL;
