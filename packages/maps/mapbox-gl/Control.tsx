@@ -1,8 +1,7 @@
-import type { Map } from 'mapbox-gl';
 import { useEffect, useMemo, useRef } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
-import { useControl } from 'react-map-gl';
+import { useControl, type MapInstance } from 'react-map-gl';
 import { useTheme } from '@mui/material';
 import type { ControlContainerProps } from './ControlContainer';
 import { ControlContainer } from './ControlContainer';
@@ -26,7 +25,7 @@ class DGControl {
   /**
    * What Mapbox uses for the map itself - needs to be named this
    */
-  _map: Map | undefined;
+  _map: MapInstance | undefined;
 
   /**
    * What Mapbox uses for the container for the element we're adding -
@@ -56,7 +55,7 @@ class DGControl {
    * Creates a new div that holds a `ControlContainer` for the contents. Pass
    * onClick if there are not multiple children.
    */
-  onAdd(map: Map) {
+  onAdd(map: MapInstance) {
     this._map = map;
     this._container?.parentNode?.removeChild(this._container);
     this._container = document.createElement('div');
