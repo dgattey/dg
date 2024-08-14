@@ -1,3 +1,4 @@
+// eslint-disable-next-line import/order
 const { withLogtail } = require('@logtail/next');
 require('dotenv-mono').config();
 

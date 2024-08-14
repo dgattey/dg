@@ -60,7 +60,7 @@ export async function fetchCurrentLocation(): Promise<MapLocation | null> {
   if (!location || !data.lightImage?.url || !data.darkImage?.url) {
     return null;
   }
-  const zoomLevels = location.zoomLevels?.filter(isNotNullish)?.map(Number) ?? [];
+  const zoomLevels = location.zoomLevels?.filter(isNotNullish).map(Number) ?? [];
   zoomLevels.sort((a, b) => {
     if (a === b) {
       return 0;
