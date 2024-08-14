@@ -24,6 +24,7 @@
     "CONTENTFUL_SPACE_ID",
     "DATABASE_URL",
     "GITHUB_AUTHENTICATION_TOKEN",
+    "GITHUB_TOKEN",
     "NEXT_PUBLIC_APP_VERSION",
     "NEXT_PUBLIC_MAPBOX_TOKEN",
     "NEXT_PUBLIC_SENTRY_DSN",
@@ -39,82 +40,48 @@
   ],
   "tasks": {
     "topo": {
-      "dependsOn": [
-        "^topo"
-      ]
+      "dependsOn": ["^topo"]
     },
     "dev": {
-      "dependsOn": [
-        "topo"
-      ],
-      "inputs": [
-        "apps/**/*",
-        "packages/**/*"
-      ],
+      "dependsOn": ["topo"],
+      "inputs": ["apps/**/*", "packages/**/*"],
       "cache": false,
       "persistent": true
     },
     "connect": {
-      "inputs": [
-        "apps/**/*",
-        "packages/**/*"
-      ],
+      "inputs": ["apps/**/*", "packages/**/*"],
       "cache": false,
       "persistent": true
     },
     "build": {
-      "dependsOn": [
-        "^build",
-        "topo",
-        "lint",
-        "lint:types",
-        "format"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**"
-      ]
+      "dependsOn": ["^build", "topo", "lint", "lint:types", "format"],
+      "outputs": [".next/**", "!.next/cache/**"]
     },
     "build:analyze": {
-      "dependsOn": [
-        "^build",
-        "topo"
-      ],
-      "outputs": [
-        ".next/**"
-      ]
+      "dependsOn": ["^build", "topo"],
+      "outputs": [".next/**"]
     },
     "build:serve": {
-      "dependsOn": [
-        "build"
-      ],
+      "dependsOn": ["build"],
       "cache": false
     },
     "format": {
-      "dependsOn": [
-        "topo"
-      ],
+      "dependsOn": ["topo"],
       "outputLogs": "new-only"
     },
     "lint": {
       "outputs": [],
-      "dependsOn": [
-        "topo"
-      ],
+      "dependsOn": ["topo"],
       "outputLogs": "new-only"
     },
     "lint:types": {
       "outputs": [],
-      "dependsOn": [
-        "topo"
-      ],
+      "dependsOn": ["topo"],
       "outputLogs": "new-only"
     },
     "codegen": {
       "cache": false,
-      "inputs": [
-        "apps/web/src/api/server/*"
-      ]
+      "inputs": ["apps/web/src/api/server/*"]
     },
     "webhook": {
       "cache": false
