@@ -11,7 +11,6 @@ const STRAVA_TOKEN_NAME = process.env.STRAVA_TOKEN_NAME;
 invariant(CALLBACK_URL, 'Missing WEBHOOK_CALLBACK_URL env variable');
 invariant(CLIENT_ID, 'Missing STRAVA_CLIENT_ID env variable');
 invariant(CLIENT_SECRET, 'Missing STRAVA_CLIENT_SECRET env variable');
-invariant(STRAVA_TOKEN_NAME, 'Missing STRAVA_TOKEN_NAME env variable');
 
 /**
  * Just a state token to confirm types between the OAuth flow and the callback
@@ -75,6 +74,7 @@ export async function exchangeCodeForToken(code: string): Promise<string> {
   const { accessToken, expiryAt, refreshToken } = validateRawDataToToken(await response.json());
 
   // Persist the refreshToken and accessToken from the response to the DB
+  invariant(STRAVA_TOKEN_NAME, 'Missing STRAVA_TOKEN_NAME env variable');
   log.info('Persisting token to DB', { accessToken, expiryAt, refreshToken });
   const [token] = await db.Token.upsert({
     name: STRAVA_TOKEN_NAME,

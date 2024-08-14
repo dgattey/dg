@@ -44,10 +44,10 @@ export function ErrorPageContents({ statusCode }: HasStatusCode) {
   return (
     <>
       <Typography variant="h1">
-        {(statusCode && TITLE_TEXT[statusCode]) || TITLE_TEXT.fallback}
+        {(statusCode && TITLE_TEXT[statusCode]) ?? TITLE_TEXT.fallback}
       </Typography>
       <Typography sx={{ maxWidth: '35em' }} variant="body1">
-        {(statusCode && descriptions[statusCode]) || descriptions.fallback}{' '}
+        {(statusCode && descriptions[statusCode]) ?? descriptions.fallback}{' '}
         {emailLink ? <Link layout="iconText" {...emailLink} href={emailLink.url} /> : 'Email Me'}{' '}
         and I can help you out!
       </Typography>

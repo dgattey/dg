@@ -14,8 +14,13 @@ const rules = {
   // There's a rule against floating promises, but React can't have
   // useEffect be async. We get around it with an immediately invoked function (a void function)
   '@typescript-eslint/no-floating-promises': ['error', { ignoreIIFE: true }],
-  // https://github.com/typescript-eslint/typescript-eslint/blob/master/packages/eslint-plugin/docs/rules/restrict-template-expressions.md
-  '@typescript-eslint/restrict-template-expressions': 'error',
+  // https://typescript-eslint.io/rules/restrict-template-expressions/
+  '@typescript-eslint/restrict-template-expressions': [
+    'error',
+    {
+      allowNumber: true,
+    },
+  ],
   // Type assertions (const x: Type = y as Type) create bugs and mask errors, don't allow them at all
   '@typescript-eslint/consistent-type-assertions': ['error', { assertionStyle: 'never' }],
   // We always want types since we run into errors with interfaces and type guards otherwise
