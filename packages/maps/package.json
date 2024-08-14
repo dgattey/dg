@@ -9,8 +9,8 @@
   "dependencies": {
     "@mui/material": "5.16.7",
     "api": "workspace:*",
-    "mapbox-gl": "3.0.1",
     "lucide-react": "0.427.0",
+    "mapbox-gl": "3.5.2",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-map-gl": "7.1.7",
@@ -18,7 +18,6 @@
     "ui": "workspace:*"
   },
   "devDependencies": {
-    "@types/mapbox-gl": "2.7.19",
     "@types/node": "22.2.0",
     "@types/react": "18.3.3",
     "@types/react-dom": "18.3.0",
