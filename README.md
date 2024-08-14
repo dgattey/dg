@@ -6,7 +6,7 @@ Hi :wave: This is an overengineered way to show off my past projects/info about 
 
 ## :hammer: Commands
 
-- `turbo dev --concurrency 1000` starts the development server + db connection to the prod DB (be careful!)
+- `turbo dev` starts the development server + db connection to the prod DB (be careful!)
 - `turbo build` runs a prod build without a db connection (for CI)
 - `turbo build:serve` runs a prod build + db connection to your local db + serves it all once built (for local testing)
 - `turbo build:analyze` builds shows bundle sizes for a prod build (for verification)

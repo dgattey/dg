@@ -1,11 +1,5 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDotEnv": [
-    ".env.development.local",
-    ".env.strava-webhooks-prod.local",
-    ".env.production.local",
-    ".env"
-  ],
   "globalDependencies": [
     ".env*",
     "config/database.config.js",
@@ -17,7 +11,11 @@
     ".pretterignore",
     "codegen.ts",
     "next.config.js",
-    "tsconfig.json"
+    "tsconfig.json",
+    ".env.development.local",
+    ".env.strava-webhooks-prod.local",
+    ".env.production.local",
+    ".env"
   ],
   "globalEnv": [
     "ANALYZE",
@@ -39,50 +37,84 @@
     "STRAVA_VERIFY_TOKEN",
     "WEBHOOK_CALLBACK_URL"
   ],
-  "pipeline": {
+  "tasks": {
     "topo": {
-      "dependsOn": ["^topo"]
+      "dependsOn": [
+        "^topo"
+      ]
     },
     "dev": {
-      "dependsOn": ["topo"],
-      "inputs": ["apps/**/*", "packages/**/*"],
+      "dependsOn": [
+        "topo"
+      ],
+      "inputs": [
+        "apps/**/*",
+        "packages/**/*"
+      ],
       "cache": false,
       "persistent": true
     },
     "connect": {
-      "inputs": ["apps/**/*", "packages/**/*"],
+      "inputs": [
+        "apps/**/*",
+        "packages/**/*"
+      ],
       "cache": false,
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build", "topo", "lint", "lint:types", "format"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": [
+        "^build",
+        "topo",
+        "lint",
+        "lint:types",
+        "format"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**"
+      ]
     },
     "build:analyze": {
-      "dependsOn": ["^build", "topo"],
-      "outputs": [".next/**"]
+      "dependsOn": [
+        "^build",
+        "topo"
+      ],
+      "outputs": [
+        ".next/**"
+      ]
     },
     "build:serve": {
-      "dependsOn": ["build"],
+      "dependsOn": [
+        "build"
+      ],
       "cache": false
     },
     "format": {
-      "outputMode": "new-only",
-      "dependsOn": ["topo"]
+      "dependsOn": [
+        "topo"
+      ],
+      "outputLogs": "new-only"
     },
     "lint": {
       "outputs": [],
-      "outputMode": "new-only",
-      "dependsOn": ["topo"]
+      "dependsOn": [
+        "topo"
+      ],
+      "outputLogs": "new-only"
     },
     "lint:types": {
       "outputs": [],
-      "outputMode": "new-only",
-      "dependsOn": ["topo"]
+      "dependsOn": [
+        "topo"
+      ],
+      "outputLogs": "new-only"
     },
     "codegen": {
       "cache": false,
-      "inputs": ["apps/web/src/api/server/*"]
+      "inputs": [
+        "apps/web/src/api/server/*"
+      ]
     },
     "webhook": {
       "cache": false
