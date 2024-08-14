@@ -1,11 +1,5 @@
 {
   "$schema": "https://turbo.build/schema.json",
-  "globalDotEnv": [
-    ".env.development.local",
-    ".env.strava-webhooks-prod.local",
-    ".env.production.local",
-    ".env"
-  ],
   "globalDependencies": [
     ".env*",
     "config/database.config.js",
@@ -17,7 +11,11 @@
     ".pretterignore",
     "codegen.ts",
     "next.config.js",
-    "tsconfig.json"
+    "tsconfig.json",
+    ".env.development.local",
+    ".env.strava-webhooks-prod.local",
+    ".env.production.local",
+    ".env"
   ],
   "globalEnv": [
     "ANALYZE",
@@ -26,6 +24,7 @@
     "CONTENTFUL_SPACE_ID",
     "DATABASE_URL",
     "GITHUB_AUTHENTICATION_TOKEN",
+    "GITHUB_TOKEN",
     "NEXT_PUBLIC_APP_VERSION",
     "NEXT_PUBLIC_MAPBOX_TOKEN",
     "NEXT_PUBLIC_SENTRY_DSN",
@@ -39,7 +38,7 @@
     "STRAVA_VERIFY_TOKEN",
     "WEBHOOK_CALLBACK_URL"
   ],
-  "pipeline": {
+  "tasks": {
     "topo": {
       "dependsOn": ["^topo"]
     },
@@ -67,18 +66,18 @@
       "cache": false
     },
     "format": {
-      "outputMode": "new-only",
-      "dependsOn": ["topo"]
+      "dependsOn": ["topo"],
+      "outputLogs": "new-only"
     },
     "lint": {
       "outputs": [],
-      "outputMode": "new-only",
-      "dependsOn": ["topo"]
+      "dependsOn": ["topo"],
+      "outputLogs": "new-only"
     },
     "lint:types": {
       "outputs": [],
-      "outputMode": "new-only",
-      "dependsOn": ["topo"]
+      "dependsOn": ["topo"],
+      "outputLogs": "new-only"
     },
     "codegen": {
       "cache": false,
