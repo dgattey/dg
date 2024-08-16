@@ -71,6 +71,11 @@ function getCardSx(
         boxShadow: theme.vars.extraShadows.card.hovered,
       },
     }),
+    [theme.breakpoints.down('md')]: {
+      justifySelf: 'center',
+      maxWidth: '85vw',
+      minWidth: 'min(fit-content, 85vw)',
+    },
     [theme.breakpoints.up('md')]: {
       ...(verticalSpan && {
         gridRow: `span ${verticalSpan}`,

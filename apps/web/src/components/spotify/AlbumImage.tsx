@@ -43,21 +43,22 @@ export function AlbumImage({ album }: AlbumImageProps) {
         sx={(theme) => ({
           position: 'relative',
           alignSelf: 'flex-end',
-          borderRadius: 8,
+          alignContent: 'center',
+          borderRadius: 6,
           margin: 0,
           padding: 0,
           overflow: 'hidden',
           aspectRatio: '1 / 1',
-          height: '100%',
-          maxHeight: `${IMAGE_SIZE}px`,
+          '--image-dim': `${IMAGE_SIZE}px`,
+          minWidth: `var(--image-dim)`,
           transition: theme.transitions.create(['max-height', 'height']),
           [theme.breakpoints.down('md')]: {
-            maxHeight: `${(2 * IMAGE_SIZE) / 3}px`,
-            borderRadius: 6,
+            '--image-dim': `${(2 * IMAGE_SIZE) / 3}px`,
+            borderRadius: 4,
           },
           [theme.breakpoints.down('sm')]: {
-            maxHeight: `${IMAGE_SIZE / 2}px`,
-            borderRadius: 4,
+            '--image-dim': `${IMAGE_SIZE / 2}px`,
+            borderRadius: 2,
           },
         })}
       >
@@ -67,6 +68,7 @@ export function AlbumImage({ album }: AlbumImageProps) {
           height={IMAGE_SIZE}
           sizes={{ extraLarge: IMAGE_SIZE }}
           width={IMAGE_SIZE}
+          fill
         />
       </Card>
     </Link>

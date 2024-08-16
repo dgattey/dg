@@ -1,8 +1,8 @@
 import { COLORS } from 'ui/theme/color';
 import { BackgroundPattern } from './BackgroundPattern';
 
-export const TEXT_FONT = 'SF Pro Text';
-export const LOGO_FONT = 'SF Pro Text Black';
+export const TEXT_FONT = 'SF Pro';
+export const LOGO_FONT = 'SF Pro Display Heavy';
 
 /**
  * Approximates the actual logo with some scaling
@@ -13,13 +13,13 @@ function Logo() {
       style={{
         fontFamily: `'${LOGO_FONT}'`,
         letterSpacing: '-0.12em',
-        fontSize: 128,
-        color: COLORS.PRIMARY,
+        fontSize: 132,
+        color: COLORS.DARK.PRIMARY,
         transformOrigin: 'left center',
         transform: 'scale(1.2, 1)',
         marginBottom: 64,
         alignSelf: 'flex-end',
-        marginRight: 64,
+        marginRight: 96,
       }}
     >
       dg.
@@ -42,8 +42,8 @@ export function OpenGraphImage({ text, subtitle }: { text: string; subtitle: str
         height: '100%',
         width: '100%',
         background: COLORS.DARK.DEFAULT_BACKGROUND,
-        color: COLORS.DARK.TEXT,
-        fontSize: 64,
+        color: COLORS.DARK.H5,
+        fontSize: 56,
         fontFamily: `'${TEXT_FONT}'`,
       }}
     >
@@ -61,8 +61,9 @@ export function OpenGraphImage({ text, subtitle }: { text: string; subtitle: str
         {text}
         <div
           style={{
-            fontSize: 42,
-            color: COLORS.MUTED_TEXT,
+            fontSize: 40,
+            fontStretch: '125%',
+            color: COLORS.DARK.MUTED_TEXT,
             marginTop: 8,
           }}
         >

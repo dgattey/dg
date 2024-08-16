@@ -37,6 +37,7 @@ export function TrackListing({ track, hasLogo }: TrackListingProps) {
     >
       <HorizontalStack
         sx={{
+          gap: 6,
           justifyContent: 'space-between',
         }}
       >

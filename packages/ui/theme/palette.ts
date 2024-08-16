@@ -3,30 +3,21 @@ import { COLORS } from './color';
 
 const lightPalette: PaletteOptions = {
   primary: {
-    main: COLORS.PRIMARY,
+    main: COLORS.LIGHT.PRIMARY,
   },
   secondary: {
-    main: COLORS.SECONDARY,
+    main: COLORS.LIGHT.SECONDARY,
   },
   card: {
-    background: COLORS.LIGHT.CARD_BACKGROUND,
     border: COLORS.LIGHT.CARD_BORDER,
-  },
-  code: {
-    background: COLORS.LIGHT.CODE_BACKGROUND,
-    text: COLORS.MUTED_TEXT,
   },
   background: {
     default: COLORS.LIGHT.DEFAULT_BACKGROUND,
     paper: COLORS.LIGHT.PAPER_BACKGROUND,
   },
-  warning: { main: COLORS.LIGHT.YELLOW },
-  active: {
-    main: COLORS.LIGHT.YELLOW,
-  },
   text: {
     primary: COLORS.LIGHT.TEXT,
-    secondary: COLORS.MUTED_TEXT,
+    secondary: COLORS.LIGHT.MUTED_TEXT,
     h1: COLORS.LIGHT.H1,
     h2: COLORS.LIGHT.H2,
     h3: COLORS.LIGHT.H3,
@@ -42,30 +33,21 @@ const lightPalette: PaletteOptions = {
 
 const darkPalette: PaletteOptions = {
   primary: {
-    main: COLORS.PRIMARY,
+    main: COLORS.DARK.PRIMARY,
   },
   secondary: {
-    main: COLORS.SECONDARY,
+    main: COLORS.DARK.SECONDARY,
   },
   card: {
-    background: COLORS.DARK.CARD_BACKGROUND,
     border: COLORS.DARK.CARD_BORDER,
-  },
-  code: {
-    background: COLORS.DARK.CODE_BACKGROUND,
-    text: COLORS.MUTED_TEXT,
   },
   background: {
     default: COLORS.DARK.DEFAULT_BACKGROUND,
     paper: COLORS.DARK.PAPER_BACKGROUND,
   },
-  warning: { main: COLORS.DARK.YELLOW },
-  active: {
-    main: COLORS.SECONDARY,
-  },
   text: {
     primary: COLORS.DARK.TEXT,
-    secondary: COLORS.MUTED_TEXT,
+    secondary: COLORS.DARK.MUTED_TEXT,
     h1: COLORS.DARK.H1,
     h2: COLORS.DARK.H2,
     h3: COLORS.DARK.H3,

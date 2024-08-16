@@ -1,8 +1,8 @@
-import type { Theme } from '@mui/material';
 import { useTheme } from '@mui/material';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import { useColorScheme } from 'ui/theme/useColorScheme';
 
 type MetaProps = {
   /**
@@ -29,63 +29,6 @@ const OG_IMAGE_API_ROUTE = 'api/og';
 const GRAPH_PREFIXES = ['og', 'twitter'] as const;
 
 /**
- * Helps reduce duplication for creation of link elements
- */
-const linkFromSize = (size: string, fileType: string, rel = 'icon') => (
-  <link
-    href={`/icons/${fileType}-${size}.png`}
-    key={`${size}${fileType}link`}
-    rel={rel}
-    sizes={`${size}x${size}`}
-  />
-);
-
-/**
- * Helps reduce duplication for creation of meta elements
- */
-const metaFromSize = (size: string, fileType: string, name: string) => (
-  <meta content={`/icons/${fileType}-${size}.png`} key={`${size}${fileType}meta`} name={name} />
-);
-
-/**
- * Organizes and maps icon file sizes/names to their created elements - keep this
- * up to date with everything in public/icons/*.png
- */
-const ICONS = {
-  generic: {
-    variants: [32, 144, 192, 228],
-    element: (size: string) => linkFromSize(size, 'favicon'),
-  },
-  android: {
-    variants: [96, 128, 144, 192, 196, 512],
-    element: (size: string) => linkFromSize(size, 'prerounded'),
-  },
-  ios: {
-    variants: [57, 76, 120, 152, 167, 180, 512, 1024],
-    element: (size: string) => linkFromSize(size, 'touch-icon', 'apple-touch-icon'),
-  },
-  windows: {
-    variants: [144],
-    element: (size: string) => metaFromSize(size, 'favicon', 'msapplication-TileImage'),
-  },
-  thumbnail: {
-    variants: [152],
-    element: (size: string) => metaFromSize(size, 'touch-icon', 'thumbnail'),
-  },
-  mask: {
-    variants: ['safari-pinned-tab.svg'],
-    element: (name: string, theme: Theme) => (
-      <link
-        color={theme.vars.palette.primary.main}
-        href={`/icons/${name}`}
-        key={`${name}mask`}
-        rel="mask-icon"
-      />
-    ),
-  },
-} as const;
-
-/**
  * Small helper to create og: and twitter: elements for keys + content
  */
 const graphMetaItems = (graph: Graph) =>
@@ -104,6 +47,7 @@ export function Meta({ title, description }: MetaProps) {
   const router = useRouter();
   const [pageUrl, setPageUrl] = useState('');
   const [baseUrl, setBaseUrl] = useState('');
+  const { colorScheme } = useColorScheme();
 
   useEffect(() => {
     const { host } = window.location;
@@ -139,16 +83,16 @@ export function Meta({ title, description }: MetaProps) {
         url: pageUrl,
         image: `${baseUrl}/${OG_IMAGE_API_ROUTE}/${imageTitle}?subtitle=${imageSubtitle}`,
       })}
-      <link href="/favicon.ico" key="favicon" rel="icon" />
       <meta content={theme.vars.palette.background.default} key="theme-color" name="theme-color" />
-      <meta
-        content={theme.vars.palette.background.default}
-        key="msapplication-TileColor"
-        name="msapplication-TileColor"
+      <link key="favicon" rel="icon" href="/favicon.ico" sizes="32x32" />
+      <link
+        key="svg-icon"
+        rel="icon"
+        href={`/icon${colorScheme.mode === 'dark' ? '-dark' : '-light'}.svg`}
+        type="image/svg+xml"
       />
-      {Object.values(ICONS).flatMap(({ variants, element }) =>
-        variants.map((variant) => element(String(variant), theme)),
-      )}
+      <link key="apple-touch" rel="apple-touch-icon" href="/apple-touch-icon.png" />
+      <link key="manifest" rel="manifest" href="/manifest.webmanifest" />
     </Head>
   );
 }

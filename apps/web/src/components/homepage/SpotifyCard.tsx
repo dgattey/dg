@@ -13,10 +13,13 @@ export function SpotifyCard() {
 
   return (
     <ContentCard
-      sx={{
+      sx={(theme) => ({
         padding: 2.5,
         display: 'flex',
-      }}
+        [theme.breakpoints.down('md')]: {
+          minWidth: 'min(max-content, inherit)',
+        },
+      })}
     >
       <TrackListing hasLogo track={track} />
     </ContentCard>

@@ -289,16 +289,18 @@ export type AssetOrder =
   | 'width_DESC';
 
 /** All data describing a recent book I've read. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/book) */
-export type Book = Entry & {
-  readonly author: Maybe<Scalars['String']['output']>;
-  readonly contentfulMetadata: ContentfulMetadata;
-  readonly coverImage: Maybe<Asset>;
-  readonly description: Maybe<BookDescription>;
-  readonly linkedFrom: Maybe<BookLinkingCollections>;
-  readonly readDate: Maybe<Scalars['DateTime']['output']>;
-  readonly sys: Sys;
-  readonly title: Maybe<Scalars['String']['output']>;
-};
+export type Book = Entry &
+  _Node & {
+    readonly _id: Scalars['ID']['output'];
+    readonly author: Maybe<Scalars['String']['output']>;
+    readonly contentfulMetadata: ContentfulMetadata;
+    readonly coverImage: Maybe<Asset>;
+    readonly description: Maybe<BookDescription>;
+    readonly linkedFrom: Maybe<BookLinkingCollections>;
+    readonly readDate: Maybe<Scalars['DateTime']['output']>;
+    readonly sys: Sys;
+    readonly title: Maybe<Scalars['String']['output']>;
+  };
 
 /** All data describing a recent book I've read. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/book) */
 export type BookAuthorArgs = {
@@ -361,9 +363,21 @@ export type BookDescriptionLinks = {
 };
 
 export type BookDescriptionResources = {
-  readonly block: ReadonlyArray<ResourceLink>;
-  readonly hyperlink: ReadonlyArray<ResourceLink>;
-  readonly inline: ReadonlyArray<ResourceLink>;
+  readonly block: ReadonlyArray<BookDescriptionResourcesBlock>;
+  readonly hyperlink: ReadonlyArray<BookDescriptionResourcesHyperlink>;
+  readonly inline: ReadonlyArray<BookDescriptionResourcesInline>;
+};
+
+export type BookDescriptionResourcesBlock = ResourceLink & {
+  readonly sys: ResourceSys;
+};
+
+export type BookDescriptionResourcesHyperlink = ResourceLink & {
+  readonly sys: ResourceSys;
+};
+
+export type BookDescriptionResourcesInline = ResourceLink & {
+  readonly sys: ResourceSys;
 };
 
 export type BookFilter = {
@@ -449,16 +463,18 @@ export type BookOrder =
   | 'title_DESC';
 
 /** All info needed to render a map with a pin for the given location [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/location) */
-export type ContentTypeLocation = Entry & {
-  readonly contentfulMetadata: ContentfulMetadata;
-  readonly image: Maybe<Asset>;
-  readonly initialZoom: Maybe<Scalars['Float']['output']>;
-  readonly linkedFrom: Maybe<ContentTypeLocationLinkingCollections>;
-  readonly point: Maybe<Location>;
-  readonly slug: Maybe<Scalars['String']['output']>;
-  readonly sys: Sys;
-  readonly zoomLevels: Maybe<ReadonlyArray<Maybe<Scalars['String']['output']>>>;
-};
+export type ContentTypeLocation = Entry &
+  _Node & {
+    readonly _id: Scalars['ID']['output'];
+    readonly contentfulMetadata: ContentfulMetadata;
+    readonly image: Maybe<Asset>;
+    readonly initialZoom: Maybe<Scalars['Float']['output']>;
+    readonly linkedFrom: Maybe<ContentTypeLocationLinkingCollections>;
+    readonly point: Maybe<Location>;
+    readonly slug: Maybe<Scalars['String']['output']>;
+    readonly sys: Sys;
+    readonly zoomLevels: Maybe<ReadonlyArray<Maybe<Scalars['String']['output']>>>;
+  };
 
 /** All info needed to render a map with a pin for the given location [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/location) */
 export type ContentTypeLocationImageArgs = {
@@ -577,7 +593,7 @@ export type ContentfulMetadataTagsFilter = {
 
 /**
  * Represents a tag entity for finding and organizing content easily.
- *     Find out more here: https://www.contentful.com/developers/docs/references/content-delivery-api/#/reference/content-tags
+ *       Find out more here: https://www.contentful.com/developers/docs/references/content-delivery-api/#/reference/content-tags
  */
 export type ContentfulTag = {
   readonly id: Maybe<Scalars['String']['output']>;
@@ -706,14 +722,16 @@ export type ImageTransformOptions = {
 };
 
 /** A link to an external site of mine [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/link) */
-export type Link = Entry & {
-  readonly contentfulMetadata: ContentfulMetadata;
-  readonly icon: Maybe<Scalars['String']['output']>;
-  readonly linkedFrom: Maybe<LinkLinkingCollections>;
-  readonly sys: Sys;
-  readonly title: Maybe<Scalars['String']['output']>;
-  readonly url: Maybe<Scalars['String']['output']>;
-};
+export type Link = Entry &
+  _Node & {
+    readonly _id: Scalars['ID']['output'];
+    readonly contentfulMetadata: ContentfulMetadata;
+    readonly icon: Maybe<Scalars['String']['output']>;
+    readonly linkedFrom: Maybe<LinkLinkingCollections>;
+    readonly sys: Sys;
+    readonly title: Maybe<Scalars['String']['output']>;
+    readonly url: Maybe<Scalars['String']['output']>;
+  };
 
 /** A link to an external site of mine [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/link) */
 export type LinkIconArgs = {
@@ -847,18 +865,20 @@ export type Location = {
 };
 
 /** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
-export type Project = Entry & {
-  readonly contentfulMetadata: ContentfulMetadata;
-  readonly creationDate: Maybe<Scalars['DateTime']['output']>;
-  readonly description: Maybe<ProjectDescription>;
-  readonly layout: Maybe<Scalars['String']['output']>;
-  readonly link: Maybe<Link>;
-  readonly linkedFrom: Maybe<ProjectLinkingCollections>;
-  readonly sys: Sys;
-  readonly thumbnail: Maybe<Asset>;
-  readonly title: Maybe<Scalars['String']['output']>;
-  readonly type: Maybe<ReadonlyArray<Maybe<Scalars['String']['output']>>>;
-};
+export type Project = Entry &
+  _Node & {
+    readonly _id: Scalars['ID']['output'];
+    readonly contentfulMetadata: ContentfulMetadata;
+    readonly creationDate: Maybe<Scalars['DateTime']['output']>;
+    readonly description: Maybe<ProjectDescription>;
+    readonly layout: Maybe<Scalars['String']['output']>;
+    readonly link: Maybe<Link>;
+    readonly linkedFrom: Maybe<ProjectLinkingCollections>;
+    readonly sys: Sys;
+    readonly thumbnail: Maybe<Asset>;
+    readonly title: Maybe<Scalars['String']['output']>;
+    readonly type: Maybe<ReadonlyArray<Maybe<Scalars['String']['output']>>>;
+  };
 
 /** Website, app, other code-based project, or graphics created for something. [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/project) */
 export type ProjectCreationDateArgs = {
@@ -933,9 +953,21 @@ export type ProjectDescriptionLinks = {
 };
 
 export type ProjectDescriptionResources = {
-  readonly block: ReadonlyArray<ResourceLink>;
-  readonly hyperlink: ReadonlyArray<ResourceLink>;
-  readonly inline: ReadonlyArray<ResourceLink>;
+  readonly block: ReadonlyArray<ProjectDescriptionResourcesBlock>;
+  readonly hyperlink: ReadonlyArray<ProjectDescriptionResourcesHyperlink>;
+  readonly inline: ReadonlyArray<ProjectDescriptionResourcesInline>;
+};
+
+export type ProjectDescriptionResourcesBlock = ResourceLink & {
+  readonly sys: ResourceSys;
+};
+
+export type ProjectDescriptionResourcesHyperlink = ResourceLink & {
+  readonly sys: ResourceSys;
+};
+
+export type ProjectDescriptionResourcesInline = ResourceLink & {
+  readonly sys: ResourceSys;
 };
 
 export type ProjectFilter = {
@@ -1027,6 +1059,7 @@ export type ProjectOrder =
   | 'title_DESC';
 
 export type Query = {
+  readonly _node: Maybe<_Node>;
   readonly asset: Maybe<Asset>;
   readonly assetCollection: Maybe<AssetCollection>;
   readonly book: Maybe<Book>;
@@ -1042,6 +1075,12 @@ export type Query = {
   readonly sectionCollection: Maybe<SectionCollection>;
   readonly textBlock: Maybe<TextBlock>;
   readonly textBlockCollection: Maybe<TextBlockCollection>;
+};
+
+export type Query_NodeArgs = {
+  id: Scalars['ID']['input'];
+  locale: InputMaybe<Scalars['String']['input']>;
+  preview: InputMaybe<Scalars['Boolean']['input']>;
 };
 
 export type QueryAssetArgs = {
@@ -1164,18 +1203,19 @@ export type ResourceLink = {
 
 export type ResourceSys = {
   readonly linkType: Scalars['String']['output'];
-  readonly type: Scalars['String']['output'];
   readonly urn: Scalars['String']['output'];
 };
 
 /** A collection of references to other nodes [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
-export type Section = Entry & {
-  readonly blocksCollection: Maybe<SectionBlocksCollection>;
-  readonly contentfulMetadata: ContentfulMetadata;
-  readonly linkedFrom: Maybe<SectionLinkingCollections>;
-  readonly slug: Maybe<Scalars['String']['output']>;
-  readonly sys: Sys;
-};
+export type Section = Entry &
+  _Node & {
+    readonly _id: Scalars['ID']['output'];
+    readonly blocksCollection: Maybe<SectionBlocksCollection>;
+    readonly contentfulMetadata: ContentfulMetadata;
+    readonly linkedFrom: Maybe<SectionLinkingCollections>;
+    readonly slug: Maybe<Scalars['String']['output']>;
+    readonly sys: Sys;
+  };
 
 /** A collection of references to other nodes [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/section) */
 export type SectionBlocksCollectionArgs = {
@@ -1269,6 +1309,8 @@ export type Sys = {
   readonly environmentId: Scalars['String']['output'];
   readonly firstPublishedAt: Maybe<Scalars['DateTime']['output']>;
   readonly id: Scalars['String']['output'];
+  /** The locale that was requested. */
+  readonly locale: Maybe<Scalars['String']['output']>;
   readonly publishedAt: Maybe<Scalars['DateTime']['output']>;
   readonly publishedVersion: Maybe<Scalars['Int']['output']>;
   readonly spaceId: Scalars['String']['output'];
@@ -1316,13 +1358,15 @@ export type SysFilter = {
 };
 
 /** A block of rich text, for use with things like Privacy Policy/introduction paragraph/etc [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/textBlock) */
-export type TextBlock = Entry & {
-  readonly content: Maybe<TextBlockContent>;
-  readonly contentfulMetadata: ContentfulMetadata;
-  readonly linkedFrom: Maybe<TextBlockLinkingCollections>;
-  readonly slug: Maybe<Scalars['String']['output']>;
-  readonly sys: Sys;
-};
+export type TextBlock = Entry &
+  _Node & {
+    readonly _id: Scalars['ID']['output'];
+    readonly content: Maybe<TextBlockContent>;
+    readonly contentfulMetadata: ContentfulMetadata;
+    readonly linkedFrom: Maybe<TextBlockLinkingCollections>;
+    readonly slug: Maybe<Scalars['String']['output']>;
+    readonly sys: Sys;
+  };
 
 /** A block of rich text, for use with things like Privacy Policy/introduction paragraph/etc [See type definition](https://app.contentful.com/spaces/nb3rzo39eupw/content_types/textBlock) */
 export type TextBlockContentArgs = {
@@ -1369,9 +1413,21 @@ export type TextBlockContentLinks = {
 };
 
 export type TextBlockContentResources = {
-  readonly block: ReadonlyArray<ResourceLink>;
-  readonly hyperlink: ReadonlyArray<ResourceLink>;
-  readonly inline: ReadonlyArray<ResourceLink>;
+  readonly block: ReadonlyArray<TextBlockContentResourcesBlock>;
+  readonly hyperlink: ReadonlyArray<TextBlockContentResourcesHyperlink>;
+  readonly inline: ReadonlyArray<TextBlockContentResourcesInline>;
+};
+
+export type TextBlockContentResourcesBlock = ResourceLink & {
+  readonly sys: ResourceSys;
+};
+
+export type TextBlockContentResourcesHyperlink = ResourceLink & {
+  readonly sys: ResourceSys;
+};
+
+export type TextBlockContentResourcesInline = ResourceLink & {
+  readonly sys: ResourceSys;
 };
 
 export type TextBlockFilter = {
@@ -1413,6 +1469,10 @@ export type TextBlockOrder =
   | 'sys_publishedAt_DESC'
   | 'sys_publishedVersion_ASC'
   | 'sys_publishedVersion_DESC';
+
+export type _Node = {
+  readonly _id: Scalars['ID']['output'];
+};
 
 export type CfLinkNestedFilter = {
   readonly AND: InputMaybe<ReadonlyArray<InputMaybe<CfLinkNestedFilter>>>;

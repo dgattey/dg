@@ -10,7 +10,7 @@ import { useLinkWithName } from 'hooks/useLinkWithName';
 /**
  * Width of the intro image on small screens
  */
-const SMALL_IMAGE_SIZE = '14em';
+const SMALL_IMAGE_SIZE = '16em';
 
 /**
  * Creates an intro information card for use on the homepage. Technically
@@ -46,10 +46,9 @@ export function IntroCard() {
         })}
         sx={(theme) => ({
           [theme.breakpoints.down('md')]: {
-            justifySelf: 'center',
-            width: SMALL_IMAGE_SIZE,
-            height: SMALL_IMAGE_SIZE,
-            borderRadius: `calc(${SMALL_IMAGE_SIZE} / 2)`,
+            minWidth: SMALL_IMAGE_SIZE,
+            maxWidth: SMALL_IMAGE_SIZE,
+            maxHeight: SMALL_IMAGE_SIZE,
           },
         })}
       >

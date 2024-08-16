@@ -5,6 +5,9 @@ import { BREAKPOINT_MAX_SIZES } from '../helpers/imageSizes';
 
 type ImageProps = Partial<Asset> & {
   url: Asset['url'];
+  width: Asset['width'];
+  height: Asset['height'];
+  fill?: boolean;
 
   /**
    * Alt text, required, but defaults to title
@@ -46,18 +49,7 @@ type ImageProps = Partial<Asset> & {
      */
     extraLarge: number;
   };
-} & (
-    | {
-        fill: true;
-        width?: never;
-        height?: never;
-      }
-    | {
-        fill?: never;
-        width: Asset['width'];
-        height: Asset['height'];
-      }
-  );
+};
 
 /**
  * All images need to be max width'd for our layouts
@@ -93,11 +85,19 @@ const generateSizesString = (sizes: ImageProps['sizes']): string => {
  * Shows a Next Image with the contents of the Asset and custom
  * sizes as needed.
  */
-export function Image({ url, title, alt, sizes, ...props }: ImageProps) {
+export function Image({ url, title, alt, sizes, width, height, fill, ...props }: ImageProps) {
   if (!url) {
     return null;
   }
-  return (
-    <MaxWidthImage alt={title ?? alt} sizes={generateSizesString(sizes)} src={url} {...props} />
-  );
+  const sharedProps = {
+    alt: title ?? alt,
+    src: url,
+    sizes: generateSizesString(sizes),
+    ...props,
+  };
+
+  if (!fill) {
+    return <MaxWidthImage {...sharedProps} width={width} height={height} />;
+  }
+  return <NextImage {...sharedProps} fill />;
 }

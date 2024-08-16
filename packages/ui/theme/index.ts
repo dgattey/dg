@@ -59,16 +59,16 @@ export function getTheme(): Theme {
               transition: 'none',
             },
             [theme.breakpoints.up('sm')]: {
-              fontSize: 17,
+              fontSize: 16,
             },
             [theme.breakpoints.up('md')]: {
-              fontSize: 18,
+              fontSize: 17,
             },
             [theme.breakpoints.up('lg')]: {
-              fontSize: 19,
+              fontSize: 18,
             },
             [theme.breakpoints.up('xl')]: {
-              fontSize: 20,
+              fontSize: 19,
             },
           },
         }),
@@ -101,8 +101,8 @@ export function getTheme(): Theme {
           {
             props: { variant: 'code' },
             style: ({ theme }) => ({
-              background: theme.vars.palette.code.background,
-              color: theme.vars.palette.code.text,
+              background: theme.vars.palette.background.paper,
+              color: theme.vars.palette.text.secondary,
             }),
           },
           {
@@ -176,7 +176,7 @@ export function getTheme(): Theme {
               color in theme.vars.palette
                 ? theme.vars.palette[
                     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-                    color as 'primary' | 'secondary' | 'warning' | 'info' | 'success'
+                    color as 'primary' | 'secondary' | 'info' | 'success'
                   ]
                 : null;
             if (!paletteColor) {
@@ -199,18 +199,18 @@ export function getTheme(): Theme {
         styleOverrides: {
           root: ({ theme }) => ({
             textTransform: 'initial',
-            borderRadius: theme.spacing(6),
-            padding: theme.spacing(1, 3),
+            borderRadius: theme.spacing(1),
+            padding: theme.spacing(0.75, 2),
           }),
         },
       },
       MuiCard: {
         styleOverrides: {
           root: ({ theme }) => ({
-            background: theme.vars.palette.card.background,
-            borderRadius: theme.spacing(6),
+            background: theme.vars.palette.background.paper,
+            borderRadius: theme.spacing(4),
             borderColor: theme.vars.palette.card.border,
-            borderWidth: 1,
+            borderWidth: 'thin',
             borderStyle: 'solid',
             boxShadow: theme.vars.extraShadows.card.main,
           }),
@@ -220,13 +220,13 @@ export function getTheme(): Theme {
         styleOverrides: {
           tooltip: ({ theme }) => ({
             ...theme.typography.caption,
-            background: theme.vars.palette.card.background,
-            borderRadius: theme.spacing(6),
+            background: theme.vars.palette.background.paper,
+            borderRadius: theme.spacing(1.5),
             borderColor: theme.vars.palette.card.border,
-            borderWidth: 1,
+            borderWidth: 'thin',
             borderStyle: 'solid',
-            boxShadow: theme.shadows[2],
-            padding: theme.spacing(0.5, 1.5),
+            boxShadow: theme.vars.extraShadows.card.main,
+            padding: theme.spacing(0.5, 1.25),
             color: theme.vars.palette.text.primary,
           }),
         },

@@ -64,7 +64,7 @@ export function Footer() {
             <NavItem sx={{ padding: 0 }}>•</NavItem>
             <NavItem>{version}</NavItem>
           </NavGroup>
-          <NavGroup component="div" sx={{ columnGap: 4 }}>
+          <NavGroup component="div" sx={{ columnGap: 2 }}>
             <HorizontalStack component="ul" sx={{ padding: 0, margin: 0 }}>
               {nonIconFooterLinks?.map((link) => <FooterLink key={link.url} link={link} />)}
             </HorizontalStack>
