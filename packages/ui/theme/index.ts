@@ -54,6 +54,7 @@ export function getTheme(): Theme {
         styleOverrides: (theme) => ({
           ':root': {
             wordBreak: 'break-word',
+            fontVariant: 'tabular-nums',
             // Ensure while swapping themes, we have no animations
             ':root[data-animations-enabled="false"] *': {
               transition: 'none',

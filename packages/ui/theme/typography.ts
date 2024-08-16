@@ -65,7 +65,7 @@ export function getTypography(theme: Theme): TypographyOptions {
     },
     caption: {
       fontSize: 14,
-      fontVariant: 'tabular-nums',
+      fontStretch: 'semi-expanded',
       fontWeight: 500,
     },
     button: {

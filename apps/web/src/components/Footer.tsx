@@ -48,7 +48,11 @@ export function Footer() {
   return (
     <Container component={Section} sx={{ padding: 0, marginTop: 12 }}>
       <footer>
-        <Divider sx={{ marginBottom: 3 }} />
+        <Divider
+          sx={{
+            marginBottom: 3,
+          }}
+        />
         <Nav
           sx={(theme) => ({
             flexDirection: 'row',
