@@ -30,9 +30,11 @@ export const getStaticProps = async (context: NextPageContext) => {
   const statusCode = res ? res.statusCode : errorCode;
   const { props: fallbackProps } = await fetchFallbackData(['version', 'footer']);
   return {
-    ...fallbackProps,
-    ...errorProps,
-    statusCode,
+    props: {
+      ...fallbackProps,
+      ...errorProps,
+      statusCode,
+    },
   };
 };
 
