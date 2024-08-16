@@ -39,7 +39,7 @@ export function Header({ headerRef }: HeaderProps) {
           sx={(theme) => ({
             backdropFilter: 'blur(16px) saturate(160%) contrast(110%)',
             backgroundColor: isScrolled
-              ? alpha(theme.palette.card.background, 0.85)
+              ? alpha(theme.palette.background.paper, 0.85)
               : theme.vars.palette.background.default,
             boxShadow: isScrolled ? theme.vars.extraShadows.card.hovered : 'none',
             willChange: 'box-shadow, background-color',

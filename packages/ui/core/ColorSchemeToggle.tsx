@@ -8,7 +8,7 @@ import { ColorSchemeButton } from './ColorSchemeButton';
 export function ColorSchemeToggle() {
   return (
     <Stack sx={{ flexDirection: 'row', alignItems: 'center' }}>
-      <ButtonGroup aria-label="outlined primary button group" size="small" variant="outlined">
+      <ButtonGroup aria-label="outlined primary button group" size="small">
         <ColorSchemeButton mode="light" />
         <ColorSchemeButton mode="dark" />
         <ColorSchemeButton mode="system" />

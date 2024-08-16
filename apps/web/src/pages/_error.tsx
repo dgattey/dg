@@ -2,7 +2,6 @@ import type { NextPageContext } from 'next';
 import NextErrorComponent from 'next/error';
 import type { FetchedFallbackData } from 'api/fetchFallbackData';
 import { fetchFallbackData } from 'api/fetchFallbackData';
-import { ErrorPageContents } from 'components/errors/ErrorPageContents';
 import { ErrorLayout } from 'components/layouts/ErrorLayout';
 import { PageLayout } from 'components/layouts/PageLayout';
 import type { GetLayout } from 'types/Page';
@@ -11,7 +10,7 @@ export type PageProps = {
   /**
    * What kind of error we encountered
    */
-  statusCode?: number;
+  statusCode: number;
 };
 
 type LayoutProps = PageProps & {
@@ -26,39 +25,29 @@ type LayoutProps = PageProps & {
  */
 export const getStaticProps = async (context: NextPageContext) => {
   const errorProps = await NextErrorComponent.getInitialProps(context);
-  const { res, err, asPath } = context;
-  const errorCode = err?.statusCode ?? 404;
+  const { res, err } = context;
+  const errorCode = err?.statusCode ?? 500;
   const statusCode = res ? res.statusCode : errorCode;
   const { props: fallbackProps } = await fetchFallbackData(['version', 'footer']);
-  const props: PageProps = {
-    ...fallbackProps,
-    ...errorProps,
-    statusCode,
+  return {
+    props: {
+      ...fallbackProps,
+      ...errorProps,
+      statusCode,
+    },
   };
-
-  // No logging here
-  if (statusCode === 404) {
-    return { props };
-  }
-
-  // Non 404 captured as is, unless err is missing
-  // eslint-disable-next-line no-console
-  console.error(
-    err ?? new Error(`_error.tsx getStaticProps missing data at path: ${asPath ?? 'unknown path'}`),
-  );
-  return { props };
 };
 
 /**
  * Generic error page, for 500s/etc
  */
-function Page({ statusCode }: PageProps) {
-  return <ErrorPageContents statusCode={statusCode} />;
+function Page() {
+  return null;
 }
 
-const getLayout: GetLayout<LayoutProps> = (page, pageProps) => (
+const getLayout: GetLayout<LayoutProps> = (_page, pageProps) => (
   <PageLayout fallback={pageProps.fallback}>
-    <ErrorLayout statusCode={pageProps.statusCode ?? 500}>{page}</ErrorLayout>
+    <ErrorLayout statusCode={pageProps.statusCode} />
   </PageLayout>
 );
 

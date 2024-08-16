@@ -27,6 +27,8 @@ export function getTypography(theme: Theme): TypographyOptions {
     h1: {
       fontSize: 34,
       fontWeight: 700,
+      fontStretch: 'expanded',
+      fontVariant: 'all-small-caps',
     },
     h2: {
       fontSize: 29.75,
@@ -38,15 +40,16 @@ export function getTypography(theme: Theme): TypographyOptions {
     },
     h4: {
       fontSize: 21.25,
-      fontWeight: 700,
+      fontWeight: 600,
     },
     h5: {
-      fontSize: 19.125,
-      fontWeight: 700,
+      fontSize: 17,
+      fontWeight: 600,
+      fontStretch: 'semi-expanded',
     },
     h6: {
-      fontSize: 17,
-      fontWeight: 700,
+      fontSize: 16,
+      fontWeight: 600,
     },
     body1: {
       fontSize: 17,
@@ -55,20 +58,22 @@ export function getTypography(theme: Theme): TypographyOptions {
       fontSize: 17,
     },
     overline: {
-      fontSize: 12,
-      textTransform: 'uppercase',
-      fontWeight: 600,
+      fontSize: 13,
+      fontVariant: 'all-small-caps',
+      fontWeight: 500,
+      fontStretch: 'expanded',
     },
     caption: {
-      fontSize: 13,
-      fontWeight: 600,
+      fontSize: 14,
+      fontStretch: 'semi-expanded',
+      fontWeight: 500,
     },
     button: {
-      fontSize: 17,
+      fontSize: 16,
       fontWeight: 600,
     },
     code: {
-      fontSize: 16,
+      fontSize: 15,
       lineHeight: 1.875, // 30px
       fontFamily:
         '"Menlo","Consolas","Roboto Mono","Ubuntu Monospace","Noto Mono","Oxygen Mono","Liberation Mono",monospace,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',

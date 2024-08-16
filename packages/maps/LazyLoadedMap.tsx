@@ -59,6 +59,7 @@ function PreviewCard({
         [theme.breakpoints.down('md')]: {
           minHeight: 200,
           height: 200,
+          width: '100%',
         },
         ...(backgroundImageUrl && {
           backgroundImage: `url('${backgroundImageUrl}')`,

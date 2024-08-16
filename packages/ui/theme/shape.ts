@@ -6,8 +6,8 @@ import type { ThemeOptions } from '@mui/material';
 export function getShape() {
   const shape: ThemeOptions['shape'] = {
     gridGap: 2,
-    gridGapLarge: 3.35,
-    gridItemDimension: 16.5,
+    gridGapLarge: 3.65,
+    gridItemDimension: 17.25,
     gridItemSize: undefined, // set below
   };
 

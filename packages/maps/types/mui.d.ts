@@ -21,12 +21,7 @@ declare module '@mui/material/styles' {
   };
 
   type CardColors = {
-    background: NonNullableColor;
     border: NonNullableColor;
-  };
-  type CodeColors = {
-    background: NonNullableColor;
-    text: NonNullableColor;
   };
   type MapColors = {
     markerBackground: NonNullableColor;
@@ -34,15 +29,11 @@ declare module '@mui/material/styles' {
   };
 
   interface Palette {
-    active: Palette['primary'];
     card: CardColors;
-    code: CodeColors;
     map: MapColors;
   }
   interface PaletteOptions {
-    active: PaletteOptions['primary'];
     card: CardColors;
-    code: CodeColors;
     map: MapColors;
   }
   interface Theme {
