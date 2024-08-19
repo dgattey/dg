@@ -12,11 +12,11 @@
     "@fortawesome/react-fontawesome": "0.2.2",
     "@mui/material": "5.16.7",
     "api": "workspace:*",
-    "lucide-react": "0.427.0",
+    "lucide-react": "0.428.0",
     "next": "14.2.5",
     "react": "18.3.1",
     "shared-core": "workspace:*",
-    "sharp": "0.33.4",
+    "sharp": "0.33.5",
     "use-breakpoint": "4.0.1"
   },
   "devDependencies": {
