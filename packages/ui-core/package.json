@@ -11,7 +11,7 @@
     "shared-core": "workspace:*"
   },
   "devDependencies": {
-    "@types/react": "18.3.3",
+    "@types/react": "18.3.4",
     "dotenv-mono": "1.3.14",
     "eslint-config-dg": "workspace:*",
     "tsconfig": "workspace:*",
