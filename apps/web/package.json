@@ -35,7 +35,7 @@
     "shared-core": "workspace:*",
     "swr": "2.2.5",
     "ui": "workspace:*",
-    "webpack": "5.93.0",
+    "webpack": "5.94.0",
     "wretch": "2.9.0"
   },
   "devDependencies": {
