@@ -10,7 +10,7 @@
     "@logtail/next": "0.1.5",
     "db": "workspace:*",
     "graphql-request": "7.1.0",
-    "wretch": "2.9.0"
+    "wretch": "2.9.1"
   },
   "devDependencies": {
     "@types/node": "22.2.0",
