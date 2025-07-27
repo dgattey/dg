@@ -15,7 +15,7 @@ type ColorSchemeButtonProps = {
 const ICON_SIZE = 13;
 const DELAY_MS = 200;
 
-const ICONS: Record<Mode, JSX.Element> = {
+const ICONS: Record<Mode, React.ReactNode> = {
   light: <Sun size={ICON_SIZE} />,
   dark: <Moon size={ICON_SIZE} />,
   system: <Monitor size={ICON_SIZE} />,

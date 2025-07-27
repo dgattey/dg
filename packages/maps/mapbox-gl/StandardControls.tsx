@@ -8,7 +8,7 @@ type StandardControlsProps = {
   /**
    * The zoom function
    */
-  mapRef: RefObject<MapRef>;
+  mapRef: RefObject<MapRef | null>;
 };
 
 /**
@@ -17,7 +17,9 @@ type StandardControlsProps = {
 export function StandardControls({ mapRef }: StandardControlsProps) {
   const theme = useTheme();
   const zoom = (inward: boolean) => (event: React.MouseEvent<SVGElement>) => {
-    (inward ? mapRef.current?.zoomIn : mapRef.current?.zoomOut)?.();
+    if (mapRef.current) {
+      (inward ? mapRef.current.zoomIn : mapRef.current.zoomOut)();
+    }
     event.stopPropagation();
     event.preventDefault();
   };

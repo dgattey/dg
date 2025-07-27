@@ -4,7 +4,7 @@ type Props = Pick<React.ComponentProps<'div'>, 'children'> & {
   /**
    * A ref to assign to the main grid, for use in animating
    */
-  gridRef: React.RefObject<HTMLDivElement>;
+  gridRef: React.RefObject<HTMLDivElement | null>;
 };
 
 /**

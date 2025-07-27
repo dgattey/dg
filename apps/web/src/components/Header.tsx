@@ -14,7 +14,7 @@ type HeaderProps = {
    * If provided, sets the ref on the `header` element for
    * sizing/whatever else is needed
    */
-  headerRef?: React.RefObject<HTMLDivElement>;
+  headerRef?: React.RefObject<HTMLDivElement | null>;
 };
 
 // Makes the header bar sticky and not responsive to user events by default
