@@ -50,10 +50,10 @@ export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
         >
           {statusCode}
         </Typography>
-        <Typography sx={{ maxWidth: '26em' }} variant="h5" textAlign="center">
+        <Typography sx={{ maxWidth: '26em', textWrap: 'balance' }} variant="h5" textAlign="center">
           {statusCode === 404
-            ? 'Sorry, got lost in the jungle. Send an email if you think there should be a page here!'
-            : 'Something went super wrong, sorry! Let me know by sending me an email.'}
+            ? 'Sorry, got lost in the jungle. Email me if something is wrong.'
+            : 'Something went super wrong, sorry. Email me to let me know.'}
         </Typography>
         <Link
           buttonProps={{
@@ -64,7 +64,7 @@ export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
           sx={{ marginTop: 3 }}
           title="Home"
         >
-          Back to safety
+          Back home
         </Link>
       </Stack>
     </>
