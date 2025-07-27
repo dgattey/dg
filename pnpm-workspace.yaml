@@ -1,3 +1,27 @@
 packages:
-  - 'packages/*'
-  - 'apps/*'
+  - packages/*
+  - apps/*
+
+catalog:
+  '@fortawesome/free-brands-svg-icons': 7.0.0
+  '@graphql-codegen/cli': 5.0.7
+  '@logtail/next': 0.2.1
+  '@mui/material': 5.16.7
+  '@types/eslint': 9.6.1
+  '@types/node': 24.1.0
+  '@types/react': 18.3.3
+  dotenv-mono: 1.4.0
+  eslint: 8.57.0
+  graphql-request: 7.2.0
+  lucide-react: 0.526.0
+  next: 14.2.5
+  react: 18.3.1
+  typescript: 5.8.3
+  wretch: 2.11.0
+
+onlyBuiltDependencies:
+  - '@vercel/speed-insights'
+  - esbuild
+  - lefthook
+  - sharp
+  - unrs-resolver

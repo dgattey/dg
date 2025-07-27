@@ -12,18 +12,18 @@
     "postinstall": "lefthook install"
   },
   "dependencies": {
-    "dotenv-mono": "1.3.14",
-    "lefthook": "1.7.12",
-    "vercel": "35.2.4"
+    "dotenv-mono": "catalog:",
+    "lefthook": "1.12.2",
+    "vercel": "44.6.3"
   },
   "devDependencies": {
-    "prettier": "3.3.3",
+    "prettier": "3.6.2",
     "tsconfig": "workspace:*",
-    "turbo": "2.0.12",
-    "typescript": "5.5.4"
+    "turbo": "2.5.5",
+    "typescript": "catalog:"
   },
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "pnpm@8.14.1+sha256.2df78e65d433d7693b9d3fbdaf431b2d96bb4f96a2ffecd51a50efe16e50a6a8"
+  "packageManager": "pnpm@10.12.4"
 }

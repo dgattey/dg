@@ -12,11 +12,13 @@
     "lint:types": "tsc"
   },
   "devDependencies": {
-    "@types/node": "22.2.0",
+    "@types/eslint": "catalog:",
+    "@types/node": "catalog:",
     "@vercel/style-guide": "6.0.0",
-    "eslint-config-turbo": "2.0.12",
-    "globals": "15.9.0",
+    "eslint": "catalog:",
+    "eslint-config-turbo": "2.5.5",
+    "globals": "16.3.0",
     "tsconfig": "workspace:*",
-    "typescript": "5.5.4"
+    "typescript": "catalog:"
   }
 }

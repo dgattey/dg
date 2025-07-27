@@ -10,14 +10,16 @@
     "lint:types": "tsc"
   },
   "devDependencies": {
-    "@graphql-codegen/cli": "5.0.2",
+    "@graphql-codegen/cli": "catalog:",
+    "@types/node": "catalog:",
     "cmd-ts": "0.13.0",
-    "dotenv-mono": "1.3.14",
+    "dotenv-mono": "catalog:",
+    "eslint": "catalog:",
     "eslint-config-dg": "workspace:*",
     "node-fetch": "3.3.2",
     "shared-core": "workspace:*",
     "tsconfig": "workspace:*",
-    "tsx": "4.17.0",
-    "typescript": "5.5.4"
+    "tsx": "4.20.3",
+    "typescript": "catalog:"
   }
 }
