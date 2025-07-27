@@ -16,17 +16,17 @@ export class Token extends Model {
   @PrimaryKey
   @Unique
   @Column(DataType.STRING)
-  name!: string;
+  declare name: string;
 
   @AllowNull
   @Column(DataType.STRING(768))
-  accessToken: string | undefined;
+  declare accessToken: string | undefined;
 
   @AllowNull
   @Column(DataType.STRING(768))
-  refreshToken: string | undefined;
+  declare refreshToken: string | undefined;
 
   @AllowNull
   @Column(DataType.DATE)
-  expiryAt: Date | undefined;
+  declare expiryAt: Date | undefined;
 }

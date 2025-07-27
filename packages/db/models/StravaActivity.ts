@@ -17,12 +17,12 @@ export class StravaActivity extends Model {
   declare id: number;
 
   @Column(DataType.DATE)
-  activityStartDate!: Date;
+  declare activityStartDate: Date;
 
   @Column(DataType.JSON)
-  activityData!: Record<string, unknown> & StravaDetailedActivity;
+  declare activityData: Record<string, unknown> & StravaDetailedActivity;
 
   @AllowNull
   @Column(DataType.DATE)
-  lastUpdate!: Date;
+  declare lastUpdate: Date;
 }

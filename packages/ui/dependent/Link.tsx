@@ -48,7 +48,7 @@ type LinkProps = BaseLinkProps &
 /**
  * All built in mappings for icon name to element
  */
-const BUILT_IN_ICONS: Record<string, JSX.Element> = {
+const BUILT_IN_ICONS: Record<string, React.ReactNode> = {
   strava: <FaIcon icon={faStrava} />,
   spotify: <FaIcon icon={faSpotify} />,
   github: <Github size="1em" />,
@@ -61,10 +61,15 @@ const BUILT_IN_ICONS: Record<string, JSX.Element> = {
  * If there's an icon, returns it, either built in or not, along with its title if
  * the layout calls for it.
  */
-const createIconElement = ({ icon, layout = 'text' }: Pick<BaseLinkProps, 'icon' | 'layout'>) =>
-  icon && !['children', 'text'].includes(layout)
-    ? (BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />)
-    : null;
+function createIconElement({
+  icon,
+  layout = 'text',
+}: Pick<BaseLinkProps, 'icon' | 'layout'>): React.ReactNode | null {
+  if (!icon || ['children', 'text'].includes(layout)) {
+    return null;
+  }
+  return BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />;
+}
 
 /**
  * Renders a link component from Contentful. Sometimes the icons are
