@@ -1,10 +1,9 @@
-import type { Theme } from '@mui/material';
-import type { TypographyOptions } from '@mui/material/styles/createTypography';
+import type { Theme, TypographyVariantsOptions } from '@mui/material/styles';
 
 /**
  * Get typography styles for a certain color mode.
  */
-export function getTypography(theme: Theme): TypographyOptions {
+export function getTypography(theme: Theme): TypographyVariantsOptions {
   return {
     fontFamily: [
       'system-ui',

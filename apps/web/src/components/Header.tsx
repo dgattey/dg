@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { Box, alpha } from '@mui/material';
+import { Box } from '@mui/material';
 import { Section } from 'ui/core/Section';
 import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
 import type { SxProps } from 'ui/theme';
@@ -39,7 +39,7 @@ export function Header({ headerRef }: HeaderProps) {
           sx={(theme) => ({
             backdropFilter: 'blur(16px) saturate(160%) contrast(110%)',
             backgroundColor: isScrolled
-              ? alpha(theme.palette.background.paper, 0.85)
+              ? `hsl(from ${theme.vars.palette.background.paper} h s l / 0.85)`
               : theme.vars.palette.background.default,
             boxShadow: isScrolled ? theme.vars.extraShadows.card.hovered : 'none',
             willChange: 'box-shadow, background-color',
