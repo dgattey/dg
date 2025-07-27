@@ -10,7 +10,7 @@ const scrolledSx: SxProps = {
   opacity: 1,
   '&:hover': {
     background: (theme) => theme.vars.palette.secondary.dark,
-    color: (theme) => theme.palette.getContrastText(theme.palette.secondary.dark),
+    color: (theme) => theme.vars.palette.text.primary,
     transform: 'scale(1.05)',
   },
 };

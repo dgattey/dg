@@ -51,11 +51,12 @@ export function ColorSchemeButton({ mode }: ColorSchemeButtonProps) {
           updatePreferredMode(mode === 'system' ? null : mode);
         }}
         sx={{
-          backgroundColor: (t) => (isInitialized ? t.palette.background.paper : undefined),
+          backgroundColor: (theme) =>
+            isInitialized ? theme.vars.palette.background.paper : undefined,
           paddingY: 0.75,
           paddingX: 0.25,
           '& svg': {
-            transition: (t) => t.transitions.create('transform'),
+            transition: (theme) => theme.transitions.create('transform'),
             transformOrigin: 'center',
           },
           '&:hover svg': {

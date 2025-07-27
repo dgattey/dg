@@ -1,4 +1,4 @@
-import { alpha, darken, lighten, Stack, Typography } from '@mui/material';
+import { Stack, Typography } from '@mui/material';
 import { Section } from 'ui/core/Section';
 import { Link } from 'ui/dependent/Link';
 import { useColorScheme } from 'ui/theme/useColorScheme';
@@ -35,16 +35,16 @@ export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
             color: 'transparent',
             fontWeight: 900,
             fontStretch: 'extra-expanded',
-            filter: (t) =>
+            filter: (theme) =>
               isInitialized
-                ? `drop-shadow(2px 2px 12px ${darken(alpha(t.palette.secondary.dark, 0.4), 0.8)})`
+                ? `drop-shadow(2px 2px 12px hsl(from ${theme.vars.palette.secondary.dark} h s calc(l * 0.2) / 0.4))`
                 : null,
             WebkitTextStroke: '1px',
-            WebkitTextStrokeColor: (t) =>
+            WebkitTextStrokeColor: (theme) =>
               isInitialized
                 ? mode === 'light'
-                  ? darken(t.palette.background.paper, 0.6)
-                  : lighten(t.palette.background.paper, 0.1)
+                  ? `hsl(from ${theme.vars.palette.background.paper} h s calc(l * 0.4))`
+                  : `hsl(from ${theme.vars.palette.background.paper} h s calc(l + (100 - l) * 0.1))`
                 : null,
           }}
         >

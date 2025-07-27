@@ -6,7 +6,7 @@ catalog:
   '@fortawesome/free-brands-svg-icons': 7.0.0
   '@graphql-codegen/cli': 5.0.7
   '@logtail/next': 0.2.1
-  '@mui/material': 5.16.7
+  '@mui/material': 7.2.0
   '@types/eslint': 9.6.1
   '@types/node': 24.1.0
   '@types/react': 19.1.8

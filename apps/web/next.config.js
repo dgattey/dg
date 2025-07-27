@@ -33,6 +33,8 @@ const nextConfig = {
   },
   // Have to do this for each of the packages we import
   transpilePackages: ['shared-core', 'api', 'ui', 'ui-core'],
+  // Disables the Sequelize warning about the `sequelize` package not being found
+  serverExternalPackages: ['sequelize'],
   experimental: {
     scrollRestoration: true,
   },

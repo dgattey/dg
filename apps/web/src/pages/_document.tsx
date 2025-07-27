@@ -1,5 +1,6 @@
 import Document, { Html, Head, Main, NextScript } from 'next/document';
-import { getInitColorSchemeScript } from '@mui/material/styles';
+import { InitColorSchemeScript } from '@mui/material';
+import { themeSelectorAttribute } from 'ui/theme';
 
 /**
  * Make sure no SSR flash for color scheme - as we use system on startup
@@ -10,7 +11,7 @@ export default class MyDocument extends Document {
       <Html>
         <Head />
         <body>
-          {getInitColorSchemeScript({ defaultMode: 'system' })}
+          <InitColorSchemeScript attribute={themeSelectorAttribute} />
           <Main />
           <NextScript />
         </body>
