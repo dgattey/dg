@@ -70,7 +70,9 @@ export function Footer() {
           </NavGroup>
           <NavGroup component="div" sx={{ columnGap: 2 }}>
             <HorizontalStack component="ul" sx={{ padding: 0, margin: 0 }}>
-              {nonIconFooterLinks?.map((link) => <FooterLink key={link.url} link={link} />)}
+              {nonIconFooterLinks?.map((link) => (
+                <FooterLink key={link.url} link={link} />
+              ))}
             </HorizontalStack>
             <HorizontalStack
               component="ul"
@@ -83,7 +85,9 @@ export function Footer() {
                 justifyContent: 'space-between',
               }}
             >
-              {iconFooterLinks?.map((link) => <FooterLink key={link.url} link={link} />)}
+              {iconFooterLinks?.map((link) => (
+                <FooterLink key={link.url} link={link} />
+              ))}
             </HorizontalStack>
           </NavGroup>
         </Nav>
