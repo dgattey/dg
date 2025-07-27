@@ -328,7 +328,7 @@ importers:
         version: 24.1.0
       '@vercel/style-guide':
         specifier: 6.0.0
-        version: 6.0.0(@next/eslint-plugin-next@14.2.5)(eslint@8.57.0)(prettier@3.6.2)(typescript@5.8.3)
+        version: 6.0.0(eslint@8.57.0)(prettier@3.6.2)(typescript@5.8.3)
       eslint:
         specifier: 'catalog:'
         version: 8.57.0
@@ -366,8 +366,8 @@ importers:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
       react-map-gl:
-        specifier: 7.1.7
-        version: 7.1.7(mapbox-gl@3.13.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        specifier: 8.0.4
+        version: 8.0.4(mapbox-gl@3.13.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       shared-core:
         specifier: workspace:*
         version: link:../shared-core
@@ -1777,9 +1777,6 @@ packages:
   '@next/env@15.4.4':
     resolution: {integrity: sha512-SJKOOkULKENyHSYXE5+KiFU6itcIb6wSBjgM92meK0HVKpo94dNOLZVdLLuS7/BxImROkGoPsjR4EnuDucqiiA==}
 
-  '@next/eslint-plugin-next@14.2.5':
-    resolution: {integrity: sha512-LY3btOpPh+OTIpviNojDpUdIbHW9j0JBYBjsIp8IxtDFfYFyORvw3yNq6N231FVqQA7n7lwaf7xHbVJlA1ED7g==}
-
   '@next/eslint-plugin-next@15.4.4':
     resolution: {integrity: sha512-1FDsyN//ai3Jd97SEd7scw5h1yLdzDACGOPRofr2GD3sEFsBylEEoL0MHSerd4n2dq9Zm/mFMqi4+NRMOreOKA==}
 
@@ -2064,9 +2061,6 @@ packages:
 
   '@types/json5@0.0.29':
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
-
-  '@types/mapbox-gl@3.4.1':
-    resolution: {integrity: sha512-NsGKKtgW93B+UaLPti6B7NwlxYlES5DpV5Gzj9F75rK5ALKsqSk15CiEHbOnTr09RGbr6ZYiCdI+59NNNcAImg==}
 
   '@types/mapbox__point-geometry@0.1.4':
     resolution: {integrity: sha512-mUWlSxAmYLfwnRBmgYV86tgYmMIICX4kza8YnE/eIlywGe2XoOxlpVnXWwir92xRLjwyarqwpu2EJKD2pk0IUA==}
@@ -2433,6 +2427,26 @@ packages:
       prettier:
         optional: true
       typescript:
+        optional: true
+
+  '@vis.gl/react-mapbox@8.0.4':
+    resolution: {integrity: sha512-NFk0vsWcNzSs0YCsVdt2100Zli9QWR+pje8DacpLkkGEAXFaJsFtI1oKD0Hatiate4/iAIW39SQHhgfhbeEPfQ==}
+    peerDependencies:
+      mapbox-gl: '>=3.5.0'
+      react: '>=16.3.0'
+      react-dom: '>=16.3.0'
+    peerDependenciesMeta:
+      mapbox-gl:
+        optional: true
+
+  '@vis.gl/react-maplibre@8.0.4':
+    resolution: {integrity: sha512-HwZyfLjEu+y1mUFvwDAkVxinGm8fEegaWN+O8np/WZ2Sqe5Lv6OXFpV6GWz9LOEvBYMbGuGk1FQdejo+4HCJ5w==}
+    peerDependencies:
+      maplibre-gl: '>=4.0.0'
+      react: '>=16.3.0'
+      react-dom: '>=16.3.0'
+    peerDependenciesMeta:
+      maplibre-gl:
         optional: true
 
   '@whatwg-node/disposablestack@0.0.6':
@@ -3861,11 +3875,6 @@ packages:
     resolution: {integrity: sha512-XxwI8EOhVQgWp6iDL+3b0r86f4d6AX6zSU55HfB4ydCEuXLXc5FcYeOu+nnGftS4TEju/11rt4KJPTMgbfmv4A==}
     engines: {node: '>=10.13.0'}
 
-  glob@10.3.10:
-    resolution: {integrity: sha512-fa46+tv1Ak0UPK1TOy/pZrIybNNt4HCv7SDzwyfiOZkvZLEbjsZkJBPtDHVshZjbecAoAGSC20MjLDG/qr679g==}
-    engines: {node: '>=16 || 14 >=14.17'}
-    hasBin: true
-
   glob@10.4.5:
     resolution: {integrity: sha512-7Bv8RF0k6xjo7d4A/PxYLbUCfb6c+Vpd2/mB2yRDlew7Jb5hEXiCD9ibfO7wpk8i4sevK6DFny9h7EYbM3/sHg==}
     hasBin: true
@@ -4366,10 +4375,6 @@ packages:
   iterator.prototype@1.1.5:
     resolution: {integrity: sha512-H0dkQoCa3b2VEeKQBOxFph+JAbcrQdE7KC0UkqwpLmv2EC4P41QXP+rqo9wYodACiG5/WM5s9oDApTU8utwj9g==}
     engines: {node: '>= 0.4'}
-
-  jackspeak@2.3.6:
-    resolution: {integrity: sha512-N3yCS/NegsOBokc8GAdM8UcmfsKiSS8cipheD/nivzr700H+nsMOxJjQnvwOcRYVuFkdH0wGUvW2WbXGmrZGbQ==}
-    engines: {node: '>=14'}
 
   jackspeak@3.4.3:
     resolution: {integrity: sha512-OGlZQpz2yfahA/Rd1Y8Cd9SIEsqvXkLVoSw/cgwhnhFMDbsQFeZYoJJ7bIZBS9BcamUW96asq/npPWugM+RQBw==}
@@ -5404,8 +5409,8 @@ packages:
   react-is@19.1.0:
     resolution: {integrity: sha512-Oe56aUPnkHyyDxxkvqtd7KkdQP5uIUfHxd5XTb3wE9d/kRnZLmKbDB0GWk919tdQ+mxxPtG6EAs6RMT6i1qtHg==}
 
-  react-map-gl@7.1.7:
-    resolution: {integrity: sha512-mwjc0obkBJOXCcoXQr3VoLqmqwo9vS4bXfbGsdxXzEgVCv/PM0v+1QggL7W0d/ccIy+VCjbXNlGij+PENz6VNg==}
+  react-map-gl@8.0.4:
+    resolution: {integrity: sha512-SHdpvFIvswsZBg6BCPcwY/nbKuCo3sJM1Cj7Sd+gA3gFRFOixD+KtZ2XSuUWq2WySL2emYEXEgrLZoXsV4Ut4Q==}
     peerDependencies:
       mapbox-gl: '>=1.13.0'
       maplibre-gl: '>=1.13.0'
@@ -7912,7 +7917,7 @@ snapshots:
       consola: 3.4.2
       detect-libc: 2.0.4
       https-proxy-agent: 7.0.6
-      node-fetch: 2.6.9
+      node-fetch: 2.7.0
       nopt: 8.1.0
       semver: 7.7.2
       tar: 7.4.3
@@ -8047,11 +8052,6 @@ snapshots:
       - utf-8-validate
 
   '@next/env@15.4.4': {}
-
-  '@next/eslint-plugin-next@14.2.5':
-    dependencies:
-      glob: 10.3.10
-    optional: true
 
   '@next/eslint-plugin-next@15.4.4':
     dependencies:
@@ -8349,10 +8349,6 @@ snapshots:
   '@types/json-schema@7.0.15': {}
 
   '@types/json5@0.0.29': {}
-
-  '@types/mapbox-gl@3.4.1':
-    dependencies:
-      '@types/geojson': 7946.0.16
 
   '@types/mapbox__point-geometry@0.1.4': {}
 
@@ -8771,7 +8767,7 @@ snapshots:
       json-schema-to-ts: 1.6.4
       ts-morph: 12.0.0
 
-  '@vercel/style-guide@6.0.0(@next/eslint-plugin-next@14.2.5)(eslint@8.57.0)(prettier@3.6.2)(typescript@5.8.3)':
+  '@vercel/style-guide@6.0.0(eslint@8.57.0)(prettier@3.6.2)(typescript@5.8.3)':
     dependencies:
       '@babel/core': 7.28.0
       '@babel/eslint-parser': 7.28.0(@babel/core@7.28.0)(eslint@8.57.0)
@@ -8794,7 +8790,6 @@ snapshots:
       eslint-plugin-vitest: 0.3.26(@typescript-eslint/eslint-plugin@7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.0)(typescript@5.8.3))(eslint@8.57.0)(typescript@5.8.3))(eslint@8.57.0)(typescript@5.8.3)
       prettier-plugin-packagejson: 2.5.19(prettier@3.6.2)
     optionalDependencies:
-      '@next/eslint-plugin-next': 14.2.5
       eslint: 8.57.0
       prettier: 3.6.2
       typescript: 5.8.3
@@ -8804,6 +8799,19 @@ snapshots:
       - jest
       - supports-color
       - vitest
+
+  '@vis.gl/react-mapbox@8.0.4(mapbox-gl@3.13.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
+    optionalDependencies:
+      mapbox-gl: 3.13.0
+
+  '@vis.gl/react-maplibre@8.0.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)':
+    dependencies:
+      '@maplibre/maplibre-gl-style-spec': 19.3.3
+      react: 19.1.0
+      react-dom: 19.1.0(react@19.1.0)
 
   '@whatwg-node/disposablestack@0.0.6':
     dependencies:
@@ -10413,15 +10421,6 @@ snapshots:
     dependencies:
       is-glob: 4.0.3
 
-  glob@10.3.10:
-    dependencies:
-      foreground-child: 3.3.1
-      jackspeak: 2.3.6
-      minimatch: 9.0.5
-      minipass: 7.1.2
-      path-scurry: 1.11.1
-    optional: true
-
   glob@10.4.5:
     dependencies:
       foreground-child: 3.3.1
@@ -10923,13 +10922,6 @@ snapshots:
       get-proto: 1.0.1
       has-symbols: 1.1.0
       set-function-name: 2.0.2
-
-  jackspeak@2.3.6:
-    dependencies:
-      '@isaacs/cliui': 8.0.2
-    optionalDependencies:
-      '@pkgjs/parseargs': 0.11.0
-    optional: true
 
   jackspeak@3.4.3:
     dependencies:
@@ -11824,10 +11816,10 @@ snapshots:
 
   react-is@19.1.0: {}
 
-  react-map-gl@7.1.7(mapbox-gl@3.13.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  react-map-gl@8.0.4(mapbox-gl@3.13.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
-      '@maplibre/maplibre-gl-style-spec': 19.3.3
-      '@types/mapbox-gl': 3.4.1
+      '@vis.gl/react-mapbox': 8.0.4(mapbox-gl@3.13.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@vis.gl/react-maplibre': 8.0.4(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
     optionalDependencies:

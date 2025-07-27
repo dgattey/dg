@@ -1,6 +1,6 @@
 import { useMemo, useRef } from 'react';
-import type { MapRef } from 'react-map-gl';
-import { Map as MapGL } from 'react-map-gl';
+import type { MapRef } from 'react-map-gl/mapbox';
+import { Map as MapGL } from 'react-map-gl/mapbox';
 import { Box } from '@mui/material';
 import { useColorScheme } from 'ui/theme/useColorScheme';
 import type { MapLocation } from 'api/contentful/MapLocation';

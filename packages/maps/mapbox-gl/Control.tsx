@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
-import { useControl, type MapInstance } from 'react-map-gl';
+import { useControl, type MapInstance } from 'react-map-gl/mapbox';
 import { useTheme } from '@mui/material';
 import type { ControlContainerProps } from './ControlContainer';
 import { ControlContainer } from './ControlContainer';
