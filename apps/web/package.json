@@ -2,7 +2,7 @@
   "name": "web",
   "private": true,
   "scripts": {
-    "dev": "VERCEL_GIT_COMMIT_SHA=$(git rev-parse HEAD) next dev",
+    "dev": "VERCEL_GIT_COMMIT_SHA=$(git rev-parse HEAD) next dev --turbopack",
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "build:serve": "next start",
@@ -35,7 +35,6 @@
     "shared-core": "workspace:*",
     "swr": "2.3.4",
     "ui": "workspace:*",
-    "webpack": "5.100.2",
     "wretch": "catalog:"
   },
   "devDependencies": {
