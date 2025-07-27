@@ -1,7 +1,7 @@
 import { useTheme } from '@mui/material';
 import { Minus, Plus } from 'lucide-react';
 import type { RefObject } from 'react';
-import type { MapRef } from 'react-map-gl';
+import type { MapRef } from 'react-map-gl/mapbox';
 import { Control } from './Control';
 
 type StandardControlsProps = {
