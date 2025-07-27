@@ -4,7 +4,7 @@ import { useData } from 'api/useData';
 
 // Only render when you want to start importing this giant component
 const FullMapCard = dynamic(() => import('maps/mapbox-gl/FullMapCard'), {
-  suspense: true,
+  loading: () => null,
 });
 
 /**
