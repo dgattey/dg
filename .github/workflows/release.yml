@@ -32,7 +32,92 @@ jobs:
       - name: Dry run release onto main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm turbo release -- --dry-run --branches="main, ${{ github.ref_name }}"
+        id: dry-run-release
+        run: |
+          OUTPUT=$(pnpm turbo release -- --dry-run --branches="main, ${{ github.ref_name }}" 2>&1)
+          echo "$OUTPUT"
+
+          # Extract version from output (looks for pattern like "## 2.50.6")
+          VERSION=$(echo "$OUTPUT" | grep -E "^## [0-9]+\.[0-9]+\.[0-9]+" | head -1 | sed -E 's/^## ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+
+          if [ -n "$VERSION" ]; then
+            echo "Found version: $VERSION"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "No version found - no changes to release"
+            echo "version=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment version on PR
+        if: github.event_name == 'pull_request' && steps.dry-run-release.outputs.version != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ steps.dry-run-release.outputs.version }}';
+            const body = `🚀 **Next Release Version**: \`v${version}\`\n\nThis PR will trigger a release of version \`v${version}\` when merged to main.`;
+
+            // Find existing comment to update or create new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existingComment = comments.find(comment => 
+              comment.user.login === 'github-actions[bot]' && 
+              comment.body.includes('Next Release Version')
+            );
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
+
+      - name: Comment no changes on PR
+        if: github.event_name == 'pull_request' && steps.dry-run-release.outputs.version == ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const body = `📝 **No Release**: This PR contains no changes that would trigger a new release.`;
+
+            // Find existing comment to update or create new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const existingComment = comments.find(comment => 
+              comment.user.login === 'github-actions[bot]' && 
+              (comment.body.includes('Next Release Version') || comment.body.includes('No Release'))
+            );
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: body
+              });
+            }
 
   release:
     timeout-minutes: 5
