@@ -3,7 +3,6 @@
 name: Release
 on:
   - push
-  - pull_request
 
 env:
   VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
