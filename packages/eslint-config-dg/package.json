@@ -3,6 +3,7 @@
   "private": true,
   "files": ["common.js", "library.js", "next.js"],
   "scripts": {
+    "clean": "rm -rf .turbo *.tsbuildinfo",
     "format": "biome check --write .",
     "lint": "eslint . --fix",
     "lint:types": "tsc"

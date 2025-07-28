@@ -4,6 +4,7 @@
   "main": "client.ts",
   "types": "client.ts",
   "scripts": {
+    "clean": "rm -rf .turbo *.tsbuildinfo",
     "db": "sequelize",
     "format": "biome check --write .",
     "lint": "eslint . --fix",

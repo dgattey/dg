@@ -2,7 +2,7 @@
   "name": "codegen",
   "private": true,
   "scripts": {
-    "clean": "find ../../ -type f -name '*.generated.ts' -delete",
+    "clean": "find ../../ -type f -name '*.generated.ts' -delete && rm -rf .turbo *.tsbuildinfo",
     "codegen": "graphql-codegen --config config.ts",
     "format": "biome check --write .",
     "lint": "eslint . --fix",

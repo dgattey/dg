@@ -4,6 +4,7 @@
   "main": "webhookCommand.ts",
   "types": "webhookCommand.ts",
   "scripts": {
+    "clean": "rm -rf .turbo *.tsbuildinfo",
     "webhook": "NODE_ENV=development tsx webhookCommand.ts",
     "format": "biome check --write .",
     "lint": "eslint . --fix",

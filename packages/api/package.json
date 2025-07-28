@@ -2,6 +2,7 @@
   "name": "api",
   "private": true,
   "scripts": {
+    "clean": "rm -rf .turbo *.tsbuildinfo",
     "format": "biome check --write .",
     "lint": "eslint . --fix",
     "lint:types": "tsc"

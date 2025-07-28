@@ -9,7 +9,7 @@
     "format": "biome check --write .",
     "lint": "eslint . --fix",
     "lint:types": "tsc",
-    "clean": "rm -rf .next"
+    "clean": "rm -rf .next .turbo *.tsbuildinfo"
   },
   "dependencies": {
     "@contentful/rich-text-react-renderer": "16.1.0",
