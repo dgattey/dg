@@ -1,0 +1,60 @@
+{
+  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
+  "organizeImports": {
+    "enabled": true
+  },
+  "linter": {
+    "enabled": false
+  },
+  "formatter": {
+    "enabled": true,
+    "useEditorconfig": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "attributePosition": "auto"
+  },
+  "javascript": {
+    "formatter": {
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "trailingCommas": "all",
+      "semicolons": "always",
+      "arrowParentheses": "always",
+      "bracketSpacing": true,
+      "bracketSameLine": false,
+      "quoteStyle": "single",
+      "attributePosition": "auto"
+    }
+  },
+  "json": {
+    "formatter": {
+      "trailingCommas": "none"
+    }
+  },
+  "files": {
+    "include": [
+      "*",
+      "**/*.js",
+      "**/*.ts",
+      "**/*.tsx",
+      "**/*.mjs",
+      "**/*.cjs",
+      "**/*.css",
+      "**/*.json",
+      "**/*.jsonc"
+    ],
+    "ignore": [
+      ".cache/**",
+      ".next/**",
+      ".vscode/**",
+      ".vercel/**",
+      ".turbo/**",
+      "node_modules/**",
+      "pnpm-lock.yaml",
+      "**/migrations/**"
+    ]
+  }
+}

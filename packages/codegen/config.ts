@@ -45,13 +45,13 @@ const githubGenerators = createApiGenerator('github', {
 
 /**
  * These are all the options for codegen itself. We format with
- * prettier after running generation for Contentful and Github,
+ * biome after running generation for Contentful and Github,
  * and overwrite existing files.
  */
 const config: CodegenConfig = {
   overwrite: true,
   hooks: {
-    afterAllFileWrite: ['prettier --write'],
+    afterAllFileWrite: ['biome format --write'],
   },
   generates: {
     ...contentfulGenerators,

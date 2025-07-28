@@ -18,12 +18,10 @@ export async function generateOpenGraphImage({
   const [normalFontData, boldFontData] = await Promise.all([normalFont, boldFont]);
   const params = new URL(url).searchParams;
   return new ImageResponse(
-    (
-      <OpenGraphImage
-        subtitle={params.get('subtitle') ?? ''}
-        text={params.get('text') ?? 'Dylan Gattey'}
-      />
-    ),
+    <OpenGraphImage
+      subtitle={params.get('subtitle') ?? ''}
+      text={params.get('text') ?? 'Dylan Gattey'}
+    />,
     {
       fonts: [
         {

@@ -11,5 +11,8 @@ export const useShowScrollIndicator = (thresholdHeight: number) => {
     threshold: 1.0,
     rootMargin: `-${thresholdHeight}px 0px 0px 0px`,
   });
-  return { ref, isIndicatorShown: Boolean(entry) && thresholdHeight > 0 && !inView };
+  return {
+    ref,
+    isIndicatorShown: Boolean(entry) && thresholdHeight > 0 && !inView,
+  };
 };

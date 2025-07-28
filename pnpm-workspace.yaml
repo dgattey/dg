@@ -20,6 +20,7 @@ catalog:
   wretch: 2.11.0
 
 onlyBuiltDependencies:
+  - '@biomejs/biome'
   - '@vercel/speed-insights'
   - esbuild
   - lefthook

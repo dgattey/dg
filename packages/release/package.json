@@ -1,14 +1,10 @@
 {
   "name": "release",
   "private": true,
-  "files": [
-    "base.json",
-    "nextjs.json",
-    "react.json"
-  ],
+  "files": ["base.json", "nextjs.json", "react.json"],
   "scripts": {
     "release": "semantic-release",
-    "format": "prettier --write ."
+    "format": "biome format --write ."
   },
   "devDependencies": {
     "@semantic-release/changelog": "6.0.3",

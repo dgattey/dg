@@ -1,18 +1,18 @@
-[![GitHub version](https://badgen.net/github/release/dgattey/dg?cache=600)][gh] [![Vercel](https://therealsujitk-vercel-badge.vercel.app/?app=dg)](https://vercel.com/dgattey/dg) [![GitHub checks](https://badgen.net/github/checks/dgattey/dg)][gh] [![Last commit](https://badgen.net/github/last-commit/dgattey/dg/main)][gh]
+[![GitHub version](https://flat.badgen.net/github/release/dgattey/dg?cache=600)][gh] [![Vercel](https://deploy-badge.vercel.app/vercel/?app=dg&style=flat-square)](https://vercel.com/dgattey/dg) [![GitHub commits](https://flat.badgen.net/github/commits/dgattey/dg)][gh] [![Last commit](https://flat.badgen.net/github/last-commit/dgattey/dg/main)][gh]
 
 # Dylan Gattey
 
-Hi :wave: This is an overengineered way to show off my past projects/info about me/experiment with new technology. It's a lightweight, mobile-friendly React app, powered by [Next](https://nextjs.org/docs/getting-started) and hosted on [Vercel](https://vercel.com). And it's all Typescript, because we like type safety. It's set up as a monorepo, using [pnpm](https://pnpm.io) workspaces and [Turbo](https://turbo.run) as a command runner
+Hi :wave: This is an overengineered way to show my past projects/experiment with new technology. It's a lightweight, mobile-friendly React app in Typescript, powered by [Next](https://nextjs.org/docs/getting-started) and hosted on [Vercel](https://vercel.com). It's set up as a monorepo, using [pnpm](https://pnpm.io) workspaces and [Turbo](https://turbo.run) as a command runner.
 
 ## :hammer: Commands
 
 - `turbo dev` starts the development server + db connection to the prod DB (be careful!)
-- `turbo build` runs a prod build without a db connection (for CI)
-- `turbo build:serve` runs a prod build + db connection to your local db + serves it all once built (for local testing)
+- `turbo build` runs a prod build (for CI)
+- `turbo build:serve` runs a prod build + db connection + serves it (for local testing)
 - `turbo build:analyze` builds shows bundle sizes for a prod build (for verification)
-- `turbo format` runs Prettier to format the files
-- `turbo lint` runs ESLint to lint all TS(X) and JS(X) files
-- `turbo lint:types` runs tsc to confirm no type errors on the same files
+- `turbo format` runs Biome to format the files
+- `turbo lint` runs ESLint to lint files
+- `turbo lint:types` runs tsc to confirm no type errors
 - `turbo codegen` generates new GraphQL APIs from Github/Contentful + operation file types from the queries/mutations
 - `turbo db -- db:migrate` uses Sequelize to run migrations, and you can list the status of migrations with `turbo db -- db:migrate:status`. Undo with `turbo db -- db:migrate:undo`
 - `turbo db -- migration:generate --name <name>` uses Sequelize to generate a new migration file ready to be populated
@@ -25,21 +25,15 @@ Hi :wave: This is an overengineered way to show off my past projects/info about 
 
 ## :beginner: Initial Setup
 
-You need Node 20+ and pnpm 8+ installed. Run `pnpm install` to get started once you have those two installed. You also need `neonctl` installed globally, with `brew install neonctl`. Most later commands are run via `turbo`.
+You need Node 20+ installed. Install `pnpm` via corepack, then run `pnpm install`. You also need `neonctl` installed globally for the db, via `brew install neonctl`.
 
 ## :memo: Pull Requests
 
-Even though it's just me, I use feature branches that merge onto main:
+Even though it's just me, I use feature branches that squash onto main, and Linear for ticket tracking.
 
-1. Run `git checkout -b feature-name` to make a branch, then commit to it and push to origin.
-
-1. I [create a PR](https://github.com/dgattey/dg/pulls) and make sure there's a label + an [issue](https://github.com/dgattey/dg/issues) the PR "fixes" or "closes".
-
-1. It'll automatically kick off Github Actions for quality, safety, and linting/formatting using CodeQL from Github + my own actions for Autochecks.
-
-1. Check out the Vercel deploy preview to verify it looks good. Once that's good and checks pass, merge and delete the branch and it'll automatically create a new release + deployment for it! :tada:
-
-Other folks: please follow the [Contribution Guidelines](CONTRIBUTING.md).
+1. PR creation will kick off Github actions for linting/formatting + post a comment about the new version.
+1. Use the Vercel deploy preview to verify functionality.
+1. Merges will automatically create a new version/release 🎉
 
 ## :rainbow: Architecture
 
@@ -53,13 +47,13 @@ Pretty standard Next app here. `/public` contains static files, `/src` contains 
 
 - [Cloudflare](https://cloudflare.com) manages DNS/security. Cloudflare's MX records redirect email to Gmail.
 
-- [Contentful](https://www.contentful.com) handles all the content, minus a few things that come from Github itself. Using their GraphQL endpoint, I fetch data all across the site + create components around it. New content triggers a new build via a webhook, so it's always up to date.
+- [Contentful](https://www.contentful.com) handles most of the content. Using their GraphQL endpoint, I fetch data all across the site + create components around it. New content triggers a new build via a webhook, so it's always up to date.
 
-- [useSWR](https://swr.vercel.app) is how I keep data all up to date. When Contentful hasn't published something new and you're still on the site, it'll fetch latest data for you. Super cool tool, and it does fancy things with caching too so there's no extra network requests + the UI is _always_ updated. I wrote a strongly typed wrapper around it for endpoints so there's clear things you can fetch from server & there's only one dynamic Next API route needed. Fun!
+- [useSWR](https://swr.vercel.app) is how I keep data all up to date. When Contentful hasn't published something new and you're still on the site, it'll fetch latest data for you. Super cool tool, and it does fancy things with caching too so there's no extra network requests + the UI is _always_ updated. I wrote a strongly typed wrapper around it for endpoints so there's clear things you can fetch from server & there's only one dynamic Next API route needed.
 
-- [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/api/) shows the map on the homepage and is loaded client side only because of speed/browser APIs it uses. It's huge file wise, but also lazy loaded.
+- [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/api/) shows the map on the homepage and is lazy loaded client side only after hovering a map, because of speed.
 
-- [MUI System](https://mui.com/system/getting-started/overview/) provides the styling system for layouts/usages of `sx` on props, running on `emotion` under the hood.
+- [MUI](https://mui.com/material/) provides the styling system for layouts/usages of `sx` on props, running on `emotion` under the hood.
 
 - [GraphQL Codegen](https://www.graphql-code-generator.com) makes all the `*.generated.ts` files. It reads Github + Contentful's API schema + creates types out of them automatically. I run it on command when I write new queries/etc to get their types.
 
@@ -79,7 +73,7 @@ Pretty standard Next app here. `/public` contains static files, `/src` contains 
 
 Because Spotify + Strava use Oauth and I use their APIs to pull stats/etc, I needed a lightweight DB to store auth tokens. I use Neon + Sequelize for this.
 
-There's only two tables, one for the tokens and one for the Strava activities, and they're used from the server only.
+There are two tables:
 
 1. **Token**: I grab the latest token, see if it's expired, and if so, fetch new data. That's done via Spotify/Strava's APIs + the saved refresh token. Once I persist the new data, I can then call the APIs with the auth tokens. Nice defaults built in so anything missing gives back the right info as possible.
 2. **StravaActivity**: I create a row when there's a webhook event with a new activity, and I fetch the whole corresponding activity from Strava's API. If there are data updates, for now I just re-fetch the activity and update the row with new JSON data. I keep track of last update time, so multiple updates in the same time window don't hammer Strava's servers.
@@ -128,6 +122,6 @@ Standard semver versioning is done via `semantic-release` and Conventional Commi
 - **Minor**: bumped if "feat:" appears in the message
 - **Patch**: bumped by default in all other cases ("chore:"/"fix:"/etc)
 
-Test a dry run with `GITHUB_TOKEN=* pnpm turbo release -- --dry-run --branches={branch here}` after filling in the token.
+Test a dry run with `GITHUB_TOKEN=* pnpm turbo release -- --dry-run --branches={branch here}` after filling in the token, or done for you on all PRs.
 
 [gh]: https://github.com/dgattey/dg

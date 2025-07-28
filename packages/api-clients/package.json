@@ -2,7 +2,7 @@
   "name": "api-clients",
   "private": true,
   "scripts": {
-    "format": "prettier --write .",
+    "format": "biome format --write .",
     "lint": "eslint . --fix",
     "lint:types": "tsc"
   },

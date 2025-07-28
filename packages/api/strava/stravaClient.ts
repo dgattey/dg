@@ -55,9 +55,8 @@ export function validateRawDataToToken(rawData: unknown): {
     refresh_token: refreshToken,
     access_token: accessToken,
     expires_at: expiresAt,
-  } =
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    rawData as RawStravaRefreshToken;
+  } = rawData as RawStravaRefreshToken;
   invariant(tokenType === 'Bearer', `Invalid token type from Strava ${tokenType}`);
   invariant(refreshToken, 'Missing refresh token from Strava');
   invariant(accessToken, 'Missing access token from Strava');

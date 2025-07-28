@@ -23,7 +23,9 @@ export default async function handler(request: NextApiRequest) {
     }
     default: {
       return new Response(
-        JSON.stringify({ error: `Method ${method ?? '<Unknown>'} Not Allowed` }),
+        JSON.stringify({
+          error: `Method ${method ?? '<Unknown>'} Not Allowed`,
+        }),
         {
           status: 405,
         },

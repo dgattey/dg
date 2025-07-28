@@ -1,7 +1,5 @@
-// eslint-disable-next-line import/order
 const { withLogtail } = require('@logtail/next');
 require('dotenv-mono').config();
-
 /**
  * Adds bundle analysis if development + with ANALYZE flag set to true
  */
@@ -32,7 +30,7 @@ const nextConfig = {
     defaultLocale: 'en',
   },
   // Have to do this for each of the packages we import
-  transpilePackages: ['shared-core', 'api', 'ui', 'ui-core'],
+  transpilePackages: ['shared-core', 'api', 'ui'],
   // Disables the Sequelize warning about the `sequelize` package not being found
   serverExternalPackages: ['sequelize'],
   experimental: {

@@ -13,7 +13,12 @@ async function createOrUpdateToken({
   expiryAt,
   refreshToken,
 }: CreateTokenProps) {
-  const token = await db.Token.upsert({ name, accessToken, expiryAt, refreshToken });
+  const token = await db.Token.upsert({
+    name,
+    accessToken,
+    expiryAt,
+    refreshToken,
+  });
   return token[0];
 }
 
@@ -101,6 +106,11 @@ export async function refreshedAccessToken(
   );
   log.info('Fetched refreshed token', { refreshToken, accessToken, expiryAt });
   await createOrUpdateToken({ name, accessToken, refreshToken, expiryAt });
-  log.info('Updated token in db, returning', { name, accessToken, refreshToken, expiryAt });
+  log.info('Updated token in db, returning', {
+    name,
+    accessToken,
+    refreshToken,
+    expiryAt,
+  });
   return accessToken;
 }

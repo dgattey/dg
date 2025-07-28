@@ -39,7 +39,9 @@ const QUERY = gql`
 export async function fetchRepoVersion(): Promise<string | null> {
   const version = process.env.NEXT_PUBLIC_APP_VERSION;
   if (version?.length) {
-    log.info(`Fetching version: using 'NEXT_PUBLIC_APP_VERSION': ${version}`, { version });
+    log.info(`Fetching version: using 'NEXT_PUBLIC_APP_VERSION': ${version}`, {
+      version,
+    });
     return version;
   }
 
@@ -47,7 +49,9 @@ export async function fetchRepoVersion(): Promise<string | null> {
   // We disable a rule here otherwise the caching gets busted every time
   // eslint-disable-next-line turbo/no-undeclared-env-vars
   const commitSha = process.env.VERCEL_GIT_COMMIT_SHA;
-  log.info('Fetching version: no public app version, fetching releases', { commitSha });
+  log.info('Fetching version: no public app version, fetching releases', {
+    commitSha,
+  });
   const data = await githubClient.request<GithubRepoVersionQuery>(QUERY);
   const releases = data.repository?.releases.nodes;
   const filteredReleases =

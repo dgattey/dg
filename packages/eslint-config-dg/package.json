@@ -1,13 +1,9 @@
 {
   "name": "eslint-config-dg",
   "private": true,
-  "files": [
-    "common.js",
-    "library.js",
-    "next.js"
-  ],
+  "files": ["common.js", "library.js", "next.js"],
   "scripts": {
-    "format": "prettier --write .",
+    "format": "biome format --write .",
     "lint": "eslint . --fix",
     "lint:types": "tsc"
   },

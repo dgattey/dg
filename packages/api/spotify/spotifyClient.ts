@@ -58,9 +58,12 @@ export const spotifyClient = createClient({
       refresh_token: refreshToken,
     }),
     validate: (rawData, refreshToken) => {
-      const { token_type: tokenType, access_token: accessToken, expires_in: expiresIn } =
+      const {
+        token_type: tokenType,
+        access_token: accessToken,
+        expires_in: expiresIn,
         // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        rawData as RawSpotifyRefreshToken;
+      } = rawData as RawSpotifyRefreshToken;
       invariant(tokenType === 'Bearer', `Invalid token type from Spotify ${tokenType}`);
       invariant(accessToken, 'Missing access token from Spotify');
 

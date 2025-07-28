@@ -3,7 +3,6 @@
 name: Release
 on:
   - push
-  - pull_request
 
 env:
   VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
@@ -38,24 +37,35 @@ jobs:
           OUTPUT=$(pnpm turbo release -- --dry-run --branches="main, ${{ github.ref_name }}" 2>&1)
           echo "$OUTPUT"
 
-          # Extract version from output (looks for pattern like "## 2.50.6")
-          VERSION=$(echo "$OUTPUT" | grep -E "^## [0-9]+\.[0-9]+\.[0-9]+" | head -1 | sed -E 's/^## ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+          # Common version pattern
+          VERSION_PATTERN="[0-9]\+\.[0-9]\+\.[0-9]\+"
+          
+          # Extract versions using sed -n (cleaner than grep | head | sed)
+          NEXT_VERSION=$(echo "$OUTPUT" | sed -n "s/^## \($VERSION_PATTERN\).*/\1/p")
+          CURRENT_VERSION=$(echo "$OUTPUT" | sed -n "s/.*Found git tag v\($VERSION_PATTERN\) associated with version.*/\1/p")
 
-          if [ -n "$VERSION" ]; then
-            echo "Found version: $VERSION"
-            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          # Print out what we have
+          if [ -n "$NEXT_VERSION" ] && [ -n "$CURRENT_VERSION" ]; then
+            echo "Found both versions - current: $CURRENT_VERSION, next: $NEXT_VERSION"
           else
-            echo "No version found - no changes to release"
-            echo "version=" >> $GITHUB_OUTPUT
+            echo "Missing version info - current: '$CURRENT_VERSION', next: '$NEXT_VERSION'"
           fi
+          
+          echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
+          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
       - name: Comment version on PR
-        if: steps.dry-run-release.outputs.version != ''
+        if: steps.dry-run-release.outputs.next_version != ''
         uses: actions/github-script@v7
         with:
           script: |
-            const version = '${{ steps.dry-run-release.outputs.version }}';
-            const body = `🚀 **Next Release Version**: \`v${version}\`\n\nThis PR will trigger a release of version \`v${version}\` when merged to main.`;
+            const nextVersion = '${{ steps.dry-run-release.outputs.next_version }}';
+            const currentVersion = '${{ steps.dry-run-release.outputs.current_version }}';
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            
+            const versionInfo = `📦 **Current Version**: \`v${currentVersion}\`\n🚀 **Next Release Version**: \`v${nextVersion}\``
+              
+            const body = `${versionInfo}\n\nThis PR will trigger a release of version \`v${nextVersion}\` when merged to main.\n\n📋 [View Release Preview Job](${runUrl}) - See the full dry-run details`;
 
             // Try to find PR - either from event context or by searching
             let prNumber = null;
