@@ -3,6 +3,7 @@
 name: Release
 on:
   - push
+  - pull_request
 
 env:
   VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
@@ -19,7 +20,7 @@ jobs:
   get-version:
     timeout-minutes: 5
     name: 'Dry run of release version'
-    if: github.ref != 'refs/heads/main' # only on non-main
+    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -32,12 +33,85 @@ jobs:
       - name: Dry run release onto main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm turbo release -- --dry-run --branches="main, ${{ github.ref_name }}"
+        id: dry-run-release
+        run: |
+          OUTPUT=$(pnpm turbo release -- --dry-run --branches="main, ${{ github.ref_name }}" 2>&1)
+          echo "$OUTPUT"
+
+          # Extract version from output (looks for pattern like "## 2.50.6")
+          VERSION=$(echo "$OUTPUT" | grep -E "^## [0-9]+\.[0-9]+\.[0-9]+" | head -1 | sed -E 's/^## ([0-9]+\.[0-9]+\.[0-9]+).*/\1/')
+
+          if [ -n "$VERSION" ]; then
+            echo "Found version: $VERSION"
+            echo "version=$VERSION" >> $GITHUB_OUTPUT
+          else
+            echo "No version found - no changes to release"
+            echo "version=" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment version on PR
+        if: steps.dry-run-release.outputs.version != ''
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const version = '${{ steps.dry-run-release.outputs.version }}';
+            const body = `🚀 **Next Release Version**: \`v${version}\`\n\nThis PR will trigger a release of version \`v${version}\` when merged to main.`;
+
+            // Try to find PR - either from event context or by searching
+            let prNumber = null;
+
+            if (context.payload.pull_request) {
+              prNumber = context.payload.pull_request.number;
+            } else {
+              // Search for PR associated with this branch
+              const { data: prs } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: `${context.repo.owner}:${context.ref.replace('refs/heads/', '')}`,
+                state: 'open'
+              });
+              if (prs.length > 0) {
+                prNumber = prs[0].number;
+              }
+            }
+
+            if (!prNumber) {
+              console.log('No PR found to comment on');
+              return;
+            }
+
+            // Find existing comment to update or create new one
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const existingComment = comments.find(comment => 
+              comment.user.login === 'github-actions[bot]' && 
+              comment.body.includes('Next Release Version')
+            );
+
+            if (existingComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existingComment.id,
+                body: body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body
+              });
+            }
 
   release:
     timeout-minutes: 5
     name: 'Release new version'
-    if: github.ref == 'refs/heads/main' # do not run elsewhere!
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -55,7 +129,7 @@ jobs:
   redeploy:
     timeout-minutes: 5
     name: 'Redeploy with new version'
-    if: github.ref == 'refs/heads/main' # do not run elsewhere!
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     needs: [release]
     steps:
