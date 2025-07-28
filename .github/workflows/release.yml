@@ -50,18 +50,41 @@ jobs:
           fi
 
       - name: Comment version on PR
-        if: github.event.pull_request && steps.dry-run-release.outputs.version != ''
+        if: steps.dry-run-release.outputs.version != ''
         uses: actions/github-script@v7
         with:
           script: |
             const version = '${{ steps.dry-run-release.outputs.version }}';
             const body = `🚀 **Next Release Version**: \`v${version}\`\n\nThis PR will trigger a release of version \`v${version}\` when merged to main.`;
 
+            // Try to find PR - either from event context or by searching
+            let prNumber = null;
+
+            if (context.payload.pull_request) {
+              prNumber = context.payload.pull_request.number;
+            } else {
+              // Search for PR associated with this branch
+              const { data: prs } = await github.rest.pulls.list({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                head: `${context.repo.owner}:${context.ref.replace('refs/heads/', '')}`,
+                state: 'open'
+              });
+              if (prs.length > 0) {
+                prNumber = prs[0].number;
+              }
+            }
+
+            if (!prNumber) {
+              console.log('No PR found to comment on');
+              return;
+            }
+
             // Find existing comment to update or create new one
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              issue_number: context.issue.number,
+              issue_number: prNumber,
             });
 
             const existingComment = comments.find(comment => 
@@ -80,42 +103,7 @@ jobs:
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body: body
-              });
-            }
-
-      - name: Comment no changes on PR
-        if: github.event.pull_request && steps.dry-run-release.outputs.version == ''
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const body = `📝 **No Release**: This PR contains no changes that would trigger a new release.`;
-
-            // Find existing comment to update or create new one
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-
-            const existingComment = comments.find(comment => 
-              comment.user.login === 'github-actions[bot]' && 
-              (comment.body.includes('Next Release Version') || comment.body.includes('No Release'))
-            );
-
-            if (existingComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existingComment.id,
-                body: body
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
+                issue_number: prNumber,
                 body: body
               });
             }
