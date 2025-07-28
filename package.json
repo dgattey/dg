@@ -17,7 +17,7 @@
     "vercel": "44.6.3"
   },
   "devDependencies": {
-    "prettier": "3.6.2",
+    "@biomejs/biome": "^1.9.4",
     "tsconfig": "workspace:*",
     "turbo": "2.5.5",
     "typescript": "catalog:"

@@ -32,7 +32,11 @@ const isSubscription = (query: Query): query is StravaSubscription =>
  */
 export const echoStravaChallengeIfValid = (
   request: { query: Query },
-  response: { status: (value: number) => { json: (value: Record<string, string>) => void } },
+  response: {
+    status: (value: number) => {
+      json: (value: Record<string, string>) => void;
+    };
+  },
 ) => {
   const { query } = request;
   if (!isSubscription(query)) {

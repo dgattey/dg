@@ -38,7 +38,9 @@ const OVERRIDES: Partial<Record<Intl.RelativeTimeFormatUnit, Record<number, stri
   },
 };
 
-const relativeTimeFormatter = new Intl.RelativeTimeFormat('en', { numeric: 'auto' });
+const relativeTimeFormatter = new Intl.RelativeTimeFormat('en', {
+  numeric: 'auto',
+});
 
 /**
  * Converts a date to a number, defaulting to right now as a fallback

@@ -14,7 +14,10 @@ type PlaybackStatusProps = {
  */
 export function PlaybackStatus({ playedAt }: PlaybackStatusProps) {
   const isNowPlaying = !playedAt;
-  const relativeLastPlayed = useRelativeTimeFormat({ fromDate: playedAt, capitalized: true });
+  const relativeLastPlayed = useRelativeTimeFormat({
+    fromDate: playedAt,
+    capitalized: true,
+  });
   return (
     <Typography
       component={HorizontalStack}

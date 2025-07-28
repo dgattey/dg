@@ -52,7 +52,11 @@ function getCardSx(
     isClickable,
     horizontalSpan,
     verticalSpan,
-  }: { isClickable: boolean; horizontalSpan: number; verticalSpan: number | null },
+  }: {
+    isClickable: boolean;
+    horizontalSpan: number;
+    verticalSpan: number | null;
+  },
 ) {
   return {
     position: 'relative',

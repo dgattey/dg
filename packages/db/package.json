@@ -5,7 +5,7 @@
   "types": "client.ts",
   "scripts": {
     "db": "sequelize",
-    "format": "prettier --write .",
+    "format": "biome format --write .",
     "lint": "eslint . --fix",
     "lint:types": "tsc"
   },

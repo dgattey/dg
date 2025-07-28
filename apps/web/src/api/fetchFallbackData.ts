@@ -1,7 +1,9 @@
 import type { AwaitedType, EndpointKey } from './endpoints';
 import { endpoints } from './endpoints';
 
-export type FetchedFallbackData<Keys extends EndpointKey> = { [Key in Keys]: AwaitedType<Key> };
+export type FetchedFallbackData<Keys extends EndpointKey> = {
+  [Key in Keys]: AwaitedType<Key>;
+};
 
 /**
  * Fetches all fallback data specified by the array of endpoint keys.

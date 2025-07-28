@@ -46,5 +46,7 @@ export const methodNotAllowedError = (
 ) => {
   const { method } = request;
   response.setHeader('Allow', allowedMethods);
-  response.status(405).json({ error: method ? `Method ${method} Not Allowed` : 'Method Required' });
+  response.status(405).json({
+    error: method ? `Method ${method} Not Allowed` : 'Method Required',
+  });
 };
