@@ -1,8 +1,8 @@
-import { truncated } from 'ui/helpers/truncated';
-import { mixinSx } from 'ui/helpers/mixinSx';
-import type { SxProps } from 'ui/theme';
-import { Link } from 'ui/dependent/Link';
 import { useData } from 'api/useData';
+import { Link } from 'ui/dependent/Link';
+import { mixinSx } from 'ui/helpers/mixinSx';
+import { truncated } from 'ui/helpers/truncated';
+import type { SxProps } from 'ui/theme';
 
 /**
  * Formatted link for the activity name

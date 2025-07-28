@@ -1,8 +1,8 @@
+import { log } from '@logtail/next';
 import type { Wretch } from 'wretch';
 import wretch from 'wretch';
-import { log } from '@logtail/next';
-import { getStatus } from './getStatus';
 import type { RefreshTokenConfig } from './RefreshTokenConfig';
+import { getStatus } from './getStatus';
 import { refreshedAccessToken } from './refreshedAccessToken';
 
 export type ClientProps = {

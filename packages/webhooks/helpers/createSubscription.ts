@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import type { WebhookType } from '../types/WebhookType';
 import { handledError } from './handledError';
-import { webhookSubscriptionConfigs, standardParams } from './webhookSubscriptionConfigs';
+import { standardParams, webhookSubscriptionConfigs } from './webhookSubscriptionConfigs';
 
 /**
  * Runs create, assuming that there's something running at the right

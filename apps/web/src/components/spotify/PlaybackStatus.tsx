@@ -1,7 +1,7 @@
-import { Music } from 'lucide-react';
 import { Typography } from '@mui/material';
-import { HorizontalStack } from 'ui/core/HorizontalStack';
 import type { Track } from 'api/spotify/Track';
+import { Music } from 'lucide-react';
+import { HorizontalStack } from 'ui/core/HorizontalStack';
 import { useRelativeTimeFormat } from 'ui/helpers/useRelativeTimeFormat';
 
 type PlaybackStatusProps = {

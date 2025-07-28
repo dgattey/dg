@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { useCurrentImageSizes } from 'ui/helpers/useCurrentImageSizes';
-import { ContentCard } from 'ui/dependent/ContentCard';
-import { HoverableContainer } from 'ui/core/HoverableContainer';
-import { Image } from 'ui/dependent/Image';
 import { useData } from 'api/useData';
 import { RichText } from 'components/RichText';
 import { useLinkWithName } from 'hooks/useLinkWithName';
+import { useState } from 'react';
+import { HoverableContainer } from 'ui/core/HoverableContainer';
+import { ContentCard } from 'ui/dependent/ContentCard';
+import { Image } from 'ui/dependent/Image';
+import { useCurrentImageSizes } from 'ui/helpers/useCurrentImageSizes';
 
 /**
  * Width of the intro image on small screens

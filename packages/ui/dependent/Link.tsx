@@ -2,12 +2,12 @@
 import { faLinkedinIn } from '@fortawesome/free-brands-svg-icons/faLinkedinIn';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
-import NextLink from 'next/link';
-import type { LinkProps as MuiLinkProps, ButtonProps } from '@mui/material';
-import { Link as MuiLink, Tooltip, Button } from '@mui/material';
+import type { ButtonProps, LinkProps as MuiLinkProps } from '@mui/material';
+import { Button, Link as MuiLink, Tooltip } from '@mui/material';
 import { Github, Instagram, Send } from 'lucide-react';
-import type { SxProps } from '../theme';
+import NextLink from 'next/link';
 import { FaIcon } from '../icons/FaIcon';
+import type { SxProps } from '../theme';
 
 type BaseLinkProps = {
   title?: string;

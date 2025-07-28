@@ -3,6 +3,6 @@
   "private": true,
   "files": ["base.json", "nextjs.json", "react.json"],
   "scripts": {
-    "format": "biome format --write ."
+    "format": "biome check --write ."
   }
 }

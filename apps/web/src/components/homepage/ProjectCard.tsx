@@ -1,9 +1,9 @@
-import { useState } from 'react';
-import { useCurrentImageSizes } from 'ui/helpers/useCurrentImageSizes';
 import type { Project } from 'api/contentful/api.generated';
-import { ContentCard } from 'ui/dependent/ContentCard';
+import { useState } from 'react';
 import { HoverableContainer } from 'ui/core/HoverableContainer';
+import { ContentCard } from 'ui/dependent/ContentCard';
 import { Image } from 'ui/dependent/Image';
+import { useCurrentImageSizes } from 'ui/helpers/useCurrentImageSizes';
 
 type ProjectCardProps = Project;
 

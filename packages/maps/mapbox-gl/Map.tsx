@@ -1,9 +1,9 @@
+import { Box } from '@mui/material';
+import type { MapLocation } from 'api/contentful/MapLocation';
 import { useMemo, useRef } from 'react';
 import type { MapRef } from 'react-map-gl/mapbox';
 import { Map as MapGL } from 'react-map-gl/mapbox';
-import { Box } from '@mui/material';
 import { useColorScheme } from 'ui/theme/useColorScheme';
-import type { MapLocation } from 'api/contentful/MapLocation';
 import { StandardControls } from './StandardControls';
 
 export type MapProps = {

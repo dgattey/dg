@@ -1,15 +1,15 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import { isRecord } from 'shared-core/helpers/typeguards';
-import { echoStravaChallengeIfValid } from 'api/strava/echoStravaChallengeIfValid';
-import { syncStravaWebhookUpdateWithDb } from 'api/strava/syncStravaWebhookUpdateWithDb';
-import type { StravaWebhookEvent } from 'api/strava/StravaWebhookEvent';
 import { log } from '@logtail/next';
+import { handleApiError, methodNotAllowedError } from 'api/handleApiError';
+import type { StravaWebhookEvent } from 'api/strava/StravaWebhookEvent';
+import { echoStravaChallengeIfValid } from 'api/strava/echoStravaChallengeIfValid';
 import {
   exchangeCodeForToken,
   getOauthTokenInitLink,
   getStravaExchangeCodeForTokenRequest,
 } from 'api/strava/runOauthFlow';
-import { handleApiError, methodNotAllowedError } from 'api/handleApiError';
+import { syncStravaWebhookUpdateWithDb } from 'api/strava/syncStravaWebhookUpdateWithDb';
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { isRecord } from 'shared-core/helpers/typeguards';
 
 // Just a shorthand for this function type
 type Processor = (request: NextApiRequest, response: NextApiResponse) => void;

@@ -1,11 +1,11 @@
 import {
-  Table,
-  Column,
-  Model,
-  Unique,
-  PrimaryKey,
-  DataType,
   AllowNull,
+  Column,
+  DataType,
+  Model,
+  PrimaryKey,
+  Table,
+  Unique,
 } from 'sequelize-typescript';
 
 export type CreateTokenProps = Pick<Token, 'name' | 'accessToken' | 'expiryAt' | 'refreshToken'>;

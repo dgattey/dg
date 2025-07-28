@@ -1,11 +1,11 @@
 import {
-  Table,
+  AllowNull,
   Column,
+  DataType,
   Model,
   PrimaryKey,
+  Table,
   Unique,
-  DataType,
-  AllowNull,
 } from 'sequelize-typescript';
 import type { StravaDetailedActivity } from './StravaDetailedActivity';
 

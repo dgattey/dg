@@ -1,8 +1,8 @@
 import { Stack, Typography } from '@mui/material';
+import { Meta } from 'components/Meta';
 import { Section } from 'ui/core/Section';
 import { Link } from 'ui/dependent/Link';
 import { useColorScheme } from 'ui/theme/useColorScheme';
-import { Meta } from 'components/Meta';
 
 type ErrorLayoutProps = {
   /**

@@ -1,5 +1,5 @@
-import { Moon, Sun, Monitor } from 'lucide-react';
 import { Button, Tooltip } from '@mui/material';
+import { Monitor, Moon, Sun } from 'lucide-react';
 import { useColorScheme } from '../theme/useColorScheme';
 import type { ColorSchemeMode } from '../theme/useColorScheme';
 

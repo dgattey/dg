@@ -1,12 +1,12 @@
 // Need to get rid of this when I clean up API
 /* eslint-disable camelcase */
 
-import { Fragment } from 'react';
 import { Typography } from '@mui/material';
-import { truncated } from 'ui/helpers/truncated';
 import type { Artist } from 'api/spotify/Track';
-import { Link } from 'ui/dependent/Link';
 import { useLinkWithName } from 'hooks/useLinkWithName';
+import { Fragment } from 'react';
+import { Link } from 'ui/dependent/Link';
+import { truncated } from 'ui/helpers/truncated';
 
 type ArtistListProps = {
   artists: Array<Artist>;

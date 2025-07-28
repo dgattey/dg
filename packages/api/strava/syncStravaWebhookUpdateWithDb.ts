@@ -1,5 +1,5 @@
-import { db } from 'db';
 import { log } from '@logtail/next';
+import { db } from 'db';
 import type { StravaWebhookEvent } from './StravaWebhookEvent';
 import { fetchStravaActivityFromApi } from './fetchStravaActivityFromApi';
 

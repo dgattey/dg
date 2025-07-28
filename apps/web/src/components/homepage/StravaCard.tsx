@@ -1,10 +1,10 @@
 import { Stack } from '@mui/material';
-import { ContentCard } from 'ui/dependent/ContentCard';
 import { useData } from 'api/useData';
+import { ActivityDescription } from 'components/strava/ActivityDescription';
+import { ActivityName } from 'components/strava/ActivityName';
 import { ActivityStats } from 'components/strava/ActivityStats';
 import { ActivityTypeWithIcon } from 'components/strava/ActivityTypeWithIcon';
-import { ActivityName } from 'components/strava/ActivityName';
-import { ActivityDescription } from 'components/strava/ActivityDescription';
+import { ContentCard } from 'ui/dependent/ContentCard';
 
 /**
  * Shows a card with the latest activity from Strava

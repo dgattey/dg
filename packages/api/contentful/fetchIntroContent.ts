@@ -1,8 +1,8 @@
 import { gql } from 'graphql-request';
-import { contentfulClient } from './contentfulClient';
-import { isTextBlock } from './parsers';
 import type { TextBlock } from './api.generated';
+import { contentfulClient } from './contentfulClient';
 import type { IntroBlockQuery } from './fetchIntroContent.generated';
+import { isTextBlock } from './parsers';
 
 /**
  * Grabs the contentful sections with the title of header. Should

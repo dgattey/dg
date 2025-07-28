@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
-import { HorizontalStack } from 'ui/core/HorizontalStack';
-import { Bike, Dumbbell } from 'lucide-react';
 import { useData } from 'api/useData';
+import { Bike, Dumbbell } from 'lucide-react';
+import { HorizontalStack } from 'ui/core/HorizontalStack';
 
 /**
  * Shows the latest activity type and an icon to depict

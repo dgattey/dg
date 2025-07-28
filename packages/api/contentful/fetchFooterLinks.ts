@@ -1,9 +1,9 @@
 import { gql } from 'graphql-request';
 import { isNotNullish } from 'shared-core/helpers/typeguards';
-import { contentfulClient } from './contentfulClient';
-import { isLink } from './parsers';
 import type { Link } from './api.generated';
+import { contentfulClient } from './contentfulClient';
 import type { FooterQuery } from './fetchFooterLinks.generated';
+import { isLink } from './parsers';
 
 /**
  * Grabs the contentful sections with the title of footer. Should

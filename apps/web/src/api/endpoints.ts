@@ -1,6 +1,6 @@
+import { fetchCurrentLocation } from 'api/contentful/fetchCurrentLocation';
 import { fetchFooterLinks } from 'api/contentful/fetchFooterLinks';
 import { fetchIntroContent } from 'api/contentful/fetchIntroContent';
-import { fetchCurrentLocation } from 'api/contentful/fetchCurrentLocation';
 import { fetchProjects } from 'api/contentful/fetchProjects';
 import { fetchRepoVersion } from 'api/github/fetchRepoVersion';
 import { fetchRecentlyPlayed } from 'api/spotify/fetchRecentlyPlayed';

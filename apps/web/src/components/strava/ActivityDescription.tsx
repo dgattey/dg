@@ -1,6 +1,6 @@
-import { truncated } from 'ui/helpers/truncated';
-import { Link } from 'ui/dependent/Link';
 import { useData } from 'api/useData';
+import { Link } from 'ui/dependent/Link';
+import { truncated } from 'ui/helpers/truncated';
 
 /**
  * Formatted link for the activity description

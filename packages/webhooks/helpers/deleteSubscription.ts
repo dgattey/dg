@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import type { WebhookType } from '../types/WebhookType';
 import { handledError } from './handledError';
-import { webhookSubscriptionConfigs, standardParams } from './webhookSubscriptionConfigs';
+import { standardParams, webhookSubscriptionConfigs } from './webhookSubscriptionConfigs';
 
 /**
  * Deletes a subscription with a given id. Use the `list` command to see

@@ -1,8 +1,8 @@
+import { useData } from 'api/useData';
+import { HOMEPAGE_TITLE, Meta } from 'components/Meta';
+import { MapPreviewCard } from 'components/homepage/MapPreviewCard';
 import { useMemo, useRef } from 'react';
 import { ContentGrid } from 'ui/core/ContentGrid';
-import { useData } from 'api/useData';
-import { MapPreviewCard } from 'components/homepage/MapPreviewCard';
-import { HOMEPAGE_TITLE, Meta } from 'components/Meta';
 import { IntroCard } from './IntroCard';
 import { ProjectCard } from './ProjectCard';
 import { SpotifyCard } from './SpotifyCard';

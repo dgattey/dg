@@ -1,5 +1,5 @@
-import { invariant } from 'shared-core/helpers/invariant';
 import { createClient } from 'api-clients/authenticatedRestClient';
+import { invariant } from 'shared-core/helpers/invariant';
 
 /**
  * This is what Spotify's refresh token API returns, as raw data

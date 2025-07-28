@@ -1,9 +1,9 @@
 import { command, oneOf, positional, run, string, subcommands } from 'cmd-ts';
 import { formattedList } from 'shared-core/helpers/formattedList';
-import type { WebhookType } from './types/WebhookType';
 import { createSubscription } from './helpers/createSubscription';
 import { deleteSubscription } from './helpers/deleteSubscription';
 import { listSubscriptions } from './helpers/listSubscriptions';
+import type { WebhookType } from './types/WebhookType';
 
 /**
  * Only Strava is supported as a subscription right now

@@ -1,9 +1,9 @@
 import { env } from 'node:process';
-import { Sequelize } from 'sequelize-typescript';
-import postgres from 'pg';
 import { log } from '@logtail/next';
-import { Token } from './models/Token';
+import postgres from 'pg';
+import { Sequelize } from 'sequelize-typescript';
 import { StravaActivity } from './models/StravaActivity';
+import { Token } from './models/Token';
 
 const SHARED_DB_OPTIONS = {
   dialect: 'postgres' as const,

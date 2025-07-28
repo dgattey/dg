@@ -1,7 +1,7 @@
-import { useMemo } from 'react';
-import { findLinkWithName } from 'api/contentful/parsers';
 import type { Link as LinkProps } from 'api/contentful/api.generated';
+import { findLinkWithName } from 'api/contentful/parsers';
 import { useData } from 'api/useData';
+import { useMemo } from 'react';
 
 /**
  * Using the header or footer links, finds a link with a given name. Can override the

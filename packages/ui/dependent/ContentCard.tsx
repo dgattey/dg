@@ -2,8 +2,8 @@ import type { Theme } from '@mui/material';
 import { Card, Typography } from '@mui/material';
 import type { Link } from 'api/contentful/api.generated';
 import { mixinSx } from '../helpers/mixinSx';
-import type { SxProps } from '../theme';
 import { truncated } from '../helpers/truncated';
+import type { SxProps } from '../theme';
 import { ContentWrappingLink } from './ContentWrappingLink';
 
 export type ContentCardProps = Pick<

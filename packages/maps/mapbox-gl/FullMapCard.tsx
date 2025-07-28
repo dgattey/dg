@@ -1,5 +1,5 @@
-import { useState } from 'react';
 import type { MapLocation } from 'api/contentful/MapLocation';
+import { useState } from 'react';
 import { Map } from './Map';
 import { Marker } from './Marker';
 

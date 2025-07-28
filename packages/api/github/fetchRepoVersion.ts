@@ -1,7 +1,7 @@
-import { gql } from 'graphql-request';
 import { log } from '@logtail/next';
-import { githubClient } from './githubClient';
+import { gql } from 'graphql-request';
 import type { GithubRepoVersionQuery } from './fetchRepoVersion.generated';
+import { githubClient } from './githubClient';
 
 /**
  * This, strictly speaking, is usually overkill. We fetch the 100 most recently

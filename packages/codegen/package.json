@@ -4,7 +4,7 @@
   "scripts": {
     "clean": "find ../../ -type f -name '*.generated.ts' -delete",
     "codegen": "graphql-codegen --config config.ts",
-    "format": "biome format --write .",
+    "format": "biome check --write .",
     "lint": "eslint . --fix",
     "lint:types": "tsc"
   },

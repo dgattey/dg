@@ -1,8 +1,8 @@
+import type { MapLocation } from 'api/contentful/MapLocation';
 import type { JSXElementConstructor } from 'react';
 import { Suspense, useState } from 'react';
-import { useColorScheme } from 'ui/theme/useColorScheme';
-import type { MapLocation } from 'api/contentful/MapLocation';
 import { ContentCard } from 'ui/dependent/ContentCard';
+import { useColorScheme } from 'ui/theme/useColorScheme';
 
 /**
  * Shows a lazy loaded map card, to be fetched on mouse over/touch start.

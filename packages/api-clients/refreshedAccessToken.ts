@@ -1,6 +1,6 @@
+import { log } from '@logtail/next';
 import { db } from 'db';
 import type { CreateTokenProps, FetchTokenProps } from 'db/models/Token';
-import { log } from '@logtail/next';
 import type { RefreshTokenConfig } from './RefreshTokenConfig';
 
 /**

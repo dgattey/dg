@@ -1,6 +1,6 @@
-import { ContentCard } from 'ui/dependent/ContentCard';
 import { useData } from 'api/useData';
 import { TrackListing } from 'components/spotify/TrackListing';
+import { ContentCard } from 'ui/dependent/ContentCard';
 
 /**
  * Shows a card with the latest data from Spotify

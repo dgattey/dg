@@ -1,8 +1,8 @@
-import { Marker as MapMarker } from 'react-map-gl/mapbox';
 import { Box } from '@mui/material';
-import { MAP_MARKER_IMAGE_SIZE } from 'ui/helpers/imageSizes';
 import type { MapLocation } from 'api/contentful/MapLocation';
+import { Marker as MapMarker } from 'react-map-gl/mapbox';
 import { Image } from 'ui/dependent/Image';
+import { MAP_MARKER_IMAGE_SIZE } from 'ui/helpers/imageSizes';
 
 const DIMENSION = 100;
 const RADIUS = DIMENSION / 2;

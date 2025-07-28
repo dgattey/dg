@@ -1,10 +1,10 @@
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import { Typography } from '@mui/material';
-import { HorizontalStack } from 'ui/core/HorizontalStack';
-import { formattedDistance } from 'shared-core/helpers/formattedDistance';
-import { FaIcon } from 'ui/icons/FaIcon';
-import { useRelativeTimeFormat } from 'ui/helpers/useRelativeTimeFormat';
 import { useData } from 'api/useData';
+import { formattedDistance } from 'shared-core/helpers/formattedDistance';
+import { HorizontalStack } from 'ui/core/HorizontalStack';
+import { useRelativeTimeFormat } from 'ui/helpers/useRelativeTimeFormat';
+import { FaIcon } from 'ui/icons/FaIcon';
 
 /**
  * Shows a horizontal stack of stats for the latest strava activity

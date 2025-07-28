@@ -1,12 +1,12 @@
-import { useContext } from 'react';
 import { Box } from '@mui/material';
-import { Section } from 'ui/core/Section';
+import { useContext } from 'react';
+import { ColorSchemeToggle } from 'ui/core/ColorSchemeToggle';
 import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
+import { ScrollIndicatorContext } from 'ui/core/ScrollIndicatorContext';
+import { Section } from 'ui/core/Section';
+import { ScrollUpButton } from 'ui/dependent/ScrollUpButton';
 import type { SxProps } from 'ui/theme';
 import { useColorScheme } from 'ui/theme/useColorScheme';
-import { ScrollIndicatorContext } from 'ui/core/ScrollIndicatorContext';
-import { ScrollUpButton } from 'ui/dependent/ScrollUpButton';
-import { ColorSchemeToggle } from 'ui/core/ColorSchemeToggle';
 import { Logo } from './Logo';
 
 type HeaderProps = {

@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import type { PaletteMode } from '@mui/material';
 import { useColorScheme as useMuiColorScheme } from '@mui/material/styles';
+import { useEffect, useState } from 'react';
 
 /**
  * The color scheme the system prefers by default

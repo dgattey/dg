@@ -1,8 +1,8 @@
 import { Card } from '@mui/material';
 import type { Track } from 'api/spotify/Track';
+import { useLinkWithName } from 'hooks/useLinkWithName';
 import { Image } from 'ui/dependent/Image';
 import { Link } from 'ui/dependent/Link';
-import { useLinkWithName } from 'hooks/useLinkWithName';
 
 type AlbumImageProps = {
   album: Track['album'];

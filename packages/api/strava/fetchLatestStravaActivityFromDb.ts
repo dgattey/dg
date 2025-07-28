@@ -1,6 +1,6 @@
-import { isRecord } from 'shared-core/helpers/typeguards';
-import type { StravaDetailedActivity } from 'db/models/StravaDetailedActivity';
 import { db } from 'db';
+import type { StravaDetailedActivity } from 'db/models/StravaDetailedActivity';
+import { isRecord } from 'shared-core/helpers/typeguards';
 import { paredStravaActivity } from './paredStravaActivity';
 
 /**

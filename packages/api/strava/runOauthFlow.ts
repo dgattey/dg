@@ -1,8 +1,8 @@
-import { db } from 'db';
 import { log } from '@logtail/next';
+import { db } from 'db';
 import { invariant } from 'shared-core/helpers/invariant';
-import { stravaTokenExchangeClient } from './stravaTokenExchangeClient';
 import { validateRawDataToToken } from './stravaClient';
+import { stravaTokenExchangeClient } from './stravaTokenExchangeClient';
 
 const CALLBACK_URL = process.env.WEBHOOK_CALLBACK_URL;
 const CLIENT_ID = process.env.STRAVA_CLIENT_ID;

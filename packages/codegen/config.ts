@@ -51,7 +51,7 @@ const githubGenerators = createApiGenerator('github', {
 const config: CodegenConfig = {
   overwrite: true,
   hooks: {
-    afterAllFileWrite: ['biome format --write'],
+    afterAllFileWrite: ['biome check --write'],
   },
   generates: {
     ...contentfulGenerators,

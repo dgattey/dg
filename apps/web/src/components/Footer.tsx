@@ -1,10 +1,10 @@
 import { Container, Divider } from '@mui/material';
-import { Section } from 'ui/core/Section';
-import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
-import { HorizontalStack } from 'ui/core/HorizontalStack';
 import type { Link as LinkType } from 'api/contentful/api.generated';
-import { Link } from 'ui/dependent/Link';
 import { useData } from 'api/useData';
+import { HorizontalStack } from 'ui/core/HorizontalStack';
+import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
+import { Section } from 'ui/core/Section';
+import { Link } from 'ui/dependent/Link';
 
 /**
  * Creates a singular footer link

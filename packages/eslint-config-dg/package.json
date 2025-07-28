@@ -3,7 +3,7 @@
   "private": true,
   "files": ["common.js", "library.js", "next.js"],
   "scripts": {
-    "format": "biome format --write .",
+    "format": "biome check --write .",
     "lint": "eslint . --fix",
     "lint:types": "tsc"
   },

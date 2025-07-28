@@ -1,10 +1,10 @@
+import type { SxProps as MuiSxProps, Theme } from '@mui/material/styles';
+import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 import type {} from '@mui/material/themeCssVarsAugmentation';
-import type { Theme, SxProps as MuiSxProps } from '@mui/material/styles';
-import { responsiveFontSizes, createTheme } from '@mui/material/styles';
-import { getShape } from './shape';
-import { getTypography } from './typography';
 import { getShadows } from './extraShadows';
 import { getPalette } from './palette';
+import { getShape } from './shape';
+import { getTypography } from './typography';
 
 /**
  * Use this everywhere where theme support is needed.

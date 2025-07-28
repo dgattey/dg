@@ -5,7 +5,7 @@
   "types": "webhookCommand.ts",
   "scripts": {
     "webhook": "NODE_ENV=development tsx webhookCommand.ts",
-    "format": "biome format --write .",
+    "format": "biome check --write .",
     "lint": "eslint . --fix",
     "lint:types": "tsc"
   },

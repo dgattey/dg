@@ -2,7 +2,7 @@
   "name": "shared-core",
   "private": true,
   "scripts": {
-    "format": "biome format --write .",
+    "format": "biome check --write .",
     "lint": "eslint . --fix",
     "lint:types": "tsc"
   },

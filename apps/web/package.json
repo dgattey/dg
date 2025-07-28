@@ -6,7 +6,7 @@
     "build": "next build",
     "build:analyze": "ANALYZE=true next build",
     "build:serve": "next start",
-    "format": "biome format --write .",
+    "format": "biome check --write .",
     "lint": "eslint . --fix",
     "lint:types": "tsc",
     "clean": "rm -rf .next"

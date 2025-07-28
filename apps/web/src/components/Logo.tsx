@@ -1,10 +1,10 @@
+import { Button } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useContext } from 'react';
-import { Button } from '@mui/material';
-import { mixinSx } from 'ui/helpers/mixinSx';
-import type { SxProps } from 'ui/theme';
 import { ScrollIndicatorContext } from 'ui/core/ScrollIndicatorContext';
 import { Link } from 'ui/dependent/Link';
+import { mixinSx } from 'ui/helpers/mixinSx';
+import type { SxProps } from 'ui/theme';
 
 /**
  * Aspect ratio'd 1:1 circle. Big, bold, and squished text for use as

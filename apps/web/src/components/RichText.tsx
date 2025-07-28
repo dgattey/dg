@@ -3,14 +3,14 @@ import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { Divider, Stack, Typography } from '@mui/material';
-import { isNotNullish } from 'shared-core/helpers/typeguards';
-import type { SxProps } from 'ui/theme';
-import { PROJECT_MAX_IMAGE_DIMENSION } from 'ui/helpers/imageSizes';
-import { isLink, isProject } from 'api/contentful/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/contentful/api.generated';
+import { isLink, isProject } from 'api/contentful/parsers';
+import { ProjectCard } from 'components/homepage/ProjectCard';
+import { isNotNullish } from 'shared-core/helpers/typeguards';
 import { Image } from 'ui/dependent/Image';
 import { Link } from 'ui/dependent/Link';
-import { ProjectCard } from 'components/homepage/ProjectCard';
+import { PROJECT_MAX_IMAGE_DIMENSION } from 'ui/helpers/imageSizes';
+import type { SxProps } from 'ui/theme';
 
 type RichTextProps = TextBlockContent & {
   sx?: SxProps;
