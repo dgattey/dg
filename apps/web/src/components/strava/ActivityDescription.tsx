@@ -1,6 +1,6 @@
-import { truncated } from 'ui/helpers/truncated';
-import { Link } from 'ui/dependent/Link';
 import { useData } from 'api/useData';
+import { Link } from 'ui/dependent/Link';
+import { truncated } from 'ui/helpers/truncated';
 
 /**
  * Formatted link for the activity description
@@ -14,8 +14,8 @@ export function ActivityDescription({ url }: { url: string }) {
   return (
     <Link
       href={url}
-      isExternal
-      linkProps={{ variant: 'body2', color: 'body2' }}
+      isExternal={true}
+      linkProps={{ color: 'body2', variant: 'body2' }}
       sx={truncated(3)}
       title={activity.name}
     >

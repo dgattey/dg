@@ -1,6 +1,5 @@
 {
   "$schema": "https://json.schemastore.org/tsconfig.json",
-  "display": "Default",
   "compilerOptions": {
     "alwaysStrict": true,
     "checkJs": true,
@@ -33,5 +32,6 @@
     "strictNullChecks": true,
     "strictPropertyInitialization": true
   },
+  "display": "Default",
   "exclude": ["node_modules", "**/*/dist", "**/*/build"]
 }

@@ -1,8 +1,8 @@
+import { useTheme } from '@mui/material';
 import { useEffect, useMemo, useRef } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
-import { useControl, type MapInstance } from 'react-map-gl/mapbox';
-import { useTheme } from '@mui/material';
+import { type MapInstance, useControl } from 'react-map-gl/mapbox';
 import type { ControlContainerProps } from './ControlContainer';
 import { ControlContainer } from './ControlContainer';
 
@@ -103,16 +103,17 @@ class DGControl {
  * Returns a no-op component that adds a control to the map in a given
  * position of the map (corners).
  */
-export function Control({ position, ...props }: ControlProps) {
+export function Control({ position, children, className, onClick }: ControlProps) {
   const theme = useTheme(); // as much of this is class based, we need to grab the theme this way
   const control = useRef<DGControl | null>(null);
   const properProps = useMemo(
     () => ({
-      ...props,
+      children,
+      className: className ? `${className} ${CLASSNAME}` : CLASSNAME,
+      onClick,
       theme,
-      className: props.className ? `${props.className} ${CLASSNAME}` : CLASSNAME,
     }),
-    [props, theme],
+    [children, className, onClick, theme],
   );
 
   // Make sure to update the children/etc when they change

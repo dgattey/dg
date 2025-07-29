@@ -1,11 +1,4 @@
 {
-  "name": "maps",
-  "private": true,
-  "scripts": {
-    "format": "biome format --write .",
-    "lint": "eslint . --fix",
-    "lint:types": "tsc"
-  },
   "dependencies": {
     "@mui/material": "catalog:",
     "api": "workspace:*",
@@ -22,9 +15,14 @@
     "@types/react": "catalog:",
     "@types/react-dom": "19.1.6",
     "dotenv-mono": "catalog:",
-    "eslint": "catalog:",
-    "eslint-config-dg": "workspace:*",
     "tsconfig": "workspace:*",
     "typescript": "catalog:"
+  },
+  "name": "maps",
+  "private": true,
+  "scripts": {
+    "check": "biome check --write .",
+    "check:types": "tsc",
+    "clean": "rm -rf .turbo *.tsbuildinfo"
   }
 }

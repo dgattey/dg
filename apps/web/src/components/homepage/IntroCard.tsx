@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { useCurrentImageSizes } from 'ui/helpers/useCurrentImageSizes';
-import { ContentCard } from 'ui/dependent/ContentCard';
-import { HoverableContainer } from 'ui/core/HoverableContainer';
-import { Image } from 'ui/dependent/Image';
 import { useData } from 'api/useData';
-import { RichText } from 'components/RichText';
-import { useLinkWithName } from 'hooks/useLinkWithName';
+import { useState } from 'react';
+import { HoverableContainer } from 'ui/core/HoverableContainer';
+import { ContentCard } from 'ui/dependent/ContentCard';
+import { Image } from 'ui/dependent/Image';
+import { useCurrentImageSizes } from 'ui/helpers/useCurrentImageSizes';
+import { useLinkWithName } from '../../hooks/useLinkWithName';
+import { RichText } from '../RichText';
 
 /**
  * Width of the intro image on small screens
@@ -46,9 +46,9 @@ export function IntroCard() {
         })}
         sx={(theme) => ({
           [theme.breakpoints.down('md')]: {
-            minWidth: SMALL_IMAGE_SIZE,
-            maxWidth: SMALL_IMAGE_SIZE,
             maxHeight: SMALL_IMAGE_SIZE,
+            maxWidth: SMALL_IMAGE_SIZE,
+            minWidth: SMALL_IMAGE_SIZE,
           },
         })}
       >
@@ -56,7 +56,7 @@ export function IntroCard() {
           <Image
             alt={introBlock.image.title ?? 'Introduction image'}
             height={height}
-            priority
+            priority={true}
             sizes={sizes}
             url={introBlock.image.url}
             width={width}
@@ -65,13 +65,13 @@ export function IntroCard() {
       </ContentCard>
       <ContentCard
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
           alignItems: 'center',
           background: 'none',
           border: 'none',
-          boxShadow: 'none',
           borderRadius: 0,
+          boxShadow: 'none',
+          display: 'flex',
+          flexDirection: 'column',
         }}
       >
         <RichText {...introBlock.textBlock.content} />

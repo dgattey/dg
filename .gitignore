@@ -26,5 +26,4 @@ npm-debug.log*
 # vercel
 .vercel
 tsconfig.tsbuildinfo
-.eslintcache
 graph.html

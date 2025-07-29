@@ -1,4 +1,4 @@
-# Autochecks the repo, using formatting and linting commands we run on precommit JUUUUST to be sure
+# Autochecks the repo, using formatting and linting commands
 name: Autochecks
 on:
   push:
@@ -21,12 +21,11 @@ jobs:
     strategy:
       matrix:
         # Each of these are commands we should run and check output
-        command: ['lint', 'lint:types', 'format']
+        command: ['check', 'check:types']
 
     outputs:
-      lint: ${{ steps.changes.outputs.lint }}
-      linttypes: ${{ steps.changes.outputs.linttypes }}
-      format: ${{ steps.changes.outputs.format }}
+      check: ${{ steps.changes.outputs.check }}
+      checktypes: ${{ steps.changes.outputs.checktypes }}
 
     name: ${{ matrix.command }}
 
@@ -58,13 +57,12 @@ jobs:
     needs: autocheck
     steps:
       - name: Autochecked files changed output
-        if: ${{ needs.autocheck.outputs.lint || needs.autocheck.outputs.linttypes || needs.autocheck.outputs.format }}
+        if: ${{ needs.autocheck.outputs.check || needs.autocheck.outputs.checktypes }}
         run: |
-          echo "Changed from lint: ${{needs.autocheck.outputs.lint || 'none'}}"
-          echo "Type check changed files: ${{needs.autocheck.outputs.linttypes || 'none'}}"
-          echo "Files formatted: ${{needs.autocheck.outputs.format || 'none'}}"
+          echo "Changed from check: ${{needs.autocheck.outputs.check || 'none'}}"
+          echo "Type check changed files: ${{needs.autocheck.outputs.checktypes || 'none'}}"
           exit 1
       - name: No changes found
-        if: ${{ !needs.autocheck.outputs.lint && !needs.autocheck.outputs.linttypes && !needs.autocheck.outputs.format }}
+        if: ${{ !needs.autocheck.outputs.check && !needs.autocheck.outputs.checktypes }}
         run: |
           echo "No changes from autochecks"

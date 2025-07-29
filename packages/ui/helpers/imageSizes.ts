@@ -3,22 +3,22 @@
  */
 export const BREAKPOINT_MAX_SIZES = {
   extraTiny: 340,
-  tiny: 576,
-  small: 768,
-  medium: 992,
   large: 1200,
+  medium: 992,
+  small: 768,
+  tiny: 576,
 };
 
 /**
  * Breakpoints from min width up - same data, just remapped
  */
 export const BREAKPOINTS_MIN_SIZES = {
-  extraTiny: 0,
-  tiny: BREAKPOINT_MAX_SIZES.extraTiny - 1,
-  small: BREAKPOINT_MAX_SIZES.tiny - 1,
-  medium: BREAKPOINT_MAX_SIZES.small - 1,
-  large: BREAKPOINT_MAX_SIZES.medium - 1,
   extraLarge: BREAKPOINT_MAX_SIZES.large - 1,
+  extraTiny: 0,
+  large: BREAKPOINT_MAX_SIZES.medium - 1,
+  medium: BREAKPOINT_MAX_SIZES.small - 1,
+  small: BREAKPOINT_MAX_SIZES.tiny - 1,
+  tiny: BREAKPOINT_MAX_SIZES.extraTiny - 1,
 };
 
 /**
@@ -40,12 +40,12 @@ export const PROJECT_MAX_IMAGE_DIMENSION = 330;
  * If sizing of the project cards change, this will need to!
  */
 export const PROJECT_IMAGE_SIZES = {
-  extraTiny: 340,
-  tiny: 543,
-  small: 510,
-  medium: 297,
-  large: 313.5,
   extraLarge: PROJECT_MAX_IMAGE_DIMENSION,
+  extraTiny: 340,
+  large: 313.5,
+  medium: 297,
+  small: 510,
+  tiny: 543,
 } as const;
 
 /**
@@ -53,10 +53,10 @@ export const PROJECT_IMAGE_SIZES = {
  * project at that breakpoint.
  */
 export const PROJECT_2X_IMAGE_SIZES = {
-  extraTiny: 340,
-  tiny: 543,
-  small: 510,
-  medium: 657,
-  large: 693.5,
   extraLarge: 730,
+  extraTiny: 340,
+  large: 693.5,
+  medium: 657,
+  small: 510,
+  tiny: 543,
 } as const;

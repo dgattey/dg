@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/consistent-type-definitions */
 import '@mui/material';
 
 type NonNullableColor = NonNullable<React.CSSProperties['color']>;
 type NonNullableBoxShadow = NonNullable<React.CSSProperties['boxShadow']>;
-type NonNullableBorderRadius = NonNullable<React.CSSProperties['borderRadius']>;
 
 declare module '@mui/material/styles' {
   /**

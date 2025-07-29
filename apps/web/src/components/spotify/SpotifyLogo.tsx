@@ -1,7 +1,7 @@
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
-import { FaIcon } from 'ui/icons/FaIcon';
 import { Link } from 'ui/dependent/Link';
-import { useLinkWithName } from 'hooks/useLinkWithName';
+import { FaIcon } from 'ui/icons/FaIcon';
+import { useLinkWithName } from '../../hooks/useLinkWithName';
 
 type SpotifyLogoProps = {
   trackTitle: string;
@@ -17,7 +17,7 @@ export function SpotifyLogo({ trackTitle, url }: SpotifyLogoProps) {
     <Link
       {...link}
       href={link.url}
-      isExternal
+      isExternal={true}
       linkProps={{
         color: 'secondary',
       }}
@@ -25,9 +25,9 @@ export function SpotifyLogo({ trackTitle, url }: SpotifyLogoProps) {
         '&&': {
           fontSize: '3rem',
         },
+        alignSelf: 'flex-start',
         lineHeight: 1,
         margin: 0,
-        alignSelf: 'flex-start',
       }}
     >
       <FaIcon icon={faSpotify} />

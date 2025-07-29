@@ -15,8 +15,8 @@ export function FaIcon({ icon, size = '1em' }: FaIconProps) {
       height={size}
       icon={icon}
       style={{
-        width: size,
         height: size,
+        width: size,
       }}
       width={size}
     />

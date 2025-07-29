@@ -1,18 +1,18 @@
+import { Button, Typography } from '@mui/material';
 import { ArrowUp } from 'lucide-react';
 import { useContext } from 'react';
-import { Button, Typography } from '@mui/material';
-import type { SxProps } from '../theme';
 import { ScrollIndicatorContext } from '../core/ScrollIndicatorContext';
+import type { SxProps } from '../theme';
 
 const scrolledSx: SxProps = {
-  transform: 'initial',
-  cursor: 'pointer',
-  opacity: 1,
   '&:hover': {
     background: (theme) => theme.vars.palette.secondary.dark,
     color: (theme) => theme.vars.palette.text.primary,
     transform: 'scale(1.05)',
   },
+  cursor: 'pointer',
+  opacity: 1,
+  transform: 'initial',
 };
 
 /**
@@ -22,7 +22,7 @@ const scrolledSx: SxProps = {
 export function ScrollUpButton() {
   const isScrolled = useContext(ScrollIndicatorContext);
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ behavior: 'smooth', top: 0 });
   };
 
   return (
@@ -31,14 +31,14 @@ export function ScrollUpButton() {
       disabled={!isScrolled}
       onClick={scrollToTop}
       sx={{
+        alignItems: 'center',
         color: (theme) => theme.vars.palette.text.primary,
         display: 'flex',
         gap: 0.5,
-        alignItems: 'center',
         opacity: 0,
-        transform: 'translateY(-200%)',
         paddingX: 1.25,
         paddingY: 0.5,
+        transform: 'translateY(-200%)',
         transition: (theme) =>
           theme.transitions.create(['opacity', 'transform', 'color', 'background-color']),
         willChange: 'transform',

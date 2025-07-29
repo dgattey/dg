@@ -19,7 +19,7 @@ export default async function handler(request: NextApiRequest) {
   const { method } = request;
   switch (method) {
     case 'GET': {
-      return generateOpenGraphImage({ url: request.url, normalFont, boldFont });
+      return await generateOpenGraphImage({ boldFont, normalFont, url: request.url });
     }
     default: {
       return new Response(

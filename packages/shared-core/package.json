@@ -1,17 +1,15 @@
 {
-  "name": "shared-core",
-  "private": true,
-  "scripts": {
-    "format": "biome format --write .",
-    "lint": "eslint . --fix",
-    "lint:types": "tsc"
-  },
   "devDependencies": {
     "@types/node": "catalog:",
     "dotenv-mono": "catalog:",
-    "eslint": "catalog:",
-    "eslint-config-dg": "workspace:*",
     "tsconfig": "workspace:*",
     "typescript": "catalog:"
+  },
+  "name": "shared-core",
+  "private": true,
+  "scripts": {
+    "check": "biome check --write .",
+    "check:types": "tsc",
+    "clean": "rm -rf .turbo *.tsbuildinfo"
   }
 }

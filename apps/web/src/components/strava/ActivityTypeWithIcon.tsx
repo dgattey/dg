@@ -1,7 +1,7 @@
 import { Typography } from '@mui/material';
-import { HorizontalStack } from 'ui/core/HorizontalStack';
-import { Bike, Dumbbell } from 'lucide-react';
 import { useData } from 'api/useData';
+import { Bike, Dumbbell } from 'lucide-react';
+import { HorizontalStack } from 'ui/core/HorizontalStack';
 
 /**
  * Shows the latest activity type and an icon to depict
@@ -23,12 +23,12 @@ export function ActivityTypeWithIcon() {
     <Typography
       component={HorizontalStack}
       sx={{
-        gap: 1,
         alignItems: 'center',
+        gap: 1,
       }}
       variant="overline"
     >
-      <>Latest {typeText.trim()}</> {icon}
+      Latest {typeText.trim()} {icon}
     </Typography>
   );
 }

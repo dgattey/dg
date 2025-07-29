@@ -9,6 +9,9 @@ module.exports = {
     [
       '@semantic-release/commit-analyzer',
       {
+        parserOpts: {
+          noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES'],
+        },
         preset,
         releaseRules: [
           {
@@ -16,8 +19,8 @@ module.exports = {
             release: 'major',
           },
           {
-            tag: 'feat',
             release: 'minor',
+            tag: 'feat',
           },
           {
             message: '*feat*',
@@ -32,9 +35,6 @@ module.exports = {
             release: 'patch',
           },
         ],
-        parserOpts: {
-          noteKeywords: ['BREAKING CHANGE', 'BREAKING CHANGES'],
-        },
       },
     ],
     [

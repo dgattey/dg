@@ -12,6 +12,7 @@ export function BackgroundPattern() {
 
   return (
     <svg
+      aria-hidden={true}
       fill={background}
       height="630"
       preserveAspectRatio="none"

@@ -3,7 +3,6 @@
   "globalDependencies": [
     ".env*",
     "config/database.config.js",
-    "packages/eslint-config-dg/eslint.config.js",
     ".node-version",
     ".npmrc",
     ".sequelizerc",
@@ -53,7 +52,7 @@
       "persistent": true
     },
     "build": {
-      "dependsOn": ["^build", "topo", "lint", "lint:types", "format"],
+      "dependsOn": ["^build", "topo", "check", "check:types"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "build:analyze": {
@@ -64,16 +63,12 @@
       "dependsOn": ["build"],
       "cache": false
     },
-    "format": {
-      "dependsOn": ["topo"],
-      "outputLogs": "new-only"
-    },
-    "lint": {
+    "check": {
       "outputs": [],
       "dependsOn": ["topo"],
       "outputLogs": "new-only"
     },
-    "lint:types": {
+    "check:types": {
       "outputs": [],
       "dependsOn": ["topo"],
       "outputLogs": "new-only"

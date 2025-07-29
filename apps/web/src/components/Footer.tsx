@@ -1,10 +1,10 @@
 import { Container, Divider } from '@mui/material';
-import { Section } from 'ui/core/Section';
-import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
-import { HorizontalStack } from 'ui/core/HorizontalStack';
 import type { Link as LinkType } from 'api/contentful/api.generated';
-import { Link } from 'ui/dependent/Link';
 import { useData } from 'api/useData';
+import { HorizontalStack } from 'ui/core/HorizontalStack';
+import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
+import { Section } from 'ui/core/Section';
+import { Link } from 'ui/dependent/Link';
 
 /**
  * Creates a singular footer link
@@ -23,13 +23,13 @@ function FooterLink({ link }: { link: LinkType }) {
           variant: 'caption',
         }}
         sx={{
+          alignItems: 'center',
+          display: 'flex',
+          fontSize: link.icon ? '1.25em' : undefined,
+          justifyContent: 'center',
+          minHeight: 40,
           // Min tap target size
           minWidth: 40,
-          minHeight: 40,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          fontSize: link.icon ? '1.25em' : undefined,
         }}
         title={link.title}
       />
@@ -46,7 +46,7 @@ export function Footer() {
   const nonIconFooterLinks = footerLinks?.filter((link) => !link.icon);
   const iconFooterLinks = footerLinks?.filter((link) => link.icon);
   return (
-    <Container component={Section} sx={{ padding: 0, marginTop: 12 }}>
+    <Container component={Section} sx={{ marginTop: 12, padding: 0 }}>
       <footer>
         <Divider
           sx={{
@@ -55,9 +55,9 @@ export function Footer() {
         />
         <Nav
           sx={(theme) => ({
+            columnGap: 3,
             flexDirection: 'row',
             flexWrap: 'wrap-reverse',
-            columnGap: 3,
             [theme.breakpoints.down('sm')]: {
               flexDirection: 'column-reverse',
             },
@@ -69,7 +69,7 @@ export function Footer() {
             <NavItem>{version}</NavItem>
           </NavGroup>
           <NavGroup component="div" sx={{ columnGap: 2 }}>
-            <HorizontalStack component="ul" sx={{ padding: 0, margin: 0 }}>
+            <HorizontalStack component="ul" sx={{ margin: 0, padding: 0 }}>
               {nonIconFooterLinks?.map((link) => (
                 <FooterLink key={link.url} link={link} />
               ))}
@@ -77,12 +77,12 @@ export function Footer() {
             <HorizontalStack
               component="ul"
               sx={{
-                padding: 0,
-                margin: 0,
                 flex: 1,
+                justifyContent: 'space-between',
+                margin: 0,
                 marginLeft: -2.5,
                 marginRight: -1.5,
-                justifyContent: 'space-between',
+                padding: 0,
               }}
             >
               {iconFooterLinks?.map((link) => (

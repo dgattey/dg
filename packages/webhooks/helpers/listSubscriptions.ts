@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import type { WebhookType } from '../types/WebhookType';
 import { handledError } from './handledError';
-import { webhookSubscriptionConfigs, standardParams } from './webhookSubscriptionConfigs';
+import { standardParams, webhookSubscriptionConfigs } from './webhookSubscriptionConfigs';
 
 /**
  * Lists all current subscriptions for a webhook type
@@ -13,8 +13,8 @@ export const listSubscriptions = async (type: WebhookType) => {
   const url = new URL(endpoint);
   url.search = new URLSearchParams(standardParams(config)).toString();
   const data = await fetch(url.toString(), {
-    method: 'GET',
     headers,
+    method: 'GET',
   });
 
   // Handle any errors or print the current subscriptions

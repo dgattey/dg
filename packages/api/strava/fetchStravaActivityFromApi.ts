@@ -1,7 +1,7 @@
-import type { StravaDetailedActivity } from 'db/models/StravaDetailedActivity';
 import { log } from '@logtail/next';
-import { stravaClient } from './stravaClient';
+import type { StravaDetailedActivity } from 'db/models/StravaDetailedActivity';
 import { paredStravaActivity } from './paredStravaActivity';
+import { stravaClient } from './stravaClient';
 
 /**
  * Fetches an activity id from Strava's API. Use sparingly! Cuts into small API
@@ -14,7 +14,7 @@ export const fetchStravaActivityFromApi = async (id: number) => {
     return null;
   }
   const allData = await response.json<StravaDetailedActivity & Record<string, unknown>>();
-  log.info('Fetched and parsed Strava activity from API', { id, allData });
+  log.info('Fetched and parsed Strava activity from API', { allData, id });
   await log.flush();
   return paredStravaActivity(allData);
 };

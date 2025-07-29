@@ -19,7 +19,7 @@ export function ContentWrappingLink({ link, children, sx }: ContentWrappingLinkP
     return null;
   }
   return (
-    <Link href={link.url} isExternal sx={sx}>
+    <Link href={link.url} isExternal={true} sx={sx}>
       {children}
     </Link>
   );

@@ -14,9 +14,9 @@ const GENERATED_API_FILE_NAME = 'api.generated.ts';
 const SHARED_CONFIG = {
   avoidOptionals: true,
   immutableTypes: true,
+  maybeValue: 'T | undefined',
   skipTypename: true,
   useTypeImports: true,
-  maybeValue: 'T | undefined',
 };
 
 /**
@@ -56,8 +56,8 @@ export function createApiGenerator(
   const schema: Schema = {
     [schemaEndpoint]: {
       headers: {
-        'User-Agent': 'dylangattey.com',
         Authorization: `Bearer ${token}`,
+        'User-Agent': 'dylangattey.com',
       },
     },
   };
@@ -65,33 +65,33 @@ export function createApiGenerator(
   return {
     // Creates the generated API file without any imports, just types
     [`${apiFolder}/${GENERATED_API_FILE_NAME}`]: {
-      documents: sourceDocumentsGlob,
-      schema,
-      plugins: ['typescript'],
       config: {
         ...SHARED_CONFIG,
         constEnums: true,
-        enumsAsTypes: true,
         defaultScalarType: 'unknown',
+        enumsAsTypes: true,
         onlyOperationTypes,
         scalars,
       },
+      documents: sourceDocumentsGlob,
+      plugins: ['typescript'],
+      schema,
     },
 
     // Creates individual `.generated.ts` files for each .ts file that has operations, right next to it
     [apiFolder]: {
+      config: {
+        ...SHARED_CONFIG,
+        preResolveTypes: true,
+      },
       documents: sourceDocumentsGlob,
-      schema,
       plugins: ['typescript-operations'],
       preset: 'near-operation-file',
       presetConfig: {
         // Relative to the location of all of these files (`apiFolder` right now). This creates an import statement for typescript
         baseTypesPath: GENERATED_API_FILE_NAME,
       },
-      config: {
-        ...SHARED_CONFIG,
-        preResolveTypes: true,
-      },
+      schema,
     },
   };
 }

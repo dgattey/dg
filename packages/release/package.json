@@ -1,14 +1,19 @@
 {
-  "name": "release",
-  "private": true,
-  "files": ["base.json", "nextjs.json", "react.json"],
-  "scripts": {
-    "release": "semantic-release",
-    "format": "biome format --write ."
-  },
   "devDependencies": {
     "@semantic-release/changelog": "6.0.3",
     "semantic-release": "24.2.7",
     "typescript": "catalog:"
+  },
+  "files": [
+    "base.json",
+    "nextjs.json",
+    "react.json"
+  ],
+  "name": "release",
+  "private": true,
+  "scripts": {
+    "check": "biome check --write .",
+    "clean": "rm -rf .turbo *.tsbuildinfo",
+    "release": "semantic-release"
   }
 }

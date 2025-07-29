@@ -1,6 +1,6 @@
-import { ContentCard } from 'ui/dependent/ContentCard';
 import { useData } from 'api/useData';
-import { TrackListing } from 'components/spotify/TrackListing';
+import { ContentCard } from 'ui/dependent/ContentCard';
+import { TrackListing } from '../spotify/TrackListing';
 
 /**
  * Shows a card with the latest data from Spotify
@@ -14,14 +14,14 @@ export function SpotifyCard() {
   return (
     <ContentCard
       sx={(theme) => ({
-        padding: 2.5,
         display: 'flex',
+        padding: 2.5,
         [theme.breakpoints.down('md')]: {
           minWidth: 'min(max-content, inherit)',
         },
       })}
     >
-      <TrackListing hasLogo track={track} />
+      <TrackListing hasLogo={true} track={track} />
     </ContentCard>
   );
 }

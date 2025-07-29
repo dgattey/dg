@@ -25,12 +25,12 @@ export async function generateOpenGraphImage({
     {
       fonts: [
         {
-          name: TEXT_FONT,
           data: normalFontData,
+          name: TEXT_FONT,
         },
         {
-          name: LOGO_FONT,
           data: boldFontData,
+          name: LOGO_FONT,
         },
       ],
     },

@@ -1,6 +1,6 @@
 import type { NextPageContext } from 'next';
 import NextErrorComponent from 'next/error';
-import { ErrorLayout } from 'components/layouts/ErrorLayout';
+import { ErrorLayout } from '../components/layouts/ErrorLayout';
 
 export type PageProps = {
   /**

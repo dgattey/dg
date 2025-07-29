@@ -1,41 +1,18 @@
 {
-  "$schema": "https://biomejs.dev/schemas/1.9.4/schema.json",
-  "organizeImports": {
+  "$schema": "https://biomejs.dev/schemas/2.1.2/schema.json",
+  "assist": {
+    "actions": {
+      "source": {
+        "organizeImports": "on",
+        "useSortedAttributes": "on",
+        "useSortedKeys": "on",
+        "useSortedProperties": "on"
+      }
+    },
     "enabled": true
   },
-  "linter": {
-    "enabled": false
-  },
-  "formatter": {
-    "enabled": true,
-    "useEditorconfig": true,
-    "formatWithErrors": false,
-    "indentStyle": "space",
-    "indentWidth": 2,
-    "lineEnding": "lf",
-    "lineWidth": 100,
-    "attributePosition": "auto"
-  },
-  "javascript": {
-    "formatter": {
-      "jsxQuoteStyle": "double",
-      "quoteProperties": "asNeeded",
-      "trailingCommas": "all",
-      "semicolons": "always",
-      "arrowParentheses": "always",
-      "bracketSpacing": true,
-      "bracketSameLine": false,
-      "quoteStyle": "single",
-      "attributePosition": "auto"
-    }
-  },
-  "json": {
-    "formatter": {
-      "trailingCommas": "none"
-    }
-  },
   "files": {
-    "include": [
+    "includes": [
       "*",
       "**/*.js",
       "**/*.ts",
@@ -44,17 +21,110 @@
       "**/*.cjs",
       "**/*.css",
       "**/*.json",
-      "**/*.jsonc"
-    ],
-    "ignore": [
-      ".cache/**",
-      ".next/**",
-      ".vscode/**",
-      ".vercel/**",
-      ".turbo/**",
-      "node_modules/**",
-      "pnpm-lock.yaml",
-      "**/migrations/**"
+      "**/*.jsonc",
+      "!**/.cache/**",
+      "!**/.next/**",
+      "!**/.vscode/**",
+      "!**/.vercel/**",
+      "!**/.turbo/**",
+      "!**/node_modules/**",
+      "!**/pnpm-lock.yaml",
+      "!**/migrations/**",
+      "!**/dist/**"
     ]
-  }
+  },
+  "formatter": {
+    "attributePosition": "auto",
+    "enabled": true,
+    "formatWithErrors": false,
+    "indentStyle": "space",
+    "indentWidth": 2,
+    "lineEnding": "lf",
+    "lineWidth": 100,
+    "useEditorconfig": true
+  },
+  "javascript": {
+    "formatter": {
+      "arrowParentheses": "always",
+      "attributePosition": "auto",
+      "bracketSameLine": false,
+      "bracketSpacing": true,
+      "jsxQuoteStyle": "double",
+      "quoteProperties": "asNeeded",
+      "quoteStyle": "single",
+      "semicolons": "always",
+      "trailingCommas": "all"
+    }
+  },
+  "json": {
+    "formatter": {
+      "trailingCommas": "none"
+    }
+  },
+  "linter": {
+    "domains": {
+      "next": "recommended",
+      "project": "recommended",
+      "react": "all"
+    },
+    "enabled": true,
+    "rules": {
+      "complexity": {
+        "noUselessStringConcat": "error",
+        "useWhile": "error"
+      },
+      "correctness": {
+        "noUndeclaredDependencies": "error"
+      },
+      "nursery": {
+        "noImportCycles": "error",
+        "useJsonImportAttribute": "error"
+      },
+      "performance": {
+        "noBarrelFile": "error",
+        "noDelete": "error"
+      },
+      "recommended": true,
+      "style": {
+        "noUselessElse": "error",
+        "useConsistentArrayType": {
+          "level": "error",
+          "options": {
+            "syntax": "generic"
+          }
+        },
+        "useSelfClosingElements": "error"
+      },
+      "suspicious": {
+        "noConsole": "error",
+        "noEvolvingTypes": "error",
+        "useAwait": "error"
+      }
+    }
+  },
+  "overrides": [
+    {
+      "includes": ["**/*.generated.ts"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noBannedTypes": "off"
+          },
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["packages/webhooks/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    }
+  ]
 }

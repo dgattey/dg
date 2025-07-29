@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import type { WebhookType } from '../types/WebhookType';
 import { handledError } from './handledError';
-import { webhookSubscriptionConfigs, standardParams } from './webhookSubscriptionConfigs';
+import { standardParams, webhookSubscriptionConfigs } from './webhookSubscriptionConfigs';
 
 /**
  * Runs create, assuming that there's something running at the right
@@ -15,13 +15,13 @@ export const createSubscription = async (type: WebhookType) => {
   }
 
   const data = await fetch(endpoint, {
-    method: 'POST',
-    headers,
     body: new URLSearchParams({
       ...standardParams(config),
-      verify_token: verifyToken,
       callback_url: callbackUrl,
+      verify_token: verifyToken,
     }),
+    headers,
+    method: 'POST',
   });
 
   // Handle any errors or print out success

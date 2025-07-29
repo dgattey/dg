@@ -1,25 +1,23 @@
 {
-  "name": "webhooks",
-  "private": true,
-  "main": "webhookCommand.ts",
-  "types": "webhookCommand.ts",
-  "scripts": {
-    "webhook": "NODE_ENV=development tsx webhookCommand.ts",
-    "format": "biome format --write .",
-    "lint": "eslint . --fix",
-    "lint:types": "tsc"
-  },
   "devDependencies": {
     "@graphql-codegen/cli": "catalog:",
     "@types/node": "catalog:",
     "cmd-ts": "0.13.0",
     "dotenv-mono": "catalog:",
-    "eslint": "catalog:",
-    "eslint-config-dg": "workspace:*",
     "node-fetch": "3.3.2",
     "shared-core": "workspace:*",
     "tsconfig": "workspace:*",
     "tsx": "4.20.3",
     "typescript": "catalog:"
-  }
+  },
+  "main": "webhookCommand.ts",
+  "name": "webhooks",
+  "private": true,
+  "scripts": {
+    "check": "biome check --write .",
+    "check:types": "tsc",
+    "clean": "rm -rf .turbo *.tsbuildinfo",
+    "webhook": "NODE_ENV=development tsx webhookCommand.ts"
+  },
+  "types": "webhookCommand.ts"
 }

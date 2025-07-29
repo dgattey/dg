@@ -1,7 +1,7 @@
-import { Moon, Sun, Monitor } from 'lucide-react';
 import { Button, Tooltip } from '@mui/material';
-import { useColorScheme } from '../theme/useColorScheme';
+import { Monitor, Moon, Sun } from 'lucide-react';
 import type { ColorSchemeMode } from '../theme/useColorScheme';
+import { useColorScheme } from '../theme/useColorScheme';
 
 type Mode = ColorSchemeMode | 'system';
 
@@ -16,14 +16,14 @@ const ICON_SIZE = 13;
 const DELAY_MS = 200;
 
 const ICONS: Record<Mode, React.ReactNode> = {
-  light: <Sun size={ICON_SIZE} />,
   dark: <Moon size={ICON_SIZE} />,
+  light: <Sun size={ICON_SIZE} />,
   system: <Monitor size={ICON_SIZE} />,
 } as const;
 
 const TOOLTIP: Record<Mode, string> = {
-  light: 'Use light color mode',
   dark: 'Use dark color mode',
+  light: 'Use light color mode',
   system: `Use system color mode`,
 } as const;
 
@@ -45,23 +45,23 @@ export function ColorSchemeButton({ mode }: ColorSchemeButtonProps) {
       title={tooltip}
     >
       <Button
-        size="small"
         aria-label={tooltip}
         onClick={() => {
           updatePreferredMode(mode === 'system' ? null : mode);
         }}
+        size="small"
         sx={{
-          backgroundColor: (theme) =>
-            isInitialized ? theme.vars.palette.background.paper : undefined,
-          paddingY: 0.75,
-          paddingX: 0.25,
           '& svg': {
-            transition: (theme) => theme.transitions.create('transform'),
             transformOrigin: 'center',
+            transition: (theme) => theme.transitions.create('transform'),
           },
           '&:hover svg': {
             transform: mode === 'system' ? undefined : 'rotate(45deg)',
           },
+          backgroundColor: (theme) =>
+            isInitialized ? theme.vars.palette.background.paper : undefined,
+          paddingX: 0.25,
+          paddingY: 0.75,
         }}
       >
         {ICONS[mode]}

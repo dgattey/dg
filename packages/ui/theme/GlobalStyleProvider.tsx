@@ -12,7 +12,7 @@ const theme = getTheme();
  */
 export function GlobalStyleProvider({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider disableTransitionOnChange theme={theme}>
+    <ThemeProvider disableTransitionOnChange={true} theme={theme}>
       <CssBaseline />
       {children}
     </ThemeProvider>

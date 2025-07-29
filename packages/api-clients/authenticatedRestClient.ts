@@ -1,6 +1,6 @@
+import { log } from '@logtail/next';
 import type { Wretch } from 'wretch';
 import wretch from 'wretch';
-import { log } from '@logtail/next';
 import { getStatus } from './getStatus';
 import type { RefreshTokenConfig } from './RefreshTokenConfig';
 import { refreshedAccessToken } from './refreshedAccessToken';

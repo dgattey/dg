@@ -27,7 +27,6 @@ export const handleApiError = (
   error?: unknown,
   responseCode?: number,
 ) => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   const typedError = error as ErrorType;
   const message =
     typeof typedError === 'string'

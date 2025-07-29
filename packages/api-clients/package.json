@@ -1,11 +1,4 @@
 {
-  "name": "api-clients",
-  "private": true,
-  "scripts": {
-    "format": "biome format --write .",
-    "lint": "eslint . --fix",
-    "lint:types": "tsc"
-  },
   "dependencies": {
     "@logtail/next": "catalog:",
     "db": "workspace:*",
@@ -15,9 +8,14 @@
   "devDependencies": {
     "@types/node": "catalog:",
     "dotenv-mono": "catalog:",
-    "eslint": "catalog:",
-    "eslint-config-dg": "workspace:*",
     "tsconfig": "workspace:*",
     "typescript": "catalog:"
+  },
+  "name": "api-clients",
+  "private": true,
+  "scripts": {
+    "check": "biome check --write .",
+    "check:types": "tsc",
+    "clean": "rm -rf .turbo *.tsbuildinfo"
   }
 }

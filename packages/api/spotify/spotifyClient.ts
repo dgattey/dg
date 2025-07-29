@@ -1,5 +1,5 @@
-import { invariant } from 'shared-core/helpers/invariant';
 import { createClient } from 'api-clients/authenticatedRestClient';
+import { invariant } from 'shared-core/helpers/invariant';
 
 /**
  * This is what Spotify's refresh token API returns, as raw data
@@ -44,34 +44,33 @@ function createExpirationDate(expiryDistanceInSeconds: number) {
  * A REST client set up to make authed calls to Spotify
  */
 export const spotifyClient = createClient({
-  endpoint: 'https://api.spotify.com/v1/',
   accessKey: 'spotify',
+  endpoint: 'https://api.spotify.com/v1/',
   refreshTokenConfig: {
-    endpoint: 'https://accounts.spotify.com/api/token/',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Accept: 'application/json',
-      Authorization: `Basic ${SPOTIFY_CLIENT_AUTH}`,
-    },
     body: (refreshToken) => ({
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
     }),
+    endpoint: 'https://accounts.spotify.com/api/token/',
+    headers: {
+      Accept: 'application/json',
+      Authorization: `Basic ${SPOTIFY_CLIENT_AUTH}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
     validate: (rawData, refreshToken) => {
       const {
         token_type: tokenType,
         access_token: accessToken,
         expires_in: expiresIn,
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       } = rawData as RawSpotifyRefreshToken;
       invariant(tokenType === 'Bearer', `Invalid token type from Spotify ${tokenType}`);
       invariant(accessToken, 'Missing access token from Spotify');
 
       // Spotify refresh tokens don't expire + we create our own expiry stamp
       return {
-        refreshToken,
         accessToken,
         expiryAt: createExpirationDate(expiresIn),
+        refreshToken,
       };
     },
   },

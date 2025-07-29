@@ -1,10 +1,10 @@
 import { Stack } from '@mui/material';
-import { HorizontalStack } from 'ui/core/HorizontalStack';
 import type { Track } from 'api/spotify/Track';
+import { HorizontalStack } from 'ui/core/HorizontalStack';
 import { AlbumImage } from './AlbumImage';
 import { ArtistList } from './ArtistList';
-import { SpotifyLogo } from './SpotifyLogo';
 import { PlaybackStatus } from './PlaybackStatus';
+import { SpotifyLogo } from './SpotifyLogo';
 import { TrackTitle } from './TrackTitle';
 
 type TrackListingProps = {

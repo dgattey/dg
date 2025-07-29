@@ -1,5 +1,5 @@
-import { invariant } from 'shared-core/helpers/invariant';
 import { createClient } from 'api-clients/authenticatedRestClient';
+import { invariant } from 'shared-core/helpers/invariant';
 
 /**
  * This is what Strava's refresh token API returns, as raw data
@@ -21,21 +21,21 @@ invariant(STRAVA_CLIENT_SECRET, 'Missing Strava client secret');
  * A REST client set up to make authed calls to Strava
  */
 export const stravaClient = createClient({
-  endpoint: 'https://www.strava.com/api/v3/',
   accessKey: STRAVA_TOKEN_NAME,
+  endpoint: 'https://www.strava.com/api/v3/',
   refreshTokenConfig: {
-    // Note: it's REALLY FUCKING IMPORTANT that this doesn't have a slash at the end. It returns empty otherwise
-    endpoint: 'https://www.strava.com/api/v3/oauth/token',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      Accept: 'application/json',
-    },
     body: (refreshToken) => ({
       client_id: STRAVA_CLIENT_ID,
       client_secret: STRAVA_CLIENT_SECRET,
       grant_type: 'refresh_token',
       refresh_token: refreshToken,
     }),
+    // Note: it's REALLY FUCKING IMPORTANT that this doesn't have a slash at the end. It returns empty otherwise
+    endpoint: 'https://www.strava.com/api/v3/oauth/token',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
     validate: validateRawDataToToken,
   },
 });
@@ -55,7 +55,6 @@ export function validateRawDataToToken(rawData: unknown): {
     refresh_token: refreshToken,
     access_token: accessToken,
     expires_at: expiresAt,
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   } = rawData as RawStravaRefreshToken;
   invariant(tokenType === 'Bearer', `Invalid token type from Strava ${tokenType}`);
   invariant(refreshToken, 'Missing refresh token from Strava');
@@ -63,9 +62,9 @@ export function validateRawDataToToken(rawData: unknown): {
   invariant(expiresAt, 'Missing expires at from Strava');
 
   return {
-    refreshToken,
     accessToken,
     // expiresAt is a timestamp in seconds!
     expiryAt: new Date(expiresAt * 1000),
+    refreshToken,
   };
 }

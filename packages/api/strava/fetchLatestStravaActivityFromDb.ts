@@ -1,6 +1,6 @@
-import { isRecord } from 'shared-core/helpers/typeguards';
-import type { StravaDetailedActivity } from 'db/models/StravaDetailedActivity';
 import { db } from 'db';
+import type { StravaDetailedActivity } from 'db/models/StravaDetailedActivity';
+import { isRecord } from 'shared-core/helpers/typeguards';
 import { paredStravaActivity } from './paredStravaActivity';
 
 /**
@@ -14,8 +14,8 @@ const isStravaActivity = (activity: unknown): activity is StravaDetailedActivity
  */
 export const fetchLatestStravaActivityFromDb = async () => {
   const data = await db.StravaActivity.findOne({
-    order: [['activityStartDate', 'DESC']],
     attributes: ['activityData'],
+    order: [['activityStartDate', 'DESC']],
   });
   const activity = data?.activityData;
   if (isStravaActivity(activity)) {

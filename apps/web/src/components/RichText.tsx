@@ -3,14 +3,14 @@ import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { Divider, Stack, Typography } from '@mui/material';
-import { isNotNullish } from 'shared-core/helpers/typeguards';
-import type { SxProps } from 'ui/theme';
-import { PROJECT_MAX_IMAGE_DIMENSION } from 'ui/helpers/imageSizes';
-import { isLink, isProject } from 'api/contentful/parsers';
 import type { Asset, Entry, TextBlockContent } from 'api/contentful/api.generated';
+import { isLink, isProject } from 'api/contentful/parsers';
+import { isNotNullish } from 'shared-core/helpers/typeguards';
 import { Image } from 'ui/dependent/Image';
 import { Link } from 'ui/dependent/Link';
-import { ProjectCard } from 'components/homepage/ProjectCard';
+import { PROJECT_MAX_IMAGE_DIMENSION } from 'ui/helpers/imageSizes';
+import type { SxProps } from 'ui/theme';
+import { ProjectCard } from './homepage/ProjectCard';
 
 type RichTextProps = TextBlockContent & {
   sx?: SxProps;
@@ -43,14 +43,12 @@ const HEADING_SX: SxProps = {
  * Typeguard for converting the `any` to a structured object
  */
 const isDataWithId = (data: NodeData): data is DataWithId =>
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   Boolean((data as DataWithId).target.sys.id);
 
 /**
  * Typeguard for converting the `any` to a structured link
  */
 const isDataWithLink = (data: NodeData): data is { uri: string } =>
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   Boolean((data as { uri: string }).uri);
 
 /**
@@ -169,10 +167,7 @@ const renderOptions = (links: TextBlockContent['links']): Options => {
 export function RichText({ json, links, sx }: RichTextProps) {
   return (
     <Stack sx={sx}>
-      {
-        // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-        documentToReactComponents(json as unknown as Document, renderOptions(links))
-      }
+      {documentToReactComponents(json as unknown as Document, renderOptions(links))}
     </Stack>
   );
 }

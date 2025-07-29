@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
 import type { PaletteMode } from '@mui/material';
 import { useColorScheme as useMuiColorScheme } from '@mui/material/styles';
+import { useEffect, useState } from 'react';
 
 /**
  * The color scheme the system prefers by default
@@ -34,9 +34,9 @@ export function useColorScheme(): Readonly<{
 
   return {
     colorScheme: {
-      mode: resolvedMode ?? 'light',
       isCustomized: isInitialized && mode !== 'system',
       isInitialized,
+      mode: resolvedMode ?? 'light',
     },
     updatePreferredMode: setMode,
   } as const;

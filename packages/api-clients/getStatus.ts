@@ -12,7 +12,7 @@ export function getStatus(resp: unknown): number {
     return resp;
   }
   if (typeof resp === 'string') {
-    return parseInt(resp);
+    return Number.parseInt(resp);
   }
   if (typeof resp === 'object' && 'status' in resp) {
     return getStatus(resp.status);

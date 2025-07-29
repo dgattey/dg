@@ -1,7 +1,7 @@
-import { gql } from 'graphql-request';
 import { log } from '@logtail/next';
-import { githubClient } from './githubClient';
+import { gql } from 'graphql-request';
 import type { GithubRepoVersionQuery } from './fetchRepoVersion.generated';
+import { githubClient } from './githubClient';
 
 /**
  * This, strictly speaking, is usually overkill. We fetch the 100 most recently
@@ -47,7 +47,6 @@ export async function fetchRepoVersion(): Promise<string | null> {
 
   // Looks for a release that matches build-time `VERCEL_GIT_COMMIT_SHA` and compares it to each release's commit SHA
   // We disable a rule here otherwise the caching gets busted every time
-  // eslint-disable-next-line turbo/no-undeclared-env-vars
   const commitSha = process.env.VERCEL_GIT_COMMIT_SHA;
   log.info('Fetching version: no public app version, fetching releases', {
     commitSha,

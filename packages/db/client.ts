@@ -1,20 +1,20 @@
 import { env } from 'node:process';
-import { Sequelize } from 'sequelize-typescript';
-import postgres from 'pg';
 import { log } from '@logtail/next';
-import { Token } from './models/Token';
+import postgres from 'pg';
+import { Sequelize } from 'sequelize-typescript';
 import { StravaActivity } from './models/StravaActivity';
+import { Token } from './models/Token';
 
 const SHARED_DB_OPTIONS = {
   dialect: 'postgres' as const,
   dialectModule: postgres, // gets around a Vercel bug where it's missing on edge functions
   dialectOptions: {
-    ssl: true,
     dialectOptions: {
       ssl: {
         rejectUnauthorized: true,
       },
     },
+    ssl: true,
   },
 };
 
@@ -30,16 +30,16 @@ log.info('Node env from env variable', { nodeEnv });
 // Sequelize options applied based on current environment
 const DB_OPTIONS = {
   development: SHARED_DB_OPTIONS,
-  test: SHARED_DB_OPTIONS,
   production: SHARED_DB_OPTIONS,
+  test: SHARED_DB_OPTIONS,
 }[nodeEnv];
 
 /**
  * These are all the models a user might possibly use
  */
 export const db = {
-  Token,
   StravaActivity,
+  Token,
 } as const;
 
 /**
@@ -47,10 +47,10 @@ export const db = {
  * through models.Something
  */
 export const dbClient = new Sequelize(databaseUrl, {
-  models: Object.values(db),
   define: {
     freezeTableName: true,
   },
+  models: Object.values(db),
   ...DB_OPTIONS,
 });
 

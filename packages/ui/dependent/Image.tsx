@@ -1,6 +1,6 @@
 import { styled } from '@mui/material';
-import NextImage from 'next/image';
 import type { Asset } from 'api/contentful/api.generated';
+import NextImage from 'next/image';
 import { BREAKPOINT_MAX_SIZES } from '../helpers/imageSizes';
 
 type ImageProps = Partial<Asset> & {
@@ -55,10 +55,10 @@ type ImageProps = Partial<Asset> & {
  * All images need to be max width'd for our layouts
  */
 const MaxWidthImage = styled(NextImage)({
-  display: 'flex',
-  maxWidth: '100%',
-  height: 'auto',
   borderStyle: 'none',
+  display: 'flex',
+  height: 'auto',
+  maxWidth: '100%',
 });
 
 /**
@@ -67,7 +67,6 @@ const MaxWidthImage = styled(NextImage)({
 const generateSizesString = (sizes: ImageProps['sizes']): string => {
   const sizesString = Object.entries(sizes)
     .map(([breakpoint, width]) => {
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
       const maxWidth = BREAKPOINT_MAX_SIZES[breakpoint as keyof typeof BREAKPOINT_MAX_SIZES];
       if (!maxWidth) {
         return `${width}px`;
@@ -91,13 +90,13 @@ export function Image({ url, title, alt, sizes, width, height, fill, ...props }:
   }
   const sharedProps = {
     alt: title ?? alt,
-    src: url,
     sizes: generateSizesString(sizes),
+    src: url,
     ...props,
   };
 
   if (!fill) {
-    return <MaxWidthImage {...sharedProps} width={width} height={height} />;
+    return <MaxWidthImage {...sharedProps} height={height} width={width} />;
   }
-  return <NextImage {...sharedProps} fill />;
+  return <NextImage {...sharedProps} fill={true} />;
 }

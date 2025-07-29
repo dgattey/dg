@@ -1,6 +1,6 @@
-import { spotifyClient } from './spotifyClient';
 import type { CurrentlyPlaying } from './CurrentlyPlaying';
 import type { RecentlyPlayed } from './RecentlyPlayed';
+import { spotifyClient } from './spotifyClient';
 import type { Track } from './Track';
 
 const CURRENTLY_PLAYING_RESOURCE = 'me/player/currently-playing';
