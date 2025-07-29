@@ -1,7 +1,7 @@
 import { log } from '@logtail/next';
 import { db } from 'db';
-import type { StravaWebhookEvent } from './StravaWebhookEvent';
 import { fetchStravaActivityFromApi } from './fetchStravaActivityFromApi';
+import type { StravaWebhookEvent } from './StravaWebhookEvent';
 
 // If an update was applied this number of ms or less ago, drop the update
 const UPDATE_THRESHOLD_IN_MS = 60000;
@@ -13,8 +13,8 @@ const UPDATE_THRESHOLD_IN_MS = 60000;
  */
 const fetchFromApiAndSaveToDb = async (id: number) => {
   const existingActivity = await db.StravaActivity.findOne({
-    where: { id },
     attributes: ['lastUpdate'],
+    where: { id },
   });
   if (
     existingActivity?.lastUpdate &&
@@ -36,9 +36,9 @@ const fetchFromApiAndSaveToDb = async (id: number) => {
     throw new Error(`Missing activity data for ${id}`);
   }
   const updatedActivity = await db.StravaActivity.upsert({
-    id,
-    activityStartDate: new Date(latestActivityData.start_date),
     activityData: latestActivityData,
+    activityStartDate: new Date(latestActivityData.start_date),
+    id,
     lastUpdate: new Date(),
   });
   log.info('Upserted Strava activity', { updatedActivity });

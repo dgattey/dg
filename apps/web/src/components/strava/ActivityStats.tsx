@@ -13,8 +13,8 @@ export function ActivityStats() {
   const { data: activity } = useData('latest/activity');
 
   const formattedDate = useRelativeTimeFormat({
-    fromDate: activity?.start_date,
     capitalized: true,
+    fromDate: activity?.start_date,
   });
   const distance = formattedDistance({ distanceInMeters: activity?.distance });
 
@@ -25,8 +25,8 @@ export function ActivityStats() {
   return (
     <HorizontalStack
       sx={{
-        justifyContent: 'space-between',
         gap: 1,
+        justifyContent: 'space-between',
       }}
     >
       <HorizontalStack

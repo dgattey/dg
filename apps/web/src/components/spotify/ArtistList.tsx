@@ -1,12 +1,11 @@
 // Need to get rid of this when I clean up API
-/* eslint-disable camelcase */
 
 import { Typography } from '@mui/material';
 import type { Artist } from 'api/spotify/Track';
-import { useLinkWithName } from 'hooks/useLinkWithName';
 import { Fragment } from 'react';
 import { Link } from 'ui/dependent/Link';
 import { truncated } from 'ui/helpers/truncated';
+import { useLinkWithName } from '../../hooks/useLinkWithName';
 
 type ArtistListProps = {
   artists: Array<Artist>;
@@ -56,17 +55,17 @@ export function ArtistList({ artists }: ArtistListProps) {
           <Fragment key={artist.id}>
             {link ? (
               <Link
-                isExternal
+                isExternal={true}
                 {...link}
                 href={link.url}
-                linkProps={{ variant: 'body2', color: 'body2' }}
+                linkProps={{ color: 'body2', variant: 'body2' }}
               >
                 {artist.name}
               </Link>
             ) : (
               <span>{artist.name}</span>
             )}
-            <span>{separator({ index, fullList: artists })}</span>
+            <span>{separator({ fullList: artists, index })}</span>
           </Fragment>
         );
       })}

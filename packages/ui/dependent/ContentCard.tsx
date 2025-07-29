@@ -59,21 +59,20 @@ function getCardSx(
   },
 ) {
   return {
-    position: 'relative',
-    overflow: 'hidden',
-    willChange: 'transform',
-    transition: theme.transitions.create(['width', 'height', 'box-shadow', 'border-color']),
-
     // Unfortunately required for the images to animate size correctly. Look into changing this!
     '& > div': {
       transform: 'none !important',
     },
+    overflow: 'hidden',
+    position: 'relative',
+    transition: theme.transitions.create(['width', 'height', 'box-shadow', 'border-color']),
+    willChange: 'transform',
     ...(isClickable && {
-      cursor: 'pointer',
       '&:hover': {
         borderColor: theme.vars.palette.card.border,
         boxShadow: theme.vars.extraShadows.card.hovered,
       },
+      cursor: 'pointer',
     }),
     [theme.breakpoints.down('md')]: {
       justifySelf: 'center',
@@ -98,37 +97,38 @@ function getCardSx(
  * only ever one element that returns from this.
  */
 function LinkWrappedChildren({ children, link, overlayContents }: LinkWrappedChildrenProps) {
-  const safelyWrappedChildren = !overlayContents ? (
-    children
-  ) : (
+  const safelyWrappedChildren = overlayContents ? (
     <div>
       {overlayContents}
       {children}
     </div>
+  ) : (
+    children
   );
   return link ? (
     <ContentWrappingLink
       link={link}
       sx={(theme) => ({
+        // By default the focus ring is hidden, so pseudo element it
+        '&:focus-visible:before': {
+          borderRadius: theme.spacing(6),
+          content: '""',
+          height: '100%',
+          outline: '-webkit-focus-ring-color auto 1px',
+          position: 'absolute',
+          width: '100%',
+          zIndex: 1,
+        },
         display: 'block',
         // Prevents overflowing links
         height: '100%',
-        // By default the focus ring is hidden, so pseudo element it
-        '&:focus-visible:before': {
-          content: '""',
-          position: 'absolute',
-          width: '100%',
-          height: '100%',
-          outline: '-webkit-focus-ring-color auto 1px',
-          borderRadius: theme.spacing(6),
-          zIndex: 1,
-        },
       })}
     >
       {overlayContents}
       {children}
     </ContentWrappingLink>
   ) : (
+    // biome-ignore lint/complexity/noUselessFragments: Needed for the undefined/null case
     <>{safelyWrappedChildren}</>
   );
 }
@@ -141,18 +141,18 @@ function OverlayContent({ overlay, sx }: { overlay: NonNullable<React.ReactNode>
     <Card
       sx={mixinSx(
         (theme) => ({
-          position: 'absolute',
-          bottom: theme.spacing(2.5),
-          left: theme.spacing(2.5),
-          margin: 0,
-          paddingLeft: theme.spacing(1.75),
-          paddingRight: theme.spacing(1.75),
-          paddingTop: theme.spacing(1),
-          paddingBottom: theme.spacing(1),
-          boxShadow: theme.vars.extraShadows.card.overlayHovered,
           '&:hover': {
             boxShadow: theme.vars.extraShadows.card.overlayHovered,
           },
+          bottom: theme.spacing(2.5),
+          boxShadow: theme.vars.extraShadows.card.overlayHovered,
+          left: theme.spacing(2.5),
+          margin: 0,
+          paddingBottom: theme.spacing(1),
+          paddingLeft: theme.spacing(1.75),
+          paddingRight: theme.spacing(1.75),
+          paddingTop: theme.spacing(1),
+          position: 'absolute',
           zIndex: 1,
         }),
         sx,
@@ -181,7 +181,7 @@ export function ContentCard({
   const isClickable = Boolean(link);
   return (
     <Card
-      sx={mixinSx((theme) => getCardSx(theme, { isClickable, horizontalSpan, verticalSpan }), sx)}
+      sx={mixinSx((theme) => getCardSx(theme, { horizontalSpan, isClickable, verticalSpan }), sx)}
       {...props}
     >
       <LinkWrappedChildren

@@ -20,17 +20,17 @@ export function ContentGrid({ children, gridRef }: Props) {
     <Box
       ref={gridRef}
       sx={(theme) => ({
-        marginTop: -4,
         display: 'grid',
         gap: `${theme.shape.gridGap}rem`,
-        gridTemplateColumns: '1fr',
         gridAutoFlow: 'dense',
+        gridTemplateColumns: '1fr',
         justifyContent: 'center',
+        marginTop: -4,
         position: 'relative',
         [theme.breakpoints.up('md')]: {
           gap: `${theme.shape.gridGapLarge}rem`,
-          gridTemplateColumns: `repeat(auto-fit, ${theme.shape.gridItemDimension}rem)`,
           gridAutoRows: `minmax(${theme.shape.gridItemDimension}rem, auto)`,
+          gridTemplateColumns: `repeat(auto-fit, ${theme.shape.gridItemDimension}rem)`,
         },
       })}
     >

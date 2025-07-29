@@ -1,15 +1,4 @@
 {
-  "name": "db",
-  "private": true,
-  "main": "client.ts",
-  "types": "client.ts",
-  "scripts": {
-    "clean": "rm -rf .turbo *.tsbuildinfo",
-    "db": "sequelize",
-    "format": "biome check --write .",
-    "lint": "eslint . --fix",
-    "lint:types": "tsc"
-  },
   "dependencies": {
     "@logtail/next": "catalog:",
     "@types/pg": "8.15.4",
@@ -19,11 +8,19 @@
     "sequelize-typescript": "2.1.6"
   },
   "devDependencies": {
-    "eslint": "catalog:",
-    "eslint-config-dg": "workspace:*",
     "pg-hstore": "2.3.4",
     "sequelize-cli": "6.6.3",
     "tsconfig": "workspace:*",
     "typescript": "catalog:"
-  }
+  },
+  "main": "client.ts",
+  "name": "db",
+  "private": true,
+  "scripts": {
+    "check": "biome check --write .",
+    "check:types": "tsc",
+    "clean": "rm -rf .turbo *.tsbuildinfo",
+    "db": "sequelize"
+  },
+  "types": "client.ts"
 }

@@ -1,9 +1,9 @@
 import { Typography } from '@mui/material';
-import { useLinkWithName } from 'hooks/useLinkWithName';
 import { Link } from 'ui/dependent/Link';
 import { mixinSx } from 'ui/helpers/mixinSx';
 import { truncated } from 'ui/helpers/truncated';
 import type { SxProps } from 'ui/theme';
+import { useLinkWithName } from '../../hooks/useLinkWithName';
 
 type TrackTitleProps = {
   trackTitle: string;
@@ -19,10 +19,10 @@ export function TrackTitle({ trackTitle, url, sx }: TrackTitleProps) {
   const mixedSx = mixinSx(truncated(2), sx);
   return link ? (
     <Link
-      isExternal
+      isExternal={true}
       {...link}
       href={link.url}
-      linkProps={{ variant: 'h5', color: 'h5' }}
+      linkProps={{ color: 'h5', variant: 'h5' }}
       sx={mixedSx}
     >
       {trackTitle}

@@ -1,8 +1,8 @@
 import { gql } from 'graphql-request';
 import { isNotNullish } from 'shared-core/helpers/typeguards';
-import type { MapLocation } from './MapLocation';
 import { contentfulClient } from './contentfulClient';
 import type { MyLocationQuery } from './fetchCurrentLocation.generated';
+import type { MapLocation } from './MapLocation';
 
 /**
  * Grabs the home location using a known id for it
@@ -68,10 +68,10 @@ export async function fetchCurrentLocation(): Promise<MapLocation | null> {
     return a < b ? -1 : 1;
   });
   return {
-    point: location.point,
-    initialZoom: location.initialZoom,
+    backupImageUrls: { dark: data.darkImage.url, light: data.lightImage.url },
     image: location.image,
+    initialZoom: location.initialZoom,
+    point: location.point,
     zoomLevels,
-    backupImageUrls: { light: data.lightImage.url, dark: data.darkImage.url },
   };
 }

@@ -23,12 +23,12 @@ export function ActivityTypeWithIcon() {
     <Typography
       component={HorizontalStack}
       sx={{
-        gap: 1,
         alignItems: 'center',
+        gap: 1,
       }}
       variant="overline"
     >
-      <>Latest {typeText.trim()}</> {icon}
+      Latest {typeText.trim()} {icon}
     </Typography>
   );
 }

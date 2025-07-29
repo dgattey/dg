@@ -11,9 +11,9 @@ export function hslToHex(hslString: string): string {
   }
 
   // Extract values and convert them to integers
-  const hue = parseInt(match.groups?.hue ?? '', 10);
-  const saturation = parseInt(match.groups?.saturation ?? '', 10) / 100;
-  const lightness = parseInt(match.groups?.lightness ?? '', 10) / 100;
+  const hue = Number.parseInt(match.groups?.hue ?? '', 10);
+  const saturation = Number.parseInt(match.groups?.saturation ?? '', 10) / 100;
+  const lightness = Number.parseInt(match.groups?.lightness ?? '', 10) / 100;
 
   // Convert HSL to RGB
   const c = (1 - Math.abs(2 * lightness - 1)) * saturation;

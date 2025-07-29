@@ -57,14 +57,14 @@ function PreviewCard({
         border: 'none',
         minHeight: 297,
         [theme.breakpoints.down('md')]: {
-          minHeight: 200,
           height: 200,
+          minHeight: 200,
           width: '100%',
         },
         ...(backgroundImageUrl && {
           backgroundImage: `url('${backgroundImageUrl}')`,
-          backgroundRepeat: 'no-repeat',
           backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
           backgroundSize: 'cover',
         }),
       })}

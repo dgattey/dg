@@ -1,9 +1,9 @@
 import type { FetchedFallbackData } from 'api/fetchFallbackData';
 import { fetchFallbackData } from 'api/fetchFallbackData';
-import { ErrorLayout } from 'components/layouts/ErrorLayout';
-import { PageLayout } from 'components/layouts/PageLayout';
 import type { GetStaticProps } from 'next/types';
-import type { GetLayout } from 'types/Page';
+import { ErrorLayout } from '../components/layouts/ErrorLayout';
+import { PageLayout } from '../components/layouts/PageLayout';
+import type { GetLayout } from '../types/Page';
 
 type PageProps = {
   fallback: FetchedFallbackData<'footer' | 'version'>;

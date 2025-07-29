@@ -3,7 +3,7 @@ import { LazyLoadedMap } from 'maps/LazyLoadedMap';
 import dynamic from 'next/dynamic';
 
 // Only render when you want to start importing this giant component
-const FullMapCard = dynamic(() => import('maps/mapbox-gl/FullMapCard'), {
+const FullMapCard = dynamic(() => import('maps/mapbox/FullMapCard'), {
   loading: () => null,
 });
 

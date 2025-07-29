@@ -8,16 +8,14 @@
   "license": "MIT",
   "private": true,
   "scripts": {
-    "preinstall": "npx only-allow pnpm",
-    "postinstall": "lefthook install"
+    "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
     "dotenv-mono": "catalog:",
-    "lefthook": "1.12.2",
     "vercel": "44.6.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "^1.9.4",
+    "@biomejs/biome": "^2.1.2",
     "tsconfig": "workspace:*",
     "turbo": "2.5.5",
     "typescript": "catalog:"

@@ -1,12 +1,4 @@
 {
-  "name": "ui",
-  "private": true,
-  "scripts": {
-    "clean": "rm -rf .turbo *.tsbuildinfo",
-    "format": "biome check --write .",
-    "lint": "eslint . --fix",
-    "lint:types": "tsc"
-  },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "7.0.0",
     "@fortawesome/free-brands-svg-icons": "catalog:",
@@ -23,9 +15,14 @@
   "devDependencies": {
     "@types/react": "catalog:",
     "dotenv-mono": "catalog:",
-    "eslint": "catalog:",
-    "eslint-config-dg": "workspace:*",
     "tsconfig": "workspace:*",
     "typescript": "catalog:"
+  },
+  "name": "ui",
+  "private": true,
+  "scripts": {
+    "check": "biome check --write .",
+    "check:types": "tsc",
+    "clean": "rm -rf .turbo *.tsbuildinfo"
   }
 }

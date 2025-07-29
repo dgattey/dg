@@ -1,14 +1,14 @@
 import { Container } from '@mui/material';
 import type { EndpointKey } from 'api/endpoints';
 import type { FetchedFallbackData } from 'api/fetchFallbackData';
-import { Footer } from 'components/Footer';
-import { Header } from 'components/Header';
-import { Meta } from 'components/Meta';
-import { useShowScrollIndicator } from 'hooks/useShowScrollIndicator';
 import { useRef } from 'react';
 import { SWRConfig } from 'swr';
 import { ScrollIndicatorContext } from 'ui/core/ScrollIndicatorContext';
 import { Section } from 'ui/core/Section';
+import { useShowScrollIndicator } from '../../hooks/useShowScrollIndicator';
+import { Footer } from '../Footer';
+import { Header } from '../Header';
+import { Meta } from '../Meta';
 
 /**
  * We have props that dictate a fallback for SWRConfig, plus children
@@ -38,7 +38,7 @@ export function PageLayout<Key extends EndpointKey>({ children, fallback }: Page
       <ScrollIndicatorContext.Provider value={isIndicatorShown}>
         <Header headerRef={headerSizingRef} />
         <Container component={Section} sx={{ marginTop: 16 }}>
-          <div aria-hidden ref={ref} style={{ height: 0, width: 0 }} />
+          <div aria-hidden={true} ref={ref} style={{ height: 0, width: 0 }} />
           <main>{children}</main>
         </Container>
         <Footer />

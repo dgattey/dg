@@ -34,9 +34,9 @@ export function useColorScheme(): Readonly<{
 
   return {
     colorScheme: {
-      mode: resolvedMode ?? 'light',
       isCustomized: isInitialized && mode !== 'system',
       isInitialized,
+      mode: resolvedMode ?? 'light',
     },
     updatePreferredMode: setMode,
   } as const;

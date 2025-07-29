@@ -14,9 +14,9 @@ async function createOrUpdateToken({
   refreshToken,
 }: CreateTokenProps) {
   const token = await db.Token.upsert({
-    name,
     accessToken,
     expiryAt,
+    name,
     refreshToken,
   });
   return token[0];
@@ -29,8 +29,8 @@ async function createOrUpdateToken({
  */
 async function getLatestTokenIfValid({ name }: FetchTokenProps) {
   const token = await db.Token.findOne({
-    where: { name },
     attributes: ['accessToken', 'refreshToken', 'expiryAt'],
+    where: { name },
   });
 
   // Shouldn't happen unless invalid name, so it's a big error
@@ -41,7 +41,7 @@ async function getLatestTokenIfValid({ name }: FetchTokenProps) {
   // Return either refresh + access, or just refresh if invalid
   const { refreshToken, accessToken, expiryAt } = token;
   const isValid = expiryAt && Number(expiryAt) > Date.now();
-  return { refreshToken, accessToken: isValid ? accessToken : null };
+  return { accessToken: isValid ? accessToken : null, refreshToken };
 }
 
 /**
@@ -54,21 +54,21 @@ async function fetchRefreshedTokenFromApi(
   const { endpoint, headers, body, validate } = refreshTokenConfig;
   const encodedBody = new URLSearchParams(body(refreshToken));
   log.info('Fetching refreshed token from API', {
+    encodedBody: [...encodedBody],
     endpoint,
     headers,
-    encodedBody: [...encodedBody],
   });
 
   const rawData = await fetch(endpoint, {
-    method: 'POST',
-    headers,
     body: encodedBody,
+    headers,
+    method: 'POST',
   });
   const data: unknown = await rawData.json();
   if (!rawData.ok) {
     log.error('Failed to fetch refreshed token', {
-      status: rawData.status,
       data,
+      status: rawData.status,
     });
     throw new TypeError('Token was not fetched properly');
   }
@@ -104,13 +104,13 @@ export async function refreshedAccessToken(
     refreshTokenConfig,
     currentData.refreshToken,
   );
-  log.info('Fetched refreshed token', { refreshToken, accessToken, expiryAt });
-  await createOrUpdateToken({ name, accessToken, refreshToken, expiryAt });
+  log.info('Fetched refreshed token', { accessToken, expiryAt, refreshToken });
+  await createOrUpdateToken({ accessToken, expiryAt, name, refreshToken });
   log.info('Updated token in db, returning', {
-    name,
     accessToken,
-    refreshToken,
     expiryAt,
+    name,
+    refreshToken,
   });
   return accessToken;
 }

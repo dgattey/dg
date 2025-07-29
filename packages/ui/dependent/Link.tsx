@@ -1,4 +1,3 @@
-/* eslint-disable no-restricted-imports */
 import { faLinkedinIn } from '@fortawesome/free-brands-svg-icons/faLinkedinIn';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
@@ -49,12 +48,12 @@ type LinkProps = BaseLinkProps &
  * All built in mappings for icon name to element
  */
 const BUILT_IN_ICONS: Record<string, React.ReactNode> = {
-  strava: <FaIcon icon={faStrava} />,
-  spotify: <FaIcon icon={faSpotify} />,
-  github: <Github size="1em" />,
-  linkedin: <FaIcon icon={faLinkedinIn} />,
-  instagram: <Instagram size="1em" />,
   email: <Send size="1em" />,
+  github: <Github size="1em" />,
+  instagram: <Instagram size="1em" />,
+  linkedin: <FaIcon icon={faLinkedinIn} />,
+  spotify: <FaIcon icon={faSpotify} />,
+  strava: <FaIcon icon={faStrava} />,
 };
 
 /**
@@ -68,6 +67,7 @@ function createIconElement({
   if (!icon || ['children', 'text'].includes(layout)) {
     return null;
   }
+  // biome-ignore lint/security/noDangerouslySetInnerHtml: This is intended
   return BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />;
 }
 
@@ -132,10 +132,10 @@ export function Link({
     }
   })();
   const sharedProps = {
+    'aria-label': title,
     component: NextLink,
     href,
-    'aria-label': title,
-    ...(isExternal ? { target: '_blank', rel: 'noreferrer' } : {}),
+    ...(isExternal ? { rel: 'noreferrer', target: '_blank' } : {}),
     sx,
   };
   return (

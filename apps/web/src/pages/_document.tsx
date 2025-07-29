@@ -1,5 +1,5 @@
 import { InitColorSchemeScript } from '@mui/material';
-import Document, { Html, Head, Main, NextScript } from 'next/document';
+import Document, { Head, Html, Main, NextScript } from 'next/document';
 import { themeSelectorAttribute } from 'ui/theme';
 
 /**

@@ -16,25 +16,25 @@ const FALLBACK: readonly [Intl.RelativeTimeFormatUnit, number] = ['second', 1000
  * the right option for formatting.
  */
 const UNITS: Partial<Record<Intl.RelativeTimeFormatUnit, number>> = {
-  year: 24 * 60 * 60 * 1000 * 365,
-  month: (24 * 60 * 60 * 1000 * 365) / 12,
   day: 24 * 60 * 60 * 1000,
   hour: 60 * 60 * 1000,
   minute: 60 * 1000,
+  month: (24 * 60 * 60 * 1000 * 365) / 12,
   second: 1000,
+  year: 24 * 60 * 60 * 1000 * 365,
 } as const;
 
 // These are overrides for certain time periods - values are
 const OVERRIDES: Partial<Record<Intl.RelativeTimeFormatUnit, Record<number, string>>> = {
-  second: {
-    30: 'just now',
+  hour: {
+    1: 'an hour ago',
   },
   minute: {
     1: 'a minute ago',
     4: 'a few minutes ago',
   },
-  hour: {
-    1: 'an hour ago',
+  second: {
+    30: 'just now',
   },
 };
 
@@ -67,7 +67,7 @@ const relativeTimeFromMs = (
   const formattedUnit = isRelativeTimeUnit(unit) ? unit : FALLBACK[0];
   const amount = Math.round(elapsedMs / value);
   const formatted = formatter.format(amount, formattedUnit);
-  return { unit: formattedUnit, amount, formatted };
+  return { amount, formatted, unit: formattedUnit };
 };
 
 /**

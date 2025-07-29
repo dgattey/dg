@@ -62,9 +62,9 @@ export async function exchangeCodeForToken(code: string): Promise<string> {
   log.info('Exchanging code for token for Strava', { code });
   const response = await stravaTokenExchangeClient
     .json({
-      code,
       client_id: CLIENT_ID,
       client_secret: CLIENT_SECRET,
+      code,
       grant_type: 'authorization_code',
     })
     .post('')
@@ -77,12 +77,11 @@ export async function exchangeCodeForToken(code: string): Promise<string> {
   invariant(STRAVA_TOKEN_NAME, 'Missing STRAVA_TOKEN_NAME env variable');
   log.info('Persisting token to DB', { accessToken, expiryAt, refreshToken });
   const [token] = await db.Token.upsert({
-    name: STRAVA_TOKEN_NAME,
     accessToken,
     expiryAt,
+    name: STRAVA_TOKEN_NAME,
     refreshToken,
   });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   log.info('Persisted token to DB', { updatedAt: token.updatedAt });
 
   return `

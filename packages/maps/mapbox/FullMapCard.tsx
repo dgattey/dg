@@ -1,6 +1,6 @@
 import type { MapLocation } from 'api/contentful/MapLocation';
 import { useState } from 'react';
-import { Map } from './Map';
+import { MapboxMap } from './MapboxMap';
 import { Marker } from './Marker';
 
 type FullMapCardProps = {
@@ -15,7 +15,7 @@ function FullMapCard({ location }: FullMapCardProps) {
   const [hasMapLoaded, setHasMapLoaded] = useState(false);
 
   return location.point ? (
-    <Map
+    <MapboxMap
       isLoaded={hasMapLoaded}
       location={location}
       setMapHasLoaded={() => {
@@ -23,10 +23,9 @@ function FullMapCard({ location }: FullMapCardProps) {
       }}
     >
       <Marker image={location.image} key="home" point={location.point} />
-    </Map>
+    </MapboxMap>
   ) : null;
 }
 
 // Enables dynamic import - needs to be default
-// eslint-disable-next-line import/no-default-export
 export default FullMapCard;

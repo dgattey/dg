@@ -10,7 +10,7 @@ const api = wretch('/api/');
  */
 const fetchData = async <Key extends EndpointKey>(key: Key): Promise<EndpointType<Key>> => {
   const result = api.get(key);
-  return result.json<EndpointType<Key>>();
+  return await result.json<EndpointType<Key>>();
 };
 
 /**

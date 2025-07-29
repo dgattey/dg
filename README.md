@@ -1,4 +1,4 @@
-[![GitHub version](https://flat.badgen.net/github/release/dgattey/dg?cache=600)][gh] [![Vercel](https://deploy-badge.vercel.app/vercel/?app=dg&style=flat-square)](https://vercel.com/dgattey/dg) [![GitHub commits](https://flat.badgen.net/github/commits/dgattey/dg)][gh] [![Last commit](https://flat.badgen.net/github/last-commit/dgattey/dg/main)][gh]
+[![GitHub version](https://flat.badgen.net/github/release/dgattey/dg?cache=600)][gh] [![Vercel](https://deploy-badge.vercel.app/vercel/?app=dg&style=flat-square)](https://vercel.com/dgattey/dg) [![GitHub commits](https://flat.badgen.net/github/commits/dgattey/dg)][gh] [![Last commit](https://flat.badgen.net/github/last-commit/dgattey/dg/main)][gh][![Checked with Biome](https://img.shields.io/badge/Checked_with-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev)
 
 # Dylan Gattey
 
@@ -10,9 +10,8 @@ Hi :wave: This is an overengineered way to show my past projects/experiment with
 - `turbo build` runs a prod build (for CI)
 - `turbo build:serve` runs a prod build + db connection + serves it (for local testing)
 - `turbo build:analyze` builds shows bundle sizes for a prod build (for verification)
-- `turbo format` runs Biome to format the files
-- `turbo lint` runs ESLint to lint files
-- `turbo lint:types` runs tsc to confirm no type errors
+- `turbo check` runs Biome to lint + format the files
+- `turbo check:types` runs tsc to confirm no type errors
 - `turbo codegen` generates new GraphQL APIs from Github/Contentful + operation file types from the queries/mutations
 - `turbo db -- db:migrate` uses Sequelize to run migrations, and you can list the status of migrations with `turbo db -- db:migrate:status`. Undo with `turbo db -- db:migrate:undo`
 - `turbo db -- migration:generate --name <name>` uses Sequelize to generate a new migration file ready to be populated

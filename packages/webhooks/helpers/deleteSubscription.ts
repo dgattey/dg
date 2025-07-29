@@ -14,8 +14,8 @@ export const deleteSubscription = async (type: WebhookType, subscriptionId: stri
   const url = new URL(`${endpoint}/${subscriptionId}`);
   url.search = new URLSearchParams(standardParams(config)).toString();
   const data = await fetch(url.toString(), {
-    method: 'DELETE',
     headers,
+    method: 'DELETE',
   });
 
   // Handle any errors or print the current subscriptions

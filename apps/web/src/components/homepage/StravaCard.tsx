@@ -1,10 +1,10 @@
 import { Stack } from '@mui/material';
 import { useData } from 'api/useData';
-import { ActivityDescription } from 'components/strava/ActivityDescription';
-import { ActivityName } from 'components/strava/ActivityName';
-import { ActivityStats } from 'components/strava/ActivityStats';
-import { ActivityTypeWithIcon } from 'components/strava/ActivityTypeWithIcon';
 import { ContentCard } from 'ui/dependent/ContentCard';
+import { ActivityDescription } from '../strava/ActivityDescription';
+import { ActivityName } from '../strava/ActivityName';
+import { ActivityStats } from '../strava/ActivityStats';
+import { ActivityTypeWithIcon } from '../strava/ActivityTypeWithIcon';
 
 /**
  * Shows a card with the latest activity from Strava
@@ -25,9 +25,9 @@ export function StravaCard() {
     >
       <Stack
         sx={{
-          justifyContent: 'space-between',
           gap: 2,
           height: '100%',
+          justifyContent: 'space-between',
         }}
       >
         <ActivityStats />

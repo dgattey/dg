@@ -1,12 +1,12 @@
 import { log } from '@logtail/next';
 import { handleApiError, methodNotAllowedError } from 'api/handleApiError';
-import type { StravaWebhookEvent } from 'api/strava/StravaWebhookEvent';
 import { echoStravaChallengeIfValid } from 'api/strava/echoStravaChallengeIfValid';
 import {
   exchangeCodeForToken,
   getOauthTokenInitLink,
   getStravaExchangeCodeForTokenRequest,
 } from 'api/strava/runOauthFlow';
+import type { StravaWebhookEvent } from 'api/strava/StravaWebhookEvent';
 import { syncStravaWebhookUpdateWithDb } from 'api/strava/syncStravaWebhookUpdateWithDb';
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { isRecord } from 'shared-core/helpers/typeguards';
@@ -50,7 +50,6 @@ const handleGet: Processor = (request, response) => {
     return;
   }
 
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   log.info('Invalid Strava webhook GET', { body: request.body as unknown });
   handleApiError(response, 'Bad Request', 400);
 };
@@ -60,7 +59,6 @@ const handleGet: Processor = (request, response) => {
  * receipt of it.
  */
 const handleWebhookEvent: AsyncProcessor = async (request, response) => {
-  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
   log.info('Received Strava webhook event', { body: request.body as unknown });
   if (!isWebhookEvent(request.body)) {
     log.error('Received invalid Strava webhook event');

@@ -14,7 +14,7 @@ export const fetchStravaActivityFromApi = async (id: number) => {
     return null;
   }
   const allData = await response.json<StravaDetailedActivity & Record<string, unknown>>();
-  log.info('Fetched and parsed Strava activity from API', { id, allData });
+  log.info('Fetched and parsed Strava activity from API', { allData, id });
   await log.flush();
   return paredStravaActivity(allData);
 };

@@ -11,31 +11,31 @@ const withNextBundleAnalyzer = require('@next/bundle-analyzer')({
  * @type {import('next').NextConfig}
  * */
 const nextConfig = {
-  reactStrictMode: true,
-  images: {
-    remotePatterns: [
-      {
-        protocol: 'https',
-        hostname: 'images.ctfassets.net',
-      },
-      {
-        protocol: 'https',
-        hostname: 'i.scdn.co',
-      },
-    ],
-  },
-  i18n: {
-    // This allows for the language value to be passed in HTML
-    locales: ['en'],
-    defaultLocale: 'en',
-  },
-  // Have to do this for each of the packages we import
-  transpilePackages: ['shared-core', 'api', 'ui'],
-  // Disables the Sequelize warning about the `sequelize` package not being found
-  serverExternalPackages: ['sequelize'],
   experimental: {
     scrollRestoration: true,
   },
+  i18n: {
+    defaultLocale: 'en',
+    // This allows for the language value to be passed in HTML
+    locales: ['en'],
+  },
+  images: {
+    remotePatterns: [
+      {
+        hostname: 'images.ctfassets.net',
+        protocol: 'https',
+      },
+      {
+        hostname: 'i.scdn.co',
+        protocol: 'https',
+      },
+    ],
+  },
+  reactStrictMode: true,
+  // Disables the Sequelize warning about the `sequelize` package not being found
+  serverExternalPackages: ['sequelize'],
+  // Have to do this for each of the packages we import
+  transpilePackages: ['shared-core', 'api', 'ui'],
 };
 
 module.exports = withNextBundleAnalyzer(withLogtail(nextConfig));

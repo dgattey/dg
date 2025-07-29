@@ -12,8 +12,6 @@ invariant(GITHUB_AUTHENTICATION_TOKEN, 'Missing GITHUB_AUTHENTICATION_TOKEN env 
 
 // For the Contentful API
 const contentfulGenerators = createApiGenerator('contentful', {
-  schemaEndpoint: `https://graphql.contentful.com/content/v1/spaces/${CONTENTFUL_SPACE_ID}`,
-  token: CONTENTFUL_ACCESS_TOKEN,
   onlyOperationTypes: false,
   scalars: {
     DateTime: 'string',
@@ -22,12 +20,12 @@ const contentfulGenerators = createApiGenerator('contentful', {
     JSON: '{ nodeType: string, data: Record<string, unknown> | undefined, value: string | undefined, content: Array<{ nodeType: string, data: Record<string, unknown> | undefined, value: string | undefined, content: Array<{ nodeType: string, data: Record<string, unknown> | undefined, value: string | undefined, content: Array<{ nodeType: string, data: Record<string, unknown> | undefined, value: string | undefined, content: Array<{ nodeType: string, data: Record<string, unknown> | undefined, value: string | undefined, content: Array<unknown> | undefined }> | undefined }> | undefined }> | undefined }> | undefined }',
     Quality: 'number',
   },
+  schemaEndpoint: `https://graphql.contentful.com/content/v1/spaces/${CONTENTFUL_SPACE_ID}`,
+  token: CONTENTFUL_ACCESS_TOKEN,
 });
 
 // For the Github API
 const githubGenerators = createApiGenerator('github', {
-  schemaEndpoint: 'https://api.github.com/graphql',
-  token: GITHUB_AUTHENTICATION_TOKEN,
   onlyOperationTypes: true,
   scalars: {
     Base64String: 'string',
@@ -41,6 +39,8 @@ const githubGenerators = createApiGenerator('github', {
     URI: 'string',
     X509Certificate: 'string',
   },
+  schemaEndpoint: 'https://api.github.com/graphql',
+  token: GITHUB_AUTHENTICATION_TOKEN,
 });
 
 /**
@@ -49,16 +49,15 @@ const githubGenerators = createApiGenerator('github', {
  * and overwrite existing files.
  */
 const config: CodegenConfig = {
-  overwrite: true,
-  hooks: {
-    afterAllFileWrite: ['biome check --write'],
-  },
   generates: {
     ...contentfulGenerators,
     ...githubGenerators,
   },
+  hooks: {
+    afterAllFileWrite: ['biome check --write'],
+  },
+  overwrite: true,
 };
 
 // We export as default so we can actually use it in a script
-// eslint-disable-next-line import/no-default-export
 export default config;

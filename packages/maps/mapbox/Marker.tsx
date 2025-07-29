@@ -22,6 +22,9 @@ export function Marker({ point, image }: MarkerProps) {
   return (
     <MapMarker latitude={point.latitude} longitude={point.longitude}>
       <svg height={DIMENSION} width={DIMENSION}>
+        <title>
+          Map marker for {point.latitude}, {point.longitude}
+        </title>
         <defs>
           <Box
             component="circle"
@@ -49,8 +52,8 @@ export function Marker({ point, image }: MarkerProps) {
         <Box
           component="span"
           sx={{
-            position: 'absolute',
             left: `${(DIMENSION - IMAGE_DIMENSION) / 2}px`,
+            position: 'absolute',
             top: `${(DIMENSION - IMAGE_DIMENSION) / 2}px`,
           }}
         >

@@ -10,6 +10,6 @@ invariant(ACCESS_TOKEN, 'Missing CONTENTFUL_ACCESS_TOKEN env variable');
  * Use this GraphQL client to make requests to Contentful from the server.
  */
 export const contentfulClient = createClient({
-  endpoint: `https://graphql.contentful.com/content/v1/spaces/${SPACE_ID}`,
   accessToken: ACCESS_TOKEN,
+  endpoint: `https://graphql.contentful.com/content/v1/spaces/${SPACE_ID}`,
 });

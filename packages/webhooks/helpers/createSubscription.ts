@@ -15,13 +15,13 @@ export const createSubscription = async (type: WebhookType) => {
   }
 
   const data = await fetch(endpoint, {
-    method: 'POST',
-    headers,
     body: new URLSearchParams({
       ...standardParams(config),
-      verify_token: verifyToken,
       callback_url: callbackUrl,
+      verify_token: verifyToken,
     }),
+    headers,
+    method: 'POST',
   });
 
   // Handle any errors or print out success

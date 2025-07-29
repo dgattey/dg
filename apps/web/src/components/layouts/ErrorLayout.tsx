@@ -1,8 +1,8 @@
 import { Stack, Typography } from '@mui/material';
-import { Meta } from 'components/Meta';
 import { Section } from 'ui/core/Section';
 import { Link } from 'ui/dependent/Link';
 import { useColorScheme } from 'ui/theme/useColorScheme';
+import { Meta } from '../Meta';
 
 type ErrorLayoutProps = {
   /**
@@ -23,22 +23,21 @@ export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
   return (
     <>
       <Meta description="An error occurred" title={pageTitle} />
-      <Stack component={Section} sx={{ gap: 3, marginTop: -8, alignItems: 'center' }}>
+      <Stack component={Section} sx={{ alignItems: 'center', gap: 3, marginTop: -8 }}>
         <Typography
-          variant="h1"
           sx={{
-            fontSize: '280px !important',
-            backgroundImage: 'url(/images/error-small.jpg)',
             backgroundClip: 'text',
+            backgroundImage: 'url(/images/error-small.jpg)',
             backgroundSize: 'cover',
-            WebkitBackgroundClip: 'text',
             color: 'transparent',
-            fontWeight: 900,
-            fontStretch: 'extra-expanded',
             filter: (theme) =>
               isInitialized
                 ? `drop-shadow(2px 2px 12px hsl(from ${theme.vars.palette.secondary.dark} h s calc(l * 0.2) / 0.4))`
                 : null,
+            fontSize: '280px !important',
+            fontStretch: 'extra-expanded',
+            fontWeight: 900,
+            WebkitBackgroundClip: 'text',
             WebkitTextStroke: '1px',
             WebkitTextStrokeColor: (theme) =>
               isInitialized
@@ -47,10 +46,11 @@ export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
                   : `hsl(from ${theme.vars.palette.background.paper} h s calc(l + (100 - l) * 0.1))`
                 : null,
           }}
+          variant="h1"
         >
           {statusCode}
         </Typography>
-        <Typography sx={{ maxWidth: '26em', textWrap: 'balance' }} variant="h5" textAlign="center">
+        <Typography sx={{ maxWidth: '26em', textWrap: 'balance' }} textAlign="center" variant="h5">
           {statusCode === 404
             ? 'Sorry, got lost in the jungle. Email me if something is wrong.'
             : 'Something went super wrong, sorry. Email me to let me know.'}
@@ -60,7 +60,7 @@ export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
             color: 'secondary',
           }}
           href="/"
-          isButton
+          isButton={true}
           sx={{ marginTop: 3 }}
           title="Home"
         >

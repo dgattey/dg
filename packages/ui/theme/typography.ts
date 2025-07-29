@@ -5,6 +5,29 @@ import type { Theme, TypographyVariantsOptions } from '@mui/material/styles';
  */
 export function getTypography(theme: Theme): TypographyVariantsOptions {
   return {
+    body1: {
+      fontSize: 17,
+    },
+    body2: {
+      fontSize: 17,
+    },
+    button: {
+      fontSize: 16,
+      fontWeight: 600,
+    },
+    caption: {
+      fontSize: 14,
+      fontStretch: 'semi-expanded',
+      fontWeight: 500,
+    },
+    code: {
+      borderRadius: theme.spacing(2),
+      fontFamily:
+        '"Menlo","Consolas","Roboto Mono","Ubuntu Monospace","Noto Mono","Oxygen Mono","Liberation Mono",monospace,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',
+      fontSize: 15,
+      lineHeight: 1.875, // 30px
+      padding: theme.spacing(0.75, 1),
+    },
     fontFamily: [
       'system-ui',
       '-apple-system',
@@ -25,9 +48,9 @@ export function getTypography(theme: Theme): TypographyVariantsOptions {
     fontSize: 20,
     h1: {
       fontSize: 34,
-      fontWeight: 700,
       fontStretch: 'expanded',
       fontVariant: 'all-small-caps',
+      fontWeight: 700,
     },
     h2: {
       fontSize: 29.75,
@@ -43,41 +66,18 @@ export function getTypography(theme: Theme): TypographyVariantsOptions {
     },
     h5: {
       fontSize: 17,
-      fontWeight: 600,
       fontStretch: 'semi-expanded',
+      fontWeight: 600,
     },
     h6: {
       fontSize: 16,
       fontWeight: 600,
     },
-    body1: {
-      fontSize: 17,
-    },
-    body2: {
-      fontSize: 17,
-    },
     overline: {
       fontSize: 13,
+      fontStretch: 'expanded',
       fontVariant: 'all-small-caps',
       fontWeight: 500,
-      fontStretch: 'expanded',
-    },
-    caption: {
-      fontSize: 14,
-      fontStretch: 'semi-expanded',
-      fontWeight: 500,
-    },
-    button: {
-      fontSize: 16,
-      fontWeight: 600,
-    },
-    code: {
-      fontSize: 15,
-      lineHeight: 1.875, // 30px
-      fontFamily:
-        '"Menlo","Consolas","Roboto Mono","Ubuntu Monospace","Noto Mono","Oxygen Mono","Liberation Mono",monospace,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',
-      padding: theme.spacing(0.75, 1),
-      borderRadius: theme.spacing(2),
     },
   };
 }

@@ -1,9 +1,13 @@
 {
+  "files": [
+    "base.json",
+    "nextjs.json",
+    "react.json"
+  ],
   "name": "tsconfig",
   "private": true,
-  "files": ["base.json", "nextjs.json", "react.json"],
   "scripts": {
-    "clean": "rm -rf .turbo *.tsbuildinfo",
-    "format": "biome check --write ."
+    "check": "biome check --write .",
+    "clean": "rm -rf .turbo *.tsbuildinfo"
   }
 }

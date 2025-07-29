@@ -13,8 +13,8 @@ export const listSubscriptions = async (type: WebhookType) => {
   const url = new URL(endpoint);
   url.search = new URLSearchParams(standardParams(config)).toString();
   const data = await fetch(url.toString(), {
-    method: 'GET',
     headers,
+    method: 'GET',
   });
 
   // Handle any errors or print the current subscriptions

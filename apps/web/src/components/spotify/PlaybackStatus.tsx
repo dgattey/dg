@@ -15,13 +15,13 @@ type PlaybackStatusProps = {
 export function PlaybackStatus({ playedAt }: PlaybackStatusProps) {
   const isNowPlaying = !playedAt;
   const relativeLastPlayed = useRelativeTimeFormat({
-    fromDate: playedAt,
     capitalized: true,
+    fromDate: playedAt,
   });
   return (
     <Typography
       component={HorizontalStack}
-      sx={{ gap: 1, alignItems: 'center' }}
+      sx={{ alignItems: 'center', gap: 1 }}
       variant="overline"
     >
       {isNowPlaying ? (

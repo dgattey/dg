@@ -19,10 +19,10 @@ type HeaderProps = {
 
 // Makes the header bar sticky and not responsive to user events by default
 const stickyContainerSx: SxProps = {
+  maxWidth: 'unset',
   position: 'sticky',
   top: 0,
   zIndex: 1,
-  maxWidth: 'unset',
 };
 
 /**
@@ -42,10 +42,10 @@ export function Header({ headerRef }: HeaderProps) {
               ? `hsl(from ${theme.vars.palette.background.paper} h s l / 0.85)`
               : theme.vars.palette.background.default,
             boxShadow: isScrolled ? theme.vars.extraShadows.card.hovered : 'none',
-            willChange: 'box-shadow, background-color',
             transition: colorScheme.isInitialized
               ? theme.transitions.create(['background-color', 'box-shadow'])
               : undefined,
+            willChange: 'box-shadow, background-color',
           })}
         >
           <Nav>

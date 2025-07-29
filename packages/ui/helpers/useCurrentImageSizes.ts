@@ -15,10 +15,10 @@ export function useCurrentImageSizes(layout?: string) {
     verticalSpan === 1 ? PROJECT_IMAGE_SIZES[breakpoint] : PROJECT_2X_IMAGE_SIZES[breakpoint];
   const sizes = horizontalSpan === 1 ? PROJECT_IMAGE_SIZES : PROJECT_2X_IMAGE_SIZES;
   return {
-    width,
     height,
     horizontalSpan,
-    verticalSpan,
     sizes,
+    verticalSpan,
+    width,
   };
 }

@@ -28,8 +28,16 @@ export type AwaitedType<Key extends EndpointKey> = Awaited<EndpointType<Key>>;
  * server or `getStaticProps`, NOT from the client!
  */
 export const endpoints = {
+  // Footer links via Contentful
+  footer: fetchFooterLinks,
   // Intro block of content via Contentful
   intro: fetchIntroContent,
+
+  // Fetches the latest Strava activity I've done
+  'latest/activity': fetchLatestStravaActivityFromDb,
+
+  // Last played song via Spotify
+  'latest/song': fetchRecentlyPlayed,
 
   // My current location via Contentful
   location: fetchCurrentLocation,
@@ -37,17 +45,8 @@ export const endpoints = {
   // All projects via Contentful
   projects: fetchProjects,
 
-  // Footer links via Contentful
-  footer: fetchFooterLinks,
-
   // App version via Github
   version: fetchRepoVersion,
-
-  // Last played song via Spotify
-  'latest/song': fetchRecentlyPlayed,
-
-  // Fetches the latest Strava activity I've done
-  'latest/activity': fetchLatestStravaActivityFromDb,
 } as const;
 
 /**

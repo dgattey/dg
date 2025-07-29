@@ -78,21 +78,21 @@ export function Meta({ title, description }: MetaProps) {
         <meta content={truncatedDescription} key="description" name="description" />
       ) : null}
       {graphMetaItems({
-        title: title ?? SITE_NAME,
         description: truncatedDescription,
-        url: pageUrl,
         image: `${baseUrl}/${OG_IMAGE_API_ROUTE}/${imageTitle}?subtitle=${imageSubtitle}`,
+        title: title ?? SITE_NAME,
+        url: pageUrl,
       })}
       <meta content={theme.vars.palette.background.default} key="theme-color" name="theme-color" />
-      <link key="favicon" rel="icon" href="/favicon.ico" sizes="32x32" />
+      <link href="/favicon.ico" key="favicon" rel="icon" sizes="32x32" />
       <link
+        href={`/icon${colorScheme.mode === 'dark' ? '-dark' : '-light'}.svg`}
         key="svg-icon"
         rel="icon"
-        href={`/icon${colorScheme.mode === 'dark' ? '-dark' : '-light'}.svg`}
         type="image/svg+xml"
       />
-      <link key="apple-touch" rel="apple-touch-icon" href="/apple-touch-icon.png" />
-      <link key="manifest" rel="manifest" href="/manifest.webmanifest" />
+      <link href="/apple-touch-icon.png" key="apple-touch" rel="apple-touch-icon" />
+      <link href="/manifest.webmanifest" key="manifest" rel="manifest" />
       {/* Preload the error image */}
       <link
         as="image"

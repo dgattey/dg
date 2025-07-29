@@ -18,30 +18,30 @@ export const themeSelectorAttribute = 'data-theme';
  */
 export function getTheme(): Theme {
   const minimalThemeOptions = {
+    breakpoints: {
+      values: {
+        lg: 992,
+        md: 768,
+        sm: 576,
+        xl: 1200,
+        xs: 0,
+      },
+    },
+    colorSchemes: {
+      dark: {
+        extraShadows: getShadows('dark'),
+        palette: getPalette('dark'),
+      },
+      light: {
+        extraShadows: getShadows('light'),
+        palette: getPalette('light'),
+      },
+    },
     cssVariables: {
       colorSchemeSelector: themeSelectorAttribute,
     },
-    colorSchemes: {
-      light: {
-        palette: getPalette('light'),
-        extraShadows: getShadows('light'),
-      },
-      dark: {
-        palette: getPalette('dark'),
-        extraShadows: getShadows('dark'),
-      },
-    },
-    shape: getShape(),
-    breakpoints: {
-      values: {
-        xs: 0,
-        sm: 576,
-        md: 768,
-        lg: 992,
-        xl: 1200,
-      },
-    },
     extraShadows: getShadows('light'),
+    shape: getShape(),
   };
   const minimalTheme = createTheme(minimalThemeOptions);
 
@@ -49,31 +49,30 @@ export function getTheme(): Theme {
   const typography = getTypography(minimalTheme);
   const themeWithColorMode = createTheme({
     ...minimalThemeOptions,
-    typography,
     components: {
-      MuiCssBaseline: {
-        styleOverrides: (theme) => ({
-          ':root': {
-            wordBreak: 'break-word',
-            fontVariant: 'tabular-nums',
-            // Ensure while swapping themes, we have no animations
-            ':root[data-animations-enabled="false"] *': {
-              transition: 'none',
-            },
-            [theme.breakpoints.up('sm')]: {
-              fontSize: 16,
-            },
-            [theme.breakpoints.up('md')]: {
-              fontSize: 17,
-            },
-            [theme.breakpoints.up('lg')]: {
-              fontSize: 18,
-            },
-            [theme.breakpoints.up('xl')]: {
-              fontSize: 19,
-            },
-          },
-        }),
+      MuiButton: {
+        defaultProps: {
+          variant: 'contained',
+        },
+        styleOverrides: {
+          root: ({ theme }) => ({
+            borderRadius: theme.spacing(1),
+            padding: theme.spacing(0.75, 2),
+            textTransform: 'initial',
+          }),
+        },
+      },
+      MuiCard: {
+        styleOverrides: {
+          root: ({ theme }) => ({
+            background: theme.vars.palette.background.paper,
+            borderColor: theme.vars.palette.card.border,
+            borderRadius: theme.spacing(4),
+            borderStyle: 'solid',
+            borderWidth: 'thin',
+            boxShadow: theme.vars.extraShadows.card.main,
+          }),
+        },
       },
       MuiContainer: {
         defaultProps: {
@@ -98,7 +97,80 @@ export function getTheme(): Theme {
           }),
         },
       },
+      MuiCssBaseline: {
+        styleOverrides: (theme) => ({
+          ':root': {
+            // Ensure while swapping themes, we have no animations
+            ':root[data-animations-enabled="false"] *': {
+              transition: 'none',
+            },
+            fontVariant: 'tabular-nums',
+            wordBreak: 'break-word',
+            [theme.breakpoints.up('sm')]: {
+              fontSize: 16,
+            },
+            [theme.breakpoints.up('md')]: {
+              fontSize: 17,
+            },
+            [theme.breakpoints.up('lg')]: {
+              fontSize: 18,
+            },
+            [theme.breakpoints.up('xl')]: {
+              fontSize: 19,
+            },
+          },
+        }),
+      },
+      MuiLink: {
+        defaultProps: {
+          underline: 'hover',
+          variant: 'body1',
+        },
+        styleOverrides: {
+          root: ({ theme, ownerState: { color } }) => {
+            if (typeof color !== 'string') {
+              return {};
+            }
+            const paletteColor =
+              color in theme.vars.palette
+                ? theme.vars.palette[color as 'primary' | 'secondary' | 'info' | 'success']
+                : null;
+            if (!paletteColor) {
+              return {};
+            }
+            return {
+              '&:hover': {
+                color: paletteColor.dark,
+              },
+              color: paletteColor.main,
+              transition: theme.transitions.create('color'),
+            };
+          },
+        },
+      },
+      MuiTooltip: {
+        styleOverrides: {
+          tooltip: ({ theme }) => ({
+            ...theme.typography.caption,
+            background: theme.vars.palette.background.paper,
+            borderColor: theme.vars.palette.card.border,
+            borderRadius: theme.spacing(1.5),
+            borderStyle: 'solid',
+            borderWidth: 'thin',
+            boxShadow: theme.vars.extraShadows.card.main,
+            color: theme.vars.palette.text.primary,
+            padding: theme.spacing(0.5, 1.25),
+          }),
+        },
+      },
       MuiTypography: {
+        styleOverrides: {
+          root: {
+            textRendering: 'optimizeLegibility',
+            // Resets the original value
+            WebkitFontSmoothing: 'auto',
+          },
+        },
         variants: [
           {
             props: { variant: 'code' },
@@ -156,84 +228,9 @@ export function getTheme(): Theme {
             }),
           },
         ],
-        styleOverrides: {
-          root: {
-            // Resets the original value
-            WebkitFontSmoothing: 'auto',
-            textRendering: 'optimizeLegibility',
-          },
-        },
-      },
-      MuiLink: {
-        defaultProps: {
-          variant: 'body1',
-          underline: 'hover',
-        },
-        styleOverrides: {
-          root: ({ theme, ownerState: { color } }) => {
-            if (typeof color !== 'string') {
-              return {};
-            }
-            const paletteColor =
-              color in theme.vars.palette
-                ? theme.vars.palette[
-                    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-                    color as 'primary' | 'secondary' | 'info' | 'success'
-                  ]
-                : null;
-            if (!paletteColor) {
-              return {};
-            }
-            return {
-              color: paletteColor.main,
-              transition: theme.transitions.create('color'),
-              '&:hover': {
-                color: paletteColor.dark,
-              },
-            };
-          },
-        },
-      },
-      MuiButton: {
-        defaultProps: {
-          variant: 'contained',
-        },
-        styleOverrides: {
-          root: ({ theme }) => ({
-            textTransform: 'initial',
-            borderRadius: theme.spacing(1),
-            padding: theme.spacing(0.75, 2),
-          }),
-        },
-      },
-      MuiCard: {
-        styleOverrides: {
-          root: ({ theme }) => ({
-            background: theme.vars.palette.background.paper,
-            borderRadius: theme.spacing(4),
-            borderColor: theme.vars.palette.card.border,
-            borderWidth: 'thin',
-            borderStyle: 'solid',
-            boxShadow: theme.vars.extraShadows.card.main,
-          }),
-        },
-      },
-      MuiTooltip: {
-        styleOverrides: {
-          tooltip: ({ theme }) => ({
-            ...theme.typography.caption,
-            background: theme.vars.palette.background.paper,
-            borderRadius: theme.spacing(1.5),
-            borderColor: theme.vars.palette.card.border,
-            borderWidth: 'thin',
-            borderStyle: 'solid',
-            boxShadow: theme.vars.extraShadows.card.main,
-            padding: theme.spacing(0.5, 1.25),
-            color: theme.vars.palette.text.primary,
-          }),
-        },
       },
     },
+    typography,
   });
 
   return responsiveFontSizes(themeWithColorMode, {

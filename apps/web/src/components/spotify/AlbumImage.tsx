@@ -1,8 +1,8 @@
 import { Card } from '@mui/material';
 import type { Track } from 'api/spotify/Track';
-import { useLinkWithName } from 'hooks/useLinkWithName';
 import { Image } from 'ui/dependent/Image';
 import { Link } from 'ui/dependent/Link';
+import { useLinkWithName } from '../../hooks/useLinkWithName';
 
 type AlbumImageProps = {
   album: Track['album'];
@@ -29,28 +29,28 @@ export function AlbumImage({ album }: AlbumImageProps) {
 
   return (
     <Link
-      isExternal
+      isExternal={true}
       {...albumLink}
       href={albumLink.url}
       sx={{
-        transition: (theme) => theme.transitions.create(['transform']),
         '&:hover': {
           transform: 'scale(1.05)',
         },
+        transition: (theme) => theme.transitions.create(['transform']),
       }}
     >
       <Card
         sx={(theme) => ({
-          position: 'relative',
-          alignSelf: 'flex-end',
+          '--image-dim': `${IMAGE_SIZE}px`,
           alignContent: 'center',
+          alignSelf: 'flex-end',
+          aspectRatio: '1 / 1',
           borderRadius: 6,
           margin: 0,
-          padding: 0,
-          overflow: 'hidden',
-          aspectRatio: '1 / 1',
-          '--image-dim': `${IMAGE_SIZE}px`,
           minWidth: `var(--image-dim)`,
+          overflow: 'hidden',
+          padding: 0,
+          position: 'relative',
           transition: theme.transitions.create(['max-height', 'height']),
           [theme.breakpoints.down('md')]: {
             '--image-dim': `${(2 * IMAGE_SIZE) / 3}px`,
@@ -65,10 +65,10 @@ export function AlbumImage({ album }: AlbumImageProps) {
         <Image
           alt={album.name}
           {...albumImage}
+          fill={true}
           height={IMAGE_SIZE}
           sizes={{ extraLarge: IMAGE_SIZE }}
           width={IMAGE_SIZE}
-          fill
         />
       </Card>
     </Link>

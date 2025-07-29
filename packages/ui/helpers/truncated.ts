@@ -6,7 +6,7 @@ import type { SxProps } from '@mui/material';
  */
 export const truncated = (numberOfLines: number): SxProps => ({
   display: '-webkit-box',
-  WebkitLineClamp: numberOfLines,
-  WebkitBoxOrient: 'vertical',
   overflow: 'hidden',
+  WebkitBoxOrient: 'vertical',
+  WebkitLineClamp: numberOfLines,
 });

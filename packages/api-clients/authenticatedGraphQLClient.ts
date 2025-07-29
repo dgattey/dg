@@ -20,7 +20,7 @@ type ClientProps = {
 export const createClient = ({ endpoint, accessToken }: ClientProps) =>
   new GraphQLClient(endpoint, {
     headers: {
-      'content-type': 'application/json',
       authorization: `Bearer ${accessToken}`,
+      'content-type': 'application/json',
     },
   });

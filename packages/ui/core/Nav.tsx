@@ -13,12 +13,12 @@ export function NavGroup({ sx, children, ...props }: BoxProps) {
       {...props}
       sx={mixinSx(
         (theme) => ({
-          display: 'flex',
           alignItems: 'center',
+          display: 'flex',
+          flexWrap: 'wrap',
+          listStyle: 'none',
           margin: 0,
           padding: 0,
-          listStyle: 'none',
-          flexWrap: 'wrap',
           [theme.breakpoints.down('xs')]: {
             flexGrow: 1,
             justifyContent: 'space-between',
@@ -43,12 +43,12 @@ export function NavItem({ sx, children, ...props }: TypographyProps) {
       {...props}
       sx={mixinSx(
         (theme) => ({
-          display: 'inline-block',
-          margin: 0,
-          paddingY: 2,
-          paddingX: 1,
           ':first-of-type': { paddingLeft: 0 },
           ':last-of-type': { paddingRight: 0 },
+          display: 'inline-block',
+          margin: 0,
+          paddingX: 1,
+          paddingY: 2,
 
           [theme.breakpoints.down('md')]: {
             paddingX: 0.5,
@@ -72,12 +72,12 @@ export function Nav({ sx, children, ...props }: ContainerProps) {
   return (
     <Container
       component="nav"
-      fixed
+      fixed={true}
       {...props}
       sx={mixinSx(
         {
-          justifyContent: 'space-between',
           display: 'flex',
+          justifyContent: 'space-between',
         },
         sx,
       )}
