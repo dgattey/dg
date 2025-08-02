@@ -2,7 +2,11 @@
 # On other branches, will dry-run the release version to see what we'll release when deployed
 name: Release
 on:
-  - push
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize]
 
 env:
   VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
@@ -19,10 +23,12 @@ jobs:
   get-version:
     timeout-minutes: 5
     name: 'Dry run of release version'
-    if: github.event_name == 'pull_request' || (github.event_name == 'push' && github.ref != 'refs/heads/main')
+    if: github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
@@ -34,7 +40,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         id: dry-run-release
         run: |
-          OUTPUT=$(pnpm turbo release -- --dry-run --branches="main, ${{ github.ref_name }}" 2>&1)
+          OUTPUT=$(pnpm turbo release -- --dry-run --branches="main, ${{ github.head_ref }}" 2>&1)
           echo "$OUTPUT"
 
           # Common version pattern
@@ -67,28 +73,8 @@ jobs:
               
             const body = `${versionInfo}\n\nThis PR will trigger a release of version \`v${nextVersion}\` when merged to main.\n\n📋 [View Release Preview Job](${runUrl}) - See the full dry-run details`;
 
-            // Try to find PR - either from event context or by searching
-            let prNumber = null;
-
-            if (context.payload.pull_request) {
-              prNumber = context.payload.pull_request.number;
-            } else {
-              // Search for PR associated with this branch
-              const { data: prs } = await github.rest.pulls.list({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                head: `${context.repo.owner}:${context.ref.replace('refs/heads/', '')}`,
-                state: 'open'
-              });
-              if (prs.length > 0) {
-                prNumber = prs[0].number;
-              }
-            }
-
-            if (!prNumber) {
-              console.log('No PR found to comment on');
-              return;
-            }
+            // Get PR number from context (always available since this only runs on PR events)
+            const prNumber = context.payload.pull_request.number;
 
             // Find existing comment to update or create new one
             const { data: comments } = await github.rest.issues.listComments({

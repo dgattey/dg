@@ -12,10 +12,10 @@
   },
   "dependencies": {
     "dotenv-mono": "catalog:",
-    "vercel": "44.6.3"
+    "vercel": "44.7.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.1.2",
+    "@biomejs/biome": "^2.1.3",
     "tsconfig": "workspace:*",
     "turbo": "2.5.5",
     "typescript": "catalog:"
@@ -23,5 +23,5 @@
   "engines": {
     "node": ">=20"
   },
-  "packageManager": "pnpm@10.13.1"
+  "packageManager": "pnpm@10.14.0"
 }
