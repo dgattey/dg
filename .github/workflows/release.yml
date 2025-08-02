@@ -77,7 +77,7 @@ jobs:
               const { data: prs } = await github.rest.pulls.list({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                head: `${context.repo.owner}:${context.ref.replace('refs/heads/', '')}`,
+                head: context.ref.replace('refs/heads/', ''),
                 state: 'open'
               });
               if (prs.length > 0) {
