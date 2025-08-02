@@ -3,7 +3,9 @@
 name: Release
 on:
   push:
+    branches: [main]
   pull_request:
+    branches: [main]
     types: [opened, synchronize]
 
 env:
@@ -25,6 +27,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.head_ref }}
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
