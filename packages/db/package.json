@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "@logtail/next": "catalog:",
-    "@types/pg": "8.15.4",
+    "@types/pg": "8.15.5",
     "dotenv-mono": "catalog:",
     "pg": "8.16.3",
     "sequelize": "6.37.7",
