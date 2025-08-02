@@ -2,7 +2,9 @@
 # On other branches, will dry-run the release version to see what we'll release when deployed
 name: Release
 on:
-  - push
+  push:
+  pull_request:
+    types: [opened, synchronize, reopened]
 
 env:
   VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
@@ -34,7 +36,8 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         id: dry-run-release
         run: |
-          OUTPUT=$(pnpm turbo release -- --dry-run --branches="main, ${{ github.ref_name }}" 2>&1)
+          BRANCH_NAME="${{ github.event_name == 'pull_request' && github.head_ref || github.ref_name }}"
+          OUTPUT=$(pnpm turbo release -- --dry-run --branches="main, $BRANCH_NAME" 2>&1)
           echo "$OUTPUT"
 
           # Common version pattern
@@ -73,7 +76,7 @@ jobs:
             if (context.payload.pull_request) {
               prNumber = context.payload.pull_request.number;
             } else {
-              // Search for PR associated with this branch
+              // Search for PR associated with this branch (for push events)
               const { data: prs } = await github.rest.pulls.list({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
