@@ -25,8 +25,8 @@ catalogs:
       specifier: 19.1.9
       version: 19.1.9
     dotenv-mono:
-      specifier: 1.4.0
-      version: 1.4.0
+      specifier: 1.5.0
+      version: 1.5.0
     graphql-request:
       specifier: 7.2.0
       version: 7.2.0
@@ -51,8 +51,8 @@ importers:
   .:
     dependencies:
       dotenv-mono:
-        specifier: 'catalog:'
-        version: 1.4.0
+        specifier: 1.5.0
+        version: 1.5.0
       vercel:
         specifier: 44.7.0
         version: 44.7.0
@@ -116,7 +116,7 @@ importers:
         version: link:../../packages/api
       dotenv-mono:
         specifier: 'catalog:'
-        version: 1.4.0
+        version: 1.5.0
       lucide-react:
         specifier: 'catalog:'
         version: 0.536.0(react@19.1.1)
@@ -181,7 +181,7 @@ importers:
         version: 24.1.0
       dotenv-mono:
         specifier: 'catalog:'
-        version: 1.4.0
+        version: 1.5.0
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -209,7 +209,7 @@ importers:
         version: 24.1.0
       dotenv-mono:
         specifier: 'catalog:'
-        version: 1.4.0
+        version: 1.5.0
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -237,7 +237,7 @@ importers:
         version: 4.6.1(graphql@16.11.0)
       dotenv-mono:
         specifier: 'catalog:'
-        version: 1.4.0
+        version: 1.5.0
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -255,7 +255,7 @@ importers:
         version: 8.15.5
       dotenv-mono:
         specifier: 'catalog:'
-        version: 1.4.0
+        version: 1.5.0
       pg:
         specifier: 8.16.3
         version: 8.16.3
@@ -320,7 +320,7 @@ importers:
         version: 19.1.7(@types/react@19.1.9)
       dotenv-mono:
         specifier: 'catalog:'
-        version: 1.4.0
+        version: 1.5.0
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -351,7 +351,7 @@ importers:
         version: 19.1.9
       dotenv-mono:
         specifier: 'catalog:'
-        version: 1.4.0
+        version: 1.5.0
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -378,7 +378,7 @@ importers:
         version: 24.1.0
       dotenv-mono:
         specifier: 'catalog:'
-        version: 1.4.0
+        version: 1.5.0
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -429,7 +429,7 @@ importers:
         version: 19.1.9
       dotenv-mono:
         specifier: 'catalog:'
-        version: 1.4.0
+        version: 1.5.0
       tsconfig:
         specifier: workspace:*
         version: link:../tsconfig
@@ -450,7 +450,7 @@ importers:
         version: 0.13.0
       dotenv-mono:
         specifier: 'catalog:'
-        version: 1.4.0
+        version: 1.5.0
       node-fetch:
         specifier: 3.3.2
         version: 3.3.2
@@ -2676,8 +2676,8 @@ packages:
     resolution: {integrity: sha512-lXpXz2ZE1cea1gL4sz2Ipj8y4PiVjytYr3Ij0SWoms1PGxIv7m2CRKuRuCRtHdVuvM/hNJPMxt5PbhboNC4dPQ==}
     engines: {node: '>=12'}
 
-  dotenv-mono@1.4.0:
-    resolution: {integrity: sha512-e2QidC5oRfUzXBWJltrVrQMTSH3HS8B8fRQrOkKgZdeRB8+HUgJoAwaLjzc15fpTTde/tyifW0r1JTH1DjIGKA==}
+  dotenv-mono@1.5.0:
+    resolution: {integrity: sha512-NbUOwLw8vAXuEGAmTvbZZ/gKichKeNqjYIWbz4XSh4KxekY4Kr1ZRtc5W/UvAgECxsEo/FUsiuMuqQ7cxGYsVA==}
     hasBin: true
 
   dotenv@16.6.1:
@@ -7766,7 +7766,7 @@ snapshots:
     dependencies:
       dotenv: 16.6.1
 
-  dotenv-mono@1.4.0:
+  dotenv-mono@1.5.0:
     dependencies:
       cross-spawn: 7.0.6
       dotenv: 17.2.1
