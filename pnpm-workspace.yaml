@@ -6,13 +6,13 @@ catalog:
   '@fortawesome/free-brands-svg-icons': 7.0.0
   '@graphql-codegen/cli': 5.0.7
   '@logtail/next': 0.2.1
-  '@mui/material': 7.2.0
+  '@mui/material': 7.3.1
   '@types/node': 24.1.0
-  '@types/react': 19.1.9
-  dotenv-mono: 1.4.0
+  '@types/react': 19.1.10
+  dotenv-mono: 1.5.0
   graphql-request: 7.2.0
-  lucide-react: 0.536.0
-  next: 15.4.5
+  lucide-react: 0.539.0
+  next: 15.4.6
   react: 19.1.1
   typescript: 5.9.2
   wretch: 2.11.0
