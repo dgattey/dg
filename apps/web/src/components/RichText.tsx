@@ -3,7 +3,8 @@ import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import { Divider, Stack, Typography } from '@mui/material';
-import type { Asset, Entry, TextBlockContent } from 'api/contentful/api.generated';
+import type { Asset, Entry } from 'api/contentful/api.generated';
+import type { IntroBlockQuery } from 'api/contentful/fetchIntroContent.generated';
 import { isLink, isProject } from 'api/contentful/parsers';
 import { isNotNullish } from 'shared-core/helpers/typeguards';
 import { Image } from 'ui/dependent/Image';
@@ -12,7 +13,9 @@ import { PROJECT_MAX_IMAGE_DIMENSION } from 'ui/helpers/imageSizes';
 import type { SxProps } from 'ui/theme';
 import { ProjectCard } from './homepage/ProjectCard';
 
-type RichTextProps = TextBlockContent & {
+type RichTextProps = NonNullable<
+  NonNullable<IntroBlockQuery['textBlockCollection']>['items'][0]
+>['content'] & {
   sx?: SxProps;
 };
 
@@ -122,16 +125,20 @@ function HeadingWithId({
 /**
  * Takes links and converts them into rich text through rendering specific types of content.
  */
-const renderOptions = (links: TextBlockContent['links']): Options => {
-  // Map the assets
+const renderOptions = (links: RichTextProps['links']): Options => {
+  // Map the assets - we only need the sys.id for mapping, and we'll cast as Asset for rendering
   const assetMap = new Map<string, Asset>();
-  links.assets.block.filter(isNotNullish).forEach((asset) => assetMap.set(asset.sys.id, asset));
+  links.assets.block.filter(isNotNullish).forEach((asset) => {
+    assetMap.set(asset.sys.id, asset as unknown as Asset);
+  });
 
   // Map the inline and block entries
   const entryMap = new Map<string, Entry>();
-  [...links.entries.block, ...links.entries.inline]
-    .filter(isNotNullish)
-    .forEach((entry) => entryMap.set(entry.sys.id, entry));
+  [...links.entries.block, ...links.entries.inline].filter(isNotNullish).forEach((entry) => {
+    if ('sys' in entry && entry.sys?.id) {
+      entryMap.set(entry.sys.id, entry as unknown as Entry);
+    }
+  });
 
   return {
     renderNode: {

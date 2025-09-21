@@ -2,12 +2,12 @@
   "devDependencies": {
     "@graphql-codegen/cli": "catalog:",
     "@types/node": "catalog:",
-    "cmd-ts": "0.13.0",
+    "cmd-ts": "0.14.2",
     "dotenv-mono": "catalog:",
     "node-fetch": "3.3.2",
     "shared-core": "workspace:*",
     "tsconfig": "workspace:*",
-    "tsx": "4.20.3",
+    "tsx": "4.20.5",
     "typescript": "catalog:"
   },
   "main": "webhookCommand.ts",

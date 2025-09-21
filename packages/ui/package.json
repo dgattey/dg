@@ -1,15 +1,15 @@
 {
   "dependencies": {
-    "@fortawesome/fontawesome-svg-core": "7.0.0",
+    "@fortawesome/fontawesome-svg-core": "7.0.1",
     "@fortawesome/free-brands-svg-icons": "catalog:",
-    "@fortawesome/react-fontawesome": "0.2.3",
+    "@fortawesome/react-fontawesome": "3.0.2",
     "@mui/material": "catalog:",
     "api": "workspace:*",
     "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
     "shared-core": "workspace:*",
-    "sharp": "0.34.3",
+    "sharp": "0.34.4",
     "use-breakpoint": "4.0.6"
   },
   "devDependencies": {

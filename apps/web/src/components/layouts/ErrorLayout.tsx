@@ -18,7 +18,7 @@ type ErrorLayoutProps = {
 export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
   const pageTitle = statusCode === 404 ? 'Page not found' : 'Oops!';
   const {
-    colorScheme: { isInitialized, mode },
+    colorScheme: { isInitialized },
   } = useColorScheme();
   return (
     <>
@@ -39,12 +39,6 @@ export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
             fontWeight: 900,
             WebkitBackgroundClip: 'text',
             WebkitTextStroke: '1px',
-            WebkitTextStrokeColor: (theme) =>
-              isInitialized
-                ? mode === 'light'
-                  ? `hsl(from ${theme.vars.palette.background.paper} h s calc(l * 0.4))`
-                  : `hsl(from ${theme.vars.palette.background.paper} h s calc(l + (100 - l) * 0.1))`
-                : null,
           }}
           variant="h1"
         >
