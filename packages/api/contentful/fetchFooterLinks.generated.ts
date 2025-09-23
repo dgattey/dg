@@ -15,7 +15,7 @@ export type FooterQuery = {
                           readonly url: string | undefined;
                           readonly icon: string | undefined;
                         }
-                      | {}
+                      | Record<PropertyKey, never>
                       | undefined
                     >;
                   }

@@ -34,12 +34,12 @@ export function Marker({ point, image }: MarkerProps) {
             r={RADIUS}
             sx={(theme) => ({ fill: theme.vars.palette.map.markerBackground })}
           />
-          <clipPath id="clip">
+          <clipPath id={`clip-${id}`}>
             <use xlinkHref={`#${id}`} />
           </clipPath>
         </defs>
         <Box
-          clipPath="url(#clip)"
+          clipPath={`url(#clip-${id})`}
           component="use"
           strokeWidth="2"
           sx={{

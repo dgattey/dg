@@ -25,8 +25,9 @@ export type IntroBlockQuery = {
                               readonly title: string | undefined;
                               readonly url: string | undefined;
                               readonly icon: string | undefined;
+                              readonly sys: { readonly id: string };
                             }
-                          | {}
+                          | Record<PropertyKey, never>
                           | undefined
                         >;
                         readonly block: ReadonlyArray<
@@ -34,8 +35,9 @@ export type IntroBlockQuery = {
                               readonly title: string | undefined;
                               readonly url: string | undefined;
                               readonly icon: string | undefined;
+                              readonly sys: { readonly id: string };
                             }
-                          | {}
+                          | Record<PropertyKey, never>
                           | undefined
                         >;
                       };

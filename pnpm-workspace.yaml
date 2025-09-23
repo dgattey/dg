@@ -3,16 +3,16 @@ packages:
   - apps/*
 
 catalog:
-  '@fortawesome/free-brands-svg-icons': 7.0.0
-  '@graphql-codegen/cli': 5.0.7
+  '@fortawesome/free-brands-svg-icons': 7.0.1
+  '@graphql-codegen/cli': 6.0.0
   '@logtail/next': 0.2.1
-  '@mui/material': 7.2.0
-  '@types/node': 24.1.0
-  '@types/react': 19.1.9
-  dotenv-mono: 1.4.0
+  '@mui/material': 7.3.2
+  '@types/node': 24.5.2
+  '@types/react': 19.1.13
+  dotenv-mono: 1.5.1
   graphql-request: 7.2.0
-  lucide-react: 0.536.0
-  next: 15.4.5
+  lucide-react: 0.544.0
+  next: 15.5.3
   react: 19.1.1
   typescript: 5.9.2
   wretch: 2.11.0

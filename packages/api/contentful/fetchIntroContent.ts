@@ -1,8 +1,6 @@
 import { gql } from 'graphql-request';
-import type { TextBlock } from './api.generated';
 import { contentfulClient } from './contentfulClient';
 import type { IntroBlockQuery } from './fetchIntroContent.generated';
-import { isTextBlock } from './parsers';
 
 /**
  * Grabs the contentful sections with the title of header. Should
@@ -30,6 +28,9 @@ const QUERY = gql`
             entries {
               inline {
                 ... on Link {
+                  sys {
+                    id
+                  }
                   title
                   url
                   icon
@@ -37,6 +38,9 @@ const QUERY = gql`
               }
               block {
                 ... on Link {
+                  sys {
+                    id
+                  }
                   title
                   url
                   icon
@@ -67,7 +71,11 @@ const QUERY = gql`
  * for the home page.
  */
 export async function fetchIntroContent(): Promise<null | {
-  textBlock: TextBlock;
+  textBlock: {
+    content: NonNullable<
+      NonNullable<IntroBlockQuery['textBlockCollection']>['items'][0]
+    >['content'];
+  };
   image: {
     url: string | undefined;
     width: number | undefined;
@@ -76,10 +84,10 @@ export async function fetchIntroContent(): Promise<null | {
   };
 }> {
   const data = await contentfulClient.request<IntroBlockQuery>(QUERY);
-  const textBlock = data.textBlockCollection?.items.filter(isTextBlock)[0];
+  const textBlockItem = data.textBlockCollection?.items.filter((item) => item?.content?.json)[0];
   const image = data.asset;
-  if (textBlock && image) {
-    return { image, textBlock };
+  if (textBlockItem?.content && image) {
+    return { image, textBlock: { content: textBlockItem.content } };
   }
   return null;
 }
