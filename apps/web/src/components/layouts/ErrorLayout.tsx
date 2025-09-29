@@ -25,28 +25,27 @@ export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
       <Meta description="An error occurred" title={pageTitle} />
       <Stack component={Section} sx={{ alignItems: 'center', gap: 3, marginTop: -8 }}>
         <Typography
-          sx={{
+          sx={(theme) => ({
             backgroundClip: 'text',
-            backgroundImage: 'url(/images/error-small.jpg)',
+            backgroundImage: 'url(/images/error-small.webp)',
             backgroundSize: 'cover',
             color: 'transparent',
-            filter: (theme) =>
-              isInitialized
-                ? `drop-shadow(2px 2px 12px hsl(from ${theme.vars.palette.secondary.dark} h s calc(l * 0.2) / 0.4))`
-                : null,
+            filter: isInitialized
+              ? `drop-shadow(2px 2px 12px hsl(from ${theme.vars.palette.secondary.dark} h s calc(l * 0.2) / 0.4))`
+              : null,
             fontSize: '280px !important',
             fontStretch: 'extra-expanded',
             fontWeight: 900,
             WebkitBackgroundClip: 'text',
-            WebkitTextStroke: '1px',
-          }}
+            WebkitTextStroke: `1px ${theme.vars.palette.secondary.main}`,
+          })}
           variant="h1"
         >
           {statusCode}
         </Typography>
         <Typography sx={{ maxWidth: '26em', textWrap: 'balance' }} textAlign="center" variant="h5">
           {statusCode === 404
-            ? 'Sorry, got lost in the jungle. Email me if something is wrong.'
+            ? 'Sorry, couldn‘t find that page. Email me if something is wrong.'
             : 'Something went super wrong, sorry. Email me to let me know.'}
         </Typography>
         <Link

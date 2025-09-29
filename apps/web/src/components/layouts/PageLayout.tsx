@@ -1,4 +1,5 @@
-import { Container } from '@mui/material';
+import Box from '@mui/material/Box';
+import Container from '@mui/material/Container';
 import type { EndpointKey } from 'api/endpoints';
 import type { FetchedFallbackData } from 'api/fetchFallbackData';
 import { useRef } from 'react';
@@ -38,7 +39,7 @@ export function PageLayout<Key extends EndpointKey>({ children, fallback }: Page
       <ScrollIndicatorContext.Provider value={isIndicatorShown}>
         <Header headerRef={headerSizingRef} />
         <Container component={Section} sx={{ marginTop: 16 }}>
-          <div aria-hidden={true} ref={ref} style={{ height: 0, width: 0 }} />
+          <Box aria-hidden={true} ref={ref} sx={{ height: 0, width: 0 }} />
           <main>{children}</main>
         </Container>
         <Footer />

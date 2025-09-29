@@ -55,10 +55,12 @@ export function Footer() {
         />
         <Nav
           sx={(theme) => ({
+            alignItems: 'center',
             columnGap: 3,
             flexDirection: 'row',
             flexWrap: 'wrap-reverse',
             [theme.breakpoints.down('sm')]: {
+              alignItems: 'stretch',
               flexDirection: 'column-reverse',
             },
           })}

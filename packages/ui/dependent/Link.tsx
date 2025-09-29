@@ -5,6 +5,7 @@ import type { ButtonProps, LinkProps as MuiLinkProps } from '@mui/material';
 import { Button, Link as MuiLink, Tooltip } from '@mui/material';
 import { Github, Instagram, Send } from 'lucide-react';
 import NextLink from 'next/link';
+import React from 'react';
 import { FaIcon } from '../icons/FaIcon';
 import type { SxProps } from '../theme';
 
@@ -78,18 +79,21 @@ function createIconElement({
  * or defaults to `icon` if one is specified, otherwise `text`. Returns
  * null if no link at all.
  */
-export function Link({
-  title,
-  href,
-  icon,
-  children,
-  isButton,
-  isExternal,
-  layout: initialLayout = 'text',
-  sx,
-  linkProps,
-  buttonProps,
-}: LinkProps) {
+export const Link = React.forwardRef<HTMLElement, LinkProps>(function Link(
+  {
+    title,
+    href,
+    icon,
+    children,
+    isButton,
+    isExternal,
+    layout: initialLayout = 'text',
+    sx,
+    linkProps,
+    buttonProps,
+  },
+  ref,
+) {
   /**
    * Generates a layout enum for use in computing the contents
    */
@@ -141,14 +145,14 @@ export function Link({
   return (
     <Tooltip placement="top" title={tooltipTitle}>
       {isButton ? (
-        <Button {...buttonProps} {...sharedProps}>
+        <Button {...buttonProps} {...sharedProps} ref={ref as React.Ref<HTMLButtonElement>}>
           {contents}
         </Button>
       ) : (
-        <MuiLink {...linkProps} {...sharedProps}>
+        <MuiLink {...linkProps} {...sharedProps} ref={ref as React.Ref<HTMLAnchorElement>}>
           {contents}
         </MuiLink>
       )}
     </Tooltip>
   );
-}
+});

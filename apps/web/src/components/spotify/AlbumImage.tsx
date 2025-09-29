@@ -2,6 +2,7 @@ import { Card } from '@mui/material';
 import type { Track } from 'api/spotify/Track';
 import { Image } from 'ui/dependent/Image';
 import { Link } from 'ui/dependent/Link';
+import { bouncyTransition } from 'ui/helpers/bouncyTransition';
 import { useLinkWithName } from '../../hooks/useLinkWithName';
 
 type AlbumImageProps = {
@@ -32,12 +33,12 @@ export function AlbumImage({ album }: AlbumImageProps) {
       isExternal={true}
       {...albumLink}
       href={albumLink.url}
-      sx={{
+      sx={(theme) => ({
         '&:hover': {
           transform: 'scale(1.05)',
         },
-        transition: (theme) => theme.transitions.create(['transform']),
-      }}
+        ...bouncyTransition(theme, ['transform']),
+      })}
     >
       <Card
         sx={(theme) => ({
@@ -51,7 +52,7 @@ export function AlbumImage({ album }: AlbumImageProps) {
           overflow: 'hidden',
           padding: 0,
           position: 'relative',
-          transition: theme.transitions.create(['max-height', 'height']),
+          ...bouncyTransition(theme, ['max-height', 'height']),
           [theme.breakpoints.down('md')]: {
             '--image-dim': `${(2 * IMAGE_SIZE) / 3}px`,
             borderRadius: 4,
