@@ -93,14 +93,6 @@ export function Meta({ title, description }: MetaProps) {
       />
       <link href="/apple-touch-icon.png" key="apple-touch" rel="apple-touch-icon" />
       <link href="/manifest.webmanifest" key="manifest" rel="manifest" />
-      {/* Preload the error image */}
-      <link
-        as="image"
-        href="/images/error-small.jpg"
-        key="preload-error-image"
-        rel="preload"
-        type="image/jpeg"
-      />
     </Head>
   );
 }

@@ -16,6 +16,7 @@ export function NavGroup({ sx, children, ...props }: BoxProps) {
           alignItems: 'center',
           display: 'flex',
           flexWrap: 'wrap',
+          height: '100%',
           listStyle: 'none',
           margin: 0,
           padding: 0,
@@ -47,14 +48,14 @@ export function NavItem({ sx, children, ...props }: TypographyProps) {
           ':last-of-type': { paddingRight: 0 },
           display: 'inline-block',
           margin: 0,
-          paddingX: 1,
-          paddingY: 2,
+          paddingBlock: 2,
+          paddingInline: 1,
 
           [theme.breakpoints.down('md')]: {
-            paddingX: 0.5,
+            paddingInline: 0.5,
           },
           [theme.breakpoints.down('sm')]: {
-            paddingX: 0.25,
+            paddingInline: 0.25,
           },
         }),
         sx,
@@ -78,6 +79,7 @@ export function Nav({ sx, children, ...props }: ContainerProps) {
         {
           display: 'flex',
           justifyContent: 'space-between',
+          paddingBlockStart: 2,
         },
         sx,
       )}

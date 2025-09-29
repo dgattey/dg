@@ -1,6 +1,4 @@
 import { useData } from 'api/useData';
-import { useState } from 'react';
-import { HoverableContainer } from 'ui/core/HoverableContainer';
 import { ContentCard } from 'ui/dependent/ContentCard';
 import { Image } from 'ui/dependent/Image';
 import { useCurrentImageSizes } from 'ui/helpers/useCurrentImageSizes';
@@ -21,7 +19,6 @@ const SMALL_IMAGE_SIZE = '16em';
 export function IntroCard() {
   const { data: introBlock } = useData('intro');
   const linkedInLink = useLinkWithName('LinkedIn');
-  const [isHovered, setIsHovered] = useState(false);
   const { width, height, sizes } = useCurrentImageSizes();
 
   if (!introBlock?.textBlock.content) {
@@ -32,12 +29,6 @@ export function IntroCard() {
     <>
       <ContentCard
         link={linkedInLink}
-        onMouseOut={() => {
-          setIsHovered(false);
-        }}
-        onMouseOver={() => {
-          setIsHovered(true);
-        }}
         overlay="About"
         overlaySx={(theme) => ({
           [theme.breakpoints.down('md')]: {
@@ -52,16 +43,14 @@ export function IntroCard() {
           },
         })}
       >
-        <HoverableContainer isHovered={isHovered}>
-          <Image
-            alt={introBlock.image.title ?? 'Introduction image'}
-            height={height}
-            priority={true}
-            sizes={sizes}
-            url={introBlock.image.url}
-            width={width}
-          />
-        </HoverableContainer>
+        <Image
+          alt={introBlock.image.title ?? 'Introduction image'}
+          height={height}
+          priority={true}
+          sizes={sizes}
+          url={introBlock.image.url}
+          width={width}
+        />
       </ContentCard>
       <ContentCard
         sx={{

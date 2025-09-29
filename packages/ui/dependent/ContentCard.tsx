@@ -1,6 +1,9 @@
 import type { Theme } from '@mui/material';
 import { Card, Typography } from '@mui/material';
 import type { Link } from 'api/contentful/api.generated';
+import { useState } from 'react';
+import { GlassContainer } from '../core/GlassContainer';
+import { bouncyTransition } from '../helpers/bouncyTransition';
 import { mixinSx } from '../helpers/mixinSx';
 import { truncated } from '../helpers/truncated';
 import type { SxProps } from '../theme';
@@ -50,10 +53,12 @@ function getCardSx(
   theme: Theme,
   {
     isClickable,
+    isHovered,
     horizontalSpan,
     verticalSpan,
   }: {
     isClickable: boolean;
+    isHovered: boolean;
     horizontalSpan: number;
     verticalSpan: number | null;
   },
@@ -65,7 +70,9 @@ function getCardSx(
     },
     overflow: 'hidden',
     position: 'relative',
-    transition: theme.transitions.create(['width', 'height', 'box-shadow', 'border-color']),
+
+    transform: `scale(${isHovered && isClickable ? 1.05 : 1})`,
+    ...bouncyTransition(theme, ['transform', 'box-shadow', 'border-color']),
     willChange: 'transform',
     ...(isClickable && {
       '&:hover': {
@@ -74,10 +81,14 @@ function getCardSx(
       },
       cursor: 'pointer',
     }),
+
+    [theme.breakpoints.down('sm')]: {
+      width: '85vw',
+    },
     [theme.breakpoints.down('md')]: {
       justifySelf: 'center',
       maxWidth: '85vw',
-      minWidth: 'min(fit-content, 85vw)',
+      width: '100%',
     },
     [theme.breakpoints.up('md')]: {
       ...(verticalSpan && {
@@ -136,16 +147,21 @@ function LinkWrappedChildren({ children, link, overlayContents }: LinkWrappedChi
 /**
  * Overlay content if it's defined
  */
-function OverlayContent({ overlay, sx }: { overlay: NonNullable<React.ReactNode>; sx?: SxProps }) {
+function OverlayContent({
+  overlay,
+  sx,
+  isHovered,
+}: {
+  overlay: NonNullable<React.ReactNode>;
+  sx?: SxProps;
+  isHovered: boolean;
+}) {
   return (
-    <Card
+    <GlassContainer
       sx={mixinSx(
         (theme) => ({
-          '&:hover': {
-            boxShadow: theme.vars.extraShadows.card.overlayHovered,
-          },
+          background: `color-mix(in srgb, ${theme.vars.palette.background.default} 60%, transparent)`,
           bottom: theme.spacing(2.5),
-          boxShadow: theme.vars.extraShadows.card.overlayHovered,
           left: theme.spacing(2.5),
           margin: 0,
           paddingBottom: theme.spacing(1),
@@ -153,15 +169,17 @@ function OverlayContent({ overlay, sx }: { overlay: NonNullable<React.ReactNode>
           paddingRight: theme.spacing(1.75),
           paddingTop: theme.spacing(1),
           position: 'absolute',
+          transform: `translateY(${isHovered ? theme.spacing(1) : 0}) translateX(${isHovered ? theme.spacing(-1) : 0})`,
           zIndex: 1,
+          ...bouncyTransition(theme, ['transform']),
         }),
         sx,
       )}
     >
-      <Typography sx={truncated(1)} variant="h5">
+      <Typography sx={{ ...truncated(1) }} variant="h5">
         {overlay}
       </Typography>
-    </Card>
+    </GlassContainer>
   );
 }
 
@@ -179,14 +197,28 @@ export function ContentCard({
   ...props
 }: ContentCardProps) {
   const isClickable = Boolean(link);
+  const [isHovered, setIsHovered] = useState(false);
   return (
     <Card
-      sx={mixinSx((theme) => getCardSx(theme, { horizontalSpan, isClickable, verticalSpan }), sx)}
+      onMouseOut={() => {
+        setIsHovered(false);
+      }}
+      onMouseOver={() => {
+        setIsHovered(true);
+      }}
+      sx={mixinSx(
+        (theme) => getCardSx(theme, { horizontalSpan, isClickable, isHovered, verticalSpan }),
+        sx,
+      )}
       {...props}
     >
       <LinkWrappedChildren
         link={link}
-        overlayContents={overlay ? <OverlayContent overlay={overlay} sx={overlaySx} /> : null}
+        overlayContents={
+          overlay ? (
+            <OverlayContent isHovered={isHovered && isClickable} overlay={overlay} sx={overlaySx} />
+          ) : null
+        }
       >
         {children}
       </LinkWrappedChildren>
