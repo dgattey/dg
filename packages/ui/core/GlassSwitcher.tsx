@@ -1,6 +1,6 @@
 import { Box, Radio, RadioGroup, Tooltip } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { bouncyTransition } from '../helpers/bouncyTransition';
 import { mixinSx } from '../helpers/mixinSx';
 import { useDebounce } from '../helpers/useDebounce';
@@ -12,6 +12,20 @@ interface ThumbStyles {
   left: number;
   top: number;
   width: number;
+}
+
+function getThumbStyles(item: HTMLElement | null | undefined): ThumbStyles | null {
+  if (!item) {
+    return null;
+  }
+
+  const { offsetLeft, offsetWidth, offsetHeight, offsetTop } = item;
+  return {
+    height: offsetHeight,
+    left: offsetLeft,
+    top: offsetTop,
+    width: offsetWidth,
+  };
 }
 
 interface SelectionThumbProps {
@@ -114,25 +128,12 @@ function useThumbPosition(selectedIndex: number) {
   });
   const itemRefs = useRef<Array<HTMLElement | null>>([]);
 
-  // Function to update thumb position
-  const updateThumbPosition = useCallback((index: number) => {
-    if (index >= 0 && itemRefs.current[index]) {
-      const selectedItem = itemRefs.current[index];
-      if (selectedItem) {
-        const { offsetLeft, offsetWidth, offsetHeight, offsetTop } = selectedItem;
-        setThumbStyles({
-          height: offsetHeight,
-          left: offsetLeft,
-          top: offsetTop,
-          width: offsetWidth,
-        });
-      }
-    }
-  }, []);
-
   // Update thumb position and trigger animation when selection changes
   useEffect(() => {
-    updateThumbPosition(selectedIndex);
+    const nextStyles = getThumbStyles(itemRefs.current[selectedIndex]);
+    if (nextStyles) {
+      setThumbStyles(nextStyles);
+    }
 
     // Trigger scale animation
     setIsAnimating(true);
@@ -141,11 +142,14 @@ function useThumbPosition(selectedIndex: number) {
     }, 250); // Use standard short animation duration
 
     return () => clearTimeout(timer);
-  }, [selectedIndex, updateThumbPosition]);
+  }, [selectedIndex]);
 
   // Debounced resize handler
   const debouncedResizeComplete = useDebounce(() => {
-    updateThumbPosition(selectedIndex);
+    const nextStyles = getThumbStyles(itemRefs.current[selectedIndex]);
+    if (nextStyles) {
+      setThumbStyles(nextStyles);
+    }
     setIsResizing(false);
   }, 300);
 

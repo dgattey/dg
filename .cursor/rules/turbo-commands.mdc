@@ -1,0 +1,14 @@
+---
+description: Prefer Turbo commands for running scripts
+alwaysApply: true
+---
+# Turbo Commands
+
+- Use `turbo run <task>` to run workspace scripts.
+- Add `--filter=<package>` when targeting a specific app/package.
+- Use `pnpm` only for dependency management (install/add/remove/update).
+
+Examples:
+- `turbo run build --filter=web`
+- `turbo run check`
+- `pnpm add -D <pkg> -F web`

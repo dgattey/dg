@@ -27,11 +27,12 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  reactCompiler: true,
   reactStrictMode: true,
   // Disables the Sequelize warning about the `sequelize` package not being found
   serverExternalPackages: ['sequelize'],
   // Have to do this for each of the packages we import
-  transpilePackages: ['shared-core', 'api', 'ui'],
+  transpilePackages: ['shared-core', 'api', 'ui', 'maps', 'og'],
 };
 
 export default withLogtail(nextConfig);

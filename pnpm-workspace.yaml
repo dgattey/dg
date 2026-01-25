@@ -9,6 +9,7 @@ catalog:
   '@mui/material': 7.3.7
   '@types/node': 25.0.10
   '@types/react': 19.2.9
+  babel-plugin-react-compiler: 1.0.0
   dotenv-mono: 1.5.1
   graphql-request: 7.4.0
   lucide-react: 0.563.0
