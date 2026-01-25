@@ -10,7 +10,6 @@
     "@logtail/next": "catalog:",
     "@mui/material": "catalog:",
     "@mui/material-nextjs": "7.3.7",
-    "@next/bundle-analyzer": "16.1.4",
     "@vercel/analytics": "1.6.1",
     "@vercel/speed-insights": "1.3.1",
     "api": "workspace:*",
@@ -34,8 +33,8 @@
   "name": "web",
   "private": true,
   "scripts": {
-    "build": "next build",
-    "build:analyze": "ANALYZE=true next build",
+    "build": "next build --turbopack",
+    "build:analyze": "next experimental-analyze",
     "build:serve": "next start",
     "check": "biome check --write .",
     "check:types": "tsc",

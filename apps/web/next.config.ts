@@ -1,18 +1,14 @@
-const { withLogtail } = require('@logtail/next');
-require('dotenv-mono').config();
-/**
- * Adds bundle analysis if development + with ANALYZE flag set to true
- */
-const withNextBundleAnalyzer = require('@next/bundle-analyzer')({
-  enabled: process.env.ANALYZE === 'true',
-});
+import { withLogtail } from '@logtail/next';
+import { config as dotenvConfig } from 'dotenv-mono';
+import type { NextConfig } from 'next';
 
-/**
- * @type {import('next').NextConfig}
- * */
-const nextConfig = {
+dotenvConfig();
+
+const nextConfig: NextConfig = {
   experimental: {
     scrollRestoration: true,
+    turbopackFileSystemCacheForBuild: true,
+    turbopackFileSystemCacheForDev: true,
   },
   i18n: {
     defaultLocale: 'en',
@@ -38,4 +34,4 @@ const nextConfig = {
   transpilePackages: ['shared-core', 'api', 'ui'],
 };
 
-module.exports = withNextBundleAnalyzer(withLogtail(nextConfig));
+export default withLogtail(nextConfig);
