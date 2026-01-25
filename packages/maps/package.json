@@ -3,17 +3,17 @@
     "@mui/material": "catalog:",
     "api": "workspace:*",
     "lucide-react": "catalog:",
-    "mapbox-gl": "3.15.0",
+    "mapbox-gl": "3.18.1",
     "react": "catalog:",
-    "react-dom": "19.1.1",
-    "react-map-gl": "8.0.4",
+    "react-dom": "19.2.3",
+    "react-map-gl": "8.1.0",
     "shared-core": "workspace:*",
     "ui": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "catalog:",
     "@types/react": "catalog:",
-    "@types/react-dom": "19.1.9",
+    "@types/react-dom": "19.2.3",
     "dotenv-mono": "catalog:",
     "tsconfig": "workspace:*",
     "typescript": "catalog:"
