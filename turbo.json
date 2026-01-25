@@ -16,7 +16,6 @@
     ".env"
   ],
   "globalEnv": [
-    "ANALYZE",
     "CONTENTFUL_ACCESS_TOKEN",
     "CONTENTFUL_SPACE_ID",
     "CONTENTFUL_SPACE_ID",
@@ -37,20 +36,6 @@
     "WEBHOOK_CALLBACK_URL"
   ],
   "tasks": {
-    "topo": {
-      "dependsOn": ["^topo"]
-    },
-    "dev": {
-      "dependsOn": ["topo"],
-      "inputs": ["apps/**/*", "packages/**/*"],
-      "cache": false,
-      "persistent": true
-    },
-    "connect": {
-      "inputs": ["apps/**/*", "packages/**/*"],
-      "cache": false,
-      "persistent": true
-    },
     "build": {
       "dependsOn": ["^build", "topo", "check", "check:types"],
       "outputs": [".next/**", "!.next/cache/**"]
@@ -60,33 +45,47 @@
       "outputs": [".next/**"]
     },
     "build:serve": {
-      "dependsOn": ["build"],
-      "cache": false
+      "cache": false,
+      "dependsOn": ["build"]
     },
     "check": {
-      "outputs": [],
       "dependsOn": ["topo"],
-      "outputLogs": "new-only"
+      "outputLogs": "new-only",
+      "outputs": []
     },
     "check:types": {
-      "outputs": [],
       "dependsOn": ["topo"],
-      "outputLogs": "new-only"
+      "outputLogs": "new-only",
+      "outputs": []
+    },
+    "clean": {
+      "cache": false
     },
     "codegen": {
       "cache": false,
       "inputs": ["apps/web/src/api/server/*"]
     },
-    "webhook": {
-      "cache": false
-    },
-    "clean": {
-      "cache": false
+    "connect": {
+      "cache": false,
+      "inputs": ["apps/**/*", "packages/**/*"],
+      "persistent": true
     },
     "db": {
       "cache": false
     },
+    "dev": {
+      "cache": false,
+      "dependsOn": ["topo"],
+      "inputs": ["apps/**/*", "packages/**/*"],
+      "persistent": true
+    },
     "release": {
+      "cache": false
+    },
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
+    "webhook": {
       "cache": false
     }
   }

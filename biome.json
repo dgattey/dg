@@ -22,6 +22,7 @@
       "**/*.css",
       "**/*.json",
       "**/*.jsonc",
+      "!**/next-env.d.ts",
       "!**/.cache/**",
       "!**/.next/**",
       "!**/.vscode/**",
