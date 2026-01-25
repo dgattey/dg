@@ -1,6 +1,6 @@
 import { Box } from '@mui/material';
 import type { MapLocation } from 'api/contentful/MapLocation';
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import type { MapRef } from 'react-map-gl/mapbox';
 import { Map as MapGL } from 'react-map-gl/mapbox';
 import { useColorScheme } from 'ui/theme/useColorScheme';
@@ -124,14 +124,11 @@ export function MapboxMap({ location, children, isLoaded, setMapHasLoaded }: Map
   const { colorScheme } = useColorScheme();
 
   // This will be used to set zoom levels, eventually
-  const initialViewState = useMemo(
-    () => ({
-      latitude: location?.point?.latitude ?? 0,
-      longitude: location?.point?.longitude ?? 0,
-      zoom: location?.initialZoom ?? 0,
-    }),
-    [location?.initialZoom, location?.point?.latitude, location?.point?.longitude],
-  );
+  const initialViewState = {
+    latitude: location?.point?.latitude ?? 0,
+    longitude: location?.point?.longitude ?? 0,
+    zoom: location?.initialZoom ?? 0,
+  };
   const zoomLevels = location?.zoomLevels ?? [];
   const minZoom = zoomLevels[0];
   const maxZoom = zoomLevels[zoomLevels.length - 1];

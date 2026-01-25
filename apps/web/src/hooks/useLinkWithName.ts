@@ -1,7 +1,6 @@
 import type { Link as LinkProps } from 'api/contentful/api.generated';
 import { findLinkWithName } from 'api/contentful/parsers';
 import { useData } from 'api/useData';
-import { useMemo } from 'react';
 
 /**
  * Using the header or footer links, finds a link with a given name. Can override the
@@ -10,8 +9,8 @@ import { useMemo } from 'react';
 export const useLinkWithName = (name: string, override?: Pick<LinkProps, 'title' | 'url'>) => {
   const { data: footerLinks } = useData('footer');
 
-  const allLinks = useMemo(() => [...(footerLinks ?? [])], [footerLinks]);
+  const allLinks = [...(footerLinks ?? [])];
 
-  const foundLink = useMemo(() => findLinkWithName(allLinks, name), [allLinks, name]);
+  const foundLink = findLinkWithName(allLinks, name);
   return override && foundLink ? { ...foundLink, ...override } : foundLink;
 };

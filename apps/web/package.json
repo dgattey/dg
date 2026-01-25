@@ -27,6 +27,7 @@
   },
   "devDependencies": {
     "@types/react": "catalog:",
+    "babel-plugin-react-compiler": "catalog:",
     "tsconfig": "workspace:*",
     "typescript": "catalog:"
   },

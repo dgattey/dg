@@ -1,5 +1,5 @@
 import { useData } from 'api/useData';
-import { useMemo, useRef } from 'react';
+import { useRef } from 'react';
 import { ContentGrid } from 'ui/core/ContentGrid';
 import { HOMEPAGE_TITLE, Meta } from '../Meta';
 import { IntroCard } from './IntroCard';
@@ -31,15 +31,12 @@ export function Homepage() {
     projects?.map((project) => <ProjectCard key={project.title} {...project} />) ?? [];
 
   // These index into projectCards to splice in other cards
-  const otherCards = useMemo(
-    () => [
-      { card: <IntroCard key="intro" />, index: 0 },
-      { card: <MapPreviewCard key="map" />, index: 0 },
-      { card: <SpotifyCard key="spotify" />, index: 2 },
-      { card: <StravaCard key="strava" />, index: 6 },
-    ],
-    [],
-  );
+  const otherCards = [
+    { card: <IntroCard key="intro" />, index: 0 },
+    { card: <MapPreviewCard key="map" />, index: 0 },
+    { card: <SpotifyCard key="spotify" />, index: 2 },
+    { card: <StravaCard key="strava" />, index: 6 },
+  ];
 
   return (
     <>

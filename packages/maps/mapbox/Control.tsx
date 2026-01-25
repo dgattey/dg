@@ -1,5 +1,5 @@
 import { useTheme } from '@mui/material';
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import type { Root } from 'react-dom/client';
 import { createRoot } from 'react-dom/client';
 import { type MapInstance, useControl } from 'react-map-gl/mapbox';
@@ -106,22 +106,25 @@ class DGControl {
 export function Control({ position, children, className, onClick }: ControlProps) {
   const theme = useTheme(); // as much of this is class based, we need to grab the theme this way
   const control = useRef<DGControl | null>(null);
-  const properProps = useMemo(
-    () => ({
+
+  // Make sure to update the children/etc when they change
+  useEffect(() => {
+    control.current?.onPropsUpdate({
       children,
       className: className ? `${className} ${CLASSNAME}` : CLASSNAME,
       onClick,
       theme,
-    }),
-    [children, className, onClick, theme],
-  );
-
-  // Make sure to update the children/etc when they change
-  useEffect(() => control.current?.onPropsUpdate(properProps), [properProps]);
+    });
+  }, [children, className, onClick, theme]);
 
   useControl(
     () => {
-      const newControl = new DGControl(properProps);
+      const newControl = new DGControl({
+        children,
+        className: className ? `${className} ${CLASSNAME}` : CLASSNAME,
+        onClick,
+        theme,
+      });
       control.current = newControl;
       return newControl;
     },
