@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@vercel/og": "0.8.5",
+    "@vercel/og": "0.8.6",
     "react": "catalog:",
     "shared-core": "workspace:*",
     "ui": "workspace:*"

@@ -3,19 +3,19 @@ packages:
   - apps/*
 
 catalog:
-  '@fortawesome/free-brands-svg-icons': 7.0.1
-  '@graphql-codegen/cli': 6.0.0
-  '@logtail/next': 0.2.1
-  '@mui/material': 7.3.2
-  '@types/node': 24.5.2
-  '@types/react': 19.1.13
+  '@fortawesome/free-brands-svg-icons': 7.1.0
+  '@graphql-codegen/cli': 6.1.1
+  '@logtail/next': 0.3.1
+  '@mui/material': 7.3.7
+  '@types/node': 25.0.10
+  '@types/react': 19.2.9
   dotenv-mono: 1.5.1
-  graphql-request: 7.2.0
-  lucide-react: 0.544.0
-  next: 15.5.3
-  react: 19.1.1
-  typescript: 5.9.2
-  wretch: 2.11.0
+  graphql-request: 7.4.0
+  lucide-react: 0.563.0
+  next: 16.1.4
+  react: 19.2.3
+  typescript: 5.9.3
+  wretch: 3.0.6
 
 onlyBuiltDependencies:
   - '@biomejs/biome'

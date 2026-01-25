@@ -1,7 +1,7 @@
 {
   "devDependencies": {
     "@semantic-release/changelog": "6.0.3",
-    "semantic-release": "24.2.9",
+    "semantic-release": "25.0.2",
     "typescript": "catalog:"
   },
   "files": [
