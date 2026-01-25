@@ -7,8 +7,8 @@ dotenvConfig();
 const nextConfig: NextConfig = {
   experimental: {
     scrollRestoration: true,
-    turbopackFileSystemCacheForDev: true,
     turbopackFileSystemCacheForBuild: true,
+    turbopackFileSystemCacheForDev: true,
   },
   i18n: {
     defaultLocale: 'en',
