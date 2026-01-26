@@ -11,6 +11,7 @@ type PageProps = {
   >;
 };
 
+// biome-ignore lint/style/useComponentExportOnlyModules: Next.js requires getStaticProps export.
 export const getStaticProps: GetStaticProps<PageProps> = async () =>
   fetchFallbackData([
     'version',

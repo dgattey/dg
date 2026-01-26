@@ -1,32 +1,24 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [
-    ".env*",
     "config/database.config.js",
+    "config/env.defaults",
+    "config/env.secrets.keys",
+    "scripts/generate-env",
     ".node-version",
     ".npmrc",
     ".sequelizerc",
     "biome.json",
     "codegen.ts",
     "next.config.js",
-    "tsconfig.json",
-    ".env.development.local",
-    ".env.strava-webhooks-prod.local",
-    ".env.production.local",
-    ".env"
+    "tsconfig.json"
   ],
   "globalEnv": [
     "CONTENTFUL_ACCESS_TOKEN",
     "CONTENTFUL_SPACE_ID",
-    "CONTENTFUL_SPACE_ID",
     "DATABASE_URL",
     "GITHUB_AUTHENTICATION_TOKEN",
-    "GITHUB_TOKEN",
-    "NEXT_PUBLIC_APP_VERSION",
     "NEXT_PUBLIC_MAPBOX_TOKEN",
-    "NEXT_PUBLIC_SENTRY_DSN",
-    "NODE_ENV",
-    "SENTRY_AUTH_TOKEN",
     "SPOTIFY_CLIENT_ID",
     "SPOTIFY_CLIENT_SECRET",
     "STRAVA_CLIENT_ID",
@@ -36,6 +28,23 @@
     "WEBHOOK_CALLBACK_URL"
   ],
   "tasks": {
+    "topo": {
+      "dependsOn": ["^topo"]
+    },
+    "dg#dev": {
+      "cache": false
+    },
+    "dev": {
+      "cache": false,
+      "dependsOn": ["dg#dev", "topo"],
+      "inputs": ["apps/**/*", "packages/**/*"],
+      "persistent": true
+    },
+    "connect": {
+      "cache": false,
+      "inputs": ["apps/**/*", "packages/**/*"],
+      "persistent": true
+    },
     "build": {
       "dependsOn": ["^build", "topo", "check", "check:types"],
       "outputs": [".next/**", "!.next/cache/**"]
@@ -65,25 +74,11 @@
       "cache": false,
       "inputs": ["apps/web/src/api/server/*"]
     },
-    "connect": {
-      "cache": false,
-      "inputs": ["apps/**/*", "packages/**/*"],
-      "persistent": true
-    },
     "db": {
       "cache": false
     },
-    "dev": {
-      "cache": false,
-      "dependsOn": ["topo"],
-      "inputs": ["apps/**/*", "packages/**/*"],
-      "persistent": true
-    },
     "release": {
       "cache": false
-    },
-    "topo": {
-      "dependsOn": ["^topo"]
     },
     "webhook": {
       "cache": false

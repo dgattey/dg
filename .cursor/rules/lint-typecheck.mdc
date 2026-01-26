@@ -1,0 +1,15 @@
+---
+description: Run Turbo lint/format and typecheck after changes
+alwaysApply: true
+---
+
+# Lint, Format, Typecheck
+
+- After every change, run `turbo check` and `turbo check:types` filtered to the affected workspace(s).
+- Skip for shell scripts (`scripts/*`) - no linting/typechecking setup for scripts yet.
+- Determine the filter based on file paths:
+  - Root-level files (config/, package.json, turbo.json, etc.): run without `--filter` or `--filter=dg`
+  - Files in `apps/<app>/`: use `--filter=<app>`
+  - Files in `packages/<pkg>/`: use `--filter=<pkg>`
+  - Multiple workspaces affected: use multiple `--filter` flags
+- Fix any issues they report and re-run until both commands pass.

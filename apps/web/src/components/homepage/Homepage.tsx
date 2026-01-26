@@ -1,7 +1,8 @@
 import { useData } from 'api/useData';
 import { useRef } from 'react';
 import { ContentGrid } from 'ui/core/ContentGrid';
-import { HOMEPAGE_TITLE, Meta } from '../Meta';
+import { Meta } from '../Meta';
+import { HOMEPAGE_TITLE } from '../Meta.constants';
 import { IntroCard } from './IntroCard';
 import { MapPreviewCard } from './MapPreviewCard';
 import { ProjectCard } from './ProjectCard';
