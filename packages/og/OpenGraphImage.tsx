@@ -1,8 +1,6 @@
 import { COLORS } from 'ui/theme/color';
 import { BackgroundPattern } from './BackgroundPattern';
-
-export const TEXT_FONT = 'SF Pro';
-export const LOGO_FONT = 'SF Pro Display Heavy';
+import { LOGO_FONT, TEXT_FONT } from './ogFonts';
 
 /**
  * Approximates the actual logo with some scaling

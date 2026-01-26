@@ -3,7 +3,7 @@ import { Box } from '@mui/material';
 import { mixinSx } from '../helpers/mixinSx';
 import type { SxProps } from '../theme';
 
-export const sectionSx: SxProps = (theme) => ({
+const sectionSx: SxProps = (theme) => ({
   [theme.breakpoints.up('sm')]: {
     marginBottom: 3,
   },

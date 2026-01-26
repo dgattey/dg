@@ -6,7 +6,7 @@ Hi :wave: This is an overengineered way to show past projects / experiment with 
 
 ## :hammer: Commands
 
-- `turbo dev` start dev server + prod DB connection (be careful)
+- `turbo dev` start dev server + prod DB connection (auto-generates `.env` if missing)
 - `turbo build` prod build (CI)
 - `turbo build:serve` prod build + serve (local testing)
 - `turbo build:analyze` bundle size analysis
@@ -19,25 +19,25 @@ Hi :wave: This is an overengineered way to show past projects / experiment with 
 - `turbo webhook -- list <name>` list webhooks
 - `turbo webhook -- delete <name> <id>` delete webhook
 - `turbo release` version bump (GitHub Action)
-- `turbo clean` clean caches + generated files
+- `turbo clean` clean caches, generated files, and `.env`
 - `turbo topo --graph=graph.html` monorepo dependency graph
 
 ## :beginner: Initial Setup
 
 ### Prereqs
-- Node 24.10.0 via `nodenv`
-- pnpm via Corepack
-- Turbo (global)
-- `neonctl`
+- Homebrew
+- 1Password account with vault `dg` (one item per env var; value stored in the `value` field)
+
+Bootstrap uses Homebrew to install `nodenv`, `node-build`, `1password-cli`, and `neonctl`, and installs `turbo` globally via `npm`.
 
 ### Setup
-1. `nodenv install 24.10.0 && nodenv local 24.10.0 && nodenv rehash`
-2. `corepack enable && corepack install pnpm`
-3. `npm -g install turbo && nodenv rehash`
-4. `pnpm install`
-5. `brew install neonctl`
+1. `scripts/bootstrap` (installs deps, authenticates 1Password + Turbo, generates `.env`)
+2. `turbo dev` to start developing
 
 If `turbo` is not found, ensure `~/.nodenv/shims` is on PATH, then `nodenv rehash`.
+
+### Env Vars
+`.env` is generated from 1Password (vault `dg`) using [`config/env.secrets.keys`](config/env.secrets.keys). Each key must be an item with the same name and the value stored in the `value` field. Non-secrets live in [`config/env.defaults`](config/env.defaults). To regenerate after vault changes: `turbo clean && turbo dev` or delete `.env` and re-run `turbo dev`.
 
 ## :memo: Pull Requests
 
@@ -55,7 +55,7 @@ Pretty standard Next app. `/public` has static files, `/src` has app code, `/src
 
 - [Next](https://nextjs.org/docs/getting-started) wraps React and provides routing, SSR/SSG, and API routes. Client calls to `/api/X` hit `pages/api/X.tsx` on the server.
 
-- [Vercel](https://vercel.com) hosts + builds the site. Every `main` commit deploys :tada: Env vars mirror `.env` with real values.
+- [Vercel](https://vercel.com) hosts + builds the site. Every `main` commit deploys :tada: Env vars mirror `.env` generated from 1Password.
 
 - [Cloudflare](https://cloudflare.com) manages DNS/security. Cloudflare's MX records redirect email to Gmail.
 
@@ -114,7 +114,7 @@ Local webhook testing uses Cloudflare Tunnel so `https://dev.dylangattey.com/api
 
 1. Start the connector from the [tunnel config](https://one.dash.cloudflare.com/737867b500ec8ef1d7e5c9650e5dbfdb/networks/tunnels/cfd_tunnel/60e09136-a10f-499c-8925-bcef7570677d/edit?tab=overview) using the “Install and run a connector” section. Change it here if `api/webhooks` ever moves.
 1. It runs as a persistent local service to keep the tunnel open.
-1. For prod debugging, temporarily swap the `STRAVA_*` env vars to prod values (except the callback URL), log into Strava, and change the accepted domain to the `dev` subdomain. Then delete + recreate the subscription and hit `api/webhooks` to restart the OAuth flow on dev.
+1. For prod debugging, temporarily swap the `STRAVA_*` items in 1Password to prod values (except the callback URL), run `scripts/generate-env`, log into Strava, and change the accepted domain to the `dev` subdomain. Then delete + recreate the subscription and hit `api/webhooks` to restart the OAuth flow on dev.
 
 #### Webhooks
 
@@ -124,7 +124,7 @@ Strava is the only webhook integration right now.
 2. To list existing subscriptions, run `turbo webhook -- list strava` to get the ids
 3. To delete a subscription, run `turbo webhook -- delete strava <id>` with an id from the list script
 4. Add a `console.log` in `pages/api/webhooks` and rename an activity to trigger events. Docs: https://developers.strava.com/docs/webhooks/.
-5. To test prod, swap the env vars in `.env.development.local` to match Vercel: `STRAVA_CLIENT_ID`, `STRAVA_CLIENT_SECRET`, `STRAVA_TOKEN_NAME`, `STRAVA_VERIFY_TOKEN` (leave the callback URL as dev). Restart everything so OAuth re-runs. Subscriptions are only changed locally with this script, or via curl, to prevent tampering.
+5. To test prod, swap the `STRAVA_*` items in 1Password to match Vercel (leave the callback URL as dev), run `scripts/generate-env`, and restart everything so OAuth re-runs. Subscriptions are only changed locally with this script, or via curl, to prevent tampering.
 
 ### Versioning
 
@@ -134,6 +134,6 @@ Versioning uses `semantic-release` + Conventional Commits. I only bump major for
 - **Minor**: `feat:`
 - **Patch**: everything else
 
-Test a dry run with `GITHUB_TOKEN=* pnpm turbo release -- --dry-run --branches={branch here}` after filling in the token, or done for you on all PRs.
+Test a dry run with `GITHUB_TOKEN=* turbo release -- --dry-run --branches={branch here}` after filling in the token, or done for you on all PRs.
 
 [gh]: https://github.com/dgattey/dg

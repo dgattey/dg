@@ -1,6 +1,7 @@
 import { ImageResponse } from '@vercel/og';
 import { invariant } from 'shared-core/helpers/invariant';
-import { LOGO_FONT, OpenGraphImage, TEXT_FONT } from './OpenGraphImage';
+import { OpenGraphImage } from './OpenGraphImage';
+import { LOGO_FONT, TEXT_FONT } from './ogFonts';
 
 /**
  * Generates a basic OpenGraph image with font data

@@ -3,6 +3,7 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useColorScheme } from 'ui/theme/useColorScheme';
+import { HOMEPAGE_TITLE } from './Meta.constants';
 
 type MetaProps = {
   /**
@@ -24,7 +25,6 @@ type Graph = Record<string, string | undefined>;
 
 const MAX_DESC_LENGTH = 300;
 const SITE_NAME = 'Dylan Gattey';
-export const HOMEPAGE_TITLE = 'Engineer. Problem Solver.';
 const OG_IMAGE_API_ROUTE = 'api/og';
 const GRAPH_PREFIXES = ['og', 'twitter'] as const;
 

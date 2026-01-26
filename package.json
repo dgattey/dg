@@ -8,6 +8,8 @@
   "license": "MIT",
   "private": true,
   "scripts": {
+    "clean": "rm -f .env .env.tmp",
+    "dev": "scripts/generate-env",
     "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
