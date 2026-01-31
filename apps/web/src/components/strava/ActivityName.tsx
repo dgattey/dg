@@ -1,26 +1,21 @@
-import { useData } from 'api/useData';
-import { Link } from 'ui/dependent/Link';
-import { mixinSx } from 'ui/helpers/mixinSx';
-import { truncated } from 'ui/helpers/truncated';
-import type { SxProps } from 'ui/theme';
+import { Link } from '@dg/ui/dependent/Link';
+import { truncated } from '@dg/ui/helpers/truncated';
+import type { SxObject } from '@dg/ui/theme';
+import type { StravaActivity } from './types';
 
 /**
  * Formatted link for the activity name
  */
-export function ActivityName({ url, sx }: { url: string; sx?: SxProps }) {
-  const { data: activity } = useData('latest/activity');
-  if (!activity?.name) {
+export function ActivityName({ activity, sx }: { activity: StravaActivity | null; sx?: SxObject }) {
+  if (!activity?.name || !activity.url) {
     return null;
   }
+  const { url } = activity;
+
+  const mergedSx = sx ? { ...truncated(2), ...sx } : truncated(2);
 
   return (
-    <Link
-      href={url}
-      isExternal={true}
-      linkProps={{ color: 'h5', variant: 'h5' }}
-      sx={mixinSx(sx, truncated(2))}
-      title={activity.name}
-    >
+    <Link href={url} isExternal={true} sx={mergedSx} title={activity.name} variant="h5">
       {activity.name}
     </Link>
   );

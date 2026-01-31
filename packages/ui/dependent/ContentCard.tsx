@@ -1,13 +1,55 @@
-import type { Theme } from '@mui/material';
+import type { Link } from '@dg/services/contentful/api.generated';
 import { Card, Typography } from '@mui/material';
-import type { Link } from 'api/contentful/api.generated';
-import { useState } from 'react';
 import { GlassContainer } from '../core/GlassContainer';
-import { bouncyTransition } from '../helpers/bouncyTransition';
-import { mixinSx } from '../helpers/mixinSx';
+import { createBouncyTransition } from '../helpers/bouncyTransition';
 import { truncated } from '../helpers/truncated';
-import type { SxProps } from '../theme';
+import type { SxObject } from '../theme';
+import { getShape } from '../theme/shape';
 import { ContentWrappingLink } from './ContentWrappingLink';
+
+const SPACING_UNIT = 8;
+const OVERLAY_SHIFT = `${SPACING_UNIT}px`;
+const OVERLAY_SHIFT_NEGATIVE = `-${SPACING_UNIT}px`;
+const OVERLAY_INSET = `${SPACING_UNIT * 2.5}px`;
+const OVERLAY_PADDING_BLOCK = `${SPACING_UNIT}px`;
+const OVERLAY_PADDING_INLINE = `${SPACING_UNIT * 1.75}px`;
+const { gridItemSize } = getShape();
+
+const cardBaseSx: SxObject = {
+  // Unfortunately required for the images to animate size correctly. Look into changing this!
+  '& > div': {
+    transform: 'none !important',
+  },
+  overflow: 'hidden',
+  position: 'relative',
+  transform: 'scale(1)',
+  ...createBouncyTransition(['transform', 'box-shadow', 'border-color']),
+  justifySelf: { md: 'auto', xs: 'center' },
+  maxWidth: { md: 'none', xs: '85vw' },
+  willChange: 'transform',
+};
+
+const overlayBaseSx: SxObject = {
+  background: 'color-mix(in srgb, var(--mui-palette-background-default) 60%, transparent)',
+  bottom: OVERLAY_INSET,
+  left: OVERLAY_INSET,
+  margin: 0,
+  paddingBottom: OVERLAY_PADDING_BLOCK,
+  paddingLeft: OVERLAY_PADDING_INLINE,
+  paddingRight: OVERLAY_PADDING_INLINE,
+  paddingTop: OVERLAY_PADDING_BLOCK,
+  position: 'absolute',
+  transform: 'translateY(0) translateX(0)',
+  zIndex: 1,
+  ...createBouncyTransition('transform'),
+};
+
+const overlayTitleSx: SxObject = {
+  ...truncated(1),
+};
+
+const getOverlaySx = (sx?: SxObject): SxObject =>
+  sx ? { ...overlayBaseSx, ...sx } : overlayBaseSx;
 
 export type ContentCardProps = Pick<
   React.ComponentProps<'div'>,
@@ -35,8 +77,8 @@ export type ContentCardProps = Pick<
    */
   link?: Link;
 
-  sx?: SxProps;
-  overlaySx?: SxProps;
+  sx?: SxObject;
+  overlaySx?: SxObject;
 };
 
 type LinkWrappedChildrenProps = Pick<ContentCardProps, 'link' | 'children'> & {
@@ -49,57 +91,41 @@ type LinkWrappedChildrenProps = Pick<ContentCardProps, 'link' | 'children'> & {
 /**
  * Returns style props for the card component, based on
  */
-function getCardSx(
-  theme: Theme,
-  {
-    isClickable,
-    isHovered,
-    horizontalSpan,
-    verticalSpan,
-  }: {
-    isClickable: boolean;
-    isHovered: boolean;
-    horizontalSpan: number;
-    verticalSpan: number | null;
-  },
-) {
+function getCardSx({
+  isClickable,
+  horizontalSpan,
+  verticalSpan,
+}: {
+  isClickable: boolean;
+  horizontalSpan: number;
+  verticalSpan: number | null;
+}): SxObject {
   return {
-    // Unfortunately required for the images to animate size correctly. Look into changing this!
-    '& > div': {
-      transform: 'none !important',
-    },
-    overflow: 'hidden',
-    position: 'relative',
-
-    transform: `scale(${isHovered && isClickable ? 1.05 : 1})`,
-    ...bouncyTransition(theme, ['transform', 'box-shadow', 'border-color']),
-    willChange: 'transform',
+    ...cardBaseSx,
     ...(isClickable && {
-      '&:hover': {
-        borderColor: theme.vars.palette.card.border,
-        boxShadow: theme.vars.extraShadows.card.hovered,
+      '&:hover [data-role="content-card-overlay"], &:focus-within [data-role="content-card-overlay"]':
+        {
+          transform: `translateY(${OVERLAY_SHIFT}) translateX(${OVERLAY_SHIFT_NEGATIVE})`,
+        },
+      '&:hover, &:focus-within': {
+        borderColor: 'var(--mui-palette-card-border)',
+        boxShadow: 'var(--mui-extraShadows-card-hovered)',
+        transform: 'scale(1.05)',
       },
       cursor: 'pointer',
     }),
-
-    [theme.breakpoints.down('sm')]: {
-      width: '85vw',
+    width: {
+      md: horizontalSpan ? gridItemSize?.(horizontalSpan) : 'auto',
+      sm: '100%',
+      xs: '85vw',
     },
-    [theme.breakpoints.down('md')]: {
-      justifySelf: 'center',
-      maxWidth: '85vw',
-      width: '100%',
-    },
-    [theme.breakpoints.up('md')]: {
-      ...(verticalSpan && {
-        gridRow: `span ${verticalSpan}`,
-        height: theme.shape.gridItemSize(verticalSpan),
-      }),
-      ...(horizontalSpan && {
-        gridColumn: `span ${horizontalSpan}`,
-        width: theme.shape.gridItemSize(horizontalSpan),
-      }),
-    },
+    ...(verticalSpan && {
+      gridRow: { md: `span ${verticalSpan}` },
+      height: { md: gridItemSize?.(verticalSpan) },
+    }),
+    ...(horizontalSpan && {
+      gridColumn: { md: `span ${horizontalSpan}` },
+    }),
   };
 }
 
@@ -117,24 +143,7 @@ function LinkWrappedChildren({ children, link, overlayContents }: LinkWrappedChi
     children
   );
   return link ? (
-    <ContentWrappingLink
-      link={link}
-      sx={(theme) => ({
-        // By default the focus ring is hidden, so pseudo element it
-        '&:focus-visible:before': {
-          borderRadius: theme.spacing(6),
-          content: '""',
-          height: '100%',
-          outline: '-webkit-focus-ring-color auto 1px',
-          position: 'absolute',
-          width: '100%',
-          zIndex: 1,
-        },
-        display: 'block',
-        // Prevents overflowing links
-        height: '100%',
-      })}
-    >
+    <ContentWrappingLink link={link}>
       {overlayContents}
       {children}
     </ContentWrappingLink>
@@ -147,36 +156,10 @@ function LinkWrappedChildren({ children, link, overlayContents }: LinkWrappedChi
 /**
  * Overlay content if it's defined
  */
-function OverlayContent({
-  overlay,
-  sx,
-  isHovered,
-}: {
-  overlay: NonNullable<React.ReactNode>;
-  sx?: SxProps;
-  isHovered: boolean;
-}) {
+function OverlayContent({ overlay, sx }: { overlay: NonNullable<React.ReactNode>; sx?: SxObject }) {
   return (
-    <GlassContainer
-      sx={mixinSx(
-        (theme) => ({
-          background: `color-mix(in srgb, ${theme.vars.palette.background.default} 60%, transparent)`,
-          bottom: theme.spacing(2.5),
-          left: theme.spacing(2.5),
-          margin: 0,
-          paddingBottom: theme.spacing(1),
-          paddingLeft: theme.spacing(1.75),
-          paddingRight: theme.spacing(1.75),
-          paddingTop: theme.spacing(1),
-          position: 'absolute',
-          transform: `translateY(${isHovered ? theme.spacing(1) : 0}) translateX(${isHovered ? theme.spacing(-1) : 0})`,
-          zIndex: 1,
-          ...bouncyTransition(theme, ['transform']),
-        }),
-        sx,
-      )}
-    >
-      <Typography sx={{ ...truncated(1) }} variant="h5">
+    <GlassContainer data-role="content-card-overlay" sx={getOverlaySx(sx)}>
+      <Typography sx={overlayTitleSx} variant="h5">
         {overlay}
       </Typography>
     </GlassContainer>
@@ -197,28 +180,13 @@ export function ContentCard({
   ...props
 }: ContentCardProps) {
   const isClickable = Boolean(link);
-  const [isHovered, setIsHovered] = useState(false);
+  const baseSx = getCardSx({ horizontalSpan, isClickable, verticalSpan });
+  const cardSx = sx ? { ...baseSx, ...sx } : baseSx;
   return (
-    <Card
-      onMouseOut={() => {
-        setIsHovered(false);
-      }}
-      onMouseOver={() => {
-        setIsHovered(true);
-      }}
-      sx={mixinSx(
-        (theme) => getCardSx(theme, { horizontalSpan, isClickable, isHovered, verticalSpan }),
-        sx,
-      )}
-      {...props}
-    >
+    <Card sx={cardSx} {...props}>
       <LinkWrappedChildren
         link={link}
-        overlayContents={
-          overlay ? (
-            <OverlayContent isHovered={isHovered && isClickable} overlay={overlay} sx={overlaySx} />
-          ) : null
-        }
+        overlayContents={overlay ? <OverlayContent overlay={overlay} sx={overlaySx} /> : null}
       >
         {children}
       </LinkWrappedChildren>

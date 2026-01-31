@@ -1,4 +1,4 @@
-import { COLORS } from 'ui/theme/color';
+import { COLORS } from '@dg/ui/theme/color';
 import { BackgroundPattern } from './BackgroundPattern';
 import { LOGO_FONT, TEXT_FONT } from './ogFonts';
 

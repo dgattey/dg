@@ -2,6 +2,11 @@
   "dependencies": {
     "@contentful/rich-text-react-renderer": "16.1.6",
     "@contentful/rich-text-types": "17.2.5",
+    "@dg/maps": "workspace:*",
+    "@dg/og": "workspace:*",
+    "@dg/services": "workspace:*",
+    "@dg/shared-core": "workspace:*",
+    "@dg/ui": "workspace:*",
     "@emotion/cache": "11.14.0",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
@@ -12,26 +17,20 @@
     "@mui/material-nextjs": "7.3.7",
     "@vercel/analytics": "1.6.1",
     "@vercel/speed-insights": "1.3.1",
-    "api": "workspace:*",
     "dotenv-mono": "catalog:",
     "lucide-react": "catalog:",
-    "maps": "workspace:*",
     "next": "catalog:",
-    "og": "workspace:*",
     "react": "catalog:",
     "react-intersection-observer": "10.0.2",
-    "shared-core": "workspace:*",
-    "swr": "2.3.8",
-    "ui": "workspace:*",
-    "wretch": "catalog:"
+    "server-only": "0.0.1"
   },
   "devDependencies": {
+    "@dg/tsconfig": "workspace:*",
     "@types/react": "catalog:",
     "babel-plugin-react-compiler": "catalog:",
-    "tsconfig": "workspace:*",
     "typescript": "catalog:"
   },
-  "name": "web",
+  "name": "@dg/web",
   "private": true,
   "scripts": {
     "build": "next build --turbopack",

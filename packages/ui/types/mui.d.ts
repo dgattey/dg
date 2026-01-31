@@ -18,6 +18,24 @@ declare module '@mui/material/styles' {
     };
   };
 
+  /**
+   * Glass effect percentage values for light/dark mode adaptations.
+   * Pre-computed for use in color-mix() CSS functions.
+   */
+  type Glass = {
+    lightBorder: string;
+    lightInset1: string;
+    lightInset2: string;
+    lightInset3: string;
+    lightInset4: string;
+    darkInset1: string;
+    darkInset2: string;
+    darkInset3: string;
+    darkInset4: string;
+    darkShadow1: string;
+    darkShadow2: string;
+  };
+
   type CardColors = {
     border: NonNullableColor;
   };
@@ -53,10 +71,12 @@ declare module '@mui/material/styles' {
 
   interface ThemeVars {
     extraShadows: ExtraShadows;
+    glass: Glass;
   }
 
   interface ColorSystemOptions {
     extraShadows: ExtraShadows;
+    glass: Glass;
   }
 
   interface TypographyVariants {

@@ -1,5 +1,5 @@
+import { isRecord } from '@dg/shared-core/helpers/typeguards';
 import type { Response } from 'node-fetch';
-import { isRecord } from 'shared-core/helpers/typeguards';
 import type { WebhookType } from '../types/WebhookType';
 
 /**

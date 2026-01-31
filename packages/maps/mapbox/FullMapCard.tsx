@@ -1,4 +1,6 @@
-import type { MapLocation } from 'api/contentful/MapLocation';
+'use client';
+
+import type { MapLocation } from '@dg/services/contentful/MapLocation';
 import { useState } from 'react';
 import { MapboxMap } from './MapboxMap';
 import { Marker } from './Marker';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useTheme } from '@mui/material';
 import { Minus, Plus } from 'lucide-react';
 import type { RefObject } from 'react';

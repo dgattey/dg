@@ -47,7 +47,7 @@ export function createApiGenerator(
   },
 ): CodegenConfig['generates'] {
   // Absolute path for the API folder root
-  const apiFolder = path.join(ROOT, `packages/api/${name}`);
+  const apiFolder = path.join(ROOT, `packages/services/${name}`);
 
   // A glob for all the source operation documents, relative to project root
   const sourceDocumentsGlob = `${apiFolder}/!(*.generated).ts`;

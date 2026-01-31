@@ -30,3 +30,5 @@ npm-debug.log*
 tsconfig.tsbuildinfo
 graph.html
 .claude
+# next-agents-md
+.next-docs/

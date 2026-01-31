@@ -1,5 +1,5 @@
+import { invariant } from '@dg/shared-core/helpers/invariant';
 import { ImageResponse } from '@vercel/og';
-import { invariant } from 'shared-core/helpers/invariant';
 import { OpenGraphImage } from './OpenGraphImage';
 import { LOGO_FONT, TEXT_FONT } from './ogFonts';
 

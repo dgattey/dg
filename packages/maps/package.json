@@ -1,24 +1,24 @@
 {
   "dependencies": {
+    "@dg/services": "workspace:*",
+    "@dg/shared-core": "workspace:*",
+    "@dg/ui": "workspace:*",
     "@mui/material": "catalog:",
-    "api": "workspace:*",
     "lucide-react": "catalog:",
     "mapbox-gl": "3.18.1",
     "react": "catalog:",
     "react-dom": "19.2.3",
-    "react-map-gl": "8.1.0",
-    "shared-core": "workspace:*",
-    "ui": "workspace:*"
+    "react-map-gl": "8.1.0"
   },
   "devDependencies": {
+    "@dg/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "19.2.3",
     "dotenv-mono": "catalog:",
-    "tsconfig": "workspace:*",
     "typescript": "catalog:"
   },
-  "name": "maps",
+  "name": "@dg/maps",
   "private": true,
   "scripts": {
     "check": "biome check --write .",

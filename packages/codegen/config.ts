@@ -1,6 +1,6 @@
+import { invariant } from '@dg/shared-core/helpers/invariant';
 import type { CodegenConfig } from '@graphql-codegen/cli';
 import { dotenvLoad } from 'dotenv-mono';
-import { invariant } from 'shared-core/helpers/invariant';
 import { createApiGenerator } from './createApiGenerator';
 
 dotenvLoad();

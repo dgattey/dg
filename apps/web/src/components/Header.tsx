@@ -1,35 +1,31 @@
-import { ColorSchemeToggle } from 'ui/core/ColorSchemeToggle';
-import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
-import { Section } from 'ui/core/Section';
-import type { SxProps } from 'ui/theme';
+import { ColorSchemeToggleClient } from '@dg/ui/core/ColorSchemeToggleClient';
+import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
+import { Section } from '@dg/ui/core/Section';
+import type { SxObject } from '@dg/ui/theme';
 import { Logo } from './Logo';
 import { ScrollIndicatorButton } from './ScrollIndicatorButton';
 
-type HeaderProps = {
-  /**
-   * If provided, sets the ref on the `header` element for
-   * sizing/whatever else is needed
-   */
-  headerRef?: React.RefObject<HTMLDivElement | null>;
-};
-
 // Makes the header bar sticky and not responsive to user events by default
-const stickyContainerSx: SxProps = {
+const stickyContainerSx: SxObject = {
   maxWidth: 'unset',
   position: 'sticky',
   top: 0,
   zIndex: 1,
 };
 
+const navSx: SxObject = {
+  columnGap: { sm: 2, xs: 1 },
+};
+
 /**
  * Creates the site header component. It's a bar that spans across the
  * page and shows a logo + header links if they exist.
  */
-export function Header({ headerRef }: HeaderProps) {
+export function Header() {
   return (
     <Section sx={stickyContainerSx}>
-      <header ref={headerRef}>
-        <Nav>
+      <header data-site-header={true}>
+        <Nav sx={navSx}>
           <NavGroup>
             <NavItem variant="body2">
               <Logo />
@@ -40,7 +36,7 @@ export function Header({ headerRef }: HeaderProps) {
           </NavGroup>
           <NavGroup>
             <NavItem>
-              <ColorSchemeToggle />
+              <ColorSchemeToggleClient initialValue="system" />
             </NavItem>
           </NavGroup>
         </Nav>

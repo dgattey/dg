@@ -9,7 +9,7 @@
     "nextjs.json",
     "react.json"
   ],
-  "name": "release",
+  "name": "@dg/release",
   "private": true,
   "scripts": {
     "check": "biome check --write .",

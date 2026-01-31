@@ -1,99 +1,133 @@
-import { Container, Divider } from '@mui/material';
-import type { Link as LinkType } from 'api/contentful/api.generated';
-import { useData } from 'api/useData';
-import { HorizontalStack } from 'ui/core/HorizontalStack';
-import { Nav, NavGroup, NavItem } from 'ui/core/Nav';
-import { Section } from 'ui/core/Section';
-import { Link } from 'ui/dependent/Link';
+import type { Link as LinkType } from '@dg/services/contentful/api.generated';
+import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
+import { Section } from '@dg/ui/core/Section';
+import { Link } from '@dg/ui/dependent/Link';
+import type { SxObject } from '@dg/ui/theme';
+import { Container, Divider, Stack } from '@mui/material';
+import { cacheLife } from 'next/cache';
+import { getFooterLinks } from '../services/contentful';
+import { getRepoVersion } from '../services/github';
+
+const navItemNoPaddingSx: SxObject = {
+  padding: 0,
+};
+
+const getFooterLinkSx = (hasIcon: boolean): SxObject => ({
+  alignItems: 'center',
+  display: 'flex',
+  fontSize: hasIcon ? '1.25em' : undefined,
+  justifyContent: 'center',
+  minHeight: 40,
+  // Min tap target size
+  minWidth: 40,
+});
+
+const footerSectionSx: SxObject = {
+  marginTop: 12,
+};
+
+const footerContainerSx: SxObject = {
+  padding: 0,
+};
+
+const dividerSx: SxObject = {
+  marginBottom: 3,
+};
+
+const footerNavSx: SxObject = {
+  alignItems: { sm: 'center', xs: 'stretch' },
+  columnGap: 3,
+  flexDirection: { sm: 'row', xs: 'column-reverse' },
+  flexWrap: 'wrap-reverse',
+};
+
+const footerNavGroupSx: SxObject = {
+  columnGap: 2,
+};
+
+const footerLinkListSx: SxObject = {
+  margin: 0,
+  padding: 0,
+};
+
+const footerIconLinkListSx: SxObject = {
+  flex: 1,
+  justifyContent: 'space-between',
+  margin: 0,
+  marginLeft: -2.5,
+  marginRight: -1.5,
+  padding: 0,
+};
 
 /**
- * Creates a singular footer link
+ * Creates a singular footer link with top-positioned tooltip
  */
 function FooterLink({ link }: { link: LinkType }) {
   return (
-    <NavItem sx={{ padding: 0 }}>
+    <NavItem sx={navItemNoPaddingSx}>
       <Link
         aria-label={link.title}
+        color="secondary"
         href={link.url}
         icon={link.icon}
         isExternal={link.url?.startsWith('http')}
         layout="icon" // the ones that have no icon will resolve to just text
-        linkProps={{
-          color: 'secondary',
-          variant: 'caption',
-        }}
-        sx={{
-          alignItems: 'center',
-          display: 'flex',
-          fontSize: link.icon ? '1.25em' : undefined,
-          justifyContent: 'center',
-          minHeight: 40,
-          // Min tap target size
-          minWidth: 40,
-        }}
+        sx={getFooterLinkSx(Boolean(link.icon))}
         title={link.title}
+        tooltipPlacement="top"
+        variant="caption"
       />
     </NavItem>
   );
 }
 
 /**
+ * Returns the current year for copyright display, cached to avoid prerender issues.
+ */
+// biome-ignore lint/suspicious/useAwait: 'use cache' requires async
+async function getCopyrightYear() {
+  'use cache';
+  cacheLife('days');
+  return new Date().getFullYear();
+}
+
+/**
  * Creates the site footer component - shows version data + copyright
  */
-export function Footer() {
-  const { data: version } = useData('version');
-  const { data: footerLinks } = useData('footer');
-  const nonIconFooterLinks = footerLinks?.filter((link) => !link.icon);
-  const iconFooterLinks = footerLinks?.filter((link) => link.icon);
+export async function Footer() {
+  const [footerLinks, version, currentYear] = await Promise.all([
+    getFooterLinks(),
+    getRepoVersion(),
+    getCopyrightYear(),
+  ]);
+  const nonIconFooterLinks = footerLinks.filter((link) => !link.icon);
+  const iconFooterLinks = footerLinks.filter((link) => link.icon);
   return (
-    <Container component={Section} sx={{ marginTop: 12, padding: 0 }}>
-      <footer>
-        <Divider
-          sx={{
-            marginBottom: 3,
-          }}
-        />
-        <Nav
-          sx={(theme) => ({
-            alignItems: 'center',
-            columnGap: 3,
-            flexDirection: 'row',
-            flexWrap: 'wrap-reverse',
-            [theme.breakpoints.down('sm')]: {
-              alignItems: 'stretch',
-              flexDirection: 'column-reverse',
-            },
-          })}
-        >
-          <NavGroup>
-            <NavItem>© {new Date().getFullYear()} Dylan Gattey</NavItem>
-            <NavItem sx={{ padding: 0 }}>•</NavItem>
-            <NavItem>{version}</NavItem>
-          </NavGroup>
-          <NavGroup component="div" sx={{ columnGap: 2 }}>
-            <HorizontalStack component="ul" sx={{ margin: 0, padding: 0 }}>
-              {nonIconFooterLinks?.map((link) => (
-                <FooterLink key={link.url} link={link} />
-              ))}
-            </HorizontalStack>
-            <HorizontalStack
-              component="ul"
-              sx={{
-                flex: 1,
-                justifyContent: 'space-between',
-                margin: 0,
-                marginLeft: -2.5,
-                marginRight: -1.5,
-                padding: 0,
-              }}
-            >
-              {iconFooterLinks?.map((link) => (
-                <FooterLink key={link.url} link={link} />
-              ))}
-            </HorizontalStack>
-          </NavGroup>
-        </Nav>
-      </footer>
-    </Container>
+    <Section sx={footerSectionSx}>
+      <Container sx={footerContainerSx}>
+        <footer>
+          <Divider sx={dividerSx} />
+          <Nav sx={footerNavSx}>
+            <NavGroup>
+              <NavItem>© {currentYear} Dylan Gattey</NavItem>
+              <NavItem sx={navItemNoPaddingSx}>•</NavItem>
+              <NavItem>{version ?? ''}</NavItem>
+            </NavGroup>
+            <NavGroup component="div" sx={footerNavGroupSx}>
+              <Stack component="ul" direction="row" sx={footerLinkListSx}>
+                {nonIconFooterLinks?.map((link) => (
+                  <FooterLink key={link.url} link={link} />
+                ))}
+              </Stack>
+              <Stack component="ul" direction="row" sx={footerIconLinkListSx}>
+                {iconFooterLinks?.map((link) => (
+                  <FooterLink key={link.url} link={link} />
+                ))}
+              </Stack>
+            </NavGroup>
+          </Nav>
+        </footer>
+      </Container>
+    </Section>
   );
 }

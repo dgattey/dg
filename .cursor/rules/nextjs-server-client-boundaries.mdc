@@ -1,0 +1,37 @@
+---
+description: Avoid server/client boundary mistakes in Next.js
+globs: apps/web/src/app/** packages/ui/** packages/maps/**
+alwaysApply: false
+---
+
+# Next.js Server/Client Boundaries
+
+- Keep `use client` as deep as possible; default to Server Components.
+- Do not pass functions (including component references or callbacks) from Server Components to Client Components.
+- Prefer serializable props only across the boundary; move logic into the client leaf instead.
+- If a Client Component needs a dynamic import, perform it inside the client file.
+
+```tsx
+// ❌ BAD (server component passes function prop)
+<LazyLoadedMap FullMapCard={FullMapCard} />
+
+// ✅ GOOD (client component owns lazy import)
+// LazyLoadedMap.tsx (client)
+const FullMapCard = lazy(() => import('./mapbox/FullMapCard'));
+```
+
+## MUI Theming (avoid useTheme)
+
+- Do not use `useTheme()` or import `Theme` from `@mui/material/styles`—it forces client components and breaks serialization.
+- **sx props must always be plain objects**, never functions.
+- Use CSS variables (e.g., `var(--mui-palette-text-primary)`) instead of `theme.vars.*`.
+- Use static spacing values (e.g., `'8px'`, `'16px'`) instead of `theme.spacing()`.
+
+```tsx
+// ❌ BAD (useTheme + function sx)
+const theme = useTheme();
+<Card sx={(theme) => ({ color: theme.vars.palette.text.primary })} />
+
+// ✅ GOOD (plain object with CSS vars)
+<Card sx={{ color: 'var(--mui-palette-text-primary)', padding: '8px' }} />
+```

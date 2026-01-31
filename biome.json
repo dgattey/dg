@@ -23,15 +23,15 @@
       "**/*.json",
       "**/*.jsonc",
       "!**/next-env.d.ts",
-      "!**/.cache/**",
-      "!**/.next/**",
-      "!**/.vscode/**",
-      "!**/.vercel/**",
-      "!**/.turbo/**",
-      "!**/node_modules/**",
+      "!**/.cache",
+      "!**/.next",
+      "!**/.vscode",
+      "!**/.vercel",
+      "!**/.turbo",
+      "!**/node_modules",
       "!**/pnpm-lock.yaml",
-      "!**/migrations/**",
-      "!**/dist/**"
+      "!**/migrations",
+      "!**/dist"
     ]
   },
   "formatter": {
@@ -88,6 +88,7 @@
       "recommended": true,
       "style": {
         "noUselessElse": "error",
+        "useComponentExportOnlyModules": "off",
         "useConsistentArrayType": {
           "level": "error",
           "options": {
@@ -113,6 +114,57 @@
           },
           "suspicious": {
             "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["apps/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": ["../**/packages/**"],
+                    "message": "Import workspace packages by name (e.g. @dg/services/*, @dg/ui/*)."
+                  }
+                ]
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "includes": ["packages/**"],
+      "linter": {
+        "rules": {
+          "style": {
+            "noRestrictedImports": {
+              "level": "error",
+              "options": {
+                "patterns": [
+                  {
+                    "group": [
+                      "../codegen/**",
+                      "../db/**",
+                      "../maps/**",
+                      "../og/**",
+                      "../release/**",
+                      "../services/**",
+                      "../shared-core/**",
+                      "../tsconfig/**",
+                      "../ui/**",
+                      "../webhooks/**"
+                    ],
+                    "message": "Import workspace packages by name (e.g. @dg/services/*, @dg/ui/*)."
+                  }
+                ]
+              }
+            }
           }
         }
       }

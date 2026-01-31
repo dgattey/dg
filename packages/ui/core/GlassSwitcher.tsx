@@ -1,220 +1,218 @@
-import { Box, Radio, RadioGroup, Tooltip } from '@mui/material';
+'use client';
+
+import { Box, Radio, RadioGroup } from '@mui/material';
 import type { ReactNode } from 'react';
-import { useEffect, useRef, useState } from 'react';
-import { bouncyTransition } from '../helpers/bouncyTransition';
-import { mixinSx } from '../helpers/mixinSx';
-import { useDebounce } from '../helpers/useDebounce';
-import type { SxProps } from '../theme';
+import { createBouncyTransition } from '../helpers/bouncyTransition';
+import type { SxElement, SxObject } from '../theme';
 import { GlassContainer } from './GlassContainer';
+import { Tooltip } from './Tooltip';
 
-interface ThumbStyles {
-  height: number;
-  left: number;
-  top: number;
-  width: number;
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Layout Configuration
+// ─────────────────────────────────────────────────────────────────────────────
+// This component renders horizontally on sm+ screens and vertically on xs.
+// A sliding "thumb" indicator shows the current selection.
 
-function getThumbStyles(item: HTMLElement | null | undefined): ThumbStyles | null {
-  if (!item) {
-    return null;
-  }
+/** Spacing constants (in theme spacing units) */
+const SPACING = {
+  /** Outer padding (horizontal layout) */
+  containerPaddingSm: 0.85,
+  /** Outer padding (vertical layout) */
+  containerPaddingXs: 0.25,
+  /** Inner padding of radio group */
+  groupPadding: 0.25,
+  /** Icon size inside each option */
+  iconSize: 2.25,
+  /** Minimum option height */
+  optionMinHeight: 4.25,
+  /** Minimum option width */
+  optionMinWidth: 7,
+  /** Vertical padding inside each option */
+  optionPaddingBlock: 0.5,
+  /** Horizontal padding inside each option */
+  optionPaddingInline: 1.25,
+  /** Gap between options and thumb edge */
+  thumbGap: 0.25,
+  /** Height of thumb in horizontal layout */
+  thumbHeight: 5,
+} as const;
 
-  const { offsetLeft, offsetWidth, offsetHeight, offsetTop } = item;
+// MUI default spacing is 8px; keep sx objects theme-free for SSR.
+const BASE_SPACING_PX = 8;
+const spacingPx = (value: number) => `${value * BASE_SPACING_PX}px`;
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Styles
+// ─────────────────────────────────────────────────────────────────────────────
+
+const glassSwitcherBaseSx: SxObject = {
+  alignItems: 'center',
+  display: 'flex',
+  maxWidth: '100%',
+  padding: {
+    sm: spacingPx(SPACING.containerPaddingSm),
+    xs: spacingPx(SPACING.containerPaddingXs),
+  },
+  position: 'relative',
+  width: { sm: 'fit-content', xs: '100%' },
+};
+
+const optionStyles: SxObject = {
+  '& svg': {
+    ...createBouncyTransition('scale'),
+    display: 'block',
+    height: spacingPx(SPACING.iconSize),
+    width: spacingPx(SPACING.iconSize),
+  },
+  '&:hover': {
+    '& svg': { scale: 1.25 },
+    color: 'var(--mui-palette-primary-light)',
+    cursor: 'pointer',
+  },
+  boxSizing: 'border-box',
+  color: 'var(--mui-palette-primary-main)',
+  display: 'grid',
+  height: '100%',
+  lineHeight: 0,
+  minHeight: spacingPx(SPACING.optionMinHeight),
+  minWidth: spacingPx(SPACING.optionMinWidth),
+  paddingBlock: spacingPx(SPACING.optionPaddingBlock),
+  paddingInline: spacingPx(SPACING.optionPaddingInline),
+  placeItems: 'center',
+  position: 'relative',
+  width: '100%',
+  zIndex: 1,
+};
+
+const hiddenRadioSx: SxObject = {
+  display: 'none',
+};
+
+/**
+ * Creates CSS variables and thumb positioning styles.
+ * Variables are defined here so the thumb can calculate its position.
+ */
+function createThumbStyles(optionCount: number, selectedIndex: number): SxObject {
+  // Pre-calculate some values for clarity
+  const gap = spacingPx(SPACING.thumbGap);
+  const optionHeight = spacingPx(SPACING.optionMinHeight);
+  const paddingBlock = spacingPx(SPACING.optionPaddingBlock);
+
+  // Total row height in vertical layout = option height + top/bottom padding
+  const rowHeight = `calc(${optionHeight} + (${paddingBlock} * 2))`;
+
   return {
-    height: offsetHeight,
-    left: offsetLeft,
-    top: offsetTop,
-    width: offsetWidth,
+    backgroundColor: 'var(--mui-palette-action-selected)',
+    border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 30%, transparent)',
+
+    // Horizontal layout (sm+): pill-shaped thumb slides left/right
+    // Vertical layout (xs): circular thumb slides up/down
+    borderRadius: { sm: '999px', xs: '50%' },
+    content: '""',
+    height: { sm: spacingPx(SPACING.thumbHeight), xs: optionHeight },
+
+    // Position the thumb to center on the selected option
+    left: { sm: 0, xs: '50%' },
+    position: 'absolute',
+    top: {
+      sm: '50%',
+      xs: `calc((${selectedIndex} * (${rowHeight} + ${gap})) + (${rowHeight} / 2))`,
+    },
+    transform: {
+      sm: `translate(calc(${selectedIndex} * (100% + ${gap})), -50%)`,
+      xs: 'translate(-50%, -50%)',
+    },
+    transition: 'background-color 200ms ease, transform 200ms ease',
+    width: {
+      sm: `calc((100% - (${gap} * ${optionCount - 1})) / ${optionCount})`,
+      xs: optionHeight,
+    },
+    zIndex: 0,
   };
 }
 
-interface SelectionThumbProps {
-  thumbStyles: ThumbStyles;
-  isAnimating: boolean;
-  isResizing: boolean;
+function createGridStyles(optionCount: number): SxObject {
+  const gap = spacingPx(SPACING.thumbGap);
+  const optionHeight = spacingPx(SPACING.optionMinHeight);
+  const paddingBlock = spacingPx(SPACING.optionPaddingBlock);
+  const rowHeight = `calc(${optionHeight} + (${paddingBlock} * 2))`;
+
+  return {
+    alignItems: 'stretch',
+    columnGap: { sm: gap, xs: 0 },
+    display: 'grid',
+
+    // Horizontal: options flow in columns
+    // Vertical: options stack in rows
+    gridAutoFlow: { sm: 'column', xs: 'row' },
+    gridTemplateColumns: { sm: `repeat(${optionCount}, minmax(0, 1fr))`, xs: 'none' },
+    gridTemplateRows: { sm: 'none', xs: `repeat(${optionCount}, ${rowHeight})` },
+    height: { sm: '100%', xs: 'auto' },
+    justifyItems: 'stretch',
+    padding: spacingPx(SPACING.groupPadding),
+    position: 'relative',
+    rowGap: { sm: 0, xs: gap },
+    width: { sm: 'auto', xs: '100%' },
+    zIndex: 1,
+  };
 }
 
-/**
- * Animated selection indicator that shows the current selection
- */
-function SelectionThumb({ thumbStyles, isAnimating, isResizing }: SelectionThumbProps) {
-  return (
-    <Box
-      sx={(theme) => ({
-        backgroundColor: theme.vars.palette.action.selected,
-        border: `1px solid color-mix(in srgb, ${theme.vars.palette.primary.main} 30%, transparent)`,
-        borderRadius: theme.spacing(4),
-        height: `calc(100% - ${theme.spacing(2)})`,
-        opacity: isResizing ? 0 : 1,
-        position: 'absolute',
-        top: theme.spacing(1),
-        transform: `${isAnimating ? `translateX(calc(${thumbStyles.left}px - ${theme.spacing(1)})) scaleX(1.25)` : `translateX(calc(${thumbStyles.left}px - ${theme.spacing(1)}))`}`,
-        transformOrigin: 'center',
-        ...bouncyTransition(theme, ['transform', 'background-color', 'opacity']),
-        width: thumbStyles.width,
-        zIndex: 0,
-
-        [theme.breakpoints.down('sm')]: {
-          flexDirection: 'column',
-          height: thumbStyles.height,
-          left: theme.spacing(1),
-          transform: `${isAnimating ? `translateY(calc(${thumbStyles.top}px - ${theme.spacing(1)})) scaleX(1.25)` : `translateY(calc(${thumbStyles.top}px - ${theme.spacing(1)}))`}`,
-          width: `calc(100% - ${theme.spacing(2)})`,
-        },
-      })}
-    />
-  );
-}
+// ─────────────────────────────────────────────────────────────────────────────
+// Components
+// ─────────────────────────────────────────────────────────────────────────────
 
 interface SwitcherOptionProps {
   option: GlassSwitcherOption;
   isSelected: boolean;
   onChange: (value: string) => void;
-  itemRef: (el: HTMLElement | null) => void;
 }
 
-/**
- * Individual option in the glass switcher
- */
-function SwitcherOption({ option, isSelected, onChange, itemRef }: SwitcherOptionProps) {
-  return (
-    <Tooltip key={option.value} ref={itemRef} title={option.label}>
-      <Box
-        component="label"
-        sx={(theme) => ({
-          '& svg': {
-            ...bouncyTransition(theme, 'scale'),
-          },
-          '&:hover': {
-            '& svg': {
-              scale: 1.25,
-            },
-            color: theme.vars.palette.primary.light,
-            cursor: 'pointer',
-          },
-          alignItems: 'center',
-          color: theme.vars.palette.primary.main,
-          display: 'flex',
-          justifyContent: 'center',
-          minHeight: theme.spacing(6),
-          minWidth: theme.spacing(6),
-          padding: theme.spacing(0, 2.5),
-          zIndex: 1,
-        })}
-      >
-        <Radio
-          checked={isSelected}
-          onChange={(event) => onChange(event.target.value)}
-          sx={{ display: 'none' }}
-          value={option.value}
-        />
-        {option.icon}
-      </Box>
-    </Tooltip>
+/** Individual clickable option with icon and hidden radio input */
+function SwitcherOption({ option, isSelected, onChange }: SwitcherOptionProps) {
+  const element = (
+    <Box component="label" sx={optionStyles}>
+      <Radio
+        checked={isSelected}
+        onChange={(event) => onChange(event.target.value)}
+        sx={hiddenRadioSx}
+        value={option.value}
+      />
+      {option.icon}
+    </Box>
   );
-}
 
-/**
- * Custom hook to manage thumb positioning and animation
- */
-function useThumbPosition(selectedIndex: number) {
-  const [isAnimating, setIsAnimating] = useState(false);
-  const [isResizing, setIsResizing] = useState(false);
-  const [thumbStyles, setThumbStyles] = useState<ThumbStyles>({
-    height: 0,
-    left: 0,
-    top: 0,
-    width: 0,
-  });
-  const itemRefs = useRef<Array<HTMLElement | null>>([]);
+  if (!option.label) {
+    return element;
+  }
 
-  // Update thumb position and trigger animation when selection changes
-  useEffect(() => {
-    const nextStyles = getThumbStyles(itemRefs.current[selectedIndex]);
-    if (nextStyles) {
-      setThumbStyles(nextStyles);
-    }
-
-    // Trigger scale animation
-    setIsAnimating(true);
-    const timer = setTimeout(() => {
-      setIsAnimating(false);
-    }, 250); // Use standard short animation duration
-
-    return () => clearTimeout(timer);
-  }, [selectedIndex]);
-
-  // Debounced resize handler
-  const debouncedResizeComplete = useDebounce(() => {
-    const nextStyles = getThumbStyles(itemRefs.current[selectedIndex]);
-    if (nextStyles) {
-      setThumbStyles(nextStyles);
-    }
-    setIsResizing(false);
-  }, 300);
-
-  // Handle window resize with proper debouncing and visual hiding
-  useEffect(() => {
-    const handleResize = () => {
-      setIsResizing(true);
-      debouncedResizeComplete();
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [debouncedResizeComplete]);
-
-  return {
-    isAnimating,
-    isResizing,
-    itemRefs,
-    thumbStyles,
-  };
+  return <Tooltip title={option.label}>{element}</Tooltip>;
 }
 
 export interface GlassSwitcherOption {
-  /**
-   * The icon to display for this option
-   */
+  /** The icon to display for this option */
   icon?: ReactNode;
-  /**
-   * Display label for the option
-   */
+  /** Display label for the option (shown in tooltip) */
   label: string;
-  /**
-   * Unique value identifier for the option
-   */
+  /** Unique value identifier for the option */
   value: string;
 }
 
 export interface GlassSwitcherProps {
-  /**
-   * Currently selected option value
-   */
+  /** Currently selected option value */
   value: string;
-  /**
-   * Callback when the selection changes
-   */
+  /** Callback when the selection changes */
   onChange: (value: string) => void;
-  /**
-   * Array of options to display
-   */
+  /** Array of options to display */
   options: Array<GlassSwitcherOption>;
-  /**
-   * Additional styling to apply to the container
-   */
-  sx?: SxProps;
-  /**
-   * Accessible label for the radio group
-   */
+  /** Additional styling to apply to the container (object only, not array) */
+  sx?: SxElement;
+  /** Accessible label for the radio group */
   'aria-label'?: string;
 }
 
 /**
- * A generic switcher component that allows selection between N options with glass morphism styling.
- * Built on MUI RadioGroup for accessibility with a glass container background.
+ * A switcher component with glass morphism styling and a sliding thumb indicator.
+ * Renders horizontally on larger screens and vertically on mobile.
  */
 export function GlassSwitcher({
   value,
@@ -223,47 +221,31 @@ export function GlassSwitcher({
   sx,
   'aria-label': ariaLabel,
 }: GlassSwitcherProps) {
-  const selectedIndex = options.findIndex((option) => option.value === value);
-  const { isAnimating, isResizing, thumbStyles, itemRefs } = useThumbPosition(selectedIndex);
+  const selectedIndex = Math.max(
+    0,
+    options.findIndex((opt) => opt.value === value),
+  );
+  const optionCount = options.length;
+
+  // Merge base and custom styles
+  const mergedSx: SxElement = sx ? { ...glassSwitcherBaseSx, ...sx } : glassSwitcherBaseSx;
+  const radioGroupSx: SxObject = {
+    '&::before': createThumbStyles(optionCount, selectedIndex),
+    ...createGridStyles(optionCount),
+  };
 
   return (
-    <GlassContainer
-      sx={mixinSx(
-        (theme) => ({
-          alignItems: 'center',
-          display: 'flex',
-          paddingBlock: theme.spacing(0.5),
-          paddingInline: theme.spacing(1),
-          position: 'relative',
-          width: 'fit-content',
-
-          [theme.breakpoints.down('sm')]: {
-            paddingBlock: theme.spacing(1),
-            paddingInline: theme.spacing(0.5),
-          },
-        }),
-        sx,
-      )}
-    >
-      <SelectionThumb isAnimating={isAnimating} isResizing={isResizing} thumbStyles={thumbStyles} />
-
+    <GlassContainer data-role="glass-switcher" sx={mergedSx}>
       <RadioGroup
         aria-label={ariaLabel}
+        name="glass-switcher"
         onChange={(event) => onChange(event.target.value)}
-        row
-        sx={(theme) => ({
-          [theme.breakpoints.down('sm')]: {
-            flexDirection: 'column',
-          },
-        })}
+        sx={radioGroupSx}
         value={value}
       >
-        {options.map((option, index) => (
+        {options.map((option) => (
           <SwitcherOption
             isSelected={value === option.value}
-            itemRef={(el: HTMLElement | null) => {
-              itemRefs.current[index] = el;
-            }}
             key={option.value}
             onChange={onChange}
             option={option}

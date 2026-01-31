@@ -61,7 +61,7 @@ Pretty standard Next app. `/public` has static files, `/src` has app code, `/src
 
 - [Contentful](https://www.contentful.com) supplies most content via GraphQL. New content triggers builds via webhook.
 
-- [useSWR](https://swr.vercel.app) keeps data fresh with caching + revalidation. I wrap it with strong endpoint types.
+- Next.js App Router caching with Cache Components (`use cache`) and tag-based revalidation keeps data fresh.
 
 - [Mapbox GL](https://docs.mapbox.com/mapbox-gl-js/api/) powers the homepage map, lazy loaded on hover.
 
@@ -75,10 +75,9 @@ Pretty standard Next app. `/public` has static files, `/src` has app code, `/src
 
 ### API
 
-1. `/src/api/endpoints.ts` is the typed contract between client + server. Don’t call endpoints directly from the client — use the types.
-1. `EndpointKey` is the typed key for every API endpoint; `useData` consumes it via `useSWR`.
-1. Fetchers can be called in `getStaticProps` for fallback data via `fetchFallback`.
-1. There’s one dynamic API route for `/api/*` (nested paths work) and it stays strongly typed.
+1. Server Components fetch data directly using server-only functions with Cache Components (`use cache`).
+1. Data fetching uses tag-based revalidation for webhook-triggered updates.
+1. Client Components receive data as props from Server Components.
 1. `/src/api/server` is server-only (clients + fetchers). Don’t import it client-side.
 
 ### DB

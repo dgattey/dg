@@ -1,19 +1,14 @@
-import { useBreakpoint } from 'use-breakpoint';
-import { BREAKPOINTS_MIN_SIZES, PROJECT_2X_IMAGE_SIZES, PROJECT_IMAGE_SIZES } from './imageSizes';
+import { PROJECT_2X_IMAGE_SIZES, PROJECT_IMAGE_SIZES } from './imageSizes';
 
 /**
- * Grabs the current breakpoint and returns the appropriate image sizes for the current
- * breakpoint and the horizontal and vertical span of the image.
+ * Returns image sizes based on layout spans.
  */
 export function useCurrentImageSizes(layout?: string) {
   const verticalSpan = layout === 'tall' ? 2 : 1;
   const horizontalSpan = layout === 'wide' ? 2 : 1;
-  const { breakpoint } = useBreakpoint(BREAKPOINTS_MIN_SIZES, 'extraLarge');
-  const width =
-    horizontalSpan === 1 ? PROJECT_IMAGE_SIZES[breakpoint] : PROJECT_2X_IMAGE_SIZES[breakpoint];
-  const height =
-    verticalSpan === 1 ? PROJECT_IMAGE_SIZES[breakpoint] : PROJECT_2X_IMAGE_SIZES[breakpoint];
   const sizes = horizontalSpan === 1 ? PROJECT_IMAGE_SIZES : PROJECT_2X_IMAGE_SIZES;
+  const width = sizes.extraLarge;
+  const height = sizes.extraLarge;
   return {
     height,
     horizontalSpan,
