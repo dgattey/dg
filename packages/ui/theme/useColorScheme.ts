@@ -1,6 +1,9 @@
+'use client';
+
 import type { PaletteMode } from '@mui/material';
 import { useColorScheme as useMuiColorScheme } from '@mui/material/styles';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect } from 'react';
+import { themeCookieName } from '.';
 
 /**
  * The color scheme the system prefers by default
@@ -24,19 +27,56 @@ export function useColorScheme(): Readonly<{
   updatePreferredMode: SetColorScheme;
 }> {
   const { mode, setMode, systemMode } = useMuiColorScheme();
-  const resolvedMode = mode === 'system' ? systemMode : mode;
-  const [isInitialized, setIsInitialized] = useState(false);
+  const isSystemMode = mode === 'system' || mode === null || typeof mode === 'undefined';
+  const resolvedMode = isSystemMode ? systemMode : mode;
+  const domTheme =
+    typeof document === 'undefined' ? null : document.documentElement.getAttribute('data-theme');
+  const domMode = domTheme === 'dark' || domTheme === 'light' ? domTheme : null;
+  const effectiveMode = resolvedMode ?? domMode;
+  const writeThemeCookie = useCallback((value: string) => {
+    const hasCookieStore =
+      'cookieStore' in window &&
+      typeof (window as Window & { cookieStore?: { set?: unknown } }).cookieStore?.set ===
+        'function';
+    const cookieStore = hasCookieStore
+      ? (
+          window as Window & {
+            cookieStore: {
+              set: (params: { name: string; value: string; path: string; maxAge: number }) => void;
+            };
+          }
+        ).cookieStore
+      : null;
 
-  // Make sure we set initialized before we try to render
-  useEffect(() => {
-    setIsInitialized(true);
+    if (cookieStore) {
+      void cookieStore.set({
+        maxAge: 60 * 60 * 24 * 365,
+        name: themeCookieName,
+        path: '/',
+        value,
+      });
+      return;
+    }
+    // biome-ignore lint/suspicious/noDocumentCookie: Legacy fallback for browsers without Cookie Store.
+    document.cookie = `${themeCookieName}=${value}; Path=/; Max-Age=31536000; SameSite=Lax`;
   }, []);
+
+  useEffect(() => {
+    if (isSystemMode) {
+      writeThemeCookie('system');
+      return;
+    }
+    if (!effectiveMode) {
+      return;
+    }
+    writeThemeCookie(effectiveMode);
+  }, [effectiveMode, isSystemMode, writeThemeCookie]);
 
   return {
     colorScheme: {
-      isCustomized: isInitialized && mode !== 'system',
-      isInitialized,
-      mode: resolvedMode ?? 'light',
+      isCustomized: !isSystemMode,
+      isInitialized: true,
+      mode: effectiveMode ?? 'light',
     },
     updatePreferredMode: setMode,
   } as const;

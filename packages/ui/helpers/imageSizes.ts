@@ -10,18 +10,6 @@ export const BREAKPOINT_MAX_SIZES = {
 };
 
 /**
- * Breakpoints from min width up - same data, just remapped
- */
-export const BREAKPOINTS_MIN_SIZES = {
-  extraLarge: BREAKPOINT_MAX_SIZES.large - 1,
-  extraTiny: 0,
-  large: BREAKPOINT_MAX_SIZES.medium - 1,
-  medium: BREAKPOINT_MAX_SIZES.small - 1,
-  small: BREAKPOINT_MAX_SIZES.tiny - 1,
-  tiny: BREAKPOINT_MAX_SIZES.extraTiny - 1,
-};
-
-/**
  * We use this both to request data and display it on map, and we
  * have a constant size for the map marker.
  */

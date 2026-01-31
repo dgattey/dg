@@ -27,21 +27,17 @@ export type ControlContainerProps = Pick<React.ComponentProps<'div'>, 'className
  * Renders one single control - needs theme injection because of how Mapbox works
  */
 function Container({ theme, ...props }: Omit<BoxProps, 'sx'> & { theme: Theme }) {
-  return (
-    <Box
-      {...props}
-      sx={{
-        borderRadius: theme.spacing(6),
-        boxShadow: theme.vars.extraShadows.map.control,
-        display: 'flex',
-        fontSize: '1rem',
-        lineHeight: '1',
-        overflow: 'hidden',
-        position: 'relative',
-        width: '100%',
-      }}
-    />
-  );
+  const containerSx: SxProps<Theme> = {
+    borderRadius: theme.spacing(6),
+    boxShadow: theme.vars.extraShadows.map.control,
+    display: 'flex',
+    fontSize: '1rem',
+    lineHeight: '1',
+    overflow: 'hidden',
+    position: 'relative',
+    width: '100%',
+  };
+  return <Box {...props} sx={containerSx} />;
 }
 
 /**

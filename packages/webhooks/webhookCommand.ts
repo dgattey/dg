@@ -1,5 +1,5 @@
+import { formattedList } from '@dg/shared-core/helpers/formattedList';
 import { command, oneOf, positional, run, string, subcommands } from 'cmd-ts';
-import { formattedList } from 'shared-core/helpers/formattedList';
 import { createSubscription } from './helpers/createSubscription';
 import { deleteSubscription } from './helpers/deleteSubscription';
 import { listSubscriptions } from './helpers/listSubscriptions';

@@ -19,13 +19,14 @@ const SHARED_DB_OPTIONS = {
 };
 
 const databaseUrl = env.DATABASE_URL;
-log.info('Database url', { databaseUrl });
+const maskedDatabaseUrl = databaseUrl ? `${databaseUrl.slice(0, 3)}...` : undefined;
+log.info('Database url', { databaseUrl: maskedDatabaseUrl });
 if (!databaseUrl) {
   throw new Error('DATABASE_URL environment variable not set');
 }
 
 const nodeEnv = env.NODE_ENV;
-log.info('Node env from env variable', { nodeEnv });
+log.info('Node env', { nodeEnv });
 
 // Sequelize options applied based on current environment
 const DB_OPTIONS = {

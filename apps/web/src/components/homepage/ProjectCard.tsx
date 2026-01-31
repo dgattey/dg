@@ -1,9 +1,18 @@
-import type { Project } from 'api/contentful/api.generated';
-import { ContentCard } from 'ui/dependent/ContentCard';
-import { Image } from 'ui/dependent/Image';
-import { useCurrentImageSizes } from 'ui/helpers/useCurrentImageSizes';
+import type { Project } from '@dg/services/contentful/api.generated';
+import { ContentCard } from '@dg/ui/dependent/ContentCard';
+import { Image } from '@dg/ui/dependent/Image';
+import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
+import type { SxObject } from '@dg/ui/theme';
+import { getShape } from '@dg/ui/theme/shape';
 
 type ProjectCardProps = Project;
+
+const { gridItemSize } = getShape();
+const smallMaxHeight = gridItemSize?.(0.75);
+
+const projectCardSx: SxObject = {
+  maxHeight: { md: 'unset', xs: smallMaxHeight ?? 'unset' },
+};
 
 /**
  * Uses the `ContentCard` to show a project's details
@@ -16,11 +25,7 @@ export function ProjectCard({ title, layout, link, thumbnail }: ProjectCardProps
       horizontalSpan={horizontalSpan}
       link={link}
       overlay={title}
-      sx={(theme) => ({
-        [theme.breakpoints.down('md')]: {
-          maxHeight: theme.shape.gridItemSize(0.75),
-        },
-      })}
+      sx={projectCardSx}
       verticalSpan={verticalSpan}
     >
       {thumbnail ? (

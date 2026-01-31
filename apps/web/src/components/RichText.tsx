@@ -2,15 +2,15 @@ import type { Options } from '@contentful/rich-text-react-renderer';
 import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
 import type { Document, NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
+import type { Asset, Entry } from '@dg/services/contentful/api.generated';
+import type { IntroBlockQuery } from '@dg/services/contentful/fetchIntroContent.generated';
+import { isLink, isProject } from '@dg/services/contentful/parsers';
+import { isNotNullish } from '@dg/shared-core/helpers/typeguards';
+import { Image } from '@dg/ui/dependent/Image';
+import { Link } from '@dg/ui/dependent/Link';
+import { PROJECT_MAX_IMAGE_DIMENSION } from '@dg/ui/helpers/imageSizes';
+import type { SxObject, SxProps } from '@dg/ui/theme';
 import { Divider, Stack, Typography } from '@mui/material';
-import type { Asset, Entry } from 'api/contentful/api.generated';
-import type { IntroBlockQuery } from 'api/contentful/fetchIntroContent.generated';
-import { isLink, isProject } from 'api/contentful/parsers';
-import { isNotNullish } from 'shared-core/helpers/typeguards';
-import { Image } from 'ui/dependent/Image';
-import { Link } from 'ui/dependent/Link';
-import { PROJECT_MAX_IMAGE_DIMENSION } from 'ui/helpers/imageSizes';
-import type { SxProps } from 'ui/theme';
 import { ProjectCard } from './homepage/ProjectCard';
 
 type RichTextProps = NonNullable<
@@ -36,10 +36,14 @@ type DataWithId = {
 /**
  * Offsets for fixed header so anchor links look right
  */
-const HEADING_SX: SxProps = {
-  marginBottom: (theme) => theme.spacing(3),
+const HEADING_SX: SxObject = {
+  marginBottom: 3,
   marginTop: -12,
   paddingTop: 12,
+};
+
+const paragraphSx: SxObject = {
+  marginBottom: 3.5,
 };
 
 /**
@@ -149,7 +153,7 @@ const renderOptions = (links: RichTextProps['links']): Options => {
       [BLOCKS.HEADING_5]: (_, children) => <HeadingWithId variant="h5">{children}</HeadingWithId>,
       [BLOCKS.HEADING_6]: (_, children) => <HeadingWithId variant="h6">{children}</HeadingWithId>,
       [BLOCKS.PARAGRAPH]: (_, children) => (
-        <Typography sx={{ marginBottom: (theme) => theme.spacing(3.5) }} variant="body1">
+        <Typography sx={paragraphSx} variant="body1">
           {children}
         </Typography>
       ),

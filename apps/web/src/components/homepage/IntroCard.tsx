@@ -1,8 +1,9 @@
-import { useData } from 'api/useData';
-import { ContentCard } from 'ui/dependent/ContentCard';
-import { Image } from 'ui/dependent/Image';
-import { useCurrentImageSizes } from 'ui/helpers/useCurrentImageSizes';
-import { useLinkWithName } from '../../hooks/useLinkWithName';
+import type { Link as LinkType } from '@dg/services/contentful/api.generated';
+import type { IntroContent } from '@dg/services/contentful/fetchIntroContent';
+import { ContentCard } from '@dg/ui/dependent/ContentCard';
+import { Image } from '@dg/ui/dependent/Image';
+import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
+import type { SxObject } from '@dg/ui/theme';
 import { RichText } from '../RichText';
 
 /**
@@ -10,15 +11,38 @@ import { RichText } from '../RichText';
  */
 const SMALL_IMAGE_SIZE = '16em';
 
+const overlaySx: SxObject = {
+  visibility: { md: 'visible', xs: 'hidden' },
+};
+
+const introImageCardSx: SxObject = {
+  maxHeight: { md: 'unset', xs: SMALL_IMAGE_SIZE },
+  maxWidth: { md: 'unset', xs: SMALL_IMAGE_SIZE },
+  minWidth: { md: 'unset', xs: SMALL_IMAGE_SIZE },
+};
+
+const introTextCardSx: SxObject = {
+  alignItems: 'center',
+  background: 'none',
+  border: 'none',
+  borderRadius: 0,
+  boxShadow: 'none',
+  display: 'flex',
+  flexDirection: 'column',
+};
+
 /**
  * Creates an intro information card for use on the homepage. Technically
  * creates two cards in a fragment. Also adds meta for the whole Homepage,
  * as the data comes from the introBlock. The width/height here is for image
  * resizing, and the actual width may be smaller.
  */
-export function IntroCard() {
-  const { data: introBlock } = useData('intro');
-  const linkedInLink = useLinkWithName('LinkedIn');
+type IntroCardProps = {
+  linkedInLink?: LinkType;
+  introBlock: IntroContent | null;
+};
+
+export function IntroCard({ introBlock, linkedInLink }: IntroCardProps) {
   const { width, height, sizes } = useCurrentImageSizes();
 
   if (!introBlock?.textBlock.content) {
@@ -27,22 +51,7 @@ export function IntroCard() {
 
   return (
     <>
-      <ContentCard
-        link={linkedInLink}
-        overlay="About"
-        overlaySx={(theme) => ({
-          [theme.breakpoints.down('md')]: {
-            visibility: 'hidden',
-          },
-        })}
-        sx={(theme) => ({
-          [theme.breakpoints.down('md')]: {
-            maxHeight: SMALL_IMAGE_SIZE,
-            maxWidth: SMALL_IMAGE_SIZE,
-            minWidth: SMALL_IMAGE_SIZE,
-          },
-        })}
-      >
+      <ContentCard link={linkedInLink} overlay="About" overlaySx={overlaySx} sx={introImageCardSx}>
         <Image
           alt={introBlock.image.title ?? 'Introduction image'}
           height={height}
@@ -52,17 +61,7 @@ export function IntroCard() {
           width={width}
         />
       </ContentCard>
-      <ContentCard
-        sx={{
-          alignItems: 'center',
-          background: 'none',
-          border: 'none',
-          borderRadius: 0,
-          boxShadow: 'none',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
+      <ContentCard sx={introTextCardSx}>
         <RichText {...introBlock.textBlock.content} />
       </ContentCard>
     </>

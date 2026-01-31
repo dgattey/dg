@@ -1,6 +1,6 @@
-import { styled } from '@mui/material';
-import type { Asset } from 'api/contentful/api.generated';
+import type { Asset } from '@dg/services/contentful/api.generated';
 import NextImage from 'next/image';
+import type { CSSProperties } from 'react';
 import { BREAKPOINT_MAX_SIZES } from '../helpers/imageSizes';
 
 type ImageProps = Partial<Asset> & {
@@ -54,12 +54,12 @@ type ImageProps = Partial<Asset> & {
 /**
  * All images need to be max width'd for our layouts
  */
-const MaxWidthImage = styled(NextImage)({
+const maxWidthImageStyle: CSSProperties = {
   borderStyle: 'none',
   display: 'flex',
   height: 'auto',
   maxWidth: '100%',
-});
+};
 
 /**
  * Turns the breakpoint to width map into a sizes string
@@ -96,7 +96,7 @@ export function Image({ url, title, alt, sizes, width, height, fill, ...props }:
   };
 
   if (!fill) {
-    return <MaxWidthImage {...sharedProps} height={height} width={width} />;
+    return <NextImage {...sharedProps} height={height} style={maxWidthImageStyle} width={width} />;
   }
   return <NextImage {...sharedProps} fill={true} />;
 }

@@ -1,11 +1,11 @@
 {
   "devDependencies": {
+    "@dg/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "dotenv-mono": "catalog:",
-    "tsconfig": "workspace:*",
     "typescript": "catalog:"
   },
-  "name": "shared-core",
+  "name": "@dg/shared-core",
   "private": true,
   "scripts": {
     "check": "biome check --write .",

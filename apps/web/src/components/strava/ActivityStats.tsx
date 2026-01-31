@@ -1,44 +1,38 @@
+import { formattedDistance } from '@dg/shared-core/helpers/formattedDistance';
+import { FaIcon } from '@dg/ui/icons/FaIcon';
+import type { SxObject } from '@dg/ui/theme';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
-import { Typography } from '@mui/material';
-import { useData } from 'api/useData';
-import { formattedDistance } from 'shared-core/helpers/formattedDistance';
-import { HorizontalStack } from 'ui/core/HorizontalStack';
-import { useRelativeTimeFormat } from 'ui/helpers/useRelativeTimeFormat';
-import { FaIcon } from 'ui/icons/FaIcon';
+import { Stack, Typography } from '@mui/material';
+import type { StravaActivity } from './types';
+
+const layoutSx: SxObject = {
+  gap: 1,
+  justifyContent: 'space-between',
+};
+
+const iconStackSx: SxObject = {
+  alignItems: 'center',
+  gap: 1,
+};
 
 /**
  * Shows a horizontal stack of stats for the latest strava activity
  */
-export function ActivityStats() {
-  const { data: activity } = useData('latest/activity');
-
-  const formattedDate = useRelativeTimeFormat({
-    capitalized: true,
-    fromDate: activity?.start_date,
-  });
-  const distance = formattedDistance({ distanceInMeters: activity?.distance });
-
-  if (!activity?.start_date || !activity.distance) {
+export function ActivityStats({ activity }: { activity: StravaActivity | null }) {
+  if (!activity?.distance) {
     return null;
   }
 
+  const distance = formattedDistance({ distanceInMeters: activity.distance });
+  const formattedDate = activity.relativeStartDate;
+
   return (
-    <HorizontalStack
-      sx={{
-        gap: 1,
-        justifyContent: 'space-between',
-      }}
-    >
-      <HorizontalStack
-        sx={{
-          alignItems: 'center',
-          gap: 1,
-        }}
-      >
+    <Stack direction="row" sx={layoutSx}>
+      <Stack direction="row" sx={iconStackSx}>
         <FaIcon icon={faStrava} />
         <Typography variant="caption">{distance}</Typography>
-      </HorizontalStack>
-      <Typography variant="caption">{formattedDate}</Typography>
-    </HorizontalStack>
+      </Stack>
+      {formattedDate ? <Typography variant="caption">{formattedDate}</Typography> : null}
+    </Stack>
   );
 }

@@ -4,7 +4,7 @@
     "nextjs.json",
     "react.json"
   ],
-  "name": "tsconfig",
+  "name": "@dg/tsconfig",
   "private": true,
   "scripts": {
     "check": "biome check --write .",

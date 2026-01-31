@@ -1,5 +1,4 @@
-import type { Link as LinkType } from 'api/contentful/api.generated';
-import type { SxProps } from '../theme';
+import type { Link as LinkType } from '@dg/services/contentful/api.generated';
 import { Link } from './Link';
 
 type ContentWrappingLinkProps = Pick<React.ComponentProps<'div'>, 'children'> & {
@@ -7,19 +6,28 @@ type ContentWrappingLinkProps = Pick<React.ComponentProps<'div'>, 'children'> & 
    * The link whose URL we should render
    */
   link: LinkType | undefined;
-
-  sx?: SxProps;
 };
 
 /**
- * Renders a link that wraps the given children. Compliant with Next's Link too.
+ * Renders a link that wraps the given children. Server component compatible.
  */
-export function ContentWrappingLink({ link, children, sx }: ContentWrappingLinkProps) {
+export function ContentWrappingLink({ link, children }: ContentWrappingLinkProps) {
   if (!link?.url) {
     return null;
   }
   return (
-    <Link href={link.url} isExternal={true} sx={sx}>
+    <Link
+      href={link.url}
+      isExternal={true}
+      sx={{
+        borderRadius: 'inherit',
+        color: 'inherit',
+        display: 'block',
+        height: '100%',
+        textDecoration: 'none',
+      }}
+      title={link.title ?? undefined}
+    >
       {children}
     </Link>
   );

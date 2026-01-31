@@ -1,20 +1,41 @@
-import type { MapLocation } from 'api/contentful/MapLocation';
-import type { JSXElementConstructor } from 'react';
-import { Suspense, useState } from 'react';
-import { ContentCard } from 'ui/dependent/ContentCard';
-import { useColorScheme } from 'ui/theme/useColorScheme';
+'use client';
+
+import type { MapLocation } from '@dg/services/contentful/MapLocation';
+import { ContentCard } from '@dg/ui/dependent/ContentCard';
+import type { SxObject } from '@dg/ui/theme';
+import { themePreferenceAttribute, themeSelectorAttribute } from '@dg/ui/theme';
+import { lazy, Suspense, useState } from 'react';
+
+const FullMapCard = lazy(() => import('./mapbox/FullMapCard'));
+
+const previewCardBaseSx: SxObject = {
+  border: 'none',
+};
+
+const getPreviewCardSx = (backgroundImageVars: SxObject | null): SxObject => ({
+  ...previewCardBaseSx,
+  ...(backgroundImageVars && {
+    ...backgroundImageVars,
+    backgroundImage: 'var(--map-preview-light)',
+    backgroundPosition: 'center',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: 'cover',
+    [`html[${themeSelectorAttribute}="dark"] &`]: {
+      backgroundImage: 'var(--map-preview-dark)',
+    },
+    '@media (prefers-color-scheme: dark)': {
+      [`html[${themePreferenceAttribute}="system"]:not([${themeSelectorAttribute}]) &`]: {
+        backgroundImage: 'var(--map-preview-dark)',
+      },
+    },
+  }),
+});
 
 /**
  * Shows a lazy loaded map card, to be fetched on mouse over/touch start.
- * The FullMapCard must be lazy loaded and passed in here!
+ * The FullMapCard is lazy loaded here to keep it client-only.
  */
-export function LazyLoadedMap({
-  FullMapCard,
-  location,
-}: {
-  FullMapCard: JSXElementConstructor<{ location: MapLocation }>;
-  location: MapLocation | null | undefined;
-}) {
+export function LazyLoadedMap({ location }: { location: MapLocation | null | undefined }) {
   const [showFullMapComponent, setShowFullMapComponent] = useState(false);
   const loadFullMap = () => {
     setShowFullMapComponent(true);
@@ -43,31 +64,23 @@ function PreviewCard({
   loadFullMap?: () => void;
   location: MapLocation | null | undefined;
 }) {
-  const { colorScheme } = useColorScheme();
-  const backgroundImageUrl = colorScheme.isInitialized
-    ? ((colorScheme.mode === 'light'
-        ? location?.backupImageUrls.light
-        : location?.backupImageUrls.dark) ?? null)
+  const lightImage = location?.backupImageUrls.light ?? null;
+  const darkImage = location?.backupImageUrls.dark ?? null;
+  const fallbackLightImage = lightImage ?? darkImage;
+  const fallbackDarkImage = darkImage ?? lightImage;
+  const hasBackgroundImage = Boolean(fallbackLightImage);
+
+  const backgroundImageVars: SxObject | null = hasBackgroundImage
+    ? {
+        '--map-preview-dark': `url("${fallbackDarkImage}")`,
+        '--map-preview-light': `url("${fallbackLightImage}")`,
+      }
     : null;
   return (
     <ContentCard
       onMouseOver={() => loadFullMap?.()}
       onTouchStart={() => loadFullMap?.()}
-      sx={(theme) => ({
-        border: 'none',
-        minHeight: 297,
-        [theme.breakpoints.down('md')]: {
-          height: 200,
-          minHeight: 200,
-          width: '100%',
-        },
-        ...(backgroundImageUrl && {
-          backgroundImage: `url('${backgroundImageUrl}')`,
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
-        }),
-      })}
+      sx={getPreviewCardSx(backgroundImageVars)}
     >
       {children}
     </ContentCard>

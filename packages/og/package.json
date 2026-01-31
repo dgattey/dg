@@ -1,18 +1,18 @@
 {
   "dependencies": {
+    "@dg/shared-core": "workspace:*",
+    "@dg/ui": "workspace:*",
     "@vercel/og": "0.8.6",
-    "react": "catalog:",
-    "shared-core": "workspace:*",
-    "ui": "workspace:*"
+    "react": "catalog:"
   },
   "devDependencies": {
+    "@dg/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "dotenv-mono": "catalog:",
-    "tsconfig": "workspace:*",
     "typescript": "catalog:"
   },
-  "name": "og",
+  "name": "@dg/og",
   "private": true,
   "scripts": {
     "check": "biome check --write .",

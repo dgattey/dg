@@ -1,22 +1,44 @@
-import { Button, Typography } from '@mui/material';
+'use client';
+
+import { GlassContainer } from '@dg/ui/core/GlassContainer';
+import { ScrollIndicatorContext } from '@dg/ui/core/ScrollIndicatorContext';
+import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
+import type { SxObject } from '@dg/ui/theme';
+import { Box, Button, Typography } from '@mui/material';
 import { ArrowUp } from 'lucide-react';
 import { useContext } from 'react';
-import { GlassContainer } from 'ui/core/GlassContainer';
-import { ScrollIndicatorContext } from 'ui/core/ScrollIndicatorContext';
-import { bouncyTransition } from 'ui/helpers/bouncyTransition';
-import { mixinSx } from 'ui/helpers/mixinSx';
-import type { SxProps } from 'ui/theme';
 
-const scrolledSx: SxProps = {
+const scrollIndicatorBaseSx: SxObject = {
+  ...createBouncyTransition(['opacity', 'transform', 'color', 'background-color']),
+  opacity: 0,
+  paddingBlock: 0.5,
+  paddingInline: 0,
+  transform: 'translateY(-100%)',
+  willChange: 'transform',
+};
+
+/** Scroll indicator styles when scrolled */
+const scrollIndicatorScrolledSx: SxObject = {
   '&:hover': {
-    background: (theme) =>
-      `color-mix(in srgb, ${theme.vars.palette.background.default} 50%, transparent)`,
-    color: (theme) => theme.vars.palette.text.primary,
+    background: 'color-mix(in srgb, var(--mui-palette-background-default) 50%, transparent)',
+    color: 'var(--mui-palette-text-primary)',
     transform: 'scale(1.05)',
   },
+  ...createBouncyTransition(['opacity', 'transform', 'color', 'background-color']),
   cursor: 'pointer',
   opacity: 1,
+  paddingBlock: 0.5,
+  paddingInline: 0,
   transform: 'translateX(0)',
+  willChange: 'transform',
+};
+
+const scrollIndicatorButtonSx: SxObject = {
+  alignItems: 'center',
+  color: 'var(--mui-palette-text-primary)',
+  display: 'flex',
+  gap: 0.5,
+  textWrap: 'nowrap',
 };
 
 /**
@@ -30,34 +52,18 @@ export function ScrollIndicatorButton() {
   };
 
   return (
-    <GlassContainer
-      sx={mixinSx(
-        (theme) => ({
-          opacity: 0,
-          paddingBlock: 0.5,
-          paddingInline: 0,
-          transform: 'translateY(-100%)',
-          willChange: 'transform',
-          ...bouncyTransition(theme, ['opacity', 'transform', 'color', 'background-color']),
-        }),
-        isScrolled ? scrolledSx : null,
-      )}
-    >
+    <GlassContainer sx={isScrolled ? scrollIndicatorScrolledSx : scrollIndicatorBaseSx}>
       <Button
         color="secondary"
         disabled={!isScrolled}
         onClick={scrollToTop}
-        sx={{
-          alignItems: 'center',
-          color: (theme) => theme.vars.palette.text.primary,
-          display: 'flex',
-          gap: 0.5,
-          textWrap: 'nowrap',
-        }}
+        sx={scrollIndicatorButtonSx}
         variant="text"
       >
         <Typography variant="caption">To top</Typography>
-        <ArrowUp size={16} style={{ flexShrink: 0 }} />
+        <Box component="span" sx={{ display: 'inline-flex', flexShrink: 0 }}>
+          <ArrowUp size={16} />
+        </Box>
       </Button>
     </GlassContainer>
   );

@@ -28,23 +28,6 @@
     "WEBHOOK_CALLBACK_URL"
   ],
   "tasks": {
-    "topo": {
-      "dependsOn": ["^topo"]
-    },
-    "dg#dev": {
-      "cache": false
-    },
-    "dev": {
-      "cache": false,
-      "dependsOn": ["dg#dev", "topo"],
-      "inputs": ["apps/**/*", "packages/**/*"],
-      "persistent": true
-    },
-    "connect": {
-      "cache": false,
-      "inputs": ["apps/**/*", "packages/**/*"],
-      "persistent": true
-    },
     "build": {
       "dependsOn": ["^build", "topo", "check", "check:types"],
       "outputs": [".next/**", "!.next/cache/**"]
@@ -74,11 +57,28 @@
       "cache": false,
       "inputs": ["apps/web/src/api/server/*"]
     },
+    "connect": {
+      "cache": false,
+      "inputs": ["apps/**/*", "packages/**/*"],
+      "persistent": true
+    },
     "db": {
+      "cache": false
+    },
+    "dev": {
+      "cache": false,
+      "dependsOn": ["dg#dev", "topo"],
+      "inputs": ["apps/**/*", "packages/**/*"],
+      "persistent": true
+    },
+    "dg#dev": {
       "cache": false
     },
     "release": {
       "cache": false
+    },
+    "topo": {
+      "dependsOn": ["^topo"]
     },
     "webhook": {
       "cache": false

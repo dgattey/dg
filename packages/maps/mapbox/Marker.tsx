@@ -1,12 +1,27 @@
+import type { MapLocation } from '@dg/services/contentful/MapLocation';
+import { Image } from '@dg/ui/dependent/Image';
+import { MAP_MARKER_IMAGE_SIZE } from '@dg/ui/helpers/imageSizes';
+import type { SxObject, SxProps } from '@dg/ui/theme';
 import { Box } from '@mui/material';
-import type { MapLocation } from 'api/contentful/MapLocation';
 import { Marker as MapMarker } from 'react-map-gl/mapbox';
-import { Image } from 'ui/dependent/Image';
-import { MAP_MARKER_IMAGE_SIZE } from 'ui/helpers/imageSizes';
 
 const DIMENSION = 100;
 const RADIUS = DIMENSION / 2;
 const IMAGE_DIMENSION = MAP_MARKER_IMAGE_SIZE;
+
+const markerFillSx: SxProps = (theme) => ({
+  fill: theme.vars.palette.map.markerBackground,
+});
+
+const markerStrokeSx: SxProps = (theme) => ({
+  stroke: theme.vars.palette.map.markerBorder,
+});
+
+const markerImageSx: SxObject = {
+  left: `${(DIMENSION - IMAGE_DIMENSION) / 2}px`,
+  position: 'absolute',
+  top: `${(DIMENSION - IMAGE_DIMENSION) / 2}px`,
+};
 
 // Required point, optional image
 type MarkerProps = Pick<MapLocation, 'point'> & Partial<Pick<MapLocation, 'image'>>;
@@ -26,14 +41,7 @@ export function Marker({ point, image }: MarkerProps) {
           Map marker for {point.latitude}, {point.longitude}
         </title>
         <defs>
-          <Box
-            component="circle"
-            cx={RADIUS}
-            cy={RADIUS}
-            id={id}
-            r={RADIUS}
-            sx={(theme) => ({ fill: theme.vars.palette.map.markerBackground })}
-          />
+          <Box component="circle" cx={RADIUS} cy={RADIUS} id={id} r={RADIUS} sx={markerFillSx} />
           <clipPath id={`clip-${id}`}>
             <use xlinkHref={`#${id}`} />
           </clipPath>
@@ -42,21 +50,12 @@ export function Marker({ point, image }: MarkerProps) {
           clipPath={`url(#clip-${id})`}
           component="use"
           strokeWidth="2"
-          sx={{
-            stroke: (theme) => theme.vars.palette.map.markerBorder,
-          }}
+          sx={markerStrokeSx}
           xlinkHref={`#${id}`}
         />
       </svg>
       {image ? (
-        <Box
-          component="span"
-          sx={{
-            left: `${(DIMENSION - IMAGE_DIMENSION) / 2}px`,
-            position: 'absolute',
-            top: `${(DIMENSION - IMAGE_DIMENSION) / 2}px`,
-          }}
-        >
+        <Box component="span" sx={markerImageSx}>
           <Image
             alt={id}
             height={IMAGE_DIMENSION}

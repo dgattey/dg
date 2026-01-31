@@ -5,15 +5,24 @@ import type { NextConfig } from 'next';
 dotenvConfig();
 
 const nextConfig: NextConfig = {
+  cacheComponents: true,
   experimental: {
     scrollRestoration: true,
     turbopackFileSystemCacheForBuild: true,
     turbopackFileSystemCacheForDev: true,
   },
-  i18n: {
-    defaultLocale: 'en',
-    // This allows for the language value to be passed in HTML
-    locales: ['en'],
+  headers() {
+    return [
+      {
+        headers: [
+          {
+            key: 'Accept-CH',
+            value: 'Sec-CH-Prefers-Color-Scheme',
+          },
+        ],
+        source: '/:path*',
+      },
+    ];
   },
   images: {
     remotePatterns: [
@@ -32,7 +41,7 @@ const nextConfig: NextConfig = {
   // Disables the Sequelize warning about the `sequelize` package not being found
   serverExternalPackages: ['sequelize'],
   // Have to do this for each of the packages we import
-  transpilePackages: ['shared-core', 'api', 'ui', 'maps', 'og'],
+  transpilePackages: ['@dg/shared-core', '@dg/services', '@dg/ui', '@dg/maps', '@dg/og'],
 };
 
 export default withLogtail(nextConfig);

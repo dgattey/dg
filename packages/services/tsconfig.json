@@ -1,0 +1,7 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "compilerOptions": {
+    "experimentalDecorators": true
+  },
+  "extends": "@dg/tsconfig/library.json"
+}

@@ -5,7 +5,10 @@ alwaysApply: true
 
 # Lint, Format, Typecheck
 
-- After every change, run `turbo check` and `turbo check:types` filtered to the affected workspace(s).
+- Run `turbo check` and `turbo check:types` **at logical checkpoints**, not after every small edit.
+  - Always run at the end of a task/session before reporting completion.
+  - Also run after larger changes (multiple files, refactors, new features, dependency changes).
+  - Skip for tiny, iterative tweaks unless they are likely to affect types or formatting.
 - Skip for shell scripts (`scripts/*`) - no linting/typechecking setup for scripts yet.
 - Determine the filter based on file paths:
   - Root-level files (config/, package.json, turbo.json, etc.): run without `--filter` or `--filter=dg`

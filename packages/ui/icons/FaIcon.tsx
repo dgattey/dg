@@ -1,5 +1,6 @@
 import type { IconDefinition } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { Box } from '@mui/material';
 
 type FaIconProps = {
   icon: IconDefinition;
@@ -11,14 +12,8 @@ type FaIconProps = {
  */
 export function FaIcon({ icon, size = '1em' }: FaIconProps) {
   return (
-    <FontAwesomeIcon
-      height={size}
-      icon={icon}
-      style={{
-        height: size,
-        width: size,
-      }}
-      width={size}
-    />
+    <Box component="span" sx={{ display: 'inline-flex', height: size, width: size }}>
+      <FontAwesomeIcon height={size} icon={icon} width={size} />
+    </Box>
   );
 }

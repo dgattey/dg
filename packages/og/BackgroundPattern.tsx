@@ -1,4 +1,4 @@
-import { COLORS } from 'ui/theme/color';
+import { COLORS } from '@dg/ui/theme/color';
 import { hslToHex } from './hslToHex';
 
 /**

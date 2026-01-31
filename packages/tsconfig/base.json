@@ -2,13 +2,10 @@
   "$schema": "https://json.schemastore.org/tsconfig.json",
   "compilerOptions": {
     "alwaysStrict": true,
-    "checkJs": true,
     "composite": false,
     "declaration": false,
     "declarationMap": false,
-    "emitDecoratorMetadata": true,
     "esModuleInterop": true,
-    "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
     "incremental": true,
     "inlineSources": false,

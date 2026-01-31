@@ -1,17 +1,17 @@
 {
   "devDependencies": {
+    "@dg/shared-core": "workspace:*",
+    "@dg/tsconfig": "workspace:*",
     "@graphql-codegen/cli": "catalog:",
     "@types/node": "catalog:",
     "cmd-ts": "0.14.3",
     "dotenv-mono": "catalog:",
     "node-fetch": "3.3.2",
-    "shared-core": "workspace:*",
-    "tsconfig": "workspace:*",
     "tsx": "4.21.0",
     "typescript": "catalog:"
   },
   "main": "webhookCommand.ts",
-  "name": "webhooks",
+  "name": "@dg/webhooks",
   "private": true,
   "scripts": {
     "check": "biome check --write .",

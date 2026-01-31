@@ -1,17 +1,17 @@
 {
   "dependencies": {
-    "shared-core": "workspace:*"
+    "@dg/shared-core": "workspace:*"
   },
   "devDependencies": {
+    "@dg/tsconfig": "workspace:*",
     "@graphql-codegen/cli": "catalog:",
     "@graphql-codegen/near-operation-file-preset": "4.0.0",
     "@graphql-codegen/typescript": "5.0.7",
     "@graphql-codegen/typescript-operations": "5.0.7",
     "dotenv-mono": "catalog:",
-    "tsconfig": "workspace:*",
     "typescript": "catalog:"
   },
-  "name": "codegen",
+  "name": "@dg/codegen",
   "private": true,
   "scripts": {
     "check": "biome check --write .",

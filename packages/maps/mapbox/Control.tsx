@@ -1,3 +1,5 @@
+'use client';
+
 import { useTheme } from '@mui/material';
 import { useEffect, useRef } from 'react';
 import type { Root } from 'react-dom/client';

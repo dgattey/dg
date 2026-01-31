@@ -1,33 +1,43 @@
+import type { Track } from '@dg/services/spotify/Track';
+import type { SxObject } from '@dg/ui/theme';
 import { Typography } from '@mui/material';
-import type { Track } from 'api/spotify/Track';
 import { Music } from 'lucide-react';
-import { HorizontalStack } from 'ui/core/HorizontalStack';
-import { useRelativeTimeFormat } from 'ui/helpers/useRelativeTimeFormat';
 
 type PlaybackStatusProps = {
   playedAt?: Track['played_at'];
+  relativePlayedAt?: Track['relativePlayedAt'];
+  color?: string;
+  textShadow?: string;
 };
+
+const getStatusSx = (color?: string, textShadow?: string): SxObject => ({
+  alignItems: 'center',
+  color,
+  display: 'flex',
+  gap: 1,
+  textShadow,
+});
 
 /**
  * Creates an element that shows if Spotify is currently playing, or if not,
  * when it last was.
  */
-export function PlaybackStatus({ playedAt }: PlaybackStatusProps) {
+export function PlaybackStatus({
+  playedAt,
+  relativePlayedAt,
+  color,
+  textShadow,
+}: PlaybackStatusProps) {
   const isNowPlaying = !playedAt;
-  const relativeLastPlayed = useRelativeTimeFormat({
-    capitalized: true,
-    fromDate: playedAt,
-  });
+  const relativeLastPlayed = isNowPlaying ? null : relativePlayedAt;
+  if (!isNowPlaying && !relativeLastPlayed) {
+    return null;
+  }
   return (
-    <Typography
-      component={HorizontalStack}
-      sx={{ alignItems: 'center', gap: 1 }}
-      variant="overline"
-    >
+    <Typography component="div" sx={getStatusSx(color, textShadow)} variant="overline">
       {isNowPlaying ? (
         <>
-          Now Playing
-          <Music size="1.25em" />
+          Now Playing <Music size="1.25em" />
         </>
       ) : (
         `Played ${relativeLastPlayed}`
