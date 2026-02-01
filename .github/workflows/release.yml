@@ -66,16 +66,6 @@ jobs:
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
-      - name: Read base version from main
-        id: base-version
-        if: steps.check-bot-commit.outputs.SKIP == 'false'
-        run: |
-          set -euo pipefail
-          git fetch origin ${{ github.base_ref }}
-          BASE_VERSION=$(git show origin/${{ github.base_ref }}:package.json | node -pe "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")
-          echo "VERSION=${BASE_VERSION}"
-          echo "VERSION=${BASE_VERSION}" >> "$GITHUB_OUTPUT"
-
       - name: Read current version
         id: current-version
         if: steps.check-bot-commit.outputs.SKIP == 'false'
@@ -85,17 +75,27 @@ jobs:
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
+      - name: Compute target version
+        id: target-version
+        if: steps.check-bot-commit.outputs.SKIP == 'false'
+        run: |
+          set -euo pipefail
+          git fetch --tags
+          OUTPUT=$(./scripts/version-and-release target-from-tags "${{ steps.current-version.outputs.VERSION }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
+          echo "$OUTPUT"
+          echo "$OUTPUT" >> "$GITHUB_OUTPUT"
+
       - name: Check if bump needed
         id: check-bump
         if: steps.check-bot-commit.outputs.SKIP == 'false'
         run: |
-          BASE="${{ steps.base-version.outputs.VERSION }}"
           CURRENT="${{ steps.current-version.outputs.VERSION }}"
-          if [ "$BASE" != "$CURRENT" ]; then
-            echo "Version already bumped from ${BASE} to ${CURRENT}. Skipping."
+          TARGET="${{ steps.target-version.outputs.VERSION_TO }}"
+          if [ "$CURRENT" = "$TARGET" ]; then
+            echo "Version already at target ${TARGET}. Skipping."
             echo "SKIP=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Version needs bump from ${BASE}"
+            echo "Version needs bump to ${TARGET}"
             echo "SKIP=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -104,7 +104,7 @@ jobs:
         if: steps.check-bot-commit.outputs.SKIP == 'false' && steps.check-bump.outputs.SKIP == 'false'
         run: |
           set -euo pipefail
-          OUTPUT=$(./scripts/version-and-release bump "${{ steps.base-version.outputs.VERSION }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
+          OUTPUT=$(./scripts/version-and-release bump "${{ steps.target-version.outputs.BASE_VERSION_USED }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 

@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 // DESCRIPTION: Manage version tags and Github releases
 
@@ -25,27 +26,56 @@ function prInfo(eventPath) {
   console.log(`RELEASE_TYPE=${releaseType}`);
 }
 
-// Bump version in package.json
-function bump(baseVersion, releaseType) {
-  const parts = baseVersion.split('.').map(Number);
+function computeNext(baseVersion, releaseType) {
+  const normalizedVersion = baseVersion.split('-', 1)[0];
+  const parts = normalizedVersion.split('.').map(Number);
   if (parts.length !== 3 || parts.some(isNaN)) {
     throw new Error(`Invalid version: ${baseVersion}`);
   }
-  
+
   let [major, minor, patch] = parts;
-  
+
   if (releaseType === 'major') { major++; minor = 0; patch = 0; }
   else if (releaseType === 'minor') { minor++; patch = 0; }
   else { patch++; }
-  
-  const newVersion = `${major}.${minor}.${patch}`;
-  
+
+  return `${major}.${minor}.${patch}`;
+}
+
+function logVersionChange(baseVersion, newVersion) {
+  console.log(`VERSION_FROM=${baseVersion}`);
+  console.log(`VERSION_TO=${newVersion}`);
+}
+
+// Bump version in package.json
+function bump(baseVersion, releaseType) {
+  const newVersion = computeNext(baseVersion, releaseType);
   const pkg = JSON.parse(fs.readFileSync(PACKAGE_JSON, 'utf8'));
   pkg.version = newVersion;
   fs.writeFileSync(PACKAGE_JSON, JSON.stringify(pkg, null, 2) + '\n', 'utf8');
-  
-  console.log(`VERSION_FROM=${baseVersion}`);
-  console.log(`VERSION_TO=${newVersion}`);
+
+  logVersionChange(baseVersion, newVersion);
+}
+
+function getLatestTagVersion() {
+  try {
+    const output = execSync('git tag --list --sort=-v:refname', {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    });
+    const tags = output.split('\n').map((tag) => tag.trim()).filter(Boolean);
+    const match = tags.find((tag) => /^v?\d+\.\d+\.\d+(?:-[0-9A-Za-z.-]+)?$/.test(tag));
+    return match ? match.replace(/^v/, '') : null;
+  } catch {
+    return null;
+  }
+}
+
+function targetVersionFromTags(currentVersion, releaseType) {
+  const baseVersion = getLatestTagVersion() ?? currentVersion;
+  const newVersion = computeNext(baseVersion, releaseType);
+  console.log(`BASE_VERSION_USED=${baseVersion}`);
+  logVersionChange(baseVersion, newVersion);
 }
 
 // Extract "What changed?" section from PR body
@@ -80,6 +110,7 @@ if (!command || command === '--help' || command === '-h') {
   console.log('  read                                  Read version from package.json');
   console.log('  pr-info <event-path>                  Parse release type from PR event');
   console.log('  bump <version> <major|minor|patch>    Compute and write next version');
+  console.log('  target-from-tags <current> <type>     Compute target from repo tags');
   console.log('  extract-notes <event-path>            Extract release notes from PR');
   process.exit(0);
 }
@@ -88,6 +119,7 @@ try {
   if (command === 'read') readVersion();
   else if (command === 'pr-info') prInfo(args[0]);
   else if (command === 'bump') bump(args[0], args[1]);
+  else if (command === 'target-from-tags') targetVersionFromTags(args[0], args[1]);
   else if (command === 'extract-notes') extractNotes(args[0]);
   else throw new Error(`Unknown command: ${command}`);
 } catch (error) {

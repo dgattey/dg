@@ -45,12 +45,60 @@ if $DRY_RUN; then
   echo "[DRY RUN] Would rebase onto origin/main, dropping ${#${(f)BOT_COMMITS}[@]} commit(s)"
   echo "[DRY RUN] Then force push with: git push --force-with-lease"
 else
-  echo "Rebasing onto origin/main and dropping bot commits..."
-  
-  # Use git rebase with EDITOR to modify the todo list
-  export GIT_SEQUENCE_EDITOR='sed -i.bak "/^pick [0-9a-f]* Bump version to v/d"'
-  git rebase -i origin/main
-  
+  echo "Rebasing branch without bot commits..."
+
+  TEMP_LIST="$(mktemp)"
+  TEMP_EDITOR="$(mktemp)"
+  cleanup() {
+    rm -f "$TEMP_LIST" "$TEMP_EDITOR"
+  }
+  trap cleanup EXIT
+
+  echo "$BOT_COMMITS" > "$TEMP_LIST"
+
+  cat > "$TEMP_EDITOR" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+todo_file="\$1"
+list_file="$TEMP_LIST"
+
+awk -v list="\$list_file" '
+  function should_drop(hash,   d) {
+    if (hash == "") return 0
+    for (d in drop) {
+      if (index(hash, d) == 1 || index(d, hash) == 1) {
+        return 1
+      }
+    }
+    return 0
+  }
+  BEGIN {
+    while ((getline < list) > 0) {
+      drop[\$1] = 1
+    }
+    close(list)
+  }
+  /^[a-z]+ / {
+    hash = ""
+    for (i = 2; i <= NF; i++) {
+      if (\$i ~ /^[0-9a-f]{7,}\$/) {
+        hash = \$i
+        break
+      }
+    }
+    if (hash != "" && \$1 !~ /^(merge|label|reset|exec)\$/ && should_drop(hash)) {
+      sub(/^[a-z]+/, "drop")
+    }
+  }
+  { print }
+' "\$todo_file" > "\${todo_file}.tmp"
+mv "\${todo_file}.tmp" "\$todo_file"
+EOF
+
+  chmod +x "$TEMP_EDITOR"
+
+  GIT_SEQUENCE_EDITOR="$TEMP_EDITOR" git rebase -i --rebase-merges origin/main
+
   echo ""
   echo "✓ Rebase completed!"
   echo ""
