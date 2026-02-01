@@ -55,15 +55,6 @@ CMS integration for site content. Uses GraphQL with generated types.
 - `ui/dependent/ContentCard.tsx` → `Link`
 - `ui/dependent/ContentWrappingLink.tsx` → `Link`
 
-## GitHub
-
-GitHub API integration for repo metadata.
-
-| Export | Description |
-|--------|-------------|
-| `fetchRepoVersion()` | Gets latest release version from repo |
-| `githubClient` | Configured GraphQL client |
-
 ## Spotify
 
 Spotify API integration for currently playing/recently played tracks.
@@ -98,7 +89,6 @@ Required environment variables (see `config/env.secrets.keys`):
 
 - `CONTENTFUL_ACCESS_TOKEN` - Contentful API access token
 - `CONTENTFUL_SPACE_ID` - Contentful space identifier
-- `GITHUB_AUTHENTICATION_TOKEN` - GitHub personal access token
 - `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` - Spotify OAuth credentials
 - `STRAVA_CLIENT_ID` / `STRAVA_CLIENT_SECRET` - Strava OAuth credentials
 - `STRAVA_TOKEN_NAME` - Database token identifier

@@ -19,7 +19,6 @@ Hi :wave: This is an overengineered way to show past projects / experiment with 
 - `turbo webhook -- create <name>` create webhook (needs `dev`)
 - `turbo webhook -- list <name>` list webhooks
 - `turbo webhook -- delete <name> <id>` delete webhook
-- `turbo release` version bump (GitHub Action)
 - `turbo clean` clean caches, generated files, and `.env`
 - `turbo topo --graph=graph.html` monorepo dependency graph
 
@@ -44,9 +43,17 @@ If `turbo` is not found, ensure `~/.nodenv/shims` is on PATH, then `nodenv rehas
 
 Feature branches squash onto main, and Linear is used for ticket tracking.
 
-1. PR creation will kick off Github actions for linting/formatting + post a comment about the new version.
+1. PR creation triggers CI checks and auto-bumps the version (see Versioning below).
 1. Use the Vercel deploy preview to verify functionality.
-1. Merges will automatically create a new version/release 🎉
+1. Merges automatically create a GitHub release with the "What changed?" content as notes 🎉
+
+<details>
+<summary>Required GitHub Permissions</summary>
+
+The release workflow requires:
+1. **Actions permissions** → Workflow permissions → **Read and write permissions**
+2. **Actions permissions** → **Allow GitHub Actions to create and approve pull requests** (checked)
+</details>
 
 ## :test_tube: Testing
 
@@ -54,15 +61,15 @@ Feature branches squash onto main, and Linear is used for ticket tracking.
 - Run `turbo test --filter=@dg/web` for web unit tests.
 - Jest setup is intentionally minimal (`apps/web/jest.setup.ts` only imports `@testing-library/jest-dom` and no-op popover methods for jsdom).
 - Use `@testing-library/user-event` for interactions (avoid `fireEvent`).
-- CI runs `turbo test` via the Autochecks `🧪 test` job.
+- CI runs `turbo test` via the `🧪 Test` job.
 
 ## :rainbow: Architecture
 
-Pretty standard Next app. `/public` has static files, `/src` has app code, `/src/types` has global types, `/src/hooks` has shared hooks, `/src/pages/api` has API routes, and `/src/api` has the shared API code.
+Pretty standard Next.js App Router app. `/public` has static files, `/src/app` has pages and API routes, `/src/types` has global types, `/src/hooks` has shared hooks, `/src/components` has React components, and `/src/services` has server-side data fetching.
 
 ### Integrations
 
-- [Next](https://nextjs.org/docs/getting-started) wraps React and provides routing, SSR/SSG, and API routes. Client calls to `/api/X` hit `pages/api/X.tsx` on the server.
+- [Next.js](https://nextjs.org/docs/getting-started) App Router provides routing, Server Components, and API routes. Client calls to `/api/X` hit `app/api/X/route.ts` on the server.
 
 - [Vercel](https://vercel.com) hosts + builds the site. Every `main` commit deploys :tada: Env vars mirror `.env` generated from 1Password.
 
@@ -76,7 +83,7 @@ Pretty standard Next app. `/public` has static files, `/src` has app code, `/src
 
 - [MUI](https://mui.com/material/) for UI and styling (`sx`, via `emotion`).
 
-- [GraphQL Codegen](https://www.graphql-code-generator.com) generates the `*.generated.ts` files from GitHub + Contentful schemas.
+- [GraphQL Codegen](https://www.graphql-code-generator.com) generates the `*.generated.ts` files from Contentful schemas.
 
 - [Neon](https://neon.tech) is the Postgres DB for auth tokens + more.
 
@@ -100,13 +107,9 @@ There are two tables:
 
 To create and run a migration:
 
-1. `turbo db -- migration:generate --name <name>`
-1. Add `up`/`down`
-1. Create a Neon branch
-1. `turbo connect -- <branch>` + `turbo dev`
-1. `turbo db -- db:migrate`
-1. Merge Neon branch when ready
-1. Undo: `turbo db -- db:migrate:undo`
+1. `turbo db -- migration:generate --name <name>` and add `up`/`down`
+1. Create a Neon branch, `turbo connect -- <branch>`, then `turbo dev`
+1. `turbo db -- db:migrate` and merge branch when ready (undo: `turbo db -- db:migrate:undo`)
 
 #### Strava
 
@@ -116,32 +119,33 @@ Each Strava app supports a single subscription, so I keep two apps: one for loca
 
 Both use the same DB but different tokens + callback URLs. `process.env.STRAVA_TOKEN_NAME` switches between them. For local webhook testing, use a Neon branch to avoid clobbering prod data.
 
-##### Cloudflare Tunnels
+<details>
+<summary>Cloudflare Tunnels (for local webhook testing)</summary>
 
 Local webhook testing uses Cloudflare Tunnel so `https://dev.dylangattey.com/api/webhooks` points at your local `turbo dev`.
 
-1. Start the connector from the [tunnel config](https://one.dash.cloudflare.com/737867b500ec8ef1d7e5c9650e5dbfdb/networks/tunnels/cfd_tunnel/60e09136-a10f-499c-8925-bcef7570677d/edit?tab=overview) using the “Install and run a connector” section. Change it here if `api/webhooks` ever moves.
+1. Start the connector from the [tunnel config](https://one.dash.cloudflare.com/737867b500ec8ef1d7e5c9650e5dbfdb/networks/tunnels/cfd_tunnel/60e09136-a10f-499c-8925-bcef7570677d/edit?tab=overview) using the “Install and run a connector” section.
 1. It runs as a persistent local service to keep the tunnel open.
-1. For prod debugging, temporarily swap the `STRAVA_*` items in 1Password to prod values (except the callback URL), run `scripts/generate-env`, log into Strava, and change the accepted domain to the `dev` subdomain. Then delete + recreate the subscription and hit `api/webhooks` to restart the OAuth flow on dev.
+1. For prod debugging, temporarily swap the `STRAVA_*` items in 1Password to prod values (except the callback URL), run `scripts/generate-env`, log into Strava, change the accepted domain to `dev`, then delete + recreate the subscription.
+</details>
 
 #### Webhooks
 
-Strava is the only webhook integration right now.
-
 1. Start `turbo dev`, then `turbo webhook -- create strava`. Delete it when done so Strava doesn’t ping a dead endpoint.
-2. To list existing subscriptions, run `turbo webhook -- list strava` to get the ids
-3. To delete a subscription, run `turbo webhook -- delete strava <id>` with an id from the list script
-4. Add a `console.log` in `pages/api/webhooks` and rename an activity to trigger events. Docs: https://developers.strava.com/docs/webhooks/.
-5. To test prod, swap the `STRAVA_*` items in 1Password to match Vercel (leave the callback URL as dev), run `scripts/generate-env`, and restart everything so OAuth re-runs. Subscriptions are only changed locally with this script, or via curl, to prevent tampering.
+2. List: `turbo webhook -- list strava` | Delete: `turbo webhook -- delete strava <id>`
+3. Add a `console.log` in `apps/web/src/app/api/webhooks/route.ts` and rename an activity to trigger events. [Docs](https://developers.strava.com/docs/webhooks/)
+4. For prod testing, swap `STRAVA_*` items in 1Password to match Vercel (keep callback URL as dev), run `scripts/generate-env`, and restart so OAuth re-runs.
 
 ### Versioning
 
-Versioning uses `semantic-release` + Conventional Commits. I only bump major for big rewrites.
+Versioning uses auto-generated version bumps on PRs with GitHub releases on merge. The version is stored in the root `package.json` and read directly by the app at build time. Check the appropriate checkbox in the PR template (Major/Minor/Patch) - the workflow will auto-commit the version bump to your branch and create a GitHub release on merge with notes from the "What changed?" section.
 
-- **Major**: `!` in the subject
-- **Minor**: `feat:`
-- **Patch**: everything else
+#### Version conflicts
 
-Test a dry run with `GITHUB_TOKEN=* turbo release -- --dry-run --branches={branch here}` after filling in the token, or done for you on all PRs.
+If multiple PRs each have their own version bump and one merges, other PRs will have conflicts in `package.json`. To fix:
+
+1. Run `scripts/drop-bot-commits` to remove bot-authored version bumps and rebase onto `origin/main`
+2. Force push: `git push --force-with-lease`
+3. The workflow will automatically create a fresh version bump commit
 
 [gh]: https://github.com/dgattey/dg

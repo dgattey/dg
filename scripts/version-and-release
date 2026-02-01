@@ -1,0 +1,96 @@
+#!/usr/bin/env node
+const fs = require('fs');
+const path = require('path');
+
+// DESCRIPTION: Manage version tags and Github releases
+
+const PACKAGE_JSON = path.join(__dirname, '..', 'package.json');
+
+// Read version from package.json
+function readVersion() {
+  const pkg = JSON.parse(fs.readFileSync(PACKAGE_JSON, 'utf8'));
+  console.log(`VERSION=${pkg.version}`);
+}
+
+// Parse PR body for release type (Major/Minor/Patch checkboxes)
+function prInfo(eventPath) {
+  const event = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
+  const body = event.pull_request?.body || '';
+  
+  // Check which release type checkbox is checked (Major > Minor > Patch)
+  const releaseType = /- \[x\]\s*Major/i.test(body) ? 'major'
+    : /- \[x\]\s*Minor/i.test(body) ? 'minor'
+    : 'patch';
+  
+  console.log(`RELEASE_TYPE=${releaseType}`);
+}
+
+// Bump version in package.json
+function bump(baseVersion, releaseType) {
+  const parts = baseVersion.split('.').map(Number);
+  if (parts.length !== 3 || parts.some(isNaN)) {
+    throw new Error(`Invalid version: ${baseVersion}`);
+  }
+  
+  let [major, minor, patch] = parts;
+  
+  if (releaseType === 'major') { major++; minor = 0; patch = 0; }
+  else if (releaseType === 'minor') { minor++; patch = 0; }
+  else { patch++; }
+  
+  const newVersion = `${major}.${minor}.${patch}`;
+  
+  const pkg = JSON.parse(fs.readFileSync(PACKAGE_JSON, 'utf8'));
+  pkg.version = newVersion;
+  fs.writeFileSync(PACKAGE_JSON, JSON.stringify(pkg, null, 2) + '\n', 'utf8');
+  
+  console.log(`VERSION_FROM=${baseVersion}`);
+  console.log(`VERSION_TO=${newVersion}`);
+}
+
+// Extract "What changed?" section from PR body
+function extractNotes(eventPath) {
+  const event = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
+  const body = event.pull_request?.body || '';
+  
+  const lines = body.split('\n');
+  let inSection = false;
+  const notes = [];
+  
+  for (const line of lines) {
+    if (/^#\s*What changed\?/i.test(line)) {
+      inSection = true;
+    } else if (inSection && /^#\s*Release info/i.test(line)) {
+      break;
+    } else if (inSection) {
+      notes.push(line);
+    }
+  }
+  
+  console.log(notes.join('\n').trim());
+}
+
+// Main
+const [,, command, ...args] = process.argv;
+
+if (!command || command === '--help' || command === '-h') {
+  console.log('Usage: scripts/version-and-release <command> [args...]');
+  console.log('');
+  console.log('Commands:');
+  console.log('  read                                  Read version from package.json');
+  console.log('  pr-info <event-path>                  Parse release type from PR event');
+  console.log('  bump <version> <major|minor|patch>    Compute and write next version');
+  console.log('  extract-notes <event-path>            Extract release notes from PR');
+  process.exit(0);
+}
+
+try {
+  if (command === 'read') readVersion();
+  else if (command === 'pr-info') prInfo(args[0]);
+  else if (command === 'bump') bump(args[0], args[1]);
+  else if (command === 'extract-notes') extractNotes(args[0]);
+  else throw new Error(`Unknown command: ${command}`);
+} catch (error) {
+  console.error(`Error: ${error.message}`);
+  process.exit(1);
+}

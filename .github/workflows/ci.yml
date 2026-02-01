@@ -1,0 +1,45 @@
+# CI checks the repo, using formatting, types, and tests
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
+jobs:
+  ci:
+    timeout-minutes: 5
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      matrix:
+        # Each of these are commands we should run and check output
+        include:
+          - command: "check:ci"
+            name: "🧹 Check"
+          - command: "check:types"
+            name: "🔎 Check types"
+          - command: "test"
+            name: "🧪 Test"
+
+    name: ${{ matrix.name }}
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: "pnpm"
+      - run: pnpm install
+      - name: ${{ matrix.command }}
+        run: NODE_OPTIONS=--max_old_space_size=8192 pnpm turbo ${{ matrix.command }}

@@ -25,5 +25,5 @@
     "dev": "scripts/generate-env",
     "preinstall": "npx only-allow pnpm"
   },
-  "version": "0.0.0-development"
+  "version": "2.51.5"
 }

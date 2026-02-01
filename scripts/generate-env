@@ -2,91 +2,53 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "${(%):-%x}")/.." && pwd)"
-DEFAULTS_FILE="${ROOT}/config/env.defaults"
-SECRETS_FILE="${ROOT}/config/env.secrets.keys"
 OUTPUT_FILE="${ROOT}/.env"
-TMP_FILE="${OUTPUT_FILE}.tmp"
-SECRETS_DIR="${TMP_FILE}.secrets"
 
-# Skip if .env already exists.
-if [ -f "${OUTPUT_FILE}" ]; then
-  echo ".env already exists, skipping generation" >&2
-  exit 0
-fi
+# Skip if .env already exists
+[[ -f "$OUTPUT_FILE" ]] && { echo ".env already exists" >&2; exit 0; }
 
-# Trim leading and trailing whitespace from a string.
-trim() {
-  local str="$1"
-  str="${str#"${str%%[![:space:]]*}"}"  # Remove leading whitespace
-  str="${str%"${str##*[![:space:]]}"}"  # Remove trailing whitespace
-  printf '%s' "$str"
-}
-
-# Check 1Password authentication status and sign in if needed.
+# Check 1Password auth
 export OP_ACCOUNT="my.1password.com"
-WHOAMI_OUTPUT="$(op whoami --account "${OP_ACCOUNT}" 2>&1)" || true
-if [[ "${WHOAMI_OUTPUT}" == *"ERROR"* ]] || [[ "${WHOAMI_OUTPUT}" == *"not signed in"* ]]; then
+if ! op whoami >/dev/null 2>&1; then
   echo "Signing in to 1Password..." >&2
-  if ! op signin --account "${OP_ACCOUNT}" 2>&1; then
-    echo "1Password sign-in failed. Enable app integration:" >&2
-    echo "  1Password > Settings > Developer > Integrate with 1Password CLI" >&2
+  op signin --account "$OP_ACCOUNT" || {
+    echo "1Password sign-in failed. Enable: 1Password > Settings > Developer > Integrate with 1Password CLI" >&2
     exit 1
-  fi
-else
-  EMAIL="$(echo "${WHOAMI_OUTPUT}" | grep -i "^Email:" | cut -d: -f2 | xargs)" || true
-  [ -n "${EMAIL}" ] && echo "Signed in to 1Password as ${EMAIL}" >&2
+  }
 fi
 
-# Validate config files exist.
-[ -f "${DEFAULTS_FILE}" ] || { echo "Missing config/env.defaults" >&2; exit 1; }
-[ -f "${SECRETS_FILE}" ] || { echo "Missing config/env.secrets.keys" >&2; exit 1; }
+# Write defaults
+echo "Writing defaults..." >&2
+grep -v '^#' "${ROOT}/config/env.defaults" | grep -v '^$' > "$OUTPUT_FILE"
 
-# Set up temp file and cleanup trap.
-rm -f "${TMP_FILE}"
-touch "${TMP_FILE}"
-trap 'rm -f "${TMP_FILE}"; rm -rf "${SECRETS_DIR}"' EXIT
+# Fetch secrets in parallel
+echo "Fetching secrets..." >&2
+TMP_DIR="$(mktemp -d)"
+trap "rm -rf '$TMP_DIR'" EXIT
 
-# Write non-secret defaults to temp file.
-DEFAULT_COUNT=0
-while IFS= read -r line || [ -n "$line" ]; do
-  trimmed="$(trim "$line")"
-  [[ -z "$trimmed" || "$trimmed" == \#* ]] && continue
-  [[ "$trimmed" == *"="* ]] || { echo "Invalid env defaults line: ${line}" >&2; exit 1; }
-  printf '%s\n' "$line" >> "${TMP_FILE}"
-  DEFAULT_COUNT=$((DEFAULT_COUNT + 1))
-done < "${DEFAULTS_FILE}"
-echo "Wrote ${DEFAULT_COUNT} defaults." >&2
-
-# Read secrets from 1Password in parallel.
-echo "Reading secrets from 1Password..." >&2
-mkdir -p "${SECRETS_DIR}"
-while IFS= read -r key || [ -n "$key" ]; do
-  trimmed="$(trim "$key")"
-  [[ -z "$trimmed" || "$trimmed" == \#* ]] && continue
-  (op read "op://dg/${trimmed}/value" > "${SECRETS_DIR}/${trimmed}" 2>&1) &
-done < "${SECRETS_FILE}"
+while read -r key; do
+  [[ -z "$key" || "$key" == \#* ]] && continue
+  (op read "op://dg/${key}/value" > "${TMP_DIR}/${key}" 2>&1) &
+done < "${ROOT}/config/env.secrets.keys"
 wait
 
-# Append secrets to temp file.
-SECRET_COUNT=0
-for file in "${SECRETS_DIR}"/*; do
-  [ -f "$file" ] || continue
+# Append secrets
+for file in "$TMP_DIR"/*; do
+  [[ -f "$file" ]] || continue
   key="$(basename "$file")"
   value="$(cat "$file")"
-  if [ -z "$value" ] || [[ "$value" == *"ERROR"* ]]; then
-    echo "Failed to read ${key} from 1Password: ${value}" >&2
+  
+  if [[ -z "$value" || "$value" == *"ERROR"* ]]; then
+    echo "Failed to read $key from 1Password" >&2
     exit 1
   fi
-  # Escape backslashes, quotes, and newlines for .env format.
-  escaped="${value//\\/\\\\}"
-  escaped="${escaped//\"/\\\"}"
-  escaped="${escaped//$'\n'/\\n}"
-  printf '%s="%s"\n' "$key" "$escaped" >> "${TMP_FILE}"
-  SECRET_COUNT=$((SECRET_COUNT + 1))
+  
+  # Escape for .env format
+  value="${value//\\/\\\\}"
+  value="${value//\"/\\\"}"
+  value="${value//$'\n'/\\n}"
+  
+  echo "${key}=\"${value}\"" >> "$OUTPUT_FILE"
 done
-rm -rf "${SECRETS_DIR}"
-echo "Wrote ${SECRET_COUNT} secrets." >&2
 
-# Atomically replace output file.
-mv "${TMP_FILE}" "${OUTPUT_FILE}"
 echo "Generated .env"

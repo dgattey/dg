@@ -45,6 +45,7 @@
     "build:analyze": "next experimental-analyze",
     "build:serve": "next start",
     "check": "biome check --write .",
+    "check:ci": "biome ci .",
     "check:types": "tsc",
     "clean": "rm -rf .next .turbo *.tsbuildinfo",
     "dev": "VERCEL_GIT_COMMIT_SHA=$(git rev-parse HEAD) next dev --turbopack",
