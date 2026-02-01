@@ -2,6 +2,15 @@
 
 Server-side API integrations and data fetching for external services. This package is marked `server-only` to ensure these functions only run on the server.
 
+## Separation from Content Models
+
+| Package | Responsibility | Example |
+|---------|---------------|---------|
+| `services` | Server-side I/O (API calls, DB, auth) | `fetchProjects()`, `spotifyClient` |
+| `content-models` | Types, schemas, validation, pure transforms | `RenderableLink`, `Track`, Valibot schemas |
+
+**Rule of thumb**: If it makes an HTTP request, touches the database, or requires `server-only`, it belongs here. If it's a type, schema, or pure function on data shapes, it belongs in `content-models`.
+
 ## Structure
 
 ```
@@ -45,6 +54,7 @@ CMS integration for site content. Uses GraphQL with Valibot-validated responses.
 | `fetchIntroContent()` | Homepage intro text block and image |
 | `fetchProjects()` | Project cards for homepage |
 | `fetchFooterLinks()` | Footer navigation links |
+| `fetchLinkByName(name)` | Single link by title (partial match) |
 | `fetchCurrentLocation()` | Current map location marker |
 | `contentfulClient` | Configured GraphQL client |
 

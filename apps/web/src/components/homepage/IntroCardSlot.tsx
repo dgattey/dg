@@ -1,12 +1,13 @@
 import 'server-only';
 
-import { findLinkWithName } from '@dg/services/contentful/parsers';
-import { getFooterLinks, getIntroContent } from '../../services/contentful';
+import { getIntroContent, getLinkByName } from '../../services/contentful';
 import { IntroCard } from './IntroCard';
 
 export async function IntroCardSlot() {
-  const [introBlock, footerLinks] = await Promise.all([getIntroContent(), getFooterLinks()]);
-  const linkedInLink = findLinkWithName(footerLinks, 'LinkedIn');
+  const [introBlock, linkedInLink] = await Promise.all([
+    getIntroContent(),
+    getLinkByName('LinkedIn'),
+  ]);
   if (!introBlock) {
     return null;
   }

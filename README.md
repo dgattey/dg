@@ -13,7 +13,7 @@ Hi :wave: This is an overengineered way to show past projects / experiment with 
 - `turbo check` Biome lint + format
 - `turbo check:types` typecheck
 - `turbo test` unit tests (Jest)
-- `turbo graphql:schema --filter=@dg/content-models` refresh Contentful GraphQL schema for editor tooling
+- `turbo graphql:schema` refresh Contentful GraphQL schema for editor tooling
 - `turbo db -- db:migrate` run migrations (`db:migrate:status`, `db:migrate:undo`)
 - `turbo db -- migration:generate --name <name>` create migration
 - `turbo webhook -- create <name>` create webhook (needs `dev`)

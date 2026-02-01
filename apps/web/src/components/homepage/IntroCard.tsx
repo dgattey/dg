@@ -38,7 +38,7 @@ const introTextCardSx: SxObject = {
  * resizing, and the actual width may be smaller.
  */
 type IntroCardProps = {
-  linkedInLink?: RenderableLink;
+  linkedInLink: RenderableLink | null;
   introBlock: IntroContent;
 };
 

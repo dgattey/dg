@@ -66,7 +66,7 @@ describe('Homepage basics', () => {
     const user = userEvent.setup();
     render(
       <>
-        <IntroCard introBlock={introBlock} />
+        <IntroCard introBlock={introBlock} linkedInLink={null} />
         <ColorSchemeToggleClient initialValue="system" />
       </>,
     );

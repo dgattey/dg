@@ -75,7 +75,7 @@ export type ContentCardProps = Pick<
    * If provided, a link to follow upon click anywhere on the
    * card
    */
-  link?: RenderableLink;
+  link?: RenderableLink | null;
 
   sx?: SxObject;
   overlaySx?: SxObject;
