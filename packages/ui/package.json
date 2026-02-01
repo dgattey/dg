@@ -16,6 +16,10 @@
   },
   "devDependencies": {
     "@dg/tsconfig": "workspace:*",
+    "@testing-library/jest-dom": "catalog:",
+    "@testing-library/react": "catalog:",
+    "@testing-library/user-event": "catalog:",
+    "@types/jest": "catalog:",
     "@types/react": "catalog:",
     "dotenv-mono": "catalog:",
     "typescript": "catalog:"
@@ -24,6 +28,7 @@
   "private": true,
   "scripts": {
     "check": "biome check --write .",
+    "check:ci": "biome ci .",
     "check:types": "tsc",
     "clean": "rm -rf .turbo *.tsbuildinfo"
   }

@@ -1,0 +1,10 @@
+---
+description: Testing conventions
+alwaysApply: true
+---
+# Testing
+
+- Tests live in `__tests__` next to source and match basenames.
+- Use `@testing-library/user-event` (`const user = userEvent.setup()`).
+- Avoid `fireEvent` unless needed.
+- Keep Jest setup minimal; prefer per-test setup.

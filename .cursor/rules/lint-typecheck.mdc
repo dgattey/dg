@@ -1,18 +1,17 @@
 ---
-description: Run Turbo lint/format and typecheck after changes
+description: Run Turbo checks and tests
 alwaysApply: true
 ---
 
-# Lint, Format, Typecheck
+# Quality checks
 
-- Run `turbo check` and `turbo check:types` **at logical checkpoints**, not after every small edit.
-  - Always run at the end of a task/session before reporting completion.
-  - Also run after larger changes (multiple files, refactors, new features, dependency changes).
-  - Skip for tiny, iterative tweaks unless they are likely to affect types or formatting.
-- Skip for shell scripts (`scripts/*`) - no linting/typechecking setup for scripts yet.
-- Determine the filter based on file paths:
-  - Root-level files (config/, package.json, turbo.json, etc.): run without `--filter` or `--filter=dg`
-  - Files in `apps/<app>/`: use `--filter=<app>`
-  - Files in `packages/<pkg>/`: use `--filter=<pkg>`
-  - Multiple workspaces affected: use multiple `--filter` flags
-- Fix any issues they report and re-run until both commands pass.
+- At logical checkpoints run `turbo check`, `turbo check:types`, and `turbo test`.
+  - Always at end of task/session; also after larger changes or deps.
+  - Skip tiny tweaks unless they affect types or behavior.
+- Filters by scope:
+  - root/config: no filter or `--filter=dg`
+  - `apps/<app>`: `--filter=<app>`
+  - `packages/<pkg>`: `--filter=<pkg>`
+  - multiple: multiple `--filter`
+- Skip shell scripts (`scripts/*`).
+- Fix issues and re-run until all pass.

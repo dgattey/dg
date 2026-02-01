@@ -8,6 +8,7 @@
   "private": true,
   "scripts": {
     "check": "biome check --write .",
+    "check:ci": "biome ci .",
     "clean": "rm -rf .turbo *.tsbuildinfo"
   }
 }

@@ -6,7 +6,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { Container, Divider, Stack } from '@mui/material';
 import { cacheLife } from 'next/cache';
 import { getFooterLinks } from '../services/contentful';
-import { getRepoVersion } from '../services/github';
+import { getAppVersion } from '../services/version';
 
 const navItemNoPaddingSx: SxObject = {
   padding: 0,
@@ -97,7 +97,7 @@ async function getCopyrightYear() {
 export async function Footer() {
   const [footerLinks, version, currentYear] = await Promise.all([
     getFooterLinks(),
-    getRepoVersion(),
+    getAppVersion(),
     getCopyrightYear(),
   ]);
   const nonIconFooterLinks = footerLinks.filter((link) => !link.icon);

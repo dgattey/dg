@@ -1,80 +1,58 @@
 #!/usr/bin/env zsh
 set -euo pipefail
 
-# Bootstrap local dependencies, authentication, and environment setup.
-
 ROOT_DIR="$(cd "$(dirname "${(%):-%x}")/.." && pwd)"
 
 echo "Bootstrapping repo in ${ROOT_DIR}"
 
-if ! command -v brew >/dev/null 2>&1; then
-  echo "Homebrew is required. Install from https://brew.sh/ and re-run." >&2
+# Check Homebrew
+command -v brew >/dev/null 2>&1 || {
+  echo "Homebrew required. Install from https://brew.sh/" >&2
   exit 1
-fi
-
-ensure_brew_package() {
-  local package="$1"
-  if ! brew list --formula "${package}" >/dev/null 2>&1; then
-    echo "Installing ${package} via Homebrew..."
-    brew install "${package}"
-  else
-    echo "${package} already installed."
-  fi
 }
 
-echo "Ensuring system dependencies..."
-ensure_brew_package nodenv
-ensure_brew_package node-build
-ensure_brew_package 1password-cli
-ensure_brew_package neonctl
+# Install system dependencies
+echo "Installing system dependencies..."
+for pkg in nodenv node-build 1password-cli neonctl; do
+  brew list --formula "$pkg" >/dev/null 2>&1 || brew install "$pkg"
+done
 
+# Authenticate 1Password
 export OP_ACCOUNT="my.1password.com"
 echo "Authenticating with 1Password..."
-if ! op whoami >/dev/null 2>&1; then
-  if ! op signin --account "${OP_ACCOUNT}"; then
-    echo "1Password sign-in failed. Run: OP_ACCOUNT=${OP_ACCOUNT} op signin" >&2
-    exit 1
-  fi
-fi
+op whoami >/dev/null 2>&1 || op signin --account "$OP_ACCOUNT"
 
-echo "Setting up Node via nodenv..."
+# Set up Node
+echo "Setting up Node..."
 export PATH="${HOME}/.nodenv/bin:${PATH}"
 eval "$(nodenv init -)"
 
-if [ ! -f "${ROOT_DIR}/.node-version" ]; then
-  echo "Missing .node-version in repo root." >&2
-  exit 1
-fi
-
 NODE_VERSION="$(cat "${ROOT_DIR}/.node-version")"
 echo "Using Node ${NODE_VERSION}"
-nodenv install -s "${NODE_VERSION}"
-nodenv local "${NODE_VERSION}"
+nodenv install -s "$NODE_VERSION"
+nodenv local "$NODE_VERSION"
 nodenv rehash
 
-echo "Setting up pnpm via Corepack..."
+# Set up pnpm
+echo "Setting up pnpm..."
 corepack enable
-PNPM_VERSION="$(node -e "const pm=require('./package.json').packageManager; const m=pm && pm.match(/^pnpm@([^+]+)/); if (!m) { process.exit(1); } console.log(m[1]);")"
+PNPM_VERSION="$(node -e "console.log(require('./package.json').packageManager.match(/pnpm@([^+]+)/)[1])")"
 corepack prepare "pnpm@${PNPM_VERSION}" --activate
 
+# Install Turbo
 if ! command -v turbo >/dev/null 2>&1; then
   echo "Installing Turbo CLI..."
   npm -g install turbo
   nodenv rehash
 fi
 
-cd "${ROOT_DIR}"
-echo "Authenticating Turbo remote cache..."
-if ! turbo login --force; then
-  echo "Turbo login failed. Run: turbo login" >&2
-  exit 1
-fi
-if ! turbo link -y; then
-  echo "Turbo link failed. Run: turbo link" >&2
-  exit 1
-fi
-echo "Installing dependencies..."
+# Authenticate Turbo
+cd "$ROOT_DIR"
+echo "Authenticating Turbo..."
+turbo login --force && turbo link -y
+
+# Install dependencies and generate .env
 pnpm install
-echo "Generating .env from 1Password..."
 scripts/generate-env
+
 echo "Bootstrap complete."

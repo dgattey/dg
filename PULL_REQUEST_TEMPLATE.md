@@ -1,3 +1,11 @@
-Closes
+Closes 
 
-## What changed? Why?
+# What changed?
+
+- 
+
+# Release info
+
+- [ ] Major
+- [ ] Minor
+- [x] Patch

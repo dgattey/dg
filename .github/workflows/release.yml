@@ -1,158 +1,205 @@
-# Releases a new version on a push to main + redeploys on Vercel with that version
-# On other branches, will dry-run the release version to see what we'll release when deployed
+# Auto-bump version on PRs and create releases on merge
 name: Release
-on:
-  push:
-    branches: [main]
-  pull_request:
-    branches: [main]
-    types: [opened, synchronize]
 
-env:
-  VERCEL_DEPLOY_TOKEN: ${{ secrets.VERCEL_DEPLOY_TOKEN }}
-  VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
-  VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
-  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+on:
+  pull_request:
+    types: [opened, edited, synchronize, closed]
+    branches: [main]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+  TURBO_TEAM: ${{ vars.TURBO_TEAM }}
+
 jobs:
-  get-version:
-    timeout-minutes: 5
-    name: 'Dry run of release version'
-    if: github.event_name == 'pull_request'
+  bump:
+    name: '📦 Bump version'
+    if: github.event.action != 'closed'
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout PR head with full history
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
+          fetch-depth: 0
+          token: ${{ secrets.PAT_FOR_ACTIONS }}
+
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
           cache: 'pnpm'
-      - run: pnpm install
-      - name: Dry run release onto main
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Configure git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Check if last commit is bot version bump
+        id: check-bot-commit
+        run: |
+          set -euo pipefail
+          LAST_AUTHOR=$(git log -1 --format='%an')
+          if [ "$LAST_AUTHOR" = "github-actions[bot]" ]; then
+            echo "Last commit was by bot. Skipping version bump."
+            echo "SKIP=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Last commit by ${LAST_AUTHOR}. Proceeding with version bump check."
+            echo "SKIP=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Parse PR info
+        id: pr-info
+        if: steps.check-bot-commit.outputs.SKIP == 'false'
+        run: |
+          set -euo pipefail
+          OUTPUT=$(./scripts/version-and-release pr-info "$GITHUB_EVENT_PATH")
+          echo "$OUTPUT"
+          echo "$OUTPUT" >> "$GITHUB_OUTPUT"
+
+      - name: Read current version
+        id: current-version
+        if: steps.check-bot-commit.outputs.SKIP == 'false'
+        run: |
+          set -euo pipefail
+          OUTPUT=$(./scripts/version-and-release read)
+          echo "$OUTPUT"
+          echo "$OUTPUT" >> "$GITHUB_OUTPUT"
+
+      - name: Compute target version
+        id: target-version
+        if: steps.check-bot-commit.outputs.SKIP == 'false'
+        run: |
+          set -euo pipefail
+          git fetch --tags
+          OUTPUT=$(./scripts/version-and-release target-from-tags "${{ steps.current-version.outputs.VERSION }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
+          echo "$OUTPUT"
+          echo "$OUTPUT" >> "$GITHUB_OUTPUT"
+
+      - name: Upsert PR version comment
+        if: steps.check-bot-commit.outputs.SKIP == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        id: dry-run-release
+          VERSION: ${{ steps.target-version.outputs.VERSION_TO }}
         run: |
-          OUTPUT=$(pnpm turbo release -- --dry-run --branches="main, ${{ github.head_ref }}" 2>&1)
-          echo "$OUTPUT"
+          set -euo pipefail
+          ./scripts/version-and-release pr-comment "$GITHUB_EVENT_PATH" "$VERSION" will-be
 
-          # Common version pattern
-          VERSION_PATTERN="[0-9]\+\.[0-9]\+\.[0-9]\+"
-          
-          # Extract versions using sed -n (cleaner than grep | head | sed)
-          NEXT_VERSION=$(echo "$OUTPUT" | sed -n "s/^## \($VERSION_PATTERN\).*/\1/p")
-          CURRENT_VERSION=$(echo "$OUTPUT" | sed -n "s/.*Found git tag v\($VERSION_PATTERN\) associated with version.*/\1/p")
-
-          # Print out what we have
-          if [ -n "$NEXT_VERSION" ] && [ -n "$CURRENT_VERSION" ]; then
-            echo "Found both versions - current: $CURRENT_VERSION, next: $NEXT_VERSION"
+      - name: Check if bump needed
+        id: check-bump
+        if: steps.check-bot-commit.outputs.SKIP == 'false'
+        run: |
+          CURRENT="${{ steps.current-version.outputs.VERSION }}"
+          TARGET="${{ steps.target-version.outputs.VERSION_TO }}"
+          if [ "$CURRENT" = "$TARGET" ]; then
+            echo "Version already at target ${TARGET}. Skipping."
+            echo "SKIP=true" >> "$GITHUB_OUTPUT"
           else
-            echo "Missing version info - current: '$CURRENT_VERSION', next: '$NEXT_VERSION'"
+            echo "Version needs bump to ${TARGET}"
+            echo "SKIP=false" >> "$GITHUB_OUTPUT"
           fi
-          
-          echo "next_version=$NEXT_VERSION" >> $GITHUB_OUTPUT
-          echo "current_version=$CURRENT_VERSION" >> $GITHUB_OUTPUT
 
-      - name: Comment version on PR
-        if: steps.dry-run-release.outputs.next_version != ''
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const nextVersion = '${{ steps.dry-run-release.outputs.next_version }}';
-            const currentVersion = '${{ steps.dry-run-release.outputs.current_version }}';
-            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            
-            const versionInfo = `📦 **Current Version**: \`v${currentVersion}\`\n🚀 **Next Release Version**: \`v${nextVersion}\``
-              
-            const body = `${versionInfo}\n\nThis PR will trigger a release of version \`v${nextVersion}\` when merged to main.\n\n📋 [View Release Preview Job](${runUrl}) - See the full dry-run details`;
+      - name: Bump version
+        id: bump
+        if: steps.check-bot-commit.outputs.SKIP == 'false' && steps.check-bump.outputs.SKIP == 'false'
+        run: |
+          set -euo pipefail
+          OUTPUT=$(./scripts/version-and-release bump "${{ steps.target-version.outputs.BASE_VERSION_USED }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
+          echo "$OUTPUT"
+          echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
-            // Get PR number from context (always available since this only runs on PR events)
-            const prNumber = context.payload.pull_request.number;
-
-            // Find existing comment to update or create new one
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: prNumber,
-            });
-
-            const existingComment = comments.find(comment => 
-              comment.user.login === 'github-actions[bot]' && 
-              comment.body.includes('Next Release Version')
-            );
-
-            if (existingComment) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existingComment.id,
-                body: body
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: prNumber,
-                body: body
-              });
-            }
+      - name: Commit version bump
+        if: steps.check-bot-commit.outputs.SKIP == 'false' && steps.check-bump.outputs.SKIP == 'false'
+        run: |
+          if git diff --quiet package.json; then
+            echo "No version change needed"
+            exit 0
+          fi
+          git add package.json
+          git commit -m "Bump version to v${{ steps.bump.outputs.VERSION_TO }}"
+          git push
 
   release:
-    timeout-minutes: 5
-    name: 'Release new version'
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    name: '🚀 Create release'
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
+      - name: Checkout merged commit
+        uses: actions/checkout@v4
         with:
-          node-version-file: .node-version
-          cache: 'pnpm'
-      - run: pnpm install
-      - name: Release new repo version
+          ref: ${{ github.event.pull_request.merge_commit_sha }}
+          fetch-depth: 0
+
+      - name: Read version from package.json
+        id: version
+        run: |
+          set -euo pipefail
+          OUTPUT=$(./scripts/version-and-release read)
+          echo "$OUTPUT"
+          echo "$OUTPUT" >> "$GITHUB_OUTPUT"
+
+      - name: Extract release notes
+        id: notes
+        run: |
+          set -euo pipefail
+          notes="$(./scripts/version-and-release extract-notes "$GITHUB_EVENT_PATH")"
+          delimiter="NOTES_$(uuidgen)"
+          {
+            echo "notes<<$delimiter"
+            echo "$notes"
+            echo "$delimiter"
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Create GitHub release
+        id: release
+        uses: actions/github-script@v7
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+          NOTES: ${{ steps.notes.outputs.notes }}
+        with:
+          script: |
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const tag = `v${process.env.VERSION}`;
+            const body = process.env.NOTES || '';
+            
+            try {
+              await github.rest.repos.getReleaseByTag({ owner, repo, tag });
+              core.setFailed(`Release ${tag} already exists. Cannot create duplicate release.`);
+              return;
+            } catch (error) {
+              if (error.status !== 404) throw error;
+            }
+            
+            const { data: createdRelease } = await github.rest.repos.createRelease({
+              owner,
+              repo,
+              tag_name: tag,
+              name: tag,
+              body,
+              target_commitish: context.payload.pull_request.merge_commit_sha,
+            });
+            
+            core.info(`Created release ${tag}`);
+            core.setOutput('release_url', createdRelease.html_url);
+
+      - name: Update PR version comment
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: pnpm turbo release -- --branches="main"
-
-  redeploy:
-    timeout-minutes: 5
-    name: 'Redeploy with new version'
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    needs: [release]
-    steps:
-      - uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version-file: .node-version
-          cache: 'pnpm'
-      - run: pnpm install
-
-      - uses: actions-ecosystem/action-get-latest-tag@v1
-        name: Get latest version tag
-        with:
-          semver_only: true
-        id: latest-version-tag
-
-      - name: Pull Vercel Environment Information
-        if: ${{ steps.latest-version-tag.outputs.tag != '' }}
-        run: pnpm vercel pull --yes --environment=production --token=${{ env.VERCEL_DEPLOY_TOKEN }}
-      - name: Build Project Artifacts with latest version
-        if: ${{ steps.latest-version-tag.outputs.tag != '' }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+          RELEASE_URL: ${{ steps.release.outputs.release_url }}
         run: |
-          echo "Latest tag: ${LATEST_TAG}"
-          NEXT_PUBLIC_APP_VERSION="${LATEST_TAG}" pnpm vercel build --prod --token=${{ env.VERCEL_DEPLOY_TOKEN }}
-        env:
-          LATEST_TAG: ${{ steps.latest-version-tag.outputs.tag }}
-      - name: Deploy Project Artifacts to Vercel
-        if: ${{ steps.latest-version-tag.outputs.tag != '' }}
-        run: pnpm vercel deploy --prebuilt --prod --token=${{ env.VERCEL_DEPLOY_TOKEN }}
+          set -euo pipefail
+          ./scripts/version-and-release pr-comment "$GITHUB_EVENT_PATH" "$VERSION" released

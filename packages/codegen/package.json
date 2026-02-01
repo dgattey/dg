@@ -15,6 +15,7 @@
   "private": true,
   "scripts": {
     "check": "biome check --write .",
+    "check:ci": "biome ci .",
     "check:types": "tsc",
     "clean": "find ../../ -type f -name '*.generated.ts' -delete && rm -rf .turbo *.tsbuildinfo",
     "codegen": "graphql-codegen --config config.ts"

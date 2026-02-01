@@ -17,7 +17,6 @@
     "CONTENTFUL_ACCESS_TOKEN",
     "CONTENTFUL_SPACE_ID",
     "DATABASE_URL",
-    "GITHUB_AUTHENTICATION_TOKEN",
     "NEXT_PUBLIC_MAPBOX_TOKEN",
     "SPOTIFY_CLIENT_ID",
     "SPOTIFY_CLIENT_SECRET",
@@ -41,6 +40,11 @@
       "dependsOn": ["build"]
     },
     "check": {
+      "dependsOn": ["topo"],
+      "outputLogs": "new-only",
+      "outputs": []
+    },
+    "check:ci": {
       "dependsOn": ["topo"],
       "outputLogs": "new-only",
       "outputs": []
@@ -74,8 +78,11 @@
     "dg#dev": {
       "cache": false
     },
-    "release": {
-      "cache": false
+    "test": {
+      "dependsOn": ["topo"],
+      "inputs": ["$TURBO_DEFAULT$", "../../packages/**", "!**/*.md", "!**/*.mdx"],
+      "outputLogs": "new-only",
+      "outputs": []
     },
     "topo": {
       "dependsOn": ["^topo"]

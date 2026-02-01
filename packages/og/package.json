@@ -16,6 +16,7 @@
   "private": true,
   "scripts": {
     "check": "biome check --write .",
+    "check:ci": "biome ci .",
     "check:types": "tsc",
     "clean": "rm -rf .turbo *.tsbuildinfo"
   }

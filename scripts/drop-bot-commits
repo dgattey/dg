@@ -1,0 +1,109 @@
+#!/usr/bin/env zsh
+set -euo pipefail
+
+# DESCRIPTION: Drop version bump commits on branch and rebase onto main
+
+[[ "${1:-}" == "--help" || "${1:-}" == "-h" ]] && {
+  echo "Usage: scripts/drop-bot-commits [--dry-run]"
+  echo ""
+  echo "Drops bot-authored version bump commits and rebases onto origin/main."
+  echo "Use when multiple PRs have conflicting version bumps."
+  exit 0
+}
+
+DRY_RUN=false
+[[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
+
+# Check branch
+BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+[[ "$BRANCH" == "main" ]] && { echo "Error: Cannot run on main branch" >&2; exit 1; }
+
+echo "Current branch: $BRANCH"
+echo "Fetching origin/main..."
+git fetch origin main
+
+# Find bot commits (message matches "Bump version to vX.Y.Z" from github-actions[bot])
+echo "Searching for bot-authored version bump commits..."
+BOT_COMMITS=$(git log origin/main..HEAD --format="%H" --author="github-actions\[bot\]" \
+  --grep="^Bump version to v" --extended-regexp || true)
+
+[[ -z "$BOT_COMMITS" ]] && { echo "No bot commits found. Nothing to do."; exit 0; }
+
+echo "Found bot commits:"
+echo "$BOT_COMMITS" | while read -r hash; do
+  echo "  ${hash:0:8} $(git log -1 --format=%s "$hash")"
+done
+
+# Check for uncommitted changes
+[[ -n "$(git status --porcelain)" ]] && { 
+  echo "Error: You have uncommitted changes. Commit or stash them first." >&2
+  exit 1
+}
+
+echo ""
+if $DRY_RUN; then
+  echo "[DRY RUN] Would rebase onto origin/main, dropping ${#${(f)BOT_COMMITS}[@]} commit(s)"
+  echo "[DRY RUN] Then force push with: git push --force-with-lease"
+else
+  echo "Rebasing branch without bot commits..."
+
+  TEMP_LIST="$(mktemp)"
+  TEMP_EDITOR="$(mktemp)"
+  cleanup() {
+    rm -f "$TEMP_LIST" "$TEMP_EDITOR"
+  }
+  trap cleanup EXIT
+
+  echo "$BOT_COMMITS" > "$TEMP_LIST"
+
+  cat > "$TEMP_EDITOR" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+todo_file="\$1"
+list_file="$TEMP_LIST"
+
+awk -v list="\$list_file" '
+  function should_drop(hash,   d) {
+    if (hash == "") return 0
+    for (d in drop) {
+      if (index(hash, d) == 1 || index(d, hash) == 1) {
+        return 1
+      }
+    }
+    return 0
+  }
+  BEGIN {
+    while ((getline < list) > 0) {
+      drop[\$1] = 1
+    }
+    close(list)
+  }
+  /^[a-z]+ / {
+    hash = ""
+    for (i = 2; i <= NF; i++) {
+      if (\$i ~ /^[0-9a-f]{7,}\$/) {
+        hash = \$i
+        break
+      }
+    }
+    if (hash != "" && \$1 !~ /^(merge|label|reset|exec)\$/ && should_drop(hash)) {
+      sub(/^[a-z]+/, "drop")
+    }
+  }
+  { print }
+' "\$todo_file" > "\${todo_file}.tmp"
+mv "\${todo_file}.tmp" "\$todo_file"
+EOF
+
+  chmod +x "$TEMP_EDITOR"
+
+  GIT_SEQUENCE_EDITOR="$TEMP_EDITOR" git rebase -i --rebase-merges origin/main
+
+  echo ""
+  echo "✓ Rebase completed!"
+  echo ""
+  echo "Next steps:"
+  echo "  1. Verify: git log origin/main..HEAD"
+  echo "  2. Force push: git push --force-with-lease"
+  echo "  3. The PR will get a new version bump automatically"
+fi
