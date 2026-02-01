@@ -1,3 +1,4 @@
+import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
 import { Stack } from '@mui/material';
@@ -5,7 +6,6 @@ import { ActivityDescription } from '../strava/ActivityDescription';
 import { ActivityName } from '../strava/ActivityName';
 import { ActivityStats } from '../strava/ActivityStats';
 import { ActivityTypeWithIcon } from '../strava/ActivityTypeWithIcon';
-import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 
 const cardSx: SxObject = {
   padding: 2.5,

@@ -1,6 +1,6 @@
+import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import { Link } from '@dg/ui/dependent/Link';
 import { truncated } from '@dg/ui/helpers/truncated';
-import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 
 /**
  * Formatted link for the activity description

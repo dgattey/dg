@@ -1,7 +1,7 @@
+import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import type { SxObject } from '@dg/ui/theme';
 import { Typography } from '@mui/material';
 import { Bike, Dumbbell } from 'lucide-react';
-import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 
 const activityTypeSx: SxObject = {
   alignItems: 'center',

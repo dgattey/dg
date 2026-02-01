@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { isRichTextDocument } from '@dg/content-models/contentful/renderables/richText';
 import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
+import { isRichTextDocument } from '@dg/content-models/contentful/renderables/richText';
 import { getIntroContent } from './contentful';
 
 const getFirstParagraph = (introBlock: IntroContent | null) => {

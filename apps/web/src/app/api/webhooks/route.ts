@@ -1,4 +1,7 @@
-import { isStravaWebhookEvent, type StravaWebhookEvent } from '@dg/content-models/strava/StravaWebhookEvent';
+import {
+  isStravaWebhookEvent,
+  type StravaWebhookEvent,
+} from '@dg/content-models/strava/StravaWebhookEvent';
 import { log } from '@dg/shared-core/helpers/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
