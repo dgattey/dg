@@ -1,4 +1,4 @@
-import type { Link } from '@dg/services/contentful/api.generated';
+import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
 import { Card, Typography } from '@mui/material';
 import { GlassContainer } from '../core/GlassContainer';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
@@ -75,7 +75,7 @@ export type ContentCardProps = Pick<
    * If provided, a link to follow upon click anywhere on the
    * card
    */
-  link?: Link;
+  link?: RenderableLink;
 
   sx?: SxObject;
   overlaySx?: SxObject;

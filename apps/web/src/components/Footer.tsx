@@ -1,4 +1,4 @@
-import type { Link as LinkType } from '@dg/services/contentful/api.generated';
+import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
 import { Link } from '@dg/ui/dependent/Link';
@@ -6,7 +6,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { Container, Divider, Stack } from '@mui/material';
 import { cacheLife } from 'next/cache';
 import { getFooterLinks } from '../services/contentful';
-import { getAppVersion } from '../services/version';
+import { getAppVersionInfo } from '../services/version';
 
 const navItemNoPaddingSx: SxObject = {
   padding: 0,
@@ -62,18 +62,19 @@ const footerIconLinkListSx: SxObject = {
 /**
  * Creates a singular footer link with top-positioned tooltip
  */
-function FooterLink({ link }: { link: LinkType }) {
+function FooterLink({ link }: { link: RenderableLink }) {
+  const { title, url, icon } = link;
   return (
     <NavItem sx={navItemNoPaddingSx}>
       <Link
-        aria-label={link.title}
+        aria-label={title}
         color="secondary"
-        href={link.url}
-        icon={link.icon}
-        isExternal={link.url?.startsWith('http')}
+        href={url}
+        icon={icon ?? undefined}
+        isExternal={url.startsWith('http')}
         layout="icon" // the ones that have no icon will resolve to just text
-        sx={getFooterLinkSx(Boolean(link.icon))}
-        title={link.title}
+        sx={getFooterLinkSx(Boolean(icon))}
+        title={title}
         tooltipPlacement="top"
         variant="caption"
       />
@@ -95,13 +96,15 @@ async function getCopyrightYear() {
  * Creates the site footer component - shows version data + copyright
  */
 export async function Footer() {
-  const [footerLinks, version, currentYear] = await Promise.all([
+  const [footerLinks, versionInfo, currentYear] = await Promise.all([
     getFooterLinks(),
-    getAppVersion(),
+    getAppVersionInfo(),
     getCopyrightYear(),
   ]);
   const nonIconFooterLinks = footerLinks.filter((link) => !link.icon);
   const iconFooterLinks = footerLinks.filter((link) => link.icon);
+  const releaseUrl = versionInfo.releaseUrl;
+  const version = versionInfo.version;
   return (
     <Section sx={footerSectionSx}>
       <Container sx={footerContainerSx}>
@@ -110,8 +113,27 @@ export async function Footer() {
           <Nav sx={footerNavSx}>
             <NavGroup>
               <NavItem>© {currentYear} Dylan Gattey</NavItem>
-              <NavItem sx={navItemNoPaddingSx}>•</NavItem>
-              <NavItem>{version ?? ''}</NavItem>
+              {version ? (
+                <>
+                  <NavItem sx={navItemNoPaddingSx}>•</NavItem>
+                  <NavItem>
+                    {releaseUrl ? (
+                      <Link
+                        aria-label={`GitHub release ${version}`}
+                        color="inherit"
+                        href={releaseUrl}
+                        isExternal
+                        title={`GitHub release ${version}`}
+                        variant="caption"
+                      >
+                        {version}
+                      </Link>
+                    ) : (
+                      version
+                    )}
+                  </NavItem>
+                </>
+              ) : null}
             </NavGroup>
             <NavGroup component="div" sx={footerNavGroupSx}>
               <Stack component="ul" direction="row" sx={footerLinkListSx}>

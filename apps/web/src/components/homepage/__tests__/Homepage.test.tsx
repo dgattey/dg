@@ -1,4 +1,4 @@
-import type { IntroContent } from '@dg/services/contentful/fetchIntroContent';
+import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
 import { ColorSchemeToggleClient } from '@dg/ui/core/ColorSchemeToggleClient';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';

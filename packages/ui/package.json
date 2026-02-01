@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@dg/services": "workspace:*",
+    "@dg/content-models": "workspace:*",
     "@dg/shared-core": "workspace:*",
     "@fortawesome/fontawesome-svg-core": "7.1.0",
     "@fortawesome/free-brands-svg-icons": "catalog:",
@@ -11,7 +11,7 @@
     "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
-    "sharp": "0.34.5",
+    "sharp": "catalog:",
     "use-breakpoint": "4.0.10"
   },
   "devDependencies": {

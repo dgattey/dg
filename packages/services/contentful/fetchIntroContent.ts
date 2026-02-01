@@ -1,6 +1,10 @@
+import { toRenderableAsset } from '@dg/content-models/contentful/renderables/assets';
+import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
+import { toRenderableRichTextContent } from '@dg/content-models/contentful/renderables/richText';
+import { introBlockResponseSchema } from '@dg/content-models/contentful/schema/intro';
 import { gql } from 'graphql-request';
+import { parseResponse } from '../clients/parseResponse';
 import { contentfulClient } from './contentfulClient';
-import type { IntroBlockQuery } from './fetchIntroContent.generated';
 
 /**
  * Grabs the contentful sections with the title of header. Should
@@ -66,33 +70,24 @@ const QUERY = gql`
   }
 `;
 
-/**
- * The return type of fetchIntroContent, exported for use in components.
- */
-export type IntroContent = {
-  textBlock: {
-    content: NonNullable<
-      NonNullable<IntroBlockQuery['textBlockCollection']>['items'][0]
-    >['content'];
-  };
-  image: {
-    url: string | undefined;
-    width: number | undefined;
-    height: number | undefined;
-    title: string | undefined;
-  };
-};
+export type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
 
 /**
  * Fetches the text block corresponding to the introduction rich text
  * for the home page.
  */
 export async function fetchIntroContent(): Promise<IntroContent | null> {
-  const data = await contentfulClient.request<IntroBlockQuery>(QUERY);
-  const textBlockItem = data.textBlockCollection?.items.filter((item) => item?.content?.json)[0];
-  const image = data.asset;
+  const data = parseResponse(introBlockResponseSchema, await contentfulClient.request(QUERY), {
+    kind: 'graphql',
+    source: 'contentful.fetchIntroContent',
+  });
+  const textBlockItem = data.textBlockCollection?.items?.find((item) => item?.content?.json);
+  const image = toRenderableAsset(data.asset);
   if (textBlockItem?.content && image) {
-    return { image, textBlock: { content: textBlockItem.content } };
+    return {
+      image,
+      textBlock: { content: toRenderableRichTextContent(textBlockItem.content) },
+    };
   }
   return null;
 }

@@ -1,6 +1,6 @@
 'use client';
 
-import type { MapLocation } from '@dg/services/contentful/MapLocation';
+import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import type { SxProps } from '@dg/ui/theme';
 import { useColorScheme } from '@dg/ui/theme/useColorScheme';
 import { Box } from '@mui/material';
@@ -13,7 +13,7 @@ export type MapProps = {
   /**
    * Where we're centered and zoomed
    */
-  location: MapLocation | null;
+  location: MapLocation;
 
   /**
    * If children exist, they need to be real elements.
@@ -126,11 +126,11 @@ export function MapboxMap({ location, children, isLoaded, setMapHasLoaded }: Map
 
   // This will be used to set zoom levels, eventually
   const initialViewState = {
-    latitude: location?.point?.latitude ?? 0,
-    longitude: location?.point?.longitude ?? 0,
-    zoom: location?.initialZoom ?? 0,
+    latitude: location.point.latitude,
+    longitude: location.point.longitude,
+    zoom: location.initialZoom ?? 0,
   };
-  const zoomLevels = location?.zoomLevels ?? [];
+  const zoomLevels = location.zoomLevels;
   const minZoom = zoomLevels[0];
   const maxZoom = zoomLevels[zoomLevels.length - 1];
 

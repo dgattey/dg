@@ -1,4 +1,4 @@
-import type { Artist } from '@dg/services/spotify/Track';
+import type { Artist } from '@dg/content-models/spotify/Track';
 import { Link } from '@dg/ui/dependent/Link';
 import { truncated } from '@dg/ui/helpers/truncated';
 import type { SxObject } from '@dg/ui/theme';
@@ -58,7 +58,7 @@ export function ArtistList({ artists, color, textShadow }: ArtistListProps) {
         return (
           <Fragment key={artist.id}>
             <Link
-              href={artist.external_urls.spotify}
+              href={artist.externalUrls.spotify}
               isExternal={true}
               title={artist.name}
               variant="body2"

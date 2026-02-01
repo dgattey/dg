@@ -1,4 +1,4 @@
-import type { Track } from '@dg/services/spotify/Track';
+import type { Track } from '@dg/content-models/spotify/Track';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { FaIcon } from '@dg/ui/icons/FaIcon';
 import type { SxObject } from '@dg/ui/theme';

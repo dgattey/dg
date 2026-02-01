@@ -1,10 +1,10 @@
-import type { Track } from '@dg/services/spotify/Track';
+import type { Track } from '@dg/content-models/spotify/Track';
 import type { SxObject } from '@dg/ui/theme';
 import { Typography } from '@mui/material';
 import { Music } from 'lucide-react';
 
 type PlaybackStatusProps = {
-  playedAt?: Track['played_at'];
+  playedAt?: Track['playedAt'];
   relativePlayedAt?: Track['relativePlayedAt'];
   color?: string;
   textShadow?: string;

@@ -1,20 +1,17 @@
-import type { Link as LinkType } from '@dg/services/contentful/api.generated';
+import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
 import { Link } from './Link';
 
 type ContentWrappingLinkProps = Pick<React.ComponentProps<'div'>, 'children'> & {
   /**
    * The link whose URL we should render
    */
-  link: LinkType | undefined;
+  link: RenderableLink;
 };
 
 /**
  * Renders a link that wraps the given children. Server component compatible.
  */
 export function ContentWrappingLink({ link, children }: ContentWrappingLinkProps) {
-  if (!link?.url) {
-    return null;
-  }
   return (
     <Link
       href={link.url}
@@ -26,7 +23,7 @@ export function ContentWrappingLink({ link, children }: ContentWrappingLinkProps
         height: '100%',
         textDecoration: 'none',
       }}
-      title={link.title ?? undefined}
+      title={link.title}
     >
       {children}
     </Link>

@@ -1,16 +1,21 @@
 {
   "dependencies": {
+    "@dg/content-models": "workspace:*",
     "@dg/db": "workspace:*",
     "@dg/shared-core": "workspace:*",
     "graphql-request": "catalog:",
-    "server-only": "0.0.1",
-    "sharp": "0.34.5",
+    "server-only": "catalog:",
+    "sharp": "catalog:",
+    "valibot": "catalog:",
     "wretch": "catalog:"
   },
   "devDependencies": {
     "@dg/tsconfig": "workspace:*",
+    "@types/jest": "catalog:",
     "@types/node": "catalog:",
     "dotenv-mono": "catalog:",
+    "graphql": "catalog:",
+    "ts-node": "catalog:",
     "typescript": "catalog:"
   },
   "name": "@dg/services",
@@ -20,5 +25,6 @@
     "check:ci": "biome ci .",
     "check:types": "tsc",
     "clean": "rm -rf .turbo *.tsbuildinfo"
-  }
+  },
+  "type": "module"
 }

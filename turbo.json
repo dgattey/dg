@@ -9,7 +9,6 @@
     ".npmrc",
     ".sequelizerc",
     "biome.json",
-    "codegen.ts",
     "next.config.js",
     "tsconfig.json"
   ],
@@ -59,10 +58,6 @@
     "clean": {
       "cache": false
     },
-    "codegen": {
-      "cache": false,
-      "inputs": ["apps/web/src/api/server/*"]
-    },
     "connect": {
       "cache": false,
       "inputs": ["apps/**/*", "packages/**/*"],
@@ -78,6 +73,9 @@
       "persistent": true
     },
     "dg#dev": {
+      "cache": false
+    },
+    "graphql:schema": {
       "cache": false
     },
     "test": {
