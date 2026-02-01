@@ -1,7 +1,7 @@
 import { stravaActivityApiSchema } from '@dg/content-models/strava/StravaActivity';
 import { log } from '@dg/shared-core/helpers/log';
 import { parseResponse } from '../clients/parseResponse';
-import { paredStravaActivity } from './paredStravaActivity';
+import { mapActivityFromApi } from './paredStravaActivity';
 import { stravaClient } from './stravaClient';
 
 /**
@@ -14,10 +14,10 @@ export const fetchStravaActivityFromApi = async (id: number) => {
   if (status !== 200) {
     return null;
   }
-  const allData = parseResponse(stravaActivityApiSchema, await response.json(), {
+  const apiData = parseResponse(stravaActivityApiSchema, await response.json(), {
     kind: 'rest',
     source: 'strava.fetchStravaActivityFromApi',
   });
-  log.info('Fetched and parsed Strava activity from API', { allData, id });
-  return paredStravaActivity(allData);
+  log.info('Fetched and parsed Strava activity from API', { apiData, id });
+  return mapActivityFromApi(apiData);
 };
