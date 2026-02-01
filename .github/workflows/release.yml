@@ -16,7 +16,7 @@ env:
 
 jobs:
   bump:
-    name: '📦 Bump version'
+    name: "📦 Bump version"
     if: github.event.action != 'closed'
     runs-on: ubuntu-latest
     permissions:
@@ -34,7 +34,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-          cache: 'pnpm'
+          cache: "pnpm"
 
       - name: Install dependencies
         run: pnpm install
@@ -129,7 +129,7 @@ jobs:
           git push
 
   release:
-    name: '🚀 Create release'
+    name: "🚀 Create release"
     if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     permissions:
@@ -174,7 +174,7 @@ jobs:
             const repo = context.repo.repo;
             const tag = `v${process.env.VERSION}`;
             const body = process.env.NOTES || '';
-            
+
             try {
               await github.rest.repos.getReleaseByTag({ owner, repo, tag });
               core.setFailed(`Release ${tag} already exists. Cannot create duplicate release.`);
@@ -182,7 +182,7 @@ jobs:
             } catch (error) {
               if (error.status !== 404) throw error;
             }
-            
+
             const { data: createdRelease } = await github.rest.repos.createRelease({
               owner,
               repo,
@@ -191,7 +191,7 @@ jobs:
               body,
               target_commitish: context.payload.pull_request.merge_commit_sha,
             });
-            
+
             core.info(`Created release ${tag}`);
             core.setOutput('release_url', createdRelease.html_url);
 
