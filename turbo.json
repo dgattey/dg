@@ -77,6 +77,12 @@
     "release": {
       "cache": false
     },
+    "test": {
+      "dependsOn": ["topo"],
+      "inputs": ["$TURBO_DEFAULT$", "../../packages/**", "!**/*.md", "!**/*.mdx"],
+      "outputLogs": "new-only",
+      "outputs": []
+    },
     "topo": {
       "dependsOn": ["^topo"]
     },

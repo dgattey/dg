@@ -1,41 +1,16 @@
 ---
-description: Next.js DevTools usage and dev server workflow
+description: Next.js dev server and verification
 alwaysApply: true
 ---
 
-# Next.js DevTools workflow
+# Next.js DevTools
 
-- When verification requires the running app, start the web dev server with `turbo run dev --filter=web`.
-- Prefer port 3000 for MCP checks. If something is already running on 3000, reuse it and leave it running as long as it responds to MCP tool calls.
-- Only stop and restart the existing process if MCP calls fail or the server is unresponsive.
-- Use Next DevTools MCP for runtime checks (errors, routes, metadata) and browser automation for page-level verification.
-- Stop the dev server after verification is complete if you started it; otherwise leave it running.
+- For verification that needs the app, run `turbo run dev --filter=web`.
+- Prefer port 3000; reuse an existing server if responsive; restart only if MCP calls fail.
+- If you started the server, stop it when done; otherwise leave it running.
+- Use Next DevTools MCP for server/runtime errors and browser MCP for client console.
 
-## Error verification workflow
+## Error checks
 
-As part of verifying changes, check for errors from both the Next.js dev server and browser console:
-
-### 1. Next.js DevTools errors (primary)
-
-Use the Next DevTools MCP to check for compilation and runtime errors:
-
-1. Call `nextjs_index` (port 3000) to discover the running server and available tools
-2. Call `nextjs_call` with `toolName="get_errors"` to retrieve compilation/runtime errors
-3. Fix any errors before proceeding—these indicate build failures or server-side issues
-
-### 2. Browser console errors (complementary)
-
-Use cursor-ide-browser MCP to check for client-side issues:
-
-1. Navigate to the relevant page using `browser_navigate`
-2. Use `browser_console_messages` to retrieve all console output
-3. Review messages for errors (`error` level) and warnings (`warning` level)
-4. Fix any errors or warnings introduced by the change before considering it complete
-5. Informational messages (`log`, `info`) can generally be ignored unless relevant
-
-### What these checks catch
-
-- **Next.js DevTools**: Compilation errors, TypeScript issues, server component errors, build failures
-- **Browser console**: Hydration mismatches, failed network requests, unhandled promise rejections, deprecation warnings, missing resources
-
-Both checks should pass before considering a change complete.
+1. `nextjs_index` on port 3000, then `nextjs_call` with `toolName="get_errors"`.
+2. `browser_navigate` to the page, then `browser_console_messages`; fix new errors/warnings.

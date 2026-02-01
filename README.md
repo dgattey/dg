@@ -12,6 +12,7 @@ Hi :wave: This is an overengineered way to show past projects / experiment with 
 - `turbo build:analyze` bundle size analysis
 - `turbo check` Biome lint + format
 - `turbo check:types` typecheck
+- `turbo test` unit tests (Jest)
 - `turbo codegen` regenerate GraphQL + operation types
 - `turbo db -- db:migrate` run migrations (`db:migrate:status`, `db:migrate:undo`)
 - `turbo db -- migration:generate --name <name>` create migration
@@ -46,6 +47,14 @@ Feature branches squash onto main, and Linear is used for ticket tracking.
 1. PR creation will kick off Github actions for linting/formatting + post a comment about the new version.
 1. Use the Vercel deploy preview to verify functionality.
 1. Merges will automatically create a new version/release 🎉
+
+## :test_tube: Testing
+
+- Unit tests live in `__tests__` folders next to source files and match basenames (`Homepage.tsx` → `__tests__/Homepage.test.tsx`).
+- Run `turbo test --filter=@dg/web` for web unit tests.
+- Jest setup is intentionally minimal (`apps/web/jest.setup.ts` only imports `@testing-library/jest-dom` and no-op popover methods for jsdom).
+- Use `@testing-library/user-event` for interactions (avoid `fireEvent`).
+- CI runs `turbo test` via the Autochecks `🧪 test` job.
 
 ## :rainbow: Architecture
 

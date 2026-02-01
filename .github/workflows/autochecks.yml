@@ -21,13 +21,20 @@ jobs:
     strategy:
       matrix:
         # Each of these are commands we should run and check output
-        command: ['check', 'check:types']
+        include:
+          - command: "check"
+            name: "🧹 Check"
+          - command: "check:types"
+            name: "🔎 Check types"
+          - command: "test"
+            name: "🧪 Test"
 
     outputs:
       check: ${{ steps.changes.outputs.check }}
       checktypes: ${{ steps.changes.outputs.checktypes }}
+      test: ${{ steps.changes.outputs.test }}
 
-    name: ${{ matrix.command }}
+    name: ${{ matrix.name }}
 
     steps:
       - uses: actions/checkout@v4
@@ -35,7 +42,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-          cache: 'pnpm'
+          cache: "pnpm"
       - run: pnpm install
       - name: ${{ matrix.command }}
         run: NODE_OPTIONS=--max_old_space_size=8192 pnpm turbo ${{ matrix.command }}
@@ -57,12 +64,13 @@ jobs:
     needs: autocheck
     steps:
       - name: Autochecked files changed output
-        if: ${{ needs.autocheck.outputs.check || needs.autocheck.outputs.checktypes }}
+        if: ${{ needs.autocheck.outputs.check || needs.autocheck.outputs.checktypes || needs.autocheck.outputs.test }}
         run: |
           echo "Changed from check: ${{needs.autocheck.outputs.check || 'none'}}"
           echo "Type check changed files: ${{needs.autocheck.outputs.checktypes || 'none'}}"
+          echo "Test changed files: ${{needs.autocheck.outputs.test || 'none'}}"
           exit 1
       - name: No changes found
-        if: ${{ !needs.autocheck.outputs.check && !needs.autocheck.outputs.checktypes }}
+        if: ${{ !needs.autocheck.outputs.check && !needs.autocheck.outputs.checktypes && !needs.autocheck.outputs.test }}
         run: |
           echo "No changes from autochecks"

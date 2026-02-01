@@ -1,56 +1,24 @@
 ---
-description: Avoid component={Function} prop pattern for RSC compatibility
+description: Avoid component={Function} for RSC
 globs: "**/*.tsx"
 alwaysApply: false
 ---
 
-# No component={Function} Prop Pattern
+# Avoid `component={Function}`
 
-Never pass a component/function as the `component` prop to MUI components. This breaks React Server Component serialization because functions cannot be passed as props from server to client components.
+- Do not pass a function/component to MUI's `component` prop; it breaks RSC serialization.
+- Use wrapper components (e.g., `Link`) or string components instead.
 
 ```tsx
-// ❌ BAD - passes function as prop, breaks RSC
+// bad
 import NextLink from 'next/link';
 
 <MuiLink component={NextLink} href="/about">About</MuiLink>
-<Button component={MyCustomComponent}>Click</Button>
-```
 
-```tsx
-// ✅ GOOD - NextLink wraps MuiLink (internal to Link component)
+// good
 <NextLink href="/about" legacyBehavior passHref>
   <MuiLink>About</MuiLink>
 </NextLink>
-```
-
-```tsx
-// ✅ GOOD - string component values are fine (not functions)
 <Button component="a" href="/about">About</Button>
 <Typography component="h1">Heading</Typography>
 ```
-
-## Why This Matters
-
-- **RSC serialization**: Functions cannot cross the server/client boundary as props
-- Using `component={Function}` forces client components
-- Server components = better performance (no JS bundle, no hydration)
-
-## Our Link Component
-
-The `Link` component handles this correctly:
-- Uses NextLink wrapper with `legacyBehavior`/`passHref` for internal links
-- Uses MuiLink directly for external links
-- Provides full MUI theming: `color`, `variant`, `underline`, `sx`
-- Server component compatible
-
-```tsx
-// Clean consumer API with MUI theming
-<Link href="/about" color="primary" variant="body2">About</Link>
-<Link href="https://example.com" isExternal underline="hover">External</Link>
-```
-
-## The legacyBehavior Pattern
-
-`legacyBehavior` is NOT deprecated - it just means NextLink doesn't render its own `<a>` tag.
-This allows MuiLink to be the anchor while NextLink handles navigation/prefetching.
-The name is unfortunate but the functionality is correct and supported.

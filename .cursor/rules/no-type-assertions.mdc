@@ -1,49 +1,20 @@
+---
+description: Avoid TypeScript assertions
+alwaysApply: true
+---
+
 # No Type Assertions
 
-Avoid using TypeScript type assertions (`as`, `<Type>`, or `!`) to work around type errors.
+- Avoid `as`, `<Type>`, and `!` to silence errors.
+- Prefer proper typing, type guards, and nullish handling.
+- Allow only with runtime validation or broken external types; add a comment.
 
-## Why
+```ts
+// bad
+const value = data as Foo;
+const item = items.find((x) => x.id === id)!;
 
-Type assertions bypass TypeScript's type checking and can hide real bugs. They should only be used when you have runtime knowledge that TypeScript cannot infer.
-
-## Bad Examples
-
-```typescript
-// Hiding a type mismatch
-const value = someFunction() as ExpectedType;
-
-// Working around union types
-const result = data as SxProps;
-
-// Non-null assertion when value might be null
-const item = array.find(x => x.id === id)!;
+// good
+if (isFoo(data)) {}
+const item = items.find((x) => x.id === id) ?? fallback;
 ```
-
-## Good Examples
-
-```typescript
-// Use proper typing instead
-const value: ExpectedType = someFunction();
-
-// Use type guards
-if (isExpectedType(value)) {
-  // TypeScript now knows the type
-}
-
-// Use nullish coalescing or optional chaining
-const item = array.find(x => x.id === id) ?? defaultItem;
-
-// Narrow types with conditionals
-if (value !== undefined) {
-  // TypeScript knows value is defined
-}
-```
-
-## Acceptable Uses
-
-Type assertions are acceptable only when:
-1. You have runtime validation that TypeScript cannot see (e.g., after JSON parsing with validation)
-2. Interfacing with external libraries that have incorrect types
-3. `as const` for literal inference (this is not a type assertion in the problematic sense)
-
-When you must use an assertion, add a comment explaining why it's necessary.
