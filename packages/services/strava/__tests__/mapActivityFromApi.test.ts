@@ -1,4 +1,4 @@
-import { mapActivityFromApi } from '../paredStravaActivity';
+import { mapActivityFromApi } from '../mapActivityFromApi';
 
 describe('mapActivityFromApi', () => {
   describe('with null/undefined input', () => {
