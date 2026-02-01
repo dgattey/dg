@@ -1,5 +1,6 @@
 {
   "dependencies": {
+    "@dg/content-models": "workspace:*",
     "@dg/shared-core": "workspace:*",
     "@types/pg": "8.16.0",
     "dotenv-mono": "catalog:",

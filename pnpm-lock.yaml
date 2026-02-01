@@ -257,6 +257,9 @@ importers:
 
   packages/db:
     dependencies:
+      '@dg/content-models':
+        specifier: workspace:*
+        version: link:../content-models
       '@dg/shared-core':
         specifier: workspace:*
         version: link:../shared-core
