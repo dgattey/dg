@@ -1,3 +1,4 @@
+import type { StravaActivity as StravaActivityData } from '@dg/content-models/strava/StravaActivity';
 import {
   AllowNull,
   Column,
@@ -7,7 +8,6 @@ import {
   Table,
   Unique,
 } from 'sequelize-typescript';
-import type { StravaDetailedActivity } from './StravaDetailedActivity';
 
 @Table({ modelName: 'StravaActivity' })
 export class StravaActivity extends Model {
@@ -20,7 +20,7 @@ export class StravaActivity extends Model {
   declare activityStartDate: Date;
 
   @Column(DataType.JSON)
-  declare activityData: Record<string, unknown> & StravaDetailedActivity;
+  declare activityData: StravaActivityData;
 
   @AllowNull
   @Column(DataType.DATE)
