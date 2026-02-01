@@ -85,6 +85,15 @@ jobs:
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
+      - name: Upsert PR version comment
+        if: steps.check-bot-commit.outputs.SKIP == 'false'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.target-version.outputs.VERSION_TO }}
+        run: |
+          set -euo pipefail
+          ./scripts/version-and-release pr-comment "$GITHUB_EVENT_PATH" "$VERSION" will-be
+
       - name: Check if bump needed
         id: check-bump
         if: steps.check-bot-commit.outputs.SKIP == 'false'
@@ -125,6 +134,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - name: Checkout merged commit
         uses: actions/checkout@v4
@@ -153,6 +163,7 @@ jobs:
           } >> "$GITHUB_OUTPUT"
 
       - name: Create GitHub release
+        id: release
         uses: actions/github-script@v7
         env:
           VERSION: ${{ steps.version.outputs.VERSION }}
@@ -172,7 +183,7 @@ jobs:
               if (error.status !== 404) throw error;
             }
             
-            await github.rest.repos.createRelease({
+            const { data: createdRelease } = await github.rest.repos.createRelease({
               owner,
               repo,
               tag_name: tag,
@@ -182,3 +193,13 @@ jobs:
             });
             
             core.info(`Created release ${tag}`);
+            core.setOutput('release_url', createdRelease.html_url);
+
+      - name: Update PR version comment
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.version.outputs.VERSION }}
+          RELEASE_URL: ${{ steps.release.outputs.release_url }}
+        run: |
+          set -euo pipefail
+          ./scripts/version-and-release pr-comment "$GITHUB_EVENT_PATH" "$VERSION" released

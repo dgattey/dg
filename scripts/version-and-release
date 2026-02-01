@@ -2,6 +2,7 @@
 const fs = require('fs');
 const path = require('path');
 const { execSync } = require('child_process');
+const https = require('https');
 
 // DESCRIPTION: Manage version tags and Github releases
 
@@ -100,6 +101,103 @@ function extractNotes(eventPath) {
   console.log(notes.join('\n').trim());
 }
 
+function getRepoInfo(eventPath) {
+  const event = JSON.parse(fs.readFileSync(eventPath, 'utf8'));
+  const owner = event.repository?.owner?.login;
+  const repo = event.repository?.name;
+  const issueNumber = event.pull_request?.number;
+
+  if (!owner || !repo || !issueNumber) {
+    throw new Error('Missing repository or pull request info in event payload');
+  }
+
+  return { owner, repo, issueNumber };
+}
+
+function requestGithub({ token, method, path: requestPath, body }) {
+  return new Promise((resolve, reject) => {
+    const options = {
+      method,
+      hostname: 'api.github.com',
+      path: requestPath,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'version-and-release-script',
+      },
+    };
+
+    const req = https.request(options, (res) => {
+      let data = '';
+      res.setEncoding('utf8');
+      res.on('data', (chunk) => { data += chunk; });
+      res.on('end', () => {
+        if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300) {
+          resolve(data ? JSON.parse(data) : null);
+          return;
+        }
+        reject(new Error(`GitHub API error ${res.statusCode}: ${data}`));
+      });
+    });
+
+    req.on('error', (error) => {
+      reject(error);
+    });
+
+    if (body) {
+      req.setHeader('Content-Type', 'application/json');
+      req.write(JSON.stringify(body));
+    }
+
+    req.end();
+  });
+}
+
+async function upsertPrComment(eventPath, version, state, releaseUrl) {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) throw new Error('GITHUB_TOKEN is required to update PR comments');
+
+  const { owner, repo, issueNumber } = getRepoInfo(eventPath);
+  const marker = '<!-- release-bot-version-comment -->';
+  const isReleased = state === 'released';
+
+  if (!version) throw new Error('Version is required to update PR comment');
+  if (isReleased && !releaseUrl) {
+    throw new Error('Release URL is required for released comment');
+  }
+
+  const body = isReleased
+    ? `${marker}\n🎉 This PR is included in version ${version} 🎉\n\n` +
+      `The release is available on [GitHub release](${releaseUrl})`
+    : `${marker}\n🎉 This PR will be included in version ${version} 🎉`;
+
+  const comments = await requestGithub({
+    token,
+    method: 'GET',
+    path: `/repos/${owner}/${repo}/issues/${issueNumber}/comments?per_page=100`,
+  });
+
+  const existing = Array.isArray(comments)
+    ? comments.find((comment) => comment.body && comment.body.includes(marker))
+    : null;
+
+  if (existing) {
+    await requestGithub({
+      token,
+      method: 'PATCH',
+      path: `/repos/${owner}/${repo}/issues/comments/${existing.id}`,
+      body: { body },
+    });
+  } else {
+    await requestGithub({
+      token,
+      method: 'POST',
+      path: `/repos/${owner}/${repo}/issues/${issueNumber}/comments`,
+      body: { body },
+    });
+  }
+}
+
 // Main
 const [,, command, ...args] = process.argv;
 
@@ -112,17 +210,31 @@ if (!command || command === '--help' || command === '-h') {
   console.log('  bump <version> <major|minor|patch>    Compute and write next version');
   console.log('  target-from-tags <current> <type>     Compute target from repo tags');
   console.log('  extract-notes <event-path>            Extract release notes from PR');
+  console.log('  pr-comment <event> <version> <state>  Upsert PR version comment');
+  console.log('                                         state: will-be|released');
+  console.log('                                         set RELEASE_URL for released');
   process.exit(0);
 }
 
-try {
+async function main() {
   if (command === 'read') readVersion();
   else if (command === 'pr-info') prInfo(args[0]);
   else if (command === 'bump') bump(args[0], args[1]);
   else if (command === 'target-from-tags') targetVersionFromTags(args[0], args[1]);
   else if (command === 'extract-notes') extractNotes(args[0]);
-  else throw new Error(`Unknown command: ${command}`);
-} catch (error) {
+  else if (command === 'pr-comment') {
+    const [eventPath, version, state] = args;
+    const releaseUrl = process.env.RELEASE_URL;
+    if (state !== 'will-be' && state !== 'released') {
+      throw new Error('State must be "will-be" or "released"');
+    }
+    await upsertPrComment(eventPath, version, state, releaseUrl);
+  } else {
+    throw new Error(`Unknown command: ${command}`);
+  }
+}
+
+main().catch((error) => {
   console.error(`Error: ${error.message}`);
   process.exit(1);
-}
+});
