@@ -95,11 +95,9 @@ const overriddenFormatString = ({ unit, amount }: RelativeTime) => {
 export const formatRelativeTime = ({
   fromDate,
   toDate,
-  capitalized,
 }: {
   fromDate: DateConstructorValue;
-  toDate?: DateConstructorValue;
-  capitalized?: boolean;
+  toDate: DateConstructorValue;
 }) => {
   const fromNumeric = numericDate(fromDate);
   const toNumeric = numericDate(toDate);
@@ -109,8 +107,5 @@ export const formatRelativeTime = ({
   const elapsedMs = fromNumeric - toNumeric;
   const relativeTime = relativeTimeFromMs(elapsedMs, relativeTimeFormatter);
   const formattedValue = overriddenFormatString(relativeTime) ?? relativeTime.formatted;
-  if (capitalized) {
-    return formattedValue.charAt(0).toUpperCase() + formattedValue.slice(1);
-  }
-  return formattedValue;
+  return formattedValue.charAt(0).toUpperCase() + formattedValue.slice(1);
 };

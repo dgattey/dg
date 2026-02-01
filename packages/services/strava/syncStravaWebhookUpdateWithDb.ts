@@ -1,5 +1,5 @@
 import { db } from '@dg/db';
-import { log } from '@logtail/next';
+import { log } from '@dg/shared-core/helpers/log';
 import { fetchStravaActivityFromApi } from './fetchStravaActivityFromApi';
 import type { StravaWebhookEvent } from './StravaWebhookEvent';
 
@@ -32,7 +32,6 @@ const fetchFromApiAndSaveToDb = async (id: number) => {
   const latestActivityData = await fetchStravaActivityFromApi(id);
   if (!latestActivityData?.start_date) {
     log.error('Missing activity data', { id, latestActivityData });
-    await log.flush();
     throw new Error(`Missing activity data for ${id}`);
   }
   const updatedActivity = await db.StravaActivity.upsert({

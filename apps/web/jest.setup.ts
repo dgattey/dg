@@ -2,6 +2,9 @@
 import '@testing-library/jest-dom';
 
 const ensurePopoverMethod = (method: 'showPopover' | 'hidePopover') => {
+  if (typeof HTMLElement === 'undefined') {
+    return;
+  }
   if (!(method in HTMLElement.prototype)) {
     Object.defineProperty(HTMLElement.prototype, method, {
       configurable: true,

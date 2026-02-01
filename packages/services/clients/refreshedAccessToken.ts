@@ -1,7 +1,7 @@
 import 'server-only';
 import { db } from '@dg/db';
 import type { CreateTokenProps, FetchTokenProps } from '@dg/db/models/Token';
-import { log } from '@logtail/next';
+import { log } from '@dg/shared-core/helpers/log';
 import { maskSecret } from './maskSecret';
 import type { RefreshTokenConfig } from './RefreshTokenConfig';
 

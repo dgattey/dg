@@ -91,7 +91,7 @@ function extractNotes(eventPath) {
   for (const line of lines) {
     if (/^#\s*What changed\?/i.test(line)) {
       inSection = true;
-    } else if (inSection && /^#\s*Release info/i.test(line)) {
+    } else if (inSection && (/^#\s*Release info/i.test(line) || /^-+\s*$/.test(line))) {
       break;
     } else if (inSection) {
       notes.push(line);

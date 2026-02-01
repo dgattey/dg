@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@logtail/next": "catalog:",
+    "@dg/shared-core": "workspace:*",
     "@types/pg": "8.16.0",
     "dotenv-mono": "catalog:",
     "pg": "8.17.2",

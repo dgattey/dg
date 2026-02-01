@@ -2,7 +2,6 @@
   "dependencies": {
     "@dg/db": "workspace:*",
     "@dg/shared-core": "workspace:*",
-    "@logtail/next": "catalog:",
     "graphql-request": "catalog:",
     "server-only": "0.0.1",
     "sharp": "0.34.5",

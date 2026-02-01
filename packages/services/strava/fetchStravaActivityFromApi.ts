@@ -1,5 +1,5 @@
 import type { StravaDetailedActivity } from '@dg/db/models/StravaDetailedActivity';
-import { log } from '@logtail/next';
+import { log } from '@dg/shared-core/helpers/log';
 import { paredStravaActivity } from './paredStravaActivity';
 import { stravaClient } from './stravaClient';
 
@@ -15,6 +15,5 @@ export const fetchStravaActivityFromApi = async (id: number) => {
   }
   const allData = await response.json<StravaDetailedActivity & Record<string, unknown>>();
   log.info('Fetched and parsed Strava activity from API', { allData, id });
-  await log.flush();
   return paredStravaActivity(allData);
 };

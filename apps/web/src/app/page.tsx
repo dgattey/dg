@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import { Homepage } from '../components/homepage/Homepage';
 import { getHomepageDescription } from '../services/homepage';
-import { HOMEPAGE_TITLE, truncateDescription } from './metadata';
+import { baseOpenGraph, baseTwitter, HOMEPAGE_TITLE, truncateDescription } from './metadata';
 
 export async function generateMetadata(): Promise<Metadata> {
   const description = truncateDescription(await getHomepageDescription());
@@ -9,12 +9,14 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     description,
     openGraph: {
+      ...baseOpenGraph,
       description,
       title: HOMEPAGE_TITLE,
       url: '/',
     },
     title: HOMEPAGE_TITLE,
     twitter: {
+      ...baseTwitter,
       description,
       title: HOMEPAGE_TITLE,
     },

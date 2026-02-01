@@ -1,4 +1,4 @@
-import { log } from '@logtail/next';
+import { log } from '@dg/shared-core/helpers/log';
 
 /**
  * Recursively parses status from known types

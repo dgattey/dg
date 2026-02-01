@@ -1,5 +1,6 @@
 import { env } from 'node:process';
-import { log } from '@logtail/next';
+import { invariant } from '@dg/shared-core/helpers/invariant';
+import { log } from '@dg/shared-core/helpers/log';
 import postgres from 'pg';
 import { Sequelize } from 'sequelize-typescript';
 import { StravaActivity } from './models/StravaActivity';
@@ -29,11 +30,20 @@ const nodeEnv = env.NODE_ENV;
 log.info('Node env', { nodeEnv });
 
 // Sequelize options applied based on current environment
-const DB_OPTIONS = {
+const dbOptionsByEnv = {
   development: SHARED_DB_OPTIONS,
   production: SHARED_DB_OPTIONS,
   test: SHARED_DB_OPTIONS,
-}[nodeEnv];
+};
+
+const isDbEnv = (value: string): value is keyof typeof dbOptionsByEnv => value in dbOptionsByEnv;
+
+invariant(
+  nodeEnv && isDbEnv(nodeEnv),
+  `Invalid NODE_ENV: "${nodeEnv}". Must be one of: ${Object.keys(dbOptionsByEnv).join(', ')}`,
+);
+
+const DB_OPTIONS = dbOptionsByEnv[nodeEnv];
 
 /**
  * These are all the models a user might possibly use

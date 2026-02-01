@@ -1,6 +1,6 @@
 import { db } from '@dg/db';
 import { invariant } from '@dg/shared-core/helpers/invariant';
-import { log } from '@logtail/next';
+import { log } from '@dg/shared-core/helpers/log';
 import { maskSecret } from '../clients/maskSecret';
 import { validateRawDataToToken } from './stravaClient';
 import { stravaTokenExchangeClient } from './stravaTokenExchangeClient';
