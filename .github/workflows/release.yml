@@ -52,6 +52,15 @@ jobs:
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
+      - name: Read base version from main
+        id: base-version
+        run: |
+          set -euo pipefail
+          git fetch origin ${{ github.base_ref }}
+          BASE_VERSION=$(git show origin/${{ github.base_ref }}:package.json | node -pe "JSON.parse(require('fs').readFileSync(0, 'utf8')).version")
+          echo "VERSION=${BASE_VERSION}"
+          echo "VERSION=${BASE_VERSION}" >> "$GITHUB_OUTPUT"
+
       - name: Read current version
         id: current-version
         run: |
@@ -60,15 +69,30 @@ jobs:
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
+      - name: Check if bump needed
+        id: check-bump
+        run: |
+          BASE="${{ steps.base-version.outputs.VERSION }}"
+          CURRENT="${{ steps.current-version.outputs.VERSION }}"
+          if [ "$BASE" != "$CURRENT" ]; then
+            echo "Version already bumped from ${BASE} to ${CURRENT}. Skipping."
+            echo "SKIP=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Version needs bump from ${BASE}"
+            echo "SKIP=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Bump version
         id: bump
+        if: steps.check-bump.outputs.SKIP == 'false'
         run: |
           set -euo pipefail
-          OUTPUT=$(./scripts/version-and-release bump "${{ steps.current-version.outputs.VERSION }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
+          OUTPUT=$(./scripts/version-and-release bump "${{ steps.base-version.outputs.VERSION }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
       - name: Commit version bump
+        if: steps.check-bump.outputs.SKIP == 'false'
         run: |
           if git diff --quiet package.json; then
             echo "No version change needed"
