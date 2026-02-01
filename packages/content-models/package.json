@@ -1,0 +1,26 @@
+{
+  "dependencies": {
+    "@contentful/rich-text-types": "catalog:",
+    "@dg/shared-core": "workspace:*",
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "@dg/tsconfig": "workspace:*",
+    "@types/jest": "catalog:",
+    "@types/node": "catalog:",
+    "dotenv-mono": "catalog:",
+    "graphql": "catalog:",
+    "ts-node": "catalog:",
+    "typescript": "catalog:"
+  },
+  "name": "@dg/content-models",
+  "private": true,
+  "scripts": {
+    "check": "biome check --write .",
+    "check:ci": "biome ci .",
+    "check:types": "tsc",
+    "clean": "rm -rf .turbo *.tsbuildinfo",
+    "graphql:schema": "ts-node scripts/graphql-schema.ts"
+  },
+  "type": "module"
+}

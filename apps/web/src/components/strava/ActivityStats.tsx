@@ -1,9 +1,9 @@
+import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import { formattedDistance } from '@dg/shared-core/helpers/formattedDistance';
 import { FaIcon } from '@dg/ui/icons/FaIcon';
 import type { SxObject } from '@dg/ui/theme';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import { Stack, Typography } from '@mui/material';
-import type { StravaActivity } from './types';
 
 const layoutSx: SxObject = {
   gap: 1,
@@ -15,24 +15,34 @@ const iconStackSx: SxObject = {
   gap: 1,
 };
 
+const dateOnlySx: SxObject = {
+  marginLeft: 'auto',
+};
+
 /**
  * Shows a horizontal stack of stats for the latest strava activity
  */
 export function ActivityStats({ activity }: { activity: StravaActivity | null }) {
-  if (!activity?.distance) {
+  const hasDistance = activity?.distance !== null && activity?.distance !== undefined;
+  const distance = hasDistance ? formattedDistance({ distanceInMeters: activity.distance }) : null;
+  const formattedDate = activity?.relativeStartDate ?? null;
+  if (!distance && !formattedDate) {
     return null;
   }
 
-  const distance = formattedDistance({ distanceInMeters: activity.distance });
-  const formattedDate = activity.relativeStartDate;
-
   return (
     <Stack direction="row" sx={layoutSx}>
-      <Stack direction="row" sx={iconStackSx}>
-        <FaIcon icon={faStrava} />
-        <Typography variant="caption">{distance}</Typography>
-      </Stack>
-      {formattedDate ? <Typography variant="caption">{formattedDate}</Typography> : null}
+      {distance ? (
+        <Stack direction="row" sx={iconStackSx}>
+          <FaIcon icon={faStrava} />
+          <Typography variant="caption">{distance}</Typography>
+        </Stack>
+      ) : null}
+      {formattedDate ? (
+        <Typography sx={distance ? undefined : dateOnlySx} variant="caption">
+          {formattedDate}
+        </Typography>
+      ) : null}
     </Stack>
   );
 }

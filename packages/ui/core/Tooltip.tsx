@@ -1,6 +1,6 @@
 'use client';
 
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import React, { useCallback, useId, useRef } from 'react';
 import type { SxObject } from '../theme';
@@ -59,7 +59,7 @@ type TooltipPopoverSx = SxObject & { positionAnchor?: string };
 export function Tooltip({ title, children, id: providedId, placement = 'bottom' }: TooltipProps) {
   const generatedId = useId();
   const tooltipId = providedId ?? `tooltip-${generatedId}`;
-  const anchorName = `--anchor-${tooltipId.replace(/:/g, '-')}`;
+  const anchorName = tooltipId ? `--anchor-${tooltipId.replace(/:/g, '-')}` : undefined;
 
   const popoverRef = useRef<HTMLSpanElement>(null);
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -84,13 +84,56 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
     return <>{children}</>;
   }
 
-  const tooltipClassName = placement === 'top' ? 'ui-tooltip ui-tooltip--top' : 'ui-tooltip';
-  const anchorSx: TooltipAnchorSx = { anchorName };
-  const popoverSx: TooltipPopoverSx = { positionAnchor: anchorName };
+  const anchorSx: TooltipAnchorSx = {
+    ...(anchorName ? { anchorName } : {}),
+    '@supports not (position-area: block-end)': {
+      position: 'relative',
+    },
+    display: 'inline-flex',
+  };
+  const popoverSx: TooltipPopoverSx = {
+    ...(anchorName ? { positionAnchor: anchorName } : {}),
+    '@supports not (position-area: block-end)': {
+      left: '50%',
+      marginBlockEnd: placement === 'top' ? '6px' : 0,
+      marginBlockStart: placement === 'top' ? 0 : '6px',
+      position: 'absolute',
+      transform: 'translateX(-50%)',
+      ...(placement === 'top'
+        ? {
+            bottom: '100%',
+            top: 'auto',
+          }
+        : {
+            bottom: 'auto',
+            top: '100%',
+          }),
+    },
+    '&:popover-open': {
+      opacity: 1,
+    },
+    background: 'var(--mui-palette-background-paper)',
+    border: 'thin solid var(--mui-palette-card-border)',
+    borderRadius: '12px',
+    boxShadow: 'var(--mui-extraShadows-card-main)',
+    color: 'var(--mui-palette-text-primary)',
+    marginBlockEnd: placement === 'top' ? '6px' : 0,
+    marginBlockStart: placement === 'top' ? 0 : '6px',
+    opacity: 0,
+    padding: '4px 10px',
+    position: 'fixed',
+    positionArea: placement === 'top' ? 'block-start' : 'block-end',
+    positionTryFallbacks: 'flip-block',
+    transition:
+      'opacity 150ms ease-in-out, overlay 150ms ease-in-out allow-discrete, display 150ms ease-in-out allow-discrete',
+    translate: '0',
+    whiteSpace: 'nowrap',
+    zIndex: 1500,
+  };
+  const describedByProps = tooltipId ? { 'aria-describedby': tooltipId } : {};
 
   return (
     <Box
-      className="ui-tooltip-anchor"
       component="span"
       onBlur={hideTooltip}
       onFocus={showTooltip}
@@ -99,14 +142,12 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
       sx={anchorSx}
     >
       {/* Clone children to add aria-describedby */}
-      {React.isValidElement(children)
-        ? React.cloneElement(children as React.ReactElement<{ 'aria-describedby'?: string }>, {
-            'aria-describedby': tooltipId,
-          })
+      {React.isValidElement<{ 'aria-describedby'?: string }>(children)
+        ? React.cloneElement(children, describedByProps)
         : children}
-      <Box
-        className={tooltipClassName}
+      <Typography
         component="span"
+        data-placement={placement}
         id={tooltipId}
         onMouseEnter={showTooltip}
         onMouseLeave={hideTooltip}
@@ -114,115 +155,10 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
         ref={popoverRef}
         role="tooltip"
         sx={popoverSx}
+        variant="caption"
       >
         {title}
-      </Box>
+      </Typography>
     </Box>
   );
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Global CSS for tooltip styling and anchor positioning
-// ─────────────────────────────────────────────────────────────────────────────
-
-/**
- * CSS string to be added to global styles for tooltip behavior.
- * Includes:
- * - Popover reset styles (removes default popover styling)
- * - MUI-matching tooltip styling
- * - CSS Anchor Positioning with bottom-to-top flip fallback
- */
-export const tooltipGlobalStyles = `
-/* Anchor wrapper */
-.ui-tooltip-anchor {
-  display: inline-flex;
-}
-
-/* Reset popover default styles and apply tooltip styling */
-.ui-tooltip {
-  /* Reset popover defaults */
-  border: none;
-  padding: 0;
-  margin: 0;
-  overflow: visible;
-  
-  /* Typography (caption) */
-  font-family: inherit;
-  font-size: 14px;
-  font-stretch: semi-expanded;
-  font-weight: 500;
-  line-height: 1.66;
-  
-  /* Container styling - matches MUI Tooltip */
-  background: var(--mui-palette-background-paper);
-  border: thin solid var(--mui-palette-card-border);
-  border-radius: 12px;
-  box-shadow: var(--mui-extraShadows-card-main);
-  color: var(--mui-palette-text-primary);
-  padding: 4px 10px;
-  
-  /* Prevent text wrapping */
-  white-space: nowrap;
-  
-  /* Ensure tooltip appears above other content */
-  z-index: 1500;
-  
-  /* CSS Anchor Positioning - bottom placement (default) with top fallback */
-  position: fixed;
-  position-area: block-end;
-  position-try-fallbacks: flip-block;
-  margin-block-start: 6px;
-  margin-block-end: 0;
-  translate: 0; /* Reset any inherited transforms */
-  justify-self: anchor-center;
-  
-  /* Smooth transition */
-  opacity: 0;
-  transition: opacity 150ms ease-in-out, overlay 150ms ease-in-out allow-discrete, display 150ms ease-in-out allow-discrete;
-}
-
-/* Top placement variant - shows above trigger, flips to bottom if no room */
-.ui-tooltip--top {
-  position-area: block-start;
-  margin-block-start: 0;
-  margin-block-end: 6px;
-}
-
-/* Visible state */
-.ui-tooltip:popover-open {
-  opacity: 1;
-}
-
-/* Starting style for entry animation */
-@starting-style {
-  .ui-tooltip:popover-open {
-    opacity: 0;
-  }
-}
-
-/* Fallback for browsers without CSS Anchor Positioning */
-@supports not (position-area: block-end) {
-  .ui-tooltip-anchor {
-    position: relative;
-  }
-  
-  /* Bottom placement fallback (default) */
-  .ui-tooltip {
-    position: absolute;
-    left: 50%;
-    top: 100%;
-    bottom: auto;
-    transform: translateX(-50%);
-    margin-top: 6px;
-    margin-bottom: 0;
-  }
-  
-  /* Top placement fallback */
-  .ui-tooltip--top {
-    top: auto;
-    bottom: 100%;
-    margin-top: 0;
-    margin-bottom: 6px;
-  }
-}
-`;

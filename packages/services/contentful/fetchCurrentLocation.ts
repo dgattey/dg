@@ -1,8 +1,10 @@
+import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
+import { toRenderableAsset } from '@dg/content-models/contentful/renderables/assets';
+import { currentLocationResponseSchema } from '@dg/content-models/contentful/schema/location';
 import { isNotNullish } from '@dg/shared-core/helpers/typeguards';
 import { gql } from 'graphql-request';
+import { parseResponse } from '../clients/parseResponse';
 import { contentfulClient } from './contentfulClient';
-import type { MyLocationQuery } from './fetchCurrentLocation.generated';
-import type { MapLocation } from './MapLocation';
 
 /**
  * Grabs the home location using a known id for it
@@ -55,9 +57,21 @@ const QUERY = gql`
  * Fetches my current location from Contentful.
  */
 export async function fetchCurrentLocation(): Promise<MapLocation | null> {
-  const data = await contentfulClient.request<MyLocationQuery>(QUERY);
+  const data = parseResponse(currentLocationResponseSchema, await contentfulClient.request(QUERY), {
+    kind: 'graphql',
+    source: 'contentful.fetchCurrentLocation',
+  });
   const location = data.contentTypeLocation;
-  if (!location || !data.lightImage?.url || !data.darkImage?.url) {
+  const point = location?.point;
+  const latitude = point?.latitude;
+  const longitude = point?.longitude;
+  if (
+    !location ||
+    latitude == null ||
+    longitude == null ||
+    !data.lightImage?.url ||
+    !data.darkImage?.url
+  ) {
     return null;
   }
   const zoomLevels = location.zoomLevels?.filter(isNotNullish).map(Number) ?? [];
@@ -69,9 +83,9 @@ export async function fetchCurrentLocation(): Promise<MapLocation | null> {
   });
   return {
     backupImageUrls: { dark: data.darkImage.url, light: data.lightImage.url },
-    image: location.image,
+    image: toRenderableAsset(location.image),
     initialZoom: location.initialZoom,
-    point: location.point,
+    point: { latitude, longitude },
     zoomLevels,
   };
 }

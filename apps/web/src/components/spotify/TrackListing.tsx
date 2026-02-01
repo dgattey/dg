@@ -1,4 +1,4 @@
-import type { Track } from '@dg/services/spotify/Track';
+import type { Track } from '@dg/content-models/spotify/Track';
 import type { SxObject } from '@dg/ui/theme';
 import { Stack } from '@mui/material';
 import { AlbumImage } from './AlbumImage';
@@ -41,7 +41,7 @@ const trackTitleSx: SxObject = {
  * up the full height of its parent!
  */
 export function TrackListing({ track, hasLogo }: TrackListingProps) {
-  const trackUrl = track.external_urls.spotify;
+  const trackUrl = track.externalUrls.spotify;
   const { name: trackTitle } = track;
   const gradientIsDark = track.albumGradientIsDark;
   const contrastStyles =
@@ -69,12 +69,12 @@ export function TrackListing({ track, hasLogo }: TrackListingProps) {
             url={trackUrl}
           />
         ) : null}
-        <AlbumImage album={track.album} />
+        <AlbumImage track={track} />
       </Stack>
       <Stack>
         <PlaybackStatus
           color={primaryTextColor}
-          playedAt={track.played_at}
+          playedAt={track.playedAt}
           relativePlayedAt={track.relativePlayedAt}
           textShadow={primaryShadow}
         />
@@ -87,10 +87,10 @@ export function TrackListing({ track, hasLogo }: TrackListingProps) {
         />
         <ArtistList artists={track.artists} color={subtitleColor} textShadow={subtitleShadow} />
         <PlaybackProgressBar
-          durationMs={track.duration_ms}
+          durationMs={track.durationMs}
           isDark={track.albumGradientIsDark}
-          isPlaying={track.is_playing}
-          progressMs={track.progress_ms}
+          isPlaying={track.isPlaying}
+          progressMs={track.progressMs}
         />
       </Stack>
     </Stack>

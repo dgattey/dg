@@ -1,8 +1,10 @@
+import {
+  isStravaWebhookEvent,
+  type StravaWebhookEvent,
+} from '@dg/content-models/strava/StravaWebhookEvent';
 import { log } from '@dg/shared-core/helpers/log';
-import { isRecord } from '@dg/shared-core/helpers/typeguards';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
-import type { StravaWebhookEvent } from '../../../services/strava';
 import {
   echoStravaChallengeIfValid,
   exchangeCodeForToken,
@@ -30,14 +32,7 @@ const toQueryRecord = (searchParams: URLSearchParams): QueryRecord =>
  */
 const isWebhookEvent = (body: unknown): body is StravaWebhookEvent => {
   log.info('Is this a webhook event?', { body });
-  if (!isRecord(body)) {
-    return false;
-  }
-  return (
-    typeof body.object_id === 'number' &&
-    typeof body.aspect_type === 'string' &&
-    typeof body.object_type === 'string'
-  );
+  return isStravaWebhookEvent(body);
 };
 
 const jsonError = (message: string, status = 500) =>

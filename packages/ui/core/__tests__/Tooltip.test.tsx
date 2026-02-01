@@ -56,7 +56,7 @@ describe('Tooltip', () => {
     }
 
     expect(tooltip).toHaveAttribute('id', describedBy);
-    expect(tooltip).toHaveClass('ui-tooltip--top');
+    expect(tooltip).toHaveAttribute('data-placement', 'top');
   });
 
   it('skips rendering when title is empty', () => {

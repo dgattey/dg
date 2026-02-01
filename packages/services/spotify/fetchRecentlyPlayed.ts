@@ -1,8 +1,15 @@
+import {
+  currentlyPlayingApiSchema,
+  mapCurrentlyPlayingFromApi,
+} from '@dg/content-models/spotify/CurrentlyPlaying';
+import {
+  mapRecentlyPlayedFromApi,
+  recentlyPlayedApiSchema,
+} from '@dg/content-models/spotify/RecentlyPlayed';
+import type { Track } from '@dg/content-models/spotify/Track';
+import { parseResponse } from '../clients/parseResponse';
 import { getImageGradientFromUrl } from '../images/getImageGradient';
-import type { CurrentlyPlaying } from './CurrentlyPlaying';
-import type { RecentlyPlayed } from './RecentlyPlayed';
 import { spotifyClient } from './spotifyClient';
-import type { Track } from './Track';
 
 const CURRENTLY_PLAYING_RESOURCE = 'me/player/currently-playing';
 const RECENTLY_PLAYED_RESOURCE = 'me/player/recently-played?limit=1';
@@ -16,15 +23,21 @@ export async function fetchRecentlyPlayed(): Promise<null | Track> {
   const { response, status } = await spotifyClient.get(CURRENTLY_PLAYING_RESOURCE);
   switch (status) {
     case 200: {
-      const data = await response.json<CurrentlyPlaying>();
-      const track = data.item
+      const data = parseResponse(currentlyPlayingApiSchema, await response.json(), {
+        kind: 'rest',
+        source: 'spotify.fetchRecentlyPlayed.currentlyPlaying',
+      });
+      const mapped = mapCurrentlyPlayingFromApi(data);
+      const track = mapped.item
         ? {
-            ...data.item,
-            duration_ms: data.item.duration_ms,
-            is_playing: data.is_playing,
-            progress_ms: data.progress_ms,
+            ...mapped.item,
+            isPlaying: mapped.isPlaying,
+            progressMs: mapped.progressMs,
           }
         : null;
+      if (!track) {
+        return fetchLastPlayed();
+      }
       return await withAlbumGradient(track);
     }
     case 204: {
@@ -47,25 +60,20 @@ async function fetchLastPlayed(): Promise<null | Track> {
   if (status !== 200) {
     return null;
   }
-  const data = await response.json<RecentlyPlayed>();
-  const item = data.items[0];
-  const track = item ? { ...item.track, played_at: item.played_at } : null;
+  const data = parseResponse(recentlyPlayedApiSchema, await response.json(), {
+    kind: 'rest',
+    source: 'spotify.fetchRecentlyPlayed.recentlyPlayed',
+  });
+  const item = mapRecentlyPlayedFromApi(data).items[0];
+  const track = item ? { ...item.track, playedAt: item.playedAt } : null;
   return await withAlbumGradient(track);
 }
-
-const getAlbumArtUrl = (track: Track) =>
-  track.album.images.find((image): image is NonNullable<typeof image> => Boolean(image))?.url ??
-  null;
 
 async function withAlbumGradient(track: Track | null): Promise<Track | null> {
   if (!track) {
     return null;
   }
-  const albumArtUrl = getAlbumArtUrl(track);
-  if (!albumArtUrl) {
-    return track;
-  }
-  const gradient = await getImageGradientFromUrl(albumArtUrl);
+  const gradient = await getImageGradientFromUrl(track.albumImage.url);
   return gradient
     ? { ...track, albumGradient: gradient.gradient, albumGradientIsDark: gradient.isDark }
     : track;

@@ -1,5 +1,5 @@
-import type { Link as LinkType } from '@dg/services/contentful/api.generated';
-import type { IntroContent } from '@dg/services/contentful/fetchIntroContent';
+import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
+import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { Image } from '@dg/ui/dependent/Image';
 import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
@@ -38,16 +38,12 @@ const introTextCardSx: SxObject = {
  * resizing, and the actual width may be smaller.
  */
 type IntroCardProps = {
-  linkedInLink?: LinkType;
-  introBlock: IntroContent | null;
+  linkedInLink: RenderableLink | null;
+  introBlock: IntroContent;
 };
 
 export function IntroCard({ introBlock, linkedInLink }: IntroCardProps) {
   const { width, height, sizes } = useCurrentImageSizes();
-
-  if (!introBlock?.textBlock.content) {
-    return null;
-  }
 
   return (
     <>

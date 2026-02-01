@@ -1,6 +1,7 @@
 'use client';
 
 import { Monitor, Moon, Sun } from 'lucide-react';
+import { useEffect, useState } from 'react';
 import type { ColorSchemeMode } from '../theme/useColorScheme';
 import { useColorScheme } from '../theme/useColorScheme';
 import { GlassSwitcher } from './GlassSwitcher';
@@ -27,11 +28,12 @@ type ColorSchemeToggleProps = {
 
 /**
  * Provides the ability to toggle the page's color scheme between
- * system, light, and dark with glass morphism styling. Prerendered, `mode` is `light`.
+ * system, light, and dark with glass morphism styling. Prerendered, the
+ * toggle starts from the provided initial value for SSR consistency.
  */
 export function ColorSchemeToggleClient({ initialValue }: ColorSchemeToggleProps) {
   const { updatePreferredMode, colorScheme } = useColorScheme();
-  const isServer = typeof window === 'undefined';
+  const [currentValue, setCurrentValue] = useState<Mode>(initialValue);
 
   const options = [
     { icon: ICONS.light, label: LABELS.light, value: 'light' },
@@ -40,14 +42,21 @@ export function ColorSchemeToggleClient({ initialValue }: ColorSchemeToggleProps
   ];
 
   // Determine current value: if mode is 'system' then 'system', otherwise the resolved mode
-  const currentValue = isServer
-    ? initialValue
-    : colorScheme.isCustomized
-      ? colorScheme.mode
-      : 'system';
+  useEffect(() => {
+    const nextValue: Mode = colorScheme.isCustomized ? colorScheme.mode : 'system';
+    setCurrentValue((previousValue) => (previousValue === nextValue ? previousValue : nextValue));
+  }, [colorScheme.isCustomized, colorScheme.mode]);
 
   const handleChange = (value: string) => {
-    updatePreferredMode(value === 'system' ? null : (value as ColorSchemeMode));
+    if (value === 'system') {
+      setCurrentValue('system');
+      updatePreferredMode(null);
+      return;
+    }
+    if (value === 'dark' || value === 'light') {
+      setCurrentValue(value);
+      updatePreferredMode(value);
+    }
   };
 
   return (

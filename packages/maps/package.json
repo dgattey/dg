@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "@dg/services": "workspace:*",
+    "@dg/content-models": "workspace:*",
     "@dg/shared-core": "workspace:*",
     "@dg/ui": "workspace:*",
     "@mui/material": "catalog:",

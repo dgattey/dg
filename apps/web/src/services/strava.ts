@@ -8,7 +8,6 @@ import {
   getOauthTokenInitLink,
   getStravaExchangeCodeForTokenRequest,
 } from '@dg/services/strava/runOauthFlow';
-import type { StravaWebhookEvent } from '@dg/services/strava/StravaWebhookEvent';
 import { syncStravaWebhookUpdateWithDb } from '@dg/services/strava/syncStravaWebhookUpdateWithDb';
 import { formatRelativeTime } from '@dg/ui/helpers/relativeTime';
 import { cacheLife, cacheTag } from 'next/cache';
@@ -20,13 +19,13 @@ export const getLatestActivity = async () => {
   cacheLife('days');
   cacheTag(LATEST_ACTIVITY_TAG);
   const activity = await fetchLatestStravaActivityFromDb();
-  if (!activity?.start_date) {
+  if (!activity?.startDate) {
     return activity;
   }
   return {
     ...activity,
     relativeStartDate: formatRelativeTime({
-      fromDate: activity.start_date,
+      fromDate: activity.startDate,
       toDate: new Date(),
     }),
   };
@@ -40,5 +39,3 @@ export {
   maskSecret,
   syncStravaWebhookUpdateWithDb,
 };
-
-export type { StravaWebhookEvent };

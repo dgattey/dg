@@ -13,7 +13,7 @@ Hi :wave: This is an overengineered way to show past projects / experiment with 
 - `turbo check` Biome lint + format
 - `turbo check:types` typecheck
 - `turbo test` unit tests (Jest)
-- `turbo codegen` regenerate GraphQL + operation types
+- `turbo graphql:schema` refresh Contentful GraphQL schema for editor tooling
 - `turbo db -- db:migrate` run migrations (`db:migrate:status`, `db:migrate:undo`)
 - `turbo db -- migration:generate --name <name>` create migration
 - `turbo webhook -- create <name>` create webhook (needs `dev`)
@@ -83,7 +83,7 @@ Pretty standard Next.js App Router app. `/public` has static files, `/src/app` h
 
 - [MUI](https://mui.com/material/) for UI and styling (`sx`, via `emotion`).
 
-- [GraphQL Codegen](https://www.graphql-code-generator.com) generates the `*.generated.ts` files from Contentful schemas.
+- Contentful schema lives in `packages/content-models/contentful/schema.graphql` and is refreshed via `pnpm graphql:schema` for editor tooling. Responses are validated with Valibot.
 
 - [Neon](https://neon.tech) is the Postgres DB for auth tokens + more.
 

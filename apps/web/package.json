@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@contentful/rich-text-react-renderer": "16.1.6",
-    "@contentful/rich-text-types": "17.2.5",
+    "@contentful/rich-text-types": "catalog:",
+    "@dg/content-models": "workspace:*",
     "@dg/maps": "workspace:*",
     "@dg/og": "workspace:*",
     "@dg/services": "workspace:*",
@@ -21,7 +22,7 @@
     "next": "catalog:",
     "react": "catalog:",
     "react-intersection-observer": "10.0.2",
-    "server-only": "0.0.1"
+    "server-only": "catalog:"
   },
   "devDependencies": {
     "@dg/tsconfig": "workspace:*",
@@ -34,7 +35,7 @@
     "babel-plugin-react-compiler": "catalog:",
     "jest": "catalog:",
     "jest-environment-jsdom": "catalog:",
-    "ts-node": "10.9.2",
+    "ts-node": "catalog:",
     "typescript": "catalog:"
   },
   "name": "@dg/web",

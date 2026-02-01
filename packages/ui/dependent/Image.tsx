@@ -1,54 +1,60 @@
-import type { Asset } from '@dg/services/contentful/api.generated';
 import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
 import { BREAKPOINT_MAX_SIZES } from '../helpers/imageSizes';
 
-type ImageProps = Partial<Asset> & {
-  url: Asset['url'];
-  width: Asset['width'];
-  height: Asset['height'];
+type ImageSizes = {
+  /**
+   * Under 576px wide
+   */
+  tiny?: number;
+
+  /**
+   * Under 768px wide
+   */
+  small?: number;
+
+  /**
+   * Under 992px wide
+   */
+  medium?: number;
+
+  /**
+   * Under 1200px wide
+   */
+  large?: number;
+
+  /**
+   * 1200px+ wide - always required as a fallback!
+   */
+  extraLarge: number;
+};
+
+type ImageProps = {
+  url: string;
+  width: number;
+  height: number;
   fill?: boolean;
 
   /**
-   * Alt text, required, but defaults to title
+   * Alt text, required, but defaults to title.
    */
   alt: string;
 
   /**
-   * For the image that should be the LCP
+   * For the image that should be the LCP.
    */
   priority?: boolean;
+
+  /**
+   * Optional title, used as alt text when present.
+   */
+  title?: string | null;
 
   /**
    * Sizes are required and map from breakpoint to image width so
    * Next can automatically generate us some well-sized images!
    */
-  sizes: {
-    /**
-     * Under 576px wide
-     */
-    tiny?: number;
-
-    /**
-     * Under 768px wide
-     */
-    small?: number;
-
-    /**
-     * Under 992px wide
-     */
-    medium?: number;
-
-    /**
-     * Under 1200px wide
-     */
-    large?: number;
-
-    /**
-     * 1200px+ wide - always required as a fallback!
-     */
-    extraLarge: number;
-  };
+  sizes: ImageSizes;
 };
 
 /**
@@ -64,7 +70,7 @@ const maxWidthImageStyle: CSSProperties = {
 /**
  * Turns the breakpoint to width map into a sizes string
  */
-const generateSizesString = (sizes: ImageProps['sizes']): string => {
+const generateSizesString = (sizes: ImageSizes): string => {
   const sizesString = Object.entries(sizes)
     .map(([breakpoint, width]) => {
       const maxWidth = BREAKPOINT_MAX_SIZES[breakpoint as keyof typeof BREAKPOINT_MAX_SIZES];
@@ -85,9 +91,6 @@ const generateSizesString = (sizes: ImageProps['sizes']): string => {
  * sizes as needed.
  */
 export function Image({ url, title, alt, sizes, width, height, fill, ...props }: ImageProps) {
-  if (!url) {
-    return null;
-  }
   const sharedProps = {
     alt: title ?? alt,
     sizes: generateSizesString(sizes),

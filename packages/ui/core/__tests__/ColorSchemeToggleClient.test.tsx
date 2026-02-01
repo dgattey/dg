@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ColorSchemeToggleClient } from '../ColorSchemeToggleClient';
 
@@ -37,8 +37,10 @@ describe('ColorSchemeToggleClient', () => {
 
     render(<ColorSchemeToggleClient initialValue="light" />);
 
-    const darkRadio = findRadioByValue('dark');
-    expect(darkRadio).toBeChecked();
+    return waitFor(() => {
+      const darkRadio = findRadioByValue('dark');
+      expect(darkRadio).toBeChecked();
+    });
   });
 
   it('maps non-system values to preferred mode', async () => {

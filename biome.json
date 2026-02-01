@@ -106,19 +106,6 @@
   },
   "overrides": [
     {
-      "includes": ["**/*.generated.ts"],
-      "linter": {
-        "rules": {
-          "complexity": {
-            "noBannedTypes": "off"
-          },
-          "suspicious": {
-            "noExplicitAny": "off"
-          }
-        }
-      }
-    },
-    {
       "includes": ["apps/**"],
       "linter": {
         "rules": {
@@ -149,7 +136,6 @@
                 "patterns": [
                   {
                     "group": [
-                      "../codegen/**",
                       "../db/**",
                       "../maps/**",
                       "../og/**",

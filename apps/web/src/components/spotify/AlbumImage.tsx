@@ -1,4 +1,4 @@
-import type { Track } from '@dg/services/spotify/Track';
+import type { Track } from '@dg/content-models/spotify/Track';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
@@ -6,11 +6,8 @@ import type { SxObject } from '@dg/ui/theme';
 import { Card } from '@mui/material';
 
 type AlbumImageProps = {
-  album: Track['album'];
+  track: Track;
 };
-
-// In px, the max image size we want from the API. We should have this be as big as it supports, as Next can resize down.
-const API_IMAGE_SIZE = 640;
 
 // In px, how big our rendered image is. Next resizes the API image to this constant size.
 const IMAGE_SIZE = 150;
@@ -43,13 +40,10 @@ const cardSx: SxObject = {
 /**
  * Creates an album image that links to the album directly
  */
-export function AlbumImage({ album }: AlbumImageProps) {
+export function AlbumImage({ track }: AlbumImageProps) {
+  const { album, albumImage } = track;
   const albumTitle = album.name;
-  const albumUrl = album.external_urls.spotify;
-  const albumImage = album.images.find((image) => image?.width === API_IMAGE_SIZE);
-  if (!albumUrl || !albumImage) {
-    return null;
-  }
+  const albumUrl = album.externalUrls.spotify;
 
   return (
     <Link href={albumUrl} isExternal={true} sx={linkSx} title={albumTitle}>

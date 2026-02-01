@@ -1,13 +1,18 @@
 import 'server-only';
 
-import type { IntroContent } from '@dg/services/contentful/fetchIntroContent';
+import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
+import { isRichTextDocument } from '@dg/content-models/contentful/renderables/richText';
 import { getIntroContent } from './contentful';
 
-const getFirstParagraph = (introBlock: IntroContent | null) =>
-  introBlock?.textBlock.content?.json.content
-    ?.find((item: { nodeType: string }) => item.nodeType === 'paragraph')
-    ?.content?.find((item: { nodeType: string; value?: string }) => item.nodeType === 'text')
-    ?.value;
+const getFirstParagraph = (introBlock: IntroContent | null) => {
+  const json = introBlock?.textBlock.content?.json;
+  if (!isRichTextDocument(json)) {
+    return undefined;
+  }
+  return json.content
+    ?.find((item) => item?.nodeType === 'paragraph')
+    ?.content?.find((item) => item?.nodeType === 'text')?.value;
+};
 
 export const getHomepageDescription = async () => {
   const introBlock = await getIntroContent();

@@ -1,6 +1,6 @@
 'use client';
 
-import type { MapLocation } from '@dg/services/contentful/MapLocation';
+import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
 import { themePreferenceAttribute, themeSelectorAttribute } from '@dg/ui/theme';

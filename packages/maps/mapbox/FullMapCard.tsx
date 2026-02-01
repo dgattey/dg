@@ -1,6 +1,6 @@
 'use client';
 
-import type { MapLocation } from '@dg/services/contentful/MapLocation';
+import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import { useState } from 'react';
 import { MapboxMap } from './MapboxMap';
 import { Marker } from './Marker';
@@ -16,7 +16,7 @@ type FullMapCardProps = {
 function FullMapCard({ location }: FullMapCardProps) {
   const [hasMapLoaded, setHasMapLoaded] = useState(false);
 
-  return location.point ? (
+  return (
     <MapboxMap
       isLoaded={hasMapLoaded}
       location={location}
@@ -26,7 +26,7 @@ function FullMapCard({ location }: FullMapCardProps) {
     >
       <Marker image={location.image} key="home" point={location.point} />
     </MapboxMap>
-  ) : null;
+  );
 }
 
 // Enables dynamic import - needs to be default

@@ -1,4 +1,4 @@
-import type { MapLocation } from '@dg/services/contentful/MapLocation';
+import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import { Image } from '@dg/ui/dependent/Image';
 import { MAP_MARKER_IMAGE_SIZE } from '@dg/ui/helpers/imageSizes';
 import type { SxObject, SxProps } from '@dg/ui/theme';
@@ -24,15 +24,12 @@ const markerImageSx: SxObject = {
 };
 
 // Required point, optional image
-type MarkerProps = Pick<MapLocation, 'point'> & Partial<Pick<MapLocation, 'image'>>;
+type MarkerProps = Pick<MapLocation, 'point' | 'image'>;
 
 /**
  * Creates a standard map marker, centered on a point
  */
 export function Marker({ point, image }: MarkerProps) {
-  if (!point?.latitude || !point.longitude) {
-    return null;
-  }
   const id = `${point.latitude},${point.longitude}`;
   return (
     <MapMarker latitude={point.latitude} longitude={point.longitude}>

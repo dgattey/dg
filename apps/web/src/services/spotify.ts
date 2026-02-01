@@ -11,13 +11,13 @@ export const getLatestSong = async () => {
   cacheLife('seconds');
   cacheTag(LATEST_SONG_TAG);
   const track = await fetchRecentlyPlayed();
-  if (!track?.played_at) {
+  if (!track?.playedAt) {
     return track;
   }
   return {
     ...track,
     relativePlayedAt: formatRelativeTime({
-      fromDate: track.played_at,
+      fromDate: track.playedAt,
       toDate: Date.now(),
     }),
   };

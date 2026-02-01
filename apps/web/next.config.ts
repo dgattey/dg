@@ -40,7 +40,14 @@ const nextConfig: NextConfig = {
   // Disables the Sequelize warning about the `sequelize` package not being found
   serverExternalPackages: ['sequelize'],
   // Have to do this for each of the packages we import
-  transpilePackages: ['@dg/shared-core', '@dg/services', '@dg/ui', '@dg/maps', '@dg/og'],
+  transpilePackages: [
+    '@dg/shared-core',
+    '@dg/content-models',
+    '@dg/services',
+    '@dg/ui',
+    '@dg/maps',
+    '@dg/og',
+  ],
 };
 
 export default nextConfig;
