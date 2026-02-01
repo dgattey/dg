@@ -1,6 +1,6 @@
 import {
-  isStravaWebhookEvent,
   type StravaWebhookEvent,
+  validateStravaWebhookEvent,
 } from '@dg/content-models/strava/StravaWebhookEvent';
 import { log } from '@dg/shared-core/helpers/log';
 import { revalidateTag } from 'next/cache';
@@ -28,11 +28,17 @@ const toQueryRecord = (searchParams: URLSearchParams): QueryRecord =>
   Object.fromEntries(searchParams.entries());
 
 /**
- * Checks most data to see if it's a webhook event.
+ * Validates webhook event and logs detailed errors on failure.
  */
 const isWebhookEvent = (body: unknown): body is StravaWebhookEvent => {
-  log.info('Is this a webhook event?', { body });
-  return isStravaWebhookEvent(body);
+  const result = validateStravaWebhookEvent(body);
+  if (!result.success) {
+    log.error('Webhook validation failed', {
+      body,
+      issues: result.issues,
+    });
+  }
+  return result.success;
 };
 
 const jsonError = (message: string, status = 500) =>
@@ -99,13 +105,16 @@ export async function GET(request: NextRequest) {
  */
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
-  log.info('Received Strava webhook event', { body });
+  log.info('Received Strava webhook POST', { body });
   if (!isWebhookEvent(body)) {
-    log.error('Received invalid Strava webhook event');
     return jsonError('Bad Request', 400);
   }
 
-  log.info('Got webhook event', { webhookEvent: body });
+  log.info('Processing valid webhook event', {
+    aspectType: body.aspect_type,
+    objectId: body.object_id,
+    objectType: body.object_type,
+  });
   // We don't handle auth/deauth events here.
   if (body.object_type === 'activity') {
     try {
