@@ -28,7 +28,7 @@ jobs:
         with:
           ref: ${{ github.head_ref }}
           fetch-depth: 0
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.PAT_FOR_ACTIONS }}
 
       - uses: pnpm/action-setup@v4
       - uses: actions/setup-node@v4
