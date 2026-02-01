@@ -1,5 +1,5 @@
 import 'server-only';
-import { log } from '@logtail/next';
+import { log } from '@dg/shared-core/helpers/log';
 import type { Wretch } from 'wretch';
 import wretch from 'wretch';
 import { getStatus } from './getStatus';

@@ -6,14 +6,25 @@ export const HOMEPAGE_TITLE = 'Engineer. Problem Solver.';
 // Max length for meta descriptions before truncation.
 export const MAX_DESC_LENGTH = 300;
 
+const toUrl = (value: string) => {
+  if (value.startsWith('http://') || value.startsWith('https://')) {
+    return new URL(value);
+  }
+  return new URL(`https://${value}`);
+};
+
 const resolveMetadataBase = () => {
   const explicitBase = process.env.NEXT_PUBLIC_SITE_URL;
   if (explicitBase) {
-    return new URL(explicitBase);
+    return toUrl(explicitBase);
+  }
+  const productionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (productionUrl) {
+    return toUrl(productionUrl);
   }
   const vercelUrl = process.env.VERCEL_URL;
   if (vercelUrl) {
-    return new URL(`https://${vercelUrl}`);
+    return toUrl(vercelUrl);
   }
   return new URL('http://localhost:3000');
 };
@@ -23,6 +34,17 @@ export const metadataBase = resolveMetadataBase();
 /**
  * Base metadata applied to all pages unless overridden.
  */
+export const baseOpenGraph: NonNullable<Metadata['openGraph']> = {
+  locale: 'en_US',
+  siteName: SITE_NAME,
+  type: 'website',
+  url: '/',
+};
+
+export const baseTwitter: NonNullable<Metadata['twitter']> = {
+  card: 'summary_large_image',
+};
+
 export const baseMetadata: Metadata = {
   description: SITE_NAME,
   icons: {
@@ -35,18 +57,12 @@ export const baseMetadata: Metadata = {
   },
   manifest: '/manifest.webmanifest',
   metadataBase,
-  openGraph: {
-    locale: 'en_US',
-    siteName: SITE_NAME,
-    type: 'website',
-  },
+  openGraph: baseOpenGraph,
   title: {
     default: SITE_NAME,
     template: `%s | ${SITE_NAME}`,
   },
-  twitter: {
-    card: 'summary_large_image',
-  },
+  twitter: baseTwitter,
 };
 
 export const viewport: Viewport = {

@@ -1,5 +1,5 @@
+import { log } from '@dg/shared-core/helpers/log';
 import { isRecord } from '@dg/shared-core/helpers/typeguards';
-import { log } from '@logtail/next';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 import type { StravaWebhookEvent } from '../../../services/strava';

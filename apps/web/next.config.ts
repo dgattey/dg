@@ -1,4 +1,3 @@
-import { withLogtail } from '@logtail/next';
 import { config as dotenvConfig } from 'dotenv-mono';
 import type { NextConfig } from 'next';
 
@@ -44,4 +43,4 @@ const nextConfig: NextConfig = {
   transpilePackages: ['@dg/shared-core', '@dg/services', '@dg/ui', '@dg/maps', '@dg/og'],
 };
 
-export default withLogtail(nextConfig);
+export default nextConfig;

@@ -17,7 +17,6 @@ export const getLatestSong = async () => {
   return {
     ...track,
     relativePlayedAt: formatRelativeTime({
-      capitalized: true,
       fromDate: track.played_at,
       toDate: Date.now(),
     }),

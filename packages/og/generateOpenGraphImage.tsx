@@ -10,10 +10,12 @@ export async function generateOpenGraphImage({
   url,
   normalFont,
   boldFont,
+  size,
 }: {
   url: string | undefined;
   normalFont: Promise<ArrayBuffer>;
   boldFont: Promise<ArrayBuffer>;
+  size?: { height: number; width: number };
 }) {
   invariant(url, 'URL is required');
   const [normalFontData, boldFontData] = await Promise.all([normalFont, boldFont]);
@@ -34,6 +36,7 @@ export async function generateOpenGraphImage({
           name: LOGO_FONT,
         },
       ],
+      ...size,
     },
   );
 }

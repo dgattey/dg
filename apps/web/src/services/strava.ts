@@ -26,8 +26,8 @@ export const getLatestActivity = async () => {
   return {
     ...activity,
     relativeStartDate: formatRelativeTime({
-      capitalized: true,
       fromDate: activity.start_date,
+      toDate: new Date(),
     }),
   };
 };
