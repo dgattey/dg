@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Find repo root and source .env
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+if [[ -f "$ROOT_DIR/.env" ]]; then
+  set -a
+  source "$ROOT_DIR/.env"
+  set +a
+fi
+
+if [[ -z "${CLOUDFLARE_TUNNEL_TOKEN:-}" ]]; then
+  echo "CLOUDFLARE_TUNNEL_TOKEN not set, skipping tunnel"
+  exit 0
+fi
+
+exec cloudflared tunnel run --token "$CLOUDFLARE_TUNNEL_TOKEN"

@@ -8,6 +8,8 @@ const createJestConfig = nextJest({
 
 const config: Config = {
   coverageProvider: 'v8',
+  globalSetup: '<rootDir>/jest.globalSetup.ts',
+  globalTeardown: '<rootDir>/jest.globalTeardown.ts',
   roots: ['<rootDir>/src', '<rootDir>/../../packages'],
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testEnvironment: 'jsdom',

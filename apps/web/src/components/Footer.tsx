@@ -134,6 +134,22 @@ export async function Footer() {
                   </NavItem>
                 </>
               ) : null}
+              {process.env.NODE_ENV === 'development' ? (
+                <>
+                  <NavItem sx={navItemNoPaddingSx}>•</NavItem>
+                  <NavItem>
+                    <Link
+                      aria-label="Developer tools"
+                      color="inherit"
+                      href="/dev"
+                      title="Developer tools"
+                      variant="caption"
+                    >
+                      Dev
+                    </Link>
+                  </NavItem>
+                </>
+              ) : null}
             </NavGroup>
             <NavGroup component="div" sx={footerNavGroupSx}>
               <Stack component="ul" direction="row" sx={footerLinkListSx}>

@@ -24,7 +24,7 @@ export const standardParams = (config: WebhookSubscriptionConfig) => {
  */
 export const webhookSubscriptionConfigs: Record<WebhookType, WebhookSubscriptionConfig> = {
   strava: {
-    callbackUrl: process.env.WEBHOOK_CALLBACK_URL,
+    callbackUrl: process.env.STRAVA_WEBHOOK_CALLBACK_URL,
     endpoint: 'https://www.strava.com/api/v3/push_subscriptions',
     headers: {
       Accept: 'application/json',

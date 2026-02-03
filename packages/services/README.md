@@ -93,6 +93,19 @@ Strava API integration for activity data and webhooks.
 | `stravaTokenExchangeClient` | Client for OAuth token exchange |
 | `StravaWebhookEvent` | Type in `@dg/content-models/strava/StravaWebhookEvent` |
 
+### Webhook Subscription Management
+
+Functions for managing Strava webhook subscriptions (in `strava/webhooks/`):
+
+| Export | Description |
+|--------|-------------|
+| `listSubscriptions(type)` | Lists all webhook subscriptions |
+| `createSubscription(type)` | Creates a new webhook subscription |
+| `deleteSubscription(type, id)` | Deletes a webhook subscription by ID |
+| `webhookSubscriptionConfigs` | Configuration for webhook endpoints |
+| `WebhookSubscription` | Type for subscription data |
+| `WebhookType` | Type union of supported webhook providers |
+
 ## Environment Variables
 
 Required environment variables (see `config/env.secrets.keys`):
@@ -101,7 +114,6 @@ Required environment variables (see `config/env.secrets.keys`):
 - `CONTENTFUL_SPACE_ID` - Contentful space identifier
 - `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` - Spotify OAuth credentials
 - `STRAVA_CLIENT_ID` / `STRAVA_CLIENT_SECRET` - Strava OAuth credentials
-- `STRAVA_TOKEN_NAME` - Database token identifier
 - `STRAVA_VERIFY_TOKEN` - Webhook verification token
 - `DATABASE_URL` - PostgreSQL connection string (for Strava caching)
 

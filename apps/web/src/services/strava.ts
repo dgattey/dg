@@ -1,14 +1,14 @@
 import 'server-only';
 
-import { maskSecret } from '@dg/services/clients/maskSecret';
 import { echoStravaChallengeIfValid } from '@dg/services/strava/echoStravaChallengeIfValid';
 import { fetchLatestStravaActivityFromDb } from '@dg/services/strava/fetchLatestStravaActivityFromDb';
-import {
-  exchangeCodeForToken,
-  getOauthTokenInitLink,
-  getStravaExchangeCodeForTokenRequest,
-} from '@dg/services/strava/runOauthFlow';
+import { getStravaOauthStatus } from '@dg/services/strava/getStravaOauthStatus';
+import { exchangeCodeForToken, getOauthTokenInitLink } from '@dg/services/strava/runOauthFlow';
 import { syncStravaWebhookUpdateWithDb } from '@dg/services/strava/syncStravaWebhookUpdateWithDb';
+import { createSubscription as createWebhookSubscription } from '@dg/services/strava/webhooks/createSubscription';
+import { deleteSubscription as deleteWebhookSubscription } from '@dg/services/strava/webhooks/deleteSubscription';
+import { listSubscriptions as listWebhookSubscriptions } from '@dg/services/strava/webhooks/listSubscriptions';
+import { maskSecret } from '@dg/shared-core/helpers/maskSecret';
 import { formatRelativeTime } from '@dg/ui/helpers/relativeTime';
 import { cacheLife, cacheTag } from 'next/cache';
 
@@ -32,10 +32,13 @@ export const getLatestActivity = async () => {
 };
 
 export {
+  createWebhookSubscription,
+  deleteWebhookSubscription,
   echoStravaChallengeIfValid,
   exchangeCodeForToken,
   getOauthTokenInitLink,
-  getStravaExchangeCodeForTokenRequest,
+  getStravaOauthStatus,
+  listWebhookSubscriptions,
   maskSecret,
   syncStravaWebhookUpdateWithDb,
 };

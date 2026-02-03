@@ -8,10 +8,6 @@ import { GET, POST } from '../route';
 // Mock all the service functions before importing the route
 jest.mock('../../../../services/strava', () => ({
   echoStravaChallengeIfValid: jest.fn(),
-  exchangeCodeForToken: jest.fn(),
-  getOauthTokenInitLink: jest.fn(),
-  getStravaExchangeCodeForTokenRequest: jest.fn(),
-  maskSecret: jest.fn((s: string) => `${s.slice(0, 3)}...`),
   syncStravaWebhookUpdateWithDb: jest.fn(),
 }));
 
@@ -24,11 +20,9 @@ import { revalidateTag } from 'next/cache';
 // Get typed references to the mocked functions
 import * as stravaService from '../../../../services/strava';
 
-const mockSyncWebhook = stravaService.syncStravaWebhookUpdateWithDb as jest.Mock;
-const mockEchoChallenge = stravaService.echoStravaChallengeIfValid as jest.Mock;
-const mockGetExchangeCode = stravaService.getStravaExchangeCodeForTokenRequest as jest.Mock;
-const mockExchangeCode = stravaService.exchangeCodeForToken as jest.Mock;
-const mockRevalidateTag = revalidateTag as jest.Mock;
+const mockSyncWebhook = jest.mocked(stravaService.syncStravaWebhookUpdateWithDb);
+const mockEchoChallenge = jest.mocked(stravaService.echoStravaChallengeIfValid);
+const mockRevalidateTag = jest.mocked(revalidateTag);
 
 describe('Webhook Route', () => {
   beforeEach(() => {
@@ -247,7 +241,6 @@ describe('Webhook Route', () => {
 
     describe('challenge verification', () => {
       it('returns challenge response for valid verification request', async () => {
-        mockGetExchangeCode.mockReturnValue(null);
         mockEchoChallenge.mockReturnValue({ 'hub.challenge': 'abc123' });
 
         const request = createGetRequest({
@@ -264,7 +257,6 @@ describe('Webhook Route', () => {
       });
 
       it('returns 400 for invalid challenge', async () => {
-        mockGetExchangeCode.mockReturnValue(null);
         mockEchoChallenge.mockImplementation(() => {
           throw new Error('Invalid challenge');
         });
@@ -281,37 +273,8 @@ describe('Webhook Route', () => {
       });
     });
 
-    describe('token exchange', () => {
-      it('exchanges code for token and returns HTML', async () => {
-        mockGetExchangeCode.mockReturnValue('auth_code_123');
-        mockExchangeCode.mockResolvedValue('<html>Success</html>');
-
-        const request = createGetRequest({ code: 'auth_code_123' });
-
-        const response = await GET(request);
-
-        expect(response.status).toBe(200);
-        expect(response.headers.get('Content-Type')).toBe('text/html');
-        expect(mockExchangeCode).toHaveBeenCalledWith('auth_code_123');
-      });
-
-      it('returns 500 when token exchange fails', async () => {
-        mockGetExchangeCode.mockReturnValue('auth_code_123');
-        mockExchangeCode.mockRejectedValue(new Error('Exchange failed'));
-
-        const request = createGetRequest({ code: 'auth_code_123' });
-
-        const response = await GET(request);
-
-        expect(response.status).toBe(500);
-        const json = await response.json();
-        expect(json.error).toBe('Could not generate oauth token');
-      });
-    });
-
     describe('invalid requests', () => {
       it('returns 400 for requests without valid params', async () => {
-        mockGetExchangeCode.mockReturnValue(null);
         mockEchoChallenge.mockReturnValue(null);
 
         const request = createGetRequest({});

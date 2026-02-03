@@ -1,8 +1,7 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [
-    "config/database.config.js",
-    "config/env.defaults",
+    "packages/db/database.config.cts",
     "config/env.secrets.keys",
     "scripts/generate-env",
     ".node-version",
@@ -13,21 +12,28 @@
     "tsconfig.json"
   ],
   "globalEnv": [
+    "CLOUDFLARE_TUNNEL_TOKEN",
     "CONTENTFUL_ACCESS_TOKEN",
     "CONTENTFUL_SPACE_ID",
     "DATABASE_URL",
+    "DATABASE_URL_TEST",
     "LOGTAIL_SOURCE_TOKEN",
     "LOGTAIL_URL",
     "NEXT_PUBLIC_MAPBOX_TOKEN",
+    "OAUTH_CALLBACK_URL",
     "SPOTIFY_CLIENT_ID",
     "SPOTIFY_CLIENT_SECRET",
     "STRAVA_CLIENT_ID",
     "STRAVA_CLIENT_SECRET",
-    "STRAVA_TOKEN_NAME",
     "STRAVA_VERIFY_TOKEN",
-    "WEBHOOK_CALLBACK_URL"
+    "STRAVA_WEBHOOK_CALLBACK_URL"
   ],
   "tasks": {
+    "@dg/shared-core#dev": {
+      "cache": false,
+      "dependsOn": ["dg#dev"],
+      "persistent": true
+    },
     "build": {
       "dependsOn": ["^build", "topo", "check", "check:types"],
       "outputs": [".next/**", "!.next/cache/**"]
@@ -58,11 +64,6 @@
     "clean": {
       "cache": false
     },
-    "connect": {
-      "cache": false,
-      "inputs": ["apps/**/*", "packages/**/*"],
-      "persistent": true
-    },
     "db": {
       "cache": false
     },
@@ -78,6 +79,10 @@
     "graphql:schema": {
       "cache": false
     },
+    "import:spotify": {
+      "cache": false,
+      "persistent": false
+    },
     "test": {
       "dependsOn": ["topo"],
       "inputs": ["$TURBO_DEFAULT$", "../../packages/**", "!**/*.md", "!**/*.mdx"],
@@ -86,9 +91,6 @@
     },
     "topo": {
       "dependsOn": ["^topo"]
-    },
-    "webhook": {
-      "cache": false
     }
   }
 }

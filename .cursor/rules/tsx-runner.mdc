@@ -1,0 +1,19 @@
+---
+description: Prefer tsx for TypeScript runners
+alwaysApply: true
+---
+
+# Prefer tsx for TypeScript runners
+
+- Use `tsx` whenever a TypeScript runner is needed.
+- Avoid `ts-node` or other TS runners in this repo.
+
+Example:
+
+```sh
+# ✅ Do this
+tsx ./scripts/my-script.ts
+
+# ❌ Avoid this
+ts-node ./scripts/my-script.ts
+```

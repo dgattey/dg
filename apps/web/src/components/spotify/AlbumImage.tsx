@@ -1,9 +1,7 @@
 import type { Track } from '@dg/content-models/spotify/Track';
-import { Image } from '@dg/ui/dependent/Image';
-import { Link } from '@dg/ui/dependent/Link';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
-import { Card } from '@mui/material';
+import { ArtworkLink } from './ArtworkLink';
 
 type AlbumImageProps = {
   track: Track;
@@ -11,13 +9,6 @@ type AlbumImageProps = {
 
 // In px, how big our rendered image is. Next resizes the API image to this constant size.
 const IMAGE_SIZE = 150;
-
-const linkSx: SxObject = {
-  '&:hover': {
-    transform: 'scale(1.05)',
-  },
-  ...createBouncyTransition('transform'),
-};
 
 const cardSx: SxObject = {
   '--image-dim': {
@@ -46,17 +37,14 @@ export function AlbumImage({ track }: AlbumImageProps) {
   const albumUrl = album.externalUrls.spotify;
 
   return (
-    <Link href={albumUrl} isExternal={true} sx={linkSx} title={albumTitle}>
-      <Card sx={cardSx}>
-        <Image
-          alt={album.name}
-          {...albumImage}
-          fill={true}
-          height={IMAGE_SIZE}
-          sizes={{ extraLarge: IMAGE_SIZE }}
-          width={IMAGE_SIZE}
-        />
-      </Card>
-    </Link>
+    <ArtworkLink
+      cardSx={cardSx}
+      hoverScale={1.05}
+      href={albumUrl}
+      image={albumImage}
+      imageSize={IMAGE_SIZE}
+      sizes={{ extraLarge: IMAGE_SIZE }}
+      title={albumTitle}
+    />
   );
 }

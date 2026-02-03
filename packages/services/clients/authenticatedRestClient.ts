@@ -1,9 +1,9 @@
 import 'server-only';
 import { log } from '@dg/shared-core/helpers/log';
+import { maskSecret } from '@dg/shared-core/helpers/maskSecret';
 import type { Wretch } from 'wretch';
 import wretch from 'wretch';
 import { getStatus } from './getStatus';
-import { maskSecret } from './maskSecret';
 import type { RefreshTokenConfig } from './RefreshTokenConfig';
 import { refreshedAccessToken } from './refreshedAccessToken';
 

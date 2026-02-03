@@ -13,8 +13,7 @@ type RawStravaRefreshToken = {
   expires_in: number;
 };
 
-const { STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET, STRAVA_TOKEN_NAME } = process.env;
-invariant(STRAVA_TOKEN_NAME, 'Missing Strava token name (used as access key)');
+const { STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET } = process.env;
 invariant(STRAVA_CLIENT_ID, 'Missing Strava client id');
 invariant(STRAVA_CLIENT_SECRET, 'Missing Strava client secret');
 
@@ -22,7 +21,7 @@ invariant(STRAVA_CLIENT_SECRET, 'Missing Strava client secret');
  * A REST client set up to make authed calls to Strava
  */
 export const stravaClient = createClient({
-  accessKey: STRAVA_TOKEN_NAME,
+  accessKey: 'strava',
   endpoint: 'https://www.strava.com/api/v3/',
   refreshTokenConfig: {
     body: (refreshToken) => ({

@@ -25,5 +25,5 @@
   "[jsonc]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "workbench.preferredDarkColorTheme": "Ayu Dark Bordered"
+  "workbench.preferredDarkColorTheme": "Tomorrow Night Blue"
 }

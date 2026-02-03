@@ -130,6 +130,18 @@ export function getTheme(): Theme {
           }),
         },
       },
+      MuiChip: {
+        defaultProps: {
+          size: 'small',
+          variant: 'outlined',
+        },
+        styleOverrides: {
+          sizeSmall: {
+            fontSize: '0.7rem',
+            height: 20,
+          },
+        },
+      },
       MuiContainer: {
         defaultProps: {
           fixed: true,

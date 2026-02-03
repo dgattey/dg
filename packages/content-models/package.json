@@ -10,7 +10,7 @@
     "@types/node": "catalog:",
     "dotenv-mono": "catalog:",
     "graphql": "catalog:",
-    "ts-node": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:"
   },
   "name": "@dg/content-models",
@@ -20,7 +20,7 @@
     "check:ci": "biome ci .",
     "check:types": "tsc",
     "clean": "rm -rf .turbo *.tsbuildinfo",
-    "graphql:schema": "ts-node scripts/graphql-schema.ts"
+    "graphql:schema": "tsx scripts/graphql-schema.ts"
   },
   "type": "module"
 }

@@ -2,7 +2,8 @@ import 'server-only';
 import { db } from '@dg/db';
 import type { CreateTokenProps, FetchTokenProps } from '@dg/db/models/Token';
 import { log } from '@dg/shared-core/helpers/log';
-import { maskSecret } from './maskSecret';
+import { maskSecret } from '@dg/shared-core/helpers/maskSecret';
+import { MissingTokenError } from './MissingTokenError';
 import type { RefreshTokenConfig } from './RefreshTokenConfig';
 
 const maskIfSensitive = (key: string, value: string) => {
@@ -58,7 +59,7 @@ async function getLatestTokenIfValid({ name }: FetchTokenProps) {
   // Shouldn't happen unless invalid name, so it's a big error
   if (!token?.refreshToken) {
     log.error('Missing token', { name });
-    throw new TypeError('Missing token');
+    throw new MissingTokenError(name);
   }
 
   // Return either refresh + access, or just refresh if invalid

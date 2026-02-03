@@ -1,0 +1,42 @@
+---
+description: Restrict @dg/db imports to packages/services
+alwaysApply: true
+---
+
+# Database imports restricted to services
+
+- Only `packages/services` may import `@dg/db`.
+- `apps/*` and other packages must NOT import `@dg/db` directly.
+- Instead, expose database operations through `packages/services` functions.
+
+## Why
+
+- Keeps database logic centralized and testable.
+- Prevents apps from coupling directly to the ORM.
+- Makes it easier to swap database implementations.
+
+## Example
+
+```ts
+// ❌ Bad - app importing db directly
+// apps/web/src/services/strava.ts
+import { db } from '@dg/db';
+const token = await db.Token.findOne({ where: { name: 'strava' } });
+
+// ✅ Good - app imports from services
+// apps/web/src/services/strava.ts
+import { getStravaOauthStatus } from '@dg/services/strava/getStravaOauthStatus';
+const status = await getStravaOauthStatus();
+```
+
+## Testing
+
+For test database setup, use `@dg/services/testing/setupTestDatabase`:
+
+```ts
+// ❌ Bad - test importing db directly
+import { setupTestDatabase } from '@dg/db/testing';
+
+// ✅ Good - test imports from services
+import { setupTestDatabase } from '@dg/services/testing/setupTestDatabase';
+```

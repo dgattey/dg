@@ -14,8 +14,8 @@ catalog:
   '@testing-library/react': 16.3.2
   '@testing-library/user-event': 14.6.1
   '@types/jest': 30.0.0
-  '@types/node': 25.0.10
-  '@types/react': 19.2.9
+  '@types/node': 25.2.0
+  '@types/react': 19.2.10
   babel-plugin-react-compiler: 1.0.0
   dotenv-mono: 1.5.1
   graphql: 16.12.0
@@ -23,11 +23,11 @@ catalog:
   jest: 30.2.0
   jest-environment-jsdom: 30.2.0
   lucide-react: 0.563.0
-  next: 16.1.4
-  react: 19.2.3
+  next: 16.1.6
+  react: 19.2.4
   server-only: 0.0.1
   sharp: 0.34.5
-  ts-node: 10.9.2
+  tsx: 4.21.0
   typescript: 5.9.3
   valibot: 1.2.0
   wretch: 3.0.6

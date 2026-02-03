@@ -1,3 +1,6 @@
+import { maskSecret } from './maskSecret';
+import { serializeError } from './serializeError';
+
 /** Optional key-value metadata to include with log messages. */
 type LogMeta = Record<string, unknown> | undefined;
 
@@ -36,7 +39,29 @@ const sanitizeMeta = (meta: LogMeta): LogMeta => {
   }
   const result: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(meta)) {
-    result[key] = isResponseLike(value) ? { status: value.status } : value;
+    if (isResponseLike(value)) {
+      result[key] = { status: value.status };
+      continue;
+    }
+    if (value instanceof Error) {
+      result[key] = serializeError(value);
+      continue;
+    }
+    if (typeof value === 'string') {
+      const normalizedKey = key.toLowerCase();
+      const forceMask =
+        normalizedKey.includes('authorization') ||
+        normalizedKey.includes('token') ||
+        normalizedKey.includes('secret') ||
+        normalizedKey.includes('password');
+      result[key] = maskSecret(value, { forceMask });
+      continue;
+    }
+    if (Array.isArray(value)) {
+      result[key] = value.map((entry) => (typeof entry === 'string' ? maskSecret(entry) : entry));
+      continue;
+    }
+    result[key] = value;
   }
   return result;
 };

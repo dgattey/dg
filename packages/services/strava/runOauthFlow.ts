@@ -1,15 +1,14 @@
 import { db } from '@dg/db';
 import { invariant } from '@dg/shared-core/helpers/invariant';
 import { log } from '@dg/shared-core/helpers/log';
-import { maskSecret } from '../clients/maskSecret';
+import { maskSecret } from '@dg/shared-core/helpers/maskSecret';
 import { validateRawDataToToken } from './stravaClient';
 import { stravaTokenExchangeClient } from './stravaTokenExchangeClient';
 
-const CALLBACK_URL = process.env.WEBHOOK_CALLBACK_URL;
+const CALLBACK_URL = process.env.OAUTH_CALLBACK_URL;
 const CLIENT_ID = process.env.STRAVA_CLIENT_ID;
 const CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
-const STRAVA_TOKEN_NAME = process.env.STRAVA_TOKEN_NAME;
-invariant(CALLBACK_URL, 'Missing WEBHOOK_CALLBACK_URL env variable');
+invariant(CALLBACK_URL, 'Missing OAUTH_CALLBACK_URL env variable');
 invariant(CLIENT_ID, 'Missing STRAVA_CLIENT_ID env variable');
 invariant(CLIENT_SECRET, 'Missing STRAVA_CLIENT_SECRET env variable');
 
@@ -18,13 +17,21 @@ invariant(CLIENT_SECRET, 'Missing STRAVA_CLIENT_SECRET env variable');
  */
 export const OAUTH_STATE_TYPE = 'stravaOauthFlow';
 
+type OauthLinkOptions = {
+  /**
+   * When true, forces the consent dialog to show even if already authorized.
+   * Useful for re-authenticating or switching accounts.
+   */
+  forceDialog?: boolean;
+};
+
 /**
  * Used to start the oauth flow for Strava. The URL returned by this
  * function needs to be opened in browser for the user to start the
  * flow manually.
  */
-export function getOauthTokenInitLink() {
-  invariant(CALLBACK_URL, 'Missing WEBHOOK_CALLBACK_URL env variable');
+export function getOauthTokenInitLink({ forceDialog = false }: OauthLinkOptions = {}) {
+  invariant(CALLBACK_URL, 'Missing OAUTH_CALLBACK_URL env variable');
   invariant(CLIENT_ID, 'Missing STRAVA_CLIENT_ID env variable');
 
   const url = new URL('https://www.strava.com/oauth/authorize');
@@ -34,23 +41,10 @@ export function getOauthTokenInitLink() {
   url.searchParams.append('redirect_uri', CALLBACK_URL);
   url.searchParams.append('state', OAUTH_STATE_TYPE);
   url.searchParams.append('scope', 'read,activity:read_all,profile:read_all,read_all');
-  return url.toString();
-}
-
-/**
- * Confirms a query record is properly formatted to exchange a code for a token, pulling out the token.
- */
-export function getStravaExchangeCodeForTokenRequest(
-  query: Partial<Record<string, string | Array<string>>>,
-): string | null {
-  if (
-    query.state === OAUTH_STATE_TYPE &&
-    typeof query.code === 'string' &&
-    typeof query.scope === 'string'
-  ) {
-    return query.code;
+  if (forceDialog) {
+    url.searchParams.append('approval_prompt', 'force');
   }
-  return null;
+  return url.toString();
 }
 
 /**
@@ -76,7 +70,6 @@ export async function exchangeCodeForToken(code: string): Promise<string> {
   const { accessToken, expiryAt, refreshToken } = validateRawDataToToken(rawTokenData);
 
   // Persist the refreshToken and accessToken from the response to the DB
-  invariant(STRAVA_TOKEN_NAME, 'Missing STRAVA_TOKEN_NAME env variable');
   log.info('Persisting token to DB', {
     accessToken: maskSecret(accessToken),
     expiryAt,
@@ -85,11 +78,11 @@ export async function exchangeCodeForToken(code: string): Promise<string> {
   const [token] = await db.Token.upsert({
     accessToken,
     expiryAt,
-    name: STRAVA_TOKEN_NAME,
+    name: 'strava',
     refreshToken,
   });
   log.info('Persisted token to DB', { updatedAt: token.updatedAt });
 
   return `
-    <p>Success! Token persisted to ${STRAVA_TOKEN_NAME} and expires at ${expiryAt.toLocaleString()}</p>`;
+    <p>Success! Token persisted to 'strava' and expires at ${expiryAt.toLocaleString()}</p>`;
 }

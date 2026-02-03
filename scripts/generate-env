@@ -3,9 +3,24 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${(%):-%x}")/.." && pwd)"
 OUTPUT_FILE="${ROOT}/.env"
+KEYS_FILE="${ROOT}/config/env.secrets.keys"
 
-# Skip if .env already exists
-[[ -f "$OUTPUT_FILE" ]] && { echo ".env already exists" >&2; exit 0; }
+# Get expected keys (non-empty, non-comment lines, sorted)
+expected_keys=$(grep -v '^#' "$KEYS_FILE" | grep -v '^$' | sort)
+
+# Check if .env exists and has matching keys
+if [[ -f "$OUTPUT_FILE" ]]; then
+  # Extract existing keys from .env (everything before =, sorted)
+  existing_keys=$(grep -v '^#' "$OUTPUT_FILE" | grep -v '^$' | cut -d= -f1 | sort)
+  
+  if [[ "$expected_keys" == "$existing_keys" ]]; then
+    echo ".env already exists with correct keys" >&2
+    exit 0
+  fi
+  
+  echo ".env keys mismatch, regenerating..." >&2
+  rm -f "$OUTPUT_FILE"
+fi
 
 # Check 1Password auth
 export OP_ACCOUNT="my.1password.com"
@@ -17,22 +32,18 @@ if ! op whoami >/dev/null 2>&1; then
   }
 fi
 
-# Write defaults
-echo "Writing defaults..." >&2
-grep -v '^#' "${ROOT}/config/env.defaults" | grep -v '^$' > "$OUTPUT_FILE"
-
 # Fetch secrets in parallel
-echo "Fetching secrets..." >&2
+echo "Fetching secrets from 1Password..." >&2
 TMP_DIR="$(mktemp -d)"
 trap "rm -rf '$TMP_DIR'" EXIT
 
 while read -r key; do
   [[ -z "$key" || "$key" == \#* ]] && continue
   (op read "op://dg/${key}/value" > "${TMP_DIR}/${key}" 2>&1) &
-done < "${ROOT}/config/env.secrets.keys"
+done < "$KEYS_FILE"
 wait
 
-# Append secrets
+# Write secrets to .env
 for file in "$TMP_DIR"/*; do
   [[ -f "$file" ]] || continue
   key="$(basename "$file")"
