@@ -1,0 +1,60 @@
+# CI for macOS app - builds and verifies the SwiftUI app compiles
+name: macOS
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/macos/**'
+      - '.github/workflows/macos.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'apps/macos/**'
+      - '.github/workflows/macos.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: 🔨 Build macOS App
+    runs-on: macos-14
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.2.app
+
+      - name: Show Xcode version
+        run: xcodebuild -version
+
+      - name: Resolve Swift Package Dependencies
+        working-directory: apps/macos
+        run: xcodebuild -resolvePackageDependencies -scheme DGApp
+
+      - name: Build Debug
+        working-directory: apps/macos
+        run: |
+          xcodebuild build \
+            -scheme DGApp \
+            -configuration Debug \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Build Release
+        working-directory: apps/macos
+        run: |
+          xcodebuild build \
+            -scheme DGApp \
+            -configuration Release \
+            -destination 'platform=macOS' \
+            CODE_SIGN_IDENTITY="-" \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGNING_ALLOWED=NO
