@@ -2,11 +2,10 @@
 
 import type { SxProps } from '@dg/ui/theme';
 import { Box } from '@mui/material';
-import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { useSongChangeEvents } from '../../hooks/useSongChangeEvents';
 
 const PROGRESS_UPDATE_INTERVAL_MS = 500;
-const REFRESH_BUFFER_MS = 250;
 
 type PlaybackProgressBarProps = {
   durationMs?: number;
@@ -21,8 +20,8 @@ const getProgressPercent = (progressMs: number, durationMs: number) =>
   durationMs > 0 ? clamp(progressMs / durationMs, 0, 1) : 0;
 
 /**
- * Shows a small progress bar for the current Spotify track and refreshes
- * the router when the track ends.
+ * Shows a small progress bar for the current Spotify track.
+ * Song-end refresh is handled via SSE from the server.
  */
 export function PlaybackProgressBar({
   durationMs,
@@ -30,7 +29,9 @@ export function PlaybackProgressBar({
   isPlaying,
   isDark,
 }: PlaybackProgressBarProps) {
-  const router = useRouter();
+  // Subscribe to server-sent events for song change notifications
+  useSongChangeEvents();
+
   const hasTiming = durationMs !== undefined && durationMs > 0 && progressMs !== undefined;
   const [progress, setProgress] = useState(() =>
     hasTiming ? getProgressPercent(progressMs, durationMs) : 0,
@@ -90,23 +91,6 @@ export function PlaybackProgressBar({
     const intervalId = window.setInterval(updateProgress, PROGRESS_UPDATE_INTERVAL_MS);
     return () => window.clearInterval(intervalId);
   }, [durationMs, isPlaying, progressMs]);
-
-  // Schedule a single refresh when the song should end so the server
-  // can provide the next track or played-at state.
-  useEffect(() => {
-    if (durationMs === undefined || durationMs <= 0 || progressMs === undefined || !isPlaying) {
-      return;
-    }
-    const remainingMs = durationMs - progressMs;
-    if (remainingMs <= 0) {
-      router.refresh();
-      return;
-    }
-    const timeoutId = window.setTimeout(() => {
-      router.refresh();
-    }, remainingMs + REFRESH_BUFFER_MS);
-    return () => window.clearTimeout(timeoutId);
-  }, [durationMs, isPlaying, progressMs, router]);
 
   if (!hasTiming) {
     return null;
