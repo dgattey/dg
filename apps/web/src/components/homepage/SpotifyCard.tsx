@@ -5,6 +5,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { Box, Card, Skeleton, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
+import { NowPlayingAnimation } from '../spotify/NowPlayingAnimation';
 import { TrackListing } from '../spotify/TrackListing';
 
 const IMAGE_SIZE = 150;
@@ -12,6 +13,8 @@ const IMAGE_SIZE = 150;
 type SpotifyCardShellProps = {
   children: ReactNode;
   gradient?: string;
+  isPlaying?: boolean;
+  noteColor?: string;
 };
 
 const shellContainerSx: SxObject = {
@@ -82,11 +85,14 @@ const loadingTitleSx: SxObject = {
   marginBottom: 1,
 };
 
-function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
+function SpotifyCardShell({ children, gradient, isPlaying, noteColor }: SpotifyCardShellProps) {
   return (
     <Box sx={shellContainerSx}>
       {gradient ? <Box aria-hidden="true" sx={getGradientGlowSx(gradient)} /> : null}
-      <ContentCard sx={getCardSx(gradient)}>{children}</ContentCard>
+      <ContentCard sx={getCardSx(gradient)}>
+        <NowPlayingAnimation isPlaying={Boolean(isPlaying)} noteColor={noteColor} />
+        {children}
+      </ContentCard>
     </Box>
   );
 }
@@ -121,6 +127,16 @@ type SpotifyCardProps = {
 };
 
 /**
+ * Gets a color for music notes based on whether the gradient is dark
+ */
+function getNoteColor(isDark?: boolean): string {
+  if (isDark === undefined) {
+    return 'rgba(128, 128, 128, 0.6)';
+  }
+  return isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.5)';
+}
+
+/**
  * Shows a card with the latest data from Spotify
  */
 export function SpotifyCard({ track }: SpotifyCardProps) {
@@ -129,7 +145,11 @@ export function SpotifyCard({ track }: SpotifyCardProps) {
   }
 
   return (
-    <SpotifyCardShell gradient={track.albumGradient}>
+    <SpotifyCardShell
+      gradient={track.albumGradient}
+      isPlaying={track.isPlaying}
+      noteColor={getNoteColor(track.albumGradientIsDark)}
+    >
       <TrackListing hasLogo track={track} />
     </SpotifyCardShell>
   );
