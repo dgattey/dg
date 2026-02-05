@@ -1,0 +1,103 @@
+import 'server-only';
+
+import { db } from '@dg/db';
+import { invariant } from '@dg/shared-core/assertions/invariant';
+import { log } from '@dg/shared-core/logging/log';
+
+const CALLBACK_URL = process.env.OAUTH_CALLBACK_URL ?? '';
+const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID ?? '';
+const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET ?? '';
+invariant(CALLBACK_URL, 'Missing OAUTH_CALLBACK_URL env variable');
+invariant(CLIENT_ID, 'Missing SPOTIFY_CLIENT_ID env variable');
+invariant(CLIENT_SECRET, 'Missing SPOTIFY_CLIENT_SECRET env variable');
+
+const SPOTIFY_TOKEN_NAME = 'spotify';
+const GRACE_PERIOD_IN_MS = 30_000;
+
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === 'object' && value !== null;
+
+const createExpirationDate = (expiryDistanceInSeconds: number) =>
+  new Date(Date.now() - GRACE_PERIOD_IN_MS + expiryDistanceInSeconds * 1000);
+
+/**
+ * Assuming the user has gone through the Spotify OAuth flow and
+ * returned with a valid authorization code, this
+ * uses the callback data to get a token by giving back the code.
+ * Supports PKCE by accepting an optional code verifier.
+ * Returns HTML to pass back to the client.
+ */
+export async function exchangeSpotifyCodeForToken(
+  code: string,
+  codeVerifier?: string,
+): Promise<string> {
+  log.info('Exchanging code for token for Spotify', { code, hasPkce: !!codeVerifier });
+
+  const authHeader = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
+  const body = new URLSearchParams({
+    code,
+    grant_type: 'authorization_code',
+    redirect_uri: CALLBACK_URL,
+  });
+
+  // Add PKCE code verifier if provided
+  if (codeVerifier) {
+    body.append('code_verifier', codeVerifier);
+  }
+
+  const response = await fetch('https://accounts.spotify.com/api/token', {
+    body,
+    headers: {
+      Authorization: `Basic ${authHeader}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    method: 'POST',
+  });
+
+  const rawTokenData: unknown = await response.json();
+  log.info('Got token response', { status: response.status });
+
+  if (!response.ok) {
+    log.error('Failed to exchange Spotify code for token', {
+      data: rawTokenData,
+      status: response.status,
+    });
+    throw new Error('Failed to exchange Spotify code for token');
+  }
+
+  if (!isRecord(rawTokenData)) {
+    throw new Error('Invalid Spotify token response');
+  }
+
+  const tokenType = rawTokenData.token_type;
+  const accessToken = rawTokenData.access_token;
+  const refreshToken = rawTokenData.refresh_token;
+  const expiresIn = rawTokenData.expires_in;
+
+  if (tokenType !== 'Bearer') {
+    throw new Error(`Invalid token type from Spotify ${String(tokenType)}`);
+  }
+  if (typeof accessToken !== 'string') {
+    throw new Error('Missing access token from Spotify');
+  }
+  if (typeof refreshToken !== 'string') {
+    throw new Error('Missing refresh token from Spotify');
+  }
+  if (typeof expiresIn !== 'number') {
+    throw new Error('Missing expires_in from Spotify');
+  }
+
+  const expiryAt = createExpirationDate(expiresIn);
+
+  log.info('Persisting token to DB', { accessToken, expiryAt, refreshToken });
+  const [token] = await db.Token.upsert({
+    accessToken,
+    expiryAt,
+    name: SPOTIFY_TOKEN_NAME,
+    refreshToken,
+  });
+  log.info('Persisted token to DB', { updatedAt: token.updatedAt });
+
+  return `
+    <p>Success! Token persisted to ${SPOTIFY_TOKEN_NAME} and expires at ${expiryAt.toLocaleString()}</p>`;
+}

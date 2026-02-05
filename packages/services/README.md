@@ -87,7 +87,7 @@ Strava API integration for activity data and webhooks.
 | `fetchStravaActivityFromApi()` | Fetches activity directly from Strava API |
 | `syncStravaWebhookUpdateWithDb()` | Syncs webhook updates to database |
 | `echoStravaChallengeIfValid()` | Handles Strava webhook verification |
-| `runOauthFlow()` | Initiates OAuth token exchange |
+| `exchangeCodeForToken()` | Exchanges an OAuth code for tokens |
 | `mapActivityFromApi()` | Converts API response (snake_case) to domain format |
 | `stravaClient` | Configured REST client with token refresh |
 | `stravaTokenExchangeClient` | Client for OAuth token exchange |

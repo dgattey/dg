@@ -18,6 +18,51 @@ function PageHeader() {
   );
 }
 
+function OauthCardsLoading() {
+  return (
+    <Box
+      sx={{
+        display: 'grid',
+        gap: 2,
+        gridTemplateColumns: { sm: 'repeat(auto-fit, minmax(280px, 1fr))', xs: '1fr' },
+      }}
+    >
+      <OauthCardSkeleton />
+      <OauthCardSkeleton />
+    </Box>
+  );
+}
+
+function OauthCards() {
+  return (
+    <Box
+      sx={{
+        display: 'grid',
+        gap: 2,
+        gridTemplateColumns: { sm: 'repeat(auto-fit, minmax(280px, 1fr))', xs: '1fr' },
+      }}
+    >
+      <Suspense fallback={<OauthCardSkeleton />}>
+        <OauthCard provider="strava" />
+      </Suspense>
+      <Suspense fallback={<OauthCardSkeleton />}>
+        <OauthCard provider="spotify" />
+      </Suspense>
+    </Box>
+  );
+}
+
+function OauthSection() {
+  return (
+    <>
+      <Typography variant="h2">OAuth connections</Typography>
+      <Suspense fallback={<OauthCardsLoading />}>
+        <OauthCards />
+      </Suspense>
+    </>
+  );
+}
+
 function WebhookSection() {
   return (
     <>
@@ -39,6 +84,8 @@ export default function ConsolePage() {
     <main>
       <Stack spacing={3}>
         <PageHeader />
+        <Divider />
+        <OauthSection />
         <Divider />
         <WebhookSection />
       </Stack>

@@ -6,52 +6,12 @@ import { log } from '@dg/shared-core/logging/log';
 import { validateRawDataToToken } from './stravaClient';
 import { stravaTokenExchangeClient } from './stravaTokenExchangeClient';
 
-const CALLBACK_URL = process.env.WEBHOOK_CALLBACK_URL;
+const CALLBACK_URL = process.env.OAUTH_CALLBACK_URL;
 const CLIENT_ID = process.env.STRAVA_CLIENT_ID;
 const CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
-invariant(CALLBACK_URL, 'Missing WEBHOOK_CALLBACK_URL env variable');
+invariant(CALLBACK_URL, 'Missing OAUTH_CALLBACK_URL env variable');
 invariant(CLIENT_ID, 'Missing STRAVA_CLIENT_ID env variable');
 invariant(CLIENT_SECRET, 'Missing STRAVA_CLIENT_SECRET env variable');
-
-/**
- * Just a state token to confirm types between the OAuth flow and the callback
- */
-export const OAUTH_STATE_TYPE = 'stravaOauthFlow';
-
-/**
- * Used to start the oauth flow for Strava. The URL returned by this
- * function needs to be opened in browser for the user to start the
- * flow manually.
- */
-export function getOauthTokenInitLink() {
-  invariant(CALLBACK_URL, 'Missing WEBHOOK_CALLBACK_URL env variable');
-  invariant(CLIENT_ID, 'Missing STRAVA_CLIENT_ID env variable');
-
-  const url = new URL('https://www.strava.com/oauth/authorize');
-  url.searchParams.append('client_id', CLIENT_ID);
-  url.searchParams.append('response_type', 'code');
-  url.searchParams.append('grant_type', 'authorization_code');
-  url.searchParams.append('redirect_uri', CALLBACK_URL);
-  url.searchParams.append('state', OAUTH_STATE_TYPE);
-  url.searchParams.append('scope', 'read,activity:read_all,profile:read_all,read_all');
-  return url.toString();
-}
-
-/**
- * Confirms a query record is properly formatted to exchange a code for a token, pulling out the token.
- */
-export function getStravaExchangeCodeForTokenRequest(
-  query: Partial<Record<string, string | Array<string>>>,
-): string | null {
-  if (
-    query.state === OAUTH_STATE_TYPE &&
-    typeof query.code === 'string' &&
-    typeof query.scope === 'string'
-  ) {
-    return query.code;
-  }
-  return null;
-}
 
 /**
  * Assuming the user has gone through the Strava OAuth flow and
