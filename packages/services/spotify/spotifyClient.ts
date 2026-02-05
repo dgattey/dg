@@ -67,11 +67,17 @@ export function getSpotifyRefreshTokenConfig(): RefreshTokenConfig {
   };
 }
 
+let _spotifyClient: ReturnType<typeof createClient> | undefined;
+
 /**
- * A REST client set up to make authed calls to Spotify
+ * A REST client set up to make authed calls to Spotify.
+ * Lazily initialized so importing this module doesn't require env vars at load time.
  */
-export const spotifyClient = createClient({
-  accessKey: 'spotify',
-  endpoint: 'https://api.spotify.com/v1/',
-  refreshTokenConfig: getSpotifyRefreshTokenConfig(),
-});
+export function getSpotifyClient() {
+  _spotifyClient ??= createClient({
+    accessKey: 'spotify',
+    endpoint: 'https://api.spotify.com/v1/',
+    refreshTokenConfig: getSpotifyRefreshTokenConfig(),
+  });
+  return _spotifyClient;
+}

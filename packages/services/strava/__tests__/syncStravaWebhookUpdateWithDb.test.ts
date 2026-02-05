@@ -8,9 +8,9 @@ const mockStravaGet = jest.fn<
 >();
 
 jest.mock('../stravaClient', () => ({
-  stravaClient: {
+  getStravaClient: () => ({
     get: mockStravaGet,
-  },
+  }),
 }));
 
 describe('syncStravaWebhookUpdateWithDb', () => {

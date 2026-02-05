@@ -39,14 +39,20 @@ export function getStravaRefreshTokenConfig(): RefreshTokenConfig {
   };
 }
 
+let _stravaClient: ReturnType<typeof createClient> | undefined;
+
 /**
- * A REST client set up to make authed calls to Strava
+ * A REST client set up to make authed calls to Strava.
+ * Lazily initialized so importing this module doesn't require env vars at load time.
  */
-export const stravaClient = createClient({
-  accessKey: 'strava',
-  endpoint: 'https://www.strava.com/api/v3/',
-  refreshTokenConfig: getStravaRefreshTokenConfig(),
-});
+export function getStravaClient() {
+  _stravaClient ??= createClient({
+    accessKey: 'strava',
+    endpoint: 'https://www.strava.com/api/v3/',
+    refreshTokenConfig: getStravaRefreshTokenConfig(),
+  });
+  return _stravaClient;
+}
 
 /**
  * Parses raw data to a token/access token from expected data

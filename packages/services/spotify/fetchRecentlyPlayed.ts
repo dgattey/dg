@@ -11,7 +11,7 @@ import {
 import type { Track } from '@dg/content-models/spotify/Track';
 import { parseResponse } from '../clients/parseResponse';
 import { getImageGradientFromUrl } from '../images/getImageGradient';
-import { spotifyClient } from './spotifyClient';
+import { getSpotifyClient } from './spotifyClient';
 
 const CURRENTLY_PLAYING_RESOURCE = 'me/player/currently-playing';
 const RECENTLY_PLAYED_RESOURCE = 'me/player/recently-played?limit=1';
@@ -22,7 +22,7 @@ const RECENTLY_PLAYED_RESOURCE = 'me/player/recently-played?limit=1';
  * - falls back to the most recently played track otherwise
  */
 export async function fetchRecentlyPlayed(): Promise<null | Track> {
-  const { response, status } = await spotifyClient.get(CURRENTLY_PLAYING_RESOURCE);
+  const { response, status } = await getSpotifyClient().get(CURRENTLY_PLAYING_RESOURCE);
   switch (status) {
     case 200: {
       const data = parseResponse(currentlyPlayingApiSchema, await response.json(), {
@@ -58,7 +58,7 @@ export async function fetchRecentlyPlayed(): Promise<null | Track> {
  * as `null`, or returns full JSON.
  */
 async function fetchLastPlayed(): Promise<null | Track> {
-  const { response, status } = await spotifyClient.get(RECENTLY_PLAYED_RESOURCE);
+  const { response, status } = await getSpotifyClient().get(RECENTLY_PLAYED_RESOURCE);
   if (status !== 200) {
     return null;
   }

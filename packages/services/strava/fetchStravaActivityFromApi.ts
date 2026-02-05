@@ -4,14 +4,14 @@ import { stravaActivityApiSchema } from '@dg/content-models/strava/StravaActivit
 import { log } from '@dg/shared-core/logging/log';
 import { parseResponse } from '../clients/parseResponse';
 import { mapActivityFromApi } from './mapActivityFromApi';
-import { stravaClient } from './stravaClient';
+import { getStravaClient } from './stravaClient';
 
 /**
  * Fetches an activity id from Strava's API. Use sparingly! Cuts into small API
  * budget. When in doubt, fall back to DB.
  */
 export const fetchStravaActivityFromApi = async (id: number) => {
-  const { response, status } = await stravaClient.get(`activities/${id}`);
+  const { response, status } = await getStravaClient().get(`activities/${id}`);
   log.info('Fetched Strava activity from API', { id, status });
   if (status !== 200) {
     return null;
