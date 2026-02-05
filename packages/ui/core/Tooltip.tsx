@@ -2,7 +2,7 @@
 
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import React, { useCallback, useId, useRef } from 'react';
+import React, { useId, useRef } from 'react';
 import type { SxObject } from '../theme';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -64,20 +64,20 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
   const popoverRef = useRef<HTMLSpanElement>(null);
   const hideTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const showTooltip = useCallback(() => {
+  const showTooltip = () => {
     if (hideTimeoutRef.current) {
       clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = null;
     }
     popoverRef.current?.showPopover();
-  }, []);
+  };
 
-  const hideTooltip = useCallback(() => {
+  const hideTooltip = () => {
     // Small delay to prevent flickering when moving between trigger and tooltip
     hideTimeoutRef.current = setTimeout(() => {
       popoverRef.current?.hidePopover();
     }, 100);
-  }, []);
+  };
 
   // Don't render wrapper if no title
   if (!title) {
