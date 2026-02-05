@@ -109,7 +109,7 @@ Required environment variables (see `config/env.secrets.keys`):
 
 - `CONTENTFUL_ACCESS_TOKEN` - Contentful API access token
 - `CONTENTFUL_SPACE_ID` - Contentful space identifier
-- `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` - Spotify OAuth credentials
+- `SPOTIFY_CLIENT_ID` - Spotify OAuth client ID (PKCE, no secret required)
 - `STRAVA_CLIENT_ID` / `STRAVA_CLIENT_SECRET` - Strava OAuth credentials
 - `STRAVA_VERIFY_TOKEN` - Webhook verification token
 - `DATABASE_URL` - PostgreSQL connection string (for Strava caching)

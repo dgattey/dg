@@ -1,9 +1,4 @@
 /**
- * Supported OAuth providers.
- */
-export type OauthProvider = 'strava' | 'spotify';
-
-/**
  * OAuth connection status for a provider.
  */
 export type OauthStatus = {

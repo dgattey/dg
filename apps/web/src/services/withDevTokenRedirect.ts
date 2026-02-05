@@ -1,11 +1,11 @@
 import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
-import { CONSOLE_ROUTE } from '@dg/shared-core/routes/routes';
+import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import { redirect } from 'next/navigation';
 
 /**
- * Wraps a promise and redirects to the console in development
+ * Wraps a promise and redirects to the dev console in development
  * if a MissingTokenError is thrown. This allows developers to
  * easily set up OAuth tokens when they're missing.
  *
@@ -16,7 +16,7 @@ export async function withDevTokenRedirect<T>(promise: Promise<T>): Promise<T> {
     return await promise;
   } catch (error) {
     if (isMissingTokenError(error) && process.env.NODE_ENV === 'development') {
-      redirect(CONSOLE_ROUTE);
+      redirect(devConsoleRoute);
     }
     throw error;
   }

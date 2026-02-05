@@ -17,8 +17,9 @@ Neon PostgreSQL database with Sequelize ORM for migrations and models.
 ## Commands
 
 - `turbo migrate` - Run pending migrations
-- `turbo db -- db:migrate:undo` - Rollback last migration
-- `turbo db -- migration:generate --name <name>` - Create new migration
+- `turbo migrate:generate -- --name <name>` - Create new migration
+- `turbo migrate:status` - Show migration status
+- `turbo migrate:undo` - Rollback last migration
 
 ## Environment
 
@@ -50,3 +51,4 @@ See `packages/testing/README.md` for full documentation.
 - `NODE_ENV` must be `development`, `production`, or `test` or the client throws on import.
 - `DATABASE_URL` / `DATABASE_URL_TEST` are required; missing values fail fast.
 - In non-test environments, `connectToDatabase()` is called automatically on import.
+

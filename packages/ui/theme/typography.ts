@@ -57,15 +57,15 @@ export function getTypography(theme: Theme): TypographyVariantsOptions {
       fontWeight: 700,
     },
     h3: {
-      fontSize: 25.5,
+      fontSize: 24.75,
       fontWeight: 700,
     },
     h4: {
-      fontSize: 21.25,
+      fontSize: 20.5,
       fontWeight: 600,
     },
     h5: {
-      fontSize: 17,
+      fontSize: 16.5,
       fontStretch: 'semi-expanded',
       fontWeight: 600,
     },

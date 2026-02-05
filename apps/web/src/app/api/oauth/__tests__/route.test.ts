@@ -1,15 +1,16 @@
 /**
  * @jest-environment node
  */
-import { CONSOLE_ROUTE } from '@dg/shared-core/routes/routes';
+import { oauthRoute } from '@dg/shared-core/routes/api';
+import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import { NextRequest } from 'next/server';
 import { GET } from '../route';
 
-jest.mock('../../../../services/strava', () => ({
-  exchangeCodeForToken: jest.fn(),
+jest.mock('@dg/services/oauth/exchangeStravaCodeForToken', () => ({
+  exchangeStravaCodeForToken: jest.fn(),
 }));
 
-jest.mock('../../../../services/spotify', () => ({
+jest.mock('@dg/services/oauth/exchangeSpotifyCodeForToken', () => ({
   exchangeSpotifyCodeForToken: jest.fn(),
 }));
 
@@ -24,14 +25,14 @@ jest.mock('@dg/services/oauth/oauthStateStorage', () => ({
   saveOauthState: (params: unknown) => mockSaveOauthState(params),
 }));
 
-import * as spotifyService from '../../../../services/spotify';
-import * as stravaService from '../../../../services/strava';
+import * as spotifyService from '@dg/services/oauth/exchangeSpotifyCodeForToken';
+import * as stravaService from '@dg/services/oauth/exchangeStravaCodeForToken';
 
-const mockExchangeStravaCode = jest.mocked(stravaService.exchangeCodeForToken);
+const mockExchangeStravaCode = jest.mocked(stravaService.exchangeStravaCodeForToken);
 const mockExchangeSpotifyCode = jest.mocked(spotifyService.exchangeSpotifyCodeForToken);
 
 const createGetRequest = (params: Record<string, string>) => {
-  const url = new URL('https://example.com/api/oauth');
+  const url = new URL(`https://example.com${oauthRoute}`);
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.set(key, value);
   }
@@ -50,7 +51,7 @@ describe('OAuth Route', () => {
     const response = await GET(createGetRequest({}));
 
     expect(response.status).toBe(307);
-    expect(response.headers.get('Location')).toBe(`https://example.com${CONSOLE_ROUTE}`);
+    expect(response.headers.get('Location')).toBe(`https://example.com${devConsoleRoute}`);
   });
 
   describe('Callback flow (code param)', () => {
@@ -102,7 +103,7 @@ describe('OAuth Route', () => {
         const response = await GET(createGetRequest({ code: 'strava_code', state }));
 
         expect(response.status).toBe(307);
-        expect(response.headers.get('Location')).toBe(`https://example.com${CONSOLE_ROUTE}`);
+        expect(response.headers.get('Location')).toBe(`https://example.com${devConsoleRoute}`);
         expect(mockExchangeStravaCode).toHaveBeenCalledWith('strava_code');
         expect(mockExchangeSpotifyCode).not.toHaveBeenCalled();
         expect(mockRetrieveAndDeleteOauthState).toHaveBeenCalledWith(state);
@@ -135,7 +136,7 @@ describe('OAuth Route', () => {
         const response = await GET(createGetRequest({ code: 'spotify_code', state }));
 
         expect(response.status).toBe(307);
-        expect(response.headers.get('Location')).toBe(`https://example.com${CONSOLE_ROUTE}`);
+        expect(response.headers.get('Location')).toBe(`https://example.com${devConsoleRoute}`);
         // Spotify gets the code verifier for PKCE
         expect(mockExchangeSpotifyCode).toHaveBeenCalledWith(
           'spotify_code',
@@ -163,7 +164,7 @@ describe('OAuth Route', () => {
     beforeEach(() => {
       process.env = {
         ...originalEnv,
-        OAUTH_CALLBACK_URL: 'https://example.com/api/oauth',
+        OAUTH_CALLBACK_URL: `https://example.com${oauthRoute}`,
         SPOTIFY_CLIENT_ID: 'test-spotify-client-id',
         STRAVA_CLIENT_ID: 'test-strava-client-id',
       };
@@ -177,7 +178,7 @@ describe('OAuth Route', () => {
       const response = await GET(createGetRequest({ provider: 'invalid' }));
 
       expect(response.status).toBe(307);
-      expect(response.headers.get('Location')).toBe(`https://example.com${CONSOLE_ROUTE}`);
+      expect(response.headers.get('Location')).toBe(`https://example.com${devConsoleRoute}`);
     });
 
     it('redirects to Strava OAuth URL for strava provider', async () => {

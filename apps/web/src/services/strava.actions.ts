@@ -4,6 +4,7 @@ import { createSubscription } from '@dg/services/strava/webhooks/createSubscript
 import { deleteSubscription } from '@dg/services/strava/webhooks/deleteSubscription';
 import { listSubscriptions } from '@dg/services/strava/webhooks/listSubscriptions';
 import { log } from '@dg/shared-core/logging/log';
+import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import { revalidatePath } from 'next/cache';
 
 type WebhookActionResult = {
@@ -22,7 +23,7 @@ export async function createWebhookSubscription(): Promise<WebhookActionResult> 
 
   try {
     await createSubscription('strava');
-    revalidatePath('/console');
+    revalidatePath(devConsoleRoute);
     return { success: true };
   } catch (error) {
     log.error('Failed to create webhook subscription', { error });
@@ -50,7 +51,7 @@ export async function deleteWebhookSubscription(): Promise<WebhookActionResult> 
     }
 
     await deleteSubscription('strava', subscription.id);
-    revalidatePath('/console');
+    revalidatePath(devConsoleRoute);
     return { success: true };
   } catch (error) {
     log.error('Failed to delete webhook subscription', { error });

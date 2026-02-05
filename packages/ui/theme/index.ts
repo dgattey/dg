@@ -143,10 +143,14 @@ export function getTheme(): Theme {
       },
       MuiChip: {
         defaultProps: {
-          size: 'small',
+          size: 'medium',
           variant: 'outlined',
         },
         styleOverrides: {
+          sizeMedium: {
+            fontSize: '0.9rem',
+            height: 28,
+          },
           sizeSmall: {
             fontSize: '0.7rem',
             height: 20,
@@ -226,6 +230,15 @@ export function getTheme(): Theme {
               transition: theme.transitions.create('color'),
             };
           },
+        },
+      },
+      MuiSkeleton: {
+        styleOverrides: {
+          root: ({ theme }) => ({
+            '&.MuiSkeleton-rounded': {
+              borderRadius: theme.spacing(1),
+            },
+          }),
         },
       },
       MuiTooltip: {

@@ -6,10 +6,8 @@ import { log } from '@dg/shared-core/logging/log';
 
 const CALLBACK_URL = process.env.OAUTH_CALLBACK_URL ?? '';
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID ?? '';
-const CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET ?? '';
 invariant(CALLBACK_URL, 'Missing OAUTH_CALLBACK_URL env variable');
 invariant(CLIENT_ID, 'Missing SPOTIFY_CLIENT_ID env variable');
-invariant(CLIENT_SECRET, 'Missing SPOTIFY_CLIENT_SECRET env variable');
 
 const SPOTIFY_TOKEN_NAME = 'spotify';
 const GRACE_PERIOD_IN_MS = 30_000;
@@ -21,11 +19,8 @@ const createExpirationDate = (expiryDistanceInSeconds: number) =>
   new Date(Date.now() - GRACE_PERIOD_IN_MS + expiryDistanceInSeconds * 1000);
 
 /**
- * Assuming the user has gone through the Spotify OAuth flow and
- * returned with a valid authorization code, this
- * uses the callback data to get a token by giving back the code.
+ * Exchanges a Spotify authorization code for an access token and persists it.
  * Supports PKCE by accepting an optional code verifier.
- * Returns HTML to pass back to the client.
  */
 export async function exchangeSpotifyCodeForToken(
   code: string,
@@ -33,22 +28,21 @@ export async function exchangeSpotifyCodeForToken(
 ): Promise<string> {
   log.info('Exchanging code for token for Spotify', { code, hasPkce: !!codeVerifier });
 
-  const authHeader = Buffer.from(`${CLIENT_ID}:${CLIENT_SECRET}`).toString('base64');
+  if (!codeVerifier) {
+    throw new Error('Missing code verifier for Spotify PKCE flow');
+  }
+
   const body = new URLSearchParams({
+    client_id: CLIENT_ID,
     code,
+    code_verifier: codeVerifier,
     grant_type: 'authorization_code',
     redirect_uri: CALLBACK_URL,
   });
 
-  // Add PKCE code verifier if provided
-  if (codeVerifier) {
-    body.append('code_verifier', codeVerifier);
-  }
-
   const response = await fetch('https://accounts.spotify.com/api/token', {
     body,
     headers: {
-      Authorization: `Basic ${authHeader}`,
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     method: 'POST',

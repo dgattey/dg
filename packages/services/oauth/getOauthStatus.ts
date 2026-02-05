@@ -2,14 +2,15 @@ import 'server-only';
 
 import { db } from '@dg/db';
 import { log } from '@dg/shared-core/logging/log';
-import type { OauthProvider, OauthStatus } from './types';
+import type { OauthProviderKey } from '@dg/shared-core/routes/api';
+import type { OauthStatus } from './types';
 
 /**
  * Gets OAuth status for a provider.
  *
  * @param provider - The OAuth provider to check status for
  */
-export async function getOauthStatus(provider: OauthProvider): Promise<OauthStatus> {
+export async function getOauthStatus(provider: OauthProviderKey): Promise<OauthStatus> {
   try {
     log.info('Getting OAuth status', { provider });
     const token = await db.Token.findOne({

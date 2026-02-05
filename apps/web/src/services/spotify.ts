@@ -1,7 +1,6 @@
 import 'server-only';
 
 import { fetchRecentlyPlayed } from '@dg/services/spotify/fetchRecentlyPlayed';
-import { exchangeSpotifyCodeForToken } from '@dg/services/spotify/runOauthFlow';
 import { formatRelativeTime } from '@dg/ui/helpers/relativeTime';
 import { cacheLife, cacheTag } from 'next/cache';
 import { withDevTokenRedirect } from './withDevTokenRedirect';
@@ -24,6 +23,3 @@ export const getLatestSong = async () => {
     }),
   };
 };
-
-// Token exchange is still provider-specific, needed by /api/oauth callback
-export { exchangeSpotifyCodeForToken };

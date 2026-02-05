@@ -22,12 +22,10 @@ This repo has no external consumers. Avoid API routes when possible.
 
 ## Services layer boundary
 
-All access to `packages/services` must go through the app's services layer.
-
-- `apps/web/src/services/*.ts` re-exports from `packages/services`
-- Server components/actions import from `apps/web/src/services/`
-- Client components NEVER import from `packages/services` directly
-- App services layer adds caching, formatting, app-specific logic
+Prefer importing from `@dg/services` directly. Keep app services only when they
+add Next.js/React-specific behavior (caching, redirects, server actions) or
+app-only formatting. Avoid wrapper re-exports that just pass through to
+`@dg/services`.
 
 ## Database imports restricted to services
 

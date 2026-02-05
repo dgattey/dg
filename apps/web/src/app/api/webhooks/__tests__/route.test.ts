@@ -2,6 +2,7 @@
  * @jest-environment node
  */
 import { log } from '@dg/shared-core/logging/log';
+import { webhooksRoute } from '@dg/shared-core/routes/api';
 import { NextRequest } from 'next/server';
 import { GET, POST } from '../route';
 
@@ -9,11 +10,17 @@ import { GET, POST } from '../route';
 const VALID_SUBSCRIPTION_ID = 254710;
 
 // Mock all the service functions before importing the route
-jest.mock('../../../../services/strava', () => ({
+jest.mock('@dg/services/strava/echoStravaChallengeIfValid', () => ({
   echoStravaChallengeIfValid: jest.fn(),
+}));
+
+jest.mock('@dg/services/strava/syncStravaWebhookUpdateWithDb', () => ({
+  syncStravaWebhookUpdateWithDb: jest.fn(),
+}));
+
+jest.mock('@dg/services/strava/webhooks/isValidSubscriptionId', () => ({
   // Return false by default, tests will mock specific values
   isValidSubscriptionId: jest.fn().mockResolvedValue(false),
-  syncStravaWebhookUpdateWithDb: jest.fn(),
 }));
 
 // Mock revalidateTag
@@ -21,13 +28,15 @@ jest.mock('next/cache', () => ({
   revalidateTag: jest.fn(),
 }));
 
-import { revalidateTag } from 'next/cache';
 // Get typed references to the mocked functions
-import * as stravaService from '../../../../services/strava';
+import * as stravaChallenge from '@dg/services/strava/echoStravaChallengeIfValid';
+import * as stravaSync from '@dg/services/strava/syncStravaWebhookUpdateWithDb';
+import * as stravaWebhooks from '@dg/services/strava/webhooks/isValidSubscriptionId';
+import { revalidateTag } from 'next/cache';
 
-const mockSyncWebhook = jest.mocked(stravaService.syncStravaWebhookUpdateWithDb);
-const mockEchoChallenge = jest.mocked(stravaService.echoStravaChallengeIfValid);
-const mockIsValidSubscriptionId = jest.mocked(stravaService.isValidSubscriptionId);
+const mockSyncWebhook = jest.mocked(stravaSync.syncStravaWebhookUpdateWithDb);
+const mockEchoChallenge = jest.mocked(stravaChallenge.echoStravaChallengeIfValid);
+const mockIsValidSubscriptionId = jest.mocked(stravaWebhooks.isValidSubscriptionId);
 const mockRevalidateTag = jest.mocked(revalidateTag);
 
 describe('Webhook Route', () => {
@@ -45,7 +54,7 @@ describe('Webhook Route', () => {
 
   describe('POST handler', () => {
     const createRequest = (body: unknown): NextRequest => {
-      const request = new NextRequest('https://example.com/api/webhooks', {
+      const request = new NextRequest(`https://example.com${webhooksRoute}`, {
         body: JSON.stringify(body),
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
@@ -160,7 +169,7 @@ describe('Webhook Route', () => {
 
     describe('error handling', () => {
       it('returns 400 for invalid JSON body', async () => {
-        const request = new NextRequest('https://example.com/api/webhooks', {
+        const request = new NextRequest(`https://example.com${webhooksRoute}`, {
           body: 'not json',
           headers: { 'Content-Type': 'application/json' },
           method: 'POST',
@@ -173,22 +182,33 @@ describe('Webhook Route', () => {
         expect(json.error).toBe('Bad Request');
       });
 
-      it('returns 400 for invalid webhook payload', async () => {
+      it('returns 204 for non-strava webhook payloads', async () => {
         const body = {
           invalid: 'payload',
         };
 
         const response = await POST(createRequest(body));
 
-        expect(response.status).toBe(400);
-        const json = await response.json();
-        expect(json.error).toBe('Bad Request');
+        expect(response.status).toBe(204);
       });
 
       it('returns 400 for missing required fields', async () => {
         const body = {
           aspect_type: 'create',
           // missing object_id and object_type
+        };
+
+        const response = await POST(createRequest(body));
+
+        expect(response.status).toBe(400);
+      });
+
+      it('returns 400 for invalid Strava payloads', async () => {
+        const body = {
+          aspect_type: 'create',
+          object_id: 'not-a-number',
+          object_type: 'activity',
+          subscription_id: VALID_SUBSCRIPTION_ID,
         };
 
         const response = await POST(createRequest(body));
@@ -263,7 +283,7 @@ describe('Webhook Route', () => {
 
   describe('GET handler', () => {
     const createGetRequest = (params: Record<string, string>): NextRequest => {
-      const url = new URL('https://example.com/api/webhooks');
+      const url = new URL(`https://example.com${webhooksRoute}`);
       for (const [key, value] of Object.entries(params)) {
         url.searchParams.set(key, value);
       }
@@ -305,14 +325,12 @@ describe('Webhook Route', () => {
     });
 
     describe('invalid requests', () => {
-      it('returns 400 for requests without valid params', async () => {
-        mockEchoChallenge.mockReturnValue(null);
-
+      it('returns 204 for requests without Strava params', async () => {
         const request = createGetRequest({});
 
         const response = await GET(request);
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(204);
       });
     });
   });

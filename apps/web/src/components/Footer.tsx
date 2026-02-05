@@ -1,5 +1,5 @@
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
-import { CONSOLE_ROUTE } from '@dg/shared-core/routes/routes';
+import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
 import { Link } from '@dg/ui/dependent/Link';
@@ -142,11 +142,11 @@ export async function Footer() {
                     <Link
                       aria-label="Developer tools"
                       color="inherit"
-                      href={CONSOLE_ROUTE}
+                      href={devConsoleRoute}
                       title="Developer tools"
                       variant="caption"
                     >
-                      Console
+                      Dev console
                     </Link>
                   </NavItem>
                 </>

@@ -2,13 +2,12 @@
 
 import { Button, Stack, Typography } from '@mui/material';
 import { useState } from 'react';
-import { deleteWebhookSubscription } from '../../services/strava.actions';
+import { createWebhookSubscription } from '../../../services/strava.actions';
 
 /**
- * Client component that renders a button to delete a Strava webhook subscription.
- * The subscription ID is looked up server-side for security.
+ * Client component that renders a button to create a Strava webhook subscription.
  */
-export function DeleteWebhookButton() {
+export function CreateWebhookButton() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -17,13 +16,13 @@ export function DeleteWebhookButton() {
     setError(null);
 
     try {
-      const result = await deleteWebhookSubscription();
+      const result = await createWebhookSubscription();
       if (!result.success) {
-        throw new Error(result.error ?? 'Failed to delete subscription');
+        throw new Error(result.error ?? 'Failed to create subscription');
       }
       // Server action handles revalidation
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to delete subscription';
+      const message = err instanceof Error ? err.message : 'Failed to create subscription';
       setError(message);
     } finally {
       setIsLoading(false);
@@ -31,21 +30,20 @@ export function DeleteWebhookButton() {
   };
 
   return (
-    <Stack spacing={1}>
+    <Stack gap={1}>
       {error && (
         <Typography color="error" variant="body2">
           {error}
         </Typography>
       )}
       <Button
-        color="error"
         disabled={isLoading}
         onClick={handleClick}
-        size="medium"
+        size="small"
         sx={{ alignSelf: 'flex-start' }}
-        variant="outlined"
+        variant="contained"
       >
-        {isLoading ? 'Deleting...' : 'Delete Subscription'}
+        {isLoading ? 'Creating...' : 'Create subscription'}
       </Button>
     </Stack>
   );

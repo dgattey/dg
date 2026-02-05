@@ -1,23 +1,23 @@
 'use client';
 
-import type { OauthProvider } from '@dg/services/oauth/types';
+import type { OauthProviderKey } from '@dg/shared-core/routes/api';
 import { Button, Stack, Typography } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
-import { forceRefreshToken } from '../../services/oauth.actions';
+import { forceRefreshToken } from '../../../services/oauth.actions';
 
-type ForceRefreshOauthButtonProps = {
+type ForceRefreshButtonProps = {
   /** Whether the provider currently has valid OAuth credentials */
   isConnected: boolean;
-  /** Which OAuth provider these actions apply to (e.g., 'spotify', 'strava') */
-  provider: OauthProvider;
+  /** Which OAuth provider these actions apply to */
+  provider: OauthProviderKey;
 };
 
 /**
  * Client component that renders a button to force-refresh an OAuth token.
  * Only renders when the provider is connected.
  */
-export function ForceRefreshOauthButton({ isConnected, provider }: ForceRefreshOauthButtonProps) {
+export function ForceRefreshButton({ isConnected, provider }: ForceRefreshButtonProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -51,7 +51,7 @@ export function ForceRefreshOauthButton({ isConnected, provider }: ForceRefreshO
   }
 
   return (
-    <Stack spacing={1}>
+    <Stack gap={1}>
       {error && (
         <Typography color="error" variant="body2">
           {error}

@@ -1,5 +1,5 @@
 /**
- * Custom error thrown when an OAuth token is missing from the database.
+ * Custom error thrown when an OAuth token is missing or invalid.
  * This allows consumers to catch this specific error and handle it
  * appropriately (e.g., redirecting to OAuth setup in development).
  */
