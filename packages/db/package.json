@@ -24,7 +24,7 @@
     "check:types": "tsc",
     "clean": "rm -rf .turbo *.tsbuildinfo",
     "db": "NODE_OPTIONS='--import tsx' pnpm exec sequelize-cli",
-    "migrate": "NODE_OPTIONS='--import tsx' pnpm exec sequelize-cli db:migrate"
+    "migrate": "tsx scripts/runMigrate.ts"
   },
   "types": "client.ts"
 }

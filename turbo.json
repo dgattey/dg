@@ -30,7 +30,7 @@
   ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build", "topo", "check", "check:types"],
+      "dependsOn": ["^build", "^migrate", "topo", "check", "check:types"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
     "build:analyze": {
