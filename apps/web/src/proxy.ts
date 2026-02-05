@@ -20,9 +20,9 @@ import { NextResponse } from 'next/server';
  * boundary can't handle this case (it serves as defense-in-depth for any
  * auth bypass instead).
  *
- * Prefetch and RSC requests are redirected to home rather than returning
- * 401, which prevents the browser's auth dialog from firing during
- * client-side navigation (which would cause duplicate prompts).
+ * Prefetch and RSC requests receive a plain 401 (no WWW-Authenticate),
+ * which fails them without triggering the browser's auth dialog. The
+ * client router then falls back to a hard navigation for the real dialog.
  */
 export function proxy(request: NextRequest) {
   if (isDevConsoleAccessAllowed(request.headers.get('authorization'))) {
@@ -31,16 +31,25 @@ export function proxy(request: NextRequest) {
 
   const redirectUrl = new URL(homeRoute, request.url);
 
-  // For prefetch/RSC requests, redirect silently instead of triggering the
-  // browser's auth dialog. This prevents duplicate prompts from prefetch +
-  // navigation, and avoids leaking page content to unauthenticated prefetches.
+  if (!hasDevConsoleCredentials()) {
+    return NextResponse.redirect(redirectUrl);
+  }
+
+  // For prefetch/RSC requests (client-side navigation via NextLink), return
+  // 401 WITHOUT the WWW-Authenticate header. This cleanly fails the request
+  // without triggering the browser's native auth dialog:
+  // - Prefetch: fails silently (browsers ignore failed prefetches)
+  // - RSC navigation: client router can't parse the response as RSC data,
+  //   falls back to a hard navigation which triggers the real auth dialog
+  // Using redirect() here instead would confuse the client router — it
+  // follows the 307, gets home page RSC data, and creates duplicate prompts.
   const isPrefetchOrRsc =
     request.headers.get('next-router-prefetch') === '1' ||
     request.headers.get('purpose') === 'prefetch' ||
     request.headers.get('rsc') === '1';
 
-  if (isPrefetchOrRsc || !hasDevConsoleCredentials()) {
-    return NextResponse.redirect(redirectUrl);
+  if (isPrefetchOrRsc) {
+    return new NextResponse(null, { status: 401 });
   }
 
   // Trigger the browser's native Basic Auth dialog. The HTML body only

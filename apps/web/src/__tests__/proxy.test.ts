@@ -93,17 +93,15 @@ describe('proxy', () => {
       expect(response.headers.get('WWW-Authenticate')).toBe('Basic realm="Dev Console"');
     });
 
-    it.each([
+    it.each<{ desc: string; headers: Record<string, string> }>([
       { desc: 'RSC requests', headers: { rsc: '1' } },
       { desc: 'prefetch requests', headers: { 'next-router-prefetch': '1' } },
       { desc: 'purpose prefetch requests', headers: { purpose: 'prefetch' } },
-    ])('redirects $desc to home instead of triggering auth dialog', ({ headers }) => {
+    ])('returns 401 without WWW-Authenticate for $desc', ({ headers }) => {
       const response = proxy(createRequest({ headers }));
 
-      expect(response.status).toBe(307);
-      const location = response.headers.get('location');
-      invariant(location, 'Expected location header to be defined');
-      expect(new URL(location).pathname).toBe('/');
+      expect(response.status).toBe(401);
+      expect(response.headers.get('WWW-Authenticate')).toBeNull();
     });
   });
 

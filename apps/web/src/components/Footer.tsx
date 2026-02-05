@@ -142,6 +142,7 @@ export async function Footer() {
                     <Link
                       aria-label="Developer tools"
                       color="inherit"
+                      forcePageNavigation
                       href={devConsoleRoute}
                       title="Developer tools"
                       variant="caption"
