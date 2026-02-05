@@ -11,6 +11,21 @@ const nextConfig: NextConfig = {
     turbopackFileSystemCacheForBuild: true,
     turbopackFileSystemCacheForDev: true,
   },
+  // LocatorJS support for Turbopack - only in development
+  ...(process.env.NODE_ENV === 'development' && {
+    turbopack: {
+      rules: {
+        '**/*.{tsx,jsx}': {
+          loaders: [
+            {
+              loader: '@locator/webpack-loader',
+              options: { env: 'development' },
+            },
+          ],
+        },
+      },
+    },
+  }),
   headers() {
     return [
       {
