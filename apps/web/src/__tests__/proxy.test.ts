@@ -14,7 +14,10 @@ const encode = (username: string, password: string) =>
 const createRequest = ({
   auth,
   headers: extraHeaders,
-}: { auth?: string; headers?: Record<string, string> } = {}) => {
+}: {
+  auth?: string;
+  headers?: Record<string, string>;
+} = {}) => {
   const headers = new Headers();
   if (auth) {
     headers.set('authorization', auth);
@@ -104,5 +107,4 @@ describe('proxy', () => {
       expect(response.headers.get('WWW-Authenticate')).toBeNull();
     });
   });
-
 });

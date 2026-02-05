@@ -93,13 +93,20 @@ const BUILT_IN_ICONS: Record<string, React.ReactNode> = {
  * Resolves the link layout and returns the rendered contents + whether
  * the link should show a tooltip (icon-only links with a title).
  */
-function resolveContents({ children, icon, layout = 'text', title }: Pick<BaseLinkProps, 'children' | 'icon' | 'layout' | 'title'>) {
+function resolveContents({
+  children,
+  icon,
+  layout = 'text',
+  title,
+}: Pick<BaseLinkProps, 'children' | 'icon' | 'layout' | 'title'>) {
   if (children) {
     return { contents: children, showTooltip: false };
   }
 
-  // biome-ignore lint/security/noDangerouslySetInnerHtml: This is intended
-  const iconElement = icon ? (BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />) : null;
+  const iconElement = icon
+    ? // biome-ignore lint/security/noDangerouslySetInnerHtml: Intended!
+      (BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />)
+    : null;
 
   if (layout === 'icon' && iconElement) {
     return { contents: iconElement, showTooltip: Boolean(title) };
@@ -159,7 +166,12 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     return null;
   }
 
-  const { contents, showTooltip } = resolveContents({ children, icon, layout: initialLayout, title });
+  const { contents, showTooltip } = resolveContents({
+    children,
+    icon,
+    layout: initialLayout,
+    title,
+  });
   const anchorProps = {
     'aria-label': title,
     ref,
@@ -167,7 +179,8 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
   };
   const externalProps = isExternal ? { rel: 'noreferrer' as const, target: '_blank' as const } : {};
   const muiStyleProps = { color, sx, underline, variant };
-  const wrap = (el: React.ReactElement) => wrapWithTooltip(el, showTooltip, title, tooltipPlacement);
+  const wrap = (el: React.ReactElement) =>
+    wrapWithTooltip(el, showTooltip, title, tooltipPlacement);
 
   if (isButton) {
     return wrap(
