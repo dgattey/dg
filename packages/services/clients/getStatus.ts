@@ -1,4 +1,6 @@
-import { log } from '@dg/shared-core/helpers/log';
+import 'server-only';
+
+import { log } from '@dg/shared-core/logging/log';
 
 /**
  * Recursively parses status from known types

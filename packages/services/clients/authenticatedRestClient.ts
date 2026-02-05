@@ -1,9 +1,9 @@
 import 'server-only';
-import { log } from '@dg/shared-core/helpers/log';
+import { assertHttpsEndpoint } from '@dg/shared-core/assertions/assertHttpsEndpoint';
+import { log } from '@dg/shared-core/logging/log';
 import type { Wretch } from 'wretch';
 import wretch from 'wretch';
 import { getStatus } from './getStatus';
-import { maskSecret } from './maskSecret';
 import type { RefreshTokenConfig } from './RefreshTokenConfig';
 import { refreshedAccessToken } from './refreshedAccessToken';
 
@@ -29,6 +29,7 @@ export type ClientProps = {
  * access tokens built into the fetch function.
  */
 export function createClient({ endpoint, accessKey, refreshTokenConfig }: ClientProps) {
+  assertHttpsEndpoint(endpoint);
   const api = wretch(endpoint).content('application/json');
 
   /**
@@ -40,7 +41,7 @@ export function createClient({ endpoint, accessKey, refreshTokenConfig }: Client
   ) {
     log.info('Adding auth', { forceRefresh });
     const accessToken = await refreshedAccessToken(accessKey, refreshTokenConfig, forceRefresh);
-    log.info('Got access token', { accessToken: maskSecret(accessToken) });
+    log.info('Got access token', { accessToken });
     return request.auth(`Bearer ${accessToken}`);
   }
 
@@ -54,7 +55,7 @@ export function createClient({ endpoint, accessKey, refreshTokenConfig }: Client
     const response = authedApi.get(resource).unauthorized(async (_error, req) => {
       // Renew credentials once and try to fetch again but fail if we hit another unauthorized
       log.info('Unauthorized request, refreshing access token', { resource });
-      const authedReq = await addAuth(req, false);
+      const authedReq = await addAuth(req, true);
       return authedReq.get(resource).unauthorized((err) => {
         log.info('Failed to refresh access token', { resource });
         throw err;

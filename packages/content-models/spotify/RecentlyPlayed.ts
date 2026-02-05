@@ -1,4 +1,4 @@
-import { isNotNullish } from '@dg/shared-core/helpers/typeguards';
+import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import * as v from 'valibot';
 import { mapTrackFromApi, type Track, trackApiSchema } from './Track';
 
@@ -24,7 +24,7 @@ export const recentlyPlayedApiSchema = v.looseObject({
 /**
  * Parsed payload for recently played data.
  */
-export type RecentlyPlayedApi = v.InferOutput<typeof recentlyPlayedApiSchema>;
+type RecentlyPlayedApi = v.InferOutput<typeof recentlyPlayedApiSchema>;
 
 /**
  * Domain payload for recently played data (camelCase).

@@ -1,4 +1,6 @@
-import { log } from '@dg/shared-core/helpers/log';
+import 'server-only';
+
+import { log } from '@dg/shared-core/logging/log';
 import { type BaseIssue, type BaseSchema, flatten, type InferOutput, safeParse } from 'valibot';
 
 type ParseContext = {

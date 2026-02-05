@@ -1,0 +1,22 @@
+{
+  "dependencies": {
+    "@swc/jest": "0.2.39",
+    "@testing-library/jest-dom": "catalog:",
+    "esbuild-register": "3.6.0"
+  },
+  "devDependencies": {
+    "@dg/tsconfig": "workspace:*",
+    "@types/jest": "catalog:",
+    "jest": "catalog:",
+    "typescript": "catalog:"
+  },
+  "name": "@dg/testing",
+  "private": true,
+  "scripts": {
+    "check": "biome check --write .",
+    "check:ci": "biome ci .",
+    "check:types": "tsc",
+    "clean": "rm -rf .turbo *.tsbuildinfo"
+  },
+  "type": "module"
+}

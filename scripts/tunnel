@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Find repo root and source .env
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ROOT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+
+if [[ -f "$ROOT_DIR/.env" ]]; then
+  set -a
+  source "$ROOT_DIR/.env"
+  set +a
+fi
+
+if [[ -z "${CLOUDFLARE_TUNNEL_TOKEN:-}" ]]; then
+  echo "Error: CLOUDFLARE_TUNNEL_TOKEN not set" >&2
+  echo "Add it to 1Password and run scripts/generate-env to regenerate .env" >&2
+  exit 1
+fi
+
+LOG_LEVEL="${CLOUDFLARED_LOGLEVEL:-warn}"
+TRANSPORT_LOG_LEVEL="${CLOUDFLARED_TRANSPORT_LOGLEVEL:-error}"
+
+export TUNNEL_LOGLEVEL="$LOG_LEVEL"
+export TUNNEL_TRANSPORT_LOGLEVEL="$TRANSPORT_LOG_LEVEL"
+
+echo "Starting cloudflared tunnel (loglevel=$LOG_LEVEL, transport=$TRANSPORT_LOG_LEVEL)"
+
+exec cloudflared tunnel run --token "$CLOUDFLARE_TUNNEL_TOKEN"

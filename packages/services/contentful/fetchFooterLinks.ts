@@ -1,12 +1,14 @@
+import 'server-only';
+
 import {
   type RenderableLink,
   toRenderableLink,
 } from '@dg/content-models/contentful/renderables/links';
 import { footerLinksResponseSchema } from '@dg/content-models/contentful/schema/footer';
-import { isNotNullish } from '@dg/shared-core/helpers/typeguards';
+import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import { gql } from 'graphql-request';
 import { parseResponse } from '../clients/parseResponse';
-import { contentfulClient } from './contentfulClient';
+import { getContentfulClient } from './contentfulClient';
 
 /**
  * Grabs the contentful sections with the title of footer. Should
@@ -34,10 +36,14 @@ const QUERY = gql`
  * Fetches all our site footer blocks from the Contentful API.
  */
 export async function fetchFooterLinks(): Promise<Array<RenderableLink>> {
-  const data = parseResponse(footerLinksResponseSchema, await contentfulClient.request(QUERY), {
-    kind: 'graphql',
-    source: 'contentful.fetchFooterLinks',
-  });
+  const data = parseResponse(
+    footerLinksResponseSchema,
+    await getContentfulClient().request(QUERY),
+    {
+      kind: 'graphql',
+      source: 'contentful.fetchFooterLinks',
+    },
+  );
   const items =
     data.sectionCollection?.items?.flatMap((item) => item?.blocksCollection?.items ?? []) ?? [];
   return items.map(toRenderableLink).filter(isNotNullish);

@@ -1,0 +1,20 @@
+# Component File Naming
+
+Component files must be named after what they contain, not generic names.
+
+## Bad names
+
+- `shared.tsx` - doesn't describe contents
+- `utils.tsx` - too generic for components
+- `helpers.tsx` - doesn't describe what's exported
+- `common.tsx` - meaningless name
+
+## Good names
+
+- `StatusIndicators.tsx` - contains `StatusChip`, `ErrorMessage`
+- `OauthCard.tsx` - contains `OauthCard` component
+- `ActivityStats.tsx` - contains activity statistics components
+
+## Rule
+
+Name files after their primary export or a descriptive grouping of related components.

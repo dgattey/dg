@@ -1,5 +1,5 @@
 import type { Document } from '@contentful/rich-text-types';
-import { isNotNullish, isRecord } from '@dg/shared-core/helpers/typeguards';
+import { isNotNullish, isRecord } from '@dg/shared-core/types/typeguards';
 import type { Entry, RichTextContent } from '../schema/shared';
 import type { RenderableAssetWithSys } from './assets';
 import { toRenderableAssetWithSys } from './assets';

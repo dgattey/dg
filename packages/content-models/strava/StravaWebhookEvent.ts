@@ -73,9 +73,3 @@ export type StravaWebhookEvent = v.InferOutput<typeof stravaWebhookEventSchema>;
  */
 export const validateStravaWebhookEvent = (input: unknown) =>
   v.safeParse(stravaWebhookEventSchema, input);
-
-/**
- * Runtime check for webhook payloads.
- */
-export const isStravaWebhookEvent = (input: unknown): input is StravaWebhookEvent =>
-  validateStravaWebhookEvent(input).success;

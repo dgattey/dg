@@ -2,7 +2,7 @@ import { faLinkedinIn } from '@fortawesome/free-brands-svg-icons/faLinkedinIn';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import type { ButtonProps, LinkProps as MuiLinkProps } from '@mui/material';
-import { Box, Button, Link as MuiLink } from '@mui/material';
+import { Button, Link as MuiLink } from '@mui/material';
 import { Github, Instagram, Send } from 'lucide-react';
 import NextLink from 'next/link';
 import React from 'react';
@@ -10,8 +10,6 @@ import type { TooltipPlacement } from '../core/Tooltip';
 import { Tooltip } from '../core/Tooltip';
 import { FaIcon } from '../icons/FaIcon';
 import type { SxProps } from '../theme';
-
-export type LinkLayout = 'text' | 'icon' | 'iconText' | 'children';
 
 export type BaseLinkProps = {
   title?: string;
@@ -29,13 +27,12 @@ export type BaseLinkProps = {
   sx?: SxProps;
 
   /**
-   * Renders as a certain type of layout.
-   * 1. 'text' renders just plain text
-   * 2. 'icon' renders the icon with tooltip
-   * 3. 'iconText' renders the icon without a tooltip, next to text
-   * 4. 'children' renders just some children
+   * Controls how the link content is rendered.
+   * - 'text': renders just the title as plain text (default)
+   * - 'icon': renders the icon with a tooltip showing the title
+   * When `children` is provided, layout is ignored and children render directly.
    */
-  layout?: 'text' | 'icon' | 'iconText';
+  layout?: 'text' | 'icon';
 
   /**
    * Defaults to false, but can be set to true to add target="_blank" and
@@ -64,6 +61,14 @@ export type BaseLinkProps = {
    * - 'top': Shows above trigger (useful for footer links)
    */
   tooltipPlacement?: TooltipPlacement;
+
+  /**
+   * When true, renders a plain `<a>` tag instead of wrapping with NextLink.
+   * This forces a full page navigation (no prefetching, no client-side RSC
+   * navigation). Useful for links to auth-protected pages where client-side
+   * navigation would interfere with the auth flow.
+   */
+  forcePageNavigation?: boolean;
 };
 
 /**
@@ -85,82 +90,56 @@ const BUILT_IN_ICONS: Record<string, React.ReactNode> = {
 };
 
 /**
- * If there's an icon, returns it, either built in or not, along with its title if
- * the layout calls for it.
+ * Resolves the link layout and returns the rendered contents + whether
+ * the link should show a tooltip (icon-only links with a title).
  */
-export function createIconElement({
-  icon,
-  layout = 'text',
-}: Pick<BaseLinkProps, 'icon' | 'layout'>): React.ReactNode | null {
-  if (!icon || ['children', 'text'].includes(layout)) {
-    return null;
-  }
-  // biome-ignore lint/security/noDangerouslySetInnerHtml: This is intended
-  return BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />;
-}
-
-/**
- * Generates a layout enum for use in computing the contents.
- */
-export function resolveLinkLayout({
+function resolveContents({
   children,
   icon,
   layout = 'text',
   title,
-}: Pick<BaseLinkProps, 'children' | 'icon' | 'layout' | 'title'>): LinkLayout {
+}: Pick<BaseLinkProps, 'children' | 'icon' | 'layout' | 'title'>) {
   if (children) {
-    return 'children';
+    return { contents: children, showTooltip: false };
   }
-  if (layout === 'text' && title) {
-    return 'text';
+
+  const iconElement = icon
+    ? // biome-ignore lint/security/noDangerouslySetInnerHtml: Intended!
+      (BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />)
+    : null;
+
+  if (layout === 'icon' && iconElement) {
+    return { contents: iconElement, showTooltip: Boolean(title) };
   }
-  if (['icon', 'iconText'].includes(layout) && icon) {
-    return layout;
-  }
-  return 'text';
+  return { contents: title, showTooltip: false };
 }
 
 /**
- * Computes the rendered link contents for the given layout.
+ * Optionally wraps an element with a Tooltip (for icon-only links).
  */
-export function getLinkContents({
-  children,
-  icon,
-  layout,
-  title,
-}: Pick<BaseLinkProps, 'children' | 'icon' | 'title'> & { layout: LinkLayout }) {
-  switch (layout) {
-    case 'icon':
-      return createIconElement({ icon, layout });
-    case 'iconText':
-      return (
-        <>
-          {createIconElement({ icon, layout })}
-          <Box component="span" sx={{ ml: 0.5 }}>
-            {title}
-          </Box>
-        </>
-      );
-    case 'text':
-      return title;
-    case 'children':
-      return children;
+function wrapWithTooltip(
+  element: React.ReactElement,
+  showTooltip: boolean,
+  title?: string,
+  placement?: TooltipPlacement,
+) {
+  if (!showTooltip) {
+    return element;
   }
-}
-
-export function shouldUseTooltip(layout: LinkLayout, title?: string) {
-  return layout === 'icon' && Boolean(title);
+  return (
+    <Tooltip placement={placement} title={title}>
+      {element}
+    </Tooltip>
+  );
 }
 
 /**
  * Server-compatible Link component with Next.js navigation and MUI theming.
  *
- * Uses MuiLink for styling (theme colors, typography, underline) and wraps with
- * NextLink for internal navigation. This avoids the component={Function} pattern
- * that breaks RSC serialization.
- *
- * - Internal links: NextLink wraps MuiLink (prefetching + theming)
- * - External links: MuiLink with href (theming only, no prefetch needed)
+ * - Internal links: NextLink wraps MuiLink `<span>` (prefetching + client nav)
+ * - External links: MuiLink `<a>` with `target="_blank"` (no NextLink needed)
+ * - `forcePageNavigation`: MuiLink `<a>` without NextLink (full page load,
+ *   useful for auth-protected pages where client-side nav interferes)
  *
  * Supports icons, tooltips, and button variant.
  */
@@ -172,6 +151,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     children,
     isButton,
     isExternal,
+    forcePageNavigation,
     layout: initialLayout = 'text',
     sx,
     buttonProps,
@@ -182,86 +162,49 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
   },
   ref,
 ) {
-  const layout = resolveLinkLayout({ children, icon, layout: initialLayout, title });
-
   if (!href) {
     return null;
   }
 
-  const contents = getLinkContents({ children, icon, layout, title });
-  const useTooltip = shouldUseTooltip(layout, title);
-  const externalProps = isExternal ? { rel: 'noreferrer', target: '_blank' as const } : {};
+  const { contents, showTooltip } = resolveContents({
+    children,
+    icon,
+    layout: initialLayout,
+    title,
+  });
+  const anchorProps = {
+    'aria-label': title,
+    ref,
+    title: showTooltip ? undefined : title,
+  };
+  const externalProps = isExternal ? { rel: 'noreferrer' as const, target: '_blank' as const } : {};
+  const muiStyleProps = { color, sx, underline, variant };
+  const wrap = (el: React.ReactElement) =>
+    wrapWithTooltip(el, showTooltip, title, tooltipPlacement);
 
-  // Button variant uses MUI Button with href (renders as <a>)
   if (isButton) {
-    const buttonElement = (
-      <Button
-        {...buttonProps}
-        aria-label={title}
-        href={href}
-        {...externalProps}
-        ref={ref}
-        sx={sx}
-        title={useTooltip ? undefined : title}
-      >
+    return wrap(
+      <Button {...buttonProps} {...anchorProps} href={href} {...externalProps} sx={sx}>
         {contents}
-      </Button>
-    );
-
-    if (useTooltip) {
-      return (
-        <Tooltip placement={tooltipPlacement} title={title}>
-          {buttonElement}
-        </Tooltip>
-      );
-    }
-    return buttonElement;
-  }
-
-  // MuiLink provides theme integration (colors, typography, underline)
-  const muiLinkElement = isExternal ? (
-    <MuiLink
-      aria-label={title}
-      color={color}
-      href={href}
-      ref={ref}
-      sx={sx}
-      title={useTooltip ? undefined : title}
-      underline={underline}
-      variant={variant}
-      {...externalProps}
-    >
-      {contents}
-    </MuiLink>
-  ) : (
-    <MuiLink color={color} component="span" sx={sx} underline={underline} variant={variant}>
-      {contents}
-    </MuiLink>
-  );
-
-  // External links: MuiLink with href directly (no NextLink needed)
-  // Internal links: NextLink wraps MuiLink (no legacyBehavior)
-  const linkElement = isExternal ? (
-    muiLinkElement
-  ) : (
-    <NextLink
-      aria-label={title}
-      href={href}
-      ref={ref}
-      style={{ color: 'inherit', textDecoration: 'none' }}
-      title={useTooltip ? undefined : title}
-    >
-      {muiLinkElement}
-    </NextLink>
-  );
-
-  if (useTooltip) {
-    return (
-      <Tooltip placement={tooltipPlacement} title={title}>
-        {linkElement}
-      </Tooltip>
+      </Button>,
     );
   }
 
-  return linkElement;
+  // External links and forcePageNavigation: plain <a> via MuiLink
+  if (isExternal || forcePageNavigation) {
+    return wrap(
+      <MuiLink {...anchorProps} href={href} {...muiStyleProps} {...externalProps}>
+        {contents}
+      </MuiLink>,
+    );
+  }
+
+  // Internal links: NextLink <a> wrapping MuiLink <span> for client-side nav
+  return wrap(
+    <NextLink {...anchorProps} href={href} style={{ color: 'inherit', textDecoration: 'none' }}>
+      <MuiLink component="span" {...muiStyleProps}>
+        {contents}
+      </MuiLink>
+    </NextLink>,
+  );
 });

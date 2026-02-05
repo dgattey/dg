@@ -25,5 +25,7 @@
   "[jsonc]": {
     "editor.defaultFormatter": "biomejs.biome"
   },
-  "workbench.preferredDarkColorTheme": "Ayu Dark Bordered"
+  "workbench.preferredDarkColorTheme": "Nebula Oni (Cerberus)",
+  "workbench.preferredLightColorTheme": "Ayu Light Bordered",
+  "jest.jestCommandLine": "turbo test --"
 }

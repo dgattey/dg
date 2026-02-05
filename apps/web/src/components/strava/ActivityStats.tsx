@@ -1,5 +1,5 @@
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
-import { formattedDistance } from '@dg/shared-core/helpers/formattedDistance';
+import { formattedDistance } from '@dg/shared-core/formatting/formattedDistance';
 import { FaIcon } from '@dg/ui/icons/FaIcon';
 import type { SxObject } from '@dg/ui/theme';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';

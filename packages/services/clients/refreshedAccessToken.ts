@@ -1,29 +1,10 @@
 import 'server-only';
 import { db } from '@dg/db';
 import type { CreateTokenProps, FetchTokenProps } from '@dg/db/models/Token';
-import { log } from '@dg/shared-core/helpers/log';
-import { maskSecret } from './maskSecret';
-import type { RefreshTokenConfig } from './RefreshTokenConfig';
-
-const maskIfSensitive = (key: string, value: string) => {
-  const normalized = key.toLowerCase();
-  if (
-    normalized.includes('authorization') ||
-    normalized.includes('token') ||
-    normalized.includes('secret')
-  ) {
-    return maskSecret(value) ?? value;
-  }
-  return value;
-};
-
-const maskHeaders = (headers: Record<string, string>) =>
-  Object.fromEntries(
-    Object.entries(headers).map(([key, value]) => [key, maskIfSensitive(key, value)]),
-  );
-
-const maskBodyEntries = (entries: Array<[string, string]>) =>
-  entries.map(([key, value]) => [key, maskIfSensitive(key, value)]);
+import { assertHttpsEndpoint } from '@dg/shared-core/assertions/assertHttpsEndpoint';
+import { MissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
+import { log } from '@dg/shared-core/logging/log';
+import type { RefreshTokenConfig, ValidatedToken } from './RefreshTokenConfig';
 
 /**
  * Creates or updates a possibly-existing token given a unique name and
@@ -58,7 +39,7 @@ async function getLatestTokenIfValid({ name }: FetchTokenProps) {
   // Shouldn't happen unless invalid name, so it's a big error
   if (!token?.refreshToken) {
     log.error('Missing token', { name });
-    throw new TypeError('Missing token');
+    throw new MissingTokenError(name);
   }
 
   // Return either refresh + access, or just refresh if invalid
@@ -71,15 +52,17 @@ async function getLatestTokenIfValid({ name }: FetchTokenProps) {
  * When necessary, gets a new access token/refresh token from the API
  */
 async function fetchRefreshedTokenFromApi(
+  name: string,
   refreshTokenConfig: RefreshTokenConfig,
   refreshToken: string,
 ) {
   const { endpoint, headers, body, validate } = refreshTokenConfig;
+  assertHttpsEndpoint(endpoint);
   const encodedBody = new URLSearchParams(body(refreshToken));
   log.info('Fetching refreshed token from API', {
-    encodedBody: maskBodyEntries([...encodedBody]),
+    body: encodedBody,
     endpoint,
-    headers: maskHeaders(headers),
+    headers,
   });
 
   const rawData = await fetch(endpoint, {
@@ -89,16 +72,51 @@ async function fetchRefreshedTokenFromApi(
   });
   const data: unknown = await rawData.json();
   if (!rawData.ok) {
+    // Log only status, not response data which could contain sensitive info
     log.error('Failed to fetch refreshed token', {
-      data,
+      name,
       status: rawData.status,
     });
+    if ([400, 401, 403].includes(rawData.status)) {
+      throw new MissingTokenError(name);
+    }
     throw new TypeError('Token was not fetched properly');
   }
   log.info('Successfully refreshed token!', {
     status: rawData.status,
   });
   return validate(data, refreshToken);
+}
+
+/**
+ * Refreshes a token using the API and persists it to the database.
+ */
+async function refreshTokenAndPersist(
+  name: string,
+  refreshTokenConfig: RefreshTokenConfig,
+  refreshToken: string,
+): Promise<ValidatedToken> {
+  log.info('Fetching refreshed token', { name });
+  const {
+    refreshToken: newRefreshToken,
+    accessToken,
+    expiryAt,
+  } = await fetchRefreshedTokenFromApi(name, refreshTokenConfig, refreshToken);
+  log.info('Fetched refreshed token', { name });
+  await createOrUpdateToken({ accessToken, expiryAt, name, refreshToken: newRefreshToken });
+  log.info('Updated token in db, returning', { name });
+  return { accessToken, expiryAt, refreshToken: newRefreshToken };
+}
+
+/**
+ * Forces a token refresh and returns the updated token data.
+ */
+export async function forceRefreshTokenData(
+  name: string,
+  refreshTokenConfig: RefreshTokenConfig,
+): Promise<ValidatedToken> {
+  const currentData = await getLatestTokenIfValid({ name });
+  return await refreshTokenAndPersist(name, refreshTokenConfig, currentData.refreshToken);
 }
 
 /**
@@ -115,27 +133,20 @@ export async function refreshedAccessToken(
   forceRefresh?: boolean,
 ) {
   const currentData = await getLatestTokenIfValid({ name });
-  const maskedCurrentData = {
-    accessToken: maskSecret(currentData.accessToken),
-    refreshToken: maskSecret(currentData.refreshToken),
-  };
   log.info('Got latest token data', {
-    currentData: maskedCurrentData,
+    accessToken: currentData.accessToken,
     forceRefresh,
     name,
+    refreshToken: currentData.refreshToken,
   });
   if (currentData.accessToken && !forceRefresh) {
     return currentData.accessToken;
   }
 
-  // Grab a new token and save it
-  log.info('Fetching refreshed token', { name });
-  const { refreshToken, accessToken, expiryAt } = await fetchRefreshedTokenFromApi(
+  const { accessToken } = await refreshTokenAndPersist(
+    name,
     refreshTokenConfig,
     currentData.refreshToken,
   );
-  log.info('Fetched refreshed token', { name });
-  await createOrUpdateToken({ accessToken, expiryAt, name, refreshToken });
-  log.info('Updated token in db, returning', { name });
   return accessToken;
 }

@@ -12,7 +12,6 @@
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
     "@fortawesome/free-brands-svg-icons": "catalog:",
-    "@fortawesome/free-solid-svg-icons": "7.1.0",
     "@mui/material": "catalog:",
     "@mui/material-nextjs": "7.3.7",
     "@vercel/analytics": "1.6.1",
@@ -25,6 +24,8 @@
     "server-only": "catalog:"
   },
   "devDependencies": {
+    "@dg/db": "workspace:*",
+    "@dg/testing": "workspace:*",
     "@dg/tsconfig": "workspace:*",
     "@testing-library/dom": "catalog:",
     "@testing-library/jest-dom": "catalog:",
@@ -35,7 +36,7 @@
     "babel-plugin-react-compiler": "catalog:",
     "jest": "catalog:",
     "jest-environment-jsdom": "catalog:",
-    "ts-node": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:"
   },
   "name": "@dg/web",
@@ -48,8 +49,7 @@
     "check:ci": "biome ci .",
     "check:types": "tsc",
     "clean": "rm -rf .next .turbo *.tsbuildinfo",
-    "dev": "VERCEL_GIT_COMMIT_SHA=$(git rev-parse HEAD) next dev --turbopack",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "dev": "next dev --turbopack",
+    "test": "jest"
   }
 }

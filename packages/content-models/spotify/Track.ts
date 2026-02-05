@@ -88,9 +88,9 @@ export const trackApiSchema = v.looseObject({
   relativePlayedAt: v.optional(v.nullable(v.string())),
 });
 
-export type ArtistApi = v.InferOutput<typeof referenceApiSchema>;
-export type AlbumApi = v.InferOutput<typeof albumApiSchema>;
-export type TrackApi = v.InferOutput<typeof trackApiSchema>;
+type ArtistApi = v.InferOutput<typeof referenceApiSchema>;
+type AlbumApi = v.InferOutput<typeof albumApiSchema>;
+type TrackApi = v.InferOutput<typeof trackApiSchema>;
 
 type ExternalUrls = {
   spotify: string;

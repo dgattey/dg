@@ -1,0 +1,65 @@
+---
+description: Type safety and runtime assertions
+globs: "**/*.{ts,tsx}"
+alwaysApply: false
+---
+
+# Type safety and runtime assertions
+
+## Avoid TypeScript assertions
+
+- Avoid `as`, `<Type>`, and `!` to silence errors.
+- Prefer proper typing, type guards, and nullish handling.
+- Allow only with runtime validation or broken external types; add a comment.
+
+```ts
+// bad
+const value = data as Foo;
+const item = items.find((x) => x.id === id)!;
+
+// good
+if (isFoo(data)) {}
+const item = items.find((x) => x.id === id) ?? fallback;
+```
+
+## Use invariant for runtime assertions
+
+Use `invariant` from `@dg/shared-core/helpers/invariant` instead of manually throwing errors for conditions that must be true.
+
+### Benefits
+
+- Acts as a TypeScript type guard (`asserts condition`)
+- Strips error messages in production for smaller bundles
+- Consistent pattern across the codebase
+
+### Examples
+
+```ts
+// bad - manual throw
+if (!nodeEnv || !isValidEnv(nodeEnv)) {
+  throw new Error(`Invalid NODE_ENV: ${nodeEnv}`);
+}
+
+// good - use invariant
+invariant(nodeEnv && isValidEnv(nodeEnv), `Invalid NODE_ENV: ${nodeEnv}`);
+```
+
+```ts
+// bad - checking and throwing separately
+const user = await getUser(id);
+if (!user) {
+  throw new Error('User not found');
+}
+
+// good - invariant narrows the type
+const user = await getUser(id);
+invariant(user, 'User not found');
+// TypeScript now knows user is defined
+```
+
+### When to use
+
+- Environment variable validation
+- Required configuration checks
+- Impossible states that indicate bugs
+- Any condition that must be true for code to proceed

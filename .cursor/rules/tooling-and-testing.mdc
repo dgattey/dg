@@ -1,0 +1,75 @@
+---
+description: Tooling, verification, and test conventions
+alwaysApply: true
+---
+
+# Tooling and verification
+
+## Turbo usage and task scoping
+
+- Prefer `turbo <task>` for all workspace scripts (do not run `pnpm <script>`).
+- Use `pnpm` only for dependency changes.
+- Use `turbo test` for unit tests.
+
+- Define workspace-specific tasks in that workspace's `package.json`.
+- Declare the task in `turbo.json` and let Turbo's graph run it for any workspace
+  that exposes the task.
+- Wire cross-workspace ordering by adding the task to `dependsOn` rather than
+  composing longer shell commands in `package.json`.
+
+Example:
+
+```sh
+# Good: let Turbo discover migrate in @dg/db via graph
+turbo dev
+
+# In turbo.json, dev depends on migrate, and only @dg/db defines migrate
+```
+
+## Quality checks
+
+- At logical checkpoints run `turbo check`, `turbo check:types`, and `turbo test`.
+  - Always at end of task/session; also after larger changes or deps.
+  - Skip tiny tweaks unless they affect types or behavior.
+- Filters by scope:
+  - root/config: no filter or `--filter=dg`
+  - `apps/<app>`: `--filter=@dg/<app>`
+  - `packages/<pkg>`: `--filter=@dg/<pkg>`
+  - multiple: multiple `--filter`
+- When making wide-ranging changes that impact many workspaces, consider skipping the filter to do full workspace checks for completeness
+- Skip shell scripts (`scripts/*`).
+- Fix issues and re-run until all pass.
+
+## Next.js dev server and verification
+
+- For verification that needs the app, run `turbo dev`.
+- Use port 3000; reuse an existing server if responsive; restart only if MCP calls fail.
+- If you started the server, stop it when done; otherwise leave it running.
+- Use Next DevTools MCP for server/runtime errors and browser MCP for client console.
+
+### Error checks
+
+1. `nextjs_index` on port 3000, then `nextjs_call` with `toolName="get_errors"`.
+2. `browser_navigate` to the page, then `browser_console_messages`; fix new errors/warnings.
+
+## Prefer tsx for TypeScript runners
+
+- Use `tsx` whenever a TypeScript runner is needed.
+- Avoid `ts-node` or other TS runners in this repo.
+
+Example:
+
+```sh
+# Do this
+tsx ./scripts/my-script.ts
+
+# Avoid this
+ts-node ./scripts/my-script.ts
+```
+
+## Testing conventions
+
+- Tests live in `__tests__` next to source and match basenames.
+- Use `@testing-library/user-event` (`const user = userEvent.setup()`).
+- Avoid `fireEvent` unless needed.
+- Keep Jest setup minimal; prefer per-test setup.

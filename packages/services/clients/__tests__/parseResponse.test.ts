@@ -1,4 +1,4 @@
-import { log } from '@dg/shared-core/helpers/log';
+import { log } from '@dg/shared-core/logging/log';
 import * as v from 'valibot';
 import { parseResponse } from '../parseResponse';
 

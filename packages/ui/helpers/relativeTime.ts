@@ -1,3 +1,5 @@
+import { capitalize } from '@dg/shared-core/formatting/capitalize';
+
 type DateConstructorValue = Date | string | number | null | undefined;
 
 type RelativeTime = {
@@ -107,5 +109,5 @@ export const formatRelativeTime = ({
   const elapsedMs = fromNumeric - toNumeric;
   const relativeTime = relativeTimeFromMs(elapsedMs, relativeTimeFormatter);
   const formattedValue = overriddenFormatString(relativeTime) ?? relativeTime.formatted;
-  return formattedValue.charAt(0).toUpperCase() + formattedValue.slice(1);
+  return capitalize(formattedValue);
 };

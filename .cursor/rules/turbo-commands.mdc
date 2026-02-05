@@ -1,9 +1,0 @@
----
-description: Use Turbo for workspace scripts
-alwaysApply: true
----
-# Turbo Commands
-
-- Use `turbo <task>` for workspace scripts; add `--filter=<pkg>` when scoped.
-- Use `pnpm` only for dependency changes.
-- Use `turbo test` for unit tests.

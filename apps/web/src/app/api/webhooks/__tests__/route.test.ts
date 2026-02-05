@@ -1,18 +1,26 @@
 /**
  * @jest-environment node
  */
-import { log } from '@dg/shared-core/helpers/log';
+import { log } from '@dg/shared-core/logging/log';
+import { webhooksRoute } from '@dg/shared-core/routes/api';
 import { NextRequest } from 'next/server';
 import { GET, POST } from '../route';
 
+// Test subscription ID that will be considered valid
+const VALID_SUBSCRIPTION_ID = 254710;
+
 // Mock all the service functions before importing the route
-jest.mock('../../../../services/strava', () => ({
+jest.mock('@dg/services/strava/echoStravaChallengeIfValid', () => ({
   echoStravaChallengeIfValid: jest.fn(),
-  exchangeCodeForToken: jest.fn(),
-  getOauthTokenInitLink: jest.fn(),
-  getStravaExchangeCodeForTokenRequest: jest.fn(),
-  maskSecret: jest.fn((s: string) => `${s.slice(0, 3)}...`),
+}));
+
+jest.mock('@dg/services/strava/syncStravaWebhookUpdateWithDb', () => ({
   syncStravaWebhookUpdateWithDb: jest.fn(),
+}));
+
+jest.mock('@dg/services/strava/webhooks/isValidSubscriptionId', () => ({
+  // Return false by default, tests will mock specific values
+  isValidSubscriptionId: jest.fn().mockResolvedValue(false),
 }));
 
 // Mock revalidateTag
@@ -20,21 +28,24 @@ jest.mock('next/cache', () => ({
   revalidateTag: jest.fn(),
 }));
 
-import { revalidateTag } from 'next/cache';
 // Get typed references to the mocked functions
-import * as stravaService from '../../../../services/strava';
+import * as stravaChallenge from '@dg/services/strava/echoStravaChallengeIfValid';
+import * as stravaSync from '@dg/services/strava/syncStravaWebhookUpdateWithDb';
+import * as stravaWebhooks from '@dg/services/strava/webhooks/isValidSubscriptionId';
+import { revalidateTag } from 'next/cache';
 
-const mockSyncWebhook = stravaService.syncStravaWebhookUpdateWithDb as jest.Mock;
-const mockEchoChallenge = stravaService.echoStravaChallengeIfValid as jest.Mock;
-const mockGetExchangeCode = stravaService.getStravaExchangeCodeForTokenRequest as jest.Mock;
-const mockExchangeCode = stravaService.exchangeCodeForToken as jest.Mock;
-const mockRevalidateTag = revalidateTag as jest.Mock;
+const mockSyncWebhook = jest.mocked(stravaSync.syncStravaWebhookUpdateWithDb);
+const mockEchoChallenge = jest.mocked(stravaChallenge.echoStravaChallengeIfValid);
+const mockIsValidSubscriptionId = jest.mocked(stravaWebhooks.isValidSubscriptionId);
+const mockRevalidateTag = jest.mocked(revalidateTag);
 
 describe('Webhook Route', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     jest.spyOn(log, 'info').mockImplementation(() => undefined);
     jest.spyOn(log, 'error').mockImplementation(() => undefined);
+    // Reset the mock to return true for valid subscription ID by default
+    mockIsValidSubscriptionId.mockResolvedValue(true);
   });
 
   afterEach(() => {
@@ -43,7 +54,7 @@ describe('Webhook Route', () => {
 
   describe('POST handler', () => {
     const createRequest = (body: unknown): NextRequest => {
-      const request = new NextRequest('https://example.com/api/webhooks', {
+      const request = new NextRequest(`https://example.com${webhooksRoute}`, {
         body: JSON.stringify(body),
         headers: { 'Content-Type': 'application/json' },
         method: 'POST',
@@ -97,6 +108,7 @@ describe('Webhook Route', () => {
           aspect_type: 'delete',
           object_id: 17234236452,
           object_type: 'activity',
+          subscription_id: VALID_SUBSCRIPTION_ID,
         };
 
         const response = await POST(createRequest(body));
@@ -112,6 +124,7 @@ describe('Webhook Route', () => {
           aspect_type: 'update',
           object_id: 17469310,
           object_type: 'athlete',
+          subscription_id: VALID_SUBSCRIPTION_ID,
           updates: { authorized: 'false' },
         };
 
@@ -122,9 +135,41 @@ describe('Webhook Route', () => {
       });
     });
 
+    describe('subscription verification', () => {
+      it('returns 400 when subscription_id is missing', async () => {
+        const body = {
+          aspect_type: 'create',
+          object_id: 12345,
+          object_type: 'activity',
+          // No subscription_id
+        };
+
+        const response = await POST(createRequest(body));
+
+        expect(response.status).toBe(400);
+      });
+
+      it('returns 403 for unknown subscription_id', async () => {
+        mockIsValidSubscriptionId.mockResolvedValue(false);
+
+        const body = {
+          aspect_type: 'create',
+          object_id: 12345,
+          object_type: 'activity',
+          subscription_id: 999999, // Unknown subscription ID
+        };
+
+        const response = await POST(createRequest(body));
+
+        expect(response.status).toBe(403);
+        const json = await response.json();
+        expect(json.error).toBe('Forbidden');
+      });
+    });
+
     describe('error handling', () => {
       it('returns 400 for invalid JSON body', async () => {
-        const request = new NextRequest('https://example.com/api/webhooks', {
+        const request = new NextRequest(`https://example.com${webhooksRoute}`, {
           body: 'not json',
           headers: { 'Content-Type': 'application/json' },
           method: 'POST',
@@ -137,22 +182,33 @@ describe('Webhook Route', () => {
         expect(json.error).toBe('Bad Request');
       });
 
-      it('returns 400 for invalid webhook payload', async () => {
+      it('returns 204 for non-strava webhook payloads', async () => {
         const body = {
           invalid: 'payload',
         };
 
         const response = await POST(createRequest(body));
 
-        expect(response.status).toBe(400);
-        const json = await response.json();
-        expect(json.error).toBe('Bad Request');
+        expect(response.status).toBe(204);
       });
 
       it('returns 400 for missing required fields', async () => {
         const body = {
           aspect_type: 'create',
           // missing object_id and object_type
+        };
+
+        const response = await POST(createRequest(body));
+
+        expect(response.status).toBe(400);
+      });
+
+      it('returns 400 for invalid Strava payloads', async () => {
+        const body = {
+          aspect_type: 'create',
+          object_id: 'not-a-number',
+          object_type: 'activity',
+          subscription_id: VALID_SUBSCRIPTION_ID,
         };
 
         const response = await POST(createRequest(body));
@@ -167,6 +223,7 @@ describe('Webhook Route', () => {
           aspect_type: 'update',
           object_id: 17234236452,
           object_type: 'activity',
+          subscription_id: VALID_SUBSCRIPTION_ID,
           updates: { title: 'Test' },
         };
 
@@ -188,6 +245,7 @@ describe('Webhook Route', () => {
           aspect_type: 'update',
           object_id: 17234236452,
           object_type: 'activity',
+          subscription_id: VALID_SUBSCRIPTION_ID,
         };
 
         const response = await POST(createRequest(body));
@@ -197,26 +255,12 @@ describe('Webhook Route', () => {
     });
 
     describe('validation edge cases', () => {
-      it('accepts valid aspect_type values', async () => {
-        mockSyncWebhook.mockResolvedValue(undefined);
-
-        for (const aspectType of ['create', 'update', 'delete']) {
-          const body = {
-            aspect_type: aspectType,
-            object_id: 12345,
-            object_type: 'activity',
-          };
-
-          const response = await POST(createRequest(body));
-          expect(response.status).toBe(200);
-        }
-      });
-
       it('rejects invalid aspect_type values', async () => {
         const body = {
           aspect_type: 'invalid',
           object_id: 12345,
           object_type: 'activity',
+          subscription_id: VALID_SUBSCRIPTION_ID,
         };
 
         const response = await POST(createRequest(body));
@@ -228,6 +272,7 @@ describe('Webhook Route', () => {
           aspect_type: 'create',
           object_id: 12345,
           object_type: 'unknown',
+          subscription_id: VALID_SUBSCRIPTION_ID,
         };
 
         const response = await POST(createRequest(body));
@@ -238,7 +283,7 @@ describe('Webhook Route', () => {
 
   describe('GET handler', () => {
     const createGetRequest = (params: Record<string, string>): NextRequest => {
-      const url = new URL('https://example.com/api/webhooks');
+      const url = new URL(`https://example.com${webhooksRoute}`);
       for (const [key, value] of Object.entries(params)) {
         url.searchParams.set(key, value);
       }
@@ -247,7 +292,6 @@ describe('Webhook Route', () => {
 
     describe('challenge verification', () => {
       it('returns challenge response for valid verification request', async () => {
-        mockGetExchangeCode.mockReturnValue(null);
         mockEchoChallenge.mockReturnValue({ 'hub.challenge': 'abc123' });
 
         const request = createGetRequest({
@@ -264,7 +308,6 @@ describe('Webhook Route', () => {
       });
 
       it('returns 400 for invalid challenge', async () => {
-        mockGetExchangeCode.mockReturnValue(null);
         mockEchoChallenge.mockImplementation(() => {
           throw new Error('Invalid challenge');
         });
@@ -281,44 +324,13 @@ describe('Webhook Route', () => {
       });
     });
 
-    describe('token exchange', () => {
-      it('exchanges code for token and returns HTML', async () => {
-        mockGetExchangeCode.mockReturnValue('auth_code_123');
-        mockExchangeCode.mockResolvedValue('<html>Success</html>');
-
-        const request = createGetRequest({ code: 'auth_code_123' });
-
-        const response = await GET(request);
-
-        expect(response.status).toBe(200);
-        expect(response.headers.get('Content-Type')).toBe('text/html');
-        expect(mockExchangeCode).toHaveBeenCalledWith('auth_code_123');
-      });
-
-      it('returns 500 when token exchange fails', async () => {
-        mockGetExchangeCode.mockReturnValue('auth_code_123');
-        mockExchangeCode.mockRejectedValue(new Error('Exchange failed'));
-
-        const request = createGetRequest({ code: 'auth_code_123' });
-
-        const response = await GET(request);
-
-        expect(response.status).toBe(500);
-        const json = await response.json();
-        expect(json.error).toBe('Could not generate oauth token');
-      });
-    });
-
     describe('invalid requests', () => {
-      it('returns 400 for requests without valid params', async () => {
-        mockGetExchangeCode.mockReturnValue(null);
-        mockEchoChallenge.mockReturnValue(null);
-
+      it('returns 204 for requests without Strava params', async () => {
         const request = createGetRequest({});
 
         const response = await GET(request);
 
-        expect(response.status).toBe(400);
+        expect(response.status).toBe(204);
       });
     });
   });

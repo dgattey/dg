@@ -1,6 +1,7 @@
 import 'server-only';
-import { invariant } from '@dg/shared-core/helpers/invariant';
+import { invariant } from '@dg/shared-core/assertions/invariant';
 import { createClient } from '../clients/authenticatedRestClient';
+import type { RefreshTokenConfig } from '../clients/RefreshTokenConfig';
 
 /**
  * This is what Strava's refresh token API returns, as raw data
@@ -13,18 +14,15 @@ type RawStravaRefreshToken = {
   expires_in: number;
 };
 
-const { STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET, STRAVA_TOKEN_NAME } = process.env;
-invariant(STRAVA_TOKEN_NAME, 'Missing Strava token name (used as access key)');
-invariant(STRAVA_CLIENT_ID, 'Missing Strava client id');
-invariant(STRAVA_CLIENT_SECRET, 'Missing Strava client secret');
-
 /**
- * A REST client set up to make authed calls to Strava
+ * Builds the refresh token config for Strava, validating required env vars.
  */
-export const stravaClient = createClient({
-  accessKey: STRAVA_TOKEN_NAME,
-  endpoint: 'https://www.strava.com/api/v3/',
-  refreshTokenConfig: {
+export function getStravaRefreshTokenConfig(): RefreshTokenConfig {
+  const { STRAVA_CLIENT_ID, STRAVA_CLIENT_SECRET } = process.env;
+  invariant(STRAVA_CLIENT_ID, 'Missing Strava client id');
+  invariant(STRAVA_CLIENT_SECRET, 'Missing Strava client secret');
+
+  return {
     body: (refreshToken) => ({
       client_id: STRAVA_CLIENT_ID,
       client_secret: STRAVA_CLIENT_SECRET,
@@ -38,8 +36,23 @@ export const stravaClient = createClient({
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     validate: validateRawDataToToken,
-  },
-});
+  };
+}
+
+let _stravaClient: ReturnType<typeof createClient> | undefined;
+
+/**
+ * A REST client set up to make authed calls to Strava.
+ * Lazily initialized so importing this module doesn't require env vars at load time.
+ */
+export function getStravaClient() {
+  _stravaClient ??= createClient({
+    accessKey: 'strava',
+    endpoint: 'https://www.strava.com/api/v3/',
+    refreshTokenConfig: getStravaRefreshTokenConfig(),
+  });
+  return _stravaClient;
+}
 
 /**
  * Parses raw data to a token/access token from expected data

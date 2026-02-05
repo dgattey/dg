@@ -1,0 +1,113 @@
+---
+description: Code organization and UI style conventions
+alwaysApply: true
+---
+
+# Code organization and style
+
+## Component file naming
+
+Component files must be named after what they contain, not generic names.
+
+### Bad names
+
+- `shared.tsx` - doesn't describe contents
+- `utils.tsx` - too generic for components
+- `helpers.tsx` - doesn't describe what's exported
+- `common.tsx` - meaningless name
+
+### Good names
+
+- `StatusIndicators.tsx` - contains `StatusChip`, `ErrorMessage`
+- `OauthCard.tsx` - contains `OauthCard` component
+- `ActivityStats.tsx` - contains activity statistics components
+
+### Rule
+
+Name files after their primary export or a descriptive grouping of related components.
+
+## Avoid section header dividers
+
+- Do not add separator blocks like `// ---------` with section titles.
+- Keep code organized through file structure, naming, and doc comments instead.
+- Use comments only when they add meaning beyond what the code already says.
+
+## Sentence case UI headings
+
+- Use sentence case for all UI headings (h1-h6, section titles, card headers).
+- Capitalize only the first word and proper nouns/acronyms.
+- Avoid Title Case.
+
+### Examples
+
+Good: OAuth connections
+Good: Strava webhooks
+Bad: OAuth Connections
+Bad: Strava Webhooks
+
+## Re-exports
+
+Don't re-export items unless package boundaries require it.
+
+### When NOT to re-export
+
+- Components re-exporting other components for sibling files
+- Utilities re-exporting utilities from the same package
+- Any re-export that could be a direct import instead
+- App-layer type re-exports (import types directly from their source)
+
+```ts
+// Bad - unnecessary re-export
+// components/Button.tsx
+export { Icon } from './Icon';
+
+// Bad - re-exporting across app layer unnecessarily
+// apps/web/src/components/index.ts
+export { SomeComponent } from './SomeComponent';
+
+// Bad - app layer type re-export
+export type { WebhookSubscription } from '@dg/services/...';
+
+// Good - import type directly
+import type { OauthProviderKey } from '@dg/shared-core/routes/api';
+```
+
+### When to re-export
+
+Only re-export when package boundaries prevent direct imports:
+
+```ts
+// Good - services re-export db types (apps can't import @dg/db)
+// packages/services/oauth/types.ts
+export type { Token } from '@dg/db';
+
+// Good - app services layer wrapping package services
+// apps/web/src/services/strava.ts
+export { getStravaActivity } from '@dg/services/strava/getStravaActivity';
+```
+
+## No manual memoization
+
+React Compiler is enabled (`reactCompiler: true` in `next.config.ts`), so manual memoization is unnecessary.
+
+### Don't use
+
+- `useCallback` - compiler handles function memoization
+- `useMemo` - compiler handles value memoization
+- `React.memo` - compiler handles component memoization
+
+### Instead
+
+Write plain functions and values. The compiler automatically optimizes re-renders.
+
+```tsx
+// Bad - unnecessary with React Compiler
+const handleClick = useCallback(() => {
+  doSomething();
+}, []);
+
+// Good - compiler handles this
+const handleClick = () => {
+  doSomething();
+};
+```

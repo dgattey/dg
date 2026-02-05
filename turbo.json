@@ -1,36 +1,41 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [
-    "config/database.config.js",
-    "config/env.defaults",
     "config/env.secrets.keys",
     "scripts/generate-env",
     ".node-version",
     ".npmrc",
-    ".sequelizerc",
     "biome.json",
-    "next.config.js",
     "tsconfig.json"
-  ],
-  "globalEnv": [
-    "CONTENTFUL_ACCESS_TOKEN",
-    "CONTENTFUL_SPACE_ID",
-    "DATABASE_URL",
-    "LOGTAIL_SOURCE_TOKEN",
-    "LOGTAIL_URL",
-    "NEXT_PUBLIC_MAPBOX_TOKEN",
-    "SPOTIFY_CLIENT_ID",
-    "SPOTIFY_CLIENT_SECRET",
-    "STRAVA_CLIENT_ID",
-    "STRAVA_CLIENT_SECRET",
-    "STRAVA_TOKEN_NAME",
-    "STRAVA_VERIFY_TOKEN",
-    "WEBHOOK_CALLBACK_URL"
   ],
   "tasks": {
     "build": {
-      "dependsOn": ["^build", "topo", "check", "check:types"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "dependsOn": ["^build", "^migrate", "topo", "check", "check:types"],
+      "env": [
+        "CONTENTFUL_ACCESS_TOKEN",
+        "CONTENTFUL_SPACE_ID",
+        "DATABASE_URL",
+        "NEXT_PUBLIC_MAPBOX_TOKEN",
+        "OAUTH_CALLBACK_URL",
+        "SPOTIFY_CLIENT_ID",
+        "STRAVA_CLIENT_ID",
+        "STRAVA_CLIENT_SECRET",
+        "STRAVA_VERIFY_TOKEN",
+        "STRAVA_WEBHOOK_CALLBACK_URL"
+      ],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        "packages/db/database.config.mts",
+        "packages/db/.sequelizerc",
+        "apps/web/next.config.ts"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "!.next/dev/**",
+        "!.next/diagnostics/**",
+        "!.next/node_modules/**"
+      ]
     },
     "build:analyze": {
       "dependsOn": ["^build", "topo"],
@@ -42,53 +47,87 @@
     },
     "check": {
       "dependsOn": ["topo"],
+      "inputs": ["$TURBO_DEFAULT$", "!.cursor/**", "!.github/**", "!.vscode/**"],
       "outputLogs": "new-only",
       "outputs": []
     },
     "check:ci": {
       "dependsOn": ["topo"],
+      "inputs": ["$TURBO_DEFAULT$", "!.cursor/**", "!.github/**", "!.vscode/**"],
       "outputLogs": "new-only",
       "outputs": []
     },
     "check:types": {
       "dependsOn": ["topo"],
+      "inputs": ["$TURBO_DEFAULT$", "!.cursor/**", "!.github/**", "!.vscode/**"],
       "outputLogs": "new-only",
       "outputs": []
     },
     "clean": {
       "cache": false
     },
-    "connect": {
-      "cache": false,
-      "inputs": ["apps/**/*", "packages/**/*"],
-      "persistent": true
-    },
     "db": {
       "cache": false
     },
     "dev": {
       "cache": false,
-      "dependsOn": ["dg#dev", "topo"],
+      "dependsOn": ["dg#env", "topo", "migrate"],
+      "env": [
+        "CLOUDFLARE_TUNNEL_TOKEN",
+        "CONTENTFUL_ACCESS_TOKEN",
+        "CONTENTFUL_SPACE_ID",
+        "DATABASE_URL",
+        "LOGTAIL_SOURCE_TOKEN",
+        "LOGTAIL_URL",
+        "NEXT_PUBLIC_MAPBOX_TOKEN",
+        "OAUTH_CALLBACK_URL",
+        "SPOTIFY_CLIENT_ID",
+        "STRAVA_CLIENT_ID",
+        "STRAVA_CLIENT_SECRET",
+        "STRAVA_VERIFY_TOKEN",
+        "STRAVA_WEBHOOK_CALLBACK_URL"
+      ],
       "inputs": ["apps/**/*", "packages/**/*"],
       "persistent": true
     },
     "dg#dev": {
+      "cache": false,
+      "dependsOn": ["dg#env"],
+      "persistent": true
+    },
+    "dg#env": {
       "cache": false
     },
     "graphql:schema": {
       "cache": false
     },
+    "migrate": {
+      "cache": false,
+      "dependsOn": ["dg#env", "topo"],
+      "env": ["DATABASE_URL"],
+      "inputs": ["$TURBO_DEFAULT$", "packages/db/database.config.mts", "packages/db/.sequelizerc"]
+    },
+    "migrate:generate": {
+      "cache": false,
+      "dependsOn": ["dg#env", "topo"]
+    },
+    "migrate:status": {
+      "cache": false,
+      "dependsOn": ["dg#env", "topo"]
+    },
+    "migrate:undo": {
+      "cache": false,
+      "dependsOn": ["dg#env", "topo"]
+    },
     "test": {
       "dependsOn": ["topo"],
-      "inputs": ["$TURBO_DEFAULT$", "../../packages/**", "!**/*.md", "!**/*.mdx"],
+      "env": ["DATABASE_URL_TEST"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!**/*.mdx"],
       "outputLogs": "new-only",
       "outputs": []
     },
     "topo": {
       "dependsOn": ["^topo"]
-    },
-    "webhook": {
-      "cache": false
     }
   }
 }

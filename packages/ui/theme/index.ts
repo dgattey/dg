@@ -113,8 +113,19 @@ export function getTheme(): Theme {
         styleOverrides: {
           root: ({ theme }) => ({
             borderRadius: theme.spacing(1),
-            padding: theme.spacing(0.75, 2),
             textTransform: 'initial',
+          }),
+          sizeLarge: ({ theme }) => ({
+            fontSize: theme.typography.pxToRem(13),
+            padding: theme.spacing(1, 2.5),
+          }),
+          sizeMedium: ({ theme }) => ({
+            fontSize: theme.typography.pxToRem(12),
+            padding: theme.spacing(0.75, 2),
+          }),
+          sizeSmall: ({ theme }) => ({
+            fontSize: theme.typography.pxToRem(11),
+            padding: theme.spacing(0.5, 1.5),
           }),
         },
       },
@@ -128,6 +139,22 @@ export function getTheme(): Theme {
             borderWidth: 'thin',
             boxShadow: theme.vars.extraShadows.card.main,
           }),
+        },
+      },
+      MuiChip: {
+        defaultProps: {
+          size: 'medium',
+          variant: 'outlined',
+        },
+        styleOverrides: {
+          sizeMedium: {
+            fontSize: '0.9rem',
+            height: 28,
+          },
+          sizeSmall: {
+            fontSize: '0.7rem',
+            height: 20,
+          },
         },
       },
       MuiContainer: {
@@ -203,6 +230,15 @@ export function getTheme(): Theme {
               transition: theme.transitions.create('color'),
             };
           },
+        },
+      },
+      MuiSkeleton: {
+        styleOverrides: {
+          root: ({ theme }) => ({
+            '&.MuiSkeleton-rounded': {
+              borderRadius: theme.spacing(1),
+            },
+          }),
         },
       },
       MuiTooltip: {

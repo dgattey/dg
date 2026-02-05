@@ -1,8 +1,8 @@
 const { resolve } = require('path');
 
 module.exports = {
-  config: resolve('database.config.js'),
-  migrationsPath: resolve('migrations'),
-  modelsPath: resolve('models'),
-  seedersPath: resolve('seeders'),
+  config: resolve('database.config.mts'),
+  'migrations-path': resolve('migrations'),
+  'models-path': resolve('models'),
+  'seeders-path': resolve('seeders'),
 };

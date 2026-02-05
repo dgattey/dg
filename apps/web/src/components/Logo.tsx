@@ -1,5 +1,6 @@
 'use client';
 
+import { homeRoute } from '@dg/shared-core/routes/app';
 import { GlassContainer } from '@dg/ui/core/GlassContainer';
 import { ScrollIndicatorContext } from '@dg/ui/core/ScrollIndicatorContext';
 import { Link } from '@dg/ui/dependent/Link';
@@ -110,7 +111,7 @@ function LogoContent() {
     window.scrollTo({ behavior: 'smooth', top: 0 });
   };
 
-  if (pathname === '/') {
+  if (pathname === homeRoute) {
     return (
       <Button disableRipple={true} onClick={scrollToTop} sx={logoButtonSx}>
         dg.
@@ -119,7 +120,7 @@ function LogoContent() {
   }
 
   return (
-    <Link href="/" sx={logoLinkMergedSx}>
+    <Link href={homeRoute} sx={logoLinkMergedSx}>
       dg.
     </Link>
   );

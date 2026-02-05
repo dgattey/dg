@@ -1,31 +1,23 @@
 import type { StravaWebhookEvent } from '@dg/content-models/strava/StravaWebhookEvent';
-import { db } from '@dg/db';
-import { log } from '@dg/shared-core/helpers/log';
-import * as stravaClientModule from '../stravaClient';
-import { syncStravaWebhookUpdateWithDb } from '../syncStravaWebhookUpdateWithDb';
+import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
+import { setupMockLifecycle } from '@dg/testing/mocks';
 
-// Mock external boundaries only
-jest.mock('@dg/db', () => ({
-  db: {
-    StravaActivity: {
-      destroy: jest.fn(),
-      findOne: jest.fn(),
-      upsert: jest.fn(),
-    },
-  },
-}));
+const mockStravaGet = jest.fn<
+  Promise<{ response: { json: () => Promise<unknown> }; status: number }>,
+  [string]
+>();
 
 jest.mock('../stravaClient', () => ({
-  stravaClient: {
-    get: jest.fn(),
-  },
+  getStravaClient: () => ({
+    get: mockStravaGet,
+  }),
 }));
 
 describe('syncStravaWebhookUpdateWithDb', () => {
-  const mockFindOne = db.StravaActivity.findOne as jest.Mock;
-  const mockUpsert = db.StravaActivity.upsert as jest.Mock;
-  const mockDestroy = db.StravaActivity.destroy as jest.Mock;
-  const mockStravaGet = stravaClientModule.stravaClient.get as jest.Mock;
+  const db = setupTestDatabase();
+  setupMockLifecycle();
+
+  let syncStravaWebhookUpdateWithDb: typeof import('../syncStravaWebhookUpdateWithDb').syncStravaWebhookUpdateWithDb;
 
   // Real Strava API response format (snake_case) - this flows through real mapping code
   const stravaApiResponse = {
@@ -45,21 +37,22 @@ describe('syncStravaWebhookUpdateWithDb', () => {
     type: 'Ride',
   };
 
-  beforeEach(() => {
-    jest.clearAllMocks();
-    jest.spyOn(log, 'info').mockImplementation(() => undefined);
-    jest.spyOn(log, 'error').mockImplementation(() => undefined);
+  const existingActivityData = {
+    id: 17234236452,
+    name: 'Existing Activity',
+    type: 'Ride',
+    url: 'https://www.strava.com/activities/17234236452',
+  };
 
-    mockFindOne.mockResolvedValue(null);
-    mockUpsert.mockResolvedValue([{ id: 17234236452 }, true]);
+  beforeAll(async () => {
+    ({ syncStravaWebhookUpdateWithDb } = await import('../syncStravaWebhookUpdateWithDb'));
+  });
+
+  beforeEach(() => {
     mockStravaGet.mockResolvedValue({
       response: { json: async () => stravaApiResponse },
       status: 200,
     });
-  });
-
-  afterEach(() => {
-    jest.restoreAllMocks();
   });
 
   describe('create events', () => {
@@ -73,21 +66,25 @@ describe('syncStravaWebhookUpdateWithDb', () => {
       await syncStravaWebhookUpdateWithDb(createEvent);
 
       expect(mockStravaGet).toHaveBeenCalledWith('activities/17234236452');
-      expect(mockUpsert).toHaveBeenCalledTimes(1);
 
-      const savedData = mockUpsert.mock.calls[0][0];
+      const savedActivity = await db.StravaActivity.findOne({
+        where: { id: 17234236452 },
+      });
+      expect(savedActivity).not.toBeNull();
+      const savedData = savedActivity?.activityData;
+      expect(savedData).not.toBeNull();
       // Verify snake_case was converted to camelCase
-      expect(savedData.activityData.startDate).toBe('2026-01-31T02:36:33Z');
-      expect(savedData.activityData.sportType).toBe('Ride');
-      expect(savedData.activityData.movingTime).toBe(1610);
-      expect(savedData.activityData.gear.resourceState).toBe(2);
-      expect(savedData.activityData.map.summaryPolyline).toBe('xyz');
-      expect(savedData.activityData.url).toBe('https://www.strava.com/activities/17234236452');
+      expect(savedData?.startDate).toBe('2026-01-31T02:36:33Z');
+      expect(savedData?.sportType).toBe('Ride');
+      expect(savedData?.movingTime).toBe(1610);
+      expect(savedData?.gear?.resourceState).toBe(2);
+      expect(savedData?.map?.summaryPolyline).toBe('xyz');
+      expect(savedData?.url).toBe('https://www.strava.com/activities/17234236452');
       // Verify no snake_case keys leaked through
-      expect(savedData.activityData).not.toHaveProperty('start_date');
-      expect(savedData.activityData).not.toHaveProperty('sport_type');
+      expect(savedData).not.toHaveProperty('start_date');
+      expect(savedData).not.toHaveProperty('sport_type');
       // Verify Date conversion
-      expect(savedData.activityStartDate).toEqual(new Date('2026-01-31T02:36:33Z'));
+      expect(savedActivity?.activityStartDate).toEqual(new Date('2026-01-31T02:36:33Z'));
     });
 
     it('throws when API returns 404', async () => {
@@ -121,30 +118,45 @@ describe('syncStravaWebhookUpdateWithDb', () => {
     it('fetches and updates when no recent update exists', async () => {
       await syncStravaWebhookUpdateWithDb(updateEvent);
 
-      expect(mockFindOne).toHaveBeenCalledWith({
-        attributes: ['lastUpdate'],
+      expect(mockStravaGet).toHaveBeenCalled();
+      const savedActivity = await db.StravaActivity.findOne({
         where: { id: 17234236452 },
       });
-      expect(mockStravaGet).toHaveBeenCalled();
-      expect(mockUpsert).toHaveBeenCalled();
+      expect(savedActivity).not.toBeNull();
     });
 
     it('fetches and updates when last update is old', async () => {
-      mockFindOne.mockResolvedValue({ lastUpdate: new Date(Date.now() - 120000) });
+      await db.StravaActivity.create({
+        activityData: existingActivityData,
+        activityStartDate: new Date('2026-01-31T02:36:33Z'),
+        id: 17234236452,
+        lastUpdate: new Date(Date.now() - 120000),
+      });
 
       await syncStravaWebhookUpdateWithDb(updateEvent);
 
       expect(mockStravaGet).toHaveBeenCalled();
-      expect(mockUpsert).toHaveBeenCalled();
+      const savedActivity = await db.StravaActivity.findOne({
+        where: { id: 17234236452 },
+      });
+      expect(savedActivity?.activityData?.name).toBe('Morning Ride');
     });
 
     it('skips when last update is too recent (within 1 minute)', async () => {
-      mockFindOne.mockResolvedValue({ lastUpdate: new Date(Date.now() - 30000) });
+      await db.StravaActivity.create({
+        activityData: existingActivityData,
+        activityStartDate: new Date('2026-01-31T02:36:33Z'),
+        id: 17234236452,
+        lastUpdate: new Date(Date.now() - 30000),
+      });
 
       await syncStravaWebhookUpdateWithDb(updateEvent);
 
       expect(mockStravaGet).not.toHaveBeenCalled();
-      expect(mockUpsert).not.toHaveBeenCalled();
+      const savedActivity = await db.StravaActivity.findOne({
+        where: { id: 17234236452 },
+      });
+      expect(savedActivity?.activityData?.name).toBe('Existing Activity');
     });
   });
 
@@ -156,17 +168,23 @@ describe('syncStravaWebhookUpdateWithDb', () => {
     };
 
     it('deletes from DB without calling API', async () => {
-      mockDestroy.mockResolvedValue(1);
+      await db.StravaActivity.create({
+        activityData: existingActivityData,
+        activityStartDate: new Date('2026-01-31T02:36:33Z'),
+        id: 17234236452,
+        lastUpdate: new Date(),
+      });
 
       await syncStravaWebhookUpdateWithDb(deleteEvent);
 
-      expect(mockDestroy).toHaveBeenCalledWith({ where: { id: 17234236452 } });
       expect(mockStravaGet).not.toHaveBeenCalled();
+      const savedActivity = await db.StravaActivity.findOne({
+        where: { id: 17234236452 },
+      });
+      expect(savedActivity).toBeNull();
     });
 
     it('succeeds even when activity does not exist', async () => {
-      mockDestroy.mockResolvedValue(0);
-
       await expect(syncStravaWebhookUpdateWithDb(deleteEvent)).resolves.not.toThrow();
     });
   });
@@ -232,10 +250,12 @@ describe('syncStravaWebhookUpdateWithDb', () => {
 
       await syncStravaWebhookUpdateWithDb(updateEvent);
 
-      const savedData = mockUpsert.mock.calls[0][0];
-      expect(savedData.activityData.startDate).toBe('2026-01-31T02:36:33Z');
-      expect(savedData.activityData.name).toBe('Heated rivalry with the boysss 🔥');
-      expect(savedData.activityData).not.toHaveProperty('start_date');
+      const savedActivity = await db.StravaActivity.findOne({
+        where: { id: 17234236452 },
+      });
+      expect(savedActivity?.activityData?.startDate).toBe('2026-01-31T02:36:33Z');
+      expect(savedActivity?.activityData?.name).toBe('Heated rivalry with the boysss 🔥');
+      expect(savedActivity?.activityData).not.toHaveProperty('start_date');
     });
   });
 });

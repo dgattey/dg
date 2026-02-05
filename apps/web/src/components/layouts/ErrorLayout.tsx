@@ -1,5 +1,6 @@
 'use client';
 
+import { homeRoute } from '@dg/shared-core/routes/app';
 import { Section } from '@dg/ui/core/Section';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject, SxProps } from '@dg/ui/theme';
@@ -59,7 +60,7 @@ export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
         buttonProps={{
           color: 'secondary',
         }}
-        href="/"
+        href={homeRoute}
         isButton={true}
         sx={backLinkSx}
         title="Home"

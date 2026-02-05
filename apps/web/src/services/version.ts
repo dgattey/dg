@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { invariant } from '@dg/shared-core/helpers/invariant';
+import { invariant } from '@dg/shared-core/assertions/invariant';
 import { repository, version } from '../../../../package.json';
 
 const getRepositoryUrl = () => {
@@ -8,7 +8,7 @@ const getRepositoryUrl = () => {
   return repository.replace(/\.git$/, '');
 };
 
-export const getAppVersion = () => {
+const getAppVersion = () => {
   invariant(version, 'App version missing in package.json');
   return `v${version}`;
 };

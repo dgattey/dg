@@ -1,10 +1,12 @@
+import 'server-only';
+
 import { toRenderableAsset } from '@dg/content-models/contentful/renderables/assets';
 import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
 import { toRenderableRichTextContent } from '@dg/content-models/contentful/renderables/richText';
 import { introBlockResponseSchema } from '@dg/content-models/contentful/schema/intro';
 import { gql } from 'graphql-request';
 import { parseResponse } from '../clients/parseResponse';
-import { contentfulClient } from './contentfulClient';
+import { getContentfulClient } from './contentfulClient';
 
 /**
  * Grabs the contentful sections with the title of header. Should
@@ -70,14 +72,12 @@ const QUERY = gql`
   }
 `;
 
-export type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
-
 /**
  * Fetches the text block corresponding to the introduction rich text
  * for the home page.
  */
 export async function fetchIntroContent(): Promise<IntroContent | null> {
-  const data = parseResponse(introBlockResponseSchema, await contentfulClient.request(QUERY), {
+  const data = parseResponse(introBlockResponseSchema, await getContentfulClient().request(QUERY), {
     kind: 'graphql',
     source: 'contentful.fetchIntroContent',
   });

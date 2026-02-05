@@ -18,7 +18,6 @@ services/
 ├── clients/          # Reusable HTTP client utilities
 ├── images/           # Server-side image utilities
 ├── contentful/       # Contentful CMS integration
-├── github/           # GitHub API integration
 ├── spotify/          # Spotify API integration
 ├── strava/           # Strava API integration
 ```
@@ -35,7 +34,6 @@ Low-level HTTP client utilities used by service integrations:
 | `refreshedAccessToken.ts` | Token refresh logic for OAuth flows |
 | `RefreshTokenConfig.ts` | Configuration type for token refresh |
 | `getStatus.ts` | HTTP status code helpers |
-| `maskSecret.ts` | Utility to mask secrets in logs |
 
 ## Images
 
@@ -87,11 +85,21 @@ Strava API integration for activity data and webhooks.
 | `fetchStravaActivityFromApi()` | Fetches activity directly from Strava API |
 | `syncStravaWebhookUpdateWithDb()` | Syncs webhook updates to database |
 | `echoStravaChallengeIfValid()` | Handles Strava webhook verification |
-| `runOauthFlow()` | Initiates OAuth token exchange |
+| `exchangeCodeForToken()` | Exchanges an OAuth code for tokens |
 | `mapActivityFromApi()` | Converts API response (snake_case) to domain format |
 | `stravaClient` | Configured REST client with token refresh |
 | `stravaTokenExchangeClient` | Client for OAuth token exchange |
 | `StravaWebhookEvent` | Type in `@dg/content-models/strava/StravaWebhookEvent` |
+
+### Webhook Subscription Management
+
+Functions for managing Strava webhook subscriptions (in `strava/webhooks/`):
+
+| Export | Description |
+|--------|-------------|
+| `listSubscriptions(type)` | Lists all webhook subscriptions |
+| `createSubscription(type)` | Creates a new webhook subscription |
+| `deleteSubscription(type, id)` | Deletes a webhook subscription by ID |
 
 ## Environment Variables
 
@@ -99,9 +107,8 @@ Required environment variables (see `config/env.secrets.keys`):
 
 - `CONTENTFUL_ACCESS_TOKEN` - Contentful API access token
 - `CONTENTFUL_SPACE_ID` - Contentful space identifier
-- `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` - Spotify OAuth credentials
+- `SPOTIFY_CLIENT_ID` - Spotify OAuth client ID (PKCE, no secret required)
 - `STRAVA_CLIENT_ID` / `STRAVA_CLIENT_SECRET` - Strava OAuth credentials
-- `STRAVA_TOKEN_NAME` - Database token identifier
 - `STRAVA_VERIFY_TOKEN` - Webhook verification token
 - `DATABASE_URL` - PostgreSQL connection string (for Strava caching)
 

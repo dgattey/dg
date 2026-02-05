@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import {
   mapStravaActivityFromApi,
@@ -6,7 +8,7 @@ import {
   stravaActivitySchema,
 } from '@dg/content-models/strava/StravaActivity';
 import { db } from '@dg/db';
-import { isRecord } from '@dg/shared-core/helpers/typeguards';
+import { isRecord } from '@dg/shared-core/types/typeguards';
 import { safeParse } from 'valibot';
 
 const hasDomainDates = (activity: Record<string, unknown>) =>

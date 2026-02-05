@@ -1,10 +1,6 @@
 import { safeParse } from 'valibot';
 import { stravaActivityApiSchema } from '../StravaActivity';
-import {
-  isStravaWebhookEvent,
-  stravaWebhookEventSchema,
-  validateStravaWebhookEvent,
-} from '../StravaWebhookEvent';
+import { stravaWebhookEventSchema, validateStravaWebhookEvent } from '../StravaWebhookEvent';
 
 describe('stravaActivityApiSchema', () => {
   it('parses activity payloads', () => {
@@ -194,26 +190,6 @@ describe('stravaWebhookEventSchema', () => {
     it('rejects non-object input', () => {
       expect(safeParse(stravaWebhookEventSchema, 'string').success).toBe(false);
     });
-  });
-});
-
-describe('isStravaWebhookEvent', () => {
-  it('returns true for valid activity event', () => {
-    const input = {
-      aspect_type: 'create',
-      object_id: 123,
-      object_type: 'activity',
-    };
-
-    expect(isStravaWebhookEvent(input)).toBe(true);
-  });
-
-  it('returns false for invalid event', () => {
-    expect(isStravaWebhookEvent({ invalid: 'data' })).toBe(false);
-  });
-
-  it('returns false for null', () => {
-    expect(isStravaWebhookEvent(null)).toBe(false);
   });
 });
 
