@@ -25,6 +25,7 @@
     "server-only": "catalog:"
   },
   "devDependencies": {
+    "@dg/testing": "workspace:*",
     "@dg/tsconfig": "workspace:*",
     "@testing-library/dom": "catalog:",
     "@testing-library/jest-dom": "catalog:",

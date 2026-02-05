@@ -6,10 +6,15 @@ const createJestConfig = nextJest({
   dir: './',
 });
 
+// Path to @dg/testing package
+const testingPackage = '../../packages/testing';
+
 const config: Config = {
   coverageProvider: 'v8',
+  globalSetup: `${testingPackage}/jest.globalSetup.ts`,
+  globalTeardown: `${testingPackage}/jest.globalTeardown.ts`,
   roots: ['<rootDir>/src', '<rootDir>/../../packages'],
-  setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
+  setupFilesAfterEnv: [`${testingPackage}/jest.setup.ts`],
   testEnvironment: 'jsdom',
   testMatch: ['**/__tests__/**/*.test.ts?(x)'],
 };

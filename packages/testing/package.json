@@ -1,25 +1,18 @@
 {
   "dependencies": {
-    "@dg/content-models": "workspace:*",
     "@dg/db": "workspace:*",
     "@dg/shared-core": "workspace:*",
-    "graphql-request": "catalog:",
-    "server-only": "catalog:",
-    "sharp": "catalog:",
-    "valibot": "catalog:",
-    "wretch": "catalog:"
+    "@testing-library/jest-dom": "catalog:",
+    "sequelize": "6.37.7",
+    "sequelize-typescript": "2.1.6"
   },
   "devDependencies": {
-    "@dg/testing": "workspace:*",
     "@dg/tsconfig": "workspace:*",
     "@types/jest": "catalog:",
-    "@types/node": "catalog:",
-    "dotenv-mono": "catalog:",
-    "graphql": "catalog:",
-    "tsx": "catalog:",
+    "jest": "catalog:",
     "typescript": "catalog:"
   },
-  "name": "@dg/services",
+  "name": "@dg/testing",
   "private": true,
   "scripts": {
     "check": "biome check --write .",

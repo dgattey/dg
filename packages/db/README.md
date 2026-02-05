@@ -9,9 +9,10 @@ Neon PostgreSQL database with Sequelize ORM for migrations and models.
 
 ## Key Exports
 
-- `Token` - OAuth token storage for Spotify/Strava
-- `StravaActivity` - Cached Strava activity data from webhooks
-- `db` - Sequelize client instance
+- `db` - Object with all models (StravaActivity, Token)
+- `dbClient` - Sequelize client instance
+- `connectToDatabase()` - Verify connection (called automatically in non-test environments)
+- `closeDbConnection()` - Close connection (used by test cleanup)
 
 ## Commands
 
@@ -21,8 +22,31 @@ Neon PostgreSQL database with Sequelize ORM for migrations and models.
 
 ## Environment
 
-- `DATABASE_URL` - Connection string for development/production (from 1Password)
-- `DATABASE_URL_TEST` - Connection string for tests (from 1Password, **required** for tests)
+- `DATABASE_URL` - Connection string for development/production
+- `DATABASE_URL_TEST` - Connection string for tests (required when `NODE_ENV=test`)
 
-Tests run with `NODE_ENV=test` so the DB client uses `DATABASE_URL_TEST`.
+The `getDatabaseUrl()` function looks up the correct URL based on `NODE_ENV` and fails loudly if not set.
 
+## Testing
+
+For test database setup, use `@dg/testing`:
+
+```ts
+import { setupTestDatabase } from '@dg/testing/databaseSetup';
+import { setupMockLifecycle } from '@dg/testing/mocks';
+
+const db = setupTestDatabase({ truncate: ['StravaActivity'] });
+setupMockLifecycle();
+
+it('creates an activity', async () => {
+  await db.StravaActivity.create({ ... });
+});
+```
+
+See `packages/testing/README.md` for full documentation.
+
+## Gotchas
+
+- `NODE_ENV` must be `development`, `production`, or `test` or the client throws on import.
+- `DATABASE_URL` / `DATABASE_URL_TEST` are required; missing values fail fast.
+- In non-test environments, `connectToDatabase()` is called automatically on import.
