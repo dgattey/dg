@@ -1,6 +1,5 @@
 import type { StravaWebhookEvent } from '@dg/content-models/strava/StravaWebhookEvent';
 import { db } from '@dg/db';
-import { log } from '@dg/shared-core/helpers/log';
 import * as stravaClientModule from '../stravaClient';
 import { syncStravaWebhookUpdateWithDb } from '../syncStravaWebhookUpdateWithDb';
 
@@ -14,6 +13,7 @@ jest.mock('@dg/db', () => ({
     },
   },
 }));
+import { log } from '@dg/shared-core/logging/log';
 
 jest.mock('../stravaClient', () => ({
   stravaClient: {

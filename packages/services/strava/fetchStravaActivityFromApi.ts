@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { stravaActivityApiSchema } from '@dg/content-models/strava/StravaActivity';
-import { log } from '@dg/shared-core/helpers/log';
+import { log } from '@dg/shared-core/logging/log';
 import { parseResponse } from '../clients/parseResponse';
 import { mapActivityFromApi } from './mapActivityFromApi';
 import { stravaClient } from './stravaClient';

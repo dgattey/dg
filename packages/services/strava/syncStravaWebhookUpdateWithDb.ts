@@ -2,7 +2,7 @@ import 'server-only';
 
 import type { StravaWebhookEvent } from '@dg/content-models/strava/StravaWebhookEvent';
 import { db } from '@dg/db';
-import { log } from '@dg/shared-core/helpers/log';
+import { log } from '@dg/shared-core/logging/log';
 import { fetchStravaActivityFromApi } from './fetchStravaActivityFromApi';
 
 // If an update was applied this number of ms or less ago, drop the update

@@ -2,7 +2,7 @@ import {
   type StravaWebhookEvent,
   validateStravaWebhookEvent,
 } from '@dg/content-models/strava/StravaWebhookEvent';
-import { log } from '@dg/shared-core/helpers/log';
+import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 import {

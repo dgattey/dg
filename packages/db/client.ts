@@ -1,7 +1,7 @@
 import { env } from 'node:process';
-import { invariant } from '@dg/shared-core/helpers/invariant';
-import { log } from '@dg/shared-core/helpers/log';
 import postgres from 'pg';
+import { invariant } from '@dg/shared-core/assertions/invariant';
+import { log } from '@dg/shared-core/logging/log';
 import { Sequelize } from 'sequelize-typescript';
 import { StravaActivity } from './models/StravaActivity';
 import { Token } from './models/Token';

@@ -1,29 +1,10 @@
 import 'server-only';
 import { db } from '@dg/db';
 import type { CreateTokenProps, FetchTokenProps } from '@dg/db/models/Token';
-import { log } from '@dg/shared-core/helpers/log';
-import { maskSecret } from './maskSecret';
+import { assertHttpsEndpoint } from '@dg/shared-core/assertions/assertHttpsEndpoint';
+import { MissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
+import { log } from '@dg/shared-core/logging/log';
 import type { RefreshTokenConfig } from './RefreshTokenConfig';
-
-const maskIfSensitive = (key: string, value: string) => {
-  const normalized = key.toLowerCase();
-  if (
-    normalized.includes('authorization') ||
-    normalized.includes('token') ||
-    normalized.includes('secret')
-  ) {
-    return maskSecret(value) ?? value;
-  }
-  return value;
-};
-
-const maskHeaders = (headers: Record<string, string>) =>
-  Object.fromEntries(
-    Object.entries(headers).map(([key, value]) => [key, maskIfSensitive(key, value)]),
-  );
-
-const maskBodyEntries = (entries: Array<[string, string]>) =>
-  entries.map(([key, value]) => [key, maskIfSensitive(key, value)]);
 
 /**
  * Creates or updates a possibly-existing token given a unique name and
@@ -58,7 +39,7 @@ async function getLatestTokenIfValid({ name }: FetchTokenProps) {
   // Shouldn't happen unless invalid name, so it's a big error
   if (!token?.refreshToken) {
     log.error('Missing token', { name });
-    throw new TypeError('Missing token');
+    throw new MissingTokenError(name);
   }
 
   // Return either refresh + access, or just refresh if invalid
@@ -75,11 +56,12 @@ async function fetchRefreshedTokenFromApi(
   refreshToken: string,
 ) {
   const { endpoint, headers, body, validate } = refreshTokenConfig;
+  assertHttpsEndpoint(endpoint);
   const encodedBody = new URLSearchParams(body(refreshToken));
   log.info('Fetching refreshed token from API', {
-    encodedBody: maskBodyEntries([...encodedBody]),
+    body: encodedBody,
     endpoint,
-    headers: maskHeaders(headers),
+    headers,
   });
 
   const rawData = await fetch(endpoint, {
@@ -89,8 +71,8 @@ async function fetchRefreshedTokenFromApi(
   });
   const data: unknown = await rawData.json();
   if (!rawData.ok) {
+    // Log only status, not response data which could contain sensitive info
     log.error('Failed to fetch refreshed token', {
-      data,
       status: rawData.status,
     });
     throw new TypeError('Token was not fetched properly');
@@ -115,14 +97,11 @@ export async function refreshedAccessToken(
   forceRefresh?: boolean,
 ) {
   const currentData = await getLatestTokenIfValid({ name });
-  const maskedCurrentData = {
-    accessToken: maskSecret(currentData.accessToken),
-    refreshToken: maskSecret(currentData.refreshToken),
-  };
   log.info('Got latest token data', {
-    currentData: maskedCurrentData,
+    accessToken: currentData.accessToken,
     forceRefresh,
     name,
+    refreshToken: currentData.refreshToken,
   });
   if (currentData.accessToken && !forceRefresh) {
     return currentData.accessToken;

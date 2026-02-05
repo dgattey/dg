@@ -1,6 +1,7 @@
 {
   "devDependencies": {
     "@dg/tsconfig": "workspace:*",
+    "@types/jest": "catalog:",
     "@types/node": "catalog:",
     "dotenv-mono": "catalog:",
     "typescript": "catalog:"

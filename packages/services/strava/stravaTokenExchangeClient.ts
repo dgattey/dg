@@ -1,5 +1,5 @@
 import 'server-only';
-import { invariant } from '@dg/shared-core/helpers/invariant';
+import { invariant } from '@dg/shared-core/assertions/invariant';
 import { createClient } from '../clients/unauthenticatedRestClient';
 
 const CLIENT_ID = process.env.STRAVA_CLIENT_ID;

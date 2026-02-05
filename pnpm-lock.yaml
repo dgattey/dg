@@ -429,6 +429,9 @@ importers:
       '@dg/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
+      '@types/jest':
+        specifier: 'catalog:'
+        version: 30.0.0
       '@types/node':
         specifier: 'catalog:'
         version: 25.0.10

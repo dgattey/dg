@@ -5,7 +5,7 @@ import {
   toRenderableLink,
 } from '@dg/content-models/contentful/renderables/links';
 import { footerLinksResponseSchema } from '@dg/content-models/contentful/schema/footer';
-import { isNotNullish } from '@dg/shared-core/helpers/typeguards';
+import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import { gql } from 'graphql-request';
 import { parseResponse } from '../clients/parseResponse';
 import { contentfulClient } from './contentfulClient';

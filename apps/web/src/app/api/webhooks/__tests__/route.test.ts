@@ -1,7 +1,7 @@
 /**
  * @jest-environment node
  */
-import { log } from '@dg/shared-core/helpers/log';
+import { log } from '@dg/shared-core/logging/log';
 import { NextRequest } from 'next/server';
 import { GET, POST } from '../route';
 

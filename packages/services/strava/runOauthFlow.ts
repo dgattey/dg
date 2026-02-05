@@ -1,9 +1,8 @@
 import 'server-only';
 
 import { db } from '@dg/db';
-import { invariant } from '@dg/shared-core/helpers/invariant';
-import { log } from '@dg/shared-core/helpers/log';
-import { maskSecret } from '../clients/maskSecret';
+import { invariant } from '@dg/shared-core/assertions/invariant';
+import { log } from '@dg/shared-core/logging/log';
 import { validateRawDataToToken } from './stravaClient';
 import { stravaTokenExchangeClient } from './stravaTokenExchangeClient';
 
@@ -56,12 +55,12 @@ export function getStravaExchangeCodeForTokenRequest(
 
 /**
  * Assuming the user has gone through the Strava OAuth flow and
- * permitted use via the url from `getOauthTokenInitLink`, this
+ * returned with a valid authorization code, this
  * uses the callback data to get a token by giving back the code.
  * Returns HTML to pass back to the client.
  */
 export async function exchangeCodeForToken(code: string): Promise<string> {
-  log.info('Exchanging code for token for Strava', { code: maskSecret(code) });
+  log.info('Exchanging code for token for Strava', { code });
   const response = await stravaTokenExchangeClient
     .json({
       client_id: CLIENT_ID,
@@ -77,11 +76,7 @@ export async function exchangeCodeForToken(code: string): Promise<string> {
   const { accessToken, expiryAt, refreshToken } = validateRawDataToToken(rawTokenData);
 
   // Persist the refreshToken and accessToken from the response to the DB
-  log.info('Persisting token to DB', {
-    accessToken: maskSecret(accessToken),
-    expiryAt,
-    refreshToken: maskSecret(refreshToken),
-  });
+  log.info('Persisting token to DB', { accessToken, expiryAt, refreshToken });
   const [token] = await db.Token.upsert({
     accessToken,
     expiryAt,

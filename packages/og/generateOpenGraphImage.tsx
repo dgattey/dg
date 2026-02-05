@@ -1,4 +1,4 @@
-import { invariant } from '@dg/shared-core/helpers/invariant';
+import { invariant } from '@dg/shared-core/assertions/invariant';
 import { ImageResponse } from '@vercel/og';
 import { OpenGraphImage } from './OpenGraphImage';
 import { LOGO_FONT, TEXT_FONT } from './ogFonts';

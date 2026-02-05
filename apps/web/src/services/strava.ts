@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { maskSecret } from '@dg/services/clients/maskSecret';
 import { echoStravaChallengeIfValid } from '@dg/services/strava/echoStravaChallengeIfValid';
 import { fetchLatestStravaActivityFromDb } from '@dg/services/strava/fetchLatestStravaActivityFromDb';
 import {
@@ -9,6 +8,7 @@ import {
   getStravaExchangeCodeForTokenRequest,
 } from '@dg/services/strava/runOauthFlow';
 import { syncStravaWebhookUpdateWithDb } from '@dg/services/strava/syncStravaWebhookUpdateWithDb';
+import { log } from '@dg/shared-core/logging/log';
 import { formatRelativeTime } from '@dg/ui/helpers/relativeTime';
 import { cacheLife, cacheTag } from 'next/cache';
 

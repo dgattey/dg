@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { invariant } from '@dg/shared-core/helpers/invariant';
+import { invariant } from '@dg/shared-core/assertions/invariant';
 import { repository, version } from '../../../../package.json';
 
 const getRepositoryUrl = () => {

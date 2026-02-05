@@ -1,5 +1,5 @@
 import 'server-only';
-import { invariant } from '@dg/shared-core/helpers/invariant';
+import { invariant } from '@dg/shared-core/assertions/invariant';
 import { createClient } from '../clients/authenticatedGraphQLClient';
 
 const SPACE_ID = process.env.CONTENTFUL_SPACE_ID;

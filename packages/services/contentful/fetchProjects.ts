@@ -5,7 +5,7 @@ import {
   toRenderableProject,
 } from '@dg/content-models/contentful/renderables/projects';
 import { projectsResponseSchema } from '@dg/content-models/contentful/schema/projects';
-import { isNotNullish } from '@dg/shared-core/helpers/typeguards';
+import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import { gql } from 'graphql-request';
 import { parseResponse } from '../clients/parseResponse';
 import { contentfulClient } from './contentfulClient';

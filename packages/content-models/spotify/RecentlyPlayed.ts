@@ -1,4 +1,4 @@
-import { isNotNullish } from '@dg/shared-core/helpers/typeguards';
+import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import * as v from 'valibot';
 import { mapTrackFromApi, type Track, trackApiSchema } from './Track';
 

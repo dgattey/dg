@@ -9,7 +9,7 @@ import {
   type RenderableEntry,
   type RenderableRichTextContent,
 } from '@dg/content-models/contentful/renderables/richText';
-import { isRecord } from '@dg/shared-core/helpers/typeguards';
+import { isRecord } from '@dg/shared-core/types/typeguards';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { PROJECT_MAX_IMAGE_DIMENSION } from '@dg/ui/helpers/imageSizes';

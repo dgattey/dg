@@ -72,8 +72,6 @@ const QUERY = gql`
   }
 `;
 
-export type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
-
 /**
  * Fetches the text block corresponding to the introduction rich text
  * for the home page.

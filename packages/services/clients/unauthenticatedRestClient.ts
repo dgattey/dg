@@ -1,4 +1,5 @@
 import 'server-only';
+import { assertHttpsEndpoint } from '@dg/shared-core/assertions/assertHttpsEndpoint';
 import wretch from 'wretch';
 
 export type ClientProps = {
@@ -12,5 +13,6 @@ export type ClientProps = {
  * Creates a REST client that can be used to fetch resources from a base API.
  */
 export function createClient({ endpoint }: ClientProps) {
+  assertHttpsEndpoint(endpoint);
   return wretch(endpoint).content('application/json');
 }
