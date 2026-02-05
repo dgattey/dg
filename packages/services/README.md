@@ -93,6 +93,16 @@ Strava API integration for activity data and webhooks.
 | `stravaTokenExchangeClient` | Client for OAuth token exchange |
 | `StravaWebhookEvent` | Type in `@dg/content-models/strava/StravaWebhookEvent` |
 
+### Webhook Subscription Management
+
+Functions for managing Strava webhook subscriptions (in `strava/webhooks/`):
+
+| Export | Description |
+|--------|-------------|
+| `listSubscriptions(type)` | Lists all webhook subscriptions |
+| `createSubscription(type)` | Creates a new webhook subscription |
+| `deleteSubscription(type, id)` | Deletes a webhook subscription by ID |
+
 ## Environment Variables
 
 Required environment variables (see `config/env.secrets.keys`):

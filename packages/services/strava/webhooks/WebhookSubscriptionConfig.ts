@@ -20,7 +20,7 @@ export type WebhookSubscriptionConfig = {
   verifyToken: string | undefined;
 
   /**
-   * Use this as the app-specific callback - url at dylangattey.com
+   * Use this as the webhook callback URL.
    */
   callbackUrl: string | undefined;
 

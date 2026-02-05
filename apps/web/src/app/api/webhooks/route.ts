@@ -7,25 +7,15 @@ import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 import {
   echoStravaChallengeIfValid,
-  exchangeCodeForToken,
-  getOauthTokenInitLink,
-  getStravaExchangeCodeForTokenRequest,
-  maskSecret,
+  isValidSubscriptionId,
   syncStravaWebhookUpdateWithDb,
 } from '../../../services/strava';
 
-type QueryRecord = Partial<Record<string, string | Array<string>>>;
-
 /**
  * Parity with the legacy pages router webhook handler:
- * - Token exchange checks state/code/scope and returns HTML.
  * - Challenge verification returns a 200 JSON response with hub.challenge.
- * - Dev mode shows the same OAuth shortcut HTML.
  * - POST validates events and syncs activity updates.
  */
-
-const toQueryRecord = (searchParams: URLSearchParams): QueryRecord =>
-  Object.fromEntries(searchParams.entries());
 
 /**
  * Validates webhook event and logs detailed errors on failure.
@@ -46,31 +36,16 @@ const jsonError = (message: string, status = 500) =>
 
 /**
  * Handles Strava webhook GET requests. This can be:
- * - A token exchange callback for the OAuth flow
  * - A Strava subscription challenge verification
- * - A development-only shortcut to kick off OAuth
  */
-export async function GET(request: NextRequest) {
-  const query = toQueryRecord(request.nextUrl.searchParams);
-  const code = getStravaExchangeCodeForTokenRequest(query);
-
-  if (code) {
-    log.info('Received token exchange webhook event', { code: maskSecret(code) });
-    try {
-      const html = await exchangeCodeForToken(code);
-      return new NextResponse(html, {
-        headers: { 'Content-Type': 'text/html' },
-        status: 200,
-      });
-    } catch (error) {
-      log.error('Failed to exchange code for token', { error });
-      return jsonError('Could not generate oauth token', 500);
-    }
-  }
+export function GET(request: NextRequest) {
+  const query = request.nextUrl.searchParams;
+  log.info('Webhook GET request received', { query, url: request.url });
 
   try {
-    const challengeResponse = echoStravaChallengeIfValid(request.nextUrl.searchParams);
+    const challengeResponse = echoStravaChallengeIfValid(query);
     if (challengeResponse) {
+      log.info('Strava challenge verified successfully');
       return NextResponse.json(challengeResponse, { status: 200 });
     }
   } catch (error) {
@@ -78,36 +53,34 @@ export async function GET(request: NextRequest) {
     return jsonError('Bad Request', 400);
   }
 
-  if (process.env.NODE_ENV === 'development') {
-    log.info('Received Strava webhook GET in development mode');
-    try {
-      const html = `
-        <h1>Development mode shortcuts</h1>
-        <h2>Strava</h2>
-        <a href="${getOauthTokenInitLink()}">Start OAuth flow</a>
-      `;
-      return new NextResponse(html, {
-        headers: { 'Content-Type': 'text/html' },
-        status: 200,
-      });
-    } catch (error) {
-      log.error('Strava OAuth flow not configured', { error });
-      return jsonError('Strava OAuth not configured', 500);
-    }
-  }
-
-  log.info('Invalid Strava webhook GET', { query });
+  log.info('Invalid Strava webhook GET - challenge validation failed', { query });
   return jsonError('Bad Request', 400);
 }
 
 /**
  * Processes a new webhook event posted to this endpoint and acknowledges receipt.
+ * Validates the subscription_id against known subscriptions to prevent fake events.
  */
 export async function POST(request: NextRequest) {
   const body = await request.json().catch(() => null);
   log.info('Received Strava webhook POST', { body });
   if (!isWebhookEvent(body)) {
     return jsonError('Bad Request', 400);
+  }
+
+  // Verify the subscription_id is from a known subscription
+  // This prevents attackers from sending fake webhook events
+  const subscriptionId = body.subscription_id;
+  if (subscriptionId === undefined) {
+    log.error('Webhook missing subscription_id');
+    return jsonError('Bad Request', 400);
+  }
+
+  const isValid = await isValidSubscriptionId(subscriptionId);
+  if (!isValid) {
+    // Don't log the subscription ID - just log that it was invalid
+    log.error('Webhook from unknown subscription');
+    return jsonError('Forbidden', 403);
   }
 
   log.info('Processing valid webhook event', {

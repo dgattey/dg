@@ -33,16 +33,17 @@ turbo dev
   - Skip tiny tweaks unless they affect types or behavior.
 - Filters by scope:
   - root/config: no filter or `--filter=dg`
-  - `apps/<app>`: `--filter=<app>`
-  - `packages/<pkg>`: `--filter=<pkg>`
+  - `apps/<app>`: `--filter=@dg/<app>`
+  - `packages/<pkg>`: `--filter=@dg/<pkg>`
   - multiple: multiple `--filter`
+- When making wide-ranging changes that impact many workspaces, consider skipping the filter to do full workspace checks for completeness
 - Skip shell scripts (`scripts/*`).
 - Fix issues and re-run until all pass.
 
 ## Next.js dev server and verification
 
-- For verification that needs the app, run `turbo run dev --filter=web`.
-- Prefer port 3000; reuse an existing server if responsive; restart only if MCP calls fail.
+- For verification that needs the app, run `turbo dev`.
+- Use port 3000; reuse an existing server if responsive; restart only if MCP calls fail.
 - If you started the server, stop it when done; otherwise leave it running.
 - Use Next DevTools MCP for server/runtime errors and browser MCP for client console.
 

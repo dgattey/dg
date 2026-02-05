@@ -17,18 +17,6 @@ const getQueryValue = (query: Query, key: string) => {
   return Array.isArray(value) ? value[0] : value;
 };
 
-const describeToken = (token: string | undefined | null) => {
-  if (!token) {
-    return { hasNonAlnum: false, length: 0, prefix: undefined, suffix: undefined };
-  }
-  return {
-    hasNonAlnum: /[^A-Za-z0-9]/.test(token),
-    length: token.length,
-    prefix: token.slice(0, 4),
-    suffix: token.slice(-4),
-  };
-};
-
 /**
  * Checks if a set of query params has a valid Strava subscription within
  * it. There may be MORE query params than present in the `StravaSubscription`
@@ -51,10 +39,9 @@ const isSubscription = (query: Query) => {
     log.info('Strava challenge validation details', {
       modeMatches,
       modeReceived: mode,
-      tokenExpected: describeToken(expectedToken),
+      tokenExpected: expectedToken,
       tokenMatches,
-      // Only log first/last few chars for security
-      tokenReceived: describeToken(verifyToken),
+      tokenReceived: verifyToken,
     });
   }
 
@@ -73,7 +60,7 @@ export const echoStravaChallengeIfValid = (query: Query): Record<string, string>
   if (!challenge) {
     log.info('Strava challenge missing', {
       mode: getQueryValue(query, MODE_KEY),
-      tokenReceived: describeToken(getQueryValue(query, VERIFY_KEY)),
+      tokenReceived: getQueryValue(query, VERIFY_KEY),
     });
     return null;
   }

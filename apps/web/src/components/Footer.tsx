@@ -1,4 +1,5 @@
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
+import { CONSOLE_ROUTE } from '@dg/shared-core/routes/routes';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
 import { Link } from '@dg/ui/dependent/Link';
@@ -131,6 +132,22 @@ export async function Footer() {
                     ) : (
                       version
                     )}
+                  </NavItem>
+                </>
+              ) : null}
+              {process.env.NODE_ENV === 'development' ? (
+                <>
+                  <NavItem sx={navItemNoPaddingSx}>•</NavItem>
+                  <NavItem>
+                    <Link
+                      aria-label="Developer tools"
+                      color="inherit"
+                      href={CONSOLE_ROUTE}
+                      title="Developer tools"
+                      variant="caption"
+                    >
+                      Console
+                    </Link>
                   </NavItem>
                 </>
               ) : null}

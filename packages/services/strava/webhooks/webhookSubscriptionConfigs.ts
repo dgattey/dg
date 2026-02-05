@@ -1,8 +1,7 @@
-import { dotenvLoad } from 'dotenv-mono';
-import type { WebhookSubscriptionConfig } from '../types/WebhookSubscriptionConfig';
-import type { WebhookType } from '../types/WebhookType';
+import 'server-only';
 
-dotenvLoad();
+import type { WebhookSubscriptionConfig } from './WebhookSubscriptionConfig';
+import type { WebhookType } from './WebhookType';
 
 /**
  * These are the standard parameters that go into the body of
@@ -11,7 +10,7 @@ dotenvLoad();
 export const standardParams = (config: WebhookSubscriptionConfig) => {
   const { id, secret } = config;
   if (!id || !secret) {
-    throw new TypeError('Missing data');
+    throw new TypeError('Missing client_id or client_secret');
   }
   return {
     client_id: id,
@@ -20,11 +19,11 @@ export const standardParams = (config: WebhookSubscriptionConfig) => {
 };
 
 /**
- * Configurations for the webhooks using mostly just env variables
+ * Configurations for the webhooks using env variables.
  */
 export const webhookSubscriptionConfigs: Record<WebhookType, WebhookSubscriptionConfig> = {
   strava: {
-    callbackUrl: process.env.WEBHOOK_CALLBACK_URL,
+    callbackUrl: process.env.STRAVA_WEBHOOK_CALLBACK_URL,
     endpoint: 'https://www.strava.com/api/v3/push_subscriptions',
     headers: {
       Accept: 'application/json',
