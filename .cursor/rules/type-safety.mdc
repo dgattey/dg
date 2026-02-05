@@ -1,20 +1,38 @@
 ---
-description: Use invariant helper for runtime assertions
+description: Type safety and runtime assertions
 globs: "**/*.{ts,tsx}"
 alwaysApply: false
 ---
 
-# Use Invariant for Runtime Assertions
+# Type safety and runtime assertions
+
+## Avoid TypeScript assertions
+
+- Avoid `as`, `<Type>`, and `!` to silence errors.
+- Prefer proper typing, type guards, and nullish handling.
+- Allow only with runtime validation or broken external types; add a comment.
+
+```ts
+// bad
+const value = data as Foo;
+const item = items.find((x) => x.id === id)!;
+
+// good
+if (isFoo(data)) {}
+const item = items.find((x) => x.id === id) ?? fallback;
+```
+
+## Use invariant for runtime assertions
 
 Use `invariant` from `@dg/shared-core/helpers/invariant` instead of manually throwing errors for conditions that must be true.
 
-## Benefits
+### Benefits
 
 - Acts as a TypeScript type guard (`asserts condition`)
 - Strips error messages in production for smaller bundles
 - Consistent pattern across the codebase
 
-## Examples
+### Examples
 
 ```ts
 // bad - manual throw
@@ -39,7 +57,7 @@ invariant(user, 'User not found');
 // TypeScript now knows user is defined
 ```
 
-## When to Use
+### When to use
 
 - Environment variable validation
 - Required configuration checks

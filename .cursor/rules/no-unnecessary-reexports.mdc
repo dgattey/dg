@@ -1,0 +1,44 @@
+---
+description: Avoid unnecessary re-exports across files
+alwaysApply: true
+---
+
+# No Unnecessary Re-exports
+
+Don't re-export items unless package boundaries require it.
+
+## When NOT to re-export
+
+- Components re-exporting other components for sibling files
+- Utilities re-exporting utilities from the same package
+- Any re-export that could be a direct import instead
+
+```ts
+// ❌ Bad - unnecessary re-export
+// components/Button.tsx
+export { Icon } from './Icon';
+
+// ❌ Bad - re-exporting across app layer unnecessarily  
+// apps/web/src/components/index.ts
+export { SomeComponent } from './SomeComponent';
+```
+
+## When to re-export
+
+Only re-export when package boundaries prevent direct imports:
+
+```ts
+// ✅ Good - services re-exports db types (apps can't import @dg/db)
+// packages/services/oauth/types.ts
+export type { Token } from '@dg/db';
+
+// ✅ Good - app services layer wrapping package services
+// apps/web/src/services/strava.ts
+export { getStravaActivity } from '@dg/services/strava/getStravaActivity';
+```
+
+## Why
+
+- Direct imports are clearer and easier to trace
+- Avoids indirection that obscures where code lives
+- Re-exports should only exist at package boundaries

@@ -1,0 +1,11 @@
+{
+  "snapshot": "snapshot-20260204-dfb1dbd6-36d8-4178-ba08-e2fc4bfd2a8d",
+  "install": "pnpm install",
+  "start": "turbo dev",
+  "terminals": [
+    {
+      "name": "Zsh",
+      "command": "zsh"
+    }
+  ]
+}

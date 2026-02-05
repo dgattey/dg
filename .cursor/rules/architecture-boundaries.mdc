@@ -1,0 +1,83 @@
+---
+description: Architecture boundaries and app/service usage
+alwaysApply: true
+---
+
+# Architecture boundaries
+
+## Minimal API routes
+
+This repo has no external consumers. Avoid API routes when possible.
+
+### When to use API routes
+
+- External callbacks (OAuth redirects, webhook receivers)
+- Third-party integrations that POST to your server
+
+### When NOT to use API routes
+
+- Internal operations from the UI - use Server Actions instead
+- Data fetching - use server components or Server Actions
+- Mutations triggered by user interaction - use Server Actions
+
+## Services layer boundary
+
+All access to `packages/services` must go through the app's services layer.
+
+- `apps/web/src/services/*.ts` re-exports from `packages/services`
+- Server components/actions import from `apps/web/src/services/`
+- Client components NEVER import from `packages/services` directly
+- App services layer adds caching, formatting, app-specific logic
+
+## Database imports restricted to services
+
+- Only `packages/services` may import `@dg/db`.
+- `apps/*` and other packages must NOT import `@dg/db` directly.
+- Instead, expose database operations through `packages/services` functions.
+
+### Testing
+
+For test database setup, use `@dg/services/testing/setupTestDatabase`:
+
+```ts
+// ❌ Bad - test importing db directly
+import { setupTestDatabase } from '@dg/db/testing';
+
+// ✅ Good - test imports from services
+import { setupTestDatabase } from '@dg/services/testing/setupTestDatabase';
+```
+
+## Server-only services
+
+### Two types of server files
+
+| File type | Marker | Purpose |
+|-----------|--------|---------|
+| `*.ts` | `import 'server-only'` | Server-only code (NOT callable from client) |
+| `*.actions.ts` | `'use server'` at top | Server Actions (callable from client) |
+
+### Rules
+
+1. Server-only files (`*.ts`): `import 'server-only'` at top
+2. Server action files (`*.actions.ts`): `'use server'` at top
+3. Never mix both in the same file
+4. Exception: Type-only files don't need either
+
+### Example structure
+
+```
+services/
+  strava.ts          # import 'server-only' - for server components
+  strava.actions.ts  # 'use server' - for client components
+  oauth.ts           # import 'server-only' - for server components
+  oauth.actions.ts   # 'use server' - for client components
+```
+
+## No backward compatibility
+
+This repo is the sole consumer of all its packages. When refactoring:
+
+- Replace functions entirely rather than adding alongside existing ones
+- Delete old implementations after creating unified replacements
+- No need to maintain deprecated APIs or migration paths
+- Rename freely without worrying about external consumers
