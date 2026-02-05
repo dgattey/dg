@@ -27,7 +27,7 @@ catalog:
   react: 19.2.3
   server-only: 0.0.1
   sharp: 0.34.5
-  ts-node: 10.9.2
+  tsx: 4.21.0
   typescript: 5.9.3
   valibot: 1.2.0
   wretch: 3.0.6

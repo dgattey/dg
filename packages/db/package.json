@@ -12,6 +12,7 @@
     "@dg/tsconfig": "workspace:*",
     "pg-hstore": "2.3.4",
     "sequelize-cli": "6.6.5",
+    "tsx": "catalog:",
     "typescript": "catalog:"
   },
   "main": "client.ts",
@@ -22,7 +23,8 @@
     "check:ci": "biome ci .",
     "check:types": "tsc",
     "clean": "rm -rf .turbo *.tsbuildinfo",
-    "db": "sequelize"
+    "db": "NODE_OPTIONS='--import tsx' pnpm exec sequelize-cli",
+    "migrate": "NODE_OPTIONS='--import tsx' pnpm exec sequelize-cli db:migrate"
   },
   "types": "client.ts"
 }

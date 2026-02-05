@@ -22,7 +22,8 @@
   "repository": "https://github.com/dgattey/dg.git",
   "scripts": {
     "clean": "rm -f .env .env.tmp",
-    "dev": "scripts/generate-env",
+    "dev": "scripts/tunnel",
+    "env": "scripts/generate-env",
     "preinstall": "npx only-allow pnpm"
   },
   "version": "2.52.6"

@@ -2,11 +2,11 @@
 
 # Dylan Gattey
 
-Hi :wave: This is an overengineered way to show past projects / experiment with new tech. It’s a lightweight, mobile-friendly React app in Typescript, powered by [Next](https://nextjs.org/docs/getting-started) and hosted on [Vercel](https://vercel.com). It’s a monorepo using [pnpm](https://pnpm.io) workspaces and [Turbo](https://turbo.run).
+Hi :wave: This is an overengineered way to show past projects / experiment with new tech. It's a lightweight, mobile-friendly React app in Typescript, powered by [Next](https://nextjs.org/docs/getting-started) and hosted on [Vercel](https://vercel.com). It's a monorepo using [pnpm](https://pnpm.io) workspaces and [Turbo](https://turbo.run).
 
 ## :hammer: Commands
 
-- `turbo dev` start dev server + prod DB connection (auto-generates `.env` if missing)
+- `turbo dev` start dev server (see [Dev workflow](#dev-workflow) below)
 - `turbo build` prod build (CI)
 - `turbo build:serve` prod build + serve (local testing)
 - `turbo build:analyze` bundle size analysis
@@ -14,7 +14,7 @@ Hi :wave: This is an overengineered way to show past projects / experiment with 
 - `turbo check:types` typecheck
 - `turbo test` unit tests (Jest)
 - `turbo graphql:schema` refresh Contentful GraphQL schema for editor tooling
-- `turbo db -- db:migrate` run migrations (`db:migrate:status`, `db:migrate:undo`)
+- `turbo migrate` run migrations (`turbo db -- db:migrate:status`, `turbo db -- db:migrate:undo`)
 - `turbo db -- migration:generate --name <name>` create migration
 - `turbo webhook -- create <name>` create webhook (needs `dev`)
 - `turbo webhook -- list <name>` list webhooks
@@ -22,13 +22,23 @@ Hi :wave: This is an overengineered way to show past projects / experiment with 
 - `turbo clean` clean caches, generated files, and `.env`
 - `turbo topo --graph=graph.html` monorepo dependency graph
 
+### Dev workflow
+
+`turbo dev` runs these steps in order before starting the Next.js dev server:
+
+1. **`dg#env`** - Generates `.env` from 1Password (vault `dg`) using `scripts/generate-env`
+3. **`migrate`** - Runs database migrations via `@dg/db` (Sequelize)
+4. **`dev`** - Starts the persistent Next.js dev server, watching all app and package files
+
+The dev and prod apps use separate Neon databases, so local testing won't affect production data.
+
 ## :beginner: Initial Setup
 
 ### Prereqs
 - Homebrew
 - 1Password account with vault `dg` (one item per env var; value stored in the `value` field)
 
-Bootstrap uses Homebrew to install `nodenv`, `node-build`, `1password-cli`, and `neonctl`, and installs `turbo` globally via `npm`.
+Bootstrap uses `brew bundle` to install dependencies from the `Brewfile` (`nodenv`, `node-build`, `1password-cli`, `neonctl`, `cloudflared`) and installs `turbo` globally via `npm`.
 
 ### Setup
 1. `scripts/bootstrap` (installs deps, authenticates 1Password + Turbo, generates `.env`)
@@ -37,7 +47,7 @@ Bootstrap uses Homebrew to install `nodenv`, `node-build`, `1password-cli`, and 
 If `turbo` is not found, ensure `~/.nodenv/shims` is on PATH, then `nodenv rehash`.
 
 ### Env Vars
-`.env` is generated from 1Password (vault `dg`) using [`config/env.secrets.keys`](config/env.secrets.keys). Each key must be an item with the same name and the value stored in the `value` field. Non-secrets live in [`config/env.defaults`](config/env.defaults). To regenerate after vault changes: `turbo clean && turbo dev` or delete `.env` and re-run `turbo dev`.
+`.env` is generated from 1Password (vault `dg`) using [`config/env.secrets.keys`](config/env.secrets.keys). Each key must be an item with the same name and the value stored in the `value` field. To regenerate after vault changes: `turbo clean && turbo dev` or delete `.env` and re-run `turbo dev`.
 
 ## :memo: Pull Requests
 
@@ -108,8 +118,7 @@ There are two tables:
 To create and run a migration:
 
 1. `turbo db -- migration:generate --name <name>` and add `up`/`down`
-1. Create a Neon branch, `turbo connect -- <branch>`, then `turbo dev`
-1. `turbo db -- db:migrate` and merge branch when ready (undo: `turbo db -- db:migrate:undo`)
+1. `turbo migrate` and merge branch when ready (undo: `turbo db -- db:migrate:undo`)
 
 #### Strava
 
@@ -120,13 +129,17 @@ Each Strava app supports a single subscription, so I keep two apps: one for loca
 Both use the same DB but different tokens + callback URLs. `process.env.STRAVA_TOKEN_NAME` switches between them. For local webhook testing, use a Neon branch to avoid clobbering prod data.
 
 <details>
-<summary>Cloudflare Tunnels (for local webhook testing)</summary>
+<summary>Cloudflare Tunnels (automatic with turbo dev)</summary>
 
-Local webhook testing uses Cloudflare Tunnel so `https://dev.dylangattey.com/api/webhooks` points at your local `turbo dev`.
+The tunnel starts automatically with `turbo dev` when `CLOUDFLARE_TUNNEL_TOKEN` is set.
+This routes `https://dev.dylangattey.com` to your local Next.js server for OAuth and webhook testing.
 
-1. Start the connector from the [tunnel config](https://one.dash.cloudflare.com/737867b500ec8ef1d7e5c9650e5dbfdb/networks/tunnels/cfd_tunnel/60e09136-a10f-499c-8925-bcef7570677d/edit?tab=overview) using the “Install and run a connector” section.
-1. It runs as a persistent local service to keep the tunnel open.
-1. For prod debugging, temporarily swap the `STRAVA_*` items in 1Password to prod values (except the callback URL), run `scripts/generate-env`, log into Strava, change the accepted domain to `dev`, then delete + recreate the subscription.
+To set up:
+1. Get the tunnel token from [Cloudflare Zero Trust](https://one.dash.cloudflare.com/737867b500ec8ef1d7e5c9650e5dbfdb/networks/tunnels/cfd_tunnel/60e09136-a10f-499c-8925-bcef7570677d/edit?tab=overview)
+2. Add it to 1Password as `CLOUDFLARE_TUNNEL_TOKEN`
+3. Run `scripts/generate-env` to update your `.env`
+
+The tunnel will fail if `CLOUDFLARE_TUNNEL_TOKEN` isn't configured in your `.env`.
 </details>
 
 #### Webhooks

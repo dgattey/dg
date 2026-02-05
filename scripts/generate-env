@@ -3,9 +3,33 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${(%):-%x}")/.." && pwd)"
 OUTPUT_FILE="${ROOT}/.env"
+KEYS_FILE="${ROOT}/config/env.secrets.keys"
 
-# Skip if .env already exists
-[[ -f "$OUTPUT_FILE" ]] && { echo ".env already exists" >&2; exit 0; }
+# Build list of keys to fetch from 1Password
+declare -A keys_to_fetch  # Maps: 1Password key -> .env key
+
+while read -r key; do
+  [[ -z "$key" || "$key" == \#* ]] && continue
+  keys_to_fetch[$key]=$key
+done < "$KEYS_FILE"
+
+# Get expected output keys (what will be written to .env)
+expected_keys=$(printf '%s\n' "${keys_to_fetch[@]}" | sort -u)
+
+# Check if .env exists with correct keys
+if [[ -f "$OUTPUT_FILE" ]]; then
+  existing_keys=$(grep -v '^#' "$OUTPUT_FILE" | grep -v '^$' | cut -d= -f1 | sort)
+  
+  if [[ "$expected_keys" == "$existing_keys" ]]; then
+    echo ".env already exists with correct keys" >&2
+    exit 0
+  fi
+  
+  echo ".env keys mismatch, regenerating..." >&2
+fi
+
+# Remove old .env if regenerating
+rm -f "$OUTPUT_FILE"
 
 # Check 1Password auth
 export OP_ACCOUNT="my.1password.com"
@@ -17,29 +41,28 @@ if ! op whoami >/dev/null 2>&1; then
   }
 fi
 
-# Write defaults
-echo "Writing defaults..." >&2
-grep -v '^#' "${ROOT}/config/env.defaults" | grep -v '^$' > "$OUTPUT_FILE"
-
 # Fetch secrets in parallel
-echo "Fetching secrets..." >&2
+echo "Fetching secrets from 1Password..." >&2
 TMP_DIR="$(mktemp -d)"
 trap "rm -rf '$TMP_DIR'" EXIT
 
-while read -r key; do
-  [[ -z "$key" || "$key" == \#* ]] && continue
-  (op read "op://dg/${key}/value" > "${TMP_DIR}/${key}" 2>&1) &
-done < "${ROOT}/config/env.secrets.keys"
+for op_key in "${(@k)keys_to_fetch}"; do
+  env_key="${keys_to_fetch[$op_key]}"
+  # Store both the op_key and env_key in the filename for later
+  (op read "op://dg/${op_key}/value" > "${TMP_DIR}/${op_key}::${env_key}" 2>&1) &
+done
 wait
 
-# Append secrets
+# Write secrets to .env
 for file in "$TMP_DIR"/*; do
   [[ -f "$file" ]] || continue
-  key="$(basename "$file")"
+  filename="$(basename "$file")"
+  op_key="${filename%%::*}"
+  env_key="${filename##*::}"
   value="$(cat "$file")"
   
   if [[ -z "$value" || "$value" == *"ERROR"* ]]; then
-    echo "Failed to read $key from 1Password" >&2
+    echo "Failed to read $op_key from 1Password" >&2
     exit 1
   fi
   
@@ -48,7 +71,7 @@ for file in "$TMP_DIR"/*; do
   value="${value//\"/\\\"}"
   value="${value//$'\n'/\\n}"
   
-  echo "${key}=\"${value}\"" >> "$OUTPUT_FILE"
+  echo "${env_key}=\"${value}\"" >> "$OUTPUT_FILE"
 done
 
 echo "Generated .env"

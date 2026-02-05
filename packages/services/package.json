@@ -15,7 +15,7 @@
     "@types/node": "catalog:",
     "dotenv-mono": "catalog:",
     "graphql": "catalog:",
-    "ts-node": "catalog:",
+    "tsx": "catalog:",
     "typescript": "catalog:"
   },
   "name": "@dg/services",

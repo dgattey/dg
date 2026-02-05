@@ -143,24 +143,13 @@
                       "../services/**",
                       "../shared-core/**",
                       "../tsconfig/**",
-                      "../ui/**",
-                      "../webhooks/**"
+                      "../ui/**"
                     ],
                     "message": "Import workspace packages by name (e.g. @dg/services/*, @dg/ui/*)."
                   }
                 ]
               }
             }
-          }
-        }
-      }
-    },
-    {
-      "includes": ["packages/webhooks/**"],
-      "linter": {
-        "rules": {
-          "suspicious": {
-            "noConsole": "off"
           }
         }
       }
