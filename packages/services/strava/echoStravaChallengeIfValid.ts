@@ -1,3 +1,5 @@
+import 'server-only';
+
 type Query = Partial<Record<string, string | Array<string>>> | URLSearchParams;
 
 const MODE_KEY = 'hub.mode';

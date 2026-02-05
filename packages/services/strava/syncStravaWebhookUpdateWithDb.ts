@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { StravaWebhookEvent } from '@dg/content-models/strava/StravaWebhookEvent';
 import { db } from '@dg/db';
 import { log } from '@dg/shared-core/helpers/log';

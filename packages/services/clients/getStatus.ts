@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { log } from '@dg/shared-core/helpers/log';
 
 /**

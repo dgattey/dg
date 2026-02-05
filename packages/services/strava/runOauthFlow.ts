@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { db } from '@dg/db';
 import { invariant } from '@dg/shared-core/helpers/invariant';
 import { log } from '@dg/shared-core/helpers/log';
@@ -8,7 +10,6 @@ import { stravaTokenExchangeClient } from './stravaTokenExchangeClient';
 const CALLBACK_URL = process.env.WEBHOOK_CALLBACK_URL;
 const CLIENT_ID = process.env.STRAVA_CLIENT_ID;
 const CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
-const STRAVA_TOKEN_NAME = process.env.STRAVA_TOKEN_NAME;
 invariant(CALLBACK_URL, 'Missing WEBHOOK_CALLBACK_URL env variable');
 invariant(CLIENT_ID, 'Missing STRAVA_CLIENT_ID env variable');
 invariant(CLIENT_SECRET, 'Missing STRAVA_CLIENT_SECRET env variable');
@@ -76,7 +77,6 @@ export async function exchangeCodeForToken(code: string): Promise<string> {
   const { accessToken, expiryAt, refreshToken } = validateRawDataToToken(rawTokenData);
 
   // Persist the refreshToken and accessToken from the response to the DB
-  invariant(STRAVA_TOKEN_NAME, 'Missing STRAVA_TOKEN_NAME env variable');
   log.info('Persisting token to DB', {
     accessToken: maskSecret(accessToken),
     expiryAt,
@@ -85,11 +85,11 @@ export async function exchangeCodeForToken(code: string): Promise<string> {
   const [token] = await db.Token.upsert({
     accessToken,
     expiryAt,
-    name: STRAVA_TOKEN_NAME,
+    name: 'strava',
     refreshToken,
   });
   log.info('Persisted token to DB', { updatedAt: token.updatedAt });
 
   return `
-    <p>Success! Token persisted to ${STRAVA_TOKEN_NAME} and expires at ${expiryAt.toLocaleString()}</p>`;
+    <p>Success! Token persisted to 'strava' and expires at ${expiryAt.toLocaleString()}</p>`;
 }

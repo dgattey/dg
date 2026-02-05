@@ -101,7 +101,6 @@ Required environment variables (see `config/env.secrets.keys`):
 - `CONTENTFUL_SPACE_ID` - Contentful space identifier
 - `SPOTIFY_CLIENT_ID` / `SPOTIFY_CLIENT_SECRET` - Spotify OAuth credentials
 - `STRAVA_CLIENT_ID` / `STRAVA_CLIENT_SECRET` - Strava OAuth credentials
-- `STRAVA_TOKEN_NAME` - Database token identifier
 - `STRAVA_VERIFY_TOKEN` - Webhook verification token
 - `DATABASE_URL` - PostgreSQL connection string (for Strava caching)
 

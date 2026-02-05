@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { toRenderableAsset } from '@dg/content-models/contentful/renderables/assets';
 import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
 import { toRenderableRichTextContent } from '@dg/content-models/contentful/renderables/richText';

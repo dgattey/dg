@@ -16,9 +16,6 @@ Hi :wave: This is an overengineered way to show past projects / experiment with 
 - `turbo graphql:schema` refresh Contentful GraphQL schema for editor tooling
 - `turbo migrate` run migrations (`turbo db -- db:migrate:status`, `turbo db -- db:migrate:undo`)
 - `turbo db -- migration:generate --name <name>` create migration
-- `turbo webhook -- create <name>` create webhook (needs `dev`)
-- `turbo webhook -- list <name>` list webhooks
-- `turbo webhook -- delete <name> <id>` delete webhook
 - `turbo clean` clean caches, generated files, and `.env`
 - `turbo topo --graph=graph.html` monorepo dependency graph
 
@@ -104,7 +101,7 @@ Pretty standard Next.js App Router app. `/public` has static files, `/src/app` h
 1. Server Components fetch data directly using server-only functions with Cache Components (`use cache`).
 1. Data fetching uses tag-based revalidation for webhook-triggered updates.
 1. Client Components receive data as props from Server Components.
-1. `/src/api/server` is server-only (clients + fetchers). Don’t import it client-side.
+1. `/src/api/server` is server-only (clients + fetchers). Don't import it client-side.
 
 ### DB
 
@@ -112,8 +109,8 @@ Spotify + Strava use OAuth, so I use Neon + Sequelize to store and refresh token
 
 There are two tables:
 
-1. **Token**: I grab the latest token, see if it's expired, and if so, fetch new data via Spotify/Strava + the saved refresh token. Once it’s persisted, I can call the APIs with the auth tokens. Nice defaults built in so anything missing gives back the right info as possible.
-2. **StravaActivity**: I create a row on new activity webhooks, fetch the full activity from Strava, and re-fetch/update JSON when data changes. I track last update time so multiple updates in a window don’t hammer Strava’s servers.
+1. **Token**: I grab the latest token, see if it's expired, and if so, fetch new data via Spotify/Strava + the saved refresh token. Once it's persisted, I can call the APIs with the auth tokens. Nice defaults built in so anything missing gives back the right info as possible.
+2. **StravaActivity**: I create a row on new activity webhooks, fetch the full activity from Strava, and re-fetch/update JSON when data changes. I track last update time so multiple updates in a window don't hammer Strava's servers.
 
 To create and run a migration:
 
@@ -124,9 +121,9 @@ To create and run a migration:
 
 DO NOT hit Strava directly unless you must. Webhooks persist activity data so we read from DB instead.
 
-Each Strava app supports a single subscription, so I keep two apps: one for local testing, one for prod. `/webhooks` handles both.
+Each Strava app supports a single subscription, so I keep two apps: one for local testing, one for prod. `/api/webhooks` handles webhook events, and `/console` handles OAuth setup and webhook subscription management (dev/test only).
 
-Both use the same DB but different tokens + callback URLs. `process.env.STRAVA_TOKEN_NAME` switches between them. For local webhook testing, use a Neon branch to avoid clobbering prod data.
+Each app uses its own Neon database, tokens, and callback URLs. `OAUTH_CALLBACK_URL` should point at `/api/oauth` (shared by Strava and Spotify), and `STRAVA_WEBHOOK_CALLBACK_URL` should point at `/api/webhooks`.
 
 <details>
 <summary>Cloudflare Tunnels (automatic with turbo dev)</summary>
@@ -144,10 +141,8 @@ The tunnel will fail if `CLOUDFLARE_TUNNEL_TOKEN` isn't configured in your `.env
 
 #### Webhooks
 
-1. Start `turbo dev`, then `turbo webhook -- create strava`. Delete it when done so Strava doesn’t ping a dead endpoint.
-2. List: `turbo webhook -- list strava` | Delete: `turbo webhook -- delete strava <id>`
-3. Add a `console.log` in `apps/web/src/app/api/webhooks/route.ts` and rename an activity to trigger events. [Docs](https://developers.strava.com/docs/webhooks/)
-4. For prod testing, swap `STRAVA_*` items in 1Password to match Vercel (keep callback URL as dev), run `scripts/generate-env`, and restart so OAuth re-runs.
+1. Start `turbo dev`, then visit `/console` in the browser to view webhook status and manage subscriptions. Delete subscriptions when done so Strava doesn't ping a dead endpoint.
+2. Add a `console.log` in `apps/web/src/app/api/webhooks/route.ts` and rename an activity to trigger events. [Docs](https://developers.strava.com/docs/webhooks/)
 
 ### Versioning
 

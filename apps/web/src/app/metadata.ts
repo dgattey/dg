@@ -14,10 +14,6 @@ const toUrl = (value: string) => {
 };
 
 const resolveMetadataBase = () => {
-  const explicitBase = process.env.NEXT_PUBLIC_SITE_URL;
-  if (explicitBase) {
-    return toUrl(explicitBase);
-  }
   const productionUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
   if (productionUrl) {
     return toUrl(productionUrl);

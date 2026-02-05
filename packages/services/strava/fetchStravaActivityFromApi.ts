@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { stravaActivityApiSchema } from '@dg/content-models/strava/StravaActivity';
 import { log } from '@dg/shared-core/helpers/log';
 import { parseResponse } from '../clients/parseResponse';

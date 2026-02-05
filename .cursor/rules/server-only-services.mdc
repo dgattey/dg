@@ -1,0 +1,43 @@
+# Server-only Services
+
+## Two types of server files
+
+| File type | Marker | Purpose |
+|-----------|--------|---------|
+| `*.ts` | `import 'server-only'` | Server-only code (NOT callable from client) |
+| `*.actions.ts` | `'use server'` at top | Server Actions (callable from client) |
+
+## Why separate files?
+
+- `server-only` = code that should NEVER be exposed to client (DB queries, secrets)
+- `'use server'` = HTTP endpoints callable from client components
+- Mixing them in one file is confusing and error-prone
+
+## Rules
+
+1. Server-only files (`*.ts`): `import 'server-only'` at top
+2. Server action files (`*.actions.ts`): `'use server'` at top
+3. Never mix both in the same file
+4. Exception: Type-only files don't need either
+
+## Example structure
+
+```
+services/
+  strava.ts          # import 'server-only' - for server components
+  strava.actions.ts  # 'use server' - for client components
+  oauth.ts           # import 'server-only' - for server components
+  oauth.actions.ts   # 'use server' - for client components
+```
+
+## No Type Re-exports
+
+Import types directly from their source:
+
+```ts
+// ❌ Bad
+export type { WebhookSubscription } from '@dg/services/...';
+
+// ✅ Good
+import type { OauthProvider } from '@dg/services/oauth/types';
+```

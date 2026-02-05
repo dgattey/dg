@@ -1,3 +1,5 @@
+import 'server-only';
+
 import { log } from '@dg/shared-core/helpers/log';
 import { type BaseIssue, type BaseSchema, flatten, type InferOutput, safeParse } from 'valibot';
 

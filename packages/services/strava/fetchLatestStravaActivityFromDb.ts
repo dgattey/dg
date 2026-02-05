@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import {
   mapStravaActivityFromApi,

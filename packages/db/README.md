@@ -15,9 +15,14 @@ Neon PostgreSQL database with Sequelize ORM for migrations and models.
 
 ## Commands
 
-- `turbo connect -- <branch>` - Connect to a Neon branch
-- `turbo db -- db:migrate` - Run pending migrations
+- `turbo migrate` - Run pending migrations
 - `turbo db -- db:migrate:undo` - Rollback last migration
 - `turbo db -- migration:generate --name <name>` - Create new migration
 
-Requires `neonctl` installed globally.
+## Environment
+
+- `DATABASE_URL` - Connection string for development/production (from 1Password)
+- `DATABASE_URL_TEST` - Connection string for tests (from 1Password, **required** for tests)
+
+Tests run with `NODE_ENV=test` so the DB client uses `DATABASE_URL_TEST`.
+

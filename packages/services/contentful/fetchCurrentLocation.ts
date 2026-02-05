@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import { toRenderableAsset } from '@dg/content-models/contentful/renderables/assets';
 import { currentLocationResponseSchema } from '@dg/content-models/contentful/schema/location';
