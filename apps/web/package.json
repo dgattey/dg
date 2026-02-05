@@ -12,7 +12,6 @@
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.1",
     "@fortawesome/free-brands-svg-icons": "catalog:",
-    "@fortawesome/free-solid-svg-icons": "7.1.0",
     "@mui/material": "catalog:",
     "@mui/material-nextjs": "7.3.7",
     "@vercel/analytics": "1.6.1",
@@ -25,6 +24,7 @@
     "server-only": "catalog:"
   },
   "devDependencies": {
+    "@dg/db": "workspace:*",
     "@dg/testing": "workspace:*",
     "@dg/tsconfig": "workspace:*",
     "@testing-library/dom": "catalog:",
@@ -50,7 +50,6 @@
     "check:types": "tsc",
     "clean": "rm -rf .next .turbo *.tsbuildinfo",
     "dev": "next dev --turbopack",
-    "test": "jest",
-    "test:watch": "jest --watch"
+    "test": "jest"
   }
 }

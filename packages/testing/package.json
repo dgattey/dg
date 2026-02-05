@@ -1,10 +1,8 @@
 {
   "dependencies": {
-    "@dg/db": "workspace:*",
-    "@dg/shared-core": "workspace:*",
+    "@swc/jest": "0.2.39",
     "@testing-library/jest-dom": "catalog:",
-    "sequelize": "6.37.7",
-    "sequelize-typescript": "2.1.6"
+    "esbuild-register": "3.6.0"
   },
   "devDependencies": {
     "@dg/tsconfig": "workspace:*",

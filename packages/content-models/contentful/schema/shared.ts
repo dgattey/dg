@@ -8,7 +8,7 @@ import * as v from 'valibot';
 /**
  * Contentful `sys` metadata used for linking entries/assets in rich text.
  */
-export const sysSchema = v.looseObject({
+const sysSchema = v.looseObject({
   id: v.string(),
 });
 
@@ -143,4 +143,3 @@ export type Project = v.InferOutput<typeof projectSchema>;
 export type ProjectWithSys = v.InferOutput<typeof projectWithSysSchema>;
 export type Entry = v.InferOutput<typeof entrySchema>;
 export type RichTextContent = v.InferOutput<typeof richTextContentSchema>;
-export type TextBlock = v.InferOutput<typeof textBlockSchema>;

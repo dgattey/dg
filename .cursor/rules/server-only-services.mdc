@@ -39,5 +39,5 @@ Import types directly from their source:
 export type { WebhookSubscription } from '@dg/services/...';
 
 // ✅ Good
-import type { OauthProvider } from '@dg/services/oauth/types';
+import type { OauthProviderKey } from '@dg/shared-core/routes/api';
 ```

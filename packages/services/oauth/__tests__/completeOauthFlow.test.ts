@@ -1,11 +1,11 @@
 import { setupMockLifecycle } from '@dg/testing/mocks';
-import { setupTestDatabase } from '../../testing/setupTestDatabase';
+import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 
 const getUrl = (input: RequestInfo): string =>
   typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
 
 describe('completeOauthFlow', () => {
-  const db = setupTestDatabase({ truncate: ['OauthState', 'Token'] });
+  const db = setupTestDatabase();
   setupMockLifecycle();
 
   const originalEnv = process.env;

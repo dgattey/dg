@@ -25,7 +25,7 @@ const GRACE_PERIOD_IN_MS = 30_000;
  * We intentionally expire with an extra grace period to ensure round trips +
  * other things don't eat up processing time and cause us to miss the expiry timestamp.
  */
-function createExpirationDate(expiryDistanceInSeconds: number) {
+export function createExpirationDate(expiryDistanceInSeconds: number) {
   return new Date(Date.now() - GRACE_PERIOD_IN_MS + expiryDistanceInSeconds * 1000);
 }
 

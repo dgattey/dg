@@ -2,7 +2,7 @@ import { invariant } from '@dg/shared-core/assertions/invariant';
 import postgres from 'pg';
 import type { SequelizeOptions } from 'sequelize-typescript';
 
-export type DbEnv = 'development' | 'production' | 'test';
+type DbEnv = 'development' | 'production' | 'test';
 
 // Shared options for all environments - unified SSL
 export const sequelizeOptions = {
@@ -11,6 +11,10 @@ export const sequelizeOptions = {
   dialectOptions: {
     ssl: { rejectUnauthorized: true },
   },
+  // In test, limit pool to 1 connection per worker so that each test's
+  // wrapping BEGIN/ROLLBACK transaction covers every query on the same
+  // physical connection, providing full isolation between parallel workers.
+  ...(process.env.NODE_ENV === 'test' && { pool: { max: 1 } }),
   ssl: true,
 } satisfies SequelizeOptions;
 

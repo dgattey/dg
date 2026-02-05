@@ -3,6 +3,8 @@ packages:
   - packages/*
   - apps/*
 
+approveBuildsAllowlist: '@swc/core'
+
 catalog:
   '@contentful/rich-text-types': 17.2.5
   '@fortawesome/free-brands-svg-icons': 7.1.0
@@ -34,6 +36,7 @@ catalog:
 
 onlyBuiltDependencies:
   - '@biomejs/biome'
+  - '@swc/core'
   - '@vercel/speed-insights'
   - esbuild
   - sharp

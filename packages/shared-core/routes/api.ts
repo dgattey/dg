@@ -2,7 +2,6 @@
  * Supported OAuth providers.
  */
 export type OauthProviderKey = 'strava' | 'spotify';
-export const OauthProviderKeys: ReadonlyArray<OauthProviderKey> = ['strava', 'spotify'] as const;
 
 /**
  * Shared API route path constants.

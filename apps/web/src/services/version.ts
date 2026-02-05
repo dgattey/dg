@@ -8,7 +8,7 @@ const getRepositoryUrl = () => {
   return repository.replace(/\.git$/, '');
 };
 
-export const getAppVersion = () => {
+const getAppVersion = () => {
   invariant(version, 'App version missing in package.json');
   return `v${version}`;
 };

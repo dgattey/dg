@@ -88,7 +88,7 @@ const BUILT_IN_ICONS: Record<string, React.ReactNode> = {
  * If there's an icon, returns it, either built in or not, along with its title if
  * the layout calls for it.
  */
-export function createIconElement({
+function createIconElement({
   icon,
   layout = 'text',
 }: Pick<BaseLinkProps, 'icon' | 'layout'>): React.ReactNode | null {
@@ -102,7 +102,7 @@ export function createIconElement({
 /**
  * Generates a layout enum for use in computing the contents.
  */
-export function resolveLinkLayout({
+function resolveLinkLayout({
   children,
   icon,
   layout = 'text',
@@ -123,7 +123,7 @@ export function resolveLinkLayout({
 /**
  * Computes the rendered link contents for the given layout.
  */
-export function getLinkContents({
+function getLinkContents({
   children,
   icon,
   layout,
@@ -148,7 +148,7 @@ export function getLinkContents({
   }
 }
 
-export function shouldUseTooltip(layout: LinkLayout, title?: string) {
+function shouldUseTooltip(layout: LinkLayout, title?: string) {
   return layout === 'icon' && Boolean(title);
 }
 

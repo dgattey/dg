@@ -1,3 +1,4 @@
+import 'dotenv-mono/load';
 import { closeTestDatabase, resetTestDatabase } from './databaseSetup';
 import { runMigrations } from './migrations';
 
@@ -12,7 +13,7 @@ import { runMigrations } from './migrations';
  */
 export default async function globalSetup() {
   // Import db to trigger connection and validation
-  const { dbClient } = await import('@dg/db');
+  const { dbClient } = await import('../client');
 
   // Run migrations to ensure schema is up to date
   await runMigrations(dbClient);

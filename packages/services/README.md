@@ -18,7 +18,6 @@ services/
 ├── clients/          # Reusable HTTP client utilities
 ├── images/           # Server-side image utilities
 ├── contentful/       # Contentful CMS integration
-├── github/           # GitHub API integration
 ├── spotify/          # Spotify API integration
 ├── strava/           # Strava API integration
 ```
@@ -35,7 +34,6 @@ Low-level HTTP client utilities used by service integrations:
 | `refreshedAccessToken.ts` | Token refresh logic for OAuth flows |
 | `RefreshTokenConfig.ts` | Configuration type for token refresh |
 | `getStatus.ts` | HTTP status code helpers |
-| `maskSecret.ts` | Utility to mask secrets in logs |
 
 ## Images
 

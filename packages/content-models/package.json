@@ -5,11 +5,13 @@
     "valibot": "catalog:"
   },
   "devDependencies": {
+    "@dg/testing": "workspace:*",
     "@dg/tsconfig": "workspace:*",
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
     "dotenv-mono": "catalog:",
     "graphql": "catalog:",
+    "jest": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:"
   },
@@ -20,7 +22,8 @@
     "check:ci": "biome ci .",
     "check:types": "tsc",
     "clean": "rm -rf .turbo *.tsbuildinfo",
-    "graphql:schema": "tsx scripts/graphql-schema.ts"
+    "graphql:schema": "tsx scripts/graphql-schema.ts",
+    "test": "jest"
   },
   "type": "module"
 }

@@ -10,3 +10,12 @@ export function setupMockLifecycle(): void {
     jest.restoreAllMocks();
   });
 }
+
+/**
+ * Replaces `process.env` with the current values merged with the given
+ * overrides. Jest automatically restores the original after each test.
+ * Use `undefined` values to simulate missing env vars.
+ */
+export function mockEnv(overrides: Record<string, string | undefined>): void {
+  jest.replaceProperty(process, 'env', { ...process.env, ...overrides });
+}

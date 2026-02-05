@@ -1,7 +1,6 @@
 import 'server-only';
 
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import { requireDevConsoleAuth } from '../../services/devConsoleAuth';
 import { OauthCard } from './oauth/OauthCard';
 import { WebhookCard } from './webhooks/WebhookCard';
 
@@ -46,9 +45,7 @@ function WebhookSection() {
   );
 }
 
-export default async function ConsolePage() {
-  await requireDevConsoleAuth();
-
+export default function ConsolePage() {
   return (
     <main>
       <Stack gap={3}>

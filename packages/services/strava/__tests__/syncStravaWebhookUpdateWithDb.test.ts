@@ -1,5 +1,5 @@
 import type { StravaWebhookEvent } from '@dg/content-models/strava/StravaWebhookEvent';
-import { setupTestDatabase } from '@dg/testing/databaseSetup';
+import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 import { setupMockLifecycle } from '@dg/testing/mocks';
 
 const mockStravaGet = jest.fn<
@@ -14,7 +14,7 @@ jest.mock('../stravaClient', () => ({
 }));
 
 describe('syncStravaWebhookUpdateWithDb', () => {
-  const db = setupTestDatabase({ truncate: ['StravaActivity'] });
+  const db = setupTestDatabase();
   setupMockLifecycle();
 
   let syncStravaWebhookUpdateWithDb: typeof import('../syncStravaWebhookUpdateWithDb').syncStravaWebhookUpdateWithDb;

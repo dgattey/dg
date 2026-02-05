@@ -22,7 +22,7 @@ export const currentlyPlayingApiSchema = v.looseObject({
 /**
  * Parsed payload for currently playing data.
  */
-export type CurrentlyPlayingApi = v.InferOutput<typeof currentlyPlayingApiSchema>;
+type CurrentlyPlayingApi = v.InferOutput<typeof currentlyPlayingApiSchema>;
 
 /**
  * Domain payload for currently playing data (camelCase).

@@ -3,6 +3,8 @@ import 'server-only';
 import { db } from '@dg/db';
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import { log } from '@dg/shared-core/logging/log';
+import { isRecord } from '@dg/shared-core/types/typeguards';
+import { createExpirationDate } from '../spotify/spotifyClient';
 
 const CALLBACK_URL = process.env.OAUTH_CALLBACK_URL ?? '';
 const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID ?? '';
@@ -10,13 +12,6 @@ invariant(CALLBACK_URL, 'Missing OAUTH_CALLBACK_URL env variable');
 invariant(CLIENT_ID, 'Missing SPOTIFY_CLIENT_ID env variable');
 
 const SPOTIFY_TOKEN_NAME = 'spotify';
-const GRACE_PERIOD_IN_MS = 30_000;
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' && value !== null;
-
-const createExpirationDate = (expiryDistanceInSeconds: number) =>
-  new Date(Date.now() - GRACE_PERIOD_IN_MS + expiryDistanceInSeconds * 1000);
 
 /**
  * Exchanges a Spotify authorization code for an access token and persists it.

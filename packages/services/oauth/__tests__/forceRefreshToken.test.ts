@@ -1,12 +1,12 @@
 import { setupMockLifecycle } from '@dg/testing/mocks';
-import { setupTestDatabase } from '../../testing/setupTestDatabase';
+import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 import { forceRefreshToken } from '../forceRefreshToken';
 
 const getUrl = (input: RequestInfo): string =>
   typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
 
 describe('forceRefreshToken', () => {
-  const db = setupTestDatabase({ truncate: ['Token'] });
+  const db = setupTestDatabase();
   setupMockLifecycle();
 
   const originalEnv = process.env;

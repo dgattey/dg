@@ -1,6 +1,5 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
-import { log } from '@dg/shared-core/logging/log';
 import type { Sequelize } from 'sequelize-typescript';
 
 /**
@@ -29,9 +28,8 @@ export async function runMigrations(dbClient: Sequelize): Promise<void> {
   )) as unknown as [[{ name: string }]];
   const executedNames = new Set(executedMigrations.map((m) => m.name));
 
-  // Find migration files (in @dg/db/migrations)
-  const dbPackagePath = require.resolve('@dg/db');
-  const migrationsDir = join(dbPackagePath, '..', 'migrations');
+  // Find migration files
+  const migrationsDir = join(__dirname, '..', 'migrations');
   const migrationFiles = readdirSync(migrationsDir)
     .filter((f) => f.endsWith('.js'))
     .sort();
@@ -40,7 +38,7 @@ export async function runMigrations(dbClient: Sequelize): Promise<void> {
   for (const file of migrationFiles) {
     if (executedNames.has(file)) continue;
 
-    log.info(`Running migration: ${file}`);
+    console.log(`Running migration: ${file}`);
     const migrationPath = join(migrationsDir, file);
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const migration = require(migrationPath) as {

@@ -24,7 +24,7 @@ export const recentlyPlayedApiSchema = v.looseObject({
 /**
  * Parsed payload for recently played data.
  */
-export type RecentlyPlayedApi = v.InferOutput<typeof recentlyPlayedApiSchema>;
+type RecentlyPlayedApi = v.InferOutput<typeof recentlyPlayedApiSchema>;
 
 /**
  * Domain payload for recently played data (camelCase).

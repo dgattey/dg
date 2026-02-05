@@ -69,7 +69,7 @@ export { SomeComponent } from './SomeComponent';
 export type { WebhookSubscription } from '@dg/services/...';
 
 // Good - import type directly
-import type { OauthProvider } from '@dg/services/oauth/types';
+import type { OauthProviderKey } from '@dg/shared-core/routes/api';
 ```
 
 ### When to re-export

@@ -6,9 +6,9 @@
     "scripts/generate-env",
     ".node-version",
     ".npmrc",
-    ".sequelizerc",
+    "packages/db/.sequelizerc",
     "biome.json",
-    "next.config.js",
+    "next.config.ts",
     "tsconfig.json"
   ],
   "globalEnv": [
@@ -96,7 +96,7 @@
     },
     "test": {
       "dependsOn": ["topo"],
-      "inputs": ["$TURBO_DEFAULT$", "../../packages/**", "!**/*.md", "!**/*.mdx"],
+      "inputs": ["$TURBO_DEFAULT$", "!**/*.md", "!**/*.mdx"],
       "outputLogs": "new-only",
       "outputs": []
     },

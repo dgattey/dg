@@ -11,10 +11,10 @@
     "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
-    "sharp": "catalog:",
-    "use-breakpoint": "4.0.10"
+    "sharp": "catalog:"
   },
   "devDependencies": {
+    "@dg/testing": "workspace:*",
     "@dg/tsconfig": "workspace:*",
     "@testing-library/jest-dom": "catalog:",
     "@testing-library/react": "catalog:",
@@ -22,6 +22,8 @@
     "@types/jest": "catalog:",
     "@types/react": "catalog:",
     "dotenv-mono": "catalog:",
+    "jest": "catalog:",
+    "jest-environment-jsdom": "catalog:",
     "typescript": "catalog:"
   },
   "name": "@dg/ui",
@@ -30,6 +32,7 @@
     "check": "biome check --write .",
     "check:ci": "biome ci .",
     "check:types": "tsc",
-    "clean": "rm -rf .turbo *.tsbuildinfo"
+    "clean": "rm -rf .turbo *.tsbuildinfo",
+    "test": "jest"
   }
 }
