@@ -21,6 +21,8 @@
   "private": true,
   "repository": "https://github.com/dgattey/dg.git",
   "scripts": {
+    "check": "biome check --write .",
+    "check:ci": "biome ci .",
     "clean": "rm -f .env .env.tmp",
     "dev": "scripts/tunnel",
     "env": "scripts/generate-env",
