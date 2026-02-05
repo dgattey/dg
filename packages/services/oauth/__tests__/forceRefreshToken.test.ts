@@ -1,5 +1,5 @@
-import { setupMockLifecycle } from '@dg/testing/mocks';
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
+import { setupMockLifecycle } from '@dg/testing/mocks';
 import { forceRefreshToken } from '../forceRefreshToken';
 
 const getUrl = (input: RequestInfo): string =>

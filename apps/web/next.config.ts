@@ -6,6 +6,7 @@ dotenvConfig();
 const nextConfig: NextConfig = {
   cacheComponents: true,
   experimental: {
+    authInterrupts: true,
     scrollRestoration: true,
     turbopackFileSystemCacheForBuild: true,
     turbopackFileSystemCacheForDev: true,

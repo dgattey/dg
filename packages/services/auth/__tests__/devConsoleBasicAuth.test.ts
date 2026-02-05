@@ -91,15 +91,33 @@ describe('isDevConsoleAccessAllowed', () => {
       mockEnv({ DEV_CONSOLE_BASIC_AUTH_PASS: 'secret', DEV_CONSOLE_BASIC_AUTH_USER: 'admin' });
     });
 
-    it('returns true for valid credentials', () => {
+    it('returns true for valid credentials in development', () => {
+      mockEnv({ NODE_ENV: 'development' });
+
       expect(isDevConsoleAccessAllowed(encode('admin', 'secret'))).toBe(true);
     });
 
-    it('returns false for invalid credentials', () => {
+    it('returns true for valid credentials in production', () => {
+      mockEnv({ NODE_ENV: 'production' });
+
+      expect(isDevConsoleAccessAllowed(encode('admin', 'secret'))).toBe(true);
+    });
+
+    it('returns false for missing credentials in development', () => {
+      mockEnv({ NODE_ENV: 'development' });
+
+      expect(isDevConsoleAccessAllowed(null)).toBe(false);
+    });
+
+    it('returns false for invalid credentials in development', () => {
+      mockEnv({ NODE_ENV: 'development' });
+
       expect(isDevConsoleAccessAllowed(encode('admin', 'wrong'))).toBe(false);
     });
 
-    it('returns false for null header', () => {
+    it('returns false for missing credentials in production', () => {
+      mockEnv({ NODE_ENV: 'production' });
+
       expect(isDevConsoleAccessAllowed(null)).toBe(false);
     });
   });

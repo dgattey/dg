@@ -1,5 +1,6 @@
 import { readdirSync } from 'node:fs';
 import { join } from 'node:path';
+import { log } from '@dg/shared-core/logging/log';
 import type { Sequelize } from 'sequelize-typescript';
 
 /**
@@ -38,7 +39,7 @@ export async function runMigrations(dbClient: Sequelize): Promise<void> {
   for (const file of migrationFiles) {
     if (executedNames.has(file)) continue;
 
-    console.log(`Running migration: ${file}`);
+    log.info(`Running migration: ${file}`);
     const migrationPath = join(migrationsDir, file);
     // eslint-disable-next-line @typescript-eslint/no-require-imports
     const migration = require(migrationPath) as {

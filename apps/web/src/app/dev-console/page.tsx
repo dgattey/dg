@@ -8,52 +8,48 @@ const oauthProviders = ['strava', 'spotify'] as const;
 
 function PageHeader() {
   return (
-    <>
+    <Stack gap={2}>
       <Typography variant="h1">Dev console</Typography>
       <Typography color="text.secondary" variant="body1">
         This page is protected and intended for developer access.
       </Typography>
-    </>
+      <Divider sx={{ marginBlockStart: 2 }} />
+    </Stack>
   );
 }
 
-function OauthSection() {
+function CardSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <>
-      <Typography variant="h2">OAuth connections</Typography>
+    <Stack gap={3}>
+      <Typography variant="h2">{title}</Typography>
       <Box
         sx={{
           display: 'grid',
-          gap: 2,
-          gridTemplateColumns: { sm: 'repeat(auto-fit, minmax(280px, 1fr))', xs: '1fr' },
+          gap: 4,
+          gridTemplateColumns: { sm: 'repeat(2, minmax(280px, 1fr))', xs: '1fr' },
         }}
       >
-        {oauthProviders.map((provider) => (
-          <OauthCard key={provider} provider={provider} />
-        ))}
+        {children}
       </Box>
-    </>
-  );
-}
-
-function WebhookSection() {
-  return (
-    <>
-      <Typography variant="h2">Webhook subscriptions</Typography>
-      <WebhookCard />
-    </>
+    </Stack>
   );
 }
 
 export default function ConsolePage() {
   return (
     <main>
-      <Stack gap={3}>
+      <Stack gap={6}>
         <PageHeader />
-        <Divider />
-        <OauthSection />
-        <Divider />
-        <WebhookSection />
+
+        <CardSection title="OAuth connections">
+          {oauthProviders.map((provider) => (
+            <OauthCard key={provider} provider={provider} />
+          ))}
+        </CardSection>
+
+        <CardSection title="Webhook subscriptions">
+          <WebhookCard />
+        </CardSection>
       </Stack>
     </main>
   );

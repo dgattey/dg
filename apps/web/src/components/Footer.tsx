@@ -135,7 +135,7 @@ export async function Footer() {
                   </NavItem>
                 </>
               ) : null}
-              {process.env.NODE_ENV === 'development' ? (
+              {process.env.NODE_ENV !== 'production' ? (
                 <>
                   <NavItem sx={navItemNoPaddingSx}>•</NavItem>
                   <NavItem>

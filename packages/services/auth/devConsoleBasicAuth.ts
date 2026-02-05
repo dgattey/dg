@@ -49,9 +49,11 @@ export function isValidDevConsoleAuth(authorizationHeader: string | null): boole
 
 /**
  * Returns true when the request should be allowed through to the dev console.
- * In non-production without credentials configured, access is always granted
- * for local development convenience. Framework-agnostic so it works in both
- * Next.js middleware (edge) and server components/actions (Node).
+ * When credentials are configured, valid Basic Auth is required in all
+ * environments (including local dev) so the auth flow can be tested locally.
+ * Without credentials configured, access is granted in non-production for
+ * convenience. Framework-agnostic so it works in both Next.js middleware
+ * (edge) and server components/actions (Node).
  */
 export function isDevConsoleAccessAllowed(authorizationHeader: string | null): boolean {
   if (!hasDevConsoleCredentials()) {

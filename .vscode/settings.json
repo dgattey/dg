@@ -26,5 +26,6 @@
     "editor.defaultFormatter": "biomejs.biome"
   },
   "workbench.preferredDarkColorTheme": "Nebula Oni (Cerberus)",
-  "workbench.preferredLightColorTheme": "Ayu Light Bordered"
+  "workbench.preferredLightColorTheme": "Ayu Light Bordered",
+  "jest.jestCommandLine": "turbo test --"
 }

@@ -1,7 +1,7 @@
-import { baseConfig } from '@dg/testing/jest.config.base';
-import type { Config } from 'jest';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { baseConfig } from '@dg/testing/jest.config.base';
+import type { Config } from 'jest';
 
 const dir = dirname(fileURLToPath(import.meta.url));
 

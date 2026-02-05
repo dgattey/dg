@@ -1,7 +1,7 @@
-import type { Config } from 'jest';
 import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import type { Config } from 'jest';
 
 const dir = dirname(fileURLToPath(import.meta.url));
 

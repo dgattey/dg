@@ -64,7 +64,6 @@ export function ServerActionButton({
         disabled={isLoading}
         onClick={handleClick}
         size="small"
-        sx={{ alignSelf: 'flex-start' }}
         variant={variant}
       >
         {isLoading ? loadingLabel : label}

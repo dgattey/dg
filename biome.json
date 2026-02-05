@@ -106,6 +106,16 @@
   },
   "overrides": [
     {
+      "includes": ["packages/shared-core/logging/log.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noConsole": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["apps/**"],
       "linter": {
         "rules": {
