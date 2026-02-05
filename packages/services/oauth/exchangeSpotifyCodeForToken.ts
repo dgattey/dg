@@ -6,11 +6,6 @@ import { log } from '@dg/shared-core/logging/log';
 import { isRecord } from '@dg/shared-core/types/typeguards';
 import { createExpirationDate } from '../spotify/spotifyClient';
 
-const CALLBACK_URL = process.env.OAUTH_CALLBACK_URL ?? '';
-const CLIENT_ID = process.env.SPOTIFY_CLIENT_ID ?? '';
-invariant(CALLBACK_URL, 'Missing OAUTH_CALLBACK_URL env variable');
-invariant(CLIENT_ID, 'Missing SPOTIFY_CLIENT_ID env variable');
-
 const SPOTIFY_TOKEN_NAME = 'spotify';
 
 /**
@@ -21,6 +16,11 @@ export async function exchangeSpotifyCodeForToken(
   code: string,
   codeVerifier?: string,
 ): Promise<string> {
+  const callbackUrl = process.env.OAUTH_CALLBACK_URL;
+  const clientId = process.env.SPOTIFY_CLIENT_ID;
+  invariant(callbackUrl, 'Missing OAUTH_CALLBACK_URL env variable');
+  invariant(clientId, 'Missing SPOTIFY_CLIENT_ID env variable');
+
   log.info('Exchanging code for token for Spotify', { code, hasPkce: !!codeVerifier });
 
   if (!codeVerifier) {
@@ -28,11 +28,11 @@ export async function exchangeSpotifyCodeForToken(
   }
 
   const body = new URLSearchParams({
-    client_id: CLIENT_ID,
+    client_id: clientId,
     code,
     code_verifier: codeVerifier,
     grant_type: 'authorization_code',
-    redirect_uri: CALLBACK_URL,
+    redirect_uri: callbackUrl,
   });
 
   const response = await fetch('https://accounts.spotify.com/api/token', {

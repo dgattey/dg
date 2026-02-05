@@ -6,7 +6,7 @@ import { currentLocationResponseSchema } from '@dg/content-models/contentful/sch
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import { gql } from 'graphql-request';
 import { parseResponse } from '../clients/parseResponse';
-import { contentfulClient } from './contentfulClient';
+import { getContentfulClient } from './contentfulClient';
 
 /**
  * Grabs the home location using a known id for it
@@ -59,10 +59,14 @@ const QUERY = gql`
  * Fetches my current location from Contentful.
  */
 export async function fetchCurrentLocation(): Promise<MapLocation | null> {
-  const data = parseResponse(currentLocationResponseSchema, await contentfulClient.request(QUERY), {
-    kind: 'graphql',
-    source: 'contentful.fetchCurrentLocation',
-  });
+  const data = parseResponse(
+    currentLocationResponseSchema,
+    await getContentfulClient().request(QUERY),
+    {
+      kind: 'graphql',
+      source: 'contentful.fetchCurrentLocation',
+    },
+  );
   const location = data.contentTypeLocation;
   const point = location?.point;
   const latitude = point?.latitude;

@@ -2,7 +2,7 @@ import 'server-only';
 
 import { log } from '@dg/shared-core/logging/log';
 import type { WebhookType } from './WebhookType';
-import { standardParams, webhookSubscriptionConfigs } from './webhookSubscriptionConfigs';
+import { getWebhookSubscriptionConfig, standardParams } from './webhookSubscriptionConfigs';
 
 /**
  * Deletes a webhook subscription with a given id.
@@ -12,7 +12,7 @@ export async function deleteSubscription(
   type: WebhookType,
   subscriptionId: number,
 ): Promise<boolean> {
-  const config = webhookSubscriptionConfigs[type];
+  const config = getWebhookSubscriptionConfig(type);
   const { endpoint, headers } = config;
 
   const url = new URL(`${endpoint}/${subscriptionId}`);

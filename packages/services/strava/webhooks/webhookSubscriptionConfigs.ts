@@ -19,18 +19,22 @@ export const standardParams = (config: WebhookSubscriptionConfig) => {
 };
 
 /**
- * Configurations for the webhooks using env variables.
+ * Returns webhook subscription configs, reading env vars at call time
+ * so tests can set mock values before the config is evaluated.
  */
-export const webhookSubscriptionConfigs: Record<WebhookType, WebhookSubscriptionConfig> = {
-  strava: {
-    callbackUrl: process.env.STRAVA_WEBHOOK_CALLBACK_URL,
-    endpoint: 'https://www.strava.com/api/v3/push_subscriptions',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/x-www-form-urlencoded',
-    },
-    id: process.env.STRAVA_CLIENT_ID,
-    secret: process.env.STRAVA_CLIENT_SECRET,
-    verifyToken: process.env.STRAVA_VERIFY_TOKEN,
-  },
-};
+export function getWebhookSubscriptionConfig(type: WebhookType): WebhookSubscriptionConfig {
+  switch (type) {
+    case 'strava':
+      return {
+        callbackUrl: process.env.STRAVA_WEBHOOK_CALLBACK_URL,
+        endpoint: 'https://www.strava.com/api/v3/push_subscriptions',
+        headers: {
+          Accept: 'application/json',
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        id: process.env.STRAVA_CLIENT_ID,
+        secret: process.env.STRAVA_CLIENT_SECRET,
+        verifyToken: process.env.STRAVA_VERIFY_TOKEN,
+      };
+  }
+}

@@ -3,7 +3,7 @@ import 'server-only';
 import { log } from '@dg/shared-core/logging/log';
 import type { WebhookSubscription } from './listSubscriptions';
 import type { WebhookType } from './WebhookType';
-import { standardParams, webhookSubscriptionConfigs } from './webhookSubscriptionConfigs';
+import { getWebhookSubscriptionConfig, standardParams } from './webhookSubscriptionConfigs';
 
 type StravaErrorResponse = {
   errors?: Array<{
@@ -62,7 +62,7 @@ function parseStravaError(status: number, body: string, callbackUrl: string): st
  * Returns the created subscription, or throws on error.
  */
 export async function createSubscription(type: WebhookType): Promise<WebhookSubscription> {
-  const config = webhookSubscriptionConfigs[type];
+  const config = getWebhookSubscriptionConfig(type);
   const { endpoint, verifyToken, callbackUrl, headers } = config;
 
   if (!verifyToken || !callbackUrl) {

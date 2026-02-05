@@ -6,8 +6,6 @@ import { createOauthState } from './createOauthState';
 import { getProviderConfig, isValidProvider } from './oauthProviderConfig';
 import { cleanupExpiredOauthStates, saveOauthState } from './oauthStateStorage';
 
-const CALLBACK_URL = process.env.OAUTH_CALLBACK_URL;
-
 export type OauthInitResult =
   | { status: 'redirect'; url: string }
   | { status: 'invalid-provider' }
@@ -24,7 +22,8 @@ export async function initiateOauthFlow(provider: string | null): Promise<OauthI
     return { status: 'invalid-provider' };
   }
 
-  if (!CALLBACK_URL) {
+  const callbackUrl = process.env.OAUTH_CALLBACK_URL;
+  if (!callbackUrl) {
     log.error('Missing OAUTH_CALLBACK_URL env variable');
     return { status: 'missing-callback-url' };
   }
@@ -50,7 +49,7 @@ export async function initiateOauthFlow(provider: string | null): Promise<OauthI
   });
 
   const authorizationUrl = buildAuthorizationUrl({
-    callbackUrl: CALLBACK_URL,
+    callbackUrl,
     clientId,
     codeChallenge,
     config,

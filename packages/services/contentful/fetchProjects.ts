@@ -8,7 +8,7 @@ import { projectsResponseSchema } from '@dg/content-models/contentful/schema/pro
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import { gql } from 'graphql-request';
 import { parseResponse } from '../clients/parseResponse';
-import { contentfulClient } from './contentfulClient';
+import { getContentfulClient } from './contentfulClient';
 
 /**
  * Grabs all projects to display
@@ -41,7 +41,7 @@ const QUERY = gql`
  * Fetches all projects sorted by newest first.
  */
 export async function fetchProjects(): Promise<Array<RenderableProject>> {
-  const data = parseResponse(projectsResponseSchema, await contentfulClient.request(QUERY), {
+  const data = parseResponse(projectsResponseSchema, await getContentfulClient().request(QUERY), {
     kind: 'graphql',
     source: 'contentful.fetchProjects',
   });

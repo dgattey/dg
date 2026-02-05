@@ -6,22 +6,20 @@ import { log } from '@dg/shared-core/logging/log';
 import { validateRawDataToToken } from '../strava/stravaClient';
 import { stravaTokenExchangeClient } from '../strava/stravaTokenExchangeClient';
 
-const CALLBACK_URL = process.env.OAUTH_CALLBACK_URL;
-const CLIENT_ID = process.env.STRAVA_CLIENT_ID;
-const CLIENT_SECRET = process.env.STRAVA_CLIENT_SECRET;
-invariant(CALLBACK_URL, 'Missing OAUTH_CALLBACK_URL env variable');
-invariant(CLIENT_ID, 'Missing STRAVA_CLIENT_ID env variable');
-invariant(CLIENT_SECRET, 'Missing STRAVA_CLIENT_SECRET env variable');
-
 /**
  * Exchanges a Strava authorization code for an access token and persists it.
  */
 export async function exchangeStravaCodeForToken(code: string): Promise<string> {
+  const clientId = process.env.STRAVA_CLIENT_ID;
+  const clientSecret = process.env.STRAVA_CLIENT_SECRET;
+  invariant(clientId, 'Missing STRAVA_CLIENT_ID env variable');
+  invariant(clientSecret, 'Missing STRAVA_CLIENT_SECRET env variable');
+
   log.info('Exchanging code for token for Strava', { code });
   const response = await stravaTokenExchangeClient
     .json({
-      client_id: CLIENT_ID,
-      client_secret: CLIENT_SECRET,
+      client_id: clientId,
+      client_secret: clientSecret,
       code,
       grant_type: 'authorization_code',
     })

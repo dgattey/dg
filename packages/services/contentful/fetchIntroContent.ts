@@ -6,7 +6,7 @@ import { toRenderableRichTextContent } from '@dg/content-models/contentful/rende
 import { introBlockResponseSchema } from '@dg/content-models/contentful/schema/intro';
 import { gql } from 'graphql-request';
 import { parseResponse } from '../clients/parseResponse';
-import { contentfulClient } from './contentfulClient';
+import { getContentfulClient } from './contentfulClient';
 
 /**
  * Grabs the contentful sections with the title of header. Should
@@ -77,7 +77,7 @@ const QUERY = gql`
  * for the home page.
  */
 export async function fetchIntroContent(): Promise<IntroContent | null> {
-  const data = parseResponse(introBlockResponseSchema, await contentfulClient.request(QUERY), {
+  const data = parseResponse(introBlockResponseSchema, await getContentfulClient().request(QUERY), {
     kind: 'graphql',
     source: 'contentful.fetchIntroContent',
   });

@@ -2,7 +2,7 @@ import 'server-only';
 
 import { log } from '@dg/shared-core/logging/log';
 import type { WebhookType } from './WebhookType';
-import { standardParams, webhookSubscriptionConfigs } from './webhookSubscriptionConfigs';
+import { getWebhookSubscriptionConfig, standardParams } from './webhookSubscriptionConfigs';
 
 /**
  * A webhook subscription returned from Strava's API
@@ -20,7 +20,7 @@ export type WebhookSubscription = {
  * Returns an array of subscriptions, or throws on error.
  */
 export async function listSubscriptions(type: WebhookType): Promise<Array<WebhookSubscription>> {
-  const config = webhookSubscriptionConfigs[type];
+  const config = getWebhookSubscriptionConfig(type);
   const { endpoint, headers } = config;
 
   const url = new URL(endpoint);
