@@ -3,7 +3,7 @@
 import type { SxObject } from '@dg/ui/theme';
 import { Box, keyframes } from '@mui/material';
 import { Music, Music2, Music3, Music4 } from 'lucide-react';
-import { type ReactNode, useEffect, useMemo, useRef, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 
 type PlayingIndicatorProps = {
   /**
@@ -42,37 +42,11 @@ type MusicNote = {
 };
 
 const MUSIC_ICONS = [Music, Music2, Music3, Music4];
-const NOTE_SPAWN_INTERVAL_MS = 280; // More frequent
+const NOTE_SPAWN_INTERVAL_MS = 280;
 const NOTE_LIFETIME_MS = 3000;
-const MAX_NOTES = 18; // More notes
+const MAX_NOTES = 18;
 
-// Organic bounce - alternates up/down with slight variation
-// Uses different timing for up vs down to feel less mechanical
-const albumBounce = keyframes`
-  0% {
-    transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
-  }
-  20% {
-    transform: scale3d(1.006, 1.006, 1) translate3d(0, -1.5px, 0);
-  }
-  35% {
-    transform: scale3d(1.002, 1.002, 1) translate3d(0, -0.5px, 0);
-  }
-  50% {
-    transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
-  }
-  65% {
-    transform: scale3d(0.998, 0.998, 1) translate3d(0, 1px, 0);
-  }
-  80% {
-    transform: scale3d(1.001, 1.001, 1) translate3d(0, 0.3px, 0);
-  }
-  100% {
-    transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
-  }
-`;
-
-// GPU-accelerated float animation
+// GPU-accelerated float animation for notes
 const floatAndFade = keyframes`
   0% {
     opacity: 0;
@@ -94,16 +68,12 @@ const floatAndFade = keyframes`
   }
 `;
 
-const getWrapperSx = (isPlaying: boolean): SxObject => ({
-  animation: isPlaying ? `${albumBounce} 0.9s ease-in-out infinite` : 'none',
+const wrapperBaseSx: SxObject = {
   backfaceVisibility: 'hidden',
   position: 'relative',
-  transform: 'translateZ(0)',
-  willChange: isPlaying ? 'transform' : 'auto',
-  zIndex: 2, // Above notes (z-index 1), ensures album art is on top
-});
+  zIndex: 2,
+};
 
-// Notes spawn from center point (0,0) and radiate outward
 const notesContainerSx: SxObject = {
   backfaceVisibility: 'hidden',
   height: 0,
@@ -124,9 +94,6 @@ const getNoteSx = (note: MusicNote, noteColor?: string, isDark?: boolean): SxObj
   animationDelay: `${note.delay}ms`,
   backfaceVisibility: 'hidden',
   color: noteColor ?? 'rgba(128, 128, 128, 0.8)',
-  // Add contrasting shadow so notes stand out against page background
-  // Dark gradient = light notes = dark shadow (for light page bg)
-  // Light gradient = dark notes = light shadow (for dark page bg)
   filter: isDark
     ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
     : 'drop-shadow(0 1px 3px rgba(255, 255, 255, 0.8))',
@@ -139,7 +106,6 @@ const getNoteSx = (note: MusicNote, noteColor?: string, isDark?: boolean): SxObj
 
 /**
  * Music notes that emanate from a center point.
- * Uses GPU-accelerated animations (transform + opacity only).
  */
 export function MusicNotes({ isPlaying, noteColor, isDark }: MusicNotesProps) {
   const [notes, setNotes] = useState<Array<MusicNote>>([]);
@@ -157,8 +123,8 @@ export function MusicNotes({ isPlaying, noteColor, isDark }: MusicNotesProps) {
 
       const newNote: MusicNote = {
         angle,
-        delay: Math.random() * 80, // Slight random delay for variation
-        distance: 120 + Math.random() * 80, // Shorter: 120-200px
+        delay: Math.random() * 80,
+        distance: 120 + Math.random() * 80,
         duration: NOTE_LIFETIME_MS + Math.random() * 600,
         icon: Math.floor(Math.random() * MUSIC_ICONS.length),
         id,
@@ -172,7 +138,6 @@ export function MusicNotes({ isPlaying, noteColor, isDark }: MusicNotesProps) {
       }, newNote.duration + newNote.delay);
     };
 
-    // Spawn initial burst
     spawnNote();
     setTimeout(spawnNote, 60);
     setTimeout(spawnNote, 120);
@@ -210,9 +175,73 @@ export function MusicNotes({ isPlaying, noteColor, isDark }: MusicNotesProps) {
 }
 
 /**
- * Client component that wraps album art with an organic bounce animation.
- * Uses GPU-accelerated transforms only.
+ * Client component that wraps album art with a waveform-simulated bounce.
+ * Uses requestAnimationFrame for organic, music-like movement with randomness.
  */
 export function PlayingIndicator({ children, isPlaying }: PlayingIndicatorProps) {
-  return <Box sx={getWrapperSx(isPlaying)}>{children}</Box>;
+  const wrapperRef = useRef<HTMLDivElement>(null);
+  const timeRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
+
+  const simulateWaveform = useCallback(() => {
+    if (!wrapperRef.current) {
+      return;
+    }
+
+    const time = timeRef.current;
+
+    // Base pulse - slow sine wave for breathing effect
+    const basePulse = Math.sin(time) * 0.012;
+
+    // Secondary rhythm - faster oscillation for groove
+    const rhythm = Math.sin(time * 1.7) * 0.006;
+
+    // Micro-jitters for realism (simulating highs/mids)
+    const jitter = (Math.random() - 0.5) * 0.004;
+
+    // Occasional "beat" - sharp bump when sine crosses threshold
+    const beatTrigger = Math.sin(time * 0.6);
+    const beat = beatTrigger > 0.92 ? 0.018 * (beatTrigger - 0.92) * 12.5 : 0;
+
+    // Subtle vertical movement synced with scale
+    const yOffset = (basePulse + rhythm) * -15; // Negative = up when scaling up
+
+    // Combine into final transform
+    const finalScale = 1 + basePulse + rhythm + jitter + beat;
+
+    wrapperRef.current.style.transform = `scale3d(${finalScale}, ${finalScale}, 1) translate3d(0, ${yOffset}px, 0)`;
+
+    // Advance time - controls tempo feel
+    timeRef.current += 0.08;
+
+    rafRef.current = requestAnimationFrame(simulateWaveform);
+  }, []);
+
+  useEffect(() => {
+    if (isPlaying) {
+      timeRef.current = 0;
+      simulateWaveform();
+    } else {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      // Reset transform when stopped
+      if (wrapperRef.current) {
+        wrapperRef.current.style.transform = 'scale3d(1, 1, 1) translate3d(0, 0, 0)';
+      }
+    }
+
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
+  }, [isPlaying, simulateWaveform]);
+
+  return (
+    <Box ref={wrapperRef} sx={wrapperBaseSx}>
+      {children}
+    </Box>
+  );
 }
