@@ -110,7 +110,12 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
           }),
     },
     '&:popover-open': {
+      animation: 'tooltip-in 100ms ease-out',
       opacity: 1,
+    },
+    '@keyframes tooltip-in': {
+      from: { opacity: 0 },
+      to: { opacity: 1 },
     },
     background: 'var(--mui-palette-background-paper)',
     border: 'thin solid var(--mui-palette-card-border)',
@@ -125,7 +130,7 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
     positionArea: placement === 'top' ? 'block-start' : 'block-end',
     positionTryFallbacks: 'flip-block',
     transition:
-      'opacity 150ms ease-in-out, overlay 150ms ease-in-out allow-discrete, display 150ms ease-in-out allow-discrete',
+      'opacity 100ms ease-out, overlay 100ms ease-out allow-discrete, display 100ms ease-out allow-discrete',
     translate: '0',
     whiteSpace: 'nowrap',
     zIndex: 1500,
