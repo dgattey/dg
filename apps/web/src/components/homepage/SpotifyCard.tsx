@@ -14,7 +14,7 @@ type SpotifyCardShellProps = {
   children: ReactNode;
   gradient?: string;
   isPlaying?: boolean;
-  noteColor?: string;
+  isDark?: boolean;
 };
 
 const shellContainerSx: SxObject = {
@@ -47,14 +47,12 @@ const getCardSx = (gradient?: string): SxObject => ({
   ...cardSx,
 });
 
-// Notes layer positioned to align with album art (top-right of card)
-// This sits outside ContentCard to avoid overflow:hidden clipping
+// Notes layer positioned to align with album art CENTER (top-right of card)
+// z-index 2 puts it ABOVE the card (z-index 1) but notes themselves will be styled
 const notesLayerSx: SxObject = {
-  // Position relative to the shell, aligned with album art location
   pointerEvents: 'none',
   position: 'absolute',
-  // Album art is in top-right with padding of 2.5 (20px) from edges
-  // Album size varies by breakpoint
+  // Album art center position: padding (20px) + half album size
   right: {
     md: `calc(20px + ${IMAGE_SIZE / 2}px)`,
     sm: `calc(20px + ${IMAGE_SIZE / 3}px)`,
@@ -65,7 +63,7 @@ const notesLayerSx: SxObject = {
     sm: `calc(20px + ${IMAGE_SIZE / 3}px)`,
     xs: `calc(20px + ${IMAGE_SIZE / 4}px)`,
   },
-  zIndex: 1, // Above card background, below album art
+  zIndex: 2, // Above card content
 };
 
 const loadingLayoutSx: SxObject = {
@@ -106,13 +104,30 @@ const loadingTitleSx: SxObject = {
   marginBottom: 1,
 };
 
-function SpotifyCardShell({ children, gradient, isPlaying, noteColor }: SpotifyCardShellProps) {
+/**
+ * Gets a note color that contrasts well with the gradient background.
+ * Uses semi-transparent colors that work on any gradient.
+ */
+function getNoteColor(isDark?: boolean): string {
+  // If gradient is dark, use light notes; if light, use dark notes
+  // This ensures notes are visible against the background
+  if (isDark === true) {
+    return 'rgba(255, 255, 255, 0.65)';
+  }
+  if (isDark === false) {
+    return 'rgba(0, 0, 0, 0.5)';
+  }
+  // Fallback - medium gray that works on most backgrounds
+  return 'rgba(100, 100, 100, 0.6)';
+}
+
+function SpotifyCardShell({ children, gradient, isPlaying, isDark }: SpotifyCardShellProps) {
   return (
     <Box sx={shellContainerSx}>
       {gradient ? <Box aria-hidden="true" sx={getGradientGlowSx(gradient)} /> : null}
-      {/* Notes layer outside ContentCard to avoid overflow clipping */}
+      {/* Notes layer - positioned at album art center, above card */}
       <Box sx={notesLayerSx}>
-        <MusicNotes isPlaying={Boolean(isPlaying)} noteColor={noteColor} />
+        <MusicNotes isPlaying={Boolean(isPlaying)} noteColor={getNoteColor(isDark)} />
       </Box>
       <ContentCard sx={getCardSx(gradient)}>{children}</ContentCard>
     </Box>
@@ -149,45 +164,6 @@ type SpotifyCardProps = {
 };
 
 /**
- * Extracts a color from a CSS gradient string for use on music notes.
- * Falls back to a semi-transparent gray if no gradient.
- */
-function extractGradientColor(gradient?: string, isDark?: boolean): string {
-  if (!gradient) {
-    return 'rgba(128, 128, 128, 0.6)';
-  }
-
-  // Extract hex colors from gradient (e.g., "linear-gradient(135deg, #abc123, #def456)")
-  const hexMatch = gradient.match(/#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g);
-  if (hexMatch?.[0]) {
-    // Use the first color from gradient with some transparency
-    const hex = hexMatch[0];
-    // Convert hex to rgba with appropriate opacity based on dark/light
-    const opacity = isDark ? 0.85 : 0.7;
-    return hexToRgba(hex, opacity);
-  }
-
-  // Fallback based on dark/light
-  return isDark ? 'rgba(200, 200, 200, 0.7)' : 'rgba(80, 80, 80, 0.6)';
-}
-
-/**
- * Converts a hex color to rgba with specified opacity.
- */
-function hexToRgba(hex: string, opacity: number): string {
-  const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
-  const fullHex = hex.replace(shorthandRegex, (_, r, g, b) => r + r + g + g + b + b);
-  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(fullHex);
-  if (!result) {
-    return `rgba(128, 128, 128, ${opacity})`;
-  }
-  const r = Number.parseInt(result[1] ?? '0', 16);
-  const g = Number.parseInt(result[2] ?? '0', 16);
-  const b = Number.parseInt(result[3] ?? '0', 16);
-  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
-}
-
-/**
  * Shows a card with the latest data from Spotify
  */
 export function SpotifyCard({ track }: SpotifyCardProps) {
@@ -198,8 +174,8 @@ export function SpotifyCard({ track }: SpotifyCardProps) {
   return (
     <SpotifyCardShell
       gradient={track.albumGradient}
+      isDark={track.albumGradientIsDark}
       isPlaying={track.isPlaying}
-      noteColor={extractGradientColor(track.albumGradient, track.albumGradientIsDark)}
     >
       <TrackListing hasLogo track={track} />
     </SpotifyCardShell>

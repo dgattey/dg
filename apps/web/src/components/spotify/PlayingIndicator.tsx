@@ -96,20 +96,18 @@ const getWrapperSx = (isPlaying: boolean): SxObject => ({
   position: 'relative',
   transform: 'translateZ(0)',
   willChange: isPlaying ? 'transform' : 'auto',
-  zIndex: 2,
 });
 
+// Notes spawn from center point (0,0) and radiate outward
 const notesContainerSx: SxObject = {
   backfaceVisibility: 'hidden',
   height: 0,
-  left: '50%',
+  left: 0,
   overflow: 'visible',
   pointerEvents: 'none',
   position: 'absolute',
-  top: '50%',
-  transform: 'translate3d(-50%, -50%, 0)',
+  top: 0,
   width: 0,
-  zIndex: 1,
 };
 
 const getNoteSx = (note: MusicNote, noteColor?: string): SxObject => ({
