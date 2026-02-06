@@ -25,6 +25,10 @@ type MusicNotesProps = {
    * Color for the music notes
    */
   noteColor?: string;
+  /**
+   * Whether the gradient background is dark (affects shadow for contrast)
+   */
+  isDark?: boolean;
 };
 
 type MusicNote = {
@@ -111,7 +115,7 @@ const notesContainerSx: SxObject = {
   width: 0,
 };
 
-const getNoteSx = (note: MusicNote, noteColor?: string): SxObject => ({
+const getNoteSx = (note: MusicNote, noteColor?: string, isDark?: boolean): SxObject => ({
   '--note-rotation': `${note.angle > 180 ? -25 : 25}deg`,
   '--note-scale': note.scale,
   '--note-x': `${Math.cos((note.angle * Math.PI) / 180) * note.distance}px`,
@@ -120,8 +124,14 @@ const getNoteSx = (note: MusicNote, noteColor?: string): SxObject => ({
   animationDelay: `${note.delay}ms`,
   backfaceVisibility: 'hidden',
   color: noteColor ?? 'rgba(128, 128, 128, 0.8)',
+  // Add contrasting shadow so notes stand out against page background
+  // Dark gradient = light notes = dark shadow (for light page bg)
+  // Light gradient = dark notes = light shadow (for dark page bg)
+  filter: isDark
+    ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
+    : 'drop-shadow(0 1px 3px rgba(255, 255, 255, 0.8))',
   left: 0,
-  opacity: 0, // Start hidden, animation will fade in
+  opacity: 0,
   position: 'absolute',
   top: 0,
   willChange: 'transform, opacity',
@@ -131,7 +141,7 @@ const getNoteSx = (note: MusicNote, noteColor?: string): SxObject => ({
  * Music notes that emanate from a center point.
  * Uses GPU-accelerated animations (transform + opacity only).
  */
-export function MusicNotes({ isPlaying, noteColor }: MusicNotesProps) {
+export function MusicNotes({ isPlaying, noteColor, isDark }: MusicNotesProps) {
   const [notes, setNotes] = useState<Array<MusicNote>>([]);
   const noteIdRef = useRef(0);
 
@@ -180,12 +190,12 @@ export function MusicNotes({ isPlaying, noteColor }: MusicNotesProps) {
           return null;
         }
         return (
-          <Box key={note.id} sx={getNoteSx(note, noteColor)}>
+          <Box key={note.id} sx={getNoteSx(note, noteColor, isDark)}>
             <IconComponent size={15} />
           </Box>
         );
       }),
-    [notes, noteColor],
+    [notes, noteColor, isDark],
   );
 
   if (!isPlaying) {

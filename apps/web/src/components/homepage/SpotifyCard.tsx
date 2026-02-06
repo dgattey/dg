@@ -127,7 +127,7 @@ function SpotifyCardShell({ children, gradient, isPlaying, isDark }: SpotifyCard
       <ContentCard sx={getCardSx(gradient)}>
         {/* Notes layer INSIDE card - z-index 1 (above bg, below album art z-index 2) */}
         <Box sx={getNotesLayerSx(playing)}>
-          <MusicNotes isPlaying={playing} noteColor={getNoteColor(isDark)} />
+          <MusicNotes isDark={isDark} isPlaying={playing} noteColor={getNoteColor(isDark)} />
         </Box>
         {children}
       </ContentCard>
