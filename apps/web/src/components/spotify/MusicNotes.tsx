@@ -3,18 +3,7 @@
 import type { SxObject } from '@dg/ui/theme';
 import { Box, keyframes } from '@mui/material';
 import { Music, Music2, Music3, Music4 } from 'lucide-react';
-import { type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from 'react';
-
-type PlayingIndicatorProps = {
-  /**
-   * The album image to wrap with bounce animation
-   */
-  children: ReactNode;
-  /**
-   * Whether the animation should be active
-   */
-  isPlaying: boolean;
-};
+import { useEffect, useMemo, useRef, useState } from 'react';
 
 type MusicNotesProps = {
   /**
@@ -22,13 +11,9 @@ type MusicNotesProps = {
    */
   isPlaying: boolean;
   /**
-   * Color for the music notes
+   * Color for the music notes (defaults to current text color)
    */
   noteColor?: string;
-  /**
-   * Whether the gradient background is dark (affects shadow for contrast)
-   */
-  isDark?: boolean;
 };
 
 type MusicNote = {
@@ -68,12 +53,6 @@ const floatAndFade = keyframes`
   }
 `;
 
-const wrapperBaseSx: SxObject = {
-  backfaceVisibility: 'hidden',
-  position: 'relative',
-  zIndex: 2,
-};
-
 const notesContainerSx: SxObject = {
   backfaceVisibility: 'hidden',
   height: 0,
@@ -85,7 +64,7 @@ const notesContainerSx: SxObject = {
   width: 0,
 };
 
-const getNoteSx = (note: MusicNote, noteColor?: string, isDark?: boolean): SxObject => ({
+const getNoteSx = (note: MusicNote, noteColor?: string): SxObject => ({
   '--note-rotation': `${note.angle > 180 ? -25 : 25}deg`,
   '--note-scale': note.scale,
   '--note-x': `${Math.cos((note.angle * Math.PI) / 180) * note.distance}px`,
@@ -93,10 +72,8 @@ const getNoteSx = (note: MusicNote, noteColor?: string, isDark?: boolean): SxObj
   animation: `${floatAndFade} ${note.duration}ms ease-out forwards`,
   animationDelay: `${note.delay}ms`,
   backfaceVisibility: 'hidden',
-  color: noteColor ?? 'rgba(128, 128, 128, 0.8)',
-  filter: isDark
-    ? 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5))'
-    : 'drop-shadow(0 1px 3px rgba(255, 255, 255, 0.8))',
+  color: noteColor ?? 'currentColor',
+  filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))',
   left: 0,
   opacity: 0,
   position: 'absolute',
@@ -106,8 +83,9 @@ const getNoteSx = (note: MusicNote, noteColor?: string, isDark?: boolean): SxObj
 
 /**
  * Music notes that emanate from a center point.
+ * Place this component where you want the notes to originate from.
  */
-export function MusicNotes({ isPlaying, noteColor, isDark }: MusicNotesProps) {
+export function MusicNotes({ isPlaying, noteColor }: MusicNotesProps) {
   const [notes, setNotes] = useState<Array<MusicNote>>([]);
   const noteIdRef = useRef(0);
 
@@ -155,12 +133,12 @@ export function MusicNotes({ isPlaying, noteColor, isDark }: MusicNotesProps) {
           return null;
         }
         return (
-          <Box key={note.id} sx={getNoteSx(note, noteColor, isDark)}>
+          <Box key={note.id} sx={getNoteSx(note, noteColor)}>
             <IconComponent size={15} />
           </Box>
         );
       }),
-    [notes, noteColor, isDark],
+    [notes, noteColor],
   );
 
   if (!isPlaying) {
@@ -170,78 +148,6 @@ export function MusicNotes({ isPlaying, noteColor, isDark }: MusicNotesProps) {
   return (
     <Box aria-hidden="true" sx={notesContainerSx}>
       {renderedNotes}
-    </Box>
-  );
-}
-
-/**
- * Client component that wraps album art with a waveform-simulated bounce.
- * Uses requestAnimationFrame for organic, music-like movement with randomness.
- */
-export function PlayingIndicator({ children, isPlaying }: PlayingIndicatorProps) {
-  const wrapperRef = useRef<HTMLDivElement>(null);
-  const timeRef = useRef(0);
-  const rafRef = useRef<number | null>(null);
-
-  const simulateWaveform = useCallback(() => {
-    if (!wrapperRef.current) {
-      return;
-    }
-
-    const time = timeRef.current;
-
-    // Base pulse - slow sine wave for breathing effect
-    const basePulse = Math.sin(time) * 0.012;
-
-    // Secondary rhythm - faster oscillation for groove
-    const rhythm = Math.sin(time * 1.7) * 0.006;
-
-    // Micro-jitters for realism (simulating highs/mids)
-    const jitter = (Math.random() - 0.5) * 0.004;
-
-    // Occasional "beat" - sharp bump when sine crosses threshold
-    const beatTrigger = Math.sin(time * 0.6);
-    const beat = beatTrigger > 0.92 ? 0.018 * (beatTrigger - 0.92) * 12.5 : 0;
-
-    // Subtle vertical movement synced with scale
-    const yOffset = (basePulse + rhythm) * -15; // Negative = up when scaling up
-
-    // Combine into final transform
-    const finalScale = 1 + basePulse + rhythm + jitter + beat;
-
-    wrapperRef.current.style.transform = `scale3d(${finalScale}, ${finalScale}, 1) translate3d(0, ${yOffset}px, 0)`;
-
-    // Advance time - controls tempo feel
-    timeRef.current += 0.08;
-
-    rafRef.current = requestAnimationFrame(simulateWaveform);
-  }, []);
-
-  useEffect(() => {
-    if (isPlaying) {
-      timeRef.current = 0;
-      simulateWaveform();
-    } else {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-        rafRef.current = null;
-      }
-      // Reset transform when stopped
-      if (wrapperRef.current) {
-        wrapperRef.current.style.transform = 'scale3d(1, 1, 1) translate3d(0, 0, 0)';
-      }
-    }
-
-    return () => {
-      if (rafRef.current !== null) {
-        cancelAnimationFrame(rafRef.current);
-      }
-    };
-  }, [isPlaying, simulateWaveform]);
-
-  return (
-    <Box ref={wrapperRef} sx={wrapperBaseSx}>
-      {children}
     </Box>
   );
 }

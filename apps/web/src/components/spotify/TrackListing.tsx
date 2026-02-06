@@ -69,11 +69,12 @@ export function TrackListing({ track, hasLogo }: TrackListingProps) {
             url={trackUrl}
           />
         ) : null}
-        <AlbumImage track={track} />
+        <AlbumImage isPlaying={Boolean(track.isPlaying)} track={track} />
       </Stack>
       <Stack>
         <PlaybackStatus
           color={primaryTextColor}
+          isPlaying={track.isPlaying}
           playedAt={track.playedAt}
           relativePlayedAt={track.relativePlayedAt}
           textShadow={primaryShadow}
