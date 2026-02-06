@@ -7,11 +7,11 @@ import { Music } from 'lucide-react';
 import { useWaveformBounce } from './useWaveformBounce';
 
 type PlaybackStatusProps = {
+  isPlaying?: Track['isPlaying'];
   playedAt?: Track['playedAt'];
   relativePlayedAt?: Track['relativePlayedAt'];
   color?: string;
   textShadow?: string;
-  isPlaying?: boolean;
 };
 
 const getStatusSx = (color?: string, textShadow?: string): SxObject => ({
@@ -32,21 +32,18 @@ const iconWrapperSx: SxObject = {
  * when it last was. The music icon bounces when playing.
  */
 export function PlaybackStatus({
+  isPlaying,
   playedAt,
   relativePlayedAt,
   color,
   textShadow,
-  isPlaying: isPlayingProp,
 }: PlaybackStatusProps) {
-  const isNowPlaying = !playedAt;
+  const isNowPlaying = isPlaying ?? !playedAt;
   const relativeLastPlayed = isNowPlaying ? null : relativePlayedAt;
-
-  // Use prop if provided, otherwise derive from playedAt
-  const isPlaying = isPlayingProp ?? isNowPlaying;
 
   const bounceRef = useWaveformBounce<HTMLSpanElement>({
     intensity: 0.8, // Slightly smaller bounce for the icon
-    isPlaying,
+    isPlaying: isNowPlaying,
   });
 
   if (!isNowPlaying && !relativeLastPlayed) {

@@ -81,6 +81,7 @@ export function TrackListing({ track, hasLogo }: TrackListingProps) {
         />
         <TrackTitle
           color={primaryTextColor}
+          maxLines={track.playedAt ? 2 : 1}
           sx={trackTitleSx}
           textShadow={primaryShadow}
           trackTitle={trackTitle}

@@ -5,6 +5,7 @@ import type { SxObject } from '@dg/ui/theme';
 type TrackTitleProps = {
   trackTitle: string;
   url: string;
+  maxLines?: number;
   color?: string;
   textShadow?: string;
   sx?: SxObject;
@@ -13,9 +14,16 @@ type TrackTitleProps = {
 /**
  * Creates an element that shows a track title that links to the song
  */
-export function TrackTitle({ trackTitle, url, color, textShadow, sx }: TrackTitleProps) {
+export function TrackTitle({
+  trackTitle,
+  url,
+  maxLines = 2,
+  color,
+  textShadow,
+  sx,
+}: TrackTitleProps) {
   const mergedSx: SxObject = {
-    ...truncated(2),
+    ...truncated(maxLines),
     ...(color ? { color } : {}),
     ...(textShadow ? { textShadow } : {}),
     ...(sx ?? {}),
