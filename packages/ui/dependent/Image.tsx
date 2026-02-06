@@ -36,6 +36,12 @@ type ImageProps = {
   fill?: boolean;
 
   /**
+   * When true, image fills its container and uses object-fit: cover.
+   * Unlike `fill`, this keeps the image in normal document flow.
+   */
+  cover?: boolean;
+
+  /**
    * Alt text, required, but defaults to title.
    */
   alt: string;
@@ -68,6 +74,17 @@ const maxWidthImageStyle: CSSProperties = {
 };
 
 /**
+ * Cover mode: fills container and crops to fit, staying in document flow
+ */
+const coverImageStyle: CSSProperties = {
+  borderStyle: 'none',
+  height: '100%',
+  objectFit: 'cover',
+  objectPosition: 'center',
+  width: '100%',
+};
+
+/**
  * Turns the breakpoint to width map into a sizes string
  */
 const generateSizesString = (sizes: ImageSizes): string => {
@@ -90,7 +107,17 @@ const generateSizesString = (sizes: ImageSizes): string => {
  * Shows a Next Image with the contents of the Asset and custom
  * sizes as needed.
  */
-export function Image({ url, title, alt, sizes, width, height, fill, ...props }: ImageProps) {
+export function Image({
+  url,
+  title,
+  alt,
+  sizes,
+  width,
+  height,
+  fill,
+  cover,
+  ...props
+}: ImageProps) {
   const sharedProps = {
     alt: title ?? alt,
     sizes: generateSizesString(sizes),
@@ -98,8 +125,10 @@ export function Image({ url, title, alt, sizes, width, height, fill, ...props }:
     ...props,
   };
 
-  if (!fill) {
-    return <NextImage {...sharedProps} height={height} style={maxWidthImageStyle} width={width} />;
+  if (fill) {
+    return <NextImage {...sharedProps} fill={true} />;
   }
-  return <NextImage {...sharedProps} fill={true} />;
+
+  const style = cover ? coverImageStyle : maxWidthImageStyle;
+  return <NextImage {...sharedProps} height={height} style={style} width={width} />;
 }

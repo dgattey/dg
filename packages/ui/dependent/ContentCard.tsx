@@ -20,6 +20,11 @@ const cardBaseSx: SxObject = {
   '& > div': {
     transform: 'none !important',
   },
+  // Images within cards should cover edge-to-edge, centered when cropped
+  '& img': {
+    objectFit: 'cover',
+    objectPosition: 'center',
+  },
   overflow: 'hidden',
   position: 'relative',
   transform: 'scale(1)',
@@ -135,7 +140,7 @@ function getCardSx({
  */
 function LinkWrappedChildren({ children, link, overlayContents }: LinkWrappedChildrenProps) {
   const safelyWrappedChildren = overlayContents ? (
-    <div>
+    <div style={{ height: '100%', width: '100%' }}>
       {overlayContents}
       {children}
     </div>

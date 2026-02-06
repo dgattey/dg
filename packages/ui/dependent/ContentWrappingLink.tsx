@@ -22,6 +22,7 @@ export function ContentWrappingLink({ link, children }: ContentWrappingLinkProps
         display: 'block',
         height: '100%',
         textDecoration: 'none',
+        width: '100%',
       }}
       title={link.title}
     >
