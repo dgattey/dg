@@ -24,58 +24,57 @@ type MusicNote = {
   scale: number;
   duration: number;
   icon: number;
+  distance: number;
 };
 
 const MUSIC_ICONS = [Music, Music2, Music3, Music4];
-const NOTE_SPAWN_INTERVAL_MS = 800;
-const NOTE_LIFETIME_MS = 2000;
-const MAX_NOTES = 8;
+const NOTE_SPAWN_INTERVAL_MS = 350;
+const NOTE_LIFETIME_MS = 2500;
+const MAX_NOTES = 16;
 
-// Keyframe for floating and fading music notes
+// Keyframe for floating and fading music notes - now fades in first
 const floatAndFade = keyframes`
   0% {
-    opacity: 0.7;
+    opacity: 0;
     transform: translate(0, 0) scale(var(--note-scale)) rotate(0deg);
   }
-  50% {
+  15% {
+    opacity: 0.8;
+    transform: translate(calc(var(--note-x) * 0.1), calc(var(--note-y) * 0.1)) scale(var(--note-scale)) rotate(calc(var(--note-rotation) * 0.2));
+  }
+  60% {
     opacity: 0.5;
   }
   100% {
     opacity: 0;
-    transform: translate(var(--note-x), var(--note-y)) scale(calc(var(--note-scale) * 0.5)) rotate(var(--note-rotation));
+    transform: translate(var(--note-x), var(--note-y)) scale(calc(var(--note-scale) * 0.6)) rotate(var(--note-rotation));
   }
 `;
 
-// Subtle bounce keyframe for the container
-const subtleBounce = keyframes`
-  0%, 100% {
-    transform: scale(1) translateY(0);
-  }
-  50% {
-    transform: scale(1.008) translateY(-1px);
-  }
-`;
-
+// Container positioned to allow notes to escape beyond the card
 const containerSx: SxObject = {
-  inset: 0,
+  // Expand beyond the card boundaries
+  bottom: -60,
+  left: -60,
   overflow: 'visible',
   pointerEvents: 'none',
   position: 'absolute',
-  zIndex: 2,
+  right: -60,
+  top: -60,
+  zIndex: 3,
 };
 
-const getBouncingSx = (isPlaying: boolean): SxObject => ({
-  animation: isPlaying ? `${subtleBounce} 1.5s ease-in-out infinite` : 'none',
+const noteContainerSx: SxObject = {
   height: '100%',
   position: 'relative',
   width: '100%',
-});
+};
 
 const getNoteSx = (note: MusicNote, noteColor?: string): SxObject => ({
-  '--note-rotation': `${note.angle > 180 ? -15 : 15}deg`,
+  '--note-rotation': `${note.angle > 0 ? 25 : -25}deg`,
   '--note-scale': note.scale,
-  '--note-x': `${Math.cos((note.angle * Math.PI) / 180) * 60}px`,
-  '--note-y': `${Math.sin((note.angle * Math.PI) / 180) * 60}px`,
+  '--note-x': `${Math.cos((note.angle * Math.PI) / 180) * note.distance}px`,
+  '--note-y': `${Math.sin((note.angle * Math.PI) / 180) * note.distance}px`,
   animation: `${floatAndFade} ${note.duration}ms ease-out forwards`,
   color: noteColor ?? 'rgba(255, 255, 255, 0.7)',
   left: `${note.x}%`,
@@ -85,9 +84,8 @@ const getNoteSx = (note: MusicNote, noteColor?: string): SxObject => ({
 });
 
 /**
- * A component that shows subtle playing animation:
- * - Gentle bounce on the card when playing
- * - Music notes floating away from random positions
+ * A component that shows music notes floating away from the album art area.
+ * Notes fade in, float outward in all directions, and fade out.
  */
 export function NowPlayingAnimation({ isPlaying, noteColor }: NowPlayingAnimationProps) {
   const [notes, setNotes] = useState<Array<MusicNote>>([]);
@@ -102,40 +100,29 @@ export function NowPlayingAnimation({ isPlaying, noteColor }: NowPlayingAnimatio
 
     const spawnNote = () => {
       const id = noteIdRef.current++;
-      // Random position along the edges and corners
-      const side = Math.random();
-      let x: number;
-      let y: number;
 
-      if (side < 0.25) {
-        // Top edge
-        x = Math.random() * 100;
-        y = Math.random() * 20;
-      } else if (side < 0.5) {
-        // Right edge
-        x = 80 + Math.random() * 20;
-        y = Math.random() * 100;
-      } else if (side < 0.75) {
-        // Bottom edge
-        x = Math.random() * 100;
-        y = 80 + Math.random() * 20;
-      } else {
-        // Left edge
-        x = Math.random() * 20;
-        y = Math.random() * 100;
-      }
+      // Center around album art area (top-right of the card content)
+      // With the expanded container (-60px on each side), we need to offset
+      // Album art is roughly at 75% from left, 25% from top of original card
+      // Adjusted for expanded container: (75% of card + 60px offset) / total width
+      const albumCenterX = 72; // Percentage in expanded container
+      const albumCenterY = 35; // Percentage in expanded container
 
-      // Calculate outward angle from center
-      const centerX = 50;
-      const centerY = 50;
-      const angle = (Math.atan2(y - centerY, x - centerX) * 180) / Math.PI;
+      // Random angle for 360-degree emanation
+      const angle = Math.random() * 360;
+
+      // Spawn near the album art center with some randomness
+      const spawnRadius = 3 + Math.random() * 8;
+      const x = albumCenterX + Math.cos((angle * Math.PI) / 180) * spawnRadius;
+      const y = albumCenterY + Math.sin((angle * Math.PI) / 180) * spawnRadius;
 
       const newNote: MusicNote = {
         angle,
-        duration: NOTE_LIFETIME_MS + Math.random() * 500,
+        distance: 80 + Math.random() * 60, // Travel 80-140px outward
+        duration: NOTE_LIFETIME_MS + Math.random() * 800,
         icon: Math.floor(Math.random() * MUSIC_ICONS.length),
         id,
-        scale: 0.8 + Math.random() * 0.4,
+        scale: 0.7 + Math.random() * 0.5,
         x,
         y,
       };
@@ -151,8 +138,10 @@ export function NowPlayingAnimation({ isPlaying, noteColor }: NowPlayingAnimatio
       }, newNote.duration);
     };
 
-    // Initial spawn
+    // Spawn a few notes immediately for visual impact
     spawnNote();
+    setTimeout(spawnNote, 100);
+    setTimeout(spawnNote, 200);
 
     // Spawn new notes at intervals
     const intervalId = setInterval(spawnNote, NOTE_SPAWN_INTERVAL_MS);
@@ -172,7 +161,7 @@ export function NowPlayingAnimation({ isPlaying, noteColor }: NowPlayingAnimatio
         }
         return (
           <Box key={note.id} sx={getNoteSx(note, noteColor)}>
-            <IconComponent size={16} />
+            <IconComponent size={14} />
           </Box>
         );
       }),
@@ -184,8 +173,8 @@ export function NowPlayingAnimation({ isPlaying, noteColor }: NowPlayingAnimatio
   }
 
   return (
-    <Box sx={containerSx}>
-      <Box sx={getBouncingSx(isPlaying)}>{renderedNotes}</Box>
+    <Box aria-hidden="true" sx={containerSx}>
+      <Box sx={noteContainerSx}>{renderedNotes}</Box>
     </Box>
   );
 }
