@@ -5,7 +5,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { Box, Card, Skeleton, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
-import { NowPlayingAnimation } from '../spotify/NowPlayingAnimation';
+import { MusicNotes } from '../spotify/PlayingIndicator';
 import { TrackListing } from '../spotify/TrackListing';
 
 const IMAGE_SIZE = 150;
@@ -47,6 +47,27 @@ const getCardSx = (gradient?: string): SxObject => ({
   ...cardSx,
 });
 
+// Notes layer positioned to align with album art (top-right of card)
+// This sits outside ContentCard to avoid overflow:hidden clipping
+const notesLayerSx: SxObject = {
+  // Position relative to the shell, aligned with album art location
+  pointerEvents: 'none',
+  position: 'absolute',
+  // Album art is in top-right with padding of 2.5 (20px) from edges
+  // Album size varies by breakpoint
+  right: {
+    md: `calc(20px + ${IMAGE_SIZE / 2}px)`,
+    sm: `calc(20px + ${IMAGE_SIZE / 3}px)`,
+    xs: `calc(20px + ${IMAGE_SIZE / 4}px)`,
+  },
+  top: {
+    md: `calc(20px + ${IMAGE_SIZE / 2}px)`,
+    sm: `calc(20px + ${IMAGE_SIZE / 3}px)`,
+    xs: `calc(20px + ${IMAGE_SIZE / 4}px)`,
+  },
+  zIndex: 1, // Above card background, below album art
+};
+
 const loadingLayoutSx: SxObject = {
   flex: 1,
   gap: 1,
@@ -86,15 +107,14 @@ const loadingTitleSx: SxObject = {
 };
 
 function SpotifyCardShell({ children, gradient, isPlaying, noteColor }: SpotifyCardShellProps) {
-  const playing = Boolean(isPlaying);
   return (
     <Box sx={shellContainerSx}>
       {gradient ? <Box aria-hidden="true" sx={getGradientGlowSx(gradient)} /> : null}
-      <ContentCard sx={getCardSx(gradient)}>
-        {/* Music notes animation - positioned from card center */}
-        <NowPlayingAnimation isPlaying={playing} noteColor={noteColor} />
-        {children}
-      </ContentCard>
+      {/* Notes layer outside ContentCard to avoid overflow clipping */}
+      <Box sx={notesLayerSx}>
+        <MusicNotes isPlaying={Boolean(isPlaying)} noteColor={noteColor} />
+      </Box>
+      <ContentCard sx={getCardSx(gradient)}>{children}</ContentCard>
     </Box>
   );
 }
