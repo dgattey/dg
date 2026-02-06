@@ -15,7 +15,8 @@ export interface GlassContainerProps extends Omit<BoxProps, 'sx'> {
  * var(--mui-palette-background-default) is dark in dark mode, light in light mode.
  */
 const GLASS_BG = 'color-mix(in srgb, var(--mui-palette-background-default) 70%, transparent)';
-const GLASS_BORDER = '1px solid color-mix(in srgb, var(--mui-palette-common-white) 12%, transparent)';
+const GLASS_BORDER =
+  '1px solid color-mix(in srgb, var(--mui-palette-common-white) 12%, transparent)';
 const GLASS_SHADOW = `
   inset 0 1px 0 color-mix(in srgb, var(--mui-palette-common-white) 15%, transparent),
   0px 1px 5px color-mix(in srgb, var(--mui-palette-common-black) 12%, transparent),

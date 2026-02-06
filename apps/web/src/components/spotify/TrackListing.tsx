@@ -3,6 +3,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { Stack } from '@mui/material';
 import { AlbumImage } from './AlbumImage';
 import { ArtistList } from './ArtistList';
+import { getContrastColors } from './contrastColors';
 import { PlaybackProgressBar } from './PlaybackProgressBar';
 import { PlaybackStatus } from './PlaybackStatus';
 import { SpotifyLogo } from './SpotifyLogo';
@@ -10,14 +11,17 @@ import { TrackTitle } from './TrackTitle';
 
 type TrackListingProps = {
   /**
-   * Has to exist, the track to list
-   */
-  track: Track;
-
-  /**
    * If this is true, it puts a logo to the left of the album art
    */
   hasLogo?: boolean;
+  /**
+   * Color for music notes when playing (e.g. from card gradient)
+   */
+  noteColor?: string;
+  /**
+   * Has to exist, the track to list
+   */
+  track: Track;
 };
 
 const layoutSx: SxObject = {
@@ -40,47 +44,34 @@ const trackTitleSx: SxObject = {
  * plus support for sizing the album art. For responsive album art, this needs to take
  * up the full height of its parent!
  */
-export function TrackListing({ track, hasLogo }: TrackListingProps) {
+export function TrackListing({ track, hasLogo, noteColor }: TrackListingProps) {
   const trackUrl = track.externalUrls.spotify;
   const { name: trackTitle } = track;
-  const gradientIsDark = track.albumGradientIsDark;
-  const contrastStyles =
-    gradientIsDark === undefined
-      ? undefined
-      : {
-          primaryShadow: gradientIsDark
-            ? '0 1px 3px rgba(0, 0, 0, 0.25)'
-            : '0 1px 3px rgba(255, 255, 255, 0.25)',
-          primaryTextColor: gradientIsDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
-          subtitleColor: gradientIsDark ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
-          subtitleShadow: gradientIsDark
-            ? '0 1px 3px rgba(0, 0, 0, 0.18)'
-            : '0 1px 3px rgba(255, 255, 255, 0.18)',
-        };
-  const { primaryTextColor, subtitleColor, primaryShadow, subtitleShadow } = contrastStyles ?? {};
+  const contrast = getContrastColors(track.albumGradientIsDark);
+  const { primaryColor, subtitleColor, primaryShadow, subtitleShadow } = contrast ?? {};
   return (
     <Stack sx={layoutSx}>
       <Stack direction="row" sx={headerSx}>
         {hasLogo ? (
           <SpotifyLogo
-            color={primaryTextColor}
+            color={primaryColor}
             textShadow={primaryShadow}
             trackTitle={trackTitle}
             url={trackUrl}
           />
         ) : null}
-        <AlbumImage isPlaying={Boolean(track.isPlaying)} track={track} />
+        <AlbumImage isPlaying={Boolean(track.isPlaying)} noteColor={noteColor} track={track} />
       </Stack>
       <Stack>
         <PlaybackStatus
-          color={primaryTextColor}
+          color={primaryColor}
           isPlaying={track.isPlaying}
           playedAt={track.playedAt}
           relativePlayedAt={track.relativePlayedAt}
           textShadow={primaryShadow}
         />
         <TrackTitle
-          color={primaryTextColor}
+          color={primaryColor}
           maxLines={track.playedAt ? 2 : 1}
           sx={trackTitleSx}
           textShadow={primaryShadow}

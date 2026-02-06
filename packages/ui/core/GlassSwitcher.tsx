@@ -3,19 +3,13 @@
 import { Box, Radio, RadioGroup } from '@mui/material';
 import type { ReactNode } from 'react';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
+import { createTransition, TIMING_MEDIUM } from '../helpers/timing';
 import type { SxElement, SxObject } from '../theme';
 import { GlassContainer } from './GlassContainer';
 import { Tooltip } from './Tooltip';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Layout Configuration
-// ─────────────────────────────────────────────────────────────────────────────
-// This component renders horizontally on sm+ screens and vertically on xs.
-// A sliding "thumb" indicator shows the current selection.
-
 /** Spacing constants (in theme spacing units) */
-const SPACING = {
-  /** Outer padding (horizontal layout) */
+export const SPACING = {
   containerPaddingSm: 0.85,
   /** Outer padding (vertical layout) */
   containerPaddingXs: 0.25,
@@ -37,13 +31,80 @@ const SPACING = {
   thumbHeight: 5,
 } as const;
 
-// MUI default spacing is 8px; keep sx objects theme-free for SSR.
 const BASE_SPACING_PX = 8;
-const spacingPx = (value: number) => `${value * BASE_SPACING_PX}px`;
+export const spacingPx = (value: number) => `${value * BASE_SPACING_PX}px`;
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Styles
-// ─────────────────────────────────────────────────────────────────────────────
+/**
+ * Creates thumb positioning styles.
+ * Must stay in sync with createGridStyles - thumb width/position must account
+ * for grid padding (groupPadding) and gaps.
+ */
+export function createThumbStyles(
+  optionCount: number,
+  selectedIndex: number,
+): SxObject {
+  const gap = spacingPx(SPACING.thumbGap);
+  const groupPadding = spacingPx(SPACING.groupPadding);
+  const optionHeight = spacingPx(SPACING.optionMinHeight);
+  const paddingBlock = spacingPx(SPACING.optionPaddingBlock);
+
+  const rowHeight = `calc(${optionHeight} + (${paddingBlock} * 2))`;
+
+  return {
+    backgroundColor: 'var(--mui-palette-action-selected)',
+    border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 30%, transparent)',
+
+    borderRadius: { sm: '999px', xs: '50%' },
+    content: '""',
+    height: { sm: spacingPx(SPACING.thumbHeight), xs: optionHeight },
+
+    left: { sm: groupPadding, xs: '50%' },
+    position: 'absolute',
+    top: {
+      sm: '50%',
+      xs: `calc(${groupPadding} + (${selectedIndex} * (${rowHeight} + ${gap})) + (${rowHeight} / 2))`,
+    },
+    transform: {
+      sm: `translate(calc(${selectedIndex} * (100% + ${gap})), -50%)`,
+      xs: 'translate(-50%, -50%)',
+    },
+    transition: createTransition(['background-color', 'transform'], TIMING_MEDIUM),
+    width: {
+      sm: `calc((100% - 2*${groupPadding} - (${gap} * ${optionCount - 1})) / ${optionCount})`,
+      xs: optionHeight,
+    },
+    zIndex: 0,
+  };
+}
+
+/**
+ * Creates grid layout styles.
+ * Must stay in sync with createThumbStyles - thumb uses groupPadding and
+ * rowHeight/gap to position correctly over each option.
+ */
+export function createGridStyles(optionCount: number): SxObject {
+  const gap = spacingPx(SPACING.thumbGap);
+  const optionHeight = spacingPx(SPACING.optionMinHeight);
+  const paddingBlock = spacingPx(SPACING.optionPaddingBlock);
+  const rowHeight = `calc(${optionHeight} + (${paddingBlock} * 2))`;
+
+  return {
+    alignItems: 'stretch',
+    columnGap: { sm: gap, xs: 0 },
+    display: 'grid',
+
+    gridAutoFlow: { sm: 'column', xs: 'row' },
+    gridTemplateColumns: { sm: `repeat(${optionCount}, minmax(0, 1fr))`, xs: 'none' },
+    gridTemplateRows: { sm: 'none', xs: `repeat(${optionCount}, ${rowHeight})` },
+    height: { sm: '100%', xs: 'auto' },
+    justifyItems: 'stretch',
+    padding: spacingPx(SPACING.groupPadding),
+    position: 'relative',
+    rowGap: { sm: 0, xs: gap },
+    width: { sm: 'auto', xs: '100%' },
+    zIndex: 1,
+  };
+}
 
 const glassSwitcherBaseSx: SxObject = {
   alignItems: 'center',
@@ -87,77 +148,6 @@ const optionStyles: SxObject = {
 const hiddenRadioSx: SxObject = {
   display: 'none',
 };
-
-/**
- * Creates CSS variables and thumb positioning styles.
- * Variables are defined here so the thumb can calculate its position.
- */
-function createThumbStyles(optionCount: number, selectedIndex: number): SxObject {
-  // Pre-calculate some values for clarity
-  const gap = spacingPx(SPACING.thumbGap);
-  const groupPadding = spacingPx(SPACING.groupPadding);
-  const optionHeight = spacingPx(SPACING.optionMinHeight);
-  const paddingBlock = spacingPx(SPACING.optionPaddingBlock);
-
-  // Total row height in vertical layout = option height + top/bottom padding
-  const rowHeight = `calc(${optionHeight} + (${paddingBlock} * 2))`;
-
-  return {
-    backgroundColor: 'var(--mui-palette-action-selected)',
-    border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 30%, transparent)',
-
-    // Horizontal layout (sm+): pill-shaped thumb slides left/right
-    // Vertical layout (xs): circular thumb slides up/down
-    borderRadius: { sm: '999px', xs: '50%' },
-    content: '""',
-    height: { sm: spacingPx(SPACING.thumbHeight), xs: optionHeight },
-
-    // Position the thumb to center on the selected option
-    // Account for grid padding so the thumb aligns with each option
-    left: { sm: groupPadding, xs: '50%' },
-    position: 'absolute',
-    top: {
-      sm: '50%',
-      xs: `calc(${groupPadding} + (${selectedIndex} * (${rowHeight} + ${gap})) + (${rowHeight} / 2))`,
-    },
-    transform: {
-      sm: `translate(calc(${selectedIndex} * (100% + ${gap})), -50%)`,
-      xs: 'translate(-50%, -50%)',
-    },
-    transition: 'background-color 200ms ease, transform 200ms ease',
-    width: {
-      sm: `calc((100% - (${gap} * ${optionCount - 1})) / ${optionCount})`,
-      xs: optionHeight,
-    },
-    zIndex: 0,
-  };
-}
-
-function createGridStyles(optionCount: number): SxObject {
-  const gap = spacingPx(SPACING.thumbGap);
-  const optionHeight = spacingPx(SPACING.optionMinHeight);
-  const paddingBlock = spacingPx(SPACING.optionPaddingBlock);
-  const rowHeight = `calc(${optionHeight} + (${paddingBlock} * 2))`;
-
-  return {
-    alignItems: 'stretch',
-    columnGap: { sm: gap, xs: 0 },
-    display: 'grid',
-
-    // Horizontal: options flow in columns
-    // Vertical: options stack in rows
-    gridAutoFlow: { sm: 'column', xs: 'row' },
-    gridTemplateColumns: { sm: `repeat(${optionCount}, minmax(0, 1fr))`, xs: 'none' },
-    gridTemplateRows: { sm: 'none', xs: `repeat(${optionCount}, ${rowHeight})` },
-    height: { sm: '100%', xs: 'auto' },
-    justifyItems: 'stretch',
-    padding: spacingPx(SPACING.groupPadding),
-    position: 'relative',
-    rowGap: { sm: 0, xs: gap },
-    width: { sm: 'auto', xs: '100%' },
-    zIndex: 1,
-  };
-}
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Components

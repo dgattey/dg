@@ -60,8 +60,10 @@ export function PlaybackProgressBar({
           : 'rgba(0, 0, 0, 0.6)',
     borderRadius: 'inherit',
     height: '100%',
-    transition: `width ${PROGRESS_UPDATE_INTERVAL_MS}ms linear`,
-    width: `${progress * 100}%`,
+    transform: `scaleX(${progress})`,
+    transformOrigin: 'left',
+    transition: `transform ${PROGRESS_UPDATE_INTERVAL_MS}ms linear`,
+    width: '100%',
   });
 
   // When the server sends fresh timing data, reset our baseline and snap the bar.

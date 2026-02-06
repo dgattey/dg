@@ -9,6 +9,7 @@ type TrackTitleProps = {
   color?: string;
   textShadow?: string;
   sx?: SxObject;
+  variant?: 'h5' | 'h6';
 };
 
 /**
@@ -21,6 +22,7 @@ export function TrackTitle({
   color,
   textShadow,
   sx,
+  variant = 'h5',
 }: TrackTitleProps) {
   const mergedSx: SxObject = {
     ...truncated(maxLines),
@@ -30,7 +32,7 @@ export function TrackTitle({
   };
 
   return (
-    <Link href={url} isExternal={true} sx={mergedSx} title={trackTitle} variant="h5">
+    <Link href={url} isExternal={true} sx={mergedSx} title={trackTitle} variant={variant}>
       {trackTitle}
     </Link>
   );

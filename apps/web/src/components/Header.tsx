@@ -1,9 +1,12 @@
 import { ColorSchemeToggleClient } from '@dg/ui/core/ColorSchemeToggleClient';
+import { GlassContainer } from '@dg/ui/core/GlassContainer';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
 import type { SxObject } from '@dg/ui/theme';
+import { Suspense } from 'react';
+import { getLatestSong } from '../services/spotify';
 import { Logo } from './Logo';
-import { ScrollIndicatorButton } from './ScrollIndicatorButton';
+import { SpotifyHeaderThumbnail } from './spotify/SpotifyHeaderThumbnail';
 
 // Makes the header bar sticky and not responsive to user events by default
 const stickyContainerSx: SxObject = {
@@ -17,9 +20,31 @@ const navSx: SxObject = {
   columnGap: { sm: 2, xs: 1 },
 };
 
+/** Glass container with logo + music content */
+const glassContainerSx: SxObject = {
+  alignItems: 'center',
+  display: 'inline-flex',
+  gap: 1,
+  px: 2,
+  py: 0.75,
+};
+
 /**
- * Creates the site header component. It's a bar that spans across the
- * page and shows a logo + header links if they exist.
+ * Async slot for Spotify thumbnail. Fetches track data server-side.
+ * Wrapped in Suspense because getLatestSong accesses runtime data (cookies).
+ */
+async function SpotifyHeaderThumbnailSlot() {
+  const track = await getLatestSong();
+  if (!track) {
+    return null;
+  }
+  return <SpotifyHeaderThumbnail track={track} />;
+}
+
+/**
+ * Creates the site header component with glass background behind logo + music.
+ * Logo and color scheme toggle are server-rendered immediately.
+ * Music thumbnail streams in via Suspense to avoid blocking.
  */
 export function Header() {
   return (
@@ -28,10 +53,12 @@ export function Header() {
         <Nav sx={navSx}>
           <NavGroup>
             <NavItem variant="body2">
-              <Logo />
-            </NavItem>
-            <NavItem>
-              <ScrollIndicatorButton />
+              <GlassContainer sx={glassContainerSx}>
+                <Logo />
+                <Suspense fallback={null}>
+                  <SpotifyHeaderThumbnailSlot />
+                </Suspense>
+              </GlassContainer>
             </NavItem>
           </NavGroup>
           <NavGroup>

@@ -1,6 +1,56 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { GlassSwitcher } from '../GlassSwitcher';
+import {
+  createGridStyles,
+  createThumbStyles,
+  GlassSwitcher,
+  SPACING,
+  spacingPx,
+} from '../GlassSwitcher';
+
+describe('GlassSwitcher layout (thumb/grid sync)', () => {
+  const groupPadding = spacingPx(SPACING.groupPadding);
+  const gap = spacingPx(SPACING.thumbGap);
+  const optionHeight = spacingPx(SPACING.optionMinHeight);
+  const paddingBlock = spacingPx(SPACING.optionPaddingBlock);
+  const rowHeight = `calc(${optionHeight} + (${paddingBlock} * 2))`;
+
+  it('uses same groupPadding in thumb and grid', () => {
+    const thumb = createThumbStyles(3, 0);
+    const grid = createGridStyles(3);
+
+    expect(thumb.left?.sm).toBe(groupPadding);
+    expect(thumb.top?.xs as string).toContain(groupPadding);
+    expect(grid.padding).toBe(groupPadding);
+  });
+
+  it('thumb horizontal width accounts for 2*groupPadding (content area inset)', () => {
+    const thumb = createThumbStyles(3, 0);
+    const widthSm = thumb.width?.sm as string;
+
+    expect(widthSm).toContain(`2*${groupPadding}`);
+    expect(widthSm).toContain(gap);
+  });
+
+  it('thumb vertical top includes groupPadding and rowHeight', () => {
+    const thumb = createThumbStyles(3, 1);
+    const topXs = thumb.top?.xs as string;
+
+    expect(topXs).toContain(groupPadding);
+    expect(topXs).toContain(rowHeight);
+    expect(topXs).toContain(gap);
+  });
+
+  it('grid uses same rowHeight and gap as thumb', () => {
+    const thumb = createThumbStyles(2, 0);
+    const grid = createGridStyles(2);
+
+    expect((grid.gridTemplateRows as { xs?: string })?.xs).toContain(rowHeight);
+    expect((grid.rowGap as { xs?: string })?.xs).toBe(gap);
+    expect((grid.columnGap as { sm?: string })?.sm).toBe(gap);
+    expect(thumb.top?.xs as string).toContain(rowHeight);
+  });
+});
 
 describe('GlassSwitcher', () => {
   it('renders options and emits changes', async () => {

@@ -1,24 +1,20 @@
 'use client';
 
 import { homeRoute } from '@dg/shared-core/routes/app';
-import { GlassContainer } from '@dg/ui/core/GlassContainer';
-import { ScrollIndicatorContext } from '@dg/ui/core/ScrollIndicatorContext';
 import { Link } from '@dg/ui/dependent/Link';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Button } from '@mui/material';
+import { Button } from '@mui/material';
 import { usePathname } from 'next/navigation';
-import { useContext } from 'react';
 
 const paddingStyles: SxObject = {
-  paddingBlock: 1.5,
-  paddingInlineEnd: 3,
-  paddingInlineStart: 2.5,
+  paddingBlock: 1,
+  paddingInline: 1.5,
 };
 
 /**
  * Aspect ratio'd 1:1 circle. Big, bold, and squished text for use as
- * logo. Has background on scroll + scales down a bit.
+ * logo. Scales up on hover.
  */
 const logoTextStyles: SxObject = {
   '&': {
@@ -43,20 +39,10 @@ const logoTextStyles: SxObject = {
   justifyContent: 'center',
   letterSpacing: '-0.12em',
   lineHeight: 1,
+  textShadow: '0 1px 2px rgba(0, 0, 0, 0.15)',
   ...createBouncyTransition(['color', 'transform']),
   background: 'none',
   willChange: 'transform',
-};
-
-const logoWrapperSx: SxObject = {
-  alignItems: 'center',
-  display: 'inline-flex',
-  position: 'relative',
-};
-
-const containerSx: SxObject = {
-  position: 'relative',
-  zIndex: 1,
 };
 
 const logoLinkSx: SxObject = {
@@ -65,46 +51,21 @@ const logoLinkSx: SxObject = {
 
 const logoButtonSx: SxObject = {
   ...logoTextStyles,
-  ...containerSx,
   ...paddingStyles,
+  flexShrink: 0,
 };
 
 const logoLinkMergedSx: SxObject = {
   ...logoTextStyles,
-  ...containerSx,
   ...paddingStyles,
   ...logoLinkSx,
-};
-
-const glassContainerSx: SxObject = {
-  ...createBouncyTransition(['opacity', 'transform']),
-  borderRadius: '32px',
-  inset: 0,
-  opacity: 0,
-  pointerEvents: 'none',
-  position: 'absolute',
-  transform: 'translateX(-100%)',
-  willChange: 'transform',
-  zIndex: 0,
-};
-
-/** Merged glass container styles when scrolled */
-const glassContainerScrolledSx: SxObject = {
-  ...createBouncyTransition(['opacity', 'transform']),
-  borderRadius: '32px',
-  inset: 0,
-  opacity: 1,
-  pointerEvents: 'none',
-  position: 'absolute',
-  transform: 'translateX(0)',
-  willChange: 'transform',
-  zIndex: 0,
+  flexShrink: 0,
 };
 
 /**
- * The actual logo content - either a button or link depending on route
+ * Logo that scrolls to top on home page, or links to home on other pages
  */
-function LogoContent() {
+export function Logo() {
   const pathname = usePathname();
 
   const scrollToTop = () => {
@@ -123,19 +84,5 @@ function LogoContent() {
     <Link href={homeRoute} sx={logoLinkMergedSx}>
       dg.
     </Link>
-  );
-}
-
-/**
- * Logo + scroll to top button, with glass container that appears on scroll
- */
-export function Logo() {
-  const isScrolled = useContext(ScrollIndicatorContext);
-
-  return (
-    <Box sx={logoWrapperSx}>
-      <GlassContainer aria-hidden sx={isScrolled ? glassContainerScrolledSx : glassContainerSx} />
-      <LogoContent />
-    </Box>
   );
 }

@@ -30,7 +30,14 @@ export function ProjectCard({ title, layout, link, thumbnail }: ProjectCardProps
       sx={projectCardSx}
       verticalSpan={verticalSpan}
     >
-      <Image alt={title} cover={true} height={height} sizes={sizes} url={thumbnail.url} width={width} />
+      <Image
+        alt={title}
+        cover={true}
+        height={height}
+        sizes={sizes}
+        url={thumbnail.url}
+        width={width}
+      />
     </ContentCard>
   );
 }
