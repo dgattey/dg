@@ -96,6 +96,7 @@ const getWrapperSx = (isPlaying: boolean): SxObject => ({
   position: 'relative',
   transform: 'translateZ(0)',
   willChange: isPlaying ? 'transform' : 'auto',
+  zIndex: 2, // Above notes (z-index 1), ensures album art is on top
 });
 
 // Notes spawn from center point (0,0) and radiate outward

@@ -37,6 +37,7 @@ const getGradientGlowSx = (gradient: string): SxObject => ({
 const cardSx: SxObject = {
   display: 'flex',
   minWidth: { md: 'auto', xs: 'min(max-content, inherit)' },
+  overflow: 'visible', // Allow notes to extend beyond card
   padding: 2.5,
   position: 'relative',
   zIndex: 1,
@@ -47,12 +48,13 @@ const getCardSx = (gradient?: string): SxObject => ({
   ...cardSx,
 });
 
-// Notes layer positioned to align with album art CENTER (top-right of card)
-// z-index 2 puts it ABOVE the card (z-index 1) but notes themselves will be styled
-const notesLayerSx: SxObject = {
+// Notes layer INSIDE the card, positioned at album art center
+// z-index 1 puts it above card background but below album art (z-index 2)
+const getNotesLayerSx = (isPlaying: boolean): SxObject => ({
+  display: isPlaying ? 'block' : 'none',
   pointerEvents: 'none',
   position: 'absolute',
-  // Album art center position: padding (20px) + half album size
+  // Album art center: padding (20px) + half album size from top-right
   right: {
     md: `calc(20px + ${IMAGE_SIZE / 2}px)`,
     sm: `calc(20px + ${IMAGE_SIZE / 3}px)`,
@@ -63,8 +65,8 @@ const notesLayerSx: SxObject = {
     sm: `calc(20px + ${IMAGE_SIZE / 3}px)`,
     xs: `calc(20px + ${IMAGE_SIZE / 4}px)`,
   },
-  zIndex: 2, // Above card content
-};
+  zIndex: 1, // Above card background, below album art
+});
 
 const loadingLayoutSx: SxObject = {
   flex: 1,
@@ -106,30 +108,29 @@ const loadingTitleSx: SxObject = {
 
 /**
  * Gets a note color that contrasts well with the gradient background.
- * Uses semi-transparent colors that work on any gradient.
  */
 function getNoteColor(isDark?: boolean): string {
-  // If gradient is dark, use light notes; if light, use dark notes
-  // This ensures notes are visible against the background
   if (isDark === true) {
     return 'rgba(255, 255, 255, 0.65)';
   }
   if (isDark === false) {
     return 'rgba(0, 0, 0, 0.5)';
   }
-  // Fallback - medium gray that works on most backgrounds
   return 'rgba(100, 100, 100, 0.6)';
 }
 
 function SpotifyCardShell({ children, gradient, isPlaying, isDark }: SpotifyCardShellProps) {
+  const playing = Boolean(isPlaying);
   return (
     <Box sx={shellContainerSx}>
       {gradient ? <Box aria-hidden="true" sx={getGradientGlowSx(gradient)} /> : null}
-      {/* Notes layer - positioned at album art center, above card */}
-      <Box sx={notesLayerSx}>
-        <MusicNotes isPlaying={Boolean(isPlaying)} noteColor={getNoteColor(isDark)} />
-      </Box>
-      <ContentCard sx={getCardSx(gradient)}>{children}</ContentCard>
+      <ContentCard sx={getCardSx(gradient)}>
+        {/* Notes layer INSIDE card - z-index 1 (above bg, below album art z-index 2) */}
+        <Box sx={getNotesLayerSx(playing)}>
+          <MusicNotes isPlaying={playing} noteColor={getNoteColor(isDark)} />
+        </Box>
+        {children}
+      </ContentCard>
     </Box>
   );
 }
