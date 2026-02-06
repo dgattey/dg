@@ -7,6 +7,7 @@
   "devDependencies": {
     "@dg/tsconfig": "workspace:*",
     "@types/jest": "catalog:",
+    "@types/node": "catalog:",
     "jest": "catalog:",
     "typescript": "catalog:"
   },

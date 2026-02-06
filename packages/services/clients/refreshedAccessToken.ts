@@ -7,6 +7,13 @@ import { log } from '@dg/shared-core/logging/log';
 import type { RefreshTokenConfig, ValidatedToken } from './RefreshTokenConfig';
 
 /**
+ * In-memory map of pending token refresh promises per token name.
+ * This prevents concurrent refresh requests from the same instance
+ * from racing to refresh the same token simultaneously.
+ */
+const pendingRefreshes = new Map<string, Promise<ValidatedToken>>();
+
+/**
  * Creates or updates a possibly-existing token given a unique name and
  * access token/refresh token/expiry period.
  */
@@ -90,8 +97,9 @@ async function fetchRefreshedTokenFromApi(
 
 /**
  * Refreshes a token using the API and persists it to the database.
+ * This is the internal implementation that actually does the refresh.
  */
-async function refreshTokenAndPersist(
+async function refreshTokenAndPersistInternal(
   name: string,
   refreshTokenConfig: RefreshTokenConfig,
   refreshToken: string,
@@ -106,6 +114,40 @@ async function refreshTokenAndPersist(
   await createOrUpdateToken({ accessToken, expiryAt, name, refreshToken: newRefreshToken });
   log.info('Updated token in db, returning', { name });
   return { accessToken, expiryAt, refreshToken: newRefreshToken };
+}
+
+/**
+ * Refreshes a token using the API and persists it to the database.
+ * Uses deduplication to prevent concurrent refresh requests from racing.
+ *
+ * When multiple requests need to refresh the same token simultaneously:
+ * 1. The first request starts the refresh and stores the promise
+ * 2. Subsequent requests await the same promise instead of starting new refreshes
+ * 3. After the promise resolves, it's removed so future requests can refresh again
+ */
+async function refreshTokenAndPersist(
+  name: string,
+  refreshTokenConfig: RefreshTokenConfig,
+  refreshToken: string,
+): Promise<ValidatedToken> {
+  // Check if there's already a pending refresh for this token
+  const existingRefresh = pendingRefreshes.get(name);
+  if (existingRefresh) {
+    log.info('Token refresh already in progress, waiting for existing refresh', { name });
+    return existingRefresh;
+  }
+
+  // Start a new refresh and store the promise
+  const refreshPromise = refreshTokenAndPersistInternal(name, refreshTokenConfig, refreshToken);
+  pendingRefreshes.set(name, refreshPromise);
+
+  try {
+    const result = await refreshPromise;
+    return result;
+  } finally {
+    // Always clean up the pending refresh, whether it succeeded or failed
+    pendingRefreshes.delete(name);
+  }
 }
 
 /**
