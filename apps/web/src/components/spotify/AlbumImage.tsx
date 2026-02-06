@@ -1,14 +1,25 @@
+'use client';
+
 import type { Track } from '@dg/content-models/spotify/Track';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
+import { Box } from '@mui/material';
 import { ArtworkLink } from './ArtworkLink';
+import { useWaveformBounce } from './useWaveformBounce';
 
 type AlbumImageProps = {
   track: Track;
+  isPlaying: boolean;
 };
 
-// In px, how big our rendered image is. Next resizes the API image to this constant size.
+// In px, how big our rendered image is
 const IMAGE_SIZE = 150;
+
+const wrapperSx: SxObject = {
+  backfaceVisibility: 'hidden',
+  position: 'relative',
+  zIndex: 2, // Above notes layer
+};
 
 const cardSx: SxObject = {
   '--image-dim': {
@@ -29,22 +40,26 @@ const cardSx: SxObject = {
 };
 
 /**
- * Creates an album image that links to the album directly
+ * Album image with waveform bounce animation when playing.
  */
-export function AlbumImage({ track }: AlbumImageProps) {
+export function AlbumImage({ track, isPlaying }: AlbumImageProps) {
   const { album, albumImage } = track;
   const albumTitle = album.name;
   const albumUrl = album.externalUrls.spotify;
 
+  const bounceRef = useWaveformBounce<HTMLDivElement>({ isPlaying });
+
   return (
-    <ArtworkLink
-      cardSx={cardSx}
-      hoverScale={1.05}
-      href={albumUrl}
-      image={albumImage}
-      imageSize={IMAGE_SIZE}
-      sizes={{ extraLarge: IMAGE_SIZE }}
-      title={albumTitle}
-    />
+    <Box ref={bounceRef} sx={wrapperSx}>
+      <ArtworkLink
+        cardSx={cardSx}
+        hoverScale={1.05}
+        href={albumUrl}
+        image={albumImage}
+        imageSize={IMAGE_SIZE}
+        sizes={{ extraLarge: IMAGE_SIZE }}
+        title={albumTitle}
+      />
+    </Box>
   );
 }
