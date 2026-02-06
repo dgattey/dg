@@ -168,10 +168,6 @@ export async function forceRefreshTokenData(
  * misconfigured. Should be caught higher up. If you force refresh, that means
  * it'll attempt to get a refreshed token even if the current token appears valid.
  * Should be used in case of 4xx codes from users.
- *
- * This function handles race conditions by:
- * 1. Deduplicating concurrent refresh requests within the same instance
- * 2. Re-checking the DB if there's a pending refresh (another instance may have completed)
  */
 export async function refreshedAccessToken(
   name: string,
@@ -189,26 +185,10 @@ export async function refreshedAccessToken(
     return currentData.accessToken;
   }
 
-  // Check if another request in this instance is already refreshing
-  const existingRefresh = pendingRefreshes.get(name);
-  if (existingRefresh) {
-    log.info('Awaiting existing token refresh', { name });
-    const result = await existingRefresh;
-    return result.accessToken;
-  }
-
-  // Double-check: re-read from DB in case another instance refreshed while we were checking.
-  // This reduces the window for race conditions across different Vercel function instances.
-  const recheckData = await getLatestTokenIfValid({ name });
-  if (recheckData.accessToken && !forceRefresh) {
-    log.info('Token was refreshed by another instance, using existing token', { name });
-    return recheckData.accessToken;
-  }
-
   const { accessToken } = await refreshTokenAndPersist(
     name,
     refreshTokenConfig,
-    recheckData.refreshToken,
+    currentData.refreshToken,
   );
   return accessToken;
 }

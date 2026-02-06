@@ -493,6 +493,9 @@ importers:
       '@types/jest':
         specifier: 'catalog:'
         version: 30.0.0
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.0.10
       jest:
         specifier: 'catalog:'
         version: 30.2.0(@types/node@25.0.10)(babel-plugin-macros@3.1.0)(esbuild-register@3.6.0(esbuild@0.27.2))(ts-node@10.9.2(@swc/core@1.15.11)(@types/node@25.0.10)(typescript@5.9.3))
@@ -559,6 +562,9 @@ importers:
       '@types/jest':
         specifier: 'catalog:'
         version: 30.0.0
+      '@types/node':
+        specifier: 'catalog:'
+        version: 25.0.10
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.9
