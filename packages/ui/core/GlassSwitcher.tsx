@@ -95,6 +95,7 @@ const hiddenRadioSx: SxObject = {
 function createThumbStyles(optionCount: number, selectedIndex: number): SxObject {
   // Pre-calculate some values for clarity
   const gap = spacingPx(SPACING.thumbGap);
+  const groupPadding = spacingPx(SPACING.groupPadding);
   const optionHeight = spacingPx(SPACING.optionMinHeight);
   const paddingBlock = spacingPx(SPACING.optionPaddingBlock);
 
@@ -112,11 +113,12 @@ function createThumbStyles(optionCount: number, selectedIndex: number): SxObject
     height: { sm: spacingPx(SPACING.thumbHeight), xs: optionHeight },
 
     // Position the thumb to center on the selected option
-    left: { sm: 0, xs: '50%' },
+    // Account for grid padding so the thumb aligns with each option
+    left: { sm: groupPadding, xs: '50%' },
     position: 'absolute',
     top: {
       sm: '50%',
-      xs: `calc((${selectedIndex} * (${rowHeight} + ${gap})) + (${rowHeight} / 2))`,
+      xs: `calc(${groupPadding} + (${selectedIndex} * (${rowHeight} + ${gap})) + (${rowHeight} / 2))`,
     },
     transform: {
       sm: `translate(calc(${selectedIndex} * (100% + ${gap})), -50%)`,
