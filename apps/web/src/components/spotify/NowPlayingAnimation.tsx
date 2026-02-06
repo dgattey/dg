@@ -28,40 +28,43 @@ type MusicNote = {
 };
 
 const MUSIC_ICONS = [Music, Music2, Music3, Music4];
-const NOTE_SPAWN_INTERVAL_MS = 350;
-const NOTE_LIFETIME_MS = 2500;
-const MAX_NOTES = 16;
+const NOTE_SPAWN_INTERVAL_MS = 400;
+const NOTE_LIFETIME_MS = 3500;
+const MAX_NOTES = 14;
 
-// Keyframe for floating and fading music notes - now fades in first
+// Keyframe for floating and fading music notes - fades in, stays visible longer, then fades out
 const floatAndFade = keyframes`
   0% {
     opacity: 0;
     transform: translate(0, 0) scale(var(--note-scale)) rotate(0deg);
   }
-  15% {
-    opacity: 0.8;
-    transform: translate(calc(var(--note-x) * 0.1), calc(var(--note-y) * 0.1)) scale(var(--note-scale)) rotate(calc(var(--note-rotation) * 0.2));
+  10% {
+    opacity: 0.7;
+    transform: translate(calc(var(--note-x) * 0.05), calc(var(--note-y) * 0.05)) scale(var(--note-scale)) rotate(calc(var(--note-rotation) * 0.1));
   }
-  60% {
-    opacity: 0.5;
+  40% {
+    opacity: 0.6;
+  }
+  70% {
+    opacity: 0.4;
   }
   100% {
     opacity: 0;
-    transform: translate(var(--note-x), var(--note-y)) scale(calc(var(--note-scale) * 0.6)) rotate(var(--note-rotation));
+    transform: translate(var(--note-x), var(--note-y)) scale(calc(var(--note-scale) * 0.7)) rotate(var(--note-rotation));
   }
 `;
 
-// Container positioned to allow notes to escape beyond the card
+// Container positioned to allow notes to escape beyond the card - behind the card content
 const containerSx: SxObject = {
   // Expand beyond the card boundaries
-  bottom: -60,
-  left: -60,
+  bottom: -100,
+  left: -100,
   overflow: 'visible',
   pointerEvents: 'none',
   position: 'absolute',
-  right: -60,
-  top: -60,
-  zIndex: 3,
+  right: -100,
+  top: -100,
+  zIndex: 0, // Behind the card content
 };
 
 const noteContainerSx: SxObject = {
@@ -102,23 +105,23 @@ export function NowPlayingAnimation({ isPlaying, noteColor }: NowPlayingAnimatio
       const id = noteIdRef.current++;
 
       // Center around album art area (top-right of the card content)
-      // With the expanded container (-60px on each side), we need to offset
+      // With the expanded container (-100px on each side), we need to offset
       // Album art is roughly at 75% from left, 25% from top of original card
-      // Adjusted for expanded container: (75% of card + 60px offset) / total width
-      const albumCenterX = 72; // Percentage in expanded container
-      const albumCenterY = 35; // Percentage in expanded container
+      // Adjusted for expanded container
+      const albumCenterX = 68; // Percentage in expanded container
+      const albumCenterY = 38; // Percentage in expanded container
 
       // Random angle for 360-degree emanation
       const angle = Math.random() * 360;
 
       // Spawn near the album art center with some randomness
-      const spawnRadius = 3 + Math.random() * 8;
+      const spawnRadius = 2 + Math.random() * 6;
       const x = albumCenterX + Math.cos((angle * Math.PI) / 180) * spawnRadius;
       const y = albumCenterY + Math.sin((angle * Math.PI) / 180) * spawnRadius;
 
       const newNote: MusicNote = {
         angle,
-        distance: 80 + Math.random() * 60, // Travel 80-140px outward
+        distance: 130 + Math.random() * 90, // Travel 130-220px outward
         duration: NOTE_LIFETIME_MS + Math.random() * 800,
         icon: Math.floor(Math.random() * MUSIC_ICONS.length),
         id,
