@@ -34,46 +34,55 @@ type MusicNote = {
   duration: number;
   icon: number;
   distance: number;
+  delay: number;
 };
 
 const MUSIC_ICONS = [Music, Music2, Music3, Music4];
-const NOTE_SPAWN_INTERVAL_MS = 400;
-const NOTE_LIFETIME_MS = 3500;
-const MAX_NOTES = 14;
+const NOTE_SPAWN_INTERVAL_MS = 280; // More frequent
+const NOTE_LIFETIME_MS = 3000;
+const MAX_NOTES = 18; // More notes
 
-// GPU-accelerated bounce using translate3d and scale3d
-// Only animates transform (compositor-only, no layout/paint)
+// Organic bounce - alternates up/down with slight variation
+// Uses different timing for up vs down to feel less mechanical
 const albumBounce = keyframes`
-  0%, 100% {
+  0% {
     transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
   }
-  25% {
-    transform: scale3d(1.008, 1.008, 1) translate3d(0, -1px, 0);
+  20% {
+    transform: scale3d(1.006, 1.006, 1) translate3d(0, -1.5px, 0);
+  }
+  35% {
+    transform: scale3d(1.002, 1.002, 1) translate3d(0, -0.5px, 0);
   }
   50% {
-    transform: scale3d(0.997, 0.997, 1) translate3d(0, 0.3px, 0);
+    transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
   }
-  75% {
-    transform: scale3d(1.003, 1.003, 1) translate3d(0, -0.3px, 0);
+  65% {
+    transform: scale3d(0.998, 0.998, 1) translate3d(0, 1px, 0);
+  }
+  80% {
+    transform: scale3d(1.001, 1.001, 1) translate3d(0, 0.3px, 0);
+  }
+  100% {
+    transform: scale3d(1, 1, 1) translate3d(0, 0, 0);
   }
 `;
 
-// GPU-accelerated float animation using translate3d
-// Only animates transform and opacity (compositor-only, no layout/paint)
+// GPU-accelerated float animation
 const floatAndFade = keyframes`
   0% {
     opacity: 0;
     transform: translate3d(-50%, -50%, 0) scale3d(var(--note-scale), var(--note-scale), 1) rotate(0deg);
   }
-  10% {
-    opacity: 0.8;
-    transform: translate3d(calc(-50% + var(--note-x) * 0.1), calc(-50% + var(--note-y) * 0.1), 0) scale3d(var(--note-scale), var(--note-scale), 1) rotate(calc(var(--note-rotation) * 0.1));
+  8% {
+    opacity: 0.75;
+    transform: translate3d(calc(-50% + var(--note-x) * 0.08), calc(-50% + var(--note-y) * 0.08), 0) scale3d(var(--note-scale), var(--note-scale), 1) rotate(calc(var(--note-rotation) * 0.08));
   }
   50% {
-    opacity: 0.6;
+    opacity: 0.5;
   }
   80% {
-    opacity: 0.3;
+    opacity: 0.25;
   }
   100% {
     opacity: 0;
@@ -82,16 +91,14 @@ const floatAndFade = keyframes`
 `;
 
 const getWrapperSx = (isPlaying: boolean): SxObject => ({
-  animation: isPlaying ? `${albumBounce} 0.6s ease-in-out infinite` : 'none',
-  // GPU acceleration hints
+  animation: isPlaying ? `${albumBounce} 0.9s ease-in-out infinite` : 'none',
   backfaceVisibility: 'hidden',
   position: 'relative',
-  transform: 'translateZ(0)', // Force GPU layer when not animating
+  transform: 'translateZ(0)',
   willChange: isPlaying ? 'transform' : 'auto',
   zIndex: 2,
 });
 
-// Notes container - GPU accelerated
 const notesContainerSx: SxObject = {
   backfaceVisibility: 'hidden',
   height: 0,
@@ -106,15 +113,16 @@ const notesContainerSx: SxObject = {
 };
 
 const getNoteSx = (note: MusicNote, noteColor?: string): SxObject => ({
-  '--note-rotation': `${note.angle > 180 ? -30 : 30}deg`,
+  '--note-rotation': `${note.angle > 180 ? -25 : 25}deg`,
   '--note-scale': note.scale,
   '--note-x': `${Math.cos((note.angle * Math.PI) / 180) * note.distance}px`,
   '--note-y': `${Math.sin((note.angle * Math.PI) / 180) * note.distance}px`,
   animation: `${floatAndFade} ${note.duration}ms ease-out forwards`,
-  // GPU acceleration hints
+  animationDelay: `${note.delay}ms`,
   backfaceVisibility: 'hidden',
-  color: noteColor ?? 'rgba(255, 255, 255, 0.8)',
+  color: noteColor ?? 'rgba(128, 128, 128, 0.8)',
   left: 0,
+  opacity: 0, // Start hidden, animation will fade in
   position: 'absolute',
   top: 0,
   willChange: 'transform, opacity',
@@ -140,23 +148,26 @@ export function MusicNotes({ isPlaying, noteColor }: MusicNotesProps) {
 
       const newNote: MusicNote = {
         angle,
-        distance: 200 + Math.random() * 150,
-        duration: NOTE_LIFETIME_MS + Math.random() * 800,
+        delay: Math.random() * 80, // Slight random delay for variation
+        distance: 120 + Math.random() * 80, // Shorter: 120-200px
+        duration: NOTE_LIFETIME_MS + Math.random() * 600,
         icon: Math.floor(Math.random() * MUSIC_ICONS.length),
         id,
-        scale: 0.9 + Math.random() * 0.4,
+        scale: 0.85 + Math.random() * 0.35,
       };
 
       setNotes((prev) => [...prev, newNote].slice(-MAX_NOTES));
 
       setTimeout(() => {
         setNotes((prev) => prev.filter((n) => n.id !== id));
-      }, newNote.duration);
+      }, newNote.duration + newNote.delay);
     };
 
+    // Spawn initial burst
     spawnNote();
-    setTimeout(spawnNote, 100);
-    setTimeout(spawnNote, 200);
+    setTimeout(spawnNote, 60);
+    setTimeout(spawnNote, 120);
+    setTimeout(spawnNote, 180);
 
     const intervalId = setInterval(spawnNote, NOTE_SPAWN_INTERVAL_MS);
     return () => clearInterval(intervalId);
@@ -171,7 +182,7 @@ export function MusicNotes({ isPlaying, noteColor }: MusicNotesProps) {
         }
         return (
           <Box key={note.id} sx={getNoteSx(note, noteColor)}>
-            <IconComponent size={16} />
+            <IconComponent size={15} />
           </Box>
         );
       }),
@@ -190,7 +201,7 @@ export function MusicNotes({ isPlaying, noteColor }: MusicNotesProps) {
 }
 
 /**
- * Client component that wraps album art with a springy bounce animation.
+ * Client component that wraps album art with an organic bounce animation.
  * Uses GPU-accelerated transforms only.
  */
 export function PlayingIndicator({ children, isPlaying }: PlayingIndicatorProps) {

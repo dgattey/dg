@@ -149,13 +149,42 @@ type SpotifyCardProps = {
 };
 
 /**
- * Gets a color for music notes based on whether the gradient is dark
+ * Extracts a color from a CSS gradient string for use on music notes.
+ * Falls back to a semi-transparent gray if no gradient.
  */
-function getNoteColor(isDark?: boolean): string {
-  if (isDark === undefined) {
-    return 'rgba(128, 128, 128, 0.7)';
+function extractGradientColor(gradient?: string, isDark?: boolean): string {
+  if (!gradient) {
+    return 'rgba(128, 128, 128, 0.6)';
   }
-  return isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)';
+
+  // Extract hex colors from gradient (e.g., "linear-gradient(135deg, #abc123, #def456)")
+  const hexMatch = gradient.match(/#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3}/g);
+  if (hexMatch?.[0]) {
+    // Use the first color from gradient with some transparency
+    const hex = hexMatch[0];
+    // Convert hex to rgba with appropriate opacity based on dark/light
+    const opacity = isDark ? 0.85 : 0.7;
+    return hexToRgba(hex, opacity);
+  }
+
+  // Fallback based on dark/light
+  return isDark ? 'rgba(200, 200, 200, 0.7)' : 'rgba(80, 80, 80, 0.6)';
+}
+
+/**
+ * Converts a hex color to rgba with specified opacity.
+ */
+function hexToRgba(hex: string, opacity: number): string {
+  const shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+  const fullHex = hex.replace(shorthandRegex, (_, r, g, b) => r + r + g + g + b + b);
+  const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(fullHex);
+  if (!result) {
+    return `rgba(128, 128, 128, ${opacity})`;
+  }
+  const r = Number.parseInt(result[1] ?? '0', 16);
+  const g = Number.parseInt(result[2] ?? '0', 16);
+  const b = Number.parseInt(result[3] ?? '0', 16);
+  return `rgba(${r}, ${g}, ${b}, ${opacity})`;
 }
 
 /**
@@ -170,7 +199,7 @@ export function SpotifyCard({ track }: SpotifyCardProps) {
     <SpotifyCardShell
       gradient={track.albumGradient}
       isPlaying={track.isPlaying}
-      noteColor={getNoteColor(track.albumGradientIsDark)}
+      noteColor={extractGradientColor(track.albumGradient, track.albumGradientIsDark)}
     >
       <TrackListing hasLogo track={track} />
     </SpotifyCardShell>
