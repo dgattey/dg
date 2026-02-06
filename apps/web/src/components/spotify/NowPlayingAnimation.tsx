@@ -56,14 +56,14 @@ const floatAndFade = keyframes`
 
 // Container positioned to allow notes to escape beyond the card - behind the card content
 const containerSx: SxObject = {
-  // Expand beyond the card boundaries
-  bottom: -100,
-  left: -100,
+  // Expand well beyond the card boundaries for long travel
+  bottom: -150,
+  left: -150,
   overflow: 'visible',
   pointerEvents: 'none',
   position: 'absolute',
-  right: -100,
-  top: -100,
+  right: -150,
+  top: -150,
   zIndex: 0, // Behind the card content
 };
 
@@ -104,24 +104,22 @@ export function NowPlayingAnimation({ isPlaying, noteColor }: NowPlayingAnimatio
     const spawnNote = () => {
       const id = noteIdRef.current++;
 
-      // Center around album art area (top-right of the card content)
-      // With the expanded container (-100px on each side), we need to offset
-      // Album art is roughly at 75% from left, 25% from top of original card
-      // Adjusted for expanded container
-      const albumCenterX = 68; // Percentage in expanded container
-      const albumCenterY = 38; // Percentage in expanded container
+      // Center of the card (accounting for the expanded container margins)
+      // The container extends 100px beyond each edge, so center is at 50%
+      const cardCenterX = 50;
+      const cardCenterY = 50;
 
       // Random angle for 360-degree emanation
       const angle = Math.random() * 360;
 
-      // Spawn near the album art center with some randomness
-      const spawnRadius = 2 + Math.random() * 6;
-      const x = albumCenterX + Math.cos((angle * Math.PI) / 180) * spawnRadius;
-      const y = albumCenterY + Math.sin((angle * Math.PI) / 180) * spawnRadius;
+      // Spawn from center with slight randomness
+      const spawnRadius = Math.random() * 3;
+      const x = cardCenterX + Math.cos((angle * Math.PI) / 180) * spawnRadius;
+      const y = cardCenterY + Math.sin((angle * Math.PI) / 180) * spawnRadius;
 
       const newNote: MusicNote = {
         angle,
-        distance: 130 + Math.random() * 90, // Travel 130-220px outward
+        distance: 180 + Math.random() * 120, // Travel 180-300px outward
         duration: NOTE_LIFETIME_MS + Math.random() * 800,
         icon: Math.floor(Math.random() * MUSIC_ICONS.length),
         id,

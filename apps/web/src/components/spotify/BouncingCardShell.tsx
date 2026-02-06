@@ -9,18 +9,27 @@ type BouncingCardShellProps = {
   isPlaying: boolean;
 };
 
-// Snappy but subtle bounce animation for the whole card
+// Springy bounce animation for the whole card
 const cardBounce = keyframes`
-  0%, 100% {
+  0% {
     transform: scale(1) translateY(0);
   }
-  50% {
-    transform: scale(1.008) translateY(-1.5px);
+  15% {
+    transform: scale(1.012) translateY(-2px);
+  }
+  30% {
+    transform: scale(0.998) translateY(0.5px);
+  }
+  45% {
+    transform: scale(1.004) translateY(-0.5px);
+  }
+  60%, 100% {
+    transform: scale(1) translateY(0);
   }
 `;
 
 const getShellSx = (isPlaying: boolean): SxObject => ({
-  animation: isPlaying ? `${cardBounce} 0.8s ease-in-out infinite` : 'none',
+  animation: isPlaying ? `${cardBounce} 1s cubic-bezier(0.34, 1.56, 0.64, 1) infinite` : 'none',
   isolation: 'isolate',
   overflow: 'visible',
   position: 'relative',
