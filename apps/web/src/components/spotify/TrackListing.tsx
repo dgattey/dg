@@ -69,7 +69,7 @@ export function TrackListing({ track, hasLogo }: TrackListingProps) {
             url={trackUrl}
           />
         ) : null}
-        <AlbumImage track={track} />
+        <AlbumImage isPlaying={track.isPlaying} track={track} />
       </Stack>
       <Stack>
         <PlaybackStatus

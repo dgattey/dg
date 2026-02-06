@@ -5,7 +5,6 @@ import type { SxObject } from '@dg/ui/theme';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { Box, Card, Skeleton, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
-import { BouncingCardShell } from '../spotify/BouncingCardShell';
 import { NowPlayingAnimation } from '../spotify/NowPlayingAnimation';
 import { TrackListing } from '../spotify/TrackListing';
 
@@ -16,6 +15,12 @@ type SpotifyCardShellProps = {
   gradient?: string;
   isPlaying?: boolean;
   noteColor?: string;
+};
+
+const shellContainerSx: SxObject = {
+  isolation: 'isolate',
+  overflow: 'visible',
+  position: 'relative',
 };
 
 const getGradientGlowSx = (gradient: string): SxObject => ({
@@ -83,12 +88,14 @@ const loadingTitleSx: SxObject = {
 function SpotifyCardShell({ children, gradient, isPlaying, noteColor }: SpotifyCardShellProps) {
   const playing = Boolean(isPlaying);
   return (
-    <BouncingCardShell isPlaying={playing}>
+    <Box sx={shellContainerSx}>
       {gradient ? <Box aria-hidden="true" sx={getGradientGlowSx(gradient)} /> : null}
-      {/* Animation outside ContentCard to avoid overflow:hidden clipping */}
-      <NowPlayingAnimation isPlaying={playing} noteColor={noteColor} />
-      <ContentCard sx={getCardSx(gradient)}>{children}</ContentCard>
-    </BouncingCardShell>
+      <ContentCard sx={getCardSx(gradient)}>
+        {/* Music notes animation - positioned from card center */}
+        <NowPlayingAnimation isPlaying={playing} noteColor={noteColor} />
+        {children}
+      </ContentCard>
+    </Box>
   );
 }
 
@@ -126,9 +133,9 @@ type SpotifyCardProps = {
  */
 function getNoteColor(isDark?: boolean): string {
   if (isDark === undefined) {
-    return 'rgba(128, 128, 128, 0.6)';
+    return 'rgba(128, 128, 128, 0.7)';
   }
-  return isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.5)';
+  return isDark ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)';
 }
 
 /**
