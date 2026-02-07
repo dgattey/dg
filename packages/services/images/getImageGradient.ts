@@ -1,6 +1,8 @@
 import 'server-only';
 
-import sharp from 'sharp';
+import { invariant } from '@dg/shared-core/assertions/invariant';
+import { log } from '@dg/shared-core/logging/log';
+import sharp, { type Stats } from 'sharp';
 
 type Rgb = {
   r: number;
@@ -8,67 +10,61 @@ type Rgb = {
   b: number;
 };
 
-type GradientOptions = {
-  angle?: number;
-  baseColor?: Rgb;
-  fromAlpha?: number;
-  toAlpha?: number;
-  mix?: number;
-  contrast?: number;
+type Rgba = Rgb & {
+  a: number;
 };
 
-type ImageStats = {
-  channels: Array<{ mean: number }>;
-  dominant?: Rgb;
+type FourItemRgba = [Rgba, Rgba, Rgba, Rgba];
+
+type ContrastSetting = 'light' | 'dark';
+
+type ImageGradientInformation = {
+  backgroundGradient: string | null;
+  contrastSetting: ContrastSetting | null;
 };
 
-type VibrantOptions = {
-  bucketSize?: number;
-  maxLuminance?: number;
-  maxColors?: number;
-  minDistance?: number;
-  minLuminance?: number;
-  minSaturation?: number;
-  sampleSize?: number;
-};
-
-type ImageGradient = {
-  gradient: string;
-  isDark: boolean;
-};
-
-const DEFAULT_OPTIONS: Required<GradientOptions> = {
-  // Tuned defaults for subdued gradients.
-  angle: 45,
-  baseColor: { b: 0, g: 0, r: 0 },
-  contrast: 0.45,
-  fromAlpha: 0.9,
-  mix: 0.1,
-  toAlpha: 0.8,
-};
-
-const DEFAULT_VIBRANT_OPTIONS: Required<VibrantOptions> = {
-  // Keep sampling small; we only need representative hues.
+// All options
+const OPTIONS = {
+  baseColor: { a: 1, b: 0, g: 0, r: 0 },
+  /** Number of buckets for vibrancy algorithm - reduces variation in color */
   bucketSize: 24,
-  maxColors: 4,
+  contrast: 0.45,
+  /** Colors aren't allowed to be more luminous than this */
   maxLuminance: 0.75,
   minDistance: 60,
+  /** Colors aren't allowed to be less luminous than this */
   minLuminance: 0.1,
-  minSaturation: 0.24,
+  primaryAlpha: 0.8,
+  quaternaryAlpha: 0.85,
+  /** Size of scaled down image for getting vibrancy for performance */
   sampleSize: 36,
-};
+  secondaryAlpha: 0.9,
+  tertiaryAlpha: 0.85,
+} as const;
 
 // Basic color math helpers.
 const clampChannel = (value: number) => Math.max(0, Math.min(255, Math.round(value)));
 
-const mixRgb = (first: Rgb, second: Rgb, ratio: number) => {
+function isRgba(color: Rgb | Rgba): color is Rgba {
+  return 'a' in color;
+}
+
+function mixRgb<T extends Rgb | Rgba>(first: T, second: T, ratio: number): T {
   const clampedRatio = Math.max(0, Math.min(1, ratio));
+  if (isRgba(first) && isRgba(second)) {
+    return {
+      a: clampChannel(first.a + (second.a - first.a) * clampedRatio),
+      b: clampChannel(first.b + (second.b - first.b) * clampedRatio),
+      g: clampChannel(first.g + (second.g - first.g) * clampedRatio),
+      r: clampChannel(first.r + (second.r - first.r) * clampedRatio),
+    } as T;
+  }
   return {
     b: clampChannel(first.b + (second.b - first.b) * clampedRatio),
     g: clampChannel(first.g + (second.g - first.g) * clampedRatio),
     r: clampChannel(first.r + (second.r - first.r) * clampedRatio),
-  };
-};
+  } as T;
+}
 
 const luminance = ({ r, g, b }: Rgb) => (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
 
@@ -90,84 +86,86 @@ const clampToMidRange = (color: Rgb, min = 0.15, max = 0.7) => {
   return color;
 };
 
-const boostSaturation = (color: Rgb, amount: number) => {
+/**
+ * Increases saturation by a given amount
+ */
+function boostSaturation(color: Rgb, amount: number) {
   const gray = (color.r + color.g + color.b) / 3;
   return {
     b: clampChannel(gray + (color.b - gray) * (1 + amount)),
     g: clampChannel(gray + (color.g - gray) * (1 + amount)),
     r: clampChannel(gray + (color.r - gray) * (1 + amount)),
   };
-};
+}
 
-const adjustForGradient = (color: Rgb) => {
-  // Nudge colors toward mid luminance and richer saturation so gradients
-  // stay visible against UI chrome.
+/**
+ * Nudges a color towards mid luminance and richer saturation for more
+ * visible gradients against a range of backgrounds.
+ */
+function boostSaturationAndNudgeToMidLuminence(color: Rgb) {
   const clamped = clampToMidRange(color);
-  const saturated = boostSaturation(clamped, 0.55);
-  const darkened = shiftLightness(saturated, -0.2);
+  const saturated = boostSaturation(clamped, 0.6);
+  const darkened = shiftLightness(saturated, -0.3);
   return clampToMidRange(darkened, 0.12, 0.7);
-};
+}
 
-const ensureQuadColors = (colors: Array<Rgb>, contrast: number) => {
-  // Prefer provided colors; derive missing swatches from the first.
-  const result = colors.slice(0, 4);
-  if (result.length === 0 || result.length === 4) {
-    return result;
-  }
-  const base = result[0];
-  if (!base) {
-    return result;
-  }
-  const derived = [
-    adjustForGradient(shiftLightness(base, contrast)),
-    adjustForGradient(shiftLightness(base, -contrast)),
-    adjustForGradient(shiftLightness(base, contrast * 0.6)),
+/**
+ * If we have < 4 colors in our array, pad it with variants of the base color
+ * until we're at 4 colors and bump saturation/nudge to mid luminence.
+ */
+function ensureQuadColorArray(colors: Array<Rgb>, fallbackColor: Rgb): FourItemRgba {
+  const { contrast, primaryAlpha, secondaryAlpha, tertiaryAlpha, quaternaryAlpha } = OPTIONS;
+  const primary = colors[0] ?? fallbackColor;
+
+  // Pad with more variants of the base color as needed
+  const derivedColors: Array<Rgb> = [
+    shiftLightness(primary, contrast),
+    shiftLightness(primary, -contrast),
+    shiftLightness(primary, contrast * 0.6),
   ];
-  for (const color of derived) {
-    if (result.length >= 4) {
+  for (const color of derivedColors) {
+    if (colors.length >= 4) {
       break;
     }
-    result.push(color);
+    colors.push(color);
   }
-  return result;
-};
 
-const toRgba = ({ r, g, b }: Rgb, alpha: number) =>
-  `rgba(${clampChannel(r)}, ${clampChannel(g)}, ${clampChannel(b)}, ${alpha})`;
+  // Get down to 4 items and boost colors
+  return colors
+    .slice(0, 4)
+    .map(boostSaturationAndNudgeToMidLuminence)
+    .map((rgb, index) => {
+      switch (index) {
+        case 0:
+          return { ...rgb, a: primaryAlpha };
+        case 1:
+          return { ...rgb, a: secondaryAlpha };
+        case 2:
+          return { ...rgb, a: tertiaryAlpha };
+        case 3:
+          return { ...rgb, a: quaternaryAlpha };
+      }
+      throw new TypeError('Bad slice logic');
+    }) as [Rgba, Rgba, Rgba, Rgba];
+}
 
-const mixWithBase = (color: Rgb, baseColor: Rgb, alpha: number) => mixRgb(baseColor, color, alpha);
+const toRgba = ({ r, g, b, a }: Rgba) =>
+  `rgba(${clampChannel(r)}, ${clampChannel(g)}, ${clampChannel(b)}, ${a})`;
 
-const deriveAccent = (color: Rgb, contrast: number) =>
-  adjustForGradient(
-    luminance(color) > 0.5 ? shiftLightness(color, -contrast) : shiftLightness(color, contrast),
-  );
-
-const buildLinearGradient = (
-  angle: number,
-  start: Rgb,
-  startAlpha: number,
-  end: Rgb,
-  endAlpha: number,
-) => `linear-gradient(${angle}deg, ${toRgba(start, startAlpha)}, ${toRgba(end, endAlpha)})`;
-
-const buildRadialGradientStack = (
-  primary: Rgb,
-  secondary: Rgb,
-  tertiary: Rgb,
-  quaternary: Rgb,
-  primaryAlpha: number,
-  secondaryAlpha: number,
-  tertiaryAlpha: number,
-  quaternaryAlpha: number,
-) =>
-  [
-    `radial-gradient(circle at top right, ${toRgba(primary, primaryAlpha)} 0%, transparent 70%)`,
-    `radial-gradient(circle at bottom left, ${toRgba(secondary, secondaryAlpha)} 0%, transparent 70%)`,
-    `radial-gradient(circle at top left, ${toRgba(tertiary, tertiaryAlpha)} 0%, transparent 70%)`,
-    `radial-gradient(circle at bottom right, ${toRgba(quaternary, quaternaryAlpha)} 0%, transparent 70%)`,
+/**
+ * Returns a radial gradient from four colors, with all coalescing into each other if not enough to
+ * go around.
+ */
+function buildRadialGradient(colors: FourItemRgba) {
+  return [
+    `radial-gradient(circle at top right, ${toRgba(colors[0])} 0%, transparent 70%)`,
+    `radial-gradient(circle at bottom left, ${toRgba(colors[1])} 0%, transparent 70%)`,
+    `radial-gradient(circle at top left, ${toRgba(colors[2])} 0%, transparent 70%)`,
+    `radial-gradient(circle at bottom right, ${toRgba(colors[3])} 0%, transparent 70%)`,
   ].join(', ');
+}
 
-const toRelativeLuminance = ({ r, g, b }: Rgb) => {
+function toRelativeLuminance({ r, g, b }: Rgb) {
   // WCAG relative luminance.
   const normalize = (value: number) => {
     const channel = value / 255;
@@ -177,29 +175,34 @@ const toRelativeLuminance = ({ r, g, b }: Rgb) => {
   const green = normalize(g);
   const blue = normalize(b);
   return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-};
+}
 
-const getContrastRatio = (first: Rgb, second: Rgb) => {
+function getContrastRatio(first: Rgb, second: Rgb) {
   const firstLum = toRelativeLuminance(first);
   const secondLum = toRelativeLuminance(second);
   const lighter = Math.max(firstLum, secondLum);
   const darker = Math.min(firstLum, secondLum);
   return (lighter + 0.05) / (darker + 0.05);
-};
+}
 
-const shouldUseLightText = (colors: Array<Rgb>) => {
+/**
+ * Returns a recommended light/dark text color based on the gradient array
+ */
+function contrastSettingForGradient(colors: FourItemRgba): ContrastSetting {
+  const { baseColor } = OPTIONS;
+  const mixedColors = colors.map((color) => mixRgb(baseColor, color, color.a));
+
   // Compare average contrast against white vs black text.
   const white: Rgb = { b: 255, g: 255, r: 255 };
   const black: Rgb = { b: 0, g: 0, r: 0 };
   const contrastWithWhite =
-    colors.reduce((total, color) => total + getContrastRatio(white, color), 0) / colors.length;
+    mixedColors.reduce((total, color) => total + getContrastRatio(white, color), 0) /
+    mixedColors.length;
   const contrastWithBlack =
-    colors.reduce((total, color) => total + getContrastRatio(black, color), 0) / colors.length;
-  return contrastWithWhite >= contrastWithBlack;
-};
-
-const shouldUseLightTextForBase = (baseColor: Rgb, colors: Array<[Rgb, number]>) =>
-  shouldUseLightText(colors.map(([color, alpha]) => mixWithBase(color, baseColor, alpha)));
+    mixedColors.reduce((total, color) => total + getContrastRatio(black, color), 0) /
+    mixedColors.length;
+  return contrastWithWhite >= contrastWithBlack ? 'light' : 'dark';
+}
 
 const rgbDistance = (first: Rgb, second: Rgb) => {
   const r = first.r - second.r;
@@ -226,87 +229,55 @@ const rgbToHsl = ({ r, g, b }: Rgb) => {
 const quantizeChannel = (value: number, bucketSize: number) =>
   clampChannel(Math.round(value / bucketSize) * bucketSize);
 
-const getDominantRgb = (stats: ImageStats): Rgb | null => {
-  if (stats.dominant && typeof stats.dominant.r === 'number') {
-    return {
-      b: clampChannel(stats.dominant.b),
-      g: clampChannel(stats.dominant.g),
-      r: clampChannel(stats.dominant.r),
-    };
-  }
-  return null;
-};
+/**
+ * Downsample, bucket, and keep the most vibrant colors
+ */
+async function getVibrantColors(buffer: Buffer): Promise<Array<Rgb>> {
+  const { bucketSize, maxLuminance, minDistance, minLuminance, sampleSize } = OPTIONS;
 
-const getMeanRgb = (stats: ImageStats): Rgb | null => {
-  if (stats.channels.length < 3) {
-    return null;
-  }
-  const [rChannel, gChannel, bChannel] = stats.channels;
-  if (!rChannel || !gChannel || !bChannel) {
-    return null;
-  }
-  return {
-    b: clampChannel(bChannel.mean),
-    g: clampChannel(gChannel.mean),
-    r: clampChannel(rChannel.mean),
-  };
-};
-
-// Downsample, bucket, and keep the most saturated distinct colors.
-const getVibrantColors = async (
-  buffer: Buffer,
-  options: VibrantOptions = {},
-): Promise<Array<Rgb>> => {
-  const {
-    bucketSize,
-    maxColors,
-    maxLuminance,
-    minDistance,
-    minLuminance,
-    minSaturation,
-    sampleSize,
-  } = {
-    ...DEFAULT_VIBRANT_OPTIONS,
-    ...options,
-  };
-
+  // Smaller image to better get vibrant colors + process less
   const { data, info } = await sharp(buffer)
     .resize(sampleSize, sampleSize, { fit: 'inside' })
     .raw()
     .toBuffer({ resolveWithObject: true });
-
-  if (info.channels < 3) {
-    return [];
-  }
-
   const hasAlpha = info.channels === 4;
+  invariant(info.channels >= 3, 'Not an image buffer!');
+
   const buckets = new Map<
     string,
     { count: number; maxSaturation: number; rSum: number; gSum: number; bSum: number }
   >();
+
+  // For each pixel in buffer, process it
   for (let index = 0; index < data.length; index += info.channels) {
     const r = data[index] ?? 0;
     const g = data[index + 1] ?? 0;
     const b = data[index + 2] ?? 0;
+
+    // Skip ~transparent colors
     const alpha = hasAlpha ? (data[index + 3] ?? 0) : 255;
     if (alpha < 10) {
       continue;
     }
+
     const color = { b, g, r };
+
+    // Skip colors outside our lightness thresholds (no super dark, no super light)
     const lightness = luminance(color);
     if (lightness < minLuminance || lightness > maxLuminance) {
       continue;
     }
+
+    // Scale down color to smaller range for comparison
     const { saturation } = rgbToHsl(color);
-    if (saturation < minSaturation) {
-      continue;
-    }
     const quantized = {
       b: quantizeChannel(b, bucketSize),
       g: quantizeChannel(g, bucketSize),
       r: quantizeChannel(r, bucketSize),
     };
     const key = `${quantized.r}-${quantized.g}-${quantized.b}`;
+
+    // Count number of times we've seen this color, and take max saturation
     const existing = buckets.get(key);
     if (existing) {
       existing.count += 1;
@@ -325,6 +296,8 @@ const getVibrantColors = async (
     }
   }
 
+  // Average the colors in our quantized buckets, and score by max saturation and how often we've
+  // seen this color
   const candidates = Array.from(buckets.values()).map((bucket) => {
     const count = bucket.count;
     const average = {
@@ -342,6 +315,8 @@ const getVibrantColors = async (
     };
   });
 
+  // Sort by score of max saturation & count, and push on all those that are sufficiently different
+  // from one another
   candidates.sort((first, second) => second.score - first.score);
   const selected: Array<(typeof candidates)[number]> = [];
   for (const candidate of candidates) {
@@ -355,105 +330,67 @@ const getVibrantColors = async (
     if (hasDistance) {
       selected.push(candidate);
     }
-    if (selected.length >= maxColors) {
+    if (selected.length >= 4) {
       break;
     }
   }
 
   return selected.map((candidate) => candidate.color);
-};
+}
+
+function getDominantRgb(stats: Stats): Rgb | null {
+  if (stats.dominant && typeof stats.dominant.r === 'number') {
+    return {
+      b: clampChannel(stats.dominant.b),
+      g: clampChannel(stats.dominant.g),
+      r: clampChannel(stats.dominant.r),
+    };
+  }
+  return null;
+}
+
+function getMeanRgb(stats: Stats): Rgb {
+  const [rChannel, gChannel, bChannel] = stats.channels;
+  invariant(rChannel && gChannel && bChannel, 'Malformed image');
+  return {
+    b: clampChannel(bChannel.mean),
+    g: clampChannel(gChannel.mean),
+    r: clampChannel(rChannel.mean),
+  };
+}
 
 /**
- * Returns a subtle CSS gradient derived from an image URL, or null on failure.
+ * Returns an up-to-4-color radial gradient from the processed image URL, and indicator boolean for
+ * recommended text color when used on top of the gradient.
  */
-export async function getImageGradientFromUrl(
+export async function getImageGradientInformationFromUrl(
   url: string,
-  options: GradientOptions = {},
-): Promise<ImageGradient | null> {
-  const { angle, baseColor, contrast, fromAlpha, mix, toAlpha } = {
-    ...DEFAULT_OPTIONS,
-    ...options,
-  };
+): Promise<ImageGradientInformation> {
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      return null;
-    }
-    const buffer = Buffer.from(await response.arrayBuffer());
-    const stats = (await sharp(buffer).stats()) as ImageStats;
-    const mean = getMeanRgb(stats);
-    const vibrant = await getVibrantColors(buffer);
-    if (!mean && vibrant.length === 0) {
-      return null;
-    }
-    const dominant = getDominantRgb(stats) ?? mean;
-    const adjusted = vibrant.map(adjustForGradient);
-    // Prefer a 4-color radial stack when we have enough vibrant swatches.
-    const [primary, secondary, tertiary, quaternary] = ensureQuadColors(adjusted, contrast);
-    if (primary && secondary && tertiary && quaternary) {
-      const primaryAlpha = toAlpha;
-      const secondaryAlpha = fromAlpha;
-      const tertiaryAlpha = fromAlpha * 0.85;
-      const quaternaryAlpha = fromAlpha * 0.85;
-      return {
-        gradient: buildRadialGradientStack(
-          primary,
-          secondary,
-          tertiary,
-          quaternary,
-          primaryAlpha,
-          secondaryAlpha,
-          tertiaryAlpha,
-          quaternaryAlpha,
-        ),
-        isDark: shouldUseLightTextForBase(baseColor, [
-          [primary, primaryAlpha],
-          [secondary, secondaryAlpha],
-          [tertiary, tertiaryAlpha],
-          [quaternary, quaternaryAlpha],
-        ]),
-      };
-    }
-    const [fallbackPrimary, fallbackSecondary] = adjusted;
-    if (fallbackPrimary && fallbackSecondary) {
-      return {
-        gradient: buildLinearGradient(
-          angle,
-          fallbackSecondary,
-          fromAlpha,
-          fallbackPrimary,
-          toAlpha,
-        ),
-        isDark: shouldUseLightTextForBase(baseColor, [
-          [fallbackSecondary, fromAlpha],
-          [fallbackPrimary, toAlpha],
-        ]),
-      };
-    }
-    if (fallbackPrimary) {
-      const accent = deriveAccent(fallbackPrimary, contrast);
-      return {
-        gradient: buildLinearGradient(angle, accent, fromAlpha, fallbackPrimary, toAlpha),
-        isDark: shouldUseLightTextForBase(baseColor, [
-          [accent, fromAlpha],
-          [fallbackPrimary, toAlpha],
-        ]),
-      };
-    }
-    if (!dominant || !mean) {
-      return null;
-    }
-    // Last resort: blend mean + dominant, then derive an accent.
-    const blended = adjustForGradient(mixRgb(dominant, mean, mix));
-    const accent = deriveAccent(blended, contrast);
+    // Fetch image, convert to buffer + stats
+    const imageResponse = await fetch(url);
+    invariant(imageResponse.ok, `Couldn't fetch image: ${imageResponse.status}`);
+    const buffer = Buffer.from(await imageResponse.arrayBuffer());
+    const stats = await sharp(buffer).stats();
+
+    // Get vibrant colors, adjusting for mid luminence + more saturated colors
+    const vibrantColors = await getVibrantColors(buffer);
+    const fallbackColor = getDominantRgb(stats) ?? getMeanRgb(stats);
+
+    // Get a 4 color radial stack, potentially falling back to the dominant color
+    const colors = ensureQuadColorArray(vibrantColors, fallbackColor);
     return {
-      gradient: buildLinearGradient(angle, accent, fromAlpha, blended, toAlpha),
-      isDark: shouldUseLightTextForBase(baseColor, [
-        [accent, fromAlpha],
-        [blended, toAlpha],
-      ]),
+      backgroundGradient: buildRadialGradient(colors),
+      contrastSetting: contrastSettingForGradient(colors),
     };
-  } catch {
-    return null;
+  } catch (error) {
+    log.warn("Couldn't get image gradient", {
+      error,
+      url,
+    });
+    return {
+      backgroundGradient: null,
+      contrastSetting: null,
+    };
   }
 }

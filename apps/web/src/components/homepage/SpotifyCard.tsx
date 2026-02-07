@@ -125,12 +125,9 @@ export function SpotifyCard({ track }: SpotifyCardProps) {
     return null;
   }
 
-  const noteColor =
-    getContrastColors(track.albumGradientIsDark)?.primaryColor ?? NEUTRAL_PRIMARY_COLOR;
-
   return (
     <SpotifyCardShell gradient={track.albumGradient}>
-      <TrackListing hasLogo noteColor={noteColor} track={track} />
+        <TrackListing track={track} />
     </SpotifyCardShell>
   );
 }

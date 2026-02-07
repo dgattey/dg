@@ -4,15 +4,16 @@ import type { SxProps } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import type { Colors } from './colors';
 
-const PROGRESS_UPDATE_INTERVAL_MS = 500;
-const REFRESH_BUFFER_MS = 250;
+const PROGRESS_UPDATE_INTERVAL_MS = 250;
+const REFRESH_BUFFER_MS = 500;
 
 type PlaybackProgressBarProps = {
   durationMs?: number;
   progressMs?: number;
   isPlaying?: boolean;
-  isDark?: boolean;
+  colors: Colors | null;
 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
@@ -28,7 +29,7 @@ export function PlaybackProgressBar({
   durationMs,
   progressMs,
   isPlaying,
-  isDark,
+  colors,
 }: PlaybackProgressBarProps) {
   const router = useRouter();
   const hasTiming = durationMs !== undefined && durationMs > 0 && progressMs !== undefined;
@@ -38,12 +39,9 @@ export function PlaybackProgressBar({
   const startTimeRef = useRef<number>(0);
   const startProgressRef = useRef<number>(progressMs ?? 0);
   const trackSx: SxProps = (theme) => ({
-    backgroundColor:
-      isDark === undefined
-        ? `color-mix(in srgb, ${theme.vars.palette.text.primary} 20%, transparent)`
-        : isDark
-          ? 'rgba(255, 255, 255, 0.25)'
-          : 'rgba(0, 0, 0, 0.2)',
+    backgroundColor: colors
+      ? colors.primaryContrast
+      : `color-mix(in srgb, ${theme.vars.palette.text.primary} 20%, transparent)`,
     borderRadius: 999,
     height: 6,
     marginTop: theme.spacing(2),
@@ -52,12 +50,7 @@ export function PlaybackProgressBar({
     width: '100%',
   });
   const progressSx: SxProps = (theme) => ({
-    backgroundColor:
-      isDark === undefined
-        ? theme.vars.palette.text.primary
-        : isDark
-          ? 'rgba(255, 255, 255, 0.7)'
-          : 'rgba(0, 0, 0, 0.6)',
+    backgroundColor: colors ? colors.primary : theme.vars.palette.text.primary,
     borderRadius: 'inherit',
     height: '100%',
     transform: `scaleX(${progress})`,

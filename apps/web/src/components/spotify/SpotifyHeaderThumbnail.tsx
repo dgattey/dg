@@ -17,6 +17,7 @@ import { Music } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
+import { getContrastingColors } from './colors';
 import { NOW_PLAYING_CARD_ID } from './SpotifyCardScrollTracker';
 import { useWaveformBounce } from './useWaveformBounce';
 
@@ -235,6 +236,7 @@ export function SpotifyHeaderThumbnail({ track }: SpotifyHeaderThumbnailProps) {
   const albumTitle = track.album.name;
   const albumUrl = track.album.externalUrls.spotify;
   const albumImageUrl = track.albumImage.url;
+  const colors = getContrastingColors(track);
 
   const statusText = isPlaying
     ? 'Now Playing'
@@ -265,6 +267,7 @@ export function SpotifyHeaderThumbnail({ track }: SpotifyHeaderThumbnailProps) {
           <Box data-thumbnail-outer sx={thumbnailOuterSx}>
             <AlbumArtWithNotes
               isPlaying={isPlaying}
+              noteColor={colors?.primary}
               notesVariant="compact"
               shouldAnimate={isInViewport}
               wrapperSx={{ height: THUMBNAIL_SIZE, width: THUMBNAIL_SIZE }}
