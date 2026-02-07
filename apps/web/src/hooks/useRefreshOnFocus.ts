@@ -21,22 +21,22 @@ export function useRefreshOnFocus() {
   const router = useRouter();
   const lastRefreshTimeRef = useRef<number | null>(null);
 
+  // Rate-limited refresh helper
+  const maybeRefresh = () => {
+    const now = Date.now();
+    const lastRefresh = lastRefreshTimeRef.current;
+
+    if (lastRefresh === null || now - lastRefresh >= MIN_REFRESH_INTERVAL_MS) {
+      lastRefreshTimeRef.current = now;
+      router.refresh();
+    }
+  };
+
   useEffect(() => {
-    // Rate-limited refresh helper
-    const maybeRefresh = () => {
-      const now = Date.now();
-      const lastRefresh = lastRefreshTimeRef.current;
-
-      if (lastRefresh === null || now - lastRefresh >= MIN_REFRESH_INTERVAL_MS) {
-        lastRefreshTimeRef.current = now;
-        router.refresh();
-      }
-    };
-
     window.addEventListener('focus', maybeRefresh);
 
     return () => {
       window.removeEventListener('focus', maybeRefresh);
     };
-  }, [router]);
+  });
 }
