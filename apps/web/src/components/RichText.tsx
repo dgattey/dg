@@ -15,7 +15,7 @@ import { Link } from '@dg/ui/dependent/Link';
 import { PROJECT_MAX_IMAGE_DIMENSION } from '@dg/ui/helpers/imageSizes';
 import type { SxObject, SxProps } from '@dg/ui/theme';
 import { Divider, Stack, Typography } from '@mui/material';
-import { ProjectCard } from './homepage/ProjectCard';
+import { ProjectCard } from '../app/home/ProjectCard';
 
 type RichTextProps = RenderableRichTextContent & {
   sx?: SxProps;

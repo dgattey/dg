@@ -1,12 +1,12 @@
 import type { Track } from '@dg/content-models/spotify/Track';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
+import { Link } from '@dg/ui/dependent/Link';
 import { FaIcon } from '@dg/ui/icons/FaIcon';
 import type { SxObject } from '@dg/ui/theme';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { Box, Card, Skeleton, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import { ALBUM_ART_BORDER_RADIUS, ALBUM_ART_DIMENSIONS } from '../spotify/AlbumImage';
-import { getContrastColors, NEUTRAL_PRIMARY_COLOR } from '../spotify/contrastColors';
 import { TrackListing } from '../spotify/TrackListing';
 
 type SpotifyCardShellProps = {
@@ -79,6 +79,11 @@ const loadingTitleSx: SxObject = {
   marginBottom: 1,
 };
 
+const historyLinkSx: SxObject = {
+  fontSize: '0.75rem',
+  opacity: 0.7,
+};
+
 function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
   return (
     <Box sx={shellContainerSx}>
@@ -127,7 +132,12 @@ export function SpotifyCard({ track }: SpotifyCardProps) {
 
   return (
     <SpotifyCardShell gradient={track.albumGradient}>
+      <Stack spacing={1}>
         <TrackListing track={track} />
+        <Link href="/spotify/history" sx={historyLinkSx}>
+          History
+        </Link>
+      </Stack>
     </SpotifyCardShell>
   );
 }

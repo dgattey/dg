@@ -4,7 +4,7 @@ import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { Image } from '@dg/ui/dependent/Image';
 import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
 import type { SxObject } from '@dg/ui/theme';
-import { RichText } from '../RichText';
+import { RichText } from '../../components/RichText';
 
 /**
  * Width of the intro image on small screens
