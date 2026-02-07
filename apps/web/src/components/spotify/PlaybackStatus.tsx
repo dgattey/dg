@@ -38,6 +38,10 @@ export function PlaybackStatus({
   color,
   textShadow,
 }: PlaybackStatusProps) {
+  if (relativePlayedAt && !playedAt) {
+    throw new Error('relativePlayedAt requires playedAt to be set');
+  }
+
   const isNowPlaying = isPlaying ?? !playedAt;
   const relativeLastPlayed = isNowPlaying ? null : relativePlayedAt;
 
@@ -46,22 +50,24 @@ export function PlaybackStatus({
     isPlaying: isNowPlaying,
   });
 
-  if (!isNowPlaying && !relativeLastPlayed) {
-    return null;
+  // Determine status text
+  let statusText: string;
+  if (isNowPlaying) {
+    statusText = 'Now Playing';
+  } else if (relativeLastPlayed) {
+    statusText = `Played ${relativeLastPlayed}`;
+  } else {
+    statusText = 'Just Played';
   }
 
   return (
     <Typography component="div" sx={getStatusSx(color, textShadow)} variant="overline">
+      {statusText}
       {isNowPlaying ? (
-        <>
-          Now Playing{' '}
-          <Box component="span" ref={bounceRef} sx={iconWrapperSx}>
-            <Music size="1.25em" />
-          </Box>
-        </>
-      ) : (
-        `Played ${relativeLastPlayed}`
-      )}
+        <Box component="span" ref={bounceRef} sx={iconWrapperSx}>
+          <Music size="1.25em" />
+        </Box>
+      ) : null}
     </Typography>
   );
 }
