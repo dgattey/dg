@@ -26,3 +26,18 @@ const ensurePopoverMethod = (method: 'showPopover' | 'hidePopover') => {
 
 ensurePopoverMethod('showPopover');
 ensurePopoverMethod('hidePopover');
+
+// Mock matchMedia for components using useMediaQuery or matchMedia directly
+const matchMediaMock = (query: string) => ({
+  addEventListener: () => {},
+  addListener: () => {},
+  dispatchEvent: () => false,
+  matches: false,
+  media: query,
+  onchange: null,
+  removeEventListener: () => {},
+  removeListener: () => {},
+});
+if (typeof window !== 'undefined') {
+  window.matchMedia = matchMediaMock as unknown as typeof window.matchMedia;
+}

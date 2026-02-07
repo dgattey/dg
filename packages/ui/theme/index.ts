@@ -183,13 +183,6 @@ export function getTheme(): Theme {
       MuiCssBaseline: {
         styleOverrides: (theme) => ({
           ...getSystemPreferenceStyles(theme),
-          'html, body': {
-            overflowX: 'clip',
-            width: '100%',
-          },
-          body: {
-            overscrollBehaviorX: 'none',
-          },
           ':root': {
             // Ensure while swapping themes, we have no animations
             ':root[data-animations-enabled="false"] *': {
@@ -209,6 +202,13 @@ export function getTheme(): Theme {
             [theme.breakpoints.up('xl')]: {
               fontSize: 19,
             },
+          },
+          body: {
+            overscrollBehaviorX: 'none',
+          },
+          'html, body': {
+            overflowX: 'clip',
+            width: '100%',
           },
         }),
       },

@@ -25,15 +25,20 @@ const THUMBNAIL_SIZE = 44;
 const THUMBNAIL_HOVER_SIZE = 84;
 const THUMBNAIL_HOVER_SCALE = THUMBNAIL_HOVER_SIZE / THUMBNAIL_SIZE;
 
-/** Exported for header hover area so parent can trigger same scale. */
+/**
+ * Exported for header hover area so parent can trigger same scale.
+ * Only applies on devices with true hover capability (not touchscreen-only).
+ */
 export const HEADER_ALBUM_ART_HOVER = {
-  '[data-album-art]': {
-    boxShadow: 'var(--mui-extraShadows-card-hovered)',
-    transform: `scale(${THUMBNAIL_HOVER_SCALE})`,
-    zIndex: 1,
-  },
-  '[data-thumbnail-outer]': {
-    width: THUMBNAIL_HOVER_SIZE,
+  '@media (hover: hover)': {
+    '[data-album-art]': {
+      boxShadow: 'var(--mui-extraShadows-card-hovered)',
+      transform: `scale(${THUMBNAIL_HOVER_SCALE})`,
+      zIndex: 1,
+    },
+    '[data-thumbnail-outer]': {
+      width: THUMBNAIL_HOVER_SIZE,
+    },
   },
 } as const;
 
@@ -119,17 +124,23 @@ const textStackSx: SxObject = {
   width: '100%',
 };
 
-/** Status line styling - uses flex for icon alignment, so needs flex-compatible truncation */
+/** Status line styling - uses flex for icon alignment */
 const statusSx: SxObject = {
   alignItems: 'center',
   display: 'flex',
   gap: 0.5,
   lineHeight: 1.2,
   minWidth: 0,
+  width: '100%',
+};
+
+/** Status text truncation - text-overflow requires block element, not direct flex child */
+const statusTextSx: SxObject = {
+  flexShrink: 1,
+  minWidth: 0,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
-  width: '100%',
 };
 
 /** Icon wrapper for bounce animation */
@@ -290,7 +301,9 @@ export function SpotifyHeaderThumbnail({ track }: SpotifyHeaderThumbnailProps) {
           <Box sx={textWrapperSx}>
             <Stack sx={textStackSx}>
               <Typography sx={statusSx} variant="overline">
-                {statusText}
+                <Box component="span" sx={statusTextSx}>
+                  {statusText}
+                </Box>
                 {isPlaying ? (
                   <Box component="span" ref={iconBounceRef} sx={iconWrapperSx}>
                     <Music size="1em" />

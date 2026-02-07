@@ -68,7 +68,7 @@ export function Header() {
             </NavItem>
           </NavGroup>
           <NavGroup sx={{ flexShrink: 0 }}>
-            <NavItem>
+            <NavItem sx={{ alignItems: 'center', display: 'flex' }}>
               <ColorSchemeToggleClient initialValue="system" />
             </NavItem>
           </NavGroup>

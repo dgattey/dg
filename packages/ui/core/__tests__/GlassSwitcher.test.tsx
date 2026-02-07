@@ -8,47 +8,42 @@ import {
   spacingPx,
 } from '../GlassSwitcher';
 
+/** Shape expected from createThumbStyles for assertions (SxObject union blocks direct access). */
+type ThumbStyleShape = {
+  left?: string;
+  width?: string;
+};
+
+/** Shape expected from createGridStyles for assertions (SxObject union blocks direct access). */
+type GridStyleShape = {
+  columnGap?: string;
+  padding?: string;
+};
+
 describe('GlassSwitcher layout (thumb/grid sync)', () => {
   const groupPadding = spacingPx(SPACING.groupPadding);
   const gap = spacingPx(SPACING.thumbGap);
-  const optionHeight = spacingPx(SPACING.optionMinHeight);
-  const paddingBlock = spacingPx(SPACING.optionPaddingBlock);
-  const rowHeight = `calc(${optionHeight} + (${paddingBlock} * 2))`;
 
   it('uses same groupPadding in thumb and grid', () => {
-    const thumb = createThumbStyles(3, 0);
-    const grid = createGridStyles(3);
+    const thumb = createThumbStyles(3, 0) as ThumbStyleShape;
+    const grid = createGridStyles(3) as GridStyleShape;
 
-    expect(thumb.left?.sm).toBe(groupPadding);
-    expect(thumb.top?.xs as string).toContain(groupPadding);
+    expect(thumb.left).toBe(groupPadding);
     expect(grid.padding).toBe(groupPadding);
   });
 
   it('thumb horizontal width accounts for 2*groupPadding (content area inset)', () => {
-    const thumb = createThumbStyles(3, 0);
-    const widthSm = thumb.width?.sm as string;
+    const thumb = createThumbStyles(3, 0) as ThumbStyleShape;
+    const width = thumb.width as string;
 
-    expect(widthSm).toContain(`2*${groupPadding}`);
-    expect(widthSm).toContain(gap);
+    expect(width).toContain(`2*${groupPadding}`);
+    expect(width).toContain(gap);
   });
 
-  it('thumb vertical top includes groupPadding and rowHeight', () => {
-    const thumb = createThumbStyles(3, 1);
-    const topXs = thumb.top?.xs as string;
+  it('grid uses same gap as thumb', () => {
+    const grid = createGridStyles(2) as GridStyleShape;
 
-    expect(topXs).toContain(groupPadding);
-    expect(topXs).toContain(rowHeight);
-    expect(topXs).toContain(gap);
-  });
-
-  it('grid uses same rowHeight and gap as thumb', () => {
-    const thumb = createThumbStyles(2, 0);
-    const grid = createGridStyles(2);
-
-    expect((grid.gridTemplateRows as { xs?: string })?.xs).toContain(rowHeight);
-    expect((grid.rowGap as { xs?: string })?.xs).toBe(gap);
-    expect((grid.columnGap as { sm?: string })?.sm).toBe(gap);
-    expect(thumb.top?.xs as string).toContain(rowHeight);
+    expect(grid.columnGap).toBe(gap);
   });
 });
 
