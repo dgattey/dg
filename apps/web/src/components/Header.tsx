@@ -1,12 +1,12 @@
 import { ColorSchemeToggleClient } from '@dg/ui/core/ColorSchemeToggleClient';
-import { GlassContainer } from '@dg/ui/core/GlassContainer';
+import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
 import type { SxObject } from '@dg/ui/theme';
 import { Suspense } from 'react';
 import { getLatestSong } from '../services/spotify';
 import { Logo } from './Logo';
-import { SpotifyHeaderThumbnail } from './spotify/SpotifyHeaderThumbnail';
+import { HEADER_ALBUM_ART_HOVER, SpotifyHeaderThumbnail } from './spotify/SpotifyHeaderThumbnail';
 
 // Makes the header bar sticky and not responsive to user events by default
 const stickyContainerSx: SxObject = {
@@ -20,11 +20,17 @@ const navSx: SxObject = {
   columnGap: { sm: 2, xs: 1 },
 };
 
+/** Hovering the logo/music area scales the album art. */
+const logoNavItemSx: SxObject = {
+  '&:hover': HEADER_ALBUM_ART_HOVER,
+};
+
 /** Glass container with logo + music content */
 const glassContainerSx: SxObject = {
   alignItems: 'center',
   display: 'inline-flex',
   gap: 1,
+  minWidth: 0,
   px: 2,
   py: 0.75,
 };
@@ -52,16 +58,16 @@ export function Header() {
       <header data-site-header={true}>
         <Nav sx={navSx}>
           <NavGroup>
-            <NavItem variant="body2">
-              <GlassContainer sx={glassContainerSx}>
+            <NavItem sx={logoNavItemSx} variant="body2">
+              <MouseAwareGlassContainer sx={glassContainerSx}>
                 <Logo />
                 <Suspense fallback={null}>
                   <SpotifyHeaderThumbnailSlot />
                 </Suspense>
-              </GlassContainer>
+              </MouseAwareGlassContainer>
             </NavItem>
           </NavGroup>
-          <NavGroup>
+          <NavGroup sx={{ flexShrink: 0 }}>
             <NavItem>
               <ColorSchemeToggleClient initialValue="system" />
             </NavItem>

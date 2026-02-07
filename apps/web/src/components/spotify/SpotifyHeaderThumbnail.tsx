@@ -4,7 +4,13 @@ import type { Track } from '@dg/content-models/spotify/Track';
 import { useSpotifyScrollProgress } from '@dg/ui/core/SpotifyHeaderContext';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
-import { createTransition, EASING_BOUNCE, TIMING_NORMAL, TIMING_SLOW } from '@dg/ui/helpers/timing';
+import {
+  createTransition,
+  EASING_BOUNCE,
+  TIMING_MEDIUM,
+  TIMING_NORMAL,
+  TIMING_SLOW,
+} from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Card, Stack, Typography } from '@mui/material';
 import { Music } from 'lucide-react';
@@ -16,10 +22,20 @@ import { useWaveformBounce } from './useWaveformBounce';
 
 /** Album art hover scales from the left (GPU). Text shifts via translateX (GPU). */
 const THUMBNAIL_SIZE = 44;
-const THUMBNAIL_HOVER_SIZE = 90;
+const THUMBNAIL_HOVER_SIZE = 84;
 const THUMBNAIL_HOVER_SCALE = THUMBNAIL_HOVER_SIZE / THUMBNAIL_SIZE;
-/** Entrance animation duration in ms */
-const ENTRANCE_DURATION = 400;
+
+/** Exported for header hover area so parent can trigger same scale. */
+export const HEADER_ALBUM_ART_HOVER = {
+  '[data-album-art]': {
+    boxShadow: 'var(--mui-extraShadows-card-hovered)',
+    transform: `scale(${THUMBNAIL_HOVER_SCALE})`,
+    zIndex: 1,
+  },
+  '[data-thumbnail-outer]': {
+    width: THUMBNAIL_HOVER_SIZE,
+  },
+} as const;
 
 /**
  * Outer container with entrance animation. Scroll progress drives opacity.
@@ -34,19 +50,14 @@ const getContainerSx = (scrollProgress: number, isHome: boolean): SxObject => ({
       transform: 'translateX(0)',
     },
   },
-  '&:hover [data-album-art]': {
-    boxShadow: 'var(--mui-extraShadows-card-hovered)',
-    transform: `scale(${THUMBNAIL_HOVER_SCALE})`,
-    zIndex: 1,
-  },
-  '&:hover [data-thumbnail-outer]': {
-    width: THUMBNAIL_HOVER_SIZE,
-  },
   alignItems: 'center',
-  animation: `headerThumbnailEnter ${ENTRANCE_DURATION}ms ease-out`,
+  animation: `headerThumbnailEnter ${TIMING_MEDIUM}ms ease-out`,
   cursor: isHome ? 'pointer' : undefined,
   display: 'flex',
+  flexShrink: 1,
   gap: 1,
+  maxWidth: 'max(25vw, 16rem)',
+  minWidth: 0,
   opacity: scrollProgress,
   overflow: 'visible',
   pointerEvents: scrollProgress > 0.1 ? 'auto' : 'none',
@@ -59,6 +70,7 @@ const getContainerSx = (scrollProgress: number, isHome: boolean): SxObject => ({
 const thumbnailOuterSx: SxObject = {
   flexShrink: 0,
   height: THUMBNAIL_SIZE,
+  minWidth: 0,
   overflow: 'visible',
   position: 'relative',
   transition: createTransition('width', TIMING_SLOW, EASING_BOUNCE),
@@ -79,35 +91,45 @@ const thumbnailCardSx: SxObject = {
 };
 
 /**
- * Shared single-line truncation for header text. Uses white-space: nowrap
- * instead of -webkit-box so each line contributes its full text width to
- * the parent Stack, letting the Stack size to the widest line.
+ * Shared single-line truncation for header text. Uses classic CSS truncation
+ * (not -webkit-box) which works better with nested elements like Link.
  */
 const headerTruncated: SxObject = {
+  display: 'block',
   lineHeight: 1.2,
+  minWidth: 0,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 };
 
-/**
- * Track info stack. Grows/shrinks with available space (up to maxWidth), minWidth 0 to allow shrinking.
- * Text shifts naturally as thumbnail wrapper width changes on hover.
- */
-const textStackSx: SxObject = {
-  color: 'var(--mui-palette-text-primary)',
-  flex: '1 1 0',
-  maxWidth: '12rem',
+/** Wrapper for text that clips overflow while allowing album art to overflow for hover */
+const textWrapperSx: SxObject = {
+  flexShrink: 1,
+  maxWidth: '100%',
   minWidth: 0,
   overflow: 'hidden',
+  width: 'fit-content',
 };
 
-/** Status line styling */
+/** Track info stack. Text shifts naturally as thumbnail wrapper width changes on hover. */
+const textStackSx: SxObject = {
+  color: 'var(--mui-palette-text-primary)',
+  minWidth: 0,
+  width: '100%',
+};
+
+/** Status line styling - uses flex for icon alignment, so needs flex-compatible truncation */
 const statusSx: SxObject = {
-  ...headerTruncated,
   alignItems: 'center',
   display: 'flex',
   gap: 0.5,
+  lineHeight: 1.2,
+  minWidth: 0,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  width: '100%',
 };
 
 /** Icon wrapper for bounce animation */
@@ -137,6 +159,7 @@ const getWidthWrapperSx = (isVisible: boolean): SxObject => ({
   display: 'grid',
   gridTemplateColumns: isVisible ? '1fr' : '0fr',
   justifyItems: 'start',
+  minWidth: 0,
   ml: isVisible ? 1 : 0,
   overflow: 'visible',
   transition: createTransition(['grid-template-columns', 'margin-left'], TIMING_SLOW),
@@ -144,6 +167,7 @@ const getWidthWrapperSx = (isVisible: boolean): SxObject => ({
 
 /** Allows the grid parent to collapse content to zero in both axes. overflow: visible when expanded so notes can extend. */
 const getCollapsibleInnerSx = (isVisible: boolean): SxObject => ({
+  maxWidth: '100%',
   minHeight: 0,
   minWidth: 0,
   overflow: isVisible ? 'visible' : 'hidden',
@@ -165,8 +189,9 @@ function scrollToNowPlayingCard() {
 export function SpotifyHeaderThumbnail({ track }: SpotifyHeaderThumbnailProps) {
   const pathname = usePathname();
   const scrollContext = useSpotifyScrollProgress();
-  const scrollProgress = scrollContext?.scrollProgress ?? 1;
   const isHome = pathname === '/';
+  // null = not measured yet; on home page stay hidden until measured, elsewhere show immediately
+  const scrollProgress = scrollContext?.scrollProgress ?? (isHome ? 0 : 1);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isInViewport, setIsInViewport] = useState(true);
 
@@ -262,30 +287,30 @@ export function SpotifyHeaderThumbnail({ track }: SpotifyHeaderThumbnailProps) {
               )}
             </AlbumArtWithNotes>
           </Box>
-          <Stack sx={textStackSx}>
-            <Typography component="span" sx={statusSx} variant="overline">
-              {statusText}{' '}
-              {isPlaying ? (
-                <Box component="span" ref={iconBounceRef} sx={iconWrapperSx}>
-                  <Music size="1em" />
-                </Box>
-              ) : null}
-            </Typography>
-            <Typography component="span" sx={titleSx} variant="caption">
-              {isHome ? (
-                <Box component="span" sx={{ cursor: 'inherit' }}>
-                  {track.name}
-                </Box>
-              ) : (
-                <Link href={trackUrl} isExternal={true} title={track.name} variant="caption">
-                  {track.name}
-                </Link>
-              )}
-            </Typography>
-            <Typography component="span" sx={artistSx} variant="caption">
-              {track.artists.map((a) => a.name).join(', ')}
-            </Typography>
-          </Stack>
+          <Box sx={textWrapperSx}>
+            <Stack sx={textStackSx}>
+              <Typography sx={statusSx} variant="overline">
+                {statusText}
+                {isPlaying ? (
+                  <Box component="span" ref={iconBounceRef} sx={iconWrapperSx}>
+                    <Music size="1em" />
+                  </Box>
+                ) : null}
+              </Typography>
+              <Typography sx={titleSx} variant="caption">
+                {isHome ? (
+                  track.name
+                ) : (
+                  <Link href={trackUrl} isExternal={true} title={track.name} variant="caption">
+                    {track.name}
+                  </Link>
+                )}
+              </Typography>
+              <Typography sx={artistSx} variant="caption">
+                {track.artists.map((a) => a.name).join(', ')}
+              </Typography>
+            </Stack>
+          </Box>
         </Box>
       </Box>
     </Box>

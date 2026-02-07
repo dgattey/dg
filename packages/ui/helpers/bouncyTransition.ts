@@ -1,9 +1,4 @@
-import {
-  createTransition,
-  EASING_BOUNCY,
-  EASING_DEFAULT,
-  TIMING_BOUNCY,
-} from './timing';
+import { createTransition, EASING_BOUNCY, EASING_DEFAULT, TIMING_BOUNCY } from './timing';
 
 export function createBouncyTransition(
   properties: string | Array<string>,

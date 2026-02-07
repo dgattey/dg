@@ -10,8 +10,8 @@ import { useEffect, useRef } from 'react';
  * scrolled to). Uses a smooth transition zone at the edges.
  *
  * Semantics: 0 = card visible (hide thumbnail), 1 = card offscreen (show thumbnail).
- * On unmount (e.g. navigating away from homepage), resets to 1 so the
- * thumbnail stays visible on other pages.
+ * On unmount (e.g. navigating away from homepage), resets to null so the
+ * thumbnail shows on other pages (consumers treat null as "show").
  */
 export function useSpotifyCardVisibility() {
   const context = useSpotifyScrollProgress();
@@ -75,8 +75,8 @@ export function useSpotifyCardVisibility() {
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
       }
-      // Reset to 1 (show thumbnail) when the card unmounts
-      context.setScrollProgress(1);
+      // Reset to null when the card unmounts so thumbnail shows on other pages
+      context.setScrollProgress(null);
     };
   }, [context]);
 

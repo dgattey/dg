@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
 import { createTransition, TIMING_MEDIUM } from '../helpers/timing';
 import type { SxElement, SxObject } from '../theme';
-import { GlassContainer } from './GlassContainer';
+import { MouseAwareGlassContainer } from './MouseAwareGlassContainer';
 import { Tooltip } from './Tooltip';
 
 /** Spacing constants (in theme spacing units) */
@@ -39,10 +39,7 @@ export const spacingPx = (value: number) => `${value * BASE_SPACING_PX}px`;
  * Must stay in sync with createGridStyles - thumb width/position must account
  * for grid padding (groupPadding) and gaps.
  */
-export function createThumbStyles(
-  optionCount: number,
-  selectedIndex: number,
-): SxObject {
+export function createThumbStyles(optionCount: number, selectedIndex: number): SxObject {
   const gap = spacingPx(SPACING.thumbGap);
   const groupPadding = spacingPx(SPACING.groupPadding);
   const optionHeight = spacingPx(SPACING.optionMinHeight);
@@ -227,7 +224,7 @@ export function GlassSwitcher({
   };
 
   return (
-    <GlassContainer data-role="glass-switcher" sx={mergedSx}>
+    <MouseAwareGlassContainer data-role="glass-switcher" sx={mergedSx}>
       <RadioGroup
         aria-label={ariaLabel}
         name="glass-switcher"
@@ -244,6 +241,6 @@ export function GlassSwitcher({
           />
         ))}
       </RadioGroup>
-    </GlassContainer>
+    </MouseAwareGlassContainer>
   );
 }

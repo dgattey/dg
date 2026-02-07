@@ -8,14 +8,17 @@ import { createContext, useContext, useState } from 'react';
  * scroll tracker and the header thumbnail. Track data is server-rendered
  * in both places — only the scroll position needs to be shared.
  *
- * Defaults to 1 (show thumbnail). The homepage scroll tracker sets it to
- * 0 when the card is visible onscreen. On non-homepage pages the tracker
- * never mounts, so the thumbnail stays visible.
+ * - `null` = scroll tracker hasn't measured yet (home page starts hidden)
+ * - `0` = main card visible onscreen (hide thumbnail)
+ * - `1` = main card offscreen (show thumbnail)
+ *
+ * On non-homepage pages the tracker never mounts, so scrollProgress stays
+ * null and consumers default to showing the thumbnail.
  */
 type SpotifyScrollContextValue = {
-  /** 0 = main card visible onscreen, 1 = main card offscreen (show thumbnail) */
-  scrollProgress: number;
-  setScrollProgress: (progress: number) => void;
+  /** null = not measured, 0 = card visible, 1 = card offscreen */
+  scrollProgress: number | null;
+  setScrollProgress: (progress: number | null) => void;
 };
 
 const SpotifyScrollContext = createContext<SpotifyScrollContextValue | null>(null);
@@ -25,7 +28,7 @@ const SpotifyScrollContext = createContext<SpotifyScrollContextValue | null>(nul
  * (which reads scroll progress) and the content area (which writes it).
  */
 export function SpotifyScrollProvider({ children }: { children: ReactNode }) {
-  const [scrollProgress, setScrollProgress] = useState(1);
+  const [scrollProgress, setScrollProgress] = useState<number | null>(null);
   return (
     <SpotifyScrollContext.Provider value={{ scrollProgress, setScrollProgress }}>
       {children}
