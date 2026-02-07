@@ -5,16 +5,13 @@ import type { SxObject } from '@dg/ui/theme';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { Box, Card, Skeleton, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
-import { MusicNotes } from '../spotify/MusicNotes';
+import { ALBUM_ART_BORDER_RADIUS, ALBUM_ART_DIMENSIONS } from '../spotify/AlbumImage';
+import { getContrastColors, NEUTRAL_PRIMARY_COLOR } from '../spotify/contrastColors';
 import { TrackListing } from '../spotify/TrackListing';
-
-const IMAGE_SIZE = 150;
 
 type SpotifyCardShellProps = {
   children: ReactNode;
   gradient?: string;
-  isPlaying?: boolean;
-  noteColor?: string;
 };
 
 const shellContainerSx: SxObject = {
@@ -48,24 +45,6 @@ const getCardSx = (gradient?: string): SxObject => ({
   ...cardSx,
 });
 
-// Notes layer positioned at album art center
-const getNotesLayerSx = (isPlaying: boolean): SxObject => ({
-  display: isPlaying ? 'block' : 'none',
-  pointerEvents: 'none',
-  position: 'absolute',
-  right: {
-    md: `calc(20px + ${IMAGE_SIZE / 2}px)`,
-    sm: `calc(20px + ${IMAGE_SIZE / 3}px)`,
-    xs: `calc(20px + ${IMAGE_SIZE / 4}px)`,
-  },
-  top: {
-    md: `calc(20px + ${IMAGE_SIZE / 2}px)`,
-    sm: `calc(20px + ${IMAGE_SIZE / 3}px)`,
-    xs: `calc(20px + ${IMAGE_SIZE / 4}px)`,
-  },
-  zIndex: 1,
-});
-
 const loadingLayoutSx: SxObject = {
   flex: 1,
   gap: 1,
@@ -84,14 +63,10 @@ const loadingLogoSx: SxObject = {
 };
 
 const loadingCardSx: SxObject = {
-  '--image-dim': {
-    md: `${IMAGE_SIZE}px`,
-    sm: `${(2 * IMAGE_SIZE) / 3}px`,
-    xs: `${IMAGE_SIZE / 2}px`,
-  },
+  ...ALBUM_ART_DIMENSIONS,
+  ...ALBUM_ART_BORDER_RADIUS,
   alignSelf: 'flex-end',
   aspectRatio: '1 / 1',
-  borderRadius: { md: 6, sm: 4, xs: 2 },
   minWidth: 'var(--image-dim)',
   overflow: 'hidden',
 };
@@ -104,30 +79,11 @@ const loadingTitleSx: SxObject = {
   marginBottom: 1,
 };
 
-/**
- * Gets note color matching the "Now Playing" text color
- */
-function getNoteColor(isDark?: boolean): string {
-  if (isDark === true) {
-    return 'rgba(255, 255, 255, 0.7)';
-  }
-  if (isDark === false) {
-    return 'rgba(0, 0, 0, 0.7)';
-  }
-  return 'rgba(128, 128, 128, 0.7)';
-}
-
-function SpotifyCardShell({ children, gradient, isPlaying, noteColor }: SpotifyCardShellProps) {
-  const playing = Boolean(isPlaying);
+function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
   return (
     <Box sx={shellContainerSx}>
       {gradient ? <Box aria-hidden="true" sx={getGradientGlowSx(gradient)} /> : null}
-      <ContentCard sx={getCardSx(gradient)}>
-        <Box sx={getNotesLayerSx(playing)}>
-          <MusicNotes isPlaying={playing} noteColor={noteColor} />
-        </Box>
-        {children}
-      </ContentCard>
+      <ContentCard sx={getCardSx(gradient)}>{children}</ContentCard>
     </Box>
   );
 }
@@ -169,13 +125,12 @@ export function SpotifyCard({ track }: SpotifyCardProps) {
     return null;
   }
 
+  const noteColor =
+    getContrastColors(track.albumGradientIsDark)?.primaryColor ?? NEUTRAL_PRIMARY_COLOR;
+
   return (
-    <SpotifyCardShell
-      gradient={track.albumGradient}
-      isPlaying={track.isPlaying}
-      noteColor={getNoteColor(track.albumGradientIsDark)}
-    >
-      <TrackListing hasLogo track={track} />
+    <SpotifyCardShell gradient={track.albumGradient}>
+      <TrackListing hasLogo noteColor={noteColor} track={track} />
     </SpotifyCardShell>
   );
 }

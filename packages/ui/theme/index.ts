@@ -203,6 +203,13 @@ export function getTheme(): Theme {
               fontSize: 19,
             },
           },
+          body: {
+            overscrollBehaviorX: 'none',
+          },
+          'html, body': {
+            overflowX: 'clip',
+            width: '100%',
+          },
         }),
       },
       MuiLink: {

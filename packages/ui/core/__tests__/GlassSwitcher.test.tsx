@@ -1,6 +1,51 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { GlassSwitcher } from '../GlassSwitcher';
+import {
+  createGridStyles,
+  createThumbStyles,
+  GlassSwitcher,
+  SPACING,
+  spacingPx,
+} from '../GlassSwitcher';
+
+/** Shape expected from createThumbStyles for assertions (SxObject union blocks direct access). */
+type ThumbStyleShape = {
+  left?: string;
+  width?: string;
+};
+
+/** Shape expected from createGridStyles for assertions (SxObject union blocks direct access). */
+type GridStyleShape = {
+  columnGap?: string;
+  padding?: string;
+};
+
+describe('GlassSwitcher layout (thumb/grid sync)', () => {
+  const groupPadding = spacingPx(SPACING.groupPadding);
+  const gap = spacingPx(SPACING.thumbGap);
+
+  it('uses same groupPadding in thumb and grid', () => {
+    const thumb = createThumbStyles(3, 0) as ThumbStyleShape;
+    const grid = createGridStyles(3) as GridStyleShape;
+
+    expect(thumb.left).toBe(groupPadding);
+    expect(grid.padding).toBe(groupPadding);
+  });
+
+  it('thumb horizontal width accounts for 2*groupPadding (content area inset)', () => {
+    const thumb = createThumbStyles(3, 0) as ThumbStyleShape;
+    const width = thumb.width as string;
+
+    expect(width).toContain(`2*${groupPadding}`);
+    expect(width).toContain(gap);
+  });
+
+  it('grid uses same gap as thumb', () => {
+    const grid = createGridStyles(2) as GridStyleShape;
+
+    expect(grid.columnGap).toBe(gap);
+  });
+});
 
 describe('GlassSwitcher', () => {
   it('renders options and emits changes', async () => {

@@ -11,6 +11,7 @@ const navGroupBaseSx: SxObject = {
   justifyContent: { sm: 'flex-start', xs: 'space-between' },
   listStyle: 'none',
   margin: 0,
+  minWidth: 0,
   padding: 0,
 } as const;
 
@@ -19,6 +20,7 @@ const navItemBaseSx: SxObject = {
   ':last-of-type': { paddingRight: 0 },
   display: 'inline-block',
   margin: 0,
+  minWidth: 0,
   paddingBlock: 2,
   paddingInline: { md: 1, sm: 0.5, xs: 0.25 },
 } as const;

@@ -7,11 +7,11 @@ import { Music } from 'lucide-react';
 import { useWaveformBounce } from './useWaveformBounce';
 
 type PlaybackStatusProps = {
+  isPlaying?: Track['isPlaying'];
   playedAt?: Track['playedAt'];
   relativePlayedAt?: Track['relativePlayedAt'];
   color?: string;
   textShadow?: string;
-  isPlaying?: boolean;
 };
 
 const getStatusSx = (color?: string, textShadow?: string): SxObject => ({
@@ -32,39 +32,42 @@ const iconWrapperSx: SxObject = {
  * when it last was. The music icon bounces when playing.
  */
 export function PlaybackStatus({
+  isPlaying,
   playedAt,
   relativePlayedAt,
   color,
   textShadow,
-  isPlaying: isPlayingProp,
 }: PlaybackStatusProps) {
-  const isNowPlaying = !playedAt;
-  const relativeLastPlayed = isNowPlaying ? null : relativePlayedAt;
+  if (relativePlayedAt && !playedAt) {
+    throw new Error('relativePlayedAt requires playedAt to be set');
+  }
 
-  // Use prop if provided, otherwise derive from playedAt
-  const isPlaying = isPlayingProp ?? isNowPlaying;
+  const isNowPlaying = isPlaying ?? !playedAt;
+  const relativeLastPlayed = isNowPlaying ? null : relativePlayedAt;
 
   const bounceRef = useWaveformBounce<HTMLSpanElement>({
     intensity: 0.8, // Slightly smaller bounce for the icon
-    isPlaying,
+    isPlaying: isNowPlaying,
   });
 
-  if (!isNowPlaying && !relativeLastPlayed) {
-    return null;
+  // Determine status text
+  let statusText: string;
+  if (isNowPlaying) {
+    statusText = 'Now Playing';
+  } else if (relativeLastPlayed) {
+    statusText = `Played ${relativeLastPlayed}`;
+  } else {
+    statusText = 'Just Played';
   }
 
   return (
     <Typography component="div" sx={getStatusSx(color, textShadow)} variant="overline">
+      {statusText}
       {isNowPlaying ? (
-        <>
-          Now Playing{' '}
-          <Box component="span" ref={bounceRef} sx={iconWrapperSx}>
-            <Music size="1.25em" />
-          </Box>
-        </>
-      ) : (
-        `Played ${relativeLastPlayed}`
-      )}
+        <Box component="span" ref={bounceRef} sx={iconWrapperSx}>
+          <Music size="1.25em" />
+        </Box>
+      ) : null}
     </Typography>
   );
 }

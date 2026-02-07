@@ -21,22 +21,22 @@ export function useRefreshOnFocus() {
   const router = useRouter();
   const lastRefreshTimeRef = useRef<number | null>(null);
 
+  // Rate-limited refresh helper
+  const maybeRefresh = () => {
+    const now = Date.now();
+    const lastRefresh = lastRefreshTimeRef.current;
+
+    if (lastRefresh === null || now - lastRefresh >= MIN_REFRESH_INTERVAL_MS) {
+      lastRefreshTimeRef.current = now;
+      router.refresh();
+    }
+  };
+
   useEffect(() => {
-    const handleFocus = () => {
-      const now = Date.now();
-      const lastRefresh = lastRefreshTimeRef.current;
-
-      // Only refresh if it's been more than 5 seconds since the last refresh
-      if (lastRefresh === null || now - lastRefresh >= MIN_REFRESH_INTERVAL_MS) {
-        lastRefreshTimeRef.current = now;
-        router.refresh();
-      }
-    };
-
-    window.addEventListener('focus', handleFocus);
+    window.addEventListener('focus', maybeRefresh);
 
     return () => {
-      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('focus', maybeRefresh);
     };
-  }, [router]);
+  });
 }

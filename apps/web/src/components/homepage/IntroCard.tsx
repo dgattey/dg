@@ -50,6 +50,7 @@ export function IntroCard({ introBlock, linkedInLink }: IntroCardProps) {
       <ContentCard link={linkedInLink} overlay="About" overlaySx={overlaySx} sx={introImageCardSx}>
         <Image
           alt={introBlock.image.title ?? 'Introduction image'}
+          cover={true}
           height={height}
           priority={true}
           sizes={sizes}

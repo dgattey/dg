@@ -1,6 +1,6 @@
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
 import { Card, Typography } from '@mui/material';
-import { GlassContainer } from '../core/GlassContainer';
+import { MouseAwareGlassContainer } from '../core/MouseAwareGlassContainer';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
 import { truncated } from '../helpers/truncated';
 import type { SxObject } from '../theme';
@@ -20,6 +20,11 @@ const cardBaseSx: SxObject = {
   '& > div': {
     transform: 'none !important',
   },
+  // Images within cards should cover edge-to-edge, centered when cropped
+  '& img': {
+    objectFit: 'cover',
+    objectPosition: 'center',
+  },
   overflow: 'hidden',
   position: 'relative',
   transform: 'scale(1)',
@@ -30,6 +35,8 @@ const cardBaseSx: SxObject = {
 };
 
 const overlayBaseSx: SxObject = {
+  '--gx-translate-x': '0px',
+  '--gx-translate-y': '0px',
   background: 'color-mix(in srgb, var(--mui-palette-background-default) 60%, transparent)',
   bottom: OVERLAY_INSET,
   left: OVERLAY_INSET,
@@ -39,7 +46,7 @@ const overlayBaseSx: SxObject = {
   paddingRight: OVERLAY_PADDING_INLINE,
   paddingTop: OVERLAY_PADDING_BLOCK,
   position: 'absolute',
-  transform: 'translateY(0) translateX(0)',
+  transform: 'translateY(var(--gx-translate-y, 0px)) translateX(var(--gx-translate-x, 0px))',
   zIndex: 1,
   ...createBouncyTransition('transform'),
 };
@@ -105,7 +112,8 @@ function getCardSx({
     ...(isClickable && {
       '&:hover [data-role="content-card-overlay"], &:focus-within [data-role="content-card-overlay"]':
         {
-          transform: `translateY(${OVERLAY_SHIFT}) translateX(${OVERLAY_SHIFT_NEGATIVE})`,
+          '--gx-translate-x': OVERLAY_SHIFT_NEGATIVE,
+          '--gx-translate-y': OVERLAY_SHIFT,
         },
       '&:hover, &:focus-within': {
         borderColor: 'var(--mui-palette-card-border)',
@@ -135,7 +143,7 @@ function getCardSx({
  */
 function LinkWrappedChildren({ children, link, overlayContents }: LinkWrappedChildrenProps) {
   const safelyWrappedChildren = overlayContents ? (
-    <div>
+    <div style={{ height: '100%', width: '100%' }}>
       {overlayContents}
       {children}
     </div>
@@ -158,11 +166,11 @@ function LinkWrappedChildren({ children, link, overlayContents }: LinkWrappedChi
  */
 function OverlayContent({ overlay, sx }: { overlay: NonNullable<React.ReactNode>; sx?: SxObject }) {
   return (
-    <GlassContainer data-role="content-card-overlay" sx={getOverlaySx(sx)}>
+    <MouseAwareGlassContainer data-role="content-card-overlay" sx={getOverlaySx(sx)}>
       <Typography sx={overlayTitleSx} variant="h5">
         {overlay}
       </Typography>
-    </GlassContainer>
+    </MouseAwareGlassContainer>
   );
 }
 

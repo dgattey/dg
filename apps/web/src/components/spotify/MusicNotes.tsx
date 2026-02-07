@@ -14,6 +14,10 @@ type MusicNotesProps = {
    * Color for the music notes (defaults to current text color)
    */
   noteColor?: string;
+  /**
+   * Compact variant for small contexts (e.g. header thumbnail)
+   */
+  variant?: 'default' | 'compact';
 };
 
 type MusicNote = {
@@ -30,6 +34,17 @@ const MUSIC_ICONS = [Music, Music2, Music3, Music4];
 const NOTE_SPAWN_INTERVAL_MS = 280;
 const NOTE_LIFETIME_MS = 3000;
 const MAX_NOTES = 18;
+
+const COMPACT = {
+  distanceMin: 26,
+  distanceRange: 24,
+  durationMs: 2000,
+  durationRandomMs: 400,
+  iconSize: 15,
+  maxNotes: 10,
+  scaleMin: 0.65,
+  scaleRange: 0.25,
+};
 
 // GPU-accelerated float animation for notes
 const floatAndFade = keyframes`
@@ -85,9 +100,10 @@ const getNoteSx = (note: MusicNote, noteColor?: string): SxObject => ({
  * Music notes that emanate from a center point.
  * Place this component where you want the notes to originate from.
  */
-export function MusicNotes({ isPlaying, noteColor }: MusicNotesProps) {
+export function MusicNotes({ isPlaying, noteColor, variant = 'default' }: MusicNotesProps) {
   const [notes, setNotes] = useState<Array<MusicNote>>([]);
   const noteIdRef = useRef(0);
+  const isCompact = variant === 'compact';
 
   useEffect(() => {
     if (!isPlaying) {
@@ -99,17 +115,28 @@ export function MusicNotes({ isPlaying, noteColor }: MusicNotesProps) {
       const id = noteIdRef.current++;
       const angle = Math.random() * 360;
 
-      const newNote: MusicNote = {
-        angle,
-        delay: Math.random() * 80,
-        distance: 120 + Math.random() * 80,
-        duration: NOTE_LIFETIME_MS + Math.random() * 600,
-        icon: Math.floor(Math.random() * MUSIC_ICONS.length),
-        id,
-        scale: 0.85 + Math.random() * 0.35,
-      };
+      const newNote: MusicNote = isCompact
+        ? {
+            angle,
+            delay: Math.random() * 60,
+            distance: COMPACT.distanceMin + Math.random() * COMPACT.distanceRange,
+            duration: COMPACT.durationMs + Math.random() * COMPACT.durationRandomMs,
+            icon: Math.floor(Math.random() * MUSIC_ICONS.length),
+            id,
+            scale: COMPACT.scaleMin + Math.random() * COMPACT.scaleRange,
+          }
+        : {
+            angle,
+            delay: Math.random() * 80,
+            distance: 120 + Math.random() * 80,
+            duration: NOTE_LIFETIME_MS + Math.random() * 600,
+            icon: Math.floor(Math.random() * MUSIC_ICONS.length),
+            id,
+            scale: 0.85 + Math.random() * 0.35,
+          };
 
-      setNotes((prev) => [...prev, newNote].slice(-MAX_NOTES));
+      const maxNotes = isCompact ? COMPACT.maxNotes : MAX_NOTES;
+      setNotes((prev) => [...prev, newNote].slice(-maxNotes));
 
       setTimeout(() => {
         setNotes((prev) => prev.filter((n) => n.id !== id));
@@ -123,8 +150,9 @@ export function MusicNotes({ isPlaying, noteColor }: MusicNotesProps) {
 
     const intervalId = setInterval(spawnNote, NOTE_SPAWN_INTERVAL_MS);
     return () => clearInterval(intervalId);
-  }, [isPlaying]);
+  }, [isPlaying, isCompact]);
 
+  const iconSize = isCompact ? COMPACT.iconSize : 15;
   const renderedNotes = useMemo(
     () =>
       notes.map((note) => {
@@ -134,11 +162,11 @@ export function MusicNotes({ isPlaying, noteColor }: MusicNotesProps) {
         }
         return (
           <Box key={note.id} sx={getNoteSx(note, noteColor)}>
-            <IconComponent size={15} />
+            <IconComponent size={iconSize} />
           </Box>
         );
       }),
-    [notes, noteColor],
+    [notes, noteColor, iconSize],
   );
 
   if (!isPlaying) {

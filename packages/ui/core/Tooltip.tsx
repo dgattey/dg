@@ -3,6 +3,7 @@
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import React, { useId, useRef } from 'react';
+import { EASING_EASE_OUT, TIMING_FAST } from '../helpers/timing';
 import type { SxObject } from '../theme';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -76,7 +77,7 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
     // Small delay to prevent flickering when moving between trigger and tooltip
     hideTimeoutRef.current = setTimeout(() => {
       popoverRef.current?.hidePopover();
-    }, 100);
+    }, TIMING_FAST);
   };
 
   // Don't render wrapper if no title
@@ -93,6 +94,10 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
   };
   const popoverSx: TooltipPopoverSx = {
     ...(anchorName ? { positionAnchor: anchorName } : {}),
+    '@keyframes tooltip-in': {
+      from: { opacity: 0 },
+      to: { opacity: 1 },
+    },
     '@supports not (position-area: block-end)': {
       left: '50%',
       marginBlockEnd: placement === 'top' ? '6px' : 0,
@@ -110,6 +115,7 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
           }),
     },
     '&:popover-open': {
+      animation: `tooltip-in ${TIMING_FAST}ms ${EASING_EASE_OUT}`,
       opacity: 1,
     },
     background: 'var(--mui-palette-background-paper)',
@@ -124,8 +130,7 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
     position: 'fixed',
     positionArea: placement === 'top' ? 'block-start' : 'block-end',
     positionTryFallbacks: 'flip-block',
-    transition:
-      'opacity 150ms ease-in-out, overlay 150ms ease-in-out allow-discrete, display 150ms ease-in-out allow-discrete',
+    transition: `opacity ${TIMING_FAST}ms ${EASING_EASE_OUT}, overlay ${TIMING_FAST}ms ${EASING_EASE_OUT} allow-discrete, display ${TIMING_FAST}ms ${EASING_EASE_OUT} allow-discrete`,
     translate: '0',
     whiteSpace: 'nowrap',
     zIndex: 1500,
