@@ -1,7 +1,7 @@
 'use client';
 
-import { useSpotifyScrollProgress } from '@dg/ui/core/SpotifyHeaderContext';
 import { useEffect, useRef } from 'react';
+import { useSpotifyScrollProgress } from '../app/spotify/SpotifyHeaderContext';
 
 /**
  * Tracks whether the Spotify card is visible onscreen and reports

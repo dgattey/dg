@@ -1,6 +1,6 @@
 'use client';
 
-import { ErrorLayout } from '../components/layouts/ErrorLayout';
+import { ErrorLayout } from './layouts/ErrorLayout';
 
 /**
  * Keep error pages simple and avoid dynamic data fetching to prevent hydration issues.

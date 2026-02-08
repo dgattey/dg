@@ -10,12 +10,11 @@ import {
   type RenderableRichTextContent,
 } from '@dg/content-models/contentful/renderables/richText';
 import { isRecord } from '@dg/shared-core/types/typeguards';
-import { Image } from '@dg/ui/dependent/Image';
-import { Link } from '@dg/ui/dependent/Link';
-import { PROJECT_MAX_IMAGE_DIMENSION } from '@dg/ui/helpers/imageSizes';
-import type { SxObject, SxProps } from '@dg/ui/theme';
 import { Divider, Stack, Typography } from '@mui/material';
-import { ProjectCard } from '../app/home/ProjectCard';
+import { PROJECT_MAX_IMAGE_DIMENSION } from '../helpers/imageSizes';
+import type { SxObject, SxProps } from '../theme';
+import { Image } from './Image';
+import { Link } from './Link';
 
 type RichTextProps = RenderableRichTextContent & {
   sx?: SxProps;
@@ -84,7 +83,7 @@ function EntryElement({
     return null;
   }
   if (isRenderableProjectEntry(entry)) {
-    return <ProjectCard {...entry} />;
+    return null;
   }
   return <Link href={entry.url} icon={entry.icon ?? undefined} title={entry.title} />;
 }

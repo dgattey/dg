@@ -6,8 +6,8 @@ import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Container, Divider, Stack } from '@mui/material';
 import { cacheLife } from 'next/cache';
-import { getFooterLinks } from '../services/contentful';
-import { getAppVersionInfo } from '../services/version';
+import { getFooterLinks } from '../../services/contentful';
+import { getAppVersionInfo } from '../../services/version';
 
 const navItemNoPaddingSx: SxObject = {
   padding: 0,

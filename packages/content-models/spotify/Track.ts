@@ -64,7 +64,7 @@ export const trackApiSchema = v.looseObject({
   /**
    * Derived contrast hint for album gradient background.
    */
-  albumGradientContrastSetting: v.optional(v.string()),
+  albumGradientContrastSetting: v.optional(v.picklist(['light', 'dark'])),
   /**
    * All artists on the track
    */
@@ -171,17 +171,11 @@ export const mapTrackFromApi = (track: TrackApi): Track | null => {
   if (!albumImage) {
     return null;
   }
-  const contrastSetting =
-    track.albumGradientContrastSetting === 'light'
-      ? 'light'
-      : track.albumGradientContrastSetting === 'dark'
-        ? 'dark'
-        : undefined;
   return {
     ...mapArtistFromApi(track),
     album: mapAlbumFromApi(track.album),
     albumGradient: track.albumGradient,
-    albumGradientContrastSetting: contrastSetting,
+    albumGradientContrastSetting: track.albumGradientContrastSetting,
     albumImage,
     artists: track.artists.map(mapArtistFromApi),
     durationMs: track.duration_ms,

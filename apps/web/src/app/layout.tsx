@@ -1,7 +1,6 @@
 import '@dg/ui/theme/classNameSetupOnImport';
 
 import { Section } from '@dg/ui/core/Section';
-import { SpotifyScrollProvider } from '@dg/ui/core/SpotifyHeaderContext';
 import type { SxObject } from '@dg/ui/theme';
 import { themePreferenceAttribute, themeSelectorAttribute } from '@dg/ui/theme';
 import { GlobalStyleProvider } from '@dg/ui/theme/GlobalStyleProvider';
@@ -12,10 +11,11 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import { type ReactNode, Suspense } from 'react';
-import { Footer } from '../components/Footer';
-import { Header } from '../components/Header';
-import { RefreshOnFocusProvider } from '../components/layouts/RefreshOnFocusProvider';
+import { Footer } from './layouts/Footer';
+import { Header } from './layouts/Header';
+import { RefreshOnFocusProvider } from './layouts/RefreshOnFocusProvider';
 import { baseMetadata, viewport } from './metadata';
+import { SpotifyScrollProvider } from './spotify/SpotifyHeaderContext';
 
 export const metadata: Metadata = baseMetadata;
 export { viewport };

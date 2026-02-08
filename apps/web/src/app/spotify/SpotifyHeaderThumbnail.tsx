@@ -1,7 +1,6 @@
 'use client';
 
 import type { Track } from '@dg/content-models/spotify/Track';
-import { useSpotifyScrollProgress } from '@dg/ui/core/SpotifyHeaderContext';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import {
@@ -19,6 +18,7 @@ import { useEffect, useRef, useState } from 'react';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
 import { getContrastingColors } from './colors';
 import { NOW_PLAYING_CARD_ID } from './SpotifyCardScrollTracker';
+import { useSpotifyScrollProgress } from './SpotifyHeaderContext';
 import { useWaveformBounce } from './useWaveformBounce';
 
 /** Album art hover scales from the left (GPU). Text shifts via translateX (GPU). */

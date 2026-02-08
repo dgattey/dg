@@ -4,9 +4,9 @@ import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
 import type { SxObject } from '@dg/ui/theme';
 import { Suspense } from 'react';
-import { getLatestSong } from '../services/spotify';
+import { getLatestSong } from '../../services/spotify';
+import { HEADER_ALBUM_ART_HOVER, SpotifyHeaderThumbnail } from '../spotify/SpotifyHeaderThumbnail';
 import { Logo } from './Logo';
-import { HEADER_ALBUM_ART_HOVER, SpotifyHeaderThumbnail } from './spotify/SpotifyHeaderThumbnail';
 
 // Makes the header bar sticky and not responsive to user events by default
 const stickyContainerSx: SxObject = {
