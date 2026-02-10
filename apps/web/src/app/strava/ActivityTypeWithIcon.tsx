@@ -1,13 +1,36 @@
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import type { SxObject } from '@dg/ui/theme';
 import { Typography } from '@mui/material';
-import { Bike, Dumbbell } from 'lucide-react';
+import type { LucideIcon } from 'lucide-react';
+import { Activity, Bike, Dumbbell, Footprints, Mountain, MountainSnow } from 'lucide-react';
 
 const activityTypeSx: SxObject = {
   alignItems: 'center',
   display: 'flex',
   gap: 1,
 };
+
+const TYPE_TO_ICON: Record<string, LucideIcon> = {
+  Ride: Bike,
+  EBikeRide: Bike,
+  VirtualRide: Bike,
+  Hike: Mountain,
+  AlpineSki: MountainSnow,
+  BackcountrySki: MountainSnow,
+  NordicSki: MountainSnow,
+  Snowboard: MountainSnow,
+  Run: Footprints,
+  VirtualRun: Footprints,
+  Walk: Footprints,
+  WeightTraining: Dumbbell,
+  Workout: Dumbbell,
+};
+
+function getActivityTypeDisplay(type: string): { label: string; Icon: LucideIcon } {
+  const label = type.replace(/([A-Z][a-z]+)/g, ' $1').trim();
+  const Icon = TYPE_TO_ICON[type] ?? Activity;
+  return { Icon, label };
+}
 
 /**
  * Shows the latest activity type and an icon to depict
@@ -18,15 +41,11 @@ export function ActivityTypeWithIcon({ activity }: { activity: StravaActivity | 
     return null;
   }
 
-  // Split on capital letters to split an enum-like value
-  const typeText = activity.type.includes('Ride')
-    ? activity.type.replace(/(?<rideType>[A-Z][a-z]+)/g, ' $1')
-    : 'Run';
-  const icon = activity.type.includes('Ride') ? <Bike size="1.25em" /> : <Dumbbell size="1.25em" />;
+  const { label, Icon } = getActivityTypeDisplay(activity.type);
 
   return (
     <Typography component="div" sx={activityTypeSx} variant="overline">
-      Latest {typeText.trim()} {icon}
+      Latest {label} <Icon size="1.25em" />
     </Typography>
   );
 }

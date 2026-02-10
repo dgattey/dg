@@ -39,9 +39,7 @@ export function PlaybackProgressBar({
   const startTimeRef = useRef<number>(0);
   const startProgressRef = useRef<number>(progressMs ?? 0);
   const trackSx: SxProps = (theme) => ({
-    backgroundColor: colors
-      ? colors.primaryContrast
-      : `color-mix(in srgb, ${theme.vars.palette.text.primary} 20%, transparent)`,
+    backgroundColor: `color-mix(in srgb, ${colors?.primary ?? theme.vars.palette.text.primary} 20%, transparent)`,
     borderRadius: 999,
     height: 6,
     marginTop: theme.spacing(2),
