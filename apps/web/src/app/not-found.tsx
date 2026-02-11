@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { ErrorLayout } from '../components/layouts/ErrorLayout';
+import { ErrorLayout } from './layouts/ErrorLayout';
 
 export const metadata: Metadata = {
   description: 'Sorry, could not find that page.',

@@ -1,6 +1,7 @@
 import { capitalize } from '@dg/shared-core/formatting/capitalize';
 
 type DateConstructorValue = Date | string | number | null | undefined;
+type DefinedDateValue = Date | string | number;
 
 type RelativeTime = {
   unit: Intl.RelativeTimeFormatUnit;
@@ -94,13 +95,27 @@ const overriddenFormatString = ({ unit, amount }: RelativeTime) => {
  * Converts a date to a "6 hours ago" or "last week" type string using
  * native date formatting.
  */
-export const formatRelativeTime = ({
+export function formatRelativeTime({
+  fromDate,
+  toDate,
+}: {
+  fromDate: NonNullable<DefinedDateValue>;
+  toDate: NonNullable<DefinedDateValue>;
+}): string;
+export function formatRelativeTime({
   fromDate,
   toDate,
 }: {
   fromDate: DateConstructorValue;
   toDate: DateConstructorValue;
-}) => {
+}): string | null;
+export function formatRelativeTime({
+  fromDate,
+  toDate,
+}: {
+  fromDate: DateConstructorValue;
+  toDate: DateConstructorValue;
+}) {
   const fromNumeric = numericDate(fromDate);
   const toNumeric = numericDate(toDate);
   if (fromNumeric === null || toNumeric === null) {
@@ -110,4 +125,4 @@ export const formatRelativeTime = ({
   const relativeTime = relativeTimeFromMs(elapsedMs, relativeTimeFormatter);
   const formattedValue = overriddenFormatString(relativeTime) ?? relativeTime.formatted;
   return capitalize(formattedValue);
-};
+}

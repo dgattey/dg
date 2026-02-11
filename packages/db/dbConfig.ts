@@ -14,7 +14,7 @@ export const sequelizeOptions = {
   // In test, limit pool to 1 connection per worker so that each test's
   // wrapping BEGIN/ROLLBACK transaction covers every query on the same
   // physical connection, providing full isolation between parallel workers.
-  ...(process.env.NODE_ENV === 'test' && { pool: { max: 1 } }),
+  ...(process.env.NODE_ENV === 'test' && { logging: false, pool: { max: 1 } }),
   ssl: true,
 } satisfies SequelizeOptions;
 

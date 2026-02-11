@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
-import { Homepage } from '../components/homepage/Homepage';
 import { getHomepageDescription } from '../services/homepage';
+import { Homepage } from './home/Homepage';
 import { baseOpenGraph, baseTwitter, HOMEPAGE_TITLE, truncateDescription } from './metadata';
 
 export async function generateMetadata(): Promise<Metadata> {

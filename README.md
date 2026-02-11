@@ -1,4 +1,4 @@
-[GitHub version](https://github.com/dgattey/dg) [Vercel](https://vercel.com/dgattey/dg) [Using Biome](https://biomejs.dev) [GitHub commits](https://github.com/dgattey/dg) [Last commit](https://github.com/dgattey/dg)
+[![GitHub version](https://flat.badgen.net/github/release/dgattey/dg?cache=600)][gh] [![Vercel](https://deploy-badge.vercel.app/vercel/?app=dg&style=flat-square)](https://vercel.com/dgattey/dg) [![Using Biome](https://img.shields.io/badge/using-Biome-60a5fa?style=flat&logo=biome)](https://biomejs.dev) [![GitHub commits](https://flat.badgen.net/github/commits/dgattey/dg)][gh] [![Last commit](https://flat.badgen.net/github/last-commit/dgattey/dg/main)][gh]
 
 # Dylan Gattey
 
@@ -76,7 +76,9 @@ The release workflow requires:
 
 ## :rainbow: Architecture
 
-Pretty standard Next.js App Router app. `/public` has static files, `/src/app` has pages and API routes, `/src/types` has global types, `/src/hooks` has shared hooks, `/src/components` has React components, and `/src/services` has server-side data fetching.
+Pretty standard Next.js App Router app. `/public` has static files, `/src/app` has pages and API
+routes and components, `/src/types` has global types, `/src/hooks` has shared hooks, and
+`/src/services` has server-side data fetching.
 
 ### Integrations
 
@@ -144,3 +146,4 @@ If multiple PRs each have their own version bump and one merges, other PRs will 
 2. Force push: `git push --force-with-lease`
 3. The workflow will automatically create a fresh version bump commit
 
+[gh]: https://github.com/dgattey/dg

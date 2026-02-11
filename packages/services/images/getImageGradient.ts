@@ -1,459 +1,290 @@
 import 'server-only';
 
-import sharp from 'sharp';
+import { invariant } from '@dg/shared-core/assertions/invariant';
+import { log } from '@dg/shared-core/logging/log';
+import sharp, { type Stats } from 'sharp';
 
-type Rgb = {
-  r: number;
-  g: number;
-  b: number;
+import { type Hsl, rgbToHsl } from './colorConversion';
+
+type Hsla = Hsl & {
+  /** Alpha, 0-1 */
+  a: number;
 };
 
-type GradientOptions = {
-  angle?: number;
-  baseColor?: Rgb;
-  fromAlpha?: number;
-  toAlpha?: number;
-  mix?: number;
-  contrast?: number;
+type FourItemHsla = [Hsla, Hsla, Hsla, Hsla];
+
+type ContrastSetting = 'light' | 'dark';
+
+type ImageGradientInformation = {
+  backgroundGradient: string | null;
+  contrastSetting: ContrastSetting | null;
 };
 
-type ImageStats = {
-  channels: Array<{ mean: number }>;
-  dominant?: Rgb;
-};
+/**
+ * Alpha values by corner position.
+ * Colors are assigned by prominence: most prominent → top right, least → top left.
+ */
+const OPTIONS = {
+  alphaBottomLeft: 0.8,
+  alphaBottomRight: 0.88,
+  alphaTopLeft: 0.9,
+  alphaTopRight: 0.85,
+  /**
+   * Extraction is more permissive than final clamping to capture edge colors.
+   * These multipliers widen the acceptable range during pixel scanning.
+   */
+  extractionLightnessBuffer: 0.45,
+  extractionLightnessMultiplier: 0.1,
+  /** Hue bucket size in degrees (45° = 8 color groups around the wheel) */
+  hueBucketSize: 20,
+  /** Lightness bands per hue bucket (allows multiple shades of the same hue) */
+  lightnessBands: 5,
+  lightnessMax: 0.5,
+  /** Lightness clamp range for final gradient colors */
+  lightnessMin: 0.2,
+  /** Size of downsampled image for color extraction */
+  sampleSize: 40,
+} as const;
 
-type VibrantOptions = {
-  bucketSize?: number;
-  maxLuminance?: number;
-  maxColors?: number;
-  minDistance?: number;
-  minLuminance?: number;
-  minSaturation?: number;
-  sampleSize?: number;
-};
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
-type ImageGradient = {
-  gradient: string;
-  isDark: boolean;
-};
+/**
+ * Shifts lightness by an amount (-1 to 1). Positive = lighter, negative = darker.
+ */
+function shiftLightness<T extends Hsl | Hsla>(color: T, amount: number): T {
+  return { ...color, l: clamp(color.l + amount, 0, 1) };
+}
 
-const DEFAULT_OPTIONS: Required<GradientOptions> = {
-  // Tuned defaults for subdued gradients.
-  angle: 45,
-  baseColor: { b: 0, g: 0, r: 0 },
-  contrast: 0.45,
-  fromAlpha: 0.9,
-  mix: 0.1,
-  toAlpha: 0.8,
-};
+/**
+ * Prepares a color for use in gradients by clamping lightness for text readability.
+ * When lightness is clamped, saturation is adjusted to preserve perceived chroma.
+ * This prevents light colors (cream) from becoming vivid (olive) when darkened.
+ *
+ * Chroma ≈ S × (1 - |2L - 1|), so at L=0.5 chroma equals S.
+ * To preserve chroma when changing lightness, we scale saturation accordingly.
+ */
+function enhanceForGradient(color: Hsl): Hsl {
+  const { lightnessMin, lightnessMax } = OPTIONS;
 
-const DEFAULT_VIBRANT_OPTIONS: Required<VibrantOptions> = {
-  // Keep sampling small; we only need representative hues.
-  bucketSize: 24,
-  maxColors: 4,
-  maxLuminance: 0.75,
-  minDistance: 60,
-  minLuminance: 0.1,
-  minSaturation: 0.24,
-  sampleSize: 36,
-};
+  // Calculate original chroma (perceived colorfulness)
+  const originalChroma = color.s * (1 - Math.abs(2 * color.l - 1));
 
-// Basic color math helpers.
-const clampChannel = (value: number) => Math.max(0, Math.min(255, Math.round(value)));
+  // Clamp lightness for readability
+  const newL = clamp(color.l, lightnessMin, lightnessMax);
 
-const mixRgb = (first: Rgb, second: Rgb, ratio: number) => {
-  const clampedRatio = Math.max(0, Math.min(1, ratio));
-  return {
-    b: clampChannel(first.b + (second.b - first.b) * clampedRatio),
-    g: clampChannel(first.g + (second.g - first.g) * clampedRatio),
-    r: clampChannel(first.r + (second.r - first.r) * clampedRatio),
-  };
-};
+  // Calculate what saturation would produce the same chroma at new lightness
+  const chromaFactor = 1 - Math.abs(2 * newL - 1);
+  const newS = chromaFactor > 0 ? Math.min(1, originalChroma / chromaFactor) : 0;
 
-const luminance = ({ r, g, b }: Rgb) => (0.2126 * r + 0.7152 * g + 0.0722 * b) / 255;
+  return { h: color.h, l: newL, s: newS };
+}
 
-const shiftLightness = (color: Rgb, amount: number) => {
-  const target = amount >= 0 ? { b: 255, g: 255, r: 255 } : { b: 0, g: 0, r: 0 };
-  return mixRgb(color, target, Math.abs(amount));
-};
+/**
+ * Ensures we have exactly 4 colors, padding with lightness variants if needed.
+ * Colors are sorted by prominence (index 0 = most prominent).
+ */
+function ensureQuadColorArray(colors: Array<Hsl>, fallbackColor: Hsl): FourItemHsla {
+  const { alphaTopRight, alphaBottomRight, alphaBottomLeft, alphaTopLeft } = OPTIONS;
 
-const clampToMidRange = (color: Rgb, min = 0.15, max = 0.7) => {
-  const value = luminance(color);
-  if (value < min) {
-    const amount = Math.min(0.6, (min - value) / min);
-    return shiftLightness(color, amount);
+  // If no colors extracted (e.g., grayscale image), use the fallback as primary
+  const primary = colors[0] ?? fallbackColor;
+  if (colors.length === 0) {
+    colors.push(primary);
   }
-  if (value > max) {
-    const amount = Math.min(0.6, (value - max) / (1 - max));
-    return shiftLightness(color, -amount);
-  }
-  return color;
-};
 
-const boostSaturation = (color: Rgb, amount: number) => {
-  const gray = (color.r + color.g + color.b) / 3;
-  return {
-    b: clampChannel(gray + (color.b - gray) * (1 + amount)),
-    g: clampChannel(gray + (color.g - gray) * (1 + amount)),
-    r: clampChannel(gray + (color.r - gray) * (1 + amount)),
-  };
-};
-
-const adjustForGradient = (color: Rgb) => {
-  // Nudge colors toward mid luminance and richer saturation so gradients
-  // stay visible against UI chrome.
-  const clamped = clampToMidRange(color);
-  const saturated = boostSaturation(clamped, 0.55);
-  const darkened = shiftLightness(saturated, -0.2);
-  return clampToMidRange(darkened, 0.12, 0.7);
-};
-
-const ensureQuadColors = (colors: Array<Rgb>, contrast: number) => {
-  // Prefer provided colors; derive missing swatches from the first.
-  const result = colors.slice(0, 4);
-  if (result.length === 0 || result.length === 4) {
-    return result;
-  }
-  const base = result[0];
-  if (!base) {
-    return result;
-  }
-  const derived = [
-    adjustForGradient(shiftLightness(base, contrast)),
-    adjustForGradient(shiftLightness(base, -contrast)),
-    adjustForGradient(shiftLightness(base, contrast * 0.6)),
+  // Pad with lightness variants of the primary color if we don't have 4
+  const derivedColors = [
+    shiftLightness(primary, 0.1),
+    shiftLightness(primary, -0.1),
+    shiftLightness(primary, 0.05),
   ];
-  for (const color of derived) {
-    if (result.length >= 4) {
+  for (const color of derivedColors) {
+    if (colors.length >= 4) {
       break;
     }
-    result.push(color);
+    colors.push(color);
   }
-  return result;
-};
 
-const toRgba = ({ r, g, b }: Rgb, alpha: number) =>
-  `rgba(${clampChannel(r)}, ${clampChannel(g)}, ${clampChannel(b)}, ${alpha})`;
+  // Enhance colors and add alpha by corner position
+  // Index 0 (most prominent) → top right, Index 3 (least) → top left
+  const alphas = [alphaTopRight, alphaBottomRight, alphaBottomLeft, alphaTopLeft];
+  return colors.slice(0, 4).map((hsl, index) => {
+    const enhanced = enhanceForGradient(hsl);
+    return { ...enhanced, a: alphas[index] ?? alphaTopRight };
+  }) as FourItemHsla;
+}
 
-const mixWithBase = (color: Rgb, baseColor: Rgb, alpha: number) => mixRgb(baseColor, color, alpha);
+/**
+ * Converts HSLA to CSS hsla() string
+ */
+const toHslaString = ({ h, s, l, a }: Hsla) =>
+  `hsla(${h.toFixed(1)}, ${(s * 100).toFixed(1)}%, ${(l * 100).toFixed(1)}%, ${a})`;
 
-const deriveAccent = (color: Rgb, contrast: number) =>
-  adjustForGradient(
-    luminance(color) > 0.5 ? shiftLightness(color, -contrast) : shiftLightness(color, contrast),
-  );
-
-const buildLinearGradient = (
-  angle: number,
-  start: Rgb,
-  startAlpha: number,
-  end: Rgb,
-  endAlpha: number,
-) => `linear-gradient(${angle}deg, ${toRgba(start, startAlpha)}, ${toRgba(end, endAlpha)})`;
-
-const buildRadialGradientStack = (
-  primary: Rgb,
-  secondary: Rgb,
-  tertiary: Rgb,
-  quaternary: Rgb,
-  primaryAlpha: number,
-  secondaryAlpha: number,
-  tertiaryAlpha: number,
-  quaternaryAlpha: number,
-) =>
-  [
-    `radial-gradient(circle at top right, ${toRgba(primary, primaryAlpha)} 0%, transparent 70%)`,
-    `radial-gradient(circle at bottom left, ${toRgba(secondary, secondaryAlpha)} 0%, transparent 70%)`,
-    `radial-gradient(circle at top left, ${toRgba(tertiary, tertiaryAlpha)} 0%, transparent 70%)`,
-    `radial-gradient(circle at bottom right, ${toRgba(quaternary, quaternaryAlpha)} 0%, transparent 70%)`,
+/**
+ * Returns a radial gradient from four colors.
+ * Stacked by prominence: most prominent (colors[0]) on top of stack,
+ * least prominent (colors[3]) at bottom. Dominant color covers the most area.
+ *
+ * Corner assignments: top right (most) → bottom right → bottom left → top left (least)
+ */
+function buildRadialGradient(colors: FourItemHsla) {
+  return [
+    `radial-gradient(circle at top right, ${toHslaString(colors[0])} 0%, transparent 70%)`,
+    `radial-gradient(circle at bottom right, ${toHslaString(colors[1])} 0%, transparent 70%)`,
+    `radial-gradient(circle at bottom left, ${toHslaString(colors[2])} 0%, transparent 70%)`,
+    `radial-gradient(circle at top left, ${toHslaString(colors[3])} 0%, transparent 70%)`,
   ].join(', ');
+}
 
-const toRelativeLuminance = ({ r, g, b }: Rgb) => {
-  // WCAG relative luminance.
-  const normalize = (value: number) => {
-    const channel = value / 255;
-    return channel <= 0.03928 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
-  };
-  const red = normalize(r);
-  const green = normalize(g);
-  const blue = normalize(b);
-  return 0.2126 * red + 0.7152 * green + 0.0722 * blue;
-};
+/**
+ * Returns recommended light/dark text color based on average gradient lightness
+ */
+function contrastSettingForGradient(colors: FourItemHsla): ContrastSetting {
+  const avgLightness = colors.reduce((sum, c) => sum + c.l * c.a, 0) / colors.length;
+  // Dark text on light backgrounds, light text on dark backgrounds
+  return avgLightness > 0.45 ? 'light' : 'dark';
+}
 
-const getContrastRatio = (first: Rgb, second: Rgb) => {
-  const firstLum = toRelativeLuminance(first);
-  const secondLum = toRelativeLuminance(second);
-  const lighter = Math.max(firstLum, secondLum);
-  const darker = Math.min(firstLum, secondLum);
-  return (lighter + 0.05) / (darker + 0.05);
-};
-
-const shouldUseLightText = (colors: Array<Rgb>) => {
-  // Compare average contrast against white vs black text.
-  const white: Rgb = { b: 255, g: 255, r: 255 };
-  const black: Rgb = { b: 0, g: 0, r: 0 };
-  const contrastWithWhite =
-    colors.reduce((total, color) => total + getContrastRatio(white, color), 0) / colors.length;
-  const contrastWithBlack =
-    colors.reduce((total, color) => total + getContrastRatio(black, color), 0) / colors.length;
-  return contrastWithWhite >= contrastWithBlack;
-};
-
-const shouldUseLightTextForBase = (baseColor: Rgb, colors: Array<[Rgb, number]>) =>
-  shouldUseLightText(colors.map(([color, alpha]) => mixWithBase(color, baseColor, alpha)));
-
-const rgbDistance = (first: Rgb, second: Rgb) => {
-  const r = first.r - second.r;
-  const g = first.g - second.g;
-  const b = first.b - second.b;
-  return Math.sqrt(r * r + g * g + b * b);
-};
-
-const rgbToHsl = ({ r, g, b }: Rgb) => {
-  const red = r / 255;
-  const green = g / 255;
-  const blue = b / 255;
-  const max = Math.max(red, green, blue);
-  const min = Math.min(red, green, blue);
-  const delta = max - min;
-  const lightness = (max + min) / 2;
-  if (delta === 0) {
-    return { lightness, saturation: 0 };
-  }
-  const saturation = delta / (1 - Math.abs(2 * lightness - 1));
-  return { lightness, saturation };
-};
-
-const quantizeChannel = (value: number, bucketSize: number) =>
-  clampChannel(Math.round(value / bucketSize) * bucketSize);
-
-const getDominantRgb = (stats: ImageStats): Rgb | null => {
-  if (stats.dominant && typeof stats.dominant.r === 'number') {
-    return {
-      b: clampChannel(stats.dominant.b),
-      g: clampChannel(stats.dominant.g),
-      r: clampChannel(stats.dominant.r),
-    };
-  }
-  return null;
-};
-
-const getMeanRgb = (stats: ImageStats): Rgb | null => {
-  if (stats.channels.length < 3) {
-    return null;
-  }
-  const [rChannel, gChannel, bChannel] = stats.channels;
-  if (!rChannel || !gChannel || !bChannel) {
-    return null;
-  }
-  return {
-    b: clampChannel(bChannel.mean),
-    g: clampChannel(gChannel.mean),
-    r: clampChannel(rChannel.mean),
-  };
-};
-
-// Downsample, bucket, and keep the most saturated distinct colors.
-const getVibrantColors = async (
-  buffer: Buffer,
-  options: VibrantOptions = {},
-): Promise<Array<Rgb>> => {
+/**
+ * Downsample, bucket by hue AND lightness, and keep the most vibrant colors.
+ * Bucketing by both dimensions allows images that are predominantly one hue
+ * (e.g., mostly red) to yield multiple shades of that hue.
+ */
+async function getVibrantColors(buffer: Buffer): Promise<Array<Hsl>> {
   const {
-    bucketSize,
-    maxColors,
-    maxLuminance,
-    minDistance,
-    minLuminance,
-    minSaturation,
+    hueBucketSize,
+    lightnessBands,
+    lightnessMax,
+    lightnessMin,
+    extractionLightnessMultiplier,
+    extractionLightnessBuffer,
     sampleSize,
-  } = {
-    ...DEFAULT_VIBRANT_OPTIONS,
-    ...options,
-  };
+  } = OPTIONS;
 
+  // Smaller image for performance
   const { data, info } = await sharp(buffer)
     .resize(sampleSize, sampleSize, { fit: 'inside' })
     .raw()
     .toBuffer({ resolveWithObject: true });
-
-  if (info.channels < 3) {
-    return [];
-  }
-
   const hasAlpha = info.channels === 4;
-  const buckets = new Map<
-    string,
-    { count: number; maxSaturation: number; rSum: number; gSum: number; bSum: number }
-  >();
+  invariant(info.channels >= 3, 'Not an image buffer!');
+
+  // Bucket colors by hue AND lightness - allows multiple shades of the same hue
+  const buckets = new Map<string, { count: number; hSum: number; sSum: number; lSum: number }>();
+
   for (let index = 0; index < data.length; index += info.channels) {
     const r = data[index] ?? 0;
     const g = data[index + 1] ?? 0;
     const b = data[index + 2] ?? 0;
+
+    // Skip transparent colors
     const alpha = hasAlpha ? (data[index + 3] ?? 0) : 255;
     if (alpha < 10) {
       continue;
     }
-    const color = { b, g, r };
-    const lightness = luminance(color);
-    if (lightness < minLuminance || lightness > maxLuminance) {
+
+    const hsl = rgbToHsl({ b, g, r });
+
+    // Skip only extreme lightness values (pure black/white edges)
+    // No saturation filtering - chroma scoring handles color prominence
+    const minL = lightnessMin * extractionLightnessMultiplier;
+    const maxL = lightnessMax + extractionLightnessBuffer;
+    if (hsl.l < minL || hsl.l > maxL) {
       continue;
     }
-    const { saturation } = rgbToHsl(color);
-    if (saturation < minSaturation) {
-      continue;
-    }
-    const quantized = {
-      b: quantizeChannel(b, bucketSize),
-      g: quantizeChannel(g, bucketSize),
-      r: quantizeChannel(r, bucketSize),
-    };
-    const key = `${quantized.r}-${quantized.g}-${quantized.b}`;
-    const existing = buckets.get(key);
+
+    // Bucket by quantized hue AND lightness band
+    const hueBucket = Math.round(hsl.h / hueBucketSize) * hueBucketSize;
+    const lightnessBand = Math.min(Math.floor(hsl.l * lightnessBands), lightnessBands - 1);
+    const bucketKey = `${hueBucket}-${lightnessBand}`;
+
+    const existing = buckets.get(bucketKey);
     if (existing) {
       existing.count += 1;
-      existing.maxSaturation = Math.max(existing.maxSaturation, saturation);
-      existing.rSum += r;
-      existing.gSum += g;
-      existing.bSum += b;
+      existing.hSum += hsl.h;
+      existing.sSum += hsl.s;
+      existing.lSum += hsl.l;
     } else {
-      buckets.set(key, {
-        bSum: b,
-        count: 1,
-        gSum: g,
-        maxSaturation: saturation,
-        rSum: r,
-      });
+      buckets.set(bucketKey, { count: 1, hSum: hsl.h, lSum: hsl.l, sSum: hsl.s });
     }
   }
 
-  const candidates = Array.from(buckets.values()).map((bucket) => {
-    const count = bucket.count;
-    const average = {
-      b: bucket.bSum / count,
-      g: bucket.gSum / count,
-      r: bucket.rSum / count,
-    };
-    return {
-      color: {
-        b: clampChannel(average.b),
-        g: clampChannel(average.g),
-        r: clampChannel(average.r),
-      },
-      score: bucket.maxSaturation * Math.sqrt(count),
-    };
-  });
-
-  candidates.sort((first, second) => second.score - first.score);
-  const selected: Array<(typeof candidates)[number]> = [];
-  for (const candidate of candidates) {
-    if (selected.length === 0) {
-      selected.push(candidate);
-      continue;
-    }
-    const hasDistance = selected.every(
-      (existing) => rgbDistance(existing.color, candidate.color) >= minDistance,
-    );
-    if (hasDistance) {
-      selected.push(candidate);
-    }
-    if (selected.length >= maxColors) {
-      break;
-    }
-  }
-
-  return selected.map((candidate) => candidate.color);
-};
+  // Score by saturation weighted by frequency, take top 4
+  // Use count^0.6 to weight pixel count more heavily than sqrt
+  // This prevents small bright accents from dominating large color areas
+  return Array.from(buckets.entries())
+    .map(([, { count, hSum, sSum, lSum }]) => {
+      const avgS = sSum / count;
+      const avgL = lSum / count;
+      return {
+        color: { h: hSum / count, l: avgL, s: avgS },
+        score: avgS * count ** 0.55,
+      };
+    })
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4)
+    .map(({ color }) => color);
+}
 
 /**
- * Returns a subtle CSS gradient derived from an image URL, or null on failure.
+ * Gets dominant color from sharp stats and converts to HSL
  */
-export async function getImageGradientFromUrl(
+function getDominantHsl(stats: Stats): Hsl | null {
+  if (stats.dominant && typeof stats.dominant.r === 'number') {
+    return rgbToHsl({
+      b: stats.dominant.b,
+      g: stats.dominant.g,
+      r: stats.dominant.r,
+    });
+  }
+  return null;
+}
+
+/**
+ * Gets mean color from sharp stats and converts to HSL
+ */
+function getMeanHsl(stats: Stats): Hsl {
+  const [rChannel, gChannel, bChannel] = stats.channels;
+  invariant(rChannel && gChannel && bChannel, 'Malformed image');
+  return rgbToHsl({
+    b: Math.round(bChannel.mean),
+    g: Math.round(gChannel.mean),
+    r: Math.round(rChannel.mean),
+  });
+}
+
+/**
+ * Returns an up-to-4-color radial gradient from the processed image URL, and indicator boolean for
+ * recommended text color when used on top of the gradient.
+ */
+export async function getImageGradientInformationFromUrl(
   url: string,
-  options: GradientOptions = {},
-): Promise<ImageGradient | null> {
-  const { angle, baseColor, contrast, fromAlpha, mix, toAlpha } = {
-    ...DEFAULT_OPTIONS,
-    ...options,
-  };
+): Promise<ImageGradientInformation> {
   try {
-    const response = await fetch(url);
-    if (!response.ok) {
-      return null;
-    }
-    const buffer = Buffer.from(await response.arrayBuffer());
-    const stats = (await sharp(buffer).stats()) as ImageStats;
-    const mean = getMeanRgb(stats);
-    const vibrant = await getVibrantColors(buffer);
-    if (!mean && vibrant.length === 0) {
-      return null;
-    }
-    const dominant = getDominantRgb(stats) ?? mean;
-    const adjusted = vibrant.map(adjustForGradient);
-    // Prefer a 4-color radial stack when we have enough vibrant swatches.
-    const [primary, secondary, tertiary, quaternary] = ensureQuadColors(adjusted, contrast);
-    if (primary && secondary && tertiary && quaternary) {
-      const primaryAlpha = toAlpha;
-      const secondaryAlpha = fromAlpha;
-      const tertiaryAlpha = fromAlpha * 0.85;
-      const quaternaryAlpha = fromAlpha * 0.85;
-      return {
-        gradient: buildRadialGradientStack(
-          primary,
-          secondary,
-          tertiary,
-          quaternary,
-          primaryAlpha,
-          secondaryAlpha,
-          tertiaryAlpha,
-          quaternaryAlpha,
-        ),
-        isDark: shouldUseLightTextForBase(baseColor, [
-          [primary, primaryAlpha],
-          [secondary, secondaryAlpha],
-          [tertiary, tertiaryAlpha],
-          [quaternary, quaternaryAlpha],
-        ]),
-      };
-    }
-    const [fallbackPrimary, fallbackSecondary] = adjusted;
-    if (fallbackPrimary && fallbackSecondary) {
-      return {
-        gradient: buildLinearGradient(
-          angle,
-          fallbackSecondary,
-          fromAlpha,
-          fallbackPrimary,
-          toAlpha,
-        ),
-        isDark: shouldUseLightTextForBase(baseColor, [
-          [fallbackSecondary, fromAlpha],
-          [fallbackPrimary, toAlpha],
-        ]),
-      };
-    }
-    if (fallbackPrimary) {
-      const accent = deriveAccent(fallbackPrimary, contrast);
-      return {
-        gradient: buildLinearGradient(angle, accent, fromAlpha, fallbackPrimary, toAlpha),
-        isDark: shouldUseLightTextForBase(baseColor, [
-          [accent, fromAlpha],
-          [fallbackPrimary, toAlpha],
-        ]),
-      };
-    }
-    if (!dominant || !mean) {
-      return null;
-    }
-    // Last resort: blend mean + dominant, then derive an accent.
-    const blended = adjustForGradient(mixRgb(dominant, mean, mix));
-    const accent = deriveAccent(blended, contrast);
+    // Fetch image, convert to buffer + stats
+    const imageResponse = await fetch(url);
+    invariant(imageResponse.ok, `Couldn't fetch image: ${imageResponse.status}`);
+    const buffer = Buffer.from(await imageResponse.arrayBuffer());
+    const stats = await sharp(buffer).stats();
+
+    // Get vibrant colors in HSL
+    const vibrantColors = await getVibrantColors(buffer);
+    const fallbackColor = getDominantHsl(stats) ?? getMeanHsl(stats);
+
+    // Get a 4 color radial stack, potentially falling back to the dominant color
+    const colors = ensureQuadColorArray(vibrantColors, fallbackColor);
     return {
-      gradient: buildLinearGradient(angle, accent, fromAlpha, blended, toAlpha),
-      isDark: shouldUseLightTextForBase(baseColor, [
-        [accent, fromAlpha],
-        [blended, toAlpha],
-      ]),
+      backgroundGradient: buildRadialGradient(colors),
+      contrastSetting: contrastSettingForGradient(colors),
     };
-  } catch {
-    return null;
+  } catch (error) {
+    log.warn("Couldn't get image gradient", {
+      error,
+      url,
+    });
+    return {
+      backgroundGradient: null,
+      contrastSetting: null,
+    };
   }
 }

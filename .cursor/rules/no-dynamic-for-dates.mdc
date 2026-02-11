@@ -1,0 +1,86 @@
+---
+description: Avoid using connection() or dynamic rendering for Date.now() hydration issues
+globs:
+alwaysApply: true
+---
+
+# Don't use dynamic rendering for date hydration
+
+## Problem
+
+Using `Date.now()` causes hydration mismatches because prerender time differs
+from client hydration time - even in Client Components if used in useState
+initializers.
+
+## Wrong approaches
+
+```tsx
+// ❌ Bad - opts entire page out of static/partial prerendering
+import { connection } from 'next/server';
+
+export async function RelativeTime({ date }) {
+  await connection(); // Don't do this!
+  const now = Date.now();
+}
+
+// ❌ Bad - Date.now() in useState initializer still runs during prerender
+'use client';
+
+export function RelativeTime({ date }) {
+  const [time, setTime] = useState(() => format(date, Date.now())); // Still breaks!
+}
+
+// ❌ Bad - uncached Date.now() in server component
+export default function Layout({ children }) {
+  const serverTime = Date.now(); // Different on prerender vs hydration!
+}
+```
+
+## Correct approach: Cached Server Time + Context
+
+Cache `Date.now()` with `cacheLife('minutes')` - for relative times like "2 days
+ago", being off by a few minutes is acceptable and avoids page blocking:
+
+```tsx
+// getServerTime.ts
+import { cacheLife } from 'next/cache';
+
+export async function getServerTime() {
+  'use cache';
+  cacheLife('minutes'); // 'seconds' still blocks; 'minutes' doesn't
+  return Date.now();
+}
+
+// layout.tsx (async Server Component)
+export default async function Layout({ children }) {
+  const serverTime = await getServerTime(); // Cached!
+  return (
+    <ServerTimeProvider serverTime={serverTime}>
+      {children}
+    </ServerTimeProvider>
+  );
+}
+
+// RelativeTime.tsx (Client Component)
+'use client';
+
+export function RelativeTime({ date }) {
+  const serverTime = useServerTime(); // Same cached value!
+
+  const [time, setTime] = useState(() =>
+    serverTime ? format(date, serverTime) : '...'
+  );
+
+  useEffect(() => {
+    setTime(format(date, Date.now())); // Switch to live after hydration
+  }, [date]);
+
+  return <>{time}</>;
+}
+```
+
+## When to use dynamic rendering
+
+Only use `connection()` or similar when content truly needs to be dynamic based
+on request-time data (user session, cookies, geolocation, etc.) - not for
+working around time-based hydration issues.

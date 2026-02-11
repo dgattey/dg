@@ -10,7 +10,7 @@ import {
 } from '@dg/content-models/spotify/RecentlyPlayed';
 import type { Track } from '@dg/content-models/spotify/Track';
 import { parseResponse } from '../clients/parseResponse';
-import { getImageGradientFromUrl } from '../images/getImageGradient';
+import { getImageGradientInformationFromUrl } from '../images/getImageGradient';
 import { getSpotifyClient } from './spotifyClient';
 
 const CURRENTLY_PLAYING_RESOURCE = 'me/player/currently-playing';
@@ -40,7 +40,7 @@ export async function fetchRecentlyPlayed(): Promise<null | Track> {
       if (!track) {
         return fetchLastPlayed();
       }
-      return await withAlbumGradient(track);
+      return await withAlbumGradientInfo(track);
     }
     case 204: {
       // We aren't currently playing a song but we could have recently played one
@@ -55,7 +55,7 @@ export async function fetchRecentlyPlayed(): Promise<null | Track> {
 /**
  * Fetches the song that last played from spotify using a valid access token.
  * May have no content, which signifies nothing is playing, which is returned
- * as `null`, or returns full JSON.
+ * as `null`, or returns full JSON. Augments it with the image gradient from the URL.
  */
 async function fetchLastPlayed(): Promise<null | Track> {
   const { response, status } = await getSpotifyClient().get(RECENTLY_PLAYED_RESOURCE);
@@ -66,17 +66,26 @@ async function fetchLastPlayed(): Promise<null | Track> {
     kind: 'rest',
     source: 'spotify.fetchRecentlyPlayed.recentlyPlayed',
   });
-  const item = mapRecentlyPlayedFromApi(data).items[0];
-  const track = item ? { ...item.track, playedAt: item.playedAt } : null;
-  return await withAlbumGradient(track);
-}
-
-async function withAlbumGradient(track: Track | null): Promise<Track | null> {
-  if (!track) {
+  const lastItemPlayed = mapRecentlyPlayedFromApi(data).items[0];
+  if (!lastItemPlayed) {
     return null;
   }
-  const gradient = await getImageGradientFromUrl(track.albumImage.url);
-  return gradient
-    ? { ...track, albumGradient: gradient.gradient, albumGradientIsDark: gradient.isDark }
-    : track;
+
+  // Augment with gradient
+  const track = { ...lastItemPlayed.track, playedAt: lastItemPlayed.playedAt };
+  return await withAlbumGradientInfo(track);
+}
+
+/**
+ * Augments the response with gradient information for the track
+ */
+async function withAlbumGradientInfo(track: Track): Promise<Track> {
+  const { backgroundGradient, contrastSetting } = await getImageGradientInformationFromUrl(
+    track.albumImage.url,
+  );
+  return {
+    ...track,
+    albumGradient: backgroundGradient ?? undefined,
+    albumGradientContrastSetting: contrastSetting ?? undefined,
+  };
 }

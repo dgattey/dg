@@ -64,7 +64,10 @@ export const trackApiSchema = v.looseObject({
   /**
    * Derived contrast hint for album gradient background.
    */
-  albumGradientIsDark: v.optional(v.boolean()),
+  albumGradientContrastSetting: v.optional(v.picklist(['light', 'dark'])),
+  /**
+   * All artists on the track
+   */
   artists: v.array(referenceApiSchema),
   /**
    * Track duration, in milliseconds.
@@ -92,20 +95,20 @@ type ArtistApi = v.InferOutput<typeof referenceApiSchema>;
 type AlbumApi = v.InferOutput<typeof albumApiSchema>;
 type TrackApi = v.InferOutput<typeof trackApiSchema>;
 
-type ExternalUrls = {
-  spotify: string;
-};
-
-/**
- * Domain artist type (camelCase).
- */
-export type Artist = {
-  externalUrls: ExternalUrls;
+export type Core = {
+  externalUrls: {
+    spotify: string;
+  };
   href: string;
   id: string;
   name: string;
   uri: string;
 };
+
+/**
+ * Domain artist type (camelCase).
+ */
+export type Artist = Core;
 
 /**
  * Domain album type (camelCase).
@@ -138,7 +141,7 @@ export type Track = Artist & {
   progressMs?: number;
   isPlaying?: boolean;
   albumGradient?: string;
-  albumGradientIsDark?: boolean;
+  albumGradientContrastSetting?: 'light' | 'dark';
 };
 
 const mapArtistFromApi = (artist: ArtistApi): Artist => ({
@@ -172,7 +175,7 @@ export const mapTrackFromApi = (track: TrackApi): Track | null => {
     ...mapArtistFromApi(track),
     album: mapAlbumFromApi(track.album),
     albumGradient: track.albumGradient,
-    albumGradientIsDark: track.albumGradientIsDark,
+    albumGradientContrastSetting: track.albumGradientContrastSetting,
     albumImage,
     artists: track.artists.map(mapArtistFromApi),
     durationMs: track.duration_ms,

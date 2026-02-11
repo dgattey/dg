@@ -39,6 +39,7 @@ export const baseConfig: Config = {
     'server-only': resolve(dir, 'server-only-mock.js'),
   },
   setupFilesAfterEnv: [resolve(dir, 'jest.setup.ts')],
+  silent: true,
   testMatch: ['**/__tests__/**/*.test.ts?(x)'],
   transform: swcTransform,
 };
