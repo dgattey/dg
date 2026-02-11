@@ -1,11 +1,18 @@
+import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { render, screen } from '@testing-library/react';
+import type { ReactNode } from 'react';
 import { ActivityStats } from '../ActivityStats';
+
+const TEST_SERVER_TIME = new Date('2026-02-10T12:00:00Z').getTime();
+
+function TestWrapper({ children }: { children: ReactNode }) {
+  return <ServerTimeProvider serverTime={TEST_SERVER_TIME}>{children}</ServerTimeProvider>;
+}
 
 describe('ActivityStats', () => {
   beforeEach(() => {
-    // Freeze time for consistent relative time testing
     jest.useFakeTimers();
-    jest.setSystemTime(new Date('2026-02-10T12:00:00Z'));
+    jest.setSystemTime(new Date(TEST_SERVER_TIME));
   });
 
   afterEach(() => {
@@ -25,6 +32,7 @@ describe('ActivityStats', () => {
           url: 'https://www.strava.com/activities/123',
         }}
       />,
+      { wrapper: TestWrapper },
     );
 
     expect(screen.getByText('6.2 miles')).toBeInTheDocument();
@@ -43,6 +51,7 @@ describe('ActivityStats', () => {
           url: 'https://www.strava.com/activities/456',
         }}
       />,
+      { wrapper: TestWrapper },
     );
 
     expect(screen.getByText('Yesterday')).toBeInTheDocument();
