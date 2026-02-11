@@ -46,7 +46,12 @@ const logoTextStyles: SxObject = {
 };
 
 const logoLinkSx: SxObject = {
+  '&:hover': {
+    textDecoration: 'none',
+  },
+  flexShrink: 0,
   textDecoration: 'none',
+  textWrap: 'nowrap',
 };
 
 const logoButtonSx: SxObject = {
@@ -59,7 +64,6 @@ const logoLinkMergedSx: SxObject = {
   ...logoTextStyles,
   ...paddingStyles,
   ...logoLinkSx,
-  flexShrink: 0,
 };
 
 /**

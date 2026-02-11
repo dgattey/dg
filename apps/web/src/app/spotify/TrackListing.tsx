@@ -57,7 +57,6 @@ export function TrackListing({ track }: TrackListingProps) {
           color={primary}
           isPlaying={track.isPlaying}
           playedAt={track.playedAt}
-          relativePlayedAt={track.relativePlayedAt}
           textShadow={primaryShadow}
         />
         <TrackTitle

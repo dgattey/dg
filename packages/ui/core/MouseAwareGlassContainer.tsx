@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import type { ComponentPropsWithoutRef } from 'react';
 import type { UseMouseGravityOptions } from '../helpers/useMouseGravity';
 import { GRAVITY_TRANSFORM_PREFIX, useMouseGravity } from '../helpers/useMouseGravity';
 import type { SxObject } from '../theme';
@@ -38,28 +38,17 @@ function composeGravitySx(sx?: SxObject): SxObject {
  * Drop-in replacement for GlassContainer — accepts all the same props plus
  * optional `gravity` configuration.
  */
-export function MouseAwareGlassContainer({
+export function MouseAwareGlassContainer<ContainerOverrideType extends React.ElementType>({
   children,
   gravity,
   sx,
+  component: ContainerOverride = GlassContainer,
   ...props
-}: MouseAwareGlassContainerProps) {
-  const [isTouchDevice, setIsTouchDevice] = useState(false);
-
-  useEffect(() => {
-    const hasTouchPoints = navigator.maxTouchPoints > 0;
-    const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
-    const hasNoHover = window.matchMedia('(hover: none)').matches;
-    setIsTouchDevice(hasTouchPoints || hasCoarsePointer || hasNoHover);
-  }, []);
-
-  const { ref } = useMouseGravity({
-    ...gravity,
-    enabled: gravity?.enabled ?? !isTouchDevice,
-  });
+}: MouseAwareGlassContainerProps & ComponentPropsWithoutRef<ContainerOverrideType>) {
+  const { ref } = useMouseGravity(gravity);
   return (
-    <GlassContainer ref={ref} sx={composeGravitySx(sx)} {...props}>
+    <ContainerOverride ref={ref} sx={{ ...composeGravitySx(sx), ...sx }} {...props}>
       {children}
-    </GlassContainer>
+    </ContainerOverride>
   );
 }

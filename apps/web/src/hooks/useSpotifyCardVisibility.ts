@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { useSpotifyScrollProgress } from '../app/spotify/SpotifyHeaderContext';
+import { usePageScrollProgress } from '../app/layouts/PageScrollContext';
 
 /**
  * Tracks whether the Spotify card is visible onscreen and reports
@@ -14,7 +14,7 @@ import { useSpotifyScrollProgress } from '../app/spotify/SpotifyHeaderContext';
  * thumbnail shows on other pages (consumers treat null as "show").
  */
 export function useSpotifyCardVisibility() {
-  const context = useSpotifyScrollProgress();
+  const context = usePageScrollProgress();
   const cardRef = useRef<HTMLDivElement>(null);
   const rafRef = useRef<number | null>(null);
 

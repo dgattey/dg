@@ -1,9 +1,10 @@
 'use client';
 
 import { homeRoute } from '@dg/shared-core/routes/app';
+import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { Section } from '@dg/ui/core/Section';
 import { Link } from '@dg/ui/dependent/Link';
-import type { SxObject, SxProps } from '@dg/ui/theme';
+import type { SxObject } from '@dg/ui/theme';
 import { Stack, Typography } from '@mui/material';
 
 type ErrorLayoutProps = {
@@ -19,18 +20,14 @@ const layoutSx: SxObject = {
   marginTop: -8,
 };
 
-const statusCodeSx: SxProps = (theme) => ({
-  backgroundClip: 'text',
-  backgroundImage: 'url(/images/error-small.webp)',
-  backgroundSize: 'cover',
-  color: 'transparent',
-  filter: `drop-shadow(2px 2px 12px hsl(from ${theme.vars.palette.secondary.dark} h s calc(l * 0.2) / 0.4))`,
-  fontSize: '280px !important',
+const statusCodeSx: SxObject = {
+  filter: `drop-shadow(2px 2px 12px hsl(from var(--mui-palette-secondary-dark) h s calc(l * 0.2) / 0.4))`,
+  flexShrink: 1,
+  fontSize: { md: '280px', sm: '200px', xs: '140px' },
   fontStretch: 'extra-expanded',
   fontWeight: 900,
-  WebkitBackgroundClip: 'text',
-  WebkitTextStroke: `1px ${theme.vars.palette.secondary.main}`,
-});
+  textWrap: 'nowrap',
+};
 
 const messageSx: SxObject = {
   maxWidth: '26em',
@@ -48,9 +45,9 @@ const backLinkSx: SxObject = {
 export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
   return (
     <Stack component={Section} sx={layoutSx}>
-      <Typography sx={statusCodeSx} variant="h1">
+      <MouseAwareGlassContainer component={Typography} sx={statusCodeSx} variant="h1">
         {statusCode}
-      </Typography>
+      </MouseAwareGlassContainer>
       <Typography sx={messageSx} textAlign="center" variant="h5">
         {statusCode === 404
           ? 'Sorry, couldn‘t find that page. Email me if something is wrong.'

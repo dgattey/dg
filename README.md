@@ -76,7 +76,9 @@ The release workflow requires:
 
 ## :rainbow: Architecture
 
-Pretty standard Next.js App Router app. `/public` has static files, `/src/app` has pages and API routes, `/src/types` has global types, `/src/hooks` has shared hooks, `/src/components` has React components, and `/src/services` has server-side data fetching.
+Pretty standard Next.js App Router app. `/public` has static files, `/src/app` has pages and API
+routes and components, `/src/types` has global types, `/src/hooks` has shared hooks, and
+`/src/services` has server-side data fetching.
 
 ### Integrations
 

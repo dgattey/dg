@@ -11,15 +11,15 @@ const activityTypeSx: SxObject = {
 };
 
 const TYPE_TO_ICON: Record<string, LucideIcon> = {
-  Ride: Bike,
-  EBikeRide: Bike,
-  VirtualRide: Bike,
-  Hike: Mountain,
   AlpineSki: MountainSnow,
   BackcountrySki: MountainSnow,
+  EBikeRide: Bike,
+  Hike: Mountain,
   NordicSki: MountainSnow,
-  Snowboard: MountainSnow,
+  Ride: Bike,
   Run: Footprints,
+  Snowboard: MountainSnow,
+  VirtualRide: Bike,
   VirtualRun: Footprints,
   Walk: Footprints,
   WeightTraining: Dumbbell,

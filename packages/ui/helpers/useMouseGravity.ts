@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 /** Maximum tilt in degrees */
 const DEFAULT_MAX_TILT = 2.5;
@@ -188,9 +188,20 @@ export function useMouseGravity({
   radius = DEFAULT_RADIUS,
   smoothing = DEFAULT_SMOOTHING,
   falloff = DEFAULT_FALLOFF,
-  enabled = true,
+  enabled: initialEnabled = true,
 }: UseMouseGravityOptions = {}) {
   const ref = useRef<HTMLDivElement>(null);
+
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    const hasTouchPoints = navigator.maxTouchPoints > 0;
+    const hasCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+    const hasNoHover = window.matchMedia('(hover: none)').matches;
+    setIsTouchDevice(hasTouchPoints || hasCoarsePointer || hasNoHover);
+  }, []);
+
+  const enabled = initialEnabled && !isTouchDevice;
 
   const state = useRef({
     animating: false,

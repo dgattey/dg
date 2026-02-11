@@ -2,6 +2,16 @@ import { render, screen } from '@testing-library/react';
 import { ActivityStats } from '../ActivityStats';
 
 describe('ActivityStats', () => {
+  beforeEach(() => {
+    // Freeze time for consistent relative time testing
+    jest.useFakeTimers();
+    jest.setSystemTime(new Date('2026-02-10T12:00:00Z'));
+  });
+
+  afterEach(() => {
+    jest.useRealTimers();
+  });
+
   it('renders distance and relative date in the header row', () => {
     render(
       <ActivityStats
@@ -10,6 +20,7 @@ describe('ActivityStats', () => {
           id: 123,
           name: 'Morning Ride',
           relativeStartDate: '2 days ago',
+          startDate: '2026-02-08T12:00:00Z',
           type: 'Ride',
           url: 'https://www.strava.com/activities/123',
         }}
@@ -27,6 +38,7 @@ describe('ActivityStats', () => {
           id: 456,
           name: 'Morning Yoga',
           relativeStartDate: 'Yesterday',
+          startDate: '2026-02-09T06:00:00Z', // ~30 hours ago, clearly "yesterday"
           type: 'Yoga',
           url: 'https://www.strava.com/activities/456',
         }}

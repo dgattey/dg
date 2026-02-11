@@ -1,5 +1,6 @@
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import { formattedDistance } from '@dg/shared-core/formatting/formattedDistance';
+import { RelativeTime } from '@dg/ui/core/RelativeTime';
 import { FaIcon } from '@dg/ui/icons/FaIcon';
 import type { SxObject } from '@dg/ui/theme';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
@@ -25,8 +26,8 @@ const dateOnlySx: SxObject = {
 export function ActivityStats({ activity }: { activity: StravaActivity | null }) {
   const hasDistance = activity?.distance !== null && activity?.distance !== undefined;
   const distance = hasDistance ? formattedDistance({ distanceInMeters: activity.distance }) : null;
-  const formattedDate = activity?.relativeStartDate ?? null;
-  if (!distance && !formattedDate) {
+  const startDate = activity?.startDate;
+  if (!distance && !startDate) {
     return null;
   }
 
@@ -38,9 +39,9 @@ export function ActivityStats({ activity }: { activity: StravaActivity | null })
           <Typography variant="caption">{distance}</Typography>
         </Stack>
       ) : null}
-      {formattedDate ? (
+      {startDate ? (
         <Typography sx={distance ? undefined : dateOnlySx} variant="caption">
-          {formattedDate}
+          <RelativeTime date={startDate} />
         </Typography>
       ) : null}
     </Stack>

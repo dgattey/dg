@@ -1,6 +1,7 @@
 'use client';
 
 import type { Track } from '@dg/content-models/spotify/Track';
+import { RelativeTime } from '@dg/ui/core/RelativeTime';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import {
@@ -15,10 +16,10 @@ import { Box, Card, Stack, Typography } from '@mui/material';
 import { Music } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { usePageScrollProgress } from '../layouts/PageScrollContext';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
 import { getContrastingColors } from './colors';
 import { NOW_PLAYING_CARD_ID } from './SpotifyCardScrollTracker';
-import { useSpotifyScrollProgress } from './SpotifyHeaderContext';
 import { useWaveformBounce } from './useWaveformBounce';
 
 /** Album art hover scales from the left (GPU). Text shifts via translateX (GPU). */
@@ -200,7 +201,7 @@ function scrollToNowPlayingCard() {
 
 export function SpotifyHeaderThumbnail({ track }: SpotifyHeaderThumbnailProps) {
   const pathname = usePathname();
-  const scrollContext = useSpotifyScrollProgress();
+  const scrollContext = usePageScrollProgress();
   const isHome = pathname === '/';
   // null = not measured yet; on home page stay hidden until measured, elsewhere show immediately
   const scrollProgress = scrollContext?.scrollProgress ?? (isHome ? 0 : 1);
@@ -238,11 +239,15 @@ export function SpotifyHeaderThumbnail({ track }: SpotifyHeaderThumbnailProps) {
   const albumImageUrl = track.albumImage.url;
   const colors = getContrastingColors(track);
 
-  const statusText = isPlaying
-    ? 'Now Playing'
-    : track.relativePlayedAt
-      ? `Played ${track.relativePlayedAt}`
-      : 'Just Played';
+  const statusText = isPlaying ? (
+    'Now Playing'
+  ) : track.playedAt ? (
+    <>
+      Played <RelativeTime date={track.playedAt} />
+    </>
+  ) : (
+    'Just Played'
+  );
 
   return (
     <Box aria-hidden={!isVisible} sx={getWidthWrapperSx(isVisible)}>
