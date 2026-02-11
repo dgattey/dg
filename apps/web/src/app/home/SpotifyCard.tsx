@@ -1,3 +1,5 @@
+import 'server-only';
+
 import type { Track } from '@dg/content-models/spotify/Track';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { FaIcon } from '@dg/ui/icons/FaIcon';
@@ -5,7 +7,10 @@ import type { SxObject } from '@dg/ui/theme';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { Box, Card, Skeleton, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
+import { Suspense } from 'react';
+import { getLatestSong } from '../../services/spotify';
 import { ALBUM_ART_BORDER_RADIUS, ALBUM_ART_DIMENSIONS } from '../spotify/AlbumImage';
+import { SpotifyCardScrollTracker } from '../spotify/SpotifyCardScrollTracker';
 import { TrackListing } from '../spotify/TrackListing';
 
 type SpotifyCardShellProps = {
@@ -88,9 +93,9 @@ function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
 }
 
 /**
- * Loading skeleton for SpotifyCard shown during Suspense.
+ * Loading skeleton shown during Suspense.
  */
-export function SpotifyCardLoading() {
+function SpotifyCardLoading() {
   return (
     <SpotifyCardShell>
       <Stack sx={loadingLayoutSx}>
@@ -112,21 +117,41 @@ export function SpotifyCardLoading() {
   );
 }
 
-type SpotifyCardProps = {
-  track: Track | null;
-};
-
 /**
- * Shows a card with the latest data from Spotify
+ * Shows a card with the latest data from Spotify, wrapped in the
+ * gradient shell and scroll tracker.
  */
-export function SpotifyCard({ track }: SpotifyCardProps) {
+function SpotifyCardContent({ track }: { track: Track | null }) {
   if (!track) {
     return null;
   }
 
   return (
-    <SpotifyCardShell gradient={track.albumGradient}>
-      <TrackListing track={track} />
-    </SpotifyCardShell>
+    <SpotifyCardScrollTracker>
+      <SpotifyCardShell gradient={track.albumGradient}>
+        <TrackListing track={track} />
+      </SpotifyCardShell>
+    </SpotifyCardScrollTracker>
+  );
+}
+
+/**
+ * Async data-fetching wrapper. Fetches the latest song server-side
+ * and renders the card content.
+ */
+async function SpotifyCardAsync() {
+  const track = await getLatestSong();
+  return <SpotifyCardContent track={track} />;
+}
+
+/**
+ * Public entry point for the Spotify card on the homepage.
+ * Wraps the async content in Suspense with a loading skeleton.
+ */
+export function SpotifyCardSlot() {
+  return (
+    <Suspense fallback={<SpotifyCardLoading />}>
+      <SpotifyCardAsync />
+    </Suspense>
   );
 }

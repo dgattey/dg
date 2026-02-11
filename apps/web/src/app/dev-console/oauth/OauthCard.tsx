@@ -46,7 +46,11 @@ function ButtonGrid({ children }: { children: React.ReactNode }) {
   return (
     <Stack
       direction="row"
-      sx={{ display: 'grid', gap: 1, gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}
+      sx={{
+        display: 'grid',
+        gap: 1,
+        gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+      }}
     >
       {children}
     </Stack>

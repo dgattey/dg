@@ -7,24 +7,46 @@ import { Box, Typography } from '@mui/material';
 import { Music } from 'lucide-react';
 import { useWaveformBounce } from './useWaveformBounce';
 
+type ListingVariant = 'card' | 'compact';
+
 type PlaybackStatusProps = {
   isPlaying?: Track['isPlaying'];
   playedAt?: Track['playedAt'];
   color?: string;
   textShadow?: string;
+  /** Override animation state separately from playback status. Defaults to matching isPlaying. */
+  animating?: boolean;
+  listingVariant?: ListingVariant;
 };
 
-const getStatusSx = (color?: string, textShadow?: string): SxObject => ({
-  alignItems: 'center',
-  color,
-  display: 'flex',
-  gap: 1,
-  textShadow,
-});
+function getStatusSx(
+  listingVariant: ListingVariant,
+  color?: string,
+  textShadow?: string,
+): SxObject {
+  const isCompact = listingVariant === 'compact';
+  return {
+    alignItems: 'center',
+    color,
+    display: 'flex',
+    gap: isCompact ? 0.5 : 1,
+    textShadow,
+    ...(isCompact ? { lineHeight: 1.2, minWidth: 0, width: '100%' } : {}),
+  };
+}
 
 const iconWrapperSx: SxObject = {
   backfaceVisibility: 'hidden',
   display: 'inline-flex',
+  flexShrink: 0,
+};
+
+const compactTextSx: SxObject = {
+  flexShrink: 1,
+  minWidth: 0,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
 };
 
 /**
@@ -48,25 +70,45 @@ function StatusText({
 }
 
 /**
- * Creates an element that shows if Spotify is currently playing, or if not,
- * when it last was. The music icon bounces when playing.
+ * Shows playback status text with a bouncing music icon when playing.
+ * Styling is driven by the parent TrackListing's variant.
  */
-export function PlaybackStatus({ isPlaying, playedAt, color, textShadow }: PlaybackStatusProps) {
+export function PlaybackStatus({
+  isPlaying,
+  playedAt,
+  color,
+  textShadow,
+  animating,
+  listingVariant = 'card',
+}: PlaybackStatusProps) {
   const isNowPlaying = isPlaying ?? !playedAt;
+  const shouldAnimate = animating ?? isNowPlaying;
+  const isCompact = listingVariant === 'compact';
 
   const bounceRef = useWaveformBounce<HTMLSpanElement>({
-    intensity: 0.8, // Slightly smaller bounce for the icon
-    isPlaying: isNowPlaying,
+    intensity: 0.8,
+    isPlaying: shouldAnimate,
   });
 
+  const statusContent = <StatusText isNowPlaying={isNowPlaying} playedAt={playedAt} />;
+  const iconSize = isCompact ? '1em' : '1.25em';
+
   return (
-    <Typography component="div" sx={getStatusSx(color, textShadow)} variant="overline">
-      <span>
-        <StatusText isNowPlaying={isNowPlaying} playedAt={playedAt} />
-      </span>
+    <Typography
+      component="div"
+      sx={getStatusSx(listingVariant, color, textShadow)}
+      variant="overline"
+    >
+      {isCompact ? (
+        <Box component="span" sx={compactTextSx}>
+          {statusContent}
+        </Box>
+      ) : (
+        <span>{statusContent}</span>
+      )}
       {isNowPlaying ? (
         <Box component="span" ref={bounceRef} sx={iconWrapperSx}>
-          <Music size="1.25em" />
+          <Music size={iconSize} />
         </Box>
       ) : null}
     </Typography>

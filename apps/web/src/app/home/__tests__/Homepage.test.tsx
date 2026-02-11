@@ -73,7 +73,9 @@ describe('Homepage basics', () => {
 
     expect(screen.getByText('About me')).toBeInTheDocument();
 
-    const themePicker = screen.getByRole('radiogroup', { name: 'Choose color scheme' });
+    const themePicker = screen.getByRole('radiogroup', {
+      name: 'Choose color scheme',
+    });
     const radios = within(themePicker).getAllByRole('radio', { hidden: true });
     const darkRadio = radios.find(
       (radio) => radio instanceof HTMLInputElement && radio.value === 'dark',

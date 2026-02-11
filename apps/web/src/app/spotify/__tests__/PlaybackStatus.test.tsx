@@ -32,7 +32,9 @@ describe('PlaybackStatus', () => {
   });
 
   it('shows relative time when played in the past', () => {
-    render(<PlaybackStatus playedAt="2026-02-10T09:00:00Z" />, { wrapper: TestWrapper });
+    render(<PlaybackStatus playedAt="2026-02-10T09:00:00Z" />, {
+      wrapper: TestWrapper,
+    });
 
     expect(screen.getByText(/played/i)).toBeInTheDocument();
     expect(screen.getByText('3 hours ago')).toBeInTheDocument();

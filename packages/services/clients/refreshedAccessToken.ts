@@ -111,7 +111,12 @@ async function refreshTokenAndPersistInternal(
     expiryAt,
   } = await fetchRefreshedTokenFromApi(name, refreshTokenConfig, refreshToken);
   log.info('Fetched refreshed token', { name });
-  await createOrUpdateToken({ accessToken, expiryAt, name, refreshToken: newRefreshToken });
+  await createOrUpdateToken({
+    accessToken,
+    expiryAt,
+    name,
+    refreshToken: newRefreshToken,
+  });
   log.info('Updated token in db, returning', { name });
   return { accessToken, expiryAt, refreshToken: newRefreshToken };
 }

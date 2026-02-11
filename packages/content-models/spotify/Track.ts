@@ -85,10 +85,6 @@ export const trackApiSchema = v.looseObject({
    * Current playback position, in milliseconds.
    */
   progress_ms: v.optional(v.number()),
-  /**
-   * Server-derived relative timestamp for last played tracks.
-   */
-  relativePlayedAt: v.optional(v.nullable(v.string())),
 });
 
 type ArtistApi = v.InferOutput<typeof referenceApiSchema>;
@@ -137,7 +133,6 @@ export type Track = Artist & {
   albumImage: AlbumImage;
   durationMs?: number;
   playedAt?: string;
-  relativePlayedAt?: string | null;
   progressMs?: number;
   isPlaying?: boolean;
   albumGradient?: string;
@@ -182,6 +177,5 @@ export const mapTrackFromApi = (track: TrackApi): Track | null => {
     isPlaying: track.is_playing,
     playedAt: track.played_at,
     progressMs: track.progress_ms,
-    relativePlayedAt: track.relativePlayedAt,
   };
 };

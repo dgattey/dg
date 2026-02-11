@@ -29,6 +29,8 @@ export function handleWebhookGet(request: NextRequest): NextResponse {
     return jsonError('Bad Request', 400);
   }
 
-  log.info('Invalid Strava webhook GET - challenge validation failed', { query });
+  log.info('Invalid Strava webhook GET - challenge validation failed', {
+    query,
+  });
   return jsonError('Bad Request', 400);
 }

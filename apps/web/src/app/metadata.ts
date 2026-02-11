@@ -47,8 +47,16 @@ export const baseMetadata: Metadata = {
     apple: '/apple-touch-icon.png',
     icon: [
       { sizes: '32x32', url: '/favicon.ico' },
-      { media: '(prefers-color-scheme: light)', type: 'image/svg+xml', url: '/icon-light.svg' },
-      { media: '(prefers-color-scheme: dark)', type: 'image/svg+xml', url: '/icon-dark.svg' },
+      {
+        media: '(prefers-color-scheme: light)',
+        type: 'image/svg+xml',
+        url: '/icon-light.svg',
+      },
+      {
+        media: '(prefers-color-scheme: dark)',
+        type: 'image/svg+xml',
+        url: '/icon-dark.svg',
+      },
     ],
   },
   manifest: '/manifest.webmanifest',
@@ -63,8 +71,14 @@ export const baseMetadata: Metadata = {
 
 export const viewport: Viewport = {
   themeColor: [
-    { color: COLORS.LIGHT.DEFAULT_BACKGROUND, media: '(prefers-color-scheme: light)' },
-    { color: COLORS.DARK.DEFAULT_BACKGROUND, media: '(prefers-color-scheme: dark)' },
+    {
+      color: COLORS.LIGHT.DEFAULT_BACKGROUND,
+      media: '(prefers-color-scheme: light)',
+    },
+    {
+      color: COLORS.DARK.DEFAULT_BACKGROUND,
+      media: '(prefers-color-scheme: dark)',
+    },
   ],
 };
 

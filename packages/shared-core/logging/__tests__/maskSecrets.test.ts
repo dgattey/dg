@@ -50,18 +50,35 @@ describe('maskSecrets', () => {
   });
 
   it('masks sensitive keys in objects', () => {
-    expect(maskSecrets({ accessToken: 'secret123abc' })).toEqual({ accessToken: 'sec...abc' });
-    expect(maskSecrets({ refreshToken: 'abcdefghij' })).toEqual({ refreshToken: 'abc...hij' });
-    expect(maskSecrets({ password: 'mypassword1' })).toEqual({ password: 'myp...rd1' });
-    expect(maskSecrets({ authorization: 'Bearer xyz' })).toEqual({ authorization: 'Bearer ***' });
-    expect(maskSecrets({ secret: 'topsecret1' })).toEqual({ secret: 'top...et1' });
-    expect(maskSecrets({ apiKey: 'key123456789' })).toEqual({ apiKey: 'key...789' });
+    expect(maskSecrets({ accessToken: 'secret123abc' })).toEqual({
+      accessToken: 'sec...abc',
+    });
+    expect(maskSecrets({ refreshToken: 'abcdefghij' })).toEqual({
+      refreshToken: 'abc...hij',
+    });
+    expect(maskSecrets({ password: 'mypassword1' })).toEqual({
+      password: 'myp...rd1',
+    });
+    expect(maskSecrets({ authorization: 'Bearer xyz' })).toEqual({
+      authorization: 'Bearer ***',
+    });
+    expect(maskSecrets({ secret: 'topsecret1' })).toEqual({
+      secret: 'top...et1',
+    });
+    expect(maskSecrets({ apiKey: 'key123456789' })).toEqual({
+      apiKey: 'key...789',
+    });
     expect(maskSecrets({ code: 'authcode123' })).toEqual({ code: 'aut...123' });
   });
 
   it('does not mask non-sensitive keys', () => {
-    expect(maskSecrets({ count: 5, name: 'test' })).toEqual({ count: 5, name: 'test' });
-    expect(maskSecrets({ message: 'hello world' })).toEqual({ message: 'hello world' });
+    expect(maskSecrets({ count: 5, name: 'test' })).toEqual({
+      count: 5,
+      name: 'test',
+    });
+    expect(maskSecrets({ message: 'hello world' })).toEqual({
+      message: 'hello world',
+    });
   });
 
   it('handles nested objects', () => {
@@ -83,7 +100,11 @@ describe('maskSecrets', () => {
   it('serializes Error objects without masking non-secret messages', () => {
     const error = new Error('Something failed');
     error.name = 'TestError';
-    const result = maskSecrets(error) as { message: string; name: string; stack?: string };
+    const result = maskSecrets(error) as {
+      message: string;
+      name: string;
+      stack?: string;
+    };
     expect(result.message).toBe('Something failed');
     expect(result.name).toBe('TestError');
     expect(result.stack).toBeDefined();

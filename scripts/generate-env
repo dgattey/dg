@@ -52,20 +52,36 @@ TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
 for key in "${keys[@]}"; do
-  (op read "op://dg/${key}/value" > "${TMP_DIR}/${key}" 2>&1) &
+  (
+    if op read "op://dg/${key}/value" > "${TMP_DIR}/${key}" 2>/dev/null; then
+      touch "${TMP_DIR}/${key}.ok"
+    else
+      echo "not_found" > "${TMP_DIR}/${key}"
+    fi
+  ) &
 done
 wait
 
-# Write secrets to .env
-for file in "$TMP_DIR"/*; do
-  [[ -f "$file" ]] || continue
-  key="$(basename "$file")"
-  value="$(<"$file")"
-
-  if [[ -z "$value" || "$value" == *"ERROR"* ]]; then
-    echo "Failed to read $key from 1Password" >&2
-    exit 1
+# Check for failures and write secrets to .env
+missing_keys=()
+for key in "${keys[@]}"; do
+  if [[ ! -f "${TMP_DIR}/${key}.ok" ]]; then
+    missing_keys+=("$key")
   fi
+done
+
+if [[ ${#missing_keys[@]} -gt 0 ]]; then
+  echo "ERROR: The following keys from config/env.secrets.keys were not found in 1Password vault 'dg':" >&2
+  for key in "${missing_keys[@]}"; do
+    echo "  - $key" >&2
+  done
+  echo "" >&2
+  echo "To fix: Add each missing key as an item in 1Password vault 'dg' with the value in a field named 'value'" >&2
+  exit 1
+fi
+
+for key in "${keys[@]}"; do
+  value="$(<"${TMP_DIR}/${key}")"
 
   # Escape for .env format
   value="${value//\\/\\\\}"

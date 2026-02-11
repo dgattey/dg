@@ -1,31 +1,31 @@
 {
   "typescript.tsdk": "node_modules/typescript/lib",
-  "typescript.enablePromptUseWorkspaceTsdk": true,
-  "editor.formatOnSave": true,
-  "editor.codeActionsOnSave": {
-    "source.fixAll.biome": "explicit",
-    "source.action.useSortedKeys.biome": "explicit",
-    "source.action.useSortedProperties.biome": "explicit",
-    "source.action.useSortedAttributes.biome": "explicit",
-    "source.action.organizeImports.biome": "explicit"
-  },
-  "editor.defaultFormatter": "biomejs.biome",
-  "[javascript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[typescript]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[typescriptreact]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[json]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "[jsonc]": {
-    "editor.defaultFormatter": "biomejs.biome"
-  },
-  "workbench.preferredDarkColorTheme": "Nebula Oni (Cerberus)",
-  "workbench.preferredLightColorTheme": "Ayu Light Bordered",
-  "jest.jestCommandLine": "turbo test --"
+	"typescript.enablePromptUseWorkspaceTsdk": true,
+	"editor.formatOnSave": true,
+	"editor.codeActionsOnSave": {
+		"source.fixAll.biome": "explicit",
+		"source.action.useSortedKeys.biome": "explicit",
+		"source.action.useSortedProperties.biome": "explicit",
+		"source.action.useSortedAttributes.biome": "explicit",
+		"source.action.organizeImports.biome": "explicit"
+	},
+	"editor.defaultFormatter": "biomejs.biome",
+	"[javascript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescript]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[json]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"[jsonc]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	},
+	"workbench.preferredDarkColorTheme": "Nebula Oni (Cerberus)",
+	"workbench.preferredLightColorTheme": "Ayu Light Bordered",
+	"jest.jestCommandLine": "turbo test --"
 }

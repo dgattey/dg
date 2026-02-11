@@ -35,7 +35,10 @@ export async function completeOauthFlow({
     return { status: 'missing-state' };
   }
 
-  log.info('Received OAuth callback', { code: code.slice(0, 8), stateLength: state.length });
+  log.info('Received OAuth callback', {
+    code: code.slice(0, 8),
+    stateLength: state.length,
+  });
 
   const storedState = await retrieveAndDeleteOauthState(state);
 

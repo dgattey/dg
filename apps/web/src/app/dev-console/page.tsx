@@ -26,7 +26,10 @@ function CardSection({ title, children }: { title: string; children: React.React
         sx={{
           display: 'grid',
           gap: 4,
-          gridTemplateColumns: { sm: 'repeat(2, minmax(280px, 1fr))', xs: '1fr' },
+          gridTemplateColumns: {
+            sm: 'repeat(2, minmax(280px, 1fr))',
+            xs: '1fr',
+          },
         }}
       >
         {children}

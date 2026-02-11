@@ -1,5 +1,5 @@
-import { dotenvLoad } from 'dotenv-mono';
-import dbConfig from './dbConfig';
+import { dotenvLoad } from "dotenv-mono";
+import dbConfig from "./dbConfig";
 
 dotenvLoad();
 

@@ -19,7 +19,10 @@ export function ContentGrid({ children }: Props) {
     gap: { md: `${gridGapLarge}rem`, xs: `${gridGap}rem` },
     gridAutoFlow: 'dense',
     gridAutoRows: { md: `minmax(${gridItemDimension}rem, auto)` },
-    gridTemplateColumns: { md: `repeat(auto-fit, ${gridItemDimension}rem)`, xs: '1fr' },
+    gridTemplateColumns: {
+      md: `repeat(auto-fit, ${gridItemDimension}rem)`,
+      xs: '1fr',
+    },
     justifyContent: 'center',
     marginTop: -4,
     position: 'relative',

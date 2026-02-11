@@ -5,10 +5,13 @@ import type { SxObject } from '@dg/ui/theme';
 import { Typography } from '@mui/material';
 import { Fragment } from 'react';
 
+type ListingVariant = 'card' | 'compact';
+
 type ArtistListProps = {
   artists: Array<Artist>;
   color?: string;
   textShadow?: string;
+  listingVariant?: ListingVariant;
 };
 
 type SeparatorProps = {
@@ -16,18 +19,42 @@ type SeparatorProps = {
   fullList: Array<unknown>;
 };
 
-const getArtistListSx = (color?: string, textShadow?: string): SxObject => ({
+const cardBaseSx: SxObject = {
   ...truncated(1),
-  ...(color
-    ? {
-        '& a': {
-          color: 'inherit',
-        },
-        color,
-      }
-    : {}),
-  ...(textShadow ? { textShadow } : {}),
-});
+};
+
+const compactBaseSx: SxObject = {
+  ...truncated(1),
+  lineHeight: 1.2,
+  opacity: 0.6,
+};
+
+const VARIANT_SX: Record<ListingVariant, SxObject> = {
+  card: cardBaseSx,
+  compact: compactBaseSx,
+};
+
+const TYPOGRAPHY_VARIANT: Record<ListingVariant, 'body2' | 'caption'> = {
+  card: 'body2',
+  compact: 'caption',
+};
+
+function getArtistListSx(
+  listingVariant: ListingVariant,
+  color?: string,
+  textShadow?: string,
+): SxObject {
+  return {
+    ...VARIANT_SX[listingVariant],
+    ...(color
+      ? {
+          '& a': { color: 'inherit' },
+          color,
+        }
+      : {}),
+    ...(textShadow ? { textShadow } : {}),
+  };
+}
 
 /**
  * Creates a separator for use after an item at index
@@ -46,29 +73,41 @@ const separator = ({ index, fullList }: SeparatorProps) => {
 };
 
 /**
- * Creates a list of artists, where each artist links
- * directly to their artist page. Uses inherited colors
- * for best usage with display elsewhere. Shows an underline
- * on hover.
+ * Creates a list of artists with smart separators. Card variant renders each
+ * artist as a link; compact variant renders plain text.
  */
-export function ArtistList({ artists, color, textShadow }: ArtistListProps) {
+export function ArtistList({
+  artists,
+  color,
+  textShadow,
+  listingVariant = 'card',
+}: ArtistListProps) {
+  const isLinked = listingVariant === 'card';
+  const typographyVariant = TYPOGRAPHY_VARIANT[listingVariant];
+
   return (
-    <Typography component="span" sx={getArtistListSx(color, textShadow)} variant="body2">
-      {artists.map((artist, index) => {
-        return (
-          <Fragment key={artist.id}>
+    <Typography
+      component="span"
+      sx={getArtistListSx(listingVariant, color, textShadow)}
+      variant={typographyVariant}
+    >
+      {artists.map((artist, index) => (
+        <Fragment key={artist.id}>
+          {isLinked ? (
             <Link
               href={artist.externalUrls.spotify}
               isExternal={true}
               title={artist.name}
-              variant="body2"
+              variant={typographyVariant}
             >
               {artist.name}
             </Link>
-            <span>{separator({ fullList: artists, index })}</span>
-          </Fragment>
-        );
-      })}
+          ) : (
+            artist.name
+          )}
+          <span>{separator({ fullList: artists, index })}</span>
+        </Fragment>
+      ))}
     </Typography>
   );
 }
