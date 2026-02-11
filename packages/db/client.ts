@@ -3,12 +3,14 @@ import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { getDatabaseUrl, sequelizeOptions } from './dbConfig';
 import { OauthState } from './models/OauthState';
+import { SpotifyPlay } from './models/SpotifyPlay';
 import { StravaActivity } from './models/StravaActivity';
 import { Token } from './models/Token';
 
 // Models
 export const db = {
   OauthState,
+  SpotifyPlay,
   StravaActivity,
   Token,
 } as const;
