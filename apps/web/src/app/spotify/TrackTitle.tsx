@@ -14,19 +14,15 @@ type TrackTitleProps = {
   listingVariant?: ListingVariant;
 };
 
-const cardBaseSx: SxObject = {
-  ...truncated(1),
-  marginBottom: 1,
-};
-
-const compactBaseSx: SxObject = {
-  ...truncated(1),
-  lineHeight: 1.2,
-};
-
 const VARIANT_SX: Record<ListingVariant, SxObject> = {
-  card: cardBaseSx,
-  compact: compactBaseSx,
+  card: {
+    ...truncated(1),
+    marginBottom: 1,
+  },
+  compact: {
+    ...truncated(1),
+    lineHeight: 1.2,
+  },
 };
 
 const TYPOGRAPHY_VARIANT: Record<ListingVariant, 'h5' | 'caption'> = {

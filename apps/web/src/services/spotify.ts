@@ -11,5 +11,5 @@ export const getLatestSong = async () => {
   cacheLife('seconds');
   cacheTag(LATEST_SONG_TAG);
   const track = await withMissingTokenFallback(fetchRecentlyPlayed());
-    return track;
+  return track;
 };
