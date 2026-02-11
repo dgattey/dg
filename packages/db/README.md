@@ -5,11 +5,11 @@ Neon PostgreSQL database with Sequelize ORM for migrations and models.
 ## Structure
 
 - `migrations/` - Sequelize migration files
-- `models/` - Database models (Token, StravaActivity)
+- `models/` - Database models (Token, StravaActivity, SpotifyPlay)
 
 ## Key Exports
 
-- `db` - Object with all models (StravaActivity, Token)
+- `db` - Object with all models (StravaActivity, Token, etc)
 - `dbClient` - Sequelize client instance
 - `connectToDatabase()` - Verify connection (called automatically in non-test environments)
 - `closeDbConnection()` - Close connection (used by test cleanup)
