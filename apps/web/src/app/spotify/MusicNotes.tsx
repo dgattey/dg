@@ -11,7 +11,7 @@ type MusicNotesProps = {
    */
   isPlaying: boolean;
   /**
-   * Color for the music notes (defaults to current text color)
+   * Color for the music notes (defaults to inherited text color)
    */
   noteColor?: string;
   /**
@@ -36,14 +36,14 @@ const NOTE_LIFETIME_MS = 3000;
 const MAX_NOTES = 18;
 
 const COMPACT = {
-  distanceMin: 26,
-  distanceRange: 24,
+  distanceMin: 30,
+  distanceRange: 28,
   durationMs: 2000,
   durationRandomMs: 400,
-  iconSize: 15,
+  iconSize: 18,
   maxNotes: 10,
-  scaleMin: 0.65,
-  scaleRange: 0.25,
+  scaleMin: 0.8,
+  scaleRange: 0.3,
 };
 
 // GPU-accelerated float animation for notes
@@ -88,7 +88,7 @@ const getNoteSx = (note: MusicNote, noteColor?: string): SxObject => ({
   animationDelay: `${note.delay}ms`,
   backfaceVisibility: 'hidden',
   color: noteColor ?? 'currentColor',
-  filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))',
+  filter: 'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))',
   left: 0,
   opacity: 0,
   position: 'absolute',

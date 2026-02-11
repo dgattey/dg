@@ -58,7 +58,9 @@ describe('RelativeTime', () => {
   });
 
   it('computes and renders relative time from date string', () => {
-    render(<RelativeTime date="2026-02-10T09:00:00Z" />, { wrapper: TestWrapper });
+    render(<RelativeTime date="2026-02-10T09:00:00Z" />, {
+      wrapper: TestWrapper,
+    });
 
     // With server time context, initial render shows the time immediately
     expect(screen.getByText('3 hours ago')).toBeInTheDocument();
@@ -109,7 +111,9 @@ describe('RelativeTime', () => {
   });
 
   it('wraps output in time element with dateTime and tooltip with full localized date', () => {
-    render(<RelativeTime date="2026-02-10T09:00:00Z" />, { wrapper: TestWrapper });
+    render(<RelativeTime date="2026-02-10T09:00:00Z" />, {
+      wrapper: TestWrapper,
+    });
 
     const timeEl = screen.getByText('3 hours ago').closest('time');
     expect(timeEl).toBeInTheDocument();
@@ -148,7 +152,9 @@ describe('RelativeTime', () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const { restore, showPopover } = setupPopoverMocks();
 
-    render(<RelativeTime date="2026-02-10T09:00:00Z" />, { wrapper: TestWrapper });
+    render(<RelativeTime date="2026-02-10T09:00:00Z" />, {
+      wrapper: TestWrapper,
+    });
 
     const timeEl = screen.getByText(/ago|Yesterday/).closest('time');
     const anchor = timeEl?.parentElement;

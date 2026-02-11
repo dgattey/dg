@@ -39,7 +39,10 @@ export async function forceRefreshToken(provider: OauthProviderKey): Promise<For
     return { expiresAt: refreshed.expiryAt, success: true };
   } catch (error) {
     if (error instanceof MissingTokenError) {
-      return { error: 'No refresh token found. Please re-authenticate.', success: false };
+      return {
+        error: 'No refresh token found. Please re-authenticate.',
+        success: false,
+      };
     }
 
     const message = error instanceof Error ? error.message : 'Unknown error';

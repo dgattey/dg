@@ -13,7 +13,8 @@ export const SPOTIFY_ART_ABOVE_NOTES_Z_INDEX = 2;
 type AlbumArtWithNotesProps = {
   children: ReactNode;
   isPlaying: boolean;
-  noteColor: string | undefined;
+  /** Override note color. Defaults to inherited text color. */
+  noteColor?: string;
   notesVariant?: 'default' | 'compact';
   /** When false, notes and bounce are off (e.g. when off-screen). Default true. */
   shouldAnimate?: boolean;

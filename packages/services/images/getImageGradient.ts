@@ -205,7 +205,12 @@ async function getVibrantColors(buffer: Buffer): Promise<Array<Hsl>> {
       existing.sSum += hsl.s;
       existing.lSum += hsl.l;
     } else {
-      buckets.set(bucketKey, { count: 1, hSum: hsl.h, lSum: hsl.l, sSum: hsl.s });
+      buckets.set(bucketKey, {
+        count: 1,
+        hSum: hsl.h,
+        lSum: hsl.l,
+        sSum: hsl.s,
+      });
     }
   }
 

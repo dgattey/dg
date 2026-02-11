@@ -20,7 +20,10 @@ describe('contentful schemas', () => {
           {
             content: {
               json: { content: [], nodeType: 'document' },
-              links: { assets: { block: [] }, entries: { block: [], inline: [] } },
+              links: {
+                assets: { block: [] },
+                entries: { block: [], inline: [] },
+              },
             },
           },
         ],
@@ -58,7 +61,11 @@ describe('contentful schemas', () => {
             description: { json: { content: [], nodeType: 'document' } },
             layout: 'default',
             link: { url: 'https://example.com' },
-            thumbnail: { height: 480, url: 'https://example.com/image.webp', width: 640 },
+            thumbnail: {
+              height: 480,
+              url: 'https://example.com/image.webp',
+              width: 640,
+            },
             title: 'Project',
             type: ['Web', 'OpenSource'],
           },

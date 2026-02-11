@@ -3,7 +3,7 @@ import { getProjects } from '../../services/contentful';
 import { IntroCardSlot } from './IntroCardSlot';
 import { MapPreviewCardSlot } from './MapPreviewCardSlot';
 import { ProjectCard } from './ProjectCard';
-import { SpotifyCardSlot } from './SpotifyCardSlot';
+import { SpotifyCardSlot } from './SpotifyCard';
 import { StravaCardSlot } from './StravaCardSlot';
 
 /**

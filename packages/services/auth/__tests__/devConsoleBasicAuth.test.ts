@@ -10,25 +10,37 @@ const encode = (username: string, password: string) =>
 
 describe('hasDevConsoleCredentials', () => {
   it('returns false when neither env var is set', () => {
-    mockEnv({ DEV_CONSOLE_BASIC_AUTH_PASS: undefined, DEV_CONSOLE_BASIC_AUTH_USER: undefined });
+    mockEnv({
+      DEV_CONSOLE_BASIC_AUTH_PASS: undefined,
+      DEV_CONSOLE_BASIC_AUTH_USER: undefined,
+    });
 
     expect(hasDevConsoleCredentials()).toBe(false);
   });
 
   it('returns false when only username is set', () => {
-    mockEnv({ DEV_CONSOLE_BASIC_AUTH_PASS: undefined, DEV_CONSOLE_BASIC_AUTH_USER: 'dev' });
+    mockEnv({
+      DEV_CONSOLE_BASIC_AUTH_PASS: undefined,
+      DEV_CONSOLE_BASIC_AUTH_USER: 'dev',
+    });
 
     expect(hasDevConsoleCredentials()).toBe(false);
   });
 
   it('returns false when only password is set', () => {
-    mockEnv({ DEV_CONSOLE_BASIC_AUTH_PASS: 'pass', DEV_CONSOLE_BASIC_AUTH_USER: undefined });
+    mockEnv({
+      DEV_CONSOLE_BASIC_AUTH_PASS: 'pass',
+      DEV_CONSOLE_BASIC_AUTH_USER: undefined,
+    });
 
     expect(hasDevConsoleCredentials()).toBe(false);
   });
 
   it('returns true when both env vars are set', () => {
-    mockEnv({ DEV_CONSOLE_BASIC_AUTH_PASS: 'pass', DEV_CONSOLE_BASIC_AUTH_USER: 'dev' });
+    mockEnv({
+      DEV_CONSOLE_BASIC_AUTH_PASS: 'pass',
+      DEV_CONSOLE_BASIC_AUTH_USER: 'dev',
+    });
 
     expect(hasDevConsoleCredentials()).toBe(true);
   });
@@ -36,7 +48,10 @@ describe('hasDevConsoleCredentials', () => {
 
 describe('isValidDevConsoleAuth', () => {
   beforeEach(() => {
-    mockEnv({ DEV_CONSOLE_BASIC_AUTH_PASS: 'secret', DEV_CONSOLE_BASIC_AUTH_USER: 'admin' });
+    mockEnv({
+      DEV_CONSOLE_BASIC_AUTH_PASS: 'secret',
+      DEV_CONSOLE_BASIC_AUTH_USER: 'admin',
+    });
   });
 
   it('returns false for null header', () => {
@@ -79,7 +94,10 @@ describe('isValidDevConsoleAuth', () => {
   });
 
   it('returns false when credentials are not configured', () => {
-    mockEnv({ DEV_CONSOLE_BASIC_AUTH_PASS: undefined, DEV_CONSOLE_BASIC_AUTH_USER: undefined });
+    mockEnv({
+      DEV_CONSOLE_BASIC_AUTH_PASS: undefined,
+      DEV_CONSOLE_BASIC_AUTH_USER: undefined,
+    });
 
     expect(isValidDevConsoleAuth(encode('admin', 'secret'))).toBe(false);
   });
@@ -88,7 +106,10 @@ describe('isValidDevConsoleAuth', () => {
 describe('isDevConsoleAccessAllowed', () => {
   describe('when credentials are configured', () => {
     beforeEach(() => {
-      mockEnv({ DEV_CONSOLE_BASIC_AUTH_PASS: 'secret', DEV_CONSOLE_BASIC_AUTH_USER: 'admin' });
+      mockEnv({
+        DEV_CONSOLE_BASIC_AUTH_PASS: 'secret',
+        DEV_CONSOLE_BASIC_AUTH_USER: 'admin',
+      });
     });
 
     it('returns true for valid credentials in development', () => {
@@ -124,7 +145,10 @@ describe('isDevConsoleAccessAllowed', () => {
 
   describe('when credentials are not configured', () => {
     beforeEach(() => {
-      mockEnv({ DEV_CONSOLE_BASIC_AUTH_PASS: undefined, DEV_CONSOLE_BASIC_AUTH_USER: undefined });
+      mockEnv({
+        DEV_CONSOLE_BASIC_AUTH_PASS: undefined,
+        DEV_CONSOLE_BASIC_AUTH_USER: undefined,
+      });
     });
 
     it('allows access in development', () => {

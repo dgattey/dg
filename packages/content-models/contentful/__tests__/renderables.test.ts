@@ -4,7 +4,13 @@ import { toRenderableRichTextContent } from '../renderables/richText';
 
 describe('contentful renderables', () => {
   it('filters out links missing required fields', () => {
-    expect(toRenderableLink({ icon: null, title: 'Example', url: 'https://example.com' })).toEqual({
+    expect(
+      toRenderableLink({
+        icon: null,
+        title: 'Example',
+        url: 'https://example.com',
+      }),
+    ).toEqual({
       icon: null,
       title: 'Example',
       url: 'https://example.com',
@@ -20,7 +26,11 @@ describe('contentful renderables', () => {
       description: { json: { content: [], nodeType: 'document' } },
       layout: 'default',
       link: { url: 'https://example.com' },
-      thumbnail: { height: 480, url: 'https://example.com/image.webp', width: 640 },
+      thumbnail: {
+        height: 480,
+        url: 'https://example.com/image.webp',
+        width: 640,
+      },
       title: 'Project',
       type: ['Web'],
     });
@@ -30,7 +40,11 @@ describe('contentful renderables', () => {
       description: { json: { content: [], nodeType: 'document' } },
       layout: 'default',
       link: { icon: null, title: 'Project', url: 'https://example.com' },
-      thumbnail: { height: 480, url: 'https://example.com/image.webp', width: 640 },
+      thumbnail: {
+        height: 480,
+        url: 'https://example.com/image.webp',
+        width: 640,
+      },
       title: 'Project',
       type: ['Web'],
     });
@@ -65,7 +79,11 @@ describe('contentful renderables', () => {
           block: [
             {
               sys: { id: 'project-good' },
-              thumbnail: { height: 480, url: 'https://example.com/image.webp', width: 640 },
+              thumbnail: {
+                height: 480,
+                url: 'https://example.com/image.webp',
+                width: 640,
+              },
               title: 'Project',
             },
             {
@@ -75,8 +93,18 @@ describe('contentful renderables', () => {
             },
           ],
           inline: [
-            { icon: null, sys: { id: 'link-good' }, title: 'Link', url: 'https://example.com' },
-            { icon: null, sys: { id: 'link-bad' }, title: null, url: 'https://example.com' },
+            {
+              icon: null,
+              sys: { id: 'link-good' },
+              title: 'Link',
+              url: 'https://example.com',
+            },
+            {
+              icon: null,
+              sys: { id: 'link-bad' },
+              title: null,
+              url: 'https://example.com',
+            },
           ],
         },
       },

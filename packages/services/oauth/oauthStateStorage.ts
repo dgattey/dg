@@ -33,7 +33,10 @@ export async function saveOauthState({
     state,
   });
 
-  log.info('Saved OAuth state to database', { provider, statePrefix: state.slice(0, 8) });
+  log.info('Saved OAuth state to database', {
+    provider,
+    statePrefix: state.slice(0, 8),
+  });
 }
 
 type RetrievedOauthState = {
@@ -52,7 +55,9 @@ export async function retrieveAndDeleteOauthState(
   const record = await db.OauthState.findByPk(state);
 
   if (!record) {
-    log.warn('OAuth state not found in database', { statePrefix: state.slice(0, 8) });
+    log.warn('OAuth state not found in database', {
+      statePrefix: state.slice(0, 8),
+    });
     return null;
   }
 

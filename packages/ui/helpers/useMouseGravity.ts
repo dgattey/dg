@@ -65,7 +65,12 @@ interface TiltState {
 }
 
 /** Neutral state: no tilt, centered origin */
-const IDENTITY: TiltState = { originX: 50, originY: 50, rotateX: 0, rotateY: 0 };
+const IDENTITY: TiltState = {
+  originX: 50,
+  originY: 50,
+  rotateX: 0,
+  rotateY: 0,
+};
 
 /**
  * Shortest distance from a point to the nearest edge of a rect.

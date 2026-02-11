@@ -104,8 +104,10 @@ function resolveContents({
   }
 
   const iconElement = icon
-    ? // biome-ignore lint/security/noDangerouslySetInnerHtml: Intended!
-      (BUILT_IN_ICONS[icon] ?? <span dangerouslySetInnerHTML={{ __html: icon }} />)
+    ? (BUILT_IN_ICONS[icon] ?? (
+        // biome-ignore lint/security/noDangerouslySetInnerHtml: Intended!
+        <span dangerouslySetInnerHTML={{ __html: icon }} />
+      ))
     : null;
 
   if (layout === 'icon' && iconElement) {

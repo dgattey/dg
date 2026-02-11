@@ -7,11 +7,12 @@ import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
 import { Card } from '@mui/material';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
-import { getContrastingColors } from './colors';
 
 type AlbumImageProps = {
   isPlaying: boolean;
   track: Track;
+  /** Note color for visibility against the background. */
+  noteColor?: string;
 };
 
 /** Base album art size at md breakpoint */
@@ -58,16 +59,15 @@ const wrapperSx: SxObject = {
 };
 
 /**
- * Album image with notes and waveform bounce when playing. Shared frame with header.
+ * Album image with notes and waveform bounce when playing.
  */
-export function AlbumImage({ track, isPlaying }: AlbumImageProps) {
+export function AlbumImage({ track, isPlaying, noteColor }: AlbumImageProps) {
   const { album, albumImage } = track;
   const albumTitle = album.name;
   const albumUrl = album.externalUrls.spotify;
-  const colors = getContrastingColors(track);
 
   return (
-    <AlbumArtWithNotes isPlaying={isPlaying} noteColor={colors?.primary} wrapperSx={wrapperSx}>
+    <AlbumArtWithNotes isPlaying={isPlaying} noteColor={noteColor} wrapperSx={wrapperSx}>
       <Link href={albumUrl} isExternal={true} sx={linkSx} title={albumTitle}>
         <Card sx={cardSx}>
           <Image

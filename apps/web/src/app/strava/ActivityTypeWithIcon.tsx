@@ -26,7 +26,10 @@ const TYPE_TO_ICON: Record<string, LucideIcon> = {
   Workout: Dumbbell,
 };
 
-function getActivityTypeDisplay(type: string): { label: string; Icon: LucideIcon } {
+function getActivityTypeDisplay(type: string): {
+  label: string;
+  Icon: LucideIcon;
+} {
   const label = type.replace(/([A-Z][a-z]+)/g, ' $1').trim();
   const Icon = TYPE_TO_ICON[type] ?? Activity;
   return { Icon, label };

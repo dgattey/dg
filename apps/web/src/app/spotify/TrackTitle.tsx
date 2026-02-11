@@ -1,38 +1,75 @@
 import { Link } from '@dg/ui/dependent/Link';
 import { truncated } from '@dg/ui/helpers/truncated';
 import type { SxObject } from '@dg/ui/theme';
+import { Typography } from '@mui/material';
+
+type ListingVariant = 'card' | 'compact';
 
 type TrackTitleProps = {
   trackTitle: string;
-  url: string;
-  maxLines?: number;
+  /** If provided, renders as a link to this URL. If omitted, renders as plain text. */
+  url?: string;
   color?: string;
   textShadow?: string;
-  sx?: SxObject;
-  variant?: 'h5' | 'h6';
+  listingVariant?: ListingVariant;
 };
 
+const cardBaseSx: SxObject = {
+  ...truncated(1),
+  marginBottom: 1,
+};
+
+const compactBaseSx: SxObject = {
+  ...truncated(1),
+  lineHeight: 1.2,
+};
+
+const VARIANT_SX: Record<ListingVariant, SxObject> = {
+  card: cardBaseSx,
+  compact: compactBaseSx,
+};
+
+const TYPOGRAPHY_VARIANT: Record<ListingVariant, 'h5' | 'caption'> = {
+  card: 'h5',
+  compact: 'caption',
+};
+
+function getTrackTitleSx(
+  listingVariant: ListingVariant,
+  color?: string,
+  textShadow?: string,
+): SxObject {
+  return {
+    ...VARIANT_SX[listingVariant],
+    ...(color ? { color } : {}),
+    ...(textShadow ? { textShadow } : {}),
+  };
+}
+
 /**
- * Creates an element that shows a track title that links to the song
+ * Shows a track title, optionally linked to the song on Spotify.
+ * Styling is driven by the parent TrackListing's variant.
  */
 export function TrackTitle({
   trackTitle,
   url,
-  maxLines = 2,
   color,
   textShadow,
-  sx,
-  variant = 'h5',
+  listingVariant = 'card',
 }: TrackTitleProps) {
-  const mergedSx: SxObject = {
-    ...truncated(maxLines),
-    ...(color ? { color } : {}),
-    ...(textShadow ? { textShadow } : {}),
-    ...(sx ?? {}),
-  };
+  const sx = getTrackTitleSx(listingVariant, color, textShadow);
+  const typographyVariant = TYPOGRAPHY_VARIANT[listingVariant];
+
+  if (!url) {
+    return (
+      <Typography sx={sx} variant={typographyVariant}>
+        {trackTitle}
+      </Typography>
+    );
+  }
 
   return (
-    <Link href={url} isExternal={true} sx={mergedSx} title={trackTitle} variant={variant}>
+    <Link href={url} isExternal={true} sx={sx} title={trackTitle} variant={typographyVariant}>
       {trackTitle}
     </Link>
   );

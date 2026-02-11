@@ -25,7 +25,13 @@ describe('syncStravaWebhookUpdateWithDb', () => {
     average_speed: 5.944,
     calories: 346,
     distance: 9569.5,
-    gear: { distance: 7828686, id: 'b12917761', name: 'Cruz', primary: false, resource_state: 2 },
+    gear: {
+      distance: 7828686,
+      id: 'b12917761',
+      name: 'Cruz',
+      primary: false,
+      resource_state: 2,
+    },
     gear_id: 'b12917761',
     id: 17234236452,
     map: { id: 'a17234236452', polyline: 'abc', summary_polyline: 'xyz' },
@@ -88,7 +94,10 @@ describe('syncStravaWebhookUpdateWithDb', () => {
     });
 
     it('throws when API returns 404', async () => {
-      mockStravaGet.mockResolvedValue({ response: { json: async () => ({}) }, status: 404 });
+      mockStravaGet.mockResolvedValue({
+        response: { json: async () => ({}) },
+        status: 404,
+      });
 
       await expect(syncStravaWebhookUpdateWithDb(createEvent)).rejects.toThrow(
         'Missing activity data for 17234236452',
@@ -216,7 +225,11 @@ describe('syncStravaWebhookUpdateWithDb', () => {
         id: 17234236452,
         kudos_count: 7,
         location_city: null,
-        map: { id: 'a17234236452', polyline: '}opeFrkcjV...', summary_polyline: 'gdpeF`rcjV...' },
+        map: {
+          id: 'a17234236452',
+          polyline: '}opeFrkcjV...',
+          summary_polyline: 'gdpeF`rcjV...',
+        },
         max_speed: 11.66,
         moving_time: 1610,
         name: 'Heated rivalry with the boysss 🔥',

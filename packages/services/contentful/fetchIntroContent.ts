@@ -86,7 +86,9 @@ export async function fetchIntroContent(): Promise<IntroContent | null> {
   if (textBlockItem?.content && image) {
     return {
       image,
-      textBlock: { content: toRenderableRichTextContent(textBlockItem.content) },
+      textBlock: {
+        content: toRenderableRichTextContent(textBlockItem.content),
+      },
     };
   }
   return null;

@@ -21,7 +21,10 @@ export async function exchangeSpotifyCodeForToken(
   invariant(callbackUrl, 'Missing OAUTH_CALLBACK_URL env variable');
   invariant(clientId, 'Missing SPOTIFY_CLIENT_ID env variable');
 
-  log.info('Exchanging code for token for Spotify', { code, hasPkce: !!codeVerifier });
+  log.info('Exchanging code for token for Spotify', {
+    code,
+    hasPkce: !!codeVerifier,
+  });
 
   if (!codeVerifier) {
     throw new Error('Missing code verifier for Spotify PKCE flow');

@@ -23,7 +23,11 @@ describe('refreshedAccessToken', () => {
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     validate: (rawData, existingRefreshToken) => {
-      const data = rawData as { access_token: string; expires_in: number; refresh_token?: string };
+      const data = rawData as {
+        access_token: string;
+        expires_in: number;
+        refresh_token?: string;
+      };
       return {
         accessToken: data.access_token,
         expiryAt: new Date(Date.now() + data.expires_in * 1000),
@@ -87,7 +91,9 @@ describe('refreshedAccessToken', () => {
     expect(result).toBe('new-access-token');
     expect(global.fetch).toHaveBeenCalledTimes(1);
 
-    const updatedToken = await db.Token.findOne({ where: { name: 'test-token' } });
+    const updatedToken = await db.Token.findOne({
+      where: { name: 'test-token' },
+    });
     expect(updatedToken?.accessToken).toBe('new-access-token');
     expect(updatedToken?.refreshToken).toBe('new-refresh-token');
   });

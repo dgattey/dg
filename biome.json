@@ -31,7 +31,8 @@
       "!**/node_modules",
       "!**/pnpm-lock.yaml",
       "!**/migrations",
-      "!**/dist"
+      "!**/dist",
+      "!**/*.graphql"
     ]
   },
   "formatter": {
