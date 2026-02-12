@@ -108,6 +108,10 @@ There are two tables:
 1. **Token**: I grab the latest token, see if it's expired, and if so, fetch new data via Spotify/Strava + the saved refresh token. Once it's persisted, I can call the APIs with the auth tokens. Nice defaults built in so anything missing gives back the right info as possible.
 2. **StravaActivity**: I create a row on new activity webhooks, fetch the full activity from Strava, and re-fetch/update JSON when data changes. I track last update time so multiple updates in a window don't hammer Strava's servers.
 
+#### Spotify History
+
+- The homepage "latest song" card uses `fetchRecentlyPlayed`, which returns now-playing or last-played data for UI.
+
 #### Strava
 
 DO NOT hit Strava directly unless you must. Webhooks persist activity data so we read from DB instead.
