@@ -8,6 +8,9 @@ const nextConfig: NextConfig = {
   experimental: {
     authInterrupts: true,
     scrollRestoration: true,
+    serverActions: {
+      bodySizeLimit: '20mb',
+    },
     turbopackFileSystemCacheForBuild: true,
     turbopackFileSystemCacheForDev: true,
   },

@@ -2,6 +2,7 @@ import 'server-only';
 
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import { OauthCard } from './oauth/OauthCard';
+import { SpotifyImportCard } from './spotify/SpotifyImportCard';
 import { WebhookCard } from './webhooks/WebhookCard';
 
 const oauthProviders = ['strava', 'spotify'] as const;
@@ -24,6 +25,7 @@ function CardSection({ title, children }: { title: string; children: React.React
       <Typography variant="h2">{title}</Typography>
       <Box
         sx={{
+          alignItems: 'flex-start',
           display: 'grid',
           gap: 4,
           gridTemplateColumns: {
@@ -50,8 +52,9 @@ export default function ConsolePage() {
           ))}
         </CardSection>
 
-        <CardSection title="Webhook subscriptions">
+        <CardSection title="Tools">
           <WebhookCard />
+          <SpotifyImportCard />
         </CardSection>
       </Stack>
     </main>

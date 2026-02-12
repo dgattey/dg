@@ -16,7 +16,7 @@ async function checkDevConsoleAuth(): Promise<boolean> {
  * server actions can be invoked directly via POST requests.
  */
 export async function withDevConsoleAuth<T extends { success: boolean; error?: string }>(
-  action: () => Promise<T>,
+  action: (() => Promise<T>) | (() => T),
 ): Promise<T> {
   const isAuthorized = await checkDevConsoleAuth();
   if (!isAuthorized) {
