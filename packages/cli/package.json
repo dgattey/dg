@@ -1,11 +1,6 @@
 {
-  "bin": {
-    "dg": "./bin/run.js"
-  },
   "dependencies": {
-    "@oclif/core": "^4.0.0",
     "chalk": "^5.4.0",
-    "dotenv-mono": "catalog:",
     "ora": "^8.1.0"
   },
   "devDependencies": {
@@ -14,38 +9,23 @@
     "tsx": "catalog:",
     "typescript": "catalog:"
   },
-  "files": [
-    "/bin",
-    "/dist"
-  ],
-  "main": "dist/index.js",
   "name": "@dg/cli",
-  "oclif": {
-    "bin": "dg",
-    "commands": "./dist/commands",
-    "dirname": "dg",
-    "topicSeparator": " "
-  },
   "private": true,
   "scripts": {
-    "build": "tsc",
     "check": "biome check --write .",
     "check:ci": "biome ci .",
     "check:types": "tsc --noEmit",
-    "clean": "rm -rf dist .turbo *.tsbuildinfo",
-    "dev": "tsc --watch",
-    "dg": "node --import tsx ./bin/dev.js",
-    "env": "node --import tsx ./bin/dev.js env generate",
-    "git:drop-bot-commits": "node --import tsx ./bin/dev.js git drop-bot-commits",
-    "tunnel": "node --import tsx ./bin/dev.js tunnel",
-    "version:bump": "node --import tsx ./bin/dev.js version bump",
-    "version:extract-notes": "node --import tsx ./bin/dev.js version extract-notes",
-    "version:pr-comment": "node --import tsx ./bin/dev.js version pr-comment",
-    "version:pr-info": "node --import tsx ./bin/dev.js version pr-info",
-    "version:read": "node --import tsx ./bin/dev.js version read",
-    "version:target-from-tags": "node --import tsx ./bin/dev.js version target-from-tags"
+    "clean": "rm -rf .turbo *.tsbuildinfo",
+    "env": "tsx src/env.ts",
+    "git:drop-bot-commits": "tsx src/git-drop-bot-commits.ts",
+    "tunnel": "tsx src/tunnel.ts",
+    "version:bump": "tsx src/version.ts bump",
+    "version:extract-notes": "tsx src/version.ts extract-notes",
+    "version:pr-comment": "tsx src/version.ts pr-comment",
+    "version:pr-info": "tsx src/version.ts pr-info",
+    "version:read": "tsx src/version.ts read",
+    "version:target-from-tags": "tsx src/version.ts target-from-tags"
   },
   "type": "module",
-  "types": "dist/index.d.ts",
   "version": "1.0.0"
 }

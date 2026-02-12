@@ -24,8 +24,6 @@
     "check": "biome check --write .",
     "check:ci": "biome ci .",
     "clean": "rm -f .env .env.tmp",
-    "dev": "pnpm --filter=@dg/cli tunnel",
-    "env": "pnpm --filter=@dg/cli env",
     "preinstall": "npx only-allow pnpm"
   },
   "version": "2.58.0"

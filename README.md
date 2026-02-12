@@ -134,7 +134,7 @@ To set up:
 
 1. Get the tunnel token from [Cloudflare Zero Trust](https://one.dash.cloudflare.com/737867b500ec8ef1d7e5c9650e5dbfdb/networks/tunnels/cfd_tunnel/60e09136-a10f-499c-8925-bcef7570677d/edit?tab=overview)
 2. Add it to 1Password as `CLOUDFLARE_TUNNEL_TOKEN`
-3. Run `turbo env` (or `pnpm --filter=@dg/cli env`) to update your `.env`
+3. Run `turbo env` to update your `.env`
 
 The tunnel will fail if `CLOUDFLARE_TUNNEL_TOKEN` isn't configured in your `.env`.
 
@@ -151,7 +151,7 @@ Versioning uses auto-generated version bumps on PRs with GitHub releases on merg
 
 If multiple PRs each have their own version bump and one merges, other PRs will have conflicts in `package.json`. To fix:
 
-1. Run `pnpm --filter=@dg/cli git:drop-bot-commits` to remove bot-authored version bumps and rebase onto `origin/main`
+1. Run `turbo git:drop-bot-commits` to remove bot-authored version bumps and rebase onto `origin/main`
 2. Force push: `git push --force-with-lease`
 3. The workflow will automatically create a fresh version bump commit
 
