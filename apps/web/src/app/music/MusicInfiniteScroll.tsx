@@ -4,8 +4,8 @@ import { useServerTime } from '@dg/ui/core/ServerTimeContext';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
-import type { HistoryTrack } from '../../../services/music';
-import { loadMoreMusicHistory } from '../../../services/music.actions';
+import type { HistoryTrack } from '../../services/music';
+import { loadMoreMusicHistory } from '../../services/music.actions';
 import { groupTracksByDate } from './groupTracksByDate';
 import { MusicGrid } from './MusicGrid';
 

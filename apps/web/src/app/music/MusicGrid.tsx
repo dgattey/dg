@@ -2,8 +2,8 @@
 
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
-import type { HistoryTrack } from '../../../services/music';
-import { AlbumThumbnail } from '../../spotify/AlbumThumbnail';
+import type { HistoryTrack } from '../../services/music';
+import { AlbumThumbnail } from '../spotify/AlbumThumbnail';
 
 type Props = {
   tracks: Array<HistoryTrack>;

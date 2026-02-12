@@ -1,10 +1,11 @@
 'use client';
 
+import { Section } from '@dg/ui/core/Section';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Container, IconButton } from '@mui/material';
 import { X } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 
 /**
@@ -59,7 +60,7 @@ const handleSx: SxObject = {
 /**
  * Header area with handle and close button
  */
-const headerSx: SxObject = {
+const sheetHeaderSx: SxObject = {
   alignItems: 'center',
   backgroundColor: 'background.default',
   display: 'flex',
@@ -94,29 +95,52 @@ const closeButtonSx: SxObject = {
 /**
  * Main content area with proper padding
  */
-const contentSx: SxObject = {
+const sheetContentSx: SxObject = {
   flex: 1,
   paddingBottom: 4,
 };
 
+type Props = {
+  children: ReactNode;
+  /** Styles to apply to the main section (home page only) */
+  mainSectionSx?: SxObject;
+};
+
 /**
- * Sheet layout component that wraps page content in a modal-like sheet.
- * Uses View Transitions API for smooth slide-up/down animations.
+ * Conditionally wraps page content in a sheet overlay for non-home pages.
+ * Uses the View Transitions API for smooth slide-up/down animations.
  *
- * Features:
- * - Fixed positioning with backdrop overlay
- * - Rounded top corners for sheet aesthetic
- * - Close button that navigates back to home
- * - Scrollable content area
- * - View transition names for animated navigation
+ * - Home page (`/`): Renders children in standard Section/Container layout
+ * - All other pages: Wraps children in a sheet with backdrop, rounded corners,
+ *   close button, and slide-up animation
  */
-export default function SheetLayout({ children }: { children: ReactNode }) {
+export function SheetWrapper({ children, mainSectionSx }: Props) {
+  const pathname = usePathname();
   const router = useRouter();
+  const isHomePage = pathname === '/';
+
+  // Home page - render with standard layout
+  if (isHomePage) {
+    // Combine mainSectionSx with view transition name
+    const sectionSx: SxObject = {
+      ...mainSectionSx,
+      viewTransitionName: 'main-content',
+    };
+
+    return (
+      <Section sx={sectionSx}>
+        <Container>
+          <main>{children}</main>
+        </Container>
+      </Section>
+    );
+  }
 
   const handleBackdropClick = () => {
     router.push('/');
   };
 
+  // Non-home pages - wrap in sheet
   return (
     <>
       {/* Backdrop - clicking navigates home */}
@@ -125,7 +149,7 @@ export default function SheetLayout({ children }: { children: ReactNode }) {
       {/* Sheet container */}
       <Box sx={sheetContainerSx}>
         {/* Sheet header with handle and close button */}
-        <Box sx={headerSx}>
+        <Box sx={sheetHeaderSx}>
           {/* Visual handle indicator */}
           <Box sx={handleSx} />
 
@@ -133,7 +157,7 @@ export default function SheetLayout({ children }: { children: ReactNode }) {
           <Container>
             <Box sx={closeButtonRowSx}>
               <IconButton
-                aria-label="Close sheet"
+                aria-label="Close and return home"
                 component={Link}
                 href="/"
                 size="small"
@@ -146,7 +170,9 @@ export default function SheetLayout({ children }: { children: ReactNode }) {
         </Box>
 
         {/* Content area */}
-        <Container sx={contentSx}>{children}</Container>
+        <Container sx={sheetContentSx}>
+          <main>{children}</main>
+        </Container>
       </Box>
     </>
   );
