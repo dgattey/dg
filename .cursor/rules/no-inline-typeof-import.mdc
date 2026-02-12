@@ -1,0 +1,36 @@
+---
+description: Prohibit inline typeof import() syntax in favor of direct imports
+globs: *.tsx
+alwaysApply: false
+---
+# No inline typeof import() syntax
+
+Never use inline `typeof import('...').identifier` for typing dynamic imports.
+
+## Bad
+
+```typescript
+let myFunction: typeof import('../module').myFunction;
+
+beforeAll(async () => {
+  ({ myFunction } = await import('../module'));
+});
+```
+
+## Good
+
+Use direct imports. Jest hoists `jest.mock()` calls, so mocks work with regular imports:
+
+```typescript
+import { myFunction } from '../module';
+
+// jest.mock() is hoisted above this import automatically
+jest.mock('../dependency', () => ({ ... }));
+```
+
+## Why
+
+- Cleaner, more readable code
+- No need for `let` declarations and dynamic imports
+- Jest's mock hoisting makes this pattern unnecessary
+- Type safety without verbose inline typeof syntax
