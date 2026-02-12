@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "_comment": "Configuration for PR before/after screenshots. See .github/workflows/pr-screenshots.yml",
+  "productionUrl": "https://dylangattey.com",
+  "defaultViewport": "1280x800",
+  "pages": [
+    {
+      "path": "/",
+      "name": "Homepage"
+    }
+  ]
+}

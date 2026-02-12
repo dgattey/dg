@@ -1,0 +1,332 @@
+# Captures before/after screenshots on Vercel preview deployments
+# Uses @vercel/before-and-after to compare production vs preview
+#
+# Configuration: .github/screenshot-config.json
+# - Define pages/paths to capture
+# - Set viewport sizes
+#
+# Vercel Deployment Protection:
+# If your preview deployments have password protection, screenshots will be
+# skipped with a note. To enable screenshots, either:
+# 1. Disable Vercel Deployment Protection for preview deployments
+# 2. Add VERCEL_AUTOMATION_BYPASS_SECRET to bypass protection (not yet supported)
+#
+# Based on: https://jm.sv/before-and-after
+
+name: PR Screenshots
+
+on:
+  deployment_status:
+
+concurrency:
+  group: pr-screenshots-${{ github.event.deployment.environment }}
+  cancel-in-progress: true
+
+jobs:
+  screenshots:
+    # Only run on successful preview deployments, not production
+    if: |
+      github.event.deployment_status.state == 'success' &&
+      github.event.deployment.environment == 'Preview'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pull-requests: write
+      deployments: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: "pnpm"
+
+      # Install Playwright browsers for screenshot capture
+      - name: Install Playwright
+        run: npx playwright install chromium --with-deps
+
+      # Install the before-and-after CLI
+      - name: Install before-and-after
+        run: npm install -g @vercel/before-and-after
+
+      # Get the PR number from the deployment
+      - name: Get PR number
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # The deployment ref is the commit SHA, find associated PR
+          PR_NUMBER=$(gh pr list --state open --json number,headRefOid \
+            --jq ".[] | select(.headRefOid == \"${{ github.event.deployment.sha }}\") | .number")
+          
+          if [ -z "$PR_NUMBER" ]; then
+            echo "No PR found for this deployment"
+            echo "skip=true" >> $GITHUB_OUTPUT
+          else
+            echo "pr_number=$PR_NUMBER" >> $GITHUB_OUTPUT
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+      # Check if preview deployment has password protection
+      - name: Check deployment protection
+        if: steps.pr.outputs.skip != 'true'
+        id: protection
+        run: |
+          PREVIEW_URL="${{ github.event.deployment_status.target_url }}"
+          HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" "$PREVIEW_URL" || echo "000")
+          
+          if [ "$HTTP_CODE" = "401" ] || [ "$HTTP_CODE" = "403" ]; then
+            echo "protected=true" >> $GITHUB_OUTPUT
+            echo "⚠️ Preview deployment has password protection (HTTP $HTTP_CODE)"
+          else
+            echo "protected=false" >> $GITHUB_OUTPUT
+            echo "✅ Preview deployment accessible (HTTP $HTTP_CODE)"
+          fi
+
+      # Load screenshot config and capture screenshots
+      - name: Capture before/after screenshots
+        if: steps.pr.outputs.skip != 'true' && steps.protection.outputs.protected != 'true'
+        id: capture
+        run: |
+          CONFIG_FILE=".github/screenshot-config.json"
+          PREVIEW_URL="${{ github.event.deployment_status.target_url }}"
+          OUTPUT_DIR="./screenshots"
+          
+          mkdir -p "$OUTPUT_DIR"
+          
+          # Read production URL from config
+          if [ -f "$CONFIG_FILE" ]; then
+            PRODUCTION_URL=$(jq -r '.productionUrl' "$CONFIG_FILE")
+            DEFAULT_VIEWPORT=$(jq -r '.defaultViewport // "1280x800"' "$CONFIG_FILE")
+          else
+            PRODUCTION_URL="https://dylangattey.com"
+            DEFAULT_VIEWPORT="1280x800"
+          fi
+          
+          echo "📸 Capturing screenshots..."
+          echo "  Production URL: $PRODUCTION_URL"
+          echo "  Preview URL: $PREVIEW_URL"
+          echo "  Default viewport: $DEFAULT_VIEWPORT"
+          
+          # Capture configured pages or default to homepage
+          if [ -f "$CONFIG_FILE" ] && [ "$(jq '.pages | length' "$CONFIG_FILE")" -gt 0 ]; then
+            # Capture each configured page
+            jq -c '.pages[]' "$CONFIG_FILE" | while read -r page; do
+              PAGE_PATH=$(echo "$page" | jq -r '.path')
+              PAGE_NAME=$(echo "$page" | jq -r '.name // .path')
+              PAGE_VIEWPORT=$(echo "$page" | jq -r ".viewport // \"$DEFAULT_VIEWPORT\"")
+              PAGE_SELECTOR=$(echo "$page" | jq -r '.selector // ""')
+              
+              BEFORE_URL="${PRODUCTION_URL}${PAGE_PATH}"
+              AFTER_URL="${PREVIEW_URL}${PAGE_PATH}"
+              SAFE_NAME=$(echo "$PAGE_NAME" | tr ' /' '_-')
+              
+              echo "  Capturing: $PAGE_NAME ($PAGE_PATH)"
+              
+              SELECTOR_FLAG=""
+              if [ -n "$PAGE_SELECTOR" ] && [ "$PAGE_SELECTOR" != "null" ]; then
+                SELECTOR_FLAG="--selector $PAGE_SELECTOR"
+              fi
+              
+              before-and-after "$BEFORE_URL" "$AFTER_URL" \
+                --output "$OUTPUT_DIR" \
+                --size "$PAGE_VIEWPORT" \
+                $SELECTOR_FLAG \
+                2>&1 || echo "  Warning: capture may have had issues for $PAGE_NAME"
+              
+              # Rename output files to include page name
+              for f in "$OUTPUT_DIR"/*-before.png "$OUTPUT_DIR"/*-after.png; do
+                if [ -f "$f" ]; then
+                  NEW_NAME=$(echo "$f" | sed "s/-\(before\|after\)\.png/-${SAFE_NAME}-\1.png/")
+                  mv "$f" "$NEW_NAME" 2>/dev/null || true
+                fi
+              done
+            done
+          else
+            # Default: capture homepage only
+            echo "  Capturing: Homepage (default)"
+            before-and-after "$PRODUCTION_URL" "$PREVIEW_URL" \
+              --output "$OUTPUT_DIR" \
+              --size "$DEFAULT_VIEWPORT" \
+              2>&1 || echo "Screenshot capture completed with warnings"
+          fi
+          
+          # List captured files
+          echo ""
+          echo "Captured files:"
+          ls -la "$OUTPUT_DIR" || echo "No files captured"
+          
+          # Set output for next step
+          echo "output_dir=$OUTPUT_DIR" >> $GITHUB_OUTPUT
+
+      # Upload screenshots as artifacts
+      - name: Upload screenshots
+        if: steps.pr.outputs.skip != 'true' && steps.protection.outputs.protected != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr-screenshots-${{ steps.pr.outputs.pr_number }}
+          path: ${{ steps.capture.outputs.output_dir }}
+          retention-days: 30
+
+      # Upload images to 0x0.st and build markdown table
+      - name: Upload images for PR comment
+        if: steps.pr.outputs.skip != 'true' && steps.protection.outputs.protected != 'true'
+        id: upload
+        run: |
+          OUTPUT_DIR="${{ steps.capture.outputs.output_dir }}"
+          
+          upload_to_0x0() {
+            local file="$1"
+            curl -s -F "file=@$file" https://0x0.st
+          }
+          
+          # Build markdown table for all captured pages
+          MARKDOWN_ROWS=""
+          UPLOADED_COUNT=0
+          
+          # Process each before/after pair
+          for BEFORE_FILE in "$OUTPUT_DIR"/*-before.png "$OUTPUT_DIR"/*before*.png; do
+            [ -f "$BEFORE_FILE" ] || continue
+            
+            # Find matching after file
+            AFTER_FILE=$(echo "$BEFORE_FILE" | sed 's/before/after/')
+            [ -f "$AFTER_FILE" ] || continue
+            
+            # Extract page name from filename if present
+            BASENAME=$(basename "$BEFORE_FILE" .png)
+            PAGE_NAME=$(echo "$BASENAME" | sed 's/.*-\(.*\)-before/\1/' | sed 's/-/ /g')
+            if [ "$PAGE_NAME" = "$BASENAME" ] || [ -z "$PAGE_NAME" ]; then
+              PAGE_NAME="Homepage"
+            fi
+            
+            echo "Uploading: $PAGE_NAME"
+            BEFORE_URL=$(upload_to_0x0 "$BEFORE_FILE")
+            AFTER_URL=$(upload_to_0x0 "$AFTER_FILE")
+            
+            if [ -n "$BEFORE_URL" ] && [ -n "$AFTER_URL" ]; then
+              MARKDOWN_ROWS="${MARKDOWN_ROWS}| **${PAGE_NAME}** | ![Before](${BEFORE_URL}) | ![After](${AFTER_URL}) |
+          "
+              UPLOADED_COUNT=$((UPLOADED_COUNT + 1))
+            fi
+          done
+          
+          if [ $UPLOADED_COUNT -gt 0 ]; then
+            echo "uploaded=true" >> $GITHUB_OUTPUT
+            # Escape newlines for GitHub Actions output
+            MARKDOWN_ROWS_ESCAPED="${MARKDOWN_ROWS//'%'/'%25'}"
+            MARKDOWN_ROWS_ESCAPED="${MARKDOWN_ROWS_ESCAPED//$'\n'/'%0A'}"
+            MARKDOWN_ROWS_ESCAPED="${MARKDOWN_ROWS_ESCAPED//$'\r'/'%0D'}"
+            echo "markdown_rows<<EOF" >> $GITHUB_OUTPUT
+            echo "$MARKDOWN_ROWS" >> $GITHUB_OUTPUT
+            echo "EOF" >> $GITHUB_OUTPUT
+            echo "Uploaded $UPLOADED_COUNT page(s)"
+          else
+            echo "uploaded=false" >> $GITHUB_OUTPUT
+            echo "No images uploaded"
+          fi
+
+      # Post comment on PR with screenshots
+      - name: Comment on PR
+        if: steps.pr.outputs.skip != 'true' && steps.upload.outputs.uploaded == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = ${{ steps.pr.outputs.pr_number }};
+            const previewUrl = '${{ github.event.deployment_status.target_url }}';
+            const markdownRows = `${{ steps.upload.outputs.markdown_rows }}`;
+            
+            const body = `## 📸 Visual comparison
+            
+            | Page | Before (production) | After (preview) |
+            |:-----|:-------------------:|:---------------:|
+            ${markdownRows}
+            **Preview URL:** ${previewUrl}
+            
+            ---
+            <sub>Generated by [before-and-after](https://jm.sv/before-and-after) • [View artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>`;
+            
+            // Find existing comment from this workflow
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('📸 Visual comparison')
+            );
+            
+            if (botComment) {
+              // Update existing comment
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body,
+              });
+              console.log('Updated existing comment');
+            } else {
+              // Create new comment
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body,
+              });
+              console.log('Created new comment');
+            }
+
+      # Post a note if deployment is protected
+      - name: Comment about protection
+        if: steps.pr.outputs.skip != 'true' && steps.protection.outputs.protected == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = ${{ steps.pr.outputs.pr_number }};
+            const previewUrl = '${{ github.event.deployment_status.target_url }}';
+            
+            const body = `## 📸 Visual comparison
+            
+            ⚠️ **Screenshots skipped**: The preview deployment has password protection enabled.
+            
+            To enable automatic screenshots:
+            1. Disable Vercel Deployment Protection for preview deployments, OR
+            2. Configure a \`VERCEL_AUTOMATION_BYPASS_SECRET\` in your Vercel project settings
+            
+            **Preview URL:** ${previewUrl}
+            
+            ---
+            <sub>Generated by [before-and-after](https://jm.sv/before-and-after)</sub>`;
+            
+            // Find existing comment from this workflow
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+            
+            const botComment = comments.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('📸 Visual comparison')
+            );
+            
+            if (botComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: body,
+              });
+            }

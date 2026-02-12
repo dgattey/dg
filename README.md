@@ -155,4 +155,35 @@ If multiple PRs each have their own version bump and one merges, other PRs will 
 2. Force push: `git push --force-with-lease`
 3. The workflow will automatically create a fresh version bump commit
 
+### PR screenshots
+
+The repo automatically captures before/after screenshots on PRs comparing production vs the Vercel preview deployment. Screenshots are posted as a PR comment using [@vercel/before-and-after](https://jm.sv/before-and-after).
+
+#### Configuration
+
+Edit `.github/screenshot-config.json` to customize which pages are captured:
+
+```json
+{
+  "productionUrl": "https://dylangattey.com",
+  "defaultViewport": "1280x800",
+  "pages": [
+    { "path": "/", "name": "Homepage" },
+    { "path": "/music", "name": "Music", "viewport": "1280x800" },
+    { "path": "/music", "name": "Music (mobile)", "viewport": "375x812" }
+  ]
+}
+```
+
+Each page can optionally specify:
+- `viewport` - Override the default viewport (e.g., `375x812` for mobile)
+- `selector` - CSS selector to capture a specific element instead of full page
+
+#### Vercel deployment protection
+
+If preview deployments have password protection enabled (Vercel Deployment Protection), screenshots will be skipped and a note posted to the PR. To enable automatic screenshots:
+
+1. **Disable protection for previews** in Vercel Project Settings > Deployment Protection
+2. **Or** use [Protection Bypass for Automation](https://vercel.com/docs/security/deployment-protection/methods-to-bypass-deployment-protection/protection-bypass-automation) (not yet implemented in this workflow)
+
 [gh]: https://github.com/dgattey/dg
