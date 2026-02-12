@@ -7,36 +7,18 @@ import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
 import { Card } from '@mui/material';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
+import {
+  ALBUM_ART_BORDER_RADIUS,
+  ALBUM_ART_DIMENSIONS,
+  ALBUM_ART_SIZE,
+  albumArtLinkSx,
+} from './albumArtStyles';
 
 type AlbumImageProps = {
   isPlaying: boolean;
   track: Track;
   /** Note color for visibility against the background. */
   noteColor?: string;
-};
-
-/** Base album art size at md breakpoint */
-export const ALBUM_IMAGE_SIZE = 150;
-
-/** Responsive --image-dim CSS variable map for album art sizing */
-export const ALBUM_ART_DIMENSIONS: SxObject = {
-  '--image-dim': {
-    md: `${ALBUM_IMAGE_SIZE}px`,
-    sm: `${(4 * ALBUM_IMAGE_SIZE) / 5}px`,
-    xs: `${(2 * ALBUM_IMAGE_SIZE) / 3}px`,
-  },
-};
-
-/** Responsive border radius for album art */
-export const ALBUM_ART_BORDER_RADIUS: SxObject = {
-  borderRadius: { md: 6, sm: 4, xs: 2 },
-};
-
-const HOVER_SCALE = 1.05;
-
-const linkSx: SxObject = {
-  '&:hover': { transform: `scale(${HOVER_SCALE})` },
-  ...createBouncyTransition('transform'),
 };
 
 const cardSx: SxObject = {
@@ -60,6 +42,7 @@ const wrapperSx: SxObject = {
 
 /**
  * Album image with notes and waveform bounce when playing.
+ * Used for the main Spotify card display.
  */
 export function AlbumImage({ track, isPlaying, noteColor }: AlbumImageProps) {
   const { album, albumImage } = track;
@@ -68,15 +51,15 @@ export function AlbumImage({ track, isPlaying, noteColor }: AlbumImageProps) {
 
   return (
     <AlbumArtWithNotes isPlaying={isPlaying} noteColor={noteColor} wrapperSx={wrapperSx}>
-      <Link href={albumUrl} isExternal={true} sx={linkSx} title={albumTitle}>
+      <Link href={albumUrl} isExternal={true} sx={albumArtLinkSx} title={albumTitle}>
         <Card sx={cardSx}>
           <Image
             alt={albumTitle}
             {...albumImage}
             fill={true}
-            height={ALBUM_IMAGE_SIZE}
-            sizes={{ extraLarge: ALBUM_IMAGE_SIZE }}
-            width={ALBUM_IMAGE_SIZE}
+            height={ALBUM_ART_SIZE}
+            sizes={{ extraLarge: ALBUM_ART_SIZE }}
+            width={ALBUM_ART_SIZE}
           />
         </Card>
       </Link>

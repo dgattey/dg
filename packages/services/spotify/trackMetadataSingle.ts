@@ -1,86 +1,101 @@
 import 'server-only';
 
-import { serializeError } from '@dg/shared-core/logging/maskSecrets';
-import {
-  extractMetadataFromTrack,
-  sleep,
-  spotifyGetWithRetry,
-  type TrackMetadata,
-  trackSchema,
-} from './trackMetadataShared';
-
-const THROTTLE_MS = 100;
+import * as v from 'valibot';
+import { spotifyGetWithRetry } from './trackMetadataShared';
 
 /**
- * Result of fetching a single track's metadata.
+ * Extended track schema for fetching display-ready data.
+ * Includes album images and external URLs for UI rendering.
  */
-export type SingleTrackResult =
-  | { success: true; metadata: TrackMetadata }
-  | { success: false; error: string };
+const trackDisplaySchema = v.looseObject({
+  album: v.looseObject({
+    external_urls: v.looseObject({ spotify: v.string() }),
+    id: v.string(),
+    images: v.array(
+      v.looseObject({
+        height: v.number(),
+        url: v.string(),
+        width: v.number(),
+      }),
+    ),
+    name: v.string(),
+  }),
+  artists: v.array(
+    v.looseObject({
+      external_urls: v.looseObject({ spotify: v.string() }),
+      id: v.string(),
+      name: v.string(),
+    }),
+  ),
+  external_urls: v.looseObject({ spotify: v.string() }),
+  id: v.string(),
+  name: v.string(),
+});
 
 /**
- * Fetches metadata for a single track by ID using GET /tracks/{id}.
- * Includes retry logic for rate limiting (429 responses).
+ * Display-ready track data structured for Music* table inserts.
  */
-export async function fetchSingleTrackMetadata(trackId: string): Promise<SingleTrackResult> {
-  const result = await spotifyGetWithRetry(`tracks/${trackId}`, trackSchema, 'single track');
-
-  if (!result.success) {
-    const error = result.status === 404 ? 'Track not found' : result.error;
-    return { error, success: false };
-  }
-
-  return {
-    metadata: extractMetadataFromTrack(result.data),
-    success: true,
+export type TrackDisplayData = {
+  track: {
+    id: string;
+    name: string;
+    albumId: string;
+    url: string;
   };
-}
-
-/**
- * Result of fetching multiple tracks individually.
- */
-export type MultipleSingleFetchResult = {
-  metadata: Map<string, TrackMetadata>;
-  errors: Array<{ trackId: string; error: string }>;
+  album: {
+    id: string;
+    name: string;
+    imageUrl: string;
+    url: string;
+  };
+  artists: Array<{
+    id: string;
+    name: string;
+    url: string;
+    position: number;
+  }>;
 };
 
 /**
- * Fetches track metadata for multiple IDs using individual GET /tracks/{id} calls.
- * This is slower than batch fetching but doesn't require the deprecated batch endpoint.
- *
- * Includes throttling between requests to avoid rate limiting.
+ * Selects the best album image (prefers 640px width, falls back to first).
  */
-export async function fetchMultipleTrackMetadata(
-  trackIds: Array<string>,
-): Promise<MultipleSingleFetchResult> {
-  const metadata = new Map<string, TrackMetadata>();
-  const errors: MultipleSingleFetchResult['errors'] = [];
+function bestImage(images: Array<{ height: number; url: string; width: number }>): string {
+  const preferred = images.find((img) => img.width === 640) ?? images[0];
+  return preferred?.url ?? '';
+}
 
-  for (let i = 0; i < trackIds.length; i++) {
-    const trackId = trackIds[i];
-    if (!trackId) {
-      continue;
-    }
-
-    try {
-      const result = await fetchSingleTrackMetadata(trackId);
-      if (result.success) {
-        metadata.set(trackId, result.metadata);
-      } else {
-        errors.push({ error: result.error, trackId });
-      }
-    } catch (error) {
-      errors.push({
-        error: serializeError(error as Error).message ?? 'Unknown error',
-        trackId,
-      });
-    }
-
-    // Throttle between requests to avoid rate limiting
-    if (i < trackIds.length - 1) {
-      await sleep(THROTTLE_MS);
-    }
+/**
+ * Fetches full display-ready track data from Spotify API.
+ * Returns structured data ready for Music* table inserts.
+ */
+export async function fetchTrackDisplayData(trackId: string): Promise<TrackDisplayData | null> {
+  const result = await spotifyGetWithRetry(
+    `tracks/${trackId}`,
+    trackDisplaySchema,
+    'track display',
+  );
+  if (!result.success) {
+    return null;
   }
-
-  return { errors, metadata };
+  const track = result.data;
+  return {
+    album: {
+      id: track.album.id,
+      imageUrl: bestImage(track.album.images),
+      name: track.album.name,
+      url: track.album.external_urls.spotify,
+    },
+    artists: track.artists.map((a, i) => ({
+      id: a.id,
+      name: a.name,
+      position: i,
+      url: a.external_urls.spotify,
+    })),
+    track: {
+      albumId: track.album.id,
+      id: track.id,
+      name: track.name,
+      url: track.external_urls.spotify,
+    },
+  };
 }
