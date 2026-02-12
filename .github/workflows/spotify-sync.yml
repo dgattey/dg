@@ -1,0 +1,18 @@
+# Sync Spotify listening history every 30 minutes
+name: Spotify sync
+
+on:
+  schedule:
+    - cron: '*/30 * * * *'
+  workflow_dispatch:
+
+jobs:
+  sync:
+    name: "🎵 Sync"
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Trigger sync
+        run: |
+          curl -sS -f -X GET "${{ secrets.SITE_URL }}/api/spotify/sync" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"

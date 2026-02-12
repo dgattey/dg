@@ -3,7 +3,8 @@ import 'server-only';
 import { db } from '@dg/db';
 import { log } from '@dg/shared-core/logging/log';
 import * as v from 'valibot';
-import { extractTrackId, fetchAllTrackMetadata, getExistingTrackMetadata } from './trackMetadata';
+import { fetchAllTrackMetadataBatch } from './trackMetadataBatch';
+import { extractTrackId, getExistingTrackMetadata } from './trackMetadataShared';
 
 /**
  * Schema for Spotify GDPR Extended StreamingHistory JSON entries.
@@ -60,7 +61,7 @@ export async function importSpotifyHistory(
     needApiFetch: newTrackIds.length,
   });
 
-  const { batchErrors, metadata: fetchedMetadata } = await fetchAllTrackMetadata(newTrackIds);
+  const { batchErrors, metadata: fetchedMetadata } = await fetchAllTrackMetadataBatch(newTrackIds);
   const allMetadata = new Map([...existingMetadata, ...fetchedMetadata]);
 
   // Build DB rows, collecting any tracks we couldn't resolve

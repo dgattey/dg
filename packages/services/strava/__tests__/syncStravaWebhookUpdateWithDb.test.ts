@@ -1,6 +1,7 @@
 import type { StravaWebhookEvent } from '@dg/content-models/strava/StravaWebhookEvent';
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 import { setupMockLifecycle } from '@dg/testing/mocks';
+import { syncStravaWebhookUpdateWithDb } from '../syncStravaWebhookUpdateWithDb';
 
 const mockStravaGet = jest.fn<
   Promise<{ response: { json: () => Promise<unknown> }; status: number }>,
@@ -16,8 +17,6 @@ jest.mock('../stravaClient', () => ({
 describe('syncStravaWebhookUpdateWithDb', () => {
   const db = setupTestDatabase();
   setupMockLifecycle();
-
-  let syncStravaWebhookUpdateWithDb: typeof import('../syncStravaWebhookUpdateWithDb').syncStravaWebhookUpdateWithDb;
 
   // Real Strava API response format (snake_case) - this flows through real mapping code
   const stravaApiResponse = {
@@ -49,10 +48,6 @@ describe('syncStravaWebhookUpdateWithDb', () => {
     type: 'Ride',
     url: 'https://www.strava.com/activities/17234236452',
   };
-
-  beforeAll(async () => {
-    ({ syncStravaWebhookUpdateWithDb } = await import('../syncStravaWebhookUpdateWithDb'));
-  });
 
   beforeEach(() => {
     mockStravaGet.mockResolvedValue({

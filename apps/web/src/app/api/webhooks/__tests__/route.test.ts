@@ -1,6 +1,3 @@
-/**
- * @jest-environment node
- */
 import { log } from '@dg/shared-core/logging/log';
 import { webhooksRoute } from '@dg/shared-core/routes/api';
 import { NextRequest } from 'next/server';

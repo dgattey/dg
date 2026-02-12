@@ -1,5 +1,6 @@
 import { Op } from '@dg/db';
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
+import { importSpotifyHistory } from '../importSpotifyHistory';
 
 const mockSpotifyGet = jest.fn<
   Promise<{
@@ -50,11 +51,6 @@ const createExtendedJson = (
 
 describe('importSpotifyHistory', () => {
   const db = setupTestDatabase();
-  let importSpotifyHistory: typeof import('../importSpotifyHistory').importSpotifyHistory;
-
-  beforeAll(async () => {
-    ({ importSpotifyHistory } = await import('../importSpotifyHistory'));
-  });
 
   beforeEach(async () => {
     jest.clearAllMocks();

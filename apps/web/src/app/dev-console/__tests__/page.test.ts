@@ -1,6 +1,3 @@
-/**
- * @jest-environment node
- */
 import ConsolePage from '../page';
 
 describe('Dev console page', () => {

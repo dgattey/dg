@@ -1,6 +1,3 @@
-/**
- * @jest-environment node
- */
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import { mockEnv } from '@dg/testing/mocks';
 import { NextRequest } from 'next/server';

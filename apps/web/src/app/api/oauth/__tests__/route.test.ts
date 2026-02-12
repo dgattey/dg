@@ -1,6 +1,3 @@
-/**
- * @jest-environment node
- */
 import { oauthRoute } from '@dg/shared-core/routes/api';
 import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import { NextRequest } from 'next/server';

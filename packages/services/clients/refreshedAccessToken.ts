@@ -180,12 +180,6 @@ export async function refreshedAccessToken(
   forceRefresh?: boolean,
 ) {
   const currentData = await getLatestTokenIfValid({ name });
-  log.info('Got latest token data', {
-    accessToken: currentData.accessToken,
-    forceRefresh,
-    name,
-    refreshToken: currentData.refreshToken,
-  });
   if (currentData.accessToken && !forceRefresh) {
     return currentData.accessToken;
   }

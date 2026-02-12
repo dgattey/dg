@@ -4,27 +4,25 @@ import { setupMockLifecycle } from '@dg/testing/mocks';
 const getUrl = (input: RequestInfo): string =>
   typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
 
+// Set up env vars before module import
+const originalEnv = process.env;
+const originalFetch = global.fetch;
+
+process.env = {
+  ...originalEnv,
+  OAUTH_CALLBACK_URL: 'https://example.com/api/oauth',
+  SPOTIFY_CLIENT_ID: 'spotify-client-id',
+  STRAVA_CLIENT_ID: 'strava-client-id',
+  STRAVA_CLIENT_SECRET: 'strava-client-secret',
+};
+
+global.fetch = jest.fn() as unknown as typeof fetch;
+
+import { completeOauthFlow } from '../completeOauthFlow';
+
 describe('completeOauthFlow', () => {
   const db = setupTestDatabase();
   setupMockLifecycle();
-
-  const originalEnv = process.env;
-  const originalFetch = global.fetch;
-
-  let completeOauthFlow: typeof import('../completeOauthFlow').completeOauthFlow;
-
-  beforeAll(async () => {
-    process.env = {
-      ...originalEnv,
-      OAUTH_CALLBACK_URL: 'https://example.com/api/oauth',
-      SPOTIFY_CLIENT_ID: 'spotify-client-id',
-      STRAVA_CLIENT_ID: 'strava-client-id',
-      STRAVA_CLIENT_SECRET: 'strava-client-secret',
-    };
-
-    global.fetch = jest.fn() as unknown as typeof fetch;
-    ({ completeOauthFlow } = await import('../completeOauthFlow'));
-  });
 
   afterAll(() => {
     process.env = originalEnv;
