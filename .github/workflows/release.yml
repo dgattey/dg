@@ -62,7 +62,7 @@ jobs:
         if: steps.check-bot-commit.outputs.SKIP == 'false'
         run: |
           set -euo pipefail
-          OUTPUT=$(./scripts/version-and-release pr-info "$GITHUB_EVENT_PATH")
+          OUTPUT=$(pnpm --filter=@dg/cli version:pr-info "$GITHUB_EVENT_PATH")
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
@@ -71,7 +71,7 @@ jobs:
         if: steps.check-bot-commit.outputs.SKIP == 'false'
         run: |
           set -euo pipefail
-          OUTPUT=$(./scripts/version-and-release read)
+          OUTPUT=$(pnpm --filter=@dg/cli version:read)
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
@@ -81,7 +81,7 @@ jobs:
         run: |
           set -euo pipefail
           git fetch --tags
-          OUTPUT=$(./scripts/version-and-release target-from-tags "${{ steps.current-version.outputs.VERSION }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
+          OUTPUT=$(pnpm --filter=@dg/cli version:target-from-tags "${{ steps.current-version.outputs.VERSION }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
@@ -92,7 +92,7 @@ jobs:
           VERSION: ${{ steps.target-version.outputs.VERSION_TO }}
         run: |
           set -euo pipefail
-          ./scripts/version-and-release pr-comment "$GITHUB_EVENT_PATH" "$VERSION" will-be
+          pnpm --filter=@dg/cli version:pr-comment "$GITHUB_EVENT_PATH" "$VERSION" will-be
 
       - name: Check if bump needed
         id: check-bump
@@ -113,7 +113,7 @@ jobs:
         if: steps.check-bot-commit.outputs.SKIP == 'false' && steps.check-bump.outputs.SKIP == 'false'
         run: |
           set -euo pipefail
-          OUTPUT=$(./scripts/version-and-release bump "${{ steps.target-version.outputs.BASE_VERSION_USED }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
+          OUTPUT=$(pnpm --filter=@dg/cli version:bump "${{ steps.target-version.outputs.BASE_VERSION_USED }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
@@ -142,11 +142,20 @@ jobs:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: 0
 
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: "pnpm"
+
+      - name: Install dependencies
+        run: pnpm install
+
       - name: Read version from package.json
         id: version
         run: |
           set -euo pipefail
-          OUTPUT=$(./scripts/version-and-release read)
+          OUTPUT=$(pnpm --filter=@dg/cli version:read)
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
@@ -154,7 +163,7 @@ jobs:
         id: notes
         run: |
           set -euo pipefail
-          notes="$(./scripts/version-and-release extract-notes "$GITHUB_EVENT_PATH")"
+          notes="$(pnpm --filter=@dg/cli version:extract-notes "$GITHUB_EVENT_PATH")"
           delimiter="NOTES_$(uuidgen)"
           {
             echo "notes<<$delimiter"
@@ -202,4 +211,4 @@ jobs:
           RELEASE_URL: ${{ steps.release.outputs.release_url }}
         run: |
           set -euo pipefail
-          ./scripts/version-and-release pr-comment "$GITHUB_EVENT_PATH" "$VERSION" released
+          pnpm --filter=@dg/cli version:pr-comment "$GITHUB_EVENT_PATH" "$VERSION" released
