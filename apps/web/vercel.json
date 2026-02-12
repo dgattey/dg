@@ -1,10 +1,4 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "cleanUrls": true,
-  "crons": [
-    {
-      "path": "/api/spotify/sync",
-      "schedule": "*/30 * * * *"
-    }
-  ]
+  "cleanUrls": true
 }

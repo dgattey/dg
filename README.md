@@ -110,7 +110,7 @@ There are two tables:
 
 #### Spotify History
 
-- Spotify only exposes the 50 most recent plays. Cron sync runs every 30 minutes via `/api/spotify/sync` (protected by `CRON_SECRET`).
+- Spotify only exposes the 50 most recent plays. Sync runs every 30 minutes via GitHub Actions calling `/api/spotify/sync`.
 - History sync is intentionally disabled until the GDPR import seeds the DB, to avoid gaps.
 - Track metadata uses two separate Spotify API patterns:
   - **Imports** (GDPR data): Uses batch `GET /tracks?ids=` endpoint (deprecated by Spotify ~March 2026).
