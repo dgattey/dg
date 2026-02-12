@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig.json",
+  "compilerOptions": {
+    "declaration": true,
+    "lib": ["ES2022"],
+    "noEmit": false,
+    "outDir": "dist",
+    "rootDir": "src",
+    "target": "ES2022"
+  },
+  "exclude": ["node_modules", "dist"],
+  "extends": "@dg/tsconfig/base.json",
+  "include": ["src/**/*"]
+}

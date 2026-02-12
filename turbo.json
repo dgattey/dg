@@ -2,7 +2,6 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [
     "config/env.secrets.keys",
-    "scripts/generate-env",
     ".node-version",
     ".npmrc",
     "biome.json",
