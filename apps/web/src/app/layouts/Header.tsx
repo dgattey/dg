@@ -9,10 +9,12 @@ import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
 import { Logo } from './Logo';
 
 // Makes the header bar sticky and not responsive to user events by default
+// view-transition-name ensures header stays pinned during page transitions
 const stickyContainerSx: SxObject = {
   maxWidth: 'unset',
   position: 'sticky',
   top: 0,
+  viewTransitionName: 'site-header',
   zIndex: 10, // Higher z-index to stay above grid content with transforms
 };
 

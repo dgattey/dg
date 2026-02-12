@@ -1,4 +1,4 @@
-import type { HistoryTrack } from '../../services/music';
+import type { HistoryTrack } from '../../../services/music';
 
 export type TrackSection = {
   label: string;

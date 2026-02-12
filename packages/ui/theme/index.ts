@@ -183,6 +183,30 @@ export function getTheme(): Theme {
       MuiCssBaseline: {
         styleOverrides: (theme) => ({
           ...getSystemPreferenceStyles(theme),
+          '::view-transition-new(main-content)': {
+            animation: 'fade-in 0.3s ease-in 0.1s both',
+          },
+          // Sheet content slides up when entering
+          '::view-transition-new(sheet-content)': {
+            animation: 'sheet-slide-up 0.35s cubic-bezier(0.32, 0.72, 0, 1)',
+          },
+          // Main content fades during transitions
+          '::view-transition-old(main-content)': {
+            animation: 'fade-out 0.2s ease-out',
+          },
+          // Default root transition - subtle fade
+          '::view-transition-old(root), ::view-transition-new(root)': {
+            animationDuration: '0.25s',
+          },
+          // Sheet content slides down when leaving
+          '::view-transition-old(sheet-content)': {
+            animation: 'sheet-slide-down 0.3s cubic-bezier(0.32, 0.72, 0, 1)',
+          },
+          // Header stays pinned during transitions (no animation)
+          '::view-transition-old(site-header), ::view-transition-new(site-header)': {
+            animation: 'none',
+            mixBlendMode: 'normal',
+          },
           ':root': {
             // Ensure while swapping themes, we have no animations
             ':root[data-animations-enabled="false"] *': {
@@ -201,6 +225,35 @@ export function getTheme(): Theme {
             },
             [theme.breakpoints.up('xl')]: {
               fontSize: 19,
+            },
+          },
+          '@keyframes fade-in': {
+            from: { opacity: 0 },
+            to: { opacity: 1 },
+          },
+          '@keyframes fade-out': {
+            from: { opacity: 1 },
+            to: { opacity: 0 },
+          },
+          '@keyframes sheet-slide-down': {
+            from: {
+              opacity: 1,
+              transform: 'translateY(0)',
+            },
+            to: {
+              opacity: 0,
+              transform: 'translateY(100%)',
+            },
+          },
+          // View Transitions API - Sheet animations
+          '@keyframes sheet-slide-up': {
+            from: {
+              opacity: 0,
+              transform: 'translateY(100%)',
+            },
+            to: {
+              opacity: 1,
+              transform: 'translateY(0)',
             },
           },
           body: {

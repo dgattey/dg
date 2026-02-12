@@ -3,7 +3,7 @@ import 'server-only';
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { Stack, Typography } from '@mui/material';
 import { redirect } from 'next/navigation';
-import { getMusicHistory } from '../../services/music';
+import { getMusicHistory } from '../../../services/music';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 
 export default async function MusicPage() {

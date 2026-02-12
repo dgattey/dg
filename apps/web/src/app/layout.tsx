@@ -22,8 +22,10 @@ import { baseMetadata, viewport } from './metadata';
 export const metadata: Metadata = baseMetadata;
 export { viewport };
 
+// Main content section with view-transition-name for animated page changes
 const mainSectionSx: SxObject = {
   marginTop: 16,
+  viewTransitionName: 'main-content',
 };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {

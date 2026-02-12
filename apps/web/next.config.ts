@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
     },
     turbopackFileSystemCacheForBuild: true,
     turbopackFileSystemCacheForDev: true,
+    viewTransition: true,
   },
   headers() {
     return [
