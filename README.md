@@ -181,9 +181,11 @@ Each page can optionally specify:
 
 #### Vercel deployment protection
 
-If preview deployments have password protection enabled (Vercel Deployment Protection), screenshots will be skipped and a note posted to the PR. To enable automatic screenshots:
+If preview deployments have password protection enabled (Vercel Deployment Protection), the workflow will attempt to use a bypass secret. To configure:
 
-1. **Disable protection for previews** in Vercel Project Settings > Deployment Protection
-2. **Or** use [Protection Bypass for Automation](https://vercel.com/docs/security/deployment-protection/methods-to-bypass-deployment-protection/protection-bypass-automation) (not yet implemented in this workflow)
+1. In Vercel: Project Settings > Deployment Protection > Protection Bypass for Automation > Generate secret
+2. In GitHub: Settings > Secrets and variables > Actions > Add `VERCEL_AUTOMATION_BYPASS_SECRET` with the same value
+
+The workflow will automatically append the bypass parameter to preview URLs. If no secret is configured or bypass fails, screenshots will be skipped with a note on the PR.
 
 [gh]: https://github.com/dgattey/dg
