@@ -2,6 +2,10 @@ import { log } from '@dg/shared-core/logging/log';
 import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { getDatabaseUrl, sequelizeOptions } from './dbConfig';
+import { MusicAlbum } from './models/MusicAlbum';
+import { MusicArtist } from './models/MusicArtist';
+import { MusicTrack } from './models/MusicTrack';
+import { MusicTrackArtist } from './models/MusicTrackArtist';
 import { OauthState } from './models/OauthState';
 import { SpotifyPlay } from './models/SpotifyPlay';
 import { StravaActivity } from './models/StravaActivity';
@@ -9,6 +13,10 @@ import { Token } from './models/Token';
 
 // Models
 export const db = {
+  MusicAlbum,
+  MusicArtist,
+  MusicTrack,
+  MusicTrackArtist,
   OauthState,
   SpotifyPlay,
   StravaActivity,

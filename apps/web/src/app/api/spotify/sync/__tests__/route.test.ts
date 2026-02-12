@@ -144,7 +144,10 @@ describe('Spotify sync route', () => {
     expect(response.body.skipped).toBe(false);
     expect(response.body.gapDetected).toBe(false);
     expect(response.body.success).toBe(true);
-    const rowCount = await db.SpotifyPlay.count();
+    // Count only rows with our test prefix to avoid conflicts with parallel tests
+    const rowCount = await db.SpotifyPlay.count({
+      where: { trackId: { [Op.like]: `${PREFIX}-%` } },
+    });
     expect(rowCount).toBe(2);
 
     // Verify revalidateTag was called when tracks were inserted

@@ -8,6 +8,12 @@ import { withMissingTokenFallback } from './withMissingTokenFallback';
 
 const LATEST_SONG_TAG = 'latest-song';
 
+/**
+ * Returns the most relevant playback state for UI:
+ * - currently playing track if available
+ * - otherwise the most recently played track
+ * - null if tokens are missing
+ */
 export const getLatestSong = async () => {
   'use cache';
   cacheLife('seconds');

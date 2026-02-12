@@ -1,5 +1,4 @@
 import type { Track } from '@dg/content-models/spotify/Track';
-import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
@@ -25,9 +24,8 @@ type TrackListingProps = {
    * Layout variant:
    * - `card` (default): Full card with logo, large album art, status, title, artists, progress bar
    * - `compact`: Small album art with truncated status/title/artists for tight spaces
-   * - `thumbnail`: Album art only, with a tooltip showing track and artist info
    */
-  variant?: 'card' | 'compact' | 'thumbnail';
+  variant?: 'card' | 'compact';
 
   /** Disable external links (e.g. compact variant on the home page). */
   disableLinks?: boolean;
@@ -236,21 +234,6 @@ function CompactLayout({
 }
 
 // ---------------------------------------------------------------------------
-// Thumbnail variant
-// ---------------------------------------------------------------------------
-
-function ThumbnailLayout({ track }: { track: Track }) {
-  const artistNames = track.artists.map((a) => a.name).join(', ');
-  const tooltip = `${track.name} – ${artistNames}`;
-
-  return (
-    <Tooltip title={tooltip}>
-      <AlbumImage isPlaying={false} track={track} />
-    </Tooltip>
-  );
-}
-
-// ---------------------------------------------------------------------------
 // Main component
 // ---------------------------------------------------------------------------
 
@@ -261,7 +244,6 @@ function ThumbnailLayout({ track }: { track: Track }) {
  * Variants:
  * - `card` — full now-playing card with logo, large art, progress bar
  * - `compact` — inline header thumbnail with small art + truncated text
- * - `thumbnail` — album art with hover tooltip for grid displays
  */
 export function TrackListing({
   track,
@@ -271,14 +253,10 @@ export function TrackListing({
 }: TrackListingProps) {
   const colors = getContrastingColors(track);
 
-  switch (variant) {
-    case 'card':
-      return <CardLayout colors={colors} track={track} />;
-    case 'compact':
-      return (
-        <CompactLayout disableLinks={disableLinks} shouldAnimate={shouldAnimate} track={track} />
-      );
-    case 'thumbnail':
-      return <ThumbnailLayout track={track} />;
+  if (variant === 'compact') {
+    return (
+      <CompactLayout disableLinks={disableLinks} shouldAnimate={shouldAnimate} track={track} />
+    );
   }
+  return <CardLayout colors={colors} track={track} />;
 }

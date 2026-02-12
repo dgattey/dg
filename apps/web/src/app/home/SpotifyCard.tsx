@@ -9,7 +9,7 @@ import { Box, Card, Skeleton, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import { Suspense } from 'react';
 import { getLatestSong } from '../../services/spotify';
-import { ALBUM_ART_BORDER_RADIUS, ALBUM_ART_DIMENSIONS } from '../spotify/AlbumImage';
+import { ALBUM_ART_BORDER_RADIUS, ALBUM_ART_DIMENSIONS } from '../spotify/albumArtStyles';
 import { SpotifyCardScrollTracker } from '../spotify/SpotifyCardScrollTracker';
 import { TrackListing } from '../spotify/TrackListing';
 
