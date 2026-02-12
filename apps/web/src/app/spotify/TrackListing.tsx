@@ -49,6 +49,11 @@ const cardHeaderSx: SxObject = {
   justifyContent: 'space-between',
 };
 
+const historyLinkSx: SxObject = {
+  marginTop: 1.5,
+  textShadow: 'inherit',
+};
+
 function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) {
   const { primary, secondary, primaryShadow, secondaryShadow } = colors ?? {};
   const trackUrl = track.externalUrls.spotify;
@@ -91,6 +96,15 @@ function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) 
           isPlaying={track.isPlaying}
           progressMs={track.progressMs}
         />
+        <Link
+          color="inherit"
+          href="/music"
+          sx={{ ...historyLinkSx, color: secondary, textShadow: secondaryShadow }}
+          title="View listening history"
+          variant="caption"
+        >
+          View history →
+        </Link>
       </Stack>
     </Stack>
   );
