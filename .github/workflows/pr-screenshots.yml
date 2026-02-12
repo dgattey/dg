@@ -13,7 +13,7 @@
 #
 # Based on: https://jm.sv/before-and-after
 
-name: PR Screenshots
+name: CI
 
 on:
   deployment_status:
@@ -24,6 +24,7 @@ concurrency:
 
 jobs:
   screenshots:
+    name: 📸 Screenshots
     # Only run on successful preview deployments, not production
     if: |
       github.event.deployment_status.state == 'success' &&
