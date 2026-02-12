@@ -206,6 +206,9 @@ export function getTheme(): Theme {
           body: {
             overscrollBehaviorX: 'none',
           },
+          html: {
+            scrollbarGutter: 'stable',
+          },
           'html, body': {
             overflowX: 'clip',
             width: '100%',
