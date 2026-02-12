@@ -47,7 +47,7 @@ fi
 # Install dependencies and generate .env
 cd "$ROOT_DIR"
 pnpm install
-pnpm --filter=@dg/cli env
+turbo env
 
 # Set up direnv to auto-load .env (for TURBO_TOKEN, etc.)
 if [[ ! -f ".envrc" ]]; then

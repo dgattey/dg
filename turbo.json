@@ -70,7 +70,7 @@
     },
     "dev": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo", "migrate"],
+      "dependsOn": ["@dg/cli#env", "topo", "migrate"],
       "env": [
         "CLOUDFLARE_TUNNEL_TOKEN",
         "CONTENTFUL_ACCESS_TOKEN",
@@ -91,32 +91,36 @@
     },
     "dg#dev": {
       "cache": false,
-      "dependsOn": ["dg#env"],
+      "dependsOn": ["@dg/cli#env"],
       "persistent": true
     },
-    "dg#env": {
+    "@dg/cli#env": {
       "cache": false
+    },
+    "@dg/cli#tunnel": {
+      "cache": false,
+      "persistent": true
     },
     "graphql:schema": {
       "cache": false
     },
     "migrate": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo"],
+      "dependsOn": ["@dg/cli#env", "topo"],
       "env": ["DATABASE_URL"],
       "inputs": ["$TURBO_DEFAULT$", "packages/db/database.config.mts", "packages/db/.sequelizerc"]
     },
     "migrate:generate": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo"]
+      "dependsOn": ["@dg/cli#env", "topo"]
     },
     "migrate:status": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo"]
+      "dependsOn": ["@dg/cli#env", "topo"]
     },
     "migrate:undo": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo"]
+      "dependsOn": ["@dg/cli#env", "topo"]
     },
     "test": {
       "dependsOn": ["topo"],
@@ -127,6 +131,27 @@
     },
     "topo": {
       "dependsOn": ["^topo"]
+    },
+    "version:read": {
+      "cache": false
+    },
+    "version:pr-info": {
+      "cache": false
+    },
+    "version:bump": {
+      "cache": false
+    },
+    "version:target-from-tags": {
+      "cache": false
+    },
+    "version:extract-notes": {
+      "cache": false
+    },
+    "version:pr-comment": {
+      "cache": false
+    },
+    "git:drop-bot-commits": {
+      "cache": false
     }
   }
 }

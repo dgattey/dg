@@ -62,7 +62,7 @@ jobs:
         if: steps.check-bot-commit.outputs.SKIP == 'false'
         run: |
           set -euo pipefail
-          OUTPUT=$(pnpm --filter=@dg/cli version:pr-info "$GITHUB_EVENT_PATH")
+          OUTPUT=$(turbo version:pr-info -- "$GITHUB_EVENT_PATH")
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
@@ -71,7 +71,7 @@ jobs:
         if: steps.check-bot-commit.outputs.SKIP == 'false'
         run: |
           set -euo pipefail
-          OUTPUT=$(pnpm --filter=@dg/cli version:read)
+          OUTPUT=$(turbo version:read)
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
@@ -81,7 +81,7 @@ jobs:
         run: |
           set -euo pipefail
           git fetch --tags
-          OUTPUT=$(pnpm --filter=@dg/cli version:target-from-tags "${{ steps.current-version.outputs.VERSION }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
+          OUTPUT=$(turbo version:target-from-tags -- "${{ steps.current-version.outputs.VERSION }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
@@ -92,7 +92,7 @@ jobs:
           VERSION: ${{ steps.target-version.outputs.VERSION_TO }}
         run: |
           set -euo pipefail
-          pnpm --filter=@dg/cli version:pr-comment "$GITHUB_EVENT_PATH" "$VERSION" will-be
+          turbo version:pr-comment -- "$GITHUB_EVENT_PATH" "$VERSION" will-be
 
       - name: Check if bump needed
         id: check-bump
@@ -113,7 +113,7 @@ jobs:
         if: steps.check-bot-commit.outputs.SKIP == 'false' && steps.check-bump.outputs.SKIP == 'false'
         run: |
           set -euo pipefail
-          OUTPUT=$(pnpm --filter=@dg/cli version:bump "${{ steps.target-version.outputs.BASE_VERSION_USED }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
+          OUTPUT=$(turbo version:bump -- "${{ steps.target-version.outputs.BASE_VERSION_USED }}" "${{ steps.pr-info.outputs.RELEASE_TYPE }}")
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
@@ -155,7 +155,7 @@ jobs:
         id: version
         run: |
           set -euo pipefail
-          OUTPUT=$(pnpm --filter=@dg/cli version:read)
+          OUTPUT=$(turbo version:read)
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
@@ -163,7 +163,7 @@ jobs:
         id: notes
         run: |
           set -euo pipefail
-          notes="$(pnpm --filter=@dg/cli version:extract-notes "$GITHUB_EVENT_PATH")"
+          notes="$(turbo version:extract-notes -- "$GITHUB_EVENT_PATH")"
           delimiter="NOTES_$(uuidgen)"
           {
             echo "notes<<$delimiter"
@@ -211,4 +211,4 @@ jobs:
           RELEASE_URL: ${{ steps.release.outputs.release_url }}
         run: |
           set -euo pipefail
-          pnpm --filter=@dg/cli version:pr-comment "$GITHUB_EVENT_PATH" "$VERSION" released
+          turbo version:pr-comment -- "$GITHUB_EVENT_PATH" "$VERSION" released
