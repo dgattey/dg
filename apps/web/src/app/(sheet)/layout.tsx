@@ -13,7 +13,8 @@ import type { ReactNode } from 'react';
  * with a semi-transparent overlay that gives the illusion of content behind.
  */
 const backdropSx: SxObject = {
-  backgroundColor: 'rgba(0, 0, 0, 0.4)',
+  backdropFilter: 'blur(4px)',
+  backgroundColor: 'rgba(0, 0, 0, 0.5)',
   bottom: 0,
   left: 0,
   position: 'fixed',
@@ -31,11 +32,11 @@ const sheetContainerSx: SxObject = {
   borderTopLeftRadius: 24,
   borderTopRightRadius: 24,
   bottom: 0,
-  boxShadow: '0 -4px 32px rgba(0, 0, 0, 0.15)',
+  boxShadow: '0 -8px 40px rgba(0, 0, 0, 0.2)',
   display: 'flex',
   flexDirection: 'column',
   left: 0,
-  maxHeight: 'calc(100vh - 80px)', // Leave room for the sticky header
+  maxHeight: 'calc(100vh - 72px)', // Leave room for the sticky header
   overflowY: 'auto',
   position: 'fixed',
   right: 0,
@@ -44,17 +45,41 @@ const sheetContainerSx: SxObject = {
 };
 
 /**
- * Close button positioned in the top-right of the sheet
+ * Handle indicator at top of sheet - visual affordance for dismissal
  */
-const closeButtonContainerSx: SxObject = {
+const handleSx: SxObject = {
+  alignSelf: 'center',
+  backgroundColor: 'divider',
+  borderRadius: 2,
+  height: 4,
+  marginTop: 1.5,
+  width: 36,
+};
+
+/**
+ * Header area with handle and close button
+ */
+const headerSx: SxObject = {
+  alignItems: 'center',
+  backgroundColor: 'background.default',
+  display: 'flex',
+  flexDirection: 'column',
+  paddingBottom: 1,
+  position: 'sticky',
+  top: 0,
+  zIndex: 3,
+};
+
+/**
+ * Close button row positioned in the top-right of the sheet
+ */
+const closeButtonRowSx: SxObject = {
   alignItems: 'center',
   display: 'flex',
   justifyContent: 'flex-end',
   paddingRight: 1,
-  paddingTop: 2,
-  position: 'sticky',
-  top: 0,
-  zIndex: 3,
+  paddingTop: 1,
+  width: '100%',
 };
 
 const closeButtonSx: SxObject = {
@@ -72,7 +97,6 @@ const closeButtonSx: SxObject = {
 const contentSx: SxObject = {
   flex: 1,
   paddingBottom: 4,
-  paddingTop: 1,
 };
 
 /**
@@ -100,20 +124,26 @@ export default function SheetLayout({ children }: { children: ReactNode }) {
 
       {/* Sheet container */}
       <Box sx={sheetContainerSx}>
-        {/* Close button */}
-        <Container>
-          <Box sx={closeButtonContainerSx}>
-            <IconButton
-              aria-label="Close sheet"
-              component={Link}
-              href="/"
-              size="small"
-              sx={closeButtonSx}
-            >
-              <X size={20} />
-            </IconButton>
-          </Box>
-        </Container>
+        {/* Sheet header with handle and close button */}
+        <Box sx={headerSx}>
+          {/* Visual handle indicator */}
+          <Box sx={handleSx} />
+
+          {/* Close button row */}
+          <Container>
+            <Box sx={closeButtonRowSx}>
+              <IconButton
+                aria-label="Close sheet"
+                component={Link}
+                href="/"
+                size="small"
+                sx={closeButtonSx}
+              >
+                <X size={20} />
+              </IconButton>
+            </Box>
+          </Container>
+        </Box>
 
         {/* Content area */}
         <Container sx={contentSx}>{children}</Container>
