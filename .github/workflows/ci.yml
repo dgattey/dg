@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
       deployments: read
 
@@ -227,7 +227,7 @@ jobs:
           path: ${{ steps.capture.outputs.output_dir }}
           retention-days: 30
 
-      - name: Commit screenshots to branch
+      - name: Upload screenshots to Gist
         if: steps.pr.outputs.skip != 'true' && steps.protection.outputs.protected != 'true'
         id: upload
         env:
@@ -235,15 +235,6 @@ jobs:
           PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
         run: |
           OUTPUT_DIR="${{ steps.capture.outputs.output_dir }}"
-          BRANCH="screenshots/pr-${PR_NUMBER}"
-          
-          # Configure git
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          # Create orphan branch for screenshots
-          git checkout --orphan "$BRANCH"
-          git rm -rf . 2>/dev/null || true
           
           MARKDOWN_ROWS=""
           UPLOADED_COUNT=0
@@ -259,52 +250,69 @@ jobs:
               continue
             fi
             
-            # Extract page name from directory (fix tr command - escape dash)
+            # Extract page name from directory
             DIR_NAME=$(basename "$DIR")
             if [ "$DIR_NAME" = "screenshots" ] || [ "$DIR_NAME" = "." ]; then
               PAGE_NAME="Homepage"
               SAFE_NAME="homepage"
             else
-              # Use sed instead of tr to avoid dash interpretation issues
               PAGE_NAME=$(echo "$DIR_NAME" | sed 's/[-_]/ /g' | sed 's/\b\(.\)/\u\1/g')
               SAFE_NAME="$DIR_NAME"
             fi
             
             echo "Processing: $PAGE_NAME"
             
-            # Copy files with clean names
-            BEFORE_DEST="${SAFE_NAME}-before.png"
-            AFTER_DEST="${SAFE_NAME}-after.png"
-            cp "$BEFORE_FILE" "$BEFORE_DEST"
-            cp "$AFTER_FILE" "$AFTER_DEST"
+            # Create a gist with base64 encoded images
+            BEFORE_B64=$(base64 -w0 "$BEFORE_FILE")
+            AFTER_B64=$(base64 -w0 "$AFTER_FILE")
             
-            # Build raw GitHub URLs
-            BEFORE_URL="https://raw.githubusercontent.com/${{ github.repository }}/${BRANCH}/${BEFORE_DEST}"
-            AFTER_URL="https://raw.githubusercontent.com/${{ github.repository }}/${BRANCH}/${AFTER_DEST}"
+            # Create gist with both images
+            GIST_RESPONSE=$(gh gist create \
+              --public \
+              --desc "PR #${PR_NUMBER} screenshots - ${PAGE_NAME}" \
+              <(echo "$BEFORE_B64" | base64 -d) \
+              <(echo "$AFTER_B64" | base64 -d) \
+              2>&1) || true
             
-            echo "  Before: $BEFORE_URL"
-            echo "  After: $AFTER_URL"
+            # Alternative: Upload images individually and get raw URLs
+            # Create temp files with proper names
+            BEFORE_TMP="/tmp/${SAFE_NAME}-before-pr${PR_NUMBER}.png"
+            AFTER_TMP="/tmp/${SAFE_NAME}-after-pr${PR_NUMBER}.png"
+            cp "$BEFORE_FILE" "$BEFORE_TMP"
+            cp "$AFTER_FILE" "$AFTER_TMP"
             
-            MARKDOWN_ROWS="${MARKDOWN_ROWS}| **${PAGE_NAME}** | ![Before](${BEFORE_URL}) | ![After](${AFTER_URL}) |
+            # Upload to gist and extract URL
+            GIST_URL=$(gh gist create --public "$BEFORE_TMP" "$AFTER_TMP" 2>/dev/null | tail -1)
+            
+            if [ -n "$GIST_URL" ]; then
+              # Extract gist ID and build raw URLs
+              GIST_ID=$(echo "$GIST_URL" | grep -oE '[a-f0-9]{32}')
+              BEFORE_URL="https://gist.githubusercontent.com/github-actions%5Bbot%5D/${GIST_ID}/raw/${SAFE_NAME}-before-pr${PR_NUMBER}.png"
+              AFTER_URL="https://gist.githubusercontent.com/github-actions%5Bbot%5D/${GIST_ID}/raw/${SAFE_NAME}-after-pr${PR_NUMBER}.png"
+              
+              echo "  Gist: $GIST_URL"
+              echo "  Before: $BEFORE_URL"
+              echo "  After: $AFTER_URL"
+              
+              MARKDOWN_ROWS="${MARKDOWN_ROWS}| **${PAGE_NAME}** | ![Before](${BEFORE_URL}) | ![After](${AFTER_URL}) |
           "
-            UPLOADED_COUNT=$((UPLOADED_COUNT + 1))
+              UPLOADED_COUNT=$((UPLOADED_COUNT + 1))
+            else
+              echo "  Failed to create gist"
+            fi
+            
+            rm -f "$BEFORE_TMP" "$AFTER_TMP"
           done
           
           if [ $UPLOADED_COUNT -gt 0 ]; then
-            # Commit and push screenshots
-            git add *.png
-            git commit -m "Screenshots for PR #${PR_NUMBER}"
-            git push -f origin "$BRANCH"
-            
             echo "uploaded=true" >> $GITHUB_OUTPUT
             echo "markdown_rows<<EOF" >> $GITHUB_OUTPUT
             echo "$MARKDOWN_ROWS" >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
-            echo "branch=$BRANCH" >> $GITHUB_OUTPUT
-            echo "Pushed $UPLOADED_COUNT screenshot(s) to $BRANCH"
+            echo "Uploaded $UPLOADED_COUNT page(s)"
           else
             echo "uploaded=false" >> $GITHUB_OUTPUT
-            echo "No screenshots to upload"
+            echo "No images uploaded"
           fi
 
       - name: Comment on PR
