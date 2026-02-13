@@ -147,16 +147,11 @@ jobs:
           
           mkdir -p "$OUTPUT_DIR"
           
-          # Configure agent-browser with bypass header for protected deployments
-          # This ensures ALL requests (including /_next/image/*) include the bypass header
+          # Build bypass query string if needed
+          BYPASS_PARAM=""
           if [ "$USE_BYPASS" = "true" ] && [ -n "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
-            echo "🔓 Configuring agent-browser with bypass header for protected deployment"
-            # Extract the origin from preview URL to scope headers
-            PREVIEW_ORIGIN=$(echo "$PREVIEW_BASE_URL" | grep -oE 'https?://[^/]+')
-            # Set bypass header for all requests to this origin
-            agent-browser open "$PREVIEW_ORIGIN/?x-vercel-protection-bypass=${VERCEL_AUTOMATION_BYPASS_SECRET}" 2>/dev/null || true
-            agent-browser wait 2000 2>/dev/null || true
-            echo "✅ Browser session initialized with bypass authentication"
+            BYPASS_PARAM="?x-vercel-protection-bypass=${VERCEL_AUTOMATION_BYPASS_SECRET}"
+            echo "🔓 Using bypass secret for protected deployment"
           fi
           
           # Read config
@@ -181,13 +176,19 @@ jobs:
               SAFE_NAME=$(echo "$PAGE_NAME" | tr ' /' '_-' | tr '[:upper:]' '[:lower:]')
               
               BEFORE_URL="${PRODUCTION_URL}${PAGE_PATH}"
-              AFTER_URL="${PREVIEW_BASE_URL}${PAGE_PATH}"
+              AFTER_URL="${PREVIEW_BASE_URL}${PAGE_PATH}${BYPASS_PARAM}"
               PAGE_OUTPUT_DIR="${OUTPUT_DIR}/${SAFE_NAME}"
               
               mkdir -p "$PAGE_OUTPUT_DIR"
               
               echo ""
               echo "📸 Capturing: $PAGE_NAME ($PAGE_PATH)"
+              
+              # Pre-warm pages to help with caching (before-and-after only waits 500ms)
+              curl -s -o /dev/null "$BEFORE_URL" &
+              curl -s -o /dev/null "$AFTER_URL" &
+              wait
+              sleep 2
               
               before-and-after "$BEFORE_URL" "$AFTER_URL" \
                 --size "$PAGE_VIEWPORT" \
@@ -198,15 +199,19 @@ jobs:
             # Default: capture homepage only
             echo ""
             echo "📸 Capturing: Homepage (default)"
+            PREVIEW_URL="${PREVIEW_BASE_URL}${BYPASS_PARAM}"
             
-            before-and-after "$PRODUCTION_URL" "$PREVIEW_BASE_URL" \
+            # Pre-warm pages
+            curl -s -o /dev/null "$PRODUCTION_URL" &
+            curl -s -o /dev/null "$PREVIEW_URL" &
+            wait
+            sleep 2
+            
+            before-and-after "$PRODUCTION_URL" "$PREVIEW_URL" \
               --size "$DEFAULT_VIEWPORT" \
               --output "$OUTPUT_DIR" \
               2>&1 || echo "Screenshot capture completed with warnings"
           fi
-          
-          # Clean up browser session
-          agent-browser close 2>/dev/null || true
           
           echo ""
           echo "Captured files:"
