@@ -188,4 +188,6 @@ If preview deployments have password protection enabled (Vercel Deployment Prote
 
 The workflow will automatically append the bypass parameter to preview URLs. If no secret is configured or bypass fails, screenshots will be skipped with a note on the PR.
 
+**Known limitation:** When Vercel Deployment Protection is enabled, images in preview screenshots may appear as empty placeholders. This is because the bypass token only authenticates the initial page request, while subsequent image requests through Next.js Image optimization (`/_next/image/*`) don't include the token. Production screenshots will show all images correctly. To get full image loading in previews, disable Vercel Deployment Protection for preview deployments.
+
 [gh]: https://github.com/dgattey/dg
