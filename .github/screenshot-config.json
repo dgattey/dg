@@ -6,6 +6,10 @@
     {
       "name": "Homepage",
       "path": "/"
+    },
+    {
+      "name": "Music",
+      "path": "/music"
     }
   ],
   "productionUrl": "https://dylangattey.com"
