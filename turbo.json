@@ -125,6 +125,10 @@
       "cache": false,
       "dependsOn": ["@dg/cli#env", "topo"]
     },
+    "setup": {
+      "cache": false,
+      "dependsOn": ["@dg/cli#env"]
+    },
     "test": {
       "dependsOn": ["topo"],
       "env": ["DATABASE_URL_TEST"],
@@ -152,10 +156,6 @@
     },
     "version:target-from-tags": {
       "cache": false
-    },
-    "setup": {
-      "cache": false,
-      "dependsOn": ["@dg/cli#env"]
     }
   }
 }
