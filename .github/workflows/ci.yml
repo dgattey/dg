@@ -1,6 +1,7 @@
 # CI checks the repo using formatting, types, tests, and PR screenshots
 #
-# Screenshots configuration: .github/screenshot-config.json
+# Screenshots: Uses @vercel/before-and-after with agent-browser
+# Screenshots config: .github/screenshot-config.json
 # Vercel bypass: https://vercel.com/docs/security/deployment-protection/methods-to-bypass-deployment-protection/protection-bypass-automation
 
 name: CI
@@ -76,8 +77,10 @@ jobs:
           node-version-file: .node-version
           cache: "pnpm"
 
-      - name: Install Playwright
-        run: npx playwright install chromium --with-deps
+      - name: Install agent-browser and before-and-after
+        run: |
+          npm install -g agent-browser @vercel/before-and-after
+          agent-browser install --with-deps
 
       - name: Get PR number
         id: pr
@@ -142,6 +145,8 @@ jobs:
           PREVIEW_BASE_URL="${{ github.event.deployment_status.target_url }}"
           OUTPUT_DIR="./screenshots"
           
+          mkdir -p "$OUTPUT_DIR"
+          
           # Build bypass query string if needed
           BYPASS_PARAM=""
           if [ "$USE_BYPASS" = "true" ] && [ -n "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
@@ -162,9 +167,8 @@ jobs:
           echo "Preview URL: $PREVIEW_BASE_URL"
           echo "Default viewport: $DEFAULT_VIEWPORT"
           
-          # Capture each configured page
+          # Capture each configured page using before-and-after CLI
           if [ -f "$CONFIG_FILE" ] && [ "$(jq '.pages | length' "$CONFIG_FILE")" -gt 0 ]; then
-            PAGE_INDEX=0
             jq -c '.pages[]' "$CONFIG_FILE" | while read -r page; do
               PAGE_PATH=$(echo "$page" | jq -r '.path')
               PAGE_NAME=$(echo "$page" | jq -r '.name // .path')
@@ -175,17 +179,15 @@ jobs:
               AFTER_URL="${PREVIEW_BASE_URL}${PAGE_PATH}${BYPASS_PARAM}"
               PAGE_OUTPUT_DIR="${OUTPUT_DIR}/${SAFE_NAME}"
               
+              mkdir -p "$PAGE_OUTPUT_DIR"
+              
               echo ""
               echo "📸 Capturing: $PAGE_NAME ($PAGE_PATH)"
               
-              node .github/scripts/capture-screenshots.mjs \
-                "$BEFORE_URL" \
-                "$AFTER_URL" \
-                "$PAGE_OUTPUT_DIR" \
-                "$PAGE_VIEWPORT" \
-                || echo "  Warning: capture may have had issues for $PAGE_NAME"
-              
-              PAGE_INDEX=$((PAGE_INDEX + 1))
+              before-and-after "$BEFORE_URL" "$AFTER_URL" \
+                --size "$PAGE_VIEWPORT" \
+                --output "$PAGE_OUTPUT_DIR" \
+                2>&1 || echo "  Warning: capture may have had issues for $PAGE_NAME"
             done
           else
             # Default: capture homepage only
@@ -193,12 +195,10 @@ jobs:
             echo "📸 Capturing: Homepage (default)"
             PREVIEW_URL="${PREVIEW_BASE_URL}${BYPASS_PARAM}"
             
-            node .github/scripts/capture-screenshots.mjs \
-              "$PRODUCTION_URL" \
-              "$PREVIEW_URL" \
-              "${OUTPUT_DIR}/homepage" \
-              "$DEFAULT_VIEWPORT" \
-              || echo "Screenshot capture completed with warnings"
+            before-and-after "$PRODUCTION_URL" "$PREVIEW_URL" \
+              --size "$DEFAULT_VIEWPORT" \
+              --output "$OUTPUT_DIR" \
+              2>&1 || echo "Screenshot capture completed with warnings"
           fi
           
           echo ""
@@ -229,18 +229,19 @@ jobs:
           MARKDOWN_ROWS=""
           UPLOADED_COUNT=0
           
-          # Find all page directories containing before/after screenshots
-          for PAGE_DIR in "$OUTPUT_DIR"/*/; do
-            [ -d "$PAGE_DIR" ] || continue
-            
-            BEFORE_FILE="${PAGE_DIR}before.png"
-            AFTER_FILE="${PAGE_DIR}after.png"
-            
-            [ -f "$BEFORE_FILE" ] || continue
+          # Find all before/after pairs (before-and-after generates timestamped filenames)
+          # Pattern: YYYYMMDD-HHMMSS-{url}-before.png / -after.png
+          for BEFORE_FILE in $(find "$OUTPUT_DIR" -name "*-before.png" -type f 2>/dev/null); do
+            AFTER_FILE=$(echo "$BEFORE_FILE" | sed 's/-before\.png$/-after.png/')
             [ -f "$AFTER_FILE" ] || continue
             
-            # Get page name from directory name
-            PAGE_NAME=$(basename "$PAGE_DIR" | tr '-' ' ' | sed 's/\b\(.\)/\u\1/g')
+            # Extract page name from directory or filename
+            DIR_NAME=$(basename "$(dirname "$BEFORE_FILE")")
+            if [ "$DIR_NAME" = "screenshots" ] || [ "$DIR_NAME" = "." ]; then
+              PAGE_NAME="Homepage"
+            else
+              PAGE_NAME=$(echo "$DIR_NAME" | tr '-_' ' ' | sed 's/\b\(.\)/\u\1/g')
+            fi
             
             echo "Uploading: $PAGE_NAME"
             BEFORE_URL=$(upload_to_0x0 "$BEFORE_FILE")
@@ -281,7 +282,7 @@ jobs:
             **Preview URL:** ${previewUrl}
             
             ---
-            <sub>[View artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>`;
+            <sub>Generated by [before-and-after](https://jm.sv/before-and-after) • [View artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>`;
             
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
@@ -329,7 +330,7 @@ jobs:
             **Preview URL:** ${previewUrl}
             
             ---
-            <sub>[CI workflow](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>`;
+            <sub>Generated by [before-and-after](https://jm.sv/before-and-after)</sub>`;
             
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
