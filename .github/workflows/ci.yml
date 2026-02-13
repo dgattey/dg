@@ -398,7 +398,7 @@ jobs:
 
   # Cleanup screenshot branches when PR is closed
   cleanup-screenshots:
-    name: 🧹 Cleanup screenshots
+    name: 🗑️ Cleanup
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
     runs-on: ubuntu-latest
     permissions:
