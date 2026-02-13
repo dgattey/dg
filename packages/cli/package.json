@@ -18,6 +18,7 @@
     "clean": "rm -rf .turbo *.tsbuildinfo",
     "env": "tsx src/env.ts",
     "git:drop-bot-commits": "tsx src/git-drop-bot-commits.ts",
+    "setup": "tsx src/setup.ts",
     "tunnel": "tsx src/tunnel.ts",
     "version:bump": "tsx src/version.ts bump",
     "version:extract-notes": "tsx src/version.ts extract-notes",

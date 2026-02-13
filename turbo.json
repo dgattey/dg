@@ -8,6 +8,13 @@
     "tsconfig.json"
   ],
   "tasks": {
+    "@dg/cli#env": {
+      "cache": false
+    },
+    "@dg/cli#tunnel": {
+      "cache": false,
+      "persistent": true
+    },
     "build": {
       "dependsOn": ["^build", "^migrate", "topo", "check", "check:types"],
       "env": [
@@ -94,12 +101,8 @@
       "dependsOn": ["@dg/cli#env"],
       "persistent": true
     },
-    "@dg/cli#env": {
+    "git:drop-bot-commits": {
       "cache": false
-    },
-    "@dg/cli#tunnel": {
-      "cache": false,
-      "persistent": true
     },
     "graphql:schema": {
       "cache": false
@@ -132,16 +135,7 @@
     "topo": {
       "dependsOn": ["^topo"]
     },
-    "version:read": {
-      "cache": false
-    },
-    "version:pr-info": {
-      "cache": false
-    },
     "version:bump": {
-      "cache": false
-    },
-    "version:target-from-tags": {
       "cache": false
     },
     "version:extract-notes": {
@@ -150,8 +144,18 @@
     "version:pr-comment": {
       "cache": false
     },
-    "git:drop-bot-commits": {
+    "version:pr-info": {
       "cache": false
+    },
+    "version:read": {
+      "cache": false
+    },
+    "version:target-from-tags": {
+      "cache": false
+    },
+    "setup": {
+      "cache": false,
+      "dependsOn": ["@dg/cli#env"]
     }
   }
 }
