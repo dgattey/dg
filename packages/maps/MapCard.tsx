@@ -3,6 +3,7 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
+import { useEffect, useRef, useState } from 'react';
 import { PigeonMap } from './src/PigeonMap';
 
 const mapCardSx: SxObject = {
@@ -10,17 +11,41 @@ const mapCardSx: SxObject = {
 };
 
 /**
- * Shows a map card using Pigeon Maps. No lazy loading needed
- * since pigeon-maps is lightweight (~10KB).
+ * Shows a map card using Pigeon Maps.
+ * Defers tile loading until the card is visible in viewport
+ * to reduce initial page bandwidth.
  */
 export function MapCard({ location }: { location: MapLocation | null | undefined }) {
-  if (!location) {
-    return <ContentCard sx={mapCardSx} />;
-  }
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const element = containerRef.current;
+    if (!element || !location) {
+      return;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setIsVisible(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: '100px' },
+    );
+
+    observer.observe(element);
+    return () => {
+      observer.disconnect();
+    };
+  }, [location]);
 
   return (
-    <ContentCard sx={mapCardSx}>
-      <PigeonMap location={location} />
-    </ContentCard>
+    <div ref={containerRef}>
+      <ContentCard sx={mapCardSx}>
+        {isVisible && location ? <PigeonMap location={location} /> : null}
+      </ContentCard>
+    </div>
   );
 }
