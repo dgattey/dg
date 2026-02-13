@@ -3,7 +3,7 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
-import { PigeonMap } from './maps/PigeonMap';
+import { PigeonMap } from './src/PigeonMap';
 
 const mapCardSx: SxObject = {
   border: 'none',
