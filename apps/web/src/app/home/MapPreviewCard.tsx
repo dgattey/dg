@@ -1,9 +1,9 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
-import { LazyLoadedMap } from '@dg/maps/LazyLoadedMap';
+import { MapCard } from '@dg/maps/MapCard';
 
 /**
- * Shows a preview of the full map card, to be fetched on hover.
+ * Shows a map card with the current location.
  */
 export function MapPreviewCard({ location }: { location: MapLocation | null }) {
-  return <LazyLoadedMap location={location} />;
+  return <MapCard location={location} />;
 }
