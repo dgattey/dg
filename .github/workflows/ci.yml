@@ -184,6 +184,12 @@ jobs:
               echo ""
               echo "📸 Capturing: $PAGE_NAME ($PAGE_PATH)"
               
+              # Pre-warm pages to help with caching (before-and-after only waits 500ms)
+              curl -s -o /dev/null "$BEFORE_URL" &
+              curl -s -o /dev/null "$AFTER_URL" &
+              wait
+              sleep 2
+              
               before-and-after "$BEFORE_URL" "$AFTER_URL" \
                 --size "$PAGE_VIEWPORT" \
                 --output "$PAGE_OUTPUT_DIR" \
@@ -194,6 +200,12 @@ jobs:
             echo ""
             echo "📸 Capturing: Homepage (default)"
             PREVIEW_URL="${PREVIEW_BASE_URL}${BYPASS_PARAM}"
+            
+            # Pre-warm pages
+            curl -s -o /dev/null "$PRODUCTION_URL" &
+            curl -s -o /dev/null "$PREVIEW_URL" &
+            wait
+            sleep 2
             
             before-and-after "$PRODUCTION_URL" "$PREVIEW_URL" \
               --size "$DEFAULT_VIEWPORT" \
@@ -221,9 +233,12 @@ jobs:
         run: |
           OUTPUT_DIR="${{ steps.capture.outputs.output_dir }}"
           
-          upload_to_0x0() {
+          # Upload to litterbox.catbox.moe (temporary file hosting, 72h retention)
+          # Works with CI unlike 0x0.st which blocks automated user agents
+          upload_image() {
             local file="$1"
-            curl -s -F "file=@$file" https://0x0.st
+            curl -s -F "reqtype=fileupload" -F "time=72h" -F "fileToUpload=@$file" \
+              "https://litterbox.catbox.moe/resources/internals/api.php"
           }
           
           MARKDOWN_ROWS=""
@@ -258,13 +273,18 @@ jobs:
             echo "  Before: $BEFORE_FILE"
             echo "  After: $AFTER_FILE"
             
-            BEFORE_URL=$(upload_to_0x0 "$BEFORE_FILE")
-            AFTER_URL=$(upload_to_0x0 "$AFTER_FILE")
+            BEFORE_URL=$(upload_image "$BEFORE_FILE")
+            AFTER_URL=$(upload_image "$AFTER_FILE")
             
-            if [ -n "$BEFORE_URL" ] && [ -n "$AFTER_URL" ]; then
+            echo "  Before URL: $BEFORE_URL"
+            echo "  After URL: $AFTER_URL"
+            
+            if [ -n "$BEFORE_URL" ] && [ -n "$AFTER_URL" ] && [[ "$BEFORE_URL" == http* ]]; then
               MARKDOWN_ROWS="${MARKDOWN_ROWS}| **${PAGE_NAME}** | ![Before](${BEFORE_URL}) | ![After](${AFTER_URL}) |
           "
               UPLOADED_COUNT=$((UPLOADED_COUNT + 1))
+            else
+              echo "  Upload failed or returned unexpected response"
             fi
           done
           
