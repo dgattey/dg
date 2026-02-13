@@ -155,4 +155,39 @@ If multiple PRs each have their own version bump and one merges, other PRs will 
 2. Force push: `git push --force-with-lease`
 3. The workflow will automatically create a fresh version bump commit
 
+### PR screenshots
+
+The repo automatically captures before/after screenshots on PRs comparing production vs the Vercel preview deployment. Screenshots are captured using [@vercel/before-and-after](https://jm.sv/before-and-after) and posted as a PR comment.
+
+#### Configuration
+
+Edit `.github/screenshot-config.json` to customize which pages are captured:
+
+```json
+{
+  "productionUrl": "https://dylangattey.com",
+  "defaultViewport": "1280x800",
+  "pages": [
+    { "path": "/", "name": "Homepage" },
+    { "path": "/music", "name": "Music", "viewport": "1280x800" },
+    { "path": "/music", "name": "Music (mobile)", "viewport": "375x812" }
+  ]
+}
+```
+
+Each page can optionally specify:
+- `viewport` - Override the default viewport (e.g., `375x812` for mobile)
+- `selector` - CSS selector to capture a specific element instead of full page
+
+#### Vercel deployment protection
+
+If preview deployments have password protection enabled (Vercel Deployment Protection), the workflow will attempt to use a bypass secret. To configure:
+
+1. In Vercel: Project Settings > Deployment Protection > Protection Bypass for Automation > Generate secret
+2. In GitHub: Settings > Secrets and variables > Actions > Add `VERCEL_AUTOMATION_BYPASS_SECRET` with the same value
+
+The workflow will automatically append the bypass parameter to preview URLs. If no secret is configured or bypass fails, screenshots will be skipped with a note on the PR.
+
+**Known limitation:** When Vercel Deployment Protection is enabled, images in preview screenshots may appear as empty placeholders. This is because the bypass token only authenticates the initial page request, while subsequent image requests through Next.js Image optimization (`/_next/image/*`) don't include the token. Production screenshots will show all images correctly. To get full image loading in previews, disable Vercel Deployment Protection for preview deployments.
+
 [gh]: https://github.com/dgattey/dg

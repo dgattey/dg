@@ -1,0 +1,16 @@
+{
+  "_comment": "Configuration for PR before/after screenshots. See .github/workflows/pr-screenshots.yml",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "defaultViewport": "1280x800",
+  "pages": [
+    {
+      "name": "Homepage",
+      "path": "/"
+    },
+    {
+      "name": "Music",
+      "path": "/music"
+    }
+  ],
+  "productionUrl": "https://dylangattey.com"
+}
