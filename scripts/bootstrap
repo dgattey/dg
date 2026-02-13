@@ -44,17 +44,12 @@ if ! command -v turbo >/dev/null 2>&1; then
   nodenv rehash
 fi
 
-# Install dependencies and generate .env
+# Install dependencies and run setup
 cd "$ROOT_DIR"
 pnpm install
-scripts/generate-env
+turbo setup
 
-# Set up direnv to auto-load .env (for TURBO_TOKEN, etc.)
-if [[ ! -f ".envrc" ]]; then
-  echo "dotenv" > .envrc
-fi
-
-# Add direnv hook to .zshrc if missing
+# Add direnv hook to .zshrc if missing (shell-specific, can't be in CLI)
 if ! grep -q "direnv hook" ~/.zshrc 2>/dev/null; then
   echo "" >> ~/.zshrc
   echo '# direnv hook (added by dg bootstrap)' >> ~/.zshrc
@@ -65,23 +60,5 @@ fi
 # Activate direnv for this session
 eval "$(direnv hook zsh)"
 direnv allow .
-
-# Configure Turbo remote caching (only if not already configured)
-if [[ ! -f ".turbo/config.json" ]]; then
-  # Source .env for TURBO_TEAM
-  if [[ -f ".env" ]]; then
-    set -a
-    source .env
-    set +a
-  fi
-  
-  if [[ -n "${TURBO_TEAM:-}" ]]; then
-    echo "Configuring Turbo remote caching for team: $TURBO_TEAM"
-    mkdir -p .turbo
-    echo "{\"teamId\":\"$TURBO_TEAM\"}" > .turbo/config.json
-  else
-    echo "Warning: TURBO_TEAM not set, skipping Turbo remote cache config"
-  fi
-fi
 
 echo "Bootstrap complete."

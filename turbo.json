@@ -2,13 +2,19 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [
     "config/env.secrets.keys",
-    "scripts/generate-env",
     ".node-version",
     ".npmrc",
     "biome.json",
     "tsconfig.json"
   ],
   "tasks": {
+    "@dg/cli#env": {
+      "cache": false
+    },
+    "@dg/cli#tunnel": {
+      "cache": false,
+      "persistent": true
+    },
     "build": {
       "dependsOn": ["^build", "^migrate", "topo", "check", "check:types"],
       "env": [
@@ -71,7 +77,7 @@
     },
     "dev": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo", "migrate"],
+      "dependsOn": ["@dg/cli#env", "topo", "migrate"],
       "env": [
         "CLOUDFLARE_TUNNEL_TOKEN",
         "CONTENTFUL_ACCESS_TOKEN",
@@ -92,10 +98,10 @@
     },
     "dg#dev": {
       "cache": false,
-      "dependsOn": ["dg#env"],
+      "dependsOn": ["@dg/cli#env"],
       "persistent": true
     },
-    "dg#env": {
+    "drop-bot-commits": {
       "cache": false
     },
     "graphql:schema": {
@@ -103,21 +109,25 @@
     },
     "migrate": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo"],
+      "dependsOn": ["@dg/cli#env", "topo"],
       "env": ["DATABASE_URL"],
       "inputs": ["$TURBO_DEFAULT$", "packages/db/database.config.mts", "packages/db/.sequelizerc"]
     },
     "migrate:generate": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo"]
+      "dependsOn": ["@dg/cli#env", "topo"]
     },
     "migrate:status": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo"]
+      "dependsOn": ["@dg/cli#env", "topo"]
     },
     "migrate:undo": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo"]
+      "dependsOn": ["@dg/cli#env", "topo"]
+    },
+    "setup": {
+      "cache": false,
+      "dependsOn": ["@dg/cli#env"]
     },
     "test": {
       "dependsOn": ["topo"],
@@ -128,6 +138,24 @@
     },
     "topo": {
       "dependsOn": ["^topo"]
+    },
+    "version:bump": {
+      "cache": false
+    },
+    "version:extract-notes": {
+      "cache": false
+    },
+    "version:pr-comment": {
+      "cache": false
+    },
+    "version:pr-info": {
+      "cache": false
+    },
+    "version:read": {
+      "cache": false
+    },
+    "version:target-from-tags": {
+      "cache": false
     }
   }
 }
