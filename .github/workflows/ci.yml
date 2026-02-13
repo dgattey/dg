@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       deployments: read
 
@@ -227,33 +227,31 @@ jobs:
           path: ${{ steps.capture.outputs.output_dir }}
           retention-days: 30
 
-      - name: Upload images for PR comment
+      - name: Commit screenshots to branch
         if: steps.pr.outputs.skip != 'true' && steps.protection.outputs.protected != 'true'
         id: upload
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
         run: |
           OUTPUT_DIR="${{ steps.capture.outputs.output_dir }}"
+          BRANCH="screenshots/pr-${PR_NUMBER}"
           
-          # Upload to litterbox.catbox.moe (temporary file hosting, 72h retention)
-          # Works with CI unlike 0x0.st which blocks automated user agents
-          upload_image() {
-            local file="$1"
-            curl -s -F "reqtype=fileupload" -F "time=72h" -F "fileToUpload=@$file" \
-              "https://litterbox.catbox.moe/resources/internals/api.php"
-          }
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create orphan branch for screenshots
+          git checkout --orphan "$BRANCH"
+          git rm -rf . 2>/dev/null || true
           
           MARKDOWN_ROWS=""
           UPLOADED_COUNT=0
           
-          # before-and-after generates: {url}-{before|after}-{timestamp}.png
-          # Before/after files share the same timestamp but have different URL prefixes
-          # Match them by finding files with same timestamp in same directory
-          
+          # Process each before/after pair
           for BEFORE_FILE in $(find "$OUTPUT_DIR" -name "*-before-*.png" -type f 2>/dev/null); do
-            # Extract timestamp from filename (e.g., 2026-02-13T04-45-53)
             TIMESTAMP=$(echo "$BEFORE_FILE" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}-[0-9]{2}')
             DIR=$(dirname "$BEFORE_FILE")
-            
-            # Find matching after file with same timestamp in same directory
             AFTER_FILE=$(find "$DIR" -name "*-after-${TIMESTAMP}.png" -type f 2>/dev/null | head -1)
             
             if [ -z "$AFTER_FILE" ] || [ ! -f "$AFTER_FILE" ]; then
@@ -261,42 +259,52 @@ jobs:
               continue
             fi
             
-            # Extract page name from directory
+            # Extract page name from directory (fix tr command - escape dash)
             DIR_NAME=$(basename "$DIR")
             if [ "$DIR_NAME" = "screenshots" ] || [ "$DIR_NAME" = "." ]; then
               PAGE_NAME="Homepage"
+              SAFE_NAME="homepage"
             else
-              PAGE_NAME=$(echo "$DIR_NAME" | tr '-_' ' ' | sed 's/\b\(.\)/\u\1/g')
+              # Use sed instead of tr to avoid dash interpretation issues
+              PAGE_NAME=$(echo "$DIR_NAME" | sed 's/[-_]/ /g' | sed 's/\b\(.\)/\u\1/g')
+              SAFE_NAME="$DIR_NAME"
             fi
             
-            echo "Uploading: $PAGE_NAME"
-            echo "  Before: $BEFORE_FILE"
-            echo "  After: $AFTER_FILE"
+            echo "Processing: $PAGE_NAME"
             
-            BEFORE_URL=$(upload_image "$BEFORE_FILE")
-            AFTER_URL=$(upload_image "$AFTER_FILE")
+            # Copy files with clean names
+            BEFORE_DEST="${SAFE_NAME}-before.png"
+            AFTER_DEST="${SAFE_NAME}-after.png"
+            cp "$BEFORE_FILE" "$BEFORE_DEST"
+            cp "$AFTER_FILE" "$AFTER_DEST"
             
-            echo "  Before URL: $BEFORE_URL"
-            echo "  After URL: $AFTER_URL"
+            # Build raw GitHub URLs
+            BEFORE_URL="https://raw.githubusercontent.com/${{ github.repository }}/${BRANCH}/${BEFORE_DEST}"
+            AFTER_URL="https://raw.githubusercontent.com/${{ github.repository }}/${BRANCH}/${AFTER_DEST}"
             
-            if [ -n "$BEFORE_URL" ] && [ -n "$AFTER_URL" ] && [[ "$BEFORE_URL" == http* ]]; then
-              MARKDOWN_ROWS="${MARKDOWN_ROWS}| **${PAGE_NAME}** | ![Before](${BEFORE_URL}) | ![After](${AFTER_URL}) |
+            echo "  Before: $BEFORE_URL"
+            echo "  After: $AFTER_URL"
+            
+            MARKDOWN_ROWS="${MARKDOWN_ROWS}| **${PAGE_NAME}** | ![Before](${BEFORE_URL}) | ![After](${AFTER_URL}) |
           "
-              UPLOADED_COUNT=$((UPLOADED_COUNT + 1))
-            else
-              echo "  Upload failed or returned unexpected response"
-            fi
+            UPLOADED_COUNT=$((UPLOADED_COUNT + 1))
           done
           
           if [ $UPLOADED_COUNT -gt 0 ]; then
+            # Commit and push screenshots
+            git add *.png
+            git commit -m "Screenshots for PR #${PR_NUMBER}"
+            git push -f origin "$BRANCH"
+            
             echo "uploaded=true" >> $GITHUB_OUTPUT
             echo "markdown_rows<<EOF" >> $GITHUB_OUTPUT
             echo "$MARKDOWN_ROWS" >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
-            echo "Uploaded $UPLOADED_COUNT page(s)"
+            echo "branch=$BRANCH" >> $GITHUB_OUTPUT
+            echo "Pushed $UPLOADED_COUNT screenshot(s) to $BRANCH"
           else
             echo "uploaded=false" >> $GITHUB_OUTPUT
-            echo "No images uploaded"
+            echo "No screenshots to upload"
           fi
 
       - name: Comment on PR
