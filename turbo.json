@@ -101,7 +101,7 @@
       "dependsOn": ["@dg/cli#env"],
       "persistent": true
     },
-    "git:drop-bot-commits": {
+    "drop-bot-commits": {
       "cache": false
     },
     "graphql:schema": {

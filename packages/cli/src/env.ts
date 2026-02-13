@@ -3,10 +3,13 @@
  * Generate .env file from 1Password secrets
  * Usage: tsx src/env.ts [--force]
  */
-import { execSync } from 'node:child_process';
+import { exec, execSync } from 'node:child_process';
 import { existsSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { promisify } from 'node:util';
 import { fail, findRoot, fmt, log, out, spinner, withSpinner } from './lib/utils.js';
+
+const execAsync = promisify(exec);
 
 const root = findRoot();
 const envFile = join(root, '.env');
@@ -63,21 +66,22 @@ try {
   }
 }
 
-// Fetch secrets
-const secrets = await withSpinner('Fetching secrets from 1Password', (s) => {
+// Fetch secrets in parallel
+const secrets = await withSpinner('Fetching secrets from 1Password', async (s) => {
   const results: Record<string, string> = {};
   const missing: Array<string> = [];
 
-  for (const key of keys) {
-    try {
-      results[key] = execSync(`op read "op://dg/${key}/value"`, {
-        encoding: 'utf8',
-        stdio: ['ignore', 'pipe', 'ignore'],
-      }).trim();
-    } catch {
-      missing.push(key);
-    }
-  }
+  // Fetch all keys in parallel
+  await Promise.all(
+    keys.map(async (key) => {
+      try {
+        const { stdout } = await execAsync(`op read "op://dg/${key}/value"`);
+        results[key] = stdout.trim();
+      } catch {
+        missing.push(key);
+      }
+    }),
+  );
 
   s.text = `Fetched ${Object.keys(results).length}/${keys.length} secrets`;
 

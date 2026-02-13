@@ -151,7 +151,7 @@ Versioning uses auto-generated version bumps on PRs with GitHub releases on merg
 
 If multiple PRs each have their own version bump and one merges, other PRs will have conflicts in `package.json`. To fix:
 
-1. Run `turbo git:drop-bot-commits` to remove bot-authored version bumps and rebase onto `origin/main`
+1. Run `turbo drop-bot-commits` to remove bot-authored version bumps and rebase onto `origin/main`
 2. Force push: `git push --force-with-lease`
 3. The workflow will automatically create a fresh version bump commit
 
