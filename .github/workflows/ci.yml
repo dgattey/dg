@@ -229,14 +229,25 @@ jobs:
           MARKDOWN_ROWS=""
           UPLOADED_COUNT=0
           
-          # Find all before/after pairs (before-and-after generates timestamped filenames)
-          # Pattern: YYYYMMDD-HHMMSS-{url}-before.png / -after.png
-          for BEFORE_FILE in $(find "$OUTPUT_DIR" -name "*-before.png" -type f 2>/dev/null); do
-            AFTER_FILE=$(echo "$BEFORE_FILE" | sed 's/-before\.png$/-after.png/')
-            [ -f "$AFTER_FILE" ] || continue
+          # before-and-after generates: {url}-{before|after}-{timestamp}.png
+          # Before/after files share the same timestamp but have different URL prefixes
+          # Match them by finding files with same timestamp in same directory
+          
+          for BEFORE_FILE in $(find "$OUTPUT_DIR" -name "*-before-*.png" -type f 2>/dev/null); do
+            # Extract timestamp from filename (e.g., 2026-02-13T04-45-53)
+            TIMESTAMP=$(echo "$BEFORE_FILE" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}-[0-9]{2}-[0-9]{2}')
+            DIR=$(dirname "$BEFORE_FILE")
             
-            # Extract page name from directory or filename
-            DIR_NAME=$(basename "$(dirname "$BEFORE_FILE")")
+            # Find matching after file with same timestamp in same directory
+            AFTER_FILE=$(find "$DIR" -name "*-after-${TIMESTAMP}.png" -type f 2>/dev/null | head -1)
+            
+            if [ -z "$AFTER_FILE" ] || [ ! -f "$AFTER_FILE" ]; then
+              echo "No matching after file for: $BEFORE_FILE"
+              continue
+            fi
+            
+            # Extract page name from directory
+            DIR_NAME=$(basename "$DIR")
             if [ "$DIR_NAME" = "screenshots" ] || [ "$DIR_NAME" = "." ]; then
               PAGE_NAME="Homepage"
             else
@@ -244,6 +255,9 @@ jobs:
             fi
             
             echo "Uploading: $PAGE_NAME"
+            echo "  Before: $BEFORE_FILE"
+            echo "  After: $AFTER_FILE"
+            
             BEFORE_URL=$(upload_to_0x0 "$BEFORE_FILE")
             AFTER_URL=$(upload_to_0x0 "$AFTER_FILE")
             
