@@ -63,7 +63,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
       deployments: read
 
@@ -227,7 +227,7 @@ jobs:
           path: ${{ steps.capture.outputs.output_dir }}
           retention-days: 30
 
-      - name: Upload screenshots to Gist
+      - name: Upload screenshots to branch
         if: steps.pr.outputs.skip != 'true' && steps.protection.outputs.protected != 'true'
         id: upload
         env:
@@ -235,6 +235,15 @@ jobs:
           PR_NUMBER: ${{ steps.pr.outputs.pr_number }}
         run: |
           OUTPUT_DIR="${{ steps.capture.outputs.output_dir }}"
+          BRANCH="screenshots/pr-${PR_NUMBER}"
+          
+          # Configure git
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          
+          # Create orphan branch for screenshots
+          git checkout --orphan "$BRANCH"
+          git rm -rf . 2>/dev/null || true
           
           MARKDOWN_ROWS=""
           UPLOADED_COUNT=0
@@ -262,57 +271,35 @@ jobs:
             
             echo "Processing: $PAGE_NAME"
             
-            # Create a gist with base64 encoded images
-            BEFORE_B64=$(base64 -w0 "$BEFORE_FILE")
-            AFTER_B64=$(base64 -w0 "$AFTER_FILE")
+            # Copy files with clean names
+            cp "$BEFORE_FILE" "${SAFE_NAME}-before.png"
+            cp "$AFTER_FILE" "${SAFE_NAME}-after.png"
             
-            # Create gist with both images
-            GIST_RESPONSE=$(gh gist create \
-              --public \
-              --desc "PR #${PR_NUMBER} screenshots - ${PAGE_NAME}" \
-              <(echo "$BEFORE_B64" | base64 -d) \
-              <(echo "$AFTER_B64" | base64 -d) \
-              2>&1) || true
+            # Build raw GitHub URLs
+            BEFORE_URL="https://raw.githubusercontent.com/${{ github.repository }}/${BRANCH}/${SAFE_NAME}-before.png"
+            AFTER_URL="https://raw.githubusercontent.com/${{ github.repository }}/${BRANCH}/${SAFE_NAME}-after.png"
             
-            # Alternative: Upload images individually and get raw URLs
-            # Create temp files with proper names
-            BEFORE_TMP="/tmp/${SAFE_NAME}-before-pr${PR_NUMBER}.png"
-            AFTER_TMP="/tmp/${SAFE_NAME}-after-pr${PR_NUMBER}.png"
-            cp "$BEFORE_FILE" "$BEFORE_TMP"
-            cp "$AFTER_FILE" "$AFTER_TMP"
+            echo "  Before: $BEFORE_URL"
+            echo "  After: $AFTER_URL"
             
-            # Upload to gist and extract URL
-            GIST_URL=$(gh gist create --public "$BEFORE_TMP" "$AFTER_TMP" 2>/dev/null | tail -1)
-            
-            if [ -n "$GIST_URL" ]; then
-              # Extract gist ID and build raw URLs
-              GIST_ID=$(echo "$GIST_URL" | grep -oE '[a-f0-9]{32}')
-              BEFORE_URL="https://gist.githubusercontent.com/github-actions%5Bbot%5D/${GIST_ID}/raw/${SAFE_NAME}-before-pr${PR_NUMBER}.png"
-              AFTER_URL="https://gist.githubusercontent.com/github-actions%5Bbot%5D/${GIST_ID}/raw/${SAFE_NAME}-after-pr${PR_NUMBER}.png"
-              
-              echo "  Gist: $GIST_URL"
-              echo "  Before: $BEFORE_URL"
-              echo "  After: $AFTER_URL"
-              
-              MARKDOWN_ROWS="${MARKDOWN_ROWS}| **${PAGE_NAME}** | ![Before](${BEFORE_URL}) | ![After](${AFTER_URL}) |
+            MARKDOWN_ROWS="${MARKDOWN_ROWS}| **${PAGE_NAME}** | ![Before](${BEFORE_URL}) | ![After](${AFTER_URL}) |
           "
-              UPLOADED_COUNT=$((UPLOADED_COUNT + 1))
-            else
-              echo "  Failed to create gist"
-            fi
-            
-            rm -f "$BEFORE_TMP" "$AFTER_TMP"
+            UPLOADED_COUNT=$((UPLOADED_COUNT + 1))
           done
           
           if [ $UPLOADED_COUNT -gt 0 ]; then
+            git add *.png
+            git commit -m "Screenshots for PR #${PR_NUMBER}"
+            git push -f origin "$BRANCH"
+            
             echo "uploaded=true" >> $GITHUB_OUTPUT
             echo "markdown_rows<<EOF" >> $GITHUB_OUTPUT
             echo "$MARKDOWN_ROWS" >> $GITHUB_OUTPUT
             echo "EOF" >> $GITHUB_OUTPUT
-            echo "Uploaded $UPLOADED_COUNT page(s)"
+            echo "Pushed $UPLOADED_COUNT screenshot(s) to $BRANCH"
           else
             echo "uploaded=false" >> $GITHUB_OUTPUT
-            echo "No images uploaded"
+            echo "No screenshots to upload"
           fi
 
       - name: Comment on PR
@@ -408,3 +395,27 @@ jobs:
                 body: body,
               });
             }
+
+  # Cleanup screenshot branches when PR is closed
+  cleanup-screenshots:
+    name: 🧹 Cleanup screenshots
+    if: github.event_name == 'pull_request' && github.event.action == 'closed'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Delete screenshot branch
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          BRANCH="screenshots/pr-${{ github.event.pull_request.number }}"
+          echo "Checking for branch: $BRANCH"
+          
+          # Check if branch exists and delete it
+          if gh api repos/${{ github.repository }}/git/refs/heads/${BRANCH} --silent 2>/dev/null; then
+            echo "Deleting branch: $BRANCH"
+            gh api -X DELETE repos/${{ github.repository }}/git/refs/heads/${BRANCH}
+            echo "✅ Deleted screenshot branch"
+          else
+            echo "ℹ️ No screenshot branch found (already deleted or never created)"
+          fi
