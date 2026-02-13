@@ -157,7 +157,7 @@ If multiple PRs each have their own version bump and one merges, other PRs will 
 
 ### PR screenshots
 
-The repo automatically captures before/after screenshots on PRs comparing production vs the Vercel preview deployment. Screenshots are posted as a PR comment using [@vercel/before-and-after](https://jm.sv/before-and-after).
+The repo automatically captures before/after screenshots on PRs comparing production vs the Vercel preview deployment. Screenshots are captured using Playwright and posted as a PR comment.
 
 #### Configuration
 

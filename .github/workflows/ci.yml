@@ -1,7 +1,6 @@
 # CI checks the repo using formatting, types, tests, and PR screenshots
 #
 # Screenshots configuration: .github/screenshot-config.json
-# Screenshots docs: https://jm.sv/before-and-after
 # Vercel bypass: https://vercel.com/docs/security/deployment-protection/methods-to-bypass-deployment-protection/protection-bypass-automation
 
 name: CI
@@ -80,9 +79,6 @@ jobs:
       - name: Install Playwright
         run: npx playwright install chromium --with-deps
 
-      - name: Install before-and-after
-        run: npm install -g @vercel/before-and-after
-
       - name: Get PR number
         id: pr
         env:
@@ -146,14 +142,14 @@ jobs:
           PREVIEW_BASE_URL="${{ github.event.deployment_status.target_url }}"
           OUTPUT_DIR="./screenshots"
           
-          mkdir -p "$OUTPUT_DIR"
-          
+          # Build bypass query string if needed
           BYPASS_PARAM=""
           if [ "$USE_BYPASS" = "true" ] && [ -n "$VERCEL_AUTOMATION_BYPASS_SECRET" ]; then
             BYPASS_PARAM="?x-vercel-protection-bypass=${VERCEL_AUTOMATION_BYPASS_SECRET}"
             echo "🔓 Using bypass secret for protected deployment"
           fi
           
+          # Read config
           if [ -f "$CONFIG_FILE" ]; then
             PRODUCTION_URL=$(jq -r '.productionUrl' "$CONFIG_FILE")
             DEFAULT_VIEWPORT=$(jq -r '.defaultViewport // "1280x800"' "$CONFIG_FILE")
@@ -162,54 +158,52 @@ jobs:
             DEFAULT_VIEWPORT="1280x800"
           fi
           
-          echo "📸 Capturing screenshots..."
-          echo "  Production URL: $PRODUCTION_URL"
-          echo "  Preview URL: $PREVIEW_BASE_URL"
-          echo "  Default viewport: $DEFAULT_VIEWPORT"
+          echo "Production URL: $PRODUCTION_URL"
+          echo "Preview URL: $PREVIEW_BASE_URL"
+          echo "Default viewport: $DEFAULT_VIEWPORT"
           
+          # Capture each configured page
           if [ -f "$CONFIG_FILE" ] && [ "$(jq '.pages | length' "$CONFIG_FILE")" -gt 0 ]; then
+            PAGE_INDEX=0
             jq -c '.pages[]' "$CONFIG_FILE" | while read -r page; do
               PAGE_PATH=$(echo "$page" | jq -r '.path')
               PAGE_NAME=$(echo "$page" | jq -r '.name // .path')
               PAGE_VIEWPORT=$(echo "$page" | jq -r ".viewport // \"$DEFAULT_VIEWPORT\"")
-              PAGE_SELECTOR=$(echo "$page" | jq -r '.selector // ""')
+              SAFE_NAME=$(echo "$PAGE_NAME" | tr ' /' '_-' | tr '[:upper:]' '[:lower:]')
               
               BEFORE_URL="${PRODUCTION_URL}${PAGE_PATH}"
               AFTER_URL="${PREVIEW_BASE_URL}${PAGE_PATH}${BYPASS_PARAM}"
-              SAFE_NAME=$(echo "$PAGE_NAME" | tr ' /' '_-')
+              PAGE_OUTPUT_DIR="${OUTPUT_DIR}/${SAFE_NAME}"
               
-              echo "  Capturing: $PAGE_NAME ($PAGE_PATH)"
+              echo ""
+              echo "📸 Capturing: $PAGE_NAME ($PAGE_PATH)"
               
-              SELECTOR_FLAG=""
-              if [ -n "$PAGE_SELECTOR" ] && [ "$PAGE_SELECTOR" != "null" ]; then
-                SELECTOR_FLAG="--selector $PAGE_SELECTOR"
-              fi
+              node .github/scripts/capture-screenshots.mjs \
+                "$BEFORE_URL" \
+                "$AFTER_URL" \
+                "$PAGE_OUTPUT_DIR" \
+                "$PAGE_VIEWPORT" \
+                || echo "  Warning: capture may have had issues for $PAGE_NAME"
               
-              before-and-after "$BEFORE_URL" "$AFTER_URL" \
-                --output "$OUTPUT_DIR" \
-                --size "$PAGE_VIEWPORT" \
-                $SELECTOR_FLAG \
-                2>&1 || echo "  Warning: capture may have had issues for $PAGE_NAME"
-              
-              for f in "$OUTPUT_DIR"/*-before.png "$OUTPUT_DIR"/*-after.png; do
-                if [ -f "$f" ]; then
-                  NEW_NAME=$(echo "$f" | sed "s/-\(before\|after\)\.png/-${SAFE_NAME}-\1.png/")
-                  mv "$f" "$NEW_NAME" 2>/dev/null || true
-                fi
-              done
+              PAGE_INDEX=$((PAGE_INDEX + 1))
             done
           else
-            echo "  Capturing: Homepage (default)"
+            # Default: capture homepage only
+            echo ""
+            echo "📸 Capturing: Homepage (default)"
             PREVIEW_URL="${PREVIEW_BASE_URL}${BYPASS_PARAM}"
-            before-and-after "$PRODUCTION_URL" "$PREVIEW_URL" \
-              --output "$OUTPUT_DIR" \
-              --size "$DEFAULT_VIEWPORT" \
-              2>&1 || echo "Screenshot capture completed with warnings"
+            
+            node .github/scripts/capture-screenshots.mjs \
+              "$PRODUCTION_URL" \
+              "$PREVIEW_URL" \
+              "${OUTPUT_DIR}/homepage" \
+              "$DEFAULT_VIEWPORT" \
+              || echo "Screenshot capture completed with warnings"
           fi
           
           echo ""
           echo "Captured files:"
-          ls -la "$OUTPUT_DIR" || echo "No files captured"
+          find "$OUTPUT_DIR" -name "*.png" -type f 2>/dev/null || echo "No files captured"
           
           echo "output_dir=$OUTPUT_DIR" >> $GITHUB_OUTPUT
 
@@ -235,17 +229,18 @@ jobs:
           MARKDOWN_ROWS=""
           UPLOADED_COUNT=0
           
-          for BEFORE_FILE in "$OUTPUT_DIR"/*-before.png "$OUTPUT_DIR"/*before*.png; do
-            [ -f "$BEFORE_FILE" ] || continue
+          # Find all page directories containing before/after screenshots
+          for PAGE_DIR in "$OUTPUT_DIR"/*/; do
+            [ -d "$PAGE_DIR" ] || continue
             
-            AFTER_FILE=$(echo "$BEFORE_FILE" | sed 's/before/after/')
+            BEFORE_FILE="${PAGE_DIR}before.png"
+            AFTER_FILE="${PAGE_DIR}after.png"
+            
+            [ -f "$BEFORE_FILE" ] || continue
             [ -f "$AFTER_FILE" ] || continue
             
-            BASENAME=$(basename "$BEFORE_FILE" .png)
-            PAGE_NAME=$(echo "$BASENAME" | sed 's/.*-\(.*\)-before/\1/' | sed 's/-/ /g')
-            if [ "$PAGE_NAME" = "$BASENAME" ] || [ -z "$PAGE_NAME" ]; then
-              PAGE_NAME="Homepage"
-            fi
+            # Get page name from directory name
+            PAGE_NAME=$(basename "$PAGE_DIR" | tr '-' ' ' | sed 's/\b\(.\)/\u\1/g')
             
             echo "Uploading: $PAGE_NAME"
             BEFORE_URL=$(upload_to_0x0 "$BEFORE_FILE")
@@ -286,7 +281,7 @@ jobs:
             **Preview URL:** ${previewUrl}
             
             ---
-            <sub>Generated by [before-and-after](https://jm.sv/before-and-after) • [View artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>`;
+            <sub>[View artifacts](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>`;
             
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
@@ -334,7 +329,7 @@ jobs:
             **Preview URL:** ${previewUrl}
             
             ---
-            <sub>Generated by [before-and-after](https://jm.sv/before-and-after)</sub>`;
+            <sub>[CI workflow](https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }})</sub>`;
             
             const { data: comments } = await github.rest.issues.listComments({
               owner: context.repo.owner,
