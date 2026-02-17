@@ -2,7 +2,6 @@
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [
     "config/env.secrets.keys",
-    "scripts/generate-env",
     ".node-version",
     ".npmrc",
     "biome.json",
@@ -71,7 +70,7 @@
     },
     "dev": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo", "migrate"],
+      "dependsOn": ["env", "topo", "migrate"],
       "env": [
         "CLOUDFLARE_TUNNEL_TOKEN",
         "CONTENTFUL_ACCESS_TOKEN",
@@ -92,10 +91,13 @@
     },
     "dg#dev": {
       "cache": false,
-      "dependsOn": ["dg#env"],
+      "dependsOn": ["env"],
       "persistent": true
     },
-    "dg#env": {
+    "drop-bot-commits": {
+      "cache": false
+    },
+    "env": {
       "cache": false
     },
     "graphql:schema": {
@@ -103,21 +105,25 @@
     },
     "migrate": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo"],
+      "dependsOn": ["env", "topo"],
       "env": ["DATABASE_URL"],
       "inputs": ["$TURBO_DEFAULT$", "packages/db/database.config.mts", "packages/db/.sequelizerc"]
     },
     "migrate:generate": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo"]
+      "dependsOn": ["env", "topo"]
     },
     "migrate:status": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo"]
+      "dependsOn": ["env", "topo"]
     },
     "migrate:undo": {
       "cache": false,
-      "dependsOn": ["dg#env", "topo"]
+      "dependsOn": ["env", "topo"]
+    },
+    "setup": {
+      "cache": false,
+      "dependsOn": ["env"]
     },
     "test": {
       "dependsOn": ["topo"],
@@ -128,6 +134,10 @@
     },
     "topo": {
       "dependsOn": ["^topo"]
+    },
+    "tunnel": {
+      "cache": false,
+      "persistent": true
     }
   }
 }

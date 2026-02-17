@@ -25,7 +25,7 @@ Hi :wave: This is an overengineered way to show past projects / experiment with 
 
 `turbo dev` runs these steps in order before starting the Next.js dev server:
 
-1. `**dg#env**` - Generates `.env` from 1Password (vault `dg`) using `scripts/generate-env`
+1. `**dg#env**` - Generates `.env` from 1Password (vault `dg`) using `@dg/cli env generate`
 2. `**migrate**` - Runs database migrations via `@dg/db` (Sequelize)
 3. `**dev**` - Starts the persistent Next.js dev server, watching all app and package files
 
@@ -134,7 +134,7 @@ To set up:
 
 1. Get the tunnel token from [Cloudflare Zero Trust](https://one.dash.cloudflare.com/737867b500ec8ef1d7e5c9650e5dbfdb/networks/tunnels/cfd_tunnel/60e09136-a10f-499c-8925-bcef7570677d/edit?tab=overview)
 2. Add it to 1Password as `CLOUDFLARE_TUNNEL_TOKEN`
-3. Run `scripts/generate-env` to update your `.env`
+3. Run `turbo env` to update your `.env`
 
 The tunnel will fail if `CLOUDFLARE_TUNNEL_TOKEN` isn't configured in your `.env`.
 
@@ -151,7 +151,7 @@ Versioning uses auto-generated version bumps on PRs with GitHub releases on merg
 
 If multiple PRs each have their own version bump and one merges, other PRs will have conflicts in `package.json`. To fix:
 
-1. Run `scripts/drop-bot-commits` to remove bot-authored version bumps and rebase onto `origin/main`
+1. Run `turbo drop-bot-commits` to remove bot-authored version bumps and rebase onto `origin/main`
 2. Force push: `git push --force-with-lease`
 3. The workflow will automatically create a fresh version bump commit
 
