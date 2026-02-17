@@ -21,11 +21,8 @@
     "setup": "tsx src/setup.ts",
     "tunnel": "tsx src/tunnel.ts",
     "version:bump": "tsx src/version.ts bump",
-    "version:extract-notes": "tsx src/version.ts extract-notes",
     "version:pr-comment": "tsx src/version.ts pr-comment",
-    "version:pr-info": "tsx src/version.ts pr-info",
-    "version:read": "tsx src/version.ts read",
-    "version:target-from-tags": "tsx src/version.ts target-from-tags"
+    "version:release-info": "tsx src/version.ts release-info"
   },
   "type": "module",
   "version": "1.0.0"

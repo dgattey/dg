@@ -4,18 +4,15 @@
  * Usage: tsx src/version.ts <command> [args...]
  *
  * Commands:
- *   read                              Read version from package.json
- *   pr-info <event-path>              Parse release type from PR
- *   bump <version> <major|minor|patch> Bump version in package.json
- *   target-from-tags <version> <type>  Compute target from git tags
- *   extract-notes <event-path>        Extract notes from PR body
+ *   bump <event-path>                 Parse PR, compute target from tags, bump package.json
+ *   release-info <event-path>         Read version + extract release notes from PR
  *   pr-comment <event> <ver> <state>  Upsert PR comment
  */
 import { execSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import https from 'node:https';
 import { join } from 'node:path';
-import { fail, findRoot, out, parseArgs, withSpinner } from './lib/utils.js';
+import { fail, findRoot, fmt, log, out, parseArgs, withSpinner } from './lib/utils.js';
 
 type ReleaseType = 'major' | 'minor' | 'patch';
 
@@ -32,6 +29,30 @@ function computeNext(base: string, type: ReleaseType): string {
 
 function readPkg(): { version: string } {
   return JSON.parse(readFileSync(pkgPath, 'utf8'));
+}
+
+function readEvent(eventPath: string): { prBody: string; event: Record<string, unknown> } {
+  const event = JSON.parse(readFileSync(eventPath, 'utf8'));
+  const pr = event.pull_request as Record<string, unknown> | undefined;
+  return { event, prBody: (pr?.body as string) ?? '' };
+}
+
+function parseReleaseType(prBody: string): ReleaseType {
+  if (/- \[x\]\s*Major/i.test(prBody)) return 'major';
+  if (/- \[x\]\s*Minor/i.test(prBody)) return 'minor';
+  return 'patch';
+}
+
+function extractNotes(prBody: string): string {
+  const notes: Array<string> = [];
+  let inSection = false;
+
+  for (const line of prBody.split('\n')) {
+    if (/^#\s*What changed\?/i.test(line)) inSection = true;
+    else if (inSection && (/^#\s*Release info/i.test(line) || /^-+\s*$/.test(line))) break;
+    else if (inSection) notes.push(line);
+  }
+  return notes.join('\n').trim();
 }
 
 function getLatestTag(): string | null {
@@ -88,62 +109,55 @@ function githubRequest<T>(method: string, path: string, body?: object): Promise<
   });
 }
 
-// Commands
 switch (cmd) {
-  case 'read': {
-    out(`VERSION=${readPkg().version}`);
-    break;
-  }
-
-  case 'pr-info': {
-    const event = JSON.parse(readFileSync(args[0] ?? '', 'utf8'));
-    const body: string = event.pull_request?.body ?? '';
-    const type = /- \[x\]\s*Major/i.test(body)
-      ? 'major'
-      : /- \[x\]\s*Minor/i.test(body)
-        ? 'minor'
-        : 'patch';
-    out(`RELEASE_TYPE=${type}`);
-    break;
-  }
-
   case 'bump': {
-    const [baseVersion, releaseType] = args;
-    if (!baseVersion || !releaseType) fail('Usage: version bump <version> <major|minor|patch>');
-    const newVersion = computeNext(baseVersion, releaseType as ReleaseType);
-    await withSpinner(`Bumping ${baseVersion} → ${newVersion}`, () => {
-      const pkg = readPkg();
-      pkg.version = newVersion;
-      writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`, 'utf8');
-    });
-    out(`VERSION_FROM=${baseVersion}`);
-    out(`VERSION_TO=${newVersion}`);
-    break;
-  }
+    if (!args[0]) fail('Usage: version bump <event-path>');
+    const { prBody } = readEvent(args[0]);
 
-  case 'target-from-tags': {
-    const [currentVersion, releaseType] = args;
-    if (!currentVersion || !releaseType) fail('Usage: version target-from-tags <version> <type>');
-    const base = getLatestTag() ?? currentVersion;
-    const target = computeNext(base, releaseType as ReleaseType);
-    out(`BASE_VERSION_USED=${base}`);
+    const releaseType = parseReleaseType(prBody);
+    log(fmt.info(`Release type: ${fmt.bold(releaseType)}`));
+
+    const current = readPkg().version;
+    log(fmt.info(`Current version: ${fmt.bold(current)}`));
+
+    const latestTag = getLatestTag();
+    const base = latestTag ?? current;
+    log(
+      fmt.info(`Base from tags: ${fmt.bold(base)}${latestTag ? '' : ' (no tags, using current)'}`),
+    );
+
+    const target = computeNext(base, releaseType);
+
+    if (current === target) {
+      log(fmt.success(`Already at target ${target}, skipping`));
+    } else {
+      await withSpinner(`Bumping ${current} → ${target}`, () => {
+        const pkg = readPkg();
+        pkg.version = target;
+        writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`, 'utf8');
+      });
+    }
     out(`VERSION_FROM=${base}`);
     out(`VERSION_TO=${target}`);
+    out(`CHANGED=${current !== target}`);
     break;
   }
 
-  case 'extract-notes': {
-    const event = JSON.parse(readFileSync(args[0] ?? '', 'utf8'));
-    const body: string = event.pull_request?.body ?? '';
-    const notes: Array<string> = [];
-    let inSection = false;
+  case 'release-info': {
+    if (!args[0]) fail('Usage: version release-info <event-path>');
+    const { prBody } = readEvent(args[0]);
 
-    for (const line of body.split('\n')) {
-      if (/^#\s*What changed\?/i.test(line)) inSection = true;
-      else if (inSection && (/^#\s*Release info/i.test(line) || /^-+\s*$/.test(line))) break;
-      else if (inSection) notes.push(line);
-    }
-    out(notes.join('\n').trim());
+    const version = readPkg().version;
+    log(fmt.info(`Version: ${fmt.bold(version)}`));
+
+    const notes = extractNotes(prBody);
+    log(fmt.info(`Release notes: ${notes ? `${notes.split('\n').length} line(s)` : 'empty'}`));
+
+    const delimiter = `NOTES_DELIM_${Date.now()}`;
+    out(`VERSION=${version}`);
+    out(`NOTES<<${delimiter}`);
+    out(notes);
+    out(delimiter);
     break;
   }
 
@@ -152,13 +166,17 @@ switch (cmd) {
     if (!eventPath || !version || !state)
       fail('Usage: version pr-comment <event> <version> <will-be|released>');
 
-    const event = JSON.parse(readFileSync(eventPath, 'utf8'));
-    const { owner, repo, number } = {
-      number: event.pull_request?.number,
-      owner: event.repository?.owner?.login,
-      repo: event.repository?.name,
-    };
-    if (!owner || !repo || !number) fail('Missing repo info in event');
+    const { event } = readEvent(eventPath);
+    const repo = event.repository as Record<string, unknown> | undefined;
+    const pr = event.pull_request as Record<string, unknown> | undefined;
+    const owner = (repo?.owner as Record<string, unknown> | undefined)?.login as string | undefined;
+    const repoName = repo?.name as string | undefined;
+    const number = pr?.number as number | undefined;
+    if (!owner || !repoName || !number) fail('Missing repo info in event');
+
+    log(
+      fmt.info(`Commenting on ${owner}/${repoName}#${number}: ${state} ${fmt.bold(`v${version}`)}`),
+    );
 
     const marker = '<!-- release-bot-version-comment -->';
     const releaseUrl = process.env.RELEASE_URL;
@@ -173,23 +191,23 @@ switch (cmd) {
       type Comment = { id: number; body?: string };
       const comments = await githubRequest<Array<Comment>>(
         'GET',
-        `/repos/${owner}/${repo}/issues/${number}/comments?per_page=100`,
+        `/repos/${owner}/${repoName}/issues/${number}/comments?per_page=100`,
       );
       const existing = comments.find((c) => c.body?.includes(marker));
 
       if (existing) {
-        await githubRequest('PATCH', `/repos/${owner}/${repo}/issues/comments/${existing.id}`, {
+        await githubRequest('PATCH', `/repos/${owner}/${repoName}/issues/comments/${existing.id}`, {
           body,
         });
       } else {
-        await githubRequest('POST', `/repos/${owner}/${repo}/issues/${number}/comments`, { body });
+        await githubRequest('POST', `/repos/${owner}/${repoName}/issues/${number}/comments`, {
+          body,
+        });
       }
     });
     break;
   }
 
   default:
-    fail(
-      `Unknown command: ${cmd}\nUsage: version <read|pr-info|bump|target-from-tags|extract-notes|pr-comment>`,
-    );
+    fail(`Unknown command: ${cmd}\nUsage: version <bump|release-info|pr-comment>`);
 }

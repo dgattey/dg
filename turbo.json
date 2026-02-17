@@ -8,13 +8,6 @@
     "tsconfig.json"
   ],
   "tasks": {
-    "@dg/cli#env": {
-      "cache": false
-    },
-    "@dg/cli#tunnel": {
-      "cache": false,
-      "persistent": true
-    },
     "build": {
       "dependsOn": ["^build", "^migrate", "topo", "check", "check:types"],
       "env": [
@@ -77,7 +70,7 @@
     },
     "dev": {
       "cache": false,
-      "dependsOn": ["@dg/cli#env", "topo", "migrate"],
+      "dependsOn": ["env", "topo", "migrate"],
       "env": [
         "CLOUDFLARE_TUNNEL_TOKEN",
         "CONTENTFUL_ACCESS_TOKEN",
@@ -98,10 +91,13 @@
     },
     "dg#dev": {
       "cache": false,
-      "dependsOn": ["@dg/cli#env"],
+      "dependsOn": ["env"],
       "persistent": true
     },
     "drop-bot-commits": {
+      "cache": false
+    },
+    "env": {
       "cache": false
     },
     "graphql:schema": {
@@ -109,25 +105,25 @@
     },
     "migrate": {
       "cache": false,
-      "dependsOn": ["@dg/cli#env", "topo"],
+      "dependsOn": ["env", "topo"],
       "env": ["DATABASE_URL"],
       "inputs": ["$TURBO_DEFAULT$", "packages/db/database.config.mts", "packages/db/.sequelizerc"]
     },
     "migrate:generate": {
       "cache": false,
-      "dependsOn": ["@dg/cli#env", "topo"]
+      "dependsOn": ["env", "topo"]
     },
     "migrate:status": {
       "cache": false,
-      "dependsOn": ["@dg/cli#env", "topo"]
+      "dependsOn": ["env", "topo"]
     },
     "migrate:undo": {
       "cache": false,
-      "dependsOn": ["@dg/cli#env", "topo"]
+      "dependsOn": ["env", "topo"]
     },
     "setup": {
       "cache": false,
-      "dependsOn": ["@dg/cli#env"]
+      "dependsOn": ["env"]
     },
     "test": {
       "dependsOn": ["topo"],
@@ -139,23 +135,9 @@
     "topo": {
       "dependsOn": ["^topo"]
     },
-    "version:bump": {
-      "cache": false
-    },
-    "version:extract-notes": {
-      "cache": false
-    },
-    "version:pr-comment": {
-      "cache": false
-    },
-    "version:pr-info": {
-      "cache": false
-    },
-    "version:read": {
-      "cache": false
-    },
-    "version:target-from-tags": {
-      "cache": false
+    "tunnel": {
+      "cache": false,
+      "persistent": true
     }
   }
 }
