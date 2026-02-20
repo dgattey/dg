@@ -26,6 +26,30 @@ type ColorSchemeToggleProps = {
   initialValue: 'dark' | 'light' | 'system';
 };
 
+const STATIC_OPTIONS = [
+  { icon: ICONS.light, label: LABELS.light, value: 'light' },
+  { icon: ICONS.dark, label: LABELS.dark, value: 'dark' },
+  { icon: ICONS.system, label: LABELS.system, value: 'system' },
+];
+
+const noop = () => {};
+
+/**
+ * Non-interactive fallback for Suspense boundaries. Renders the same
+ * GlassSwitcher visual with "system" selected but without the color
+ * scheme hook that causes suspension.
+ */
+export function ColorSchemeToggleFallback() {
+  return (
+    <GlassSwitcher
+      aria-label="Choose color scheme"
+      onChange={noop}
+      options={STATIC_OPTIONS}
+      value="system"
+    />
+  );
+}
+
 /**
  * Provides the ability to toggle the page's color scheme between
  * system, light, and dark with glass morphism styling. Prerendered, the
@@ -34,12 +58,6 @@ type ColorSchemeToggleProps = {
 export function ColorSchemeToggleClient({ initialValue }: ColorSchemeToggleProps) {
   const { updatePreferredMode, colorScheme } = useColorScheme();
   const [currentValue, setCurrentValue] = useState<Mode>(initialValue);
-
-  const options = [
-    { icon: ICONS.light, label: LABELS.light, value: 'light' },
-    { icon: ICONS.dark, label: LABELS.dark, value: 'dark' },
-    { icon: ICONS.system, label: LABELS.system, value: 'system' },
-  ];
 
   // Determine current value: if mode is 'system' then 'system', otherwise the resolved mode
   useEffect(() => {
@@ -63,7 +81,7 @@ export function ColorSchemeToggleClient({ initialValue }: ColorSchemeToggleProps
     <GlassSwitcher
       aria-label="Choose color scheme"
       onChange={handleChange}
-      options={options}
+      options={STATIC_OPTIONS}
       value={currentValue}
     />
   );

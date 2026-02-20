@@ -1,4 +1,7 @@
-import { ColorSchemeToggleClient } from '@dg/ui/core/ColorSchemeToggleClient';
+import {
+  ColorSchemeToggleClient,
+  ColorSchemeToggleFallback,
+} from '@dg/ui/core/ColorSchemeToggleClient';
 import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
@@ -17,7 +20,7 @@ const stickyContainerSx: SxObject = {
 };
 
 const navSx: SxObject = {
-  columnGap: { sm: 2, xs: 1 },
+  columnGap: { sm: 2, xs: 1.5 },
 };
 
 /** Glass container with logo + music content */
@@ -62,9 +65,9 @@ export function Header() {
               </MouseAwareGlassContainer>
             </NavItem>
           </NavGroup>
-          <NavGroup sx={{ flexShrink: 0 }}>
+          <NavGroup sx={{ flexShrink: 0, justifyContent: 'flex-end' }}>
             <NavItem sx={{ alignItems: 'center', display: 'flex' }}>
-              <Suspense fallback={null}>
+              <Suspense fallback={<ColorSchemeToggleFallback />}>
                 <ColorSchemeToggleClient initialValue="system" />
               </Suspense>
             </NavItem>

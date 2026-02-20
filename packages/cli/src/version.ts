@@ -12,7 +12,7 @@ import { execSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import https from 'node:https';
 import { join } from 'node:path';
-import { fail, findRoot, fmt, log, out, parseArgs, withSpinner } from './lib/utils.js';
+import { fail, findRoot, fmt, out, parseArgs, withSpinner } from './lib/utils.js';
 
 type ReleaseType = 'major' | 'minor' | 'patch';
 
@@ -115,21 +115,21 @@ switch (cmd) {
     const { prBody } = readEvent(args[0]);
 
     const releaseType = parseReleaseType(prBody);
-    log(fmt.info(`Release type: ${fmt.bold(releaseType)}`));
+    out(fmt.info(`Release type: ${fmt.bold(releaseType)}`));
 
     const current = readPkg().version;
-    log(fmt.info(`Current version: ${fmt.bold(current)}`));
+    out(fmt.info(`Current version: ${fmt.bold(current)}`));
 
     const latestTag = getLatestTag();
     const base = latestTag ?? current;
-    log(
+    out(
       fmt.info(`Base from tags: ${fmt.bold(base)}${latestTag ? '' : ' (no tags, using current)'}`),
     );
 
     const target = computeNext(base, releaseType);
 
     if (current === target) {
-      log(fmt.success(`Already at target ${target}, skipping`));
+      out(fmt.success(`Already at target ${target}, skipping`));
     } else {
       await withSpinner(`Bumping ${current} → ${target}`, () => {
         const pkg = readPkg();
@@ -148,10 +148,10 @@ switch (cmd) {
     const { prBody } = readEvent(args[0]);
 
     const version = readPkg().version;
-    log(fmt.info(`Version: ${fmt.bold(version)}`));
+    out(fmt.info(`Version: ${fmt.bold(version)}`));
 
     const notes = extractNotes(prBody);
-    log(fmt.info(`Release notes: ${notes ? `${notes.split('\n').length} line(s)` : 'empty'}`));
+    out(fmt.info(`Release notes: ${notes ? `${notes.split('\n').length} line(s)` : 'empty'}`));
 
     const delimiter = `NOTES_DELIM_${Date.now()}`;
     out(`VERSION=${version}`);
@@ -174,7 +174,7 @@ switch (cmd) {
     const number = pr?.number as number | undefined;
     if (!owner || !repoName || !number) fail('Missing repo info in event');
 
-    log(
+    out(
       fmt.info(`Commenting on ${owner}/${repoName}#${number}: ${state} ${fmt.bold(`v${version}`)}`),
     );
 

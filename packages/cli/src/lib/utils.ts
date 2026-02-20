@@ -49,12 +49,16 @@ export function loadEnv(root?: string): void {
 }
 
 /**
- * Create and manage spinners
+ * Create ora spinners on stdout so turbo can capture and prefix the output.
  */
 export function spinner(text: string): Ora {
-  return ora({ color: 'cyan', text });
+  return ora({ color: 'cyan', stream: process.stdout, text });
 }
 
+/**
+ * Run an async function with a spinner. Shows progress text while running,
+ * then replaces with successText (or the original text) on completion.
+ */
 export async function withSpinner<T>(
   text: string,
   fn: (s: Ora) => T | Promise<T>,
