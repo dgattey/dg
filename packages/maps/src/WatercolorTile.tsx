@@ -67,9 +67,7 @@ export function WatercolorTile({ tile, tileLoaded }: TileComponentProps) {
 
   return (
     <Box sx={containerSx}>
-      {/* biome-ignore lint/performance/noImgElement: dynamic tile URLs from pigeon-maps, not optimizable by next/image */}
       <Box alt="" component="img" onLoad={handleImageLoad} src={tile.url} sx={tileImgSx} />
-      {/* biome-ignore lint/performance/noImgElement: dynamic tile URLs from pigeon-maps, not optimizable by next/image */}
       <Box alt="" component="img" onLoad={handleImageLoad} src={labelsUrl} sx={tileImgSx} />
     </Box>
   );

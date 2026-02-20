@@ -16,7 +16,8 @@ const stickyContainerSx: SxObject = {
   maxWidth: 'unset',
   position: 'sticky',
   top: 0,
-  zIndex: 10, // Higher z-index to stay above grid content with transforms
+  viewTransitionName: 'site-header',
+  zIndex: 10,
 };
 
 const navSx: SxObject = {

@@ -1,0 +1,126 @@
+/*
+ * View Transition animations for Sheet and page content.
+ *
+ * Transition cases:
+ * 1. no-sheet → sheet: sheet slides up, contents fade in
+ * 2. sheet → sheet: old slides left, new slides from right (reversed on back)
+ * 3. sheet → no-sheet: sheet slides down, contents fade out
+ * 4. no-sheet → no-sheet: old slides left, new slides from right (reversed on back)
+ */
+
+/* --- Sheet enter: slides up from bottom with fade --- */
+.vt-sheet-enter {
+  animation: sheet-slide-up 0.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* --- Sheet exit: slides down to bottom with fade --- */
+.vt-sheet-exit {
+  animation: sheet-slide-down 0.35s cubic-bezier(0.7, 0, 0.84, 0) both;
+}
+
+/* --- Sheet share (sheet→sheet): cross-slide horizontally --- */
+.vt-sheet-share {
+  animation: sheet-slide-in-right 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* --- Page content enter: slide in from right --- */
+.vt-page-enter {
+  animation: page-slide-in-right 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* --- Page content exit: slide out to left --- */
+.vt-page-exit {
+  animation: page-slide-out-left 0.35s cubic-bezier(0.7, 0, 0.84, 0) both;
+}
+
+/* --- Page content share (no-sheet→no-sheet): slide horizontally --- */
+.vt-page-share {
+  animation: page-slide-in-right 0.35s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* --- Keyframes --- */
+
+@keyframes sheet-slide-up {
+  from {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes sheet-slide-down {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(40%);
+  }
+}
+
+@keyframes sheet-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes page-slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes page-slide-out-left {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(-30%);
+  }
+}
+
+/* --- view-transition pseudo-element overrides ---
+ * These target the browser's view transition pseudo-elements
+ * for finer control over the snapshot animations.
+ */
+
+::view-transition-old(sheet) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+}
+
+::view-transition-new(sheet) {
+  animation-duration: 0.4s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+::view-transition-old(page-content) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.7, 0, 0.84, 0);
+}
+
+::view-transition-new(page-content) {
+  animation-duration: 0.35s;
+  animation-timing-function: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Keep the header stable during transitions */
+::view-transition-group(site-header) {
+  animation: none;
+}

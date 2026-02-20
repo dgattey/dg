@@ -12,6 +12,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
+import { ViewTransition } from 'react';
 import { getServerTime } from '../services/getServerTime';
 import { Footer } from './layouts/Footer';
 import { Header } from './layouts/Header';
@@ -49,7 +50,16 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                 {/* Contained main content with consistent section spacing */}
                 <Section sx={mainSectionSx}>
                   <Container>
-                    <main>{children}</main>
+                    <main>
+                      <ViewTransition
+                        enter="vt-page-enter"
+                        exit="vt-page-exit"
+                        name="page-content"
+                        share="vt-page-share"
+                      >
+                        {children}
+                      </ViewTransition>
+                    </main>
                   </Container>
                 </Section>
               </PageScrollProvider>

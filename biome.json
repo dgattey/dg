@@ -107,6 +107,16 @@
   },
   "overrides": [
     {
+      "includes": ["**/sheet-transitions.css"],
+      "linter": {
+        "rules": {
+          "correctness": {
+            "noUnknownTypeSelector": "off"
+          }
+        }
+      }
+    },
+    {
       "includes": ["packages/shared-core/logging/log.ts"],
       "linter": {
         "rules": {

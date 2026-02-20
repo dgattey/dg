@@ -1,7 +1,8 @@
 import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
-import { Stack, Typography } from '@mui/material';
+import { Sheet } from '@dg/ui/core/Sheet';
+import { Stack } from '@mui/material';
 import { redirect } from 'next/navigation';
 import { getMusicHistory } from '../../services/music';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
@@ -15,7 +16,6 @@ export default async function MusicPage() {
     tracks = result.tracks;
     nextCursor = result.nextCursor;
   } catch (error) {
-    // In development, redirect to the dev page to set up OAuth
     if (isMissingTokenError(error) && process.env.NODE_ENV === 'development') {
       redirect('/dev');
     }
@@ -23,11 +23,10 @@ export default async function MusicPage() {
   }
 
   return (
-    <main>
+    <Sheet title="Listening history">
       <Stack spacing={2}>
-        <Typography variant="h1">Listening history</Typography>
         <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />
       </Stack>
-    </main>
+    </Sheet>
   );
 }
