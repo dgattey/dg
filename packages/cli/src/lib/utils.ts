@@ -49,10 +49,11 @@ export function loadEnv(root?: string): void {
 }
 
 /**
- * Create ora spinners on stdout so turbo can capture and prefix the output.
+ * Create ora spinners. Defaults to stdout so turbo can capture and prefix
+ * the output. Use `stderr: true` for CI scripts where stdout is parsed.
  */
-export function spinner(text: string): Ora {
-  return ora({ color: 'cyan', stream: process.stdout, text });
+export function spinner(text: string, { stderr = false } = {}): Ora {
+  return ora({ color: 'cyan', stream: stderr ? process.stderr : process.stdout, text });
 }
 
 /**
@@ -63,8 +64,9 @@ export async function withSpinner<T>(
   text: string,
   fn: (s: Ora) => T | Promise<T>,
   successText?: string,
+  { stderr = false } = {},
 ): Promise<T> {
-  const s = spinner(text).start();
+  const s = spinner(text, { stderr }).start();
   try {
     const result = await Promise.resolve(fn(s));
     s.succeed(successText ?? text);

@@ -12,7 +12,7 @@ import { execSync } from 'node:child_process';
 import { readFileSync, writeFileSync } from 'node:fs';
 import https from 'node:https';
 import { join } from 'node:path';
-import { fail, findRoot, fmt, out, parseArgs, withSpinner } from './lib/utils.js';
+import { fail, findRoot, fmt, log, out, parseArgs, withSpinner } from './lib/utils.js';
 
 type ReleaseType = 'major' | 'minor' | 'patch';
 
@@ -115,27 +115,32 @@ switch (cmd) {
     const { prBody } = readEvent(args[0]);
 
     const releaseType = parseReleaseType(prBody);
-    out(fmt.info(`Release type: ${fmt.bold(releaseType)}`));
+    log(fmt.info(`Release type: ${fmt.bold(releaseType)}`));
 
     const current = readPkg().version;
-    out(fmt.info(`Current version: ${fmt.bold(current)}`));
+    log(fmt.info(`Current version: ${fmt.bold(current)}`));
 
     const latestTag = getLatestTag();
     const base = latestTag ?? current;
-    out(
+    log(
       fmt.info(`Base from tags: ${fmt.bold(base)}${latestTag ? '' : ' (no tags, using current)'}`),
     );
 
     const target = computeNext(base, releaseType);
 
     if (current === target) {
-      out(fmt.success(`Already at target ${target}, skipping`));
+      log(fmt.success(`Already at target ${target}, skipping`));
     } else {
-      await withSpinner(`Bumping ${current} → ${target}`, () => {
-        const pkg = readPkg();
-        pkg.version = target;
-        writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`, 'utf8');
-      });
+      await withSpinner(
+        `Bumping ${current} → ${target}`,
+        () => {
+          const pkg = readPkg();
+          pkg.version = target;
+          writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`, 'utf8');
+        },
+        undefined,
+        { stderr: true },
+      );
     }
     out(`VERSION_FROM=${base}`);
     out(`VERSION_TO=${target}`);
@@ -148,10 +153,10 @@ switch (cmd) {
     const { prBody } = readEvent(args[0]);
 
     const version = readPkg().version;
-    out(fmt.info(`Version: ${fmt.bold(version)}`));
+    log(fmt.info(`Version: ${fmt.bold(version)}`));
 
     const notes = extractNotes(prBody);
-    out(fmt.info(`Release notes: ${notes ? `${notes.split('\n').length} line(s)` : 'empty'}`));
+    log(fmt.info(`Release notes: ${notes ? `${notes.split('\n').length} line(s)` : 'empty'}`));
 
     const delimiter = `NOTES_DELIM_${Date.now()}`;
     out(`VERSION=${version}`);
@@ -174,7 +179,7 @@ switch (cmd) {
     const number = pr?.number as number | undefined;
     if (!owner || !repoName || !number) fail('Missing repo info in event');
 
-    out(
+    log(
       fmt.info(`Commenting on ${owner}/${repoName}#${number}: ${state} ${fmt.bold(`v${version}`)}`),
     );
 
@@ -187,24 +192,31 @@ switch (cmd) {
         ? `${marker}\n🎉 This PR is included in version ${version} 🎉\n\nRelease: [GitHub](${releaseUrl})`
         : `${marker}\n🎉 This PR will be included in version ${version} 🎉`;
 
-    await withSpinner('Updating PR comment', async () => {
-      type Comment = { id: number; body?: string };
-      const comments = await githubRequest<Array<Comment>>(
-        'GET',
-        `/repos/${owner}/${repoName}/issues/${number}/comments?per_page=100`,
-      );
-      const existing = comments.find((c) => c.body?.includes(marker));
+    await withSpinner(
+      'Updating PR comment',
+      async () => {
+        type Comment = { id: number; body?: string };
+        const comments = await githubRequest<Array<Comment>>(
+          'GET',
+          `/repos/${owner}/${repoName}/issues/${number}/comments?per_page=100`,
+        );
+        const existing = comments.find((c) => c.body?.includes(marker));
 
-      if (existing) {
-        await githubRequest('PATCH', `/repos/${owner}/${repoName}/issues/comments/${existing.id}`, {
-          body,
-        });
-      } else {
-        await githubRequest('POST', `/repos/${owner}/${repoName}/issues/${number}/comments`, {
-          body,
-        });
-      }
-    });
+        if (existing) {
+          await githubRequest(
+            'PATCH',
+            `/repos/${owner}/${repoName}/issues/comments/${existing.id}`,
+            { body },
+          );
+        } else {
+          await githubRequest('POST', `/repos/${owner}/${repoName}/issues/${number}/comments`, {
+            body,
+          });
+        }
+      },
+      undefined,
+      { stderr: true },
+    );
     break;
   }
 

@@ -15,7 +15,6 @@ const containerSx: SxObject = {
   width: '100%',
 };
 
-
 const DEFAULT_MIN_ZOOM = 3;
 const DEFAULT_MAX_ZOOM = 18;
 
@@ -63,7 +62,6 @@ export function PigeonMap({ location, stadiaApiKey }: PigeonMapProps) {
         metaWheelZoomWarning=""
         minZoom={minZoom}
         onBoundsChanged={({ center: newCenter, zoom: newZoom }) => {
-          console.log('zoom:', newZoom);
           setCenter(newCenter);
           const closest = levels.reduce(
             (best, level, i) =>
