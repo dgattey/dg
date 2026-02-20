@@ -1,4 +1,5 @@
-import type { SxProps } from '@dg/ui/theme';
+import { GlassContainer } from '@dg/ui/core/GlassContainer';
+import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { Minus, Plus } from 'lucide-react';
 
@@ -7,47 +8,55 @@ type ZoomControlsProps = {
   onZoomOut: () => void;
 };
 
-const containerSx: SxProps = (theme) => ({
-  borderRadius: theme.spacing(6),
-  boxShadow: theme.vars.extraShadows.map.control,
+const containerSx: SxObject = {
+  borderRadius: '24px',
   display: 'flex',
-  left: theme.spacing(3.25),
+  left: 26,
   overflow: 'hidden',
   position: 'absolute',
-  top: theme.spacing(3.25),
+  top: 26,
   zIndex: 1,
-});
+};
 
-const buttonSx: SxProps = (theme) => ({
+const dividerSx: SxObject = {
+  backgroundColor: 'divider',
+  width: '1px',
+};
+
+const buttonSx: SxObject = {
   ':hover': {
-    backgroundColor: theme.vars.palette.secondary.main,
-    color: theme.vars.palette.secondary.contrastText,
+    backgroundColor: 'action.hover',
   },
   alignItems: 'center',
-  backgroundColor: theme.vars.palette.background.default,
-  color: theme.vars.palette.text.primary,
+  background: 'none',
+  border: 'none',
+  color: 'text.primary',
   cursor: 'pointer',
   display: 'flex',
   fontSize: '1rem',
   justifyContent: 'center',
   lineHeight: 1,
-  padding: '0.5rem',
-  transition: theme.transitions.create(['background-color', 'color']),
-});
+  padding: '0.4rem 0.5rem',
+  transition: 'background-color 0.2s',
+};
+
+const stopPropagation = (e: React.MouseEvent) => {
+  e.stopPropagation();
+};
 
 /**
- * Zoom controls overlay for the map.
- * Positioned in the top-left corner with theme-aware styling.
+ * Glass morphism zoom controls overlay, positioned in the top-left corner.
  */
 export function ZoomControls({ onZoomIn, onZoomOut }: ZoomControlsProps) {
   return (
-    <Box sx={containerSx}>
+    <GlassContainer onMouseDown={stopPropagation} onMouseUp={stopPropagation} sx={containerSx}>
       <Box aria-label="Zoom in" component="button" onClick={onZoomIn} sx={buttonSx} type="button">
         <Plus size="1em" />
       </Box>
+      <Box sx={dividerSx} />
       <Box aria-label="Zoom out" component="button" onClick={onZoomOut} sx={buttonSx} type="button">
         <Minus size="1em" />
       </Box>
-    </Box>
+    </GlassContainer>
   );
 }

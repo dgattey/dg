@@ -9,10 +9,6 @@ const lightPalette: PaletteOptions = {
   card: {
     border: COLORS.LIGHT.CARD_BORDER,
   },
-  map: {
-    markerBackground: COLORS.LIGHT.MAP.MARKER_BACKGROUND,
-    markerBorder: COLORS.LIGHT.MAP.MARKER_BORDER,
-  },
   primary: {
     main: COLORS.LIGHT.PRIMARY,
   },
@@ -38,10 +34,6 @@ const darkPalette: PaletteOptions = {
   },
   card: {
     border: COLORS.DARK.CARD_BORDER,
-  },
-  map: {
-    markerBackground: COLORS.DARK.MAP.MARKER_BACKGROUND,
-    markerBorder: COLORS.DARK.MAP.MARKER_BORDER,
   },
   primary: {
     main: COLORS.DARK.PRIMARY,

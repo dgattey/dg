@@ -54,17 +54,14 @@ export async function fetchCurrentLocation(): Promise<MapLocation | null> {
   if (!location || latitude == null || longitude == null) {
     return null;
   }
-  const zoomLevels = location.zoomLevels?.filter(isNotNullish).map(Number) ?? [];
-  zoomLevels.sort((a, b) => {
-    if (a === b) {
-      return 0;
-    }
-    return a < b ? -1 : 1;
-  });
   return {
     image: toRenderableAsset(location.image),
     initialZoom: location.initialZoom,
     point: { latitude, longitude },
-    zoomLevels,
+    zoomLevels:
+      location.zoomLevels
+        ?.filter(isNotNullish)
+        .map(Number)
+        .sort((a, b) => a - b) ?? [],
   };
 }

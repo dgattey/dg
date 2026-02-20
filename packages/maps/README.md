@@ -1,6 +1,6 @@
 # Maps
 
-Lightweight map component using Pigeon Maps with Stadia tile provider.
+Lightweight map component using Pigeon Maps with Stamen Watercolor tiles.
 
 ## Key Exports
 
@@ -10,7 +10,7 @@ Lightweight map component using Pigeon Maps with Stadia tile provider.
 
 ## Features
 
-- Light/dark mode support via Stadia Maps tiles
+- Stamen Watercolor base tiles with terrain labels overlay (via Stadia Maps)
 - Custom themed zoom controls
 - Custom circular marker with image overlay
 - No lazy loading required (~10KB bundle)

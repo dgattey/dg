@@ -87,7 +87,7 @@ routes and components, `/src/types` has global types, `/src/hooks` has shared ho
 - [Cloudflare](https://cloudflare.com) manages DNS/security. Cloudflare's MX records redirect email to Gmail.
 - [Contentful](https://www.contentful.com) supplies most content via GraphQL. New content triggers builds via webhook.
 - Next.js App Router caching with Cache Components (`use cache`) and tag-based revalidation keeps data fresh.
-- [Pigeon Maps](https://pigeon-maps.js.org/) powers the homepage map with CartoDB tile providers (Voyager/Dark Matter) for light/dark mode.
+- [Pigeon Maps](https://pigeon-maps.js.org/) powers the homepage map with Stamen Watercolor tiles and terrain labels (via [Stadia Maps](https://stadiamaps.com/)).
 - [MUI](https://mui.com/material/) for UI and styling (`sx`, via `emotion`).
 - Contentful schema lives in `packages/content-models/contentful/schema.graphql` and is refreshed via `turbo graphql:schema` for editor tooling. Responses are validated with Valibot.
 - [Neon](https://neon.tech) is the Postgres DB for auth tokens + more.

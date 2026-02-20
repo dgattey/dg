@@ -1,42 +1,28 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
-import { Suspense } from 'react';
 import { PigeonMap } from './src/PigeonMap';
 
 const mapCardSx: SxObject = {
-  border: 'none',
+  '& > div': { height: '100%' },
+  aspectRatio: { md: 'auto', xs: '2 / 1' },
 };
 
 /**
- * Server component wrapper for the map.
- * PigeonMap is a client component wrapped in Suspense for loading state.
+ * Server component wrapper for the map. Reads the Stadia API key
+ * server-side and passes it to the client PigeonMap component.
+ * PigeonMap renders an underlay image that's visible until tiles load.
  */
 export function MapCard({ location }: { location: MapLocation | null | undefined }) {
   if (!location) {
     return <ContentCard sx={mapCardSx} />;
   }
 
+  const stadiaApiKey = process.env.STADIA_API_KEY ?? '';
+
   return (
     <ContentCard sx={mapCardSx}>
-      <Suspense fallback={<MapFallback />}>
-        <PigeonMap location={location} />
-      </Suspense>
+      <PigeonMap location={location} stadiaApiKey={stadiaApiKey} />
     </ContentCard>
-  );
-}
-
-/**
- * Simple loading fallback that matches the map's dimensions.
- */
-function MapFallback() {
-  return (
-    <div
-      style={{
-        backgroundColor: 'var(--mui-palette-background-paper)',
-        height: '100%',
-        width: '100%',
-      }}
-    />
   );
 }

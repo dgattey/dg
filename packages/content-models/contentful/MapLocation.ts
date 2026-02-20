@@ -23,7 +23,7 @@ export type MapLocation = {
   image?: RenderableAsset | null;
 
   /**
-   * Converts zoom levels to a number array
+   * Sorted zoom levels from Contentful. First = min, last = max.
    */
   zoomLevels: Array<number>;
 };

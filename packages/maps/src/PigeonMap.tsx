@@ -1,75 +1,87 @@
 'use client';
 
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
-import { useColorScheme } from '@dg/ui/theme/useColorScheme';
+import type { SxObject } from '@dg/ui/theme';
+import { Box } from '@mui/material';
 import { Overlay, Map as PigeonMapCore } from 'pigeon-maps';
 import { useState } from 'react';
 import { Marker } from './Marker';
+import { WatercolorTile } from './WatercolorTile';
 import { ZoomControls } from './ZoomControls';
 
-/**
- * Stadia Maps tile providers for light and dark modes.
- * Uses their free tier - Alidade Smooth for light, Alidade Smooth Dark for dark.
- * No API key needed for low-volume usage.
- */
-const STADIA_LIGHT = (x: number, y: number, z: number, dpr?: number) =>
-  `https://tiles.stadiamaps.com/tiles/alidade_smooth/${z}/${x}/${y}${(dpr ?? 1) >= 2 ? '@2x' : ''}.png`;
+const containerSx: SxObject = {
+  height: '100%',
+  position: 'relative',
+  width: '100%',
+};
 
-const STADIA_DARK = (x: number, y: number, z: number, dpr?: number) =>
-  `https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/${z}/${x}/${y}${(dpr ?? 1) >= 2 ? '@2x' : ''}.png`;
+
+const DEFAULT_MIN_ZOOM = 3;
+const DEFAULT_MAX_ZOOM = 18;
 
 export type PigeonMapProps = {
-  /**
-   * Location data including coordinates, zoom levels, and marker image
-   */
   location: MapLocation;
+  stadiaApiKey: string;
 };
 
 /**
- * Lightweight map component using Pigeon Maps with Stadia tile provider.
- * Supports light/dark mode, zoom controls, and custom markers.
+ * Lightweight map component using Pigeon Maps with Stamen Watercolor tiles
+ * and terrain labels overlay. Zoom range is driven by zoomLevels from Contentful.
  */
-export function PigeonMap({ location }: PigeonMapProps) {
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme.mode === 'dark';
-
+export function PigeonMap({ location, stadiaApiKey }: PigeonMapProps) {
   const [center, setCenter] = useState<[number, number]>([
     location.point.latitude,
     location.point.longitude,
   ]);
-  const [zoom, setZoom] = useState(location.initialZoom ?? 10);
+  const levels = location.zoomLevels;
+  const initialIndex = levels.indexOf(location.initialZoom ?? levels[0] ?? DEFAULT_MIN_ZOOM);
+  const [zoomIndex, setZoomIndex] = useState(initialIndex === -1 ? 0 : initialIndex);
+  const zoom = levels[zoomIndex] ?? location.initialZoom ?? 10;
 
-  const minZoom = location.zoomLevels[0] ?? 1;
-  const maxZoom = location.zoomLevels[location.zoomLevels.length - 1] ?? 18;
+  const minZoom = levels.at(0) ?? DEFAULT_MIN_ZOOM;
+  const maxZoom = levels.at(-1) ?? DEFAULT_MAX_ZOOM;
+
+  const provider = (x: number, y: number, z: number) =>
+    `https://tiles.stadiamaps.com/tiles/stamen_watercolor/${z}/${x}/${y}.jpg?api_key=${stadiaApiKey}`;
 
   const handleZoomIn = () => {
-    setZoom((z) => Math.min(z + 1, maxZoom));
+    setZoomIndex((i) => Math.min(i + 1, levels.length - 1));
   };
 
   const handleZoomOut = () => {
-    setZoom((z) => Math.max(z - 1, minZoom));
+    setZoomIndex((i) => Math.max(i - 1, 0));
   };
 
   return (
-    <PigeonMapCore
-      attribution={false}
-      center={center}
-      dprs={[1, 2]}
-      maxZoom={maxZoom}
-      metaWheelZoom={true}
-      minZoom={minZoom}
-      onBoundsChanged={({ center: newCenter, zoom: newZoom }) => {
-        setCenter(newCenter);
-        setZoom(newZoom);
-      }}
-      provider={isDark ? STADIA_DARK : STADIA_LIGHT}
-      twoFingerDrag={true}
-      zoom={zoom}
-    >
-      <Overlay anchor={[location.point.latitude, location.point.longitude]}>
-        <Marker image={location.image} />
-      </Overlay>
+    <Box sx={containerSx}>
+      <PigeonMapCore
+        attribution={false}
+        center={center}
+        dprs={[1, 2]}
+        maxZoom={maxZoom}
+        metaWheelZoom={false}
+        metaWheelZoomWarning=""
+        minZoom={minZoom}
+        onBoundsChanged={({ center: newCenter, zoom: newZoom }) => {
+          console.log('zoom:', newZoom);
+          setCenter(newCenter);
+          const closest = levels.reduce(
+            (best, level, i) =>
+              Math.abs(level - newZoom) < Math.abs((levels[best] ?? 0) - newZoom) ? i : best,
+            0,
+          );
+          setZoomIndex(closest);
+        }}
+        provider={provider}
+        tileComponent={WatercolorTile}
+        twoFingerDrag={true}
+        zoom={zoom}
+      >
+        <Overlay anchor={[location.point.latitude, location.point.longitude]}>
+          <Marker image={location.image} />
+        </Overlay>
+      </PigeonMapCore>
       <ZoomControls onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} />
-    </PigeonMapCore>
+    </Box>
   );
 }
