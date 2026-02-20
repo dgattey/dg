@@ -6,6 +6,11 @@ import { ViewTransition } from 'react';
 import type { SxObject } from '../theme';
 import './sheet-transitions.css';
 
+const closeLinkStyle = {
+  color: 'inherit',
+  display: 'inline-flex',
+} as const;
+
 const sheetContainerSx: SxObject = {
   background: 'var(--mui-palette-background-default)',
   borderTopLeftRadius: 32,
@@ -63,9 +68,11 @@ export function Sheet({ title, children }: SheetProps) {
           <Typography component="h1" variant="h1">
             {title}
           </Typography>
-          <IconButton aria-label="Close" component={NextLink} href="/" size="small">
-            <X size={20} />
-          </IconButton>
+          <NextLink aria-label="Close" href="/" style={closeLinkStyle}>
+            <IconButton size="small" tabIndex={-1}>
+              <X size={20} />
+            </IconButton>
+          </NextLink>
         </Stack>
         <Box sx={contentSx}>{children}</Box>
       </Box>
