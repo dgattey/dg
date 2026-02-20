@@ -7,7 +7,7 @@ import { spawnSync } from 'node:child_process';
 import { chmodSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { exec, execSafe, fail, fmt, out, spinner } from './lib/utils.js';
+import { exec, execSafe, fail, fmt, out, spinner, withSpinner } from './lib/utils.js';
 
 const dryRun = process.argv.includes('--dry-run') || process.argv.includes('-n');
 
@@ -18,14 +18,13 @@ if (branch === 'main') fail('Cannot run on main branch');
 out(fmt.info(`Current branch: ${branch}`));
 
 // Fetch
-const fetchSpinner = spinner('Fetching origin/main...').start();
-try {
-  exec('git fetch origin main');
-  fetchSpinner.succeed('Fetched origin/main');
-} catch (e) {
-  fetchSpinner.fail('Failed to fetch');
-  throw e;
-}
+await withSpinner(
+  'Fetching origin/main...',
+  () => {
+    exec('git fetch origin main');
+  },
+  'Fetched origin/main',
+);
 
 // Find bot commits
 const searchSpinner = spinner('Searching for bot version bump commits...').start();

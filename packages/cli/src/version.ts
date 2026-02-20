@@ -131,11 +131,16 @@ switch (cmd) {
     if (current === target) {
       log(fmt.success(`Already at target ${target}, skipping`));
     } else {
-      await withSpinner(`Bumping ${current} → ${target}`, () => {
-        const pkg = readPkg();
-        pkg.version = target;
-        writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`, 'utf8');
-      });
+      await withSpinner(
+        `Bumping ${current} → ${target}`,
+        () => {
+          const pkg = readPkg();
+          pkg.version = target;
+          writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`, 'utf8');
+        },
+        undefined,
+        { stderr: true },
+      );
     }
     out(`VERSION_FROM=${base}`);
     out(`VERSION_TO=${target}`);
@@ -187,24 +192,31 @@ switch (cmd) {
         ? `${marker}\n🎉 This PR is included in version ${version} 🎉\n\nRelease: [GitHub](${releaseUrl})`
         : `${marker}\n🎉 This PR will be included in version ${version} 🎉`;
 
-    await withSpinner('Updating PR comment', async () => {
-      type Comment = { id: number; body?: string };
-      const comments = await githubRequest<Array<Comment>>(
-        'GET',
-        `/repos/${owner}/${repoName}/issues/${number}/comments?per_page=100`,
-      );
-      const existing = comments.find((c) => c.body?.includes(marker));
+    await withSpinner(
+      'Updating PR comment',
+      async () => {
+        type Comment = { id: number; body?: string };
+        const comments = await githubRequest<Array<Comment>>(
+          'GET',
+          `/repos/${owner}/${repoName}/issues/${number}/comments?per_page=100`,
+        );
+        const existing = comments.find((c) => c.body?.includes(marker));
 
-      if (existing) {
-        await githubRequest('PATCH', `/repos/${owner}/${repoName}/issues/comments/${existing.id}`, {
-          body,
-        });
-      } else {
-        await githubRequest('POST', `/repos/${owner}/${repoName}/issues/${number}/comments`, {
-          body,
-        });
-      }
-    });
+        if (existing) {
+          await githubRequest(
+            'PATCH',
+            `/repos/${owner}/${repoName}/issues/comments/${existing.id}`,
+            { body },
+          );
+        } else {
+          await githubRequest('POST', `/repos/${owner}/${repoName}/issues/${number}/comments`, {
+            body,
+          });
+        }
+      },
+      undefined,
+      { stderr: true },
+    );
     break;
   }
 

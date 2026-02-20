@@ -32,26 +32,6 @@ const QUERY = gql`
         height
       }
     }
-    lightImage: asset(id: "5PrFVu1gJBLhgJGixRL4Wc") {
-      url(
-        transform: {
-          width: 660 # PROJECT_MAX_IMAGE_DIMENSION * 2
-          height: 660 # PROJECT_MAX_IMAGE_DIMENSION * 2
-          quality: 80
-          format: WEBP
-        }
-      )
-    }
-    darkImage: asset(id: "6bRgM9lkcceJQOE0jSOEfu") {
-      url(
-        transform: {
-          width: 660 # PROJECT_MAX_IMAGE_DIMENSION * 2
-          height: 660 # PROJECT_MAX_IMAGE_DIMENSION * 2
-          quality: 80
-          format: WEBP
-        }
-      )
-    }
   }
 `;
 
@@ -71,27 +51,17 @@ export async function fetchCurrentLocation(): Promise<MapLocation | null> {
   const point = location?.point;
   const latitude = point?.latitude;
   const longitude = point?.longitude;
-  if (
-    !location ||
-    latitude == null ||
-    longitude == null ||
-    !data.lightImage?.url ||
-    !data.darkImage?.url
-  ) {
+  if (!location || latitude == null || longitude == null) {
     return null;
   }
-  const zoomLevels = location.zoomLevels?.filter(isNotNullish).map(Number) ?? [];
-  zoomLevels.sort((a, b) => {
-    if (a === b) {
-      return 0;
-    }
-    return a < b ? -1 : 1;
-  });
   return {
-    backupImageUrls: { dark: data.darkImage.url, light: data.lightImage.url },
     image: toRenderableAsset(location.image),
     initialZoom: location.initialZoom,
     point: { latitude, longitude },
-    zoomLevels,
+    zoomLevels:
+      location.zoomLevels
+        ?.filter(isNotNullish)
+        .map(Number)
+        .sort((a, b) => a - b) ?? [],
   };
 }

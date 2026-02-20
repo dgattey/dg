@@ -208,6 +208,7 @@ export function getTheme(): Theme {
           },
           html: {
             scrollbarGutter: 'stable',
+            textWrap: 'pretty',
           },
           'html, body': {
             overflowX: 'clip',

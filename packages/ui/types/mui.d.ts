@@ -39,18 +39,12 @@ declare module '@mui/material/styles' {
   type CardColors = {
     border: NonNullableColor;
   };
-  type MapColors = {
-    markerBackground: NonNullableColor;
-    markerBorder: NonNullableColor;
-  };
 
   interface Palette {
     card: CardColors;
-    map: MapColors;
   }
   interface PaletteOptions {
     card: CardColors;
-    map: MapColors;
   }
   interface Theme {
     shape: {

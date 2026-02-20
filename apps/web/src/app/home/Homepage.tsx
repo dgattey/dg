@@ -1,7 +1,7 @@
 import { ContentGrid } from '@dg/ui/core/ContentGrid';
 import { getProjects } from '../../services/contentful';
 import { IntroCardSlot } from './IntroCardSlot';
-import { MapPreviewCardSlot } from './MapPreviewCardSlot';
+import { MapCardSlot } from './MapCardSlot';
 import { ProjectCard } from './ProjectCard';
 import { SpotifyCardSlot } from './SpotifyCard';
 import { StravaCardSlot } from './StravaCardSlot';
@@ -34,7 +34,7 @@ export async function Homepage() {
   // should maintain their original order, but not necessarily index.
   const preciselyPlacedCards = new Map([
     [0, <IntroCardSlot key="intro" />],
-    [1, <MapPreviewCardSlot key="map" />],
+    [1, <MapCardSlot key="map" />],
     [3, <SpotifyCardSlot key="spotify" />],
     [4, <StravaCardSlot key="strava" />],
   ]);

@@ -13,10 +13,10 @@ alwaysApply: false
 
 ```tsx
 // bad: server passes function prop
-<LazyLoadedMap FullMapCard={FullMapCard} />
+<ClientComponent ServerChild={ServerChild} />
 
 // good: client owns lazy import
-const FullMapCard = lazy(() => import('./mapbox/FullMapCard'));
+const HeavyComponent = lazy(() => import('./HeavyComponent'));
 ```
 
 ## MUI theming (no `useTheme`)

@@ -1,17 +1,24 @@
 # Maps
 
-Mapbox GL integration for interactive maps. Dynamically imported to reduce bundle size.
+Lightweight map component using Pigeon Maps with Stamen Watercolor tiles.
 
 ## Key Exports
 
-- `MapCanvas` - Interactive map component with markers and controls
-- Mapbox GL configuration and styling
-- Location marker rendering utilities
+- `MapCard` - Map component wrapped in a content card
+- `PigeonMap` - Core map with markers and zoom controls
+- Custom marker with image support
+
+## Features
+
+- Stamen Watercolor base tiles with terrain labels overlay (via Stadia Maps)
+- Custom themed zoom controls
+- Custom circular marker with image overlay
+- No lazy loading required (~10KB bundle)
 
 ## Usage
 
-Lazy load via dynamic import to avoid loading the large Mapbox dependency upfront:
+```tsx
+import { MapCard } from '@dg/maps/MapCard';
 
-```ts
-const MapCanvas = dynamic(() => import('@dg/maps').then(m => m.MapCanvas))
+<MapCard location={location} />
 ```

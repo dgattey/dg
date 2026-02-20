@@ -5,7 +5,7 @@
  */
 import { existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { findRoot, fmt, loadEnv, log, out } from './lib/utils.js';
+import { findRoot, fmt, loadEnv, out } from './lib/utils.js';
 
 const root = findRoot();
 
@@ -15,7 +15,7 @@ if (!existsSync(envrcPath)) {
   writeFileSync(envrcPath, 'dotenv\n', 'utf8');
   out(fmt.success('Created .envrc for direnv'));
 } else {
-  log(fmt.dim('.envrc already exists'));
+  out(fmt.dim('.envrc already exists'));
 }
 
 // Configure Turbo remote caching
@@ -30,10 +30,10 @@ if (!existsSync(turboConfigPath)) {
     writeFileSync(turboConfigPath, `${JSON.stringify({ teamId: turboTeam }, null, 2)}\n`, 'utf8');
     out(fmt.success(`Configured Turbo remote caching for team: ${turboTeam}`));
   } else {
-    log(fmt.warn('TURBO_TEAM not set, skipping Turbo remote cache config'));
+    out(fmt.warn('TURBO_TEAM not set, skipping Turbo remote cache config'));
   }
 } else {
-  log(fmt.dim('Turbo config already exists'));
+  out(fmt.dim('Turbo config already exists'));
 }
 
 out(fmt.success('Setup complete'));

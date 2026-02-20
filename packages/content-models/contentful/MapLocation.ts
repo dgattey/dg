@@ -23,13 +23,7 @@ export type MapLocation = {
   image?: RenderableAsset | null;
 
   /**
-   * Converts zoom levels to a number array
+   * Sorted zoom levels from Contentful. First = min, last = max.
    */
   zoomLevels: Array<number>;
-
-  /**
-   * Dark and light mode images that should be used to show a backup
-   * screenshot of the map before the MapboxGL package loads
-   */
-  backupImageUrls: { light: string; dark: string };
 };
