@@ -85,8 +85,6 @@ describe('contentful schemas', () => {
         point: { latitude: 37.5, longitude: -122.4 },
         zoomLevels: [6, '8', 10],
       },
-      darkImage: { url: 'https://example.com/dark.webp' },
-      lightImage: { url: 'https://example.com/light.webp' },
     };
 
     expect(safeParse(currentLocationResponseSchema, input).success).toBe(true);

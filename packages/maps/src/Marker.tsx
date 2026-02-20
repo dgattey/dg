@@ -3,6 +3,7 @@ import { Image } from '@dg/ui/dependent/Image';
 import { MAP_MARKER_IMAGE_SIZE } from '@dg/ui/helpers/imageSizes';
 import type { SxObject, SxProps } from '@dg/ui/theme';
 import { Box } from '@mui/material';
+import { useId } from 'react';
 
 const DIMENSION = 100;
 const RADIUS = DIMENSION / 2;
@@ -43,8 +44,7 @@ type MarkerProps = {
  * Position is controlled by wrapping Overlay component.
  */
 export function Marker({ image }: MarkerProps) {
-  // Generate a unique ID for SVG elements
-  const id = `marker-${Date.now()}`;
+  const id = useId();
 
   return (
     <Box sx={markerContainerSx}>

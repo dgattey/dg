@@ -26,10 +26,4 @@ export type MapLocation = {
    * Converts zoom levels to a number array
    */
   zoomLevels: Array<number>;
-
-  /**
-   * Dark and light mode images that should be used to show a backup
-   * screenshot of the map before the MapboxGL package loads
-   */
-  backupImageUrls: { light: string; dark: string };
 };

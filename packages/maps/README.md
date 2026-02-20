@@ -13,7 +13,7 @@ Lightweight map component using Pigeon Maps with Stadia tile provider.
 - Light/dark mode support via Stadia Maps tiles
 - Custom themed zoom controls
 - Custom circular marker with image overlay
-- No lazy loading required (~10KB bundle vs ~500KB for Mapbox)
+- No lazy loading required (~10KB bundle)
 
 ## Usage
 

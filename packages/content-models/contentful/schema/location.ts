@@ -22,6 +22,4 @@ export const currentLocationResponseSchema = v.looseObject({
       }),
     ),
   ),
-  darkImage: v.optional(v.nullable(assetSchema)),
-  lightImage: v.optional(v.nullable(assetSchema)),
 });
