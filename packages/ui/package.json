@@ -24,6 +24,7 @@
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
+    "@typescript/native": "catalog:",
     "dotenv-mono": "catalog:",
     "jest": "catalog:",
     "jest-environment-jsdom": "catalog:",

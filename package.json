@@ -8,6 +8,7 @@
   "devDependencies": {
     "@biomejs/biome": "^2.5.5",
     "@dg/tsconfig": "workspace:*",
+    "@typescript/native": "catalog:",
     "turbo": "2.10.5",
     "typescript": "catalog:"
   },

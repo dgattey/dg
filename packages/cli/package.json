@@ -6,6 +6,7 @@
   "devDependencies": {
     "@dg/tsconfig": "workspace:*",
     "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:"
   },

@@ -14,6 +14,7 @@
     "@types/node": "catalog:",
     "@types/react": "catalog:",
     "@types/react-dom": "19.2.3",
+    "@typescript/native": "catalog:",
     "dotenv-mono": "catalog:",
     "typescript": "catalog:"
   },

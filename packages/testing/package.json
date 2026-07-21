@@ -9,6 +9,7 @@
     "@dg/tsconfig": "workspace:*",
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
     "jest": "catalog:",
     "typescript": "catalog:"
   },

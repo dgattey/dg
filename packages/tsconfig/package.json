@@ -1,8 +1,8 @@
 {
   "files": [
     "base.json",
-    "nextjs.json",
-    "react.json"
+    "library.json",
+    "nextjs.json"
   ],
   "name": "@dg/tsconfig",
   "private": true,

@@ -9,6 +9,7 @@
     "@dg/tsconfig": "workspace:*",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
+    "@typescript/native": "catalog:",
     "dotenv-mono": "catalog:",
     "typescript": "catalog:"
   },
