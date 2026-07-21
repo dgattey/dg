@@ -24,7 +24,7 @@ catalog:
   graphql-request: 7.4.0
   jest: 30.4.2
   jest-environment-jsdom: 30.4.1
-  lucide-react: 0.563.0
+  lucide-react: 1.25.0
   next: 16.2.10
   react: 19.2.7
   server-only: 0.0.1
