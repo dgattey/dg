@@ -2,7 +2,7 @@
   "dependencies": {
     "@dg/shared-core": "workspace:*",
     "@dg/ui": "workspace:*",
-    "@vercel/og": "0.8.6",
+    "@vercel/og": "0.11.1",
     "react": "catalog:"
   },
   "devDependencies": {
