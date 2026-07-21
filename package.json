@@ -18,7 +18,7 @@
   "homepage": "https://github.com/dgattey/dg#readme",
   "license": "MIT",
   "name": "dg",
-  "packageManager": "pnpm@10.28.2+sha512.41872f037ad22f7348e3b1debbaf7e867cfd448f2726d9cf74c08f19507c31d2c8e7a11525b983febc2df640b5438dee6023ebb1f84ed43cc2d654d2bc326264",
+  "packageManager": "pnpm@11.15.1+sha512.81350b07e53c9538a02f1f2303b4290fa2d7be04e56e2a970c4cc4b417dc761de196edabd49d55c7dc9580db81007c44143e4e3d7e462b3000d23c255122d065",
   "private": true,
   "repository": "https://github.com/dgattey/dg.git",
   "scripts": {

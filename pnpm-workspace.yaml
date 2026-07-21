@@ -3,7 +3,27 @@ packages:
   - packages/*
   - apps/*
 
-approveBuildsAllowlist: '@swc/core'
+# pnpm 11 reads .npmrc for auth and registries only, so these live here now.
+autoInstallPeers: true
+engineStrict: true
+saveExact: true
+
+# Turbo already gates every task behind a single install, so re-verifying
+# dependencies on each `pnpm run` is pure overhead.
+verifyDepsBeforeRun: false
+
+# node_modules is fully reproducible from the lockfile, so don't stop and ask
+# before rebuilding it. Without this pnpm hard-fails outside a TTY, which is
+# what a developer hits the first time they install on the pnpm 11 store.
+confirmModulesPurge: false
+
+# Replaces onlyBuiltDependencies. Anything not listed here is blocked from
+# running install scripts, and pnpm 11 fails the install rather than warning.
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
 
 catalog:
   '@contentful/rich-text-types': 17.2.7
@@ -35,10 +55,18 @@ catalog:
   valibot: 1.4.2
   wretch: 3.0.9
 
-onlyBuiltDependencies:
-  - '@biomejs/biome'
-  - '@swc/core'
-  - '@vercel/speed-insights'
-  - esbuild
-  - sharp
-  - unrs-resolver
+# pnpm quarantines releases younger than minimumReleaseAge (1 day by default).
+# pnpm appends to this list itself when a pinned version is newer than that; it
+# never prunes, so entries for packages that have since moved on can be deleted.
+minimumReleaseAgeExclude:
+  - '@biomejs/biome@2.5.5'
+  - '@biomejs/cli-darwin-arm64@2.5.5'
+  - '@biomejs/cli-darwin-x64@2.5.5'
+  - '@biomejs/cli-linux-arm64-musl@2.5.5'
+  - '@biomejs/cli-linux-arm64@2.5.5'
+  - '@biomejs/cli-linux-x64-musl@2.5.5'
+  - '@biomejs/cli-linux-x64@2.5.5'
+  - '@biomejs/cli-win32-arm64@2.5.5'
+  - '@biomejs/cli-win32-x64@2.5.5'
+  - '@testing-library/jest-dom@7.0.0'
+  - vercel@56.4.1
