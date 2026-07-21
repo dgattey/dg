@@ -5,7 +5,12 @@ export function TokenExpiry({ expiresAt }: { expiresAt: Date | null }) {
     return null;
   }
   return (
-    <Typography color="text.secondary" variant="body2">
+    <Typography
+      sx={{
+        color: 'text.secondary',
+      }}
+      variant="body2"
+    >
       Access token expires at {expiresAt.toLocaleString()}
     </Typography>
   );

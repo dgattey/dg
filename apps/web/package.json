@@ -11,7 +11,7 @@
     "@emotion/styled": "11.14.1",
     "@fortawesome/free-brands-svg-icons": "catalog:",
     "@mui/material": "catalog:",
-    "@mui/material-nextjs": "7.3.7",
+    "@mui/material-nextjs": "9.1.1",
     "@vercel/analytics": "2.0.1",
     "@vercel/speed-insights": "2.0.0",
     "dotenv-mono": "catalog:",

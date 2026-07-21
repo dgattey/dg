@@ -22,13 +22,23 @@ async function WebhookCardContent() {
 
   return (
     <>
-      <Stack alignItems="center" direction="row" gap={1}>
+      <Stack
+        direction="row"
+        sx={{
+          alignItems: 'center',
+          gap: 1,
+        }}
+      >
         <Typography variant="h3">Strava webhooks</Typography>
         <StatusChip isConnected={hasSubscription} />
       </Stack>
       {hasSubscription ? (
         <>
-          <Stack gap={1}>
+          <Stack
+            sx={{
+              gap: 1,
+            }}
+          >
             {subscriptions.map((subscription) => (
               <SubscriptionDetails
                 details={subscription}
@@ -52,7 +62,13 @@ async function WebhookCardContent() {
 function WebhookCardContentSkeleton() {
   return (
     <>
-      <Stack alignItems="center" direction="row" gap={1.5}>
+      <Stack
+        direction="row"
+        sx={{
+          alignItems: 'center',
+          gap: 1.5,
+        }}
+      >
         <Skeleton height={36} variant="text" width={240} />
         <Skeleton height={24} variant="rounded" width={120} />
       </Stack>

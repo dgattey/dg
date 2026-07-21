@@ -31,6 +31,7 @@ const statusCodeSx: SxObject = {
 
 const messageSx: SxObject = {
   maxWidth: '26em',
+  textAlign: 'center',
   textWrap: 'balance',
 };
 
@@ -48,7 +49,7 @@ export function ErrorLayout({ statusCode }: ErrorLayoutProps) {
       <MouseAwareGlassContainer component={Typography} sx={statusCodeSx} variant="h1">
         {statusCode}
       </MouseAwareGlassContainer>
-      <Typography sx={messageSx} textAlign="center" variant="h5">
+      <Typography sx={messageSx} variant="h5">
         {statusCode === 404
           ? 'Sorry, couldn‘t find that page. Email me if something is wrong.'
           : 'Something went super wrong, sorry. Email me to let me know.'}

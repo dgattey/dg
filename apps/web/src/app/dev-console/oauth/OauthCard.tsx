@@ -28,7 +28,13 @@ async function OauthCardContent({ provider }: OauthCardProps) {
 
   return (
     <>
-      <Stack alignItems="center" direction="row" gap={1.5}>
+      <Stack
+        direction="row"
+        sx={{
+          alignItems: 'center',
+          gap: 1.5,
+        }}
+      >
         <Typography variant="h3">{capitalize(provider)}</Typography>
         <StatusChip isConnected={status.isConnected} />
       </Stack>
@@ -64,7 +70,13 @@ function ButtonGrid({ children }: { children: React.ReactNode }) {
 function OauthCardContentSkeleton() {
   return (
     <>
-      <Stack alignItems="center" direction="row" gap={1}>
+      <Stack
+        direction="row"
+        sx={{
+          alignItems: 'center',
+          gap: 1,
+        }}
+      >
         <Skeleton height={36} variant="text" width={100} />
         <Skeleton height={24} variant="rounded" width={120} />
       </Stack>

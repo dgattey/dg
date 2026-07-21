@@ -19,7 +19,11 @@ export function ImportResults({ results, dryRun }: ImportResultsProps) {
   const failedFiles = results.filter((r) => r.error);
 
   return (
-    <Stack gap={1}>
+    <Stack
+      sx={{
+        gap: 1,
+      }}
+    >
       <Alert severity={dryRun ? 'info' : 'success'}>
         {dryRun ? 'Dry run complete: would import' : 'Imported'} {totalImported.toLocaleString()}{' '}
         plays ({totalSkipped.toLocaleString()} skipped, {totalErrors.toLocaleString()} errors)
@@ -38,7 +42,12 @@ export function ImportResults({ results, dryRun }: ImportResultsProps) {
         </Alert>
       )}
 
-      <Typography color="text.secondary" variant="body2">
+      <Typography
+        sx={{
+          color: 'text.secondary',
+        }}
+        variant="body2"
+      >
         Previously imported entries are automatically skipped. Safe to re-run.
       </Typography>
     </Stack>

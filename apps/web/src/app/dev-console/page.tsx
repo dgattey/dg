@@ -9,9 +9,18 @@ const oauthProviders = ['strava', 'spotify'] as const;
 
 function PageHeader() {
   return (
-    <Stack gap={2}>
+    <Stack
+      sx={{
+        gap: 2,
+      }}
+    >
       <Typography variant="h1">Dev console</Typography>
-      <Typography color="text.secondary" variant="body1">
+      <Typography
+        sx={{
+          color: 'text.secondary',
+        }}
+        variant="body1"
+      >
         This page is protected and intended for developer access.
       </Typography>
       <Divider sx={{ marginBlockStart: 2 }} />
@@ -21,7 +30,11 @@ function PageHeader() {
 
 function CardSection({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <Stack gap={3}>
+    <Stack
+      sx={{
+        gap: 3,
+      }}
+    >
       <Typography variant="h2">{title}</Typography>
       <Box
         sx={{
@@ -43,7 +56,11 @@ function CardSection({ title, children }: { title: string; children: React.React
 export default function ConsolePage() {
   return (
     <main>
-      <Stack gap={6}>
+      <Stack
+        sx={{
+          gap: 6,
+        }}
+      >
         <PageHeader />
 
         <CardSection title="OAuth connections">
