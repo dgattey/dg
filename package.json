@@ -6,7 +6,7 @@
   },
   "description": "Dylan Gattey's public website, implemented in NextJS in a monorepo",
   "devDependencies": {
-    "@biomejs/biome": "^2.5.4",
+    "@biomejs/biome": "^2.5.5",
     "@dg/tsconfig": "workspace:*",
     "turbo": "2.10.5",
     "typescript": "catalog:"
