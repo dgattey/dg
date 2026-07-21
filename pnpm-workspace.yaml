@@ -20,7 +20,7 @@ catalog:
   '@types/react': 19.2.17
   babel-plugin-react-compiler: 1.0.0
   dotenv-mono: 1.5.1
-  graphql: 16.12.0
+  graphql: 16.14.2
   graphql-request: 7.4.0
   jest: 30.4.2
   jest-environment-jsdom: 30.4.1
