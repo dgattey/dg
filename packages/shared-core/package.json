@@ -4,6 +4,7 @@
     "@dg/tsconfig": "workspace:*",
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
     "dotenv-mono": "catalog:",
     "jest": "catalog:",
     "typescript": "catalog:"

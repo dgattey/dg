@@ -3,8 +3,8 @@
   "globalDependencies": [
     "config/env.secrets.keys",
     ".node-version",
-    ".npmrc",
     "biome.json",
+    "pnpm-workspace.yaml",
     "tsconfig.json"
   ],
   "tasks": {

@@ -27,7 +27,8 @@
     "strictBindCallApply": true,
     "strictFunctionTypes": true,
     "strictNullChecks": true,
-    "strictPropertyInitialization": true
+    "strictPropertyInitialization": true,
+    "types": ["node"]
   },
   "display": "Default",
   "exclude": ["node_modules", "**/*/dist", "**/*/build"]

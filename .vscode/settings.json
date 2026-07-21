@@ -1,6 +1,9 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib",
-	"typescript.enablePromptUseWorkspaceTsdk": true,
+	// No workspace tsdk pin: `typescript` resolves to @typescript/typescript6, which
+	// is an API-only bridge for Next's build-time check and ships no tsserver. The
+	// editor uses its own bundled TypeScript instead. Run "Disable TypeScript 7
+	// Language Server" if you need the `next` language-service plugin, which only
+	// loads under a TypeScript 6 language server.
 	"editor.formatOnSave": true,
 	"editor.codeActionsOnSave": {
 		"source.fixAll.biome": "explicit",

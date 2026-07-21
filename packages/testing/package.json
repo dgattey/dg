@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@swc/jest": "0.2.39",
+    "@testing-library/dom": "catalog:",
     "@testing-library/jest-dom": "catalog:",
     "esbuild-register": "3.6.0"
   },
@@ -8,6 +9,7 @@
     "@dg/tsconfig": "workspace:*",
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
     "jest": "catalog:",
     "typescript": "catalog:"
   },

@@ -18,8 +18,18 @@ export function SpotifyImportCard() {
     <DevConsoleCardShell>
       <Typography variant="h3">Spotify history import</Typography>
 
-      <Stack gap={2}>
-        <Stack alignItems="center" direction="row" gap={2}>
+      <Stack
+        sx={{
+          gap: 2,
+        }}
+      >
+        <Stack
+          direction="row"
+          sx={{
+            alignItems: 'center',
+            gap: 2,
+          }}
+        >
           <FileImportInput dryRun={dryRun} onComplete={setResults} />
           <FormControlLabel
             control={<Checkbox checked={dryRun} onChange={() => setDryRun(!dryRun)} />}

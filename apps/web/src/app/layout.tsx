@@ -7,7 +7,7 @@ import { themePreferenceAttribute, themeSelectorAttribute } from '@dg/ui/theme';
 import { GlobalStyleProvider } from '@dg/ui/theme/GlobalStyleProvider';
 import { InitColorSchemeScript } from '@mui/material';
 import Container from '@mui/material/Container';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';

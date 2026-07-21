@@ -1,9 +1,11 @@
+import { faGithub } from '@fortawesome/free-brands-svg-icons/faGithub';
+import { faInstagram } from '@fortawesome/free-brands-svg-icons/faInstagram';
 import { faLinkedinIn } from '@fortawesome/free-brands-svg-icons/faLinkedinIn';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import type { ButtonProps, LinkProps as MuiLinkProps } from '@mui/material';
 import { Button, Link as MuiLink } from '@mui/material';
-import { Github, Instagram, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import NextLink from 'next/link';
 import React from 'react';
 import type { TooltipPlacement } from '../core/Tooltip';
@@ -78,12 +80,13 @@ type LinkProps = BaseLinkProps &
   ({ isButton: true; buttonProps?: ButtonProps<'a'> } | { isButton?: false; buttonProps?: never });
 
 /**
- * All built in mappings for icon name to element
+ * All built in mappings for icon name to element. Brand marks come from Font
+ * Awesome since lucide-react v1 dropped brand icons for trademark reasons.
  */
 const BUILT_IN_ICONS: Record<string, React.ReactNode> = {
   email: <Send size="1em" />,
-  github: <Github size="1em" />,
-  instagram: <Instagram size="1em" />,
+  github: <FaIcon icon={faGithub} />,
+  instagram: <FaIcon icon={faInstagram} />,
   linkedin: <FaIcon icon={faLinkedinIn} />,
   spotify: <FaIcon icon={faSpotify} />,
   strava: <FaIcon icon={faStrava} />,

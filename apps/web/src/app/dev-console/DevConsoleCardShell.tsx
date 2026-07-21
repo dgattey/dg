@@ -9,7 +9,13 @@ export function DevConsoleCardShell({ children }: DevConsoleCardShellProps) {
   return (
     <Card>
       <CardContent>
-        <Stack gap={2}>{children}</Stack>
+        <Stack
+          sx={{
+            gap: 2,
+          }}
+        >
+          {children}
+        </Stack>
       </CardContent>
     </Card>
   );

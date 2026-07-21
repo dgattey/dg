@@ -3,41 +3,70 @@ packages:
   - packages/*
   - apps/*
 
-approveBuildsAllowlist: '@swc/core'
+# pnpm 11 reads .npmrc for auth and registries only, so these live here now.
+autoInstallPeers: true
+engineStrict: true
+saveExact: true
+
+# Turbo already gates every task behind a single install, so re-verifying
+# dependencies on each `pnpm run` is pure overhead.
+verifyDepsBeforeRun: false
+
+# node_modules is fully reproducible from the lockfile, so don't stop and ask
+# before rebuilding it. Without this pnpm hard-fails outside a TTY, which is
+# what a developer hits the first time they install on the pnpm 11 store.
+confirmModulesPurge: false
+
+# Replaces onlyBuiltDependencies. Anything not listed here is blocked from
+# running install scripts, and pnpm 11 fails the install rather than warning.
+allowBuilds:
+  '@swc/core': true
+  esbuild: true
+  sharp: true
+  unrs-resolver: true
 
 catalog:
-  '@contentful/rich-text-types': 17.2.5
-  '@fortawesome/free-brands-svg-icons': 7.1.0
-  '@mui/material': 7.3.7
-  '@mui/system': 7.3.7
-  '@mui/utils': 7.3.7
+  '@contentful/rich-text-types': 17.2.7
+  '@fortawesome/free-brands-svg-icons': 7.3.1
+  '@mui/material': 9.2.0
+  '@mui/system': 9.2.0
+  '@mui/utils': 9.2.0
   '@testing-library/dom': 10.4.1
-  '@testing-library/jest-dom': 6.9.1
+  '@testing-library/jest-dom': 7.0.0
   '@testing-library/react': 16.3.2
   '@testing-library/user-event': 14.6.1
   '@types/jest': 30.0.0
-  '@types/node': 25.0.10
-  '@types/react': 19.2.9
+  '@types/node': 26.1.1
+  '@types/react': 19.2.17
+  '@typescript/native': npm:typescript@7.0.2
   babel-plugin-react-compiler: 1.0.0
   dotenv-mono: 1.5.1
-  graphql: 16.12.0
+  graphql: 16.14.2
   graphql-request: 7.4.0
-  jest: 30.2.0
-  jest-environment-jsdom: 30.2.0
-  lucide-react: 0.563.0
-  next: 16.1.4
-  react: 19.2.3
+  jest: 30.4.2
+  jest-environment-jsdom: 30.4.1
+  lucide-react: 1.25.0
+  next: 16.2.10
+  react: 19.2.7
   server-only: 0.0.1
-  sharp: 0.34.5
-  tsx: 4.21.0
-  typescript: 5.9.3
-  valibot: 1.2.0
-  wretch: 3.0.6
+  sharp: 0.35.3
+  tsx: 4.23.1
+  typescript: npm:@typescript/typescript6@6.0.2
+  valibot: 1.4.2
+  wretch: 3.0.9
 
-onlyBuiltDependencies:
-  - '@biomejs/biome'
-  - '@swc/core'
-  - '@vercel/speed-insights'
-  - esbuild
-  - sharp
-  - unrs-resolver
+# pnpm quarantines releases younger than minimumReleaseAge (1 day by default).
+# pnpm appends to this list itself when a pinned version is newer than that; it
+# never prunes, so entries for packages that have since moved on can be deleted.
+minimumReleaseAgeExclude:
+  - '@biomejs/biome@2.5.5'
+  - '@biomejs/cli-darwin-arm64@2.5.5'
+  - '@biomejs/cli-darwin-x64@2.5.5'
+  - '@biomejs/cli-linux-arm64-musl@2.5.5'
+  - '@biomejs/cli-linux-arm64@2.5.5'
+  - '@biomejs/cli-linux-x64-musl@2.5.5'
+  - '@biomejs/cli-linux-x64@2.5.5'
+  - '@biomejs/cli-win32-arm64@2.5.5'
+  - '@biomejs/cli-win32-x64@2.5.5'
+  - '@testing-library/jest-dom@7.0.0'
+  - vercel@56.4.1

@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.3.12/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.5.5/schema.json",
   "assist": {
     "actions": {
       "source": {
@@ -79,14 +79,12 @@
         "noUndeclaredDependencies": "error",
         "useJsonImportAttributes": "error"
       },
-      "nursery": {
-        "noImportCycles": "error"
-      },
       "performance": {
         "noBarrelFile": "error",
-        "noDelete": "error"
+        "noDelete": "error",
+        "noJsxPropsBind": "off"
       },
-      "recommended": true,
+      "preset": "recommended",
       "style": {
         "noUselessElse": "error",
         "useComponentExportOnlyModules": "off",
@@ -101,6 +99,8 @@
       "suspicious": {
         "noConsole": "error",
         "noEvolvingTypes": "error",
+        "noImportCycles": "error",
+        "noLeakedRender": "off",
         "useAwait": "error"
       }
     }

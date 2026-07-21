@@ -53,7 +53,11 @@ export function ServerActionButton({
   };
 
   return (
-    <Stack gap={1}>
+    <Stack
+      sx={{
+        gap: 1,
+      }}
+    >
       {error && (
         <Typography color="error" variant="body2">
           {error}

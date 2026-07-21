@@ -2,16 +2,18 @@
   "dependencies": {
     "@dg/content-models": "workspace:*",
     "@dg/shared-core": "workspace:*",
-    "@types/pg": "8.16.0",
+    "@types/pg": "8.20.0",
     "dotenv-mono": "catalog:",
-    "pg": "8.17.2",
-    "sequelize": "6.37.7",
+    "pg": "8.22.0",
+    "sequelize": "6.37.8",
     "sequelize-typescript": "2.1.6"
   },
   "devDependencies": {
     "@dg/testing": "workspace:*",
     "@dg/tsconfig": "workspace:*",
     "@types/jest": "catalog:",
+    "@types/node": "catalog:",
+    "@typescript/native": "catalog:",
     "jest": "catalog:",
     "pg-hstore": "2.3.4",
     "sequelize-cli": "6.6.5",

@@ -4,11 +4,25 @@ import { Stack, Typography } from '@mui/material';
 
 export function SubscriptionDetails({ details }: { details: WebhookSubscriptionMetadata }) {
   return (
-    <Stack gap={0.5}>
-      <Typography color="text.secondary" variant="body2">
+    <Stack
+      sx={{
+        gap: 0.5,
+      }}
+    >
+      <Typography
+        sx={{
+          color: 'text.secondary',
+        }}
+        variant="body2"
+      >
         <strong>Callback URL:</strong> {details.callbackUrl}
       </Typography>
-      <Typography color="text.secondary" variant="body2">
+      <Typography
+        sx={{
+          color: 'text.secondary',
+        }}
+        variant="body2"
+      >
         <strong>Created:</strong> <RelativeTime date={details.createdAt} />
       </Typography>
     </Stack>
