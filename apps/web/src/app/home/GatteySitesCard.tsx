@@ -3,12 +3,12 @@ import { Link } from '@dg/ui/dependent/Link';
 import { truncated } from '@dg/ui/helpers/truncated';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack, Typography } from '@mui/material';
-import type { ReactNode } from 'react';
+import type { ComponentType } from 'react';
 import { PhotosSiteMark, WmmSiteMark } from './gatteySiteMarks';
 
 type GatteySite = {
   description: string;
-  mark: ReactNode;
+  Mark: ComponentType;
   title: string;
   url: string;
 };
@@ -16,13 +16,13 @@ type GatteySite = {
 const SITES: Array<GatteySite> = [
   {
     description: 'Family gallery uploads and frame sync',
-    mark: <PhotosSiteMark />,
+    Mark: PhotosSiteMark,
     title: 'Gattey Photos',
     url: 'https://photos.gattey.com',
   },
   {
     description: 'What you own, where it sits',
-    mark: <WmmSiteMark />,
+    Mark: WmmSiteMark,
     title: 'WMM',
     url: 'https://wmm.gattey.com',
   },
@@ -74,20 +74,16 @@ export function GatteySitesCard() {
           Also on gattey.com
         </Typography>
         <Stack sx={siteListSx}>
-          {SITES.map(({ description, mark, title, url }) => (
+          {SITES.map(({ description, Mark, title, url }) => (
             <Stack key={url} sx={siteRowSx}>
-              <Box sx={markSx}>{mark}</Box>
+              <Box sx={markSx}>
+                <Mark />
+              </Box>
               <Stack>
-                <Link href={url} isExternal={true} sx={siteTitleSx} title={title} variant="h5">
+                <Link href={url} isExternal sx={siteTitleSx} title={title} variant="h5">
                   {title}
                 </Link>
-                <Link
-                  href={url}
-                  isExternal={true}
-                  sx={siteDescriptionSx}
-                  title={title}
-                  variant="body2"
-                >
+                <Link href={url} isExternal sx={siteDescriptionSx} title={title} variant="body2">
                   {description}
                 </Link>
               </Stack>
