@@ -2,7 +2,7 @@
   "author": "Dylan Gattey <hi@dylangattey.com>",
   "dependencies": {
     "dotenv-mono": "catalog:",
-    "vercel": "50.5.0"
+    "vercel": "56.4.1"
   },
   "description": "Dylan Gattey's public website, implemented in NextJS in a monorepo",
   "devDependencies": {
