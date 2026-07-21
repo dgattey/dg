@@ -27,5 +27,5 @@
     "clean": "rm -f .env .env.tmp",
     "preinstall": "npx only-allow pnpm"
   },
-  "version": "2.61.0"
+  "version": "2.61.1"
 }
