@@ -40,6 +40,7 @@ Valibot schemas that validate raw GraphQL responses from Contentful.
 | `shared.ts` | Common types: `Asset`, `Link`, `Sys` |
 | `intro.ts` | Homepage intro content schema |
 | `projects.ts` | Project card schema |
+| `sideProjects.ts` | Side project card schema |
 | `footer.ts` | Footer links schema |
 | `location.ts` | Map location schema |
 
@@ -53,6 +54,7 @@ Transformed types ready for UI consumption. These strip nulls, flatten structure
 | `links.ts` | `RenderableLink`, `toRenderableLink()` |
 | `intro.ts` | `RenderableIntro`, `toRenderableIntro()` |
 | `projects.ts` | `RenderableProject`, `toRenderableProject()` |
+| `sideProjects.ts` | `RenderableSideProject`, `toRenderableSideProject()`, `takeNewestSideProjects()` |
 | `richText.ts` | `RenderableRichText`, `toRenderableRichText()` |
 
 ## Spotify
