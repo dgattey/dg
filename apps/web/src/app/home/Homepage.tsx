@@ -1,6 +1,6 @@
 import { ContentGrid } from '@dg/ui/core/ContentGrid';
 import { getProjects } from '../../services/contentful';
-import { GatteySitesCard } from './GatteySitesCard';
+import { GatteySitesCardSlot } from './GatteySitesCardSlot';
 import { IntroCardSlot } from './IntroCardSlot';
 import { MapCardSlot } from './MapCardSlot';
 import { ProjectCard } from './ProjectCard';
@@ -38,7 +38,7 @@ export async function Homepage() {
     [1, <MapCardSlot key="map" />],
     [3, <SpotifyCardSlot key="spotify" />],
     [4, <StravaCardSlot key="strava" />],
-    [7, <GatteySitesCard key="gattey-sites" />],
+    [7, <GatteySitesCardSlot key="gattey-sites" />],
   ]);
 
   return <ContentGrid>{mergeCards(projectCards, preciselyPlacedCards)}</ContentGrid>;

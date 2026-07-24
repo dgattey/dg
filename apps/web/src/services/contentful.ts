@@ -5,6 +5,7 @@ import { fetchFooterLinks } from '@dg/services/contentful/fetchFooterLinks';
 import { fetchIntroContent } from '@dg/services/contentful/fetchIntroContent';
 import { fetchLinkByName } from '@dg/services/contentful/fetchLinkByName';
 import { fetchProjects } from '@dg/services/contentful/fetchProjects';
+import { fetchSideProjects } from '@dg/services/contentful/fetchSideProjects';
 import { cacheLife, cacheTag } from 'next/cache';
 
 const CONTENTFUL_TAG = 'contentful';
@@ -14,6 +15,13 @@ export const getProjects = async () => {
   cacheLife('default');
   cacheTag(CONTENTFUL_TAG);
   return await fetchProjects();
+};
+
+export const getSideProjects = async () => {
+  'use cache';
+  cacheLife('default');
+  cacheTag(CONTENTFUL_TAG);
+  return await fetchSideProjects();
 };
 
 export const getIntroContent = async () => {
