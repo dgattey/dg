@@ -3,7 +3,6 @@ import { footerLinksResponseSchema } from '../schema/footer';
 import { introBlockResponseSchema } from '../schema/intro';
 import { currentLocationResponseSchema } from '../schema/location';
 import { projectsResponseSchema } from '../schema/projects';
-import { sideProjectsResponseSchema } from '../schema/sideProjects';
 
 describe('contentful schemas', () => {
   it('parses intro block responses', () => {
@@ -60,8 +59,10 @@ describe('contentful schemas', () => {
             __typename: 'Project',
             creationDate: '2024-01-01',
             description: { json: { content: [], nodeType: 'document' } },
+            isSideProject: false,
             layout: 'default',
             link: { url: 'https://example.com' },
+            summary: null,
             thumbnail: {
               height: 480,
               url: 'https://example.com/image.webp',
@@ -70,36 +71,24 @@ describe('contentful schemas', () => {
             title: 'Project',
             type: ['Web', 'OpenSource'],
           },
-        ],
-      },
-    };
-
-    expect(safeParse(projectsResponseSchema, input).success).toBe(true);
-  });
-
-  it('parses side project list responses', () => {
-    const input = {
-      sideProjectCollection: {
-        __typename: 'SideProjectCollection',
-        items: [
           {
-            __typename: 'SideProject',
-            description: 'See what you own and where it sits',
-            mark: {
+            __typename: 'Project',
+            creationDate: '2026-07-01',
+            isSideProject: true,
+            link: { url: 'https://wmm.gattey.com' },
+            summary: 'See what you own and where it sits',
+            thumbnail: {
               height: 80,
-              title: 'WMM mark',
               url: 'https://images.ctfassets.net/example/wmm.webp',
               width: 80,
             },
-            publishedAt: '2026-07-01T00:00:00.000Z',
             title: 'WMM',
-            url: 'https://wmm.gattey.com',
           },
         ],
       },
     };
 
-    expect(safeParse(sideProjectsResponseSchema, input).success).toBe(true);
+    expect(safeParse(projectsResponseSchema, input).success).toBe(true);
   });
 
   it('parses current location responses', () => {

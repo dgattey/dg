@@ -4,7 +4,7 @@ import {
   toRenderableSideProject,
 } from '../renderables/sideProjects';
 
-const mark = {
+const thumbnail = {
   height: 80,
   title: 'Mark',
   url: 'https://images.ctfassets.net/example/mark.webp',
@@ -12,16 +12,18 @@ const mark = {
 };
 
 describe('side project renderables', () => {
-  it('maps valid side projects and rejects unsafe or incomplete entries', () => {
+  it('maps flagged projects and rejects unsafe, incomplete, or unflagged entries', () => {
     expect(
       toRenderableSideProject({
-        description: 'See what you own and where it sits',
-        mark,
-        publishedAt: '2026-07-01T00:00:00.000Z',
+        creationDate: '2026-07-01T00:00:00.000Z',
+        isSideProject: true,
+        link: { url: 'https://wmm.gattey.com' },
+        summary: 'See what you own and where it sits',
+        thumbnail,
         title: 'WMM',
-        url: 'https://wmm.gattey.com',
       }),
     ).toEqual({
+      creationDate: '2026-07-01T00:00:00.000Z',
       description: 'See what you own and where it sits',
       mark: {
         height: 80,
@@ -29,58 +31,68 @@ describe('side project renderables', () => {
         url: 'https://images.ctfassets.net/example/mark.webp',
         width: 80,
       },
-      publishedAt: '2026-07-01T00:00:00.000Z',
       title: 'WMM',
       url: 'https://wmm.gattey.com',
     });
 
     expect(
       toRenderableSideProject({
-        description: 'Nope',
-        mark,
+        isSideProject: false,
+        link: { url: 'https://example.com' },
+        summary: 'Nope',
+        thumbnail,
+        title: 'Regular',
+      }),
+    ).toBeNull();
+    expect(
+      toRenderableSideProject({
+        isSideProject: true,
+        link: { url: 'http://example.com' },
+        summary: 'Nope',
+        thumbnail,
         title: 'Insecure',
-        url: 'http://example.com',
       }),
     ).toBeNull();
     expect(
       toRenderableSideProject({
-        description: 'Nope',
-        mark,
-        title: 'Script',
-        url: 'javascript:alert(1)',
-      }),
-    ).toBeNull();
-    expect(
-      toRenderableSideProject({
-        description: 'Nope',
-        mark: { ...mark, url: null },
+        isSideProject: true,
+        link: { url: 'https://example.com' },
+        summary: 'Nope',
+        thumbnail: { ...thumbnail, url: null },
         title: 'Missing mark',
-        url: 'https://example.com',
       }),
     ).toBeNull();
-    expect(toRenderableSideProject({ mark, title: null, url: 'https://example.com' })).toBeNull();
+    expect(
+      toRenderableSideProject({
+        isSideProject: true,
+        link: { url: 'https://example.com' },
+        summary: null,
+        thumbnail,
+        title: 'Missing summary',
+      }),
+    ).toBeNull();
   });
 
-  it('orders newest first and keeps only the homepage max', () => {
+  it('orders newest first by creationDate and keeps only the homepage max', () => {
     const selected = takeNewestSideProjects([
       {
+        creationDate: '2024-01-01T00:00:00.000Z',
         description: 'Oldest',
-        mark,
-        publishedAt: '2024-01-01T00:00:00.000Z',
+        mark: thumbnail,
         title: 'Oldest',
         url: 'https://example.com/oldest',
       },
       {
+        creationDate: '2026-07-01T00:00:00.000Z',
         description: 'Newest',
-        mark,
-        publishedAt: '2026-07-01T00:00:00.000Z',
+        mark: thumbnail,
         title: 'Newest',
         url: 'https://example.com/newest',
       },
       {
+        creationDate: '2025-06-01T00:00:00.000Z',
         description: 'Middle',
-        mark,
-        publishedAt: '2025-06-01T00:00:00.000Z',
+        mark: thumbnail,
         title: 'Middle',
         url: 'https://example.com/middle',
       },

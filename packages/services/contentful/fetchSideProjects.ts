@@ -1,30 +1,33 @@
 import 'server-only';
 
 import {
-  SIDE_PROJECTS_LIMIT,
   type RenderableSideProject,
+  SIDE_PROJECTS_LIMIT,
   takeNewestSideProjects,
   toRenderableSideProject,
 } from '@dg/content-models/contentful/renderables/sideProjects';
-import { sideProjectsResponseSchema } from '@dg/content-models/contentful/schema/sideProjects';
+import { projectsResponseSchema } from '@dg/content-models/contentful/schema/projects';
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import { gql } from 'graphql-request';
 import { parseResponse } from '../clients/parseResponse';
 import { getContentfulClient } from './contentfulClient';
 
 /**
- * Newest published side projects for the homepage card.
- * Contentful orders by explicit publishedAt; we still re-sort and cap locally.
+ * Newest flagged side projects for the homepage card.
+ * Uses project.isSideProject and creationDate (same recency as the grid).
  */
 const QUERY = gql`
   query SideProjects {
-    sideProjectCollection(limit: 2, order: publishedAt_DESC) {
+    projectCollection(limit: 2, where: { isSideProject: true }, order: creationDate_DESC) {
       items {
         title
-        description
-        url
-        publishedAt
-        mark {
+        summary
+        creationDate
+        isSideProject
+        link {
+          url
+        }
+        thumbnail {
           url(transform: { quality: 90, format: WEBP, width: 80, height: 80 })
           width
           height
@@ -36,18 +39,14 @@ const QUERY = gql`
 `;
 
 /**
- * Fetches at most the two newest published side projects.
+ * Fetches at most the two newest published side projects (flagged projects).
  */
 export async function fetchSideProjects(): Promise<Array<RenderableSideProject>> {
-  const data = parseResponse(
-    sideProjectsResponseSchema,
-    await getContentfulClient().request(QUERY),
-    {
-      kind: 'graphql',
-      source: 'contentful.fetchSideProjects',
-    },
-  );
-  const projects = (data.sideProjectCollection?.items ?? [])
+  const data = parseResponse(projectsResponseSchema, await getContentfulClient().request(QUERY), {
+    kind: 'graphql',
+    source: 'contentful.fetchSideProjects',
+  });
+  const projects = (data.projectCollection?.items ?? [])
     .map(toRenderableSideProject)
     .filter(isNotNullish);
   return takeNewestSideProjects(projects, SIDE_PROJECTS_LIMIT);

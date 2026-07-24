@@ -1,5 +1,5 @@
-import { render, screen } from '@testing-library/react';
 import type { RenderableSideProject } from '@dg/content-models/contentful/renderables/sideProjects';
+import { render, screen } from '@testing-library/react';
 import { GatteySitesCard } from '../GatteySitesCard';
 
 const mark = {
@@ -11,20 +11,20 @@ const mark = {
 
 const projects: Array<RenderableSideProject> = [
   {
+    creationDate: '2026-07-01T00:00:00.000Z',
     description: 'See what you own and where it sits',
     mark,
-    publishedAt: '2026-07-01T00:00:00.000Z',
     title: 'WMM',
     url: 'https://wmm.gattey.com',
   },
   {
+    creationDate: '2026-06-01T00:00:00.000Z',
     description: 'Score Lost Cities by photo or manual entry',
     mark: {
       ...mark,
       title: 'Lost Cities',
       url: 'https://images.ctfassets.net/example/lost.webp',
     },
-    publishedAt: '2026-06-01T00:00:00.000Z',
     title: 'Lost Cities scorer',
     url: 'https://lostcities.app',
   },
