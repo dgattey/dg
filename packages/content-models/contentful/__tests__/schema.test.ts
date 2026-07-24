@@ -3,6 +3,7 @@ import { footerLinksResponseSchema } from '../schema/footer';
 import { introBlockResponseSchema } from '../schema/intro';
 import { currentLocationResponseSchema } from '../schema/location';
 import { projectsResponseSchema } from '../schema/projects';
+import { sideProjectsResponseSchema } from '../schema/sideProjects';
 
 describe('contentful schemas', () => {
   it('parses intro block responses', () => {
@@ -74,6 +75,31 @@ describe('contentful schemas', () => {
     };
 
     expect(safeParse(projectsResponseSchema, input).success).toBe(true);
+  });
+
+  it('parses side project list responses', () => {
+    const input = {
+      sideProjectCollection: {
+        __typename: 'SideProjectCollection',
+        items: [
+          {
+            __typename: 'SideProject',
+            description: 'See what you own and where it sits',
+            mark: {
+              height: 80,
+              title: 'WMM mark',
+              url: 'https://images.ctfassets.net/example/wmm.webp',
+              width: 80,
+            },
+            publishedAt: '2026-07-01T00:00:00.000Z',
+            title: 'WMM',
+            url: 'https://wmm.gattey.com',
+          },
+        ],
+      },
+    };
+
+    expect(safeParse(sideProjectsResponseSchema, input).success).toBe(true);
   });
 
   it('parses current location responses', () => {
