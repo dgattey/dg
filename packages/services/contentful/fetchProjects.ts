@@ -11,15 +11,17 @@ import { parseResponse } from '../clients/parseResponse';
 import { getContentfulClient } from './contentfulClient';
 
 /**
- * Grabs all projects to display
+ * Homepage grid projects. Excludes flagged side projects.
+ * Missing/unset isSideProject is treated as a regular project via isSideProject_not: true.
  */
 const QUERY = gql`
   query Projects {
-    projectCollection(order: creationDate_DESC) {
+    projectCollection(where: { isSideProject_not: true }, order: creationDate_DESC) {
       items {
         title
         creationDate
         type
+        isSideProject
         link {
           url
         }
@@ -38,12 +40,15 @@ const QUERY = gql`
 `;
 
 /**
- * Fetches all projects sorted by newest first.
+ * Fetches all non-side projects sorted by newest first.
  */
 export async function fetchProjects(): Promise<Array<RenderableProject>> {
   const data = parseResponse(projectsResponseSchema, await getContentfulClient().request(QUERY), {
     kind: 'graphql',
     source: 'contentful.fetchProjects',
   });
-  return (data.projectCollection?.items ?? []).map(toRenderableProject).filter(isNotNullish);
+  return (data.projectCollection?.items ?? [])
+    .filter((project) => project?.isSideProject !== true)
+    .map(toRenderableProject)
+    .filter(isNotNullish);
 }

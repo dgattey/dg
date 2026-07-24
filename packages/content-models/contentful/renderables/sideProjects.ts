@@ -1,9 +1,10 @@
+import type { Project } from '../schema/shared';
 import { toRenderableAsset } from './assets';
-import type { SideProject } from '../schema/sideProjects';
 
 export const SIDE_PROJECTS_LIMIT = 2;
 
 export type RenderableSideProject = {
+  creationDate: string | null;
   description: string;
   mark: {
     height: number;
@@ -11,7 +12,6 @@ export type RenderableSideProject = {
     url: string;
     width: number;
   };
-  publishedAt: string | null;
   title: string;
   url: string;
 };
@@ -26,42 +26,47 @@ const isSafeHttpsUrl = (value: string): boolean => {
 };
 
 /**
- * Maps a Contentful side project into a UI-safe shape.
- * Drops entries missing required fields or with non-https URLs/assets.
+ * Maps a flagged Contentful project into the side-projects card shape.
+ * Reuses title, summary, link.url, thumbnail, and creationDate.
  */
 export const toRenderableSideProject = (
-  project: SideProject | null | undefined,
+  project: Project | null | undefined,
 ): RenderableSideProject | null => {
-  if (!project?.title || !project.description || !project.url) {
+  if (project?.isSideProject !== true) {
     return null;
   }
-  if (!isSafeHttpsUrl(project.url)) {
+  if (!project.title || !project.summary) {
     return null;
   }
-  const mark = toRenderableAsset(project.mark);
+  const url = project.link?.url ?? null;
+  if (!url || !isSafeHttpsUrl(url)) {
+    return null;
+  }
+  const mark = toRenderableAsset(project.thumbnail);
   if (!mark || !isSafeHttpsUrl(mark.url)) {
     return null;
   }
   return {
-    description: project.description,
+    creationDate: project.creationDate ?? null,
+    description: project.summary,
     mark,
-    publishedAt: project.publishedAt ?? null,
     title: project.title,
-    url: project.url,
+    url,
   };
 };
 
 /**
- * Keeps newest-first order and caps at the homepage max.
- * Assumes input is already ordered by publishedAt descending when present.
+ * Keeps newest-first order by creationDate and caps at the homepage max.
  */
 export const takeNewestSideProjects = (
   projects: ReadonlyArray<RenderableSideProject>,
   limit: number = SIDE_PROJECTS_LIMIT,
 ): Array<RenderableSideProject> => {
   const sorted = [...projects].sort((left, right) => {
-    const leftTime = left.publishedAt ? Date.parse(left.publishedAt) : Number.NEGATIVE_INFINITY;
-    const rightTime = right.publishedAt ? Date.parse(right.publishedAt) : Number.NEGATIVE_INFINITY;
+    const leftTime = left.creationDate ? Date.parse(left.creationDate) : Number.NEGATIVE_INFINITY;
+    const rightTime = right.creationDate
+      ? Date.parse(right.creationDate)
+      : Number.NEGATIVE_INFINITY;
     return rightTime - leftTime;
   });
   return sorted.slice(0, limit);

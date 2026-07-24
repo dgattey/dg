@@ -39,8 +39,7 @@ Valibot schemas that validate raw GraphQL responses from Contentful.
 |------|-------------|
 | `shared.ts` | Common types: `Asset`, `Link`, `Sys` |
 | `intro.ts` | Homepage intro content schema |
-| `projects.ts` | Project card schema |
-| `sideProjects.ts` | Side project card schema |
+| `projects.ts` | Project card schema (includes side-project fields) |
 | `footer.ts` | Footer links schema |
 | `location.ts` | Map location schema |
 
