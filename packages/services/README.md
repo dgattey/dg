@@ -58,6 +58,7 @@ CMS integration for site content. Uses GraphQL with Valibot-validated responses.
 | ------------------------ | ------------------------------------ |
 | `fetchIntroContent()`    | Homepage intro text block and image  |
 | `fetchProjects()`        | Project cards for homepage           |
+| `fetchSideProjects()`    | Newest side projects for homepage    |
 | `fetchFooterLinks()`     | Footer navigation links              |
 | `fetchLinkByName(name)`  | Single link by title (partial match) |
 | `fetchCurrentLocation()` | Current map location marker          |
