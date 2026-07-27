@@ -39,7 +39,8 @@ type DataWithId = {
  */
 const HEADING_SX: SxObject = {
   marginBottom: 3,
-  scrollMarginTop: 120,
+  // Sticky header is ~123px; keep a small gap below it for anchor jumps.
+  scrollMarginTop: 136,
 };
 
 const paragraphSx: SxObject = {
