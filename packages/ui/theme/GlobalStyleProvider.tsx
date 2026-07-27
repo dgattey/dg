@@ -14,8 +14,8 @@ const theme = getTheme();
  */
 export function GlobalStyleProvider({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeProvider defaultMode="system" disableTransitionOnChange={true} theme={theme}>
-      <CssBaseline />
+    <ThemeProvider theme={theme}>
+      <CssBaseline enableColorScheme={false} />
       {children}
     </ThemeProvider>
   );

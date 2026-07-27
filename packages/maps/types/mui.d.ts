@@ -49,10 +49,6 @@ declare module '@mui/material/styles' {
     extraShadows: ExtraShadows;
   }
 
-  interface ColorSystemOptions {
-    extraShadows: ExtraShadows;
-  }
-
   interface TypographyVariants {
     code: React.CSSProperties;
   }

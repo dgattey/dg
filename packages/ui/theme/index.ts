@@ -2,10 +2,9 @@ import type { SxProps as MuiSxProps, Theme } from '@mui/material/styles';
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import type { SystemStyleObject } from '@mui/system';
-import { unstable_prepareCssVars as prepareCssVars } from '@mui/system';
-import deepmerge from '@mui/utils/deepmerge';
+import { onCanvas } from './color';
+import { COLOR_SCHEME_ATTRIBUTE } from './colorScheme';
 import { getShadows } from './extraShadows';
-import { getGlass } from './glass';
 import { getPalette } from './palette';
 import { getShape } from './shape';
 import { getTypography } from './typography';
@@ -28,42 +27,7 @@ export type SxObject = SystemStyleObject<Theme>;
  */
 export type SxElement = SxObject;
 
-export const themeSelectorAttribute = 'data-theme';
-export const themeCookieName = 'color-scheme';
-export const themePreferenceAttribute = 'data-theme-preference';
-
-const defaultColorScheme = 'light' as const;
-
-const mergeStyleSheets = (styleSheets: Array<Record<string, unknown>>) =>
-  styleSheets.reduce((acc, sheet) => deepmerge(acc, sheet), {});
-
-const getSystemPreferenceStyles = (theme: Theme) => {
-  const systemSelector = `html[${themePreferenceAttribute}="system"]:not([${themeSelectorAttribute}])`;
-  const defaultScheme = theme.defaultColorScheme ?? 'light';
-  const { generateStyleSheets } = prepareCssVars(theme, {
-    colorSchemeSelector: 'media',
-    getSelector: (colorScheme, css) => {
-      if (!colorScheme) {
-        return systemSelector;
-      }
-      if (colorScheme === defaultScheme) {
-        return systemSelector;
-      }
-      const scheme = theme.colorSchemes?.[colorScheme as keyof typeof theme.colorSchemes] as
-        | { palette?: { mode?: string } }
-        | undefined;
-      const mode = scheme?.palette?.mode ?? String(colorScheme);
-      return {
-        [`@media (prefers-color-scheme: ${mode})`]: {
-          [systemSelector]: css,
-        },
-      };
-    },
-    prefix: theme.cssVarPrefix ?? 'mui',
-  });
-
-  return mergeStyleSheets(generateStyleSheets());
-};
+const shouldSkipGeneratingVar = (keys: Array<string>) => keys.at(-1)?.endsWith('Channel') === true;
 
 /**
  * Our MUI theme, customized, and dark/light mode compatible.
@@ -79,24 +43,12 @@ export function getTheme(): Theme {
         xs: 0,
       },
     },
-    colorSchemes: {
-      dark: {
-        extraShadows: getShadows('dark'),
-        glass: getGlass('dark'),
-        palette: getPalette('dark'),
-      },
-      light: {
-        extraShadows: getShadows('light'),
-        glass: getGlass('light'),
-        palette: getPalette('light'),
-      },
-    },
     cssVariables: {
-      colorSchemeSelector: themeSelectorAttribute,
+      disableCssColorScheme: true,
+      shouldSkipGeneratingVar,
     },
-    defaultColorScheme,
-    extraShadows: getShadows(defaultColorScheme),
-    glass: getGlass(defaultColorScheme),
+    extraShadows: getShadows(),
+    palette: getPalette(),
     shape: getShape(),
   };
   const minimalTheme = createTheme(minimalThemeOptions);
@@ -181,66 +133,52 @@ export function getTheme(): Theme {
         },
       },
       MuiCssBaseline: {
-        styleOverrides: (theme) => {
-          const systemSelector = `html[${themePreferenceAttribute}="system"]:not([${themeSelectorAttribute}])`;
-          return {
-            ...getSystemPreferenceStyles(theme),
-            ':root': {
-              fontVariant: 'tabular-nums',
-              wordBreak: 'break-word',
-              [theme.breakpoints.up('sm')]: {
-                fontSize: 16,
-              },
-              [theme.breakpoints.up('md')]: {
-                fontSize: 17,
-              },
-              [theme.breakpoints.up('lg')]: {
-                fontSize: 18,
-              },
-              [theme.breakpoints.up('xl')]: {
-                fontSize: 19,
-              },
+        styleOverrides: (theme) => ({
+          ':root': {
+            fontVariant: 'tabular-nums',
+            wordBreak: 'break-word',
+            [theme.breakpoints.up('sm')]: {
+              fontSize: 16,
             },
-            body: {
-              overscrollBehaviorX: 'none',
+            [theme.breakpoints.up('md')]: {
+              fontSize: 17,
             },
-            html: {
-              colorScheme: 'light',
-              scrollbarGutter: 'stable',
-              textWrap: 'pretty',
+            [theme.breakpoints.up('lg')]: {
+              fontSize: 18,
             },
-            [`html[${themeSelectorAttribute}="light"]`]: {
-              colorScheme: 'light',
+            [theme.breakpoints.up('xl')]: {
+              fontSize: 19,
             },
-            [`html[${themeSelectorAttribute}="dark"]`]: {
-              colorScheme: 'dark',
+          },
+          body: {
+            overscrollBehaviorX: 'none',
+          },
+          html: {
+            colorScheme: 'light dark',
+            scrollbarGutter: 'stable',
+            textWrap: 'pretty',
+          },
+          [`html[${COLOR_SCHEME_ATTRIBUTE}="dark"]`]: {
+            colorScheme: 'dark',
+          },
+          [`html[${COLOR_SCHEME_ATTRIBUTE}="light"]`]: {
+            colorScheme: 'light',
+          },
+          '@media (prefers-reduced-motion: reduce)': {
+            '*, *::before, *::after': {
+              animationDuration: '0.01ms !important',
+              animationIterationCount: '1 !important',
+              transitionDuration: '0.01ms !important',
             },
-            '@media (prefers-color-scheme: dark)': {
-              [systemSelector]: {
-                colorScheme: 'dark',
-              },
-            },
-            '@media (prefers-color-scheme: light)': {
-              [systemSelector]: {
-                colorScheme: 'light',
-              },
-            },
-            '@media (prefers-reduced-motion: reduce)': {
-              '*, *::before, *::after': {
-                animationDuration: '0.01ms !important',
-                animationIterationCount: '1 !important',
-                transitionDuration: '0.01ms !important',
-              },
-            },
-            'h1, h2, h3, h4': {
-              textWrap: 'balance',
-            },
-            'html, body': {
-              overflowX: 'clip',
-              width: '100%',
-            },
-          };
-        },
+          },
+          'h1, h2, h3, h4': {
+            textWrap: 'balance',
+          },
+          'html, body': {
+            overflowX: 'clip',
+            width: '100%',
+          },
+        }),
       },
       MuiLink: {
         defaultProps: {
@@ -269,12 +207,27 @@ export function getTheme(): Theme {
           },
         },
       },
+      MuiMenuItem: {
+        styleOverrides: {
+          root: {
+            '&.Mui-selected': {
+              backgroundColor:
+                'color-mix(in srgb, var(--mui-palette-primary-main) 12%, transparent)',
+            },
+            '&.Mui-selected:hover': {
+              backgroundColor:
+                'color-mix(in srgb, var(--mui-palette-primary-main) 16%, transparent)',
+            },
+          },
+        },
+      },
       MuiSkeleton: {
         styleOverrides: {
           root: ({ theme }) => ({
             '&.MuiSkeleton-rounded': {
               borderRadius: theme.spacing(1),
             },
+            backgroundColor: onCanvas(12),
           }),
         },
       },
