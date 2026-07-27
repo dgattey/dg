@@ -1,0 +1,36 @@
+---
+description: Never manually bump the root package.json version — CI owns it
+alwaysApply: true
+---
+
+# No manual version bumps
+
+The root `package.json` `version` field is owned exclusively by the Release
+workflow (`.github/workflows/release.yml`). CI auto-bumps it from the PR
+template Major/Minor/Patch checkboxes and commits as `github-actions[bot]`.
+
+Agents and humans must never change that field in commits. CI writing the
+version is expected and allowed.
+
+## Hard ban
+
+- NEVER edit the `version` field in the root `package.json`
+- NEVER run `npm version`, `pnpm version`, or any local release bump for this repo
+- NEVER include a version change in a feature/fix/chore commit
+- NEVER "helpfully" bump the version to match a release, tag, or bot commit
+- NEVER stage or commit a `package.json` diff whose only (or partial) change is
+  `version`
+
+## Allowed
+
+- Leave `version` untouched in every human/agent commit
+- Resolve version conflicts with `turbo drop-bot-commits`, then force-push; the
+  Release workflow will rewrite the bump
+- Check Major/Minor/Patch in the PR template so CI can bump
+- CI/Release workflow commits that change `version` are fine — do not revert them
+  unless you are deliberately running `turbo drop-bot-commits`
+
+## If you already changed it
+
+Revert only the `version` field to whatever it was before your edit (typically
+the value on the base branch or the last bot bump). Do not invent a new semver.
