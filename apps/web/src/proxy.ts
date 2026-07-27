@@ -2,9 +2,10 @@ import {
   hasDevConsoleCredentials,
   isDevConsoleAccessAllowed,
 } from '@dg/services/auth/devConsoleBasicAuth';
-import { homeRoute } from '@dg/shared-core/routes/app';
+import { devConsoleRoute, homeRoute } from '@dg/shared-core/routes/app';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { negotiateMarkdown } from './services/markdown/contentNegotiation';
 
 /**
  * Protects `/dev-console` with Basic Auth in production only. Non-production
@@ -23,8 +24,15 @@ import { NextResponse } from 'next/server';
  * Prefetch and RSC requests receive a plain 401 (no WWW-Authenticate),
  * which fails them without triggering the browser's auth dialog. The
  * client router then falls back to a hard navigation for the real dialog.
+ *
+ * Also negotiates Markdown for public pages (`.md` URLs, Accept headers,
+ * Link/Vary discovery) so AI agents can fetch clean content.
  */
-export function proxy(request: NextRequest) {
+function protectDevConsole(request: NextRequest): NextResponse | null {
+  if (!request.nextUrl.pathname.startsWith(devConsoleRoute)) {
+    return null;
+  }
+
   if (isDevConsoleAccessAllowed(request.headers.get('authorization'))) {
     return NextResponse.next();
   }
@@ -67,6 +75,26 @@ export function proxy(request: NextRequest) {
   });
 }
 
+export function proxy(request: NextRequest) {
+  const devConsoleResponse = protectDevConsole(request);
+  if (devConsoleResponse) {
+    return devConsoleResponse;
+  }
+
+  const markdownResponse = negotiateMarkdown(request);
+  if (markdownResponse) {
+    return markdownResponse;
+  }
+
+  return NextResponse.next();
+}
+
 export const config = {
-  matcher: ['/dev-console/:path*'],
+  matcher: [
+    // Public HTML pages (Accept negotiation + Link/Vary headers)
+    '/',
+    '/music',
+    // Dev console Basic Auth
+    '/dev-console/:path*',
+  ],
 };

@@ -1,0 +1,9 @@
+# Allow search and AI crawlers to read public content.
+# Content-Signal: https://contentsignals.org/
+User-agent: *
+Content-Signal: search=yes, ai-input=yes, ai-train=yes
+Allow: /
+Disallow: /dev-console
+Disallow: /api/
+
+Sitemap: https://dylangattey.com/sitemap.xml
