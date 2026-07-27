@@ -47,17 +47,17 @@ export function getTypography(theme: Theme): TypographyVariantsOptions {
     ].join(','),
     fontSize: 20,
     h1: {
-      fontSize: 34,
+      fontSize: 'clamp(1.75rem, 1.2rem + 2.5vw, 2.125rem)',
       fontStretch: 'expanded',
       fontVariant: 'all-small-caps',
       fontWeight: 700,
     },
     h2: {
-      fontSize: 29.75,
+      fontSize: 'clamp(1.5rem, 1.1rem + 2vw, 1.859375rem)',
       fontWeight: 700,
     },
     h3: {
-      fontSize: 24.75,
+      fontSize: 'clamp(1.35rem, 1.05rem + 1.5vw, 1.546875rem)',
       fontWeight: 700,
     },
     h4: {

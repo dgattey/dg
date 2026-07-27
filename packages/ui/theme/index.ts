@@ -164,6 +164,16 @@ export function getTheme(): Theme {
           [`html[${COLOR_SCHEME_ATTRIBUTE}="light"]`]: {
             colorScheme: 'light',
           },
+          '@media (prefers-reduced-motion: reduce)': {
+            '*, *::before, *::after': {
+              animationDuration: '0.01ms !important',
+              animationIterationCount: '1 !important',
+              transitionDuration: '0.01ms !important',
+            },
+          },
+          'h1, h2, h3, h4': {
+            textWrap: 'balance',
+          },
           'html, body': {
             overflowX: 'clip',
             width: '100%',
@@ -307,6 +317,7 @@ export function getTheme(): Theme {
   });
 
   return responsiveFontSizes(themeWithColorMode, {
-    variants: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'caption', 'overline', 'body1', 'body2', 'code'],
+    // h1–h3 use clamp() in typography.ts; keep breakpoint scaling for the rest
+    variants: ['h4', 'h5', 'h6', 'caption', 'overline', 'body1', 'body2', 'code'],
   });
 }
