@@ -2,7 +2,6 @@ import { homeRoute } from '@dg/shared-core/routes/app';
 import type { Metadata } from 'next';
 import { getHomepageDescription } from '../services/homepage';
 import { Homepage } from './home/Homepage';
-import { MarkdownPageShell } from './layouts/MarkdownPageShell';
 import { markdownAlternates } from './layouts/markdownAlternates';
 import { baseOpenGraph, baseTwitter, HOMEPAGE_TITLE, truncateDescription } from './metadata';
 
@@ -28,9 +27,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
-  return (
-    <MarkdownPageShell path={homeRoute}>
-      <Homepage />
-    </MarkdownPageShell>
-  );
+  return <Homepage />;
 }

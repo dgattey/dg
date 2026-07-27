@@ -25,17 +25,15 @@ each new page.
 
 ```tsx
 import { markdownAlternates } from '../layouts/markdownAlternates';
-import { MarkdownPageShell } from '../layouts/MarkdownPageShell';
 
 export const metadata = {
   alternates: markdownAlternates(myRoute),
   title: '…',
 };
-
-export default function Page() {
-  return <MarkdownPageShell path={myRoute}>{/* page content */}</MarkdownPageShell>;
-}
 ```
+
+Discovery uses `rel="alternate"` metadata, `Link` headers from Accept negotiation,
+and `/llms.txt` — not visually hidden DOM hints.
 
 ## Do not
 

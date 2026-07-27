@@ -47,7 +47,13 @@ export function IntroCard({ introBlock, linkedInLink }: IntroCardProps) {
 
   return (
     <>
-      <ContentCard link={linkedInLink} overlay="About" overlaySx={overlaySx} sx={introImageCardSx}>
+      <ContentCard
+        link={linkedInLink}
+        overlay="About"
+        overlaySx={overlaySx}
+        sx={introImageCardSx}
+        verticalSpan={1}
+      >
         <Image
           alt={introBlock.image.title ?? 'Introduction image'}
           cover={true}

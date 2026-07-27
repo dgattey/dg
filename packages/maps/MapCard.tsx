@@ -15,13 +15,13 @@ const mapCardSx: SxObject = {
  */
 export function MapCard({ location }: { location: MapLocation | null | undefined }) {
   if (!location) {
-    return <ContentCard sx={mapCardSx} />;
+    return <ContentCard sx={mapCardSx} verticalSpan={1} />;
   }
 
   const stadiaApiKey = process.env.STADIA_API_KEY ?? '';
 
   return (
-    <ContentCard sx={mapCardSx}>
+    <ContentCard sx={mapCardSx} verticalSpan={1}>
       <PigeonMap location={location} stadiaApiKey={stadiaApiKey} />
     </ContentCard>
   );

@@ -6,7 +6,6 @@ import { Stack, Typography } from '@mui/material';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getMusicHistory } from '../../services/music';
-import { MarkdownPageShell } from '../layouts/MarkdownPageShell';
 import { markdownAlternates } from '../layouts/markdownAlternates';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 
@@ -32,13 +31,11 @@ export default async function MusicPage() {
   }
 
   return (
-    <MarkdownPageShell path={musicRoute}>
-      <main>
-        <Stack spacing={2}>
-          <Typography variant="h1">Listening history</Typography>
-          <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />
-        </Stack>
-      </main>
-    </MarkdownPageShell>
+    <main>
+      <Stack spacing={2}>
+        <Typography variant="h1">Listening history</Typography>
+        <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />
+      </Stack>
+    </main>
   );
 }

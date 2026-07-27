@@ -38,7 +38,7 @@ Derived from the registry:
 1. **Registry** — append to `markdownPages` (export a route constant if useful).
 2. **Page Markdown** — add `*Markdown.ts` beside that page’s UI/data.
 3. **Wire** — add `pageMarkdownGenerators[path]` in `llm-markdown/pageMarkdown.ts`.
-4. **HTML page** — `markdownAlternates(path)` + `<MarkdownPageShell path={path}>`.
+4. **HTML page** — `markdownAlternates(path)` in metadata.
 5. **Skip private surfaces** — `/dev-console`, `/api/*`, OAuth, webhooks.
 
 Do **not** add per-page `.md/route.ts` files or edit the proxy matcher per page.
