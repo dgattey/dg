@@ -1,4 +1,4 @@
-import { COLORS } from '@dg/ui/theme/color';
+import { BRAND_PAIRS } from '@dg/ui/theme/color';
 import { BackgroundPattern } from './BackgroundPattern';
 import { LOGO_FONT, TEXT_FONT } from './ogFonts';
 
@@ -10,7 +10,7 @@ function Logo() {
     <div
       style={{
         alignSelf: 'flex-end',
-        color: COLORS.DARK.PRIMARY,
+        color: BRAND_PAIRS.primary[1],
         fontFamily: `'${LOGO_FONT}'`,
         fontSize: 132,
         letterSpacing: '-0.12em',
@@ -33,8 +33,8 @@ export function OpenGraphImage({ text, subtitle }: { text: string; subtitle: str
   return (
     <div
       style={{
-        background: COLORS.DARK.DEFAULT_BACKGROUND,
-        color: COLORS.DARK.H5,
+        background: BRAND_PAIRS.defaultBackground[1],
+        color: BRAND_PAIRS.h5[1],
         display: 'flex',
         flexDirection: 'column',
         fontFamily: `'${TEXT_FONT}'`,
@@ -59,7 +59,7 @@ export function OpenGraphImage({ text, subtitle }: { text: string; subtitle: str
         {text}
         <div
           style={{
-            color: COLORS.DARK.MUTED_TEXT,
+            color: BRAND_PAIRS.mutedText[1],
             fontSize: 40,
             fontStretch: '125%',
             marginTop: 8,

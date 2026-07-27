@@ -1,14 +1,14 @@
-import { COLORS } from '@dg/ui/theme/color';
+import { BRAND_PAIRS } from '@dg/ui/theme/color';
 import { hslToHex } from './hslToHex';
 
 /**
  * Creates a fun SVG background pattern.
  */
 export function BackgroundPattern() {
-  const background = hslToHex(COLORS.DARK.DEFAULT_BACKGROUND);
-  const paper = hslToHex(COLORS.DARK.PAPER_BACKGROUND);
-  const primary = hslToHex(COLORS.DARK.PRIMARY);
-  const muted = hslToHex(COLORS.DARK.MUTED_TEXT);
+  const background = hslToHex(BRAND_PAIRS.defaultBackground[1]);
+  const paper = hslToHex(BRAND_PAIRS.paperBackground[1]);
+  const primary = hslToHex(BRAND_PAIRS.primary[1]);
+  const muted = hslToHex(BRAND_PAIRS.mutedText[1]);
 
   return (
     <svg

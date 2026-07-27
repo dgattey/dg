@@ -5,6 +5,7 @@ import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { Section } from '@dg/ui/core/Section';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
+import { BRAND } from '@dg/ui/theme/color';
 import { Stack, Typography } from '@mui/material';
 
 type ErrorLayoutProps = {
@@ -21,7 +22,7 @@ const layoutSx: SxObject = {
 };
 
 const statusCodeSx: SxObject = {
-  filter: `drop-shadow(2px 2px 12px hsl(from var(--mui-palette-secondary-dark) h s calc(l * 0.2) / 0.4))`,
+  filter: `drop-shadow(2px 2px 12px ${BRAND.secondaryShadow})`,
   flexShrink: 1,
   fontSize: { md: '280px', sm: '200px', xs: '140px' },
   fontStretch: 'extra-expanded',

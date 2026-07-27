@@ -1,4 +1,4 @@
-import { COLORS } from '@dg/ui/theme/color';
+import { BRAND_PAIRS } from '@dg/ui/theme/color';
 import type { Metadata, Viewport } from 'next';
 
 export const SITE_NAME = 'Dylan Gattey';
@@ -72,11 +72,11 @@ export const baseMetadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     {
-      color: COLORS.LIGHT.DEFAULT_BACKGROUND,
+      color: BRAND_PAIRS.defaultBackground[0],
       media: '(prefers-color-scheme: light)',
     },
     {
-      color: COLORS.DARK.DEFAULT_BACKGROUND,
+      color: BRAND_PAIRS.defaultBackground[1],
       media: '(prefers-color-scheme: dark)',
     },
   ],

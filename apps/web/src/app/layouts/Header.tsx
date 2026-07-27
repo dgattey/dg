@@ -1,7 +1,4 @@
-import {
-  ColorSchemeToggleClient,
-  ColorSchemeToggleFallback,
-} from '@dg/ui/core/ColorSchemeToggleClient';
+import { ColorSchemeToggleClient } from '@dg/ui/core/ColorSchemeToggleClient';
 import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
@@ -67,9 +64,7 @@ export function Header() {
           </NavGroup>
           <NavGroup sx={{ flexShrink: 0, justifyContent: 'flex-end' }}>
             <NavItem sx={{ alignItems: 'center', display: 'flex' }}>
-              <Suspense fallback={<ColorSchemeToggleFallback />}>
-                <ColorSchemeToggleClient initialValue="system" />
-              </Suspense>
+              <ColorSchemeToggleClient />
             </NavItem>
           </NavGroup>
         </Nav>

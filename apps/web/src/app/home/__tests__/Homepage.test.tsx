@@ -4,16 +4,12 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { IntroCard } from '../IntroCard';
 
-const mockUpdatePreferredMode = jest.fn();
+const mockSetPreference = jest.fn();
 
 jest.mock('@dg/ui/theme/useColorScheme', () => ({
   useColorScheme: () => ({
-    colorScheme: {
-      isCustomized: false,
-      isInitialized: true,
-      mode: 'light',
-    },
-    updatePreferredMode: mockUpdatePreferredMode,
+    preference: 'system',
+    setPreference: mockSetPreference,
   }),
 }));
 
@@ -59,7 +55,7 @@ const introBlock: IntroContent = {
 
 describe('Homepage basics', () => {
   beforeEach(() => {
-    mockUpdatePreferredMode.mockClear();
+    mockSetPreference.mockClear();
   });
 
   it('renders the about text and allows theme selection', async () => {
@@ -67,7 +63,7 @@ describe('Homepage basics', () => {
     render(
       <>
         <IntroCard introBlock={introBlock} linkedInLink={null} />
-        <ColorSchemeToggleClient initialValue="system" />
+        <ColorSchemeToggleClient />
       </>,
     );
 
@@ -86,6 +82,6 @@ describe('Homepage basics', () => {
     }
 
     await user.click(darkRadio);
-    expect(mockUpdatePreferredMode).toHaveBeenCalledWith('dark');
+    expect(mockSetPreference).toHaveBeenCalledWith('dark');
   });
 });

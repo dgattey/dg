@@ -1,54 +1,76 @@
 'use client';
 
-import type { PaletteMode } from '@mui/material';
-import { useColorScheme as useMuiColorScheme } from '@mui/material/styles';
-import { useEffect } from 'react';
-import { themeCookieName } from '.';
+import { useSyncExternalStore } from 'react';
+import {
+  COLOR_SCHEME_ATTRIBUTE,
+  COLOR_SCHEME_STORAGE_KEY,
+  type ColorSchemePreference,
+  colorSchemeDeclaration,
+  DEFAULT_COLOR_SCHEME_PREFERENCE,
+  parseColorSchemePreference,
+} from './colorScheme';
 
-/**
- * The color scheme the system prefers by default
- */
-export type ColorSchemeMode = PaletteMode;
+let inMemorySnapshot: ColorSchemePreference = DEFAULT_COLOR_SCHEME_PREFERENCE;
 
-/**
- * Function to update a nullable color scheme
- */
-export type SetColorScheme = (value: ColorSchemeMode | null) => void;
+function applyPreference(preference: ColorSchemePreference) {
+  const root = document.documentElement;
+  if (preference === 'system') {
+    root.removeAttribute(COLOR_SCHEME_ATTRIBUTE);
+  } else {
+    root.setAttribute(COLOR_SCHEME_ATTRIBUTE, preference);
+  }
+  root.style.colorScheme = colorSchemeDeclaration(preference);
+}
 
-/**
- * Hook to fetch the current color scheme from MUI and update it
- */
-export function useColorScheme(): Readonly<{
-  colorScheme: {
-    mode: ColorSchemeMode;
-    isCustomized: boolean;
-    isInitialized: boolean;
-  };
-  updatePreferredMode: SetColorScheme;
-}> {
-  const { mode, setMode, systemMode } = useMuiColorScheme();
-  const isSystemMode = mode === 'system' || mode === null || typeof mode === 'undefined';
-  const resolvedMode = isSystemMode ? systemMode : mode;
-  const domTheme =
-    typeof document === 'undefined' ? null : document.documentElement.getAttribute('data-theme');
-  const domMode = domTheme === 'dark' || domTheme === 'light' ? domTheme : null;
-  const effectiveMode = resolvedMode ?? domMode;
+function getSnapshot(): ColorSchemePreference {
+  inMemorySnapshot = parseColorSchemePreference(
+    document.documentElement.getAttribute(COLOR_SCHEME_ATTRIBUTE),
+  );
+  return inMemorySnapshot;
+}
 
-  useEffect(() => {
-    const value = isSystemMode ? 'system' : effectiveMode;
-    if (!value) {
+const getServerSnapshot = (): ColorSchemePreference => DEFAULT_COLOR_SCHEME_PREFERENCE;
+
+function subscribe(onStoreChange: () => void): () => void {
+  const observer = new MutationObserver(onStoreChange);
+  observer.observe(document.documentElement, {
+    attributeFilter: [COLOR_SCHEME_ATTRIBUTE],
+    attributes: true,
+  });
+
+  const handleStorage = (event: StorageEvent) => {
+    if (event.key !== COLOR_SCHEME_STORAGE_KEY) {
       return;
     }
-    // biome-ignore lint/suspicious/noDocumentCookie: Client-side theme persistence requires document.cookie
-    document.cookie = `${themeCookieName}=${value}; Path=/; Max-Age=31536000; SameSite=Lax`;
-  }, [effectiveMode, isSystemMode]);
+    inMemorySnapshot = parseColorSchemePreference(event.newValue);
+    applyPreference(inMemorySnapshot);
+    onStoreChange();
+  };
+  window.addEventListener('storage', handleStorage);
 
-  return {
-    colorScheme: {
-      isCustomized: !isSystemMode,
-      isInitialized: true,
-      mode: effectiveMode ?? 'light',
-    },
-    updatePreferredMode: setMode,
-  } as const;
+  return () => {
+    observer.disconnect();
+    window.removeEventListener('storage', handleStorage);
+  };
+}
+
+function setPreference(preference: ColorSchemePreference) {
+  inMemorySnapshot = preference;
+  try {
+    if (preference === 'system') {
+      localStorage.removeItem(COLOR_SCHEME_STORAGE_KEY);
+    } else {
+      localStorage.setItem(COLOR_SCHEME_STORAGE_KEY, preference);
+    }
+    localStorage.removeItem('mui-mode');
+  } catch {}
+  applyPreference(preference);
+}
+
+export function useColorScheme(): Readonly<{
+  preference: ColorSchemePreference;
+  setPreference: (preference: ColorSchemePreference) => void;
+}> {
+  const preference = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  return { preference, setPreference };
 }

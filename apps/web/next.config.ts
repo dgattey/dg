@@ -14,19 +14,6 @@ const nextConfig: NextConfig = {
     turbopackFileSystemCacheForBuild: true,
     turbopackFileSystemCacheForDev: true,
   },
-  headers() {
-    return [
-      {
-        headers: [
-          {
-            key: 'Accept-CH',
-            value: 'Sec-CH-Prefers-Color-Scheme',
-          },
-        ],
-        source: '/:path*',
-      },
-    ];
-  },
   images: {
     remotePatterns: [
       {

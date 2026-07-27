@@ -3,9 +3,9 @@ import '@dg/ui/theme/classNameSetupOnImport';
 import { Section } from '@dg/ui/core/Section';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import type { SxObject } from '@dg/ui/theme';
-import { themePreferenceAttribute, themeSelectorAttribute } from '@dg/ui/theme';
+import { ColorSchemeScript } from '@dg/ui/theme/ColorSchemeScript';
+import { SYSTEM_COLOR_SCHEME_STYLE } from '@dg/ui/theme/colorScheme';
 import { GlobalStyleProvider } from '@dg/ui/theme/GlobalStyleProvider';
-import { InitColorSchemeScript } from '@mui/material';
 import Container from '@mui/material/Container';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
 import { Analytics } from '@vercel/analytics/react';
@@ -30,14 +30,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   // Cached server time for hydration-safe relative time rendering
   const serverTime = await getServerTime();
 
-  const htmlAttributes = {
-    [themePreferenceAttribute]: 'system',
-  };
-
   return (
-    <html lang="en" {...htmlAttributes} suppressHydrationWarning={true}>
+    <html lang="en" style={SYSTEM_COLOR_SCHEME_STYLE} suppressHydrationWarning={true}>
       <body>
-        <InitColorSchemeScript attribute={themeSelectorAttribute} defaultMode="system" />
+        <ColorSchemeScript />
         <AppRouterCacheProvider>
           <ServerTimeProvider serverTime={serverTime}>
             <GlobalStyleProvider>
