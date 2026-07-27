@@ -3,7 +3,7 @@
  */
 
 import { markdownPagePaths } from '@dg/shared-core/routes/app';
-import { pageMarkdownGenerators } from '../getPageMarkdown';
+import { pageMarkdownGenerators } from '../pageMarkdown';
 
 describe('pageMarkdownGenerators', () => {
   it('covers every registered markdown page path', () => {

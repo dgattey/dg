@@ -5,9 +5,9 @@ import { musicRoute } from '@dg/shared-core/routes/app';
 import { Stack, Typography } from '@mui/material';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { markdownAlternates } from '../../services/markdown/markdownAlternates';
 import { getMusicHistory } from '../../services/music';
 import { MarkdownPageShell } from '../layouts/MarkdownPageShell';
+import { markdownAlternates } from '../layouts/markdownAlternates';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 
 export const metadata: Metadata = {

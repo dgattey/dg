@@ -1,10 +1,9 @@
 import 'server-only';
 
-import { getLlmsFullTxt } from '../../services/markdown/getLlmsFullTxt';
+import { getLlmsFullTxt } from './getLlmsFullTxt';
 
 export async function GET() {
-  const body = await getLlmsFullTxt();
-  return new Response(body, {
+  return new Response(await getLlmsFullTxt(), {
     headers: {
       'Cache-Control': 's-maxage=60, stale-while-revalidate=86400',
       'Content-Type': 'text/markdown; charset=utf-8',

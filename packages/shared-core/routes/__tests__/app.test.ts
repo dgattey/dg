@@ -5,13 +5,14 @@ import {
   markdownPagePaths,
   markdownPages,
   markdownPathToHtmlPath,
+  tryHtmlPathToMarkdownPath,
 } from '../app';
 
 describe('markdown page registry', () => {
   it('maps html paths to .md twins by convention', () => {
     expect(htmlPathToMarkdownPath('/')).toBe('/index.md');
     expect(htmlPathToMarkdownPath('/music')).toBe('/music.md');
-    expect(htmlPathToMarkdownPath('/dev-console')).toBeNull();
+    expect(tryHtmlPathToMarkdownPath('/dev-console')).toBeNull();
   });
 
   it('maps .md paths back to html', () => {
@@ -29,7 +30,7 @@ describe('markdown page registry', () => {
     expect(markdownPagePaths).toEqual(markdownPages.map((page) => page.path));
     for (const path of markdownPagePaths) {
       expect(isMarkdownPagePath(path)).toBe(true);
-      expect(markdownPathToHtmlPath(htmlPathToMarkdownPath(path) ?? '')).toBe(path);
+      expect(markdownPathToHtmlPath(htmlPathToMarkdownPath(path))).toBe(path);
     }
   });
 });

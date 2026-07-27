@@ -1,15 +1,16 @@
 import 'server-only';
 
 import { homeRoute, isMarkdownPagePath } from '@dg/shared-core/routes/app';
-import { handleMarkdownRequest } from '../../../services/markdown/handleMarkdownRequest';
+import { markdownResponse } from '../markdownResponse';
+import { getPageMarkdown } from '../pageMarkdown';
 
 type RouteContext = {
   params: Promise<{ slug?: Array<string> }>;
 };
 
 /**
- * Internal Markdown representation endpoint. Public clients should use
- * `.md` URLs or `Accept: text/markdown` — proxy rewrites those here.
+ * Internal Markdown endpoint. Public clients use `.md` URLs or Accept negotiation;
+ * proxy rewrites those here.
  */
 export async function GET(request: Request, context: RouteContext) {
   const { slug } = await context.params;
@@ -19,5 +20,8 @@ export async function GET(request: Request, context: RouteContext) {
     return new Response('Not found', { status: 404 });
   }
 
-  return handleMarkdownRequest(request, pathname);
+  return markdownResponse(await getPageMarkdown(pathname), {
+    htmlPath: pathname,
+    request,
+  });
 }

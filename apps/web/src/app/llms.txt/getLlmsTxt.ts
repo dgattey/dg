@@ -6,25 +6,19 @@ import {
   llmsFullTxtRoute,
   markdownPages,
 } from '@dg/shared-core/routes/app';
-import { HOMEPAGE_TITLE, SITE_NAME } from '../../app/metadata';
-import { getHomepageDescription } from '../homepage';
-import { absoluteUrl } from './siteUrl';
+import { getHomepageDescription } from '../../services/homepage';
+import { HOMEPAGE_TITLE, metadataBase, SITE_NAME } from '../metadata';
 
-/**
- * Builds the curated `/llms.txt` index for AI tools from the page registry.
- */
+const absoluteUrl = (pathname: string) => new URL(pathname, metadataBase).toString();
+
+/** Curated `/llms.txt` index from the page registry. */
 export async function getLlmsTxt(): Promise<string> {
   const description = (await getHomepageDescription()) ?? `${SITE_NAME} — ${HOMEPAGE_TITLE}`;
-
   const pageLinks = markdownPages
-    .map((page) => {
-      const mdPath = htmlPathToMarkdownPath(page.path);
-      if (!mdPath) {
-        return null;
-      }
-      return `- [${page.title}](${absoluteUrl(mdPath)}): ${page.summary}`;
-    })
-    .filter(Boolean)
+    .map(
+      (page) =>
+        `- [${page.title}](${absoluteUrl(htmlPathToMarkdownPath(page.path))}): ${page.summary}`,
+    )
     .join('\n');
 
   return `# ${SITE_NAME}

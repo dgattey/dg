@@ -14,28 +14,18 @@ export const llmsTxtRoute = '/llms.txt' as const;
 
 export const llmsFullTxtRoute = '/llms-full.txt' as const;
 
-/**
- * Internal rewrite target that serves Markdown for a public HTML path.
- * Not a public API — agents use `.md` URLs or Accept negotiation instead.
- */
+/** Internal rewrite target for Markdown (not a public agent URL). */
 export const internalMarkdownRoutePrefix = '/llm-markdown' as const;
 
 export type MarkdownPageDefinition = {
-  /** HTML path (`/` or `/music`). */
   path: string;
-  /** Short title used in llms.txt and fallback Markdown. */
   title: string;
-  /** One-line summary for llms.txt. */
   summary: string;
-  /** sitemap.xml changefreq. */
   changeFrequency: 'always' | 'hourly' | 'daily' | 'weekly' | 'monthly' | 'yearly' | 'never';
-  /** sitemap.xml priority 0–1. */
   priority: number;
 };
 
-/**
- * Public Markdown-capable pages. Order is the curated llms.txt order.
- */
+/** Public Markdown-capable pages. Order is the curated llms.txt order. */
 export const markdownPages = [
   {
     changeFrequency: 'weekly',
@@ -59,40 +49,24 @@ export const markdownPagePaths: ReadonlyArray<MarkdownPagePath> = markdownPages.
   (page) => page.path,
 );
 
-/**
- * True when this HTML path has a Markdown representation.
- */
 export function isMarkdownPagePath(pathname: string): pathname is MarkdownPagePath {
   return (markdownPagePaths as ReadonlyArray<string>).includes(pathname);
 }
 
-/**
- * Looks up registry metadata for a Markdown-capable path.
- */
-export function getMarkdownPage(pathname: MarkdownPagePath): (typeof markdownPages)[number] {
-  const page = markdownPages.find((entry) => entry.path === pathname);
-  if (!page) {
-    throw new Error(`Missing markdown page registry entry for ${pathname}`);
-  }
-  return page;
-}
-
-/**
- * Maps an HTML page path to its `.md` twin (`/` → `/index.md`).
- */
-export function htmlPathToMarkdownPath(pathname: string): string | null {
-  if (!isMarkdownPagePath(pathname)) {
-    return null;
-  }
+/** `.md` twin for a registered HTML path (`/` → `/index.md`). */
+export function htmlPathToMarkdownPath(pathname: MarkdownPagePath): string {
   return pathname === homeRoute ? '/index.md' : `${pathname}.md`;
 }
 
-/**
- * Maps a `.md` path back to its HTML page (`/index.md` → `/`).
- */
+/** `.md` twin when the path might not be registered. */
+export function tryHtmlPathToMarkdownPath(pathname: string): string | null {
+  return isMarkdownPagePath(pathname) ? htmlPathToMarkdownPath(pathname) : null;
+}
+
+/** HTML path for a `.md` twin (`/index.md` → `/`). */
 export function markdownPathToHtmlPath(pathname: string): MarkdownPagePath | null {
   if (pathname === '/index.md') {
-    return isMarkdownPagePath(homeRoute) ? homeRoute : null;
+    return homeRoute;
   }
   if (!pathname.endsWith('.md')) {
     return null;
@@ -101,9 +75,7 @@ export function markdownPathToHtmlPath(pathname: string): MarkdownPagePath | nul
   return isMarkdownPagePath(htmlPath) ? htmlPath : null;
 }
 
-/**
- * Internal route used by proxy rewrites for both `.md` URLs and Accept negotiation.
- */
+/** Internal `/llm-markdown` path used by proxy rewrites. */
 export function htmlPathToInternalMarkdownPath(pathname: MarkdownPagePath): string {
   return pathname === homeRoute
     ? internalMarkdownRoutePrefix

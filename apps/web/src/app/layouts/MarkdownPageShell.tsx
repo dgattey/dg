@@ -1,7 +1,6 @@
-import { invariant } from '@dg/shared-core/assertions/invariant';
 import { htmlPathToMarkdownPath, type MarkdownPagePath } from '@dg/shared-core/routes/app';
 import type { ReactNode } from 'react';
-import { absoluteUrl } from '../../services/markdown/siteUrl';
+import { metadataBase } from '../metadata';
 import { MarkdownAlternateHint } from './MarkdownAlternateHint';
 
 type MarkdownPageShellProps = {
@@ -9,16 +8,13 @@ type MarkdownPageShellProps = {
   children: ReactNode;
 };
 
-/**
- * Wraps public page content with the visually hidden Markdown discovery hint.
- */
+/** Wraps public page content with the visually hidden Markdown discovery hint. */
 export function MarkdownPageShell({ path, children }: MarkdownPageShellProps) {
-  const markdownPath = htmlPathToMarkdownPath(path);
-  invariant(markdownPath, `Missing markdown path for ${path}`);
+  const markdownUrl = new URL(htmlPathToMarkdownPath(path), metadataBase).toString();
 
   return (
     <>
-      <MarkdownAlternateHint markdownUrl={absoluteUrl(markdownPath)} />
+      <MarkdownAlternateHint markdownUrl={markdownUrl} />
       {children}
     </>
   );

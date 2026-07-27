@@ -2,11 +2,11 @@
  * @jest-environment node
  */
 
-jest.mock('../../homepage', () => ({
+jest.mock('../../../services/homepage', () => ({
   getHomepageDescription: jest.fn(async () => 'Engineer and problem solver.'),
 }));
 
-jest.mock('../../../app/metadata', () => ({
+jest.mock('../../metadata', () => ({
   HOMEPAGE_TITLE: 'Engineer. Problem Solver.',
   metadataBase: new URL('https://dylangattey.com'),
   SITE_NAME: 'Dylan Gattey',

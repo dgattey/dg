@@ -25,8 +25,7 @@ import { negotiateMarkdown } from './services/markdown/contentNegotiation';
  * which fails them without triggering the browser's auth dialog. The
  * client router then falls back to a hard navigation for the real dialog.
  *
- * Also negotiates Markdown for public pages (`.md` URLs, Accept headers,
- * Link/Vary discovery) so AI agents can fetch clean content.
+ * Also negotiates Markdown for registered public pages.
  */
 function protectDevConsole(request: NextRequest): NextResponse | null {
   if (!request.nextUrl.pathname.startsWith(devConsoleRoute)) {

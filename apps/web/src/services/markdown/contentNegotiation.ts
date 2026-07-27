@@ -3,6 +3,7 @@ import {
   htmlPathToInternalMarkdownPath,
   htmlPathToMarkdownPath,
   isMarkdownPagePath,
+  type MarkdownPagePath,
   markdownPathToHtmlPath,
 } from '@dg/shared-core/routes/app';
 import type { NextRequest } from 'next/server';
@@ -22,14 +23,12 @@ const appendVaryAccept = (headers: Headers): void => {
   }
 };
 
-const appendMarkdownLink = (headers: Headers, htmlPath: string): void => {
-  const markdownPath = htmlPathToMarkdownPath(htmlPath);
-  if (!markdownPath) {
-    return;
-  }
-  const link = `<${markdownPath}>; rel="alternate"; type="text/markdown"`;
-  const existing = headers.get('Link');
-  headers.set('Link', existing ? `${existing}, ${link}` : link);
+const rewriteToMarkdown = (request: NextRequest, htmlPath: MarkdownPagePath): NextResponse => {
+  const url = request.nextUrl.clone();
+  url.pathname = htmlPathToInternalMarkdownPath(htmlPath);
+  const rewritten = NextResponse.rewrite(url);
+  appendVaryAccept(rewritten.headers);
+  return rewritten;
 };
 
 const isNextInternalRequest = (request: NextRequest): boolean =>
@@ -38,20 +37,9 @@ const isNextInternalRequest = (request: NextRequest): boolean =>
   request.headers.get('purpose') === 'prefetch' ||
   request.method !== 'GET';
 
-const rewriteToMarkdown = (
-  request: NextRequest,
-  htmlPath: Parameters<typeof htmlPathToInternalMarkdownPath>[0],
-): NextResponse => {
-  const url = request.nextUrl.clone();
-  url.pathname = htmlPathToInternalMarkdownPath(htmlPath);
-  const rewritten = NextResponse.rewrite(url);
-  appendVaryAccept(rewritten.headers);
-  return rewritten;
-};
-
 /**
- * Negotiates Markdown vs HTML for registered public pages and rewrites
- * `.md` twins to the shared internal Markdown handler.
+ * Negotiates Markdown vs HTML for registered pages and rewrites `.md` twins
+ * to `/llm-markdown`.
  */
 export function negotiateMarkdown(request: NextRequest): NextResponse | null {
   const pathname = request.nextUrl.pathname;
@@ -74,17 +62,10 @@ export function negotiateMarkdown(request: NextRequest): NextResponse | null {
   }
 
   if (chosen === null && acceptHeader?.trim()) {
-    const links = [
-      `<${pathname}>; rel="alternate"; type="text/html"`,
-      markdownPath ? `<${markdownPath}>; rel="alternate"; type="text/markdown"` : null,
-    ]
-      .filter(Boolean)
-      .join(', ');
-
     return new NextResponse('Not Acceptable\n\nAvailable: text/html, text/markdown\n', {
       headers: {
         'Content-Type': 'text/plain; charset=utf-8',
-        Link: links,
+        Link: `<${pathname}>; rel="alternate"; type="text/html", <${markdownPath}>; rel="alternate"; type="text/markdown"`,
         Vary: 'Accept',
       },
       status: 406,
@@ -93,6 +74,6 @@ export function negotiateMarkdown(request: NextRequest): NextResponse | null {
 
   const response = NextResponse.next();
   appendVaryAccept(response.headers);
-  appendMarkdownLink(response.headers, pathname);
+  response.headers.set('Link', `<${markdownPath}>; rel="alternate"; type="text/markdown"`);
   return response;
 }
