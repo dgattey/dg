@@ -5,13 +5,21 @@ const createRequest = (path: string, headers: Record<string, string> = {}) =>
   new NextRequest(`https://example.com${path}`, { headers });
 
 describe('negotiateMarkdown', () => {
+  it('rewrites .md URLs to the internal markdown handler', () => {
+    const response = negotiateMarkdown(createRequest('/index.md'));
+
+    expect(response).not.toBeNull();
+    expect(response?.headers.get('x-middleware-rewrite')).toContain('/llm-markdown');
+    expect(response?.headers.get('Vary')).toContain('Accept');
+  });
+
   it('rewrites when Accept explicitly prefers markdown', () => {
     const response = negotiateMarkdown(
       createRequest('/', { accept: 'text/markdown, text/html;q=0.9' }),
     );
 
     expect(response).not.toBeNull();
-    expect(response?.headers.get('x-middleware-rewrite')).toContain('/index.md');
+    expect(response?.headers.get('x-middleware-rewrite')).toContain('/llm-markdown');
   });
 
   it('adds Link and Vary on HTML responses for public pages', () => {

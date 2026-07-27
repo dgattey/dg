@@ -1,5 +1,10 @@
 import { hasExplicitType, preferredType } from '@dg/shared-core/http/accept';
-import { htmlPathToMarkdownPath, isMarkdownPagePath } from '@dg/shared-core/routes/app';
+import {
+  htmlPathToInternalMarkdownPath,
+  htmlPathToMarkdownPath,
+  isMarkdownPagePath,
+  markdownPathToHtmlPath,
+} from '@dg/shared-core/routes/app';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
@@ -33,13 +38,28 @@ const isNextInternalRequest = (request: NextRequest): boolean =>
   request.headers.get('purpose') === 'prefetch' ||
   request.method !== 'GET';
 
+const rewriteToMarkdown = (
+  request: NextRequest,
+  htmlPath: Parameters<typeof htmlPathToInternalMarkdownPath>[0],
+): NextResponse => {
+  const url = request.nextUrl.clone();
+  url.pathname = htmlPathToInternalMarkdownPath(htmlPath);
+  const rewritten = NextResponse.rewrite(url);
+  appendVaryAccept(rewritten.headers);
+  return rewritten;
+};
+
 /**
- * Negotiates Markdown vs HTML for public pages and advertises Markdown
- * alternates via Link + Vary headers. `.md` twins are real route handlers;
- * Accept-based requests rewrite to those paths.
+ * Negotiates Markdown vs HTML for registered public pages and rewrites
+ * `.md` twins to the shared internal Markdown handler.
  */
 export function negotiateMarkdown(request: NextRequest): NextResponse | null {
   const pathname = request.nextUrl.pathname;
+
+  const htmlFromMarkdown = markdownPathToHtmlPath(pathname);
+  if (htmlFromMarkdown) {
+    return rewriteToMarkdown(request, htmlFromMarkdown);
+  }
 
   if (!isMarkdownPagePath(pathname) || isNextInternalRequest(request)) {
     return null;
@@ -49,20 +69,10 @@ export function negotiateMarkdown(request: NextRequest): NextResponse | null {
   const chosen = preferredType(acceptHeader, PRODUCES);
   const markdownPath = htmlPathToMarkdownPath(pathname);
 
-  if (
-    chosen === 'text/markdown' &&
-    hasExplicitType(acceptHeader, 'text/markdown') &&
-    markdownPath
-  ) {
-    const url = request.nextUrl.clone();
-    url.pathname = markdownPath;
-    const rewritten = NextResponse.rewrite(url);
-    appendVaryAccept(rewritten.headers);
-    return rewritten;
+  if (chosen === 'text/markdown' && hasExplicitType(acceptHeader, 'text/markdown')) {
+    return rewriteToMarkdown(request, pathname);
   }
 
-  // Spec-correct 406 only for document GETs that reject every representation
-  // we produce. Skip Next.js RSC/prefetch traffic via isNextInternalRequest.
   if (chosen === null && acceptHeader?.trim()) {
     const links = [
       `<${pathname}>; rel="alternate"; type="text/html"`,

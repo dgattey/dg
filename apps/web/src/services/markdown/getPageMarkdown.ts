@@ -1,7 +1,15 @@
 import 'server-only';
 
 import { richTextToMarkdown } from '@dg/content-models/contentful/richTextToMarkdown';
-import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
+import {
+  getMarkdownPage,
+  homeRoute,
+  htmlPathToMarkdownPath,
+  isMarkdownPagePath,
+  type MarkdownPagePath,
+  markdownPages,
+  musicRoute,
+} from '@dg/shared-core/routes/app';
 import { HOMEPAGE_TITLE, SITE_NAME } from '../../app/metadata';
 import { getCurrentLocation, getFooterLinks, getIntroContent, getProjects } from '../contentful';
 import { getMusicHistory } from '../music';
@@ -11,6 +19,22 @@ const formatProjectTypes = (type: string | Array<string> | null | undefined): st
     return null;
   }
   return Array.isArray(type) ? type.join(', ') : type;
+};
+
+const moreLinksMarkdown = (currentPath: MarkdownPagePath): string => {
+  const otherPages = markdownPages
+    .filter((page) => page.path !== currentPath)
+    .map((page) => {
+      const mdPath = htmlPathToMarkdownPath(page.path);
+      return mdPath ? `- [${page.title}](${mdPath}): ${page.summary}` : null;
+    })
+    .filter(Boolean);
+
+  return [
+    '## More',
+    ...otherPages,
+    `- [llms.txt](/llms.txt): Curated map of LLM-friendly pages`,
+  ].join('\n');
 };
 
 async function getHomepageMarkdown(): Promise<string> {
@@ -58,21 +82,15 @@ async function getHomepageMarkdown(): Promise<string> {
     );
   }
 
-  sections.push(
-    '## More',
-    `- [Listening history](${musicRoute}.md): Recent Spotify plays`,
-    `- [llms.txt](/llms.txt): Curated map of LLM-friendly pages`,
-  );
+  sections.push(moreLinksMarkdown(homeRoute));
 
   return `${sections.join('\n\n')}\n`;
 }
 
 async function getMusicMarkdown(): Promise<string> {
   const { tracks } = await getMusicHistory({});
-  const sections: Array<string> = [
-    '# Listening history',
-    `> Recent Spotify plays from ${SITE_NAME}`,
-  ];
+  const page = getMarkdownPage(musicRoute);
+  const sections: Array<string> = [`# ${page.title}`, `> ${page.summary} from ${SITE_NAME}`];
 
   if (tracks.length === 0) {
     sections.push('No recent plays available.');
@@ -84,20 +102,28 @@ async function getMusicMarkdown(): Promise<string> {
     sections.push('## Recent plays', lines.join('\n'));
   }
 
-  sections.push('## More', `- [Home](/index.md): About, projects, and links`);
+  sections.push(moreLinksMarkdown(musicRoute));
 
   return `${sections.join('\n\n')}\n`;
 }
 
 /**
+ * Per-page Markdown generators. TypeScript requires every registry path
+ * to have an entry — that is the main guardrail when adding pages.
+ */
+export const pageMarkdownGenerators: {
+  [Path in MarkdownPagePath]: () => Promise<string>;
+} = {
+  [homeRoute]: getHomepageMarkdown,
+  [musicRoute]: getMusicMarkdown,
+};
+
+/**
  * Returns Markdown for a public page path, or null when the path has no twin.
  */
 export function getPageMarkdown(pathname: string): Promise<string | null> {
-  if (pathname === homeRoute) {
-    return getHomepageMarkdown();
+  if (!isMarkdownPagePath(pathname)) {
+    return Promise.resolve(null);
   }
-  if (pathname === musicRoute) {
-    return getMusicMarkdown();
-  }
-  return Promise.resolve(null);
+  return pageMarkdownGenerators[pathname]();
 }

@@ -1,23 +1,17 @@
 import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
-import { htmlPathToMarkdownPath, musicRoute } from '@dg/shared-core/routes/app';
+import { musicRoute } from '@dg/shared-core/routes/app';
 import { Stack, Typography } from '@mui/material';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
-import { absoluteUrl } from '../../services/markdown/siteUrl';
+import { markdownAlternates } from '../../services/markdown/markdownAlternates';
 import { getMusicHistory } from '../../services/music';
-import { MarkdownAlternateHint } from '../layouts/MarkdownAlternateHint';
+import { MarkdownPageShell } from '../layouts/MarkdownPageShell';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 
-const markdownPath = htmlPathToMarkdownPath(musicRoute) ?? '/music.md';
-
 export const metadata: Metadata = {
-  alternates: {
-    types: {
-      'text/markdown': markdownPath,
-    },
-  },
+  alternates: markdownAlternates(musicRoute),
   title: 'Listening history',
 };
 
@@ -38,12 +32,13 @@ export default async function MusicPage() {
   }
 
   return (
-    <main>
-      <MarkdownAlternateHint markdownUrl={absoluteUrl(markdownPath)} />
-      <Stack spacing={2}>
-        <Typography variant="h1">Listening history</Typography>
-        <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />
-      </Stack>
-    </main>
+    <MarkdownPageShell path={musicRoute}>
+      <main>
+        <Stack spacing={2}>
+          <Typography variant="h1">Listening history</Typography>
+          <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />
+        </Stack>
+      </main>
+    </MarkdownPageShell>
   );
 }

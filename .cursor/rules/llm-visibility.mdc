@@ -1,0 +1,48 @@
+---
+description: Keep public pages LLM-readable via the markdown page registry
+globs: apps/web/src/app/**/page.tsx,packages/shared-core/routes/app.ts,apps/web/src/services/markdown/**
+alwaysApply: false
+---
+
+# LLM visibility for public pages
+
+Public HTML pages must be readable by LLMs/agents. Do not hand-wire discovery
+in multiple places — extend the shared registry and page generator map.
+
+## Source of truth
+
+1. Add the page to `packages/shared-core/routes/app.ts` (`markdownPages`)
+2. Add a Markdown generator in `apps/web/src/services/markdown/getPageMarkdown.ts`
+   (`pageMarkdownGenerators` — TypeScript requires every registry path)
+
+Path helpers, sitemap, `/llms.txt`, `/llms-full.txt`, Accept negotiation, and
+`.md` rewrites all derive from that registry. Do **not** edit the proxy matcher
+list for each new page.
+
+## On the HTML page
+
+```tsx
+import { markdownAlternates } from '../../services/markdown/markdownAlternates';
+import { MarkdownPageShell } from '../layouts/MarkdownPageShell';
+
+export const metadata = {
+  alternates: markdownAlternates(myRoute),
+  title: '…',
+};
+
+export default function Page() {
+  return <MarkdownPageShell path={myRoute}>{/* page content */}</MarkdownPageShell>;
+}
+```
+
+## Do not
+
+- Auth, API, webhook, or OAuth routes — leave them out of `markdownPages`
+- Separate hand-maintained `.md` files that can drift from the HTML page
+- `ai-content` / `llms` meta tags, User-Agent cloaking, or “for AI only” pages
+- Per-page `/api/markdown` handlers — proxy rewrites to `/llm-markdown`
+
+## Verify
+
+- `turbo check:types` (generator map exhaustiveness)
+- Unit tests under `services/markdown/__tests__` and `routes/__tests__`

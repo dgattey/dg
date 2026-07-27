@@ -91,10 +91,13 @@ export function proxy(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // Public HTML pages (Accept negotiation + Link/Vary headers)
-    '/',
-    '/music',
-    // Dev console Basic Auth
+    /*
+     * Run on document navigations and `.md` twins. Skip Next/Vercel
+     * internals, API routes, and common static asset extensions.
+     * Registered Markdown pages are filtered again in negotiateMarkdown,
+     * so new public pages only need the shared registry — not this list.
+     */
+    '/((?!_next/|_vercel/|api/|.*\\.(?:ico|png|jpg|jpeg|gif|svg|webp|txt|xml|webmanifest)$).*)',
     '/dev-console/:path*',
   ],
 };

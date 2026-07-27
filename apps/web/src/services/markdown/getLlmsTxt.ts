@@ -4,19 +4,28 @@ import {
   homeRoute,
   htmlPathToMarkdownPath,
   llmsFullTxtRoute,
-  musicRoute,
+  markdownPages,
 } from '@dg/shared-core/routes/app';
 import { HOMEPAGE_TITLE, SITE_NAME } from '../../app/metadata';
 import { getHomepageDescription } from '../homepage';
 import { absoluteUrl } from './siteUrl';
 
 /**
- * Builds the curated `/llms.txt` index for AI tools.
+ * Builds the curated `/llms.txt` index for AI tools from the page registry.
  */
 export async function getLlmsTxt(): Promise<string> {
   const description = (await getHomepageDescription()) ?? `${SITE_NAME} — ${HOMEPAGE_TITLE}`;
-  const homeMarkdown = htmlPathToMarkdownPath(homeRoute);
-  const musicMarkdown = htmlPathToMarkdownPath(musicRoute);
+
+  const pageLinks = markdownPages
+    .map((page) => {
+      const mdPath = htmlPathToMarkdownPath(page.path);
+      if (!mdPath) {
+        return null;
+      }
+      return `- [${page.title}](${absoluteUrl(mdPath)}): ${page.summary}`;
+    })
+    .filter(Boolean)
+    .join('\n');
 
   return `# ${SITE_NAME}
 
@@ -27,12 +36,11 @@ Prefer the \`.md\` links below for clean, token-efficient content.
 
 ## Pages
 
-- [Home](${absoluteUrl(homeMarkdown ?? '/index.md')}): About, projects, location, and links
-- [Listening history](${absoluteUrl(musicMarkdown ?? '/music.md')}): Recent Spotify plays
+${pageLinks}
 
 ## Optional
 
-- [Full site Markdown](${absoluteUrl(llmsFullTxtRoute)}): Homepage and music content in one file
+- [Full site Markdown](${absoluteUrl(llmsFullTxtRoute)}): All public pages in one file
 - [HTML home](${absoluteUrl(homeRoute)}): Human-oriented homepage
 `;
 }

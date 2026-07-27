@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
+import { markdownPagePaths } from '@dg/shared-core/routes/app';
 import { getPageMarkdown } from './getPageMarkdown';
 
 const safePageMarkdown = async (pathname: string): Promise<string | null> => {
@@ -12,13 +12,9 @@ const safePageMarkdown = async (pathname: string): Promise<string | null> => {
 };
 
 /**
- * Builds `/llms-full.txt` by concatenating public Markdown pages.
+ * Builds `/llms-full.txt` by concatenating every registered Markdown page.
  */
 export async function getLlmsFullTxt(): Promise<string> {
-  const [home, music] = await Promise.all([
-    safePageMarkdown(homeRoute),
-    safePageMarkdown(musicRoute),
-  ]);
-
-  return [home, music].filter(Boolean).join('\n---\n\n');
+  const pages = await Promise.all(markdownPagePaths.map((path) => safePageMarkdown(path)));
+  return pages.filter(Boolean).join('\n---\n\n');
 }

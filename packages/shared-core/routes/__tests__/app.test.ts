@@ -1,7 +1,14 @@
-import { htmlPathToMarkdownPath, isMarkdownPagePath, markdownPathToHtmlPath } from '../app';
+import {
+  htmlPathToInternalMarkdownPath,
+  htmlPathToMarkdownPath,
+  isMarkdownPagePath,
+  markdownPagePaths,
+  markdownPages,
+  markdownPathToHtmlPath,
+} from '../app';
 
-describe('markdown route helpers', () => {
-  it('maps html paths to .md twins', () => {
+describe('markdown page registry', () => {
+  it('maps html paths to .md twins by convention', () => {
     expect(htmlPathToMarkdownPath('/')).toBe('/index.md');
     expect(htmlPathToMarkdownPath('/music')).toBe('/music.md');
     expect(htmlPathToMarkdownPath('/dev-console')).toBeNull();
@@ -13,9 +20,16 @@ describe('markdown route helpers', () => {
     expect(markdownPathToHtmlPath('/about.md')).toBeNull();
   });
 
-  it('identifies markdown-capable pages', () => {
-    expect(isMarkdownPagePath('/')).toBe(true);
-    expect(isMarkdownPagePath('/music')).toBe(true);
-    expect(isMarkdownPagePath('/dev-console')).toBe(false);
+  it('maps html paths to the internal markdown handler', () => {
+    expect(htmlPathToInternalMarkdownPath('/')).toBe('/llm-markdown');
+    expect(htmlPathToInternalMarkdownPath('/music')).toBe('/llm-markdown/music');
+  });
+
+  it('keeps path helpers and registry entries aligned', () => {
+    expect(markdownPagePaths).toEqual(markdownPages.map((page) => page.path));
+    for (const path of markdownPagePaths) {
+      expect(isMarkdownPagePath(path)).toBe(true);
+      expect(markdownPathToHtmlPath(htmlPathToMarkdownPath(path) ?? '')).toBe(path);
+    }
   });
 });
