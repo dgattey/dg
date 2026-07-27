@@ -1,4 +1,9 @@
-import { colorSchemeDeclaration, parseColorSchemePreference } from '../colorScheme';
+import {
+  COLOR_SCHEME_ATTRIBUTE,
+  COLOR_SCHEME_STORAGE_KEY,
+  colorSchemeDeclaration,
+  parseColorSchemePreference,
+} from '../colorScheme';
 
 describe('color scheme preference', () => {
   it.each([
@@ -18,5 +23,10 @@ describe('color scheme preference', () => {
     ['system', 'light dark'],
   ] as const)('declares %s as %s', (preference, expected) => {
     expect(colorSchemeDeclaration(preference)).toBe(expected);
+  });
+
+  it('keeps ColorSchemeScript storage keys aligned with constants', () => {
+    expect(COLOR_SCHEME_STORAGE_KEY).toBe('color-scheme');
+    expect(COLOR_SCHEME_ATTRIBUTE).toBe('data-color-scheme');
   });
 });
