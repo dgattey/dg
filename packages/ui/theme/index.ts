@@ -215,12 +215,12 @@ export function getTheme(): Theme {
             [`html[${themeSelectorAttribute}="dark"]`]: {
               colorScheme: 'dark',
             },
-            [`@media (prefers-color-scheme: dark)`]: {
+            '@media (prefers-color-scheme: dark)': {
               [systemSelector]: {
                 colorScheme: 'dark',
               },
             },
-            [`@media (prefers-color-scheme: light)`]: {
+            '@media (prefers-color-scheme: light)': {
               [systemSelector]: {
                 colorScheme: 'light',
               },
