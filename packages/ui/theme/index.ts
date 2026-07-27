@@ -181,40 +181,66 @@ export function getTheme(): Theme {
         },
       },
       MuiCssBaseline: {
-        styleOverrides: (theme) => ({
-          ...getSystemPreferenceStyles(theme),
-          ':root': {
-            // Ensure while swapping themes, we have no animations
-            ':root[data-animations-enabled="false"] *': {
-              transition: 'none',
+        styleOverrides: (theme) => {
+          const systemSelector = `html[${themePreferenceAttribute}="system"]:not([${themeSelectorAttribute}])`;
+          return {
+            ...getSystemPreferenceStyles(theme),
+            ':root': {
+              fontVariant: 'tabular-nums',
+              wordBreak: 'break-word',
+              [theme.breakpoints.up('sm')]: {
+                fontSize: 16,
+              },
+              [theme.breakpoints.up('md')]: {
+                fontSize: 17,
+              },
+              [theme.breakpoints.up('lg')]: {
+                fontSize: 18,
+              },
+              [theme.breakpoints.up('xl')]: {
+                fontSize: 19,
+              },
             },
-            fontVariant: 'tabular-nums',
-            wordBreak: 'break-word',
-            [theme.breakpoints.up('sm')]: {
-              fontSize: 16,
+            body: {
+              overscrollBehaviorX: 'none',
             },
-            [theme.breakpoints.up('md')]: {
-              fontSize: 17,
+            html: {
+              colorScheme: 'light',
+              scrollbarGutter: 'stable',
+              textWrap: 'pretty',
             },
-            [theme.breakpoints.up('lg')]: {
-              fontSize: 18,
+            [`html[${themeSelectorAttribute}="light"]`]: {
+              colorScheme: 'light',
             },
-            [theme.breakpoints.up('xl')]: {
-              fontSize: 19,
+            [`html[${themeSelectorAttribute}="dark"]`]: {
+              colorScheme: 'dark',
             },
-          },
-          body: {
-            overscrollBehaviorX: 'none',
-          },
-          html: {
-            scrollbarGutter: 'stable',
-            textWrap: 'pretty',
-          },
-          'html, body': {
-            overflowX: 'clip',
-            width: '100%',
-          },
-        }),
+            [`@media (prefers-color-scheme: dark)`]: {
+              [systemSelector]: {
+                colorScheme: 'dark',
+              },
+            },
+            [`@media (prefers-color-scheme: light)`]: {
+              [systemSelector]: {
+                colorScheme: 'light',
+              },
+            },
+            '@media (prefers-reduced-motion: reduce)': {
+              '*, *::before, *::after': {
+                animationDuration: '0.01ms !important',
+                animationIterationCount: '1 !important',
+                transitionDuration: '0.01ms !important',
+              },
+            },
+            'h1, h2, h3, h4': {
+              textWrap: 'balance',
+            },
+            'html, body': {
+              overflowX: 'clip',
+              width: '100%',
+            },
+          };
+        },
       },
       MuiLink: {
         defaultProps: {
@@ -338,6 +364,7 @@ export function getTheme(): Theme {
   });
 
   return responsiveFontSizes(themeWithColorMode, {
-    variants: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'caption', 'overline', 'body1', 'body2', 'code'],
+    // h1–h3 use clamp() in typography.ts; keep breakpoint scaling for the rest
+    variants: ['h4', 'h5', 'h6', 'caption', 'overline', 'body1', 'body2', 'code'],
   });
 }
