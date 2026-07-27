@@ -32,8 +32,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   return (
     <html lang="en" style={SYSTEM_COLOR_SCHEME_STYLE} suppressHydrationWarning={true}>
-      <body>
+      <head>
         <ColorSchemeScript />
+      </head>
+      <body>
         <AppRouterCacheProvider>
           <ServerTimeProvider serverTime={serverTime}>
             <GlobalStyleProvider>
