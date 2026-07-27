@@ -35,12 +35,12 @@ type DataWithId = {
 };
 
 /**
- * Offsets for fixed header so anchor links look right
+ * Clears the sticky header when jumping to heading anchors.
  */
 const HEADING_SX: SxObject = {
   marginBottom: 3,
-  marginTop: -12,
-  paddingTop: 12,
+  // Sticky header is ~123px; keep a small gap below it for anchor jumps.
+  scrollMarginTop: 136,
 };
 
 const paragraphSx: SxObject = {
