@@ -69,9 +69,6 @@ catalogs:
     next:
       specifier: 16.2.10
       version: 16.2.10
-    react:
-      specifier: 19.2.7
-      version: 19.2.7
     server-only:
       specifier: 0.0.1
       version: 0.0.1
@@ -90,6 +87,10 @@ catalogs:
     wretch:
       specifier: 3.0.9
       version: 3.0.9
+
+overrides:
+  react: 19.3.0-canary-756fdd47-20260727
+  react-dom: 19.3.0-canary-756fdd47-20260727
 
 importers:
 
@@ -143,40 +144,43 @@ importers:
         version: 11.14.0
       '@emotion/react':
         specifier: 11.14.0
-        version: 11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1)
+        version: 11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)
       '@emotion/styled':
         specifier: 11.14.1
-        version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1)
+        version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)
       '@fortawesome/free-brands-svg-icons':
         specifier: 'catalog:'
         version: 7.3.1
       '@mui/material':
         specifier: 'catalog:'
-        version: 9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       '@mui/material-nextjs':
         specifier: 9.1.1
-        version: 9.1.1(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+        version: 9.1.1(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       '@vercel/analytics':
         specifier: 2.0.1
-        version: 2.0.1(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+        version: 2.0.1(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       '@vercel/speed-insights':
         specifier: 2.0.0
-        version: 2.0.0(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)
+        version: 2.0.0(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       dotenv-mono:
         specifier: 'catalog:'
         version: 1.5.1
       lucide-react:
         specifier: 'catalog:'
-        version: 1.25.0(react@19.2.7)
+        version: 1.25.0(react@19.3.0-canary-756fdd47-20260727)
       next:
         specifier: 'catalog:'
-        version: 16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       react:
-        specifier: 'catalog:'
-        version: 19.2.7
+        specifier: 19.3.0-canary-756fdd47-20260727
+        version: 19.3.0-canary-756fdd47-20260727
+      react-dom:
+        specifier: 19.3.0-canary-756fdd47-20260727
+        version: 19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727)
       react-intersection-observer:
         specifier: 10.1.0
-        version: 10.1.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 10.1.0(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       server-only:
         specifier: 'catalog:'
         version: 0.0.1
@@ -198,7 +202,7 @@ importers:
         version: 7.0.0(@testing-library/dom@10.4.1)
       '@testing-library/react':
         specifier: 'catalog:'
-        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       '@testing-library/user-event':
         specifier: 'catalog:'
         version: 14.6.1(@testing-library/dom@10.4.1)
@@ -366,19 +370,19 @@ importers:
         version: link:../ui
       '@mui/material':
         specifier: 'catalog:'
-        version: 9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.25.0(react@19.2.7)
+        version: 1.25.0(react@19.3.0-canary-756fdd47-20260727)
       pigeon-maps:
         specifier: 0.22.1
-        version: 0.22.1(react@19.2.7)
+        version: 0.22.1(react@19.3.0-canary-756fdd47-20260727)
       react:
-        specifier: 'catalog:'
-        version: 19.2.7
+        specifier: 19.3.0-canary-756fdd47-20260727
+        version: 19.3.0-canary-756fdd47-20260727
       react-dom:
-        specifier: 19.2.7
-        version: 19.2.7(react@19.2.7)
+        specifier: 19.3.0-canary-756fdd47-20260727
+        version: 19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727)
     devDependencies:
       '@dg/tsconfig':
         specifier: workspace:*
@@ -414,8 +418,8 @@ importers:
         specifier: 0.11.1
         version: 0.11.1
       react:
-        specifier: 'catalog:'
-        version: 19.2.7
+        specifier: 19.3.0-canary-756fdd47-20260727
+        version: 19.3.0-canary-756fdd47-20260727
     devDependencies:
       '@dg/tsconfig':
         specifier: workspace:*
@@ -561,7 +565,7 @@ importers:
     dependencies:
       '@contentful/rich-text-react-renderer':
         specifier: 16.2.1
-        version: 16.2.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.2.1(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       '@contentful/rich-text-types':
         specifier: 'catalog:'
         version: 17.2.7
@@ -579,25 +583,28 @@ importers:
         version: 7.3.1
       '@fortawesome/react-fontawesome':
         specifier: 3.5.0
-        version: 3.5.0(@fortawesome/fontawesome-svg-core@7.3.1)(react@19.2.7)
+        version: 3.5.0(@fortawesome/fontawesome-svg-core@7.3.1)(react@19.3.0-canary-756fdd47-20260727)
       '@mui/material':
         specifier: 'catalog:'
-        version: 9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       '@mui/system':
         specifier: 'catalog:'
-        version: 9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)
+        version: 9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)
       '@mui/utils':
         specifier: 'catalog:'
-        version: 9.2.0(@types/react@19.2.17)(react@19.2.7)
+        version: 9.2.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)
       lucide-react:
         specifier: 'catalog:'
-        version: 1.25.0(react@19.2.7)
+        version: 1.25.0(react@19.3.0-canary-756fdd47-20260727)
       next:
         specifier: 'catalog:'
-        version: 16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       react:
-        specifier: 'catalog:'
-        version: 19.2.7
+        specifier: 19.3.0-canary-756fdd47-20260727
+        version: 19.3.0-canary-756fdd47-20260727
+      react-dom:
+        specifier: 19.3.0-canary-756fdd47-20260727
+        version: 19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727)
       sharp:
         specifier: 'catalog:'
         version: 0.35.3(@types/node@26.1.1)
@@ -613,7 +620,7 @@ importers:
         version: 7.0.0(@testing-library/dom@10.4.1)
       '@testing-library/react':
         specifier: 'catalog:'
-        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+        version: 16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       '@testing-library/user-event':
         specifier: 'catalog:'
         version: 14.6.1(@testing-library/dom@10.4.1)
@@ -883,8 +890,8 @@ packages:
     resolution: {integrity: sha512-CZTqlaa/Je3T6JfFaHDAaDWuJrDAYBlBEptedlyBml+hojpMFRRz3Vmv5iU7AI7d80BJ1MlXdA7srLXK7ik/HA==}
     engines: {node: '>=20.0.0'}
     peerDependencies:
-      react: ^16.8.6 || ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^16.8.6 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727
 
   '@contentful/rich-text-types@17.2.7':
     resolution: {integrity: sha512-aIdozk8vk5gsYcallOrwEiL6+GSlMXZorDOmiVELfpbVaXMJPJPlf2CBw3LUzviAqCw0UPQcKHHCwG7SdY7u5w==}
@@ -949,7 +956,7 @@ packages:
     resolution: {integrity: sha512-O000MLDBDdk/EohJPFUqvnp4qnHeYkVP5B0xEG0D/L7cOKP9kefu2DXn8dj74cQfsEzUqh+sr1RzFqiL1o+PpA==}
     peerDependencies:
       '@types/react': '*'
-      react: '>=16.8.0'
+      react: 19.3.0-canary-756fdd47-20260727
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -965,7 +972,7 @@ packages:
     peerDependencies:
       '@emotion/react': ^11.0.0-rc.0
       '@types/react': '*'
-      react: '>=16.8.0'
+      react: 19.3.0-canary-756fdd47-20260727
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -976,7 +983,7 @@ packages:
   '@emotion/use-insertion-effect-with-fallbacks@1.2.0':
     resolution: {integrity: sha512-yJMtVdH59sxi/aVJBpk9FQq+OR8ll5GT8oWd57UpeaKEVGab41JWaCFA7FRLoMLloOZF/c/wsPoe+bfGmRKgDg==}
     peerDependencies:
-      react: '>=16.8.0'
+      react: 19.3.0-canary-756fdd47-20260727
 
   '@emotion/utils@1.4.2':
     resolution: {integrity: sha512-3vLclRofFziIa3J2wDh9jjbkUz9qk5Vi3IZ/FSTKViB0k+ef0fPV7dYrUIugbgupYDx7v9ud/SjrtEP8Y4xLoA==}
@@ -1317,7 +1324,7 @@ packages:
     engines: {node: '>=20'}
     peerDependencies:
       '@fortawesome/fontawesome-svg-core': ~6 || ~7
-      react: ^18.0.0 || ^19.0.0
+      react: 19.3.0-canary-756fdd47-20260727
 
   '@graphql-typed-document-node/core@3.2.0':
     resolution: {integrity: sha512-mB9oAsNCm9aM3/SOv4YtBMqZbYj10R7dkq8byBqxGY/ncFwhf2oQzMV+LCRlWoDSEBJ3COiR1yeDvMtsoOsuFQ==}
@@ -1783,7 +1790,7 @@ packages:
       '@emotion/server': ^11.11.0
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
       next: ^13.0.0 || ^14.0.0 || ^15.0.0 || ^16.0.0
-      react: ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: 19.3.0-canary-756fdd47-20260727
     peerDependenciesMeta:
       '@emotion/cache':
         optional: true
@@ -1800,8 +1807,8 @@ packages:
       '@emotion/styled': ^11.3.0
       '@mui/material-pigment-css': ^9.2.0
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
-      react: ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727
     peerDependenciesMeta:
       '@emotion/react':
         optional: true
@@ -1817,7 +1824,7 @@ packages:
     engines: {node: '>=14.0.0'}
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
-      react: ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: 19.3.0-canary-756fdd47-20260727
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -1828,7 +1835,7 @@ packages:
     peerDependencies:
       '@emotion/react': ^11.4.1
       '@emotion/styled': ^11.3.0
-      react: ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: 19.3.0-canary-756fdd47-20260727
     peerDependenciesMeta:
       '@emotion/react':
         optional: true
@@ -1842,7 +1849,7 @@ packages:
       '@emotion/react': ^11.5.0
       '@emotion/styled': ^11.3.0
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
-      react: ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: 19.3.0-canary-756fdd47-20260727
     peerDependenciesMeta:
       '@emotion/react':
         optional: true
@@ -1864,7 +1871,7 @@ packages:
     engines: {node: '>=14.0.0'}
     peerDependencies:
       '@types/react': ^17.0.0 || ^18.0.0 || ^19.0.0
-      react: ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: 19.3.0-canary-756fdd47-20260727
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -2166,8 +2173,8 @@ packages:
       '@testing-library/dom': ^10.0.0
       '@types/react': ^18.0.0 || ^19.0.0
       '@types/react-dom': ^18.0.0 || ^19.0.0
-      react: ^18.0.0 || ^19.0.0
-      react-dom: ^18.0.0 || ^19.0.0
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727
     peerDependenciesMeta:
       '@types/react':
         optional: true
@@ -2547,7 +2554,7 @@ packages:
       '@sveltejs/kit': ^1 || ^2
       next: '>= 13'
       nuxt: '>= 3'
-      react: ^18 || ^19 || ^19.0.0-rc
+      react: 19.3.0-canary-756fdd47-20260727
       svelte: '>= 4'
       vue: ^3
       vue-router: ^4
@@ -2613,7 +2620,7 @@ packages:
       '@sveltejs/kit': ^1 || ^2
       next: '>= 13'
       nuxt: '>= 3'
-      react: ^18 || ^19 || ^19.0.0-rc
+      react: 19.3.0-canary-756fdd47-20260727
       svelte: '>= 4'
       vue: ^3
       vue-router: ^4
@@ -3586,7 +3593,7 @@ packages:
   lucide-react@1.25.0:
     resolution: {integrity: sha512-/mdJTRbiwcLOQ1NZZK1amZF9rIZyvO18D6r9TngE6TG1NmqHgFuT4eE7Xrkm9UsXMbBJD1NlfwHVltCDWHrOTw==}
     peerDependencies:
-      react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: 19.3.0-canary-756fdd47-20260727
 
   luxon@3.7.2:
     resolution: {integrity: sha512-vtEhXh/gNjI9Yg1u4jX/0YVPMvxzHuGgCm6tC5kZyb08yjGWGnqAjGJvcXbqQR2P3MyMEFnRbpcdFS6PBcLqew==}
@@ -3681,8 +3688,8 @@ packages:
       '@opentelemetry/api': ^1.1.0
       '@playwright/test': ^1.51.1
       babel-plugin-react-compiler: '*'
-      react: ^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0
-      react-dom: ^18.2.0 || 19.0.0-rc-de68d2f4-20241204 || ^19.0.0
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727
       sass: ^1.3.0
     peerDependenciesMeta:
       '@opentelemetry/api':
@@ -3874,7 +3881,7 @@ packages:
   pigeon-maps@0.22.1:
     resolution: {integrity: sha512-mVWxgpIyhAekITeJvDGlFAo/Ytm6Fg7prpDiAuQ0Z6cJ/LwpnS8F0sF+0TDqyJu7C/DDHupkstFTNoIRqhdP5A==}
     peerDependencies:
-      react: '*'
+      react: 19.3.0-canary-756fdd47-20260727
 
   pirates@4.0.7:
     resolution: {integrity: sha512-TfySrs/5nm8fQJDcBDuUng3VOUKsd7S+zqvbOTiGXHfxX4wK31ard+hoNuvkicM/2YFzlpDgABOevKSsB4G/FA==}
@@ -3935,16 +3942,16 @@ packages:
     resolution: {integrity: sha512-9WmIKF6mkvA0SLmA2Knm9+qj89e+j1zqgyn8aXGd7+nAduPoqgI9lO57SAZNn/Byzo5P7JhXTyg9PzaJbH73bA==}
     engines: {node: '>= 0.8'}
 
-  react-dom@19.2.7:
-    resolution: {integrity: sha512-t0BRVXvbiE/o20Hfw669rLbMCDWtYZLvmJigy2f0MxsXF+71pxhR3xOkspmsO8h3ZlNzyibAmtCa3l4lYKk6gQ==}
+  react-dom@19.3.0-canary-756fdd47-20260727:
+    resolution: {integrity: sha512-2srxpv9aRehSuV/DaFWnHht9g9gS1OnHMGI5qiY2gwg6cR3psc81Qj1Wfb3tdgTStHXkNtWW5BhbkyoHIgJ5vQ==}
     peerDependencies:
-      react: ^19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
 
   react-intersection-observer@10.1.0:
     resolution: {integrity: sha512-V8HDu3+Llg6OEhOxx8LnUSS0t4VS+1Xk9ZatkI8Jct/H0CwKnqFTCu8NT3q7ghJTghTdIrEMPSWr2dkKPG+gdQ==}
     peerDependencies:
-      react: ^17.0.0 || ^18.0.0 || ^19.0.0
-      react-dom: ^17.0.0 || ^18.0.0 || ^19.0.0
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727
     peerDependenciesMeta:
       react-dom:
         optional: true
@@ -3964,11 +3971,11 @@ packages:
   react-transition-group@4.4.5:
     resolution: {integrity: sha512-pZcd1MCJoiKiBR2NRxeCRg13uCXbydPnmB4EOeRrY7480qNWO8IIgQG6zlDkm6uRMsURXPuKq0GWtiM59a5Q6g==}
     peerDependencies:
-      react: '>=16.6.0'
-      react-dom: '>=16.6.0'
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727
 
-  react@19.2.7:
-    resolution: {integrity: sha512-HNe9WslTbXmFK8o8cmwgAeJFSBvt1bPdHCVKtaaV+WlAN36mpT4hcRpwbf3fY56ar2oIXzsBpOAiIRHAdY0OlQ==}
+  react@19.3.0-canary-756fdd47-20260727:
+    resolution: {integrity: sha512-PctzrDbeeDKBf4AR1orbQMshQW+95LQBm2FlqBj+n07lDQJd4+UumZVuFAQ1RtgbpBbtiG5WFwmgf8vVRWOSKg==}
     engines: {node: '>=0.10.0'}
 
   readdirp@4.1.2:
@@ -4032,8 +4039,8 @@ packages:
     resolution: {integrity: sha512-xAg7SOnEhrm5zI3puOOKyy1OMcMlIJZYNJY7xLBwSze0UjhPLnWfj2GF2EpT0jmzaJKIWKHLsaSSajf35bcYnA==}
     engines: {node: '>=v12.22.7'}
 
-  scheduler@0.27.0:
-    resolution: {integrity: sha512-eNv+WrVbKu1f3vbYJT/xtiF5syA5HPIMtf9IgY/nKg0sWqzAUEvqY/xm7OcZc/qafLx/iO9FgOmeSAp4v5ti/Q==}
+  scheduler@0.28.0-canary-756fdd47-20260727:
+    resolution: {integrity: sha512-37Q4wWWA79rQx2/UISpZwBPHfnNoWwXGwbLNlu+j4P5ZmE88L55GRmyZXp2ewCtZPA/CfqKMix1cP6TKvbwpSA==}
 
   semver@6.3.1:
     resolution: {integrity: sha512-BR7VvDCVHO+q2xBEWskxS6DJE1qRnb7DxzUrogb71CWoSficBxYsiAGd+Kl0mmq/MprG9yArRkyrQxTO6XjMzA==}
@@ -4238,7 +4245,7 @@ packages:
     peerDependencies:
       '@babel/core': '*'
       babel-plugin-macros: '*'
-      react: '>= 16.8.0 || 17.x.x || ^18.0.0-0 || ^19.0.0-0'
+      react: 19.3.0-canary-756fdd47-20260727
     peerDependenciesMeta:
       '@babel/core':
         optional: true
@@ -4878,11 +4885,11 @@ snapshots:
 
   '@bytecodealliance/preview2-shim@0.17.6': {}
 
-  '@contentful/rich-text-react-renderer@16.2.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@contentful/rich-text-react-renderer@16.2.1(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)':
     dependencies:
       '@contentful/rich-text-types': 17.2.7
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727)
 
   '@contentful/rich-text-types@17.2.7': {}
 
@@ -4959,17 +4966,17 @@ snapshots:
 
   '@emotion/memoize@0.9.0': {}
 
-  '@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1)':
+  '@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@emotion/babel-plugin': 11.13.5(supports-color@8.1.1)
       '@emotion/cache': 11.14.0
       '@emotion/serialize': 1.3.3
-      '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@19.2.7)
+      '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@19.3.0-canary-756fdd47-20260727)
       '@emotion/utils': 1.4.2
       '@emotion/weak-memoize': 0.4.0
       hoist-non-react-statics: 3.3.2
-      react: 19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
     optionalDependencies:
       '@types/react': 19.2.17
     transitivePeerDependencies:
@@ -4985,16 +4992,16 @@ snapshots:
 
   '@emotion/sheet@1.4.0': {}
 
-  '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1)':
+  '@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@emotion/babel-plugin': 11.13.5(supports-color@8.1.1)
       '@emotion/is-prop-valid': 1.4.0
-      '@emotion/react': 11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1)
+      '@emotion/react': 11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)
       '@emotion/serialize': 1.3.3
-      '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@19.2.7)
+      '@emotion/use-insertion-effect-with-fallbacks': 1.2.0(react@19.3.0-canary-756fdd47-20260727)
       '@emotion/utils': 1.4.2
-      react: 19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
     optionalDependencies:
       '@types/react': 19.2.17
     transitivePeerDependencies:
@@ -5002,9 +5009,9 @@ snapshots:
 
   '@emotion/unitless@0.10.0': {}
 
-  '@emotion/use-insertion-effect-with-fallbacks@1.2.0(react@19.2.7)':
+  '@emotion/use-insertion-effect-with-fallbacks@1.2.0(react@19.3.0-canary-756fdd47-20260727)':
     dependencies:
-      react: 19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
 
   '@emotion/utils@1.4.2': {}
 
@@ -5178,10 +5185,10 @@ snapshots:
     dependencies:
       '@fortawesome/fontawesome-common-types': 7.3.1
 
-  '@fortawesome/react-fontawesome@3.5.0(@fortawesome/fontawesome-svg-core@7.3.1)(react@19.2.7)':
+  '@fortawesome/react-fontawesome@3.5.0(@fortawesome/fontawesome-svg-core@7.3.1)(react@19.3.0-canary-756fdd47-20260727)':
     dependencies:
       '@fortawesome/fontawesome-svg-core': 7.3.1
-      react: 19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
 
   '@graphql-typed-document-node/core@3.2.0(graphql@16.14.2)':
     dependencies:
@@ -5630,47 +5637,47 @@ snapshots:
 
   '@mui/core-downloads-tracker@9.2.0': {}
 
-  '@mui/material-nextjs@9.1.1(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)':
+  '@mui/material-nextjs@9.1.1(@emotion/cache@11.14.0)(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)':
     dependencies:
       '@babel/runtime': 7.29.7
-      '@emotion/react': 11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1)
-      next: 16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react: 19.2.7
+      '@emotion/react': 11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)
+      next: 16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
+      react: 19.3.0-canary-756fdd47-20260727
     optionalDependencies:
       '@emotion/cache': 11.14.0
       '@types/react': 19.2.17
 
-  '@mui/material@9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@mui/material@9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@mui/core-downloads-tracker': 9.2.0
-      '@mui/system': 9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)
+      '@mui/system': 9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)
       '@mui/types': 9.1.1(@types/react@19.2.17)
-      '@mui/utils': 9.2.0(@types/react@19.2.17)(react@19.2.7)
+      '@mui/utils': 9.2.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)
       '@popperjs/core': 2.11.8
       '@types/react-transition-group': 4.4.12(@types/react@19.2.17)
       clsx: 2.1.1
       csstype: 3.2.3
       prop-types: 15.8.1
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727)
       react-is: 19.2.7
-      react-transition-group: 4.4.5(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react-transition-group: 4.4.5(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
     optionalDependencies:
-      '@emotion/react': 11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1)
-      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1)
+      '@emotion/react': 11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)
+      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)
       '@types/react': 19.2.17
 
-  '@mui/private-theming@9.2.0(@types/react@19.2.17)(react@19.2.7)':
+  '@mui/private-theming@9.2.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)':
     dependencies:
       '@babel/runtime': 7.29.7
-      '@mui/utils': 9.2.0(@types/react@19.2.17)(react@19.2.7)
+      '@mui/utils': 9.2.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)
       prop-types: 15.8.1
-      react: 19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
     optionalDependencies:
       '@types/react': 19.2.17
 
-  '@mui/styled-engine@9.1.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(react@19.2.7)':
+  '@mui/styled-engine@9.1.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(react@19.3.0-canary-756fdd47-20260727)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@emotion/cache': 11.14.0
@@ -5678,25 +5685,25 @@ snapshots:
       '@emotion/sheet': 1.4.0
       csstype: 3.2.3
       prop-types: 15.8.1
-      react: 19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
     optionalDependencies:
-      '@emotion/react': 11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1)
-      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1)
+      '@emotion/react': 11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)
+      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)
 
-  '@mui/system@9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)':
+  '@mui/system@9.2.0(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)':
     dependencies:
       '@babel/runtime': 7.29.7
-      '@mui/private-theming': 9.2.0(@types/react@19.2.17)(react@19.2.7)
-      '@mui/styled-engine': 9.1.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(react@19.2.7)
+      '@mui/private-theming': 9.2.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)
+      '@mui/styled-engine': 9.1.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(react@19.3.0-canary-756fdd47-20260727)
       '@mui/types': 9.1.1(@types/react@19.2.17)
-      '@mui/utils': 9.2.0(@types/react@19.2.17)(react@19.2.7)
+      '@mui/utils': 9.2.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)
       clsx: 2.1.1
       csstype: 3.2.3
       prop-types: 15.8.1
-      react: 19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
     optionalDependencies:
-      '@emotion/react': 11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1)
-      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.2.7)(supports-color@8.1.1)
+      '@emotion/react': 11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)
+      '@emotion/styled': 11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)
       '@types/react': 19.2.17
 
   '@mui/types@9.1.1(@types/react@19.2.17)':
@@ -5705,14 +5712,14 @@ snapshots:
     optionalDependencies:
       '@types/react': 19.2.17
 
-  '@mui/utils@9.2.0(@types/react@19.2.17)(react@19.2.7)':
+  '@mui/utils@9.2.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@mui/types': 9.1.1(@types/react@19.2.17)
       '@types/prop-types': 15.7.15
       clsx: 2.1.1
       prop-types: 15.8.1
-      react: 19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
       react-is: 19.2.7
     optionalDependencies:
       '@types/react': 19.2.17
@@ -5921,12 +5928,12 @@ snapshots:
       picocolors: 1.1.1
       redent: 3.0.0
 
-  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
+  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(@types/react-dom@19.2.3(@types/react@19.2.17))(@types/react@19.2.17)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@testing-library/dom': 10.4.1
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727)
     optionalDependencies:
       '@types/react': 19.2.17
       '@types/react-dom': 19.2.3(@types/react@19.2.17)
@@ -6184,10 +6191,10 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.12.2':
     optional: true
 
-  '@vercel/analytics@2.0.1(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)':
+  '@vercel/analytics@2.0.1(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)':
     optionalDependencies:
-      next: 16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react: 19.2.7
+      next: 16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
+      react: 19.3.0-canary-756fdd47-20260727
 
   '@vercel/blob@2.4.0':
     dependencies:
@@ -6280,10 +6287,10 @@ snapshots:
       - bare-abort-controller
       - react-native-b4a
 
-  '@vercel/speed-insights@2.0.0(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(react@19.2.7)':
+  '@vercel/speed-insights@2.0.0(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)':
     optionalDependencies:
-      next: 16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
-      react: 19.2.7
+      next: 16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
+      react: 19.3.0-canary-756fdd47-20260727
 
   '@workflow/serde@4.1.0-beta.2': {}
 
@@ -7414,9 +7421,9 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  lucide-react@1.25.0(react@19.2.7):
+  lucide-react@1.25.0(react@19.3.0-canary-756fdd47-20260727):
     dependencies:
-      react: 19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
 
   luxon@3.7.2: {}
 
@@ -7482,16 +7489,16 @@ snapshots:
 
   natural-compare@1.4.0: {}
 
-  next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727):
     dependencies:
       '@next/env': 16.2.10
       '@swc/helpers': 0.5.15
       baseline-browser-mapping: 2.10.43
       caniuse-lite: 1.0.30001806
       postcss: 8.4.31
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
-      styled-jsx: 5.1.6(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(react@19.2.7)
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727)
+      styled-jsx: 5.1.6(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(react@19.3.0-canary-756fdd47-20260727)
     optionalDependencies:
       '@next/swc-darwin-arm64': 16.2.10
       '@next/swc-darwin-x64': 16.2.10
@@ -7666,9 +7673,9 @@ snapshots:
 
   picomatch@4.0.5: {}
 
-  pigeon-maps@0.22.1(react@19.2.7):
+  pigeon-maps@0.22.1(react@19.3.0-canary-756fdd47-20260727):
     dependencies:
-      react: 19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
 
   pirates@4.0.7: {}
 
@@ -7728,16 +7735,16 @@ snapshots:
       iconv-lite: 0.4.24
       unpipe: 1.0.0
 
-  react-dom@19.2.7(react@19.2.7):
+  react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727):
     dependencies:
-      react: 19.2.7
-      scheduler: 0.27.0
+      react: 19.3.0-canary-756fdd47-20260727
+      scheduler: 0.28.0-canary-756fdd47-20260727
 
-  react-intersection-observer@10.1.0(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  react-intersection-observer@10.1.0(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727):
     dependencies:
-      react: 19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
     optionalDependencies:
-      react-dom: 19.2.7(react@19.2.7)
+      react-dom: 19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727)
 
   react-is@16.13.1: {}
 
@@ -7747,16 +7754,16 @@ snapshots:
 
   react-is@19.2.7: {}
 
-  react-transition-group@4.4.5(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
+  react-transition-group@4.4.5(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727):
     dependencies:
       '@babel/runtime': 7.29.7
       dom-helpers: 5.2.1
       loose-envify: 1.4.0
       prop-types: 15.8.1
-      react: 19.2.7
-      react-dom: 19.2.7(react@19.2.7)
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727)
 
-  react@19.2.7: {}
+  react@19.3.0-canary-756fdd47-20260727: {}
 
   readdirp@4.1.2: {}
 
@@ -7829,7 +7836,7 @@ snapshots:
     dependencies:
       xmlchars: 2.2.0
 
-  scheduler@0.27.0: {}
+  scheduler@0.28.0-canary-756fdd47-20260727: {}
 
   semver@6.3.1: {}
 
@@ -8052,10 +8059,10 @@ snapshots:
 
   strip-json-comments@3.1.1: {}
 
-  styled-jsx@5.1.6(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(react@19.2.7):
+  styled-jsx@5.1.6(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(react@19.3.0-canary-756fdd47-20260727):
     dependencies:
       client-only: 0.0.1
-      react: 19.2.7
+      react: 19.3.0-canary-756fdd47-20260727
     optionalDependencies:
       '@babel/core': 7.29.7(supports-color@8.1.1)
       babel-plugin-macros: 3.1.0

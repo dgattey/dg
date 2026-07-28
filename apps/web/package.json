@@ -18,6 +18,7 @@
     "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
+    "react-dom": "catalog:",
     "react-intersection-observer": "10.1.0",
     "server-only": "catalog:"
   },
