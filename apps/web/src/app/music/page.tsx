@@ -1,10 +1,18 @@
 import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
+import { musicRoute } from '@dg/shared-core/routes/app';
 import { Stack, Typography } from '@mui/material';
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getMusicHistory } from '../../services/music';
+import { markdownAlternates } from '../layouts/markdownAlternates';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
+
+export const metadata: Metadata = {
+  alternates: markdownAlternates(musicRoute),
+  title: 'Listening history',
+};
 
 export default async function MusicPage() {
   let tracks: Awaited<ReturnType<typeof getMusicHistory>>['tracks'];

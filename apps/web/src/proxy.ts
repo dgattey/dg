@@ -2,9 +2,10 @@ import {
   hasDevConsoleCredentials,
   isDevConsoleAccessAllowed,
 } from '@dg/services/auth/devConsoleBasicAuth';
-import { homeRoute } from '@dg/shared-core/routes/app';
+import { devConsoleRoute, homeRoute } from '@dg/shared-core/routes/app';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { negotiateMarkdown } from './services/markdown/contentNegotiation';
 
 /**
  * Protects `/dev-console` with Basic Auth in production only. Non-production
@@ -23,8 +24,14 @@ import { NextResponse } from 'next/server';
  * Prefetch and RSC requests receive a plain 401 (no WWW-Authenticate),
  * which fails them without triggering the browser's auth dialog. The
  * client router then falls back to a hard navigation for the real dialog.
+ *
+ * Also negotiates Markdown for registered public pages.
  */
-export function proxy(request: NextRequest) {
+function protectDevConsole(request: NextRequest): NextResponse | null {
+  if (!request.nextUrl.pathname.startsWith(devConsoleRoute)) {
+    return null;
+  }
+
   if (isDevConsoleAccessAllowed(request.headers.get('authorization'))) {
     return NextResponse.next();
   }
@@ -67,6 +74,29 @@ export function proxy(request: NextRequest) {
   });
 }
 
+export function proxy(request: NextRequest) {
+  const devConsoleResponse = protectDevConsole(request);
+  if (devConsoleResponse) {
+    return devConsoleResponse;
+  }
+
+  const markdownResponse = negotiateMarkdown(request);
+  if (markdownResponse) {
+    return markdownResponse;
+  }
+
+  return NextResponse.next();
+}
+
 export const config = {
-  matcher: ['/dev-console/:path*'],
+  matcher: [
+    /*
+     * Run on document navigations and `.md` twins. Skip Next/Vercel
+     * internals, API routes, and common static asset extensions.
+     * Registered Markdown pages are filtered again in negotiateMarkdown,
+     * so new public pages only need the shared registry — not this list.
+     */
+    '/((?!_next/|_vercel/|api/|.*\\.(?:ico|png|jpg|jpeg|gif|svg|webp|txt|xml|webmanifest)$).*)',
+    '/dev-console/:path*',
+  ],
 };

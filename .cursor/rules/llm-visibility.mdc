@@ -1,0 +1,49 @@
+---
+description: Keep public pages LLM-readable via the markdown page registry
+globs: apps/web/src/app/**/page.tsx,packages/shared-core/routes/app.ts,apps/web/src/app/**/*Markdown*,apps/web/src/app/llm-markdown/**,apps/web/src/app/llms.txt/**,apps/web/src/app/llms-full.txt/**
+alwaysApply: false
+---
+
+# LLM visibility for public pages
+
+Public HTML pages must be readable by LLMs/agents. Extend the shared registry
+and put page Markdown next to the page — do not invent a generic CMS layer.
+
+## Source of truth
+
+1. Add the page to `packages/shared-core/routes/app.ts` (`markdownPages`)
+2. Add a page-local Markdown module next to that page
+   (e.g. `app/home/homepageMarkdown.ts`, `app/music/musicMarkdown.ts`)
+3. Wire it in `app/llm-markdown/pageMarkdown.ts` (`pageMarkdownGenerators` —
+   TypeScript requires every registry path)
+
+Path helpers, sitemap, `/llms.txt`, `/llms-full.txt`, Accept negotiation, and
+`.md` rewrites derive from the registry. Do **not** edit the proxy matcher for
+each new page.
+
+## On the HTML page
+
+```tsx
+import { markdownAlternates } from '../layouts/markdownAlternates';
+
+export const metadata = {
+  alternates: markdownAlternates(myRoute),
+  title: '…',
+};
+```
+
+Discovery uses `rel="alternate"` metadata, `Link` headers from Accept negotiation,
+and `/llms.txt` — not visually hidden DOM hints.
+
+## Do not
+
+- Auth, API, webhook, or OAuth routes — leave them out of `markdownPages`
+- Central "generic" Markdown builders for page-specific content
+- Hand-maintained `.md` files that can drift from the page
+- `ai-content` / `llms` meta tags, User-Agent cloaking, or “for AI only” pages
+- Per-page `/api/markdown` handlers — proxy rewrites to `/llm-markdown`
+
+## Verify
+
+- `turbo check:types` (generator map exhaustiveness)
+- Unit tests under `app/llm-markdown`, `app/llms.txt`, and `routes/__tests__`

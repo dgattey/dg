@@ -105,7 +105,7 @@ function getCardSx({
 }: {
   isClickable: boolean;
   horizontalSpan: number;
-  verticalSpan: number | null;
+  verticalSpan?: number;
 }): SxObject {
   return {
     ...cardBaseSx,
@@ -127,10 +127,11 @@ function getCardSx({
       sm: '100%',
       xs: '85vw',
     },
-    ...(verticalSpan && {
-      gridRow: { md: `span ${verticalSpan}` },
-      height: { md: gridItemSize?.(verticalSpan) },
-    }),
+    ...(verticalSpan != null &&
+      verticalSpan > 0 && {
+        gridRow: { md: `span ${verticalSpan}` },
+        height: { md: gridItemSize?.(verticalSpan) },
+      }),
     ...(horizontalSpan && {
       gridColumn: { md: `span ${horizontalSpan}` },
     }),
@@ -179,7 +180,7 @@ function OverlayContent({ overlay, sx }: { overlay: NonNullable<React.ReactNode>
  */
 export function ContentCard({
   horizontalSpan = 1,
-  verticalSpan = 1,
+  verticalSpan,
   children,
   overlay,
   link,
