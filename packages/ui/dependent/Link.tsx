@@ -71,6 +71,12 @@ export type BaseLinkProps = {
    * navigation would interfere with the auth flow.
    */
   forcePageNavigation?: boolean;
+
+  /**
+   * Passed to Next.js Link for View Transition typing on internal navigations.
+   * Ignored for external and forcePageNavigation links.
+   */
+  transitionTypes?: ReadonlyArray<string>;
 };
 
 /**
@@ -164,6 +170,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     underline = 'hover',
     variant,
     tooltipPlacement,
+    transitionTypes,
   },
   ref,
 ) {
@@ -206,7 +213,12 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
 
   // Internal links: NextLink <a> wrapping MuiLink <span> for client-side nav
   return wrap(
-    <NextLink {...anchorProps} href={href} style={{ color: 'inherit', textDecoration: 'none' }}>
+    <NextLink
+      {...anchorProps}
+      href={href}
+      style={{ color: 'inherit', textDecoration: 'none' }}
+      transitionTypes={transitionTypes ? [...transitionTypes] : undefined}
+    >
       <MuiLink component="span" {...muiStyleProps}>
         {contents}
       </MuiLink>

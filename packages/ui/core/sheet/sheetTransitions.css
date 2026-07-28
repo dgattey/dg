@@ -1,0 +1,77 @@
+/*
+ * View Transition classes for sheet open/close.
+ * Durations and easings come from :root vars set by getTimingCssVars().
+ */
+
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+}
+
+::view-transition-new(.vt-sheet-open) {
+  animation:
+    var(--timing-slow) var(--easing-default) both vt-sheet-fade,
+    var(--timing-bouncy) var(--easing-bouncy) both vt-sheet-slide-up;
+}
+
+::view-transition-old(.vt-sheet-close) {
+  animation:
+    var(--timing-medium) var(--easing-default) both vt-sheet-fade reverse,
+    var(--timing-slow) var(--easing-default) both vt-sheet-slide-down;
+}
+
+::view-transition-group(site-header) {
+  z-index: 100;
+  animation: none;
+}
+
+::view-transition-old(site-header) {
+  display: none;
+}
+
+::view-transition-new(site-header) {
+  animation: none;
+}
+
+/* Match Next VT guide: force-disable UA transition animations for reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(*),
+  ::view-transition-new(*),
+  ::view-transition-group(*) {
+    /* biome-ignore lint/complexity/noImportantStyles: override browser VT defaults */
+    animation-duration: 0s !important;
+    /* biome-ignore lint/complexity/noImportantStyles: override browser VT defaults */
+    animation-delay: 0s !important;
+  }
+}
+
+@keyframes vt-sheet-slide-up {
+  from {
+    transform: translateY(40%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes vt-sheet-slide-down {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(40%);
+  }
+}
+
+@keyframes vt-sheet-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

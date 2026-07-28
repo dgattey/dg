@@ -1,17 +1,21 @@
 import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
-import { musicRoute } from '@dg/shared-core/routes/app';
-import { Stack, Typography } from '@mui/material';
+import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
+import { Sheet } from '@dg/ui/core/sheet/Sheet';
+import { Stack } from '@mui/material';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getMusicHistory } from '../../services/music';
 import { markdownAlternates } from '../layouts/markdownAlternates';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 
+const TITLE = 'Listening history';
+
 export const metadata: Metadata = {
   alternates: markdownAlternates(musicRoute),
-  title: 'Listening history',
+  description: 'Recent tracks played on Spotify.',
+  title: TITLE,
 };
 
 export default async function MusicPage() {
@@ -31,11 +35,10 @@ export default async function MusicPage() {
   }
 
   return (
-    <main>
+    <Sheet closeHref={homeRoute} title={TITLE}>
       <Stack spacing={2}>
-        <Typography variant="h1">Listening history</Typography>
         <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />
       </Stack>
-    </main>
+    </Sheet>
   );
 }

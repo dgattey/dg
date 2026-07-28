@@ -1,7 +1,8 @@
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
-import { devConsoleRoute } from '@dg/shared-core/routes/app';
+import { devConsoleRoute, musicRoute } from '@dg/shared-core/routes/app';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
+import { sheetTransitionTypes } from '@dg/ui/core/sheet/sheetTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Container, Divider, Stack } from '@mui/material';
@@ -135,6 +136,19 @@ export async function Footer() {
                   </NavItem>
                 </>
               ) : null}
+              <NavItem sx={navItemNoPaddingSx}>•</NavItem>
+              <NavItem>
+                <Link
+                  aria-label="Listening history"
+                  color="inherit"
+                  href={musicRoute}
+                  title="Listening history"
+                  transitionTypes={sheetTransitionTypes('open')}
+                  variant="caption"
+                >
+                  Listening history
+                </Link>
+              </NavItem>
               {process.env.NODE_ENV !== 'production' ? (
                 <>
                   <NavItem sx={navItemNoPaddingSx}>•</NavItem>
