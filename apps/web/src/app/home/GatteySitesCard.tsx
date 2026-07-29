@@ -32,6 +32,13 @@ const projectListSx: SxObject = {
   '& > li + li': {
     borderTop: '1px solid var(--mui-palette-card-border)',
   },
+  // Hide the shared divider when either adjacent row is hovered.
+  '& > li:hover': {
+    borderTopColor: 'transparent',
+  },
+  '& > li:hover + li': {
+    borderTopColor: 'transparent',
+  },
   listStyle: 'none',
   margin: 0,
   padding: 0,
