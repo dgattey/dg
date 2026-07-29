@@ -38,8 +38,26 @@ describe('negotiateMarkdown', () => {
     expect(response?.headers.get('Vary')).toContain('Accept');
   });
 
-  it('skips negotiation for RSC requests', () => {
+  it('skips negotiation for RSC requests with the rsc header', () => {
     const response = negotiateMarkdown(createRequest('/', { accept: 'application/pdf', rsc: '1' }));
+
+    expect(response).toBeNull();
+  });
+
+  it('skips negotiation for Flight Accept without rsc header (Proxy strips it)', () => {
+    // Mirrors production Proxy: Next removes `rsc` from request.headers, but
+    // RSC resumes still send Accept: text/x-component.
+    const response = negotiateMarkdown(createRequest('/', { accept: 'text/x-component' }));
+
+    expect(response).toBeNull();
+  });
+
+  it('skips negotiation for Flight Accept that also lists html', () => {
+    const response = negotiateMarkdown(
+      createRequest('/', {
+        accept: 'text/x-component, text/html;q=0.9',
+      }),
+    );
 
     expect(response).toBeNull();
   });

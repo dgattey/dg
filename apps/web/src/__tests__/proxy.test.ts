@@ -28,6 +28,19 @@ const createRequest = ({
 };
 
 describe('proxy', () => {
+  describe('markdown negotiation on public pages', () => {
+    it('does not 406 Flight resumes that lack the stripped rsc header', () => {
+      const response = proxy(
+        new NextRequest('https://example.com/', {
+          headers: { accept: 'text/x-component' },
+        }),
+      );
+
+      expect(response.status).not.toBe(406);
+      expect(response.headers.get('x-middleware-next')).toBe('1');
+    });
+  });
+
   describe('without credentials configured', () => {
     beforeEach(() => {
       mockEnv({
@@ -95,6 +108,7 @@ describe('proxy', () => {
 
     it.each<{ desc: string; headers: Record<string, string> }>([
       { desc: 'RSC requests', headers: { rsc: '1' } },
+      { desc: 'Flight Accept without rsc header', headers: { accept: 'text/x-component' } },
       { desc: 'prefetch requests', headers: { 'next-router-prefetch': '1' } },
       { desc: 'purpose prefetch requests', headers: { purpose: 'prefetch' } },
     ])('returns 401 without WWW-Authenticate for $desc', ({ headers }) => {
