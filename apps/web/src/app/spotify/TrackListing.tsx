@@ -1,4 +1,5 @@
 import type { Track } from '@dg/content-models/spotify/Track';
+import { favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
@@ -49,6 +50,20 @@ const cardHeaderSx: SxObject = {
   justifyContent: 'space-between',
 };
 
+const statusRowSx: SxObject = {
+  alignItems: 'baseline',
+  display: 'flex',
+  gap: 1,
+  justifyContent: 'space-between',
+};
+
+const getAlbumsLinkSx = (color?: string, textShadow?: string): SxObject => ({
+  color: color ?? 'var(--mui-palette-text-secondary)',
+  flexShrink: 0,
+  textShadow,
+  whiteSpace: 'nowrap',
+});
+
 function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) {
   const { primary, secondary, primaryShadow, secondaryShadow } = colors ?? {};
   const trackUrl = track.externalUrls.spotify;
@@ -65,13 +80,23 @@ function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) 
         <AlbumImage isPlaying={Boolean(track.isPlaying)} noteColor={primary} track={track} />
       </Stack>
       <Stack>
-        <PlaybackStatus
-          color={primary}
-          isPlaying={track.isPlaying}
-          listingVariant="card"
-          playedAt={track.playedAt}
-          textShadow={primaryShadow}
-        />
+        <Box sx={statusRowSx}>
+          <PlaybackStatus
+            color={primary}
+            isPlaying={track.isPlaying}
+            listingVariant="card"
+            playedAt={track.playedAt}
+            textShadow={primaryShadow}
+          />
+          <Link
+            href={favoriteAlbumsRoute}
+            sx={getAlbumsLinkSx(secondary, secondaryShadow)}
+            title="Favorite albums"
+            variant="overline"
+          >
+            Favorite albums
+          </Link>
+        </Box>
         <TrackTitle
           color={primary}
           listingVariant="card"
