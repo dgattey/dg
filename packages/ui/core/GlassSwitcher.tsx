@@ -174,7 +174,7 @@ function SwitcherOption({ option, isSelected, onChange }: SwitcherOptionProps) {
         value={option.value}
       />
       {option.icon ?? (
-        <Typography component="span" sx={optionLabelSx} variant="overline">
+        <Typography component="span" sx={optionLabelSx} variant="caption">
           {option.label}
         </Typography>
       )}
