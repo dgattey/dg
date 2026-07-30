@@ -1,10 +1,13 @@
 import type { Track } from '@dg/content-models/spotify/Track';
 import { favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
+import { GlassContainer } from '@dg/ui/core/GlassContainer';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
+import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Card, Stack } from '@mui/material';
+import { Box, Card, Stack, Typography } from '@mui/material';
+import { Disc3 } from 'lucide-react';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
 import { AlbumImage } from './AlbumImage';
 import { ArtistList } from './ArtistList';
@@ -50,19 +53,43 @@ const cardHeaderSx: SxObject = {
   justifyContent: 'space-between',
 };
 
-const statusRowSx: SxObject = {
-  alignItems: 'baseline',
-  display: 'flex',
-  gap: 1,
-  justifyContent: 'space-between',
+const logoColumnSx: SxObject = {
+  alignItems: 'flex-start',
 };
 
-const getAlbumsLinkSx = (color?: string, textShadow?: string): SxObject => ({
-  color: color ?? 'var(--mui-palette-text-secondary)',
-  flexShrink: 0,
-  textShadow,
+const albumsChipSx: SxObject = {
+  '&:hover': {
+    transform: 'scale(1.05)',
+  },
+  alignItems: 'center',
+  borderRadius: '999px',
+  color: 'var(--mui-palette-text-primary)',
+  display: 'inline-flex',
+  gap: 0.75,
+  paddingBlock: 0.5,
+  paddingInline: 1.25,
+  width: 'fit-content',
+  ...createBouncyTransition('transform'),
+};
+
+const albumsChipTextSx: SxObject = {
+  lineHeight: 1.2,
   whiteSpace: 'nowrap',
-});
+};
+
+/** Small glass chip linking to the favorite albums page. */
+function FavoriteAlbumsChip() {
+  return (
+    <Link href={favoriteAlbumsRoute} title="Favorite albums" underline="none">
+      <GlassContainer sx={albumsChipSx}>
+        <Disc3 size={14} />
+        <Typography component="span" sx={albumsChipTextSx} variant="overline">
+          Favorite albums
+        </Typography>
+      </GlassContainer>
+    </Link>
+  );
+}
 
 function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) {
   const { primary, secondary, primaryShadow, secondaryShadow } = colors ?? {};
@@ -71,32 +98,25 @@ function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) 
   return (
     <Stack sx={cardLayoutSx}>
       <Stack direction="row" sx={cardHeaderSx}>
-        <SpotifyLogo
-          color={primary}
-          textShadow={primaryShadow}
-          trackTitle={track.name}
-          url={trackUrl}
-        />
+        <Stack spacing={1.5} sx={logoColumnSx}>
+          <SpotifyLogo
+            color={primary}
+            textShadow={primaryShadow}
+            trackTitle={track.name}
+            url={trackUrl}
+          />
+          <FavoriteAlbumsChip />
+        </Stack>
         <AlbumImage isPlaying={Boolean(track.isPlaying)} noteColor={primary} track={track} />
       </Stack>
       <Stack>
-        <Box sx={statusRowSx}>
-          <PlaybackStatus
-            color={primary}
-            isPlaying={track.isPlaying}
-            listingVariant="card"
-            playedAt={track.playedAt}
-            textShadow={primaryShadow}
-          />
-          <Link
-            href={favoriteAlbumsRoute}
-            sx={getAlbumsLinkSx(secondary, secondaryShadow)}
-            title="Favorite albums"
-            variant="overline"
-          >
-            Favorite albums
-          </Link>
-        </Box>
+        <PlaybackStatus
+          color={primary}
+          isPlaying={track.isPlaying}
+          listingVariant="card"
+          playedAt={track.playedAt}
+          textShadow={primaryShadow}
+        />
         <TrackTitle
           color={primary}
           listingVariant="card"
