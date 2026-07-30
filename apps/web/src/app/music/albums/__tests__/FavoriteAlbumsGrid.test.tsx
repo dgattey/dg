@@ -39,6 +39,11 @@ const albums: Array<PlaylistAlbum> = [
 const renderedAlbumNames = () =>
   screen.getAllByRole('img').map((image) => image.getAttribute('alt'));
 
+/** Clicks a sort option in the GlassSwitcher (hidden radio inside a label). */
+const clickSort = async (user: ReturnType<typeof userEvent.setup>, label: string) => {
+  await user.click(screen.getByRole('radio', { hidden: true, name: label }));
+};
+
 describe('FavoriteAlbumsGrid', () => {
   it('defaults to newest added first and links each album on Spotify', () => {
     render(<FavoriteAlbumsGrid albums={albums} />);
@@ -54,7 +59,7 @@ describe('FavoriteAlbumsGrid', () => {
     const user = userEvent.setup();
     render(<FavoriteAlbumsGrid albums={albums} />);
 
-    await user.click(screen.getByRole('button', { name: 'Album' }));
+    await clickSort(user, 'Album');
 
     expect(renderedAlbumNames()).toEqual(['Apple', 'Mango', 'Zebra']);
   });
@@ -63,7 +68,7 @@ describe('FavoriteAlbumsGrid', () => {
     const user = userEvent.setup();
     render(<FavoriteAlbumsGrid albums={albums} />);
 
-    await user.click(screen.getByRole('button', { name: 'Artist' }));
+    await clickSort(user, 'Artist');
 
     expect(renderedAlbumNames()).toEqual(['Zebra', 'Apple', 'Mango']);
   });
@@ -72,7 +77,7 @@ describe('FavoriteAlbumsGrid', () => {
     const user = userEvent.setup();
     render(<FavoriteAlbumsGrid albums={albums} />);
 
-    await user.click(screen.getByRole('button', { name: 'Release date' }));
+    await clickSort(user, 'Release date');
 
     expect(renderedAlbumNames()).toEqual(['Apple', 'Mango', 'Zebra']);
   });
@@ -81,8 +86,8 @@ describe('FavoriteAlbumsGrid', () => {
     const user = userEvent.setup();
     render(<FavoriteAlbumsGrid albums={albums} />);
 
-    await user.click(screen.getByRole('button', { name: 'Album' }));
-    await user.click(screen.getByRole('button', { name: 'Recently added' }));
+    await clickSort(user, 'Album');
+    await clickSort(user, 'Recently added');
 
     expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
   });

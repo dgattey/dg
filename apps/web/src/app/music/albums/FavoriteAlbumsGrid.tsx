@@ -1,9 +1,11 @@
 'use client';
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
+import { GlassSwitcher } from '@dg/ui/core/GlassSwitcher';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Stack, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Box, Stack } from '@mui/material';
+import { ArrowDownUp } from 'lucide-react';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { AlbumThumbnail } from '../../spotify/AlbumThumbnail';
 
@@ -34,10 +36,6 @@ const gridSx: SxObject = {
   },
 };
 
-const sortControlSx: SxObject = {
-  flexWrap: 'wrap',
-};
-
 type Props = {
   albums: Array<PlaylistAlbum>;
 };
@@ -52,8 +50,8 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
   const itemRefs = useRef(new Map<string, HTMLElement>());
   const previousRects = useRef<Map<string, DOMRect> | null>(null);
 
-  const handleSortChange = (_event: React.MouseEvent, next: AlbumSortKey | null) => {
-    if (!next || next === sortKey) {
+  const handleSortChange = (next: AlbumSortKey) => {
+    if (next === sortKey) {
       return;
     }
     previousRects.current = new Map(
@@ -92,20 +90,13 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
 
   return (
     <Stack spacing={2}>
-      <ToggleButtonGroup
+      <GlassSwitcher
         aria-label="Sort albums"
-        exclusive={true}
-        onChange={handleSortChange}
-        size="small"
-        sx={sortControlSx}
+        mobileIcon={<ArrowDownUp size={18} />}
+        onChange={(next) => handleSortChange(next as AlbumSortKey)}
+        options={SORT_OPTIONS.map((option) => ({ label: option.label, value: option.key }))}
         value={sortKey}
-      >
-        {SORT_OPTIONS.map((option) => (
-          <ToggleButton key={option.key} value={option.key}>
-            {option.label}
-          </ToggleButton>
-        ))}
-      </ToggleButtonGroup>
+      />
       <Box sx={gridSx}>
         {sortedAlbums.map((album) => (
           <Box
