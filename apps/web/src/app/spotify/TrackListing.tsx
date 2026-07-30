@@ -53,8 +53,12 @@ const cardHeaderSx: SxObject = {
   justifyContent: 'space-between',
 };
 
+/**
+ * Anchors the chip without contributing width: the card's breakout album art
+ * depends on the header row's intrinsic width staying logo + gap + art.
+ */
 const logoColumnSx: SxObject = {
-  alignItems: 'flex-start',
+  position: 'relative',
 };
 
 const albumsChipSx: SxObject = {
@@ -66,8 +70,12 @@ const albumsChipSx: SxObject = {
   color: 'var(--mui-palette-text-primary)',
   display: 'inline-flex',
   gap: 0.75,
+  // Below the 3rem Spotify logo, out of the header row's layout flow
+  insetBlockStart: 'calc(3rem + 12px)',
+  insetInlineStart: 0,
   paddingBlock: 0.5,
   paddingInline: 1.25,
+  position: 'absolute',
   width: 'fit-content',
   ...createBouncyTransition('transform'),
 };
@@ -77,14 +85,17 @@ const albumsChipTextSx: SxObject = {
   whiteSpace: 'nowrap',
 };
 
-/** Small glass chip linking to the favorite albums page. */
+/**
+ * Small glass chip linking to the favorite albums page. Label is short so the
+ * chip clears the breakout album art on its right.
+ */
 function FavoriteAlbumsChip() {
   return (
     <Link href={favoriteAlbumsRoute} title="Favorite albums" underline="none">
       <GlassContainer sx={albumsChipSx}>
         <Disc3 size={14} />
         <Typography component="span" sx={albumsChipTextSx} variant="overline">
-          Favorite albums
+          Albums
         </Typography>
       </GlassContainer>
     </Link>
@@ -98,7 +109,7 @@ function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) 
   return (
     <Stack sx={cardLayoutSx}>
       <Stack direction="row" sx={cardHeaderSx}>
-        <Stack spacing={1.5} sx={logoColumnSx}>
+        <Box sx={logoColumnSx}>
           <SpotifyLogo
             color={primary}
             textShadow={primaryShadow}
@@ -106,7 +117,7 @@ function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) 
             url={trackUrl}
           />
           <FavoriteAlbumsChip />
-        </Stack>
+        </Box>
         <AlbumImage isPlaying={Boolean(track.isPlaying)} noteColor={primary} track={track} />
       </Stack>
       <Stack>
