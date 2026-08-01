@@ -51,10 +51,7 @@ export function getContentDiscoveryOpenApi() {
   const pagePaths = Object.fromEntries(
     markdownPages.flatMap((page) => [
       [page.path, negotiatedGet(`${page.title} page`)],
-      [
-        htmlPathToMarkdownPath(page.path),
-        textGet(`${page.title} Markdown`, ['text/markdown']),
-      ],
+      [htmlPathToMarkdownPath(page.path), textGet(`${page.title} Markdown`, ['text/markdown'])],
     ]),
   );
 

@@ -1,10 +1,6 @@
 import 'server-only';
 
-import {
-  apiOpenApiRoute,
-  apiStatusRoute,
-  llmsTxtRoute,
-} from '@dg/shared-core/routes/app';
+import { apiOpenApiRoute, apiStatusRoute, llmsTxtRoute } from '@dg/shared-core/routes/app';
 import { metadataBase } from '../../metadata';
 
 type ApiCatalogLink = {
