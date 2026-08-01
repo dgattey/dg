@@ -8,6 +8,7 @@ import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Container, Divider, Stack, Typography } from '@mui/material';
 import { cacheLife } from 'next/cache';
+import { Suspense } from 'react';
 import { interactiveRedesign } from '../../flags';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
@@ -101,14 +102,33 @@ async function getCopyrightYear() {
 }
 
 /**
+ * Quiet footer badge when the interactive-redesign flag is on.
+ * Wrapped in Suspense because flag evaluation reads request-time data.
+ */
+export async function RedesignBadge() {
+  if (!(await interactiveRedesign())) {
+    return null;
+  }
+  return (
+    <>
+      <NavItem sx={navItemNoPaddingSx}>•</NavItem>
+      <NavItem>
+        <Typography color="text.secondary" component="span" variant="caption">
+          redesign on
+        </Typography>
+      </NavItem>
+    </>
+  );
+}
+
+/**
  * Creates the site footer component - shows version data + copyright
  */
 export async function Footer() {
-  const [footerLinks, versionInfo, currentYear, redesignOn] = await Promise.all([
+  const [footerLinks, versionInfo, currentYear] = await Promise.all([
     getFooterLinks(),
     getAppVersionInfo(),
     getCopyrightYear(),
-    interactiveRedesign(),
   ]);
   const nonIconFooterLinks = footerLinks.filter((link) => !link.icon);
   const iconFooterLinks = footerLinks.filter((link) => link.icon);
@@ -155,16 +175,9 @@ export async function Footer() {
                   Listening history
                 </SheetOpenLink>
               </NavItem>
-              {redesignOn ? (
-                <>
-                  <NavItem sx={navItemNoPaddingSx}>•</NavItem>
-                  <NavItem>
-                    <Typography color="text.secondary" component="span" variant="caption">
-                      redesign on
-                    </Typography>
-                  </NavItem>
-                </>
-              ) : null}
+              <Suspense fallback={null}>
+                <RedesignBadge />
+              </Suspense>
               {process.env.NODE_ENV !== 'production' ? (
                 <>
                   <NavItem sx={navItemNoPaddingSx}>•</NavItem>
