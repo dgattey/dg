@@ -51,6 +51,8 @@ If `turbo` is not found, ensure `~/.nodenv/shims` is on PATH, then `nodenv rehas
 
 `.env` is generated from 1Password (vault `dg`) using `[config/env.secrets.keys](config/env.secrets.keys)`. Each key must be an item with the same name and the value stored in the `value` field. To regenerate after vault changes: `turbo clean && turbo dev` or delete `.env` and re-run `turbo dev`.
 
+Feature flags are separate: Vercel Flags (`FLAGS` on Vercel, see `apps/web/src/flags.ts`). Local OAuth/webhook debugging lives at `/dev-console`.
+
 ## :memo: Pull Requests
 
 Feature branches squash onto main, and Linear is used for ticket tracking.

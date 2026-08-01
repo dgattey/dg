@@ -8,7 +8,7 @@ import { listSubscriptions } from './listSubscriptions';
  */
 export async function isValidSubscriptionId(subscriptionId: number): Promise<boolean> {
   try {
-    const subscriptions = await listSubscriptions('strava');
+    const subscriptions = await listSubscriptions();
     return subscriptions.some((subscription) => subscription.id === subscriptionId);
   } catch (error) {
     log.error('Failed to validate subscription ID', { error });

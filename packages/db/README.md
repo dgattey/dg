@@ -30,21 +30,23 @@ The `getDatabaseUrl()` function looks up the correct URL based on `NODE_ENV` and
 
 ## Testing
 
-For test database setup, use `@dg/testing`:
+Test helpers live in this package under `@dg/db/testing`. Runtime app code still
+must not import `@dg/db`; tests may import `@dg/db/testing`.
 
 ```ts
-import { setupTestDatabase } from '@dg/testing/databaseSetup';
-import { setupMockLifecycle } from '@dg/testing/mocks';
+import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 
-const db = setupTestDatabase({ truncate: ['StravaActivity'] });
-setupMockLifecycle();
+const db = setupTestDatabase();
 
 it('creates an activity', async () => {
   await db.StravaActivity.create({ ... });
 });
 ```
 
-See `packages/testing/README.md` for full documentation.
+`setupTestDatabase()` wraps each test in a transaction (BEGIN/ROLLBACK). Use
+`resetTestDatabase()` when you need a full truncate. Jest shared config is
+`@dg/db/testing/jest.config.base`. Mocks and other non-DB test utilities live in
+`@dg/testing` (see `packages/testing/README.md`).
 
 ## Gotchas
 

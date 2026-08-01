@@ -21,7 +21,7 @@ type WebhookActionResult = {
 export async function createWebhookSubscription(): Promise<WebhookActionResult> {
   return withDevConsoleAuth(async () => {
     try {
-      await createSubscription('strava');
+      await createSubscription();
       revalidatePath(devConsoleRoute);
       return { success: true };
     } catch (error) {
@@ -41,14 +41,14 @@ export async function createWebhookSubscription(): Promise<WebhookActionResult> 
 export async function deleteWebhookSubscription(): Promise<WebhookActionResult> {
   return withDevConsoleAuth(async () => {
     try {
-      const subscriptions = await listSubscriptions('strava');
+      const subscriptions = await listSubscriptions();
       const subscription = subscriptions[0];
 
       if (!subscription) {
         return { error: 'No subscription found to delete', success: false };
       }
 
-      await deleteSubscription('strava', subscription.id);
+      await deleteSubscription(subscription.id);
       revalidatePath(devConsoleRoute);
       return { success: true };
     } catch (error) {
