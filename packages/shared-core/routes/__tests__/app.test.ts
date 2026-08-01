@@ -1,4 +1,7 @@
 import {
+  apiCatalogRoute,
+  apiOpenApiRoute,
+  apiStatusRoute,
   htmlPathToInternalMarkdownPath,
   htmlPathToMarkdownPath,
   isMarkdownPagePath,
@@ -34,5 +37,11 @@ describe('markdown page registry', () => {
       expect(isMarkdownPagePath(path)).toBe(true);
       expect(markdownPathToHtmlPath(htmlPathToMarkdownPath(path))).toBe(path);
     }
+  });
+
+  it('keeps well-known machine documents out of the page registry', () => {
+    expect(markdownPagePaths).not.toEqual(
+      expect.arrayContaining([apiCatalogRoute, apiOpenApiRoute, apiStatusRoute]),
+    );
   });
 });
