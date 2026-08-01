@@ -4,8 +4,8 @@
     "@dg/db": "workspace:*",
     "@dg/shared-core": "workspace:*",
     "graphql-request": "catalog:",
+    "jpeg-js": "catalog:",
     "server-only": "catalog:",
-    "sharp": "catalog:",
     "valibot": "catalog:",
     "wretch": "catalog:"
   },

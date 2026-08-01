@@ -2,9 +2,16 @@ import 'server-only';
 
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import { log } from '@dg/shared-core/logging/log';
-import sharp, { type Stats } from 'sharp';
+import { decode } from 'jpeg-js';
 
 import { type Hsl, rgbToHsl } from './colorConversion';
+
+export type RgbaImage = {
+  /** Row-major RGBA bytes, four per pixel */
+  data: Uint8Array;
+  height: number;
+  width: number;
+};
 
 type Hsla = Hsl & {
   /** Alpha, 0-1 */
@@ -42,8 +49,6 @@ const OPTIONS = {
   lightnessMax: 0.5,
   /** Lightness clamp range for final gradient colors */
   lightnessMin: 0.2,
-  /** Size of downsampled image for color extraction */
-  sampleSize: 40,
 } as const;
 
 const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
@@ -146,11 +151,11 @@ function contrastSettingForGradient(colors: FourItemHsla): ContrastSetting {
 }
 
 /**
- * Downsample, bucket by hue AND lightness, and keep the most vibrant colors.
+ * Bucket by hue AND lightness, and keep the most vibrant colors.
  * Bucketing by both dimensions allows images that are predominantly one hue
  * (e.g., mostly red) to yield multiple shades of that hue.
  */
-async function getVibrantColors(buffer: Buffer): Promise<Array<Hsl>> {
+function getVibrantColors(image: RgbaImage): Array<Hsl> {
   const {
     hueBucketSize,
     lightnessBands,
@@ -158,27 +163,19 @@ async function getVibrantColors(buffer: Buffer): Promise<Array<Hsl>> {
     lightnessMin,
     extractionLightnessMultiplier,
     extractionLightnessBuffer,
-    sampleSize,
   } = OPTIONS;
-
-  // Smaller image for performance
-  const { data, info } = await sharp(buffer)
-    .resize(sampleSize, sampleSize, { fit: 'inside' })
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-  const hasAlpha = info.channels === 4;
-  invariant(info.channels >= 3, 'Not an image buffer!');
 
   // Bucket colors by hue AND lightness - allows multiple shades of the same hue
   const buckets = new Map<string, { count: number; hSum: number; sSum: number; lSum: number }>();
+  const pixelDataLength = image.width * image.height * 4;
 
-  for (let index = 0; index < data.length; index += info.channels) {
-    const r = data[index] ?? 0;
-    const g = data[index + 1] ?? 0;
-    const b = data[index + 2] ?? 0;
+  for (let index = 0; index < pixelDataLength; index += 4) {
+    const r = image.data[index] ?? 0;
+    const g = image.data[index + 1] ?? 0;
+    const b = image.data[index + 2] ?? 0;
 
     // Skip transparent colors
-    const alpha = hasAlpha ? (data[index + 3] ?? 0) : 255;
+    const alpha = image.data[index + 3] ?? 0;
     if (alpha < 10) {
       continue;
     }
@@ -231,57 +228,91 @@ async function getVibrantColors(buffer: Buffer): Promise<Array<Hsl>> {
     .map(({ color }) => color);
 }
 
-/**
- * Gets dominant color from sharp stats and converts to HSL
- */
-function getDominantHsl(stats: Stats): Hsl | null {
-  if (stats.dominant && typeof stats.dominant.r === 'number') {
-    return rgbToHsl({
-      b: stats.dominant.b,
-      g: stats.dominant.g,
-      r: stats.dominant.r,
-    });
-  }
-  return null;
-}
+type HistogramBin = {
+  bSum: number;
+  count: number;
+  gSum: number;
+  rSum: number;
+};
 
 /**
- * Gets mean color from sharp stats and converts to HSL
+ * Most populous bin of a 16x16x16 RGB histogram, averaged over the pixels in it.
  */
-function getMeanHsl(stats: Stats): Hsl {
-  const [rChannel, gChannel, bChannel] = stats.channels;
-  invariant(rChannel && gChannel && bChannel, 'Malformed image');
+function getDominantHsl(image: RgbaImage): Hsl {
+  const histogram = new Map<number, HistogramBin>();
+  const pixelDataLength = image.width * image.height * 4;
+
+  for (let index = 0; index < pixelDataLength; index += 4) {
+    const r = image.data[index] ?? 0;
+    const g = image.data[index + 1] ?? 0;
+    const b = image.data[index + 2] ?? 0;
+    const binKey = (r >> 4) * 256 + (g >> 4) * 16 + (b >> 4);
+    const bin = histogram.get(binKey);
+
+    if (bin) {
+      bin.bSum += b;
+      bin.count += 1;
+      bin.gSum += g;
+      bin.rSum += r;
+    } else {
+      histogram.set(binKey, {
+        bSum: b,
+        count: 1,
+        gSum: g,
+        rSum: r,
+      });
+    }
+  }
+
+  let dominantBin: HistogramBin | null = null;
+  for (const bin of histogram.values()) {
+    if (!dominantBin || bin.count > dominantBin.count) {
+      dominantBin = bin;
+    }
+  }
+  invariant(dominantBin, 'Image has no pixels');
+
   return rgbToHsl({
-    b: Math.round(bChannel.mean),
-    g: Math.round(gChannel.mean),
-    r: Math.round(rChannel.mean),
+    b: dominantBin.bSum / dominantBin.count,
+    g: dominantBin.gSum / dominantBin.count,
+    r: dominantBin.rSum / dominantBin.count,
   });
 }
 
 /**
- * Returns an up-to-4-color radial gradient from the processed image URL, and indicator boolean for
+ * Returns an up-to-4-color radial gradient from decoded pixels, and an indicator for the
  * recommended text color when used on top of the gradient.
+ */
+export function getImageGradientInformation(image: RgbaImage): ImageGradientInformation {
+  invariant(
+    image.width > 0 && image.height > 0 && image.data.length >= image.width * image.height * 4,
+    'Malformed image',
+  );
+
+  const colors = ensureQuadColorArray(getVibrantColors(image), getDominantHsl(image));
+  return {
+    backgroundGradient: buildRadialGradient(colors),
+    contrastSetting: contrastSettingForGradient(colors),
+  };
+}
+
+/**
+ * Fetches a JPEG and returns its gradient information. Decoding is capped well above album art
+ * (640x640 is 0.41MP) so a hostile response can't exhaust the function's memory.
  */
 export async function getImageGradientInformationFromUrl(
   url: string,
 ): Promise<ImageGradientInformation> {
   try {
-    // Fetch image, convert to buffer + stats
     const imageResponse = await fetch(url);
     invariant(imageResponse.ok, `Couldn't fetch image: ${imageResponse.status}`);
-    const buffer = Buffer.from(await imageResponse.arrayBuffer());
-    const stats = await sharp(buffer).stats();
-
-    // Get vibrant colors in HSL
-    const vibrantColors = await getVibrantColors(buffer);
-    const fallbackColor = getDominantHsl(stats) ?? getMeanHsl(stats);
-
-    // Get a 4 color radial stack, potentially falling back to the dominant color
-    const colors = ensureQuadColorArray(vibrantColors, fallbackColor);
-    return {
-      backgroundGradient: buildRadialGradient(colors),
-      contrastSetting: contrastSettingForGradient(colors),
-    };
+    const bytes = new Uint8Array(await imageResponse.arrayBuffer());
+    const decoded = decode(bytes, {
+      maxMemoryUsageInMB: 64,
+      maxResolutionInMP: 1,
+      useTArray: true,
+    });
+    return getImageGradientInformation(decoded);
   } catch (error) {
     log.warn("Couldn't get image gradient", {
       error,

@@ -1,119 +1,94 @@
-import sharp from 'sharp';
-import { getImageGradientInformationFromUrl } from '../getImageGradient';
+import { encode } from 'jpeg-js';
+import {
+  getImageGradientInformation,
+  getImageGradientInformationFromUrl,
+  type RgbaImage,
+} from '../getImageGradient';
 
-// Mock fetch
-global.fetch = jest.fn();
-
-// Helper to create a mock image buffer with specific RGB pixels
-function createMockImageBuffer(pixels: Array<[number, number, number]>): Buffer {
-  // Create raw RGB buffer from pixel array
-  const data = new Uint8Array(pixels.length * 3);
+function imageFromPixels(
+  pixels: Array<[number, number, number]>,
+  width: number,
+  height: number,
+): RgbaImage {
+  const data = new Uint8Array(pixels.length * 4);
   pixels.forEach(([r, g, b], i) => {
-    data[i * 3] = r;
-    data[i * 3 + 1] = g;
-    data[i * 3 + 2] = b;
+    data[i * 4] = r;
+    data[i * 4 + 1] = g;
+    data[i * 4 + 2] = b;
+    data[i * 4 + 3] = 255;
   });
-  return Buffer.from(data);
+  return { data, height, width };
 }
 
-// Helper to create uniform color image (all same pixel)
 function createUniformPixels(
   r: number,
   g: number,
   b: number,
   count: number,
 ): Array<[number, number, number]> {
-  return Array(count).fill([r, g, b]) as Array<[number, number, number]>;
+  return Array.from({ length: count }, (): [number, number, number] => [r, g, b]);
 }
 
-// Helper to mix pixels of different colors
 function mixPixels(
   ...groups: Array<{ color: [number, number, number]; count: number }>
 ): Array<[number, number, number]> {
-  return groups.flatMap(({ color, count }) => Array(count).fill(color)) as Array<
-    [number, number, number]
-  >;
+  return groups.flatMap(({ color, count }) =>
+    Array.from({ length: count }, (): [number, number, number] => color),
+  );
 }
 
 describe('getImageGradient color extraction', () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
-  });
-
-  // Test helper that processes an image and returns extracted info for inspection
-  async function processTestImage(
+  function processTestImage(
     pixels: Array<[number, number, number]>,
     width: number,
     height: number,
   ) {
-    const rawBuffer = createMockImageBuffer(pixels);
-
-    // Create actual sharp image from raw pixel data
-    const imageBuffer = await sharp(rawBuffer, {
-      raw: { channels: 3, height, width },
-    })
-      .png()
-      .toBuffer();
-
-    // Mock fetch to return our test image
-    (global.fetch as jest.Mock).mockResolvedValueOnce({
-      arrayBuffer: () => Promise.resolve(imageBuffer),
-      ok: true,
-    });
-
-    return getImageGradientInformationFromUrl('https://test.com/image.png');
+    return getImageGradientInformation(imageFromPixels(pixels, width, height));
   }
 
   describe('black/grayscale images', () => {
-    it('extracts dark gray gradient from mostly black image', async () => {
-      // Pure black pixels (RGB: 0, 0, 0)
-      const pixels = createUniformPixels(20, 20, 20, 100); // 10x10 dark gray
-      const result = await processTestImage(pixels, 10, 10);
+    it('extracts dark gray gradient from mostly black image', () => {
+      const pixels = createUniformPixels(20, 20, 20, 100);
+      const result = processTestImage(pixels, 10, 10);
 
       expect(result.backgroundGradient).not.toBeNull();
-      expect(result.contrastSetting).toBe('dark'); // Dark background = light text
+      expect(result.contrastSetting).toBe('dark');
     });
 
-    it('extracts gray gradient from grayscale image', async () => {
-      // Mix of grays
+    it('extracts gray gradient from grayscale image', () => {
       const pixels = mixPixels(
-        { color: [30, 30, 30], count: 40 }, // Dark gray
-        { color: [80, 80, 80], count: 40 }, // Medium gray
-        { color: [50, 50, 50], count: 20 }, // Mid-dark gray
+        { color: [30, 30, 30], count: 40 },
+        { color: [80, 80, 80], count: 40 },
+        { color: [50, 50, 50], count: 20 },
       );
-      const result = await processTestImage(pixels, 10, 10);
+      const result = processTestImage(pixels, 10, 10);
 
       expect(result.backgroundGradient).not.toBeNull();
     });
   });
 
   describe('cream/off-white images (Rumours album case)', () => {
-    it('extracts subtle cream gradient, NOT bright yellow', async () => {
-      // Cream color: RGB ~255, 253, 240 (very light, slight yellow tint)
-      // In HSL: hue ~45, saturation ~0.1, lightness ~0.97
+    it('extracts subtle cream gradient, NOT bright yellow', () => {
       const pixels = createUniformPixels(255, 253, 240, 100);
-      const result = await processTestImage(pixels, 10, 10);
+      const result = processTestImage(pixels, 10, 10);
 
       expect(result.backgroundGradient).not.toBeNull();
     });
 
-    it('handles mix of black clothing and cream background (like Rumours)', async () => {
-      // Simulating Rumours: ~60% black clothing, ~40% cream background
+    it('handles mix of black clothing and cream background (like Rumours)', () => {
       const pixels = mixPixels(
-        { color: [20, 20, 20], count: 60 }, // Black clothing
-        { color: [255, 250, 235], count: 40 }, // Cream background
+        { color: [20, 20, 20], count: 60 },
+        { color: [255, 250, 235], count: 40 },
       );
-      const result = await processTestImage(pixels, 10, 10);
+      const result = processTestImage(pixels, 10, 10);
 
       expect(result.backgroundGradient).not.toBeNull();
 
-      // Extract saturation values - should be low (not bright yellow)
       const satMatches = [
         ...(result.backgroundGradient?.matchAll(/hsla\([^,]+,\s*([\d.]+)%/g) ?? []),
       ];
       const saturations = satMatches.map((m) => parseFloat(m[1] ?? '0'));
 
-      // All saturations should be under 30% (muted, not vibrant yellow)
       saturations.forEach((sat) => {
         expect(sat).toBeLessThan(30);
       });
@@ -121,44 +96,40 @@ describe('getImageGradient color extraction', () => {
   });
 
   describe('vibrant colored images', () => {
-    it('extracts red from predominantly red image', async () => {
-      // Vibrant red: RGB 220, 50, 50
+    it('extracts red from predominantly red image', () => {
       const pixels = createUniformPixels(220, 50, 50, 100);
-      const result = await processTestImage(pixels, 10, 10);
+      const result = processTestImage(pixels, 10, 10);
 
       expect(result.backgroundGradient).not.toBeNull();
     });
 
-    it('extracts multiple colors from colorful image', async () => {
-      // Mix of vibrant colors
+    it('extracts multiple colors from colorful image', () => {
       const pixels = mixPixels(
-        { color: [220, 50, 50], count: 30 }, // Red
-        { color: [50, 50, 220], count: 30 }, // Blue
-        { color: [50, 180, 50], count: 20 }, // Green
-        { color: [200, 200, 50], count: 20 }, // Yellow
+        { color: [220, 50, 50], count: 30 },
+        { color: [50, 50, 220], count: 30 },
+        { color: [50, 180, 50], count: 20 },
+        { color: [200, 200, 50], count: 20 },
       );
-      const result = await processTestImage(pixels, 10, 10);
+      const result = processTestImage(pixels, 10, 10);
 
       expect(result.backgroundGradient).not.toBeNull();
     });
   });
 
   describe('edge cases', () => {
-    it('handles pure white image', async () => {
+    it('handles pure white image', () => {
       const pixels = createUniformPixels(255, 255, 255, 100);
-      const result = await processTestImage(pixels, 10, 10);
+      const result = processTestImage(pixels, 10, 10);
 
       expect(result.backgroundGradient).not.toBeNull();
     });
 
-    it('handles image with slight yellow tint that should NOT become neon', async () => {
-      // RGB 250, 248, 243 is a subtle cream (~30% saturation in HSL)
+    it('handles image with slight yellow tint that should NOT become neon', () => {
       const pixels = createUniformPixels(250, 248, 243, 100);
-      const result = await processTestImage(pixels, 10, 10);
+      const result = processTestImage(pixels, 10, 10);
 
       expect(result.backgroundGradient).not.toBeNull();
 
-      // Extract all saturation percentages - should stay low
       const satMatches = [
         ...(result.backgroundGradient?.matchAll(/hsla\([^,]+,\s*([\d.]+)%/g) ?? []),
       ];
@@ -169,21 +140,66 @@ describe('getImageGradient color extraction', () => {
       });
     });
 
-    it('chroma scoring prefers mid-tone vibrant colors over light colors when mixed', async () => {
-      // When vibrant red competes with cream, red should dominate
+    it('chroma scoring prefers mid-tone vibrant colors over light colors when mixed', () => {
       const pixels = mixPixels(
-        { color: [220, 50, 50], count: 40 }, // Vibrant red (mid-tone)
-        { color: [255, 250, 235], count: 60 }, // Cream (high lightness)
+        { color: [220, 50, 50], count: 40 },
+        { color: [255, 250, 235], count: 60 },
       );
-      const result = await processTestImage(pixels, 10, 10);
+      const result = processTestImage(pixels, 10, 10);
 
-      // Extract first (most prominent) color's hue - should be red (~0°), not yellow (~45°)
       const hueMatch = result.backgroundGradient?.match(/hsla\(([\d.]+),/);
       const hue = hueMatch?.[1] ? parseFloat(hueMatch[1]) : -1;
 
-      // Hue should be in red range (0-30° or 330-360°), not yellow range (40-60°)
       const isRed = hue < 30 || hue > 330;
       expect(isRed).toBe(true);
+    });
+  });
+});
+
+describe('getImageGradientInformationFromUrl', () => {
+  const fetchMock = jest.spyOn(global, 'fetch');
+
+  beforeEach(() => {
+    fetchMock.mockReset();
+  });
+
+  afterAll(() => {
+    fetchMock.mockRestore();
+  });
+
+  it('extracts a gradient from JPEG bytes', async () => {
+    const image = imageFromPixels(createUniformPixels(220, 50, 50, 64), 8, 8);
+    const jpeg = encode(image, 90);
+    fetchMock.mockResolvedValueOnce(
+      new Response(Uint8Array.from(jpeg.data).buffer, { status: 200 }),
+    );
+
+    const result = await getImageGradientInformationFromUrl('https://test.com/image.jpg');
+
+    expect(result.backgroundGradient).not.toBeNull();
+  });
+
+  it('returns null gradient information for a non-ok response', async () => {
+    fetchMock.mockResolvedValueOnce(new Response(null, { status: 404 }));
+
+    const result = await getImageGradientInformationFromUrl('https://test.com/missing.jpg');
+
+    expect(result).toEqual({
+      backgroundGradient: null,
+      contrastSetting: null,
+    });
+  });
+
+  it('returns null gradient information for non-JPEG bytes', async () => {
+    fetchMock.mockResolvedValueOnce(
+      new Response(Uint8Array.from([0, 1, 2, 3]).buffer, { status: 200 }),
+    );
+
+    const result = await getImageGradientInformationFromUrl('https://test.com/not-an-image.jpg');
+
+    expect(result).toEqual({
+      backgroundGradient: null,
+      contrastSetting: null,
     });
   });
 });

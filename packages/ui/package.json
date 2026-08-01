@@ -12,8 +12,7 @@
     "@mui/utils": "catalog:",
     "lucide-react": "catalog:",
     "next": "catalog:",
-    "react": "catalog:",
-    "sharp": "catalog:"
+    "react": "catalog:"
   },
   "devDependencies": {
     "@dg/testing": "workspace:*",

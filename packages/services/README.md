@@ -44,9 +44,10 @@ Low-level HTTP client utilities used by service integrations:
 Server-side image utilities for creating UI-friendly derived data.
 
 
-| Export                                 | Description                                                  |
-| -------------------------------------- | ------------------------------------------------------------ |
-| `getImageGradientInformationFromUrl()` | Builds a CSS gradient + contrast text hint from an image URL |
+| Export                                 | Description                                                         |
+| -------------------------------------- | ------------------------------------------------------------------- |
+| `getImageGradientInformation()`        | Builds a CSS gradient + contrast text hint from decoded RGBA pixels |
+| `getImageGradientInformationFromUrl()` | Fetches a JPEG and builds its CSS gradient + contrast text hint     |
 
 
 ## Contentful
