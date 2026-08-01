@@ -30,6 +30,9 @@ export const EASING_DEFAULT = 'cubic-bezier(0.4, 0, 0.2, 1)';
 export const EASING_EASE_OUT = 'ease-out';
 export const EASING_BOUNCE = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 
+/** Fast start, long settle. For entrances that should land without overshoot. */
+export const EASING_DECELERATE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
+
 /**
  * Bouncy timing function for spring-like animations.
  * This creates an overshoot effect that settles naturally.
@@ -44,9 +47,8 @@ export const EASING_BOUNCY =
  */
 export function getTimingCssVars(): Record<`--${string}`, string> {
   return {
-    '--easing-bouncy': EASING_BOUNCY,
+    '--easing-decelerate': EASING_DECELERATE,
     '--easing-default': EASING_DEFAULT,
-    '--timing-bouncy': `${TIMING_BOUNCY}ms`,
     '--timing-medium': `${TIMING_MEDIUM}ms`,
     '--timing-slow': `${TIMING_SLOW}ms`,
   };

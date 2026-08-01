@@ -16,6 +16,7 @@ import { getServerTime } from '../services/getServerTime';
 import { Footer } from './layouts/Footer';
 import { Header } from './layouts/Header';
 import { PageScrollProvider } from './layouts/PageScrollContext';
+import { PageViewTransition } from './layouts/PageViewTransition';
 import { RefreshOnFocusProvider } from './layouts/RefreshOnFocusProvider';
 import { WebMcpTools } from './layouts/WebMcpTools';
 import { baseMetadata, viewport } from './metadata';
@@ -49,7 +50,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                 {/* Contained main content with consistent section spacing */}
                 <Section sx={mainSectionSx}>
                   <Container>
-                    <main>{children}</main>
+                    <main>
+                      <PageViewTransition>{children}</PageViewTransition>
+                    </main>
                   </Container>
                 </Section>
               </PageScrollProvider>

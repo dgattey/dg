@@ -1,5 +1,5 @@
 /*
- * View Transition classes for sheet open/close.
+ * View Transition motion for sheet open/close.
  * Durations and easings come from :root vars set by getTimingCssVars().
  */
 
@@ -7,34 +7,57 @@
   pointer-events: none;
 }
 
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation: none;
+/*
+ * Persistent chrome is captured separately from `root` so it keeps painting
+ * through the page cross-fade instead of being destroyed and rebuilt with it.
+ */
+::view-transition-group(site-header),
+::view-transition-group(site-footer) {
+  z-index: 100;
+}
+
+::view-transition-old(site-header),
+::view-transition-new(site-header),
+::view-transition-old(site-footer),
+::view-transition-new(site-footer) {
+  animation-duration: var(--timing-slow);
+  animation-timing-function: var(--easing-default);
+}
+
+/*
+ * The heading travels between the control that opened the sheet and the sheet
+ * header, so it has to paint above both page snapshots for the whole trip.
+ */
+::view-transition-group(sheet-title) {
+  z-index: 200;
+  animation-duration: var(--timing-slow);
+  animation-timing-function: var(--easing-decelerate);
+}
+
+::view-transition-old(sheet-title),
+::view-transition-new(sheet-title) {
+  animation-duration: var(--timing-slow);
+  animation-timing-function: var(--easing-decelerate);
+}
+
+/*
+ * Both page snapshots animate for the whole transition so they overlap and the
+ * viewport is never blank between them.
+ */
+::view-transition-old(.vt-page-recede) {
+  animation: var(--timing-medium) var(--easing-default) both vt-page-out;
+}
+
+::view-transition-new(.vt-page-advance) {
+  animation: var(--timing-slow) var(--easing-decelerate) both vt-page-in;
 }
 
 ::view-transition-new(.vt-sheet-open) {
-  animation:
-    var(--timing-slow) var(--easing-default) both vt-sheet-fade,
-    var(--timing-bouncy) var(--easing-bouncy) both vt-sheet-slide-up;
+  animation: var(--timing-slow) var(--easing-decelerate) both vt-sheet-in;
 }
 
 ::view-transition-old(.vt-sheet-close) {
-  animation:
-    var(--timing-medium) var(--easing-default) both vt-sheet-fade reverse,
-    var(--timing-slow) var(--easing-default) both vt-sheet-slide-down;
-}
-
-::view-transition-group(site-header) {
-  z-index: 100;
-  animation: none;
-}
-
-::view-transition-old(site-header) {
-  display: none;
-}
-
-::view-transition-new(site-header) {
-  animation: none;
+  animation: var(--timing-medium) var(--easing-default) both vt-sheet-out;
 }
 
 /* Match Next VT guide: force-disable UA transition animations for reduced motion. */
@@ -49,29 +72,54 @@
   }
 }
 
-@keyframes vt-sheet-slide-up {
+@keyframes vt-sheet-in {
   from {
-    transform: translateY(40%);
+    opacity: 0;
+    transform: translateY(1.5rem) scale(0.985);
   }
   to {
-    transform: translateY(0);
+    opacity: 1;
+    transform: none;
   }
 }
 
-@keyframes vt-sheet-slide-down {
+@keyframes vt-sheet-out {
   from {
-    transform: translateY(0);
+    opacity: 1;
+    transform: none;
   }
   to {
-    transform: translateY(40%);
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.99);
   }
 }
 
-@keyframes vt-sheet-fade {
+/*
+ * Page snapshots keep `mix-blend-mode: plus-lighter` throughout. Naming an
+ * animation on a snapshot replaces the UA's blend-mode animation, and without
+ * it two overlapping fades read as a dip to black rather than a cross-fade.
+ *
+ * Pages are as tall as their content, so they fade in place. Scaling would
+ * pivot around a mid-document origin that is usually off screen.
+ */
+@keyframes vt-page-out {
   from {
+    mix-blend-mode: plus-lighter;
+    opacity: 1;
+  }
+  to {
+    mix-blend-mode: plus-lighter;
+    opacity: 0;
+  }
+}
+
+@keyframes vt-page-in {
+  from {
+    mix-blend-mode: plus-lighter;
     opacity: 0;
   }
   to {
+    mix-blend-mode: plus-lighter;
     opacity: 1;
   }
 }

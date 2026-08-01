@@ -6,8 +6,10 @@ import { Sheet } from '@dg/ui/core/sheet/Sheet';
 import { Stack } from '@mui/material';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 import { getMusicHistory } from '../../services/music';
 import { markdownAlternates } from '../layouts/markdownAlternates';
+import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 
 const TITLE = 'Listening history';
@@ -18,7 +20,7 @@ export const metadata: Metadata = {
   title: TITLE,
 };
 
-export default async function MusicPage() {
+async function MusicHistory() {
   let tracks: Awaited<ReturnType<typeof getMusicHistory>>['tracks'];
   let nextCursor: Awaited<ReturnType<typeof getMusicHistory>>['nextCursor'];
 
@@ -35,10 +37,24 @@ export default async function MusicPage() {
   }
 
   return (
+    <Stack spacing={2}>
+      <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />
+    </Stack>
+  );
+}
+
+/**
+ * The sheet shell stays synchronous so it commits in the same render as the
+ * outgoing page. Awaiting here instead would suspend the whole route, the old
+ * page would already be unmounted by the time the sheet arrives, and the view
+ * transition would have nothing to animate away from.
+ */
+export default function MusicPage() {
+  return (
     <Sheet closeHref={homeRoute} title={TITLE}>
-      <Stack spacing={2}>
-        <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />
-      </Stack>
+      <Suspense fallback={<MusicHistorySkeleton />}>
+        <MusicHistory />
+      </Suspense>
     </Sheet>
   );
 }

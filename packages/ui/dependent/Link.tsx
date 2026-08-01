@@ -77,6 +77,11 @@ export type BaseLinkProps = {
    * Ignored for external and forcePageNavigation links.
    */
   transitionTypes?: ReadonlyArray<string>;
+
+  /**
+   * Only usable from client components.
+   */
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
 /**
@@ -172,6 +177,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     variant,
     tooltipPlacement,
     transitionTypes,
+    onClick,
   },
   ref,
 ) {
@@ -187,6 +193,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
   });
   const anchorProps = {
     'aria-label': title,
+    onClick,
     ref,
     title: showTooltip ? undefined : title,
   };

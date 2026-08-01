@@ -4,7 +4,11 @@ import type { ReactNode } from 'react';
 import { ViewTransition } from 'react';
 import { Link } from '../../dependent/Link';
 import type { SxObject } from '../../theme';
-import { sheetTransitionTypes, sheetViewTransitionProps } from './sheetTransitions';
+import {
+  SHEET_TITLE_VIEW_TRANSITION_NAME,
+  sheetTransitionTypes,
+  sheetViewTransitionProps,
+} from './sheetTransitions';
 import './sheetTransitions.css';
 
 const sheetWrapperSx: SxObject = {
@@ -43,6 +47,10 @@ const contentSx: SxObject = {
   p: 3,
 };
 
+const sheetTitleSx: SxObject = {
+  viewTransitionName: SHEET_TITLE_VIEW_TRANSITION_NAME,
+};
+
 const closeLinkSx: SxObject = {
   alignItems: 'center',
   color: 'inherit',
@@ -67,7 +75,7 @@ export function Sheet({ title, closeHref, children }: SheetProps) {
       <Box sx={sheetWrapperSx}>
         <Box sx={sheetContainerSx}>
           <Stack direction="row" sx={sheetHeaderSx}>
-            <Typography component="h1" variant="h1">
+            <Typography component="h1" sx={sheetTitleSx} variant="h1">
               {title}
             </Typography>
             <Link

@@ -2,8 +2,7 @@
 
 import type { Track } from '@dg/content-models/spotify/Track';
 import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
-import { sheetTransitionTypes } from '@dg/ui/core/sheet/sheetTransitions';
-import { Link } from '@dg/ui/dependent/Link';
+import { SheetOpenLink } from '@dg/ui/core/sheet/SheetOpenLink';
 import { createTransition, TIMING_MEDIUM, TIMING_NORMAL, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
@@ -141,14 +140,9 @@ export function SpotifyHeaderCard({ track }: SpotifyHeaderCardProps) {
     <Box aria-hidden={!isVisible} sx={getWidthWrapperSx(isVisible)}>
       <Box sx={getCollapsibleInnerSx(isVisible)}>
         {opensMusicSheet ? (
-          <Link
-            href={musicRoute}
-            sx={musicLinkSx}
-            title="Listening history"
-            transitionTypes={sheetTransitionTypes('open')}
-          >
+          <SheetOpenLink href={musicRoute} sx={musicLinkSx} title="Listening history">
             {card}
-          </Link>
+          </SheetOpenLink>
         ) : (
           card
         )}
