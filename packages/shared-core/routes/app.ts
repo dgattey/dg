@@ -8,6 +8,8 @@ export const homeRoute = '/' as const;
 
 export const musicRoute = '/music' as const;
 
+export const favoriteAlbumsRoute = '/music/albums' as const;
+
 export const devConsoleRoute = '/dev-console' as const;
 
 export const llmsTxtRoute = '/llms.txt' as const;
@@ -40,6 +42,13 @@ export const markdownPages = [
     priority: 0.7,
     summary: 'Recent Spotify plays',
     title: 'Listening history',
+  },
+  {
+    changeFrequency: 'weekly',
+    path: favoriteAlbumsRoute,
+    priority: 0.6,
+    summary: 'All-time favorite albums',
+    title: 'Favorite albums',
   },
 ] as const satisfies ReadonlyArray<MarkdownPageDefinition>;
 

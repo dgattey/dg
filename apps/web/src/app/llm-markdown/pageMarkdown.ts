@@ -1,12 +1,14 @@
 import 'server-only';
 
 import {
+  favoriteAlbumsRoute,
   homeRoute,
   isMarkdownPagePath,
   type MarkdownPagePath,
   musicRoute,
 } from '@dg/shared-core/routes/app';
 import { getHomepageMarkdown } from '../home/homepageMarkdown';
+import { getFavoriteAlbumsMarkdown } from '../music/albums/favoriteAlbumsMarkdown';
 import { getMusicMarkdown } from '../music/musicMarkdown';
 
 /**
@@ -16,6 +18,7 @@ import { getMusicMarkdown } from '../music/musicMarkdown';
 export const pageMarkdownGenerators: {
   [Path in MarkdownPagePath]: () => Promise<string>;
 } = {
+  [favoriteAlbumsRoute]: getFavoriteAlbumsMarkdown,
   [homeRoute]: getHomepageMarkdown,
   [musicRoute]: getMusicMarkdown,
 };

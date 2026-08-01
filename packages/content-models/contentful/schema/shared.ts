@@ -73,6 +73,7 @@ const projectFields = {
       }),
     ),
   ),
+  isSideProject: v.optional(v.nullable(v.boolean())),
   layout: v.optional(v.nullable(v.string())),
   link: v.optional(
     v.nullable(
@@ -81,6 +82,7 @@ const projectFields = {
       }),
     ),
   ),
+  summary: v.optional(v.nullable(v.string())),
   thumbnail: v.optional(
     v.nullable(
       v.looseObject({

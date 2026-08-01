@@ -8,6 +8,7 @@ import {
 } from '@dg/shared-core/routes/app';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { isNextFlightRequest } from '../isNextFlightRequest';
 
 const PRODUCES = ['text/html', 'text/markdown'] as const;
 
@@ -31,12 +32,6 @@ const rewriteToMarkdown = (request: NextRequest, htmlPath: MarkdownPagePath): Ne
   return rewritten;
 };
 
-const isNextInternalRequest = (request: NextRequest): boolean =>
-  request.headers.get('rsc') === '1' ||
-  request.headers.get('next-router-prefetch') === '1' ||
-  request.headers.get('purpose') === 'prefetch' ||
-  request.method !== 'GET';
-
 /**
  * Negotiates Markdown vs HTML for registered pages and rewrites `.md` twins
  * to `/llm-markdown`.
@@ -49,7 +44,8 @@ export function negotiateMarkdown(request: NextRequest): NextResponse | null {
     return rewriteToMarkdown(request, htmlFromMarkdown);
   }
 
-  if (!isMarkdownPagePath(pathname) || isNextInternalRequest(request)) {
+  // Skip Flight/RSC + non-GET: negotiation must not 406 text/x-component resumes.
+  if (!isMarkdownPagePath(pathname) || isNextFlightRequest(request) || request.method !== 'GET') {
     return null;
   }
 

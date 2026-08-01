@@ -5,7 +5,7 @@ import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import type { ButtonProps, LinkProps as MuiLinkProps } from '@mui/material';
 import { Button, Link as MuiLink } from '@mui/material';
-import { Send } from 'lucide-react';
+import { Disc3, Send } from 'lucide-react';
 import NextLink from 'next/link';
 import React from 'react';
 import type { TooltipPlacement } from '../core/Tooltip';
@@ -90,6 +90,7 @@ type LinkProps = BaseLinkProps &
  * Awesome since lucide-react v1 dropped brand icons for trademark reasons.
  */
 const BUILT_IN_ICONS: Record<string, React.ReactNode> = {
+  albums: <Disc3 size="1em" />,
   email: <Send size="1em" />,
   github: <FaIcon icon={faGithub} />,
   instagram: <FaIcon icon={faInstagram} />,

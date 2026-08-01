@@ -5,6 +5,7 @@ import {
 import { devConsoleRoute, homeRoute } from '@dg/shared-core/routes/app';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { isNextFlightRequest } from './services/isNextFlightRequest';
 import { negotiateMarkdown } from './services/markdown/contentNegotiation';
 
 /**
@@ -50,12 +51,8 @@ function protectDevConsole(request: NextRequest): NextResponse | null {
   //   falls back to a hard navigation which triggers the real auth dialog
   // Using redirect() here instead would confuse the client router — it
   // follows the 307, gets home page RSC data, and creates duplicate prompts.
-  const isPrefetchOrRsc =
-    request.headers.get('next-router-prefetch') === '1' ||
-    request.headers.get('purpose') === 'prefetch' ||
-    request.headers.get('rsc') === '1';
-
-  if (isPrefetchOrRsc) {
+  // Detect via Accept: text/x-component too — Proxy strips Flight headers.
+  if (isNextFlightRequest(request)) {
     return new NextResponse(null, { status: 401 });
   }
 

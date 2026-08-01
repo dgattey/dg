@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, IconButton, Menu, MenuItem, Radio, RadioGroup } from '@mui/material';
+import { Box, IconButton, Menu, MenuItem, Radio, RadioGroup, Typography } from '@mui/material';
 import type { MouseEvent, ReactNode } from 'react';
 import { useId, useState } from 'react';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
@@ -111,6 +111,11 @@ const hiddenRadioSx: SxObject = {
   display: 'none',
 };
 
+const optionLabelSx: SxObject = {
+  lineHeight: 1.2,
+  whiteSpace: 'nowrap',
+};
+
 /** Size to match adjacent header glass container (Logo ~52px + container py 0.75 each side) */
 const MOBILE_CONTAINER_SIZE = 64;
 
@@ -155,7 +160,10 @@ interface SwitcherOptionProps {
   onChange: (value: string) => void;
 }
 
-/** Desktop: Individual clickable option with icon and hidden radio input */
+/**
+ * Desktop: individual clickable option with hidden radio input. Icon options
+ * get a tooltip with the label; text options show the label directly.
+ */
 function SwitcherOption({ option, isSelected, onChange }: SwitcherOptionProps) {
   const element = (
     <Box component="label" sx={optionStyles}>
@@ -165,11 +173,15 @@ function SwitcherOption({ option, isSelected, onChange }: SwitcherOptionProps) {
         sx={hiddenRadioSx}
         value={option.value}
       />
-      {option.icon}
+      {option.icon ?? (
+        <Typography component="span" sx={optionLabelSx} variant="caption">
+          {option.label}
+        </Typography>
+      )}
     </Box>
   );
 
-  if (!option.label) {
+  if (!option.label || !option.icon) {
     return element;
   }
 
@@ -188,6 +200,11 @@ export interface GlassSwitcherProps {
   options: Array<GlassSwitcherOption>;
   sx?: SxElement;
   'aria-label'?: string;
+  /**
+   * Icon for the mobile menu trigger. Required for text-only options, which
+   * have no per-option icon to show; falls back to the selected option's icon.
+   */
+  mobileIcon?: ReactNode;
 }
 
 /**
@@ -201,8 +218,11 @@ export function GlassSwitcher({
   options,
   sx,
   'aria-label': ariaLabel,
+  mobileIcon,
 }: GlassSwitcherProps) {
   const menuId = useId();
+  // Unique radio name so multiple switchers on a page don't share a native group
+  const radioGroupName = useId();
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
 
   const selectedIndex = Math.max(
@@ -247,7 +267,7 @@ export function GlassSwitcher({
           onClick={handleMenuOpen}
           sx={mobileButtonSx}
         >
-          {selectedOption?.icon}
+          {mobileIcon ?? selectedOption?.icon}
         </IconButton>
         <Menu
           anchorEl={menuAnchor}
@@ -275,7 +295,7 @@ export function GlassSwitcher({
       <MouseAwareGlassContainer data-role="glass-switcher" sx={desktopSx}>
         <RadioGroup
           aria-label={ariaLabel}
-          name="glass-switcher"
+          name={radioGroupName}
           onChange={(event) => onChange(event.target.value)}
           sx={radioGroupSx}
           value={value}
