@@ -2,7 +2,10 @@ import { ColorSchemeToggleClient } from '@dg/ui/core/ColorSchemeToggleClient';
 import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
-import { SITE_HEADER_VIEW_TRANSITION_NAME } from '@dg/ui/core/sheet/sheetTransitions';
+import {
+  pinnedChromeSx,
+  SITE_HEADER_VIEW_TRANSITION_NAME,
+} from '@dg/ui/core/sheet/sheetTransitions';
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { Suspense } from 'react';
@@ -18,9 +21,7 @@ const stickyContainerSx: SxObject = {
   zIndex: 10, // Higher z-index to stay above grid content with transforms
 };
 
-const siteHeaderSx: SxObject = {
-  viewTransitionName: SITE_HEADER_VIEW_TRANSITION_NAME,
-};
+const siteHeaderSx: SxObject = pinnedChromeSx(SITE_HEADER_VIEW_TRANSITION_NAME);
 
 const navSx: SxObject = {
   columnGap: { sm: 2, xs: 1.5 },

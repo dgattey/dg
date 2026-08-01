@@ -2,7 +2,10 @@ import type { RenderableLink } from '@dg/content-models/contentful/renderables/l
 import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
-import { SITE_FOOTER_VIEW_TRANSITION_NAME } from '@dg/ui/core/sheet/sheetTransitions';
+import {
+  pinnedChromeSx,
+  SITE_FOOTER_VIEW_TRANSITION_NAME,
+} from '@dg/ui/core/sheet/sheetTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Container, Divider, Stack, Typography } from '@mui/material';
@@ -36,9 +39,7 @@ const footerContainerSx: SxObject = {
   padding: 0,
 };
 
-const siteFooterSx: SxObject = {
-  viewTransitionName: SITE_FOOTER_VIEW_TRANSITION_NAME,
-};
+const siteFooterSx: SxObject = pinnedChromeSx(SITE_FOOTER_VIEW_TRANSITION_NAME);
 
 const dividerSx: SxObject = {
   marginBottom: 3,
