@@ -17,6 +17,7 @@ import { Footer } from './layouts/Footer';
 import { Header } from './layouts/Header';
 import { PageScrollProvider } from './layouts/PageScrollContext';
 import { RefreshOnFocusProvider } from './layouts/RefreshOnFocusProvider';
+import { WebMcpTools } from './layouts/WebMcpTools';
 import { baseMetadata, viewport } from './metadata';
 
 export const metadata: Metadata = baseMetadata;
@@ -41,6 +42,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <GlobalStyleProvider>
               {/* Refresh RSC data on focus or navigation */}
               <RefreshOnFocusProvider />
+              <WebMcpTools />
               {/* Scroll provider wraps header + content for docked header thumbnail */}
               <PageScrollProvider>
                 <Header />
