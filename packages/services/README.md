@@ -39,16 +39,6 @@ Low-level HTTP client utilities used by service integrations:
 | `getStatus.ts`                  | HTTP status code helpers                |
 
 
-## Images
-
-Server-side image utilities for creating UI-friendly derived data.
-
-
-| Export                                 | Description                                                  |
-| -------------------------------------- | ------------------------------------------------------------ |
-| `getImageGradientInformationFromUrl()` | Builds a CSS gradient + contrast text hint from an image URL |
-
-
 ## Contentful
 
 CMS integration for site content. Uses GraphQL with Valibot-validated responses.

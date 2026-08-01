@@ -16,6 +16,12 @@ export const llmsTxtRoute = '/llms.txt' as const;
 
 export const llmsFullTxtRoute = '/llms-full.txt' as const;
 
+export const apiCatalogRoute = '/.well-known/api-catalog' as const;
+
+export const apiOpenApiRoute = '/.well-known/openapi.json' as const;
+
+export const apiStatusRoute = '/.well-known/api-status' as const;
+
 /** Internal rewrite target for Markdown (not a public agent URL). */
 export const internalMarkdownRoutePrefix = '/llm-markdown' as const;
 

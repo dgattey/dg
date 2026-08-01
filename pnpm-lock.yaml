@@ -453,9 +453,6 @@ importers:
       server-only:
         specifier: 'catalog:'
         version: 0.0.1
-      sharp:
-        specifier: 'catalog:'
-        version: 0.35.3(@types/node@26.1.1)
       valibot:
         specifier: 'catalog:'
         version: 1.4.2(@typescript/typescript6@6.0.2)
