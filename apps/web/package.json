@@ -42,7 +42,7 @@
   "name": "@dg/web",
   "private": true,
   "scripts": {
-    "build": "next build --turbopack",
+    "build": "next build --turbopack && tsx scripts/verifyTracedNativeLibraries.ts",
     "build:analyze": "next experimental-analyze",
     "build:serve": "next start",
     "check": "biome check --write .",
