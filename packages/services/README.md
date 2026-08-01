@@ -89,8 +89,7 @@ Spotify API integration for currently playing, history, and albums.
 | `fetchRecentlyPlayed()`      | Recently played or currently playing track            |
 | `fetchMusicHistoryPage()`    | Paginated listening history from the DB               |
 | `fetchPlaylistAlbums()`      | Favorite albums from a playlist                       |
-| `syncSpotifyHistory()`       | Incremental history sync                              |
-| `importSpotifyHistory()`     | Bulk import path                                      |
+| `syncSpotifyHistory()`       | Incremental history sync (seeds empty DB from recent plays) |
 | `spotifyClient`              | Configured REST client with token refresh             |
 | `CurrentlyPlaying`           | Type in `@dg/content-models/spotify/CurrentlyPlaying` |
 | `RecentlyPlayed`             | Type in `@dg/content-models/spotify/RecentlyPlayed`   |

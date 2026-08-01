@@ -99,28 +99,45 @@ describe('Spotify sync route', () => {
     expect(mockSpotifyGet).not.toHaveBeenCalled();
   });
 
-  it('skips syncing when history is not seeded', async () => {
-    // Sync treats any SpotifyPlay row as seeded history. Parallel suites share
+  it('seeds history when the database is empty', async () => {
+    // Sync reads the whole SpotifyPlay table. Parallel suites share
     // DATABASE_URL_TEST, so skip when other tests have visible rows.
     const totalCount = await db.SpotifyPlay.count();
     if (totalCount > 0) {
       return;
     }
 
+    mockSpotifyGet.mockResolvedValue({
+      response: {
+        json: async () => ({
+          items: [
+            {
+              played_at: '2025-01-02T00:00:00.000Z',
+              track: buildTrackApi('seed'),
+            },
+          ],
+          next: null,
+        }),
+      },
+      status: 200,
+    });
+
     const response = await handleSpotifySync(createRequest('Bearer test-secret'));
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
       gapDetected: false,
-      inserted: 0,
-      skipped: true,
+      inserted: 1,
       success: true,
-      total: 0,
+      total: 1,
     });
-    expect(mockSpotifyGet).not.toHaveBeenCalled();
+    expect(mockSpotifyGet).toHaveBeenCalledWith(
+      expect.stringMatching(/^me\/player\/recently-played\?limit=50$/),
+    );
+    expect(mockRevalidateTag).toHaveBeenCalledWith('spotify-history', 'max');
   });
 
-  it('syncs when history is seeded', async () => {
+  it('syncs when history already exists', async () => {
     await db.SpotifyPlay.create({
       albumId: `${PREFIX}-album-seed`,
       artistIds: [`${PREFIX}-artist-seed`],
@@ -148,7 +165,6 @@ describe('Spotify sync route', () => {
     expect(mockSpotifyGet).toHaveBeenCalledTimes(1);
     // Check total (tracks returned from API) and that new row was added
     expect(response.body.total).toBe(1);
-    expect(response.body.skipped).toBe(false);
     expect(response.body.gapDetected).toBe(false);
     expect(response.body.success).toBe(true);
     // Count only rows with our test prefix to avoid conflicts with parallel tests

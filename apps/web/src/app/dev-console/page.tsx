@@ -2,7 +2,6 @@ import 'server-only';
 
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import { OauthCard } from './oauth/OauthCard';
-import { SpotifyImportCard } from './spotify/SpotifyImportCard';
 import { WebhookCard } from './webhooks/WebhookCard';
 
 const oauthProviders = ['strava', 'spotify'] as const;
@@ -71,7 +70,6 @@ export default function ConsolePage() {
 
         <CardSection title="Tools">
           <WebhookCard />
-          <SpotifyImportCard />
         </CardSection>
       </Stack>
     </main>
