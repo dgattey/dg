@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
-import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
+import { devConsoleRoute, homeRoute, musicRoute } from '@dg/shared-core/routes/app';
 import { Sheet } from '@dg/ui/core/sheet/Sheet';
 import { Stack } from '@mui/material';
 import type { Metadata } from 'next';
@@ -29,9 +29,9 @@ async function MusicHistory() {
     tracks = result.tracks;
     nextCursor = result.nextCursor;
   } catch (error) {
-    // In development, redirect to the dev page to set up OAuth
+    // In development, redirect to the dev console to set up OAuth
     if (isMissingTokenError(error) && process.env.NODE_ENV === 'development') {
-      redirect('/dev');
+      redirect(devConsoleRoute);
     }
     throw error;
   }

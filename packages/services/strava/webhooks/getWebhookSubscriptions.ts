@@ -28,7 +28,7 @@ export type WebhookSubscriptionsStatus = {
  */
 export async function getWebhookSubscriptions(): Promise<WebhookSubscriptionsStatus> {
   try {
-    const subscriptions = await listSubscriptions('strava');
+    const subscriptions = await listSubscriptions();
     return {
       error: null,
       subscriptions: subscriptions.map((subscription) => ({

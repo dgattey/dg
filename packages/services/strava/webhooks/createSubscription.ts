@@ -4,16 +4,15 @@ import { StravaApiError } from '@dg/shared-core/errors/StravaApiError';
 import { log } from '@dg/shared-core/logging/log';
 import type { WebhookSubscription } from './listSubscriptions';
 import { parseStravaError } from './parseStravaError';
-import type { WebhookType } from './WebhookType';
 import { getWebhookSubscriptionConfig, standardParams } from './webhookSubscriptionConfigs';
 
 /**
- * Creates a webhook subscription.
+ * Creates a Strava webhook subscription.
  * Assumes there's something running at the callback URL for the webhook to call back to.
  * Returns the created subscription, or throws a `StravaApiError` on refusal.
  */
-export async function createSubscription(type: WebhookType): Promise<WebhookSubscription> {
-  const config = getWebhookSubscriptionConfig(type);
+export async function createSubscription(): Promise<WebhookSubscription> {
+  const config = getWebhookSubscriptionConfig();
   const { endpoint, verifyToken, callbackUrl, headers } = config;
 
   if (!verifyToken || !callbackUrl) {
@@ -34,7 +33,6 @@ export async function createSubscription(type: WebhookType): Promise<WebhookSubs
       client_id: config.id,
       verify_token: verifyToken,
     },
-    type,
     verifyToken,
   });
 
@@ -50,7 +48,6 @@ export async function createSubscription(type: WebhookType): Promise<WebhookSubs
       body: errorBody,
       callbackUrl,
       status: response.status,
-      type,
     });
     const userMessage = parseStravaError(response.status, errorBody, callbackUrl);
     throw new StravaApiError(userMessage, response.status);

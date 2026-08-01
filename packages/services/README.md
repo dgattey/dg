@@ -11,17 +11,18 @@ Server-side API integrations and data fetching for external services. This packa
 | `content-models` | Types, schemas, validation, pure transforms | `RenderableLink`, `Track`, Valibot schemas |
 
 
-**Rule of thumb**: If it makes an HTTP request, touches the database, or requires `server-only`, it belongs here. If it's a type, schema, or pure function on data shapes, it belongs in `content-models`.
+**Rule of thumb**: If it makes an HTTP request, touches the database, or requires `server-only`, it belongs here. If it's a type, schema, or pure function on data shapes, it belongs in `content-models`. The `content-models` name covers validated external payloads (Contentful, Spotify, Strava), not CMS-only types.
 
 ## Structure
 
 ```
 services/
+├── auth/             # Dev-console basic auth helpers
 ├── clients/          # Reusable HTTP client utilities
-├── images/           # Server-side image utilities
 ├── contentful/       # Contentful CMS integration
-├── spotify/          # Spotify API integration
-├── strava/           # Strava API integration
+├── oauth/            # Shared OAuth flows (Spotify + Strava)
+├── spotify/          # Spotify API + history sync
+├── strava/           # Strava API + webhooks
 ```
 
 ## Clients
@@ -37,6 +38,21 @@ Low-level HTTP client utilities used by service integrations:
 | `refreshedAccessToken.ts`       | Token refresh logic for OAuth flows     |
 | `RefreshTokenConfig.ts`         | Configuration type for token refresh    |
 | `getStatus.ts`                  | HTTP status code helpers                |
+
+
+## OAuth
+
+Shared OAuth orchestration under `oauth/`:
+
+
+| Export                           | Description                                      |
+| -------------------------------- | ------------------------------------------------ |
+| `initiateOauthFlow()`            | Starts an OAuth redirect for a provider          |
+| `completeOauthFlow()`            | Finishes the callback and stores tokens          |
+| `exchangeSpotifyCodeForToken()`  | Spotify PKCE code exchange                       |
+| `exchangeStravaCodeForToken()`   | Strava client-secret code exchange               |
+| `getOauthStatus()`               | Connection status for a provider                 |
+| `forceRefreshToken()`            | Forces a token refresh                           |
 
 
 ## Contentful
@@ -65,16 +81,20 @@ CMS integration for site content. Uses GraphQL with Valibot-validated responses.
 
 ## Spotify
 
-Spotify API integration for currently playing/recently played tracks.
+Spotify API integration for currently playing, history, and albums.
 
 
-| Export                  | Description                                             |
-| ----------------------- | ------------------------------------------------------- |
-| `fetchRecentlyPlayed()` | Gets recently played or currently playing track         |
-| `spotifyClient`         | Configured REST client with token refresh               |
-| `CurrentlyPlaying`      | Type in `@dg/content-models/spotify/CurrentlyPlaying`   |
-| `RecentlyPlayed`        | Type in `@dg/content-models/spotify/RecentlyPlayed`     |
-| `Track`                 | Shared track type in `@dg/content-models/spotify/Track` |
+| Export                       | Description                                           |
+| ---------------------------- | ----------------------------------------------------- |
+| `fetchRecentlyPlayed()`      | Recently played or currently playing track            |
+| `fetchMusicHistoryPage()`    | Paginated listening history from the DB               |
+| `fetchPlaylistAlbums()`      | Favorite albums from a playlist                       |
+| `syncSpotifyHistory()`       | Incremental history sync                              |
+| `importSpotifyHistory()`     | Bulk import path                                      |
+| `spotifyClient`              | Configured REST client with token refresh             |
+| `CurrentlyPlaying`           | Type in `@dg/content-models/spotify/CurrentlyPlaying` |
+| `RecentlyPlayed`             | Type in `@dg/content-models/spotify/RecentlyPlayed`   |
+| `Track`                      | Shared track type in `@dg/content-models/spotify/Track` |
 
 
 ## Strava
@@ -88,23 +108,22 @@ Strava API integration for activity data and webhooks.
 | `fetchStravaActivityFromApi()`      | Fetches activity directly from Strava API              |
 | `syncStravaWebhookUpdateWithDb()`   | Syncs webhook updates to database                      |
 | `echoStravaChallengeIfValid()`      | Handles Strava webhook verification                    |
-| `exchangeCodeForToken()`            | Exchanges an OAuth code for tokens                     |
 | `mapActivityFromApi()`              | Converts API response (snake_case) to domain format    |
 | `stravaClient`                      | Configured REST client with token refresh              |
 | `stravaTokenExchangeClient`         | Client for OAuth token exchange                        |
 | `StravaWebhookEvent`                | Type in `@dg/content-models/strava/StravaWebhookEvent` |
 
 
-### Webhook Subscription Management
+### Webhook subscription management
 
 Functions for managing Strava webhook subscriptions (in `strava/webhooks/`):
 
 
-| Export                         | Description                          |
-| ------------------------------ | ------------------------------------ |
-| `listSubscriptions(type)`      | Lists all webhook subscriptions      |
-| `createSubscription(type)`     | Creates a new webhook subscription   |
-| `deleteSubscription(type, id)` | Deletes a webhook subscription by ID |
+| Export                     | Description                          |
+| -------------------------- | ------------------------------------ |
+| `listSubscriptions()`      | Lists all webhook subscriptions      |
+| `createSubscription()`     | Creates a new webhook subscription   |
+| `deleteSubscription(id)`   | Deletes a webhook subscription by ID |
 
 
 ## Environment Variables
@@ -124,4 +143,3 @@ Required environment variables (see `config/env.secrets.keys`):
 - `shared-core` - Shared utilities
 - `graphql-request` - GraphQL client
 - `wretch` - Fetch wrapper for REST APIs
-

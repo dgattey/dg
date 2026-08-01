@@ -35,14 +35,15 @@ app-only formatting. Avoid wrapper re-exports that just pass through to
 
 ### Testing
 
-For test database setup, use `@dg/services/testing/setupTestDatabase`:
+Runtime app code must not import `@dg/db`. Tests may import `@dg/db/testing`
+(for example `setupTestDatabase` from `@dg/db/testing/databaseSetup`).
 
 ```ts
-// ❌ Bad - test importing db directly
-import { setupTestDatabase } from '@dg/db/testing';
+// ❌ Bad - app runtime importing db
+import { db } from '@dg/db';
 
-// ✅ Good - test imports from services
-import { setupTestDatabase } from '@dg/services/testing/setupTestDatabase';
+// ✅ Good - tests using the db testing helpers
+import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 ```
 
 ## Server-only services
