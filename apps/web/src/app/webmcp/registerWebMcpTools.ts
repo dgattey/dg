@@ -132,17 +132,12 @@ export function registerWebMcpTools(options?: {
 
   const tools = buildTools(navigate);
 
-  if (typeof modelContext.provideContext === 'function') {
-    modelContext.provideContext({ tools });
-    return true;
+  if (typeof modelContext.registerTool !== 'function') {
+    return false;
   }
 
-  if (typeof modelContext.registerTool === 'function') {
-    for (const tool of tools) {
-      modelContext.registerTool(tool, { signal: options?.signal });
-    }
-    return true;
+  for (const tool of tools) {
+    modelContext.registerTool(tool, { signal: options?.signal });
   }
-
-  return false;
+  return true;
 }

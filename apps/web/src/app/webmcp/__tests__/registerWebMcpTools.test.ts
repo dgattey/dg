@@ -6,34 +6,33 @@ describe('registerWebMcpTools', () => {
     expect(registerWebMcpTools({ globalObject: {} as typeof globalThis })).toBe(false);
   });
 
-  it('registers read-only tools via provideContext when available', async () => {
-    let registered: ReadonlyArray<WebMcpTool> | undefined;
+  it('registers read-only tools via navigator.modelContext.registerTool', async () => {
+    const registered: WebMcpTool[] = [];
+    const registerTool = jest.fn((tool: WebMcpTool) => {
+      registered.push(tool);
+    });
     const globalObject = {
-      document: {
-        modelContext: {
-          provideContext: ({ tools }: { tools: ReadonlyArray<WebMcpTool> }) => {
-            registered = tools;
-          },
-        },
-      },
       location: { assign: jest.fn() },
+      navigator: {
+        modelContext: { registerTool },
+      },
     } as unknown as typeof globalThis;
 
     expect(registerWebMcpTools({ globalObject })).toBe(true);
-    expect(registered?.map((tool) => tool.name)).toEqual([
+    expect(registered.map((tool) => tool.name)).toEqual([
       'list_pages',
       'fetch_markdown',
       'open_page',
     ]);
-    expect(registered?.every((tool) => tool.annotations?.readOnlyHint === true)).toBe(true);
+    expect(registered.every((tool) => tool.annotations?.readOnlyHint === true)).toBe(true);
 
-    const listPages = registered?.find((tool) => tool.name === 'list_pages');
+    const listPages = registered.find((tool) => tool.name === 'list_pages');
     const listed = await listPages?.execute({});
     expect(listed).toContain('/music/albums');
     expect(listed).toContain('/llms.txt');
   });
 
-  it('falls back to registerTool with an abort signal', () => {
+  it('passes an abort signal to every registered tool', () => {
     const registerTool = jest.fn();
     const controller = new AbortController();
     const globalObject = {
