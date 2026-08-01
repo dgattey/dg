@@ -1,10 +1,12 @@
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
-import { devConsoleRoute } from '@dg/shared-core/routes/app';
+import { devConsoleRoute, musicRoute } from '@dg/shared-core/routes/app';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
+import { SheetOpenLink } from '@dg/ui/core/sheet/SheetOpenLink';
+import { SITE_FOOTER_VIEW_TRANSITION_NAME } from '@dg/ui/core/sheet/sheetTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
-import { Container, Divider, Stack } from '@mui/material';
+import { Box, Container, Divider, Stack } from '@mui/material';
 import { cacheLife } from 'next/cache';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
@@ -29,6 +31,10 @@ const footerSectionSx: SxObject = {
 
 const footerContainerSx: SxObject = {
   padding: 0,
+};
+
+const siteFooterSx: SxObject = {
+  viewTransitionName: SITE_FOOTER_VIEW_TRANSITION_NAME,
 };
 
 const dividerSx: SxObject = {
@@ -109,7 +115,7 @@ export async function Footer() {
   return (
     <Section sx={footerSectionSx}>
       <Container sx={footerContainerSx}>
-        <footer>
+        <Box component="footer" sx={siteFooterSx}>
           <Divider sx={dividerSx} />
           <Nav sx={footerNavSx}>
             <NavGroup>
@@ -135,6 +141,18 @@ export async function Footer() {
                   </NavItem>
                 </>
               ) : null}
+              <NavItem sx={navItemNoPaddingSx}>•</NavItem>
+              <NavItem>
+                <SheetOpenLink
+                  color="inherit"
+                  href={musicRoute}
+                  morphsTitle
+                  title="Listening history"
+                  variant="caption"
+                >
+                  Listening history
+                </SheetOpenLink>
+              </NavItem>
               {process.env.NODE_ENV !== 'production' ? (
                 <>
                   <NavItem sx={navItemNoPaddingSx}>•</NavItem>
@@ -166,7 +184,7 @@ export async function Footer() {
               </Stack>
             </NavGroup>
           </Nav>
-        </footer>
+        </Box>
       </Container>
     </Section>
   );

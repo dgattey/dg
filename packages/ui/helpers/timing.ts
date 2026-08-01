@@ -30,12 +30,31 @@ export const EASING_DEFAULT = 'cubic-bezier(0.4, 0, 0.2, 1)';
 export const EASING_EASE_OUT = 'ease-out';
 export const EASING_BOUNCE = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 
+/** Fast start, long settle. For entrances that should land without overshoot. */
+export const EASING_DECELERATE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
+
 /**
  * Bouncy timing function for spring-like animations.
  * This creates an overshoot effect that settles naturally.
  */
 export const EASING_BOUNCY =
   'linear(0, 0.205 2.1%, 0.822 6.8%, 1.073 9.1%, 1.256 11.6%, 1.308, 1.333 14.1%, 1.337,1.333 15.6%, 1.303 17.2%, 0.98 25.6%, 0.921 28.1%, 0.905, 0.896 30.6%,0.895 32.1%, 0.905 33.8%, 1.006 42.2%, 1.024, 1.033 47.1%, 1.03 50.5%,0.999 58.8%, 0.99 63.5%, 1.003 79.6%, 1)';
+
+/**
+ * `:root` CSS custom properties sourced from the timing/easing constants above.
+ * Plain CSS (e.g. view-transition pseudo-elements) must consume these vars
+ * instead of duplicating millisecond or curve literals.
+ */
+export function getTimingCssVars(): Record<`--${string}`, string> {
+  return {
+    '--easing-decelerate': EASING_DECELERATE,
+    '--easing-default': EASING_DEFAULT,
+    '--easing-ease-out': EASING_EASE_OUT,
+    '--timing-fast': `${TIMING_FAST}ms`,
+    '--timing-medium': `${TIMING_MEDIUM}ms`,
+    '--timing-slow': `${TIMING_SLOW}ms`,
+  };
+}
 
 /**
  * Creates a CSS transition string with standardized timing.

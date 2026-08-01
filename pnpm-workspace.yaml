@@ -47,13 +47,20 @@ catalog:
   jest-environment-jsdom: 30.4.1
   lucide-react: 1.25.0
   next: 16.2.10
-  react: 19.2.7
+  # ViewTransition + addTransitionType ship on the canary channel only (not 19.2.x stable).
+  react: 19.3.0-canary-756fdd47-20260727
+  react-dom: 19.3.0-canary-756fdd47-20260727
   server-only: 0.0.1
   sharp: 0.35.3
   tsx: 4.23.1
   typescript: npm:@typescript/typescript6@6.0.2
   valibot: 1.4.2
   wretch: 3.0.9
+
+# Force a single React canary for ViewTransition across peers of next/mui/testing.
+overrides:
+  react: 'catalog:'
+  react-dom: 'catalog:'
 
 # pnpm quarantines releases younger than minimumReleaseAge (1 day by default).
 # pnpm appends to this list itself when a pinned version is newer than that; it
@@ -70,3 +77,6 @@ minimumReleaseAgeExclude:
   - '@biomejs/cli-win32-x64@2.5.5'
   - '@testing-library/jest-dom@7.0.0'
   - vercel@56.4.1
+  - react@19.3.0-canary-756fdd47-20260727
+  - react-dom@19.3.0-canary-756fdd47-20260727
+  - scheduler@0.28.0-canary-756fdd47-20260727

@@ -1,20 +1,26 @@
 import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
-import { musicRoute } from '@dg/shared-core/routes/app';
-import { Stack, Typography } from '@mui/material';
+import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
+import { Sheet } from '@dg/ui/core/sheet/Sheet';
+import { Stack } from '@mui/material';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
+import { Suspense } from 'react';
 import { getMusicHistory } from '../../services/music';
 import { markdownAlternates } from '../layouts/markdownAlternates';
+import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
+
+const TITLE = 'Listening history';
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(musicRoute),
-  title: 'Listening history',
+  description: 'Recent tracks played on Spotify.',
+  title: TITLE,
 };
 
-export default async function MusicPage() {
+async function MusicHistory() {
   let tracks: Awaited<ReturnType<typeof getMusicHistory>>['tracks'];
   let nextCursor: Awaited<ReturnType<typeof getMusicHistory>>['nextCursor'];
 
@@ -31,11 +37,24 @@ export default async function MusicPage() {
   }
 
   return (
-    <main>
-      <Stack spacing={2}>
-        <Typography variant="h1">Listening history</Typography>
-        <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />
-      </Stack>
-    </main>
+    <Stack spacing={2}>
+      <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />
+    </Stack>
+  );
+}
+
+/**
+ * The sheet shell stays synchronous so it commits in the same render as the
+ * outgoing page. Awaiting here instead would suspend the whole route, the old
+ * page would already be unmounted by the time the sheet arrives, and the view
+ * transition would have nothing to animate away from.
+ */
+export default function MusicPage() {
+  return (
+    <Sheet closeHref={homeRoute} title={TITLE}>
+      <Suspense fallback={<MusicHistorySkeleton />}>
+        <MusicHistory />
+      </Suspense>
+    </Sheet>
   );
 }

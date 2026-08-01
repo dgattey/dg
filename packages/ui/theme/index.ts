@@ -2,6 +2,7 @@ import type { SxProps as MuiSxProps, Theme } from '@mui/material/styles';
 import { createTheme, responsiveFontSizes } from '@mui/material/styles';
 import type {} from '@mui/material/themeCssVarsAugmentation';
 import type { SystemStyleObject } from '@mui/system';
+import { getTimingCssVars } from '../helpers/timing';
 import { onCanvas } from './color';
 import { COLOR_SCHEME_ATTRIBUTE } from './colorScheme';
 import { getShadows } from './extraShadows';
@@ -135,6 +136,7 @@ export function getTheme(): Theme {
       MuiCssBaseline: {
         styleOverrides: (theme) => ({
           ':root': {
+            ...getTimingCssVars(),
             fontVariant: 'tabular-nums',
             wordBreak: 'break-word',
             [theme.breakpoints.up('sm')]: {

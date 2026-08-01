@@ -71,6 +71,17 @@ export type BaseLinkProps = {
    * navigation would interfere with the auth flow.
    */
   forcePageNavigation?: boolean;
+
+  /**
+   * Passed to Next.js Link for View Transition typing on internal navigations.
+   * Ignored for external and forcePageNavigation links.
+   */
+  transitionTypes?: ReadonlyArray<string>;
+
+  /**
+   * Only usable from client components.
+   */
+  onClick?: React.MouseEventHandler<HTMLAnchorElement>;
 };
 
 /**
@@ -165,6 +176,8 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     underline = 'hover',
     variant,
     tooltipPlacement,
+    transitionTypes,
+    onClick,
   },
   ref,
 ) {
@@ -180,6 +193,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
   });
   const anchorProps = {
     'aria-label': title,
+    onClick,
     ref,
     title: showTooltip ? undefined : title,
   };
@@ -207,7 +221,12 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
 
   // Internal links: NextLink <a> wrapping MuiLink <span> for client-side nav
   return wrap(
-    <NextLink {...anchorProps} href={href} style={{ color: 'inherit', textDecoration: 'none' }}>
+    <NextLink
+      {...anchorProps}
+      href={href}
+      style={{ color: 'inherit', textDecoration: 'none' }}
+      transitionTypes={transitionTypes ? [...transitionTypes] : undefined}
+    >
       <MuiLink component="span" {...muiStyleProps}>
         {contents}
       </MuiLink>

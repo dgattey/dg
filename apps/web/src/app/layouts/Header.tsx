@@ -2,7 +2,9 @@ import { ColorSchemeToggleClient } from '@dg/ui/core/ColorSchemeToggleClient';
 import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
+import { SITE_HEADER_VIEW_TRANSITION_NAME } from '@dg/ui/core/sheet/sheetTransitions';
 import type { SxObject } from '@dg/ui/theme';
+import { Box } from '@mui/material';
 import { Suspense } from 'react';
 import { getLatestSong } from '../../services/spotify';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
@@ -14,6 +16,10 @@ const stickyContainerSx: SxObject = {
   position: 'sticky',
   top: 0,
   zIndex: 10, // Higher z-index to stay above grid content with transforms
+};
+
+const siteHeaderSx: SxObject = {
+  viewTransitionName: SITE_HEADER_VIEW_TRANSITION_NAME,
 };
 
 const navSx: SxObject = {
@@ -50,7 +56,7 @@ async function SpotifyHeaderCardSlot() {
 export function Header() {
   return (
     <Section sx={stickyContainerSx}>
-      <header data-site-header={true}>
+      <Box component="header" data-site-header={true} sx={siteHeaderSx}>
         <Nav sx={navSx}>
           <NavGroup>
             <NavItem variant="body2">
@@ -68,7 +74,7 @@ export function Header() {
             </NavItem>
           </NavGroup>
         </Nav>
-      </header>
+      </Box>
     </Section>
   );
 }

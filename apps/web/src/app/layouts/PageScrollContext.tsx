@@ -12,8 +12,9 @@ import { createContext, useContext, useState } from 'react';
  * - `0` = tracked element visible onscreen
  * - `1` = tracked element offscreen
  *
- * When no tracker mounts, scrollProgress stays null and consumers can
- * choose their default behavior.
+ * Null only ever means a fresh page load: a tracker that unmounts reports 1,
+ * since an element that left the document is offscreen. Consumers pick their
+ * own default for null.
  */
 type PageScrollContextValue = {
   /** null = not measured, 0 = element visible, 1 = element offscreen */
