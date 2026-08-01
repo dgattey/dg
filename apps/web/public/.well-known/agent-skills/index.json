@@ -1,0 +1,19 @@
+{
+  "$schema": "https://schemas.agentskills.io/discovery/0.2.0/schema.json",
+  "skills": [
+    {
+      "description": "Read this site as Markdown via /llms.txt, /llms-full.txt, .md twins, and Accept negotiation.",
+      "digest": "sha256:6c5a3fcd79d881e15dd08fb221452d5eacef452f46c741ee00198a2d6a01cccf",
+      "name": "read-site-markdown",
+      "type": "skill-md",
+      "url": "/.well-known/agent-skills/read-site-markdown/SKILL.md"
+    },
+    {
+      "description": "Explore public listening history and favorite albums via /music and /music/albums HTML and Markdown URLs.",
+      "digest": "sha256:fb1c7c4d846fea37c1737b0524b2ef19ef69160813625a9ad22f05a62af3c1ab",
+      "name": "explore-music",
+      "type": "skill-md",
+      "url": "/.well-known/agent-skills/explore-music/SKILL.md"
+    }
+  ]
+}

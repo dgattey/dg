@@ -18,6 +18,7 @@ import { Header } from './layouts/Header';
 import { PageScrollProvider } from './layouts/PageScrollContext';
 import { RefreshOnFocusProvider } from './layouts/RefreshOnFocusProvider';
 import { baseMetadata, viewport } from './metadata';
+import { SiteWebMcp } from './webmcp/SiteWebMcp';
 
 export const metadata: Metadata = baseMetadata;
 export { viewport };
@@ -52,6 +53,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                 </Section>
               </PageScrollProvider>
               <Footer />
+              <SiteWebMcp />
               <SpeedInsights />
               <Analytics />
             </GlobalStyleProvider>
