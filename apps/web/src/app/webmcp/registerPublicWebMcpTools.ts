@@ -43,9 +43,9 @@ export function registerPublicWebMcpTools(args: {
 
   const controller = new AbortController();
   for (const tool of tools) {
-    void Promise.resolve(
-      modelContext.registerTool(tool, { signal: controller.signal }),
-    ).catch(() => undefined);
+    void Promise.resolve(modelContext.registerTool(tool, { signal: controller.signal })).catch(
+      () => undefined,
+    );
   }
 
   return () => {

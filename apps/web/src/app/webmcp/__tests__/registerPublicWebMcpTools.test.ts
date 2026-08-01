@@ -2,10 +2,7 @@
  * @jest-environment node
  */
 
-import {
-  registerPublicWebMcpTools,
-  resolveModelContext,
-} from '../registerPublicWebMcpTools';
+import { registerPublicWebMcpTools, resolveModelContext } from '../registerPublicWebMcpTools';
 import type { ModelContext, WebMcpToolDefinition } from '../webMcpTypes';
 
 function createTool(name: string): WebMcpToolDefinition {
