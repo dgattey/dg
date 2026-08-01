@@ -100,6 +100,13 @@ describe('Spotify sync route', () => {
   });
 
   it('skips syncing when history is not seeded', async () => {
+    // Sync treats any SpotifyPlay row as seeded history. Parallel suites share
+    // DATABASE_URL_TEST, so skip when other tests have visible rows.
+    const totalCount = await db.SpotifyPlay.count();
+    if (totalCount > 0) {
+      return;
+    }
+
     const response = await handleSpotifySync(createRequest('Bearer test-secret'));
 
     expect(response.status).toBe(200);

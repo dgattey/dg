@@ -1,5 +1,6 @@
 import { Card, CardContent, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
+import { DevConsoleCardBoundary } from './DevConsoleCardBoundary';
 
 type DevConsoleCardShellProps = {
   children: ReactNode;
@@ -14,7 +15,7 @@ export function DevConsoleCardShell({ children }: DevConsoleCardShellProps) {
             gap: 2,
           }}
         >
-          {children}
+          <DevConsoleCardBoundary>{children}</DevConsoleCardBoundary>
         </Stack>
       </CardContent>
     </Card>
