@@ -1,3 +1,5 @@
+import type { SxObject } from '../../theme';
+
 export type SheetNavigationIntent = 'open' | 'close';
 
 const SHEET_TRANSITION_TYPES = {
@@ -13,6 +15,25 @@ export function sheetTransitionTypes(intent: SheetNavigationIntent): Array<Sheet
 
 export const SITE_HEADER_VIEW_TRANSITION_NAME = 'site-header';
 export const SITE_FOOTER_VIEW_TRANSITION_NAME = 'site-footer';
+
+/**
+ * Chrome that has to stay pinned across a sheet navigation needs a
+ * view-transition-name, but a named element is also a backdrop root: any
+ * `backdrop-filter` inside it samples that element instead of the page, so
+ * glass surfaces in the header flatten out to a plain tint. The name is only
+ * read while a transition is capturing, so it is claimed only then and the
+ * glass keeps the page as its backdrop the rest of the time.
+ *
+ * The selector leads with `html` rather than `:root`, which Emotion would read
+ * as a pseudo-class on this element and never match.
+ */
+export function pinnedChromeSx(name: string): SxObject {
+  return {
+    'html:active-view-transition &': {
+      viewTransitionName: name,
+    },
+  };
+}
 
 /**
  * Shared between the sheet's heading and the one control allowed to morph into
