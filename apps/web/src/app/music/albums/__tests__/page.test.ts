@@ -2,10 +2,9 @@ import { homeRoute } from '@dg/shared-core/routes/app';
 import type { ReactElement } from 'react';
 
 jest.mock('@dg/ui/core/sheet/Sheet', () => ({
-  Sheet: Object.assign(
-    ({ children }: { children: React.ReactNode }) => children,
-    { displayName: 'Sheet' },
-  ),
+  Sheet: Object.assign(({ children }: { children: React.ReactNode }) => children, {
+    displayName: 'Sheet',
+  }),
 }));
 
 import { Sheet } from '@dg/ui/core/sheet/Sheet';
