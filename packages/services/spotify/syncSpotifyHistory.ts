@@ -73,29 +73,25 @@ async function getLatestPlayedAt(): Promise<Date | null> {
 
 /**
  * Persists listening history from Spotify's recently-played endpoint.
+ * An empty DB seeds from the current recent-plays window (no `after` filter).
  * This is separate from the "latest song" UI fetch.
  */
 export async function syncSpotifyPlaysSince(): Promise<{
   inserted: number;
   total: number;
   gapDetected: boolean;
-  skipped: boolean;
 }> {
   const latestPlayedAt = await getLatestPlayedAt();
-  if (!latestPlayedAt) {
-    log.info('Skipping Spotify sync until history import seeds the database');
-    return { gapDetected: false, inserted: 0, skipped: true, total: 0 };
-  }
 
   log.info('Syncing Spotify plays', {
-    since: latestPlayedAt.toISOString(),
+    since: latestPlayedAt?.toISOString() ?? null,
   });
 
   const plays = await fetchRecentPlays(latestPlayedAt?.getTime());
 
   if (plays.length === 0) {
     log.info('No new Spotify plays to sync');
-    return { gapDetected: false, inserted: 0, skipped: false, total: 0 };
+    return { gapDetected: false, inserted: 0, total: 0 };
   }
 
   const gapDetected = latestPlayedAt !== null && plays.length === SPOTIFY_HISTORY_LIMIT;
@@ -121,7 +117,7 @@ export async function syncSpotifyPlaysSince(): Promise<{
     total: plays.length,
   });
 
-  return { gapDetected, inserted, skipped: false, total: plays.length };
+  return { gapDetected, inserted, total: plays.length };
 }
 
 type SyncContext = 'backfill' | 'cron';
@@ -142,14 +138,7 @@ export async function syncSpotifyHistoryWithLogging({
 }: SyncWithLoggingOptions) {
   try {
     const result = await syncSpotifyPlaysSince();
-    const label = getContextLabel(context);
-
-    if (result.skipped) {
-      log.info(`${label}: Spotify history sync skipped (history not seeded)`);
-    } else {
-      log.info(`${label}: Spotify history sync complete`, result);
-    }
-
+    log.info(`${getContextLabel(context)}: Spotify history sync complete`, result);
     return result;
   } catch (error) {
     log[failureLogLevel](`${getContextLabel(context)}: Spotify history sync failed`, {

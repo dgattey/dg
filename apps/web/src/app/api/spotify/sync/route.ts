@@ -14,7 +14,6 @@ type SyncResponse = {
     error?: string;
     gapDetected?: boolean;
     inserted?: number;
-    skipped?: boolean;
     success?: boolean;
     total?: number;
   };
@@ -45,7 +44,6 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
     body: {
       gapDetected: result.gapDetected,
       inserted: result.inserted,
-      skipped: result.skipped,
       success: true,
       total: result.total,
     },

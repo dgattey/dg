@@ -65,25 +65,47 @@ afterEach(async () => {
 });
 
 describe('syncSpotifyPlaysSince', () => {
-  it('skips sync when the database is empty', async () => {
-    // The sync function checks ALL rows in the table (not just prefixed ones)
-    // to determine if history is seeded. Since tests run with transaction
-    // isolation, we may see data from parallel tests. Check actual state first.
+  it('seeds an empty database from recent plays', async () => {
+    // Sync reads the whole SpotifyPlay table. Parallel suites share
+    // DATABASE_URL_TEST, so skip when other tests have visible rows.
     const totalCount = await db.SpotifyPlay.count();
     if (totalCount > 0) {
-      // Other tests have data visible - skip rather than fail flakily
       return;
     }
+
+    const responseBody = {
+      items: [
+        {
+          played_at: '2025-01-02T00:00:00.000Z',
+          track: buildTrackApi(),
+        },
+      ],
+      next: null,
+    };
+
+    mockSpotifyGet.mockResolvedValue({
+      response: {
+        json: async () => responseBody,
+      },
+      status: 200,
+    });
 
     const result = await syncSpotifyPlaysSince();
 
     expect(result).toEqual({
       gapDetected: false,
-      inserted: 0,
-      skipped: true,
-      total: 0,
+      inserted: 1,
+      total: 1,
     });
-    expect(mockSpotifyGet).not.toHaveBeenCalled();
+    expect(mockSpotifyGet).toHaveBeenCalledWith(
+      expect.stringMatching(/^me\/player\/recently-played\?limit=50$/),
+    );
+
+    const insertedRow = await db.SpotifyPlay.findOne({
+      where: { trackId: `${PREFIX}-track-id` },
+    });
+    expect(insertedRow?.albumId).toBe(`${PREFIX}-album-id`);
+    expect(insertedRow?.playedAt.toISOString()).toBe('2025-01-02T00:00:00.000Z');
   });
 
   it('syncs plays since the latest timestamp', async () => {
@@ -114,7 +136,6 @@ describe('syncSpotifyPlaysSince', () => {
 
     const result = await syncSpotifyPlaysSince();
 
-    expect(result.skipped).toBe(false);
     expect(result.gapDetected).toBe(false);
     expect(result.total).toBe(1);
 
@@ -173,7 +194,6 @@ describe('syncSpotifyPlaysSince', () => {
     expect(result).toEqual({
       gapDetected: false,
       inserted: 0,
-      skipped: false,
       total: 0,
     });
   });
@@ -196,7 +216,6 @@ describe('syncSpotifyPlaysSince', () => {
     expect(result).toEqual({
       gapDetected: false,
       inserted: 0,
-      skipped: false,
       total: 0,
     });
   });
@@ -233,8 +252,9 @@ describe('syncSpotifyPlaysSince', () => {
 
     const result = await syncSpotifyPlaysSince();
 
-    // Same track at different timestamp should be inserted as a new play
-    expect(result.inserted).toBe(1);
+    // Same track at a new timestamp should appear as another play row.
+    // Prefer row assertions over result.inserted: that count is a whole-table
+    // delta and drifts under parallel suites sharing DATABASE_URL_TEST.
     expect(result.total).toBe(1);
 
     // Should now have 2 rows for this track (different timestamps)
@@ -253,20 +273,26 @@ describe('syncSpotifyHistoryWithLogging', () => {
     });
   });
 
-  it('returns skipped result when database has no seed data', async () => {
-    // The sync function checks ALL rows in the table (not just prefixed ones)
-    // to determine if history is seeded. Check actual state first.
+  it('returns result when seeding an empty database', async () => {
     const totalCount = await db.SpotifyPlay.count();
     if (totalCount > 0) {
-      // Other tests have data visible - skip rather than fail flakily
       return;
     }
+
+    mockSpotifyGet.mockResolvedValue({
+      response: { json: async () => ({ items: [], next: null }) },
+      status: 200,
+    });
 
     const result = await syncSpotifyHistoryWithLogging({ context: 'backfill' });
 
     expect(result).not.toBeNull();
-    expect(result?.skipped).toBe(true);
-    expect(mockSpotifyGet).not.toHaveBeenCalled();
+    expect(result).toEqual({
+      gapDetected: false,
+      inserted: 0,
+      total: 0,
+    });
+    expect(mockSpotifyGet).toHaveBeenCalled();
   });
 
   it('returns result on successful sync', async () => {
@@ -285,7 +311,7 @@ describe('syncSpotifyHistoryWithLogging', () => {
     const result = await syncSpotifyHistoryWithLogging({ context: 'cron' });
 
     expect(result).not.toBeNull();
-    expect(result?.skipped).toBe(false);
+    expect(result?.inserted).toBe(0);
   });
 
   it('returns null on error', async () => {
