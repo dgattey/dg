@@ -10,7 +10,6 @@ import {
 } from '@dg/content-models/spotify/RecentlyPlayed';
 import type { Track } from '@dg/content-models/spotify/Track';
 import { parseResponse } from '../clients/parseResponse';
-import { getImageGradientInformationFromUrl } from '../images/getImageGradient';
 import { getSpotifyClient } from './spotifyClient';
 
 const CURRENTLY_PLAYING_RESOURCE = 'me/player/currently-playing';
@@ -20,6 +19,9 @@ const RECENTLY_PLAYED_RESOURCE = 'me/player/recently-played?limit=1';
  * Fetches the track most relevant to "latest playback":
  * - returns the currently playing track when available
  * - falls back to the most recently played track otherwise
+ *
+ * Album-art gradient/contrast are derived client-side so the homepage
+ * server bundle never loads sharp/libvips.
  */
 export async function fetchRecentlyPlayed(): Promise<null | Track> {
   const { response, status } = await getSpotifyClient().get(CURRENTLY_PLAYING_RESOURCE);
@@ -40,7 +42,7 @@ export async function fetchRecentlyPlayed(): Promise<null | Track> {
       if (!track) {
         return fetchLastPlayed();
       }
-      return await withAlbumGradientInfo(track);
+      return track;
     }
     case 204: {
       // We aren't currently playing a song but we could have recently played one
@@ -55,7 +57,7 @@ export async function fetchRecentlyPlayed(): Promise<null | Track> {
 /**
  * Fetches the song that last played from spotify using a valid access token.
  * May have no content, which signifies nothing is playing, which is returned
- * as `null`, or returns full JSON. Augments it with the image gradient from the URL.
+ * as `null`, or returns full JSON.
  */
 async function fetchLastPlayed(): Promise<null | Track> {
   const { response, status } = await getSpotifyClient().get(RECENTLY_PLAYED_RESOURCE);
@@ -71,21 +73,5 @@ async function fetchLastPlayed(): Promise<null | Track> {
     return null;
   }
 
-  // Augment with gradient
-  const track = { ...lastItemPlayed.track, playedAt: lastItemPlayed.playedAt };
-  return await withAlbumGradientInfo(track);
-}
-
-/**
- * Augments the response with gradient information for the track
- */
-async function withAlbumGradientInfo(track: Track): Promise<Track> {
-  const { backgroundGradient, contrastSetting } = await getImageGradientInformationFromUrl(
-    track.albumImage.url,
-  );
-  return {
-    ...track,
-    albumGradient: backgroundGradient ?? undefined,
-    albumGradientContrastSetting: contrastSetting ?? undefined,
-  };
+  return { ...lastItemPlayed.track, playedAt: lastItemPlayed.playedAt };
 }

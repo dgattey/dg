@@ -5,7 +5,6 @@
     "@dg/shared-core": "workspace:*",
     "graphql-request": "catalog:",
     "server-only": "catalog:",
-    "sharp": "catalog:",
     "valibot": "catalog:",
     "wretch": "catalog:"
   },
