@@ -7,10 +7,11 @@ import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getFavoriteAlbums } from '../../../services/albums';
 import { markdownAlternates } from '../../layouts/markdownAlternates';
+import { musicSheetLabel } from '../../layouts/musicFooterDestinations';
 import { FavoriteAlbumsGrid } from './FavoriteAlbumsGrid';
 import { FavoriteAlbumsSkeleton } from './FavoriteAlbumsSkeleton';
 
-const TITLE = 'Favorite albums';
+const TITLE = musicSheetLabel(favoriteAlbumsRoute);
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(favoriteAlbumsRoute),

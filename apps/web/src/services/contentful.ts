@@ -10,32 +10,35 @@ import { cacheLife, cacheTag } from 'next/cache';
 
 const CONTENTFUL_TAG = 'contentful';
 
-export const getProjects = async () => {
-  'use cache';
+/**
+ * Shared Contentful cache life/tag. Each caller still owns its own `'use cache'`
+ * so Next keeps a distinct cache entry per wrapper (args alone are not enough
+ * when the fetcher callback is not serializable).
+ */
+async function cachedContentful<T>(fn: () => Promise<T>): Promise<T> {
   cacheLife('default');
   cacheTag(CONTENTFUL_TAG);
-  return await fetchProjects();
+  return await fn();
+}
+
+export const getProjects = async () => {
+  'use cache';
+  return await cachedContentful(fetchProjects);
 };
 
 export const getSideProjects = async () => {
   'use cache';
-  cacheLife('default');
-  cacheTag(CONTENTFUL_TAG);
-  return await fetchSideProjects();
+  return await cachedContentful(fetchSideProjects);
 };
 
 export const getIntroContent = async () => {
   'use cache';
-  cacheLife('default');
-  cacheTag(CONTENTFUL_TAG);
-  return await fetchIntroContent();
+  return await cachedContentful(fetchIntroContent);
 };
 
 export const getFooterLinks = async () => {
   'use cache';
-  cacheLife('default');
-  cacheTag(CONTENTFUL_TAG);
-  return await fetchFooterLinks();
+  return await cachedContentful(fetchFooterLinks);
 };
 
 /**
@@ -43,14 +46,10 @@ export const getFooterLinks = async () => {
  */
 export const getLinkByName = async (name: string) => {
   'use cache';
-  cacheLife('default');
-  cacheTag(CONTENTFUL_TAG);
-  return await fetchLinkByName(name);
+  return await cachedContentful(() => fetchLinkByName(name));
 };
 
 export const getCurrentLocation = async () => {
   'use cache';
-  cacheLife('default');
-  cacheTag(CONTENTFUL_TAG);
-  return await fetchCurrentLocation();
+  return await cachedContentful(fetchCurrentLocation);
 };

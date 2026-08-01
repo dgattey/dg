@@ -31,7 +31,8 @@ The `getDatabaseUrl()` function looks up the correct URL based on `NODE_ENV` and
 ## Testing
 
 Test helpers live in this package under `@dg/db/testing`. Runtime app code still
-must not import `@dg/db`; tests may import `@dg/db/testing`.
+must not import `@dg/db`; tests may import `@dg/db/testing`. `apps/web` tests may
+also import `@dg/db` for Sequelize operators such as `Op` (test-only exception).
 
 ```ts
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
