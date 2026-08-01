@@ -18,7 +18,10 @@ type SpotifyCardShellProps = {
   gradient?: string;
 };
 
+// The shell, not the card, is the grid item, so it has to pass the cell's
+// height down or the card sizes to its contents and leaves a gap while loading.
 const shellContainerSx: SxObject = {
+  height: '100%',
   isolation: 'isolate',
   overflow: 'visible',
   position: 'relative',
@@ -37,6 +40,7 @@ const getGradientGlowSx = (gradient: string): SxObject => ({
 
 const cardSx: SxObject = {
   display: 'flex',
+  height: '100%',
   minWidth: { md: 'auto', xs: 'min(max-content, inherit)' },
   overflow: 'visible',
   padding: 2.5,
