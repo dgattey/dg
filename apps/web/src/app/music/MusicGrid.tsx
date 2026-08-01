@@ -1,8 +1,8 @@
 'use client';
 
+import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
-import type { HistoryTrack } from '../../services/music';
 import { AlbumThumbnail } from '../spotify/AlbumThumbnail';
 
 type Props = {

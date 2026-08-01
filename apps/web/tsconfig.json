@@ -5,5 +5,10 @@
     "types": ["jest", "node"]
   },
   "extends": "@dg/tsconfig/nextjs.json",
-  "include": ["src", "next.config.ts", "next-env.d.ts"]
+  "include": [
+    "src",
+    "next.config.ts",
+    "next-env.d.ts",
+    "../../packages/ui/types/react-view-transition.d.ts"
+  ]
 }

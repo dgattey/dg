@@ -1,6 +1,7 @@
 'use server';
 
-import { getMusicHistory, type HistoryTrack, parseMusicHistoryCursor } from './music';
+import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
+import { getMusicHistory, parseMusicHistoryCursor } from './music';
 
 type LoadMoreResult = {
   tracks: Array<HistoryTrack>;
