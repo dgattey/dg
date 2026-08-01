@@ -6,23 +6,7 @@ import { useLayoutEffect, useRef } from 'react';
 import { Link } from '../../dependent/Link';
 import type { SxProps } from '../../theme';
 import { rememberSheetOrigin } from './sheetScrollMemory';
-import {
-  SHEET_TITLE_SLOT_VIEW_TRANSITION_NAME,
-  SHEET_TITLE_VIEW_TRANSITION_NAME,
-  sheetTransitionTypes,
-} from './sheetTransitions';
-
-/**
- * The sheet's own heading owns the shared name while the sheet is open, so the
- * control holds the placeholder name then and the shared one the rest of the
- * time. Either way it stays out of the surrounding chrome's snapshot.
- */
-function titleName(morphsTitle: boolean, isSheetOpen: boolean) {
-  if (!morphsTitle) {
-    return '';
-  }
-  return isSheetOpen ? SHEET_TITLE_SLOT_VIEW_TRANSITION_NAME : SHEET_TITLE_VIEW_TRANSITION_NAME;
-}
+import { sheetTitleMorphName, sheetTransitionTypes } from './sheetTransitions';
 
 export type SheetOpenLinkProps = {
   children?: ReactNode;
@@ -63,7 +47,9 @@ export function SheetOpenLink({
     if (!anchor.current) {
       return;
     }
-    anchor.current.style.viewTransitionName = titleName(morphsTitle, pathname === href);
+    anchor.current.style.viewTransitionName = morphsTitle
+      ? sheetTitleMorphName(pathname === href)
+      : '';
   }, [href, morphsTitle, pathname]);
 
   return (

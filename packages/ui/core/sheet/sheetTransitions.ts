@@ -31,6 +31,15 @@ export const SHEET_TITLE_VIEW_TRANSITION_NAME = 'sheet-title';
 export const SHEET_TITLE_SLOT_VIEW_TRANSITION_NAME = 'sheet-title-slot';
 
 /**
+ * Name for the single control that morphs into the sheet heading. While any
+ * sheet that shares that control is open, the control holds the slot name so
+ * the heading alone owns `sheet-title` at capture time.
+ */
+export function sheetTitleMorphName(sheetIsOpen: boolean): string {
+  return sheetIsOpen ? SHEET_TITLE_SLOT_VIEW_TRANSITION_NAME : SHEET_TITLE_VIEW_TRANSITION_NAME;
+}
+
+/**
  * One boundary owns page content, and the intent of the navigation decides
  * whether the arriving route is a sheet rising over the page it covers or the
  * page coming back out from under it. Classes are matched in
