@@ -80,4 +80,29 @@ describe('GlassSwitcher', () => {
 
     expect(screen.getAllByRole('tooltip')).toHaveLength(1);
   });
+
+  it('renders visible labels without tooltips for text-only options', async () => {
+    const user = userEvent.setup();
+    const handleChange = jest.fn();
+    render(
+      <GlassSwitcher
+        aria-label="Sort things"
+        mobileIcon={<span data-testid="mobile-icon" />}
+        onChange={handleChange}
+        options={[
+          { label: 'Recently added', value: 'added' },
+          { label: 'Album', value: 'album' },
+        ]}
+        value="added"
+      />,
+    );
+
+    expect(screen.getByText('Recently added')).toBeInTheDocument();
+    expect(screen.getByText('Album')).toBeInTheDocument();
+    expect(screen.queryAllByRole('tooltip')).toHaveLength(0);
+    expect(screen.getByTestId('mobile-icon')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('radio', { hidden: true, name: 'Album' }));
+    expect(handleChange).toHaveBeenCalledWith('album');
+  });
 });
