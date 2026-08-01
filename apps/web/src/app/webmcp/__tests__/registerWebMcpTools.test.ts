@@ -7,7 +7,7 @@ describe('registerWebMcpTools', () => {
   });
 
   it('registers read-only tools via navigator.modelContext.registerTool', async () => {
-    const registered: WebMcpTool[] = [];
+    const registered: Array<WebMcpTool> = [];
     const registerTool = jest.fn((tool: WebMcpTool) => {
       registered.push(tool);
     });
