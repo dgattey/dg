@@ -1,8 +1,7 @@
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
-import { devConsoleRoute, musicRoute } from '@dg/shared-core/routes/app';
+import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
-import { SheetOpenLink } from '@dg/ui/core/sheet/SheetOpenLink';
 import { SITE_FOOTER_VIEW_TRANSITION_NAME } from '@dg/ui/core/sheet/sheetTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
@@ -12,6 +11,7 @@ import { Suspense } from 'react';
 import { interactiveRedesign } from '../../flags';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
+import { isFavoriteAlbumsFooterUrl, MusicFooterMenu } from './MusicFooterMenu';
 
 const navItemNoPaddingSx: SxObject = {
   padding: 0,
@@ -163,18 +163,6 @@ export async function Footer() {
                   </NavItem>
                 </>
               ) : null}
-              <NavItem sx={navItemNoPaddingSx}>•</NavItem>
-              <NavItem>
-                <SheetOpenLink
-                  color="inherit"
-                  href={musicRoute}
-                  morphsTitle
-                  title="Listening history"
-                  variant="caption"
-                >
-                  Listening history
-                </SheetOpenLink>
-              </NavItem>
               <Suspense fallback={null}>
                 <RedesignBadge />
               </Suspense>
@@ -203,9 +191,13 @@ export async function Footer() {
                 ))}
               </Stack>
               <Stack component="ul" direction="row" sx={footerIconLinkListSx}>
-                {iconFooterLinks?.map((link) => (
-                  <FooterLink key={link.url} link={link} />
-                ))}
+                {iconFooterLinks?.map((link) =>
+                  isFavoriteAlbumsFooterUrl(link.url) ? (
+                    <MusicFooterMenu icon={link.icon} key={link.url} title={link.title} />
+                  ) : (
+                    <FooterLink key={link.url} link={link} />
+                  ),
+                )}
               </Stack>
             </NavGroup>
           </Nav>
