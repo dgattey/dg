@@ -14,7 +14,10 @@ type SpotifyCardShellProps = {
   gradient?: string;
 };
 
+// The shell sits inside the scroll-tracker grid item, so it has to pass the
+// cell height down or the card sizes to its contents and sits short of neighbors.
 const shellContainerSx: SxObject = {
+  height: '100%',
   isolation: 'isolate',
   overflow: 'visible',
   position: 'relative',
@@ -33,6 +36,7 @@ const getGradientGlowSx = (gradient: string): SxObject => ({
 
 const cardSx: SxObject = {
   display: 'flex',
+  height: '100%',
   minWidth: { md: 'auto', xs: 'min(max-content, inherit)' },
   overflow: 'visible',
   padding: 2.5,

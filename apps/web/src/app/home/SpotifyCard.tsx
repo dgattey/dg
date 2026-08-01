@@ -44,8 +44,11 @@ const loadingTitleSx: SxObject = {
   marginBottom: 1,
 };
 
+// Fill the grid cell while loading so a short skeleton does not leave a gap
+// next to full-height neighbors.
 const loadingShellSx: SxObject = {
   display: 'flex',
+  height: '100%',
   minWidth: { md: 'auto', xs: 'min(max-content, inherit)' },
   overflow: 'visible',
   padding: 2.5,

@@ -29,6 +29,24 @@ const introTextCardSx: SxObject = {
   boxShadow: 'none',
   display: 'flex',
   flexDirection: 'column',
+  justifyContent: 'center',
+};
+
+/**
+ * The intro copy shares a row with fixed-height cards, so it has one grid cell
+ * of vertical room. Two things keep it there: the stack owns the rhythm with a
+ * single gap instead of per-element margins, and the paragraphs sit at the root
+ * font size rather than the responsively scaled `body1`, which grows enough on
+ * wide screens to push the last paragraph onto an extra line.
+ */
+const introTextSx: SxObject = {
+  '& > .MuiTypography-root': {
+    marginBottom: 0,
+  },
+  '& p': {
+    fontSize: '1rem',
+  },
+  gap: 2.5,
 };
 
 /**
@@ -65,7 +83,7 @@ export function IntroCard({ introBlock, linkedInLink }: IntroCardProps) {
         />
       </ContentCard>
       <ContentCard sx={introTextCardSx}>
-        <RichText {...introBlock.textBlock.content} />
+        <RichText {...introBlock.textBlock.content} sx={introTextSx} />
       </ContentCard>
     </>
   );
