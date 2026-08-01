@@ -6,8 +6,10 @@ import { SheetOpenLink } from '@dg/ui/core/sheet/SheetOpenLink';
 import { SITE_FOOTER_VIEW_TRANSITION_NAME } from '@dg/ui/core/sheet/sheetTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Container, Divider, Stack } from '@mui/material';
+import { Box, Container, Divider, Stack, Typography } from '@mui/material';
 import { cacheLife } from 'next/cache';
+import { Suspense } from 'react';
+import { interactiveRedesign } from '../../flags';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
 
@@ -100,6 +102,26 @@ async function getCopyrightYear() {
 }
 
 /**
+ * Quiet footer badge when the interactive-redesign flag is on.
+ * Wrapped in Suspense because flag evaluation reads request-time data.
+ */
+export async function RedesignBadge() {
+  if (!(await interactiveRedesign())) {
+    return null;
+  }
+  return (
+    <>
+      <NavItem sx={navItemNoPaddingSx}>•</NavItem>
+      <NavItem>
+        <Typography color="text.secondary" component="span" variant="caption">
+          redesign on
+        </Typography>
+      </NavItem>
+    </>
+  );
+}
+
+/**
  * Creates the site footer component - shows version data + copyright
  */
 export async function Footer() {
@@ -153,6 +175,9 @@ export async function Footer() {
                   Listening history
                 </SheetOpenLink>
               </NavItem>
+              <Suspense fallback={null}>
+                <RedesignBadge />
+              </Suspense>
               {process.env.NODE_ENV !== 'production' ? (
                 <>
                   <NavItem sx={navItemNoPaddingSx}>•</NavItem>
