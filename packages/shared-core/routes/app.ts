@@ -16,8 +16,18 @@ export const llmsTxtRoute = '/llms.txt' as const;
 
 export const llmsFullTxtRoute = '/llms-full.txt' as const;
 
+/** Agent Skills Discovery index (Cloudflare RFC draft v0.2.0). */
+export const agentSkillsIndexRoute = '/.well-known/agent-skills/index.json' as const;
+
+export const agentSkillsPrefix = '/.well-known/agent-skills' as const;
+
 /** Internal rewrite target for Markdown (not a public agent URL). */
 export const internalMarkdownRoutePrefix = '/llm-markdown' as const;
+
+/** Absolute path to a published skill artifact. */
+export function agentSkillArtifactPath(skillName: string): string {
+  return `${agentSkillsPrefix}/${skillName}/SKILL.md`;
+}
 
 export type MarkdownPageDefinition = {
   path: string;

@@ -1,4 +1,6 @@
 import {
+  agentSkillArtifactPath,
+  agentSkillsIndexRoute,
   htmlPathToInternalMarkdownPath,
   htmlPathToMarkdownPath,
   isMarkdownPagePath,
@@ -34,5 +36,12 @@ describe('markdown page registry', () => {
       expect(isMarkdownPagePath(path)).toBe(true);
       expect(markdownPathToHtmlPath(htmlPathToMarkdownPath(path))).toBe(path);
     }
+  });
+
+  it('keeps agent-skills machine documents out of the page registry', () => {
+    expect(markdownPagePaths).not.toEqual(expect.arrayContaining([agentSkillsIndexRoute]));
+    expect(agentSkillArtifactPath('read-site')).toBe(
+      '/.well-known/agent-skills/read-site/SKILL.md',
+    );
   });
 });
