@@ -23,6 +23,14 @@ export const SITE_FOOTER_VIEW_TRANSITION_NAME = 'site-footer';
 export const SHEET_TITLE_VIEW_TRANSITION_NAME = 'sheet-title';
 
 /**
+ * Held by the control the heading flew out of, for as long as the heading is
+ * away. A control with no name of its own stays part of the footer snapshot,
+ * which then paints its label in the slot the heading just left, so the
+ * heading reads as two texts stacked at the start of the flight.
+ */
+export const SHEET_TITLE_SLOT_VIEW_TRANSITION_NAME = 'sheet-title-slot';
+
+/**
  * One boundary owns page content, and the intent of the navigation decides
  * whether the arriving route is a sheet rising over the page it covers or the
  * page coming back out from under it. Classes are matched in

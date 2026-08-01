@@ -85,7 +85,15 @@
  * One snapshot flying and scaling into place is the morph; two is a ghost.
  */
 ::view-transition-old(sheet-title) {
-  display: none;
+  opacity: 0;
+  animation: none;
+}
+
+/* The slot the heading vacated is a hole, not a second copy of the heading. */
+::view-transition-old(sheet-title-slot),
+::view-transition-new(sheet-title-slot) {
+  opacity: 0;
+  animation: none;
 }
 
 ::view-transition-new(sheet-title) {
