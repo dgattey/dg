@@ -22,7 +22,7 @@ type OauthCardProps = {
  * Displays OAuth connection status for a single provider. Shows the current
  * connection state, a connect button, force refresh action, and token expiry info.
  */
-async function OauthCardContent({ provider }: OauthCardProps) {
+export async function OauthCardContent({ provider }: OauthCardProps) {
   await connection();
   const status = await getOauthStatus(provider);
 

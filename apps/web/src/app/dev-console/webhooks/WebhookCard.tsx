@@ -1,24 +1,59 @@
 import 'server-only';
 
+import type { WebhookSubscriptionMetadata } from '@dg/services/strava/webhooks/getWebhookSubscriptions';
 import { getWebhookSubscriptions } from '@dg/services/strava/webhooks/getWebhookSubscriptions';
 import { Skeleton, Stack, Typography } from '@mui/material';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
 import { DevConsoleCardShell } from '../DevConsoleCardShell';
+import { ErrorMessage } from '../ErrorMessage';
 import { StatusChip } from '../StatusChip';
 import { CreateWebhookButton } from './CreateWebhookButton';
 import { DeleteWebhookButton } from './DeleteWebhookButton';
 import { SubscriptionDetails } from './SubscriptionDetails';
 
 /**
+ * Subscriptions we know about, plus the action that makes sense for them.
+ */
+function SubscriptionActions({
+  subscriptions,
+}: {
+  subscriptions: Array<WebhookSubscriptionMetadata>;
+}) {
+  if (subscriptions.length === 0) {
+    return <CreateWebhookButton />;
+  }
+
+  return (
+    <>
+      <Stack
+        sx={{
+          gap: 1,
+        }}
+      >
+        {subscriptions.map((subscription) => (
+          <SubscriptionDetails
+            details={subscription}
+            key={`${subscription.callbackUrl}-${subscription.createdAt}`}
+          />
+        ))}
+      </Stack>
+      <DeleteWebhookButton />
+    </>
+  );
+}
+
+/**
  * Fetches Strava webhook subscription status and renders a card with the
  * current state and available actions. Use with Suspense and
  * WebhookCardContentSkeleton for streaming.
+ *
+ * When Strava refuses the listing the card says so and offers no actions,
+ * since creating or deleting would be guessing at state we don't have.
  */
-async function WebhookCardContent() {
+export async function WebhookCardContent() {
   await connection();
-  const subscriptions = await getWebhookSubscriptions();
-  const hasSubscription = subscriptions.length > 0;
+  const { subscriptions, error } = await getWebhookSubscriptions();
 
   return (
     <>
@@ -30,27 +65,10 @@ async function WebhookCardContent() {
         }}
       >
         <Typography variant="h3">Strava webhooks</Typography>
-        <StatusChip isConnected={hasSubscription} />
+        <StatusChip isConnected={subscriptions.length > 0} />
       </Stack>
-      {hasSubscription ? (
-        <>
-          <Stack
-            sx={{
-              gap: 1,
-            }}
-          >
-            {subscriptions.map((subscription) => (
-              <SubscriptionDetails
-                details={subscription}
-                key={`${subscription.callbackUrl}-${subscription.createdAt}`}
-              />
-            ))}
-          </Stack>
-          <DeleteWebhookButton />
-        </>
-      ) : (
-        <CreateWebhookButton />
-      )}
+      <ErrorMessage message={error} />
+      {error ? null : <SubscriptionActions subscriptions={subscriptions} />}
     </>
   );
 }

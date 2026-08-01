@@ -1,6 +1,8 @@
 import 'server-only';
 
+import { StravaApiError } from '@dg/shared-core/errors/StravaApiError';
 import { log } from '@dg/shared-core/logging/log';
+import { parseStravaError } from './parseStravaError';
 import type { WebhookType } from './WebhookType';
 import { getWebhookSubscriptionConfig, standardParams } from './webhookSubscriptionConfigs';
 
@@ -17,7 +19,8 @@ export type WebhookSubscription = {
 
 /**
  * Lists all current subscriptions for a webhook type.
- * Returns an array of subscriptions, or throws on error.
+ * Returns an array of subscriptions, or throws a `StravaApiError` when Strava
+ * rejects the request so callers can tell an API refusal apart from a bug.
  */
 export async function listSubscriptions(type: WebhookType): Promise<Array<WebhookSubscription>> {
   const config = getWebhookSubscriptionConfig(type);
@@ -38,7 +41,7 @@ export async function listSubscriptions(type: WebhookType): Promise<Array<Webhoo
       status: response.status,
       type,
     });
-    throw new Error(`Failed to list ${type} webhook subscriptions: ${response.status}`);
+    throw new StravaApiError(parseStravaError(response.status, errorBody), response.status);
   }
 
   const subscriptions = (await response.json()) as Array<WebhookSubscription>;
