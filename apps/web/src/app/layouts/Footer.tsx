@@ -11,7 +11,8 @@ import { Suspense } from 'react';
 import { interactiveRedesign } from '../../flags';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
-import { isFavoriteAlbumsFooterUrl, MusicFooterMenu } from './MusicFooterMenu';
+import { MusicFooterMenu } from './MusicFooterMenu';
+import { isFavoriteAlbumsFooterUrl } from './musicFooterDestinations';
 
 const navItemNoPaddingSx: SxObject = {
   padding: 0,

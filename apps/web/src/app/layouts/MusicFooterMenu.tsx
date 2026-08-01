@@ -1,6 +1,5 @@
 'use client';
 
-import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
 import { NavItem } from '@dg/ui/core/Nav';
 import { SheetOpenLink } from '@dg/ui/core/sheet/SheetOpenLink';
 import { sheetTitleMorphName } from '@dg/ui/core/sheet/sheetTransitions';
@@ -11,19 +10,11 @@ import { Disc3 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useId, useLayoutEffect, useRef, useState } from 'react';
-
-export type MusicDestination = {
-  href: string;
-  label: string;
-};
-
-/** Music sheet destinations opened from the footer vinyl menu. Order is UI order. */
-export const MUSIC_FOOTER_DESTINATIONS: ReadonlyArray<MusicDestination> = [
-  { href: favoriteAlbumsRoute, label: 'Favorite albums' },
-  { href: musicRoute, label: 'Listening history' },
-];
-
-const MUSIC_SHEET_PATHS = new Set(MUSIC_FOOTER_DESTINATIONS.map((destination) => destination.href));
+import {
+  MUSIC_FOOTER_DESTINATIONS,
+  MUSIC_SHEET_PATHS,
+  normalizeMusicPath,
+} from './musicFooterDestinations';
 
 const triggerSx: SxObject = {
   alignItems: 'center',
@@ -48,18 +39,6 @@ const menuLinkSx: SxObject = {
 const menuItemSx: SxObject = {
   p: 0,
 };
-
-function normalizePath(path: string) {
-  if (path.length > 1 && path.endsWith('/')) {
-    return path.slice(0, -1);
-  }
-  return path;
-}
-
-/** Contentful footer icon whose URL points at favorite albums. */
-export function isFavoriteAlbumsFooterUrl(url: string) {
-  return normalizePath(url) === favoriteAlbumsRoute;
-}
 
 function resolveTriggerIcon(icon?: string | null) {
   if (icon === 'albums') {
@@ -86,7 +65,7 @@ export function MusicFooterMenu({ icon, title }: MusicFooterMenuProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
-  const sheetIsOpen = MUSIC_SHEET_PATHS.has(normalizePath(pathname));
+  const sheetIsOpen = MUSIC_SHEET_PATHS.has(normalizeMusicPath(pathname));
 
   useLayoutEffect(() => {
     if (!triggerRef.current) {

@@ -19,7 +19,8 @@ jest.mock('@dg/ui/core/sheet/sheetScrollMemory', () => ({
 }));
 
 import { usePathname } from 'next/navigation';
-import { isFavoriteAlbumsFooterUrl, MusicFooterMenu } from '../MusicFooterMenu';
+import { MusicFooterMenu } from '../MusicFooterMenu';
+import { isFavoriteAlbumsFooterUrl } from '../musicFooterDestinations';
 
 const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>;
 
