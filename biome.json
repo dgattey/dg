@@ -107,7 +107,7 @@
   },
   "overrides": [
     {
-      "includes": ["packages/shared-core/logging/log.ts"],
+      "includes": ["packages/shared-core/logging/log.ts", "scripts/**"],
       "linter": {
         "rules": {
           "suspicious": {
