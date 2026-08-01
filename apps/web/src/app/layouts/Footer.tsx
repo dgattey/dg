@@ -146,6 +146,7 @@ export async function Footer() {
                 <SheetOpenLink
                   color="inherit"
                   href={musicRoute}
+                  morphsTitle
                   title="Listening history"
                   variant="caption"
                 >

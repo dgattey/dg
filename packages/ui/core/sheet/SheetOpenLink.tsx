@@ -12,30 +12,45 @@ export type SheetOpenLinkProps = {
   children?: ReactNode;
   color?: 'inherit';
   href: string;
+  /**
+   * Lends this control's box to the sheet heading. At most one control per
+   * sheet may set it, since two elements sharing a `view-transition-name`
+   * abort the transition.
+   */
+  morphsTitle?: boolean;
   sx?: SxProps;
   title: string;
   variant?: 'caption';
 };
 
 /**
- * Link that hands its own box to the sheet heading as the view transition
- * starts, so the heading flies out of the control that was clicked.
+ * Link that opens a sheet route, optionally handing its own box to the sheet
+ * heading so the heading flies out of the control on the way in and back into
+ * it on the way out.
  *
- * The name lands on the anchor at click time rather than at render time
- * because several controls can open the same sheet, and two elements sharing
- * a `view-transition-name` abort the transition outright. It is dropped again
- * once the new route commits, otherwise the sheet's own heading would collide
- * with it on the way back out.
+ * The sheet's heading owns the shared name while the sheet is open, so this
+ * control only holds it everywhere else. Swapping it in a layout effect lands
+ * the name before the browser photographs either side of a navigation, which
+ * is what makes the return trip morph rather than fade in place.
  */
-export function SheetOpenLink({ children, href, sx, title, ...rest }: SheetOpenLinkProps) {
+export function SheetOpenLink({
+  children,
+  href,
+  morphsTitle,
+  sx,
+  title,
+  ...rest
+}: SheetOpenLinkProps) {
   const anchor = useRef<HTMLAnchorElement>(null);
   const pathname = usePathname();
 
   useLayoutEffect(() => {
-    if (pathname === href && anchor.current) {
-      anchor.current.style.viewTransitionName = '';
+    if (!anchor.current) {
+      return;
     }
-  }, [href, pathname]);
+    anchor.current.style.viewTransitionName =
+      morphsTitle && pathname !== href ? SHEET_TITLE_VIEW_TRANSITION_NAME : '';
+  }, [href, morphsTitle, pathname]);
 
   return (
     <Link
@@ -43,9 +58,6 @@ export function SheetOpenLink({ children, href, sx, title, ...rest }: SheetOpenL
       href={href}
       onClick={() => {
         rememberSheetOrigin(pathname);
-        if (anchor.current) {
-          anchor.current.style.viewTransitionName = SHEET_TITLE_VIEW_TRANSITION_NAME;
-        }
       }}
       ref={anchor}
       sx={sx}

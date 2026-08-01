@@ -10,8 +10,10 @@ import { usePageScrollProgress } from '../app/layouts/PageScrollContext';
  * scrolled to). Uses a smooth transition zone at the edges.
  *
  * Semantics: 0 = card visible (hide thumbnail), 1 = card offscreen (show thumbnail).
- * On unmount (e.g. navigating away from homepage), resets to null so the
- * thumbnail shows on other pages (consumers treat null as "show").
+ * A card that is not in the document is offscreen, so unmounting reports 1
+ * rather than "not measured". Reporting null there would read as a fresh page
+ * load and briefly collapse the header thumbnail on the way back, which a view
+ * transition then freezes mid-collapse for the length of the animation.
  */
 export function useSpotifyCardVisibility() {
   const context = usePageScrollProgress();
@@ -75,8 +77,7 @@ export function useSpotifyCardVisibility() {
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
       }
-      // Reset to null when the card unmounts so thumbnail shows on other pages
-      context.setScrollProgress(null);
+      context.setScrollProgress(1);
     };
   }, [context]);
 

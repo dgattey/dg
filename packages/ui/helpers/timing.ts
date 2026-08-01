@@ -49,6 +49,8 @@ export function getTimingCssVars(): Record<`--${string}`, string> {
   return {
     '--easing-decelerate': EASING_DECELERATE,
     '--easing-default': EASING_DEFAULT,
+    '--easing-ease-out': EASING_EASE_OUT,
+    '--timing-fast': `${TIMING_FAST}ms`,
     '--timing-medium': `${TIMING_MEDIUM}ms`,
     '--timing-slow': `${TIMING_SLOW}ms`,
   };

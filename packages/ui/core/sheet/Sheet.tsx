@@ -1,14 +1,9 @@
 import { Box, Stack, Typography } from '@mui/material';
 import { X } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { ViewTransition } from 'react';
 import { Link } from '../../dependent/Link';
 import type { SxObject } from '../../theme';
-import {
-  SHEET_TITLE_VIEW_TRANSITION_NAME,
-  sheetTransitionTypes,
-  sheetViewTransitionProps,
-} from './sheetTransitions';
+import { SHEET_TITLE_VIEW_TRANSITION_NAME, sheetTransitionTypes } from './sheetTransitions';
 import './sheetTransitions.css';
 
 const sheetWrapperSx: SxObject = {
@@ -66,30 +61,31 @@ export type SheetProps = {
 };
 
 /**
- * Raised page chrome with sticky title and close link. Open/close motion comes
- * from React ViewTransition classes driven by sheet transition types.
+ * Raised page chrome with sticky title and close link.
+ *
+ * There is no boundary of its own here. The route's `PageViewTransition` already
+ * captures this subtree, and a nested boundary would lift the panel out of that
+ * snapshot and leave the page one holding nothing.
  */
 export function Sheet({ title, closeHref, children }: SheetProps) {
   return (
-    <ViewTransition {...sheetViewTransitionProps}>
-      <Box sx={sheetWrapperSx}>
-        <Box sx={sheetContainerSx}>
-          <Stack direction="row" sx={sheetHeaderSx}>
-            <Typography component="h1" sx={sheetTitleSx} variant="h1">
-              {title}
-            </Typography>
-            <Link
-              href={closeHref}
-              sx={closeLinkSx}
-              title="Close"
-              transitionTypes={sheetTransitionTypes('close')}
-            >
-              <X size={20} />
-            </Link>
-          </Stack>
-          <Box sx={contentSx}>{children}</Box>
-        </Box>
+    <Box sx={sheetWrapperSx}>
+      <Box sx={sheetContainerSx}>
+        <Stack direction="row" sx={sheetHeaderSx}>
+          <Typography component="h1" sx={sheetTitleSx} variant="h1">
+            {title}
+          </Typography>
+          <Link
+            href={closeHref}
+            sx={closeLinkSx}
+            title="Close"
+            transitionTypes={sheetTransitionTypes('close')}
+          >
+            <X size={20} />
+          </Link>
+        </Stack>
+        <Box sx={contentSx}>{children}</Box>
       </Box>
-    </ViewTransition>
+    </Box>
   );
 }
