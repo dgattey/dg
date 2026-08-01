@@ -8,6 +8,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { musicSheetLabel } from '../layouts/musicFooterDestinations';
 import { usePageScrollProgress } from '../layouts/PageScrollContext';
 import { NOW_PLAYING_CARD_ID } from './SpotifyCardScrollTracker';
 import { TrackListing } from './TrackListing';
@@ -140,7 +141,7 @@ export function SpotifyHeaderCard({ track }: SpotifyHeaderCardProps) {
     <Box aria-hidden={!isVisible} sx={getWidthWrapperSx(isVisible)}>
       <Box sx={getCollapsibleInnerSx(isVisible)}>
         {opensMusicSheet ? (
-          <SheetOpenLink href={musicRoute} sx={musicLinkSx} title="Listening history">
+          <SheetOpenLink href={musicRoute} sx={musicLinkSx} title={musicSheetLabel(musicRoute)}>
             {card}
           </SheetOpenLink>
         ) : (

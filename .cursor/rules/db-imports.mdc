@@ -33,6 +33,9 @@ const status = await getStravaOauthStatus();
 
 Runtime app code must not import `@dg/db`. Tests may import `@dg/db/testing`
 (for example `setupTestDatabase` from `@dg/db/testing/databaseSetup`).
+`apps/web` tests may also import `@dg/db` for Sequelize operators such as `Op`
+when asserting query shape. That is a test-only exception; runtime app code
+still goes through `@dg/services`.
 
 ```ts
 // ❌ Bad - app runtime importing db
@@ -40,4 +43,7 @@ import { db } from '@dg/db';
 
 // ✅ Good - tests using the db testing helpers
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
+
+// ✅ Allowed in apps/web tests only - Sequelize operators
+import { Op } from '@dg/db';
 ```

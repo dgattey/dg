@@ -10,11 +10,7 @@ import { Disc3 } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useId, useLayoutEffect, useRef, useState } from 'react';
-import {
-  MUSIC_FOOTER_DESTINATIONS,
-  MUSIC_SHEET_PATHS,
-  normalizeMusicPath,
-} from './musicFooterDestinations';
+import { isMusicSheetPath, MUSIC_SHEET_ROUTES } from './musicFooterDestinations';
 
 const triggerSx: SxObject = {
   alignItems: 'center',
@@ -65,7 +61,7 @@ export function MusicFooterMenu({ icon, title }: MusicFooterMenuProps) {
   const triggerRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
   const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
-  const sheetIsOpen = MUSIC_SHEET_PATHS.has(normalizeMusicPath(pathname));
+  const sheetIsOpen = isMusicSheetPath(pathname);
 
   useLayoutEffect(() => {
     if (!triggerRef.current) {
@@ -105,7 +101,7 @@ export function MusicFooterMenu({ icon, title }: MusicFooterMenuProps) {
         open={Boolean(menuAnchor)}
         transformOrigin={{ horizontal: 'center', vertical: 'bottom' }}
       >
-        {MUSIC_FOOTER_DESTINATIONS.map((destination) => (
+        {MUSIC_SHEET_ROUTES.map((destination) => (
           <MenuItem key={destination.href} onClick={handleClose} sx={menuItemSx}>
             <SheetOpenLink href={destination.href} sx={menuLinkSx} title={destination.label}>
               {destination.label}

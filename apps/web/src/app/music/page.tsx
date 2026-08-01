@@ -9,10 +9,11 @@ import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { getMusicHistory } from '../../services/music';
 import { markdownAlternates } from '../layouts/markdownAlternates';
+import { musicSheetLabel } from '../layouts/musicFooterDestinations';
 import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 
-const TITLE = 'Listening history';
+const TITLE = musicSheetLabel(musicRoute);
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(musicRoute),
