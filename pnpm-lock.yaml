@@ -148,6 +148,9 @@ importers:
       '@emotion/styled':
         specifier: 11.14.1
         version: 11.14.1(@emotion/react@11.14.0(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1))(@types/react@19.2.17)(react@19.3.0-canary-756fdd47-20260727)(supports-color@8.1.1)
+      '@flags-sdk/vercel':
+        specifier: 1.4.6
+        version: 1.4.6(flags@4.2.4(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(ws@8.21.1)
       '@fortawesome/free-brands-svg-icons':
         specifier: 'catalog:'
         version: 7.3.1
@@ -166,6 +169,9 @@ importers:
       dotenv-mono:
         specifier: 'catalog:'
         version: 1.5.1
+      flags:
+        specifier: 4.2.4
+        version: 4.2.4(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
       lucide-react:
         specifier: 'catalog:'
         version: 1.25.0(react@19.3.0-canary-756fdd47-20260727)
@@ -922,6 +928,10 @@ packages:
     resolution: {integrity: sha512-Vd/9EVDiu6PPJt9yAh6roZP6El1xHrdvIVGjyBsHR0RYwNHgL7FJPyIIW4fANJNG6FtyZfvlRPpFI4ZM/lubvw==}
     engines: {node: '>=18'}
 
+  '@edge-runtime/cookies@5.0.2':
+    resolution: {integrity: sha512-Sd8LcWpZk/SWEeKGE8LT6gMm5MGfX/wm+GPnh1eBEtCpya3vYqn37wYknwAHw92ONoyyREl1hJwxV/Qx2DWNOg==}
+    engines: {node: '>=16'}
+
   '@emnapi/core@1.10.0':
     resolution: {integrity: sha512-yq6OkJ4p82CAfPl0u9mQebQHKPJkY7WrIuk205cTYnYe+k2Z8YBh11FrbRG/H6ihirqcacOgl2BIO8oyMQLeXw==}
 
@@ -1303,6 +1313,11 @@ packages:
   '@fastify/busboy@2.1.1':
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
+
+  '@flags-sdk/vercel@1.4.6':
+    resolution: {integrity: sha512-S0hkhjdzFmOTvpfI5kQMF6fyTNkx3V0dov3DOi3C6M/EdXlieZhGeMv21npW7zzj5IyUYUmYHihextWLe7ib5Q==}
+    peerDependencies:
+      flags: '*'
 
   '@fortawesome/fontawesome-common-types@7.3.1':
     resolution: {integrity: sha512-k0C0sdHmZtAo6dRDtd1Z/qcpyHbL0CKsjV8seMY/21xGhY5Wsv0XRmiI/xEEH4y2c9b1+jvgNs/3EqhV27yUEA==}
@@ -2586,13 +2601,43 @@ packages:
   '@vercel/cli-config@0.2.0':
     resolution: {integrity: sha512-fJRRRB7734BDuXZ89yBEaA2ncYhH7bWX30mk04W80J6VAfQc+4iB8lyzAdaGpFV3/vNlkt9VZt+/uoQoWX6UsQ==}
 
+  '@vercel/cli-config@0.2.1':
+    resolution: {integrity: sha512-RhfyXmRLHdbnry8RJqHDc+5rGxMZ0bu+fpysZjtv3bE+BubpuwxTancHOKiH5zKQREsdwFVr3mOI2kOvxlOyxA==}
+
+  '@vercel/cli-exec@1.0.0':
+    resolution: {integrity: sha512-kQF8LGie/Hbdq9/psJxLE7owRTcqMQMhgybU04gCeR7cbQAr5t8OrjefDNColJv1QSSucFt4pLwRiARVmlOnug==}
+    engines: {node: '>= 18'}
+
   '@vercel/detect-agent@1.2.3':
     resolution: {integrity: sha512-VYNCgUc0nOmC4WJmWw9GkrKdfr8Zl4/rxhC5SvgacBgxiW9W/9NRttUoHHXV8xdII3MaRgkZZVX8Ikzc/Jmjag==}
     engines: {node: '>=14'}
 
+  '@vercel/flags-core@1.7.1':
+    resolution: {integrity: sha512-Fzm/+ubwxjEjhdGC8RXp+maQzjRFCNCPbXuxHd75v1tKllya45+gYRhc71HHqIVuteVWkdaYAdRdi+ytwaShiQ==}
+    peerDependencies:
+      '@openfeature/server-sdk': 1.18.0
+      next: '*'
+    peerDependenciesMeta:
+      '@openfeature/server-sdk':
+        optional: true
+      next:
+        optional: true
+
   '@vercel/fun@1.3.0':
     resolution: {integrity: sha512-8erw9uPe0dFg45THkNxmjtvMX143SkZebmjgSVbcM3XCkXu3RIiBaJMcMNG8aaS+rnTuw8+d4De9HVT0M/r3wg==}
     engines: {node: '>= 18'}
+
+  '@vercel/functions@3.7.6':
+    resolution: {integrity: sha512-QKlSfrgvo4pGEnzHw8Dha9GRTb5hhLBbImKi4rL4CmxClaVs+36hxgjW0MOqez57wWShstpKOWZY/mU8KuYoUQ==}
+    engines: {node: '>= 20'}
+    peerDependencies:
+      '@aws-sdk/credential-provider-web-identity': '*'
+      ws: '>=8'
+    peerDependenciesMeta:
+      '@aws-sdk/credential-provider-web-identity':
+        optional: true
+      ws:
+        optional: true
 
   '@vercel/og@0.11.1':
     resolution: {integrity: sha512-02rXXRABFq1B03w3aNhcVfxkY+8Ba5QFi4ax0zS0oOiD/LL9WUd/LA7BjVPakrQmVhIBjuo2oBM5U25R9IuXMg==}
@@ -2600,6 +2645,14 @@ packages:
 
   '@vercel/oidc@3.2.0':
     resolution: {integrity: sha512-UycprH3T6n3jH0k44NHMa7pnFHGu/N05MjojYr+Mc6I7obkoLIJujSWwin1pCvdy/eOxrI/l3uDLQsmcrOb4ug==}
+    engines: {node: '>= 20'}
+
+  '@vercel/oidc@3.5.0':
+    resolution: {integrity: sha512-jo7GgeJx2YMkjg9A28pFM5p88n5SnSHvDeNlf9898bRWiG9jPxwedj/gn/2XTw4UOTyQ50uHlrTGSlf/XU5tgw==}
+    engines: {node: '>= 20'}
+
+  '@vercel/oidc@3.8.1':
+    resolution: {integrity: sha512-ufdalm2MWOYksyj8KVpWjoOFPJO6zoYpuyvIggIQ2bB0CFCjTCiTkGXHqAKwG77GVRjOaN3/8S5ITlZpXWmqOw==}
     engines: {node: '>= 20'}
 
   '@vercel/prepare-flags-definitions@0.3.0':
@@ -3138,6 +3191,23 @@ packages:
     resolution: {integrity: sha512-PpOwAdQ/YlXQ2vj8a3h8IipDuYRi3wceVQQGYWxNINccq40Anw7BlsEXCMbt1Zt+OLA6Fq9suIpIWD0OsnISlw==}
     engines: {node: '>=8'}
 
+  flags@4.2.4:
+    resolution: {integrity: sha512-PzNTHW6y6RV4AANlmc7wGzYjTMIZ1Jpa29zeEYwXM9qqxc4XC1tfcjOLvae3KyZMWocgvoud86vSzc2zOa14nQ==}
+    peerDependencies:
+      '@opentelemetry/api': ^1.7.0
+      next: '*'
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727
+    peerDependenciesMeta:
+      '@opentelemetry/api':
+        optional: true
+      next:
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+
   foreground-child@3.3.1:
     resolution: {integrity: sha512-gIXjKqtFuWEgzFRJA9WCQeSJLZDjgJUOMCMzxtvFq/37KojM1BFGufqsCy0r4qSQmYLsZYMeyRqzIWOMup03sw==}
     engines: {node: '>=14'}
@@ -3496,6 +3566,12 @@ packages:
       node-notifier:
         optional: true
 
+  jose@5.10.0:
+    resolution: {integrity: sha512-s+3Al/p9g32Iq+oqXxkW//7jk2Vig6FF1CFqzVXoTUXt2qz89YWbL+OwS17NFYEvxC35n0FKeGO2LGYSxeM2Gg==}
+
+  jose@5.2.1:
+    resolution: {integrity: sha512-qiaQhtQRw6YrOaOj0v59h3R6hUY9NvxBmmnMfKemkqYmBB0tEc97NbLP7ix44VP5p9/0YHG8Vyhzuo5YBNwviA==}
+
   jose@5.9.6:
     resolution: {integrity: sha512-AMlnetc9+CV9asI19zHmrgS/WYsWUwCn2R7RzlbJWD7F9eWYUTGyBmU9o6PxngtLGOiDGPRu+Uc4fhKzbpteZQ==}
 
@@ -3512,6 +3588,10 @@ packages:
 
   js-tokens@4.0.0:
     resolution: {integrity: sha512-RdJUflcE3cUzKiMqQgsCu06FPu9UdIJO0beYbPhHN4k6apgJtifcoCtT9bcxOpYBtpD2kCM6Sbzg4CausW/PKQ==}
+
+  js-xxhash@4.0.0:
+    resolution: {integrity: sha512-3Q2eIqG6s1KEBBmkj9tGM9lef8LJbuRyTVBdI3GpTnrvtytunjLPO0wqABp5qhtMzfA32jYn1FlnIV7GH1RAHQ==}
+    engines: {node: '>=18.0.0'}
 
   js-yaml@3.15.0:
     resolution: {integrity: sha512-ttBQIIQPDeLjpPOohtUdXuXUVoA2uIB6fEH9HyJ7234s5mBJ5wTx20njxplLZQgLaOfpmPQA7X2t5AX6tIPbog==}
@@ -4910,6 +4990,8 @@ snapshots:
 
   '@csstools/css-tokenizer@3.0.4': {}
 
+  '@edge-runtime/cookies@5.0.2': {}
+
   '@emnapi/core@1.10.0':
     dependencies:
       '@emnapi/wasi-threads': 1.2.1
@@ -5171,6 +5253,16 @@ snapshots:
     optional: true
 
   '@fastify/busboy@2.1.1': {}
+
+  '@flags-sdk/vercel@1.4.6(flags@4.2.4(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(ws@8.21.1)':
+    dependencies:
+      '@vercel/flags-core': 1.7.1(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(ws@8.21.1)
+      flags: 4.2.4(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-provider-web-identity'
+      - '@openfeature/server-sdk'
+      - next
+      - ws
 
   '@fortawesome/fontawesome-common-types@7.3.1': {}
 
@@ -6220,7 +6312,28 @@ snapshots:
       xdg-app-paths: 5.5.1
       zod: 4.1.11
 
+  '@vercel/cli-config@0.2.1':
+    dependencies:
+      xdg-app-paths: 5.5.1
+      zod: 4.1.11
+
+  '@vercel/cli-exec@1.0.0':
+    dependencies:
+      execa: 5.1.1
+
   '@vercel/detect-agent@1.2.3': {}
+
+  '@vercel/flags-core@1.7.1(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(ws@8.21.1)':
+    dependencies:
+      '@vercel/functions': 3.7.6(ws@8.21.1)
+      '@vercel/oidc': 3.5.0
+      jose: 5.2.1
+      js-xxhash: 4.0.0
+    optionalDependencies:
+      next: 16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
+    transitivePeerDependencies:
+      - '@aws-sdk/credential-provider-web-identity'
+      - ws
 
   '@vercel/fun@1.3.0(supports-color@8.1.1)':
     dependencies:
@@ -6246,6 +6359,12 @@ snapshots:
       - encoding
       - supports-color
 
+  '@vercel/functions@3.7.6(ws@8.21.1)':
+    dependencies:
+      '@vercel/oidc': 3.8.1
+    optionalDependencies:
+      ws: 8.21.1
+
   '@vercel/og@0.11.1':
     dependencies:
       '@resvg/resvg-wasm': 2.4.0
@@ -6254,6 +6373,14 @@ snapshots:
       sharp: 0.34.5
 
   '@vercel/oidc@3.2.0': {}
+
+  '@vercel/oidc@3.5.0': {}
+
+  '@vercel/oidc@3.8.1':
+    dependencies:
+      '@vercel/cli-config': 0.2.1
+      '@vercel/cli-exec': 1.0.0
+      jose: 5.9.6
 
   '@vercel/prepare-flags-definitions@0.3.0': {}
 
@@ -6778,6 +6905,15 @@ snapshots:
     dependencies:
       locate-path: 5.0.0
       path-exists: 4.0.0
+
+  flags@4.2.4(next@16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727))(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727):
+    dependencies:
+      '@edge-runtime/cookies': 5.0.2
+      jose: 5.10.0
+    optionalDependencies:
+      next: 16.2.10(@babel/core@7.29.7(supports-color@8.1.1))(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727))(react@19.3.0-canary-756fdd47-20260727)
+      react: 19.3.0-canary-756fdd47-20260727
+      react-dom: 19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727)
 
   foreground-child@3.3.1:
     dependencies:
@@ -7316,6 +7452,10 @@ snapshots:
       - supports-color
       - ts-node
 
+  jose@5.10.0: {}
+
+  jose@5.2.1: {}
+
   jose@5.9.6: {}
 
   jose@6.2.3: {}
@@ -7331,6 +7471,8 @@ snapshots:
   js-cookie@3.0.8: {}
 
   js-tokens@4.0.0: {}
+
+  js-xxhash@4.0.0: {}
 
   js-yaml@3.15.0:
     dependencies:

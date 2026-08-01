@@ -6,8 +6,9 @@ import { SheetOpenLink } from '@dg/ui/core/sheet/SheetOpenLink';
 import { SITE_FOOTER_VIEW_TRANSITION_NAME } from '@dg/ui/core/sheet/sheetTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Container, Divider, Stack } from '@mui/material';
+import { Box, Container, Divider, Stack, Typography } from '@mui/material';
 import { cacheLife } from 'next/cache';
+import { interactiveRedesign } from '../../flags';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
 
@@ -103,10 +104,11 @@ async function getCopyrightYear() {
  * Creates the site footer component - shows version data + copyright
  */
 export async function Footer() {
-  const [footerLinks, versionInfo, currentYear] = await Promise.all([
+  const [footerLinks, versionInfo, currentYear, redesignOn] = await Promise.all([
     getFooterLinks(),
     getAppVersionInfo(),
     getCopyrightYear(),
+    interactiveRedesign(),
   ]);
   const nonIconFooterLinks = footerLinks.filter((link) => !link.icon);
   const iconFooterLinks = footerLinks.filter((link) => link.icon);
@@ -153,6 +155,16 @@ export async function Footer() {
                   Listening history
                 </SheetOpenLink>
               </NavItem>
+              {redesignOn ? (
+                <>
+                  <NavItem sx={navItemNoPaddingSx}>•</NavItem>
+                  <NavItem>
+                    <Typography color="text.secondary" component="span" variant="caption">
+                      redesign on
+                    </Typography>
+                  </NavItem>
+                </>
+              ) : null}
               {process.env.NODE_ENV !== 'production' ? (
                 <>
                   <NavItem sx={navItemNoPaddingSx}>•</NavItem>
