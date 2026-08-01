@@ -16,7 +16,7 @@ export async function getFavoriteAlbumsMarkdown(): Promise<string> {
       `> All-time favorite albums from ${SITE_NAME}`,
     ];
 
-    if (albums.length === 0) {
+    if (!albums || albums.length === 0) {
       sections.push('No albums available.');
     } else {
       sections.push(
