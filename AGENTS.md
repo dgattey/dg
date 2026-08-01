@@ -14,6 +14,14 @@ This is `dg`, a single Next.js 16 app (`@dg/web`) in a pnpm + Turbo monorepo. Se
 - `STADIA_API_KEY` may be absent; the homepage still renders (only the watercolor map tiles are affected).
 - `turbo dev` does NOT start the Cloudflare tunnel (the `dev` task does not depend on `tunnel`), so a set `CLOUDFLARE_TUNNEL_TOKEN` is ignored during normal dev.
 
+### Agent surfaces
+- `/llms.txt`, `/llms-full.txt` — LLM site summaries
+- `/.well-known/api-catalog`, `openapi.json`, `api-status` — API discovery
+- `/.well-known/agent-skills` — skill index (`index.json`) and `[name]/SKILL.md`
+- `/.well-known/vercel/flags` — Flags discovery endpoint
+- WebMCP: `apps/web/src/app/layouts/WebMcpTools.tsx`
+- Page list for markdown negotiation is centralized in `packages/shared-core/routes` (`markdownPages`)
+
 ### Database (Postgres / Neon) — important gotchas
 - The app needs `DATABASE_URL` (dev) and `DATABASE_URL_TEST` (tests). If `turbo migrate` or app startup fails with `password authentication failed`, the injected DB credentials are stale and need to be refreshed; any reachable Postgres (e.g. a fresh Neon branch) works if you override those two env vars for the process.
 - Test-DB migration deadlock: the initial migration opens a transaction but calls `createTable` on a fresh connection, and the test env forces `pool.max = 1`. Running *pending* migrations against the test DB therefore deadlocks (`SequelizeConnectionAcquireTimeoutError`). `turbo test`'s global setup only runs *pending* migrations, so make sure `DATABASE_URL_TEST` already has every migration applied before running tests — the reliable way is to migrate it once through the dev pool (point `DATABASE_URL` at the test DB and run `turbo migrate`, which uses the default multi-connection pool and does not deadlock).

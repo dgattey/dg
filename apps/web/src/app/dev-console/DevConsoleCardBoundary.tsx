@@ -1,7 +1,7 @@
 'use client';
 
 import { Component, type ReactNode } from 'react';
-import { ErrorMessage } from './ErrorMessage';
+import { ErrorMessage } from './StatusIndicators';
 
 type DevConsoleCardBoundaryProps = {
   children: ReactNode;

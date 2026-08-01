@@ -1,4 +1,4 @@
-import type { HistoryTrack } from '../../services/music';
+import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
 
 export type TrackSection = {
   label: string;

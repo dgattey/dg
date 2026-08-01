@@ -53,6 +53,18 @@ If `turbo` is not found, ensure `~/.nodenv/shims` is on PATH, then `nodenv rehas
 
 Feature flags are separate: Vercel Flags (`FLAGS` on Vercel, see `apps/web/src/flags.ts`). Local OAuth/webhook debugging lives at `/dev-console`.
 
+### Agent surfaces
+
+Public discovery endpoints for LLMs and tools (route registry lives in `packages/shared-core/routes`):
+
+- `/llms.txt` and `/llms-full.txt` — site summaries for agents
+- `/.well-known/api-catalog`, `openapi.json`, `api-status` — machine-readable API discovery
+- `/.well-known/agent-skills` — skill index + per-skill markdown
+- `/.well-known/vercel/flags` — Vercel Flags discovery (not 1Password)
+- WebMCP tools in `apps/web/src/app/layouts/WebMcpTools.tsx`
+
+Secrets stay on 1Password via `turbo env` / `config/env.secrets.keys`. Flags stay on Vercel (`FLAGS`). Do not merge those systems without an explicit product decision.
+
 ## :memo: Pull Requests
 
 Feature branches squash onto main, and Linear is used for ticket tracking.

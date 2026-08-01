@@ -1,9 +1,6 @@
 import 'server-only';
 
-import {
-  fetchMusicHistoryPage,
-  type HistoryTrack,
-} from '@dg/services/spotify/fetchMusicHistoryPage';
+import { fetchMusicHistoryPage } from '@dg/services/spotify/fetchMusicHistoryPage';
 import { cacheLife, cacheTag } from 'next/cache';
 
 const MUSIC_HISTORY_TAG = 'music-history';
@@ -14,7 +11,7 @@ type MusicHistoryOptions = {
 };
 
 type MusicHistoryResult = {
-  tracks: Array<HistoryTrack>;
+  tracks: Awaited<ReturnType<typeof fetchMusicHistoryPage>>['tracks'];
   nextCursor: string | null;
 };
 
@@ -44,6 +41,3 @@ export async function getMusicHistory({
     pageSize: MUSIC_HISTORY_PAGE_SIZE,
   });
 }
-
-// Re-export HistoryTrack type for consumers
-export type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
