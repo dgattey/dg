@@ -1,11 +1,13 @@
 'use client';
 
 import { homeRoute } from '@dg/shared-core/routes/app';
+import { pageTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
 import { Button } from '@mui/material';
 import { usePathname } from 'next/navigation';
+import { isMusicDestinationPath } from './musicFooterDestinations';
 
 const paddingStyles: SxObject = {
   paddingBlock: 1,
@@ -67,7 +69,9 @@ const logoLinkMergedSx: SxObject = {
 };
 
 /**
- * Logo that scrolls to top on home page, or links to home on other pages
+ * Logo that scrolls to top on home page, or links to home on other pages.
+ * Leaving a music destination uses the close view-transition type so the page
+ * falls away instead of snapping.
  */
 export function Logo() {
   const pathname = usePathname();
@@ -85,7 +89,11 @@ export function Logo() {
   }
 
   return (
-    <Link href={homeRoute} sx={logoLinkMergedSx}>
+    <Link
+      href={homeRoute}
+      sx={logoLinkMergedSx}
+      transitionTypes={isMusicDestinationPath(pathname) ? pageTransitionTypes('close') : undefined}
+    >
       dg.
     </Link>
   );

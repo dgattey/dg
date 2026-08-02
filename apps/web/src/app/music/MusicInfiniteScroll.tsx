@@ -2,6 +2,7 @@
 
 import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
 import { useServerTime } from '@dg/ui/core/ServerTimeContext';
+import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, CircularProgress, Stack, Typography } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
@@ -19,6 +20,10 @@ const loadingContainerSx: SxObject = {
   display: 'flex',
   justifyContent: 'center',
   py: 2,
+};
+
+const sectionHeaderSx: SxObject = {
+  paddingBlock: 2,
 };
 
 /**
@@ -69,9 +74,11 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor }: Props) {
     <Stack spacing={3}>
       {sections.map((section) => (
         <Stack key={section.label} spacing={1}>
-          <Typography sx={{ paddingBlock: 2 }} variant="h2">
-            {section.label}
-          </Typography>
+          <StickyFadeBar>
+            <Typography sx={sectionHeaderSx} variant="h2">
+              {section.label}
+            </Typography>
+          </StickyFadeBar>
           <MusicGrid tracks={section.tracks} />
         </Stack>
       ))}

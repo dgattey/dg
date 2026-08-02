@@ -2,6 +2,7 @@
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { GlassSwitcher } from '@dg/ui/core/GlassSwitcher';
+import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack } from '@mui/material';
@@ -90,13 +91,15 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
 
   return (
     <Stack spacing={2}>
-      <GlassSwitcher
-        aria-label="Sort albums"
-        mobileIcon={<ArrowDownUp size={18} />}
-        onChange={(next) => handleSortChange(next as AlbumSortKey)}
-        options={SORT_OPTIONS.map((option) => ({ label: option.label, value: option.key }))}
-        value={sortKey}
-      />
+      <StickyFadeBar>
+        <GlassSwitcher
+          aria-label="Sort albums"
+          mobileIcon={<ArrowDownUp size={18} />}
+          onChange={(next) => handleSortChange(next as AlbumSortKey)}
+          options={SORT_OPTIONS.map((option) => ({ label: option.label, value: option.key }))}
+          value={sortKey}
+        />
+      </StickyFadeBar>
       <Box sx={gridSx}>
         {sortedAlbums.map((album) => (
           <Box

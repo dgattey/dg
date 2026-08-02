@@ -1,8 +1,8 @@
 /*
- * A sheet route presents as a panel over the page it was opened from. The page
- * dims in place and stays underneath; the panel slides without ever going
- * translucent. Nothing cross-fades two full screens, so no frame shows both
- * layouts at once.
+ * A destination opened from the footer music control rises over the page it was
+ * opened from. The page it covers dims in place and stays underneath; the
+ * arriving page slides without ever going translucent. Nothing cross-fades two
+ * full screens, so no frame shows both layouts at once.
  *
  * Durations and easings come from :root vars set by getTimingCssVars().
  */
@@ -45,9 +45,9 @@
 }
 
 /*
- * The footer sits above the page it belongs to but under the panel, so the
- * panel occludes it on the way in and uncovers it on the way out instead of
- * chrome floating over album art.
+ * The footer sits above the page it belongs to but under the arriving one, so
+ * the arriving page occludes it on the way in and uncovers it on the way out
+ * instead of chrome floating over album art.
  */
 ::view-transition-group(site-footer) {
   z-index: 15;
@@ -66,12 +66,12 @@
 }
 
 /*
- * The heading travels between the footer control and the sheet header, so it
- * paints above both panels for the whole trip. Sizing both snapshots to the
+ * The heading travels between the footer control and the page heading, so it
+ * paints above both pages for the whole trip. Sizing both snapshots to the
  * group makes the two type scales grow into each other rather than one text
  * stretching over the other.
  */
-::view-transition-group(sheet-title) {
+::view-transition-group(page-title) {
   z-index: 200;
   animation-duration: var(--timing-slow);
   animation-timing-function: var(--easing-ease-out);
@@ -84,19 +84,19 @@
  * heading spelled two ways at once with a rule struck through the middle.
  * One snapshot flying and scaling into place is the morph; two is a ghost.
  */
-::view-transition-old(sheet-title) {
+::view-transition-old(page-title) {
   opacity: 0;
   animation: none;
 }
 
 /* The slot the heading vacated is a hole, not a second copy of the heading. */
-::view-transition-old(sheet-title-slot),
-::view-transition-new(sheet-title-slot) {
+::view-transition-old(page-title-slot),
+::view-transition-new(page-title-slot) {
   opacity: 0;
   animation: none;
 }
 
-::view-transition-new(sheet-title) {
+::view-transition-new(page-title) {
   width: auto;
   block-size: 100%;
   object-fit: contain;
@@ -104,9 +104,9 @@
   animation: none;
 }
 
-/* The panel rides above the page it covers, in both directions. */
-::view-transition-group(.vt-sheet-rise),
-::view-transition-group(.vt-sheet-fall) {
+/* The arriving page rides above the one it covers, in both directions. */
+::view-transition-group(.vt-page-rise),
+::view-transition-group(.vt-page-fall) {
   z-index: 20;
 }
 
@@ -123,12 +123,12 @@
   animation: var(--timing-slow) var(--easing-ease-out) both vt-page-reveal;
 }
 
-::view-transition-new(.vt-sheet-rise) {
-  animation: var(--timing-slow) var(--easing-ease-out) both vt-sheet-rise;
+::view-transition-new(.vt-page-rise) {
+  animation: var(--timing-slow) var(--easing-ease-out) both vt-page-rise;
 }
 
-::view-transition-old(.vt-sheet-fall) {
-  animation: var(--timing-slow) var(--easing-ease-out) both vt-sheet-fall;
+::view-transition-old(.vt-page-fall) {
+  animation: var(--timing-slow) var(--easing-ease-out) both vt-page-fall;
 }
 
 /* Match Next VT guide: force-disable UA transition animations for reduced motion. */
@@ -144,35 +144,37 @@
 }
 
 /*
- * Translation only. An opacity fade on the panel would let the page show
- * through it mid-flight, which is the double exposure this motion exists to
- * avoid. Percentages resolve against the panel's own height, so the travel
- * scales with how tall the sheet is.
+ * Translation only. An opacity fade on the arriving page would let the page
+ * underneath show through it mid-flight, which is the double exposure this
+ * motion exists to avoid. A percentage resolves against the snapshot's own
+ * height, and these pages run as long as their content, so the travel is
+ * capped to a slice of the viewport: an uncapped page-height slide reads as a
+ * scroll rather than a rise.
  */
 
-@keyframes vt-sheet-rise {
+@keyframes vt-page-rise {
   from {
-    transform: translateY(100%);
+    transform: translateY(min(100%, 30dvh));
   }
   to {
     transform: none;
   }
 }
 
-@keyframes vt-sheet-fall {
+@keyframes vt-page-fall {
   from {
     transform: none;
   }
   to {
-    transform: translateY(100%);
+    transform: translateY(min(100%, 30dvh));
   }
 }
 
 /*
  * The covered page drops to a dim hold for most of the transition so it reads
- * as one scene with the panel, then clears in the tail once the panel has
- * landed. Going straight to transparent would blank the viewport around the
- * panel; stopping at the hold would pop when the snapshot is discarded.
+ * as one scene with the arriving page, then clears in the tail once that page
+ * has landed. Going straight to transparent would blank the viewport around it;
+ * stopping at the hold would pop when the snapshot is discarded.
  *
  * No `mix-blend-mode: plus-lighter`. Adding two layers is what produced the
  * double-exposed frames these keyframes replace. Pages are as tall as their

@@ -1,23 +1,18 @@
-import { homeRoute } from '@dg/shared-core/routes/app';
-import type { ReactElement } from 'react';
-
-jest.mock('@dg/ui/core/sheet/Sheet', () => ({
-  Sheet: Object.assign(({ children }: { children: React.ReactNode }) => children, {
-    displayName: 'Sheet',
-  }),
-}));
-
-import { Sheet } from '@dg/ui/core/sheet/Sheet';
+import type { ReactElement, ReactNode } from 'react';
+import { PageTitle } from '../../../layouts/PageTitle';
 import FavoriteAlbumsPage from '../page';
 
 describe('Favorite albums page', () => {
-  it('wraps content in a home-closing sheet without awaiting at the page root', () => {
-    const element = FavoriteAlbumsPage() as ReactElement<{
-      closeHref: string;
-      title: string;
-    }>;
-    expect(element.type).toBe(Sheet);
-    expect(element.props.title).toBe('Favorite albums');
-    expect(element.props.closeHref).toBe(homeRoute);
+  it('renders a page title without a sheet shell', () => {
+    const element = FavoriteAlbumsPage() as ReactElement<{ children: ReactNode }>;
+    const children = Array.isArray(element.props.children)
+      ? element.props.children
+      : [element.props.children];
+    const title = children.find(
+      (child): child is ReactElement<{ children: string }> =>
+        !!child && typeof child === 'object' && 'type' in child && child.type === PageTitle,
+    );
+    expect(title).toBeDefined();
+    expect(title?.props.children).toBe('Favorite albums');
   });
 });

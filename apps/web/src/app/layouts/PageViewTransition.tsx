@@ -1,7 +1,7 @@
 'use client';
 
-import { takeSheetOrigin } from '@dg/ui/core/sheet/sheetScrollMemory';
-import { sheetPageViewTransitionProps } from '@dg/ui/core/sheet/sheetTransitions';
+import { takePageOrigin } from '@dg/ui/core/transitions/pageScrollMemory';
+import { pageViewTransitionProps } from '@dg/ui/core/transitions/pageTransitions';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { useLayoutEffect, ViewTransition } from 'react';
@@ -18,14 +18,14 @@ export function PageViewTransition({ children }: { children: ReactNode }) {
   // Scroll has to land before the browser photographs the new page, so this
   // is a layout effect rather than an effect.
   useLayoutEffect(() => {
-    const scrollY = takeSheetOrigin(pathname);
+    const scrollY = takePageOrigin(pathname);
     if (scrollY !== null) {
       window.scrollTo({ behavior: 'instant', top: scrollY });
     }
   }, [pathname]);
 
   return (
-    <ViewTransition key={pathname} {...sheetPageViewTransitionProps}>
+    <ViewTransition key={pathname} {...pageViewTransitionProps}>
       {children}
     </ViewTransition>
   );

@@ -4,9 +4,9 @@
 
 import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
 import {
-  SHEET_TITLE_SLOT_VIEW_TRANSITION_NAME,
-  SHEET_TITLE_VIEW_TRANSITION_NAME,
-} from '@dg/ui/core/sheet/sheetTransitions';
+  PAGE_TITLE_SLOT_VIEW_TRANSITION_NAME,
+  PAGE_TITLE_VIEW_TRANSITION_NAME,
+} from '@dg/ui/core/transitions/pageTransitions';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
@@ -14,8 +14,8 @@ jest.mock('next/navigation', () => ({
   usePathname: jest.fn(() => '/'),
 }));
 
-jest.mock('@dg/ui/core/sheet/sheetScrollMemory', () => ({
-  rememberSheetOrigin: jest.fn(),
+jest.mock('@dg/ui/core/transitions/pageScrollMemory', () => ({
+  rememberPageOrigin: jest.fn(),
 }));
 
 import { usePathname } from 'next/navigation';
@@ -32,9 +32,9 @@ describe('MusicFooterMenu', () => {
 
   it('opens a menu with both music destinations in order', async () => {
     const user = userEvent.setup();
-    render(<MusicFooterMenu icon="albums" title="Favorite albums" />);
+    render(<MusicFooterMenu icon="albums" />);
 
-    const trigger = screen.getByRole('button', { name: 'Favorite albums' });
+    const trigger = screen.getByRole('button', { name: 'Music' });
     expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
     expect(trigger).not.toHaveAttribute('aria-expanded', 'true');
 
@@ -49,13 +49,13 @@ describe('MusicFooterMenu', () => {
     expect(links.map((link) => link.textContent)).toEqual(['Favorite albums', 'Listening history']);
   });
 
-  it('gives only the trigger the sheet-title name while the menu is open', async () => {
+  it('gives only the trigger the page-title name while the menu is open', async () => {
     const user = userEvent.setup();
     mockUsePathname.mockReturnValue('/');
-    render(<MusicFooterMenu icon="albums" title="Favorite albums" />);
+    render(<MusicFooterMenu icon="albums" />);
 
-    const trigger = screen.getByRole('button', { name: 'Favorite albums' });
-    expect(trigger.style.viewTransitionName).toBe(SHEET_TITLE_VIEW_TRANSITION_NAME);
+    const trigger = screen.getByRole('button', { name: 'Music' });
+    expect(trigger.style.viewTransitionName).toBe(PAGE_TITLE_VIEW_TRANSITION_NAME);
 
     await user.click(trigger);
     const menuLinks = screen.getAllByRole('link');
@@ -65,22 +65,22 @@ describe('MusicFooterMenu', () => {
     }
 
     const named = [trigger, ...menuLinks].filter(
-      (element) => element.style.viewTransitionName === SHEET_TITLE_VIEW_TRANSITION_NAME,
+      (element) => element.style.viewTransitionName === PAGE_TITLE_VIEW_TRANSITION_NAME,
     );
     expect(named).toHaveLength(1);
   });
 
-  it('switches the trigger to the slot name on either music sheet', () => {
+  it('switches the trigger to the slot name on either music destination', () => {
     mockUsePathname.mockReturnValue(musicRoute);
-    const { rerender } = render(<MusicFooterMenu icon="albums" title="Favorite albums" />);
-    expect(screen.getByRole('button', { name: 'Favorite albums' }).style.viewTransitionName).toBe(
-      SHEET_TITLE_SLOT_VIEW_TRANSITION_NAME,
+    const { rerender } = render(<MusicFooterMenu icon="albums" />);
+    expect(screen.getByRole('button', { name: 'Music' }).style.viewTransitionName).toBe(
+      PAGE_TITLE_SLOT_VIEW_TRANSITION_NAME,
     );
 
     mockUsePathname.mockReturnValue(favoriteAlbumsRoute);
-    rerender(<MusicFooterMenu icon="albums" title="Favorite albums" />);
-    expect(screen.getByRole('button', { name: 'Favorite albums' }).style.viewTransitionName).toBe(
-      SHEET_TITLE_SLOT_VIEW_TRANSITION_NAME,
+    rerender(<MusicFooterMenu icon="albums" />);
+    expect(screen.getByRole('button', { name: 'Music' }).style.viewTransitionName).toBe(
+      PAGE_TITLE_SLOT_VIEW_TRANSITION_NAME,
     );
   });
 

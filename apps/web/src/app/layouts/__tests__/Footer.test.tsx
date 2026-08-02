@@ -26,8 +26,8 @@ jest.mock('next/navigation', () => ({
   usePathname: jest.fn(() => '/'),
 }));
 
-jest.mock('@dg/ui/core/sheet/SheetOpenLink', () => ({
-  SheetOpenLink: ({
+jest.mock('@dg/ui/core/transitions/PageTransitionLink', () => ({
+  PageTransitionLink: ({
     children,
     href,
     title,
@@ -87,7 +87,7 @@ describe('Footer redesign badge', () => {
 
     expect(screen.getByRole('link', { name: 'GitHub' })).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Favorite albums' }));
+    await user.click(screen.getByRole('button', { name: 'Music' }));
     expect(screen.getByRole('link', { name: 'Favorite albums' })).toHaveAttribute(
       'href',
       favoriteAlbumsRoute,
@@ -104,6 +104,6 @@ describe('Footer redesign badge', () => {
       { icon: 'albums', title: 'Favorite albums', url: `${favoriteAlbumsRoute}/` },
     ]);
     render(await Footer());
-    expect(screen.getByRole('button', { name: 'Favorite albums' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Music' })).toBeInTheDocument();
   });
 });
