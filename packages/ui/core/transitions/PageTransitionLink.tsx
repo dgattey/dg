@@ -5,17 +5,17 @@ import type { ReactNode } from 'react';
 import { useLayoutEffect, useRef } from 'react';
 import { Link } from '../../dependent/Link';
 import type { SxProps } from '../../theme';
-import { rememberSheetOrigin } from './sheetScrollMemory';
-import { sheetTitleMorphName, sheetTransitionTypes } from './sheetTransitions';
+import { rememberPageOrigin } from './pageScrollMemory';
+import { pageTitleMorphName, pageTransitionTypes } from './pageTransitions';
 
-export type SheetOpenLinkProps = {
+export type PageTransitionLinkProps = {
   children?: ReactNode;
   color?: 'inherit';
   href: string;
   /**
-   * Lends this control's box to the sheet heading. At most one control per
-   * sheet may set it, since two elements sharing a `view-transition-name`
-   * abort the transition.
+   * Lends this control's box to the destination's heading. At most one control
+   * per destination may set it, since two elements sharing a
+   * `view-transition-name` abort the transition.
    */
   morphsTitle?: boolean;
   sx?: SxProps;
@@ -24,22 +24,22 @@ export type SheetOpenLinkProps = {
 };
 
 /**
- * Link that opens a sheet route, optionally handing its own box to the sheet
- * heading so the heading flies out of the control on the way in and back into
- * it on the way out.
+ * Link that rises a destination page over the current one, optionally handing
+ * its own box to that page's heading so the heading flies out of the control on
+ * the way in and back into it on the way out.
  *
  * Swapping the name in a layout effect lands it before the browser photographs
  * either side of a navigation, which is what makes the return trip morph
  * rather than fade in place.
  */
-export function SheetOpenLink({
+export function PageTransitionLink({
   children,
   href,
   morphsTitle = false,
   sx,
   title,
   ...rest
-}: SheetOpenLinkProps) {
+}: PageTransitionLinkProps) {
   const anchor = useRef<HTMLAnchorElement>(null);
   const pathname = usePathname();
 
@@ -48,7 +48,7 @@ export function SheetOpenLink({
       return;
     }
     anchor.current.style.viewTransitionName = morphsTitle
-      ? sheetTitleMorphName(pathname === href)
+      ? pageTitleMorphName(pathname === href)
       : '';
   }, [href, morphsTitle, pathname]);
 
@@ -57,12 +57,12 @@ export function SheetOpenLink({
       {...rest}
       href={href}
       onClick={() => {
-        rememberSheetOrigin(pathname);
+        rememberPageOrigin(pathname);
       }}
       ref={anchor}
       sx={sx}
       title={title}
-      transitionTypes={sheetTransitionTypes('open')}
+      transitionTypes={pageTransitionTypes('open')}
     >
       {children}
     </Link>

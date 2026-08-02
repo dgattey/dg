@@ -5,7 +5,7 @@ import { Section } from '@dg/ui/core/Section';
 import {
   pinnedChromeSx,
   SITE_FOOTER_VIEW_TRANSITION_NAME,
-} from '@dg/ui/core/sheet/sheetTransitions';
+} from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Container, Divider, Stack, Typography } from '@mui/material';
@@ -14,6 +14,7 @@ import { Suspense } from 'react';
 import { interactiveRedesign } from '../../flags';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
+import { FOOTER_ICON_FONT_SIZE } from './footerIconSize';
 import { MusicFooterMenu } from './MusicFooterMenu';
 import { isFavoriteAlbumsFooterUrl } from './musicFooterDestinations';
 
@@ -24,7 +25,7 @@ const navItemNoPaddingSx: SxObject = {
 const getFooterLinkSx = (hasIcon: boolean): SxObject => ({
   alignItems: 'center',
   display: 'flex',
-  fontSize: hasIcon ? '1.25em' : undefined,
+  fontSize: hasIcon ? FOOTER_ICON_FONT_SIZE : undefined,
   justifyContent: 'center',
   minHeight: 40,
   // Min tap target size
@@ -195,7 +196,7 @@ export async function Footer() {
               <Stack component="ul" direction="row" sx={footerIconLinkListSx}>
                 {iconFooterLinks?.map((link) =>
                   isFavoriteAlbumsFooterUrl(link.url) ? (
-                    <MusicFooterMenu icon={link.icon} key={link.url} title={link.title} />
+                    <MusicFooterMenu icon={link.icon} key={link.url} />
                   ) : (
                     <FooterLink key={link.url} link={link} />
                   ),

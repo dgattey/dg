@@ -2,13 +2,13 @@
 
 import type { Track } from '@dg/content-models/spotify/Track';
 import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
-import { SheetOpenLink } from '@dg/ui/core/sheet/SheetOpenLink';
+import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { createTransition, TIMING_MEDIUM, TIMING_NORMAL, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { musicSheetLabel } from '../layouts/musicFooterDestinations';
+import { musicDestinationLabel } from '../layouts/musicFooterDestinations';
 import { usePageScrollProgress } from '../layouts/PageScrollContext';
 import { NOW_PLAYING_CARD_ID } from './SpotifyCardScrollTracker';
 import { TrackListing } from './TrackListing';
@@ -80,7 +80,7 @@ function scrollToNowPlayingCard() {
 /**
  * Docked Spotify card in the header. Manages scroll-based visibility,
  * viewport detection for animation pausing, and home-page scroll-to-card behavior.
- * Off-home (and not already on music) navigates to listening history as a sheet.
+ * Off-home (and not already on music) navigates to listening history.
  * Track display is delegated to TrackListing variant="compact".
  */
 export function SpotifyHeaderCard({ track }: SpotifyHeaderCardProps) {
@@ -88,7 +88,7 @@ export function SpotifyHeaderCard({ track }: SpotifyHeaderCardProps) {
   const scrollContext = usePageScrollProgress();
   const isHome = pathname === homeRoute;
   const isMusic = pathname === musicRoute;
-  const opensMusicSheet = !isHome && !isMusic;
+  const opensMusicPage = !isHome && !isMusic;
   // null = not measured yet; on home page stay hidden until measured, elsewhere show immediately
   const scrollProgress = scrollContext?.scrollProgress ?? (isHome ? 0 : 1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -125,11 +125,11 @@ export function SpotifyHeaderCard({ track }: SpotifyHeaderCardProps) {
       }
       ref={containerRef}
       role={isHome ? 'button' : undefined}
-      sx={getContainerSx(scrollProgress, isHome || opensMusicSheet)}
+      sx={getContainerSx(scrollProgress, isHome || opensMusicPage)}
       tabIndex={isHome ? 0 : undefined}
     >
       <TrackListing
-        disableLinks={isHome || opensMusicSheet}
+        disableLinks={isHome || opensMusicPage}
         shouldAnimate={isInViewport}
         track={track}
         variant="compact"
@@ -140,10 +140,14 @@ export function SpotifyHeaderCard({ track }: SpotifyHeaderCardProps) {
   return (
     <Box aria-hidden={!isVisible} sx={getWidthWrapperSx(isVisible)}>
       <Box sx={getCollapsibleInnerSx(isVisible)}>
-        {opensMusicSheet ? (
-          <SheetOpenLink href={musicRoute} sx={musicLinkSx} title={musicSheetLabel(musicRoute)}>
+        {opensMusicPage ? (
+          <PageTransitionLink
+            href={musicRoute}
+            sx={musicLinkSx}
+            title={musicDestinationLabel(musicRoute)}
+          >
             {card}
-          </SheetOpenLink>
+          </PageTransitionLink>
         ) : (
           card
         )}

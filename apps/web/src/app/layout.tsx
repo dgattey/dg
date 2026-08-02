@@ -1,4 +1,5 @@
 import '@dg/ui/theme/classNameSetupOnImport';
+import '@dg/ui/core/transitions/pageTransitions.css';
 
 import { Section } from '@dg/ui/core/Section';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';

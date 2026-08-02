@@ -1,19 +1,19 @@
 import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
-import { devConsoleRoute, homeRoute, musicRoute } from '@dg/shared-core/routes/app';
-import { Sheet } from '@dg/ui/core/sheet/Sheet';
+import { devConsoleRoute, musicRoute } from '@dg/shared-core/routes/app';
 import { Stack } from '@mui/material';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { getMusicHistory } from '../../services/music';
 import { markdownAlternates } from '../layouts/markdownAlternates';
-import { musicSheetLabel } from '../layouts/musicFooterDestinations';
+import { musicDestinationLabel } from '../layouts/musicFooterDestinations';
+import { PageTitle } from '../layouts/PageTitle';
 import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 
-const TITLE = musicSheetLabel(musicRoute);
+const TITLE = musicDestinationLabel(musicRoute);
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(musicRoute),
@@ -45,17 +45,18 @@ async function MusicHistory() {
 }
 
 /**
- * The sheet shell stays synchronous so it commits in the same render as the
+ * Page shell stays synchronous so it commits in the same render as the
  * outgoing page. Awaiting here instead would suspend the whole route, the old
- * page would already be unmounted by the time the sheet arrives, and the view
+ * page would already be unmounted by the time this arrives, and the view
  * transition would have nothing to animate away from.
  */
 export default function MusicPage() {
   return (
-    <Sheet closeHref={homeRoute} title={TITLE}>
+    <>
+      <PageTitle>{TITLE}</PageTitle>
       <Suspense fallback={<MusicHistorySkeleton />}>
         <MusicHistory />
       </Suspense>
-    </Sheet>
+    </>
   );
 }

@@ -5,13 +5,14 @@ import { Section } from '@dg/ui/core/Section';
 import {
   pinnedChromeSx,
   SITE_HEADER_VIEW_TRANSITION_NAME,
-} from '@dg/ui/core/sheet/sheetTransitions';
+} from '@dg/ui/core/transitions/pageTransitions';
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { Suspense } from 'react';
 import { getLatestSong } from '../../services/spotify';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
 import { Logo } from './Logo';
+import { SiteHeaderHeight } from './SiteHeaderHeight';
 
 // Makes the header bar sticky and not responsive to user events by default
 const stickyContainerSx: SxObject = {
@@ -57,6 +58,7 @@ async function SpotifyHeaderCardSlot() {
 export function Header() {
   return (
     <Section sx={stickyContainerSx}>
+      <SiteHeaderHeight />
       <Box component="header" data-site-header={true} sx={siteHeaderSx}>
         <Nav sx={navSx}>
           <NavGroup>
