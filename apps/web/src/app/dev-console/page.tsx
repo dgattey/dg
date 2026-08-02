@@ -2,6 +2,7 @@ import 'server-only';
 
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import { OauthCard } from './oauth/OauthCard';
+import { VercelSignInCard } from './vercel/VercelSignInCard';
 import { WebhookCard } from './webhooks/WebhookCard';
 
 const oauthProviders = ['strava', 'spotify'] as const;
@@ -52,7 +53,17 @@ function CardSection({ title, children }: { title: string; children: React.React
   );
 }
 
-export default function ConsolePage() {
+type ConsolePageProps = {
+  searchParams?: Promise<Record<string, string | Array<string> | undefined>>;
+};
+
+export default async function ConsolePage({ searchParams }: ConsolePageProps) {
+  const params = (await searchParams) ?? {};
+  const authError = params.vercel_auth === 'error';
+  const reasonValue = params.reason;
+  const authErrorReason =
+    authError && typeof reasonValue === 'string' ? reasonValue : authError ? 'unknown' : null;
+
   return (
     <main>
       <Stack
@@ -66,6 +77,10 @@ export default function ConsolePage() {
           {oauthProviders.map((provider) => (
             <OauthCard key={provider} provider={provider} />
           ))}
+        </CardSection>
+
+        <CardSection title="Flags identity">
+          <VercelSignInCard authErrorReason={authErrorReason} />
         </CardSection>
 
         <CardSection title="Tools">
