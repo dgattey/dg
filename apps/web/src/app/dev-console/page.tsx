@@ -57,13 +57,11 @@ type ConsolePageProps = {
   searchParams?: Promise<Record<string, string | Array<string> | undefined>>;
 };
 
-export default async function ConsolePage({ searchParams }: ConsolePageProps) {
-  const params = (await searchParams) ?? {};
-  const authError = params.vercel_auth === 'error';
-  const reasonValue = params.reason;
-  const authErrorReason =
-    authError && typeof reasonValue === 'string' ? reasonValue : authError ? 'unknown' : null;
-
+/**
+ * Dev console shell. Keep this sync — await `searchParams` / cookies only inside
+ * Suspense boundaries (see VercelSignInCard) so the route can prerender.
+ */
+export default function ConsolePage({ searchParams }: ConsolePageProps) {
   return (
     <main>
       <Stack
@@ -80,7 +78,7 @@ export default async function ConsolePage({ searchParams }: ConsolePageProps) {
         </CardSection>
 
         <CardSection title="Flags identity">
-          <VercelSignInCard authErrorReason={authErrorReason} />
+          <VercelSignInCard searchParams={searchParams} />
         </CardSection>
 
         <CardSection title="Tools">

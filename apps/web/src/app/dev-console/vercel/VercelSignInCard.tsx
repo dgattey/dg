@@ -7,12 +7,26 @@ import { getVercelSession } from '../../../auth/vercel/getVercelSession';
 import { DevConsoleCardShell } from '../DevConsoleCardShell';
 import { StatusChip } from '../StatusIndicators';
 
+type SearchParams = Promise<Record<string, string | Array<string> | undefined>>;
+
 type VercelSignInCardProps = {
-  authErrorReason?: string | null;
+  searchParams?: SearchParams;
 };
 
-async function VercelSignInCardContent({ authErrorReason }: VercelSignInCardProps) {
-  const session = await getVercelSession();
+async function resolveAuthErrorReason(searchParams?: SearchParams): Promise<string | null> {
+  const params = (await searchParams) ?? {};
+  if (params.vercel_auth !== 'error') {
+    return null;
+  }
+  const reasonValue = params.reason;
+  return typeof reasonValue === 'string' ? reasonValue : 'unknown';
+}
+
+async function VercelSignInCardContent({ searchParams }: VercelSignInCardProps) {
+  const [session, authErrorReason] = await Promise.all([
+    getVercelSession(),
+    resolveAuthErrorReason(searchParams),
+  ]);
   const isSignedIn = Boolean(session);
 
   return (
@@ -68,12 +82,13 @@ async function VercelSignInCardContent({ authErrorReason }: VercelSignInCardProp
 
 /**
  * Dev-console card for optional Sign in with Vercel (Flags identify only).
+ * Session + searchParams are read inside Suspense so /dev-console can prerender.
  */
-export function VercelSignInCard({ authErrorReason }: VercelSignInCardProps) {
+export function VercelSignInCard({ searchParams }: VercelSignInCardProps) {
   return (
     <DevConsoleCardShell>
       <Suspense fallback={<Typography variant="body2">Loading identity…</Typography>}>
-        <VercelSignInCardContent authErrorReason={authErrorReason} />
+        <VercelSignInCardContent searchParams={searchParams} />
       </Suspense>
     </DevConsoleCardShell>
   );
