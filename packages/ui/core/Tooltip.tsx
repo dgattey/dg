@@ -16,6 +16,29 @@ import type { SxObject } from '../theme';
 
 export type TooltipPlacement = 'top' | 'bottom';
 
+/** Gap kept between a tooltip and the viewport edge, matching theme spacing(1). */
+const VIEWPORT_EDGE_PADDING = 8;
+
+/**
+ * Nudges an open tooltip inline so it stays inset from the viewport edges.
+ *
+ * Anchor positioning centers the tooltip on its trigger, so triggers near a
+ * screen edge push the tooltip flush against it (or off screen entirely).
+ */
+const insetFromViewportEdges = (tooltip: HTMLElement) => {
+  tooltip.style.translate = '0';
+  const { left, right, width } = tooltip.getBoundingClientRect();
+  if (!width) {
+    return;
+  }
+  const startOverflow = VIEWPORT_EDGE_PADDING - left;
+  const endOverflow = right - (window.innerWidth - VIEWPORT_EDGE_PADDING);
+  const shift = startOverflow > 0 ? startOverflow : Math.min(-endOverflow, 0);
+  if (shift) {
+    tooltip.style.translate = `${Math.round(shift)}px`;
+  }
+};
+
 export interface TooltipProps {
   /**
    * The content to display in the tooltip
@@ -70,7 +93,12 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
       clearTimeout(hideTimeoutRef.current);
       hideTimeoutRef.current = null;
     }
-    popoverRef.current?.showPopover();
+    const tooltip = popoverRef.current;
+    if (!tooltip) {
+      return;
+    }
+    tooltip.showPopover();
+    insetFromViewportEdges(tooltip);
   };
 
   const hideTooltip = () => {

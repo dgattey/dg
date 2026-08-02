@@ -101,4 +101,33 @@ describe('Tooltip', () => {
     restore();
     jest.useRealTimers();
   });
+
+  it('shifts inline to stay inset from the viewport edge', async () => {
+    const user = userEvent.setup();
+    const { restore } = setupPopoverMocks();
+
+    render(
+      <Tooltip title="Near the edge">
+        <button type="button">Trigger</button>
+      </Tooltip>,
+    );
+
+    const tooltip = screen.getByRole('tooltip');
+    const anchor = screen.getByRole('button', { name: 'Trigger' }).parentElement;
+    if (!anchor) {
+      throw new Error('Tooltip anchor not found');
+    }
+    // Overhangs the right edge by 12px, so it needs a 20px shift for an 8px gap
+    jest.spyOn(tooltip, 'getBoundingClientRect').mockReturnValue({
+      left: window.innerWidth - 108,
+      right: window.innerWidth + 12,
+      width: 120,
+    } as DOMRect);
+
+    await user.hover(anchor);
+
+    expect(tooltip.style.translate).toBe('-20px');
+
+    restore();
+  });
 });
