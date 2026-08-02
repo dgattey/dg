@@ -3,16 +3,43 @@ import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { SxObject } from '../theme';
 
+const BACKGROUND = 'var(--mui-palette-background-default)';
+
+/** Measured once by the header, so the bar tracks it across breakpoints. */
+const HEADER_HEIGHT = 'var(--site-header-height, 5.5rem)';
+
+const scrim = (percent: number) => `color-mix(in srgb, ${BACKGROUND} ${percent}%, transparent)`;
+
 /**
- * Soft gradient that trails below a sticky bar so content scrolls under it
- * instead of colliding. Pointer-events stay off so clicks pass through to
- * whatever sits under the fade.
+ * Covers the strip between the top of the viewport and the pinned bar, so
+ * content scrolling up vanishes behind the header instead of showing through
+ * the gap above the bar.
+ *
+ * Fixed rather than absolute: an unpinned bar sits mid-page, and only the
+ * viewport-anchored strip should ever be covered. Opaque all the way through,
+ * so a page with several bars paints the same pixels once instead of stacking
+ * translucent copies.
+ */
+const viewportMaskSx: SxObject = {
+  backgroundColor: BACKGROUND,
+  /* Overlap the bar by a pixel so no seam shows between the two surfaces. */
+  height: `calc(${HEADER_HEIGHT} + 1px)`,
+  insetInline: 0,
+  pointerEvents: 'none',
+  position: 'fixed',
+  top: 0,
+  zIndex: 0,
+};
+
+/**
+ * Trails below the bar so content dissolves as it scrolls under. Alpha eases
+ * out across the ramp: a straight two-stop gradient reads as a visible band
+ * because perceived luminance doesn't fall off linearly with alpha.
  */
 const fadeOverlaySx: SxObject = {
-  background:
-    'linear-gradient(to bottom, var(--mui-palette-background-default) 0%, color-mix(in srgb, var(--mui-palette-background-default) 70%, transparent) 55%, transparent 100%)',
+  background: `linear-gradient(to bottom, ${BACKGROUND} 0%, ${scrim(84)} 22%, ${scrim(56)} 42%, ${scrim(30)} 62%, ${scrim(11)} 80%, transparent 100%)`,
   bottom: 0,
-  height: '2.5rem',
+  height: '1.5rem',
   left: 0,
   pointerEvents: 'none',
   position: 'absolute',
@@ -23,10 +50,10 @@ const fadeOverlaySx: SxObject = {
 
 const stickyBarSx: SxObject = {
   /* Opaque under the content so scrolling cards don't show through the label. */
-  backgroundColor: 'var(--mui-palette-background-default)',
+  backgroundColor: BACKGROUND,
   position: 'sticky',
-  /* Sit just under the glass header. Measured once by Header into this var. */
-  top: 'var(--site-header-height, 5.5rem)',
+  /* Sit just under the glass header, which the mask above covers. */
+  top: HEADER_HEIGHT,
   zIndex: 5,
 };
 
@@ -41,14 +68,16 @@ type StickyFadeBarProps = Omit<BoxProps, 'sx' | 'children'> & {
 };
 
 /**
- * Sticky bar with a soft fade beneath it. Content that follows scrolls under
- * the bar rather than colliding with it. Theme-aware via the background CSS
- * variable, so it works in both light and dark schemes.
+ * Sticky bar with a soft fade beneath it and a mask over the strip above it,
+ * so content scrolls out of sight rather than colliding with the bar or
+ * peeking between it and the top of the window. Theme-aware via the background
+ * CSS variable, so it works in both light and dark schemes.
  */
 export function StickyFadeBar({ children, sx, ...props }: StickyFadeBarProps) {
   const mergedSx = sx ? { ...stickyBarSx, ...sx } : stickyBarSx;
   return (
     <Box {...props} sx={mergedSx}>
+      <Box aria-hidden data-sticky-mask sx={viewportMaskSx} />
       <Box sx={stickyInnerSx}>{children}</Box>
       <Box aria-hidden data-sticky-fade sx={fadeOverlaySx} />
     </Box>
