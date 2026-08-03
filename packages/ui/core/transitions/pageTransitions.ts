@@ -17,18 +17,26 @@ export const SITE_HEADER_VIEW_TRANSITION_NAME = 'site-header';
 export const SITE_FOOTER_VIEW_TRANSITION_NAME = 'site-footer';
 
 /**
- * Sticky bar chrome (the window-top mask, the bar fill, and the fade under it)
- * is painted into the page snapshot and then rides that page's slide — a
- * full-bleed cream band washing mid-page content on the way through. Naming
- * each piece with `match-element` pulls it out of the page bitmap; the matching
- * class in `pageTransitions.css` then hides the group for the whole flight so
- * nothing of it paints. Claimed only while a transition is capturing, same as
- * `pinnedChromeSx`, so it adds no containing block at rest.
+ * Sticky bar chrome — the window-top mask, the bar fill, and the fade under it —
+ * is a full-bleed opaque band, and it gets photographed into whichever snapshot
+ * catches it. A navigation then sweeps that band across mid-page content: the
+ * row under a bar washes to cream from the top down and reads as blank tiles
+ * with a sliver of artwork below.
+ *
+ * So the chrome just doesn't paint while a transition runs. Both sides read
+ * this rule at capture time, so neither page carries a band, and the strip above
+ * a pinned bar is briefly unmasked instead — the lesser of the two, and it lands
+ * back the instant the flight ends. Hiding beats a group of its own: a name per
+ * piece is the only way to lift them out of the page bitmap, and a page with
+ * several bars needs a unique one for each, which no widely supported keyword
+ * gives us.
+ *
+ * The selector leads with `html` rather than `:root`, which Emotion would read
+ * as a pseudo-class on this element and never match.
  */
 export const stickyDecorSx: SxObject = {
   'html:active-view-transition &': {
-    viewTransitionClass: 'vt-sticky-decor',
-    viewTransitionName: 'match-element',
+    opacity: 0,
   },
 };
 

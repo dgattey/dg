@@ -125,8 +125,8 @@ export function StickyFadeBar({ children, sx, ...props }: StickyFadeBarProps) {
 /**
  * Hides whatever scrolls between the top of the window and a pinned
  * `StickyFadeBar`. Belongs in the app shell rather than beside each bar: copies
- * would paint the same pixels, and during a page transition the layer is named
- * out of the page snapshot and suppressed so it cannot wash mid-page content.
+ * would paint the same pixels, and a layer that lives in the page rides that
+ * page wherever a navigation takes it.
  */
 export function StickyBarTopMask() {
   return <Box aria-hidden data-sticky-mask sx={topMaskSx} />;

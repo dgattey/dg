@@ -66,22 +66,6 @@
 }
 
 /*
- * Sticky bar chrome — the window-top mask, the bar fill, and the fade under it —
- * is named out of the page snapshot (see `stickyDecorSx`) so it does not ride
- * the page's slide. The group then stays invisible for the flight: a cross-fade
- * still left a cream band mid-page, and the user would rather see the brief
- * unmasked strip than that.
- */
-::view-transition-group(.vt-sticky-decor),
-::view-transition-old(.vt-sticky-decor),
-::view-transition-new(.vt-sticky-decor) {
-  /* biome-ignore lint/complexity/noImportantStyles: override UA VT defaults and any group size animation */
-  opacity: 0 !important;
-  /* biome-ignore lint/complexity/noImportantStyles: override UA VT defaults and any group size animation */
-  animation: none !important;
-}
-
-/*
  * The heading travels between the footer control and the page heading, so it
  * paints above both pages for the whole trip. Sizing both snapshots to the
  * group makes the two type scales grow into each other rather than one text
