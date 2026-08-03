@@ -2,6 +2,7 @@ import 'server-only';
 
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import { OauthCard } from './oauth/OauthCard';
+import { VercelSignInCard } from './vercel/VercelSignInCard';
 import { WebhookCard } from './webhooks/WebhookCard';
 
 const oauthProviders = ['strava', 'spotify'] as const;
@@ -52,7 +53,15 @@ function CardSection({ title, children }: { title: string; children: React.React
   );
 }
 
-export default function ConsolePage() {
+type ConsolePageProps = {
+  searchParams?: Promise<Record<string, string | Array<string> | undefined>>;
+};
+
+/**
+ * Dev console shell. Keep this sync — await `searchParams` / cookies only inside
+ * Suspense boundaries (see VercelSignInCard) so the route can prerender.
+ */
+export default function ConsolePage({ searchParams }: ConsolePageProps) {
   return (
     <main>
       <Stack
@@ -66,6 +75,10 @@ export default function ConsolePage() {
           {oauthProviders.map((provider) => (
             <OauthCard key={provider} provider={provider} />
           ))}
+        </CardSection>
+
+        <CardSection title="Flags identity">
+          <VercelSignInCard searchParams={searchParams} />
         </CardSection>
 
         <CardSection title="Tools">

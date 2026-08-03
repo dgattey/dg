@@ -9,6 +9,7 @@ This is `dg`, a single Next.js 16 app (`@dg/web`) in a pnpm + Turbo monorepo. Se
 ### Environment / secrets
 - Runtime config comes from env vars, not a checked-in file. Normally `turbo dev`/`turbo migrate` run a `dg#env` step that generates `.env` from 1Password via the `op` CLI; `op` is not installed here, so that step logs "1Password CLI not found, skipping .env generation" and is a harmless no-op. The app instead reads the injected secret env vars directly.
 - Feature flags use Vercel Flags (`FLAGS` on Vercel via `apps/web/src/flags.ts`). That is separate from 1Password/`turbo env` secrets; do not fold `FLAGS` into `config/env.secrets.keys` without an explicit product decision.
+- Vercel dashboard login ≠ Flags identity. Optional Sign in with Vercel on `/dev-console` feeds `identify` (`user.id` / `user.email`); targeting is via Flags Entities/Segments. Session does not bypass `/dev-console` Basic Auth. Details: `apps/web/src/auth/vercel/README.md`. Env: `NEXT_PUBLIC_VERCEL_APP_CLIENT_ID`, `VERCEL_APP_CLIENT_SECRET` (also in `config/env.secrets.keys`).
 - Real secrets for Contentful, Spotify, Strava, OAuth callback, and Turbo cache are injected as env vars, so the homepage renders real CMS content and OAuth flows redirect to the real providers.
 - The dev console lives at `/dev-console`. Basic auth is only enforced when `DEV_CONSOLE_BASIC_AUTH_USER`/`_PASS` are set; otherwise it is open in development.
 - `STADIA_API_KEY` may be absent; the homepage still renders (only the watercolor map tiles are affected).
@@ -19,6 +20,7 @@ This is `dg`, a single Next.js 16 app (`@dg/web`) in a pnpm + Turbo monorepo. Se
 - `/.well-known/api-catalog`, `openapi.json`, `api-status` — API discovery
 - `/.well-known/agent-skills` — skill index (`index.json`) and `[name]/SKILL.md`
 - `/.well-known/vercel/flags` — Flags discovery endpoint
+- `/dev-console` — OAuth/webhook debugging + optional Sign in with Vercel for Flags targeting (see `apps/web/src/auth/vercel/README.md`)
 - WebMCP: `apps/web/src/app/layouts/WebMcpTools.tsx`
 - Page list for markdown negotiation is centralized in `packages/shared-core/routes` (`markdownPages`)
 
