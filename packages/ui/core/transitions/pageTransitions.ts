@@ -17,6 +17,21 @@ export const SITE_HEADER_VIEW_TRANSITION_NAME = 'site-header';
 export const SITE_FOOTER_VIEW_TRANSITION_NAME = 'site-footer';
 
 /**
+ * Lifts the scrim that covers the strip above a pinned bar into a group of its
+ * own. Anything caught in a page's snapshot inherits that page's slide, and a
+ * full-bleed opaque band sweeping across the window is the last thing that
+ * should move; on its own it can only cross-fade. Same reasoning as
+ * `pinnedChromeSx` for claiming the name at capture time. Matched by class in
+ * `pageTransitions.css`, so exactly one element may carry this at a time.
+ */
+export const stickyTopMaskSx: SxObject = {
+  'html:active-view-transition &': {
+    viewTransitionClass: 'vt-sticky-scrim',
+    viewTransitionName: 'sticky-top-mask',
+  },
+};
+
+/**
  * Chrome that has to stay pinned across a navigation needs a
  * view-transition-name, but a named element is also a backdrop root: any
  * `backdrop-filter` inside it samples that element instead of the page, so

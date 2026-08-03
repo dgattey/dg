@@ -2,6 +2,7 @@ import type { BoxProps } from '@mui/material';
 import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { SxObject } from '../theme';
+import { stickyTopMaskSx } from './transitions/pageTransitions';
 
 const BACKGROUND = 'var(--mui-palette-background-default)';
 
@@ -24,24 +25,32 @@ const fullBleed = {
 } as const;
 
 /**
- * Covers the strip between the top of the viewport and the pinned bar, so
- * content scrolling up vanishes behind the header instead of showing through
- * the gap above the bar.
+ * Covers the strip between the top of the window and a pinned bar, so content
+ * scrolling up vanishes behind the header instead of showing through the gap
+ * above the bar.
  *
  * Fixed rather than absolute: an unpinned bar sits mid-page, and only the
- * viewport-anchored strip should ever be covered. Opaque all the way through,
- * so a page with several bars paints the same pixels once instead of stacking
- * translucent copies.
+ * window-anchored strip should ever be covered. Over page content but under the
+ * bars themselves, which overlap it by a pixel.
+ *
+ * Dormant until a page actually pins a bar. It renders in the app shell so that
+ * a navigation can't sweep it along with the page, and an opaque strip on a page
+ * with nothing to hide would only leave the header glass with nothing to blur.
  */
-const viewportMaskSx: SxObject = {
+const topMaskSx: SxObject = {
   backgroundColor: BACKGROUND,
+  'body:has([data-sticky-fade]) &': {
+    display: 'block',
+  },
+  display: 'none',
   /* Overlap the bar by a pixel so no seam shows between the two surfaces. */
   height: `calc(${HEADER_HEIGHT} + 1px)`,
   insetInline: 0,
   pointerEvents: 'none',
   position: 'fixed',
   top: 0,
-  zIndex: 0,
+  zIndex: 4,
+  ...stickyTopMaskSx,
 };
 
 /**
@@ -95,19 +104,29 @@ type StickyFadeBarProps = Omit<BoxProps, 'sx' | 'children'> & {
 };
 
 /**
- * Sticky bar with a soft fade beneath it and a mask over the strip above it,
- * so content scrolls out of sight rather than colliding with the bar or
- * peeking between it and the top of the window. Theme-aware via the background
- * CSS variable, so it works in both light and dark schemes.
+ * Sticky bar with a soft fade beneath it, so content dissolves as it scrolls
+ * under rather than colliding with the bar. Theme-aware via the background CSS
+ * variable, so it works in both light and dark schemes. The strip above the
+ * pinned bar is covered by `StickyBarTopMask`, which the app shell renders.
  */
 export function StickyFadeBar({ children, sx, ...props }: StickyFadeBarProps) {
   const mergedSx = sx ? { ...stickyBarSx, ...sx } : stickyBarSx;
   return (
     <Box {...props} sx={mergedSx}>
-      <Box aria-hidden data-sticky-mask sx={viewportMaskSx} />
       <Box aria-hidden data-sticky-surface sx={barSurfaceSx} />
       <Box sx={stickyInnerSx}>{children}</Box>
       <Box aria-hidden data-sticky-fade sx={fadeOverlaySx} />
     </Box>
   );
+}
+
+/**
+ * Hides whatever scrolls between the top of the window and a pinned
+ * `StickyFadeBar`. Belongs in the app shell rather than beside each bar: copies
+ * would paint the same pixels, only one element may carry the transition name
+ * that keeps the strip from sliding off with the page, and rendered inside a
+ * page React folds it into that page's snapshot whatever the name says.
+ */
+export function StickyBarTopMask() {
+  return <Box aria-hidden data-sticky-mask sx={topMaskSx} />;
 }

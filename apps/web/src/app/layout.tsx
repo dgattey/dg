@@ -3,6 +3,7 @@ import '@dg/ui/core/transitions/pageTransitions.css';
 
 import { Section } from '@dg/ui/core/Section';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
+import { StickyBarTopMask } from '@dg/ui/core/StickyFadeBar';
 import type { SxObject } from '@dg/ui/theme';
 import { ColorSchemeScript } from '@dg/ui/theme/ColorSchemeScript';
 import { SYSTEM_COLOR_SCHEME_STYLE } from '@dg/ui/theme/colorScheme';
@@ -48,6 +49,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
               {/* Scroll provider wraps header + content for docked header thumbnail */}
               <PageScrollProvider>
                 <Header />
+                {/* Covers the strip above a pinned bar, on pages that have one */}
+                <StickyBarTopMask />
                 {/* Contained main content with consistent section spacing */}
                 <Section sx={mainSectionSx}>
                   <Container>

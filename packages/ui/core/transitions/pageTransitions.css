@@ -66,6 +66,24 @@
 }
 
 /*
+ * The scrim above a pinned bar is window chrome that happens to live in the
+ * page, so it holds still: over both pages, under the header, and with the group
+ * animation off so nothing can translate or resize it. Both sides share one
+ * name, which pairs them into a single cross-fade, so arriving at a page that
+ * has one fades it in and leaving fades it out.
+ */
+::view-transition-group(.vt-sticky-scrim) {
+  z-index: 90;
+  animation-name: none;
+}
+
+::view-transition-old(.vt-sticky-scrim),
+::view-transition-new(.vt-sticky-scrim) {
+  animation-duration: var(--timing-slow);
+  animation-timing-function: var(--easing-ease-out);
+}
+
+/*
  * The heading travels between the footer control and the page heading, so it
  * paints above both pages for the whole trip. Sizing both snapshots to the
  * group makes the two type scales grow into each other rather than one text
