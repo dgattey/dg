@@ -2,7 +2,7 @@ import type { BoxProps } from '@mui/material';
 import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { SxObject } from '../theme';
-import { stickyTopMaskSx } from './transitions/pageTransitions';
+import { stickyDecorSx } from './transitions/pageTransitions';
 
 const BACKGROUND = 'var(--mui-palette-background-default)';
 
@@ -50,7 +50,7 @@ const topMaskSx: SxObject = {
   position: 'fixed',
   top: 0,
   zIndex: 4,
-  ...stickyTopMaskSx,
+  ...stickyDecorSx,
 };
 
 /**
@@ -59,6 +59,7 @@ const topMaskSx: SxObject = {
  */
 const barSurfaceSx: SxObject = {
   ...fullBleed,
+  ...stickyDecorSx,
   backgroundColor: BACKGROUND,
   bottom: 0,
   pointerEvents: 'none',
@@ -78,6 +79,7 @@ const FADE_HEIGHT = '3rem';
  */
 const fadeOverlaySx: SxObject = {
   ...fullBleed,
+  ...stickyDecorSx,
   background: `linear-gradient(to bottom, ${BACKGROUND} 0%, ${scrim(94)} 15%, ${scrim(78)} 30%, ${scrim(57)} 45%, ${scrim(35)} 60%, ${scrim(16)} 75%, ${scrim(4)} 88%, transparent 100%)`,
   bottom: `calc(-1 * ${FADE_HEIGHT})`,
   height: FADE_HEIGHT,
@@ -123,9 +125,8 @@ export function StickyFadeBar({ children, sx, ...props }: StickyFadeBarProps) {
 /**
  * Hides whatever scrolls between the top of the window and a pinned
  * `StickyFadeBar`. Belongs in the app shell rather than beside each bar: copies
- * would paint the same pixels, only one element may carry the transition name
- * that keeps the strip from sliding off with the page, and rendered inside a
- * page React folds it into that page's snapshot whatever the name says.
+ * would paint the same pixels, and during a page transition the layer is named
+ * out of the page snapshot and suppressed so it cannot wash mid-page content.
  */
 export function StickyBarTopMask() {
   return <Box aria-hidden data-sticky-mask sx={topMaskSx} />;

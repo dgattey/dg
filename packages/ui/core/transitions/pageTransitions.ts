@@ -17,17 +17,18 @@ export const SITE_HEADER_VIEW_TRANSITION_NAME = 'site-header';
 export const SITE_FOOTER_VIEW_TRANSITION_NAME = 'site-footer';
 
 /**
- * Lifts the scrim that covers the strip above a pinned bar into a group of its
- * own. Anything caught in a page's snapshot inherits that page's slide, and a
- * full-bleed opaque band sweeping across the window is the last thing that
- * should move; on its own it can only cross-fade. Same reasoning as
- * `pinnedChromeSx` for claiming the name at capture time. Matched by class in
- * `pageTransitions.css`, so exactly one element may carry this at a time.
+ * Sticky bar chrome (the window-top mask, the bar fill, and the fade under it)
+ * is painted into the page snapshot and then rides that page's slide — a
+ * full-bleed cream band washing mid-page content on the way through. Naming
+ * each piece with `match-element` pulls it out of the page bitmap; the matching
+ * class in `pageTransitions.css` then hides the group for the whole flight so
+ * nothing of it paints. Claimed only while a transition is capturing, same as
+ * `pinnedChromeSx`, so it adds no containing block at rest.
  */
-export const stickyTopMaskSx: SxObject = {
+export const stickyDecorSx: SxObject = {
   'html:active-view-transition &': {
-    viewTransitionClass: 'vt-sticky-scrim',
-    viewTransitionName: 'sticky-top-mask',
+    viewTransitionClass: 'vt-sticky-decor',
+    viewTransitionName: 'match-element',
   },
 };
 
