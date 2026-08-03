@@ -51,7 +51,7 @@ If `turbo` is not found, ensure `~/.nodenv/shims` is on PATH, then `nodenv rehas
 
 `.env` is generated from 1Password (vault `dg`) using `[config/env.secrets.keys](config/env.secrets.keys)`. Each key must be an item with the same name and the value stored in the `value` field. To regenerate after vault changes: `turbo clean && turbo dev` or delete `.env` and re-run `turbo dev`.
 
-Feature flags are separate: Vercel Flags (`FLAGS` on Vercel, see `apps/web/src/flags.ts`). Local OAuth/webhook debugging lives at `/dev-console`. Optional **Sign in with Vercel** on that page (`NEXT_PUBLIC_VERCEL_APP_CLIENT_ID` / `VERCEL_APP_CLIENT_SECRET`) feeds Flags `identify` for segment targeting — create the Vercel App in the dashboard and add matching 1Password items before `turbo env`.
+Feature flags are separate: Vercel Flags (`FLAGS` on Vercel, see `apps/web/src/flags.ts`). Local OAuth/webhook debugging lives at `/dev-console`. Optional **Sign in with Vercel** on that page establishes a signed identity session so Flags `identify` can send `user.id` / `user.email` for segment targeting (dashboard login alone does not). Needs a Vercel App plus `NEXT_PUBLIC_VERCEL_APP_CLIENT_ID` / `VERCEL_APP_CLIENT_SECRET` in the project env and matching 1Password items before `turbo env`. How it works, dashboard setup, and security boundary: [`apps/web/src/auth/vercel/README.md`](apps/web/src/auth/vercel/README.md).
 
 ### Agent surfaces
 
