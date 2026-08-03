@@ -58,16 +58,20 @@ const barSurfaceSx: SxObject = {
   zIndex: 0,
 };
 
+/** Long enough that the ramp reads as a dissolve rather than an edge. */
+const FADE_HEIGHT = '3rem';
+
 /**
- * Trails below the bar so content dissolves as it scrolls under. Alpha eases
- * out across the ramp: a straight two-stop gradient reads as a visible band
- * because perceived luminance doesn't fall off linearly with alpha.
+ * Trails below the bar so content dissolves as it scrolls under. Alpha follows
+ * a smoothstep curve rather than a straight line, so neither end forms a knee:
+ * a short or linear ramp reads as a band because perceived luminance doesn't
+ * fall off linearly with alpha.
  */
 const fadeOverlaySx: SxObject = {
   ...fullBleed,
-  background: `linear-gradient(to bottom, ${BACKGROUND} 0%, ${scrim(84)} 22%, ${scrim(56)} 42%, ${scrim(30)} 62%, ${scrim(11)} 80%, transparent 100%)`,
-  bottom: '-1.5rem',
-  height: '1.5rem',
+  background: `linear-gradient(to bottom, ${BACKGROUND} 0%, ${scrim(94)} 15%, ${scrim(78)} 30%, ${scrim(57)} 45%, ${scrim(35)} 60%, ${scrim(16)} 75%, ${scrim(4)} 88%, transparent 100%)`,
+  bottom: `calc(-1 * ${FADE_HEIGHT})`,
+  height: FADE_HEIGHT,
   pointerEvents: 'none',
   position: 'absolute',
   zIndex: 0,
