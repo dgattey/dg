@@ -37,7 +37,7 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
   }
 
   if (result.inserted > 0) {
-    revalidateTag('spotify-history', 'max');
+    revalidateTag('music-history', 'max');
   }
 
   return {

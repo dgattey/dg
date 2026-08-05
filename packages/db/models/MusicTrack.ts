@@ -33,6 +33,15 @@ export class MusicTrack extends Model {
   @Column({ allowNull: true, type: DataType.STRING })
   declare url: string | null;
 
+  @Column({ allowNull: true, type: DataType.INTEGER })
+  declare durationMs: number | null;
+
+  @Column({ allowNull: true, type: DataType.INTEGER })
+  declare trackNumber: number | null;
+
+  @Column({ allowNull: true, type: DataType.INTEGER })
+  declare discNumber: number | null;
+
   // Use string reference 'MusicTrackArtist' to avoid import cycle
   @BelongsToMany(() => MusicArtist, 'MusicTrackArtist', 'trackId', 'artistId')
   declare artists: Array<MusicArtist>;
