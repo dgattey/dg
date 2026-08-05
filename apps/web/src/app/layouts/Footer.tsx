@@ -27,9 +27,10 @@ const getFooterLinkSx = (hasIcon: boolean): SxObject => ({
   display: 'flex',
   fontSize: hasIcon ? FOOTER_ICON_FONT_SIZE : undefined,
   justifyContent: 'center',
-  minHeight: 40,
-  // Min tap target size
-  minWidth: 40,
+  // Slightly tighter on mobile so an extra icon still fits; 36px is below the
+  // ideal 44px a11y target (desktop stays at 40, already a trade-off).
+  minHeight: { sm: 40, xs: 36 },
+  minWidth: { sm: 40, xs: 36 },
 });
 
 const footerSectionSx: SxObject = {
@@ -66,8 +67,9 @@ const footerIconLinkListSx: SxObject = {
   flex: 1,
   justifyContent: 'space-between',
   margin: 0,
-  marginLeft: -2.5,
-  marginRight: -1.5,
+  // Pull further into container padding on mobile so the extra icon fits.
+  marginLeft: { sm: -2.5, xs: -3 },
+  marginRight: { sm: -1.5, xs: -2 },
   padding: 0,
 };
 

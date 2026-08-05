@@ -28,8 +28,8 @@ const triggerSx: SxObject = {
   display: 'flex',
   fontSize: FOOTER_ICON_FONT_SIZE,
   justifyContent: 'center',
-  minHeight: 40,
-  minWidth: 40,
+  minHeight: { sm: 40, xs: 36 },
+  minWidth: { sm: 40, xs: 36 },
   padding: 0,
 };
 
