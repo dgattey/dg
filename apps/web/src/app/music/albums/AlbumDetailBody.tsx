@@ -16,18 +16,35 @@ const tabularSx: SxObject = {
   fontVariantNumeric: 'tabular-nums',
 };
 
+const overflowTextSx: SxObject = {
+  display: 'block',
+  minWidth: 0,
+  overflow: 'hidden',
+  textOverflow: 'ellipsis',
+  whiteSpace: 'nowrap',
+  width: '100%',
+};
+
+const TRACK_COLUMN_GAP = 1.5;
+
 /** Cancels its own padding so the number column starts on the well's text edge. */
 const trackRowSx: SxObject = {
   '&:hover': {
     backgroundColor: 'color-mix(in srgb, var(--mui-palette-primary-main) 8%, transparent)',
   },
-  alignItems: 'baseline',
+  alignItems: 'center',
   borderRadius: 1,
-  columnGap: 1.5,
+  columnGap: TRACK_COLUMN_GAP,
   display: 'grid',
   mx: -1,
   px: 1,
-  py: 0.75,
+  py: 1,
+};
+
+const trackTextSx: SxObject = {
+  display: 'grid',
+  minWidth: 0,
+  rowGap: 0.25,
 };
 
 const POPULARITY_BAR_WIDTH = 56;
@@ -97,9 +114,16 @@ function Popularity({ value }: { value: number }) {
  */
 export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
   const numberColumnCh = String(album.tracks.length).length + 1;
+  const trackColumns = `${numberColumnCh}ch minmax(0, 1fr) auto`;
   const trackGridSx: SxObject = {
     ...trackRowSx,
-    gridTemplateColumns: `${numberColumnCh}ch minmax(0, 1fr) auto`,
+    gridTemplateColumns: trackColumns,
+  };
+  const metaGridSx: SxObject = {
+    columnGap: TRACK_COLUMN_GAP,
+    display: 'grid',
+    gridTemplateColumns: trackColumns,
+    mt: 0.75,
   };
   const facts = [
     album.releaseDate ? album.releaseDate.slice(0, 4) : null,
@@ -108,7 +132,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
   ].filter(Boolean);
 
   return (
-    <>
+    <Box>
       <Typography color="text.secondary" variant="body1">
         {album.artists.map((artist, index) => (
           <span key={artist.id}>
@@ -120,38 +144,56 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
         ))}
       </Typography>
 
-      <Box sx={metaRowSx}>
-        <Typography component="p" sx={tabularSx} variant="body2">
-          {facts.join(' · ')}
-        </Typography>
-        {album.popularity == null ? null : (
-          <>
-            <Typography aria-hidden component="span" variant="body2">
-              ·
-            </Typography>
-            <Popularity value={album.popularity} />
-          </>
-        )}
+      <Box sx={metaGridSx}>
+        <Box data-role="album-meta" sx={{ ...metaRowSx, gridColumn: '2 / -1' }}>
+          <Typography component="p" sx={tabularSx} variant="body2">
+            {facts.join(' · ')}
+          </Typography>
+          {album.popularity == null ? null : (
+            <>
+              <Typography aria-hidden component="span" variant="body2">
+                ·
+              </Typography>
+              <Popularity value={album.popularity} />
+            </>
+          )}
+        </Box>
       </Box>
 
-      <Box component="ol" sx={{ listStyle: 'none', m: 0, p: 0 }}>
+      <Box
+        component="ol"
+        data-role="track-list"
+        sx={{ display: 'grid', gap: 0.5, listStyle: 'none', mb: 0, mt: 2.5, p: 0 }}
+      >
         {album.tracks.map((track) => (
-          <Box component="li" key={track.id} sx={trackGridSx}>
+          <Box component="li" data-role="track-row" key={track.id} sx={trackGridSx}>
             <Typography
               color="text.secondary"
               component="span"
+              data-role="track-number"
               sx={{ ...tabularSx, textAlign: 'end' }}
               variant="body2"
             >
               {track.trackNumber}
             </Typography>
-            <Box sx={{ minWidth: 0 }}>
-              <Typography noWrap variant="body2">
+            <Box data-role="track-text" sx={trackTextSx}>
+              <Typography
+                data-role="track-title"
+                sx={overflowTextSx}
+                title={track.name}
+                variant="body2"
+              >
                 <Link href={track.url} isExternal={true} title={`Open ${track.name} on Spotify`}>
                   {track.name}
                 </Link>
               </Typography>
-              <Typography color="text.secondary" noWrap variant="caption">
+              <Typography
+                color="text.secondary"
+                data-role="track-artists"
+                sx={overflowTextSx}
+                title={track.artists.map((artist) => artist.name).join(', ')}
+                variant="caption"
+              >
                 {track.artists.map((artist, index) => (
                   <span key={`${track.id}-${artist.id}`}>
                     {index > 0 ? ', ' : null}
@@ -166,12 +208,18 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
                 ))}
               </Typography>
             </Box>
-            <Typography color="text.secondary" component="span" sx={tabularSx} variant="caption">
+            <Typography
+              color="text.secondary"
+              component="span"
+              data-role="track-duration"
+              sx={{ ...tabularSx, whiteSpace: 'nowrap' }}
+              variant="caption"
+            >
               {formatTrackDuration(track.durationMs)}
             </Typography>
           </Box>
         ))}
       </Box>
-    </>
+    </Box>
   );
 }

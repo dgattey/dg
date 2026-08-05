@@ -41,11 +41,16 @@ const album: AlbumDetail = {
           name: 'Guest',
           url: 'https://open.spotify.com/artist/artist-2',
         },
+        {
+          id: 'artist-3',
+          name: 'Another guest with a long name',
+          url: 'https://open.spotify.com/artist/artist-3',
+        },
       ],
       discNumber: 1,
       durationMs: 180_000,
       id: 'track-2',
-      name: 'Closer',
+      name: 'Closer with a title that needs to truncate on narrow screens',
       trackNumber: 2,
       url: 'https://open.spotify.com/track/track-2',
     },
@@ -64,12 +69,22 @@ describe('AlbumDetailBody', () => {
       'href',
       'https://open.spotify.com/track/track-1',
     );
-    expect(screen.getByRole('link', { name: 'Open Closer on Spotify' })).toHaveAttribute(
-      'href',
-      'https://open.spotify.com/track/track-2',
-    );
+    expect(
+      screen.getByRole('link', {
+        name: 'Open Closer with a title that needs to truncate on narrow screens on Spotify',
+      }),
+    ).toHaveAttribute('href', 'https://open.spotify.com/track/track-2');
     expect(screen.getByText('1')).toBeInTheDocument();
     expect(screen.getByText('2')).toBeInTheDocument();
+  });
+
+  it('makes complete truncated track text available as native titles', () => {
+    render(<AlbumDetailBody album={album} />);
+
+    expect(
+      screen.getByTitle('Closer with a title that needs to truncate on narrow screens'),
+    ).toBeInTheDocument();
+    expect(screen.getByTitle('Guest, Another guest with a long name')).toBeInTheDocument();
   });
 
   it('summarizes the album without naming the label', () => {
