@@ -14,7 +14,7 @@ import { Suspense } from 'react';
 import { interactiveRedesign } from '../../flags';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
-import { FOOTER_ICON_FONT_SIZE } from './footerIconSize';
+import { FOOTER_ICON_DESKTOP_FONT_SIZE, FOOTER_ICON_FONT_SIZE } from './footerIconSize';
 import { MusicFooterMenu } from './MusicFooterMenu';
 import { isFavoriteAlbumsFooterUrl } from './musicFooterDestinations';
 
@@ -25,7 +25,7 @@ const navItemNoPaddingSx: SxObject = {
 const getFooterLinkSx = (hasIcon: boolean): SxObject => ({
   alignItems: 'center',
   display: 'flex',
-  fontSize: hasIcon ? FOOTER_ICON_FONT_SIZE : undefined,
+  fontSize: hasIcon ? { sm: FOOTER_ICON_DESKTOP_FONT_SIZE, xs: FOOTER_ICON_FONT_SIZE } : undefined,
   justifyContent: 'center',
   // Slightly tighter on mobile so an extra icon still fits; 36px is below the
   // ideal 44px a11y target (desktop stays at 40, already a trade-off).
