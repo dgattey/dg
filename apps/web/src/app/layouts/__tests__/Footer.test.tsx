@@ -81,11 +81,17 @@ describe('Footer redesign badge', () => {
     mockInteractiveRedesign.mockResolvedValue(false);
     mockGetFooterLinks.mockResolvedValue([
       { icon: 'albums', title: 'Favorite albums', url: favoriteAlbumsRoute },
+      { icon: 'cursor', title: 'Cursor', url: 'https://cursor.com' },
       { icon: 'github', title: 'GitHub', url: 'https://github.com/dgattey' },
     ]);
     render(await Footer());
 
-    expect(screen.getByRole('link', { name: 'GitHub' })).toBeInTheDocument();
+    const cursor = screen.getByRole('link', { name: 'Cursor' });
+    const github = screen.getByRole('link', { name: 'GitHub' });
+    expect(cursor).toHaveAttribute('href', 'https://cursor.com');
+    expect(github).toBeInTheDocument();
+    // Cursor sits immediately left of GitHub in the icon row.
+    expect(cursor.compareDocumentPosition(github) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     await user.click(screen.getByRole('button', { name: 'Music' }));
     expect(screen.getByRole('link', { name: 'Favorite albums' })).toHaveAttribute(
