@@ -15,8 +15,11 @@ import { fetchTrackDisplayData, type TrackDisplayData } from './trackMetadataSin
  * Uses valibot for schema definition and runtime validation.
  */
 export const historyTrackSchema = v.object({
+  albumId: v.string(),
   albumImageUrl: v.string(),
   albumName: v.string(),
+  /** Spotify album page, empty when we never captured one. */
+  albumUrl: v.string(),
   artistNames: v.string(),
   playedAt: v.string(),
   trackId: v.string(),
@@ -186,8 +189,10 @@ function toHistoryTrack(
   const artistNames = sortedArtists.map((a) => a.name).join(', ');
 
   return v.parse(historyTrackSchema, {
+    albumId: cached.album.id,
     albumImageUrl: cached.album.imageUrl,
     albumName: cached.album.name,
+    albumUrl: cached.album.url ?? '',
     artistNames,
     playedAt: playedAt.toISOString(),
     trackId: cached.track.id,
@@ -206,8 +211,10 @@ function displayDataToHistoryTrack(data: TrackDisplayData, playedAt: Date): Hist
     .join(', ');
 
   return v.parse(historyTrackSchema, {
+    albumId: data.album.id,
     albumImageUrl: data.album.imageUrl,
     albumName: data.album.name,
+    albumUrl: data.album.url,
     artistNames,
     playedAt: playedAt.toISOString(),
     trackId: data.track.id,
