@@ -69,19 +69,14 @@ describe('Homepage basics', () => {
 
     expect(screen.getByText('About me')).toBeInTheDocument();
 
+    // The picker is collapsed until its trigger is pressed
+    await user.click(screen.getByRole('button', { name: 'Color scheme: system' }));
+
     const themePicker = screen.getByRole('radiogroup', {
       name: 'Choose color scheme',
     });
-    const radios = within(themePicker).getAllByRole('radio', { hidden: true });
-    const darkRadio = radios.find(
-      (radio) => radio instanceof HTMLInputElement && radio.value === 'dark',
-    );
+    await user.click(within(themePicker).getByRole('radio', { name: 'Dark' }));
 
-    if (!darkRadio) {
-      throw new Error('Dark color option not found');
-    }
-
-    await user.click(darkRadio);
     expect(mockSetPreference).toHaveBeenCalledWith('dark');
   });
 });
