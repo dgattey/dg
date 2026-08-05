@@ -17,6 +17,30 @@ export const SITE_HEADER_VIEW_TRANSITION_NAME = 'site-header';
 export const SITE_FOOTER_VIEW_TRANSITION_NAME = 'site-footer';
 
 /**
+ * Sticky bar chrome — the window-top mask, the bar fill, and the fade under it —
+ * is a full-bleed opaque band, and it gets photographed into whichever snapshot
+ * catches it. A navigation then sweeps that band across mid-page content: the
+ * row under a bar washes to cream from the top down and reads as blank tiles
+ * with a sliver of artwork below.
+ *
+ * So the chrome just doesn't paint while a transition runs. Both sides read
+ * this rule at capture time, so neither page carries a band, and the strip above
+ * a pinned bar is briefly unmasked instead — the lesser of the two, and it lands
+ * back the instant the flight ends. Hiding beats a group of its own: a name per
+ * piece is the only way to lift them out of the page bitmap, and a page with
+ * several bars needs a unique one for each, which no widely supported keyword
+ * gives us.
+ *
+ * The selector leads with `html` rather than `:root`, which Emotion would read
+ * as a pseudo-class on this element and never match.
+ */
+export const stickyDecorSx: SxObject = {
+  'html:active-view-transition &': {
+    opacity: 0,
+  },
+};
+
+/**
  * Chrome that has to stay pinned across a navigation needs a
  * view-transition-name, but a named element is also a backdrop root: any
  * `backdrop-filter` inside it samples that element instead of the page, so
