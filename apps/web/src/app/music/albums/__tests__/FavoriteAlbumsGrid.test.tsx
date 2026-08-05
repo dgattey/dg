@@ -45,14 +45,14 @@ const clickSort = async (user: ReturnType<typeof userEvent.setup>, label: string
 };
 
 describe('FavoriteAlbumsGrid', () => {
-  it('defaults to newest added first and links each album on Spotify', () => {
+  it('defaults to newest added first and links each album to its detail route', () => {
     render(<FavoriteAlbumsGrid albums={albums} />);
 
     expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
 
     const link = screen.getByRole('link', { name: 'Zebra' });
-    expect(link).toHaveAttribute('href', 'https://open.spotify.com/album/zebra');
-    expect(link).toHaveAttribute('target', '_blank');
+    expect(link).toHaveAttribute('href', '/music/albums/album-zebra');
+    expect(link).not.toHaveAttribute('target', '_blank');
   });
 
   it('sorts by album name', async () => {

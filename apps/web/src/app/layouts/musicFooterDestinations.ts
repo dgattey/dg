@@ -25,7 +25,15 @@ export function normalizeMusicPath(path: string) {
 }
 
 export function isMusicDestinationPath(path: string) {
-  return MUSIC_DESTINATION_PATHS.has(normalizeMusicPath(path));
+  const normalized = normalizeMusicPath(path);
+  if (MUSIC_DESTINATION_PATHS.has(normalized)) {
+    return true;
+  }
+  // Album detail wells live under favorite albums and keep music chrome.
+  return (
+    normalized.startsWith(`${favoriteAlbumsRoute}/`) &&
+    normalized.length > favoriteAlbumsRoute.length + 1
+  );
 }
 
 export function musicDestinationLabel(href: string): string {

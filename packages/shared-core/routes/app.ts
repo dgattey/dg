@@ -10,6 +10,9 @@ export const musicRoute = '/music' as const;
 
 export const favoriteAlbumsRoute = '/music/albums' as const;
 
+/** In-page album detail well under favorite albums (`/music/albums/:id`). */
+export const albumRoute = (id: string) => `${favoriteAlbumsRoute}/${id}`;
+
 export const devConsoleRoute = '/dev-console' as const;
 
 export const llmsTxtRoute = '/llms.txt' as const;

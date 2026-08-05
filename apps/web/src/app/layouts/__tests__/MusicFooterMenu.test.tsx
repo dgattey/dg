@@ -82,6 +82,12 @@ describe('MusicFooterMenu', () => {
     expect(screen.getByRole('button', { name: 'Music' }).style.viewTransitionName).toBe(
       PAGE_TITLE_SLOT_VIEW_TRANSITION_NAME,
     );
+
+    mockUsePathname.mockReturnValue(`${favoriteAlbumsRoute}/album123`);
+    rerender(<MusicFooterMenu icon="albums" />);
+    expect(screen.getByRole('button', { name: 'Music' }).style.viewTransitionName).toBe(
+      PAGE_TITLE_SLOT_VIEW_TRANSITION_NAME,
+    );
   });
 
   it('recognizes favorite-albums footer URLs with a trailing slash', () => {

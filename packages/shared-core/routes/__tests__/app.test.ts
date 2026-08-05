@@ -1,7 +1,9 @@
 import {
+  albumRoute,
   apiCatalogRoute,
   apiOpenApiRoute,
   apiStatusRoute,
+  favoriteAlbumsRoute,
   htmlPathToInternalMarkdownPath,
   htmlPathToMarkdownPath,
   isMarkdownPagePath,
@@ -43,5 +45,9 @@ describe('markdown page registry', () => {
     expect(markdownPagePaths).not.toEqual(
       expect.arrayContaining([apiCatalogRoute, apiOpenApiRoute, apiStatusRoute]),
     );
+  });
+
+  it('builds album detail routes under favorite albums', () => {
+    expect(albumRoute('abc123')).toBe(`${favoriteAlbumsRoute}/abc123`);
   });
 });

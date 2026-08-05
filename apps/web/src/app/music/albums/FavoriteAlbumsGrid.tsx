@@ -1,14 +1,16 @@
 'use client';
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
+import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
 import { GlassSwitcher } from '@dg/ui/core/GlassSwitcher';
 import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Stack } from '@mui/material';
+import { Box, Stack, useMediaQuery, useTheme } from '@mui/material';
 import { ArrowDownUp } from 'lucide-react';
 import { useLayoutEffect, useRef, useState } from 'react';
-import { AlbumThumbnail } from '../../spotify/AlbumThumbnail';
+import { AlbumWell } from './AlbumWell';
+import { FavoriteAlbumCell } from './FavoriteAlbumCell';
 
 const SORT_OPTIONS = [
   { key: 'added', label: 'Recently added' },
@@ -37,19 +39,39 @@ const gridSx: SxObject = {
   },
 };
 
+function useAlbumGridColumns(): number {
+  const theme = useTheme();
+  const isLg = useMediaQuery(theme.breakpoints.up('lg'), { noSsr: true });
+  const isMd = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true });
+  const isSm = useMediaQuery(theme.breakpoints.up('sm'), { noSsr: true });
+  if (isLg) {
+    return 6;
+  }
+  if (isMd) {
+    return 4;
+  }
+  if (isSm) {
+    return 3;
+  }
+  return 2;
+}
+
 type Props = {
   albums: Array<PlaylistAlbum>;
+  selectedAlbumId?: string;
+  albumDetail?: AlbumDetail | null;
 };
 
 /**
- * Sortable grid of favorite album covers. Reordering runs a FLIP animation:
- * item positions are captured before the sort is applied, then each moved
- * item plays from its old position to its new one.
+ * Sortable grid of favorite album covers. When an album is selected, a content-
+ * width well is inserted after that album's row; the selected cell stays put
+ * as a collapsed placeholder while art morphs into the well.
  */
-export function FavoriteAlbumsGrid({ albums }: Props) {
+export function FavoriteAlbumsGrid({ albums, selectedAlbumId, albumDetail }: Props) {
   const [sortKey, setSortKey] = useState<AlbumSortKey>('added');
   const itemRefs = useRef(new Map<string, HTMLElement>());
   const previousRects = useRef<Map<string, DOMRect> | null>(null);
+  const columns = useAlbumGridColumns();
 
   const handleSortChange = (next: AlbumSortKey) => {
     if (next === sortKey) {
@@ -88,6 +110,39 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
   });
 
   const sortedAlbums = [...albums].sort(comparators[sortKey]);
+  const selectedIndex = selectedAlbumId
+    ? sortedAlbums.findIndex((album) => album.id === selectedAlbumId)
+    : -1;
+  const wellAfterIndex =
+    selectedIndex >= 0
+      ? Math.min(sortedAlbums.length - 1, (Math.floor(selectedIndex / columns) + 1) * columns - 1)
+      : -1;
+  const showWell = Boolean(selectedAlbumId && albumDetail);
+  const albumsBeforeWell =
+    showWell && wellAfterIndex >= 0 ? sortedAlbums.slice(0, wellAfterIndex + 1) : sortedAlbums;
+  const albumsAfterWell =
+    showWell && wellAfterIndex >= 0 ? sortedAlbums.slice(wellAfterIndex + 1) : [];
+
+  const renderAlbum = (album: PlaylistAlbum) => (
+    <Box
+      key={album.id}
+      ref={(element: HTMLElement | null) => {
+        if (element) {
+          itemRefs.current.set(album.id, element);
+        } else {
+          itemRefs.current.delete(album.id);
+        }
+      }}
+    >
+      <FavoriteAlbumCell
+        albumId={album.id}
+        albumName={album.name}
+        collapsed={album.id === selectedAlbumId}
+        imageUrl={album.imageUrl}
+        tooltip={`${album.name} – ${album.artistNames}`}
+      />
+    </Box>
+  );
 
   return (
     <Stack spacing={2}>
@@ -101,25 +156,10 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
         />
       </StickyFadeBar>
       <Box sx={gridSx}>
-        {sortedAlbums.map((album) => (
-          <Box
-            key={album.id}
-            ref={(element: HTMLElement | null) => {
-              if (element) {
-                itemRefs.current.set(album.id, element);
-              } else {
-                itemRefs.current.delete(album.id);
-              }
-            }}
-          >
-            <AlbumThumbnail
-              albumName={album.name}
-              imageUrl={album.imageUrl}
-              linkUrl={album.url}
-              tooltip={`${album.name} – ${album.artistNames}`}
-            />
-          </Box>
-        ))}
+        {showWell && selectedIndex < 0 && albumDetail ? <AlbumWell album={albumDetail} /> : null}
+        {albumsBeforeWell.map(renderAlbum)}
+        {showWell && wellAfterIndex >= 0 && albumDetail ? <AlbumWell album={albumDetail} /> : null}
+        {albumsAfterWell.map(renderAlbum)}
       </Box>
     </Stack>
   );
