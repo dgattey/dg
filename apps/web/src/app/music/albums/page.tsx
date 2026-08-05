@@ -1,46 +1,45 @@
 import 'server-only';
 
-import { favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
-import { Typography } from '@mui/material';
-import type { Metadata } from 'next';
+import { ALBUM_PARAM } from '@dg/shared-core/routes/app';
+import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
-import { getFavoriteAlbums } from '../../../services/albums';
-import { markdownAlternates } from '../../layouts/markdownAlternates';
-import { musicDestinationLabel } from '../../layouts/musicFooterDestinations';
-import { PageTitle } from '../../layouts/PageTitle';
-import { FavoriteAlbumsGrid } from './FavoriteAlbumsGrid';
-import { FavoriteAlbumsSkeleton } from './FavoriteAlbumsSkeleton';
+import { getAlbumDetail } from '../../../services/albumDetail';
+import { AlbumDetailBody } from './AlbumDetailBody';
+import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
 
-const TITLE = musicDestinationLabel(favoriteAlbumsRoute);
-
-export const metadata: Metadata = {
-  alternates: markdownAlternates(favoriteAlbumsRoute),
-  title: TITLE,
+type PageProps = {
+  searchParams: Promise<Record<string, string | Array<string> | undefined>>;
 };
 
-async function FavoriteAlbums() {
-  const albums = await getFavoriteAlbums();
+async function SelectedAlbum({ searchParams }: PageProps) {
+  const albumId = (await searchParams)[ALBUM_PARAM];
 
-  if (!albums?.length) {
-    return <Typography color="text.secondary">No albums right now. Check back soon.</Typography>;
+  if (typeof albumId !== 'string' || !albumId) {
+    return null;
   }
 
-  return <FavoriteAlbumsGrid albums={albums} />;
+  const detail = await getAlbumDetail(albumId);
+
+  if (!detail) {
+    notFound();
+  }
+
+  return <AlbumDetailBody album={detail} />;
 }
 
 /**
- * Page shell stays synchronous so it commits in the same render as the
- * outgoing page. Awaiting here instead would suspend the whole route, the old
- * page would already be unmounted by the time this arrives, and the view
- * transition would have nothing to animate away from.
+ * Fills the well slot the albums layout leaves inside the grid. Only the part
+ * that needs a fetch lives here — the layout already renders the well frame,
+ * art, and title, so the shared art name is on screen before this resolves and
+ * the morph has somewhere to land.
+ *
+ * Shell stays synchronous so `searchParams` is awaited inside the boundary
+ * rather than blocking the route's static shell.
  */
-export default function FavoriteAlbumsPage() {
+export default function FavoriteAlbumsPage({ searchParams }: PageProps) {
   return (
-    <>
-      <PageTitle>{TITLE}</PageTitle>
-      <Suspense fallback={<FavoriteAlbumsSkeleton />}>
-        <FavoriteAlbums />
-      </Suspense>
-    </>
+    <Suspense fallback={<AlbumDetailBodySkeleton />}>
+      <SelectedAlbum searchParams={searchParams} />
+    </Suspense>
   );
 }

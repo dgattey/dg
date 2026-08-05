@@ -48,6 +48,6 @@ describe('markdown page registry', () => {
   });
 
   it('builds album detail routes under favorite albums', () => {
-    expect(albumRoute('abc123')).toBe(`${favoriteAlbumsRoute}/abc123`);
+    expect(albumRoute('abc123')).toBe(`${favoriteAlbumsRoute}?album=abc123`);
   });
 });

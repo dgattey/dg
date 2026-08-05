@@ -9,7 +9,7 @@ import { SITE_NAME } from '../../metadata';
  * Markdown representation of favorite albums — kept next to the albums page.
  * Per-album HTML wells are intentionally omitted from markdownPages: the
  * registry is a static list, and each album is already linked here with its
- * shareable `/music/albums/:id` URL plus the Spotify external URL.
+ * shareable `/music/albums?album=:id` URL plus the Spotify external URL.
  */
 export async function getFavoriteAlbumsMarkdown(): Promise<string> {
   try {

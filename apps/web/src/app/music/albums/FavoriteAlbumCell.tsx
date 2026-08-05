@@ -10,9 +10,31 @@ import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Card } from '@mui/material';
-import { ALBUM_ART_SIZE, albumArtLinkSx } from '../../spotify/albumArtStyles';
+import { X } from 'lucide-react';
+import { ViewTransition } from 'react';
+import { albumArtLinkSx } from '../../spotify/albumArtStyles';
+
+/** Art now stretches to its grid column, so sample above the legacy 150px. */
+const GRID_ART_SIZE = 300;
+
+const GRID_ART_SIZES = { extraLarge: 200, medium: 200, tiny: 180 } as const;
+
+/**
+ * Art fills its column so the row of albums lines up with the well's edges.
+ * Tooltip wraps its child in an inline-flex span, which otherwise shrink-wraps
+ * the art to its intrinsic size and leaves the row visibly narrower.
+ */
+const fillCellSx: SxObject = {
+  display: 'block',
+  width: '100%',
+};
 
 const cardSx: SxObject = {
+  '& img': {
+    display: 'block',
+    height: 'auto',
+    width: '100%',
+  },
   borderRadius: 2,
   boxShadow: 'var(--mui-extraShadows-card-main)',
   lineHeight: 0,
@@ -20,11 +42,52 @@ const cardSx: SxObject = {
   width: '100%',
 };
 
+/**
+ * The art is away in the well, so the cell keeps a dimmed, blurred copy as the
+ * socket it lifted out of and puts the close affordance where the album was.
+ */
 const placeholderSx: SxObject = {
+  '& img': {
+    filter: 'blur(5px) saturate(0.6)',
+    height: '100%',
+    objectFit: 'cover',
+    opacity: 0.4,
+    transform: 'scale(1.1)',
+    width: '100%',
+  },
+  '&:hover': {
+    backgroundColor: 'color-mix(in srgb, CanvasText 10%, transparent)',
+  },
+  alignItems: 'center',
   aspectRatio: '1',
-  backgroundColor: 'color-mix(in srgb, CanvasText 4%, transparent)',
+  backgroundColor: 'color-mix(in srgb, CanvasText 6%, transparent)',
   borderRadius: 2,
-  boxShadow: 'inset 0 0 0 1px color-mix(in srgb, CanvasText 14%, transparent)',
+  boxShadow: 'inset 0 0 0 1px color-mix(in srgb, CanvasText 22%, transparent)',
+  display: 'grid',
+  justifyItems: 'center',
+  overflow: 'hidden',
+  position: 'relative',
+  width: '100%',
+};
+
+const closeMarkSx: SxObject = {
+  alignItems: 'center',
+  backgroundColor: 'color-mix(in srgb, var(--mui-palette-background-paper) 78%, transparent)',
+  borderRadius: '50%',
+  boxShadow: 'inset 0 0 0 1px color-mix(in srgb, CanvasText 18%, transparent)',
+  color: 'text.primary',
+  display: 'flex',
+  gridArea: '1 / 1',
+  height: 40,
+  justifyContent: 'center',
+  position: 'relative',
+  width: 40,
+};
+
+const artSlotSx: SxObject = {
+  gridArea: '1 / 1',
+  height: '100%',
+  lineHeight: 0,
   width: '100%',
 };
 
@@ -53,11 +116,24 @@ export function FavoriteAlbumCell({
       <Tooltip title={`Close ${albumName}`}>
         <Link
           href={favoriteAlbumsRoute}
-          sx={{ display: 'block', ...albumArtLinkSx }}
+          sx={{ ...albumArtLinkSx, ...fillCellSx }}
           title={`Close ${albumName}`}
           transitionTypes={albumTransitionTypes('close')}
         >
-          <Box aria-label={`Collapse ${albumName}`} sx={placeholderSx} />
+          <Box sx={placeholderSx}>
+            <Box sx={artSlotSx}>
+              <Image
+                alt=""
+                height={GRID_ART_SIZE}
+                sizes={GRID_ART_SIZES}
+                url={imageUrl}
+                width={GRID_ART_SIZE}
+              />
+            </Box>
+            <Box sx={closeMarkSx}>
+              <X aria-hidden size={20} />
+            </Box>
+          </Box>
         </Link>
       </Tooltip>
     );
@@ -67,24 +143,21 @@ export function FavoriteAlbumCell({
     <Tooltip title={tooltip}>
       <Link
         href={albumRoute(albumId)}
-        sx={albumArtLinkSx}
+        sx={{ ...albumArtLinkSx, ...fillCellSx }}
         title={albumName}
         transitionTypes={albumTransitionTypes('open')}
       >
-        <Card
-          sx={{
-            ...cardSx,
-            viewTransitionName: albumArtViewTransitionName(albumId),
-          }}
-        >
-          <Image
-            alt={albumName}
-            height={ALBUM_ART_SIZE}
-            sizes={{ extraLarge: ALBUM_ART_SIZE }}
-            url={imageUrl}
-            width={ALBUM_ART_SIZE}
-          />
-        </Card>
+        <ViewTransition name={albumArtViewTransitionName(albumId)} share="vt-album-art">
+          <Card sx={cardSx}>
+            <Image
+              alt={albumName}
+              height={GRID_ART_SIZE}
+              sizes={GRID_ART_SIZES}
+              url={imageUrl}
+              width={GRID_ART_SIZE}
+            />
+          </Card>
+        </ViewTransition>
       </Link>
     </Tooltip>
   );

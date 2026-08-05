@@ -1,13 +1,15 @@
 'use client';
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
-import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
+import { ALBUM_PARAM } from '@dg/shared-core/routes/app';
 import { GlassSwitcher } from '@dg/ui/core/GlassSwitcher';
 import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Stack, useMediaQuery, useTheme } from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { ArrowDownUp } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
+import type { ReactNode } from 'react';
 import { useLayoutEffect, useRef, useState } from 'react';
 import { AlbumWell } from './AlbumWell';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
@@ -28,50 +30,72 @@ const comparators: Record<AlbumSortKey, (a: PlaylistAlbum, b: PlaylistAlbum) => 
   released: (a, b) => b.releaseDate.localeCompare(a.releaseDate),
 };
 
+const COLUMNS_BY_BREAKPOINT = { lg: 6, md: 4, sm: 3, xs: 2 } as const;
+
 const gridSx: SxObject = {
   display: 'grid',
   gap: 2,
   gridTemplateColumns: {
-    lg: 'repeat(6, 1fr)',
-    md: 'repeat(4, 1fr)',
-    sm: 'repeat(3, 1fr)',
-    xs: 'repeat(2, 1fr)',
+    lg: `repeat(${COLUMNS_BY_BREAKPOINT.lg}, 1fr)`,
+    md: `repeat(${COLUMNS_BY_BREAKPOINT.md}, 1fr)`,
+    sm: `repeat(${COLUMNS_BY_BREAKPOINT.sm}, 1fr)`,
+    xs: `repeat(${COLUMNS_BY_BREAKPOINT.xs}, 1fr)`,
   },
 };
 
-function useAlbumGridColumns(): number {
-  const theme = useTheme();
-  const isLg = useMediaQuery(theme.breakpoints.up('lg'), { noSsr: true });
-  const isMd = useMediaQuery(theme.breakpoints.up('md'), { noSsr: true });
-  const isSm = useMediaQuery(theme.breakpoints.up('sm'), { noSsr: true });
-  if (isLg) {
-    return 6;
-  }
-  if (isMd) {
-    return 4;
-  }
-  if (isSm) {
-    return 3;
-  }
-  return 2;
+/**
+ * Stretches the cell's tooltip wrapper, which is inline-flex and would
+ * otherwise shrink-wrap the art and leave the row narrower than the well.
+ */
+function albumSlotSx(index: number): SxObject {
+  return {
+    '& > *': { width: '100%' },
+    order: 2 * index + 1,
+  };
+}
+
+/**
+ * Albums claim the odd visual slots (album `i` gets `order: 2i + 1`), which
+ * leaves every even slot free for the well. The well belongs at the end of the
+ * selected album's row, and only CSS knows how many columns that row has, so
+ * its slot is emitted once per breakpoint rather than measured in JS —
+ * measuring would render a different tree on the server than on the client.
+ */
+function wellPlacementSx(selectedIndex: number, albumCount: number): SxObject {
+  const slotFor = (columns: number) =>
+    2 * Math.min(albumCount, (Math.floor(selectedIndex / columns) + 1) * columns);
+
+  return {
+    gridColumn: '1 / -1',
+    order: {
+      lg: slotFor(COLUMNS_BY_BREAKPOINT.lg),
+      md: slotFor(COLUMNS_BY_BREAKPOINT.md),
+      sm: slotFor(COLUMNS_BY_BREAKPOINT.sm),
+      xs: slotFor(COLUMNS_BY_BREAKPOINT.xs),
+    },
+  };
 }
 
 type Props = {
   albums: Array<PlaylistAlbum>;
-  selectedAlbumId?: string;
-  albumDetail?: AlbumDetail | null;
+  /** Streamed album detail from the `[id]` route, rendered inside the well. */
+  children?: ReactNode;
 };
 
 /**
- * Sortable grid of favorite album covers. When an album is selected, a content-
- * width well is inserted after that album's row; the selected cell stays put
- * as a collapsed placeholder while art morphs into the well.
+ * Sortable grid of favorite album covers. When the URL names an album, a
+ * content-width well is inserted after that album's row; the selected cell
+ * stays put as a collapsed placeholder while art morphs into the well.
+ *
+ * The selection is read from the query rather than passed in, so this grid can
+ * live in the layout — where a query change never refetches it — and stay
+ * mounted across open and close.
  */
-export function FavoriteAlbumsGrid({ albums, selectedAlbumId, albumDetail }: Props) {
+export function FavoriteAlbumsGrid({ albums, children }: Props) {
+  const selectedAlbumId = useSearchParams().get(ALBUM_PARAM);
   const [sortKey, setSortKey] = useState<AlbumSortKey>('added');
   const itemRefs = useRef(new Map<string, HTMLElement>());
   const previousRects = useRef<Map<string, DOMRect> | null>(null);
-  const columns = useAlbumGridColumns();
 
   const handleSortChange = (next: AlbumSortKey) => {
     if (next === sortKey) {
@@ -113,17 +137,14 @@ export function FavoriteAlbumsGrid({ albums, selectedAlbumId, albumDetail }: Pro
   const selectedIndex = selectedAlbumId
     ? sortedAlbums.findIndex((album) => album.id === selectedAlbumId)
     : -1;
-  const wellAfterIndex =
-    selectedIndex >= 0
-      ? Math.min(sortedAlbums.length - 1, (Math.floor(selectedIndex / columns) + 1) * columns - 1)
-      : -1;
-  const showWell = Boolean(selectedAlbumId && albumDetail);
-  const albumsBeforeWell =
-    showWell && wellAfterIndex >= 0 ? sortedAlbums.slice(0, wellAfterIndex + 1) : sortedAlbums;
-  const albumsAfterWell =
-    showWell && wellAfterIndex >= 0 ? sortedAlbums.slice(wellAfterIndex + 1) : [];
+  const selectedAlbum = selectedIndex >= 0 ? sortedAlbums[selectedIndex] : undefined;
+  const well = selectedAlbum ? (
+    <Box key="album-well" sx={wellPlacementSx(selectedIndex, sortedAlbums.length)}>
+      <AlbumWell album={selectedAlbum}>{children}</AlbumWell>
+    </Box>
+  ) : null;
 
-  const renderAlbum = (album: PlaylistAlbum) => (
+  const renderAlbum = (album: PlaylistAlbum, index: number) => (
     <Box
       key={album.id}
       ref={(element: HTMLElement | null) => {
@@ -133,6 +154,7 @@ export function FavoriteAlbumsGrid({ albums, selectedAlbumId, albumDetail }: Pro
           itemRefs.current.delete(album.id);
         }
       }}
+      sx={albumSlotSx(index)}
     >
       <FavoriteAlbumCell
         albumId={album.id}
@@ -142,6 +164,14 @@ export function FavoriteAlbumsGrid({ albums, selectedAlbumId, albumDetail }: Pro
         tooltip={`${album.name} – ${album.artistNames}`}
       />
     </Box>
+  );
+
+  // The well sits next to its album in the DOM for reading and tab order; CSS
+  // `order` is what floats it down to the end of that album's row.
+  const cells = sortedAlbums.flatMap((album, index) =>
+    index === selectedIndex && well
+      ? [renderAlbum(album, index), well]
+      : [renderAlbum(album, index)],
   );
 
   return (
@@ -155,12 +185,7 @@ export function FavoriteAlbumsGrid({ albums, selectedAlbumId, albumDetail }: Pro
           value={sortKey}
         />
       </StickyFadeBar>
-      <Box sx={gridSx}>
-        {showWell && selectedIndex < 0 && albumDetail ? <AlbumWell album={albumDetail} /> : null}
-        {albumsBeforeWell.map(renderAlbum)}
-        {showWell && wellAfterIndex >= 0 && albumDetail ? <AlbumWell album={albumDetail} /> : null}
-        {albumsAfterWell.map(renderAlbum)}
-      </Box>
+      <Box sx={gridSx}>{cells}</Box>
     </Stack>
   );
 }

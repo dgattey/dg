@@ -1,7 +1,12 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useSearchParams } from 'next/navigation';
 import { FavoriteAlbumsGrid } from '../FavoriteAlbumsGrid';
+
+jest.mock('next/navigation', () => ({
+  useSearchParams: jest.fn(() => new URLSearchParams()),
+}));
 
 const albums: Array<PlaylistAlbum> = [
   {
@@ -51,8 +56,29 @@ describe('FavoriteAlbumsGrid', () => {
     expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
 
     const link = screen.getByRole('link', { name: 'Zebra' });
-    expect(link).toHaveAttribute('href', '/music/albums/album-zebra');
+    expect(link).toHaveAttribute('href', '/music/albums?album=album-zebra');
     expect(link).not.toHaveAttribute('target', '_blank');
+  });
+
+  it('expands the album named in the query and offers its cell as the way back', () => {
+    jest
+      .mocked(useSearchParams)
+      .mockReturnValueOnce(
+        new URLSearchParams('album=album-zebra') as ReturnType<typeof useSearchParams>,
+      );
+
+    render(
+      <FavoriteAlbumsGrid albums={albums}>
+        <p>streamed tracklist</p>
+      </FavoriteAlbumsGrid>,
+    );
+
+    expect(screen.getByRole('region', { name: 'Zebra details' })).toBeInTheDocument();
+    expect(screen.getByText('streamed tracklist')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Close Zebra' })).toHaveAttribute(
+      'href',
+      '/music/albums',
+    );
   });
 
   it('sorts by album name', async () => {
