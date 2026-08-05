@@ -4,5 +4,8 @@
  */
 export const FOOTER_ICON_FONT_SIZE = '1.25em';
 
+/** Slightly larger footer icon size from the small breakpoint upward. */
+export const FOOTER_ICON_DESKTOP_FONT_SIZE = '1.4em';
+
 /** Caption size in px — the font-size under footer icon links / menu labels. */
 export const FOOTER_ICON_BASE_PX = 14;

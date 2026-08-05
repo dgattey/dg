@@ -14,7 +14,7 @@ import { Suspense } from 'react';
 import { interactiveRedesign } from '../../flags';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
-import { FOOTER_ICON_FONT_SIZE } from './footerIconSize';
+import { FOOTER_ICON_DESKTOP_FONT_SIZE, FOOTER_ICON_FONT_SIZE } from './footerIconSize';
 import { MusicFooterMenu } from './MusicFooterMenu';
 import { isFavoriteAlbumsFooterUrl } from './musicFooterDestinations';
 
@@ -25,7 +25,7 @@ const navItemNoPaddingSx: SxObject = {
 const getFooterLinkSx = (hasIcon: boolean): SxObject => ({
   alignItems: 'center',
   display: 'flex',
-  fontSize: hasIcon ? FOOTER_ICON_FONT_SIZE : undefined,
+  fontSize: hasIcon ? { sm: FOOTER_ICON_DESKTOP_FONT_SIZE, xs: FOOTER_ICON_FONT_SIZE } : undefined,
   justifyContent: 'center',
   // Slightly tighter on mobile so an extra icon still fits; 36px is below the
   // ideal 44px a11y target (desktop stays at 40, already a trade-off).
@@ -48,28 +48,43 @@ const dividerSx: SxObject = {
 };
 
 const footerNavSx: SxObject = {
-  alignItems: { sm: 'center', xs: 'stretch' },
-  columnGap: 3,
-  flexDirection: { sm: 'row', xs: 'column-reverse' },
-  flexWrap: 'wrap-reverse',
+  alignItems: 'stretch',
+  flexDirection: 'column',
+  rowGap: 1,
 };
 
-const footerNavGroupSx: SxObject = {
-  columnGap: 2,
+const footerLinksGroupSx: SxObject = {
+  alignItems: 'stretch',
+  flexDirection: 'column',
+  height: 'auto',
+  rowGap: 1,
+  width: '100%',
 };
 
 const footerLinkListSx: SxObject = {
+  justifyContent: 'flex-start',
   margin: 0,
   padding: 0,
+  width: '100%',
 };
 
 const footerIconLinkListSx: SxObject = {
-  flex: 1,
   justifyContent: 'space-between',
   margin: 0,
-  // Pull further into container padding on mobile so the extra icon fits.
-  marginLeft: { sm: -2.5, xs: -3 },
-  marginRight: { sm: -1.5, xs: -2 },
+  padding: 0,
+  width: '100%',
+};
+
+const footerMetaSx: SxObject = {
+  columnGap: 1.5,
+  flexGrow: 0,
+  height: 'auto',
+  justifyContent: 'flex-start',
+  rowGap: 0.5,
+  width: '100%',
+};
+
+const footerMetaItemSx: SxObject = {
   padding: 0,
 };
 
@@ -115,14 +130,12 @@ export async function RedesignBadge() {
     return null;
   }
   return (
-    <>
-      <NavItem sx={navItemNoPaddingSx}>•</NavItem>
-      <NavItem>
-        <Typography color="text.secondary" component="span" variant="caption">
-          redesign on
-        </Typography>
-      </NavItem>
-    </>
+    <NavItem sx={footerMetaItemSx}>
+      •{' '}
+      <Typography color="text.secondary" component="span" variant="caption">
+        redesign on
+      </Typography>
+    </NavItem>
   );
 }
 
@@ -145,57 +158,13 @@ export async function Footer() {
         <Box component="footer" sx={siteFooterSx}>
           <Divider sx={dividerSx} />
           <Nav sx={footerNavSx}>
-            <NavGroup>
-              <NavItem>© {currentYear} Dylan Gattey</NavItem>
-              {version ? (
-                <>
-                  <NavItem sx={navItemNoPaddingSx}>•</NavItem>
-                  <NavItem>
-                    {releaseUrl ? (
-                      <Link
-                        aria-label={`GitHub release ${version}`}
-                        color="inherit"
-                        href={releaseUrl}
-                        isExternal
-                        title={`GitHub release ${version}`}
-                        variant="caption"
-                      >
-                        {version}
-                      </Link>
-                    ) : (
-                      version
-                    )}
-                  </NavItem>
-                </>
-              ) : null}
-              <Suspense fallback={null}>
-                <RedesignBadge />
-              </Suspense>
-              {process.env.NODE_ENV !== 'production' ? (
-                <>
-                  <NavItem sx={navItemNoPaddingSx}>•</NavItem>
-                  <NavItem>
-                    <Link
-                      aria-label="Developer tools"
-                      color="inherit"
-                      forcePageNavigation
-                      href={devConsoleRoute}
-                      title="Developer tools"
-                      variant="caption"
-                    >
-                      Dev console
-                    </Link>
-                  </NavItem>
-                </>
-              ) : null}
-            </NavGroup>
-            <NavGroup component="div" sx={footerNavGroupSx}>
-              <Stack component="ul" direction="row" sx={footerLinkListSx}>
-                {nonIconFooterLinks?.map((link) => (
-                  <FooterLink key={link.url} link={link} />
-                ))}
-              </Stack>
-              <Stack component="ul" direction="row" sx={footerIconLinkListSx}>
+            <NavGroup component="div" sx={footerLinksGroupSx}>
+              <Stack
+                aria-label="Footer icon links"
+                component="ul"
+                direction="row"
+                sx={footerIconLinkListSx}
+              >
                 {iconFooterLinks?.map((link) =>
                   isFavoriteAlbumsFooterUrl(link.url) ? (
                     <MusicFooterMenu icon={link.icon} key={link.url} />
@@ -204,6 +173,58 @@ export async function Footer() {
                   ),
                 )}
               </Stack>
+              {nonIconFooterLinks.length > 0 ? (
+                <Stack
+                  aria-label="Footer text links"
+                  component="ul"
+                  direction="row"
+                  sx={footerLinkListSx}
+                >
+                  {nonIconFooterLinks.map((link) => (
+                    <FooterLink key={link.url} link={link} />
+                  ))}
+                </Stack>
+              ) : null}
+            </NavGroup>
+            <NavGroup aria-label="Site information" sx={footerMetaSx}>
+              <NavItem sx={footerMetaItemSx}>© {currentYear} Dylan Gattey</NavItem>
+              {version ? (
+                <NavItem sx={footerMetaItemSx}>
+                  •{' '}
+                  {releaseUrl ? (
+                    <Link
+                      aria-label={`GitHub release ${version}`}
+                      color="inherit"
+                      href={releaseUrl}
+                      isExternal
+                      title={`GitHub release ${version}`}
+                      variant="caption"
+                    >
+                      {version}
+                    </Link>
+                  ) : (
+                    version
+                  )}
+                </NavItem>
+              ) : null}
+              <Suspense fallback={null}>
+                <RedesignBadge />
+              </Suspense>
+              {process.env.NODE_ENV !== 'production' ? (
+                <NavItem sx={footerMetaItemSx}>
+                  •{' '}
+                  <Link
+                    aria-label="Developer tools"
+                    color="inherit"
+                    forcePageNavigation
+                    href={devConsoleRoute}
+                    title="Developer tools"
+                    variant="caption"
+                  >
+                    Dev console
+                  </Link>
+                </NavItem>
+              ) : null}
             </NavGroup>
           </Nav>
         </Box>
