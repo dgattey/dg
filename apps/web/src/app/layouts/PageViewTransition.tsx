@@ -26,7 +26,15 @@ export function PageViewTransition({ children }: { children: ReactNode }) {
 
   return (
     <ViewTransition key={pathname} {...pageViewTransitionProps}>
-      {children}
+      {/*
+       * One wrapper so the boundary has a single child. React names every
+       * direct child itself, which overwrites any `view-transition-name` the
+       * page set — the heading loses `page-title`, stops pairing with the
+       * footer control, and dips away with the page instead of morphing into
+       * it. Naming this wrapper leaves the page's own names intact and makes
+       * the page rise and fall as one piece.
+       */}
+      <div>{children}</div>
     </ViewTransition>
   );
 }
