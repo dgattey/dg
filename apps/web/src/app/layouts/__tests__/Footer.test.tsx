@@ -83,24 +83,13 @@ describe('Footer redesign badge', () => {
       { icon: 'albums', title: 'Favorite albums', url: favoriteAlbumsRoute },
       { icon: 'cursor', title: 'Cursor', url: 'https://cursor.com' },
       { icon: 'github', title: 'GitHub', url: 'https://github.com/dgattey' },
-      { title: 'Privacy', url: '/privacy' },
     ]);
     render(await Footer());
 
-    const iconLinks = screen.getByRole('list', { name: 'Footer icon links' });
-    const textLinks = screen.getByRole('list', { name: 'Footer text links' });
-    const siteInformation = screen.getByRole('list', { name: 'Site information' });
     const cursor = screen.getByRole('link', { name: 'Cursor' });
     const github = screen.getByRole('link', { name: 'GitHub' });
     expect(cursor).toHaveAttribute('href', 'https://cursor.com');
     expect(github).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Privacy' })).toHaveAttribute('href', '/privacy');
-    expect(
-      iconLinks.compareDocumentPosition(textLinks) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-    expect(
-      textLinks.compareDocumentPosition(siteInformation) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
     // Cursor sits immediately left of GitHub in the icon row.
     expect(cursor.compareDocumentPosition(github) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 

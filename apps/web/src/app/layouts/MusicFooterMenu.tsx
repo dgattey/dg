@@ -12,11 +12,7 @@ import { Disc3, DiscAlbum, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent } from 'react';
 import { useId, useLayoutEffect, useRef, useState } from 'react';
-import {
-  FOOTER_ICON_BASE_PX,
-  FOOTER_ICON_DESKTOP_FONT_SIZE,
-  FOOTER_ICON_FONT_SIZE,
-} from './footerIconSize';
+import { FOOTER_ICON_BASE_PX, FOOTER_ICON_FONT_SIZE } from './footerIconSize';
 import { isMusicDestinationPath, MUSIC_DESTINATIONS } from './musicFooterDestinations';
 
 const MUSIC_LABEL = 'Music';
@@ -30,7 +26,7 @@ const triggerSx: SxObject = {
   alignItems: 'center',
   color: 'secondary.main',
   display: 'flex',
-  fontSize: { sm: FOOTER_ICON_DESKTOP_FONT_SIZE, xs: FOOTER_ICON_FONT_SIZE },
+  fontSize: FOOTER_ICON_FONT_SIZE,
   justifyContent: 'center',
   minHeight: { sm: 40, xs: 36 },
   minWidth: { sm: 40, xs: 36 },
