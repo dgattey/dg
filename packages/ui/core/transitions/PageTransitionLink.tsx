@@ -18,6 +18,8 @@ export type PageTransitionLinkProps = {
    * `view-transition-name` abort the transition.
    */
   morphsTitle?: boolean;
+  onClick?: () => void;
+  role?: React.AriaRole;
   sx?: SxProps;
   title: string;
   variant?: 'caption';
@@ -36,6 +38,7 @@ export function PageTransitionLink({
   children,
   href,
   morphsTitle = false,
+  onClick,
   sx,
   title,
   ...rest
@@ -58,6 +61,7 @@ export function PageTransitionLink({
       href={href}
       onClick={() => {
         rememberPageOrigin(pathname);
+        onClick?.();
       }}
       ref={anchor}
       sx={sx}

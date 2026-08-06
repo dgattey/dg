@@ -5,7 +5,7 @@ import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
 import type { ButtonProps, LinkProps as MuiLinkProps } from '@mui/material';
 import { Button, Link as MuiLink } from '@mui/material';
-import { Disc3, Send } from 'lucide-react';
+import { Send } from 'lucide-react';
 import NextLink from 'next/link';
 import React from 'react';
 import type { TooltipPlacement } from '../core/Tooltip';
@@ -82,6 +82,11 @@ export type BaseLinkProps = {
    * Only usable from client components.
    */
   onClick?: React.MouseEventHandler<HTMLAnchorElement>;
+
+  /**
+   * Optional ARIA role for the underlying anchor (e.g. menuitem in a disclosure).
+   */
+  role?: React.AriaRole;
 };
 
 /**
@@ -119,7 +124,6 @@ function CursorIcon({ size = '1em' }: { size?: string }) {
  * Cursor is not in FA; map the Contentful `icon: "cursor"` string the same way.
  */
 const BUILT_IN_ICONS: Record<string, React.ReactNode> = {
-  albums: <Disc3 size="1em" />,
   cursor: <CursorIcon />,
   email: <Send size="1em" />,
   github: <FaIcon icon={faGithub} />,
@@ -203,6 +207,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     tooltipPlacement,
     transitionTypes,
     onClick,
+    role,
   },
   ref,
 ) {
@@ -220,6 +225,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     'aria-label': title,
     onClick,
     ref,
+    role,
     title: showTooltip ? undefined : title,
   };
   const externalProps = isExternal ? { rel: 'noreferrer' as const, target: '_blank' as const } : {};
