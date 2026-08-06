@@ -65,7 +65,25 @@ const clickSort = async (user: ReturnType<typeof userEvent.setup>, label: string
   await user.click(screen.getByRole('radio', { hidden: true, name: label }));
 };
 
+/**
+ * Lays every element out at 100px per sibling so a cell that changes position
+ * in the grid reports a different rect before and after a sort.
+ */
+const layOutBySiblingOrder = () => {
+  jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    const left = [...(this.parentElement?.children ?? [])].indexOf(this) * 100;
+    return { height: 100, left, top: 0, width: 100 } as DOMRect;
+  });
+};
+
 describe('FavoriteAlbumsGrid', () => {
+  afterEach(() => {
+    jest.restoreAllMocks();
+    Reflect.deleteProperty(Element.prototype, 'animate');
+  });
+
   it('defaults to newest added first and links each album to its detail route', () => {
     render(<FavoriteAlbumsGrid albums={albums} />);
 
@@ -74,6 +92,30 @@ describe('FavoriteAlbumsGrid', () => {
     const link = screen.getByRole('link', { name: 'Zebra' });
     expect(link).toHaveAttribute('href', '/music/albums?album=album-zebra');
     expect(link).not.toHaveAttribute('target', '_blank');
+  });
+
+  it('fans sleeves behind every cover, since every favorite is a whole album', () => {
+    const { container } = render(<FavoriteAlbumsGrid albums={albums} />);
+
+    const coversPerCell = [...container.querySelectorAll('a')].map(
+      (link) => link.querySelectorAll('img').length,
+    );
+    expect(coversPerCell).toEqual([3, 3, 3]);
+    expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
+  });
+
+  it('keeps a collapsed cell fanned while its only named cover flies to the well', () => {
+    jest
+      .mocked(useSearchParams)
+      .mockReturnValueOnce(
+        new URLSearchParams('album=album-zebra') as ReturnType<typeof useSearchParams>,
+      );
+
+    render(<FavoriteAlbumsGrid albums={albums} />);
+
+    const collapsed = screen.getByRole('link', { name: 'Close Zebra' });
+    expect(collapsed.querySelectorAll('img')).toHaveLength(3);
+    expect(screen.getAllByAltText('Zebra')).toHaveLength(1);
   });
 
   it('expands the album named in the query and offers its cell as the way back', () => {
@@ -222,6 +264,27 @@ describe('FavoriteAlbumsGrid', () => {
         expect.objectContaining({ transitionTypes: ['album-close'] }),
       );
     });
+  });
+
+  it('slides the cells that moved from where they were to where they landed', async () => {
+    const animate = jest.fn();
+    Object.defineProperty(Element.prototype, 'animate', { configurable: true, value: animate });
+    layOutBySiblingOrder();
+    const user = userEvent.setup();
+    render(<FavoriteAlbumsGrid albums={albums} />);
+
+    await clickSort(user, 'Album');
+
+    // Zebra and Apple swap ends; Mango holds the middle and stays still.
+    expect(animate).toHaveBeenCalledTimes(2);
+    expect(animate).toHaveBeenCalledWith(
+      [{ transform: 'translate(200px, 0px)' }, { transform: 'translate(0, 0)' }],
+      expect.objectContaining({ duration: expect.any(Number) }),
+    );
+    expect(animate).toHaveBeenCalledWith(
+      [{ transform: 'translate(-200px, 0px)' }, { transform: 'translate(0, 0)' }],
+      expect.objectContaining({ duration: expect.any(Number) }),
+    );
   });
 
   it('returns to the default order via recently added', async () => {

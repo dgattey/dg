@@ -1,3 +1,8 @@
+/**
+ * Art on the now-playing card, which is a fixed-size piece of a card layout
+ * rather than a grid cell. Grid cells on the music pages are a column wide and
+ * take their size, radius, and hover from `music/albumTileGeometry` instead.
+ */
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
 
@@ -5,7 +10,7 @@ import type { SxObject } from '@dg/ui/theme';
 export const ALBUM_ART_SIZE = 150;
 
 /** Standard hover scale for album art */
-export const ALBUM_ART_HOVER_SCALE = 1.05;
+const ALBUM_ART_HOVER_SCALE = 1.05;
 
 /** Bouncy hover link style for album art */
 export const albumArtLinkSx: SxObject = {
@@ -23,7 +28,7 @@ export const ALBUM_ART_DIMENSIONS: SxObject = {
   },
 };
 
-/** Responsive border radius for album art */
+/** Responsive border radius for the card's art, which is far bigger than a tile */
 export const ALBUM_ART_BORDER_RADIUS: SxObject = {
   borderRadius: { md: 6, sm: 4, xs: 2 },
 };

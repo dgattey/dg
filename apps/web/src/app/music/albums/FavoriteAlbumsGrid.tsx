@@ -9,6 +9,7 @@ import { Box, Stack } from '@mui/material';
 import { ArrowDownUp } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Fragment, useLayoutEffect, useRef, useState } from 'react';
+import { ALBUM_GRID_COLUMNS, albumGridSx, albumTileSlotSx } from '../albumTileGeometry';
 import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
 import { AlbumWell } from './AlbumWell';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
@@ -30,26 +31,10 @@ const comparators: Record<AlbumSortKey, (a: PlaylistAlbum, b: PlaylistAlbum) => 
   released: (a, b) => b.releaseDate.localeCompare(a.releaseDate),
 };
 
-const COLUMNS_BY_BREAKPOINT = { lg: 6, md: 4, sm: 3, xs: 2 } as const;
-
-const gridSx: SxObject = {
-  display: 'grid',
-  gap: 2,
-  gridTemplateColumns: {
-    lg: `repeat(${COLUMNS_BY_BREAKPOINT.lg}, 1fr)`,
-    md: `repeat(${COLUMNS_BY_BREAKPOINT.md}, 1fr)`,
-    sm: `repeat(${COLUMNS_BY_BREAKPOINT.sm}, 1fr)`,
-    xs: `repeat(${COLUMNS_BY_BREAKPOINT.xs}, 1fr)`,
-  },
-};
-
-/**
- * Stretches the cell's tooltip wrapper, which is inline-flex and would
- * otherwise shrink-wrap the art and leave the row narrower than the well.
- */
+/** A cell's slot in the grid, stretched around it and ordered ahead of a well. */
 function albumSlotSx(index: number): SxObject {
   return {
-    '& > *': { width: '100%' },
+    ...albumTileSlotSx,
     order: 2 * index + 1,
   };
 }
@@ -68,10 +53,10 @@ function wellPlacementSx(selectedIndex: number, albumCount: number): SxObject {
   return {
     gridColumn: '1 / -1',
     order: {
-      lg: slotFor(COLUMNS_BY_BREAKPOINT.lg),
-      md: slotFor(COLUMNS_BY_BREAKPOINT.md),
-      sm: slotFor(COLUMNS_BY_BREAKPOINT.sm),
-      xs: slotFor(COLUMNS_BY_BREAKPOINT.xs),
+      lg: slotFor(ALBUM_GRID_COLUMNS.lg),
+      md: slotFor(ALBUM_GRID_COLUMNS.md),
+      sm: slotFor(ALBUM_GRID_COLUMNS.sm),
+      xs: slotFor(ALBUM_GRID_COLUMNS.xs),
     },
   };
 }
@@ -198,7 +183,7 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
           value={sortKey}
         />
       </StickyFadeBar>
-      <Box onClickCapture={onAlbumNavigationCapture} sx={gridSx}>
+      <Box onClickCapture={onAlbumNavigationCapture} sx={albumGridSx}>
         {cells}
       </Box>
     </Stack>
