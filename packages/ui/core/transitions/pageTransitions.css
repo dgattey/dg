@@ -132,6 +132,46 @@
   animation: none;
 }
 
+/*
+ * Album well open/close. Vertical clip rather than a second shared-art flight:
+ * the cover already morphs under `.vt-album-art`, and this layer only reveals
+ * the surface around it. Duration matches SpotifyHeaderCard's fr expand tier
+ * but at `--timing-medium` — `--timing-slow` read as laggy next to other UI.
+ * Under art (z 150) so the morph still clears the well surface.
+ */
+::view-transition-group(album-well) {
+  z-index: 140;
+  overflow: clip;
+  animation-duration: var(--timing-medium);
+  animation-timing-function: var(--easing-default);
+}
+
+::view-transition-old(album-well) {
+  animation: var(--timing-medium) var(--easing-default) both vt-album-well-collapse;
+}
+
+::view-transition-new(album-well) {
+  animation: var(--timing-medium) var(--easing-default) both vt-album-well-expand;
+}
+
+@keyframes vt-album-well-expand {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes vt-album-well-collapse {
+  from {
+    clip-path: inset(0 0 0 0);
+  }
+  to {
+    clip-path: inset(0 0 100% 0);
+  }
+}
+
 /* The arriving page rides above the one it covers, in both directions. */
 ::view-transition-group(.vt-page-rise),
 ::view-transition-group(.vt-page-fall) {
