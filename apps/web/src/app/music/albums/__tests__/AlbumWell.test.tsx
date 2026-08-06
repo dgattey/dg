@@ -1,6 +1,6 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { render, screen } from '@testing-library/react';
-import { AlbumWell } from '../AlbumWell';
+import { AlbumWell, TRACK_NUMBER_COLUMN } from '../AlbumWell';
 
 const album: PlaylistAlbum = {
   addedAt: '2024-01-02T03:04:05Z',
@@ -36,5 +36,22 @@ describe('AlbumWell', () => {
     );
 
     expect(screen.getByText('streamed tracklist')).toBeInTheDocument();
+  });
+
+  it('starts the album name on the same text edge the tracklist uses', () => {
+    render(<AlbumWell album={album} />);
+
+    const name = screen.getByRole('heading', { name: 'Example Album' });
+
+    expect(getComputedStyle(name).gridTemplateColumns).toBe(
+      `${TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,
+    );
+    expect(getComputedStyle(screen.getByRole('link', { name: 'Example Album' })).gridColumn).toBe(
+      '2',
+    );
+  });
+
+  it('reserves a gutter that no streamed track count can change', () => {
+    expect(TRACK_NUMBER_COLUMN).toBe('1.5rem');
   });
 });

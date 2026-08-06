@@ -1,15 +1,43 @@
 import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Stack, Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 
-const metaRowSx: SxObject = {
+const TRACK_NUMBER_COLUMN = '1.5rem';
+const TRACK_COLUMN_GAP = 1.5;
+const PINNED_SURFACE =
+  'color-mix(in srgb, var(--mui-palette-background-paper) 88%, var(--mui-palette-background-default))';
+
+/** Mirrors the well's fixed gutter without crossing its client boundary. */
+const metaBandSx: SxObject = {
+  backgroundColor: PINNED_SURFACE,
+  columnGap: TRACK_COLUMN_GAP,
+  display: 'grid',
+  gridArea: 'meta',
+  gridTemplateColumns: `${TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,
+  pb: 2,
+  position: 'sticky',
+  top: {
+    sm: 'calc(var(--site-header-height, 5.5rem) + 159px)',
+    xs: 'calc(var(--site-header-height, 5.5rem) + 298px)',
+  },
+  zIndex: 2,
+};
+
+const metaTextSx: SxObject = {
+  display: 'grid',
+  gridColumn: 2,
+  minWidth: 0,
+  rowGap: 0.75,
+};
+
+const factsRowSx: SxObject = {
   alignItems: 'center',
   color: 'text.secondary',
-  columnGap: 1,
+  columnGap: 1.5,
   display: 'flex',
   flexWrap: 'wrap',
-  rowGap: 0.5,
+  rowGap: 1,
 };
 
 const tabularSx: SxObject = {
@@ -25,9 +53,16 @@ const overflowTextSx: SxObject = {
   width: '100%',
 };
 
-const TRACK_COLUMN_GAP = 1.5;
+const trackListSx: SxObject = {
+  display: 'grid',
+  gap: 0.5,
+  gridArea: 'tracks',
+  listStyle: 'none',
+  m: 0,
+  p: 0,
+};
 
-/** Cancels its own padding so the number column starts on the well's text edge. */
+/** Cancels its own padding so the number column stays in the well's gutter. */
 const trackRowSx: SxObject = {
   '&:hover': {
     backgroundColor: 'color-mix(in srgb, var(--mui-palette-primary-main) 8%, transparent)',
@@ -36,6 +71,7 @@ const trackRowSx: SxObject = {
   borderRadius: 1,
   columnGap: TRACK_COLUMN_GAP,
   display: 'grid',
+  gridTemplateColumns: `${TRACK_NUMBER_COLUMN} minmax(0, 1fr) auto`,
   mx: -1,
   px: 1,
   py: 1,
@@ -47,14 +83,26 @@ const trackTextSx: SxObject = {
   rowGap: 0.25,
 };
 
-const POPULARITY_BAR_WIDTH = 56;
+const POPULARITY_METER_WIDTH = 72;
+
+const popularitySx: SxObject = {
+  alignItems: 'center',
+  backgroundColor: 'color-mix(in srgb, CanvasText 5%, transparent)',
+  borderRadius: '999px',
+  boxShadow: 'inset 0 0 0 1px color-mix(in srgb, CanvasText 12%, transparent)',
+  columnGap: 0.75,
+  display: 'inline-flex',
+  pl: 1.25,
+  pr: 1,
+  py: 0.5,
+};
 
 const popularityTrackSx: SxObject = {
-  backgroundColor: 'color-mix(in srgb, CanvasText 14%, transparent)',
-  borderRadius: 1,
-  height: 6,
+  backgroundColor: 'color-mix(in srgb, CanvasText 16%, transparent)',
+  borderRadius: '999px',
+  height: 8,
   overflow: 'hidden',
-  width: POPULARITY_BAR_WIDTH,
+  width: POPULARITY_METER_WIDTH,
 };
 
 const popularityFillSx: SxObject = {
@@ -87,44 +135,38 @@ function formatTrackDuration(ms: number | null): string {
   return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
-/** Reads as a filled meter rather than a bare number, with the value spoken. */
+/**
+ * A named gauge rather than a bare number trailing the facts, which read as a
+ * stray year. The label and value are hidden from the tree because the wrapper
+ * already speaks both.
+ */
 function Popularity({ value }: { value: number }) {
   return (
-    <Stack
-      aria-label={`Popularity ${value} out of 100`}
-      direction="row"
-      role="img"
-      spacing={0.75}
-      sx={{ alignItems: 'center' }}
-    >
+    <Box aria-label={`Popularity ${value} out of 100`} role="img" sx={popularitySx}>
+      <Typography aria-hidden component="span" variant="caption">
+        Popularity
+      </Typography>
       <Box sx={popularityTrackSx}>
         <Box sx={{ ...popularityFillSx, width: `${value}%` }} />
       </Box>
-      <Typography aria-hidden component="span" sx={tabularSx} variant="body2">
+      <Typography
+        aria-hidden
+        component="span"
+        sx={{ ...tabularSx, color: 'text.primary', fontWeight: 700 }}
+        variant="body2"
+      >
         {value}
       </Typography>
-    </Stack>
+    </Box>
   );
 }
 
 /**
  * The part of the well that needs a fetch: artist links, album meta, and the
- * numbered tracklist. Track numbers sit in a column sized to the album's widest
- * number so titles line up no matter how long the record is.
+ * numbered tracklist. Everything sits on the well's shared text edge, with
+ * track numbers hanging in the gutter the well reserves to its left.
  */
 export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
-  const numberColumnCh = String(album.tracks.length).length + 1;
-  const trackColumns = `${numberColumnCh}ch minmax(0, 1fr) auto`;
-  const trackGridSx: SxObject = {
-    ...trackRowSx,
-    gridTemplateColumns: trackColumns,
-  };
-  const metaGridSx: SxObject = {
-    columnGap: TRACK_COLUMN_GAP,
-    display: 'grid',
-    gridTemplateColumns: trackColumns,
-    mt: 0.75,
-  };
   const facts = [
     album.releaseDate ? album.releaseDate.slice(0, 4) : null,
     `${album.totalTracks} track${album.totalTracks === 1 ? '' : 's'}`,
@@ -132,41 +174,31 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
   ].filter(Boolean);
 
   return (
-    <Box>
-      <Typography color="text.secondary" variant="body1">
-        {album.artists.map((artist, index) => (
-          <span key={artist.id}>
-            {index > 0 ? ', ' : null}
-            <Link href={artist.url} isExternal={true} title={`Open ${artist.name} on Spotify`}>
-              {artist.name}
-            </Link>
-          </span>
-        ))}
-      </Typography>
-
-      <Box sx={metaGridSx}>
-        <Box data-role="album-meta" sx={{ ...metaRowSx, gridColumn: '2 / -1' }}>
-          <Typography component="p" sx={tabularSx} variant="body2">
-            {facts.join(' · ')}
+    <Box sx={{ display: 'contents' }}>
+      <Box sx={metaBandSx}>
+        <Box data-role="album-meta" sx={metaTextSx}>
+          <Typography color="text.secondary" sx={overflowTextSx} variant="body1">
+            {album.artists.map((artist, index) => (
+              <span key={artist.id}>
+                {index > 0 ? ', ' : null}
+                <Link href={artist.url} isExternal={true} title={`Open ${artist.name} on Spotify`}>
+                  {artist.name}
+                </Link>
+              </span>
+            ))}
           </Typography>
-          {album.popularity == null ? null : (
-            <>
-              <Typography aria-hidden component="span" variant="body2">
-                ·
-              </Typography>
-              <Popularity value={album.popularity} />
-            </>
-          )}
+          <Box sx={factsRowSx}>
+            <Typography component="p" sx={tabularSx} variant="body2">
+              {facts.join(' · ')}
+            </Typography>
+            {album.popularity == null ? null : <Popularity value={album.popularity} />}
+          </Box>
         </Box>
       </Box>
 
-      <Box
-        component="ol"
-        data-role="track-list"
-        sx={{ display: 'grid', gap: 0.5, listStyle: 'none', mb: 0, mt: 2.5, p: 0 }}
-      >
+      <Box component="ol" data-role="track-list" sx={trackListSx}>
         {album.tracks.map((track) => (
-          <Box component="li" data-role="track-row" key={track.id} sx={trackGridSx}>
+          <Box component="li" data-role="track-row" key={track.id} sx={trackRowSx}>
             <Typography
               color="text.secondary"
               component="span"
