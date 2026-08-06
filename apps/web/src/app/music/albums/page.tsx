@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { ALBUM_PARAM } from '@dg/shared-core/routes/app';
+import { Typography } from '@mui/material';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
 import { getAlbumDetail } from '../../../services/albumDetail';
@@ -20,8 +21,15 @@ async function SelectedAlbum({ searchParams }: PageProps) {
 
   const detail = await getAlbumDetail(albumId);
 
-  if (!detail) {
+  if (detail === null) {
     notFound();
+  }
+  if (detail === undefined) {
+    return (
+      <Typography color="text.secondary">
+        Album details are temporarily unavailable. Please try again soon.
+      </Typography>
+    );
   }
 
   return <AlbumDetailBody album={detail} />;

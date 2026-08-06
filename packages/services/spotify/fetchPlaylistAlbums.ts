@@ -6,8 +6,7 @@ import {
   playlistItemsPageApiSchema,
 } from '@dg/content-models/spotify/PlaylistAlbums';
 import { log } from '@dg/shared-core/logging/log';
-import { parseResponse } from '../clients/parseResponse';
-import { getSpotifyClient } from './spotifyClient';
+import { spotifyGetWithRetry } from './trackMetadataShared';
 
 const PAGE_SIZE = 50;
 
@@ -20,23 +19,20 @@ const MAX_PAGES = 100;
 /**
  * Fetches every item of a playlist and collapses them into unique albums,
  * newest playlist addition first. Throws on non-200 so callers never cache
- * a silently empty list.
+ * a silently empty list. Rate limits are retried (Retry-After aware) inside
+ * spotifyGetWithRetry before this throws.
  */
 export async function fetchPlaylistAlbums(playlistId: string): Promise<Array<PlaylistAlbum>> {
   const items: Array<unknown> = [];
   let hasMore = true;
   for (let page = 0; hasMore && page < MAX_PAGES; page += 1) {
     const resource = `playlists/${playlistId}/tracks?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`;
-    const { response, status } = await getSpotifyClient().get(resource);
-    if (status !== 200) {
-      throw new Error(`Spotify playlist ${playlistId} fetch failed with status ${status}`);
+    const result = await spotifyGetWithRetry(resource, playlistItemsPageApiSchema, 'playlist page');
+    if (!result.success) {
+      throw new Error(`Spotify playlist ${playlistId} fetch failed with status ${result.status}`);
     }
-    const data = parseResponse(playlistItemsPageApiSchema, await response.json(), {
-      kind: 'rest',
-      source: 'spotify.fetchPlaylistAlbums',
-    });
-    items.push(...data.items);
-    hasMore = Boolean(data.next);
+    items.push(...result.data.items);
+    hasMore = Boolean(result.data.next);
   }
   if (hasMore) {
     log.warn('Playlist truncated at page cap; newest additions may be missing', {

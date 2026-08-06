@@ -5,13 +5,18 @@ import {
   extractMetadataFromTrack,
   extractTrackId,
   getExistingTrackMetadata,
+  RETRY_CONFIG,
   sleep,
   spotifyGetWithRetry,
   trackSchema,
 } from '../trackMetadataShared';
 
 const mockSpotifyGet = jest.fn<
-  Promise<{ response: { json: () => Promise<unknown> }; status: number }>,
+  Promise<{
+    response: { json: () => Promise<unknown> };
+    retryAfterSeconds?: number;
+    status: number;
+  }>,
   [string]
 >();
 
@@ -260,6 +265,23 @@ describe('spotifyGetWithRetry', () => {
     expect(result).toEqual({
       error: 'HTTP 404',
       status: 404,
+      success: false,
+    });
+  });
+
+  it('does not retry before a Retry-After beyond the bounded retry budget', async () => {
+    mockSpotifyGet.mockResolvedValue({
+      response: { json: async () => ({}) },
+      retryAfterSeconds: RETRY_CONFIG.maxBackoffSeconds + 1,
+      status: 429,
+    });
+
+    const result = await spotifyGetWithRetry('test-resource', testSchema, 'test');
+
+    expect(mockSpotifyGet).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({
+      error: `Retry after ${RETRY_CONFIG.maxBackoffSeconds + 1}s`,
+      status: 429,
       success: false,
     });
   });

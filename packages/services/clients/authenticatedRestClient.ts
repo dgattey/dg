@@ -44,6 +44,29 @@ export function createClient({ endpoint, accessKey, refreshTokenConfig }: Client
   }
 
   /**
+   * Spotify (and similar APIs) send `Retry-After` as seconds or an HTTP date.
+   * Returns undefined when the header is missing or unparseable.
+   */
+  function readRetryAfterSeconds(resp: unknown): number | undefined {
+    if (!(resp instanceof Response)) {
+      return undefined;
+    }
+    const raw = resp.headers.get('retry-after');
+    if (!raw) {
+      return undefined;
+    }
+    const asSeconds = Number.parseInt(raw, 10);
+    if (!Number.isNaN(asSeconds)) {
+      return Math.max(0, asSeconds);
+    }
+    const asDate = Date.parse(raw);
+    if (Number.isNaN(asDate)) {
+      return undefined;
+    }
+    return Math.max(0, Math.ceil((asDate - Date.now()) / 1000));
+  }
+
+  /**
    * Fetches a resource from the API, using a refreshed access token if necessary. Returns a
    * Wretch chain that can be used to further process the response based on status code.
    */
@@ -60,9 +83,11 @@ export function createClient({ endpoint, accessKey, refreshTokenConfig }: Client
     });
     const respOrError = await response.res().catch((err: unknown) => err);
     const status = getStatus(respOrError);
-    log.info('Fetched', { resource, status });
+    const retryAfterSeconds = readRetryAfterSeconds(respOrError);
+    log.info('Fetched', { resource, retryAfterSeconds, status });
     return {
       response,
+      retryAfterSeconds,
       status,
     };
   }

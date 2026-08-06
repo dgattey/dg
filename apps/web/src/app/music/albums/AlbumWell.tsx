@@ -213,7 +213,7 @@ export function AlbumWell({ album, children }: Props) {
           </Link>
 
           <Box sx={{ display: 'contents' }}>
-            <Typography component="h2" sx={nameBandSx} variant="h3">
+            <Typography component="h2" sx={nameBandSx} variant="h2">
               <Link href={album.url} isExternal={true} sx={nameLinkSx} title={album.name}>
                 {album.name}
               </Link>

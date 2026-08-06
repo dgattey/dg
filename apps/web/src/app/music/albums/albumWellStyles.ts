@@ -15,7 +15,7 @@ export const ALBUM_WELL_STICKY_TOP = {
   xs: 'calc(var(--site-header-height, 5.5rem) + 94px)',
 } as const;
 
-/** Stable one-line height for the responsive h3 album-name variant. */
+/** Stable one-line height for the responsive h2 album-name variant. */
 export const ALBUM_WELL_NAME_LINE = '2.25rem';
 
 /** Gap below the album name inside its pinned band. */
