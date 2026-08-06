@@ -1,6 +1,6 @@
 'use client';
 
-import { ALBUM_PARAM, albumRoute, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
+import { ALBUM_PARAM, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import { albumTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { MouseEvent } from 'react';
@@ -49,20 +49,6 @@ function albumsRouteAnchor(event: MouseEvent<HTMLElement>) {
     : null;
 }
 
-/** True once the optimistic selection has committed to the DOM. */
-function selectionCommitted(albumId: string | null) {
-  if (albumId === null) {
-    return !document.querySelector('section[aria-label$="details"]');
-  }
-  // Selected cells swap their open link for a close link, so the album href
-  // disappearing is the signal the pending selection painted — including when
-  // switching from one open album to another (a well was already on screen).
-  return (
-    Boolean(document.querySelector('section[aria-label$="details"]')) &&
-    !document.querySelector(`a[href="${albumRoute(albumId)}"]`)
-  );
-}
-
 /**
  * Which album the well is open for, driven by the click rather than by the URL
  * it produces.
@@ -72,10 +58,10 @@ function selectionCommitted(albumId: string | null) {
  * moves until Spotify answers, and the page's skeleton never gets a chance to
  * show because the well isn't open yet. The click therefore writes the
  * selection in its own transition (so the shared art morph can photograph the
- * open), and only after that open has committed asks the router to follow on a
- * separate task — putting `router.push` in the same transition would suspend
- * that lane and hold the open above shut for the whole fetch. Back/forward and
- * any other URL change clear the guess so it can never outrank the address bar.
+ * open), then asks the router to follow on the next frame. Keeping
+ * `router.push` out of the optimistic transition prevents its suspended RSC
+ * request from holding the well shut. Back/forward and any other URL change
+ * clear the guess so it can never outrank the address bar.
  */
 export function useOptimisticAlbumSelection() {
   const router = useRouter();
@@ -124,8 +110,8 @@ export function useOptimisticAlbumSelection() {
     const types = albumTransitionTypes(albumId ? 'open' : 'close');
     const href = `${destination.pathname}${destination.search}`;
 
-    // Selection update lives in this transition so React photographs the art
-    // morph (cell ↔ well). Do not call `router.push` here — that suspends.
+    // The selection gets its own transition so React can paint the skeleton and
+    // photograph the art morph before navigation starts suspending on the RSC.
     startTransition(() => {
       for (const type of types) {
         addTransitionType(type);
@@ -133,26 +119,9 @@ export function useOptimisticAlbumSelection() {
       setPending({ albumId, fromAlbumId: urlAlbumId });
     });
 
-    let navigated = false;
-    const navigate = () => {
-      if (navigated) {
-        return;
-      }
-      navigated = true;
+    requestAnimationFrame(() => {
       router.push(href, { transitionTypes: [...types] });
-    };
-
-    const navigateAfterOpen = () => {
-      if (selectionCommitted(albumId)) {
-        navigate();
-        return;
-      }
-      requestAnimationFrame(navigateAfterOpen);
-    };
-    requestAnimationFrame(navigateAfterOpen);
-    // If the transition is somehow starved, still navigate — better a late
-    // open than a click that never updates the URL.
-    window.setTimeout(navigate, 500);
+    });
   };
 
   return {
