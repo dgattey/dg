@@ -226,7 +226,6 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     onClick,
     ref,
     role,
-    title: showTooltip ? undefined : title,
   };
   const externalProps = isExternal ? { rel: 'noreferrer' as const, target: '_blank' as const } : {};
   const muiStyleProps = { color, sx, underline, variant };
