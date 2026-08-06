@@ -8,7 +8,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import { musicDestinationLabel } from '../layouts/musicFooterDestinations';
+import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
 import { usePageScrollProgress } from '../layouts/PageScrollContext';
 import { NOW_PLAYING_CARD_ID } from './SpotifyCardScrollTracker';
 import { TrackListing } from './TrackListing';

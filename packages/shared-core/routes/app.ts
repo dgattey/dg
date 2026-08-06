@@ -10,6 +10,19 @@ export const musicRoute = '/music' as const;
 
 export const favoriteAlbumsRoute = '/music/albums' as const;
 
+/** Query key naming the album expanded in place on the favorite albums page. */
+export const ALBUM_PARAM = 'album' as const;
+
+/**
+ * A favorite album expanded in place (`/music/albums?album=:id`).
+ *
+ * Deliberately a query rather than a path segment: expanding an album must not
+ * change the route. A route change makes Next refetch the albums layout, which
+ * re-suspends its boundary, replays the grid skeleton, and destroys the art the
+ * transition was supposed to morph. Same route, new query, nothing torn down.
+ */
+export const albumRoute = (id: string) => `${favoriteAlbumsRoute}?${ALBUM_PARAM}=${id}`;
+
 export const devConsoleRoute = '/dev-console' as const;
 
 export const llmsTxtRoute = '/llms.txt' as const;

@@ -134,7 +134,7 @@ describe('Spotify sync route', () => {
     expect(mockSpotifyGet).toHaveBeenCalledWith(
       expect.stringMatching(/^me\/player\/recently-played\?limit=50$/),
     );
-    expect(mockRevalidateTag).toHaveBeenCalledWith('spotify-history', 'max');
+    expect(mockRevalidateTag).toHaveBeenCalledWith('music-history', 'max');
   });
 
   it('syncs when history already exists', async () => {
@@ -174,6 +174,6 @@ describe('Spotify sync route', () => {
     expect(rowCount).toBe(2);
 
     // Verify revalidateTag was called when tracks were inserted
-    expect(mockRevalidateTag).toHaveBeenCalledWith('spotify-history', 'max');
+    expect(mockRevalidateTag).toHaveBeenCalledWith('music-history', 'max');
   });
 });

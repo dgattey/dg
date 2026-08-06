@@ -7,7 +7,7 @@ import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
 import { Button } from '@mui/material';
 import { usePathname } from 'next/navigation';
-import { isMusicDestinationPath } from './musicFooterDestinations';
+import { isMusicDestinationPath } from './musicHeaderDestinations';
 
 const paddingStyles: SxObject = {
   paddingBlock: 1,

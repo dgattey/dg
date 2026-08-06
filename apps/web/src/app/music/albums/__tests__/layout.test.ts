@@ -1,10 +1,12 @@
 import type { ReactElement, ReactNode } from 'react';
 import { PageTitle } from '../../../layouts/PageTitle';
-import FavoriteAlbumsPage from '../page';
+import FavoriteAlbumsLayout from '../layout';
 
-describe('Favorite albums page', () => {
-  it('renders a page title without a sheet shell', () => {
-    const element = FavoriteAlbumsPage() as ReactElement<{ children: ReactNode }>;
+describe('Favorite albums layout', () => {
+  it('renders the page title so it survives album navigations', () => {
+    const element = FavoriteAlbumsLayout({ children: null }) as ReactElement<{
+      children: ReactNode;
+    }>;
     const children = Array.isArray(element.props.children)
       ? element.props.children
       : [element.props.children];

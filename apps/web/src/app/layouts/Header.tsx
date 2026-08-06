@@ -1,4 +1,3 @@
-import { ColorSchemeToggleClient } from '@dg/ui/core/ColorSchemeToggleClient';
 import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
@@ -11,6 +10,7 @@ import { Box } from '@mui/material';
 import { Suspense } from 'react';
 import { getLatestSong } from '../../services/spotify';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
+import { HeaderControls } from './HeaderControls';
 import { Logo } from './Logo';
 import { SiteHeaderHeight } from './SiteHeaderHeight';
 
@@ -25,6 +25,7 @@ const stickyContainerSx: SxObject = {
 const siteHeaderSx: SxObject = pinnedChromeSx(SITE_HEADER_VIEW_TRANSITION_NAME);
 
 const navSx: SxObject = {
+  alignItems: 'stretch',
   columnGap: { sm: 2, xs: 1.5 },
 };
 
@@ -52,7 +53,7 @@ async function SpotifyHeaderCardSlot() {
 
 /**
  * Creates the site header component with glass background behind logo + music.
- * Logo and color scheme toggle are server-rendered immediately.
+ * Logo and header controls are server-rendered immediately.
  * Music card streams in via Suspense to avoid blocking.
  */
 export function Header() {
@@ -61,7 +62,7 @@ export function Header() {
       <SiteHeaderHeight />
       <Box component="header" data-site-header={true} sx={siteHeaderSx}>
         <Nav sx={navSx}>
-          <NavGroup>
+          <NavGroup sx={{ height: 'auto' }}>
             <NavItem variant="body2">
               <MouseAwareGlassContainer sx={glassContainerSx}>
                 <Logo />
@@ -71,9 +72,9 @@ export function Header() {
               </MouseAwareGlassContainer>
             </NavItem>
           </NavGroup>
-          <NavGroup sx={{ flexShrink: 0, justifyContent: 'flex-end' }}>
-            <NavItem sx={{ alignItems: 'center', display: 'flex' }}>
-              <ColorSchemeToggleClient />
+          <NavGroup sx={{ flexShrink: 0, height: 'auto', justifyContent: 'flex-end' }}>
+            <NavItem sx={{ alignItems: 'center', display: 'flex', paddingInline: 0 }}>
+              <HeaderControls />
             </NavItem>
           </NavGroup>
         </Nav>

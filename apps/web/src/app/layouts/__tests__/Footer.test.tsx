@@ -2,9 +2,8 @@
  * @jest-environment jsdom
  */
 
-import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
+import { favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 
 jest.mock('../../../flags', () => ({
   interactiveRedesign: jest.fn(),
@@ -76,8 +75,7 @@ describe('Footer redesign badge', () => {
     expect(screen.queryByText('Listening history')).not.toBeInTheDocument();
   });
 
-  it('turns the favorite-albums icon into the music menu', async () => {
-    const user = userEvent.setup();
+  it('keeps the favorite-albums icon as a regular footer link', async () => {
     mockInteractiveRedesign.mockResolvedValue(false);
     mockGetFooterLinks.mockResolvedValue([
       { icon: 'albums', title: 'Favorite albums', url: favoriteAlbumsRoute },
@@ -92,24 +90,22 @@ describe('Footer redesign badge', () => {
     expect(github).toBeInTheDocument();
     // Cursor sits immediately left of GitHub in the icon row.
     expect(cursor.compareDocumentPosition(github) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-
-    await user.click(screen.getByRole('button', { name: 'Music' }));
     expect(screen.getByRole('link', { name: 'Favorite albums' })).toHaveAttribute(
       'href',
       favoriteAlbumsRoute,
     );
-    expect(screen.getByRole('link', { name: 'Listening history' })).toHaveAttribute(
-      'href',
-      musicRoute,
-    );
+    expect(screen.queryByRole('button', { name: 'Music' })).not.toBeInTheDocument();
   });
 
-  it('matches favorite-albums URLs with a trailing slash', async () => {
+  it('normalizes a favorite-albums URL with a trailing slash', async () => {
     mockInteractiveRedesign.mockResolvedValue(false);
     mockGetFooterLinks.mockResolvedValue([
       { icon: 'albums', title: 'Favorite albums', url: `${favoriteAlbumsRoute}/` },
     ]);
     render(await Footer());
-    expect(screen.getByRole('button', { name: 'Music' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Favorite albums' })).toHaveAttribute(
+      'href',
+      favoriteAlbumsRoute,
+    );
   });
 });

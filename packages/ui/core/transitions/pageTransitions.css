@@ -104,6 +104,34 @@
   animation: none;
 }
 
+/*
+ * Album art travels between its grid cell and the expanded well. It has to
+ * clear the well's own surface, which is painted by the page group underneath.
+ */
+::view-transition-group(.vt-album-art) {
+  z-index: 150;
+  animation-duration: var(--timing-slow);
+  animation-timing-function: var(--easing-ease-out);
+}
+
+/*
+ * Both sides are the same cover at two sizes, so a cross-fade only smears it
+ * against itself. The arriving snapshot alone paints, stretched to the group,
+ * which reads as one piece of art growing into place.
+ */
+::view-transition-old(.vt-album-art) {
+  opacity: 0;
+  animation: none;
+}
+
+::view-transition-new(.vt-album-art) {
+  inline-size: 100%;
+  block-size: 100%;
+  object-fit: cover;
+  opacity: 1;
+  animation: none;
+}
+
 /* The arriving page rides above the one it covers, in both directions. */
 ::view-transition-group(.vt-page-rise),
 ::view-transition-group(.vt-page-fall) {

@@ -15,8 +15,6 @@ import { interactiveRedesign } from '../../flags';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
 import { FOOTER_ICON_DESKTOP_FONT_SIZE, FOOTER_ICON_FONT_SIZE } from './footerIconSize';
-import { MusicFooterMenu } from './MusicFooterMenu';
-import { isFavoriteAlbumsFooterUrl } from './musicFooterDestinations';
 
 const navItemNoPaddingSx: SxObject = {
   padding: 0,
@@ -196,13 +194,9 @@ export async function Footer() {
                 ))}
               </Stack>
               <Stack component="ul" direction="row" sx={footerIconLinkListSx}>
-                {iconFooterLinks?.map((link) =>
-                  isFavoriteAlbumsFooterUrl(link.url) ? (
-                    <MusicFooterMenu icon={link.icon} key={link.url} />
-                  ) : (
-                    <FooterLink key={link.url} link={link} />
-                  ),
-                )}
+                {iconFooterLinks?.map((link) => (
+                  <FooterLink key={link.url} link={link} />
+                ))}
               </Stack>
             </NavGroup>
           </Nav>

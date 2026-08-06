@@ -7,10 +7,29 @@ const PAGE_TRANSITION_TYPES = {
   open: 'page-open',
 } as const;
 
+const ALBUM_TRANSITION_TYPES = {
+  close: 'album-close',
+  open: 'album-open',
+} as const;
+
 export type PageTransitionType = (typeof PAGE_TRANSITION_TYPES)[PageNavigationIntent];
+export type AlbumTransitionType = (typeof ALBUM_TRANSITION_TYPES)[PageNavigationIntent];
 
 export function pageTransitionTypes(intent: PageNavigationIntent): Array<PageTransitionType> {
   return [PAGE_TRANSITION_TYPES[intent]];
+}
+
+/**
+ * Album well open/close intentionally miss the page rise/fall map so the grid
+ * stays put and only the shared album-art name morphs between cell and well.
+ */
+export function albumTransitionTypes(intent: PageNavigationIntent): Array<AlbumTransitionType> {
+  return [ALBUM_TRANSITION_TYPES[intent]];
+}
+
+/** Shared element name so album art flies between the grid cell and the well. */
+export function albumArtViewTransitionName(albumId: string): string {
+  return `album-art-${albumId}`;
 }
 
 export const SITE_HEADER_VIEW_TRANSITION_NAME = 'site-header';
