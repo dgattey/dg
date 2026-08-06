@@ -40,6 +40,20 @@ const setupPopoverMocks = () => {
   return { hidePopover, restore, showPopover };
 };
 
+/**
+ * jsdom's selector engine answers `:focus-visible` the same way it answers
+ * `:focus`, so it can't tell a click from a Tab on its own. Stubbing the
+ * trigger's `matches` is the only way to exercise both branches here.
+ */
+const stubFocusVisible = (element: Element, isFocusVisible: boolean) => {
+  const actualMatches = element.matches.bind(element);
+  jest
+    .spyOn(element, 'matches')
+    .mockImplementation((selector: string) =>
+      selector === ':focus-visible' ? isFocusVisible : actualMatches(selector),
+    );
+};
+
 describe('Tooltip', () => {
   it('adds aria-describedby and respects placement', () => {
     render(
@@ -97,6 +111,84 @@ describe('Tooltip', () => {
       jest.advanceTimersByTime(100);
     });
     expect(hidePopover).toHaveBeenCalledTimes(1);
+
+    restore();
+    jest.useRealTimers();
+  });
+
+  it('shows on keyboard focus', async () => {
+    const user = userEvent.setup();
+    const { restore, showPopover } = setupPopoverMocks();
+
+    render(
+      <Tooltip title="Keyboard">
+        <button type="button">Trigger</button>
+      </Tooltip>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Trigger' });
+    stubFocusVisible(button, true);
+
+    await user.tab();
+
+    expect(button).toHaveFocus();
+    expect(showPopover).toHaveBeenCalledTimes(1);
+
+    restore();
+  });
+
+  it('ignores focus the browser does not treat as keyboard focus', () => {
+    const { restore, showPopover } = setupPopoverMocks();
+
+    render(
+      <Tooltip title="Mouse">
+        <button type="button">Trigger</button>
+      </Tooltip>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Trigger' });
+    stubFocusVisible(button, false);
+
+    act(() => {
+      button.focus();
+    });
+
+    // Focus really did land, so this pins the guard rather than absent focus
+    expect(button).toHaveFocus();
+    expect(showPopover).not.toHaveBeenCalled();
+
+    restore();
+  });
+
+  it('does not keep the tooltip open after a click once the pointer leaves', async () => {
+    jest.useFakeTimers();
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const { hidePopover, restore, showPopover } = setupPopoverMocks();
+
+    render(
+      <Tooltip title="Mouse">
+        <button type="button">Trigger</button>
+      </Tooltip>,
+    );
+
+    const button = screen.getByRole('button', { name: 'Trigger' });
+    const anchor = button.parentElement;
+    if (!anchor) {
+      throw new Error('Tooltip anchor not found');
+    }
+    stubFocusVisible(button, false);
+
+    await user.click(button);
+    const showsFromHover = showPopover.mock.calls.length;
+
+    await user.unhover(anchor);
+    act(() => {
+      jest.advanceTimersByTime(100);
+    });
+
+    expect(button).toHaveFocus();
+    expect(hidePopover).toHaveBeenCalled();
+    expect(showPopover).toHaveBeenCalledTimes(showsFromHover);
 
     restore();
     jest.useRealTimers();
