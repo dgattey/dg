@@ -1,6 +1,7 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { act, render, screen } from '@testing-library/react';
-import { AlbumWell, TRACK_NUMBER_COLUMN } from '../AlbumWell';
+import { AlbumWell } from '../AlbumWell';
+import { ALBUM_WELL_TRACK_NUMBER_COLUMN } from '../albumWellStyles';
 
 const album: PlaylistAlbum = {
   addedAt: '2024-01-02T03:04:05Z',
@@ -17,7 +18,7 @@ describe('AlbumWell', () => {
   it('renders art and title linking to the album on Spotify', () => {
     render(<AlbumWell album={album} />);
 
-    expect(screen.getByRole('heading', { name: 'Example Album' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Example Album' })).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Example Album' })).toHaveAttribute(
       'href',
       'https://open.spotify.com/album/album-1',
@@ -44,7 +45,7 @@ describe('AlbumWell', () => {
     const name = screen.getByRole('heading', { name: 'Example Album' });
 
     expect(getComputedStyle(name).gridTemplateColumns).toBe(
-      `${TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,
+      `${ALBUM_WELL_TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,
     );
     expect(getComputedStyle(screen.getByRole('link', { name: 'Example Album' })).gridColumn).toBe(
       '2',
@@ -52,7 +53,7 @@ describe('AlbumWell', () => {
   });
 
   it('reserves a gutter that no streamed track count can change', () => {
-    expect(TRACK_NUMBER_COLUMN).toBe('1.5rem');
+    expect(ALBUM_WELL_TRACK_NUMBER_COLUMN).toBe('1.5rem');
   });
 
   it('tweens shell height when streamed content grows, then releases to auto', () => {

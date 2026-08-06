@@ -1,5 +1,9 @@
-import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
+import {
+  ALBUM_ART_BASE_RADIUS,
+  ALBUM_ART_HOVER_SCALE,
+  albumArtHoverTransitionSx,
+} from '../albumArtStyles';
 
 /**
  * Columns every album grid uses. Exported because the album well has to know
@@ -25,7 +29,7 @@ export const albumGridSx: SxObject = {
 };
 
 /** Radius shared by every cover in a grid cell, sleeves and front alike. */
-export const ALBUM_TILE_BORDER_RADIUS = 2;
+export const ALBUM_TILE_BORDER_RADIUS = ALBUM_ART_BASE_RADIUS;
 
 /** Sleeves drawn behind a front cover at most, however long the run is. */
 export const MAX_ALBUM_SLEEVES = 2;
@@ -47,9 +51,6 @@ const HOVER_SPREAD = 1.5;
 
 /** Percent of the page background mixed into each sleeve behind the front. */
 const SLEEVE_RECESSION = 22;
-
-/** Lift on hover, shared so every cell grows by the same amount. */
-const HOVER_SCALE = 1.05;
 
 /** Half the fan's width: how far its outermost cover sits from the middle. */
 const MAX_FAN_SHIFT = (MAX_ALBUM_SLEEVES / 2) * LAYER_STEP;
@@ -101,13 +102,13 @@ export const albumTileLinkSx: SxObject = {
   '--album-fan-spread': 1,
   '&:focus-visible, &:hover': {
     '--album-fan-spread': HOVER_SPREAD,
-    transform: `scale(${HOVER_SCALE})`,
+    transform: `scale(${ALBUM_ART_HOVER_SCALE})`,
     zIndex: 1,
   },
   display: 'block',
   position: 'relative',
   width: '100%',
-  ...createBouncyTransition('transform'),
+  ...albumArtHoverTransitionSx,
 };
 
 /**
@@ -133,7 +134,7 @@ export function albumCoverSx(depth: number, sleeveCount: number): SxObject {
     position: 'absolute',
     transform: `translate(${offset}, calc(-1 * ${offset})) rotate(${depth * LAYER_TILT}deg)`,
     ...(depth > 0 ? { border: 'thin solid var(--mui-palette-card-border)' } : {}),
-    ...createBouncyTransition('transform'),
+    ...albumArtHoverTransitionSx,
   };
 }
 

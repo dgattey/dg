@@ -2,34 +2,12 @@ import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
-
-const TRACK_NUMBER_COLUMN = '1.5rem';
-const TRACK_COLUMN_GAP = 1.5;
-const PINNED_SURFACE =
-  'color-mix(in srgb, var(--mui-palette-background-paper) 88%, var(--mui-palette-background-default))';
-
-/** Mirrors the well's fixed gutter without crossing its client boundary. */
-const metaBandSx: SxObject = {
-  backgroundColor: PINNED_SURFACE,
-  columnGap: TRACK_COLUMN_GAP,
-  display: 'grid',
-  gridArea: 'meta',
-  gridTemplateColumns: `${TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,
-  pb: 2,
-  position: 'sticky',
-  top: {
-    sm: 'calc(var(--site-header-height, 5.5rem) + 159px)',
-    xs: 'calc(var(--site-header-height, 5.5rem) + 298px)',
-  },
-  zIndex: 2,
-};
-
-const metaTextSx: SxObject = {
-  display: 'grid',
-  gridColumn: 2,
-  minWidth: 0,
-  rowGap: 0.75,
-};
+import {
+  ALBUM_WELL_TRACK_COLUMN_GAP,
+  ALBUM_WELL_TRACK_NUMBER_COLUMN,
+  albumWellMetaBandSx,
+  albumWellMetaTextSx,
+} from './albumWellStyles';
 
 const factsRowSx: SxObject = {
   alignItems: 'center',
@@ -69,9 +47,9 @@ const trackRowSx: SxObject = {
   },
   alignItems: 'center',
   borderRadius: 1,
-  columnGap: TRACK_COLUMN_GAP,
+  columnGap: ALBUM_WELL_TRACK_COLUMN_GAP,
   display: 'grid',
-  gridTemplateColumns: `${TRACK_NUMBER_COLUMN} minmax(0, 1fr) auto`,
+  gridTemplateColumns: `${ALBUM_WELL_TRACK_NUMBER_COLUMN} minmax(0, 1fr) auto`,
   mx: -1,
   px: 1,
   py: 1,
@@ -175,9 +153,15 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
 
   return (
     <Box sx={{ display: 'contents' }}>
-      <Box sx={metaBandSx}>
-        <Box data-role="album-meta" sx={metaTextSx}>
-          <Typography color="text.secondary" sx={overflowTextSx} variant="body1">
+      <Box sx={albumWellMetaBandSx}>
+        <Box data-role="album-meta" sx={albumWellMetaTextSx}>
+          <Typography
+            color="text.secondary"
+            component="h3"
+            data-role="album-artists"
+            sx={overflowTextSx}
+            variant="h4"
+          >
             {album.artists.map((artist, index) => (
               <span key={artist.id}>
                 {index > 0 ? ', ' : null}

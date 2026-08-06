@@ -9,58 +9,18 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode, TransitionEvent } from 'react';
 import { useLayoutEffect, useRef, useState, ViewTransition } from 'react';
+import {
+  ALBUM_WELL_ART_SIZE_XS,
+  ALBUM_WELL_NAME_GAP,
+  ALBUM_WELL_NAME_LINE,
+  ALBUM_WELL_PINNED_SURFACE,
+  ALBUM_WELL_STICKY_TOP,
+  albumWellBandSx,
+} from './albumWellStyles';
 
 const WELL_ART_SIZE = 220;
-const WELL_ART_SIZE_XS = 160;
-
-/**
- * Track numbers hang in this gutter so the album name, the artist, the facts,
- * and every track title start on one edge. Fixed rather than measured off the
- * track count: the name is on screen before the tracklist streams in, so a
- * gutter that grew on arrival would shove the whole block sideways. A rem value
- * resolves identically for the h4 name and body rows (unlike `ch`), while 1.5rem
- * fits two tabular digits without looking loose on a three-track EP.
- */
-export const TRACK_NUMBER_COLUMN = '1.5rem';
-
-/** Splits the number gutter from the text edge everywhere the column is used. */
-const TRACK_COLUMN_GAP = 1.5;
 
 const REDUCED_MOTION = '@media (prefers-reduced-motion: reduce)';
-
-/**
- * The well's column structure: a gutter for track numbers, then the text edge
- * everything else shares. Bands span the gutter rather than starting after it
- * so a pinned background covers the numbers sliding underneath.
- */
-const wellBandSx: SxObject = {
-  columnGap: TRACK_COLUMN_GAP,
-  display: 'grid',
-  gridTemplateColumns: `${TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,
-};
-
-/**
- * Opaque twin of the well's translucent surface. A pinned band needs it: mixed
- * with `transparent` instead, the tracklist reads straight through the header.
- */
-const PINNED_SURFACE =
-  'color-mix(in srgb, var(--mui-palette-background-paper) 88%, var(--mui-palette-background-default))';
-
-/**
- * Clears the glass header and the sorter's reserved fade band. These values
- * match the responsive StickyFadeBar geometry; keeping the clearance here avoids
- * putting a named transition ancestor around the shared album art.
- */
-const STICKY_TOP = {
-  sm: 'calc(var(--site-header-height, 5.5rem) + 115px)',
-  xs: 'calc(var(--site-header-height, 5.5rem) + 94px)',
-} as const;
-
-/** h4 is a flat 20.5px, so one line of the name is a height both bands can rely on. */
-const NAME_LINE = '2rem';
-
-/** The gap under the name, carried as padding so the pinned band stays unbroken. */
-const NAME_GAP = '12px';
 
 /**
  * Claimed only while an album open/close is photographing. A persistent name
@@ -118,23 +78,23 @@ const artLinkSx: SxObject = {
   display: 'block',
   gridArea: 'art',
   justifySelf: { sm: 'stretch', xs: 'center' },
-  maxWidth: { sm: WELL_ART_SIZE, xs: WELL_ART_SIZE_XS },
+  maxWidth: { sm: WELL_ART_SIZE, xs: ALBUM_WELL_ART_SIZE_XS },
   position: 'sticky',
-  top: STICKY_TOP,
+  top: ALBUM_WELL_STICKY_TOP,
   width: '100%',
 };
 
 const nameBandSx: SxObject = {
-  ...wellBandSx,
-  backgroundColor: PINNED_SURFACE,
+  ...albumWellBandSx,
+  backgroundColor: ALBUM_WELL_PINNED_SURFACE,
   fontWeight: 700,
   gridArea: 'name',
-  lineHeight: NAME_LINE,
-  pb: NAME_GAP,
+  lineHeight: ALBUM_WELL_NAME_LINE,
+  pb: ALBUM_WELL_NAME_GAP,
   position: 'sticky',
   top: {
-    sm: STICKY_TOP.sm,
-    xs: `calc(${STICKY_TOP.xs} + ${WELL_ART_SIZE_XS}px)`,
+    sm: ALBUM_WELL_STICKY_TOP.sm,
+    xs: `calc(${ALBUM_WELL_STICKY_TOP.xs} + ${ALBUM_WELL_ART_SIZE_XS}px)`,
   },
   zIndex: 3,
 };
@@ -253,7 +213,7 @@ export function AlbumWell({ album, children }: Props) {
           </Link>
 
           <Box sx={{ display: 'contents' }}>
-            <Typography component="h2" sx={nameBandSx} variant="h4">
+            <Typography component="h2" sx={nameBandSx} variant="h3">
               <Link href={album.url} isExternal={true} sx={nameLinkSx} title={album.name}>
                 {album.name}
               </Link>

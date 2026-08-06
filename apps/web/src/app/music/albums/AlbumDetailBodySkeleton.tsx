@@ -1,30 +1,18 @@
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Skeleton } from '@mui/material';
+import {
+  ALBUM_WELL_TRACK_COLUMN_GAP,
+  ALBUM_WELL_TRACK_NUMBER_COLUMN,
+  albumWellMetaBandSx,
+  albumWellMetaTextSx,
+} from './albumWellStyles';
 
 const PLACEHOLDER_TRACKS = Array.from({ length: 6 }, (_, track) => `track-${track}`);
-const TRACK_NUMBER_COLUMN = '1.5rem';
-const TRACK_COLUMN_GAP = 1.5;
-
-const metaBandSx: SxObject = {
-  backgroundColor:
-    'color-mix(in srgb, var(--mui-palette-background-paper) 88%, var(--mui-palette-background-default))',
-  columnGap: TRACK_COLUMN_GAP,
-  display: 'grid',
-  gridArea: 'meta',
-  gridTemplateColumns: `${TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,
-  pb: 2,
-  position: 'sticky',
-  top: {
-    sm: 'calc(var(--site-header-height, 5.5rem) + 159px)',
-    xs: 'calc(var(--site-header-height, 5.5rem) + 298px)',
-  },
-  zIndex: 2,
-};
 
 const rowSx: SxObject = {
-  columnGap: TRACK_COLUMN_GAP,
+  columnGap: ALBUM_WELL_TRACK_COLUMN_GAP,
   display: 'grid',
-  gridTemplateColumns: `${TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,
+  gridTemplateColumns: `${ALBUM_WELL_TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,
   py: 1,
 };
 
@@ -36,8 +24,8 @@ const rowSx: SxObject = {
 export function AlbumDetailBodySkeleton() {
   return (
     <Box sx={{ display: 'contents' }}>
-      <Box data-role="album-meta-skeleton" sx={metaBandSx}>
-        <Box sx={{ display: 'grid', gridColumn: 2, rowGap: 0.75 }}>
+      <Box data-role="album-meta-skeleton" sx={albumWellMetaBandSx}>
+        <Box sx={albumWellMetaTextSx}>
           <Skeleton sx={{ maxWidth: 320 }} variant="text" width="55%" />
           <Skeleton height={28} sx={{ maxWidth: 380 }} variant="text" width="65%" />
         </Box>

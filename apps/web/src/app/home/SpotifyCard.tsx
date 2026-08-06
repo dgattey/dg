@@ -7,7 +7,7 @@ import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { Box, Card, Skeleton, Stack } from '@mui/material';
 import { Suspense } from 'react';
 import { getLatestSong } from '../../services/spotify';
-import { ALBUM_ART_BORDER_RADIUS, ALBUM_ART_DIMENSIONS } from '../spotify/albumArtStyles';
+import { ALBUM_ART_BORDER_RADIUS, ALBUM_ART_DIMENSIONS } from '../albumArtStyles';
 import { SpotifyCardWithGradient } from '../spotify/SpotifyCardWithGradient';
 
 const loadingLayoutSx: SxObject = {

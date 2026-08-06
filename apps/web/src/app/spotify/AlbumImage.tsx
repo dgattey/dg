@@ -6,13 +6,13 @@ import { Link } from '@dg/ui/dependent/Link';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
 import { Card } from '@mui/material';
-import { AlbumArtWithNotes } from './AlbumArtWithNotes';
 import {
   ALBUM_ART_BORDER_RADIUS,
   ALBUM_ART_DIMENSIONS,
   ALBUM_ART_SIZE,
   albumArtLinkSx,
-} from './albumArtStyles';
+} from '../albumArtStyles';
+import { AlbumArtWithNotes } from './AlbumArtWithNotes';
 
 type AlbumImageProps = {
   isPlaying: boolean;
