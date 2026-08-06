@@ -25,6 +25,7 @@ const stickyContainerSx: SxObject = {
 const siteHeaderSx: SxObject = pinnedChromeSx(SITE_HEADER_VIEW_TRANSITION_NAME);
 
 const navSx: SxObject = {
+  alignItems: 'stretch',
   columnGap: { sm: 2, xs: 1.5 },
 };
 
@@ -61,7 +62,7 @@ export function Header() {
       <SiteHeaderHeight />
       <Box component="header" data-site-header={true} sx={siteHeaderSx}>
         <Nav sx={navSx}>
-          <NavGroup>
+          <NavGroup sx={{ height: 'auto' }}>
             <NavItem variant="body2">
               <MouseAwareGlassContainer sx={glassContainerSx}>
                 <Logo />
@@ -71,8 +72,8 @@ export function Header() {
               </MouseAwareGlassContainer>
             </NavItem>
           </NavGroup>
-          <NavGroup sx={{ flexShrink: 0, justifyContent: 'flex-end' }}>
-            <NavItem sx={{ alignItems: 'center', display: 'flex', padding: 0 }}>
+          <NavGroup sx={{ flexShrink: 0, height: 'auto', justifyContent: 'flex-end' }}>
+            <NavItem sx={{ alignItems: 'center', display: 'flex', paddingInline: 0 }}>
               <HeaderControls />
             </NavItem>
           </NavGroup>

@@ -1,16 +1,16 @@
 'use client';
 
 import { ColorSchemeToggleClient } from '@dg/ui/core/ColorSchemeToggleClient';
-import { Box } from '@mui/material';
+import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { useState } from 'react';
 import { MusicHeaderMenu } from './MusicHeaderMenu';
 
 type OpenControl = 'music' | 'theme' | null;
 
 /**
- * Sibling header disclosures. Theme sits left because its panel grows left;
- * music sits at the viewport edge and opens its menu down and left. Only one
- * can be open, so their glass surfaces never collide.
+ * Sibling header disclosures on one shared glass capsule. Music sits left and
+ * theme right; both panels open down and left from their own trigger. Only one
+ * can be open, so their surfaces never collide.
  */
 export function HeaderControls() {
   const [openControl, setOpenControl] = useState<OpenControl>(null);
@@ -24,12 +24,17 @@ export function HeaderControls() {
   };
 
   return (
-    <Box sx={{ alignItems: 'start', display: 'flex', gap: 1 }}>
+    <MouseAwareGlassContainer
+      data-header-controls={true}
+      gravity={{ maxTilt: 1.5, radius: 180 }}
+      sx={{ alignItems: 'center', display: 'flex', gap: 0.5, p: 1 }}
+    >
+      <MusicHeaderMenu isOpen={openControl === 'music'} onOpenChange={handleMusicOpenChange} />
       <ColorSchemeToggleClient
+        embedded
         isOpen={openControl === 'theme'}
         onOpenChange={handleThemeOpenChange}
       />
-      <MusicHeaderMenu isOpen={openControl === 'music'} onOpenChange={handleMusicOpenChange} />
-    </Box>
+    </MouseAwareGlassContainer>
   );
 }

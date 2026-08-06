@@ -44,6 +44,16 @@ describe('ColorSchemeToggleClient', () => {
     expect(getTrigger().querySelector('.lucide-sun-moon')).toBeInTheDocument();
   });
 
+  it('opens its option panel when embedded in another glass surface', async () => {
+    const user = userEvent.setup();
+    render(<ColorSchemeToggleClient embedded />);
+
+    await openPicker(user);
+
+    expect(getGroup()).not.toHaveAttribute('inert');
+    expect(getTrigger()).toHaveAttribute('aria-expanded', 'true');
+  });
+
   it('expands to the full scheme list and marks the current one', async () => {
     const user = userEvent.setup();
     document.documentElement.setAttribute(COLOR_SCHEME_ATTRIBUTE, 'dark');

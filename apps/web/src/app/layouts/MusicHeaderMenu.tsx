@@ -1,7 +1,6 @@
 'use client';
 
 import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
-import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { pageTitleMorphName } from '@dg/ui/core/transitions/pageTransitions';
@@ -17,8 +16,6 @@ import { isMusicDestinationPath, MUSIC_DESTINATIONS } from './musicHeaderDestina
 const MUSIC_LABEL = 'Music';
 const ICON_SIZE = 22;
 const ROW_HEIGHT = 48;
-const PANEL_PADDING = 8;
-const COLLAPSED_SIZE = ROW_HEIGHT + PANEL_PADDING * 2;
 const EXPANDED_WIDTH = 176;
 
 const DESTINATION_ICONS: Record<string, LucideIcon> = {
@@ -28,18 +25,9 @@ const DESTINATION_ICONS: Record<string, LucideIcon> = {
 
 const anchorSx: SxObject = {
   display: 'block',
-  height: COLLAPSED_SIZE,
+  height: ROW_HEIGHT,
   position: 'relative',
-  width: COLLAPSED_SIZE,
-};
-
-const glassSx: SxObject = {
-  height: COLLAPSED_SIZE,
-  overflow: 'hidden',
-  position: 'absolute',
-  right: 0,
-  top: 0,
-  width: COLLAPSED_SIZE,
+  width: ROW_HEIGHT,
 };
 
 const triggerSx: SxObject = {
@@ -58,11 +46,8 @@ const triggerSx: SxObject = {
   display: 'flex',
   height: ROW_HEIGHT,
   justifyContent: 'center',
-  left: PANEL_PADDING,
   padding: 0,
-  position: 'absolute',
-  right: PANEL_PADDING,
-  top: PANEL_PADDING,
+  width: ROW_HEIGHT,
 };
 
 const menuPaperSx: SxObject = {
@@ -148,21 +133,19 @@ export function MusicHeaderMenu({ isOpen, onOpenChange }: MusicHeaderMenuProps) 
 
   return (
     <Box sx={anchorSx}>
-      <MouseAwareGlassContainer gravity={{ maxTilt: 1.5, radius: 180 }} sx={glassSx}>
-        <Tooltip placement="bottom" title={MUSIC_LABEL}>
-          <IconButton
-            aria-controls={isOpen ? menuId : undefined}
-            aria-expanded={isOpen ? 'true' : undefined}
-            aria-haspopup="menu"
-            aria-label={MUSIC_LABEL}
-            onClick={() => onOpenChange(!isOpen)}
-            ref={triggerRef}
-            sx={triggerSx}
-          >
-            <Disc3 size={ICON_SIZE} />
-          </IconButton>
-        </Tooltip>
-      </MouseAwareGlassContainer>
+      <Tooltip placement="bottom" title={MUSIC_LABEL}>
+        <IconButton
+          aria-controls={isOpen ? menuId : undefined}
+          aria-expanded={isOpen ? 'true' : undefined}
+          aria-haspopup="menu"
+          aria-label={MUSIC_LABEL}
+          onClick={() => onOpenChange(!isOpen)}
+          ref={triggerRef}
+          sx={triggerSx}
+        >
+          <Disc3 size={ICON_SIZE} />
+        </IconButton>
+      </Tooltip>
       <Menu
         anchorEl={triggerRef.current}
         anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}

@@ -28,6 +28,10 @@ describe('HeaderControls', () => {
 
     const theme = screen.getByRole('button', { name: 'Color scheme: system' });
     const music = screen.getByRole('button', { name: 'Music' });
+    const sharedSurface = music.closest('[data-header-controls]');
+
+    expect(sharedSurface).toBe(theme.closest('[data-header-controls]'));
+    expect(music.compareDocumentPosition(theme) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     await user.click(theme);
     expect(theme).toHaveAttribute('aria-expanded', 'true');

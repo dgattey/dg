@@ -38,6 +38,8 @@ const OPTIONS = [
 
 const EXPANDED_HEIGHT =
   PANEL_PADDING * 2 + ROW_HEIGHT * (OPTIONS.length + 1) + ROW_GAP * OPTIONS.length;
+const EMBEDDED_EXPANDED_HEIGHT =
+  PANEL_PADDING * 2 + ROW_HEIGHT * OPTIONS.length + ROW_GAP * (OPTIONS.length - 1);
 
 /** Arrow keys move through the group in either axis, matching native radios. */
 const ARROW_STEPS: Record<string, number | undefined> = {
@@ -55,6 +57,12 @@ const anchorSx: SxObject = {
   height: COLLAPSED_SIZE,
   position: 'relative',
   width: COLLAPSED_SIZE,
+};
+
+const embeddedAnchorSx: SxObject = {
+  height: ROW_HEIGHT,
+  position: 'relative',
+  width: ROW_HEIGHT,
 };
 
 /**
@@ -76,6 +84,23 @@ function createPanelSx(isOpen: boolean): SxObject {
       ['background-color', 'border-color', 'box-shadow', 'height', 'width'],
       TIMING_SLOW,
     ),
+  };
+}
+
+function createEmbeddedPanelSx(isOpen: boolean): SxObject {
+  return {
+    [REDUCED_MOTION]: { transition: 'none' },
+    height: isOpen ? EMBEDDED_EXPANDED_HEIGHT : 0,
+    opacity: isOpen ? 1 : 0,
+    overflow: 'hidden',
+    pointerEvents: isOpen ? 'auto' : 'none',
+    position: 'absolute',
+    right: 0,
+    top: ROW_HEIGHT + ROW_GAP,
+    transform: isOpen ? 'none' : `translateY(-${ROW_HEIGHT / 4}px)`,
+    width: EXPANDED_WIDTH,
+    zIndex: 2,
+    ...createBouncyTransition(['height', 'opacity', 'transform'], TIMING_SLOW),
   };
 }
 
@@ -107,6 +132,13 @@ const triggerSx: SxObject = {
   top: PANEL_PADDING,
 };
 
+const embeddedTriggerSx: SxObject = {
+  ...triggerSx,
+  left: 0,
+  right: 0,
+  top: 0,
+};
+
 /**
  * Collapsed, the list is invisible rather than unmounted so both directions
  * animate. `visibility` also takes it out of the accessibility tree and out of
@@ -125,6 +157,13 @@ function createListSx(isOpen: boolean): SxObject {
     transform: isOpen ? 'none' : `translateY(-${ROW_HEIGHT / 4}px)`,
     transition: `${createTransition(['opacity', 'transform'], TIMING_MEDIUM)}, visibility 0s linear ${isOpen ? 0 : TIMING_MEDIUM}ms`,
     visibility: isOpen ? 'visible' : 'hidden',
+  };
+}
+
+function createEmbeddedListSx(isOpen: boolean): SxObject {
+  return {
+    ...createListSx(isOpen),
+    top: PANEL_PADDING,
   };
 }
 
@@ -204,12 +243,15 @@ const optionLabelSx: SxObject = {
  * since the rows would land under the cursor and invite an accidental change.
  */
 type ColorSchemeToggleClientProps = {
+  /** Places the trigger inside a shared parent surface and hangs its own panel below. */
+  embedded?: boolean;
   /** Optional controlled state for coordinating adjacent header disclosures. */
   isOpen?: boolean;
   onOpenChange?: (isOpen: boolean) => void;
 };
 
 export function ColorSchemeToggleClient({
+  embedded = false,
   isOpen: controlledIsOpen,
   onOpenChange,
 }: ColorSchemeToggleClientProps = {}) {
@@ -306,52 +348,78 @@ export function ColorSchemeToggleClient({
     }
   };
 
+  const trigger = (
+    <Box
+      aria-controls={listId}
+      aria-expanded={isOpen}
+      aria-label={`Color scheme: ${selectedOption.label.toLowerCase()}`}
+      component="button"
+      onClick={() => (isOpen ? collapse() : setOpen(true))}
+      ref={triggerRef}
+      sx={embedded ? embeddedTriggerSx : triggerSx}
+      type="button"
+    >
+      {isOpen ? <ChevronUp size={ICON_SIZE} /> : selectedOption.icon}
+    </Box>
+  );
+  const options = (
+    <Box
+      aria-label="Choose color scheme"
+      id={listId}
+      inert={!isOpen}
+      onKeyDown={handleListKeyDown}
+      ref={listRef}
+      role="radiogroup"
+      sx={embedded ? createEmbeddedListSx(isOpen) : createListSx(isOpen)}
+    >
+      <Box sx={createThumbSx(selectedIndex)} />
+      {OPTIONS.map((option) => (
+        <Box component="label" key={option.value} sx={optionSx}>
+          <Box
+            checked={option.value === preference}
+            component="input"
+            name={radioGroupName}
+            onChange={(event: ChangeEvent<HTMLInputElement>) => {
+              setPreference(parseColorSchemePreference(event.target.value));
+              collapse();
+            }}
+            sx={inputSx}
+            type="radio"
+            value={option.value}
+          />
+          <Box sx={iconCellSx}>{option.icon}</Box>
+          <Typography component="span" sx={optionLabelSx} variant="caption">
+            {option.label}
+          </Typography>
+        </Box>
+      ))}
+    </Box>
+  );
+  const rootProps = {
+    onBlur: handleFocusOut,
+    onKeyDown: handleRootKeyDown,
+    ref: rootRef,
+  };
+
+  if (embedded) {
+    return (
+      <Box {...rootProps} sx={embeddedAnchorSx}>
+        {trigger}
+        <MouseAwareGlassContainer
+          gravity={{ maxTilt: 1.5, radius: 180 }}
+          sx={createEmbeddedPanelSx(isOpen)}
+        >
+          {options}
+        </MouseAwareGlassContainer>
+      </Box>
+    );
+  }
+
   return (
-    <Box onBlur={handleFocusOut} onKeyDown={handleRootKeyDown} ref={rootRef} sx={anchorSx}>
+    <Box {...rootProps} sx={anchorSx}>
       <MouseAwareGlassContainer gravity={{ maxTilt: 1.5, radius: 180 }} sx={createPanelSx(isOpen)}>
-        <Box
-          aria-controls={listId}
-          aria-expanded={isOpen}
-          aria-label={`Color scheme: ${selectedOption.label.toLowerCase()}`}
-          component="button"
-          onClick={() => (isOpen ? collapse() : setOpen(true))}
-          ref={triggerRef}
-          sx={triggerSx}
-          type="button"
-        >
-          {isOpen ? <ChevronUp size={ICON_SIZE} /> : selectedOption.icon}
-        </Box>
-        <Box
-          aria-label="Choose color scheme"
-          id={listId}
-          inert={!isOpen}
-          onKeyDown={handleListKeyDown}
-          ref={listRef}
-          role="radiogroup"
-          sx={createListSx(isOpen)}
-        >
-          <Box sx={createThumbSx(selectedIndex)} />
-          {OPTIONS.map((option) => (
-            <Box component="label" key={option.value} sx={optionSx}>
-              <Box
-                checked={option.value === preference}
-                component="input"
-                name={radioGroupName}
-                onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                  setPreference(parseColorSchemePreference(event.target.value));
-                  collapse();
-                }}
-                sx={inputSx}
-                type="radio"
-                value={option.value}
-              />
-              <Box sx={iconCellSx}>{option.icon}</Box>
-              <Typography component="span" sx={optionLabelSx} variant="caption">
-                {option.label}
-              </Typography>
-            </Box>
-          ))}
-        </Box>
+        {trigger}
+        {options}
       </MouseAwareGlassContainer>
     </Box>
   );
