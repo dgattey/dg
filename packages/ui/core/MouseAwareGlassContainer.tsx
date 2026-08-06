@@ -46,10 +46,8 @@ export function MouseAwareGlassContainer<ContainerOverrideType extends React.Ele
   ...props
 }: MouseAwareGlassContainerProps & ComponentPropsWithoutRef<ContainerOverrideType>) {
   const { ref } = useMouseGravity(gravity);
-  // composeGravitySx already spreads `sx` and prefixes any consumer transform
-  // with the gravity var — don't re-spread `sx` after or gravity is overwritten.
   return (
-    <ContainerOverride ref={ref} sx={composeGravitySx(sx)} {...props}>
+    <ContainerOverride ref={ref} sx={{ ...composeGravitySx(sx), ...sx }} {...props}>
       {children}
     </ContainerOverride>
   );

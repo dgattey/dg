@@ -43,4 +43,24 @@ describe('HeaderControls', () => {
       expect(music).toHaveAttribute('aria-expanded', 'true');
     });
   });
+
+  /**
+   * An element with `backdrop-filter` is the backdrop root for its whole subtree,
+   * so a panel nested inside the capsule glass would blur the capsule instead of
+   * the page — and, hanging below the capsule's box, sample nothing at all.
+   */
+  it('keeps the capsule glass a sibling of the disclosure panels, never their ancestor', () => {
+    render(<HeaderControls />);
+
+    const glass = document.querySelector('[data-capsule-glass]');
+    expect(glass).not.toBeNull();
+    expect(glass?.childElementCount).toBe(0);
+
+    for (const panel of [
+      screen.getByRole('menu', { hidden: true }),
+      screen.getByRole('radiogroup', { hidden: true }),
+    ]) {
+      expect(glass?.contains(panel)).toBe(false);
+    }
+  });
 });

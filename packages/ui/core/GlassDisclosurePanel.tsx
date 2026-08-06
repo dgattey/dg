@@ -5,7 +5,7 @@ import type { ReactNode } from 'react';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
 import { createTransition, TIMING_SLOW } from '../helpers/timing';
 import type { SxObject } from '../theme';
-import { MouseAwareGlassContainer } from './MouseAwareGlassContainer';
+import { GlassContainer } from './GlassContainer';
 
 /** Shared geometry for header disclosures that hang under a trigger. */
 export const DISCLOSURE_ICON_SIZE = 22;
@@ -33,8 +33,7 @@ function createPanelMotionSx(isOpen: boolean): SxObject {
     [REDUCED_MOTION]: { transition: 'none' },
     opacity: isOpen ? 1 : 0,
     pointerEvents: isOpen ? 'auto' : 'none',
-    // Only the open/close offset — MouseAwareGlassContainer prefixes gravity.
-    transform: isOpen ? undefined : `translateY(-${DISCLOSURE_ROW_HEIGHT / 4}px)`,
+    transform: isOpen ? 'none' : `translateY(-${DISCLOSURE_ROW_HEIGHT / 4}px)`,
     visibility: isOpen ? 'visible' : 'hidden',
     ...createBouncyTransition(['opacity', 'transform'], TIMING_SLOW),
     transition: `${createTransition(['opacity', 'transform'], TIMING_SLOW)}, visibility 0s linear ${
@@ -95,9 +94,13 @@ type GlassDisclosurePanelProps = {
 };
 
 /**
- * Shared glass disclosure panel for header menus. Uses the same
- * MouseAwareGlassContainer treatment as the logo capsule; open/close motion
- * composes with gravity instead of replacing it.
+ * Shared glass disclosure panel for header menus.
+ *
+ * Deliberately a plain `GlassContainer` rather than a mouse-aware one: the panel
+ * hangs off a trigger inside a capsule that already tilts toward the cursor, so
+ * it inherits that tilt. Its own gravity transform would only double it, and the
+ * transform would make the panel a containing block and stacking context for no
+ * gain.
  */
 export function GlassDisclosurePanel({
   children,
@@ -108,17 +111,16 @@ export function GlassDisclosurePanel({
   sx,
 }: GlassDisclosurePanelProps) {
   return (
-    <MouseAwareGlassContainer
+    <GlassContainer
       aria-hidden={!isOpen}
       aria-label={label}
-      gravity={{ maxTilt: 1.5, radius: 180 }}
       id={id}
       inert={!isOpen}
       role={role}
       sx={{ ...panelBaseSx, ...createPanelMotionSx(isOpen), ...sx }}
     >
       {children}
-    </MouseAwareGlassContainer>
+    </GlassContainer>
   );
 }
 
