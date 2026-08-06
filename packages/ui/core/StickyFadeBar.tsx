@@ -53,35 +53,43 @@ const topMaskSx: SxObject = {
   ...stickyDecorSx,
 };
 
+/** Long enough that the ramp reads as a dissolve rather than an edge. */
+const FADE_HEIGHT = '3rem';
+
 /**
- * Opaque under the content so scrolling cards don't show through the label,
- * and out to the window edges so they don't show up beside it either.
+ * Opaque under the label so scrolling cards don't show through it, and out to
+ * the window edges so they don't show up beside it either. Stops where the
+ * ramp starts, overlapping it by a pixel so no seam shows between the two.
  */
 const barSurfaceSx: SxObject = {
   ...fullBleed,
   ...stickyDecorSx,
   backgroundColor: BACKGROUND,
-  bottom: 0,
+  bottom: `calc(${FADE_HEIGHT} - 1px)`,
   pointerEvents: 'none',
   position: 'absolute',
   top: 0,
   zIndex: 0,
 };
 
-/** Long enough that the ramp reads as a dissolve rather than an edge. */
-const FADE_HEIGHT = '3rem';
-
 /**
- * Trails below the bar so content dissolves as it scrolls under. Alpha follows
- * a smoothstep curve rather than a straight line, so neither end forms a knee:
- * a short or linear ramp reads as a band because perceived luminance doesn't
- * fall off linearly with alpha.
+ * The bar's soft bottom edge, so content dissolves as it scrolls under rather
+ * than meeting the opaque fill at a line. Alpha follows a smoothstep curve
+ * rather than a straight line, so neither end forms a knee: a short or linear
+ * ramp reads as a band because perceived luminance doesn't fall off linearly
+ * with alpha.
+ *
+ * Inside the bar's own band, not trailing below it. A ramp that hangs past the
+ * bar washes whatever is parked under it — the row a heading introduces sits
+ * there at rest, so it lost the top third of its album art to a scrim nothing
+ * was scrolling through. Content still crosses the whole ramp on its way up;
+ * it just finishes dissolving before it reaches the label instead of after.
  */
 const fadeOverlaySx: SxObject = {
   ...fullBleed,
   ...stickyDecorSx,
   background: `linear-gradient(to bottom, ${BACKGROUND} 0%, ${scrim(94)} 15%, ${scrim(78)} 30%, ${scrim(57)} 45%, ${scrim(35)} 60%, ${scrim(16)} 75%, ${scrim(4)} 88%, transparent 100%)`,
-  bottom: `calc(-1 * ${FADE_HEIGHT})`,
+  bottom: 0,
   height: FADE_HEIGHT,
   pointerEvents: 'none',
   position: 'absolute',
@@ -89,6 +97,8 @@ const fadeOverlaySx: SxObject = {
 };
 
 const stickyBarSx: SxObject = {
+  /* Room for the ramp, which lives in the band instead of hanging past it. */
+  paddingBlockEnd: FADE_HEIGHT,
   position: 'sticky',
   /* Sit just under the glass header, which the mask above covers. */
   top: HEADER_HEIGHT,
@@ -106,10 +116,13 @@ type StickyFadeBarProps = Omit<BoxProps, 'sx' | 'children'> & {
 };
 
 /**
- * Sticky bar with a soft fade beneath it, so content dissolves as it scrolls
+ * Sticky bar whose band ends in a soft fade, so content dissolves as it scrolls
  * under rather than colliding with the bar. Theme-aware via the background CSS
  * variable, so it works in both light and dark schemes. The strip above the
  * pinned bar is covered by `StickyBarTopMask`, which the app shell renders.
+ *
+ * The band reserves `FADE_HEIGHT` below its children for the ramp, so children
+ * only need their own leading padding.
  */
 export function StickyFadeBar({ children, sx, ...props }: StickyFadeBarProps) {
   const mergedSx = sx ? { ...stickyBarSx, ...sx } : stickyBarSx;

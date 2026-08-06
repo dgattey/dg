@@ -22,8 +22,9 @@ const loadingContainerSx: SxObject = {
   py: 2,
 };
 
+/** Trailing space comes from the bar's fade ramp, so only lead the label. */
 const sectionHeaderSx: SxObject = {
-  paddingBlock: 2,
+  paddingBlockStart: 2,
 };
 
 /**
