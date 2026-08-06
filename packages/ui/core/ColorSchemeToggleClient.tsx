@@ -1,7 +1,7 @@
 'use client';
 
 import { Box, Typography } from '@mui/material';
-import { ChevronUp, Monitor, Moon, Sun } from 'lucide-react';
+import { ChevronUp, Moon, Sun, SunMoon } from 'lucide-react';
 import type { ChangeEvent, FocusEvent, KeyboardEvent, ReactNode } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
@@ -33,7 +33,7 @@ interface SchemeOption {
 const OPTIONS = [
   { icon: <Sun size={ICON_SIZE} />, label: 'Light', value: 'light' },
   { icon: <Moon size={ICON_SIZE} />, label: 'Dark', value: 'dark' },
-  { icon: <Monitor size={ICON_SIZE} />, label: 'System', value: 'system' },
+  { icon: <SunMoon size={ICON_SIZE} />, label: 'System', value: 'system' },
 ] as const satisfies ReadonlyArray<SchemeOption>;
 
 const EXPANDED_HEIGHT =
@@ -203,15 +203,32 @@ const optionLabelSx: SxObject = {
  * out, or pressing Escape closes it again. Hover deliberately does not open it,
  * since the rows would land under the cursor and invite an accidental change.
  */
-export function ColorSchemeToggleClient() {
+type ColorSchemeToggleClientProps = {
+  /** Optional controlled state for coordinating adjacent header disclosures. */
+  isOpen?: boolean;
+  onOpenChange?: (isOpen: boolean) => void;
+};
+
+export function ColorSchemeToggleClient({
+  isOpen: controlledIsOpen,
+  onOpenChange,
+}: ColorSchemeToggleClientProps = {}) {
   const { preference, setPreference } = useColorScheme();
-  const [isOpen, setIsOpen] = useState(false);
+  const [internalIsOpen, setInternalIsOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const listId = useId();
   // Unique radio name so a second picker on the page can't join this group
   const radioGroupName = useId();
+  const isOpen = controlledIsOpen ?? internalIsOpen;
+
+  const setOpen = (nextIsOpen: boolean) => {
+    if (controlledIsOpen === undefined) {
+      setInternalIsOpen(nextIsOpen);
+    }
+    onOpenChange?.(nextIsOpen);
+  };
 
   const matchedIndex = OPTIONS.findIndex((option) => option.value === preference);
   const selectedIndex = matchedIndex === -1 ? 0 : matchedIndex;
@@ -231,17 +248,20 @@ export function ColorSchemeToggleClient() {
     }
     const closeOnOutsidePress = (event: PointerEvent) => {
       if (!rootRef.current?.contains(event.target as Node)) {
-        setIsOpen(false);
+        if (controlledIsOpen === undefined) {
+          setInternalIsOpen(false);
+        }
+        onOpenChange?.(false);
       }
     };
     document.addEventListener('pointerdown', closeOnOutsidePress);
     return () => {
       document.removeEventListener('pointerdown', closeOnOutsidePress);
     };
-  }, [isOpen]);
+  }, [controlledIsOpen, isOpen, onOpenChange]);
 
   const collapse = () => {
-    setIsOpen(false);
+    setOpen(false);
     triggerRef.current?.focus();
   };
 
@@ -282,7 +302,7 @@ export function ColorSchemeToggleClient() {
 
   const handleFocusOut = (event: FocusEvent<HTMLDivElement>) => {
     if (isOpen && !event.currentTarget.contains(event.relatedTarget)) {
-      setIsOpen(false);
+      setOpen(false);
     }
   };
 
@@ -294,7 +314,7 @@ export function ColorSchemeToggleClient() {
           aria-expanded={isOpen}
           aria-label={`Color scheme: ${selectedOption.label.toLowerCase()}`}
           component="button"
-          onClick={() => (isOpen ? collapse() : setIsOpen(true))}
+          onClick={() => (isOpen ? collapse() : setOpen(true))}
           ref={triggerRef}
           sx={triggerSx}
           type="button"

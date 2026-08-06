@@ -38,6 +38,12 @@ describe('ColorSchemeToggleClient', () => {
     expect(screen.getByRole('radiogroup', { hidden: true })).toHaveAttribute('inert');
   });
 
+  it('uses a combined sun and moon glyph for the system preference', () => {
+    render(<ColorSchemeToggleClient />);
+
+    expect(getTrigger().querySelector('.lucide-sun-moon')).toBeInTheDocument();
+  });
+
   it('expands to the full scheme list and marks the current one', async () => {
     const user = userEvent.setup();
     document.documentElement.setAttribute(COLOR_SCHEME_ATTRIBUTE, 'dark');

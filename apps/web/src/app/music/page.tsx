@@ -8,7 +8,7 @@ import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { getMusicHistory } from '../../services/music';
 import { markdownAlternates } from '../layouts/markdownAlternates';
-import { musicDestinationLabel } from '../layouts/musicFooterDestinations';
+import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
 import { PageTitle } from '../layouts/PageTitle';
 import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';

@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 import { Suspense } from 'react';
 import { getFavoriteAlbums } from '../../../services/albums';
 import { markdownAlternates } from '../../layouts/markdownAlternates';
-import { musicDestinationLabel } from '../../layouts/musicFooterDestinations';
+import { musicDestinationLabel } from '../../layouts/musicHeaderDestinations';
 import { PageTitle } from '../../layouts/PageTitle';
 import { FavoriteAlbumsGrid } from './FavoriteAlbumsGrid';
 import { FavoriteAlbumsSkeleton } from './FavoriteAlbumsSkeleton';

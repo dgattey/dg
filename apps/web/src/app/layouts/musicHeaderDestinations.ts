@@ -6,7 +6,7 @@ export type MusicDestination = {
 };
 
 /**
- * Registry of music destinations opened from the footer vinyl control. One
+ * Registry of music destinations opened from the header vinyl control. One
  * entry drives menu labels/hrefs, title morph path set, and page titles. Add a
  * page, then add a row.
  */
@@ -43,9 +43,4 @@ export function musicDestinationLabel(href: string): string {
     throw new Error(`Unknown music destination: ${href}`);
   }
   return match.label;
-}
-
-/** Contentful footer icon whose URL points at favorite albums. */
-export function isFavoriteAlbumsFooterUrl(url: string) {
-  return normalizeMusicPath(url) === favoriteAlbumsRoute;
 }

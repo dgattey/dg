@@ -9,6 +9,7 @@ import {
 } from '@dg/ui/core/transitions/pageTransitions';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { useState } from 'react';
 
 jest.mock('next/navigation', () => ({
   usePathname: jest.fn(() => '/'),
@@ -19,12 +20,16 @@ jest.mock('@dg/ui/core/transitions/pageScrollMemory', () => ({
 }));
 
 import { usePathname } from 'next/navigation';
-import { MusicFooterMenu } from '../MusicFooterMenu';
-import { isFavoriteAlbumsFooterUrl } from '../musicFooterDestinations';
+import { MusicHeaderMenu } from '../MusicHeaderMenu';
 
 const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>;
 
-describe('MusicFooterMenu', () => {
+function TestMusicHeaderMenu() {
+  const [isOpen, setIsOpen] = useState(false);
+  return <MusicHeaderMenu isOpen={isOpen} onOpenChange={setIsOpen} />;
+}
+
+describe('MusicHeaderMenu', () => {
   afterEach(() => {
     jest.clearAllMocks();
     mockUsePathname.mockReturnValue('/');
@@ -32,7 +37,7 @@ describe('MusicFooterMenu', () => {
 
   it('opens a menu with both music destinations in order', async () => {
     const user = userEvent.setup();
-    render(<MusicFooterMenu icon="albums" />);
+    render(<TestMusicHeaderMenu />);
 
     const trigger = screen.getByRole('button', { name: 'Music' });
     expect(trigger).toHaveAttribute('aria-haspopup', 'menu');
@@ -52,7 +57,7 @@ describe('MusicFooterMenu', () => {
   it('gives only the trigger the page-title name while the menu is open', async () => {
     const user = userEvent.setup();
     mockUsePathname.mockReturnValue('/');
-    render(<MusicFooterMenu icon="albums" />);
+    render(<TestMusicHeaderMenu />);
 
     const trigger = screen.getByRole('button', { name: 'Music' });
     expect(trigger.style.viewTransitionName).toBe(PAGE_TITLE_VIEW_TRANSITION_NAME);
@@ -72,27 +77,21 @@ describe('MusicFooterMenu', () => {
 
   it('switches the trigger to the slot name on either music destination', () => {
     mockUsePathname.mockReturnValue(musicRoute);
-    const { rerender } = render(<MusicFooterMenu icon="albums" />);
+    const { rerender } = render(<TestMusicHeaderMenu />);
     expect(screen.getByRole('button', { name: 'Music' }).style.viewTransitionName).toBe(
       PAGE_TITLE_SLOT_VIEW_TRANSITION_NAME,
     );
 
     mockUsePathname.mockReturnValue(favoriteAlbumsRoute);
-    rerender(<MusicFooterMenu icon="albums" />);
+    rerender(<TestMusicHeaderMenu />);
     expect(screen.getByRole('button', { name: 'Music' }).style.viewTransitionName).toBe(
       PAGE_TITLE_SLOT_VIEW_TRANSITION_NAME,
     );
 
     mockUsePathname.mockReturnValue(`${favoriteAlbumsRoute}/album123`);
-    rerender(<MusicFooterMenu icon="albums" />);
+    rerender(<TestMusicHeaderMenu />);
     expect(screen.getByRole('button', { name: 'Music' }).style.viewTransitionName).toBe(
       PAGE_TITLE_SLOT_VIEW_TRANSITION_NAME,
     );
-  });
-
-  it('recognizes favorite-albums footer URLs with a trailing slash', () => {
-    expect(isFavoriteAlbumsFooterUrl(favoriteAlbumsRoute)).toBe(true);
-    expect(isFavoriteAlbumsFooterUrl(`${favoriteAlbumsRoute}/`)).toBe(true);
-    expect(isFavoriteAlbumsFooterUrl(musicRoute)).toBe(false);
   });
 });
