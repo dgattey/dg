@@ -1,18 +1,18 @@
 'use client';
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
-import { ALBUM_PARAM } from '@dg/shared-core/routes/app';
 import { GlassSwitcher } from '@dg/ui/core/GlassSwitcher';
 import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack } from '@mui/material';
 import { ArrowDownUp } from 'lucide-react';
-import { useSearchParams } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { Fragment, useLayoutEffect, useRef, useState } from 'react';
+import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
 import { AlbumWell } from './AlbumWell';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
+import { useOptimisticAlbumSelection } from './useOptimisticAlbumSelection';
 
 const SORT_OPTIONS = [
   { key: 'added', label: 'Recently added' },
@@ -78,7 +78,7 @@ function wellPlacementSx(selectedIndex: number, albumCount: number): SxObject {
 
 type Props = {
   albums: Array<PlaylistAlbum>;
-  /** Streamed album detail from the `[id]` route, rendered inside the well. */
+  /** Streamed detail for the album in the URL, rendered inside the well. */
   children?: ReactNode;
 };
 
@@ -89,10 +89,12 @@ type Props = {
  *
  * The selection is read from the query rather than passed in, so this grid can
  * live in the layout — where a query change never refetches it — and stay
- * mounted across open and close.
+ * mounted across open and close. Clicks run ahead of the query so the well
+ * opens on the click instead of on the payload that click goes and fetches.
  */
 export function FavoriteAlbumsGrid({ albums, children }: Props) {
-  const selectedAlbumId = useSearchParams().get(ALBUM_PARAM);
+  const { isAwaitingDetail, onAlbumNavigationCapture, selectedAlbumId } =
+    useOptimisticAlbumSelection();
   const [sortKey, setSortKey] = useState<AlbumSortKey>('added');
   const itemRefs = useRef(new Map<string, HTMLElement>());
   const previousRects = useRef<Map<string, DOMRect> | null>(null);
@@ -140,7 +142,18 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
   const selectedAlbum = selectedIndex >= 0 ? sortedAlbums[selectedIndex] : undefined;
   const well = selectedAlbum ? (
     <Box key="album-well" sx={wellPlacementSx(selectedIndex, sortedAlbums.length)}>
-      <AlbumWell album={selectedAlbum}>{children}</AlbumWell>
+      <AlbumWell album={selectedAlbum}>
+        {/*
+         * Streamed detail always belongs to the album in the URL, so it is only
+         * rendered once the URL agrees with what the well is showing; until then
+         * the well holds the same skeleton the page streams behind. Keying by
+         * album makes that the single swap and stops one album's tracklist from
+         * lingering inside another album's well.
+         */}
+        <Fragment key={selectedAlbum.id}>
+          {isAwaitingDetail ? <AlbumDetailBodySkeleton /> : children}
+        </Fragment>
+      </AlbumWell>
     </Box>
   ) : null;
 
@@ -185,7 +198,9 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
           value={sortKey}
         />
       </StickyFadeBar>
-      <Box sx={gridSx}>{cells}</Box>
+      <Box onClickCapture={onAlbumNavigationCapture} sx={gridSx}>
+        {cells}
+      </Box>
     </Stack>
   );
 }

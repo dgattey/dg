@@ -1,12 +1,28 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FavoriteAlbumsGrid } from '../FavoriteAlbumsGrid';
 
 jest.mock('next/navigation', () => ({
-  useSearchParams: jest.fn(() => new URLSearchParams()),
+  useRouter: jest.fn(),
+  useSearchParams: jest.fn(),
 }));
+
+const push = jest.fn();
+
+/** Points the mocked router hooks at a query, as the URL would after a nav. */
+const mockUrl = (query = '') => {
+  jest
+    .mocked(useSearchParams)
+    .mockReturnValue(new URLSearchParams(query) as ReturnType<typeof useSearchParams>);
+};
+
+beforeEach(() => {
+  push.mockClear();
+  jest.mocked(useRouter).mockReturnValue({ push } as unknown as ReturnType<typeof useRouter>);
+  mockUrl();
+});
 
 const albums: Array<PlaylistAlbum> = [
   {
@@ -61,11 +77,7 @@ describe('FavoriteAlbumsGrid', () => {
   });
 
   it('expands the album named in the query and offers its cell as the way back', () => {
-    jest
-      .mocked(useSearchParams)
-      .mockReturnValueOnce(
-        new URLSearchParams('album=album-zebra') as ReturnType<typeof useSearchParams>,
-      );
+    mockUrl('album=album-zebra');
 
     render(
       <FavoriteAlbumsGrid albums={albums}>
@@ -106,6 +118,110 @@ describe('FavoriteAlbumsGrid', () => {
     await clickSort(user, 'Release date');
 
     expect(renderedAlbumNames()).toEqual(['Apple', 'Mango', 'Zebra']);
+  });
+
+  it('opens the clicked album immediately, holding a skeleton until detail lands', async () => {
+    const user = userEvent.setup();
+    mockUrl('album=album-zebra');
+
+    const { container } = render(
+      <FavoriteAlbumsGrid albums={albums}>
+        <p>zebra tracklist</p>
+      </FavoriteAlbumsGrid>,
+    );
+
+    await user.click(screen.getByRole('link', { name: 'Mango' }));
+
+    expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
+    expect(screen.queryByText('zebra tracklist')).not.toBeInTheDocument();
+    expect(container.querySelectorAll('.MuiSkeleton-root').length).toBeGreaterThan(0);
+    await waitFor(() => {
+      expect(push).toHaveBeenCalledWith(
+        '/music/albums?album=album-mango',
+        expect.objectContaining({ transitionTypes: ['album-open'] }),
+      );
+    });
+  });
+
+  it('swaps the skeleton for streamed detail once the URL names the same album', async () => {
+    const user = userEvent.setup();
+    const view = render(
+      <FavoriteAlbumsGrid albums={albums}>
+        <p>mango tracklist</p>
+      </FavoriteAlbumsGrid>,
+    );
+
+    await user.click(screen.getByRole('link', { name: 'Mango' }));
+    expect(screen.queryByText('mango tracklist')).not.toBeInTheDocument();
+
+    mockUrl('album=album-mango');
+    view.rerender(
+      <FavoriteAlbumsGrid albums={albums}>
+        <p>mango tracklist</p>
+      </FavoriteAlbumsGrid>,
+    );
+
+    expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
+    expect(screen.getByText('mango tracklist')).toBeInTheDocument();
+  });
+
+  it('lets the URL win when it moves somewhere the click never pointed', async () => {
+    const user = userEvent.setup();
+    mockUrl('album=album-zebra');
+
+    const view = render(<FavoriteAlbumsGrid albums={albums} />);
+    await user.click(screen.getByRole('link', { name: 'Mango' }));
+    expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
+
+    mockUrl('album=album-apple');
+    view.rerender(
+      <FavoriteAlbumsGrid albums={albums}>
+        <p>apple tracklist</p>
+      </FavoriteAlbumsGrid>,
+    );
+
+    expect(screen.getByRole('region', { name: 'Apple details' })).toBeInTheDocument();
+    expect(screen.getByText('apple tracklist')).toBeInTheDocument();
+  });
+
+  it('retires a click for good, so going back cannot revive it', async () => {
+    const user = userEvent.setup();
+    mockUrl('album=album-zebra');
+
+    const view = render(<FavoriteAlbumsGrid albums={albums} />);
+    await user.click(screen.getByRole('link', { name: 'Mango' }));
+
+    const rerenderAt = (query: string) => {
+      mockUrl(query);
+      view.rerender(<FavoriteAlbumsGrid albums={albums} />);
+    };
+
+    rerenderAt('album=album-mango');
+    rerenderAt('album=album-zebra');
+
+    expect(screen.getByRole('region', { name: 'Zebra details' })).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Mango details' })).not.toBeInTheDocument();
+  });
+
+  it('closes the well on click without waiting for the navigation', async () => {
+    const user = userEvent.setup();
+    mockUrl('album=album-zebra');
+
+    render(
+      <FavoriteAlbumsGrid albums={albums}>
+        <p>zebra tracklist</p>
+      </FavoriteAlbumsGrid>,
+    );
+
+    await user.click(screen.getByRole('link', { name: 'Close Zebra' }));
+
+    expect(screen.queryByRole('region', { name: 'Zebra details' })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(push).toHaveBeenCalledWith(
+        '/music/albums',
+        expect.objectContaining({ transitionTypes: ['album-close'] }),
+      );
+    });
   });
 
   it('returns to the default order via recently added', async () => {
