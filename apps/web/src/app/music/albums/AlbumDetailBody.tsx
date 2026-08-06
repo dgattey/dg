@@ -171,7 +171,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
               color="text.secondary"
               component="span"
               data-role="track-number"
-              sx={{ ...tabularSx, textAlign: 'end' }}
+              sx={{ ...tabularSx, alignSelf: 'start', textAlign: 'end' }}
               variant="body2"
             >
               {track.trackNumber}
