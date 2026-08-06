@@ -35,7 +35,7 @@ describe('MusicHeaderMenu', () => {
     mockUsePathname.mockReturnValue('/');
   });
 
-  it('opens a menu with both music destinations in order', async () => {
+  it('opens a shared glass menu with both music destinations in order', async () => {
     const user = userEvent.setup();
     render(<TestMusicHeaderMenu />);
 
@@ -45,8 +45,9 @@ describe('MusicHeaderMenu', () => {
 
     await user.click(trigger);
     expect(trigger).toHaveAttribute('aria-expanded', 'true');
+    expect(screen.getByRole('menu', { name: 'Music' })).toBeInTheDocument();
 
-    const links = screen.getAllByRole('link');
+    const links = screen.getAllByRole('menuitem');
     expect(links.map((link) => link.getAttribute('href'))).toEqual([
       favoriteAlbumsRoute,
       musicRoute,
@@ -63,7 +64,7 @@ describe('MusicHeaderMenu', () => {
     expect(trigger.style.viewTransitionName).toBe(PAGE_TITLE_VIEW_TRANSITION_NAME);
 
     await user.click(trigger);
-    const menuLinks = screen.getAllByRole('link');
+    const menuLinks = screen.getAllByRole('menuitem');
     expect(menuLinks).toHaveLength(2);
     for (const link of menuLinks) {
       expect(link.style.viewTransitionName).toBe('');
@@ -73,6 +74,19 @@ describe('MusicHeaderMenu', () => {
       (element) => element.style.viewTransitionName === PAGE_TITLE_VIEW_TRANSITION_NAME,
     );
     expect(named).toHaveLength(1);
+  });
+
+  it('closes on Escape and returns focus to the trigger', async () => {
+    const user = userEvent.setup();
+    render(<TestMusicHeaderMenu />);
+
+    const trigger = screen.getByRole('button', { name: 'Music' });
+    await user.click(trigger);
+    expect(trigger).toHaveAttribute('aria-expanded', 'true');
+
+    await user.keyboard('{Escape}');
+    expect(trigger).toHaveAttribute('aria-expanded', 'false');
+    expect(trigger).toHaveFocus();
   });
 
   it('switches the trigger to the slot name on either music destination', () => {

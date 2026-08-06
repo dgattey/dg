@@ -1,6 +1,6 @@
 'use client';
 
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import { ChevronUp, Moon, Sun, SunMoon } from 'lucide-react';
 import type { ChangeEvent, FocusEvent, KeyboardEvent, ReactNode } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
@@ -9,20 +9,23 @@ import { createTransition, TIMING_MEDIUM, TIMING_SLOW } from '../helpers/timing'
 import type { SxObject } from '../theme';
 import { type ColorSchemePreference, parseColorSchemePreference } from '../theme/colorScheme';
 import { useColorScheme } from '../theme/useColorScheme';
+import {
+  DISCLOSURE_ICON_SIZE,
+  DISCLOSURE_PANEL_PADDING,
+  DISCLOSURE_PANEL_WIDTH,
+  DISCLOSURE_ROW_GAP,
+  DISCLOSURE_ROW_HEIGHT,
+  GlassDisclosurePanel,
+  GlassDisclosureRow,
+} from './GlassDisclosurePanel';
 import { MouseAwareGlassContainer } from './MouseAwareGlassContainer';
 
-const ICON_SIZE = 22;
-
 /**
- * Row geometry in px. Collapsed, the control is one padded row — a glass
- * circle. Expanded, it keeps that row as the disclosure toggle and grows down
- * and to the left to fit one row per scheme.
+ * Row geometry in px. Collapsed, the standalone control is one padded row — a
+ * glass circle. Expanded, it keeps that row as the disclosure toggle and grows
+ * down and to the left to fit one row per scheme.
  */
-const ROW_HEIGHT = 48;
-const ROW_GAP = 4;
-const PANEL_PADDING = 8;
-const COLLAPSED_SIZE = ROW_HEIGHT + PANEL_PADDING * 2;
-const EXPANDED_WIDTH = 176;
+const COLLAPSED_SIZE = DISCLOSURE_ROW_HEIGHT + DISCLOSURE_PANEL_PADDING * 2;
 
 interface SchemeOption {
   icon: ReactNode;
@@ -31,15 +34,15 @@ interface SchemeOption {
 }
 
 const OPTIONS = [
-  { icon: <Sun size={ICON_SIZE} />, label: 'Light', value: 'light' },
-  { icon: <Moon size={ICON_SIZE} />, label: 'Dark', value: 'dark' },
-  { icon: <SunMoon size={ICON_SIZE} />, label: 'System', value: 'system' },
+  { icon: <Sun size={DISCLOSURE_ICON_SIZE} />, label: 'Light', value: 'light' },
+  { icon: <Moon size={DISCLOSURE_ICON_SIZE} />, label: 'Dark', value: 'dark' },
+  { icon: <SunMoon size={DISCLOSURE_ICON_SIZE} />, label: 'System', value: 'system' },
 ] as const satisfies ReadonlyArray<SchemeOption>;
 
 const EXPANDED_HEIGHT =
-  PANEL_PADDING * 2 + ROW_HEIGHT * (OPTIONS.length + 1) + ROW_GAP * OPTIONS.length;
-const EMBEDDED_EXPANDED_HEIGHT =
-  PANEL_PADDING * 2 + ROW_HEIGHT * OPTIONS.length + ROW_GAP * (OPTIONS.length - 1);
+  DISCLOSURE_PANEL_PADDING * 2 +
+  DISCLOSURE_ROW_HEIGHT * (OPTIONS.length + 1) +
+  DISCLOSURE_ROW_GAP * OPTIONS.length;
 
 /** Arrow keys move through the group in either axis, matching native radios. */
 const ARROW_STEPS: Record<string, number | undefined> = {
@@ -60,13 +63,13 @@ const anchorSx: SxObject = {
 };
 
 const embeddedAnchorSx: SxObject = {
-  height: ROW_HEIGHT,
+  height: DISCLOSURE_ROW_HEIGHT,
   position: 'relative',
-  width: ROW_HEIGHT,
+  width: DISCLOSURE_ROW_HEIGHT,
 };
 
 /**
- * The glass surface itself. Absolutely positioned out of the header's flow so
+ * Standalone glass surface. Absolutely positioned out of the header's flow so
  * the expanded panel hangs below the sticky bar instead of stretching it, and
  * anchored to the right edge so it grows inward, away from the viewport edge.
  */
@@ -78,29 +81,12 @@ function createPanelSx(isOpen: boolean): SxObject {
     position: 'absolute',
     right: 0,
     top: 0,
-    width: isOpen ? EXPANDED_WIDTH : COLLAPSED_SIZE,
+    width: isOpen ? DISCLOSURE_PANEL_WIDTH : COLLAPSED_SIZE,
     zIndex: 1,
     ...createBouncyTransition(
       ['background-color', 'border-color', 'box-shadow', 'height', 'width'],
       TIMING_SLOW,
     ),
-  };
-}
-
-function createEmbeddedPanelSx(isOpen: boolean): SxObject {
-  return {
-    [REDUCED_MOTION]: { transition: 'none' },
-    height: isOpen ? EMBEDDED_EXPANDED_HEIGHT : 0,
-    opacity: isOpen ? 1 : 0,
-    overflow: 'hidden',
-    pointerEvents: isOpen ? 'auto' : 'none',
-    position: 'absolute',
-    right: 0,
-    top: ROW_HEIGHT + ROW_GAP,
-    transform: isOpen ? 'none' : `translateY(-${ROW_HEIGHT / 4}px)`,
-    width: EXPANDED_WIDTH,
-    zIndex: 2,
-    ...createBouncyTransition(['height', 'opacity', 'transform'], TIMING_SLOW),
   };
 }
 
@@ -123,13 +109,13 @@ const triggerSx: SxObject = {
   color: 'var(--mui-palette-primary-main)',
   cursor: 'pointer',
   display: 'flex',
-  height: ROW_HEIGHT,
+  height: DISCLOSURE_ROW_HEIGHT,
   justifyContent: 'center',
-  left: PANEL_PADDING,
+  left: DISCLOSURE_PANEL_PADDING,
   padding: 0,
   position: 'absolute',
-  right: PANEL_PADDING,
-  top: PANEL_PADDING,
+  right: DISCLOSURE_PANEL_PADDING,
+  top: DISCLOSURE_PANEL_PADDING,
 };
 
 const embeddedTriggerSx: SxObject = {
@@ -140,32 +126,31 @@ const embeddedTriggerSx: SxObject = {
 };
 
 /**
- * Collapsed, the list is invisible rather than unmounted so both directions
- * animate. `visibility` also takes it out of the accessibility tree and out of
- * the tab order, and `inert` keeps pointer and focus events off it.
+ * Collapsed, the standalone list is invisible rather than unmounted so both
+ * directions animate. `visibility` also takes it out of the accessibility tree
+ * and out of the tab order, and `inert` keeps pointer and focus events off it.
  */
-function createListSx(isOpen: boolean): SxObject {
+function createStandaloneListSx(isOpen: boolean): SxObject {
   return {
     [REDUCED_MOTION]: { transition: 'none' },
     display: 'grid',
-    left: PANEL_PADDING,
+    left: DISCLOSURE_PANEL_PADDING,
     opacity: isOpen ? 1 : 0,
     position: 'absolute',
-    right: PANEL_PADDING,
-    rowGap: `${ROW_GAP}px`,
-    top: PANEL_PADDING + ROW_HEIGHT + ROW_GAP,
-    transform: isOpen ? 'none' : `translateY(-${ROW_HEIGHT / 4}px)`,
+    right: DISCLOSURE_PANEL_PADDING,
+    rowGap: `${DISCLOSURE_ROW_GAP}px`,
+    top: DISCLOSURE_PANEL_PADDING + DISCLOSURE_ROW_HEIGHT + DISCLOSURE_ROW_GAP,
+    transform: isOpen ? 'none' : `translateY(-${DISCLOSURE_ROW_HEIGHT / 4}px)`,
     transition: `${createTransition(['opacity', 'transform'], TIMING_MEDIUM)}, visibility 0s linear ${isOpen ? 0 : TIMING_MEDIUM}ms`,
     visibility: isOpen ? 'visible' : 'hidden',
   };
 }
 
-function createEmbeddedListSx(isOpen: boolean): SxObject {
-  return {
-    ...createListSx(isOpen),
-    top: PANEL_PADDING,
-  };
-}
+const embeddedListSx: SxObject = {
+  display: 'grid',
+  position: 'relative',
+  rowGap: `${DISCLOSURE_ROW_GAP}px`,
+};
 
 /** Sliding highlight behind the selected row, echoing the albums sorter thumb. */
 function createThumbSx(selectedIndex: number): SxObject {
@@ -174,40 +159,22 @@ function createThumbSx(selectedIndex: number): SxObject {
     backgroundColor: 'var(--mui-palette-action-selected)',
     border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 30%, transparent)',
     borderRadius: '999px',
-    height: ROW_HEIGHT,
+    height: DISCLOSURE_ROW_HEIGHT,
     left: 0,
     position: 'absolute',
     right: 0,
     top: 0,
-    transform: `translateY(${selectedIndex * (ROW_HEIGHT + ROW_GAP)}px)`,
+    transform: `translateY(${selectedIndex * (DISCLOSURE_ROW_HEIGHT + DISCLOSURE_ROW_GAP)}px)`,
     transition: createTransition(['background-color', 'transform'], TIMING_MEDIUM),
     zIndex: 0,
   };
 }
 
-const optionSx: SxObject = {
-  '& svg': {
-    ...createBouncyTransition('scale'),
-    display: 'block',
-  },
+const optionRowSx: SxObject = {
   '&:has(input:focus-visible)': {
     outline: '-webkit-focus-ring-color auto 1px',
   },
-  '&:hover': {
-    color: 'var(--mui-palette-primary-light)',
-  },
-  '&:hover svg': {
-    scale: 1.2,
-  },
-  alignItems: 'center',
-  borderRadius: '999px',
-  color: 'var(--mui-palette-primary-main)',
   cursor: 'pointer',
-  display: 'grid',
-  gridTemplateColumns: `${ROW_HEIGHT}px 1fr`,
-  height: ROW_HEIGHT,
-  position: 'relative',
-  zIndex: 1,
 };
 
 /**
@@ -221,17 +188,6 @@ const inputSx: SxObject = {
   margin: 0,
   opacity: 0,
   position: 'absolute',
-};
-
-const iconCellSx: SxObject = {
-  display: 'grid',
-  placeItems: 'center',
-};
-
-const optionLabelSx: SxObject = {
-  lineHeight: 1.2,
-  paddingInlineEnd: 1.5,
-  whiteSpace: 'nowrap',
 };
 
 /**
@@ -359,9 +315,10 @@ export function ColorSchemeToggleClient({
       sx={embedded ? embeddedTriggerSx : triggerSx}
       type="button"
     >
-      {isOpen ? <ChevronUp size={ICON_SIZE} /> : selectedOption.icon}
+      {isOpen ? <ChevronUp size={DISCLOSURE_ICON_SIZE} /> : selectedOption.icon}
     </Box>
   );
+
   const options = (
     <Box
       aria-label="Choose color scheme"
@@ -370,11 +327,17 @@ export function ColorSchemeToggleClient({
       onKeyDown={handleListKeyDown}
       ref={listRef}
       role="radiogroup"
-      sx={embedded ? createEmbeddedListSx(isOpen) : createListSx(isOpen)}
+      sx={embedded ? embeddedListSx : createStandaloneListSx(isOpen)}
     >
       <Box sx={createThumbSx(selectedIndex)} />
       {OPTIONS.map((option) => (
-        <Box component="label" key={option.value} sx={optionSx}>
+        <GlassDisclosureRow
+          component="label"
+          icon={option.icon}
+          key={option.value}
+          label={option.label}
+          sx={optionRowSx}
+        >
           <Box
             checked={option.value === preference}
             component="input"
@@ -387,14 +350,11 @@ export function ColorSchemeToggleClient({
             type="radio"
             value={option.value}
           />
-          <Box sx={iconCellSx}>{option.icon}</Box>
-          <Typography component="span" sx={optionLabelSx} variant="caption">
-            {option.label}
-          </Typography>
-        </Box>
+        </GlassDisclosureRow>
       ))}
     </Box>
   );
+
   const rootProps = {
     onBlur: handleFocusOut,
     onKeyDown: handleRootKeyDown,
@@ -405,12 +365,9 @@ export function ColorSchemeToggleClient({
     return (
       <Box {...rootProps} sx={embeddedAnchorSx}>
         {trigger}
-        <MouseAwareGlassContainer
-          gravity={{ maxTilt: 1.5, radius: 180 }}
-          sx={createEmbeddedPanelSx(isOpen)}
-        >
+        <GlassDisclosurePanel isOpen={isOpen} label="Choose color scheme">
           {options}
-        </MouseAwareGlassContainer>
+        </GlassDisclosurePanel>
       </Box>
     );
   }

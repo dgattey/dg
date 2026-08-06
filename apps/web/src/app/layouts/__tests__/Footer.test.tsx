@@ -67,45 +67,33 @@ describe('Footer redesign badge', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders the footer shell without a listening-history text link', async () => {
+  it('renders the footer shell without music destination links', async () => {
     mockInteractiveRedesign.mockResolvedValue(false);
     mockGetFooterLinks.mockResolvedValue([]);
     render(await Footer());
     expect(screen.getByText(/Dylan Gattey/)).toBeInTheDocument();
     expect(screen.queryByText('Listening history')).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: 'Favorite albums' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Music' })).not.toBeInTheDocument();
   });
 
-  it('keeps the favorite-albums icon as a regular footer link', async () => {
+  it('renders social icon links from Contentful without a music disc', async () => {
     mockInteractiveRedesign.mockResolvedValue(false);
     mockGetFooterLinks.mockResolvedValue([
-      { icon: 'albums', title: 'Favorite albums', url: favoriteAlbumsRoute },
       { icon: 'cursor', title: 'Cursor', url: 'https://cursor.com' },
       { icon: 'github', title: 'GitHub', url: 'https://github.com/dgattey' },
+      { icon: 'spotify', title: 'Spotify', url: 'https://open.spotify.com/user/dylangattey' },
     ]);
     render(await Footer());
 
     const cursor = screen.getByRole('link', { name: 'Cursor' });
     const github = screen.getByRole('link', { name: 'GitHub' });
+    const spotify = screen.getByRole('link', { name: 'Spotify' });
     expect(cursor).toHaveAttribute('href', 'https://cursor.com');
     expect(github).toBeInTheDocument();
-    // Cursor sits immediately left of GitHub in the icon row.
+    expect(spotify).toHaveAttribute('href', 'https://open.spotify.com/user/dylangattey');
     expect(cursor.compareDocumentPosition(github) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(screen.getByRole('link', { name: 'Favorite albums' })).toHaveAttribute(
-      'href',
-      favoriteAlbumsRoute,
-    );
-    expect(screen.queryByRole('button', { name: 'Music' })).not.toBeInTheDocument();
-  });
-
-  it('normalizes a favorite-albums URL with a trailing slash', async () => {
-    mockInteractiveRedesign.mockResolvedValue(false);
-    mockGetFooterLinks.mockResolvedValue([
-      { icon: 'albums', title: 'Favorite albums', url: `${favoriteAlbumsRoute}/` },
-    ]);
-    render(await Footer());
-    expect(screen.getByRole('link', { name: 'Favorite albums' })).toHaveAttribute(
-      'href',
-      favoriteAlbumsRoute,
-    );
+    expect(screen.queryByRole('link', { name: 'Favorite albums' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('link', { name: favoriteAlbumsRoute })).not.toBeInTheDocument();
   });
 });

@@ -1,33 +1,44 @@
 'use client';
 
 import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
+import {
+  DISCLOSURE_ICON_SIZE,
+  DISCLOSURE_ROW_HEIGHT,
+  GlassDisclosurePanel,
+  GlassDisclosureRow,
+} from '@dg/ui/core/GlassDisclosurePanel';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { pageTitleMorphName } from '@dg/ui/core/transitions/pageTransitions';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, IconButton, Menu, MenuItem } from '@mui/material';
+import { Box, IconButton } from '@mui/material';
 import type { LucideIcon } from 'lucide-react';
 import { Disc3, DiscAlbum, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useId, useLayoutEffect, useRef } from 'react';
+import type { FocusEvent, KeyboardEvent } from 'react';
+import { useEffect, useId, useLayoutEffect, useRef } from 'react';
 import { isMusicDestinationPath, MUSIC_DESTINATIONS } from './musicHeaderDestinations';
 
 const MUSIC_LABEL = 'Music';
-const ICON_SIZE = 22;
-const ROW_HEIGHT = 48;
-const EXPANDED_WIDTH = 176;
 
 const DESTINATION_ICONS: Record<string, LucideIcon> = {
   [favoriteAlbumsRoute]: DiscAlbum,
   [musicRoute]: History,
 };
 
+const ARROW_STEPS: Record<string, number | undefined> = {
+  ArrowDown: 1,
+  ArrowLeft: -1,
+  ArrowRight: 1,
+  ArrowUp: -1,
+};
+
 const anchorSx: SxObject = {
   display: 'block',
-  height: ROW_HEIGHT,
+  height: DISCLOSURE_ROW_HEIGHT,
   position: 'relative',
-  width: ROW_HEIGHT,
+  width: DISCLOSURE_ROW_HEIGHT,
 };
 
 const triggerSx: SxObject = {
@@ -44,64 +55,17 @@ const triggerSx: SxObject = {
   alignItems: 'center',
   color: 'var(--mui-palette-primary-main)',
   display: 'flex',
-  height: ROW_HEIGHT,
+  height: DISCLOSURE_ROW_HEIGHT,
   justifyContent: 'center',
   padding: 0,
-  width: ROW_HEIGHT,
+  width: DISCLOSURE_ROW_HEIGHT,
 };
 
-const menuPaperSx: SxObject = {
-  backdropFilter: 'blur(12px) saturate(150%)',
-  backgroundColor: 'color-mix(in srgb, var(--mui-palette-background-default) 70%, transparent)',
-  border: '1px solid color-mix(in srgb, CanvasText 12%, transparent)',
-  borderRadius: 2,
-  boxShadow: `
-    inset 0 1px 0 color-mix(in srgb, var(--mui-palette-common-white) 15%, transparent),
-    0px 1px 5px color-mix(in srgb, var(--mui-palette-common-black) 12%, transparent),
-    0px 6px 16px color-mix(in srgb, var(--mui-palette-common-black) 8%, transparent)`,
-  minWidth: EXPANDED_WIDTH,
-  mt: 0.5,
-  py: 1,
-};
-
-const menuItemSx: SxObject = {
-  '&:hover': {
-    backgroundColor: 'color-mix(in srgb, var(--mui-palette-primary-main) 10%, transparent)',
-  },
-  borderRadius: '999px',
-  minHeight: ROW_HEIGHT,
-  mx: 1,
-  px: 0,
-  py: 0,
-};
-
-const menuLinkSx: SxObject = {
-  alignItems: 'center',
+const destinationLinkSx: SxObject = {
   color: 'inherit',
-  display: 'grid',
-  fontSize: 'inherit',
-  fontWeight: 500,
-  gridTemplateColumns: `${ROW_HEIGHT}px 1fr`,
-  height: ROW_HEIGHT,
+  display: 'block',
   textDecoration: 'none',
   width: '100%',
-};
-
-const menuRowSx: SxObject = {
-  alignItems: 'center',
-  display: 'contents',
-  lineHeight: 1.3,
-  minWidth: 0,
-};
-
-const menuIconSx: SxObject = {
-  '& svg': {
-    height: ICON_SIZE,
-    width: ICON_SIZE,
-  },
-  display: 'grid',
-  flexShrink: 0,
-  placeItems: 'center',
 };
 
 type MusicHeaderMenuProps = {
@@ -110,13 +74,15 @@ type MusicHeaderMenuProps = {
 };
 
 /**
- * Header vinyl control: opens a glass menu of music destinations. The trigger
- * alone owns the page-title view-transition name so menu item links never
- * collide. Scroll lock stays off so sticky header chrome remains pinned.
+ * Header vinyl control: opens a shared glass disclosure of music destinations.
+ * The trigger alone owns the page-title view-transition name so menu item links
+ * never collide.
  */
 export function MusicHeaderMenu({ isOpen, onOpenChange }: MusicHeaderMenuProps) {
   const menuId = useId();
+  const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
   const destinationIsOpen = isMusicDestinationPath(pathname);
 
@@ -127,56 +93,114 @@ export function MusicHeaderMenu({ isOpen, onOpenChange }: MusicHeaderMenuProps) 
     triggerRef.current.style.viewTransitionName = pageTitleMorphName(destinationIsOpen);
   }, [destinationIsOpen]);
 
-  const handleClose = () => {
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    const links = listRef.current?.querySelectorAll<HTMLAnchorElement>('a[href]');
+    links?.[0]?.focus();
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+    const closeOnOutsidePress = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) {
+        onOpenChange(false);
+      }
+    };
+    document.addEventListener('pointerdown', closeOnOutsidePress);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePress);
+    };
+  }, [isOpen, onOpenChange]);
+
+  const collapse = () => {
     onOpenChange(false);
+    triggerRef.current?.focus();
+  };
+
+  const handleRootKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (isOpen && event.key === 'Escape') {
+      event.preventDefault();
+      collapse();
+    }
+  };
+
+  const handleListKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      collapse();
+      return;
+    }
+    const links = [...(listRef.current?.querySelectorAll<HTMLAnchorElement>('a[href]') ?? [])];
+    if (links.length === 0) {
+      return;
+    }
+    const currentIndex =
+      document.activeElement instanceof HTMLAnchorElement
+        ? links.indexOf(document.activeElement)
+        : -1;
+    const step = ARROW_STEPS[event.key];
+    const nextIndex =
+      event.key === 'Home'
+        ? 0
+        : event.key === 'End'
+          ? links.length - 1
+          : step === undefined || currentIndex === -1
+            ? -1
+            : (currentIndex + step + links.length) % links.length;
+    if (nextIndex === -1) {
+      return;
+    }
+    event.preventDefault();
+    links[nextIndex]?.focus();
+  };
+
+  const handleFocusOut = (event: FocusEvent<HTMLDivElement>) => {
+    if (isOpen && !event.currentTarget.contains(event.relatedTarget)) {
+      onOpenChange(false);
+    }
   };
 
   return (
-    <Box sx={anchorSx}>
+    <Box onBlur={handleFocusOut} onKeyDown={handleRootKeyDown} ref={rootRef} sx={anchorSx}>
       <Tooltip placement="bottom" title={MUSIC_LABEL}>
         <IconButton
           aria-controls={isOpen ? menuId : undefined}
-          aria-expanded={isOpen ? 'true' : undefined}
+          aria-expanded={isOpen}
           aria-haspopup="menu"
           aria-label={MUSIC_LABEL}
           onClick={() => onOpenChange(!isOpen)}
           ref={triggerRef}
           sx={triggerSx}
         >
-          <Disc3 size={ICON_SIZE} />
+          <Disc3 size={DISCLOSURE_ICON_SIZE} />
         </IconButton>
       </Tooltip>
-      <Menu
-        anchorEl={triggerRef.current}
-        anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
-        disableScrollLock
-        id={menuId}
-        onClose={handleClose}
-        open={isOpen}
-        slotProps={{ paper: { sx: menuPaperSx } }}
-        transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-      >
-        {MUSIC_DESTINATIONS.map((destination) => {
-          const Icon = DESTINATION_ICONS[destination.href] ?? Disc3;
-          return (
-            <MenuItem key={destination.href} onClick={handleClose} sx={menuItemSx}>
+      <GlassDisclosurePanel id={menuId} isOpen={isOpen} label={MUSIC_LABEL} role="menu">
+        <Box onKeyDown={handleListKeyDown} ref={listRef} sx={{ display: 'contents' }}>
+          {MUSIC_DESTINATIONS.map((destination) => {
+            const Icon = DESTINATION_ICONS[destination.href] ?? Disc3;
+            return (
               <PageTransitionLink
                 href={destination.href}
-                sx={menuLinkSx}
+                key={destination.href}
+                onClick={collapse}
+                role="menuitem"
+                sx={destinationLinkSx}
                 title={destination.label}
-                variant="caption"
               >
-                <Box component="span" sx={menuRowSx}>
-                  <Box component="span" sx={menuIconSx}>
-                    <Icon aria-hidden size={ICON_SIZE} />
-                  </Box>
-                  <Box component="span">{destination.label}</Box>
-                </Box>
+                <GlassDisclosureRow
+                  icon={<Icon aria-hidden size={DISCLOSURE_ICON_SIZE} />}
+                  label={destination.label}
+                />
               </PageTransitionLink>
-            </MenuItem>
-          );
-        })}
-      </Menu>
+            );
+          })}
+        </Box>
+      </GlassDisclosurePanel>
     </Box>
   );
 }
