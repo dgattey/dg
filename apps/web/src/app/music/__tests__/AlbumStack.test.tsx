@@ -1,63 +1,42 @@
 import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { AlbumCover } from '../AlbumCover';
 import { AlbumStack } from '../AlbumStack';
 
-const props = {
-  albumName: 'Feet of Clay',
-  artistNames: 'Earl Sweatshirt',
-  imageUrl: 'https://i.scdn.co/image/clay',
-  linkUrl: 'https://open.spotify.com/album/clay',
-  trackCount: 12,
-};
+const imageUrl = 'https://i.scdn.co/image/clay';
+
+function renderStack(sleeveCount: number) {
+  return render(
+    <AlbumStack imageUrl={imageUrl} sleeveCount={sleeveCount}>
+      <AlbumCover alt="Feet of Clay" depth={0} imageUrl={imageUrl} sleeveCount={sleeveCount} />
+    </AlbumStack>,
+  );
+}
 
 describe('AlbumStack', () => {
-  it('exposes one link to the album with the run described in its label', () => {
-    render(<AlbumStack {...props} />);
+  it('draws a sleeve behind the front cover for each one asked for', () => {
+    const { container } = renderStack(2);
 
-    const links = screen.getAllByRole('link');
-    expect(links).toHaveLength(1);
-    expect(links[0]).toHaveAccessibleName('Feet of Clay – Earl Sweatshirt, 12 tracks');
-    expect(links[0]).toHaveAttribute('href', 'https://open.spotify.com/album/clay');
-    expect(links[0]).toHaveAttribute('target', '_blank');
+    expect(container.querySelectorAll('img')).toHaveLength(3);
   });
 
-  it('shows the play count in sentence case', () => {
-    render(<AlbumStack {...props} />);
+  it('draws a lone cover when nothing sits behind it', () => {
+    const { container } = renderStack(0);
 
-    expect(screen.getByText('12 tracks')).toBeInTheDocument();
+    expect(container.querySelectorAll('img')).toHaveLength(1);
   });
 
   it('names only the front cover, leaving the sleeves behind it decorative', () => {
-    render(<AlbumStack {...props} />);
+    renderStack(2);
 
     expect(screen.getAllByRole('img').map((image) => image.getAttribute('alt'))).toEqual([
       'Feet of Clay',
     ]);
   });
 
-  it('caps the sleeves it draws no matter how long the run is', () => {
-    const { container } = render(<AlbumStack {...props} trackCount={40} />);
+  it('puts the front cover last so it paints over its sleeves', () => {
+    const { container } = renderStack(2);
 
-    expect(container.querySelectorAll('img')).toHaveLength(3);
-    expect(screen.getByText('40 tracks')).toBeInTheDocument();
-  });
-
-  it('draws one sleeve behind the cover for a run of two', () => {
-    const { container } = render(<AlbumStack {...props} trackCount={2} />);
-
-    expect(container.querySelectorAll('img')).toHaveLength(2);
-    expect(screen.getByText('2 tracks')).toBeInTheDocument();
-  });
-
-  it('reveals the tooltip on keyboard focus', async () => {
-    const user = userEvent.setup();
-    render(<AlbumStack {...props} />);
-
-    await user.tab();
-
-    expect(screen.getByRole('link')).toHaveFocus();
-    expect(screen.getByRole('tooltip')).toHaveTextContent(
-      'Feet of Clay – Earl Sweatshirt, 12 tracks',
-    );
+    const alts = [...container.querySelectorAll('img')].map((image) => image.getAttribute('alt'));
+    expect(alts).toEqual(['', '', 'Feet of Clay']);
   });
 });
