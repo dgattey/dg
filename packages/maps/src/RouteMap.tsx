@@ -13,24 +13,18 @@ const ROUTE_PADDING = 42;
 const DEFAULT_SIZE = 320;
 
 const containerSx: SxObject = {
-  '& .pigeon-attribution': {
-    background:
-      'color-mix(in srgb, var(--mui-palette-background-paper) 82%, transparent) !important',
-    color: 'var(--mui-palette-text-secondary) !important',
-    opacity: 0.76,
-  },
-  '& .pigeon-attribution a': {
-    color: 'inherit !important',
-    textDecoration: 'none',
-  },
-  '& .pigeon-attribution, & .pigeon-overlays': {
-    zIndex: 2,
-  },
+  // Pigeon's root is the tile layer's own stacking level; keep it above the
+  // placeholder underlay instead of relying on DOM order.
   '& > div': {
     backgroundColor: 'transparent !important',
+    position: 'relative',
+    zIndex: 1,
   },
   backgroundColor: 'var(--mui-palette-background-paper)',
   height: '100%',
+  // Groups the underlay, tiles and route into one layer so none of them can
+  // paint above whatever the host renders over the map.
+  isolation: 'isolate',
   overflow: 'hidden',
   pointerEvents: 'none',
   position: 'relative',
@@ -46,6 +40,7 @@ const underlaySx: SxObject = {
   position: 'absolute',
   transform: 'scale(1.05)',
   width: '110%',
+  zIndex: 0,
 };
 
 const routeSvgSx: SxObject = {
@@ -94,7 +89,6 @@ function RouteOverlay({ latLngToPixel, mapState, points }: RouteOverlayProps) {
         component="path"
         d={path}
         fill="none"
-        opacity={0.75}
         stroke="#fc4c02"
         strokeLinecap="round"
         strokeLinejoin="round"
@@ -130,19 +124,22 @@ function tileCoordinates([latitude, longitude]: Point, zoom: number) {
 
 function tileUrl({
   dark,
+  dpr,
   stadiaApiKey,
   x,
   y,
   zoom,
 }: {
   dark: boolean;
+  dpr?: number;
   stadiaApiKey: string;
   x: number;
   y: number;
   zoom: number;
 }) {
   const style = dark ? 'alidade_smooth_dark' : 'alidade_smooth';
-  return `https://tiles.stadiamaps.com/tiles/${style}/${zoom}/${x}/${y}.png?api_key=${stadiaApiKey}`;
+  const density = dpr && dpr > 1 ? '@2x' : '';
+  return `https://tiles.stadiamaps.com/tiles/${style}/${zoom}/${x}/${y}${density}.png?api_key=${stadiaApiKey}`;
 }
 
 export type RouteMapProps = {
@@ -168,8 +165,8 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
     width: size.width,
   });
   const underlayTile = tileCoordinates(viewport.center, viewport.zoom);
-  const provider = (x: number, y: number, zoom: number) =>
-    tileUrl({ dark, stadiaApiKey, x, y, zoom });
+  const provider = (x: number, y: number, zoom: number, dpr?: number) =>
+    tileUrl({ dark, dpr, stadiaApiKey, x, y, zoom });
 
   useEffect(() => {
     const element = containerRef.current;
@@ -205,21 +202,17 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
       />
       <PigeonMapCore
         animate={false}
-        attribution={
-          <span style={{ fontSize: 8 }}>
-            © <a href="https://stadiamaps.com/">Stadia</a> ·{' '}
-            <a href="https://openmaptiles.org/">OpenMapTiles</a> ·{' '}
-            <a href="https://www.openstreetmap.org/copyright">OSM</a>
-          </span>
-        }
-        attributionPrefix={false}
+        attribution={false}
         center={viewport.center}
         dprs={[1, 2]}
+        height={size.height}
+        // Pigeon only reads width/height in its constructor, so remount on resize.
         key={`${Math.round(size.width)}x${Math.round(size.height)}`}
         mouseEvents={false}
         provider={provider}
         tileComponent={SmoothTile}
         touchEvents={false}
+        width={size.width}
         zoom={viewport.zoom}
         zoomSnap={false}
       >

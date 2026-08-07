@@ -19,7 +19,7 @@ const layoutStackSx: SxObject = {
   padding: 2.5,
   position: 'relative',
   textShadow:
-    '0 0 3px var(--mui-palette-background-paper), 0 0 7px var(--mui-palette-background-paper)',
+    '0 0 4px var(--mui-palette-background-paper), 0 0 10px var(--mui-palette-background-paper), 0 0 16px var(--mui-palette-background-paper)',
   zIndex: 3,
 };
 
@@ -30,11 +30,12 @@ const activityNameSx: SxObject = {
 const mapSx: SxObject = {
   inset: 0,
   position: 'absolute',
+  zIndex: 0,
 };
 
 const scrimSx: SxObject = {
   background:
-    'linear-gradient(180deg, color-mix(in srgb, var(--mui-palette-background-paper) 68%, transparent), color-mix(in srgb, var(--mui-palette-background-paper) 86%, transparent))',
+    'linear-gradient(180deg, color-mix(in srgb, var(--mui-palette-background-paper) 22%, transparent), color-mix(in srgb, var(--mui-palette-background-paper) 48%, transparent))',
   inset: 0,
   pointerEvents: 'none',
   position: 'absolute',
