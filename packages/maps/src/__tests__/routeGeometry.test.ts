@@ -1,5 +1,9 @@
-import type { Point } from 'pigeon-maps';
-import { decodePolyline, fitRouteViewport } from '../routeGeometry';
+import {
+  decodePolyline,
+  fitRouteViewport,
+  projectRouteToPixels,
+  toSvgPath,
+} from '../routeGeometry';
 
 describe('route geometry', () => {
   it('decodes the canonical Google polyline fixture', () => {
@@ -21,26 +25,26 @@ describe('route geometry', () => {
     const padding = 40;
     const viewport = fitRouteViewport({ height, padding, points, width });
 
-    const worldPixel = ([latitude, longitude]: Point): Point => {
-      const scale = 256 * 2 ** viewport.zoom;
-      const latitudeRadians = (latitude * Math.PI) / 180;
-      return [
-        ((longitude + 180) / 360) * scale,
-        ((1 - Math.log(Math.tan(latitudeRadians) + 1 / Math.cos(latitudeRadians)) / Math.PI) / 2) *
-          scale,
-      ];
-    };
-    const centerPixel = worldPixel(viewport.center);
-
-    for (const point of points) {
-      const pixel = worldPixel(point);
-      const x = pixel[0] - centerPixel[0] + width / 2;
-      const y = pixel[1] - centerPixel[1] + height / 2;
+    for (const { x, y } of projectRouteToPixels({ ...viewport, height, points, width })) {
       expect(x).toBeGreaterThanOrEqual(padding - 0.001);
       expect(x).toBeLessThanOrEqual(width - padding + 0.001);
       expect(y).toBeGreaterThanOrEqual(padding - 0.001);
       expect(y).toBeLessThanOrEqual(height - padding + 0.001);
     }
+  });
+
+  it('centers a single-point route and renders it as a one-command path', () => {
+    const points = decodePolyline('_p~iF~ps|U');
+    const pixels = projectRouteToPixels({
+      center: points[0] as [number, number],
+      height: 200,
+      points,
+      width: 300,
+      zoom: 15,
+    });
+
+    expect(pixels).toEqual([{ x: 150, y: 100 }]);
+    expect(toSvgPath(pixels)).toBe('M150.00 100.00');
   });
 
   it('uses a close zoom for a single-point route', () => {

@@ -4,7 +4,7 @@ const TILE_SIZE = 256;
 const MAX_MERCATOR_LATITUDE = 85.051_128_78;
 const DEFAULT_ROUTE_ZOOM = 15;
 
-type ProjectedPoint = {
+export type ProjectedPoint = {
   x: number;
   y: number;
 };
@@ -116,4 +116,41 @@ export function fitRouteViewport({
     center: unproject({ x: (minX + maxX) / 2, y: (minY + maxY) / 2 }),
     zoom,
   };
+}
+
+/**
+ * Maps route points onto viewport pixels using the same 256px slippy-map
+ * projection Pigeon uses, so the overlay can live outside the map instead of
+ * depending on Pigeon's own projection callback.
+ */
+export function projectRouteToPixels({
+  center,
+  height,
+  points,
+  width,
+  zoom,
+}: {
+  center: Point;
+  height: number;
+  points: Array<Point>;
+  width: number;
+  zoom: number;
+}): Array<ProjectedPoint> {
+  const scale = TILE_SIZE * 2 ** zoom;
+  const projectedCenter = project(center);
+
+  return points.map((point) => {
+    const projected = project(point);
+    return {
+      x: (projected.x - projectedCenter.x) * scale + width / 2,
+      y: (projected.y - projectedCenter.y) * scale + height / 2,
+    };
+  });
+}
+
+/** Builds an SVG path command string from already-projected route pixels. */
+export function toSvgPath(pixels: Array<ProjectedPoint>) {
+  return pixels
+    .map(({ x, y }, index) => `${index === 0 ? 'M' : 'L'}${x.toFixed(2)} ${y.toFixed(2)}`)
+    .join(' ');
 }

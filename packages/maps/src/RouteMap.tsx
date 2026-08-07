@@ -3,27 +3,21 @@
 import type { SxObject } from '@dg/ui/theme';
 import { useColorScheme } from '@dg/ui/theme/useColorScheme';
 import { Box } from '@mui/material';
-import type { PigeonProps, Point } from 'pigeon-maps';
+import type { Point } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { fitRouteViewport } from './routeGeometry';
+import { fitRouteViewport, projectRouteToPixels, toSvgPath } from './routeGeometry';
 import { SmoothTile } from './SmoothTile';
 
 const ROUTE_PADDING = 42;
 const DEFAULT_SIZE = 320;
+const STRAVA_ORANGE = '#fc4c02';
 
 const containerSx: SxObject = {
-  // Pigeon's root is the tile layer's own stacking level; keep it above the
-  // placeholder underlay instead of relying on DOM order.
-  '& > div': {
-    backgroundColor: 'transparent !important',
-    position: 'relative',
-    zIndex: 1,
-  },
   backgroundColor: 'var(--mui-palette-background-paper)',
   height: '100%',
-  // Groups the underlay, tiles and route into one layer so none of them can
-  // paint above whatever the host renders over the map.
+  // Groups the underlay, tiles, scrim and route into one layer so none of them
+  // can paint above whatever the host renders over the map.
   isolation: 'isolate',
   overflow: 'hidden',
   pointerEvents: 'none',
@@ -43,6 +37,37 @@ const underlaySx: SxObject = {
   zIndex: 0,
 };
 
+const tileLayerSx: SxObject = {
+  // Pigeon paints its own opaque background, which would hide the placeholder.
+  '& > div': {
+    backgroundColor: 'transparent !important',
+  },
+  // Mutes the basemap's landcover so the route and card copy lead, while roads,
+  // trails and water still read as a map.
+  filter: 'saturate(0.62)',
+  inset: 0,
+  position: 'absolute',
+  zIndex: 1,
+};
+
+/**
+ * Knocks the basemap back just far enough for the copy to win, weighted toward
+ * the bottom where the densest text sits. Outdoors is a vivid, fully labelled
+ * style so it needs more help than the already-muted dark basemap.
+ */
+const getScrimSx = (dark: boolean): SxObject => {
+  const [top, middle, bottom] = dark ? ([16, 28, 44] as const) : ([32, 42, 55] as const);
+  const paper = (percent: number) =>
+    `color-mix(in srgb, var(--mui-palette-background-paper) ${percent}%, transparent)`;
+
+  return {
+    background: `linear-gradient(180deg, ${paper(top)} 0%, ${paper(middle)} 45%, ${paper(bottom)} 100%)`,
+    inset: 0,
+    position: 'absolute',
+    zIndex: 2,
+  };
+};
+
 const routeSvgSx: SxObject = {
   height: '100%',
   left: 0,
@@ -50,54 +75,8 @@ const routeSvgSx: SxObject = {
   position: 'absolute',
   top: 0,
   width: '100%',
+  zIndex: 3,
 };
-
-type RouteOverlayProps = PigeonProps & {
-  points: Array<Point>;
-};
-
-function RouteOverlay({ latLngToPixel, mapState, points }: RouteOverlayProps) {
-  if (!latLngToPixel || !mapState || mapState.width <= 0 || mapState.height <= 0) {
-    return null;
-  }
-
-  const path = points
-    .map((point, index) => {
-      const [x, y] = latLngToPixel(point);
-      return `${index === 0 ? 'M' : 'L'}${x.toFixed(2)} ${y.toFixed(2)}`;
-    })
-    .join(' ');
-
-  return (
-    <Box
-      aria-hidden="true"
-      component="svg"
-      sx={routeSvgSx}
-      viewBox={`0 0 ${mapState.width} ${mapState.height}`}
-    >
-      <Box
-        component="path"
-        d={path}
-        fill="none"
-        stroke="color-mix(in srgb, var(--mui-palette-background-default) 85%, transparent)"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={8}
-        vectorEffect="non-scaling-stroke"
-      />
-      <Box
-        component="path"
-        d={path}
-        fill="none"
-        stroke="#fc4c02"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        strokeWidth={4}
-        vectorEffect="non-scaling-stroke"
-      />
-    </Box>
-  );
-}
 
 const subscribeToSystemDark = (onStoreChange: () => void) => {
   const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -137,7 +116,9 @@ function tileUrl({
   y: number;
   zoom: number;
 }) {
-  const style = dark ? 'alidade_smooth_dark' : 'alidade_smooth';
+  // Outdoors carries trails, contours and greenery, so it still reads as a map
+  // under a scrim. Alidade Smooth Dark is the closest dark counterpart.
+  const style = dark ? 'alidade_smooth_dark' : 'outdoors';
   const density = dpr && dpr > 1 ? '@2x' : '';
   return `https://tiles.stadiamaps.com/tiles/${style}/${zoom}/${x}/${y}${density}.png?api_key=${stadiaApiKey}`;
 }
@@ -165,6 +146,15 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
     width: size.width,
   });
   const underlayTile = tileCoordinates(viewport.center, viewport.zoom);
+  const routePath = toSvgPath(
+    projectRouteToPixels({
+      center: viewport.center,
+      height: size.height,
+      points,
+      width: size.width,
+      zoom: viewport.zoom,
+    }),
+  );
   const provider = (x: number, y: number, zoom: number, dpr?: number) =>
     tileUrl({ dark, dpr, stadiaApiKey, x, y, zoom });
 
@@ -200,24 +190,47 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
         })}
         sx={underlaySx}
       />
-      <PigeonMapCore
-        animate={false}
-        attribution={false}
-        center={viewport.center}
-        dprs={[1, 2]}
-        height={size.height}
-        // Pigeon only reads width/height in its constructor, so remount on resize.
-        key={`${Math.round(size.width)}x${Math.round(size.height)}`}
-        mouseEvents={false}
-        provider={provider}
-        tileComponent={SmoothTile}
-        touchEvents={false}
-        width={size.width}
-        zoom={viewport.zoom}
-        zoomSnap={false}
-      >
-        <RouteOverlay points={points} />
-      </PigeonMapCore>
+      <Box sx={tileLayerSx}>
+        <PigeonMapCore
+          animate={false}
+          attribution={false}
+          center={viewport.center}
+          dprs={[1, 2]}
+          height={size.height}
+          // Pigeon only reads width/height in its constructor, so remount on resize.
+          key={`${Math.round(size.width)}x${Math.round(size.height)}`}
+          mouseEvents={false}
+          provider={provider}
+          tileComponent={SmoothTile}
+          touchEvents={false}
+          width={size.width}
+          zoom={viewport.zoom}
+          zoomSnap={false}
+        />
+      </Box>
+      <Box sx={getScrimSx(dark)} />
+      <Box component="svg" sx={routeSvgSx} viewBox={`0 0 ${size.width} ${size.height}`}>
+        <Box
+          component="path"
+          d={routePath}
+          fill="none"
+          stroke="color-mix(in srgb, var(--mui-palette-background-paper) 78%, transparent)"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={9}
+          vectorEffect="non-scaling-stroke"
+        />
+        <Box
+          component="path"
+          d={routePath}
+          fill="none"
+          stroke={STRAVA_ORANGE}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth={4.5}
+          vectorEffect="non-scaling-stroke"
+        />
+      </Box>
     </Box>
   );
 }
