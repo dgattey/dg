@@ -17,10 +17,21 @@ const THRESHOLD_Y_PX = 0.025;
 const THRESHOLD_ROT_DEG = 0.03;
 
 /**
+ * Legacy advance was `+0.16` per rAF frame, which tied tempo to refresh rate
+ * (~55 BPM at 60Hz, ~110 BPM at 120Hz). Drive time from wall clock at the
+ * 60Hz-equivalent rate so the designed pulse stays stable across displays.
+ */
+const TIME_UNITS_PER_SECOND = 0.16 * 60;
+
+/** Cap a single frame's advance so a backgrounded tab does not jump many beats. */
+const MAX_FRAME_DELTA_SECONDS = 0.1;
+
+/**
  * Hook that applies a beat-led bounce to a ref when music is playing.
  * Clear rhythmic pulses with subtle organic variation between beats.
- * requestAnimationFrame already caps at display refresh rate; we only write
- * the transform when the change is significant to avoid constant tiny updates.
+ * Time advances from wall-clock delta (not per frame) so beat rate is
+ * refresh-rate independent; we only write the transform when the change is
+ * significant to avoid constant tiny updates.
  */
 export function useWaveformBounce<T extends HTMLElement>({
   isPlaying,
@@ -29,6 +40,7 @@ export function useWaveformBounce<T extends HTMLElement>({
   const ref = useRef<T>(null);
   const timeRef = useRef(0);
   const rafRef = useRef<number | null>(null);
+  const lastTimestampRef = useRef<number | null>(null);
   const jitterRef = useRef(0);
   const rotationRef = useRef(0);
   const nudgedThisBeatRef = useRef(false);
@@ -42,6 +54,7 @@ export function useWaveformBounce<T extends HTMLElement>({
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
+      lastTimestampRef.current = null;
       if (ref.current) {
         ref.current.style.transform = 'rotate(0deg) scale3d(1, 1, 1) translate3d(0, 0, 0)';
       }
@@ -49,6 +62,7 @@ export function useWaveformBounce<T extends HTMLElement>({
     }
 
     timeRef.current = 0;
+    lastTimestampRef.current = null;
     jitterRef.current = 0;
     rotationRef.current = 0;
     nudgedThisBeatRef.current = false;
@@ -56,10 +70,16 @@ export function useWaveformBounce<T extends HTMLElement>({
     lastYRef.current = 0;
     lastRotRef.current = 0;
 
-    const animate = () => {
+    const animate = (now: number) => {
       if (!ref.current) {
         return;
       }
+
+      const last = lastTimestampRef.current;
+      const deltaSeconds =
+        last === null ? 0 : Math.min((now - last) / 1000, MAX_FRAME_DELTA_SECONDS);
+      lastTimestampRef.current = now;
+      timeRef.current += deltaSeconds * TIME_UNITS_PER_SECOND;
 
       const time = timeRef.current;
       const scale = intensity;
@@ -102,17 +122,16 @@ export function useWaveformBounce<T extends HTMLElement>({
         ref.current.style.transform = `rotate(${rotDeg}deg) scale3d(${finalScale}, ${finalScale}, 1) translate3d(0, ${yOffset}px, 0)`;
       }
 
-      timeRef.current += 0.16;
-
       rafRef.current = requestAnimationFrame(animate);
     };
 
-    animate();
+    rafRef.current = requestAnimationFrame(animate);
 
     return () => {
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
       }
+      lastTimestampRef.current = null;
     };
   }, [isPlaying, intensity]);
 
