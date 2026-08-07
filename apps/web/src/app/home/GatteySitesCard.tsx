@@ -2,6 +2,7 @@ import type { RenderableSideProject } from '@dg/content-models/contentful/render
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
+import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import { truncated } from '@dg/ui/helpers/truncated';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack, Typography } from '@mui/material';
@@ -11,11 +12,22 @@ type GatteySitesCardProps = {
   projects: ReadonlyArray<RenderableSideProject>;
 };
 
+const MARK_ROLE = 'side-project-mark';
+
+/**
+ * Rows sit 13px inside the card: 20px of card padding plus its 1px border, less
+ * the 8px each row bleeds back out. Keeping their corners concentric with the
+ * card's 32px radius means subtracting that gap.
+ */
+const ROW_BORDER_RADIUS = '19px';
+
 const markSx: SxObject = {
   flexShrink: 0,
   height: 40,
   overflow: 'hidden',
+  transform: 'scale(1)',
   width: 40,
+  ...createBouncyTransition('transform'),
 };
 
 const cardSx: SxObject = {
@@ -45,6 +57,9 @@ const projectListSx: SxObject = {
 };
 
 const projectLinkSx: SxObject = {
+  [`&:hover [data-role="${MARK_ROLE}"], &:focus-visible [data-role="${MARK_ROLE}"]`]: {
+    transform: 'scale(1.1)',
+  },
   '&:focus-visible': {
     outline: '2px solid var(--mui-palette-primary-main)',
     outlineOffset: 2,
@@ -54,13 +69,13 @@ const projectLinkSx: SxObject = {
     textDecoration: 'none',
   },
   alignItems: 'center',
-  borderRadius: 1,
+  borderRadius: ROW_BORDER_RADIUS,
   display: 'flex',
   gap: 1.5,
   marginInline: -1,
   padding: 1,
   textDecoration: 'none',
-  transition: 'background-color 160ms ease',
+  ...createBouncyTransition('background-color'),
 };
 
 const projectTextSx: SxObject = {
@@ -99,7 +114,7 @@ export function GatteySitesCard({ projects }: GatteySitesCardProps) {
           {projects.map(({ description, mark, title, url }) => (
             <Box component="li" key={url}>
               <Link href={url} isExternal={true} sx={projectLinkSx} title={title} underline="none">
-                <Box aria-hidden="true" sx={markSx}>
+                <Box aria-hidden="true" data-role={MARK_ROLE} sx={markSx}>
                   <Image
                     alt=""
                     cover={true}
