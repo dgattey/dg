@@ -3,7 +3,13 @@
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
-import { createTransition, TIMING_SLOW } from '../helpers/timing';
+import {
+  createTransition,
+  EASING_BOUNCY,
+  TIMING_BOUNCY,
+  TIMING_MEDIUM,
+  TIMING_NORMAL,
+} from '../helpers/timing';
 import type { SxObject } from '../theme';
 import { GlassContainer } from './GlassContainer';
 
@@ -21,24 +27,57 @@ const panelBaseSx: SxObject = {
   display: 'grid',
   padding: `${DISCLOSURE_PANEL_PADDING}px`,
   position: 'absolute',
-  right: 0,
   rowGap: `${DISCLOSURE_ROW_GAP}px`,
   top: DISCLOSURE_ROW_HEIGHT + DISCLOSURE_ROW_GAP,
   width: DISCLOSURE_PANEL_WIDTH,
   zIndex: 2,
 };
 
+/**
+ * Which edge the panel shares with its trigger. The panel is wider than every
+ * trigger that opens one, so it always grows sideways: pinned to the trigger's
+ * inline-end it grows inward from page chrome on the right, and pinned to the
+ * inline-start it grows inward from a control on the left. Getting this backwards
+ * puts the panel off the side of the viewport rather than merely off-centre.
+ */
+export type DisclosureAlign = 'start' | 'end';
+
+const alignSx: Record<DisclosureAlign, SxObject> = {
+  end: { insetInlineEnd: 0 },
+  start: { insetInlineStart: 0 },
+};
+
+/**
+ * One shorthand, three different jobs — the properties genuinely need different
+ * curves, so composing them by hand beats a helper that spreads a single easing
+ * across all of them.
+ *
+ * `EASING_BOUNCY` is a full spring: it overshoots to 1.337 and rings down
+ * through several oscillations before settling, so it needs `TIMING_BOUNCY` to
+ * read as a bounce rather than a stutter. That is the duration `ContentCard`
+ * gives it, which is why the cards feel right and this panel is matched to them.
+ *
+ * Only `transform` springs. Opacity clamps at 1, so an overshoot there flattens
+ * into a hitch instead of a bounce, and a panel that spends the whole spring
+ * fading in reads as sluggish — it fades on `TIMING_NORMAL` and is fully opaque
+ * while the slide is still settling.
+ *
+ * `visibility` is what keeps a closed panel out of the a11y tree and the tab
+ * order, so its delay tracks the opacity duration rather than the longer
+ * transform: any longer and the panel stays reachable after it looks gone.
+ */
 function createPanelMotionSx(isOpen: boolean): SxObject {
   return {
     [REDUCED_MOTION]: { transition: 'none' },
     opacity: isOpen ? 1 : 0,
     pointerEvents: isOpen ? 'auto' : 'none',
     transform: isOpen ? 'none' : `translateY(-${DISCLOSURE_ROW_HEIGHT / 4}px)`,
+    transition: [
+      createTransition('transform', TIMING_BOUNCY, EASING_BOUNCY),
+      createTransition('opacity', TIMING_NORMAL),
+      `visibility 0s linear ${isOpen ? 0 : TIMING_NORMAL}ms`,
+    ].join(', '),
     visibility: isOpen ? 'visible' : 'hidden',
-    ...createBouncyTransition(['opacity', 'transform'], TIMING_SLOW),
-    transition: `${createTransition(['opacity', 'transform'], TIMING_SLOW)}, visibility 0s linear ${
-      isOpen ? 0 : TIMING_SLOW
-    }ms`,
   };
 }
 
@@ -69,6 +108,12 @@ const rowBaseSx: SxObject = {
   zIndex: 1,
 };
 
+/** Text-only rows drop the icon cell rather than indenting past an empty one. */
+const labelOnlyRowSx: SxObject = {
+  gridTemplateColumns: '1fr',
+  paddingInlineStart: 1.75,
+};
+
 const iconCellSx: SxObject = {
   display: 'grid',
   placeItems: 'center',
@@ -88,21 +133,29 @@ type GlassDisclosurePanelProps = {
   isOpen: boolean;
   /** Accessible name for the disclosure surface. */
   label: string;
+  /** Trigger edge the panel is pinned to. Defaults to the inline end. */
+  align?: DisclosureAlign;
   id?: string;
   role?: string;
   sx?: SxObject;
 };
 
 /**
- * Shared glass disclosure panel for header menus.
+ * Shared glass disclosure panel behind every dropdown on the site.
  *
  * Deliberately a plain `GlassContainer` rather than a mouse-aware one: the panel
  * hangs off a trigger inside a capsule that already tilts toward the cursor, so
  * it inherits that tilt. Its own gravity transform would only double it, and the
  * transform would make the panel a containing block and stacking context for no
  * gain.
+ *
+ * Mount this as a *sibling* of the trigger, never inside another glass surface.
+ * `backdrop-filter` makes an element the backdrop root for its whole subtree, and
+ * a panel hangs below its trigger's box — so nested in glass it samples an area
+ * with nothing behind it and paints fully transparent.
  */
 export function GlassDisclosurePanel({
+  align = 'end',
   children,
   id,
   isOpen,
@@ -117,15 +170,49 @@ export function GlassDisclosurePanel({
       id={id}
       inert={!isOpen}
       role={role}
-      sx={{ ...panelBaseSx, ...createPanelMotionSx(isOpen), ...sx }}
+      sx={{ ...panelBaseSx, ...alignSx[align], ...createPanelMotionSx(isOpen), ...sx }}
     >
       {children}
     </GlassContainer>
   );
 }
 
+/**
+ * Sliding highlight behind the selected row of a single-select disclosure.
+ *
+ * Absolute inside the row list, so the list must be the positioned ancestor and
+ * rows must keep their own stacking above it.
+ */
+export function GlassDisclosureThumb({ selectedIndex }: { selectedIndex: number }) {
+  return (
+    <Box
+      sx={{
+        [REDUCED_MOTION]: { transition: 'none' },
+        backgroundColor: 'var(--mui-palette-action-selected)',
+        border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 30%, transparent)',
+        borderRadius: '999px',
+        height: DISCLOSURE_ROW_HEIGHT,
+        insetInline: 0,
+        position: 'absolute',
+        top: 0,
+        transform: `translateY(${selectedIndex * (DISCLOSURE_ROW_HEIGHT + DISCLOSURE_ROW_GAP)}px)`,
+        transition: createTransition(['background-color', 'transform'], TIMING_MEDIUM),
+        zIndex: 0,
+      }}
+    />
+  );
+}
+
+/** Row list for a single-select disclosure, positioned for its thumb. */
+export const disclosureListSx: SxObject = {
+  display: 'grid',
+  position: 'relative',
+  rowGap: `${DISCLOSURE_ROW_GAP}px`,
+};
+
 type GlassDisclosureRowProps = {
-  icon: ReactNode;
+  /** Omitted for text-only option sets, which render as full-width rows. */
+  icon?: ReactNode;
   label: string;
   children?: ReactNode;
   component?: React.ElementType;
@@ -146,11 +233,17 @@ export function GlassDisclosureRow({
   sx,
 }: GlassDisclosureRowProps) {
   return (
-    <Box component={component} onClick={onClick} sx={{ ...rowBaseSx, ...sx }}>
+    <Box
+      component={component}
+      onClick={onClick}
+      sx={{ ...rowBaseSx, ...(icon ? undefined : labelOnlyRowSx), ...sx }}
+    >
       {children}
-      <Box aria-hidden component="span" sx={iconCellSx}>
-        {icon}
-      </Box>
+      {icon ? (
+        <Box aria-hidden component="span" sx={iconCellSx}>
+          {icon}
+        </Box>
+      ) : null}
       <Typography component="span" sx={labelSx} variant="caption">
         {label}
       </Typography>

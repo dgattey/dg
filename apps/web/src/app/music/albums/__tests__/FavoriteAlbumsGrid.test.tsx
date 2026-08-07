@@ -1,5 +1,5 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FavoriteAlbumsGrid } from '../FavoriteAlbumsGrid';
@@ -60,9 +60,15 @@ const albums: Array<PlaylistAlbum> = [
 const renderedAlbumNames = () =>
   screen.getAllByRole('img').map((image) => image.getAttribute('alt'));
 
-/** Clicks a sort option in the GlassSwitcher (hidden radio inside a label). */
+/**
+ * Clicks a sort option in the GlassSwitcher (hidden radio inside a label).
+ *
+ * Scoped to the desktop row on purpose: the switcher also renders a mobile
+ * disclosure with its own radio per option, and only CSS picks between them.
+ */
 const clickSort = async (user: ReturnType<typeof userEvent.setup>, label: string) => {
-  await user.click(screen.getByRole('radio', { hidden: true, name: label }));
+  const desktopSwitcher = document.querySelector('[data-role="glass-switcher"]') as HTMLElement;
+  await user.click(within(desktopSwitcher).getByRole('radio', { hidden: true, name: label }));
 };
 
 /**
