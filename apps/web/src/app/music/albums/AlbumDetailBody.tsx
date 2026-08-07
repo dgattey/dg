@@ -5,7 +5,7 @@ import { Box, Typography } from '@mui/material';
 import {
   ALBUM_WELL_TRACK_COLUMN_GAP,
   ALBUM_WELL_TRACK_NUMBER_COLUMN,
-  albumWellMetaBandSx,
+  albumWellMetaRowSx,
   albumWellMetaTextSx,
 } from './albumWellStyles';
 
@@ -153,7 +153,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
 
   return (
     <Box sx={{ display: 'contents' }}>
-      <Box sx={albumWellMetaBandSx}>
+      <Box sx={albumWellMetaRowSx}>
         <Box data-role="album-meta" sx={albumWellMetaTextSx}>
           <Typography
             color="text.secondary"

@@ -2,11 +2,11 @@ import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { act, render, screen } from '@testing-library/react';
 import { AlbumDetailBodySkeleton } from '../AlbumDetailBodySkeleton';
 import { AlbumWell } from '../AlbumWell';
-import { ALBUM_WELL_NAME_BAND, ALBUM_WELL_TRACK_NUMBER_COLUMN } from '../albumWellStyles';
+import { ALBUM_WELL_TRACK_NUMBER_COLUMN } from '../albumWellStyles';
 
 /**
- * Conditional rules, pseudo-elements and the height reserve never resolve into
- * an element's own style, so they are read off the stylesheet Emotion emits for
+ * Breakpoint-conditional rules and the height reserve never resolve into an
+ * element's own style, so they are read off the stylesheet Emotion emits for
  * it. Emotion inserts through the CSSOM here, which leaves the `style` tags
  * themselves empty.
  */
@@ -81,29 +81,31 @@ describe('AlbumWell', () => {
     expect(ALBUM_WELL_TRACK_NUMBER_COLUMN).toBe('1.5rem');
   });
 
-  it('holds the name band at exactly the height the meta band pins against', () => {
-    render(<AlbumWell album={album} />);
+  it('leaves the album name in the flow, so it cannot cover a track row', () => {
+    render(
+      <AlbumWell album={album}>
+        <AlbumDetailBodySkeleton />
+      </AlbumWell>,
+    );
 
-    // Left to its own line box the band comes up short of this, and the strip
-    // it leaves is where the tracklist showed between the two pinned surfaces.
-    const band = rulesFor(screen.getByRole('heading', { name: 'Example Album' }));
-
-    expect(band.replaceAll(/\s+/g, ' ')).toContain(`block-size: ${ALBUM_WELL_NAME_BAND}`);
+    // Pinned, the name and the artist/facts under it swallowed three tracklist
+    // rows at 1280 and four at 390 — a frame read as track 10, album metadata,
+    // track 12. Only the art pins, and only where it has its own column.
+    expect(rulesFor(screen.getByRole('heading', { name: 'Example Album' }))).not.toMatch(
+      /position:\s*sticky/,
+    );
+    expect(rulesFor(document.querySelector('[data-role="album-meta-skeleton"]'))).not.toMatch(
+      /position:\s*sticky/,
+    );
   });
 
-  it('backs the pinned name with opaque well surface running up past the fade', () => {
+  it('pins the art alone, and only where it has a column of its own', () => {
     render(<AlbumWell album={album} />);
 
-    const band = rulesFor(screen.getByRole('heading', { name: 'Example Album' }));
+    const art = rulesFor(screen.getByRole('link', { name: 'Open Example Album on Spotify' }));
 
-    // Above the band, so the tracklist is gone before it reaches the band's edge
-    // rather than ghosting through the sorter fade's near-transparent tail.
-    expect(band).toMatch(/::before/);
-    expect(band).toMatch(/bottom:\s*100%/);
-    // Wider than the text column, to reach the card's edges and cover the art.
-    expect(band).toMatch(/inset-inline:\s*-100%/);
-    // And the card trims both overshoots, so none of it escapes onto the page.
-    expect(wellRules()).toMatch(/overflow:\s*clip/);
+    expect(art).toMatch(/position:\s*static/);
+    expect(art).toMatch(/position:\s*sticky/);
   });
 
   it('tweens shell height when streamed content grows, then releases to auto', () => {

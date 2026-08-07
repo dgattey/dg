@@ -3,7 +3,7 @@ import { Box, Skeleton } from '@mui/material';
 import {
   ALBUM_WELL_TRACK_COLUMN_GAP,
   ALBUM_WELL_TRACK_NUMBER_COLUMN,
-  albumWellMetaBandSx,
+  albumWellMetaRowSx,
   albumWellMetaTextSx,
 } from './albumWellStyles';
 
@@ -28,7 +28,7 @@ const rowSx: SxObject = {
 export function AlbumDetailBodySkeleton() {
   return (
     <Box data-role="album-detail-placeholder" sx={{ display: 'contents' }}>
-      <Box data-role="album-meta-skeleton" sx={albumWellMetaBandSx}>
+      <Box data-role="album-meta-skeleton" sx={albumWellMetaRowSx}>
         <Box sx={albumWellMetaTextSx}>
           <Skeleton sx={{ maxWidth: 320 }} variant="text" width="55%" />
           <Skeleton height={28} sx={{ maxWidth: 380 }} variant="text" width="65%" />
