@@ -7,7 +7,7 @@ import { MusicTrack } from '@dg/db/models/MusicTrack';
 import { MusicTrackArtist } from '@dg/db/models/MusicTrackArtist';
 import * as v from 'valibot';
 import type { AlbumDetail, AlbumDetailArtist, AlbumDetailTrack } from './albumDetailTypes';
-import { spotifyGetWithRetry } from './trackMetadataShared';
+import { spotifyGet } from './trackMetadataShared';
 
 export type { AlbumDetail, AlbumDetailArtist, AlbumDetailTrack } from './albumDetailTypes';
 
@@ -185,7 +185,7 @@ async function fetchAllAlbumTracks(
   let offset = items.length;
 
   while (next) {
-    const page = await spotifyGetWithRetry(
+    const page = await spotifyGet(
       `albums/${albumId}/tracks?limit=50&offset=${offset}`,
       albumTracksPageSchema,
       'album tracks page',
@@ -202,7 +202,7 @@ async function fetchAllAlbumTracks(
 }
 
 async function fetchAlbumFromSpotify(albumId: string): Promise<AlbumDetail | null> {
-  const result = await spotifyGetWithRetry(`albums/${albumId}`, albumDetailSchema, 'album detail');
+  const result = await spotifyGet(`albums/${albumId}`, albumDetailSchema, 'album detail');
   if (!result.success) {
     if (result.status === 404) {
       return null;

@@ -34,7 +34,7 @@ const mockSpotifyGetWithRetry = jest.fn();
 
 jest.mock('../trackMetadataShared', () => ({
   ...jest.requireActual('../trackMetadataShared'),
-  spotifyGetWithRetry: (...args: Array<unknown>) => mockSpotifyGetWithRetry(...args),
+  spotifyGet: (...args: Array<unknown>) => mockSpotifyGetWithRetry(...args),
 }));
 
 // Use unique prefix for this test file to avoid conflicts with parallel tests

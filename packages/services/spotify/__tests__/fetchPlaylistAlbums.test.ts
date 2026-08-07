@@ -1,7 +1,14 @@
 const mockGet = jest.fn();
+const mockReadSnapshot = jest.fn();
+const mockWriteSnapshot = jest.fn();
 
 jest.mock('../spotifyClient', () => ({
   getSpotifyClient: () => ({ get: mockGet }),
+}));
+
+jest.mock('../favoriteAlbumsSnapshot', () => ({
+  readFavoriteAlbumsSnapshot: () => mockReadSnapshot(),
+  writeFavoriteAlbumsSnapshot: (albums: unknown) => mockWriteSnapshot(albums),
 }));
 
 import { fetchPlaylistAlbums } from '../fetchPlaylistAlbums';
@@ -41,6 +48,8 @@ const buildPage = (albumIds: Array<string>, next: string | null) => ({
 describe('fetchPlaylistAlbums', () => {
   beforeEach(() => {
     mockGet.mockReset();
+    mockReadSnapshot.mockReset().mockResolvedValue(null);
+    mockWriteSnapshot.mockReset().mockResolvedValue(undefined);
   });
 
   it('pages through the playlist and dedupes albums across pages', async () => {
@@ -56,7 +65,28 @@ describe('fetchPlaylistAlbums', () => {
     expect(albums.map((album) => album.id).sort()).toEqual(['a', 'b', 'c']);
   });
 
-  it('throws on a non-200 status instead of returning an empty list', async () => {
+  it('stores each successful read so a later failure has something to serve', async () => {
+    mockGet.mockResolvedValueOnce(buildPage(['a'], null));
+
+    await fetchPlaylistAlbums('playlist-id');
+
+    expect(mockWriteSnapshot).toHaveBeenCalledWith([expect.objectContaining({ id: 'a' })]);
+  });
+
+  it('serves the stored list when Spotify rate limits, without waiting', async () => {
+    const stored = [{ id: 'stored-album', name: 'Stored' }];
+    mockGet.mockResolvedValue({ response: { json: async () => ({}) }, status: 429 });
+    mockReadSnapshot.mockResolvedValue(stored);
+
+    const started = Date.now();
+    const albums = await fetchPlaylistAlbums('playlist-id');
+
+    expect(albums).toEqual(stored);
+    expect(mockGet).toHaveBeenCalledTimes(1);
+    expect(Date.now() - started).toBeLessThan(1000);
+  });
+
+  it('throws when the live read fails and nothing is stored', async () => {
     mockGet.mockResolvedValueOnce({ response: { json: async () => ({}) }, status: 403 });
 
     await expect(fetchPlaylistAlbums('playlist-id')).rejects.toThrow('status 403');
