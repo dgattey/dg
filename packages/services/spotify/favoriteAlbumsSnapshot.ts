@@ -25,15 +25,20 @@ const SNAPSHOT_FIELDS = [
  */
 export async function readFavoriteAlbumsSnapshot(): Promise<Array<PlaylistAlbum> | null> {
   try {
-    const [snapshot, rows] = await Promise.all([
-      db.FavoriteAlbumSnapshot.findOne({ where: { singleton: true } }),
-      db.FavoriteAlbum.findAll({
-        attributes: [...SNAPSHOT_FIELDS],
-        order: [['addedAt', 'DESC']],
-        raw: true,
-      }),
-    ]);
-    return snapshot ? (rows as unknown as Array<PlaylistAlbum>) : null;
+    const rows = (await db.FavoriteAlbum.findAll({
+      attributes: [...SNAPSHOT_FIELDS],
+      order: [['addedAt', 'DESC']],
+      raw: true,
+    })) as unknown as Array<PlaylistAlbum>;
+    if (rows.length > 0) {
+      return rows;
+    }
+
+    // Preview builds skip migrations. Only the marker needs the new table, and
+    // only an empty snapshot needs the marker, so populated snapshots remain
+    // readable in previews immediately after the FavoriteAlbum migration.
+    const snapshot = await db.FavoriteAlbumSnapshot.findOne({ where: { singleton: true } });
+    return snapshot ? [] : null;
   } catch (error) {
     log.warn('Could not read stored favorite albums', { error });
     return null;

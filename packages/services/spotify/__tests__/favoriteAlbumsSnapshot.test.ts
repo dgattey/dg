@@ -30,4 +30,10 @@ describe('favorite albums snapshot', () => {
     await writeFavoriteAlbumsSnapshot([album]);
     await expect(readFavoriteAlbumsSnapshot()).resolves.toEqual([album]);
   });
+
+  it('reads populated rows without requiring the newer marker table state', async () => {
+    await db.FavoriteAlbum.create(album);
+
+    await expect(readFavoriteAlbumsSnapshot()).resolves.toEqual([album]);
+  });
 });
