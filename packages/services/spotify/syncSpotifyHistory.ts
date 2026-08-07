@@ -27,10 +27,34 @@ type SpotifyPlayRow = TrackMetadata & {
 };
 
 /**
+ * Raised when Spotify could not be read. Distinct from "read Spotify fine, and
+ * there was genuinely nothing new", which is a normal quiet outcome.
+ */
+export class SpotifyHistoryUnavailableError extends Error {
+  readonly status: number;
+  readonly retryAfterSeconds: number | undefined;
+
+  constructor(status: number, retryAfterSeconds: number | undefined) {
+    super(
+      `Spotify recently-played read failed with status ${status}${
+        retryAfterSeconds === undefined ? '' : ` (retry after ${retryAfterSeconds}s)`
+      }`,
+    );
+    this.name = 'SpotifyHistoryUnavailableError';
+    this.retryAfterSeconds = retryAfterSeconds;
+    this.status = status;
+  }
+}
+
+/**
  * Fetches recently played tracks from Spotify.
  *
  * IMPORTANT: Spotify only returns the 50 most recent tracks total.
  * This is NOT pagination - once 50 new tracks play, older ones are gone forever.
+ *
+ * Throws when Spotify cannot be read. A caller that turned that into an empty
+ * list would report a successful run that quietly collected nothing, which is
+ * indistinguishable from a listener who simply had not played anything.
  */
 async function fetchRecentPlays(afterTimestamp?: number): Promise<Array<SpotifyPlayRow>> {
   const params = new URLSearchParams({ limit: String(SPOTIFY_HISTORY_LIMIT) });
@@ -39,11 +63,10 @@ async function fetchRecentPlays(afterTimestamp?: number): Promise<Array<SpotifyP
   }
 
   const resource = `me/player/recently-played?${params.toString()}`;
-  const { response, status } = await getSpotifyClient().get(resource);
+  const { response, retryAfterSeconds, status } = await getSpotifyClient().get(resource);
 
   if (status !== 200) {
-    log.warn('Spotify recently-played fetch failed', { status });
-    return [];
+    throw new SpotifyHistoryUnavailableError(status, retryAfterSeconds);
   }
 
   const json = await response.json();
@@ -54,6 +77,20 @@ async function fetchRecentPlays(afterTimestamp?: number): Promise<Array<SpotifyP
   });
 
   const mapped = mapRecentlyPlayedFromApi(data);
+
+  // Mapping drops tracks it cannot represent (an album with no artwork). Losing
+  // every track means the payload shape changed rather than the listener idling.
+  if (data.items.length > 0 && mapped.items.length === 0) {
+    throw new Error(
+      `Spotify returned ${data.items.length} plays but none could be mapped; the payload shape likely changed`,
+    );
+  }
+  if (mapped.items.length < data.items.length) {
+    log.warn('Dropped unmappable Spotify plays', {
+      dropped: data.items.length - mapped.items.length,
+      received: data.items.length,
+    });
+  }
 
   return mapped.items.map((item) => ({
     albumId: item.track.album.id,
@@ -127,6 +164,23 @@ type SyncWithLoggingOptions = {
   failureLogLevel?: 'error' | 'warn';
 };
 
+/**
+ * The result of a sync attempt. A failed attempt carries its reason so callers
+ * can report it instead of returning a success-shaped body with zeroes in it.
+ */
+export type SpotifySyncOutcome =
+  | {
+      gapDetected: boolean;
+      inserted: number;
+      status: 'ok';
+      total: number;
+    }
+  | {
+      reason: string;
+      retryAfterSeconds?: number;
+      status: 'failed';
+    };
+
 const getContextLabel = (context: SyncContext) => (context === 'cron' ? 'Cron' : 'Backfill');
 
 /**
@@ -135,15 +189,20 @@ const getContextLabel = (context: SyncContext) => (context === 'cron' ? 'Cron' :
 export async function syncSpotifyHistoryWithLogging({
   context,
   failureLogLevel = 'error',
-}: SyncWithLoggingOptions) {
+}: SyncWithLoggingOptions): Promise<SpotifySyncOutcome> {
   try {
     const result = await syncSpotifyPlaysSince();
     log.info(`${getContextLabel(context)}: Spotify history sync complete`, result);
-    return result;
+    return { ...result, status: 'ok' };
   } catch (error) {
     log[failureLogLevel](`${getContextLabel(context)}: Spotify history sync failed`, {
       error: serializeError(error as Error),
     });
-    return null;
+    return {
+      reason: error instanceof Error ? error.message : 'Unknown Spotify history sync failure',
+      retryAfterSeconds:
+        error instanceof SpotifyHistoryUnavailableError ? error.retryAfterSeconds : undefined,
+      status: 'failed',
+    };
   }
 }

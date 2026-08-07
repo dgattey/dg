@@ -94,7 +94,12 @@ export function createClient({ endpoint, accessKey, refreshTokenConfig }: Client
     const response = authedApi.get(resource).unauthorized(async (_error, req) => {
       // Renew credentials once and try to fetch again but fail if we hit another unauthorized
       log.info('Unauthorized request, refreshing access token', { resource });
-      const authedReq = await addAuth(req, true);
+      // The retry needs its own deadline. Reusing the first request's signal
+      // spends that budget on the failed attempt plus the token refresh, so a
+      // slow refresh aborts the retry before it is even sent.
+      const authedReq = (await addAuth(req, true)).options({
+        signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      });
       return authedReq.get(resource).unauthorized((err) => {
         log.error('Failed to refresh access token', { resource });
         throw err;

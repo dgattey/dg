@@ -1,9 +1,17 @@
 import { Op } from '@dg/db';
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
-import { syncSpotifyHistoryWithLogging, syncSpotifyPlaysSince } from '../syncSpotifyHistory';
+import {
+  SpotifyHistoryUnavailableError,
+  syncSpotifyHistoryWithLogging,
+  syncSpotifyPlaysSince,
+} from '../syncSpotifyHistory';
 
 const mockSpotifyGet = jest.fn<
-  Promise<{ response: { json: () => Promise<unknown> }; status: number }>,
+  Promise<{
+    response: { json: () => Promise<unknown> };
+    retryAfterSeconds?: number;
+    status: number;
+  }>,
   [string]
 >();
 
@@ -198,7 +206,7 @@ describe('syncSpotifyPlaysSince', () => {
     });
   });
 
-  it('returns empty array when API fails with non-200 status', async () => {
+  it('throws instead of reporting an empty sync when the API fails', async () => {
     await db.SpotifyPlay.create({
       albumId: `${PREFIX}-album-seed`,
       artistIds: [`${PREFIX}-artist-seed`],
@@ -211,13 +219,58 @@ describe('syncSpotifyPlaysSince', () => {
       status: 500,
     });
 
-    const result = await syncSpotifyPlaysSince();
+    await expect(syncSpotifyPlaysSince()).rejects.toThrow(SpotifyHistoryUnavailableError);
+  });
 
-    expect(result).toEqual({
-      gapDetected: false,
-      inserted: 0,
-      total: 0,
+  it('surfaces a rate limit with its Retry-After rather than looking idle', async () => {
+    await db.SpotifyPlay.create({
+      albumId: `${PREFIX}-album-seed`,
+      artistIds: [`${PREFIX}-artist-seed`],
+      playedAt: new Date('2025-01-01T00:00:00.000Z'),
+      trackId: `${PREFIX}-track-seed-429`,
     });
+
+    mockSpotifyGet.mockResolvedValue({
+      response: { json: async () => ({}) },
+      retryAfterSeconds: 19_572,
+      status: 429,
+    });
+
+    await expect(syncSpotifyPlaysSince()).rejects.toMatchObject({
+      name: 'SpotifyHistoryUnavailableError',
+      retryAfterSeconds: 19_572,
+      status: 429,
+    });
+  });
+
+  it('throws when Spotify returns plays that cannot be mapped', async () => {
+    await db.SpotifyPlay.create({
+      albumId: `${PREFIX}-album-seed`,
+      artistIds: [`${PREFIX}-artist-seed`],
+      playedAt: new Date('2025-01-01T00:00:00.000Z'),
+      trackId: `${PREFIX}-track-seed-shape`,
+    });
+
+    // An album with no artwork is dropped during mapping. Losing every play
+    // means the payload changed, which must not look like an idle listener.
+    mockSpotifyGet.mockResolvedValue({
+      response: {
+        json: async () => ({
+          items: [
+            {
+              played_at: '2025-01-02T00:00:00.000Z',
+              track: buildTrackApi({
+                album: { ...buildTrackApi().album, images: [] },
+              }),
+            },
+          ],
+          next: null,
+        }),
+      },
+      status: 200,
+    });
+
+    await expect(syncSpotifyPlaysSince()).rejects.toThrow(/none could be mapped/);
   });
 
   it('inserts multiple plays of the same track at different timestamps', async () => {
@@ -286,10 +339,10 @@ describe('syncSpotifyHistoryWithLogging', () => {
 
     const result = await syncSpotifyHistoryWithLogging({ context: 'backfill' });
 
-    expect(result).not.toBeNull();
     expect(result).toEqual({
       gapDetected: false,
       inserted: 0,
+      status: 'ok',
       total: 0,
     });
     expect(mockSpotifyGet).toHaveBeenCalled();
@@ -310,11 +363,10 @@ describe('syncSpotifyHistoryWithLogging', () => {
 
     const result = await syncSpotifyHistoryWithLogging({ context: 'cron' });
 
-    expect(result).not.toBeNull();
-    expect(result?.inserted).toBe(0);
+    expect(result.status).toBe('ok');
   });
 
-  it('returns null on error', async () => {
+  it('reports a failure with its reason instead of a zeroed success', async () => {
     await db.SpotifyPlay.create({
       albumId: `${PREFIX}-album-err`,
       artistIds: [`${PREFIX}-artist-err`],
@@ -326,6 +378,29 @@ describe('syncSpotifyHistoryWithLogging', () => {
 
     const result = await syncSpotifyHistoryWithLogging({ context: 'cron' });
 
-    expect(result).toBeNull();
+    expect(result).toEqual({
+      reason: 'Network failure',
+      retryAfterSeconds: undefined,
+      status: 'failed',
+    });
+  });
+
+  it('carries Retry-After through to the caller on a rate limit', async () => {
+    await db.SpotifyPlay.create({
+      albumId: `${PREFIX}-album-429`,
+      artistIds: [`${PREFIX}-artist-429`],
+      playedAt: new Date('2025-01-01T00:00:00.000Z'),
+      trackId: `${PREFIX}-track-429`,
+    });
+
+    mockSpotifyGet.mockResolvedValue({
+      response: { json: async () => ({}) },
+      retryAfterSeconds: 19_572,
+      status: 429,
+    });
+
+    const result = await syncSpotifyHistoryWithLogging({ context: 'cron' });
+
+    expect(result).toMatchObject({ retryAfterSeconds: 19_572, status: 'failed' });
   });
 });
