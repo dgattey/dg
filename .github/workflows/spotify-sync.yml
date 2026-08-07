@@ -18,18 +18,18 @@ jobs:
         run: |
           set -euo pipefail
 
-          status=$(curl -sS --max-time 60 -X GET "${{ secrets.SITE_URL }}/api/spotify/sync" \
+          http_status=$(curl -sS --max-time 60 -X GET "${{ secrets.SITE_URL }}/api/spotify/sync" \
             -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
             -o response.json -w '%{http_code}')
 
-          echo "HTTP $status"
+          echo "HTTP $http_status"
           cat response.json
           echo
 
           {
             echo "### Spotify sync"
             echo
-            echo "HTTP status: \`$status\`"
+            echo "HTTP status: \`$http_status\`"
             echo
             echo '```json'
             cat response.json
@@ -37,8 +37,8 @@ jobs:
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
-          if [ "$status" != "200" ]; then
-            echo "::error::Spotify sync failed with HTTP $status - $(cat response.json)"
+          if [ "$http_status" != "200" ]; then
+            echo "::error::Spotify sync failed with HTTP $http_status - $(cat response.json)"
             exit 1
           fi
 
