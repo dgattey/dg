@@ -2,15 +2,16 @@ import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { act, render, screen } from '@testing-library/react';
 import { AlbumDetailBodySkeleton } from '../AlbumDetailBodySkeleton';
 import { AlbumWell } from '../AlbumWell';
-import { ALBUM_WELL_TRACK_NUMBER_COLUMN } from '../albumWellStyles';
+import { ALBUM_WELL_NAME_BAND, ALBUM_WELL_TRACK_NUMBER_COLUMN } from '../albumWellStyles';
 
 /**
- * The well's height reserve is a conditional CSS rule rather than a resolved
- * style, so it is read off the stylesheet Emotion emits for the well. Emotion
- * inserts through the CSSOM here, which leaves the `style` tags themselves empty.
+ * Conditional rules, pseudo-elements and the height reserve never resolve into
+ * an element's own style, so they are read off the stylesheet Emotion emits for
+ * it. Emotion inserts through the CSSOM here, which leaves the `style` tags
+ * themselves empty.
  */
-function wellRules() {
-  const classes = [...(document.querySelector('section')?.classList ?? [])];
+function rulesFor(element: Element | null) {
+  const classes = [...(element?.classList ?? [])];
   const rules = [...document.styleSheets].flatMap((sheet) => {
     try {
       return [...sheet.cssRules].map((rule) => rule.cssText);
@@ -21,6 +22,10 @@ function wellRules() {
   return rules
     .filter((rule) => classes.some((className) => rule.includes(`.${className}`)))
     .join('\n');
+}
+
+function wellRules() {
+  return rulesFor(document.querySelector('section'));
 }
 
 const album: PlaylistAlbum = {
@@ -74,6 +79,31 @@ describe('AlbumWell', () => {
 
   it('reserves a gutter that no streamed track count can change', () => {
     expect(ALBUM_WELL_TRACK_NUMBER_COLUMN).toBe('1.5rem');
+  });
+
+  it('holds the name band at exactly the height the meta band pins against', () => {
+    render(<AlbumWell album={album} />);
+
+    // Left to its own line box the band comes up short of this, and the strip
+    // it leaves is where the tracklist showed between the two pinned surfaces.
+    const band = rulesFor(screen.getByRole('heading', { name: 'Example Album' }));
+
+    expect(band.replaceAll(/\s+/g, ' ')).toContain(`block-size: ${ALBUM_WELL_NAME_BAND}`);
+  });
+
+  it('backs the pinned name with opaque well surface running up past the fade', () => {
+    render(<AlbumWell album={album} />);
+
+    const band = rulesFor(screen.getByRole('heading', { name: 'Example Album' }));
+
+    // Above the band, so the tracklist is gone before it reaches the band's edge
+    // rather than ghosting through the sorter fade's near-transparent tail.
+    expect(band).toMatch(/::before/);
+    expect(band).toMatch(/bottom:\s*100%/);
+    // Wider than the text column, to reach the card's edges and cover the art.
+    expect(band).toMatch(/inset-inline:\s*-100%/);
+    // And the card trims both overshoots, so none of it escapes onto the page.
+    expect(wellRules()).toMatch(/overflow:\s*clip/);
   });
 
   it('tweens shell height when streamed content grows, then releases to auto', () => {

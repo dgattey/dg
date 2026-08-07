@@ -11,6 +11,7 @@ import type { ReactNode, TransitionEvent } from 'react';
 import { useLayoutEffect, useRef, useState, ViewTransition } from 'react';
 import {
   ALBUM_WELL_ART_SIZE_XS,
+  ALBUM_WELL_NAME_BAND,
   ALBUM_WELL_NAME_GAP,
   ALBUM_WELL_NAME_LINE,
   ALBUM_WELL_PINNED_SURFACE,
@@ -70,14 +71,22 @@ const wellSx: SxObject = {
     0 8px 28px color-mix(in srgb, var(--mui-palette-common-black) 8%, transparent)`,
   columnGap: { sm: 3, xs: 0 },
   display: 'grid',
+  // Art sits beside the pinned bands from `sm` up, and under them on mobile,
+  // where stacking it on top would put it inside the strip the bands' backdrop
+  // covers and leave it half-erased before a single row had scrolled.
   gridTemplateAreas: {
     sm: '"art name" "art meta" "art tracks"',
-    xs: '"art" "name" "meta" "tracks"',
+    xs: '"name" "meta" "art" "tracks"',
   },
   gridTemplateColumns: {
     sm: `${WELL_ART_SIZE}px minmax(0, 1fr)`,
     xs: '1fr',
   },
+  // Trims the pinned name band's backdrop, which overshoots the card on every
+  // side so it can reach the card's edges from inside the text column. `clip`
+  // rather than `hidden` for the same reason the shell uses it: `hidden` would
+  // make this a scrollport and re-anchor the sticky art and bands to the card.
+  overflow: 'clip',
   p: { sm: 3, xs: 2 },
 };
 
@@ -95,9 +104,14 @@ const artCardSx: SxObject = {
 };
 
 /**
- * Sticks alongside the pinned name and meta. Grid items stretch by default,
- * which would both leave the anchor covering the empty column beside the
- * tracklist and give sticky no room to travel inside the grid area.
+ * Sticks beside the pinned name and meta from `sm` up, where it shares a row
+ * with them and has the whole card to travel through. Grid items stretch by
+ * default, which would both leave the anchor covering the empty column beside
+ * the tracklist and give sticky no room to travel inside the grid area.
+ *
+ * Static on mobile, where pinning a 160px cover on top of an already 150px
+ * pinned stack claimed over a third of the viewport, and left bare strips
+ * either side of a centred square for the tracklist to scroll through.
  */
 const artLinkSx: SxObject = {
   alignSelf: 'start',
@@ -105,29 +119,51 @@ const artLinkSx: SxObject = {
   gridArea: 'art',
   justifySelf: { sm: 'stretch', xs: 'center' },
   maxWidth: { sm: WELL_ART_SIZE, xs: ALBUM_WELL_ART_SIZE_XS },
-  position: 'sticky',
+  mb: { sm: 0, xs: 2 },
+  position: { sm: 'sticky', xs: 'static' },
   top: ALBUM_WELL_STICKY_TOP,
   width: '100%',
 };
 
+/**
+ * Runs the well's opaque surface from the top of the pinned name band up past
+ * the sorter's fade, so the tracklist has dissolved into the card before it
+ * reaches the band rather than ghosting through the fade's near-transparent
+ * tail and then meeting the band at a line.
+ *
+ * Taller than that gap needs to be, and wider than the text column, so it
+ * reaches the card's edges and covers the art column once a long tracklist runs
+ * the sticky art out of travel. The well clips both overshoots; everything
+ * above the fade is already covered by the bar's own surface.
+ */
+const pinnedBackdropSx: SxObject = {
+  backgroundColor: ALBUM_WELL_PINNED_SURFACE,
+  bottom: '100%',
+  content: '""',
+  height: '5rem',
+  insetInline: '-100%',
+  position: 'absolute',
+};
+
 const nameBandSx: SxObject = {
   ...albumWellBandSx,
+  '&::before': pinnedBackdropSx,
   backgroundColor: ALBUM_WELL_PINNED_SURFACE,
+  // Sized to the constant the meta band pins against rather than to the h2's
+  // own line box, which is shorter and left a gap between the two when stuck.
+  blockSize: ALBUM_WELL_NAME_BAND,
   fontWeight: 700,
   gridArea: 'name',
-  lineHeight: ALBUM_WELL_NAME_LINE,
   pb: ALBUM_WELL_NAME_GAP,
   position: 'sticky',
-  top: {
-    sm: ALBUM_WELL_STICKY_TOP.sm,
-    xs: `calc(${ALBUM_WELL_STICKY_TOP.xs} + ${ALBUM_WELL_ART_SIZE_XS}px)`,
-  },
+  top: ALBUM_WELL_STICKY_TOP,
   zIndex: 3,
 };
 
-/** One line so the band's height stays the constant the meta pins against. */
+/** One line, and the one that sets the band's fixed height from the inside. */
 const nameLinkSx: SxObject = {
   gridColumn: 2,
+  lineHeight: ALBUM_WELL_NAME_LINE,
   minWidth: 0,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
