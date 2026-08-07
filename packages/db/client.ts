@@ -3,6 +3,7 @@ import { Op } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { getDatabaseUrl, sequelizeOptions } from './dbConfig';
 import { FavoriteAlbum } from './models/FavoriteAlbum';
+import { FavoriteAlbumSnapshot } from './models/FavoriteAlbumSnapshot';
 import { MusicAlbum } from './models/MusicAlbum';
 import { MusicAlbumArtist } from './models/MusicAlbumArtist';
 import { MusicArtist } from './models/MusicArtist';
@@ -16,6 +17,7 @@ import { Token } from './models/Token';
 // Models
 export const db = {
   FavoriteAlbum,
+  FavoriteAlbumSnapshot,
   MusicAlbum,
   MusicAlbumArtist,
   MusicArtist,

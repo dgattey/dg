@@ -1,4 +1,4 @@
-# Sync Spotify listening history every 30 minutes
+# Sync Spotify listening history and favorite albums every 30 minutes
 name: Spotify sync
 
 on:
