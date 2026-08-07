@@ -198,4 +198,53 @@ describe('Spotify sync route', () => {
     expect(mockRevalidateTag).toHaveBeenCalledWith('music-history', 'max');
     expect(mockRevalidateTag).toHaveBeenCalledWith('favorite-albums', 'max');
   });
+
+  // The scheduled workflow only knows a run failed if the status is non-2xx, so
+  // these are the cases that used to report a green "inserted 0" run forever.
+  it.each([
+    ['a rate limit', 429, 19_572],
+    ['an auth failure', 401, undefined],
+    ['an aborted request', 500, undefined],
+  ])('fails the run on %s rather than reporting success', async (_label, status, retryAfter) => {
+    await db.SpotifyPlay.create({
+      albumId: `${PREFIX}-album-fail`,
+      artistIds: [`${PREFIX}-artist-fail`],
+      playedAt: new Date('2025-01-01T00:00:00.000Z'),
+      // Spotify ids are VARCHAR(22), so keep seeded ids short.
+      trackId: `${PREFIX}-f-${status}`,
+    });
+    mockSpotifyGet.mockResolvedValue({
+      response: { json: async () => ({}) },
+      retryAfterSeconds: retryAfter,
+      status,
+    });
+
+    const response = await handleSpotifySync(createRequest('Bearer test-secret'));
+
+    expect(response.status).toBe(500);
+    expect(response.body.success).toBeUndefined();
+    expect(response.body.error).toContain(String(status));
+    expect(response.body.retryAfterSeconds).toBe(retryAfter);
+    expect(mockRevalidateTag).not.toHaveBeenCalledWith('music-history', 'max');
+  });
+
+  it('stays quiet and successful when there is genuinely nothing new', async () => {
+    await db.SpotifyPlay.create({
+      albumId: `${PREFIX}-album-quiet`,
+      artistIds: [`${PREFIX}-artist-quiet`],
+      playedAt: new Date('2025-01-01T00:00:00.000Z'),
+      trackId: `${PREFIX}-track-quiet`,
+    });
+    mockSpotifyGet.mockResolvedValue({
+      response: { json: async () => ({ items: [], next: null }) },
+      status: 200,
+    });
+
+    const response = await handleSpotifySync(createRequest('Bearer test-secret'));
+
+    expect(response.status).toBe(200);
+    expect(response.body.success).toBe(true);
+    expect(response.body.inserted).toBe(0);
+    expect(mockRevalidateTag).not.toHaveBeenCalledWith('music-history', 'max');
+  });
 });

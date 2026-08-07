@@ -12,7 +12,38 @@ jobs:
     runs-on: ubuntu-latest
     permissions: {}
     steps:
+      # The route answers 2xx only when it actually read Spotify, so a non-200
+      # here means the sync failed rather than "nothing new was playing".
       - name: Trigger sync
         run: |
-          curl -sS -f -X GET "${{ secrets.SITE_URL }}/api/spotify/sync" \
-            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}"
+          set -euo pipefail
+
+          status=$(curl -sS --max-time 60 -X GET "${{ secrets.SITE_URL }}/api/spotify/sync" \
+            -H "Authorization: Bearer ${{ secrets.CRON_SECRET }}" \
+            -o response.json -w '%{http_code}')
+
+          echo "HTTP $status"
+          cat response.json
+          echo
+
+          {
+            echo "### Spotify sync"
+            echo
+            echo "HTTP status: \`$status\`"
+            echo
+            echo '```json'
+            cat response.json
+            echo
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          if [ "$status" != "200" ]; then
+            echo "::error::Spotify sync failed with HTTP $status - $(cat response.json)"
+            exit 1
+          fi
+
+          # Spotify only keeps the last 50 plays, so a full window means plays
+          # between runs are already gone for good.
+          if grep -q '"gapDetected":true' response.json; then
+            echo "::warning::Spotify returned a full 50-track window; plays between runs may have been lost."
+          fi
