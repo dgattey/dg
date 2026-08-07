@@ -93,7 +93,8 @@ export type SpotifyRequestResult<T> =
 
 /**
  * Makes a GET request to Spotify with automatic rate limit retry.
- * Handles 429 responses with exponential backoff.
+ * Prefers Spotify's Retry-After when present, otherwise exponential backoff,
+ * always capped at maxBackoffSeconds and maxRetries.
  */
 export async function spotifyGetWithRetry<T>(
   resource: string,
@@ -103,14 +104,23 @@ export async function spotifyGetWithRetry<T>(
   let retries = 0;
 
   while (retries <= RETRY_CONFIG.maxRetries) {
-    const { response, status } = await getSpotifyClient().get(resource);
+    const { response, retryAfterSeconds, status } = await getSpotifyClient().get(resource);
 
     if (status === 429) {
-      const waitSeconds = Math.min(
-        RETRY_CONFIG.initialBackoffSeconds * (retries + 1),
-        RETRY_CONFIG.maxBackoffSeconds,
-      );
-      log.warn(`Spotify rate limited (${context}), waiting`, { resource, retries, waitSeconds });
+      if (retryAfterSeconds && retryAfterSeconds > RETRY_CONFIG.maxBackoffSeconds) {
+        log.warn(`Spotify rate limit exceeds retry budget (${context})`, {
+          resource,
+          retryAfterSeconds,
+        });
+        return { error: `Retry after ${retryAfterSeconds}s`, status, success: false };
+      }
+      const waitSeconds = retryAfterSeconds ?? RETRY_CONFIG.initialBackoffSeconds * (retries + 1);
+      log.warn(`Spotify rate limited (${context}), waiting`, {
+        resource,
+        retries,
+        retryAfterSeconds,
+        waitSeconds,
+      });
       await sleep(waitSeconds * 1000);
       retries++;
       continue;

@@ -38,6 +38,17 @@ describe('MusicGrid', () => {
     expect(screen.getByText('3 tracks')).toBeInTheDocument();
   });
 
+  it('fans sleeves only for runs, leaving single plays flat', () => {
+    const { container } = render(
+      <MusicGrid tracks={[play('Bloom', 'One'), play('Bloom', 'Two'), play('Clay', 'Solo')]} />,
+    );
+
+    const covers = [...container.querySelectorAll('a')].map(
+      (link) => link.querySelectorAll('img').length,
+    );
+    expect(covers).toEqual([2, 1]);
+  });
+
   it('sends a stack to the album and a single tile to its track', () => {
     render(
       <MusicGrid tracks={[play('Bloom', 'One'), play('Bloom', 'Two'), play('Clay', 'Solo')]} />,

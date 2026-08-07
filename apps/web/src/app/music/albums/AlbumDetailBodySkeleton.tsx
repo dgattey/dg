@@ -1,21 +1,46 @@
-import { Skeleton, Stack } from '@mui/material';
+import type { SxObject } from '@dg/ui/theme';
+import { Box, Skeleton } from '@mui/material';
+import {
+  ALBUM_WELL_TRACK_COLUMN_GAP,
+  ALBUM_WELL_TRACK_NUMBER_COLUMN,
+  albumWellMetaBandSx,
+  albumWellMetaTextSx,
+} from './albumWellStyles';
 
 const PLACEHOLDER_TRACKS = Array.from({ length: 6 }, (_, track) => `track-${track}`);
 
+const rowSx: SxObject = {
+  columnGap: ALBUM_WELL_TRACK_COLUMN_GAP,
+  display: 'grid',
+  gridTemplateColumns: `${ALBUM_WELL_TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,
+  py: 1,
+};
+
 /**
  * Holds the well open at roughly its loaded height while the tracklist streams
- * in, so the grid below does not jump once it lands.
+ * in, so the grid below does not jump once it lands. Mirrors the well's gutter
+ * and text edge too, so the album name above it does not slide sideways either.
  */
 export function AlbumDetailBodySkeleton() {
   return (
-    <Stack spacing={1.5}>
-      <Skeleton sx={{ maxWidth: 220 }} variant="text" width="40%" />
-      <Skeleton sx={{ maxWidth: 320 }} variant="text" width="55%" />
-      <Stack spacing={0.5}>
+    <Box sx={{ display: 'contents' }}>
+      <Box data-role="album-meta-skeleton" sx={albumWellMetaBandSx}>
+        <Box sx={albumWellMetaTextSx}>
+          <Skeleton sx={{ maxWidth: 320 }} variant="text" width="55%" />
+          <Skeleton height={28} sx={{ maxWidth: 380 }} variant="text" width="65%" />
+        </Box>
+      </Box>
+      <Box sx={{ display: 'grid', gap: 0.5, gridArea: 'tracks' }}>
         {PLACEHOLDER_TRACKS.map((track) => (
-          <Skeleton height={34} key={track} variant="text" />
+          <Box data-role="track-row-skeleton" key={track} sx={rowSx}>
+            <Skeleton variant="text" />
+            <Box sx={{ display: 'grid', rowGap: 0.25 }}>
+              <Skeleton variant="text" width="70%" />
+              <Skeleton height={16} variant="text" width="45%" />
+            </Box>
+          </Box>
         ))}
-      </Stack>
-    </Stack>
+      </Box>
+    </Box>
   );
 }

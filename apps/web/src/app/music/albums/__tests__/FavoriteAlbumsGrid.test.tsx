@@ -1,12 +1,28 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
-import { render, screen } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { FavoriteAlbumsGrid } from '../FavoriteAlbumsGrid';
 
 jest.mock('next/navigation', () => ({
-  useSearchParams: jest.fn(() => new URLSearchParams()),
+  useRouter: jest.fn(),
+  useSearchParams: jest.fn(),
 }));
+
+const push = jest.fn();
+
+/** Points the mocked router hooks at a query, as the URL would after a nav. */
+const mockUrl = (query = '') => {
+  jest
+    .mocked(useSearchParams)
+    .mockReturnValue(new URLSearchParams(query) as ReturnType<typeof useSearchParams>);
+};
+
+beforeEach(() => {
+  push.mockClear();
+  jest.mocked(useRouter).mockReturnValue({ push } as unknown as ReturnType<typeof useRouter>);
+  mockUrl();
+});
 
 const albums: Array<PlaylistAlbum> = [
   {
@@ -49,23 +65,40 @@ const clickSort = async (user: ReturnType<typeof userEvent.setup>, label: string
   await user.click(screen.getByRole('radio', { hidden: true, name: label }));
 };
 
+/**
+ * Lays every element out at 100px per sibling so a cell that changes position
+ * in the grid reports a different rect before and after a sort.
+ */
+const layOutBySiblingOrder = () => {
+  jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+    this: HTMLElement,
+  ) {
+    const left = [...(this.parentElement?.children ?? [])].indexOf(this) * 100;
+    return { height: 100, left, top: 0, width: 100 } as DOMRect;
+  });
+};
+
 describe('FavoriteAlbumsGrid', () => {
-  it('defaults to newest added first and links each album to its detail route', () => {
-    render(<FavoriteAlbumsGrid albums={albums} />);
+  afterEach(() => {
+    jest.restoreAllMocks();
+    Reflect.deleteProperty(Element.prototype, 'animate');
+  });
+
+  it('renders linked, sleeved albums newest first', () => {
+    const { container } = render(<FavoriteAlbumsGrid albums={albums} />);
 
     expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
-
     const link = screen.getByRole('link', { name: 'Zebra' });
     expect(link).toHaveAttribute('href', '/music/albums?album=album-zebra');
     expect(link).not.toHaveAttribute('target', '_blank');
+    const coversPerCell = [...container.querySelectorAll('a')].map(
+      (link) => link.querySelectorAll('img').length,
+    );
+    expect(coversPerCell).toEqual([3, 3, 3]);
   });
 
-  it('expands the album named in the query and offers its cell as the way back', () => {
-    jest
-      .mocked(useSearchParams)
-      .mockReturnValueOnce(
-        new URLSearchParams('album=album-zebra') as ReturnType<typeof useSearchParams>,
-      );
+  it('expands the URL album while preserving its sleeved close socket', () => {
+    mockUrl('album=album-zebra');
 
     render(
       <FavoriteAlbumsGrid albums={albums}>
@@ -75,46 +108,125 @@ describe('FavoriteAlbumsGrid', () => {
 
     expect(screen.getByRole('region', { name: 'Zebra details' })).toBeInTheDocument();
     expect(screen.getByText('streamed tracklist')).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Close Zebra' })).toHaveAttribute(
-      'href',
-      '/music/albums',
-    );
+    const close = screen.getByRole('link', { name: 'Close Zebra' });
+    expect(close).toHaveAttribute('href', '/music/albums');
+    expect(close.querySelectorAll('img')).toHaveLength(3);
+    expect(screen.getAllByAltText('Zebra')).toHaveLength(1);
   });
 
-  it('sorts by album name', async () => {
+  it('sorts by each option and returns to recently added', async () => {
     const user = userEvent.setup();
     render(<FavoriteAlbumsGrid albums={albums} />);
 
     await clickSort(user, 'Album');
-
     expect(renderedAlbumNames()).toEqual(['Apple', 'Mango', 'Zebra']);
-  });
-
-  it('sorts by artist name', async () => {
-    const user = userEvent.setup();
-    render(<FavoriteAlbumsGrid albums={albums} />);
 
     await clickSort(user, 'Artist');
-
     expect(renderedAlbumNames()).toEqual(['Zebra', 'Apple', 'Mango']);
-  });
-
-  it('sorts by release date, newest first', async () => {
-    const user = userEvent.setup();
-    render(<FavoriteAlbumsGrid albums={albums} />);
 
     await clickSort(user, 'Release date');
-
     expect(renderedAlbumNames()).toEqual(['Apple', 'Mango', 'Zebra']);
+
+    await clickSort(user, 'Recently added');
+    expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
   });
 
-  it('returns to the default order via recently added', async () => {
+  it('opens with a skeleton before navigation, then shows matching streamed detail', async () => {
+    const user = userEvent.setup();
+    mockUrl('album=album-zebra');
+
+    const view = render(
+      <FavoriteAlbumsGrid albums={albums}>
+        <p>zebra tracklist</p>
+      </FavoriteAlbumsGrid>,
+    );
+
+    await user.click(screen.getByRole('link', { name: 'Mango' }));
+
+    expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
+    expect(screen.queryByText('zebra tracklist')).not.toBeInTheDocument();
+    expect(view.container.querySelectorAll('.MuiSkeleton-root').length).toBeGreaterThan(0);
+    await waitFor(() => {
+      expect(push).toHaveBeenCalledWith(
+        '/music/albums?album=album-mango',
+        expect.objectContaining({ transitionTypes: ['album-open'] }),
+      );
+    });
+
+    mockUrl('album=album-mango');
+    view.rerender(
+      <FavoriteAlbumsGrid albums={albums}>
+        <p>mango tracklist</p>
+      </FavoriteAlbumsGrid>,
+    );
+
+    expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
+    expect(screen.getByText('mango tracklist')).toBeInTheDocument();
+  });
+
+  it('lets URL changes retire a pending click permanently', async () => {
+    const user = userEvent.setup();
+    mockUrl('album=album-zebra');
+
+    const view = render(<FavoriteAlbumsGrid albums={albums} />);
+    await user.click(screen.getByRole('link', { name: 'Mango' }));
+    expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
+
+    mockUrl('album=album-apple');
+    view.rerender(
+      <FavoriteAlbumsGrid albums={albums}>
+        <p>apple tracklist</p>
+      </FavoriteAlbumsGrid>,
+    );
+
+    expect(screen.getByRole('region', { name: 'Apple details' })).toBeInTheDocument();
+    expect(screen.getByText('apple tracklist')).toBeInTheDocument();
+
+    mockUrl('album=album-zebra');
+    view.rerender(<FavoriteAlbumsGrid albums={albums} />);
+    expect(screen.getByRole('region', { name: 'Zebra details' })).toBeInTheDocument();
+    expect(screen.queryByRole('region', { name: 'Mango details' })).not.toBeInTheDocument();
+  });
+
+  it('closes the well on click without waiting for the navigation', async () => {
+    const user = userEvent.setup();
+    mockUrl('album=album-zebra');
+
+    render(
+      <FavoriteAlbumsGrid albums={albums}>
+        <p>zebra tracklist</p>
+      </FavoriteAlbumsGrid>,
+    );
+
+    await user.click(screen.getByRole('link', { name: 'Close Zebra' }));
+
+    expect(screen.queryByRole('region', { name: 'Zebra details' })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(push).toHaveBeenCalledWith(
+        '/music/albums',
+        expect.objectContaining({ transitionTypes: ['album-close'] }),
+      );
+    });
+  });
+
+  it('slides the cells that moved from where they were to where they landed', async () => {
+    const animate = jest.fn();
+    Object.defineProperty(Element.prototype, 'animate', { configurable: true, value: animate });
+    layOutBySiblingOrder();
     const user = userEvent.setup();
     render(<FavoriteAlbumsGrid albums={albums} />);
 
     await clickSort(user, 'Album');
-    await clickSort(user, 'Recently added');
 
-    expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
+    // Zebra and Apple swap ends; Mango holds the middle and stays still.
+    expect(animate).toHaveBeenCalledTimes(2);
+    expect(animate).toHaveBeenCalledWith(
+      [{ transform: 'translate(200px, 0px)' }, { transform: 'translate(0, 0)' }],
+      expect.objectContaining({ duration: expect.any(Number) }),
+    );
+    expect(animate).toHaveBeenCalledWith(
+      [{ transform: 'translate(-200px, 0px)' }, { transform: 'translate(0, 0)' }],
+      expect.objectContaining({ duration: expect.any(Number) }),
+    );
   });
 });

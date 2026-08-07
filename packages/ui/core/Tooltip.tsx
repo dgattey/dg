@@ -108,6 +108,16 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
     }, TIMING_FAST);
   };
 
+  // A mouse click focuses its target, so focus alone would pop a tooltip open
+  // on click and leave it there. `:focus-visible` is the browser's own answer
+  // to "was this focus keyboard-driven", so keyboard users keep the hint.
+  const showTooltipFromFocus = (event: React.FocusEvent<HTMLSpanElement>) => {
+    if (!event.target.matches(':focus-visible')) {
+      return;
+    }
+    showTooltip();
+  };
+
   // Don't render wrapper if no title
   if (!title) {
     return <>{children}</>;
@@ -169,7 +179,7 @@ export function Tooltip({ title, children, id: providedId, placement = 'bottom' 
     <Box
       component="span"
       onBlur={hideTooltip}
-      onFocus={showTooltip}
+      onFocus={showTooltipFromFocus}
       onMouseEnter={showTooltip}
       onMouseLeave={hideTooltip}
       sx={anchorSx}

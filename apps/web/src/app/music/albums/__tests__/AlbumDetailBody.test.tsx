@@ -1,6 +1,8 @@
 import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
 import { render, screen } from '@testing-library/react';
 import { AlbumDetailBody } from '../AlbumDetailBody';
+import { AlbumDetailBodySkeleton } from '../AlbumDetailBodySkeleton';
+import { ALBUM_WELL_TRACK_NUMBER_COLUMN } from '../albumWellStyles';
 
 const album: AlbumDetail = {
   artists: [
@@ -58,10 +60,40 @@ const album: AlbumDetail = {
   url: 'https://open.spotify.com/album/album-1',
 };
 
+function albumWithTracks(count: number): AlbumDetail {
+  const tracks = Array.from({ length: count }, (_, index) => ({
+    artists: [{ id: 'artist-1', name: 'Primary Artist', url: 'https://example.com/artist-1' }],
+    discNumber: 1,
+    durationMs: 120_000,
+    id: `filler-${index + 1}`,
+    name: `Track ${index + 1}`,
+    trackNumber: index + 1,
+    url: `https://example.com/track-${index + 1}`,
+  }));
+  return { ...album, totalTracks: count, tracks };
+}
+
+const threeTrackEp = albumWithTracks(3);
+const fortyFiveTrackAlbum = albumWithTracks(45);
+
+function byRole(container: HTMLElement, role: string): HTMLElement {
+  const element = container.querySelector<HTMLElement>(`[data-role="${role}"]`);
+  if (!element) {
+    throw new Error(`No element with data-role="${role}"`);
+  }
+  return element;
+}
+
+const templateOf = (element: HTMLElement) => getComputedStyle(element).gridTemplateColumns;
+const columnsOf = (element: HTMLElement) => getComputedStyle(element).gridColumn;
+
 describe('AlbumDetailBody', () => {
   it('renders numbered tracks and Spotify links for artists and tracks', () => {
     render(<AlbumDetailBody album={album} />);
 
+    expect(
+      screen.getByRole('heading', { level: 3, name: 'Open Primary Artist on Spotify' }),
+    ).toBeInTheDocument();
     expect(
       screen.getAllByRole('link', { name: 'Open Primary Artist on Spotify' })[0],
     ).toHaveAttribute('href', 'https://open.spotify.com/artist/artist-1');
@@ -95,10 +127,47 @@ describe('AlbumDetailBody', () => {
     expect(screen.queryByText(/Example Records/)).not.toBeInTheDocument();
   });
 
-  it('shows popularity as a meter with a spoken value', () => {
+  it('shows popularity as a labelled meter with a spoken value', () => {
     render(<AlbumDetailBody album={album} />);
 
-    expect(screen.getByRole('img', { name: 'Popularity 55 out of 100' })).toBeInTheDocument();
+    const meter = screen.getByRole('img', { name: 'Popularity 55 out of 100' });
+    expect(meter).toBeInTheDocument();
+    expect(meter).toHaveTextContent('Popularity');
+    expect(meter).toHaveTextContent('55');
     expect(screen.queryByText('Popularity 55')).not.toBeInTheDocument();
+  });
+
+  it('lands the meta and every track title on one text edge', () => {
+    const { container } = render(<AlbumDetailBody album={album} />);
+
+    const meta = byRole(container, 'album-meta');
+    const metaBand = meta.parentElement as HTMLElement;
+
+    expect(columnsOf(meta)).toBe('2');
+    expect(templateOf(metaBand)).toBe(`${ALBUM_WELL_TRACK_NUMBER_COLUMN} minmax(0, 1fr)`);
+    for (const row of container.querySelectorAll<HTMLElement>('[data-role="track-row"]')) {
+      expect(templateOf(row)).toBe(`${ALBUM_WELL_TRACK_NUMBER_COLUMN} minmax(0, 1fr) auto`);
+    }
+  });
+
+  it('keeps the gutter identical for a three-track EP and a long album', () => {
+    const { container, unmount } = render(<AlbumDetailBody album={threeTrackEp} />);
+    const epGutter = templateOf(byRole(container, 'track-row'));
+    unmount();
+
+    const long = render(<AlbumDetailBody album={fortyFiveTrackAlbum} />);
+
+    expect(templateOf(byRole(long.container, 'track-row'))).toBe(epGutter);
+  });
+
+  it('keeps the skeleton on the loaded column structure', () => {
+    const { container } = render(<AlbumDetailBodySkeleton />);
+
+    expect(templateOf(byRole(container, 'album-meta-skeleton'))).toBe(
+      `${ALBUM_WELL_TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,
+    );
+    expect(templateOf(byRole(container, 'track-row-skeleton'))).toBe(
+      `${ALBUM_WELL_TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,
+    );
   });
 });

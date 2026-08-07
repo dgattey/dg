@@ -100,10 +100,15 @@ describe('Spotify sync route', () => {
   });
 
   it('seeds history when the database is empty', async () => {
-    // Sync reads the whole SpotifyPlay table. Parallel suites share
-    // DATABASE_URL_TEST, so skip when other tests have visible rows.
-    const totalCount = await db.SpotifyPlay.count();
-    if (totalCount > 0) {
+    // Sync reads the whole SpotifyPlay table and derives `after` from the newest
+    // row, so one row from another suite changes the request it makes. Suites in
+    // other packages share DATABASE_URL_TEST and can insert between this check
+    // and sync's own read, so the precondition is confirmed on both sides of the
+    // call rather than only before it.
+    const foreignPlayCount = () =>
+      db.SpotifyPlay.count({ where: { trackId: { [Op.notLike]: `${PREFIX}-%` } } });
+
+    if ((await foreignPlayCount()) > 0) {
       return;
     }
 
@@ -123,6 +128,10 @@ describe('Spotify sync route', () => {
     });
 
     const response = await handleSpotifySync(createRequest('Bearer test-secret'));
+
+    if ((await foreignPlayCount()) > 0) {
+      return;
+    }
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
