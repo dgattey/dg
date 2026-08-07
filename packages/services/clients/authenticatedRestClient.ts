@@ -28,6 +28,13 @@ export type ClientProps = {
  * Creates a REST client that can be used to fetch resources from a base API, with auto-refreshing
  * access tokens built into the fetch function.
  */
+/**
+ * Ceiling for a single upstream request. Without this a slow third party can
+ * hold a server render open indefinitely, which the user experiences as a page
+ * that never finishes loading.
+ */
+const REQUEST_TIMEOUT_MS = 8_000;
+
 export function createClient({ endpoint, accessKey, refreshTokenConfig }: ClientProps) {
   assertHttpsEndpoint(endpoint);
   const api = wretch(endpoint).content('application/json');
@@ -46,8 +53,18 @@ export function createClient({ endpoint, accessKey, refreshTokenConfig }: Client
   /**
    * Spotify (and similar APIs) send `Retry-After` as seconds or an HTTP date.
    * Returns undefined when the header is missing or unparseable.
+   *
+   * Non-2xx responses arrive as a thrown wretch error rather than a `Response`,
+   * so unwrap that too — otherwise the header is invisible for exactly the
+   * statuses (429, 503) that send it.
    */
-  function readRetryAfterSeconds(resp: unknown): number | undefined {
+  function readRetryAfterSeconds(input: unknown): number | undefined {
+    const resp =
+      input instanceof Response
+        ? input
+        : typeof input === 'object' && input !== null && 'response' in input
+          ? (input as { response: unknown }).response
+          : undefined;
     if (!(resp instanceof Response)) {
       return undefined;
     }
@@ -71,7 +88,9 @@ export function createClient({ endpoint, accessKey, refreshTokenConfig }: Client
    * Wretch chain that can be used to further process the response based on status code.
    */
   async function getWithAuth(resource: string) {
-    const authedApi = await addAuth(api, false);
+    const authedApi = (await addAuth(api, false)).options({
+      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+    });
     const response = authedApi.get(resource).unauthorized(async (_error, req) => {
       // Renew credentials once and try to fetch again but fail if we hit another unauthorized
       log.info('Unauthorized request, refreshing access token', { resource });

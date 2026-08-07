@@ -73,67 +73,35 @@ export function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Retry configuration for Spotify API calls.
- */
-export const RETRY_CONFIG = {
-  /** Initial wait time in seconds for rate limit backoff */
-  initialBackoffSeconds: 5,
-  /** Maximum wait time in seconds for rate limit backoff */
-  maxBackoffSeconds: 30,
-  /** Maximum number of retries for rate-limited requests */
-  maxRetries: 3,
-} as const;
-
-/**
- * Result of a Spotify API request with rate limit retry.
+ * Result of a Spotify API request.
  */
 export type SpotifyRequestResult<T> =
   | { success: true; data: T; status: 200 }
   | { success: false; status: number; error: string };
 
 /**
- * Makes a GET request to Spotify with automatic rate limit retry.
- * Prefers Spotify's Retry-After when present, otherwise exponential backoff,
- * always capped at maxBackoffSeconds and maxRetries.
+ * Makes a GET request to Spotify and validates the payload.
+ *
+ * Deliberately does not retry. Every caller is on a page render, and sleeping
+ * through a rate limit while a visitor waits is never the right trade — an
+ * earlier backoff ladder here made `/music/albums` hang for 51 seconds before
+ * showing an empty page. Rate limits are absorbed by caching the successful
+ * result and by falling back to stored data, not by waiting.
  */
-export async function spotifyGetWithRetry<T>(
+export async function spotifyGet<T>(
   resource: string,
   schema: v.GenericSchema<unknown, T>,
   context: string,
 ): Promise<SpotifyRequestResult<T>> {
-  let retries = 0;
+  const { response, retryAfterSeconds, status } = await getSpotifyClient().get(resource);
 
-  while (retries <= RETRY_CONFIG.maxRetries) {
-    const { response, retryAfterSeconds, status } = await getSpotifyClient().get(resource);
-
+  if (status !== 200) {
     if (status === 429) {
-      if (retryAfterSeconds && retryAfterSeconds > RETRY_CONFIG.maxBackoffSeconds) {
-        log.warn(`Spotify rate limit exceeds retry budget (${context})`, {
-          resource,
-          retryAfterSeconds,
-        });
-        return { error: `Retry after ${retryAfterSeconds}s`, status, success: false };
-      }
-      const waitSeconds = retryAfterSeconds ?? RETRY_CONFIG.initialBackoffSeconds * (retries + 1);
-      log.warn(`Spotify rate limited (${context}), waiting`, {
-        resource,
-        retries,
-        retryAfterSeconds,
-        waitSeconds,
-      });
-      await sleep(waitSeconds * 1000);
-      retries++;
-      continue;
+      log.warn(`Spotify rate limited (${context})`, { resource, retryAfterSeconds });
     }
-
-    if (status !== 200) {
-      return { error: `HTTP ${status}`, status, success: false };
-    }
-
-    const data = v.parse(schema, await response.json());
-    return { data, status: 200, success: true };
+    return { error: `HTTP ${status}`, status, success: false };
   }
 
-  log.warn(`Spotify request failed after max retries (${context})`, { resource });
-  return { error: 'Max retries exceeded', status: 429, success: false };
+  const data = v.parse(schema, await response.json());
+  return { data, status: 200, success: true };
 }

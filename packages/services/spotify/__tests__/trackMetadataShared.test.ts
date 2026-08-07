@@ -5,9 +5,8 @@ import {
   extractMetadataFromTrack,
   extractTrackId,
   getExistingTrackMetadata,
-  RETRY_CONFIG,
   sleep,
-  spotifyGetWithRetry,
+  spotifyGet,
   trackSchema,
 } from '../trackMetadataShared';
 
@@ -214,7 +213,7 @@ describe('extractMetadataFromTrack', () => {
   });
 });
 
-describe('spotifyGetWithRetry', () => {
+describe('spotifyGet', () => {
   const testSchema = v.looseObject({
     data: v.string(),
   });
@@ -229,7 +228,7 @@ describe('spotifyGetWithRetry', () => {
       status: 200,
     });
 
-    const result = await spotifyGetWithRetry('test-resource', testSchema, 'test');
+    const result = await spotifyGet('test-resource', testSchema, 'test');
 
     expect(result).toEqual({
       data: { data: 'test-value' },
@@ -245,7 +244,7 @@ describe('spotifyGetWithRetry', () => {
       status: 500,
     });
 
-    const result = await spotifyGetWithRetry('test-resource', testSchema, 'test');
+    const result = await spotifyGet('test-resource', testSchema, 'test');
 
     expect(result).toEqual({
       error: 'HTTP 500',
@@ -260,7 +259,7 @@ describe('spotifyGetWithRetry', () => {
       status: 404,
     });
 
-    const result = await spotifyGetWithRetry('test-resource', testSchema, 'test');
+    const result = await spotifyGet('test-resource', testSchema, 'test');
 
     expect(result).toEqual({
       error: 'HTTP 404',
@@ -269,62 +268,24 @@ describe('spotifyGetWithRetry', () => {
     });
   });
 
-  it('does not retry before a Retry-After beyond the bounded retry budget', async () => {
+  it('gives up immediately on a rate limit instead of making the caller wait', async () => {
     mockSpotifyGet.mockResolvedValue({
       response: { json: async () => ({}) },
-      retryAfterSeconds: RETRY_CONFIG.maxBackoffSeconds + 1,
+      retryAfterSeconds: 30,
       status: 429,
     });
 
-    const result = await spotifyGetWithRetry('test-resource', testSchema, 'test');
+    const started = Date.now();
+    const result = await spotifyGet('test-resource', testSchema, 'test');
 
     expect(mockSpotifyGet).toHaveBeenCalledTimes(1);
+    expect(Date.now() - started).toBeLessThan(1000);
     expect(result).toEqual({
-      error: `Retry after ${RETRY_CONFIG.maxBackoffSeconds + 1}s`,
+      error: 'HTTP 429',
       status: 429,
       success: false,
     });
   });
-
-  it('retries on 429 rate limit then succeeds', async () => {
-    let callCount = 0;
-    mockSpotifyGet.mockImplementation(() => {
-      callCount++;
-      if (callCount === 1) {
-        return Promise.resolve({ response: { json: async () => ({}) }, status: 429 });
-      }
-      return Promise.resolve({
-        response: { json: async () => ({ data: 'retry-success' }) },
-        status: 200,
-      });
-    });
-
-    const result = await spotifyGetWithRetry('test-resource', testSchema, 'test');
-
-    expect(callCount).toBe(2);
-    expect(result).toEqual({
-      data: { data: 'retry-success' },
-      status: 200,
-      success: true,
-    });
-  }, 15000);
-
-  it('fails after max retries on persistent 429', async () => {
-    mockSpotifyGet.mockResolvedValue({
-      response: { json: async () => ({}) },
-      status: 429,
-    });
-
-    const result = await spotifyGetWithRetry('test-resource', testSchema, 'test');
-
-    // 4 calls: initial + 3 retries
-    expect(mockSpotifyGet).toHaveBeenCalledTimes(4);
-    expect(result).toEqual({
-      error: 'Max retries exceeded',
-      status: 429,
-      success: false,
-    });
-  }, 60000);
 });
 
 describe('trackSchema', () => {

@@ -1,7 +1,7 @@
 import 'server-only';
 
 import * as v from 'valibot';
-import { spotifyGetWithRetry } from './trackMetadataShared';
+import { spotifyGet } from './trackMetadataShared';
 
 /**
  * Extended track schema for fetching display-ready data.
@@ -69,11 +69,7 @@ function bestImage(images: Array<{ height: number; url: string; width: number }>
  * Returns structured data ready for Music* table inserts.
  */
 export async function fetchTrackDisplayData(trackId: string): Promise<TrackDisplayData | null> {
-  const result = await spotifyGetWithRetry(
-    `tracks/${trackId}`,
-    trackDisplaySchema,
-    'track display',
-  );
+  const result = await spotifyGet(`tracks/${trackId}`, trackDisplaySchema, 'track display');
   if (!result.success) {
     return null;
   }

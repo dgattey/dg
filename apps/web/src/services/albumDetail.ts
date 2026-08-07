@@ -10,6 +10,11 @@ const ALBUM_DETAIL_TAG = 'album-detail';
 /**
  * Cached album-detail read. Isolated so Spotify failures do not poison the
  * hours-long cache with a null entry.
+ *
+ * Local rather than `remote` on purpose: `fetchAlbumDetail` already reads the
+ * database first and writes through, so a miss here costs a fast query rather
+ * than a Spotify call. The favorites playlist needs `remote` because it has no
+ * such store in front of it.
  */
 async function getAlbumDetailCached(albumId: string) {
   'use cache';
