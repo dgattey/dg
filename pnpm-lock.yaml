@@ -389,10 +389,19 @@ importers:
       react-dom:
         specifier: 19.3.0-canary-756fdd47-20260727
         version: 19.3.0-canary-756fdd47-20260727(react@19.3.0-canary-756fdd47-20260727)
+      server-only:
+        specifier: 'catalog:'
+        version: 0.0.1
     devDependencies:
+      '@dg/testing':
+        specifier: workspace:*
+        version: link:../testing
       '@dg/tsconfig':
         specifier: workspace:*
         version: link:../tsconfig
+      '@types/jest':
+        specifier: 'catalog:'
+        version: 30.0.0
       '@types/node':
         specifier: 'catalog:'
         version: 26.1.1
@@ -408,6 +417,9 @@ importers:
       dotenv-mono:
         specifier: 'catalog:'
         version: 1.5.1
+      jest:
+        specifier: 'catalog:'
+        version: 30.4.2(@types/node@26.1.1)(babel-plugin-macros@3.1.0)(esbuild-register@3.6.0(esbuild@0.28.1)(supports-color@8.1.1))(supports-color@8.1.1)
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
