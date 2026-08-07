@@ -7,10 +7,15 @@ jest.mock('@dg/services/spotify/spotifyClient', () => ({
   getSpotifyClient: jest.fn(),
 }));
 
+jest.mock('@dg/services/spotify/refreshFavoriteAlbumsSnapshot', () => ({
+  refreshFavoriteAlbumsSnapshotWithLogging: jest.fn(),
+}));
+
 jest.mock('next/cache', () => ({
   revalidateTag: jest.fn(),
 }));
 
+import { refreshFavoriteAlbumsSnapshotWithLogging } from '@dg/services/spotify/refreshFavoriteAlbumsSnapshot';
 // Get typed references to the mocked functions
 import * as spotifyClient from '@dg/services/spotify/spotifyClient';
 import { revalidateTag } from 'next/cache';
@@ -18,6 +23,7 @@ import { handleSpotifySync } from '../route';
 
 const mockSpotifyGet = jest.fn();
 const mockGetSpotifyClient = jest.mocked(spotifyClient.getSpotifyClient);
+const mockRefreshFavoriteAlbums = jest.mocked(refreshFavoriteAlbumsSnapshotWithLogging);
 const mockRevalidateTag = jest.mocked(revalidateTag);
 
 // Use unique prefix for this test file to avoid conflicts with parallel tests
@@ -71,6 +77,7 @@ beforeAll(() => {
 
 beforeEach(async () => {
   jest.clearAllMocks();
+  mockRefreshFavoriteAlbums.mockResolvedValue({ count: 3 });
   mockGetSpotifyClient.mockReturnValue({ get: mockSpotifyGet } as ReturnType<
     typeof spotifyClient.getSpotifyClient
   >);
@@ -135,6 +142,8 @@ describe('Spotify sync route', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
+      favoriteAlbums: 3,
+      favoriteAlbumsRefreshed: true,
       gapDetected: false,
       inserted: 1,
       success: true,
@@ -144,6 +153,7 @@ describe('Spotify sync route', () => {
       expect.stringMatching(/^me\/player\/recently-played\?limit=50$/),
     );
     expect(mockRevalidateTag).toHaveBeenCalledWith('music-history', 'max');
+    expect(mockRevalidateTag).toHaveBeenCalledWith('favorite-albums', 'max');
   });
 
   it('syncs when history already exists', async () => {
@@ -176,6 +186,8 @@ describe('Spotify sync route', () => {
     expect(response.body.total).toBe(1);
     expect(response.body.gapDetected).toBe(false);
     expect(response.body.success).toBe(true);
+    expect(response.body.favoriteAlbums).toBe(3);
+    expect(response.body.favoriteAlbumsRefreshed).toBe(true);
     // Count only rows with our test prefix to avoid conflicts with parallel tests
     const rowCount = await db.SpotifyPlay.count({
       where: { trackId: { [Op.like]: `${PREFIX}-%` } },
@@ -184,5 +196,6 @@ describe('Spotify sync route', () => {
 
     // Verify revalidateTag was called when tracks were inserted
     expect(mockRevalidateTag).toHaveBeenCalledWith('music-history', 'max');
+    expect(mockRevalidateTag).toHaveBeenCalledWith('favorite-albums', 'max');
   });
 });

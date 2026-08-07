@@ -22,8 +22,15 @@ export const metadata: Metadata = {
 async function AlbumsGrid({ children }: { children: ReactNode }) {
   const albums = await getFavoriteAlbums();
 
-  if (!albums?.length) {
-    return <Typography color="text.secondary">No albums right now. Check back soon.</Typography>;
+  if (albums === null) {
+    return (
+      <Typography color="text.secondary">
+        Favorite albums are temporarily unavailable. Please try again soon.
+      </Typography>
+    );
+  }
+  if (albums.length === 0) {
+    return <Typography color="text.secondary">No favorite albums yet.</Typography>;
   }
 
   return <FavoriteAlbumsGrid albums={albums}>{children}</FavoriteAlbumsGrid>;

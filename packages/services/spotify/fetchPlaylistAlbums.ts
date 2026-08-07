@@ -6,7 +6,6 @@ import {
   playlistItemsPageApiSchema,
 } from '@dg/content-models/spotify/PlaylistAlbums';
 import { log } from '@dg/shared-core/logging/log';
-import { readFavoriteAlbumsSnapshot, writeFavoriteAlbumsSnapshot } from './favoriteAlbumsSnapshot';
 import { spotifyGet } from './trackMetadataShared';
 
 const PAGE_SIZE = 50;
@@ -21,11 +20,9 @@ const MAX_PAGES = 100;
  * Fetches every item of a playlist and collapses them into unique albums,
  * newest playlist addition first.
  *
- * This runs on a user's request path, so it never waits out a rate limit. A
- * live read that fails falls back to the stored snapshot from the last
- * successful read, and only throws when there is nothing stored either — so
- * callers can still tell "no data at all" from "showing slightly stale data".
- * A successful read refreshes the snapshot for the next failure.
+ * This is called by the background sync, never by a page render. It still does
+ * not retry: a rate limit is honored by leaving the last snapshot untouched
+ * and trying again on the next scheduled run.
  */
 export async function fetchPlaylistAlbums(playlistId: string): Promise<Array<PlaylistAlbum>> {
   const items: Array<unknown> = [];
@@ -34,14 +31,6 @@ export async function fetchPlaylistAlbums(playlistId: string): Promise<Array<Pla
     const resource = `playlists/${playlistId}/tracks?limit=${PAGE_SIZE}&offset=${page * PAGE_SIZE}`;
     const result = await spotifyGet(resource, playlistItemsPageApiSchema, 'playlist page');
     if (!result.success) {
-      const stored = await readFavoriteAlbumsSnapshot();
-      if (stored) {
-        log.warn('Serving stored favorite albums; live playlist read failed', {
-          playlistId,
-          status: result.status,
-        });
-        return stored;
-      }
       throw new Error(`Spotify playlist ${playlistId} fetch failed with status ${result.status}`);
     }
     items.push(...result.data.items);
@@ -53,7 +42,5 @@ export async function fetchPlaylistAlbums(playlistId: string): Promise<Array<Pla
       playlistId,
     });
   }
-  const albums = mapPlaylistAlbumsFromApi(items);
-  await writeFavoriteAlbumsSnapshot(albums);
-  return albums;
+  return mapPlaylistAlbumsFromApi(items);
 }

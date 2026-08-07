@@ -16,19 +16,24 @@ const SNAPSHOT_FIELDS = [
 ] as const;
 
 /**
- * Last stored favorites list, newest playlist addition first, or null when
- * nothing has been stored yet. Never throws: a missing table (a preview
- * deployment reading a database that hasn't migrated) has to degrade rather
- * than take the page down.
+ * Last stored favorites list, newest playlist addition first, or null when no
+ * refresh has ever completed. An empty array means Spotify was reached and the
+ * playlist was genuinely empty.
+ *
+ * Never throws: a missing table (a preview deployment reading a database that
+ * hasn't migrated) has to degrade rather than take the page down.
  */
 export async function readFavoriteAlbumsSnapshot(): Promise<Array<PlaylistAlbum> | null> {
   try {
-    const rows = await db.FavoriteAlbum.findAll({
-      attributes: [...SNAPSHOT_FIELDS],
-      order: [['addedAt', 'DESC']],
-      raw: true,
-    });
-    return rows.length > 0 ? (rows as unknown as Array<PlaylistAlbum>) : null;
+    const [snapshot, rows] = await Promise.all([
+      db.FavoriteAlbumSnapshot.findOne({ where: { singleton: true } }),
+      db.FavoriteAlbum.findAll({
+        attributes: [...SNAPSHOT_FIELDS],
+        order: [['addedAt', 'DESC']],
+        raw: true,
+      }),
+    ]);
+    return snapshot ? (rows as unknown as Array<PlaylistAlbum>) : null;
   } catch (error) {
     log.warn('Could not read stored favorite albums', { error });
     return null;
@@ -39,16 +44,20 @@ export async function readFavoriteAlbumsSnapshot(): Promise<Array<PlaylistAlbum>
  * Replaces the stored favorites list with a fresh one. The playlist is the
  * source of truth, so removals have to disappear here too — hence replace
  * rather than upsert. Never throws; failing to store is not worth failing a
- * request that already has its data.
+ * request that already has its data. The marker row records a successful empty
+ * playlist too, so the UI can tell empty from temporarily unavailable.
  */
 export async function writeFavoriteAlbumsSnapshot(albums: Array<PlaylistAlbum>): Promise<void> {
-  if (albums.length === 0) {
-    return;
-  }
   try {
     await dbClient.transaction(async (transaction) => {
       await db.FavoriteAlbum.destroy({ transaction, where: {} });
-      await db.FavoriteAlbum.bulkCreate([...albums], { transaction });
+      if (albums.length > 0) {
+        await db.FavoriteAlbum.bulkCreate([...albums], { transaction });
+      }
+      await db.FavoriteAlbumSnapshot.upsert(
+        { refreshedAt: new Date(), singleton: true },
+        { transaction },
+      );
     });
   } catch (error) {
     log.warn('Could not store favorite albums', { error });

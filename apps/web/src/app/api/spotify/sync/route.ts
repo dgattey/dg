@@ -1,3 +1,4 @@
+import { refreshFavoriteAlbumsSnapshotWithLogging } from '@dg/services/spotify/refreshFavoriteAlbumsSnapshot';
 import { syncSpotifyHistoryWithLogging } from '@dg/services/spotify/syncSpotifyHistory';
 import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
@@ -12,6 +13,8 @@ type SyncResponse = {
   status: number;
   body: {
     error?: string;
+    favoriteAlbums?: number;
+    favoriteAlbumsRefreshed?: boolean;
     gapDetected?: boolean;
     inserted?: number;
     success?: boolean;
@@ -31,9 +34,21 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
     context: 'cron',
     failureLogLevel: 'error',
   });
+  const favoriteAlbums = await refreshFavoriteAlbumsSnapshotWithLogging();
+
+  if (favoriteAlbums) {
+    revalidateTag('favorite-albums', 'max');
+  }
 
   if (!result) {
-    return { body: { error: 'Sync failed' }, status: 500 };
+    return {
+      body: {
+        error: 'History sync failed',
+        favoriteAlbums: favoriteAlbums?.count,
+        favoriteAlbumsRefreshed: favoriteAlbums !== null,
+      },
+      status: 500,
+    };
   }
 
   if (result.inserted > 0) {
@@ -42,6 +57,8 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
 
   return {
     body: {
+      favoriteAlbums: favoriteAlbums?.count,
+      favoriteAlbumsRefreshed: favoriteAlbums !== null,
       gapDetected: result.gapDetected,
       inserted: result.inserted,
       success: true,
