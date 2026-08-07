@@ -42,19 +42,30 @@ export const SITE_FOOTER_VIEW_TRANSITION_NAME = 'site-footer';
  * row under a bar washes to cream from the top down and reads as blank tiles
  * with a sliver of artwork below.
  *
- * So the chrome just doesn't paint while a transition runs. Both sides read
- * this rule at capture time, so neither page carries a band, and the strip above
- * a pinned bar is briefly unmasked instead — the lesser of the two, and it lands
- * back the instant the flight ends. Hiding beats a group of its own: a name per
- * piece is the only way to lift them out of the page bitmap, and a page with
- * several bars needs a unique one for each, which no widely supported keyword
- * gives us.
+ * So the chrome just doesn't paint while a navigation's transition runs. Both
+ * sides read this rule at capture time, so neither page carries a band, and the
+ * strip above a pinned bar is briefly unmasked instead — the lesser of the two,
+ * and it lands back the instant the flight ends. Hiding beats a group of its own:
+ * a name per piece is the only way to lift them out of the page bitmap, and a
+ * page with several bars needs a unique one for each, which no widely supported
+ * keyword gives us.
+ *
+ * Album open/close is exempt, because there is no sweep to guard against: those
+ * transitions deliberately miss the page rise/fall map, so the page underneath
+ * never travels. Hiding there only costs — the chrome is what covers the artwork
+ * scrolled up behind the heading and the sorter, so dropping it flashes a band of
+ * album covers through the pinned bar for the length of the transition.
  *
  * The selector leads with `html` rather than `:root`, which Emotion would read
  * as a pseudo-class on this element and never match.
  */
 export const stickyDecorSx: SxObject = {
-  'html:active-view-transition &': {
+  [[
+    'html:active-view-transition',
+    `:not(:active-view-transition-type(${ALBUM_TRANSITION_TYPES.open}))`,
+    `:not(:active-view-transition-type(${ALBUM_TRANSITION_TYPES.close}))`,
+    ' &',
+  ].join('')]: {
     opacity: 0,
   },
 };

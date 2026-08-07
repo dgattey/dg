@@ -1,7 +1,27 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { act, render, screen } from '@testing-library/react';
+import { AlbumDetailBodySkeleton } from '../AlbumDetailBodySkeleton';
 import { AlbumWell } from '../AlbumWell';
 import { ALBUM_WELL_TRACK_NUMBER_COLUMN } from '../albumWellStyles';
+
+/**
+ * The well's height reserve is a conditional CSS rule rather than a resolved
+ * style, so it is read off the stylesheet Emotion emits for the well. Emotion
+ * inserts through the CSSOM here, which leaves the `style` tags themselves empty.
+ */
+function wellRules() {
+  const classes = [...(document.querySelector('section')?.classList ?? [])];
+  const rules = [...document.styleSheets].flatMap((sheet) => {
+    try {
+      return [...sheet.cssRules].map((rule) => rule.cssText);
+    } catch {
+      return [];
+    }
+  });
+  return rules
+    .filter((rule) => classes.some((className) => rule.includes(`.${className}`)))
+    .join('\n');
+}
 
 const album: PlaylistAlbum = {
   addedAt: '2024-01-02T03:04:05Z',
@@ -102,7 +122,9 @@ describe('AlbumWell', () => {
       observerCallback?.([] as unknown as Array<ResizeObserverEntry>, {} as ResizeObserver);
     });
 
-    expect(shell).toHaveStyle({ height: '80px', overflow: 'hidden' });
+    // `clip`, not `hidden`: a scrollport here would re-anchor the well's sticky
+    // art and name band to the shell and slide them down their `top` offsets.
+    expect(shell).toHaveStyle({ height: '80px', overflow: 'clip' });
 
     act(() => {
       rafCallback?.(0);
@@ -119,10 +141,79 @@ describe('AlbumWell', () => {
     });
 
     expect(shell).not.toHaveStyle({ height: '240px' });
-    expect(getComputedStyle(shell).overflow).not.toBe('hidden');
+    expect(getComputedStyle(shell).overflow).toBe('visible');
 
     rafSpy.mockRestore();
     global.ResizeObserver = OriginalResizeObserver;
+  });
+
+  it('floors the well at the outgoing height while a placeholder stands in', () => {
+    let observerCallback: ResizeObserverCallback | undefined;
+    const OriginalResizeObserver = global.ResizeObserver;
+
+    global.ResizeObserver = class {
+      constructor(callback: ResizeObserverCallback) {
+        observerCallback = callback;
+      }
+      observe = jest.fn();
+      unobserve = jest.fn();
+      disconnect = jest.fn();
+    } as unknown as typeof ResizeObserver;
+
+    const { container, rerender } = render(
+      <AlbumWell album={album}>
+        <div>album one tracklist</div>
+      </AlbumWell>,
+    );
+
+    const shell = container.firstElementChild as HTMLElement;
+    const measure = shell.firstElementChild as HTMLElement;
+    const scrollHeight = 900;
+
+    Object.defineProperty(measure, 'scrollHeight', {
+      configurable: true,
+      get: () => scrollHeight,
+    });
+
+    // Settle on album one's tall tracklist.
+    act(() => {
+      observerCallback?.([] as unknown as Array<ResizeObserverEntry>, {} as ResizeObserver);
+    });
+
+    expect(wellRules()).not.toMatch(/min-height/);
+
+    // Switching albums swaps in a placeholder far shorter than what it replaces.
+    act(() => {
+      rerender(
+        <AlbumWell album={{ ...album, id: 'album-2', name: 'Other Album' }}>
+          <AlbumDetailBodySkeleton />
+        </AlbumWell>,
+      );
+    });
+
+    const floored = wellRules();
+
+    // Scoped to the placeholder, so its removal is what drops the floor.
+    expect(floored).toMatch(
+      /:has\(\[data-role="album-detail-placeholder"\]\)\s*\{\s*min-height:\s*900px/,
+    );
+    expect(screen.getByRole('region', { name: 'Other Album details' })).toBeInTheDocument();
+
+    // The floor's slack has to collect below the tracklist. Stretched rows would
+    // spread it through the card and strand the placeholder past the fold.
+    expect(floored).toMatch(/align-content:\s*start/);
+
+    global.ResizeObserver = OriginalResizeObserver;
+  });
+
+  it('has no floor to apply before an album has ever been measured', () => {
+    render(
+      <AlbumWell album={album}>
+        <AlbumDetailBodySkeleton />
+      </AlbumWell>,
+    );
+
+    expect(wellRules()).not.toMatch(/min-height/);
   });
 
   it('skips height tweening when the user prefers reduced motion', () => {
