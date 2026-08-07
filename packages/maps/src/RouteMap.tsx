@@ -13,6 +13,9 @@ const ROUTE_PADDING = 42;
 const DEFAULT_SIZE = 320;
 const STRAVA_ORANGE = '#fc4c02';
 
+const paperMix = (percent: number) =>
+  `color-mix(in srgb, var(--mui-palette-background-paper) ${percent}%, transparent)`;
+
 const containerSx: SxObject = {
   backgroundColor: 'var(--mui-palette-background-paper)',
   height: '100%',
@@ -37,31 +40,30 @@ const underlaySx: SxObject = {
   zIndex: 0,
 };
 
-const tileLayerSx: SxObject = {
+const getTileLayerSx = (dark: boolean): SxObject => ({
   // Pigeon paints its own opaque background, which would hide the placeholder.
   '& > div': {
     backgroundColor: 'transparent !important',
   },
-  // Mutes the basemap's landcover so the route and card copy lead, while roads,
-  // trails and water still read as a map.
-  filter: 'saturate(0.62)',
+  // Outdoors is vivid and fully labelled, so light mode also lifts its darkest
+  // ink — road casings and place labels — toward the landcover. Without that the
+  // basemap's own labels, not the route, become the worst thing under the copy.
+  filter: dark ? 'saturate(0.85)' : 'saturate(0.5) brightness(1.1) contrast(0.76)',
   inset: 0,
   position: 'absolute',
   zIndex: 1,
-};
+});
 
 /**
- * Knocks the basemap back just far enough for the copy to win, weighted toward
- * the bottom where the densest text sits. Outdoors is a vivid, fully labelled
- * style so it needs more help than the already-muted dark basemap.
+ * A mild, near-uniform knock-back that sets how present the basemap feels.
+ * Legibility is the host's job: whatever renders text over this map is expected
+ * to back its own text regions, since only it knows where the copy sits.
  */
 const getScrimSx = (dark: boolean): SxObject => {
-  const [top, middle, bottom] = dark ? ([16, 28, 44] as const) : ([32, 42, 55] as const);
-  const paper = (percent: number) =>
-    `color-mix(in srgb, var(--mui-palette-background-paper) ${percent}%, transparent)`;
+  const [top, bottom] = dark ? ([10, 20] as const) : ([20, 28] as const);
 
   return {
-    background: `linear-gradient(180deg, ${paper(top)} 0%, ${paper(middle)} 45%, ${paper(bottom)} 100%)`,
+    background: `linear-gradient(180deg, ${paperMix(top)} 0%, ${paperMix(bottom)} 100%)`,
     inset: 0,
     position: 'absolute',
     zIndex: 2,
@@ -190,7 +192,7 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
         })}
         sx={underlaySx}
       />
-      <Box sx={tileLayerSx}>
+      <Box sx={getTileLayerSx(dark)}>
         <PigeonMapCore
           animate={false}
           attribution={false}
@@ -214,10 +216,10 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
           component="path"
           d={routePath}
           fill="none"
-          stroke="color-mix(in srgb, var(--mui-palette-background-paper) 78%, transparent)"
+          stroke={dark ? 'rgb(0 0 0 / 0.5)' : paperMix(92)}
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={9}
+          strokeWidth={7}
           vectorEffect="non-scaling-stroke"
         />
         <Box
@@ -227,7 +229,7 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
           stroke={STRAVA_ORANGE}
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={4.5}
+          strokeWidth={3}
           vectorEffect="non-scaling-stroke"
         />
       </Box>
