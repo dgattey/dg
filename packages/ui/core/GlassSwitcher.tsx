@@ -1,12 +1,19 @@
 'use client';
 
-import { Box, IconButton, Menu, MenuItem, Radio, RadioGroup, Typography } from '@mui/material';
-import type { MouseEvent, ReactNode } from 'react';
-import { useId, useState } from 'react';
+import { Box, IconButton, Radio, RadioGroup, Typography } from '@mui/material';
+import type { FocusEvent, KeyboardEvent, ReactNode } from 'react';
+import { useEffect, useId, useRef, useState } from 'react';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
 import { createTransition, TIMING_MEDIUM } from '../helpers/timing';
 import type { SxElement, SxObject } from '../theme';
 import { GlassContainer } from './GlassContainer';
+import {
+  DISCLOSURE_ROW_GAP,
+  disclosureListSx,
+  GlassDisclosurePanel,
+  GlassDisclosureRow,
+  GlassDisclosureThumb,
+} from './GlassDisclosurePanel';
 import { MouseAwareGlassContainer } from './MouseAwareGlassContainer';
 import { Tooltip } from './Tooltip';
 
@@ -119,34 +126,70 @@ const optionLabelSx: SxObject = {
 /** Size to match adjacent header glass container (Logo ~52px + container py 0.75 each side) */
 const MOBILE_CONTAINER_SIZE = 64;
 
-/** Mobile icon button - fills container for large touch target */
-const mobileButtonSx: SxObject = {
+/**
+ * Show only on mobile (xs), hide on sm+. Reserves the collapsed circle so the
+ * panel hangs out of flow and opening it never reflows the sticky bar it sits in.
+ */
+const mobileOnlySx: SxObject = {
+  display: { sm: 'none', xs: 'block' },
+  height: MOBILE_CONTAINER_SIZE,
+  position: 'relative',
+  width: MOBILE_CONTAINER_SIZE,
+};
+
+/**
+ * The glass circle sits *behind* the trigger as a sibling rather than wrapping
+ * it, for the same reason the header capsule does: `backdrop-filter` would make
+ * it the backdrop root for the panel hanging below it, which has nothing behind
+ * it to sample and so paints transparent.
+ */
+const mobileGlassSx: SxObject = {
+  borderRadius: '50%',
+  inset: 0,
+  position: 'absolute',
+};
+
+/** Fills the reserved circle, so the whole glass disc is the tap target. */
+const mobileTriggerSx: SxObject = {
   '& svg': {
+    ...createBouncyTransition('scale'),
+    display: 'block',
     height: spacingPx(SPACING.iconSize),
     width: spacingPx(SPACING.iconSize),
+  },
+  '&:hover svg': {
+    scale: 1.2,
   },
   color: 'var(--mui-palette-primary-main)',
   height: '100%',
+  inset: 0,
+  position: 'absolute',
   width: '100%',
 };
 
-const menuItemSx: SxObject = {
-  '& svg': {
-    height: spacingPx(SPACING.iconSize),
-    marginRight: 1.5,
-    width: spacingPx(SPACING.iconSize),
-  },
-  color: 'var(--mui-palette-primary-main)',
+/** Hangs the panel clear of the 64px disc rather than the 48px header row. */
+const mobilePanelSx: SxObject = {
+  top: MOBILE_CONTAINER_SIZE + DISCLOSURE_ROW_GAP,
 };
 
-/** Show only on mobile (xs), hide on sm+ - circular, same height as adjacent content */
-const mobileOnlySx: SxObject = {
-  alignItems: 'center',
-  borderRadius: '50%',
-  display: { sm: 'none', xs: 'flex' },
-  height: MOBILE_CONTAINER_SIZE,
-  justifyContent: 'center',
-  width: MOBILE_CONTAINER_SIZE,
+const optionRowSx: SxObject = {
+  '&:has(input:focus-visible)': {
+    outline: '-webkit-focus-ring-color auto 1px',
+  },
+  cursor: 'pointer',
+};
+
+/**
+ * Stretched over its row so the whole row is the tap target, and kept at zero
+ * opacity rather than `display: none` so it stays focusable and announced.
+ */
+const mobileInputSx: SxObject = {
+  appearance: 'none',
+  cursor: 'pointer',
+  inset: 0,
+  margin: 0,
+  opacity: 0,
+  position: 'absolute',
 };
 
 /** Show only on desktop (sm+), hide on mobile */
@@ -223,7 +266,12 @@ export function GlassSwitcher({
   const menuId = useId();
   // Unique radio name so multiple switchers on a page don't share a native group
   const radioGroupName = useId();
-  const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null);
+  // The mobile panel renders alongside the desktop row, so it needs its own group
+  const mobileRadioGroupName = useId();
+  const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const mobileRootRef = useRef<HTMLDivElement>(null);
+  const mobileListRef = useRef<HTMLDivElement>(null);
+  const mobileTriggerRef = useRef<HTMLButtonElement>(null);
 
   const selectedIndex = Math.max(
     0,
@@ -232,17 +280,50 @@ export function GlassSwitcher({
   const selectedOption = options[selectedIndex];
   const optionCount = options.length;
 
-  const handleMenuOpen = (event: MouseEvent<HTMLButtonElement>) => {
-    setMenuAnchor(event.currentTarget);
+  // Focus lands on the selected row when the panel opens, wherever it opened from
+  useEffect(() => {
+    if (!isMobileOpen) {
+      return;
+    }
+    mobileListRef.current?.querySelector<HTMLInputElement>('input:checked')?.focus();
+  }, [isMobileOpen]);
+
+  useEffect(() => {
+    if (!isMobileOpen) {
+      return;
+    }
+    const closeOnOutsidePress = (event: PointerEvent) => {
+      if (!mobileRootRef.current?.contains(event.target as Node)) {
+        setIsMobileOpen(false);
+      }
+    };
+    document.addEventListener('pointerdown', closeOnOutsidePress);
+    return () => {
+      document.removeEventListener('pointerdown', closeOnOutsidePress);
+    };
+  }, [isMobileOpen]);
+
+  const collapseMobile = () => {
+    setIsMobileOpen(false);
+    mobileTriggerRef.current?.focus();
   };
 
-  const handleMenuClose = () => {
-    setMenuAnchor(null);
+  const handleMobileKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (isMobileOpen && event.key === 'Escape') {
+      event.preventDefault();
+      collapseMobile();
+    }
   };
 
-  const handleMenuSelect = (newValue: string) => {
+  const handleMobileFocusOut = (event: FocusEvent<HTMLDivElement>) => {
+    if (isMobileOpen && !event.currentTarget.contains(event.relatedTarget)) {
+      setIsMobileOpen(false);
+    }
+  };
+
+  const handleMobileSelect = (newValue: string) => {
     onChange(newValue);
-    handleMenuClose();
+    collapseMobile();
   };
 
   const desktopSx: SxElement = sx
@@ -257,39 +338,68 @@ export function GlassSwitcher({
 
   return (
     <>
-      {/* Mobile: IconButton + Menu - uses GlassContainer (no mouse effects on touch) */}
-      <GlassContainer data-role="glass-switcher" sx={mobileSx}>
+      {/* Mobile: glass disc trigger + the shared disclosure panel */}
+      <Box
+        data-role="glass-switcher-mobile"
+        onBlur={handleMobileFocusOut}
+        onKeyDown={handleMobileKeyDown}
+        ref={mobileRootRef}
+        sx={mobileSx}
+      >
+        <GlassContainer aria-hidden={true} data-switcher-glass={true} sx={mobileGlassSx} />
+        {/*
+         * No tooltip here, unlike the desktop options: this trigger only shows at
+         * xs, where there is no hover to reveal one, and `aria-label` already
+         * names it.
+         */}
         <IconButton
-          aria-controls={menuAnchor ? menuId : undefined}
-          aria-expanded={menuAnchor ? 'true' : undefined}
+          aria-controls={isMobileOpen ? menuId : undefined}
+          aria-expanded={isMobileOpen}
           aria-haspopup="true"
           aria-label={ariaLabel}
-          onClick={handleMenuOpen}
-          sx={mobileButtonSx}
+          onClick={() => (isMobileOpen ? collapseMobile() : setIsMobileOpen(true))}
+          ref={mobileTriggerRef}
+          sx={mobileTriggerSx}
         >
           {mobileIcon ?? selectedOption?.icon}
         </IconButton>
-        <Menu
-          anchorEl={menuAnchor}
-          anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+        <GlassDisclosurePanel
+          align="start"
           id={menuId}
-          onClose={handleMenuClose}
-          open={Boolean(menuAnchor)}
-          transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+          isOpen={isMobileOpen}
+          label={ariaLabel ?? ''}
+          role="radiogroup"
+          sx={mobilePanelSx}
         >
-          {options.map((option) => (
-            <MenuItem
-              key={option.value}
-              onClick={() => handleMenuSelect(option.value)}
-              selected={value === option.value}
-              sx={menuItemSx}
-            >
-              {option.icon}
-              {option.label}
-            </MenuItem>
-          ))}
-        </Menu>
-      </GlassContainer>
+          {/*
+           * The rows need their own positioned wrapper: the thumb is absolute, and
+           * against the panel it would resolve to the padding box and overhang the
+           * rows by the panel's padding on each side.
+           */}
+          <Box ref={mobileListRef} sx={disclosureListSx}>
+            <GlassDisclosureThumb selectedIndex={selectedIndex} />
+            {options.map((option) => (
+              <GlassDisclosureRow
+                component="label"
+                icon={option.icon}
+                key={option.value}
+                label={option.label}
+                sx={optionRowSx}
+              >
+                <Box
+                  checked={option.value === value}
+                  component="input"
+                  name={mobileRadioGroupName}
+                  onChange={() => handleMobileSelect(option.value)}
+                  sx={mobileInputSx}
+                  type="radio"
+                  value={option.value}
+                />
+              </GlassDisclosureRow>
+            ))}
+          </Box>
+        </GlassDisclosurePanel>
+      </Box>
 
       {/* Desktop: Horizontal RadioGroup with thumb indicator */}
       <MouseAwareGlassContainer data-role="glass-switcher" sx={desktopSx}>

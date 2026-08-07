@@ -15,8 +15,10 @@ import {
   DISCLOSURE_PANEL_WIDTH,
   DISCLOSURE_ROW_GAP,
   DISCLOSURE_ROW_HEIGHT,
+  disclosureListSx,
   GlassDisclosurePanel,
   GlassDisclosureRow,
+  GlassDisclosureThumb,
 } from './GlassDisclosurePanel';
 import { MouseAwareGlassContainer } from './MouseAwareGlassContainer';
 
@@ -143,30 +145,6 @@ function createStandaloneListSx(isOpen: boolean): SxObject {
     transform: isOpen ? 'none' : `translateY(-${DISCLOSURE_ROW_HEIGHT / 4}px)`,
     transition: `${createTransition(['opacity', 'transform'], TIMING_MEDIUM)}, visibility 0s linear ${isOpen ? 0 : TIMING_MEDIUM}ms`,
     visibility: isOpen ? 'visible' : 'hidden',
-  };
-}
-
-const embeddedListSx: SxObject = {
-  display: 'grid',
-  position: 'relative',
-  rowGap: `${DISCLOSURE_ROW_GAP}px`,
-};
-
-/** Sliding highlight behind the selected row, echoing the albums sorter thumb. */
-function createThumbSx(selectedIndex: number): SxObject {
-  return {
-    [REDUCED_MOTION]: { transition: 'none' },
-    backgroundColor: 'var(--mui-palette-action-selected)',
-    border: '1px solid color-mix(in srgb, var(--mui-palette-primary-main) 30%, transparent)',
-    borderRadius: '999px',
-    height: DISCLOSURE_ROW_HEIGHT,
-    left: 0,
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    transform: `translateY(${selectedIndex * (DISCLOSURE_ROW_HEIGHT + DISCLOSURE_ROW_GAP)}px)`,
-    transition: createTransition(['background-color', 'transform'], TIMING_MEDIUM),
-    zIndex: 0,
   };
 }
 
@@ -327,9 +305,9 @@ export function ColorSchemeToggleClient({
       onKeyDown={handleListKeyDown}
       ref={listRef}
       role="radiogroup"
-      sx={embedded ? embeddedListSx : createStandaloneListSx(isOpen)}
+      sx={embedded ? disclosureListSx : createStandaloneListSx(isOpen)}
     >
-      <Box sx={createThumbSx(selectedIndex)} />
+      <GlassDisclosureThumb selectedIndex={selectedIndex} />
       {OPTIONS.map((option) => (
         <GlassDisclosureRow
           component="label"
