@@ -27,6 +27,11 @@ export const BRAND_PAIRS = {
   primaryContrastText: ['#fff', 'rgba(0, 0, 0, 0.87)'],
   primaryDark: ['hsl(183, 33%, 27.3%, 1)', 'hsl(24, 88%, 49%, 1)'],
   primaryLight: ['hsl(183, 33%, 51.2%, 1)', 'hsl(24, 88%, 76%, 1)'],
+  // The warm accent hue, muted so a route reads as ink on the map rather than a
+  // highlighter. Both schemes stay near the same luminance: light needs to be
+  // darker than the cream paper, dark needs to stay clear of the light body copy
+  // it passes behind, so neither can simply take the h1 warm tone.
+  routeLine: ['hsl(24deg, 58%, 46%, 1)', 'hsl(24deg, 58%, 50%, 1)'],
   secondary: ['hsl(183deg, 33%, 39%, 0.75)', 'hsl(24deg, 88%, 70%, 0.75)'],
   secondaryContrastText: ['#fff', 'rgba(0, 0, 0, 0.87)'],
   secondaryDark: ['hsl(183, 33%, 27.3%, 0.75)', 'hsl(24, 88%, 49%, 0.75)'],

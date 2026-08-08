@@ -1,6 +1,7 @@
 'use client';
 
 import type { SxObject } from '@dg/ui/theme';
+import { BRAND } from '@dg/ui/theme/color';
 import { useColorScheme } from '@dg/ui/theme/useColorScheme';
 import { Box } from '@mui/material';
 import type { Point } from 'pigeon-maps';
@@ -11,7 +12,6 @@ import { SmoothTile } from './SmoothTile';
 
 const ROUTE_PADDING = 42;
 const DEFAULT_SIZE = 320;
-const STRAVA_ORANGE = '#fc4c02';
 
 const paperMix = (percent: number) =>
   `color-mix(in srgb, var(--mui-palette-background-paper) ${percent}%, transparent)`;
@@ -216,20 +216,20 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
           component="path"
           d={routePath}
           fill="none"
-          stroke={dark ? 'rgb(0 0 0 / 0.5)' : paperMix(92)}
+          stroke={dark ? 'rgb(0 0 0 / 0.42)' : paperMix(86)}
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={7}
+          strokeWidth={6}
           vectorEffect="non-scaling-stroke"
         />
         <Box
           component="path"
           d={routePath}
           fill="none"
-          stroke={STRAVA_ORANGE}
+          stroke={BRAND.routeLine}
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={3}
+          strokeWidth={2.5}
           vectorEffect="non-scaling-stroke"
         />
       </Box>
