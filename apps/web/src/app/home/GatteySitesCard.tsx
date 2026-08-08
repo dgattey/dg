@@ -3,8 +3,10 @@ import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
+import { getConcentricBorderRadius } from '@dg/ui/helpers/concentricBorderRadius';
 import { truncated } from '@dg/ui/helpers/truncated';
 import type { SxObject } from '@dg/ui/theme';
+import { getShape } from '@dg/ui/theme/shape';
 import { Box, Stack, Typography } from '@mui/material';
 import { ArrowUpRight } from 'lucide-react';
 
@@ -14,12 +16,12 @@ type GatteySitesCardProps = {
 
 const MARK_ROLE = 'side-project-mark';
 
-/**
- * Rows sit 13px inside the card: 20px of card padding plus its 1px border, less
- * the 8px each row bleeds back out. Keeping their corners concentric with the
- * card's 32px radius means subtracting that gap.
- */
-const ROW_BORDER_RADIUS = '19px';
+const CARD_PADDING_PX = 20;
+const CARD_BORDER_WIDTH_PX = 1;
+const ROW_BLEED_PX = 8;
+const ROW_INSET_PX = CARD_PADDING_PX + CARD_BORDER_WIDTH_PX - ROW_BLEED_PX;
+const { cardBorderRadius } = getShape();
+const ROW_BORDER_RADIUS = getConcentricBorderRadius(cardBorderRadius, ROW_INSET_PX);
 
 const markSx: SxObject = {
   flexShrink: 0,
@@ -31,7 +33,7 @@ const markSx: SxObject = {
 };
 
 const cardSx: SxObject = {
-  padding: 2.5,
+  padding: `${CARD_PADDING_PX}px`,
 };
 
 const layoutSx: SxObject = {
@@ -72,7 +74,7 @@ const projectLinkSx: SxObject = {
   borderRadius: ROW_BORDER_RADIUS,
   display: 'flex',
   gap: 1.5,
-  marginInline: -1,
+  marginInline: `-${ROW_BLEED_PX}px`,
   padding: 1,
   textDecoration: 'none',
   ...createBouncyTransition('background-color'),

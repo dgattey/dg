@@ -87,7 +87,7 @@ export function getTheme(): Theme {
           root: ({ theme }) => ({
             background: theme.vars.palette.background.paper,
             borderColor: theme.vars.palette.card.border,
-            borderRadius: theme.spacing(4),
+            borderRadius: theme.shape.cardBorderRadius,
             borderStyle: 'solid',
             borderWidth: 'thin',
             boxShadow: theme.vars.extraShadows.card.main,

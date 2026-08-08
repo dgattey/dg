@@ -2,6 +2,7 @@ import type { BoxProps } from '@mui/material';
 import { Box } from '@mui/material';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
 import type { SxObject } from '../theme';
+import { getShape } from '../theme/shape';
 
 export interface GlassContainerProps extends Omit<BoxProps, 'sx'> {
   /**
@@ -20,12 +21,13 @@ const GLASS_SHADOW = `
   inset 0 1px 0 color-mix(in srgb, var(--mui-palette-common-white) 15%, transparent),
   0px 1px 5px color-mix(in srgb, var(--mui-palette-common-black) 12%, transparent),
   0px 6px 16px color-mix(in srgb, var(--mui-palette-common-black) 8%, transparent)`;
+const { cardBorderRadius } = getShape();
 
 const glassContainerBaseSx: SxObject = {
   backdropFilter: 'blur(12px) saturate(150%)',
   backgroundColor: GLASS_BG,
   border: GLASS_BORDER,
-  borderRadius: '32px',
+  borderRadius: `${cardBorderRadius}px`,
   boxShadow: GLASS_SHADOW,
   position: 'relative',
   ...createBouncyTransition(['background-color', 'border-color', 'box-shadow'], 375),

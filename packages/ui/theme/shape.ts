@@ -1,10 +1,10 @@
 import type { ThemeOptions } from '@mui/material';
 
-/**
- * Sets up the spacing features for the grid in rem units
- */
+const CARD_BORDER_RADIUS_PX = 32;
+
 export function getShape() {
   const shape: ThemeOptions['shape'] = {
+    cardBorderRadius: CARD_BORDER_RADIUS_PX,
     gridGap: 2,
     gridGapLarge: 3.65,
     gridItemDimension: 17.25,

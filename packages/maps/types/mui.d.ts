@@ -30,6 +30,7 @@ declare module '@mui/material/styles' {
   }
   interface Theme {
     shape: {
+      cardBorderRadius: number;
       gridGap: number;
       gridGapLarge: number;
       gridItemDimension: number;
@@ -38,6 +39,7 @@ declare module '@mui/material/styles' {
   }
   interface ThemeOptions {
     shape: {
+      cardBorderRadius: number;
       gridGap: number;
       gridGapLarge: number;
       gridItemDimension: number;
