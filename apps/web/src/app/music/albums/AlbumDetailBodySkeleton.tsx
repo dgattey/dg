@@ -3,7 +3,7 @@ import { Box, Skeleton } from '@mui/material';
 import {
   ALBUM_WELL_TRACK_COLUMN_GAP,
   ALBUM_WELL_TRACK_NUMBER_COLUMN,
-  albumWellMetaBandSx,
+  albumWellMetaRowSx,
   albumWellMetaTextSx,
 } from './albumWellStyles';
 
@@ -20,11 +20,15 @@ const rowSx: SxObject = {
  * Holds the well open at roughly its loaded height while the tracklist streams
  * in, so the grid below does not jump once it lands. Mirrors the well's gutter
  * and text edge too, so the album name above it does not slide sideways either.
+ *
+ * `data-role="album-detail-placeholder"` is what the well's height reserve keys
+ * off: while this is on screen the well is floored at the height the previous
+ * album measured, and its removal is what releases that floor.
  */
 export function AlbumDetailBodySkeleton() {
   return (
-    <Box sx={{ display: 'contents' }}>
-      <Box data-role="album-meta-skeleton" sx={albumWellMetaBandSx}>
+    <Box data-role="album-detail-placeholder" sx={{ display: 'contents' }}>
+      <Box data-role="album-meta-skeleton" sx={albumWellMetaRowSx}>
         <Box sx={albumWellMetaTextSx}>
           <Skeleton sx={{ maxWidth: 320 }} variant="text" width="55%" />
           <Skeleton height={28} sx={{ maxWidth: 380 }} variant="text" width="65%" />

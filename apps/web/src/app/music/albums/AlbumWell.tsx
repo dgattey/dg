@@ -13,9 +13,8 @@ import {
   ALBUM_WELL_ART_SIZE_XS,
   ALBUM_WELL_NAME_GAP,
   ALBUM_WELL_NAME_LINE,
-  ALBUM_WELL_PINNED_SURFACE,
   ALBUM_WELL_STICKY_TOP,
-  albumWellBandSx,
+  albumWellTextGridSx,
 } from './albumWellStyles';
 
 const WELL_ART_SIZE = 220;
@@ -34,8 +33,34 @@ const albumWellVtNameSx: SxObject = {
     },
 };
 
+/**
+ * Floor the card at the height the outgoing album's detail measured, for exactly
+ * as long as a placeholder is standing in for detail that has not landed.
+ *
+ * Switching straight from one album to another swaps a tracklist of dozens of
+ * rows for a placeholder of six, so without a floor the card — and every grid row
+ * under it — drops by the difference (~3300px at 1280) in the frame the click
+ * commits, then climbs back as the real tracklist arrives. Holding the floor
+ * turns that shrink-then-grow into a single eased step.
+ *
+ * `:has()` is what releases it: the moment real detail replaces the placeholder
+ * the floor stops applying, the card falls to its natural height, and the resize
+ * observer below tweens that one change. Nothing has to decide when detail has
+ * "really" arrived — the URL lands well before the streamed tracklist does, so
+ * every signal short of the placeholder's own absence releases too early.
+ */
+function reserveSx(reservePx: number | null): SxObject {
+  return reservePx == null
+    ? {}
+    : { '&:has([data-role="album-detail-placeholder"])': { minHeight: reservePx } };
+}
+
 const wellSx: SxObject = {
   ...albumWellVtNameSx,
+  // Content-height rows, so the floor below leaves its slack at the bottom of the
+  // card. Stretching would spread it between the name, meta, and tracklist rows
+  // and push everything but the title past the fold while the placeholder is up.
+  alignContent: 'start',
   backgroundColor: 'color-mix(in srgb, var(--mui-palette-background-paper) 88%, transparent)',
   border: '1px solid color-mix(in srgb, CanvasText 10%, transparent)',
   borderRadius: 3,
@@ -69,9 +94,15 @@ const artCardSx: SxObject = {
 };
 
 /**
- * Sticks alongside the pinned name and meta. Grid items stretch by default,
- * which would both leave the anchor covering the empty column beside the
- * tracklist and give sticky no room to travel inside the grid area.
+ * The one thing in the well that pins, and the only thing that can: it has its
+ * own column from `sm` up, so it travels beside the tracklist without ever
+ * covering a row. Grid items stretch by default, which would both leave the
+ * anchor covering the empty column beside the tracklist and give sticky no room
+ * to travel inside the grid area.
+ *
+ * Static on mobile, where the single column puts it directly over the rows and
+ * a pinned 160px cover claimed a fifth of the viewport with bare strips either
+ * side of a centred square for the tracklist to scroll through.
  */
 const artLinkSx: SxObject = {
   alignSelf: 'start',
@@ -79,29 +110,22 @@ const artLinkSx: SxObject = {
   gridArea: 'art',
   justifySelf: { sm: 'stretch', xs: 'center' },
   maxWidth: { sm: WELL_ART_SIZE, xs: ALBUM_WELL_ART_SIZE_XS },
-  position: 'sticky',
+  position: { sm: 'sticky', xs: 'static' },
   top: ALBUM_WELL_STICKY_TOP,
   width: '100%',
 };
 
-const nameBandSx: SxObject = {
-  ...albumWellBandSx,
-  backgroundColor: ALBUM_WELL_PINNED_SURFACE,
+const nameSx: SxObject = {
+  ...albumWellTextGridSx,
   fontWeight: 700,
   gridArea: 'name',
-  lineHeight: ALBUM_WELL_NAME_LINE,
   pb: ALBUM_WELL_NAME_GAP,
-  position: 'sticky',
-  top: {
-    sm: ALBUM_WELL_STICKY_TOP.sm,
-    xs: `calc(${ALBUM_WELL_STICKY_TOP.xs} + ${ALBUM_WELL_ART_SIZE_XS}px)`,
-  },
-  zIndex: 3,
 };
 
-/** One line so the band's height stays the constant the meta pins against. */
+/** One line, so a long title can't reflow the card while detail streams in. */
 const nameLinkSx: SxObject = {
   gridColumn: 2,
+  lineHeight: ALBUM_WELL_NAME_LINE,
   minWidth: 0,
   overflow: 'hidden',
   textOverflow: 'ellipsis',
@@ -109,9 +133,14 @@ const nameLinkSx: SxObject = {
 };
 
 /**
- * Outer shell height. Locked to a pixel value only while tweening skeleton →
- * detail (or any later content resize); released to `auto` afterward so sticky
- * bands are not trapped under `overflow: hidden`.
+ * Outer shell height. Locked to a pixel value only while a content resize is
+ * tweening, then released to `auto`.
+ *
+ * `clip` rather than `hidden`: `hidden` makes this a scroll container, which
+ * re-parents the well's sticky art and name band to it. Their `top` offsets then
+ * apply against a box scrolled to 0, so both slid ~100px down the card the frame
+ * the height locked and snapped back when it released. `clip` hides the same
+ * overflow without a scrollport, leaving sticky anchored to the page.
  */
 function shellSx(heightPx: number | null): SxObject {
   const locking = heightPx != null;
@@ -122,7 +151,7 @@ function shellSx(heightPx: number | null): SxObject {
       transition: 'none',
     },
     height: locking ? heightPx : 'auto',
-    overflow: locking ? 'hidden' : 'visible',
+    overflow: locking ? 'clip' : 'visible',
     // Same tier as SpotifyHeaderCard's fr expand, but medium — open felt slow at slow.
     transition: locking ? createTransition('height', TIMING_MEDIUM, EASING_DEFAULT) : undefined,
   };
@@ -141,14 +170,31 @@ type Props = {
  * everything that needs a fetch arrives as children.
  *
  * Open/close height is a view-transition clip on `album-well` (scoped to
- * album-open/close only). After open, content that lands later — skeleton →
- * tracklist — grows the shell with a measured height tween so the jump never
+ * album-open/close only). After open, content that lands later — placeholder →
+ * tracklist — resizes the shell with a measured height tween so the change never
  * reads as a jolt, then releases back to `auto` for sticky.
+ *
+ * Switching straight from one album to another goes further and floors the card
+ * at the outgoing height until the arriving tracklist replaces the placeholder,
+ * so that swap costs the page no layout at all. See `reserveSx`.
  */
 export function AlbumWell({ album, children }: Props) {
   const measureRef = useRef<HTMLDivElement>(null);
   const lastHeightRef = useRef<number | null>(null);
   const [heightPx, setHeightPx] = useState<number | null>(null);
+  const [reservePx, setReservePx] = useState<number | null>(null);
+  const [openAlbumId, setOpenAlbumId] = useState(album.id);
+
+  if (album.id !== openAlbumId) {
+    // Claim the reserve in the same render that swaps the content in, so the
+    // placeholder never gets a frame at its own height to paint at. The shell is
+    // pinned to the same height as well: the floor drops the instant real detail
+    // replaces the placeholder, but the tween that follows can only start on the
+    // next resize observation, and an `auto` shell would reflow in between.
+    setOpenAlbumId(album.id);
+    setReservePx(lastHeightRef.current);
+    setHeightPx(lastHeightRef.current);
+  }
 
   useLayoutEffect(() => {
     const node = measureRef.current;
@@ -168,7 +214,7 @@ export function AlbumWell({ album, children }: Props) {
         return;
       }
 
-      // Two-stage grow: pin the outgoing height, then ease to the new content.
+      // Two-stage tween: pin the outgoing height, then ease to the new content.
       setHeightPx(previous);
       requestAnimationFrame(() => {
         setHeightPx(next);
@@ -186,13 +232,20 @@ export function AlbumWell({ album, children }: Props) {
       return;
     }
     setHeightPx(null);
+    // The reserve has already been released by the placeholder leaving; dropping
+    // it here keeps a stale floor from applying to some later placeholder.
+    setReservePx(null);
     lastHeightRef.current = measureRef.current?.scrollHeight ?? lastHeightRef.current;
   };
 
   return (
     <Box onTransitionEnd={handleTransitionEnd} sx={shellSx(heightPx)}>
       <Box ref={measureRef}>
-        <Box aria-label={`${album.name} details`} component="section" sx={wellSx}>
+        <Box
+          aria-label={`${album.name} details`}
+          component="section"
+          sx={{ ...wellSx, ...reserveSx(reservePx) }}
+        >
           <Link
             href={album.url}
             isExternal={true}
@@ -213,7 +266,7 @@ export function AlbumWell({ album, children }: Props) {
           </Link>
 
           <Box sx={{ display: 'contents' }}>
-            <Typography component="h2" sx={nameBandSx} variant="h2">
+            <Typography component="h2" sx={nameSx} variant="h2">
               <Link href={album.url} isExternal={true} sx={nameLinkSx} title={album.name}>
                 {album.name}
               </Link>
