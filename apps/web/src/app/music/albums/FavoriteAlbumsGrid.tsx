@@ -8,12 +8,54 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack } from '@mui/material';
 import { ArrowDownUp } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { Fragment, useLayoutEffect, useRef, useState } from 'react';
+import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { hasClientHydrated } from '../../layouts/clientHydrated';
 import { ALBUM_GRID_COLUMNS, albumGridSx, albumTileSlotSx } from '../albumTileGeometry';
 import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
 import { AlbumWell } from './AlbumWell';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
+import { FavoriteAlbumsSkeleton } from './FavoriteAlbumsSkeleton';
 import { useOptimisticAlbumSelection } from './useOptimisticAlbumSelection';
+
+/**
+ * SSR and the matching hydrate must paint the real grid. After the app has
+ * committed once, a new mount is a client navigation: photograph the
+ * skeleton instead. `:active-view-transition` is not set yet inside React's
+ * startViewTransition update, so we cannot key off that.
+ */
+function paintAlbumsOnFirstPass() {
+  return !hasClientHydrated();
+}
+
+function viewTransitionPseudoElement(effect: AnimationEffect | null) {
+  if (!effect || !('pseudoElement' in effect)) {
+    return null;
+  }
+  const pseudo = effect.pseudoElement;
+  return typeof pseudo === 'string' ? pseudo : null;
+}
+
+function waitForViewTransitionAnimations() {
+  const listed = typeof document.getAnimations === 'function' ? document.getAnimations() : [];
+  const animations = listed.filter((animation) =>
+    Boolean(viewTransitionPseudoElement(animation.effect)?.startsWith('::view-transition')),
+  );
+  if (animations.length === 0) {
+    return Promise.resolve();
+  }
+  return Promise.all(animations.map((animation) => animation.finished.catch(() => undefined)));
+}
+
+function afterNextPaint() {
+  if (typeof requestAnimationFrame !== 'function') {
+    return Promise.resolve();
+  }
+  return new Promise<void>((resolve) => {
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => resolve());
+    });
+  });
+}
 
 const SORT_OPTIONS = [
   { key: 'added', label: 'Recently added' },
@@ -78,6 +120,24 @@ type Props = {
  * opens on the click instead of on the payload that click goes and fetches.
  */
 export function FavoriteAlbumsGrid({ albums, children }: Props) {
+  // Client navigations photograph a height-matched reserve instead of ~300
+  // next/image nodes. Reveal after the page-rise animations (plus a paint)
+  // so the grid commit cannot hitch the 300ms transition.
+  const [showGrid, setShowGrid] = useState(paintAlbumsOnFirstPass);
+  useEffect(() => {
+    let cancelled = false;
+    void waitForViewTransitionAnimations()
+      .then(afterNextPaint)
+      .then(() => {
+        if (!cancelled) {
+          setShowGrid(true);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   const { isAwaitingDetail, onAlbumNavigationCapture, selectedAlbumId } =
     useOptimisticAlbumSelection();
   const [sortKey, setSortKey] = useState<AlbumSortKey>('added');
@@ -119,6 +179,10 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
       );
     }
   });
+
+  if (!showGrid) {
+    return <FavoriteAlbumsSkeleton reserveOnly tileCount={albums.length} />;
+  }
 
   const sortedAlbums = [...albums].sort(comparators[sortKey]);
   const selectedIndex = selectedAlbumId

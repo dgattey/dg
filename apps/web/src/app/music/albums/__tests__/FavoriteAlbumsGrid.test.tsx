@@ -2,6 +2,7 @@ import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { markClientHydrated, resetClientHydrated } from '../../../layouts/clientHydrated';
 import { FavoriteAlbumsGrid } from '../FavoriteAlbumsGrid';
 
 jest.mock('next/navigation', () => ({
@@ -87,7 +88,54 @@ const layOutBySiblingOrder = () => {
 describe('FavoriteAlbumsGrid', () => {
   afterEach(() => {
     jest.restoreAllMocks();
+    resetClientHydrated();
+    Reflect.deleteProperty(document, 'getAnimations');
     Reflect.deleteProperty(Element.prototype, 'animate');
+  });
+
+  it('holds the height-matched skeleton while a view transition is running', () => {
+    markClientHydrated();
+    Object.defineProperty(document, 'getAnimations', {
+      configurable: true,
+      value: () => [
+        {
+          effect: { pseudoElement: '::view-transition-new(root)' },
+          finished: new Promise<void>(() => {
+            /* stay pending for this render */
+          }),
+        },
+      ],
+    });
+
+    render(<FavoriteAlbumsGrid albums={albums} />);
+
+    expect(screen.queryByRole('link', { name: 'Zebra' })).not.toBeInTheDocument();
+    expect(document.querySelectorAll('.MuiSkeleton-root').length).toBe(1);
+  });
+
+  it('reveals albums after view-transition animations finish', async () => {
+    markClientHydrated();
+    let resolveFinished = () => {};
+    const finished = new Promise<void>((resolve) => {
+      resolveFinished = resolve;
+    });
+    Object.defineProperty(document, 'getAnimations', {
+      configurable: true,
+      value: () => [
+        {
+          effect: { pseudoElement: '::view-transition-new(root)' },
+          finished,
+        },
+      ],
+    });
+
+    render(<FavoriteAlbumsGrid albums={albums} />);
+    expect(screen.queryByRole('link', { name: 'Zebra' })).not.toBeInTheDocument();
+
+    resolveFinished();
+    await waitFor(() => {
+      expect(screen.getByRole('link', { name: 'Zebra' })).toBeInTheDocument();
+    });
   });
 
   it('renders linked, sleeved albums newest first', () => {
