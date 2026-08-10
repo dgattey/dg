@@ -90,10 +90,13 @@ export function pinnedChromeSx(name: string): SxObject {
 }
 
 /**
- * Shared between a destination page's heading and the one control allowed to
- * morph into it, so the browser interpolates a single element instead of
- * cross-fading two unrelated snapshots. Exactly one element may carry it at any
- * capture; a duplicate aborts the transition outright.
+ * Shared between music destination headings so "Listening history" and
+ * "Favorite albums" morph in place. Do not put this on the header disc: that
+ * pairs a 48px icon in the northeast chrome with a full-width h1 and the
+ * browser FLIPs the type ~1000px at 23× scale.
+ *
+ * Exactly one element may carry it at any capture; a duplicate aborts the
+ * transition outright.
  */
 export const PAGE_TITLE_VIEW_TRANSITION_NAME = 'page-title';
 

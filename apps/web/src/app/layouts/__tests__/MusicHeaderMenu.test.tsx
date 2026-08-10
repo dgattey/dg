@@ -3,39 +3,21 @@
  */
 
 import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
-import {
-  PAGE_TITLE_SLOT_VIEW_TRANSITION_NAME,
-  PAGE_TITLE_VIEW_TRANSITION_NAME,
-} from '@dg/ui/core/transitions/pageTransitions';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { useState } from 'react';
-
-jest.mock('next/navigation', () => ({
-  usePathname: jest.fn(() => '/'),
-}));
 
 jest.mock('@dg/ui/core/transitions/pageScrollMemory', () => ({
   rememberPageOrigin: jest.fn(),
 }));
 
-import { usePathname } from 'next/navigation';
 import { MusicHeaderMenu } from '../MusicHeaderMenu';
 
-const mockUsePathname = usePathname as jest.MockedFunction<typeof usePathname>;
-
-/**
- * The trigger's name is scoped to a navigation capture rather than set on the
- * element, so it is absent at rest and only visible in the emitted rule.
- */
+/** Any view-transition-name emitted for this element's generated class. */
 function capturedTitleName(element: HTMLElement): string | undefined {
   const matched = [...document.querySelectorAll('style')]
     .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
-    .filter(
-      (rule) =>
-        rule.includes('active-view-transition-type') &&
-        [...element.classList].some((className) => rule.includes(`.${className}`)),
-    )
+    .filter((rule) => [...element.classList].some((className) => rule.includes(`.${className}`)))
     .map((rule) => rule.match(/view-transition-name:\s*([\w-]+)/)?.at(1))
     .filter((name): name is string => Boolean(name));
   return [...new Set(matched)].at(0);
@@ -47,11 +29,6 @@ function TestMusicHeaderMenu() {
 }
 
 describe('MusicHeaderMenu', () => {
-  afterEach(() => {
-    jest.clearAllMocks();
-    mockUsePathname.mockReturnValue('/');
-  });
-
   it('opens a shared glass menu with both music destinations in order', async () => {
     const user = userEvent.setup();
     render(<TestMusicHeaderMenu />);
@@ -73,18 +50,17 @@ describe('MusicHeaderMenu', () => {
   });
 
   /**
-   * A name held at rest also lifts the trigger out of same-page transitions,
-   * whose `page-title-slot` snapshots are blanked — that made the disc vanish
-   * for the length of every album well open and close.
+   * Pairing the disc with `page-title` makes the heading FLIP in from a 48px
+   * icon in the northeast header (~1000px, 23×). Leave it unnamed so it stays
+   * inside `site-header` and the heading appears in place.
    */
-  it('names the trigger only for a navigation capture, never at rest', async () => {
+  it('does not name the trigger or menu links for a title morph', async () => {
     const user = userEvent.setup();
-    mockUsePathname.mockReturnValue('/');
     render(<TestMusicHeaderMenu />);
 
     const trigger = screen.getByRole('button', { name: 'Music' });
     expect(trigger.style.viewTransitionName).toBe('');
-    expect(capturedTitleName(trigger)).toBe(PAGE_TITLE_VIEW_TRANSITION_NAME);
+    expect(capturedTitleName(trigger)).toBeUndefined();
 
     await user.click(trigger);
     const menuLinks = screen.getAllByRole('menuitem');
@@ -106,18 +82,5 @@ describe('MusicHeaderMenu', () => {
     await user.keyboard('{Escape}');
     expect(trigger).toHaveAttribute('aria-expanded', 'false');
     expect(trigger).toHaveFocus();
-  });
-
-  it('switches the trigger to the slot name on either music destination', () => {
-    mockUsePathname.mockReturnValue(musicRoute);
-    const { rerender } = render(<TestMusicHeaderMenu />);
-
-    for (const path of [musicRoute, favoriteAlbumsRoute, `${favoriteAlbumsRoute}/album123`]) {
-      mockUsePathname.mockReturnValue(path);
-      rerender(<TestMusicHeaderMenu />);
-      const trigger = screen.getByRole('button', { name: 'Music' });
-      expect(trigger.style.viewTransitionName).toBe('');
-      expect(capturedTitleName(trigger)).toBe(PAGE_TITLE_SLOT_VIEW_TRANSITION_NAME);
-    }
   });
 });

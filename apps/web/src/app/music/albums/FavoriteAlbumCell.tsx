@@ -119,7 +119,16 @@ export function FavoriteAlbumCell({
         transitionTypes={albumTransitionTypes('open')}
       >
         <AlbumStack imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT}>
-          <ViewTransition name={albumArtViewTransitionName(albumId)} share="vt-album-art">
+          {/*
+           * `default="none"` keeps this name off page-open/close. Without it
+           * every cover enters during homepage → albums, and React snapshots
+           * the whole grid as separate shared elements mid-flight.
+           */}
+          <ViewTransition
+            default="none"
+            name={albumArtViewTransitionName(albumId)}
+            share="vt-album-art"
+          >
             <AlbumCover alt={albumName} depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />
           </ViewTransition>
         </AlbumStack>

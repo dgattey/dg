@@ -252,7 +252,11 @@ export function AlbumWell({ album, children }: Props) {
             sx={artLinkSx}
             title={`Open ${album.name} on Spotify`}
           >
-            <ViewTransition name={albumArtViewTransitionName(album.id)} share="vt-album-art">
+            <ViewTransition
+              default="none"
+              name={albumArtViewTransitionName(album.id)}
+              share="vt-album-art"
+            >
               <Box sx={artCardSx}>
                 <Image
                   alt={album.name}

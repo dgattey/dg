@@ -9,16 +9,14 @@ import {
 } from '@dg/ui/core/GlassDisclosurePanel';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
-import { pageTitleMorphName, pageTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, IconButton } from '@mui/material';
 import type { LucideIcon } from 'lucide-react';
 import { Disc3, DiscAlbum, History } from 'lucide-react';
-import { usePathname } from 'next/navigation';
 import type { FocusEvent, KeyboardEvent } from 'react';
 import { useEffect, useId, useRef } from 'react';
-import { isMusicDestinationPath, MUSIC_DESTINATIONS } from './musicHeaderDestinations';
+import { MUSIC_DESTINATIONS } from './musicHeaderDestinations';
 
 const MUSIC_LABEL = 'Music';
 
@@ -68,35 +66,6 @@ const destinationLinkSx: SxObject = {
   width: '100%',
 };
 
-/** Only navigations move a heading, so only they need the trigger named. */
-const PAGE_NAVIGATION_CAPTURE = `html:active-view-transition-type(${[
-  ...pageTransitionTypes('open'),
-  ...pageTransitionTypes('close'),
-].join(', ')}) &`;
-
-/**
- * Lends the trigger's box to a music page's heading, but only while a
- * navigation is being photographed.
- *
- * Held persistently, the name also lifts the trigger out of every *same-page*
- * transition on a music route — and `page-title-slot` snapshots are deliberately
- * blanked, since the slot a heading flew out of is a hole rather than a second
- * copy of it. That blanked the disc for the whole flight every time an album
- * well opened or closed on the favorite albums page. Unnamed between
- * navigations, the trigger stays inside the `site-header` snapshot instead,
- * which paints once at full opacity and never animates.
- *
- * The selector leads with `html` rather than `:root`, which Emotion would read
- * as a pseudo-class on this element and never match.
- */
-function pageTitleMorphSx(destinationIsOpen: boolean): SxObject {
-  return {
-    [PAGE_NAVIGATION_CAPTURE]: {
-      viewTransitionName: pageTitleMorphName(destinationIsOpen),
-    },
-  };
-}
-
 type MusicHeaderMenuProps = {
   isOpen: boolean;
   onOpenChange: (isOpen: boolean) => void;
@@ -104,16 +73,17 @@ type MusicHeaderMenuProps = {
 
 /**
  * Header vinyl control: opens a shared glass disclosure of music destinations.
- * The trigger alone owns the page-title view-transition name so menu item links
- * never collide.
+ *
+ * The trigger must stay unnamed. Sharing `page-title` with the destination
+ * heading pairs a 48px disc in the northeast header with a full-width h1 —
+ * a ~1000px, 23× FLIP that is the title flying in from the corner. Sibling
+ * music headings still share `page-title` so that morph stays local.
  */
 export function MusicHeaderMenu({ isOpen, onOpenChange }: MusicHeaderMenuProps) {
   const menuId = useId();
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
-  const pathname = usePathname();
-  const destinationIsOpen = isMusicDestinationPath(pathname);
 
   useEffect(() => {
     if (!isOpen) {
@@ -196,7 +166,7 @@ export function MusicHeaderMenu({ isOpen, onOpenChange }: MusicHeaderMenuProps) 
           aria-label={MUSIC_LABEL}
           onClick={() => onOpenChange(!isOpen)}
           ref={triggerRef}
-          sx={{ ...triggerSx, ...pageTitleMorphSx(destinationIsOpen) }}
+          sx={triggerSx}
         >
           <Disc3 size={DISCLOSURE_ICON_SIZE} />
         </IconButton>
