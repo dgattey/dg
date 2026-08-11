@@ -48,6 +48,20 @@ const alignSx: Record<DisclosureAlign, SxObject> = {
 };
 
 /**
+ * Marks the element whose `<details open>` state drives the panel inside it.
+ *
+ * A panel needs a no-script way to know it is open, and `<details>` is the only
+ * disclosure the platform tracks on its own. Selecting on the host rather than
+ * on the details itself lets the panel stay a *sibling* of the disclosure, out
+ * of the details' own content, so its motion is ours to animate and the glass
+ * nesting rules below still hold.
+ */
+export const DISCLOSURE_HOST_ATTRIBUTE = 'data-disclosure-host';
+
+/** Spread onto the element that wraps a `<details>` trigger and its panel. */
+export const disclosureHostProps = { [DISCLOSURE_HOST_ATTRIBUTE]: true } as const;
+
+/**
  * One shorthand, three different jobs — the properties genuinely need different
  * curves, so composing them by hand beats a helper that spreads a single easing
  * across all of them.
@@ -80,6 +94,21 @@ function createPanelMotionSx(isOpen: boolean): SxObject {
     visibility: isOpen ? 'visible' : 'hidden',
   };
 }
+
+/**
+ * Closed until a host `<details>` says otherwise, with no React state involved.
+ *
+ * `visibility` is doing the accessibility work here that `inert` cannot: a
+ * script-driven panel can be marked inert as it closes, but an attribute
+ * rendered on the server never changes without scripting, so a panel that
+ * shipped `inert` would stay unusable for exactly the visitors this path is for.
+ * A `visibility: hidden` panel is already out of the tab order and out of the
+ * accessibility tree, which is what `inert` was insuring against.
+ */
+const detailsDrivenMotionSx: SxObject = {
+  ...createPanelMotionSx(false),
+  [`[${DISCLOSURE_HOST_ATTRIBUTE}]:has(> details[open]) &`]: createPanelMotionSx(true),
+};
 
 const rowBaseSx: SxObject = {
   '& svg': {
@@ -130,7 +159,12 @@ const labelSx: SxObject = {
 
 type GlassDisclosurePanelProps = {
   children: ReactNode;
-  isOpen: boolean;
+  /**
+   * Script-owned open state. Omit it to let a host `<details open>` drive the
+   * panel from CSS alone, which is what keeps a disclosure working with
+   * scripting off — see `DISCLOSURE_HOST_ATTRIBUTE`.
+   */
+  isOpen?: boolean;
   /** Accessible name for the disclosure surface. */
   label: string;
   /** Trigger edge the panel is pinned to. Defaults to the inline end. */
@@ -163,14 +197,20 @@ export function GlassDisclosurePanel({
   role,
   sx,
 }: GlassDisclosurePanelProps) {
+  const isScriptDriven = isOpen !== undefined;
   return (
     <GlassContainer
-      aria-hidden={!isOpen}
+      aria-hidden={isScriptDriven ? !isOpen : undefined}
       aria-label={label}
       id={id}
-      inert={!isOpen}
+      inert={isScriptDriven ? !isOpen : undefined}
       role={role}
-      sx={{ ...panelBaseSx, ...alignSx[align], ...createPanelMotionSx(isOpen), ...sx }}
+      sx={{
+        ...panelBaseSx,
+        ...alignSx[align],
+        ...(isScriptDriven ? createPanelMotionSx(isOpen) : detailsDrivenMotionSx),
+        ...sx,
+      }}
     >
       {children}
     </GlassContainer>

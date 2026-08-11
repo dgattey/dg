@@ -1,7 +1,14 @@
+import { Box } from '@mui/material';
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { Disc3, Sun } from 'lucide-react';
 import { EASING_BOUNCY, TIMING_BOUNCY, TIMING_NORMAL } from '../../helpers/timing';
-import { GlassDisclosurePanel, GlassDisclosureRow } from '../GlassDisclosurePanel';
+import {
+  DISCLOSURE_HOST_ATTRIBUTE,
+  disclosureHostProps,
+  GlassDisclosurePanel,
+  GlassDisclosureRow,
+} from '../GlassDisclosurePanel';
 
 /** The emitted rule for a panel, which is where its transition actually lives. */
 function panelRule(panel: HTMLElement): string {
@@ -33,6 +40,51 @@ describe('GlassDisclosurePanel', () => {
     );
 
     expect(screen.getByLabelText('Closed menu')).toHaveAttribute('inert');
+  });
+
+  /**
+   * Omitting `isOpen` hands the panel to a host `<details>`, which is the only
+   * disclosure state a browser keeps without scripting. `inert` and `aria-hidden`
+   * have to stay off that path: rendered on the server they would never flip, so
+   * they would permanently bury the panel for visitors with no script.
+   */
+  it('takes its open state from a host details when no script owns it', () => {
+    render(
+      <Box {...disclosureHostProps}>
+        <details>
+          <summary>Open</summary>
+        </details>
+        <GlassDisclosurePanel label="Scriptless menu" role="menu">
+          <GlassDisclosureRow icon={<Sun />} label="Light" />
+        </GlassDisclosurePanel>
+      </Box>,
+    );
+
+    const panel = screen.getByRole('menu', { hidden: true });
+    expect(panel).not.toHaveAttribute('inert');
+    expect(panel).not.toHaveAttribute('aria-hidden');
+
+    const rule = panelRule(panel);
+    expect(rule).toContain(`[${DISCLOSURE_HOST_ATTRIBUTE}]:has(> details[open])`);
+    expect(rule).toContain('visibility: visible');
+  });
+
+  it('reveals a details-driven panel as soon as the disclosure opens', async () => {
+    const user = userEvent.setup();
+    render(
+      <Box {...disclosureHostProps}>
+        <details>
+          <summary>Open</summary>
+        </details>
+        <GlassDisclosurePanel label="Scriptless menu" role="menu">
+          <GlassDisclosureRow icon={<Sun />} label="Light" />
+        </GlassDisclosurePanel>
+      </Box>,
+    );
+
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument();
+    await user.click(screen.getByText('Open'));
+    expect(screen.getByRole('menu', { name: 'Scriptless menu' })).toBeInTheDocument();
   });
 
   /**

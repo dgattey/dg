@@ -20,6 +20,7 @@ import {
   GlassDisclosureRow,
   GlassDisclosureThumb,
 } from './GlassDisclosurePanel';
+import { jsOnlyProps } from './JsOnlyStyle';
 import { MouseAwareGlassContainer } from './MouseAwareGlassContainer';
 
 /**
@@ -333,7 +334,17 @@ export function ColorSchemeToggleClient({
     </Box>
   );
 
+  /**
+   * Hidden outright when scripting is off. A stored preference lives in
+   * `localStorage` and is applied by a head script, so with no script there is
+   * nothing to write it with and nothing to read it back — the picker would be
+   * three radio buttons that silently do nothing. The site instead follows
+   * `prefers-color-scheme`, which is what `color-scheme: light dark` on the
+   * document already does in CSS alone, so the scheme is still right; it just
+   * can't be overridden.
+   */
   const rootProps = {
+    ...jsOnlyProps,
     onBlur: handleFocusOut,
     onKeyDown: handleRootKeyDown,
     ref: rootRef,

@@ -22,25 +22,40 @@ describe('HeaderControls', () => {
     document.documentElement.style.colorScheme = 'light dark';
   });
 
+  /**
+   * The two disclosures track their open state differently on purpose — the
+   * music menu delegates to `<details>` so it survives scripting being off,
+   * while the theme picker is script-only — so exclusivity is asserted against
+   * each one's own source of truth rather than a shared attribute.
+   */
   it('keeps the theme and music disclosures mutually exclusive', async () => {
     const user = userEvent.setup();
     render(<HeaderControls />);
 
     const theme = screen.getByRole('button', { name: 'Color scheme: system' });
-    const music = screen.getByRole('button', { name: 'Music' });
-    const sharedSurface = music.closest('[data-header-controls]');
+    const music = document.querySelector('details > summary');
+    const musicDisclosure = document.querySelector('details');
+    if (!(music instanceof HTMLElement) || !(musicDisclosure instanceof HTMLDetailsElement)) {
+      throw new Error('no <details> music menu rendered');
+    }
 
-    expect(sharedSurface).toBe(theme.closest('[data-header-controls]'));
+    expect(music.closest('[data-header-controls]')).toBe(theme.closest('[data-header-controls]'));
     expect(music.compareDocumentPosition(theme) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
 
     await user.click(theme);
     expect(theme).toHaveAttribute('aria-expanded', 'true');
-    expect(music).not.toHaveAttribute('aria-expanded', 'true');
+    expect(musicDisclosure.open).toBe(false);
 
     await user.click(music);
     await waitFor(() => {
       expect(theme).toHaveAttribute('aria-expanded', 'false');
-      expect(music).toHaveAttribute('aria-expanded', 'true');
+      expect(musicDisclosure.open).toBe(true);
+    });
+
+    await user.click(theme);
+    await waitFor(() => {
+      expect(theme).toHaveAttribute('aria-expanded', 'true');
+      expect(musicDisclosure.open).toBe(false);
     });
   });
 
