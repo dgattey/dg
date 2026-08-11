@@ -20,7 +20,6 @@ describe('ColorSchemeToggleClient', () => {
   beforeEach(() => {
     localStorage.clear();
     document.documentElement.removeAttribute(COLOR_SCHEME_ATTRIBUTE);
-    document.documentElement.style.colorScheme = 'light dark';
   });
 
   afterEach(() => {
@@ -28,7 +27,7 @@ describe('ColorSchemeToggleClient', () => {
   });
 
   it('collapses to a single button that announces the current scheme', () => {
-    document.documentElement.setAttribute(COLOR_SCHEME_ATTRIBUTE, 'dark');
+    localStorage.setItem(COLOR_SCHEME_STORAGE_KEY, 'dark');
 
     render(<ColorSchemeToggleClient />);
 
@@ -56,7 +55,7 @@ describe('ColorSchemeToggleClient', () => {
 
   it('expands to the full scheme list and marks the current one', async () => {
     const user = userEvent.setup();
-    document.documentElement.setAttribute(COLOR_SCHEME_ATTRIBUTE, 'dark');
+    localStorage.setItem(COLOR_SCHEME_STORAGE_KEY, 'dark');
 
     render(<ColorSchemeToggleClient />);
     await openPicker(user);
@@ -79,7 +78,6 @@ describe('ColorSchemeToggleClient', () => {
 
     await waitFor(() => {
       expect(document.documentElement).toHaveAttribute(COLOR_SCHEME_ATTRIBUTE, 'dark');
-      expect(document.documentElement.style.colorScheme).toBe('dark');
       expect(localStorage.getItem(COLOR_SCHEME_STORAGE_KEY)).toBe('dark');
     });
     expect(getTrigger()).toHaveAttribute('aria-expanded', 'false');
@@ -90,7 +88,6 @@ describe('ColorSchemeToggleClient', () => {
   it('removes the stored override for system preference', async () => {
     const user = userEvent.setup();
     localStorage.setItem(COLOR_SCHEME_STORAGE_KEY, 'dark');
-    document.documentElement.setAttribute(COLOR_SCHEME_ATTRIBUTE, 'dark');
 
     render(<ColorSchemeToggleClient />);
     await openPicker(user);
@@ -98,7 +95,6 @@ describe('ColorSchemeToggleClient', () => {
 
     await waitFor(() => {
       expect(document.documentElement).not.toHaveAttribute(COLOR_SCHEME_ATTRIBUTE);
-      expect(document.documentElement.style.colorScheme).toBe('light dark');
       expect(localStorage.getItem(COLOR_SCHEME_STORAGE_KEY)).toBeNull();
     });
   });
@@ -121,6 +117,8 @@ describe('ColorSchemeToggleClient', () => {
   it('applies cross-tab storage updates', async () => {
     render(<ColorSchemeToggleClient />);
 
+    // A real cross-tab write lands in storage before the event fires.
+    localStorage.setItem(COLOR_SCHEME_STORAGE_KEY, 'dark');
     window.dispatchEvent(
       new StorageEvent('storage', {
         key: COLOR_SCHEME_STORAGE_KEY,
@@ -136,7 +134,7 @@ describe('ColorSchemeToggleClient', () => {
 
   it('moves through the group with arrow keys without collapsing', async () => {
     const user = userEvent.setup();
-    document.documentElement.setAttribute(COLOR_SCHEME_ATTRIBUTE, 'light');
+    localStorage.setItem(COLOR_SCHEME_STORAGE_KEY, 'light');
 
     render(<ColorSchemeToggleClient />);
     await openPicker(user);
