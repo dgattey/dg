@@ -15,7 +15,7 @@ import { StravaCardSlot } from './StravaCardSlot';
  * interspersed with `introBlock` data, and dark/light mode
  * toggle.
  */
-export async function ContentGridHomepage() {
+async function ContentGridHomepage() {
   const projects = await getProjects();
   const projectCards = projects.map((project) => <ProjectCard key={project.title} {...project} />);
 
