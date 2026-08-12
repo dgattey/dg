@@ -1,6 +1,7 @@
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { type ForestWorld, type MinimapKind, toMinimapRuns } from './forestMap';
+import { hudSurfaceSx } from './forestMaterials';
 
 /**
  * A corner chart of the whole island, so a visitor who can only see their own
@@ -24,16 +25,13 @@ const MINIMAP_FILL: Record<MinimapKind, string> = {
 };
 
 const minimapSx: SxObject = {
-  backgroundColor: 'color-mix(in srgb, var(--mui-palette-background-paper) 70%, transparent)',
-  border: '1px solid var(--mui-palette-card-border)',
-  borderRadius: 3,
-  bottom: 12,
-  boxShadow: 'var(--mui-extraShadows-card-main)',
+  ...hudSurfaceSx,
+  bottom: 16,
   lineHeight: 0,
-  padding: 0.5,
+  padding: 0.75,
   pointerEvents: 'none',
   position: 'absolute',
-  right: 12,
+  right: 16,
   zIndex: 6,
 };
 

@@ -52,19 +52,54 @@ export type TerrainRun = {
 };
 
 /**
- * Plot geometry, in tiles. A cell has to hold a `gridItemDimension` card (17.25rem
- * ≈ 5.75 tiles) plus its sign, with enough forest left over between clearings
- * that the trail reads as a walk rather than a lawn.
+ * Every landmark reserves the same rectangle of ground, measured in tiles, and
+ * the whole layout is derived from it so two boards can never overlap. The
+ * plaque is bottom-anchored on the plot's trail tile and stands entirely north
+ * of it, so the footprint is all upward: `FOOTPRINT_NORTH` tiles tall and
+ * `FOOTPRINT_WIDTH` wide, centred on the anchor.
+ *
+ * The board component clamps its own rendered size to this rectangle (see
+ * `LANDMARK_CONTENT_WIDTH_PX` / `LANDMARK_MAX_HEIGHT_PX`), so variable-height
+ * cards — a long side-project list, a live tracklist — stay inside their plot
+ * instead of growing into a neighbour.
  */
-const PLOT_COLUMNS = 4;
-const PLOT_CELL_WIDTH = 15;
-const PLOT_CELL_HEIGHT = 14;
-const EDGE_MARGIN_X = 6;
-const EDGE_MARGIN_Y = 5;
+export const FOOTPRINT_WIDTH = 7;
+export const FOOTPRINT_NORTH = 8;
+
+/**
+ * Pixel budget the board's content fills. Width leaves half a tile of frame
+ * inside the reserved rectangle; height leaves room for the posts, frame,
+ * nameplate and gap on top of the content so the whole plaque still fits inside
+ * `FOOTPRINT_NORTH` and can never grow into the plot above it.
+ */
+export const LANDMARK_CONTENT_WIDTH_PX = (FOOTPRINT_WIDTH - 0.5) * TILE_SIZE;
+const LANDMARK_CHROME_BUDGET_PX = 84;
+export const LANDMARK_MAX_HEIGHT_PX = FOOTPRINT_NORTH * TILE_SIZE - LANDMARK_CHROME_BUDGET_PX;
+
+/**
+ * Plot geometry, in tiles. Cells are the footprint plus a guaranteed margin, so
+ * the gap between neighbours is `CELL - FOOTPRINT` on every side — enough forest
+ * that the trail reads as a walk, and enough that no jitter is needed (and none
+ * is used, so spacing stays provable).
+ */
+const PLOT_COLUMNS = 3;
+const PLOT_CELL_WIDTH = FOOTPRINT_WIDTH + 3;
+const PLOT_CELL_HEIGHT = FOOTPRINT_NORTH + 4;
+/** The anchor sits low in its cell so the whole northward board fits above it. */
+const CENTER_Y_OFFSET = FOOTPRINT_NORTH + 2;
+const EDGE_MARGIN_X = 5;
+const EDGE_MARGIN_Y = 6;
 
 /** Tiles around a plot centre that stay clear of trees, rocks and peaks. */
 const PLOT_PROTECT_RADIUS = 4.6;
 const CLEARING_RADIUS = 2.7;
+
+/**
+ * Radius around a plot anchor that stays free of scenery. Comfortably covers the
+ * two-tile ring the trail and the walker need, so stepping up to a sign is never
+ * blocked by something that grew next to it.
+ */
+const SCENERY_CLEAR_RADIUS = 3.2;
 
 /** Trail width in tiles. Two is wide enough to walk, narrow enough to read as a path. */
 const TRAIL_WIDTH = 2;
@@ -114,28 +149,46 @@ function valueNoise(x: number, y: number, scale: number, salt: number): number {
 
 /**
  * Lays plots out in a serpentine so the trail between them reads as one walk
- * rather than a grid, with a tile of jitter to break up the rows.
+ * rather than a grid. Each anchor sits at its cell's horizontal centre and low
+ * in the cell vertically, leaving room for the northward board. No jitter is
+ * applied: the margin between cells is what guarantees boards never touch, and
+ * jitter would eat into it.
  */
 function layOutPlots(ids: ReadonlyArray<string>): Array<ForestPlot> {
   return ids.map((id, index) => {
     const row = Math.floor(index / PLOT_COLUMNS);
     const indexInRow = index % PLOT_COLUMNS;
     const column = row % 2 === 0 ? indexInRow : PLOT_COLUMNS - 1 - indexInRow;
-    const jitterX = Math.round(hashUnit(index, 1, 7) * 2) - 1;
-    const jitterY = Math.round(hashUnit(index, 2, 9) * 2) - 1;
     return {
       id,
-      tileX: EDGE_MARGIN_X + column * PLOT_CELL_WIDTH + Math.floor(PLOT_CELL_WIDTH / 2) + jitterX,
-      tileY: EDGE_MARGIN_Y + row * PLOT_CELL_HEIGHT + Math.floor(PLOT_CELL_HEIGHT / 2) + jitterY,
+      tileX: EDGE_MARGIN_X + column * PLOT_CELL_WIDTH + Math.floor(PLOT_CELL_WIDTH / 2),
+      tileY: EDGE_MARGIN_Y + row * PLOT_CELL_HEIGHT + CENTER_Y_OFFSET,
     };
   });
 }
 
 function worldSize(plotCount: number) {
   const plotRows = Math.max(1, Math.ceil(plotCount / PLOT_COLUMNS));
+  const usedColumns = Math.min(PLOT_COLUMNS, Math.max(1, plotCount));
   return {
-    columns: EDGE_MARGIN_X * 2 + PLOT_COLUMNS * PLOT_CELL_WIDTH,
+    columns: EDGE_MARGIN_X * 2 + usedColumns * PLOT_CELL_WIDTH,
     rows: EDGE_MARGIN_Y * 2 + plotRows * PLOT_CELL_HEIGHT,
+  };
+}
+
+/**
+ * The rectangle of tiles a landmark reserves, in map space. The board is drawn
+ * from `ForestLandmark`, but this is the ground truth both the clearing carver
+ * and the overlap tests use, so the reserved footprint and the rendered plaque
+ * can never drift apart.
+ */
+export function landmarkTileRect(plot: ForestPlot) {
+  const halfWidth = FOOTPRINT_WIDTH / 2;
+  return {
+    maxX: plot.tileX + halfWidth,
+    maxY: plot.tileY,
+    minX: plot.tileX - halfWidth,
+    minY: plot.tileY - FOOTPRINT_NORTH,
   };
 }
 
@@ -253,7 +306,18 @@ function carveTrail(
   }
 }
 
-/** Opens a soft-edged clearing so a card has ground to stand on. */
+/**
+ * Opens a soft-edged glade at the foot of each landmark, so a board has mown
+ * ground to stand on and the trail through it reads as a stop rather than a
+ * thicket.
+ *
+ * Deliberately only the glade. Mowing the board's whole reserved footprint
+ * flattens roughly half the island — the boards are eight tiles tall — and
+ * leaves nowhere for the forest to actually be. The board is opaque and paints
+ * over whatever grows behind it, so the ground it covers does not need clearing;
+ * what must be guaranteed is that nothing is *scattered* there, which
+ * `isReservedGround` handles structurally.
+ */
 function openClearings(
   terrain: Array<Array<TerrainKind>>,
   columns: number,
@@ -278,6 +342,27 @@ function openClearings(
       }
     }
   }
+}
+
+/**
+ * The rectangle a board covers, in tiles. Nothing is scattered here at all — a
+ * tree planted at the top of the footprint would grow out past the plaque's top
+ * edge, since sprites stand nearly two tiles tall. This is the scenery half of
+ * the same footprint the layout uses to keep boards from overlapping each other.
+ */
+function isUnderBoard(x: number, y: number, plots: ReadonlyArray<ForestPlot>): boolean {
+  return plots.some((plot) => {
+    const rect = landmarkTileRect(plot);
+    return x >= rect.minX - 1 && x <= rect.maxX + 1 && y >= rect.minY - 1 && y <= rect.maxY + 1;
+  });
+}
+
+/**
+ * True where a tree or rock would stand between the walker and a sign. Flowers
+ * are welcome in a glade; anything solid is not.
+ */
+function blocksApproach(x: number, y: number, plots: ReadonlyArray<ForestPlot>): boolean {
+  return nearestPlotDistance(x, y, plots) <= SCENERY_CLEAR_RADIUS;
 }
 
 function hasNeighbour(
@@ -313,13 +398,16 @@ function scatterScenery(
   for (let y = 1; y < rows - 1; y++) {
     for (let x = 1; x < columns - 1; x++) {
       const kind = terrain[y]?.[x];
-      if (!kind) {
+      if (!kind || isUnderBoard(x, y, plots)) {
         continue;
       }
       const roll = hashUnit(x, y, 41);
+      const mayPlantSolid = !blocksApproach(x, y, plots);
       if (kind === 'sand') {
         if (roll > 0.965) {
-          scenery.push({ kind: 'rock', tileX: x, tileY: y });
+          if (mayPlantSolid) {
+            scenery.push({ kind: 'rock', tileX: x, tileY: y });
+          }
         } else if (roll < 0.02) {
           scenery.push({ kind: 'reed', tileX: x, tileY: y });
         }
@@ -339,6 +427,9 @@ function scatterScenery(
         if (roll > 0.9) {
           scenery.push({ kind: roll > 0.96 ? 'stump' : 'bloom', tileX: x, tileY: y });
         }
+        continue;
+      }
+      if (!mayPlantSolid) {
         continue;
       }
       const density = valueNoise(x, y, 6, 53);
@@ -479,6 +570,38 @@ export function toMinimapRuns(world: Pick<ForestWorld, 'rows' | 'terrain'>) {
     }
   }
   return runs;
+}
+
+export type PixelRect = { height: number; left: number; top: number; width: number };
+
+/**
+ * The pixel rectangle every landmark reserves on the world plane. Boards clamp
+ * themselves to these, so this is what the overlap tests measure against: no two
+ * may intersect, and none may fall outside the island.
+ */
+export function landmarkRects(
+  world: Pick<ForestWorld, 'plots'>,
+): Array<PixelRect & { id: string }> {
+  return world.plots.map((plot) => {
+    const rect = landmarkTileRect(plot);
+    return {
+      height: (rect.maxY - rect.minY) * TILE_SIZE,
+      id: plot.id,
+      left: rect.minX * TILE_SIZE,
+      top: rect.minY * TILE_SIZE,
+      width: (rect.maxX - rect.minX) * TILE_SIZE,
+    };
+  });
+}
+
+/** True when two rectangles share any area. */
+export function rectsOverlap(a: PixelRect, b: PixelRect): boolean {
+  return (
+    a.left < b.left + b.width &&
+    a.left + a.width > b.left &&
+    a.top < b.top + b.height &&
+    a.top + a.height > b.top
+  );
 }
 
 /**

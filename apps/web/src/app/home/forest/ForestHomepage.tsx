@@ -1,7 +1,7 @@
 import 'server-only';
 
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Typography } from '@mui/material';
+import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import { getProjects } from '../../../services/contentful';
 import { GatteySitesCardSlot } from '../GatteySitesCardSlot';
@@ -16,14 +16,16 @@ import { ForestMinimap } from './ForestMinimap';
 import { ForestScene } from './ForestScene';
 import { ForestTerrain } from './ForestTerrain';
 import { buildForestWorld, toBlockedMask } from './forestMap';
+import { FOREST_COLOR_VARS } from './forestPalette';
 
 /**
- * The homepage as a small island you walk around, behind `interactive-redesign`.
+ * The homepage as a full-page walkable island, behind `interactive-redesign`.
  *
- * Same cards, same data, same links as the grid — they are just planted in
- * clearings instead of laid out in rows. The island is generated from the card
- * order, so this stays a switch on presentation rather than a second homepage
- * with its own content.
+ * The world owns the viewport: it breaks out of the page container, sits flush
+ * under the header and floods the ocean to every edge, so there is no card frame
+ * or cream page around it. The header stays put but is restyled into the world's
+ * HUD material by `ForestWorldStyles`. Same cards, same data, same links as the
+ * grid — planted on carved boards along a trail instead of laid out in a grid.
  */
 
 type PlantedCard = {
@@ -32,10 +34,61 @@ type PlantedCard = {
   node: ReactNode;
 };
 
-const introSx: SxObject = {
-  marginBottom: 2,
-  maxWidth: '42rem',
+/** Marks the DOM so the scoped global style can pull the header into the world. */
+export const FOREST_WORLD_ATTRIBUTE = 'data-forest-world';
+
+const forestPageSx: SxObject = {
+  ...FOREST_COLOR_VARS,
+  // Break out of the centered page container to true viewport width.
+  marginInline: 'calc(50% - 50dvw)',
+  position: 'relative',
+  width: '100dvw',
 };
+
+/** Keeps the page's h1 in the accessibility tree without drawing text over the world. */
+const srOnlySx: SxObject = {
+  border: 0,
+  clip: 'rect(0 0 0 0)',
+  clipPath: 'inset(50%)',
+  height: '1px',
+  margin: '-1px',
+  overflow: 'hidden',
+  padding: 0,
+  position: 'absolute',
+  whiteSpace: 'nowrap',
+  width: '1px',
+};
+
+/**
+ * Scoped global style, active only while a forest world is in the DOM. It hands
+ * the world's material tokens to the header (which lives above this subtree),
+ * removes the page spacing that used to box the world in, and swaps the header's
+ * frosted-glass capsule for the same HUD material the minimap and hint use.
+ *
+ * Written as a plain `<style>` so it needs no client component and disappears
+ * with the world when the flag is off.
+ */
+function ForestWorldStyles() {
+  const tokens = Object.entries(FOREST_COLOR_VARS as Record<string, string>)
+    .map(([name, value]) => `${name}:${value}`)
+    .join(';');
+  const css = `
+    body:has([${FOREST_WORLD_ATTRIBUTE}]){${tokens};overflow-x:hidden;}
+    body:has([${FOREST_WORLD_ATTRIBUTE}]) section:has(> * > main){margin-top:0;}
+    body:has([${FOREST_WORLD_ATTRIBUTE}]) section:has([data-site-header]){margin-bottom:0;}
+    body:has([${FOREST_WORLD_ATTRIBUTE}]) [data-header-capsule]{
+      backdrop-filter:none;
+      background-color:var(--forest-hud);
+      border-color:var(--forest-hud-edge);
+      box-shadow:0 8px 20px -10px light-dark(hsl(140deg 30% 20% / 0.5), hsl(190deg 60% 3% / 0.7));
+    }`;
+  return (
+    <style
+      // biome-ignore lint/security/noDangerouslySetInnerHtml: fixed literal, no input reaches it
+      dangerouslySetInnerHTML={{ __html: css }}
+    />
+  );
+}
 
 export async function ForestHomepage() {
   const projects = await getProjects();
@@ -62,10 +115,11 @@ export async function ForestHomepage() {
   const world = buildForestWorld(planted.map((card) => card.id));
 
   return (
-    <Box component="section">
-      <Typography component="h1" sx={introSx} variant="h4">
+    <Box {...{ [FOREST_WORLD_ATTRIBUTE]: true }} component="section" sx={forestPageSx}>
+      <ForestWorldStyles />
+      <Box component="h1" sx={srOnlySx}>
         A small island of everything I&rsquo;m up to. Walk the trail and see what you find.
-      </Typography>
+      </Box>
       <ForestScene
         blockedMask={toBlockedMask(world)}
         columns={world.columns}
@@ -86,6 +140,7 @@ export async function ForestHomepage() {
               label={card.label}
               tileX={plot.tileX}
               tileY={plot.tileY}
+              variant={card.id === 'spotify' ? 'grove' : 'board'}
             >
               {card.node}
             </ForestLandmark>

@@ -1,6 +1,8 @@
 import {
   buildForestWorld,
   isWalkableTile,
+  landmarkRects,
+  rectsOverlap,
   TILE_SIZE,
   toBlockedMask,
   toTerrainRuns,
@@ -144,4 +146,53 @@ describe('toBlockedMask', () => {
 
 it('keeps a tile size that fits a card in a clearing', () => {
   expect(TILE_SIZE).toBeGreaterThan(0);
+});
+
+describe('landmark footprints', () => {
+  const idsFor = (count: number) => Array.from({ length: count }, (_, i) => `card-${i}`);
+
+  it.each([[1], [2], [3], [6], [9], [12], [15]])(
+    'reserve rectangles that never overlap for %i cards',
+    (count) => {
+      const rects = landmarkRects(buildForestWorld(idsFor(count)));
+      for (let i = 0; i < rects.length; i++) {
+        for (let j = i + 1; j < rects.length; j++) {
+          const a = rects[i];
+          const b = rects[j];
+          if (a && b) {
+            expect(rectsOverlap(a, b)).toBe(false);
+          }
+        }
+      }
+    },
+  );
+
+  it('keep every landmark inside the island', () => {
+    const world = buildForestWorld(CARD_IDS);
+    const worldWidth = world.columns * TILE_SIZE;
+    const worldHeight = world.rows * TILE_SIZE;
+    for (const rect of landmarkRects(world)) {
+      expect(rect.left).toBeGreaterThanOrEqual(0);
+      expect(rect.top).toBeGreaterThanOrEqual(0);
+      expect(rect.left + rect.width).toBeLessThanOrEqual(worldWidth);
+      expect(rect.top + rect.height).toBeLessThanOrEqual(worldHeight);
+    }
+  });
+
+  it('mow the whole footprint so no tree pokes through a board', () => {
+    const world = buildForestWorld(CARD_IDS);
+    const blocking = new Set(
+      world.scenery
+        .filter((sprite) => ['oak', 'pine', 'rock'].includes(sprite.kind))
+        .map((sprite) => `${sprite.tileX},${sprite.tileY}`),
+    );
+    for (const plot of world.plots) {
+      const halfWidth = 3;
+      for (let y = plot.tileY - 7; y <= plot.tileY; y++) {
+        for (let x = plot.tileX - halfWidth; x <= plot.tileX + halfWidth; x++) {
+          expect(blocking.has(`${x},${y}`)).toBe(false);
+        }
+      }
+    }
+  });
 });

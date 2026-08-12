@@ -8,6 +8,7 @@ import { CHARACTER_ROLE, ForestCharacter } from './ForestCharacter';
 import { LANDMARK_ATTRIBUTE, LANDMARK_NEAR_ATTRIBUTE } from './ForestLandmark';
 import { MINIMAP_MARKER_ROLE } from './ForestMinimap';
 import { TILE_SIZE } from './forestMap';
+import { hudSurfaceSx } from './forestMaterials';
 import { FOREST_COLOR_VARS } from './forestPalette';
 
 /**
@@ -51,16 +52,18 @@ const viewportSx: SxObject = {
   ...FOREST_COLOR_VARS,
   '&:focus-visible': {
     outline: '2px solid var(--mui-palette-primary-main)',
-    outlineOffset: 3,
+    outlineOffset: -2,
   },
+  // The world owns the page: it fills the viewport below the header edge to
+  // edge, with no card frame around it. The ocean floods to every edge so the
+  // island reads as an island, not an image clipped inside a panel.
   backgroundColor: 'var(--forest-ocean)',
-  border: '1px solid var(--mui-palette-card-border)',
-  borderRadius: 6,
-  boxShadow: 'var(--mui-extraShadows-card-main)',
-  height: 'clamp(26rem, 78vh, 54rem)',
+  height: 'calc(100dvh - var(--site-header-height, 5rem))',
+  minHeight: '30rem',
   // Scrollable until the walker takes over on hydration, so a scriptless visitor
   // can still pan the island and click into every card.
   overflow: 'auto',
+  overscrollBehavior: 'contain',
   position: 'relative',
 };
 
@@ -94,11 +97,9 @@ const characterAnchorSx: SxObject = {
 };
 
 const hintSx: SxObject = {
-  backdropFilter: 'blur(6px)',
-  backgroundColor: 'color-mix(in srgb, var(--mui-palette-background-paper) 78%, transparent)',
-  border: '1px solid var(--mui-palette-card-border)',
+  ...hudSurfaceSx,
   borderRadius: 999,
-  bottom: 12,
+  bottom: 16,
   color: 'var(--mui-palette-text-secondary)',
   left: '50%',
   paddingBlock: 0.5,

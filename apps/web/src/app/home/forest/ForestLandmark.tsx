@@ -1,39 +1,51 @@
-import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import { TILE_SIZE } from './forestMap';
+import {
+  carvedSignLabelSx,
+  carvedSignSx,
+  createBouncyTransition,
+  groveStageSx,
+  groveSurfaceSx,
+  LANDMARK_POST_HEIGHT,
+  landmarkFrameSx,
+  landmarkNearSx,
+  landmarkSurfaceSx,
+} from './forestMaterials';
 
 /**
- * One homepage card planted in a clearing, with a carved sign naming the spot.
+ * One homepage card mounted on a world-native landmark.
  *
- * Server-rendered: the card inside is whatever the normal grid would have shown,
- * so data fetching, links and hover behaviour are untouched. The only thing the
- * walker does to a landmark is flip `data-forest-near`, which this styles.
+ * A `board` is a carved wooden plaque on two posts, standing in its clearing; a
+ * `grove` is a rounded stone stage for the now-playing card, left open so the
+ * album glow can bloom past it. Either way the content inside is the same card
+ * the grid renders — its surface is dissolved (see `dissolveInnerCardSx`) so it
+ * reads as content on the board, not a card pasted on top, while its links,
+ * hover, focus and data fetching are untouched.
+ *
+ * The only thing the walker does to a landmark is flip `data-forest-near`, which
+ * lights its lantern.
  */
 
 /** Attribute the client walker reads to find landmarks and mark the closest. */
 export const LANDMARK_ATTRIBUTE = 'data-forest-landmark';
 export const LANDMARK_NEAR_ATTRIBUTE = 'data-forest-near';
 
-/** Gap between the trail and the bottom of the signpost, in pixels. */
-const POST_HEIGHT = 18;
+export type LandmarkVariant = 'board' | 'grove';
 
 /** The anchor is a zero-sized point on the plot's centre tile, right on the trail. */
 const landmarkSx: SxObject = {
-  '--forest-sign': 'light-dark(hsl(32deg 44% 78%), hsl(28deg 24% 28%))',
-  '--forest-sign-active': 'light-dark(hsl(38deg 82% 74%), hsl(24deg 44% 38%))',
   position: 'absolute',
 };
 
 /** Everything visible stands north of the anchor so the trail stays walkable. */
 const stackSx: SxObject = {
   [`[${LANDMARK_NEAR_ATTRIBUTE}='true'] &`]: {
-    '& [data-role="forest-sign"]': { backgroundColor: 'var(--forest-sign-active)' },
-    transform: 'translateX(-50%) scale(1.04)',
+    transform: 'translateX(-50%) scale(1.03)',
   },
   alignItems: 'center',
-  bottom: POST_HEIGHT,
+  bottom: LANDMARK_POST_HEIGHT,
   display: 'flex',
   flexDirection: 'column',
   gap: 1,
@@ -45,51 +57,25 @@ const stackSx: SxObject = {
   willChange: 'transform',
 };
 
-const signSx: SxObject = {
-  backgroundColor: 'var(--forest-sign)',
-  border: '2px solid var(--forest-bark)',
-  borderRadius: '4px',
-  boxShadow: '0 2px 0 var(--forest-bark-dark)',
-  color: 'light-dark(hsl(24deg 34% 24%), hsl(38deg 44% 84%))',
-  paddingBlock: 0.25,
-  paddingInline: 1,
-  position: 'relative',
-  whiteSpace: 'nowrap',
-  ...createBouncyTransition('background-color'),
-  '&::after': {
-    backgroundColor: 'var(--forest-bark)',
-    bottom: -POST_HEIGHT,
+/** Two posts sinking the board into the trail below it. */
+const postsSx: SxObject = {
+  '&::after': { right: '22%' },
+  '&::before': { left: '22%' },
+  '&::before, &::after': {
+    backgroundColor: 'var(--forest-wood-dark)',
+    borderRadius: '2px',
+    bottom: -LANDMARK_POST_HEIGHT,
     content: '""',
-    height: POST_HEIGHT,
-    left: 'calc(50% - 2px)',
+    height: LANDMARK_POST_HEIGHT + 4,
     position: 'absolute',
-    width: 4,
+    width: 5,
   },
-};
-
-const signLabelSx: SxObject = {
-  fontWeight: 700,
-  letterSpacing: '0.08em',
-  textTransform: 'uppercase',
-};
-
-/**
- * A mown pad under whatever card is planted here. Real cards bring their own
- * paper so it never shows through them; it exists for the intro copy, which is
- * deliberately surface-less in the grid and would otherwise be text on grass.
- */
-const contentSx: SxObject = {
-  backdropFilter: 'blur(2px)',
-  backgroundColor: 'color-mix(in srgb, var(--mui-palette-background-default) 72%, transparent)',
-  borderRadius: 6,
-  boxShadow: '0 0 0 6px color-mix(in srgb, var(--forest-clearing) 55%, transparent)',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 2,
-  maxWidth: TILE_SIZE * 7,
-  overflow: 'visible',
-  padding: 1,
   position: 'relative',
+};
+
+const nearFrameSx: SxObject = {
+  [`[${LANDMARK_NEAR_ATTRIBUTE}='true'] &`]: landmarkNearSx,
+  ...createBouncyTransition('box-shadow'),
 };
 
 type ForestLandmarkProps = {
@@ -98,9 +84,21 @@ type ForestLandmarkProps = {
   label: string;
   tileX: number;
   tileY: number;
+  variant?: LandmarkVariant;
 };
 
-export function ForestLandmark({ children, id, label, tileX, tileY }: ForestLandmarkProps) {
+export function ForestLandmark({
+  children,
+  id,
+  label,
+  tileX,
+  tileY,
+  variant = 'board',
+}: ForestLandmarkProps) {
+  const isGrove = variant === 'grove';
+  const frameSx = { ...(isGrove ? groveStageSx : landmarkFrameSx), ...nearFrameSx };
+  const surfaceSx = isGrove ? groveSurfaceSx : landmarkSurfaceSx;
+
   return (
     <Box
       {...{ [LANDMARK_ATTRIBUTE]: id }}
@@ -111,11 +109,15 @@ export function ForestLandmark({ children, id, label, tileX, tileY }: ForestLand
       }}
     >
       <Box sx={stackSx}>
-        <Box sx={contentSx}>{children}</Box>
-        <Box aria-hidden="true" data-role="forest-sign" sx={signSx}>
-          <Typography component="span" sx={signLabelSx} variant="caption">
-            {label}
-          </Typography>
+        <Box sx={postsSx}>
+          <Box data-role="forest-frame" sx={frameSx}>
+            <Box aria-hidden="true" sx={carvedSignSx}>
+              <Typography component="span" sx={carvedSignLabelSx} variant="caption">
+                {label}
+              </Typography>
+            </Box>
+            <Box sx={surfaceSx}>{children}</Box>
+          </Box>
         </Box>
       </Box>
     </Box>

@@ -64,7 +64,7 @@ export function Header() {
         <Nav sx={navSx}>
           <NavGroup sx={{ height: 'auto' }}>
             <NavItem variant="body2">
-              <MouseAwareGlassContainer sx={glassContainerSx}>
+              <MouseAwareGlassContainer data-header-capsule={true} sx={glassContainerSx}>
                 <Logo />
                 <Suspense fallback={null}>
                   <SpotifyHeaderCardSlot />
