@@ -5,7 +5,8 @@ import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { type ReactNode, useEffect, useState } from 'react';
-import { extractAlbumGradientFromUrl } from './extractAlbumGradient';
+import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
+import { type AlbumGradientInformation, extractAlbumGradientFromUrl } from './extractAlbumGradient';
 import { SpotifyCardScrollTracker } from './SpotifyCardScrollTracker';
 import { TrackListing } from './TrackListing';
 
@@ -23,16 +24,23 @@ const shellContainerSx: SxObject = {
   position: 'relative',
 };
 
-const getGradientGlowSx = (gradient: string): SxObject => ({
-  backgroundImage: gradient,
+const gradientGlowSx: SxObject = {
   borderRadius: 6,
   filter: 'blur(16px)',
   inset: -2,
   opacity: 0.5,
-  pointerEvents: 'none',
-  position: 'absolute',
   zIndex: 0,
-});
+};
+
+/**
+ * Sits behind the card's contents but above its paper background, inset by the
+ * hairline border so the gradient still reaches the card's edges.
+ */
+const gradientSurfaceSx: SxObject = {
+  borderRadius: 'inherit',
+  inset: '-1px',
+  zIndex: -1,
+};
 
 const cardSx: SxObject = {
   display: 'flex',
@@ -44,16 +52,14 @@ const cardSx: SxObject = {
   zIndex: 1,
 };
 
-const getCardSx = (gradient?: string): SxObject => ({
-  ...(gradient ? { backgroundImage: gradient } : {}),
-  ...cardSx,
-});
-
 function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
   return (
     <Box sx={shellContainerSx}>
-      {gradient ? <Box aria-hidden="true" sx={getGradientGlowSx(gradient)} /> : null}
-      <ContentCard sx={getCardSx(gradient)}>{children}</ContentCard>
+      <AlbumGradientBackdrop containerSx={gradientGlowSx} gradient={gradient} />
+      <ContentCard sx={cardSx}>
+        <AlbumGradientBackdrop containerSx={gradientSurfaceSx} gradient={gradient} />
+        {children}
+      </ContentCard>
     </Box>
   );
 }
@@ -67,30 +73,34 @@ type SpotifyCardWithGradientProps = {
  * Keeps sharp (and its native libvips) out of the homepage server module graph.
  */
 export function SpotifyCardWithGradient({ track }: SpotifyCardWithGradientProps) {
-  const [displayTrack, setDisplayTrack] = useState(track);
+  const [gradientInformation, setGradientInformation] = useState<AlbumGradientInformation>({
+    backgroundGradient: track.albumGradient ?? null,
+    contrastSetting: track.albumGradientContrastSetting ?? null,
+  });
 
   useEffect(() => {
-    setDisplayTrack(track);
     let cancelled = false;
     extractAlbumGradientFromUrl(track.albumImage.url).then((info) => {
       if (cancelled) {
         return;
       }
-      setDisplayTrack({
-        ...track,
-        albumGradient: info.backgroundGradient ?? undefined,
-        albumGradientContrastSetting: info.contrastSetting ?? undefined,
-      });
+      setGradientInformation(info);
     });
     return () => {
       cancelled = true;
     };
-  }, [track]);
+  }, [track.albumImage.url]);
+
+  const trackWithCurrentGradient: Track = {
+    ...track,
+    albumGradient: gradientInformation.backgroundGradient ?? undefined,
+    albumGradientContrastSetting: gradientInformation.contrastSetting ?? undefined,
+  };
 
   return (
     <SpotifyCardScrollTracker>
-      <SpotifyCardShell gradient={displayTrack.albumGradient}>
-        <TrackListing track={displayTrack} />
+      <SpotifyCardShell gradient={trackWithCurrentGradient.albumGradient}>
+        <TrackListing track={trackWithCurrentGradient} />
       </SpotifyCardShell>
     </SpotifyCardScrollTracker>
   );
