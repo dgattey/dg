@@ -7,7 +7,7 @@ import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { StickyBarTopMask } from '@dg/ui/core/StickyFadeBar';
 import type { SxObject } from '@dg/ui/theme';
 import { ColorSchemeScript } from '@dg/ui/theme/ColorSchemeScript';
-import { SYSTEM_COLOR_SCHEME_STYLE } from '@dg/ui/theme/colorScheme';
+import { ColorSchemeSync } from '@dg/ui/theme/ColorSchemeSync';
 import { GlobalStyleProvider } from '@dg/ui/theme/GlobalStyleProvider';
 import Container from '@mui/material/Container';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
@@ -36,7 +36,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const serverTime = await getServerTime();
 
   return (
-    <html lang="en" style={SYSTEM_COLOR_SCHEME_STYLE} suppressHydrationWarning={true}>
+    <html lang="en" suppressHydrationWarning={true}>
       <head>
         <ColorSchemeScript />
         <JsOnlyStyle />
@@ -45,6 +45,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <AppRouterCacheProvider>
           <ServerTimeProvider serverTime={serverTime}>
             <GlobalStyleProvider>
+              {/* Restores the stored scheme that hydration strips off <html> */}
+              <ColorSchemeSync />
               {/* Refresh RSC data on focus or navigation */}
               <RefreshOnFocusProvider />
               <WebMcpTools />
