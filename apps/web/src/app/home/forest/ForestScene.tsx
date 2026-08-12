@@ -54,17 +54,19 @@ const viewportSx: SxObject = {
     outline: '2px solid var(--mui-palette-primary-main)',
     outlineOffset: -2,
   },
-  // The world owns the page: it fills the viewport below the header edge to
-  // edge, with no card frame around it. The ocean floods to every edge so the
-  // island reads as an island, not an image clipped inside a panel.
+  // The world owns the page: it fills the whole viewport, edge to edge and up
+  // behind the header, with no card frame around it. The ocean floods to every
+  // edge so the island reads as an island, not an image clipped inside a panel.
   backgroundColor: 'var(--forest-ocean)',
-  height: 'calc(100dvh - var(--site-header-height, 5rem))',
+  height: '100dvh',
   minHeight: '30rem',
-  // Scrollable until the walker takes over on hydration, so a scriptless visitor
-  // can still pan the island and click into every card.
+  // Scrollable until someone actually starts walking, so every visitor can reach
+  // every card: no scripting, no keyboard, or just a mouse wheel.
   overflow: 'auto',
   overscrollBehavior: 'contain',
   position: 'relative',
+  scrollbarColor: 'var(--forest-wood-dark) transparent',
+  scrollbarWidth: 'thin',
 };
 
 const worldSx: SxObject = {
@@ -98,15 +100,19 @@ const characterAnchorSx: SxObject = {
 
 const hintSx: SxObject = {
   ...hudSurfaceSx,
+  // Nothing here is true without a keyboard, and on a phone it would also crowd
+  // the minimap in the same corner of a very small screen.
+  '@media (pointer: coarse)': { display: 'none' },
   borderRadius: 999,
   bottom: 16,
   color: 'var(--mui-palette-text-secondary)',
-  left: '50%',
+  left: 16,
+  // Sits at the left so it can never collide with the minimap opposite it.
+  maxWidth: 'calc(100% - 12rem)',
   paddingBlock: 0.5,
   paddingInline: 2,
   pointerEvents: 'none',
   position: 'absolute',
-  transform: 'translateX(-50%)',
   zIndex: 6,
 };
 
@@ -149,9 +155,6 @@ export function ForestScene({
       return;
     }
 
-    viewport.style.overflow = 'hidden';
-    viewport.scrollTo(0, 0);
-
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const landmarks = Array.from(
       world.querySelectorAll<HTMLElement>(`[${LANDMARK_ATTRIBUTE}]`),
@@ -170,6 +173,7 @@ export function ForestScene({
     let isOnScreen = true;
     let lastFrame = 0;
     let frame = 0;
+    let isWalkerDriving = false;
 
     const canStand = (x: number, y: number) => {
       const corners = [
@@ -325,6 +329,31 @@ export function ForestScene({
       return active !== null && active !== viewport && viewport.contains(active);
     };
 
+    /**
+     * Hands the island over to the walker, which happens the first time someone
+     * presses a direction rather than on load.
+     *
+     * Until then it stays an ordinary scroll container, which is the only thing
+     * that works for every visitor: a scriptless one, a phone with no arrow keys
+     * at all, and a mouse user who would otherwise have found a page they cannot
+     * scroll. Taking the scrollbar away is only fair once a visitor has shown
+     * they intend to drive. The camera snaps rather than eases here, because it
+     * is answering a keypress that means "I am this character".
+     */
+    const takeTheWheel = () => {
+      if (isWalkerDriving) {
+        return;
+      }
+      isWalkerDriving = true;
+      viewport.style.overflow = 'hidden';
+      viewport.scrollTo(0, 0);
+      moveTo(footX, footY);
+      frame = requestAnimationFrame((time) => {
+        lastFrame = time;
+        frame = requestAnimationFrame(step);
+      });
+    };
+
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.metaKey || event.ctrlKey || event.altKey || !ownsKeyboard()) {
         return;
@@ -332,6 +361,7 @@ export function ForestScene({
       const key = normalizeKey(event.key);
       if (MOVEMENT_KEYS[key]) {
         event.preventDefault();
+        takeTheWheel();
         held.add(key);
         return;
       }
@@ -350,10 +380,14 @@ export function ForestScene({
 
     const onBlur = () => held.clear();
 
-    /** Tabbing to an off-screen card walks the character over to meet it. */
+    /**
+     * Tabbing to an off-screen card walks the character over to meet it. Only
+     * once the walker is driving — before that the browser scrolls focus into
+     * view on its own, and doing both fights it.
+     */
     const onFocusIn = (event: FocusEvent) => {
       const target = event.target;
-      if (!(target instanceof Element)) {
+      if (!isWalkerDriving || !(target instanceof Element)) {
         return;
       }
       const landmark = target.closest<HTMLElement>(`[${LANDMARK_ATTRIBUTE}]`);
@@ -375,11 +409,9 @@ export function ForestScene({
     window.addEventListener('blur', onBlur);
     world.addEventListener('focusin', onFocusIn);
 
-    moveTo(footX, footY);
-    frame = requestAnimationFrame((time) => {
-      lastFrame = time;
-      frame = requestAnimationFrame(step);
-    });
+    // Places the walker in the world without claiming the scrollbar or starting
+    // the animation loop: nothing runs per-frame until someone walks.
+    drawCharacter();
 
     return () => {
       cancelAnimationFrame(frame);
@@ -394,7 +426,7 @@ export function ForestScene({
 
   return (
     <Box
-      aria-label="Forest map of this site. With scripting on, arrow keys walk a character between cards; otherwise the map scrolls."
+      aria-label="Forest map of this site. The map scrolls, and with scripting on, arrow keys walk a character between cards."
       ref={viewportRef}
       role="application"
       sx={viewportSx}
@@ -408,7 +440,7 @@ export function ForestScene({
       </Box>
       {overlay}
       <Typography {...jsOnlyProps} component="p" sx={hintSx} variant="caption">
-        Arrow keys or WASD to walk · Enter opens the nearest spot
+        Scroll to explore · arrow keys or WASD to walk · Enter opens the nearest spot
       </Typography>
     </Box>
   );

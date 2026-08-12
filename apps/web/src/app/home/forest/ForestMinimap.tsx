@@ -26,8 +26,12 @@ const MINIMAP_FILL: Record<MinimapKind, string> = {
 
 const minimapSx: SxObject = {
   ...hudSurfaceSx,
+  // The chart is a fixed-size SVG of a map that grows with the card list, so on
+  // a small screen it is told to scale down rather than eat the corner.
+  '& svg': { height: 'auto', maxWidth: '100%' },
   bottom: 16,
   lineHeight: 0,
+  maxWidth: 'min(30vw, 40vh)',
   padding: 0.75,
   pointerEvents: 'none',
   position: 'absolute',

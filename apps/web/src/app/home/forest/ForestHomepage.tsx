@@ -39,8 +39,12 @@ export const FOREST_WORLD_ATTRIBUTE = 'data-forest-world';
 
 const forestPageSx: SxObject = {
   ...FOREST_COLOR_VARS,
-  // Break out of the centered page container to true viewport width.
+  // Break out of the centered page container to true viewport width, then pull
+  // up under the sticky header so the terrain — not a strip of page background —
+  // is what sits behind the site chrome. The header keeps its space in flow, so
+  // the world still measures exactly one viewport tall.
   marginInline: 'calc(50% - 50dvw)',
+  marginTop: 'calc(-1 * var(--site-header-height, 5rem))',
   position: 'relative',
   width: '100dvw',
 };
@@ -74,7 +78,7 @@ function ForestWorldStyles() {
     .join(';');
   const css = `
     body:has([${FOREST_WORLD_ATTRIBUTE}]){${tokens};overflow-x:hidden;}
-    body:has([${FOREST_WORLD_ATTRIBUTE}]) section:has(> * > main){margin-top:0;}
+    body:has([${FOREST_WORLD_ATTRIBUTE}]) section:has(> * > main){margin-top:0;margin-bottom:0;}
     body:has([${FOREST_WORLD_ATTRIBUTE}]) section:has([data-site-header]){margin-bottom:0;}
     body:has([${FOREST_WORLD_ATTRIBUTE}]) [data-header-capsule]{
       backdrop-filter:none;

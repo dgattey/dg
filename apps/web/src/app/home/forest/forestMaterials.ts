@@ -47,6 +47,12 @@ export const dissolveInnerCardSx: SxObject = {
     backgroundColor: 'transparent',
     borderColor: 'transparent',
     boxShadow: 'none',
+    // A ContentCard sizes itself to a grid cell it is no longer in. Left alone it
+    // stays that width and spills its text past the edge of the board, so the
+    // board's own clamp has to win.
+    height: 'auto',
+    maxWidth: '100%',
+    width: '100%',
   },
   '& .MuiCard-root:focus-within, & .MuiCard-root:hover': {
     boxShadow: 'none',
