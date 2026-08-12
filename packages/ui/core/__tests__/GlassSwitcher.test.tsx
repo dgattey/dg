@@ -86,7 +86,8 @@ describe('GlassSwitcher', () => {
     await user.click(secondRadio);
     expect(handleChange).toHaveBeenCalledWith('second');
 
-    expect(screen.getAllByRole('tooltip')).toHaveLength(1);
+    // Hidden until hover or keyboard focus reveals it, which CSS alone does
+    expect(screen.getAllByRole('tooltip', { hidden: true })).toHaveLength(1);
   });
 
   it('renders visible labels without tooltips for text-only options', async () => {
@@ -107,7 +108,7 @@ describe('GlassSwitcher', () => {
 
     expect(desktop().getByText('Recently added')).toBeInTheDocument();
     expect(desktop().getByText('Album')).toBeInTheDocument();
-    expect(screen.queryAllByRole('tooltip')).toHaveLength(0);
+    expect(screen.queryAllByRole('tooltip', { hidden: true })).toHaveLength(0);
     expect(screen.getByTestId('mobile-icon')).toBeInTheDocument();
 
     await user.click(desktop().getByRole('radio', { hidden: true, name: 'Album' }));

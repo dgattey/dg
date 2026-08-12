@@ -1,5 +1,4 @@
 import { act, render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
 import type { ReactNode } from 'react';
 import { RelativeTime } from '../RelativeTime';
 import { ServerTimeProvider } from '../ServerTimeContext';
@@ -10,42 +9,8 @@ function TestWrapper({ children }: { children: ReactNode }) {
   return <ServerTimeProvider serverTime={TEST_SERVER_TIME}>{children}</ServerTimeProvider>;
 }
 
-function setupPopoverMocks() {
-  const showPopover = jest.fn();
-  const hidePopover = jest.fn();
-  const originalShow = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'showPopover');
-  const originalHide = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'hidePopover');
-
-  Object.defineProperty(HTMLElement.prototype, 'showPopover', {
-    configurable: true,
-    value: showPopover,
-  });
-  Object.defineProperty(HTMLElement.prototype, 'hidePopover', {
-    configurable: true,
-    value: hidePopover,
-  });
-
-  const restore = () => {
-    if (originalShow) {
-      Object.defineProperty(HTMLElement.prototype, 'showPopover', originalShow);
-    } else {
-      Object.defineProperty(HTMLElement.prototype, 'showPopover', {
-        configurable: true,
-        value: undefined,
-      });
-    }
-    if (originalHide) {
-      Object.defineProperty(HTMLElement.prototype, 'hidePopover', originalHide);
-    } else {
-      Object.defineProperty(HTMLElement.prototype, 'hidePopover', {
-        configurable: true,
-        value: undefined,
-      });
-    }
-  };
-
-  return { hidePopover, restore, showPopover };
-}
+/** Closed tooltips are hidden, so the full date has to be asked for by name. */
+const fullDateTooltip = () => screen.getByRole('tooltip', { hidden: true });
 
 describe('RelativeTime', () => {
   beforeEach(() => {
@@ -119,7 +84,7 @@ describe('RelativeTime', () => {
     expect(timeEl).toBeInTheDocument();
     expect(timeEl).toHaveAttribute('dateTime', '2026-02-10T09:00:00.000Z');
 
-    const tooltip = screen.getByRole('tooltip');
+    const tooltip = fullDateTooltip();
     expect(tooltip).toBeInTheDocument();
     // Intl formats per environment locale (date + time)
     expect(tooltip).toHaveTextContent(/2026/);
@@ -132,8 +97,7 @@ describe('RelativeTime', () => {
 
     const timeEl = screen.getByText('2 days ago').closest('time');
     expect(timeEl).toHaveAttribute('dateTime', '2026-02-08T14:30:00.000Z');
-    const tooltip = screen.getByRole('tooltip');
-    expect(tooltip).toHaveTextContent(/2026/);
+    expect(fullDateTooltip()).toHaveTextContent(/2026/);
   });
 
   it('tooltip and dateTime are correct for timestamp number input', () => {
@@ -143,29 +107,18 @@ describe('RelativeTime', () => {
     // Formatter may show "1 day ago" or "Yesterday"
     const timeEl = screen.getByText(/1 day ago|Yesterday/).closest('time');
     expect(timeEl).toHaveAttribute('dateTime', '2026-02-09T00:00:00.000Z');
-    const tooltip = screen.getByRole('tooltip');
-    expect(tooltip).toHaveTextContent(/2026/);
+    expect(fullDateTooltip()).toHaveTextContent(/2026/);
   });
 
-  it('shows tooltip on hover', async () => {
-    jest.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
-    const { restore, showPopover } = setupPopoverMocks();
+  /**
+   * The exact instant is only ever *shown* by the tooltip, so it has to be
+   * announced with the relative text rather than left to a hover a keyboard or
+   * a screen reader never performs.
+   */
+  it('describes the relative time with the full date', () => {
+    render(<RelativeTime date="2026-02-10T09:00:00Z" />, { wrapper: TestWrapper });
 
-    render(<RelativeTime date="2026-02-10T09:00:00Z" />, {
-      wrapper: TestWrapper,
-    });
-
-    const timeEl = screen.getByText(/ago|Yesterday/).closest('time');
-    const anchor = timeEl?.parentElement;
-    if (!anchor) {
-      throw new Error('Tooltip anchor not found');
-    }
-
-    await user.hover(anchor);
-    expect(showPopover).toHaveBeenCalledTimes(1);
-
-    restore();
-    jest.useRealTimers();
+    const timeEl = screen.getByText('3 hours ago').closest('time');
+    expect(timeEl).toHaveAttribute('aria-describedby', fullDateTooltip().id);
   });
 });

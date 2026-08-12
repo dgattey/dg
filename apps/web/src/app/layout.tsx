@@ -1,6 +1,7 @@
 import '@dg/ui/theme/classNameSetupOnImport';
 import '@dg/ui/core/transitions/pageTransitions.css';
 
+import { JsOnlyStyle } from '@dg/ui/core/JsOnlyStyle';
 import { Section } from '@dg/ui/core/Section';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { StickyBarTopMask } from '@dg/ui/core/StickyFadeBar';
@@ -38,6 +39,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang="en" style={SYSTEM_COLOR_SCHEME_STYLE} suppressHydrationWarning={true}>
       <head>
         <ColorSchemeScript />
+        <JsOnlyStyle />
       </head>
       <body>
         <AppRouterCacheProvider>

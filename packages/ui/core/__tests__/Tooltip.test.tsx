@@ -1,58 +1,27 @@
-import { act, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Tooltip } from '../Tooltip';
 
-const setupPopoverMocks = () => {
-  const showPopover = jest.fn();
-  const hidePopover = jest.fn();
-  const originalShow = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'showPopover');
-  const originalHide = Object.getOwnPropertyDescriptor(HTMLElement.prototype, 'hidePopover');
-
-  Object.defineProperty(HTMLElement.prototype, 'showPopover', {
-    configurable: true,
-    value: showPopover,
-  });
-  Object.defineProperty(HTMLElement.prototype, 'hidePopover', {
-    configurable: true,
-    value: hidePopover,
-  });
-
-  const restore = () => {
-    if (originalShow) {
-      Object.defineProperty(HTMLElement.prototype, 'showPopover', originalShow);
-    } else {
-      Object.defineProperty(HTMLElement.prototype, 'showPopover', {
-        configurable: true,
-        value: undefined,
-      });
-    }
-
-    if (originalHide) {
-      Object.defineProperty(HTMLElement.prototype, 'hidePopover', originalHide);
-    } else {
-      Object.defineProperty(HTMLElement.prototype, 'hidePopover', {
-        configurable: true,
-        value: undefined,
-      });
-    }
-  };
-
-  return { hidePopover, restore, showPopover };
-};
-
 /**
- * jsdom's selector engine answers `:focus-visible` the same way it answers
- * `:focus`, so it can't tell a click from a Tab on its own. Stubbing the
- * trigger's `matches` is the only way to exercise both branches here.
+ * Rules emotion has emitted for the tooltip surface. jsdom can't simulate
+ * `:hover` or `:focus-visible`, so the stylesheet is where the reveal has to be
+ * checked — and checking it there is the point: a rule in the stylesheet is a
+ * rule the browser applies with no script running.
  */
-const stubFocusVisible = (element: Element, isFocusVisible: boolean) => {
-  const actualMatches = element.matches.bind(element);
-  jest
-    .spyOn(element, 'matches')
-    .mockImplementation((selector: string) =>
-      selector === ':focus-visible' ? isFocusVisible : actualMatches(selector),
-    );
+const surfaceRules = () => {
+  const surfaceClass = [...screen.getByRole('tooltip', { hidden: true }).classList].find((name) =>
+    name.startsWith('css-'),
+  );
+  if (!surfaceClass) {
+    throw new Error('Tooltip surface has no emotion class');
+  }
+  // Emotion inserts through the CSSOM here, so the tags themselves have no text
+  return [...document.querySelectorAll('style')]
+    .flatMap((tag) => [...(tag.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
+    .filter((rule) => rule.includes(surfaceClass));
 };
+
+const rulesMatching = (pattern: RegExp) => surfaceRules().filter((rule) => pattern.test(rule));
 
 describe('Tooltip', () => {
   it('adds aria-describedby and respects placement', () => {
@@ -63,7 +32,7 @@ describe('Tooltip', () => {
     );
 
     const button = screen.getByRole('button', { name: 'Trigger' });
-    const tooltip = screen.getByRole('tooltip');
+    const tooltip = screen.getByRole('tooltip', { hidden: true });
     const describedBy = button.getAttribute('aria-describedby');
     if (!describedBy) {
       throw new Error('aria-describedby not set');
@@ -82,121 +51,71 @@ describe('Tooltip', () => {
 
     const button = screen.getByRole('button', { name: 'Trigger' });
 
-    expect(screen.queryByRole('tooltip')).toBeNull();
+    expect(screen.queryByRole('tooltip', { hidden: true })).toBeNull();
     expect(button).not.toHaveAttribute('aria-describedby');
   });
 
-  it('shows and hides with the popover API', async () => {
-    jest.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
-    const { hidePopover, restore, showPopover } = setupPopoverMocks();
+  /**
+   * The whole point of the rewrite: hovering must not need a script. A tooltip
+   * that called `showPopover()` was invisible with scripting off.
+   */
+  it('reveals from CSS rather than the popover API', async () => {
+    const user = userEvent.setup();
+    const showPopover = jest.fn();
+    Object.defineProperty(HTMLElement.prototype, 'showPopover', {
+      configurable: true,
+      value: showPopover,
+    });
 
     render(
-      <Tooltip title="Popover">
+      <Tooltip title="Hint">
         <button type="button">Trigger</button>
       </Tooltip>,
     );
-
-    const button = screen.getByRole('button', { name: 'Trigger' });
-    const anchor = button.parentElement;
+    const anchor = screen.getByRole('button', { name: 'Trigger' }).parentElement;
     if (!anchor) {
       throw new Error('Tooltip anchor not found');
     }
 
     await user.hover(anchor);
-    expect(showPopover).toHaveBeenCalledTimes(1);
 
-    await user.unhover(anchor);
-    act(() => {
-      jest.advanceTimersByTime(100);
-    });
-    expect(hidePopover).toHaveBeenCalledTimes(1);
-
-    restore();
-    jest.useRealTimers();
-  });
-
-  it('shows on keyboard focus', async () => {
-    const user = userEvent.setup();
-    const { restore, showPopover } = setupPopoverMocks();
-
-    render(
-      <Tooltip title="Keyboard">
-        <button type="button">Trigger</button>
-      </Tooltip>,
-    );
-
-    const button = screen.getByRole('button', { name: 'Trigger' });
-    stubFocusVisible(button, true);
-
-    await user.tab();
-
-    expect(button).toHaveFocus();
-    expect(showPopover).toHaveBeenCalledTimes(1);
-
-    restore();
-  });
-
-  it('ignores focus the browser does not treat as keyboard focus', () => {
-    const { restore, showPopover } = setupPopoverMocks();
-
-    render(
-      <Tooltip title="Mouse">
-        <button type="button">Trigger</button>
-      </Tooltip>,
-    );
-
-    const button = screen.getByRole('button', { name: 'Trigger' });
-    stubFocusVisible(button, false);
-
-    act(() => {
-      button.focus();
-    });
-
-    // Focus really did land, so this pins the guard rather than absent focus
-    expect(button).toHaveFocus();
     expect(showPopover).not.toHaveBeenCalled();
-
-    restore();
+    expect(screen.getByRole('tooltip', { hidden: true })).not.toHaveAttribute('popover');
+    expect(rulesMatching(/\[data-tooltip-anchor\]:hover/)).not.toHaveLength(0);
   });
 
-  it('does not keep the tooltip open after a click once the pointer leaves', async () => {
-    jest.useFakeTimers();
-    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
-    const { hidePopover, restore, showPopover } = setupPopoverMocks();
-
+  /**
+   * A mouse click focuses its target, so plain `:focus` would pop a tooltip open
+   * on click and leave it there. Keyboard users still get the hint because
+   * `:focus-visible` is the browser's own answer to "was this focus keyboard-driven".
+   */
+  it('reveals on keyboard focus only, from either side of the anchor', () => {
     render(
-      <Tooltip title="Mouse">
+      <Tooltip title="Hint">
         <button type="button">Trigger</button>
       </Tooltip>,
     );
 
-    const button = screen.getByRole('button', { name: 'Trigger' });
-    const anchor = button.parentElement;
-    if (!anchor) {
-      throw new Error('Tooltip anchor not found');
-    }
-    stubFocusVisible(button, false);
+    expect(rulesMatching(/:focus(?!-visible)/)).toHaveLength(0);
+    // Trigger inside the anchor, and an anchor that has to sit inside its trigger
+    expect(rulesMatching(/\[data-tooltip-anchor\]:has\(:focus-visible\)/)).not.toHaveLength(0);
+    expect(rulesMatching(/\*:focus-visible>\[data-tooltip-anchor\]/)).not.toHaveLength(0);
+  });
 
-    await user.click(button);
-    const showsFromHover = showPopover.mock.calls.length;
+  it('keeps a closed tooltip out of the accessibility tree and the tab order', () => {
+    render(
+      <Tooltip title="Hint">
+        <button type="button">Trigger</button>
+      </Tooltip>,
+    );
 
-    await user.unhover(anchor);
-    act(() => {
-      jest.advanceTimersByTime(100);
-    });
-
-    expect(button).toHaveFocus();
-    expect(hidePopover).toHaveBeenCalled();
-    expect(showPopover).toHaveBeenCalledTimes(showsFromHover);
-
-    restore();
-    jest.useRealTimers();
+    // `visibility: hidden` is what does this, in place of the old `popover` attribute
+    expect(screen.queryByRole('tooltip')).toBeNull();
+    expect(screen.getByRole('tooltip', { hidden: true })).toBeInTheDocument();
   });
 
   it('shifts inline to stay inset from the viewport edge', async () => {
     const user = userEvent.setup();
-    const { restore } = setupPopoverMocks();
 
     render(
       <Tooltip title="Near the edge">
@@ -204,7 +123,7 @@ describe('Tooltip', () => {
       </Tooltip>,
     );
 
-    const tooltip = screen.getByRole('tooltip');
+    const tooltip = screen.getByRole('tooltip', { hidden: true });
     const anchor = screen.getByRole('button', { name: 'Trigger' }).parentElement;
     if (!anchor) {
       throw new Error('Tooltip anchor not found');
@@ -219,7 +138,5 @@ describe('Tooltip', () => {
     await user.hover(anchor);
 
     expect(tooltip.style.translate).toBe('-20px');
-
-    restore();
   });
 });

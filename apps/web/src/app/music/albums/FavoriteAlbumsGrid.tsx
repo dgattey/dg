@@ -2,6 +2,7 @@
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { GlassSwitcher } from '@dg/ui/core/GlassSwitcher';
+import { jsOnlyProps } from '@dg/ui/core/JsOnlyStyle';
 import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
@@ -238,7 +239,14 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
 
   return (
     <Stack spacing={2}>
-      <StickyFadeBar>
+      {/*
+       * The whole bar goes with the sorter when scripting is off, rather than
+       * leaving a dead control or an empty band behind it. Sorting is the only
+       * thing this bar is for, and it reorders a grid that React holds in state;
+       * every album and every album link is already on the page in the default
+       * order, so nothing here is the only route to anything.
+       */}
+      <StickyFadeBar {...jsOnlyProps}>
         <GlassSwitcher
           aria-label="Sort albums"
           mobileIcon={<ArrowDownUp size={18} />}
