@@ -1,3 +1,4 @@
+import { jsOnlyProps } from '@dg/ui/core/JsOnlyStyle';
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 
@@ -39,6 +40,12 @@ const fallbackSx: SxObject = {
   width: '100dvw',
 };
 
+/**
+ * Marked JS-only because without scripting this boundary never resolves: React
+ * swaps streamed content in with inline scripts, so the wash would sit there
+ * forever, a viewport of empty gradient above the `noscript` homepage the page
+ * renders for exactly that case.
+ */
 export function HomepageFallback() {
-  return <Box aria-hidden="true" sx={fallbackSx} />;
+  return <Box aria-hidden="true" sx={fallbackSx} {...jsOnlyProps} />;
 }
