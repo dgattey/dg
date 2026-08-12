@@ -8,7 +8,7 @@ import { Box, Card, Skeleton, Stack } from '@mui/material';
 import { Suspense } from 'react';
 import { getLatestSong } from '../../services/spotify';
 import { ALBUM_ART_BORDER_RADIUS, ALBUM_ART_DIMENSIONS } from '../albumArtStyles';
-import { SpotifyCardWithGradient } from '../spotify/SpotifyCardWithGradient';
+import { type AlbumGlowVariant, SpotifyCardWithGradient } from '../spotify/SpotifyCardWithGradient';
 
 const loadingLayoutSx: SxObject = {
   flex: 1,
@@ -83,22 +83,27 @@ function SpotifyCardLoading() {
  * Async data-fetching wrapper. Fetches the latest song server-side
  * and renders the client card that derives its gradient from album art.
  */
-async function SpotifyCardAsync() {
+async function SpotifyCardAsync({ glowVariant }: SpotifyCardSlotProps) {
   const track = await getLatestSong();
   if (!track) {
     return null;
   }
-  return <SpotifyCardWithGradient track={track} />;
+  return <SpotifyCardWithGradient glowVariant={glowVariant} track={track} />;
 }
+
+type SpotifyCardSlotProps = {
+  /** `ambient` widens the album glow so it spills into the forest map. */
+  glowVariant?: AlbumGlowVariant;
+};
 
 /**
  * Public entry point for the Spotify card on the homepage.
  * Wraps the async content in Suspense with a loading skeleton.
  */
-export function SpotifyCardSlot() {
+export function SpotifyCardSlot({ glowVariant }: SpotifyCardSlotProps) {
   return (
     <Suspense fallback={<SpotifyCardLoading />}>
-      <SpotifyCardAsync />
+      <SpotifyCardAsync glowVariant={glowVariant} />
     </Suspense>
   );
 }

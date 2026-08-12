@@ -10,8 +10,17 @@ import { type AlbumGradientInformation, extractAlbumGradientFromUrl } from './ex
 import { SpotifyCardScrollTracker } from './SpotifyCardScrollTracker';
 import { TrackListing } from './TrackListing';
 
+/**
+ * How far the album's colors are allowed to spill past the card.
+ * - `card` — the homepage grid's tight halo, hugging the card's own edges.
+ * - `ambient` — a wide, soft bloom for the forest map, where the now-playing
+ *   clearing is supposed to light the trees around it.
+ */
+export type AlbumGlowVariant = 'ambient' | 'card';
+
 type SpotifyCardShellProps = {
   children: ReactNode;
+  glowVariant: AlbumGlowVariant;
   gradient?: string;
 };
 
@@ -30,6 +39,19 @@ const gradientGlowSx: SxObject = {
   inset: -2,
   opacity: 0.5,
   zIndex: 0,
+};
+
+const ambientGradientGlowSx: SxObject = {
+  borderRadius: '50%',
+  filter: 'blur(64px)',
+  inset: -110,
+  opacity: 0.62,
+  zIndex: 0,
+};
+
+const GLOW_SX: Record<AlbumGlowVariant, SxObject> = {
+  ambient: ambientGradientGlowSx,
+  card: gradientGlowSx,
 };
 
 /**
@@ -52,10 +74,10 @@ const cardSx: SxObject = {
   zIndex: 1,
 };
 
-function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
+function SpotifyCardShell({ children, glowVariant, gradient }: SpotifyCardShellProps) {
   return (
     <Box sx={shellContainerSx}>
-      <AlbumGradientBackdrop containerSx={gradientGlowSx} gradient={gradient} />
+      <AlbumGradientBackdrop containerSx={GLOW_SX[glowVariant]} gradient={gradient} />
       <ContentCard sx={cardSx}>
         <AlbumGradientBackdrop containerSx={gradientSurfaceSx} gradient={gradient} />
         {children}
@@ -65,6 +87,8 @@ function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
 }
 
 type SpotifyCardWithGradientProps = {
+  /** Spread of the outer album-art glow. Defaults to the grid's tight halo. */
+  glowVariant?: AlbumGlowVariant;
   track: Track;
 };
 
@@ -72,7 +96,10 @@ type SpotifyCardWithGradientProps = {
  * Client card that derives album-art gradient/contrast in the browser.
  * Keeps sharp (and its native libvips) out of the homepage server module graph.
  */
-export function SpotifyCardWithGradient({ track }: SpotifyCardWithGradientProps) {
+export function SpotifyCardWithGradient({
+  glowVariant = 'card',
+  track,
+}: SpotifyCardWithGradientProps) {
   const [gradientInformation, setGradientInformation] = useState<AlbumGradientInformation>({
     backgroundGradient: track.albumGradient ?? null,
     contrastSetting: track.albumGradientContrastSetting ?? null,
@@ -99,7 +126,7 @@ export function SpotifyCardWithGradient({ track }: SpotifyCardWithGradientProps)
 
   return (
     <SpotifyCardScrollTracker>
-      <SpotifyCardShell gradient={trackWithCurrentGradient.albumGradient}>
+      <SpotifyCardShell glowVariant={glowVariant} gradient={trackWithCurrentGradient.albumGradient}>
         <TrackListing track={trackWithCurrentGradient} />
       </SpotifyCardShell>
     </SpotifyCardScrollTracker>

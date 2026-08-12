@@ -1,5 +1,6 @@
 import { homeRoute } from '@dg/shared-core/routes/app';
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import { getHomepageDescription } from '../services/homepage';
 import { Homepage } from './home/Homepage';
 import { markdownAlternates } from './layouts/markdownAlternates';
@@ -26,6 +27,16 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+/**
+ * The homepage layout is chosen by the `interactive-redesign` flag, and flag
+ * evaluation reads request-time cookies, so the choice lives in a Suspense hole
+ * rather than the prerendered shell. Both layouts are built from cached data, so
+ * the hole resolves as part of the same streamed response.
+ */
 export default function Page() {
-  return <Homepage />;
+  return (
+    <Suspense fallback={null}>
+      <Homepage />
+    </Suspense>
+  );
 }
