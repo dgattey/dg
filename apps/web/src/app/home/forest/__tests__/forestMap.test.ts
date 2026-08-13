@@ -49,6 +49,49 @@ describe('buildForestWorld', () => {
     expect(corners).toEqual(['ocean', 'ocean', 'ocean', 'ocean']);
   });
 
+  it('builds distinct water, meadow, wetland, forest, hill and mountain regions', () => {
+    const world = buildForestWorld(CARD_IDS);
+    const kinds = new Set(world.terrain.flat());
+    for (const kind of [
+      'bridge',
+      'grass',
+      'hill',
+      'lake',
+      'meadow',
+      'mountain',
+      'ocean',
+      'path',
+      'trail',
+      'wetland',
+    ]) {
+      expect(kinds).toContain(kind);
+    }
+  });
+
+  it('draws a branching trail network with main paths, side trails and water crossings', () => {
+    const world = buildForestWorld(CARD_IDS);
+    const branchTiles = world.terrain.flatMap((row, y) =>
+      row.flatMap((kind, x) => {
+        if (kind !== 'path' && kind !== 'trail' && kind !== 'bridge') {
+          return [];
+        }
+        const connected = [
+          world.terrain[y - 1]?.[x],
+          world.terrain[y + 1]?.[x],
+          world.terrain[y]?.[x - 1],
+          world.terrain[y]?.[x + 1],
+        ].filter(
+          (neighbor) => neighbor === 'path' || neighbor === 'trail' || neighbor === 'bridge',
+        );
+        return connected.length >= 3 ? [`${x},${y}`] : [];
+      }),
+    );
+    expect(branchTiles.length).toBeGreaterThan(0);
+    expect(world.terrain.flat()).toContain('path');
+    expect(world.terrain.flat()).toContain('trail');
+    expect(world.terrain.flat()).toContain('bridge');
+  });
+
   it('runs the trail through every card and keeps its glade clear', () => {
     const world = buildForestWorld(CARD_IDS);
     const mask = toBlockedMask(world);
@@ -102,6 +145,46 @@ describe('buildForestWorld', () => {
     expect(isWalkableTile(world, oceanTile, 0)).toBe(false);
     expect(isWalkableTile(world, -1, 0)).toBe(false);
     expect(isWalkableTile(world, 0, world.rows)).toBe(false);
+  });
+
+  it('blocks visible water and cliffs except where a route paints a crossing or pass', () => {
+    const world = buildForestWorld(CARD_IDS);
+    for (let y = 0; y < world.rows; y++) {
+      for (let x = 0; x < world.columns; x++) {
+        const kind = world.terrain[y]?.[x];
+        if (kind === 'lake' || kind === 'mountain' || kind === 'ocean' || kind === 'shallow') {
+          expect(isWalkableTile(world, x, y)).toBe(false);
+        }
+        if (kind === 'bridge' || kind === 'path' || kind === 'trail') {
+          expect(isWalkableTile(world, x, y)).toBe(true);
+        }
+      }
+    }
+  });
+
+  it('varies tree density between forest and open meadow', () => {
+    const world = buildForestWorld(CARD_IDS);
+    const trees = new Set(
+      world.scenery
+        .filter((sprite) => sprite.kind === 'oak' || sprite.kind === 'pine')
+        .map((sprite) => `${sprite.tileX},${sprite.tileY}`),
+    );
+    const count = (kind: 'grass' | 'meadow') => {
+      let terrainTiles = 0;
+      let treeTiles = 0;
+      for (let y = 0; y < world.rows; y++) {
+        for (let x = 0; x < world.columns; x++) {
+          if (world.terrain[y]?.[x] === kind) {
+            terrainTiles++;
+            if (trees.has(`${x},${y}`)) {
+              treeTiles++;
+            }
+          }
+        }
+      }
+      return treeTiles / terrainTiles;
+    };
+    expect(count('grass')).toBeGreaterThan(count('meadow') * 2);
   });
 });
 

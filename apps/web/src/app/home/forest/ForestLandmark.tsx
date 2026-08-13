@@ -1,7 +1,7 @@
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import { TILE_SIZE } from './forestMap';
+import { type LandmarkRegion, TILE_SIZE } from './forestMap';
 import {
   carvedSignLabelSx,
   carvedSignSx,
@@ -82,15 +82,26 @@ type ForestLandmarkProps = {
   children: ReactNode;
   id: string;
   label: string;
+  region: LandmarkRegion;
   tileX: number;
   tileY: number;
   variant?: LandmarkVariant;
+};
+
+const REGION_LABEL: Record<LandmarkRegion, string> = {
+  'forest-grove': 'Forest grove',
+  lakeside: 'Lakeside',
+  'meadow-camp': 'Meadow camp',
+  'mountain-overlook': 'Mountain overlook',
+  'rocky-shore': 'Rocky shore',
+  wetland: 'Wetland boardwalk',
 };
 
 export function ForestLandmark({
   children,
   id,
   label,
+  region,
   tileX,
   tileY,
   variant = 'board',
@@ -114,6 +125,13 @@ export function ForestLandmark({
             <Box aria-hidden="true" sx={carvedSignSx}>
               <Typography component="span" sx={carvedSignLabelSx} variant="caption">
                 {label}
+              </Typography>
+              <Typography
+                component="span"
+                sx={{ display: 'block', opacity: 0.72 }}
+                variant="caption"
+              >
+                {REGION_LABEL[region]}
               </Typography>
             </Box>
             <Box sx={surfaceSx}>{children}</Box>

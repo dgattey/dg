@@ -17,25 +17,39 @@ export const MINIMAP_MARKER_ROLE = 'forest-minimap-marker';
 const MINIMAP_TILE = 3;
 
 const MINIMAP_FILL: Record<MinimapKind, string> = {
+  bridge: 'var(--forest-bridge)',
   clearing: 'var(--forest-clearing)',
-  land: 'var(--forest-grass)',
+  forest: 'var(--forest-canopy-pine)',
+  hill: 'var(--forest-hill)',
+  meadow: 'var(--forest-meadow)',
   peak: 'var(--forest-mountain)',
+  'side-trail': 'var(--forest-trail)',
   trail: 'var(--forest-path)',
   water: 'var(--forest-ocean)',
+  wetland: 'var(--forest-wetland)',
 };
 
 const minimapSx: SxObject = {
   ...hudSurfaceSx,
+  '@media (max-height: 560px)': {
+    maxWidth: 30,
+    padding: 0.25,
+    right: 8,
+    top: 4,
+  },
   // The chart is a fixed-size SVG of a map that grows with the card list, so on
   // a small screen it is told to scale down rather than eat the corner.
   '& svg': { height: 'auto', maxWidth: '100%' },
-  bottom: 16,
   lineHeight: 0,
-  maxWidth: 'min(30vw, 40vh)',
+  // The camera reserves this top-right chart lane when framing a landmark.
+  // Scaling by both viewport axes keeps the lane useful on phones and short
+  // laptop windows without letting it cover a board.
+  maxWidth: 'min(22vw, 14vh)',
   padding: 0.75,
   pointerEvents: 'none',
   position: 'absolute',
   right: 16,
+  top: 16,
   zIndex: 6,
 };
 

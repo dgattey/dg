@@ -10,14 +10,19 @@
 export const TILE_SIZE = 48;
 
 export type TerrainKind =
+  | 'bridge'
   | 'clearing'
   | 'grass'
+  | 'hill'
+  | 'lake'
   | 'meadow'
   | 'mountain'
   | 'ocean'
   | 'path'
   | 'sand'
-  | 'shallow';
+  | 'shallow'
+  | 'trail'
+  | 'wetland';
 
 export type SceneryKind = 'bloom' | 'oak' | 'pine' | 'reed' | 'rock' | 'stump';
 
@@ -30,9 +35,18 @@ export type ScenerySprite = {
 /** A cleared spot in the forest that one homepage card is planted on. */
 export type ForestPlot = {
   id: string;
+  region: LandmarkRegion;
   tileX: number;
   tileY: number;
 };
+
+export type LandmarkRegion =
+  | 'forest-grove'
+  | 'lakeside'
+  | 'meadow-camp'
+  | 'mountain-overlook'
+  | 'rocky-shore'
+  | 'wetland';
 
 export type ForestWorld = {
   columns: number;
@@ -82,13 +96,36 @@ export const LANDMARK_MAX_HEIGHT_PX = FOOTPRINT_NORTH * TILE_SIZE - LANDMARK_CHR
  * that the trail reads as a walk, and enough that no jitter is needed (and none
  * is used, so spacing stays provable).
  */
-const PLOT_COLUMNS = 3;
-const PLOT_CELL_WIDTH = FOOTPRINT_WIDTH + 3;
-const PLOT_CELL_HEIGHT = FOOTPRINT_NORTH + 4;
-/** The anchor sits low in its cell so the whole northward board fits above it. */
-const CENTER_Y_OFFSET = FOOTPRINT_NORTH + 2;
-const EDGE_MARGIN_X = 5;
-const EDGE_MARGIN_Y = 6;
+const WORLD_COLUMNS = 62;
+const MIN_WORLD_ROWS = 86;
+
+/**
+ * Authored geographic anchors, not a card grid. Their uneven spacing makes each
+ * stop belong to a recognizable place while the footprint dimensions keep the
+ * boards provably separate. Special cards choose a matching region by id; all
+ * other projects take the next unused anchor.
+ */
+const LANDMARK_ANCHORS: ReadonlyArray<{
+  region: LandmarkRegion;
+  tileX: number;
+  tileY: number;
+}> = [
+  { region: 'meadow-camp', tileX: 10, tileY: 19 },
+  { region: 'meadow-camp', tileX: 25, tileY: 17 },
+  { region: 'mountain-overlook', tileX: 40, tileY: 21 },
+  { region: 'mountain-overlook', tileX: 54, tileY: 18 },
+  { region: 'forest-grove', tileX: 12, tileY: 39 },
+  { region: 'lakeside', tileX: 28, tileY: 42 },
+  { region: 'lakeside', tileX: 44, tileY: 36 },
+  { region: 'wetland', tileX: 55, tileY: 43 },
+  { region: 'rocky-shore', tileX: 9, tileY: 60 },
+  { region: 'forest-grove', tileX: 24, tileY: 57 },
+  { region: 'meadow-camp', tileX: 40, tileY: 62 },
+  { region: 'wetland', tileX: 54, tileY: 58 },
+  { region: 'forest-grove', tileX: 12, tileY: 79 },
+  { region: 'lakeside', tileX: 29, tileY: 76 },
+  { region: 'mountain-overlook', tileX: 45, tileY: 80 },
+];
 
 /** Tiles around a plot centre that stay clear of trees, rocks and peaks. */
 const PLOT_PROTECT_RADIUS = 4.6;
@@ -107,11 +144,15 @@ const TRAIL_WIDTH = 2;
 const SEED = 20_260_812;
 
 const WALKABLE_TERRAIN: ReadonlySet<TerrainKind> = new Set<TerrainKind>([
+  'bridge',
   'clearing',
   'grass',
+  'hill',
   'meadow',
   'path',
   'sand',
+  'trail',
+  'wetland',
 ]);
 
 const BLOCKING_SCENERY: ReadonlySet<SceneryKind> = new Set<SceneryKind>(['oak', 'pine', 'rock']);
@@ -147,33 +188,42 @@ function valueNoise(x: number, y: number, scale: number, salt: number): number {
   return lerp(top, bottom, fractionY);
 }
 
+const REGION_FOR_ID: ReadonlyArray<[RegExp, LandmarkRegion]> = [
+  [/spotify/i, 'forest-grove'],
+  [/strava/i, 'mountain-overlook'],
+  [/map/i, 'lakeside'],
+  [/gattey-sites/i, 'meadow-camp'],
+  [/intro/i, 'meadow-camp'],
+];
+
+const preferredRegion = (id: string): LandmarkRegion | undefined =>
+  REGION_FOR_ID.find(([pattern]) => pattern.test(id))?.[1];
+
 /**
- * Lays plots out in a serpentine so the trail between them reads as one walk
- * rather than a grid. Each anchor sits at its cell's horizontal centre and low
- * in the cell vertically, leaving room for the northward board. No jitter is
- * applied: the margin between cells is what guarantees boards never touch, and
- * jitter would eat into it.
+ * Assigns content to geographic anchors. Recognizable cards prefer a region
+ * that fits their story (Spotify's listening grove, Strava's overlook, the map
+ * at a dock); projects fill the remaining places in deterministic order.
  */
 function layOutPlots(ids: ReadonlyArray<string>): Array<ForestPlot> {
-  return ids.map((id, index) => {
-    const row = Math.floor(index / PLOT_COLUMNS);
-    const indexInRow = index % PLOT_COLUMNS;
-    const column = row % 2 === 0 ? indexInRow : PLOT_COLUMNS - 1 - indexInRow;
+  const available = LANDMARK_ANCHORS.slice();
+  return ids.map((id) => {
+    const desired = preferredRegion(id);
+    const matchingIndex = desired ? available.findIndex((anchor) => anchor.region === desired) : -1;
+    const anchorIndex = matchingIndex >= 0 ? matchingIndex : 0;
+    const anchor = available.splice(anchorIndex, 1)[0];
+    if (!anchor) {
+      throw new Error('Forest world has no landmark anchors');
+    }
     return {
       id,
-      tileX: EDGE_MARGIN_X + column * PLOT_CELL_WIDTH + Math.floor(PLOT_CELL_WIDTH / 2),
-      tileY: EDGE_MARGIN_Y + row * PLOT_CELL_HEIGHT + CENTER_Y_OFFSET,
+      ...anchor,
     };
   });
 }
 
-function worldSize(plotCount: number) {
-  const plotRows = Math.max(1, Math.ceil(plotCount / PLOT_COLUMNS));
-  const usedColumns = Math.min(PLOT_COLUMNS, Math.max(1, plotCount));
-  return {
-    columns: EDGE_MARGIN_X * 2 + usedColumns * PLOT_CELL_WIDTH,
-    rows: EDGE_MARGIN_Y * 2 + plotRows * PLOT_CELL_HEIGHT,
-  };
+function worldSize(plots: ReadonlyArray<ForestPlot>) {
+  const lowestAnchor = plots.reduce((lowest, plot) => Math.max(lowest, plot.tileY), 0);
+  return { columns: WORLD_COLUMNS, rows: Math.max(MIN_WORLD_ROWS, lowestAnchor + 8) };
 }
 
 /**
@@ -192,13 +242,46 @@ export function landmarkTileRect(plot: ForestPlot) {
   };
 }
 
+type Point = { x: number; y: number };
+
+const distanceToSegment = (x: number, y: number, from: Point, to: Point) => {
+  const dx = to.x - from.x;
+  const dy = to.y - from.y;
+  const lengthSquared = dx * dx + dy * dy;
+  const t =
+    lengthSquared === 0
+      ? 0
+      : Math.max(0, Math.min(1, ((x - from.x) * dx + (y - from.y) * dy) / lengthSquared));
+  return Math.hypot(x - (from.x + dx * t), y - (from.y + dy * t));
+};
+
+const riverDistance = (x: number, y: number, rows: number) => {
+  const points = [
+    { x: 33, y: 36 },
+    { x: 25, y: 48 },
+    { x: 28, y: 62 },
+    { x: 20, y: rows },
+  ];
+  let nearest = Number.POSITIVE_INFINITY;
+  for (let index = 0; index < points.length - 1; index++) {
+    const from = points[index];
+    const to = points[index + 1];
+    if (from && to) {
+      nearest = Math.min(nearest, distanceToSegment(x, y, from, to));
+    }
+  }
+  return nearest;
+};
+
 /**
- * Ocean fades to surf, then beach, then forest floor. The shoreline depth is
- * noise-driven so the island has coves instead of square corners.
+ * Layered distance fields and value noise produce the underlying geography:
+ * an irregular coast, a multi-lobed inland lake feeding a winding river, open
+ * meadow basins, wetlands around water, and forest floor everywhere between.
+ * Boundaries are deliberately soft and warped rather than geometric masks.
  */
 function baseTerrainAt(x: number, y: number, columns: number, rows: number): TerrainKind {
   const distanceToEdge = Math.min(x, y, columns - 1 - x, rows - 1 - y);
-  const shore = 2 + valueNoise(x, y, 9, 3) * 4;
+  const shore = 1.8 + valueNoise(x, y, 8, 3) * 3.8 + valueNoise(x, y, 19, 5) * 1.4;
   if (distanceToEdge < shore - 1.6) {
     return 'ocean';
   }
@@ -208,7 +291,34 @@ function baseTerrainAt(x: number, y: number, columns: number, rows: number): Ter
   if (distanceToEdge < shore + 2.4) {
     return 'sand';
   }
-  return valueNoise(x, y, 7, 11) > 0.62 ? 'meadow' : 'grass';
+
+  const warpX = (valueNoise(x, y, 11, 71) - 0.5) * 4;
+  const warpY = (valueNoise(x, y, 13, 73) - 0.5) * 4;
+  const lakeMain = Math.hypot((x + warpX - 35) / 9.5, (y + warpY - 32) / 7);
+  const lakeCove = Math.hypot((x - warpX - 29) / 6, (y + warpY - 35) / 5);
+  const lakeField = Math.min(lakeMain, lakeCove);
+  if (lakeField < 0.88) {
+    return 'lake';
+  }
+  if (lakeField < 1.14) {
+    return valueNoise(x, y, 4, 79) > 0.42 ? 'shallow' : 'wetland';
+  }
+
+  const river = riverDistance(x + warpX * 0.35, y + warpY * 0.35, rows);
+  const riverWidth = 1.05 + valueNoise(x, y, 7, 83) * 0.9;
+  if (river < riverWidth) {
+    return 'lake';
+  }
+  if (river < riverWidth + 1.1) {
+    return valueNoise(x, y, 5, 89) > 0.35 ? 'wetland' : 'shallow';
+  }
+
+  const meadowNoise = valueNoise(x, y, 12, 11) * 0.55 + valueNoise(x, y, 25, 13) * 0.45;
+  const meadowBasin = Math.min(
+    Math.hypot((x - 17) / 16, (y - 22) / 13),
+    Math.hypot((x - 37) / 18, (y - 61) / 16),
+  );
+  return meadowNoise > 0.55 || meadowBasin < 0.72 ? 'meadow' : 'grass';
 }
 
 const distanceTo = (x: number, y: number, plot: ForestPlot) =>
@@ -220,88 +330,191 @@ const nearestPlotDistance = (x: number, y: number, plots: ReadonlyArray<ForestPl
     Number.POSITIVE_INFINITY,
   );
 
-/** Small peaks tucked into the corners the trail never visits. */
+/**
+ * A broken mountain range follows a warped diagonal ridge. A wider hill band
+ * makes elevation ramp up visibly before the blocking rock faces; gaps around
+ * overlooks and paths become natural passes rather than invisible collision.
+ */
 function addMountains(
   terrain: Array<Array<TerrainKind>>,
   columns: number,
   rows: number,
   plots: ReadonlyArray<ForestPlot>,
 ) {
-  const peaks = [
-    { radius: 5, x: columns * 0.16, y: rows * 0.07 },
-    { radius: 4.5, x: columns * 0.86, y: rows * 0.28 },
-    { radius: 4, x: columns * 0.12, y: rows * 0.72 },
-    { radius: 4.5, x: columns * 0.88, y: rows * 0.93 },
+  const ridge = [
+    { x: columns * 0.7, y: 4 },
+    { x: columns * 0.84, y: rows * 0.24 },
+    { x: columns * 0.72, y: rows * 0.48 },
+    { x: columns * 0.9, y: rows * 0.72 },
+    { x: columns * 0.82, y: rows - 4 },
   ];
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < columns; x++) {
       const row = terrain[y];
-      if (!row || (row[x] !== 'grass' && row[x] !== 'meadow')) {
+      if (!row || (row[x] !== 'grass' && row[x] !== 'meadow' && row[x] !== 'wetland')) {
         continue;
       }
-      if (nearestPlotDistance(x, y, plots) < PLOT_PROTECT_RADIUS + 1) {
+      if (nearestPlotDistance(x, y, plots) < PLOT_PROTECT_RADIUS + 0.5) {
         continue;
       }
-      const wobble = valueNoise(x, y, 5, 17) * 2.4;
-      const isPeak = peaks.some(
-        (peak) => Math.hypot(x - peak.x, y - peak.y) < peak.radius + wobble,
-      );
-      if (isPeak) {
+      let distance = Number.POSITIVE_INFINITY;
+      for (let index = 0; index < ridge.length - 1; index++) {
+        const from = ridge[index];
+        const to = ridge[index + 1];
+        if (from && to) {
+          distance = Math.min(distance, distanceToSegment(x, y, from, to));
+        }
+      }
+      const breakNoise = valueNoise(x, y, 9, 17);
+      const width = 2.1 + valueNoise(x, y, 6, 19) * 3.4;
+      if (distance < width && breakNoise > 0.24) {
         row[x] = 'mountain';
+      } else if (distance < width + 2.8 && breakNoise > 0.16) {
+        row[x] = 'hill';
       }
     }
   }
 }
 
-/** Stamps a short, slightly ragged section of trail. */
+type TrailKind = 'path' | 'trail';
+
+/** Stamps one part of a trail, turning water into a visible bridge or ford. */
 function stampTrail(
   terrain: Array<Array<TerrainKind>>,
   columns: number,
   rows: number,
   x: number,
   y: number,
+  kind: TrailKind,
 ) {
-  const drift = Math.round(valueNoise(x, y, 6, 21) * 2) - 1;
-  for (let offsetY = 0; offsetY < TRAIL_WIDTH; offsetY++) {
-    for (let offsetX = 0; offsetX < TRAIL_WIDTH; offsetX++) {
+  const width = kind === 'path' ? TRAIL_WIDTH : 1;
+  for (let offsetY = 0; offsetY < width; offsetY++) {
+    for (let offsetX = 0; offsetX < width; offsetX++) {
       const tileX = x + offsetX;
-      const tileY = y + offsetY + drift;
+      const tileY = y + offsetY;
       if (tileX < 1 || tileY < 1 || tileX >= columns - 1 || tileY >= rows - 1) {
         continue;
       }
       const row = terrain[tileY];
-      if (!row || row[tileX] === 'ocean' || row[tileX] === 'shallow') {
+      const existing = row?.[tileX];
+      if (!row || !existing || existing === 'ocean') {
         continue;
       }
-      row[tileX] = 'path';
+      if (existing === 'lake' || existing === 'shallow') {
+        row[tileX] = 'bridge';
+      } else {
+        row[tileX] = kind;
+      }
     }
   }
 }
 
-/** Connects plots in order with elbowed corridors that cut through the peaks. */
-function carveTrail(
+type TrailEdge = { from: number; kind: TrailKind; to: number };
+
+const edgeKey = (a: number, b: number) => `${Math.min(a, b)}-${Math.max(a, b)}`;
+
+/**
+ * Builds a connected trail graph instead of a conveyor loop. A Prim-style
+ * backbone guarantees every landmark is reachable; then each stop gets a
+ * second nearest-neighbor connection where possible, creating forks, loops and
+ * shortcuts. Main-tree edges are broad paths; optional links are narrow trails.
+ */
+function buildTrailNetwork(plots: ReadonlyArray<ForestPlot>): Array<TrailEdge> {
+  if (plots.length < 2) {
+    return [];
+  }
+  const edges: Array<TrailEdge> = [];
+  const connected = new Set([0]);
+  const keys = new Set<string>();
+  while (connected.size < plots.length) {
+    let best: { distance: number; from: number; to: number } | undefined;
+    for (const from of connected) {
+      const a = plots[from];
+      if (!a) {
+        continue;
+      }
+      for (let to = 0; to < plots.length; to++) {
+        const b = plots[to];
+        if (!b || connected.has(to)) {
+          continue;
+        }
+        const distance = Math.hypot(a.tileX - b.tileX, a.tileY - b.tileY);
+        if (!best || distance < best.distance) {
+          best = { distance, from, to };
+        }
+      }
+    }
+    if (!best) {
+      break;
+    }
+    edges.push({ from: best.from, kind: 'path', to: best.to });
+    keys.add(edgeKey(best.from, best.to));
+    connected.add(best.to);
+  }
+
+  for (let from = 0; from < plots.length; from++) {
+    const a = plots[from];
+    if (!a) {
+      continue;
+    }
+    const candidate = plots
+      .map((b, to) => ({ distance: Math.hypot(a.tileX - b.tileX, a.tileY - b.tileY), to }))
+      .filter(({ to }) => to !== from && !keys.has(edgeKey(from, to)))
+      .sort((left, right) => left.distance - right.distance)[0];
+    if (candidate && candidate.distance < 30) {
+      const key = edgeKey(from, candidate.to);
+      if (!keys.has(key)) {
+        edges.push({ from, kind: 'trail', to: candidate.to });
+        keys.add(key);
+      }
+    }
+  }
+  return edges;
+}
+
+/**
+ * Curves one route between landmarks using a deterministic perpendicular bend
+ * plus small noise. Water crossed by a route becomes bridge tiles; mountain
+ * faces become a visible pass. Collision therefore follows exactly what is
+ * drawn instead of using hidden portals.
+ */
+function carveRoute(
+  terrain: Array<Array<TerrainKind>>,
+  columns: number,
+  rows: number,
+  from: ForestPlot,
+  to: ForestPlot,
+  kind: TrailKind,
+  salt: number,
+) {
+  const dx = to.tileX - from.tileX;
+  const dy = to.tileY - from.tileY;
+  const distance = Math.hypot(dx, dy);
+  const steps = Math.max(1, Math.ceil(distance * 2));
+  const bend = (hashUnit(from.tileX, to.tileY, salt) - 0.5) * Math.min(9, distance * 0.3);
+  const normalX = distance === 0 ? 0 : -dy / distance;
+  const normalY = distance === 0 ? 0 : dx / distance;
+  for (let step = 0; step <= steps; step++) {
+    const t = step / steps;
+    const arc = Math.sin(Math.PI * t) * bend;
+    const drift = (valueNoise(step, salt, 5, 97) - 0.5) * 1.4;
+    const x = Math.round(lerp(from.tileX, to.tileX, t) + normalX * (arc + drift));
+    const y = Math.round(lerp(from.tileY, to.tileY, t) + normalY * (arc + drift));
+    stampTrail(terrain, columns, rows, x, y, kind);
+  }
+}
+
+function carveTrails(
   terrain: Array<Array<TerrainKind>>,
   columns: number,
   rows: number,
   plots: ReadonlyArray<ForestPlot>,
 ) {
-  for (let index = 0; index < plots.length - 1; index++) {
-    const from = plots[index];
-    const to = plots[index + 1];
-    if (!from || !to) {
-      continue;
-    }
-    const elbowY = index % 2 === 0 ? from.tileY : to.tileY;
-    const stepX = from.tileX <= to.tileX ? 1 : -1;
-    for (let x = from.tileX; x !== to.tileX + stepX; x += stepX) {
-      stampTrail(terrain, columns, rows, x, elbowY);
-    }
-    const startY = elbowY === from.tileY ? from.tileY : to.tileY;
-    const endY = elbowY === from.tileY ? to.tileY : from.tileY;
-    const anchorX = elbowY === from.tileY ? to.tileX : from.tileX;
-    const stepY = startY <= endY ? 1 : -1;
-    for (let y = startY; y !== endY + stepY; y += stepY) {
-      stampTrail(terrain, columns, rows, anchorX, y);
+  for (const [index, edge] of buildTrailNetwork(plots).entries()) {
+    const from = plots[edge.from];
+    const to = plots[edge.to];
+    if (from && to) {
+      carveRoute(terrain, columns, rows, from, to, edge.kind, 101 + index);
     }
   }
 }
@@ -336,7 +549,7 @@ function openClearings(
       }
       for (let x = minX; x <= maxX; x++) {
         const edge = CLEARING_RADIUS + valueNoise(x, y, 4, 29) * 1.2;
-        if (distanceTo(x, y, plot) <= edge && row[x] !== 'ocean' && row[x] !== 'shallow') {
+        if (distanceTo(x, y, plot) <= edge && row[x] !== 'ocean') {
           row[x] = 'clearing';
         }
       }
@@ -382,7 +595,12 @@ function hasNeighbour(
   return false;
 }
 
-const TRAIL_ADJACENT: ReadonlySet<TerrainKind> = new Set<TerrainKind>(['clearing', 'path']);
+const TRAIL_ADJACENT: ReadonlySet<TerrainKind> = new Set<TerrainKind>([
+  'bridge',
+  'clearing',
+  'path',
+  'trail',
+]);
 
 /**
  * Scatters trees and detail. Density comes from clumped noise so the forest has
@@ -419,6 +637,20 @@ function scatterScenery(
         }
         continue;
       }
+      if (kind === 'wetland') {
+        if (roll < 0.34) {
+          scenery.push({ kind: 'reed', tileX: x, tileY: y });
+        } else if (roll > 0.96) {
+          scenery.push({ kind: 'bloom', tileX: x, tileY: y });
+        }
+        continue;
+      }
+      if (kind === 'hill') {
+        if (mayPlantSolid && roll < 0.18) {
+          scenery.push({ kind: roll < 0.1 ? 'pine' : 'rock', tileX: x, tileY: y });
+        }
+        continue;
+      }
       if (kind !== 'grass' && kind !== 'meadow') {
         continue;
       }
@@ -432,11 +664,23 @@ function scatterScenery(
       if (!mayPlantSolid) {
         continue;
       }
-      const density = valueNoise(x, y, 6, 53);
-      if (roll < 0.28 + density * 0.62) {
-        scenery.push({ kind: roll < 0.35 ? 'pine' : 'oak', tileX: x, tileY: y });
-      } else if (roll > 0.965) {
+      const density = valueNoise(x, y, 7, 53) * 0.65 + valueNoise(x, y, 18, 59) * 0.35;
+      const treeThreshold =
+        kind === 'grass'
+          ? density > 0.62
+            ? 0.48
+            : density > 0.48
+              ? 0.22
+              : 0.06
+          : density > 0.72
+            ? 0.08
+            : 0.015;
+      if (roll < treeThreshold) {
+        scenery.push({ kind: density > 0.65 ? 'pine' : 'oak', tileX: x, tileY: y });
+      } else if (roll > 0.972) {
         scenery.push({ kind: 'rock', tileX: x, tileY: y });
+      } else if (kind === 'meadow' && roll > 0.9) {
+        scenery.push({ kind: 'bloom', tileX: x, tileY: y });
       }
     }
   }
@@ -481,17 +725,17 @@ export function isWalkableTile(world: WalkableWorld, tileX: number, tileY: numbe
  */
 export function buildForestWorld(plotIds: ReadonlyArray<string>): ForestWorld {
   const plots = layOutPlots(plotIds);
-  const { columns, rows } = worldSize(plotIds.length);
+  const { columns, rows } = worldSize(plots);
 
   const terrain: Array<Array<TerrainKind>> = Array.from({ length: rows }, (_, y) =>
     Array.from({ length: columns }, (__, x) => baseTerrainAt(x, y, columns, rows)),
   );
 
   addMountains(terrain, columns, rows, plots);
-  // Clearings first, then the trail, so the path stays unbroken as it runs
-  // through each glade rather than being swallowed by it.
+  // Clearings first, then the network, so every path remains visible through a
+  // landmark's glade and every bridge/pass matches the final collision mask.
   openClearings(terrain, columns, rows, plots);
-  carveTrail(terrain, columns, rows, plots);
+  carveTrails(terrain, columns, rows, plots);
   const scenery = scatterScenery(terrain, columns, rows, plots);
 
   // Start on the first clearing's own tile: the trail runs through every plot
@@ -541,22 +785,38 @@ export function toTerrainRuns(world: Pick<ForestWorld, 'rows' | 'terrain'>): Arr
   return runs;
 }
 
-export type MinimapKind = 'clearing' | 'land' | 'peak' | 'trail' | 'water';
+export type MinimapKind =
+  | 'bridge'
+  | 'clearing'
+  | 'forest'
+  | 'hill'
+  | 'meadow'
+  | 'peak'
+  | 'side-trail'
+  | 'trail'
+  | 'water'
+  | 'wetland';
 
 const MINIMAP_KIND: Record<TerrainKind, MinimapKind> = {
+  bridge: 'bridge',
   clearing: 'clearing',
-  grass: 'land',
-  meadow: 'land',
+  grass: 'forest',
+  hill: 'hill',
+  lake: 'water',
+  meadow: 'meadow',
   mountain: 'peak',
   ocean: 'water',
   path: 'trail',
-  sand: 'land',
+  sand: 'meadow',
   shallow: 'water',
+  trail: 'side-trail',
+  wetland: 'wetland',
 };
 
 /**
- * The same island reduced to five colours, which merges long stretches of beach
- * and forest into single spans — a few hundred rects becomes a few dozen.
+ * The same world reduced to biome and route colours. Main paths, side trails,
+ * bridges, water, elevation and vegetation remain distinct so the larger world
+ * is legible without turning the minimap into a tiny screenshot.
  */
 export function toMinimapRuns(world: Pick<ForestWorld, 'rows' | 'terrain'>) {
   const runs: Array<{ kind: MinimapKind; length: number; tileX: number; tileY: number }> = [];

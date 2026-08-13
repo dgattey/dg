@@ -33,10 +33,10 @@ const terrainSx: SxObject = {
 /** Sparse foam dashes so the ocean is never a flat block of colour. */
 function waveDashes(world: ForestWorld) {
   const dashes: Array<{ tileX: number; tileY: number }> = [];
-  for (let y = 0; y < world.rows; y += 2) {
-    for (let x = (y / 2) % 2 === 0 ? 1 : 3; x < world.columns; x += 4) {
+  for (let y = 0; y < world.rows; y += 3) {
+    for (let x = (y / 3) % 2 === 0 ? 1 : 4; x < world.columns; x += 6) {
       const kind = world.terrain[y]?.[x];
-      if (kind === 'ocean' || kind === 'shallow') {
+      if (kind === 'lake' || kind === 'ocean' || kind === 'shallow') {
         dashes.push({ tileX: x, tileY: y });
       }
     }
@@ -48,6 +48,7 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
   const width = world.columns * TILE_SIZE;
   const height = world.rows * TILE_SIZE;
   const runs = toTerrainRuns(world);
+  const bridgePatternId = `forest-bridge-planks-${world.columns}-${world.rows}`;
 
   return (
     <Box aria-hidden="true" sx={terrainSx}>
@@ -60,6 +61,22 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
         xmlns="http://www.w3.org/2000/svg"
       >
         <ForestSpriteDefs />
+        <defs>
+          <pattern
+            height={TILE_SIZE}
+            id={bridgePatternId}
+            patternUnits="userSpaceOnUse"
+            width={TILE_SIZE}
+          >
+            <rect
+              fill="var(--forest-wood-dark)"
+              height={TILE_SIZE}
+              opacity={0.5}
+              width={2}
+              x={TILE_SIZE - 2}
+            />
+          </pattern>
+        </defs>
         {runs.map((run) => (
           <rect
             fill={TERRAIN_FILL[run.kind]}
@@ -85,6 +102,34 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
               y={run.tileY * TILE_SIZE}
             />
           ))}
+        <g opacity={0.38}>
+          {runs
+            .filter((run) => run.kind === 'hill')
+            .map((run) => (
+              <rect
+                fill="var(--forest-stone-light)"
+                height={TILE_SIZE * 0.12}
+                key={`hill-${run.tileY}-${run.tileX}`}
+                width={run.length * TILE_SIZE}
+                x={run.tileX * TILE_SIZE}
+                y={run.tileY * TILE_SIZE + TILE_SIZE * 0.16}
+              />
+            ))}
+        </g>
+        <g>
+          {runs
+            .filter((run) => run.kind === 'bridge')
+            .map((run) => (
+              <rect
+                fill={`url(#${bridgePatternId})`}
+                height={TILE_SIZE}
+                key={`bridge-${run.tileY}-${run.tileX}`}
+                width={run.length * TILE_SIZE}
+                x={run.tileX * TILE_SIZE}
+                y={run.tileY * TILE_SIZE}
+              />
+            ))}
+        </g>
         <g fill="var(--forest-surf)">
           {waveDashes(world).map((dash, index) => (
             <rect

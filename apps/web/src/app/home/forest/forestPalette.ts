@@ -14,16 +14,19 @@ export const FOREST_COLOR_VARS: SxObject = {
   '--forest-bark-dark': 'light-dark(hsl(24deg 34% 30%), hsl(24deg 22% 17%))',
   '--forest-bloom': 'light-dark(hsl(340deg 70% 68%), hsl(24deg 80% 62%))',
   '--forest-bloom-alt': 'light-dark(hsl(48deg 90% 62%), hsl(48deg 70% 58%))',
+  '--forest-bridge': 'light-dark(hsl(29deg 46% 54%), hsl(27deg 30% 29%))',
   '--forest-canopy': 'light-dark(hsl(126deg 32% 38%), hsl(158deg 34% 24%))',
   '--forest-canopy-light': 'light-dark(hsl(112deg 38% 50%), hsl(150deg 30% 32%))',
   '--forest-canopy-pine': 'light-dark(hsl(150deg 34% 30%), hsl(168deg 38% 19%))',
   '--forest-canopy-pine-light': 'light-dark(hsl(146deg 36% 40%), hsl(162deg 32% 26%))',
   '--forest-clearing': 'light-dark(hsl(96deg 42% 71%), hsl(150deg 24% 25%))',
   '--forest-grass': 'light-dark(hsl(104deg 34% 62%), hsl(158deg 28% 19%))',
+  '--forest-hill': 'light-dark(hsl(78deg 26% 57%), hsl(164deg 20% 25%))',
   // HUD chrome (header capsule, minimap, hint). Nearly opaque so it reads as a
   // carved board, not the old frosted glass floating over the scene.
   '--forest-hud': 'light-dark(hsl(40deg 54% 90% / 0.94), hsl(192deg 46% 12% / 0.94))',
   '--forest-hud-edge': 'light-dark(hsl(28deg 40% 46% / 0.9), hsl(28deg 30% 40% / 0.8))',
+  '--forest-lake': 'light-dark(hsl(195deg 57% 51%), hsl(196deg 62% 16%))',
   // Warm lantern light that flares on the landmark the walker is standing at.
   '--forest-lantern': 'light-dark(hsl(38deg 92% 60%), hsl(30deg 92% 62%))',
   '--forest-meadow': 'light-dark(hsl(88deg 44% 68%), hsl(150deg 26% 22%))',
@@ -41,6 +44,8 @@ export const FOREST_COLOR_VARS: SxObject = {
   '--forest-stone': 'light-dark(hsl(30deg 12% 70%), hsl(196deg 12% 34%))',
   '--forest-stone-light': 'light-dark(hsl(32deg 16% 82%), hsl(196deg 14% 46%))',
   '--forest-surf': 'light-dark(hsl(190deg 80% 92%), hsl(186deg 44% 40%))',
+  '--forest-trail': 'light-dark(hsl(30deg 34% 65%), hsl(28deg 18% 27%))',
+  '--forest-wetland': 'light-dark(hsl(126deg 28% 56%), hsl(174deg 30% 20%))',
   // Landmark material system — the shared "wood, paper, stone" vocabulary every
   // in-world panel is built from, so a plaque here and a future signpost on the
   // music pages read as the same terrain rather than a card pasted on top.
@@ -50,12 +55,17 @@ export const FOREST_COLOR_VARS: SxObject = {
 };
 
 export const TERRAIN_FILL: Record<TerrainKind, string> = {
+  bridge: 'var(--forest-bridge)',
   clearing: 'var(--forest-clearing)',
   grass: 'var(--forest-grass)',
+  hill: 'var(--forest-hill)',
+  lake: 'var(--forest-lake)',
   meadow: 'var(--forest-meadow)',
   mountain: 'var(--forest-mountain)',
   ocean: 'var(--forest-ocean)',
   path: 'var(--forest-path)',
   sand: 'var(--forest-sand)',
   shallow: 'var(--forest-shallow)',
+  trail: 'var(--forest-trail)',
+  wetland: 'var(--forest-wetland)',
 };

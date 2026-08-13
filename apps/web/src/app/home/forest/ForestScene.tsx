@@ -21,7 +21,7 @@ import { FOREST_COLOR_VARS } from './forestPalette';
  * rAF loop, so walking never triggers a React render.
  */
 
-const WALK_SPEED_PX_PER_SECOND = 300;
+const WALK_SPEED_PX_PER_SECOND = 340;
 const CAMERA_EASING = 0.16;
 const NEAR_DISTANCE_PX = TILE_SIZE * 3.2;
 const FOOT_HALF_WIDTH = 9;
@@ -100,6 +100,7 @@ const characterAnchorSx: SxObject = {
 
 const hintSx: SxObject = {
   ...hudSurfaceSx,
+  '@media (max-height: 650px)': { display: 'none' },
   // Nothing here is true without a keyboard, and on a phone it would also crowd
   // the minimap in the same corner of a very small screen.
   '@media (pointer: coarse)': { display: 'none' },
@@ -216,13 +217,15 @@ export function ForestScene({
         : clamp(visible / 2 - footX, visible - worldWidth, 0);
     };
 
-    // Sits the walker below centre: cards stand north of the trail, so the spare
-    // room belongs above them rather than under their feet.
+    // Sits the walker low in the viewport: boards stand north of the trail and
+    // the minimap owns the top-right HUD lane. Short windows push the anchor
+    // almost to the bottom so the full board and compact chart can coexist.
     const cameraTargetY = () => {
       const visible = viewport.clientHeight;
+      const anchorLine = visible < 650 ? visible - 8 : visible * 0.8;
       return worldHeight <= visible
         ? (visible - worldHeight) / 2
-        : clamp(visible * 0.68 - footY, visible - worldHeight, 0);
+        : clamp(anchorLine - footY, visible - worldHeight, 0);
     };
 
     const updateNearest = () => {
@@ -407,7 +410,10 @@ export function ForestScene({
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
     window.addEventListener('blur', onBlur);
-    world.addEventListener('focusin', onFocusIn);
+    // Capture before nested MUI controls can stop the bubbling focus event.
+    // Keyboard focus must always frame its landmark, regardless of the card
+    // implementation mounted inside the board.
+    world.addEventListener('focusin', onFocusIn, true);
 
     // Places the walker in the world without claiming the scrollbar or starting
     // the animation loop: nothing runs per-frame until someone walks.
@@ -419,7 +425,7 @@ export function ForestScene({
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
       window.removeEventListener('blur', onBlur);
-      world.removeEventListener('focusin', onFocusIn);
+      world.removeEventListener('focusin', onFocusIn, true);
       nearest?.removeAttribute(LANDMARK_NEAR_ATTRIBUTE);
     };
   }, [blockedMask, worldWidth, worldHeight]);

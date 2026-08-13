@@ -142,6 +142,7 @@ export async function ForestHomepage() {
               id={card.id}
               key={card.id}
               label={card.label}
+              region={plot.region}
               tileX={plot.tileX}
               tileY={plot.tileY}
               variant={card.id === 'spotify' ? 'grove' : 'board'}
