@@ -48,18 +48,33 @@ const clamp = (value: number, low: number, high: number) =>
 
 const normalizeKey = (key: string) => (key.length === 1 ? key.toLowerCase() : key);
 
-const viewportSx: SxObject = {
+/**
+ * The scene's outer box, and the thing the HUD is pinned to.
+ *
+ * The minimap and hint have to live outside the scroller. Inside it they are
+ * positioned against the scrolled content, so they slide away with the terrain
+ * — the chart was gone 200px into a 4176px island, which is most of the visit
+ * for anyone using a mouse or a phone, since the walker only takes over on the
+ * first arrow key. Sticky is no help either: it can only travel as far as its
+ * parent's box, which here is exactly one viewport tall.
+ */
+const sceneShellSx: SxObject = {
   ...FOREST_COLOR_VARS,
-  '&:focus-visible': {
-    outline: '2px solid var(--mui-palette-primary-main)',
-    outlineOffset: -2,
-  },
   // The world owns the page: it fills the whole viewport, edge to edge and up
   // behind the header, with no card frame around it. The ocean floods to every
   // edge so the island reads as an island, not an image clipped inside a panel.
   backgroundColor: 'var(--forest-ocean)',
   height: '100dvh',
   minHeight: '30rem',
+  position: 'relative',
+};
+
+const viewportSx: SxObject = {
+  '&:focus-visible': {
+    outline: '2px solid var(--mui-palette-primary-main)',
+    outlineOffset: -2,
+  },
+  height: '100%',
   // Scrollable until someone actually starts walking, so every visitor can reach
   // every card: no scripting, no keyboard, or just a mouse wheel.
   overflow: 'auto',
@@ -135,6 +150,7 @@ export function ForestScene({
   rows,
   spawn,
 }: ForestSceneProps) {
+  const shellRef = useRef<HTMLDivElement>(null);
   const viewportRef = useRef<HTMLDivElement>(null);
   const worldRef = useRef<HTMLDivElement>(null);
   const characterRef = useRef<HTMLDivElement>(null);
@@ -149,10 +165,11 @@ export function ForestScene({
   const positionRef = useRef({ x: spawnX, y: spawnY });
 
   useEffect(() => {
+    const shell = shellRef.current;
     const viewport = viewportRef.current;
     const world = worldRef.current;
     const character = characterRef.current;
-    if (!viewport || !world || !character) {
+    if (!shell || !viewport || !world || !character) {
       return;
     }
 
@@ -161,7 +178,7 @@ export function ForestScene({
       world.querySelectorAll<HTMLElement>(`[${LANDMARK_ATTRIBUTE}]`),
     ).map((element) => ({ element, x: element.offsetLeft, y: element.offsetTop }));
 
-    const minimapMarker = viewport.querySelector<SVGRectElement>(
+    const minimapMarker = shell.querySelector<SVGRectElement>(
       `[data-role='${MINIMAP_MARKER_ROLE}']`,
     );
 
@@ -431,17 +448,19 @@ export function ForestScene({
   }, [blockedMask, worldWidth, worldHeight]);
 
   return (
-    <Box
-      aria-label="Forest map of this site. The map scrolls, and with scripting on, arrow keys walk a character between cards."
-      ref={viewportRef}
-      role="application"
-      sx={viewportSx}
-      tabIndex={0}
-    >
-      <Box ref={worldRef} sx={{ ...worldSx, height: worldHeight, width: worldWidth }}>
-        {children}
-        <Box ref={characterRef} sx={characterAnchorSx}>
-          <ForestCharacter />
+    <Box ref={shellRef} sx={sceneShellSx}>
+      <Box
+        aria-label="Forest map of this site. The map scrolls, and with scripting on, arrow keys walk a character between cards."
+        ref={viewportRef}
+        role="application"
+        sx={viewportSx}
+        tabIndex={0}
+      >
+        <Box ref={worldRef} sx={{ ...worldSx, height: worldHeight, width: worldWidth }}>
+          {children}
+          <Box ref={characterRef} sx={characterAnchorSx}>
+            <ForestCharacter />
+          </Box>
         </Box>
       </Box>
       {overlay}

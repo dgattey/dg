@@ -16,6 +16,7 @@ import { ForestMinimap } from './ForestMinimap';
 import { ForestScene } from './ForestScene';
 import { ForestTerrain } from './ForestTerrain';
 import { buildForestWorld, toBlockedMask } from './forestMap';
+import { boardMediaSx } from './forestMaterials';
 import { FOREST_COLOR_VARS } from './forestPalette';
 
 /**
@@ -107,7 +108,18 @@ export async function ForestHomepage() {
   const preciselyPlacedCards = new Map<number, PlantedCard>([
     [0, { id: 'intro-image', label: 'About', node: <ForestIntroImageSlot /> }],
     [1, { id: 'intro-text', label: 'Hey friends', node: <ForestIntroTextSlot /> }],
-    [2, { id: 'map', label: 'Where I am', node: <MapCardSlot /> }],
+    [
+      2,
+      {
+        id: 'map',
+        label: 'Where I am',
+        node: (
+          <Box sx={boardMediaSx}>
+            <MapCardSlot />
+          </Box>
+        ),
+      },
+    ],
     [4, { id: 'spotify', label: 'Now playing', node: <SpotifyCardSlot glowVariant="ambient" /> }],
     [5, { id: 'strava', label: 'Latest activity', node: <StravaCardSlot /> }],
     [8, { id: 'gattey-sites', label: 'Side projects', node: <GatteySitesCardSlot /> }],

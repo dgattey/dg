@@ -65,6 +65,19 @@ export const dissolveInnerCardSx: SxObject = {
 };
 
 /**
+ * Gives a card its own shape when it used to take one from the grid.
+ *
+ * The map is the one card with no intrinsic height: in the grid it fills a row
+ * it was assigned, and only below `md` does it fall back to an aspect ratio. A
+ * board is a fixed-width box at every viewport, so from `md` up the map card
+ * collapsed to about thirty pixels and the board stood there empty. Boards do
+ * not vary with viewport width, so neither should this.
+ */
+export const boardMediaSx: SxObject = {
+  '& .MuiCard-root': { aspectRatio: '2 / 1' },
+};
+
+/**
  * The carved board a landmark's content is mounted on: a wood frame around a
  * paper surface, with a hard drop shadow so it sits *on* the clearing. Opaque by
  * design — no blur, no translucency — which is what separates it from the old
