@@ -477,6 +477,13 @@ function buildTrailNetwork(plots: ReadonlyArray<ForestPlot>): Array<TrailEdge> {
  * plus small noise. Water crossed by a route becomes bridge tiles; mountain
  * faces become a visible pass. Collision therefore follows exactly what is
  * drawn instead of using hidden portals.
+ *
+ * Consecutive samples are joined orthogonally rather than stamped as isolated
+ * dots. Rounding a curved route to whole tiles can move both axes at once, and
+ * a diagonal hop leaves two tiles touching only at a corner — which the walker
+ * cannot pass through, because its foot box would have to overlap the water or
+ * rock on either side. Stamped as-is that draws a trail into the lake that
+ * stops halfway across, and bridge tiles nothing can ever reach.
  */
 function carveRoute(
   terrain: Array<Array<TerrainKind>>,
@@ -494,13 +501,30 @@ function carveRoute(
   const bend = (hashUnit(from.tileX, to.tileY, salt) - 0.5) * Math.min(9, distance * 0.3);
   const normalX = distance === 0 ? 0 : -dy / distance;
   const normalY = distance === 0 ? 0 : dx / distance;
+  let previousX: number | undefined;
+  let previousY: number | undefined;
   for (let step = 0; step <= steps; step++) {
     const t = step / steps;
     const arc = Math.sin(Math.PI * t) * bend;
     const drift = (valueNoise(step, salt, 5, 97) - 0.5) * 1.4;
     const x = Math.round(lerp(from.tileX, to.tileX, t) + normalX * (arc + drift));
     const y = Math.round(lerp(from.tileY, to.tileY, t) + normalY * (arc + drift));
-    stampTrail(terrain, columns, rows, x, y, kind);
+    if (previousX === undefined || previousY === undefined) {
+      stampTrail(terrain, columns, rows, x, y, kind);
+    } else {
+      let walkX = previousX;
+      let walkY = previousY;
+      while (walkX !== x || walkY !== y) {
+        if (walkX !== x) {
+          walkX += Math.sign(x - walkX);
+        } else {
+          walkY += Math.sign(y - walkY);
+        }
+        stampTrail(terrain, columns, rows, walkX, walkY, kind);
+      }
+    }
+    previousX = x;
+    previousY = y;
   }
 }
 

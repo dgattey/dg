@@ -138,6 +138,39 @@ describe('buildForestWorld', () => {
     }
   });
 
+  it('leaves no route tile stranded, so every drawn crossing can be walked', () => {
+    const world = buildForestWorld(CARD_IDS);
+    const mask = toBlockedMask(world);
+    const seen = new Set<string>();
+    const queue = [[world.spawn.tileX, world.spawn.tileY]];
+    while (queue.length > 0) {
+      const next = queue.pop();
+      if (!next) {
+        break;
+      }
+      const [x, y] = next;
+      if (x === undefined || y === undefined) {
+        continue;
+      }
+      const key = `${x},${y}`;
+      if (seen.has(key) || mask[y]?.[x] !== '0') {
+        continue;
+      }
+      seen.add(key);
+      queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+    }
+    const stranded: Array<string> = [];
+    for (let y = 0; y < world.rows; y++) {
+      for (let x = 0; x < world.columns; x++) {
+        const kind = world.terrain[y]?.[x];
+        if ((kind === 'bridge' || kind === 'path' || kind === 'trail') && !seen.has(`${x},${y}`)) {
+          stranded.push(`${kind} ${x},${y}`);
+        }
+      }
+    }
+    expect(stranded).toEqual([]);
+  });
+
   it('keeps the ocean unwalkable', () => {
     const world = buildForestWorld(CARD_IDS);
     const oceanTile = world.terrain[0]?.indexOf('ocean') ?? -1;
