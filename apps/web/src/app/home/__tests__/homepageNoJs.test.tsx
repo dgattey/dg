@@ -17,8 +17,9 @@
  * was chosen by a request-time flag read inside the page. The proxy picks the
  * route now; these tests keep each route's own output honest.
  */
+import { Writable } from 'node:stream';
 import { type ReactElement, Suspense, use } from 'react';
-import { prerenderToNodeStream } from 'react-dom/static';
+import { renderToPipeableStream } from 'react-dom/server';
 
 jest.mock('../../../services/contentful', () => ({
   getIntroContent: async () => null,
@@ -63,14 +64,37 @@ jest.mock('../forest/ForestIntroSlots', () => ({
   ForestIntroTextSlot: stub('intro-text', 'https://example.com/intro-text'),
 }));
 
+/** Everything the server streams, hidden Suspense payloads and all. */
+const streamedHtml = (element: ReactElement, abortAfterMs?: number): Promise<string> =>
+  new Promise((resolve, reject) => {
+    const chunks: Array<Buffer> = [];
+    const sink = new Writable({
+      write(chunk, _encoding, done) {
+        chunks.push(Buffer.from(chunk));
+        done();
+      },
+    });
+    sink.on('finish', () => {
+      resolve(Buffer.concat(chunks).toString('utf8'));
+    });
+    sink.on('error', reject);
+
+    const { pipe, abort } = renderToPipeableStream(element, {
+      // An aborted boundary reports here; that is the point of the first test.
+      onError() {},
+      onShellError: reject,
+      onShellReady() {
+        pipe(sink);
+      },
+    });
+    if (abortAfterMs !== undefined) {
+      setTimeout(abort, abortAfterMs);
+    }
+  });
+
 /** The markup a browser paints before it runs anything. */
-async function noScriptShell(element: ReactElement, signal?: AbortSignal): Promise<string> {
-  const { prelude } = await prerenderToNodeStream(element, { signal });
-  const chunks: Array<Buffer> = [];
-  for await (const chunk of prelude) {
-    chunks.push(Buffer.from(chunk));
-  }
-  const html = Buffer.concat(chunks).toString('utf8');
+async function noScriptShell(element: ReactElement, abortAfterMs?: number): Promise<string> {
+  const html = await streamedHtml(element, abortAfterMs);
   const firstScript = html.indexOf('<script');
   return firstScript === -1 ? html : html.slice(0, firstScript);
 }
@@ -88,30 +112,32 @@ const hrefsIn = (html: string) => [...html.matchAll(/href="([^"]+)"/g)].map(([, 
 describe('homepage without scripting', () => {
   it('does not count content that only arrives behind a boundary', async () => {
     // Proves the two assertions below cannot pass on markup a no-JS visitor
-    // never sees. Content inside an unresolved boundary is exactly what the
-    // old homepage shipped, and it must not show up in the shell.
-    const never = new Promise<void>(() => {});
-    const Pending = () => {
-      use(never);
-      return null;
+    // never sees, and that truncating is what makes the difference.
+    // A fresh promise each time: a settled one never suspends, so reusing the
+    // tree would quietly stop testing anything.
+    const tree = () => {
+      const slow = new Promise<void>((resolve) => {
+        setTimeout(resolve, 50);
+      });
+      const Late = () => {
+        use(slow);
+        return <p>only with scripts</p>;
+      };
+      return (
+        <div>
+          <p>in the shell</p>
+          <Suspense fallback={<p>loading</p>}>
+            <Late />
+          </Suspense>
+        </div>
+      );
     };
-    const controller = new AbortController();
-    setTimeout(() => {
-      controller.abort();
-    }, 100);
-    const shell = await noScriptShell(
-      <div>
-        <p>in the shell</p>
-        <Suspense fallback={<p>loading</p>}>
-          <Pending />
-          {/* Reachable, but only ever through the inline script that swaps a
-              resolved boundary into place — so never for a no-JS visitor. */}
-          <p>only with scripts</p>
-        </Suspense>
-      </div>,
-      controller.signal,
-    );
 
+    // The boundary does resolve, so the full stream carries its markup — this
+    // is exactly the false pass that asserting on unsliced HTML would give.
+    expect(visibleText(await streamedHtml(tree()))).toContain('only with scripts');
+
+    const shell = await noScriptShell(tree());
     expect(visibleText(shell)).toContain('in the shell');
     expect(visibleText(shell)).toContain('loading');
     expect(visibleText(shell)).not.toContain('only with scripts');
