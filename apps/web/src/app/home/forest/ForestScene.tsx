@@ -121,7 +121,9 @@ const hintSx: SxObject = {
   '@media (pointer: coarse)': { display: 'none' },
   borderRadius: 999,
   bottom: 16,
-  color: 'var(--mui-palette-text-secondary)',
+  // The only place the controls are written down, so it takes primary text:
+  // secondary over the HUD measured 3.2:1, under the 4.5:1 this size needs.
+  color: 'var(--mui-palette-text-primary)',
   left: 16,
   // Sits at the left so it can never collide with the minimap opposite it.
   maxWidth: 'calc(100% - 12rem)',
