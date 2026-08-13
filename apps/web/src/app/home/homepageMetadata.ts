@@ -23,7 +23,11 @@ export async function generateHomepageMetadata(): Promise<Metadata> {
       title: HOMEPAGE_TITLE,
       url: homeRoute,
     },
-    title: HOMEPAGE_TITLE,
+    // Absolute so both routes render the same <title>. The root layout's
+    // `%s | Dylan Gattey` template applies to child segments but not to
+    // `app/page.tsx`, which shares the root segment — so a bare string would
+    // give the interactive route a suffix `/` never had.
+    title: { absolute: HOMEPAGE_TITLE },
     twitter: {
       ...baseTwitter,
       description,
