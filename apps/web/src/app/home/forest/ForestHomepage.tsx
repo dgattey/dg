@@ -70,6 +70,12 @@ const srOnlySx: SxObject = {
  * removes the page spacing that used to box the world in, and swaps the header's
  * frosted-glass capsule for the same HUD material the minimap and hint use.
  *
+ * It also stops the header swallowing the top of the world. The header is a
+ * full-width transparent band roughly 120px tall, and the world is pulled up
+ * underneath it, so every wheel event in that strip — a seventh of a laptop
+ * screen, and the strip the minimap sits in — landed on the header and scrolled
+ * nothing. Only the parts with chrome on them take input now.
+ *
  * Written as a plain `<style>` so it needs no client component and disappears
  * with the world when the flag is off.
  */
@@ -86,6 +92,13 @@ function ForestWorldStyles() {
       background-color:var(--forest-hud);
       border-color:var(--forest-hud-edge);
       box-shadow:0 8px 20px -10px light-dark(hsl(140deg 30% 20% / 0.5), hsl(190deg 60% 3% / 0.7));
+    }
+    body:has([${FOREST_WORLD_ATTRIBUTE}]) section:has([data-site-header]),
+    body:has([${FOREST_WORLD_ATTRIBUTE}]) [data-site-header]{pointer-events:none;}
+    body:has([${FOREST_WORLD_ATTRIBUTE}]) [data-site-header] a,
+    body:has([${FOREST_WORLD_ATTRIBUTE}]) [data-site-header] button,
+    body:has([${FOREST_WORLD_ATTRIBUTE}]) [data-site-header] [data-header-capsule]{
+      pointer-events:auto;
     }`;
   return (
     <style
