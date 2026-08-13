@@ -2,11 +2,20 @@ import {
   hasDevConsoleCredentials,
   isDevConsoleAccessAllowed,
 } from '@dg/services/auth/devConsoleBasicAuth';
-import { devConsoleRoute, homeRoute } from '@dg/shared-core/routes/app';
+import {
+  devConsoleRoute,
+  homeRoute,
+  internalInteractiveHomeRoute,
+} from '@dg/shared-core/routes/app';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import { homepageRewritePath } from './services/homepageLayout';
 import { isNextFlightRequest } from './services/isNextFlightRequest';
-import { negotiateMarkdown } from './services/markdown/contentNegotiation';
+import {
+  negotiateMarkdown,
+  rewriteToPath,
+  withMarkdownAlternate,
+} from './services/markdown/contentNegotiation';
 
 /**
  * Protects `/dev-console` with Basic Auth in production only. Non-production
@@ -71,10 +80,28 @@ function protectDevConsole(request: NextRequest): NextResponse | null {
   });
 }
 
-export function proxy(request: NextRequest) {
+/**
+ * Keeps the interactive homepage from becoming a second public homepage. It is
+ * a rewrite target only, so a direct hit is a duplicate of `/` and is sent
+ * there. Rewrites don't re-enter the proxy, so this never intercepts the
+ * homepage's own rewrite.
+ */
+function hideInteractiveHomeRoute(request: NextRequest): NextResponse | null {
+  if (request.nextUrl.pathname !== internalInteractiveHomeRoute) {
+    return null;
+  }
+  return NextResponse.redirect(new URL(homeRoute, request.url));
+}
+
+export async function proxy(request: NextRequest) {
   const devConsoleResponse = protectDevConsole(request);
   if (devConsoleResponse) {
     return devConsoleResponse;
+  }
+
+  const internalRouteResponse = hideInteractiveHomeRoute(request);
+  if (internalRouteResponse) {
+    return internalRouteResponse;
   }
 
   const markdownResponse = negotiateMarkdown(request);
@@ -82,7 +109,12 @@ export function proxy(request: NextRequest) {
     return markdownResponse;
   }
 
-  return NextResponse.next();
+  // Serving HTML from here on. The homepage picks its layout now, before
+  // render, so neither route carries a request-time branch — see
+  // `homepageRewritePath`.
+  const rewritePath = await homepageRewritePath(request);
+  const response = rewritePath ? rewriteToPath(request, rewritePath) : NextResponse.next();
+  return withMarkdownAlternate(request, response);
 }
 
 export const config = {

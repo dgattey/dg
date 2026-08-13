@@ -1,7 +1,5 @@
 import { ContentGrid } from '@dg/ui/core/ContentGrid';
-import { interactiveRedesign } from '../../flags';
 import { getProjects } from '../../services/contentful';
-import { ForestHomepage } from './forest/ForestHomepage';
 import { GatteySitesCardSlot } from './GatteySitesCardSlot';
 import { IntroCardSlot } from './IntroCardSlot';
 import { MapCardSlot } from './MapCardSlot';
@@ -15,7 +13,7 @@ import { StravaCardSlot } from './StravaCardSlot';
  * interspersed with `introBlock` data, and dark/light mode
  * toggle.
  */
-async function ContentGridHomepage() {
+export async function Homepage() {
   const projects = await getProjects();
   const projectCards = projects.map((project) => <ProjectCard key={project.title} {...project} />);
 
@@ -30,16 +28,4 @@ async function ContentGridHomepage() {
   ]);
 
   return <ContentGrid>{mergeCards(projectCards, preciselyPlacedCards)}</ContentGrid>;
-}
-
-/**
- * Picks the homepage layout. `interactive-redesign` swaps the card grid for a
- * walkable forest map built from the same cards; with the flag off this is the
- * grid it has always been.
- */
-export async function Homepage() {
-  if (await interactiveRedesign()) {
-    return <ForestHomepage />;
-  }
-  return <ContentGridHomepage />;
 }

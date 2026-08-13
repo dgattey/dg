@@ -38,6 +38,15 @@ export const apiStatusRoute = '/.well-known/api-status' as const;
 /** Internal rewrite target for Markdown (not a public agent URL). */
 export const internalMarkdownRoutePrefix = '/llm-markdown' as const;
 
+/**
+ * Internal rewrite target for the `interactive-redesign` homepage.
+ *
+ * `/` is still the only public homepage URL. The proxy evaluates the flag and
+ * rewrites here, so the interactive layout lives in its own route that has no
+ * request-time branch to prerender around. Hitting it directly redirects home.
+ */
+export const internalInteractiveHomeRoute = '/interactive-home' as const;
+
 export type MarkdownPageDefinition = {
   path: string;
   title: string;

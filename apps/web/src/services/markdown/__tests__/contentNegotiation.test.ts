@@ -1,5 +1,5 @@
-import { NextRequest } from 'next/server';
-import { negotiateMarkdown } from '../contentNegotiation';
+import { NextRequest, NextResponse } from 'next/server';
+import { negotiateMarkdown, withMarkdownAlternate } from '../contentNegotiation';
 
 const createRequest = (path: string, headers: Record<string, string> = {}) =>
   new NextRequest(`https://example.com${path}`, { headers });
@@ -22,13 +22,8 @@ describe('negotiateMarkdown', () => {
     expect(response?.headers.get('x-middleware-rewrite')).toContain('/llm-markdown');
   });
 
-  it('adds Link and Vary on HTML responses for public pages', () => {
-    const response = negotiateMarkdown(createRequest('/music', { accept: 'text/html' }));
-
-    expect(response).not.toBeNull();
-    expect(response?.headers.get('x-middleware-next')).toBe('1');
-    expect(response?.headers.get('Link')).toContain('/music.md');
-    expect(response?.headers.get('Vary')).toContain('Accept');
+  it('leaves HTML requests for the caller to serve', () => {
+    expect(negotiateMarkdown(createRequest('/music', { accept: 'text/html' }))).toBeNull();
   });
 
   it('returns 406 when no produced type is acceptable', () => {
@@ -64,5 +59,33 @@ describe('negotiateMarkdown', () => {
 
   it('ignores non-markdown pages', () => {
     expect(negotiateMarkdown(createRequest('/dev-console'))).toBeNull();
+  });
+});
+
+describe('withMarkdownAlternate', () => {
+  it('adds Link and Vary on HTML responses for public pages', () => {
+    const response = withMarkdownAlternate(
+      createRequest('/music', { accept: 'text/html' }),
+      NextResponse.next(),
+    );
+
+    expect(response.headers.get('Link')).toContain('/music.md');
+    expect(response.headers.get('Vary')).toContain('Accept');
+  });
+
+  it('decorates a rewrite as readily as a pass-through', () => {
+    const response = withMarkdownAlternate(
+      createRequest('/', { accept: 'text/html' }),
+      NextResponse.rewrite(new URL('https://example.com/interactive-home')),
+    );
+
+    expect(response.headers.get('x-middleware-rewrite')).toContain('/interactive-home');
+    expect(response.headers.get('Link')).toContain('/index.md');
+  });
+
+  it('leaves responses for unregistered pages alone', () => {
+    const response = withMarkdownAlternate(createRequest('/dev-console'), NextResponse.next());
+
+    expect(response.headers.get('Link')).toBeNull();
   });
 });
