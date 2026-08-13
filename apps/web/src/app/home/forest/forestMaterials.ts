@@ -47,11 +47,18 @@ export const dissolveInnerCardSx: SxObject = {
     backgroundColor: 'transparent',
     borderColor: 'transparent',
     boxShadow: 'none',
+    // As a flex item the card was shrinking below its content and clipping the
+    // rest itself, because a Card is `overflow: hidden`. That hid the last two
+    // lines of the intro letter mid-sentence and left nothing to scroll: the
+    // board's surface never saw the overflow. Keep the card its natural height
+    // and let it spill into the surface, which is the thing that scrolls.
+    flexShrink: 0,
     // A ContentCard sizes itself to a grid cell it is no longer in. Left alone it
     // stays that width and spills its text past the edge of the board, so the
     // board's own clamp has to win.
     height: 'auto',
     maxWidth: '100%',
+    overflow: 'visible',
     width: '100%',
   },
   '& .MuiCard-root:focus-within, & .MuiCard-root:hover': {
@@ -95,9 +102,25 @@ export const landmarkFrameSx: SxObject = {
   padding: `${FRAME_PADDING}px`,
 };
 
-/** The paper inside the frame that content rests on. */
+/**
+ * The paper inside the frame that content rests on.
+ *
+ * A long card — the intro letter, a side-project list — is clamped to the
+ * board's footprint and scrolls inside it, which left it sliced through the
+ * middle of a line with nothing to say it continued: macOS hides the overlay
+ * scrollbar until you are already scrolling, so there was no way to know. The
+ * board therefore carries its own always-visible scrollbar, cut from the same
+ * wood as the frame, and only on the boards that actually overflow.
+ */
 export const landmarkSurfaceSx: SxObject = {
   ...dissolveInnerCardSx,
+  '&::-webkit-scrollbar': { width: 8 },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: 'var(--forest-wood)',
+    border: '2px solid var(--forest-paper)',
+    borderRadius: 999,
+  },
+  '&::-webkit-scrollbar-track': { backgroundColor: 'var(--forest-paper-edge)', borderRadius: 999 },
   backgroundColor: 'var(--forest-paper)',
   border: '1px solid var(--forest-paper-edge)',
   borderRadius: '6px',
@@ -107,6 +130,8 @@ export const landmarkSurfaceSx: SxObject = {
   overflow: 'auto',
   overscrollBehavior: 'contain',
   padding: 1,
+  scrollbarColor: 'var(--forest-wood) var(--forest-paper-edge)',
+  scrollbarWidth: 'thin',
   // Keep a scrollable long list (side projects, a live tracklist) inside its
   // footprint instead of letting it grow into a neighbour.
   width: LANDMARK_CONTENT_WIDTH_PX,
