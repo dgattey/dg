@@ -6,13 +6,17 @@ import type { CritterKind, SceneryKind } from './forestMap';
  * Everything is axis-aligned rectangles in a 16x16 box whose baseline is y=16,
  * so sprites can be hung above their tile and still look planted. Each one gets
  * a ground shadow and a lit left face. Canopies have a bit of branch structure
- * so pine, oak, birch and willow read as different trees from a distance.
+ * so pine, oak, birch, maple, cedar, fruit and willow read as different trees from a distance.
  */
 
 export const SPRITE_ID: Record<SceneryKind, string> = {
   birch: 'forest-birch',
   bloom: 'forest-bloom',
+  cedar: 'forest-cedar',
   dead: 'forest-dead',
+  fruit: 'forest-fruit',
+  log: 'forest-log',
+  maple: 'forest-maple',
   oak: 'forest-oak',
   pine: 'forest-pine',
   reed: 'forest-reed',
@@ -35,7 +39,11 @@ export const PIXELATE_FILTER_ID = 'forest-pixelate';
 export const SPRITE_SCALE: Record<SceneryKind, { height: number; width: number }> = {
   birch: { height: 2.3, width: 1.7 },
   bloom: { height: 1, width: 1 },
+  cedar: { height: 2.8, width: 1.4 },
   dead: { height: 2.0, width: 1.5 },
+  fruit: { height: 2.1, width: 1.9 },
+  log: { height: 0.7, width: 1.9 },
+  maple: { height: 2.4, width: 2.2 },
   oak: { height: 2.2, width: 2.0 },
   pine: { height: 2.5, width: 1.8 },
   reed: { height: 1.2, width: 1 },
@@ -54,7 +62,10 @@ export const CRITTER_SCALE: Record<CritterKind, { height: number; width: number 
 
 export const WINDY_KINDS: ReadonlySet<SceneryKind> = new Set<SceneryKind>([
   'birch',
+  'cedar',
   'dead',
+  'fruit',
+  'maple',
   'oak',
   'pine',
   'reed',
@@ -149,6 +160,47 @@ export function ForestSpriteDefs() {
         <rect fill="var(--forest-bark-dark)" height="1.2" width="3.6" x="8.4" y="8.2" />
         <rect fill="var(--forest-bark)" height="3.2" width="1.2" x="3.6" y="3.4" />
         <rect fill="var(--forest-bark)" height="2.6" width="1.2" x="10.8" y="5.8" />
+      </symbol>
+
+      <symbol id={SPRITE_ID.maple} viewBox="0 0 16 16">
+        <GroundShadow />
+        <rect fill="var(--forest-bark)" height="5.6" width="2.2" x="7" y="9.6" />
+        <rect fill="var(--forest-canopy-maple)" height="7.2" width="11.4" x="2.3" y="3" />
+        <rect fill="var(--forest-canopy-maple)" height="3.6" width="6.8" x="4.6" y="1.2" />
+        <rect fill="var(--forest-canopy-maple)" height="2.6" width="3" x="1.2" y="5.2" />
+        <rect fill="var(--forest-canopy-maple)" height="2.4" width="2.8" x="12" y="5.6" />
+        <rect fill="var(--forest-canopy-maple-light)" height="2.2" width="4.2" x="3.2" y="3.4" />
+        <rect fill="var(--forest-canopy-maple-light)" height="1.4" width="2.6" x="6.2" y="1.6" />
+      </symbol>
+
+      <symbol id={SPRITE_ID.cedar} viewBox="0 0 16 16">
+        <GroundShadow />
+        <rect fill="var(--forest-bark-dark)" height="4.6" width="1.6" x="7.2" y="10.6" />
+        <rect fill="var(--forest-canopy-cedar)" height="2.8" width="8.2" x="3.9" y="9.2" />
+        <rect fill="var(--forest-canopy-cedar)" height="2.6" width="6.6" x="4.7" y="6.8" />
+        <rect fill="var(--forest-canopy-cedar)" height="2.4" width="5" x="5.5" y="4.6" />
+        <rect fill="var(--forest-canopy-cedar)" height="2.2" width="3.4" x="6.3" y="2.6" />
+        <rect fill="var(--forest-canopy-cedar)" height="1.8" width="2" x="7" y="1.1" />
+        <rect fill="var(--forest-canopy-pine-light)" height="0.9" width="3.2" x="3.9" y="9.2" />
+        <rect fill="var(--forest-canopy-pine-light)" height="0.8" width="2.4" x="4.7" y="6.8" />
+      </symbol>
+
+      <symbol id={SPRITE_ID.fruit} viewBox="0 0 16 16">
+        <GroundShadow />
+        <rect fill="var(--forest-bark)" height="5.8" width="2" x="7" y="9.4" />
+        <rect fill="var(--forest-canopy)" height="6.4" width="10.4" x="2.8" y="3.4" />
+        <rect fill="var(--forest-canopy)" height="2.8" width="5.6" x="5.2" y="1.8" />
+        <rect fill="var(--forest-canopy-light)" height="1.8" width="3.6" x="3.4" y="4.2" />
+        <rect fill="var(--forest-bloom)" height="1.3" width="1.3" x="4.2" y="6.4" />
+        <rect fill="var(--forest-bloom-alt)" height="1.2" width="1.2" x="9.6" y="5.2" />
+        <rect fill="var(--forest-bloom)" height="1.1" width="1.1" x="7.2" y="7.6" />
+      </symbol>
+
+      <symbol id={SPRITE_ID.log} viewBox="0 0 16 16">
+        <ellipse cx="8" cy="13.6" fill="var(--forest-shadow)" rx="6" ry="1.2" />
+        <rect fill="var(--forest-bark)" height="2.6" width="11.2" x="2.4" y="10.6" />
+        <rect fill="var(--forest-bark-dark)" height="2.6" width="1.4" x="2.4" y="10.6" />
+        <rect fill="var(--forest-wood-light)" height="1" width="6" x="5.2" y="11" />
       </symbol>
 
       <symbol id={SPRITE_ID.rock} viewBox="0 0 16 16">

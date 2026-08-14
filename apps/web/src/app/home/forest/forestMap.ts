@@ -6,7 +6,7 @@
  * mask, which is all the walker needs to stop people wading into the ocean.
  */
 
-/** Pixel size of one map tile. Small enough to look blocky, big enough to walk. */
+/** Pixel size of one map tile. Collision and walking stay on this grid; the ground bitmap samples finer than it so the island does not read as 48px blocks. */
 export const TILE_SIZE = 48;
 
 export type TerrainKind =
@@ -27,7 +27,11 @@ export type TerrainKind =
 export type SceneryKind =
   | 'birch'
   | 'bloom'
+  | 'cedar'
   | 'dead'
+  | 'fruit'
+  | 'log'
+  | 'maple'
   | 'oak'
   | 'pine'
   | 'reed'
@@ -37,6 +41,7 @@ export type SceneryKind =
 
 export type ScenerySprite = {
   kind: SceneryKind;
+  scale: number;
   tileX: number;
   tileY: number;
 };
@@ -58,13 +63,8 @@ export type ForestPlot = {
   tileY: number;
 };
 
-export type LandmarkRegion =
-  | 'forest-grove'
-  | 'lakeside'
-  | 'meadow-camp'
-  | 'mountain-overlook'
-  | 'rocky-shore'
-  | 'wetland';
+/** Biome role used only to place cards. Never shown as a caption. */
+export type LandmarkRegion = 'marsh' | 'meadow' | 'peak' | 'shore' | 'water' | 'woods';
 
 export type ForestWorld = {
   columns: number;
@@ -72,6 +72,7 @@ export type ForestWorld = {
   plots: Array<ForestPlot>;
   rows: number;
   scenery: Array<ScenerySprite>;
+  seed: number;
   spawn: { tileX: number; tileY: number };
   terrain: Array<Array<TerrainKind>>;
 };
@@ -118,34 +119,6 @@ export const LANDMARK_MAX_HEIGHT_PX = FOOTPRINT_NORTH * TILE_SIZE - LANDMARK_CHR
 const WORLD_COLUMNS = 62;
 const MIN_WORLD_ROWS = 86;
 
-/**
- * Authored geographic anchors, not a card grid. Their uneven spacing makes each
- * stop belong to a recognizable place while the footprint dimensions keep the
- * boards provably separate. Special cards choose a matching region by id; all
- * other projects take the next unused anchor.
- */
-const LANDMARK_ANCHORS: ReadonlyArray<{
-  region: LandmarkRegion;
-  tileX: number;
-  tileY: number;
-}> = [
-  { region: 'meadow-camp', tileX: 10, tileY: 19 },
-  { region: 'meadow-camp', tileX: 25, tileY: 17 },
-  { region: 'mountain-overlook', tileX: 40, tileY: 21 },
-  { region: 'mountain-overlook', tileX: 54, tileY: 18 },
-  { region: 'forest-grove', tileX: 12, tileY: 39 },
-  { region: 'lakeside', tileX: 28, tileY: 42 },
-  { region: 'lakeside', tileX: 44, tileY: 36 },
-  { region: 'wetland', tileX: 55, tileY: 43 },
-  { region: 'rocky-shore', tileX: 9, tileY: 60 },
-  { region: 'forest-grove', tileX: 24, tileY: 57 },
-  { region: 'meadow-camp', tileX: 40, tileY: 62 },
-  { region: 'wetland', tileX: 54, tileY: 58 },
-  { region: 'forest-grove', tileX: 12, tileY: 79 },
-  { region: 'lakeside', tileX: 29, tileY: 76 },
-  { region: 'mountain-overlook', tileX: 45, tileY: 80 },
-];
-
 /** Tiles around a plot centre that stay clear of trees, rocks and peaks. */
 const PLOT_PROTECT_RADIUS = 4.6;
 const CLEARING_RADIUS = 2.7;
@@ -160,7 +133,9 @@ const SCENERY_CLEAR_RADIUS = 3.2;
 /** Trail width in tiles. Two is wide enough to walk, narrow enough to read as a path. */
 const TRAIL_WIDTH = 2;
 
-const SEED = 20_260_812;
+export const DEFAULT_FOREST_SEED = 20_260_812;
+
+let activeSeed = DEFAULT_FOREST_SEED;
 
 const WALKABLE_TERRAIN: ReadonlySet<TerrainKind> = new Set<TerrainKind>([
   'bridge',
@@ -176,7 +151,10 @@ const WALKABLE_TERRAIN: ReadonlySet<TerrainKind> = new Set<TerrainKind>([
 
 export const TREE_KINDS: ReadonlySet<SceneryKind> = new Set<SceneryKind>([
   'birch',
+  'cedar',
   'dead',
+  'fruit',
+  'maple',
   'oak',
   'pine',
   'willow',
@@ -195,7 +173,7 @@ function hashUnit(x: number, y: number, salt: number): number {
   let h =
     Math.imul(x + 0x1f1f, 0x27d4_eb2d) ^
     Math.imul(y + 0x9e37, 0x1656_67b1) ^
-    Math.imul(salt + SEED, 0x2545_f491);
+    Math.imul(salt + activeSeed, 0x2545_f491);
   h = Math.imul(h ^ (h >>> 15), 0x85eb_ca6b);
   h = Math.imul(h ^ (h >>> 13), 0xc2b2_ae35);
   return ((h ^ (h >>> 16)) >>> 0) / 0x1_0000_0000;
@@ -222,41 +200,242 @@ function valueNoise(x: number, y: number, scale: number, salt: number): number {
 }
 
 const REGION_FOR_ID: ReadonlyArray<[RegExp, LandmarkRegion]> = [
-  [/spotify/i, 'forest-grove'],
-  [/strava/i, 'mountain-overlook'],
-  [/map/i, 'lakeside'],
-  [/gattey-sites/i, 'meadow-camp'],
-  [/intro/i, 'meadow-camp'],
+  [/spotify/i, 'woods'],
+  [/strava/i, 'peak'],
+  [/map/i, 'water'],
+  [/gattey-sites/i, 'meadow'],
+  [/intro/i, 'meadow'],
 ];
 
 const preferredRegion = (id: string): LandmarkRegion | undefined =>
   REGION_FOR_ID.find(([pattern]) => pattern.test(id))?.[1];
 
+const SLOT_LAND: ReadonlySet<TerrainKind> = new Set<TerrainKind>([
+  'grass',
+  'hill',
+  'meadow',
+  'sand',
+  'wetland',
+]);
+
+const ROUTE_KINDS: ReadonlySet<TerrainKind> = new Set<TerrainKind>([
+  'bridge',
+  'clearing',
+  'path',
+  'trail',
+]);
+
+export function generateForestSeed(): number {
+  const bytes = new Uint32Array(1);
+  crypto.getRandomValues(bytes);
+  return (bytes[0] || 1) >>> 0;
+}
+
 /**
- * Assigns content to geographic anchors. Recognizable cards prefer a region
- * that fits their story (Spotify's listening grove, Strava's overlook, the map
- * at a dock); projects fill the remaining places in deterministic order.
+ * Finds walkable clearings on already-generated terrain, then hands cards to
+ * slots that match their biome preference so neighborhoods stay familiar:
+ * listening in the woods, activity up high, the map by water.
  */
-function layOutPlots(ids: ReadonlyArray<string>): Array<ForestPlot> {
-  const available = LANDMARK_ANCHORS.slice();
+function meanPoint(points: ReadonlyArray<{ tileX: number; tileY: number }>) {
+  if (points.length === 0) {
+    return { tileX: 0, tileY: 0 };
+  }
+  return {
+    tileX: points.reduce((sum, point) => sum + point.tileX, 0) / points.length,
+    tileY: points.reduce((sum, point) => sum + point.tileY, 0) / points.length,
+  };
+}
+
+function takeClosestSlot(
+  pool: ReadonlyArray<{ region: LandmarkRegion; tileX: number; tileY: number }>,
+  target: { tileX: number; tileY: number },
+) {
+  let bestIndex = 0;
+  let bestDistance = Number.POSITIVE_INFINITY;
+  for (let index = 0; index < pool.length; index++) {
+    const slot = pool[index];
+    if (!slot) {
+      continue;
+    }
+    const distance = Math.hypot(slot.tileX - target.tileX, slot.tileY - target.tileY);
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      bestIndex = index;
+    }
+  }
+  return pool[bestIndex];
+}
+
+function layOutPlots(
+  ids: ReadonlyArray<string>,
+  terrain: ReadonlyArray<ReadonlyArray<TerrainKind>>,
+  columns: number,
+  rows: number,
+): Array<ForestPlot> {
+  const slots = collectSlots(terrain, columns, rows, ids.length);
+  const available = slots.slice();
+  const placed: Array<ForestPlot> = [];
   return ids.map((id) => {
     const desired = preferredRegion(id);
-    const matchingIndex = desired ? available.findIndex((anchor) => anchor.region === desired) : -1;
-    const anchorIndex = matchingIndex >= 0 ? matchingIndex : 0;
-    const anchor = available.splice(anchorIndex, 1)[0];
-    if (!anchor) {
-      throw new Error('Forest world has no landmark anchors');
+    const matching = desired ? available.filter((slot) => slot.region === desired) : [];
+    const pool = matching.length > 0 ? matching : available;
+    const neighbors = desired ? placed.filter((plot) => plot.region === desired) : placed;
+    const target = neighbors.length > 0 ? meanPoint(neighbors) : meanPoint(pool);
+    const slot = takeClosestSlot(pool, target);
+    if (!slot) {
+      throw new Error(`Forest world could not place ${ids.length} landmarks`);
     }
-    return {
-      id,
-      ...anchor,
-    };
+    const availableIndex = available.findIndex(
+      (candidate) => candidate.tileX === slot.tileX && candidate.tileY === slot.tileY,
+    );
+    available.splice(availableIndex, 1);
+    const plot = { id, ...slot };
+    placed.push(plot);
+    return plot;
   });
 }
 
-function worldSize(plots: ReadonlyArray<ForestPlot>) {
-  const lowestAnchor = plots.reduce((lowest, plot) => Math.max(lowest, plot.tileY), 0);
-  return { columns: WORLD_COLUMNS, rows: Math.max(MIN_WORLD_ROWS, lowestAnchor + 8) };
+function footprintFits(
+  tileX: number,
+  tileY: number,
+  terrain: ReadonlyArray<ReadonlyArray<TerrainKind>>,
+  columns: number,
+  rows: number,
+): boolean {
+  const halfWidth = FOOTPRINT_WIDTH / 2;
+  const minX = tileX - halfWidth;
+  const maxX = tileX + halfWidth;
+  const minY = tileY - FOOTPRINT_NORTH;
+  if (minX < 2 || minY < 2 || maxX > columns - 3 || tileY > rows - 4) {
+    return false;
+  }
+  for (let y = Math.floor(minY); y <= tileY; y++) {
+    for (let x = Math.floor(minX); x <= Math.ceil(maxX); x++) {
+      const kind = terrain[y]?.[x];
+      if (!kind || !SLOT_LAND.has(kind)) {
+        return false;
+      }
+    }
+  }
+  return true;
+}
+
+function classifySlot(
+  tileX: number,
+  tileY: number,
+  terrain: ReadonlyArray<ReadonlyArray<TerrainKind>>,
+): LandmarkRegion {
+  let water = 0;
+  let marsh = 0;
+  let peak = 0;
+  let shore = 0;
+  let meadow = 0;
+  for (let y = tileY - 6; y <= tileY + 2; y++) {
+    for (let x = tileX - 5; x <= tileX + 5; x++) {
+      const kind = terrain[y]?.[x];
+      if (kind === 'lake' || kind === 'shallow') {
+        water += 1;
+      } else if (kind === 'wetland') {
+        marsh += 1;
+      } else if (kind === 'mountain' || kind === 'hill') {
+        peak += 1;
+      } else if (kind === 'sand' || kind === 'ocean') {
+        shore += 1;
+      } else if (kind === 'meadow') {
+        meadow += 1;
+      }
+    }
+  }
+  if (water >= 6) {
+    return 'water';
+  }
+  if (peak >= 8) {
+    return 'peak';
+  }
+  if (marsh >= 6) {
+    return 'marsh';
+  }
+  if (shore >= 8) {
+    return 'shore';
+  }
+  if (meadow >= 10) {
+    return 'meadow';
+  }
+  return 'woods';
+}
+
+function footprintsConflict(
+  a: { tileX: number; tileY: number },
+  b: { tileX: number; tileY: number },
+  pad: number,
+): boolean {
+  return (
+    Math.abs(a.tileX - b.tileX) < FOOTPRINT_WIDTH + pad &&
+    Math.abs(a.tileY - b.tileY) < FOOTPRINT_NORTH + pad
+  );
+}
+
+function collectSlots(
+  terrain: ReadonlyArray<ReadonlyArray<TerrainKind>>,
+  columns: number,
+  rows: number,
+  count: number,
+): Array<{ region: LandmarkRegion; tileX: number; tileY: number }> {
+  const candidates: Array<{ region: LandmarkRegion; tileX: number; tileY: number; rank: number }> =
+    [];
+  for (let y = FOOTPRINT_NORTH + 2; y < rows - 4; y += 1) {
+    for (let x = 5; x < columns - 5; x += 1) {
+      if (!footprintFits(x, y, terrain, columns, rows)) {
+        continue;
+      }
+      candidates.push({
+        rank: hashUnit(x, y, 211),
+        region: classifySlot(x, y, terrain),
+        tileX: x,
+        tileY: y,
+      });
+    }
+  }
+  candidates.sort((a, b) => a.rank - b.rank);
+  const regionOrder: ReadonlyArray<LandmarkRegion> = [
+    'woods',
+    'peak',
+    'water',
+    'meadow',
+    'marsh',
+    'shore',
+  ];
+
+  for (let pad = 3; pad >= 1; pad -= 1) {
+    const picked: Array<{ region: LandmarkRegion; tileX: number; tileY: number }> = [];
+    const consider = (candidate: (typeof candidates)[number]) => {
+      if (picked.some((slot) => footprintsConflict(slot, candidate, pad))) {
+        return false;
+      }
+      picked.push({
+        region: candidate.region,
+        tileX: candidate.tileX,
+        tileY: candidate.tileY,
+      });
+      return picked.length >= count;
+    };
+    for (const region of regionOrder) {
+      const candidate = candidates.find(
+        (slot) =>
+          slot.region === region &&
+          !picked.some((pickedSlot) => footprintsConflict(pickedSlot, slot, pad)),
+      );
+      if (candidate && consider(candidate)) {
+        return picked;
+      }
+    }
+    for (const candidate of candidates) {
+      if (consider(candidate)) {
+        return picked;
+      }
+    }
+  }
+  throw new Error(`Forest world could not place ${count} landmarks`);
 }
 
 /**
@@ -289,11 +468,14 @@ const distanceToSegment = (x: number, y: number, from: Point, to: Point) => {
 };
 
 const riverDistance = (x: number, y: number, rows: number) => {
+  const mouthX = 18 + hashUnit(0, 0, 221) * 10;
+  const lakeX = 26 + hashUnit(0, 0, 223) * 14;
+  const lakeY = 28 + hashUnit(0, 0, 225) * 12;
   const points = [
-    { x: 33, y: 36 },
-    { x: 25, y: 48 },
-    { x: 28, y: 62 },
-    { x: 20, y: rows },
+    { x: lakeX + 4, y: lakeY + 4 },
+    { x: lakeX - 6, y: lakeY + 16 },
+    { x: lakeX, y: lakeY + 30 },
+    { x: mouthX, y: rows },
   ];
   let nearest = Number.POSITIVE_INFINITY;
   for (let index = 0; index < points.length - 1; index++) {
@@ -310,30 +492,48 @@ const riverDistance = (x: number, y: number, rows: number) => {
  * Layered distance fields and value noise produce the underlying geography:
  * an irregular coast, a multi-lobed inland lake feeding a winding river, open
  * meadow basins, wetlands around water, and forest floor everywhere between.
- * Boundaries are deliberately soft and warped rather than geometric masks.
+ * Boundaries are soft and warped. Lake and meadow centres move with the seed.
  */
 function baseTerrainAt(x: number, y: number, columns: number, rows: number): TerrainKind {
-  const distanceToEdge = Math.min(x, y, columns - 1 - x, rows - 1 - y);
-  const shore = 1.8 + valueNoise(x, y, 8, 3) * 3.8 + valueNoise(x, y, 19, 5) * 1.4;
-  if (distanceToEdge < shore - 1.6) {
+  const warpX = (valueNoise(x, y, 11, 71) - 0.5) * 4.2;
+  const warpY = (valueNoise(x, y, 13, 73) - 0.5) * 4.2;
+  const centreX = (columns - 1) / 2 + (hashUnit(0, 0, 201) - 0.5) * 3;
+  const centreY = (rows - 1) / 2 + (hashUnit(0, 0, 203) - 0.5) * 4;
+  const radiusX = columns * (0.46 + hashUnit(0, 0, 205) * 0.04);
+  const radiusY = rows * (0.47 + hashUnit(0, 0, 207) * 0.04);
+  const island =
+    Math.hypot((x + warpX - centreX) / radiusX, (y + warpY - centreY) / radiusY) +
+    (valueNoise(x, y, 8, 3) - 0.5) * 0.12 +
+    (valueNoise(x, y, 19, 5) - 0.5) * 0.08;
+  if (island > 1.06) {
     return 'ocean';
   }
-  if (distanceToEdge < shore) {
+  if (island > 0.96) {
     return 'shallow';
   }
-  if (distanceToEdge < shore + 2.4) {
+  if (island > 0.88) {
     return 'sand';
   }
 
-  const warpX = (valueNoise(x, y, 11, 71) - 0.5) * 4;
-  const warpY = (valueNoise(x, y, 13, 73) - 0.5) * 4;
-  const lakeMain = Math.hypot((x + warpX - 35) / 9.5, (y + warpY - 32) / 7);
-  const lakeCove = Math.hypot((x - warpX - 29) / 6, (y + warpY - 35) / 5);
-  const lakeField = Math.min(lakeMain, lakeCove);
+  const lakeCx = 28 + hashUnit(0, 0, 231) * 14;
+  const lakeCy = 30 + hashUnit(0, 0, 233) * 16;
+  const lakeMain = Math.hypot(
+    (x + warpX * 0.45 - lakeCx) / (7.4 + hashUnit(0, 0, 235) * 3.2),
+    (y + warpY * 0.45 - lakeCy) / (5.6 + hashUnit(0, 0, 237) * 2.6),
+  );
+  const lakeCove = Math.hypot(
+    (x - warpX * 0.3 - (lakeCx - 6)) / 5.4,
+    (y + warpY * 0.3 - (lakeCy + 3)) / 4.6,
+  );
+  const pond = Math.hypot(
+    (x - (16 + hashUnit(0, 0, 239) * 22)) / 4.2,
+    (y - (52 + hashUnit(0, 0, 240) * 18)) / 3.6,
+  );
+  const lakeField = Math.min(lakeMain, lakeCove, pond);
   if (lakeField < 0.88) {
     return 'lake';
   }
-  if (lakeField < 1.14) {
+  if (lakeField < 1.16) {
     return valueNoise(x, y, 4, 79) > 0.42 ? 'shallow' : 'wetland';
   }
 
@@ -347,9 +547,13 @@ function baseTerrainAt(x: number, y: number, columns: number, rows: number): Ter
   }
 
   const meadowNoise = valueNoise(x, y, 12, 11) * 0.55 + valueNoise(x, y, 25, 13) * 0.45;
+  const meadowAx = 14 + hashUnit(0, 0, 241) * 10;
+  const meadowAy = 20 + hashUnit(0, 0, 243) * 10;
+  const meadowBx = 34 + hashUnit(0, 0, 245) * 12;
+  const meadowBy = 56 + hashUnit(0, 0, 247) * 12;
   const meadowBasin = Math.min(
-    Math.hypot((x - 17) / 16, (y - 22) / 13),
-    Math.hypot((x - 37) / 18, (y - 61) / 16),
+    Math.hypot((x - meadowAx) / 16, (y - meadowAy) / 13),
+    Math.hypot((x - meadowBx) / 18, (y - meadowBy) / 16),
   );
   return meadowNoise > 0.55 || meadowBasin < 0.72 ? 'meadow' : 'grass';
 }
@@ -363,6 +567,43 @@ const nearestPlotDistance = (x: number, y: number, plots: ReadonlyArray<ForestPl
     Number.POSITIVE_INFINITY,
   );
 
+function ridgeFor(columns: number, rows: number) {
+  const shift = (hashUnit(0, 0, 251) - 0.5) * 10;
+  return [
+    { x: columns * (0.62 + hashUnit(0, 0, 253) * 0.16) + shift, y: 4 },
+    { x: columns * (0.76 + hashUnit(0, 0, 255) * 0.12) + shift, y: rows * 0.24 },
+    { x: columns * (0.64 + hashUnit(0, 0, 257) * 0.14) + shift, y: rows * 0.48 },
+    { x: columns * (0.8 + hashUnit(0, 0, 259) * 0.12) + shift, y: rows * 0.72 },
+    { x: columns * (0.74 + hashUnit(0, 0, 261) * 0.12) + shift, y: rows - 4 },
+  ];
+}
+
+function mountainBandAt(
+  x: number,
+  y: number,
+  columns: number,
+  rows: number,
+): 'hill' | 'mountain' | null {
+  const ridge = ridgeFor(columns, rows);
+  let distance = Number.POSITIVE_INFINITY;
+  for (let index = 0; index < ridge.length - 1; index++) {
+    const from = ridge[index];
+    const to = ridge[index + 1];
+    if (from && to) {
+      distance = Math.min(distance, distanceToSegment(x, y, from, to));
+    }
+  }
+  const breakNoise = valueNoise(x, y, 9, 17);
+  const width = 1.5 + valueNoise(x, y, 6, 19) * 2.4;
+  if (distance < width && breakNoise > 0.28) {
+    return 'mountain';
+  }
+  if (distance < width + 3.2 && breakNoise > 0.16) {
+    return 'hill';
+  }
+  return null;
+}
+
 /**
  * A broken mountain range follows a warped diagonal ridge. A wider hill band
  * makes elevation ramp up visibly before the blocking rock faces; gaps around
@@ -374,13 +615,6 @@ function addMountains(
   rows: number,
   plots: ReadonlyArray<ForestPlot>,
 ) {
-  const ridge = [
-    { x: columns * 0.7, y: 4 },
-    { x: columns * 0.84, y: rows * 0.24 },
-    { x: columns * 0.72, y: rows * 0.48 },
-    { x: columns * 0.9, y: rows * 0.72 },
-    { x: columns * 0.82, y: rows - 4 },
-  ];
   for (let y = 0; y < rows; y++) {
     for (let x = 0; x < columns; x++) {
       const row = terrain[y];
@@ -390,20 +624,9 @@ function addMountains(
       if (nearestPlotDistance(x, y, plots) < PLOT_PROTECT_RADIUS + 0.5) {
         continue;
       }
-      let distance = Number.POSITIVE_INFINITY;
-      for (let index = 0; index < ridge.length - 1; index++) {
-        const from = ridge[index];
-        const to = ridge[index + 1];
-        if (from && to) {
-          distance = Math.min(distance, distanceToSegment(x, y, from, to));
-        }
-      }
-      const breakNoise = valueNoise(x, y, 9, 17);
-      const width = 2.1 + valueNoise(x, y, 6, 19) * 3.4;
-      if (distance < width && breakNoise > 0.24) {
-        row[x] = 'mountain';
-      } else if (distance < width + 2.8 && breakNoise > 0.16) {
-        row[x] = 'hill';
+      const band = mountainBandAt(x, y, columns, rows);
+      if (band) {
+        row[x] = band;
       }
     }
   }
@@ -561,6 +784,56 @@ function carveRoute(
   }
 }
 
+function spanBridges(terrain: Array<Array<TerrainKind>>, columns: number, rows: number) {
+  const dirs = [
+    [1, 0],
+    [-1, 0],
+    [0, 1],
+    [0, -1],
+  ] as const;
+  for (let y = 1; y < rows - 1; y++) {
+    for (let x = 1; x < columns - 1; x++) {
+      const kind = terrain[y]?.[x];
+      if (kind !== 'path' && kind !== 'trail') {
+        continue;
+      }
+      for (const [dx, dy] of dirs) {
+        const water: Array<{ x: number; y: number }> = [];
+        let cx = x + dx;
+        let cy = y + dy;
+        while (
+          water.length < 7 &&
+          cx > 0 &&
+          cy > 0 &&
+          cx < columns - 1 &&
+          cy < rows - 1 &&
+          (terrain[cy]?.[cx] === 'lake' || terrain[cy]?.[cx] === 'shallow')
+        ) {
+          water.push({ x: cx, y: cy });
+          cx += dx;
+          cy += dy;
+        }
+        const land = terrain[cy]?.[cx];
+        if (
+          water.length >= 1 &&
+          land &&
+          land !== 'ocean' &&
+          land !== 'mountain' &&
+          land !== 'lake' &&
+          land !== 'shallow'
+        ) {
+          for (const tile of water) {
+            const row = terrain[tile.y];
+            if (row) {
+              row[tile.x] = 'bridge';
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 function carveTrails(
   terrain: Array<Array<TerrainKind>>,
   columns: number,
@@ -574,6 +847,7 @@ function carveTrails(
       carveRoute(terrain, columns, rows, from, to, edge.kind, 101 + index);
     }
   }
+  spanBridges(terrain, columns, rows);
 }
 
 /**
@@ -683,15 +957,26 @@ function pickTreeKind(
     return 'willow';
   }
   if (kind === 'hill' || density > 0.68) {
-    return 'pine';
+    return hashUnit(x, y, 48) > 0.45 ? 'cedar' : 'pine';
   }
-  if (hashUnit(x, y, 49) > 0.88) {
+  if (hashUnit(x, y, 49) > 0.9) {
     return 'dead';
   }
-  if (hashUnit(x, y, 51) > 0.5) {
+  if (hashUnit(x, y, 50) > 0.82) {
+    return 'fruit';
+  }
+  const mix = hashUnit(x, y, 51);
+  if (mix > 0.66) {
+    return 'maple';
+  }
+  if (mix > 0.38) {
     return 'birch';
   }
   return 'oak';
+}
+
+function spriteScale(x: number, y: number): number {
+  return 0.72 + hashUnit(x, y, 52) * 0.7;
 }
 
 /**
@@ -716,30 +1001,35 @@ function scatterScenery(
       if (kind === 'sand') {
         if (roll > 0.965) {
           if (mayPlantSolid) {
-            scenery.push({ kind: 'rock', tileX: x, tileY: y });
+            scenery.push({ kind: 'rock', scale: spriteScale(x, y), tileX: x, tileY: y });
           }
         } else if (roll < 0.02) {
-          scenery.push({ kind: 'reed', tileX: x, tileY: y });
+          scenery.push({ kind: 'reed', scale: spriteScale(x, y), tileX: x, tileY: y });
         }
         continue;
       }
       if (kind === 'clearing') {
         if (roll > 0.93 && nearestPlotDistance(x, y, plots) > CLEARING_RADIUS - 1.5) {
-          scenery.push({ kind: 'bloom', tileX: x, tileY: y });
+          scenery.push({ kind: 'bloom', scale: spriteScale(x, y), tileX: x, tileY: y });
         }
         continue;
       }
       if (kind === 'wetland') {
         if (roll < 0.34) {
-          scenery.push({ kind: 'reed', tileX: x, tileY: y });
+          scenery.push({ kind: 'reed', scale: spriteScale(x, y), tileX: x, tileY: y });
         } else if (roll > 0.96) {
-          scenery.push({ kind: 'bloom', tileX: x, tileY: y });
+          scenery.push({ kind: 'bloom', scale: spriteScale(x, y), tileX: x, tileY: y });
         }
         continue;
       }
       if (kind === 'hill') {
         if (mayPlantSolid && roll < 0.18) {
-          scenery.push({ kind: roll < 0.1 ? 'pine' : 'rock', tileX: x, tileY: y });
+          scenery.push({
+            kind: roll < 0.1 ? 'cedar' : 'rock',
+            scale: spriteScale(x, y),
+            tileX: x,
+            tileY: y,
+          });
         }
         continue;
       }
@@ -749,7 +1039,12 @@ function scatterScenery(
       const nextToTrail = hasNeighbour(terrain, x, y, TRAIL_ADJACENT);
       if (nextToTrail) {
         if (roll > 0.9) {
-          scenery.push({ kind: roll > 0.96 ? 'stump' : 'bloom', tileX: x, tileY: y });
+          scenery.push({
+            kind: roll > 0.97 ? 'log' : roll > 0.96 ? 'stump' : 'bloom',
+            scale: spriteScale(x, y),
+            tileX: x,
+            tileY: y,
+          });
         }
         continue;
       }
@@ -770,13 +1065,14 @@ function scatterScenery(
       if (roll < treeThreshold) {
         scenery.push({
           kind: pickTreeKind(x, y, kind, density, terrain),
+          scale: spriteScale(x, y),
           tileX: x,
           tileY: y,
         });
       } else if (roll > 0.972) {
-        scenery.push({ kind: 'rock', tileX: x, tileY: y });
+        scenery.push({ kind: 'rock', scale: spriteScale(x, y), tileX: x, tileY: y });
       } else if (kind === 'meadow' && roll > 0.9) {
-        scenery.push({ kind: 'bloom', tileX: x, tileY: y });
+        scenery.push({ kind: 'bloom', scale: spriteScale(x, y), tileX: x, tileY: y });
       }
     }
   }
@@ -786,10 +1082,16 @@ function scatterScenery(
 const GROVE_OFFSETS: ReadonlyArray<readonly [number, number]> = [
   [-4, 1],
   [4, 1],
+  [-6, 2],
+  [6, 2],
   [-5, 0],
   [5, 0],
+  [-6, -2],
+  [6, -2],
   [-5, -3],
   [5, -3],
+  [-3, -5],
+  [3, -5],
 ];
 
 /**
@@ -823,6 +1125,7 @@ function plantGroveSentinels(
       occupied.add(`${x},${y}`);
       scenery.push({
         kind: pickTreeKind(x, y, kind, 0.6, terrain),
+        scale: spriteScale(x, y),
         tileX: x,
         tileY: y,
       });
@@ -916,37 +1219,70 @@ export function isWalkableTile(world: WalkableWorld, tileX: number, tileY: numbe
 }
 
 /**
- * Builds the island around an ordered list of card ids. The ids drive plot
- * placement, so adding or removing a homepage card reshapes the map instead of
- * leaving an empty glade behind.
+ * Builds the island around an ordered list of card ids. Terrain is generated
+ * first from `seed`, then cards are slotted into valid clearings. The same seed
+ * always yields the same island, so SSR markup and hydration match.
  */
-export function buildForestWorld(plotIds: ReadonlyArray<string>): ForestWorld {
-  const plots = layOutPlots(plotIds);
-  const { columns, rows } = worldSize(plots);
+export function buildForestWorld(
+  plotIds: ReadonlyArray<string>,
+  seed = DEFAULT_FOREST_SEED,
+): ForestWorld {
+  const previous = activeSeed;
+  activeSeed = seed >>> 0 || 1;
+  try {
+    const columns = WORLD_COLUMNS;
+    const rows = MIN_WORLD_ROWS;
+    const terrain: Array<Array<TerrainKind>> = Array.from({ length: rows }, (_, y) =>
+      Array.from({ length: columns }, (__, x) => baseTerrainAt(x, y, columns, rows)),
+    );
 
-  const terrain: Array<Array<TerrainKind>> = Array.from({ length: rows }, (_, y) =>
-    Array.from({ length: columns }, (__, x) => baseTerrainAt(x, y, columns, rows)),
-  );
+    addMountains(terrain, columns, rows, []);
+    const plots = layOutPlots(plotIds, terrain, columns, rows);
+    openClearings(terrain, columns, rows, plots);
+    carveTrails(terrain, columns, rows, plots);
+    const scenery = scatterScenery(terrain, columns, rows, plots);
+    plantGroveSentinels(terrain, columns, rows, plots, scenery);
+    const critters = placeCritters(terrain, columns, rows, plots);
 
-  addMountains(terrain, columns, rows, plots);
-  // Clearings first, then the network, so every path remains visible through a
-  // landmark's glade and every bridge/pass matches the final collision mask.
-  openClearings(terrain, columns, rows, plots);
-  carveTrails(terrain, columns, rows, plots);
-  const scenery = scatterScenery(terrain, columns, rows, plots);
-  plantGroveSentinels(terrain, columns, rows, plots, scenery);
-  const critters = placeCritters(terrain, columns, rows, plots);
+    const firstPlot = plots[0];
+    const spawn = findNearestWalkable(
+      { columns, rows, terrain },
+      firstPlot ? firstPlot.tileX : Math.floor(columns / 2),
+      firstPlot ? firstPlot.tileY : Math.floor(rows / 2),
+    );
 
-  // Start on the first clearing's own tile: the trail runs through every plot
-  // centre, so whichever way someone walks first they are already on it.
-  const firstPlot = plots[0];
-  const spawn = findNearestWalkable(
-    { columns, rows, terrain },
-    firstPlot ? firstPlot.tileX : Math.floor(columns / 2),
-    firstPlot ? firstPlot.tileY : Math.floor(rows / 2),
-  );
+    return { columns, critters, plots, rows, scenery, seed: activeSeed, spawn, terrain };
+  } finally {
+    activeSeed = previous;
+  }
+}
 
-  return { columns, critters, plots, rows, scenery, spawn, terrain };
+/**
+ * Sub-tile sample used to paint the ground bitmap. Routes stay on the discrete
+ * grid so the walker and the drawing agree; biomes and coast follow the same
+ * noise at fractional coordinates so the tile grid does not print as blocks.
+ */
+export function visualTerrainAt(world: ForestWorld, fx: number, fy: number): TerrainKind {
+  const tileX = Math.min(world.columns - 1, Math.max(0, Math.floor(fx)));
+  const tileY = Math.min(world.rows - 1, Math.max(0, Math.floor(fy)));
+  const discrete = world.terrain[tileY]?.[tileX] ?? 'ocean';
+  if (ROUTE_KINDS.has(discrete)) {
+    return discrete;
+  }
+  const previous = activeSeed;
+  activeSeed = world.seed;
+  try {
+    const land = baseTerrainAt(fx, fy, world.columns, world.rows);
+    if (land === 'grass' || land === 'meadow' || land === 'wetland') {
+      const band = mountainBandAt(fx, fy, world.columns, world.rows);
+      if (band && nearestPlotDistance(fx, fy, world.plots) >= PLOT_PROTECT_RADIUS + 0.5) {
+        return band;
+      }
+    }
+    return land;
+  } finally {
+    activeSeed = previous;
+  }
 }
 
 /** Collapses one row of values into `{ start, length, value }` spans. */

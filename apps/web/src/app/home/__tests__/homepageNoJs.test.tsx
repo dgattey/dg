@@ -20,6 +20,11 @@
 import { Writable } from 'node:stream';
 import { type ReactElement, Suspense, use } from 'react';
 import { renderToPipeableStream } from 'react-dom/server';
+import { DEFAULT_FOREST_SEED } from '../forest/forestMap';
+
+jest.mock('next/server', () => ({
+  connection: jest.fn().mockResolvedValue(undefined),
+}));
 
 jest.mock('../../../services/contentful', () => ({
   getIntroContent: async () => null,
@@ -162,7 +167,7 @@ describe('homepage without scripting', () => {
 
   it('serves the island in the shell', async () => {
     const { ForestHomepage } = await import('../forest/ForestHomepage');
-    const shell = await noScriptShell(await ForestHomepage());
+    const shell = await noScriptShell(await ForestHomepage({ seed: DEFAULT_FOREST_SEED }));
 
     // The world itself, not just a wash: a terrain bitmap and carved boards.
     expect(shell).toContain('data-forest-world');
@@ -170,7 +175,16 @@ describe('homepage without scripting', () => {
     expect(shell).toContain('data-forest-landmark');
     expect(shell).toContain('data-forest-minimap');
     expect(visibleText(shell)).toContain('Alpha Project');
-    expect(visibleText(shell)).not.toContain('Meadow camp');
+    for (const caption of [
+      'Meadow camp',
+      'Wetland boardwalk',
+      'Mountain overlook',
+      'Forest grove',
+      'Rocky shore',
+      'Lakeside',
+    ]) {
+      expect(shell).not.toContain(caption);
+    }
 
     // Every card the grid has is reachable here too.
     expect(hrefsIn(shell)).toEqual(

@@ -2,18 +2,21 @@ import 'server-only';
 
 import { deflateSync } from 'node:zlib';
 import type { ForestWorld, TerrainKind } from './forestMap';
+import { visualTerrainAt } from './forestMap';
 import { TERRAIN_DETAIL_HSL, TERRAIN_HSL } from './forestPalette';
 
 /**
- * One pixelated bitmap of the island, generated on the server so the page
+ * One painted bitmap of the island, generated on the server so the page
  * paints a single image instead of thousands of SVG rects.
  *
- * Indexed PNG, ocean as transparency (the page already floods that colour),
- * light and dark palettes swapped with `light-dark()` so the theme toggle
- * still works without JavaScript.
+ * Indexed PNG sampled finer than a walkable tile, ocean as transparency (the
+ * page already floods that colour), light and dark palettes swapped with
+ * `light-dark()` so the theme toggle still works without JavaScript. The
+ * bitmap is upscaled with ordinary interpolation so biome edges blend instead
+ * of printing the 48px collision grid.
  */
 
-export const BITMAP_PX_PER_TILE = 4;
+export const BITMAP_PX_PER_TILE = 8;
 
 const TERRAIN_INDEX: Record<TerrainKind, number> = {
   bridge: 11,
@@ -134,35 +137,32 @@ export function encodeIndexedPng(
   return `data:image/png;base64,${Buffer.from(concat(parts)).toString('base64')}`;
 }
 
-function paintTerrain(world: Pick<ForestWorld, 'columns' | 'rows' | 'terrain'>): Uint8Array {
+function paintTerrain(world: ForestWorld): Uint8Array {
   const width = world.columns * BITMAP_PX_PER_TILE;
   const height = world.rows * BITMAP_PX_PER_TILE;
   const pixels = new Uint8Array(width * height);
-  for (let tileY = 0; tileY < world.rows; tileY++) {
-    for (let tileX = 0; tileX < world.columns; tileX++) {
-      const kind = world.terrain[tileY]?.[tileX] ?? 'ocean';
-      const base = TERRAIN_INDEX[kind];
-      const north = world.terrain[tileY - 1]?.[tileX];
-      for (let py = 0; py < BITMAP_PX_PER_TILE; py++) {
-        for (let px = 0; px < BITMAP_PX_PER_TILE; px++) {
-          let index = base;
-          if (kind === 'mountain' && py === 0 && north !== 'mountain') {
-            index = DETAIL_CAP;
-          } else if (kind === 'hill' && py === 1) {
-            index = DETAIL_RIDGE;
-          } else if (kind === 'bridge' && px === BITMAP_PX_PER_TILE - 1) {
-            index = DETAIL_PLANK;
-          }
-          pixels[(tileY * BITMAP_PX_PER_TILE + py) * width + (tileX * BITMAP_PX_PER_TILE + px)] =
-            index;
-        }
+  const step = 1 / BITMAP_PX_PER_TILE;
+  for (let py = 0; py < height; py++) {
+    for (let px = 0; px < width; px++) {
+      const fx = (px + 0.5) * step;
+      const fy = (py + 0.5) * step;
+      const kind = visualTerrainAt(world, fx, fy);
+      const north = visualTerrainAt(world, fx, fy - step);
+      let index = TERRAIN_INDEX[kind];
+      if (kind === 'mountain' && north !== 'mountain') {
+        index = DETAIL_CAP;
+      } else if (kind === 'hill' && north === 'mountain') {
+        index = DETAIL_RIDGE;
+      } else if (kind === 'bridge' && Math.floor(fx * 5) % 2 === 0) {
+        index = DETAIL_PLANK;
       }
+      pixels[py * width + px] = index;
     }
   }
   return pixels;
 }
 
-export function forestTerrainDataUrls(world: Pick<ForestWorld, 'columns' | 'rows' | 'terrain'>) {
+export function forestTerrainDataUrls(world: ForestWorld) {
   const pixels = paintTerrain(world);
   const width = world.columns * BITMAP_PX_PER_TILE;
   const height = world.rows * BITMAP_PX_PER_TILE;
@@ -174,14 +174,15 @@ export function forestTerrainDataUrls(world: Pick<ForestWorld, 'columns' | 'rows
   };
 }
 
-export function forestWaterMaskDataUrl(world: Pick<ForestWorld, 'columns' | 'rows' | 'terrain'>) {
-  const width = world.columns;
-  const height = world.rows;
+export function forestWaterMaskDataUrl(world: ForestWorld) {
+  const scale = 2;
+  const width = world.columns * scale;
+  const height = world.rows * scale;
   const pixels = new Uint8Array(width * height);
-  for (let y = 0; y < height; y++) {
-    for (let x = 0; x < width; x++) {
-      const kind = world.terrain[y]?.[x];
-      pixels[y * width + x] = kind === 'lake' || kind === 'ocean' || kind === 'shallow' ? 1 : 0;
+  for (let py = 0; py < height; py++) {
+    for (let px = 0; px < width; px++) {
+      const kind = visualTerrainAt(world, (px + 0.5) / scale, (py + 0.5) / scale);
+      pixels[py * width + px] = kind === 'lake' || kind === 'ocean' || kind === 'shallow' ? 1 : 0;
     }
   }
   return encodeIndexedPng(

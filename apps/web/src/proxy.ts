@@ -87,7 +87,7 @@ function protectDevConsole(request: NextRequest): NextResponse | null {
  * homepage's own rewrite.
  */
 function hideInteractiveHomeRoute(request: NextRequest): NextResponse | null {
-  if (request.nextUrl.pathname !== internalInteractiveHomeRoute) {
+  if (!request.nextUrl.pathname.startsWith(internalInteractiveHomeRoute)) {
     return null;
   }
   return NextResponse.redirect(new URL(homeRoute, request.url));

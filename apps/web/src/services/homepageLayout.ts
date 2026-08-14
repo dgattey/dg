@@ -1,6 +1,7 @@
 import { homeRoute, internalInteractiveHomeRoute } from '@dg/shared-core/routes/app';
 import type { NextRequest } from 'next/server';
 import { interactiveRedesign } from '../flags';
+import { rollForestSeed } from './forestSeeds';
 
 /**
  * Picks the route that renders `/` for this request, evaluating
@@ -17,6 +18,10 @@ import { interactiveRedesign } from '../flags';
  * *routing* choice: each route has no request-time branch left, so both
  * prerender to complete HTML that needs no scripts to become visible.
  *
+ * When the island is on, the rewrite picks a seed from a prerendered deck so
+ * visits usually get a different map without generating terrain on the request.
+ * The page itself never reads the flag or `connection()`.
+ *
  * Returns null when `/` should render itself — a different path, or the flag
  * being off.
  */
@@ -29,5 +34,5 @@ export async function homepageRewritePath(request: NextRequest): Promise<string 
   // this visitor's cookies (session and Flags Explorer override) and nobody
   // else's.
   const isInteractive = await interactiveRedesign(request);
-  return isInteractive ? internalInteractiveHomeRoute : null;
+  return isInteractive ? `${internalInteractiveHomeRoute}/s/${rollForestSeed()}` : null;
 }

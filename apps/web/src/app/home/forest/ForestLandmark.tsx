@@ -43,7 +43,7 @@ const landmarkSx: SxObject = {
 /** Everything visible stands north of the anchor so the trail stays walkable. */
 const stackSx: SxObject = {
   [`[${LANDMARK_NEAR_ATTRIBUTE}='true'] &`]: {
-    transform: 'translateX(-50%) perspective(720px) rotateX(7deg) scale(1.03)',
+    transform: 'translateX(-50%) perspective(640px) rotateX(12deg) scale(1.03)',
   },
   alignItems: 'center',
   bottom: LANDMARK_POST_HEIGHT,
@@ -52,7 +52,7 @@ const stackSx: SxObject = {
   gap: 1,
   left: 0,
   position: 'absolute',
-  transform: 'translateX(-50%) perspective(720px) rotateX(7deg)',
+  transform: 'translateX(-50%) perspective(640px) rotateX(12deg)',
   transformOrigin: 'bottom center',
   ...createBouncyTransition('transform'),
 };
@@ -66,11 +66,12 @@ const postsSx: SxObject = {
       'linear-gradient(90deg, var(--forest-wood-dark), var(--forest-wood) 40%, var(--forest-wood-dark))',
     borderRadius: '2px',
     bottom: -LANDMARK_POST_HEIGHT,
-    boxShadow: '0 10px 0 3px var(--forest-shadow)',
+    boxShadow:
+      '0 10px 0 3px var(--forest-shadow), 0 14px 0 8px color-mix(in srgb, var(--forest-sand) 70%, var(--forest-shadow))',
     content: '""',
-    height: LANDMARK_POST_HEIGHT + 4,
+    height: LANDMARK_POST_HEIGHT + 6,
     position: 'absolute',
-    width: 6,
+    width: 7,
   },
   position: 'relative',
 };

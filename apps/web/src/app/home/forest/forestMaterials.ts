@@ -112,18 +112,18 @@ export const landmarkFrameSx: SxObject = {
   },
   '&::before': {
     background:
-      'radial-gradient(circle at 20% 0, var(--forest-canopy) 0 7px, transparent 8px), radial-gradient(circle at 80% 0, var(--forest-canopy-pine) 0 6px, transparent 7px), radial-gradient(circle at 55% 2px, var(--forest-canopy-light) 0 5px, transparent 6px)',
+      'radial-gradient(circle at 18% 0, var(--forest-canopy) 0 8px, transparent 9px), radial-gradient(circle at 82% 0, var(--forest-canopy-pine) 0 7px, transparent 8px), radial-gradient(circle at 52% 2px, var(--forest-canopy-light) 0 6px, transparent 7px), radial-gradient(circle at 36% 8px, var(--forest-canopy-maple) 0 5px, transparent 6px)',
     content: '""',
-    height: 14,
-    left: 10,
+    height: 22,
+    left: 8,
     pointerEvents: 'none',
     position: 'absolute',
-    right: 10,
-    top: -6,
+    right: 8,
+    top: -10,
   },
   backgroundColor: 'var(--forest-wood)',
   backgroundImage:
-    'repeating-linear-gradient(90deg, transparent 0 11px, var(--forest-wood-dark) 11px 12px), linear-gradient(180deg, var(--forest-wood-light) 0 3px, transparent 12px)',
+    'repeating-linear-gradient(90deg, transparent 0 11px, var(--forest-wood-dark) 11px 12px), linear-gradient(180deg, var(--forest-wood-light) 0 3px, transparent 12px), radial-gradient(circle at 8% 70%, var(--forest-canopy) 0 3px, transparent 4px), radial-gradient(circle at 94% 40%, var(--forest-canopy-pine) 0 2.5px, transparent 3.5px)',
   borderRadius: '10px',
   boxShadow:
     '0 2px 0 var(--forest-wood-dark), 0 16px 24px -12px var(--forest-shadow), 0 28px 18px -20px var(--forest-shadow)',
@@ -158,7 +158,7 @@ export const landmarkSurfaceSx: SxObject = {
   backgroundBlendMode: 'multiply',
   backgroundColor: 'var(--forest-paper)',
   backgroundImage:
-    'repeating-linear-gradient(180deg, transparent 0 7px, var(--forest-paper-edge) 7px 8px)',
+    'repeating-linear-gradient(180deg, transparent 0 7px, var(--forest-paper-edge) 7px 8px), radial-gradient(circle at 18% 22%, var(--forest-canopy) 0 1.2px, transparent 1.6px)',
   border: '1px solid var(--forest-paper-edge)',
   borderRadius: '6px',
   display: 'flex',
@@ -178,17 +178,29 @@ export const landmarkSurfaceSx: SxObject = {
  * light the surrounding trees.
  */
 export const groveStageSx: SxObject = {
+  '&::before': {
+    background:
+      'radial-gradient(circle at 22% 8%, var(--forest-canopy) 0 10px, transparent 11px), radial-gradient(circle at 78% 6%, var(--forest-canopy-pine) 0 9px, transparent 10px), radial-gradient(circle at 50% 0, var(--forest-canopy-light) 0 7px, transparent 8px)',
+    content: '""',
+    height: 24,
+    left: 16,
+    pointerEvents: 'none',
+    position: 'absolute',
+    right: 16,
+    top: -12,
+  },
   background:
     'radial-gradient(circle at 50% 30%, var(--forest-stone-light), var(--forest-stone) 72%)',
   borderRadius: '999px 999px 20px 20px',
   boxShadow:
-    '0 2px 0 var(--forest-wood-dark), 0 18px 30px -12px light-dark(hsl(140deg 30% 20% / 0.5), hsl(190deg 60% 3% / 0.75))',
+    '0 2px 0 var(--forest-wood-dark), 0 18px 30px -12px light-dark(hsl(140deg 30% 20% / 0.5), hsl(190deg 60% 3% / 0.75)), 0 22px 0 10px color-mix(in srgb, var(--forest-grass) 55%, transparent)',
   display: 'flex',
   flexDirection: 'column',
   gap: `${FRAME_PADDING}px`,
   maxWidth: LANDMARK_CONTENT_WIDTH_PX + FRAME_PADDING * 4,
   overflow: 'visible',
   padding: `${FRAME_PADDING * 2}px`,
+  position: 'relative',
 };
 
 /**
@@ -209,6 +221,8 @@ export const groveSurfaceSx: SxObject = {
 /** The routed nameplate that names each stop, carved into a darker wood plate. */
 export const carvedSignSx: SxObject = {
   backgroundColor: 'var(--forest-wood-dark)',
+  backgroundImage:
+    'radial-gradient(circle at 12% 30%, var(--forest-canopy) 0 2px, transparent 3px), radial-gradient(circle at 88% 70%, var(--forest-canopy-pine) 0 1.8px, transparent 2.6px)',
   borderRadius: '4px',
   boxShadow: 'inset 0 1px 0 var(--forest-wood-light), inset 0 -2px 3px rgb(0 0 0 / 0.25)',
   color: 'light-dark(hsl(40deg 60% 92%), hsl(40deg 44% 84%))',

@@ -15,7 +15,7 @@ import { ForestLandmark } from './ForestLandmark';
 import { ForestMinimap } from './ForestMinimap';
 import { ForestScene } from './ForestScene';
 import { ForestTerrain } from './ForestTerrain';
-import { buildForestWorld, toBlockedMask } from './forestMap';
+import { buildForestWorld, DEFAULT_FOREST_SEED, toBlockedMask } from './forestMap';
 import { boardMediaSx } from './forestMaterials';
 import { FOREST_COLOR_VARS } from './forestPalette';
 
@@ -27,6 +27,14 @@ import { FOREST_COLOR_VARS } from './forestPalette';
  * or cream page around it. The header stays put but is restyled into the world's
  * HUD material by `ForestWorldStyles`. Same cards, same data, same links as the
  * grid — planted on carved boards along a trail instead of laid out in a grid.
+ *
+ * Seed strategy: the proxy rolls a seed from a prerendered deck and rewrites
+ * `/` to `/interactive-home/s/:seed`. This component just builds that island.
+ * Same seed always yields the same markup (SSR == hydration). A brand-new
+ * uint32 every request generated the bitmap on the hot path (~1.5s+ TTFB);
+ * the deck keeps first paint cheap. Reloads usually get a different map.
+ * Tests pass `seed` directly. If none is passed, the default seed is used so
+ * the unsuffixed route can still prerender a complete island at build time.
  */
 
 type PlantedCard = {
@@ -108,7 +116,7 @@ function ForestWorldStyles() {
   );
 }
 
-export async function ForestHomepage() {
+export async function ForestHomepage({ seed }: { seed?: number } = {}) {
   const projects = await getProjects();
   const projectCards: Array<PlantedCard> = projects.map((project) => ({
     id: `project-${project.title}`,
@@ -141,7 +149,10 @@ export async function ForestHomepage() {
   const planted = mergeCards(projectCards, preciselyPlacedCards).filter(
     (card): card is PlantedCard => card !== undefined,
   );
-  const world = buildForestWorld(planted.map((card) => card.id));
+  const world = buildForestWorld(
+    planted.map((card) => card.id),
+    seed ?? DEFAULT_FOREST_SEED,
+  );
 
   return (
     <Box {...{ [FOREST_WORLD_ATTRIBUTE]: true }} component="section" sx={forestPageSx}>

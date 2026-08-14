@@ -16,6 +16,8 @@ describe('ForestLandmark', () => {
     expect(screen.queryByText('Wetland boardwalk')).not.toBeInTheDocument();
     expect(screen.queryByText('Forest grove')).not.toBeInTheDocument();
     expect(screen.queryByText('Mountain overlook')).not.toBeInTheDocument();
+    expect(screen.queryByText('Rocky shore')).not.toBeInTheDocument();
+    expect(screen.queryByText('Lakeside')).not.toBeInTheDocument();
     expect(screen.getByText('letter body')).toBeInTheDocument();
   });
 

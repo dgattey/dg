@@ -50,12 +50,17 @@ describe('proxy', () => {
       expect(response.headers.get('x-middleware-rewrite')).toBeNull();
     });
 
-    it('rewrites / to the interactive route when the flag is on', async () => {
+    it('rewrites / to a seeded island from the prerendered deck when the flag is on', async () => {
       mockInteractiveRedesign.mockResolvedValue(true);
 
-      const response = await proxy(createPageRequest('/', { accept: 'text/html' }));
-
-      expect(response.headers.get('x-middleware-rewrite')).toContain('/interactive-home');
+      const paths = new Set<string>();
+      for (let i = 0; i < 24; i++) {
+        const response = await proxy(createPageRequest('/', { accept: 'text/html' }));
+        const rewrite = response.headers.get('x-middleware-rewrite') ?? '';
+        expect(rewrite).toMatch(/\/interactive-home\/s\/\d+/);
+        paths.add(rewrite);
+      }
+      expect(paths.size).toBeGreaterThan(1);
     });
 
     it('keeps the Markdown alternate advertised on the rewritten homepage', async () => {
@@ -72,7 +77,7 @@ describe('proxy', () => {
 
       const response = await proxy(createPageRequest('/', { accept: 'text/x-component' }));
 
-      expect(response.headers.get('x-middleware-rewrite')).toContain('/interactive-home');
+      expect(response.headers.get('x-middleware-rewrite')).toMatch(/\/interactive-home\/s\/\d+/);
     });
 
     it('evaluates the flag against the incoming request, not ambient headers', async () => {
@@ -91,6 +96,15 @@ describe('proxy', () => {
 
     it('redirects a direct hit on the interactive route back home', async () => {
       const response = await proxy(createPageRequest('/interactive-home'));
+
+      expect(response.status).toBe(307);
+      const location = response.headers.get('location');
+      invariant(location, 'Expected location header to be defined');
+      expect(new URL(location).pathname).toBe('/');
+    });
+
+    it('redirects a direct hit on a seeded island back home', async () => {
+      const response = await proxy(createPageRequest('/interactive-home/s/123'));
 
       expect(response.status).toBe(307);
       const location = response.headers.get('location');

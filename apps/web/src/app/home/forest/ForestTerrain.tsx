@@ -8,14 +8,15 @@ import {
   SPRITE_SCALE,
   WINDY_KINDS,
 } from './ForestSprites';
-import { type ForestWorld, layerZ, TILE_SIZE } from './forestMap';
+import { type ForestWorld, layerZ, TILE_SIZE, TREE_KINDS } from './forestMap';
 import { forestTerrainDataUrls, forestWaterMaskDataUrl } from './forestTerrainBitmap';
 
 /**
- * The island itself, painted on the server as one pixelated bitmap plus stamped
+ * The island itself, painted on the server as one blended bitmap plus stamped
  * scenery. The ground is a single image so first paint does not wait on
  * thousands of SVG rects. Trees and animals are `<use>` stamps stacked by tile
- * row so a canopy south of a board paints in front of it.
+ * row so a canopy south of a board paints in front of it. Each stamp carries
+ * its own scale so groves mix sizes instead of cloning one pine.
  *
  * Stamps are siblings of the landmarks (not wrapped in their own stacking
  * context) so `z-index` from `layerZ` actually compares against the boards.
@@ -28,7 +29,7 @@ const bitmapSx = (light: string, dark: string, width: number, height: number): S
   backgroundRepeat: 'no-repeat',
   backgroundSize: '100% 100%',
   height,
-  imageRendering: 'pixelated',
+  imageRendering: 'auto',
   left: 0,
   pointerEvents: 'none',
   position: 'absolute',
@@ -100,9 +101,12 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
       <Box aria-hidden="true" className="forest-ripple" sx={rippleSx(waterMask)} />
       {world.scenery.map((sprite, index) => {
         const scale = SPRITE_SCALE[sprite.kind];
-        const spriteWidth = TILE_SIZE * scale.width;
-        const spriteHeight = TILE_SIZE * scale.height;
+        const spriteWidth = TILE_SIZE * scale.width * sprite.scale;
+        const spriteHeight = TILE_SIZE * scale.height * sprite.scale;
         const windy = WINDY_KINDS.has(sprite.kind);
+        const hue = TREE_KINDS.has(sprite.kind)
+          ? ((sprite.tileX * 13 + sprite.tileY * 29) % 9) * 7 - 28
+          : 0;
         return (
           <svg
             aria-hidden="true"
@@ -119,6 +123,7 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
                 layerZ(sprite.tileY),
               ),
               animationDelay: windy ? `${(index % 11) * 345}ms` : undefined,
+              filter: hue ? `hue-rotate(${hue}deg)` : undefined,
             }}
             viewBox="0 0 16 16"
             width={spriteWidth}
