@@ -24,10 +24,28 @@ export type TerrainKind =
   | 'trail'
   | 'wetland';
 
-export type SceneryKind = 'bloom' | 'oak' | 'pine' | 'reed' | 'rock' | 'stump';
+export type SceneryKind =
+  | 'birch'
+  | 'bloom'
+  | 'dead'
+  | 'oak'
+  | 'pine'
+  | 'reed'
+  | 'rock'
+  | 'stump'
+  | 'willow';
 
 export type ScenerySprite = {
   kind: SceneryKind;
+  tileX: number;
+  tileY: number;
+};
+
+export type CritterKind = 'bird' | 'deer' | 'fish' | 'fox' | 'rabbit';
+
+export type ForestCritter = {
+  delayMs: number;
+  kind: CritterKind;
   tileX: number;
   tileY: number;
 };
@@ -50,6 +68,7 @@ export type LandmarkRegion =
 
 export type ForestWorld = {
   columns: number;
+  critters: Array<ForestCritter>;
   plots: Array<ForestPlot>;
   rows: number;
   scenery: Array<ScenerySprite>;
@@ -155,7 +174,21 @@ const WALKABLE_TERRAIN: ReadonlySet<TerrainKind> = new Set<TerrainKind>([
   'wetland',
 ]);
 
-const BLOCKING_SCENERY: ReadonlySet<SceneryKind> = new Set<SceneryKind>(['oak', 'pine', 'rock']);
+export const TREE_KINDS: ReadonlySet<SceneryKind> = new Set<SceneryKind>([
+  'birch',
+  'dead',
+  'oak',
+  'pine',
+  'willow',
+]);
+
+const BLOCKING_SCENERY: ReadonlySet<SceneryKind> = new Set<SceneryKind>([...TREE_KINDS, 'rock']);
+
+/** Stacking order so a tree south of a board paints in front of it. Terrain is 0. */
+export const layerZ = (tileY: number) => tileY + 1;
+
+/** Attribute the scene uses to drive the minimap "you are here" marker. */
+export const MINIMAP_MARKER_ROLE = 'forest-minimap-marker';
 
 /** Stable 0..1 hash. Nothing random reaches the client, so SSR and hydration agree. */
 function hashUnit(x: number, y: number, salt: number): number {
@@ -590,7 +623,10 @@ function openClearings(
 function isUnderBoard(x: number, y: number, plots: ReadonlyArray<ForestPlot>): boolean {
   return plots.some((plot) => {
     const rect = landmarkTileRect(plot);
-    return x >= rect.minX - 1 && x <= rect.maxX + 1 && y >= rect.minY - 1 && y <= rect.maxY + 1;
+    // Extra tile of padding only to the north: sprites stand ~two tiles tall, so a
+    // tree planted on the plaque's top edge would grow out through the nameplate.
+    // East, west and south stay tight so grove trees can overlap the posts.
+    return x >= rect.minX && x <= rect.maxX && y >= rect.minY - 1 && y <= rect.maxY;
   });
 }
 
@@ -625,6 +661,38 @@ const TRAIL_ADJACENT: ReadonlySet<TerrainKind> = new Set<TerrainKind>([
   'path',
   'trail',
 ]);
+
+const WATER_KINDS: ReadonlySet<TerrainKind> = new Set<TerrainKind>(['lake', 'shallow', 'wetland']);
+
+const PLANTABLE: ReadonlySet<TerrainKind> = new Set<TerrainKind>([
+  'clearing',
+  'grass',
+  'hill',
+  'meadow',
+  'sand',
+]);
+
+function pickTreeKind(
+  x: number,
+  y: number,
+  kind: TerrainKind,
+  density: number,
+  terrain: ReadonlyArray<ReadonlyArray<TerrainKind>>,
+): SceneryKind {
+  if (hasNeighbour(terrain, x, y, WATER_KINDS) && hashUnit(x, y, 47) < 0.55) {
+    return 'willow';
+  }
+  if (kind === 'hill' || density > 0.68) {
+    return 'pine';
+  }
+  if (hashUnit(x, y, 49) > 0.88) {
+    return 'dead';
+  }
+  if (hashUnit(x, y, 51) > 0.5) {
+    return 'birch';
+  }
+  return 'oak';
+}
 
 /**
  * Scatters trees and detail. Density comes from clumped noise so the forest has
@@ -700,7 +768,11 @@ function scatterScenery(
             ? 0.08
             : 0.015;
       if (roll < treeThreshold) {
-        scenery.push({ kind: density > 0.65 ? 'pine' : 'oak', tileX: x, tileY: y });
+        scenery.push({
+          kind: pickTreeKind(x, y, kind, density, terrain),
+          tileX: x,
+          tileY: y,
+        });
       } else if (roll > 0.972) {
         scenery.push({ kind: 'rock', tileX: x, tileY: y });
       } else if (kind === 'meadow' && roll > 0.9) {
@@ -709,6 +781,107 @@ function scatterScenery(
     }
   }
   return scenery;
+}
+
+const GROVE_OFFSETS: ReadonlyArray<readonly [number, number]> = [
+  [-4, 1],
+  [4, 1],
+  [-5, 0],
+  [5, 0],
+  [-5, -3],
+  [5, -3],
+];
+
+/**
+ * Plants a handful of trees just outside each footprint so boards sit in a
+ * grove. South-side trees share the walker's row or the one below, which with
+ * south-in-front stacking lets the canopy overlap the posts without covering
+ * the nameplate.
+ */
+function plantGroveSentinels(
+  terrain: ReadonlyArray<ReadonlyArray<TerrainKind>>,
+  columns: number,
+  rows: number,
+  plots: ReadonlyArray<ForestPlot>,
+  scenery: Array<ScenerySprite>,
+) {
+  const occupied = new Set(scenery.map((sprite) => `${sprite.tileX},${sprite.tileY}`));
+  for (const plot of plots) {
+    for (const [offsetX, offsetY] of GROVE_OFFSETS) {
+      const x = plot.tileX + offsetX;
+      const y = plot.tileY + offsetY;
+      if (x < 1 || y < 1 || x >= columns - 1 || y >= rows - 1) {
+        continue;
+      }
+      if (isUnderBoard(x, y, plots) || occupied.has(`${x},${y}`)) {
+        continue;
+      }
+      const kind = terrain[y]?.[x];
+      if (!kind || !(PLANTABLE.has(kind) || kind === 'wetland')) {
+        continue;
+      }
+      occupied.add(`${x},${y}`);
+      scenery.push({
+        kind: pickTreeKind(x, y, kind, 0.6, terrain),
+        tileX: x,
+        tileY: y,
+      });
+    }
+  }
+}
+
+const MAX_CRITTERS = 12;
+
+const HOPPERS: ReadonlyArray<CritterKind> = ['deer', 'fox', 'rabbit'];
+
+/**
+ * A few looping animals, placed from the same seed as the trees. They never
+ * sit on a board or on water the walker cannot cross.
+ */
+function placeCritters(
+  terrain: ReadonlyArray<ReadonlyArray<TerrainKind>>,
+  columns: number,
+  rows: number,
+  plots: ReadonlyArray<ForestPlot>,
+): Array<ForestCritter> {
+  const critters: Array<ForestCritter> = [];
+  for (let y = 2; y < rows - 2 && critters.length < MAX_CRITTERS; y++) {
+    for (let x = 2; x < columns - 2 && critters.length < MAX_CRITTERS; x++) {
+      if (isUnderBoard(x, y, plots) || blocksApproach(x, y, plots)) {
+        continue;
+      }
+      const kind = terrain[y]?.[x];
+      const roll = hashUnit(x, y, 61);
+      if (kind === 'lake' && roll > 0.984) {
+        critters.push({
+          delayMs: Math.floor(hashUnit(x, y, 63) * 4000),
+          kind: 'fish',
+          tileX: x,
+          tileY: y,
+        });
+        continue;
+      }
+      if ((kind === 'grass' || kind === 'meadow' || kind === 'clearing') && roll > 0.991) {
+        const hopper = HOPPERS[Math.floor(hashUnit(x, y, 67) * HOPPERS.length)] ?? 'rabbit';
+        critters.push({
+          delayMs: Math.floor(hashUnit(x, y, 69) * 3500),
+          kind: hopper,
+          tileX: x,
+          tileY: y,
+        });
+        continue;
+      }
+      if (kind === 'grass' && roll > 0.988 && roll <= 0.991) {
+        critters.push({
+          delayMs: Math.floor(hashUnit(x, y, 71) * 6000),
+          kind: 'bird',
+          tileX: x,
+          tileY: y,
+        });
+      }
+    }
+  }
+  return critters;
 }
 
 /** Walks outward in rings until it finds somewhere the character can stand. */
@@ -761,6 +934,8 @@ export function buildForestWorld(plotIds: ReadonlyArray<string>): ForestWorld {
   openClearings(terrain, columns, rows, plots);
   carveTrails(terrain, columns, rows, plots);
   const scenery = scatterScenery(terrain, columns, rows, plots);
+  plantGroveSentinels(terrain, columns, rows, plots, scenery);
+  const critters = placeCritters(terrain, columns, rows, plots);
 
   // Start on the first clearing's own tile: the trail runs through every plot
   // centre, so whichever way someone walks first they are already on it.
@@ -771,7 +946,7 @@ export function buildForestWorld(plotIds: ReadonlyArray<string>): ForestWorld {
     firstPlot ? firstPlot.tileY : Math.floor(rows / 2),
   );
 
-  return { columns, plots, rows, scenery, spawn, terrain };
+  return { columns, critters, plots, rows, scenery, spawn, terrain };
 }
 
 /** Collapses one row of values into `{ start, length, value }` spans. */

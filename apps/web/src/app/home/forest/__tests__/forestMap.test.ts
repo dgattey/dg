@@ -2,6 +2,7 @@ import {
   buildForestWorld,
   isWalkableTile,
   landmarkRects,
+  landmarkTileRect,
   rectsOverlap,
   TILE_SIZE,
   toBlockedMask,
@@ -199,7 +200,7 @@ describe('buildForestWorld', () => {
     const world = buildForestWorld(CARD_IDS);
     const trees = new Set(
       world.scenery
-        .filter((sprite) => sprite.kind === 'oak' || sprite.kind === 'pine')
+        .filter((sprite) => ['birch', 'dead', 'oak', 'pine', 'willow'].includes(sprite.kind))
         .map((sprite) => `${sprite.tileX},${sprite.tileY}`),
     );
     const count = (kind: 'grass' | 'meadow') => {
@@ -299,7 +300,9 @@ describe('landmark footprints', () => {
     const world = buildForestWorld(CARD_IDS);
     const blocking = new Set(
       world.scenery
-        .filter((sprite) => ['oak', 'pine', 'rock'].includes(sprite.kind))
+        .filter((sprite) =>
+          ['birch', 'dead', 'oak', 'pine', 'rock', 'willow'].includes(sprite.kind),
+        )
         .map((sprite) => `${sprite.tileX},${sprite.tileY}`),
     );
     for (const plot of world.plots) {
@@ -310,5 +313,51 @@ describe('landmark footprints', () => {
         }
       }
     }
+  });
+
+  it('plants grove trees beside boards, outside the footprint', () => {
+    const world = buildForestWorld(CARD_IDS);
+    const trees = world.scenery.filter((sprite) =>
+      ['birch', 'dead', 'oak', 'pine', 'willow'].includes(sprite.kind),
+    );
+    for (const plot of world.plots) {
+      const nearby = trees.filter(
+        (sprite) =>
+          Math.abs(sprite.tileX - plot.tileX) >= 4 &&
+          Math.abs(sprite.tileX - plot.tileX) <= 6 &&
+          Math.abs(sprite.tileY - plot.tileY) <= 4,
+      );
+      expect(nearby.length).toBeGreaterThan(0);
+    }
+  });
+});
+
+describe('critters', () => {
+  it('are deterministic and never sit on a board', () => {
+    const a = buildForestWorld(CARD_IDS);
+    const b = buildForestWorld(CARD_IDS);
+    expect(a.critters).toEqual(b.critters);
+    expect(a.critters.length).toBeGreaterThan(0);
+    expect(a.critters.length).toBeLessThanOrEqual(12);
+    for (const plot of a.plots) {
+      const rect = landmarkTileRect(plot);
+      for (const critter of a.critters) {
+        const onBoard =
+          critter.tileX >= rect.minX &&
+          critter.tileX <= rect.maxX &&
+          critter.tileY >= rect.minY &&
+          critter.tileY <= rect.maxY;
+        expect(onBoard).toBe(false);
+      }
+    }
+  });
+});
+
+describe('tree mix', () => {
+  it('scatters more than pine and oak', () => {
+    const kinds = new Set(buildForestWorld(CARD_IDS).scenery.map((sprite) => sprite.kind));
+    expect(kinds.has('pine')).toBe(true);
+    expect(kinds.has('oak')).toBe(true);
+    expect(kinds.has('birch') || kinds.has('willow') || kinds.has('dead')).toBe(true);
   });
 });
