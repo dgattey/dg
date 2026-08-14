@@ -20,5 +20,6 @@ describe('ForestMinimap', () => {
     expect(css).toMatch(/position:\s*fixed/);
     expect(css).toMatch(/bottom:\s*16px/);
     expect(css).toMatch(/right:\s*16px/);
+    expect(css).toMatch(/width:\s*min\(22vw,\s*16vh\)/);
   });
 });

@@ -27,6 +27,7 @@ const minimapSx: SxObject = {
     maxWidth: 'min(26vw, 11vh)',
     padding: 0.25,
     right: 8,
+    width: 'min(26vw, 11vh)',
   },
   '& [data-forest-minimap-map]': { height: 'auto', maxWidth: '100%', width: '100%' },
   bottom: 16,
@@ -36,6 +37,7 @@ const minimapSx: SxObject = {
   pointerEvents: 'none',
   position: 'fixed',
   right: 16,
+  width: 'min(22vw, 16vh)',
   zIndex: 6,
 };
 
