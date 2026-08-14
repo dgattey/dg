@@ -1,166 +1,162 @@
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
-import { ForestSpriteDefs, SPRITE_ID, SPRITE_SCALE } from './ForestSprites';
-import { type ForestWorld, TILE_SIZE, toTerrainRuns } from './forestMap';
-import { FOREST_COLOR_VARS, TERRAIN_FILL } from './forestPalette';
+import {
+  CRITTER_ID,
+  CRITTER_SCALE,
+  ForestSpriteDefs,
+  SPRITE_ID,
+  SPRITE_SCALE,
+  WINDY_KINDS,
+} from './ForestSprites';
+import { type ForestWorld, layerZ, TILE_SIZE } from './forestMap';
+import { forestTerrainDataUrls, forestWaterMaskDataUrl } from './forestTerrainBitmap';
 
 /**
- * The island itself, rendered on the server as one SVG.
+ * The island itself, painted on the server as one pixelated bitmap plus stamped
+ * scenery. The ground is a single image so first paint does not wait on
+ * thousands of SVG rects. Trees and animals are `<use>` stamps stacked by tile
+ * row so a canopy south of a board paints in front of it.
  *
- * Rows collapse into horizontal runs before they become rects, mountains get a
- * lit top face where nothing sits above them, and scenery is stamped in row
- * order so trees lower on the map overlap the ones behind them.
+ * Stamps are siblings of the landmarks (not wrapped in their own stacking
+ * context) so `z-index` from `layerZ` actually compares against the boards.
+ * Wind, waves and critter motion live on `ForestScene`'s world box, which is
+ * the parent of both.
  */
 
-const WAVE_PERIOD_MS = 5200;
-
-const terrainSx: SxObject = {
-  ...FOREST_COLOR_VARS,
-  '@keyframes forestWave': {
-    '0%, 100%': { opacity: 0.35, transform: 'translateX(0)' },
-    '50%': { opacity: 0.85, transform: `translateX(${TILE_SIZE * 0.18}px)` },
-  },
-  '@media (prefers-reduced-motion: reduce)': {
-    '& .forest-wave': { animation: 'none', opacity: 0.6 },
-  },
-  '& .forest-wave': {
-    animation: `forestWave ${WAVE_PERIOD_MS}ms ease-in-out infinite`,
-  },
-  inset: 0,
+const bitmapSx = (light: string, dark: string, width: number, height: number): SxObject => ({
+  backgroundImage: `light-dark(url("${light}"), url("${dark}"))`,
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: '100% 100%',
+  height,
+  imageRendering: 'pixelated',
+  left: 0,
+  pointerEvents: 'none',
   position: 'absolute',
-};
+  top: 0,
+  width,
+  zIndex: 0,
+});
 
-/** Sparse foam dashes so the ocean is never a flat block of colour. */
-function waveDashes(world: ForestWorld) {
-  const dashes: Array<{ tileX: number; tileY: number }> = [];
-  for (let y = 0; y < world.rows; y += 3) {
-    for (let x = (y / 3) % 2 === 0 ? 1 : 4; x < world.columns; x += 6) {
-      const kind = world.terrain[y]?.[x];
-      if (kind === 'lake' || kind === 'ocean' || kind === 'shallow') {
-        dashes.push({ tileX: x, tileY: y });
-      }
-    }
-  }
-  return dashes;
+const waveSx = (mask: string): SxObject => ({
+  backgroundImage:
+    'linear-gradient(90deg, transparent 0%, var(--forest-surf) 48%, transparent 100%)',
+  backgroundRepeat: 'no-repeat',
+  backgroundSize: '42% 100%',
+  inset: 0,
+  maskImage: `url("${mask}")`,
+  maskSize: '100% 100%',
+  pointerEvents: 'none',
+  position: 'absolute',
+  zIndex: 0,
+});
+
+const rippleSx = (mask: string): SxObject => ({
+  backgroundImage: 'radial-gradient(circle, var(--forest-surf) 0 1px, transparent 1.4px 100%)',
+  backgroundPosition: 'center',
+  backgroundRepeat: 'repeat',
+  backgroundSize: '18% 18%',
+  inset: 0,
+  maskImage: `url("${mask}")`,
+  maskSize: '100% 100%',
+  pointerEvents: 'none',
+  position: 'absolute',
+  zIndex: 0,
+});
+
+function stampStyle(tileX: number, tileY: number, width: number, height: number, z: number) {
+  return {
+    height,
+    left: tileX * TILE_SIZE - (width - TILE_SIZE) / 2,
+    overflow: 'visible',
+    pointerEvents: 'none' as const,
+    position: 'absolute' as const,
+    top: (tileY + 1) * TILE_SIZE - height,
+    width,
+    zIndex: z,
+  };
 }
 
 export function ForestTerrain({ world }: { world: ForestWorld }) {
   const width = world.columns * TILE_SIZE;
   const height = world.rows * TILE_SIZE;
-  const runs = toTerrainRuns(world);
-  const bridgePatternId = `forest-bridge-planks-${world.columns}-${world.rows}`;
+  const terrain = forestTerrainDataUrls(world);
+  const waterMask = forestWaterMaskDataUrl(world);
 
   return (
-    <Box aria-hidden="true" sx={terrainSx}>
+    <>
       <svg
-        height={height}
+        aria-hidden="true"
+        height={0}
         role="presentation"
-        shapeRendering="crispEdges"
-        viewBox={`0 0 ${width} ${height}`}
-        width={width}
+        style={{ height: 0, overflow: 'hidden', position: 'absolute', width: 0 }}
+        viewBox="0 0 1 1"
+        width={0}
         xmlns="http://www.w3.org/2000/svg"
       >
         <ForestSpriteDefs />
-        <defs>
-          <pattern
-            height={TILE_SIZE}
-            id={bridgePatternId}
-            patternUnits="userSpaceOnUse"
-            width={TILE_SIZE}
-          >
-            <rect
-              fill="var(--forest-wood-dark)"
-              height={TILE_SIZE}
-              opacity={0.5}
-              width={2}
-              x={TILE_SIZE - 2}
-            />
-          </pattern>
-        </defs>
-        {runs.map((run) => (
-          <rect
-            fill={TERRAIN_FILL[run.kind]}
-            height={TILE_SIZE}
-            key={`${run.tileY}-${run.tileX}`}
-            width={run.length * TILE_SIZE}
-            x={run.tileX * TILE_SIZE}
-            y={run.tileY * TILE_SIZE}
-          />
-        ))}
-        {runs
-          .filter(
-            (run) =>
-              run.kind === 'mountain' && world.terrain[run.tileY - 1]?.[run.tileX] !== 'mountain',
-          )
-          .map((run) => (
-            <rect
-              fill="var(--forest-mountain-cap)"
-              height={TILE_SIZE * 0.34}
-              key={`cap-${run.tileY}-${run.tileX}`}
-              width={run.length * TILE_SIZE}
-              x={run.tileX * TILE_SIZE}
-              y={run.tileY * TILE_SIZE}
-            />
-          ))}
-        <g opacity={0.38}>
-          {runs
-            .filter((run) => run.kind === 'hill')
-            .map((run) => (
-              <rect
-                fill="var(--forest-stone-light)"
-                height={TILE_SIZE * 0.12}
-                key={`hill-${run.tileY}-${run.tileX}`}
-                width={run.length * TILE_SIZE}
-                x={run.tileX * TILE_SIZE}
-                y={run.tileY * TILE_SIZE + TILE_SIZE * 0.16}
-              />
-            ))}
-        </g>
-        <g>
-          {runs
-            .filter((run) => run.kind === 'bridge')
-            .map((run) => (
-              <rect
-                fill={`url(#${bridgePatternId})`}
-                height={TILE_SIZE}
-                key={`bridge-${run.tileY}-${run.tileX}`}
-                width={run.length * TILE_SIZE}
-                x={run.tileX * TILE_SIZE}
-                y={run.tileY * TILE_SIZE}
-              />
-            ))}
-        </g>
-        <g fill="var(--forest-surf)">
-          {waveDashes(world).map((dash, index) => (
-            <rect
-              className="forest-wave"
-              height={TILE_SIZE * 0.16}
-              key={`wave-${dash.tileY}-${dash.tileX}`}
-              style={{ animationDelay: `${(index % 7) * (WAVE_PERIOD_MS / 7)}ms` }}
-              width={TILE_SIZE * 0.75}
-              x={dash.tileX * TILE_SIZE}
-              y={dash.tileY * TILE_SIZE + TILE_SIZE * 0.4}
-            />
-          ))}
-        </g>
-        <g shapeRendering="auto">
-          {world.scenery.map((sprite) => {
-            const scale = SPRITE_SCALE[sprite.kind];
-            const spriteWidth = TILE_SIZE * scale.width;
-            const spriteHeight = TILE_SIZE * scale.height;
-            return (
-              <use
-                height={spriteHeight}
-                href={`#${SPRITE_ID[sprite.kind]}`}
-                key={`${sprite.tileY}-${sprite.tileX}-${sprite.kind}`}
-                width={spriteWidth}
-                x={sprite.tileX * TILE_SIZE - (spriteWidth - TILE_SIZE) / 2}
-                y={(sprite.tileY + 1) * TILE_SIZE - spriteHeight}
-              />
-            );
-          })}
-        </g>
       </svg>
-    </Box>
+      <Box aria-hidden="true" sx={bitmapSx(terrain.light, terrain.dark, width, height)} />
+      <Box aria-hidden="true" className="forest-wave" sx={waveSx(waterMask)} />
+      <Box aria-hidden="true" className="forest-ripple" sx={rippleSx(waterMask)} />
+      {world.scenery.map((sprite, index) => {
+        const scale = SPRITE_SCALE[sprite.kind];
+        const spriteWidth = TILE_SIZE * scale.width;
+        const spriteHeight = TILE_SIZE * scale.height;
+        const windy = WINDY_KINDS.has(sprite.kind);
+        return (
+          <svg
+            aria-hidden="true"
+            className={windy ? 'forest-wind' : undefined}
+            height={spriteHeight}
+            key={`${sprite.tileY}-${sprite.tileX}-${sprite.kind}`}
+            overflow="visible"
+            style={{
+              ...stampStyle(
+                sprite.tileX,
+                sprite.tileY,
+                spriteWidth,
+                spriteHeight,
+                layerZ(sprite.tileY),
+              ),
+              animationDelay: windy ? `${(index % 11) * 345}ms` : undefined,
+            }}
+            viewBox="0 0 16 16"
+            width={spriteWidth}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <use href={`#${SPRITE_ID[sprite.kind]}`} />
+          </svg>
+        );
+      })}
+      {world.critters.map((critter) => {
+        const scale = CRITTER_SCALE[critter.kind];
+        const spriteWidth = TILE_SIZE * scale.width;
+        const spriteHeight = TILE_SIZE * scale.height;
+        return (
+          <svg
+            aria-hidden="true"
+            className={`forest-critter forest-critter-${critter.kind}`}
+            height={spriteHeight}
+            key={`${critter.kind}-${critter.tileY}-${critter.tileX}`}
+            overflow="visible"
+            style={{
+              ...stampStyle(
+                critter.tileX,
+                critter.tileY,
+                spriteWidth,
+                spriteHeight,
+                layerZ(critter.tileY),
+              ),
+              animationDelay: `${critter.delayMs}ms`,
+            }}
+            viewBox="0 0 16 16"
+            width={spriteWidth}
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <use href={`#${CRITTER_ID[critter.kind]}`} />
+          </svg>
+        );
+      })}
+    </>
   );
 }

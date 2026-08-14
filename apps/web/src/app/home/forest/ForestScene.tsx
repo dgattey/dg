@@ -6,8 +6,7 @@ import { Box, Typography } from '@mui/material';
 import { type ReactNode, useEffect, useRef } from 'react';
 import { CHARACTER_ROLE, ForestCharacter } from './ForestCharacter';
 import { LANDMARK_ATTRIBUTE, LANDMARK_NEAR_ATTRIBUTE } from './ForestLandmark';
-import { MINIMAP_MARKER_ROLE } from './ForestMinimap';
-import { TILE_SIZE } from './forestMap';
+import { layerZ, MINIMAP_MARKER_ROLE, TILE_SIZE } from './forestMap';
 import { hudSurfaceSx } from './forestMaterials';
 import { FOREST_COLOR_VARS } from './forestPalette';
 
@@ -84,7 +83,61 @@ const viewportSx: SxObject = {
   scrollbarWidth: 'thin',
 };
 
+const WAVE_PERIOD_MS = 5200;
+const WIND_PERIOD_MS = 3800;
+
 const worldSx: SxObject = {
+  '@keyframes forestDrift': {
+    '0%, 100%': { transform: 'translate3d(0, 0, 0)' },
+    '50%': { transform: 'translate3d(16px, -3px, 0)' },
+  },
+  '@keyframes forestFly': {
+    '0%': { transform: 'translate3d(0, 0, 0)' },
+    '50%': { transform: 'translate3d(140px, -16px, 0)' },
+    '100%': { transform: 'translate3d(260px, 4px, 0)' },
+  },
+  '@keyframes forestHop': {
+    '0%, 100%': { transform: 'translate3d(0, 0, 0)' },
+    '30%': { transform: 'translate3d(10px, -9px, 0)' },
+    '50%': { transform: 'translate3d(18px, 0, 0)' },
+    '80%': { transform: 'translate3d(28px, -7px, 0)' },
+  },
+  '@keyframes forestRipple': {
+    '0%, 100%': { backgroundSize: '18% 18%', opacity: 0.18 },
+    '50%': { backgroundSize: '22% 22%', opacity: 0.4 },
+  },
+  '@keyframes forestWave': {
+    '0%, 100%': { backgroundPosition: '0% 0', opacity: 0.28 },
+    '50%': { backgroundPosition: '70% 0', opacity: 0.62 },
+  },
+  '@keyframes forestWind': {
+    from: { transform: 'rotate(-1.6deg)' },
+    to: { transform: 'rotate(2deg)' },
+  },
+  '@media (prefers-reduced-motion: reduce)': {
+    '& .forest-wave, & .forest-ripple, & .forest-wind, & .forest-critter': {
+      animation: 'none',
+    },
+  },
+  '& .forest-critter-bird': {
+    animation: 'forestFly 14000ms linear infinite',
+  },
+  '& .forest-critter-fish': {
+    animation: `forestDrift ${WAVE_PERIOD_MS}ms ease-in-out infinite`,
+  },
+  '& .forest-critter-rabbit, & .forest-critter-fox, & .forest-critter-deer': {
+    animation: 'forestHop 4200ms ease-in-out infinite',
+  },
+  '& .forest-ripple': {
+    animation: `forestRipple ${WAVE_PERIOD_MS * 1.35}ms ease-in-out infinite`,
+  },
+  '& .forest-wave': {
+    animation: `forestWave ${WAVE_PERIOD_MS}ms ease-in-out infinite`,
+  },
+  '& .forest-wind': {
+    animation: `forestWind ${WIND_PERIOD_MS}ms ease-in-out infinite alternate`,
+    transformOrigin: '50% 100%',
+  },
   left: 0,
   position: 'absolute',
   top: 0,
@@ -110,7 +163,6 @@ const characterAnchorSx: SxObject = {
   top: 0,
   width: 0,
   willChange: 'transform',
-  zIndex: 5,
 };
 
 const hintSx: SxObject = {
@@ -126,7 +178,7 @@ const hintSx: SxObject = {
   color: 'var(--mui-palette-text-primary)',
   left: 16,
   // Sits at the left so it can never collide with the minimap opposite it.
-  maxWidth: 'calc(100% - 12rem)',
+  maxWidth: 'min(42vw, calc(100% - 8rem))',
   paddingBlock: 0.5,
   paddingInline: 2,
   pointerEvents: 'none',
@@ -180,9 +232,7 @@ export function ForestScene({
       world.querySelectorAll<HTMLElement>(`[${LANDMARK_ATTRIBUTE}]`),
     ).map((element) => ({ element, x: element.offsetLeft, y: element.offsetTop }));
 
-    const minimapMarker = shell.querySelector<SVGRectElement>(
-      `[data-role='${MINIMAP_MARKER_ROLE}']`,
-    );
+    const minimapMarker = shell.querySelector<HTMLElement>(`[data-role='${MINIMAP_MARKER_ROLE}']`);
 
     const held = new Set<string>();
     let footX = positionRef.current.x;
@@ -236,12 +286,11 @@ export function ForestScene({
         : clamp(visible / 2 - footX, visible - worldWidth, 0);
     };
 
-    // Sits the walker low in the viewport: boards stand north of the trail and
-    // the minimap owns the top-right HUD lane. Short windows push the anchor
-    // almost to the bottom so the full board and compact chart can coexist.
+    // Sits the walker low in the viewport: boards stand north of the trail.
+    // The minimap lives bottom-right, so the anchor stays above that HUD lane.
     const cameraTargetY = () => {
       const visible = viewport.clientHeight;
-      const anchorLine = visible < 650 ? visible - 8 : visible * 0.8;
+      const anchorLine = visible < 650 ? visible * 0.72 : visible * 0.68;
       return worldHeight <= visible
         ? (visible - worldHeight) / 2
         : clamp(anchorLine - footY, visible - worldHeight, 0);
@@ -268,8 +317,11 @@ export function ForestScene({
     const drawCharacter = () => {
       positionRef.current = { x: footX, y: footY };
       character.style.transform = `translate3d(${footX}px, ${footY}px, 0)`;
-      minimapMarker?.setAttribute('x', String(footX / TILE_SIZE - 1.5));
-      minimapMarker?.setAttribute('y', String(footY / TILE_SIZE - 1.5));
+      character.style.zIndex = String(layerZ(Math.floor(footY / TILE_SIZE)));
+      minimapMarker?.style.setProperty(
+        'transform',
+        `translate3d(${(footX / worldWidth) * 100}%, ${(footY / worldHeight) * 100}%, 0)`,
+      );
       updateNearest();
     };
 

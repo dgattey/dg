@@ -54,18 +54,54 @@ export const FOREST_COLOR_VARS: SxObject = {
   '--forest-wood-light': 'light-dark(hsl(32deg 48% 60%), hsl(28deg 26% 36%))',
 };
 
-export const TERRAIN_FILL: Record<TerrainKind, string> = {
-  bridge: 'var(--forest-bridge)',
-  clearing: 'var(--forest-clearing)',
-  grass: 'var(--forest-grass)',
-  hill: 'var(--forest-hill)',
-  lake: 'var(--forest-lake)',
-  meadow: 'var(--forest-meadow)',
-  mountain: 'var(--forest-mountain)',
-  ocean: 'var(--forest-ocean)',
-  path: 'var(--forest-path)',
-  sand: 'var(--forest-sand)',
-  shallow: 'var(--forest-shallow)',
-  trail: 'var(--forest-trail)',
-  wetland: 'var(--forest-wetland)',
+type Hsl = readonly [number, number, number];
+
+/** HSL for the terrain bitmap. Mirrors the CSS tokens so light/dark stay in lockstep. */
+export const TERRAIN_HSL: Record<'dark' | 'light', Record<TerrainKind, Hsl>> = {
+  dark: {
+    bridge: [27, 30, 29],
+    clearing: [150, 24, 25],
+    grass: [158, 28, 19],
+    hill: [164, 20, 25],
+    lake: [196, 62, 16],
+    meadow: [150, 26, 22],
+    mountain: [196, 14, 32],
+    ocean: [196, 64, 13],
+    path: [28, 20, 32],
+    sand: [38, 24, 42],
+    shallow: [190, 52, 22],
+    trail: [28, 18, 27],
+    wetland: [174, 30, 20],
+  },
+  light: {
+    bridge: [29, 46, 54],
+    clearing: [96, 42, 71],
+    grass: [104, 34, 62],
+    hill: [78, 26, 57],
+    lake: [195, 57, 51],
+    meadow: [88, 44, 68],
+    mountain: [28, 14, 68],
+    ocean: [196, 58, 58],
+    path: [32, 46, 72],
+    sand: [42, 64, 82],
+    shallow: [188, 62, 72],
+    trail: [30, 34, 65],
+    wetland: [126, 28, 56],
+  },
+};
+
+export const TERRAIN_DETAIL_HSL: Record<
+  'dark' | 'light',
+  Record<'cap' | 'plank' | 'ridge', Hsl>
+> = {
+  dark: {
+    cap: [196, 16, 44],
+    plank: [24, 28, 16],
+    ridge: [196, 14, 46],
+  },
+  light: {
+    cap: [30, 22, 84],
+    plank: [24, 40, 32],
+    ridge: [32, 16, 82],
+  },
 };

@@ -164,10 +164,12 @@ describe('homepage without scripting', () => {
     const { ForestHomepage } = await import('../forest/ForestHomepage');
     const shell = await noScriptShell(await ForestHomepage());
 
-    // The world itself, not just a wash: terrain tiles and carved boards.
+    // The world itself, not just a wash: a terrain bitmap and carved boards.
     expect(shell).toContain('data-forest-world');
-    expect(shell.match(/<rect/g)?.length ?? 0).toBeGreaterThan(100);
+    expect(shell).toContain('data:image/png;base64,');
+    expect(shell).toContain('data-forest-landmark');
     expect(visibleText(shell)).toContain('Alpha Project');
+    expect(visibleText(shell)).not.toContain('Meadow camp');
 
     // Every card the grid has is reachable here too.
     expect(hrefsIn(shell)).toEqual(
