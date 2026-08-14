@@ -1,7 +1,7 @@
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import { type LandmarkRegion, TILE_SIZE } from './forestMap';
+import { layerZ, TILE_SIZE } from './forestMap';
 import {
   carvedSignLabelSx,
   carvedSignSx,
@@ -31,6 +31,7 @@ import {
 /** Attribute the client walker reads to find landmarks and mark the closest. */
 export const LANDMARK_ATTRIBUTE = 'data-forest-landmark';
 export const LANDMARK_NEAR_ATTRIBUTE = 'data-forest-near';
+export const PIXELATE_ATTRIBUTE = 'data-forest-pixelate';
 
 export type LandmarkVariant = 'board' | 'grove';
 
@@ -42,7 +43,7 @@ const landmarkSx: SxObject = {
 /** Everything visible stands north of the anchor so the trail stays walkable. */
 const stackSx: SxObject = {
   [`[${LANDMARK_NEAR_ATTRIBUTE}='true'] &`]: {
-    transform: 'translateX(-50%) scale(1.03)',
+    transform: 'translateX(-50%) perspective(720px) rotateX(7deg) scale(1.03)',
   },
   alignItems: 'center',
   bottom: LANDMARK_POST_HEIGHT,
@@ -51,24 +52,25 @@ const stackSx: SxObject = {
   gap: 1,
   left: 0,
   position: 'absolute',
-  transform: 'translateX(-50%)',
+  transform: 'translateX(-50%) perspective(720px) rotateX(7deg)',
   transformOrigin: 'bottom center',
   ...createBouncyTransition('transform'),
-  willChange: 'transform',
 };
 
-/** Two posts sinking the board into the trail below it. */
+/** Two posts sinking the board into the trail below it, with a bit of dirt at the feet. */
 const postsSx: SxObject = {
   '&::after': { right: '22%' },
   '&::before': { left: '22%' },
   '&::before, &::after': {
-    backgroundColor: 'var(--forest-wood-dark)',
+    background:
+      'linear-gradient(90deg, var(--forest-wood-dark), var(--forest-wood) 40%, var(--forest-wood-dark))',
     borderRadius: '2px',
     bottom: -LANDMARK_POST_HEIGHT,
+    boxShadow: '0 10px 0 3px var(--forest-shadow)',
     content: '""',
     height: LANDMARK_POST_HEIGHT + 4,
     position: 'absolute',
-    width: 5,
+    width: 6,
   },
   position: 'relative',
 };
@@ -82,26 +84,15 @@ type ForestLandmarkProps = {
   children: ReactNode;
   id: string;
   label: string;
-  region: LandmarkRegion;
   tileX: number;
   tileY: number;
   variant?: LandmarkVariant;
-};
-
-const REGION_LABEL: Record<LandmarkRegion, string> = {
-  'forest-grove': 'Forest grove',
-  lakeside: 'Lakeside',
-  'meadow-camp': 'Meadow camp',
-  'mountain-overlook': 'Mountain overlook',
-  'rocky-shore': 'Rocky shore',
-  wetland: 'Wetland boardwalk',
 };
 
 export function ForestLandmark({
   children,
   id,
   label,
-  region,
   tileX,
   tileY,
   variant = 'board',
@@ -117,6 +108,7 @@ export function ForestLandmark({
         ...landmarkSx,
         left: tileX * TILE_SIZE + TILE_SIZE / 2,
         top: tileY * TILE_SIZE + TILE_SIZE / 2,
+        zIndex: layerZ(tileY),
       }}
     >
       <Box sx={stackSx}>
@@ -126,15 +118,10 @@ export function ForestLandmark({
               <Typography component="span" sx={carvedSignLabelSx} variant="caption">
                 {label}
               </Typography>
-              <Typography
-                component="span"
-                sx={{ display: 'block', opacity: 0.72 }}
-                variant="caption"
-              >
-                {REGION_LABEL[region]}
-              </Typography>
             </Box>
-            <Box sx={surfaceSx}>{children}</Box>
+            <Box {...{ [PIXELATE_ATTRIBUTE]: true }} sx={surfaceSx}>
+              {children}
+            </Box>
           </Box>
         </Box>
       </Box>

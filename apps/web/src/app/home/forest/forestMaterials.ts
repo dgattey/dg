@@ -1,5 +1,6 @@
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
+import { PIXELATE_FILTER_ID } from './ForestSprites';
 import { LANDMARK_CONTENT_WIDTH_PX, LANDMARK_MAX_HEIGHT_PX } from './forestMap';
 
 /**
@@ -84,6 +85,14 @@ export const boardMediaSx: SxObject = {
   '& .MuiCard-root': { aspectRatio: '2 / 1' },
 };
 
+/** Photographs on a board, pixelated at paint time. The source asset is untouched. */
+export const pixelatedMediaSx: SxObject = {
+  '& img': {
+    filter: `contrast(1.14) saturate(1.1) url(#${PIXELATE_FILTER_ID})`,
+    imageRendering: 'pixelated',
+  },
+};
+
 /**
  * The carved board a landmark's content is mounted on: a wood frame around a
  * paper surface, with a hard drop shadow so it sits *on* the clearing. Opaque by
@@ -91,15 +100,39 @@ export const boardMediaSx: SxObject = {
  * pasted-on glass.
  */
 export const landmarkFrameSx: SxObject = {
+  '&::after': {
+    background: 'radial-gradient(circle, var(--forest-wood-dark) 0 1.4px, transparent 1.6px)',
+    backgroundPosition: '18% 22%, 82% 22%',
+    backgroundRepeat: 'no-repeat',
+    backgroundSize: '4px 4px',
+    content: '""',
+    inset: 0,
+    pointerEvents: 'none',
+    position: 'absolute',
+  },
+  '&::before': {
+    background:
+      'radial-gradient(circle at 20% 0, var(--forest-canopy) 0 7px, transparent 8px), radial-gradient(circle at 80% 0, var(--forest-canopy-pine) 0 6px, transparent 7px), radial-gradient(circle at 55% 2px, var(--forest-canopy-light) 0 5px, transparent 6px)',
+    content: '""',
+    height: 14,
+    left: 10,
+    pointerEvents: 'none',
+    position: 'absolute',
+    right: 10,
+    top: -6,
+  },
   backgroundColor: 'var(--forest-wood)',
+  backgroundImage:
+    'repeating-linear-gradient(90deg, transparent 0 11px, var(--forest-wood-dark) 11px 12px), linear-gradient(180deg, var(--forest-wood-light) 0 3px, transparent 12px)',
   borderRadius: '10px',
   boxShadow:
-    '0 2px 0 var(--forest-wood-dark), 0 14px 22px -10px light-dark(hsl(140deg 30% 20% / 0.5), hsl(190deg 60% 3% / 0.7))',
+    '0 2px 0 var(--forest-wood-dark), 0 16px 24px -12px var(--forest-shadow), 0 28px 18px -20px var(--forest-shadow)',
   display: 'flex',
   flexDirection: 'column',
   gap: `${FRAME_PADDING}px`,
   maxWidth: LANDMARK_CONTENT_WIDTH_PX + FRAME_PADDING * 2,
   padding: `${FRAME_PADDING}px`,
+  position: 'relative',
 };
 
 /**
@@ -114,6 +147,7 @@ export const landmarkFrameSx: SxObject = {
  */
 export const landmarkSurfaceSx: SxObject = {
   ...dissolveInnerCardSx,
+  ...pixelatedMediaSx,
   '&::-webkit-scrollbar': { width: 8 },
   '&::-webkit-scrollbar-thumb': {
     backgroundColor: 'var(--forest-wood)',
@@ -121,7 +155,10 @@ export const landmarkSurfaceSx: SxObject = {
     borderRadius: 999,
   },
   '&::-webkit-scrollbar-track': { backgroundColor: 'var(--forest-paper-edge)', borderRadius: 999 },
+  backgroundBlendMode: 'multiply',
   backgroundColor: 'var(--forest-paper)',
+  backgroundImage:
+    'repeating-linear-gradient(180deg, transparent 0 7px, var(--forest-paper-edge) 7px 8px)',
   border: '1px solid var(--forest-paper-edge)',
   borderRadius: '6px',
   display: 'flex',
@@ -132,8 +169,6 @@ export const landmarkSurfaceSx: SxObject = {
   padding: 1,
   scrollbarColor: 'var(--forest-wood) var(--forest-paper-edge)',
   scrollbarWidth: 'thin',
-  // Keep a scrollable long list (side projects, a live tracklist) inside its
-  // footprint instead of letting it grow into a neighbour.
   width: LANDMARK_CONTENT_WIDTH_PX,
 };
 
@@ -163,6 +198,7 @@ export const groveStageSx: SxObject = {
  */
 export const groveSurfaceSx: SxObject = {
   ...dissolveInnerCardSx,
+  ...pixelatedMediaSx,
   display: 'flex',
   flexDirection: 'column',
   height: LANDMARK_MAX_HEIGHT_PX,
