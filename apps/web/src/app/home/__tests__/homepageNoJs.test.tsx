@@ -168,6 +168,7 @@ describe('homepage without scripting', () => {
     expect(shell).toContain('data-forest-world');
     expect(shell).toContain('data:image/png;base64,');
     expect(shell).toContain('data-forest-landmark');
+    expect(shell).toContain('data-forest-minimap');
     expect(visibleText(shell)).toContain('Alpha Project');
     expect(visibleText(shell)).not.toContain('Meadow camp');
 

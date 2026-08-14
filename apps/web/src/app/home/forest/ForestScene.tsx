@@ -182,7 +182,7 @@ const hintSx: SxObject = {
   paddingBlock: 0.5,
   paddingInline: 2,
   pointerEvents: 'none',
-  position: 'absolute',
+  position: 'fixed',
   zIndex: 6,
 };
 

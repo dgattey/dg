@@ -14,6 +14,12 @@ import { forestMinimapDataUrls } from './forestTerrainBitmap';
 
 const MINIMAP_TILE = 3;
 
+/**
+ * Pinned to the visual viewport, not the 100dvw world box. The island is pulled
+ * full-bleed with `overflow-x: hidden`, so `absolute; right: 16` on that box
+ * sits in the gutter the body clips — which is why the chart vanished under the
+ * header when it lived top-right, and off the right edge once it moved down.
+ */
 const minimapSx: SxObject = {
   ...hudSurfaceSx,
   '@media (max-height: 560px), (max-width: 420px)': {
@@ -25,10 +31,10 @@ const minimapSx: SxObject = {
   '& [data-forest-minimap-map]': { height: 'auto', maxWidth: '100%', width: '100%' },
   bottom: 16,
   lineHeight: 0,
-  maxWidth: 'min(22vw, 14vh)',
+  maxWidth: 'min(22vw, 16vh)',
   padding: 0.75,
   pointerEvents: 'none',
-  position: 'absolute',
+  position: 'fixed',
   right: 16,
   zIndex: 6,
 };
@@ -81,7 +87,7 @@ export function ForestMinimap({ world }: { world: ForestWorld }) {
   const spawnY = (world.spawn.tileY / world.rows) * 100;
 
   return (
-    <Box aria-hidden="true" sx={minimapSx}>
+    <Box aria-hidden="true" data-forest-minimap="" sx={minimapSx}>
       <Box
         data-forest-minimap-map=""
         sx={mapSx(bitmap.light, bitmap.dark, bitmap.width, bitmap.height)}
