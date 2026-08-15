@@ -6,15 +6,7 @@ import { getIntroContent, getLinkByName } from '../../../services/contentful';
 import { IntroTextCard } from '../IntroCard';
 import { FOREST_ABOUT_IMAGE_PX } from './forestMaterials';
 
-/**
- * The grid puts the portrait and the intro copy in adjacent cells. On the map
- * they get their own clearings, so each half is fetched and planted separately.
- * Both reads are cached, so asking twice costs one Contentful round trip.
- *
- * The About photo asks Next for a ~960 source. The board is only ~312px wide,
- * but a 1440 crop of that board looks blocky if the optimizer serves the grid's
- * 330px `extraLarge`. No filter, no smash. The grid `IntroImageCard` is unchanged.
- */
+/** About asks Next for a 960 source so a 1440 crop of the board stays sharp. */
 
 const forestAboutSizes = {
   extraLarge: FOREST_ABOUT_IMAGE_PX,
