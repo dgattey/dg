@@ -1,13 +1,13 @@
-import { buildForestWorld } from '../forestMap';
+import { buildForestWorld, sampleGroundGrain } from '../forestMap';
 import {
   BITMAP_PX_PER_TILE,
   encodeIndexedPng,
   forestMinimapDataUrls,
-  forestTerrainDataUrls,
   forestTerrainPng,
+  forestTerrainSize,
   forestWaterMaskPng,
-  grainDelta,
   nearestRibbon,
+  samplePaintedGround,
 } from '../forestTerrainBitmap';
 
 const pngBytes = (dataUrl: string) => {
@@ -25,15 +25,17 @@ describe('forest terrain bitmap', () => {
     expect([...bytes.subarray(0, 8)]).toEqual([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
   });
 
-  it('paints the island as one image per scheme, not a rect per tile', () => {
+  it('paints a continuous field and ships it as a compact indexed PNG', () => {
     const world = buildForestWorld(['intro', 'map', 'spotify']);
-    const terrain = forestTerrainDataUrls(world);
-    expect(terrain.width).toBe(world.columns * BITMAP_PX_PER_TILE);
-    expect(terrain.height).toBe(world.rows * BITMAP_PX_PER_TILE);
-    expect(terrain.light.startsWith('data:image/png;base64,')).toBe(true);
-    expect(terrain.dark.startsWith('data:image/png;base64,')).toBe(true);
-    expect(terrain.light).not.toEqual(terrain.dark);
-    expect(pngBytes(terrain.light).length).toBeLessThan(terrain.width * terrain.height * 3);
+    const size = forestTerrainSize(world);
+    const png = forestTerrainPng(world, 'light');
+    expect(size.width).toBe(world.columns * BITMAP_PX_PER_TILE);
+    expect(size.height).toBe(world.rows * BITMAP_PX_PER_TILE);
+    expect(png[25]).toBe(2);
+    expect(png.length).toBeLessThan(480_000);
+    expect(samplePaintedGround(world, 'light', 22.4, 31.2)).not.toEqual(
+      samplePaintedGround(world, 'dark', 22.4, 31.2),
+    );
   });
 
   it('keeps a water mask and a minimap that match the world size', () => {
@@ -45,26 +47,42 @@ describe('forest terrain bitmap', () => {
     expect(minimap.height).toBe(world.rows);
   });
 
-  it('keeps each ground layer small enough to ship as a cached file', () => {
+  it('keeps the water mask tiny', () => {
+    expect(forestWaterMaskPng(buildForestWorld(['intro', 'map', 'spotify'])).length).toBeLessThan(
+      8_000,
+    );
+  });
+
+  it('samples the ground finer than a tile so 1440 does not show a pixel grid', () => {
+    expect(BITMAP_PX_PER_TILE).toBeGreaterThanOrEqual(12);
+  });
+
+  it('grains the grass with value noise, not a repeating block', () => {
+    const world = { seed: 20_260_812 };
+    const a = sampleGroundGrain(world, 10.0, 12.0);
+    const b = sampleGroundGrain(world, 10.15, 12.0);
+    const c = sampleGroundGrain(world, 10.0, 12.15);
+    expect(a).not.toBe(b);
+    expect(a).not.toBe(c);
+    expect(Math.abs(a - b)).toBeLessThan(8);
+  });
+
+  it('lerps two points inside the same grass tile instead of stamping one colour', () => {
     const world = buildForestWorld(['intro', 'map', 'spotify']);
-    expect(forestTerrainPng(world, 'light').length).toBeLessThan(120_000);
-    expect(forestWaterMaskPng(world).length).toBeLessThan(8_000);
-  });
-
-  it('ships the ground as an RGB PNG so coasts can blend', () => {
-    const png = forestTerrainPng(buildForestWorld(['intro', 'map', 'spotify']), 'light');
-    expect(png[25]).toBe(2);
-  });
-
-  it('grains the grass so the ground is not a flat fill', () => {
-    const deltas = new Set<number>();
-    for (let py = 0; py < 16; py++) {
-      for (let px = 0; px < 16; px++) {
-        deltas.add(grainDelta(px, py, 20_260_812));
+    let tileX = 0;
+    let tileY = 0;
+    outer: for (let y = 0; y < world.rows; y++) {
+      for (let x = 0; x < world.columns; x++) {
+        if (world.terrain[y]?.[x] === 'grass') {
+          tileX = x;
+          tileY = y;
+          break outer;
+        }
       }
     }
-    expect(deltas.size).toBeGreaterThan(4);
-    expect([...deltas].some((delta) => delta !== 0)).toBe(true);
+    const a = samplePaintedGround(world, 'light', tileX + 0.2, tileY + 0.2);
+    const b = samplePaintedGround(world, 'light', tileX + 0.8, tileY + 0.7);
+    expect(a).not.toEqual(b);
   });
 
   it('treats a path as a ribbon, not a hard tile stamp', () => {

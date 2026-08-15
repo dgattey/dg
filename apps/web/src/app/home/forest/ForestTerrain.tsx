@@ -27,12 +27,28 @@ import { forestShoreClipPath } from './forestShore';
  * the parent of both.
  */
 
-const landSvgSx = (width: number, height: number): SxObject => ({
+const landImgSx = (
+  width: number,
+  height: number,
+  clipId: string,
+  scheme: 'dark' | 'light',
+): SxObject => ({
   '@media (prefers-color-scheme: dark)': {
-    '& .forest-land-dark': { display: 'block' },
-    '& .forest-land-light': { display: 'none' },
+    display: scheme === 'dark' ? 'block' : 'none',
   },
-  '& .forest-land-dark': { display: 'none' },
+  clipPath: `url(#${clipId})`,
+  display: scheme === 'dark' ? 'none' : 'block',
+  height,
+  imageRendering: 'auto',
+  left: 0,
+  pointerEvents: 'none',
+  position: 'absolute',
+  top: 0,
+  width,
+  zIndex: 1,
+});
+
+const landSvgSx = (width: number, height: number): SxObject => ({
   height,
   left: 0,
   overflow: 'visible',
@@ -85,8 +101,6 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
   const dark = forestGroundPath(world.seed, 'dark.png');
   const shore = forestShoreClipPath(world);
   const shoreId = `forest-shore-${world.seed}`;
-  const lightPattern = `forest-ground-light-${world.seed}`;
-  const darkPattern = `forest-ground-dark-${world.seed}`;
 
   return (
     <>
@@ -104,29 +118,40 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
       <Box aria-hidden="true" className="forest-wave" sx={waveSx} />
       <Box aria-hidden="true" className="forest-ripple" sx={rippleSx} />
       <Box
+        alt=""
+        aria-hidden="true"
+        className="forest-land"
+        component="img"
+        src={light}
+        sx={landImgSx(width, height, shoreId, 'light')}
+      />
+      <Box
+        alt=""
+        aria-hidden="true"
+        className="forest-land"
+        component="img"
+        src={dark}
+        sx={landImgSx(width, height, shoreId, 'dark')}
+      />
+      <Box
         aria-hidden="true"
         component="svg"
         sx={landSvgSx(width, height)}
         viewBox={`0 0 ${width} ${height}`}
       >
         <defs>
-          <path d={shore} fillRule="evenodd" id={shoreId} />
-          <pattern height={height} id={lightPattern} patternUnits="userSpaceOnUse" width={width}>
-            <image height={height} href={light} width={width} />
-          </pattern>
-          <pattern height={height} id={darkPattern} patternUnits="userSpaceOnUse" width={width}>
-            <image height={height} href={dark} width={width} />
-          </pattern>
+          <clipPath clipPathUnits="userSpaceOnUse" id={shoreId}>
+            <path d={shore} fillRule="evenodd" />
+          </clipPath>
+          <path d={shore} fillRule="evenodd" id={`${shoreId}-stroke`} />
         </defs>
         <use
           fill="none"
-          href={`#${shoreId}`}
+          href={`#${shoreId}-stroke`}
           stroke="var(--forest-sand)"
           strokeLinejoin="round"
           strokeWidth={28}
         />
-        <use className="forest-land-light" fill={`url(#${lightPattern})`} href={`#${shoreId}`} />
-        <use className="forest-land-dark" fill={`url(#${darkPattern})`} href={`#${shoreId}`} />
       </Box>
       {world.scenery.map((sprite, index) => {
         const scale = SPRITE_SCALE[sprite.kind];

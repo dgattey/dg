@@ -2,21 +2,27 @@ import 'server-only';
 
 import { deflateSync } from 'node:zlib';
 import type { ForestWorld, TerrainFields, TerrainKind } from './forestMap';
-import { sampleTerrainFields, visualTerrainAt } from './forestMap';
+import {
+  sampleGroundGrainUnlocked,
+  sampleTerrainFieldsUnlocked,
+  visualTerrainAt,
+  withWorldSeed,
+} from './forestMap';
 import { TERRAIN_DETAIL_HSL, TERRAIN_HSL } from './forestPalette';
 
 /**
  * One painted bitmap of the island, generated on the server so the page
  * paints a single image instead of thousands of SVG rects.
  *
- * RGB PNG of a continuous height/moisture field — every pixel is a lerp, never
- * a nearest-biome index. The shoreline silhouette is a separate vector path
- * (`forestShore.ts`); this file only needs to be fine enough for bilinear
- * upscale of a gradient. Light and dark palettes are cached files.
+ * Continuous height/moisture field — every pixel is a lerp, never a
+ * nearest-biome index. Shipped as RGB so the blends are not posterized into
+ * a checker. The shoreline silhouette is a separate vector path
+ * (`forestShore.ts`). Twelve samples per tile is enough that a 1440 crop
+ * reads as paint. Light and dark palettes are cached files, not inlined.
  */
 
-/** Collision stays 48px. Four samples per tile keeps inland ribbons smooth. */
-export const BITMAP_PX_PER_TILE = 4;
+/** Collision stays 48px. The painter samples finer so the eye never sees the grid. */
+export const BITMAP_PX_PER_TILE = 12;
 
 /** Water mask only needs a soft silhouette for CSS waves. */
 export const WATER_MASK_PX_PER_TILE = 2;
@@ -143,7 +149,7 @@ export function encodeIndexedPngBytes(
     const trns = new Uint8Array(transparentIndex + 1);
     parts.push(chunk('tRNS', trns));
   }
-  parts.push(chunk('IDAT', deflateSync(scanlines, { level: 9 })));
+  parts.push(chunk('IDAT', deflateSync(scanlines, { level: 6 })));
   parts.push(chunk('IEND', new Uint8Array()));
   return Buffer.from(concat(parts));
 }
@@ -190,7 +196,7 @@ export function encodeRgbPngBytes(width: number, height: number, pixels: Uint8Ar
     concat([
       Uint8Array.of(0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a),
       chunk('IHDR', ihdr),
-      chunk('IDAT', deflateSync(scanlines, { level: 9 })),
+      chunk('IDAT', deflateSync(scanlines, { level: 6 })),
       chunk('IEND', new Uint8Array()),
     ]),
   );
@@ -200,30 +206,35 @@ function clampByte(value: number) {
   return Math.min(255, Math.max(0, value));
 }
 
-/**
- * Repeating 8×8 grain so grass is not a flat fill. Periodic on purpose: white
- * noise would balloon the cached PNG.
- */
-export function grainDelta(px: number, py: number, seed: number) {
-  // 2×2 blocks so the grain survives the 12× bilinear upscale to a tile.
-  const gx = px >> 1;
-  const gy = py >> 1;
-  const n = ((gx * 37 + gy * 17 + (seed & 255)) ^ (gx * 13 + gy * 7)) & 31;
-  return n - 16;
+const smoothstep = (t: number) => t * t * (3 - 2 * t);
+
+function ramp(value: number, start: number, end: number) {
+  return smoothstep(Math.min(1, Math.max(0, (value - start) / (end - start))));
 }
 
 function fieldRgb(fields: TerrainFields, colors: ReadonlyArray<Rgb>): Rgb {
   const grass = colors[TERRAIN_INDEX.grass] ?? [0, 0, 0];
   const meadow = colors[TERRAIN_INDEX.meadow] ?? grass;
   const wetland = colors[TERRAIN_INDEX.wetland] ?? grass;
-  const land = mixRgb(grass, meadow, fields.meadowMix);
-  return mixRgb(land, wetland, Math.min(1, fields.lakeShore * 0.35 + fields.riverShore * 0.2));
-}
-
-const smoothstep = (t: number) => t * t * (3 - 2 * t);
-
-function ramp(value: number, start: number, end: number) {
-  return smoothstep(Math.min(1, Math.max(0, (value - start) / (end - start))));
+  const sand = colors[TERRAIN_INDEX.sand] ?? grass;
+  const dirt = colors[TERRAIN_INDEX.path] ?? sand;
+  const shallow = colors[TERRAIN_INDEX.shallow] ?? sand;
+  const lake = colors[TERRAIN_INDEX.lake] ?? shallow;
+  let land = mixRgb(grass, meadow, fields.meadowMix);
+  const worn = Math.max(0, fields.meadowNoise - 0.72) * 1.4;
+  land = mixRgb(land, dirt, Math.min(0.28, worn));
+  land = mixRgb(land, sand, ramp(fields.island, 0.72, 0.94) * 0.92);
+  const lakeWet = 1 - ramp(fields.lakeField, 0.82, 1.22);
+  const riverWet = 1 - ramp(fields.river, fields.riverWidth, fields.riverWidth + 1.4);
+  land = mixRgb(land, wetland, Math.min(1, lakeWet * 0.85 + riverWet * 0.65) * 0.55);
+  const water = Math.max(
+    1 - ramp(fields.lakeField, 0.55, 0.95),
+    1 - ramp(fields.river, 0, fields.riverWidth + 0.15),
+  );
+  if (water > 0) {
+    land = mixRgb(land, mixRgb(shallow, lake, water), water);
+  }
+  return land;
 }
 
 const RIBBON_KINDS: ReadonlySet<TerrainKind> = new Set(['bridge', 'clearing', 'path', 'trail']);
@@ -277,50 +288,213 @@ export function nearestRibbon(
   return kind ? { dist: best, kind } : null;
 }
 
-function paintTerrain(world: ForestWorld, scheme: 'dark' | 'light'): Uint8Array {
-  const width = world.columns * BITMAP_PX_PER_TILE;
-  const height = world.rows * BITMAP_PX_PER_TILE;
-  const colors = paletteFor(scheme);
-  const step = 1 / BITMAP_PX_PER_TILE;
-  const pixels = new Uint8Array(width * height * 3);
-  for (let py = 0; py < height; py++) {
-    for (let px = 0; px < width; px++) {
-      const fx = (px + 0.5) * step;
-      const fy = (py + 0.5) * step;
-      const fields = sampleTerrainFields(world, fx, fy);
-      let pixel = fieldRgb(fields, colors);
-      const ribbon = nearestRibbon(world, fx, fy, RIBBON_KINDS);
-      if (ribbon) {
-        const amount = 1 - ramp(ribbon.dist, -0.04, 0.64);
-        if (amount > 0) {
-          if (ribbon.kind === 'bridge') {
-            const plank =
-              Math.floor(fx * 5) % 2 === 0
-                ? (colors[DETAIL_PLANK] ?? colors[TERRAIN_INDEX.bridge])
-                : (colors[TERRAIN_INDEX.bridge] ?? pixel);
-            pixel = mixRgb(pixel, plank ?? pixel, amount);
-          } else {
-            const strength = ribbon.kind === 'clearing' ? 0.5 : 0.88;
-            pixel = mixRgb(pixel, colors[TERRAIN_INDEX[ribbon.kind]] ?? pixel, amount * strength);
+function markNear(world: ForestWorld, kinds: ReadonlySet<TerrainKind>, ring: number) {
+  const { columns, rows } = world;
+  const mark = new Uint8Array(columns * rows);
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < columns; x++) {
+      const kind = world.terrain[y]?.[x];
+      if (!kind || !kinds.has(kind)) {
+        continue;
+      }
+      for (let offsetY = -ring; offsetY <= ring; offsetY++) {
+        for (let offsetX = -ring; offsetX <= ring; offsetX++) {
+          const nx = x + offsetX;
+          const ny = y + offsetY;
+          if (nx >= 0 && ny >= 0 && nx < columns && ny < rows) {
+            mark[ny * columns + nx] = 1;
           }
         }
       }
-      const elev = nearestRibbon(world, fx, fy, ELEV_KINDS);
-      if (elev) {
-        const amount = 1 - ramp(elev.dist, 0, 0.85);
-        if (amount > 0) {
-          const strength = elev.kind === 'mountain' ? 0.72 : 0.52;
-          pixel = mixRgb(pixel, colors[TERRAIN_INDEX[elev.kind]] ?? pixel, amount * strength);
-        }
-      }
-      const grain = grainDelta(px, py, world.seed);
-      const offset = (py * width + px) * 3;
-      pixels[offset] = clampByte(pixel[0] + grain);
-      pixels[offset + 1] = clampByte(pixel[1] + grain);
-      pixels[offset + 2] = clampByte(pixel[2] + Math.round(grain * 0.65));
     }
   }
-  return pixels;
+  return mark;
+}
+
+/** Tiles whose 3-ring is ocean — outside the warped shore, safe to skip. */
+function interiorOceanMask(world: ForestWorld) {
+  const { columns, rows } = world;
+  const mark = new Uint8Array(columns * rows);
+  const ring = 3;
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < columns; x++) {
+      let interior = 1;
+      scan: for (let offsetY = -ring; offsetY <= ring; offsetY++) {
+        for (let offsetX = -ring; offsetX <= ring; offsetX++) {
+          if ((world.terrain[y + offsetY]?.[x + offsetX] ?? 'ocean') !== 'ocean') {
+            interior = 0;
+            break scan;
+          }
+        }
+      }
+      mark[y * columns + x] = interior;
+    }
+  }
+  return mark;
+}
+
+function writePixel(pixels: Uint8Array, offset: number, pixel: Rgb, grain: number) {
+  pixels[offset] = clampByte(pixel[0] + grain);
+  pixels[offset + 1] = clampByte(pixel[1] + grain);
+  pixels[offset + 2] = clampByte(pixel[2] + Math.round(grain * 0.7));
+}
+
+const FIELD_PX_PER_TILE = 3;
+const FIELD_COMPS = 6;
+
+function packFields(out: Float32Array, index: number, fields: TerrainFields) {
+  const offset = index * FIELD_COMPS;
+  out[offset] = fields.island;
+  out[offset + 1] = fields.lakeField;
+  out[offset + 2] = fields.meadowMix;
+  out[offset + 3] = fields.meadowNoise;
+  out[offset + 4] = fields.river;
+  out[offset + 5] = fields.riverWidth;
+}
+
+function lerpGrid(
+  grid: Float32Array,
+  i00: number,
+  i10: number,
+  i01: number,
+  i11: number,
+  comp: number,
+  tx: number,
+  ty: number,
+) {
+  const tl = grid[i00 + comp] ?? 0;
+  const tr = grid[i10 + comp] ?? 0;
+  const bl = grid[i01 + comp] ?? 0;
+  const br = grid[i11 + comp] ?? 0;
+  return tl + (tr - tl) * tx + (bl - tl) * ty + (br - tr - bl + tl) * tx * ty;
+}
+
+function applyRibbon(
+  world: ForestWorld,
+  fx: number,
+  fy: number,
+  pixel: Rgb,
+  colors: ReadonlyArray<Rgb>,
+  nearRoute: Uint8Array,
+  nearElev: Uint8Array,
+  tile: number,
+): Rgb {
+  let next = pixel;
+  if (nearRoute[tile]) {
+    const ribbon = nearestRibbon(world, fx, fy, RIBBON_KINDS);
+    if (ribbon) {
+      const amount = 1 - ramp(ribbon.dist, -0.04, 0.64);
+      if (amount > 0) {
+        if (ribbon.kind === 'bridge') {
+          const plank =
+            Math.floor(fx * 5) % 2 === 0
+              ? (colors[DETAIL_PLANK] ?? colors[TERRAIN_INDEX.bridge])
+              : (colors[TERRAIN_INDEX.bridge] ?? next);
+          next = mixRgb(next, plank ?? next, amount);
+        } else {
+          const strength = ribbon.kind === 'clearing' ? 0.5 : 0.88;
+          next = mixRgb(next, colors[TERRAIN_INDEX[ribbon.kind]] ?? next, amount * strength);
+        }
+      }
+    }
+  }
+  if (nearElev[tile]) {
+    const elev = nearestRibbon(world, fx, fy, ELEV_KINDS);
+    if (elev) {
+      const amount = 1 - ramp(elev.dist, 0, 0.85);
+      if (amount > 0) {
+        const strength = elev.kind === 'mountain' ? 0.72 : 0.52;
+        next = mixRgb(next, colors[TERRAIN_INDEX[elev.kind]] ?? next, amount * strength);
+      }
+    }
+  }
+  return next;
+}
+
+function paintTerrain(world: ForestWorld, scheme: 'dark' | 'light'): Uint8Array {
+  const width = world.columns * BITMAP_PX_PER_TILE;
+  const height = world.rows * BITMAP_PX_PER_TILE;
+  const fieldWidth = world.columns * FIELD_PX_PER_TILE;
+  const fieldHeight = world.rows * FIELD_PX_PER_TILE;
+  const colors = paletteFor(scheme);
+  const ocean = colors[TERRAIN_INDEX.ocean] ?? [0, 0, 0];
+  const step = 1 / BITMAP_PX_PER_TILE;
+  const fieldStep = 1 / FIELD_PX_PER_TILE;
+  const pixels = new Uint8Array(width * height * 3);
+  const fieldGrid = new Float32Array(fieldWidth * fieldHeight * FIELD_COMPS);
+  const skip = interiorOceanMask(world);
+  const nearRoute = markNear(world, RIBBON_KINDS, 2);
+  const nearElev = markNear(world, ELEV_KINDS, 2);
+  const oceanFields: TerrainFields = {
+    island: 1.2,
+    lakeField: 2,
+    lakeShore: 0,
+    meadowBasin: 2,
+    meadowMix: 0,
+    meadowNoise: 0,
+    river: 8,
+    riverShore: 0,
+    riverWidth: 1,
+  };
+  const sampled: TerrainFields = { ...oceanFields };
+  return withWorldSeed(world.seed, () => {
+    for (let fy = 0; fy < fieldHeight; fy++) {
+      for (let fx = 0; fx < fieldWidth; fx++) {
+        const wx = (fx + 0.5) * fieldStep;
+        const wy = (fy + 0.5) * fieldStep;
+        const tileX = Math.min(world.columns - 1, Math.max(0, Math.floor(wx)));
+        const tileY = Math.min(world.rows - 1, Math.max(0, Math.floor(wy)));
+        const fields = skip[tileY * world.columns + tileX]
+          ? oceanFields
+          : sampleTerrainFieldsUnlocked(world, wx, wy);
+        packFields(fieldGrid, fy * fieldWidth + fx, fields);
+      }
+    }
+    for (let py = 0; py < height; py++) {
+      for (let px = 0; px < width; px++) {
+        const fx = (px + 0.5) * step;
+        const fy = (py + 0.5) * step;
+        const tileX = Math.min(world.columns - 1, Math.max(0, Math.floor(fx)));
+        const tileY = Math.min(world.rows - 1, Math.max(0, Math.floor(fy)));
+        const tile = tileY * world.columns + tileX;
+        const offset = (py * width + px) * 3;
+        if (skip[tile]) {
+          writePixel(pixels, offset, ocean, 0);
+          continue;
+        }
+        const gx = fx * FIELD_PX_PER_TILE - 0.5;
+        const gy = fy * FIELD_PX_PER_TILE - 0.5;
+        const x0 = Math.min(fieldWidth - 1, Math.max(0, Math.floor(gx)));
+        const y0 = Math.min(fieldHeight - 1, Math.max(0, Math.floor(gy)));
+        const x1 = Math.min(fieldWidth - 1, x0 + 1);
+        const y1 = Math.min(fieldHeight - 1, y0 + 1);
+        const tx = Math.min(1, Math.max(0, gx - x0));
+        const ty = Math.min(1, Math.max(0, gy - y0));
+        const i00 = (y0 * fieldWidth + x0) * FIELD_COMPS;
+        const i10 = (y0 * fieldWidth + x1) * FIELD_COMPS;
+        const i01 = (y1 * fieldWidth + x0) * FIELD_COMPS;
+        const i11 = (y1 * fieldWidth + x1) * FIELD_COMPS;
+        sampled.island = lerpGrid(fieldGrid, i00, i10, i01, i11, 0, tx, ty);
+        sampled.lakeField = lerpGrid(fieldGrid, i00, i10, i01, i11, 1, tx, ty);
+        sampled.meadowMix = lerpGrid(fieldGrid, i00, i10, i01, i11, 2, tx, ty);
+        sampled.meadowNoise = lerpGrid(fieldGrid, i00, i10, i01, i11, 3, tx, ty);
+        sampled.river = lerpGrid(fieldGrid, i00, i10, i01, i11, 4, tx, ty);
+        sampled.riverWidth = lerpGrid(fieldGrid, i00, i10, i01, i11, 5, tx, ty);
+        const pixel = applyRibbon(
+          world,
+          fx,
+          fy,
+          fieldRgb(sampled, colors),
+          colors,
+          nearRoute,
+          nearElev,
+          tile,
+        );
+        writePixel(pixels, offset, pixel, sampleGroundGrainUnlocked(fx, fy));
+      }
+    }
+    return pixels;
+  });
 }
 
 export function forestTerrainSize(world: Pick<ForestWorld, 'columns' | 'rows'>) {
@@ -333,6 +507,25 @@ export function forestTerrainSize(world: Pick<ForestWorld, 'columns' | 'rows'>) 
 export function forestTerrainPng(world: ForestWorld, scheme: 'dark' | 'light') {
   const { height, width } = forestTerrainSize(world);
   return encodeRgbPngBytes(width, height, paintTerrain(world, scheme));
+}
+
+/** One continuous sample — used to prove a tile is not a flat biome stamp. */
+export function samplePaintedGround(
+  world: ForestWorld,
+  scheme: 'dark' | 'light',
+  fx: number,
+  fy: number,
+): Rgb {
+  const colors = paletteFor(scheme);
+  return withWorldSeed(world.seed, () => {
+    const pixel = fieldRgb(sampleTerrainFieldsUnlocked(world, fx, fy), colors);
+    const grain = sampleGroundGrainUnlocked(fx, fy);
+    return [
+      clampByte(pixel[0] + grain),
+      clampByte(pixel[1] + grain),
+      clampByte(pixel[2] + Math.round(grain * 0.7)),
+    ];
+  });
 }
 
 export function forestTerrainDataUrls(world: ForestWorld) {

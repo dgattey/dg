@@ -112,6 +112,11 @@ function ForestWorldStyles() {
     [${FOREST_WORLD_ATTRIBUTE}] [data-forest-landmark] img{
       filter:none;
       image-rendering:auto;
+    }
+    [${FOREST_WORLD_ATTRIBUTE}] svg image,
+    [${FOREST_WORLD_ATTRIBUTE}] img.forest-land{
+      image-rendering:auto;
+      image-rendering:smooth;
     }`;
   return (
     <style

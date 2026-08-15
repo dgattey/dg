@@ -170,6 +170,17 @@ export const DEFAULT_FOREST_SEED = 20_260_812;
 
 let activeSeed = DEFAULT_FOREST_SEED;
 
+/** Run a sampler with this world's seed, then put the previous seed back. */
+export function withWorldSeed<T>(seed: number, fn: () => T): T {
+  const previous = activeSeed;
+  activeSeed = seed >>> 0 || 1;
+  try {
+    return fn();
+  } finally {
+    activeSeed = previous;
+  }
+}
+
 const WALKABLE_TERRAIN: ReadonlySet<TerrainKind> = new Set<TerrainKind>([
   'bridge',
   'clearing',
@@ -215,8 +226,8 @@ function hashUnit(x: number, y: number, salt: number): number {
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
 
-/** Bilinear value noise — enough shape for coastlines and tree clumps. */
-function valueNoise(x: number, y: number, scale: number, salt: number): number {
+/** Bilinear value noise — enough shape for coastlines, grain, and tree clumps. */
+export function valueNoise(x: number, y: number, scale: number, salt: number): number {
   const gridX = x / scale;
   const gridY = y / scale;
   const cellX = Math.floor(gridX);
@@ -1455,25 +1466,32 @@ export function buildForestWorld(
 }
 
 /**
- * Sub-tile sample used to paint the ground bitmap. Routes stay on the discrete
- * grid so the walker and the drawing agree. Biomes are re-evaluated at
- * fractional coordinates, then domain-warped at tile scale so coastlines
- * wander instead of printing concentric stairs. Fine per-pixel noise is
- * avoided — it made the PNG huge without reading as a softer shore.
+ * Multi-octave value noise for the ground painter. Collision stays on the
+ * 48px grid; this is only what you see. Returns a signed colour delta.
+ * Callers that already hold the world seed should use the unlocked variant.
  */
+export function sampleGroundGrainUnlocked(fx: number, fy: number) {
+  return (valueNoise(fx, fy, 2.6, 501) - 0.5) * 15 + (valueNoise(fx, fy, 0.95, 503) - 0.5) * 8;
+}
+
+export function sampleGroundGrain(world: Pick<ForestWorld, 'seed'>, fx: number, fy: number) {
+  return withWorldSeed(world.seed, () => sampleGroundGrainUnlocked(fx, fy));
+}
+
 /**
- * Continuous fields at a fractional coordinate. No biome classification and
- * no tile-scale domain warp — those two are what printed stairs. The shore
- * path and the ground painter both use this.
+ * Continuous fields at a fractional coordinate. No biome classification —
+ * the painter lerps colours from these numbers so coasts blend.
  */
+export function sampleTerrainFieldsUnlocked(
+  world: Pick<ForestWorld, 'columns' | 'rows'>,
+  fx: number,
+  fy: number,
+): TerrainFields {
+  return terrainFieldsAt(fx, fy, world.columns, world.rows, true);
+}
+
 export function sampleTerrainFields(world: ForestWorld, fx: number, fy: number): TerrainFields {
-  const previous = activeSeed;
-  activeSeed = world.seed;
-  try {
-    return terrainFieldsAt(fx, fy, world.columns, world.rows, true);
-  } finally {
-    activeSeed = previous;
-  }
+  return withWorldSeed(world.seed, () => sampleTerrainFieldsUnlocked(world, fx, fy));
 }
 
 export type VisualTerrainSample = {
