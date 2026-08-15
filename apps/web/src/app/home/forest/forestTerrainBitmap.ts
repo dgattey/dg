@@ -175,7 +175,7 @@ export function forestTerrainDataUrls(world: ForestWorld) {
 }
 
 export function forestWaterMaskDataUrl(world: ForestWorld) {
-  const scale = 2;
+  const scale = 4;
   const width = world.columns * scale;
   const height = world.rows * scale;
   const pixels = new Uint8Array(width * height);

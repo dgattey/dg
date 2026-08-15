@@ -3,20 +3,22 @@ import { Box } from '@mui/material';
 import {
   CRITTER_ID,
   CRITTER_SCALE,
+  CRITTER_VIEWBOX,
   ForestSpriteDefs,
   SPRITE_ID,
   SPRITE_SCALE,
+  SPRITE_VIEWBOX,
   WINDY_KINDS,
 } from './ForestSprites';
-import { type ForestWorld, layerZ, TILE_SIZE, TREE_KINDS } from './forestMap';
+import { type ForestWorld, layerZ, TILE_SIZE } from './forestMap';
 import { forestTerrainDataUrls, forestWaterMaskDataUrl } from './forestTerrainBitmap';
 
 /**
  * The island itself, painted on the server as one blended bitmap plus stamped
  * scenery. The ground is a single image so first paint does not wait on
  * thousands of SVG rects. Trees and animals are `<use>` stamps stacked by tile
- * row so a canopy south of a board paints in front of it. Each stamp carries
- * its own scale so groves mix sizes instead of cloning one pine.
+ * row so a canopy south of a board paints in front of it. Each stamp is a
+ * distinct silhouette, scaled so groves mix sizes instead of cloning one pine.
  *
  * Stamps are siblings of the landmarks (not wrapped in their own stacking
  * context) so `z-index` from `layerZ` actually compares against the boards.
@@ -104,9 +106,6 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
         const spriteWidth = TILE_SIZE * scale.width * sprite.scale;
         const spriteHeight = TILE_SIZE * scale.height * sprite.scale;
         const windy = WINDY_KINDS.has(sprite.kind);
-        const hue = TREE_KINDS.has(sprite.kind)
-          ? ((sprite.tileX * 13 + sprite.tileY * 29) % 9) * 7 - 28
-          : 0;
         return (
           <svg
             aria-hidden="true"
@@ -123,9 +122,8 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
                 layerZ(sprite.tileY),
               ),
               animationDelay: windy ? `${(index % 11) * 345}ms` : undefined,
-              filter: hue ? `hue-rotate(${hue}deg)` : undefined,
             }}
-            viewBox="0 0 16 16"
+            viewBox={SPRITE_VIEWBOX[sprite.kind]}
             width={spriteWidth}
             xmlns="http://www.w3.org/2000/svg"
           >
@@ -154,7 +152,7 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
               ),
               animationDelay: `${critter.delayMs}ms`,
             }}
-            viewBox="0 0 16 16"
+            viewBox={CRITTER_VIEWBOX[critter.kind]}
             width={spriteWidth}
             xmlns="http://www.w3.org/2000/svg"
           >

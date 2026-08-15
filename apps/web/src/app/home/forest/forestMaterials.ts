@@ -34,7 +34,7 @@ import { LANDMARK_CONTENT_WIDTH_PX, LANDMARK_MAX_HEIGHT_PX } from './forestMap';
  */
 
 /** Frame thickness and nameplate sizing, shared so posts and glow line up. */
-export const LANDMARK_POST_HEIGHT = 20;
+export const LANDMARK_POST_HEIGHT = 44;
 const FRAME_PADDING = 6;
 
 /**
@@ -85,19 +85,26 @@ export const boardMediaSx: SxObject = {
   '& .MuiCard-root': { aspectRatio: '2 / 1' },
 };
 
-/** Photographs on a board, pixelated at paint time. The source asset is untouched. */
+/**
+ * Photographs on a board, snapped at paint time. Contrast and saturation stay
+ * near identity so faces, album art and thumbs remain recognizable; the SVG
+ * filter only hints that the photo lives in a pixel world. The source asset is
+ * untouched.
+ */
+export const PIXELATE_CONTRAST = 1.04;
+export const PIXELATE_SATURATE = 1.03;
+
 export const pixelatedMediaSx: SxObject = {
   '& img': {
-    filter: `contrast(1.14) saturate(1.1) url(#${PIXELATE_FILTER_ID})`,
+    filter: `contrast(${PIXELATE_CONTRAST}) saturate(${PIXELATE_SATURATE}) url(#${PIXELATE_FILTER_ID})`,
     imageRendering: 'pixelated',
   },
 };
 
 /**
  * The carved board a landmark's content is mounted on: a wood frame around a
- * paper surface, with a hard drop shadow so it sits *on* the clearing. Opaque by
- * design — no blur, no translucency — which is what separates it from the old
- * pasted-on glass.
+ * paper surface. It sits on posts; the ground shadow lives on the landmark, not
+ * as a Material drop shadow that would float the board over the map.
  */
 export const landmarkFrameSx: SxObject = {
   '&::after': {
@@ -112,21 +119,21 @@ export const landmarkFrameSx: SxObject = {
   },
   '&::before': {
     background:
-      'radial-gradient(circle at 18% 0, var(--forest-canopy) 0 8px, transparent 9px), radial-gradient(circle at 82% 0, var(--forest-canopy-pine) 0 7px, transparent 8px), radial-gradient(circle at 52% 2px, var(--forest-canopy-light) 0 6px, transparent 7px), radial-gradient(circle at 36% 8px, var(--forest-canopy-maple) 0 5px, transparent 6px)',
+      'radial-gradient(circle at 16% 8px, var(--forest-canopy) 0 11px, transparent 12px), radial-gradient(circle at 84% 6px, var(--forest-canopy-pine) 0 10px, transparent 11px), radial-gradient(circle at 50% 0, var(--forest-canopy-light) 0 9px, transparent 10px), radial-gradient(circle at 34% 14px, var(--forest-canopy-maple) 0 7px, transparent 8px), radial-gradient(circle at 68% 16px, var(--forest-canopy) 0 6px, transparent 7px)',
     content: '""',
-    height: 22,
-    left: 8,
+    height: 34,
+    left: 2,
     pointerEvents: 'none',
     position: 'absolute',
-    right: 8,
-    top: -10,
+    right: 2,
+    top: -18,
+    zIndex: 2,
   },
   backgroundColor: 'var(--forest-wood)',
   backgroundImage:
     'repeating-linear-gradient(90deg, transparent 0 11px, var(--forest-wood-dark) 11px 12px), linear-gradient(180deg, var(--forest-wood-light) 0 3px, transparent 12px), radial-gradient(circle at 8% 70%, var(--forest-canopy) 0 3px, transparent 4px), radial-gradient(circle at 94% 40%, var(--forest-canopy-pine) 0 2.5px, transparent 3.5px)',
-  borderRadius: '10px',
-  boxShadow:
-    '0 2px 0 var(--forest-wood-dark), 0 16px 24px -12px var(--forest-shadow), 0 28px 18px -20px var(--forest-shadow)',
+  borderRadius: '8px 8px 4px 4px',
+  boxShadow: 'inset 0 1px 0 var(--forest-wood-light), 0 3px 0 var(--forest-wood-dark)',
   display: 'flex',
   flexDirection: 'column',
   gap: `${FRAME_PADDING}px`,
@@ -180,20 +187,20 @@ export const landmarkSurfaceSx: SxObject = {
 export const groveStageSx: SxObject = {
   '&::before': {
     background:
-      'radial-gradient(circle at 22% 8%, var(--forest-canopy) 0 10px, transparent 11px), radial-gradient(circle at 78% 6%, var(--forest-canopy-pine) 0 9px, transparent 10px), radial-gradient(circle at 50% 0, var(--forest-canopy-light) 0 7px, transparent 8px)',
+      'radial-gradient(circle at 22% 10px, var(--forest-canopy) 0 12px, transparent 13px), radial-gradient(circle at 78% 8px, var(--forest-canopy-pine) 0 11px, transparent 12px), radial-gradient(circle at 50% 0, var(--forest-canopy-light) 0 9px, transparent 10px)',
     content: '""',
-    height: 24,
-    left: 16,
+    height: 28,
+    left: 10,
     pointerEvents: 'none',
     position: 'absolute',
-    right: 16,
-    top: -12,
+    right: 10,
+    top: -14,
+    zIndex: 2,
   },
   background:
     'radial-gradient(circle at 50% 30%, var(--forest-stone-light), var(--forest-stone) 72%)',
-  borderRadius: '999px 999px 20px 20px',
-  boxShadow:
-    '0 2px 0 var(--forest-wood-dark), 0 18px 30px -12px light-dark(hsl(140deg 30% 20% / 0.5), hsl(190deg 60% 3% / 0.75)), 0 22px 0 10px color-mix(in srgb, var(--forest-grass) 55%, transparent)',
+  borderRadius: '999px 999px 18px 18px',
+  boxShadow: 'inset 0 1px 0 var(--forest-stone-light), 0 3px 0 var(--forest-wood-dark)',
   display: 'flex',
   flexDirection: 'column',
   gap: `${FRAME_PADDING}px`,
@@ -252,7 +259,7 @@ export const hudSurfaceSx: SxObject = {
 /** Emphasis applied to whichever board the walker is standing at. */
 export const landmarkNearSx: SxObject = {
   boxShadow:
-    '0 0 0 2px var(--forest-lantern), 0 2px 0 var(--forest-wood-dark), 0 18px 30px -10px light-dark(hsl(38deg 90% 40% / 0.45), hsl(30deg 90% 30% / 0.55))',
+    '0 0 0 2px var(--forest-lantern), inset 0 1px 0 var(--forest-wood-light), 0 3px 0 var(--forest-wood-dark)',
 };
 
 export { createBouncyTransition };

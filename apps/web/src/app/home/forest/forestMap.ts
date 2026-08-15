@@ -27,6 +27,7 @@ export type TerrainKind =
 export type SceneryKind =
   | 'birch'
   | 'bloom'
+  | 'bush'
   | 'cedar'
   | 'dead'
   | 'fruit'
@@ -494,17 +495,27 @@ const riverDistance = (x: number, y: number, rows: number) => {
  * meadow basins, wetlands around water, and forest floor everywhere between.
  * Boundaries are soft and warped. Lake and meadow centres move with the seed.
  */
-function baseTerrainAt(x: number, y: number, columns: number, rows: number): TerrainKind {
+function baseTerrainAt(
+  x: number,
+  y: number,
+  columns: number,
+  rows: number,
+  visual = false,
+): TerrainKind {
   const warpX = (valueNoise(x, y, 11, 71) - 0.5) * 4.2;
   const warpY = (valueNoise(x, y, 13, 73) - 0.5) * 4.2;
   const centreX = (columns - 1) / 2 + (hashUnit(0, 0, 201) - 0.5) * 3;
   const centreY = (rows - 1) / 2 + (hashUnit(0, 0, 203) - 0.5) * 4;
   const radiusX = columns * (0.46 + hashUnit(0, 0, 205) * 0.04);
   const radiusY = rows * (0.47 + hashUnit(0, 0, 207) * 0.04);
+  const ripple = visual
+    ? (valueNoise(x, y, 0.42, 401) - 0.5) * 0.24 + (valueNoise(x, y, 0.16, 403) - 0.5) * 0.12
+    : 0;
   const island =
     Math.hypot((x + warpX - centreX) / radiusX, (y + warpY - centreY) / radiusY) +
     (valueNoise(x, y, 8, 3) - 0.5) * 0.12 +
-    (valueNoise(x, y, 19, 5) - 0.5) * 0.08;
+    (valueNoise(x, y, 19, 5) - 0.5) * 0.08 +
+    ripple;
   if (island > 1.06) {
     return 'ocean';
   }
@@ -529,7 +540,10 @@ function baseTerrainAt(x: number, y: number, columns: number, rows: number): Ter
     (x - (16 + hashUnit(0, 0, 239) * 22)) / 4.2,
     (y - (52 + hashUnit(0, 0, 240) * 18)) / 3.6,
   );
-  const lakeField = Math.min(lakeMain, lakeCove, pond);
+  const lakeRipple = visual
+    ? (valueNoise(x, y, 0.38, 407) - 0.5) * 0.2 + (valueNoise(x, y, 0.14, 409) - 0.5) * 0.1
+    : 0;
+  const lakeField = Math.min(lakeMain, lakeCove, pond) + lakeRipple;
   if (lakeField < 0.88) {
     return 'lake';
   }
@@ -953,30 +967,42 @@ function pickTreeKind(
   density: number,
   terrain: ReadonlyArray<ReadonlyArray<TerrainKind>>,
 ): SceneryKind {
-  if (hasNeighbour(terrain, x, y, WATER_KINDS) && hashUnit(x, y, 47) < 0.55) {
+  if (hasNeighbour(terrain, x, y, WATER_KINDS) && hashUnit(x, y, 47) < 0.62) {
     return 'willow';
   }
-  if (kind === 'hill' || density > 0.68) {
-    return hashUnit(x, y, 48) > 0.45 ? 'cedar' : 'pine';
+  if (kind === 'hill' || density > 0.7) {
+    return hashUnit(x, y, 48) > 0.5 ? 'cedar' : 'pine';
   }
-  if (hashUnit(x, y, 49) > 0.9) {
+  if (kind === 'meadow' && hashUnit(x, y, 46) < 0.32) {
+    return 'bush';
+  }
+  if (hashUnit(x, y, 49) > 0.92) {
     return 'dead';
   }
-  if (hashUnit(x, y, 50) > 0.82) {
+  if (hashUnit(x, y, 50) > 0.84) {
     return 'fruit';
   }
   const mix = hashUnit(x, y, 51);
-  if (mix > 0.66) {
+  if (mix > 0.74) {
     return 'maple';
   }
-  if (mix > 0.38) {
+  if (mix > 0.5) {
     return 'birch';
   }
-  return 'oak';
+  if (mix > 0.26) {
+    return 'oak';
+  }
+  return hashUnit(x, y, 54) > 0.45 ? 'pine' : 'oak';
 }
 
-function spriteScale(x: number, y: number): number {
-  return 0.72 + hashUnit(x, y, 52) * 0.7;
+function spriteScale(x: number, y: number, density = 0.5): number {
+  if (density > 0.62) {
+    return 0.58 + hashUnit(x, y, 52) * 0.38;
+  }
+  if (density < 0.4) {
+    return 1.12 + hashUnit(x, y, 52) * 0.36;
+  }
+  return 0.78 + hashUnit(x, y, 52) * 0.48;
 }
 
 /**
@@ -1001,24 +1027,24 @@ function scatterScenery(
       if (kind === 'sand') {
         if (roll > 0.965) {
           if (mayPlantSolid) {
-            scenery.push({ kind: 'rock', scale: spriteScale(x, y), tileX: x, tileY: y });
+            scenery.push({ kind: 'rock', scale: spriteScale(x, y, 0.5), tileX: x, tileY: y });
           }
         } else if (roll < 0.02) {
-          scenery.push({ kind: 'reed', scale: spriteScale(x, y), tileX: x, tileY: y });
+          scenery.push({ kind: 'reed', scale: spriteScale(x, y, 0.5), tileX: x, tileY: y });
         }
         continue;
       }
       if (kind === 'clearing') {
         if (roll > 0.93 && nearestPlotDistance(x, y, plots) > CLEARING_RADIUS - 1.5) {
-          scenery.push({ kind: 'bloom', scale: spriteScale(x, y), tileX: x, tileY: y });
+          scenery.push({ kind: 'bloom', scale: spriteScale(x, y, 0.3), tileX: x, tileY: y });
         }
         continue;
       }
       if (kind === 'wetland') {
         if (roll < 0.34) {
-          scenery.push({ kind: 'reed', scale: spriteScale(x, y), tileX: x, tileY: y });
+          scenery.push({ kind: 'reed', scale: spriteScale(x, y, 0.5), tileX: x, tileY: y });
         } else if (roll > 0.96) {
-          scenery.push({ kind: 'bloom', scale: spriteScale(x, y), tileX: x, tileY: y });
+          scenery.push({ kind: 'bloom', scale: spriteScale(x, y, 0.5), tileX: x, tileY: y });
         }
         continue;
       }
@@ -1026,7 +1052,7 @@ function scatterScenery(
         if (mayPlantSolid && roll < 0.18) {
           scenery.push({
             kind: roll < 0.1 ? 'cedar' : 'rock',
-            scale: spriteScale(x, y),
+            scale: spriteScale(x, y, 0.7),
             tileX: x,
             tileY: y,
           });
@@ -1041,7 +1067,7 @@ function scatterScenery(
         if (roll > 0.9) {
           scenery.push({
             kind: roll > 0.97 ? 'log' : roll > 0.96 ? 'stump' : 'bloom',
-            scale: spriteScale(x, y),
+            scale: spriteScale(x, y, 0.4),
             tileX: x,
             tileY: y,
           });
@@ -1065,14 +1091,16 @@ function scatterScenery(
       if (roll < treeThreshold) {
         scenery.push({
           kind: pickTreeKind(x, y, kind, density, terrain),
-          scale: spriteScale(x, y),
+          scale: spriteScale(x, y, density),
           tileX: x,
           tileY: y,
         });
+      } else if (kind === 'meadow' && roll > 0.82 && roll < 0.9) {
+        scenery.push({ kind: 'bush', scale: spriteScale(x, y, 0.7), tileX: x, tileY: y });
       } else if (roll > 0.972) {
-        scenery.push({ kind: 'rock', scale: spriteScale(x, y), tileX: x, tileY: y });
+        scenery.push({ kind: 'rock', scale: spriteScale(x, y, 0.5), tileX: x, tileY: y });
       } else if (kind === 'meadow' && roll > 0.9) {
-        scenery.push({ kind: 'bloom', scale: spriteScale(x, y), tileX: x, tileY: y });
+        scenery.push({ kind: 'bloom', scale: spriteScale(x, y, 0.35), tileX: x, tileY: y });
       }
     }
   }
@@ -1123,9 +1151,13 @@ function plantGroveSentinels(
         continue;
       }
       occupied.add(`${x},${y}`);
+      const sentinelKind =
+        Math.abs(offsetY) <= 1 && hashUnit(x, y, 57) < 0.28
+          ? 'bush'
+          : pickTreeKind(x, y, kind, 0.65, terrain);
       scenery.push({
-        kind: pickTreeKind(x, y, kind, 0.6, terrain),
-        scale: spriteScale(x, y),
+        kind: sentinelKind,
+        scale: spriteScale(x, y, sentinelKind === 'bush' ? 0.7 : 0.65),
         tileX: x,
         tileY: y,
       });
@@ -1259,8 +1291,9 @@ export function buildForestWorld(
 
 /**
  * Sub-tile sample used to paint the ground bitmap. Routes stay on the discrete
- * grid so the walker and the drawing agree; biomes and coast follow the same
- * noise at fractional coordinates so the tile grid does not print as blocks.
+ * grid so the walker and the drawing agree. Biomes are re-evaluated at
+ * fractional coordinates, then domain-warped with high-frequency noise so
+ * coastlines and lake shores break into irregular blobs instead of 8-bit stairs.
  */
 export function visualTerrainAt(world: ForestWorld, fx: number, fy: number): TerrainKind {
   const tileX = Math.min(world.columns - 1, Math.max(0, Math.floor(fx)));
@@ -1272,10 +1305,16 @@ export function visualTerrainAt(world: ForestWorld, fx: number, fy: number): Ter
   const previous = activeSeed;
   activeSeed = world.seed;
   try {
-    const land = baseTerrainAt(fx, fy, world.columns, world.rows);
+    const jx =
+      (valueNoise(fx, fy, 0.52, 311) - 0.5) * 1.35 + (valueNoise(fx, fy, 0.2, 317) - 0.5) * 0.55;
+    const jy =
+      (valueNoise(fx, fy, 0.58, 313) - 0.5) * 1.35 + (valueNoise(fx, fy, 0.22, 319) - 0.5) * 0.55;
+    const sx = fx + jx;
+    const sy = fy + jy;
+    const land = baseTerrainAt(sx, sy, world.columns, world.rows, true);
     if (land === 'grass' || land === 'meadow' || land === 'wetland') {
-      const band = mountainBandAt(fx, fy, world.columns, world.rows);
-      if (band && nearestPlotDistance(fx, fy, world.plots) >= PLOT_PROTECT_RADIUS + 0.5) {
+      const band = mountainBandAt(sx, sy, world.columns, world.rows);
+      if (band && nearestPlotDistance(sx, sy, world.plots) >= PLOT_PROTECT_RADIUS + 0.5) {
         return band;
       }
     }

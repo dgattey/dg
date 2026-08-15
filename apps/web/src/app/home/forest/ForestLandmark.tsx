@@ -43,7 +43,7 @@ const landmarkSx: SxObject = {
 /** Everything visible stands north of the anchor so the trail stays walkable. */
 const stackSx: SxObject = {
   [`[${LANDMARK_NEAR_ATTRIBUTE}='true'] &`]: {
-    transform: 'translateX(-50%) perspective(640px) rotateX(12deg) scale(1.03)',
+    transform: 'translateX(-50%) perspective(640px) rotateX(10deg) scale(1.02)',
   },
   alignItems: 'center',
   bottom: LANDMARK_POST_HEIGHT,
@@ -52,26 +52,64 @@ const stackSx: SxObject = {
   gap: 1,
   left: 0,
   position: 'absolute',
-  transform: 'translateX(-50%) perspective(640px) rotateX(12deg)',
+  transform: 'translateX(-50%) perspective(640px) rotateX(10deg)',
   transformOrigin: 'bottom center',
   ...createBouncyTransition('transform'),
 };
 
-/** Two posts sinking the board into the trail below it, with a bit of dirt at the feet. */
+/** Contact at the post feet only — a wide oval under the plaque reads as a floating card. */
+const groundShadowSx: SxObject = {
+  background:
+    'radial-gradient(ellipse at 30% 45%, var(--forest-shadow) 0 7px, transparent 12px), radial-gradient(ellipse at 70% 45%, var(--forest-shadow) 0 7px, transparent 12px)',
+  height: 18,
+  left: '50%',
+  pointerEvents: 'none',
+  position: 'absolute',
+  top: 6,
+  transform: 'translateX(-50%)',
+  width: 72,
+};
+
+/** Dirt, moss and pebbles packed around the post feet. */
+const groundBedSx: SxObject = {
+  '&::after': {
+    background:
+      'radial-gradient(ellipse at 26% 48%, var(--forest-rock) 0 3.4px, transparent 4.2px), radial-gradient(ellipse at 74% 58%, var(--forest-rock-light) 0 2.8px, transparent 3.6px)',
+    content: '""',
+    inset: 0,
+    position: 'absolute',
+  },
+  '&::before': {
+    background:
+      'radial-gradient(ellipse at 22% 36%, var(--forest-canopy) 0 5px, transparent 6px), radial-gradient(ellipse at 78% 30%, var(--forest-canopy-pine) 0 4.5px, transparent 5.5px)',
+    content: '""',
+    inset: 0,
+    position: 'absolute',
+  },
+  background:
+    'radial-gradient(ellipse at 32% 50%, var(--forest-sand) 0 28%, transparent 48%), radial-gradient(ellipse at 68% 50%, var(--forest-sand) 0 28%, transparent 48%)',
+  height: 16,
+  left: '50%',
+  pointerEvents: 'none',
+  position: 'absolute',
+  top: 4,
+  transform: 'translateX(-50%)',
+  width: 78,
+};
+
+/** Two posts sinking the board into the dirt bed below it. */
 const postsSx: SxObject = {
   '&::after': { right: '22%' },
   '&::before': { left: '22%' },
   '&::before, &::after': {
     background:
       'linear-gradient(90deg, var(--forest-wood-dark), var(--forest-wood) 40%, var(--forest-wood-dark))',
-    borderRadius: '2px',
+    borderRadius: '2px 2px 1px 1px',
     bottom: -LANDMARK_POST_HEIGHT,
-    boxShadow:
-      '0 10px 0 3px var(--forest-shadow), 0 14px 0 8px color-mix(in srgb, var(--forest-sand) 70%, var(--forest-shadow))',
     content: '""',
-    height: LANDMARK_POST_HEIGHT + 6,
+    height: LANDMARK_POST_HEIGHT + 10,
     position: 'absolute',
-    width: 7,
+    width: 8,
   },
   position: 'relative',
 };
@@ -112,6 +150,8 @@ export function ForestLandmark({
         zIndex: layerZ(tileY),
       }}
     >
+      <Box aria-hidden="true" sx={groundShadowSx} />
+      <Box aria-hidden="true" sx={groundBedSx} />
       <Box sx={stackSx}>
         <Box sx={postsSx}>
           <Box data-role="forest-frame" sx={frameSx}>

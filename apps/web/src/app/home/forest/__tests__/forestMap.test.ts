@@ -10,6 +10,7 @@ import {
   TREE_KINDS,
   toBlockedMask,
   toTerrainRuns,
+  visualTerrainAt,
 } from '../forestMap';
 
 const CARD_IDS = [
@@ -247,6 +248,25 @@ describe('buildForestWorld', () => {
   });
 });
 
+describe('visualTerrainAt', () => {
+  it('breaks a coastal tile into more than one biome so shores are not stairs', () => {
+    const world = worldFor();
+    const mixed = world.terrain.flatMap((row, y) =>
+      row.flatMap((kind, x) => {
+        if (kind !== 'sand' && kind !== 'shallow') {
+          return [];
+        }
+        const samples = new Set<string>();
+        for (let i = 0; i < 8; i++) {
+          samples.add(visualTerrainAt(world, x + (i + 0.5) / 8, y + 0.5));
+        }
+        return samples.size > 1 ? [`${x},${y}`] : [];
+      }),
+    );
+    expect(mixed.length).toBeGreaterThan(0);
+  });
+});
+
 describe('toTerrainRuns', () => {
   it('collapses each row into far fewer rects than tiles', () => {
     const world = worldFor();
@@ -439,8 +459,8 @@ describe('tree mix', () => {
     const kinds = new Set(worldFor().scenery.map((sprite) => sprite.kind));
     expect(kinds.has('pine') || kinds.has('cedar')).toBe(true);
     expect(kinds.has('oak') || kinds.has('maple')).toBe(true);
+    expect(kinds.has('willow') || kinds.has('dead') || kinds.has('bush')).toBe(true);
     expect(kinds.has('maple')).toBe(true);
-    expect(kinds.has('cedar') || kinds.has('fruit')).toBe(true);
   });
 
   it('gives every sprite a scale so groves mix sizes', () => {
