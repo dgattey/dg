@@ -92,7 +92,7 @@ async function SpotifyCardAsync({ glowVariant }: SpotifyCardSlotProps) {
 }
 
 type SpotifyCardSlotProps = {
-  /** `ambient` widens the album glow so it spills into the forest map. */
+  /** Forest passes `none` so the album does not bloom off the plaque. */
   glowVariant?: AlbumGlowVariant;
 };
 

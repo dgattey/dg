@@ -21,6 +21,17 @@ describe('ForestLandmark', () => {
     expect(screen.getByText('letter body')).toBeInTheDocument();
   });
 
+  it('does not tilt the plaque off the ground plane', () => {
+    const landmarkId = 'about-flat';
+    const { container } = render(
+      <ForestLandmark id={landmarkId} label="About" tileX={10} tileY={19}>
+        <p>letter body</p>
+      </ForestLandmark>,
+    );
+    expect(container.innerHTML).not.toContain('rotateX');
+    expect(container.innerHTML).not.toContain('perspective');
+  });
+
   it('marks photographs for a light filter, not a mosaic', () => {
     const landmarkId = 'project-a';
     const { container } = render(
@@ -40,11 +51,12 @@ describe('ForestLandmark', () => {
     expect(pixelatedMediaSx).toEqual(
       expect.objectContaining({
         '& img': expect.objectContaining({
+          filter: 'none',
           imageRendering: 'auto',
         }),
       }),
     );
-    expect(JSON.stringify(pixelatedMediaSx)).toContain('sepia');
+    expect(JSON.stringify(pixelatedMediaSx)).not.toContain('sepia');
     expect(JSON.stringify(pixelatedMediaSx)).not.toContain('pixelated');
     expect(JSON.stringify(pixelatedMediaSx)).not.toContain('forest-pixelate');
   });

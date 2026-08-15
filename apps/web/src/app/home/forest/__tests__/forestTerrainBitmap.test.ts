@@ -6,6 +6,7 @@ import {
   forestTerrainDataUrls,
   forestTerrainPng,
   forestWaterMaskPng,
+  nearestRibbon,
 } from '../forestTerrainBitmap';
 
 const pngBytes = (dataUrl: string) => {
@@ -45,12 +46,37 @@ describe('forest terrain bitmap', () => {
 
   it('keeps each ground layer small enough to ship as a cached file', () => {
     const world = buildForestWorld(['intro', 'map', 'spotify']);
-    expect(forestTerrainPng(world, 'light').length).toBeLessThan(80_000);
+    expect(forestTerrainPng(world, 'light').length).toBeLessThan(120_000);
     expect(forestWaterMaskPng(world).length).toBeLessThan(8_000);
   });
 
   it('ships the ground as an RGB PNG so coasts can blend', () => {
     const png = forestTerrainPng(buildForestWorld(['intro', 'map', 'spotify']), 'light');
     expect(png[25]).toBe(2);
+  });
+
+  it('treats a path as a ribbon, not a hard tile stamp', () => {
+    const world = buildForestWorld(['intro', 'map', 'spotify']);
+    let pathX = 0;
+    let pathY = 0;
+    outer: for (let y = 0; y < world.rows; y++) {
+      for (let x = 0; x < world.columns; x++) {
+        if (world.terrain[y]?.[x] === 'path') {
+          pathX = x;
+          pathY = y;
+          break outer;
+        }
+      }
+    }
+    const kinds = new Set<'bridge' | 'clearing' | 'path' | 'trail'>([
+      'bridge',
+      'clearing',
+      'path',
+      'trail',
+    ]);
+    const onPath = nearestRibbon(world, pathX + 0.5, pathY + 0.5, kinds);
+    const offPath = nearestRibbon(world, 0.5, 0.5, kinds);
+    expect(onPath?.dist).toBeLessThan(0);
+    expect(offPath === null || offPath.dist > 0.8).toBe(true);
   });
 });

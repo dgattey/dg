@@ -13,10 +13,10 @@ import { TrackListing } from './TrackListing';
 /**
  * How far the album's colors are allowed to spill past the card.
  * - `card` — the homepage grid's tight halo, hugging the card's own edges.
- * - `ambient` — a wide, soft bloom for the forest map, where the now-playing
- *   clearing is supposed to light the trees around it.
+ * - `ambient` — a wide, soft bloom. Unused on the forest map (it floated).
+ * - `none` — no outer glow; the forest plaque should not light the grass.
  */
-export type AlbumGlowVariant = 'ambient' | 'card';
+export type AlbumGlowVariant = 'ambient' | 'card' | 'none';
 
 type SpotifyCardShellProps = {
   children: ReactNode;
@@ -49,7 +49,7 @@ const ambientGradientGlowSx: SxObject = {
   zIndex: 0,
 };
 
-const GLOW_SX: Record<AlbumGlowVariant, SxObject> = {
+const GLOW_SX: Record<Exclude<AlbumGlowVariant, 'none'>, SxObject> = {
   ambient: ambientGradientGlowSx,
   card: gradientGlowSx,
 };
@@ -77,7 +77,9 @@ const cardSx: SxObject = {
 function SpotifyCardShell({ children, glowVariant, gradient }: SpotifyCardShellProps) {
   return (
     <Box sx={shellContainerSx}>
-      <AlbumGradientBackdrop containerSx={GLOW_SX[glowVariant]} gradient={gradient} />
+      {glowVariant !== 'none' ? (
+        <AlbumGradientBackdrop containerSx={GLOW_SX[glowVariant]} gradient={gradient} />
+      ) : null}
       <ContentCard sx={cardSx}>
         <AlbumGradientBackdrop containerSx={gradientSurfaceSx} gradient={gradient} />
         {children}

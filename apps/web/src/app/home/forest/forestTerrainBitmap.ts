@@ -15,8 +15,8 @@ import { TERRAIN_DETAIL_HSL, TERRAIN_HSL } from './forestPalette';
  * upscale of a gradient. Light and dark palettes are cached files.
  */
 
-/** Collision stays 48px. Three samples per tile is enough once colour is continuous. */
-export const BITMAP_PX_PER_TILE = 3;
+/** Collision stays 48px. Four samples per tile keeps inland ribbons smooth. */
+export const BITMAP_PX_PER_TILE = 4;
 
 /** Water mask only needs a soft silhouette for CSS waves. */
 export const WATER_MASK_PX_PER_TILE = 2;
@@ -204,6 +204,63 @@ function fieldRgb(fields: TerrainFields, colors: ReadonlyArray<Rgb>): Rgb {
   return mixRgb(land, wetland, Math.min(1, fields.lakeShore * 0.35 + fields.riverShore * 0.2));
 }
 
+const smoothstep = (t: number) => t * t * (3 - 2 * t);
+
+function ramp(value: number, start: number, end: number) {
+  return smoothstep(Math.min(1, Math.max(0, (value - start) / (end - start))));
+}
+
+const RIBBON_KINDS: ReadonlySet<TerrainKind> = new Set(['bridge', 'clearing', 'path', 'trail']);
+const ELEV_KINDS: ReadonlySet<TerrainKind> = new Set(['hill', 'mountain']);
+
+function distToSegment(px: number, py: number, ax: number, ay: number, bx: number, by: number) {
+  const vx = bx - ax;
+  const vy = by - ay;
+  const length = vx * vx + vy * vy || 1;
+  const t = Math.min(1, Math.max(0, ((px - ax) * vx + (py - ay) * vy) / length));
+  return Math.hypot(px - (ax + vx * t), py - (ay + vy * t));
+}
+
+/** Signed distance to the nearest route/elevation ribbon. Negative is inside. */
+export function nearestRibbon(
+  world: Pick<ForestWorld, 'terrain'>,
+  fx: number,
+  fy: number,
+  kinds: ReadonlySet<TerrainKind>,
+): { dist: number; kind: TerrainKind } | null {
+  const tileX = Math.floor(fx);
+  const tileY = Math.floor(fy);
+  let best = 3;
+  let kind: TerrainKind | null = null;
+  for (let offsetY = -2; offsetY <= 2; offsetY++) {
+    for (let offsetX = -2; offsetX <= 2; offsetX++) {
+      const sample = world.terrain[tileY + offsetY]?.[tileX + offsetX];
+      if (!sample || !kinds.has(sample)) {
+        continue;
+      }
+      const cx = tileX + offsetX + 0.5;
+      const cy = tileY + offsetY + 0.5;
+      let distance = Math.hypot(fx - cx, fy - cy) - 0.34;
+      for (const [stepX, stepY] of [
+        [1, 0],
+        [-1, 0],
+        [0, 1],
+        [0, -1],
+      ] as const) {
+        if (world.terrain[tileY + offsetY + stepY]?.[tileX + offsetX + stepX] !== sample) {
+          continue;
+        }
+        distance = Math.min(distance, distToSegment(fx, fy, cx, cy, cx + stepX, cy + stepY) - 0.34);
+      }
+      if (distance < best) {
+        best = distance;
+        kind = sample;
+      }
+    }
+  }
+  return kind ? { dist: best, kind } : null;
+}
+
 function paintTerrain(world: ForestWorld, scheme: 'dark' | 'light'): Uint8Array {
   const width = world.columns * BITMAP_PX_PER_TILE;
   const height = world.rows * BITMAP_PX_PER_TILE;
@@ -214,24 +271,31 @@ function paintTerrain(world: ForestWorld, scheme: 'dark' | 'light'): Uint8Array 
     for (let px = 0; px < width; px++) {
       const fx = (px + 0.5) * step;
       const fy = (py + 0.5) * step;
-      const tileX = Math.min(world.columns - 1, Math.max(0, Math.floor(fx)));
-      const tileY = Math.min(world.rows - 1, Math.max(0, Math.floor(fy)));
-      const discrete = world.terrain[tileY]?.[tileX] ?? 'ocean';
       const fields = sampleTerrainFields(world, fx, fy);
       let pixel = fieldRgb(fields, colors);
-      if (discrete === 'path' || discrete === 'trail' || discrete === 'clearing') {
-        const route = colors[TERRAIN_INDEX[discrete]] ?? pixel;
-        pixel = mixRgb(pixel, route, 0.72);
-      } else if (discrete === 'bridge') {
-        const plank =
-          Math.floor(fx * 5) % 2 === 0
-            ? (colors[DETAIL_PLANK] ?? colors[TERRAIN_INDEX.bridge])
-            : (colors[TERRAIN_INDEX.bridge] ?? pixel);
-        pixel = plank ?? pixel;
-      } else if (discrete === 'mountain') {
-        pixel = mixRgb(pixel, colors[TERRAIN_INDEX.mountain] ?? pixel, 0.8);
-      } else if (discrete === 'hill') {
-        pixel = mixRgb(pixel, colors[TERRAIN_INDEX.hill] ?? pixel, 0.65);
+      const ribbon = nearestRibbon(world, fx, fy, RIBBON_KINDS);
+      if (ribbon) {
+        const amount = 1 - ramp(ribbon.dist, -0.04, 0.64);
+        if (amount > 0) {
+          if (ribbon.kind === 'bridge') {
+            const plank =
+              Math.floor(fx * 5) % 2 === 0
+                ? (colors[DETAIL_PLANK] ?? colors[TERRAIN_INDEX.bridge])
+                : (colors[TERRAIN_INDEX.bridge] ?? pixel);
+            pixel = mixRgb(pixel, plank ?? pixel, amount);
+          } else {
+            const strength = ribbon.kind === 'clearing' ? 0.5 : 0.88;
+            pixel = mixRgb(pixel, colors[TERRAIN_INDEX[ribbon.kind]] ?? pixel, amount * strength);
+          }
+        }
+      }
+      const elev = nearestRibbon(world, fx, fy, ELEV_KINDS);
+      if (elev) {
+        const amount = 1 - ramp(elev.dist, 0, 0.85);
+        if (amount > 0) {
+          const strength = elev.kind === 'mountain' ? 0.72 : 0.52;
+          pixel = mixRgb(pixel, colors[TERRAIN_INDEX[elev.kind]] ?? pixel, amount * strength);
+        }
       }
       const offset = (py * width + px) * 3;
       pixels[offset] = pixel[0];

@@ -95,9 +95,7 @@ export const PIXELATE_SATURATE = 1;
 
 export const pixelatedMediaSx: SxObject = {
   '& img': {
-    borderRadius: '2px',
-    boxShadow: 'inset 0 0 0 1px rgb(70 42 12 / 0.16)',
-    filter: 'sepia(0.08) contrast(0.96) brightness(1.02)',
+    filter: 'none',
     imageRendering: 'auto',
   },
 };
@@ -111,9 +109,8 @@ export const landmarkFrameSx: SxObject = {
   backgroundColor: 'var(--forest-wood)',
   backgroundImage:
     'repeating-linear-gradient(90deg, transparent 0 13px, var(--forest-wood-dark) 13px 14px), linear-gradient(180deg, var(--forest-wood-light) 0 4px, transparent 18px)',
-  borderRadius: '10px 10px 3px 3px',
+  borderRadius: '8px',
   boxShadow: 'none',
-  clipPath: 'polygon(7% 0, 93% 0, 100% 100%, 0 100%)',
   display: 'flex',
   flexDirection: 'column',
   gap: `${FRAME_PADDING}px`,

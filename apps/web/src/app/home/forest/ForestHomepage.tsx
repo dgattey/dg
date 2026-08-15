@@ -110,6 +110,7 @@ function ForestWorldStyles() {
       pointer-events:auto;
     }
     [${FOREST_WORLD_ATTRIBUTE}] [data-forest-landmark] img{
+      filter:none;
       image-rendering:auto;
     }`;
   return (
@@ -146,7 +147,7 @@ export async function ForestHomepage({ seed }: { seed?: number } = {}) {
     spotify: {
       id: 'spotify',
       label: 'Now playing',
-      node: <SpotifyCardSlot glowVariant="ambient" />,
+      node: <SpotifyCardSlot glowVariant="none" />,
     },
     strava: { id: 'strava', label: 'Latest activity', node: <StravaCardSlot /> },
   };
@@ -191,7 +192,7 @@ export async function ForestHomepage({ seed }: { seed?: number } = {}) {
               label={card.label}
               tileX={plot.tileX}
               tileY={plot.tileY}
-              variant={card.id === 'spotify' ? 'grove' : 'board'}
+              variant="board"
             >
               {card.node}
             </ForestLandmark>

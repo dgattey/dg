@@ -8,7 +8,6 @@ import {
   createBouncyTransition,
   groveStageSx,
   groveSurfaceSx,
-  LANDMARK_POST_HEIGHT,
   landmarkFrameSx,
   landmarkNearSx,
   landmarkSurfaceSx,
@@ -17,15 +16,11 @@ import {
 /**
  * One homepage card mounted on a world-native landmark.
  *
- * A `board` is a carved wooden plaque on two posts, standing in its clearing; a
- * `grove` is a rounded stone stage for the now-playing card, left open so the
- * album glow can bloom past it. Either way the content inside is the same card
- * the grid renders — its surface is dissolved (see `dissolveInnerCardSx`) so it
- * reads as content on the board, not a card pasted on top, while its links,
- * hover, focus and data fetching are untouched.
- *
- * The only thing the walker does to a landmark is flip `data-forest-near`, which
- * lights its lantern.
+ * A `board` is a carved wooden plaque sitting in its clearing — same plane as
+ * the grass, no isolated rotateX. South-side trees and the grass fringe paint
+ * in front of it. The content inside is the same card the grid renders; its
+ * surface is dissolved (see `dissolveInnerCardSx`) so it reads as paper on
+ * wood. The walker only flips `data-forest-near`, which lights its lantern.
  */
 
 /** Attribute the client walker reads to find landmarks and mark the closest. */
@@ -37,25 +32,19 @@ export type LandmarkVariant = 'board' | 'grove';
 
 /** The anchor is a zero-sized point on the plot's centre tile, right on the trail. */
 const landmarkSx: SxObject = {
-  perspective: '620px',
   position: 'absolute',
 };
 
-/** Standing sign in the ground plane. Shadow and dirt stay unrotated on the grass. */
+/** Flat plaque on the dirt. Shares the world's plane — no per-card perspective. */
 const stackSx: SxObject = {
-  [`[${LANDMARK_NEAR_ATTRIBUTE}='true'] &`]: {
-    transform: 'translateX(-50%) rotateX(44deg) scale(1.1, 1.24)',
-  },
   alignItems: 'center',
-  bottom: LANDMARK_POST_HEIGHT,
+  bottom: 10,
   display: 'flex',
   flexDirection: 'column',
   gap: 0.75,
   left: 0,
   position: 'absolute',
-  transform: 'translateX(-50%) rotateX(42deg) scale(1.08, 1.22)',
-  transformOrigin: 'bottom center',
-  ...createBouncyTransition('transform'),
+  transform: 'translateX(-50%)',
 };
 
 /** Soft oval on the grass under the whole plaque — not a Material drop shadow. */
@@ -70,7 +59,7 @@ const groundShadowSx: SxObject = {
   width: 360,
 };
 
-/** Packed dirt and moss the posts sink into. Irregular so it does not read as a platform. */
+/** Packed dirt and moss under the plaque. Irregular so it does not read as a platform. */
 const groundBedSx: SxObject = {
   '&::after': {
     background:
@@ -97,7 +86,7 @@ const groundBedSx: SxObject = {
   width: 320,
 };
 
-/** Grass in front of the posts so they sink into the ground plane. */
+/** Grass in front of the plaque so the south edge sits in the ground plane. */
 const groundFringeSx: SxObject = {
   background:
     'radial-gradient(ellipse at 12% 70%, var(--forest-canopy) 0 16px, transparent 18px), radial-gradient(ellipse at 30% 90%, var(--forest-grass) 0 22px, transparent 24px), radial-gradient(ellipse at 52% 78%, var(--forest-canopy-light) 0 18px, transparent 20px), radial-gradient(ellipse at 74% 92%, var(--forest-grass) 0 20px, transparent 22px), radial-gradient(ellipse at 90% 68%, var(--forest-canopy-pine) 0 14px, transparent 16px), radial-gradient(ellipse at 44% 100%, var(--forest-sand) 0 12px, transparent 14px)',
@@ -109,23 +98,6 @@ const groundFringeSx: SxObject = {
   transform: 'translateX(-50%)',
   width: 320,
   zIndex: 5,
-};
-
-/** Two posts sinking the board into the dirt bed below it. */
-const postsSx: SxObject = {
-  '&::after': { right: '18%' },
-  '&::before': { left: '18%' },
-  '&::before, &::after': {
-    background:
-      'linear-gradient(90deg, var(--forest-wood-dark), var(--forest-wood) 38%, var(--forest-wood-light) 52%, var(--forest-wood-dark))',
-    borderRadius: '3px 3px 1px 1px',
-    bottom: -LANDMARK_POST_HEIGHT,
-    content: '""',
-    height: LANDMARK_POST_HEIGHT + 16,
-    position: 'absolute',
-    width: 11,
-  },
-  position: 'relative',
 };
 
 const nearFrameSx: SxObject = {
@@ -168,16 +140,14 @@ export function ForestLandmark({
       <Box aria-hidden="true" sx={groundBedSx} />
       <Box aria-hidden="true" sx={groundFringeSx} />
       <Box sx={stackSx}>
-        <Box sx={postsSx}>
-          <Box data-role="forest-frame" sx={frameSx}>
-            <Box aria-hidden="true" sx={carvedSignSx}>
-              <Typography component="span" sx={carvedSignLabelSx} variant="caption">
-                {label}
-              </Typography>
-            </Box>
-            <Box {...{ [PIXELATE_ATTRIBUTE]: true }} sx={surfaceSx}>
-              {children}
-            </Box>
+        <Box data-role="forest-frame" sx={frameSx}>
+          <Box aria-hidden="true" sx={carvedSignSx}>
+            <Typography component="span" sx={carvedSignLabelSx} variant="caption">
+              {label}
+            </Typography>
+          </Box>
+          <Box {...{ [PIXELATE_ATTRIBUTE]: true }} sx={surfaceSx}>
+            {children}
           </Box>
         </Box>
       </Box>
