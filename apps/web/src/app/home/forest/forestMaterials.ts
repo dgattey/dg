@@ -6,11 +6,11 @@ import { LANDMARK_CONTENT_WIDTH_PX, LANDMARK_MAX_HEIGHT_PX } from './forestMap';
  * The world's material vocabulary.
  *
  * Everything the redesign puts on the island is built from four materials —
- * wood, paper, stone and HUD chrome — defined once here as `var(--forest-*)`
- * tokens (see `forestPalette.ts`) and composed into a handful of shared
- * primitives. There is deliberately no per-card styling: a project board, the
- * intro letter and the now-playing grove all frame themselves from these, which
- * is what makes them read as one place instead of a pile of cards.
+ * weathered crate, paper, slag-stone and steel HUD — defined once here as
+ * `var(--forest-*)` tokens (see `forestPalette.ts`) and composed into a handful
+ * of shared primitives. There is deliberately no per-card styling: a project
+ * board, the intro letter and the now-playing grove all frame themselves from
+ * these, which is what makes them read as one place instead of a pile of cards.
  *
  * ## Extending to the rest of the site
  *
@@ -121,9 +121,11 @@ export const pixelatedMediaSx: SxObject = {
 export const landmarkFrameSx: SxObject = {
   backgroundColor: 'var(--forest-wood)',
   backgroundImage:
-    'repeating-linear-gradient(90deg, transparent 0 13px, var(--forest-wood-dark) 13px 14px), linear-gradient(180deg, var(--forest-wood-light) 0 4px, transparent 18px)',
-  borderRadius: '2px',
-  boxShadow: 'none',
+    'linear-gradient(90deg, var(--forest-wood-light) 0 3px, transparent 3px), linear-gradient(180deg, var(--forest-wood-light) 0 2px, transparent 10px)',
+  border: '1px solid var(--forest-steel)',
+  borderRadius: '1px',
+  boxShadow:
+    'inset 0 0 0 1px var(--forest-wood-dark), 1px 1px 0 var(--forest-bark-dark), 2px 2px 0 rgb(0 0 0 / 0.28)',
   display: 'flex',
   flexDirection: 'column',
   gap: `${FRAME_PADDING}px`,
@@ -152,17 +154,17 @@ export const landmarkSurfaceSx: SxObject = {
   ...pixelatedMediaSx,
   '&::-webkit-scrollbar': { width: 8 },
   '&::-webkit-scrollbar-thumb': {
-    backgroundColor: 'var(--forest-wood)',
-    border: '2px solid var(--forest-paper)',
-    borderRadius: 999,
+    backgroundColor: 'var(--forest-steel)',
+    border: '1px solid var(--forest-paper)',
+    borderRadius: 1,
   },
-  '&::-webkit-scrollbar-track': { backgroundColor: 'var(--forest-paper-edge)', borderRadius: 999 },
+  '&::-webkit-scrollbar-track': { backgroundColor: 'var(--forest-paper-edge)', borderRadius: 1 },
   backgroundBlendMode: 'multiply',
   backgroundColor: 'var(--forest-paper)',
   backgroundImage:
-    'radial-gradient(ellipse at 18% 12%, var(--forest-paper-edge) 0 18%, transparent 42%), radial-gradient(ellipse at 82% 88%, var(--forest-wood) 0 8%, transparent 36%)',
-  border: 'none',
-  borderRadius: '4px',
+    'linear-gradient(180deg, var(--forest-paper-edge) 0 1px, transparent 12px), linear-gradient(90deg, rgb(0 0 0 / 0.04) 0 1px, transparent 1px)',
+  border: '1px solid var(--forest-paper-edge)',
+  borderRadius: '1px',
   display: 'flex',
   flexDirection: 'column',
   maxHeight: LANDMARK_MAX_HEIGHT_PX,
@@ -181,9 +183,10 @@ export const landmarkSurfaceSx: SxObject = {
  */
 export const groveStageSx: SxObject = {
   background:
-    'radial-gradient(circle at 50% 30%, var(--forest-stone-light), var(--forest-stone) 72%)',
-  borderRadius: '28px 28px 10px 10px',
-  boxShadow: 'none',
+    'linear-gradient(180deg, var(--forest-stone-light) 0 3px, var(--forest-stone) 18px, var(--forest-rock) 100%)',
+  border: '1px solid var(--forest-steel)',
+  borderRadius: '1px',
+  boxShadow: '1px 1px 0 var(--forest-bark-dark), 2px 2px 0 rgb(0 0 0 / 0.28)',
   display: 'flex',
   flexDirection: 'column',
   gap: `${FRAME_PADDING}px`,
@@ -209,14 +212,15 @@ export const groveSurfaceSx: SxObject = {
   width: LANDMARK_CONTENT_WIDTH_PX,
 };
 
-/** The routed nameplate that names each stop, carved into a darker wood plate. */
+/** The stenciled nameplate that names each stop, a steel-edged crate plate. */
 export const carvedSignSx: SxObject = {
   backgroundColor: 'var(--forest-wood-dark)',
   backgroundImage:
-    'radial-gradient(circle at 12% 30%, var(--forest-canopy) 0 2px, transparent 3px), radial-gradient(circle at 88% 70%, var(--forest-canopy-pine) 0 1.8px, transparent 2.6px)',
-  borderRadius: '4px',
-  boxShadow: 'inset 0 1px 0 var(--forest-wood-light), inset 0 -2px 3px rgb(0 0 0 / 0.25)',
-  color: 'light-dark(hsl(40deg 60% 92%), hsl(40deg 44% 84%))',
+    'radial-gradient(circle at 8px 50%, var(--forest-steel) 0 1.4px, transparent 1.6px), radial-gradient(circle at calc(100% - 8px) 50%, var(--forest-steel) 0 1.4px, transparent 1.6px)',
+  border: '1px solid var(--forest-steel)',
+  borderRadius: '1px',
+  boxShadow: 'inset 0 1px 0 var(--forest-wood-light), inset 0 -1px 0 rgb(0 0 0 / 0.35)',
+  color: 'light-dark(hsl(40deg 12% 86%), hsl(40deg 8% 78%))',
   paddingBlock: 0.5,
   paddingInline: 1.25,
   textAlign: 'center',
@@ -230,19 +234,18 @@ export const carvedSignLabelSx: SxObject = {
 
 /**
  * Pinned HUD chrome — the minimap, the walk hint, and (via a global style) the
- * header capsule. Nearly opaque wood-and-paper so it reads as a signpost bolted
- * to the world rather than the frosted glass it replaces.
+ * header capsule. A steel-edged panel, not a cream pill.
  */
 export const hudSurfaceSx: SxObject = {
   backgroundColor: 'var(--forest-hud)',
   border: '1px solid var(--forest-hud-edge)',
-  borderRadius: '12px',
-  boxShadow: '0 8px 20px -10px light-dark(hsl(140deg 30% 20% / 0.5), hsl(190deg 60% 3% / 0.7))',
+  borderRadius: '2px',
+  boxShadow: '1px 1px 0 rgb(0 0 0 / 0.28), 2px 2px 0 rgb(0 0 0 / 0.12)',
 };
 
 /** Emphasis applied to whichever board the walker is standing at. */
 export const landmarkNearSx: SxObject = {
-  boxShadow: '0 0 0 2px var(--forest-lantern), inset 0 1px 0 var(--forest-wood-light)',
+  boxShadow: '0 0 0 1px var(--forest-brass), 1px 1px 0 var(--forest-bark-dark)',
 };
 
 export { createBouncyTransition };

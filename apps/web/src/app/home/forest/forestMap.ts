@@ -1420,7 +1420,7 @@ function plantGroveSentinels(
   }
 }
 
-const MAX_CRITTERS = 12;
+const MAX_CRITTERS = 8;
 
 const HOPPERS: ReadonlyArray<CritterKind> = ['deer', 'fox', 'rabbit'];
 

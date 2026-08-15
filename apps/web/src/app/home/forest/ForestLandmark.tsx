@@ -17,7 +17,7 @@ import {
 /**
  * One homepage card mounted on a world-native landmark.
  *
- * A `board` is a carved wooden plaque sitting in its clearing — same plane as
+ * A `board` is a steel-edged crate sitting in its clearing — same plane as
  * the grass, no isolated rotateX. South-side grass may paint in front of the
  * posts by `layerZ(tileY)`. World trees stay off the nameplate, photograph,
  * and copy. The content inside is the same card the grid renders; its surface
@@ -59,12 +59,12 @@ const stackSx: SxObject = {
 const postsSx: SxObject = {
   '&::after, &::before': {
     background:
-      'linear-gradient(180deg, var(--forest-wood-light) 0 3px, var(--forest-wood) 10px, var(--forest-wood-dark) 100%)',
-    boxShadow: 'inset 1px 0 0 var(--forest-wood-light), inset -2px 0 3px rgb(0 0 0 / 0.35)',
+      'linear-gradient(180deg, var(--forest-steel) 0 3px, var(--forest-wood) 5px, var(--forest-wood-dark) 100%)',
+    boxShadow: 'inset 1px 0 0 var(--forest-wood-light), inset -1px 0 2px rgb(0 0 0 / 0.4)',
     content: '""',
     display: 'block',
     height: LANDMARK_POST_HEIGHT,
-    width: 12,
+    width: 8,
   },
   display: 'flex',
   height: LANDMARK_POST_HEIGHT,
@@ -76,24 +76,17 @@ const postsSx: SxObject = {
   zIndex: 1,
 };
 
-/** Packed dirt and moss under the posts. Opaque enough to read as a bed, not a hint. */
+/** Packed slag and gravel under the posts. Opaque enough to read as a bed, not a hint. */
 const groundBedSx: SxObject = {
   '&::after': {
     background:
-      'radial-gradient(ellipse at 18% 52%, var(--forest-rock) 0 5px, transparent 6px), radial-gradient(ellipse at 78% 58%, var(--forest-rock-light) 0 4px, transparent 5px), radial-gradient(ellipse at 46% 72%, var(--forest-rock) 0 3.2px, transparent 4px), radial-gradient(ellipse at 62% 38%, var(--forest-rock-light) 0 2.6px, transparent 3.4px)',
-    content: '""',
-    inset: 0,
-    position: 'absolute',
-  },
-  '&::before': {
-    background:
-      'radial-gradient(ellipse at 14% 24%, var(--forest-canopy) 0 14px, transparent 16px), radial-gradient(ellipse at 86% 20%, var(--forest-canopy-pine) 0 13px, transparent 15px), radial-gradient(ellipse at 38% 8%, var(--forest-canopy-light) 0 11px, transparent 13px), radial-gradient(ellipse at 70% 14%, var(--forest-canopy-maple) 0 10px, transparent 12px)',
+      'radial-gradient(ellipse at 18% 52%, var(--forest-rock) 0 4px, transparent 5px), radial-gradient(ellipse at 78% 58%, var(--forest-steel) 0 3px, transparent 4px), radial-gradient(ellipse at 46% 72%, var(--forest-rock) 0 2.6px, transparent 3.4px)',
     content: '""',
     inset: 0,
     position: 'absolute',
   },
   background:
-    'radial-gradient(ellipse at 50% 58%, var(--forest-path) 0 52%, var(--forest-sand) 68%, transparent 82%)',
+    'radial-gradient(ellipse at 50% 58%, var(--forest-path) 0 52%, var(--forest-trail) 70%, transparent 84%)',
   height: 42,
   marginTop: -18,
   pointerEvents: 'none',
@@ -101,10 +94,9 @@ const groundBedSx: SxObject = {
   width: 280,
 };
 
-/** Contact shadow on the grass under the dirt — darker than the token alone. */
+/** Hard contact shadow on the grass under the crate. */
 const groundShadowSx: SxObject = {
-  background:
-    'radial-gradient(ellipse at 50% 42%, hsl(140deg 24% 18% / 0.38) 0 42%, transparent 74%)',
+  background: 'radial-gradient(ellipse at 56% 42%, var(--forest-shadow) 0 46%, transparent 72%)',
   height: 40,
   marginTop: -24,
   pointerEvents: 'none',

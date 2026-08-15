@@ -98,9 +98,7 @@ const worldSx: SxObject = {
   },
   '@keyframes forestHop': {
     '0%, 100%': { transform: 'translate3d(0, 0, 0)' },
-    '30%': { transform: 'translate3d(10px, -9px, 0)' },
-    '50%': { transform: 'translate3d(18px, 0, 0)' },
-    '80%': { transform: 'translate3d(28px, -7px, 0)' },
+    '50%': { transform: 'translate3d(10px, 0, 0)' },
   },
   '@keyframes forestRipple': {
     '0%, 100%': { backgroundSize: '18% 18%', opacity: 0.18 },
@@ -111,8 +109,8 @@ const worldSx: SxObject = {
     '50%': { backgroundPosition: '70% 0', opacity: 0.62 },
   },
   '@keyframes forestWind': {
-    from: { transform: 'rotate(-1.6deg)' },
-    to: { transform: 'rotate(2deg)' },
+    from: { transform: 'rotate(-0.7deg)' },
+    to: { transform: 'rotate(0.9deg)' },
   },
   '@media (prefers-reduced-motion: reduce)': {
     '& .forest-wave, & .forest-ripple, & .forest-wind, & .forest-critter': {
@@ -150,7 +148,7 @@ const characterAnchorSx: SxObject = {
   },
   '@keyframes forestStep': {
     from: { translate: '0 0' },
-    to: { translate: '0 -3px' },
+    to: { translate: '1px 0' },
   },
   '@media (prefers-reduced-motion: reduce)': {
     [`&[data-walking='true'] [data-role='${CHARACTER_ROLE}']`]: { animation: 'none' },
@@ -170,7 +168,7 @@ const hintSx: SxObject = {
   // Nothing here is true without a keyboard, and on a phone it would also crowd
   // the minimap in the same corner of a very small screen.
   '@media (pointer: coarse)': { display: 'none' },
-  borderRadius: 999,
+  borderRadius: '2px',
   bottom: 16,
   // The only place the controls are written down, so it takes primary text:
   // secondary over the HUD measured 3.2:1, under the 4.5:1 this size needs.
