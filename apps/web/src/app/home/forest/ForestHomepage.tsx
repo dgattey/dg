@@ -100,8 +100,8 @@ function ForestWorldStyles() {
       backdrop-filter:none;
       background-color:var(--forest-hud);
       border-color:var(--forest-hud-edge);
-      border-radius:2px !important;
-      box-shadow:1px 1px 0 rgb(0 0 0 / 0.28);
+      border-radius:10px;
+      box-shadow:0 8px 18px -12px var(--forest-shadow);
     }
     body:has([${FOREST_WORLD_ATTRIBUTE}]) section:has([data-site-header]),
     body:has([${FOREST_WORLD_ATTRIBUTE}]) [data-site-header]{pointer-events:none;}

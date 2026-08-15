@@ -168,7 +168,7 @@ const hintSx: SxObject = {
   // Nothing here is true without a keyboard, and on a phone it would also crowd
   // the minimap in the same corner of a very small screen.
   '@media (pointer: coarse)': { display: 'none' },
-  borderRadius: '2px',
+  borderRadius: '10px',
   bottom: 16,
   // The only place the controls are written down, so it takes primary text:
   // secondary over the HUD measured 3.2:1, under the 4.5:1 this size needs.

@@ -73,14 +73,14 @@ const markerTrackSx: SxObject = {
 };
 
 const markerDotSx: SxObject = {
-  backgroundColor: 'var(--forest-brass)',
-  boxShadow: '0 0 0 1px var(--forest-steel)',
-  height: 7,
+  backgroundColor: 'var(--forest-lake)',
+  boxShadow: '0 0 0 1px var(--forest-paper)',
+  height: 8,
   left: 0,
   position: 'absolute',
   top: 0,
-  transform: 'translate(-50%, -50%) rotate(45deg)',
-  width: 7,
+  transform: 'translate(-50%, -50%)',
+  width: 8,
 };
 
 export function ForestMinimap({ world }: { world: ForestWorld }) {
