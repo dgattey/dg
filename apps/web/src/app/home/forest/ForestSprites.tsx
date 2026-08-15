@@ -124,7 +124,14 @@ function Trunk({
   return (
     <>
       <rect fill="var(--forest-bark)" height={height} rx={0.6} width={width} x={x} y={y} />
-      <rect fill="var(--forest-wood-light)" height={height} rx={0.4} width={width * 0.35} x={x} y={y} />
+      <rect
+        fill="var(--forest-wood-light)"
+        height={height}
+        rx={0.4}
+        width={width * 0.35}
+        x={x}
+        y={y}
+      />
     </>
   );
 }
@@ -258,8 +265,22 @@ export function ForestSpriteDefs() {
       </symbol>
 
       <symbol id={SPRITE_ID.reed} viewBox="0 0 16 16">
-        <rect fill="var(--forest-canopy-light)" height={7.4} rx={0.45} width={0.85} x={5.4} y={7.2} />
-        <rect fill="var(--forest-canopy-light)" height={8.8} rx={0.45} width={0.85} x={7.8} y={5.8} />
+        <rect
+          fill="var(--forest-canopy-light)"
+          height={7.4}
+          rx={0.45}
+          width={0.85}
+          x={5.4}
+          y={7.2}
+        />
+        <rect
+          fill="var(--forest-canopy-light)"
+          height={8.8}
+          rx={0.45}
+          width={0.85}
+          x={7.8}
+          y={5.8}
+        />
         <rect fill="var(--forest-canopy)" height={6.4} rx={0.45} width={0.85} x={10} y={8} />
         <ellipse cx="5.8" cy="7" fill="var(--forest-canopy)" rx="1.05" ry="0.65" />
         <ellipse cx="8.2" cy="5.6" fill="var(--forest-canopy)" rx="1.05" ry="0.65" />
