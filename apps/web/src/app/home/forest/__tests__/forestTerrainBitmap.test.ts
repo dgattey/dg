@@ -6,6 +6,7 @@ import {
   forestTerrainDataUrls,
   forestTerrainPng,
   forestWaterMaskPng,
+  grainDelta,
   nearestRibbon,
 } from '../forestTerrainBitmap';
 
@@ -53,6 +54,17 @@ describe('forest terrain bitmap', () => {
   it('ships the ground as an RGB PNG so coasts can blend', () => {
     const png = forestTerrainPng(buildForestWorld(['intro', 'map', 'spotify']), 'light');
     expect(png[25]).toBe(2);
+  });
+
+  it('grains the grass so the ground is not a flat fill', () => {
+    const deltas = new Set<number>();
+    for (let py = 0; py < 16; py++) {
+      for (let px = 0; px < 16; px++) {
+        deltas.add(grainDelta(px, py, 20_260_812));
+      }
+    }
+    expect(deltas.size).toBeGreaterThan(4);
+    expect([...deltas].some((delta) => delta !== 0)).toBe(true);
   });
 
   it('treats a path as a ribbon, not a hard tile stamp', () => {

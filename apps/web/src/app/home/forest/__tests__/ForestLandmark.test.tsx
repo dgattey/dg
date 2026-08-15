@@ -30,6 +30,9 @@ describe('ForestLandmark', () => {
     );
     expect(container.innerHTML).not.toContain('rotateX');
     expect(container.innerHTML).not.toContain('perspective');
+    expect(container.querySelector('[data-role="forest-posts"]')).not.toBeNull();
+    expect(container.querySelector('[data-role="forest-dirt"]')).not.toBeNull();
+    expect(container.querySelector('[data-role="forest-shadow"]')).not.toBeNull();
   });
 
   it('marks photographs for a light filter, not a mosaic', () => {

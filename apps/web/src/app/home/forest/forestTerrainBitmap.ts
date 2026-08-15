@@ -196,6 +196,22 @@ export function encodeRgbPngBytes(width: number, height: number, pixels: Uint8Ar
   );
 }
 
+function clampByte(value: number) {
+  return Math.min(255, Math.max(0, value));
+}
+
+/**
+ * Repeating 8×8 grain so grass is not a flat fill. Periodic on purpose: white
+ * noise would balloon the cached PNG.
+ */
+export function grainDelta(px: number, py: number, seed: number) {
+  // 2×2 blocks so the grain survives the 12× bilinear upscale to a tile.
+  const gx = px >> 1;
+  const gy = py >> 1;
+  const n = ((gx * 37 + gy * 17 + (seed & 255)) ^ (gx * 13 + gy * 7)) & 31;
+  return n - 16;
+}
+
 function fieldRgb(fields: TerrainFields, colors: ReadonlyArray<Rgb>): Rgb {
   const grass = colors[TERRAIN_INDEX.grass] ?? [0, 0, 0];
   const meadow = colors[TERRAIN_INDEX.meadow] ?? grass;
@@ -297,10 +313,11 @@ function paintTerrain(world: ForestWorld, scheme: 'dark' | 'light'): Uint8Array 
           pixel = mixRgb(pixel, colors[TERRAIN_INDEX[elev.kind]] ?? pixel, amount * strength);
         }
       }
+      const grain = grainDelta(px, py, world.seed);
       const offset = (py * width + px) * 3;
-      pixels[offset] = pixel[0];
-      pixels[offset + 1] = pixel[1];
-      pixels[offset + 2] = pixel[2];
+      pixels[offset] = clampByte(pixel[0] + grain);
+      pixels[offset + 1] = clampByte(pixel[1] + grain);
+      pixels[offset + 2] = clampByte(pixel[2] + Math.round(grain * 0.65));
     }
   }
   return pixels;

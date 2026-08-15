@@ -45,6 +45,12 @@ export type ScenerySprite = {
   scale: number;
   tileX: number;
   tileY: number;
+  /**
+   * When false, the stamp still paints (and can occlude a plaque) but the
+   * walker can pass through. South grove trees use this so the trail stays
+   * clear while canopies stand in front of the lower third.
+   */
+  blocks?: boolean;
 };
 
 export type CritterKind = 'bird' | 'deer' | 'fish' | 'fox' | 'rabbit';
@@ -1152,12 +1158,24 @@ function scatterScenery(
 }
 
 const GROVE_OFFSETS: ReadonlyArray<readonly [number, number]> = [
+  [-2, 1],
+  [2, 1],
+  [-3, 1],
+  [3, 1],
+  [-1, 1],
+  [1, 1],
+  [0, 1],
+  [-2, 2],
+  [2, 2],
+  [-3, 2],
+  [3, 2],
+  [-1, 2],
+  [1, 2],
+  [0, 2],
   [-4, 1],
   [4, 1],
   [-6, 2],
   [6, 2],
-  [-3, 2],
-  [3, 2],
   [-2, 3],
   [2, 3],
   [-4, 3],
@@ -1182,9 +1200,9 @@ const GROVE_OFFSETS: ReadonlyArray<readonly [number, number]> = [
 
 /**
  * Plants a handful of trees just outside each footprint so boards sit in a
- * grove. South-side trees share the walker's row or the one below, which with
- * south-in-front stacking lets the canopy overlap the posts without covering
- * the nameplate.
+ * grove. South-side stamps (offsetY >= 1) use `layerZ` to paint in front of the
+ * plaque's lower third. The trail centre stays bushes so the walker can still
+ * walk up to the sign.
  */
 function plantGroveSentinels(
   terrain: ReadonlyArray<ReadonlyArray<TerrainKind>>,
@@ -1204,7 +1222,7 @@ function plantGroveSentinels(
       if (isUnderBoard(x, y, plots) || occupied.has(`${x},${y}`)) {
         continue;
       }
-      const southGrove = offsetY > 1;
+      const southGrove = offsetY >= 1;
       if (
         !southGrove &&
         plots.some((other) => Math.abs(other.tileX - x) <= 2 && Math.abs(other.tileY - y) <= 2)
@@ -1212,27 +1230,31 @@ function plantGroveSentinels(
         continue;
       }
       const kind = terrain[y]?.[x];
+      const trailGrass = southGrove && Math.abs(offsetX) <= 1 && offsetY <= 2;
+      if (!kind || kind === 'ocean' || kind === 'lake' || kind === 'shallow') {
+        continue;
+      }
+      const southPlantable =
+        kind === 'clearing' ||
+        kind === 'meadow' ||
+        kind === 'grass' ||
+        kind === 'path' ||
+        kind === 'trail';
       if (
-        !kind ||
-        !(
-          PLANTABLE.has(kind) ||
-          kind === 'wetland' ||
-          (southGrove && (kind === 'clearing' || kind === 'meadow' || kind === 'grass'))
-        )
+        !trailGrass &&
+        !(PLANTABLE.has(kind) || kind === 'wetland' || (southGrove && southPlantable))
       ) {
         continue;
       }
       occupied.add(`${x},${y}`);
-      const sentinelKind =
-        Math.abs(offsetY) <= 1 && hashUnit(x, y, 57) < 0.28
-          ? 'bush'
-          : pickTreeKind(x, y, kind, 0.65, terrain);
+      const sentinelKind = trailGrass ? 'bush' : pickTreeKind(x, y, kind, 0.65, terrain);
       scenery.push({
+        ...(southGrove ? { blocks: false } : {}),
         kind: sentinelKind,
         scale: spriteScale(
           x,
           y,
-          offsetY > 2 ? 0.18 : offsetY > 1 ? 0.24 : sentinelKind === 'bush' ? 0.55 : 0.32,
+          sentinelKind === 'bush' ? 0.22 : offsetY <= 2 ? 0.16 : offsetY <= 3 ? 0.2 : 0.28,
         ),
         tileX: x,
         tileY: y,
@@ -1557,7 +1579,7 @@ export function rectsOverlap(a: PixelRect, b: PixelRect): boolean {
 export function toBlockedMask(world: ForestWorld): Array<string> {
   const blocked = new Set(
     world.scenery
-      .filter((sprite) => BLOCKING_SCENERY.has(sprite.kind))
+      .filter((sprite) => sprite.blocks !== false && BLOCKING_SCENERY.has(sprite.kind))
       .map((sprite) => `${sprite.tileX},${sprite.tileY}`),
   );
   return Array.from({ length: world.rows }, (_, y) =>

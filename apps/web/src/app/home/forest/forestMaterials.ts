@@ -32,22 +32,31 @@ import { LANDMARK_CONTENT_WIDTH_PX, LANDMARK_MAX_HEIGHT_PX } from './forestMap';
  * now live here, and each is written so another page can reuse it verbatim.
  */
 
-/** Frame thickness and nameplate sizing, shared so posts and glow line up. */
-export const LANDMARK_POST_HEIGHT = 44;
+/** Intrinsic size requested for the forest About photo so a 1440 crop stays sharp. */
+export const FOREST_ABOUT_IMAGE_PX = 960;
+
+/** Posts that plant the plaque in the dirt. Short, so they read as feet, not stilts. */
+export const LANDMARK_POST_HEIGHT = 32;
 const FRAME_PADDING = 6;
 
 /**
  * Strips a nested `ContentCard`'s own surface so it reads as content resting on
- * the board rather than a card floating on it. Images keep their radius; the
- * card's hover-scale and its glass title overlay give way to the board's own
- * lantern-lit "near" state and carved nameplate, so nothing is announced twice.
+ * the board rather than a card floating on it. Theme Card chrome — border,
+ * radius, paper fill, hover scale, glass title — has to lose, or the plaque
+ * still looks like a homepage tile.
  */
 export const dissolveInnerCardSx: SxObject = {
-  '& .MuiCard-root': {
+  '& .MuiCard-root img, & img': {
+    borderRadius: 0,
+  },
+  '& .MuiCard-root, & .MuiPaper-root': {
     backgroundColor: 'transparent',
     backgroundImage: 'none',
     border: 'none',
+    borderColor: 'transparent',
     borderRadius: 0,
+    borderStyle: 'none',
+    borderWidth: 0,
     boxShadow: 'none',
     // As a flex item the card was shrinking below its content and clipping the
     // rest itself, because a Card is `overflow: hidden`. That hid the last two
@@ -60,11 +69,14 @@ export const dissolveInnerCardSx: SxObject = {
     // board's own clamp has to win.
     height: 'auto',
     maxWidth: '100%',
+    outline: 'none',
     overflow: 'visible',
     width: '100%',
   },
   '& .MuiCard-root:focus-within, & .MuiCard-root:hover': {
+    border: 'none',
     boxShadow: 'none',
+    outline: 'none',
     transform: 'none',
   },
   // The card's own glass title chip; the nameplate carries the name in-world.
@@ -95,6 +107,7 @@ export const PIXELATE_SATURATE = 1;
 
 export const pixelatedMediaSx: SxObject = {
   '& img': {
+    borderRadius: 0,
     filter: 'none',
     imageRendering: 'auto',
   },
@@ -109,7 +122,7 @@ export const landmarkFrameSx: SxObject = {
   backgroundColor: 'var(--forest-wood)',
   backgroundImage:
     'repeating-linear-gradient(90deg, transparent 0 13px, var(--forest-wood-dark) 13px 14px), linear-gradient(180deg, var(--forest-wood-light) 0 4px, transparent 18px)',
-  borderRadius: '8px',
+  borderRadius: '2px',
   boxShadow: 'none',
   display: 'flex',
   flexDirection: 'column',

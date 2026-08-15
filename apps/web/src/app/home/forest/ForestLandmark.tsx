@@ -8,6 +8,7 @@ import {
   createBouncyTransition,
   groveStageSx,
   groveSurfaceSx,
+  LANDMARK_POST_HEIGHT,
   landmarkFrameSx,
   landmarkNearSx,
   landmarkSurfaceSx,
@@ -17,10 +18,10 @@ import {
  * One homepage card mounted on a world-native landmark.
  *
  * A `board` is a carved wooden plaque sitting in its clearing — same plane as
- * the grass, no isolated rotateX. South-side trees and the grass fringe paint
- * in front of it. The content inside is the same card the grid renders; its
- * surface is dissolved (see `dissolveInnerCardSx`) so it reads as paper on
- * wood. The walker only flips `data-forest-near`, which lights its lantern.
+ * the grass, no isolated rotateX. South-side trees paint in front of it by
+ * `layerZ(tileY)`, not decorations glued to this box. Posts and a dirt bed live
+ * in the plaque stack so they sit at the feet. The content inside is the same
+ * card the grid renders; its surface is dissolved (see `dissolveInnerCardSx`).
  */
 
 /** Attribute the client walker reads to find landmarks and mark the closest. */
@@ -38,66 +39,69 @@ const landmarkSx: SxObject = {
 /** Flat plaque on the dirt. Shares the world's plane — no per-card perspective. */
 const stackSx: SxObject = {
   alignItems: 'center',
-  bottom: 10,
+  bottom: 0,
   display: 'flex',
   flexDirection: 'column',
-  gap: 0.75,
   left: 0,
   position: 'absolute',
   transform: 'translateX(-50%)',
 };
 
-/** Soft oval on the grass under the whole plaque — not a Material drop shadow. */
-const groundShadowSx: SxObject = {
-  background: 'radial-gradient(ellipse at 50% 45%, var(--forest-shadow) 0 38%, transparent 78%)',
-  height: 52,
-  left: '50%',
+/** Two short posts under the frame, planted in the dirt. */
+const postsSx: SxObject = {
+  '&::after, &::before': {
+    background:
+      'linear-gradient(180deg, var(--forest-wood-light) 0 3px, var(--forest-wood) 10px, var(--forest-wood-dark) 100%)',
+    boxShadow: 'inset 1px 0 0 var(--forest-wood-light), inset -2px 0 3px rgb(0 0 0 / 0.35)',
+    content: '""',
+    display: 'block',
+    height: LANDMARK_POST_HEIGHT,
+    width: 12,
+  },
+  display: 'flex',
+  height: LANDMARK_POST_HEIGHT,
+  justifyContent: 'space-between',
+  marginTop: '-2px',
   pointerEvents: 'none',
-  position: 'absolute',
-  top: 4,
-  transform: 'translateX(-50%)',
-  width: 360,
+  position: 'relative',
+  width: '54%',
+  zIndex: 1,
 };
 
-/** Packed dirt and moss under the plaque. Irregular so it does not read as a platform. */
+/** Packed dirt and moss under the posts. Opaque enough to read as a bed, not a hint. */
 const groundBedSx: SxObject = {
   '&::after': {
     background:
-      'radial-gradient(ellipse at 16% 58%, var(--forest-rock) 0 4px, transparent 5px), radial-gradient(ellipse at 82% 64%, var(--forest-rock-light) 0 3.4px, transparent 4.4px), radial-gradient(ellipse at 48% 78%, var(--forest-rock) 0 2.8px, transparent 3.6px), radial-gradient(ellipse at 64% 42%, var(--forest-rock-light) 0 2.2px, transparent 3px)',
+      'radial-gradient(ellipse at 18% 52%, var(--forest-rock) 0 5px, transparent 6px), radial-gradient(ellipse at 78% 58%, var(--forest-rock-light) 0 4px, transparent 5px), radial-gradient(ellipse at 46% 72%, var(--forest-rock) 0 3.2px, transparent 4px), radial-gradient(ellipse at 62% 38%, var(--forest-rock-light) 0 2.6px, transparent 3.4px)',
     content: '""',
     inset: 0,
     position: 'absolute',
   },
   '&::before': {
     background:
-      'radial-gradient(ellipse at 10% 22%, var(--forest-canopy) 0 18px, transparent 20px), radial-gradient(ellipse at 90% 18%, var(--forest-canopy-pine) 0 16px, transparent 18px), radial-gradient(ellipse at 38% 8%, var(--forest-canopy-light) 0 14px, transparent 16px), radial-gradient(ellipse at 70% 12%, var(--forest-canopy-maple) 0 12px, transparent 14px), radial-gradient(ellipse at 52% 86%, var(--forest-grass) 0 28px, transparent 32px)',
+      'radial-gradient(ellipse at 14% 24%, var(--forest-canopy) 0 14px, transparent 16px), radial-gradient(ellipse at 86% 20%, var(--forest-canopy-pine) 0 13px, transparent 15px), radial-gradient(ellipse at 38% 8%, var(--forest-canopy-light) 0 11px, transparent 13px), radial-gradient(ellipse at 70% 14%, var(--forest-canopy-maple) 0 10px, transparent 12px)',
     content: '""',
     inset: 0,
     position: 'absolute',
   },
   background:
-    'radial-gradient(ellipse at 24% 58%, var(--forest-sand) 0 34%, transparent 62%), radial-gradient(ellipse at 76% 62%, var(--forest-sand) 0 30%, transparent 58%), radial-gradient(ellipse at 48% 72%, var(--forest-path) 0 26%, transparent 52%), radial-gradient(ellipse at 58% 40%, var(--forest-path) 0 16%, transparent 38%)',
-  height: 44,
-  left: '50%',
+    'radial-gradient(ellipse at 50% 58%, var(--forest-path) 0 52%, var(--forest-sand) 68%, transparent 82%)',
+  height: 42,
+  marginTop: -18,
   pointerEvents: 'none',
-  position: 'absolute',
-  top: 2,
-  transform: 'translateX(-50%)',
-  width: 320,
+  position: 'relative',
+  width: 280,
 };
 
-/** Grass in front of the plaque so the south edge sits in the ground plane. */
-const groundFringeSx: SxObject = {
+/** Contact shadow on the grass under the dirt — darker than the token alone. */
+const groundShadowSx: SxObject = {
   background:
-    'radial-gradient(ellipse at 12% 70%, var(--forest-canopy) 0 16px, transparent 18px), radial-gradient(ellipse at 30% 90%, var(--forest-grass) 0 22px, transparent 24px), radial-gradient(ellipse at 52% 78%, var(--forest-canopy-light) 0 18px, transparent 20px), radial-gradient(ellipse at 74% 92%, var(--forest-grass) 0 20px, transparent 22px), radial-gradient(ellipse at 90% 68%, var(--forest-canopy-pine) 0 14px, transparent 16px), radial-gradient(ellipse at 44% 100%, var(--forest-sand) 0 12px, transparent 14px)',
-  height: 58,
-  left: '50%',
+    'radial-gradient(ellipse at 50% 42%, hsl(140deg 24% 18% / 0.38) 0 42%, transparent 74%)',
+  height: 40,
+  marginTop: -24,
   pointerEvents: 'none',
-  position: 'absolute',
-  top: 6,
-  transform: 'translateX(-50%)',
+  position: 'relative',
   width: 320,
-  zIndex: 5,
 };
 
 const nearFrameSx: SxObject = {
@@ -136,9 +140,6 @@ export function ForestLandmark({
         zIndex: layerZ(tileY),
       }}
     >
-      <Box aria-hidden="true" sx={groundShadowSx} />
-      <Box aria-hidden="true" sx={groundBedSx} />
-      <Box aria-hidden="true" sx={groundFringeSx} />
       <Box sx={stackSx}>
         <Box data-role="forest-frame" sx={frameSx}>
           <Box aria-hidden="true" sx={carvedSignSx}>
@@ -150,6 +151,9 @@ export function ForestLandmark({
             {children}
           </Box>
         </Box>
+        <Box aria-hidden="true" data-role="forest-posts" sx={postsSx} />
+        <Box aria-hidden="true" data-role="forest-dirt" sx={groundBedSx} />
+        <Box aria-hidden="true" data-role="forest-shadow" sx={groundShadowSx} />
       </Box>
     </Box>
   );
