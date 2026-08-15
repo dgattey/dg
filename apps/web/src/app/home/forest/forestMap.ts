@@ -46,9 +46,9 @@ export type ScenerySprite = {
   tileX: number;
   tileY: number;
   /**
-   * When false, the stamp still paints (and can occlude a plaque) but the
-   * walker can pass through. South grove trees use this so the trail stays
-   * clear while canopies stand in front of the lower third.
+   * When false, the stamp still paints but the walker can pass through. South
+   * grove undergrowth uses this so grass can sit in front of the posts without
+   * blocking the trail. Stamps that would cover a board's content are dropped.
    */
   blocks?: boolean;
 };
@@ -92,6 +92,8 @@ export type TerrainRun = {
   tileY: number;
 };
 
+export type PixelRect = { height: number; left: number; top: number; width: number };
+
 /**
  * Every landmark reserves the same rectangle of ground, measured in tiles, and
  * the whole layout is derived from it so two boards can never overlap. The
@@ -117,15 +119,7 @@ export const LANDMARK_CONTENT_WIDTH_PX = (FOOTPRINT_WIDTH - 0.5) * TILE_SIZE;
 const LANDMARK_CHROME_BUDGET_PX = 84;
 export const LANDMARK_MAX_HEIGHT_PX = FOOTPRINT_NORTH * TILE_SIZE - LANDMARK_CHROME_BUDGET_PX;
 
-/**
- * How far a south-grove stamp may rise above the plot origin. That band is
- * posts plus the bottom wood of the frame — not the photograph, body text, or
- * nameplate. Tallest sprite (cedar) is used when capping so a pine cannot
- * grow through a face.
- */
-export const SOUTH_GROVE_MAX_OVERHANG_PX = 40;
-
-/** Matches `SPRITE_SCALE` so a cap in tiles is a cap on screen. */
+/** Matches `SPRITE_SCALE` so a stamp's AABB matches what `ForestTerrain` paints. */
 const STAMP_TILES: Record<SceneryKind, { height: number; width: number }> = {
   birch: { height: 3.15, width: 1.8 },
   bloom: { height: 0.85, width: 0.85 },
@@ -1284,51 +1278,73 @@ const GROVE_OFFSETS: ReadonlyArray<readonly [number, number]> = [
   [0, -10],
 ];
 
-function fitSouthGroveScale(offsetY: number, kind: SceneryKind, x: number, y: number): number {
-  const feetSouth = offsetY * TILE_SIZE + TILE_SIZE / 2;
-  const tiles = STAMP_TILES[kind].height;
-  const desired = spriteScale(x, y, kind === 'bush' ? 0.48 : 0.7);
-  const maxScale = (feetSouth + SOUTH_GROVE_MAX_OVERHANG_PX) / (TILE_SIZE * tiles);
-  return Math.max(0.4, Math.min(desired, maxScale));
+/**
+ * Pixel box of the painted nameplate, photograph, and body.
+ *
+ * The landmark node is a 0×0 trail anchor. The stack's *layout* height is only
+ * the collapsed chrome (`LANDMARK_STACK_LAYOUT_PX`); the paper and photo
+ * overflow that box and paint south of the trail. Height-capping south grove
+ * against the reserved footprint therefore missed the face. This rect is the
+ * painted frame, not the tile footprint.
+ */
+const LANDMARK_FRAME_PAD_PX = 6;
+const LANDMARK_FRAME_CHROME_PX = 66;
+export const LANDMARK_STACK_LAYOUT_PX = 142;
+
+export function landmarkContentRect(plot: ForestPlot): PixelRect {
+  const anchorX = plot.tileX * TILE_SIZE + TILE_SIZE / 2;
+  const anchorY = plot.tileY * TILE_SIZE + TILE_SIZE / 2;
+  const width = LANDMARK_CONTENT_WIDTH_PX + LANDMARK_FRAME_PAD_PX * 2;
+  return {
+    height: LANDMARK_MAX_HEIGHT_PX + LANDMARK_FRAME_CHROME_PX,
+    left: anchorX - width / 2,
+    top: anchorY - LANDMARK_STACK_LAYOUT_PX,
+    width,
+  };
 }
 
 /**
- * Scatter can plant a full-size pine on the approach after the grove pass.
- * Shrink any stamp whose canopy would cover the photograph or nameplate.
+ * Pixel box `ForestTerrain` paints for a stamp: bottom-aligned to the tile,
+ * centred on it, sized by `STAMP_TILES` × scale.
  */
-function trimSouthCanopies(plots: ReadonlyArray<ForestPlot>, scenery: Array<ScenerySprite>) {
-  const contentHalf = LANDMARK_CONTENT_WIDTH_PX / 2;
+export function sceneryStampRect(sprite: ScenerySprite): PixelRect {
+  const metrics = STAMP_TILES[sprite.kind];
+  const width = TILE_SIZE * metrics.width * sprite.scale;
+  const height = TILE_SIZE * metrics.height * sprite.scale;
+  return {
+    height,
+    left: sprite.tileX * TILE_SIZE - (width - TILE_SIZE) / 2,
+    top: (sprite.tileY + 1) * TILE_SIZE - height,
+    width,
+  };
+}
+
+const stampCoversContent = (sprite: ScenerySprite, contents: ReadonlyArray<PixelRect>): boolean =>
+  contents.some((content) => rectsOverlap(sceneryStampRect(sprite), content));
+
+/**
+ * Drop every stamp whose painted AABB sits on a nameplate, photograph, or
+ * body. Height caps still left foliage on About's face; if it intersects the
+ * content box it cannot stay, in front or behind.
+ */
+function dropContentOverlaps(plots: ReadonlyArray<ForestPlot>, scenery: Array<ScenerySprite>) {
+  const contents = plots.map(landmarkContentRect);
+  let write = 0;
   for (const sprite of scenery) {
-    for (const plot of plots) {
-      const offsetY = sprite.tileY - plot.tileY;
-      const offsetX = sprite.tileX - plot.tileX;
-      if (offsetY < 1 || offsetY > 5 || Math.abs(offsetX) > 6) {
-        continue;
-      }
-      if (offsetY <= 2 && Math.abs(offsetX) <= 3 && TREE_KINDS.has(sprite.kind)) {
-        sprite.kind = 'bush';
-        sprite.scale = fitSouthGroveScale(offsetY, 'bush', sprite.tileX, sprite.tileY);
-      }
-      const metrics = STAMP_TILES[sprite.kind];
-      const feetSouth = offsetY * TILE_SIZE + TILE_SIZE / 2;
-      const halfWidth = (TILE_SIZE * metrics.width * sprite.scale) / 2;
-      const overlapsContentX = Math.abs(offsetX * TILE_SIZE) - halfWidth < contentHalf;
-      if (!overlapsContentX) {
-        continue;
-      }
-      const maxScale = (feetSouth + SOUTH_GROVE_MAX_OVERHANG_PX) / (TILE_SIZE * metrics.height);
-      if (sprite.scale > maxScale) {
-        sprite.scale = Math.max(0.35, maxScale);
-      }
+    if (stampCoversContent(sprite, contents)) {
+      continue;
     }
+    scenery[write] = sprite;
+    write += 1;
   }
+  scenery.length = write;
 }
 
 /**
  * Plants a handful of trees just outside each footprint so boards sit in a
- * grove. South-side stamps use `layerZ` to paint in front of the posts and the
- * lower wood — never the photograph, body text, or nameplate. The column in
- * front of the content box stays bushes.
+ * grove. South-side stamps may stand in front of the posts and dirt. Anything
+ * whose canopy would sit on the photograph or copy is skipped here and
+ * dropped again after scatter, so a later pass cannot put foliage on a face.
  */
 function plantGroveSentinels(
   terrain: ReadonlyArray<ReadonlyArray<TerrainKind>>,
@@ -1338,6 +1354,7 @@ function plantGroveSentinels(
   scenery: Array<ScenerySprite>,
 ) {
   const occupied = new Set(scenery.map((sprite) => `${sprite.tileX},${sprite.tileY}`));
+  const contents = plots.map(landmarkContentRect);
   for (const plot of plots) {
     for (const [offsetX, offsetY] of GROVE_OFFSETS) {
       const x = plot.tileX + offsetX;
@@ -1376,15 +1393,29 @@ function plantGroveSentinels(
       const frontOfBoard = southGrove && offsetY <= 2 && Math.abs(offsetX) <= 3;
       const sentinelKind =
         trailGrass || frontOfBoard ? 'bush' : pickTreeKind(x, y, kind, 0.65, terrain);
-      scenery.push({
+      const sentinel: ScenerySprite = {
         ...(southGrove ? { blocks: false } : {}),
         kind: sentinelKind,
-        scale: southGrove
-          ? fitSouthGroveScale(offsetY, sentinelKind, x, y)
-          : spriteScale(x, y, 0.32),
+        scale: spriteScale(x, y, southGrove ? (sentinelKind === 'bush' ? 0.48 : 0.7) : 0.32),
         tileX: x,
         tileY: y,
-      });
+      };
+      if (stampCoversContent(sentinel, contents)) {
+        if (sentinelKind === 'bush') {
+          continue;
+        }
+        const bush: ScenerySprite = {
+          ...sentinel,
+          kind: 'bush',
+          scale: spriteScale(x, y, 0.48),
+        };
+        if (stampCoversContent(bush, contents)) {
+          continue;
+        }
+        scenery.push(bush);
+        continue;
+      }
+      scenery.push(sentinel);
     }
   }
 }
@@ -1498,7 +1529,7 @@ export function buildForestWorld(
     carveTrails(terrain, columns, rows, plots);
     const scenery = scatterScenery(terrain, columns, rows, plots);
     plantGroveSentinels(terrain, columns, rows, plots, scenery);
-    trimSouthCanopies(plots, scenery);
+    dropContentOverlaps(plots, scenery);
     const critters = placeCritters(terrain, columns, rows, plots);
 
     const firstPlot = plots[0];
@@ -1683,8 +1714,6 @@ export function toMinimapRuns(world: Pick<ForestWorld, 'rows' | 'terrain'>) {
   }
   return runs;
 }
-
-export type PixelRect = { height: number; left: number; top: number; width: number };
 
 /**
  * The pixel rectangle every landmark reserves on the world plane. Boards clamp

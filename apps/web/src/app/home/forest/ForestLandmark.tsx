@@ -18,10 +18,10 @@ import {
  * One homepage card mounted on a world-native landmark.
  *
  * A `board` is a carved wooden plaque sitting in its clearing — same plane as
- * the grass, no isolated rotateX. South-side trees paint in front of it by
- * `layerZ(tileY)`, not decorations glued to this box. Posts and a dirt bed live
- * in the plaque stack so they sit at the feet. The content inside is the same
- * card the grid renders; its surface is dissolved (see `dissolveInnerCardSx`).
+ * the grass, no isolated rotateX. South-side grass may paint in front of the
+ * posts by `layerZ(tileY)`. World trees stay off the nameplate, photograph,
+ * and copy. The content inside is the same card the grid renders; its surface
+ * is dissolved (see `dissolveInnerCardSx`).
  */
 
 /** Attribute the client walker reads to find landmarks and mark the closest. */
@@ -36,15 +36,23 @@ const landmarkSx: SxObject = {
   position: 'absolute',
 };
 
-/** Flat plaque on the dirt. Shares the world's plane — no per-card perspective. */
+/**
+ * Flat plaque on the dirt. Shares the world's plane — no per-card perspective.
+ *
+ * The landmark node is a zero-size anchor on the trail tile. `bottom: 0` on a
+ * 0×0 containing block does not lift the stack in Chrome — the plaque grew
+ * down over the south grove and the photograph sat where the map thought the
+ * posts were. Translate the whole stack above the anchor so nameplate, photo
+ * and copy occupy the reserved footprint north of the plot.
+ */
 const stackSx: SxObject = {
   alignItems: 'center',
-  bottom: 0,
   display: 'flex',
   flexDirection: 'column',
   left: 0,
   position: 'absolute',
-  transform: 'translateX(-50%)',
+  top: 0,
+  transform: 'translate(-50%, -100%)',
 };
 
 /** Two short posts under the frame, planted in the dirt. */
@@ -140,7 +148,7 @@ export function ForestLandmark({
         zIndex: layerZ(tileY),
       }}
     >
-      <Box sx={stackSx}>
+      <Box data-role="forest-stack" sx={stackSx}>
         <Box data-role="forest-frame" sx={frameSx}>
           <Box aria-hidden="true" sx={carvedSignSx}>
             <Typography component="span" sx={carvedSignLabelSx} variant="caption">

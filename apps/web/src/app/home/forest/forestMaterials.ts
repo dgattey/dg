@@ -132,6 +132,9 @@ export const landmarkFrameSx: SxObject = {
   padding: `${FRAME_PADDING}px`,
   paddingTop: `${FRAME_PADDING + 10}px`,
   position: 'relative',
+  // Dirt and shadow sit later in the stack and used to paint over the
+  // overflowing photograph. Keep the paper above those feet.
+  zIndex: 2,
 };
 
 /**
@@ -188,6 +191,7 @@ export const groveStageSx: SxObject = {
   overflow: 'visible',
   padding: `${FRAME_PADDING * 2}px`,
   position: 'relative',
+  zIndex: 2,
 };
 
 /**
