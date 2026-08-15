@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
 import { ForestLandmark, PIXELATE_ATTRIBUTE } from '../ForestLandmark';
-import { PIXELATE_CELL_PX, PIXELATE_DILATE_RADIUS } from '../ForestSprites';
 import { PIXELATE_CONTRAST, PIXELATE_SATURATE, pixelatedMediaSx } from '../forestMaterials';
 
 describe('ForestLandmark', () => {
@@ -22,7 +21,7 @@ describe('ForestLandmark', () => {
     expect(screen.getByText('letter body')).toBeInTheDocument();
   });
 
-  it('marks photographs for a mild render-time snap, not an 8-bit mosaic', () => {
+  it('marks photographs for a light filter, not a mosaic', () => {
     const landmarkId = 'project-a';
     const { container } = render(
       <ForestLandmark id={landmarkId} label="Alpha" tileX={4} tileY={8}>
@@ -36,17 +35,17 @@ describe('ForestLandmark', () => {
     expect(surface?.querySelector('img')?.getAttribute('src')).toBe(
       'https://example.com/alpha.webp',
     );
-    expect(PIXELATE_CELL_PX).toBe(2);
-    expect(PIXELATE_DILATE_RADIUS).toBe(1);
-    expect(PIXELATE_CONTRAST).toBeLessThan(1.08);
-    expect(PIXELATE_SATURATE).toBeLessThan(1.08);
+    expect(PIXELATE_CONTRAST).toBeLessThan(1.05);
+    expect(PIXELATE_SATURATE).toBeLessThan(1.05);
     expect(pixelatedMediaSx).toEqual(
       expect.objectContaining({
         '& img': expect.objectContaining({
-          filter: `contrast(${PIXELATE_CONTRAST}) saturate(${PIXELATE_SATURATE}) url(#forest-pixelate)`,
-          imageRendering: 'pixelated',
+          filter: `contrast(${PIXELATE_CONTRAST}) saturate(${PIXELATE_SATURATE})`,
+          imageRendering: 'auto',
         }),
       }),
     );
+    expect(JSON.stringify(pixelatedMediaSx)).not.toContain('pixelated');
+    expect(JSON.stringify(pixelatedMediaSx)).not.toContain('forest-pixelate');
   });
 });

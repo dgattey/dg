@@ -43,73 +43,86 @@ const landmarkSx: SxObject = {
 /** Everything visible stands north of the anchor so the trail stays walkable. */
 const stackSx: SxObject = {
   [`[${LANDMARK_NEAR_ATTRIBUTE}='true'] &`]: {
-    transform: 'translateX(-50%) perspective(640px) rotateX(10deg) scale(1.02)',
+    transform: 'translateX(-50%) scale(1.015)',
   },
   alignItems: 'center',
   bottom: LANDMARK_POST_HEIGHT,
   display: 'flex',
   flexDirection: 'column',
-  gap: 1,
+  gap: 0.75,
   left: 0,
   position: 'absolute',
-  transform: 'translateX(-50%) perspective(640px) rotateX(10deg)',
+  transform: 'translateX(-50%)',
   transformOrigin: 'bottom center',
   ...createBouncyTransition('transform'),
 };
 
-/** Contact at the post feet only — a wide oval under the plaque reads as a floating card. */
+/** Soft oval on the grass under the whole plaque — not a Material drop shadow. */
 const groundShadowSx: SxObject = {
-  background:
-    'radial-gradient(ellipse at 30% 45%, var(--forest-shadow) 0 7px, transparent 12px), radial-gradient(ellipse at 70% 45%, var(--forest-shadow) 0 7px, transparent 12px)',
-  height: 18,
+  background: 'radial-gradient(ellipse at 50% 45%, var(--forest-shadow) 0 38%, transparent 78%)',
+  height: 52,
   left: '50%',
   pointerEvents: 'none',
   position: 'absolute',
-  top: 6,
+  top: 4,
   transform: 'translateX(-50%)',
-  width: 72,
+  width: 360,
 };
 
-/** Dirt, moss and pebbles packed around the post feet. */
+/** Packed dirt and moss the posts sink into. Irregular so it does not read as a platform. */
 const groundBedSx: SxObject = {
   '&::after': {
     background:
-      'radial-gradient(ellipse at 26% 48%, var(--forest-rock) 0 3.4px, transparent 4.2px), radial-gradient(ellipse at 74% 58%, var(--forest-rock-light) 0 2.8px, transparent 3.6px)',
+      'radial-gradient(ellipse at 16% 58%, var(--forest-rock) 0 4px, transparent 5px), radial-gradient(ellipse at 82% 64%, var(--forest-rock-light) 0 3.4px, transparent 4.4px), radial-gradient(ellipse at 48% 78%, var(--forest-rock) 0 2.8px, transparent 3.6px), radial-gradient(ellipse at 64% 42%, var(--forest-rock-light) 0 2.2px, transparent 3px)',
     content: '""',
     inset: 0,
     position: 'absolute',
   },
   '&::before': {
     background:
-      'radial-gradient(ellipse at 22% 36%, var(--forest-canopy) 0 5px, transparent 6px), radial-gradient(ellipse at 78% 30%, var(--forest-canopy-pine) 0 4.5px, transparent 5.5px)',
+      'radial-gradient(ellipse at 10% 22%, var(--forest-canopy) 0 18px, transparent 20px), radial-gradient(ellipse at 90% 18%, var(--forest-canopy-pine) 0 16px, transparent 18px), radial-gradient(ellipse at 38% 8%, var(--forest-canopy-light) 0 14px, transparent 16px), radial-gradient(ellipse at 70% 12%, var(--forest-canopy-maple) 0 12px, transparent 14px), radial-gradient(ellipse at 52% 86%, var(--forest-grass) 0 28px, transparent 32px)',
     content: '""',
     inset: 0,
     position: 'absolute',
   },
   background:
-    'radial-gradient(ellipse at 32% 50%, var(--forest-sand) 0 28%, transparent 48%), radial-gradient(ellipse at 68% 50%, var(--forest-sand) 0 28%, transparent 48%)',
-  height: 16,
+    'radial-gradient(ellipse at 24% 58%, var(--forest-sand) 0 34%, transparent 62%), radial-gradient(ellipse at 76% 62%, var(--forest-sand) 0 30%, transparent 58%), radial-gradient(ellipse at 48% 72%, var(--forest-path) 0 26%, transparent 52%), radial-gradient(ellipse at 58% 40%, var(--forest-path) 0 16%, transparent 38%)',
+  height: 44,
   left: '50%',
   pointerEvents: 'none',
   position: 'absolute',
-  top: 4,
+  top: 2,
   transform: 'translateX(-50%)',
-  width: 78,
+  width: 320,
+};
+
+/** Grass and dirt eating the bottom edge of the board so the rectangle dissolves. */
+const groundFringeSx: SxObject = {
+  background:
+    'radial-gradient(ellipse at 12% 70%, var(--forest-canopy) 0 16px, transparent 18px), radial-gradient(ellipse at 30% 90%, var(--forest-grass) 0 22px, transparent 24px), radial-gradient(ellipse at 52% 78%, var(--forest-canopy-light) 0 18px, transparent 20px), radial-gradient(ellipse at 74% 92%, var(--forest-grass) 0 20px, transparent 22px), radial-gradient(ellipse at 90% 68%, var(--forest-canopy-pine) 0 14px, transparent 16px), radial-gradient(ellipse at 44% 100%, var(--forest-sand) 0 12px, transparent 14px)',
+  bottom: LANDMARK_POST_HEIGHT - 8,
+  height: 36,
+  left: '50%',
+  pointerEvents: 'none',
+  position: 'absolute',
+  transform: 'translateX(-50%)',
+  width: 300,
+  zIndex: 4,
 };
 
 /** Two posts sinking the board into the dirt bed below it. */
 const postsSx: SxObject = {
-  '&::after': { right: '22%' },
-  '&::before': { left: '22%' },
+  '&::after': { right: '18%' },
+  '&::before': { left: '18%' },
   '&::before, &::after': {
     background:
-      'linear-gradient(90deg, var(--forest-wood-dark), var(--forest-wood) 40%, var(--forest-wood-dark))',
-    borderRadius: '2px 2px 1px 1px',
+      'linear-gradient(90deg, var(--forest-wood-dark), var(--forest-wood) 38%, var(--forest-wood-light) 52%, var(--forest-wood-dark))',
+    borderRadius: '3px 3px 1px 1px',
     bottom: -LANDMARK_POST_HEIGHT,
     content: '""',
-    height: LANDMARK_POST_HEIGHT + 10,
+    height: LANDMARK_POST_HEIGHT + 16,
     position: 'absolute',
-    width: 8,
+    width: 11,
   },
   position: 'relative',
 };
@@ -152,6 +165,7 @@ export function ForestLandmark({
     >
       <Box aria-hidden="true" sx={groundShadowSx} />
       <Box aria-hidden="true" sx={groundBedSx} />
+      <Box aria-hidden="true" sx={groundFringeSx} />
       <Box sx={stackSx}>
         <Box sx={postsSx}>
           <Box data-role="forest-frame" sx={frameSx}>

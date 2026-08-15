@@ -171,6 +171,7 @@ describe('homepage without scripting', () => {
 
     // The world itself, not just a wash: a terrain bitmap and carved boards.
     expect(shell).toContain('data-forest-world');
+    expect(shell).toContain(`/forest-ground/${DEFAULT_FOREST_SEED}/light.png`);
     expect(shell).toContain('data:image/png;base64,');
     expect(shell).toContain('data-forest-landmark');
     expect(shell).toContain('data-forest-minimap');

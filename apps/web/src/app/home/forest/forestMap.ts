@@ -490,18 +490,29 @@ const riverDistance = (x: number, y: number, rows: number) => {
 };
 
 /**
- * Layered distance fields and value noise produce the underlying geography:
- * an irregular coast, a multi-lobed inland lake feeding a winding river, open
- * meadow basins, wetlands around water, and forest floor everywhere between.
- * Boundaries are soft and warped. Lake and meadow centres move with the seed.
+ * Continuous distance fields for one sample. Collision classifies these into
+ * tiles; the ground painter lerps colours across the same numbers so a coast
+ * can curve instead of printing 48px stairs.
  */
-function baseTerrainAt(
+export type TerrainFields = {
+  island: number;
+  lakeField: number;
+  lakeShore: number;
+  meadowBasin: number;
+  meadowMix: number;
+  meadowNoise: number;
+  river: number;
+  riverShore: number;
+  riverWidth: number;
+};
+
+function terrainFieldsAt(
   x: number,
   y: number,
   columns: number,
   rows: number,
   visual = false,
-): TerrainKind {
+): TerrainFields {
   const warpX = (valueNoise(x, y, 11, 71) - 0.5) * 4.2;
   const warpY = (valueNoise(x, y, 13, 73) - 0.5) * 4.2;
   const centreX = (columns - 1) / 2 + (hashUnit(0, 0, 201) - 0.5) * 3;
@@ -509,22 +520,13 @@ function baseTerrainAt(
   const radiusX = columns * (0.46 + hashUnit(0, 0, 205) * 0.04);
   const radiusY = rows * (0.47 + hashUnit(0, 0, 207) * 0.04);
   const ripple = visual
-    ? (valueNoise(x, y, 0.42, 401) - 0.5) * 0.24 + (valueNoise(x, y, 0.16, 403) - 0.5) * 0.12
+    ? (valueNoise(x, y, 1.15, 401) - 0.5) * 0.2 + (valueNoise(x, y, 2.4, 403) - 0.5) * 0.1
     : 0;
   const island =
     Math.hypot((x + warpX - centreX) / radiusX, (y + warpY - centreY) / radiusY) +
     (valueNoise(x, y, 8, 3) - 0.5) * 0.12 +
     (valueNoise(x, y, 19, 5) - 0.5) * 0.08 +
     ripple;
-  if (island > 1.06) {
-    return 'ocean';
-  }
-  if (island > 0.96) {
-    return 'shallow';
-  }
-  if (island > 0.88) {
-    return 'sand';
-  }
 
   const lakeCx = 28 + hashUnit(0, 0, 231) * 14;
   const lakeCy = 30 + hashUnit(0, 0, 233) * 16;
@@ -541,25 +543,11 @@ function baseTerrainAt(
     (y - (52 + hashUnit(0, 0, 240) * 18)) / 3.6,
   );
   const lakeRipple = visual
-    ? (valueNoise(x, y, 0.38, 407) - 0.5) * 0.2 + (valueNoise(x, y, 0.14, 409) - 0.5) * 0.1
+    ? (valueNoise(x, y, 1.05, 407) - 0.5) * 0.18 + (valueNoise(x, y, 2.2, 409) - 0.5) * 0.08
     : 0;
   const lakeField = Math.min(lakeMain, lakeCove, pond) + lakeRipple;
-  if (lakeField < 0.88) {
-    return 'lake';
-  }
-  if (lakeField < 1.16) {
-    return valueNoise(x, y, 4, 79) > 0.42 ? 'shallow' : 'wetland';
-  }
-
   const river = riverDistance(x + warpX * 0.35, y + warpY * 0.35, rows);
   const riverWidth = 1.05 + valueNoise(x, y, 7, 83) * 0.9;
-  if (river < riverWidth) {
-    return 'lake';
-  }
-  if (river < riverWidth + 1.1) {
-    return valueNoise(x, y, 5, 89) > 0.35 ? 'wetland' : 'shallow';
-  }
-
   const meadowNoise = valueNoise(x, y, 12, 11) * 0.55 + valueNoise(x, y, 25, 13) * 0.45;
   const meadowAx = 14 + hashUnit(0, 0, 241) * 10;
   const meadowAy = 20 + hashUnit(0, 0, 243) * 10;
@@ -569,7 +557,63 @@ function baseTerrainAt(
     Math.hypot((x - meadowAx) / 16, (y - meadowAy) / 13),
     Math.hypot((x - meadowBx) / 18, (y - meadowBy) / 16),
   );
-  return meadowNoise > 0.55 || meadowBasin < 0.72 ? 'meadow' : 'grass';
+  const meadowMix = Math.min(
+    1,
+    Math.max(0, (meadowNoise - 0.42) / 0.28) + Math.max(0, (0.82 - meadowBasin) / 0.22),
+  );
+
+  return {
+    island,
+    lakeField,
+    lakeShore: valueNoise(x, y, 4, 79),
+    meadowBasin,
+    meadowMix,
+    meadowNoise,
+    river,
+    riverShore: valueNoise(x, y, 5, 89),
+    riverWidth,
+  };
+}
+
+function classifyTerrain(fields: TerrainFields): TerrainKind {
+  if (fields.island > 1.06) {
+    return 'ocean';
+  }
+  if (fields.island > 0.96) {
+    return 'shallow';
+  }
+  if (fields.island > 0.88) {
+    return 'sand';
+  }
+  if (fields.lakeField < 0.88) {
+    return 'lake';
+  }
+  if (fields.lakeField < 1.16) {
+    return fields.lakeShore > 0.42 ? 'shallow' : 'wetland';
+  }
+  if (fields.river < fields.riverWidth) {
+    return 'lake';
+  }
+  if (fields.river < fields.riverWidth + 1.1) {
+    return fields.riverShore > 0.35 ? 'wetland' : 'shallow';
+  }
+  return fields.meadowNoise > 0.55 || fields.meadowBasin < 0.72 ? 'meadow' : 'grass';
+}
+
+/**
+ * Layered distance fields and value noise produce the underlying geography:
+ * an irregular coast, a multi-lobed inland lake feeding a winding river, open
+ * meadow basins, wetlands around water, and forest floor everywhere between.
+ * Boundaries are soft and warped. Lake and meadow centres move with the seed.
+ */
+function baseTerrainAt(
+  x: number,
+  y: number,
+  columns: number,
+  rows: number,
+  visual = false,
+): TerrainKind {
+  return classifyTerrain(terrainFieldsAt(x, y, columns, rows, visual));
 }
 
 const distanceTo = (x: number, y: number, plot: ForestPlot) =>
@@ -1114,12 +1158,15 @@ const GROVE_OFFSETS: ReadonlyArray<readonly [number, number]> = [
   [6, 2],
   [-5, 0],
   [5, 0],
+  [-4, -1],
+  [4, -1],
   [-6, -2],
   [6, -2],
   [-5, -3],
   [5, -3],
-  [-3, -5],
-  [3, -5],
+  [-3, -10],
+  [3, -10],
+  [0, -10],
 ];
 
 /**
@@ -1146,6 +1193,9 @@ function plantGroveSentinels(
       if (isUnderBoard(x, y, plots) || occupied.has(`${x},${y}`)) {
         continue;
       }
+      if (plots.some((other) => Math.abs(other.tileX - x) <= 2 && Math.abs(other.tileY - y) <= 2)) {
+        continue;
+      }
       const kind = terrain[y]?.[x];
       if (!kind || !(PLANTABLE.has(kind) || kind === 'wetland')) {
         continue;
@@ -1157,7 +1207,7 @@ function plantGroveSentinels(
           : pickTreeKind(x, y, kind, 0.65, terrain);
       scenery.push({
         kind: sentinelKind,
-        scale: spriteScale(x, y, sentinelKind === 'bush' ? 0.7 : 0.65),
+        scale: spriteScale(x, y, sentinelKind === 'bush' ? 0.55 : 0.32),
         tileX: x,
         tileY: y,
       });
@@ -1292,36 +1342,57 @@ export function buildForestWorld(
 /**
  * Sub-tile sample used to paint the ground bitmap. Routes stay on the discrete
  * grid so the walker and the drawing agree. Biomes are re-evaluated at
- * fractional coordinates, then domain-warped with high-frequency noise so
- * coastlines and lake shores break into irregular blobs instead of 8-bit stairs.
+ * fractional coordinates, then domain-warped at tile scale so coastlines
+ * wander instead of printing concentric stairs. Fine per-pixel noise is
+ * avoided — it made the PNG huge without reading as a softer shore.
  */
-export function visualTerrainAt(world: ForestWorld, fx: number, fy: number): TerrainKind {
+export type VisualTerrainSample = {
+  fields: TerrainFields | null;
+  kind: TerrainKind;
+  route: boolean;
+};
+
+/**
+ * Same sample the bitmap painter uses. Routes stay snapped to the collision
+ * grid. Everything else re-evaluates the distance field at a warped
+ * fractional coordinate so the PNG can lerp a coast instead of a stair.
+ */
+export function visualTerrainSample(
+  world: ForestWorld,
+  fx: number,
+  fy: number,
+): VisualTerrainSample {
   const tileX = Math.min(world.columns - 1, Math.max(0, Math.floor(fx)));
   const tileY = Math.min(world.rows - 1, Math.max(0, Math.floor(fy)));
   const discrete = world.terrain[tileY]?.[tileX] ?? 'ocean';
   if (ROUTE_KINDS.has(discrete)) {
-    return discrete;
+    return { fields: null, kind: discrete, route: true };
   }
   const previous = activeSeed;
   activeSeed = world.seed;
   try {
     const jx =
-      (valueNoise(fx, fy, 0.52, 311) - 0.5) * 1.35 + (valueNoise(fx, fy, 0.2, 317) - 0.5) * 0.55;
+      (valueNoise(fx, fy, 1.2, 311) - 0.5) * 2.15 + (valueNoise(fx, fy, 2.6, 317) - 0.5) * 0.9;
     const jy =
-      (valueNoise(fx, fy, 0.58, 313) - 0.5) * 1.35 + (valueNoise(fx, fy, 0.22, 319) - 0.5) * 0.55;
+      (valueNoise(fx, fy, 1.3, 313) - 0.5) * 2.15 + (valueNoise(fx, fy, 2.8, 319) - 0.5) * 0.9;
     const sx = fx + jx;
     const sy = fy + jy;
-    const land = baseTerrainAt(sx, sy, world.columns, world.rows, true);
-    if (land === 'grass' || land === 'meadow' || land === 'wetland') {
+    const fields = terrainFieldsAt(sx, sy, world.columns, world.rows, true);
+    let kind = classifyTerrain(fields);
+    if (kind === 'grass' || kind === 'meadow' || kind === 'wetland') {
       const band = mountainBandAt(sx, sy, world.columns, world.rows);
       if (band && nearestPlotDistance(sx, sy, world.plots) >= PLOT_PROTECT_RADIUS + 0.5) {
-        return band;
+        kind = band;
       }
     }
-    return land;
+    return { fields, kind, route: false };
   } finally {
     activeSeed = previous;
   }
+}
+
+export function visualTerrainAt(world: ForestWorld, fx: number, fy: number): TerrainKind {
+  return visualTerrainSample(world, fx, fy).kind;
 }
 
 /** Collapses one row of values into `{ start, length, value }` spans. */

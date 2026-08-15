@@ -34,16 +34,6 @@ export const CRITTER_ID: Record<CritterKind, string> = {
   rabbit: 'forest-rabbit',
 };
 
-export const PIXELATE_FILTER_ID = 'forest-pixelate';
-
-/**
- * Snap photographs to a 2px grid and dilate by 1px. The old 8px / radius-4
- * mosaic turned faces into unreadable blobs; this is a slight pixel snap so a
- * portrait still reads as a person on a wooden board.
- */
-export const PIXELATE_CELL_PX = 2;
-export const PIXELATE_DILATE_RADIUS = 1;
-
 export const SPRITE_VIEWBOX: Record<SceneryKind, string> = {
   birch: '0 0 24 32',
   bloom: '0 0 16 16',
@@ -71,28 +61,28 @@ export const CRITTER_VIEWBOX: Record<CritterKind, string> = {
 
 /** Multiples of a tile. Trees overhang their tile so the canopy layers overlap. */
 export const SPRITE_SCALE: Record<SceneryKind, { height: number; width: number }> = {
-  birch: { height: 2.6, width: 1.5 },
-  bloom: { height: 0.7, width: 0.7 },
-  bush: { height: 1.05, width: 1.6 },
-  cedar: { height: 3.1, width: 1.35 },
-  dead: { height: 2.4, width: 1.5 },
-  fruit: { height: 2.3, width: 1.9 },
-  log: { height: 0.7, width: 1.9 },
-  maple: { height: 2.55, width: 2.15 },
-  oak: { height: 2.45, width: 2.2 },
-  pine: { height: 2.9, width: 1.7 },
-  reed: { height: 1.35, width: 0.9 },
-  rock: { height: 0.85, width: 1.15 },
-  stump: { height: 0.85, width: 1 },
-  willow: { height: 2.35, width: 2.5 },
+  birch: { height: 3.15, width: 1.8 },
+  bloom: { height: 0.85, width: 0.85 },
+  bush: { height: 1.25, width: 1.9 },
+  cedar: { height: 3.7, width: 1.6 },
+  dead: { height: 2.9, width: 1.8 },
+  fruit: { height: 2.8, width: 2.25 },
+  log: { height: 0.8, width: 2.1 },
+  maple: { height: 3.1, width: 2.55 },
+  oak: { height: 3, width: 2.65 },
+  pine: { height: 3.5, width: 2.05 },
+  reed: { height: 1.55, width: 1.05 },
+  rock: { height: 1, width: 1.35 },
+  stump: { height: 1, width: 1.15 },
+  willow: { height: 2.85, width: 3 },
 };
 
 export const CRITTER_SCALE: Record<CritterKind, { height: number; width: number }> = {
-  bird: { height: 0.85, width: 1.35 },
-  deer: { height: 1.65, width: 2.05 },
-  fish: { height: 0.6, width: 1.05 },
-  fox: { height: 1.15, width: 1.55 },
-  rabbit: { height: 0.95, width: 1.05 },
+  bird: { height: 1, width: 1.6 },
+  deer: { height: 1.95, width: 2.45 },
+  fish: { height: 0.7, width: 1.25 },
+  fox: { height: 1.35, width: 1.85 },
+  rabbit: { height: 1.15, width: 1.25 },
 };
 
 export const WINDY_KINDS: ReadonlySet<SceneryKind> = new Set<SceneryKind>([
@@ -115,21 +105,6 @@ function TreeShadow() {
 export function ForestSpriteDefs() {
   return (
     <defs>
-      <filter
-        colorInterpolationFilters="sRGB"
-        height="100%"
-        id={PIXELATE_FILTER_ID}
-        width="100%"
-        x="0"
-        y="0"
-      >
-        <feFlood height="1" width="1" x={PIXELATE_CELL_PX / 2} y={PIXELATE_CELL_PX / 2} />
-        <feComposite height={PIXELATE_CELL_PX} width={PIXELATE_CELL_PX} />
-        <feTile result="a" />
-        <feComposite in="SourceGraphic" in2="a" operator="in" />
-        <feMorphology operator="dilate" radius={PIXELATE_DILATE_RADIUS} />
-      </filter>
-
       <symbol id={SPRITE_ID.pine} viewBox="0 0 24 32">
         <TreeShadow />
         <rect fill="var(--forest-bark-dark)" height="8" width="2.2" x="10.9" y="22" />

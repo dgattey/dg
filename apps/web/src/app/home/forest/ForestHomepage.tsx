@@ -15,6 +15,7 @@ import { ForestLandmark } from './ForestLandmark';
 import { ForestMinimap } from './ForestMinimap';
 import { ForestScene } from './ForestScene';
 import { ForestTerrain } from './ForestTerrain';
+import { FOREST_FIXED_CARD_IDS } from './forestCards';
 import { buildForestWorld, DEFAULT_FOREST_SEED, toBlockedMask } from './forestMap';
 import { boardMediaSx } from './forestMaterials';
 import { FOREST_COLOR_VARS } from './forestPalette';
@@ -107,6 +108,13 @@ function ForestWorldStyles() {
     body:has([${FOREST_WORLD_ATTRIBUTE}]) [data-site-header] button,
     body:has([${FOREST_WORLD_ATTRIBUTE}]) [data-site-header] [data-header-capsule]{
       pointer-events:auto;
+    }
+    [${FOREST_WORLD_ATTRIBUTE}] [data-forest-pixelate]{
+      contain-intrinsic-size:300px 360px;
+      content-visibility:auto;
+    }
+    [${FOREST_WORLD_ATTRIBUTE}] [data-forest-landmark] img{
+      content-visibility:auto;
     }`;
   return (
     <style
@@ -126,25 +134,32 @@ export async function ForestHomepage({ seed }: { seed?: number } = {}) {
 
   // The grid's interleave order, shifted by one because the intro's portrait and
   // copy get a clearing each here instead of sharing a slot.
-  const preciselyPlacedCards = new Map<number, PlantedCard>([
-    [0, { id: 'intro-image', label: 'About', node: <ForestIntroImageSlot /> }],
-    [1, { id: 'intro-text', label: 'Hey friends', node: <ForestIntroTextSlot /> }],
-    [
-      2,
-      {
-        id: 'map',
-        label: 'Where I am',
-        node: (
-          <Box sx={boardMediaSx}>
-            <MapCardSlot />
-          </Box>
-        ),
-      },
-    ],
-    [4, { id: 'spotify', label: 'Now playing', node: <SpotifyCardSlot glowVariant="ambient" /> }],
-    [5, { id: 'strava', label: 'Latest activity', node: <StravaCardSlot /> }],
-    [8, { id: 'gattey-sites', label: 'Side projects', node: <GatteySitesCardSlot /> }],
-  ]);
+  const cardById: Record<string, PlantedCard> = {
+    'gattey-sites': { id: 'gattey-sites', label: 'Side projects', node: <GatteySitesCardSlot /> },
+    'intro-image': { id: 'intro-image', label: 'About', node: <ForestIntroImageSlot /> },
+    'intro-text': { id: 'intro-text', label: 'Hey friends', node: <ForestIntroTextSlot /> },
+    map: {
+      id: 'map',
+      label: 'Where I am',
+      node: (
+        <Box sx={boardMediaSx}>
+          <MapCardSlot />
+        </Box>
+      ),
+    },
+    spotify: {
+      id: 'spotify',
+      label: 'Now playing',
+      node: <SpotifyCardSlot glowVariant="ambient" />,
+    },
+    strava: { id: 'strava', label: 'Latest activity', node: <StravaCardSlot /> },
+  };
+  const preciselyPlacedCards = new Map<number, PlantedCard>(
+    [...FOREST_FIXED_CARD_IDS.entries()].flatMap(([index, id]) => {
+      const card = cardById[id];
+      return card ? [[index, card] as const] : [];
+    }),
+  );
 
   const planted = mergeCards(projectCards, preciselyPlacedCards).filter(
     (card): card is PlantedCard => card !== undefined,

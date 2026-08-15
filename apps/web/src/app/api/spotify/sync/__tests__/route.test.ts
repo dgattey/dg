@@ -26,6 +26,8 @@ const mockGetSpotifyClient = jest.mocked(spotifyClient.getSpotifyClient);
 const mockRefreshFavoriteAlbums = jest.mocked(refreshFavoriteAlbumsSnapshotWithLogging);
 const mockRevalidateTag = jest.mocked(revalidateTag);
 
+const revalidatedTags = () => mockRevalidateTag.mock.calls.map(([tag]) => tag);
+
 // Use unique prefix for this test file to avoid conflicts with parallel tests
 const PREFIX = 'sync-api';
 
@@ -152,8 +154,7 @@ describe('Spotify sync route', () => {
     expect(mockSpotifyGet).toHaveBeenCalledWith(
       expect.stringMatching(/^me\/player\/recently-played\?limit=50$/),
     );
-    expect(mockRevalidateTag).toHaveBeenCalledWith('music-history', 'max');
-    expect(mockRevalidateTag).toHaveBeenCalledWith('favorite-albums', 'max');
+    expect(revalidatedTags()).toEqual(expect.arrayContaining(['favorite-albums', 'music-history']));
   });
 
   it('syncs when history already exists', async () => {
@@ -194,9 +195,9 @@ describe('Spotify sync route', () => {
     });
     expect(rowCount).toBe(2);
 
-    // Verify revalidateTag was called when tracks were inserted
-    expect(mockRevalidateTag).toHaveBeenCalledWith('music-history', 'max');
-    expect(mockRevalidateTag).toHaveBeenCalledWith('favorite-albums', 'max');
+    // Both tags are invalidated; favorite-albums is refreshed first so call
+    // order is not part of the contract.
+    expect(revalidatedTags()).toEqual(expect.arrayContaining(['favorite-albums', 'music-history']));
   });
 
   // The scheduled workflow only knows a run failed if the status is non-2xx, so

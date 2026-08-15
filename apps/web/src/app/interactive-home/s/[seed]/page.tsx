@@ -26,11 +26,25 @@ async function SeededIsland({ params }: { params: Promise<{ seed: string }> }) {
 /**
  * One seeded island. The proxy rewrites `/` here with a seed from a
  * prerendered deck, so the HTML is complete for that map — no flag read, no
- * `connection()`, no blank fallback. Direct hits are redirected home.
+ * `connection()`. The Suspense fallback is an ocean wash, not a second copy
+ * of the default island: shipping two full maps in every document was ~1.7 MB
+ * and wrecked first paint. Direct hits are redirected home.
  */
+function OceanFallback() {
+  return (
+    <div
+      aria-hidden="true"
+      style={{
+        backgroundColor: 'light-dark(hsl(196deg 58% 58%), hsl(196deg 64% 13%))',
+        height: '100dvh',
+      }}
+    />
+  );
+}
+
 export default function Page({ params }: { params: Promise<{ seed: string }> }) {
   return (
-    <Suspense fallback={<ForestHomepage seed={DEFAULT_FOREST_SEED} />}>
+    <Suspense fallback={<OceanFallback />}>
       <SeededIsland params={params} />
     </Suspense>
   );

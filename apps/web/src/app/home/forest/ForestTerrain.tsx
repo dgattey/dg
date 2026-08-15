@@ -10,8 +10,8 @@ import {
   SPRITE_VIEWBOX,
   WINDY_KINDS,
 } from './ForestSprites';
+import { forestGroundPath } from './forestGround';
 import { type ForestWorld, layerZ, TILE_SIZE } from './forestMap';
-import { forestTerrainDataUrls, forestWaterMaskDataUrl } from './forestTerrainBitmap';
 
 /**
  * The island itself, painted on the server as one blended bitmap plus stamped
@@ -30,6 +30,7 @@ const bitmapSx = (light: string, dark: string, width: number, height: number): S
   backgroundImage: `light-dark(url("${light}"), url("${dark}"))`,
   backgroundRepeat: 'no-repeat',
   backgroundSize: '100% 100%',
+  filter: 'blur(1.15px)',
   height,
   imageRendering: 'auto',
   left: 0,
@@ -82,8 +83,9 @@ function stampStyle(tileX: number, tileY: number, width: number, height: number,
 export function ForestTerrain({ world }: { world: ForestWorld }) {
   const width = world.columns * TILE_SIZE;
   const height = world.rows * TILE_SIZE;
-  const terrain = forestTerrainDataUrls(world);
-  const waterMask = forestWaterMaskDataUrl(world);
+  const light = forestGroundPath(world.seed, 'light.png');
+  const dark = forestGroundPath(world.seed, 'dark.png');
+  const waterMask = forestGroundPath(world.seed, 'water.png');
 
   return (
     <>
@@ -98,7 +100,7 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
       >
         <ForestSpriteDefs />
       </svg>
-      <Box aria-hidden="true" sx={bitmapSx(terrain.light, terrain.dark, width, height)} />
+      <Box aria-hidden="true" sx={bitmapSx(light, dark, width, height)} />
       <Box aria-hidden="true" className="forest-wave" sx={waveSx(waterMask)} />
       <Box aria-hidden="true" className="forest-ripple" sx={rippleSx(waterMask)} />
       {world.scenery.map((sprite, index) => {
