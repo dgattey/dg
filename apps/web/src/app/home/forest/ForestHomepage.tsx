@@ -20,23 +20,7 @@ import { buildForestWorld, DEFAULT_FOREST_SEED, toBlockedMask } from './forestMa
 import { boardMediaSx } from './forestMaterials';
 import { FOREST_COLOR_VARS } from './forestPalette';
 
-/**
- * The homepage as a full-page walkable island, behind `interactive-redesign`.
- *
- * The world owns the viewport: it breaks out of the page container, sits flush
- * under the header and floods the ocean to every edge, so there is no card frame
- * or cream page around it. The header stays put but is restyled into the world's
- * HUD material by `ForestWorldStyles`. Same cards, same data, same links as the
- * grid — planted on carved boards along a trail instead of laid out in a grid.
- *
- * Seed strategy: the proxy rolls a seed from a prerendered deck and rewrites
- * `/` to `/interactive-home/s/:seed`. This component just builds that island.
- * Same seed always yields the same markup (SSR == hydration). A brand-new
- * uint32 every request generated the bitmap on the hot path (~1.5s+ TTFB);
- * the deck keeps first paint cheap. Reloads usually get a different map.
- * Tests pass `seed` directly. If none is passed, the default seed is used so
- * the unsuffixed route can still prerender a complete island at build time.
- */
+/** Flag-on homepage. Builds the island for a seed the proxy already chose. */
 
 type PlantedCard = {
   id: string;
@@ -49,10 +33,6 @@ export const FOREST_WORLD_ATTRIBUTE = 'data-forest-world';
 
 const forestPageSx: SxObject = {
   ...FOREST_COLOR_VARS,
-  // Break out of the centered page container to true viewport width, then pull
-  // up under the sticky header so the terrain — not a strip of page background —
-  // is what sits behind the site chrome. The header keeps its space in flow, so
-  // the world still measures exactly one viewport tall.
   marginInline: 'calc(50% - 50dvw)',
   marginTop: 'calc(-1 * var(--site-header-height, 5rem))',
   position: 'relative',
@@ -73,21 +53,6 @@ const srOnlySx: SxObject = {
   width: '1px',
 };
 
-/**
- * Scoped global style, active only while a forest world is in the DOM. It hands
- * the world's material tokens to the header (which lives above this subtree),
- * removes the page spacing that used to box the world in, and swaps the header's
- * frosted-glass capsule for the same HUD material the minimap and hint use.
- *
- * It also stops the header swallowing the top of the world. The header is a
- * full-width transparent band roughly 120px tall, and the world is pulled up
- * underneath it, so every wheel event in that strip — a seventh of a laptop
- * screen, and the strip the minimap sits in — landed on the header and scrolled
- * nothing. Only the parts with chrome on them take input now.
- *
- * Written as a plain `<style>` so it needs no client component and disappears
- * with the world when the flag is off.
- */
 function ForestWorldStyles() {
   const tokens = Object.entries(FOREST_COLOR_VARS as Record<string, string>)
     .map(([name, value]) => `${name}:${value}`)
@@ -136,8 +101,6 @@ export async function ForestHomepage({ seed }: { seed?: number } = {}) {
     node: <ProjectCard {...project} />,
   }));
 
-  // The grid's interleave order, shifted by one because the intro's portrait and
-  // copy get a clearing each here instead of sharing a slot.
   const cardById: Record<string, PlantedCard> = {
     'gattey-sites': { id: 'gattey-sites', label: 'Side projects', node: <GatteySitesCardSlot /> },
     'intro-image': { id: 'intro-image', label: 'About', node: <ForestIntroImageSlot /> },
@@ -199,7 +162,6 @@ export async function ForestHomepage({ seed }: { seed?: number } = {}) {
               label={card.label}
               tileX={plot.tileX}
               tileY={plot.tileY}
-              variant="board"
             >
               {card.node}
             </ForestLandmark>

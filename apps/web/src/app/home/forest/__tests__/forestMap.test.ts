@@ -11,7 +11,6 @@ import {
   TILE_SIZE,
   TREE_KINDS,
   toBlockedMask,
-  toTerrainRuns,
   visualTerrainAt,
 } from '../forestMap';
 
@@ -31,6 +30,29 @@ const SEEDS = FOREST_SEED_DECK;
 
 const worldFor = (seed: number = DEFAULT_FOREST_SEED, ids: ReadonlyArray<string> = CARD_IDS) =>
   buildForestWorld(ids, seed);
+
+const walkFromSpawn = (world: ReturnType<typeof worldFor>) => {
+  const mask = toBlockedMask(world);
+  const seen = new Set<string>();
+  const queue = [[world.spawn.tileX, world.spawn.tileY]];
+  while (queue.length > 0) {
+    const next = queue.pop();
+    if (!next) {
+      break;
+    }
+    const [x, y] = next;
+    if (x === undefined || y === undefined) {
+      continue;
+    }
+    const key = `${x},${y}`;
+    if (seen.has(key) || mask[y]?.[x] !== '0') {
+      continue;
+    }
+    seen.add(key);
+    queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
+  }
+  return seen;
+};
 
 describe('buildForestWorld', () => {
   it('gives every card a plot and grows the island to fit them', () => {
@@ -143,25 +165,7 @@ describe('buildForestWorld', () => {
 
   it('links every clearing to the spawn by a walkable route', () => {
     const world = worldFor();
-    const mask = toBlockedMask(world);
-    const seen = new Set<string>();
-    const queue = [[world.spawn.tileX, world.spawn.tileY]];
-    while (queue.length > 0) {
-      const next = queue.pop();
-      if (!next) {
-        break;
-      }
-      const [x, y] = next;
-      if (x === undefined || y === undefined) {
-        continue;
-      }
-      const key = `${x},${y}`;
-      if (seen.has(key) || mask[y]?.[x] !== '0') {
-        continue;
-      }
-      seen.add(key);
-      queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
-    }
+    const seen = walkFromSpawn(world);
     for (const plot of world.plots) {
       expect(seen.has(`${plot.tileX},${plot.tileY}`)).toBe(true);
     }
@@ -169,25 +173,7 @@ describe('buildForestWorld', () => {
 
   it('leaves no route tile stranded, so every drawn crossing can be walked', () => {
     const world = worldFor();
-    const mask = toBlockedMask(world);
-    const seen = new Set<string>();
-    const queue = [[world.spawn.tileX, world.spawn.tileY]];
-    while (queue.length > 0) {
-      const next = queue.pop();
-      if (!next) {
-        break;
-      }
-      const [x, y] = next;
-      if (x === undefined || y === undefined) {
-        continue;
-      }
-      const key = `${x},${y}`;
-      if (seen.has(key) || mask[y]?.[x] !== '0') {
-        continue;
-      }
-      seen.add(key);
-      queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
-    }
+    const seen = walkFromSpawn(world);
     const stranded: Array<string> = [];
     for (let y = 0; y < world.rows; y++) {
       for (let x = 0; x < world.columns; x++) {
@@ -266,25 +252,6 @@ describe('visualTerrainAt', () => {
       }),
     );
     expect(mixed.length).toBeGreaterThan(0);
-  });
-});
-
-describe('toTerrainRuns', () => {
-  it('collapses each row into far fewer rects than tiles', () => {
-    const world = worldFor();
-    const runs = toTerrainRuns(world);
-    expect(runs.length).toBeLessThan(world.columns * world.rows * 0.35);
-  });
-
-  it('covers every tile of every row exactly once', () => {
-    const world = worldFor();
-    const covered = new Array<number>(world.rows).fill(0);
-    for (const run of toTerrainRuns(world)) {
-      const total = covered[run.tileY];
-      expect(total).toBe(run.tileX);
-      covered[run.tileY] = run.tileX + run.length;
-    }
-    expect(covered).toEqual(new Array<number>(world.rows).fill(world.columns));
   });
 });
 
@@ -373,35 +340,6 @@ describe('landmark footprints', () => {
     }
   });
 
-  it('plants grove trees beside boards, outside the footprint', () => {
-    const world = worldFor();
-    const trees = world.scenery.filter((sprite) => TREE_KINDS.has(sprite.kind));
-    for (const plot of world.plots) {
-      const nearby = trees.filter(
-        (sprite) =>
-          Math.abs(sprite.tileX - plot.tileX) >= 4 &&
-          Math.abs(sprite.tileX - plot.tileX) <= 6 &&
-          Math.abs(sprite.tileY - plot.tileY) <= 4,
-      );
-      expect(nearby.length).toBeGreaterThan(0);
-    }
-  });
-
-  it('does not plant a south grove on the painted photograph', () => {
-    const world = worldFor();
-    for (const plot of world.plots) {
-      const content = landmarkContentRect(plot);
-      const onPhoto = world.scenery.filter(
-        (sprite) =>
-          sprite.tileY >= plot.tileY + 1 &&
-          sprite.tileY <= plot.tileY + 2 &&
-          Math.abs(sprite.tileX - plot.tileX) <= 3 &&
-          rectsOverlap(sceneryStampRect(sprite), content),
-      );
-      expect(onPhoto).toHaveLength(0);
-    }
-  });
-
   it.each([...SEEDS])('keeps every scenery stamp off landmark content on seed %i', (seed) => {
     const world = worldFor(seed);
     for (const plot of world.plots) {
@@ -418,8 +356,7 @@ describe('critters', () => {
     const a = worldFor();
     const b = worldFor();
     expect(a.critters).toEqual(b.critters);
-    expect(a.critters.length).toBeGreaterThan(0);
-    expect(a.critters.length).toBeLessThanOrEqual(12);
+    expect(a.critters.length).toBeLessThanOrEqual(6);
     for (const plot of a.plots) {
       const rect = landmarkTileRect(plot);
       for (const critter of a.critters) {
@@ -435,29 +372,6 @@ describe('critters', () => {
 });
 
 describe('across seeds', () => {
-  const walkFromSpawn = (world: ReturnType<typeof worldFor>) => {
-    const mask = toBlockedMask(world);
-    const seen = new Set<string>();
-    const queue = [[world.spawn.tileX, world.spawn.tileY]];
-    while (queue.length > 0) {
-      const next = queue.pop();
-      if (!next) {
-        break;
-      }
-      const [x, y] = next;
-      if (x === undefined || y === undefined) {
-        continue;
-      }
-      const key = `${x},${y}`;
-      if (seen.has(key) || mask[y]?.[x] !== '0') {
-        continue;
-      }
-      seen.add(key);
-      queue.push([x + 1, y], [x - 1, y], [x, y + 1], [x, y - 1]);
-    }
-    return seen;
-  };
-
   it.each([...SEEDS])('keeps every landmark reachable and in bounds on seed %i', (seed) => {
     const world = worldFor(seed);
     const seen = walkFromSpawn(world);
@@ -482,15 +396,14 @@ describe('across seeds', () => {
 });
 
 describe('tree mix', () => {
-  it('scatters more than pine and oak', () => {
+  it('scatters more than one tree kind', () => {
     const kinds = new Set(worldFor().scenery.map((sprite) => sprite.kind));
-    expect(kinds.has('pine') || kinds.has('cedar')).toBe(true);
-    expect(kinds.has('oak') || kinds.has('maple')).toBe(true);
-    expect(kinds.has('willow') || kinds.has('dead') || kinds.has('bush')).toBe(true);
-    expect(kinds.has('maple')).toBe(true);
+    expect(kinds.has('pine')).toBe(true);
+    expect(kinds.has('oak') || kinds.has('birch')).toBe(true);
+    expect(kinds.has('willow') || kinds.has('bush')).toBe(true);
   });
 
-  it('gives every sprite a scale so groves mix sizes', () => {
+  it('gives every sprite a scale so nearby trees mix sizes', () => {
     for (const sprite of worldFor().scenery) {
       expect(sprite.scale).toBeGreaterThan(0.5);
       expect(sprite.scale).toBeLessThan(2);

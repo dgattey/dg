@@ -1,6 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { ForestLandmark, PIXELATE_ATTRIBUTE } from '../ForestLandmark';
-import { PIXELATE_CONTRAST, PIXELATE_SATURATE, pixelatedMediaSx } from '../forestMaterials';
+import { ForestLandmark } from '../ForestLandmark';
 
 describe('ForestLandmark', () => {
   it('names the stop with the card label only', () => {
@@ -36,7 +35,7 @@ describe('ForestLandmark', () => {
     expect(container.querySelector('[data-role="forest-shadow"]')).not.toBeNull();
   });
 
-  it('marks photographs for a light filter, not a mosaic', () => {
+  it('leaves photographs as prints, not a mosaic', () => {
     const landmarkId = 'project-a';
     const { container } = render(
       <ForestLandmark id={landmarkId} label="Alpha" tileX={4} tileY={8}>
@@ -45,23 +44,9 @@ describe('ForestLandmark', () => {
       </ForestLandmark>,
     );
 
-    const surface = container.querySelector(`[${PIXELATE_ATTRIBUTE}]`);
-    expect(surface).not.toBeNull();
-    expect(surface?.querySelector('img')?.getAttribute('src')).toBe(
-      'https://example.com/alpha.webp',
-    );
-    expect(PIXELATE_CONTRAST).toBeLessThanOrEqual(1);
-    expect(PIXELATE_SATURATE).toBeLessThanOrEqual(1);
-    expect(pixelatedMediaSx).toEqual(
-      expect.objectContaining({
-        '& img': expect.objectContaining({
-          filter: 'none',
-          imageRendering: 'auto',
-        }),
-      }),
-    );
-    expect(JSON.stringify(pixelatedMediaSx)).not.toContain('sepia');
-    expect(JSON.stringify(pixelatedMediaSx)).not.toContain('pixelated');
-    expect(JSON.stringify(pixelatedMediaSx)).not.toContain('forest-pixelate');
+    const image = container.querySelector('img');
+    expect(image?.getAttribute('src')).toBe('https://example.com/alpha.webp');
+    expect(container.innerHTML).not.toContain('pixelated');
+    expect(container.innerHTML).not.toContain('sepia');
   });
 });

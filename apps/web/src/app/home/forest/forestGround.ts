@@ -1,12 +1,4 @@
-/**
- * Cached ground bitmaps, one URL per seed and layer.
- *
- * The page only emits these paths. The PNG lives at `/forest-ground/:seed/:layer`
- * so a 16-seed deck can reuse the same files across visits instead of inlining
- * a unique ~1.7 MB document each time.
- */
-
-export const FOREST_GROUND_LAYERS = ['dark.png', 'light.png', 'water.png'] as const;
+export const FOREST_GROUND_LAYERS = ['dark.png', 'light.png'] as const;
 
 export type ForestGroundLayer = (typeof FOREST_GROUND_LAYERS)[number];
 

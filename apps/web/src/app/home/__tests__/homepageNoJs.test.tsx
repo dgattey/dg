@@ -3,19 +3,8 @@
  */
 
 /**
- * Guards the no-JS homepage.
- *
- * Both homepage layouts must land in the server-rendered shell, not behind a
- * Suspense boundary. React fills a resolved boundary by writing markup into a
- * hidden container and swapping it in with an inline script, so anything that
- * only arrives that way is invisible with scripting disabled. Truncating at the
- * first `<script>` is what makes these assertions honest: the full streamed
- * markup contains those hidden payloads, so asserting against it passes even
- * when a no-JS visitor would see nothing.
- *
- * This broke once already, for the grid as much as the world, when the layout
- * was chosen by a request-time flag read inside the page. The proxy picks the
- * route now; these tests keep each route's own output honest.
+ * Both homepage layouts must land in the server-rendered shell. Truncating at
+ * the first `<script>` is what makes these assertions honest.
  */
 import { Writable } from 'node:stream';
 import { type ReactElement, Suspense, use } from 'react';

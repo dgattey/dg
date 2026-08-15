@@ -10,15 +10,7 @@ import { layerZ, MINIMAP_MARKER_ROLE, TILE_SIZE } from './forestMap';
 import { hudSurfaceSx } from './forestMaterials';
 import { FOREST_COLOR_VARS } from './forestPalette';
 
-/**
- * The only client component on the forest homepage.
- *
- * Everything visible — terrain, scenery, every card — arrives as server-rendered
- * `children`. This adds a keyboard-driven walker on top: it reads a blocked-tile
- * mask, moves a sprite with `transform`, pans the world under the viewport, and
- * flags the nearest landmark. Movement is written straight to the DOM inside a
- * rAF loop, so walking never triggers a React render.
- */
+/** Client walker. Terrain and cards arrive as server-rendered children. */
 
 const WALK_SPEED_PX_PER_SECOND = 340;
 const CAMERA_EASING = 0.16;
@@ -47,21 +39,8 @@ const clamp = (value: number, low: number, high: number) =>
 
 const normalizeKey = (key: string) => (key.length === 1 ? key.toLowerCase() : key);
 
-/**
- * The scene's outer box, and the thing the HUD is pinned to.
- *
- * The minimap and hint have to live outside the scroller. Inside it they are
- * positioned against the scrolled content, so they slide away with the terrain
- * — the chart was gone 200px into a 4176px island, which is most of the visit
- * for anyone using a mouse or a phone, since the walker only takes over on the
- * first arrow key. Sticky is no help either: it can only travel as far as its
- * parent's box, which here is exactly one viewport tall.
- */
 const sceneShellSx: SxObject = {
   ...FOREST_COLOR_VARS,
-  // The world owns the page: it fills the whole viewport, edge to edge and up
-  // behind the header, with no card frame around it. The ocean floods to every
-  // edge so the island reads as an island, not an image clipped inside a panel.
   backgroundColor: 'var(--forest-ocean)',
   height: '100dvh',
   minHeight: '30rem',
@@ -74,8 +53,6 @@ const viewportSx: SxObject = {
     outlineOffset: -2,
   },
   height: '100%',
-  // Scrollable until someone actually starts walking, so every visitor can reach
-  // every card: no scripting, no keyboard, or just a mouse wheel.
   overflow: 'auto',
   overscrollBehavior: 'contain',
   position: 'relative',
@@ -87,10 +64,6 @@ const WAVE_PERIOD_MS = 5200;
 const WIND_PERIOD_MS = 3800;
 
 const worldSx: SxObject = {
-  '@keyframes forestDrift': {
-    '0%, 100%': { transform: 'translate3d(0, 0, 0)' },
-    '50%': { transform: 'translate3d(16px, -3px, 0)' },
-  },
   '@keyframes forestFly': {
     '0%': { transform: 'translate3d(0, 0, 0)' },
     '50%': { transform: 'translate3d(140px, -16px, 0)' },
@@ -120,10 +93,7 @@ const worldSx: SxObject = {
   '& .forest-critter-bird': {
     animation: 'forestFly 14000ms linear infinite',
   },
-  '& .forest-critter-fish': {
-    animation: `forestDrift ${WAVE_PERIOD_MS}ms ease-in-out infinite`,
-  },
-  '& .forest-critter-rabbit, & .forest-critter-fox, & .forest-critter-deer': {
+  '& .forest-critter-rabbit': {
     animation: 'forestHop 4200ms ease-in-out infinite',
   },
   '& .forest-ripple': {
@@ -165,16 +135,11 @@ const characterAnchorSx: SxObject = {
 const hintSx: SxObject = {
   ...hudSurfaceSx,
   '@media (max-height: 650px)': { display: 'none' },
-  // Nothing here is true without a keyboard, and on a phone it would also crowd
-  // the minimap in the same corner of a very small screen.
   '@media (pointer: coarse)': { display: 'none' },
   borderRadius: '10px',
   bottom: 16,
-  // The only place the controls are written down, so it takes primary text:
-  // secondary over the HUD measured 3.2:1, under the 4.5:1 this size needs.
   color: 'var(--mui-palette-text-primary)',
   left: 16,
-  // Sits at the left so it can never collide with the minimap opposite it.
   maxWidth: 'min(42vw, calc(100% - 8rem))',
   paddingBlock: 0.5,
   paddingInline: 2,
@@ -211,8 +176,6 @@ export function ForestScene({
   const spawnX = spawn.tileX * TILE_SIZE + TILE_SIZE / 2;
   const spawnY = spawn.tileY * TILE_SIZE + TILE_SIZE / 2;
 
-  // Survives effect restarts (a background RSC refresh re-creates the props), so
-  // a data revalidation never teleports someone back to the landing beach.
   const positionRef = useRef({ x: spawnX, y: spawnY });
 
   useEffect(() => {
@@ -258,11 +221,6 @@ export function ForestScene({
       });
     };
 
-    /**
-     * How far to nudge sideways to make a blocked step fit, or null if it never
-     * fits. Clipping the corner of a tree slides you around it instead of
-     * stopping you dead, which is what keeps the woods feeling walkable.
-     */
     const slipFor = (x: number, y: number, isVertical: boolean) => {
       if (canStand(x, y)) {
         return 0;
@@ -275,7 +233,6 @@ export function ForestScene({
       return null;
     };
 
-    /** Keeps the walker centred, stopping the pan once the island's edge is flush. */
     const cameraTargetX = () => {
       const visible = viewport.clientWidth;
       return worldWidth <= visible
@@ -283,8 +240,6 @@ export function ForestScene({
         : clamp(visible / 2 - footX, visible - worldWidth, 0);
     };
 
-    // Sits the walker low in the viewport: boards stand north of the trail.
-    // The minimap lives bottom-right, so the anchor stays above that HUD lane.
     const cameraTargetY = () => {
       const visible = viewport.clientHeight;
       const anchorLine = visible < 650 ? visible * 0.72 : visible * 0.68;
@@ -381,11 +336,6 @@ export function ForestScene({
       world.style.transform = `translate(${Math.round(cameraX)}px, ${Math.round(cameraY)}px)`;
     };
 
-    /**
-     * Arrow keys drive the map while the scene is on screen and focus is either
-     * inside it or nowhere in particular, so typing elsewhere on the page and
-     * tabbing through chrome still behave normally.
-     */
     const ownsKeyboard = () => {
       if (!isOnScreen) {
         return false;
@@ -394,23 +344,11 @@ export function ForestScene({
       return !active || active === document.body || viewport.contains(active);
     };
 
-    /** True once focus has landed on something inside a card, where Enter is theirs. */
     const focusIsOnCardContent = () => {
       const active = document.activeElement;
       return active !== null && active !== viewport && viewport.contains(active);
     };
 
-    /**
-     * Hands the island over to the walker, which happens the first time someone
-     * presses a direction rather than on load.
-     *
-     * Until then it stays an ordinary scroll container, which is the only thing
-     * that works for every visitor: a scriptless one, a phone with no arrow keys
-     * at all, and a mouse user who would otherwise have found a page they cannot
-     * scroll. Taking the scrollbar away is only fair once a visitor has shown
-     * they intend to drive. The camera snaps rather than eases here, because it
-     * is answering a keypress that means "I am this character".
-     */
     const takeTheWheel = () => {
       if (isWalkerDriving) {
         return;
@@ -451,11 +389,6 @@ export function ForestScene({
 
     const onBlur = () => held.clear();
 
-    /**
-     * Tabbing to an off-screen card walks the character over to meet it. Only
-     * once the walker is driving — before that the browser scrolls focus into
-     * view on its own, and doing both fights it.
-     */
     const onFocusIn = (event: FocusEvent) => {
       const target = event.target;
       if (!isWalkerDriving || !(target instanceof Element)) {
@@ -478,13 +411,7 @@ export function ForestScene({
     window.addEventListener('keydown', onKeyDown);
     window.addEventListener('keyup', onKeyUp);
     window.addEventListener('blur', onBlur);
-    // Capture before nested MUI controls can stop the bubbling focus event.
-    // Keyboard focus must always frame its landmark, regardless of the card
-    // implementation mounted inside the board.
     world.addEventListener('focusin', onFocusIn, true);
-
-    // Places the walker in the world without claiming the scrollbar or starting
-    // the animation loop: nothing runs per-frame until someone walks.
     drawCharacter();
 
     return () => {

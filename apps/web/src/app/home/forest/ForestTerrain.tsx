@@ -12,20 +12,6 @@ import {
 } from './ForestSprites';
 import { forestGroundPath } from './forestGround';
 import { type ForestWorld, layerZ, TILE_SIZE } from './forestMap';
-import { forestShoreClipPath } from './forestShore';
-
-/**
- * The island itself, painted on the server as one blended bitmap plus stamped
- * scenery. The ground is a single image so first paint does not wait on
- * thousands of SVG rects. Trees and animals are `<use>` stamps stacked by tile
- * row so a canopy south of a board paints in front of it. Each stamp is a
- * distinct silhouette, scaled so groves mix sizes instead of cloning one pine.
- *
- * Stamps are siblings of the landmarks (not wrapped in their own stacking
- * context) so `z-index` from `layerZ` actually compares against the boards.
- * Wind, waves and critter motion live on `ForestScene`'s world box, which is
- * the parent of both.
- */
 
 const landImgSx = (width: number, height: number, scheme: 'dark' | 'light'): SxObject => ({
   '@media (prefers-color-scheme: dark)': {
@@ -35,17 +21,6 @@ const landImgSx = (width: number, height: number, scheme: 'dark' | 'light'): SxO
   height,
   imageRendering: 'auto',
   left: 0,
-  pointerEvents: 'none',
-  position: 'absolute',
-  top: 0,
-  width,
-  zIndex: 1,
-});
-
-const landSvgSx = (width: number, height: number): SxObject => ({
-  height,
-  left: 0,
-  overflow: 'visible',
   pointerEvents: 'none',
   position: 'absolute',
   top: 0,
@@ -93,8 +68,6 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
   const height = world.rows * TILE_SIZE;
   const light = forestGroundPath(world.seed, 'light.png');
   const dark = forestGroundPath(world.seed, 'dark.png');
-  const shore = forestShoreClipPath(world);
-  const shoreId = `forest-shore-${world.seed}`;
 
   return (
     <>
@@ -135,23 +108,6 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
         sx={landImgSx(width, height, 'dark')}
         width={width}
       />
-      <Box
-        aria-hidden="true"
-        component="svg"
-        sx={landSvgSx(width, height)}
-        viewBox={`0 0 ${width} ${height}`}
-      >
-        <defs>
-          <path d={shore} fillRule="evenodd" id={`${shoreId}-stroke`} />
-        </defs>
-        <use
-          fill="none"
-          href={`#${shoreId}-stroke`}
-          stroke="var(--forest-sand)"
-          strokeLinejoin="round"
-          strokeWidth={28}
-        />
-      </Box>
       {world.scenery.map((sprite, index) => {
         const scale = SPRITE_SCALE[sprite.kind];
         const spriteWidth = TILE_SIZE * scale.width * sprite.scale;

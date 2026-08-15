@@ -5,8 +5,6 @@ import {
   forestMinimapDataUrls,
   forestTerrainPng,
   forestTerrainSize,
-  forestWaterMaskPng,
-  nearestRibbon,
   samplePaintedGround,
 } from '../forestTerrainBitmap';
 
@@ -38,26 +36,18 @@ describe('forest terrain bitmap', () => {
     );
   });
 
-  it('keeps a water mask and a minimap that match the world size', () => {
+  it('keeps a minimap that matches the world size', () => {
     const world = buildForestWorld(['intro', 'map']);
-    const mask = forestWaterMaskPng(world);
     const minimap = forestMinimapDataUrls(world);
-    expect(mask[0]).toBe(0x89);
     expect(minimap.width).toBe(world.columns);
     expect(minimap.height).toBe(world.rows);
-  });
-
-  it('keeps the water mask tiny', () => {
-    expect(forestWaterMaskPng(buildForestWorld(['intro', 'map', 'spotify'])).length).toBeLessThan(
-      8_000,
-    );
   });
 
   it('samples the ground finer than a tile so 1440 does not show a pixel grid', () => {
     expect(BITMAP_PX_PER_TILE).toBeGreaterThanOrEqual(24);
   });
 
-  it('grains the grass with smooth FBM, not a repeating block', () => {
+  it('grains the grass smoothly, not as a repeating block', () => {
     const world = { seed: 20_260_812 };
     const a = sampleGroundGrain(world, 10.0, 12.0);
     const b = sampleGroundGrain(world, 10.15, 12.0);
@@ -83,30 +73,5 @@ describe('forest terrain bitmap', () => {
     const a = samplePaintedGround(world, 'light', tileX + 0.2, tileY + 0.2);
     const b = samplePaintedGround(world, 'light', tileX + 0.8, tileY + 0.7);
     expect(a).not.toEqual(b);
-  });
-
-  it('treats a path as a ribbon, not a hard tile stamp', () => {
-    const world = buildForestWorld(['intro', 'map', 'spotify']);
-    let pathX = 0;
-    let pathY = 0;
-    outer: for (let y = 0; y < world.rows; y++) {
-      for (let x = 0; x < world.columns; x++) {
-        if (world.terrain[y]?.[x] === 'path') {
-          pathX = x;
-          pathY = y;
-          break outer;
-        }
-      }
-    }
-    const kinds = new Set<'bridge' | 'clearing' | 'path' | 'trail'>([
-      'bridge',
-      'clearing',
-      'path',
-      'trail',
-    ]);
-    const onPath = nearestRibbon(world, pathX + 0.5, pathY + 0.5, kinds);
-    const offPath = nearestRibbon(world, 0.5, 0.5, kinds);
-    expect(onPath?.dist).toBeLessThan(0);
-    expect(offPath === null || offPath.dist > 0.8).toBe(true);
   });
 });

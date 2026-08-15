@@ -4,22 +4,8 @@ import { type ForestWorld, MINIMAP_MARKER_ROLE } from './forestMap';
 import { hudSurfaceSx } from './forestMaterials';
 import { forestMinimapDataUrls } from './forestTerrainBitmap';
 
-/**
- * A corner chart of the whole island, so a visitor who can only see their own
- * clearing still knows the shape of the place and where the other stops are.
- *
- * Server-rendered like the map it summarises. The scene moves one marker inside
- * it with a compositor transform; nothing else here changes after the first paint.
- */
-
 const MINIMAP_TILE = 3;
 
-/**
- * Pinned to the visual viewport, not the 100dvw world box. The island is pulled
- * full-bleed with `overflow-x: hidden`, so `absolute; right: 16` on that box
- * sits in the gutter the body clips — which is why the chart vanished under the
- * header when it lived top-right, and off the right edge once it moved down.
- */
 const minimapSx: SxObject = {
   ...hudSurfaceSx,
   '@media (max-height: 560px), (max-width: 420px)': {
