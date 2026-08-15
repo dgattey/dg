@@ -1,11 +1,14 @@
 import { FOREST_SEED_DECK } from '../../../../services/forestSeeds';
+import { SPRITE_SCALE } from '../ForestSprites';
 import {
   buildForestWorld,
   DEFAULT_FOREST_SEED,
   isWalkableTile,
+  LANDMARK_CONTENT_WIDTH_PX,
   landmarkRects,
   landmarkTileRect,
   rectsOverlap,
+  SOUTH_GROVE_MAX_OVERHANG_PX,
   TILE_SIZE,
   TREE_KINDS,
   toBlockedMask,
@@ -396,6 +399,43 @@ describe('landmark footprints', () => {
           Math.abs(sprite.tileX - plot.tileX) <= 3,
       );
       expect(front.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('plants only bushes in the column in front of the content box', () => {
+    const world = worldFor();
+    for (const plot of world.plots) {
+      const inFront = world.scenery.filter(
+        (sprite) =>
+          sprite.tileY >= plot.tileY + 1 &&
+          sprite.tileY <= plot.tileY + 2 &&
+          Math.abs(sprite.tileX - plot.tileX) <= 3,
+      );
+      expect(inFront.length).toBeGreaterThan(0);
+      expect(inFront.filter((sprite) => TREE_KINDS.has(sprite.kind))).toHaveLength(0);
+    }
+  });
+
+  it('keeps south grove canopies off the photograph and nameplate', () => {
+    const world = worldFor();
+    for (const plot of world.plots) {
+      for (const sprite of world.scenery) {
+        const offsetY = sprite.tileY - plot.tileY;
+        const offsetX = sprite.tileX - plot.tileX;
+        if (offsetY < 1 || offsetY > 4 || Math.abs(offsetX) > 6) {
+          continue;
+        }
+        const metrics = SPRITE_SCALE[sprite.kind];
+        const feetSouth = offsetY * TILE_SIZE + TILE_SIZE / 2;
+        const height = TILE_SIZE * metrics.height * sprite.scale;
+        const overhang = height - feetSouth;
+        const halfWidth = (TILE_SIZE * metrics.width * sprite.scale) / 2;
+        const overlapsContentX =
+          Math.abs(offsetX * TILE_SIZE) - halfWidth < LANDMARK_CONTENT_WIDTH_PX / 2;
+        if (overlapsContentX) {
+          expect(overhang).toBeLessThanOrEqual(SOUTH_GROVE_MAX_OVERHANG_PX + 0.5);
+        }
+      }
     }
   });
 });

@@ -118,6 +118,32 @@ const LANDMARK_CHROME_BUDGET_PX = 84;
 export const LANDMARK_MAX_HEIGHT_PX = FOOTPRINT_NORTH * TILE_SIZE - LANDMARK_CHROME_BUDGET_PX;
 
 /**
+ * How far a south-grove stamp may rise above the plot origin. That band is
+ * posts plus the bottom wood of the frame — not the photograph, body text, or
+ * nameplate. Tallest sprite (cedar) is used when capping so a pine cannot
+ * grow through a face.
+ */
+export const SOUTH_GROVE_MAX_OVERHANG_PX = 40;
+
+/** Matches `SPRITE_SCALE` so a cap in tiles is a cap on screen. */
+const STAMP_TILES: Record<SceneryKind, { height: number; width: number }> = {
+  birch: { height: 3.15, width: 1.8 },
+  bloom: { height: 0.85, width: 0.85 },
+  bush: { height: 1.25, width: 1.9 },
+  cedar: { height: 3.7, width: 1.6 },
+  dead: { height: 2.9, width: 1.8 },
+  fruit: { height: 2.8, width: 2.25 },
+  log: { height: 0.8, width: 2.1 },
+  maple: { height: 3.1, width: 2.55 },
+  oak: { height: 3, width: 2.65 },
+  pine: { height: 3.5, width: 2.05 },
+  reed: { height: 1.55, width: 1.05 },
+  rock: { height: 1, width: 1.35 },
+  stump: { height: 1, width: 1.15 },
+  willow: { height: 2.85, width: 3 },
+};
+
+/**
  * Plot geometry, in tiles. Cells are the footprint plus a guaranteed margin, so
  * the gap between neighbours is `CELL - FOOTPRINT` on every side — enough forest
  * that the trail reads as a walk, and enough that no jitter is needed (and none
@@ -1198,11 +1224,51 @@ const GROVE_OFFSETS: ReadonlyArray<readonly [number, number]> = [
   [0, -10],
 ];
 
+function fitSouthGroveScale(offsetY: number, kind: SceneryKind, x: number, y: number): number {
+  const feetSouth = offsetY * TILE_SIZE + TILE_SIZE / 2;
+  const tiles = STAMP_TILES[kind].height;
+  const desired = spriteScale(x, y, kind === 'bush' ? 0.48 : 0.7);
+  const maxScale = (feetSouth + SOUTH_GROVE_MAX_OVERHANG_PX) / (TILE_SIZE * tiles);
+  return Math.max(0.4, Math.min(desired, maxScale));
+}
+
+/**
+ * Scatter can plant a full-size pine on the approach after the grove pass.
+ * Shrink any stamp whose canopy would cover the photograph or nameplate.
+ */
+function trimSouthCanopies(plots: ReadonlyArray<ForestPlot>, scenery: Array<ScenerySprite>) {
+  const contentHalf = LANDMARK_CONTENT_WIDTH_PX / 2;
+  for (const sprite of scenery) {
+    for (const plot of plots) {
+      const offsetY = sprite.tileY - plot.tileY;
+      const offsetX = sprite.tileX - plot.tileX;
+      if (offsetY < 1 || offsetY > 5 || Math.abs(offsetX) > 6) {
+        continue;
+      }
+      if (offsetY <= 2 && Math.abs(offsetX) <= 3 && TREE_KINDS.has(sprite.kind)) {
+        sprite.kind = 'bush';
+        sprite.scale = fitSouthGroveScale(offsetY, 'bush', sprite.tileX, sprite.tileY);
+      }
+      const metrics = STAMP_TILES[sprite.kind];
+      const feetSouth = offsetY * TILE_SIZE + TILE_SIZE / 2;
+      const halfWidth = (TILE_SIZE * metrics.width * sprite.scale) / 2;
+      const overlapsContentX = Math.abs(offsetX * TILE_SIZE) - halfWidth < contentHalf;
+      if (!overlapsContentX) {
+        continue;
+      }
+      const maxScale = (feetSouth + SOUTH_GROVE_MAX_OVERHANG_PX) / (TILE_SIZE * metrics.height);
+      if (sprite.scale > maxScale) {
+        sprite.scale = Math.max(0.35, maxScale);
+      }
+    }
+  }
+}
+
 /**
  * Plants a handful of trees just outside each footprint so boards sit in a
- * grove. South-side stamps (offsetY >= 1) use `layerZ` to paint in front of the
- * plaque's lower third. The trail centre stays bushes so the walker can still
- * walk up to the sign.
+ * grove. South-side stamps use `layerZ` to paint in front of the posts and the
+ * lower wood — never the photograph, body text, or nameplate. The column in
+ * front of the content box stays bushes.
  */
 function plantGroveSentinels(
   terrain: ReadonlyArray<ReadonlyArray<TerrainKind>>,
@@ -1247,15 +1313,15 @@ function plantGroveSentinels(
         continue;
       }
       occupied.add(`${x},${y}`);
-      const sentinelKind = trailGrass ? 'bush' : pickTreeKind(x, y, kind, 0.65, terrain);
+      const frontOfBoard = southGrove && offsetY <= 2 && Math.abs(offsetX) <= 3;
+      const sentinelKind =
+        trailGrass || frontOfBoard ? 'bush' : pickTreeKind(x, y, kind, 0.65, terrain);
       scenery.push({
         ...(southGrove ? { blocks: false } : {}),
         kind: sentinelKind,
-        scale: spriteScale(
-          x,
-          y,
-          sentinelKind === 'bush' ? 0.22 : offsetY <= 2 ? 0.16 : offsetY <= 3 ? 0.2 : 0.28,
-        ),
+        scale: southGrove
+          ? fitSouthGroveScale(offsetY, sentinelKind, x, y)
+          : spriteScale(x, y, 0.32),
         tileX: x,
         tileY: y,
       });
@@ -1372,6 +1438,7 @@ export function buildForestWorld(
     carveTrails(terrain, columns, rows, plots);
     const scenery = scatterScenery(terrain, columns, rows, plots);
     plantGroveSentinels(terrain, columns, rows, plots, scenery);
+    trimSouthCanopies(plots, scenery);
     const critters = placeCritters(terrain, columns, rows, plots);
 
     const firstPlot = plots[0];
