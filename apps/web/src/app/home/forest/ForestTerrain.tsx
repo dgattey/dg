@@ -12,6 +12,7 @@ import {
 } from './ForestSprites';
 import { forestGroundPath } from './forestGround';
 import { type ForestWorld, layerZ, TILE_SIZE } from './forestMap';
+import { forestShoreClipPath } from './forestShore';
 
 /**
  * The island itself, painted on the server as one blended bitmap plus stamped
@@ -26,46 +27,43 @@ import { type ForestWorld, layerZ, TILE_SIZE } from './forestMap';
  * the parent of both.
  */
 
-const bitmapSx = (light: string, dark: string, width: number, height: number): SxObject => ({
-  backgroundImage: `light-dark(url("${light}"), url("${dark}"))`,
-  backgroundRepeat: 'no-repeat',
-  backgroundSize: '100% 100%',
-  filter: 'blur(1.15px)',
+const landSvgSx = (width: number, height: number): SxObject => ({
+  '@media (prefers-color-scheme: dark)': {
+    '& .forest-land-dark': { display: 'block' },
+    '& .forest-land-light': { display: 'none' },
+  },
+  '& .forest-land-dark': { display: 'none' },
   height,
-  imageRendering: 'auto',
   left: 0,
+  overflow: 'visible',
   pointerEvents: 'none',
   position: 'absolute',
   top: 0,
   width,
-  zIndex: 0,
+  zIndex: 1,
 });
 
-const waveSx = (mask: string): SxObject => ({
+const waveSx: SxObject = {
   backgroundImage:
     'linear-gradient(90deg, transparent 0%, var(--forest-surf) 48%, transparent 100%)',
   backgroundRepeat: 'no-repeat',
   backgroundSize: '42% 100%',
   inset: 0,
-  maskImage: `url("${mask}")`,
-  maskSize: '100% 100%',
   pointerEvents: 'none',
   position: 'absolute',
   zIndex: 0,
-});
+};
 
-const rippleSx = (mask: string): SxObject => ({
+const rippleSx: SxObject = {
   backgroundImage: 'radial-gradient(circle, var(--forest-surf) 0 1px, transparent 1.4px 100%)',
   backgroundPosition: 'center',
   backgroundRepeat: 'repeat',
   backgroundSize: '18% 18%',
   inset: 0,
-  maskImage: `url("${mask}")`,
-  maskSize: '100% 100%',
   pointerEvents: 'none',
   position: 'absolute',
   zIndex: 0,
-});
+};
 
 function stampStyle(tileX: number, tileY: number, width: number, height: number, z: number) {
   return {
@@ -85,7 +83,10 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
   const height = world.rows * TILE_SIZE;
   const light = forestGroundPath(world.seed, 'light.png');
   const dark = forestGroundPath(world.seed, 'dark.png');
-  const waterMask = forestGroundPath(world.seed, 'water.png');
+  const shore = forestShoreClipPath(world);
+  const shoreId = `forest-shore-${world.seed}`;
+  const lightPattern = `forest-ground-light-${world.seed}`;
+  const darkPattern = `forest-ground-dark-${world.seed}`;
 
   return (
     <>
@@ -100,9 +101,33 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
       >
         <ForestSpriteDefs />
       </svg>
-      <Box aria-hidden="true" sx={bitmapSx(light, dark, width, height)} />
-      <Box aria-hidden="true" className="forest-wave" sx={waveSx(waterMask)} />
-      <Box aria-hidden="true" className="forest-ripple" sx={rippleSx(waterMask)} />
+      <Box aria-hidden="true" className="forest-wave" sx={waveSx} />
+      <Box aria-hidden="true" className="forest-ripple" sx={rippleSx} />
+      <Box
+        aria-hidden="true"
+        component="svg"
+        sx={landSvgSx(width, height)}
+        viewBox={`0 0 ${width} ${height}`}
+      >
+        <defs>
+          <path d={shore} fillRule="evenodd" id={shoreId} />
+          <pattern height={height} id={lightPattern} patternUnits="userSpaceOnUse" width={width}>
+            <image height={height} href={light} width={width} />
+          </pattern>
+          <pattern height={height} id={darkPattern} patternUnits="userSpaceOnUse" width={width}>
+            <image height={height} href={dark} width={width} />
+          </pattern>
+        </defs>
+        <use
+          fill="none"
+          href={`#${shoreId}`}
+          stroke="var(--forest-sand)"
+          strokeLinejoin="round"
+          strokeWidth={28}
+        />
+        <use className="forest-land-light" fill={`url(#${lightPattern})`} href={`#${shoreId}`} />
+        <use className="forest-land-dark" fill={`url(#${darkPattern})`} href={`#${shoreId}`} />
+      </Box>
       {world.scenery.map((sprite, index) => {
         const scale = SPRITE_SCALE[sprite.kind];
         const spriteWidth = TILE_SIZE * scale.width * sprite.scale;

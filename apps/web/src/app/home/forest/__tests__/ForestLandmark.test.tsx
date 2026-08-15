@@ -35,16 +35,16 @@ describe('ForestLandmark', () => {
     expect(surface?.querySelector('img')?.getAttribute('src')).toBe(
       'https://example.com/alpha.webp',
     );
-    expect(PIXELATE_CONTRAST).toBeLessThan(1.05);
-    expect(PIXELATE_SATURATE).toBeLessThan(1.05);
+    expect(PIXELATE_CONTRAST).toBeLessThanOrEqual(1);
+    expect(PIXELATE_SATURATE).toBeLessThanOrEqual(1);
     expect(pixelatedMediaSx).toEqual(
       expect.objectContaining({
         '& img': expect.objectContaining({
-          filter: `contrast(${PIXELATE_CONTRAST}) saturate(${PIXELATE_SATURATE})`,
           imageRendering: 'auto',
         }),
       }),
     );
+    expect(JSON.stringify(pixelatedMediaSx)).toContain('sepia');
     expect(JSON.stringify(pixelatedMediaSx)).not.toContain('pixelated');
     expect(JSON.stringify(pixelatedMediaSx)).not.toContain('forest-pixelate');
   });

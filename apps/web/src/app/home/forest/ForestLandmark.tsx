@@ -37,13 +37,14 @@ export type LandmarkVariant = 'board' | 'grove';
 
 /** The anchor is a zero-sized point on the plot's centre tile, right on the trail. */
 const landmarkSx: SxObject = {
+  perspective: '620px',
   position: 'absolute',
 };
 
-/** Everything visible stands north of the anchor so the trail stays walkable. */
+/** Standing sign in the ground plane. Shadow and dirt stay unrotated on the grass. */
 const stackSx: SxObject = {
   [`[${LANDMARK_NEAR_ATTRIBUTE}='true'] &`]: {
-    transform: 'translateX(-50%) scale(1.015)',
+    transform: 'translateX(-50%) rotateX(44deg) scale(1.1, 1.24)',
   },
   alignItems: 'center',
   bottom: LANDMARK_POST_HEIGHT,
@@ -52,7 +53,7 @@ const stackSx: SxObject = {
   gap: 0.75,
   left: 0,
   position: 'absolute',
-  transform: 'translateX(-50%)',
+  transform: 'translateX(-50%) rotateX(42deg) scale(1.08, 1.22)',
   transformOrigin: 'bottom center',
   ...createBouncyTransition('transform'),
 };
@@ -96,18 +97,18 @@ const groundBedSx: SxObject = {
   width: 320,
 };
 
-/** Grass and dirt eating the bottom edge of the board so the rectangle dissolves. */
+/** Grass in front of the posts so they sink into the ground plane. */
 const groundFringeSx: SxObject = {
   background:
     'radial-gradient(ellipse at 12% 70%, var(--forest-canopy) 0 16px, transparent 18px), radial-gradient(ellipse at 30% 90%, var(--forest-grass) 0 22px, transparent 24px), radial-gradient(ellipse at 52% 78%, var(--forest-canopy-light) 0 18px, transparent 20px), radial-gradient(ellipse at 74% 92%, var(--forest-grass) 0 20px, transparent 22px), radial-gradient(ellipse at 90% 68%, var(--forest-canopy-pine) 0 14px, transparent 16px), radial-gradient(ellipse at 44% 100%, var(--forest-sand) 0 12px, transparent 14px)',
-  bottom: LANDMARK_POST_HEIGHT - 8,
-  height: 36,
+  height: 58,
   left: '50%',
   pointerEvents: 'none',
   position: 'absolute',
+  top: 6,
   transform: 'translateX(-50%)',
-  width: 300,
-  zIndex: 4,
+  width: 320,
+  zIndex: 5,
 };
 
 /** Two posts sinking the board into the dirt bed below it. */

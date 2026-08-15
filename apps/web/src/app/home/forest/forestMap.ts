@@ -1156,6 +1156,17 @@ const GROVE_OFFSETS: ReadonlyArray<readonly [number, number]> = [
   [4, 1],
   [-6, 2],
   [6, 2],
+  [-3, 2],
+  [3, 2],
+  [-2, 3],
+  [2, 3],
+  [-4, 3],
+  [4, 3],
+  [0, 3],
+  [-1, 4],
+  [1, 4],
+  [-3, 4],
+  [3, 4],
   [-5, 0],
   [5, 0],
   [-4, -1],
@@ -1193,11 +1204,22 @@ function plantGroveSentinels(
       if (isUnderBoard(x, y, plots) || occupied.has(`${x},${y}`)) {
         continue;
       }
-      if (plots.some((other) => Math.abs(other.tileX - x) <= 2 && Math.abs(other.tileY - y) <= 2)) {
+      const southGrove = offsetY > 1;
+      if (
+        !southGrove &&
+        plots.some((other) => Math.abs(other.tileX - x) <= 2 && Math.abs(other.tileY - y) <= 2)
+      ) {
         continue;
       }
       const kind = terrain[y]?.[x];
-      if (!kind || !(PLANTABLE.has(kind) || kind === 'wetland')) {
+      if (
+        !kind ||
+        !(
+          PLANTABLE.has(kind) ||
+          kind === 'wetland' ||
+          (southGrove && (kind === 'clearing' || kind === 'meadow' || kind === 'grass'))
+        )
+      ) {
         continue;
       }
       occupied.add(`${x},${y}`);
@@ -1207,7 +1229,11 @@ function plantGroveSentinels(
           : pickTreeKind(x, y, kind, 0.65, terrain);
       scenery.push({
         kind: sentinelKind,
-        scale: spriteScale(x, y, sentinelKind === 'bush' ? 0.55 : 0.32),
+        scale: spriteScale(
+          x,
+          y,
+          offsetY > 2 ? 0.18 : offsetY > 1 ? 0.24 : sentinelKind === 'bush' ? 0.55 : 0.32,
+        ),
         tileX: x,
         tileY: y,
       });
@@ -1346,6 +1372,21 @@ export function buildForestWorld(
  * wander instead of printing concentric stairs. Fine per-pixel noise is
  * avoided — it made the PNG huge without reading as a softer shore.
  */
+/**
+ * Continuous fields at a fractional coordinate. No biome classification and
+ * no tile-scale domain warp — those two are what printed stairs. The shore
+ * path and the ground painter both use this.
+ */
+export function sampleTerrainFields(world: ForestWorld, fx: number, fy: number): TerrainFields {
+  const previous = activeSeed;
+  activeSeed = world.seed;
+  try {
+    return terrainFieldsAt(fx, fy, world.columns, world.rows, true);
+  } finally {
+    activeSeed = previous;
+  }
+}
+
 export type VisualTerrainSample = {
   fields: TerrainFields | null;
   kind: TerrainKind;

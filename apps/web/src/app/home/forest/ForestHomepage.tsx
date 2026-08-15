@@ -109,12 +109,8 @@ function ForestWorldStyles() {
     body:has([${FOREST_WORLD_ATTRIBUTE}]) [data-site-header] [data-header-capsule]{
       pointer-events:auto;
     }
-    [${FOREST_WORLD_ATTRIBUTE}] [data-forest-pixelate]{
-      contain-intrinsic-size:300px 360px;
-      content-visibility:auto;
-    }
     [${FOREST_WORLD_ATTRIBUTE}] [data-forest-landmark] img{
-      content-visibility:auto;
+      image-rendering:auto;
     }`;
   return (
     <style

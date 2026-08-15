@@ -384,6 +384,20 @@ describe('landmark footprints', () => {
       expect(nearby.length).toBeGreaterThan(0);
     }
   });
+
+  it('plants trees south of boards so canopies can stand in front', () => {
+    const world = worldFor();
+    const trees = world.scenery.filter((sprite) => TREE_KINDS.has(sprite.kind));
+    const south = trees.filter((sprite) =>
+      world.plots.some(
+        (plot) =>
+          sprite.tileY >= plot.tileY + 2 &&
+          sprite.tileY <= plot.tileY + 4 &&
+          Math.abs(sprite.tileX - plot.tileX) <= 4,
+      ),
+    );
+    expect(south.length).toBeGreaterThan(0);
+  });
 });
 
 describe('critters', () => {

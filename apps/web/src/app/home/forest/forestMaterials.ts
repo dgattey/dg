@@ -87,17 +87,17 @@ export const boardMediaSx: SxObject = {
 };
 
 /**
- * Photographs on a board, treated at paint time only. A whisper of contrast —
- * no mosaic, no `pixelated` rendering — so faces and album art stay
- * recognizable. The source asset is untouched.
+ * Photographs as a print on the board: warm paper, no mosaic, no
+ * `pixelated` rendering. The source asset is untouched.
  */
-export const PIXELATE_CONTRAST = 1.03;
-export const PIXELATE_SATURATE = 1.02;
+export const PIXELATE_CONTRAST = 1;
+export const PIXELATE_SATURATE = 1;
 
 export const pixelatedMediaSx: SxObject = {
   '& img': {
     borderRadius: '2px',
-    filter: `contrast(${PIXELATE_CONTRAST}) saturate(${PIXELATE_SATURATE})`,
+    boxShadow: 'inset 0 0 0 1px rgb(70 42 12 / 0.16)',
+    filter: 'sepia(0.08) contrast(0.96) brightness(1.02)',
     imageRendering: 'auto',
   },
 };
@@ -108,32 +108,12 @@ export const pixelatedMediaSx: SxObject = {
  * as a Material drop shadow that would float the board over the map.
  */
 export const landmarkFrameSx: SxObject = {
-  '&::after': {
-    background:
-      'radial-gradient(circle at 4% 22%, var(--forest-canopy) 0 22px, transparent 24px), radial-gradient(circle at 96% 28%, var(--forest-canopy-pine) 0 20px, transparent 22px), radial-gradient(circle at 2% 58%, var(--forest-canopy-maple) 0 16px, transparent 18px), radial-gradient(circle at 98% 64%, var(--forest-canopy) 0 14px, transparent 16px), radial-gradient(circle at 8% 88%, var(--forest-canopy-light) 0 18px, transparent 20px), radial-gradient(circle at 92% 92%, var(--forest-canopy-pine) 0 16px, transparent 18px)',
-    content: '""',
-    inset: 0,
-    pointerEvents: 'none',
-    position: 'absolute',
-    zIndex: 3,
-  },
-  '&::before': {
-    background:
-      'radial-gradient(circle at 10% 36px, var(--forest-canopy) 0 42px, transparent 44px), radial-gradient(circle at 90% 30px, var(--forest-canopy-pine) 0 40px, transparent 42px), radial-gradient(circle at 50% 10px, var(--forest-canopy-light) 0 36px, transparent 38px), radial-gradient(circle at 28% 48px, var(--forest-canopy-maple) 0 28px, transparent 30px), radial-gradient(circle at 72% 44px, var(--forest-canopy) 0 26px, transparent 28px), radial-gradient(circle at 18% 12px, var(--forest-canopy-pine) 0 20px, transparent 22px), radial-gradient(circle at 82% 8px, var(--forest-canopy) 0 18px, transparent 20px), radial-gradient(circle at 40% 58px, var(--forest-canopy-light) 0 16px, transparent 18px)',
-    content: '""',
-    height: 112,
-    left: -18,
-    pointerEvents: 'none',
-    position: 'absolute',
-    right: -18,
-    top: -52,
-    zIndex: 3,
-  },
   backgroundColor: 'var(--forest-wood)',
   backgroundImage:
     'repeating-linear-gradient(90deg, transparent 0 13px, var(--forest-wood-dark) 13px 14px), linear-gradient(180deg, var(--forest-wood-light) 0 4px, transparent 18px)',
-  borderRadius: '3px 3px 1px 1px',
-  boxShadow: 'inset 0 1px 0 var(--forest-wood-light)',
+  borderRadius: '10px 10px 3px 3px',
+  boxShadow: 'none',
+  clipPath: 'polygon(7% 0, 93% 0, 100% 100%, 0 100%)',
   display: 'flex',
   flexDirection: 'column',
   gap: `${FRAME_PADDING}px`,
@@ -167,9 +147,9 @@ export const landmarkSurfaceSx: SxObject = {
   backgroundBlendMode: 'multiply',
   backgroundColor: 'var(--forest-paper)',
   backgroundImage:
-    'repeating-linear-gradient(180deg, transparent 0 9px, var(--forest-paper-edge) 9px 10px)',
+    'radial-gradient(ellipse at 18% 12%, var(--forest-paper-edge) 0 18%, transparent 42%), radial-gradient(ellipse at 82% 88%, var(--forest-wood) 0 8%, transparent 36%)',
   border: 'none',
-  borderRadius: '2px',
+  borderRadius: '4px',
   display: 'flex',
   flexDirection: 'column',
   maxHeight: LANDMARK_MAX_HEIGHT_PX,
@@ -187,31 +167,10 @@ export const landmarkSurfaceSx: SxObject = {
  * light the surrounding trees.
  */
 export const groveStageSx: SxObject = {
-  '&::after': {
-    background:
-      'radial-gradient(circle at 6% 28%, var(--forest-canopy) 0 20px, transparent 22px), radial-gradient(circle at 94% 36%, var(--forest-canopy-pine) 0 18px, transparent 20px), radial-gradient(circle at 10% 82%, var(--forest-canopy-light) 0 16px, transparent 18px), radial-gradient(circle at 88% 88%, var(--forest-canopy) 0 14px, transparent 16px)',
-    content: '""',
-    inset: 0,
-    pointerEvents: 'none',
-    position: 'absolute',
-    zIndex: 3,
-  },
-  '&::before': {
-    background:
-      'radial-gradient(circle at 18% 32px, var(--forest-canopy) 0 36px, transparent 38px), radial-gradient(circle at 82% 24px, var(--forest-canopy-pine) 0 34px, transparent 36px), radial-gradient(circle at 50% 8px, var(--forest-canopy-light) 0 30px, transparent 32px), radial-gradient(circle at 34% 48px, var(--forest-canopy-maple) 0 20px, transparent 22px)',
-    content: '""',
-    height: 88,
-    left: -12,
-    pointerEvents: 'none',
-    position: 'absolute',
-    right: -12,
-    top: -40,
-    zIndex: 3,
-  },
   background:
     'radial-gradient(circle at 50% 30%, var(--forest-stone-light), var(--forest-stone) 72%)',
-  borderRadius: '40px 40px 16px 16px',
-  boxShadow: 'inset 0 1px 0 var(--forest-stone-light)',
+  borderRadius: '28px 28px 10px 10px',
+  boxShadow: 'none',
   display: 'flex',
   flexDirection: 'column',
   gap: `${FRAME_PADDING}px`,

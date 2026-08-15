@@ -45,7 +45,7 @@ describe('forest terrain bitmap', () => {
 
   it('keeps each ground layer small enough to ship as a cached file', () => {
     const world = buildForestWorld(['intro', 'map', 'spotify']);
-    expect(forestTerrainPng(world, 'light').length).toBeLessThan(230_000);
+    expect(forestTerrainPng(world, 'light').length).toBeLessThan(80_000);
     expect(forestWaterMaskPng(world).length).toBeLessThan(8_000);
   });
 
