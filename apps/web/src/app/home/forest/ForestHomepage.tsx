@@ -117,6 +117,7 @@ function ForestWorldStyles() {
     [${FOREST_WORLD_ATTRIBUTE}] img.forest-land{
       image-rendering:auto;
       image-rendering:smooth;
+      image-rendering:high-quality;
     }`;
   return (
     <style

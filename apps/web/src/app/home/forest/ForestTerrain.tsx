@@ -27,16 +27,10 @@ import { forestShoreClipPath } from './forestShore';
  * the parent of both.
  */
 
-const landImgSx = (
-  width: number,
-  height: number,
-  clipId: string,
-  scheme: 'dark' | 'light',
-): SxObject => ({
+const landImgSx = (width: number, height: number, scheme: 'dark' | 'light'): SxObject => ({
   '@media (prefers-color-scheme: dark)': {
     display: scheme === 'dark' ? 'block' : 'none',
   },
-  clipPath: `url(#${clipId})`,
   display: scheme === 'dark' ? 'none' : 'block',
   height,
   imageRendering: 'auto',
@@ -122,16 +116,24 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
         aria-hidden="true"
         className="forest-land"
         component="img"
+        decoding="async"
+        fetchPriority="low"
+        height={height}
         src={light}
-        sx={landImgSx(width, height, shoreId, 'light')}
+        sx={landImgSx(width, height, 'light')}
+        width={width}
       />
       <Box
         alt=""
         aria-hidden="true"
         className="forest-land"
         component="img"
+        decoding="async"
+        fetchPriority="low"
+        height={height}
         src={dark}
-        sx={landImgSx(width, height, shoreId, 'dark')}
+        sx={landImgSx(width, height, 'dark')}
+        width={width}
       />
       <Box
         aria-hidden="true"
@@ -140,9 +142,6 @@ export function ForestTerrain({ world }: { world: ForestWorld }) {
         viewBox={`0 0 ${width} ${height}`}
       >
         <defs>
-          <clipPath clipPathUnits="userSpaceOnUse" id={shoreId}>
-            <path d={shore} fillRule="evenodd" />
-          </clipPath>
           <path d={shore} fillRule="evenodd" id={`${shoreId}-stroke`} />
         </defs>
         <use

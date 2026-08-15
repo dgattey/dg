@@ -141,7 +141,6 @@ const worldSx: SxObject = {
   left: 0,
   position: 'absolute',
   top: 0,
-  willChange: 'transform',
 };
 
 const characterAnchorSx: SxObject = {
@@ -330,7 +329,7 @@ export function ForestScene({
       footY = y;
       cameraX = cameraTargetX();
       cameraY = cameraTargetY();
-      world.style.transform = `translate3d(${cameraX}px, ${cameraY}px, 0)`;
+      world.style.transform = `translate(${cameraX}px, ${cameraY}px)`;
       drawCharacter();
     };
 
@@ -381,7 +380,7 @@ export function ForestScene({
       const easing = prefersReducedMotion ? 1 : CAMERA_EASING;
       cameraX += (targetX - cameraX) * easing;
       cameraY += (targetY - cameraY) * easing;
-      world.style.transform = `translate3d(${Math.round(cameraX)}px, ${Math.round(cameraY)}px, 0)`;
+      world.style.transform = `translate(${Math.round(cameraX)}px, ${Math.round(cameraY)}px)`;
     };
 
     /**

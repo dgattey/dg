@@ -15,14 +15,15 @@ import { TERRAIN_DETAIL_HSL, TERRAIN_HSL } from './forestPalette';
  * paints a single image instead of thousands of SVG rects.
  *
  * Continuous height/moisture field — every pixel is a lerp, never a
- * nearest-biome index. Shipped as RGB so the blends are not posterized into
- * a checker. The shoreline silhouette is a separate vector path
- * (`forestShore.ts`). Twelve samples per tile is enough that a 1440 crop
- * reads as paint. Light and dark palettes are cached files, not inlined.
+ * nearest-biome index. Shipped as RGBA so the ocean can be transparent and
+ * the page does not have to `clip-path` the `<img>` (Chrome re-rasterizes
+ * that clip into the grass checker). Twenty-four samples per tile plus
+ * domain-warped FBM so a 2× CSS scale cannot resolve as a square lattice.
+ * Light and dark palettes are cached files, not inlined.
  */
 
-/** Collision stays 48px. The painter samples finer so the eye never sees the grid. */
-export const BITMAP_PX_PER_TILE = 12;
+/** Collision stays 48px. Two CSS pixels per sample; the img is not clipped. */
+export const BITMAP_PX_PER_TILE = 24;
 
 /** Water mask only needs a soft silhouette for CSS waves. */
 export const WATER_MASK_PX_PER_TILE = 2;
@@ -164,32 +165,18 @@ export function encodeIndexedPng(
   return `data:image/png;base64,${encodeIndexedPngBytes(width, height, pixels, palette, transparentIndex).toString('base64')}`;
 }
 
-function paethPredictor(left: number, above: number, upperLeft: number): number {
-  const estimate = left + above - upperLeft;
-  const toLeft = Math.abs(estimate - left);
-  const toAbove = Math.abs(estimate - above);
-  const toCorner = Math.abs(estimate - upperLeft);
-  if (toLeft <= toAbove && toLeft <= toCorner) {
-    return left;
-  }
-  return toAbove <= toCorner ? above : upperLeft;
-}
-
-/** RGB PNG (no alpha). Ocean is painted opaque so the file stays small; the page floods the same colour behind it. */
-export function encodeRgbPngBytes(width: number, height: number, pixels: Uint8Array): Buffer {
-  const ihdr = concat([u32(width), u32(height), Uint8Array.of(8, 2, 0, 0, 0)]);
-  const stride = width * 3;
+/** RGBA PNG. Ocean is alpha 0 so waves show through without clipping the img. */
+export function encodeRgbaPngBytes(width: number, height: number, pixels: Uint8Array): Buffer {
+  const ihdr = concat([u32(width), u32(height), Uint8Array.of(8, 6, 0, 0, 0)]);
+  const stride = width * 4;
   const scanlines = new Uint8Array(height * (stride + 1));
   for (let y = 0; y < height; y++) {
     const rowStart = y * (stride + 1);
-    scanlines[rowStart] = 4;
+    scanlines[rowStart] = 2;
     const row = pixels.subarray(y * stride, (y + 1) * stride);
     const prev = y > 0 ? pixels.subarray((y - 1) * stride, y * stride) : null;
     for (let i = 0; i < stride; i++) {
-      const left = i >= 3 ? (row[i - 3] ?? 0) : 0;
-      const above = prev?.[i] ?? 0;
-      const upperLeft = i >= 3 ? (prev?.[i - 3] ?? 0) : 0;
-      scanlines[rowStart + 1 + i] = ((row[i] ?? 0) - paethPredictor(left, above, upperLeft)) & 255;
+      scanlines[rowStart + 1 + i] = ((row[i] ?? 0) - (prev?.[i] ?? 0)) & 255;
     }
   }
   return Buffer.from(
@@ -220,9 +207,9 @@ function fieldRgb(fields: TerrainFields, colors: ReadonlyArray<Rgb>): Rgb {
   const dirt = colors[TERRAIN_INDEX.path] ?? sand;
   const shallow = colors[TERRAIN_INDEX.shallow] ?? sand;
   const lake = colors[TERRAIN_INDEX.lake] ?? shallow;
-  let land = mixRgb(grass, meadow, fields.meadowMix);
-  const worn = Math.max(0, fields.meadowNoise - 0.72) * 1.4;
-  land = mixRgb(land, dirt, Math.min(0.28, worn));
+  let land = mixRgb(grass, meadow, Math.min(1, fields.meadowMix * 1.2));
+  const worn = Math.max(0, fields.meadowNoise - 0.58) * 1.15;
+  land = mixRgb(land, dirt, Math.min(0.42, worn));
   land = mixRgb(land, sand, ramp(fields.island, 0.72, 0.94) * 0.92);
   const lakeWet = 1 - ramp(fields.lakeField, 0.82, 1.22);
   const riverWet = 1 - ramp(fields.river, fields.riverWidth, fields.riverWidth + 1.4);
@@ -333,16 +320,17 @@ function interiorOceanMask(world: ForestWorld) {
   return mark;
 }
 
-function writePixel(pixels: Uint8Array, offset: number, pixel: Rgb, grain: number) {
+function writePixel(pixels: Uint8Array, offset: number, pixel: Rgb, grain: number, alpha: number) {
   pixels[offset] = clampByte(pixel[0] + grain);
   pixels[offset + 1] = clampByte(pixel[1] + grain);
   pixels[offset + 2] = clampByte(pixel[2] + Math.round(grain * 0.7));
+  pixels[offset + 3] = clampByte(alpha);
 }
 
-const FIELD_PX_PER_TILE = 3;
-const FIELD_COMPS = 6;
+const FIELD_PX_PER_TILE = 8;
+const FIELD_COMPS = 7;
 
-function packFields(out: Float32Array, index: number, fields: TerrainFields) {
+function packFields(out: Float32Array, index: number, fields: TerrainFields, grain: number) {
   const offset = index * FIELD_COMPS;
   out[offset] = fields.island;
   out[offset + 1] = fields.lakeField;
@@ -350,6 +338,7 @@ function packFields(out: Float32Array, index: number, fields: TerrainFields) {
   out[offset + 3] = fields.meadowNoise;
   out[offset + 4] = fields.river;
   out[offset + 5] = fields.riverWidth;
+  out[offset + 6] = grain;
 }
 
 function lerpGrid(
@@ -420,7 +409,7 @@ function paintTerrain(world: ForestWorld, scheme: 'dark' | 'light'): Uint8Array 
   const ocean = colors[TERRAIN_INDEX.ocean] ?? [0, 0, 0];
   const step = 1 / BITMAP_PX_PER_TILE;
   const fieldStep = 1 / FIELD_PX_PER_TILE;
-  const pixels = new Uint8Array(width * height * 3);
+  const pixels = new Uint8Array(width * height * 4);
   const fieldGrid = new Float32Array(fieldWidth * fieldHeight * FIELD_COMPS);
   const skip = interiorOceanMask(world);
   const nearRoute = markNear(world, RIBBON_KINDS, 2);
@@ -447,7 +436,12 @@ function paintTerrain(world: ForestWorld, scheme: 'dark' | 'light'): Uint8Array 
         const fields = skip[tileY * world.columns + tileX]
           ? oceanFields
           : sampleTerrainFieldsUnlocked(world, wx, wy);
-        packFields(fieldGrid, fy * fieldWidth + fx, fields);
+        packFields(
+          fieldGrid,
+          fy * fieldWidth + fx,
+          fields,
+          skip[tileY * world.columns + tileX] ? 0 : sampleGroundGrainUnlocked(wx, wy),
+        );
       }
     }
     for (let py = 0; py < height; py++) {
@@ -457,9 +451,9 @@ function paintTerrain(world: ForestWorld, scheme: 'dark' | 'light'): Uint8Array 
         const tileX = Math.min(world.columns - 1, Math.max(0, Math.floor(fx)));
         const tileY = Math.min(world.rows - 1, Math.max(0, Math.floor(fy)));
         const tile = tileY * world.columns + tileX;
-        const offset = (py * width + px) * 3;
+        const offset = (py * width + px) * 4;
         if (skip[tile]) {
-          writePixel(pixels, offset, ocean, 0);
+          writePixel(pixels, offset, ocean, 0, 0);
           continue;
         }
         const gx = fx * FIELD_PX_PER_TILE - 0.5;
@@ -480,6 +474,7 @@ function paintTerrain(world: ForestWorld, scheme: 'dark' | 'light'): Uint8Array 
         sampled.meadowNoise = lerpGrid(fieldGrid, i00, i10, i01, i11, 3, tx, ty);
         sampled.river = lerpGrid(fieldGrid, i00, i10, i01, i11, 4, tx, ty);
         sampled.riverWidth = lerpGrid(fieldGrid, i00, i10, i01, i11, 5, tx, ty);
+        const grain = lerpGrid(fieldGrid, i00, i10, i01, i11, 6, tx, ty);
         const pixel = applyRibbon(
           world,
           fx,
@@ -490,7 +485,13 @@ function paintTerrain(world: ForestWorld, scheme: 'dark' | 'light'): Uint8Array 
           nearElev,
           tile,
         );
-        writePixel(pixels, offset, pixel, sampleGroundGrainUnlocked(fx, fy));
+        const inlandWater = Math.max(
+          1 - ramp(sampled.lakeField, 0.55, 0.95),
+          1 - ramp(sampled.river, 0, sampled.riverWidth + 0.15),
+        );
+        const cover = Math.max(inlandWater, 1 - ramp(sampled.island, 0.94, 1.08));
+        const alpha = Math.round(cover * 255);
+        writePixel(pixels, offset, pixel, alpha < 8 ? 0 : grain, alpha);
       }
     }
     return pixels;
@@ -506,7 +507,7 @@ export function forestTerrainSize(world: Pick<ForestWorld, 'columns' | 'rows'>) 
 
 export function forestTerrainPng(world: ForestWorld, scheme: 'dark' | 'light') {
   const { height, width } = forestTerrainSize(world);
-  return encodeRgbPngBytes(width, height, paintTerrain(world, scheme));
+  return encodeRgbaPngBytes(width, height, paintTerrain(world, scheme));
 }
 
 /** One continuous sample — used to prove a tile is not a flat biome stamp. */

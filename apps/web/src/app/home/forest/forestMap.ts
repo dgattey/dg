@@ -226,6 +226,38 @@ function hashUnit(x: number, y: number, salt: number): number {
 const lerp = (a: number, b: number, t: number) => a + (b - a) * t;
 const smoothstep = (t: number) => t * t * (3 - 2 * t);
 
+const fade = (t: number) => t * t * t * (t * (t * 6 - 15) + 10);
+
+/**
+ * Gradient noise. Value noise prints a square lattice (the grass checker).
+ * Perlin dots random gradients so the same octaves read as flow, not tiles.
+ */
+export function perlinNoise(x: number, y: number, scale: number, salt: number): number {
+  const gridX = x / scale;
+  const gridY = y / scale;
+  const cellX = Math.floor(gridX);
+  const cellY = Math.floor(gridY);
+  const fx = gridX - cellX;
+  const fy = gridY - cellY;
+  const grad = (ix: number, iy: number, dx: number, dy: number) => {
+    const pick = (hashUnit(ix, iy, salt) * 8) | 0;
+    const gx = pick & 1 ? 1 : -1;
+    const gy = pick & 2 ? 1 : -1;
+    return (pick & 4 ? gx * dx : gy * dy) + (pick & 4 ? gy * dy * 0.35 : gx * dx * 0.35);
+  };
+  const u = fade(fx);
+  const v = fade(fy);
+  const n =
+    lerp(
+      lerp(grad(cellX, cellY, fx, fy), grad(cellX + 1, cellY, fx - 1, fy), u),
+      lerp(grad(cellX, cellY + 1, fx, fy - 1), grad(cellX + 1, cellY + 1, fx - 1, fy - 1), u),
+      v,
+    ) *
+      0.5 +
+    0.5;
+  return Math.min(1, Math.max(0, n));
+}
+
 /** Bilinear value noise — enough shape for coastlines, grain, and tree clumps. */
 export function valueNoise(x: number, y: number, scale: number, salt: number): number {
   const gridX = x / scale;
@@ -549,6 +581,21 @@ export type TerrainFields = {
   riverWidth: number;
 };
 
+/** Domain-warped FBM so meadow/grass mottling is not one octave of equal blobs. */
+function visualMeadowFbm(x: number, y: number) {
+  const warpX = x + (perlinNoise(x, y, 5.2, 21) - 0.5) * 3.4;
+  const warpY = y + (perlinNoise(x, y, 4.6, 23) - 0.5) * 3.4;
+  let value = 0;
+  let amplitude = 0.5;
+  let scale = 8.2;
+  for (let octave = 0; octave < 5; octave++) {
+    value += perlinNoise(warpX, warpY, scale, 11 + octave * 17) * amplitude;
+    amplitude *= 0.5;
+    scale *= 0.48;
+  }
+  return value;
+}
+
 function terrainFieldsAt(
   x: number,
   y: number,
@@ -563,7 +610,7 @@ function terrainFieldsAt(
   const radiusX = columns * (0.46 + hashUnit(0, 0, 205) * 0.04);
   const radiusY = rows * (0.47 + hashUnit(0, 0, 207) * 0.04);
   const ripple = visual
-    ? (valueNoise(x, y, 1.15, 401) - 0.5) * 0.2 + (valueNoise(x, y, 2.4, 403) - 0.5) * 0.1
+    ? (perlinNoise(x, y, 5.4, 401) - 0.5) * 0.08 + (perlinNoise(x, y, 9.2, 403) - 0.5) * 0.05
     : 0;
   const island =
     Math.hypot((x + warpX - centreX) / radiusX, (y + warpY - centreY) / radiusY) +
@@ -586,12 +633,14 @@ function terrainFieldsAt(
     (y - (52 + hashUnit(0, 0, 240) * 18)) / 3.6,
   );
   const lakeRipple = visual
-    ? (valueNoise(x, y, 1.05, 407) - 0.5) * 0.18 + (valueNoise(x, y, 2.2, 409) - 0.5) * 0.08
+    ? (perlinNoise(x, y, 4.8, 407) - 0.5) * 0.08 + (perlinNoise(x, y, 8.6, 409) - 0.5) * 0.05
     : 0;
   const lakeField = Math.min(lakeMain, lakeCove, pond) + lakeRipple;
   const river = riverDistance(x + warpX * 0.35, y + warpY * 0.35, rows);
   const riverWidth = 1.05 + valueNoise(x, y, 7, 83) * 0.9;
-  const meadowNoise = valueNoise(x, y, 12, 11) * 0.55 + valueNoise(x, y, 25, 13) * 0.45;
+  const meadowNoise = visual
+    ? visualMeadowFbm(x, y)
+    : valueNoise(x, y, 12, 11) * 0.55 + valueNoise(x, y, 25, 13) * 0.45;
   const meadowAx = 14 + hashUnit(0, 0, 241) * 10;
   const meadowAy = 20 + hashUnit(0, 0, 243) * 10;
   const meadowBx = 34 + hashUnit(0, 0, 245) * 12;
@@ -1466,12 +1515,22 @@ export function buildForestWorld(
 }
 
 /**
- * Multi-octave value noise for the ground painter. Collision stays on the
- * 48px grid; this is only what you see. Returns a signed colour delta.
- * Callers that already hold the world seed should use the unlocked variant.
+ * Smooth FBM for the ground painter. Many octaves, small amplitude — a
+ * punchy lattice aliases into the light-green checker. Collision stays on
+ * the 48px grid; this is only what you see.
  */
 export function sampleGroundGrainUnlocked(fx: number, fy: number) {
-  return (valueNoise(fx, fy, 2.6, 501) - 0.5) * 15 + (valueNoise(fx, fy, 0.95, 503) - 0.5) * 8;
+  const warpX = fx + (perlinNoise(fx, fy, 9.4, 521) - 0.5) * 2.4;
+  const warpY = fy + (perlinNoise(fx, fy, 8.1, 523) - 0.5) * 2.4;
+  let amplitude = 1.7;
+  let scale = 6.8;
+  let grain = 0;
+  for (let octave = 0; octave < 5; octave++) {
+    grain += (perlinNoise(warpX, warpY, scale, 501 + octave * 19) - 0.5) * amplitude;
+    amplitude *= 0.52;
+    scale *= 0.5;
+  }
+  return grain;
 }
 
 export function sampleGroundGrain(world: Pick<ForestWorld, 'seed'>, fx: number, fy: number) {

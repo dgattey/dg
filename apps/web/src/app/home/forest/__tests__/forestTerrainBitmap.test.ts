@@ -25,14 +25,14 @@ describe('forest terrain bitmap', () => {
     expect([...bytes.subarray(0, 8)]).toEqual([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
   });
 
-  it('paints a continuous field and ships it as a compact indexed PNG', () => {
+  it('paints a continuous field and ships it as a compact RGBA PNG', () => {
     const world = buildForestWorld(['intro', 'map', 'spotify']);
     const size = forestTerrainSize(world);
     const png = forestTerrainPng(world, 'light');
     expect(size.width).toBe(world.columns * BITMAP_PX_PER_TILE);
     expect(size.height).toBe(world.rows * BITMAP_PX_PER_TILE);
-    expect(png[25]).toBe(2);
-    expect(png.length).toBeLessThan(480_000);
+    expect(png[25]).toBe(6);
+    expect(png.length).toBeLessThan(1_400_000);
     expect(samplePaintedGround(world, 'light', 22.4, 31.2)).not.toEqual(
       samplePaintedGround(world, 'dark', 22.4, 31.2),
     );
@@ -54,10 +54,10 @@ describe('forest terrain bitmap', () => {
   });
 
   it('samples the ground finer than a tile so 1440 does not show a pixel grid', () => {
-    expect(BITMAP_PX_PER_TILE).toBeGreaterThanOrEqual(12);
+    expect(BITMAP_PX_PER_TILE).toBeGreaterThanOrEqual(24);
   });
 
-  it('grains the grass with value noise, not a repeating block', () => {
+  it('grains the grass with smooth FBM, not a repeating block', () => {
     const world = { seed: 20_260_812 };
     const a = sampleGroundGrain(world, 10.0, 12.0);
     const b = sampleGroundGrain(world, 10.15, 12.0);

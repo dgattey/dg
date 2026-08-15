@@ -210,7 +210,7 @@ function smoothedLoops(
 
 /**
  * Even-odd clip path: the island fill, with lakes punched out. Coordinates
- * match the world box so it can sit on the ground bitmap as `clip-path`.
+ * match the world box so the sand stroke can ring the painted shore.
  */
 export function forestShoreClipPath(world: ForestWorld): string {
   const island = sampleGrid(world, (fields) => fields.island);
