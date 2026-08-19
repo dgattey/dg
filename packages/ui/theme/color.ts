@@ -48,7 +48,8 @@ export const BRAND_PAIRS = {
   warningLight: ['#ff9800', '#ffb74d'],
 } as const satisfies Record<string, SchemePair>;
 
-const lightDark = ([light, dark]: SchemePair): SchemeColor => `light-dark(${light}, ${dark})`;
+export const lightDark = ([light, dark]: SchemePair): SchemeColor =>
+  `light-dark(${light}, ${dark})`;
 
 export const BRAND = Object.fromEntries(
   Object.entries(BRAND_PAIRS).map(([key, pair]) => [key, lightDark(pair)]),

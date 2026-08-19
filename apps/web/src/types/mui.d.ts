@@ -31,18 +31,22 @@ declare module '@mui/material/styles' {
   interface Theme {
     shape: {
       cardBorderRadius: number;
+      cardPadding: number;
       gridGap: number;
       gridGapLarge: number;
       gridItemDimension: number;
+      gridItemMinSize: number;
       gridItemSize: (span: number) => string;
     };
   }
   interface ThemeOptions {
     shape: {
       cardBorderRadius: number;
+      cardPadding: number;
       gridGap: number;
       gridGapLarge: number;
       gridItemDimension: number;
+      gridItemMinSize: number;
       gridItemSize?: (span: number) => string;
     };
   }
@@ -53,10 +57,12 @@ declare module '@mui/material/styles' {
 
   interface TypographyVariants {
     code: React.CSSProperties;
+    display: React.CSSProperties;
   }
 
   interface TypographyVariantsOptions {
     code?: React.CSSProperties;
+    display?: React.CSSProperties;
   }
 
   interface TypeText {
@@ -73,6 +79,7 @@ declare module '@mui/material/styles' {
 declare module '@mui/material/Typography' {
   interface TypographyPropsVariantOverrides {
     code: true;
+    display: true;
     subtitle1: false;
     subtitle2: false;
   }

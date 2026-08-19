@@ -12,10 +12,10 @@ export interface GlassContainerProps extends Omit<BoxProps, 'sx'> {
 }
 
 /**
- * Theme-adaptive background using MUI CSS variables.
- * var(--mui-palette-background-default) is dark in dark mode, light in light mode.
+ * Theme-adaptive background using CSS variables so a parent can drop the
+ * frost (`--glass-backdrop-filter: none`) and go more opaque without a
+ * second glass component. Fallbacks match today's look when the vars are unset.
  */
-const GLASS_BG = 'color-mix(in srgb, var(--mui-palette-background-default) 70%, transparent)';
 const GLASS_BORDER = '1px solid color-mix(in srgb, CanvasText 12%, transparent)';
 const GLASS_SHADOW = `
   inset 0 1px 0 color-mix(in srgb, var(--mui-palette-common-white) 15%, transparent),
@@ -24,8 +24,9 @@ const GLASS_SHADOW = `
 const { cardBorderRadius } = getShape();
 
 const glassContainerBaseSx: SxObject = {
-  backdropFilter: 'blur(12px) saturate(150%)',
-  backgroundColor: GLASS_BG,
+  backdropFilter: 'var(--glass-backdrop-filter, blur(12px) saturate(150%))',
+  backgroundColor:
+    'var(--glass-bg, color-mix(in srgb, var(--mui-palette-background-default) 70%, transparent))',
   border: GLASS_BORDER,
   borderRadius: `${cardBorderRadius}px`,
   boxShadow: GLASS_SHADOW,

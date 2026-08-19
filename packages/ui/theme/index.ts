@@ -6,9 +6,10 @@ import { getTimingCssVars } from '../helpers/timing';
 import { onCanvas } from './color';
 import { COLOR_SCHEME_ATTRIBUTE } from './colorScheme';
 import { getShadows } from './extraShadows';
+import { getGlassCssVars } from './glass';
 import { getPalette } from './palette';
 import { getShape } from './shape';
-import { getTypography } from './typography';
+import { getTypeCssVars, getTypography } from './typography';
 
 /**
  * Use this everywhere where theme support is needed.
@@ -137,6 +138,8 @@ export function getTheme(): Theme {
         styleOverrides: (theme) => ({
           ':root': {
             ...getTimingCssVars(),
+            ...getTypeCssVars(),
+            ...getGlassCssVars(),
             fontVariant: 'tabular-nums',
             wordBreak: 'break-word',
             [theme.breakpoints.up('sm')]: {
@@ -262,6 +265,12 @@ export function getTheme(): Theme {
             style: ({ theme }) => ({
               background: theme.vars.palette.background.paper,
               color: theme.vars.palette.text.secondary,
+            }),
+          },
+          {
+            props: { variant: 'display' },
+            style: ({ theme }) => ({
+              color: theme.vars.palette.text.h1,
             }),
           },
           {
