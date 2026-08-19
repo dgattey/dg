@@ -7,8 +7,8 @@ describe('greenhouseLayout', () => {
 
   it('stays within the overlay cap', () => {
     const plants = layoutGreenhousePlants('home');
-    expect(plants.filter((plant) => plant.layer === 'front').length).toBeLessThanOrEqual(24);
-    expect(plants.filter((plant) => plant.layer === 'back').length).toBeLessThanOrEqual(8);
+    expect(plants.filter((plant) => plant.layer === 'front').length).toBeLessThanOrEqual(10);
+    expect(plants.filter((plant) => plant.layer === 'back').length).toBeLessThanOrEqual(4);
   });
 
   it('uses only the shared leaf vocabulary', () => {
@@ -26,7 +26,15 @@ describe('greenhouseLayout', () => {
     const featuredOf = (surface: 'home' | '/music' | '/music/albums') =>
       layoutGreenhousePlants(surface).find((plant) => plant.featured)?.symbol;
 
-    expect(featuredOf('home')).not.toBe(featuredOf('/music'));
-    expect(featuredOf('home')).not.toBe(featuredOf('/music/albums'));
+    expect(featuredOf('home')).toBe('leaf-monstera');
+    expect(featuredOf('/music')).toBe('leaf-bop');
+    expect(featuredOf('/music/albums')).toBe('leaf-pothos');
+  });
+
+  it('hangs plants from viewport edges instead of scattering over copy', () => {
+    for (const plant of layoutGreenhousePlants('home')) {
+      expect(['left', 'right']).toContain(plant.edge);
+      expect(plant.x).toBeLessThanOrEqual(4);
+    }
   });
 });

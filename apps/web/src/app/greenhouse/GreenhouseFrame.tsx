@@ -3,7 +3,6 @@ import 'server-only';
 import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import { GreenhousePlants } from './GreenhousePlants';
-import { GreenhouseSpriteDefs } from './GreenhouseSpriteDefs';
 import styles from './greenhouse.module.css';
 import type { GreenhouseSurface } from './greenhouseLayout';
 import { layoutGreenhousePlants } from './greenhouseLayout';
@@ -36,21 +35,20 @@ export function GreenhouseFrame({ children, surface, chrome = true }: Greenhouse
     >
       {chrome ? (
         <>
-          <svg aria-hidden="true" className={styles.hiddenSprite}>
-            <GreenhouseSpriteDefs />
-          </svg>
           <div className={styles.backStack}>
             <div className={styles.atmosphere}>
+              <div className={styles.canopy} />
+              <div className={styles.shaft} />
+              <div className={styles.panes} />
               <div className={styles.dew} />
               <div className={styles.sun} />
               <div className={styles.mullions}>
                 <span className={styles.mullionV} style={{ left: '0%' }} />
-                <span className={styles.mullionV} style={{ left: '25%' }} />
-                <span className={styles.mullionV} style={{ left: '50%' }} />
-                <span className={styles.mullionV} style={{ left: '75%' }} />
-                <span className={styles.mullionV} style={{ left: 'calc(100% - 4px)' }} />
+                <span className={styles.mullionV} style={{ left: '33%' }} />
+                <span className={styles.mullionV} style={{ left: '67%' }} />
+                <span className={styles.mullionV} style={{ left: 'calc(100% - 10px)' }} />
                 <span className={styles.mullionH} style={{ top: '0%' }} />
-                <span className={styles.mullionH} style={{ top: '36%' }} />
+                <span className={styles.mullionH} style={{ top: '12%' }} />
                 <span className={styles.mullionH} style={{ bottom: '0%' }} />
               </div>
             </div>

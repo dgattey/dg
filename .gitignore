@@ -29,6 +29,7 @@ npm-debug.log*
 
 # Local-only greenhouse screenshot fixtures (never ship)
 apps/web/src/app/greenhouse/.local/
+apps/web/public/.greenhouse-local/
 
 # vercel
 .vercel

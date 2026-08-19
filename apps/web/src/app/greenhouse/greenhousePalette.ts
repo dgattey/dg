@@ -8,8 +8,10 @@ import { FONT_DISPLAY_STACK, HEADING_FONT_SIZE_DISPLAY } from '@dg/ui/theme/typo
  * sans small-caps headings and frosted glass.
  */
 export const GREENHOUSE_TOKEN_VARS: SxObject = {
-  '--card-backdrop-filter': 'none',
+  '--card-backdrop-filter': 'blur(20px) saturate(125%)',
   '--card-bg': GLASS_BG_MATTE,
+  '--card-box-shadow':
+    'inset 0 1.5px 0 color-mix(in srgb, white 82%, transparent), inset 0 0 0 1px color-mix(in srgb, white 34%, transparent), inset 0 -1px 0 color-mix(in srgb, black 6%, transparent), 0 18px 40px color-mix(in srgb, black 12%, transparent)',
   '--font-display': FONT_DISPLAY_STACK,
   '--glass-backdrop-filter': 'none',
   '--glass-bg': GLASS_BG_MATTE,
@@ -46,19 +48,23 @@ export const GREENHOUSE_LEAF_VARS: SxObject = {
 };
 
 const atmospherePair = {
-  mullion: ['hsl(28deg, 18%, 22%)', 'hsl(0deg, 0%, 82%)'],
-  mullionEdge: ['hsl(40deg, 30%, 78%, 0.4)', 'hsl(0deg, 0%, 100%, 0.14)'],
-  ribDark: ['hsl(95deg, 18%, 28%, 0.42)', 'hsl(160deg, 10%, 80%, 0.18)'],
-  ribMid: ['hsl(88deg, 28%, 72%, 0.28)', 'hsl(160deg, 16%, 22%, 0.24)'],
-  ribShine: ['hsl(48deg, 55%, 90%, 0.28)', 'hsl(40deg, 20%, 32%, 0.16)'],
-  sunCore: ['hsl(48deg, 100%, 94%, 0.95)', 'hsl(40deg, 80%, 58%, 0.55)'],
-  sunHalo: ['hsl(42deg, 90%, 80%, 0.5)', 'hsl(38deg, 60%, 40%, 0.28)'],
-  wash: ['hsl(95deg, 24%, 58%)', 'hsl(160deg, 28%, 9%)'],
+  mullion: ['hsl(32deg, 22%, 28%)', 'hsl(0deg, 0%, 82%)'],
+  mullionEdge: ['hsl(40deg 40% 86% / 0.45)', 'hsl(0deg 0% 100% / 0.16)'],
+  mullionHighlight: ['hsl(38deg, 28%, 58%)', 'hsl(0deg, 0%, 88%)'],
+  mullionShade: ['hsl(28deg, 22%, 12%)', 'hsl(0deg, 0%, 18%)'],
+  ribDark: ['hsl(40deg 18% 28% / 0.28)', 'hsl(160deg 10% 80% / 0.18)'],
+  ribMid: ['hsl(42deg 32% 78% / 0.22)', 'hsl(160deg 16% 22% / 0.24)'],
+  ribShine: ['hsl(48deg 55% 92% / 0.32)', 'hsl(40deg 20% 32% / 0.16)'],
+  sunCore: ['hsl(48deg 100% 94% / 0.95)', 'hsl(40deg 80% 58% / 0.55)'],
+  sunHalo: ['hsl(42deg 92% 78% / 0.62)', 'hsl(38deg 60% 40% / 0.28)'],
+  wash: ['hsl(42deg, 32%, 78%)', 'hsl(160deg, 28%, 9%)'],
 } as const;
 
 export const GREENHOUSE_ATMOSPHERE_VARS: SxObject = {
   '--greenhouse-mullion': lightDark(atmospherePair.mullion),
   '--greenhouse-mullion-edge': lightDark(atmospherePair.mullionEdge),
+  '--greenhouse-mullion-highlight': lightDark(atmospherePair.mullionHighlight),
+  '--greenhouse-mullion-shade': lightDark(atmospherePair.mullionShade),
   '--greenhouse-rib-dark': lightDark(atmospherePair.ribDark),
   '--greenhouse-rib-mid': lightDark(atmospherePair.ribMid),
   '--greenhouse-rib-shine': lightDark(atmospherePair.ribShine),
