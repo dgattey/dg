@@ -12,7 +12,7 @@ export const generateMetadata = generateHomepageMetadata;
 export default function Page() {
   return (
     <GreenhouseFrame surface="home">
-      <Homepage Grid={OrganicGrid} />
+      <Homepage Grid={OrganicGrid} introVariant="composed" />
     </GreenhouseFrame>
   );
 }

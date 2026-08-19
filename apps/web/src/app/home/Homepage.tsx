@@ -1,6 +1,7 @@
 import { ContentGrid } from '@dg/ui/core/ContentGrid';
 import { getProjects } from '../../services/contentful';
 import { GatteySitesCardSlot } from './GatteySitesCardSlot';
+import type { IntroCardVariant } from './IntroCard';
 import { IntroCardSlot } from './IntroCardSlot';
 import { MapCardSlot } from './MapCardSlot';
 import { ProjectCard } from './ProjectCard';
@@ -30,21 +31,40 @@ function mergeCards(
  * toggle.
  *
  * `Grid` defaults to the rigid `ContentGrid` so flag-off `/` stays put.
- * The greenhouse homepage passes a looser grid.
+ * The greenhouse homepage passes a looser grid and a composed intro.
  */
-export async function Homepage({ Grid = ContentGrid }: { Grid?: HomepageGrid } = {}) {
-  const projects = await getProjects();
-  const projectCards = projects.map((project) => <ProjectCard key={project.title} {...project} />);
+export async function Homepage({
+  Grid = ContentGrid,
+  introVariant = 'split',
+}: {
+  Grid?: HomepageGrid;
+  introVariant?: IntroCardVariant;
+} = {}) {
+  const isGreenhouse = introVariant === 'composed';
+  const projects = await getProjects().catch(() => []);
+  const projectCards = projects.map((project, index) => (
+    <ProjectCard
+      key={project.title}
+      variant={isGreenhouse && index === 0 ? 'featured' : 'media'}
+      {...project}
+    />
+  ));
 
   // These cards are interleaved between the project cards at the given indices. Project cards
   // should maintain their original order, but not necessarily index.
-  const preciselyPlacedCards = new Map([
-    [0, <IntroCardSlot key="intro" />],
-    [1, <MapCardSlot key="map" />],
-    [3, <SpotifyCardSlot key="spotify" />],
-    [4, <StravaCardSlot key="strava" />],
-    [7, <GatteySitesCardSlot key="gattey-sites" />],
-  ]);
+  const preciselyPlacedCards = isGreenhouse
+    ? new Map([
+        [0, <IntroCardSlot key="intro" variant="composed" />],
+        [1, <SpotifyCardSlot key="spotify" variant="nowPlaying" />],
+        [2, <StravaCardSlot key="strava" />],
+      ])
+    : new Map([
+        [0, <IntroCardSlot key="intro" variant={introVariant} />],
+        [1, <MapCardSlot key="map" />],
+        [3, <SpotifyCardSlot key="spotify" />],
+        [4, <StravaCardSlot key="strava" />],
+        [7, <GatteySitesCardSlot key="gattey-sites" />],
+      ]);
 
   return <Grid>{mergeCards(projectCards, preciselyPlacedCards)}</Grid>;
 }

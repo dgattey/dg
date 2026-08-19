@@ -128,7 +128,7 @@ export async function RedesignBadge() {
  */
 export async function Footer() {
   const [footerLinks, versionInfo, currentYear] = await Promise.all([
-    getFooterLinks(),
+    getFooterLinks().catch(() => []),
     getAppVersionInfo(),
     getCopyrightYear(),
   ]);

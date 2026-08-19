@@ -92,7 +92,7 @@ export function getTheme(): Theme {
             borderRadius: theme.shape.cardBorderRadius,
             borderStyle: 'solid',
             borderWidth: 'thin',
-            boxShadow: theme.vars.extraShadows.card.main,
+            boxShadow: `var(--card-box-shadow, ${theme.vars.extraShadows.card.main})`,
           }),
         },
       },

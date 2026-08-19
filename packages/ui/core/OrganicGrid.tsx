@@ -12,8 +12,26 @@ type Props = Pick<React.ComponentProps<'div'>, 'children'>;
  * Mobile stays a single column, matching `ContentGrid`.
  */
 export function OrganicGrid({ children }: Props) {
-  const { gridGap, gridGapLarge, gridItemMinSize } = getShape();
+  const { gridGap, gridGapLarge } = getShape();
   const gridSx: SxObject = {
+    '& > [data-bento="activity"], & > *:has([data-bento="activity"])': {
+      gridColumn: { md: '1 / span 2' },
+      gridRow: { md: '2' },
+      minHeight: { md: '13.25rem' },
+    },
+    '& > [data-bento="featured"], & > *:has([data-bento="featured"])': {
+      gridColumn: { md: '3' },
+      gridRow: { md: '2' },
+    },
+    '& > [data-bento="intro"], & > *:has([data-bento="intro"])': {
+      gridColumn: { md: '1 / span 2' },
+      gridRow: { md: '1' },
+      minHeight: { md: '15rem' },
+    },
+    '& > [data-bento="now-playing"], & > *:has([data-bento="now-playing"])': {
+      gridColumn: { md: '3' },
+      gridRow: { md: '1' },
+    },
     '& > *': {
       height: { md: '100%' },
       justifySelf: 'stretch',
@@ -21,23 +39,23 @@ export function OrganicGrid({ children }: Props) {
       width: { md: '100% !important', xs: '85vw' },
     },
     '& > *:nth-child(3n)': {
-      marginInlineStart: { md: '0.2rem' },
-      marginTop: { md: '0.45rem' },
+      marginInlineStart: { md: '0.15rem' },
+      marginTop: { md: '0.25rem' },
     },
     '& > *:nth-child(3n+1)': {
-      marginInlineEnd: { md: '0.35rem' },
-      marginTop: { md: '-0.4rem' },
+      marginInlineEnd: { md: '0.2rem' },
+      marginTop: { md: '-0.2rem' },
     },
     '& > *:nth-child(3n+2)': {
-      marginInlineStart: { md: '-0.2rem' },
-      marginTop: { md: '0.55rem' },
+      marginInlineStart: { md: '-0.1rem' },
+      marginTop: { md: '0.3rem' },
     },
     display: 'grid',
-    gap: { md: `${gridGapLarge + 0.35}rem`, xs: `${gridGap}rem` },
+    gap: { md: `${gridGapLarge}rem`, xs: `${gridGap}rem` },
     gridAutoFlow: 'dense',
-    gridAutoRows: { md: `minmax(${gridItemMinSize}rem, auto)` },
+    gridAutoRows: { md: 'auto', xs: 'auto' },
     gridTemplateColumns: {
-      md: `repeat(auto-fit, minmax(${gridItemMinSize}rem, 1fr))`,
+      md: 'repeat(3, minmax(0, 1fr))',
       xs: '1fr',
     },
     justifyContent: 'center',

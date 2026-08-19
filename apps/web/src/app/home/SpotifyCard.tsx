@@ -83,22 +83,26 @@ function SpotifyCardLoading() {
  * Async data-fetching wrapper. Fetches the latest song server-side
  * and renders the client card that derives its gradient from album art.
  */
-async function SpotifyCardAsync() {
-  const track = await getLatestSong();
-  if (!track) {
+async function SpotifyCardAsync({ variant }: { variant: 'card' | 'nowPlaying' }) {
+  try {
+    const track = await getLatestSong();
+    if (!track) {
+      return null;
+    }
+    return <SpotifyCardWithGradient track={track} variant={variant} />;
+  } catch {
     return null;
   }
-  return <SpotifyCardWithGradient track={track} />;
 }
 
 /**
  * Public entry point for the Spotify card on the homepage.
  * Wraps the async content in Suspense with a loading skeleton.
  */
-export function SpotifyCardSlot() {
+export function SpotifyCardSlot({ variant = 'card' }: { variant?: 'card' | 'nowPlaying' } = {}) {
   return (
     <Suspense fallback={<SpotifyCardLoading />}>
-      <SpotifyCardAsync />
+      <SpotifyCardAsync variant={variant} />
     </Suspense>
   );
 }

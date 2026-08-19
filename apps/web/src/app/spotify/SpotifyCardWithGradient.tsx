@@ -7,6 +7,7 @@ import { Box } from '@mui/material';
 import { type ReactNode, useEffect, useState } from 'react';
 import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
 import { type AlbumGradientInformation, extractAlbumGradientFromUrl } from './extractAlbumGradient';
+import { NowPlayingCard } from './NowPlayingCard';
 import { SpotifyCardScrollTracker } from './SpotifyCardScrollTracker';
 import { TrackListing } from './TrackListing';
 
@@ -66,19 +67,27 @@ function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
 
 type SpotifyCardWithGradientProps = {
   track: Track;
+  /**
+   * `card` is today's homepage listing. `nowPlaying` is the greenhouse tile:
+   * wash, notes, progress, botanical accent.
+   */
+  variant?: 'card' | 'nowPlaying';
 };
 
 /**
  * Client card that derives album-art gradient/contrast in the browser.
  * Keeps sharp (and its native libvips) out of the homepage server module graph.
  */
-export function SpotifyCardWithGradient({ track }: SpotifyCardWithGradientProps) {
+export function SpotifyCardWithGradient({ track, variant = 'card' }: SpotifyCardWithGradientProps) {
   const [gradientInformation, setGradientInformation] = useState<AlbumGradientInformation>({
     backgroundGradient: track.albumGradient ?? null,
     contrastSetting: track.albumGradientContrastSetting ?? null,
   });
 
   useEffect(() => {
+    if (!track.albumImage.url.startsWith('http')) {
+      return undefined;
+    }
     let cancelled = false;
     extractAlbumGradientFromUrl(track.albumImage.url).then((info) => {
       if (cancelled) {
@@ -96,6 +105,14 @@ export function SpotifyCardWithGradient({ track }: SpotifyCardWithGradientProps)
     albumGradient: gradientInformation.backgroundGradient ?? undefined,
     albumGradientContrastSetting: gradientInformation.contrastSetting ?? undefined,
   };
+
+  if (variant === 'nowPlaying') {
+    return (
+      <SpotifyCardScrollTracker>
+        <NowPlayingCard track={trackWithCurrentGradient} />
+      </SpotifyCardScrollTracker>
+    );
+  }
 
   return (
     <SpotifyCardScrollTracker>

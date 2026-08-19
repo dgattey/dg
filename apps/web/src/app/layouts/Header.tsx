@@ -44,11 +44,15 @@ const glassContainerSx: SxObject = {
  * Wrapped in Suspense because getLatestSong accesses runtime data (cookies).
  */
 async function SpotifyHeaderCardSlot() {
-  const track = await getLatestSong();
-  if (!track) {
+  try {
+    const track = await getLatestSong();
+    if (!track) {
+      return null;
+    }
+    return <SpotifyHeaderCard track={track} />;
+  } catch {
     return null;
   }
-  return <SpotifyHeaderCard track={track} />;
 }
 
 /**

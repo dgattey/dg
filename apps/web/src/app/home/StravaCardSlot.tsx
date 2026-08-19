@@ -4,6 +4,10 @@ import { getLatestActivity } from '../../services/strava';
 import { StravaCard } from './StravaCard';
 
 export async function StravaCardSlot() {
-  const activity = await getLatestActivity();
-  return <StravaCard activity={activity} />;
+  try {
+    const activity = await getLatestActivity();
+    return <StravaCard activity={activity} />;
+  } catch {
+    return null;
+  }
 }

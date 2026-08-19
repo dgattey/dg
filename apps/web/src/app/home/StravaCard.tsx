@@ -85,7 +85,7 @@ export function StravaCard({ activity }: { activity: StravaActivity | null }) {
   const encodedPolyline = activity.map?.summaryPolyline ?? activity.map?.polyline;
 
   return (
-    <ContentCard sx={cardSx}>
+    <ContentCard data-bento="activity" sx={cardSx}>
       {encodedPolyline ? (
         <Box sx={mapSx}>
           <StravaRouteMap encodedPolyline={encodedPolyline} />

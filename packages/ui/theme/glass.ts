@@ -11,7 +11,7 @@ export const GLASS_BG_DEFAULT =
   'color-mix(in srgb, var(--mui-palette-background-default) 70%, transparent)';
 
 export const GLASS_BG_MATTE =
-  'color-mix(in srgb, var(--mui-palette-background-paper) 80%, transparent)';
+  'color-mix(in srgb, var(--mui-palette-background-paper) 82%, transparent)';
 
 export function getGlassCssVars(): Record<`--${string}`, string> {
   return {
