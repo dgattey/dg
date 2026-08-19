@@ -8,6 +8,8 @@ import { FONT_DISPLAY_STACK, HEADING_FONT_SIZE_DISPLAY } from '@dg/ui/theme/typo
  * sans small-caps headings and frosted glass.
  */
 export const GREENHOUSE_TOKEN_VARS: SxObject = {
+  '--card-backdrop-filter': 'none',
+  '--card-bg': GLASS_BG_MATTE,
   '--font-display': FONT_DISPLAY_STACK,
   '--glass-backdrop-filter': 'none',
   '--glass-bg': GLASS_BG_MATTE,

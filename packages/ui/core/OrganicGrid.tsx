@@ -15,9 +15,10 @@ export function OrganicGrid({ children }: Props) {
   const { gridGap, gridGapLarge, gridItemMinSize } = getShape();
   const gridSx: SxObject = {
     '& > *': {
+      height: { md: '100%' },
       justifySelf: 'stretch',
-      maxWidth: { md: 'none', xs: '85vw' },
-      width: { md: 'auto', xs: '85vw' },
+      maxWidth: { md: 'none !important', xs: '85vw' },
+      width: { md: '100% !important', xs: '85vw' },
     },
     '& > *:nth-child(3n)': {
       marginInlineStart: { md: '0.2rem' },

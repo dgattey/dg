@@ -15,7 +15,7 @@ export function GreenhousePlants({ plants, layer }: GreenhousePlantsProps) {
     <svg
       aria-hidden="true"
       className={layer === 'back' ? styles.plantsBack : styles.plantsFront}
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="none"
       viewBox="0 0 100 100"
     >
       {items.map((plant) => (

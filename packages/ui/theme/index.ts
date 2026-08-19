@@ -86,7 +86,8 @@ export function getTheme(): Theme {
       MuiCard: {
         styleOverrides: {
           root: ({ theme }) => ({
-            background: theme.vars.palette.background.paper,
+            backdropFilter: 'var(--card-backdrop-filter, none)',
+            background: `var(--card-bg, ${theme.vars.palette.background.paper})`,
             borderColor: theme.vars.palette.card.border,
             borderRadius: theme.shape.cardBorderRadius,
             borderStyle: 'solid',
