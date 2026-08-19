@@ -31,7 +31,7 @@ export function GreenhousePlants({ plants, layer }: GreenhousePlantsProps) {
     <div aria-hidden="true" className={layer === 'back' ? styles.plantsBack : styles.plantsFront}>
       {items.map((plant) => {
         const asset = FOLIAGE[plant.symbol];
-        const mass = plant.featured ? 30 : 20;
+        const mass = plant.featured ? 38 : 28;
         const inset = `${plant.x}%`;
         return (
           <img

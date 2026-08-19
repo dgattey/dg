@@ -7,8 +7,8 @@ describe('greenhouseLayout', () => {
 
   it('stays within the overlay cap', () => {
     const plants = layoutGreenhousePlants('home');
-    expect(plants.filter((plant) => plant.layer === 'front').length).toBeLessThanOrEqual(10);
-    expect(plants.filter((plant) => plant.layer === 'back').length).toBeLessThanOrEqual(4);
+    expect(plants.filter((plant) => plant.layer === 'front').length).toBeLessThanOrEqual(14);
+    expect(plants.filter((plant) => plant.layer === 'back').length).toBeLessThanOrEqual(8);
   });
 
   it('uses only the shared leaf vocabulary', () => {

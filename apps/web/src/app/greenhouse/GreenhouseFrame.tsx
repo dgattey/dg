@@ -38,17 +38,24 @@ export function GreenhouseFrame({ children, surface, chrome = true }: Greenhouse
           <div className={styles.backStack}>
             <div className={styles.atmosphere}>
               <div className={styles.canopy} />
+              <div className={styles.ribs} />
               <div className={styles.shaft} />
               <div className={styles.panes} />
+              <div className={styles.dapple} />
               <div className={styles.dew} />
               <div className={styles.sun} />
+              <div className={styles.sunBlob} />
               <div className={styles.mullions}>
                 <span className={styles.mullionV} style={{ left: '0%' }} />
-                <span className={styles.mullionV} style={{ left: '33%' }} />
-                <span className={styles.mullionV} style={{ left: '67%' }} />
-                <span className={styles.mullionV} style={{ left: 'calc(100% - 10px)' }} />
+                <span className={styles.mullionV} style={{ left: '20%' }} />
+                <span className={styles.mullionV} style={{ left: '40%' }} />
+                <span className={styles.mullionV} style={{ left: '60%' }} />
+                <span className={styles.mullionV} style={{ left: '80%' }} />
+                <span className={styles.mullionV} style={{ left: 'calc(100% - 7px)' }} />
                 <span className={styles.mullionH} style={{ top: '0%' }} />
-                <span className={styles.mullionH} style={{ top: '12%' }} />
+                <span className={styles.mullionH} style={{ top: '16%' }} />
+                <span className={styles.mullionH} style={{ top: '38%' }} />
+                <span className={styles.mullionH} style={{ top: '68%' }} />
                 <span className={styles.mullionH} style={{ bottom: '0%' }} />
               </div>
             </div>

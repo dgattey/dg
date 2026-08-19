@@ -11,7 +11,7 @@ export const GREENHOUSE_TOKEN_VARS: SxObject = {
   '--card-backdrop-filter': 'blur(20px) saturate(125%)',
   '--card-bg': GLASS_BG_MATTE,
   '--card-box-shadow':
-    'inset 0 1.5px 0 color-mix(in srgb, white 82%, transparent), inset 0 0 0 1px color-mix(in srgb, white 34%, transparent), inset 0 -1px 0 color-mix(in srgb, black 6%, transparent), 0 18px 40px color-mix(in srgb, black 12%, transparent)',
+    'inset 0 1.5px 0 color-mix(in srgb, white 82%, transparent), inset 0 0 0 1px color-mix(in srgb, white 34%, transparent), inset 0 -1px 0 color-mix(in srgb, black 6%, transparent), 0 22px 48px color-mix(in srgb, black 28%, transparent), 0 8px 18px color-mix(in srgb, black 16%, transparent)',
   '--font-display': FONT_DISPLAY_STACK,
   '--glass-backdrop-filter': 'none',
   '--glass-bg': GLASS_BG_MATTE,
@@ -48,16 +48,16 @@ export const GREENHOUSE_LEAF_VARS: SxObject = {
 };
 
 const atmospherePair = {
-  mullion: ['hsl(32deg, 22%, 28%)', 'hsl(0deg, 0%, 82%)'],
-  mullionEdge: ['hsl(40deg 40% 86% / 0.45)', 'hsl(0deg 0% 100% / 0.16)'],
-  mullionHighlight: ['hsl(38deg, 28%, 58%)', 'hsl(0deg, 0%, 88%)'],
-  mullionShade: ['hsl(28deg, 22%, 12%)', 'hsl(0deg, 0%, 18%)'],
-  ribDark: ['hsl(40deg 18% 28% / 0.28)', 'hsl(160deg 10% 80% / 0.18)'],
-  ribMid: ['hsl(42deg 32% 78% / 0.22)', 'hsl(160deg 16% 22% / 0.24)'],
-  ribShine: ['hsl(48deg 55% 92% / 0.32)', 'hsl(40deg 20% 32% / 0.16)'],
-  sunCore: ['hsl(48deg 100% 94% / 0.95)', 'hsl(40deg 80% 58% / 0.55)'],
-  sunHalo: ['hsl(42deg 92% 78% / 0.62)', 'hsl(38deg 60% 40% / 0.28)'],
-  wash: ['hsl(42deg, 32%, 78%)', 'hsl(160deg, 28%, 9%)'],
+  mullion: ['hsl(36deg, 14%, 32%)', 'hsl(0deg, 0%, 78%)'],
+  mullionEdge: ['hsl(48deg 50% 88% / 0.55)', 'hsl(0deg 0% 100% / 0.18)'],
+  mullionHighlight: ['hsl(40deg, 22%, 62%)', 'hsl(0deg, 0%, 90%)'],
+  mullionShade: ['hsl(30deg, 18%, 10%)', 'hsl(0deg, 0%, 16%)'],
+  ribDark: ['hsl(90deg 32% 16% / 0.42)', 'hsl(160deg 12% 80% / 0.2)'],
+  ribMid: ['hsl(88deg 22% 52% / 0.12)', 'hsl(160deg 14% 24% / 0.22)'],
+  ribShine: ['hsl(50deg 70% 96% / 0.55)', 'hsl(40deg 18% 36% / 0.18)'],
+  sunCore: ['hsl(48deg 100% 97% / 1)', 'hsl(40deg 86% 62% / 0.62)'],
+  sunHalo: ['hsl(46deg 96% 80% / 0.9)', 'hsl(38deg 58% 38% / 0.34)'],
+  wash: ['hsl(82deg, 28%, 66%)', 'hsl(158deg, 26%, 9%)'],
 } as const;
 
 export const GREENHOUSE_ATMOSPHERE_VARS: SxObject = {

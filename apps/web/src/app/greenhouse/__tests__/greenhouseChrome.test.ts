@@ -16,9 +16,12 @@ describe('greenhouse chrome', () => {
     expect(css).toContain('--greenhouse-wash');
     expect(css).toContain('.canopy');
     expect(css).toContain('.shaft');
-    expect(css).not.toContain('.ribs');
+    expect(css).toContain('.ribs');
+    expect(css).toContain('.dapple');
+    expect(css).toContain('repeating-linear-gradient');
     expect(css).not.toContain('#7f9b6c');
     expect(css).not.toContain('#90ae7a');
+    expect(css).not.toContain('#e2d4b0');
   });
 
   it('paints foliage as inert images, not stretched SVG uses', () => {
