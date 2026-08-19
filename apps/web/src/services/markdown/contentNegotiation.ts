@@ -24,17 +24,42 @@ const appendVaryAccept = (headers: Headers): void => {
   }
 };
 
-const rewriteToMarkdown = (request: NextRequest, htmlPath: MarkdownPagePath): NextResponse => {
+/**
+ * Rewrites the request to an internal path, keeping `Vary: Accept` so a
+ * negotiated response is never reused across content types.
+ */
+export const rewriteToPath = (request: NextRequest, pathname: string): NextResponse => {
   const url = request.nextUrl.clone();
-  url.pathname = htmlPathToInternalMarkdownPath(htmlPath);
+  url.pathname = pathname;
   const rewritten = NextResponse.rewrite(url);
   appendVaryAccept(rewritten.headers);
   return rewritten;
 };
 
+const rewriteToMarkdown = (request: NextRequest, htmlPath: MarkdownPagePath): NextResponse =>
+  rewriteToPath(request, htmlPathToInternalMarkdownPath(htmlPath));
+
 /**
- * Negotiates Markdown vs HTML for registered pages and rewrites `.md` twins
- * to `/llm-markdown`.
+ * The registered page this request negotiates for, or null when negotiation
+ * does not apply. Flight/RSC and non-GET are excluded: negotiation must not
+ * 406 a `text/x-component` resume.
+ */
+const negotiablePagePath = (request: NextRequest): MarkdownPagePath | null => {
+  const pathname = request.nextUrl.pathname;
+  if (!isMarkdownPagePath(pathname) || isNextFlightRequest(request) || request.method !== 'GET') {
+    return null;
+  }
+  return pathname;
+};
+
+/**
+ * Resolves requests that must not be served as HTML: `.md` twins, an Accept
+ * that explicitly asks for Markdown, and Accept headers we cannot satisfy.
+ *
+ * Returns null when the request should continue as HTML, leaving the caller to
+ * build that response — which is what lets the homepage still be rewritten to
+ * its flagged layout. Advertise the Markdown twin on it with
+ * `withMarkdownAlternate`.
  */
 export function negotiateMarkdown(request: NextRequest): NextResponse | null {
   const pathname = request.nextUrl.pathname;
@@ -44,17 +69,17 @@ export function negotiateMarkdown(request: NextRequest): NextResponse | null {
     return rewriteToMarkdown(request, htmlFromMarkdown);
   }
 
-  // Skip Flight/RSC + non-GET: negotiation must not 406 text/x-component resumes.
-  if (!isMarkdownPagePath(pathname) || isNextFlightRequest(request) || request.method !== 'GET') {
+  const pagePath = negotiablePagePath(request);
+  if (!pagePath) {
     return null;
   }
 
   const acceptHeader = request.headers.get('accept');
   const chosen = preferredType(acceptHeader, PRODUCES);
-  const markdownPath = htmlPathToMarkdownPath(pathname);
+  const markdownPath = htmlPathToMarkdownPath(pagePath);
 
   if (chosen === 'text/markdown' && hasExplicitType(acceptHeader, 'text/markdown')) {
-    return rewriteToMarkdown(request, pathname);
+    return rewriteToMarkdown(request, pagePath);
   }
 
   if (chosen === null && acceptHeader?.trim()) {
@@ -68,7 +93,20 @@ export function negotiateMarkdown(request: NextRequest): NextResponse | null {
     });
   }
 
-  const response = NextResponse.next();
+  return null;
+}
+
+/**
+ * Advertises a registered page's Markdown twin on the HTML response being
+ * served for it, and marks that response as varying by Accept.
+ */
+export function withMarkdownAlternate(request: NextRequest, response: NextResponse): NextResponse {
+  const pagePath = negotiablePagePath(request);
+  if (!pagePath) {
+    return response;
+  }
+
+  const markdownPath = htmlPathToMarkdownPath(pagePath);
   appendVaryAccept(response.headers);
   response.headers.set('Link', `<${markdownPath}>; rel="alternate"; type="text/markdown"`);
   return response;

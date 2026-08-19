@@ -6,6 +6,7 @@ import {
   favoriteAlbumsRoute,
   htmlPathToInternalMarkdownPath,
   htmlPathToMarkdownPath,
+  internalGreenhouseHomeRoute,
   isMarkdownPagePath,
   markdownPagePaths,
   markdownPages,
@@ -45,6 +46,11 @@ describe('markdown page registry', () => {
     expect(markdownPagePaths).not.toEqual(
       expect.arrayContaining([apiCatalogRoute, apiOpenApiRoute, apiStatusRoute]),
     );
+  });
+
+  it('keeps the greenhouse rewrite target out of the page registry', () => {
+    expect(isMarkdownPagePath(internalGreenhouseHomeRoute)).toBe(false);
+    expect(markdownPagePaths).not.toContain(internalGreenhouseHomeRoute);
   });
 
   it('builds album detail routes under favorite albums', () => {

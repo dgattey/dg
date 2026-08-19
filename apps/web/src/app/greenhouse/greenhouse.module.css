@@ -1,0 +1,106 @@
+.frame {
+  position: relative;
+}
+
+.backStack,
+.frontStack {
+  position: sticky;
+  top: 0;
+  width: 100vw;
+  height: 100dvh;
+  margin-bottom: -100dvh;
+  margin-left: calc(50% - 50vw);
+  pointer-events: none;
+}
+
+.backStack {
+  z-index: 0;
+}
+
+.frontStack {
+  z-index: 3;
+}
+
+.atmosphere {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  contain: paint;
+  background-color: light-dark(hsl(42deg, 38%, 88%), hsl(183deg, 42%, 8%));
+  background-image:
+    radial-gradient(
+      ellipse 55% 40% at 72% 8%,
+      light-dark(hsl(48deg, 90%, 92%, 0.7), hsl(40deg, 50%, 28%, 0.35)),
+      transparent 62%
+    ),
+    repeating-linear-gradient(
+      90deg,
+      light-dark(hsl(40deg, 28%, 78%, 0.28), hsl(183deg, 20%, 18%, 0.35)) 0 2px,
+      transparent 2px 11px
+    ),
+    repeating-linear-gradient(
+      90deg,
+      light-dark(hsl(30deg, 12%, 38%, 0.28), hsl(0deg, 0%, 80%, 0.18)) 0 3px,
+      transparent 3px calc(25% - 3px),
+      light-dark(hsl(30deg, 12%, 38%, 0.28), hsl(0deg, 0%, 80%, 0.18)) calc(25% - 3px) 25%
+    );
+}
+
+.sun {
+  position: absolute;
+  top: -4rem;
+  left: 58%;
+  width: 18rem;
+  height: 18rem;
+  pointer-events: none;
+  background: radial-gradient(
+    circle at 50% 50%,
+    light-dark(hsl(48deg, 100%, 92%, 0.85), hsl(40deg, 70%, 55%, 0.35)) 0 28%,
+    transparent 68%
+  );
+  filter: blur(12px);
+}
+
+.plantsBack,
+.plantsFront {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.plantsBack {
+  z-index: 1;
+}
+
+.plantsFront {
+  z-index: 3;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+}
+
+.hiddenSprite {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+}
+
+@media (max-width: 575px) {
+  .plantsBack [data-cluster="side"],
+  .plantsFront [data-cluster="side"] {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .atmosphere,
+  .plantsBack,
+  .plantsFront {
+    animation: none;
+  }
+}

@@ -7,6 +7,8 @@ import { ProjectCard } from './ProjectCard';
 import { SpotifyCardSlot } from './SpotifyCard';
 import { StravaCardSlot } from './StravaCardSlot';
 
+type HomepageGrid = (props: { children: React.ReactNode }) => React.ReactNode;
+
 /**
  * Merges the projects and other cards into a single array, where the other cards
  * are interleaved between the project cards at the given indices.
@@ -26,8 +28,11 @@ function mergeCards(
  * Puts all projects into a grid using `projects` data,
  * interspersed with `introBlock` data, and dark/light mode
  * toggle.
+ *
+ * `Grid` defaults to the rigid `ContentGrid` so flag-off `/` stays put.
+ * The greenhouse homepage passes a looser grid.
  */
-export async function Homepage() {
+export async function Homepage({ Grid = ContentGrid }: { Grid?: HomepageGrid } = {}) {
   const projects = await getProjects();
   const projectCards = projects.map((project) => <ProjectCard key={project.title} {...project} />);
 
@@ -41,5 +46,5 @@ export async function Homepage() {
     [7, <GatteySitesCardSlot key="gattey-sites" />],
   ]);
 
-  return <ContentGrid>{mergeCards(projectCards, preciselyPlacedCards)}</ContentGrid>;
+  return <Grid>{mergeCards(projectCards, preciselyPlacedCards)}</Grid>;
 }

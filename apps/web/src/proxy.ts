@@ -5,8 +5,16 @@ import {
 import { devConsoleRoute, homeRoute } from '@dg/shared-core/routes/app';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
+import {
+  greenhouseRewritePath,
+  publicPathForInternalGreenhouse,
+} from './services/greenhouseRewrite';
 import { isNextFlightRequest } from './services/isNextFlightRequest';
-import { negotiateMarkdown } from './services/markdown/contentNegotiation';
+import {
+  negotiateMarkdown,
+  rewriteToPath,
+  withMarkdownAlternate,
+} from './services/markdown/contentNegotiation';
 
 /**
  * Protects `/dev-console` with Basic Auth in production only. Non-production
@@ -71,10 +79,29 @@ function protectDevConsole(request: NextRequest): NextResponse | null {
   });
 }
 
-export function proxy(request: NextRequest) {
+/**
+ * Keeps the greenhouse homepage from becoming a second public homepage. It is
+ * a rewrite target only, so a direct hit is a duplicate of `/` and is sent
+ * there. Rewrites don't re-enter the proxy, so this never intercepts the
+ * homepage's own rewrite.
+ */
+function hideInternalGreenhouseRoute(request: NextRequest): NextResponse | null {
+  const publicPath = publicPathForInternalGreenhouse(request.nextUrl.pathname);
+  if (!publicPath) {
+    return null;
+  }
+  return NextResponse.redirect(new URL(publicPath, request.url));
+}
+
+export async function proxy(request: NextRequest) {
   const devConsoleResponse = protectDevConsole(request);
   if (devConsoleResponse) {
     return devConsoleResponse;
+  }
+
+  const internalRouteResponse = hideInternalGreenhouseRoute(request);
+  if (internalRouteResponse) {
+    return internalRouteResponse;
   }
 
   const markdownResponse = negotiateMarkdown(request);
@@ -82,7 +109,9 @@ export function proxy(request: NextRequest) {
     return markdownResponse;
   }
 
-  return NextResponse.next();
+  const rewritePath = await greenhouseRewritePath(request);
+  const response = rewritePath ? rewriteToPath(request, rewritePath) : NextResponse.next();
+  return withMarkdownAlternate(request, response);
 }
 
 export const config = {

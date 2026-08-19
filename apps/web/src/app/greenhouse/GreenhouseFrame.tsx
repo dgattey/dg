@@ -1,0 +1,56 @@
+import 'server-only';
+
+import { Box } from '@mui/material';
+import type { ReactNode } from 'react';
+import { GreenhousePlants } from './GreenhousePlants';
+import { GreenhouseSpriteDefs } from './GreenhouseSpriteDefs';
+import styles from './greenhouse.module.css';
+import type { GreenhouseSurface } from './greenhouseLayout';
+import { layoutGreenhousePlants } from './greenhouseLayout';
+import { GREENHOUSE_FRAME_VARS } from './greenhousePalette';
+
+type GreenhouseFrameProps = {
+  children: ReactNode;
+  surface: GreenhouseSurface;
+  /**
+   * Decorative ribs, sun, and plants. Token overrides still apply when this
+   * is off so the design-system pass can be photographed on its own.
+   */
+  chrome?: boolean;
+};
+
+/**
+ * Shared greenhouse shell. Tokens (display serif, matte glass) always apply.
+ * Atmosphere and plants are optional so other routes can wrap later with the
+ * same vocabulary.
+ */
+export function GreenhouseFrame({ children, surface, chrome = true }: GreenhouseFrameProps) {
+  const plants = chrome ? layoutGreenhousePlants(surface) : [];
+  return (
+    <Box
+      className={styles.frame}
+      data-greenhouse-chrome={chrome ? 'on' : 'off'}
+      data-greenhouse-frame={true}
+      data-greenhouse-surface={surface}
+      sx={GREENHOUSE_FRAME_VARS}
+    >
+      {chrome ? (
+        <>
+          <svg aria-hidden="true" className={styles.hiddenSprite}>
+            <GreenhouseSpriteDefs />
+          </svg>
+          <div className={styles.backStack}>
+            <div className={styles.atmosphere}>
+              <div className={styles.sun} />
+            </div>
+            <GreenhousePlants layer="back" plants={plants} />
+          </div>
+          <div className={styles.frontStack}>
+            <GreenhousePlants layer="front" plants={plants} />
+          </div>
+        </>
+      ) : null}
+      <div className={styles.content}>{children}</div>
+    </Box>
+  );
+}
