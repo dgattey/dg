@@ -224,11 +224,59 @@
   transform-origin: 50% 50%;
 }
 
+.plantFrame {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.frameLeft,
+.frameRight,
+.frameBottom {
+  position: absolute;
+  pointer-events: none;
+  filter: drop-shadow(0 16px 20px hsl(150deg, 32%, 6%, 0.45));
+}
+
+.frameLeft {
+  top: 0;
+  bottom: 0;
+  left: 0;
+  width: auto;
+  max-width: 28vw;
+  height: 100%;
+  object-fit: cover;
+  object-position: left center;
+}
+
+.frameRight {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: auto;
+  max-width: 28vw;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+}
+
+.frameBottom {
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  max-height: 34vh;
+  object-fit: cover;
+  object-position: center bottom;
+}
+
 .content {
   position: relative;
   z-index: 2;
-  padding-inline: max(1.25rem, calc((100vw - 72rem) / 2));
-  margin-top: -5.25rem;
+  padding-inline: max(2.25rem, calc((100vw - 64rem) / 2));
+  margin-top: -4.5rem;
 }
 
 :global(html),
@@ -263,6 +311,15 @@
     max-width: none;
     height: 28vw;
     max-height: none;
+  }
+
+  .frameLeft,
+  .frameRight {
+    max-width: 22vw;
+  }
+
+  .frameBottom {
+    max-height: 22vh;
   }
 
   .content {

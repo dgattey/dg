@@ -39,16 +39,16 @@ export function OrganicGrid({ children }: Props) {
       width: { md: '100% !important', xs: '85vw' },
     },
     '& > *:nth-child(3n)': {
-      marginInlineStart: { md: '0.15rem' },
-      marginTop: { md: '0.25rem' },
+      marginInlineStart: { md: '0.35rem' },
+      marginTop: { md: '0.45rem' },
     },
     '& > *:nth-child(3n+1)': {
-      marginInlineEnd: { md: '0.2rem' },
-      marginTop: { md: '-0.2rem' },
+      marginInlineEnd: { md: '0.4rem' },
+      marginTop: { md: '0.1rem' },
     },
     '& > *:nth-child(3n+2)': {
-      marginInlineStart: { md: '-0.1rem' },
-      marginTop: { md: '0.3rem' },
+      marginInlineStart: { md: '0.15rem' },
+      marginTop: { md: '0.35rem' },
     },
     display: 'grid',
     gap: { md: `${gridGapLarge}rem`, xs: `${gridGap}rem` },

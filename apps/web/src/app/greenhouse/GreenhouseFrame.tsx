@@ -2,6 +2,7 @@ import 'server-only';
 
 import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
+import { GreenhousePlantFrame } from './GreenhousePlantFrame';
 import { GreenhousePlants } from './GreenhousePlants';
 import styles from './greenhouse.module.css';
 import type { GreenhouseSurface } from './greenhouseLayout';
@@ -62,6 +63,7 @@ export function GreenhouseFrame({ children, surface, chrome = true }: Greenhouse
             <GreenhousePlants layer="back" plants={plants} />
           </div>
           <div className={styles.frontStack}>
+            {surface === 'home' ? <GreenhousePlantFrame /> : null}
             <GreenhousePlants layer="front" plants={plants} />
           </div>
         </>

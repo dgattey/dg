@@ -4,10 +4,24 @@ import { join } from 'node:path';
 describe('greenhouse chrome', () => {
   it('keeps painterly foliage sprites under the transfer budget', () => {
     const dir = join(__dirname, '../foliage');
-    const files = readdirSync(dir).filter((name) => name.endsWith('.webp'));
+    const files = readdirSync(dir).filter(
+      (name) => name.endsWith('.webp') && !name.startsWith('frame-'),
+    );
     expect(files.length).toBeGreaterThanOrEqual(4);
     const total = files.reduce((sum, name) => sum + statSync(join(dir, name)).size, 0);
     expect(total).toBeLessThan(150 * 1024);
+  });
+
+  it('keeps the photographic plant frame small', () => {
+    const dir = join(__dirname, '../foliage');
+    const frames = readdirSync(dir).filter(
+      (name) => name.startsWith('frame-') && name.endsWith('.webp'),
+    );
+    expect(frames).toEqual(
+      expect.arrayContaining(['frame-left.webp', 'frame-right.webp', 'frame-bottom.webp']),
+    );
+    const total = frames.reduce((sum, name) => sum + statSync(join(dir, name)).size, 0);
+    expect(total).toBeLessThan(110 * 1024);
   });
 
   it('keeps the glass atmosphere raster small', () => {
@@ -36,5 +50,12 @@ describe('greenhouse chrome', () => {
     expect(plants).toContain('.webp');
     expect(plants).not.toContain('<use');
     expect(plants).not.toContain('preserveAspectRatio="none"');
+  });
+
+  it('paints the home plant frame as inert images', () => {
+    const frame = readFileSync(join(__dirname, '../GreenhousePlantFrame.tsx'), 'utf8');
+    expect(frame).toContain('aria-hidden');
+    expect(frame).toContain('frame-left.webp');
+    expect(frame).not.toContain('<use');
   });
 });

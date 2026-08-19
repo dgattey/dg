@@ -52,7 +52,7 @@ const introTextSx: SxObject = {
 };
 
 const composedCardSx: SxObject = {
-  background: 'color-mix(in srgb, var(--mui-palette-background-paper) 86%, transparent)',
+  background: 'color-mix(in srgb, var(--mui-palette-background-paper) 52%, transparent)',
   borderColor: 'color-mix(in srgb, var(--mui-palette-common-white) 48%, transparent)',
   boxShadow: `
     inset 0 1.5px 0 color-mix(in srgb, var(--mui-palette-common-white) 84%, transparent),

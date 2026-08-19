@@ -29,7 +29,7 @@ const washSx: SxObject = {
   backgroundImage: FALLBACK_WASH,
   borderRadius: 'inherit',
   inset: 0,
-  opacity: 0.92,
+  opacity: 0.78,
   pointerEvents: 'none',
   position: 'absolute',
   zIndex: 0,
