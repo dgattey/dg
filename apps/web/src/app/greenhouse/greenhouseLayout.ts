@@ -60,10 +60,10 @@ const SURFACE_MIX: Record<GreenhouseSurface, SurfaceMix> = {
 };
 
 const HOME_SAFE_RECTS: ReadonlyArray<SafeRect> = [
-  { h: 16, w: 28, x: 18, y: 10 },
-  { h: 14, w: 24, x: 56, y: 12 },
-  { h: 16, w: 30, x: 16, y: 48 },
-  { h: 14, w: 22, x: 58, y: 52 },
+  { h: 10, w: 16, x: 30, y: 20 },
+  { h: 10, w: 14, x: 58, y: 22 },
+  { h: 10, w: 16, x: 30, y: 54 },
+  { h: 10, w: 14, x: 58, y: 56 },
 ];
 
 const MUSIC_SAFE_RECTS: ReadonlyArray<SafeRect> = [
@@ -72,10 +72,10 @@ const MUSIC_SAFE_RECTS: ReadonlyArray<SafeRect> = [
 ];
 
 const CORNER_ANCHORS: Record<'tl' | 'tr' | 'bl' | 'br', { x: number; y: number }> = {
-  bl: { x: -4, y: 72 },
-  br: { x: 78, y: 70 },
-  tl: { x: -6, y: -4 },
-  tr: { x: 80, y: -6 },
+  bl: { x: -10, y: 58 },
+  br: { x: 62, y: 56 },
+  tl: { x: -12, y: -8 },
+  tr: { x: 64, y: -10 },
 };
 
 const hashString = (input: string): number => {
@@ -131,7 +131,7 @@ const tryPlace = (
   rects: ReadonlyArray<SafeRect>,
 ): PlantInstance | null => {
   for (let attempt = 0; attempt < 6; attempt += 1) {
-    const scale = (base.featured ? 1.15 : 0.7) + next() * (base.featured ? 0.45 : 0.45);
+    const scale = (base.featured ? 1.85 : 1.05) + next() * (base.featured ? 0.7 : 0.55);
     const rotate = (next() - 0.5) * 70;
     const candidate: PlantInstance = {
       ...base,
@@ -213,7 +213,7 @@ export function layoutGreenhousePlants(
     }
   }
 
-  const vineX = mix.vineSide === 'left' ? -2 : 82;
+  const vineX = mix.vineSide === 'left' ? -8 : 68;
   const vineCount = 4 + Math.floor(next() * 2);
   for (let index = 0; index < vineCount; index += 1) {
     push(

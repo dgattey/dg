@@ -41,7 +41,18 @@ export function GreenhouseFrame({ children, surface, chrome = true }: Greenhouse
           </svg>
           <div className={styles.backStack}>
             <div className={styles.atmosphere}>
+              <div className={styles.dew} />
               <div className={styles.sun} />
+              <div className={styles.mullions}>
+                <span className={styles.mullionV} style={{ left: '0%' }} />
+                <span className={styles.mullionV} style={{ left: '25%' }} />
+                <span className={styles.mullionV} style={{ left: '50%' }} />
+                <span className={styles.mullionV} style={{ left: '75%' }} />
+                <span className={styles.mullionV} style={{ left: 'calc(100% - 4px)' }} />
+                <span className={styles.mullionH} style={{ top: '0%' }} />
+                <span className={styles.mullionH} style={{ top: '36%' }} />
+                <span className={styles.mullionH} style={{ bottom: '0%' }} />
+              </div>
             </div>
             <GreenhousePlants layer="back" plants={plants} />
           </div>

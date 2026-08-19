@@ -1,36 +1,48 @@
+import { LEAF_VIEWBOXES } from './GreenhouseSpriteDefs';
 import styles from './greenhouse.module.css';
-import type { PlantInstance, PlantLayer } from './greenhouseLayout';
+import type { LeafSymbol, PlantInstance, PlantLayer } from './greenhouseLayout';
 
 type GreenhousePlantsProps = {
   plants: ReadonlyArray<PlantInstance>;
   layer: PlantLayer;
 };
 
+const aspectWidth = (symbol: LeafSymbol, scale: number, featured: boolean): string => {
+  const box = LEAF_VIEWBOXES[symbol];
+  const [, , width, height] = box.split(' ').map(Number);
+  const ratio = (width ?? 100) / (height ?? 100);
+  const mass = featured ? 34 : 22;
+  return `${scale * mass * Math.min(1.15, ratio + 0.15)}vmin`;
+};
+
 /**
- * Decorative SVG overlay. Clicks pass through; screen readers skip it.
+ * Decorative SVG overlay. Each leaf keeps its authored aspect ratio — stretching
+ * is banned. Clicks pass through; screen readers skip it.
  */
 export function GreenhousePlants({ plants, layer }: GreenhousePlantsProps) {
   const items = plants.filter((plant) => plant.layer === layer);
   return (
-    <svg
-      aria-hidden="true"
-      className={layer === 'back' ? styles.plantsBack : styles.plantsFront}
-      preserveAspectRatio="none"
-      viewBox="0 0 100 100"
-    >
+    <div aria-hidden="true" className={layer === 'back' ? styles.plantsBack : styles.plantsFront}>
       {items.map((plant) => (
-        <use
+        <svg
+          aria-hidden="true"
+          className={styles.plant}
           data-cluster={plant.cluster}
           data-featured={plant.featured ? 'true' : undefined}
-          height={plant.scale * 18}
-          href={`#${plant.symbol}`}
+          focusable="false"
           key={plant.id}
-          transform={`rotate(${plant.rotate} ${plant.x + plant.scale * 9} ${plant.y + plant.scale * 9})`}
-          width={plant.scale * 18}
-          x={plant.x}
-          y={plant.y}
-        />
+          preserveAspectRatio="xMidYMid meet"
+          style={{
+            left: `${plant.x}%`,
+            top: `${plant.y}%`,
+            transform: `rotate(${plant.rotate}deg)`,
+            width: aspectWidth(plant.symbol, plant.scale, plant.featured),
+          }}
+          viewBox={LEAF_VIEWBOXES[plant.symbol]}
+        >
+          <use href={`#${plant.symbol}`} />
+        </svg>
       ))}
-    </svg>
+    </div>
   );
 }

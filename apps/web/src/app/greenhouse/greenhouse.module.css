@@ -1,14 +1,17 @@
 .frame {
   position: relative;
+  width: 100vw;
+  margin-left: calc(50% - 50vw);
+  background-color: var(--greenhouse-wash, #90ae7a);
 }
 
 .backStack,
 .frontStack {
-  position: fixed;
-  inset: 0;
+  position: sticky;
+  top: 0;
   width: 100%;
   height: 100dvh;
-  margin: 0;
+  margin-bottom: -100dvh;
   pointer-events: none;
 }
 
@@ -25,71 +28,96 @@
   width: 100%;
   height: 100%;
   contain: paint;
-  background-color: light-dark(hsl(42deg, 36%, 86%), hsl(183deg, 42%, 8%));
-  background-image:
-    radial-gradient(
-      ellipse 55% 40% at 72% 8%,
-      light-dark(hsl(48deg, 90%, 92%, 0.7), hsl(40deg, 50%, 28%, 0.35)),
-      transparent 62%
-    ),
-    repeating-linear-gradient(
-      90deg,
-      light-dark(hsl(40deg, 22%, 74%, 0.22), hsl(183deg, 20%, 18%, 0.28)) 0 2px,
-      transparent 2px 10px
-    ),
-    repeating-linear-gradient(
-      0deg,
-      light-dark(hsl(40deg, 18%, 72%, 0.12), hsl(183deg, 16%, 16%, 0.2)) 0 1px,
-      transparent 1px 14px
-    ),
-    repeating-linear-gradient(
-      90deg,
-      light-dark(hsl(30deg, 12%, 34%, 0.32), hsl(0deg, 0%, 80%, 0.18)) 0 4px,
-      transparent 4px calc(25% - 4px),
-      light-dark(hsl(30deg, 12%, 34%, 0.32), hsl(0deg, 0%, 80%, 0.18)) calc(25% - 4px) 25%
-    ),
-    repeating-linear-gradient(
-      0deg,
-      light-dark(hsl(30deg, 12%, 34%, 0.22), hsl(0deg, 0%, 80%, 0.14)) 0 3px,
-      transparent 3px 33.333%
-    );
+  background-color: var(--greenhouse-wash, #90ae7a);
+  background-image: repeating-linear-gradient(
+    90deg,
+    var(--greenhouse-rib-dark, rgb(69 84 59 / 0.42)) 0 3px,
+    var(--greenhouse-rib-mid, rgb(185 204 164 / 0.28)) 3px 8px,
+    var(--greenhouse-rib-shine, rgb(244 238 215 / 0.28)) 8px 10px,
+    transparent 10px 16px
+  );
+}
+
+.dew {
+  position: absolute;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 128 128'%3E%3Ccircle cx='18' cy='24' r='1.2' fill='white'/%3E%3Ccircle cx='46' cy='12' r='0.8' fill='white'/%3E%3Ccircle cx='72' cy='38' r='1.4' fill='white'/%3E%3Ccircle cx='104' cy='20' r='0.9' fill='white'/%3E%3Ccircle cx='28' cy='64' r='1.1' fill='white'/%3E%3Ccircle cx='88' cy='72' r='0.7' fill='white'/%3E%3Ccircle cx='60' cy='96' r='1.3' fill='white'/%3E%3Ccircle cx='14' cy='108' r='0.8' fill='white'/%3E%3Ccircle cx='118' cy='88' r='1' fill='white'/%3E%3C/svg%3E");
+  background-size: 128px 128px;
+  opacity: 0.1;
 }
 
 .sun {
   position: absolute;
-  top: -4rem;
+  top: -8%;
   left: 58%;
-  width: 18rem;
-  height: 18rem;
+  width: 28vw;
+  max-width: 22rem;
+  height: 28vw;
+  max-height: 22rem;
   pointer-events: none;
   background: radial-gradient(
     circle at 50% 50%,
-    light-dark(hsl(48deg, 100%, 92%, 0.85), hsl(40deg, 70%, 55%, 0.35)) 0 28%,
-    transparent 68%
+    var(--greenhouse-sun-core, rgb(255 249 224 / 0.95)) 0 22%,
+    var(--greenhouse-sun-halo, rgb(250 222 158 / 0.55)) 42%,
+    transparent 72%
   );
-  filter: blur(12px);
+  filter: blur(10px);
+}
+
+.mullions {
+  position: absolute;
+  inset: 0;
+}
+
+.mullionV,
+.mullionH {
+  position: absolute;
+  background: var(--greenhouse-mullion, #42372e);
+  box-shadow: 1px 0 0 var(--greenhouse-mullion-edge, rgb(216 205 182 / 0.4));
+}
+
+.mullionV {
+  top: 0;
+  bottom: 0;
+  width: 4px;
+}
+
+.mullionH {
+  right: 0;
+  left: 0;
+  height: 4px;
+  box-shadow: 0 1px 0 var(--greenhouse-mullion-edge, rgb(216 205 182 / 0.4));
 }
 
 .plantsBack,
 .plantsFront {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
+  overflow: visible;
   pointer-events: none;
 }
 
 .plantsBack {
   z-index: 1;
+  opacity: 0.78;
 }
 
 .plantsFront {
   z-index: 3;
 }
 
+.plant {
+  position: absolute;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 12px 16px hsl(150deg, 30%, 10%, 0.32));
+  transform-origin: 35% 85%;
+}
+
 .content {
   position: relative;
   z-index: 2;
+  padding-inline: max(1.25rem, calc((100vw - 72rem) / 2));
 }
 
 .hiddenSprite {
@@ -99,17 +127,39 @@
   overflow: hidden;
 }
 
+:global(html),
+:global(body) {
+  background-color: #90ae7a !important;
+}
+
+:global(html[data-color-scheme="dark"]),
+:global(html[data-color-scheme="dark"] body) {
+  background-color: #111d19 !important;
+}
+
 @media (max-width: 575px) {
   .plantsBack [data-cluster="side"],
   .plantsFront [data-cluster="side"] {
     display: none;
+  }
+
+  .sun {
+    width: 42vw;
+    max-width: none;
+    height: 42vw;
+    max-height: none;
+  }
+
+  .content {
+    padding-inline: 1rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .atmosphere,
   .plantsBack,
-  .plantsFront {
+  .plantsFront,
+  .plant {
     animation: none;
   }
 }
