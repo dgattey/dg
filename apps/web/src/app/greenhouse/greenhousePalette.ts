@@ -1,6 +1,5 @@
 import type { SxObject } from '@dg/ui/theme';
 import { lightDark } from '@dg/ui/theme/color';
-import { GLASS_BG_MATTE } from '@dg/ui/theme/glass';
 import { FONT_DISPLAY_STACK, HEADING_FONT_SIZE_DISPLAY } from '@dg/ui/theme/typography';
 
 /**
@@ -8,13 +7,13 @@ import { FONT_DISPLAY_STACK, HEADING_FONT_SIZE_DISPLAY } from '@dg/ui/theme/typo
  * sans small-caps headings and frosted glass.
  */
 export const GREENHOUSE_TOKEN_VARS: SxObject = {
-  '--card-backdrop-filter': 'blur(20px) saturate(125%)',
-  '--card-bg': GLASS_BG_MATTE,
+  '--card-backdrop-filter': 'blur(18px) saturate(130%)',
+  '--card-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 54%, transparent)',
   '--card-box-shadow':
     'inset 0 1.5px 0 color-mix(in srgb, white 82%, transparent), inset 0 0 0 1px color-mix(in srgb, white 34%, transparent), inset 0 -1px 0 color-mix(in srgb, black 6%, transparent), 0 22px 48px color-mix(in srgb, black 28%, transparent), 0 8px 18px color-mix(in srgb, black 16%, transparent)',
   '--font-display': FONT_DISPLAY_STACK,
-  '--glass-backdrop-filter': 'none',
-  '--glass-bg': GLASS_BG_MATTE,
+  '--glass-backdrop-filter': 'blur(18px) saturate(130%)',
+  '--glass-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 54%, transparent)',
   '--heading-font-size': HEADING_FONT_SIZE_DISPLAY,
   '--heading-font-stretch': 'normal',
   '--heading-font-variant': 'normal',
@@ -57,7 +56,7 @@ const atmospherePair = {
   ribShine: ['hsl(50deg 70% 96% / 0.55)', 'hsl(40deg 18% 36% / 0.18)'],
   sunCore: ['hsl(48deg 100% 97% / 1)', 'hsl(40deg 86% 62% / 0.62)'],
   sunHalo: ['hsl(46deg 96% 80% / 0.9)', 'hsl(38deg 58% 38% / 0.34)'],
-  wash: ['hsl(82deg, 28%, 66%)', 'hsl(158deg, 26%, 9%)'],
+  wash: ['hsl(42deg, 34%, 82%)', 'hsl(158deg, 26%, 9%)'],
 } as const;
 
 export const GREENHOUSE_ATMOSPHERE_VARS: SxObject = {

@@ -10,10 +10,16 @@ describe('greenhouse chrome', () => {
     expect(total).toBeLessThan(150 * 1024);
   });
 
+  it('keeps the glass atmosphere raster small', () => {
+    const glass = join(__dirname, '../atmosphere/glass.webp');
+    expect(statSync(glass).size).toBeLessThan(80 * 1024);
+  });
+
   it('does not use light-dark in the CSS module (LightningCSS invalidates it)', () => {
     const css = readFileSync(join(__dirname, '../greenhouse.module.css'), 'utf8');
     expect(css).not.toContain('light-dark(');
     expect(css).toContain('--greenhouse-wash');
+    expect(css).toContain('./atmosphere/glass.webp');
     expect(css).toContain('.canopy');
     expect(css).toContain('.shaft');
     expect(css).toContain('.ribs');
