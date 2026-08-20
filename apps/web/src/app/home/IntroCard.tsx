@@ -85,7 +85,10 @@ const composedTextSx: SxObject = {
   '& h1, & .MuiTypography-h1': {
     color: 'text.primary',
     fontFamily: 'var(--font-display)',
-    fontSize: { md: 'clamp(2.15rem, 1.4rem + 2.2vw, 3.05rem)', xs: 'clamp(1.85rem, 8.4vw, 2.35rem)' },
+    fontSize: {
+      md: 'clamp(2.15rem, 1.4rem + 2.2vw, 3.05rem)',
+      xs: 'clamp(1.85rem, 8.4vw, 2.35rem)',
+    },
     fontStretch: 'normal',
     fontVariant: 'normal',
     fontWeight: 600,

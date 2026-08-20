@@ -35,7 +35,7 @@ describe('greenhouse chrome', () => {
     expect(css).not.toContain('#e2d4b0');
     expect(css).toContain('.homeFrame');
     expect(css).toContain('object-fit: cover');
-    expect(css).toContain('mask-composite: add');
+    expect(css).not.toContain('mask-composite');
     expect(css).not.toContain('.frameLeft');
   });
 
