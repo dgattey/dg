@@ -6,17 +6,13 @@ describe('greenhouse chrome', () => {
     const dir = join(__dirname, '../foliage');
     const files = readdirSync(dir).filter((name) => name.endsWith('.webp'));
     expect(files.length).toBeGreaterThanOrEqual(4);
-    const sprites = files.filter(
-      (name) => !name.startsWith('frame-') && name !== 'home-frame.webp',
-    );
+    const sprites = files.filter((name) => name !== 'home-frame.webp');
     const spriteBytes = sprites.reduce((sum, name) => sum + statSync(join(dir, name)).size, 0);
     expect(spriteBytes).toBeLessThan(175 * 1024);
-    const frames = files.filter((name) => name.startsWith('frame-'));
-    expect(frames).toEqual(
-      expect.arrayContaining(['frame-left.webp', 'frame-right.webp', 'frame-bottom.webp']),
-    );
-    const frameBytes = frames.reduce((sum, name) => sum + statSync(join(dir, name)).size, 0);
-    expect(frameBytes).toBeLessThan(120 * 1024);
+    expect(files).toContain('home-frame.webp');
+    expect(files.some((name) => name.startsWith('frame-'))).toBe(false);
+    expect(statSync(join(dir, 'home-frame.webp')).size).toBeLessThan(130 * 1024);
+    expect(statSync(join(dir, 'home-frame.webp')).size).toBeGreaterThan(40 * 1024);
   });
 
   it('keeps the glass atmosphere raster small', () => {
@@ -37,6 +33,10 @@ describe('greenhouse chrome', () => {
     expect(css).not.toContain('#7f9b6c');
     expect(css).not.toContain('#90ae7a');
     expect(css).not.toContain('#e2d4b0');
+    expect(css).toContain('.homeFrame');
+    expect(css).toContain('object-fit: cover');
+    expect(css).toContain('mask-composite: add');
+    expect(css).not.toContain('.frameLeft');
   });
 
   it('paints foliage as inert images, not stretched SVG uses', () => {
@@ -47,11 +47,11 @@ describe('greenhouse chrome', () => {
     expect(plants).not.toContain('preserveAspectRatio="none"');
   });
 
-  it('paints the home plant frame as an inert photograph, not 200px strips', () => {
+  it('paints the home plant frame as one inert photograph', () => {
     const frame = readFileSync(join(__dirname, '../GreenhousePlantFrame.tsx'), 'utf8');
     expect(frame).toContain('aria-hidden');
-    expect(frame).toContain('frame-left.webp');
-    expect(frame).not.toContain('home-frame.webp');
+    expect(frame).toContain('home-frame.webp');
+    expect(frame).not.toContain('frame-left.webp');
     expect(frame).not.toContain('<use');
   });
 });

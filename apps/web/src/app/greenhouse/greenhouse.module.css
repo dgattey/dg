@@ -224,50 +224,24 @@
   transform-origin: 50% 50%;
 }
 
-.plantFrame {
+.homeFrame {
   position: absolute;
   inset: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-.frameLeft,
-.frameRight,
-.frameBottom {
-  position: absolute;
-  pointer-events: none;
-  image-rendering: auto;
-}
-
-.frameLeft {
-  top: 0;
-  bottom: 0;
-  left: 0;
-  width: auto;
-  height: 100%;
-  object-fit: contain;
-  object-position: left bottom;
-}
-
-.frameRight {
-  top: 0;
-  right: 0;
-  bottom: 0;
-  width: auto;
-  height: 100%;
-  object-fit: contain;
-  object-position: right bottom;
-}
-
-.frameBottom {
-  right: 0;
-  bottom: 0;
-  left: 0;
   width: 100%;
-  height: auto;
-  max-height: 26vh;
-  object-fit: contain;
+  height: 100%;
+  pointer-events: none;
+  object-fit: cover;
   object-position: center bottom;
+  image-rendering: auto;
+  /* Viewport rim on one photo — overlapping fades, not three cropped strips. */
+  mask-image:
+    linear-gradient(90deg, #000 11%, transparent 18%, transparent 82%, #000 89%),
+    linear-gradient(0deg, #000 14%, transparent 24%);
+  mask-composite: add;
+  -webkit-mask-image:
+    linear-gradient(90deg, #000 11%, transparent 18%, transparent 82%, #000 89%),
+    linear-gradient(0deg, #000 14%, transparent 24%);
+  -webkit-mask-composite: source-over;
 }
 
 .content {
@@ -297,15 +271,6 @@
     width: min(var(--plant-width), 68vw);
   }
 
-  .frameLeft,
-  .frameRight {
-    max-width: 16vw;
-  }
-
-  .frameBottom {
-    max-height: 16vh;
-  }
-
   .sun {
     width: 58vw;
     max-width: none;
@@ -322,6 +287,15 @@
 
   .content {
     padding-inline: 1rem;
+  }
+
+  .homeFrame {
+    mask-image:
+      linear-gradient(90deg, #000 7%, transparent 16%, transparent 84%, #000 93%),
+      linear-gradient(0deg, #000 11%, transparent 20%);
+    -webkit-mask-image:
+      linear-gradient(90deg, #000 7%, transparent 16%, transparent 84%, #000 93%),
+      linear-gradient(0deg, #000 11%, transparent 20%);
   }
 }
 
