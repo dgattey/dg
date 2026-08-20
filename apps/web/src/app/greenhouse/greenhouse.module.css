@@ -215,12 +215,12 @@
 .plant {
   position: absolute;
   width: var(--plant-width);
-  max-width: none;
   height: auto;
   overflow: visible;
   pointer-events: none;
-  filter: drop-shadow(0 18px 22px hsl(150deg, 32%, 6%, 0.58))
-    drop-shadow(0 4px 8px hsl(150deg, 28%, 8%, 0.35));
+  image-rendering: auto;
+  filter: drop-shadow(0 14px 16px hsl(150deg, 32%, 6%, 0.42))
+    drop-shadow(0 3px 6px hsl(150deg, 28%, 8%, 0.28));
   transform-origin: 50% 50%;
 }
 
@@ -236,7 +236,7 @@
 .frameBottom {
   position: absolute;
   pointer-events: none;
-  filter: drop-shadow(0 16px 20px hsl(150deg, 32%, 6%, 0.45));
+  image-rendering: auto;
 }
 
 .frameLeft {
@@ -244,10 +244,9 @@
   bottom: 0;
   left: 0;
   width: auto;
-  max-width: 28vw;
   height: 100%;
-  object-fit: cover;
-  object-position: left center;
+  object-fit: contain;
+  object-position: left bottom;
 }
 
 .frameRight {
@@ -255,10 +254,9 @@
   right: 0;
   bottom: 0;
   width: auto;
-  max-width: 28vw;
   height: 100%;
-  object-fit: cover;
-  object-position: right center;
+  object-fit: contain;
+  object-position: right bottom;
 }
 
 .frameBottom {
@@ -267,8 +265,8 @@
   left: 0;
   width: 100%;
   height: auto;
-  max-height: 34vh;
-  object-fit: cover;
+  max-height: 26vh;
+  object-fit: contain;
   object-position: center bottom;
 }
 
@@ -299,6 +297,15 @@
     width: min(var(--plant-width), 68vw);
   }
 
+  .frameLeft,
+  .frameRight {
+    max-width: 16vw;
+  }
+
+  .frameBottom {
+    max-height: 16vh;
+  }
+
   .sun {
     width: 58vw;
     max-width: none;
@@ -311,15 +318,6 @@
     max-width: none;
     height: 28vw;
     max-height: none;
-  }
-
-  .frameLeft,
-  .frameRight {
-    max-width: 22vw;
-  }
-
-  .frameBottom {
-    max-height: 22vh;
   }
 
   .content {

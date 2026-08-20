@@ -4,8 +4,8 @@ import right from './foliage/frame-right.webp';
 import styles from './greenhouse.module.css';
 
 /**
- * Photographic plant frame for the homepage. Cut from the conservatory
- * reference so species and overlap match the inspo, with copy punched out.
+ * Home plant layer from the conservatory photo, as viewport strips at
+ * display size (≈374×960 / 1440×308). Not 200px sources stretched to fill.
  */
 export function GreenhousePlantFrame() {
   return (

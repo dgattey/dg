@@ -26,7 +26,7 @@ const projectCardSx: SxObject = {
 const featuredCardSx: SxObject = {
   display: 'flex',
   height: '100%',
-  minHeight: { md: '13.25rem', xs: 'auto' },
+  minHeight: { md: '14.5rem', xs: 'auto' },
   padding: 2.25,
 };
 

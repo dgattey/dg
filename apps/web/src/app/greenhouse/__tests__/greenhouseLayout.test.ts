@@ -37,4 +37,10 @@ describe('greenhouseLayout', () => {
       expect(plant.x).toBeLessThanOrEqual(4);
     }
   });
+
+  it('does not CSS-upscale sprites past native size', () => {
+    for (const plant of layoutGreenhousePlants('home')) {
+      expect(plant.scale).toBeLessThanOrEqual(1.2);
+    }
+  });
 });

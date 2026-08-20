@@ -201,25 +201,14 @@ const COMPOSITIONS: Record<GreenhouseSurface, ReadonlyArray<PlantSpec>> = {
   home: [
     {
       cluster: 'corner',
-      edge: 'left',
-      featured: false,
-      layer: 'back',
-      rotate: -10,
-      scale: 0.9,
-      symbol: 'leaf-bop',
-      x: -22,
-      y: 42,
-    },
-    {
-      cluster: 'corner',
       edge: 'right',
       featured: true,
       layer: 'front',
-      rotate: 8,
-      scale: 0.72,
+      rotate: 10,
+      scale: 0.82,
       symbol: 'leaf-monstera',
-      x: -24,
-      y: 12,
+      x: -16,
+      y: 78,
     },
   ],
 };
@@ -237,6 +226,8 @@ export function layoutGreenhousePlants(
   return COMPOSITIONS[surface].map((plant, index) => ({
     ...plant,
     id: `${surface}-${plant.symbol}-${plant.layer}-${index}`,
+    // Never CSS-upscale past the 480px sprites (1.2 × 22vmin ≈ native at 1×).
+    scale: Math.min(plant.scale, 1.2),
     y: plant.y + (plant.layer === 'back' ? nudge * 0.4 : 0),
   }));
 }

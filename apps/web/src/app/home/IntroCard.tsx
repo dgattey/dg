@@ -62,7 +62,7 @@ const composedCardSx: SxObject = {
   display: 'flex',
   minHeight: { md: '15rem', xs: 'auto' },
   overflow: 'hidden',
-  padding: { md: '1.7rem 1.55rem 1.45rem 1.9rem', xs: '1.25rem' },
+  padding: { md: '2.05rem 1.55rem 1.45rem 1.9rem', xs: '1.35rem' },
   width: { md: '100%', xs: '85vw' },
 };
 
@@ -85,13 +85,15 @@ const composedTextSx: SxObject = {
   '& h1, & .MuiTypography-h1': {
     color: 'text.primary',
     fontFamily: 'var(--font-display)',
-    fontSize: 'clamp(2.45rem, 1.55rem + 2.8vw, 3.45rem)',
+    fontSize: 'clamp(2.15rem, 1.4rem + 2.2vw, 3.05rem)',
     fontStretch: 'normal',
     fontVariant: 'normal',
     fontWeight: 600,
     letterSpacing: '-0.032em',
-    lineHeight: 1.05,
-    marginBottom: 0.85,
+    lineHeight: 1.18,
+    marginBottom: 0.75,
+    overflow: 'visible',
+    paddingTop: '0.12em',
   },
   '& p': {
     color: 'text.secondary',
