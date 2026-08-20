@@ -54,9 +54,6 @@ export function GreenhouseFrame({ children, surface, chrome = true }: Greenhouse
                 <span className={styles.mullionV} style={{ left: '80%' }} />
                 <span className={styles.mullionV} style={{ left: 'calc(100% - 7px)' }} />
                 <span className={styles.mullionH} style={{ top: '0%' }} />
-                <span className={styles.mullionH} style={{ top: '16%' }} />
-                <span className={styles.mullionH} style={{ top: '38%' }} />
-                <span className={styles.mullionH} style={{ top: '68%' }} />
                 <span className={styles.mullionH} style={{ bottom: '0%' }} />
               </div>
             </div>

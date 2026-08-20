@@ -6,13 +6,18 @@ describe('greenhouse chrome', () => {
     const dir = join(__dirname, '../foliage');
     const files = readdirSync(dir).filter((name) => name.endsWith('.webp'));
     expect(files.length).toBeGreaterThanOrEqual(4);
-    const sprites = files.filter((name) => name !== 'home-frame.webp');
+    const sprites = files.filter(
+      (name) => name !== 'home-frame.webp' && name !== 'home-frame-mobile.webp',
+    );
     const spriteBytes = sprites.reduce((sum, name) => sum + statSync(join(dir, name)).size, 0);
     expect(spriteBytes).toBeLessThan(175 * 1024);
     expect(files).toContain('home-frame.webp');
+    expect(files).toContain('home-frame-mobile.webp');
     expect(files.some((name) => name.startsWith('frame-'))).toBe(false);
     expect(statSync(join(dir, 'home-frame.webp')).size).toBeLessThan(130 * 1024);
     expect(statSync(join(dir, 'home-frame.webp')).size).toBeGreaterThan(40 * 1024);
+    expect(statSync(join(dir, 'home-frame-mobile.webp')).size).toBeLessThan(140 * 1024);
+    expect(statSync(join(dir, 'home-frame-mobile.webp')).size).toBeGreaterThan(20 * 1024);
   });
 
   it('keeps the glass atmosphere raster small', () => {
@@ -34,6 +39,7 @@ describe('greenhouse chrome', () => {
     expect(css).not.toContain('#90ae7a');
     expect(css).not.toContain('#e2d4b0');
     expect(css).toContain('.homeFrame');
+    expect(css).toContain('.homeFrameMobile');
     expect(css).toContain('object-fit: cover');
     expect(css).not.toContain('mask-composite');
     expect(css).not.toContain('.frameLeft');
@@ -51,6 +57,7 @@ describe('greenhouse chrome', () => {
     const frame = readFileSync(join(__dirname, '../GreenhousePlantFrame.tsx'), 'utf8');
     expect(frame).toContain('aria-hidden');
     expect(frame).toContain('home-frame.webp');
+    expect(frame).toContain('home-frame-mobile.webp');
     expect(frame).not.toContain('frame-left.webp');
     expect(frame).not.toContain('<use');
   });
