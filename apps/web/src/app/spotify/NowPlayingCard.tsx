@@ -18,7 +18,7 @@ import { WatercolorLeaves } from './WatercolorLeaves';
  * Sage-to-gold fallback when album art has not produced a gradient yet.
  * Album colors still paint, then get mixed toward this wash.
  */
-const FALLBACK_WASH = 'linear-gradient(155deg, #d2cd90 0%, #c2b468 40%, #8f9a56 72%, #6d8348 100%)';
+const FALLBACK_WASH = 'linear-gradient(155deg, #d8d4a0 0%, #c4b86a 46%, #9aa058 78%, #7a8a4a 100%)';
 
 const CREAM: Colors = {
   primary: 'rgba(255, 248, 230, 0.96)',
@@ -29,7 +29,7 @@ const CREAM: Colors = {
 };
 
 const SAGE_GOLD_WASH =
-  'radial-gradient(ellipse 62% 58% at 96% 10%, rgb(255 230 140 / 0.95) 0%, transparent 64%), radial-gradient(ellipse 46% 42% at 6% 88%, rgb(96 114 56 / 0.55) 0%, transparent 70%), linear-gradient(108deg, #8f9a54 0%, #b8ae68 42%, #e8d48c 100%)';
+  'radial-gradient(ellipse 58% 52% at 94% 8%, rgb(255 232 148 / 0.88) 0%, transparent 62%), radial-gradient(ellipse 52% 48% at 8% 92%, rgb(62 80 36 / 0.62) 0%, transparent 70%), linear-gradient(to top right, #3f522c 0%, #6d7a40 38%, #c4b468 72%, #f0dc96 100%)';
 
 const layerBaseSx: SxObject = {
   inset: 0,
@@ -72,7 +72,7 @@ const hueLockSx: SxObject = {
   ...layerBaseSx,
   '[data-greenhouse-frame] &': {
     backgroundImage:
-      'linear-gradient(155deg, rgb(210 200 120 / 0.55) 0%, rgb(168 156 72 / 0.42) 46%, rgb(110 132 72 / 0.5) 100%)',
+      'linear-gradient(to top right, rgb(88 104 48 / 0.55) 0%, rgb(168 156 72 / 0.38) 52%, rgb(228 208 120 / 0.42) 100%)',
     borderRadius: 'inherit',
     mixBlendMode: 'color',
     opacity: 0.46,
@@ -84,8 +84,8 @@ const watercolorBleedSx: SxObject = {
   ...layerBaseSx,
   '[data-greenhouse-frame] &': {
     backgroundImage:
-      'radial-gradient(ellipse 46% 40% at 94% 86%, rgb(88 104 48 / 0.38), transparent 70%), radial-gradient(ellipse 34% 38% at 80% 100%, rgb(154 136 58 / 0.32), transparent 68%), radial-gradient(ellipse 30% 34% at 102% 62%, rgb(112 124 60 / 0.26), transparent 66%)',
-    filter: 'blur(5px)',
+      'radial-gradient(ellipse 48% 42% at 86% 78%, rgb(176 158 72 / 0.22), transparent 70%), radial-gradient(ellipse 36% 34% at 96% 58%, rgb(214 190 96 / 0.18), transparent 68%), radial-gradient(ellipse 40% 36% at 72% 96%, rgb(110 124 56 / 0.16), transparent 66%)',
+    filter: 'blur(16px)',
     mixBlendMode: 'multiply',
   },
   zIndex: 2,
@@ -113,39 +113,49 @@ const restingNotesSx: SxObject = {
 
 const layoutSx: SxObject = {
   flex: 1,
-  justifyContent: 'space-between',
+  gap: 1.25,
+  justifyContent: 'flex-end',
   minHeight: 0,
   position: 'relative',
   zIndex: 5,
 };
 
+const copySx: SxObject = {
+  maxWidth: '46%',
+};
+
 const headerSx: SxObject = {
   alignItems: 'center',
   flexDirection: 'row',
-  gap: 1,
+  gap: 0.75,
 };
 
 const leafBadgeSx: SxObject = {
   alignItems: 'center',
-  backgroundColor: 'rgb(255 248 236 / 0.92)',
+  backgroundColor: 'rgb(255 248 236 / 0.94)',
   borderRadius: '999px',
   color: 'rgb(72 82 40 / 0.78)',
   display: 'inline-flex',
   height: 28,
   justifyContent: 'center',
+  left: 18,
+  position: 'absolute',
+  top: 18,
   width: 28,
+  zIndex: 6,
 };
 
 const titleSx: SxObject = {
   '& .MuiTypography-root': {
     color: CREAM.primary,
-    fontSize: 'clamp(1.7rem, 1.25rem + 1.6vw, 2.25rem)',
+    fontSize: 'clamp(1.5rem, 1.35rem + 0.55vw, 1.75rem)',
     fontWeight: 600,
     letterSpacing: '-0.02em',
-    lineHeight: 1.12,
+    lineHeight: 1.15,
+    marginBottom: '0.2rem',
     textShadow: CREAM.primaryShadow,
   },
-  marginTop: 0.75,
+  marginTop: 0.35,
 };
 
 const artistSx: SxObject = {
@@ -164,7 +174,7 @@ const progressWrapSx: SxObject = {
   '& > div > div': {
     backgroundColor: 'rgb(255 248 228 / 0.96) !important',
   },
-  marginTop: 1.5,
+  marginTop: 0.25,
 };
 
 const RESTING_NOTES = [
@@ -210,12 +220,12 @@ export function NowPlayingCard({ track }: { track: Track }) {
       <Box aria-hidden="true" sx={notesOriginSx}>
         <MusicNotes isPlaying={Boolean(track.isPlaying)} noteColor={CREAM.primary} variant="card" />
       </Box>
+      <Box aria-hidden="true" data-now-playing-leaf="" sx={leafBadgeSx}>
+        <Leaf size={14} />
+      </Box>
       <Stack sx={layoutSx}>
-        <Stack>
+        <Stack data-now-playing-copy="" sx={copySx}>
           <Stack sx={headerSx}>
-            <Box aria-hidden="true" sx={leafBadgeSx}>
-              <Leaf size={14} />
-            </Box>
             <PlaybackStatus
               color={CREAM.primary}
               isPlaying={track.isPlaying}

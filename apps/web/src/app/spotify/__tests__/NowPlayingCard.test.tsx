@@ -68,7 +68,9 @@ describe('NowPlayingCard', () => {
 
     expect(container.querySelector('[data-watercolor-leaves]')).toBeTruthy();
     expect(container.querySelector('[data-now-playing-wash]')).toBeTruthy();
-    expect(container.querySelectorAll('svg[data-watercolor-leaves] path[stroke]')).toHaveLength(0);
+    expect(container.querySelectorAll('[data-watercolor-leaf]').length).toBeGreaterThanOrEqual(20);
+    expect(container.querySelector('[data-now-playing-copy]')).toBeTruthy();
+    expect(container.querySelector('[data-now-playing-leaf]')).toBeTruthy();
   });
 
   it('keeps cream resting notes when playback is idle', () => {
