@@ -1,11 +1,36 @@
 import 'server-only';
 
+import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
+import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
 import { getFooterLinks, getIntroContent, getLinkByName } from '../../services/contentful';
 import { IntroCard, type IntroCardVariant } from './IntroCard';
 
 const SOCIAL_ORDER = ['github', 'linkedin', 'email'] as const;
 
-export async function IntroCardSlot({ variant = 'split' }: { variant?: IntroCardVariant } = {}) {
+export type IntroCardFixture = {
+  introBlock: IntroContent;
+  linkedInLink?: RenderableLink | null;
+  socialLinks?: Array<RenderableLink>;
+};
+
+export async function IntroCardSlot({
+  fixture,
+  variant = 'split',
+}: {
+  fixture?: IntroCardFixture;
+  variant?: IntroCardVariant;
+} = {}) {
+  if (fixture) {
+    return (
+      <IntroCard
+        introBlock={fixture.introBlock}
+        linkedInLink={fixture.linkedInLink ?? null}
+        socialLinks={fixture.socialLinks ?? []}
+        variant={variant}
+      />
+    );
+  }
+
   try {
     const [introBlock, linkedInLink, footerLinks] = await Promise.all([
       getIntroContent(),

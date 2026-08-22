@@ -6,6 +6,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { Box, Card, Skeleton, Stack } from '@mui/material';
 import { Suspense } from 'react';
+import type { Track } from '@dg/content-models/spotify/Track';
 import { getLatestSong } from '../../services/spotify';
 import { ALBUM_ART_BORDER_RADIUS, ALBUM_ART_DIMENSIONS } from '../albumArtStyles';
 import { SpotifyCardWithGradient } from '../spotify/SpotifyCardWithGradient';
@@ -83,7 +84,17 @@ function SpotifyCardLoading() {
  * Async data-fetching wrapper. Fetches the latest song server-side
  * and renders the client card that derives its gradient from album art.
  */
-async function SpotifyCardAsync({ variant }: { variant: 'card' | 'nowPlaying' }) {
+async function SpotifyCardAsync({
+  fixture,
+  variant,
+}: {
+  fixture?: Track;
+  variant: 'card' | 'nowPlaying';
+}) {
+  if (fixture) {
+    return <SpotifyCardWithGradient track={fixture} variant={variant} />;
+  }
+
   try {
     const track = await getLatestSong();
     if (!track) {
@@ -99,10 +110,16 @@ async function SpotifyCardAsync({ variant }: { variant: 'card' | 'nowPlaying' })
  * Public entry point for the Spotify card on the homepage.
  * Wraps the async content in Suspense with a loading skeleton.
  */
-export function SpotifyCardSlot({ variant = 'card' }: { variant?: 'card' | 'nowPlaying' } = {}) {
+export function SpotifyCardSlot({
+  fixture,
+  variant = 'card',
+}: {
+  fixture?: Track;
+  variant?: 'card' | 'nowPlaying';
+} = {}) {
   return (
     <Suspense fallback={<SpotifyCardLoading />}>
-      <SpotifyCardAsync variant={variant} />
+      <SpotifyCardAsync fixture={fixture} variant={variant} />
     </Suspense>
   );
 }

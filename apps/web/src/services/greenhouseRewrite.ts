@@ -6,15 +6,16 @@ import { interactiveRedesign } from '../flags';
  * Flag-off leaves `/` as the grid. Flag-on rewrites to the prerendered
  * greenhouse homepage. Music destinations are not rewritten yet.
  *
- * `GREENHOUSE_PREVIEW=1` forces the rewrite in non-production so local shots
- * can hit the surface without flipping the Flags default.
+ * `GREENHOUSE_PREVIEW=1` forces the rewrite on local and Vercel preview
+ * (`VERCEL_ENV !== 'production'`) so `/` can be photographed with real
+ * data without flipping the Flags default. Never on Vercel production.
  */
 export async function greenhouseRewritePath(request: NextRequest): Promise<string | null> {
   if (request.nextUrl.pathname !== homeRoute) {
     return null;
   }
 
-  if (process.env.NODE_ENV !== 'production' && process.env.GREENHOUSE_PREVIEW === '1') {
+  if (process.env.GREENHOUSE_PREVIEW === '1' && process.env.VERCEL_ENV !== 'production') {
     return internalGreenhouseHomeRoute;
   }
 
