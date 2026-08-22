@@ -34,7 +34,19 @@ export const CONTENT_MAX_PX = 68 * 16;
 export const EDGE_STRIP_MIN = 180;
 export const EDGE_STRIP_VW = 0.2;
 export const EDGE_STRIP_MAX = 440;
+export const EDGE_STRIP_MOBILE_MIN = 90;
+export const EDGE_STRIP_MOBILE_VW = 0.14;
+export const EDGE_STRIP_MOBILE_MAX = 140;
 export const SM_BREAKPOINT = 576;
+
+/** Top-right music/theme capsule. Right strip is clipped out of this well. */
+export const HEADER_CONTROLS_SAFE = {
+  height: 52,
+  id: 'header-controls',
+  insetRight: 16,
+  top: 8,
+  width: 132,
+} as const;
 
 export const LEAF_ASPECT: Record<LeafSymbol, number> = {
   'leaf-bop': 1024 / 1536,
@@ -163,13 +175,30 @@ export function rectsIntersect(a: Rect, b: Rect): boolean {
 }
 
 export function contentInset(width: number): number {
-  const minPad = width < SM_BREAKPOINT ? 16 : 24;
-  return Math.max(minPad, (width - CONTENT_MAX_PX) / 2);
+  const minPad = width < SM_BREAKPOINT ? EDGE_STRIP_MOBILE_MIN : 24;
+  const centered = Math.max(minPad, (width - CONTENT_MAX_PX) / 2);
+  return Math.max(centered, edgeStripWidth(width));
 }
 
-/** Matches `clamp(180px, 20vw, 440px)`. */
+/** Desktop `clamp(180px, 20vw, 440px)`; mobile `clamp(90px, 14vw, 140px)`. */
 export function edgeStripWidth(width: number): number {
+  if (width < SM_BREAKPOINT) {
+    return Math.min(
+      EDGE_STRIP_MOBILE_MAX,
+      Math.max(EDGE_STRIP_MOBILE_MIN, width * EDGE_STRIP_MOBILE_VW),
+    );
+  }
   return Math.min(EDGE_STRIP_MAX, Math.max(EDGE_STRIP_MIN, width * EDGE_STRIP_VW));
+}
+
+export function headerControlsRect(viewport: ViewportSize): NamedRect {
+  return {
+    height: HEADER_CONTROLS_SAFE.height,
+    id: HEADER_CONTROLS_SAFE.id,
+    width: HEADER_CONTROLS_SAFE.width,
+    x: viewport.width - HEADER_CONTROLS_SAFE.insetRight - HEADER_CONTROLS_SAFE.width,
+    y: HEADER_CONTROLS_SAFE.top,
+  };
 }
 
 export function edgeStripRect(side: 'left' | 'right', viewport: ViewportSize): Rect {
@@ -217,16 +246,19 @@ export function homeGrid(viewport: ViewportSize): {
 export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<NamedRect> {
   const size = GREENHOUSE_VIEWPORTS[viewport];
   const { col, gutter, left, row1, top, twoCol } = homeGrid(size);
+  const strip = edgeStripWidth(size.width);
   if (!twoCol) {
+    const pad = Math.max(left, strip);
+    const copyWidth = Math.max(120, size.width - pad * 2 - 16);
     return [
-      { height: 240, id: 'intro-copy', width: Math.min(250, col - 24), x: left + 8, y: 260 },
-      { height: 118, id: 'now-playing-copy', width: Math.min(268, col - 24), x: left + 8, y: 700 },
+      { height: 240, id: 'intro-copy', width: Math.min(250, copyWidth), x: pad + 8, y: 260 },
+      { height: 118, id: 'now-playing-copy', width: Math.min(268, copyWidth), x: pad + 8, y: 700 },
+      headerControlsRect(size),
     ];
   }
 
   const nowLeft = left + col + gutter;
   const lowerTop = top + row1 + gutter;
-  const strip = edgeStripWidth(size.width);
   const introX = Math.max(left + 22, strip + 12);
   const featuredRight = Math.min(nowLeft + 16 + Math.min(390, col - 32), size.width - strip - 12);
   const featuredX = nowLeft + 16;
@@ -241,7 +273,10 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
     {
       height: 150,
       id: 'now-playing-copy',
-      width: Math.min(300, col - 36),
+      width: Math.max(
+        80,
+        Math.min(300, col - 36, size.width - strip - 12 - (nowLeft + 18)),
+      ),
       x: nowLeft + 18,
       y: top + 14,
     },
@@ -259,6 +294,7 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
       x: featuredX,
       y: lowerTop + 12,
     },
+    headerControlsRect(size),
   ];
 }
 
@@ -310,6 +346,9 @@ export function viewportToEdgeStrip(
 ): { x: number; y: number } | null {
   const box = edgeStripRect(side, viewport);
   if (vx < box.x || vx >= box.x + box.width || vy < box.y || vy >= box.y + box.height) {
+    return null;
+  }
+  if (side === 'right' && rectsIntersect({ height: 1, width: 1, x: vx, y: vy }, headerControlsRect(viewport))) {
     return null;
   }
   return mapCover(vx - box.x, vy - box.y, box, image, side === 'left' ? 0 : 1, 1);

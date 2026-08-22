@@ -39,10 +39,11 @@
 
 .backPlate img {
   display: block;
-  width: 100%;
+  width: 106%;
   height: 100%;
+  margin-inline-start: -4%;
   object-fit: cover;
-  object-position: center bottom;
+  object-position: 62% 100%;
 }
 
 .plateTint {
@@ -107,6 +108,14 @@
 
 .edgeRight {
   right: 0;
+  clip-path: polygon(
+    0 0,
+    calc(100% - 148px) 0,
+    calc(100% - 148px) 60px,
+    100% 60px,
+    100% 100%,
+    0 100%
+  );
 }
 
 .edgeLeft img,
@@ -182,7 +191,7 @@
 .content {
   position: relative;
   z-index: 2;
-  padding-inline: max(1.5rem, calc((100vw - 68rem) / 2));
+  padding-inline: max(1.5rem, calc((100vw - 68rem) / 2), clamp(180px, 20vw, 440px));
   padding-top: 0.35rem;
 }
 
@@ -204,6 +213,17 @@
 @media (max-width: 575px) {
   .frame {
     --greenhouse-gutter: 1rem;
+  }
+
+  .edgeLeft,
+  .edgeRight {
+    width: clamp(90px, 14vw, 140px);
+  }
+
+  .backPlate img {
+    width: 100%;
+    margin-inline-start: 0;
+    object-position: center bottom;
   }
 
   .plantsBack[data-viewport="desktop"],
@@ -241,7 +261,7 @@
   }
 
   .content {
-    padding-inline: 1rem;
+    padding-inline: clamp(90px, 14vw, 140px);
     padding-top: 0.25rem;
   }
 }

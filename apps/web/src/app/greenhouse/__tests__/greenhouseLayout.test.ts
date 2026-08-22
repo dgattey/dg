@@ -85,7 +85,13 @@ describe('greenhouseLayout', () => {
 describe('greenhouse safe zones', () => {
   it('defines copy wells for intro, now-playing, activity, and featured on desktop', () => {
     const ids = homeSafeRects('desktop').map((rect) => rect.id);
-    expect(ids).toEqual(['intro-copy', 'now-playing-copy', 'activity-stats', 'featured-copy']);
+    expect(ids).toEqual([
+      'intro-copy',
+      'now-playing-copy',
+      'activity-stats',
+      'featured-copy',
+      'header-controls',
+    ]);
   });
 
   it('keeps every desktop plant AABB out of the copy wells', () => {
@@ -94,7 +100,7 @@ describe('greenhouse safe zones', () => {
 
   it('keeps every mobile plant AABB out of the name column and now-playing title', () => {
     const ids = homeSafeRects('mobile').map((rect) => rect.id);
-    expect(ids).toEqual(['intro-copy', 'now-playing-copy']);
+    expect(ids).toEqual(['intro-copy', 'now-playing-copy', 'header-controls']);
     expect(plantSafeZoneHits(layoutGreenhousePlants('home', 0, 'mobile'), 'mobile')).toEqual([]);
   });
 

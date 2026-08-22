@@ -31,8 +31,8 @@ export type PlantInstance = {
 type PlantSpec = Omit<PlantInstance, 'id'>;
 
 /**
- * Home desktop: one cutout per species on card corners. Edge strips and
- * the bottom band do the lushness; these overlap the corners.
+ * Home: monstera + BOP as the corner accents the mock overlaps. Strips
+ * already carry calathea and nerve.
  */
 const HOME_DESKTOP: ReadonlyArray<PlantSpec> = [
   {
@@ -54,31 +54,8 @@ const HOME_DESKTOP: ReadonlyArray<PlantSpec> = [
     rotate: 8,
     scale: 0.96,
     symbol: 'leaf-monstera',
-    x: -16,
-    y: -18,
-  },
-  {
-    cluster: 'vine',
-    edge: 'bottom',
-    featured: false,
-    flip: true,
-    layer: 'front',
-    rotate: 6,
-    scale: 0.88,
-    symbol: 'leaf-calathea',
-    x: 6,
-    y: -18,
-  },
-  {
-    cluster: 'corner',
-    edge: 'bottom',
-    featured: false,
-    layer: 'front',
-    rotate: -8,
-    scale: 0.82,
-    symbol: 'leaf-nerve',
-    x: 86,
-    y: -16,
+    x: -18,
+    y: 10,
   },
 ];
 
@@ -95,8 +72,8 @@ const HOME_MOBILE: ReadonlyArray<PlantSpec> = [
     rotate: 8,
     scale: 0.9,
     symbol: 'leaf-monstera',
-    x: -10,
-    y: -10,
+    x: -12,
+    y: 14,
   },
   {
     cluster: 'vine',
@@ -108,17 +85,6 @@ const HOME_MOBILE: ReadonlyArray<PlantSpec> = [
     symbol: 'leaf-bop',
     x: -8,
     y: -22,
-  },
-  {
-    cluster: 'corner',
-    edge: 'bottom',
-    featured: false,
-    layer: 'front',
-    rotate: -6,
-    scale: 0.8,
-    symbol: 'leaf-nerve',
-    x: 78,
-    y: -18,
   },
 ];
 

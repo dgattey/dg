@@ -7,13 +7,13 @@ import { FONT_DISPLAY_STACK, HEADING_FONT_SIZE_DISPLAY } from '@dg/ui/theme/typo
  * sans small-caps headings and frosted glass.
  */
 export const GREENHOUSE_TOKEN_VARS: SxObject = {
-  '--card-backdrop-filter': 'blur(20px) saturate(1.2)',
-  '--card-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 42%, transparent)',
+  '--card-backdrop-filter': 'blur(20px) saturate(1.05)',
+  '--card-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 50%, transparent)',
   '--card-box-shadow':
     'inset 0 1.5px 0 color-mix(in srgb, white 82%, transparent), inset 0 0 0 1px color-mix(in srgb, white 34%, transparent), inset 0 -1px 0 color-mix(in srgb, black 6%, transparent), 0 22px 48px color-mix(in srgb, black 28%, transparent), 0 8px 18px color-mix(in srgb, black 16%, transparent)',
   '--font-display': FONT_DISPLAY_STACK,
-  '--glass-backdrop-filter': 'blur(20px) saturate(1.2)',
-  '--glass-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 42%, transparent)',
+  '--glass-backdrop-filter': 'blur(20px) saturate(1.05)',
+  '--glass-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 50%, transparent)',
   '--greenhouse-gutter': '1.25rem',
   '--heading-font-size': HEADING_FONT_SIZE_DISPLAY,
   '--heading-font-stretch': 'normal',

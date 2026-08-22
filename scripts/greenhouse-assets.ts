@@ -151,21 +151,33 @@ async function rawFromSharp(image: import('sharp').Sharp): Promise<Rgba> {
   return { data, height: info.height, width: info.width };
 }
 
-async function encodeKeyedHeight(raw: Rgba, height: number, outBase: string): Promise<void> {
+async function encodeKeyedHeight(
+  raw: Rgba,
+  height: number,
+  outBase: string,
+  targetKb = 65,
+): Promise<void> {
   const pipeline = () =>
     sharp(raw.data, { raw: { channels: 4, height: raw.height, width: raw.width } }).resize({
       fit: 'inside',
       height,
     });
 
-  const avif = await pipeline()
-    .avif({ chromaSubsampling: '4:4:4', effort: 7, quality: 40 })
+  let quality = 35;
+  let avif = await pipeline()
+    .avif({ chromaSubsampling: '4:2:0', effort: 7, quality })
     .toBuffer();
-  const webp = await pipeline().webp({ alphaQuality: 80, quality: 65 }).toBuffer();
+  while (avif.length > targetKb * 1024 && quality > 28) {
+    quality -= 1;
+    avif = await pipeline()
+      .avif({ chromaSubsampling: '4:2:0', effort: 7, quality })
+      .toBuffer();
+  }
+  const webp = await pipeline().webp({ alphaQuality: 80, quality: 62 }).toBuffer();
   writeFileSync(`${outBase}.avif`, avif);
   writeFileSync(`${outBase}.webp`, webp);
   process.stdout.write(
-    `  ${outBase.split('/').at(-1)}  avif ${(avif.length / 1024).toFixed(1)}KB  webp ${(webp.length / 1024).toFixed(1)}KB\n`,
+    `  ${outBase.split('/').at(-1)}  avif ${(avif.length / 1024).toFixed(1)}KB q${quality}  webp ${(webp.length / 1024).toFixed(1)}KB\n`,
   );
 }
 
@@ -195,7 +207,7 @@ async function encodeRgbWidth(
   targetKb: { max: number; min: number },
 ): Promise<void> {
   const resized = sharp(src).resize(width, null, { fit: 'inside', withoutEnlargement: true });
-  let quality = 52;
+  let quality = 38;
   let avif = await resized
     .clone()
     .avif({ chromaSubsampling: '4:2:0', effort: 7, quality })
@@ -254,8 +266,8 @@ async function encodeBackPlates(srcDir: string, outDir: string): Promise<void> {
     1536,
     join(outDir, 'back-plate-1536'),
     {
-      max: 145,
-      min: 125,
+      max: 110,
+      min: 90,
     },
   );
   await encodeRgbWidth(

@@ -68,10 +68,8 @@ describe('greenhouse foliage safe zones', () => {
           viewport,
         ),
       ).toEqual([]);
-      expect(edgeStripSafeZoneHits(left.alpha, left, 'left', viewport)).toEqual(expect.any(Array));
-      expect(edgeStripSafeZoneHits(right.alpha, right, 'right', viewport)).toEqual(
-        expect.any(Array),
-      );
+      expect(edgeStripSafeZoneHits(left.alpha, left, 'left', viewport)).toEqual([]);
+      expect(edgeStripSafeZoneHits(right.alpha, right, 'right', viewport)).toEqual([]);
       expect(bottomBandSafeZoneHits(band.alpha, band, viewport)).toEqual(expect.any(Array));
     }
 

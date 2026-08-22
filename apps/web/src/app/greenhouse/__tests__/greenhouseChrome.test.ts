@@ -14,19 +14,21 @@ describe('greenhouse chrome', () => {
     expect(existsSync(mid)).toBe(true);
     expect(existsSync(portrait)).toBe(true);
     expect(existsSync(join(atmosphereDir, 'depth-plate.avif'))).toBe(false);
-    expect(statSync(landscape).size).toBeGreaterThan(100 * 1024);
-    expect(statSync(landscape).size).toBeLessThan(160 * 1024);
+    expect(statSync(landscape).size).toBeGreaterThan(70 * 1024);
+    expect(statSync(landscape).size).toBeLessThan(115 * 1024);
     expect(statSync(portrait).size).toBeGreaterThan(40 * 1024);
     expect(statSync(portrait).size).toBeLessThan(100 * 1024);
     const css = readFileSync(cssPath, 'utf8');
-    expect(css).toContain('object-position: center bottom');
+    expect(css).toContain('object-position: 62% 100%');
     expect(css).not.toContain('blur(22px)');
     expect(css).not.toContain('.mullions');
   });
 
   it('ships independently anchored edge strips and a tiled bottom band', () => {
-    expect(statSync(join(foliageDir, 'edge-left-1536.avif')).size).toBeGreaterThan(40 * 1024);
-    expect(statSync(join(foliageDir, 'edge-right-1536.avif')).size).toBeGreaterThan(40 * 1024);
+    expect(statSync(join(foliageDir, 'edge-left-1536.avif')).size).toBeGreaterThan(30 * 1024);
+    expect(statSync(join(foliageDir, 'edge-left-1536.avif')).size).toBeLessThan(70 * 1024);
+    expect(statSync(join(foliageDir, 'edge-right-1536.avif')).size).toBeGreaterThan(30 * 1024);
+    expect(statSync(join(foliageDir, 'edge-right-1536.avif')).size).toBeLessThan(70 * 1024);
     expect(statSync(join(foliageDir, 'edge-left-900.avif')).size).toBeGreaterThan(20 * 1024);
     expect(statSync(join(foliageDir, 'edge-right-900.avif')).size).toBeGreaterThan(20 * 1024);
     expect(statSync(join(foliageDir, 'bottom-band-1536.avif')).size).toBeGreaterThan(30 * 1024);
@@ -34,6 +36,7 @@ describe('greenhouse chrome', () => {
     expect(existsSync(join(foliageDir, 'thicket-1536.avif'))).toBe(false);
     const css = readFileSync(cssPath, 'utf8');
     expect(css).toContain('clamp(180px, 20vw, 440px)');
+    expect(css).toContain('clamp(90px, 14vw, 140px)');
     expect(css).toContain('repeat-x');
     expect(css).toContain('object-position: bottom left');
     expect(css).toContain('object-position: bottom right');
