@@ -25,9 +25,9 @@ const cardSx: SxObject = {
   '[data-greenhouse-frame] &': {
     '--map-scrim-opacity': 0.04,
     // Brand route hue at full saturation — reads as Strava orange, not burnt sienna.
-    '--route-casing': '#f3ead6',
+    '--route-casing': '#fff8ec',
     '--route-casing-width': 7,
-    '--route-line': 'hsl(24deg, 100%, 52%)',
+    '--route-line': '#f0701a',
     '--route-line-filter': 'drop-shadow(0 1px 3px rgb(0 0 0 / 0.25))',
     '--route-stroke-width': 4,
     '&::after': {
@@ -114,8 +114,8 @@ const activityNameSx: SxObject = {
 const mapSx: SxObject = {
   '[data-greenhouse-frame] &': {
     borderRadius: 'inherit',
-    inset: '3px',
-    opacity: 0.9,
+    inset: '5px',
+    opacity: 0.84,
     overflow: 'hidden',
   },
   inset: 0,

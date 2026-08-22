@@ -8,7 +8,7 @@ import {
   stitchSegments,
 } from './topoField';
 
-export const TOPO_LAND = '#efe6cf';
+export const TOPO_LAND = '#e9e3c4';
 
 export type LatLngBounds = {
   maxLat: number;
@@ -55,10 +55,10 @@ export type TopoLayers = {
 const WATER = '#a4bfd0';
 const WATER_DEEP = '#8eafc2';
 const SHORE = 'rgba(70, 96, 88, 0.55)';
-const CONTOUR = 'rgba(60, 80, 50, 0.28)';
-const INDEX_CONTOUR = 'rgba(50, 68, 42, 0.46)';
+const CONTOUR = 'rgba(60, 80, 50, 0.34)';
+const INDEX_CONTOUR = 'rgba(48, 66, 40, 0.5)';
 const ROAD = 'rgba(120, 112, 96, 0.32)';
-const CANOPY = '#7d9a62';
+const CANOPY = '#6f8d56';
 const WASH = ['#d5dcb4', '#c3d09a', '#aebc86'] as const;
 
 export function routeBounds(points: Array<Point>): LatLngBounds {
@@ -269,21 +269,21 @@ export function buildTopoLayers(points: Array<Point>): TopoLayers {
         strokeWidth: index ? 1.5 : 1,
       });
     }
-    if (level === 4 || level === 8 || level === 12) {
-      const wash = WASH[level === 4 ? 0 : level === 8 ? 1 : 2] ?? WASH[2];
+    if (level === 7 || level === 13) {
+      const wash = WASH[level === 7 ? 1 : 2] ?? WASH[2];
       for (const [lineIndex, line] of lines.entries()) {
         const first = line[0];
         const last = line[line.length - 1];
         if (!first || !last) {
           continue;
         }
-        if (Math.hypot(first[0] - last[0], first[1] - last[1]) > latSpan * 0.04) {
+        if (Math.hypot(first[0] - last[0], first[1] - last[1]) > latSpan * 0.03) {
           continue;
         }
         bands.push({
           fill: wash,
           id: `wash-${level}-${lineIndex}`,
-          opacity: 0.1 + (level / 12) * 0.04,
+          opacity: 0.055,
           ring: line,
         });
       }
@@ -292,30 +292,72 @@ export function buildTopoLayers(points: Array<Point>): TopoLayers {
 
   const canopy: Array<TopoDot> = [];
   for (let row = 1; row < rows; row += 1) {
-    const v = row / rows;
-    const lat = ys[row] ?? bounds.minLat;
     for (let col = 1; col < cols; col += 1) {
-      const u = col / cols;
-      const lng = xs[col] ?? bounds.minLng;
       const elevation = samples[row * (cols + 1) + col] ?? -1;
-      if (elevation < minLand + span * 0.52) {
+      if (elevation < minLand + span * 0.5) {
         continue;
       }
-      const speck = fbm(u * 22 + 4, v * 22, seed + 41, 3);
-      if (speck < 0.46) {
+      const u = (col + (next() - 0.5) * 0.7) / cols;
+      const v = (row + (next() - 0.5) * 0.7) / rows;
+      const speck = fbm(u * 28 + 3, v * 28, seed + 41, 3);
+      if (speck < 0.4) {
         continue;
       }
-      const size = 0.004 + speck * 0.01;
+      const size = 0.0009 + speck * 0.0016;
       canopy.push({
         fill: CANOPY,
-        id: `canopy-${row}-${col}`,
-        opacity: 0.4 + speck * 0.2,
-        point: [lat, lng],
+        id: `stipple-${row}-${col}`,
+        opacity: 0.46 + speck * 0.16,
+        point: [bounds.minLat + v * latSpan, bounds.minLng + u * lngSpan],
         radiusLat: latSpan * size,
-        radiusLng: lngSpan * size * 0.85,
+        radiusLng: lngSpan * size * (0.65 + next() * 0.55),
       });
     }
   }
+  for (let index = 0; index < 220; index += 1) {
+    const u = next();
+    const v = next();
+    const lat = bounds.minLat + v * latSpan;
+    const lng = bounds.minLng + u * lngSpan;
+    const coast = coastLongitude(lat, bounds, coastLng, phase);
+    if (isWaterLng(lng, coast, westWater)) {
+      continue;
+    }
+    const elevation =
+      fbm(u * 3.4 + 2.1, v * 3.4, seed) * 0.72 + fbm(u * 9.5 + 8, v * 9.5, seed + 17, 4) * 0.28;
+    if (elevation < minLand + span * 0.48) {
+      continue;
+    }
+    const speck = fbm(u * 28 + 3, v * 28, seed + 41, 3);
+    if (speck < 0.38) {
+      continue;
+    }
+    const size = 0.0011 + speck * 0.0022;
+    canopy.push({
+      fill: CANOPY,
+      id: `canopy-${index}`,
+      opacity: 0.42 + speck * 0.18,
+      point: [lat, lng],
+      radiusLat: latSpan * size,
+      radiusLng: lngSpan * size * (0.7 + next() * 0.5),
+    });
+  }
+
+  const waterRipples: Array<TopoStroke> = [0, 1].map((index) => {
+    const offset = (westWater ? -1 : 1) * lngSpan * (0.04 + index * 0.035);
+    const line: Array<Point> = [];
+    for (let step = 0; step <= 20; step += 1) {
+      const lat = bounds.minLat + (step / 20) * latSpan;
+      line.push([lat, coastLongitude(lat, bounds, coastLng, phase) + offset]);
+    }
+    return {
+      id: `ripple-${index}`,
+      line,
+      opacity: 0.28,
+      stroke: 'rgba(70, 96, 108, 0.35)',
+      strokeWidth: 0.6,
+    };
+  });
 
   const roads: Array<TopoStroke> = [0, 1].map((index) => {
     const start: Point = [
@@ -345,7 +387,7 @@ export function buildTopoLayers(points: Array<Point>): TopoLayers {
     contours,
     grainSeed: seed,
     land: TOPO_LAND,
-    roads,
+    roads: [...roads, ...waterRipples],
     shore: [
       {
         id: 'shore',

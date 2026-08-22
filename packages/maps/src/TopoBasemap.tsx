@@ -88,11 +88,11 @@ export function TopoBasemap({
           />
           <feColorMatrix
             type="matrix"
-            values="0 0 0 0 0.42  0 0 0 0 0.38  0 0 0 0 0.28  0 0 0 0.028 0"
+            values="0 0 0 0 0.42  0 0 0 0 0.38  0 0 0 0 0.28  0 0 0 0.055 0"
           />
         </filter>
       </defs>
-      <rect fill={layers.land} height={height} width={width} />
+      <rect fill={layers.land} height={height} opacity={0.94} width={width} />
       <rect filter={`url(#${grainId})`} height={height} width={width} />
       {layers.bands.map((band) => (
         <path

@@ -19,6 +19,11 @@ const paperMix = (percent: number) =>
 
 const containerSx: SxObject = {
   '[data-greenhouse-frame] &': {
+    '--route-casing': '#fff8ec',
+    '--route-casing-width': 7,
+    '--route-line': '#f0701a',
+    '--route-line-filter': 'drop-shadow(0 1px 3px rgb(0 0 0 / 0.25))',
+    '--route-stroke-width': 4,
     backgroundColor: 'transparent',
   },
   backgroundColor: 'var(--mui-palette-background-paper)',

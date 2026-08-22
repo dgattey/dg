@@ -1,8 +1,8 @@
 import type { Point } from 'pigeon-maps';
 
-export const FIELD_COLS = 56;
-export const FIELD_ROWS = 36;
-export const ISO_COUNT = 16;
+export const FIELD_COLS = 80;
+export const FIELD_ROWS = 52;
+export const ISO_COUNT = 18;
 
 function hash2(ix: number, iy: number, seed: number) {
   let value = Math.imul(ix, 374_761_393) ^ Math.imul(iy, 668_265_263) ^ seed;
