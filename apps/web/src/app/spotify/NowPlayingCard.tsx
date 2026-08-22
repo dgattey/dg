@@ -29,7 +29,7 @@ const CREAM: Colors = {
 };
 
 const SAGE_GOLD_WASH =
-  'radial-gradient(ellipse 78% 68% at 90% 6%, rgb(246 228 152 / 0.78) 0%, transparent 70%), radial-gradient(ellipse 50% 42% at 12% 88%, rgb(124 138 72 / 0.42) 0%, transparent 72%), linear-gradient(155deg, #d2cd90 0%, #c2b468 40%, #8f9a56 72%, #6d8348 100%)';
+  'radial-gradient(ellipse 62% 58% at 96% 10%, rgb(255 230 140 / 0.95) 0%, transparent 64%), radial-gradient(ellipse 46% 42% at 6% 88%, rgb(96 114 56 / 0.55) 0%, transparent 70%), linear-gradient(108deg, #8f9a54 0%, #b8ae68 42%, #e8d48c 100%)';
 
 const layerBaseSx: SxObject = {
   inset: 0,
@@ -84,8 +84,8 @@ const watercolorBleedSx: SxObject = {
   ...layerBaseSx,
   '[data-greenhouse-frame] &': {
     backgroundImage:
-      'radial-gradient(ellipse 58% 52% at 96% 84%, rgb(88 104 48 / 0.46), transparent 72%), radial-gradient(ellipse 42% 48% at 78% 102%, rgb(154 136 58 / 0.4), transparent 70%), radial-gradient(ellipse 38% 42% at 102% 58%, rgb(112 124 60 / 0.34), transparent 68%)',
-    filter: 'blur(12px)',
+      'radial-gradient(ellipse 46% 40% at 94% 86%, rgb(88 104 48 / 0.38), transparent 70%), radial-gradient(ellipse 34% 38% at 80% 100%, rgb(154 136 58 / 0.32), transparent 68%), radial-gradient(ellipse 30% 34% at 102% 62%, rgb(112 124 60 / 0.26), transparent 66%)',
+    filter: 'blur(5px)',
     mixBlendMode: 'multiply',
   },
   zIndex: 2,
@@ -93,8 +93,8 @@ const watercolorBleedSx: SxObject = {
 
 const notesOriginSx: SxObject = {
   '[data-greenhouse-frame] &': {
-    left: '62%',
-    top: '26%',
+    left: '54%',
+    top: '22%',
   },
   pointerEvents: 'none',
   position: 'absolute',
@@ -127,9 +127,9 @@ const headerSx: SxObject = {
 
 const leafBadgeSx: SxObject = {
   alignItems: 'center',
-  backgroundColor: 'rgb(255 248 230 / 0.22)',
+  backgroundColor: 'rgb(255 248 236 / 0.92)',
   borderRadius: '999px',
-  color: 'rgb(255 246 220 / 0.88)',
+  color: 'rgb(72 82 40 / 0.78)',
   display: 'inline-flex',
   height: 28,
   justifyContent: 'center',
@@ -139,8 +139,7 @@ const leafBadgeSx: SxObject = {
 const titleSx: SxObject = {
   '& .MuiTypography-root': {
     color: CREAM.primary,
-    fontFamily: 'var(--font-display, inherit)',
-    fontSize: 'clamp(1.65rem, 1.2rem + 1.5vw, 2.2rem)',
+    fontSize: 'clamp(1.7rem, 1.25rem + 1.6vw, 2.25rem)',
     fontWeight: 600,
     letterSpacing: '-0.02em',
     lineHeight: 1.12,
@@ -159,7 +158,7 @@ const artistSx: SxObject = {
 const progressWrapSx: SxObject = {
   '& > div': {
     backgroundColor: 'rgb(255 248 230 / 0.28) !important',
-    height: '7px !important',
+    height: '5px !important',
     marginTop: '0 !important',
   },
   '& > div > div': {
@@ -184,7 +183,7 @@ function RestingNotes() {
           key={`${left}-${top}`}
           sx={{ left, position: 'absolute', top, transform: `rotate(${rotate})` }}
         >
-          <Icon size={size} />
+          <Icon size={size} strokeWidth={2.25} />
         </Box>
       ))}
     </Box>
