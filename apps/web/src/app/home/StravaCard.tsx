@@ -92,7 +92,7 @@ export function StravaCard({ activity }: { activity: StravaActivity | null }) {
         </Box>
       ) : null}
       <Stack sx={layoutStackSx}>
-        <Box data-safe="activity-stats" sx={statsBackingSx}>
+        <Box sx={statsBackingSx}>
           <ActivityStats activity={activity} />
         </Box>
         <Stack sx={copyBackingSx}>

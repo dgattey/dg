@@ -57,7 +57,7 @@ const atmospherePair = {
   ribShine: ['hsl(48deg 70% 96% / 0.42)', 'hsl(40deg 18% 36% / 0.18)'],
   sunCore: ['hsl(48deg 100% 97% / 1)', 'hsl(40deg 86% 62% / 0.62)'],
   sunHalo: ['hsl(46deg 96% 80% / 0.78)', 'hsl(38deg 58% 38% / 0.34)'],
-  wash: ['hsl(68deg, 26%, 44%)', 'hsl(158deg, 26%, 9%)'],
+  wash: ['hsl(62deg, 22%, 48%)', 'hsl(158deg, 26%, 9%)'],
 } as const;
 
 export const GREENHOUSE_ATMOSPHERE_VARS: SxObject = {

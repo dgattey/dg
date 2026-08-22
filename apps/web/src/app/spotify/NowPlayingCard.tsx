@@ -213,7 +213,7 @@ export function NowPlayingCard({ track }: { track: Track }) {
               textShadow={colors?.primaryShadow}
             />
           </Stack>
-          <Box data-safe="now-playing-copy" sx={titleSx}>
+          <Box sx={titleSx}>
             <TrackTitle
               color={colors?.primary}
               listingVariant="card"
