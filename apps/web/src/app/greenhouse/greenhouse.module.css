@@ -195,6 +195,60 @@
   padding-top: 0.35rem;
 }
 
+.grid {
+  position: relative;
+  display: grid;
+  grid-auto-rows: auto;
+  gap: var(--greenhouse-gutter, 1.25rem);
+  align-items: stretch;
+  width: 100%;
+  max-width: 68rem;
+  margin-inline: auto;
+}
+
+.cell {
+  box-sizing: border-box;
+  align-self: stretch;
+  justify-self: stretch;
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+.cell :global([data-bento]) {
+  width: 100%;
+  min-width: 0;
+  max-width: none;
+}
+
+.cell:not([data-greenhouse-cell="intro"]) :global([data-bento]) {
+  height: 100%;
+}
+
+.cell[data-greenhouse-cell="intro"] {
+  overflow: visible;
+}
+
+.nowPlaying {
+  align-self: stretch;
+  min-width: 0;
+  container-type: inline-size;
+}
+
+@media (min-width: 600px) {
+  .grid {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+  }
+
+  /* cqi on this box would be the viewport: a container cannot query itself. */
+  .nowPlaying > :global(*) {
+    width: 100%;
+    height: 100%;
+    min-height: 75cqi;
+    max-height: 160cqi;
+  }
+}
+
 :global(body:has([data-greenhouse-frame]) section:has([data-greenhouse-frame])) {
   margin-top: 0;
   margin-bottom: 0;

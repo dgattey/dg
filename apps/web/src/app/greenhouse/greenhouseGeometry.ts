@@ -82,9 +82,9 @@ export const GREENHOUSE_GRID_SPANS = {
 } as const;
 
 export const HOME_DESKTOP_GRID = {
-  gutter: 20,
-  row1: 320,
-  row2: 260,
+  gutter: 24,
+  row1: 426,
+  row2: 257,
   top: 172,
 } as const;
 
@@ -323,24 +323,24 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
   }
 
   const lowerTop = grid.top + grid.row1 + grid.gutter;
-  const introCopyX = grid.introX + 22;
-  const introCopyW = Math.min(grid.introW * 0.52, 40 * 9.8);
+  const introCopyX = grid.introX + 20;
+  const introCopyW = Math.min(grid.introW - 40, 40 * 11.1);
   const nowCopyX = grid.nowX + 14;
   const featuredCopyX = grid.featuredX + 16;
   return [
     {
-      height: 260,
+      height: 200,
       id: 'intro-copy',
-      width: Math.max(140, introCopyW),
+      width: Math.max(160, introCopyW),
       x: introCopyX,
-      y: grid.top + 18,
+      y: grid.top + 14,
     },
     {
       height: 88,
       id: 'now-playing-copy',
       width: Math.max(80, Math.min(grid.nowW - 28, size.width - strip - 12 - nowCopyX)),
       x: nowCopyX,
-      y: grid.top + grid.row1 - 102,
+      y: grid.top + Math.min(grid.row1, grid.nowW * 1.6) - 102,
     },
     {
       height: 50,

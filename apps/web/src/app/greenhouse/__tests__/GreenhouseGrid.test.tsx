@@ -4,6 +4,12 @@ import { render, screen } from '@testing-library/react';
 import { GreenhouseGrid } from '../GreenhouseGrid';
 import { GREENHOUSE_GRID_SPANS } from '../greenhouseGeometry';
 
+jest.mock('../greenhouse.module.css', () => ({
+  cell: 'cell',
+  grid: 'grid',
+  nowPlaying: 'nowPlaying',
+}));
+
 describe('GreenhouseGrid', () => {
   it('renders children in one grid container', () => {
     render(
@@ -13,8 +19,8 @@ describe('GreenhouseGrid', () => {
     );
 
     const child = screen.getByText('Grid item');
-    expect(child.parentElement?.tagName).toBe('DIV');
-    expect(child.parentElement).toHaveAttribute('data-greenhouse-grid');
+    expect(child.parentElement).toHaveAttribute('data-greenhouse-cell', 'intro');
+    expect(child.parentElement?.parentElement).toHaveAttribute('data-greenhouse-grid');
   });
 
   it('places the four home slots on a 12-col content-sized grid', () => {
@@ -23,9 +29,12 @@ describe('GreenhouseGrid', () => {
     expect(GREENHOUSE_GRID_SPANS.activity).toEqual({ span: 7, start: 1 });
     expect(GREENHOUSE_GRID_SPANS.featured).toEqual({ span: 5, start: 8 });
     const source = readFileSync(join(__dirname, '../GreenhouseGrid.tsx'), 'utf8');
-    expect(source).toContain('repeat(12, minmax(0, 1fr))');
-    expect(source).toContain("gridAutoRows: 'auto'");
-    expect(source).toContain('75cqi');
-    expect(source).toContain('160cqi');
+    const css = readFileSync(join(__dirname, '../greenhouse.module.css'), 'utf8');
+    expect(source).toContain('GREENHOUSE_GRID_SPANS[slot].span');
+    expect(css).toContain('repeat(12, minmax(0, 1fr))');
+    expect(css).toContain('grid-auto-rows: auto');
+    expect(css).toContain('container-type: inline-size');
+    expect(css).toContain('75cqi');
+    expect(css).toContain('160cqi');
   });
 });

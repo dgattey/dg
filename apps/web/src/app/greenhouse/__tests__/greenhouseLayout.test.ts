@@ -91,8 +91,8 @@ describe('greenhouse safe zones', () => {
     expect(grid.activityW).toBeGreaterThan(grid.featuredW);
     expect(grid.nowX).toBeGreaterThan(grid.introX + grid.introW);
     expect(grid.featuredX).toBeGreaterThan(grid.activityX + grid.activityW);
-    expect(grid.row1).toBeGreaterThanOrEqual(288);
-    expect(grid.row1).toBeLessThanOrEqual(352);
+    expect(grid.row1).toBeGreaterThanOrEqual(360);
+    expect(grid.row1).toBeLessThanOrEqual(450);
   });
 
   it('defines copy wells for intro, now-playing, activity, and featured on desktop', () => {

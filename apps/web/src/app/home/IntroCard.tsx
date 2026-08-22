@@ -64,19 +64,16 @@ const composedCardSx: SxObject = {
 };
 
 const composedLayoutSx: SxObject = {
-  alignItems: { sm: 'stretch', xs: 'center' },
-  flexDirection: { sm: 'row', xs: 'column-reverse' },
-  gap: { sm: 3.25, xs: 2 },
-  height: '100%',
+  '&::after': {
+    clear: 'both',
+    content: '""',
+    display: 'table',
+  },
+  alignItems: { xs: 'center' },
+  display: { sm: 'block', xs: 'flex' },
+  flexDirection: { xs: 'column' },
+  gap: { xs: 2 },
   width: '100%',
-};
-
-const composedCopySx: SxObject = {
-  flex: '1 1 58%',
-  gap: 1,
-  justifyContent: { sm: 'space-between', xs: 'flex-start' },
-  minWidth: 0,
-  py: { md: 0.15, xs: 0 },
 };
 
 const composedTextSx: SxObject = {
@@ -93,7 +90,7 @@ const composedTextSx: SxObject = {
     hyphens: 'none',
     letterSpacing: '-0.03em',
     lineHeight: 1.05,
-    marginBottom: 0.7,
+    marginBottom: 0.5,
     overflow: 'visible',
     overflowWrap: 'normal',
     paddingTop: '0.04em',
@@ -102,29 +99,31 @@ const composedTextSx: SxObject = {
   '& p': {
     color: 'text.secondary',
     fontSize: '0.96rem',
-    lineHeight: 1.45,
-    marginBottom: 0.85,
+    lineHeight: 1.4,
+    marginBottom: 0.55,
     maxWidth: '40ch',
   },
   '& p:first-of-type': {
     color: 'text.primary',
     fontSize: '1.02rem',
     fontWeight: 500,
-    marginBottom: 0.7,
+    marginBottom: 0.5,
   },
   '& p:last-of-type': {
     marginBottom: 0,
   },
-  gap: 0,
+  display: 'contents',
 };
 
 const composedPortraitWrapSx: SxObject = {
-  alignSelf: { sm: 'center', xs: 'center' },
   aspectRatio: '4 / 5',
   borderRadius: '1.2rem',
   boxShadow: '0 14px 28px color-mix(in srgb, var(--mui-palette-common-black) 16%, transparent)',
-  flex: { sm: '0 0 40%', xs: '0 0 auto' },
-  maxHeight: { sm: '22rem', xs: 'none' },
+  float: { sm: 'right', xs: 'none' },
+  marginBottom: { sm: 1, xs: 0 },
+  marginInlineStart: { sm: 2, xs: 0 },
+  maxHeight: { sm: '20rem', xs: 'none' },
+  maxWidth: { sm: '40%', xs: '70%' },
   overflow: 'hidden',
   width: { sm: '40%', xs: '70%' },
 };
@@ -140,7 +139,7 @@ const composedPortraitImgSx: SxObject = {
 const socialRowSx: SxObject = {
   columnGap: 1.25,
   flexDirection: 'row',
-  marginTop: { sm: 0.25, xs: 1 },
+  marginTop: { sm: 0.35, xs: 1 },
 };
 
 const socialLinkSx: SxObject = {
@@ -203,31 +202,29 @@ function ComposedIntroCard({
 }) {
   return (
     <ContentCard data-bento="intro" sx={composedCardSx}>
-      <Stack sx={composedLayoutSx}>
-        <Stack sx={composedCopySx}>
-          <RichText {...introBlock.textBlock.content} sx={composedTextSx} />
-          {socialLinks.length > 0 ? (
-            <Stack sx={socialRowSx}>
-              {socialLinks.map((link) => (
-                <Link
-                  aria-label={link.title}
-                  color="secondary"
-                  href={link.url}
-                  icon={link.icon ?? undefined}
-                  isExternal={link.url.startsWith('http')}
-                  key={link.url}
-                  layout="icon"
-                  sx={socialLinkSx}
-                  title={link.title}
-                />
-              ))}
-            </Stack>
-          ) : null}
-        </Stack>
+      <Box sx={composedLayoutSx}>
         <Box sx={composedPortraitWrapSx}>
           <IntroPortrait introBlock={introBlock} />
         </Box>
-      </Stack>
+        <RichText {...introBlock.textBlock.content} sx={composedTextSx} />
+        {socialLinks.length > 0 ? (
+          <Stack sx={socialRowSx}>
+            {socialLinks.map((link) => (
+              <Link
+                aria-label={link.title}
+                color="secondary"
+                href={link.url}
+                icon={link.icon ?? undefined}
+                isExternal={link.url.startsWith('http')}
+                key={link.url}
+                layout="icon"
+                sx={socialLinkSx}
+                title={link.title}
+              />
+            ))}
+          </Stack>
+        ) : null}
+      </Box>
     </ContentCard>
   );
 }

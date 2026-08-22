@@ -82,6 +82,7 @@ describe('IntroCard', () => {
     const source = readFileSync(join(__dirname, '../IntroCard.tsx'), 'utf8');
     expect(source).not.toContain('6.8ch');
     expect(source).toContain("maxWidth: '40ch'");
-    expect(source).toContain("'0 0 40%'");
+    expect(source).toContain("sm: '40%'");
+    expect(source).toContain("sm: 'right'");
   });
 });
