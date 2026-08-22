@@ -26,8 +26,9 @@ const cardSx: SxObject = {
     '--map-scrim-opacity': 0.06,
     '--route-casing': 'rgb(70 42 16 / 0.34)',
     '--route-casing-width': 8,
-    '--route-line': 'hsl(24deg, 94%, 48%)',
-    '--route-line-filter': 'drop-shadow(0 1px 3px rgb(70 36 8 / 0.4))',
+    '--route-line': 'hsl(22deg, 98%, 49%)',
+    '--route-line-filter':
+      'drop-shadow(0 1px 4px rgb(70 36 8 / 0.55)) drop-shadow(0 0 7px rgb(255 122 36 / 0.38))',
     '--route-stroke-width': 5,
     height: '100%',
     maxWidth: 'none',

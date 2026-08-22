@@ -24,6 +24,13 @@ describe('topoBasemap', () => {
     expect(seedFromBounds(routeBounds(LOOP))).toBe(seedFromBounds(routeBounds(LOOP)));
   });
 
+  it('keeps a water edge inside the route bbox so the card can see it', () => {
+    const tight = routeBounds(LOOP);
+    const layers = buildTopoLayers(LOOP);
+    const coastLngs = layers.water[0]?.ring.map(([, lng]) => lng) ?? [];
+    expect(coastLngs.some((lng) => lng >= tight.minLng && lng <= tight.maxLng)).toBe(true);
+  });
+
   it('places water on the side away from the route centroid', () => {
     const layers = buildTopoLayers(LOOP);
     const [lat, lng] = routeCentroid(LOOP);

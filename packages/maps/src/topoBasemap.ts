@@ -32,11 +32,11 @@ export type TopoLayers = {
   water: Array<TopoFill>;
 };
 
-const SAGE = ['#e4e6c6', '#d2d8b0', '#c0cca0', '#adbe8c'] as const;
-const WATER = '#c3d3db';
-const WATER_DEEP = '#b2c5d0';
-const CONTOUR = '#c6bda4';
-const ROAD = '#d2c8b0';
+const SAGE = ['#e2e6c2', '#cfd8a8', '#b7c490', '#9aaf78'] as const;
+const WATER = '#9db8c8';
+const WATER_DEEP = '#86a6b8';
+const CONTOUR = '#c2b89a';
+const ROAD = '#e7dfcc';
 
 export function routeBounds(points: Array<Point>): LatLngBounds {
   const first = points[0];
@@ -128,107 +128,150 @@ function waterRing(
   coastLng: number,
   phase: number,
   west: boolean,
+  oceanFactor: number,
 ): Array<Point> {
   const latSpan = bounds.maxLat - bounds.minLat;
   const lngSpan = bounds.maxLng - bounds.minLng;
-  const samples = 32;
+  const samples = 40;
   const coast: Array<Point> = [];
   for (let index = 0; index <= samples; index += 1) {
     const lat = bounds.minLat + (index / samples) * latSpan;
-    const wave = Math.sin(index * 0.55 + phase) * lngSpan * 0.035;
-    const bulge = Math.sin(index * 0.22 + phase * 0.4) * lngSpan * 0.02;
+    const wave = Math.sin(index * 0.48 + phase) * lngSpan * 0.028;
+    const bulge = Math.sin(index * 0.18 + phase * 0.5) * lngSpan * 0.018;
     coast.push([lat, coastLng + wave + bulge]);
   }
 
-  const oceanLng = west ? bounds.minLng - lngSpan * 0.55 : bounds.maxLng + lngSpan * 0.55;
-  const south = bounds.minLat - latSpan * 0.25;
-  const north = bounds.maxLat + latSpan * 0.25;
-  const southWest: Point = [south, oceanLng];
-  const northWest: Point = [north, oceanLng];
+  const oceanLng = west
+    ? bounds.minLng - lngSpan * oceanFactor
+    : bounds.maxLng + lngSpan * oceanFactor;
+  const south = bounds.minLat - latSpan * 0.08;
+  const north = bounds.maxLat + latSpan * 0.08;
+  const oceanSouth: Point = [south, oceanLng];
+  const oceanNorth: Point = [north, oceanLng];
   if (west) {
-    return [southWest, ...coast, northWest, southWest];
+    return [oceanSouth, ...coast, oceanNorth, oceanSouth];
   }
-  return [southWest, ...[...coast].reverse(), northWest, southWest];
+  return [oceanSouth, ...[...coast].reverse(), oceanNorth, oceanSouth];
+}
+
+function landPolyline(start: Point, end: Point, mid: Point, steps: number): Array<Point> {
+  const line: Array<Point> = [];
+  for (let step = 0; step <= steps; step += 1) {
+    const t = step / steps;
+    const omt = 1 - t;
+    line.push([
+      omt * omt * start[0] + 2 * omt * t * mid[0] + t * t * end[0],
+      omt * omt * start[1] + 2 * omt * t * mid[1] + t * t * end[1],
+    ]);
+  }
+  return line;
 }
 
 /**
  * Invented outdoors layers in lat/lng, derived from the route bbox so the
  * same activity always paints the same cream/sage land, water, and contours.
+ * Features stay inside a tight pad of the route so they remain in the card.
  */
 export function buildTopoLayers(points: Array<Point>): TopoLayers {
   const tight = routeBounds(points);
-  const bounds = expandBounds(tight, 1.2);
+  const bounds = expandBounds(tight, 0.16);
   const next = createRng(seedFromBounds(tight));
   const centroid = routeCentroid(points);
   const latSpan = bounds.maxLat - bounds.minLat;
   const lngSpan = bounds.maxLng - bounds.minLng;
   const westWater = (centroid[1] - bounds.minLng) / lngSpan > 0.42;
   const coastLng = westWater
-    ? bounds.minLng + lngSpan * (0.16 + next() * 0.06)
-    : bounds.maxLng - lngSpan * (0.16 + next() * 0.06);
+    ? bounds.minLng + lngSpan * (0.22 + next() * 0.05)
+    : bounds.maxLng - lngSpan * (0.22 + next() * 0.05);
   const phase = next() * Math.PI * 2;
 
   const landMinLng = westWater ? coastLng : bounds.minLng;
   const landMaxLng = westWater ? bounds.maxLng : coastLng;
-  const landLngSpan = Math.max(landMaxLng - landMinLng, lngSpan * 0.35);
+  const landLngSpan = Math.max(landMaxLng - landMinLng, lngSpan * 0.4);
 
   const bands: Array<TopoFill> = [];
   const contours: Array<TopoStroke> = [];
 
-  for (let hill = 0; hill < 3; hill += 1) {
+  for (let hill = 0; hill < 4; hill += 1) {
     const center: Point = [
-      bounds.minLat + (0.18 + next() * 0.64) * latSpan,
-      landMinLng + (0.2 + next() * 0.6) * landLngSpan,
+      bounds.minLat + (0.14 + next() * 0.72) * latSpan,
+      landMinLng + (0.18 + next() * 0.64) * landLngSpan,
     ];
-    const radiusLng = landLngSpan * (0.22 + next() * 0.18);
-    const radiusLat = latSpan * (0.2 + next() * 0.16);
+    const radiusLng = landLngSpan * (0.28 + next() * 0.22);
+    const radiusLat = latSpan * (0.22 + next() * 0.2);
     const warpPhase = next() * Math.PI * 2;
+    const stretch = 1.15 + next() * 0.35;
 
-    for (let band = 0; band < 4; band += 1) {
-      const scale = 1 - band * 0.18;
+    for (let band = 0; band < 5; band += 1) {
+      const scale = 1 - band * 0.15;
       const ring = ellipseRing(
         center,
-        radiusLng * scale,
+        radiusLng * scale * stretch,
         radiusLat * scale,
-        36,
-        (angle) => 0.86 + 0.14 * Math.sin(angle * 2 + warpPhase + band),
+        44,
+        (angle) =>
+          0.78 +
+          0.16 * Math.sin(angle * 2 + warpPhase + band) +
+          0.08 * Math.sin(angle * 5 + warpPhase * 0.6),
       );
       bands.push({
-        fill: SAGE[band] ?? SAGE[3],
+        fill: SAGE[Math.min(band, SAGE.length - 1)] ?? SAGE[3],
         id: `band-${hill}-${band}`,
-        opacity: 0.42 + band * 0.08,
+        opacity: 0.34 + band * 0.1,
         ring,
       });
       if (band > 0) {
         contours.push({
           id: `contour-${hill}-${band}`,
           line: ring,
-          opacity: 0.38,
+          opacity: 0.32 + band * 0.04,
           stroke: CONTOUR,
-          strokeWidth: 0.9,
+          strokeWidth: band === 4 ? 1.15 : 0.7,
         });
       }
     }
   }
 
-  const roads: Array<TopoStroke> = [0, 1].map((index) => {
-    const startLat = bounds.minLat + (0.15 + next() * 0.2 + index * 0.35) * latSpan;
-    const endLat = startLat + (next() - 0.5) * latSpan * 0.25;
-    const startLng = landMinLng + next() * landLngSpan * 0.2;
-    const endLng = landMaxLng - next() * landLngSpan * 0.2;
-    const midLat = (startLat + endLat) / 2 + (next() - 0.5) * latSpan * 0.12;
-    const midLng = (startLng + endLng) / 2 + (next() - 0.5) * landLngSpan * 0.1;
+  for (let index = 0; index < 9; index += 1) {
+    const lat = bounds.minLat + ((index + 0.4) / 9) * latSpan;
     const line: Array<Point> = [];
-    const steps = 14;
-    for (let step = 0; step <= steps; step += 1) {
-      const t = step / steps;
-      const omt = 1 - t;
-      line.push([
-        omt * omt * startLat + 2 * omt * t * midLat + t * t * endLat,
-        omt * omt * startLng + 2 * omt * t * midLng + t * t * endLng,
-      ]);
+    const samples = 28;
+    const drift = (next() - 0.5) * latSpan * 0.04;
+    const wavePhase = next() * Math.PI * 2;
+    for (let sample = 0; sample <= samples; sample += 1) {
+      const t = sample / samples;
+      const lng = landMinLng + t * landLngSpan;
+      line.push([lat + drift + Math.sin(t * Math.PI * 2.4 + wavePhase) * latSpan * 0.018, lng]);
     }
-    return { id: `road-${index}`, line, opacity: 0.28, stroke: ROAD, strokeWidth: 1.05 };
+    contours.push({
+      id: `field-${index}`,
+      line,
+      opacity: 0.22,
+      stroke: CONTOUR,
+      strokeWidth: 0.55,
+    });
+  }
+
+  const roads: Array<TopoStroke> = [0, 1, 2].map((index) => {
+    const start: Point = [
+      bounds.minLat + (0.12 + next() * 0.18 + index * 0.28) * latSpan,
+      landMinLng + next() * landLngSpan * 0.18,
+    ];
+    const end: Point = [
+      start[0] + (next() - 0.45) * latSpan * 0.28,
+      landMaxLng - next() * landLngSpan * 0.16,
+    ];
+    const mid: Point = [
+      (start[0] + end[0]) / 2 + (next() - 0.5) * latSpan * 0.14,
+      (start[1] + end[1]) / 2 + (next() - 0.5) * landLngSpan * 0.12,
+    ];
+    return {
+      id: `road-${index}`,
+      line: landPolyline(start, end, mid, 16),
+      opacity: 0.55,
+      stroke: ROAD,
+      strokeWidth: 1.15,
+    };
   });
 
   return {
@@ -240,18 +283,19 @@ export function buildTopoLayers(points: Array<Point>): TopoLayers {
       {
         fill: WATER,
         id: 'water-shelf',
-        opacity: 0.92,
-        ring: waterRing(bounds, coastLng, phase, westWater),
+        opacity: 1,
+        ring: waterRing(bounds, coastLng, phase, westWater, 0.02),
       },
       {
         fill: WATER_DEEP,
         id: 'water-deep',
-        opacity: 0.35,
+        opacity: 0.42,
         ring: waterRing(
-          expandBounds(bounds, -0.08),
-          coastLng + (westWater ? -lngSpan * 0.06 : lngSpan * 0.06),
-          phase + 0.4,
+          expandBounds(bounds, -0.06),
+          coastLng + (westWater ? -lngSpan * 0.07 : lngSpan * 0.07),
+          phase + 0.35,
           westWater,
+          0.08,
         ),
       },
     ],
