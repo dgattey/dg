@@ -24,6 +24,21 @@ describe('greenhouseLayout', () => {
     expect(plants.filter((plant) => plant.layer === 'back').every((plant) => plant.x <= -18)).toBe(
       true,
     );
+
+    const symbolsOn = (edge: 'left' | 'right' | 'bottom') =>
+      plants.filter((plant) => plant.edge === edge).map((plant) => plant.symbol);
+    expect(symbolsOn('left')).toEqual(
+      expect.arrayContaining(['leaf-bop', 'leaf-calathea', 'leaf-monstera']),
+    );
+    expect(symbolsOn('right')).toEqual(expect.arrayContaining(['leaf-monstera', 'leaf-calathea']));
+    expect(symbolsOn('bottom')).toEqual(
+      expect.arrayContaining(['leaf-calathea', 'leaf-nerve', 'leaf-monstera']),
+    );
+    const leftFront = plants.filter((plant) => plant.edge === 'left' && plant.layer === 'front');
+    expect(leftFront.every((plant) => plant.x >= -10)).toBe(true);
+    expect(plants.filter((plant) => plant.edge === 'bottom').every((plant) => plant.y >= 0)).toBe(
+      true,
+    );
   });
 
   it('uses only the shared leaf vocabulary', () => {
