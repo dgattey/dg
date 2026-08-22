@@ -11,7 +11,8 @@
  *   /cursor/stores/bc-a78ceb1c-cd13-4ea5-bacd-55a94f7b77db/media/plant-src-nerve.png
  *
  * Optional argv[2] overrides the source directory. Emits 1024w + 768w
- * lossy AVIF-with-alpha and WebP q65 into apps/web/src/app/greenhouse/foliage/.
+ * lossy AVIF-with-alpha and WebP q65 into apps/web/src/app/greenhouse/foliage/,
+ * plus a 640w blurred-depth plate into atmosphere/.
  *
  * Usage (from repo root, sharp resolved via @dg/ui):
  *   pnpm --filter @dg/web exec tsx ../../scripts/greenhouse-assets.ts
@@ -152,6 +153,32 @@ async function encodeWidth(raw: Rgba, width: number, outBase: string): Promise<v
   );
 }
 
+async function encodeDepthPlate(srcDir: string, outDir: string): Promise<void> {
+  const src = join(srcDir, 'spike-glass-plate.png');
+  mkdirSync(outDir, { recursive: true });
+  const resized = sharp(src).resize(640, null, { fit: 'inside', withoutEnlargement: true });
+
+  let quality = 36;
+  let avif = await resized.clone().avif({ chromaSubsampling: '4:2:0', effort: 7, quality }).toBuffer();
+  while (avif.length > 25 * 1024 && quality > 18) {
+    quality -= 4;
+    avif = await resized.clone().avif({ chromaSubsampling: '4:2:0', effort: 7, quality }).toBuffer();
+  }
+  if (avif.length < 15 * 1024 && quality < 48) {
+    quality += 6;
+    avif = await resized.clone().avif({ chromaSubsampling: '4:2:0', effort: 7, quality }).toBuffer();
+  }
+
+  const webp = await resized.clone().webp({ quality: 52 }).toBuffer();
+  const avifPath = join(outDir, 'depth-plate.avif');
+  const webpPath = join(outDir, 'depth-plate.webp');
+  writeFileSync(avifPath, avif);
+  writeFileSync(webpPath, webp);
+  process.stdout.write(
+    `depth-plate 640w  avif ${(avif.length / 1024).toFixed(1)}KB q${quality}  webp ${(webp.length / 1024).toFixed(1)}KB\n`,
+  );
+}
+
 async function processPlant(name: string, srcDir: string, outDir: string): Promise<void> {
   const src = join(srcDir, `plant-src-${name}.png`);
   const image = sharp(src).ensureAlpha();
@@ -171,12 +198,14 @@ async function processPlant(name: string, srcDir: string, outDir: string): Promi
 
 async function main(): Promise<void> {
   const srcDir = process.argv[2] ?? DEFAULT_SRC_DIR;
-  const outDir = join(repoRoot, 'apps/web/src/app/greenhouse/foliage');
-  mkdirSync(outDir, { recursive: true });
+  const foliageDir = join(repoRoot, 'apps/web/src/app/greenhouse/foliage');
+  const atmosphereDir = join(repoRoot, 'apps/web/src/app/greenhouse/atmosphere');
+  mkdirSync(foliageDir, { recursive: true });
 
   for (const name of PLANTS) {
-    await processPlant(name, srcDir, outDir);
+    await processPlant(name, srcDir, foliageDir);
   }
+  await encodeDepthPlate(srcDir, atmosphereDir);
 }
 
 main().catch((error: unknown) => {

@@ -5,6 +5,7 @@
     "types": ["jest", "node"]
   },
   "extends": "@dg/tsconfig/nextjs.json",
+  "exclude": ["src/app/greenhouse/m1-shot"],
   "include": [
     "src",
     "next.config.ts",

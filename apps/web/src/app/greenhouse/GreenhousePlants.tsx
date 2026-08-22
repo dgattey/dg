@@ -15,12 +15,19 @@ import nerve768Avif from './foliage/nerve-768.avif';
 import nerve768Webp from './foliage/nerve-768.webp';
 import nerve1024Avif from './foliage/nerve-1024.avif';
 import nerve1024Webp from './foliage/nerve-1024.webp';
+import { plantMassVmin } from './greenhouseGeometry';
 import styles from './greenhouse.module.css';
-import type { LeafSymbol, PlantInstance, PlantLayer } from './greenhouseLayout';
+import type {
+  GreenhouseViewport,
+  LeafSymbol,
+  PlantInstance,
+  PlantLayer,
+} from './greenhouseLayout';
 
 type GreenhousePlantsProps = {
   plants: ReadonlyArray<PlantInstance>;
   layer: PlantLayer;
+  viewport?: GreenhouseViewport;
 };
 
 type FoliageSet = {
@@ -90,16 +97,20 @@ function plantPosition(plant: PlantInstance): CSSProperties {
  * Photoreal cutouts. Clicks pass through; screen readers skip them.
  * AVIF is the transfer; WebP is the fallback. Mobile uses the 768w encode.
  */
-export function GreenhousePlants({ plants, layer }: GreenhousePlantsProps) {
+export function GreenhousePlants({ plants, layer, viewport = 'desktop' }: GreenhousePlantsProps) {
   const items = plants.filter((plant) => plant.layer === layer && FOLIAGE[plant.symbol]);
   return (
-    <div aria-hidden="true" className={layer === 'back' ? styles.plantsBack : styles.plantsFront}>
+    <div
+      aria-hidden="true"
+      className={layer === 'back' ? styles.plantsBack : styles.plantsFront}
+      data-viewport={viewport}
+    >
       {items.map((plant) => {
         const asset = FOLIAGE[plant.symbol];
         if (!asset) {
           return null;
         }
-        const mass = plant.featured ? 34 : 28;
+        const mass = plantMassVmin(plant);
         return (
           <picture
             className={styles.plant}

@@ -2,6 +2,7 @@ import { readdirSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 
 const foliageDir = join(__dirname, '../foliage');
+const atmosphereDir = join(__dirname, '../atmosphere');
 const cssPath = join(__dirname, '../greenhouse.module.css');
 
 describe('greenhouse chrome', () => {
@@ -26,7 +27,17 @@ describe('greenhouse chrome', () => {
     }
   });
 
-  it('does not ship a glass raster or punched plant plate', () => {
+  it('ships a 640w depth plate behind the CSS mullions', () => {
+    const plate = join(atmosphereDir, 'depth-plate.avif');
+    const bytes = statSync(plate).size;
+    expect(bytes).toBeGreaterThan(12 * 1024);
+    expect(bytes).toBeLessThan(26 * 1024);
+    const css = readFileSync(cssPath, 'utf8');
+    expect(css).toContain('.depthPlate');
+    expect(css).toContain('blur(22px)');
+  });
+
+  it('does not ship the crushed glass raster or a punched plant plate', () => {
     const css = readFileSync(cssPath, 'utf8');
     expect(css).not.toContain('atmosphere/glass.webp');
     expect(css).not.toContain('.homeFrame');

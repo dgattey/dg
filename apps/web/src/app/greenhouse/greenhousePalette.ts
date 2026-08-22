@@ -48,16 +48,16 @@ export const GREENHOUSE_LEAF_VARS: SxObject = {
 };
 
 const atmospherePair = {
-  mullion: ['hsl(36deg, 8%, 58%)', 'hsl(0deg, 0%, 78%)'],
-  mullionEdge: ['hsl(48deg 40% 92% / 0.5)', 'hsl(0deg 0% 100% / 0.18)'],
-  mullionHighlight: ['hsl(40deg, 16%, 78%)', 'hsl(0deg, 0%, 90%)'],
-  mullionShade: ['hsl(32deg, 10%, 38%)', 'hsl(0deg, 0%, 16%)'],
+  mullion: ['hsl(32deg, 14%, 28%)', 'hsl(0deg, 0%, 72%)'],
+  mullionEdge: ['hsl(48deg 40% 92% / 0.7)', 'hsl(0deg 0% 100% / 0.18)'],
+  mullionHighlight: ['hsl(42deg, 28%, 78%)', 'hsl(0deg, 0%, 88%)'],
+  mullionShade: ['hsl(28deg, 16%, 16%)', 'hsl(0deg, 0%, 14%)'],
   ribDark: ['hsl(80deg 22% 28% / 0.28)', 'hsl(160deg 12% 80% / 0.2)'],
   ribMid: ['hsl(70deg 18% 58% / 0.1)', 'hsl(160deg 14% 24% / 0.22)'],
   ribShine: ['hsl(48deg 70% 96% / 0.42)', 'hsl(40deg 18% 36% / 0.18)'],
   sunCore: ['hsl(48deg 100% 97% / 1)', 'hsl(40deg 86% 62% / 0.62)'],
   sunHalo: ['hsl(46deg 96% 80% / 0.78)', 'hsl(38deg 58% 38% / 0.34)'],
-  wash: ['hsl(46deg, 38%, 80%)', 'hsl(158deg, 26%, 9%)'],
+  wash: ['hsl(62deg, 22%, 48%)', 'hsl(158deg, 26%, 9%)'],
 } as const;
 
 export const GREENHOUSE_ATMOSPHERE_VARS: SxObject = {

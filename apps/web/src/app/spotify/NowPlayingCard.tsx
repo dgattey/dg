@@ -13,7 +13,7 @@ import { PlaybackProgressBar } from './PlaybackProgressBar';
 import { PlaybackStatus } from './PlaybackStatus';
 import { TrackTitle } from './TrackTitle';
 
-const FALLBACK_WASH = 'linear-gradient(155deg, #f4d78f 0%, #e3ad52 46%, #c97a36 78%, #b35f2c 100%)';
+const FALLBACK_WASH = 'linear-gradient(155deg, #d8d4a0 0%, #c4b86a 46%, #9aa058 78%, #7a8a4a 100%)';
 
 const cardSx: SxObject = {
   display: 'flex',
