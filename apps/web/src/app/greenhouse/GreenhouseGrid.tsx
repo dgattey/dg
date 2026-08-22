@@ -20,6 +20,7 @@ export function GreenhouseGrid({ children }: Props) {
     '& > [data-bento="intro"]': {
       gridColumn: { sm: '1' },
       gridRow: { sm: '1' },
+      overflow: 'visible',
     },
     '& > [data-bento="now-playing"]': {
       gridColumn: { sm: '2' },
