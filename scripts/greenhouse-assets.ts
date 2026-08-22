@@ -10,12 +10,12 @@
  *   /cursor/stores/bc-a78ceb1c-cd13-4ea5-bacd-55a94f7b77db/media/plant-src-calathea.png
  *   /cursor/stores/bc-a78ceb1c-cd13-4ea5-bacd-55a94f7b77db/media/plant-src-nerve.png
  *
- * GREENHOUSE_PLANT_SRC_DIR overrides the directory. Emits 1024w + 768w
+ * Optional argv[2] overrides the source directory. Emits 1024w + 768w
  * lossy AVIF-with-alpha and WebP q65 into apps/web/src/app/greenhouse/foliage/.
  *
  * Usage (from repo root, sharp resolved via @dg/ui):
- *   pnpm --filter @dg/ui exec node --import tsx ../../scripts/greenhouse-assets.ts
  *   pnpm --filter @dg/web exec tsx ../../scripts/greenhouse-assets.ts
+ *   pnpm --filter @dg/web exec tsx ../../scripts/greenhouse-assets.ts /path/to/sources
  */
 import { mkdirSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
@@ -45,8 +45,7 @@ function loadSharp() {
 
 const sharp = loadSharp();
 
-const DEFAULT_SRC_DIR =
-  '/cursor/stores/bc-a78ceb1c-cd13-4ea5-bacd-55a94f7b77db/media';
+const DEFAULT_SRC_DIR = '/cursor/stores/bc-a78ceb1c-cd13-4ea5-bacd-55a94f7b77db/media';
 
 const PLANTS = ['monstera', 'bop', 'calathea', 'nerve'] as const;
 
@@ -171,7 +170,7 @@ async function processPlant(name: string, srcDir: string, outDir: string): Promi
 }
 
 async function main(): Promise<void> {
-  const srcDir = process.env.GREENHOUSE_PLANT_SRC_DIR ?? DEFAULT_SRC_DIR;
+  const srcDir = process.argv[2] ?? DEFAULT_SRC_DIR;
   const outDir = join(repoRoot, 'apps/web/src/app/greenhouse/foliage');
   mkdirSync(outDir, { recursive: true });
 

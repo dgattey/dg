@@ -15,7 +15,10 @@ describe('greenhouse chrome', () => {
       'nerve-1024.avif',
     ]);
     expect(files.some((name) => name.startsWith('home-frame'))).toBe(false);
-    const desktopBytes = avifs.reduce((sum, name) => sum + statSync(join(foliageDir, name)).size, 0);
+    const desktopBytes = avifs.reduce(
+      (sum, name) => sum + statSync(join(foliageDir, name)).size,
+      0,
+    );
     expect(desktopBytes).toBeLessThan(240 * 1024);
     for (const name of avifs) {
       expect(statSync(join(foliageDir, name)).size).toBeGreaterThan(20 * 1024);

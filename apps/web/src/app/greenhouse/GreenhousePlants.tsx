@@ -1,20 +1,20 @@
 import type { CSSProperties } from 'react';
-import bop1024Avif from './foliage/bop-1024.avif';
-import bop1024Webp from './foliage/bop-1024.webp';
 import bop768Avif from './foliage/bop-768.avif';
 import bop768Webp from './foliage/bop-768.webp';
-import calathea1024Avif from './foliage/calathea-1024.avif';
-import calathea1024Webp from './foliage/calathea-1024.webp';
+import bop1024Avif from './foliage/bop-1024.avif';
+import bop1024Webp from './foliage/bop-1024.webp';
 import calathea768Avif from './foliage/calathea-768.avif';
 import calathea768Webp from './foliage/calathea-768.webp';
-import monstera1024Avif from './foliage/monstera-1024.avif';
-import monstera1024Webp from './foliage/monstera-1024.webp';
+import calathea1024Avif from './foliage/calathea-1024.avif';
+import calathea1024Webp from './foliage/calathea-1024.webp';
 import monstera768Avif from './foliage/monstera-768.avif';
 import monstera768Webp from './foliage/monstera-768.webp';
-import nerve1024Avif from './foliage/nerve-1024.avif';
-import nerve1024Webp from './foliage/nerve-1024.webp';
+import monstera1024Avif from './foliage/monstera-1024.avif';
+import monstera1024Webp from './foliage/monstera-1024.webp';
 import nerve768Avif from './foliage/nerve-768.avif';
 import nerve768Webp from './foliage/nerve-768.webp';
+import nerve1024Avif from './foliage/nerve-1024.avif';
+import nerve1024Webp from './foliage/nerve-1024.webp';
 import styles from './greenhouse.module.css';
 import type { LeafSymbol, PlantInstance, PlantLayer } from './greenhouseLayout';
 
@@ -115,16 +115,8 @@ export function GreenhousePlants({ plants, layer }: GreenhousePlantsProps) {
               } as CSSProperties
             }
           >
-            <source
-              media="(max-width: 575px)"
-              srcSet={asset.mobileAvif}
-              type="image/avif"
-            />
-            <source
-              media="(max-width: 575px)"
-              srcSet={asset.mobileWebp}
-              type="image/webp"
-            />
+            <source media="(max-width: 575px)" srcSet={asset.mobileAvif} type="image/avif" />
+            <source media="(max-width: 575px)" srcSet={asset.mobileWebp} type="image/webp" />
             <source srcSet={asset.desktopAvif} type="image/avif" />
             <img
               alt=""

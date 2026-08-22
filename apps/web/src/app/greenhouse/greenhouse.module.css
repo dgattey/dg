@@ -232,14 +232,14 @@
   padding-top: 0.75rem;
 }
 
-:global(html),
-:global(body) {
-  background-color: #e4d7b4 !important;
+:global(html:has([data-greenhouse-frame])),
+:global(html:has([data-greenhouse-frame]) body) {
+  background-color: #e4d7b4;
 }
 
-:global(html[data-color-scheme="dark"]),
-:global(html[data-color-scheme="dark"] body) {
-  background-color: #0f1c16 !important;
+:global(html[data-color-scheme="dark"]:has([data-greenhouse-frame])),
+:global(html[data-color-scheme="dark"]:has([data-greenhouse-frame]) body) {
+  background-color: #0f1c16;
 }
 
 @media (max-width: 575px) {
