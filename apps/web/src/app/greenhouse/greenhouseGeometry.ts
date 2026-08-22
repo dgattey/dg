@@ -70,15 +70,25 @@ export const LEAF_OPAQUE_INSET: Record<
 
 /**
  * 1440×900 fold: 12 columns, content-sized rows, 1.25rem gutter.
- * Intro `span 8` / now-playing `span 4`, then activity `span 7` /
- * featured `span 5`. Row 1 is ~18–22rem with a wide intro measure.
+ * Desktop (`xl` 1200+): intro `span 8` / now-playing `span 4`, then
+ * activity `span 7` / featured `span 5`.
+ * Below `xl`, a `span 4` now-playing is ~190–220px inside the foliage
+ * inset, so intro goes `span 12` and now-playing takes the next row.
  */
 export const GREENHOUSE_GRID_COLUMNS = 12;
+export const GREENHOUSE_MD = 768;
+export const GREENHOUSE_XL = 1200;
 export const GREENHOUSE_GRID_SPANS = {
   activity: { span: 7, start: 1 },
   featured: { span: 5, start: 8 },
   intro: { span: 8, start: 1 },
   'now-playing': { span: 4, start: 9 },
+} as const;
+export const GREENHOUSE_STACKED_SPANS = {
+  activity: { span: 7, start: 1 },
+  featured: { span: 5, start: 8 },
+  intro: { span: 12, start: 1 },
+  'now-playing': { span: 12, start: 1 },
 } as const;
 
 export const HOME_DESKTOP_GRID = {
@@ -87,6 +97,19 @@ export const HOME_DESKTOP_GRID = {
   row2: 257,
   top: 172,
 } as const;
+
+/** Stacked intro + now-playing rows between `md` and `xl`. Live 1024. */
+export const HOME_STACKED_GRID = {
+  gutter: 24,
+  intro: 374,
+  now: 461,
+  row3: 243,
+  top: 162,
+} as const;
+
+export function isStackedHome(width: number): boolean {
+  return width >= GREENHOUSE_MD && width < GREENHOUSE_XL;
+}
 
 export function gridTrackSize(contentWidth: number, gutter: number): number {
   return (contentWidth - (GREENHOUSE_GRID_COLUMNS - 1) * gutter) / GREENHOUSE_GRID_COLUMNS;
@@ -250,32 +273,41 @@ export function homeGrid(viewport: ViewportSize): {
   introW: number;
   introX: number;
   left: number;
+  nowH: number;
   nowW: number;
   nowX: number;
   row1: number;
+  stacked: boolean;
   top: number;
   twoCol: boolean;
 } {
   const twoCol = viewport.width >= SM_BREAKPOINT;
+  const stacked = isStackedHome(viewport.width);
   const left = contentInset(viewport.width);
   const gutter = twoCol ? HOME_DESKTOP_GRID.gutter : 16;
   const contentW = viewport.width - left * 2;
-  const top = twoCol ? HOME_DESKTOP_GRID.top : 96;
-  const row1 = twoCol ? HOME_DESKTOP_GRID.row1 : 280;
-  if (!twoCol) {
+  const top = stacked ? HOME_STACKED_GRID.top : twoCol ? HOME_DESKTOP_GRID.top : 96;
+  const row1 = stacked ? HOME_STACKED_GRID.intro : twoCol ? HOME_DESKTOP_GRID.row1 : 280;
+  const nowH = stacked ? HOME_STACKED_GRID.now : row1;
+  if (!twoCol || stacked) {
+    const track = stacked ? gridTrackSize(contentW, gutter) : 0;
+    const activity = GREENHOUSE_STACKED_SPANS.activity;
+    const featured = GREENHOUSE_STACKED_SPANS.featured;
     return {
-      activityW: contentW,
-      activityX: left,
+      activityW: stacked ? gridSpanWidth(track, gutter, activity.span) : contentW,
+      activityX: stacked ? left + gridSpanOffset(track, gutter, activity.start) : left,
       contentW,
-      featuredW: contentW,
-      featuredX: left,
+      featuredW: stacked ? gridSpanWidth(track, gutter, featured.span) : contentW,
+      featuredX: stacked ? left + gridSpanOffset(track, gutter, featured.start) : left,
       gutter,
       introW: contentW,
       introX: left,
       left,
+      nowH,
       nowW: contentW,
       nowX: left,
       row1,
+      stacked,
       top,
       twoCol,
     };
@@ -296,9 +328,11 @@ export function homeGrid(viewport: ViewportSize): {
     introW: gridSpanWidth(track, gutter, intro.span),
     introX: left + gridSpanOffset(track, gutter, intro.start),
     left,
+    nowH,
     nowW: gridSpanWidth(track, gutter, now.span),
     nowX: left + gridSpanOffset(track, gutter, now.start),
     row1,
+    stacked,
     top,
     twoCol,
   };
@@ -322,14 +356,17 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
     ];
   }
 
-  const lowerTop = grid.top + grid.row1 + grid.gutter;
+  const nowTop = grid.stacked ? grid.top + grid.row1 + grid.gutter : grid.top;
+  const lowerTop = grid.stacked
+    ? nowTop + grid.nowH + grid.gutter
+    : grid.top + grid.row1 + grid.gutter;
   const introCopyX = grid.introX + 20;
   const introCopyW = Math.min(grid.introW - 40, 40 * 11.1);
   const nowCopyX = grid.nowX + 14;
   const featuredCopyX = grid.featuredX + 16;
   return [
     {
-      height: 200,
+      height: grid.stacked ? 180 : 200,
       id: 'intro-copy',
       width: Math.max(160, introCopyW),
       x: introCopyX,
@@ -340,7 +377,7 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
       id: 'now-playing-copy',
       width: Math.max(80, Math.min(grid.nowW - 28, size.width - strip - 12 - nowCopyX)),
       x: nowCopyX,
-      y: grid.top + Math.min(grid.row1, grid.nowW * 1.6) - 102,
+      y: nowTop + Math.min(grid.nowH, grid.nowW * 1.6) - 102,
     },
     {
       height: 50,

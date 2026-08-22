@@ -235,7 +235,7 @@
   container-type: inline-size;
 }
 
-@media (min-width: 600px) {
+@media (min-width: 768px) {
   .grid {
     grid-template-columns: repeat(12, minmax(0, 1fr));
   }

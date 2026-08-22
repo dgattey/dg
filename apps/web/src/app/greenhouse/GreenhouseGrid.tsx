@@ -2,7 +2,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { Children } from 'react';
 import styles from './greenhouse.module.css';
-import { GREENHOUSE_GRID_SPANS } from './greenhouseGeometry';
+import { GREENHOUSE_GRID_SPANS, GREENHOUSE_STACKED_SPANS } from './greenhouseGeometry';
 
 type Props = Pick<React.ComponentProps<'div'>, 'children'>;
 type Slot = keyof typeof GREENHOUSE_GRID_SPANS;
@@ -14,25 +14,32 @@ const SLOTS = [
   'featured',
 ] as const satisfies ReadonlyArray<Slot>;
 
+const stackedSpan = (slot: Slot): string =>
+  slot === 'activity' || slot === 'featured'
+    ? `span ${GREENHOUSE_STACKED_SPANS[slot].span}`
+    : '1 / -1';
+
 const cellLayout = (slot: Slot): SxObject => ({
   gridColumn: {
-    sm: `span ${GREENHOUSE_GRID_SPANS[slot].span}`,
+    md: stackedSpan(slot),
+    xl: `span ${GREENHOUSE_GRID_SPANS[slot].span}`,
     xs: '1 / -1',
   },
   gridRow: {
-    sm: slot === 'intro' || slot === 'now-playing' ? '1' : '2',
+    md: slot === 'intro' ? '1' : slot === 'now-playing' ? '2' : '3',
+    xl: slot === 'intro' || slot === 'now-playing' ? '1' : '2',
     xs: 'auto',
   },
   minHeight: {
-    sm: slot === 'activity' || slot === 'featured' ? '13.5rem' : 'auto',
+    md: slot === 'activity' || slot === 'featured' ? '13.5rem' : 'auto',
     xs: 'auto',
   },
 });
 
 /**
- * 12-col greenhouse homepage. Cells are wrappers we own: `cqi` is 1% of
- * the now-playing column, not the viewport, and ContentCard's 1-col rem
- * width cannot size the track.
+ * 12-col greenhouse homepage. Below `xl` the intro takes the full track so
+ * now-playing stays ≥ ~300px. Cells are wrappers we own: `cqi` is 1% of
+ * the now-playing column, not the viewport.
  */
 export function GreenhouseGrid({ children }: Props) {
   const items = Children.toArray(children);

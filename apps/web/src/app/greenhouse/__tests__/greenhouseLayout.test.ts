@@ -87,12 +87,24 @@ describe('greenhouseLayout', () => {
 describe('greenhouse safe zones', () => {
   it('sizes the 12-col home grid so intro is wider than now-playing', () => {
     const grid = homeGrid(GREENHOUSE_VIEWPORTS.desktop);
+    expect(grid.stacked).toBe(false);
     expect(grid.introW).toBeGreaterThan(grid.nowW * 1.7);
     expect(grid.activityW).toBeGreaterThan(grid.featuredW);
     expect(grid.nowX).toBeGreaterThan(grid.introX + grid.introW);
     expect(grid.featuredX).toBeGreaterThan(grid.activityX + grid.activityW);
     expect(grid.row1).toBeGreaterThanOrEqual(360);
     expect(grid.row1).toBeLessThanOrEqual(450);
+  });
+
+  it('stacks intro and now-playing below xl so the track is at least 300px', () => {
+    for (const width of [768, 834, 1024, 1180]) {
+      const grid = homeGrid({ height: 1366, width });
+      expect(grid.stacked).toBe(true);
+      expect(grid.introW).toBe(grid.contentW);
+      expect(grid.nowW).toBe(grid.contentW);
+      expect(grid.nowW).toBeGreaterThanOrEqual(300);
+      expect(grid.nowX).toBe(grid.introX);
+    }
   });
 
   it('defines copy wells for intro, now-playing, activity, and featured on desktop', () => {

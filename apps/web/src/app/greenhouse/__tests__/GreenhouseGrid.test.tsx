@@ -31,7 +31,10 @@ describe('GreenhouseGrid', () => {
     const source = readFileSync(join(__dirname, '../GreenhouseGrid.tsx'), 'utf8');
     const css = readFileSync(join(__dirname, '../greenhouse.module.css'), 'utf8');
     expect(source).toContain('GREENHOUSE_GRID_SPANS[slot].span');
+    expect(source).toContain('GREENHOUSE_STACKED_SPANS');
+    expect(source).toContain('md: stackedSpan(slot)');
     expect(css).toContain('repeat(12, minmax(0, 1fr))');
+    expect(css).toContain('min-width: 768px');
     expect(css).toContain('grid-auto-rows: auto');
     expect(css).toContain('container-type: inline-size');
     expect(css).toContain('75cqi');
