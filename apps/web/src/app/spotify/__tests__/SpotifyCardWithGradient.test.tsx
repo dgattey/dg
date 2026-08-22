@@ -86,6 +86,8 @@ describe('SpotifyCardWithGradient', () => {
     expect(screen.getByText('Artist new')).toBeInTheDocument();
     expect(screen.getByText('https://images.test/new.jpg')).toBeInTheDocument();
     expect(screen.queryByText('Track old')).not.toBeInTheDocument();
+    expect(screen.getByTestId('track-listing')).toBeInTheDocument();
+    expect(document.querySelector('[data-watercolor-leaves]')).toBeNull();
   });
 
   it('keeps the previous gradient until the next one resolves', async () => {

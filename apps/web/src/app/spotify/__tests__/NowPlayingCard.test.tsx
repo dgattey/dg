@@ -10,7 +10,11 @@ jest.mock('next/navigation', () => ({
 const TEST_SERVER_TIME = new Date('2026-02-10T12:00:00Z').getTime();
 
 function TestWrapper({ children }: { children: ReactNode }) {
-  return <ServerTimeProvider serverTime={TEST_SERVER_TIME}>{children}</ServerTimeProvider>;
+  return (
+    <div data-greenhouse-frame={true}>
+      <ServerTimeProvider serverTime={TEST_SERVER_TIME}>{children}</ServerTimeProvider>
+    </div>
+  );
 }
 
 const artist = {
@@ -52,5 +56,50 @@ describe('NowPlayingCard', () => {
     expect(screen.getByText(/now playing/i)).toBeInTheDocument();
     expect(screen.getByText('Leaflight')).toBeInTheDocument();
     expect(screen.getByText('Alder & Moss')).toBeInTheDocument();
+    expect(document.querySelector('[data-now-playing-progress]')).toBeTruthy();
+  });
+
+  it('paints watercolor leaves instead of line-art botanical strokes', () => {
+    const { container } = render(
+      <TestWrapper>
+        <NowPlayingCard track={track} />
+      </TestWrapper>,
+    );
+
+    expect(container.querySelector('[data-watercolor-leaves]')).toBeTruthy();
+    expect(container.querySelector('[data-now-playing-wash]')).toBeTruthy();
+    expect(container.querySelectorAll('svg[data-watercolor-leaves] path[stroke]')).toHaveLength(0);
+  });
+
+  it('keeps cream resting notes when playback is idle', () => {
+    render(
+      <TestWrapper>
+        <NowPlayingCard track={{ ...track, isPlaying: false }} />
+      </TestWrapper>,
+    );
+
+    expect(document.querySelector('[data-resting-notes]')).toBeTruthy();
+    expect(document.querySelector('[data-music-notes]')).toBeNull();
+  });
+
+  it('uses the card note scatter while a track is playing', () => {
+    render(
+      <TestWrapper>
+        <NowPlayingCard track={track} />
+      </TestWrapper>,
+    );
+
+    expect(document.querySelector('[data-music-notes="card"]')).toBeTruthy();
+  });
+
+  it('does not print playback timestamps on the home card', () => {
+    render(
+      <TestWrapper>
+        <NowPlayingCard track={track} />
+      </TestWrapper>,
+    );
+
+    expect(screen.queryByText(/:/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/2:47/)).not.toBeInTheDocument();
   });
 });

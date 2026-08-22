@@ -4,16 +4,38 @@ import type { Track } from '@dg/content-models/spotify/Track';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack } from '@mui/material';
-import { Leaf, Music, Music2, Music3 } from 'lucide-react';
+import { Leaf, Music, Music2, Music3, Music4 } from 'lucide-react';
 import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
 import { ArtistList } from './ArtistList';
-import { getContrastingColors } from './colors';
+import type { Colors } from './colors';
 import { MusicNotes } from './MusicNotes';
 import { PlaybackProgressBar } from './PlaybackProgressBar';
 import { PlaybackStatus } from './PlaybackStatus';
 import { TrackTitle } from './TrackTitle';
+import { WatercolorLeaves } from './WatercolorLeaves';
 
-const FALLBACK_WASH = 'linear-gradient(155deg, #d8d4a0 0%, #c4b86a 46%, #9aa058 78%, #7a8a4a 100%)';
+/**
+ * Sage-to-gold fallback when album art has not produced a gradient yet.
+ * Album colors still paint, then get mixed toward this wash.
+ */
+const FALLBACK_WASH = 'linear-gradient(155deg, #d2cd90 0%, #c2b468 40%, #8f9a56 72%, #6d8348 100%)';
+
+const CREAM: Colors = {
+  primary: 'rgba(255, 248, 230, 0.96)',
+  primaryContrast: 'rgba(48, 40, 16, 0.22)',
+  primaryShadow: '0 1px 2px rgba(40, 28, 8, 0.16)',
+  secondary: 'rgba(255, 244, 214, 0.78)',
+  secondaryShadow: '0 1px 2px rgba(40, 28, 8, 0.1)',
+};
+
+const SAGE_GOLD_WASH =
+  'radial-gradient(ellipse 78% 68% at 90% 6%, rgb(246 228 152 / 0.78) 0%, transparent 70%), radial-gradient(ellipse 50% 42% at 12% 88%, rgb(124 138 72 / 0.42) 0%, transparent 72%), linear-gradient(155deg, #d2cd90 0%, #c2b468 40%, #8f9a56 72%, #6d8348 100%)';
+
+const layerBaseSx: SxObject = {
+  inset: 0,
+  pointerEvents: 'none',
+  position: 'absolute',
+};
 
 const cardSx: SxObject = {
   display: 'flex',
@@ -26,61 +48,67 @@ const cardSx: SxObject = {
 };
 
 const washSx: SxObject = {
-  backgroundImage: FALLBACK_WASH,
-  borderRadius: 'inherit',
-  inset: 0,
-  opacity: 0.78,
-  pointerEvents: 'none',
-  position: 'absolute',
+  ...layerBaseSx,
+  '[data-greenhouse-frame] &': {
+    backgroundImage: SAGE_GOLD_WASH,
+    borderRadius: 'inherit',
+    opacity: 0.9,
+  },
   zIndex: 0,
 };
 
-const gradientSx: SxObject = {
-  borderRadius: 'inherit',
-  inset: 0,
-  mixBlendMode: 'soft-light',
-  opacity: 0.4,
+const albumMixSx: SxObject = {
+  ...layerBaseSx,
+  '[data-greenhouse-frame] &': {
+    borderRadius: 'inherit',
+    filter: 'saturate(0.4) sepia(0.3) hue-rotate(12deg) brightness(1.06)',
+    mixBlendMode: 'soft-light',
+    opacity: 0.52,
+  },
   zIndex: 1,
 };
 
-const botanicalSx: SxObject = {
-  color: 'rgba(72, 48, 16, 0.38)',
-  height: '100%',
-  opacity: 1,
-  pointerEvents: 'none',
-  position: 'absolute',
-  right: 0,
-  top: 0,
-  width: '72%',
+const hueLockSx: SxObject = {
+  ...layerBaseSx,
+  '[data-greenhouse-frame] &': {
+    backgroundImage:
+      'linear-gradient(155deg, rgb(210 200 120 / 0.55) 0%, rgb(168 156 72 / 0.42) 46%, rgb(110 132 72 / 0.5) 100%)',
+    borderRadius: 'inherit',
+    mixBlendMode: 'color',
+    opacity: 0.46,
+  },
+  zIndex: 2,
+};
+
+const watercolorBleedSx: SxObject = {
+  ...layerBaseSx,
+  '[data-greenhouse-frame] &': {
+    backgroundImage:
+      'radial-gradient(ellipse 58% 52% at 96% 84%, rgb(88 104 48 / 0.46), transparent 72%), radial-gradient(ellipse 42% 48% at 78% 102%, rgb(154 136 58 / 0.4), transparent 70%), radial-gradient(ellipse 38% 42% at 102% 58%, rgb(112 124 60 / 0.34), transparent 68%)',
+    filter: 'blur(12px)',
+    mixBlendMode: 'multiply',
+  },
   zIndex: 2,
 };
 
 const notesOriginSx: SxObject = {
-  left: '74%',
+  '[data-greenhouse-frame] &': {
+    left: '62%',
+    top: '26%',
+  },
   pointerEvents: 'none',
   position: 'absolute',
-  top: '32%',
-  zIndex: 3,
+  zIndex: 4,
 };
 
-const staticNotesSx: SxObject = {
-  color: 'rgba(48, 28, 10, 0.45)',
+const restingNotesSx: SxObject = {
+  '[data-greenhouse-frame] &': {
+    color: 'rgb(255 246 214 / 0.72)',
+  },
   inset: 0,
   pointerEvents: 'none',
   position: 'absolute',
-  zIndex: 3,
-};
-
-const progressWrapSx: SxObject = {
-  '& > div': {
-    backgroundColor: 'rgba(255, 255, 255, 0.32) !important',
-    height: '5px !important',
-    marginTop: '0 !important',
-  },
-  '& > div > div': {
-    backgroundColor: 'rgba(255, 248, 230, 0.95) !important',
-  },
-  marginTop: 1.5,
+  zIndex: 4,
 };
 
 const layoutSx: SxObject = {
@@ -88,7 +116,7 @@ const layoutSx: SxObject = {
   justifyContent: 'space-between',
   minHeight: 0,
   position: 'relative',
-  zIndex: 4,
+  zIndex: 5,
 };
 
 const headerSx: SxObject = {
@@ -99,8 +127,9 @@ const headerSx: SxObject = {
 
 const leafBadgeSx: SxObject = {
   alignItems: 'center',
-  backgroundColor: 'color-mix(in srgb, var(--mui-palette-common-white) 38%, transparent)',
+  backgroundColor: 'rgb(255 248 230 / 0.22)',
   borderRadius: '999px',
+  color: 'rgb(255 246 220 / 0.88)',
   display: 'inline-flex',
   height: 28,
   justifyContent: 'center',
@@ -109,95 +138,78 @@ const leafBadgeSx: SxObject = {
 
 const titleSx: SxObject = {
   '& .MuiTypography-root': {
-    fontSize: 'clamp(1.45rem, 1.15rem + 1.2vw, 1.85rem)',
+    color: CREAM.primary,
+    fontFamily: 'var(--font-display, inherit)',
+    fontSize: 'clamp(1.65rem, 1.2rem + 1.5vw, 2.2rem)',
     fontWeight: 600,
     letterSpacing: '-0.02em',
-    lineHeight: 1.15,
+    lineHeight: 1.12,
+    textShadow: CREAM.primaryShadow,
   },
   marginTop: 0.75,
 };
 
-/**
- * Line-art tropical leaves in the wash. Decorative only.
- */
-function BotanicalAccent() {
-  return (
-    <Box aria-hidden="true" sx={botanicalSx}>
-      <svg aria-hidden="true" fill="none" viewBox="0 0 280 320">
-        <path
-          d="M176 292c-18-54 6-108 58-148-8 48 6 96 38 128-42 22-72 22-96 20Z"
-          stroke="currentColor"
-          strokeLinejoin="round"
-          strokeWidth="3"
-        />
-        <path
-          d="M92 38c48 22 78 70 70 132-38-8-78-40-92-86 8-18 14-32 22-46Z"
-          stroke="currentColor"
-          strokeLinejoin="round"
-          strokeWidth="3"
-        />
-        <path
-          d="M118 86c18 28 22 58 8 86"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="2"
-        />
-        <path
-          d="M48 168c44-8 86 10 112 48-36 18-82 22-118 8 4-22 6-40 6-56Z"
-          stroke="currentColor"
-          strokeLinejoin="round"
-          strokeWidth="3"
-        />
-        <path
-          d="M154 196c22 18 34 42 32 70"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeWidth="2"
-        />
-        <path
-          d="M206 72c28 36 28 86-6 124 34 4 62-22 74-56-10-28-32-52-68-68Z"
-          stroke="currentColor"
-          strokeLinejoin="round"
-          strokeWidth="3"
-        />
-      </svg>
-    </Box>
-  );
-}
+const artistSx: SxObject = {
+  '& .MuiTypography-root, & a': {
+    color: CREAM.secondary,
+    textShadow: CREAM.secondaryShadow,
+  },
+};
+
+const progressWrapSx: SxObject = {
+  '& > div': {
+    backgroundColor: 'rgb(255 248 230 / 0.28) !important',
+    height: '7px !important',
+    marginTop: '0 !important',
+  },
+  '& > div > div': {
+    backgroundColor: 'rgb(255 248 228 / 0.96) !important',
+  },
+  marginTop: 1.5,
+};
+
+const RESTING_NOTES = [
+  { Icon: Music, left: '38%', rotate: '-16deg', size: 18, top: '10%' },
+  { Icon: Music2, left: '56%', rotate: '12deg', size: 16, top: '18%' },
+  { Icon: Music3, left: '72%', rotate: '-8deg', size: 20, top: '8%' },
+  { Icon: Music4, left: '48%', rotate: '18deg', size: 14, top: '36%' },
+  { Icon: Music, left: '82%', rotate: '8deg', size: 15, top: '32%' },
+] as const;
 
 function RestingNotes() {
   return (
-    <Box aria-hidden="true" sx={staticNotesSx}>
-      <Box sx={{ left: '58%', position: 'absolute', top: '18%', transform: 'rotate(-18deg)' }}>
-        <Music size={18} />
-      </Box>
-      <Box sx={{ left: '78%', position: 'absolute', top: '28%', transform: 'rotate(12deg)' }}>
-        <Music2 size={16} />
-      </Box>
-      <Box sx={{ left: '66%', position: 'absolute', top: '48%', transform: 'rotate(8deg)' }}>
-        <Music3 size={14} />
-      </Box>
+    <Box aria-hidden="true" data-resting-notes="" sx={restingNotesSx}>
+      {RESTING_NOTES.map(({ Icon, left, rotate, size, top }) => (
+        <Box
+          key={`${left}-${top}`}
+          sx={{ left, position: 'absolute', top, transform: `rotate(${rotate})` }}
+        >
+          <Icon size={size} />
+        </Box>
+      ))}
     </Box>
   );
 }
 
 /**
- * Greenhouse now-playing tile: color wash from art, floating notes, progress,
- * and a botanical accent. Live `TrackListing` pieces stay underneath.
+ * Greenhouse now-playing tile: sage/gold wash, watercolor leaves, floating
+ * notes, and a cream progress pill. Live `Track` pieces stay underneath.
  */
 export function NowPlayingCard({ track }: { track: Track }) {
-  const colors = getContrastingColors(track);
   const gradient = track.albumGradient ?? FALLBACK_WASH;
-  const noteColor = colors?.primary ?? 'rgba(40, 24, 8, 0.72)';
 
   return (
     <ContentCard data-bento="now-playing" sx={cardSx}>
-      <Box aria-hidden="true" sx={washSx} />
-      <AlbumGradientBackdrop containerSx={gradientSx} gradient={gradient} />
-      <BotanicalAccent />
+      <Box aria-hidden="true" data-now-playing-wash="" sx={washSx} />
+      <Box aria-hidden="true" sx={albumMixSx}>
+        <AlbumGradientBackdrop containerSx={{ inset: 0 }} gradient={gradient} />
+      </Box>
+      <Box aria-hidden="true" sx={hueLockSx} />
+      <Box aria-hidden="true" sx={watercolorBleedSx} />
+      <WatercolorLeaves />
       <RestingNotes />
       <Box aria-hidden="true" sx={notesOriginSx}>
-        <MusicNotes isPlaying={Boolean(track.isPlaying)} noteColor={noteColor} />
+        <MusicNotes isPlaying={Boolean(track.isPlaying)} noteColor={CREAM.primary} variant="card" />
       </Box>
       <Stack sx={layoutSx}>
         <Stack>
@@ -206,32 +218,34 @@ export function NowPlayingCard({ track }: { track: Track }) {
               <Leaf size={14} />
             </Box>
             <PlaybackStatus
-              color={colors?.primary}
+              color={CREAM.primary}
               isPlaying={track.isPlaying}
               listingVariant="card"
               playedAt={track.playedAt}
-              textShadow={colors?.primaryShadow}
+              textShadow={CREAM.primaryShadow}
             />
           </Stack>
           <Box sx={titleSx}>
             <TrackTitle
-              color={colors?.primary}
+              color={CREAM.primary}
               listingVariant="card"
-              textShadow={colors?.primaryShadow}
+              textShadow={CREAM.primaryShadow}
               trackTitle={track.name}
               url={track.externalUrls.spotify}
             />
           </Box>
-          <ArtistList
-            artists={track.artists}
-            color={colors?.secondary}
-            listingVariant="card"
-            textShadow={colors?.secondaryShadow}
-          />
+          <Box sx={artistSx}>
+            <ArtistList
+              artists={track.artists}
+              color={CREAM.secondary}
+              listingVariant="card"
+              textShadow={CREAM.secondaryShadow}
+            />
+          </Box>
         </Stack>
-        <Box sx={progressWrapSx}>
+        <Box data-now-playing-progress="" sx={progressWrapSx}>
           <PlaybackProgressBar
-            colors={colors}
+            colors={CREAM}
             durationMs={track.durationMs}
             isPlaying={track.isPlaying}
             progressMs={track.progressMs}
