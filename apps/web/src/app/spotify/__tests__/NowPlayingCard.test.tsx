@@ -152,4 +152,24 @@ describe('NowPlayingCard', () => {
     expect(css).toContain('font-size: 1.5rem');
     expect(css).not.toContain('1.35rem + 0.55vw');
   });
+
+  it('uses a medium title weight and a soft copy scrim instead of a left panel', () => {
+    render(
+      <TestWrapper>
+        <NowPlayingCard track={track} />
+      </TestWrapper>,
+    );
+
+    const css = [...document.querySelectorAll('style')]
+      .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
+      .join('\n');
+
+    expect(document.querySelector('[data-now-playing-scrim]')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-grain]')).toBeTruthy();
+    expect(css).toContain('font-weight: 500');
+    expect(css).toContain('rgba(40, 55, 35, 0.55)');
+    expect(css).toContain('#e7d48a');
+    expect(css).not.toContain('#3f522c');
+    expect(css).not.toContain('ellipse 58% 52% at 94% 8%');
+  });
 });

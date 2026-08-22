@@ -10,13 +10,13 @@ const leavesSx: SxObject = {
   '[data-greenhouse-frame] &': {
     opacity: 1,
   },
-  bottom: '-10%',
-  height: '118%',
+  bottom: '-14%',
+  height: '126%',
   pointerEvents: 'none',
   position: 'absolute',
-  right: '-8%',
+  right: '-12%',
   top: 'auto',
-  width: '62%',
+  width: '72%',
   zIndex: 3,
 };
 
@@ -49,61 +49,101 @@ function bezierAngle(a: Point, b: Point, c: Point, d: Point, t: number): number 
 }
 
 function lanceolate(length: number, width: number): string {
-  const tip = length * 0.58;
-  const base = length * 0.42;
-  return `M 0 ${-base} C ${width} ${-base * 0.2} ${width * 0.55} ${tip * 0.35} 0 ${tip} C ${-width * 0.55} ${tip * 0.35} ${-width} ${-base * 0.2} 0 ${-base} Z`;
+  const tip = length * 0.68;
+  const base = length * 0.32;
+  const waist = width * 0.42;
+  return `M 0 ${-base} C ${width} ${-base * 0.15} ${width * 0.72} ${tip * 0.22} ${waist} ${tip * 0.62} C ${waist * 0.45} ${tip * 0.86} ${waist * 0.2} ${tip} 0 ${tip} C ${-waist * 0.2} ${tip} ${-waist * 0.45} ${tip * 0.86} ${-waist} ${tip * 0.62} C ${-width * 0.72} ${tip * 0.22} ${-width} ${-base * 0.15} 0 ${-base} Z`;
 }
 
-function sprigLeaves(
-  stem: [Point, Point, Point, Point],
-  count: number,
-  start: number,
-  end: number,
-  baseLength: number,
-  tipLength: number,
-  opacity: number,
-): Array<LeafSpec> {
+function sprigLeaves({
+  stem,
+  stations,
+  start,
+  end,
+  baseLength,
+  tipLength,
+  opacity,
+  pairSpread,
+}: {
+  stem: [Point, Point, Point, Point];
+  stations: number;
+  start: number;
+  end: number;
+  baseLength: number;
+  tipLength: number;
+  opacity: number;
+  pairSpread: number;
+}): Array<LeafSpec> {
   const [a, b, c, d] = stem;
-  return Array.from({ length: count }, (_, index) => {
-    const t = start + ((end - start) * index) / (count - 1);
+  const leaves: Array<LeafSpec> = [];
+  for (let index = 0; index < stations; index += 1) {
+    const linear = index / (stations - 1);
+    const t = start + (end - start) * linear ** 0.62;
     const point = bezierPoint(a, b, c, d, t);
     const along = bezierAngle(a, b, c, d, t);
-    const side = index % 2 === 0 ? -1 : 1;
-    const flare = 58 + (index % 3) * 4;
-    const length = baseLength + (tipLength - baseLength) * t;
-    return {
-      length,
-      opacity,
-      rotate: along + side * flare,
-      width: length * 0.3,
-      x: point.x,
-      y: point.y,
-    };
-  });
+    const tipMix = linear ** 1.15;
+    const length = baseLength + (tipLength - baseLength) * tipMix;
+    const cluster = 1 + Math.round((1 - linear) * 0.2 + linear * 1.15);
+    for (let sideIndex = 0; sideIndex < cluster; sideIndex += 1) {
+      const side = sideIndex % 2 === 0 ? -1 : 1;
+      const alongShift = (sideIndex > 1 ? 7 : 0) * (sideIndex % 2 === 0 ? 1 : -1);
+      const flare = pairSpread + (index % 4) * 3 + sideIndex * 5;
+      const sizeJitter = 1 - sideIndex * 0.16 - (index % 3) * 0.04;
+      leaves.push({
+        length: length * sizeJitter,
+        opacity: opacity - sideIndex * 0.06,
+        rotate: along + side * flare + alongShift,
+        width: length * sizeJitter * 0.22,
+        x: point.x + side * (1 - linear) * 2.4,
+        y: point.y,
+      });
+    }
+  }
+  return leaves;
 }
 
 const MAIN_STEM: [Point, Point, Point, Point] = [
-  { x: 308, y: 348 },
-  { x: 274, y: 246 },
-  { x: 216, y: 132 },
-  { x: 154, y: 22 },
+  { x: 292, y: 352 },
+  { x: 262, y: 248 },
+  { x: 208, y: 128 },
+  { x: 148, y: 18 },
 ];
 
 const BACK_STEM: [Point, Point, Point, Point] = [
-  { x: 332, y: 318 },
-  { x: 304, y: 236 },
-  { x: 268, y: 172 },
-  { x: 236, y: 108 },
+  { x: 326, y: 328 },
+  { x: 298, y: 232 },
+  { x: 264, y: 158 },
+  { x: 228, y: 86 },
 ];
 
-const MAIN_LEAVES = sprigLeaves(MAIN_STEM, 17, 0.06, 0.94, 26, 13, 0.7);
-const BACK_LEAVES = sprigLeaves(BACK_STEM, 8, 0.12, 0.88, 18, 11, 0.48);
+const MAIN_LEAVES = sprigLeaves({
+  baseLength: 46,
+  end: 0.96,
+  opacity: 0.7,
+  pairSpread: 52,
+  start: 0.04,
+  stations: 16,
+  stem: MAIN_STEM,
+  tipLength: 22,
+});
+
+const BACK_LEAVES = sprigLeaves({
+  baseLength: 34,
+  end: 0.9,
+  opacity: 0.42,
+  pairSpread: 46,
+  start: 0.1,
+  stations: 10,
+  stem: BACK_STEM,
+  tipLength: 16,
+});
 
 const MAIN_PATH = `M ${MAIN_STEM[0].x} ${MAIN_STEM[0].y} C ${MAIN_STEM[1].x} ${MAIN_STEM[1].y}, ${MAIN_STEM[2].x} ${MAIN_STEM[2].y}, ${MAIN_STEM[3].x} ${MAIN_STEM[3].y}`;
 const BACK_PATH = `M ${BACK_STEM[0].x} ${BACK_STEM[0].y} C ${BACK_STEM[1].x} ${BACK_STEM[1].y}, ${BACK_STEM[2].x} ${BACK_STEM[2].y}, ${BACK_STEM[3].x} ${BACK_STEM[3].y}`;
 
 /**
- * Fern / eucalyptus sprig for the greenhouse now-playing tile. Zero image bytes.
+ * Dense eucalyptus / fern sprig for the greenhouse now-playing tile.
+ * Zero image bytes: SVG paths plus a painted-edge displacement.
  */
 export function WatercolorLeaves() {
   const rawId = useId();
@@ -122,48 +162,48 @@ export function WatercolorLeaves() {
         width="100%"
       >
         <defs>
-          <filter height="180%" id={edge} width="180%" x="-40%" y="-40%">
+          <filter height="220%" id={edge} width="220%" x="-60%" y="-60%">
             <feTurbulence
-              baseFrequency="0.045 0.06"
-              numOctaves="2"
+              baseFrequency="0.035 0.05"
+              numOctaves="3"
               result="noise"
-              seed="5"
+              seed="7"
               type="fractalNoise"
             />
             <feDisplacementMap
               in="SourceGraphic"
               in2="noise"
               result="displaced"
-              scale="2.2"
+              scale="7.5"
               xChannelSelector="R"
               yChannelSelector="G"
             />
-            <feGaussianBlur in="displaced" stdDeviation="0.35" />
+            <feGaussianBlur in="displaced" stdDeviation="0.45" />
           </filter>
-          <filter height="180%" id={bloom} width="180%" x="-40%" y="-40%">
-            <feGaussianBlur stdDeviation="22" />
+          <filter height="260%" id={bloom} width="260%" x="-80%" y="-80%">
+            <feGaussianBlur stdDeviation="42" />
           </filter>
         </defs>
         <g filter={`url(#${bloom})`}>
-          <ellipse cx="248" cy="268" fill="rgb(198 176 78 / 0.28)" rx="118" ry="86" />
-          <ellipse cx="300" cy="196" fill="rgb(168 150 64 / 0.22)" rx="92" ry="74" />
-          <ellipse cx="188" cy="214" fill="rgb(120 132 64 / 0.18)" rx="86" ry="70" />
-          <ellipse cx="276" cy="318" fill="rgb(214 190 96 / 0.16)" rx="100" ry="64" />
+          <ellipse cx="268" cy="292" fill="rgb(217 194 122 / 0.28)" rx="132" ry="98" />
+          <ellipse cx="312" cy="210" fill="rgb(217 194 122 / 0.18)" rx="108" ry="86" />
+          <ellipse cx="198" cy="248" fill="rgb(138 154 91 / 0.22)" rx="118" ry="92" />
+          <ellipse cx="296" cy="338" fill="rgb(138 154 91 / 0.16)" rx="124" ry="78" />
         </g>
         <g fill={SPRIG} filter={`url(#${edge})`}>
           <path
             d={BACK_PATH}
             fill="none"
-            opacity="0.4"
+            opacity="0.38"
             stroke={SPRIG}
             strokeLinecap="round"
-            strokeWidth="1.15"
+            strokeWidth="1.2"
           />
           {BACK_LEAVES.map((leaf) => (
             <path
               d={lanceolate(leaf.length, leaf.width)}
               data-watercolor-leaf=""
-              key={`back-${leaf.x}-${leaf.y}`}
+              key={`back-${leaf.x}-${leaf.y}-${leaf.rotate}`}
               opacity={leaf.opacity}
               transform={`translate(${leaf.x} ${leaf.y}) rotate(${leaf.rotate})`}
             />
@@ -174,13 +214,13 @@ export function WatercolorLeaves() {
             opacity="0.62"
             stroke={SPRIG}
             strokeLinecap="round"
-            strokeWidth="1.35"
+            strokeWidth="1.45"
           />
           {MAIN_LEAVES.map((leaf) => (
             <path
               d={lanceolate(leaf.length, leaf.width)}
               data-watercolor-leaf=""
-              key={`main-${leaf.x}-${leaf.y}`}
+              key={`main-${leaf.x}-${leaf.y}-${leaf.rotate}`}
               opacity={leaf.opacity}
               transform={`translate(${leaf.x} ${leaf.y}) rotate(${leaf.rotate})`}
             />

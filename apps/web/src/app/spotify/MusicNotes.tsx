@@ -48,14 +48,14 @@ const COMPACT = {
 };
 
 const CARD = {
-  distanceMin: 48,
-  distanceRange: 132,
+  distanceMin: 44,
+  distanceRange: 168,
   durationMs: 2800,
   durationRandomMs: 700,
-  iconSize: 20,
-  maxNotes: 14,
-  scaleMin: 0.72,
-  scaleRange: 0.5,
+  iconSize: 28,
+  maxNotes: 16,
+  scaleMin: 0.5,
+  scaleRange: 1.15,
 };
 
 const DEFAULT_NOTE_SHADOW =

@@ -5,6 +5,7 @@ import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack } from '@mui/material';
 import { Leaf, Music, Music2, Music3, Music4 } from 'lucide-react';
+import { useId } from 'react';
 import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
 import { ArtistList } from './ArtistList';
 import type { Colors } from './colors';
@@ -29,7 +30,10 @@ const CREAM: Colors = {
 };
 
 const SAGE_GOLD_WASH =
-  'radial-gradient(ellipse 58% 52% at 94% 8%, rgb(255 232 148 / 0.88) 0%, transparent 62%), radial-gradient(ellipse 52% 48% at 8% 92%, rgb(62 80 36 / 0.62) 0%, transparent 70%), linear-gradient(to top right, #3f522c 0%, #6d7a40 38%, #c4b468 72%, #f0dc96 100%)';
+  'radial-gradient(ellipse 90% 80% at 96% 4%, #e7d48a 0%, rgb(231 212 138 / 0.55) 36%, transparent 78%), linear-gradient(115deg, #6a7548 0%, #9aa05a 38%, #c9b86a 68%, #e7d48a 100%)';
+
+const COPY_SCRIM =
+  'radial-gradient(ellipse 78% 82% at 6% 96%, rgba(40, 55, 35, 0.55) 0%, rgba(40, 55, 35, 0.28) 34%, transparent 64%), linear-gradient(115deg, rgba(40, 55, 35, 0.42) 0%, rgba(40, 55, 35, 0.12) 38%, transparent 60%)';
 
 const layerBaseSx: SxObject = {
   inset: 0,
@@ -38,6 +42,9 @@ const layerBaseSx: SxObject = {
 };
 
 const cardSx: SxObject = {
+  '[data-greenhouse-frame] &': {
+    backgroundColor: 'transparent',
+  },
   boxSizing: 'border-box',
   containerName: 'now-playing',
   containerType: 'inline-size',
@@ -78,20 +85,38 @@ const hueLockSx: SxObject = {
   ...layerBaseSx,
   '[data-greenhouse-frame] &': {
     backgroundImage:
-      'linear-gradient(to top right, rgb(88 104 48 / 0.55) 0%, rgb(168 156 72 / 0.38) 52%, rgb(228 208 120 / 0.42) 100%)',
+      'linear-gradient(115deg, rgb(88 104 48 / 0.28) 0%, rgb(180 168 88 / 0.22) 48%, rgb(231 212 138 / 0.38) 100%)',
     borderRadius: 'inherit',
     mixBlendMode: 'color',
-    opacity: 0.46,
+    opacity: 0.4,
   },
   zIndex: 2,
+};
+
+const copyScrimSx: SxObject = {
+  ...layerBaseSx,
+  '[data-greenhouse-frame] &': {
+    backgroundImage: COPY_SCRIM,
+    borderRadius: 'inherit',
+  },
+  zIndex: 2,
+};
+
+const grainSx: SxObject = {
+  ...layerBaseSx,
+  '[data-greenhouse-frame] &': {
+    mixBlendMode: 'soft-light',
+    opacity: 0.085,
+  },
+  zIndex: 3,
 };
 
 const watercolorBleedSx: SxObject = {
   ...layerBaseSx,
   '[data-greenhouse-frame] &': {
     backgroundImage:
-      'radial-gradient(ellipse 48% 42% at 86% 78%, rgb(176 158 72 / 0.22), transparent 70%), radial-gradient(ellipse 36% 34% at 96% 58%, rgb(214 190 96 / 0.18), transparent 68%), radial-gradient(ellipse 40% 36% at 72% 96%, rgb(110 124 56 / 0.16), transparent 66%)',
-    filter: 'blur(16px)',
+      'radial-gradient(ellipse 58% 52% at 88% 86%, rgb(217 194 122 / 0.28), transparent 72%), radial-gradient(ellipse 46% 42% at 98% 62%, rgb(231 212 138 / 0.2), transparent 74%), radial-gradient(ellipse 50% 46% at 74% 98%, rgb(138 154 91 / 0.22), transparent 70%)',
+    filter: 'blur(28px)',
     mixBlendMode: 'multiply',
   },
   zIndex: 2,
@@ -164,7 +189,7 @@ const titleSx: SxObject = {
   '& .MuiTypography-root': {
     color: CREAM.primary,
     fontSize: '1.75rem',
-    fontWeight: 600,
+    fontWeight: 500,
     letterSpacing: '-0.02em',
     lineHeight: 1.15,
     marginBottom: '0.2rem',
@@ -193,11 +218,14 @@ const progressWrapSx: SxObject = {
 };
 
 const RESTING_NOTES = [
-  { Icon: Music, left: '38%', rotate: '-16deg', size: 18, top: '10%' },
-  { Icon: Music2, left: '56%', rotate: '12deg', size: 16, top: '18%' },
-  { Icon: Music3, left: '72%', rotate: '-8deg', size: 20, top: '8%' },
-  { Icon: Music4, left: '48%', rotate: '18deg', size: 14, top: '36%' },
-  { Icon: Music, left: '82%', rotate: '8deg', size: 15, top: '32%' },
+  { Icon: Music, left: '52%', rotate: '-18deg', size: 16, top: '8%' },
+  { Icon: Music2, left: '64%', rotate: '14deg', size: 28, top: '14%' },
+  { Icon: Music3, left: '78%', rotate: '-10deg', size: 36, top: '6%' },
+  { Icon: Music4, left: '58%', rotate: '20deg', size: 18, top: '28%' },
+  { Icon: Music, left: '86%', rotate: '8deg', size: 22, top: '24%' },
+  { Icon: Music2, left: '70%', rotate: '-22deg', size: 14, top: '34%' },
+  { Icon: Music4, left: '48%', rotate: '6deg', size: 20, top: '16%' },
+  { Icon: Music3, left: '90%', rotate: '-6deg', size: 30, top: '38%' },
 ] as const;
 
 function RestingNotes() {
@@ -211,6 +239,22 @@ function RestingNotes() {
           <Icon size={size} strokeWidth={2.25} />
         </Box>
       ))}
+    </Box>
+  );
+}
+
+function FrostGrain() {
+  const rawId = useId();
+  const id = `${rawId.replaceAll(':', '')}-grain`;
+
+  return (
+    <Box aria-hidden="true" data-now-playing-grain="" sx={grainSx}>
+      <svg aria-hidden="true" height="100%" preserveAspectRatio="none" width="100%">
+        <filter id={id}>
+          <feTurbulence baseFrequency="0.85" numOctaves="4" type="fractalNoise" />
+        </filter>
+        <rect filter={`url(#${id})`} height="100%" width="100%" />
+      </svg>
     </Box>
   );
 }
@@ -230,6 +274,8 @@ export function NowPlayingCard({ track }: { track: Track }) {
       </Box>
       <Box aria-hidden="true" sx={hueLockSx} />
       <Box aria-hidden="true" sx={watercolorBleedSx} />
+      <Box aria-hidden="true" data-now-playing-scrim="" sx={copyScrimSx} />
+      <FrostGrain />
       <WatercolorLeaves />
       <RestingNotes />
       <Box aria-hidden="true" sx={notesOriginSx}>
