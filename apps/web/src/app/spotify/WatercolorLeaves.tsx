@@ -10,14 +10,23 @@ const leavesSx: SxObject = {
   '[data-greenhouse-frame] &': {
     opacity: 1,
   },
-  bottom: '-14%',
-  height: '126%',
+  inset: 0,
+  overflow: 'visible',
   pointerEvents: 'none',
   position: 'absolute',
-  right: '-12%',
-  top: 'auto',
-  width: '72%',
   zIndex: 3,
+};
+
+const bloomsSx: SxObject = {
+  '[data-greenhouse-frame] &': {
+    backgroundImage:
+      'radial-gradient(ellipse 45% 42% at 88% 14%, rgb(231 212 138 / 0.35) 0%, rgb(231 212 138 / 0.16) 42%, transparent 72%), radial-gradient(ellipse 36% 40% at 78% 48%, rgb(138 154 91 / 0.2) 0%, rgb(138 154 91 / 0.08) 48%, transparent 74%), radial-gradient(ellipse 40% 28% at 70% 94%, rgb(244 232 190 / 0.24) 0%, rgb(244 232 190 / 0.08) 46%, transparent 72%)',
+    filter: 'blur(44px)',
+  },
+  inset: 0,
+  overflow: 'visible',
+  pointerEvents: 'none',
+  position: 'absolute',
 };
 
 type Point = { x: number; y: number };
@@ -49,10 +58,10 @@ function bezierAngle(a: Point, b: Point, c: Point, d: Point, t: number): number 
 }
 
 function lanceolate(length: number, width: number): string {
-  const tip = length * 0.68;
-  const base = length * 0.32;
-  const waist = width * 0.42;
-  return `M 0 ${-base} C ${width} ${-base * 0.15} ${width * 0.72} ${tip * 0.22} ${waist} ${tip * 0.62} C ${waist * 0.45} ${tip * 0.86} ${waist * 0.2} ${tip} 0 ${tip} C ${-waist * 0.2} ${tip} ${-waist * 0.45} ${tip * 0.86} ${-waist} ${tip * 0.62} C ${-width * 0.72} ${tip * 0.22} ${-width} ${-base * 0.15} 0 ${-base} Z`;
+  const tip = length * 0.7;
+  const base = length * 0.3;
+  const waist = width * 0.38;
+  return `M 0 ${-base} C ${width} ${-base * 0.12} ${width * 0.7} ${tip * 0.2} ${waist} ${tip * 0.64} C ${waist * 0.4} ${tip * 0.88} ${waist * 0.18} ${tip} 0 ${tip} C ${-waist * 0.18} ${tip} ${-waist * 0.4} ${tip * 0.88} ${-waist} ${tip * 0.64} C ${-width * 0.7} ${tip * 0.2} ${-width} ${-base * 0.12} 0 ${-base} Z`;
 }
 
 function sprigLeaves({
@@ -75,97 +84,90 @@ function sprigLeaves({
   pairSpread: number;
 }): Array<LeafSpec> {
   const [a, b, c, d] = stem;
-  const leaves: Array<LeafSpec> = [];
-  for (let index = 0; index < stations; index += 1) {
+  return Array.from({ length: stations }, (_, index) => {
     const linear = index / (stations - 1);
-    const t = start + (end - start) * linear ** 0.55;
+    const t = start + (end - start) * linear;
     const point = bezierPoint(a, b, c, d, t);
     const along = bezierAngle(a, b, c, d, t);
-    const tipMix = linear ** 1.05;
-    const length = baseLength + (tipLength - baseLength) * tipMix;
-    const cluster = 2 + Math.round(linear * 2.2);
-    for (let sideIndex = 0; sideIndex < cluster; sideIndex += 1) {
-      const side = sideIndex % 2 === 0 ? -1 : 1;
-      const layer = Math.floor(sideIndex / 2);
-      const flare = pairSpread - linear * 10 + layer * 16 + (index % 5) * 4 + sideIndex * 3;
-      const twist = ((index * 13 + sideIndex * 19) % 17) - 8;
-      const sizeJitter = 1 - layer * 0.22 - (index % 4) * 0.05 - sideIndex * 0.03;
-      leaves.push({
-        length: length * sizeJitter,
-        opacity: Math.max(0.28, opacity - layer * 0.08 - sideIndex * 0.03),
-        rotate: along + side * flare + twist,
-        width: length * sizeJitter * (0.2 + (index % 3) * 0.03),
-        x: point.x + side * (3.2 - linear * 1.4) + layer * side * 1.6,
-        y: point.y + (layer - 0.4) * 2.2,
-      });
-    }
-  }
-  return leaves;
+    const length = baseLength + (tipLength - baseLength) * linear;
+    const side = index % 2 === 0 ? -1 : 1;
+    const twist = ((index * 11) % 9) - 4;
+    return {
+      length,
+      opacity,
+      rotate: along + side * (pairSpread + (index % 3) * 4) + twist,
+      width: length / 6,
+      x: point.x + side * 1.1,
+      y: point.y,
+    };
+  });
 }
 
 const MAIN_STEM: [Point, Point, Point, Point] = [
-  { x: 292, y: 352 },
-  { x: 262, y: 248 },
-  { x: 208, y: 128 },
-  { x: 148, y: 18 },
+  { x: 78, y: 98 },
+  { x: 72, y: 70 },
+  { x: 64, y: 38 },
+  { x: 56, y: 8 },
 ];
 
 const BACK_STEM: [Point, Point, Point, Point] = [
-  { x: 326, y: 328 },
-  { x: 298, y: 232 },
-  { x: 264, y: 158 },
-  { x: 228, y: 86 },
+  { x: 88, y: 90 },
+  { x: 82, y: 64 },
+  { x: 76, y: 42 },
+  { x: 70, y: 22 },
 ];
 
 const MAIN_LEAVES = sprigLeaves({
-  baseLength: 58,
-  end: 0.97,
+  baseLength: 13,
+  end: 0.94,
   opacity: 0.7,
-  pairSpread: 56,
-  start: 0.03,
-  stations: 20,
+  pairSpread: 54,
+  start: 0.06,
+  stations: 13,
   stem: MAIN_STEM,
-  tipLength: 26,
+  tipLength: 7.5,
 });
 
 const BACK_LEAVES = sprigLeaves({
-  baseLength: 40,
-  end: 0.92,
+  baseLength: 9.5,
+  end: 0.9,
   opacity: 0.4,
-  pairSpread: 48,
-  start: 0.08,
-  stations: 13,
+  pairSpread: 50,
+  start: 0.1,
+  stations: 8,
   stem: BACK_STEM,
-  tipLength: 18,
+  tipLength: 6,
 });
 
 const MAIN_PATH = `M ${MAIN_STEM[0].x} ${MAIN_STEM[0].y} C ${MAIN_STEM[1].x} ${MAIN_STEM[1].y}, ${MAIN_STEM[2].x} ${MAIN_STEM[2].y}, ${MAIN_STEM[3].x} ${MAIN_STEM[3].y}`;
 const BACK_PATH = `M ${BACK_STEM[0].x} ${BACK_STEM[0].y} C ${BACK_STEM[1].x} ${BACK_STEM[1].y}, ${BACK_STEM[2].x} ${BACK_STEM[2].y}, ${BACK_STEM[3].x} ${BACK_STEM[3].y}`;
 
 /**
- * Dense eucalyptus / fern sprig for the greenhouse now-playing tile.
- * Zero image bytes: SVG paths plus a painted-edge displacement.
+ * Full-card eucalyptus sprig. The layer is inset 0 so leaves are not clipped
+ * by a right-side box; only the card's rounded rect clips. Zero image bytes.
  */
 export function WatercolorLeaves() {
   const rawId = useId();
   const id = rawId.replaceAll(':', '');
   const edge = `${id}-edge`;
-  const bloom = `${id}-bloom`;
 
   return (
     <Box aria-hidden="true" data-watercolor-leaves="" sx={leavesSx}>
+      <Box aria-hidden="true" data-watercolor-blooms="" sx={bloomsSx} />
       <svg
         aria-hidden="true"
         fill="none"
         height="100%"
-        preserveAspectRatio="xMaxYMax slice"
-        viewBox="0 0 340 360"
+        overflow="visible"
+        preserveAspectRatio="none"
+        style={{ display: 'block', overflow: 'visible' }}
+        viewBox="0 0 100 100"
         width="100%"
       >
         <defs>
-          <filter height="220%" id={edge} width="220%" x="-60%" y="-60%">
+          <filter height="180%" id={edge} width="180%" x="-40%" y="-40%">
             <feTurbulence
-              baseFrequency="0.035 0.05"
+              baseFrequency="0.04 0.055"
               numOctaves="3"
               result="noise"
               seed="7"
@@ -175,30 +177,21 @@ export function WatercolorLeaves() {
               in="SourceGraphic"
               in2="noise"
               result="displaced"
-              scale="11"
+              scale="1.4"
               xChannelSelector="R"
               yChannelSelector="G"
             />
-            <feGaussianBlur in="displaced" stdDeviation="0.45" />
-          </filter>
-          <filter height="260%" id={bloom} width="260%" x="-80%" y="-80%">
-            <feGaussianBlur stdDeviation="42" />
+            <feGaussianBlur in="displaced" stdDeviation="0.08" />
           </filter>
         </defs>
-        <g filter={`url(#${bloom})`}>
-          <ellipse cx="268" cy="292" fill="rgb(217 194 122 / 0.28)" rx="132" ry="98" />
-          <ellipse cx="312" cy="210" fill="rgb(217 194 122 / 0.18)" rx="108" ry="86" />
-          <ellipse cx="198" cy="248" fill="rgb(138 154 91 / 0.22)" rx="118" ry="92" />
-          <ellipse cx="296" cy="338" fill="rgb(138 154 91 / 0.16)" rx="124" ry="78" />
-        </g>
         <g fill={SPRIG} filter={`url(#${edge})`}>
           <path
             d={BACK_PATH}
             fill="none"
-            opacity="0.38"
+            opacity="0.36"
             stroke={SPRIG}
             strokeLinecap="round"
-            strokeWidth="1.2"
+            strokeWidth="0.28"
           />
           {BACK_LEAVES.map((leaf) => (
             <path
@@ -212,10 +205,10 @@ export function WatercolorLeaves() {
           <path
             d={MAIN_PATH}
             fill="none"
-            opacity="0.62"
+            opacity="0.6"
             stroke={SPRIG}
             strokeLinecap="round"
-            strokeWidth="1.45"
+            strokeWidth="0.32"
           />
           {MAIN_LEAVES.map((leaf) => (
             <path

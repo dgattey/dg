@@ -111,17 +111,6 @@ const grainSx: SxObject = {
   zIndex: 3,
 };
 
-const watercolorBleedSx: SxObject = {
-  ...layerBaseSx,
-  '[data-greenhouse-frame] &': {
-    backgroundImage:
-      'radial-gradient(ellipse 58% 52% at 88% 86%, rgb(217 194 122 / 0.28), transparent 72%), radial-gradient(ellipse 46% 42% at 98% 62%, rgb(231 212 138 / 0.2), transparent 74%), radial-gradient(ellipse 50% 46% at 74% 98%, rgb(138 154 91 / 0.22), transparent 70%)',
-    filter: 'blur(28px)',
-    mixBlendMode: 'multiply',
-  },
-  zIndex: 2,
-};
-
 const notesOriginSx: SxObject = {
   '[data-greenhouse-frame] &': {
     left: '54%',
@@ -273,7 +262,6 @@ export function NowPlayingCard({ track }: { track: Track }) {
         <AlbumGradientBackdrop containerSx={{ inset: 0 }} gradient={gradient} />
       </Box>
       <Box aria-hidden="true" sx={hueLockSx} />
-      <Box aria-hidden="true" sx={watercolorBleedSx} />
       <Box aria-hidden="true" data-now-playing-scrim="" sx={copyScrimSx} />
       <FrostGrain />
       <WatercolorLeaves />

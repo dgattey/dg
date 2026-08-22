@@ -67,10 +67,32 @@ describe('NowPlayingCard', () => {
     );
 
     expect(container.querySelector('[data-watercolor-leaves]')).toBeTruthy();
+    expect(container.querySelector('[data-watercolor-blooms]')).toBeTruthy();
     expect(container.querySelector('[data-now-playing-wash]')).toBeTruthy();
-    expect(container.querySelectorAll('[data-watercolor-leaf]').length).toBeGreaterThanOrEqual(20);
+    const leaves = container.querySelectorAll('[data-watercolor-leaf]');
+    expect(leaves.length).toBeGreaterThanOrEqual(20);
+    expect(leaves.length).toBeLessThan(40);
     expect(container.querySelector('[data-now-playing-copy]')).toBeTruthy();
     expect(container.querySelector('[data-now-playing-leaf]')).toBeTruthy();
+  });
+
+  it('lets the sprig span the full card so leaves are not boxed on the right', () => {
+    const { container } = render(
+      <TestWrapper>
+        <NowPlayingCard track={track} />
+      </TestWrapper>,
+    );
+
+    const layer = container.querySelector('[data-watercolor-leaves]');
+    expect(layer).toHaveStyle({ inset: '0', overflow: 'visible', position: 'absolute' });
+
+    const css = [...document.querySelectorAll('style')]
+      .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
+      .join('\n');
+    expect(css).not.toContain('width: 72%');
+    expect(css).toContain('rgb(231 212 138 / 0.35)');
+    expect(css).toContain('rgb(138 154 91 / 0.2)');
+    expect(css).toContain('blur(44px)');
   });
 
   it('keeps cream resting notes when playback is idle', () => {
