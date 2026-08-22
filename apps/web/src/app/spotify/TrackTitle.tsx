@@ -3,7 +3,7 @@ import { truncated } from '@dg/ui/helpers/truncated';
 import type { SxObject } from '@dg/ui/theme';
 import { Typography } from '@mui/material';
 
-type ListingVariant = 'card' | 'compact';
+type ListingVariant = 'card' | 'compact' | 'nowPlaying';
 
 type TrackTitleProps = {
   trackTitle: string;
@@ -12,6 +12,19 @@ type TrackTitleProps = {
   color?: string;
   textShadow?: string;
   listingVariant?: ListingVariant;
+};
+
+/**
+ * Greenhouse now-playing titles wrap to two lines and break mid-word if needed.
+ * Flag-off `card` / `compact` stay single-line ellipsis.
+ */
+const nowPlayingTitleSx: SxObject = {
+  display: '-webkit-box',
+  marginBottom: 1,
+  overflow: 'hidden',
+  overflowWrap: 'anywhere',
+  WebkitBoxOrient: 'vertical',
+  WebkitLineClamp: 2,
 };
 
 const VARIANT_SX: Record<ListingVariant, SxObject> = {
@@ -23,11 +36,13 @@ const VARIANT_SX: Record<ListingVariant, SxObject> = {
     ...truncated(1),
     lineHeight: 1.2,
   },
+  nowPlaying: nowPlayingTitleSx,
 };
 
 const TYPOGRAPHY_VARIANT: Record<ListingVariant, 'h5' | 'caption'> = {
   card: 'h5',
   compact: 'caption',
+  nowPlaying: 'h5',
 };
 
 function getTrackTitleSx(

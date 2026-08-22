@@ -1,8 +1,13 @@
 import type { Track } from '@dg/content-models/spotify/Track';
+import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { act, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { extractAlbumGradientFromUrl } from '../extractAlbumGradient';
 import { SpotifyCardWithGradient } from '../SpotifyCardWithGradient';
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh: jest.fn() }),
+}));
 
 jest.mock('@dg/ui/dependent/ContentCard', () => ({
   ContentCard: ({ children }: { children: ReactNode }) => <div>{children}</div>,
@@ -88,6 +93,26 @@ describe('SpotifyCardWithGradient', () => {
     expect(screen.queryByText('Track old')).not.toBeInTheDocument();
     expect(screen.getByTestId('track-listing')).toBeInTheDocument();
     expect(document.querySelector('[data-watercolor-leaves]')).toBeNull();
+    expect(document.querySelector('[data-now-playing-title]')).toBeNull();
+    expect(document.querySelector('[data-bento="now-playing"]')).toBeNull();
+  });
+
+  it('keeps variant="card" on TrackListing after a now-playing render', () => {
+    mockExtractAlbumGradient.mockImplementation(() => deferredGradient().promise);
+    const { rerender } = render(
+      <ServerTimeProvider serverTime={new Date('2026-02-10T12:00:00Z').getTime()}>
+        <SpotifyCardWithGradient track={makeTrack('play', OLD_GRADIENT)} variant="nowPlaying" />
+      </ServerTimeProvider>,
+    );
+
+    expect(document.querySelector('[data-watercolor-leaves]')).toBeTruthy();
+    expect(screen.queryByTestId('track-listing')).not.toBeInTheDocument();
+
+    rerender(<SpotifyCardWithGradient track={makeTrack('card', OLD_GRADIENT)} />);
+
+    expect(screen.getByTestId('track-listing')).toBeInTheDocument();
+    expect(document.querySelector('[data-watercolor-leaves]')).toBeNull();
+    expect(document.querySelector('[data-now-playing-title]')).toBeNull();
   });
 
   it('keeps the previous gradient until the next one resolves', async () => {

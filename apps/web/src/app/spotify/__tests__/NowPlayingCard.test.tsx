@@ -104,4 +104,52 @@ describe('NowPlayingCard', () => {
     expect(screen.queryByText(/:/)).not.toBeInTheDocument();
     expect(screen.queryByText(/2:47/)).not.toBeInTheDocument();
   });
+
+  it('clamps the title to two wrapping lines and the artist to one', () => {
+    render(
+      <TestWrapper>
+        <NowPlayingCard track={track} />
+      </TestWrapper>,
+    );
+
+    const title = screen.getByText('Leaflight');
+    const titleCss = [...document.querySelectorAll('style')]
+      .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
+      .filter((rule) => [...title.classList].some((className) => rule.includes(`.${className}`)))
+      .join('\n');
+    expect(titleCss).toContain('-webkit-line-clamp: 2');
+    expect(titleCss).toContain('overflow-wrap: anywhere');
+
+    const artist = document.querySelector('[data-now-playing-artist] .MuiTypography-root');
+    expect(artist).toBeTruthy();
+    const artistCss = [...document.querySelectorAll('style')]
+      .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
+      .filter((rule) =>
+        [...(artist?.classList ?? [])].some((className) => rule.includes(`.${className}`)),
+      )
+      .join('\n');
+    expect(artistCss).toContain('-webkit-line-clamp: 1');
+  });
+
+  it('names a card container and steps the title down inside it', () => {
+    render(
+      <TestWrapper>
+        <NowPlayingCard track={track} />
+      </TestWrapper>,
+    );
+
+    const card = document.querySelector('[data-bento="now-playing"]');
+    expect(card).toHaveStyle({
+      containerName: 'now-playing',
+      containerType: 'inline-size',
+    });
+
+    const css = [...document.querySelectorAll('style')]
+      .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
+      .join('\n');
+    expect(css).toContain('@container now-playing (max-width: 25.5rem)');
+    expect(css).toContain('font-size: 1.75rem');
+    expect(css).toContain('font-size: 1.5rem');
+    expect(css).not.toContain('1.35rem + 0.55vw');
+  });
 });

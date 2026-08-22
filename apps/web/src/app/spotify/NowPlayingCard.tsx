@@ -38,13 +38,19 @@ const layerBaseSx: SxObject = {
 };
 
 const cardSx: SxObject = {
+  boxSizing: 'border-box',
+  containerName: 'now-playing',
+  containerType: 'inline-size',
   display: 'flex',
   height: '100%',
   isolation: 'isolate',
+  maxWidth: 'none',
   minHeight: { md: '15rem', xs: '16.5rem' },
+  minWidth: 0,
   overflow: 'hidden',
   padding: 2.25,
   position: 'relative',
+  width: '100%',
 };
 
 const washSx: SxObject = {
@@ -121,7 +127,11 @@ const layoutSx: SxObject = {
 };
 
 const copySx: SxObject = {
-  maxWidth: '46%',
+  '@container now-playing (max-width: 25.5rem)': {
+    width: '74%',
+  },
+  minWidth: 0,
+  width: '46%',
 };
 
 const headerSx: SxObject = {
@@ -146,9 +156,14 @@ const leafBadgeSx: SxObject = {
 };
 
 const titleSx: SxObject = {
+  '@container now-playing (max-width: 25.5rem)': {
+    '& .MuiTypography-root': {
+      fontSize: '1.5rem',
+    },
+  },
   '& .MuiTypography-root': {
     color: CREAM.primary,
-    fontSize: 'clamp(1.5rem, 1.35rem + 0.55vw, 1.75rem)',
+    fontSize: '1.75rem',
     fontWeight: 600,
     letterSpacing: '-0.02em',
     lineHeight: 1.15,
@@ -234,16 +249,16 @@ export function NowPlayingCard({ track }: { track: Track }) {
               textShadow={CREAM.primaryShadow}
             />
           </Stack>
-          <Box sx={titleSx}>
+          <Box data-now-playing-title="" sx={titleSx}>
             <TrackTitle
               color={CREAM.primary}
-              listingVariant="card"
+              listingVariant="nowPlaying"
               textShadow={CREAM.primaryShadow}
               trackTitle={track.name}
               url={track.externalUrls.spotify}
             />
           </Box>
-          <Box sx={artistSx}>
+          <Box data-now-playing-artist="" sx={artistSx}>
             <ArtistList
               artists={track.artists}
               color={CREAM.secondary}
