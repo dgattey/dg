@@ -42,4 +42,10 @@ describe('ProjectCard', () => {
     expect(screen.getByText('React')).toBeInTheDocument();
     expect(screen.getByText('View project →')).toBeInTheDocument();
   });
+
+  it('keeps the featured title as one heading and a single CTA link', () => {
+    render(<ProjectCard {...project} variant="featured" />);
+    expect(screen.getByRole('heading', { name: 'Flowstate' })).toBeInTheDocument();
+    expect(screen.getAllByRole('link')).toHaveLength(1);
+  });
 });

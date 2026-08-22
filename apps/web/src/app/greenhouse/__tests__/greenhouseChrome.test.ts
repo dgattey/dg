@@ -32,6 +32,7 @@ describe('greenhouse chrome', () => {
     expect(css).not.toContain('.homeFrame');
     expect(css).toContain('--greenhouse-wash');
     expect(css).toContain('--greenhouse-gutter');
+    expect(css).toContain('section:has([data-greenhouse-frame])');
     expect(css).toContain('.ribs');
     expect(css).toContain('repeating-linear-gradient');
   });

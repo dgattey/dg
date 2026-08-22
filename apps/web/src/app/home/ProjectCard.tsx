@@ -24,22 +24,44 @@ const projectCardSx: SxObject = {
 };
 
 const featuredCardSx: SxObject = {
+  boxSizing: 'border-box',
   display: 'flex',
-  height: '100%',
-  minHeight: { md: '14.5rem', xs: 'auto' },
+  flexDirection: 'column',
+  maxWidth: 'none',
+  minHeight: { sm: '13.5rem', xs: 'auto' },
+  minWidth: 0,
   padding: 2.25,
+  width: '100%',
 };
 
 const featuredLayoutSx: SxObject = {
-  flex: 1,
-  gap: 1.5,
+  flex: '1 1 auto',
+  gap: 1.25,
   justifyContent: 'space-between',
-  minHeight: 0,
+  minWidth: 0,
+  width: '100%',
 };
 
 const featuredCopySx: SxObject = {
   gap: 1,
   minWidth: 0,
+  width: '100%',
+};
+
+const featuredTitleRowSx: SxObject = {
+  alignItems: 'center',
+  flexDirection: 'row',
+  flexWrap: 'nowrap',
+  gap: 1.5,
+  minWidth: 0,
+  width: '100%',
+};
+
+const featuredTitleSx: SxObject = {
+  flex: '1 1 auto',
+  minWidth: 0,
+  overflowWrap: 'break-word',
+  whiteSpace: 'normal',
 };
 
 const featuredIconSx: SxObject = {
@@ -49,6 +71,23 @@ const featuredIconSx: SxObject = {
   height: 52,
   overflow: 'hidden',
   width: 52,
+};
+
+const featuredIconImgSx: SxObject = {
+  display: 'block',
+  height: '100%',
+  objectFit: 'cover',
+  width: '100%',
+};
+
+const featuredBlurbSx: SxObject = {
+  '& p': {
+    display: '-webkit-box',
+    margin: 0,
+    overflow: 'hidden',
+    WebkitBoxOrient: 'vertical',
+    WebkitLineClamp: 2,
+  },
 };
 
 const featuredTagsSx: SxObject = {
@@ -74,33 +113,46 @@ function projectTags(type: RenderableProject['type']): Array<string> {
   return type ? [type] : [];
 }
 
+function FeaturedIcon({ thumbnail }: { thumbnail: RenderableProject['thumbnail'] }) {
+  if (thumbnail.url.startsWith('http')) {
+    return (
+      <Image
+        alt=""
+        cover={true}
+        height={52}
+        sizes={{ extraLarge: 52 }}
+        url={thumbnail.url}
+        width={52}
+      />
+    );
+  }
+  return <Box alt="" component="img" src={thumbnail.url} sx={featuredIconImgSx} />;
+}
+
 function FeaturedProjectCard({ description, link, thumbnail, title, type }: RenderableProject) {
   const tags = projectTags(type);
   const descriptionJson = description?.json;
 
   return (
-    <ContentCard data-bento="featured" link={link ?? undefined} sx={featuredCardSx}>
+    <ContentCard data-bento="featured" sx={featuredCardSx}>
       <Stack sx={featuredLayoutSx}>
         <Stack sx={featuredCopySx}>
           <Typography color="text.secondary" variant="overline">
             Featured project
           </Typography>
-          <Stack direction="row" spacing={1.5} sx={{ alignItems: 'center' }}>
+          <Stack sx={featuredTitleRowSx}>
             <Box sx={featuredIconSx}>
-              <Image
-                alt=""
-                cover={true}
-                height={52}
-                sizes={{ extraLarge: 52 }}
-                url={thumbnail.url}
-                width={52}
-              />
+              <FeaturedIcon thumbnail={thumbnail} />
             </Box>
-            <Typography component="h2" variant="h5">
+            <Typography component="h2" sx={featuredTitleSx} variant="h5">
               {title}
             </Typography>
           </Stack>
-          {descriptionJson ? <RichText json={descriptionJson} links={emptyRichTextLinks} /> : null}
+          {descriptionJson ? (
+            <Box sx={featuredBlurbSx}>
+              <RichText json={descriptionJson} links={emptyRichTextLinks} />
+            </Box>
+          ) : null}
           {tags.length > 0 ? (
             <Stack sx={featuredTagsSx}>
               {tags.map((tag) => (

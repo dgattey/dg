@@ -110,7 +110,7 @@ export function GreenhousePlants({ plants, layer }: GreenhousePlantsProps) {
               {
                 '--plant-width': `${plant.scale * mass}vmin`,
                 maxWidth: `${asset.width}px`,
-                transform: `rotate(${plant.rotate}deg)`,
+                transform: `${plant.flip ? 'scaleX(-1) ' : ''}rotate(${plant.rotate}deg)`,
                 ...plantPosition(plant),
               } as CSSProperties
             }

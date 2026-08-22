@@ -11,5 +11,6 @@ describe('GreenhouseGrid', () => {
 
     const child = screen.getByText('Grid item');
     expect(child.parentElement?.tagName).toBe('DIV');
+    expect(child.parentElement).toHaveAttribute('data-greenhouse-grid');
   });
 });

@@ -5,17 +5,25 @@ describe('greenhouseLayout', () => {
     expect(layoutGreenhousePlants('home')).toEqual(layoutGreenhousePlants('home'));
   });
 
-  it('places four home plants in the corners', () => {
+  it('stacks repeats of each home cutout along the sides and bottom', () => {
     const plants = layoutGreenhousePlants('home');
-    expect(plants).toHaveLength(4);
-    expect(plants.map((plant) => plant.symbol).sort()).toEqual([
-      'leaf-bop',
-      'leaf-calathea',
-      'leaf-monstera',
-      'leaf-nerve',
-    ]);
-    expect(plants.filter((plant) => plant.layer === 'front').length).toBeLessThanOrEqual(4);
+    expect(plants.length).toBeGreaterThanOrEqual(8);
+    const counts = Object.fromEntries(LEAF_SYMBOLS.map((symbol) => [symbol, 0])) as Record<
+      (typeof LEAF_SYMBOLS)[number],
+      number
+    >;
+    for (const plant of plants) {
+      counts[plant.symbol] += 1;
+    }
+    expect(counts['leaf-bop']).toBeGreaterThanOrEqual(2);
+    expect(counts['leaf-calathea']).toBeGreaterThanOrEqual(2);
+    expect(counts['leaf-monstera']).toBeGreaterThanOrEqual(2);
+    expect(counts['leaf-nerve']).toBeGreaterThanOrEqual(2);
+    expect(plants.some((plant) => plant.flip)).toBe(true);
     expect(plants.filter((plant) => plant.layer === 'back').length).toBeLessThanOrEqual(2);
+    expect(plants.filter((plant) => plant.layer === 'back').every((plant) => plant.x <= -18)).toBe(
+      true,
+    );
   });
 
   it('uses only the shared leaf vocabulary', () => {

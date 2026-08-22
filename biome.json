@@ -32,7 +32,8 @@
       "!**/pnpm-lock.yaml",
       "!**/migrations",
       "!**/dist",
-      "!**/*.graphql"
+      "!**/*.graphql",
+      "!**/apps/web/src/app/greenhouse/m1-shot"
     ]
   },
   "formatter": {

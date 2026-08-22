@@ -60,7 +60,7 @@ const composedCardSx: SxObject = {
     0 18px 40px color-mix(in srgb, var(--mui-palette-common-black) 12%, transparent)
   `,
   display: 'flex',
-  minHeight: { sm: '22rem', xs: 'auto' },
+  minHeight: { sm: '40vh', xs: 'auto' },
   overflow: 'visible',
   padding: { sm: '2.05rem 1.55rem 1.45rem 1.9rem', xs: '1.5rem 1.25rem' },
   width: '100%',

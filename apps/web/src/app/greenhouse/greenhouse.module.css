@@ -218,6 +218,10 @@
   transform-origin: 50% 80%;
 }
 
+.plantsBack .plant {
+  filter: none;
+}
+
 .plant img {
   display: block;
   width: 100%;
@@ -229,7 +233,12 @@
   position: relative;
   z-index: 2;
   padding-inline: max(1.5rem, calc((100vw - 68rem) / 2));
-  padding-top: 0.75rem;
+  padding-top: 0.35rem;
+}
+
+:global(body:has([data-greenhouse-frame]) section:has([data-greenhouse-frame])) {
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 :global(html:has([data-greenhouse-frame])),
