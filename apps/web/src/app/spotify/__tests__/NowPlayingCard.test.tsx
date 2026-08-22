@@ -90,9 +90,9 @@ describe('NowPlayingCard', () => {
       .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
       .join('\n');
     expect(css).not.toContain('width: 72%');
-    expect(css).toContain('rgb(231 212 138 / 0.35)');
-    expect(css).toContain('rgb(138 154 91 / 0.2)');
-    expect(css).toContain('blur(44px)');
+    expect(css).toContain('rgb(231 212 138 / 0.55)');
+    expect(css).toContain('rgb(138 154 91 / 0.32)');
+    expect(css).toContain('blur(40px)');
   });
 
   it('keeps cream resting notes when playback is idle', () => {

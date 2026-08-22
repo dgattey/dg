@@ -20,8 +20,9 @@ const leavesSx: SxObject = {
 const bloomsSx: SxObject = {
   '[data-greenhouse-frame] &': {
     backgroundImage:
-      'radial-gradient(ellipse 45% 42% at 88% 14%, rgb(231 212 138 / 0.35) 0%, rgb(231 212 138 / 0.16) 42%, transparent 72%), radial-gradient(ellipse 36% 40% at 78% 48%, rgb(138 154 91 / 0.2) 0%, rgb(138 154 91 / 0.08) 48%, transparent 74%), radial-gradient(ellipse 40% 28% at 70% 94%, rgb(244 232 190 / 0.24) 0%, rgb(244 232 190 / 0.08) 46%, transparent 72%)',
-    filter: 'blur(44px)',
+      'radial-gradient(ellipse 48% 46% at 90% 10%, rgb(231 212 138 / 0.55) 0%, rgb(231 212 138 / 0.22) 40%, transparent 70%), radial-gradient(ellipse 38% 42% at 76% 50%, rgb(138 154 91 / 0.32) 0%, rgb(138 154 91 / 0.12) 46%, transparent 72%), radial-gradient(ellipse 44% 30% at 68% 94%, rgb(255 244 210 / 0.34) 0%, rgb(255 244 210 / 0.1) 44%, transparent 70%)',
+    filter: 'blur(40px)',
+    mixBlendMode: 'screen',
   },
   inset: 0,
   overflow: 'visible',
