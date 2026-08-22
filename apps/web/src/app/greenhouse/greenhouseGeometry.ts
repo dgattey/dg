@@ -69,17 +69,36 @@ export const LEAF_OPAQUE_INSET: Record<
 };
 
 /**
- * 1440×900 fold from the M1 grid pass: 68rem content, 1.25rem gutter,
- * header + zeroed section, two `auto` rows.
+ * 1440×900 fold: 12 columns, content-sized rows, 1.25rem gutter.
+ * Intro `span 8` / now-playing `span 4`, then activity `span 7` /
+ * featured `span 5`. Row 1 is ~18–22rem with a wide intro measure.
  */
+export const GREENHOUSE_GRID_COLUMNS = 12;
+export const GREENHOUSE_GRID_SPANS = {
+  activity: { span: 7, start: 1 },
+  featured: { span: 5, start: 8 },
+  intro: { span: 8, start: 1 },
+  'now-playing': { span: 4, start: 9 },
+} as const;
+
 export const HOME_DESKTOP_GRID = {
-  col: 534,
   gutter: 20,
-  left: 176,
-  row1: 404,
-  row2: 269,
+  row1: 320,
+  row2: 260,
   top: 172,
 } as const;
+
+export function gridTrackSize(contentWidth: number, gutter: number): number {
+  return (contentWidth - (GREENHOUSE_GRID_COLUMNS - 1) * gutter) / GREENHOUSE_GRID_COLUMNS;
+}
+
+export function gridSpanWidth(track: number, gutter: number, span: number): number {
+  return span * track + (span - 1) * gutter;
+}
+
+export function gridSpanOffset(track: number, gutter: number, start: number): number {
+  return (start - 1) * (track + gutter);
+}
 
 export function plantMassVmin(plant: Pick<PlantInstance, 'featured'>): number {
   return plant.featured ? FEATURED_PLANT_MASS_VMIN : REGULAR_PLANT_MASS_VMIN;
@@ -222,21 +241,67 @@ export function bottomBandRect(viewport: ViewportSize): Rect {
 }
 
 export function homeGrid(viewport: ViewportSize): {
-  col: number;
+  activityW: number;
+  activityX: number;
+  contentW: number;
+  featuredW: number;
+  featuredX: number;
   gutter: number;
+  introW: number;
+  introX: number;
   left: number;
+  nowW: number;
+  nowX: number;
   row1: number;
   top: number;
   twoCol: boolean;
 } {
   const twoCol = viewport.width >= SM_BREAKPOINT;
   const left = contentInset(viewport.width);
-  const gutter = twoCol ? 20 : 16;
+  const gutter = twoCol ? HOME_DESKTOP_GRID.gutter : 16;
   const contentW = viewport.width - left * 2;
-  const col = twoCol ? (contentW - gutter) / 2 : contentW;
   const top = twoCol ? HOME_DESKTOP_GRID.top : 96;
-  const row1 = twoCol ? Math.min(HOME_DESKTOP_GRID.row1, viewport.height * 0.36) : 280;
-  return { col, gutter, left, row1, top, twoCol };
+  const row1 = twoCol ? HOME_DESKTOP_GRID.row1 : 280;
+  if (!twoCol) {
+    return {
+      activityW: contentW,
+      activityX: left,
+      contentW,
+      featuredW: contentW,
+      featuredX: left,
+      gutter,
+      introW: contentW,
+      introX: left,
+      left,
+      nowW: contentW,
+      nowX: left,
+      row1,
+      top,
+      twoCol,
+    };
+  }
+
+  const track = gridTrackSize(contentW, gutter);
+  const intro = GREENHOUSE_GRID_SPANS.intro;
+  const now = GREENHOUSE_GRID_SPANS['now-playing'];
+  const activity = GREENHOUSE_GRID_SPANS.activity;
+  const featured = GREENHOUSE_GRID_SPANS.featured;
+  return {
+    activityW: gridSpanWidth(track, gutter, activity.span),
+    activityX: left + gridSpanOffset(track, gutter, activity.start),
+    contentW,
+    featuredW: gridSpanWidth(track, gutter, featured.span),
+    featuredX: left + gridSpanOffset(track, gutter, featured.start),
+    gutter,
+    introW: gridSpanWidth(track, gutter, intro.span),
+    introX: left + gridSpanOffset(track, gutter, intro.start),
+    left,
+    nowW: gridSpanWidth(track, gutter, now.span),
+    nowX: left + gridSpanOffset(track, gutter, now.start),
+    row1,
+    top,
+    twoCol,
+  };
 }
 
 /**
@@ -245,50 +310,50 @@ export function homeGrid(viewport: ViewportSize): {
  */
 export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<NamedRect> {
   const size = GREENHOUSE_VIEWPORTS[viewport];
-  const { col, gutter, left, row1, top, twoCol } = homeGrid(size);
+  const grid = homeGrid(size);
   const strip = edgeStripWidth(size.width);
-  if (!twoCol) {
-    const pad = Math.max(left, strip);
+  if (!grid.twoCol) {
+    const pad = Math.max(grid.left, strip);
     const copyWidth = Math.max(120, size.width - pad * 2 - 16);
     return [
-      { height: 240, id: 'intro-copy', width: Math.min(250, copyWidth), x: pad + 8, y: 260 },
-      { height: 118, id: 'now-playing-copy', width: Math.min(268, copyWidth), x: pad + 8, y: 700 },
+      { height: 280, id: 'intro-copy', width: Math.min(280, copyWidth), x: pad + 8, y: 248 },
+      { height: 96, id: 'now-playing-copy', width: Math.min(268, copyWidth), x: pad + 8, y: 720 },
       headerControlsRect(size),
     ];
   }
 
-  const nowLeft = left + col + gutter;
-  const lowerTop = top + row1 + gutter;
-  const introX = Math.max(left + 22, strip + 12);
-  const featuredRight = Math.min(nowLeft + 16 + Math.min(390, col - 32), size.width - strip - 12);
-  const featuredX = nowLeft + 16;
+  const lowerTop = grid.top + grid.row1 + grid.gutter;
+  const introCopyX = grid.introX + 22;
+  const introCopyW = Math.min(grid.introW * 0.52, 40 * 9.8);
+  const nowCopyX = grid.nowX + 14;
+  const featuredCopyX = grid.featuredX + 16;
   return [
     {
-      height: 300,
+      height: 260,
       id: 'intro-copy',
-      width: Math.min(318, left + col - introX - 16),
-      x: introX,
-      y: top + 24,
+      width: Math.max(140, introCopyW),
+      x: introCopyX,
+      y: grid.top + 18,
     },
     {
-      height: 150,
+      height: 88,
       id: 'now-playing-copy',
-      width: Math.max(80, Math.min(300, col - 36, size.width - strip - 12 - (nowLeft + 18))),
-      x: nowLeft + 18,
-      y: top + 14,
+      width: Math.max(80, Math.min(grid.nowW - 28, size.width - strip - 12 - nowCopyX)),
+      x: nowCopyX,
+      y: grid.top + grid.row1 - 102,
     },
     {
       height: 50,
       id: 'activity-stats',
-      width: Math.min(228, col - 24),
-      x: Math.max(left + 10, strip + 8),
+      width: Math.min(228, grid.activityW - 24),
+      x: Math.max(grid.activityX + 10, strip + 8),
       y: lowerTop + 8,
     },
     {
-      height: 200,
+      height: 168,
       id: 'featured-copy',
-      width: Math.max(120, featuredRight - featuredX),
-      x: featuredX,
+      width: Math.max(120, Math.min(grid.featuredW - 32, size.width - strip - 12 - featuredCopyX)),
+      x: featuredCopyX,
       y: lowerTop + 12,
     },
     headerControlsRect(size),

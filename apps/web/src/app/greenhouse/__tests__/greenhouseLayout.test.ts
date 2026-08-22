@@ -2,6 +2,8 @@ import {
   CONTENT_MAX_PX,
   contentInset,
   edgeStripWidth,
+  GREENHOUSE_VIEWPORTS,
+  homeGrid,
   homeSafeRects,
   plantSafeZoneHits,
 } from '../greenhouseGeometry';
@@ -83,6 +85,16 @@ describe('greenhouseLayout', () => {
 });
 
 describe('greenhouse safe zones', () => {
+  it('sizes the 12-col home grid so intro is wider than now-playing', () => {
+    const grid = homeGrid(GREENHOUSE_VIEWPORTS.desktop);
+    expect(grid.introW).toBeGreaterThan(grid.nowW * 1.7);
+    expect(grid.activityW).toBeGreaterThan(grid.featuredW);
+    expect(grid.nowX).toBeGreaterThan(grid.introX + grid.introW);
+    expect(grid.featuredX).toBeGreaterThan(grid.activityX + grid.activityW);
+    expect(grid.row1).toBeGreaterThanOrEqual(288);
+    expect(grid.row1).toBeLessThanOrEqual(352);
+  });
+
   it('defines copy wells for intro, now-playing, activity, and featured on desktop', () => {
     const ids = homeSafeRects('desktop').map((rect) => rect.id);
     expect(ids).toEqual([
@@ -92,6 +104,8 @@ describe('greenhouse safe zones', () => {
       'featured-copy',
       'header-controls',
     ]);
+    const intro = homeSafeRects('desktop').find((rect) => rect.id === 'intro-copy');
+    expect(intro?.width).toBeGreaterThan(200);
   });
 
   it('keeps every desktop plant AABB out of the copy wells', () => {

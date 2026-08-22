@@ -73,10 +73,10 @@ const composedLayoutSx: SxObject = {
 
 const composedCopySx: SxObject = {
   flex: '1 1 58%',
-  gap: 1.25,
-  justifyContent: 'flex-start',
+  gap: 1,
+  justifyContent: { sm: 'space-between', xs: 'flex-start' },
   minWidth: 0,
-  py: { md: 0.25, xs: 0 },
+  py: { md: 0.15, xs: 0 },
 };
 
 const composedTextSx: SxObject = {
@@ -84,7 +84,7 @@ const composedTextSx: SxObject = {
     color: 'text.primary',
     fontFamily: 'var(--font-display)',
     fontSize: {
-      sm: 'clamp(2.8rem, 2rem + 3.2vw, 4.25rem)',
+      sm: 'clamp(2.35rem, 1.5rem + 2.1vw, 3.35rem)',
       xs: 'clamp(2.2rem, 10vw, 3rem)',
     },
     fontStretch: 'normal',
@@ -93,26 +93,27 @@ const composedTextSx: SxObject = {
     hyphens: 'none',
     letterSpacing: '-0.03em',
     lineHeight: 1.05,
-    marginBottom: 0.75,
-    maxWidth: '6.8ch',
+    marginBottom: 0.7,
     overflow: 'visible',
     overflowWrap: 'normal',
-    paddingTop: '0.08em',
-    width: '6.8ch',
+    paddingTop: '0.04em',
     wordBreak: 'normal',
   },
   '& p': {
     color: 'text.secondary',
-    fontSize: '0.98rem',
-    lineHeight: 1.5,
-    marginBottom: 1.15,
-    maxWidth: '36ch',
+    fontSize: '0.96rem',
+    lineHeight: 1.45,
+    marginBottom: 0.85,
+    maxWidth: '40ch',
   },
   '& p:first-of-type': {
     color: 'text.primary',
-    fontSize: '1.08rem',
+    fontSize: '1.02rem',
     fontWeight: 500,
-    marginBottom: 0.85,
+    marginBottom: 0.7,
+  },
+  '& p:last-of-type': {
+    marginBottom: 0,
   },
   gap: 0,
 };
@@ -122,10 +123,10 @@ const composedPortraitWrapSx: SxObject = {
   aspectRatio: '4 / 5',
   borderRadius: '1.2rem',
   boxShadow: '0 14px 28px color-mix(in srgb, var(--mui-palette-common-black) 16%, transparent)',
-  flex: { sm: '0 0 36%', xs: '0 0 auto' },
-  maxHeight: { sm: '18rem', xs: 'none' },
+  flex: { sm: '0 0 40%', xs: '0 0 auto' },
+  maxHeight: { sm: '22rem', xs: 'none' },
   overflow: 'hidden',
-  width: { sm: '36%', xs: '70%' },
+  width: { sm: '40%', xs: '70%' },
 };
 
 const composedPortraitImgSx: SxObject = {
@@ -139,7 +140,7 @@ const composedPortraitImgSx: SxObject = {
 const socialRowSx: SxObject = {
   columnGap: 1.25,
   flexDirection: 'row',
-  marginTop: 1,
+  marginTop: { sm: 0.25, xs: 1 },
 };
 
 const socialLinkSx: SxObject = {
