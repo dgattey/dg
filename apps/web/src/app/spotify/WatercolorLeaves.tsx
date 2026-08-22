@@ -78,24 +78,25 @@ function sprigLeaves({
   const leaves: Array<LeafSpec> = [];
   for (let index = 0; index < stations; index += 1) {
     const linear = index / (stations - 1);
-    const t = start + (end - start) * linear ** 0.62;
+    const t = start + (end - start) * linear ** 0.55;
     const point = bezierPoint(a, b, c, d, t);
     const along = bezierAngle(a, b, c, d, t);
-    const tipMix = linear ** 1.15;
+    const tipMix = linear ** 1.05;
     const length = baseLength + (tipLength - baseLength) * tipMix;
-    const cluster = 1 + Math.round((1 - linear) * 0.2 + linear * 1.15);
+    const cluster = 2 + Math.round(linear * 2.2);
     for (let sideIndex = 0; sideIndex < cluster; sideIndex += 1) {
       const side = sideIndex % 2 === 0 ? -1 : 1;
-      const alongShift = (sideIndex > 1 ? 7 : 0) * (sideIndex % 2 === 0 ? 1 : -1);
-      const flare = pairSpread + (index % 4) * 3 + sideIndex * 5;
-      const sizeJitter = 1 - sideIndex * 0.16 - (index % 3) * 0.04;
+      const layer = Math.floor(sideIndex / 2);
+      const flare = pairSpread - linear * 10 + layer * 16 + (index % 5) * 4 + sideIndex * 3;
+      const twist = ((index * 13 + sideIndex * 19) % 17) - 8;
+      const sizeJitter = 1 - layer * 0.22 - (index % 4) * 0.05 - sideIndex * 0.03;
       leaves.push({
         length: length * sizeJitter,
-        opacity: opacity - sideIndex * 0.06,
-        rotate: along + side * flare + alongShift,
-        width: length * sizeJitter * 0.22,
-        x: point.x + side * (1 - linear) * 2.4,
-        y: point.y,
+        opacity: Math.max(0.28, opacity - layer * 0.08 - sideIndex * 0.03),
+        rotate: along + side * flare + twist,
+        width: length * sizeJitter * (0.2 + (index % 3) * 0.03),
+        x: point.x + side * (3.2 - linear * 1.4) + layer * side * 1.6,
+        y: point.y + (layer - 0.4) * 2.2,
       });
     }
   }
@@ -117,25 +118,25 @@ const BACK_STEM: [Point, Point, Point, Point] = [
 ];
 
 const MAIN_LEAVES = sprigLeaves({
-  baseLength: 46,
-  end: 0.96,
+  baseLength: 58,
+  end: 0.97,
   opacity: 0.7,
-  pairSpread: 52,
-  start: 0.04,
-  stations: 16,
+  pairSpread: 56,
+  start: 0.03,
+  stations: 20,
   stem: MAIN_STEM,
-  tipLength: 22,
+  tipLength: 26,
 });
 
 const BACK_LEAVES = sprigLeaves({
-  baseLength: 34,
-  end: 0.9,
-  opacity: 0.42,
-  pairSpread: 46,
-  start: 0.1,
-  stations: 10,
+  baseLength: 40,
+  end: 0.92,
+  opacity: 0.4,
+  pairSpread: 48,
+  start: 0.08,
+  stations: 13,
   stem: BACK_STEM,
-  tipLength: 16,
+  tipLength: 18,
 });
 
 const MAIN_PATH = `M ${MAIN_STEM[0].x} ${MAIN_STEM[0].y} C ${MAIN_STEM[1].x} ${MAIN_STEM[1].y}, ${MAIN_STEM[2].x} ${MAIN_STEM[2].y}, ${MAIN_STEM[3].x} ${MAIN_STEM[3].y}`;
@@ -174,7 +175,7 @@ export function WatercolorLeaves() {
               in="SourceGraphic"
               in2="noise"
               result="displaced"
-              scale="7.5"
+              scale="11"
               xChannelSelector="R"
               yChannelSelector="G"
             />

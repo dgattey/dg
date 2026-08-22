@@ -30,10 +30,10 @@ const CREAM: Colors = {
 };
 
 const SAGE_GOLD_WASH =
-  'radial-gradient(ellipse 90% 80% at 96% 4%, #e7d48a 0%, rgb(231 212 138 / 0.55) 36%, transparent 78%), linear-gradient(115deg, #6a7548 0%, #9aa05a 38%, #c9b86a 68%, #e7d48a 100%)';
+  'radial-gradient(ellipse 110% 95% at 98% 0%, #e7d48a 0%, rgb(231 212 138 / 0.62) 28%, rgb(231 212 138 / 0.18) 58%, transparent 82%), linear-gradient(115deg, #7a8450 0%, #8f9456 22%, #b3ac64 48%, #d4c478 72%, #e7d48a 100%)';
 
 const COPY_SCRIM =
-  'radial-gradient(ellipse 78% 82% at 6% 96%, rgba(40, 55, 35, 0.55) 0%, rgba(40, 55, 35, 0.28) 34%, transparent 64%), linear-gradient(115deg, rgba(40, 55, 35, 0.42) 0%, rgba(40, 55, 35, 0.12) 38%, transparent 60%)';
+  'radial-gradient(ellipse 95% 90% at 0% 100%, rgba(40, 55, 35, 0.55) 0%, rgba(40, 55, 35, 0.32) 24%, rgba(40, 55, 35, 0.14) 46%, rgba(40, 55, 35, 0.04) 62%, transparent 76%), linear-gradient(115deg, rgba(40, 55, 35, 0.4) 0%, rgba(40, 55, 35, 0.22) 18%, rgba(40, 55, 35, 0.1) 36%, rgba(40, 55, 35, 0.03) 52%, transparent 68%)';
 
 const layerBaseSx: SxObject = {
   inset: 0,
