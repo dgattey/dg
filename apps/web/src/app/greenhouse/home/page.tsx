@@ -1,7 +1,7 @@
-import { OrganicGrid } from '@dg/ui/core/OrganicGrid';
 import { Homepage } from '../../home/Homepage';
 import { generateHomepageMetadata } from '../../home/homepageMetadata';
 import { GreenhouseFrame } from '../GreenhouseFrame';
+import { GreenhouseGrid } from '../GreenhouseGrid';
 
 export const generateMetadata = generateHomepageMetadata;
 
@@ -12,7 +12,7 @@ export const generateMetadata = generateHomepageMetadata;
 export default function Page() {
   return (
     <GreenhouseFrame surface="home">
-      <Homepage Grid={OrganicGrid} introVariant="composed" />
+      <Homepage Grid={GreenhouseGrid} introVariant="composed" />
     </GreenhouseFrame>
   );
 }

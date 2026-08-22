@@ -14,6 +14,7 @@ export const GREENHOUSE_TOKEN_VARS: SxObject = {
   '--font-display': FONT_DISPLAY_STACK,
   '--glass-backdrop-filter': 'blur(18px) saturate(130%)',
   '--glass-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 54%, transparent)',
+  '--greenhouse-gutter': '1.25rem',
   '--heading-font-size': HEADING_FONT_SIZE_DISPLAY,
   '--heading-font-stretch': 'normal',
   '--heading-font-variant': 'normal',
@@ -47,16 +48,16 @@ export const GREENHOUSE_LEAF_VARS: SxObject = {
 };
 
 const atmospherePair = {
-  mullion: ['hsl(36deg, 14%, 32%)', 'hsl(0deg, 0%, 78%)'],
-  mullionEdge: ['hsl(48deg 50% 88% / 0.55)', 'hsl(0deg 0% 100% / 0.18)'],
-  mullionHighlight: ['hsl(40deg, 22%, 62%)', 'hsl(0deg, 0%, 90%)'],
-  mullionShade: ['hsl(30deg, 18%, 10%)', 'hsl(0deg, 0%, 16%)'],
-  ribDark: ['hsl(90deg 32% 16% / 0.42)', 'hsl(160deg 12% 80% / 0.2)'],
-  ribMid: ['hsl(88deg 22% 52% / 0.12)', 'hsl(160deg 14% 24% / 0.22)'],
-  ribShine: ['hsl(50deg 70% 96% / 0.55)', 'hsl(40deg 18% 36% / 0.18)'],
+  mullion: ['hsl(36deg, 8%, 58%)', 'hsl(0deg, 0%, 78%)'],
+  mullionEdge: ['hsl(48deg 40% 92% / 0.5)', 'hsl(0deg 0% 100% / 0.18)'],
+  mullionHighlight: ['hsl(40deg, 16%, 78%)', 'hsl(0deg, 0%, 90%)'],
+  mullionShade: ['hsl(32deg, 10%, 38%)', 'hsl(0deg, 0%, 16%)'],
+  ribDark: ['hsl(80deg 22% 28% / 0.28)', 'hsl(160deg 12% 80% / 0.2)'],
+  ribMid: ['hsl(70deg 18% 58% / 0.1)', 'hsl(160deg 14% 24% / 0.22)'],
+  ribShine: ['hsl(48deg 70% 96% / 0.42)', 'hsl(40deg 18% 36% / 0.18)'],
   sunCore: ['hsl(48deg 100% 97% / 1)', 'hsl(40deg 86% 62% / 0.62)'],
-  sunHalo: ['hsl(46deg 96% 80% / 0.9)', 'hsl(38deg 58% 38% / 0.34)'],
-  wash: ['hsl(42deg, 34%, 82%)', 'hsl(158deg, 26%, 9%)'],
+  sunHalo: ['hsl(46deg 96% 80% / 0.78)', 'hsl(38deg 58% 38% / 0.34)'],
+  wash: ['hsl(46deg, 38%, 80%)', 'hsl(158deg, 26%, 9%)'],
 } as const;
 
 export const GREENHOUSE_ATMOSPHERE_VARS: SxObject = {

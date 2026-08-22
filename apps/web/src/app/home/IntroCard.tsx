@@ -60,16 +60,16 @@ const composedCardSx: SxObject = {
     0 18px 40px color-mix(in srgb, var(--mui-palette-common-black) 12%, transparent)
   `,
   display: 'flex',
-  minHeight: { md: '15rem', xs: 'auto' },
-  overflow: 'visible',
-  padding: { md: '2.05rem 1.55rem 1.45rem 1.9rem', xs: '1.5rem 1.25rem' },
-  width: { md: '100%', xs: '85vw' },
+  minHeight: { sm: '22rem', xs: 'auto' },
+  overflow: 'visible !important',
+  padding: { sm: '2.05rem 1.55rem 1.45rem 1.9rem', xs: '1.5rem 1.25rem' },
+  width: '100%',
 };
 
 const composedLayoutSx: SxObject = {
-  alignItems: { md: 'stretch', xs: 'center' },
-  flexDirection: { md: 'row', xs: 'column-reverse' },
-  gap: { md: 3.25, xs: 2 },
+  alignItems: { sm: 'stretch', xs: 'center' },
+  flexDirection: { sm: 'row', xs: 'column-reverse' },
+  gap: { sm: 3.25, xs: 2 },
   height: '100%',
   width: '100%',
 };
@@ -86,17 +86,19 @@ const composedTextSx: SxObject = {
     color: 'text.primary',
     fontFamily: 'var(--font-display)',
     fontSize: {
-      md: 'clamp(2.15rem, 1.4rem + 2.2vw, 3.05rem)',
-      xs: 'clamp(1.85rem, 8.4vw, 2.35rem)',
+      sm: 'clamp(2.8rem, 2rem + 3.2vw, 4.25rem)',
+      xs: 'clamp(2.2rem, 10vw, 3rem)',
     },
     fontStretch: 'normal',
     fontVariant: 'normal',
     fontWeight: 600,
-    letterSpacing: '-0.032em',
-    lineHeight: 1.18,
+    letterSpacing: '-0.03em',
+    lineHeight: 1.05,
     marginBottom: 0.75,
+    maxWidth: '5.4ch',
     overflow: 'visible',
-    paddingTop: '0.12em',
+    paddingTop: '0.08em',
+    width: '5.4ch',
   },
   '& p': {
     color: 'text.secondary',
@@ -115,14 +117,14 @@ const composedTextSx: SxObject = {
 };
 
 const composedPortraitWrapSx: SxObject = {
-  alignSelf: { md: 'center', xs: 'center' },
+  alignSelf: { sm: 'center', xs: 'center' },
   aspectRatio: '4 / 5',
   borderRadius: '1.2rem',
   boxShadow: '0 14px 28px color-mix(in srgb, var(--mui-palette-common-black) 16%, transparent)',
-  flex: { md: '0 0 36%', xs: '0 0 auto' },
-  maxHeight: { md: '16.75rem', xs: 'none' },
+  flex: { sm: '0 0 36%', xs: '0 0 auto' },
+  maxHeight: { sm: '18rem', xs: 'none' },
   overflow: 'hidden',
-  width: { md: '36%', xs: '70%' },
+  width: { sm: '36%', xs: '70%' },
 };
 
 const composedPortraitImgSx: SxObject = {

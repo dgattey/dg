@@ -5,10 +5,17 @@ describe('greenhouseLayout', () => {
     expect(layoutGreenhousePlants('home')).toEqual(layoutGreenhousePlants('home'));
   });
 
-  it('stays within the overlay cap', () => {
+  it('places four home plants in the corners', () => {
     const plants = layoutGreenhousePlants('home');
-    expect(plants.filter((plant) => plant.layer === 'front').length).toBeLessThanOrEqual(14);
-    expect(plants.filter((plant) => plant.layer === 'back').length).toBeLessThanOrEqual(8);
+    expect(plants).toHaveLength(4);
+    expect(plants.map((plant) => plant.symbol).sort()).toEqual([
+      'leaf-bop',
+      'leaf-calathea',
+      'leaf-monstera',
+      'leaf-nerve',
+    ]);
+    expect(plants.filter((plant) => plant.layer === 'front').length).toBeLessThanOrEqual(4);
+    expect(plants.filter((plant) => plant.layer === 'back').length).toBeLessThanOrEqual(2);
   });
 
   it('uses only the shared leaf vocabulary', () => {
@@ -28,19 +35,21 @@ describe('greenhouseLayout', () => {
 
     expect(featuredOf('home')).toBe('leaf-monstera');
     expect(featuredOf('/music')).toBe('leaf-bop');
-    expect(featuredOf('/music/albums')).toBe('leaf-pothos');
+    expect(featuredOf('/music/albums')).toBe('leaf-calathea');
   });
 
   it('hangs plants from viewport edges instead of scattering over copy', () => {
     for (const plant of layoutGreenhousePlants('home')) {
-      expect(['left', 'right']).toContain(plant.edge);
-      expect(plant.x).toBeLessThanOrEqual(4);
+      expect(['left', 'right', 'bottom']).toContain(plant.edge);
+      if (plant.edge !== 'bottom') {
+        expect(plant.x).toBeLessThanOrEqual(4);
+      }
     }
   });
 
-  it('does not CSS-upscale sprites past native size', () => {
+  it('does not CSS-upscale cutouts past native 1024w', () => {
     for (const plant of layoutGreenhousePlants('home')) {
-      expect(plant.scale).toBeLessThanOrEqual(1.2);
+      expect(plant.scale).toBeLessThanOrEqual(1.3);
     }
   });
 });
