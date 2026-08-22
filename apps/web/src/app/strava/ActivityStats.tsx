@@ -28,7 +28,7 @@ const iconStackSx: SxObject = {
 const iconSx: SxObject = {
   '[data-greenhouse-frame] &': {
     alignItems: 'center',
-    backgroundColor: 'var(--route-line, hsl(22deg, 98%, 49%))',
+    backgroundColor: 'var(--route-line, hsl(24deg, 100%, 52%))',
     borderRadius: '50%',
     color: '#fff',
     display: 'inline-flex',

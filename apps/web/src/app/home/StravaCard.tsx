@@ -23,13 +23,23 @@ const scrimMix = (light: number, dark: number) =>
 
 const cardSx: SxObject = {
   '[data-greenhouse-frame] &': {
-    '--map-scrim-opacity': 0.06,
-    '--route-casing': 'rgb(70 42 16 / 0.34)',
-    '--route-casing-width': 8,
-    '--route-line': 'hsl(22deg, 98%, 49%)',
-    '--route-line-filter':
-      'drop-shadow(0 1px 4px rgb(70 36 8 / 0.55)) drop-shadow(0 0 7px rgb(255 122 36 / 0.38))',
-    '--route-stroke-width': 5,
+    '--map-scrim-opacity': 0.04,
+    // Brand route hue at full saturation — reads as Strava orange, not burnt sienna.
+    '--route-casing': '#f3ead6',
+    '--route-casing-width': 7,
+    '--route-line': 'hsl(24deg, 100%, 52%)',
+    '--route-line-filter': 'drop-shadow(0 1px 3px rgb(0 0 0 / 0.25))',
+    '--route-stroke-width': 4,
+    '&::after': {
+      borderRadius: 'inherit',
+      boxShadow:
+        'inset 0 1.5px 0 color-mix(in srgb, white 82%, transparent), inset 0 0 0 1px color-mix(in srgb, white 34%, transparent), inset 0 -1px 0 color-mix(in srgb, black 6%, transparent)',
+      content: '""',
+      inset: 0,
+      pointerEvents: 'none',
+      position: 'absolute',
+      zIndex: 4,
+    },
     height: '100%',
     maxWidth: 'none',
     minHeight: '13.5rem',
@@ -102,6 +112,12 @@ const activityNameSx: SxObject = {
 };
 
 const mapSx: SxObject = {
+  '[data-greenhouse-frame] &': {
+    borderRadius: 'inherit',
+    inset: '3px',
+    opacity: 0.9,
+    overflow: 'hidden',
+  },
   inset: 0,
   position: 'absolute',
   zIndex: 0,

@@ -16,8 +16,14 @@ describe('topoBasemap', () => {
     expect(first).toEqual(second);
     expect(first.land).toBe(TOPO_LAND);
     expect(first.water.length).toBeGreaterThan(0);
-    expect(first.bands.length).toBeGreaterThan(0);
-    expect(first.contours.length).toBeGreaterThan(0);
+    expect(first.contours.length).toBeGreaterThanOrEqual(12);
+    expect(first.canopy.length).toBeGreaterThan(0);
+    expect(first.shore.length).toBeGreaterThan(0);
+  });
+
+  it('marks every fourth iso as an index contour', () => {
+    const index = buildTopoLayers(LOOP).contours.filter((contour) => contour.strokeWidth === 1.5);
+    expect(index.length).toBeGreaterThan(0);
   });
 
   it('keeps the same seed for the same bounds', () => {
