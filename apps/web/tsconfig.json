@@ -4,8 +4,8 @@
     "experimentalDecorators": true,
     "types": ["jest", "node"]
   },
-  "extends": "@dg/tsconfig/nextjs.json",
   "exclude": ["src/app/greenhouse/m1-shot"],
+  "extends": "@dg/tsconfig/nextjs.json",
   "include": [
     "src",
     "next.config.ts",

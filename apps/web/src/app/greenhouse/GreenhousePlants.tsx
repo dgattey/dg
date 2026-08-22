@@ -15,14 +15,9 @@ import nerve768Avif from './foliage/nerve-768.avif';
 import nerve768Webp from './foliage/nerve-768.webp';
 import nerve1024Avif from './foliage/nerve-1024.avif';
 import nerve1024Webp from './foliage/nerve-1024.webp';
-import { plantMassVmin } from './greenhouseGeometry';
 import styles from './greenhouse.module.css';
-import type {
-  GreenhouseViewport,
-  LeafSymbol,
-  PlantInstance,
-  PlantLayer,
-} from './greenhouseLayout';
+import { plantMassVmin } from './greenhouseGeometry';
+import type { GreenhouseViewport, LeafSymbol, PlantInstance, PlantLayer } from './greenhouseLayout';
 
 type GreenhousePlantsProps = {
   plants: ReadonlyArray<PlantInstance>;

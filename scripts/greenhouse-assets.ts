@@ -159,14 +159,23 @@ async function encodeDepthPlate(srcDir: string, outDir: string): Promise<void> {
   const resized = sharp(src).resize(640, null, { fit: 'inside', withoutEnlargement: true });
 
   let quality = 36;
-  let avif = await resized.clone().avif({ chromaSubsampling: '4:2:0', effort: 7, quality }).toBuffer();
+  let avif = await resized
+    .clone()
+    .avif({ chromaSubsampling: '4:2:0', effort: 7, quality })
+    .toBuffer();
   while (avif.length > 25 * 1024 && quality > 18) {
     quality -= 4;
-    avif = await resized.clone().avif({ chromaSubsampling: '4:2:0', effort: 7, quality }).toBuffer();
+    avif = await resized
+      .clone()
+      .avif({ chromaSubsampling: '4:2:0', effort: 7, quality })
+      .toBuffer();
   }
   if (avif.length < 15 * 1024 && quality < 48) {
     quality += 6;
-    avif = await resized.clone().avif({ chromaSubsampling: '4:2:0', effort: 7, quality }).toBuffer();
+    avif = await resized
+      .clone()
+      .avif({ chromaSubsampling: '4:2:0', effort: 7, quality })
+      .toBuffer();
   }
 
   const webp = await resized.clone().webp({ quality: 52 }).toBuffer();

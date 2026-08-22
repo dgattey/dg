@@ -25,11 +25,11 @@
 
 .atmosphere {
   position: relative;
-  isolation: isolate;
   width: 100%;
   height: 100%;
   overflow: hidden;
   background-color: var(--greenhouse-wash, #8f9258);
+  isolation: isolate;
 }
 
 .depthPlate {
@@ -44,8 +44,8 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  filter: blur(22px) saturate(1.1) contrast(1.18);
   opacity: 0.7;
+  filter: blur(22px) saturate(1.1) contrast(1.18);
 }
 
 .behindGlass {
@@ -215,24 +215,24 @@
   width: 3px;
 }
 
-.mullionV[data-slot='edgeL'] {
+.mullionV[data-slot="edgeL"] {
   left: 0;
 }
 
-.mullionV[data-slot='contentL'] {
+.mullionV[data-slot="contentL"] {
   left: max(1.5rem, calc((100vw - 68rem) / 2));
 }
 
-.mullionV[data-slot='center'] {
+.mullionV[data-slot="center"] {
   left: 50%;
   transform: translateX(-1px);
 }
 
-.mullionV[data-slot='contentR'] {
+.mullionV[data-slot="contentR"] {
   left: calc(100% - max(1.5rem, calc((100vw - 68rem) / 2)) - 3px);
 }
 
-.mullionV[data-slot='edgeR'] {
+.mullionV[data-slot="edgeR"] {
   left: calc(100% - 3px);
 }
 
@@ -251,19 +251,19 @@
     inset 0 1px 0 var(--greenhouse-mullion-edge, rgb(255 246 228 / 0.7));
 }
 
-.mullionH[data-slot='edgeT'] {
+.mullionH[data-slot="edgeT"] {
   top: 0;
 }
 
-.mullionH[data-slot='third'] {
+.mullionH[data-slot="third"] {
   top: 33.333%;
 }
 
-.mullionH[data-slot='gutter'] {
+.mullionH[data-slot="gutter"] {
   top: 65.1%;
 }
 
-.mullionH[data-slot='edgeB'] {
+.mullionH[data-slot="edgeB"] {
   top: calc(100% - 2px);
 }
 
