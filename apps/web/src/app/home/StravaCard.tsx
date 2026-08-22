@@ -22,10 +22,26 @@ const scrimMix = (light: number, dark: number) =>
   `light-dark(${paperMix(light)}, rgb(0 0 0 / ${dark / 100}))`;
 
 const cardSx: SxObject = {
+  '[data-greenhouse-frame] &': {
+    '--map-scrim-opacity': 0.06,
+    '--route-casing': 'rgb(70 42 16 / 0.34)',
+    '--route-casing-width': 8,
+    '--route-line': 'hsl(24deg, 94%, 48%)',
+    '--route-line-filter': 'drop-shadow(0 1px 3px rgb(70 36 8 / 0.4))',
+    '--route-stroke-width': 5,
+    height: '100%',
+    maxWidth: 'none',
+    minHeight: '13.5rem',
+    width: '100%',
+  },
   padding: 0,
 };
 
 const layoutStackSx: SxObject = {
+  '[data-greenhouse-frame] &': {
+    justifyContent: 'flex-start',
+    textShadow: 'none',
+  },
   gap: 2,
   height: '100%',
   justifyContent: 'space-between',
@@ -47,6 +63,19 @@ const FADE = 30;
  * line rather than drifting with the card's aspect ratio.
  */
 const statsBackingSx: SxObject = {
+  '[data-greenhouse-frame] &': {
+    backdropFilter: 'blur(14px) saturate(140%)',
+    background: 'color-mix(in srgb, var(--mui-palette-background-paper) 74%, transparent)',
+    borderRadius: '999px',
+    boxShadow:
+      'inset 0 1px 0 color-mix(in srgb, white 70%, transparent), 0 1px 3px rgb(40 28 12 / 0.1)',
+    margin: 0,
+    paddingBottom: '0.42rem',
+    paddingLeft: '0.5rem',
+    paddingRight: '0.85rem',
+    paddingTop: '0.42rem',
+    width: 'fit-content',
+  },
   background: `linear-gradient(180deg, ${scrimMix(50, 34)} 0, ${scrimMix(44, 28)} ${FADE}px, transparent 100%)`,
   marginTop: -BLEED,
   marginX: -BLEED,
@@ -56,6 +85,9 @@ const statsBackingSx: SxObject = {
 };
 
 const copyBackingSx: SxObject = {
+  '[data-greenhouse-frame] &': {
+    display: 'none',
+  },
   background: `linear-gradient(180deg, transparent 0, ${scrimMix(58, 38)} ${FADE}px, ${scrimMix(70, 48)} 55%, ${scrimMix(80, 58)} 100%)`,
   marginBottom: -BLEED,
   marginX: -BLEED,

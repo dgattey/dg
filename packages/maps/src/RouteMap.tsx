@@ -9,6 +9,7 @@ import { Map as PigeonMapCore } from 'pigeon-maps';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { fitRouteViewport, projectRouteToPixels, toSvgPath } from './routeGeometry';
 import { SmoothTile } from './SmoothTile';
+import { TopoBasemap } from './TopoBasemap';
 
 const ROUTE_PADDING = 42;
 const DEFAULT_SIZE = 320;
@@ -17,6 +18,9 @@ const paperMix = (percent: number) =>
   `color-mix(in srgb, var(--mui-palette-background-paper) ${percent}%, transparent)`;
 
 const containerSx: SxObject = {
+  '[data-greenhouse-frame] &': {
+    backgroundColor: 'transparent',
+  },
   backgroundColor: 'var(--mui-palette-background-paper)',
   height: '100%',
   // Groups the underlay, tiles, scrim and route into one layer so none of them
@@ -65,6 +69,7 @@ const getScrimSx = (dark: boolean): SxObject => {
   return {
     background: `linear-gradient(180deg, ${paperMix(top)} 0%, ${paperMix(bottom)} 100%)`,
     inset: 0,
+    opacity: 'var(--map-scrim-opacity)',
     position: 'absolute',
     zIndex: 2,
   };
@@ -125,64 +130,6 @@ function tileUrl({
   return `https://tiles.stadiamaps.com/tiles/${style}/${zoom}/${x}/${y}${density}.png?api_key=${stadiaApiKey}`;
 }
 
-const topoBasemapSx: SxObject = {
-  height: '100%',
-  inset: 0,
-  position: 'absolute',
-  width: '100%',
-  zIndex: 0,
-};
-
-/** Invented outdoors theme used when Stadia tiles are unavailable. */
-function TopoBasemap() {
-  return (
-    <Box
-      aria-hidden="true"
-      component="svg"
-      preserveAspectRatio="xMidYMid slice"
-      sx={topoBasemapSx}
-      viewBox="0 0 640 280"
-    >
-      <rect fill="#d4e0c8" height="280" width="640" />
-      <path
-        d="M0 210 C 70 190 110 240 180 200 C 250 155 280 230 360 210 C 440 188 500 240 640 200 L 640 280 L 0 280 Z"
-        fill="#c3d4b4"
-      />
-      <path
-        d="M220 40 C 280 20 340 70 400 48 C 460 24 520 80 600 56 L 620 120 C 520 150 430 90 360 118 C 290 146 240 90 180 112 Z"
-        fill="#b7c8a6"
-      />
-      <path d="M0 0 L 210 0 C 160 40 90 20 0 70 Z" fill="#cfe0c2" />
-      <path
-        d="M0 250 C 90 230 140 270 230 248 C 310 226 360 268 640 236 L 640 280 L 0 280 Z"
-        fill="#9fb392"
-      />
-      <path
-        d="M40 200 C 90 170 130 210 180 186 C 230 160 270 204 330 176"
-        fill="none"
-        stroke="#7e9170"
-        strokeWidth="1.1"
-      />
-      <path
-        d="M260 150 C 310 120 360 158 420 132 C 480 104 530 150 600 128"
-        fill="none"
-        stroke="#7e9170"
-        strokeWidth="1.1"
-      />
-      <path
-        d="M300 70 C 340 50 380 86 430 64 C 480 42 530 78 580 60"
-        fill="none"
-        stroke="#8a9c7a"
-        strokeWidth="1"
-      />
-      <path d="M80 90 C 130 60 170 110 230 82" fill="none" stroke="#8a9c7a" strokeWidth="1" />
-      <ellipse cx="470" cy="96" fill="none" rx="54" ry="28" stroke="#7e9170" strokeWidth="1" />
-      <ellipse cx="470" cy="96" fill="none" rx="34" ry="16" stroke="#7e9170" strokeWidth="0.9" />
-      <ellipse cx="200" cy="168" fill="none" rx="70" ry="32" stroke="#7e9170" strokeWidth="1" />
-    </Box>
-  );
-}
-
 export type RouteMapProps = {
   points: Array<Point>;
   stadiaApiKey: string;
@@ -237,9 +184,17 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
   }, []);
 
   const hasTiles = stadiaApiKey.length > 0;
+  const routeVars: SxObject = {
+    '--map-scrim-opacity': hasTiles ? 1 : 0.32,
+    '--route-casing': dark ? 'rgb(0 0 0 / 0.42)' : paperMix(86),
+    '--route-casing-width': hasTiles ? 6 : 8,
+    '--route-line': BRAND.routeLine,
+    '--route-line-filter': 'none',
+    '--route-stroke-width': hasTiles ? 2.5 : 4.5,
+  };
 
   return (
-    <Box aria-hidden="true" ref={containerRef} sx={containerSx}>
+    <Box aria-hidden="true" ref={containerRef} sx={{ ...containerSx, ...routeVars }}>
       {hasTiles ? (
         <Box
           alt=""
@@ -254,7 +209,13 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
           sx={underlaySx}
         />
       ) : (
-        <TopoBasemap />
+        <TopoBasemap
+          center={viewport.center}
+          height={size.height}
+          points={points}
+          width={size.width}
+          zoom={viewport.zoom}
+        />
       )}
       {hasTiles ? (
         <Box sx={getTileLayerSx(dark)}>
@@ -276,26 +237,27 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
           />
         </Box>
       ) : null}
-      <Box sx={hasTiles ? getScrimSx(dark) : { ...getScrimSx(dark), opacity: 0.32 }} />
+      <Box sx={getScrimSx(dark)} />
       <Box component="svg" sx={routeSvgSx} viewBox={`0 0 ${size.width} ${size.height}`}>
         <Box
           component="path"
           d={routePath}
           fill="none"
-          stroke={dark ? 'rgb(0 0 0 / 0.42)' : paperMix(86)}
+          stroke="var(--route-casing)"
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={hasTiles ? 6 : 8}
+          strokeWidth="var(--route-casing-width)"
           vectorEffect="non-scaling-stroke"
         />
         <Box
           component="path"
           d={routePath}
           fill="none"
-          stroke={BRAND.routeLine}
+          stroke="var(--route-line)"
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={hasTiles ? 2.5 : 4.5}
+          strokeWidth="var(--route-stroke-width)"
+          sx={{ filter: 'var(--route-line-filter, none)' }}
           vectorEffect="non-scaling-stroke"
         />
       </Box>

@@ -23,6 +23,26 @@ describe('StravaCard', () => {
     expect(screen.queryByTestId('route-map')).not.toBeInTheDocument();
   });
 
+  it('hides the activity name on the greenhouse surface', () => {
+    render(
+      <div data-greenhouse-frame="">
+        <StravaCard
+          activity={{
+            ...activity,
+            description: 'Along the ridge',
+            distance: 29_612,
+            map: { summaryPolyline: 'summary-route' },
+            movingTime: 7620,
+          }}
+        />
+      </div>,
+    );
+
+    expect(screen.getByText('Morning run')).not.toBeVisible();
+    expect(screen.getByText('Along the ridge')).not.toBeVisible();
+    expect(screen.getByTestId('route-map')).toHaveAttribute('data-polyline', 'summary-route');
+  });
+
   it('prefers the summary polyline for the background route', () => {
     render(
       <StravaCard

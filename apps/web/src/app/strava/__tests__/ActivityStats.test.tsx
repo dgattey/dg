@@ -39,6 +39,53 @@ describe('ActivityStats', () => {
     expect(screen.getByText('2 days ago')).toBeInTheDocument();
   });
 
+  it('keeps moving time in the tree but hidden off the greenhouse surface', () => {
+    render(
+      <ActivityStats
+        activity={{
+          distance: 29_612,
+          id: 123,
+          movingTime: 7620,
+          name: 'Morning Ride',
+          relativeStartDate: '2 days ago',
+          startDate: '2026-02-08T12:00:00Z',
+          type: 'Ride',
+          url: 'https://www.strava.com/activities/123',
+        }}
+      />,
+      { wrapper: TestWrapper },
+    );
+
+    const moving = screen.getByText('2h 07m');
+    expect(moving).toBeInTheDocument();
+    expect(moving).not.toBeVisible();
+    expect(screen.getByText('2 days ago')).toBeVisible();
+  });
+
+  it('shows distance and moving time inside a greenhouse frame', () => {
+    render(
+      <div data-greenhouse-frame="">
+        <ActivityStats
+          activity={{
+            distance: 29_612,
+            id: 123,
+            movingTime: 7620,
+            name: 'Morning Ride',
+            relativeStartDate: '2 days ago',
+            startDate: '2026-02-08T12:00:00Z',
+            type: 'Ride',
+            url: 'https://www.strava.com/activities/123',
+          }}
+        />
+      </div>,
+      { wrapper: TestWrapper },
+    );
+
+    expect(screen.getByText('18.4 miles')).toBeVisible();
+    expect(screen.getByText('2h 07m')).toBeVisible();
+    expect(screen.getByText('2 days ago')).not.toBeVisible();
+  });
+
   it('renders relative date without distance', () => {
     render(
       <ActivityStats
