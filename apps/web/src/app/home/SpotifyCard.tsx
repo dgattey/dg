@@ -1,12 +1,12 @@
 import 'server-only';
 
+import type { Track } from '@dg/content-models/spotify/Track';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { FaIcon } from '@dg/ui/icons/FaIcon';
 import type { SxObject } from '@dg/ui/theme';
 import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 import { Box, Card, Skeleton, Stack } from '@mui/material';
 import { Suspense } from 'react';
-import type { Track } from '@dg/content-models/spotify/Track';
 import { getLatestSong } from '../../services/spotify';
 import { ALBUM_ART_BORDER_RADIUS, ALBUM_ART_DIMENSIONS } from '../albumArtStyles';
 import { SpotifyCardWithGradient } from '../spotify/SpotifyCardWithGradient';

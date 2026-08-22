@@ -273,10 +273,7 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
     {
       height: 150,
       id: 'now-playing-copy',
-      width: Math.max(
-        80,
-        Math.min(300, col - 36, size.width - strip - 12 - (nowLeft + 18)),
-      ),
+      width: Math.max(80, Math.min(300, col - 36, size.width - strip - 12 - (nowLeft + 18))),
       x: nowLeft + 18,
       y: top + 14,
     },
@@ -348,7 +345,10 @@ export function viewportToEdgeStrip(
   if (vx < box.x || vx >= box.x + box.width || vy < box.y || vy >= box.y + box.height) {
     return null;
   }
-  if (side === 'right' && rectsIntersect({ height: 1, width: 1, x: vx, y: vy }, headerControlsRect(viewport))) {
+  if (
+    side === 'right' &&
+    rectsIntersect({ height: 1, width: 1, x: vx, y: vy }, headerControlsRect(viewport))
+  ) {
     return null;
   }
   return mapCover(vx - box.x, vy - box.y, box, image, side === 'left' ? 0 : 1, 1);

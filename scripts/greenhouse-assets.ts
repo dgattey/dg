@@ -164,14 +164,10 @@ async function encodeKeyedHeight(
     });
 
   let quality = 35;
-  let avif = await pipeline()
-    .avif({ chromaSubsampling: '4:2:0', effort: 7, quality })
-    .toBuffer();
+  let avif = await pipeline().avif({ chromaSubsampling: '4:2:0', effort: 7, quality }).toBuffer();
   while (avif.length > targetKb * 1024 && quality > 28) {
     quality -= 1;
-    avif = await pipeline()
-      .avif({ chromaSubsampling: '4:2:0', effort: 7, quality })
-      .toBuffer();
+    avif = await pipeline().avif({ chromaSubsampling: '4:2:0', effort: 7, quality }).toBuffer();
   }
   const webp = await pipeline().webp({ alphaQuality: 80, quality: 62 }).toBuffer();
   writeFileSync(`${outBase}.avif`, avif);
