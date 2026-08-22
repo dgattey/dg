@@ -120,6 +120,32 @@ function rotatePoint(
   return { x: originX + dx * cos - dy * sin, y: originY + dx * sin + dy * cos };
 }
 
+function aabbFromCorners(corners: ReadonlyArray<{ x: number; y: number }>): Rect {
+  const xs = corners.map((corner) => corner.x);
+  const ys = corners.map((corner) => corner.y);
+  const minX = Math.min(...xs);
+  const maxX = Math.max(...xs);
+  const minY = Math.min(...ys);
+  const maxY = Math.max(...ys);
+  return { height: maxY - minY, width: maxX - minX, x: minX, y: minY };
+}
+
+/**
+ * Full CSS box after rotate. Used for safe-zone hits so transparent padding
+ * cannot hide a glyph collision the way optimistic opaque insets did.
+ */
+export function plantRotatedAabb(plant: PlantInstance, viewport: ViewportSize): Rect {
+  const box = plantCssBox(plant, viewport);
+  const originX = box.x + box.width * PLANT_TRANSFORM_ORIGIN.x;
+  const originY = box.y + box.height * PLANT_TRANSFORM_ORIGIN.y;
+  return aabbFromCorners([
+    rotatePoint(box.x, box.y, originX, originY, plant.rotate),
+    rotatePoint(box.x + box.width, box.y, originX, originY, plant.rotate),
+    rotatePoint(box.x, box.y + box.height, originX, originY, plant.rotate),
+    rotatePoint(box.x + box.width, box.y + box.height, originX, originY, plant.rotate),
+  ]);
+}
+
 /**
  * Axis-aligned box of the opaque cutout after CSS place + rotate.
  * `scaleX(-1)` swaps the left/right insets; origin stays 50% / 80%.
@@ -135,19 +161,12 @@ export function plantOpaqueAabb(plant: PlantInstance, viewport: ViewportSize): R
   const bottom = box.y + box.height * (1 - inset.bottom);
   const originX = box.x + box.width * PLANT_TRANSFORM_ORIGIN.x;
   const originY = box.y + box.height * PLANT_TRANSFORM_ORIGIN.y;
-  const corners = [
+  return aabbFromCorners([
     rotatePoint(left, top, originX, originY, plant.rotate),
     rotatePoint(right, top, originX, originY, plant.rotate),
     rotatePoint(left, bottom, originX, originY, plant.rotate),
     rotatePoint(right, bottom, originX, originY, plant.rotate),
-  ];
-  const xs = corners.map((corner) => corner.x);
-  const ys = corners.map((corner) => corner.y);
-  const minX = Math.min(...xs);
-  const maxX = Math.max(...xs);
-  const minY = Math.min(...ys);
-  const maxY = Math.max(...ys);
-  return { height: maxY - minY, width: maxX - minX, x: minX, y: minY };
+  ]);
 }
 
 export function rectsIntersect(a: Rect, b: Rect): boolean {
@@ -164,16 +183,16 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
     const nowLeft = left + col + gutter;
     const lowerTop = top + row1 + gutter;
     return [
-      { height: 320, id: 'intro-copy', width: 318, x: left + 22, y: top + 24 },
-      { height: 150, id: 'now-playing-copy', width: 300, x: nowLeft + 18, y: top + 14 },
-      { height: 50, id: 'activity-stats', width: 228, x: left + 10, y: lowerTop + 8 },
-      { height: 220, id: 'featured-copy', width: 390, x: nowLeft + 16, y: lowerTop + 12 },
+      { height: 300, id: 'intro-copy', width: 300, x: left + 10, y: top + 18 },
+      { height: 150, id: 'now-playing-copy', width: 280, x: nowLeft + 16, y: top + 14 },
+      { height: 52, id: 'activity-stats', width: 240, x: left + 8, y: lowerTop + 6 },
+      { height: 210, id: 'featured-copy', width: 340, x: nowLeft + 14, y: lowerTop + 10 },
     ];
   }
 
   return [
-    { height: 240, id: 'intro-copy', width: 250, x: 16, y: 260 },
-    { height: 118, id: 'now-playing-copy', width: 268, x: 16, y: 700 },
+    { height: 220, id: 'intro-copy', width: 250, x: 16, y: 268 },
+    { height: 72, id: 'now-playing-copy', width: 240, x: 16, y: 688 },
   ];
 }
 
@@ -185,7 +204,7 @@ export function plantSafeZoneHits(
   const safes = homeSafeRects(viewport);
   const hits: Array<{ plantId: string; rectId: string }> = [];
   for (const plant of plants) {
-    const aabb = plantOpaqueAabb(plant, size);
+    const aabb = plantRotatedAabb(plant, size);
     for (const safe of safes) {
       if (rectsIntersect(aabb, safe)) {
         hits.push({ plantId: plant.id, rectId: safe.id });

@@ -144,17 +144,17 @@ function FeaturedProjectCard({ description, link, thumbnail, title, type }: Rend
             <Box sx={featuredIconSx}>
               <FeaturedIcon thumbnail={thumbnail} />
             </Box>
-            <Typography component="h2" sx={featuredTitleSx} variant="h5">
+            <Typography component="h2" data-safe="featured-title" sx={featuredTitleSx} variant="h5">
               {title}
             </Typography>
           </Stack>
           {descriptionJson ? (
-            <Box sx={featuredBlurbSx}>
+            <Box data-safe="featured-blurb" sx={featuredBlurbSx}>
               <RichText json={descriptionJson} links={emptyRichTextLinks} />
             </Box>
           ) : null}
           {tags.length > 0 ? (
-            <Stack sx={featuredTagsSx}>
+            <Stack data-safe="featured-tags" sx={featuredTagsSx}>
               {tags.map((tag) => (
                 <Chip key={tag} label={tag} size="small" />
               ))}
@@ -162,7 +162,13 @@ function FeaturedProjectCard({ description, link, thumbnail, title, type }: Rend
           ) : null}
         </Stack>
         {link ? (
-          <Link color="secondary" href={link.url} sx={featuredCtaSx} title={link.title}>
+          <Link
+            color="secondary"
+            data-safe="featured-cta"
+            href={link.url}
+            sx={featuredCtaSx}
+            title={link.title}
+          >
             View project →
           </Link>
         ) : null}

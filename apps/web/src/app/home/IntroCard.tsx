@@ -205,7 +205,7 @@ function ComposedIntroCard({
   return (
     <ContentCard data-bento="intro" sx={composedCardSx}>
       <Stack sx={composedLayoutSx}>
-        <Stack sx={composedCopySx}>
+        <Stack data-safe="intro-copy" sx={composedCopySx}>
           <RichText {...introBlock.textBlock.content} sx={composedTextSx} />
           {socialLinks.length > 0 ? (
             <Stack sx={socialRowSx}>
