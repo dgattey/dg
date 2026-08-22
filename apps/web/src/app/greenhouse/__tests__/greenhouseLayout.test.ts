@@ -1,4 +1,10 @@
-import { homeSafeRects, plantSafeZoneHits } from '../greenhouseGeometry';
+import {
+  CONTENT_MAX_PX,
+  contentInset,
+  edgeStripWidth,
+  homeSafeRects,
+  plantSafeZoneHits,
+} from '../greenhouseGeometry';
 import { LEAF_SYMBOLS, layoutGreenhousePlants } from '../greenhouseLayout';
 
 describe('greenhouseLayout', () => {
@@ -9,38 +15,12 @@ describe('greenhouseLayout', () => {
     );
   });
 
-  it('stacks 14–20 desktop home cutouts along the sides and bottom', () => {
+  it('keeps two to four desktop corner cutouts in front of the strips', () => {
     const plants = layoutGreenhousePlants('home');
-    expect(plants.length).toBeGreaterThanOrEqual(14);
-    expect(plants.length).toBeLessThanOrEqual(20);
-    const counts = Object.fromEntries(LEAF_SYMBOLS.map((symbol) => [symbol, 0])) as Record<
-      (typeof LEAF_SYMBOLS)[number],
-      number
-    >;
-    for (const plant of plants) {
-      counts[plant.symbol] += 1;
-    }
-    expect(counts['leaf-bop']).toBeGreaterThanOrEqual(3);
-    expect(counts['leaf-calathea']).toBeGreaterThanOrEqual(3);
-    expect(counts['leaf-monstera']).toBeGreaterThanOrEqual(3);
-    expect(counts['leaf-nerve']).toBeGreaterThanOrEqual(3);
-    expect(counts['leaf-bop']).toBeLessThanOrEqual(5);
-    expect(counts['leaf-calathea']).toBeLessThanOrEqual(5);
-    expect(counts['leaf-monstera']).toBeLessThanOrEqual(5);
-    expect(counts['leaf-nerve']).toBeLessThanOrEqual(5);
-    expect(plants.some((plant) => plant.flip)).toBe(true);
-    expect(plants.some((plant) => plant.layer === 'back')).toBe(true);
-    expect(plants.some((plant) => plant.layer === 'front')).toBe(true);
-
-    const symbolsOn = (edge: 'left' | 'right' | 'bottom') =>
-      plants.filter((plant) => plant.edge === edge).map((plant) => plant.symbol);
-    expect(symbolsOn('left')).toEqual(
-      expect.arrayContaining(['leaf-bop', 'leaf-calathea', 'leaf-monstera']),
-    );
-    expect(symbolsOn('right')).toEqual(expect.arrayContaining(['leaf-monstera', 'leaf-calathea']));
-    expect(symbolsOn('bottom')).toEqual(
-      expect.arrayContaining(['leaf-calathea', 'leaf-nerve', 'leaf-monstera']),
-    );
+    expect(plants.length).toBeGreaterThanOrEqual(2);
+    expect(plants.length).toBeLessThanOrEqual(4);
+    expect(plants.every((plant) => plant.layer === 'front')).toBe(true);
+    expect(plants.some((plant) => plant.symbol === 'leaf-monstera')).toBe(true);
     expect(plants.filter((plant) => plant.edge === 'left').every((plant) => plant.x <= 0)).toBe(
       true,
     );
@@ -52,10 +32,10 @@ describe('greenhouseLayout', () => {
     );
   });
 
-  it('keeps the mobile home thicket to 8–10 plants on the top-right and bottom', () => {
+  it('keeps two mobile corner cutouts on the top-right and bottom', () => {
     const plants = layoutGreenhousePlants('home', 0, 'mobile');
-    expect(plants.length).toBeGreaterThanOrEqual(8);
-    expect(plants.length).toBeLessThanOrEqual(10);
+    expect(plants.length).toBeGreaterThanOrEqual(2);
+    expect(plants.length).toBeLessThanOrEqual(4);
     expect(plants.every((plant) => plant.edge === 'right' || plant.edge === 'bottom')).toBe(true);
     expect(plants.some((plant) => plant.edge === 'right')).toBe(true);
     expect(plants.some((plant) => plant.edge === 'bottom')).toBe(true);
@@ -116,5 +96,18 @@ describe('greenhouse safe zones', () => {
     const ids = homeSafeRects('mobile').map((rect) => rect.id);
     expect(ids).toEqual(['intro-copy', 'now-playing-copy']);
     expect(plantSafeZoneHits(layoutGreenhousePlants('home', 0, 'mobile'), 'mobile')).toEqual([]);
+  });
+
+  it('keeps tablet and ultrawide cutouts out of the copy wells', () => {
+    const plants = layoutGreenhousePlants('home', 0, 'desktop');
+    expect(plantSafeZoneHits(plants, 'tablet')).toEqual([]);
+    expect(plantSafeZoneHits(plants, 'ultrawide')).toEqual([]);
+  });
+
+  it('keeps the 68rem grid clear of edge strips on ultrawide', () => {
+    const inset = contentInset(2560);
+    const strip = edgeStripWidth(2560);
+    expect(inset).toBeGreaterThan((2560 - CONTENT_MAX_PX) / 2 - 1);
+    expect(strip).toBeLessThan(inset);
   });
 });

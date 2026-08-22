@@ -23,7 +23,7 @@ const cell = (slot: 'activity' | 'featured' | 'intro' | 'now-playing'): SxObject
       sm: slot === 'intro' || slot === 'now-playing' ? '1' : '2',
     },
     minHeight: {
-      sm: slot === 'intro' ? '40vh' : '13.5rem',
+      sm: slot === 'intro' ? 'auto' : '13.5rem',
       xs: 'auto',
     },
   },

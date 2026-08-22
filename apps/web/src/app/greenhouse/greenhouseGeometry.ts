@@ -1,6 +1,6 @@
 import type { LeafSymbol, PlantInstance } from './greenhouseLayout';
 
-export type GreenhouseViewportName = 'desktop' | 'mobile';
+export type GreenhouseViewportName = 'desktop' | 'mobile' | 'tablet' | 'ultrawide';
 
 export type ViewportSize = {
   height: number;
@@ -21,12 +21,20 @@ export type NamedRect = Rect & {
 export const GREENHOUSE_VIEWPORTS = {
   desktop: { height: 900, width: 1440 },
   mobile: { height: 844, width: 390 },
+  tablet: { height: 1366, width: 1024 },
+  ultrawide: { height: 1440, width: 2560 },
 } as const satisfies Record<GreenhouseViewportName, ViewportSize>;
 
 export const FEATURED_PLANT_MASS_VMIN = 34;
 export const REGULAR_PLANT_MASS_VMIN = 28;
 export const MOBILE_PLANT_MAX_VW = 0.72;
 export const PLANT_TRANSFORM_ORIGIN = { x: 0.5, y: 0.8 } as const;
+export const FOLIAGE_ALPHA_THRESHOLD = 24;
+export const CONTENT_MAX_PX = 68 * 16;
+export const EDGE_STRIP_MIN = 180;
+export const EDGE_STRIP_VW = 0.2;
+export const EDGE_STRIP_MAX = 440;
+export const SM_BREAKPOINT = 576;
 
 export const LEAF_ASPECT: Record<LeafSymbol, number> = {
   'leaf-bop': 1024 / 1536,
@@ -154,26 +162,103 @@ export function rectsIntersect(a: Rect, b: Rect): boolean {
   return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
 }
 
+export function contentInset(width: number): number {
+  const minPad = width < SM_BREAKPOINT ? 16 : 24;
+  return Math.max(minPad, (width - CONTENT_MAX_PX) / 2);
+}
+
+/** Matches `clamp(180px, 20vw, 440px)`. */
+export function edgeStripWidth(width: number): number {
+  return Math.min(EDGE_STRIP_MAX, Math.max(EDGE_STRIP_MIN, width * EDGE_STRIP_VW));
+}
+
+export function edgeStripRect(side: 'left' | 'right', viewport: ViewportSize): Rect {
+  const width = edgeStripWidth(viewport.width);
+  return {
+    height: viewport.height,
+    width,
+    x: side === 'left' ? 0 : viewport.width - width,
+    y: 0,
+  };
+}
+
+export function bottomBandHeight(viewport: ViewportSize): number {
+  const mobile = viewport.width < SM_BREAKPOINT;
+  return Math.min(mobile ? 260 : 420, viewport.height * (mobile ? 0.24 : 0.34));
+}
+
+export function bottomBandRect(viewport: ViewportSize): Rect {
+  const height = bottomBandHeight(viewport);
+  return { height, width: viewport.width, x: 0, y: viewport.height - height };
+}
+
+export function homeGrid(viewport: ViewportSize): {
+  col: number;
+  gutter: number;
+  left: number;
+  row1: number;
+  top: number;
+  twoCol: boolean;
+} {
+  const twoCol = viewport.width >= SM_BREAKPOINT;
+  const left = contentInset(viewport.width);
+  const gutter = twoCol ? 20 : 16;
+  const contentW = viewport.width - left * 2;
+  const col = twoCol ? (contentW - gutter) / 2 : contentW;
+  const top = twoCol ? HOME_DESKTOP_GRID.top : 96;
+  const row1 = twoCol ? Math.min(HOME_DESKTOP_GRID.row1, viewport.height * 0.36) : 280;
+  return { col, gutter, left, row1, top, twoCol };
+}
+
 /**
  * Tight copy wells — not whole cards. Plants may occupy corners, gutters,
  * and the viewport margins around these rects.
  */
 export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<NamedRect> {
-  if (viewport === 'desktop') {
-    const { col, gutter, left, row1, top } = HOME_DESKTOP_GRID;
-    const nowLeft = left + col + gutter;
-    const lowerTop = top + row1 + gutter;
+  const size = GREENHOUSE_VIEWPORTS[viewport];
+  const { col, gutter, left, row1, top, twoCol } = homeGrid(size);
+  if (!twoCol) {
     return [
-      { height: 320, id: 'intro-copy', width: 318, x: left + 22, y: top + 24 },
-      { height: 150, id: 'now-playing-copy', width: 300, x: nowLeft + 18, y: top + 14 },
-      { height: 50, id: 'activity-stats', width: 228, x: left + 10, y: lowerTop + 8 },
-      { height: 220, id: 'featured-copy', width: 390, x: nowLeft + 16, y: lowerTop + 12 },
+      { height: 240, id: 'intro-copy', width: Math.min(250, col - 24), x: left + 8, y: 260 },
+      { height: 118, id: 'now-playing-copy', width: Math.min(268, col - 24), x: left + 8, y: 700 },
     ];
   }
 
+  const nowLeft = left + col + gutter;
+  const lowerTop = top + row1 + gutter;
+  const strip = edgeStripWidth(size.width);
+  const introX = Math.max(left + 22, strip + 12);
+  const featuredRight = Math.min(nowLeft + 16 + Math.min(390, col - 32), size.width - strip - 12);
+  const featuredX = nowLeft + 16;
   return [
-    { height: 240, id: 'intro-copy', width: 250, x: 16, y: 260 },
-    { height: 118, id: 'now-playing-copy', width: 268, x: 16, y: 700 },
+    {
+      height: 300,
+      id: 'intro-copy',
+      width: Math.min(318, left + col - introX - 16),
+      x: introX,
+      y: top + 24,
+    },
+    {
+      height: 150,
+      id: 'now-playing-copy',
+      width: Math.min(300, col - 36),
+      x: nowLeft + 18,
+      y: top + 14,
+    },
+    {
+      height: 50,
+      id: 'activity-stats',
+      width: Math.min(228, col - 24),
+      x: Math.max(left + 10, strip + 8),
+      y: lowerTop + 8,
+    },
+    {
+      height: 200,
+      id: 'featured-copy',
+      width: Math.max(120, featuredRight - featuredX),
+      x: featuredX,
+      y: lowerTop + 12,
+    },
   ];
 }
 
@@ -193,4 +278,129 @@ export function plantSafeZoneHits(
     }
   }
   return hits;
+}
+
+function mapCover(
+  localX: number,
+  localY: number,
+  box: ViewportSize,
+  image: ViewportSize,
+  posX: number,
+  posY: number,
+): { x: number; y: number } | null {
+  const scale = Math.max(box.width / image.width, box.height / image.height);
+  const drawnWidth = image.width * scale;
+  const drawnHeight = image.height * scale;
+  const offsetX = (box.width - drawnWidth) * posX;
+  const offsetY = (box.height - drawnHeight) * posY;
+  const x = (localX - offsetX) / scale;
+  const y = (localY - offsetY) / scale;
+  if (x < 0 || y < 0 || x >= image.width || y >= image.height) {
+    return null;
+  }
+  return { x, y };
+}
+
+export function viewportToEdgeStrip(
+  vx: number,
+  vy: number,
+  viewport: ViewportSize,
+  image: ViewportSize,
+  side: 'left' | 'right',
+): { x: number; y: number } | null {
+  const box = edgeStripRect(side, viewport);
+  if (vx < box.x || vx >= box.x + box.width || vy < box.y || vy >= box.y + box.height) {
+    return null;
+  }
+  return mapCover(vx - box.x, vy - box.y, box, image, side === 'left' ? 0 : 1, 1);
+}
+
+export function viewportToBottomBand(
+  vx: number,
+  vy: number,
+  viewport: ViewportSize,
+  image: ViewportSize,
+): { x: number; y: number } | null {
+  const box = bottomBandRect(viewport);
+  if (vx < box.x || vx >= box.x + box.width || vy < box.y || vy >= box.y + box.height) {
+    return null;
+  }
+  const scale = box.height / image.height;
+  const tileWidth = image.width * scale;
+  const origin = viewport.width / 2 - tileWidth / 2;
+  let relX = vx - origin;
+  relX = ((relX % tileWidth) + tileWidth) % tileWidth;
+  const x = relX / scale;
+  const y = (vy - box.y) / scale;
+  if (x < 0 || y < 0 || x >= image.width || y >= image.height) {
+    return null;
+  }
+  return { x, y };
+}
+
+function sampleAlpha(
+  alpha: Uint8Array | Buffer,
+  image: ViewportSize,
+  mapped: { x: number; y: number },
+): number {
+  const px = Math.min(image.width - 1, Math.max(0, Math.round(mapped.x)));
+  const py = Math.min(image.height - 1, Math.max(0, Math.round(mapped.y)));
+  return alpha[py * image.width + px] ?? 0;
+}
+
+export type FoliageHit = { layer: string; rectId: string; x: number; y: number };
+
+function hitsInWells(
+  viewport: GreenhouseViewportName,
+  sample: (vx: number, vy: number) => number,
+  layer: string,
+): Array<FoliageHit> {
+  const hits: Array<FoliageHit> = [];
+  const stride = 4;
+  for (const safe of homeSafeRects(viewport)) {
+    const maxX = Math.floor(safe.x + safe.width);
+    const maxY = Math.floor(safe.y + safe.height);
+    found: for (let vy = Math.floor(safe.y); vy < maxY; vy += stride) {
+      for (let vx = Math.floor(safe.x); vx < maxX; vx += stride) {
+        if (sample(vx, vy) > FOLIAGE_ALPHA_THRESHOLD) {
+          hits.push({ layer, rectId: safe.id, x: vx, y: vy });
+          break found;
+        }
+      }
+    }
+  }
+  return hits;
+}
+
+export function edgeStripSafeZoneHits(
+  alpha: Uint8Array | Buffer,
+  image: ViewportSize,
+  side: 'left' | 'right',
+  viewport: GreenhouseViewportName,
+): ReadonlyArray<FoliageHit> {
+  const size = GREENHOUSE_VIEWPORTS[viewport];
+  return hitsInWells(
+    viewport,
+    (vx, vy) => {
+      const mapped = viewportToEdgeStrip(vx, vy, size, image, side);
+      return mapped ? sampleAlpha(alpha, image, mapped) : 0;
+    },
+    `edge-${side}`,
+  );
+}
+
+export function bottomBandSafeZoneHits(
+  alpha: Uint8Array | Buffer,
+  image: ViewportSize,
+  viewport: GreenhouseViewportName,
+): ReadonlyArray<FoliageHit> {
+  const size = GREENHOUSE_VIEWPORTS[viewport];
+  return hitsInWells(
+    viewport,
+    (vx, vy) => {
+      const mapped = viewportToBottomBand(vx, vy, size, image);
+      return mapped ? sampleAlpha(alpha, image, mapped) : 0;
+    },
+    'bottom-band',
+  );
 }

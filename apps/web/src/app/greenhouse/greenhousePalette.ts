@@ -7,13 +7,13 @@ import { FONT_DISPLAY_STACK, HEADING_FONT_SIZE_DISPLAY } from '@dg/ui/theme/typo
  * sans small-caps headings and frosted glass.
  */
 export const GREENHOUSE_TOKEN_VARS: SxObject = {
-  '--card-backdrop-filter': 'blur(18px) saturate(130%)',
-  '--card-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 54%, transparent)',
+  '--card-backdrop-filter': 'blur(20px) saturate(1.2)',
+  '--card-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 42%, transparent)',
   '--card-box-shadow':
     'inset 0 1.5px 0 color-mix(in srgb, white 82%, transparent), inset 0 0 0 1px color-mix(in srgb, white 34%, transparent), inset 0 -1px 0 color-mix(in srgb, black 6%, transparent), 0 22px 48px color-mix(in srgb, black 28%, transparent), 0 8px 18px color-mix(in srgb, black 16%, transparent)',
   '--font-display': FONT_DISPLAY_STACK,
-  '--glass-backdrop-filter': 'blur(18px) saturate(130%)',
-  '--glass-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 54%, transparent)',
+  '--glass-backdrop-filter': 'blur(20px) saturate(1.2)',
+  '--glass-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 42%, transparent)',
   '--greenhouse-gutter': '1.25rem',
   '--heading-font-size': HEADING_FONT_SIZE_DISPLAY,
   '--heading-font-stretch': 'normal',
@@ -48,28 +48,18 @@ export const GREENHOUSE_LEAF_VARS: SxObject = {
 };
 
 const atmospherePair = {
-  mullion: ['hsl(32deg, 14%, 28%)', 'hsl(0deg, 0%, 72%)'],
-  mullionEdge: ['hsl(48deg 40% 92% / 0.7)', 'hsl(0deg 0% 100% / 0.18)'],
-  mullionHighlight: ['hsl(42deg, 28%, 78%)', 'hsl(0deg, 0%, 88%)'],
-  mullionShade: ['hsl(28deg, 16%, 16%)', 'hsl(0deg, 0%, 14%)'],
   ribDark: ['hsl(80deg 22% 28% / 0.28)', 'hsl(160deg 12% 80% / 0.2)'],
   ribMid: ['hsl(70deg 18% 58% / 0.1)', 'hsl(160deg 14% 24% / 0.22)'],
   ribShine: ['hsl(48deg 70% 96% / 0.42)', 'hsl(40deg 18% 36% / 0.18)'],
-  sunCore: ['hsl(48deg 100% 97% / 1)', 'hsl(40deg 86% 62% / 0.62)'],
-  sunHalo: ['hsl(46deg 96% 80% / 0.78)', 'hsl(38deg 58% 38% / 0.34)'],
+  sunCore: ['hsl(48deg 100% 97% / 0.7)', 'hsl(40deg 86% 62% / 0.4)'],
   wash: ['hsl(62deg, 22%, 48%)', 'hsl(158deg, 26%, 9%)'],
 } as const;
 
 export const GREENHOUSE_ATMOSPHERE_VARS: SxObject = {
-  '--greenhouse-mullion': lightDark(atmospherePair.mullion),
-  '--greenhouse-mullion-edge': lightDark(atmospherePair.mullionEdge),
-  '--greenhouse-mullion-highlight': lightDark(atmospherePair.mullionHighlight),
-  '--greenhouse-mullion-shade': lightDark(atmospherePair.mullionShade),
   '--greenhouse-rib-dark': lightDark(atmospherePair.ribDark),
   '--greenhouse-rib-mid': lightDark(atmospherePair.ribMid),
   '--greenhouse-rib-shine': lightDark(atmospherePair.ribShine),
   '--greenhouse-sun-core': lightDark(atmospherePair.sunCore),
-  '--greenhouse-sun-halo': lightDark(atmospherePair.sunHalo),
   '--greenhouse-wash': lightDark(atmospherePair.wash),
 };
 

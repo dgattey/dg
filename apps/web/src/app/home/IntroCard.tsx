@@ -52,17 +52,14 @@ const introTextSx: SxObject = {
 };
 
 const composedCardSx: SxObject = {
-  background: 'color-mix(in srgb, var(--mui-palette-background-paper) 52%, transparent)',
+  backdropFilter: 'var(--card-backdrop-filter)',
+  background: 'var(--card-bg)',
   borderColor: 'color-mix(in srgb, var(--mui-palette-common-white) 48%, transparent)',
-  boxShadow: `
-    inset 0 1.5px 0 color-mix(in srgb, var(--mui-palette-common-white) 84%, transparent),
-    inset 0 0 0 1px color-mix(in srgb, var(--mui-palette-common-white) 28%, transparent),
-    0 18px 40px color-mix(in srgb, var(--mui-palette-common-black) 12%, transparent)
-  `,
+  boxShadow: 'var(--card-box-shadow)',
   display: 'flex',
-  minHeight: { sm: '40vh', xs: 'auto' },
+  minHeight: 'auto',
   overflow: 'visible',
-  padding: { sm: '2.05rem 1.55rem 1.45rem 1.9rem', xs: '1.5rem 1.25rem' },
+  padding: { sm: '1.45rem 1.35rem 1.15rem 1.5rem', xs: '1.2rem 1.1rem' },
   width: '100%',
 };
 
@@ -76,7 +73,8 @@ const composedLayoutSx: SxObject = {
 
 const composedCopySx: SxObject = {
   flex: '1 1 58%',
-  justifyContent: 'space-between',
+  gap: 1.25,
+  justifyContent: 'flex-start',
   minWidth: 0,
   py: { md: 0.25, xs: 0 },
 };
