@@ -1,4 +1,4 @@
-import type { LeafSymbol, PlantInstance } from './greenhouseLayout';
+import type { GreenhouseSurface, LeafSymbol, PlantInstance } from './greenhouseLayout';
 
 export type GreenhouseViewportName = 'desktop' | 'mobile' | 'tablet' | 'ultrawide';
 
@@ -140,6 +140,10 @@ export function plantHeightPx(plant: PlantInstance, viewport: ViewportSize): num
   return plantWidthPx(plant, viewport) / LEAF_ASPECT[plant.symbol];
 }
 
+/**
+ * CSS box for a plant on the visual viewport. Chrome is `position: fixed`,
+ * so pass the viewport size — not the document height — even on long music pages.
+ */
 export function plantCssBox(plant: PlantInstance, viewport: ViewportSize): Rect {
   const width = plantWidthPx(plant, viewport);
   const height = plantHeightPx(plant, viewport);
@@ -397,12 +401,28 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
   ];
 }
 
+/**
+ * Safe wells for a surface. Plants stay pinned to the visual viewport, so
+ * these rects never grow with document height. Music only protects the
+ * header; page copy is the music worker's layout.
+ */
+export function surfaceSafeRects(
+  surface: GreenhouseSurface,
+  viewport: GreenhouseViewportName,
+): ReadonlyArray<NamedRect> {
+  if (surface === 'home') {
+    return homeSafeRects(viewport);
+  }
+  return [headerControlsRect(GREENHOUSE_VIEWPORTS[viewport])];
+}
+
 export function plantSafeZoneHits(
   plants: ReadonlyArray<PlantInstance>,
   viewport: GreenhouseViewportName,
+  surface: GreenhouseSurface = 'home',
 ): ReadonlyArray<{ plantId: string; rectId: string }> {
   const size = GREENHOUSE_VIEWPORTS[viewport];
-  const safes = homeSafeRects(viewport);
+  const safes = surfaceSafeRects(surface, viewport);
   const hits: Array<{ plantId: string; rectId: string }> = [];
   for (const plant of plants) {
     const aabb = plantOpaqueAabb(plant, size);

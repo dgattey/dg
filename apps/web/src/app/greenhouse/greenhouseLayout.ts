@@ -2,7 +2,7 @@ export const LEAF_SYMBOLS = ['leaf-calathea', 'leaf-nerve', 'leaf-bop', 'leaf-mo
 
 export type LeafSymbol = (typeof LEAF_SYMBOLS)[number];
 
-export type GreenhouseSurface = 'home' | '/music' | '/music/albums';
+export type GreenhouseSurface = 'home' | 'music';
 
 export type GreenhouseViewport = 'desktop' | 'mobile';
 
@@ -89,7 +89,7 @@ const HOME_MOBILE: ReadonlyArray<PlantSpec> = [
 ];
 
 const COMPOSITIONS: Record<GreenhouseSurface, ReadonlyArray<PlantSpec>> = {
-  '/music': [
+  music: [
     {
       cluster: 'vine',
       edge: 'left',
@@ -133,52 +133,6 @@ const COMPOSITIONS: Record<GreenhouseSurface, ReadonlyArray<PlantSpec>> = {
       symbol: 'leaf-nerve',
       x: -6,
       y: 62,
-    },
-  ],
-  '/music/albums': [
-    {
-      cluster: 'side',
-      edge: 'right',
-      featured: false,
-      layer: 'back',
-      rotate: 12,
-      scale: 1.1,
-      symbol: 'leaf-monstera',
-      x: -16,
-      y: 12,
-    },
-    {
-      cluster: 'corner',
-      edge: 'left',
-      featured: true,
-      layer: 'front',
-      rotate: -12,
-      scale: 1.15,
-      symbol: 'leaf-calathea',
-      x: -10,
-      y: 52,
-    },
-    {
-      cluster: 'corner',
-      edge: 'right',
-      featured: false,
-      layer: 'front',
-      rotate: 16,
-      scale: 0.95,
-      symbol: 'leaf-nerve',
-      x: -8,
-      y: 64,
-    },
-    {
-      cluster: 'vine',
-      edge: 'bottom',
-      featured: false,
-      layer: 'front',
-      rotate: -8,
-      scale: 1.05,
-      symbol: 'leaf-bop',
-      x: -4,
-      y: -10,
     },
   ],
   home: HOME_DESKTOP,

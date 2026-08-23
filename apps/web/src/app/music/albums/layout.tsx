@@ -8,6 +8,7 @@ import { Suspense } from 'react';
 import { getFavoriteAlbums } from '../../../services/albums';
 import { markdownAlternates } from '../../layouts/markdownAlternates';
 import { musicDestinationLabel } from '../../layouts/musicHeaderDestinations';
+import { GreenhouseSurface } from '../../greenhouse/GreenhouseSurface';
 import { PageTitle } from '../../layouts/PageTitle';
 import { FavoriteAlbumsGrid } from './FavoriteAlbumsGrid';
 import { FavoriteAlbumsSkeleton } from './FavoriteAlbumsSkeleton';
@@ -47,11 +48,11 @@ async function AlbumsGrid({ children }: { children: ReactNode }) {
  */
 export default function FavoriteAlbumsLayout({ children }: { children: ReactNode }) {
   return (
-    <>
+    <GreenhouseSurface surface="music">
       <PageTitle>{TITLE}</PageTitle>
       <Suspense fallback={<FavoriteAlbumsSkeleton />}>
         <AlbumsGrid>{children}</AlbumsGrid>
       </Suspense>
-    </>
+    </GreenhouseSurface>
   );
 }

@@ -21,9 +21,9 @@ type GreenhouseFrameProps = {
 };
 
 /**
- * Shared greenhouse shell. Tokens (display serif, matte glass) always apply.
- * Atmosphere and plants are optional so other routes can wrap later with the
- * same vocabulary.
+ * Shared greenhouse shell. `surface` selects the plant layout (`home` vs
+ * `music`). Tokens always apply; chrome is optional so other routes can wrap
+ * later with the same vocabulary.
  */
 export function GreenhouseFrame({ children, surface, chrome = true }: GreenhouseFrameProps) {
   const desktopPlants = chrome ? layoutGreenhousePlants(surface, 0, 'desktop') : [];

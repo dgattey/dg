@@ -9,6 +9,7 @@ import { Suspense } from 'react';
 import { getMusicHistory } from '../../services/music';
 import { markdownAlternates } from '../layouts/markdownAlternates';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
+import { GreenhouseSurface } from '../greenhouse/GreenhouseSurface';
 import { PageTitle } from '../layouts/PageTitle';
 import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
@@ -52,11 +53,11 @@ async function MusicHistory() {
  */
 export default function MusicPage() {
   return (
-    <>
+    <GreenhouseSurface surface="music">
       <PageTitle>{TITLE}</PageTitle>
       <Suspense fallback={<MusicHistorySkeleton />}>
         <MusicHistory />
       </Suspense>
-    </>
+    </GreenhouseSurface>
   );
 }

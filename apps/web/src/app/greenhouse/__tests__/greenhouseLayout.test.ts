@@ -5,7 +5,9 @@ import {
   GREENHOUSE_VIEWPORTS,
   homeGrid,
   homeSafeRects,
+  plantOpaqueAabb,
   plantSafeZoneHits,
+  surfaceSafeRects,
 } from '../greenhouseGeometry';
 import { LEAF_SYMBOLS, layoutGreenhousePlants } from '../greenhouseLayout';
 
@@ -50,17 +52,15 @@ describe('greenhouseLayout', () => {
   });
 
   it('does not reuse one composition across surfaces', () => {
-    expect(layoutGreenhousePlants('home')).not.toEqual(layoutGreenhousePlants('/music'));
-    expect(layoutGreenhousePlants('/music')).not.toEqual(layoutGreenhousePlants('/music/albums'));
+    expect(layoutGreenhousePlants('home')).not.toEqual(layoutGreenhousePlants('music'));
   });
 
   it('features a different species per surface', () => {
-    const featuredOf = (surface: 'home' | '/music' | '/music/albums') =>
+    const featuredOf = (surface: 'home' | 'music') =>
       layoutGreenhousePlants(surface).find((plant) => plant.featured)?.symbol;
 
     expect(featuredOf('home')).toBe('leaf-monstera');
-    expect(featuredOf('/music')).toBe('leaf-bop');
-    expect(featuredOf('/music/albums')).toBe('leaf-calathea');
+    expect(featuredOf('music')).toBe('leaf-bop');
   });
 
   it('hangs plants from viewport edges instead of scattering over copy', () => {
@@ -128,6 +128,24 @@ describe('greenhouse safe zones', () => {
     const ids = homeSafeRects('mobile').map((rect) => rect.id);
     expect(ids).toEqual(['intro-copy', 'now-playing-copy', 'header-controls']);
     expect(plantSafeZoneHits(layoutGreenhousePlants('home', 0, 'mobile'), 'mobile')).toEqual([]);
+  });
+
+  it('pins music chrome to the visual viewport on tall pages', () => {
+    const plants = layoutGreenhousePlants('music');
+    const viewport = GREENHOUSE_VIEWPORTS.desktop;
+    for (const plant of plants) {
+      const box = plantOpaqueAabb(plant, viewport);
+      expect(box.y).toBeLessThan(viewport.height);
+      expect(box.y + box.height).toBeGreaterThan(0);
+    }
+    for (const rect of surfaceSafeRects('music', 'desktop')) {
+      expect(rect.y + rect.height).toBeLessThanOrEqual(viewport.height);
+    }
+    expect(surfaceSafeRects('music', 'desktop').map((rect) => rect.id)).toEqual([
+      'header-controls',
+    ]);
+    expect(plantSafeZoneHits(plants, 'desktop', 'music')).toEqual([]);
+    expect(plantSafeZoneHits(plants, 'mobile', 'music')).toEqual([]);
   });
 
   it('keeps tablet and ultrawide cutouts out of the copy wells', () => {
