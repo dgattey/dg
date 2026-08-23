@@ -198,3 +198,25 @@ export function stitchOffsets(frames: ReadonlyArray<StitchFrame>): ReadonlyArray
   }
   return offsets;
 }
+
+/**
+ * True viewport stops for a filmstrip. A stitched PNG cannot honestly show a
+ * fixed photographic plate, so we keep each settled viewport intact.
+ */
+export function planFilmstripStops(
+  scrollHeight: number,
+  viewportHeight: number,
+): ReadonlyArray<number> {
+  if (viewportHeight <= 0 || scrollHeight <= 0) {
+    throw new StitchSeamError(`invalid metrics vh=${viewportHeight} sh=${scrollHeight}`);
+  }
+  const maxScroll = Math.max(0, scrollHeight - viewportHeight);
+  const stops = [0];
+  for (let y = viewportHeight; y < maxScroll - 1; y += viewportHeight) {
+    stops.push(y);
+  }
+  if (maxScroll > 0 && stops.at(-1) !== maxScroll) {
+    stops.push(maxScroll);
+  }
+  return stops;
+}

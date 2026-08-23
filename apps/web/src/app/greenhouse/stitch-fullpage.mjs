@@ -1,24 +1,19 @@
 /**
- * Seam-proof full-page stitcher for greenhouse photography.
+ * Greenhouse photography driver.
  *
  * Motion off: Playwright `emulateMedia({ reducedMotion: 'reduce' })` plus a
- * global animation/transition kill. Crop uses the browser's actual scrollY.
- * Fixed header is cropped from frames 2..n. Fixed bottom foliage is cropped
- * from every frame except the last (thicket once, at the true page end).
+ * global animation/transition kill. After each scrollTo, wait until scrollY
+ * is stable across two rAFs and fonts.ready.
  *
- *   node --experimental-strip-types stitch-fullpage.mjs --final2
+ * `--final3` writes a filmstrip of true viewport frames (the fixed plate
+ * cannot be stitched honestly) plus individual `s{N}` folds.
+ *
+ *   node --experimental-strip-types stitch-fullpage.mjs --final3
  *   node --experimental-strip-types stitch-fullpage.mjs --url … --out … --width 1440 --height 900
  */
 import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import {
-  assertFrameAbutment,
-  assertHeadingsOnce,
-  headingInFrame,
-  planStitchFrames,
-  realizeFrame,
-  stitchOffsets,
-} from './greenhouseStitch.ts';
+import { planFilmstripStops } from './greenhouseStitch.ts';
 
 const OUT = process.env.FOLIAGE_OUT || '/opt/cursor/artifacts/foliage';
 const STORE = '/cursor/stores/bc-a78ceb1c-cd13-4ea5-bacd-55a94f7b77db/media';
@@ -44,15 +39,17 @@ async function loadPlaywright() {
       // try next
     }
   }
-  throw new Error('Playwright is not installed. Set PLAYWRIGHT_MODULE or npm i -C /tmp/pw playwright');
+  throw new Error(
+    'Playwright is not installed. Set PLAYWRIGHT_MODULE or npm i -C /tmp/pw playwright',
+  );
 }
 
 function parseArgs(argv) {
-  const args = { dpr: 2, final2: false, height: 900, out: '', url: '', width: 1440 };
+  const args = { dpr: 2, final3: false, height: 900, out: '', url: '', width: 1440 };
   for (let i = 0; i < argv.length; i += 1) {
     const key = argv[i];
     const next = argv[i + 1];
-    if (key === '--final2') args.final2 = true;
+    if (key === '--final3') args.final3 = true;
     else if (key === '--url') args.url = next;
     else if (key === '--out') args.out = next;
     else if (key === '--width') args.width = Number(next);
@@ -63,7 +60,7 @@ function parseArgs(argv) {
 }
 
 async function waitStableScroll(page, top) {
-  return page.evaluate(async (desired) => {
+  return await page.evaluate(async (desired) => {
     window.scrollTo(0, desired);
     if (document.fonts?.ready) {
       await document.fonts.ready.catch(() => null);
@@ -85,14 +82,16 @@ async function waitStableScroll(page, top) {
 }
 
 async function measureChrome(page) {
-  return page.evaluate(() => {
+  return await page.evaluate(() => {
     const header = document.querySelector('[data-site-header], header');
     const headerHeight = header ? Math.ceil(header.getBoundingClientRect().height) : 0;
     const frame = document.querySelector('[data-greenhouse-frame]');
     const cssFringe = frame
       ? Number.parseFloat(getComputedStyle(frame).getPropertyValue('--greenhouse-fringe'))
       : 0;
-    const fringeHeight = Math.ceil((Number.isFinite(cssFringe) && cssFringe > 0 ? cssFringe : 81) + 28);
+    const fringeHeight = Math.ceil(
+      (Number.isFinite(cssFringe) && cssFringe > 0 ? cssFringe : 81) + 28,
+    );
     return {
       fringeHeight,
       headerHeight,
@@ -102,39 +101,20 @@ async function measureChrome(page) {
   });
 }
 
-async function collectHeadings(page) {
-  return page.evaluate(() => {
-    const nodes = [...document.querySelectorAll('h1, h2, h3, h4, h5, [role="heading"]')];
-    return nodes
-      .map((el) => {
-        const box = el.getBoundingClientRect();
-        const style = getComputedStyle(el);
-        const text = (el.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 80);
-        if (!text || box.width < 2 || box.height < 2 || style.visibility === 'hidden') {
-          return null;
-        }
-        const sticky =
-          style.position === 'sticky' ||
-          style.position === 'fixed' ||
-          Boolean(el.closest('header, [data-site-header]'));
-        const docY = sticky ? box.y : window.scrollY + box.y;
-        return {
-          height: box.height,
-          id: `${text}@${Math.round(docY)}`,
-          sticky,
-          width: box.width,
-          x: box.x,
-          y: box.y,
-        };
-      })
-      .filter(Boolean);
-  });
+const FILMSTRIP_GAP_CSS = 24;
+const FILMSTRIP_GAP_COLOR = { alpha: 1, b: 230, g: 239, r: 244 };
+
+async function loadSharp() {
+  const sharpMod = await import(
+    '/workspace/node_modules/.pnpm/sharp@0.34.5/node_modules/sharp/lib/index.js'
+  );
+  return sharpMod.default;
 }
 
-async function stitchPage(page, { url, width, height, dpr = 2 }) {
-  await page.setViewportSize({ width, height });
+async function filmstripPage(page, { url, width, height, dpr = 2 }) {
+  await page.setViewportSize({ height, width });
   await page.emulateMedia({ reducedMotion: 'reduce' });
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 });
+  await page.goto(url, { timeout: 60000, waitUntil: 'domcontentloaded' });
   await page.waitForSelector('main, [data-greenhouse-frame]', { timeout: 20000 }).catch(() => null);
   await page.addStyleTag({ content: KILL_MOTION });
   await page.evaluate(async () => {
@@ -143,92 +123,52 @@ async function stitchPage(page, { url, width, height, dpr = 2 }) {
   await page.evaluate(() => new Promise((resolve) => setTimeout(resolve, 800)));
 
   const metrics = await measureChrome(page);
-  const planned = planStitchFrames({
-    fringeHeight: metrics.fringeHeight,
-    headerHeight: metrics.headerHeight,
-    scrollHeight: metrics.scrollHeight,
-    viewportHeight: metrics.innerH || height,
-  });
-
-  const realized = [];
-  const appearances = [];
-  const pngs = [];
-  let covered = 0;
   const vh = metrics.innerH || height;
+  const planned = planFilmstripStops(metrics.scrollHeight, vh);
+  const stops = [];
+  const pngs = [];
 
-  for (const step of planned) {
-    const actual = await waitStableScroll(page, step.scrollY);
-    const frame = realizeFrame(step, actual, covered, vh);
-    realized.push(frame);
-    const shot = await page.screenshot({
-      animations: 'disabled',
-      caret: 'hide',
-      scale: 'device',
-      type: 'png',
-    });
-    pngs.push(shot);
-    covered = frame.docBottom;
-  }
-
-  assertFrameAbutment(realized);
-  const offsets = stitchOffsets(realized);
-  for (let i = 0; i < realized.length; i += 1) {
-    await waitStableScroll(page, realized[i].scrollY);
-    const headings = await collectHeadings(page);
-    for (const heading of headings) {
-      const hit = headingInFrame(heading, realized[i], offsets[i], vh);
-      if (hit) appearances.push(hit);
+  for (const desired of planned) {
+    const actual = await waitStableScroll(page, desired);
+    if (stops.length > 0 && actual === stops.at(-1)) {
+      continue;
     }
-  }
-  assertHeadingsOnce(appearances);
-
-  const sharpMod = await import(
-    '/workspace/node_modules/.pnpm/sharp@0.34.5/node_modules/sharp/lib/index.js'
-  );
-  const sharp = sharpMod.default;
-  const strips = [];
-  for (let i = 0; i < pngs.length; i += 1) {
-    const meta = await sharp(pngs[i]).metadata();
-    const imgH = meta.height ?? 0;
-    const imgW = meta.width ?? 0;
-    const top = Math.round(realized[i].cropTop * dpr);
-    const bottom = Math.round(realized[i].cropBottom * dpr);
-    const extractH = Math.max(1, imgH - top - bottom);
-    if (top + extractH > imgH) {
-      throw new Error(`crop overflow frame ${i}: top=${top} h=${extractH} img=${imgH}`);
-    }
-    strips.push(
-      await sharp(pngs[i])
-        .extract({ height: extractH, left: 0, top, width: imgW })
-        .png()
-        .toBuffer(),
+    stops.push(actual);
+    pngs.push(
+      await page.screenshot({
+        animations: 'disabled',
+        caret: 'hide',
+        scale: 'device',
+        type: 'png',
+      }),
     );
   }
 
-  const metas = await Promise.all(strips.map((buf) => sharp(buf).metadata()));
+  const sharp = await loadSharp();
+  const metas = await Promise.all(pngs.map((buf) => sharp(buf).metadata()));
   const widthPx = Math.max(...metas.map((item) => item.width ?? 0));
   const heights = metas.map((item) => item.height ?? 0);
-  const total = heights.reduce((sum, value) => sum + value, 0);
+  const gap = FILMSTRIP_GAP_CSS * dpr;
+  const total = heights.reduce((sum, value) => sum + value, 0) + gap * Math.max(0, pngs.length - 1);
   const composites = [];
   let top = 0;
-  for (let i = 0; i < strips.length; i += 1) {
-    composites.push({ input: strips[i], left: 0, top });
-    top += heights[i];
+  for (let i = 0; i < pngs.length; i += 1) {
+    composites.push({ input: pngs[i], left: 0, top });
+    top += heights[i] + gap;
   }
   const png = await sharp({
-    create: { background: { alpha: 1, b: 17, g: 17, r: 17 }, channels: 4, height: total, width: widthPx },
+    create: {
+      background: FILMSTRIP_GAP_COLOR,
+      channels: 4,
+      height: Math.max(1, total),
+      width: widthPx,
+    },
   })
     .composite(composites)
     .png()
     .toBuffer();
 
-  return {
-    appearances: appearances.length,
-    frames: realized,
-    headings: new Set(appearances.map((item) => item.id)).size,
-    metrics,
-    png,
-  };
+  return { metrics, png, pngs, stops };
 }
 
 function writeRetry(path, buf, tries = 4) {
@@ -259,23 +199,13 @@ function writeBoth(name, buf) {
   }
 }
 
-const FINAL2 = [
-  { height: 900, name: 'final2-home-1440.png', url: `${BASE}/greenhouse/m1-shot`, width: 1440 },
-  { height: 844, name: 'final2-home-390.png', url: `${BASE}/greenhouse/m1-shot`, width: 390 },
-  { height: 900, name: 'final2-music-1440.png', url: `${BASE}/greenhouse/music-shot`, width: 1440 },
-  { height: 844, name: 'final2-music-390.png', url: `${BASE}/greenhouse/music-shot`, width: 390 },
-  {
-    height: 900,
-    name: 'final2-albums-1440.png',
-    url: `${BASE}/greenhouse/music-shot?view=albums`,
-    width: 1440,
-  },
-  {
-    height: 844,
-    name: 'final2-albums-390.png',
-    url: `${BASE}/greenhouse/music-shot?view=albums`,
-    width: 390,
-  },
+const FINAL3 = [
+  { height: 900, route: 'home', url: `${BASE}/greenhouse/m1-shot`, width: 1440 },
+  { height: 844, route: 'home', url: `${BASE}/greenhouse/m1-shot`, width: 390 },
+  { height: 900, route: 'music', url: `${BASE}/greenhouse/music-shot`, width: 1440 },
+  { height: 844, route: 'music', url: `${BASE}/greenhouse/music-shot`, width: 390 },
+  { height: 900, route: 'albums', url: `${BASE}/greenhouse/music-shot?view=albums`, width: 1440 },
+  { height: 844, route: 'albums', url: `${BASE}/greenhouse/music-shot?view=albums`, width: 390 },
 ];
 
 const args = parseArgs(process.argv.slice(2));
@@ -292,30 +222,28 @@ const context = await browser.newContext({
 const page = await context.newPage();
 
 try {
-  const jobs = args.final2
-    ? FINAL2
-    : [{ height: args.height, name: args.out, url: args.url, width: args.width }];
+  const jobs = args.final3
+    ? FINAL3
+    : [{ height: args.height, name: args.out, route: '', url: args.url, width: args.width }];
   for (const job of jobs) {
-    if (!job.url || !job.name) {
-      throw new Error('need --url and --out (or --final2)');
+    if (!job.url || !(job.route || job.name)) {
+      throw new Error('need --url and --out (or --final3)');
     }
-    console.log('stitch', job.name, job.url, `${job.width}x${job.height}`);
-    const result = await stitchPage(page, { dpr: args.dpr, ...job });
-    const dest = job.name.startsWith('/') ? job.name : job.name;
-    writeBoth(dest, result.png);
-    console.log(
-      JSON.stringify({
-        check: 'passed',
-        frames: result.frames.map((frame) => ({
-          crop: [frame.cropTop, frame.cropBottom],
-          doc: [Math.round(frame.docTop), Math.round(frame.docBottom)],
-          y: Math.round(frame.scrollY),
-        })),
-        headings: result.headings,
-        metrics: result.metrics,
-        name: dest,
+    const prefix = job.route ? `final3-${job.route}-${job.width}` : job.name.replace(/\.png$/, '');
+    process.stdout.write(`filmstrip ${prefix} ${job.url} ${job.width}x${job.height}\n`);
+    const result = await filmstripPage(page, { dpr: args.dpr, ...job });
+    result.pngs.forEach((buf, index) => {
+      writeBoth(`${prefix}-s${index + 1}.png`, buf);
+    });
+    writeBoth(job.route ? `${prefix}-filmstrip.png` : job.name, result.png);
+    process.stdout.write(
+      `${JSON.stringify({
         bytes: result.png.length,
-      }),
+        check: 'passed',
+        frames: result.stops.map((y, index) => ({ n: index + 1, y: Math.round(y) })),
+        metrics: result.metrics,
+        name: job.route ? `${prefix}-filmstrip.png` : job.name,
+      })}\n`,
     );
   }
 } finally {

@@ -2,6 +2,7 @@ import {
   assertFrameAbutment,
   assertHeadingsOnce,
   headingInFrame,
+  planFilmstripStops,
   planStitchFrames,
   realizeFrame,
   StitchSeamError,
@@ -94,5 +95,12 @@ describe('greenhouse stitch plan', () => {
       throw new Error('expected the heading to split across abutting frames');
     }
     expect(() => assertHeadingsOnce([a, b])).not.toThrow();
+  });
+
+  it('plans filmstrip stops at scroll 0, each viewport, and page end', () => {
+    expect(planFilmstripStops(1673, 900)).toEqual([0, 773]);
+    expect(planFilmstripStops(3152, 844)).toEqual([0, 844, 1688, 2308]);
+    expect(planFilmstripStops(1994, 900)).toEqual([0, 900, 1094]);
+    expect(planFilmstripStops(800, 900)).toEqual([0]);
   });
 });
