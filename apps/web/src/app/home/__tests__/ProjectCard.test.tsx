@@ -69,4 +69,16 @@ describe('ProjectCard', () => {
     expect(source).toContain("overflowWrap: 'normal'");
     expect(source).toContain("objectFit: 'contain'");
   });
+
+  it('keeps every tag as a chip that cannot shrink off its pill', () => {
+    render(<ProjectCard {...project} variant="featured" />);
+    const typescript = screen.getByText('TypeScript');
+    const react = screen.getByText('React');
+    expect(typescript).toHaveClass('MuiChip-label');
+    expect(react).toHaveClass('MuiChip-label');
+    expect(typescript.closest('.MuiChip-root')).toBeTruthy();
+    expect(react.closest('.MuiChip-root')).toBeTruthy();
+    const source = readFileSync(join(__dirname, '../ProjectCard.tsx'), 'utf8');
+    expect(source).toContain('flexShrink: 0');
+  });
 });

@@ -121,9 +121,17 @@ const featuredBlurbSx: SxObject = {
 };
 
 const featuredTagsSx: SxObject = {
+  alignItems: 'center',
   flexDirection: 'row',
   flexWrap: 'wrap',
   gap: 0.75,
+  minWidth: 0,
+  width: '100%',
+};
+
+const featuredChipSx: SxObject = {
+  flexShrink: 0,
+  maxWidth: '100%',
 };
 
 const emptyRichTextLinks = {
@@ -205,7 +213,7 @@ function FeaturedProjectCard({
           {tags.length > 0 ? (
             <Stack sx={featuredTagsSx}>
               {tags.map((tag) => (
-                <Chip key={tag} label={tag} size="small" />
+                <Chip key={tag} label={tag} size="small" sx={featuredChipSx} />
               ))}
             </Stack>
           ) : null}
