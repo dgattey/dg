@@ -1,13 +1,22 @@
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
-import { Children } from 'react';
+import type { ReactNode } from 'react';
 import styles from '../../greenhouse/greenhouse.module.css';
 
-type Props = Pick<React.ComponentProps<'div'>, 'children'>;
+const SLOTS = ['intro', 'now-playing', 'albums', 'history', 'tracks', 'artists'] as const;
 
-const SLOTS = ['intro', 'now-playing', 'albums', 'tracks', 'artists'] as const;
+type Slot = (typeof SLOTS)[number];
 
-const cellLayout = (slot: (typeof SLOTS)[number]): SxObject => {
+type Props = {
+  intro: ReactNode;
+  nowPlaying: ReactNode;
+  albums?: ReactNode;
+  history?: ReactNode;
+  tracks?: ReactNode;
+  artists?: ReactNode;
+};
+
+const cellLayout = (slot: Slot): SxObject => {
   switch (slot) {
     case 'intro':
       return {
@@ -27,30 +36,50 @@ const cellLayout = (slot: (typeof SLOTS)[number]): SxObject => {
         gridColumn: '1 / -1',
         gridRow: { xl: '2', xs: 'auto' },
       };
+    case 'history':
+      return {
+        gridColumn: '1 / -1',
+        gridRow: { xl: '3', xs: 'auto' },
+      };
     case 'tracks':
       return {
         gridColumn: { md: 'span 6', xs: '1 / -1' },
-        gridRow: { xl: '3', xs: 'auto' },
+        gridRow: { xl: '4', xs: 'auto' },
       };
     case 'artists':
       return {
         gridColumn: { md: 'span 6', xs: '1 / -1' },
-        gridRow: { xl: '3', xs: 'auto' },
+        gridRow: { xl: '4', xs: 'auto' },
       };
   }
 };
 
 /**
- * 12-col music greenhouse. Desktop is intro 4 + landscape hero 8, on-repeat
- * full width, then tracks 6 / artists 6. Does not use the home `.nowPlaying`
- * 75cqi min-height — that cell is a portrait tile.
+ * 12-col music greenhouse. Named slots so a missing on-repeat / list card
+ * does not shift later cells. Desktop is intro 4 + landscape hero 8, on-repeat
+ * full width, listening history full width, then tracks 6 / artists 6.
  */
-export function MusicGreenhouseGrid({ children }: Props) {
-  const items = Children.toArray(children);
+export function MusicGreenhouseGrid({
+  intro,
+  nowPlaying,
+  albums,
+  history,
+  tracks,
+  artists,
+}: Props) {
+  const slotted: Record<Slot, ReactNode> = {
+    albums,
+    artists,
+    history,
+    intro,
+    'now-playing': nowPlaying,
+    tracks,
+  };
+
   return (
     <Box className={styles.grid} data-greenhouse-grid="music">
-      {SLOTS.map((slot, index) => {
-        const child = items[index];
+      {SLOTS.map((slot) => {
+        const child = slotted[slot];
         if (!child) {
           return null;
         }

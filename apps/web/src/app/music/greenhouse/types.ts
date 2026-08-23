@@ -1,5 +1,6 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import type { Track } from '@dg/content-models/spotify/Track';
+import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
 
 export type RankedTrack = {
   artist: string;
@@ -31,6 +32,8 @@ export type MusicGreenhouseFixture = {
   albums?: ReadonlyArray<RankedAlbum>;
   artists?: ReadonlyArray<RankedArtist>;
   favoriteAlbums?: ReadonlyArray<PlaylistAlbum>;
+  historyCursor?: string | null;
+  historyTracks?: ReadonlyArray<HistoryTrack>;
   nowPlaying?: Track;
   tracks?: ReadonlyArray<RankedTrack>;
 };
