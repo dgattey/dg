@@ -54,20 +54,34 @@ describe('ProjectCard', () => {
     expect(screen.getAllByRole('link')).toHaveLength(1);
   });
 
-  it('sizes leftover tiles to their copy and keeps the title in one word', () => {
+  it('fills the card top with the thumbnail and keeps copy on the type scale', () => {
     const { container } = render(<ProjectCard {...project} eyebrow="Project" variant="tile" />);
     const title = screen.getByRole('heading', { name: 'Flowstate' });
-    expect(title).toHaveClass('MuiTypography-h4');
-    expect(title).toHaveStyle({ overflowWrap: 'normal' });
+    expect(title).toHaveClass('MuiTypography-h3');
+    expect(title.tagName).toBe('H3');
+    expect(screen.getByRole('img', { name: 'Flowstate' })).toBeInTheDocument();
     expect(container.querySelector('[data-bento="project"]')).toBeTruthy();
-    expect(container.querySelector('[data-project-mark]')).toBeTruthy();
-    expect(
-      screen.getByText('A quieter way to keep a long-running project honest.'),
-    ).toBeInTheDocument();
+    expect(container.querySelector('[data-project-media]')).toBeTruthy();
+    expect(container.querySelector('[data-project-mark]')).toBeNull();
+    expect(screen.getByText('View project →')).toHaveClass('MuiTypography-body2');
+    expect(screen.getByText('Project')).toHaveClass('MuiTypography-overline');
     const source = readFileSync(join(__dirname, '../ProjectCard.tsx'), 'utf8');
-    expect(source).toContain("'@container (max-width: 575px)'");
-    expect(source).toContain("overflowWrap: 'normal'");
-    expect(source).toContain("objectFit: 'contain'");
+    expect(source).toContain('getConcentricBorderRadius');
+    expect(source).toContain("objectFit: 'cover'");
+    expect(source).toContain('data-project-media');
+  });
+
+  it('keeps the mark only when the thumbnail url is empty', () => {
+    const { container } = render(
+      <ProjectCard
+        {...project}
+        thumbnail={{ height: 0, url: '', width: 0 }}
+        variant="featured"
+      />,
+    );
+    expect(container.querySelector('[data-project-mark]')).toBeTruthy();
+    expect(container.querySelector('[data-project-media]')).toBeNull();
+    expect(screen.queryByRole('img', { name: 'Flowstate' })).not.toBeInTheDocument();
   });
 
   it('keeps every tag as a chip that cannot shrink off its pill', () => {
@@ -80,5 +94,6 @@ describe('ProjectCard', () => {
     expect(react.closest('.MuiChip-root')).toBeTruthy();
     const source = readFileSync(join(__dirname, '../ProjectCard.tsx'), 'utf8');
     expect(source).toContain('flexShrink: 0');
+    expect(source).toContain("typography: 'caption'");
   });
 });

@@ -3,6 +3,7 @@ import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { RichText } from '@dg/ui/dependent/RichText';
+import { getConcentricBorderRadius } from '@dg/ui/helpers/concentricBorderRadius';
 import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
 import type { SxObject } from '@dg/ui/theme';
 import { getShape } from '@dg/ui/theme/shape';
@@ -22,28 +23,24 @@ type ProjectCardProps = RenderableProject & {
   variant?: ProjectCardVariant;
 };
 
-const { gridItemSize } = getShape();
+const { gridItemSize, cardBorderRadius } = getShape();
 const smallMaxHeight = gridItemSize?.(0.75);
+const CARD_BORDER_WIDTH_PX = 1;
+const mediaRadius = getConcentricBorderRadius(cardBorderRadius, CARD_BORDER_WIDTH_PX);
 
 const projectCardSx: SxObject = {
   maxHeight: { md: 'unset', xs: smallMaxHeight ?? 'unset' },
 };
 
 const featuredCardSx: SxObject = {
-  '& [data-project-mark] img': {
-    height: '100%',
-    objectFit: 'contain',
-    objectPosition: 'center',
-    width: '100%',
-  },
   boxSizing: 'border-box',
-  containerType: 'inline-size',
   display: 'flex',
   flexDirection: 'column',
   maxWidth: 'none',
   minHeight: { sm: '13.5rem', xs: 'auto' },
   minWidth: 0,
-  padding: 2.25,
+  overflow: 'hidden',
+  padding: 0,
   width: '100%',
 };
 
@@ -57,7 +54,7 @@ const tileCardSx: SxObject = {
 
 const featuredLayoutSx: SxObject = {
   flex: '1 1 auto',
-  gap: 1.25,
+  gap: 0,
   justifyContent: 'space-between',
   minWidth: 0,
   width: '100%',
@@ -68,27 +65,32 @@ const tileLayoutSx: SxObject = {
   justifyContent: 'flex-start',
 };
 
-const featuredCopySx: SxObject = {
-  gap: 1,
-  minWidth: 0,
+const mediaSx: SxObject = {
+  aspectRatio: '16 / 10',
+  borderTopLeftRadius: mediaRadius,
+  borderTopRightRadius: mediaRadius,
+  flexShrink: 0,
+  overflow: 'hidden',
+  position: 'relative',
   width: '100%',
 };
 
-const featuredTitleRowSx: SxObject = {
-  '@container (max-width: 575px)': {
-    alignItems: 'flex-start',
-    flexDirection: 'column',
-  },
-  alignItems: 'center',
-  flexDirection: 'row',
-  flexWrap: 'nowrap',
-  gap: 1.5,
+const mediaImgSx: SxObject = {
+  display: 'block',
+  height: '100%',
+  objectFit: 'cover',
+  objectPosition: 'center',
+  width: '100%',
+};
+
+const featuredCopySx: SxObject = {
+  gap: 1,
   minWidth: 0,
+  padding: 2.25,
   width: '100%',
 };
 
 const featuredTitleSx: SxObject = {
-  flex: '1 1 auto',
   hyphens: 'none',
   minWidth: 0,
   overflowWrap: 'normal',
@@ -130,6 +132,9 @@ const featuredTagsSx: SxObject = {
 };
 
 const featuredChipSx: SxObject = {
+  '& .MuiChip-label': {
+    typography: 'caption',
+  },
   flexShrink: 0,
   maxWidth: '100%',
 };
@@ -154,7 +159,48 @@ function hasRichText(json: unknown): boolean {
   return Array.isArray(content) && content.length > 0;
 }
 
-function FeaturedIcon({ thumbnail }: { thumbnail: RenderableProject['thumbnail'] }) {
+function hasThumbnailUrl(url: string): boolean {
+  return url.length > 0;
+}
+
+function ProjectPhoto({
+  height,
+  sizes,
+  thumbnail,
+  title,
+  width,
+}: {
+  height: number;
+  sizes: ReturnType<typeof useCurrentImageSizes>['sizes'];
+  thumbnail: RenderableProject['thumbnail'];
+  title: string;
+  width: number;
+}) {
+  if (thumbnail.url.startsWith('http')) {
+    return (
+      <Image
+        alt={title}
+        cover={true}
+        height={height}
+        sizes={sizes}
+        url={thumbnail.url}
+        width={width}
+      />
+    );
+  }
+  return (
+    <Box
+      alt={title}
+      component="img"
+      height={height}
+      src={thumbnail.url}
+      sx={mediaImgSx}
+      width={width}
+    />
+  );
+}
+
+function FallbackMark({ thumbnail }: { thumbnail: RenderableProject['thumbnail'] }) {
   if (thumbnail.url.startsWith('http')) {
     return (
       <Image
@@ -166,6 +212,9 @@ function FeaturedIcon({ thumbnail }: { thumbnail: RenderableProject['thumbnail']
         width={thumbnail.width}
       />
     );
+  }
+  if (!hasThumbnailUrl(thumbnail.url)) {
+    return null;
   }
   return <Box alt="" component="img" src={thumbnail.url} sx={featuredIconImgSx} />;
 }
@@ -182,6 +231,8 @@ function FeaturedProjectCard({
   const tags = projectTags(type);
   const descriptionJson = description?.json;
   const isTile = variant === 'tile';
+  const { width, height, sizes } = useCurrentImageSizes();
+  const showPhoto = hasThumbnailUrl(thumbnail.url);
 
   return (
     <ContentCard
@@ -189,18 +240,29 @@ function FeaturedProjectCard({
       sx={isTile ? { ...featuredCardSx, ...tileCardSx } : featuredCardSx}
     >
       <Stack sx={isTile ? { ...featuredLayoutSx, ...tileLayoutSx } : featuredLayoutSx}>
+        {showPhoto ? (
+          <Box data-project-media="" sx={mediaSx}>
+            <ProjectPhoto
+              height={height}
+              sizes={sizes}
+              thumbnail={thumbnail}
+              title={title}
+              width={width}
+            />
+          </Box>
+        ) : null}
         <Stack sx={featuredCopySx}>
           <Typography color="text.secondary" variant="overline">
             {eyebrow}
           </Typography>
-          <Stack sx={featuredTitleRowSx}>
+          {showPhoto ? null : (
             <Box data-project-mark="" sx={featuredIconSx}>
-              <FeaturedIcon thumbnail={thumbnail} />
+              <FallbackMark thumbnail={thumbnail} />
             </Box>
-            <Typography component="h2" sx={featuredTitleSx} variant={isTile ? 'h4' : 'h3'}>
-              {title}
-            </Typography>
-          </Stack>
+          )}
+          <Typography component="h3" sx={featuredTitleSx} variant="h3">
+            {title}
+          </Typography>
           {hasRichText(descriptionJson) ? (
             <Box sx={featuredBlurbSx}>
               <RichText
@@ -217,12 +279,12 @@ function FeaturedProjectCard({
               ))}
             </Stack>
           ) : null}
+          {link ? (
+            <Link color="secondary" href={link.url} title={link.title} variant="body2">
+              View project →
+            </Link>
+          ) : null}
         </Stack>
-        {link ? (
-          <Link color="secondary" href={link.url} title={link.title} variant="caption">
-            View project →
-          </Link>
-        ) : null}
       </Stack>
     </ContentCard>
   );
