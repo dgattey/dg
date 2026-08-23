@@ -14,7 +14,7 @@ type TrackTitleProps = {
   color?: string;
   textShadow?: string;
   listingVariant?: ListingVariant;
-  /** Greenhouse now-playing only. `hero` adds `h2` above 30rem. */
+  /** Greenhouse now-playing only. `hero` adds `h2` above 480px. */
   layout?: NowPlayingLayout;
 };
 
@@ -34,14 +34,14 @@ const nowPlayingClampSx: SxObject = {
 
 const nowPlayingH3Sx: SxObject = {
   ...nowPlayingClampSx,
-  '@container now-playing (max-width: 22.5rem)': {
+  '@container now-playing (max-width: 360px)': {
     display: 'none',
   },
 };
 
 const nowPlayingH4Sx: SxObject = {
   ...nowPlayingClampSx,
-  '@container now-playing (min-width: 12rem) and (max-width: 22.5rem)': {
+  '@container now-playing (min-width: 192px) and (max-width: 360px)': {
     display: '-webkit-box',
   },
   display: 'none',
@@ -49,7 +49,7 @@ const nowPlayingH4Sx: SxObject = {
 
 const nowPlayingH5Sx: SxObject = {
   ...nowPlayingClampSx,
-  '@container now-playing (max-width: 12rem)': {
+  '@container now-playing (max-width: 192px)': {
     display: '-webkit-box',
   },
   display: 'none',
@@ -57,14 +57,14 @@ const nowPlayingH5Sx: SxObject = {
 
 const nowPlayingHeroH2Sx: SxObject = {
   ...nowPlayingClampSx,
-  '@container now-playing (min-width: 30rem)': {
+  '@container now-playing (min-width: 480px)': {
     display: '-webkit-box',
   },
   display: 'none',
 };
 
 const hideWhenHeroWide: SxObject = {
-  '@container now-playing (min-width: 30rem)': {
+  '@container now-playing (min-width: 480px)': {
     display: 'none',
   },
 };

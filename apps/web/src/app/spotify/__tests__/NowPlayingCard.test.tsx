@@ -180,8 +180,8 @@ describe('NowPlayingCard', () => {
     const css = [...document.querySelectorAll('style')]
       .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
       .join('\n');
-    expect(css).toContain('@container now-playing (max-width: 22.5rem)');
-    expect(css).toContain('@container now-playing (min-width: 12rem) and (max-width: 22.5rem)');
+    expect(css).toContain('@container now-playing (max-width: 360px)');
+    expect(css).toContain('@container now-playing (min-width: 192px) and (max-width: 360px)');
     expect(document.querySelector('[data-now-playing-title] .MuiTypography-h3')).toBeTruthy();
     expect(document.querySelector('[data-now-playing-title] .MuiTypography-h4')).toBeTruthy();
     expect(document.querySelector('[data-now-playing-title] .MuiTypography-h5')).toBeTruthy();
@@ -223,10 +223,10 @@ describe('NowPlayingCard', () => {
     const css = [...document.querySelectorAll('style')]
       .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
       .join('\n');
-    expect(css).toContain('@container now-playing (min-width: 30rem)');
-    expect(css).toContain('minmax(0, 4fr) minmax(0, 6fr)');
-    expect(css).toContain('grid-area: art');
+    expect(css).toContain('@container now-playing (min-width: 480px)');
+    expect(css).toContain('40%');
+    expect(css).toContain('aspect-ratio');
     expect(document.querySelector('[data-hero-art-fill]')).toBeTruthy();
-    expect(css).toContain('inset: 12px');
+    expect(css).toMatch(/padding: 12px|padding: 1\.5/);
   });
 });

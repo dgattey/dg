@@ -32,13 +32,13 @@ describe('TrackTitle', () => {
     expect(css).toContain('-webkit-line-clamp: 2');
     expect(css).toContain('overflow-wrap: break-word');
     expect(css).not.toContain('overflow-wrap: anywhere');
-    expect(css).toContain('@container now-playing (max-width: 22.5rem)');
-    expect(css).toContain('@container now-playing (min-width: 12rem) and (max-width: 22.5rem)');
-    expect(css).toContain('@container now-playing (max-width: 12rem)');
+    expect(css).toContain('@container now-playing (max-width: 360px)');
+    expect(css).toContain('@container now-playing (min-width: 192px) and (max-width: 360px)');
+    expect(css).toContain('@container now-playing (max-width: 192px)');
     expect(css).not.toContain('-webkit-line-clamp: 1');
   });
 
-  it('adds an h2 step for the hero layout above 30rem', () => {
+  it('adds an h2 step for the hero layout above 480px', () => {
     render(
       <TrackTitle
         layout="hero"
@@ -55,7 +55,7 @@ describe('TrackTitle', () => {
     expect(titles[3]).toHaveClass('MuiTypography-h5');
 
     const css = titles.map((title) => rulesFor(title)).join('\n');
-    expect(css).toContain('@container now-playing (min-width: 30rem)');
+    expect(css).toContain('@container now-playing (min-width: 480px)');
     expect(css).toContain('-webkit-line-clamp: 2');
   });
 });

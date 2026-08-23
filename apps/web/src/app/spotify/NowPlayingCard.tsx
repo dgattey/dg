@@ -80,7 +80,7 @@ const layoutSx: SxObject = {
 };
 
 const headerSx: SxObject = {
-  '@container now-playing (max-width: 16.5rem)': {
+  '@container now-playing (max-width: 264px)': {
     alignItems: 'flex-start',
     flexDirection: 'column',
     gap: 1.5,
@@ -90,7 +90,9 @@ const headerSx: SxObject = {
 };
 
 const copySx: SxObject = {
+  alignItems: 'flex-start',
   minWidth: 0,
+  textAlign: 'left',
 };
 
 const titleSx: SxObject = {
@@ -100,7 +102,7 @@ const titleSx: SxObject = {
 
 const cellArtWrapSx: SxObject = {
   '--image-dim': 'clamp(9.375rem, 56cqi, 14rem)',
-  '@container now-playing (max-width: 16.5rem)': {
+  '@container now-playing (max-width: 264px)': {
     '--image-dim': 'min(72cqi, 12rem)',
     alignSelf: 'flex-start',
   },
@@ -131,31 +133,36 @@ const artCardSx: SxObject = {
 };
 
 const heroArtWrapSx: SxObject = {
-  '@container now-playing (max-width: 30rem)': {
-    '& [data-hero-art-fill]': {
-      inset: 'unset',
-      position: 'relative',
-    },
+  '@container now-playing (max-width: 480px)': {
     aspectRatio: '1 / 1',
-    gridArea: 'art',
+    flex: '0 0 auto',
     height: 'auto',
-    width: 'min(72cqi, 12rem)',
+    maxWidth: 'min(72cqi, 16rem)',
+    padding: 0,
+    width: 'min(72cqi, 16rem)',
   },
+  alignItems: 'center',
   alignSelf: 'stretch',
-  gridArea: 'art',
-  justifySelf: 'stretch',
+  boxSizing: 'border-box',
+  display: 'flex',
+  flex: '0 0 40%',
+  justifyContent: 'center',
+  maxWidth: '40%',
   minHeight: 0,
   minWidth: 0,
   overflow: 'visible',
+  padding: 1.5,
   position: 'relative',
+  width: '40%',
 };
 
 const heroArtFillSx: SxObject = {
-  height: '100%',
-  inset: 12,
+  aspectRatio: '1 / 1',
+  flex: '1 1 auto',
+  maxHeight: '100%',
+  maxWidth: '100%',
   overflow: 'visible',
-  position: 'absolute',
-  width: 'auto',
+  width: '100%',
 };
 
 const artNotesWrapSx: SxObject = {
@@ -166,21 +173,17 @@ const artNotesWrapSx: SxObject = {
 };
 
 const heroGridSx: SxObject = {
-  '@container now-playing (max-width: 30rem)': {
-    alignItems: 'start',
+  '@container now-playing (max-width: 480px)': {
+    alignItems: 'flex-start',
+    flexDirection: 'column',
     gap: 1,
-    gridTemplateAreas: '"logo" "art" "copy"',
-    gridTemplateColumns: 'minmax(0, 1fr)',
-    gridTemplateRows: 'auto auto 1fr',
     padding: 2.5,
   },
   alignItems: 'stretch',
-  display: 'grid',
+  display: 'flex',
   flex: 1,
+  flexDirection: 'row',
   gap: 0,
-  gridTemplateAreas: '"art copy"',
-  gridTemplateColumns: 'minmax(0, 4fr) minmax(0, 6fr)',
-  gridTemplateRows: 'minmax(0, 1fr)',
   height: '100%',
   minHeight: { sm: '14rem', xs: '16.5rem' },
   minWidth: 0,
@@ -199,10 +202,10 @@ const heroArtLinkSx: SxObject = {
 
 const heroArtFrameSx: SxObject = {
   ...ALBUM_ART_BORDER_RADIUS,
-  '@container now-playing (max-width: 30rem)': {
+  '@container now-playing (max-width: 480px)': {
     aspectRatio: '1 / 1',
   },
-  '@container now-playing (min-width: 30rem)': {
+  '@container now-playing (min-width: 480px)': {
     borderRadius: 3,
   },
   height: '100%',
@@ -212,7 +215,7 @@ const heroArtFrameSx: SxObject = {
 };
 
 const heroCopySx: SxObject = {
-  '@container now-playing (min-width: 30rem)': {
+  '@container now-playing (min-width: 480px)': {
     justifyContent: 'space-between',
     paddingBottom: 2.5,
     paddingLeft: 1,
@@ -220,18 +223,15 @@ const heroCopySx: SxObject = {
     paddingTop: 2.5,
   },
   display: 'flex',
+  flex: '1 1 60%',
   flexDirection: 'column',
   gap: 1,
-  gridArea: 'copy',
   justifyContent: 'flex-end',
   minWidth: 0,
 };
 
 const heroLogoSx: SxObject = {
-  '@container now-playing (min-width: 30rem)': {
-    gridArea: 'unset',
-  },
-  gridArea: 'logo',
+  flexShrink: 0,
 };
 
 const reducedMotionSx: SxObject = {
@@ -346,7 +346,7 @@ function NowPlayingCopy({
  * logo, large album art with floating notes, status, title, artist, and a
  * progress pill, painted on the glass card with the album gradient.
  * `layout="hero"` is the landscape music-page card and falls back to the
- * cell arrangement below 30rem.
+ * cell arrangement below 480px.
  */
 export function NowPlayingCard({
   layout = 'cell',
