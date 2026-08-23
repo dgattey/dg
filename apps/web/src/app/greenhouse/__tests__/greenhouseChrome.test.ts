@@ -63,6 +63,15 @@ describe('greenhouse chrome', () => {
     expect(css).toContain('section:has([data-greenhouse-frame])');
   });
 
+  it('keeps flag evaluation behind Suspense on the surface shell', () => {
+    const surface = readFileSync(join(__dirname, '../GreenhouseSurface.tsx'), 'utf8');
+    expect(surface).toContain('export function GreenhouseSurface');
+    expect(surface).not.toContain('export async function GreenhouseSurface');
+    expect(surface).toContain('<Suspense fallback={null}>');
+    expect(surface).toContain('async function GreenhouseSurfaceSwitch');
+    expect(surface).toContain('await interactiveRedesign()');
+  });
+
   it('resolves foliage image imports through the Jest stub', async () => {
     const foliage = await import('../GreenhouseFoliage');
     expect(foliage.GreenhouseFoliage).toEqual(expect.any(Function));
