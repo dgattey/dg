@@ -73,11 +73,7 @@ describe('ProjectCard', () => {
 
   it('keeps the mark only when the thumbnail url is empty', () => {
     const { container } = render(
-      <ProjectCard
-        {...project}
-        thumbnail={{ height: 0, url: '', width: 0 }}
-        variant="featured"
-      />,
+      <ProjectCard {...project} thumbnail={{ height: 0, url: '', width: 0 }} variant="featured" />,
     );
     expect(container.querySelector('[data-project-mark]')).toBeTruthy();
     expect(container.querySelector('[data-project-media]')).toBeNull();
