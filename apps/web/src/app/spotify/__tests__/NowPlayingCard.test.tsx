@@ -226,5 +226,7 @@ describe('NowPlayingCard', () => {
     expect(css).toContain('@container now-playing (min-width: 30rem)');
     expect(css).toContain('minmax(0, 4fr) minmax(0, 6fr)');
     expect(css).toContain('grid-area: art');
+    expect(document.querySelector('[data-hero-art-fill]')).toBeTruthy();
+    expect(css).toContain('inset: 12px');
   });
 });

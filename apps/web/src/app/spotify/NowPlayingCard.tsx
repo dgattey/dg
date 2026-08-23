@@ -132,36 +132,49 @@ const artCardSx: SxObject = {
 
 const heroArtWrapSx: SxObject = {
   '@container now-playing (max-width: 30rem)': {
+    '& [data-hero-art-fill]': {
+      inset: 'unset',
+      position: 'relative',
+    },
+    aspectRatio: '1 / 1',
+    gridArea: 'art',
     height: 'auto',
-    margin: 0,
     width: 'min(72cqi, 12rem)',
   },
   alignSelf: 'stretch',
   gridArea: 'art',
-  height: 'calc(100% - 24px)',
   justifySelf: 'stretch',
-  margin: '12px',
   minHeight: 0,
   minWidth: 0,
   overflow: 'visible',
   position: 'relative',
+};
+
+const heroArtFillSx: SxObject = {
+  height: '100%',
+  inset: 12,
+  overflow: 'visible',
+  position: 'absolute',
   width: 'auto',
 };
 
 const artNotesWrapSx: SxObject = {
   height: '100%',
+  minHeight: 0,
   overflow: 'visible',
   width: '100%',
 };
 
 const heroGridSx: SxObject = {
   '@container now-playing (max-width: 30rem)': {
+    alignItems: 'start',
     gap: 1,
     gridTemplateAreas: '"logo" "art" "copy"',
     gridTemplateColumns: 'minmax(0, 1fr)',
     gridTemplateRows: 'auto auto 1fr',
     padding: 2.5,
   },
+  alignItems: 'stretch',
   display: 'grid',
   flex: 1,
   gap: 0,
@@ -169,7 +182,7 @@ const heroGridSx: SxObject = {
   gridTemplateColumns: 'minmax(0, 4fr) minmax(0, 6fr)',
   gridTemplateRows: 'minmax(0, 1fr)',
   height: '100%',
-  minHeight: 0,
+  minHeight: { sm: '14rem', xs: '16.5rem' },
   minWidth: 0,
   padding: 0,
   position: 'relative',
@@ -248,31 +261,41 @@ function AlbumCover({
   const hero = layout === 'hero';
   const sourcePx = hero ? HERO_ART_SOURCE_PX : CELL_ART_SOURCE_PX;
 
+  const cover = (
+    <AlbumArtWithNotes isPlaying={isPlaying} noteColor={noteColor} wrapperSx={artNotesWrapSx}>
+      <Link
+        href={albumUrl}
+        isExternal={true}
+        sx={hero ? heroArtLinkSx : artLinkSx}
+        title={albumTitle}
+      >
+        <Card sx={hero ? heroArtFrameSx : artCardSx}>
+          <Image
+            alt={albumTitle}
+            fill={true}
+            height={sourcePx}
+            sizes={
+              hero
+                ? { extraLarge: HERO_ART_SOURCE_PX, large: 640, tiny: 256 }
+                : { extraLarge: CELL_ART_SOURCE_PX, tiny: 224 }
+            }
+            url={track.albumImage.url}
+            width={sourcePx}
+          />
+        </Card>
+      </Link>
+    </AlbumArtWithNotes>
+  );
+
   return (
     <Box data-now-playing-art="" sx={hero ? heroArtWrapSx : cellArtWrapSx}>
-      <AlbumArtWithNotes isPlaying={isPlaying} noteColor={noteColor} wrapperSx={artNotesWrapSx}>
-        <Link
-          href={albumUrl}
-          isExternal={true}
-          sx={hero ? heroArtLinkSx : artLinkSx}
-          title={albumTitle}
-        >
-          <Card sx={hero ? heroArtFrameSx : artCardSx}>
-            <Image
-              alt={albumTitle}
-              fill={true}
-              height={sourcePx}
-              sizes={
-                hero
-                  ? { extraLarge: HERO_ART_SOURCE_PX, large: 640, tiny: 256 }
-                  : { extraLarge: CELL_ART_SOURCE_PX, tiny: 224 }
-              }
-              url={track.albumImage.url}
-              width={sourcePx}
-            />
-          </Card>
-        </Link>
-      </AlbumArtWithNotes>
+      {hero ? (
+        <Box data-hero-art-fill="" sx={heroArtFillSx}>
+          {cover}
+        </Box>
+      ) : (
+        cover
+      )}
     </Box>
   );
 }
