@@ -142,4 +142,13 @@ describe('greenhouse stitch plan', () => {
   it('drops the previous stop when page end is within 40% of the viewport', () => {
     expect(planFilmstripStops(3152, 844, 105)).toEqual([0, 723, 1446, 2308]);
   });
+
+  it('does not steal a working stride when titles already clear', () => {
+    expect(
+      planFilmstripStops(3152, 844, 105, [
+        { docY: 850, height: 54, sticky: false },
+        { docY: 920, height: 24, sticky: false },
+      ]),
+    ).toEqual([0, 723, 1446, 2308]);
+  });
 });

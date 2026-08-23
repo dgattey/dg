@@ -253,11 +253,53 @@ function headingsClearOn(
   );
 }
 
+function appendPageEnd(
+  stops: Array<number>,
+  maxScroll: number,
+  viewportHeight: number,
+  headerBottom: number,
+  headings: ReadonlyArray<FilmstripHeadingDoc>,
+): ReadonlyArray<number> {
+  const minGap = filmstripMinGap(viewportHeight);
+  if (maxScroll <= 0 || stops.at(-1) === maxScroll) {
+    return stops;
+  }
+  const prev = stops.at(-1) ?? 0;
+  if (stops.length > 1 && maxScroll - prev < minGap) {
+    const withoutPrev = [...stops.slice(0, -1), maxScroll];
+    if (headingsClearOn(headings, withoutPrev, headerBottom, viewportHeight)) {
+      stops.pop();
+    }
+  }
+  if (stops.at(-1) !== maxScroll) {
+    stops.push(maxScroll);
+  }
+  return stops;
+}
+
+function restripeFrom(
+  prefix: ReadonlyArray<number>,
+  start: number,
+  step: number,
+  maxScroll: number,
+  viewportHeight: number,
+  headerBottom: number,
+  headings: ReadonlyArray<FilmstripHeadingDoc>,
+): ReadonlyArray<number> {
+  const stops = [...prefix, start];
+  let y = start;
+  while (y + step < maxScroll - 1) {
+    y += step;
+    stops.push(y);
+  }
+  return appendPageEnd(stops, maxScroll, viewportHeight, headerBottom, headings);
+}
+
 /**
- * True viewport stops for a filmstrip. Step is `vh − headerBottom − 16` so
- * the band under the sticky header in frame n was fully visible in frame n−1.
- * Last stop is always page end. Adjacent stops stay at least 40% of vh apart;
- * if the clamped end is closer than that, the previous stop is dropped.
+ * True viewport stops for a filmstrip. Step is `vh − headerBottom − 16`.
+ * Adjacent stops stay at least 40% of vh apart; if the clamped end is closer
+ * than that, the previous stop is dropped (page end stays). A title park
+ * replaces the next stride and the stride continues from it.
  */
 export function planFilmstripStops(
   scrollHeight: number,
@@ -270,52 +312,29 @@ export function planFilmstripStops(
   }
   const maxScroll = Math.max(0, scrollHeight - viewportHeight);
   const step = filmstripStep(viewportHeight, headerBottom);
-  const minGap = filmstripMinGap(viewportHeight);
   const content = contentHeadings(headings);
-  const stops = [0];
-  let y = 0;
-  while (y + step < maxScroll - 1) {
-    const regular = y + step;
-    const missing = content.filter(
-      (heading) =>
-        !stops.some((scrollY) => headingClearAt(heading, scrollY, headerBottom, viewportHeight)) &&
-        !headingClearAt(heading, regular, headerBottom, viewportHeight),
-    );
-    const parks = missing
-      .map((heading) => parkFor(heading, headerBottom, maxScroll))
-      .filter((park) => park > y && park < maxScroll);
-    const next = parks.length > 0 ? Math.min(...parks) : regular;
-    y = next;
-    stops.push(y);
+  const regular: Array<number> = [0];
+  for (let y = step; y < maxScroll - 1; y += step) {
+    regular.push(y);
   }
-  if (maxScroll > 0 && stops.at(-1) !== maxScroll) {
-    const prev = stops.at(-1) ?? 0;
-    if (stops.length > 1 && maxScroll - prev < minGap) {
-      const withoutPrev = [...stops.slice(0, -1), maxScroll];
-      if (headingsClearOn(content, withoutPrev, headerBottom, viewportHeight)) {
-        stops.pop();
-      } else {
-        const prevPrev = stops.at(-2) ?? 0;
-        const lost = content.filter(
-          (heading) =>
-            !withoutPrev.some((scrollY) =>
-              headingClearAt(heading, scrollY, headerBottom, viewportHeight),
-            ),
-        );
-        const latest = Math.min(
-          ...lost.map((heading) => parkFor(heading, headerBottom, maxScroll)),
-        );
-        const nudged = Math.min(prev, latest);
-        if (nudged > prevPrev && headingsClearOn(lost, [nudged], headerBottom, viewportHeight)) {
-          stops[stops.length - 1] = nudged;
-        }
-      }
-    }
-    if (stops.at(-1) !== maxScroll) {
-      stops.push(maxScroll);
-    }
+  const collapsed = [...appendPageEnd(regular, maxScroll, viewportHeight, headerBottom, [])];
+  const missing = content.filter(
+    (heading) =>
+      !collapsed.some((scrollY) => headingClearAt(heading, scrollY, headerBottom, viewportHeight)),
+  );
+  if (missing.length === 0) {
+    return collapsed;
   }
-  return stops;
+  const park = Math.min(...missing.map((heading) => parkFor(heading, headerBottom, maxScroll)));
+  const replaceAt = collapsed.findIndex(
+    (scrollY, index) => index > 0 && scrollY < maxScroll && Math.abs(scrollY - park) <= step,
+  );
+  const insertAt = collapsed.findIndex((scrollY) => scrollY >= maxScroll || scrollY > park);
+  const index = replaceAt >= 0 ? replaceAt : insertAt >= 0 ? insertAt : collapsed.length;
+  const prefix = collapsed.slice(0, Math.max(1, index));
+  const previous = prefix.at(-1) ?? 0;
+  const next = Math.min(maxScroll, Math.max(previous + 1, park));
+  return restripeFrom(prefix, next, step, maxScroll, viewportHeight, headerBottom, content);
 }
 
 /**
