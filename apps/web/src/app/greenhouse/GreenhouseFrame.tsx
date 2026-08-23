@@ -21,8 +21,9 @@ type GreenhouseFrameProps = {
 
 /**
  * Shared greenhouse shell. `surface` selects the plant layout (`home` vs
- * `music`). Stack is plate → in-document sides → cards → fixed bottom fringe.
- * The site header lives outside this frame at a higher z-index.
+ * `music`). Stack is plate → cards → in-document sides and fixed bottom
+ * fringe, so cards scroll under the cutouts. The site header lives outside
+ * this frame at a higher z-index.
  */
 export function GreenhouseFrame({ children, surface, chrome = true }: GreenhouseFrameProps) {
   const desktopPlants = chrome ? layoutGreenhousePlants(surface, 0, 'desktop') : [];

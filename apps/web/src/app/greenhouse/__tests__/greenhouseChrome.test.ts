@@ -109,6 +109,28 @@ describe('greenhouse chrome', () => {
     expect(plants).not.toContain('preserveAspectRatio="none"');
   });
 
+  it('paints side and bottom cutouts over cards, plate behind, clicks through', () => {
+    const css = readFileSync(cssPath, 'utf8');
+    const block = (name: string) => {
+      const match = css.match(new RegExp(`\\.${name}\\s*\\{([^}]*)\\}`));
+      expect(match?.[1]).toBeTruthy();
+      return match?.[1] ?? '';
+    };
+    const z = (body: string) => Number.parseInt(/z-index:\s*(\d+)/.exec(body)?.[1] ?? '', 10);
+    const plate = z(block('backStack'));
+    const sides = z(block('sideStack'));
+    const cards = z(block('content'));
+    const fringe = z(block('bottomStack'));
+    expect(plate).toBe(0);
+    expect(cards).toBeGreaterThan(plate);
+    expect(sides).toBeGreaterThan(cards);
+    expect(fringe).toBeGreaterThan(cards);
+    expect(block('sideStack')).toContain('pointer-events: none');
+    expect(block('bottomStack')).toContain('pointer-events: none');
+    expect(block('sideStack')).toContain('position: absolute');
+    expect(block('bottomStack')).toContain('position: fixed');
+  });
+
   it('keeps only plate, sides, cards, and bottom fringe in the frame', () => {
     const frame = readFileSync(join(__dirname, '../GreenhouseFrame.tsx'), 'utf8');
     const css = readFileSync(cssPath, 'utf8');
