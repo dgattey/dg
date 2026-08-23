@@ -17,6 +17,13 @@ export type RouteViewport = {
   zoom: number;
 };
 
+export type LatLngBounds = {
+  maxLat: number;
+  maxLng: number;
+  minLat: number;
+  minLng: number;
+};
+
 function decodeValue(encoded: string, startIndex: number) {
   let index = startIndex;
   let result = 0;
@@ -149,6 +156,45 @@ export function projectRouteToPixels({
       y: (projected.y - projectedCenter.y) * scale + height / 2,
     };
   });
+}
+
+/** Lat/lng box of the four viewBox corners in the same projection as the route. */
+export function viewportLatLngBounds({
+  center,
+  height,
+  width,
+  zoom,
+}: {
+  center: Point;
+  height: number;
+  width: number;
+  zoom: number;
+}): LatLngBounds {
+  const scale = TILE_SIZE * 2 ** zoom;
+  const projectedCenter = project(center);
+  const halfWidth = width / 2 / scale;
+  const halfHeight = height / 2 / scale;
+  const corners = [
+    unproject({ x: projectedCenter.x - halfWidth, y: projectedCenter.y - halfHeight }),
+    unproject({ x: projectedCenter.x + halfWidth, y: projectedCenter.y - halfHeight }),
+    unproject({ x: projectedCenter.x - halfWidth, y: projectedCenter.y + halfHeight }),
+    unproject({ x: projectedCenter.x + halfWidth, y: projectedCenter.y + halfHeight }),
+  ];
+  const first = corners[0] ?? [0, 0];
+  return corners.reduce(
+    (bounds, [lat, lng]) => ({
+      maxLat: Math.max(bounds.maxLat, lat),
+      maxLng: Math.max(bounds.maxLng, lng),
+      minLat: Math.min(bounds.minLat, lat),
+      minLng: Math.min(bounds.minLng, lng),
+    }),
+    {
+      maxLat: first[0],
+      maxLng: first[1],
+      minLat: first[0],
+      minLng: first[1],
+    },
+  );
 }
 
 /** Builds an SVG path command string from already-projected route pixels. */

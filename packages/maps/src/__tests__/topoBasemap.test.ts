@@ -1,4 +1,9 @@
-import { decodePolyline } from '../routeGeometry';
+import {
+  CARD_ROUTE_PADDING,
+  decodePolyline,
+  fitRouteViewport,
+  projectRouteToPixels,
+} from '../routeGeometry';
 import {
   buildTopoLayers,
   routeBounds,
@@ -47,5 +52,30 @@ describe('topoBasemap', () => {
     const waterMean =
       (waterLngs?.reduce((sum, value) => sum + value, 0) ?? 0) / (waterLngs?.length ?? 1);
     expect(Math.abs(waterMean - lng)).toBeGreaterThan(0.2);
+  });
+
+  it.each([
+    { height: 900, name: 'desktop 16:9', width: 1600 },
+    { height: 1200, name: 'mobile 4:3', width: 1600 },
+  ])('covers the $name viewBox with terrain, not just the route bbox', ({ height, width }) => {
+    const padding = Math.round((CARD_ROUTE_PADDING * width) / 460);
+    const viewport = {
+      ...fitRouteViewport({ height, padding, points: LOOP, width }),
+      height,
+      width,
+    };
+    const layers = buildTopoLayers(LOOP, viewport);
+    const terrain = [
+      ...layers.contours.flatMap((contour) => contour.line),
+      ...layers.water.flatMap((body) => body.ring),
+      ...layers.shore.flatMap((line) => line.line),
+    ];
+    const pixels = projectRouteToPixels({ ...viewport, points: terrain });
+    const xs = pixels.map(({ x }) => x);
+    const ys = pixels.map(({ y }) => y);
+    expect(Math.min(...xs)).toBeLessThan(width * 0.04);
+    expect(Math.max(...xs)).toBeGreaterThan(width * 0.96);
+    expect(Math.min(...ys)).toBeLessThan(height * 0.04);
+    expect(Math.max(...ys)).toBeGreaterThan(height * 0.96);
   });
 });

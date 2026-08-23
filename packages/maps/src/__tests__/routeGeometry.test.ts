@@ -4,6 +4,7 @@ import {
   fitRouteViewport,
   projectRouteToPixels,
   toSvgPath,
+  viewportLatLngBounds,
 } from '../routeGeometry';
 
 const OSRM_GGP =
@@ -124,6 +125,19 @@ describe('route geometry', () => {
       throw new Error('expected two fallback aspects');
     }
     expect(Math.abs(wideAspect - tallAspect) / wideAspect).toBeLessThan(0.12);
+  });
+
+  it('unprojects the viewBox corners to a lat/lng box around the center', () => {
+    const bounds = viewportLatLngBounds({
+      center: [37.77, -122.45],
+      height: 900,
+      width: 1600,
+      zoom: 12,
+    });
+    expect(bounds.minLat).toBeLessThan(37.77);
+    expect(bounds.maxLat).toBeGreaterThan(37.77);
+    expect(bounds.minLng).toBeLessThan(-122.45);
+    expect(bounds.maxLng).toBeGreaterThan(-122.45);
   });
 
   it('uses a close zoom for a single-point route', () => {

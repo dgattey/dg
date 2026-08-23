@@ -66,8 +66,8 @@ export function TopoBasemap({
   width: number;
   zoom: number;
 }) {
-  const layers = buildTopoLayers(points);
   const viewport = { center, height, width, zoom };
+  const layers = buildTopoLayers(points, viewport);
   const grainId = `topo-paper-${layers.grainSeed}`;
 
   return (

@@ -1,4 +1,5 @@
 import type { Point } from 'pigeon-maps';
+import { type LatLngBounds, viewportLatLngBounds } from './routeGeometry';
 import {
   FIELD_COLS,
   FIELD_ROWS,
@@ -10,12 +11,7 @@ import {
 
 export const TOPO_LAND = '#e9e3c4';
 
-export type LatLngBounds = {
-  maxLat: number;
-  maxLng: number;
-  minLat: number;
-  minLng: number;
-};
+export type { LatLngBounds };
 
 export type TopoFill = {
   fill: string;
@@ -50,6 +46,13 @@ export type TopoLayers = {
   roads: Array<TopoStroke>;
   shore: Array<TopoStroke>;
   water: Array<TopoFill>;
+};
+
+export type TopoViewport = {
+  center: Point;
+  height: number;
+  width: number;
+  zoom: number;
 };
 
 const WATER = '#a4bfd0';
@@ -127,15 +130,10 @@ function createRng(seed: number) {
   };
 }
 
-function coastLongitude(
-  lat: number,
-  bounds: LatLngBounds,
-  coastLng: number,
-  phase: number,
-): number {
-  const latSpan = bounds.maxLat - bounds.minLat || 1;
-  const lngSpan = bounds.maxLng - bounds.minLng || 1;
-  const t = (lat - bounds.minLat) / latSpan;
+function coastLongitude(lat: number, shape: LatLngBounds, coastLng: number, phase: number): number {
+  const latSpan = shape.maxLat - shape.minLat || 1;
+  const lngSpan = shape.maxLng - shape.minLng || 1;
+  const t = (lat - shape.minLat) / latSpan;
   return (
     coastLng +
     Math.sin(t * Math.PI * 3.2 + phase) * lngSpan * 0.028 +
@@ -143,27 +141,35 @@ function coastLongitude(
   );
 }
 
-function waterRing(
-  bounds: LatLngBounds,
-  coastLng: number,
-  phase: number,
-  west: boolean,
-  oceanFactor: number,
-): Array<Point> {
-  const latSpan = bounds.maxLat - bounds.minLat;
-  const lngSpan = bounds.maxLng - bounds.minLng;
+function waterRing({
+  coastLng,
+  field,
+  oceanFactor,
+  phase,
+  shape,
+  west,
+}: {
+  coastLng: number;
+  field: LatLngBounds;
+  oceanFactor: number;
+  phase: number;
+  shape: LatLngBounds;
+  west: boolean;
+}): Array<Point> {
+  const latSpan = field.maxLat - field.minLat;
+  const lngSpan = field.maxLng - field.minLng;
   const samples = 48;
   const coast: Array<Point> = [];
   for (let index = 0; index <= samples; index += 1) {
-    const lat = bounds.minLat + (index / samples) * latSpan;
-    coast.push([lat, coastLongitude(lat, bounds, coastLng, phase)]);
+    const lat = field.minLat + (index / samples) * latSpan;
+    coast.push([lat, coastLongitude(lat, shape, coastLng, phase)]);
   }
 
   const oceanLng = west
-    ? bounds.minLng - lngSpan * oceanFactor
-    : bounds.maxLng + lngSpan * oceanFactor;
-  const south = bounds.minLat - latSpan * 0.08;
-  const north = bounds.maxLat + latSpan * 0.08;
+    ? field.minLng - lngSpan * oceanFactor
+    : field.maxLng + lngSpan * oceanFactor;
+  const south = field.minLat - latSpan * 0.08;
+  const north = field.maxLat + latSpan * 0.08;
   const oceanSouth: Point = [south, oceanLng];
   const oceanNorth: Point = [north, oceanLng];
   if (west) {
@@ -172,13 +178,18 @@ function waterRing(
   return [oceanSouth, ...[...coast].reverse(), oceanNorth, oceanSouth];
 }
 
-function shoreLine(bounds: LatLngBounds, coastLng: number, phase: number): Array<Point> {
-  const latSpan = bounds.maxLat - bounds.minLat;
+function shoreLine(
+  field: LatLngBounds,
+  shape: LatLngBounds,
+  coastLng: number,
+  phase: number,
+): Array<Point> {
+  const latSpan = field.maxLat - field.minLat;
   const line: Array<Point> = [];
   const samples = 48;
   for (let index = 0; index <= samples; index += 1) {
-    const lat = bounds.minLat + (index / samples) * latSpan;
-    line.push([lat, coastLongitude(lat, bounds, coastLng, phase)]);
+    const lat = field.minLat + (index / samples) * latSpan;
+    line.push([lat, coastLongitude(lat, shape, coastLng, phase)]);
   }
   return line;
 }
@@ -201,42 +212,44 @@ function isWaterLng(lng: number, coast: number, west: boolean) {
 }
 
 /**
- * Invented outdoors layers in lat/lng, derived from the route bbox so the
- * same activity always paints the same cream land, water, and contour field.
+ * Invented outdoors layers in lat/lng. Coast sits on the route's geography;
+ * the contour field fills the card viewBox when a viewport is passed.
  */
-export function buildTopoLayers(points: Array<Point>): TopoLayers {
+export function buildTopoLayers(points: Array<Point>, viewport?: TopoViewport): TopoLayers {
   const tight = routeBounds(points);
-  const bounds = expandBounds(tight, 0.16);
+  const shape = expandBounds(tight, 0.16);
+  const field = viewport ? expandBounds(viewportLatLngBounds(viewport), 0.12) : shape;
   const seed = seedFromBounds(tight);
   const next = createRng(seed);
   const centroid = routeCentroid(points);
-  const latSpan = bounds.maxLat - bounds.minLat || 1;
-  const lngSpan = bounds.maxLng - bounds.minLng || 1;
-  const westWater = (centroid[1] - bounds.minLng) / lngSpan > 0.42;
+  const shapeLngSpan = shape.maxLng - shape.minLng || 1;
+  const latSpan = field.maxLat - field.minLat || 1;
+  const lngSpan = field.maxLng - field.minLng || 1;
+  const westWater = (centroid[1] - shape.minLng) / shapeLngSpan > 0.42;
   const coastLng = westWater
-    ? bounds.minLng + lngSpan * (0.22 + next() * 0.05)
-    : bounds.maxLng - lngSpan * (0.22 + next() * 0.05);
+    ? shape.minLng + shapeLngSpan * (0.22 + next() * 0.05)
+    : shape.maxLng - shapeLngSpan * (0.22 + next() * 0.05);
   const phase = next() * Math.PI * 2;
 
-  const landMinLng = westWater ? coastLng : bounds.minLng;
-  const landMaxLng = westWater ? bounds.maxLng : coastLng;
+  const landMinLng = westWater ? coastLng : field.minLng;
+  const landMaxLng = westWater ? field.maxLng : coastLng;
   const landLngSpan = Math.max(landMaxLng - landMinLng, lngSpan * 0.4);
 
   const cols = FIELD_COLS;
   const rows = FIELD_ROWS;
-  const xs = Array.from({ length: cols + 1 }, (_, col) => bounds.minLng + (col / cols) * lngSpan);
-  const ys = Array.from({ length: rows + 1 }, (_, row) => bounds.minLat + (row / rows) * latSpan);
+  const xs = Array.from({ length: cols + 1 }, (_, col) => field.minLng + (col / cols) * lngSpan);
+  const ys = Array.from({ length: rows + 1 }, (_, row) => field.minLat + (row / rows) * latSpan);
   const samples: Array<number> = [];
   let minLand = 1;
   let maxLand = 0;
 
   for (let row = 0; row <= rows; row += 1) {
     const v = row / rows;
-    const lat = ys[row] ?? bounds.minLat;
+    const lat = ys[row] ?? field.minLat;
     for (let col = 0; col <= cols; col += 1) {
       const u = col / cols;
-      const lng = xs[col] ?? bounds.minLng;
-      const coast = coastLongitude(lat, bounds, coastLng, phase);
+      const lng = xs[col] ?? field.minLng;
+      const coast = coastLongitude(lat, shape, coastLng, phase);
       if (isWaterLng(lng, coast, westWater)) {
         samples.push(-0.2);
         continue;
@@ -308,7 +321,7 @@ export function buildTopoLayers(points: Array<Point>): TopoLayers {
         fill: CANOPY,
         id: `stipple-${row}-${col}`,
         opacity: 0.46 + speck * 0.16,
-        point: [bounds.minLat + v * latSpan, bounds.minLng + u * lngSpan],
+        point: [field.minLat + v * latSpan, field.minLng + u * lngSpan],
         radiusLat: latSpan * size,
         radiusLng: lngSpan * size * (0.65 + next() * 0.55),
       });
@@ -317,9 +330,9 @@ export function buildTopoLayers(points: Array<Point>): TopoLayers {
   for (let index = 0; index < 220; index += 1) {
     const u = next();
     const v = next();
-    const lat = bounds.minLat + v * latSpan;
-    const lng = bounds.minLng + u * lngSpan;
-    const coast = coastLongitude(lat, bounds, coastLng, phase);
+    const lat = field.minLat + v * latSpan;
+    const lng = field.minLng + u * lngSpan;
+    const coast = coastLongitude(lat, shape, coastLng, phase);
     if (isWaterLng(lng, coast, westWater)) {
       continue;
     }
@@ -347,8 +360,8 @@ export function buildTopoLayers(points: Array<Point>): TopoLayers {
     const offset = (westWater ? -1 : 1) * lngSpan * (0.04 + index * 0.035);
     const line: Array<Point> = [];
     for (let step = 0; step <= 20; step += 1) {
-      const lat = bounds.minLat + (step / 20) * latSpan;
-      line.push([lat, coastLongitude(lat, bounds, coastLng, phase) + offset]);
+      const lat = field.minLat + (step / 20) * latSpan;
+      line.push([lat, coastLongitude(lat, shape, coastLng, phase) + offset]);
     }
     return {
       id: `ripple-${index}`,
@@ -361,7 +374,7 @@ export function buildTopoLayers(points: Array<Point>): TopoLayers {
 
   const roads: Array<TopoStroke> = [0, 1].map((index) => {
     const start: Point = [
-      bounds.minLat + (0.18 + next() * 0.16 + index * 0.38) * latSpan,
+      field.minLat + (0.18 + next() * 0.16 + index * 0.38) * latSpan,
       landMinLng + next() * landLngSpan * 0.16,
     ];
     const end: Point = [
@@ -391,7 +404,7 @@ export function buildTopoLayers(points: Array<Point>): TopoLayers {
     shore: [
       {
         id: 'shore',
-        line: shoreLine(bounds, coastLng, phase),
+        line: shoreLine(field, shape, coastLng, phase),
         opacity: 1,
         stroke: SHORE,
         strokeWidth: 1.15,
@@ -402,19 +415,27 @@ export function buildTopoLayers(points: Array<Point>): TopoLayers {
         fill: WATER,
         id: 'water-shelf',
         opacity: 0.92,
-        ring: waterRing(bounds, coastLng, phase, westWater, 0.02),
+        ring: waterRing({
+          coastLng,
+          field,
+          oceanFactor: 0.02,
+          phase,
+          shape,
+          west: westWater,
+        }),
       },
       {
         fill: WATER_DEEP,
         id: 'water-deep',
         opacity: 0.28,
-        ring: waterRing(
-          expandBounds(bounds, -0.05),
-          coastLng + (westWater ? -lngSpan * 0.06 : lngSpan * 0.06),
-          phase + 0.28,
-          westWater,
-          0.08,
-        ),
+        ring: waterRing({
+          coastLng: coastLng + (westWater ? -lngSpan * 0.06 : lngSpan * 0.06),
+          field: expandBounds(field, -0.05),
+          oceanFactor: 0.08,
+          phase: phase + 0.28,
+          shape,
+          west: westWater,
+        }),
       },
     ],
   };
