@@ -143,7 +143,7 @@ const layoutSx: SxObject = {
 };
 
 const copyRowSx: SxObject = {
-  '@container now-playing (max-width: 16.5rem)': {
+  '@container now-playing (max-width: 13.5rem)': {
     alignItems: 'flex-start',
     flexDirection: 'column',
   },
