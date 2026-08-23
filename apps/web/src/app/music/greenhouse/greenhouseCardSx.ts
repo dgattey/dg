@@ -36,11 +36,6 @@ export const greenhouseHeadingCardSx: SxObject = {
   padding: { sm: '1.45rem 1.35rem 1.15rem 1.5rem', xs: '1.2rem 1.1rem' },
 };
 
-export const greenhousePileCardSx: SxObject = {
-  ...greenhouseHeadingCardSx,
-  justifyContent: 'flex-start',
-};
-
 /**
  * Flag-off `StickyFadeBar` paints `100vw` cream bands. Kill that bleed when
  * the bar is nested in a greenhouse card so nothing escapes the column.

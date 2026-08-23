@@ -32,7 +32,9 @@ describe('OnRepeatCard', () => {
   it('renders three fanned piles with album · artist captions and song pills on glass', () => {
     render(<OnRepeatCard albums={albums} />);
 
-    expect(screen.getByText('On repeat')).toBeInTheDocument();
+    const heading = screen.getByRole('heading', { name: 'On repeat' });
+    expect(heading.tagName).toBe('H3');
+    expect(screen.getByText('Listening')).toBeInTheDocument();
     expect(screen.queryByText('Stacked albums')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'USB' })).toBeInTheDocument();
     expect(screen.getByText('Fred again.., Jamie T')).toBeInTheDocument();
@@ -43,8 +45,10 @@ describe('OnRepeatCard', () => {
     ).toBeGreaterThanOrEqual(12);
     const cover = screen.getByRole('img', { name: 'USB' });
     expect(cover.getAttribute('sizes') ?? '').toContain('400px');
-    expect(document.querySelector('[data-greenhouse-cell="on-repeat-heading"]')).toBeTruthy();
-    expect(document.querySelectorAll('[data-greenhouse-cell="on-repeat-pile"]')).toHaveLength(3);
+    const card = document.querySelector('[data-on-repeat]');
+    expect(card).toHaveAttribute('data-greenhouse-cell', 'on-repeat');
+    expect(document.querySelector('[data-greenhouse-cell="on-repeat-heading"]')).toBeNull();
+    expect(document.querySelectorAll('[data-greenhouse-cell="on-repeat-pile"]')).toHaveLength(0);
   });
 
   it('renders nothing when there are no albums', () => {

@@ -3,16 +3,8 @@ import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
 import { AlbumPile } from './AlbumPile';
-import { greenhouseHeadingCardSx, greenhousePileCardSx } from './greenhouseCardSx';
+import { greenhouseCardHeaderSx, greenhouseWellCardSx } from './greenhouseCardSx';
 import type { RankedAlbum } from './types';
-
-const sectionSx: SxObject = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 1.5,
-  minWidth: 0,
-  width: '100%',
-};
 
 const pilesSx: SxObject = {
   display: { sm: 'grid', xs: 'flex' },
@@ -29,9 +21,9 @@ const pilesSx: SxObject = {
   WebkitOverflowScrolling: 'touch',
 };
 
-const pileCardSx: SxObject = {
-  ...greenhousePileCardSx,
+const pileSx: SxObject = {
   flex: { sm: 'unset', xs: '0 0 78%' },
+  minWidth: 0,
   scrollSnapAlign: { sm: 'unset', xs: 'start' },
 };
 
@@ -49,9 +41,8 @@ type Props = {
 };
 
 /**
- * Three fanned album piles on desktop, two on tablet, a scroll-snap row on
- * mobile. Each pile sits on intro-token glass so the caption stays readable.
- * Fan-out is CSS only.
+ * One glass section card: Listening overline + “On repeat” heading, then the
+ * stack row (3-up on desktop, scroll-snap on mobile). Fan-out is CSS only.
  */
 export function OnRepeatCard({ albums }: Props) {
   if (albums.length === 0) {
@@ -59,13 +50,16 @@ export function OnRepeatCard({ albums }: Props) {
   }
 
   return (
-    <Box data-on-repeat="" sx={sectionSx}>
-      <ContentCard data-greenhouse-cell="on-repeat-heading" sx={greenhouseHeadingCardSx}>
-        <Typography variant="overline">On repeat</Typography>
-      </ContentCard>
+    <ContentCard data-greenhouse-cell="on-repeat" data-on-repeat="" sx={greenhouseWellCardSx}>
+      <Box sx={greenhouseCardHeaderSx}>
+        <Typography variant="overline">Listening</Typography>
+        <Typography component="h3" variant="h3">
+          On repeat
+        </Typography>
+      </Box>
       <Box sx={pilesSx}>
         {albums.map((album) => (
-          <ContentCard data-greenhouse-cell="on-repeat-pile" key={album.id} sx={pileCardSx}>
+          <Box key={album.id} sx={pileSx}>
             <Link
               href={album.url}
               isExternal={true}
@@ -85,9 +79,9 @@ export function OnRepeatCard({ albums }: Props) {
                 <Typography variant="caption">{album.artistNames}</Typography>
               </Box>
             </Link>
-          </ContentCard>
+          </Box>
         ))}
       </Box>
-    </Box>
+    </ContentCard>
   );
 }
