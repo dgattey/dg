@@ -296,7 +296,7 @@ export function headerControlsRect(viewport: ViewportSize): NamedRect {
 }
 
 export function edgeStripVisibleHeight(viewport: ViewportSize): number {
-  return bottomBandHeight(viewport) + viewport.height * 0.06;
+  return bottomBandHeight(viewport);
 }
 
 export function edgeStripRect(

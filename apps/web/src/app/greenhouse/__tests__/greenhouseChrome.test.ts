@@ -48,7 +48,7 @@ describe('greenhouse chrome', () => {
     expect(css).toContain('repeat-x');
     expect(css).toContain('object-position: bottom left');
     expect(css).toContain('object-position: bottom right');
-    expect(css).toContain('height: calc(var(--greenhouse-band) + 6dvh)');
+    expect(css).toContain('height: var(--greenhouse-band)');
     expect(css).toContain('mask-image: linear-gradient(to bottom, transparent, #000 42%)');
   });
 

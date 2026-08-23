@@ -172,8 +172,8 @@ describe('greenhouse safe zones', () => {
   it('caps the bottom band to a peek, not a wall', () => {
     expect(bottomBandHeight(GREENHOUSE_VIEWPORTS.desktop)).toBe(135);
     expect(bottomBandHeight(GREENHOUSE_VIEWPORTS.mobile)).toBeCloseTo(75.96, 1);
-    expect(edgeStripVisibleHeight(GREENHOUSE_VIEWPORTS.desktop)).toBe(189);
-    expect(edgeStripVisibleHeight(GREENHOUSE_VIEWPORTS.mobile)).toBeCloseTo(126.6, 1);
+    expect(edgeStripVisibleHeight(GREENHOUSE_VIEWPORTS.desktop)).toBe(135);
+    expect(edgeStripVisibleHeight(GREENHOUSE_VIEWPORTS.mobile)).toBeCloseTo(75.96, 1);
   });
 
   it('lets edge silhouettes overlap the grid column without covering copy', () => {
