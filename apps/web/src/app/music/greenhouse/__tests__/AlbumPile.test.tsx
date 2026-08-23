@@ -1,14 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { AlbumPile } from '../AlbumPile';
 
-jest.mock('../albumPile.module.css', () => ({
-  cover: 'cover',
-  pile: 'pile',
-  pill: 'pill',
-  scrim: 'scrim',
-  stage: 'stage',
-}));
-
 describe('AlbumPile', () => {
   it('fans four to six covers and names only the front', () => {
     const { container } = render(

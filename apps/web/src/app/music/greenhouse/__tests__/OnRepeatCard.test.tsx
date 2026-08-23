@@ -1,14 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { OnRepeatCard } from '../OnRepeatCard';
 
-jest.mock('../albumPile.module.css', () => ({
-  cover: 'cover',
-  pile: 'pile',
-  pill: 'pill',
-  scrim: 'scrim',
-  stage: 'stage',
-}));
-
 const albums = [
   {
     artistNames: 'Fred again.., Jamie T',

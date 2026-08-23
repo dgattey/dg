@@ -1,12 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { MusicGreenhouseGrid } from '../MusicGreenhouseGrid';
 
-jest.mock('../../../greenhouse/greenhouse.module.css', () => ({
-  cell: 'cell',
-  grid: 'grid',
-  nowPlaying: 'nowPlaying',
-}));
-
 describe('MusicGreenhouseGrid', () => {
   it('maps intro, landscape hero, on-repeat, and the two lists onto 12 columns', () => {
     render(

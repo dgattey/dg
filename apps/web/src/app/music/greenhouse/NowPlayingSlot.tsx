@@ -7,13 +7,9 @@ import { Suspense } from 'react';
 import { getLatestSong } from '../../../services/spotify';
 import { SpotifyCardWithGradient } from '../../spotify/SpotifyCardWithGradient';
 
-const heroSx: SxObject = {
-  '& [data-bento="now-playing"]': {
-    minHeight: { sm: 'unset' },
-  },
+const cellSx: SxObject = {
   display: 'flex',
   height: '100%',
-  minHeight: { sm: 'unset', xs: '16.5rem' },
   width: '100%',
 };
 
@@ -24,20 +20,16 @@ async function NowPlayingAsync({ fixture }: { fixture?: Track }) {
   }
 
   return (
-    <Box data-now-playing-hero="" sx={heroSx}>
-      {/*
-       * `layout="hero"` lands on `NowPlayingCard` from its owner (art large
-       * right, `h2` title). Until then the card already sits art-beside-copy
-       * at ≥ 13.5rem; this slot only gives it the landscape span.
-       */}
-      <SpotifyCardWithGradient track={track} variant="nowPlaying" />
+    <Box data-now-playing-hero-slot="" sx={cellSx}>
+      <SpotifyCardWithGradient layout="hero" track={track} variant="nowPlaying" />
     </Box>
   );
 }
 
 /**
- * Live now-playing through the greenhouse `NowPlayingCard` (notes, wash, art).
- * Typed `fixture` is for the gitignored preview page only.
+ * Live now-playing through the greenhouse `NowPlayingCard`. The slot only
+ * fills the landscape cell; `layout="hero"` owns art, copy, and the <30rem
+ * fallback. Typed `fixture` is for the gitignored preview page only.
  */
 export function NowPlayingSlot({ fixture }: { fixture?: Track } = {}) {
   return (

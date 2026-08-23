@@ -1,14 +1,6 @@
 import { render, screen } from '@testing-library/react';
 import { AlbumsGreenhouseGrid } from '../AlbumsGreenhouseGrid';
 
-jest.mock('../albumPile.module.css', () => ({
-  cover: 'cover',
-  pile: 'pile',
-  pill: 'pill',
-  scrim: 'scrim',
-  stage: 'stage',
-}));
-
 const albums = [
   {
     addedAt: '2026-01-01T00:00:00Z',
