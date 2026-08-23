@@ -23,10 +23,9 @@ describe('AlbumsGreenhouseGrid', () => {
   it('restores the sortable favorite grid with name – artist tooltips', () => {
     render(<AlbumsGreenhouseGrid albums={albums} />);
 
-    expect(document.querySelector('[data-albums-greenhouse]')).toHaveAttribute(
-      'data-greenhouse-cell',
-      'albums-grid',
-    );
+    expect(document.querySelector('[data-albums-greenhouse]')).toBeTruthy();
+    expect(document.querySelector('[data-greenhouse-cell="albums-toolbar"]')).toBeTruthy();
+    expect(document.querySelector('[data-greenhouse-cell="albums-grid"]')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'USB' }).getAttribute('href')).toContain(
       '2ClZ9xWAYg1BH8zkR96dJo',
     );

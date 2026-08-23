@@ -2,14 +2,24 @@ import 'server-only';
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
+import type { SxObject } from '@dg/ui/theme';
 import { GreenhouseTypeProvider } from '@dg/ui/theme/GreenhouseTypeProvider';
-import { Typography } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import { Suspense } from 'react';
 import { getFavoriteAlbums } from '../../../services/albums';
 import { AlbumsGreenhouseGrid } from './AlbumsGreenhouseGrid';
 import { greenhouseHeadingCardSx } from './greenhouseCardSx';
 import { ListeningHeading } from './ListeningHeading';
+
+const albumsColumnSx: SxObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 'var(--greenhouse-gutter, 1.25rem)',
+  marginInline: 'auto',
+  maxWidth: '68rem',
+  width: '100%',
+};
 
 const ALBUMS_DESCRIPTION = 'Saved records, stacked so they fan on hover.';
 
@@ -59,10 +69,12 @@ export function AlbumsGreenhousePage({
 }) {
   return (
     <GreenhouseTypeProvider>
-      <ListeningHeading cell="albums-heading" description={ALBUMS_DESCRIPTION} title="Albums" />
-      <Suspense fallback={null}>
-        <AlbumsGreenhouseSlots fixture={fixture}>{children}</AlbumsGreenhouseSlots>
-      </Suspense>
+      <Box sx={albumsColumnSx}>
+        <ListeningHeading cell="albums-heading" description={ALBUMS_DESCRIPTION} title="Albums" />
+        <Suspense fallback={null}>
+          <AlbumsGreenhouseSlots fixture={fixture}>{children}</AlbumsGreenhouseSlots>
+        </Suspense>
+      </Box>
     </GreenhouseTypeProvider>
   );
 }

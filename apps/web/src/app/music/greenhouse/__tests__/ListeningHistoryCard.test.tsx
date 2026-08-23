@@ -27,6 +27,7 @@ describe('ListeningHistoryCard', () => {
   it('shows the flag-off empty copy on glass when history is empty', () => {
     render(<ListeningHistoryCard initialCursor={null} initialTracks={[]} />);
 
+    expect(screen.getByRole('heading', { name: 'Listening history' })).toBeInTheDocument();
     expect(screen.getByText('No listening history yet.')).toBeInTheDocument();
     expect(document.querySelector('[data-listening-history]')).toHaveAttribute(
       'data-greenhouse-cell',
@@ -44,6 +45,7 @@ describe('ListeningHistoryCard', () => {
       </ServerTimeProvider>,
     );
 
+    expect(screen.getByRole('heading', { name: 'Listening history' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'Today' })).toBeInTheDocument();
     expect(screen.getByText('2 tracks')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Bloom – Bloom artist, 2 tracks' })).toHaveAttribute(

@@ -82,6 +82,8 @@ function albumSlotSx(index: number): SxObject {
   };
 }
 
+type AlbumGridColumns = typeof ALBUM_GRID_COLUMNS;
+
 /**
  * Albums claim the odd visual slots (album `i` gets `order: 2i + 1`), which
  * leaves every even slot free for the well. The well belongs at the end of the
@@ -89,17 +91,21 @@ function albumSlotSx(index: number): SxObject {
  * its slot is emitted once per breakpoint rather than measured in JS —
  * measuring would render a different tree on the server than on the client.
  */
-function wellPlacementSx(selectedIndex: number, albumCount: number): SxObject {
-  const slotFor = (columns: number) =>
-    2 * Math.min(albumCount, (Math.floor(selectedIndex / columns) + 1) * columns);
+function wellPlacementSx(
+  selectedIndex: number,
+  albumCount: number,
+  columns: AlbumGridColumns,
+): SxObject {
+  const slotFor = (columnCount: number) =>
+    2 * Math.min(albumCount, (Math.floor(selectedIndex / columnCount) + 1) * columnCount);
 
   return {
     gridColumn: '1 / -1',
     order: {
-      lg: slotFor(ALBUM_GRID_COLUMNS.lg),
-      md: slotFor(ALBUM_GRID_COLUMNS.md),
-      sm: slotFor(ALBUM_GRID_COLUMNS.sm),
-      xs: slotFor(ALBUM_GRID_COLUMNS.xs),
+      lg: slotFor(columns.lg),
+      md: slotFor(columns.md),
+      sm: slotFor(columns.sm),
+      xs: slotFor(columns.xs),
     },
   };
 }
@@ -108,6 +114,15 @@ type Props = {
   albums: Array<PlaylistAlbum>;
   /** Streamed detail for the album in the URL, rendered inside the well. */
   children?: ReactNode;
+  /**
+   * Column counts for the grid and the in-row well. Flag-off omits this and
+   * keeps `ALBUM_GRID_COLUMNS`. Greenhouse passes a wider-cover count.
+   */
+  columns?: AlbumGridColumns;
+  /** Wrap the sort bar (greenhouse toolbar card). Flag-off omits this. */
+  renderToolbar?: (toolbar: ReactNode) => ReactNode;
+  /** Wrap the cover grid (greenhouse glass card). Flag-off omits this. */
+  renderGrid?: (grid: ReactNode) => ReactNode;
 };
 
 /**
@@ -120,7 +135,13 @@ type Props = {
  * mounted across open and close. Clicks run ahead of the query so the well
  * opens on the click instead of on the payload that click goes and fetches.
  */
-export function FavoriteAlbumsGrid({ albums, children }: Props) {
+export function FavoriteAlbumsGrid({
+  albums,
+  children,
+  columns = ALBUM_GRID_COLUMNS,
+  renderToolbar,
+  renderGrid,
+}: Props) {
   // Client navigations photograph a height-matched reserve instead of ~300
   // next/image nodes. Reveal after the page-rise animations (plus a paint)
   // so the grid commit cannot hitch the 300ms transition.
@@ -191,7 +212,7 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
     : -1;
   const selectedAlbum = selectedIndex >= 0 ? sortedAlbums[selectedIndex] : undefined;
   const well = selectedAlbum ? (
-    <Box key="album-well" sx={wellPlacementSx(selectedIndex, sortedAlbums.length)}>
+    <Box key="album-well" sx={wellPlacementSx(selectedIndex, sortedAlbums.length, columns)}>
       <AlbumWell album={selectedAlbum}>
         {/*
          * Streamed detail always belongs to the album in the URL, so it is only
@@ -237,27 +258,41 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
       : [renderAlbum(album, index)],
   );
 
+  // The whole bar goes with the sorter when scripting is off, rather than
+  // leaving a dead control or an empty band behind it. Sorting is the only
+  // thing this bar is for, and it reorders a grid that React holds in state;
+  // every album and every album link is already on the page in the default
+  // order, so nothing here is the only route to anything.
+  const toolbar = (
+    <StickyFadeBar {...jsOnlyProps}>
+      <GlassSwitcher
+        aria-label="Sort albums"
+        mobileIcon={<ArrowDownUp size={18} />}
+        onChange={(next) => handleSortChange(next as AlbumSortKey)}
+        options={SORT_OPTIONS.map((option) => ({ label: option.label, value: option.key }))}
+        value={sortKey}
+      />
+    </StickyFadeBar>
+  );
+  const gridSx: SxObject = {
+    ...albumGridSx,
+    gridTemplateColumns: {
+      lg: `repeat(${columns.lg}, 1fr)`,
+      md: `repeat(${columns.md}, 1fr)`,
+      sm: `repeat(${columns.sm}, 1fr)`,
+      xs: `repeat(${columns.xs}, 1fr)`,
+    },
+  };
+  const grid = (
+    <Box onClickCapture={onAlbumNavigationCapture} sx={gridSx}>
+      {cells}
+    </Box>
+  );
+
   return (
     <Stack spacing={2}>
-      {/*
-       * The whole bar goes with the sorter when scripting is off, rather than
-       * leaving a dead control or an empty band behind it. Sorting is the only
-       * thing this bar is for, and it reorders a grid that React holds in state;
-       * every album and every album link is already on the page in the default
-       * order, so nothing here is the only route to anything.
-       */}
-      <StickyFadeBar {...jsOnlyProps}>
-        <GlassSwitcher
-          aria-label="Sort albums"
-          mobileIcon={<ArrowDownUp size={18} />}
-          onChange={(next) => handleSortChange(next as AlbumSortKey)}
-          options={SORT_OPTIONS.map((option) => ({ label: option.label, value: option.key }))}
-          value={sortKey}
-        />
-      </StickyFadeBar>
-      <Box onClickCapture={onAlbumNavigationCapture} sx={albumGridSx}>
-        {cells}
-      </Box>
+      {renderToolbar ? renderToolbar(toolbar) : toolbar}
+      {renderGrid ? renderGrid(grid) : grid}
     </Stack>
   );
 }

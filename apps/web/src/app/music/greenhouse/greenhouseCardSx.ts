@@ -41,6 +41,41 @@ export const greenhousePileCardSx: SxObject = {
   justifyContent: 'flex-start',
 };
 
+/**
+ * Flag-off `StickyFadeBar` paints `100vw` cream bands. Kill that bleed when
+ * the bar is nested in a greenhouse card so nothing escapes the column.
+ */
+export const containStickyBleedSx: SxObject = {
+  '& [data-sticky-fade], & [data-sticky-surface]': {
+    display: 'none',
+  },
+};
+
+/** History / albums grid: intro frost, fans may paint past the pad. */
+export const greenhouseWellCardSx: SxObject = {
+  ...greenhouseHeadingCardSx,
+  ...containStickyBleedSx,
+  justifyContent: 'flex-start',
+  overflow: 'visible',
+};
+
+/** Sort chips: same frost, no sticky cream band, no leftover fade pad. */
+export const greenhouseToolbarCardSx: SxObject = {
+  ...greenhouseWellCardSx,
+  '& > *': {
+    paddingBlockEnd: 0,
+    position: 'relative',
+    top: 'auto',
+    zIndex: 'auto',
+  },
+};
+
+/**
+ * Four desktop columns so stacks read at ~original cover size or larger.
+ * Flag-off stays on `ALBUM_GRID_COLUMNS` (6 / 4 / 3 / 2).
+ */
+export const GREENHOUSE_ALBUM_COLUMNS = { lg: 4, md: 3, sm: 3, xs: 2 } as const;
+
 export const greenhouseCardHeaderSx: SxObject = {
   display: 'flex',
   flexDirection: 'column',
