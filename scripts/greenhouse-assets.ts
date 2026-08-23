@@ -305,6 +305,64 @@ async function loadKeyedSource(src: string): Promise<Rgba> {
   return prepareKeyed(await rawFromSharp(sharp(src)));
 }
 
+/**
+ * Soften a rectangular inner slab so the content-facing edge reads as a
+ * silhouette. Wave the erode depth so the cut is not a second straight line.
+ */
+function erodeInnerSlab(raw: Rgba, side: 'left' | 'right'): Rgba {
+  const { data, width, height } = raw;
+  const out = Buffer.from(data);
+  for (let y = 0; y < height; y += 1) {
+    const wave =
+      12 + 24 * (0.5 + 0.5 * Math.sin(y * 0.037)) + 16 * (0.5 + 0.5 * Math.sin(y * 0.091 + 1.2));
+    const radius = Math.round(32 + wave);
+    if (side === 'right') {
+      let first = -1;
+      for (let x = 0; x < width; x += 1) {
+        if (data[(y * width + x) * 4 + 3] > 24) {
+          first = x;
+          break;
+        }
+      }
+      if (first < 0) {
+        continue;
+      }
+      for (let x = first; x < Math.min(width, first + radius); x += 1) {
+        const t = (x - first) / radius;
+        const i = (y * width + x) * 4 + 3;
+        out[i] = Math.round(out[i] * t * t);
+      }
+    } else {
+      let last = -1;
+      for (let x = width - 1; x >= 0; x -= 1) {
+        if (data[(y * width + x) * 4 + 3] > 24) {
+          last = x;
+          break;
+        }
+      }
+      if (last < 0) {
+        continue;
+      }
+      for (let x = last; x > Math.max(-1, last - radius); x -= 1) {
+        const t = (last - x) / radius;
+        const i = (y * width + x) * 4 + 3;
+        out[i] = Math.round(out[i] * t * t);
+      }
+    }
+  }
+  return { data: out, height, width };
+}
+
+/** Keep the top silhouette of a keyed band so the dense mass is a peek, not a wall. */
+function cropBandPeek(raw: Rgba, maxHeight = 168): Rgba {
+  if (raw.height <= maxHeight) {
+    return raw;
+  }
+  const data = Buffer.alloc(raw.width * maxHeight * 4);
+  raw.data.copy(data, 0, 0, raw.width * maxHeight * 4);
+  return { data, height: maxHeight, width: raw.width };
+}
+
 function cropFoliageRows(raw: Rgba, threshold = 24): Rgba {
   let top = 0;
   found: for (let y = 0; y < raw.height; y += 1) {
@@ -369,7 +427,7 @@ async function encodeEdges(srcDir: string, outDir: string): Promise<void> {
   for (const side of ['left', 'right'] as const) {
     const src = requireSrc(srcDir, `plant-src-edge-${side}.png`);
     process.stdout.write(`edge-${side} ${src}\n`);
-    const keyed = await loadKeyedSource(src);
+    const keyed = erodeInnerSlab(await loadKeyedSource(src), side);
     await encodeKeyedHeight(keyed, 1536, join(outDir, `edge-${side}-1536`));
     await encodeKeyedHeight(keyed, 900, join(outDir, `edge-${side}-900`));
     await encodeKeyedHeight(keyed, 768, join(outDir, `edge-${side}-768`), 40);
@@ -378,7 +436,7 @@ async function encodeEdges(srcDir: string, outDir: string): Promise<void> {
 
 async function encodeBottomBand(srcDir: string, outDir: string): Promise<void> {
   const src = requireSrc(srcDir, 'plant-src-bottom-band.png');
-  const keyed = cropFoliageRows(await loadKeyedSource(src));
+  const keyed = cropBandPeek(cropFoliageRows(await loadKeyedSource(src)));
   const seam = seamMeanAbsDiff(keyed);
   const dirty = seam > 18;
   process.stdout.write(
@@ -399,6 +457,32 @@ async function processPlant(name: string, srcDir: string, outDir: string): Promi
   process.stdout.write(`${name} ${keyed.width}×${keyed.height}\n`);
   await encodeKeyedWidth(keyed, 1024, join(outDir, `${name}-1024`));
   await encodeKeyedWidth(keyed, 768, join(outDir, `${name}-768`));
+}
+
+/**
+ * Re-key shipped encodes when the magenta PNG sources are not on disk.
+ * Right strip: eat the inner slab. Band: keep a shallow peek tile.
+ */
+async function repairExistingFoliage(foliageDir: string): Promise<void> {
+  const rightSrc = join(foliageDir, 'edge-right-1536.webp');
+  if (!existsSync(rightSrc)) {
+    throw new Error(`missing ${rightSrc}`);
+  }
+  process.stdout.write('repair edge-right inner slab from existing 1536 webp\n');
+  const right = featherAlpha(erodeInnerSlab(await rawFromSharp(sharp(rightSrc)), 'right'));
+  await encodeKeyedHeight(right, 1536, join(foliageDir, 'edge-right-1536'));
+  await encodeKeyedHeight(right, 900, join(foliageDir, 'edge-right-900'));
+  await encodeKeyedHeight(right, 768, join(foliageDir, 'edge-right-768'), 40);
+
+  const bandSrc = join(foliageDir, 'bottom-band-1536.webp');
+  if (!existsSync(bandSrc)) {
+    throw new Error(`missing ${bandSrc}`);
+  }
+  process.stdout.write('repair bottom-band peek from existing 1536 webp\n');
+  const band = cropBandPeek(await rawFromSharp(sharp(bandSrc)));
+  await encodeKeyedWidth(band, 1536, join(foliageDir, 'bottom-band-1536'));
+  await encodeKeyedWidth(band, 1024, join(foliageDir, 'bottom-band-1024'));
+  await encodeKeyedWidth(band, 768, join(foliageDir, 'bottom-band-768'));
 }
 
 async function encodeOneXFromExisting(atmosphereDir: string, foliageDir: string): Promise<void> {
@@ -463,6 +547,12 @@ async function main(): Promise<void> {
   mkdirSync(foliageDir, { recursive: true });
 
   const run = (name: string) => only.length === 0 || only.includes(name);
+  if (run('repair')) {
+    await repairExistingFoliage(foliageDir);
+    if (only.length === 1) {
+      return;
+    }
+  }
   if (run('1x')) {
     await encodeOneXFromExisting(atmosphereDir, foliageDir);
     if (only.length === 1) {
