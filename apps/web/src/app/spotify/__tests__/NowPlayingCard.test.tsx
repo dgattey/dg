@@ -54,7 +54,7 @@ describe('NowPlayingCard', () => {
     );
 
     expect(screen.getByText(/now playing/i)).toBeInTheDocument();
-    expect(screen.getAllByText('Leaflight').length).toBe(2);
+    expect(screen.getAllByText('Leaflight').length).toBe(3);
     expect(screen.getByText('Alder & Moss')).toBeInTheDocument();
     expect(document.querySelector('[data-now-playing-progress]')).toBeTruthy();
   });
@@ -151,7 +151,8 @@ describe('NowPlayingCard', () => {
 
     const titles = screen.getAllByText('Leaflight');
     expect(titles[0]).toHaveClass('MuiTypography-h3');
-    expect(titles[1]).toHaveClass('MuiTypography-h5');
+    expect(titles[1]).toHaveClass('MuiTypography-h4');
+    expect(titles[2]).toHaveClass('MuiTypography-h5');
     const titleCss = [...document.querySelectorAll('style')]
       .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
       .filter((rule) =>
@@ -191,7 +192,9 @@ describe('NowPlayingCard', () => {
       .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
       .join('\n');
     expect(css).toContain('@container now-playing (max-width: 22.5rem)');
+    expect(css).toContain('@container now-playing (min-width: 12rem) and (max-width: 22.5rem)');
     expect(document.querySelector('[data-now-playing-title] .MuiTypography-h3')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-title] .MuiTypography-h4')).toBeTruthy();
     expect(document.querySelector('[data-now-playing-title] .MuiTypography-h5')).toBeTruthy();
     expect(document.querySelector('[data-now-playing-artist] .MuiTypography-h5')).toBeTruthy();
     expect(css).not.toContain('1.35rem + 0.55vw');
@@ -211,6 +214,7 @@ describe('NowPlayingCard', () => {
     expect(document.querySelector('[data-now-playing-scrim]')).toBeTruthy();
     expect(document.querySelector('[data-now-playing-grain]')).toBeTruthy();
     expect(document.querySelector('[data-now-playing-title] .MuiTypography-h3')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-title] .MuiTypography-h4')).toBeTruthy();
     expect(document.querySelector('[data-now-playing-artist] .MuiTypography-h5')).toBeTruthy();
     expect(css).toContain('rgba(40, 55, 35, 0.55)');
     expect(css).toContain('#e7d48a');

@@ -27,16 +27,24 @@ const nowPlayingClampSx: SxObject = {
   WebkitLineClamp: 2,
 };
 
-const nowPlayingWideSx: SxObject = {
+const nowPlayingH3Sx: SxObject = {
   ...nowPlayingClampSx,
   '@container now-playing (max-width: 22.5rem)': {
     display: 'none',
   },
 };
 
-const nowPlayingNarrowSx: SxObject = {
+const nowPlayingH4Sx: SxObject = {
   ...nowPlayingClampSx,
-  '@container now-playing (max-width: 22.5rem)': {
+  '@container now-playing (min-width: 12rem) and (max-width: 22.5rem)': {
+    display: '-webkit-box',
+  },
+  display: 'none',
+};
+
+const nowPlayingH5Sx: SxObject = {
+  ...nowPlayingClampSx,
+  '@container now-playing (max-width: 12rem)': {
     display: '-webkit-box',
   },
   display: 'none',
@@ -90,30 +98,38 @@ function NowPlayingTitle({
   textShadow?: string;
 }) {
   const paint = colorShadowSx(color, textShadow);
-  const wideSx = { ...nowPlayingWideSx, ...paint };
-  const narrowSx = { ...nowPlayingNarrowSx, ...paint };
+  const steps = [
+    { sx: { ...nowPlayingH3Sx, ...paint }, variant: 'h3' as const },
+    { sx: { ...nowPlayingH4Sx, ...paint }, variant: 'h4' as const },
+    { sx: { ...nowPlayingH5Sx, ...paint }, variant: 'h5' as const },
+  ];
 
   if (!url) {
     return (
       <>
-        <Typography sx={wideSx} variant="h3">
-          {trackTitle}
-        </Typography>
-        <Typography sx={narrowSx} variant="h5">
-          {trackTitle}
-        </Typography>
+        {steps.map(({ sx, variant }) => (
+          <Typography key={variant} sx={sx} variant={variant}>
+            {trackTitle}
+          </Typography>
+        ))}
       </>
     );
   }
 
   return (
     <>
-      <Link href={url} isExternal={true} sx={wideSx} title={trackTitle} variant="h3">
-        {trackTitle}
-      </Link>
-      <Link href={url} isExternal={true} sx={narrowSx} title={trackTitle} variant="h5">
-        {trackTitle}
-      </Link>
+      {steps.map(({ sx, variant }) => (
+        <Link
+          href={url}
+          isExternal={true}
+          key={variant}
+          sx={sx}
+          title={trackTitle}
+          variant={variant}
+        >
+          {trackTitle}
+        </Link>
+      ))}
     </>
   );
 }
