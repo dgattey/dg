@@ -95,8 +95,10 @@ describe('IntroCard', () => {
     const about = screen.getByRole('link', { name: 'About' });
     expect(about).toHaveAttribute('href', 'https://linkedin.com/in/dgattey');
     expect(about).toHaveAttribute('target', '_blank');
-    expect(screen.getByText('About')).toBeInTheDocument();
+    expect(screen.getByText('About')).toHaveClass('MuiTypography-overline');
     expect(document.querySelector('[data-role="intro-about-overlay"]')).toBeTruthy();
+    expect(screen.getByText('Dylan Gattey')).toHaveClass('MuiTypography-h1');
+    expect(screen.getByText('Engineer. Problem solver.')).toHaveClass('MuiTypography-body1');
   });
 
   it('does not force a two-word heading measure onto the bio column', () => {

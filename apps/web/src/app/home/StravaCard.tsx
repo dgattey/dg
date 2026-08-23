@@ -143,7 +143,13 @@ const mapSx: SxObject = {
 /**
  * Shows a card with the latest activity from Strava
  */
-export function StravaCard({ activity }: { activity: StravaActivity | null }) {
+export function StravaCard({
+  activity,
+  typeScale = 'default',
+}: {
+  activity: StravaActivity | null;
+  typeScale?: 'default' | 'greenhouse';
+}) {
   if (!activity) {
     return null;
   }
@@ -163,7 +169,7 @@ export function StravaCard({ activity }: { activity: StravaActivity | null }) {
         </Box>
         <Stack sx={copyBackingSx}>
           <ActivityTypeWithIcon activity={activity} />
-          <ActivityName activity={activity} sx={activityNameSx} />
+          <ActivityName activity={activity} sx={activityNameSx} typeScale={typeScale} />
           <ActivityDescription activity={activity} />
         </Stack>
       </Stack>

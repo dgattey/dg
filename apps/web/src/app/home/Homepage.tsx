@@ -49,7 +49,7 @@ export async function Homepage({
       <Grid>
         <IntroCardSlot key="intro" variant="composed" />
         <SpotifyCardSlot key="spotify" variant="nowPlaying" />
-        <StravaCardSlot key="strava" />
+        <StravaCardSlot key="strava" typeScale="greenhouse" />
         {featured ? (
           <ProjectCard
             eyebrow="Featured project"

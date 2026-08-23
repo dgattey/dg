@@ -21,7 +21,9 @@ describe('StravaCard', () => {
   it('keeps the standard card treatment when the activity has no route', () => {
     render(<StravaCard activity={{ ...activity, map: null }} />);
 
-    expect(screen.getByRole('link', { name: 'Morning run' })).toBeInTheDocument();
+    const name = screen.getByRole('link', { name: 'Morning run' });
+    expect(name).toBeInTheDocument();
+    expect(name).toHaveClass('MuiTypography-h5');
     expect(screen.queryByTestId('route-map')).not.toBeInTheDocument();
   });
 
@@ -36,6 +38,7 @@ describe('StravaCard', () => {
             map: { summaryPolyline: 'summary-route' },
             movingTime: 7620,
           }}
+          typeScale="greenhouse"
         />
       </div>,
     );
@@ -43,6 +46,7 @@ describe('StravaCard', () => {
     const links = screen.getAllByRole('link', { name: 'Morning run' });
     expect(links).toHaveLength(2);
     expect(links[0]).toBeVisible();
+    expect(links[0]).toHaveClass('MuiTypography-h3');
     expect(links[0]).toHaveAttribute('href', 'https://www.strava.com/activities/123');
     expect(links[1]).toBeVisible();
     expect(screen.getByText('Along the ridge')).toBeVisible();

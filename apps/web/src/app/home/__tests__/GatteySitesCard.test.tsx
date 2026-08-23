@@ -67,12 +67,12 @@ describe('GatteySitesCard', () => {
     );
   });
 
-  it('uses h5 titles and caption descriptions on greenhouse rows', () => {
+  it('uses h3 titles and body2 descriptions on greenhouse rows', () => {
     render(<GatteySitesCard projects={projects} variant="rows" />);
 
-    expect(screen.getByText('WMM')).toHaveClass('MuiTypography-h5');
+    expect(screen.getByText('WMM')).toHaveClass('MuiTypography-h3');
     expect(screen.getByText('See what you own and where it sits')).toHaveClass(
-      'MuiTypography-caption',
+      'MuiTypography-body2',
     );
   });
 });

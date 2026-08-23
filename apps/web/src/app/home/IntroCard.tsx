@@ -220,7 +220,7 @@ function ComposedPortrait({
       <IntroPortrait introBlock={introBlock} />
       {linkedInLink ? (
         <Box data-role="intro-about-overlay" sx={composedAboutOverlaySx}>
-          <Typography variant="h5">About</Typography>
+          <Typography variant="overline">About</Typography>
         </Box>
       ) : null}
     </>
