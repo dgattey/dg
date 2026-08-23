@@ -47,16 +47,16 @@ export const HEADING_FONT_SIZE_DISPLAY = 'clamp(2.25rem, 1.4rem + 4vw, 3.25rem)'
  * one vocabulary. Applied only through a nested theme / `[data-greenhouse-type]`.
  */
 export const GREENHOUSE_TYPE_SCALE = {
-  body1: 'clamp(0.875rem, 0.8125rem + 0.14vw, 0.9375rem)',
-  body2: 'clamp(0.8125rem, 0.76rem + 0.14vw, 0.875rem)',
-  caption: 'clamp(0.6875rem, 0.64rem + 0.12vw, 0.75rem)',
-  h1: 'clamp(2.25rem, 0.75rem + 3.4vw, 4rem)',
-  h2: 'clamp(1.75rem, 1.05rem + 1.8vw, 2.5rem)',
-  h3: 'clamp(1.375rem, 0.9rem + 1.15vw, 1.875rem)',
-  h4: 'clamp(1.125rem, 0.85rem + 0.7vw, 1.375rem)',
-  h5: 'clamp(0.8125rem, 0.7rem + 0.35vw, 1rem)',
-  h6: 'clamp(0.8125rem, 0.7rem + 0.35vw, 1rem)',
-  overline: 'clamp(0.6875rem, 0.625rem + 0.14vw, 0.75rem)',
+  body1: 'clamp(14px, 13px + 0.14vw, 15px)',
+  body2: 'clamp(13px, 12.16px + 0.14vw, 14px)',
+  caption: 'clamp(11px, 10.24px + 0.12vw, 12px)',
+  h1: 'clamp(36px, 12px + 3.4vw, 64px)',
+  h2: 'clamp(28px, 16.8px + 1.8vw, 40px)',
+  h3: 'clamp(22px, 14.4px + 1.15vw, 30px)',
+  h4: 'clamp(18px, 13.6px + 0.7vw, 22px)',
+  h5: 'clamp(13px, 11.2px + 0.35vw, 16px)',
+  h6: 'clamp(13px, 11.2px + 0.35vw, 16px)',
+  overline: 'clamp(11px, 10px + 0.14vw, 12px)',
 } as const;
 
 export const GREENHOUSE_TYPE_VARS: Record<`--${string}`, string> = {
