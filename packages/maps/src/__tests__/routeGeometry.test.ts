@@ -93,7 +93,11 @@ describe('route geometry', () => {
       return spanX / spanY;
     });
 
-    expect(Math.abs(aspects[0]! - aspects[1]!) / aspects[0]!).toBeLessThan(0.12);
+    const [wideAspect, tallAspect] = aspects;
+    if (wideAspect === undefined || tallAspect === undefined) {
+      throw new Error('expected two route aspects');
+    }
+    expect(Math.abs(wideAspect - tallAspect) / wideAspect).toBeLessThan(0.12);
   });
 
   it('uses a close zoom for a single-point route', () => {
