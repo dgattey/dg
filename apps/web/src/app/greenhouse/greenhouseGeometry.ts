@@ -527,8 +527,8 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
 }
 
 /**
- * Live-DOM copy wells: every `[data-greenhouse-cell]` plus the page
- * heading and On repeat eyebrow. Snapshots live in `greenhouseMusicWells`.
+ * Live-DOM copy wells: every `[data-greenhouse-cell]` plus header and
+ * footer. On repeat is one merged card. Snapshots live in `greenhouseMusicWells`.
  */
 export function musicCopyRects(viewport: ViewportSize): Array<NamedRect> {
   return [...musicLiveWells(viewport)];

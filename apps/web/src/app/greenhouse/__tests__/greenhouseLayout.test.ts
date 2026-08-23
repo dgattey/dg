@@ -227,24 +227,18 @@ describe('greenhouse safe zones', () => {
       'cell-intro',
       'cell-now-playing',
       'cell-albums',
-      'cell-on-repeat-heading',
+      'cell-on-repeat',
       'cell-history',
-      'cell-on-repeat-pile-0',
-      'cell-on-repeat-pile-1',
-      'cell-on-repeat-pile-2',
     ]);
     expect(musicDocumentWells(viewport, 'listening').map((rect) => rect.id)).toEqual([
       'header-bar',
       'cell-intro',
       'cell-now-playing',
       'cell-albums',
-      'cell-on-repeat-heading',
+      'cell-on-repeat',
       'cell-history',
       'cell-tracks',
       'cell-artists',
-      'cell-on-repeat-pile-0',
-      'cell-on-repeat-pile-1',
-      'cell-on-repeat-pile-2',
       'footer',
     ]);
     expect(musicDocumentWells(viewport, 'albums').map((rect) => rect.id)).toEqual([

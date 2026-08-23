@@ -143,7 +143,7 @@ export function headingInFrame(
   const contribBottom = viewportHeight - frame.cropBottom;
   const top = Math.max(viewTop, contribTop);
   const bottom = Math.min(viewBottom, contribBottom);
-  if (bottom - top <= 0.5) {
+  if (bottom - top <= 2) {
     return null;
   }
   return {

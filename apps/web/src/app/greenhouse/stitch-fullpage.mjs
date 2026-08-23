@@ -10,7 +10,7 @@
  *   node --experimental-strip-types stitch-fullpage.mjs --url … --out … --width 1440 --height 900
  */
 import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join } from 'node:path';
 import {
   assertFrameAbutment,
   assertHeadingsOnce,
@@ -106,7 +106,7 @@ async function collectHeadings(page) {
   return page.evaluate(() => {
     const nodes = [...document.querySelectorAll('h1, h2, h3, h4, h5, [role="heading"]')];
     return nodes
-      .map((el, index) => {
+      .map((el) => {
         const box = el.getBoundingClientRect();
         const style = getComputedStyle(el);
         const text = (el.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 80);
@@ -117,9 +117,10 @@ async function collectHeadings(page) {
           style.position === 'sticky' ||
           style.position === 'fixed' ||
           Boolean(el.closest('header, [data-site-header]'));
+        const docY = sticky ? box.y : window.scrollY + box.y;
         return {
           height: box.height,
-          id: `${text}#${index}`,
+          id: `${text}@${Math.round(docY)}`,
           sticky,
           width: box.width,
           x: box.x,
@@ -230,13 +231,31 @@ async function stitchPage(page, { url, width, height, dpr = 2 }) {
   };
 }
 
+function writeRetry(path, buf, tries = 4) {
+  let last;
+  for (let i = 0; i < tries; i += 1) {
+    try {
+      mkdirSync(dirname(path), { recursive: true });
+      writeFileSync(path, buf);
+      return;
+    } catch (error) {
+      last = error;
+      Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, 250 * 2 ** i);
+    }
+  }
+  throw last;
+}
+
 function writeBoth(name, buf) {
-  mkdirSync(OUT, { recursive: true });
-  writeFileSync(join(OUT, name), buf);
+  const dest = name.startsWith('/') ? name : join(OUT, name);
+  writeRetry(dest, buf);
+  if (name.startsWith('/')) {
+    return;
+  }
   try {
-    writeFileSync(join(STORE, name), buf);
+    writeRetry(join(STORE, name), buf);
   } catch {
-    copyFileSync(join(OUT, name), join(STORE, name));
+    copyFileSync(dest, join(STORE, name));
   }
 }
 
