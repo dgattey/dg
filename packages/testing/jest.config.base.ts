@@ -35,6 +35,9 @@ const swcTransform: Config['transform'] = {
 export const baseConfig: Config = {
   maxWorkers: '50%',
   moduleNameMapper: {
+    // Static rasters (Next image imports) — next/jest maps these at the top
+    // level, but `projects` do not inherit that mapper.
+    '\\.(avif|webp|png|jpg)$': resolve(dir, 'file-stub.cjs'),
     // Mock server-only to a no-op (next/jest does this automatically for @dg/web)
     'server-only': resolve(dir, 'server-only-mock.js'),
   },

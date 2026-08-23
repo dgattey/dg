@@ -1,9 +1,16 @@
 /** @jest-config-loader esbuild-register */
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { dbConfig } from '@dg/db/testing/jest.config.base';
 import type { Config } from 'jest';
 import nextJest from 'next/jest.js';
 
 const createJestConfig = nextJest({ dir: './' });
+
+const imageAssetStub = resolve(
+  dirname(fileURLToPath(import.meta.url)),
+  '../../packages/testing/file-stub.cjs',
+);
 
 // Shared config that applies to all tests
 const sharedConfig: Config = {
@@ -11,6 +18,10 @@ const sharedConfig: Config = {
   coverageProvider: 'v8',
   // Next.js 16 patches setImmediate; Jest leak detection recurses via promisify in tests.
   detectLeaks: false,
+  moduleNameMapper: {
+    ...dbConfig.moduleNameMapper,
+    '\\.(avif|webp|png|jpg)$': imageAssetStub,
+  },
 };
 
 // Auto-detect environment by file extension:
