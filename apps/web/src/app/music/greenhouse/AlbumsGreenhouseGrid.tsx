@@ -6,11 +6,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import { FavoriteAlbumsGrid } from '../albums/FavoriteAlbumsGrid';
-import {
-  GREENHOUSE_ALBUM_COLUMNS,
-  greenhouseToolbarCardSx,
-  greenhouseWellCardSx,
-} from './greenhouseCardSx';
+import { GREENHOUSE_ALBUM_COLUMNS, greenhouseWellCardSx } from './greenhouseCardSx';
 
 type Props = {
   albums: ReadonlyArray<PlaylistAlbum>;
@@ -28,29 +24,22 @@ const columnSx: SxObject = {
 };
 
 /**
- * Favorite albums in the greenhouse column: glass sort toolbar + glass grid
- * of stacked covers. Same `FavoriteAlbumsGrid` data and interactions as
- * flag-off; the 100vw fade bar is stripped by the card tokens.
+ * Favorite albums in one greenhouse card: sort chips, then stacked covers.
+ * Same `FavoriteAlbumsGrid` data and interactions as flag-off; the sticky
+ * fade bar stays off so it cannot paint the layout cream header mask.
  */
 export function AlbumsGreenhouseGrid({ albums, children }: Props) {
   return (
     <Box data-albums-greenhouse="" sx={columnSx}>
-      <FavoriteAlbumsGrid
-        albums={[...albums]}
-        columns={GREENHOUSE_ALBUM_COLUMNS}
-        renderGrid={(grid) => (
-          <ContentCard data-greenhouse-cell="albums-grid" sx={greenhouseWellCardSx}>
-            {grid}
-          </ContentCard>
-        )}
-        renderToolbar={(toolbar) => (
-          <ContentCard data-greenhouse-cell="albums-toolbar" sx={greenhouseToolbarCardSx}>
-            {toolbar}
-          </ContentCard>
-        )}
-      >
-        {children}
-      </FavoriteAlbumsGrid>
+      <ContentCard data-greenhouse-cell="albums-grid" sx={greenhouseWellCardSx}>
+        <FavoriteAlbumsGrid
+          albums={[...albums]}
+          columns={GREENHOUSE_ALBUM_COLUMNS}
+          stickyToolbar={false}
+        >
+          {children}
+        </FavoriteAlbumsGrid>
+      </ContentCard>
     </Box>
   );
 }

@@ -57,17 +57,6 @@ export const greenhouseWellCardSx: SxObject = {
   overflow: 'visible',
 };
 
-/** Sort chips: same frost, no sticky cream band, no leftover fade pad. */
-export const greenhouseToolbarCardSx: SxObject = {
-  ...greenhouseWellCardSx,
-  '& > *': {
-    paddingBlockEnd: 0,
-    position: 'relative',
-    top: 'auto',
-    zIndex: 'auto',
-  },
-};
-
 /**
  * Four desktop columns so stacks read at ~original cover size or larger.
  * Flag-off stays on `ALBUM_GRID_COLUMNS` (6 / 4 / 3 / 2).

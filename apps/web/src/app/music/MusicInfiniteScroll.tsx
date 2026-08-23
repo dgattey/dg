@@ -13,6 +13,12 @@ import { MusicGrid } from './MusicGrid';
 type Props = {
   initialTracks: Array<HistoryTrack>;
   initialCursor: string | null;
+  /**
+   * Flag-off default: sticky h2 date bars. Greenhouse passes `plain` so
+   * labels sit in the card as overlines and do not emit `data-sticky-fade`
+   * (that trips the layout cream header mask).
+   */
+  dateLabels?: 'sticky' | 'plain';
 };
 
 const loadingContainerSx: SxObject = {
@@ -31,7 +37,11 @@ const sectionHeaderSx: SxObject = {
  * Infinite scroll wrapper for music history.
  * Loads more tracks when sentinel element enters viewport.
  */
-export function MusicInfiniteScroll({ initialTracks, initialCursor }: Props) {
+export function MusicInfiniteScroll({
+  initialTracks,
+  initialCursor,
+  dateLabels = 'sticky',
+}: Props) {
   const serverTime = useServerTime();
   const [allTracks, setAllTracks] = useState<Array<HistoryTrack>>(initialTracks);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
@@ -75,11 +85,17 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor }: Props) {
     <Stack spacing={3}>
       {sections.map((section) => (
         <Stack key={section.label} spacing={1}>
-          <StickyFadeBar>
-            <Typography sx={sectionHeaderSx} variant="h2">
+          {dateLabels === 'plain' ? (
+            <Typography color="text.primary" variant="overline">
               {section.label}
             </Typography>
-          </StickyFadeBar>
+          ) : (
+            <StickyFadeBar>
+              <Typography sx={sectionHeaderSx} variant="h2">
+                {section.label}
+              </Typography>
+            </StickyFadeBar>
+          )}
           <MusicGrid tracks={section.tracks} />
         </Stack>
       ))}

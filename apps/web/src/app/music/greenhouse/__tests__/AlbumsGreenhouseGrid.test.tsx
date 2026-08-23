@@ -24,8 +24,11 @@ describe('AlbumsGreenhouseGrid', () => {
     render(<AlbumsGreenhouseGrid albums={albums} />);
 
     expect(document.querySelector('[data-albums-greenhouse]')).toBeTruthy();
-    expect(document.querySelector('[data-greenhouse-cell="albums-toolbar"]')).toBeTruthy();
+    expect(document.querySelector('[data-greenhouse-cell="albums-toolbar"]')).toBeNull();
     expect(document.querySelector('[data-greenhouse-cell="albums-grid"]')).toBeTruthy();
+    expect(document.querySelector('[data-sticky-fade]')).toBeNull();
+    const albumsCard = document.querySelector('[data-greenhouse-cell="albums-grid"]');
+    expect(albumsCard?.querySelector('[data-role="glass-switcher"]')).toBeTruthy();
     expect(screen.getByRole('link', { name: 'USB' }).getAttribute('href')).toContain(
       '2ClZ9xWAYg1BH8zkR96dJo',
     );

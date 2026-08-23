@@ -17,13 +17,17 @@ type Props = {
 export function ListeningHistoryCard({ initialTracks, initialCursor }: Props) {
   return (
     <ContentCard data-greenhouse-cell="history" data-listening-history="" sx={greenhouseWellCardSx}>
-      <Typography component="h2" variant="h2">
+      <Typography component="h3" variant="h3">
         Listening history
       </Typography>
       {initialTracks.length === 0 ? (
         <Typography variant="body1">No listening history yet.</Typography>
       ) : (
-        <MusicInfiniteScroll initialCursor={initialCursor} initialTracks={[...initialTracks]} />
+        <MusicInfiniteScroll
+          dateLabels="plain"
+          initialCursor={initialCursor}
+          initialTracks={[...initialTracks]}
+        />
       )}
     </ContentCard>
   );

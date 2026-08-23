@@ -119,10 +119,12 @@ type Props = {
    * keeps `ALBUM_GRID_COLUMNS`. Greenhouse passes a wider-cover count.
    */
   columns?: AlbumGridColumns;
-  /** Wrap the sort bar (greenhouse toolbar card). Flag-off omits this. */
-  renderToolbar?: (toolbar: ReactNode) => ReactNode;
-  /** Wrap the cover grid (greenhouse glass card). Flag-off omits this. */
-  renderGrid?: (grid: ReactNode) => ReactNode;
+  /**
+   * Flag-off default: sort chips sit in a `StickyFadeBar`. Greenhouse passes
+   * `false` so the chips live inside the albums card and do not emit
+   * `data-sticky-fade` (that trips the layout cream header mask).
+   */
+  stickyToolbar?: boolean;
 };
 
 /**
@@ -139,8 +141,7 @@ export function FavoriteAlbumsGrid({
   albums,
   children,
   columns = ALBUM_GRID_COLUMNS,
-  renderToolbar,
-  renderGrid,
+  stickyToolbar = true,
 }: Props) {
   // Client navigations photograph a height-matched reserve instead of ~300
   // next/image nodes. Reveal after the page-rise animations (plus a paint)
@@ -263,16 +264,19 @@ export function FavoriteAlbumsGrid({
   // thing this bar is for, and it reorders a grid that React holds in state;
   // every album and every album link is already on the page in the default
   // order, so nothing here is the only route to anything.
-  const toolbar = (
-    <StickyFadeBar {...jsOnlyProps}>
-      <GlassSwitcher
-        aria-label="Sort albums"
-        mobileIcon={<ArrowDownUp size={18} />}
-        onChange={(next) => handleSortChange(next as AlbumSortKey)}
-        options={SORT_OPTIONS.map((option) => ({ label: option.label, value: option.key }))}
-        value={sortKey}
-      />
-    </StickyFadeBar>
+  const switcher = (
+    <GlassSwitcher
+      aria-label="Sort albums"
+      mobileIcon={<ArrowDownUp size={18} />}
+      onChange={(next) => handleSortChange(next as AlbumSortKey)}
+      options={SORT_OPTIONS.map((option) => ({ label: option.label, value: option.key }))}
+      value={sortKey}
+    />
+  );
+  const toolbar = stickyToolbar ? (
+    <StickyFadeBar {...jsOnlyProps}>{switcher}</StickyFadeBar>
+  ) : (
+    <Box {...jsOnlyProps}>{switcher}</Box>
   );
   const gridSx: SxObject = {
     ...albumGridSx,
@@ -291,8 +295,8 @@ export function FavoriteAlbumsGrid({
 
   return (
     <Stack spacing={2}>
-      {renderToolbar ? renderToolbar(toolbar) : toolbar}
-      {renderGrid ? renderGrid(grid) : grid}
+      {toolbar}
+      {grid}
     </Stack>
   );
 }
