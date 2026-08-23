@@ -202,30 +202,8 @@ export function stitchOffsets(frames: ReadonlyArray<StitchFrame>): ReadonlyArray
 /** Overlap between consecutive filmstrip viewports, below the sticky header. */
 export const FILMSTRIP_HEADER_GAP_PX = 16;
 
-/**
- * True viewport stops for a filmstrip. Step is `vh − headerBottom − 16` so
- * the band under the sticky header in frame n was fully visible in frame n−1.
- * Last stop is always page end.
- */
-export function planFilmstripStops(
-  scrollHeight: number,
-  viewportHeight: number,
-  headerBottom = 0,
-): ReadonlyArray<number> {
-  if (viewportHeight <= 0 || scrollHeight <= 0) {
-    throw new StitchSeamError(`invalid metrics vh=${viewportHeight} sh=${scrollHeight}`);
-  }
-  const maxScroll = Math.max(0, scrollHeight - viewportHeight);
-  const step = Math.max(1, viewportHeight - Math.max(0, headerBottom) - FILMSTRIP_HEADER_GAP_PX);
-  const stops = [0];
-  for (let y = step; y < maxScroll - 1; y += step) {
-    stops.push(y);
-  }
-  if (maxScroll > 0 && stops.at(-1) !== maxScroll) {
-    stops.push(maxScroll);
-  }
-  return stops;
-}
+/** Adjacent stops closer than this fraction of the viewport look copy-pasted. */
+export const FILMSTRIP_MIN_GAP_RATIO = 0.4;
 
 export type FilmstripHeadingDoc = {
   docY: number;
@@ -233,31 +211,126 @@ export type FilmstripHeadingDoc = {
   sticky: boolean;
 };
 
+export function filmstripStep(viewportHeight: number, headerBottom = 0): number {
+  return Math.max(1, viewportHeight - Math.max(0, headerBottom) - FILMSTRIP_HEADER_GAP_PX);
+}
+
+export function filmstripMinGap(viewportHeight: number): number {
+  return FILMSTRIP_MIN_GAP_RATIO * viewportHeight;
+}
+
+export function headingClearAt(
+  heading: FilmstripHeadingDoc,
+  scrollY: number,
+  headerBottom: number,
+  viewportHeight: number,
+): boolean {
+  if (heading.sticky || heading.height <= 0) {
+    return false;
+  }
+  const y = heading.docY - scrollY;
+  return y >= headerBottom && y + heading.height <= viewportHeight + 0.5;
+}
+
+function contentHeadings(
+  headings: ReadonlyArray<FilmstripHeadingDoc>,
+): ReadonlyArray<FilmstripHeadingDoc> {
+  return headings.filter((heading) => !heading.sticky && heading.height > 0);
+}
+
+function parkFor(heading: FilmstripHeadingDoc, headerBottom: number, maxScroll: number): number {
+  return Math.min(maxScroll, Math.max(0, Math.round(heading.docY - headerBottom)));
+}
+
+function headingsClearOn(
+  headings: ReadonlyArray<FilmstripHeadingDoc>,
+  stops: ReadonlyArray<number>,
+  headerBottom: number,
+  viewportHeight: number,
+): boolean {
+  return headings.every((heading) =>
+    stops.some((scrollY) => headingClearAt(heading, scrollY, headerBottom, viewportHeight)),
+  );
+}
+
 /**
- * The default stride can leave a title sitting in the 16px overlap. Insert a
- * stop that parks that title just below the header so the self-check can pass.
+ * True viewport stops for a filmstrip. Step is `vh − headerBottom − 16` so
+ * the band under the sticky header in frame n was fully visible in frame n−1.
+ * Last stop is always page end. Adjacent stops stay at least 40% of vh apart;
+ * if the clamped end is closer than that, the previous stop is dropped.
+ */
+export function planFilmstripStops(
+  scrollHeight: number,
+  viewportHeight: number,
+  headerBottom = 0,
+  headings: ReadonlyArray<FilmstripHeadingDoc> = [],
+): ReadonlyArray<number> {
+  if (viewportHeight <= 0 || scrollHeight <= 0) {
+    throw new StitchSeamError(`invalid metrics vh=${viewportHeight} sh=${scrollHeight}`);
+  }
+  const maxScroll = Math.max(0, scrollHeight - viewportHeight);
+  const step = filmstripStep(viewportHeight, headerBottom);
+  const minGap = filmstripMinGap(viewportHeight);
+  const content = contentHeadings(headings);
+  const stops = [0];
+  let y = 0;
+  while (y + step < maxScroll - 1) {
+    const regular = y + step;
+    const missing = content.filter(
+      (heading) =>
+        !stops.some((scrollY) => headingClearAt(heading, scrollY, headerBottom, viewportHeight)) &&
+        !headingClearAt(heading, regular, headerBottom, viewportHeight),
+    );
+    const parks = missing
+      .map((heading) => parkFor(heading, headerBottom, maxScroll))
+      .filter((park) => park > y && park < maxScroll);
+    const next = parks.length > 0 ? Math.min(...parks) : regular;
+    y = next;
+    stops.push(y);
+  }
+  if (maxScroll > 0 && stops.at(-1) !== maxScroll) {
+    const prev = stops.at(-1) ?? 0;
+    if (stops.length > 1 && maxScroll - prev < minGap) {
+      const withoutPrev = [...stops.slice(0, -1), maxScroll];
+      if (headingsClearOn(content, withoutPrev, headerBottom, viewportHeight)) {
+        stops.pop();
+      } else {
+        const prevPrev = stops.at(-2) ?? 0;
+        const lost = content.filter(
+          (heading) =>
+            !withoutPrev.some((scrollY) =>
+              headingClearAt(heading, scrollY, headerBottom, viewportHeight),
+            ),
+        );
+        const latest = Math.min(
+          ...lost.map((heading) => parkFor(heading, headerBottom, maxScroll)),
+        );
+        const nudged = Math.min(prev, latest);
+        if (nudged > prevPrev && headingsClearOn(lost, [nudged], headerBottom, viewportHeight)) {
+          stops[stops.length - 1] = nudged;
+        }
+      }
+    }
+    if (stops.at(-1) !== maxScroll) {
+      stops.push(maxScroll);
+    }
+  }
+  return stops;
+}
+
+/**
+ * Rebuild the filmstrip around title-clearance: a park replaces the regular
+ * step, then the stride continues from that stop. Near-duplicate finals drop
+ * the previous stop, not page end.
  */
 export function ensureHeadingStops(
-  stops: ReadonlyArray<number>,
+  _stops: ReadonlyArray<number>,
   headings: ReadonlyArray<FilmstripHeadingDoc>,
   headerBottom: number,
   viewportHeight: number,
   maxScroll: number,
 ): ReadonlyArray<number> {
-  const extra: Array<number> = [];
-  for (const heading of headings) {
-    if (heading.sticky || heading.height <= 0) {
-      continue;
-    }
-    const ok = stops.some((scrollY) => {
-      const y = heading.docY - scrollY;
-      return y >= headerBottom && y + heading.height <= viewportHeight + 0.5;
-    });
-    if (!ok) {
-      extra.push(Math.min(maxScroll, Math.max(0, Math.round(heading.docY - headerBottom))));
-    }
-  }
-  return [...new Set([...stops, ...extra])].toSorted((a, b) => a - b);
+  return planFilmstripStops(maxScroll + viewportHeight, viewportHeight, headerBottom, headings);
 }
 
 export type FilmstripHeadingShot = {

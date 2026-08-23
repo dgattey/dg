@@ -102,9 +102,9 @@ describe('greenhouse stitch plan', () => {
 
   it('plans filmstrip stops with a header-overlap step, ending at page end', () => {
     expect(planFilmstripStops(1673, 900, 78)).toEqual([0, 773]);
-    expect(planFilmstripStops(3152, 844, 105)).toEqual([0, 723, 1446, 2169, 2308]);
-    expect(planFilmstripStops(1994, 900, 78)).toEqual([0, 806, 1094]);
-    expect(planFilmstripStops(2620, 844, 105)).toEqual([0, 723, 1446, 1776]);
+    expect(planFilmstripStops(3152, 844, 105)).toEqual([0, 723, 1446, 2308]);
+    expect(planFilmstripStops(1994, 900, 78)).toEqual([0, 1094]);
+    expect(planFilmstripStops(2620, 844, 105)).toEqual([0, 723, 1776]);
     expect(planFilmstripStops(800, 900, 78)).toEqual([0]);
   });
 
@@ -126,9 +126,9 @@ describe('greenhouse stitch plan', () => {
     ).not.toThrow();
   });
 
-  it('inserts a stop when a title would sit in the header-overlap gap', () => {
+  it('replaces the next stride with a title park and continues from it', () => {
     const stops = planFilmstripStops(1994, 900, 78);
-    expect(stops).toEqual([0, 806, 1094]);
+    expect(stops).toEqual([0, 1094]);
     const patched = ensureHeadingStops(
       stops,
       [{ docY: 859, height: 46, sticky: false }],
@@ -136,6 +136,10 @@ describe('greenhouse stitch plan', () => {
       900,
       1094,
     );
-    expect(patched).toEqual([0, 781, 806, 1094]);
+    expect(patched).toEqual([0, 781, 1094]);
+  });
+
+  it('drops the previous stop when page end is within 40% of the viewport', () => {
+    expect(planFilmstripStops(3152, 844, 105)).toEqual([0, 723, 1446, 2308]);
   });
 });
