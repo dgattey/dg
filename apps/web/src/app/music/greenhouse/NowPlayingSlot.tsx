@@ -1,17 +1,9 @@
 import 'server-only';
 
 import type { Track } from '@dg/content-models/spotify/Track';
-import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { Suspense } from 'react';
 import { getLatestSong } from '../../../services/spotify';
 import { SpotifyCardWithGradient } from '../../spotify/SpotifyCardWithGradient';
-
-const cellSx: SxObject = {
-  display: 'flex',
-  height: '100%',
-  width: '100%',
-};
 
 async function NowPlayingAsync({ fixture }: { fixture?: Track }) {
   const track = fixture ?? (await getLatestSong().catch(() => null));
@@ -19,16 +11,12 @@ async function NowPlayingAsync({ fixture }: { fixture?: Track }) {
     return null;
   }
 
-  return (
-    <Box data-now-playing-hero-slot="" sx={cellSx}>
-      <SpotifyCardWithGradient layout="hero" track={track} variant="nowPlaying" />
-    </Box>
-  );
+  return <SpotifyCardWithGradient layout="hero" track={track} variant="nowPlaying" />;
 }
 
 /**
- * Live now-playing through the greenhouse `NowPlayingCard`. The slot only
- * fills the landscape cell; `layout="hero"` owns art, copy, and the <30rem
+ * Live now-playing through the greenhouse `NowPlayingCard`. The grid cell
+ * owns the landscape span; `layout="hero"` owns art, copy, and the <30rem
  * fallback. Typed `fixture` is for the gitignored preview page only.
  */
 export function NowPlayingSlot({ fixture }: { fixture?: Track } = {}) {
