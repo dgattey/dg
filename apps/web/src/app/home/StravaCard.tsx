@@ -32,6 +32,9 @@ const cardSx: SxObject = {
     '--route-line': '#f0701a',
     '--route-line-filter': 'drop-shadow(0 1px 3px rgb(0 0 0 / 0.25))',
     '--route-stroke-width': 4,
+    '& [data-activity-when]': {
+      display: 'block',
+    },
     aspectRatio: { md: '16 / 9', xs: '4 / 3' },
     border: 'none',
     display: 'grid',
@@ -50,7 +53,7 @@ const layoutStackSx: SxObject = {
   '[data-greenhouse-frame] &': {
     gridArea: '1 / 1',
     height: '100%',
-    justifyContent: 'flex-start',
+    justifyContent: 'space-between',
     minHeight: 0,
     padding: 1.5,
     textShadow: 'none',
@@ -100,7 +103,14 @@ const statsBackingSx: SxObject = {
 
 const copyBackingSx: SxObject = {
   '[data-greenhouse-frame] &': {
-    display: 'none',
+    backdropFilter: 'blur(14px) saturate(140%)',
+    background: 'color-mix(in srgb, var(--mui-palette-background-paper) 78%, transparent)',
+    borderRadius: '1rem',
+    boxShadow:
+      'inset 0 1px 0 color-mix(in srgb, white 70%, transparent), 0 1px 3px rgb(40 28 12 / 0.1)',
+    margin: 0,
+    padding: '0.7rem 0.85rem 0.75rem',
+    width: '100%',
   },
   background: `linear-gradient(180deg, transparent 0, ${scrimMix(58, 38)} ${FADE}px, ${scrimMix(70, 48)} 55%, ${scrimMix(80, 58)} 100%)`,
   marginBottom: -BLEED,

@@ -25,7 +25,7 @@ describe('StravaCard', () => {
     expect(screen.queryByTestId('route-map')).not.toBeInTheDocument();
   });
 
-  it('hides the activity name on the greenhouse surface', () => {
+  it('keeps the activity name, description, and Strava link on the greenhouse surface', () => {
     render(
       <div data-greenhouse-frame="">
         <StravaCard
@@ -40,8 +40,13 @@ describe('StravaCard', () => {
       </div>,
     );
 
-    expect(screen.getByText('Morning run')).not.toBeVisible();
-    expect(screen.getByText('Along the ridge')).not.toBeVisible();
+    const links = screen.getAllByRole('link', { name: 'Morning run' });
+    expect(links).toHaveLength(2);
+    expect(links[0]).toBeVisible();
+    expect(links[0]).toHaveAttribute('href', 'https://www.strava.com/activities/123');
+    expect(links[1]).toBeVisible();
+    expect(screen.getByText('Along the ridge')).toBeVisible();
+    expect(screen.getByText(/Latest Run/)).toBeVisible();
     expect(screen.getByTestId('route-map')).toHaveAttribute('data-polyline', 'summary-route');
   });
 
@@ -65,5 +70,7 @@ describe('StravaCard', () => {
     expect(source).toContain("height: 'auto !important'");
     expect(source).toContain("display: 'grid'");
     expect(source).toContain("position: 'relative'");
+    expect(source).not.toContain("display: 'none'");
+    expect(source).toContain("justifyContent: 'space-between'");
   });
 });
