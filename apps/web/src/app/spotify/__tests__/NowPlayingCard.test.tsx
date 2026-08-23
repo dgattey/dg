@@ -78,7 +78,9 @@ describe('NowPlayingCard', () => {
     const css = [...document.querySelectorAll('style')]
       .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
       .join('\n');
-    expect(css).toContain('clamp(9.375rem, 56cqi, 14rem)');
+    expect(css).toContain('calc(100cqi - 4.5rem)');
+    expect(css).toContain('margin-left: auto');
+    expect(css).not.toContain('@container now-playing (max-width: 264px)');
     expect(css).not.toContain('width: 64px');
     expect(css).not.toContain('height: 64px');
   });

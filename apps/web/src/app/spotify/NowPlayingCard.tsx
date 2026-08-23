@@ -80,12 +80,8 @@ const layoutSx: SxObject = {
 };
 
 const headerSx: SxObject = {
-  '@container now-playing (max-width: 264px)': {
-    alignItems: 'flex-start',
-    flexDirection: 'column',
-    gap: 1.5,
-  },
-  gap: 3,
+  alignItems: 'flex-start',
+  gap: 1.5,
   justifyContent: 'space-between',
 };
 
@@ -101,14 +97,18 @@ const titleSx: SxObject = {
 };
 
 const cellArtWrapSx: SxObject = {
-  '--image-dim': 'clamp(9.375rem, 56cqi, 14rem)',
-  '@container now-playing (max-width: 264px)': {
-    '--image-dim': 'min(72cqi, 12rem)',
-    alignSelf: 'flex-start',
+  '--image-dim': 'min(14rem, 56cqi, calc(100cqi - 4.5rem))',
+  '@container now-playing (max-width: 210px)': {
+    '--image-dim': '100%',
+    marginLeft: 0,
+    width: '100%',
   },
   alignSelf: 'flex-end',
   aspectRatio: '1 / 1',
-  minWidth: 'var(--image-dim)',
+  flexShrink: 0,
+  marginLeft: 'auto',
+  maxWidth: '100%',
+  minWidth: 0,
   overflow: 'visible',
   position: 'relative',
   width: 'var(--image-dim)',
@@ -230,7 +230,7 @@ const heroCopySx: SxObject = {
   minWidth: 0,
 };
 
-const heroLogoSx: SxObject = {
+const logoSlotSx: SxObject = {
   flexShrink: 0,
 };
 
@@ -373,7 +373,7 @@ export function NowPlayingCard({
           <Box data-now-playing-hero="" sx={heroGridSx}>
             <AlbumCover isPlaying={isPlaying} layout="hero" noteColor={primary} track={track} />
             <Stack sx={heroCopySx}>
-              <Box data-now-playing-logo="" sx={heroLogoSx}>
+              <Box data-now-playing-logo="" sx={logoSlotSx}>
                 <SpotifyLogo
                   color={primary}
                   textShadow={primaryShadow}
@@ -397,7 +397,7 @@ export function NowPlayingCard({
         ) : (
           <Stack sx={layoutSx}>
             <Stack direction="row" sx={headerSx}>
-              <Box data-now-playing-logo="">
+              <Box data-now-playing-logo="" sx={logoSlotSx}>
                 <SpotifyLogo
                   color={primary}
                   textShadow={primaryShadow}
