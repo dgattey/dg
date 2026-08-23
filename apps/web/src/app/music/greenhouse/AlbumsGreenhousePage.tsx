@@ -15,7 +15,7 @@ async function AlbumsGreenhouseSlots({
   children,
   fixture,
 }: {
-  children: ReactNode;
+  children?: ReactNode;
   fixture?: ReadonlyArray<PlaylistAlbum>;
 }) {
   const albums = fixture ?? (await getFavoriteAlbums().catch(() => null)) ?? [];
@@ -35,7 +35,7 @@ export function AlbumsGreenhousePage({
   children,
   fixture,
 }: {
-  children: ReactNode;
+  children?: ReactNode;
   fixture?: ReadonlyArray<PlaylistAlbum>;
 }) {
   return (
