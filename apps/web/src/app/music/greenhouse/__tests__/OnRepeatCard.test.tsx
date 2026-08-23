@@ -33,8 +33,8 @@ describe('OnRepeatCard', () => {
     expect(screen.getByRole('heading', { name: 'USB' })).toBeInTheDocument();
     expect(screen.getByText(/Fred again/)).toBeInTheDocument();
     expect(document.querySelector('[data-album-stack="greenhouse"]')).toBeTruthy();
-    const cover = document.querySelector('img');
-    expect(cover?.getAttribute('sizes') ?? '').toContain('400px');
+    const cover = screen.getByRole('img', { name: 'USB' });
+    expect(cover.getAttribute('sizes') ?? '').toContain('400px');
   });
 
   it('renders nothing when there are no albums', () => {

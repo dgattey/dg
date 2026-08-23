@@ -5,6 +5,7 @@ import { Box, Typography } from '@mui/material';
 import { AlbumCover } from '../AlbumCover';
 import { AlbumStack } from '../AlbumStack';
 import { MAX_ALBUM_SLEEVES } from '../albumTileGeometry';
+import greenhouseStackStyles from './albumStack.module.css';
 import {
   GREENHOUSE_STACK_ART_SIZE,
   GREENHOUSE_STACK_ART_SIZES,
@@ -70,6 +71,7 @@ export function OnRepeatCard({ albums }: Props) {
             title={album.name}
           >
             <AlbumStack
+              className={greenhouseStackStyles.stack}
               imageUrl={album.imageUrl}
               sleeveCount={MAX_ALBUM_SLEEVES}
               variant="greenhouse"
