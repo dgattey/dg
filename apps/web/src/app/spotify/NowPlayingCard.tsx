@@ -150,7 +150,7 @@ const copyRowSx: SxObject = {
   '@container now-playing (min-width: 22.5rem)': {
     width: '56%',
   },
-  alignItems: 'flex-end',
+  alignItems: 'flex-start',
   display: 'flex',
   flexDirection: 'row',
   gap: 1.25,
