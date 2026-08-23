@@ -38,8 +38,16 @@ jest.mock('../ProjectCard', () => ({
   ),
 }));
 
+jest.mock('../MapCardSlot', () => ({
+  MapCardSlot: () => <div data-bento="map">map</div>,
+}));
+
+jest.mock('../GatteySitesCardSlot', () => ({
+  GatteySitesCardSlot: () => <div data-bento="gattey-sites">gattey sites</div>,
+}));
+
 describe('Homepage greenhouse', () => {
-  it('emits only the four mock slots and the first project', async () => {
+  it('emits every flag-off slot including leftover projects', async () => {
     const page = await Homepage({
       Grid: ({ children }) => <div data-testid="grid">{children}</div>,
       introVariant: 'composed',
@@ -47,11 +55,13 @@ describe('Homepage greenhouse', () => {
     render(page);
 
     const grid = screen.getByTestId('grid');
-    expect(grid.children).toHaveLength(4);
+    expect(grid.children).toHaveLength(7);
     expect(screen.getByText('intro')).toBeInTheDocument();
     expect(screen.getByText('now playing')).toBeInTheDocument();
     expect(screen.getByText('activity')).toBeInTheDocument();
     expect(screen.getByText('Flowstate')).toBeInTheDocument();
-    expect(screen.queryByText('Other')).not.toBeInTheDocument();
+    expect(screen.getByText('Other')).toBeInTheDocument();
+    expect(screen.getByText('map')).toBeInTheDocument();
+    expect(screen.getByText('gattey sites')).toBeInTheDocument();
   });
 });

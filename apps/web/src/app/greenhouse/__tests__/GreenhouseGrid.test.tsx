@@ -40,4 +40,30 @@ describe('GreenhouseGrid', () => {
     expect(css).toContain('75cqi');
     expect(css).toContain('160cqi');
   });
+
+  it('flows leftover cells at span 4 on desktop and span 6 on tablet', () => {
+    render(
+      <GreenhouseGrid>
+        <div>intro</div>
+        <div>now</div>
+        <div>activity</div>
+        <div>featured</div>
+        <div>extra-a</div>
+        <div>extra-b</div>
+      </GreenhouseGrid>,
+    );
+
+    expect(screen.getByText('extra-a').parentElement).toHaveAttribute(
+      'data-greenhouse-cell',
+      'more-4',
+    );
+    expect(screen.getByText('extra-b').parentElement).toHaveAttribute(
+      'data-greenhouse-cell',
+      'more-5',
+    );
+    const source = readFileSync(join(__dirname, '../GreenhouseGrid.tsx'), 'utf8');
+    expect(source).toContain("xl: 'span 4'");
+    expect(source).toContain("md: 'span 6'");
+    expect(source).toContain("span ${GREENHOUSE_GRID_SPANS[slot].span}");
+  });
 });

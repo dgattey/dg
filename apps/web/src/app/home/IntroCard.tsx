@@ -79,17 +79,7 @@ const composedLayoutSx: SxObject = {
 const composedTextSx: SxObject = {
   '& h1, & .MuiTypography-h1': {
     color: 'text.primary',
-    fontFamily: 'var(--font-display)',
-    fontSize: {
-      sm: 'clamp(2.35rem, 1.5rem + 2.1vw, 3.35rem)',
-      xs: 'clamp(2.2rem, 10vw, 3rem)',
-    },
-    fontStretch: 'normal',
-    fontVariant: 'normal',
-    fontWeight: 600,
     hyphens: 'none',
-    letterSpacing: '-0.03em',
-    lineHeight: 1.05,
     marginBottom: 0.5,
     overflow: 'visible',
     overflowWrap: 'normal',
@@ -97,16 +87,11 @@ const composedTextSx: SxObject = {
     wordBreak: 'normal',
   },
   '& p': {
-    color: 'text.secondary',
-    fontSize: '0.96rem',
-    lineHeight: 1.4,
     marginBottom: 0.55,
     maxWidth: '40ch',
   },
   '& p:first-of-type': {
     color: 'text.primary',
-    fontSize: '1.02rem',
-    fontWeight: 500,
     marginBottom: 0.5,
   },
   '& p:last-of-type': {
@@ -146,10 +131,10 @@ const socialLinkSx: SxObject = {
   alignItems: 'center',
   color: 'text.secondary',
   display: 'inline-flex',
-  fontSize: '1.15rem',
   height: 36,
   justifyContent: 'center',
   minWidth: 36,
+  width: 36,
 };
 
 export type IntroCardVariant = 'split' | 'composed';

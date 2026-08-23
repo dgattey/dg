@@ -19,6 +19,16 @@ const stackedSpan = (slot: Slot): string =>
     ? `span ${GREENHOUSE_STACKED_SPANS[slot].span}`
     : '1 / -1';
 
+const extraLayout: SxObject = {
+  gridColumn: {
+    md: 'span 6',
+    xl: 'span 4',
+    xs: '1 / -1',
+  },
+  gridRow: 'auto',
+  minHeight: 'auto',
+};
+
 const cellLayout = (slot: Slot): SxObject => ({
   gridColumn: {
     md: stackedSpan(slot),
@@ -48,7 +58,16 @@ export function GreenhouseGrid({ children }: Props) {
       {items.map((child, index) => {
         const slot = SLOTS[index];
         if (!slot) {
-          return child;
+          return (
+            <Box
+              className={styles.cell}
+              data-greenhouse-cell={`more-${index}`}
+              key={`more-${index}`}
+              sx={extraLayout}
+            >
+              {child}
+            </Box>
+          );
         }
         const className =
           slot === 'now-playing' ? `${styles.cell} ${styles.nowPlaying}` : styles.cell;

@@ -10,6 +10,10 @@ import { Box, Chip, Stack, Typography } from '@mui/material';
 
 type ProjectCardProps = RenderableProject & {
   /**
+   * Overline on the featured tile. First project is "Featured project".
+   */
+  eyebrow?: string;
+  /**
    * `media` is today's thumbnail + overlay. `featured` is the greenhouse
    * project tile: label, tags, and a text CTA.
    */
@@ -82,11 +86,7 @@ const featuredIconImgSx: SxObject = {
 
 const featuredBlurbSx: SxObject = {
   '& p': {
-    display: '-webkit-box',
     margin: 0,
-    overflow: 'hidden',
-    WebkitBoxOrient: 'vertical',
-    WebkitLineClamp: 2,
   },
 };
 
@@ -94,11 +94,6 @@ const featuredTagsSx: SxObject = {
   flexDirection: 'row',
   flexWrap: 'wrap',
   gap: 0.75,
-};
-
-const featuredCtaSx: SxObject = {
-  fontSize: '0.92rem',
-  fontWeight: 600,
 };
 
 const emptyRichTextLinks = {
@@ -129,7 +124,14 @@ function FeaturedIcon({ thumbnail }: { thumbnail: RenderableProject['thumbnail']
   return <Box alt="" component="img" src={thumbnail.url} sx={featuredIconImgSx} />;
 }
 
-function FeaturedProjectCard({ description, link, thumbnail, title, type }: RenderableProject) {
+function FeaturedProjectCard({
+  description,
+  eyebrow = 'Featured project',
+  link,
+  thumbnail,
+  title,
+  type,
+}: RenderableProject & { eyebrow?: string }) {
   const tags = projectTags(type);
   const descriptionJson = description?.json;
 
@@ -138,19 +140,23 @@ function FeaturedProjectCard({ description, link, thumbnail, title, type }: Rend
       <Stack sx={featuredLayoutSx}>
         <Stack sx={featuredCopySx}>
           <Typography color="text.secondary" variant="overline">
-            Featured project
+            {eyebrow}
           </Typography>
           <Stack sx={featuredTitleRowSx}>
             <Box sx={featuredIconSx}>
               <FeaturedIcon thumbnail={thumbnail} />
             </Box>
-            <Typography component="h2" sx={featuredTitleSx} variant="h5">
+            <Typography component="h2" sx={featuredTitleSx} variant="h3">
               {title}
             </Typography>
           </Stack>
           {descriptionJson ? (
             <Box sx={featuredBlurbSx}>
-              <RichText json={descriptionJson} links={emptyRichTextLinks} />
+              <RichText
+                json={descriptionJson}
+                links={emptyRichTextLinks}
+                paragraphVariant="body2"
+              />
             </Box>
           ) : null}
           {tags.length > 0 ? (
@@ -162,7 +168,12 @@ function FeaturedProjectCard({ description, link, thumbnail, title, type }: Rend
           ) : null}
         </Stack>
         {link ? (
-          <Link color="secondary" href={link.url} sx={featuredCtaSx} title={link.title}>
+          <Link
+            color="secondary"
+            href={link.url}
+            title={link.title}
+            variant="caption"
+          >
             View project →
           </Link>
         ) : null}
@@ -174,13 +185,13 @@ function FeaturedProjectCard({ description, link, thumbnail, title, type }: Rend
 /**
  * Uses the `ContentCard` to show a project's details
  */
-export function ProjectCard({ variant = 'media', ...project }: ProjectCardProps) {
+export function ProjectCard({ eyebrow, variant = 'media', ...project }: ProjectCardProps) {
   const { width, height, sizes, verticalSpan, horizontalSpan } = useCurrentImageSizes(
     project.layout ?? undefined,
   );
 
   if (variant === 'featured') {
-    return <FeaturedProjectCard {...project} />;
+    return <FeaturedProjectCard eyebrow={eyebrow} {...project} />;
   }
 
   return (

@@ -1,3 +1,4 @@
+import { GreenhouseTypeProvider } from '@dg/ui/theme/GreenhouseTypeProvider';
 import { Homepage } from '../../home/Homepage';
 import { generateHomepageMetadata } from '../../home/homepageMetadata';
 import { GreenhouseFrame } from '../GreenhouseFrame';
@@ -11,8 +12,10 @@ export const generateMetadata = generateHomepageMetadata;
  */
 export default function Page() {
   return (
-    <GreenhouseFrame surface="home">
-      <Homepage Grid={GreenhouseGrid} introVariant="composed" />
-    </GreenhouseFrame>
+    <GreenhouseTypeProvider>
+      <GreenhouseFrame surface="home">
+        <Homepage Grid={GreenhouseGrid} introVariant="composed" />
+      </GreenhouseFrame>
+    </GreenhouseTypeProvider>
   );
 }

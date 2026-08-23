@@ -31,8 +31,8 @@ function mergeCards(
  * toggle.
  *
  * `Grid` defaults to the rigid `ContentGrid` so flag-off `/` stays put.
- * The greenhouse homepage is four cells: intro, now playing, activity,
- * and the first project as featured.
+ * The greenhouse homepage keeps every flag-off slot: intro, now playing,
+ * activity, every project, the location map, and side projects.
  */
 export async function Homepage({
   Grid = ContentGrid,
@@ -44,13 +44,25 @@ export async function Homepage({
   const projects = await getProjects().catch(() => []);
 
   if (introVariant === 'composed') {
-    const featured = projects[0];
+    const [featured, ...rest] = projects;
     return (
       <Grid>
         <IntroCardSlot key="intro" variant="composed" />
         <SpotifyCardSlot key="spotify" variant="nowPlaying" />
         <StravaCardSlot key="strava" />
-        {featured ? <ProjectCard key={featured.title} variant="featured" {...featured} /> : null}
+        {featured ? (
+          <ProjectCard
+            eyebrow="Featured project"
+            key={featured.title}
+            variant="featured"
+            {...featured}
+          />
+        ) : null}
+        {rest.map((project) => (
+          <ProjectCard eyebrow="Project" key={project.title} variant="featured" {...project} />
+        ))}
+        <MapCardSlot key="map" />
+        <GatteySitesCardSlot key="gattey-sites" />
       </Grid>
     );
   }
