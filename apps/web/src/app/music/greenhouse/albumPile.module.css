@@ -6,9 +6,9 @@
 
 .pile {
   --album-fan: 1;
-  isolation: isolate;
   position: relative;
   width: 100%;
+  isolation: isolate;
 }
 
 .pile:hover,
@@ -51,87 +51,72 @@
 }
 
 .stage {
-  aspect-ratio: 1;
-  overflow: visible;
   position: relative;
   width: 100%;
+  aspect-ratio: 1;
+  overflow: visible;
 }
 
 .cover {
-  border-radius: 0.7rem;
-  box-shadow: 0 10px 22px rgb(32 28 12 / 0.18);
+  position: absolute;
   inset: 14% 16% 10% 16%;
   overflow: hidden;
-  position: absolute;
+  border-radius: 0.7rem;
+  box-shadow: 0 10px 22px rgb(32 28 12 / 0.18);
   transform-origin: 50% 70%;
 }
 
 .cover[data-depth="5"] {
-  transform: translate(
-      calc(-14px * var(--album-fan)),
-      calc(10px * var(--album-fan))
-    )
-    rotate(calc(-3.8deg * var(--album-fan)));
   z-index: 1;
+  transform: translate(calc(-14px * var(--album-fan)), calc(10px * var(--album-fan)))
+    rotate(calc(-3.8deg * var(--album-fan)));
 }
 
 .cover[data-depth="4"] {
-  transform: translate(
-      calc(-9px * var(--album-fan)),
-      calc(6px * var(--album-fan))
-    )
-    rotate(calc(-2.4deg * var(--album-fan)));
   z-index: 2;
+  transform: translate(calc(-9px * var(--album-fan)), calc(6px * var(--album-fan)))
+    rotate(calc(-2.4deg * var(--album-fan)));
 }
 
 .cover[data-depth="3"] {
-  transform: translate(
-      calc(8px * var(--album-fan)),
-      calc(-4px * var(--album-fan))
-    )
-    rotate(calc(2.2deg * var(--album-fan)));
   z-index: 3;
+  transform: translate(calc(8px * var(--album-fan)), calc(-4px * var(--album-fan)))
+    rotate(calc(2.2deg * var(--album-fan)));
 }
 
 .cover[data-depth="2"] {
-  transform: translate(
-      calc(13px * var(--album-fan)),
-      calc(-8px * var(--album-fan))
-    )
-    rotate(calc(3.6deg * var(--album-fan)));
   z-index: 4;
+  transform: translate(calc(13px * var(--album-fan)), calc(-8px * var(--album-fan)))
+    rotate(calc(3.6deg * var(--album-fan)));
 }
 
 .cover[data-depth="1"] {
-  transform: translate(
-      calc(-5px * var(--album-fan)),
-      calc(-2px * var(--album-fan))
-    )
-    rotate(calc(-1.6deg * var(--album-fan)));
   z-index: 5;
+  transform: translate(calc(-5px * var(--album-fan)), calc(-2px * var(--album-fan)))
+    rotate(calc(-1.6deg * var(--album-fan)));
 }
 
 .cover[data-depth="0"] {
+  z-index: 6;
   box-shadow: 0 12px 26px rgb(32 28 12 / 0.26);
   transform: none;
-  z-index: 6;
 }
 
 .scrim {
-  background: color-mix(in srgb, var(--mui-palette-background-default) 28%, transparent);
+  position: absolute;
   inset: 0;
   pointer-events: none;
-  position: absolute;
+  background: color-mix(in srgb, var(--mui-palette-background-default) 28%, transparent);
 }
 
 .pill {
-  backdrop-filter: blur(12px) saturate(150%);
+  position: absolute;
+  inset-inline-start: 0.55rem;
+  bottom: 0.55rem;
+  padding: 0.15rem 0.65rem;
+  white-space: nowrap;
   background-color: color-mix(in srgb, var(--mui-palette-background-default) 72%, transparent);
   border: thin solid color-mix(in srgb, var(--mui-palette-common-white) 42%, transparent);
   border-radius: 999px;
-  bottom: 0.55rem;
-  inset-inline-start: 0.55rem;
-  padding: 0.15rem 0.65rem;
-  position: absolute;
-  white-space: nowrap;
+  backdrop-filter: blur(12px) saturate(150%);
 }

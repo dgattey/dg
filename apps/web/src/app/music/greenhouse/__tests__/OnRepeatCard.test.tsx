@@ -46,9 +46,9 @@ describe('OnRepeatCard', () => {
     expect(screen.getByText('Fred again.., Jamie T')).toBeInTheDocument();
     expect(screen.getByText('12 songs')).toBeInTheDocument();
     expect(document.querySelectorAll('[data-album-pile]')).toHaveLength(3);
-    expect(document.querySelectorAll('[data-album-pile] [data-depth]').length).toBeGreaterThanOrEqual(
-      12,
-    );
+    expect(
+      document.querySelectorAll('[data-album-pile] [data-depth]').length,
+    ).toBeGreaterThanOrEqual(12);
     const cover = screen.getByRole('img', { name: 'USB' });
     expect(cover.getAttribute('sizes') ?? '').toContain('400px');
   });

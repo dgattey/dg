@@ -19,7 +19,10 @@ describe('MusicGreenhouseGrid', () => {
       </MusicGreenhouseGrid>,
     );
 
-    expect(screen.getByText('intro').parentElement).toHaveAttribute('data-greenhouse-cell', 'intro');
+    expect(screen.getByText('intro').parentElement).toHaveAttribute(
+      'data-greenhouse-cell',
+      'intro',
+    );
     expect(screen.getByText('now').parentElement).toHaveAttribute(
       'data-greenhouse-cell',
       'now-playing',

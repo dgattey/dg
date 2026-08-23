@@ -8,13 +8,13 @@ import { getLatestSong } from '../../../services/spotify';
 import { SpotifyCardWithGradient } from '../../spotify/SpotifyCardWithGradient';
 
 const heroSx: SxObject = {
+  '& [data-bento="now-playing"]': {
+    minHeight: { sm: 'unset' },
+  },
   display: 'flex',
   height: '100%',
   minHeight: { sm: 'unset', xs: '16.5rem' },
   width: '100%',
-  '& [data-bento="now-playing"]': {
-    minHeight: { sm: 'unset' },
-  },
 };
 
 async function NowPlayingAsync({ fixture }: { fixture?: Track }) {

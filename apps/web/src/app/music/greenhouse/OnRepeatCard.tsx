@@ -28,8 +28,8 @@ const pilesSx: SxObject = {
   minWidth: 0,
   overflowX: { sm: 'visible', xs: 'auto' },
   paddingBlockEnd: { sm: 0, xs: 0.5 },
-  scrollSnapType: { sm: 'none', xs: 'x mandatory' },
   scrollbarWidth: 'none',
+  scrollSnapType: { sm: 'none', xs: 'x mandatory' },
   WebkitOverflowScrolling: 'touch',
 };
 
