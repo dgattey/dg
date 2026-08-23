@@ -205,7 +205,7 @@ const heroGridSx: SxObject = {
 const heroCopySx: SxObject = {
   '@container now-playing (min-width: 30rem)': {
     alignSelf: 'start',
-    paddingTop: 1,
+    paddingTop: 5.25,
   },
   gridArea: 'copy',
   minWidth: 0,
