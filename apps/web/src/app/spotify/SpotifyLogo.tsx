@@ -15,10 +15,10 @@ const getLogoSx = (color?: string, textShadow?: string): SxObject => ({
     fontSize: '3rem',
   },
   alignSelf: 'flex-start',
-  color,
   lineHeight: 1,
   margin: 0,
-  textShadow,
+  ...(color ? { color } : {}),
+  ...(textShadow ? { textShadow } : {}),
 });
 
 /**

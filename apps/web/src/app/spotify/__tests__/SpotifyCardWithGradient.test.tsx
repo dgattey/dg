@@ -116,6 +116,21 @@ describe('SpotifyCardWithGradient', () => {
     expect(document.querySelector('[data-now-playing-title]')).toBeNull();
   });
 
+  it('does not extract a gradient from a non-http album image', () => {
+    const local = makeTrack('local');
+    local.albumGradient = undefined;
+    local.albumGradientContrastSetting = undefined;
+    local.albumImage = { ...local.albumImage, url: '/art.jpg' };
+    render(
+      <ServerTimeProvider serverTime={new Date('2026-02-10T12:00:00Z').getTime()}>
+        <SpotifyCardWithGradient track={local} variant="nowPlaying" />
+      </ServerTimeProvider>,
+    );
+
+    expect(mockExtractAlbumGradient).not.toHaveBeenCalled();
+    expect(document.querySelector('[data-now-playing-fallback]')).toBeTruthy();
+  });
+
   it('forwards layout="hero" to the greenhouse now-playing card', () => {
     mockExtractAlbumGradient.mockImplementation(() => deferredGradient().promise);
     render(

@@ -22,7 +22,6 @@ import { type NowPlayingLayout, TrackTitle } from './TrackTitle';
 
 const shellSx: SxObject = {
   height: '100%',
-  isolation: 'isolate',
   overflow: 'visible',
   position: 'relative',
 };
@@ -37,14 +36,15 @@ const glowSx: SxObject = {
 
 const cardSx: SxObject = {
   '[data-greenhouse-frame] &': {
-    backgroundColor: 'var(--card-bg, var(--glass-bg))',
+    backdropFilter: 'var(--card-backdrop-filter)',
+    background: 'var(--card-bg)',
+    boxShadow: 'var(--card-box-shadow)',
   },
   boxSizing: 'border-box',
   containerName: 'now-playing',
   containerType: 'inline-size',
   display: 'flex',
   height: '100%',
-  isolation: 'isolate',
   maxWidth: 'none',
   minHeight: { md: '15rem', xs: '16.5rem' },
   minWidth: 0,
@@ -66,7 +66,7 @@ const gradientSurfaceSx: SxObject = {
   },
   borderRadius: 'inherit',
   inset: '-1px',
-  zIndex: -1,
+  zIndex: 0,
 };
 
 const layoutSx: SxObject = {
@@ -359,16 +359,22 @@ export function NowPlayingCard({
   const { primary, primaryShadow } = colors ?? {};
   const isPlaying = Boolean(track.isPlaying);
   const hero = layout === 'hero';
+  const gradient = track.albumGradient;
 
   return (
-    <Box sx={{ ...shellSx, ...reducedMotionSx }}>
-      <AlbumGradientBackdrop containerSx={glowSx} gradient={track.albumGradient} />
+    <Box
+      data-now-playing-fallback={gradient ? undefined : ''}
+      sx={{ ...shellSx, ...reducedMotionSx }}
+    >
+      {gradient ? <AlbumGradientBackdrop containerSx={glowSx} gradient={gradient} /> : null}
       <ContentCard
         data-bento="now-playing"
         data-now-playing-layout={layout}
         sx={hero ? heroCardSx : cardSx}
       >
-        <AlbumGradientBackdrop containerSx={gradientSurfaceSx} gradient={track.albumGradient} />
+        {gradient ? (
+          <AlbumGradientBackdrop containerSx={gradientSurfaceSx} gradient={gradient} />
+        ) : null}
         {hero ? (
           <Box data-now-playing-hero="" sx={heroGridSx}>
             <AlbumCover isPlaying={isPlaying} layout="hero" noteColor={primary} track={track} />

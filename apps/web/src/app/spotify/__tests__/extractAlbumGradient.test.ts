@@ -1,4 +1,7 @@
-import { extractAlbumGradientFromImageData } from '../extractAlbumGradient';
+import {
+  contrastSettingFromGradientCss,
+  extractAlbumGradientFromImageData,
+} from '../extractAlbumGradient';
 
 function createRgbaPixels(pixels: Array<[number, number, number]>): Uint8ClampedArray {
   const data = new Uint8ClampedArray(pixels.length * 4);
@@ -78,5 +81,23 @@ describe('extractAlbumGradientFromImageData', () => {
     );
     expect(result.backgroundGradient).not.toBeNull();
     expect(result.backgroundGradient?.split('radial-gradient').length).toBeGreaterThan(3);
+  });
+});
+
+describe('contrastSettingFromGradientCss', () => {
+  it('reads a dark hsla wash as dark', () => {
+    expect(
+      contrastSettingFromGradientCss(
+        'radial-gradient(circle at top right, hsla(24, 40%, 16%, 0.9) 0%, transparent 70%)',
+      ),
+    ).toBe('dark');
+  });
+
+  it('reads a light hex wash as light', () => {
+    expect(contrastSettingFromGradientCss('linear-gradient(#f7f1e4, #efe6d4)')).toBe('light');
+  });
+
+  it('defaults unparseable washes to dark type', () => {
+    expect(contrastSettingFromGradientCss('url(#noise)')).toBe('dark');
   });
 });

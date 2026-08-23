@@ -231,4 +231,46 @@ describe('NowPlayingCard', () => {
     expect(document.querySelector('[data-hero-art-fill]')).toBeTruthy();
     expect(css).toMatch(/padding: 12px|padding: 1\.5/);
   });
+
+  it('paints greenhouse glass and theme type when the album wash is missing', () => {
+    const { albumGradient: _gradient, albumGradientContrastSetting: _contrast, ...bare } = track;
+    const { container } = render(
+      <TestWrapper>
+        <NowPlayingCard track={bare} />
+      </TestWrapper>,
+    );
+
+    expect(document.querySelector('[data-now-playing-fallback]')).toBeTruthy();
+    expect(container.querySelector('[data-gradient-layer]')).toBeNull();
+    const css = [...document.querySelectorAll('style')]
+      .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
+      .join('\n');
+    expect(css).toContain('background: var(--card-bg)');
+    expect(css).toContain('backdrop-filter: var(--card-backdrop-filter)');
+    const title = document.querySelector('[data-now-playing-title] .MuiTypography-root');
+    expect(title).toBeTruthy();
+    expect(getComputedStyle(title as Element).color).not.toBe('rgba(0, 0, 0, 0.7)');
+    expect(getComputedStyle(title as Element).color).not.toBe('rgba(255, 255, 255, 0.7)');
+  });
+
+  it('derives light type on a dark wash when contrastSetting is missing', () => {
+    render(
+      <TestWrapper>
+        <NowPlayingCard
+          track={{
+            ...track,
+            albumGradient: 'linear-gradient(hsla(20, 40%, 18%, 0.9), hsla(20, 30%, 12%, 0.85))',
+            albumGradientContrastSetting: undefined,
+          }}
+        />
+      </TestWrapper>,
+    );
+
+    expect(document.querySelector('[data-now-playing-fallback]')).toBeNull();
+    expect(document.querySelector('[data-gradient-layer]')).toBeTruthy();
+    const css = [...document.querySelectorAll('style')]
+      .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
+      .join('\n');
+    expect(css).toContain('rgba(255, 255, 255, 0.7)');
+  });
 });

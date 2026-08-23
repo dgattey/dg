@@ -86,6 +86,126 @@ function contrastSettingForGradient(colors: FourItemHsla): ContrastSetting {
   return avgLightness > 0.45 ? 'light' : 'dark';
 }
 
+function srgbChannelToLinear(channel: number) {
+  const value = channel / 255;
+  return value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
+}
+
+function relativeLuminance(r: number, g: number, b: number) {
+  return (
+    0.2126 * srgbChannelToLinear(r) +
+    0.7152 * srgbChannelToLinear(g) +
+    0.0722 * srgbChannelToLinear(b)
+  );
+}
+
+function hslToRgb(h: number, s: number, l: number): { r: number; g: number; b: number } {
+  const chroma = (1 - Math.abs(2 * l - 1)) * s;
+  const huePrime = (((h % 360) + 360) % 360) / 60;
+  const x = chroma * (1 - Math.abs((huePrime % 2) - 1));
+  let red = 0;
+  let green = 0;
+  let blue = 0;
+  if (huePrime < 1) {
+    red = chroma;
+    green = x;
+  } else if (huePrime < 2) {
+    red = x;
+    green = chroma;
+  } else if (huePrime < 3) {
+    green = chroma;
+    blue = x;
+  } else if (huePrime < 4) {
+    green = x;
+    blue = chroma;
+  } else if (huePrime < 5) {
+    red = x;
+    blue = chroma;
+  } else {
+    red = chroma;
+    blue = x;
+  }
+  const match = l - chroma / 2;
+  return {
+    b: Math.round((blue + match) * 255),
+    g: Math.round((green + match) * 255),
+    r: Math.round((red + match) * 255),
+  };
+}
+
+function parseHexColor(hex: string): { r: number; g: number; b: number; a: number } | null {
+  const raw =
+    hex.length === 3 || hex.length === 4
+      ? [...hex].map((digit) => `${digit}${digit}`).join('')
+      : hex;
+  if (raw.length !== 6 && raw.length !== 8) {
+    return null;
+  }
+  const r = Number.parseInt(raw.slice(0, 2), 16);
+  const g = Number.parseInt(raw.slice(2, 4), 16);
+  const b = Number.parseInt(raw.slice(4, 6), 16);
+  const a = raw.length === 8 ? Number.parseInt(raw.slice(6, 8), 16) / 255 : 1;
+  if ([r, g, b, a].some((channel) => Number.isNaN(channel))) {
+    return null;
+  }
+  return { a, b, g, r };
+}
+
+/**
+ * Contrast hint from a CSS gradient string when the extractor did not
+ * store `contrastSetting`. Dark washes get light type; light washes get
+ * dark type. Unparseable strings follow the usual album-wash default.
+ */
+export function contrastSettingFromGradientCss(gradient: string): ContrastSetting {
+  const samples: Array<{ alpha: number; luminance: number }> = [];
+
+  for (const match of gradient.matchAll(
+    /hsla?\(\s*([\d.]+)(?:deg)?\s*,\s*([\d.]+)%\s*,\s*([\d.]+)%(?:\s*,\s*([\d.]+))?\s*\)/gi,
+  )) {
+    const rgb = hslToRgb(
+      Number.parseFloat(match[1] ?? '0'),
+      Number.parseFloat(match[2] ?? '0') / 100,
+      Number.parseFloat(match[3] ?? '0') / 100,
+    );
+    samples.push({
+      alpha: match[4] === undefined ? 1 : Number.parseFloat(match[4]),
+      luminance: relativeLuminance(rgb.r, rgb.g, rgb.b),
+    });
+  }
+
+  for (const match of gradient.matchAll(
+    /rgba?\(\s*([\d.]+)\s*,\s*([\d.]+)\s*,\s*([\d.]+)(?:\s*,\s*([\d.]+))?\s*\)/gi,
+  )) {
+    samples.push({
+      alpha: match[4] === undefined ? 1 : Number.parseFloat(match[4]),
+      luminance: relativeLuminance(
+        Number.parseFloat(match[1] ?? '0'),
+        Number.parseFloat(match[2] ?? '0'),
+        Number.parseFloat(match[3] ?? '0'),
+      ),
+    });
+  }
+
+  for (const match of gradient.matchAll(/#([0-9a-f]{3,8})\b/gi)) {
+    const parsed = parseHexColor(match[1] ?? '');
+    if (!parsed) {
+      continue;
+    }
+    samples.push({
+      alpha: parsed.a,
+      luminance: relativeLuminance(parsed.r, parsed.g, parsed.b),
+    });
+  }
+
+  const opaque = samples.filter((sample) => sample.alpha > 0);
+  if (opaque.length === 0) {
+    return 'dark';
+  }
+  const weight = opaque.reduce((sum, sample) => sum + sample.alpha, 0);
+  const average = opaque.reduce((sum, sample) => sum + sample.luminance * sample.alpha, 0) / weight;
+  return average > 0.45 ? 'light' : 'dark';
+}
+
 /**
  * Buckets RGBA pixel data by hue and lightness, returning the top vibrant colors.
  * Also returns the mean color of scanned pixels as a fallback.

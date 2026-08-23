@@ -1,4 +1,5 @@
 import type { Track } from '@dg/content-models/spotify/Track';
+import { contrastSettingFromGradientCss } from './extractAlbumGradient';
 
 export type Colors = {
   primary: string;
@@ -32,8 +33,11 @@ const CONTRASTING_COLORS: Record<'light' | 'dark', Colors> = {
  * Returns a contrasting color for the given track so the gradient background has the right contrast.
  */
 export function getContrastingColors(track: Track): Colors | null {
-  if (!track.albumGradientContrastSetting) {
+  const contrast =
+    track.albumGradientContrastSetting ??
+    (track.albumGradient ? contrastSettingFromGradientCss(track.albumGradient) : null);
+  if (!contrast) {
     return null;
   }
-  return CONTRASTING_COLORS[track.albumGradientContrastSetting];
+  return CONTRASTING_COLORS[contrast];
 }

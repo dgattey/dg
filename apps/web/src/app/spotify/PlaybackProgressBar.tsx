@@ -38,8 +38,9 @@ export function PlaybackProgressBar({
   );
   const startTimeRef = useRef<number>(0);
   const startProgressRef = useRef<number>(progressMs ?? 0);
+  const fill = colors?.primary ?? 'var(--mui-palette-text-primary)';
   const trackSx: SxProps = (theme) => ({
-    backgroundColor: `color-mix(in srgb, ${colors?.primary ?? theme.vars.palette.text.primary} 20%, transparent)`,
+    backgroundColor: `color-mix(in srgb, ${fill} 20%, transparent)`,
     borderRadius: 999,
     height: 6,
     marginTop: theme.spacing(2),
@@ -47,15 +48,15 @@ export function PlaybackProgressBar({
     pointerEvents: 'none',
     width: '100%',
   });
-  const progressSx: SxProps = (theme) => ({
-    backgroundColor: colors ? colors.primary : theme.vars.palette.text.primary,
+  const progressSx: SxProps = {
+    backgroundColor: fill,
     borderRadius: 'inherit',
     height: '100%',
     transform: `scaleX(${progress})`,
     transformOrigin: 'left',
     transition: `transform ${PROGRESS_UPDATE_INTERVAL_MS}ms linear`,
     width: '100%',
-  });
+  };
 
   // When the server sends fresh timing data, reset our baseline and snap the bar.
   useEffect(() => {
