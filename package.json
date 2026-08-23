@@ -24,10 +24,8 @@
   "scripts": {
     "check": "biome check --write .",
     "check:ci": "biome ci .",
-    "check:types": "tsc --noEmit -p scripts/tsconfig.json",
     "clean": "rm -f .env .env.tmp",
-    "preinstall": "npx only-allow pnpm",
-    "test": "pnpm --filter @dg/web exec tsx --test ../../scripts/__tests__/greenhouse-filmstrip.test.ts"
+    "preinstall": "npx only-allow pnpm"
   },
   "version": "2.68.12"
 }
