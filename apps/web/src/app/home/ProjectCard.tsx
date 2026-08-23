@@ -189,11 +189,7 @@ function FeaturedProjectCard({
             <Box data-project-mark="" sx={featuredIconSx}>
               <FeaturedIcon thumbnail={thumbnail} />
             </Box>
-            <Typography
-              component="h2"
-              sx={featuredTitleSx}
-              variant={isTile ? 'h4' : 'h3'}
-            >
+            <Typography component="h2" sx={featuredTitleSx} variant={isTile ? 'h4' : 'h3'}>
               {title}
             </Typography>
           </Stack>
