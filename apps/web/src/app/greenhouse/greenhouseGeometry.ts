@@ -295,13 +295,17 @@ export function headerControlsRect(viewport: ViewportSize): NamedRect {
   return headerBarRect(viewport);
 }
 
+export function edgeStripVisibleHeight(viewport: ViewportSize): number {
+  return bottomBandHeight(viewport) + viewport.height * 0.06;
+}
+
 export function edgeStripRect(
   side: 'left' | 'right',
   viewport: ViewportSize,
   surface: GreenhouseSurface = 'home',
 ): Rect {
   const width = edgeStripImgWidth(viewport.width, side, surface);
-  const height = width / EDGE_STRIP_ASPECT;
+  const height = edgeStripVisibleHeight(viewport);
   return {
     height,
     width,
@@ -577,7 +581,7 @@ export function plantSafeZoneHits(
   return hits;
 }
 
-function mapContain(
+function mapCover(
   localX: number,
   localY: number,
   box: ViewportSize,
@@ -585,7 +589,7 @@ function mapContain(
   posX: number,
   posY: number,
 ): { x: number; y: number } | null {
-  const scale = Math.min(box.width / image.width, box.height / image.height);
+  const scale = Math.max(box.width / image.width, box.height / image.height);
   const drawnWidth = image.width * scale;
   const drawnHeight = image.height * scale;
   const offsetX = (box.width - drawnWidth) * posX;
@@ -610,7 +614,7 @@ export function viewportToEdgeStrip(
   if (vx < box.x || vx >= box.x + box.width || vy < box.y || vy >= box.y + box.height) {
     return null;
   }
-  return mapContain(vx - box.x, vy - box.y, box, image, side === 'left' ? 0 : 1, 1);
+  return mapCover(vx - box.x, vy - box.y, box, image, side === 'left' ? 0 : 1, 1);
 }
 
 export function viewportToBottomBand(

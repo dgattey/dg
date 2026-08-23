@@ -48,6 +48,7 @@ describe('greenhouse chrome', () => {
     expect(css).toContain('repeat-x');
     expect(css).toContain('object-position: bottom left');
     expect(css).toContain('object-position: bottom right');
+    expect(css).toContain('height: calc(var(--greenhouse-band) + 6dvh)');
   });
 
   it('keeps four keyed cutouts for the corner layer and other surfaces', () => {

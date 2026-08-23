@@ -56,17 +56,19 @@
 
 .edgeLeft {
   left: 0;
+  transform-origin: bottom left;
 }
 
 .edgeRight {
   right: 0;
+  transform-origin: bottom right;
 }
 
 .edgeLeft img,
 .edgeRight img {
   display: block;
-  height: auto;
-  object-fit: contain;
+  height: calc(var(--greenhouse-band) + 6dvh);
+  object-fit: cover;
 }
 
 .edgeLeft img {

@@ -4,9 +4,13 @@ import {
   bottomBandSafeZoneHits,
   contentInset,
   edgeStripCopyWellHits,
+  edgeStripOpaqueExtent,
+  edgeStripOverlap,
   edgeStripSafeZoneHits,
   edgeStripWidth,
+  GREENHOUSE_VIEWPORTS,
   type GreenhouseViewportName,
+  musicCopyRects,
   plantSafeZoneHits,
 } from '../greenhouseGeometry';
 import { layoutGreenhousePlants } from '../greenhouseLayout';
@@ -86,6 +90,21 @@ describe('greenhouse foliage safe zones', () => {
       expect(
         plantSafeZoneHits(layoutGreenhousePlants('music', 0, viewport), viewport, 'music'),
       ).toEqual([]);
+    }
+  }, 30000);
+
+  it('fails if a strip opaque AABB crosses a copy well', async () => {
+    const left = await loadAlpha(join(foliageDir, 'edge-left-1536.avif'));
+    const size = GREENHOUSE_VIEWPORTS.desktop;
+    const allowed = contentInset(size.width) + edgeStripOverlap(size.width);
+    for (const well of musicCopyRects(size)) {
+      for (let y = Math.floor(well.y); y < well.y + well.height; y += 8) {
+        const extent = edgeStripOpaqueExtent(left.alpha, left, 'left', size, y, 'music');
+        if (extent != null) {
+          expect(extent).toBeLessThanOrEqual(allowed);
+          expect(extent).toBeLessThan(well.x);
+        }
+      }
     }
   }, 30000);
 });
