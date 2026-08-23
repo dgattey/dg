@@ -1,4 +1,5 @@
 /** @jest-config-loader esbuild-register */
+import { createRequire } from 'node:module';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { dbConfig } from '@dg/db/testing/jest.config.base';
@@ -6,6 +7,7 @@ import type { Config } from 'jest';
 import nextJest from 'next/jest.js';
 
 const createJestConfig = nextJest({ dir: './' });
+const require = createRequire(import.meta.url);
 
 const imageAssetStub = resolve(
   dirname(fileURLToPath(import.meta.url)),
@@ -20,7 +22,8 @@ const sharedConfig: Config = {
   detectLeaks: false,
   moduleNameMapper: {
     ...dbConfig.moduleNameMapper,
-    '\\.(avif|webp|png|jpg)$': imageAssetStub,
+    '\\.(avif|webp|png|jpg|jpeg|gif|svg)$': imageAssetStub,
+    '\\.module\\.css$': require.resolve('identity-obj-proxy'),
   },
 };
 

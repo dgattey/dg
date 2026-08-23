@@ -63,6 +63,12 @@ describe('greenhouse chrome', () => {
     expect(css).toContain('section:has([data-greenhouse-frame])');
   });
 
+  it('resolves foliage image imports through the Jest stub', async () => {
+    const foliage = await import('../GreenhouseFoliage');
+    expect(foliage.GreenhouseFoliage).toEqual(expect.any(Function));
+    expect(foliage.GreenhouseBackPlate).toEqual(expect.any(Function));
+  });
+
   it('paints foliage as inert pictures, not SVG uses', () => {
     const plants = readFileSync(join(__dirname, '../GreenhousePlants.tsx'), 'utf8');
     const foliage = readFileSync(join(__dirname, '../GreenhouseFoliage.tsx'), 'utf8');
