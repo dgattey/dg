@@ -30,6 +30,32 @@ const bloomsSx: SxObject = {
   position: 'absolute',
 };
 
+const heroBloomsSx: SxObject = {
+  ...bloomsSx,
+  '[data-greenhouse-frame] &': {
+    backgroundImage:
+      'radial-gradient(ellipse 42% 48% at 18% 16%, rgb(231 212 138 / 0.5) 0%, rgb(231 212 138 / 0.2) 42%, transparent 72%), radial-gradient(ellipse 36% 40% at 24% 84%, rgb(138 154 91 / 0.34) 0%, rgb(138 154 91 / 0.12) 48%, transparent 74%), radial-gradient(ellipse 32% 28% at 40% 58%, rgb(255 244 210 / 0.22) 0%, transparent 70%)',
+    filter: 'blur(40px)',
+    mixBlendMode: 'screen',
+  },
+};
+
+const heroSprigSx: SxObject = {
+  '@container now-playing (min-width: 30rem)': {
+    height: '100%',
+    left: 0,
+    opacity: 0.46,
+    right: 'auto',
+    top: 0,
+    transform: 'scaleX(-1)',
+    transformOrigin: 'center',
+    width: '58%',
+  },
+  height: '100%',
+  position: 'absolute',
+  width: '100%',
+};
+
 type Point = { x: number; y: number };
 
 type LeafSpec = {
@@ -147,81 +173,88 @@ const BACK_PATH = `M ${BACK_STEM[0].x} ${BACK_STEM[0].y} C ${BACK_STEM[1].x} ${B
  * Full-card eucalyptus sprig. The layer is inset 0 so leaves are not clipped
  * by a right-side box; only the card's rounded rect clips. Zero image bytes.
  */
-export function WatercolorLeaves() {
+export function WatercolorLeaves({ layout = 'cell' }: { layout?: 'cell' | 'hero' } = {}) {
   const rawId = useId();
   const id = rawId.replaceAll(':', '');
   const edge = `${id}-edge`;
+  const hero = layout === 'hero';
 
   return (
     <Box aria-hidden="true" data-watercolor-leaves="" sx={leavesSx}>
-      <Box aria-hidden="true" data-watercolor-blooms="" sx={bloomsSx} />
-      <svg
+      <Box aria-hidden="true" data-watercolor-blooms="" sx={hero ? heroBloomsSx : bloomsSx} />
+      <Box
         aria-hidden="true"
-        fill="none"
-        height="100%"
-        overflow="visible"
-        preserveAspectRatio="none"
-        style={{ display: 'block', overflow: 'visible' }}
-        viewBox="0 0 100 100"
-        width="100%"
+        data-watercolor-sprig=""
+        sx={hero ? heroSprigSx : { display: 'contents' }}
       >
-        <defs>
-          <filter height="180%" id={edge} width="180%" x="-40%" y="-40%">
-            <feTurbulence
-              baseFrequency="0.04 0.055"
-              numOctaves="3"
-              result="noise"
-              seed="7"
-              type="fractalNoise"
-            />
-            <feDisplacementMap
-              in="SourceGraphic"
-              in2="noise"
-              result="displaced"
-              scale="1.4"
-              xChannelSelector="R"
-              yChannelSelector="G"
-            />
-            <feGaussianBlur in="displaced" stdDeviation="0.08" />
-          </filter>
-        </defs>
-        <g fill={SPRIG} filter={`url(#${edge})`}>
-          <path
-            d={BACK_PATH}
-            fill="none"
-            opacity="0.36"
-            stroke={SPRIG}
-            strokeLinecap="round"
-            strokeWidth="0.28"
-          />
-          {BACK_LEAVES.map((leaf) => (
+        <svg
+          aria-hidden="true"
+          fill="none"
+          height="100%"
+          overflow="visible"
+          preserveAspectRatio="none"
+          style={{ display: 'block', overflow: 'visible' }}
+          viewBox="0 0 100 100"
+          width="100%"
+        >
+          <defs>
+            <filter height="180%" id={edge} width="180%" x="-40%" y="-40%">
+              <feTurbulence
+                baseFrequency="0.04 0.055"
+                numOctaves="3"
+                result="noise"
+                seed="7"
+                type="fractalNoise"
+              />
+              <feDisplacementMap
+                in="SourceGraphic"
+                in2="noise"
+                result="displaced"
+                scale="1.4"
+                xChannelSelector="R"
+                yChannelSelector="G"
+              />
+              <feGaussianBlur in="displaced" stdDeviation="0.08" />
+            </filter>
+          </defs>
+          <g fill={SPRIG} filter={`url(#${edge})`}>
             <path
-              d={lanceolate(leaf.length, leaf.width)}
-              data-watercolor-leaf=""
-              key={`back-${leaf.x}-${leaf.y}-${leaf.rotate}`}
-              opacity={leaf.opacity}
-              transform={`translate(${leaf.x} ${leaf.y}) rotate(${leaf.rotate})`}
+              d={BACK_PATH}
+              fill="none"
+              opacity="0.36"
+              stroke={SPRIG}
+              strokeLinecap="round"
+              strokeWidth="0.28"
             />
-          ))}
-          <path
-            d={MAIN_PATH}
-            fill="none"
-            opacity="0.6"
-            stroke={SPRIG}
-            strokeLinecap="round"
-            strokeWidth="0.32"
-          />
-          {MAIN_LEAVES.map((leaf) => (
+            {BACK_LEAVES.map((leaf) => (
+              <path
+                d={lanceolate(leaf.length, leaf.width)}
+                data-watercolor-leaf=""
+                key={`back-${leaf.x}-${leaf.y}-${leaf.rotate}`}
+                opacity={leaf.opacity}
+                transform={`translate(${leaf.x} ${leaf.y}) rotate(${leaf.rotate})`}
+              />
+            ))}
             <path
-              d={lanceolate(leaf.length, leaf.width)}
-              data-watercolor-leaf=""
-              key={`main-${leaf.x}-${leaf.y}-${leaf.rotate}`}
-              opacity={leaf.opacity}
-              transform={`translate(${leaf.x} ${leaf.y}) rotate(${leaf.rotate})`}
+              d={MAIN_PATH}
+              fill="none"
+              opacity="0.6"
+              stroke={SPRIG}
+              strokeLinecap="round"
+              strokeWidth="0.32"
             />
-          ))}
-        </g>
-      </svg>
+            {MAIN_LEAVES.map((leaf) => (
+              <path
+                d={lanceolate(leaf.length, leaf.width)}
+                data-watercolor-leaf=""
+                key={`main-${leaf.x}-${leaf.y}-${leaf.rotate}`}
+                opacity={leaf.opacity}
+                transform={`translate(${leaf.x} ${leaf.y}) rotate(${leaf.rotate})`}
+              />
+            ))}
+          </g>
+        </svg>
+      </Box>
     </Box>
   );
 }

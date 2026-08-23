@@ -123,6 +123,14 @@ const notesOriginSx: SxObject = {
   zIndex: 4,
 };
 
+const heroNotesOriginSx: SxObject = {
+  ...notesOriginSx,
+  '[data-greenhouse-frame] &': {
+    left: '26%',
+    top: '34%',
+  },
+};
+
 const restingNotesSx: SxObject = {
   '[data-greenhouse-frame] &': {
     color: 'rgb(255 246 214 / 0.72)',
@@ -181,14 +189,14 @@ const heroGridSx: SxObject = {
   '@container now-playing (max-width: 13.5rem)': {
     gridTemplateAreas: '"art" "copy" "progress"',
     gridTemplateColumns: 'minmax(0, 1fr)',
+    gridTemplateRows: 'auto auto auto',
   },
   '@container now-playing (min-width: 30rem)': {
-    alignContent: 'stretch',
-    alignItems: 'stretch',
-    gap: 2,
-    gridTemplateAreas: '"copy art" "progress art"',
-    gridTemplateColumns: 'minmax(0, 1fr) 41%',
-    gridTemplateRows: '1fr auto',
+    columnGap: 2,
+    gridTemplateAreas: '". art" "copy art" "progress art" ". art"',
+    gridTemplateColumns: 'minmax(0, 1fr) auto',
+    gridTemplateRows: '1fr auto auto 1fr',
+    padding: 0,
   },
   alignContent: 'end',
   display: 'grid',
@@ -197,15 +205,17 @@ const heroGridSx: SxObject = {
   gridTemplateAreas: '"art copy" "progress progress"',
   gridTemplateColumns: 'auto minmax(0, 1fr)',
   gridTemplateRows: 'auto auto',
+  height: '100%',
   minHeight: 0,
   position: 'relative',
+  width: '100%',
   zIndex: 5,
 };
 
 const heroCopySx: SxObject = {
   '@container now-playing (min-width: 30rem)': {
-    alignSelf: 'start',
-    paddingTop: 5.25,
+    paddingLeft: '32px',
+    paddingRight: 1.5,
   },
   gridArea: 'copy',
   minWidth: 0,
@@ -213,9 +223,13 @@ const heroCopySx: SxObject = {
 
 const heroArtLinkSx: SxObject = {
   '@container now-playing (min-width: 30rem)': {
-    alignSelf: 'stretch',
-    height: '100%',
-    width: '100%',
+    alignSelf: 'center',
+    aspectRatio: '1 / 1',
+    height: 'calc(100% - 40px)',
+    marginBottom: '20px',
+    marginRight: '20px',
+    marginTop: '20px',
+    width: 'auto',
   },
   alignSelf: 'end',
   display: 'block',
@@ -227,10 +241,17 @@ const heroArtLinkSx: SxObject = {
 const heroArtFrameSx: SxObject = {
   ...artFrameSx,
   '@container now-playing (min-width: 30rem)': {
-    borderRadius: '18px',
-    boxShadow: '0 8px 28px rgb(32 28 12 / 0.28)',
+    borderRadius: '20px',
+    boxShadow: '0 10px 28px rgb(32 28 12 / 0.28)',
     height: '100%',
     width: '100%',
+  },
+};
+
+const heroCardSx: SxObject = {
+  ...cardSx,
+  '@container now-playing (min-width: 30rem)': {
+    padding: 0,
   },
 };
 
@@ -285,6 +306,12 @@ const progressWrapSx: SxObject = {
 
 const heroProgressSx: SxObject = {
   ...progressWrapSx,
+  '@container now-playing (min-width: 30rem)': {
+    marginTop: '20px',
+    paddingLeft: '32px',
+    paddingRight: 1.5,
+    width: '100%',
+  },
   gridArea: 'progress',
   minWidth: 0,
 };
@@ -298,6 +325,17 @@ const RESTING_NOTES = [
   { Icon: Music2, left: '70%', rotate: '-22deg', size: 14, top: '34%' },
   { Icon: Music4, left: '48%', rotate: '6deg', size: 20, top: '16%' },
   { Icon: Music3, left: '90%', rotate: '-6deg', size: 30, top: '38%' },
+] as const;
+
+const HERO_RESTING_NOTES = [
+  { Icon: Music, left: '10%', rotate: '-16deg', size: 16, top: '20%' },
+  { Icon: Music2, left: '22%', rotate: '12deg', size: 26, top: '34%' },
+  { Icon: Music3, left: '14%', rotate: '-8deg', size: 32, top: '58%' },
+  { Icon: Music4, left: '32%', rotate: '18deg', size: 18, top: '16%' },
+  { Icon: Music, left: '28%', rotate: '8deg', size: 20, top: '72%' },
+  { Icon: Music2, left: '38%', rotate: '-20deg', size: 14, top: '46%' },
+  { Icon: Music4, left: '54%', rotate: '10deg', size: 22, top: '30%' },
+  { Icon: Music3, left: '58%', rotate: '-6deg', size: 28, top: '62%' },
 ] as const;
 
 const ART_SOURCE_PX = 160;
@@ -334,10 +372,11 @@ function AlbumThumb({ layout, track }: { layout: NowPlayingLayout; track: Track 
   );
 }
 
-function RestingNotes() {
+function RestingNotes({ layout }: { layout: NowPlayingLayout }) {
+  const notes = layout === 'hero' ? HERO_RESTING_NOTES : RESTING_NOTES;
   return (
     <Box aria-hidden="true" data-resting-notes="" sx={restingNotesSx}>
-      {RESTING_NOTES.map(({ Icon, left, rotate, size, top }) => (
+      {notes.map(({ Icon, left, rotate, size, top }) => (
         <Box
           key={`${left}-${top}`}
           sx={{ left, position: 'absolute', top, transform: `rotate(${rotate})` }}
@@ -427,7 +466,11 @@ export function NowPlayingCard({
   const hero = layout === 'hero';
 
   return (
-    <ContentCard data-bento="now-playing" data-now-playing-layout={layout} sx={cardSx}>
+    <ContentCard
+      data-bento="now-playing"
+      data-now-playing-layout={layout}
+      sx={hero ? heroCardSx : cardSx}
+    >
       <Box aria-hidden="true" data-now-playing-wash="" sx={washSx} />
       <Box aria-hidden="true" sx={albumMixSx}>
         <AlbumGradientBackdrop containerSx={{ inset: 0 }} gradient={gradient} />
@@ -435,9 +478,9 @@ export function NowPlayingCard({
       <Box aria-hidden="true" sx={hueLockSx} />
       <Box aria-hidden="true" data-now-playing-scrim="" sx={copyScrimSx} />
       <FrostGrain />
-      <WatercolorLeaves />
-      <RestingNotes />
-      <Box aria-hidden="true" sx={notesOriginSx}>
+      <WatercolorLeaves layout={layout} />
+      <RestingNotes layout={layout} />
+      <Box aria-hidden="true" sx={hero ? heroNotesOriginSx : notesOriginSx}>
         <MusicNotes isPlaying={Boolean(track.isPlaying)} noteColor={CREAM.primary} variant="card" />
       </Box>
       <Box aria-hidden="true" data-now-playing-leaf="" sx={leafBadgeSx}>

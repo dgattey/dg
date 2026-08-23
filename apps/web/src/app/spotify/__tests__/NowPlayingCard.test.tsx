@@ -258,7 +258,12 @@ describe('NowPlayingCard', () => {
       .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
       .join('\n');
     expect(css).toContain('@container now-playing (min-width: 30rem)');
-    expect(css).toContain('41%');
-    expect(css).toContain('border-radius: 18px');
+    expect(css).toContain('padding-left: 32px');
+    expect(css).toContain('margin-top: 20px');
+    expect(css).toContain('calc(100% - 40px)');
+    expect(css).toContain('border-radius: 20px');
+    expect(css).toContain('scaleX(-1)');
+    expect(css).toContain('at 18% 16%');
+    expect(css).toContain('at 24% 84%');
   });
 });
