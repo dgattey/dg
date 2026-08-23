@@ -18,13 +18,28 @@ type TrackTitleProps = {
  * Greenhouse now-playing titles wrap to two lines and break mid-word if needed.
  * Flag-off `card` / `compact` stay single-line ellipsis.
  */
-const nowPlayingTitleSx: SxObject = {
+const nowPlayingClampSx: SxObject = {
   display: '-webkit-box',
   marginBottom: 1,
   overflow: 'hidden',
   overflowWrap: 'anywhere',
   WebkitBoxOrient: 'vertical',
   WebkitLineClamp: 2,
+};
+
+const nowPlayingWideSx: SxObject = {
+  ...nowPlayingClampSx,
+  '@container now-playing (max-width: 22.5rem)': {
+    display: 'none',
+  },
+};
+
+const nowPlayingNarrowSx: SxObject = {
+  ...nowPlayingClampSx,
+  '@container now-playing (max-width: 22.5rem)': {
+    display: '-webkit-box',
+  },
+  display: 'none',
 };
 
 const VARIANT_SX: Record<ListingVariant, SxObject> = {
@@ -36,7 +51,7 @@ const VARIANT_SX: Record<ListingVariant, SxObject> = {
     ...truncated(1),
     lineHeight: 1.2,
   },
-  nowPlaying: nowPlayingTitleSx,
+  nowPlaying: nowPlayingClampSx,
 };
 
 const TYPOGRAPHY_VARIANT: Record<ListingVariant, 'h5' | 'caption'> = {
@@ -45,6 +60,13 @@ const TYPOGRAPHY_VARIANT: Record<ListingVariant, 'h5' | 'caption'> = {
   nowPlaying: 'h5',
 };
 
+function colorShadowSx(color?: string, textShadow?: string): SxObject {
+  return {
+    ...(color ? { color } : {}),
+    ...(textShadow ? { textShadow } : {}),
+  };
+}
+
 function getTrackTitleSx(
   listingVariant: ListingVariant,
   color?: string,
@@ -52,9 +74,48 @@ function getTrackTitleSx(
 ): SxObject {
   return {
     ...VARIANT_SX[listingVariant],
-    ...(color ? { color } : {}),
-    ...(textShadow ? { textShadow } : {}),
+    ...colorShadowSx(color, textShadow),
   };
+}
+
+function NowPlayingTitle({
+  trackTitle,
+  url,
+  color,
+  textShadow,
+}: {
+  trackTitle: string;
+  url?: string;
+  color?: string;
+  textShadow?: string;
+}) {
+  const paint = colorShadowSx(color, textShadow);
+  const wideSx = { ...nowPlayingWideSx, ...paint };
+  const narrowSx = { ...nowPlayingNarrowSx, ...paint };
+
+  if (!url) {
+    return (
+      <>
+        <Typography sx={wideSx} variant="h3">
+          {trackTitle}
+        </Typography>
+        <Typography sx={narrowSx} variant="h5">
+          {trackTitle}
+        </Typography>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <Link href={url} isExternal={true} sx={wideSx} title={trackTitle} variant="h3">
+        {trackTitle}
+      </Link>
+      <Link href={url} isExternal={true} sx={narrowSx} title={trackTitle} variant="h5">
+        {trackTitle}
+      </Link>
+    </>
+  );
 }
 
 /**
@@ -68,6 +129,12 @@ export function TrackTitle({
   textShadow,
   listingVariant = 'card',
 }: TrackTitleProps) {
+  if (listingVariant === 'nowPlaying') {
+    return (
+      <NowPlayingTitle color={color} textShadow={textShadow} trackTitle={trackTitle} url={url} />
+    );
+  }
+
   const sx = getTrackTitleSx(listingVariant, color, textShadow);
   const typographyVariant = TYPOGRAPHY_VARIANT[listingVariant];
 

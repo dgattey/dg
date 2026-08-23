@@ -2,8 +2,10 @@
 
 import type { Track } from '@dg/content-models/spotify/Track';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
+import { Image } from '@dg/ui/dependent/Image';
+import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Stack } from '@mui/material';
+import { Box, Card, Stack } from '@mui/material';
 import { Leaf, Music, Music2, Music3, Music4 } from 'lucide-react';
 import { useId } from 'react';
 import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
@@ -140,12 +142,39 @@ const layoutSx: SxObject = {
   zIndex: 5,
 };
 
-const copySx: SxObject = {
-  '@container now-playing (max-width: 25.5rem)': {
-    width: '74%',
+const copyRowSx: SxObject = {
+  '@container now-playing (max-width: 16.5rem)': {
+    alignItems: 'flex-start',
+    flexDirection: 'column',
   },
+  '@container now-playing (min-width: 22.5rem)': {
+    width: '56%',
+  },
+  alignItems: 'flex-end',
+  display: 'flex',
+  flexDirection: 'row',
+  gap: 1.25,
   minWidth: 0,
-  width: '46%',
+  width: '92%',
+};
+
+const copyTextSx: SxObject = {
+  flex: 1,
+  minWidth: 0,
+};
+
+const artFrameSx: SxObject = {
+  '@container now-playing (min-width: 22.5rem)': {
+    height: 80,
+    width: 80,
+  },
+  borderRadius: 1.5,
+  boxShadow: '0 2px 10px rgb(32 28 12 / 0.22)',
+  flexShrink: 0,
+  height: 64,
+  overflow: 'hidden',
+  position: 'relative',
+  width: 64,
 };
 
 const headerSx: SxObject = {
@@ -170,21 +199,12 @@ const leafBadgeSx: SxObject = {
 };
 
 const titleSx: SxObject = {
-  '@container now-playing (max-width: 25.5rem)': {
-    '& .MuiTypography-root': {
-      fontSize: '1.5rem',
-    },
-  },
   '& .MuiTypography-root': {
     color: CREAM.primary,
-    fontSize: '1.75rem',
-    fontWeight: 500,
-    letterSpacing: '-0.02em',
-    lineHeight: 1.15,
-    marginBottom: '0.2rem',
     textShadow: CREAM.primaryShadow,
   },
   marginTop: 0.35,
+  minWidth: 0,
 };
 
 const artistSx: SxObject = {
@@ -216,6 +236,28 @@ const RESTING_NOTES = [
   { Icon: Music4, left: '48%', rotate: '6deg', size: 20, top: '16%' },
   { Icon: Music3, left: '90%', rotate: '-6deg', size: 30, top: '38%' },
 ] as const;
+
+const ART_SOURCE_PX = 160;
+
+function AlbumThumb({ track }: { track: Track }) {
+  const albumTitle = track.album.name;
+  const albumUrl = track.album.externalUrls.spotify;
+
+  return (
+    <Link href={albumUrl} isExternal={true} title={albumTitle}>
+      <Card data-now-playing-art="" sx={artFrameSx}>
+        <Image
+          alt={albumTitle}
+          fill={true}
+          height={ART_SOURCE_PX}
+          sizes={{ extraLarge: ART_SOURCE_PX, tiny: 128 }}
+          url={track.albumImage.url}
+          width={ART_SOURCE_PX}
+        />
+      </Card>
+    </Link>
+  );
+}
 
 function RestingNotes() {
   return (
@@ -273,34 +315,37 @@ export function NowPlayingCard({ track }: { track: Track }) {
         <Leaf size={14} />
       </Box>
       <Stack sx={layoutSx}>
-        <Stack data-now-playing-copy="" sx={copySx}>
-          <Stack sx={headerSx}>
-            <PlaybackStatus
-              color={CREAM.primary}
-              isPlaying={track.isPlaying}
-              listingVariant="card"
-              playedAt={track.playedAt}
-              textShadow={CREAM.primaryShadow}
-            />
+        <Box data-now-playing-copy="" sx={copyRowSx}>
+          <AlbumThumb track={track} />
+          <Stack sx={copyTextSx}>
+            <Stack sx={headerSx}>
+              <PlaybackStatus
+                color={CREAM.primary}
+                isPlaying={track.isPlaying}
+                listingVariant="card"
+                playedAt={track.playedAt}
+                textShadow={CREAM.primaryShadow}
+              />
+            </Stack>
+            <Box data-now-playing-title="" sx={titleSx}>
+              <TrackTitle
+                color={CREAM.primary}
+                listingVariant="nowPlaying"
+                textShadow={CREAM.primaryShadow}
+                trackTitle={track.name}
+                url={track.externalUrls.spotify}
+              />
+            </Box>
+            <Box data-now-playing-artist="" sx={artistSx}>
+              <ArtistList
+                artists={track.artists}
+                color={CREAM.secondary}
+                listingVariant="nowPlaying"
+                textShadow={CREAM.secondaryShadow}
+              />
+            </Box>
           </Stack>
-          <Box data-now-playing-title="" sx={titleSx}>
-            <TrackTitle
-              color={CREAM.primary}
-              listingVariant="nowPlaying"
-              textShadow={CREAM.primaryShadow}
-              trackTitle={track.name}
-              url={track.externalUrls.spotify}
-            />
-          </Box>
-          <Box data-now-playing-artist="" sx={artistSx}>
-            <ArtistList
-              artists={track.artists}
-              color={CREAM.secondary}
-              listingVariant="card"
-              textShadow={CREAM.secondaryShadow}
-            />
-          </Box>
-        </Stack>
+        </Box>
         <Box data-now-playing-progress="" sx={progressWrapSx}>
           <PlaybackProgressBar
             colors={CREAM}

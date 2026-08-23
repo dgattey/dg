@@ -54,7 +54,7 @@ describe('NowPlayingCard', () => {
     );
 
     expect(screen.getByText(/now playing/i)).toBeInTheDocument();
-    expect(screen.getByText('Leaflight')).toBeInTheDocument();
+    expect(screen.getAllByText('Leaflight').length).toBe(2);
     expect(screen.getByText('Alder & Moss')).toBeInTheDocument();
     expect(document.querySelector('[data-now-playing-progress]')).toBeTruthy();
   });
@@ -73,7 +73,22 @@ describe('NowPlayingCard', () => {
     expect(leaves.length).toBeGreaterThanOrEqual(20);
     expect(leaves.length).toBeLessThan(40);
     expect(container.querySelector('[data-now-playing-copy]')).toBeTruthy();
+    expect(container.querySelector('[data-now-playing-art]')).toBeTruthy();
     expect(container.querySelector('[data-now-playing-leaf]')).toBeTruthy();
+  });
+
+  it('shows the album cover next to the copy with a 2x sizes hint', () => {
+    render(
+      <TestWrapper>
+        <NowPlayingCard track={track} />
+      </TestWrapper>,
+    );
+
+    const art = document.querySelector('[data-now-playing-art] img');
+    expect(art).toBeTruthy();
+    expect(art).toHaveAttribute('alt', 'Glasshouse');
+    expect(art?.getAttribute('src') ?? '').toContain('art.jpg');
+    expect(art?.getAttribute('sizes') ?? '').toContain('160px');
   });
 
   it('lets the sprig span the full card so leaves are not boxed on the right', () => {
@@ -134,10 +149,16 @@ describe('NowPlayingCard', () => {
       </TestWrapper>,
     );
 
-    const title = screen.getByText('Leaflight');
+    const titles = screen.getAllByText('Leaflight');
+    expect(titles[0]).toHaveClass('MuiTypography-h3');
+    expect(titles[1]).toHaveClass('MuiTypography-h5');
     const titleCss = [...document.querySelectorAll('style')]
       .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
-      .filter((rule) => [...title.classList].some((className) => rule.includes(`.${className}`)))
+      .filter((rule) =>
+        titles.some((title) =>
+          [...title.classList].some((className) => rule.includes(`.${className}`)),
+        ),
+      )
       .join('\n');
     expect(titleCss).toContain('-webkit-line-clamp: 2');
     expect(titleCss).toContain('overflow-wrap: anywhere');
@@ -169,13 +190,14 @@ describe('NowPlayingCard', () => {
     const css = [...document.querySelectorAll('style')]
       .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
       .join('\n');
-    expect(css).toContain('@container now-playing (max-width: 25.5rem)');
-    expect(css).toContain('font-size: 1.75rem');
-    expect(css).toContain('font-size: 1.5rem');
+    expect(css).toContain('@container now-playing (max-width: 22.5rem)');
+    expect(document.querySelector('[data-now-playing-title] .MuiTypography-h3')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-title] .MuiTypography-h5')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-artist] .MuiTypography-h5')).toBeTruthy();
     expect(css).not.toContain('1.35rem + 0.55vw');
   });
 
-  it('uses a medium title weight and a soft copy scrim instead of a left panel', () => {
+  it('uses semantic type and a soft copy scrim instead of a left panel', () => {
     render(
       <TestWrapper>
         <NowPlayingCard track={track} />
@@ -188,7 +210,8 @@ describe('NowPlayingCard', () => {
 
     expect(document.querySelector('[data-now-playing-scrim]')).toBeTruthy();
     expect(document.querySelector('[data-now-playing-grain]')).toBeTruthy();
-    expect(css).toContain('font-weight: 500');
+    expect(document.querySelector('[data-now-playing-title] .MuiTypography-h3')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-artist] .MuiTypography-h5')).toBeTruthy();
     expect(css).toContain('rgba(40, 55, 35, 0.55)');
     expect(css).toContain('#e7d48a');
     expect(css).not.toContain('#3f522c');

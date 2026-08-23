@@ -22,11 +22,15 @@ describe('TrackTitle', () => {
   it('wraps greenhouse titles to two lines anywhere instead of ellipsizing', () => {
     render(<TrackTitle listingVariant="nowPlaying" trackTitle="Everything In Its Right Place" />);
 
-    const title = screen.getByText('Everything In Its Right Place');
-    const css = rulesFor(title);
-    expect(title).toHaveStyle({ display: '-webkit-box', overflow: 'hidden' });
+    const titles = screen.getAllByText('Everything In Its Right Place');
+    expect(titles).toHaveLength(2);
+    expect(titles[0]).toHaveClass('MuiTypography-h3');
+    expect(titles[1]).toHaveClass('MuiTypography-h5');
+
+    const css = titles.map((title) => rulesFor(title)).join('\n');
     expect(css).toContain('-webkit-line-clamp: 2');
     expect(css).toContain('overflow-wrap: anywhere');
+    expect(css).toContain('@container now-playing (max-width: 22.5rem)');
     expect(css).not.toContain('-webkit-line-clamp: 1');
   });
 });

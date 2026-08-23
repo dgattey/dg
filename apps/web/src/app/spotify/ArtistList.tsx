@@ -5,7 +5,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { Typography } from '@mui/material';
 import { Fragment } from 'react';
 
-type ListingVariant = 'card' | 'compact';
+type ListingVariant = 'card' | 'compact' | 'nowPlaying';
 
 type ArtistListProps = {
   artists: Array<Artist>;
@@ -32,11 +32,13 @@ const compactBaseSx: SxObject = {
 const VARIANT_SX: Record<ListingVariant, SxObject> = {
   card: cardBaseSx,
   compact: compactBaseSx,
+  nowPlaying: cardBaseSx,
 };
 
-const TYPOGRAPHY_VARIANT: Record<ListingVariant, 'body2' | 'caption'> = {
+const TYPOGRAPHY_VARIANT: Record<ListingVariant, 'body2' | 'caption' | 'h5'> = {
   card: 'body2',
   compact: 'caption',
+  nowPlaying: 'h5',
 };
 
 function getArtistListSx(
@@ -82,7 +84,7 @@ export function ArtistList({
   textShadow,
   listingVariant = 'card',
 }: ArtistListProps) {
-  const isLinked = listingVariant === 'card';
+  const isLinked = listingVariant !== 'compact';
   const typographyVariant = TYPOGRAPHY_VARIANT[listingVariant];
 
   return (
