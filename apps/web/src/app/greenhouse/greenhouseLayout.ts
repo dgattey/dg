@@ -89,6 +89,7 @@ const HOME_MOBILE: ReadonlyArray<PlantSpec> = [
 ];
 
 const COMPOSITIONS: Record<GreenhouseSurface, ReadonlyArray<PlantSpec>> = {
+  home: HOME_DESKTOP,
   music: [
     {
       cluster: 'vine',
@@ -135,7 +136,6 @@ const COMPOSITIONS: Record<GreenhouseSurface, ReadonlyArray<PlantSpec>> = {
       y: 62,
     },
   ],
-  home: HOME_DESKTOP,
 };
 
 /**
