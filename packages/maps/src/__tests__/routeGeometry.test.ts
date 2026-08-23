@@ -100,6 +100,32 @@ describe('route geometry', () => {
     expect(Math.abs(wideAspect - tallAspect) / wideAspect).toBeLessThan(0.12);
   });
 
+  it('keeps the park loop uniformly tall on the unmeasured fallback viewBoxes', () => {
+    const points = decodePolyline(OSRM_GGP);
+    const padding = Math.round((CARD_ROUTE_PADDING * 1600) / 460);
+    const boxes = [
+      { height: 900, width: 1600 },
+      { height: 1200, width: 1600 },
+    ] as const;
+
+    const aspects = boxes.map(({ height, width }) => {
+      const viewport = fitRouteViewport({ height, padding, points, width });
+      const pixels = projectRouteToPixels({ ...viewport, height, points, width });
+      const xs = pixels.map(({ x }) => x);
+      const ys = pixels.map(({ y }) => y);
+      const spanX = Math.max(...xs) - Math.min(...xs);
+      const spanY = Math.max(...ys) - Math.min(...ys);
+      expect(spanY).toBeGreaterThan(height * 0.28);
+      return spanX / spanY;
+    });
+
+    const [wideAspect, tallAspect] = aspects;
+    if (wideAspect === undefined || tallAspect === undefined) {
+      throw new Error('expected two fallback aspects');
+    }
+    expect(Math.abs(wideAspect - tallAspect) / wideAspect).toBeLessThan(0.12);
+  });
+
   it('uses a close zoom for a single-point route', () => {
     expect(
       fitRouteViewport({

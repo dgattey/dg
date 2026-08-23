@@ -6,7 +6,7 @@ import { useColorScheme } from '@dg/ui/theme/useColorScheme';
 import { Box } from '@mui/material';
 import type { Point } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import {
   CARD_ROUTE_PADDING,
   fitRouteViewport,
@@ -16,7 +16,9 @@ import {
 import { SmoothTile } from './SmoothTile';
 import { TopoBasemap } from './TopoBasemap';
 
-const DEFAULT_SIZE = { height: 180, width: 320 };
+const MD_MIN_WIDTH = 768;
+const DESKTOP_MAP_SIZE = { height: 900, width: 1600 };
+const MOBILE_MAP_SIZE = { height: 1200, width: 1600 };
 
 const paperMix = (percent: number) =>
   `color-mix(in srgb, var(--mui-palette-background-paper) ${percent}%, transparent)`;
@@ -103,6 +105,15 @@ const subscribeToSystemDark = (onStoreChange: () => void) => {
 const getSystemDarkSnapshot = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
 const getServerSystemDarkSnapshot = () => false;
 
+const subscribeToMd = (onStoreChange: () => void) => {
+  const media = window.matchMedia(`(min-width: ${MD_MIN_WIDTH}px)`);
+  media.addEventListener('change', onStoreChange);
+  return () => media.removeEventListener('change', onStoreChange);
+};
+
+const getMdSnapshot = () => window.matchMedia(`(min-width: ${MD_MIN_WIDTH}px)`).matches;
+const getServerMdSnapshot = () => true;
+
 function tileCoordinates([latitude, longitude]: Point, zoom: number) {
   const tileZoom = Math.round(zoom);
   const scale = 2 ** tileZoom;
@@ -147,17 +158,21 @@ export type RouteMapProps = {
 /** A non-interactive, theme-aware route map intended for card backgrounds. */
 export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState(DEFAULT_SIZE);
+  const [measured, setMeasured] = useState<{ height: number; width: number } | null>(null);
   const { preference } = useColorScheme();
   const systemDark = useSyncExternalStore(
     subscribeToSystemDark,
     getSystemDarkSnapshot,
     getServerSystemDarkSnapshot,
   );
+  const isMd = useSyncExternalStore(subscribeToMd, getMdSnapshot, getServerMdSnapshot);
+  const size = measured ?? (isMd ? DESKTOP_MAP_SIZE : MOBILE_MAP_SIZE);
   const dark = preference === 'dark' || (preference === 'system' && systemDark);
+  const padding =
+    measured == null ? Math.round((CARD_ROUTE_PADDING * size.width) / 460) : CARD_ROUTE_PADDING;
   const viewport = fitRouteViewport({
     height: size.height,
-    padding: CARD_ROUTE_PADDING,
+    padding,
     points,
     width: size.width,
   });
@@ -174,25 +189,34 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
   const provider = (x: number, y: number, zoom: number, dpr?: number) =>
     tileUrl({ dark, dpr, stadiaApiKey, x, y, zoom });
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const element = containerRef.current;
     if (!element) {
       return;
     }
 
-    const updateSize = () => {
-      const width = element.clientWidth;
-      const height = element.clientHeight;
-      if (height > 0 && width > 0) {
-        setSize((current) =>
-          Math.abs(current.width - width) < 0.5 && Math.abs(current.height - height) < 0.5
-            ? current
-            : { height, width },
-        );
+    const applySize = (width: number, height: number) => {
+      if (height <= 0 || width <= 0) {
+        return;
       }
+      setMeasured((current) =>
+        current && Math.abs(current.width - width) < 0.5 && Math.abs(current.height - height) < 0.5
+          ? current
+          : { height, width },
+      );
+    };
+    const updateSize = () => {
+      applySize(element.clientWidth, element.clientHeight);
     };
     updateSize();
-    const observer = new ResizeObserver(updateSize);
+    const observer = new ResizeObserver((entries) => {
+      const rect = entries[0]?.contentRect;
+      if (rect) {
+        applySize(rect.width, rect.height);
+        return;
+      }
+      updateSize();
+    });
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
@@ -208,7 +232,12 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
   };
 
   return (
-    <Box aria-hidden="true" ref={containerRef} sx={{ ...containerSx, ...routeVars }}>
+    <Box
+      aria-hidden="true"
+      data-route-size={`${Math.round(size.width)}x${Math.round(size.height)}`}
+      ref={containerRef}
+      sx={{ ...containerSx, ...routeVars }}
+    >
       {hasTiles ? (
         <Box
           alt=""
