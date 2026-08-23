@@ -25,6 +25,7 @@ describe('type tokens', () => {
     expect(scale.h1?.fontFamily).toBe(FONT_DISPLAY_STACK);
     expect(scale.h1?.fontSize).toBe(GREENHOUSE_TYPE_SCALE.h1);
     expect(scale.h3?.fontSize).toBe(GREENHOUSE_TYPE_SCALE.h3);
+    expect(scale.h4?.fontSize).toBe(GREENHOUSE_TYPE_SCALE.h4);
     expect(scale.h5?.fontSize).toBe(GREENHOUSE_TYPE_SCALE.h5);
     expect(scale.overline?.fontSize).toBe(GREENHOUSE_TYPE_SCALE.overline);
     expect(scale.body1?.fontSize).toBe(GREENHOUSE_TYPE_SCALE.body1);
@@ -33,6 +34,8 @@ describe('type tokens', () => {
     expect(String(scale.h1?.fontSize)).toMatch(/clamp\(/);
     expect(scale.h1?.fontWeight).toBe(500);
     expect(scale.h3?.fontWeight).toBe(500);
+    expect(scale.h4?.fontWeight).toBe(500);
+    expect(GREENHOUSE_TYPE_SCALE.h4).toBe('clamp(18px, 13.6px + 0.7vw, 22px)');
     expect(scale.h5?.fontWeight).toBe(400);
     expect(scale.h5?.opacity).toBe(0.8);
     expect(scale.overline?.fontWeight).toBe(600);

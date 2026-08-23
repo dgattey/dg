@@ -65,6 +65,7 @@ export const GREENHOUSE_TYPE_VARS: Record<`--${string}`, string> = {
   '--type-caption': GREENHOUSE_TYPE_SCALE.caption,
   '--type-h1': GREENHOUSE_TYPE_SCALE.h1,
   '--type-h3': GREENHOUSE_TYPE_SCALE.h3,
+  '--type-h4': GREENHOUSE_TYPE_SCALE.h4,
   '--type-h5': GREENHOUSE_TYPE_SCALE.h5,
   '--type-overline': GREENHOUSE_TYPE_SCALE.overline,
 };
