@@ -121,7 +121,13 @@ async function collectHeadings(page) {
         const box = el.getBoundingClientRect();
         const style = getComputedStyle(el);
         const text = (el.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 80);
-        if (!text || box.width < 2 || box.height < 2 || style.visibility === 'hidden') {
+        if (
+          !text ||
+          box.width < 2 ||
+          box.height < 2 ||
+          box.height > 80 ||
+          style.visibility === 'hidden'
+        ) {
           return null;
         }
         const sticky =

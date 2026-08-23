@@ -205,6 +205,9 @@ export const FILMSTRIP_HEADER_GAP_PX = 16;
 /** Adjacent stops closer than this fraction of the viewport look copy-pasted. */
 export const FILMSTRIP_MIN_GAP_RATIO = 0.4;
 
+/** Card-sized heading wrappers (e.g. a 332px LOCATION h2) are not titles. */
+export const FILMSTRIP_MAX_TITLE_HEIGHT_PX = 80;
+
 export type FilmstripHeadingDoc = {
   docY: number;
   height: number;
@@ -235,7 +238,14 @@ export function headingClearAt(
 function contentHeadings(
   headings: ReadonlyArray<FilmstripHeadingDoc>,
 ): ReadonlyArray<FilmstripHeadingDoc> {
-  return headings.filter((heading) => !heading.sticky && heading.height > 0);
+  return headings.filter(
+    (heading) =>
+      !heading.sticky && heading.height > 0 && heading.height <= FILMSTRIP_MAX_TITLE_HEIGHT_PX,
+  );
+}
+
+function isStrideLattice(scrollY: number, step: number): boolean {
+  return Math.abs(Math.round(scrollY / step) * step - scrollY) < 1;
 }
 
 function parkFor(heading: FilmstripHeadingDoc, headerBottom: number, maxScroll: number): number {
@@ -259,6 +269,7 @@ function appendPageEnd(
   viewportHeight: number,
   headerBottom: number,
   headings: ReadonlyArray<FilmstripHeadingDoc>,
+  step: number,
 ): ReadonlyArray<number> {
   const minGap = filmstripMinGap(viewportHeight);
   if (maxScroll <= 0 || stops.at(-1) === maxScroll) {
@@ -269,6 +280,16 @@ function appendPageEnd(
     const withoutPrev = [...stops.slice(0, -1), maxScroll];
     if (headingsClearOn(headings, withoutPrev, headerBottom, viewportHeight)) {
       stops.pop();
+    } else if (isStrideLattice(prev, step)) {
+      const prevPrev = stops.at(-2) ?? 0;
+      const nudged = Math.round(maxScroll - minGap);
+      const nudgedList = [...stops.slice(0, -1), nudged, maxScroll];
+      if (
+        nudged > prevPrev &&
+        headingsClearOn(headings, nudgedList, headerBottom, viewportHeight)
+      ) {
+        stops[stops.length - 1] = nudged;
+      }
     }
   }
   if (stops.at(-1) !== maxScroll) {
@@ -292,7 +313,7 @@ function restripeFrom(
     y += step;
     stops.push(y);
   }
-  return appendPageEnd(stops, maxScroll, viewportHeight, headerBottom, headings);
+  return appendPageEnd(stops, maxScroll, viewportHeight, headerBottom, headings, step);
 }
 
 /**
@@ -317,21 +338,21 @@ export function planFilmstripStops(
   for (let y = step; y < maxScroll - 1; y += step) {
     regular.push(y);
   }
-  const collapsed = [...appendPageEnd(regular, maxScroll, viewportHeight, headerBottom, [])];
+  const preview = maxScroll > 0 && regular.at(-1) !== maxScroll ? [...regular, maxScroll] : regular;
   const missing = content.filter(
     (heading) =>
-      !collapsed.some((scrollY) => headingClearAt(heading, scrollY, headerBottom, viewportHeight)),
+      !preview.some((scrollY) => headingClearAt(heading, scrollY, headerBottom, viewportHeight)),
   );
   if (missing.length === 0) {
-    return collapsed;
+    return [...appendPageEnd(regular, maxScroll, viewportHeight, headerBottom, content, step)];
   }
   const park = Math.min(...missing.map((heading) => parkFor(heading, headerBottom, maxScroll)));
-  const replaceAt = collapsed.findIndex(
+  const replaceAt = preview.findIndex(
     (scrollY, index) => index > 0 && scrollY < maxScroll && Math.abs(scrollY - park) <= step,
   );
-  const insertAt = collapsed.findIndex((scrollY) => scrollY >= maxScroll || scrollY > park);
-  const index = replaceAt >= 0 ? replaceAt : insertAt >= 0 ? insertAt : collapsed.length;
-  const prefix = collapsed.slice(0, Math.max(1, index));
+  const insertAt = preview.findIndex((scrollY) => scrollY >= maxScroll || scrollY > park);
+  const index = replaceAt >= 0 ? replaceAt : insertAt >= 0 ? insertAt : preview.length;
+  const prefix = preview.slice(0, Math.max(1, index));
   const previous = prefix.at(-1) ?? 0;
   const next = Math.min(maxScroll, Math.max(previous + 1, park));
   return restripeFrom(prefix, next, step, maxScroll, viewportHeight, headerBottom, content);
@@ -365,7 +386,7 @@ export function headingFullyClearOfChrome(
   headerBottom: number,
   viewportHeight: number,
 ): boolean {
-  if (heading.sticky) {
+  if (heading.sticky || heading.height > FILMSTRIP_MAX_TITLE_HEIGHT_PX) {
     return false;
   }
   return heading.y >= headerBottom && heading.y + heading.height <= viewportHeight + 0.5;
@@ -381,7 +402,7 @@ export function assertHeadingsClearOfChrome(
   const ids = new Set<string>();
   const seen = new Set<string>();
   for (const shot of shots) {
-    if (shot.sticky) {
+    if (shot.sticky || shot.height > FILMSTRIP_MAX_TITLE_HEIGHT_PX) {
       continue;
     }
     ids.add(shot.id);

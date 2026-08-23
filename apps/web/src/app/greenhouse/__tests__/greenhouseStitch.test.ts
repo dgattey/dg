@@ -151,4 +151,10 @@ describe('greenhouse stitch plan', () => {
       ]),
     ).toEqual([0, 723, 1446, 2308]);
   });
+
+  it('nudges a too-close regular stop instead of pairing it with page end', () => {
+    expect(planFilmstripStops(2620, 844, 105, [{ docY: 1629, height: 48, sticky: false }])).toEqual(
+      [0, 723, 1438, 1776],
+    );
+  });
 });
