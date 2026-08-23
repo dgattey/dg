@@ -70,7 +70,7 @@ type SpotifyCardWithGradientProps = {
   track: Track;
   /**
    * `card` is today's homepage listing. `nowPlaying` is the greenhouse tile:
-   * wash, notes, progress, botanical accent.
+   * original card pieces on the glass surface.
    */
   variant?: 'card' | 'nowPlaying';
   /**

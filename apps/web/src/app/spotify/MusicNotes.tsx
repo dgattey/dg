@@ -16,9 +16,8 @@ type MusicNotesProps = {
   noteColor?: string;
   /**
    * Compact variant for small contexts (e.g. header thumbnail).
-   * `card` is the greenhouse now-playing scatter — same bounce, cream-weight glyphs.
    */
-  variant?: 'default' | 'compact' | 'card';
+  variant?: 'default' | 'compact';
 };
 
 type MusicNote = {
@@ -47,20 +46,8 @@ const COMPACT = {
   scaleRange: 0.3,
 };
 
-const CARD = {
-  distanceMin: 44,
-  distanceRange: 168,
-  durationMs: 2800,
-  durationRandomMs: 700,
-  iconSize: 28,
-  maxNotes: 16,
-  scaleMin: 0.5,
-  scaleRange: 1.15,
-};
-
 const DEFAULT_NOTE_SHADOW =
   'drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))';
-const CARD_NOTE_SHADOW = 'drop-shadow(0 1px 2px rgba(64, 48, 12, 0.22))';
 
 // GPU-accelerated float animation for notes
 const floatAndFade = keyframes`
@@ -95,11 +82,7 @@ const notesContainerSx: SxObject = {
   width: 0,
 };
 
-const getNoteSx = (
-  note: MusicNote,
-  noteColor: string | undefined,
-  tone: 'default' | 'card',
-): SxObject => ({
+const getNoteSx = (note: MusicNote, noteColor: string | undefined): SxObject => ({
   '--note-rotation': `${note.angle > 180 ? -25 : 25}deg`,
   '--note-scale': note.scale,
   '--note-x': `${Math.cos((note.angle * Math.PI) / 180) * note.distance}px`,
@@ -108,7 +91,7 @@ const getNoteSx = (
   animationDelay: `${note.delay}ms`,
   backfaceVisibility: 'hidden',
   color: noteColor ?? 'currentColor',
-  filter: tone === 'card' ? CARD_NOTE_SHADOW : DEFAULT_NOTE_SHADOW,
+  filter: DEFAULT_NOTE_SHADOW,
   left: 0,
   opacity: 0,
   position: 'absolute',
@@ -124,9 +107,7 @@ export function MusicNotes({ isPlaying, noteColor, variant = 'default' }: MusicN
   const [notes, setNotes] = useState<Array<MusicNote>>([]);
   const noteIdRef = useRef(0);
   const isCompact = variant === 'compact';
-  const isCard = variant === 'card';
-  const spawn = isCompact ? COMPACT : isCard ? CARD : null;
-  const tone = isCard ? 'card' : 'default';
+  const spawn = isCompact ? COMPACT : null;
 
   useEffect(() => {
     if (!isPlaying) {
@@ -141,7 +122,7 @@ export function MusicNotes({ isPlaying, noteColor, variant = 'default' }: MusicN
       const newNote: MusicNote = spawn
         ? {
             angle,
-            delay: Math.random() * (isCard ? 80 : 60),
+            delay: Math.random() * 60,
             distance: spawn.distanceMin + Math.random() * spawn.distanceRange,
             duration: spawn.durationMs + Math.random() * spawn.durationRandomMs,
             icon: Math.floor(Math.random() * MUSIC_ICONS.length),
@@ -173,7 +154,7 @@ export function MusicNotes({ isPlaying, noteColor, variant = 'default' }: MusicN
 
     const intervalId = setInterval(spawnNote, NOTE_SPAWN_INTERVAL_MS);
     return () => clearInterval(intervalId);
-  }, [isPlaying, isCard, spawn]);
+  }, [isPlaying, spawn]);
 
   const iconSize = spawn?.iconSize ?? 15;
   const renderedNotes = useMemo(
@@ -184,12 +165,12 @@ export function MusicNotes({ isPlaying, noteColor, variant = 'default' }: MusicN
           return null;
         }
         return (
-          <Box key={note.id} sx={getNoteSx(note, noteColor, tone)}>
+          <Box key={note.id} sx={getNoteSx(note, noteColor)}>
             <IconComponent size={iconSize} />
           </Box>
         );
       }),
-    [notes, noteColor, iconSize, tone],
+    [notes, noteColor, iconSize],
   );
 
   if (!isPlaying) {

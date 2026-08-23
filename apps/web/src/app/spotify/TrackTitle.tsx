@@ -19,16 +19,17 @@ type TrackTitleProps = {
 };
 
 /**
- * Greenhouse now-playing titles wrap to two lines and break mid-word if needed.
+ * Greenhouse now-playing titles wrap to two lines at word boundaries.
  * Flag-off `card` / `compact` stay single-line ellipsis.
  */
 const nowPlayingClampSx: SxObject = {
   display: '-webkit-box',
   marginBottom: 1,
   overflow: 'hidden',
-  overflowWrap: 'anywhere',
+  overflowWrap: 'break-word',
   WebkitBoxOrient: 'vertical',
   WebkitLineClamp: 2,
+  wordBreak: 'normal',
 };
 
 const nowPlayingH3Sx: SxObject = {

@@ -28,18 +28,14 @@ describe('MusicNotes', () => {
     });
   });
 
-  it('uses the lighter card shadow and wider scatter variant', () => {
+  it('uses the compact size for tight contexts', () => {
     const { container } = render(
-      <MusicNotes isPlaying={true} noteColor="#fff8e6" variant="card" />,
+      <MusicNotes isPlaying={true} noteColor="#fff" variant="compact" />,
     );
     act(() => {
       jest.advanceTimersByTime(200);
     });
 
-    expect(container.querySelector('[data-music-notes="card"]')).toBeTruthy();
-    const note = container.querySelector('[data-music-notes="card"] > div');
-    expect(note).toHaveStyle({
-      filter: 'drop-shadow(0 1px 2px rgba(64, 48, 12, 0.22))',
-    });
+    expect(container.querySelector('[data-music-notes="compact"]')).toBeTruthy();
   });
 });

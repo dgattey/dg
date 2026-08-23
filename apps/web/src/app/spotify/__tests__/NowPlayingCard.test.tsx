@@ -46,38 +46,44 @@ const track = {
 };
 
 describe('NowPlayingCard', () => {
-  it('shows now playing copy, track, artist, and progress', () => {
+  it('shows the Spotify logo, track, artist, and progress', () => {
     render(
       <TestWrapper>
         <NowPlayingCard track={track} />
       </TestWrapper>,
     );
 
+    const logo = document.querySelector('[data-now-playing-logo] a');
+    expect(logo).toHaveAttribute('href', 'https://open.spotify.com/artist/a');
     expect(screen.getByText(/now playing/i)).toBeInTheDocument();
-    expect(screen.getAllByText('Leaflight').length).toBe(3);
+    expect(screen.getAllByText('Leaflight').length).toBeGreaterThanOrEqual(1);
     expect(screen.getByText('Alder & Moss')).toBeInTheDocument();
     expect(document.querySelector('[data-now-playing-progress]')).toBeTruthy();
   });
 
-  it('paints watercolor leaves instead of line-art botanical strokes', () => {
+  it('keeps album art large and drops the leaf and watercolor sprig', () => {
     const { container } = render(
       <TestWrapper>
         <NowPlayingCard track={track} />
       </TestWrapper>,
     );
 
-    expect(container.querySelector('[data-watercolor-leaves]')).toBeTruthy();
-    expect(container.querySelector('[data-watercolor-blooms]')).toBeTruthy();
-    expect(container.querySelector('[data-now-playing-wash]')).toBeTruthy();
-    const leaves = container.querySelectorAll('[data-watercolor-leaf]');
-    expect(leaves.length).toBeGreaterThanOrEqual(20);
-    expect(leaves.length).toBeLessThan(40);
-    expect(container.querySelector('[data-now-playing-copy]')).toBeTruthy();
+    expect(container.querySelector('[data-watercolor-leaves]')).toBeNull();
+    expect(container.querySelector('[data-watercolor-blooms]')).toBeNull();
+    expect(container.querySelector('[data-now-playing-leaf]')).toBeNull();
+    expect(container.querySelector('[data-resting-notes]')).toBeNull();
     expect(container.querySelector('[data-now-playing-art]')).toBeTruthy();
-    expect(container.querySelector('[data-now-playing-leaf]')).toBeTruthy();
+    expect(container.querySelector('[data-now-playing-logo]')).toBeTruthy();
+
+    const css = [...document.querySelectorAll('style')]
+      .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
+      .join('\n');
+    expect(css).toContain('clamp(9.375rem, 56cqi, 14rem)');
+    expect(css).not.toContain('width: 64px');
+    expect(css).not.toContain('height: 64px');
   });
 
-  it('shows the album cover next to the copy with a 2x sizes hint', () => {
+  it('shows the album cover with a 2x sizes hint', () => {
     render(
       <TestWrapper>
         <NowPlayingCard track={track} />
@@ -88,47 +94,27 @@ describe('NowPlayingCard', () => {
     expect(art).toBeTruthy();
     expect(art).toHaveAttribute('alt', 'Glasshouse');
     expect(art?.getAttribute('src') ?? '').toContain('art.jpg');
-    expect(art?.getAttribute('sizes') ?? '').toContain('160px');
+    expect(art?.getAttribute('sizes') ?? '').toContain('448px');
   });
 
-  it('lets the sprig span the full card so leaves are not boxed on the right', () => {
-    const { container } = render(
+  it('uses the original note scatter while a track is playing', () => {
+    render(
       <TestWrapper>
         <NowPlayingCard track={track} />
       </TestWrapper>,
     );
 
-    const layer = container.querySelector('[data-watercolor-leaves]');
-    expect(layer).toHaveStyle({ inset: '0', overflow: 'visible', position: 'absolute' });
-
-    const css = [...document.querySelectorAll('style')]
-      .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
-      .join('\n');
-    expect(css).not.toContain('width: 72%');
-    expect(css).toContain('rgb(231 212 138 / 0.55)');
-    expect(css).toContain('rgb(138 154 91 / 0.32)');
-    expect(css).toContain('blur(40px)');
+    expect(document.querySelector('[data-music-notes="default"]')).toBeTruthy();
   });
 
-  it('keeps cream resting notes when playback is idle', () => {
+  it('hides notes when playback is idle', () => {
     render(
       <TestWrapper>
         <NowPlayingCard track={{ ...track, isPlaying: false }} />
       </TestWrapper>,
     );
 
-    expect(document.querySelector('[data-resting-notes]')).toBeTruthy();
     expect(document.querySelector('[data-music-notes]')).toBeNull();
-  });
-
-  it('uses the card note scatter while a track is playing', () => {
-    render(
-      <TestWrapper>
-        <NowPlayingCard track={track} />
-      </TestWrapper>,
-    );
-
-    expect(document.querySelector('[data-music-notes="card"]')).toBeTruthy();
   });
 
   it('does not print playback timestamps on the home card', () => {
@@ -138,18 +124,20 @@ describe('NowPlayingCard', () => {
       </TestWrapper>,
     );
 
-    expect(screen.queryByText(/:/)).not.toBeInTheDocument();
     expect(screen.queryByText(/2:47/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/4:32/)).not.toBeInTheDocument();
   });
 
-  it('clamps the title to two wrapping lines and the artist to one', () => {
+  it('clamps the title to two wrapping lines at word boundaries', () => {
     render(
       <TestWrapper>
         <NowPlayingCard track={track} />
       </TestWrapper>,
     );
 
-    const titles = screen.getAllByText('Leaflight');
+    const titles = screen
+      .getAllByText('Leaflight')
+      .filter((node) => node.className.includes('MuiTypography-h'));
     expect(titles[0]).toHaveClass('MuiTypography-h3');
     expect(titles[1]).toHaveClass('MuiTypography-h4');
     expect(titles[2]).toHaveClass('MuiTypography-h5');
@@ -162,7 +150,8 @@ describe('NowPlayingCard', () => {
       )
       .join('\n');
     expect(titleCss).toContain('-webkit-line-clamp: 2');
-    expect(titleCss).toContain('overflow-wrap: anywhere');
+    expect(titleCss).toContain('overflow-wrap: break-word');
+    expect(titleCss).not.toContain('overflow-wrap: anywhere');
 
     const artist = document.querySelector('[data-now-playing-artist] .MuiTypography-root');
     expect(artist).toBeTruthy();
@@ -197,29 +186,6 @@ describe('NowPlayingCard', () => {
     expect(document.querySelector('[data-now-playing-title] .MuiTypography-h4')).toBeTruthy();
     expect(document.querySelector('[data-now-playing-title] .MuiTypography-h5')).toBeTruthy();
     expect(document.querySelector('[data-now-playing-artist] .MuiTypography-h5')).toBeTruthy();
-    expect(css).not.toContain('1.35rem + 0.55vw');
-  });
-
-  it('uses semantic type and a soft copy scrim instead of a left panel', () => {
-    render(
-      <TestWrapper>
-        <NowPlayingCard track={track} />
-      </TestWrapper>,
-    );
-
-    const css = [...document.querySelectorAll('style')]
-      .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
-      .join('\n');
-
-    expect(document.querySelector('[data-now-playing-scrim]')).toBeTruthy();
-    expect(document.querySelector('[data-now-playing-grain]')).toBeTruthy();
-    expect(document.querySelector('[data-now-playing-title] .MuiTypography-h3')).toBeTruthy();
-    expect(document.querySelector('[data-now-playing-title] .MuiTypography-h4')).toBeTruthy();
-    expect(document.querySelector('[data-now-playing-artist] .MuiTypography-h5')).toBeTruthy();
-    expect(css).toContain('rgba(40, 55, 35, 0.55)');
-    expect(css).toContain('#e7d48a');
-    expect(css).not.toContain('#3f522c');
-    expect(css).not.toContain('ellipse 58% 52% at 94% 8%');
   });
 
   it('defaults to the cell layout', () => {
@@ -235,10 +201,10 @@ describe('NowPlayingCard', () => {
     expect(document.querySelector('[data-now-playing-title] .MuiTypography-h2')).toBeNull();
     expect(
       document.querySelector('[data-now-playing-art] img')?.getAttribute('sizes') ?? '',
-    ).toContain('160px');
+    ).toContain('448px');
   });
 
-  it('swaps to the landscape hero layout and keeps the cell fallback query', () => {
+  it('swaps to the landscape hero layout with art in the leading column', () => {
     render(
       <TestWrapper>
         <NowPlayingCard layout="hero" track={track} />
@@ -249,7 +215,7 @@ describe('NowPlayingCard', () => {
     expect(card).toHaveAttribute('data-now-playing-layout', 'hero');
     expect(document.querySelector('[data-now-playing-hero]')).toBeTruthy();
     expect(document.querySelector('[data-now-playing-title] .MuiTypography-h2')).toBeTruthy();
-    expect(document.querySelector('[data-now-playing-artist] .MuiTypography-h5')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-logo]')).toBeTruthy();
     expect(
       document.querySelector('[data-now-playing-art] img')?.getAttribute('sizes') ?? '',
     ).toContain('800px');
@@ -258,12 +224,7 @@ describe('NowPlayingCard', () => {
       .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
       .join('\n');
     expect(css).toContain('@container now-playing (min-width: 30rem)');
-    expect(css).toContain('padding-left: 32px');
-    expect(css).toContain('margin-top: 20px');
-    expect(css).toContain('calc(100% - 40px)');
-    expect(css).toContain('border-radius: 20px');
-    expect(css).toContain('scaleX(-1)');
-    expect(css).toContain('at 18% 16%');
-    expect(css).toContain('at 24% 84%');
+    expect(css).toContain('minmax(0, 4fr) minmax(0, 6fr)');
+    expect(css).toContain('grid-area: art');
   });
 });

@@ -105,7 +105,8 @@ describe('SpotifyCardWithGradient', () => {
       </ServerTimeProvider>,
     );
 
-    expect(document.querySelector('[data-watercolor-leaves]')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-logo]')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-art]')).toBeTruthy();
     expect(screen.queryByTestId('track-listing')).not.toBeInTheDocument();
 
     rerender(<SpotifyCardWithGradient track={makeTrack('card', OLD_GRADIENT)} />);
@@ -129,7 +130,8 @@ describe('SpotifyCardWithGradient', () => {
 
     expect(document.querySelector('[data-now-playing-hero]')).toBeTruthy();
     expect(document.querySelector('[data-now-playing-title] .MuiTypography-h2')).toBeTruthy();
-    expect(document.querySelector('[data-watercolor-leaves]')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-logo]')).toBeTruthy();
+    expect(document.querySelector('[data-watercolor-leaves]')).toBeNull();
   });
 
   it('keeps the previous gradient until the next one resolves', async () => {

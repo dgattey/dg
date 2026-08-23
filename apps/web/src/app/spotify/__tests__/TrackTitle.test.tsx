@@ -19,7 +19,7 @@ describe('TrackTitle', () => {
     expect(css).not.toContain('overflow-wrap: anywhere');
   });
 
-  it('wraps greenhouse titles to two lines anywhere instead of ellipsizing', () => {
+  it('wraps greenhouse titles to two lines at word boundaries', () => {
     render(<TrackTitle listingVariant="nowPlaying" trackTitle="Everything In Its Right Place" />);
 
     const titles = screen.getAllByText('Everything In Its Right Place');
@@ -30,7 +30,8 @@ describe('TrackTitle', () => {
 
     const css = titles.map((title) => rulesFor(title)).join('\n');
     expect(css).toContain('-webkit-line-clamp: 2');
-    expect(css).toContain('overflow-wrap: anywhere');
+    expect(css).toContain('overflow-wrap: break-word');
+    expect(css).not.toContain('overflow-wrap: anywhere');
     expect(css).toContain('@container now-playing (max-width: 22.5rem)');
     expect(css).toContain('@container now-playing (min-width: 12rem) and (max-width: 22.5rem)');
     expect(css).toContain('@container now-playing (max-width: 12rem)');
