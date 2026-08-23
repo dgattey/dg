@@ -14,13 +14,28 @@ import { Logo } from './Logo';
 import { SiteHeaderHeight } from './SiteHeaderHeight';
 
 const stickyContainerSx: SxObject = {
+  backgroundColor: 'transparent',
   maxWidth: 'unset',
   position: 'sticky',
   top: 0,
   zIndex: 10,
 };
 
-const siteHeaderSx: SxObject = pinnedChromeSx(SITE_HEADER_VIEW_TRANSITION_NAME);
+const siteHeaderSx: SxObject = {
+  ...pinnedChromeSx(SITE_HEADER_VIEW_TRANSITION_NAME),
+  backgroundColor: 'transparent',
+};
+
+/**
+ * Flag-off `StickyBarTopMask` paints a cream strip the height of the header
+ * whenever `data-sticky-fade` is in the DOM. Greenhouse uses the plate as
+ * the backdrop, so that mask must stay off on every greenhouse route.
+ */
+const hideStickyMask = `
+  body:has([data-greenhouse-header]) [data-sticky-mask] {
+    display: none !important;
+  }
+`;
 
 const navSx: SxObject = {
   paddingBlockStart: { sm: 1.5, xs: 1 },
@@ -58,6 +73,7 @@ const toggleWrapSx: SxObject = {
 export function GreenhouseHeader() {
   return (
     <GreenhouseTypeProvider>
+      <style>{hideStickyMask}</style>
       <Section sx={stickyContainerSx}>
         <SiteHeaderHeight />
         <Box

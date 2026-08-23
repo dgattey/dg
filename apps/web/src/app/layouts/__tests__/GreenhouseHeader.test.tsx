@@ -49,6 +49,11 @@ describe('GreenhouseHeader', () => {
     );
     expect(screen.getByRole('button', { name: 'Color scheme: system' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Music' })).not.toBeInTheDocument();
+    expect(
+      Array.from(document.querySelectorAll('style'))
+        .map((node) => node.textContent)
+        .join(''),
+    ).toContain('[data-sticky-mask]');
   });
 
   it('marks the listening link current on the music page', () => {
