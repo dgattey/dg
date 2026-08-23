@@ -43,7 +43,7 @@ jest.mock('@dg/ui/core/transitions/PageTransitionLink', () => ({
 
 import { interactiveRedesign } from '../../../flags';
 import { getFooterLinks } from '../../../services/contentful';
-import { Footer, RedesignBadge } from '../Footer';
+import { FooterBody, RedesignBadge } from '../Footer';
 
 const mockInteractiveRedesign = interactiveRedesign as jest.MockedFunction<
   typeof interactiveRedesign
@@ -70,7 +70,7 @@ describe('Footer redesign badge', () => {
   it('renders the footer shell without music destination links', async () => {
     mockInteractiveRedesign.mockResolvedValue(false);
     mockGetFooterLinks.mockResolvedValue([]);
-    render(await Footer());
+    render(await FooterBody());
     expect(screen.getByText(/Dylan Gattey/)).toBeInTheDocument();
     expect(screen.queryByText('Listening history')).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'Favorite albums' })).not.toBeInTheDocument();
@@ -84,7 +84,7 @@ describe('Footer redesign badge', () => {
       { icon: 'github', title: 'GitHub', url: 'https://github.com/dgattey' },
       { icon: 'spotify', title: 'Spotify', url: 'https://open.spotify.com/user/dylangattey' },
     ]);
-    render(await Footer());
+    render(await FooterBody());
 
     const cursor = screen.getByRole('link', { name: 'Cursor' });
     const github = screen.getByRole('link', { name: 'GitHub' });

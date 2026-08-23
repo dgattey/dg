@@ -60,8 +60,11 @@ async function SpotifyHeaderCardSlot() {
 /**
  * Flag-off header: logo + music capsule, music/theme pills. Markup is the
  * pre-greenhouse header so `/` without the flag stays put.
+ *
+ * `showSpotify` stays off on the static layout fallback so `/_not-found`
+ * does not prerender a Spotify fetch.
  */
-export function ClassicHeader() {
+export function ClassicHeader({ showSpotify = true }: { showSpotify?: boolean } = {}) {
   return (
     <Section sx={stickyContainerSx}>
       <SiteHeaderHeight />
@@ -71,9 +74,11 @@ export function ClassicHeader() {
             <NavItem variant="body2">
               <MouseAwareGlassContainer sx={glassContainerSx}>
                 <Logo />
-                <Suspense fallback={null}>
-                  <SpotifyHeaderCardSlot />
-                </Suspense>
+                {showSpotify ? (
+                  <Suspense fallback={null}>
+                    <SpotifyHeaderCardSlot />
+                  </Suspense>
+                ) : null}
               </MouseAwareGlassContainer>
             </NavItem>
           </NavGroup>
@@ -89,11 +94,23 @@ export function ClassicHeader() {
 }
 
 /**
- * Greenhouse bar when the flag or preview gate is on. Flag-off is ClassicHeader.
+ * Flag evaluation reads request cookies. Keep it off the static layout
+ * shell so `/_not-found` can prerender under cacheComponents.
  */
-export async function Header() {
+async function ResolvedHeader() {
   if (await shouldUseGreenhouseChrome()) {
     return <GreenhouseHeader />;
   }
   return <ClassicHeader />;
+}
+
+/**
+ * Greenhouse bar when the flag or preview gate is on. Flag-off is ClassicHeader.
+ */
+export function Header() {
+  return (
+    <Suspense fallback={<ClassicHeader showSpotify={false} />}>
+      <ResolvedHeader />
+    </Suspense>
+  );
 }

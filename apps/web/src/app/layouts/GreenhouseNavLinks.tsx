@@ -57,7 +57,7 @@ function isCurrentPath(pathname: string, href: string): boolean {
  * Plain text destinations for the greenhouse header bar.
  */
 export function GreenhouseNavLinks() {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? '';
 
   return (
     <Box component="ul" sx={listSx}>

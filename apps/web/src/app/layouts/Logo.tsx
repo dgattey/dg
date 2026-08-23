@@ -102,7 +102,7 @@ type LogoProps = {
  * falls away instead of snapping.
  */
 export function Logo({ appearance = 'classic' }: LogoProps = {}) {
-  const pathname = usePathname();
+  const pathname = usePathname() ?? '';
   const isHome = pathname === homeRoute || pathname.startsWith('/greenhouse/');
 
   const scrollToTop = () => {

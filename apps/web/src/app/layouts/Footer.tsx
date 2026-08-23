@@ -125,21 +125,17 @@ export async function RedesignBadge() {
   );
 }
 
-/**
- * Creates the site footer component - shows version data + copyright
- */
-export async function Footer() {
-  const [footerLinks, versionInfo, currentYear, greenhouse] = await Promise.all([
-    getFooterLinks().catch(() => []),
-    getAppVersionInfo(),
-    getCopyrightYear(),
-    shouldUseGreenhouseChrome(),
-  ]);
+type FooterContentsProps = {
+  currentYear: number;
+  footerLinks: ReadonlyArray<RenderableLink>;
+  version: string | null;
+  releaseUrl: string | null;
+};
+
+function FooterContents({ currentYear, footerLinks, releaseUrl, version }: FooterContentsProps) {
   const nonIconFooterLinks = footerLinks.filter((link) => !link.icon);
   const iconFooterLinks = footerLinks.filter((link) => link.icon);
-  const releaseUrl = versionInfo.releaseUrl;
-  const version = versionInfo.version;
-  const footer = (
+  return (
     <Section sx={footerSectionSx}>
       <Container sx={footerContainerSx}>
         <Box component="footer" sx={siteFooterSx}>
@@ -191,12 +187,12 @@ export async function Footer() {
             </NavGroup>
             <NavGroup component="div" sx={footerNavGroupSx}>
               <Stack component="ul" direction="row" sx={footerLinkListSx}>
-                {nonIconFooterLinks?.map((link) => (
+                {nonIconFooterLinks.map((link) => (
                   <FooterLink key={link.url} link={link} />
                 ))}
               </Stack>
               <Stack component="ul" direction="row" sx={footerIconLinkListSx}>
-                {iconFooterLinks?.map((link) => (
+                {iconFooterLinks.map((link) => (
                   <FooterLink key={link.url} link={link} />
                 ))}
               </Stack>
@@ -206,8 +202,49 @@ export async function Footer() {
       </Container>
     </Section>
   );
+}
+
+function FooterFallback() {
+  return (
+    <Section sx={footerSectionSx}>
+      <Container sx={footerContainerSx}>
+        <Box component="footer" sx={siteFooterSx}>
+          <Divider sx={dividerSx} />
+        </Box>
+      </Container>
+    </Section>
+  );
+}
+
+export async function FooterBody() {
+  const greenhouse = await shouldUseGreenhouseChrome();
+  const [footerLinks, versionInfo, currentYear] = await Promise.all([
+    getFooterLinks().catch(() => []),
+    getAppVersionInfo(),
+    getCopyrightYear(),
+  ]);
+  const contents = (
+    <FooterContents
+      currentYear={currentYear}
+      footerLinks={footerLinks}
+      releaseUrl={versionInfo.releaseUrl}
+      version={versionInfo.version}
+    />
+  );
   if (greenhouse) {
-    return <GreenhouseTypeProvider>{footer}</GreenhouseTypeProvider>;
+    return <GreenhouseTypeProvider>{contents}</GreenhouseTypeProvider>;
   }
-  return footer;
+  return contents;
+}
+
+/**
+ * Cached Contentful + flag evaluation stay behind Suspense so the
+ * `/_not-found` shell can prerender without those fetches.
+ */
+export function Footer() {
+  return (
+    <Suspense fallback={<FooterFallback />}>
+      <FooterBody />
+    </Suspense>
+  );
 }
