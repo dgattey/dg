@@ -29,7 +29,10 @@ describe('ListeningHistoryCard', () => {
 
     const title = screen.getByRole('heading', { name: 'Listening history' });
     expect(title.tagName).toBe('H3');
-    expect(screen.getByText('No listening history yet.')).toBeInTheDocument();
+    expect(title.className).toContain('MuiTypography-h3');
+    expect(screen.getByText('No listening history yet.').className).toContain(
+      'MuiTypography-body1',
+    );
     expect(document.querySelector('[data-listening-history]')).toHaveAttribute(
       'data-greenhouse-cell',
       'history',
@@ -48,8 +51,9 @@ describe('ListeningHistoryCard', () => {
 
     const title = screen.getByRole('heading', { name: 'Listening history' });
     expect(title.tagName).toBe('H3');
+    expect(title.className).toContain('MuiTypography-h3');
     expect(screen.queryByRole('heading', { name: 'Today' })).not.toBeInTheDocument();
-    expect(screen.getByText('Today')).toBeInTheDocument();
+    expect(screen.getByText('Today').className).toContain('MuiTypography-overline');
     expect(document.querySelector('[data-sticky-fade]')).toBeNull();
     expect(screen.getByText('2 tracks')).toBeInTheDocument();
     expect(screen.getByRole('link', { name: 'Bloom – Bloom artist, 2 tracks' })).toHaveAttribute(

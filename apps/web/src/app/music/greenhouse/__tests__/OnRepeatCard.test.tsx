@@ -34,11 +34,12 @@ describe('OnRepeatCard', () => {
 
     const heading = screen.getByRole('heading', { name: 'On repeat' });
     expect(heading.tagName).toBe('H3');
-    expect(screen.getByText('Listening')).toBeInTheDocument();
+    expect(heading.className).toContain('MuiTypography-h3');
+    expect(screen.getByText('Listening').className).toContain('MuiTypography-overline');
     expect(screen.queryByText('Stacked albums')).not.toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'USB' })).not.toBeInTheDocument();
-    expect(screen.getByText('USB')).toBeInTheDocument();
-    expect(screen.getByText('Fred again.., Jamie T')).toBeInTheDocument();
+    expect(screen.getByText('USB').className).toContain('MuiTypography-body1');
+    expect(screen.getByText('Fred again.., Jamie T').className).toContain('MuiTypography-body2');
     expect(screen.getByText('12 songs')).toBeInTheDocument();
     expect(document.querySelectorAll('[data-album-pile]')).toHaveLength(3);
     expect(

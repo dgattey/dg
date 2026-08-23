@@ -14,7 +14,7 @@ describe('AlbumPile', () => {
     expect(container.querySelectorAll('[data-depth]').length).toBeGreaterThanOrEqual(4);
     expect(container.querySelectorAll('[data-depth]').length).toBeLessThanOrEqual(6);
     expect(screen.getAllByRole('img').map((image) => image.getAttribute('alt'))).toEqual(['USB']);
-    expect(screen.getByText('12 songs')).toBeInTheDocument();
+    expect(screen.getByText('12 songs').className).toContain('MuiTypography-caption');
   });
 
   it('hides the pill when there is no count', () => {

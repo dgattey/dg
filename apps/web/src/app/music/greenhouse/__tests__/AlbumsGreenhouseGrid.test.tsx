@@ -34,6 +34,8 @@ describe('AlbumsGreenhouseGrid', () => {
     );
     expect(document.querySelector('[data-role="glass-switcher"]')).toBeTruthy();
     expect(screen.getAllByText('Recently added').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Recently added')[0]?.className).toContain('MuiTypography-caption');
+    expect(screen.queryByRole('heading', { name: 'USB' })).not.toBeInTheDocument();
     expect(screen.getByRole('img', { name: 'USB' })).toBeInTheDocument();
   });
 });

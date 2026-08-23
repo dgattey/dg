@@ -24,20 +24,32 @@ const artists = [
 ];
 
 describe('greenhouse music lists', () => {
-  it('renders top tracks as ranked rows', () => {
+  it('renders top tracks as ranked body rows under one h3', () => {
     render(<TopTracksCard tracks={tracks} />);
 
-    expect(screen.getByText('Top tracks')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'INVISIBLE' })).toBeInTheDocument();
-    expect(screen.getByText('SHIMA')).toBeInTheDocument();
-    expect(screen.getByText('1')).toBeInTheDocument();
+    const title = screen.getByRole('heading', { name: 'Top tracks' });
+    expect(title.tagName).toBe('H3');
+    expect(title.className).toContain('MuiTypography-h3');
+    expect(screen.getByText('Listening').className).toContain('MuiTypography-overline');
+    expect(screen.queryByRole('heading', { name: 'INVISIBLE' })).not.toBeInTheDocument();
+    expect(screen.getByText('INVISIBLE').className).toContain('MuiTypography-body1');
+    expect(screen.getByText('SHIMA').className).toContain('MuiTypography-body2');
+    expect(screen.getByText('1').className).toContain('MuiTypography-caption');
+    expect(screen.getByRole('link', { name: 'INVISIBLE' })).toHaveAttribute(
+      'href',
+      'https://open.spotify.com/track/invisible',
+    );
   });
 
-  it('renders top artists as ranked rows', () => {
+  it('renders top artists as ranked body rows under one h3', () => {
     render(<TopArtistsCard artists={artists} />);
 
-    expect(screen.getByText('Top artists')).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'SHIMA' })).toBeInTheDocument();
-    expect(screen.getByText('3 plays')).toBeInTheDocument();
+    const title = screen.getByRole('heading', { name: 'Top artists' });
+    expect(title.tagName).toBe('H3');
+    expect(title.className).toContain('MuiTypography-h3');
+    expect(screen.getByText('Listening').className).toContain('MuiTypography-overline');
+    expect(screen.queryByRole('heading', { name: 'SHIMA' })).not.toBeInTheDocument();
+    expect(screen.getByText('SHIMA').className).toContain('MuiTypography-body1');
+    expect(screen.getByText('3 plays').className).toContain('MuiTypography-body2');
   });
 });
