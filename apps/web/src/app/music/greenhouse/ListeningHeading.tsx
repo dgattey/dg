@@ -1,15 +1,8 @@
 import { PAGE_TITLE_VIEW_TRANSITION_NAME } from '@dg/ui/core/transitions/pageTransitions';
+import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Typography } from '@mui/material';
-
-const headingSx: SxObject = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 1,
-  justifyContent: 'flex-end',
-  minWidth: 0,
-  paddingBlockEnd: { xl: 0.5, xs: 0 },
-};
+import { Typography } from '@mui/material';
+import { greenhouseHeadingCardSx } from './greenhouseCardSx';
 
 const titleSx: SxObject = {
   color: 'text.primary',
@@ -26,21 +19,24 @@ const descriptionSx: SxObject = {
 type Props = {
   title: string;
   description: string;
+  /** Foliage copy-well name. Parent grid cells may also set this. */
+  cell?: string;
 };
 
 /**
  * Greenhouse page display: the same `h1` serif as the homepage intro, plus a
- * one-line `body1`. Ink matches the intro (`text.primary`), not the teal accent.
+ * one-line `body1`, on the intro glass card so the title does not float on
+ * the plate.
  */
-export function ListeningHeading({ title, description }: Props) {
+export function ListeningHeading({ title, description, cell = 'intro' }: Props) {
   return (
-    <Box data-music-heading="" sx={headingSx}>
+    <ContentCard data-greenhouse-cell={cell} data-music-heading="" sx={greenhouseHeadingCardSx}>
       <Typography component="h1" sx={titleSx} variant="h1">
         {title}
       </Typography>
       <Typography sx={descriptionSx} variant="body1">
         {description}
       </Typography>
-    </Box>
+    </ContentCard>
   );
 }

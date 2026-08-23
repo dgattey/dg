@@ -14,8 +14,31 @@ export const greenhouseCardSx: SxObject = {
   justifySelf: 'stretch',
   maxWidth: 'none',
   minWidth: 0,
+  overflow: 'visible',
   padding: 2.25,
   width: '100%',
+};
+
+/**
+ * Same frost tokens as the homepage intro `ContentCard` (`composedCardSx`).
+ * Headings and pile captions sit on this, not on the plate.
+ */
+export const greenhouseHeadingCardSx: SxObject = {
+  ...greenhouseCardSx,
+  backdropFilter: 'var(--card-backdrop-filter)',
+  background: 'var(--card-bg)',
+  borderColor: 'color-mix(in srgb, var(--mui-palette-common-white) 48%, transparent)',
+  boxShadow: 'var(--card-box-shadow)',
+  gap: 1,
+  height: 'auto',
+  justifyContent: 'flex-end',
+  minHeight: 'auto',
+  padding: { sm: '1.45rem 1.35rem 1.15rem 1.5rem', xs: '1.2rem 1.1rem' },
+};
+
+export const greenhousePileCardSx: SxObject = {
+  ...greenhouseHeadingCardSx,
+  justifyContent: 'flex-start',
 };
 
 export const greenhouseCardHeaderSx: SxObject = {

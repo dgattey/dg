@@ -29,7 +29,7 @@ const albums = [
 ];
 
 describe('OnRepeatCard', () => {
-  it('renders three fanned piles with album · artist captions and song pills', () => {
+  it('renders three fanned piles with album · artist captions and song pills on glass', () => {
     render(<OnRepeatCard albums={albums} />);
 
     expect(screen.getByText('On repeat')).toBeInTheDocument();
@@ -43,6 +43,8 @@ describe('OnRepeatCard', () => {
     ).toBeGreaterThanOrEqual(12);
     const cover = screen.getByRole('img', { name: 'USB' });
     expect(cover.getAttribute('sizes') ?? '').toContain('400px');
+    expect(document.querySelector('[data-greenhouse-cell="on-repeat-heading"]')).toBeTruthy();
+    expect(document.querySelectorAll('[data-greenhouse-cell="on-repeat-pile"]')).toHaveLength(3);
   });
 
   it('renders nothing when there are no albums', () => {

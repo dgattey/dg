@@ -1,7 +1,9 @@
+import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
 import { AlbumPile } from './AlbumPile';
+import { greenhouseHeadingCardSx, greenhousePileCardSx } from './greenhouseCardSx';
 import type { RankedAlbum } from './types';
 
 const sectionSx: SxObject = {
@@ -10,12 +12,6 @@ const sectionSx: SxObject = {
   gap: 1.5,
   minWidth: 0,
   width: '100%',
-};
-
-const headerSx: SxObject = {
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 0.5,
 };
 
 const pilesSx: SxObject = {
@@ -33,14 +29,18 @@ const pilesSx: SxObject = {
   WebkitOverflowScrolling: 'touch',
 };
 
+const pileCardSx: SxObject = {
+  ...greenhousePileCardSx,
+  flex: { sm: 'unset', xs: '0 0 78%' },
+  scrollSnapAlign: { sm: 'unset', xs: 'start' },
+};
+
 const pileLinkSx: SxObject = {
   color: 'inherit',
   display: 'flex',
-  flex: { sm: 'unset', xs: '0 0 78%' },
   flexDirection: 'column',
   gap: 1,
   minWidth: 0,
-  scrollSnapAlign: { sm: 'unset', xs: 'start' },
   textDecoration: 'none',
 };
 
@@ -50,7 +50,8 @@ type Props = {
 
 /**
  * Three fanned album piles on desktop, two on tablet, a scroll-snap row on
- * mobile. Captions are album · artist. Fan-out is CSS only.
+ * mobile. Each pile sits on intro-token glass so the caption stays readable.
+ * Fan-out is CSS only.
  */
 export function OnRepeatCard({ albums }: Props) {
   if (albums.length === 0) {
@@ -59,31 +60,32 @@ export function OnRepeatCard({ albums }: Props) {
 
   return (
     <Box data-on-repeat="" sx={sectionSx}>
-      <Box sx={headerSx}>
+      <ContentCard data-greenhouse-cell="on-repeat-heading" sx={greenhouseHeadingCardSx}>
         <Typography variant="overline">On repeat</Typography>
-      </Box>
+      </ContentCard>
       <Box sx={pilesSx}>
         {albums.map((album) => (
-          <Link
-            href={album.url}
-            isExternal={true}
-            key={album.id}
-            sx={pileLinkSx}
-            title={album.name}
-          >
-            <AlbumPile
-              count={album.playCount}
-              countKind="song"
-              imageUrl={album.imageUrl}
-              name={album.name}
-            />
-            <Box>
-              <Typography component="h5" variant="h5">
-                {album.name}
-              </Typography>
-              <Typography variant="caption">{album.artistNames}</Typography>
-            </Box>
-          </Link>
+          <ContentCard data-greenhouse-cell="on-repeat-pile" key={album.id} sx={pileCardSx}>
+            <Link
+              href={album.url}
+              isExternal={true}
+              sx={pileLinkSx}
+              title={`${album.name} – ${album.artistNames}`}
+            >
+              <AlbumPile
+                count={album.playCount}
+                countKind="song"
+                imageUrl={album.imageUrl}
+                name={album.name}
+              />
+              <Box>
+                <Typography component="h5" variant="h5">
+                  {album.name}
+                </Typography>
+                <Typography variant="caption">{album.artistNames}</Typography>
+              </Box>
+            </Link>
+          </ContentCard>
         ))}
       </Box>
     </Box>
