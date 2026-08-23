@@ -6,7 +6,7 @@ import { Link } from '@dg/ui/dependent/Link';
 import { RichText } from '@dg/ui/dependent/RichText';
 import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Stack } from '@mui/material';
+import { Box, Stack, Typography } from '@mui/material';
 
 /**
  * Width of the intro image on small screens
@@ -121,6 +121,36 @@ const composedPortraitImgSx: SxObject = {
   width: '100%',
 };
 
+const composedAboutOverlaySx: SxObject = {
+  backdropFilter: 'blur(10px)',
+  background: 'color-mix(in srgb, var(--mui-palette-background-default) 60%, transparent)',
+  borderRadius: '0.65rem',
+  bottom: '0.75rem',
+  left: '0.75rem',
+  padding: '0.35rem 0.7rem',
+  position: 'absolute',
+  transition: 'transform 0.2s ease',
+  visibility: { md: 'visible', xs: 'hidden' },
+  zIndex: 1,
+};
+
+const composedPortraitLinkSx: SxObject = {
+  '&:focus-visible': {
+    outline: '2px solid var(--mui-palette-primary-main)',
+    outlineOffset: 2,
+  },
+  '&:hover': {
+    textDecoration: 'none',
+  },
+  '&:hover [data-role="intro-about-overlay"], &:focus-visible [data-role="intro-about-overlay"]': {
+    transform: 'translate(-8px, 8px)',
+  },
+  ...composedPortraitWrapSx,
+  display: 'block',
+  position: 'relative',
+  textDecoration: 'none',
+};
+
 const socialRowSx: SxObject = {
   columnGap: 1.25,
   flexDirection: 'row',
@@ -178,19 +208,54 @@ function IntroPortrait({ introBlock }: { introBlock: IntroContent }) {
   );
 }
 
+function ComposedPortrait({
+  introBlock,
+  linkedInLink,
+}: {
+  introBlock: IntroContent;
+  linkedInLink: RenderableLink | null;
+}) {
+  const portrait = (
+    <>
+      <IntroPortrait introBlock={introBlock} />
+      {linkedInLink ? (
+        <Box data-role="intro-about-overlay" sx={composedAboutOverlaySx}>
+          <Typography variant="h5">About</Typography>
+        </Box>
+      ) : null}
+    </>
+  );
+
+  if (!linkedInLink) {
+    return <Box sx={composedPortraitWrapSx}>{portrait}</Box>;
+  }
+
+  return (
+    <Link
+      aria-label="About"
+      href={linkedInLink.url}
+      isExternal={linkedInLink.url.startsWith('http')}
+      sx={composedPortraitLinkSx}
+      title="About"
+    >
+      {portrait}
+    </Link>
+  );
+}
+
 function ComposedIntroCard({
   introBlock,
+  linkedInLink,
   socialLinks,
 }: {
   introBlock: IntroContent;
+  linkedInLink: RenderableLink | null;
   socialLinks: ReadonlyArray<RenderableLink>;
 }) {
   return (
     <ContentCard data-bento="intro" sx={composedCardSx}>
       <Box sx={composedLayoutSx}>
-        <Box sx={composedPortraitWrapSx}>
-          <IntroPortrait introBlock={introBlock} />
-        </Box>
+        <ComposedPortrait introBlock={introBlock} linkedInLink={linkedInLink} />
         <RichText {...introBlock.textBlock.content} sx={composedTextSx} />
         {socialLinks.length > 0 ? (
           <Stack sx={socialRowSx}>
@@ -229,7 +294,13 @@ export function IntroCard({
   const { width, height, sizes } = useCurrentImageSizes();
 
   if (variant === 'composed') {
-    return <ComposedIntroCard introBlock={introBlock} socialLinks={socialLinks} />;
+    return (
+      <ComposedIntroCard
+        introBlock={introBlock}
+        linkedInLink={linkedInLink}
+        socialLinks={socialLinks}
+      />
+    );
   }
 
   return (

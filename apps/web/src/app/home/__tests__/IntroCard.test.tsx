@@ -78,6 +78,27 @@ describe('IntroCard', () => {
     expect(screen.queryByText('About')).not.toBeInTheDocument();
   });
 
+  it('links the composed portrait to LinkedIn with an About overlay', () => {
+    render(
+      <IntroCard
+        introBlock={introBlock}
+        linkedInLink={{
+          icon: 'linkedin',
+          title: 'LinkedIn',
+          url: 'https://linkedin.com/in/dgattey',
+        }}
+        socialLinks={[{ icon: 'github', title: 'GitHub', url: 'https://github.com/dgattey' }]}
+        variant="composed"
+      />,
+    );
+
+    const about = screen.getByRole('link', { name: 'About' });
+    expect(about).toHaveAttribute('href', 'https://linkedin.com/in/dgattey');
+    expect(about).toHaveAttribute('target', '_blank');
+    expect(screen.getByText('About')).toBeInTheDocument();
+    expect(document.querySelector('[data-role="intro-about-overlay"]')).toBeTruthy();
+  });
+
   it('does not force a two-word heading measure onto the bio column', () => {
     const source = readFileSync(join(__dirname, '../IntroCard.tsx'), 'utf8');
     expect(source).not.toContain('6.8ch');
