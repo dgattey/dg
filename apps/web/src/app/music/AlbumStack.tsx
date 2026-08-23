@@ -4,6 +4,7 @@ import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import { AlbumCover } from './AlbumCover';
 import { albumTileFrameSx } from './albumTileGeometry';
+import greenhouseStackStyles from './greenhouse/albumStack.module.css';
 
 type Props = {
   /** Album art URL, repeated by every sleeve behind the front cover. */
@@ -12,6 +13,11 @@ type Props = {
   sleeveCount: number;
   /** The front of the stack: a cover, or the socket left when art is away. */
   children: ReactNode;
+  /**
+   * `greenhouse` adds CSS-only hover / view-timeline fan-out. Flag-off
+   * callers keep the default hover spread on `albumTileLinkSx`.
+   */
+  variant?: 'default' | 'greenhouse';
 };
 
 /**
@@ -23,12 +29,16 @@ type Props = {
  * transition that morphs into the album well. Sleeves never take a transition
  * name, so a morph lifts only the front cover and the fan stays where it is.
  */
-export function AlbumStack({ imageUrl, sleeveCount, children }: Props) {
+export function AlbumStack({ imageUrl, sleeveCount, children, variant = 'default' }: Props) {
   // Back to front, so the front cover paints last and sits on top.
   const sleeveDepths = Array.from({ length: sleeveCount }, (_, index) => sleeveCount - index);
 
   return (
-    <Box sx={albumTileFrameSx}>
+    <Box
+      className={variant === 'greenhouse' ? greenhouseStackStyles.stack : undefined}
+      data-album-stack={variant}
+      sx={albumTileFrameSx}
+    >
       {sleeveDepths.map((depth) => (
         <AlbumCover
           alt=""

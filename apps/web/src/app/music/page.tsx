@@ -8,9 +8,11 @@ import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { getMusicHistory } from '../../services/music';
 import { GreenhouseSurface } from '../greenhouse/GreenhouseSurface';
+import { shouldUseGreenhouseChrome } from '../layouts/greenhouseChrome';
 import { markdownAlternates } from '../layouts/markdownAlternates';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
 import { PageTitle } from '../layouts/PageTitle';
+import { MusicGreenhousePage } from './greenhouse/MusicGreenhousePage';
 import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 
@@ -46,18 +48,37 @@ async function MusicHistory() {
 }
 
 /**
- * Page shell stays synchronous so it commits in the same render as the
- * outgoing page. Awaiting here instead would suspend the whole route, the old
- * page would already be unmounted by the time this arrives, and the view
- * transition would have nothing to animate away from.
+ * Flag-off `/music`. Keep this tree identical so the listening-history HTML
+ * does not change when the redesign is off. `GreenhouseSurface` is a no-op
+ * off-flag and lives on the default export, not here.
  */
-export default function MusicPage() {
+export function FlagOffMusicPage() {
   return (
-    <GreenhouseSurface surface="music">
+    <>
       <PageTitle>{TITLE}</PageTitle>
       <Suspense fallback={<MusicHistorySkeleton />}>
         <MusicHistory />
       </Suspense>
+    </>
+  );
+}
+
+async function MusicPageSwitch() {
+  if (await shouldUseGreenhouseChrome()) {
+    return <MusicGreenhousePage />;
+  }
+  return <FlagOffMusicPage />;
+}
+
+/**
+ * Page shell stays synchronous so it commits in the same render as the
+ * outgoing page. The flag check lives in a child; flag-off still returns
+ * `FlagOffMusicPage` unchanged inside the chrome worker's surface wrap.
+ */
+export default function MusicPage() {
+  return (
+    <GreenhouseSurface surface="music">
+      <MusicPageSwitch />
     </GreenhouseSurface>
   );
 }

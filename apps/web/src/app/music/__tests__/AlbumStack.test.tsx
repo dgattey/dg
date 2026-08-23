@@ -39,4 +39,15 @@ describe('AlbumStack', () => {
     const alts = [...container.querySelectorAll('img')].map((image) => image.getAttribute('alt'));
     expect(alts).toEqual(['', '', 'Feet of Clay']);
   });
+
+  it('marks a greenhouse stack without changing the default fan', () => {
+    const { container } = render(
+      <AlbumStack imageUrl={imageUrl} sleeveCount={2} variant="greenhouse">
+        <AlbumCover alt="Feet of Clay" depth={0} imageUrl={imageUrl} sleeveCount={2} />
+      </AlbumStack>,
+    );
+
+    expect(container.querySelector('[data-album-stack="greenhouse"]')).toBeTruthy();
+    expect(container.querySelectorAll('img')).toHaveLength(3);
+  });
 });
