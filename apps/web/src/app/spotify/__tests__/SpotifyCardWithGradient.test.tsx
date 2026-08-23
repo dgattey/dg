@@ -115,6 +115,23 @@ describe('SpotifyCardWithGradient', () => {
     expect(document.querySelector('[data-now-playing-title]')).toBeNull();
   });
 
+  it('forwards layout="hero" to the greenhouse now-playing card', () => {
+    mockExtractAlbumGradient.mockImplementation(() => deferredGradient().promise);
+    render(
+      <ServerTimeProvider serverTime={new Date('2026-02-10T12:00:00Z').getTime()}>
+        <SpotifyCardWithGradient
+          layout="hero"
+          track={makeTrack('play', OLD_GRADIENT)}
+          variant="nowPlaying"
+        />
+      </ServerTimeProvider>,
+    );
+
+    expect(document.querySelector('[data-now-playing-hero]')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-title] .MuiTypography-h2')).toBeTruthy();
+    expect(document.querySelector('[data-watercolor-leaves]')).toBeTruthy();
+  });
+
   it('keeps the previous gradient until the next one resolves', async () => {
     const oldExtraction = deferredGradient();
     const newExtraction = deferredGradient();

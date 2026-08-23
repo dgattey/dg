@@ -10,6 +10,7 @@ import { Suspense } from 'react';
 import { getLatestSong } from '../../services/spotify';
 import { ALBUM_ART_BORDER_RADIUS, ALBUM_ART_DIMENSIONS } from '../albumArtStyles';
 import { SpotifyCardWithGradient } from '../spotify/SpotifyCardWithGradient';
+import type { NowPlayingLayout } from '../spotify/TrackTitle';
 
 const loadingLayoutSx: SxObject = {
   flex: 1,
@@ -86,13 +87,15 @@ function SpotifyCardLoading() {
  */
 async function SpotifyCardAsync({
   fixture,
+  layout,
   variant,
 }: {
   fixture?: Track;
+  layout?: NowPlayingLayout;
   variant: 'card' | 'nowPlaying';
 }) {
   if (fixture) {
-    return <SpotifyCardWithGradient track={fixture} variant={variant} />;
+    return <SpotifyCardWithGradient layout={layout} track={fixture} variant={variant} />;
   }
 
   try {
@@ -100,7 +103,7 @@ async function SpotifyCardAsync({
     if (!track) {
       return null;
     }
-    return <SpotifyCardWithGradient track={track} variant={variant} />;
+    return <SpotifyCardWithGradient layout={layout} track={track} variant={variant} />;
   } catch {
     return null;
   }
@@ -112,14 +115,16 @@ async function SpotifyCardAsync({
  */
 export function SpotifyCardSlot({
   fixture,
+  layout,
   variant = 'card',
 }: {
   fixture?: Track;
+  layout?: NowPlayingLayout;
   variant?: 'card' | 'nowPlaying';
 } = {}) {
   return (
     <Suspense fallback={<SpotifyCardLoading />}>
-      <SpotifyCardAsync fixture={fixture} variant={variant} />
+      <SpotifyCardAsync fixture={fixture} layout={layout} variant={variant} />
     </Suspense>
   );
 }

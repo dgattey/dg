@@ -5,6 +5,8 @@ import { Typography } from '@mui/material';
 
 type ListingVariant = 'card' | 'compact' | 'nowPlaying';
 
+export type NowPlayingLayout = 'cell' | 'hero';
+
 type TrackTitleProps = {
   trackTitle: string;
   /** If provided, renders as a link to this URL. If omitted, renders as plain text. */
@@ -12,6 +14,8 @@ type TrackTitleProps = {
   color?: string;
   textShadow?: string;
   listingVariant?: ListingVariant;
+  /** Greenhouse now-playing only. `hero` adds `h2` above 30rem. */
+  layout?: NowPlayingLayout;
 };
 
 /**
@@ -48,6 +52,20 @@ const nowPlayingH5Sx: SxObject = {
     display: '-webkit-box',
   },
   display: 'none',
+};
+
+const nowPlayingHeroH2Sx: SxObject = {
+  ...nowPlayingClampSx,
+  '@container now-playing (min-width: 30rem)': {
+    display: '-webkit-box',
+  },
+  display: 'none',
+};
+
+const hideWhenHeroWide: SxObject = {
+  '@container now-playing (min-width: 30rem)': {
+    display: 'none',
+  },
 };
 
 const VARIANT_SX: Record<ListingVariant, SxObject> = {
@@ -91,18 +109,30 @@ function NowPlayingTitle({
   url,
   color,
   textShadow,
+  layout,
 }: {
   trackTitle: string;
   url?: string;
   color?: string;
   textShadow?: string;
+  layout: NowPlayingLayout;
 }) {
   const paint = colorShadowSx(color, textShadow);
-  const steps = [
+  const cellSteps = [
     { sx: { ...nowPlayingH3Sx, ...paint }, variant: 'h3' as const },
     { sx: { ...nowPlayingH4Sx, ...paint }, variant: 'h4' as const },
     { sx: { ...nowPlayingH5Sx, ...paint }, variant: 'h5' as const },
   ];
+  const steps =
+    layout === 'hero'
+      ? [
+          { sx: { ...nowPlayingHeroH2Sx, ...paint }, variant: 'h2' as const },
+          ...cellSteps.map(({ sx, variant }) => ({
+            sx: { ...sx, ...hideWhenHeroWide },
+            variant,
+          })),
+        ]
+      : cellSteps;
 
   if (!url) {
     return (
@@ -144,10 +174,17 @@ export function TrackTitle({
   color,
   textShadow,
   listingVariant = 'card',
+  layout = 'cell',
 }: TrackTitleProps) {
   if (listingVariant === 'nowPlaying') {
     return (
-      <NowPlayingTitle color={color} textShadow={textShadow} trackTitle={trackTitle} url={url} />
+      <NowPlayingTitle
+        color={color}
+        layout={layout}
+        textShadow={textShadow}
+        trackTitle={trackTitle}
+        url={url}
+      />
     );
   }
 

@@ -10,6 +10,7 @@ import { type AlbumGradientInformation, extractAlbumGradientFromUrl } from './ex
 import { NowPlayingCard } from './NowPlayingCard';
 import { SpotifyCardScrollTracker } from './SpotifyCardScrollTracker';
 import { TrackListing } from './TrackListing';
+import type { NowPlayingLayout } from './TrackTitle';
 
 type SpotifyCardShellProps = {
   children: ReactNode;
@@ -72,13 +73,22 @@ type SpotifyCardWithGradientProps = {
    * wash, notes, progress, botanical accent.
    */
   variant?: 'card' | 'nowPlaying';
+  /**
+   * Greenhouse `nowPlaying` only. `hero` is the landscape music-page card.
+   * Ignored for `variant="card"`.
+   */
+  layout?: NowPlayingLayout;
 };
 
 /**
  * Client card that derives album-art gradient/contrast in the browser.
  * Keeps sharp (and its native libvips) out of the homepage server module graph.
  */
-export function SpotifyCardWithGradient({ track, variant = 'card' }: SpotifyCardWithGradientProps) {
+export function SpotifyCardWithGradient({
+  layout = 'cell',
+  track,
+  variant = 'card',
+}: SpotifyCardWithGradientProps) {
   const [gradientInformation, setGradientInformation] = useState<AlbumGradientInformation>({
     backgroundGradient: track.albumGradient ?? null,
     contrastSetting: track.albumGradientContrastSetting ?? null,
@@ -109,7 +119,7 @@ export function SpotifyCardWithGradient({ track, variant = 'card' }: SpotifyCard
   if (variant === 'nowPlaying') {
     return (
       <SpotifyCardScrollTracker>
-        <NowPlayingCard track={trackWithCurrentGradient} />
+        <NowPlayingCard layout={layout} track={trackWithCurrentGradient} />
       </SpotifyCardScrollTracker>
     );
   }

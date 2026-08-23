@@ -14,7 +14,7 @@ import type { Colors } from './colors';
 import { MusicNotes } from './MusicNotes';
 import { PlaybackProgressBar } from './PlaybackProgressBar';
 import { PlaybackStatus } from './PlaybackStatus';
-import { TrackTitle } from './TrackTitle';
+import { type NowPlayingLayout, TrackTitle } from './TrackTitle';
 import { WatercolorLeaves } from './WatercolorLeaves';
 
 /**
@@ -177,6 +177,63 @@ const artFrameSx: SxObject = {
   width: 64,
 };
 
+const heroGridSx: SxObject = {
+  '@container now-playing (max-width: 13.5rem)': {
+    gridTemplateAreas: '"art" "copy" "progress"',
+    gridTemplateColumns: 'minmax(0, 1fr)',
+  },
+  '@container now-playing (min-width: 30rem)': {
+    alignContent: 'stretch',
+    alignItems: 'stretch',
+    gap: 2,
+    gridTemplateAreas: '"copy art" "progress art"',
+    gridTemplateColumns: 'minmax(0, 1fr) 41%',
+    gridTemplateRows: '1fr auto',
+  },
+  alignContent: 'end',
+  display: 'grid',
+  flex: 1,
+  gap: 1.25,
+  gridTemplateAreas: '"art copy" "progress progress"',
+  gridTemplateColumns: 'auto minmax(0, 1fr)',
+  gridTemplateRows: 'auto auto',
+  minHeight: 0,
+  position: 'relative',
+  zIndex: 5,
+};
+
+const heroCopySx: SxObject = {
+  '@container now-playing (min-width: 30rem)': {
+    alignSelf: 'start',
+    paddingTop: 1,
+  },
+  gridArea: 'copy',
+  minWidth: 0,
+};
+
+const heroArtLinkSx: SxObject = {
+  '@container now-playing (min-width: 30rem)': {
+    alignSelf: 'stretch',
+    height: '100%',
+    width: '100%',
+  },
+  alignSelf: 'end',
+  display: 'block',
+  gridArea: 'art',
+  minHeight: 0,
+  minWidth: 0,
+};
+
+const heroArtFrameSx: SxObject = {
+  ...artFrameSx,
+  '@container now-playing (min-width: 30rem)': {
+    borderRadius: '18px',
+    boxShadow: '0 8px 28px rgb(32 28 12 / 0.28)',
+    height: '100%',
+    width: '100%',
+  },
+};
+
 const headerSx: SxObject = {
   alignItems: 'center',
   flexDirection: 'row',
@@ -226,6 +283,12 @@ const progressWrapSx: SxObject = {
   marginTop: 0.25,
 };
 
+const heroProgressSx: SxObject = {
+  ...progressWrapSx,
+  gridArea: 'progress',
+  minWidth: 0,
+};
+
 const RESTING_NOTES = [
   { Icon: Music, left: '52%', rotate: '-18deg', size: 16, top: '8%' },
   { Icon: Music2, left: '64%', rotate: '14deg', size: 28, top: '14%' },
@@ -238,21 +301,33 @@ const RESTING_NOTES = [
 ] as const;
 
 const ART_SOURCE_PX = 160;
+const HERO_ART_SOURCE_PX = 800;
 
-function AlbumThumb({ track }: { track: Track }) {
+function AlbumThumb({ layout, track }: { layout: NowPlayingLayout; track: Track }) {
   const albumTitle = track.album.name;
   const albumUrl = track.album.externalUrls.spotify;
+  const hero = layout === 'hero';
+  const sourcePx = hero ? HERO_ART_SOURCE_PX : ART_SOURCE_PX;
 
   return (
-    <Link href={albumUrl} isExternal={true} title={albumTitle}>
-      <Card data-now-playing-art="" sx={artFrameSx}>
+    <Link
+      href={albumUrl}
+      isExternal={true}
+      sx={hero ? heroArtLinkSx : undefined}
+      title={albumTitle}
+    >
+      <Card data-now-playing-art="" sx={hero ? heroArtFrameSx : artFrameSx}>
         <Image
           alt={albumTitle}
           fill={true}
-          height={ART_SOURCE_PX}
-          sizes={{ extraLarge: ART_SOURCE_PX, tiny: 128 }}
+          height={sourcePx}
+          sizes={
+            hero
+              ? { extraLarge: HERO_ART_SOURCE_PX, large: 640, tiny: 256 }
+              : { extraLarge: ART_SOURCE_PX, tiny: 128 }
+          }
           url={track.albumImage.url}
-          width={ART_SOURCE_PX}
+          width={sourcePx}
         />
       </Card>
     </Link>
@@ -290,15 +365,69 @@ function FrostGrain() {
   );
 }
 
+function NowPlayingCopy({ layout, track }: { layout: NowPlayingLayout; track: Track }) {
+  return (
+    <>
+      <Stack sx={headerSx}>
+        <PlaybackStatus
+          color={CREAM.primary}
+          isPlaying={track.isPlaying}
+          listingVariant="card"
+          playedAt={track.playedAt}
+          textShadow={CREAM.primaryShadow}
+        />
+      </Stack>
+      <Box data-now-playing-title="" sx={titleSx}>
+        <TrackTitle
+          color={CREAM.primary}
+          layout={layout}
+          listingVariant="nowPlaying"
+          textShadow={CREAM.primaryShadow}
+          trackTitle={track.name}
+          url={track.externalUrls.spotify}
+        />
+      </Box>
+      <Box data-now-playing-artist="" sx={artistSx}>
+        <ArtistList
+          artists={track.artists}
+          color={CREAM.secondary}
+          listingVariant="nowPlaying"
+          textShadow={CREAM.secondaryShadow}
+        />
+      </Box>
+    </>
+  );
+}
+
+function NowPlayingProgress({ track }: { track: Track }) {
+  return (
+    <PlaybackProgressBar
+      colors={CREAM}
+      durationMs={track.durationMs}
+      isPlaying={track.isPlaying}
+      progressMs={track.progressMs}
+    />
+  );
+}
+
 /**
  * Greenhouse now-playing tile: sage/gold wash, watercolor leaves, floating
  * notes, and a cream progress pill. Live `Track` pieces stay underneath.
+ * `layout="hero"` is the landscape music-page card; it falls back to the
+ * cell arrangement below 30rem. Default `cell` stays the homepage tile.
  */
-export function NowPlayingCard({ track }: { track: Track }) {
+export function NowPlayingCard({
+  layout = 'cell',
+  track,
+}: {
+  layout?: NowPlayingLayout;
+  track: Track;
+}) {
   const gradient = track.albumGradient ?? FALLBACK_WASH;
+  const hero = layout === 'hero';
 
   return (
-    <ContentCard data-bento="now-playing" sx={cardSx}>
+    <ContentCard data-bento="now-playing" data-now-playing-layout={layout} sx={cardSx}>
       <Box aria-hidden="true" data-now-playing-wash="" sx={washSx} />
       <Box aria-hidden="true" sx={albumMixSx}>
         <AlbumGradientBackdrop containerSx={{ inset: 0 }} gradient={gradient} />
@@ -314,47 +443,29 @@ export function NowPlayingCard({ track }: { track: Track }) {
       <Box aria-hidden="true" data-now-playing-leaf="" sx={leafBadgeSx}>
         <Leaf size={14} />
       </Box>
-      <Stack sx={layoutSx}>
-        <Box data-now-playing-copy="" sx={copyRowSx}>
-          <AlbumThumb track={track} />
-          <Stack sx={copyTextSx}>
-            <Stack sx={headerSx}>
-              <PlaybackStatus
-                color={CREAM.primary}
-                isPlaying={track.isPlaying}
-                listingVariant="card"
-                playedAt={track.playedAt}
-                textShadow={CREAM.primaryShadow}
-              />
-            </Stack>
-            <Box data-now-playing-title="" sx={titleSx}>
-              <TrackTitle
-                color={CREAM.primary}
-                listingVariant="nowPlaying"
-                textShadow={CREAM.primaryShadow}
-                trackTitle={track.name}
-                url={track.externalUrls.spotify}
-              />
-            </Box>
-            <Box data-now-playing-artist="" sx={artistSx}>
-              <ArtistList
-                artists={track.artists}
-                color={CREAM.secondary}
-                listingVariant="nowPlaying"
-                textShadow={CREAM.secondaryShadow}
-              />
-            </Box>
+      {hero ? (
+        <Box data-now-playing-hero="" sx={heroGridSx}>
+          <AlbumThumb layout="hero" track={track} />
+          <Stack data-now-playing-copy="" sx={heroCopySx}>
+            <NowPlayingCopy layout="hero" track={track} />
           </Stack>
+          <Box data-now-playing-progress="" sx={heroProgressSx}>
+            <NowPlayingProgress track={track} />
+          </Box>
         </Box>
-        <Box data-now-playing-progress="" sx={progressWrapSx}>
-          <PlaybackProgressBar
-            colors={CREAM}
-            durationMs={track.durationMs}
-            isPlaying={track.isPlaying}
-            progressMs={track.progressMs}
-          />
-        </Box>
-      </Stack>
+      ) : (
+        <Stack sx={layoutSx}>
+          <Box data-now-playing-copy="" sx={copyRowSx}>
+            <AlbumThumb layout="cell" track={track} />
+            <Stack sx={copyTextSx}>
+              <NowPlayingCopy layout="cell" track={track} />
+            </Stack>
+          </Box>
+          <Box data-now-playing-progress="" sx={progressWrapSx}>
+            <NowPlayingProgress track={track} />
+          </Box>
+        </Stack>
+      )}
     </ContentCard>
   );
 }

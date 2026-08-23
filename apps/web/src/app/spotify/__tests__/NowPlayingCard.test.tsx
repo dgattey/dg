@@ -221,4 +221,44 @@ describe('NowPlayingCard', () => {
     expect(css).not.toContain('#3f522c');
     expect(css).not.toContain('ellipse 58% 52% at 94% 8%');
   });
+
+  it('defaults to the cell layout', () => {
+    render(
+      <TestWrapper>
+        <NowPlayingCard track={track} />
+      </TestWrapper>,
+    );
+
+    const card = document.querySelector('[data-bento="now-playing"]');
+    expect(card).toHaveAttribute('data-now-playing-layout', 'cell');
+    expect(document.querySelector('[data-now-playing-hero]')).toBeNull();
+    expect(document.querySelector('[data-now-playing-title] .MuiTypography-h2')).toBeNull();
+    expect(
+      document.querySelector('[data-now-playing-art] img')?.getAttribute('sizes') ?? '',
+    ).toContain('160px');
+  });
+
+  it('swaps to the landscape hero layout and keeps the cell fallback query', () => {
+    render(
+      <TestWrapper>
+        <NowPlayingCard layout="hero" track={track} />
+      </TestWrapper>,
+    );
+
+    const card = document.querySelector('[data-bento="now-playing"]');
+    expect(card).toHaveAttribute('data-now-playing-layout', 'hero');
+    expect(document.querySelector('[data-now-playing-hero]')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-title] .MuiTypography-h2')).toBeTruthy();
+    expect(document.querySelector('[data-now-playing-artist] .MuiTypography-h5')).toBeTruthy();
+    expect(
+      document.querySelector('[data-now-playing-art] img')?.getAttribute('sizes') ?? '',
+    ).toContain('800px');
+
+    const css = [...document.querySelectorAll('style')]
+      .flatMap((style) => [...(style.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
+      .join('\n');
+    expect(css).toContain('@container now-playing (min-width: 30rem)');
+    expect(css).toContain('41%');
+    expect(css).toContain('border-radius: 18px');
+  });
 });
