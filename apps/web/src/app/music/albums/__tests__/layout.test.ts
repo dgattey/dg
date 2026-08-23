@@ -1,10 +1,6 @@
 import type { ReactElement, ReactNode } from 'react';
 import { PageTitle } from '../../../layouts/PageTitle';
-import { FlagOffAlbumsLayout } from '../layout';
-
-jest.mock('../../../greenhouse/GreenhouseSurface', () => ({
-  GreenhouseSurface: ({ children }: { children: unknown }) => children,
-}));
+import { FlagOffAlbumsLayout } from '../FlagOffAlbumsLayout';
 
 describe('Favorite albums layout', () => {
   it('renders the page title so it survives album navigations', () => {
