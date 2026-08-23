@@ -172,10 +172,7 @@ function waterRing({
   const north = field.maxLat + latSpan * 0.08;
   const oceanSouth: Point = [south, oceanLng];
   const oceanNorth: Point = [north, oceanLng];
-  if (west) {
-    return [oceanSouth, ...coast, oceanNorth, oceanSouth];
-  }
-  return [oceanSouth, ...[...coast].reverse(), oceanNorth, oceanSouth];
+  return [oceanSouth, ...coast, oceanNorth, oceanSouth];
 }
 
 function shoreLine(

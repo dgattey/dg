@@ -78,4 +78,46 @@ describe('topoBasemap', () => {
     expect(Math.min(...ys)).toBeLessThan(height * 0.04);
     expect(Math.max(...ys)).toBeGreaterThan(height * 0.96);
   });
+
+  it('fills water to the viewBox edge instead of leaving a paper margin', () => {
+    const width = 1600;
+    const height = 900;
+    const padding = Math.round((CARD_ROUTE_PADDING * width) / 460);
+    const viewport = {
+      ...fitRouteViewport({ height, padding, points: LOOP, width }),
+      height,
+      width,
+    };
+    const layers = buildTopoLayers(LOOP, viewport);
+    const ring = layers.water[0]?.ring ?? [];
+    const pixels = projectRouteToPixels({ ...viewport, points: ring });
+    const waterLngs = ring.map(([, lng]) => lng);
+    const waterOnEast = (Math.max(...waterLngs) + Math.min(...waterLngs)) / 2 > viewport.center[1];
+    const probe = waterOnEast ? { x: width - 8, y: height / 2 } : { x: 8, y: height / 2 };
+    expect(pointInRing(pixels, probe)).toBe(true);
+  });
 });
+
+function pointInRing(ring: Array<{ x: number; y: number }>, point: { x: number; y: number }) {
+  let inside = false;
+  for (
+    let index = 0, previous = ring.length - 1;
+    index < ring.length;
+    previous = index, index += 1
+  ) {
+    const current = ring[index];
+    const last = ring[previous];
+    if (!current || !last) {
+      continue;
+    }
+    const crosses =
+      current.y > point.y !== last.y > point.y &&
+      point.x <
+        ((last.x - current.x) * (point.y - current.y)) / (last.y - current.y || Number.EPSILON) +
+          current.x;
+    if (crosses) {
+      inside = !inside;
+    }
+  }
+  return inside;
+}
