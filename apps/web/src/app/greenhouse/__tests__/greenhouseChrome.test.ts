@@ -49,6 +49,7 @@ describe('greenhouse chrome', () => {
     expect(css).toContain('object-position: bottom left');
     expect(css).toContain('object-position: bottom right');
     expect(css).toContain('height: calc(var(--greenhouse-band) + 6dvh)');
+    expect(css).toContain('mask-image: linear-gradient(to bottom, transparent, #000 42%)');
   });
 
   it('keeps four keyed cutouts for the corner layer and other surfaces', () => {

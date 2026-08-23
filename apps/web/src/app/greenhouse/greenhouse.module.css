@@ -69,6 +69,7 @@
   display: block;
   height: calc(var(--greenhouse-band) + 6dvh);
   object-fit: cover;
+  mask-image: linear-gradient(to bottom, transparent, #000 42%);
 }
 
 .edgeLeft img {
