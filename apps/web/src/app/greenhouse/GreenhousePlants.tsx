@@ -19,9 +19,12 @@ import styles from './greenhouse.module.css';
 import { plantMassVmin } from './greenhouseGeometry';
 import type { GreenhouseViewport, LeafSymbol, PlantInstance, PlantLayer } from './greenhouseLayout';
 
+type PlantMount = 'side' | 'bottom';
+
 type GreenhousePlantsProps = {
   plants: ReadonlyArray<PlantInstance>;
   layer: PlantLayer;
+  mount?: PlantMount;
   viewport?: GreenhouseViewport;
 };
 
@@ -92,8 +95,19 @@ function plantPosition(plant: PlantInstance): CSSProperties {
  * Photoreal cutouts. Clicks pass through; screen readers skip them.
  * AVIF is the transfer; WebP is the fallback. Mobile uses the 768w encode.
  */
-export function GreenhousePlants({ plants, layer, viewport = 'desktop' }: GreenhousePlantsProps) {
-  const items = plants.filter((plant) => plant.layer === layer && FOLIAGE[plant.symbol]);
+function matchesMount(plant: PlantInstance, mount: PlantMount): boolean {
+  return mount === 'bottom' ? plant.edge === 'bottom' : plant.edge !== 'bottom';
+}
+
+export function GreenhousePlants({
+  plants,
+  layer,
+  mount = 'bottom',
+  viewport = 'desktop',
+}: GreenhousePlantsProps) {
+  const items = plants.filter(
+    (plant) => plant.layer === layer && matchesMount(plant, mount) && FOLIAGE[plant.symbol],
+  );
   return (
     <div
       aria-hidden="true"
@@ -112,6 +126,7 @@ export function GreenhousePlants({ plants, layer, viewport = 'desktop' }: Greenh
             data-cluster={plant.cluster}
             data-edge={plant.edge}
             data-featured={plant.featured ? 'true' : undefined}
+            data-min-width={plant.minWidth != null ? 'wide' : undefined}
             key={plant.id}
             style={
               {
@@ -121,6 +136,7 @@ export function GreenhousePlants({ plants, layer, viewport = 'desktop' }: Greenh
                 '--plant-flip': plant.flip ? -1 : 1,
                 '--plant-rotate': `${plant.rotate}deg`,
                 '--plant-width': `${plant.scale * mass}vmin`,
+                '--plant-z': plant.z ?? 0,
                 maxWidth: `${asset.width}px`,
                 ...plantPosition(plant),
               } as CSSProperties

@@ -1,19 +1,51 @@
 import {
-  bottomBandHeight,
   CONTENT_MAX_PX,
   contentGutterWidth,
   contentInset,
-  edgeStripImgWidth,
-  edgeStripVisibleHeight,
+  DENSE_FOLIAGE_DESKTOP_MAX,
+  DENSE_FOLIAGE_MOBILE_MAX,
   edgeStripWidth,
+  FOLIAGE_SAFE_VIEWPORTS,
   GREENHOUSE_VIEWPORTS,
   homeGrid,
   homeSafeRects,
+  plantCssBox,
   plantOpaqueAabb,
   plantSafeZoneHits,
+  plantSafeZoneHitsForSize,
   surfaceSafeRects,
 } from '../greenhouseGeometry';
-import { LEAF_SYMBOLS, layoutGreenhousePlants } from '../greenhouseLayout';
+import { LEAF_SYMBOLS, layoutGreenhousePlants, plantsVisibleAt } from '../greenhouseLayout';
+
+function bottomNeighborsMatch(
+  plants: ReturnType<typeof layoutGreenhousePlants>,
+  width: number,
+): boolean {
+  const bottom = plantsVisibleAt(plants, width)
+    .filter((plant) => plant.edge === 'bottom')
+    .toSorted((a, b) => a.x - b.x);
+  return bottom.some((plant, index) => {
+    const prev = bottom[index - 1];
+    return (
+      prev != null && prev.symbol === plant.symbol && Boolean(prev.flip) === Boolean(plant.flip)
+    );
+  });
+}
+
+function denseBottomPx(
+  plants: ReturnType<typeof layoutGreenhousePlants>,
+  viewport: { height: number; width: number },
+): number {
+  let highest = viewport.height;
+  for (const plant of plantsVisibleAt(plants, viewport.width)) {
+    if (plant.edge !== 'bottom') {
+      continue;
+    }
+    const box = plantCssBox(plant, viewport);
+    highest = Math.min(highest, box.y);
+  }
+  return viewport.height - highest;
+}
 
 describe('greenhouseLayout', () => {
   it('is deterministic for a surface', () => {
@@ -23,27 +55,20 @@ describe('greenhouseLayout', () => {
     );
   });
 
-  it('keeps two to four desktop corner cutouts in front of the strips', () => {
+  it('places a mixed bottom fringe and side peeks on desktop', () => {
     const plants = layoutGreenhousePlants('home');
-    expect(plants.length).toBeGreaterThanOrEqual(2);
-    expect(plants.length).toBeLessThanOrEqual(4);
-    expect(plants.every((plant) => plant.layer === 'front')).toBe(true);
+    expect(plants.filter((plant) => plant.edge === 'bottom').length).toBeGreaterThanOrEqual(6);
+    expect(plants.some((plant) => plant.edge === 'left')).toBe(true);
+    expect(plants.some((plant) => plant.edge === 'right')).toBe(true);
     expect(plants.some((plant) => plant.symbol === 'leaf-monstera')).toBe(true);
-    expect(plants.filter((plant) => plant.edge === 'left').every((plant) => plant.x <= 0)).toBe(
-      true,
-    );
-    expect(plants.filter((plant) => plant.edge === 'right').every((plant) => plant.x <= 0)).toBe(
-      true,
-    );
-    expect(plants.filter((plant) => plant.edge === 'bottom').every((plant) => plant.y < 0)).toBe(
-      true,
-    );
+    expect(plants.some((plant) => plant.symbol === 'leaf-bop')).toBe(true);
+    expect(plants.some((plant) => plant.symbol === 'leaf-calathea')).toBe(true);
+    expect(plants.some((plant) => plant.symbol === 'leaf-nerve')).toBe(true);
   });
 
-  it('keeps two mobile corner cutouts on the top-right and bottom', () => {
+  it('keeps mobile foliage on the bottom and one right peek', () => {
     const plants = layoutGreenhousePlants('home', 0, 'mobile');
-    expect(plants.length).toBeGreaterThanOrEqual(2);
-    expect(plants.length).toBeLessThanOrEqual(4);
+    expect(plants.length).toBeGreaterThanOrEqual(4);
     expect(plants.every((plant) => plant.edge === 'right' || plant.edge === 'bottom')).toBe(true);
     expect(plants.some((plant) => plant.edge === 'right')).toBe(true);
     expect(plants.some((plant) => plant.edge === 'bottom')).toBe(true);
@@ -85,6 +110,12 @@ describe('greenhouseLayout', () => {
       expect(plant.scale).toBeGreaterThanOrEqual(0.7);
       expect(plant.scale).toBeLessThanOrEqual(1.4);
     }
+  });
+
+  it('varies symbol or flip so no two bottom neighbors match', () => {
+    expect(bottomNeighborsMatch(layoutGreenhousePlants('home'), 1440)).toBe(false);
+    expect(bottomNeighborsMatch(layoutGreenhousePlants('home', 0, 'mobile'), 390)).toBe(false);
+    expect(bottomNeighborsMatch(layoutGreenhousePlants('music'), 1440)).toBe(false);
   });
 });
 
@@ -137,7 +168,7 @@ describe('greenhouse safe zones', () => {
   it('pins music chrome to the visual viewport on tall pages', () => {
     const plants = layoutGreenhousePlants('music');
     const viewport = GREENHOUSE_VIEWPORTS.desktop;
-    for (const plant of plants) {
+    for (const plant of plantsVisibleAt(plants, viewport.width)) {
       const box = plantOpaqueAabb(plant, viewport);
       expect(box.y).toBeLessThan(viewport.height);
       expect(box.y + box.height).toBeGreaterThan(0);
@@ -156,33 +187,36 @@ describe('greenhouse safe zones', () => {
     ).toEqual([]);
   });
 
-  it('keeps tablet and ultrawide cutouts out of the copy wells', () => {
-    const plants = layoutGreenhousePlants('home', 0, 'desktop');
-    expect(plantSafeZoneHits(plants, 'tablet')).toEqual([]);
-    expect(plantSafeZoneHits(plants, 'ultrawide')).toEqual([]);
+  it('keeps cutouts out of copy wells at every foliage viewport', () => {
+    for (const size of FOLIAGE_SAFE_VIEWPORTS) {
+      const viewport = size.width < 576 ? 'mobile' : 'desktop';
+      expect(plantSafeZoneHitsForSize(layoutGreenhousePlants('home', 0, viewport), size)).toEqual(
+        [],
+      );
+      expect(
+        plantSafeZoneHitsForSize(layoutGreenhousePlants('music', 0, viewport), size, 'music'),
+      ).toEqual([]);
+    }
   });
 
-  it('keeps the 68rem grid clear of edge strips on ultrawide', () => {
+  it('keeps the 68rem grid clear of the side gutter on ultrawide', () => {
     const inset = contentInset(2560);
     const strip = edgeStripWidth(2560);
     expect(inset).toBeGreaterThan((2560 - CONTENT_MAX_PX) / 2 - 1);
     expect(strip).toBeLessThan(inset);
   });
 
-  it('caps the bottom band to a peek, not a wall', () => {
-    expect(bottomBandHeight(GREENHOUSE_VIEWPORTS.desktop)).toBe(135);
-    expect(bottomBandHeight(GREENHOUSE_VIEWPORTS.mobile)).toBeCloseTo(75.96, 1);
-    expect(edgeStripVisibleHeight(GREENHOUSE_VIEWPORTS.desktop)).toBe(135);
-    expect(edgeStripVisibleHeight(GREENHOUSE_VIEWPORTS.mobile)).toBeCloseTo(75.96, 1);
-  });
-
-  it('lets edge silhouettes overlap the grid column without covering copy', () => {
-    const desktop = GREENHOUSE_VIEWPORTS.desktop.width;
-    const mobile = GREENHOUSE_VIEWPORTS.mobile.width;
-    expect(edgeStripImgWidth(desktop, 'left')).toBeGreaterThan(contentGutterWidth(desktop) + 40);
-    expect(edgeStripImgWidth(desktop, 'left')).toBeLessThan(contentGutterWidth(desktop) + 120);
-    expect(edgeStripImgWidth(mobile, 'left')).toBeGreaterThan(contentGutterWidth(mobile) + 8);
-    expect(edgeStripImgWidth(mobile, 'left')).toBeLessThan(contentGutterWidth(mobile) + 40);
-    expect(contentInset(mobile)).toBe(16);
+  it('keeps the bottom fringe a peek, not a wall', () => {
+    const desktop = denseBottomPx(
+      layoutGreenhousePlants('home', 0, 'desktop'),
+      GREENHOUSE_VIEWPORTS.desktop,
+    );
+    const mobile = denseBottomPx(
+      layoutGreenhousePlants('home', 0, 'mobile'),
+      GREENHOUSE_VIEWPORTS.mobile,
+    );
+    expect(desktop).toBeLessThanOrEqual(DENSE_FOLIAGE_DESKTOP_MAX + 160);
+    expect(mobile).toBeLessThanOrEqual(DENSE_FOLIAGE_MOBILE_MAX + 140);
+    expect(contentGutterWidth(1440)).toBeGreaterThan(100);
   });
 });

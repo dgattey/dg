@@ -6,19 +6,15 @@
  *   /cursor/stores/bc-a78ceb1c-cd13-4ea5-bacd-55a94f7b77db/media
  *
  * Required dedicated sources:
- *   plant-src-edge-left.png, plant-src-edge-right.png (1024×1536)
- *   plant-src-bottom-band.png (1536×1024)
+ *   plant-src-{monstera,bop,calathea,nerve}.png
  *   spike-glass-plate.png (landscape), plate-src-portrait.png
  *
  * Despill is hue-limited so BOP orange and fittonia pink stay saturated.
- * Edges erode 1px. Bottom band is cropped to foliage rows, then checked
- * for a 40px wrap seam; a dirty seam is baked as a mirror tile.
+ * Edges erode 1px.
  *
  * Emits:
  *   atmosphere/back-plate-1536, -960, and -768 (landscape)
  *   atmosphere/back-plate-portrait and -portrait-768
- *   foliage/edge-{left,right}-1536, -900, and -768 (height)
- *   foliage/bottom-band-1536, -1024, and -768 (width)
  *   foliage/{name}-1024 and -768 cutouts
  *
  * Usage (from repo root, sharp resolved via @dg/ui):
@@ -151,32 +147,6 @@ async function rawFromSharp(image: import('sharp').Sharp): Promise<Rgba> {
   return { data, height: info.height, width: info.width };
 }
 
-async function encodeKeyedHeight(
-  raw: Rgba,
-  height: number,
-  outBase: string,
-  targetKb = 65,
-): Promise<void> {
-  const pipeline = () =>
-    sharp(raw.data, { raw: { channels: 4, height: raw.height, width: raw.width } }).resize({
-      fit: 'inside',
-      height,
-    });
-
-  let quality = 35;
-  let avif = await pipeline().avif({ chromaSubsampling: '4:2:0', effort: 7, quality }).toBuffer();
-  while (avif.length > targetKb * 1024 && quality > 28) {
-    quality -= 1;
-    avif = await pipeline().avif({ chromaSubsampling: '4:2:0', effort: 7, quality }).toBuffer();
-  }
-  const webp = await pipeline().webp({ alphaQuality: 80, quality: 62 }).toBuffer();
-  writeFileSync(`${outBase}.avif`, avif);
-  writeFileSync(`${outBase}.webp`, webp);
-  process.stdout.write(
-    `  ${outBase.split('/').at(-1)}  avif ${(avif.length / 1024).toFixed(1)}KB q${quality}  webp ${(webp.length / 1024).toFixed(1)}KB\n`,
-  );
-}
-
 async function encodeKeyedWidth(raw: Rgba, width: number, outBase: string): Promise<void> {
   const pipeline = () =>
     sharp(raw.data, { raw: { channels: 4, height: raw.height, width: raw.width } }).resize(
@@ -305,152 +275,6 @@ async function loadKeyedSource(src: string): Promise<Rgba> {
   return prepareKeyed(await rawFromSharp(sharp(src)));
 }
 
-/**
- * Soften a rectangular inner slab so the content-facing edge reads as a
- * silhouette. Wave the erode depth so the cut is not a second straight line.
- */
-function erodeInnerSlab(raw: Rgba, side: 'left' | 'right'): Rgba {
-  const { data, width, height } = raw;
-  const out = Buffer.from(data);
-  for (let y = 0; y < height; y += 1) {
-    const wave =
-      12 + 24 * (0.5 + 0.5 * Math.sin(y * 0.037)) + 16 * (0.5 + 0.5 * Math.sin(y * 0.091 + 1.2));
-    const radius = Math.round(32 + wave);
-    if (side === 'right') {
-      let first = -1;
-      for (let x = 0; x < width; x += 1) {
-        if (data[(y * width + x) * 4 + 3] > 24) {
-          first = x;
-          break;
-        }
-      }
-      if (first < 0) {
-        continue;
-      }
-      for (let x = first; x < Math.min(width, first + radius); x += 1) {
-        const t = (x - first) / radius;
-        const i = (y * width + x) * 4 + 3;
-        out[i] = Math.round(out[i] * t * t);
-      }
-    } else {
-      let last = -1;
-      for (let x = width - 1; x >= 0; x -= 1) {
-        if (data[(y * width + x) * 4 + 3] > 24) {
-          last = x;
-          break;
-        }
-      }
-      if (last < 0) {
-        continue;
-      }
-      for (let x = last; x > Math.max(-1, last - radius); x -= 1) {
-        const t = (last - x) / radius;
-        const i = (y * width + x) * 4 + 3;
-        out[i] = Math.round(out[i] * t * t);
-      }
-    }
-  }
-  return { data: out, height, width };
-}
-
-/** Keep the top silhouette of a keyed band so the dense mass is a peek, not a wall. */
-function cropBandPeek(raw: Rgba, maxHeight = 168): Rgba {
-  if (raw.height <= maxHeight) {
-    return raw;
-  }
-  const data = Buffer.alloc(raw.width * maxHeight * 4);
-  raw.data.copy(data, 0, 0, raw.width * maxHeight * 4);
-  return { data, height: maxHeight, width: raw.width };
-}
-
-function cropFoliageRows(raw: Rgba, threshold = 24): Rgba {
-  let top = 0;
-  found: for (let y = 0; y < raw.height; y += 1) {
-    for (let x = 0; x < raw.width; x += 1) {
-      if (raw.data[(y * raw.width + x) * 4 + 3] > threshold) {
-        top = Math.max(0, y - 2);
-        break found;
-      }
-    }
-  }
-  const height = raw.height - top;
-  const data = Buffer.alloc(raw.width * height * 4);
-  raw.data.copy(data, 0, top * raw.width * 4);
-  return { data, height, width: raw.width };
-}
-
-function seamMeanAbsDiff(raw: Rgba, cols = 40): number {
-  const width = Math.min(cols, Math.floor(raw.width / 2));
-  let sum = 0;
-  let n = 0;
-  for (let y = 0; y < raw.height; y += 1) {
-    for (let x = 0; x < width; x += 1) {
-      const left = (y * raw.width + x) * 4;
-      const right = (y * raw.width + raw.width - width + x) * 4;
-      sum += Math.abs(raw.data[left] - raw.data[right]);
-      sum += Math.abs(raw.data[left + 1] - raw.data[right + 1]);
-      sum += Math.abs(raw.data[left + 2] - raw.data[right + 2]);
-      sum += Math.abs(raw.data[left + 3] - raw.data[right + 3]);
-      n += 4;
-    }
-  }
-  return n === 0 ? 0 : sum / n;
-}
-
-async function mirrorTile(raw: Rgba): Promise<Rgba> {
-  const tile = await sharp(raw.data, {
-    raw: { channels: 4, height: raw.height, width: raw.width },
-  })
-    .png()
-    .toBuffer();
-  const flipped = await sharp(tile).flop().png().toBuffer();
-  const joined = await sharp({
-    create: {
-      background: { alpha: 0, b: 0, g: 0, r: 0 },
-      channels: 4,
-      height: raw.height,
-      width: raw.width * 2,
-    },
-  })
-    .composite([
-      { input: tile, left: 0, top: 0 },
-      { input: flipped, left: raw.width, top: 0 },
-    ])
-    .ensureAlpha()
-    .raw()
-    .toBuffer({ resolveWithObject: true });
-  return { data: joined.data, height: joined.info.height, width: joined.info.width };
-}
-
-async function encodeEdges(srcDir: string, outDir: string): Promise<void> {
-  mkdirSync(outDir, { recursive: true });
-  for (const side of ['left', 'right'] as const) {
-    const src = requireSrc(srcDir, `plant-src-edge-${side}.png`);
-    process.stdout.write(`edge-${side} ${src}\n`);
-    const keyed = erodeInnerSlab(await loadKeyedSource(src), side);
-    await encodeKeyedHeight(keyed, 1536, join(outDir, `edge-${side}-1536`));
-    await encodeKeyedHeight(keyed, 900, join(outDir, `edge-${side}-900`));
-    await encodeKeyedHeight(keyed, 768, join(outDir, `edge-${side}-768`), 40);
-  }
-}
-
-async function encodeBottomBand(srcDir: string, outDir: string): Promise<void> {
-  const src = requireSrc(srcDir, 'plant-src-bottom-band.png');
-  const keyed = cropBandPeek(cropFoliageRows(await loadKeyedSource(src)));
-  const seam = seamMeanAbsDiff(keyed);
-  const dirty = seam > 18;
-  process.stdout.write(
-    `bottom-band cropped ${keyed.width}×${keyed.height}  seam MAD ${seam.toFixed(1)}${dirty ? ' → mirror-tile' : ' (clean)'}\n`,
-  );
-  const tile = dirty ? await mirrorTile(keyed) : keyed;
-  await encodeKeyedWidth(tile, 1536, join(outDir, 'bottom-band-1536'));
-  await encodeKeyedWidth(tile, 1024, join(outDir, 'bottom-band-1024'));
-  await encodeKeyedWidth(tile, 768, join(outDir, 'bottom-band-768'));
-  for (const stale of ['bottom-band.avif', 'bottom-band.webp']) {
-    unlinkQuiet(join(outDir, stale));
-  }
-}
-
 async function processPlant(name: string, srcDir: string, outDir: string): Promise<void> {
   const src = join(srcDir, `plant-src-${name}.png`);
   const keyed = await loadKeyedSource(src);
@@ -459,35 +283,9 @@ async function processPlant(name: string, srcDir: string, outDir: string): Promi
   await encodeKeyedWidth(keyed, 768, join(outDir, `${name}-768`));
 }
 
-/**
- * Re-key shipped encodes when the magenta PNG sources are not on disk.
- * Right strip: eat the inner slab. Band: keep a shallow peek tile.
- */
-async function repairExistingFoliage(foliageDir: string): Promise<void> {
-  const rightSrc = join(foliageDir, 'edge-right-1536.webp');
-  if (!existsSync(rightSrc)) {
-    throw new Error(`missing ${rightSrc}`);
-  }
-  process.stdout.write('repair edge-right inner slab from existing 1536 webp\n');
-  const right = featherAlpha(erodeInnerSlab(await rawFromSharp(sharp(rightSrc)), 'right'));
-  await encodeKeyedHeight(right, 1536, join(foliageDir, 'edge-right-1536'));
-  await encodeKeyedHeight(right, 900, join(foliageDir, 'edge-right-900'));
-  await encodeKeyedHeight(right, 768, join(foliageDir, 'edge-right-768'), 40);
-
-  const bandSrc = join(foliageDir, 'bottom-band-1536.webp');
-  if (!existsSync(bandSrc)) {
-    throw new Error(`missing ${bandSrc}`);
-  }
-  process.stdout.write('repair bottom-band peek from existing 1536 webp\n');
-  const band = cropBandPeek(await rawFromSharp(sharp(bandSrc)));
-  await encodeKeyedWidth(band, 1536, join(foliageDir, 'bottom-band-1536'));
-  await encodeKeyedWidth(band, 1024, join(foliageDir, 'bottom-band-1024'));
-  await encodeKeyedWidth(band, 768, join(foliageDir, 'bottom-band-768'));
-}
-
-async function encodeOneXFromExisting(atmosphereDir: string, foliageDir: string): Promise<void> {
+async function encodeOneXFromExisting(atmosphereDir: string): Promise<void> {
   process.stdout.write('1x ladder from existing 2x encodes\n');
-  const jobs: Array<{ src: string; width?: number; height?: number; out: string }> = [
+  const jobs: Array<{ src: string; width: number; out: string }> = [
     {
       out: join(atmosphereDir, 'back-plate-768'),
       src: join(atmosphereDir, 'back-plate-1536.webp'),
@@ -498,29 +296,14 @@ async function encodeOneXFromExisting(atmosphereDir: string, foliageDir: string)
       src: join(atmosphereDir, 'back-plate-portrait.webp'),
       width: 768,
     },
-    {
-      height: 768,
-      out: join(foliageDir, 'edge-left-768'),
-      src: join(foliageDir, 'edge-left-1536.webp'),
-    },
-    {
-      height: 768,
-      out: join(foliageDir, 'edge-right-768'),
-      src: join(foliageDir, 'edge-right-1536.webp'),
-    },
-    {
-      out: join(foliageDir, 'bottom-band-768'),
-      src: join(foliageDir, 'bottom-band-1536.webp'),
-      width: 768,
-    },
   ];
   for (const job of jobs) {
     if (!existsSync(job.src)) {
       throw new Error(`missing ${job.src}`);
     }
     const pipeline = sharp(job.src).resize({
-      ...(job.width ? { width: job.width } : { height: job.height }),
       fit: 'inside',
+      width: job.width,
       withoutEnlargement: true,
     });
     const avif = await pipeline
@@ -536,6 +319,33 @@ async function encodeOneXFromExisting(atmosphereDir: string, foliageDir: string)
   }
 }
 
+const STALE_FOLIAGE = [
+  'thicket-1536.avif',
+  'thicket-1536.webp',
+  'thicket-768.avif',
+  'thicket-768.webp',
+  'bottom-band.avif',
+  'bottom-band.webp',
+  'bottom-band-768.avif',
+  'bottom-band-768.webp',
+  'bottom-band-1024.avif',
+  'bottom-band-1024.webp',
+  'bottom-band-1536.avif',
+  'bottom-band-1536.webp',
+  'edge-left-768.avif',
+  'edge-left-768.webp',
+  'edge-left-900.avif',
+  'edge-left-900.webp',
+  'edge-left-1536.avif',
+  'edge-left-1536.webp',
+  'edge-right-768.avif',
+  'edge-right-768.webp',
+  'edge-right-900.avif',
+  'edge-right-900.webp',
+  'edge-right-1536.avif',
+  'edge-right-1536.webp',
+];
+
 async function main(): Promise<void> {
   const rawArgs = process.argv.slice(2);
   const skipPlants = rawArgs.includes('--skip-plants');
@@ -547,14 +357,8 @@ async function main(): Promise<void> {
   mkdirSync(foliageDir, { recursive: true });
 
   const run = (name: string) => only.length === 0 || only.includes(name);
-  if (run('repair')) {
-    await repairExistingFoliage(foliageDir);
-    if (only.length === 1) {
-      return;
-    }
-  }
   if (run('1x')) {
-    await encodeOneXFromExisting(atmosphereDir, foliageDir);
+    await encodeOneXFromExisting(atmosphereDir);
     if (only.length === 1) {
       return;
     }
@@ -562,25 +366,12 @@ async function main(): Promise<void> {
   if (run('plates')) {
     await encodeBackPlates(srcDir, atmosphereDir);
   }
-  if (run('edges')) {
-    await encodeEdges(srcDir, foliageDir);
-  }
-  if (run('band')) {
-    await encodeBottomBand(srcDir, foliageDir);
-  }
   if (!skipPlants && run('plants')) {
     for (const name of PLANTS) {
       await processPlant(name, srcDir, foliageDir);
     }
   }
-  for (const stale of [
-    'thicket-1536.avif',
-    'thicket-1536.webp',
-    'thicket-768.avif',
-    'thicket-768.webp',
-    'bottom-band.avif',
-    'bottom-band.webp',
-  ]) {
+  for (const stale of STALE_FOLIAGE) {
     unlinkQuiet(join(foliageDir, stale));
   }
 }

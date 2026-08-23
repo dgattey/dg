@@ -1,21 +1,13 @@
 .frame {
   --greenhouse-gutter: 1.25rem;
   --greenhouse-strip: clamp(180px, 20vw, 440px);
-  --greenhouse-overlap: 56px;
-  --greenhouse-left-scale: 1;
-  --greenhouse-band: min(15dvh, 150px);
   position: relative;
   width: 100vw;
   margin-left: calc(50% - 50vw);
   background-color: var(--greenhouse-wash, #8f9258);
 }
 
-.frame[data-greenhouse-surface="music"] {
-  --greenhouse-left-scale: 0.64;
-}
-
-.backStack,
-.frontStack {
+.backStack {
   position: fixed;
   inset: 0;
   z-index: 0;
@@ -25,8 +17,25 @@
   pointer-events: none;
 }
 
-.frontStack {
+.sideStack {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100dvh;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.bottomStack {
+  position: fixed;
+  inset: 0;
   z-index: 3;
+  width: 100%;
+  height: 100dvh;
+  overflow: visible;
+  pointer-events: none;
 }
 
 .backPlate {
@@ -42,61 +51,6 @@
   margin-inline-start: -4%;
   object-fit: cover;
   object-position: 62% 100%;
-}
-
-.edgeLeft,
-.edgeRight {
-  position: fixed;
-  bottom: 0;
-  width: auto;
-  height: auto;
-  overflow: visible;
-  pointer-events: none;
-}
-
-.edgeLeft {
-  left: 0;
-  transform-origin: bottom left;
-}
-
-.edgeRight {
-  right: 0;
-  transform-origin: bottom right;
-}
-
-.edgeLeft img,
-.edgeRight img {
-  display: block;
-  height: var(--greenhouse-band);
-  object-fit: cover;
-  mask-image: linear-gradient(to bottom, transparent, #000 42%);
-}
-
-.edgeLeft img {
-  width: calc(
-    ((var(--greenhouse-strip) + var(--greenhouse-overlap)) / 0.856) *
-    var(--greenhouse-left-scale)
-  );
-  object-position: bottom left;
-}
-
-.edgeRight img {
-  width: calc((var(--greenhouse-strip) + var(--greenhouse-overlap)) / 0.721);
-  object-position: bottom right;
-}
-
-.bottomBand {
-  position: fixed;
-  inset: auto 0 0;
-  height: var(--greenhouse-band);
-  pointer-events: none;
-  background-repeat: repeat-x;
-  background-position: bottom center;
-  background-size: auto var(--greenhouse-band);
-}
-
-.bottomBandMobile {
-  display: none;
 }
 
 .plantsBack,
@@ -119,6 +73,7 @@
 
 .plant {
   position: absolute;
+  z-index: var(--plant-z, 0);
   width: var(--plant-width);
   height: auto;
   overflow: visible;
@@ -128,6 +83,16 @@
   transform-origin: 50% 80%;
   rotate: var(--plant-rotate, 0deg);
   scale: var(--plant-flip, 1) 1;
+}
+
+.plant[data-min-width="wide"] {
+  display: none;
+}
+
+@media (min-width: 1800px) {
+  .plant[data-min-width="wide"] {
+    display: block;
+  }
 }
 
 .plantsBack .plant {
@@ -221,8 +186,6 @@
   .frame {
     --greenhouse-gutter: 1rem;
     --greenhouse-strip: 16px;
-    --greenhouse-overlap: 16px;
-    --greenhouse-band: min(9dvh, 84px);
   }
 
   .backPlate img {
@@ -243,14 +206,6 @@
 
   .plant {
     width: min(var(--plant-width), 72vw);
-  }
-
-  .bottomBandDesktop {
-    display: none;
-  }
-
-  .bottomBandMobile {
-    display: block;
   }
 
   .content {
@@ -283,45 +238,34 @@
   }
 }
 
-.edgeLeft {
+.plant[data-edge="left"] {
   --greenhouse-drift-from: -1.5deg;
   --greenhouse-drift-to: 0.4deg;
-}
-
-.edgeRight {
-  --greenhouse-drift-from: 1.5deg;
-  --greenhouse-drift-to: -0.4deg;
-}
-
-.bottomBand {
-  --greenhouse-drift-from: 0deg;
-  --greenhouse-drift-to: 0deg;
-}
-
-.plant[data-edge="left"] {
   --plant-enter-x: -12vw;
   --plant-enter-y: 4vh;
 }
 
 .plant[data-edge="right"] {
+  --greenhouse-drift-from: 1.5deg;
+  --greenhouse-drift-to: -0.4deg;
   --plant-enter-x: 12vw;
   --plant-enter-y: 4vh;
 }
 
 .plant[data-edge="bottom"] {
+  --greenhouse-drift-from: 0deg;
+  --greenhouse-drift-to: 0deg;
   --plant-enter-x: 0;
   --plant-enter-y: 10vh;
 }
 
 @supports (animation-timeline: scroll()) {
-  .edgeLeft,
-  .edgeRight,
-  .bottomBand {
+  .bottomStack .plant {
     animation: greenhouse-chrome-drift linear both;
     animation-timeline: scroll();
   }
 
-  .plant {
+  .sideStack .plant {
     animation: greenhouse-plant-in cubic-bezier(0.34, 1.56, 0.64, 1) both;
     animation-timeline: view();
     animation-range: entry 0% cover 28%;
@@ -329,9 +273,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .edgeLeft,
-  .edgeRight,
-  .bottomBand,
+  .sideStack,
+  .bottomStack,
   .plantsBack,
   .plantsFront,
   .plant {

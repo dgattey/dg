@@ -2,7 +2,7 @@ import 'server-only';
 
 import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
-import { GreenhouseBackPlate, GreenhouseFoliage } from './GreenhouseFoliage';
+import { GreenhouseBackPlate } from './GreenhouseFoliage';
 import { GreenhousePlants } from './GreenhousePlants';
 import styles from './greenhouse.module.css';
 import type { GreenhouseSurface } from './greenhouseLayout';
@@ -13,17 +13,16 @@ type GreenhouseFrameProps = {
   children: ReactNode;
   surface: GreenhouseSurface;
   /**
-   * Plate, edge strips, bottom band, and corner cutouts. Token overrides
-   * still apply when this is off so the design-system pass can be photographed
-   * on its own.
+   * Plate and cutout foliage. Token overrides still apply when this is off
+   * so the design-system pass can be photographed on its own.
    */
   chrome?: boolean;
 };
 
 /**
  * Shared greenhouse shell. `surface` selects the plant layout (`home` vs
- * `music`). Stack is plate → cards → foreground plants. The site header
- * lives outside this frame at a higher z-index.
+ * `music`). Stack is plate → in-document sides → cards → fixed bottom fringe.
+ * The site header lives outside this frame at a higher z-index.
  */
 export function GreenhouseFrame({ children, surface, chrome = true }: GreenhouseFrameProps) {
   const desktopPlants = chrome ? layoutGreenhousePlants(surface, 0, 'desktop') : [];
@@ -39,18 +38,30 @@ export function GreenhouseFrame({ children, surface, chrome = true }: Greenhouse
       {chrome ? (
         <div className={styles.backStack} data-greenhouse-layer="plate">
           <GreenhouseBackPlate />
-          <GreenhousePlants layer="back" plants={desktopPlants} viewport="desktop" />
-          <GreenhousePlants layer="back" plants={mobilePlants} viewport="mobile" />
+        </div>
+      ) : null}
+      {chrome ? (
+        <div aria-hidden="true" className={styles.sideStack} data-greenhouse-layer="sides">
+          <GreenhousePlants layer="back" mount="side" plants={desktopPlants} viewport="desktop" />
+          <GreenhousePlants layer="back" mount="side" plants={mobilePlants} viewport="mobile" />
+          <GreenhousePlants layer="front" mount="side" plants={desktopPlants} viewport="desktop" />
+          <GreenhousePlants layer="front" mount="side" plants={mobilePlants} viewport="mobile" />
         </div>
       ) : null}
       <div className={styles.content} data-greenhouse-layer="cards">
         {children}
       </div>
       {chrome ? (
-        <div aria-hidden="true" className={styles.frontStack} data-greenhouse-layer="plants">
-          <GreenhouseFoliage />
-          <GreenhousePlants layer="front" plants={desktopPlants} viewport="desktop" />
-          <GreenhousePlants layer="front" plants={mobilePlants} viewport="mobile" />
+        <div aria-hidden="true" className={styles.bottomStack} data-greenhouse-layer="plants">
+          <GreenhousePlants layer="back" mount="bottom" plants={desktopPlants} viewport="desktop" />
+          <GreenhousePlants layer="back" mount="bottom" plants={mobilePlants} viewport="mobile" />
+          <GreenhousePlants
+            layer="front"
+            mount="bottom"
+            plants={desktopPlants}
+            viewport="desktop"
+          />
+          <GreenhousePlants layer="front" mount="bottom" plants={mobilePlants} viewport="mobile" />
         </div>
       ) : null}
     </Box>

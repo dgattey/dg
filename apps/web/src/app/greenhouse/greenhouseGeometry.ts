@@ -1,6 +1,14 @@
 import type { GreenhouseSurface, LeafSymbol, PlantInstance } from './greenhouseLayout';
+import { plantsVisibleAt } from './greenhouseLayout';
 
-export type GreenhouseViewportName = 'desktop' | 'mobile' | 'tablet' | 'ultrawide';
+export type GreenhouseViewportName =
+  | 'phone360'
+  | 'mobile'
+  | 'tablet768'
+  | 'tablet'
+  | 'desktop'
+  | 'desktop1920'
+  | 'ultrawide';
 
 export type ViewportSize = {
   height: number;
@@ -20,18 +28,39 @@ export type NamedRect = Rect & {
 
 export const GREENHOUSE_VIEWPORTS = {
   desktop: { height: 900, width: 1440 },
+  desktop1920: { height: 1080, width: 1920 },
   mobile: { height: 844, width: 390 },
+  phone360: { height: 800, width: 360 },
   tablet: { height: 1366, width: 1024 },
+  tablet768: { height: 1024, width: 768 },
   ultrawide: { height: 1440, width: 2560 },
 } as const satisfies Record<GreenhouseViewportName, ViewportSize>;
+
+/** Viewports the foliage safe-zone test must cover. */
+export const FOLIAGE_SAFE_VIEWPORTS = [
+  GREENHOUSE_VIEWPORTS.phone360,
+  GREENHOUSE_VIEWPORTS.mobile,
+  GREENHOUSE_VIEWPORTS.tablet768,
+  GREENHOUSE_VIEWPORTS.tablet,
+  GREENHOUSE_VIEWPORTS.desktop,
+  GREENHOUSE_VIEWPORTS.desktop1920,
+  GREENHOUSE_VIEWPORTS.ultrawide,
+] as const;
 
 export const FEATURED_PLANT_MASS_VMIN = 34;
 export const REGULAR_PLANT_MASS_VMIN = 28;
 export const MOBILE_PLANT_MAX_VW = 0.72;
 export const PLANT_TRANSFORM_ORIGIN = { x: 0.5, y: 0.8 } as const;
 export const FOLIAGE_ALPHA_THRESHOLD = 24;
-/** Alpha > 0.5. Used when measuring whether a strip covers copy. */
+/** Alpha > 0.5. Used when measuring whether foliage covers copy. */
 export const FOLIAGE_OPAQUE_THRESHOLD = 128;
+/**
+ * How far an opaque leaf may sit inside a copy well before the test fails.
+ * Wells already sit inset from card chrome; 8px is a tip graze, not a title.
+ */
+export const ALLOWED_FOLIAGE_COPY_OVERLAP_PX = 8;
+/** How far plants may overlap a card edge. Copy wells stay inside this. */
+export const FOLIAGE_CARD_OVERLAP = 24;
 export const CONTENT_MAX_PX = 68 * 16;
 export const EDGE_STRIP_MIN = 180;
 export const EDGE_STRIP_VW = 0.2;
@@ -40,11 +69,10 @@ export const EDGE_STRIP_MOBILE_MIN = 16;
 export const EDGE_STRIP_MOBILE_MAX = 16;
 export const MOBILE_CONTENT_PAD = 16;
 export const SM_BREAKPOINT = 576;
-export const BOTTOM_BAND_DESKTOP_DVH = 0.15;
-export const BOTTOM_BAND_DESKTOP_MAX = 150;
-export const BOTTOM_BAND_MOBILE_DVH = 0.09;
-export const BOTTOM_BAND_MOBILE_MAX = 84;
-export const MUSIC_LEFT_STRIP_SCALE = 0.64;
+/** Dense bottom mass target on a 900px-tall desktop. Tips may rise higher. */
+export const DENSE_FOLIAGE_DESKTOP_MIN = 63;
+export const DENSE_FOLIAGE_DESKTOP_MAX = 81;
+export const DENSE_FOLIAGE_MOBILE_MAX = 59;
 
 /**
  * Single glass nav bar (`GreenhouseHeader`). MUI `Container fixed` +
@@ -60,11 +88,8 @@ export const HEADER_BAR_SAFE = {
   topMobile: 8,
 } as const;
 
-/** Opaque width ÷ intrinsic width of the 1536 keyed strips (alpha > 24). */
-export const EDGE_STRIP_OPAQUE = { left: 0.856, right: 0.721 } as const;
-export const EDGE_STRIP_ASPECT = 1024 / 1536;
-export const EDGE_STRIP_OVERLAP_DESKTOP = 56;
-export const EDGE_STRIP_OVERLAP_MOBILE = 16;
+export const EDGE_STRIP_OVERLAP_DESKTOP = FOLIAGE_CARD_OVERLAP;
+export const EDGE_STRIP_OVERLAP_MOBILE = 12;
 
 export const LEAF_ASPECT: Record<LeafSymbol, number> = {
   'leaf-bop': 1024 / 1536,
@@ -257,19 +282,6 @@ export function edgeStripOverlap(width: number): number {
   return width < SM_BREAKPOINT ? EDGE_STRIP_OVERLAP_MOBILE : EDGE_STRIP_OVERLAP_DESKTOP;
 }
 
-/** CSS img width so the opaque silhouette reaches gutter + overlap. */
-export function edgeStripImgWidth(
-  width: number,
-  side: 'left' | 'right',
-  surface: GreenhouseSurface = 'home',
-): number {
-  const base = (edgeStripWidth(width) + edgeStripOverlap(width)) / EDGE_STRIP_OPAQUE[side];
-  if (surface === 'music' && side === 'left') {
-    return base * MUSIC_LEFT_STRIP_SCALE;
-  }
-  return base;
-}
-
 export function contentInset(width: number): number {
   if (width < SM_BREAKPOINT) {
     return MOBILE_CONTENT_PAD;
@@ -293,38 +305,6 @@ export function headerBarRect(viewport: ViewportSize): NamedRect {
 
 export function headerControlsRect(viewport: ViewportSize): NamedRect {
   return headerBarRect(viewport);
-}
-
-export function edgeStripVisibleHeight(viewport: ViewportSize): number {
-  return bottomBandHeight(viewport);
-}
-
-export function edgeStripRect(
-  side: 'left' | 'right',
-  viewport: ViewportSize,
-  surface: GreenhouseSurface = 'home',
-): Rect {
-  const width = edgeStripImgWidth(viewport.width, side, surface);
-  const height = edgeStripVisibleHeight(viewport);
-  return {
-    height,
-    width,
-    x: side === 'left' ? 0 : viewport.width - width,
-    y: viewport.height - height,
-  };
-}
-
-export function bottomBandHeight(viewport: ViewportSize): number {
-  const mobile = viewport.width < SM_BREAKPOINT;
-  return Math.min(
-    mobile ? BOTTOM_BAND_MOBILE_MAX : BOTTOM_BAND_DESKTOP_MAX,
-    viewport.height * (mobile ? BOTTOM_BAND_MOBILE_DVH : BOTTOM_BAND_DESKTOP_DVH),
-  );
-}
-
-export function bottomBandRect(viewport: ViewportSize): Rect {
-  const height = bottomBandHeight(viewport);
-  return { height, width: viewport.width, x: 0, y: viewport.height - height };
 }
 
 export function homeGrid(viewport: ViewportSize): {
@@ -428,7 +408,7 @@ function homeExtraCopyRects(
   viewport: ViewportSize,
   grid: ReturnType<typeof homeGrid>,
 ): Array<NamedRect> {
-  if (grid.extraTop >= viewport.height) {
+  if (grid.extraTop >= viewport.height - DENSE_FOLIAGE_DESKTOP_MAX - 12) {
     return [];
   }
   const gutter = contentGutterWidth(viewport.width);
@@ -453,10 +433,10 @@ function homeExtraCopyRects(
  * cards (span 4 on xl, span 6 on md) are only protected when they sit in
  * the first viewport.
  */
-export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<NamedRect> {
-  const size = GREENHOUSE_VIEWPORTS[viewport];
+export function homeSafeRectsForSize(size: ViewportSize): ReadonlyArray<NamedRect> {
   const grid = homeGrid(size);
   const strip = contentGutterWidth(size.width);
+  const nowTop = grid.stacked || !grid.twoCol ? grid.top + grid.row1 + grid.gutter : grid.top;
   if (!grid.twoCol) {
     const pad = grid.left;
     const overlap = edgeStripOverlap(size.width);
@@ -464,19 +444,24 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
     const rightClear = size.width - pad - overlap - 8;
     const copyWidth = Math.max(80, rightClear - leftClear);
     return [
-      { height: 200, id: 'intro-copy', width: Math.min(200, copyWidth), x: leftClear, y: 248 },
       {
-        height: 96,
+        height: 180,
+        id: 'intro-copy',
+        width: Math.min(200, copyWidth),
+        x: leftClear,
+        y: grid.top + 16,
+      },
+      {
+        height: 72,
         id: 'now-playing-copy',
         width: Math.min(268, copyWidth),
         x: leftClear,
-        y: 720,
+        y: nowTop + 16,
       },
       headerBarRect(size),
     ];
   }
 
-  const nowTop = grid.stacked ? grid.top + grid.row1 + grid.gutter : grid.top;
   const lowerTop = grid.stacked
     ? nowTop + grid.nowH + grid.gutter
     : grid.top + grid.row1 + grid.gutter;
@@ -485,6 +470,7 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
   const nowCopyX = grid.nowX + 14;
   const featuredCopyX = grid.featuredX + 16;
   const rightClear = size.width - strip - edgeStripOverlap(size.width) - 8;
+  const nowCopyY = grid.stacked ? nowTop + 18 : nowTop + Math.min(grid.nowH, grid.nowW * 1.6) - 102;
   return [
     {
       height: grid.stacked ? 180 : 200,
@@ -498,7 +484,7 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
       id: 'now-playing-copy',
       width: Math.max(80, Math.min(grid.nowW - 28, rightClear - nowCopyX)),
       x: nowCopyX,
-      y: nowTop + Math.min(grid.nowH, grid.nowW * 1.6) - 102,
+      y: nowCopyY,
     },
     {
       height: 50,
@@ -519,9 +505,13 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
   ];
 }
 
+export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<NamedRect> {
+  return homeSafeRectsForSize(GREENHOUSE_VIEWPORTS[viewport]);
+}
+
 /**
  * Listening heading + On repeat eyebrow. The heading sits in the span-4
- * intro cell; body1 is `36ch`. Plants and strips must stay out of these.
+ * intro cell; body1 is `36ch`. Plants must stay out of these.
  */
 export function musicCopyRects(viewport: ViewportSize): Array<NamedRect> {
   const left = contentInset(viewport.width);
@@ -548,18 +538,25 @@ export function musicCopyRects(viewport: ViewportSize): Array<NamedRect> {
 }
 
 /**
- * Safe wells for a surface. Plants stay pinned to the visual viewport, so
- * these rects never grow with document height.
+ * Safe wells for a surface at a named viewport.
  */
 export function surfaceSafeRects(
   surface: GreenhouseSurface,
   viewport: GreenhouseViewportName,
 ): ReadonlyArray<NamedRect> {
-  if (surface === 'home') {
-    return homeSafeRects(viewport);
-  }
-  const size = GREENHOUSE_VIEWPORTS[viewport];
-  return [...musicCopyRects(size), headerBarRect(size)];
+  return surfaceSafeRectsForSize(surface, GREENHOUSE_VIEWPORTS[viewport]);
+}
+
+export function surfaceSafeRectsForSize(
+  surface: GreenhouseSurface,
+  size: ViewportSize,
+): ReadonlyArray<NamedRect> {
+  const fringe = size.width < SM_BREAKPOINT ? DENSE_FOLIAGE_MOBILE_MAX : DENSE_FOLIAGE_DESKTOP_MAX;
+  const wells =
+    surface === 'home'
+      ? homeSafeRectsForSize(size)
+      : [...musicCopyRects(size), headerBarRect(size)];
+  return wells.filter((well) => well.y + 8 < size.height - fringe);
 }
 
 export function plantSafeZoneHits(
@@ -567,10 +564,18 @@ export function plantSafeZoneHits(
   viewport: GreenhouseViewportName,
   surface: GreenhouseSurface = 'home',
 ): ReadonlyArray<{ plantId: string; rectId: string }> {
-  const size = GREENHOUSE_VIEWPORTS[viewport];
-  const safes = surfaceSafeRects(surface, viewport);
+  return plantSafeZoneHitsForSize(plants, GREENHOUSE_VIEWPORTS[viewport], surface);
+}
+
+export function plantSafeZoneHitsForSize(
+  plants: ReadonlyArray<PlantInstance>,
+  size: ViewportSize,
+  surface: GreenhouseSurface = 'home',
+): ReadonlyArray<{ plantId: string; rectId: string }> {
+  const visible = plantsVisibleAt(plants, size.width);
+  const safes = surfaceSafeRectsForSize(surface, size);
   const hits: Array<{ plantId: string; rectId: string }> = [];
-  for (const plant of plants) {
+  for (const plant of visible) {
     const aabb = plantOpaqueAabb(plant, size);
     for (const safe of safes) {
       if (rectsIntersect(aabb, safe)) {
@@ -581,189 +586,106 @@ export function plantSafeZoneHits(
   return hits;
 }
 
-function mapCover(
-  localX: number,
-  localY: number,
-  box: ViewportSize,
-  image: ViewportSize,
-  posX: number,
-  posY: number,
-): { x: number; y: number } | null {
-  const scale = Math.max(box.width / image.width, box.height / image.height);
-  const drawnWidth = image.width * scale;
-  const drawnHeight = image.height * scale;
-  const offsetX = (box.width - drawnWidth) * posX;
-  const offsetY = (box.height - drawnHeight) * posY;
-  const x = (localX - offsetX) / scale;
-  const y = (localY - offsetY) / scale;
-  if (x < 0 || y < 0 || x >= image.width || y >= image.height) {
-    return null;
-  }
-  return { x, y };
-}
-
-export function viewportToEdgeStrip(
-  vx: number,
-  vy: number,
-  viewport: ViewportSize,
-  image: ViewportSize,
-  side: 'left' | 'right',
-  surface: GreenhouseSurface = 'home',
-): { x: number; y: number } | null {
-  const box = edgeStripRect(side, viewport, surface);
-  if (vx < box.x || vx >= box.x + box.width || vy < box.y || vy >= box.y + box.height) {
-    return null;
-  }
-  return mapCover(vx - box.x, vy - box.y, box, image, side === 'left' ? 0 : 1, 1);
-}
-
-export function viewportToBottomBand(
-  vx: number,
-  vy: number,
-  viewport: ViewportSize,
-  image: ViewportSize,
-): { x: number; y: number } | null {
-  const box = bottomBandRect(viewport);
-  if (vx < box.x || vx >= box.x + box.width || vy < box.y || vy >= box.y + box.height) {
-    return null;
-  }
-  const scale = box.height / image.height;
-  const tileWidth = image.width * scale;
-  const origin = viewport.width / 2 - tileWidth / 2;
-  let relX = vx - origin;
-  relX = ((relX % tileWidth) + tileWidth) % tileWidth;
-  const x = relX / scale;
-  const y = (vy - box.y) / scale;
-  if (x < 0 || y < 0 || x >= image.width || y >= image.height) {
-    return null;
-  }
-  return { x, y };
-}
-
-function sampleAlpha(
-  alpha: Uint8Array | Buffer,
-  image: ViewportSize,
-  mapped: { x: number; y: number },
-): number {
-  const px = Math.min(image.width - 1, Math.max(0, Math.round(mapped.x)));
-  const py = Math.min(image.height - 1, Math.max(0, Math.round(mapped.y)));
-  return alpha[py * image.width + px] ?? 0;
+export function insetRect(rect: Rect, inset: number): Rect {
+  return {
+    height: Math.max(0, rect.height - inset * 2),
+    width: Math.max(0, rect.width - inset * 2),
+    x: rect.x + inset,
+    y: rect.y + inset,
+  };
 }
 
 export type FoliageHit = { layer: string; rectId: string; x: number; y: number };
 
-function hitsInWells(
-  viewport: GreenhouseViewportName,
-  sample: (vx: number, vy: number) => number,
-  layer: string,
+export type PlantAlpha = {
+  alpha: Uint8Array | Buffer;
+  height: number;
+  width: number;
+};
+
+function sampleAlpha(image: PlantAlpha, mapped: { x: number; y: number }): number {
+  const px = Math.min(image.width - 1, Math.max(0, Math.round(mapped.x)));
+  const py = Math.min(image.height - 1, Math.max(0, Math.round(mapped.y)));
+  return image.alpha[py * image.width + px] ?? 0;
+}
+
+/**
+ * Inverse of the CSS place + rotate + flip, so a viewport sample can read
+ * the keyed cutout's alpha.
+ */
+export function viewportToPlant(
+  vx: number,
+  vy: number,
+  plant: PlantInstance,
+  viewport: ViewportSize,
+  image: ViewportSize,
+): { x: number; y: number } | null {
+  const box = plantCssBox(plant, viewport);
+  const originX = box.x + box.width * PLANT_TRANSFORM_ORIGIN.x;
+  const originY = box.y + box.height * PLANT_TRANSFORM_ORIGIN.y;
+  const local = rotatePoint(vx, vy, originX, originY, -plant.rotate);
+  if (
+    local.x < box.x ||
+    local.x >= box.x + box.width ||
+    local.y < box.y ||
+    local.y >= box.y + box.height
+  ) {
+    return null;
+  }
+  let u = (local.x - box.x) / box.width;
+  const v = (local.y - box.y) / box.height;
+  if (plant.flip) {
+    u = 1 - u;
+  }
+  return { x: u * image.width, y: v * image.height };
+}
+
+function plantAlphaAt(
+  vx: number,
+  vy: number,
+  plant: PlantInstance,
+  viewport: ViewportSize,
+  images: Partial<Record<LeafSymbol, PlantAlpha>>,
+): number {
+  const image = images[plant.symbol];
+  if (!image) {
+    return 0;
+  }
+  const mapped = viewportToPlant(vx, vy, plant, viewport, image);
+  return mapped ? sampleAlpha(image, mapped) : 0;
+}
+
+/**
+ * Opaque foliage (alpha > 0.5) that sits more than `allowed` px inside a
+ * copy well. A tip grazing the well edge is allowed; covering a title is not.
+ */
+export function plantOpaqueCopyHits(
+  plants: ReadonlyArray<PlantInstance>,
+  size: ViewportSize,
+  images: Partial<Record<LeafSymbol, PlantAlpha>>,
   surface: GreenhouseSurface = 'home',
-  threshold: number = FOLIAGE_ALPHA_THRESHOLD,
-): Array<FoliageHit> {
+  allowed = ALLOWED_FOLIAGE_COPY_OVERLAP_PX,
+): ReadonlyArray<FoliageHit> {
+  const visible = plantsVisibleAt(plants, size.width);
   const hits: Array<FoliageHit> = [];
   const stride = 4;
-  for (const safe of surfaceSafeRects(surface, viewport)) {
-    const maxX = Math.floor(safe.x + safe.width);
-    const maxY = Math.floor(safe.y + safe.height);
-    found: for (let vy = Math.floor(safe.y); vy < maxY; vy += stride) {
-      for (let vx = Math.floor(safe.x); vx < maxX; vx += stride) {
-        if (sample(vx, vy) > threshold) {
-          hits.push({ layer, rectId: safe.id, x: vx, y: vy });
-          break found;
+  for (const well of surfaceSafeRectsForSize(surface, size)) {
+    const inner = insetRect(well, allowed);
+    if (inner.width <= 0 || inner.height <= 0) {
+      continue;
+    }
+    const maxX = Math.floor(inner.x + inner.width);
+    const maxY = Math.floor(inner.y + inner.height);
+    found: for (let vy = Math.floor(inner.y); vy < maxY; vy += stride) {
+      for (let vx = Math.floor(inner.x); vx < maxX; vx += stride) {
+        for (const plant of visible) {
+          if (plantAlphaAt(vx, vy, plant, size, images) > FOLIAGE_OPAQUE_THRESHOLD) {
+            hits.push({ layer: plant.id, rectId: well.id, x: vx, y: vy });
+            break found;
+          }
         }
       }
     }
   }
   return hits;
-}
-
-/**
- * How far a strip's opaque (alpha > 0.5) mass reaches at `y`.
- * Left returns the max x; right returns the min x. Null if none.
- */
-export function edgeStripOpaqueExtent(
-  alpha: Uint8Array | Buffer,
-  image: ViewportSize,
-  side: 'left' | 'right',
-  viewport: ViewportSize,
-  y: number,
-  surface: GreenhouseSurface = 'home',
-): number | null {
-  const box = edgeStripRect(side, viewport, surface);
-  if (y < box.y || y >= box.y + box.height) {
-    return null;
-  }
-  const start = Math.floor(box.x);
-  const end = Math.ceil(box.x + box.width);
-  if (side === 'left') {
-    let maxX: number | null = null;
-    for (let vx = start; vx < end; vx += 1) {
-      const mapped = viewportToEdgeStrip(vx, y, viewport, image, side, surface);
-      if (mapped && sampleAlpha(alpha, image, mapped) > FOLIAGE_OPAQUE_THRESHOLD) {
-        maxX = vx;
-      }
-    }
-    return maxX;
-  }
-  for (let vx = start; vx < end; vx += 1) {
-    const mapped = viewportToEdgeStrip(vx, y, viewport, image, side, surface);
-    if (mapped && sampleAlpha(alpha, image, mapped) > FOLIAGE_OPAQUE_THRESHOLD) {
-      return vx;
-    }
-  }
-  return null;
-}
-
-export function edgeStripCopyWellHits(
-  alpha: Uint8Array | Buffer,
-  image: ViewportSize,
-  side: 'left' | 'right',
-  viewport: GreenhouseViewportName,
-  surface: GreenhouseSurface,
-): ReadonlyArray<FoliageHit> {
-  const size = GREENHOUSE_VIEWPORTS[viewport];
-  return hitsInWells(
-    viewport,
-    (vx, vy) => {
-      const mapped = viewportToEdgeStrip(vx, vy, size, image, side, surface);
-      return mapped ? sampleAlpha(alpha, image, mapped) : 0;
-    },
-    `edge-${side}`,
-    surface,
-    FOLIAGE_OPAQUE_THRESHOLD,
-  );
-}
-
-export function edgeStripSafeZoneHits(
-  alpha: Uint8Array | Buffer,
-  image: ViewportSize,
-  side: 'left' | 'right',
-  viewport: GreenhouseViewportName,
-  surface: GreenhouseSurface = 'home',
-): ReadonlyArray<FoliageHit> {
-  const size = GREENHOUSE_VIEWPORTS[viewport];
-  return hitsInWells(
-    viewport,
-    (vx, vy) => {
-      const mapped = viewportToEdgeStrip(vx, vy, size, image, side, surface);
-      return mapped ? sampleAlpha(alpha, image, mapped) : 0;
-    },
-    `edge-${side}`,
-    surface,
-  );
-}
-
-export function bottomBandSafeZoneHits(
-  alpha: Uint8Array | Buffer,
-  image: ViewportSize,
-  viewport: GreenhouseViewportName,
-): ReadonlyArray<FoliageHit> {
-  const size = GREENHOUSE_VIEWPORTS[viewport];
-  return hitsInWells(
-    viewport,
-    (vx, vy) => {
-      const mapped = viewportToBottomBand(vx, vy, size, image);
-      return mapped ? sampleAlpha(alpha, image, mapped) : 0;
-    },
-    'bottom-band',
-  );
 }

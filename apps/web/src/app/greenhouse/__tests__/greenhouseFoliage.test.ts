@@ -1,18 +1,11 @@
 import { createRequire } from 'node:module';
 import { join } from 'node:path';
 import {
-  bottomBandSafeZoneHits,
-  contentInset,
-  edgeStripCopyWellHits,
-  edgeStripOpaqueExtent,
-  edgeStripOverlap,
-  edgeStripSafeZoneHits,
-  edgeStripWidth,
-  GREENHOUSE_VIEWPORTS,
-  type GreenhouseViewportName,
-  musicCopyRects,
-  plantSafeZoneHits,
+  FOLIAGE_SAFE_VIEWPORTS,
+  type PlantAlpha,
+  plantOpaqueCopyHits,
 } from '../greenhouseGeometry';
+import type { LeafSymbol } from '../greenhouseLayout';
 import { layoutGreenhousePlants } from '../greenhouseLayout';
 
 const require = createRequire(join(__dirname, '../../../../../../packages/ui/package.json'));
@@ -44,7 +37,7 @@ function loadSharp(): SharpFn {
   throw new Error('sharp is not installed');
 }
 
-async function loadAlpha(path: string) {
+async function loadAlpha(path: string): Promise<PlantAlpha> {
   const sharp = loadSharp();
   const { data, info } = await sharp(path)
     .ensureAlpha()
@@ -58,53 +51,31 @@ async function loadAlpha(path: string) {
 }
 
 const foliageDir = join(__dirname, '../foliage');
-const VIEWPORTS: Array<GreenhouseViewportName> = ['desktop', 'mobile', 'tablet', 'ultrawide'];
+
+const SPECIES = {
+  'leaf-bop': 'bop-1024.avif',
+  'leaf-calathea': 'calathea-1024.avif',
+  'leaf-monstera': 'monstera-1024.avif',
+  'leaf-nerve': 'nerve-1024.avif',
+} as const satisfies Record<LeafSymbol, string>;
 
 describe('greenhouse foliage safe zones', () => {
-  it('keeps front cutouts out of copy wells at four viewports', async () => {
-    const left = await loadAlpha(join(foliageDir, 'edge-left-1536.avif'));
-    const right = await loadAlpha(join(foliageDir, 'edge-right-1536.avif'));
-    const band = await loadAlpha(join(foliageDir, 'bottom-band-1536.avif'));
+  it('fails if opaque foliage (alpha > 0.5) crosses a copy well past the allowed overlap', async () => {
+    const images = {
+      'leaf-bop': await loadAlpha(join(foliageDir, SPECIES['leaf-bop'])),
+      'leaf-calathea': await loadAlpha(join(foliageDir, SPECIES['leaf-calathea'])),
+      'leaf-monstera': await loadAlpha(join(foliageDir, SPECIES['leaf-monstera'])),
+      'leaf-nerve': await loadAlpha(join(foliageDir, SPECIES['leaf-nerve'])),
+    };
 
-    for (const viewport of VIEWPORTS) {
+    for (const size of FOLIAGE_SAFE_VIEWPORTS) {
+      const viewport = size.width < 576 ? 'mobile' : 'desktop';
       expect(
-        plantSafeZoneHits(
-          layoutGreenhousePlants('home', 0, viewport === 'mobile' ? 'mobile' : 'desktop'),
-          viewport,
-        ),
+        plantOpaqueCopyHits(layoutGreenhousePlants('home', 0, viewport), size, images),
       ).toEqual([]);
-      expect(edgeStripSafeZoneHits(left.alpha, left, 'left', viewport)).toEqual([]);
-      expect(edgeStripSafeZoneHits(right.alpha, right, 'right', viewport)).toEqual([]);
-      expect(bottomBandSafeZoneHits(band.alpha, band, viewport)).toEqual(expect.any(Array));
-    }
-
-    expect(edgeStripWidth(2560)).toBeLessThan(contentInset(2560));
-  }, 30000);
-
-  it('keeps strip opaque mass out of music heading and on-repeat wells', async () => {
-    const left = await loadAlpha(join(foliageDir, 'edge-left-1536.avif'));
-    const right = await loadAlpha(join(foliageDir, 'edge-right-1536.avif'));
-    for (const viewport of ['desktop', 'mobile'] as const) {
-      expect(edgeStripCopyWellHits(left.alpha, left, 'left', viewport, 'music')).toEqual([]);
-      expect(edgeStripCopyWellHits(right.alpha, right, 'right', viewport, 'music')).toEqual([]);
       expect(
-        plantSafeZoneHits(layoutGreenhousePlants('music', 0, viewport), viewport, 'music'),
+        plantOpaqueCopyHits(layoutGreenhousePlants('music', 0, viewport), size, images, 'music'),
       ).toEqual([]);
-    }
-  }, 30000);
-
-  it('fails if a strip opaque AABB crosses a copy well', async () => {
-    const left = await loadAlpha(join(foliageDir, 'edge-left-1536.avif'));
-    const size = GREENHOUSE_VIEWPORTS.desktop;
-    const allowed = contentInset(size.width) + edgeStripOverlap(size.width);
-    for (const well of musicCopyRects(size)) {
-      for (let y = Math.floor(well.y); y < well.y + well.height; y += 8) {
-        const extent = edgeStripOpaqueExtent(left.alpha, left, 'left', size, y, 'music');
-        if (extent != null) {
-          expect(extent).toBeLessThanOrEqual(allowed);
-          expect(extent).toBeLessThan(well.x);
-        }
-      }
     }
   }, 30000);
 });
