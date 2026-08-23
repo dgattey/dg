@@ -1,12 +1,10 @@
 import 'server-only';
 
-import { musicRoute } from '@dg/shared-core/routes/app';
 import { GreenhouseTypeProvider } from '@dg/ui/theme/GreenhouseTypeProvider';
 import { Suspense } from 'react';
 import { getFavoriteAlbums } from '../../../services/albums';
 import { getMusicHistory } from '../../../services/music';
-import { musicDestinationLabel } from '../../layouts/musicHeaderDestinations';
-import { PageTitle } from '../../layouts/PageTitle';
+import { ListeningHeading } from './ListeningHeading';
 import { MusicGreenhouseGrid } from './MusicGreenhouseGrid';
 import { NowPlayingSlot } from './NowPlayingSlot';
 import { OnRepeatCard } from './OnRepeatCard';
@@ -15,12 +13,13 @@ import { TopArtistsCard } from './TopArtistsCard';
 import { TopTracksCard } from './TopTracksCard';
 import type { MusicGreenhouseFixture } from './types';
 
-const TITLE = musicDestinationLabel(musicRoute);
+const LISTENING_DESCRIPTION = 'Recent Spotify plays, stacked the way they sound.';
 
 async function MusicGreenhouseSlots({ fixture }: { fixture?: MusicGreenhouseFixture }) {
   if (fixture) {
     return (
       <MusicGreenhouseGrid>
+        <ListeningHeading description={LISTENING_DESCRIPTION} title="Listening" />
         <NowPlayingSlot fixture={fixture.nowPlaying} />
         <OnRepeatCard albums={fixture.albums ?? []} />
         <TopTracksCard tracks={fixture.tracks ?? []} />
@@ -47,6 +46,7 @@ async function MusicGreenhouseSlots({ fixture }: { fixture?: MusicGreenhouseFixt
 
   return (
     <MusicGreenhouseGrid>
+      <ListeningHeading description={LISTENING_DESCRIPTION} title="Listening" />
       <NowPlayingSlot />
       <OnRepeatCard albums={rankAlbums(historyTracks, favorites)} />
       <TopTracksCard tracks={rankTracks(historyTracks)} />
@@ -62,7 +62,6 @@ async function MusicGreenhouseSlots({ fixture }: { fixture?: MusicGreenhouseFixt
 export function MusicGreenhousePage({ fixture }: { fixture?: MusicGreenhouseFixture } = {}) {
   return (
     <GreenhouseTypeProvider>
-      <PageTitle>{TITLE}</PageTitle>
       <Suspense fallback={null}>
         <MusicGreenhouseSlots fixture={fixture} />
       </Suspense>

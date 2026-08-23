@@ -1,3 +1,4 @@
+import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import type { Track } from '@dg/content-models/spotify/Track';
 
 export type RankedTrack = {
@@ -29,6 +30,7 @@ export type RankedAlbum = {
 export type MusicGreenhouseFixture = {
   albums?: ReadonlyArray<RankedAlbum>;
   artists?: ReadonlyArray<RankedArtist>;
+  favoriteAlbums?: ReadonlyArray<PlaylistAlbum>;
   nowPlaying?: Track;
   tracks?: ReadonlyArray<RankedTrack>;
 };

@@ -1,35 +1,46 @@
-import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
-import { AlbumCover } from '../AlbumCover';
-import { AlbumStack } from '../AlbumStack';
-import { MAX_ALBUM_SLEEVES } from '../albumTileGeometry';
-import greenhouseStackStyles from './albumStack.module.css';
-import {
-  GREENHOUSE_STACK_ART_SIZE,
-  GREENHOUSE_STACK_ART_SIZES,
-  greenhouseCardHeaderSx,
-  greenhouseCardSx,
-} from './greenhouseCardSx';
+import { AlbumPile } from './AlbumPile';
 import type { RankedAlbum } from './types';
 
-const stacksSx: SxObject = {
-  '@container (min-width: 28rem)': {
-    gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
-  },
-  containerType: 'inline-size',
-  display: 'grid',
-  gap: 1.5,
-  gridTemplateColumns: '1fr',
-};
-
-const stackLinkSx: SxObject = {
-  color: 'inherit',
+const sectionSx: SxObject = {
   display: 'flex',
   flexDirection: 'column',
-  gap: 0.75,
+  gap: 1.5,
   minWidth: 0,
+  width: '100%',
+};
+
+const headerSx: SxObject = {
+  display: 'flex',
+  flexDirection: 'column',
+  gap: 0.5,
+};
+
+const pilesSx: SxObject = {
+  display: { sm: 'grid', xs: 'flex' },
+  gap: { md: 3, xs: 2 },
+  gridTemplateColumns: {
+    md: 'repeat(3, minmax(0, 1fr))',
+    sm: 'repeat(2, minmax(0, 1fr))',
+  },
+  minWidth: 0,
+  overflowX: { sm: 'visible', xs: 'auto' },
+  paddingBlockEnd: { sm: 0, xs: 0.5 },
+  scrollSnapType: { sm: 'none', xs: 'x mandatory' },
+  scrollbarWidth: 'none',
+  WebkitOverflowScrolling: 'touch',
+};
+
+const pileLinkSx: SxObject = {
+  color: 'inherit',
+  display: 'flex',
+  flex: { sm: 'unset', xs: '0 0 78%' },
+  flexDirection: 'column',
+  gap: 1,
+  minWidth: 0,
+  scrollSnapAlign: { sm: 'unset', xs: 'start' },
   textDecoration: 'none',
 };
 
@@ -37,16 +48,9 @@ type Props = {
   albums: ReadonlyArray<RankedAlbum>;
 };
 
-function playLabel(playCount: number) {
-  if (playCount <= 0) {
-    return 'Favorite';
-  }
-  return `${playCount} ${playCount === 1 ? 'play' : 'plays'}`;
-}
-
 /**
- * Fanned album stacks inside the shared greenhouse glass card. Fan-out is CSS
- * (`:hover` + `animation-timeline: view()`), no scroll listeners.
+ * Three fanned album piles on desktop, two on tablet, a scroll-snap row on
+ * mobile. Captions are album · artist. Fan-out is CSS only.
  */
 export function OnRepeatCard({ albums }: Props) {
   if (albums.length === 0) {
@@ -54,48 +58,34 @@ export function OnRepeatCard({ albums }: Props) {
   }
 
   return (
-    <ContentCard data-on-repeat="" sx={greenhouseCardSx}>
-      <Box sx={greenhouseCardHeaderSx}>
+    <Box data-on-repeat="" sx={sectionSx}>
+      <Box sx={headerSx}>
         <Typography variant="overline">On repeat</Typography>
-        <Typography component="h3" variant="h3">
-          Stacked albums
-        </Typography>
       </Box>
-      <Box sx={stacksSx}>
+      <Box sx={pilesSx}>
         {albums.map((album) => (
           <Link
             href={album.url}
             isExternal={true}
             key={album.id}
-            sx={stackLinkSx}
+            sx={pileLinkSx}
             title={album.name}
           >
-            <AlbumStack
-              className={greenhouseStackStyles.stack}
+            <AlbumPile
+              count={album.playCount}
+              countKind="song"
               imageUrl={album.imageUrl}
-              sleeveCount={MAX_ALBUM_SLEEVES}
-              variant="greenhouse"
-            >
-              <AlbumCover
-                alt={album.name}
-                artSize={GREENHOUSE_STACK_ART_SIZE}
-                depth={0}
-                imageUrl={album.imageUrl}
-                sizes={GREENHOUSE_STACK_ART_SIZES}
-                sleeveCount={MAX_ALBUM_SLEEVES}
-              />
-            </AlbumStack>
+              name={album.name}
+            />
             <Box>
               <Typography component="h5" variant="h5">
                 {album.name}
               </Typography>
-              <Typography variant="caption">
-                {album.artistNames} · {playLabel(album.playCount)}
-              </Typography>
+              <Typography variant="caption">{album.artistNames}</Typography>
             </Box>
           </Link>
         ))}
       </Box>
-    </ContentCard>
+    </Box>
   );
 }

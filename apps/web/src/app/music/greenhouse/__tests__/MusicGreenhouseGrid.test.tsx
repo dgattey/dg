@@ -8,9 +8,10 @@ jest.mock('../../../greenhouse/greenhouse.module.css', () => ({
 }));
 
 describe('MusicGreenhouseGrid', () => {
-  it('maps the four music slots onto the shared 12-col grid', () => {
+  it('maps intro, landscape hero, on-repeat, and the two lists onto 12 columns', () => {
     render(
       <MusicGreenhouseGrid>
+        <div>intro</div>
         <div>now</div>
         <div>albums</div>
         <div>tracks</div>
@@ -18,6 +19,7 @@ describe('MusicGreenhouseGrid', () => {
       </MusicGreenhouseGrid>,
     );
 
+    expect(screen.getByText('intro').parentElement).toHaveAttribute('data-greenhouse-cell', 'intro');
     expect(screen.getByText('now').parentElement).toHaveAttribute(
       'data-greenhouse-cell',
       'now-playing',
@@ -34,6 +36,7 @@ describe('MusicGreenhouseGrid', () => {
       'data-greenhouse-cell',
       'artists',
     );
+    expect(screen.getByText('now').parentElement?.className).not.toContain('nowPlaying');
     expect(screen.getByText('now').parentElement?.parentElement).toHaveAttribute(
       'data-greenhouse-grid',
       'music',

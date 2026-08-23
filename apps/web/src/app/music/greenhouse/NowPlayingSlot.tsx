@@ -1,24 +1,38 @@
 import 'server-only';
 
 import type { Track } from '@dg/content-models/spotify/Track';
+import type { SxObject } from '@dg/ui/theme';
+import { Box } from '@mui/material';
 import { Suspense } from 'react';
 import { getLatestSong } from '../../../services/spotify';
 import { SpotifyCardWithGradient } from '../../spotify/SpotifyCardWithGradient';
 
-async function NowPlayingAsync({ fixture }: { fixture?: Track }) {
-  if (fixture) {
-    return <SpotifyCardWithGradient track={fixture} variant="nowPlaying" />;
-  }
+const heroSx: SxObject = {
+  display: 'flex',
+  height: '100%',
+  minHeight: { sm: 'unset', xs: '16.5rem' },
+  width: '100%',
+  '& [data-bento="now-playing"]': {
+    minHeight: { sm: 'unset' },
+  },
+};
 
-  try {
-    const track = await getLatestSong();
-    if (!track) {
-      return null;
-    }
-    return <SpotifyCardWithGradient track={track} variant="nowPlaying" />;
-  } catch {
+async function NowPlayingAsync({ fixture }: { fixture?: Track }) {
+  const track = fixture ?? (await getLatestSong().catch(() => null));
+  if (!track) {
     return null;
   }
+
+  return (
+    <Box data-now-playing-hero="" sx={heroSx}>
+      {/*
+       * `layout="hero"` lands on `NowPlayingCard` from its owner (art large
+       * right, `h2` title). Until then the card already sits art-beside-copy
+       * at ≥ 13.5rem; this slot only gives it the landscape span.
+       */}
+      <SpotifyCardWithGradient track={track} variant="nowPlaying" />
+    </Box>
+  );
 }
 
 /**

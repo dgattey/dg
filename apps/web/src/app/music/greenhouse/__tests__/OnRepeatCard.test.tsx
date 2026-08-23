@@ -1,8 +1,12 @@
 import { render, screen } from '@testing-library/react';
 import { OnRepeatCard } from '../OnRepeatCard';
 
-jest.mock('../albumStack.module.css', () => ({
-  stack: 'greenhouse-stack',
+jest.mock('../albumPile.module.css', () => ({
+  cover: 'cover',
+  pile: 'pile',
+  pill: 'pill',
+  scrim: 'scrim',
+  stage: 'stage',
 }));
 
 const albums = [
@@ -11,7 +15,7 @@ const albums = [
     id: '2ClZ9xWAYg1BH8zkR96dJo',
     imageUrl: 'https://i.scdn.co/image/ab67616d0000b2734018b70099d433d9c8aabb12',
     name: 'USB',
-    playCount: 4,
+    playCount: 12,
     url: 'https://open.spotify.com/album/2ClZ9xWAYg1BH8zkR96dJo',
   },
   {
@@ -19,20 +23,32 @@ const albums = [
     id: '79dL7FLiJFOO0EoehUHQBv',
     imageUrl: 'https://i.scdn.co/image/ab67616d0000b2739e1cfc756886ac782e363d79',
     name: 'Currents',
-    playCount: 2,
+    playCount: 9,
     url: 'https://open.spotify.com/album/79dL7FLiJFOO0EoehUHQBv',
+  },
+  {
+    artistNames: 'ROSALÍA',
+    id: '3goLwu2fkSSmghikOcVufU',
+    imageUrl: 'https://i.scdn.co/image/ab67616d0000b2732b497f6bf340faa8812b940c',
+    name: 'LUX (Complete Works)',
+    playCount: 8,
+    url: 'https://open.spotify.com/album/3goLwu2fkSSmghikOcVufU',
   },
 ];
 
 describe('OnRepeatCard', () => {
-  it('renders stacked albums in a glass card with caption meta', () => {
+  it('renders three fanned piles with album · artist captions and song pills', () => {
     render(<OnRepeatCard albums={albums} />);
 
     expect(screen.getByText('On repeat')).toBeInTheDocument();
-    expect(screen.getByText('Stacked albums')).toBeInTheDocument();
+    expect(screen.queryByText('Stacked albums')).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { name: 'USB' })).toBeInTheDocument();
-    expect(screen.getByText(/Fred again/)).toBeInTheDocument();
-    expect(document.querySelector('[data-album-stack="greenhouse"]')).toBeTruthy();
+    expect(screen.getByText('Fred again.., Jamie T')).toBeInTheDocument();
+    expect(screen.getByText('12 songs')).toBeInTheDocument();
+    expect(document.querySelectorAll('[data-album-pile]')).toHaveLength(3);
+    expect(document.querySelectorAll('[data-album-pile] [data-depth]').length).toBeGreaterThanOrEqual(
+      12,
+    );
     const cover = screen.getByRole('img', { name: 'USB' });
     expect(cover.getAttribute('sizes') ?? '').toContain('400px');
   });

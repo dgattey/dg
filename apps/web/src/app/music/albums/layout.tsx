@@ -56,11 +56,7 @@ export function FlagOffAlbumsLayout({ children }: { children: ReactNode }) {
 
 async function FavoriteAlbumsLayoutSwitch({ children }: { children: ReactNode }) {
   if (await shouldUseGreenhouseChrome()) {
-    return (
-      <AlbumsGreenhousePage>
-        <FlagOffAlbumsLayout>{children}</FlagOffAlbumsLayout>
-      </AlbumsGreenhousePage>
-    );
+    return <AlbumsGreenhousePage>{children}</AlbumsGreenhousePage>;
   }
   return <FlagOffAlbumsLayout>{children}</FlagOffAlbumsLayout>;
 }
