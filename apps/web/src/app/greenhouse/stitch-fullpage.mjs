@@ -15,6 +15,7 @@ import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import {
   assertHeadingsClearOfChrome,
+  ensureHeadingStops,
   headingFullyClearOfChrome,
   planFilmstripStops,
 } from './greenhouseStitch.ts';
@@ -114,6 +115,7 @@ async function collectHeadings(page) {
         'h1, h2, h3, h4, h5, h6, [role="heading"], [data-now-playing-title], [data-now-playing-artist]',
       ),
     ];
+    const seen = new Map();
     return nodes
       .map((el) => {
         const box = el.getBoundingClientRect();
@@ -126,10 +128,12 @@ async function collectHeadings(page) {
           style.position === 'sticky' ||
           style.position === 'fixed' ||
           Boolean(el.closest('header, [data-site-header]'));
-        const docY = sticky ? box.y : window.scrollY + box.y;
+        const nth = (seen.get(text) ?? 0) + 1;
+        seen.set(text, nth);
         return {
+          docY: window.scrollY + box.y,
           height: box.height,
-          id: `${text}@${Math.round(docY)}`,
+          id: nth > 1 ? `${text}#${nth}` : text,
           sticky,
           y: box.y,
         };
@@ -162,7 +166,15 @@ async function filmstripPage(page, { url, width, height, dpr = 2 }) {
   const metrics = await measureChrome(page);
   const vh = metrics.innerH || height;
   const headerBottom = metrics.headerBottom ?? metrics.headerHeight ?? 0;
-  const planned = planFilmstripStops(metrics.scrollHeight, vh, headerBottom);
+  const maxScroll = Math.max(0, metrics.scrollHeight - vh);
+  const catalog = await collectHeadings(page);
+  const planned = ensureHeadingStops(
+    planFilmstripStops(metrics.scrollHeight, vh, headerBottom),
+    catalog,
+    headerBottom,
+    vh,
+    maxScroll,
+  );
   const stops = [];
   const pngs = [];
   const headingShots = [];

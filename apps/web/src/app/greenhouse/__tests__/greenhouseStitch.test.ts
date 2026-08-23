@@ -2,6 +2,7 @@ import {
   assertFrameAbutment,
   assertHeadingsClearOfChrome,
   assertHeadingsOnce,
+  ensureHeadingStops,
   headingFullyClearOfChrome,
   headingInFrame,
   planFilmstripStops,
@@ -123,5 +124,18 @@ describe('greenhouse stitch plan', () => {
         { ...title, visible: true, y: 120 },
       ]),
     ).not.toThrow();
+  });
+
+  it('inserts a stop when a title would sit in the header-overlap gap', () => {
+    const stops = planFilmstripStops(1994, 900, 78);
+    expect(stops).toEqual([0, 806, 1094]);
+    const patched = ensureHeadingStops(
+      stops,
+      [{ docY: 859, height: 46, sticky: false }],
+      78,
+      900,
+      1094,
+    );
+    expect(patched).toEqual([0, 781, 806, 1094]);
   });
 });

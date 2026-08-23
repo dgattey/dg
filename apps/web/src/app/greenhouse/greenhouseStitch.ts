@@ -227,6 +227,39 @@ export function planFilmstripStops(
   return stops;
 }
 
+export type FilmstripHeadingDoc = {
+  docY: number;
+  height: number;
+  sticky: boolean;
+};
+
+/**
+ * The default stride can leave a title sitting in the 16px overlap. Insert a
+ * stop that parks that title just below the header so the self-check can pass.
+ */
+export function ensureHeadingStops(
+  stops: ReadonlyArray<number>,
+  headings: ReadonlyArray<FilmstripHeadingDoc>,
+  headerBottom: number,
+  viewportHeight: number,
+  maxScroll: number,
+): ReadonlyArray<number> {
+  const extra: Array<number> = [];
+  for (const heading of headings) {
+    if (heading.sticky || heading.height <= 0) {
+      continue;
+    }
+    const ok = stops.some((scrollY) => {
+      const y = heading.docY - scrollY;
+      return y >= headerBottom && y + heading.height <= viewportHeight + 0.5;
+    });
+    if (!ok) {
+      extra.push(Math.min(maxScroll, Math.max(0, Math.round(heading.docY - headerBottom))));
+    }
+  }
+  return [...new Set([...stops, ...extra])].toSorted((a, b) => a - b);
+}
+
 export type FilmstripHeadingShot = {
   height: number;
   id: string;
