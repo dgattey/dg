@@ -5,7 +5,7 @@ import { pageTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
-import { Button } from '@mui/material';
+import { Button, Typography } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { isMusicDestinationPath } from './musicHeaderDestinations';
 
@@ -68,17 +68,68 @@ const logoLinkMergedSx: SxObject = {
   ...logoLinkSx,
 };
 
+const wordmarkResetSx: SxObject = {
+  '&:focus-visible': {
+    background: 'none',
+    boxShadow: 'none',
+    outline: '-webkit-focus-ring-color auto 1px',
+  },
+  '&:hover': {
+    background: 'none',
+    boxShadow: 'none',
+    textDecoration: 'none',
+  },
+  background: 'none',
+  boxShadow: 'none',
+  color: 'var(--mui-palette-text-primary)',
+  flexShrink: 0,
+  minWidth: 0,
+  padding: 0,
+  textTransform: 'none',
+};
+
+type LogoProps = {
+  /**
+   * `classic` is the flag-off bubble mark. `wordmark` sits in the greenhouse
+   * bar and inherits the surface type scale.
+   */
+  appearance?: 'classic' | 'wordmark';
+};
+
 /**
  * Logo that scrolls to top on home page, or links to home on other pages.
  * Leaving a music destination uses the close view-transition type so the page
  * falls away instead of snapping.
  */
-export function Logo() {
+export function Logo({ appearance = 'classic' }: LogoProps = {}) {
   const pathname = usePathname();
+  const isHome = pathname === homeRoute || pathname.startsWith('/greenhouse/');
 
   const scrollToTop = () => {
     window.scrollTo({ behavior: 'smooth', top: 0 });
   };
+
+  if (appearance === 'wordmark') {
+    if (isHome) {
+      return (
+        <Button disableRipple={true} onClick={scrollToTop} sx={wordmarkResetSx} variant="text">
+          <Typography component="span" variant="h4">
+            dg.
+          </Typography>
+        </Button>
+      );
+    }
+    return (
+      <Link
+        href={homeRoute}
+        sx={wordmarkResetSx}
+        transitionTypes={isMusicDestinationPath(pathname) ? pageTransitionTypes('close') : undefined}
+        variant="h4"
+      >
+        dg.
+      </Link>
+    );
+  }
 
   if (pathname === homeRoute) {
     return (

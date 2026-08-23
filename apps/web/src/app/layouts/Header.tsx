@@ -10,9 +10,11 @@ import { Box } from '@mui/material';
 import { Suspense } from 'react';
 import { getLatestSong } from '../../services/spotify';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
+import { GreenhouseHeader } from './GreenhouseHeader';
 import { HeaderControls } from './HeaderControls';
 import { Logo } from './Logo';
 import { SiteHeaderHeight } from './SiteHeaderHeight';
+import { shouldUseGreenhouseChrome } from './greenhouseChrome';
 
 // Makes the header bar sticky and not responsive to user events by default
 const stickyContainerSx: SxObject = {
@@ -56,11 +58,10 @@ async function SpotifyHeaderCardSlot() {
 }
 
 /**
- * Creates the site header component with glass background behind logo + music.
- * Logo and header controls are server-rendered immediately.
- * Music card streams in via Suspense to avoid blocking.
+ * Flag-off header: logo + music capsule, music/theme pills. Markup is the
+ * pre-greenhouse header so `/` without the flag stays put.
  */
-export function Header() {
+export function ClassicHeader() {
   return (
     <Section sx={stickyContainerSx}>
       <SiteHeaderHeight />
@@ -85,4 +86,14 @@ export function Header() {
       </Box>
     </Section>
   );
+}
+
+/**
+ * Greenhouse bar when the flag or preview gate is on. Flag-off is ClassicHeader.
+ */
+export async function Header() {
+  if (await shouldUseGreenhouseChrome()) {
+    return <GreenhouseHeader />;
+  }
+  return <ClassicHeader />;
 }

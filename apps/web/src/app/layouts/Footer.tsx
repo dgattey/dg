@@ -8,6 +8,7 @@ import {
 } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
+import { GreenhouseTypeProvider } from '@dg/ui/theme/GreenhouseTypeProvider';
 import { Box, Container, Divider, Stack, Typography } from '@mui/material';
 import { cacheLife } from 'next/cache';
 import { Suspense } from 'react';
@@ -15,6 +16,7 @@ import { interactiveRedesign } from '../../flags';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
 import { FOOTER_ICON_DESKTOP_FONT_SIZE, FOOTER_ICON_FONT_SIZE } from './footerIconSize';
+import { shouldUseGreenhouseChrome } from './greenhouseChrome';
 
 const navItemNoPaddingSx: SxObject = {
   padding: 0,
@@ -127,16 +129,17 @@ export async function RedesignBadge() {
  * Creates the site footer component - shows version data + copyright
  */
 export async function Footer() {
-  const [footerLinks, versionInfo, currentYear] = await Promise.all([
+  const [footerLinks, versionInfo, currentYear, greenhouse] = await Promise.all([
     getFooterLinks().catch(() => []),
     getAppVersionInfo(),
     getCopyrightYear(),
+    shouldUseGreenhouseChrome(),
   ]);
   const nonIconFooterLinks = footerLinks.filter((link) => !link.icon);
   const iconFooterLinks = footerLinks.filter((link) => link.icon);
   const releaseUrl = versionInfo.releaseUrl;
   const version = versionInfo.version;
-  return (
+  const footer = (
     <Section sx={footerSectionSx}>
       <Container sx={footerContainerSx}>
         <Box component="footer" sx={siteFooterSx}>
@@ -203,4 +206,8 @@ export async function Footer() {
       </Container>
     </Section>
   );
+  if (greenhouse) {
+    return <GreenhouseTypeProvider>{footer}</GreenhouseTypeProvider>;
+  }
+  return footer;
 }
