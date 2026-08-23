@@ -193,6 +193,7 @@ const heroGridSx: SxObject = {
   },
   '@container now-playing (min-width: 30rem)': {
     columnGap: 2,
+    gap: 0,
     gridTemplateAreas: '". art" "copy art" "progress art" ". art"',
     gridTemplateColumns: 'minmax(0, 1fr) auto',
     gridTemplateRows: '1fr auto auto 1fr',
@@ -207,6 +208,7 @@ const heroGridSx: SxObject = {
   gridTemplateRows: 'auto auto',
   height: '100%',
   minHeight: 0,
+  padding: 2.25,
   position: 'relative',
   width: '100%',
   zIndex: 5,
@@ -250,9 +252,7 @@ const heroArtFrameSx: SxObject = {
 
 const heroCardSx: SxObject = {
   ...cardSx,
-  '@container now-playing (min-width: 30rem)': {
-    padding: 0,
-  },
+  padding: 0,
 };
 
 const headerSx: SxObject = {
