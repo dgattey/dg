@@ -16,7 +16,6 @@ import {
 import { SmoothTile } from './SmoothTile';
 import { TopoBasemap } from './TopoBasemap';
 
-const MD_MIN_WIDTH = 768;
 const DESKTOP_MAP_SIZE = { height: 900, width: 1600 };
 const MOBILE_MAP_SIZE = { height: 1200, width: 1600 };
 
@@ -105,14 +104,21 @@ const subscribeToSystemDark = (onStoreChange: () => void) => {
 const getSystemDarkSnapshot = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
 const getServerSystemDarkSnapshot = () => false;
 
-const subscribeToMd = (onStoreChange: () => void) => {
-  const media = window.matchMedia(`(min-width: ${MD_MIN_WIDTH}px)`);
-  media.addEventListener('change', onStoreChange);
-  return () => media.removeEventListener('change', onStoreChange);
+const fallbackPadding = (width: number) => Math.round((CARD_ROUTE_PADDING * width) / 460);
+
+const desktopStackSx: SxObject = {
+  display: { md: 'block', xs: 'none' },
+  height: '100%',
+  position: 'relative',
+  width: '100%',
 };
 
-const getMdSnapshot = () => window.matchMedia(`(min-width: ${MD_MIN_WIDTH}px)`).matches;
-const getServerMdSnapshot = () => true;
+const mobileStackSx: SxObject = {
+  display: { md: 'none', xs: 'block' },
+  height: '100%',
+  position: 'relative',
+  width: '100%',
+};
 
 function tileCoordinates([latitude, longitude]: Point, zoom: number) {
   const tileZoom = Math.round(zoom);
@@ -155,21 +161,21 @@ export type RouteMapProps = {
   stadiaApiKey: string;
 };
 
-/** A non-interactive, theme-aware route map intended for card backgrounds. */
-export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [measured, setMeasured] = useState<{ height: number; width: number } | null>(null);
-  const { preference } = useColorScheme();
-  const systemDark = useSyncExternalStore(
-    subscribeToSystemDark,
-    getSystemDarkSnapshot,
-    getServerSystemDarkSnapshot,
-  );
-  const isMd = useSyncExternalStore(subscribeToMd, getMdSnapshot, getServerMdSnapshot);
-  const size = measured ?? (isMd ? DESKTOP_MAP_SIZE : MOBILE_MAP_SIZE);
-  const dark = preference === 'dark' || (preference === 'system' && systemDark);
-  const padding =
-    measured == null ? Math.round((CARD_ROUTE_PADDING * size.width) / 460) : CARD_ROUTE_PADDING;
+function MapLayers({
+  dark,
+  hasTiles,
+  padding,
+  points,
+  size,
+  stadiaApiKey,
+}: {
+  dark: boolean;
+  hasTiles: boolean;
+  padding: number;
+  points: Array<Point>;
+  size: { height: number; width: number };
+  stadiaApiKey: string;
+}) {
   const viewport = fitRouteViewport({
     height: size.height,
     padding,
@@ -189,55 +195,8 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
   const provider = (x: number, y: number, zoom: number, dpr?: number) =>
     tileUrl({ dark, dpr, stadiaApiKey, x, y, zoom });
 
-  useLayoutEffect(() => {
-    const element = containerRef.current;
-    if (!element) {
-      return;
-    }
-
-    const applySize = (width: number, height: number) => {
-      if (height <= 0 || width <= 0) {
-        return;
-      }
-      setMeasured((current) =>
-        current && Math.abs(current.width - width) < 0.5 && Math.abs(current.height - height) < 0.5
-          ? current
-          : { height, width },
-      );
-    };
-    const updateSize = () => {
-      applySize(element.clientWidth, element.clientHeight);
-    };
-    updateSize();
-    const observer = new ResizeObserver((entries) => {
-      const rect = entries[0]?.contentRect;
-      if (rect) {
-        applySize(rect.width, rect.height);
-        return;
-      }
-      updateSize();
-    });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-
-  const hasTiles = stadiaApiKey.length > 0;
-  const routeVars: SxObject = {
-    '--map-scrim-opacity': hasTiles ? 1 : 0.32,
-    '--route-casing': dark ? 'rgb(0 0 0 / 0.42)' : paperMix(86),
-    '--route-casing-width': hasTiles ? 6 : 8,
-    '--route-line': BRAND.routeLine,
-    '--route-line-filter': 'none',
-    '--route-stroke-width': hasTiles ? 2.5 : 4.5,
-  };
-
   return (
-    <Box
-      aria-hidden="true"
-      data-route-size={`${Math.round(size.width)}x${Math.round(size.height)}`}
-      ref={containerRef}
-      sx={{ ...containerSx, ...routeVars }}
-    >
+    <>
       {hasTiles ? (
         <Box
           alt=""
@@ -309,6 +268,96 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
           vectorEffect="non-scaling-stroke"
         />
       </Box>
+    </>
+  );
+}
+
+/** A non-interactive, theme-aware route map intended for card backgrounds. */
+export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [measured, setMeasured] = useState<{ height: number; width: number } | null>(null);
+  const { preference } = useColorScheme();
+  const systemDark = useSyncExternalStore(
+    subscribeToSystemDark,
+    getSystemDarkSnapshot,
+    getServerSystemDarkSnapshot,
+  );
+  const dark = preference === 'dark' || (preference === 'system' && systemDark);
+
+  useLayoutEffect(() => {
+    const element = containerRef.current;
+    if (!element) {
+      return;
+    }
+
+    const applySize = (width: number, height: number) => {
+      if (height <= 0 || width <= 0) {
+        return;
+      }
+      setMeasured((current) =>
+        current && Math.abs(current.width - width) < 0.5 && Math.abs(current.height - height) < 0.5
+          ? current
+          : { height, width },
+      );
+    };
+    const updateSize = () => {
+      applySize(element.clientWidth, element.clientHeight);
+    };
+    updateSize();
+    const observer = new ResizeObserver((entries) => {
+      const rect = entries[0]?.contentRect;
+      if (rect) {
+        applySize(rect.width, rect.height);
+        return;
+      }
+      updateSize();
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
+
+  const hasTiles = stadiaApiKey.length > 0;
+  const routeVars: SxObject = {
+    '--map-scrim-opacity': hasTiles ? 1 : 0.32,
+    '--route-casing': dark ? 'rgb(0 0 0 / 0.42)' : paperMix(86),
+    '--route-casing-width': hasTiles ? 6 : 8,
+    '--route-line': BRAND.routeLine,
+    '--route-line-filter': 'none',
+    '--route-stroke-width': hasTiles ? 2.5 : 4.5,
+  };
+  const layers = { dark, hasTiles, points, stadiaApiKey };
+
+  return (
+    <Box
+      aria-hidden="true"
+      data-route-size={
+        measured
+          ? `${Math.round(measured.width)}x${Math.round(measured.height)}`
+          : `${DESKTOP_MAP_SIZE.width}x${DESKTOP_MAP_SIZE.height}|${MOBILE_MAP_SIZE.width}x${MOBILE_MAP_SIZE.height}`
+      }
+      ref={containerRef}
+      sx={{ ...containerSx, ...routeVars }}
+    >
+      {measured ? (
+        <MapLayers {...layers} padding={CARD_ROUTE_PADDING} size={measured} />
+      ) : (
+        <>
+          <Box sx={desktopStackSx}>
+            <MapLayers
+              {...layers}
+              padding={fallbackPadding(DESKTOP_MAP_SIZE.width)}
+              size={DESKTOP_MAP_SIZE}
+            />
+          </Box>
+          <Box sx={mobileStackSx}>
+            <MapLayers
+              {...layers}
+              padding={fallbackPadding(MOBILE_MAP_SIZE.width)}
+              size={MOBILE_MAP_SIZE}
+            />
+          </Box>
+        </>
+      )}
     </Box>
   );
 }
