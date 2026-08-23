@@ -1,3 +1,5 @@
+'use client';
+
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';

@@ -47,7 +47,10 @@ export const greenhousePileCardSx: SxObject = {
  */
 export const containStickyBleedSx: SxObject = {
   '& [data-sticky-fade], & [data-sticky-surface]': {
-    display: 'none',
+    display: 'none !important',
+    insetInlineStart: '0 !important',
+    marginInlineStart: '0 !important',
+    width: '100% !important',
   },
 };
 
