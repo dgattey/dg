@@ -1,5 +1,7 @@
 .frame {
   --greenhouse-gutter: 1.25rem;
+  --greenhouse-strip: clamp(180px, 20vw, 440px);
+  --greenhouse-overlap: 56px;
   position: relative;
   width: 100vw;
   margin-left: calc(50% - 50vw);
@@ -10,25 +12,15 @@
 .frontStack {
   position: fixed;
   inset: 0;
+  z-index: 0;
   width: 100%;
   height: 100dvh;
+  overflow: visible;
   pointer-events: none;
-}
-
-.backStack {
-  z-index: 0;
 }
 
 .frontStack {
   z-index: 3;
-}
-
-.atmosphere {
-  position: relative;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  isolation: isolate;
 }
 
 .backPlate {
@@ -46,59 +38,13 @@
   object-position: 62% 100%;
 }
 
-.plateTint {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: color-mix(in srgb, var(--greenhouse-wash, #8f9258) 12%, transparent);
-}
-
-.ribs {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  contain: paint;
-  pointer-events: none;
-  background-image: repeating-linear-gradient(
-    90deg,
-    var(--greenhouse-rib-dark, rgb(70 82 40 / 0.28)) 0 1.5px,
-    var(--greenhouse-rib-mid, rgb(168 178 110 / 0.08)) 4px,
-    var(--greenhouse-rib-shine, rgb(255 252 236 / 0.42)) 8px,
-    var(--greenhouse-rib-mid, rgb(168 178 110 / 0.08)) 12px,
-    var(--greenhouse-rib-dark, rgb(70 82 40 / 0.28)) 16px
-  );
-  background-size: 16px 100%;
-  mix-blend-mode: overlay;
-  opacity: 0.08;
-}
-
-.sun {
-  position: absolute;
-  top: -12%;
-  right: -4%;
-  left: auto;
-  z-index: 1;
-  width: 38vw;
-  max-width: 32rem;
-  height: 32vw;
-  max-height: 24rem;
-  pointer-events: none;
-  background: radial-gradient(
-    circle at 58% 30%,
-    var(--greenhouse-sun-core, rgb(255 252 242 / 0.55)) 0 12%,
-    rgb(255 236 160 / 0.22) 32%,
-    transparent 68%
-  );
-}
-
 .edgeLeft,
 .edgeRight {
   position: fixed;
   bottom: 0;
-  width: clamp(180px, 20vw, 440px);
-  height: 100dvh;
-  overflow: hidden;
+  width: auto;
+  height: auto;
+  overflow: visible;
   pointer-events: none;
 }
 
@@ -108,29 +54,22 @@
 
 .edgeRight {
   right: 0;
-  clip-path: polygon(
-    0 0,
-    calc(100% - 148px) 0,
-    calc(100% - 148px) 60px,
-    100% 60px,
-    100% 100%,
-    0 100%
-  );
 }
 
 .edgeLeft img,
 .edgeRight img {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  height: auto;
+  object-fit: contain;
 }
 
 .edgeLeft img {
+  width: calc((var(--greenhouse-strip) + var(--greenhouse-overlap)) / 0.856);
   object-position: bottom left;
 }
 
 .edgeRight img {
+  width: calc((var(--greenhouse-strip) + var(--greenhouse-overlap)) / 0.743);
   object-position: bottom right;
 }
 
@@ -191,7 +130,7 @@
 .content {
   position: relative;
   z-index: 2;
-  padding-inline: max(1.5rem, calc((100vw - 68rem) / 2), clamp(180px, 20vw, 440px));
+  padding-inline: max(1.5rem, calc((100vw - 68rem) / 2), var(--greenhouse-strip));
   padding-top: 0.35rem;
 }
 
@@ -267,11 +206,8 @@
 @media (max-width: 575px) {
   .frame {
     --greenhouse-gutter: 1rem;
-  }
-
-  .edgeLeft,
-  .edgeRight {
-    width: clamp(90px, 14vw, 140px);
+    --greenhouse-strip: clamp(90px, 14vw, 140px);
+    --greenhouse-overlap: 24px;
   }
 
   .backPlate img {
@@ -294,13 +230,6 @@
     width: min(var(--plant-width), 72vw);
   }
 
-  .sun {
-    width: 58vw;
-    max-width: none;
-    height: 52vw;
-    max-height: none;
-  }
-
   .bottomBand {
     height: min(24dvh, 260px);
     background-size: auto min(24dvh, 260px);
@@ -315,13 +244,12 @@
   }
 
   .content {
-    padding-inline: clamp(90px, 14vw, 140px);
+    padding-inline: var(--greenhouse-strip);
     padding-top: 0.25rem;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .atmosphere,
   .plantsBack,
   .plantsFront,
   .plant {

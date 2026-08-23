@@ -39,14 +39,25 @@ export const EDGE_STRIP_MOBILE_VW = 0.14;
 export const EDGE_STRIP_MOBILE_MAX = 140;
 export const SM_BREAKPOINT = 576;
 
-/** Top-right music/theme capsule. Right strip is clipped out of this well. */
-export const HEADER_CONTROLS_SAFE = {
-  height: 52,
-  id: 'header-controls',
-  insetRight: 16,
-  top: 8,
-  width: 132,
+/**
+ * Single glass nav bar (`GreenhouseHeader`). MUI `Container fixed` +
+ * `paddingBlockStart` 12 / bar `py` 8. Mobile wraps links onto a second row.
+ */
+export const HEADER_BAR_SAFE = {
+  containerMax: 1536,
+  heightDesktop: 64,
+  heightMobile: 96,
+  id: 'header-bar',
+  inset: 16,
+  topDesktop: 12,
+  topMobile: 8,
 } as const;
+
+/** Opaque width ÷ intrinsic width of the 1536 keyed strips (alpha > 24). */
+export const EDGE_STRIP_OPAQUE = { left: 0.856, right: 0.743 } as const;
+export const EDGE_STRIP_ASPECT = 1024 / 1536;
+export const EDGE_STRIP_OVERLAP_DESKTOP = 56;
+export const EDGE_STRIP_OVERLAP_MOBILE = 24;
 
 export const LEAF_ASPECT: Record<LeafSymbol, number> = {
   'leaf-bop': 1024 / 1536,
@@ -220,14 +231,7 @@ export function rectsIntersect(a: Rect, b: Rect): boolean {
   return a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
 }
 
-export function contentInset(width: number): number {
-  const minPad = width < SM_BREAKPOINT ? EDGE_STRIP_MOBILE_MIN : 24;
-  const centered = Math.max(minPad, (width - CONTENT_MAX_PX) / 2);
-  return Math.max(centered, edgeStripWidth(width));
-}
-
-/** Desktop `clamp(180px, 20vw, 440px)`; mobile `clamp(90px, 14vw, 140px)`. */
-export function edgeStripWidth(width: number): number {
+export function contentGutterWidth(width: number): number {
   if (width < SM_BREAKPOINT) {
     return Math.min(
       EDGE_STRIP_MOBILE_MAX,
@@ -237,23 +241,51 @@ export function edgeStripWidth(width: number): number {
   return Math.min(EDGE_STRIP_MAX, Math.max(EDGE_STRIP_MIN, width * EDGE_STRIP_VW));
 }
 
-export function headerControlsRect(viewport: ViewportSize): NamedRect {
+/** Desktop `clamp(180px, 20vw, 440px)`; mobile `clamp(90px, 14vw, 140px)`. */
+export function edgeStripWidth(width: number): number {
+  return contentGutterWidth(width);
+}
+
+export function edgeStripOverlap(width: number): number {
+  return width < SM_BREAKPOINT ? EDGE_STRIP_OVERLAP_MOBILE : EDGE_STRIP_OVERLAP_DESKTOP;
+}
+
+/** CSS img width so the opaque silhouette reaches gutter + overlap. */
+export function edgeStripImgWidth(width: number, side: 'left' | 'right'): number {
+  return (contentGutterWidth(width) + edgeStripOverlap(width)) / EDGE_STRIP_OPAQUE[side];
+}
+
+export function contentInset(width: number): number {
+  const minPad = width < SM_BREAKPOINT ? EDGE_STRIP_MOBILE_MIN : 24;
+  const centered = Math.max(minPad, (width - CONTENT_MAX_PX) / 2);
+  return Math.max(centered, contentGutterWidth(width));
+}
+
+export function headerBarRect(viewport: ViewportSize): NamedRect {
+  const mobile = viewport.width < SM_BREAKPOINT;
+  const maxW = Math.min(HEADER_BAR_SAFE.containerMax, viewport.width);
+  const x = (viewport.width - maxW) / 2 + HEADER_BAR_SAFE.inset;
   return {
-    height: HEADER_CONTROLS_SAFE.height,
-    id: HEADER_CONTROLS_SAFE.id,
-    width: HEADER_CONTROLS_SAFE.width,
-    x: viewport.width - HEADER_CONTROLS_SAFE.insetRight - HEADER_CONTROLS_SAFE.width,
-    y: HEADER_CONTROLS_SAFE.top,
+    height: mobile ? HEADER_BAR_SAFE.heightMobile : HEADER_BAR_SAFE.heightDesktop,
+    id: HEADER_BAR_SAFE.id,
+    width: Math.max(120, maxW - HEADER_BAR_SAFE.inset * 2),
+    x,
+    y: mobile ? HEADER_BAR_SAFE.topMobile : HEADER_BAR_SAFE.topDesktop,
   };
 }
 
+export function headerControlsRect(viewport: ViewportSize): NamedRect {
+  return headerBarRect(viewport);
+}
+
 export function edgeStripRect(side: 'left' | 'right', viewport: ViewportSize): Rect {
-  const width = edgeStripWidth(viewport.width);
+  const width = edgeStripImgWidth(viewport.width, side);
+  const height = width / EDGE_STRIP_ASPECT;
   return {
-    height: viewport.height,
+    height,
     width,
     x: side === 'left' ? 0 : viewport.width - width,
-    y: 0,
+    y: viewport.height - height,
   };
 }
 
@@ -271,6 +303,9 @@ export function homeGrid(viewport: ViewportSize): {
   activityW: number;
   activityX: number;
   contentW: number;
+  extraTop: number;
+  extraW: number;
+  extraXs: ReadonlyArray<number>;
   featuredW: number;
   featuredX: number;
   gutter: number;
@@ -293,14 +328,25 @@ export function homeGrid(viewport: ViewportSize): {
   const top = stacked ? HOME_STACKED_GRID.top : twoCol ? HOME_DESKTOP_GRID.top : 96;
   const row1 = stacked ? HOME_STACKED_GRID.intro : twoCol ? HOME_DESKTOP_GRID.row1 : 280;
   const nowH = stacked ? HOME_STACKED_GRID.now : row1;
+  const lowerH = stacked ? HOME_STACKED_GRID.row3 : twoCol ? HOME_DESKTOP_GRID.row2 : 220;
+  const extraTop = stacked
+    ? top + row1 + gutter + nowH + gutter + lowerH + gutter
+    : twoCol
+      ? top + row1 + gutter + lowerH + gutter
+      : top + row1 + gutter + nowH + gutter + lowerH + gutter;
   if (!twoCol || stacked) {
     const track = stacked ? gridTrackSize(contentW, gutter) : 0;
     const activity = GREENHOUSE_STACKED_SPANS.activity;
     const featured = GREENHOUSE_STACKED_SPANS.featured;
+    const extraW = stacked ? gridSpanWidth(track, gutter, 6) : contentW;
+    const extraXs = stacked ? [left, left + extraW + gutter] : [left];
     return {
       activityW: stacked ? gridSpanWidth(track, gutter, activity.span) : contentW,
       activityX: stacked ? left + gridSpanOffset(track, gutter, activity.start) : left,
       contentW,
+      extraTop,
+      extraW,
+      extraXs,
       featuredW: stacked ? gridSpanWidth(track, gutter, featured.span) : contentW,
       featuredX: stacked ? left + gridSpanOffset(track, gutter, featured.start) : left,
       gutter,
@@ -322,10 +368,14 @@ export function homeGrid(viewport: ViewportSize): {
   const now = GREENHOUSE_GRID_SPANS['now-playing'];
   const activity = GREENHOUSE_GRID_SPANS.activity;
   const featured = GREENHOUSE_GRID_SPANS.featured;
+  const extraW = gridSpanWidth(track, gutter, 4);
   return {
     activityW: gridSpanWidth(track, gutter, activity.span),
     activityX: left + gridSpanOffset(track, gutter, activity.start),
     contentW,
+    extraTop,
+    extraW,
+    extraXs: [left, left + extraW + gutter, left + (extraW + gutter) * 2],
     featuredW: gridSpanWidth(track, gutter, featured.span),
     featuredX: left + gridSpanOffset(track, gutter, featured.start),
     gutter,
@@ -346,17 +396,55 @@ export function homeGrid(viewport: ViewportSize): {
  * Tight copy wells — not whole cards. Plants may occupy corners, gutters,
  * and the viewport margins around these rects.
  */
+function homeExtraCopyRects(
+  viewport: ViewportSize,
+  grid: ReturnType<typeof homeGrid>,
+): Array<NamedRect> {
+  if (grid.extraTop >= viewport.height) {
+    return [];
+  }
+  const gutter = contentGutterWidth(viewport.width);
+  const overlap = edgeStripOverlap(viewport.width);
+  const leftClear = gutter + overlap + 8;
+  const rightClear = viewport.width - gutter - overlap - 8;
+  return grid.extraXs.map((x, index) => {
+    const copyX = Math.max(x + 14, leftClear);
+    return {
+      height: 72,
+      id: `extra-${index}`,
+      width: Math.max(80, Math.min(grid.extraW - 28, rightClear - copyX)),
+      x: copyX,
+      y: grid.extraTop + 12,
+    };
+  });
+}
+
+/**
+ * Tight copy wells — not whole cards. Plants may occupy corners, gutters,
+ * and the viewport margins around these rects. Extra project / map / side
+ * cards (span 4 on xl, span 6 on md) are only protected when they sit in
+ * the first viewport.
+ */
 export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<NamedRect> {
   const size = GREENHOUSE_VIEWPORTS[viewport];
   const grid = homeGrid(size);
-  const strip = edgeStripWidth(size.width);
+  const strip = contentGutterWidth(size.width);
   if (!grid.twoCol) {
     const pad = Math.max(grid.left, strip);
-    const copyWidth = Math.max(120, size.width - pad * 2 - 16);
+    const overlap = edgeStripOverlap(size.width);
+    const leftClear = pad + overlap + 8;
+    const rightClear = size.width - pad - overlap - 8;
+    const copyWidth = Math.max(80, rightClear - leftClear);
     return [
       { height: 280, id: 'intro-copy', width: Math.min(280, copyWidth), x: pad + 8, y: 248 },
-      { height: 96, id: 'now-playing-copy', width: Math.min(268, copyWidth), x: pad + 8, y: 720 },
-      headerControlsRect(size),
+      {
+        height: 96,
+        id: 'now-playing-copy',
+        width: Math.min(268, copyWidth),
+        x: leftClear,
+        y: 720,
+      },
+      headerBarRect(size),
     ];
   }
 
@@ -368,6 +456,7 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
   const introCopyW = Math.min(grid.introW - 40, 40 * 11.1);
   const nowCopyX = grid.nowX + 14;
   const featuredCopyX = grid.featuredX + 16;
+  const rightClear = size.width - strip - edgeStripOverlap(size.width) - 8;
   return [
     {
       height: grid.stacked ? 180 : 200,
@@ -379,7 +468,7 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
     {
       height: 88,
       id: 'now-playing-copy',
-      width: Math.max(80, Math.min(grid.nowW - 28, size.width - strip - 12 - nowCopyX)),
+      width: Math.max(80, Math.min(grid.nowW - 28, rightClear - nowCopyX)),
       x: nowCopyX,
       y: nowTop + Math.min(grid.nowH, grid.nowW * 1.6) - 102,
     },
@@ -393,11 +482,12 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
     {
       height: 168,
       id: 'featured-copy',
-      width: Math.max(120, Math.min(grid.featuredW - 32, size.width - strip - 12 - featuredCopyX)),
+      width: Math.max(120, Math.min(grid.featuredW - 32, rightClear - featuredCopyX)),
       x: featuredCopyX,
       y: lowerTop + 12,
     },
-    headerControlsRect(size),
+    ...homeExtraCopyRects(size, grid),
+    headerBarRect(size),
   ];
 }
 
@@ -413,7 +503,7 @@ export function surfaceSafeRects(
   if (surface === 'home') {
     return homeSafeRects(viewport);
   }
-  return [headerControlsRect(GREENHOUSE_VIEWPORTS[viewport])];
+  return [headerBarRect(GREENHOUSE_VIEWPORTS[viewport])];
 }
 
 export function plantSafeZoneHits(
@@ -435,7 +525,7 @@ export function plantSafeZoneHits(
   return hits;
 }
 
-function mapCover(
+function mapContain(
   localX: number,
   localY: number,
   box: ViewportSize,
@@ -443,7 +533,7 @@ function mapCover(
   posX: number,
   posY: number,
 ): { x: number; y: number } | null {
-  const scale = Math.max(box.width / image.width, box.height / image.height);
+  const scale = Math.min(box.width / image.width, box.height / image.height);
   const drawnWidth = image.width * scale;
   const drawnHeight = image.height * scale;
   const offsetX = (box.width - drawnWidth) * posX;
@@ -467,13 +557,7 @@ export function viewportToEdgeStrip(
   if (vx < box.x || vx >= box.x + box.width || vy < box.y || vy >= box.y + box.height) {
     return null;
   }
-  if (
-    side === 'right' &&
-    rectsIntersect({ height: 1, width: 1, x: vx, y: vy }, headerControlsRect(viewport))
-  ) {
-    return null;
-  }
-  return mapCover(vx - box.x, vy - box.y, box, image, side === 'left' ? 0 : 1, 1);
+  return mapContain(vx - box.x, vy - box.y, box, image, side === 'left' ? 0 : 1, 1);
 }
 
 export function viewportToBottomBand(

@@ -1,10 +1,11 @@
 import type { SxObject } from '@dg/ui/theme';
 import { lightDark } from '@dg/ui/theme/color';
-import { FONT_DISPLAY_STACK, HEADING_FONT_SIZE_DISPLAY } from '@dg/ui/theme/typography';
+import { FONT_DISPLAY_STACK } from '@dg/ui/theme/typography';
 
 /**
- * Token overrides scoped to `GreenhouseFrame`. Flag-off `:root` keeps today's
- * sans small-caps headings and frosted glass.
+ * Token overrides scoped to `GreenhouseFrame`. Type comes from MUI
+ * variants via `GreenhouseTypeProvider` — this file only sets glass/card
+ * paints and the display stack.
  */
 export const GREENHOUSE_TOKEN_VARS: SxObject = {
   '--card-backdrop-filter': 'blur(20px) saturate(1.05)',
@@ -15,9 +16,6 @@ export const GREENHOUSE_TOKEN_VARS: SxObject = {
   '--glass-backdrop-filter': 'blur(20px) saturate(1.05)',
   '--glass-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 50%, transparent)',
   '--greenhouse-gutter': '1.25rem',
-  '--heading-font-size': HEADING_FONT_SIZE_DISPLAY,
-  '--heading-font-stretch': 'normal',
-  '--heading-font-variant': 'normal',
 };
 
 const leafPair = {
@@ -48,18 +46,10 @@ export const GREENHOUSE_LEAF_VARS: SxObject = {
 };
 
 const atmospherePair = {
-  ribDark: ['hsl(80deg 22% 28% / 0.28)', 'hsl(160deg 12% 80% / 0.2)'],
-  ribMid: ['hsl(70deg 18% 58% / 0.1)', 'hsl(160deg 14% 24% / 0.22)'],
-  ribShine: ['hsl(48deg 70% 96% / 0.42)', 'hsl(40deg 18% 36% / 0.18)'],
-  sunCore: ['hsl(48deg 100% 97% / 0.7)', 'hsl(40deg 86% 62% / 0.4)'],
   wash: ['hsl(62deg, 22%, 48%)', 'hsl(158deg, 26%, 9%)'],
 } as const;
 
 export const GREENHOUSE_ATMOSPHERE_VARS: SxObject = {
-  '--greenhouse-rib-dark': lightDark(atmospherePair.ribDark),
-  '--greenhouse-rib-mid': lightDark(atmospherePair.ribMid),
-  '--greenhouse-rib-shine': lightDark(atmospherePair.ribShine),
-  '--greenhouse-sun-core': lightDark(atmospherePair.sunCore),
   '--greenhouse-wash': lightDark(atmospherePair.wash),
 };
 

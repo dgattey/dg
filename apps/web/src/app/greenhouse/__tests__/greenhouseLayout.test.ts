@@ -1,6 +1,8 @@
 import {
   CONTENT_MAX_PX,
+  contentGutterWidth,
   contentInset,
+  edgeStripImgWidth,
   edgeStripWidth,
   GREENHOUSE_VIEWPORTS,
   homeGrid,
@@ -114,7 +116,7 @@ describe('greenhouse safe zones', () => {
       'now-playing-copy',
       'activity-stats',
       'featured-copy',
-      'header-controls',
+      'header-bar',
     ]);
     const intro = homeSafeRects('desktop').find((rect) => rect.id === 'intro-copy');
     expect(intro?.width).toBeGreaterThan(200);
@@ -126,7 +128,7 @@ describe('greenhouse safe zones', () => {
 
   it('keeps every mobile plant AABB out of the name column and now-playing title', () => {
     const ids = homeSafeRects('mobile').map((rect) => rect.id);
-    expect(ids).toEqual(['intro-copy', 'now-playing-copy', 'header-controls']);
+    expect(ids).toEqual(['intro-copy', 'now-playing-copy', 'header-bar']);
     expect(plantSafeZoneHits(layoutGreenhousePlants('home', 0, 'mobile'), 'mobile')).toEqual([]);
   });
 
@@ -141,9 +143,7 @@ describe('greenhouse safe zones', () => {
     for (const rect of surfaceSafeRects('music', 'desktop')) {
       expect(rect.y + rect.height).toBeLessThanOrEqual(viewport.height);
     }
-    expect(surfaceSafeRects('music', 'desktop').map((rect) => rect.id)).toEqual([
-      'header-controls',
-    ]);
+    expect(surfaceSafeRects('music', 'desktop').map((rect) => rect.id)).toEqual(['header-bar']);
     expect(plantSafeZoneHits(plants, 'desktop', 'music')).toEqual([]);
     expect(plantSafeZoneHits(plants, 'mobile', 'music')).toEqual([]);
   });
@@ -159,5 +159,13 @@ describe('greenhouse safe zones', () => {
     const strip = edgeStripWidth(2560);
     expect(inset).toBeGreaterThan((2560 - CONTENT_MAX_PX) / 2 - 1);
     expect(strip).toBeLessThan(inset);
+  });
+
+  it('lets edge silhouettes overlap the grid column without covering copy', () => {
+    const desktop = GREENHOUSE_VIEWPORTS.desktop.width;
+    const mobile = GREENHOUSE_VIEWPORTS.mobile.width;
+    expect(edgeStripImgWidth(desktop, 'left')).toBeGreaterThan(contentGutterWidth(desktop) + 40);
+    expect(edgeStripImgWidth(desktop, 'left')).toBeLessThan(contentGutterWidth(desktop) + 120);
+    expect(edgeStripImgWidth(mobile, 'left')).toBeGreaterThan(contentGutterWidth(mobile) + 16);
   });
 });

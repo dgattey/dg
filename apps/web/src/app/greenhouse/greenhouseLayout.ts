@@ -44,7 +44,7 @@ const HOME_DESKTOP: ReadonlyArray<PlantSpec> = [
     scale: 0.92,
     symbol: 'leaf-bop',
     x: -14,
-    y: -6,
+    y: 10,
   },
   {
     cluster: 'corner',
@@ -55,7 +55,7 @@ const HOME_DESKTOP: ReadonlyArray<PlantSpec> = [
     scale: 0.96,
     symbol: 'leaf-monstera',
     x: -18,
-    y: 10,
+    y: 16,
   },
 ];
 
@@ -73,7 +73,7 @@ const HOME_MOBILE: ReadonlyArray<PlantSpec> = [
     scale: 0.9,
     symbol: 'leaf-monstera',
     x: -12,
-    y: 14,
+    y: 20,
   },
   {
     cluster: 'vine',
@@ -100,7 +100,7 @@ const COMPOSITIONS: Record<GreenhouseSurface, ReadonlyArray<PlantSpec>> = {
       scale: 1.15,
       symbol: 'leaf-bop',
       x: -16,
-      y: 8,
+      y: 16,
     },
     {
       cluster: 'corner',
@@ -111,7 +111,7 @@ const COMPOSITIONS: Record<GreenhouseSurface, ReadonlyArray<PlantSpec>> = {
       scale: 1.2,
       symbol: 'leaf-bop',
       x: -10,
-      y: 18,
+      y: 22,
     },
     {
       cluster: 'corner',

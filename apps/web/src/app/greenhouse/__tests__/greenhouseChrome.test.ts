@@ -37,6 +37,10 @@ describe('greenhouse chrome', () => {
     const css = readFileSync(cssPath, 'utf8');
     expect(css).toContain('clamp(180px, 20vw, 440px)');
     expect(css).toContain('clamp(90px, 14vw, 140px)');
+    expect(css).toContain('--greenhouse-overlap: 56px');
+    expect(css).toContain('--greenhouse-overlap: 24px');
+    expect(css).toContain('overflow: visible');
+    expect(css).not.toContain('clip-path');
     expect(css).toContain('repeat-x');
     expect(css).toContain('object-position: bottom left');
     expect(css).toContain('object-position: bottom right');
@@ -87,7 +91,33 @@ describe('greenhouse chrome', () => {
     expect(foliage).toContain('fetchPriority="high"');
     expect(foliage).toContain('fetchPriority="low"');
     expect(foliage).toContain('(max-width: 767px)');
+    expect(foliage).toContain('srcSet');
+    expect(foliage).toContain('1536w');
+    expect(foliage).toContain('1x');
     expect(plants).not.toContain('<use');
     expect(plants).not.toContain('preserveAspectRatio="none"');
+  });
+
+  it('keeps only plate, cards, and foreground plants in the frame', () => {
+    const frame = readFileSync(join(__dirname, '../GreenhouseFrame.tsx'), 'utf8');
+    const css = readFileSync(cssPath, 'utf8');
+    expect(frame).toContain('data-greenhouse-layer="plate"');
+    expect(frame).toContain('data-greenhouse-layer="cards"');
+    expect(frame).toContain('data-greenhouse-layer="plants"');
+    expect(css).not.toContain('.plateTint');
+    expect(css).not.toContain('.ribs');
+    expect(css).not.toContain('.sun');
+    expect(css).not.toContain('.atmosphere');
+    expect(css).not.toMatch(/font-size\s*:/);
+    expect(css).not.toMatch(/line-height\s*:/);
+    expect(css).not.toMatch(/letter-spacing\s*:/);
+  });
+
+  it('ships a 1x ladder so 2x screens can pick the native source cap', () => {
+    expect(existsSync(join(atmosphereDir, 'back-plate-768.avif'))).toBe(true);
+    expect(existsSync(join(atmosphereDir, 'back-plate-portrait-768.avif'))).toBe(true);
+    expect(existsSync(join(foliageDir, 'edge-left-768.avif'))).toBe(true);
+    expect(existsSync(join(foliageDir, 'edge-right-768.avif'))).toBe(true);
+    expect(existsSync(join(foliageDir, 'bottom-band-768.avif'))).toBe(true);
   });
 });

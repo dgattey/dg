@@ -22,8 +22,8 @@ type GreenhouseFrameProps = {
 
 /**
  * Shared greenhouse shell. `surface` selects the plant layout (`home` vs
- * `music`). Tokens always apply; chrome is optional so other routes can wrap
- * later with the same vocabulary.
+ * `music`). Stack is plate → cards → foreground plants. The site header
+ * lives outside this frame at a higher z-index.
  */
 export function GreenhouseFrame({ children, surface, chrome = true }: GreenhouseFrameProps) {
   const desktopPlants = chrome ? layoutGreenhousePlants(surface, 0, 'desktop') : [];
@@ -37,23 +37,22 @@ export function GreenhouseFrame({ children, surface, chrome = true }: Greenhouse
       sx={GREENHOUSE_FRAME_VARS}
     >
       {chrome ? (
-        <>
-          <div className={styles.backStack}>
-            <div className={styles.atmosphere}>
-              <GreenhouseBackPlate />
-              <div className={styles.plateTint} />
-              <div className={styles.ribs} />
-              <div className={styles.sun} />
-            </div>
-            <GreenhouseFoliage />
-          </div>
-          <div className={styles.frontStack}>
-            <GreenhousePlants layer="front" plants={desktopPlants} viewport="desktop" />
-            <GreenhousePlants layer="front" plants={mobilePlants} viewport="mobile" />
-          </div>
-        </>
+        <div className={styles.backStack} data-greenhouse-layer="plate">
+          <GreenhouseBackPlate />
+          <GreenhousePlants layer="back" plants={desktopPlants} viewport="desktop" />
+          <GreenhousePlants layer="back" plants={mobilePlants} viewport="mobile" />
+        </div>
       ) : null}
-      <div className={styles.content}>{children}</div>
+      <div className={styles.content} data-greenhouse-layer="cards">
+        {children}
+      </div>
+      {chrome ? (
+        <div aria-hidden="true" className={styles.frontStack} data-greenhouse-layer="plants">
+          <GreenhouseFoliage />
+          <GreenhousePlants layer="front" plants={desktopPlants} viewport="desktop" />
+          <GreenhousePlants layer="front" plants={mobilePlants} viewport="mobile" />
+        </div>
+      ) : null}
     </Box>
   );
 }
