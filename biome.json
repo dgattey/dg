@@ -33,7 +33,8 @@
       "!**/migrations",
       "!**/dist",
       "!**/*.graphql",
-      "!**/apps/web/src/app/greenhouse/m1-shot"
+      "!**/apps/web/src/app/greenhouse/m1-shot",
+      "!**/apps/web/src/app/greenhouse/music-shot"
     ]
   },
   "formatter": {

@@ -100,12 +100,76 @@ describe('greenhouseLayout', () => {
     expect(layoutGreenhousePlants('home')).not.toEqual(layoutGreenhousePlants('music'));
   });
 
-  it('features a different species per surface', () => {
+  it('features a different side peek per surface', () => {
     const featuredOf = (surface: 'home' | 'music') =>
-      layoutGreenhousePlants(surface).find((plant) => plant.featured)?.symbol;
+      layoutGreenhousePlants(surface).find((plant) => plant.featured);
 
-    expect(featuredOf('home')).toBe('leaf-monstera');
-    expect(featuredOf('music')).toBe('leaf-bop');
+    expect(featuredOf('home')?.symbol).toBe('leaf-bop');
+    expect(featuredOf('home')?.edge).toBe('right');
+    expect(featuredOf('music')?.symbol).toBe('leaf-bop');
+    expect(featuredOf('music')?.edge).toBe('right');
+    expect(featuredOf('home')?.id).not.toBe(featuredOf('music')?.id);
+  });
+
+  it('keeps side peeks off the plate species at that edge', () => {
+    for (const surface of ['home', 'music'] as const) {
+      for (const viewport of ['desktop', 'mobile'] as const) {
+        const plants = layoutGreenhousePlants(surface, 0, viewport);
+        for (const plant of plants) {
+          if (plant.edge === 'left' || plant.edge === 'right') {
+            expect(plant.layer).toBe('front');
+          }
+          if (plant.edge === 'left') {
+            expect(plant.symbol).not.toBe('leaf-bop');
+          }
+          if (plant.edge === 'right') {
+            expect(plant.symbol).not.toBe('leaf-monstera');
+          }
+        }
+      }
+    }
+  });
+
+  it('shows every species at 1440 and never repeats one below 1800', () => {
+    for (const surface of ['home', 'music'] as const) {
+      const desktop = layoutGreenhousePlants(surface);
+      const at1440 = new Set(plantsVisibleAt(desktop, 1440).map((plant) => plant.symbol));
+      expect([...at1440].toSorted()).toEqual([...LEAF_SYMBOLS]);
+      expect(speciesRepeatAt(desktop, 1440)).toBe(false);
+      expect(speciesRepeatAt(desktop, 1024)).toBe(false);
+      expect(speciesRepeatAt(layoutGreenhousePlants(surface, 0, 'mobile'), 390)).toBe(false);
+    }
+  });
+
+  it('keeps ultrawide repeats flipped, resized, and 600px from their twin', () => {
+    for (const width of [1920, 2560]) {
+      const size = { height: width === 1920 ? 1080 : 1440, width };
+      for (const surface of ['home', 'music'] as const) {
+        const plants = plantsVisibleAt(layoutGreenhousePlants(surface), width);
+        const bySymbol = new Map<string, typeof plants>();
+        for (const plant of plants) {
+          const group = bySymbol.get(plant.symbol) ?? [];
+          group.push(plant);
+          bySymbol.set(plant.symbol, group);
+        }
+        for (const group of bySymbol.values()) {
+          if (group.length < 2) continue;
+          for (let i = 0; i < group.length; i += 1) {
+            for (let j = i + 1; j < group.length; j += 1) {
+              const a = group[i];
+              const b = group[j];
+              expect(Boolean(a.flip)).not.toBe(Boolean(b.flip));
+              expect(a.scale).not.toBe(b.scale);
+              expect(a.rotate).not.toBe(b.rotate);
+              const boxA = plantCssBox(a, size);
+              const boxB = plantCssBox(b, size);
+              const dx = boxA.x + boxA.width / 2 - (boxB.x + boxB.width / 2);
+              expect(Math.abs(dx)).toBeGreaterThanOrEqual(600);
+            }
+          }
+        }
+      }
+    }
   });
 
   it('hangs plants from viewport edges instead of scattering over copy', () => {

@@ -43,8 +43,10 @@ export type PlantInstance = {
 type PlantSpec = Omit<PlantInstance, 'id'>;
 
 /**
- * Home desktop: one of each species inside 1440. Ultrawide fillers reuse
- * a mid-row species so neighbors still differ. Sides stay in-document.
+ * Home desktop: one of each species inside 1440. Side peeks are portrait
+ * cutouts the plate does not already paint at that edge (no BoP on the
+ * left, no monstera on the right), both `front`. Ultrawide fillers may
+ * repeat a far twin (flipped, different scale/rotation, ≥ 600px away).
  */
 const HOME_DESKTOP: ReadonlyArray<PlantSpec> = [
   {
@@ -114,13 +116,13 @@ const HOME_DESKTOP: ReadonlyArray<PlantSpec> = [
     edge: 'left',
     featured: false,
     flip: true,
-    layer: 'back',
-    rotate: -12,
-    scale: 0.74,
-    symbol: 'leaf-bop',
+    layer: 'front',
+    rotate: -10,
+    scale: 0.82,
+    symbol: 'leaf-monstera',
     x: -8,
     y: 18,
-    z: 0,
+    z: 3,
   },
   {
     cluster: 'side',
@@ -129,7 +131,7 @@ const HOME_DESKTOP: ReadonlyArray<PlantSpec> = [
     layer: 'front',
     rotate: 9,
     scale: 0.86,
-    symbol: 'leaf-monstera',
+    symbol: 'leaf-bop',
     x: -6,
     y: 16,
     z: 4,
@@ -138,26 +140,26 @@ const HOME_DESKTOP: ReadonlyArray<PlantSpec> = [
     cluster: 'vine',
     edge: 'bottom',
     featured: false,
-    flip: true,
     layer: 'front',
     minWidth: 1800,
-    rotate: 7,
-    scale: 0.8,
+    rotate: 12,
+    scale: 0.7,
     symbol: 'leaf-calathea',
-    x: -10,
-    y: -24,
+    x: -12,
+    y: -22,
     z: 2,
   },
   {
     cluster: 'vine',
     edge: 'bottom',
     featured: false,
+    flip: true,
     layer: 'front',
     minWidth: 1800,
-    rotate: -7,
-    scale: 0.78,
+    rotate: 14,
+    scale: 0.7,
     symbol: 'leaf-zz',
-    x: 96,
+    x: 98,
     y: -34,
     z: 2,
   },
@@ -224,7 +226,7 @@ const HOME_MOBILE: ReadonlyArray<PlantSpec> = [
     layer: 'front',
     rotate: 8,
     scale: 0.78,
-    symbol: 'leaf-monstera',
+    symbol: 'leaf-bop',
     x: -32,
     y: 72,
     z: 3,
@@ -296,6 +298,19 @@ const MUSIC_DESKTOP: ReadonlyArray<PlantSpec> = [
   },
   {
     cluster: 'corner',
+    edge: 'left',
+    featured: false,
+    flip: true,
+    layer: 'front',
+    rotate: -8,
+    scale: 0.78,
+    symbol: 'leaf-monstera',
+    x: -32,
+    y: 70,
+    z: 3,
+  },
+  {
+    cluster: 'corner',
     edge: 'right',
     featured: true,
     layer: 'front',
@@ -312,11 +327,11 @@ const MUSIC_DESKTOP: ReadonlyArray<PlantSpec> = [
     featured: false,
     layer: 'front',
     minWidth: 1800,
-    rotate: -6,
-    scale: 0.78,
-    symbol: 'leaf-monstera',
-    x: -8,
-    y: -28,
+    rotate: -9,
+    scale: 0.7,
+    symbol: 'leaf-calathea',
+    x: -10,
+    y: -16,
     z: 2,
   },
 ];
