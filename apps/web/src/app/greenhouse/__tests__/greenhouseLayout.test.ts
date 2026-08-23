@@ -316,7 +316,6 @@ describe('greenhouse safe zones', () => {
     expect(musicDocumentWells(viewport, 'albums').map((rect) => rect.id)).toEqual([
       'header-bar',
       'cell-albums-heading',
-      'cell-albums-toolbar',
       'cell-albums-grid',
       'footer',
     ]);
