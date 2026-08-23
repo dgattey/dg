@@ -78,7 +78,7 @@ function plantPosition(plant: PlantInstance): CSSProperties {
   const inset = `${plant.x}%`;
   if (plant.edge === 'bottom') {
     return {
-      bottom: `${plant.y}%`,
+      bottom: `calc(${plant.y} * 9px)`,
       left: inset,
       right: 'auto',
       top: 'auto',
@@ -135,7 +135,7 @@ export function GreenhousePlants({
                 '--plant-enter-y': plant.edge === 'bottom' ? '10vh' : '4vh',
                 '--plant-flip': plant.flip ? -1 : 1,
                 '--plant-rotate': `${plant.rotate}deg`,
-                '--plant-width': `${plant.scale * mass}vmin`,
+                '--plant-width': `min(${plant.scale * mass}vmin, ${plant.scale * mass * 9}px)`,
                 '--plant-z': plant.z ?? 0,
                 maxWidth: `${asset.width}px`,
                 ...plantPosition(plant),

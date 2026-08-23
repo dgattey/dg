@@ -170,8 +170,11 @@ export function plantMassVmin(plant: Pick<PlantInstance, 'featured'>): number {
   return plant.featured ? FEATURED_PLANT_MASS_VMIN : REGULAR_PLANT_MASS_VMIN;
 }
 
+/** Cap so ultrawide adds plants, not bigger ones. 1vmin at 900 CSS px. */
+export const PLANT_VMIN_CAP_PX = 900;
+
 export function plantWidthPx(plant: PlantInstance, viewport: ViewportSize): number {
-  const vmin = Math.min(viewport.width, viewport.height);
+  const vmin = Math.min(viewport.width, viewport.height, PLANT_VMIN_CAP_PX);
   const width = plant.scale * plantMassVmin(plant) * (vmin / 100);
   if (viewport.width <= 575) {
     return Math.min(width, viewport.width * MOBILE_PLANT_MAX_VW);
@@ -195,7 +198,7 @@ export function plantCssBox(plant: PlantInstance, viewport: ViewportSize): Rect 
       height,
       width,
       x: (plant.x / 100) * viewport.width,
-      y: viewport.height - (plant.y / 100) * viewport.height - height,
+      y: viewport.height - (plant.y / 100) * PLANT_VMIN_CAP_PX - height,
     };
   }
   if (plant.edge === 'right') {
