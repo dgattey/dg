@@ -1,7 +1,12 @@
 import { homeDocumentWells, homeScrollStops, wellInViewport } from './greenhouseHomeWells';
 import type { GreenhouseSurface, LeafSymbol, PlantInstance } from './greenhouseLayout';
 import { plantsVisibleAt } from './greenhouseLayout';
-import { musicLiveWells } from './greenhouseMusicWells';
+import {
+  MUSIC_LIVE_VIEWS,
+  musicDocumentWells,
+  musicLiveWells,
+  musicScrollStops,
+} from './greenhouseMusicWells';
 
 export type GreenhouseViewportName =
   | 'phone360'
@@ -526,9 +531,7 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
  * heading and On repeat eyebrow. Snapshots live in `greenhouseMusicWells`.
  */
 export function musicCopyRects(viewport: ViewportSize): Array<NamedRect> {
-  const fringe =
-    viewport.width < SM_BREAKPOINT ? DENSE_FOLIAGE_MOBILE_MAX : DENSE_FOLIAGE_DESKTOP_MAX;
-  return [...musicLiveWells(viewport, fringe)];
+  return [...musicLiveWells(viewport)];
 }
 
 /**
@@ -546,7 +549,7 @@ export function surfaceSafeRectsForSize(
   size: ViewportSize,
 ): ReadonlyArray<NamedRect> {
   if (surface === 'music') {
-    return [...musicCopyRects(size), headerBarRect(size)];
+    return [...musicCopyRects(size)];
   }
   return homeDocumentWells(size).flatMap((well) => {
     const visible = wellInViewport(well, 0, size.height);
@@ -569,24 +572,29 @@ export function plantSafeZoneHitsForSize(
 ): ReadonlyArray<{ plantId: string; rectId: string; scrollY?: number }> {
   const visible = plantsVisibleAt(plants, size.width);
   const hits: Array<{ plantId: string; rectId: string; scrollY?: number }> = [];
-  const overlap = surface === 'home' ? FOLIAGE_CARD_OVERLAP : 0;
-  const stops = surface === 'home' ? homeScrollStops(size) : [0];
-  for (const scrollY of stops) {
-    const safes =
-      surface === 'home'
-        ? homeDocumentWells(size).flatMap((well) => {
-            const visibleWell = wellInViewport(well, scrollY, size.height);
-            return visibleWell ? [insetRect(visibleWell, overlap)] : [];
-          })
-        : surfaceSafeRectsForSize(surface, size);
-    for (const plant of visible) {
-      const aabb = plantOpaqueAabb(plant, size, scrollY);
-      for (const safe of safes) {
-        if (safe.id === 'header-bar' && plant.edge !== 'bottom') {
-          continue;
-        }
-        if (safe.width > 0 && safe.height > 0 && rectsIntersect(aabb, safe)) {
-          hits.push({ plantId: plant.id, rectId: safe.id, scrollY });
+  const overlap = FOLIAGE_CARD_OVERLAP;
+  const sweeps =
+    surface === 'music'
+      ? MUSIC_LIVE_VIEWS.map((view) => ({
+          stops: musicScrollStops(size, view),
+          wells: musicDocumentWells(size, view),
+        }))
+      : [{ stops: homeScrollStops(size), wells: homeDocumentWells(size) }];
+  for (const sweep of sweeps) {
+    for (const scrollY of sweep.stops) {
+      const safes = sweep.wells.flatMap((well) => {
+        const visibleWell = wellInViewport(well, scrollY, size.height);
+        return visibleWell ? [insetRect(visibleWell, overlap)] : [];
+      });
+      for (const plant of visible) {
+        const aabb = plantOpaqueAabb(plant, size, scrollY);
+        for (const safe of safes) {
+          if (safe.id === 'header-bar' && plant.edge !== 'bottom') {
+            continue;
+          }
+          if (safe.width > 0 && safe.height > 0 && rectsIntersect(aabb, safe)) {
+            hits.push({ plantId: plant.id, rectId: safe.id, scrollY });
+          }
         }
       }
     }
@@ -680,32 +688,37 @@ export function plantOpaqueCopyHits(
   const visible = plantsVisibleAt(plants, size.width);
   const hits: Array<FoliageHit> = [];
   const stride = 4;
-  const inset = surface === 'home' ? Math.max(allowed, FOLIAGE_CARD_OVERLAP) : allowed;
-  const stops = surface === 'home' ? homeScrollStops(size) : [0];
-  for (const scrollY of stops) {
-    const wells =
-      surface === 'home'
-        ? homeDocumentWells(size).flatMap((well) => {
-            const visibleWell = wellInViewport(well, scrollY, size.height);
-            return visibleWell ? [visibleWell] : [];
-          })
-        : [...surfaceSafeRectsForSize(surface, size)];
-    for (const well of wells) {
-      const inner = insetRect(well, inset);
-      if (inner.width <= 0 || inner.height <= 0) {
-        continue;
-      }
-      const maxX = Math.floor(inner.x + inner.width);
-      const maxY = Math.floor(inner.y + inner.height);
-      found: for (let vy = Math.floor(inner.y); vy < maxY; vy += stride) {
-        for (let vx = Math.floor(inner.x); vx < maxX; vx += stride) {
-          for (const plant of visible) {
-            if (well.id === 'header-bar' && plant.edge !== 'bottom') {
-              continue;
-            }
-            if (plantAlphaAt(vx, vy, plant, size, images, scrollY) > FOLIAGE_OPAQUE_THRESHOLD) {
-              hits.push({ layer: plant.id, rectId: well.id, x: vx, y: vy });
-              break found;
+  const inset = Math.max(allowed, FOLIAGE_CARD_OVERLAP);
+  const sweeps =
+    surface === 'music'
+      ? MUSIC_LIVE_VIEWS.map((view) => ({
+          stops: musicScrollStops(size, view),
+          wells: musicDocumentWells(size, view),
+        }))
+      : [{ stops: homeScrollStops(size), wells: homeDocumentWells(size) }];
+  for (const sweep of sweeps) {
+    for (const scrollY of sweep.stops) {
+      const wells = sweep.wells.flatMap((well) => {
+        const visibleWell = wellInViewport(well, scrollY, size.height);
+        return visibleWell ? [visibleWell] : [];
+      });
+      for (const well of wells) {
+        const inner = insetRect(well, inset);
+        if (inner.width <= 0 || inner.height <= 0) {
+          continue;
+        }
+        const maxX = Math.floor(inner.x + inner.width);
+        const maxY = Math.floor(inner.y + inner.height);
+        found: for (let vy = Math.floor(inner.y); vy < maxY; vy += stride) {
+          for (let vx = Math.floor(inner.x); vx < maxX; vx += stride) {
+            for (const plant of visible) {
+              if (well.id === 'header-bar' && plant.edge !== 'bottom') {
+                continue;
+              }
+              if (plantAlphaAt(vx, vy, plant, size, images, scrollY) > FOLIAGE_OPAQUE_THRESHOLD) {
+                hits.push({ layer: plant.id, rectId: well.id, x: vx, y: vy });
+                break found;
+              }
             }
           }
         }

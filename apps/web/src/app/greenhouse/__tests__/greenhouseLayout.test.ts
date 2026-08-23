@@ -16,6 +16,7 @@ import {
   surfaceSafeRects,
 } from '../greenhouseGeometry';
 import { LEAF_SYMBOLS, layoutGreenhousePlants, plantsVisibleAt } from '../greenhouseLayout';
+import { musicDocumentWells } from '../greenhouseMusicWells';
 
 function bottomNeighborsShareSpecies(
   plants: ReturnType<typeof layoutGreenhousePlants>,
@@ -214,21 +215,44 @@ describe('greenhouse safe zones', () => {
     const viewport = GREENHOUSE_VIEWPORTS.desktop;
     for (const plant of plantsVisibleAt(plants, viewport.width)) {
       const box = plantOpaqueAabb(plant, viewport);
-      expect(box.y).toBeLessThan(viewport.height);
-      expect(box.y + box.height).toBeGreaterThan(0);
+      // Fixed fringe may hang off the bottom; it must not live in document space.
+      expect(box.y + box.height).toBeGreaterThan(viewport.height * 0.7);
+      expect(box.y).toBeLessThan(viewport.height + 80);
     }
     for (const rect of surfaceSafeRects('music', 'desktop')) {
       expect(rect.y + rect.height).toBeLessThanOrEqual(viewport.height);
     }
     expect(surfaceSafeRects('music', 'desktop').map((rect) => rect.id)).toEqual([
-      'music-heading',
+      'header-bar',
       'cell-intro',
       'cell-now-playing',
       'cell-albums',
-      'music-on-repeat',
+      'cell-on-repeat-heading',
+      'cell-history',
+      'cell-on-repeat-pile-0',
+      'cell-on-repeat-pile-1',
+      'cell-on-repeat-pile-2',
+    ]);
+    expect(musicDocumentWells(viewport, 'listening').map((rect) => rect.id)).toEqual([
+      'header-bar',
+      'cell-intro',
+      'cell-now-playing',
+      'cell-albums',
+      'cell-on-repeat-heading',
+      'cell-history',
       'cell-tracks',
       'cell-artists',
+      'cell-on-repeat-pile-0',
+      'cell-on-repeat-pile-1',
+      'cell-on-repeat-pile-2',
+      'footer',
+    ]);
+    expect(musicDocumentWells(viewport, 'albums').map((rect) => rect.id)).toEqual([
       'header-bar',
+      'cell-albums-heading',
+      'cell-albums-toolbar',
+      'cell-albums-grid',
+      'footer',
     ]);
     expect(plantSafeZoneHits(plants, 'desktop', 'music')).toEqual([]);
     expect(

@@ -240,8 +240,8 @@ const MUSIC_DESKTOP: ReadonlyArray<PlantSpec> = [
     rotate: -7,
     scale: 0.76,
     symbol: 'leaf-zz',
-    x: 4,
-    y: -20,
+    x: -2,
+    y: -24,
     z: 1,
   },
   {
@@ -254,7 +254,7 @@ const MUSIC_DESKTOP: ReadonlyArray<PlantSpec> = [
     scale: 0.84,
     symbol: 'leaf-prayer',
     x: 24,
-    y: -10,
+    y: -14,
     z: 2,
   },
   {
@@ -278,7 +278,7 @@ const MUSIC_DESKTOP: ReadonlyArray<PlantSpec> = [
     scale: 0.88,
     symbol: 'leaf-nerve',
     x: 68,
-    y: -10,
+    y: -14,
     z: 3,
   },
   {
@@ -291,7 +291,7 @@ const MUSIC_DESKTOP: ReadonlyArray<PlantSpec> = [
     scale: 0.8,
     symbol: 'leaf-calathea',
     x: 86,
-    y: -10,
+    y: -12,
     z: 2,
   },
   {
@@ -302,8 +302,8 @@ const MUSIC_DESKTOP: ReadonlyArray<PlantSpec> = [
     rotate: 10,
     scale: 0.84,
     symbol: 'leaf-bop',
-    x: -28,
-    y: 62,
+    x: -32,
+    y: 68,
     z: 4,
   },
   {
