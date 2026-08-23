@@ -17,6 +17,7 @@ import { Image } from './Image';
 import { Link } from './Link';
 
 type RichTextProps = RenderableRichTextContent & {
+  paragraphVariant?: 'body1' | 'body2';
   sx?: SxProps;
 };
 
@@ -151,7 +152,10 @@ function HeadingWithId({
 /**
  * Takes links and converts them into rich text through rendering specific types of content.
  */
-const renderOptions = (links: RichTextProps['links']): Options => {
+const renderOptions = (
+  links: RichTextProps['links'],
+  paragraphVariant: NonNullable<RichTextProps['paragraphVariant']>,
+): Options => {
   // Map the assets - we only need the sys.id for mapping, and we'll cast as Asset for rendering
   const assetMap = new Map<string, RenderableAssetWithSys>();
   links.assets.block.forEach((asset) => {
@@ -173,7 +177,7 @@ const renderOptions = (links: RichTextProps['links']): Options => {
       [BLOCKS.HEADING_5]: (_, children) => <HeadingWithId variant="h5">{children}</HeadingWithId>,
       [BLOCKS.HEADING_6]: (_, children) => <HeadingWithId variant="h6">{children}</HeadingWithId>,
       [BLOCKS.PARAGRAPH]: (_, children) => (
-        <Typography sx={paragraphSx} variant="body1">
+        <Typography sx={paragraphSx} variant={paragraphVariant}>
           {children}
         </Typography>
       ),
@@ -195,9 +199,11 @@ const renderOptions = (links: RichTextProps['links']): Options => {
  * Complicated component to render rich text from Contentful's rich
  * text renderer, resolving all items to components
  */
-export function RichText({ json, links, sx }: RichTextProps) {
+export function RichText({ json, links, paragraphVariant = 'body1', sx }: RichTextProps) {
   if (!isRichTextDocument(json)) {
     return null;
   }
-  return <Stack sx={sx}>{documentToReactComponents(json, renderOptions(links))}</Stack>;
+  return (
+    <Stack sx={sx}>{documentToReactComponents(json, renderOptions(links, paragraphVariant))}</Stack>
+  );
 }
