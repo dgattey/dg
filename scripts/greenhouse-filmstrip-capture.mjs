@@ -1,15 +1,8 @@
+#!/usr/bin/env node
 /**
- * Greenhouse photography driver.
+ * Greenhouse photography driver (Playwright). Not app runtime.
  *
- * Motion off: Playwright `emulateMedia({ reducedMotion: 'reduce' })` plus a
- * global animation/transition kill. After each scrollTo, wait until scrollY
- * is stable across two rAFs and fonts.ready.
- *
- * `--final3` writes a filmstrip of true viewport frames (the fixed plate
- * cannot be stitched honestly) plus individual `s{N}` folds.
- *
- *   node --experimental-strip-types stitch-fullpage.mjs --final3
- *   node --experimental-strip-types stitch-fullpage.mjs --url … --out … --width 1440 --height 900
+ *   node --experimental-strip-types scripts/greenhouse-filmstrip-capture.mjs --final3
  */
 import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
@@ -18,7 +11,7 @@ import {
   ensureHeadingStops,
   headingFullyClearOfChrome,
   planFilmstripStops,
-} from './greenhouseStitch.ts';
+} from './greenhouse-filmstrip.ts';
 
 const OUT = process.env.FOLIAGE_OUT || '/opt/cursor/artifacts/foliage';
 const STORE = '/cursor/stores/bc-a78ceb1c-cd13-4ea5-bacd-55a94f7b77db/media';

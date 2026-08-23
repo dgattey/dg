@@ -15,7 +15,12 @@ import {
   plantSafeZoneHitsForSize,
   surfaceSafeRects,
 } from '../greenhouseGeometry';
-import { LEAF_SYMBOLS, layoutGreenhousePlants, plantsVisibleAt } from '../greenhouseLayout';
+import {
+  LEAF_SYMBOLS,
+  layoutGreenhousePlants,
+  type PlantInstance,
+  plantsVisibleAt,
+} from '../greenhouseLayout';
 import { musicDocumentWells } from '../greenhouseMusicWells';
 
 function bottomNeighborsShareSpecies(
@@ -146,7 +151,7 @@ describe('greenhouseLayout', () => {
       const size = { height: width === 1920 ? 1080 : 1440, width };
       for (const surface of ['home', 'music'] as const) {
         const plants = plantsVisibleAt(layoutGreenhousePlants(surface), width);
-        const bySymbol = new Map<string, typeof plants>();
+        const bySymbol = new Map<string, Array<PlantInstance>>();
         for (const plant of plants) {
           const group = bySymbol.get(plant.symbol) ?? [];
           group.push(plant);
@@ -158,6 +163,9 @@ describe('greenhouseLayout', () => {
             for (let j = i + 1; j < group.length; j += 1) {
               const a = group[i];
               const b = group[j];
+              if (!a || !b) {
+                throw new Error(`expected a twin pair at ${i}/${j}`);
+              }
               expect(Boolean(a.flip)).not.toBe(Boolean(b.flip));
               expect(a.scale).not.toBe(b.scale);
               expect(a.rotate).not.toBe(b.rotate);

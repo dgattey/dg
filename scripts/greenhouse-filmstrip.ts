@@ -1,8 +1,9 @@
+#!/usr/bin/env tsx
 /**
- * Document-space stitch plan. Seams are structurally impossible: consecutive
- * frames abut (gap ≤ 1px, no overlap). Fixed header is cropped from frames
- * 2..n. Fixed bottom foliage is cropped from every frame except the last, so
- * the thicket appears once — at the true page end.
+ * Document-space stitch / filmstrip planner for greenhouse photography.
+ *
+ * Screenshot tooling, not app runtime. Capture driver:
+ *   node --experimental-strip-types scripts/greenhouse-filmstrip-capture.mjs --final3
  */
 export type StitchFrame = {
   cropBottom: number;
@@ -24,6 +25,18 @@ export class StitchSeamError extends Error {
     super(message);
     this.name = 'StitchSeamError';
   }
+}
+
+function requireFrame(
+  frames: ReadonlyArray<StitchFrame>,
+  index: number,
+  label: string,
+): StitchFrame {
+  const frame = frames[index];
+  if (!frame) {
+    throw new StitchSeamError(`missing ${label} frame at ${index}`);
+  }
+  return frame;
 }
 
 export function planStitchFrames({
@@ -65,9 +78,10 @@ export function planStitchFrames({
   }
 
   assertFrameAbutment(frames);
-  if (frames[frames.length - 1]?.docBottom < scrollHeight - 1) {
+  const lastFrame = frames.at(-1);
+  if (!lastFrame || lastFrame.docBottom < scrollHeight - 1) {
     throw new StitchSeamError(
-      `plan stops at ${frames[frames.length - 1]?.docBottom} before scrollHeight ${scrollHeight}`,
+      `plan stops at ${lastFrame?.docBottom} before scrollHeight ${scrollHeight}`,
     );
   }
   return frames;
@@ -102,10 +116,12 @@ export function realizeFrame(
 
 export function assertFrameAbutment(frames: ReadonlyArray<StitchFrame>, maxGap = 1): void {
   for (let i = 0; i < frames.length - 1; i += 1) {
-    const gap = frames[i + 1].docTop - frames[i].docBottom;
+    const current = requireFrame(frames, i, 'current');
+    const following = requireFrame(frames, i + 1, 'following');
+    const gap = following.docTop - current.docBottom;
     if (gap > maxGap || gap < -0.01) {
       throw new StitchSeamError(
-        `frames ${i}..${i + 1} do not abut: gap=${gap} (${frames[i].docBottom} → ${frames[i + 1].docTop})`,
+        `frames ${i}..${i + 1} do not abut: gap=${gap} (${current.docBottom} → ${following.docTop})`,
       );
     }
   }
@@ -166,10 +182,17 @@ export function assertHeadingsOnce(
   }
   for (const [id, list] of byId) {
     const ordered = list.toSorted((a, b) => a.stitchTop - b.stitchTop);
-    const merged = [ordered[0]];
+    const first = ordered[0];
+    if (!first) {
+      continue;
+    }
+    const merged = [first];
     for (let i = 1; i < ordered.length; i += 1) {
       const prev = merged[merged.length - 1];
       const next = ordered[i];
+      if (!prev || !next) {
+        throw new StitchSeamError(`heading "${id}" is missing a stitch range`);
+      }
       const gap = next.stitchTop - prev.stitchBottom;
       if (gap > maxGap) {
         throw new StitchSeamError(
