@@ -1,6 +1,11 @@
 import { render, screen } from '@testing-library/react';
 import { AlbumsGreenhouseGrid } from '../AlbumsGreenhouseGrid';
 
+jest.mock('next/navigation', () => ({
+  useRouter: jest.fn(() => ({ push: jest.fn() })),
+  useSearchParams: jest.fn(() => new URLSearchParams()),
+}));
+
 const albums = [
   {
     addedAt: '2026-01-01T00:00:00Z',
@@ -15,15 +20,18 @@ const albums = [
 ];
 
 describe('AlbumsGreenhouseGrid', () => {
-  it('renders glass pile cells with album · artist captions', () => {
+  it('restores the sortable favorite grid with name – artist tooltips', () => {
     render(<AlbumsGreenhouseGrid albums={albums} />);
 
-    expect(screen.getByRole('heading', { name: 'USB' })).toBeInTheDocument();
-    expect(screen.getByText('Fred again.., Jamie T')).toBeInTheDocument();
-    expect(document.querySelector('[data-albums-greenhouse]')).toBeTruthy();
-    expect(document.querySelector('[data-album-pile]')).toBeTruthy();
-    expect(screen.getByRole('link', { name: /USB/ }).getAttribute('href')).toContain(
+    expect(document.querySelector('[data-albums-greenhouse]')).toHaveAttribute(
+      'data-greenhouse-cell',
+      'albums-grid',
+    );
+    expect(screen.getByRole('link', { name: 'USB' }).getAttribute('href')).toContain(
       '2ClZ9xWAYg1BH8zkR96dJo',
     );
+    expect(document.querySelector('[data-role="glass-switcher"]')).toBeTruthy();
+    expect(screen.getAllByText('Recently added').length).toBeGreaterThan(0);
+    expect(screen.getByRole('img', { name: 'USB' })).toBeInTheDocument();
   });
 });
