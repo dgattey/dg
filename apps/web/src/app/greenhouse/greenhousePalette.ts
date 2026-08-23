@@ -16,6 +16,7 @@ export const GREENHOUSE_TOKEN_VARS: SxObject = {
   '--glass-backdrop-filter': 'blur(20px) saturate(1.05)',
   '--glass-bg': 'color-mix(in srgb, var(--mui-palette-background-paper) 50%, transparent)',
   '--greenhouse-gutter': '1.25rem',
+  '--greenhouse-overlap': '24px',
 };
 
 const leafPair = {

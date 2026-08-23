@@ -1,3 +1,4 @@
+import { homeDocumentWells, homeScrollStops, wellInViewport } from './greenhouseHomeWells';
 import type { GreenhouseSurface, LeafSymbol, PlantInstance } from './greenhouseLayout';
 import { plantsVisibleAt } from './greenhouseLayout';
 import { musicLiveWells } from './greenhouseMusicWells';
@@ -197,7 +198,7 @@ export function plantHeightPx(plant: PlantInstance, viewport: ViewportSize): num
  * CSS box for a plant on the visual viewport. Chrome is `position: fixed`,
  * so pass the viewport size — not the document height — even on long music pages.
  */
-export function plantCssBox(plant: PlantInstance, viewport: ViewportSize): Rect {
+export function plantCssBox(plant: PlantInstance, viewport: ViewportSize, scrollY = 0): Rect {
   const width = plantWidthPx(plant, viewport);
   const height = plantHeightPx(plant, viewport);
   if (plant.edge === 'bottom') {
@@ -208,19 +209,20 @@ export function plantCssBox(plant: PlantInstance, viewport: ViewportSize): Rect 
       y: viewport.height - (plant.y / 100) * PLANT_VMIN_CAP_PX - height,
     };
   }
+  const y = (plant.y / 100) * viewport.height - scrollY;
   if (plant.edge === 'right') {
     return {
       height,
       width,
       x: viewport.width - (plant.x / 100) * viewport.width - width,
-      y: (plant.y / 100) * viewport.height,
+      y,
     };
   }
   return {
     height,
     width,
     x: (plant.x / 100) * viewport.width,
-    y: (plant.y / 100) * viewport.height,
+    y,
   };
 }
 
@@ -243,8 +245,8 @@ function rotatePoint(
  * Axis-aligned box of the opaque cutout after CSS place + rotate.
  * `scaleX(-1)` swaps the left/right insets; origin stays 50% / 80%.
  */
-export function plantOpaqueAabb(plant: PlantInstance, viewport: ViewportSize): Rect {
-  const box = plantCssBox(plant, viewport);
+export function plantOpaqueAabb(plant: PlantInstance, viewport: ViewportSize, scrollY = 0): Rect {
+  const box = plantCssBox(plant, viewport, scrollY);
   const inset = LEAF_OPAQUE_INSET[plant.symbol];
   const leftInset = plant.flip ? inset.right : inset.left;
   const rightInset = plant.flip ? inset.left : inset.right;
@@ -546,8 +548,10 @@ export function surfaceSafeRectsForSize(
   if (surface === 'music') {
     return [...musicCopyRects(size), headerBarRect(size)];
   }
-  const fringe = size.width < SM_BREAKPOINT ? DENSE_FOLIAGE_MOBILE_MAX : DENSE_FOLIAGE_DESKTOP_MAX;
-  return homeSafeRectsForSize(size).filter((well) => well.y + 8 < size.height - fringe);
+  return homeDocumentWells(size).flatMap((well) => {
+    const visible = wellInViewport(well, 0, size.height);
+    return visible ? [visible] : [];
+  });
 }
 
 export function plantSafeZoneHits(
@@ -562,23 +566,37 @@ export function plantSafeZoneHitsForSize(
   plants: ReadonlyArray<PlantInstance>,
   size: ViewportSize,
   surface: GreenhouseSurface = 'home',
-): ReadonlyArray<{ plantId: string; rectId: string }> {
+): ReadonlyArray<{ plantId: string; rectId: string; scrollY?: number }> {
   const visible = plantsVisibleAt(plants, size.width);
-  const safes = surfaceSafeRectsForSize(surface, size);
-  const hits: Array<{ plantId: string; rectId: string }> = [];
-  for (const plant of visible) {
-    const aabb = plantOpaqueAabb(plant, size);
-    for (const safe of safes) {
-      if (rectsIntersect(aabb, safe)) {
-        hits.push({ plantId: plant.id, rectId: safe.id });
+  const hits: Array<{ plantId: string; rectId: string; scrollY?: number }> = [];
+  const overlap = surface === 'home' ? FOLIAGE_CARD_OVERLAP : 0;
+  const stops = surface === 'home' ? homeScrollStops(size) : [0];
+  for (const scrollY of stops) {
+    const safes =
+      surface === 'home'
+        ? homeDocumentWells(size).flatMap((well) => {
+            const visibleWell = wellInViewport(well, scrollY, size.height);
+            return visibleWell ? [insetRect(visibleWell, overlap)] : [];
+          })
+        : surfaceSafeRectsForSize(surface, size);
+    for (const plant of visible) {
+      const aabb = plantOpaqueAabb(plant, size, scrollY);
+      for (const safe of safes) {
+        if (safe.id === 'header-bar' && plant.edge !== 'bottom') {
+          continue;
+        }
+        if (safe.width > 0 && safe.height > 0 && rectsIntersect(aabb, safe)) {
+          hits.push({ plantId: plant.id, rectId: safe.id, scrollY });
+        }
       }
     }
   }
   return hits;
 }
 
-export function insetRect(rect: Rect, inset: number): Rect {
+export function insetRect<T extends Rect>(rect: T, inset: number): T {
   return {
+    ...rect,
     height: Math.max(0, rect.height - inset * 2),
     width: Math.max(0, rect.width - inset * 2),
     x: rect.x + inset,
@@ -610,8 +628,9 @@ export function viewportToPlant(
   plant: PlantInstance,
   viewport: ViewportSize,
   image: ViewportSize,
+  scrollY = 0,
 ): { x: number; y: number } | null {
-  const box = plantCssBox(plant, viewport);
+  const box = plantCssBox(plant, viewport, scrollY);
   const originX = box.x + box.width * PLANT_TRANSFORM_ORIGIN.x;
   const originY = box.y + box.height * PLANT_TRANSFORM_ORIGIN.y;
   const local = rotatePoint(vx, vy, originX, originY, -plant.rotate);
@@ -637,12 +656,13 @@ function plantAlphaAt(
   plant: PlantInstance,
   viewport: ViewportSize,
   images: Partial<Record<LeafSymbol, PlantAlpha>>,
+  scrollY = 0,
 ): number {
   const image = images[plant.symbol];
   if (!image) {
     return 0;
   }
-  const mapped = viewportToPlant(vx, vy, plant, viewport, image);
+  const mapped = viewportToPlant(vx, vy, plant, viewport, image, scrollY);
   return mapped ? sampleAlpha(image, mapped) : 0;
 }
 
@@ -660,19 +680,33 @@ export function plantOpaqueCopyHits(
   const visible = plantsVisibleAt(plants, size.width);
   const hits: Array<FoliageHit> = [];
   const stride = 4;
-  for (const well of surfaceSafeRectsForSize(surface, size)) {
-    const inner = insetRect(well, allowed);
-    if (inner.width <= 0 || inner.height <= 0) {
-      continue;
-    }
-    const maxX = Math.floor(inner.x + inner.width);
-    const maxY = Math.floor(inner.y + inner.height);
-    found: for (let vy = Math.floor(inner.y); vy < maxY; vy += stride) {
-      for (let vx = Math.floor(inner.x); vx < maxX; vx += stride) {
-        for (const plant of visible) {
-          if (plantAlphaAt(vx, vy, plant, size, images) > FOLIAGE_OPAQUE_THRESHOLD) {
-            hits.push({ layer: plant.id, rectId: well.id, x: vx, y: vy });
-            break found;
+  const inset = surface === 'home' ? Math.max(allowed, FOLIAGE_CARD_OVERLAP) : allowed;
+  const stops = surface === 'home' ? homeScrollStops(size) : [0];
+  for (const scrollY of stops) {
+    const wells =
+      surface === 'home'
+        ? homeDocumentWells(size).flatMap((well) => {
+            const visibleWell = wellInViewport(well, scrollY, size.height);
+            return visibleWell ? [visibleWell] : [];
+          })
+        : [...surfaceSafeRectsForSize(surface, size)];
+    for (const well of wells) {
+      const inner = insetRect(well, inset);
+      if (inner.width <= 0 || inner.height <= 0) {
+        continue;
+      }
+      const maxX = Math.floor(inner.x + inner.width);
+      const maxY = Math.floor(inner.y + inner.height);
+      found: for (let vy = Math.floor(inner.y); vy < maxY; vy += stride) {
+        for (let vx = Math.floor(inner.x); vx < maxX; vx += stride) {
+          for (const plant of visible) {
+            if (well.id === 'header-bar' && plant.edge !== 'bottom') {
+              continue;
+            }
+            if (plantAlphaAt(vx, vy, plant, size, images, scrollY) > FOLIAGE_OPAQUE_THRESHOLD) {
+              hits.push({ layer: plant.id, rectId: well.id, x: vx, y: vy });
+              break found;
+            }
           }
         }
       }

@@ -185,6 +185,24 @@ describe('greenhouse safe zones', () => {
     expect(plantSafeZoneHits(layoutGreenhousePlants('home', 0, 'desktop'), 'desktop')).toEqual([]);
   });
 
+  it('measures every home cell, the header, and the footer as copy wells', () => {
+    expect(surfaceSafeRects('home', 'desktop').map((rect) => rect.id)).toEqual([
+      'header-bar',
+      'cell-intro',
+      'cell-now-playing',
+      'cell-activity',
+      'cell-featured',
+      'cell-more-4',
+      'cell-more-5',
+      'cell-more-6',
+    ]);
+    expect(surfaceSafeRects('home', 'mobile').map((rect) => rect.id)).toEqual([
+      'header-bar',
+      'cell-intro',
+      'cell-now-playing',
+    ]);
+  });
+
   it('keeps every mobile plant AABB out of the name column and now-playing title', () => {
     const ids = homeSafeRects('mobile').map((rect) => rect.id);
     expect(ids).toEqual(['intro-copy', 'now-playing-copy', 'header-bar']);

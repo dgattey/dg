@@ -1,8 +1,11 @@
 .frame {
   --greenhouse-gutter: 1.25rem;
+  --greenhouse-overlap: 24px;
+  --greenhouse-fringe: 81px;
   --greenhouse-strip: clamp(180px, 20vw, 440px);
   position: relative;
   width: 100vw;
+  padding-bottom: var(--greenhouse-fringe);
   margin-left: calc(50% - 50vw);
   background-color: var(--greenhouse-wash, #8f9258);
 }
@@ -185,6 +188,7 @@
 @media (max-width: 575px) {
   .frame {
     --greenhouse-gutter: 1rem;
+    --greenhouse-fringe: 59px;
     --greenhouse-strip: 16px;
   }
 
