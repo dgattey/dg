@@ -1,6 +1,8 @@
 import {
   assertFrameAbutment,
+  assertHeadingsClearOfChrome,
   assertHeadingsOnce,
+  headingFullyClearOfChrome,
   headingInFrame,
   planFilmstripStops,
   planStitchFrames,
@@ -97,10 +99,29 @@ describe('greenhouse stitch plan', () => {
     expect(() => assertHeadingsOnce([a, b])).not.toThrow();
   });
 
-  it('plans filmstrip stops at scroll 0, each viewport, and page end', () => {
-    expect(planFilmstripStops(1673, 900)).toEqual([0, 773]);
-    expect(planFilmstripStops(3152, 844)).toEqual([0, 844, 1688, 2308]);
-    expect(planFilmstripStops(1994, 900)).toEqual([0, 900, 1094]);
-    expect(planFilmstripStops(800, 900)).toEqual([0]);
+  it('plans filmstrip stops with a header-overlap step, ending at page end', () => {
+    expect(planFilmstripStops(1673, 900, 78)).toEqual([0, 773]);
+    expect(planFilmstripStops(3152, 844, 105)).toEqual([0, 723, 1446, 2169, 2308]);
+    expect(planFilmstripStops(1994, 900, 78)).toEqual([0, 806, 1094]);
+    expect(planFilmstripStops(2620, 844, 105)).toEqual([0, 723, 1446, 1776]);
+    expect(planFilmstripStops(800, 900, 78)).toEqual([0]);
+  });
+
+  it('requires each content heading to sit fully in the content band at some stop', () => {
+    const title = { height: 24, id: 'INVISIBLE@400', sticky: false, y: 80 };
+    expect(headingFullyClearOfChrome(title, 105, 844)).toBe(false);
+    expect(headingFullyClearOfChrome({ ...title, y: 120 }, 105, 844)).toBe(true);
+    expect(() =>
+      assertHeadingsClearOfChrome([
+        { ...title, visible: false },
+        { ...title, visible: false, y: 10 },
+      ]),
+    ).toThrow(/INVISIBLE/);
+    expect(() =>
+      assertHeadingsClearOfChrome([
+        { ...title, visible: false },
+        { ...title, visible: true, y: 120 },
+      ]),
+    ).not.toThrow();
   });
 });

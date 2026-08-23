@@ -11,9 +11,13 @@
  *   node --experimental-strip-types stitch-fullpage.mjs --final3
  *   node --experimental-strip-types stitch-fullpage.mjs --url … --out … --width 1440 --height 900
  */
-import { copyFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { copyFileSync, mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { planFilmstripStops } from './greenhouseStitch.ts';
+import {
+  assertHeadingsClearOfChrome,
+  headingFullyClearOfChrome,
+  planFilmstripStops,
+} from './greenhouseStitch.ts';
 
 const OUT = process.env.FOLIAGE_OUT || '/opt/cursor/artifacts/foliage';
 const STORE = '/cursor/stores/bc-a78ceb1c-cd13-4ea5-bacd-55a94f7b77db/media';
@@ -92,12 +96,45 @@ async function measureChrome(page) {
     const fringeHeight = Math.ceil(
       (Number.isFinite(cssFringe) && cssFringe > 0 ? cssFringe : 81) + 28,
     );
+    const headerBottom = header ? Math.ceil(header.getBoundingClientRect().bottom) : 0;
     return {
       fringeHeight,
+      headerBottom,
       headerHeight,
       innerH: window.innerHeight,
       scrollHeight: document.documentElement.scrollHeight,
     };
+  });
+}
+
+async function collectHeadings(page) {
+  return await page.evaluate(() => {
+    const nodes = [
+      ...document.querySelectorAll(
+        'h1, h2, h3, h4, h5, h6, [role="heading"], [data-now-playing-title], [data-now-playing-artist]',
+      ),
+    ];
+    return nodes
+      .map((el) => {
+        const box = el.getBoundingClientRect();
+        const style = getComputedStyle(el);
+        const text = (el.innerText || '').replace(/\s+/g, ' ').trim().slice(0, 80);
+        if (!text || box.width < 2 || box.height < 2 || style.visibility === 'hidden') {
+          return null;
+        }
+        const sticky =
+          style.position === 'sticky' ||
+          style.position === 'fixed' ||
+          Boolean(el.closest('header, [data-site-header]'));
+        const docY = sticky ? box.y : window.scrollY + box.y;
+        return {
+          height: box.height,
+          id: `${text}@${Math.round(docY)}`,
+          sticky,
+          y: box.y,
+        };
+      })
+      .filter(Boolean);
   });
 }
 
@@ -124,9 +161,11 @@ async function filmstripPage(page, { url, width, height, dpr = 2 }) {
 
   const metrics = await measureChrome(page);
   const vh = metrics.innerH || height;
-  const planned = planFilmstripStops(metrics.scrollHeight, vh);
+  const headerBottom = metrics.headerBottom ?? metrics.headerHeight ?? 0;
+  const planned = planFilmstripStops(metrics.scrollHeight, vh, headerBottom);
   const stops = [];
   const pngs = [];
+  const headingShots = [];
 
   for (const desired of planned) {
     const actual = await waitStableScroll(page, desired);
@@ -134,6 +173,13 @@ async function filmstripPage(page, { url, width, height, dpr = 2 }) {
       continue;
     }
     stops.push(actual);
+    const headings = await collectHeadings(page);
+    for (const heading of headings) {
+      headingShots.push({
+        ...heading,
+        visible: headingFullyClearOfChrome(heading, headerBottom, vh),
+      });
+    }
     pngs.push(
       await page.screenshot({
         animations: 'disabled',
@@ -143,6 +189,8 @@ async function filmstripPage(page, { url, width, height, dpr = 2 }) {
       }),
     );
   }
+
+  assertHeadingsClearOfChrome(headingShots);
 
   const sharp = await loadSharp();
   const metas = await Promise.all(pngs.map((buf) => sharp(buf).metadata()));
@@ -168,7 +216,14 @@ async function filmstripPage(page, { url, width, height, dpr = 2 }) {
     .png()
     .toBuffer();
 
-  return { metrics, png, pngs, stops };
+  return {
+    headerBottom,
+    headings: new Set(headingShots.filter((shot) => !shot.sticky).map((shot) => shot.id)).size,
+    metrics,
+    png,
+    pngs,
+    stops,
+  };
 }
 
 function writeRetry(path, buf, tries = 4) {
@@ -232,6 +287,11 @@ try {
     const prefix = job.route ? `final3-${job.route}-${job.width}` : job.name.replace(/\.png$/, '');
     process.stdout.write(`filmstrip ${prefix} ${job.url} ${job.width}x${job.height}\n`);
     const result = await filmstripPage(page, { dpr: args.dpr, ...job });
+    for (let n = result.pngs.length + 1; n <= 12; n += 1) {
+      for (const dir of [OUT, STORE]) {
+        rmSync(join(dir, `${prefix}-s${n}.png`), { force: true });
+      }
+    }
     result.pngs.forEach((buf, index) => {
       writeBoth(`${prefix}-s${index + 1}.png`, buf);
     });
@@ -241,6 +301,8 @@ try {
         bytes: result.png.length,
         check: 'passed',
         frames: result.stops.map((y, index) => ({ n: index + 1, y: Math.round(y) })),
+        headerBottom: result.headerBottom,
+        headings: result.headings,
         metrics: result.metrics,
         name: job.route ? `${prefix}-filmstrip.png` : job.name,
       })}\n`,

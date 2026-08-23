@@ -199,24 +199,75 @@ export function stitchOffsets(frames: ReadonlyArray<StitchFrame>): ReadonlyArray
   return offsets;
 }
 
+/** Overlap between consecutive filmstrip viewports, below the sticky header. */
+export const FILMSTRIP_HEADER_GAP_PX = 16;
+
 /**
- * True viewport stops for a filmstrip. A stitched PNG cannot honestly show a
- * fixed photographic plate, so we keep each settled viewport intact.
+ * True viewport stops for a filmstrip. Step is `vh − headerBottom − 16` so
+ * the band under the sticky header in frame n was fully visible in frame n−1.
+ * Last stop is always page end.
  */
 export function planFilmstripStops(
   scrollHeight: number,
   viewportHeight: number,
+  headerBottom = 0,
 ): ReadonlyArray<number> {
   if (viewportHeight <= 0 || scrollHeight <= 0) {
     throw new StitchSeamError(`invalid metrics vh=${viewportHeight} sh=${scrollHeight}`);
   }
   const maxScroll = Math.max(0, scrollHeight - viewportHeight);
+  const step = Math.max(1, viewportHeight - Math.max(0, headerBottom) - FILMSTRIP_HEADER_GAP_PX);
   const stops = [0];
-  for (let y = viewportHeight; y < maxScroll - 1; y += viewportHeight) {
+  for (let y = step; y < maxScroll - 1; y += step) {
     stops.push(y);
   }
   if (maxScroll > 0 && stops.at(-1) !== maxScroll) {
     stops.push(maxScroll);
   }
   return stops;
+}
+
+export type FilmstripHeadingShot = {
+  height: number;
+  id: string;
+  sticky: boolean;
+  y: number;
+};
+
+/** True when the heading sits fully in the content band of this viewport. */
+export function headingFullyClearOfChrome(
+  heading: FilmstripHeadingShot,
+  headerBottom: number,
+  viewportHeight: number,
+): boolean {
+  if (heading.sticky) {
+    return false;
+  }
+  return heading.y >= headerBottom && heading.y + heading.height <= viewportHeight + 0.5;
+}
+
+/**
+ * Every content heading must be fully below the sticky header and above the
+ * viewport bottom in at least one filmstrip stop.
+ */
+export function assertHeadingsClearOfChrome(
+  shots: ReadonlyArray<FilmstripHeadingShot & { visible: boolean }>,
+): void {
+  const ids = new Set<string>();
+  const seen = new Set<string>();
+  for (const shot of shots) {
+    if (shot.sticky) {
+      continue;
+    }
+    ids.add(shot.id);
+    if (shot.visible) {
+      seen.add(shot.id);
+    }
+  }
+  const missing = [...ids].filter((id) => !seen.has(id));
+  if (missing.length > 0) {
+    throw new StitchSeamError(
+      `heading never fully clear of the header: ${missing.slice(0, 8).join(', ')}`,
+    );
+  }
 }
