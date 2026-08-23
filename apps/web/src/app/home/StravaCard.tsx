@@ -30,19 +30,10 @@ const cardSx: SxObject = {
     '--route-line': '#f0701a',
     '--route-line-filter': 'drop-shadow(0 1px 3px rgb(0 0 0 / 0.25))',
     '--route-stroke-width': 4,
-    '&::after': {
-      borderRadius: 'inherit',
-      boxShadow:
-        'inset 0 1.5px 0 color-mix(in srgb, white 82%, transparent), inset 0 0 0 1px color-mix(in srgb, white 34%, transparent), inset 0 -1px 0 color-mix(in srgb, black 6%, transparent)',
-      content: '""',
-      inset: 0,
-      pointerEvents: 'none',
-      position: 'absolute',
-      zIndex: 4,
-    },
     height: '100%',
     maxWidth: 'none',
     minHeight: '13.5rem',
+    overflow: 'hidden',
     width: '100%',
   },
   padding: 0,
@@ -51,6 +42,7 @@ const cardSx: SxObject = {
 const layoutStackSx: SxObject = {
   '[data-greenhouse-frame] &': {
     justifyContent: 'flex-start',
+    padding: 1.5,
     textShadow: 'none',
   },
   gap: 2,
@@ -112,14 +104,10 @@ const activityNameSx: SxObject = {
 };
 
 const mapSx: SxObject = {
-  '[data-greenhouse-frame] &': {
-    borderRadius: 'inherit',
-    inset: '5px',
-    opacity: 0.84,
-    overflow: 'hidden',
-  },
+  height: '100%',
   inset: 0,
   position: 'absolute',
+  width: '100%',
   zIndex: 0,
 };
 

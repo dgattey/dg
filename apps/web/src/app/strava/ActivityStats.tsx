@@ -42,20 +42,21 @@ const iconSx: SxObject = {
 
 const distanceSx: SxObject = {
   '[data-greenhouse-frame] &': {
-    fontSize: '0.92rem',
-    fontWeight: 700,
-    letterSpacing: '-0.02em',
-    lineHeight: 1.15,
+    display: 'none',
   },
+};
+
+const greenhouseDistanceSx: SxObject = {
+  '[data-greenhouse-frame] &': {
+    display: 'block',
+  },
+  display: 'none',
 };
 
 const movingSx: SxObject = {
   '[data-greenhouse-frame] &': {
     color: 'var(--mui-palette-text-secondary)',
     display: 'block',
-    fontSize: '0.72rem',
-    fontWeight: 500,
-    lineHeight: 1.2,
   },
   display: 'none',
 };
@@ -90,6 +91,9 @@ export function ActivityStats({ activity }: { activity: StravaActivity | null })
             <FaIcon icon={faStrava} />
           </Box>
           <Typography data-activity-distance="" sx={distanceSx} variant="caption">
+            {distance}
+          </Typography>
+          <Typography data-activity-distance-greenhouse="" sx={greenhouseDistanceSx} variant="h5">
             {distance}
           </Typography>
           {movingTime ? (

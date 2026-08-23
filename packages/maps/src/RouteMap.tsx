@@ -7,11 +7,15 @@ import { Box } from '@mui/material';
 import type { Point } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { fitRouteViewport, projectRouteToPixels, toSvgPath } from './routeGeometry';
+import {
+  CARD_ROUTE_PADDING,
+  fitRouteViewport,
+  projectRouteToPixels,
+  toSvgPath,
+} from './routeGeometry';
 import { SmoothTile } from './SmoothTile';
 import { TopoBasemap } from './TopoBasemap';
 
-const ROUTE_PADDING = 42;
 const DEFAULT_SIZE = 320;
 
 const paperMix = (percent: number) =>
@@ -153,7 +157,7 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
   const dark = preference === 'dark' || (preference === 'system' && systemDark);
   const viewport = fitRouteViewport({
     height: size.height,
-    padding: ROUTE_PADDING,
+    padding: CARD_ROUTE_PADDING,
     points,
     width: size.width,
   });

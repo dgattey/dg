@@ -4,6 +4,9 @@ const TILE_SIZE = 256;
 const MAX_MERCATOR_LATITUDE = 85.051_128_78;
 const DEFAULT_ROUTE_ZOOM = 15;
 
+/** Pixel inset used when fitting a route to a card. Belongs to the viewport, not the container. */
+export const CARD_ROUTE_PADDING = 42;
+
 export type ProjectedPoint = {
   x: number;
   y: number;

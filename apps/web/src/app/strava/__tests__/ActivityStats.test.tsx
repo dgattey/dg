@@ -35,7 +35,9 @@ describe('ActivityStats', () => {
       { wrapper: TestWrapper },
     );
 
-    expect(screen.getByText('6.2 miles')).toBeInTheDocument();
+    expect(
+      screen.getByText('6.2 miles', { selector: '[data-activity-distance]' }),
+    ).toBeInTheDocument();
     expect(screen.getByText('2 days ago')).toBeInTheDocument();
   });
 
@@ -81,7 +83,7 @@ describe('ActivityStats', () => {
       { wrapper: TestWrapper },
     );
 
-    expect(screen.getByText('18.4 miles')).toBeVisible();
+    expect(screen.getByRole('heading', { name: '18.4 miles' })).toBeVisible();
     expect(screen.getByText('2h 07m')).toBeVisible();
     expect(screen.getByText('2 days ago')).not.toBeVisible();
   });
