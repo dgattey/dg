@@ -10,12 +10,14 @@ import { GatteySitesCard } from './GatteySitesCard';
  */
 export async function GatteySitesCardSlot({
   fixture,
+  variant = 'list',
 }: {
   fixture?: ReadonlyArray<RenderableSideProject>;
+  variant?: 'list' | 'rows';
 } = {}) {
   const projects = fixture ?? (await getSideProjects());
   if (projects.length === 0) {
     return null;
   }
-  return <GatteySitesCard projects={projects} />;
+  return <GatteySitesCard projects={projects} variant={variant} />;
 }

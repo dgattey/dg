@@ -58,4 +58,21 @@ describe('GatteySitesCard', () => {
     const { container } = render(<GatteySitesCard projects={[]} />);
     expect(container).toBeEmptyDOMElement();
   });
+
+  it('keeps h6 titles on the flag-off list', () => {
+    render(<GatteySitesCard projects={projects} />);
+    expect(screen.getByText('WMM')).toHaveClass('MuiTypography-h6');
+    expect(screen.getByText('See what you own and where it sits')).toHaveClass(
+      'MuiTypography-body2',
+    );
+  });
+
+  it('uses h5 titles and caption descriptions on greenhouse rows', () => {
+    render(<GatteySitesCard projects={projects} variant="rows" />);
+
+    expect(screen.getByText('WMM')).toHaveClass('MuiTypography-h5');
+    expect(screen.getByText('See what you own and where it sits')).toHaveClass(
+      'MuiTypography-caption',
+    );
+  });
 });

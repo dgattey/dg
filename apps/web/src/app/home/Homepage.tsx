@@ -61,8 +61,8 @@ export async function Homepage({
         {rest.map((project) => (
           <ProjectCard eyebrow="Project" key={project.title} variant="featured" {...project} />
         ))}
-        <MapCardSlot key="map" />
-        <GatteySitesCardSlot key="gattey-sites" />
+        <MapCardSlot key="map" variant="location" />
+        <GatteySitesCardSlot key="gattey-sites" variant="rows" />
       </Grid>
     );
   }

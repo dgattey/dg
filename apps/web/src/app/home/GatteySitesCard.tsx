@@ -10,9 +10,26 @@ import { getShape } from '@dg/ui/theme/shape';
 import { Box, Stack, Typography } from '@mui/material';
 import { ArrowUpRight } from 'lucide-react';
 
+type GatteySitesCardVariant = 'list' | 'rows';
+
 type GatteySitesCardProps = {
   projects: ReadonlyArray<RenderableSideProject>;
+  /**
+   * `list` is flag-off (h6 / body2). `rows` matches greenhouse music list
+   * rows (h5 / caption).
+   */
+  variant?: GatteySitesCardVariant;
 };
+
+const TITLE_VARIANT = {
+  list: 'h6',
+  rows: 'h5',
+} as const;
+
+const DESCRIPTION_VARIANT = {
+  list: 'body2',
+  rows: 'caption',
+} as const;
 
 const MARK_ROLE = 'side-project-mark';
 
@@ -101,10 +118,13 @@ const markSizes = {
 /**
  * Mid-grid collection of independently linked side projects.
  */
-export function GatteySitesCard({ projects }: GatteySitesCardProps) {
+export function GatteySitesCard({ projects, variant = 'list' }: GatteySitesCardProps) {
   if (projects.length === 0) {
     return null;
   }
+
+  const titleVariant = TITLE_VARIANT[variant];
+  const descriptionVariant = DESCRIPTION_VARIANT[variant];
 
   return (
     <ContentCard sx={cardSx}>
@@ -127,10 +147,14 @@ export function GatteySitesCard({ projects }: GatteySitesCardProps) {
                   />
                 </Box>
                 <Stack sx={projectTextSx}>
-                  <Typography component="span" variant="h6">
+                  <Typography component="span" variant={titleVariant}>
                     {title}
                   </Typography>
-                  <Typography component="span" sx={projectDescriptionSx} variant="body2">
+                  <Typography
+                    component="span"
+                    sx={projectDescriptionSx}
+                    variant={descriptionVariant}
+                  >
                     {description}
                   </Typography>
                 </Stack>
