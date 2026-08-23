@@ -52,8 +52,10 @@ describe('route geometry', () => {
   });
 
   it.each([
+    { height: 360, name: 'desktop 16:9 card', width: 640 },
     { height: 255, name: 'desktop greenhouse cell', width: 460 },
     { height: 255, name: 'tablet greenhouse cell', width: 300 },
+    { height: 300, name: 'mobile 4:3 card', width: 400 },
     { height: 220, name: 'mobile full-width card', width: 390 },
   ])('keeps the OSRM park loop inside $name with card padding', ({ height, width }) => {
     const points = decodePolyline(OSRM_GGP);
@@ -66,6 +68,32 @@ describe('route geometry', () => {
       expect(y).toBeGreaterThanOrEqual(padding - 0.001);
       expect(y).toBeLessThanOrEqual(height - padding + 0.001);
     }
+  });
+
+  it('keeps the OSRM park loop uniformly tall in 16:9 and 4:3 cards', () => {
+    const points = decodePolyline(OSRM_GGP);
+    const boxes = [
+      { height: 360, width: 640 },
+      { height: 300, width: 400 },
+    ] as const;
+
+    const aspects = boxes.map(({ height, width }) => {
+      const viewport = fitRouteViewport({
+        height,
+        padding: CARD_ROUTE_PADDING,
+        points,
+        width,
+      });
+      const pixels = projectRouteToPixels({ ...viewport, height, points, width });
+      const xs = pixels.map(({ x }) => x);
+      const ys = pixels.map(({ y }) => y);
+      const spanX = Math.max(...xs) - Math.min(...xs);
+      const spanY = Math.max(...ys) - Math.min(...ys);
+      expect(spanY).toBeGreaterThan(height * 0.28);
+      return spanX / spanY;
+    });
+
+    expect(Math.abs(aspects[0]! - aspects[1]!) / aspects[0]!).toBeLessThan(0.12);
   });
 
   it('uses a close zoom for a single-point route', () => {

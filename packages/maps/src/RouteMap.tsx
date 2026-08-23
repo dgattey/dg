@@ -16,7 +16,7 @@ import {
 import { SmoothTile } from './SmoothTile';
 import { TopoBasemap } from './TopoBasemap';
 
-const DEFAULT_SIZE = 320;
+const DEFAULT_SIZE = { height: 180, width: 320 };
 
 const paperMix = (percent: number) =>
   `color-mix(in srgb, var(--mui-palette-background-paper) ${percent}%, transparent)`;
@@ -147,7 +147,7 @@ export type RouteMapProps = {
 /** A non-interactive, theme-aware route map intended for card backgrounds. */
 export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ height: DEFAULT_SIZE, width: DEFAULT_SIZE });
+  const [size, setSize] = useState(DEFAULT_SIZE);
   const { preference } = useColorScheme();
   const systemDark = useSyncExternalStore(
     subscribeToSystemDark,
@@ -181,9 +181,14 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
     }
 
     const updateSize = () => {
-      const { height, width } = element.getBoundingClientRect();
+      const width = element.clientWidth;
+      const height = element.clientHeight;
       if (height > 0 && width > 0) {
-        setSize({ height, width });
+        setSize((current) =>
+          Math.abs(current.width - width) < 0.5 && Math.abs(current.height - height) < 0.5
+            ? current
+            : { height, width },
+        );
       }
     };
     updateSize();
@@ -247,7 +252,12 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
         </Box>
       ) : null}
       <Box sx={getScrimSx(dark)} />
-      <Box component="svg" sx={routeSvgSx} viewBox={`0 0 ${size.width} ${size.height}`}>
+      <Box
+        component="svg"
+        preserveAspectRatio="xMidYMid meet"
+        sx={routeSvgSx}
+        viewBox={`0 0 ${size.width} ${size.height}`}
+      >
         <Box
           component="path"
           d={routePath}

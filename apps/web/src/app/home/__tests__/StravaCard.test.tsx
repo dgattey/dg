@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import { render, screen } from '@testing-library/react';
 import { StravaCard } from '../StravaCard';
@@ -54,5 +56,14 @@ describe('StravaCard', () => {
     );
 
     expect(screen.getByTestId('route-map')).toHaveAttribute('data-polyline', 'summary-route');
+  });
+
+  it('locks the greenhouse card to a stable map aspect so the grid row cannot squash it', () => {
+    const source = readFileSync(join(__dirname, '../StravaCard.tsx'), 'utf8');
+    expect(source).toContain("'16 / 9'");
+    expect(source).toContain("'4 / 3'");
+    expect(source).toContain("height: 'auto !important'");
+    expect(source).toContain("display: 'grid'");
+    expect(source).toContain("position: 'relative'");
   });
 });

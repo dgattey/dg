@@ -74,7 +74,7 @@ export function TopoBasemap({
     <Box
       aria-hidden="true"
       component="svg"
-      preserveAspectRatio="xMidYMid slice"
+      preserveAspectRatio="xMidYMid meet"
       sx={topoBasemapSx}
       viewBox={`0 0 ${width} ${height}`}
     >

@@ -22,7 +22,9 @@ const scrimMix = (light: number, dark: number) =>
   `light-dark(${paperMix(light)}, rgb(0 0 0 / ${dark / 100}))`;
 
 const cardSx: SxObject = {
-  '[data-greenhouse-frame] &': {
+  // Attribute on this card so we beat `.cell [data-bento] { height: 100% }`
+  // without touching GreenhouseGrid. Width + height together drop aspect-ratio.
+  '[data-greenhouse-frame] &[data-bento="activity"]': {
     '--map-scrim-opacity': 0.04,
     // Brand route hue at full saturation — reads as Strava orange, not burnt sienna.
     '--route-casing': '#fff8ec',
@@ -30,10 +32,14 @@ const cardSx: SxObject = {
     '--route-line': '#f0701a',
     '--route-line-filter': 'drop-shadow(0 1px 3px rgb(0 0 0 / 0.25))',
     '--route-stroke-width': 4,
+    aspectRatio: { md: '16 / 9', xs: '4 / 3' },
     border: 'none',
-    height: '100%',
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 1fr)',
+    gridTemplateRows: 'minmax(0, 1fr)',
+    height: 'auto !important',
     maxWidth: 'none',
-    minHeight: '13.5rem',
+    minHeight: 0,
     overflow: 'hidden',
     width: '100%',
   },
@@ -42,9 +48,13 @@ const cardSx: SxObject = {
 
 const layoutStackSx: SxObject = {
   '[data-greenhouse-frame] &': {
+    gridArea: '1 / 1',
+    height: '100%',
     justifyContent: 'flex-start',
+    minHeight: 0,
     padding: 1.5,
     textShadow: 'none',
+    width: '100%',
   },
   gap: 2,
   height: '100%',
@@ -105,6 +115,14 @@ const activityNameSx: SxObject = {
 };
 
 const mapSx: SxObject = {
+  '[data-greenhouse-frame] &': {
+    gridArea: '1 / 1',
+    height: '100%',
+    inset: 'auto',
+    minHeight: 0,
+    position: 'relative',
+    width: '100%',
+  },
   height: '100%',
   inset: 0,
   position: 'absolute',
