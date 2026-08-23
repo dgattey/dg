@@ -57,6 +57,9 @@ const SPECIES = {
   'leaf-calathea': 'calathea-1024.avif',
   'leaf-monstera': 'monstera-1024.avif',
   'leaf-nerve': 'nerve-1024.avif',
+  'leaf-pothos': 'pothos-1024.avif',
+  'leaf-prayer': 'prayer-1024.avif',
+  'leaf-zz': 'zz-1024.avif',
 } as const satisfies Record<LeafSymbol, string>;
 
 describe('greenhouse foliage safe zones', () => {
@@ -66,6 +69,9 @@ describe('greenhouse foliage safe zones', () => {
       'leaf-calathea': await loadAlpha(join(foliageDir, SPECIES['leaf-calathea'])),
       'leaf-monstera': await loadAlpha(join(foliageDir, SPECIES['leaf-monstera'])),
       'leaf-nerve': await loadAlpha(join(foliageDir, SPECIES['leaf-nerve'])),
+      'leaf-pothos': await loadAlpha(join(foliageDir, SPECIES['leaf-pothos'])),
+      'leaf-prayer': await loadAlpha(join(foliageDir, SPECIES['leaf-prayer'])),
+      'leaf-zz': await loadAlpha(join(foliageDir, SPECIES['leaf-zz'])),
     };
 
     for (const size of FOLIAGE_SAFE_VIEWPORTS) {

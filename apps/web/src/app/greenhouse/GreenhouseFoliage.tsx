@@ -4,6 +4,8 @@ import plate960Avif from './atmosphere/back-plate-960.avif';
 import plate960Webp from './atmosphere/back-plate-960.webp';
 import plate1536Avif from './atmosphere/back-plate-1536.avif';
 import plate1536Webp from './atmosphere/back-plate-1536.webp';
+import plate2560Avif from './atmosphere/back-plate-2560.avif';
+import plate2560Webp from './atmosphere/back-plate-2560.webp';
 import platePortraitAvif from './atmosphere/back-plate-portrait.avif';
 import platePortraitWebp from './atmosphere/back-plate-portrait.webp';
 import platePortrait768Avif from './atmosphere/back-plate-portrait-768.avif';
@@ -14,11 +16,12 @@ const src = (asset: { src: string }) => asset.src;
 
 /**
  * Photographic back plate. Portrait glass on phones; landscape otherwise.
- * 768/960 are 1× candidates; 1536 is the native source cap (2× of ~768 CSS).
+ * 768/960 are 1× candidates; 1536 is the native source. 2560 is a
+ * lanczos upsample so 1440×2× is not stretched past 1.25×.
  */
 export function GreenhouseBackPlate() {
-  const landscapeAvif = `${src(plate768Avif)} 768w, ${src(plate960Avif)} 960w, ${src(plate1536Avif)} 1536w`;
-  const landscapeWebp = `${src(plate768Webp)} 768w, ${src(plate960Webp)} 960w, ${src(plate1536Webp)} 1536w`;
+  const landscapeAvif = `${src(plate768Avif)} 768w, ${src(plate960Avif)} 960w, ${src(plate1536Avif)} 1536w, ${src(plate2560Avif)} 2560w`;
+  const landscapeWebp = `${src(plate768Webp)} 768w, ${src(plate960Webp)} 960w, ${src(plate1536Webp)} 1536w, ${src(plate2560Webp)} 2560w`;
   const portraitAvif = `${src(platePortrait768Avif)} 768w, ${src(platePortraitAvif)} 1024w`;
   const portraitWebp = `${src(platePortrait768Webp)} 768w, ${src(platePortraitWebp)} 1024w`;
   return (

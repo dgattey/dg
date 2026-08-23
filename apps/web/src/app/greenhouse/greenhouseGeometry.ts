@@ -1,5 +1,6 @@
 import type { GreenhouseSurface, LeafSymbol, PlantInstance } from './greenhouseLayout';
 import { plantsVisibleAt } from './greenhouseLayout';
+import { musicLiveWells } from './greenhouseMusicWells';
 
 export type GreenhouseViewportName =
   | 'phone360'
@@ -96,6 +97,9 @@ export const LEAF_ASPECT: Record<LeafSymbol, number> = {
   'leaf-calathea': 1024 / 683,
   'leaf-monstera': 1024 / 1536,
   'leaf-nerve': 1024 / 683,
+  'leaf-pothos': 1024 / 1536,
+  'leaf-prayer': 1024 / 683,
+  'leaf-zz': 1024 / 1536,
 };
 
 /**
@@ -105,10 +109,13 @@ export const LEAF_OPAQUE_INSET: Record<
   LeafSymbol,
   { bottom: number; left: number; right: number; top: number }
 > = {
-  'leaf-bop': { bottom: 0.001, left: 0.056, right: 0.175, top: 0.066 },
-  'leaf-calathea': { bottom: 0.001, left: 0.023, right: 0.069, top: 0.176 },
-  'leaf-monstera': { bottom: 0.059, left: 0.001, right: 0.046, top: 0.061 },
-  'leaf-nerve': { bottom: 0.154, left: 0.084, right: 0.071, top: 0.135 },
+  'leaf-bop': { bottom: 0.001, left: 0.056, right: 0.174, top: 0.066 },
+  'leaf-calathea': { bottom: 0, left: 0.023, right: 0.068, top: 0.176 },
+  'leaf-monstera': { bottom: 0.059, left: 0.001, right: 0.045, top: 0.061 },
+  'leaf-nerve': { bottom: 0.152, left: 0.084, right: 0.07, top: 0.135 },
+  'leaf-pothos': { bottom: 0.045, left: 0.125, right: 0.101, top: 0.066 },
+  'leaf-prayer': { bottom: 0.048, left: 0.048, right: 0.072, top: 0.085 },
+  'leaf-zz': { bottom: 0.087, left: 0.018, right: 0.019, top: 0.082 },
 };
 
 /**
@@ -513,31 +520,13 @@ export function homeSafeRects(viewport: GreenhouseViewportName): ReadonlyArray<N
 }
 
 /**
- * Listening heading + On repeat eyebrow. The heading sits in the span-4
- * intro cell; body1 is `36ch`. Plants must stay out of these.
+ * Live-DOM copy wells: every `[data-greenhouse-cell]` plus the page
+ * heading and On repeat eyebrow. Snapshots live in `greenhouseMusicWells`.
  */
 export function musicCopyRects(viewport: ViewportSize): Array<NamedRect> {
-  const left = contentInset(viewport.width);
-  const copyX = left + 8;
-  if (viewport.width < SM_BREAKPOINT) {
-    const width = Math.max(80, viewport.width - copyX - left);
-    return [
-      { height: 120, id: 'music-heading', width: Math.min(220, width), x: copyX, y: 96 },
-      { height: 36, id: 'music-on-repeat', width: Math.min(180, width), x: copyX, y: 560 },
-    ];
-  }
-  const contentW = viewport.width - left * 2;
-  const introW = (contentW * 4) / 12;
-  return [
-    {
-      height: 130,
-      id: 'music-heading',
-      width: Math.max(120, Math.min(36 * 10, introW - 16)),
-      x: copyX,
-      y: 200,
-    },
-    { height: 40, id: 'music-on-repeat', width: 200, x: copyX, y: 336 },
-  ];
+  const fringe =
+    viewport.width < SM_BREAKPOINT ? DENSE_FOLIAGE_MOBILE_MAX : DENSE_FOLIAGE_DESKTOP_MAX;
+  return [...musicLiveWells(viewport, fringe)];
 }
 
 /**
@@ -554,12 +543,11 @@ export function surfaceSafeRectsForSize(
   surface: GreenhouseSurface,
   size: ViewportSize,
 ): ReadonlyArray<NamedRect> {
+  if (surface === 'music') {
+    return [...musicCopyRects(size), headerBarRect(size)];
+  }
   const fringe = size.width < SM_BREAKPOINT ? DENSE_FOLIAGE_MOBILE_MAX : DENSE_FOLIAGE_DESKTOP_MAX;
-  const wells =
-    surface === 'home'
-      ? homeSafeRectsForSize(size)
-      : [...musicCopyRects(size), headerBarRect(size)];
-  return wells.filter((well) => well.y + 8 < size.height - fringe);
+  return homeSafeRectsForSize(size).filter((well) => well.y + 8 < size.height - fringe);
 }
 
 export function plantSafeZoneHits(

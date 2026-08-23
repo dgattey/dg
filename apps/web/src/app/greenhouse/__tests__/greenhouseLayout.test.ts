@@ -17,7 +17,7 @@ import {
 } from '../greenhouseGeometry';
 import { LEAF_SYMBOLS, layoutGreenhousePlants, plantsVisibleAt } from '../greenhouseLayout';
 
-function bottomNeighborsMatch(
+function bottomNeighborsShareSpecies(
   plants: ReturnType<typeof layoutGreenhousePlants>,
   width: number,
 ): boolean {
@@ -26,10 +26,22 @@ function bottomNeighborsMatch(
     .toSorted((a, b) => a.x - b.x);
   return bottom.some((plant, index) => {
     const prev = bottom[index - 1];
-    return (
-      prev != null && prev.symbol === plant.symbol && Boolean(prev.flip) === Boolean(plant.flip)
-    );
+    return prev != null && prev.symbol === plant.symbol;
   });
+}
+
+function speciesRepeatAt(
+  plants: ReturnType<typeof layoutGreenhousePlants>,
+  width: number,
+): boolean {
+  const seen = new Set<string>();
+  for (const plant of plantsVisibleAt(plants, width)) {
+    if (seen.has(plant.symbol)) {
+      return true;
+    }
+    seen.add(plant.symbol);
+  }
+  return false;
 }
 
 function denseBottomPx(
@@ -64,6 +76,9 @@ describe('greenhouseLayout', () => {
     expect(plants.some((plant) => plant.symbol === 'leaf-bop')).toBe(true);
     expect(plants.some((plant) => plant.symbol === 'leaf-calathea')).toBe(true);
     expect(plants.some((plant) => plant.symbol === 'leaf-nerve')).toBe(true);
+    expect(plants.some((plant) => plant.symbol === 'leaf-pothos')).toBe(true);
+    expect(plants.some((plant) => plant.symbol === 'leaf-prayer')).toBe(true);
+    expect(plants.some((plant) => plant.symbol === 'leaf-zz')).toBe(true);
   });
 
   it('keeps mobile foliage on the bottom and one right peek', () => {
@@ -112,10 +127,21 @@ describe('greenhouseLayout', () => {
     }
   });
 
-  it('varies symbol or flip so no two bottom neighbors match', () => {
-    expect(bottomNeighborsMatch(layoutGreenhousePlants('home'), 1440)).toBe(false);
-    expect(bottomNeighborsMatch(layoutGreenhousePlants('home', 0, 'mobile'), 390)).toBe(false);
-    expect(bottomNeighborsMatch(layoutGreenhousePlants('music'), 1440)).toBe(false);
+  it('never lets two bottom neighbors share a species', () => {
+    for (const width of [360, 390, 768, 1024, 1440, 1920, 2560]) {
+      const viewport = width < 576 ? 'mobile' : 'desktop';
+      expect(bottomNeighborsShareSpecies(layoutGreenhousePlants('home', 0, viewport), width)).toBe(
+        false,
+      );
+      expect(bottomNeighborsShareSpecies(layoutGreenhousePlants('music', 0, viewport), width)).toBe(
+        false,
+      );
+    }
+  });
+
+  it('does not repeat a species within one 1440 viewport', () => {
+    expect(speciesRepeatAt(layoutGreenhousePlants('home'), 1440)).toBe(false);
+    expect(speciesRepeatAt(layoutGreenhousePlants('music'), 1440)).toBe(false);
   });
 });
 
@@ -178,7 +204,12 @@ describe('greenhouse safe zones', () => {
     }
     expect(surfaceSafeRects('music', 'desktop').map((rect) => rect.id)).toEqual([
       'music-heading',
+      'cell-intro',
+      'cell-now-playing',
+      'cell-albums',
       'music-on-repeat',
+      'cell-tracks',
+      'cell-artists',
       'header-bar',
     ]);
     expect(plantSafeZoneHits(plants, 'desktop', 'music')).toEqual([]);

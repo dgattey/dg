@@ -10,6 +10,9 @@ const CUTOUT_1024 = [
   'calathea-1024.avif',
   'monstera-1024.avif',
   'nerve-1024.avif',
+  'pothos-1024.avif',
+  'prayer-1024.avif',
+  'zz-1024.avif',
 ] as const;
 
 describe('greenhouse chrome', () => {
@@ -52,16 +55,17 @@ describe('greenhouse chrome', () => {
     expect(css).toContain('.sideStack');
   });
 
-  it('keeps four keyed cutouts and stays under the desktop chrome budget', () => {
+  it('keeps seven keyed cutouts and stays under the desktop chrome budget', () => {
     const files = readdirSync(foliageDir);
     const avifs = files.filter((name) => name.endsWith('-1024.avif'));
     expect(avifs.sort()).toEqual([...CUTOUT_1024]);
-    const plate = statSync(join(atmosphereDir, 'back-plate-1536.avif')).size;
+    const plate1536 = statSync(join(atmosphereDir, 'back-plate-1536.avif')).size;
+    const plate2560 = statSync(join(atmosphereDir, 'back-plate-2560.avif')).size;
     const cutouts = CUTOUT_1024.reduce(
       (sum, name) => sum + statSync(join(foliageDir, name)).size,
       0,
     );
-    expect(plate + cutouts).toBeLessThanOrEqual(400 * 1024);
+    expect(Math.max(plate1536, plate2560) + cutouts).toBeLessThanOrEqual(400 * 1024);
   });
 
   it('does not ship the crushed glass raster or a punched plant plate', () => {
@@ -98,6 +102,7 @@ describe('greenhouse chrome', () => {
     expect(foliage).toContain('(max-width: 767px)');
     expect(foliage).toContain('srcSet');
     expect(foliage).toContain('1536w');
+    expect(foliage).toContain('2560w');
     expect(plants).not.toContain('<use');
     expect(plants).not.toContain('preserveAspectRatio="none"');
   });
@@ -121,5 +126,6 @@ describe('greenhouse chrome', () => {
   it('ships a 1x plate ladder so 2x screens can pick the native source cap', () => {
     expect(existsSync(join(atmosphereDir, 'back-plate-768.avif'))).toBe(true);
     expect(existsSync(join(atmosphereDir, 'back-plate-portrait-768.avif'))).toBe(true);
+    expect(existsSync(join(atmosphereDir, 'back-plate-2560.avif'))).toBe(true);
   });
 });

@@ -15,6 +15,18 @@ import nerve768Avif from './foliage/nerve-768.avif';
 import nerve768Webp from './foliage/nerve-768.webp';
 import nerve1024Avif from './foliage/nerve-1024.avif';
 import nerve1024Webp from './foliage/nerve-1024.webp';
+import pothos768Avif from './foliage/pothos-768.avif';
+import pothos768Webp from './foliage/pothos-768.webp';
+import pothos1024Avif from './foliage/pothos-1024.avif';
+import pothos1024Webp from './foliage/pothos-1024.webp';
+import prayer768Avif from './foliage/prayer-768.avif';
+import prayer768Webp from './foliage/prayer-768.webp';
+import prayer1024Avif from './foliage/prayer-1024.avif';
+import prayer1024Webp from './foliage/prayer-1024.webp';
+import zz768Avif from './foliage/zz-768.avif';
+import zz768Webp from './foliage/zz-768.webp';
+import zz1024Avif from './foliage/zz-1024.avif';
+import zz1024Webp from './foliage/zz-1024.webp';
 import styles from './greenhouse.module.css';
 import { plantMassVmin } from './greenhouseGeometry';
 import type { GreenhouseViewport, LeafSymbol, PlantInstance, PlantLayer } from './greenhouseLayout';
@@ -71,6 +83,30 @@ const FOLIAGE: Partial<Record<LeafSymbol, FoliageSet>> = {
     mobileAvif: src(nerve768Avif).src,
     mobileWebp: src(nerve768Webp).src,
     width: nerve1024Webp.width,
+  },
+  'leaf-pothos': {
+    desktopAvif: src(pothos1024Avif).src,
+    desktopWebp: src(pothos1024Webp).src,
+    height: pothos1024Webp.height,
+    mobileAvif: src(pothos768Avif).src,
+    mobileWebp: src(pothos768Webp).src,
+    width: pothos1024Webp.width,
+  },
+  'leaf-prayer': {
+    desktopAvif: src(prayer1024Avif).src,
+    desktopWebp: src(prayer1024Webp).src,
+    height: prayer1024Webp.height,
+    mobileAvif: src(prayer768Avif).src,
+    mobileWebp: src(prayer768Webp).src,
+    width: prayer1024Webp.width,
+  },
+  'leaf-zz': {
+    desktopAvif: src(zz1024Avif).src,
+    desktopWebp: src(zz1024Webp).src,
+    height: zz1024Webp.height,
+    mobileAvif: src(zz768Avif).src,
+    mobileWebp: src(zz768Webp).src,
+    width: zz1024Webp.width,
   },
 };
 

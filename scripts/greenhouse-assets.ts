@@ -6,14 +6,14 @@
  *   /cursor/stores/bc-a78ceb1c-cd13-4ea5-bacd-55a94f7b77db/media
  *
  * Required dedicated sources:
- *   plant-src-{monstera,bop,calathea,nerve}.png
+ *   plant-src-{monstera,bop,calathea,nerve,pothos,zz,prayer,monstera-side}.png
  *   spike-glass-plate.png (landscape), plate-src-portrait.png
  *
  * Despill is hue-limited so BOP orange and fittonia pink stay saturated.
  * Edges erode 1px.
  *
  * Emits:
- *   atmosphere/back-plate-1536, -960, and -768 (landscape)
+ *   atmosphere/back-plate-1536, -2560, -960, and -768 (landscape)
  *   atmosphere/back-plate-portrait and -portrait-768
  *   foliage/{name}-1024 and -768 cutouts
  *
@@ -50,7 +50,13 @@ const sharp = loadSharp();
 
 const DEFAULT_SRC_DIR = '/cursor/stores/bc-a78ceb1c-cd13-4ea5-bacd-55a94f7b77db/media';
 
-const PLANTS = ['monstera', 'bop', 'calathea', 'nerve'] as const;
+const PLANTS = ['monstera', 'bop', 'calathea', 'nerve', 'pothos', 'zz', 'prayer'] as const;
+
+/** Trailing cutouts are leafier; drop AVIF quality so the set stays ≤ 400KB. */
+const PLANT_QUALITY: Partial<Record<(typeof PLANTS)[number], number>> = {
+  pothos: 22,
+  zz: 26,
+};
 
 const KEY_THRESHOLD = 42;
 const KEY_SOFT = 28;
@@ -147,7 +153,12 @@ async function rawFromSharp(image: import('sharp').Sharp): Promise<Rgba> {
   return { data, height: info.height, width: info.width };
 }
 
-async function encodeKeyedWidth(raw: Rgba, width: number, outBase: string): Promise<void> {
+async function encodeKeyedWidth(
+  raw: Rgba,
+  width: number,
+  outBase: string,
+  quality = 40,
+): Promise<void> {
   const pipeline = () =>
     sharp(raw.data, { raw: { channels: 4, height: raw.height, width: raw.width } }).resize(
       width,
@@ -155,9 +166,7 @@ async function encodeKeyedWidth(raw: Rgba, width: number, outBase: string): Prom
       { fit: 'inside', withoutEnlargement: true },
     );
 
-  const avif = await pipeline()
-    .avif({ chromaSubsampling: '4:4:4', effort: 7, quality: 40 })
-    .toBuffer();
+  const avif = await pipeline().avif({ chromaSubsampling: '4:4:4', effort: 7, quality }).toBuffer();
   const webp = await pipeline().webp({ alphaQuality: 80, quality: 65 }).toBuffer();
   writeFileSync(`${outBase}.avif`, avif);
   writeFileSync(`${outBase}.webp`, webp);
@@ -171,8 +180,15 @@ async function encodeRgbWidth(
   width: number,
   outBase: string,
   targetKb: { max: number; min: number },
+  resize: { allowEnlarge?: boolean; kernel?: 'lanczos3' } = {},
 ): Promise<void> {
-  const resized = sharp(src).resize(width, null, { fit: 'inside', withoutEnlargement: true });
+  const resized = sharp(src)
+    .resize(width, null, {
+      fit: 'inside',
+      kernel: resize.kernel ?? 'lanczos3',
+      withoutEnlargement: resize.allowEnlarge !== true,
+    })
+    .sharpen(resize.allowEnlarge === true ? { m1: 0.6, m2: 0.4, sigma: 0.8 } : undefined);
   let quality = 38;
   let avif = await resized
     .clone()
@@ -238,6 +254,16 @@ async function encodeBackPlates(srcDir: string, outDir: string): Promise<void> {
   );
   await encodeRgbWidth(
     requireSrc(srcDir, 'spike-glass-plate.png'),
+    2560,
+    join(outDir, 'back-plate-2560'),
+    {
+      max: 95,
+      min: 82,
+    },
+    { allowEnlarge: true, kernel: 'lanczos3' },
+  );
+  await encodeRgbWidth(
+    requireSrc(srcDir, 'spike-glass-plate.png'),
     960,
     join(outDir, 'back-plate-960'),
     {
@@ -279,8 +305,9 @@ async function processPlant(name: string, srcDir: string, outDir: string): Promi
   const src = join(srcDir, `plant-src-${name}.png`);
   const keyed = await loadKeyedSource(src);
   process.stdout.write(`${name} ${keyed.width}×${keyed.height}\n`);
-  await encodeKeyedWidth(keyed, 1024, join(outDir, `${name}-1024`));
-  await encodeKeyedWidth(keyed, 768, join(outDir, `${name}-768`));
+  const quality = PLANT_QUALITY[name as (typeof PLANTS)[number]] ?? 40;
+  await encodeKeyedWidth(keyed, 1024, join(outDir, `${name}-1024`), quality);
+  await encodeKeyedWidth(keyed, 768, join(outDir, `${name}-768`), quality);
 }
 
 async function encodeOneXFromExisting(atmosphereDir: string): Promise<void> {
@@ -344,6 +371,10 @@ const STALE_FOLIAGE = [
   'edge-right-900.webp',
   'edge-right-1536.avif',
   'edge-right-1536.webp',
+  'monstera-side-768.avif',
+  'monstera-side-768.webp',
+  'monstera-side-1024.avif',
+  'monstera-side-1024.webp',
 ];
 
 async function main(): Promise<void> {
@@ -366,8 +397,17 @@ async function main(): Promise<void> {
   if (run('plates')) {
     await encodeBackPlates(srcDir, atmosphereDir);
   }
+  const plantOnly =
+    rawArgs
+      .find((arg) => arg.startsWith('--plant='))
+      ?.slice('--plant='.length)
+      .split(',')
+      .filter(Boolean) ?? [];
   if (!skipPlants && run('plants')) {
     for (const name of PLANTS) {
+      if (plantOnly.length > 0 && !plantOnly.includes(name)) {
+        continue;
+      }
       await processPlant(name, srcDir, foliageDir);
     }
   }
