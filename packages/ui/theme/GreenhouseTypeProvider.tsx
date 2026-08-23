@@ -1,13 +1,19 @@
 'use client';
 
 import { Box } from '@mui/material';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { ThemeProvider } from '@mui/material/styles';
 import { getTheme } from '.';
 import { GREENHOUSE_TYPE_VARS, getGreenhouseTypographyOverrides } from './typography';
 
-const greenhouseTheme = createTheme(getTheme(), {
-  typography: getGreenhouseTypographyOverrides(),
-});
+const baseTheme = getTheme();
+const greenhouseOverrides = getGreenhouseTypographyOverrides();
+const greenhouseTheme = {
+  ...baseTheme,
+  typography: {
+    ...baseTheme.typography,
+    ...greenhouseOverrides,
+  },
+};
 
 /**
  * Nested theme for greenhouse chrome only. Flag-off pages never mount this,

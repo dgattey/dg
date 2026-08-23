@@ -43,7 +43,9 @@ const linkSx: SxObject = {
 function isCurrentPath(pathname: string, href: string): boolean {
   const path = normalizeMusicPath(pathname);
   if (href === homeRoute) {
-    return path === homeRoute || path === '/greenhouse/home' || path.startsWith('/greenhouse/m1-shot');
+    return (
+      path === homeRoute || path === '/greenhouse/home' || path.startsWith('/greenhouse/m1-shot')
+    );
   }
   if (href === favoriteAlbumsRoute) {
     return path === favoriteAlbumsRoute || path.startsWith(`${favoriteAlbumsRoute}/`);

@@ -2,8 +2,8 @@
  * @jest-environment jsdom
  */
 
-import { render, screen } from '@testing-library/react';
 import { Typography } from '@mui/material';
+import { render, screen } from '@testing-library/react';
 import { GreenhouseTypeProvider } from '../GreenhouseTypeProvider';
 import { getGreenhouseTypographyOverrides } from '../typography';
 

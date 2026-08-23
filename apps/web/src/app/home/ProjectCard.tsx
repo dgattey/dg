@@ -168,12 +168,7 @@ function FeaturedProjectCard({
           ) : null}
         </Stack>
         {link ? (
-          <Link
-            color="secondary"
-            href={link.url}
-            title={link.title}
-            variant="caption"
-          >
+          <Link color="secondary" href={link.url} title={link.title} variant="caption">
             View project →
           </Link>
         ) : null}

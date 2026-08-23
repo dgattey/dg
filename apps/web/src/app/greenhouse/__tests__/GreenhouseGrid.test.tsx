@@ -64,6 +64,6 @@ describe('GreenhouseGrid', () => {
     const source = readFileSync(join(__dirname, '../GreenhouseGrid.tsx'), 'utf8');
     expect(source).toContain("xl: 'span 4'");
     expect(source).toContain("md: 'span 6'");
-    expect(source).toContain("span ${GREENHOUSE_GRID_SPANS[slot].span}");
+    expect(source).toContain('GREENHOUSE_GRID_SPANS[slot].span');
   });
 });

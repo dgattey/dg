@@ -20,6 +20,10 @@ jest.mock('@dg/ui/theme/useColorScheme', () => ({
   }),
 }));
 
+jest.mock('../SiteHeaderHeight', () => ({
+  SiteHeaderHeight: () => null,
+}));
+
 import { usePathname } from 'next/navigation';
 import { GreenhouseHeader } from '../GreenhouseHeader';
 

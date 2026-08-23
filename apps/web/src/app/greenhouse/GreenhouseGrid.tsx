@@ -1,6 +1,6 @@
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
-import { Children } from 'react';
+import { Children, isValidElement } from 'react';
 import styles from './greenhouse.module.css';
 import { GREENHOUSE_GRID_SPANS, GREENHOUSE_STACKED_SPANS } from './greenhouseGeometry';
 
@@ -57,12 +57,13 @@ export function GreenhouseGrid({ children }: Props) {
     <Box className={styles.grid} data-greenhouse-grid={true}>
       {items.map((child, index) => {
         const slot = SLOTS[index];
+        const childKey = isValidElement(child) && child.key != null ? String(child.key) : slot;
         if (!slot) {
           return (
             <Box
               className={styles.cell}
               data-greenhouse-cell={`more-${index}`}
-              key={`more-${index}`}
+              key={childKey ?? 'extra'}
               sx={extraLayout}
             >
               {child}

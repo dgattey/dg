@@ -11,9 +11,9 @@ export function isGreenhousePreview(): boolean {
  * Greenhouse chrome (header bar, type scale on footer) when the flag is on
  * or when preview photography is forced.
  */
-export async function shouldUseGreenhouseChrome(): Promise<boolean> {
+export function shouldUseGreenhouseChrome(): Promise<boolean> {
   if (isGreenhousePreview()) {
-    return true;
+    return Promise.resolve(true);
   }
   return interactiveRedesign();
 }

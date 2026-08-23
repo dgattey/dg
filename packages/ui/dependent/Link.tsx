@@ -87,6 +87,11 @@ export type BaseLinkProps = {
    * Optional ARIA role for the underlying anchor (e.g. menuitem in a disclosure).
    */
   role?: React.AriaRole;
+
+  /**
+   * Current-page marker for nav landmarks.
+   */
+  'aria-current'?: React.AriaAttributes['aria-current'];
 };
 
 /**
@@ -208,6 +213,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     transitionTypes,
     onClick,
     role,
+    'aria-current': ariaCurrent,
   },
   ref,
 ) {
@@ -222,6 +228,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     title,
   });
   const anchorProps = {
+    'aria-current': ariaCurrent,
     'aria-label': title,
     onClick,
     ref,

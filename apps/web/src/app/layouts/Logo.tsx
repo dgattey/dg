@@ -123,7 +123,9 @@ export function Logo({ appearance = 'classic' }: LogoProps = {}) {
       <Link
         href={homeRoute}
         sx={wordmarkResetSx}
-        transitionTypes={isMusicDestinationPath(pathname) ? pageTransitionTypes('close') : undefined}
+        transitionTypes={
+          isMusicDestinationPath(pathname) ? pageTransitionTypes('close') : undefined
+        }
         variant="h4"
       >
         dg.

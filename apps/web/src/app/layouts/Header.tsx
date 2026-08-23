@@ -11,10 +11,10 @@ import { Suspense } from 'react';
 import { getLatestSong } from '../../services/spotify';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
 import { GreenhouseHeader } from './GreenhouseHeader';
+import { shouldUseGreenhouseChrome } from './greenhouseChrome';
 import { HeaderControls } from './HeaderControls';
 import { Logo } from './Logo';
 import { SiteHeaderHeight } from './SiteHeaderHeight';
-import { shouldUseGreenhouseChrome } from './greenhouseChrome';
 
 // Makes the header bar sticky and not responsive to user events by default
 const stickyContainerSx: SxObject = {
