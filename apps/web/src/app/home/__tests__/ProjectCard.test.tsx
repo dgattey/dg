@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { render, screen } from '@testing-library/react';
 import { ProjectCard } from '../ProjectCard';
 
@@ -41,11 +43,30 @@ describe('ProjectCard', () => {
     expect(screen.getByText('TypeScript')).toBeInTheDocument();
     expect(screen.getByText('React')).toBeInTheDocument();
     expect(screen.getByText('View project →')).toBeInTheDocument();
+    expect(
+      screen.getByText('A quieter way to keep a long-running project honest.'),
+    ).toBeInTheDocument();
   });
 
   it('keeps the featured title as one heading and a single CTA link', () => {
     render(<ProjectCard {...project} variant="featured" />);
     expect(screen.getByRole('heading', { name: 'Flowstate' })).toBeInTheDocument();
     expect(screen.getAllByRole('link')).toHaveLength(1);
+  });
+
+  it('sizes leftover tiles to their copy and keeps the title in one word', () => {
+    const { container } = render(<ProjectCard {...project} eyebrow="Project" variant="tile" />);
+    const title = screen.getByRole('heading', { name: 'Flowstate' });
+    expect(title).toHaveClass('MuiTypography-h4');
+    expect(title).toHaveStyle({ overflowWrap: 'normal' });
+    expect(container.querySelector('[data-bento="project"]')).toBeTruthy();
+    expect(container.querySelector('[data-project-mark]')).toBeTruthy();
+    expect(
+      screen.getByText('A quieter way to keep a long-running project honest.'),
+    ).toBeInTheDocument();
+    const source = readFileSync(join(__dirname, '../ProjectCard.tsx'), 'utf8');
+    expect(source).toContain("'@container (max-width: 575px)'");
+    expect(source).toContain("overflowWrap: 'normal'");
+    expect(source).toContain("objectFit: 'contain'");
   });
 });

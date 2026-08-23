@@ -50,6 +50,9 @@ const markSx: SxObject = {
 };
 
 const cardSx: SxObject = {
+  '[data-greenhouse-frame] &[data-bento="side-projects"]': {
+    height: 'auto !important',
+  },
   padding: `${CARD_PADDING_PX}px`,
 };
 
@@ -127,7 +130,7 @@ export function GatteySitesCard({ projects, variant = 'list' }: GatteySitesCardP
   const descriptionVariant = DESCRIPTION_VARIANT[variant];
 
   return (
-    <ContentCard sx={cardSx}>
+    <ContentCard data-bento="side-projects" sx={cardSx}>
       <Stack sx={layoutSx}>
         <Typography component="h2" variant="overline">
           Side projects

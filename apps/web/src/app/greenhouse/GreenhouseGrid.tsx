@@ -20,12 +20,16 @@ const stackedSpan = (slot: Slot): string =>
     : '1 / -1';
 
 const extraLayout: SxObject = {
+  // Beat `.cell { align-self: stretch }` so leftover cards size to
+  // their own content. Row neighbors (location vs projects) may differ.
+  alignSelf: 'start !important',
   gridColumn: {
     md: 'span 6',
     xl: 'span 4',
     xs: '1 / -1',
   },
   gridRow: 'auto',
+  height: 'auto',
   minHeight: 'auto',
 };
 

@@ -8,16 +8,18 @@ import type { SxObject } from '@dg/ui/theme';
 import { getShape } from '@dg/ui/theme/shape';
 import { Box, Chip, Stack, Typography } from '@mui/material';
 
+type ProjectCardVariant = 'media' | 'featured' | 'tile';
+
 type ProjectCardProps = RenderableProject & {
   /**
    * Overline on the featured tile. First project is "Featured project".
    */
   eyebrow?: string;
   /**
-   * `media` is today's thumbnail + overlay. `featured` is the greenhouse
-   * project tile: label, tags, and a text CTA.
+   * `media` is today's thumbnail + overlay. `featured` fills the activity
+   * row. `tile` is leftover greenhouse projects: same chrome, hug content.
    */
-  variant?: 'media' | 'featured';
+  variant?: ProjectCardVariant;
 };
 
 const { gridItemSize } = getShape();
@@ -28,7 +30,14 @@ const projectCardSx: SxObject = {
 };
 
 const featuredCardSx: SxObject = {
+  '& [data-project-mark] img': {
+    height: '100%',
+    objectFit: 'contain',
+    objectPosition: 'center',
+    width: '100%',
+  },
   boxSizing: 'border-box',
+  containerType: 'inline-size',
   display: 'flex',
   flexDirection: 'column',
   maxWidth: 'none',
@@ -36,6 +45,14 @@ const featuredCardSx: SxObject = {
   minWidth: 0,
   padding: 2.25,
   width: '100%',
+};
+
+const tileCardSx: SxObject = {
+  '[data-greenhouse-frame] &[data-bento="project"]': {
+    height: 'auto !important',
+    minHeight: 'auto',
+  },
+  minHeight: 'auto',
 };
 
 const featuredLayoutSx: SxObject = {
@@ -46,6 +63,11 @@ const featuredLayoutSx: SxObject = {
   width: '100%',
 };
 
+const tileLayoutSx: SxObject = {
+  flex: '0 0 auto',
+  justifyContent: 'flex-start',
+};
+
 const featuredCopySx: SxObject = {
   gap: 1,
   minWidth: 0,
@@ -53,6 +75,10 @@ const featuredCopySx: SxObject = {
 };
 
 const featuredTitleRowSx: SxObject = {
+  '@container (max-width: 575px)': {
+    alignItems: 'flex-start',
+    flexDirection: 'column',
+  },
   alignItems: 'center',
   flexDirection: 'row',
   flexWrap: 'nowrap',
@@ -63,9 +89,11 @@ const featuredTitleRowSx: SxObject = {
 
 const featuredTitleSx: SxObject = {
   flex: '1 1 auto',
+  hyphens: 'none',
   minWidth: 0,
-  overflowWrap: 'break-word',
+  overflowWrap: 'normal',
   whiteSpace: 'normal',
+  wordBreak: 'normal',
 };
 
 const featuredIconSx: SxObject = {
@@ -74,13 +102,15 @@ const featuredIconSx: SxObject = {
   flexShrink: 0,
   height: 52,
   overflow: 'hidden',
+  position: 'relative',
   width: 52,
 };
 
 const featuredIconImgSx: SxObject = {
   display: 'block',
   height: '100%',
-  objectFit: 'cover',
+  objectFit: 'contain',
+  objectPosition: 'center',
   width: '100%',
 };
 
@@ -108,16 +138,24 @@ function projectTags(type: RenderableProject['type']): Array<string> {
   return type ? [type] : [];
 }
 
+function hasRichText(json: unknown): boolean {
+  if (!json || typeof json !== 'object') {
+    return false;
+  }
+  const content = 'content' in json ? json.content : null;
+  return Array.isArray(content) && content.length > 0;
+}
+
 function FeaturedIcon({ thumbnail }: { thumbnail: RenderableProject['thumbnail'] }) {
   if (thumbnail.url.startsWith('http')) {
     return (
       <Image
         alt=""
-        cover={true}
-        height={52}
+        fill={true}
+        height={thumbnail.height}
         sizes={{ extraLarge: 52 }}
         url={thumbnail.url}
-        width={52}
+        width={thumbnail.width}
       />
     );
   }
@@ -131,26 +169,35 @@ function FeaturedProjectCard({
   thumbnail,
   title,
   type,
-}: RenderableProject & { eyebrow?: string }) {
+  variant,
+}: RenderableProject & { eyebrow?: string; variant: 'featured' | 'tile' }) {
   const tags = projectTags(type);
   const descriptionJson = description?.json;
+  const isTile = variant === 'tile';
 
   return (
-    <ContentCard data-bento="featured" sx={featuredCardSx}>
-      <Stack sx={featuredLayoutSx}>
+    <ContentCard
+      data-bento={isTile ? 'project' : 'featured'}
+      sx={isTile ? { ...featuredCardSx, ...tileCardSx } : featuredCardSx}
+    >
+      <Stack sx={isTile ? { ...featuredLayoutSx, ...tileLayoutSx } : featuredLayoutSx}>
         <Stack sx={featuredCopySx}>
           <Typography color="text.secondary" variant="overline">
             {eyebrow}
           </Typography>
           <Stack sx={featuredTitleRowSx}>
-            <Box sx={featuredIconSx}>
+            <Box data-project-mark="" sx={featuredIconSx}>
               <FeaturedIcon thumbnail={thumbnail} />
             </Box>
-            <Typography component="h2" sx={featuredTitleSx} variant="h3">
+            <Typography
+              component="h2"
+              sx={featuredTitleSx}
+              variant={isTile ? 'h4' : 'h3'}
+            >
               {title}
             </Typography>
           </Stack>
-          {descriptionJson ? (
+          {hasRichText(descriptionJson) ? (
             <Box sx={featuredBlurbSx}>
               <RichText
                 json={descriptionJson}
@@ -185,8 +232,8 @@ export function ProjectCard({ eyebrow, variant = 'media', ...project }: ProjectC
     project.layout ?? undefined,
   );
 
-  if (variant === 'featured') {
-    return <FeaturedProjectCard eyebrow={eyebrow} {...project} />;
+  if (variant === 'featured' || variant === 'tile') {
+    return <FeaturedProjectCard eyebrow={eyebrow} variant={variant} {...project} />;
   }
 
   return (

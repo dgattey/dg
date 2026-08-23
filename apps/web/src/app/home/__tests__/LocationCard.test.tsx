@@ -23,5 +23,6 @@ describe('LocationCard', () => {
     expect(screen.getByRole('heading', { name: 'Location' })).toHaveClass('MuiTypography-overline');
     expect(screen.getByTestId('map-card')).toHaveTextContent('Memoji');
     expect(document.querySelector('[data-location-map]')).toBeTruthy();
+    expect(document.querySelector('[data-bento="location"]')).toBeTruthy();
   });
 });

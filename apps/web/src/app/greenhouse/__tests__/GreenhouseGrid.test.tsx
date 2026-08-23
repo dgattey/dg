@@ -65,5 +65,6 @@ describe('GreenhouseGrid', () => {
     expect(source).toContain("xl: 'span 4'");
     expect(source).toContain("md: 'span 6'");
     expect(source).toContain('GREENHOUSE_GRID_SPANS[slot].span');
+    expect(source).toContain("alignSelf: 'start !important'");
   });
 });

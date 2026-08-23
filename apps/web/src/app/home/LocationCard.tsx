@@ -4,18 +4,22 @@ import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
 
+const paperMix = (percent: number) =>
+  `color-mix(in srgb, var(--mui-palette-background-paper) ${percent}%, transparent)`;
+
 const cardSx: SxObject = {
-  boxSizing: 'border-box',
-  display: 'flex',
-  flexDirection: 'column',
-  gap: 1.25,
-  height: '100%',
-  justifySelf: 'stretch',
-  maxWidth: 'none',
-  minHeight: { sm: '13.5rem', xs: 'auto' },
-  minWidth: 0,
-  padding: 2.25,
-  width: '100%',
+  '[data-greenhouse-frame] &[data-bento="location"]': {
+    aspectRatio: { md: '4 / 3', xs: '1 / 1' },
+    display: 'grid',
+    gridTemplateColumns: 'minmax(0, 1fr)',
+    gridTemplateRows: 'minmax(0, 1fr)',
+    height: 'auto !important',
+    maxWidth: 'none',
+    minHeight: { sm: '16rem', xs: '14rem' },
+    overflow: 'hidden',
+    padding: 0,
+    width: '100%',
+  },
 };
 
 const wellSx: SxObject = {
@@ -29,29 +33,47 @@ const wellSx: SxObject = {
     height: '100%',
     maxWidth: 'none',
     minHeight: '100%',
+    padding: 0,
     width: '100%',
   },
-  borderRadius: 2,
-  flex: '1 1 auto',
-  minHeight: { md: '12rem', xs: '10rem' },
+  '& *:has(> [aria-label="Zoom in"])': {
+    bottom: 12,
+    left: 'auto',
+    right: 12,
+    top: 'auto',
+  },
+  gridArea: '1 / 1',
+  height: '100%',
+  minHeight: 0,
   overflow: 'hidden',
   position: 'relative',
   width: '100%',
 };
 
+const eyebrowSx: SxObject = {
+  background: paperMix(78),
+  borderRadius: 1,
+  gridArea: '1 / 1',
+  justifySelf: 'start',
+  margin: 1.5,
+  paddingBlock: 0.25,
+  paddingInline: 0.75,
+  zIndex: 2,
+};
+
 /**
- * Greenhouse location tile. Glass chrome and the Location eyebrow live here so
- * flag-off `MapCard` stays an edge-to-edge map. The map provider is unchanged.
+ * Greenhouse location tile. The map fills the glass card edge-to-edge;
+ * the Location eyebrow sits on the field and zoom docks bottom-right.
  */
 export function LocationCard({ location }: { location: MapLocation | null | undefined }) {
   return (
-    <ContentCard sx={cardSx}>
-      <Typography component="h2" variant="overline">
-        Location
-      </Typography>
+    <ContentCard data-bento="location" sx={cardSx}>
       <Box data-location-map="" sx={wellSx}>
         <MapCard location={location} />
       </Box>
+      <Typography component="h2" sx={eyebrowSx} variant="overline">
+        Location
+      </Typography>
     </ContentCard>
   );
 }
