@@ -3,6 +3,7 @@ import { join } from 'node:path';
 import {
   bottomBandSafeZoneHits,
   contentInset,
+  edgeStripCopyWellHits,
   edgeStripSafeZoneHits,
   edgeStripWidth,
   type GreenhouseViewportName,
@@ -74,5 +75,17 @@ describe('greenhouse foliage safe zones', () => {
     }
 
     expect(edgeStripWidth(2560)).toBeLessThan(contentInset(2560));
+  }, 30000);
+
+  it('keeps strip opaque mass out of music heading and on-repeat wells', async () => {
+    const left = await loadAlpha(join(foliageDir, 'edge-left-1536.avif'));
+    const right = await loadAlpha(join(foliageDir, 'edge-right-1536.avif'));
+    for (const viewport of ['desktop', 'mobile'] as const) {
+      expect(edgeStripCopyWellHits(left.alpha, left, 'left', viewport, 'music')).toEqual([]);
+      expect(edgeStripCopyWellHits(right.alpha, right, 'right', viewport, 'music')).toEqual([]);
+      expect(
+        plantSafeZoneHits(layoutGreenhousePlants('music', 0, viewport), viewport, 'music'),
+      ).toEqual([]);
+    }
   }, 30000);
 });

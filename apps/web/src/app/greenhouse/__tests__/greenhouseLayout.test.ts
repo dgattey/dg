@@ -1,4 +1,5 @@
 import {
+  bottomBandHeight,
   CONTENT_MAX_PX,
   contentGutterWidth,
   contentInset,
@@ -143,9 +144,15 @@ describe('greenhouse safe zones', () => {
     for (const rect of surfaceSafeRects('music', 'desktop')) {
       expect(rect.y + rect.height).toBeLessThanOrEqual(viewport.height);
     }
-    expect(surfaceSafeRects('music', 'desktop').map((rect) => rect.id)).toEqual(['header-bar']);
+    expect(surfaceSafeRects('music', 'desktop').map((rect) => rect.id)).toEqual([
+      'music-heading',
+      'music-on-repeat',
+      'header-bar',
+    ]);
     expect(plantSafeZoneHits(plants, 'desktop', 'music')).toEqual([]);
-    expect(plantSafeZoneHits(plants, 'mobile', 'music')).toEqual([]);
+    expect(
+      plantSafeZoneHits(layoutGreenhousePlants('music', 0, 'mobile'), 'mobile', 'music'),
+    ).toEqual([]);
   });
 
   it('keeps tablet and ultrawide cutouts out of the copy wells', () => {
@@ -161,11 +168,18 @@ describe('greenhouse safe zones', () => {
     expect(strip).toBeLessThan(inset);
   });
 
+  it('caps the bottom band to a peek, not a wall', () => {
+    expect(bottomBandHeight(GREENHOUSE_VIEWPORTS.desktop)).toBe(135);
+    expect(bottomBandHeight(GREENHOUSE_VIEWPORTS.mobile)).toBeCloseTo(75.96, 1);
+  });
+
   it('lets edge silhouettes overlap the grid column without covering copy', () => {
     const desktop = GREENHOUSE_VIEWPORTS.desktop.width;
     const mobile = GREENHOUSE_VIEWPORTS.mobile.width;
     expect(edgeStripImgWidth(desktop, 'left')).toBeGreaterThan(contentGutterWidth(desktop) + 40);
     expect(edgeStripImgWidth(desktop, 'left')).toBeLessThan(contentGutterWidth(desktop) + 120);
-    expect(edgeStripImgWidth(mobile, 'left')).toBeGreaterThan(contentGutterWidth(mobile) + 16);
+    expect(edgeStripImgWidth(mobile, 'left')).toBeGreaterThan(contentGutterWidth(mobile) + 8);
+    expect(edgeStripImgWidth(mobile, 'left')).toBeLessThan(contentGutterWidth(mobile) + 40);
+    expect(contentInset(mobile)).toBe(16);
   });
 });

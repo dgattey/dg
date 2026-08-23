@@ -110,13 +110,18 @@ export function GreenhousePlants({ plants, layer, viewport = 'desktop' }: Greenh
           <picture
             className={styles.plant}
             data-cluster={plant.cluster}
+            data-edge={plant.edge}
             data-featured={plant.featured ? 'true' : undefined}
             key={plant.id}
             style={
               {
+                '--plant-enter-x':
+                  plant.edge === 'right' ? '12vw' : plant.edge === 'bottom' ? '0px' : '-12vw',
+                '--plant-enter-y': plant.edge === 'bottom' ? '10vh' : '4vh',
+                '--plant-flip': plant.flip ? -1 : 1,
+                '--plant-rotate': `${plant.rotate}deg`,
                 '--plant-width': `${plant.scale * mass}vmin`,
                 maxWidth: `${asset.width}px`,
-                transform: `${plant.flip ? 'scaleX(-1) ' : ''}rotate(${plant.rotate}deg)`,
                 ...plantPosition(plant),
               } as CSSProperties
             }

@@ -65,7 +65,7 @@ const EDGES: Record<
 };
 
 const EDGE_SIZES =
-  '(max-width: 575px) calc((clamp(90px, 14vw, 140px) + 24px) / 0.8), calc((clamp(180px, 20vw, 440px) + 56px) / 0.8)';
+  '(max-width: 575px) calc((16px + 16px) / 0.8), calc((clamp(180px, 20vw, 440px) + 56px) / 0.8)';
 
 function srcSet(x1: string, x2: string, mid?: { src: string; w: number }): string {
   return mid ? `${x1} 768w, ${mid.src} ${mid.w}w, ${x2} 1536w` : `${x1} 1x, ${x2} 2x`;

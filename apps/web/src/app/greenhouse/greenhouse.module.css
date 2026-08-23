@@ -2,10 +2,16 @@
   --greenhouse-gutter: 1.25rem;
   --greenhouse-strip: clamp(180px, 20vw, 440px);
   --greenhouse-overlap: 56px;
+  --greenhouse-left-scale: 1;
+  --greenhouse-band: min(15dvh, 150px);
   position: relative;
   width: 100vw;
   margin-left: calc(50% - 50vw);
   background-color: var(--greenhouse-wash, #8f9258);
+}
+
+.frame[data-greenhouse-surface="music"] {
+  --greenhouse-left-scale: 0.64;
 }
 
 .backStack,
@@ -64,23 +70,26 @@
 }
 
 .edgeLeft img {
-  width: calc((var(--greenhouse-strip) + var(--greenhouse-overlap)) / 0.856);
+  width: calc(
+    ((var(--greenhouse-strip) + var(--greenhouse-overlap)) / 0.856) *
+    var(--greenhouse-left-scale)
+  );
   object-position: bottom left;
 }
 
 .edgeRight img {
-  width: calc((var(--greenhouse-strip) + var(--greenhouse-overlap)) / 0.743);
+  width: calc((var(--greenhouse-strip) + var(--greenhouse-overlap)) / 0.721);
   object-position: bottom right;
 }
 
 .bottomBand {
   position: fixed;
   inset: auto 0 0;
-  height: min(34dvh, 420px);
+  height: var(--greenhouse-band);
   pointer-events: none;
   background-repeat: repeat-x;
   background-position: bottom center;
-  background-size: auto min(34dvh, 420px);
+  background-size: auto var(--greenhouse-band);
 }
 
 .bottomBandMobile {
@@ -114,6 +123,8 @@
   filter: drop-shadow(0 14px 16px hsl(150deg, 32%, 6%, 0.36))
     drop-shadow(0 3px 6px hsl(150deg, 28%, 8%, 0.22));
   transform-origin: 50% 80%;
+  rotate: var(--plant-rotate, 0deg);
+  scale: var(--plant-flip, 1) 1;
 }
 
 .plantsBack .plant {
@@ -206,8 +217,9 @@
 @media (max-width: 575px) {
   .frame {
     --greenhouse-gutter: 1rem;
-    --greenhouse-strip: clamp(90px, 14vw, 140px);
-    --greenhouse-overlap: 24px;
+    --greenhouse-strip: 16px;
+    --greenhouse-overlap: 16px;
+    --greenhouse-band: min(9dvh, 84px);
   }
 
   .backPlate img {
@@ -230,11 +242,6 @@
     width: min(var(--plant-width), 72vw);
   }
 
-  .bottomBand {
-    height: min(24dvh, 260px);
-    background-size: auto min(24dvh, 260px);
-  }
-
   .bottomBandDesktop {
     display: none;
   }
@@ -244,12 +251,84 @@
   }
 
   .content {
-    padding-inline: var(--greenhouse-strip);
+    padding-inline: 1rem;
     padding-top: 0.25rem;
   }
 }
 
+@keyframes greenhouse-chrome-drift {
+  from {
+    translate: 0 1.6vh;
+    rotate: var(--greenhouse-drift-from, -1.5deg);
+  }
+
+  to {
+    translate: 0 -2.4vh;
+    rotate: var(--greenhouse-drift-to, 1.5deg);
+  }
+}
+
+@keyframes greenhouse-plant-in {
+  from {
+    translate: var(--plant-enter-x, -10vw) var(--plant-enter-y, 6vh);
+    opacity: 0.35;
+  }
+
+  to {
+    translate: 0 0;
+    opacity: 1;
+  }
+}
+
+.edgeLeft {
+  --greenhouse-drift-from: -1.5deg;
+  --greenhouse-drift-to: 0.4deg;
+}
+
+.edgeRight {
+  --greenhouse-drift-from: 1.5deg;
+  --greenhouse-drift-to: -0.4deg;
+}
+
+.bottomBand {
+  --greenhouse-drift-from: 0deg;
+  --greenhouse-drift-to: 0deg;
+}
+
+.plant[data-edge="left"] {
+  --plant-enter-x: -12vw;
+  --plant-enter-y: 4vh;
+}
+
+.plant[data-edge="right"] {
+  --plant-enter-x: 12vw;
+  --plant-enter-y: 4vh;
+}
+
+.plant[data-edge="bottom"] {
+  --plant-enter-x: 0;
+  --plant-enter-y: 10vh;
+}
+
+@supports (animation-timeline: scroll()) {
+  .edgeLeft,
+  .edgeRight,
+  .bottomBand {
+    animation: greenhouse-chrome-drift linear both;
+    animation-timeline: scroll();
+  }
+
+  .plant {
+    animation: greenhouse-plant-in cubic-bezier(0.34, 1.56, 0.64, 1) both;
+    animation-timeline: view();
+    animation-range: entry 0% cover 28%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .edgeLeft,
+  .edgeRight,
+  .bottomBand,
   .plantsBack,
   .plantsFront,
   .plant {
