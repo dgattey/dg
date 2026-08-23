@@ -82,7 +82,7 @@ function albumSlotSx(index: number): SxObject {
   };
 }
 
-type AlbumGridColumns = typeof ALBUM_GRID_COLUMNS;
+type AlbumGridColumns = { lg: number; md: number; sm: number; xs: number };
 
 /**
  * Albums claim the odd visual slots (album `i` gets `order: 2i + 1`), which
