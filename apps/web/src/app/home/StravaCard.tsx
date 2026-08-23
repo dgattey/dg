@@ -30,6 +30,7 @@ const cardSx: SxObject = {
     '--route-line': '#f0701a',
     '--route-line-filter': 'drop-shadow(0 1px 3px rgb(0 0 0 / 0.25))',
     '--route-stroke-width': 4,
+    border: 'none',
     height: '100%',
     maxWidth: 'none',
     minHeight: '13.5rem',
