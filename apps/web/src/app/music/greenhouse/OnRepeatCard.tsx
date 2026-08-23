@@ -73,10 +73,8 @@ export function OnRepeatCard({ albums }: Props) {
                 name={album.name}
               />
               <Box>
-                <Typography component="h5" variant="h5">
-                  {album.name}
-                </Typography>
-                <Typography variant="caption">{album.artistNames}</Typography>
+                <Typography variant="body1">{album.name}</Typography>
+                <Typography variant="body2">{album.artistNames}</Typography>
               </Box>
             </Link>
           </Box>

@@ -34,10 +34,8 @@ export function MusicListRow({ href, imageUrl, imageAlt, title, meta, rank }: Pr
         />
       </Box>
       <Box sx={{ minWidth: 0 }}>
-        <Typography component="h5" variant="h5">
-          {title}
-        </Typography>
-        <Typography variant="caption">{meta}</Typography>
+        <Typography variant="body1">{title}</Typography>
+        <Typography variant="body2">{meta}</Typography>
       </Box>
       <Typography variant="caption">{rank}</Typography>
     </Link>

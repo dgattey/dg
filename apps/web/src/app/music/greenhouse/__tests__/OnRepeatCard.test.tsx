@@ -36,7 +36,8 @@ describe('OnRepeatCard', () => {
     expect(heading.tagName).toBe('H3');
     expect(screen.getByText('Listening')).toBeInTheDocument();
     expect(screen.queryByText('Stacked albums')).not.toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'USB' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { name: 'USB' })).not.toBeInTheDocument();
+    expect(screen.getByText('USB')).toBeInTheDocument();
     expect(screen.getByText('Fred again.., Jamie T')).toBeInTheDocument();
     expect(screen.getByText('12 songs')).toBeInTheDocument();
     expect(document.querySelectorAll('[data-album-pile]')).toHaveLength(3);
