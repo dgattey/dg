@@ -15,15 +15,15 @@ type GatteySitesCardVariant = 'list' | 'rows';
 type GatteySitesCardProps = {
   projects: ReadonlyArray<RenderableSideProject>;
   /**
-   * `list` is flag-off (h6 / body2). `rows` uses greenhouse card type
-   * (h3 / body2).
+   * `list` is flag-off (h6 / body2). `rows` matches greenhouse music list
+   * rows (body1 / body2).
    */
   variant?: GatteySitesCardVariant;
 };
 
 const TITLE_VARIANT = {
   list: 'h6',
-  rows: 'h3',
+  rows: 'body1',
 } as const;
 
 const DESCRIPTION_VARIANT = {
