@@ -71,8 +71,8 @@ describe('GatteySitesCard', () => {
     render(<GatteySitesCard projects={projects} variant="rows" />);
 
     expect(screen.getByText('WMM')).toHaveClass('MuiTypography-body1');
-    expect(screen.getByText('See what you own and where it sits')).toHaveClass(
-      'MuiTypography-body2',
-    );
+    const description = screen.getByText('See what you own and where it sits');
+    expect(description).toHaveClass('MuiTypography-body2');
+    expect(description).not.toHaveStyle({ WebkitLineClamp: '2' });
   });
 });

@@ -155,7 +155,7 @@ export function GatteySitesCard({ projects, variant = 'list' }: GatteySitesCardP
                   </Typography>
                   <Typography
                     component="span"
-                    sx={projectDescriptionSx}
+                    sx={variant === 'list' ? projectDescriptionSx : undefined}
                     variant={descriptionVariant}
                   >
                     {description}
