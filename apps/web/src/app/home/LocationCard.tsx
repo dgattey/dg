@@ -36,6 +36,23 @@ const wellSx: SxObject = {
     padding: 0,
     width: '100%',
   },
+  '& img[alt="Location marker"]': {
+    borderRadius: '50%',
+    height: '100%',
+    left: 0,
+    maxWidth: 'none',
+    objectFit: 'cover',
+    position: 'absolute',
+    top: 0,
+    width: '100%',
+  },
+  '& *:has(> img[alt="Location marker"])': {
+    height: '100%',
+    inset: 0,
+    left: 0,
+    top: 0,
+    width: '100%',
+  },
   '& *:has(> [aria-label="Zoom in"])': {
     bottom: 12,
     left: 'auto',
