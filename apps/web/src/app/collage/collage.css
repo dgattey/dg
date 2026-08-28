@@ -86,4 +86,8 @@ html:has(.collageRoot) body {
   .collageRoot {
     --site-header-height: 0px;
   }
+
+  .collageMain {
+    padding-block-start: 32px;
+  }
 }
