@@ -38,6 +38,9 @@ export const apiStatusRoute = '/.well-known/api-status' as const;
 /** Internal rewrite target for Markdown (not a public agent URL). */
 export const internalMarkdownRoutePrefix = '/llm-markdown' as const;
 
+/** Internal rewrite prefix for the collage surface. Not a public URL. */
+export const redesignRoutePrefix = '/redesign' as const;
+
 export type MarkdownPageDefinition = {
   path: string;
   title: string;

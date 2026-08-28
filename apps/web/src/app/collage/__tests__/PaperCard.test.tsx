@@ -46,6 +46,7 @@ describe('PaperButton', () => {
   it('renders a native button without href', () => {
     render(<PaperButton>Light</PaperButton>);
     expect(screen.getByRole('button', { name: 'Light' })).toHaveAttribute('type', 'button');
+    expect(screen.getByRole('button', { name: 'Light' })).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('marks the current scheme button as pressed', () => {
