@@ -35,6 +35,7 @@ const swcTransform: Config['transform'] = {
 export const baseConfig: Config = {
   maxWorkers: '50%',
   moduleNameMapper: {
+    '^.+\\.(css|sass|scss)$': resolve(dir, 'css-module-mock.cjs'),
     // Mock server-only to a no-op (next/jest does this automatically for @dg/web)
     'server-only': resolve(dir, 'server-only-mock.js'),
   },

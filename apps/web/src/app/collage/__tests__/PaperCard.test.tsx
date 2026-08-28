@@ -35,10 +35,9 @@ describe('PaperCard', () => {
         Hello
       </PaperCard>,
     );
-    expect(screen.getByRole('link', { name: 'Listening history' })).toHaveAttribute(
-      'href',
-      '/music',
-    );
+    const link = screen.getByRole('link', { name: 'Hello' });
+    expect(link).toHaveAttribute('href', '/music');
+    expect(link).toHaveAttribute('title', 'Listening history');
   });
 });
 
