@@ -77,6 +77,7 @@
         "CONTENTFUL_ACCESS_TOKEN",
         "CONTENTFUL_SPACE_ID",
         "DATABASE_URL",
+        "INTERACTIVE_REDESIGN",
         "LOGTAIL_SOURCE_TOKEN",
         "LOGTAIL_URL",
         "MAP_TILES",
