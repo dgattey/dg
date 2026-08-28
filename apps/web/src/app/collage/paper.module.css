@@ -1,0 +1,166 @@
+.wrap {
+  --pc: var(--cream);
+  --on: var(--ink-on-cream);
+  --soft: color-mix(in oklab, var(--on) 66%, var(--pc));
+  --r: 0deg;
+  position: relative;
+  z-index: 2;
+  filter: var(--dshadow);
+  rotate: var(--r);
+}
+
+.inner {
+  color: var(--on);
+  background: var(--pc);
+  clip-path: var(--clip, var(--quad-a));
+  rotate: none;
+}
+
+.link {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .wrap:has(> a):hover {
+    translate: 0 -2px;
+  }
+}
+
+.toneCream {
+  --pc: var(--cream);
+  --on: var(--ink-on-cream);
+}
+
+.toneUltramarine {
+  --pc: var(--ultramarine);
+  --on: var(--cream);
+}
+
+.toneViridian {
+  --pc: var(--viridian);
+  --on: var(--cream);
+}
+
+.toneLeaf {
+  --pc: var(--leaf);
+  --on: var(--cream);
+}
+
+.toneOlive {
+  --pc: var(--olive);
+  --on: var(--ink-on-cream);
+}
+
+.toneChartreuse {
+  --pc: var(--chartreuse);
+  --on: var(--ink-on-cream);
+}
+
+.toneCerulean {
+  --pc: var(--cerulean);
+  --on: var(--cream);
+}
+
+.toneCobalt {
+  --pc: var(--cobalt);
+  --on: var(--cream);
+}
+
+.toneVermilion {
+  --pc: var(--vermilion);
+  --on: var(--cream);
+}
+
+.toneOchre {
+  --pc: var(--ochre);
+  --on: var(--ink-on-cream);
+}
+
+.toneRose {
+  --pc: var(--rose);
+  --on: var(--ink-on-cream);
+}
+
+.toneBlack {
+  --pc: var(--black);
+  --on: var(--cream);
+}
+
+.edgeQuadA {
+  --clip: var(--quad-a);
+}
+
+.edgeQuadB {
+  --clip: var(--quad-b);
+}
+
+.edgeQuadC {
+  --clip: var(--quad-c);
+}
+
+.edgeQuadD {
+  --clip: var(--quad-d);
+}
+
+.edgeTornA {
+  --clip: var(--torn-a);
+}
+
+.edgeTornB {
+  --clip: var(--torn-b);
+}
+
+.edgeTornC {
+  --clip: var(--torn-c);
+}
+
+.tag,
+.button {
+  display: inline-flex;
+  gap: 0.5em;
+  align-items: center;
+  padding: 0.65em 0.95em 0.7em;
+  font-family: var(--display);
+  font-size: 16.5px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--on);
+  letter-spacing: 0;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  background: var(--pc);
+  border: 0;
+  filter: var(--dshadow);
+  clip-path: var(--clip, var(--quad-c));
+  rotate: var(--r, 0deg);
+}
+
+.tag {
+  padding: 0.5em 0.85em 0.55em;
+  font-size: 14px;
+  cursor: default;
+}
+
+.button:focus-visible,
+.tag:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.buttonCurrent {
+  color: var(--cream);
+  background: var(--ink);
+}
+
+.buttonSmall {
+  padding: 0.45em 0.75em 0.5em;
+  font-size: 14px;
+}
