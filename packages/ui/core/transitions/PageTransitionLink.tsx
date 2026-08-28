@@ -10,8 +10,10 @@ import { pageTitleMorphName, pageTransitionTypes } from './pageTransitions';
 
 export type PageTransitionLinkProps = {
   children?: ReactNode;
+  className?: string;
   color?: 'inherit';
   href: string;
+  'aria-current'?: 'page';
   /**
    * Lends this control's box to the destination's heading. At most one control
    * per destination may set it, since two elements sharing a

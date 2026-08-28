@@ -7,9 +7,9 @@ import {
   type MarkdownPagePath,
   musicRoute,
 } from '@dg/shared-core/routes/app';
+import { getFavoriteAlbumsMarkdown } from '../(classic)/music/albums/favoriteAlbumsMarkdown';
+import { getMusicMarkdown } from '../(classic)/music/musicMarkdown';
 import { getHomepageMarkdown } from '../home/homepageMarkdown';
-import { getFavoriteAlbumsMarkdown } from '../music/albums/favoriteAlbumsMarkdown';
-import { getMusicMarkdown } from '../music/musicMarkdown';
 
 /**
  * Wires each registered public path to the Markdown module next to that page.
