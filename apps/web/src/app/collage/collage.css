@@ -81,3 +81,9 @@ html:has(.collageRoot) body {
   padding-block: 8px 48px;
   margin-inline: auto;
 }
+
+@media (max-width: 480px) {
+  .collageRoot {
+    --site-header-height: 0px;
+  }
+}
