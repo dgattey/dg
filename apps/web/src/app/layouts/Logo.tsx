@@ -7,6 +7,7 @@ import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
 import { Button } from '@mui/material';
 import { usePathname } from 'next/navigation';
+import type { SiteSurface } from '../collage/types';
 import { isMusicDestinationPath } from './musicHeaderDestinations';
 
 const paddingStyles: SxObject = {
@@ -73,12 +74,34 @@ const logoLinkMergedSx: SxObject = {
  * Leaving a music destination uses the close view-transition type so the page
  * falls away instead of snapping.
  */
-export function Logo() {
+export function Logo({ surface = 'classic' }: { surface?: SiteSurface }) {
   const pathname = usePathname();
 
   const scrollToTop = () => {
     window.scrollTo({ behavior: 'smooth', top: 0 });
   };
+
+  if (surface === 'collage') {
+    if (pathname === homeRoute) {
+      return (
+        <button onClick={scrollToTop} type="button">
+          dg.
+        </button>
+      );
+    }
+    return (
+      <Link
+        href={homeRoute}
+        sx={{ color: 'inherit', textDecoration: 'none' }}
+        title="Home"
+        transitionTypes={
+          isMusicDestinationPath(pathname) ? pageTransitionTypes('close') : undefined
+        }
+      >
+        dg.
+      </Link>
+    );
+  }
 
   if (pathname === homeRoute) {
     return (

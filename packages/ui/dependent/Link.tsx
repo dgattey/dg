@@ -28,6 +28,8 @@ export type BaseLinkProps = {
    */
   sx?: SxProps;
 
+  className?: string;
+
   /**
    * Controls how the link content is rendered.
    * - 'text': renders just the title as plain text (default)
@@ -87,6 +89,11 @@ export type BaseLinkProps = {
    * Optional ARIA role for the underlying anchor (e.g. menuitem in a disclosure).
    */
   role?: React.AriaRole;
+
+  /**
+   * Optional ARIA current page marker for nav links.
+   */
+  'aria-current'?: 'page';
 };
 
 /**
@@ -199,6 +206,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     isExternal,
     forcePageNavigation,
     layout: initialLayout = 'text',
+    className,
     sx,
     buttonProps,
     color = 'inherit',
@@ -208,6 +216,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     transitionTypes,
     onClick,
     role,
+    'aria-current': ariaCurrent,
   },
   ref,
 ) {
@@ -222,19 +231,27 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     title,
   });
   const anchorProps = {
+    'aria-current': ariaCurrent,
     'aria-label': title,
     onClick,
     ref,
     role,
   };
   const externalProps = isExternal ? { rel: 'noreferrer' as const, target: '_blank' as const } : {};
-  const muiStyleProps = { color, sx, underline, variant };
+  const muiStyleProps = { className, color, sx, underline, variant };
   const wrap = (el: React.ReactElement) =>
     wrapWithTooltip(el, showTooltip, title, tooltipPlacement);
 
   if (isButton) {
     return wrap(
-      <Button {...buttonProps} {...anchorProps} href={href} {...externalProps} sx={sx}>
+      <Button
+        {...buttonProps}
+        {...anchorProps}
+        className={className}
+        href={href}
+        {...externalProps}
+        sx={sx}
+      >
         {contents}
       </Button>,
     );
