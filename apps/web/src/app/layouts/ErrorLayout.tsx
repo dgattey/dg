@@ -11,9 +11,9 @@ import { Stack, Typography } from '@mui/material';
 import { CutLetters } from '../collage/CutLetters';
 import { CutOut } from '../collage/CutOut';
 import { CutOutSymbols } from '../collage/CutOutSymbols';
+import type { CutOutPlacement } from '../collage/cutOutPlacements';
 import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
-import type { CutOutPlacement } from '../collage/cutOutPlacements';
 import styles from './ErrorLayout.module.css';
 
 type ErrorLayoutProps = {
@@ -125,9 +125,7 @@ export function ErrorLayout({ statusCode, surface = 'classic' }: ErrorLayoutProp
               {isNotFound ? 'Sorry, couldn‘t find that page.' : 'Something went wrong on my end.'}
             </Typography>
             <Typography>
-              {isNotFound
-                ? 'Email me if something is wrong.'
-                : 'Email me if it keeps happening.'}
+              {isNotFound ? 'Email me if something is wrong.' : 'Email me if it keeps happening.'}
             </Typography>
           </PaperCard>
           <PaperButton href={homeRoute} tiltDeg={2} title="Home" tone="ochre">
