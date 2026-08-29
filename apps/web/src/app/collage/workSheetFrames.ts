@@ -1,11 +1,14 @@
 import type { RenderableProject } from '@dg/content-models/contentful/renderables/projects';
+import type { SlottedProject } from './assignProjectSlots';
 import type { PaperEdge, PaperTone } from './types';
 
 export type ProjectFrameAspect = 'square' | 'tall' | 'wide';
 
+export type ProjectFrameTagClass = 'tagBottomLeft' | 'tagBottomRight' | 'tagTopLeft';
+
 export type ProjectFrameStyle = {
   edge: PaperEdge;
-  tagClassName: 'tagBottomRight' | 'tagTopLeft';
+  tagClassName: ProjectFrameTagClass;
   tagTiltDeg: number;
   tagTone: PaperTone;
   tiltDeg: number;
@@ -13,6 +16,7 @@ export type ProjectFrameStyle = {
 
 export type WorkSheetFrame = {
   gridArea: 'c1' | 'ws';
+  key: SlottedProject['key'];
   project: RenderableProject;
   style: ProjectFrameStyle;
 };
@@ -40,7 +44,7 @@ const ASPECT_RATIO: Record<ProjectFrameAspect, number> = {
   wide: 2.25,
 };
 
-export function workSheetFrames(projects: ReadonlyArray<RenderableProject>): Array<WorkSheetFrame> {
+export function workSheetFrames(projects: ReadonlyArray<SlottedProject>): Array<WorkSheetFrame> {
   const slots = [
     { gridArea: 'c1' as const, style: WORK_FRAME_STYLES[0] },
     { gridArea: 'ws' as const, style: WORK_FRAME_STYLES[1] },
@@ -48,13 +52,14 @@ export function workSheetFrames(projects: ReadonlyArray<RenderableProject>): Arr
 
   const frames: Array<WorkSheetFrame> = [];
   for (const [index, slot] of slots.entries()) {
-    const project = projects[index];
-    if (!project || !slot.style) {
+    const slotted = projects[index];
+    if (!slotted || !slot.style) {
       continue;
     }
     frames.push({
       gridArea: slot.gridArea,
-      project,
+      key: slotted.key,
+      project: slotted.project,
       style: slot.style,
     });
   }
