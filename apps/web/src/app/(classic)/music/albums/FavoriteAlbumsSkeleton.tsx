@@ -1,11 +1,22 @@
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Skeleton, Stack } from '@mui/material';
+import { PaperCard } from '../../../collage/PaperCard';
+import { PaperTag } from '../../../collage/PaperTag';
 import {
   ALBUM_GRID_COLUMNS,
   albumGridSx,
   albumTileFrameSx,
   albumTileSkeletonSx,
 } from '../albumTileGeometry';
+import {
+  COLLAGE_ALBUM_CAPTION_RESERVE_PX,
+  COLLAGE_ALBUM_GRID_COLUMNS,
+  COLLAGE_ALBUM_GRID_GAP_PX,
+  collageAlbumCardClassName,
+  collageAlbumCardTreatment,
+} from './collageAlbumCardTreatments';
+import styles from './FavoriteAlbums.module.css';
 
 const sortSwitcherSx: SxObject = {
   borderRadius: 999,
@@ -15,6 +26,13 @@ const sortSwitcherSx: SxObject = {
 };
 
 const DEFAULT_PLACEHOLDER_COUNT = 12;
+
+const COLLAGE_SORT_SKELETONS = [
+  { label: 'Recently added', tiltDeg: -3, tone: 'black' },
+  { label: 'Album', tiltDeg: 2, tone: 'cream' },
+  { label: 'Artist', tiltDeg: -1.5, tone: 'cream' },
+  { label: 'Release date', tiltDeg: 2.5, tone: 'cream' },
+] as const;
 
 /**
  * One box the same height as `tileCount` square cells plus gaps, without
@@ -40,6 +58,46 @@ function albumGridReserveSx(tileCount: number): SxObject {
   };
 }
 
+function collageAlbumGridReserveSx(tileCount: number): SxObject {
+  const reserve = (columns: number, gap: number) => {
+    const rows = Math.ceil(tileCount / columns);
+    const fixedHeight =
+      rows * COLLAGE_ALBUM_CAPTION_RESERVE_PX + Math.max(0, rows - 1) * gap;
+    return `calc(${(rows / columns) * 100}% + ${fixedHeight}px)`;
+  };
+
+  return {
+    paddingBottom: {
+      lg: reserve(COLLAGE_ALBUM_GRID_COLUMNS.lg, COLLAGE_ALBUM_GRID_GAP_PX.lg),
+      md: reserve(COLLAGE_ALBUM_GRID_COLUMNS.md, COLLAGE_ALBUM_GRID_GAP_PX.md),
+      sm: reserve(COLLAGE_ALBUM_GRID_COLUMNS.sm, COLLAGE_ALBUM_GRID_GAP_PX.sm),
+      xs: reserve(COLLAGE_ALBUM_GRID_COLUMNS.xs, COLLAGE_ALBUM_GRID_GAP_PX.xs),
+    },
+  };
+}
+
+function CollageSortSkeleton() {
+  return (
+    <div
+      aria-label="Loading album sort controls"
+      className={styles.collageSortSkeleton}
+      role="status"
+    >
+      {COLLAGE_SORT_SKELETONS.map((sort) => (
+        <PaperTag
+          className={styles.collageSortTag}
+          edge="quad-a"
+          key={sort.label}
+          tiltDeg={sort.tiltDeg}
+          tone={sort.tone}
+        >
+          <Skeleton className={styles.collageSortSkeletonLine} variant="text" />
+        </PaperTag>
+      ))}
+    </div>
+  );
+}
+
 /**
  * Occupies the same space the loaded grid will, so the page does not resize
  * under the view transition when albums stream in. Pass `tileCount` when the
@@ -48,11 +106,56 @@ function albumGridReserveSx(tileCount: number): SxObject {
  */
 export function FavoriteAlbumsSkeleton({
   reserveOnly = false,
+  surface = 'classic',
   tileCount = DEFAULT_PLACEHOLDER_COUNT,
 }: {
   reserveOnly?: boolean;
+  surface?: SiteSurface;
   tileCount?: number;
 }) {
+  if (surface === 'collage') {
+    if (reserveOnly) {
+      return (
+        <>
+          <CollageSortSkeleton />
+          <Box
+            className={styles.collageAlbumReserve}
+            data-role="collage-album-reserve"
+            sx={collageAlbumGridReserveSx(tileCount)}
+          />
+        </>
+      );
+    }
+
+    const tiles = Array.from({ length: tileCount }, (_, tile) => `album-${tile}`);
+    return (
+      <>
+        <CollageSortSkeleton />
+        <div className={styles.collageGridSkeleton} data-role="collage-album-skeleton-grid">
+          {tiles.map((tile, index) => {
+            const treatment = collageAlbumCardTreatment(index);
+            return (
+              <PaperCard
+                className={collageAlbumCardClassName(treatment)}
+                edge="quad-a"
+                innerClassName={styles.collageCardInner}
+                key={tile}
+                tiltDeg={treatment.tiltDeg}
+                tone={treatment.tone}
+              >
+                <Skeleton className={styles.collageArtSkeleton} variant="rectangular" />
+                <div className={styles.collageCaptionSkeleton}>
+                  <Skeleton variant="text" width="82%" />
+                  <Skeleton variant="text" width="58%" />
+                </div>
+              </PaperCard>
+            );
+          })}
+        </div>
+      </>
+    );
+  }
+
   if (reserveOnly) {
     return (
       <Stack spacing={2}>

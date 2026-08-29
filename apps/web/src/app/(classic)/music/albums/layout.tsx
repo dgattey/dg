@@ -1,14 +1,17 @@
 import 'server-only';
 
 import { favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Typography } from '@mui/material';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Suspense } from 'react';
 import { getFavoriteAlbums } from '../../../../services/albums';
+import { CutLetters } from '../../../collage/CutLetters';
 import { markdownAlternates } from '../../../layouts/markdownAlternates';
 import { musicDestinationLabel } from '../../../layouts/musicHeaderDestinations';
 import { PageTitle } from '../../../layouts/PageTitle';
+import styles from './FavoriteAlbums.module.css';
 import { FavoriteAlbumsGrid } from './FavoriteAlbumsGrid';
 import { FavoriteAlbumsSkeleton } from './FavoriteAlbumsSkeleton';
 
@@ -19,7 +22,13 @@ export const metadata: Metadata = {
   title: TITLE,
 };
 
-async function AlbumsGrid({ children }: { children: ReactNode }) {
+async function AlbumsGrid({
+  children,
+  surface = 'classic',
+}: {
+  children: ReactNode;
+  surface?: SiteSurface;
+}) {
   const albums = await getFavoriteAlbums();
 
   if (albums === null) {
@@ -33,7 +42,11 @@ async function AlbumsGrid({ children }: { children: ReactNode }) {
     return <Typography color="text.secondary">No favorite albums yet.</Typography>;
   }
 
-  return <FavoriteAlbumsGrid albums={albums}>{children}</FavoriteAlbumsGrid>;
+  return (
+    <FavoriteAlbumsGrid albums={albums} surface={surface}>
+      {children}
+    </FavoriteAlbumsGrid>
+  );
 }
 
 /**
@@ -45,7 +58,24 @@ async function AlbumsGrid({ children }: { children: ReactNode }) {
  * page; awaiting here would suspend the route and leave the transition with no
  * old snapshot to animate away from.
  */
-export default function FavoriteAlbumsLayout({ children }: { children: ReactNode }) {
+export default function FavoriteAlbumsLayout({
+  children,
+  surface = 'classic',
+}: {
+  children: ReactNode;
+  surface?: SiteSurface;
+}) {
+  if (surface === 'collage') {
+    return (
+      <section aria-label={TITLE} className={styles.collageLayout}>
+        <CutLetters className={styles.collageTitle} text={TITLE} />
+        <Suspense fallback={<FavoriteAlbumsSkeleton surface="collage" />}>
+          <AlbumsGrid surface="collage">{children}</AlbumsGrid>
+        </Suspense>
+      </section>
+    );
+  }
+
   return (
     <>
       <PageTitle>{TITLE}</PageTitle>
