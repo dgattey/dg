@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react';
-import { StickyFadeBar } from '../StickyFadeBar';
+import { StickyBarTopMask, StickyFadeBar } from '../StickyFadeBar';
 
 describe('StickyFadeBar', () => {
   it('reserves only the perceptible part of its fade', () => {
@@ -16,6 +16,30 @@ describe('StickyFadeBar', () => {
     });
     expect(container.querySelector('[data-sticky-surface]')).toHaveStyle({
       bottom: 'calc(1.375rem - 1px)',
+    });
+  });
+
+  it('paints collage bars with the collage paper background', () => {
+    const { container } = render(
+      <StickyFadeBar data-testid="bar" surface="collage">
+        <span>July 2026</span>
+      </StickyFadeBar>,
+    );
+
+    expect(screen.getByTestId('bar')).toHaveAttribute('data-site-surface', 'collage');
+    expect(screen.getByTestId('bar')).toHaveStyle({
+      '--sticky-fade-background': 'var(--paper)',
+    });
+    expect(container.querySelector('[data-sticky-surface]')).toHaveStyle({
+      backgroundColor: 'var(--sticky-fade-background, var(--mui-palette-background-default))',
+    });
+  });
+
+  it('paints the collage top mask with the collage paper background', () => {
+    render(<StickyBarTopMask surface="collage" />);
+
+    expect(document.querySelector('[data-sticky-mask]')).toHaveStyle({
+      '--sticky-fade-background': 'var(--paper)',
     });
   });
 

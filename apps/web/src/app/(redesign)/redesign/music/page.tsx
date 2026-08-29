@@ -3,5 +3,5 @@ import ClassicMusic, { metadata as musicMetadata } from '../../../(classic)/musi
 export const metadata = musicMetadata;
 
 export default function Page() {
-  return <ClassicMusic />;
+  return <ClassicMusic surface="collage" />;
 }
