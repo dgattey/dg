@@ -1,0 +1,15 @@
+.print {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--ultramarine);
+  isolation: isolate;
+  mix-blend-mode: multiply;
+}
+
+.print img {
+  mix-blend-mode: screen;
+  filter: grayscale(1) contrast(1.18) brightness(1.02);
+}

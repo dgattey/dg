@@ -1,5 +1,6 @@
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
 import { devConsoleRoute } from '@dg/shared-core/routes/app';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
 import {
@@ -15,7 +16,6 @@ import { getAppVersionInfo } from '../../services/version';
 import chrome from '../collage/chrome.module.css';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
-import type { SiteSurface } from '../collage/types';
 import { FOOTER_ICON_DESKTOP_FONT_SIZE, FOOTER_ICON_FONT_SIZE } from './footerIconSize';
 
 const navItemNoPaddingSx: SxObject = {

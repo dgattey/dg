@@ -40,5 +40,5 @@ export async function generateMetadata(
 }
 
 export default function Page() {
-  return <Homepage />;
+  return <Homepage surface="classic" />;
 }

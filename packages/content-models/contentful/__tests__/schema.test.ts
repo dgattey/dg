@@ -98,6 +98,7 @@ describe('contentful schemas', () => {
         image: { height: 170, url: 'https://example.com/map.webp', width: 170 },
         initialZoom: 8,
         point: { latitude: 37.5, longitude: -122.4 },
+        title: 'San Francisco',
         zoomLevels: [3, '8', 18],
       },
     };
