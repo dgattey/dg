@@ -46,6 +46,11 @@
   left: -14px;
 }
 
+.tagBottomLeft {
+  bottom: -14px;
+  left: -12px;
+}
+
 .tagBottomRight {
   right: -12px;
   bottom: -14px;

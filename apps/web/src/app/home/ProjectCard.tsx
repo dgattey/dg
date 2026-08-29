@@ -5,6 +5,7 @@ import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
 import type { SxObject } from '@dg/ui/theme';
 import { getShape } from '@dg/ui/theme/shape';
 import { CollageProjectFrame } from '../collage/CollageProjectFrame';
+import type { CollageProjectSlot } from '../collage/CollageProjectFrame';
 import type { ProjectFrameStyle } from '../collage/workSheetFrames';
 
 type ClassicProjectCardProps = RenderableProject & {
@@ -13,7 +14,7 @@ type ClassicProjectCardProps = RenderableProject & {
 
 type CollageProjectCardProps = RenderableProject & {
   className?: string;
-  'data-work-slot'?: 'c1' | 'ws';
+  'data-slot'?: CollageProjectSlot;
   style: ProjectFrameStyle;
   surface: 'collage';
 };
@@ -54,11 +55,11 @@ function ClassicProjectCard({ title, layout, link, thumbnail }: RenderableProjec
 
 export function ProjectCard(props: ProjectCardProps) {
   if (props.surface === 'collage') {
-    const { className, style, surface: _surface, 'data-work-slot': workSlot, ...project } = props;
+    const { className, style, surface: _surface, 'data-slot': dataSlot, ...project } = props;
     return (
       <CollageProjectFrame
         className={className}
-        data-work-slot={workSlot}
+        data-slot={dataSlot}
         project={project}
         style={style}
       />
