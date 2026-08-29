@@ -20,10 +20,10 @@ jest.mock('../../home/ProjectCard', () => ({
     'data-work-slot'?: string;
   }) => (
     <div
+      data-has-style={style ? 'true' : 'false'}
       data-surface={surface}
       data-testid="project-card"
       data-work-slot={workSlot}
-      data-has-style={style ? 'true' : 'false'}
     >
       {title}
     </div>

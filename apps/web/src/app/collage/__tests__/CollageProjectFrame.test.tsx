@@ -19,7 +19,7 @@ jest.mock('../PaperTag', () => ({
 
 jest.mock('../Print', () => ({
   Print: ({ alt, treatment }: { alt: string; treatment?: string }) => (
-    <img alt={alt} data-treatment={treatment} />
+    <span aria-label={alt} data-treatment={treatment} role="img" />
   ),
 }));
 
@@ -50,7 +50,10 @@ describe('CollageProjectFrame', () => {
       'https://cursor.com/@dyl',
     );
     expect(screen.getByRole('link', { name: /Cursor/ })).toHaveAttribute('data-work-slot', 'c1');
-    expect(screen.getByAltText('Cursor')).toHaveAttribute('data-treatment', 'project');
+    expect(screen.getByRole('img', { name: 'Cursor' })).toHaveAttribute(
+      'data-treatment',
+      'project',
+    );
     expect(screen.getByTestId('tag')).toHaveTextContent('Cursor');
     expect(screen.getByTestId('tag')).toHaveTextContent('Website · 2026');
   });

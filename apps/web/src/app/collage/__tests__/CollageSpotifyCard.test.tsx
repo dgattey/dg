@@ -35,7 +35,9 @@ jest.mock('../PaperCard', () => ({
 }));
 
 jest.mock('@dg/ui/dependent/Image', () => ({
-  Image: ({ alt, url }: { alt: string; url: string }) => <img alt={alt} src={url} />,
+  Image: ({ alt, url }: { alt: string; url: string }) => (
+    <span aria-label={alt} data-src={url} role="img" />
+  ),
 }));
 
 jest.mock('@dg/ui/dependent/Link', () => ({
@@ -82,14 +84,17 @@ const track = {
   name: 'City of Sound',
   progressMs: 40_000,
   uri: '',
-} as Track;
+} satisfies Track;
 
 describe('CollageSpotifyCard', () => {
   it('renders disc art, status, title, artists, and progress', () => {
     const { container } = render(<CollageSpotifyCard track={track} />);
 
     expect(container.querySelector('[data-work-slot="sp"]')).toBeInTheDocument();
-    expect(screen.getByAltText('City LP')).toHaveAttribute('src', 'https://images.test/cover.jpg');
+    expect(screen.getByRole('img', { name: 'City LP' })).toHaveAttribute(
+      'data-src',
+      'https://images.test/cover.jpg',
+    );
     expect(screen.getByText('Played recently')).toBeInTheDocument();
     expect(screen.getByText('City of Sound')).toBeInTheDocument();
     expect(screen.getByText('Big Wild')).toBeInTheDocument();
