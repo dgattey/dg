@@ -64,6 +64,19 @@ describe('AlbumWell', () => {
     expect(screen.getByText('streamed tracklist')).toBeInTheDocument();
   });
 
+  it('renders the collage well as full-color tagged album art', () => {
+    const { container } = render(<AlbumWell album={album} surface="collage" />);
+
+    expect(screen.getByRole('region', { name: 'Example Album details' })).toHaveAttribute(
+      'data-surface',
+      'collage',
+    );
+    expect(container.querySelector('[data-image-treatment="full-color"]')).not.toBeNull();
+    expect(screen.getByText('Album')).toBeInTheDocument();
+    expect(screen.getByText('2019')).toBeInTheDocument();
+    expect(screen.getByText('Spotify ↗')).toBeInTheDocument();
+  });
+
   it('starts the album name on the same text edge the tracklist uses', () => {
     render(<AlbumWell album={album} />);
 

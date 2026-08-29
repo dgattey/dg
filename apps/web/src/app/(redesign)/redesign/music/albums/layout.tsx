@@ -6,5 +6,5 @@ import ClassicAlbumsLayout, {
 export const metadata = albumsMetadata;
 
 export default function Layout({ children }: { children: ReactNode }) {
-  return <ClassicAlbumsLayout>{children}</ClassicAlbumsLayout>;
+  return <ClassicAlbumsLayout surface="collage">{children}</ClassicAlbumsLayout>;
 }
