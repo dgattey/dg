@@ -42,7 +42,7 @@
   }
 
   .desktopOnly {
-    display: none;
     --cut-display: none;
+    display: none;
   }
 }

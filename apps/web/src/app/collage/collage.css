@@ -23,7 +23,7 @@ html:has(.collageRoot) body {
   --ink: light-dark(#1d1a15, #f3ecdc);
   --ink-on-cream: #1d1a15;
   --viridian: light-dark(#1a5240, #1f6e52);
-  --leaf: light-dark(#3d7b4b, #3d7b4b);
+  --leaf: light-dark(#3d7b4b, #356f43);
   --olive: light-dark(#7b8a3a, #8d9e46);
   --chartreuse: light-dark(#b7c25a, #c3cf66);
   --ultramarine: light-dark(#2c4db0, #3557b8);

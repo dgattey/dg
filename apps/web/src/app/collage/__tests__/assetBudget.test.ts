@@ -35,8 +35,8 @@ describe('collage asset budgets', () => {
 
   it('keeps the shared paper tile and display font within their budgets', () => {
     expect(statSync(join(collageDirectory, 'img/paper.webp')).size).toBeLessThanOrEqual(30 * 1024);
-    expect(statSync(join(collageDirectory, 'fonts/Familjen-Grotesk.woff2')).size).toBeLessThanOrEqual(
-      25 * 1024,
-    );
+    expect(
+      statSync(join(collageDirectory, 'fonts/Familjen-Grotesk.woff2')).size,
+    ).toBeLessThanOrEqual(25 * 1024);
   });
 });
