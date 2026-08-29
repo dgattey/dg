@@ -48,7 +48,7 @@
 
 .toneCerulean {
   --pc: var(--cerulean);
-  --on: var(--cream);
+  --on: var(--ink-on-cream);
 }
 
 .toneCobalt {
@@ -58,7 +58,7 @@
 
 .toneVermilion {
   --pc: var(--vermilion);
-  --on: var(--cream);
+  --on: var(--ink-on-cream);
 }
 
 .toneOchre {

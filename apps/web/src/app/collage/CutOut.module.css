@@ -1,0 +1,48 @@
+.cutOut {
+  position: absolute;
+  top: var(--cut-y);
+  left: var(--cut-x);
+  z-index: var(--cut-z);
+  display: var(--cut-display, block);
+  width: min(var(--cut-size), var(--cut-max-size, 46vw));
+  aspect-ratio: 1;
+  overflow: visible;
+  color: var(--cut-color);
+  pointer-events: none;
+  filter: var(--dshadow);
+  fill: currentColor;
+  rotate: var(--cut-rotation);
+}
+
+.desktopOnly {
+  --cut-display: block;
+}
+
+.nightOnly {
+  --cut-display: none;
+}
+
+@media (prefers-color-scheme: dark) {
+  .nightOnly {
+    --cut-display: block;
+  }
+}
+
+:global(html[data-color-scheme="light"]) .nightOnly {
+  --cut-display: none;
+}
+
+:global(html[data-color-scheme="dark"]) .nightOnly {
+  --cut-display: block;
+}
+
+@media (max-width: 600px) {
+  .cutOut {
+    --cut-max-size: 44vw;
+  }
+
+  .desktopOnly {
+    display: none;
+    --cut-display: none;
+  }
+}

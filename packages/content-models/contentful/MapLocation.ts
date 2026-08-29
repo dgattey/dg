@@ -5,6 +5,11 @@ import type { RenderableAsset } from './renderables/assets';
  */
 export type MapLocation = {
   /**
+   * Human-readable location name.
+   */
+  title: string;
+
+  /**
    * Coordinates to center the map.
    */
   point: {
