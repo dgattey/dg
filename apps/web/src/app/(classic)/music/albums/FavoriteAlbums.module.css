@@ -56,6 +56,10 @@
   grid-area: albums;
 }
 
+.collageAlbumReserve {
+  visibility: hidden;
+}
+
 .collageAlbumGrid {
   position: relative;
   z-index: 2;
@@ -171,6 +175,12 @@
   width: 84%;
   aspect-ratio: 1;
   margin: 8% 8% calc(8% + 7px);
+}
+
+.collageReserveArt {
+  width: 100%;
+  aspect-ratio: 1;
+  margin-bottom: 7px;
 }
 
 .collageCaptionSkeleton {
