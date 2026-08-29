@@ -53,23 +53,26 @@ async function SpotifyHeaderCardSlot({ surface }: { surface: SiteSurface }) {
 export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
   if (surface === 'collage') {
     return (
-      <header className={chrome.header}>
-        <PaperCard className={chrome.logo} edge="quad-b" tiltDeg={-4} tone="ochre">
-          <div className={chrome.logoInner}>
-            <Logo surface="collage" />
+      <>
+        <SiteHeaderHeight surface="collage" />
+        <header className={chrome.header} data-site-header={true}>
+          <PaperCard className={chrome.logo} edge="quad-b" tiltDeg={-4} tone="ochre">
+            <div className={chrome.logoInner}>
+              <Logo surface="collage" />
+            </div>
+          </PaperCard>
+          <div className={chrome.nowPlaying}>
+            <Suspense fallback={null}>
+              <SpotifyHeaderCardSlot surface="collage" />
+            </Suspense>
           </div>
-        </PaperCard>
-        <div className={chrome.nowPlaying}>
-          <Suspense fallback={null}>
-            <SpotifyHeaderCardSlot surface="collage" />
-          </Suspense>
-        </div>
-        <div className={chrome.spacer} />
-        <nav className={chrome.nav}>
-          <CollageMusicLinks />
-          <CollageColorSchemeFieldset />
-        </nav>
-      </header>
+          <div className={chrome.spacer} />
+          <nav className={chrome.nav}>
+            <CollageMusicLinks />
+            <CollageColorSchemeFieldset />
+          </nav>
+        </header>
+      </>
     );
   }
 

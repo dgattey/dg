@@ -140,9 +140,7 @@ describe('MusicInfiniteScroll', () => {
       expect(screen.getByRole('link', { name: /Solo/ })).toHaveTextContent('SoloClay artist');
     });
     expect(container.querySelectorAll('[data-image-treatment="full-color"]')).toHaveLength(2);
-    expect(container.querySelector('[data-role="collage-music-end"]')).toHaveTextContent(
-      'That’s everything3 plays',
-    );
+    expect(container.querySelector('[data-role="collage-music-loading"]')).toBeNull();
   });
 
   it('uses a paper card for the collage empty state without changing the classic copy', () => {

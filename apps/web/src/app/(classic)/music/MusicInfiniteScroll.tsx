@@ -94,20 +94,21 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
   }
 
   if (surface === 'collage') {
-    const playCountLabel = `${allTracks.length} ${allTracks.length === 1 ? 'play' : 'plays'}`;
     return (
       <div className={styles.collageHistory}>
         {sections.map((section, sectionIndex) => (
           <section aria-label={section.label} className={styles.collageSection} key={section.label}>
             <StickyFadeBar className={styles.collageDateBar} surface="collage">
-              <PaperTag
-                className={styles.collageDateTag}
-                edge="torn-b"
-                tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
-                tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
-              >
-                <h2 className={styles.collageDateHeading}>{section.label}</h2>
-              </PaperTag>
+              <h2 className={styles.collageDateHeading}>
+                <PaperTag
+                  className={styles.collageDateTag}
+                  edge="torn-b"
+                  tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
+                  tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
+                >
+                  {section.label}
+                </PaperTag>
+              </h2>
             </StickyFadeBar>
             <MusicGrid surface="collage" tracks={section.tracks} />
           </section>
@@ -130,20 +131,6 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
                 <span aria-hidden="true" className={styles.collageRing} />
                 <span>Loading more plays…</span>
               </PaperCard>
-            </div>
-          ) : cursor === null ? (
-            <div className={styles.collageState} data-role="collage-music-end">
-              <PaperCard
-                edge="quad-b"
-                innerClassName={styles.collageStateInner}
-                tiltDeg={1}
-                tone="cream"
-              >
-                <h2>That’s everything</h2>
-              </PaperCard>
-              <PaperTag className={styles.collageStateTag} tiltDeg={-3} tone="ochre">
-                {playCountLabel}
-              </PaperTag>
             </div>
           ) : null}
         </div>
