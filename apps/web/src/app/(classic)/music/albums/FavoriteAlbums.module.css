@@ -15,6 +15,7 @@
   grid-area: title;
   padding-top: 20px;
   font-size: clamp(48px, 6.2vw, 88px);
+  view-transition-name: page-title;
 }
 
 .collageSort,
@@ -127,7 +128,6 @@
   display: grid;
   gap: 4px;
   min-width: 0;
-  font-family: var(--display);
   line-height: 1.35;
 }
 
@@ -238,10 +238,6 @@
 
 .collageWellMeta {
   color: inherit;
-}
-
-.collageTrackList {
-  font-family: var(--display);
 }
 
 .collageTrackRow {
