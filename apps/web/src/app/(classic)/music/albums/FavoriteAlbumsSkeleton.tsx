@@ -1,3 +1,4 @@
+import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Skeleton, Stack } from '@mui/material';
@@ -10,9 +11,6 @@ import {
   albumTileSkeletonSx,
 } from '../albumTileGeometry';
 import {
-  COLLAGE_ALBUM_CAPTION_RESERVE_PX,
-  COLLAGE_ALBUM_GRID_COLUMNS,
-  COLLAGE_ALBUM_GRID_GAP_PX,
   collageAlbumCardClassName,
   collageAlbumCardTreatment,
 } from './collageAlbumCardTreatments';
@@ -58,23 +56,6 @@ function albumGridReserveSx(tileCount: number): SxObject {
   };
 }
 
-function collageAlbumGridReserveSx(tileCount: number): SxObject {
-  const reserve = (columns: number, gap: number) => {
-    const rows = Math.ceil(tileCount / columns);
-    const fixedHeight = rows * COLLAGE_ALBUM_CAPTION_RESERVE_PX + Math.max(0, rows - 1) * gap;
-    return `calc(${(rows / columns) * 100}% + ${fixedHeight}px)`;
-  };
-
-  return {
-    paddingBottom: {
-      lg: reserve(COLLAGE_ALBUM_GRID_COLUMNS.lg, COLLAGE_ALBUM_GRID_GAP_PX.lg),
-      md: reserve(COLLAGE_ALBUM_GRID_COLUMNS.md, COLLAGE_ALBUM_GRID_GAP_PX.md),
-      sm: reserve(COLLAGE_ALBUM_GRID_COLUMNS.sm, COLLAGE_ALBUM_GRID_GAP_PX.sm),
-      xs: reserve(COLLAGE_ALBUM_GRID_COLUMNS.xs, COLLAGE_ALBUM_GRID_GAP_PX.xs),
-    },
-  };
-}
-
 function CollageSortSkeleton() {
   return (
     <div
@@ -98,34 +79,16 @@ function CollageSortSkeleton() {
 }
 
 /**
- * Occupies the same space the loaded grid will, so the page does not resize
- * under the view transition when albums stream in. Pass `tileCount` when the
- * real length is already known so the opening snapshot matches the grid height.
- * `reserveOnly` keeps that height without compositing a tile per album.
+ * Occupies the same space the loaded grid will while albums stream in.
  */
 export function FavoriteAlbumsSkeleton({
-  reserveOnly = false,
   surface = 'classic',
   tileCount = DEFAULT_PLACEHOLDER_COUNT,
 }: {
-  reserveOnly?: boolean;
   surface?: SiteSurface;
   tileCount?: number;
 }) {
   if (surface === 'collage') {
-    if (reserveOnly) {
-      return (
-        <>
-          <CollageSortSkeleton />
-          <Box
-            className={styles.collageAlbumReserve}
-            data-role="collage-album-reserve"
-            sx={collageAlbumGridReserveSx(tileCount)}
-          />
-        </>
-      );
-    }
-
     const tiles = Array.from({ length: tileCount }, (_, tile) => `album-${tile}`);
     return (
       <>
@@ -155,15 +118,6 @@ export function FavoriteAlbumsSkeleton({
     );
   }
 
-  if (reserveOnly) {
-    return (
-      <Stack spacing={2}>
-        <Skeleton sx={sortSwitcherSx} variant="rectangular" />
-        <Box sx={albumGridReserveSx(tileCount)} />
-      </Stack>
-    );
-  }
-
   const tiles = Array.from({ length: tileCount }, (_, tile) => `album-${tile}`);
   return (
     <Stack spacing={2}>
@@ -176,5 +130,53 @@ export function FavoriteAlbumsSkeleton({
         ))}
       </Box>
     </Stack>
+  );
+}
+
+export function FavoriteAlbumsReserve({
+  albums,
+  surface = 'classic',
+}: {
+  albums: ReadonlyArray<PlaylistAlbum>;
+  surface?: SiteSurface;
+}) {
+  if (surface === 'classic') {
+    return (
+      <Stack spacing={2}>
+        <Skeleton sx={sortSwitcherSx} variant="rectangular" />
+        <Box sx={albumGridReserveSx(albums.length)} />
+      </Stack>
+    );
+  }
+
+  return (
+    <>
+      <CollageSortSkeleton />
+      <div
+        aria-hidden="true"
+        className={`${styles.collageGridSkeleton} ${styles.collageAlbumReserve}`}
+        data-role="collage-album-reserve"
+      >
+        {albums.map((album, index) => {
+          const treatment = collageAlbumCardTreatment(index);
+          return (
+            <PaperCard
+              className={collageAlbumCardClassName(treatment)}
+              edge="quad-a"
+              innerClassName={styles.collageCardInner}
+              key={album.id}
+              tiltDeg={treatment.tiltDeg}
+              tone={treatment.tone}
+            >
+              <div className={styles.collageReserveArt} />
+              <span className={styles.collageCaption}>
+                <strong className={styles.collageAlbumName}>{album.name}</strong>
+                <span className={styles.collageArtist}>{album.artistNames}</span>
+              </span>
+            </PaperCard>
+          );
+        })}
+      </div>
+    </>
   );
 }

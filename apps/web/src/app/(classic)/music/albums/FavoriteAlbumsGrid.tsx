@@ -22,7 +22,7 @@ import {
 } from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
 import styles from './FavoriteAlbums.module.css';
-import { FavoriteAlbumsSkeleton } from './FavoriteAlbumsSkeleton';
+import { FavoriteAlbumsReserve } from './FavoriteAlbumsSkeleton';
 import { useOptimisticAlbumSelection } from './useOptimisticAlbumSelection';
 
 /**
@@ -206,16 +206,21 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
   });
 
   if (!showGrid) {
-    return <FavoriteAlbumsSkeleton reserveOnly surface={surface} tileCount={albums.length} />;
+    return <FavoriteAlbumsReserve albums={albums} surface={surface} />;
   }
 
-  const sortedAlbums = [...albums].sort(comparators[sortKey]);
+  const albumCards = albums.map((album, index) => ({
+    album,
+    treatment: collageAlbumCardTreatment(index),
+  }));
+  const sortedAlbumCards = albumCards.sort((a, b) => comparators[sortKey](a.album, b.album));
   const selectedIndex = selectedAlbumId
-    ? sortedAlbums.findIndex((album) => album.id === selectedAlbumId)
+    ? sortedAlbumCards.findIndex(({ album }) => album.id === selectedAlbumId)
     : -1;
-  const selectedAlbum = selectedIndex >= 0 ? sortedAlbums[selectedIndex] : undefined;
+  const selectedAlbum =
+    selectedIndex >= 0 ? sortedAlbumCards[selectedIndex]?.album : undefined;
   const well = selectedAlbum ? (
-    <Box key="album-well" sx={wellPlacementSx(selectedIndex, sortedAlbums.length, surface)}>
+    <Box key="album-well" sx={wellPlacementSx(selectedIndex, sortedAlbumCards.length, surface)}>
       <AlbumWell album={selectedAlbum} surface={surface}>
         {/*
          * Streamed detail always belongs to the album in the URL, so it is only
@@ -231,7 +236,10 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
     </Box>
   ) : null;
 
-  const renderAlbum = (album: PlaylistAlbum, index: number) => (
+  const renderAlbum = (
+    { album, treatment }: (typeof sortedAlbumCards)[number],
+    index: number,
+  ) => (
     <Box
       key={album.id}
       ref={(element: HTMLElement | null) => {
@@ -247,7 +255,7 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
         albumId={album.id}
         albumName={album.name}
         artistCaption={album.artistNames}
-        collageTreatment={collageAlbumCardTreatment(index)}
+        collageTreatment={treatment}
         collapsed={album.id === selectedAlbumId}
         imageUrl={album.imageUrl}
         surface={surface}
@@ -258,10 +266,10 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
 
   // The well sits next to its album in the DOM for reading and tab order; CSS
   // `order` is what floats it down to the end of that album's row.
-  const cells = sortedAlbums.flatMap((album, index) =>
+  const cells = sortedAlbumCards.flatMap((albumCard, index) =>
     index === selectedIndex && well
-      ? [renderAlbum(album, index), well]
-      : [renderAlbum(album, index)],
+      ? [renderAlbum(albumCard, index), well]
+      : [renderAlbum(albumCard, index)],
   );
 
   if (surface === 'collage') {

@@ -4,7 +4,10 @@ import userEvent from '@testing-library/user-event';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { markClientHydrated, resetClientHydrated } from '../../../../layouts/clientHydrated';
 import { FavoriteAlbumsGrid } from '../FavoriteAlbumsGrid';
-import { FavoriteAlbumsSkeleton } from '../FavoriteAlbumsSkeleton';
+import {
+  FavoriteAlbumsReserve,
+  FavoriteAlbumsSkeleton,
+} from '../FavoriteAlbumsSkeleton';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
@@ -217,6 +220,25 @@ describe('FavoriteAlbumsGrid', () => {
     expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
   });
 
+  it('keeps each collage card treatment stable while sorting', async () => {
+    const user = userEvent.setup();
+    render(<FavoriteAlbumsGrid albums={albums} surface="collage" />);
+    const appearance = (name: string) => {
+      const card = screen.getByRole('link', { name }).closest('div[style]');
+      return {
+        className: card?.className,
+        rotation: card instanceof HTMLElement ? card.style.getPropertyValue('--r') : undefined,
+      };
+    };
+    const before = new Map(albums.map((album) => [album.name, appearance(album.name)]));
+
+    await clickCollageSort(user, 'Album');
+
+    for (const album of albums) {
+      expect(appearance(album.name)).toEqual(before.get(album.name));
+    }
+  });
+
   it('opens and closes collage wells with the same deep-link semantics', async () => {
     const user = userEvent.setup();
     mockUrl('album=album-zebra');
@@ -277,10 +299,14 @@ describe('FavoriteAlbumsGrid', () => {
     expect(collageGrid?.children).toHaveLength(3);
     expect(classic.container.querySelectorAll('.MuiSkeleton-root')).toHaveLength(13);
 
-    classic.rerender(<FavoriteAlbumsSkeleton reserveOnly surface="collage" tileCount={3} />);
+    classic.rerender(<FavoriteAlbumsReserve albums={albums} surface="collage" />);
 
     expect(classic.container.querySelector('[data-role="collage-album-skeleton-grid"]')).toBeNull();
-    expect(classic.container.querySelector('[data-role="collage-album-reserve"]')).not.toBeNull();
+    const reserve = classic.container.querySelector('[data-role="collage-album-reserve"]');
+    expect(reserve).not.toBeNull();
+    expect(reserve?.children).toHaveLength(3);
+    expect(reserve).toHaveTextContent('ZebraAlpha');
+    expect(reserve?.querySelectorAll('img')).toHaveLength(0);
     expect(classic.container.querySelectorAll('.MuiSkeleton-root')).toHaveLength(4);
   });
 
