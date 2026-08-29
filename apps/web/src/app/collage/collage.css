@@ -23,16 +23,17 @@ html:has(.collageRoot) body {
   --ink: light-dark(#1d1a15, #f3ecdc);
   --ink-on-cream: #1d1a15;
   --viridian: light-dark(#1a5240, #1f6e52);
-  --leaf: light-dark(#3d7b4b, #4a945b);
+  --leaf: light-dark(#3d7b4b, #3d7b4b);
   --olive: light-dark(#7b8a3a, #8d9e46);
   --chartreuse: light-dark(#b7c25a, #c3cf66);
-  --ultramarine: light-dark(#2c4db0, #4266cc);
+  --ultramarine: light-dark(#2c4db0, #3557b8);
   --cerulean: light-dark(#4f8ec1, #5d9ccf);
-  --cobalt: light-dark(#3a60c2, #4a72d4);
-  --vermilion: light-dark(#d4512d, #e05f3a);
+  --cobalt: light-dark(#3a60c2, #3557b8);
+  --vermilion: light-dark(#d95a36, #e05f3a);
   --ochre: light-dark(#dca63b, #e4b348);
   --rose: light-dark(#d9838f, #df909b);
   --black: light-dark(#1d1a15, #0c1424);
+  --star: light-dark(#1d1a15, #f3ecdc);
   --gap: clamp(14px, 1.6vw, 24px);
   --pad: clamp(16px, 4vw, 80px);
   --measure: 1280px;
@@ -65,10 +66,11 @@ html:has(.collageRoot) body {
     --ultramarine: #2c4db0;
     --cerulean: #4f8ec1;
     --cobalt: #3a60c2;
-    --vermilion: #d4512d;
+    --vermilion: #d95a36;
     --ochre: #dca63b;
     --rose: #d9838f;
     --black: #1d1a15;
+    --star: #1d1a15;
   }
 }
 

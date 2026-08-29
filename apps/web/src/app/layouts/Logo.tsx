@@ -1,13 +1,13 @@
 'use client';
 
 import { homeRoute } from '@dg/shared-core/routes/app';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { pageTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
 import { Button } from '@mui/material';
 import { usePathname } from 'next/navigation';
-import type { SiteSurface } from '../collage/types';
 import { isMusicDestinationPath } from './musicHeaderDestinations';
 
 const paddingStyles: SxObject = {

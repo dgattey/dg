@@ -2,6 +2,7 @@
 
 import type { Track } from '@dg/content-models/spotify/Track';
 import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { createTransition, TIMING_MEDIUM, TIMING_NORMAL, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
@@ -10,7 +11,6 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import chrome from '../collage/chrome.module.css';
 import { PaperCard } from '../collage/PaperCard';
-import type { SiteSurface } from '../collage/types';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
 import { usePageScrollProgress } from '../layouts/PageScrollContext';
 import { NOW_PLAYING_CARD_ID } from './SpotifyCardScrollTracker';

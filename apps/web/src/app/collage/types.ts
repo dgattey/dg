@@ -1,7 +1,3 @@
-export const SITE_SURFACES = ['classic', 'collage'] as const;
-
-export type SiteSurface = (typeof SITE_SURFACES)[number];
-
 export const PAPER_TONES = [
   'cream',
   'ultramarine',
@@ -31,11 +27,12 @@ export const PAPER_EDGES = [
 
 export type PaperEdge = (typeof PAPER_EDGES)[number];
 
-/** Tones that keep ink text so small type stays above 4.5:1. */
 export const PAPER_INK_TONES = {
+  cerulean: true,
   chartreuse: true,
   cream: true,
   ochre: true,
   olive: true,
   rose: true,
+  vermilion: true,
 } as const satisfies Partial<Record<PaperTone, true>>;
