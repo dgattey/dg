@@ -21,7 +21,9 @@ jest.mock('../../spotify/AlbumArtWithNotes', () => ({
 }));
 
 jest.mock('@dg/ui/dependent/Image', () => ({
-  Image: ({ alt, url }: { alt: string; url: string }) => <img alt={alt} src={url} />,
+  Image: ({ alt, url }: { alt: string; url: string }) => (
+    <span aria-label={alt} data-src={url} role="img" />
+  ),
 }));
 
 jest.mock('@dg/ui/dependent/Link', () => ({
@@ -62,7 +64,7 @@ const track = {
   name: 'City of Sound',
   progressMs: 40_000,
   uri: '',
-} as Track;
+} satisfies Track;
 
 describe('RecordDisc', () => {
   it('wraps the clipped disc so notes can paint outside the record', () => {
@@ -70,7 +72,10 @@ describe('RecordDisc', () => {
 
     const notesWrap = container.querySelector('[data-notes-wrap="true"]');
     expect(notesWrap).toHaveAttribute('data-overflow', 'visible');
-    expect(notesWrap?.querySelector('img')).toHaveAttribute('src', 'https://images.test/cover.jpg');
+    expect(screen.getByRole('img', { name: 'City LP' })).toHaveAttribute(
+      'data-src',
+      'https://images.test/cover.jpg',
+    );
     expect(screen.getByRole('link', { name: 'Spotify' })).toHaveAttribute(
       'href',
       'https://open.spotify.com/track/1',
