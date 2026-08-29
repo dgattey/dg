@@ -1,10 +1,17 @@
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import type { BoxProps } from '@mui/material';
 import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { SxObject } from '../theme';
 import { stickyDecorSx } from './transitions/pageTransitions';
 
-const BACKGROUND = 'var(--mui-palette-background-default)';
+const CLASSIC_BACKGROUND = 'var(--mui-palette-background-default)';
+const BACKGROUND = `var(--sticky-fade-background, ${CLASSIC_BACKGROUND})`;
+
+const surfaceBackgroundSx = {
+  classic: { '--sticky-fade-background': CLASSIC_BACKGROUND },
+  collage: { '--sticky-fade-background': 'var(--paper)' },
+} satisfies Record<SiteSurface, SxObject>;
 
 /** Measured once by the header, so the bar tracks it across breakpoints. */
 const HEADER_HEIGHT = 'var(--site-header-height, 5.5rem)';
@@ -120,6 +127,7 @@ const stickyInnerSx: SxObject = {
 
 type StickyFadeBarProps = Omit<BoxProps, 'sx' | 'children'> & {
   children: ReactNode;
+  surface?: SiteSurface;
   sx?: SxObject;
 };
 
@@ -132,10 +140,10 @@ type StickyFadeBarProps = Omit<BoxProps, 'sx' | 'children'> & {
  * The band reserves the perceptible part of the ramp below its children, so
  * children only need their own leading padding.
  */
-export function StickyFadeBar({ children, sx, ...props }: StickyFadeBarProps) {
-  const mergedSx = sx ? { ...stickyBarSx, ...sx } : stickyBarSx;
+export function StickyFadeBar({ children, surface = 'classic', sx, ...props }: StickyFadeBarProps) {
+  const mergedSx = { ...stickyBarSx, ...surfaceBackgroundSx[surface], ...sx };
   return (
-    <Box {...props} sx={mergedSx}>
+    <Box {...props} data-site-surface={surface} sx={mergedSx}>
       <Box aria-hidden data-sticky-surface sx={barSurfaceSx} />
       <Box sx={stickyInnerSx}>{children}</Box>
       <Box aria-hidden data-sticky-fade sx={fadeOverlaySx} />
@@ -149,6 +157,13 @@ export function StickyFadeBar({ children, sx, ...props }: StickyFadeBarProps) {
  * would paint the same pixels, and a layer that lives in the page rides that
  * page wherever a navigation takes it.
  */
-export function StickyBarTopMask() {
-  return <Box aria-hidden data-sticky-mask sx={topMaskSx} />;
+export function StickyBarTopMask({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
+  return (
+    <Box
+      aria-hidden
+      data-site-surface={surface}
+      data-sticky-mask
+      sx={{ ...topMaskSx, ...surfaceBackgroundSx[surface] }}
+    />
+  );
 }
