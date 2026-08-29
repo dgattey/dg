@@ -1,0 +1,340 @@
+.collageLayout {
+  display: grid;
+  grid-template-areas:
+    "title title title title title title title title sort sort sort sort"
+    "albums albums albums albums albums albums albums albums albums albums albums albums";
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  row-gap: 44px;
+  align-items: center;
+  width: min(100%, 1120px);
+  padding-block: 40px 42px;
+  margin-inline: auto;
+}
+
+.collageTitle {
+  grid-area: title;
+  padding-top: 20px;
+  font-size: clamp(48px, 6.2vw, 88px);
+}
+
+.collageSort,
+.collageSortSkeleton {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  grid-area: sort;
+  gap: 8px;
+  justify-content: flex-end;
+  justify-self: end;
+}
+
+.collageSortTag {
+  padding: 0;
+  font-size: 15.5px;
+  line-height: 1.25;
+}
+
+.collageSortButton {
+  all: unset;
+  padding: 11px 16px 12px;
+  cursor: pointer;
+}
+
+.collageSortButton:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+.collageSortSkeletonLine {
+  width: 74px;
+}
+
+.collageAlbumGrid,
+.collageAlbumReserve {
+  grid-area: albums;
+}
+
+.collageAlbumGrid {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 16px;
+}
+
+.collageCard {
+  --card-offset: 0px;
+  align-self: start;
+  width: 100%;
+  overflow-wrap: anywhere;
+  translate: 0 var(--card-offset);
+}
+
+.cardStagger0 {
+  --card-offset: 0px;
+}
+
+.cardStagger8 {
+  --card-offset: 8px;
+}
+
+.cardStagger10 {
+  --card-offset: 10px;
+}
+
+.cardStagger14 {
+  --card-offset: 14px;
+}
+
+.collageCardInner {
+  display: block;
+  padding: 10px 10px 16px;
+  overflow: clip;
+}
+
+.collageAlbumLink {
+  display: grid;
+  grid-template-rows: auto auto;
+  gap: 4px;
+  color: inherit;
+  text-decoration: none;
+}
+
+.collageArt {
+  position: relative;
+  z-index: 2;
+  display: block;
+  width: 100%;
+  margin-bottom: 7px;
+  line-height: 0;
+  rotate: 1.5deg;
+}
+
+.fullColorArt,
+.fullColorArt img {
+  background: transparent;
+  mix-blend-mode: normal;
+}
+
+.fullColorArt.fullColorArt img {
+  filter: none;
+}
+
+.collageCaption {
+  position: relative;
+  z-index: 4;
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+  font-family: var(--display);
+  line-height: 1.35;
+}
+
+.collageAlbumName {
+  font-size: 17px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.collageArtist {
+  font-size: 15px;
+  opacity: 0.92;
+}
+
+.collageSelected .collageCardInner {
+  outline: 3px solid var(--vermilion);
+  outline-offset: -3px;
+}
+
+.collageCloseMark {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  z-index: 5;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font-family: var(--display);
+  font-size: 19px;
+  font-style: normal;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--cream);
+  background: var(--vermilion);
+  clip-path: var(--quad-b);
+  rotate: 6deg;
+}
+
+.collageArtSkeleton {
+  width: 84%;
+  aspect-ratio: 1;
+  margin: 8% 8% calc(8% + 7px);
+}
+
+.collageCaptionSkeleton {
+  display: grid;
+  gap: 4px;
+}
+
+.collageWellCard {
+  width: calc(100% + 20px);
+  margin: 28px -10px 14px;
+}
+
+:global(html:active-view-transition-type(album-close)) .collageWellCard,
+:global(html:active-view-transition-type(album-open)) .collageWellCard {
+  view-transition-name: album-well;
+}
+
+.collageWellInner {
+  overflow: clip;
+}
+
+.collageWell {
+  color: var(--cream);
+}
+
+.collageWell a {
+  color: inherit;
+}
+
+.collageWellArt {
+  position: relative;
+}
+
+.collageWellAlbumTag,
+.collageWellSpotifyTag {
+  position: absolute;
+  z-index: 3;
+  font-size: 12px;
+}
+
+.collageWellAlbumTag {
+  bottom: 10px;
+  left: 10px;
+  gap: 0.7em;
+  align-items: baseline;
+  line-height: 1.1;
+}
+
+.collageWellAlbumTag small {
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+
+.collageWellSpotifyTag {
+  top: 10px;
+  right: 10px;
+}
+
+.collageWellName {
+  font-family: var(--display);
+}
+
+.collageWellMeta {
+  color: inherit;
+}
+
+.collageTrackList {
+  font-family: var(--display);
+}
+
+.collageTrackRow {
+  border-bottom: 1px solid color-mix(in oklab, var(--cream) 28%, var(--viridian));
+}
+
+.collageGridSkeleton {
+  display: grid;
+  grid-area: albums;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 16px;
+}
+
+@media (min-width: 600px) {
+  .collageAlbumGrid,
+  .collageGridSkeleton {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 900px) {
+  .collageAlbumGrid,
+  .collageGridSkeleton {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: clamp(22px, 2.6vw, 36px) clamp(16px, 2vw, 28px);
+  }
+}
+
+@media (min-width: 1200px) {
+  .collageAlbumGrid,
+  .collageGridSkeleton {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .collageCard {
+    transition:
+      translate 350ms cubic-bezier(0.2, 0.8, 0.2, 1),
+      filter 350ms;
+  }
+
+  .collageCard:hover {
+    translate: 0 calc(var(--card-offset) - 3px);
+  }
+}
+
+@media (max-width: 820px) {
+  .collageLayout {
+    grid-template-areas:
+      "title"
+      "sort"
+      "albums";
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 36px;
+    padding-block-start: 16px;
+  }
+
+  .collageTitle {
+    padding-top: 16px;
+    font-size: clamp(54px, 16.5vw, 72px);
+  }
+
+  .collageSort,
+  .collageSortSkeleton {
+    justify-content: flex-start;
+    justify-self: start;
+  }
+
+  .cardStagger0 {
+    --card-offset: 0px;
+  }
+
+  .cardStagger8,
+  .cardStagger10,
+  .cardStagger14 {
+    --card-offset: 8px;
+  }
+
+  .collageCardInner {
+    padding: 8px 8px 14px;
+  }
+
+  .collageAlbumName {
+    font-size: 15.5px;
+  }
+
+  .collageArtist {
+    font-size: 14px;
+  }
+
+  .collageWellCard {
+    width: 100%;
+    margin: 10px 0 6px;
+  }
+}
