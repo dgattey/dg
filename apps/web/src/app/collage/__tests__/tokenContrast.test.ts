@@ -1,6 +1,6 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { invariant } from '@dg/shared-core/helpers/invariant';
+import { invariant } from '@dg/shared-core/assertions/invariant';
 import { PAPER_INK_TONES, PAPER_TONES, type PaperTone } from '../types';
 
 const collageCss = readFileSync(join(__dirname, '..', 'collage.css'), 'utf8');
@@ -48,7 +48,9 @@ describe('collage token contrast', () => {
     const className = `tone${tone[0]?.toUpperCase()}${tone.slice(1)}`;
     const foregroundToken = usesInk(tone) ? 'ink-on-cream' : 'cream';
 
-    expect(paperCss).toContain(`.${className} {\n  --pc: var(--${tone});\n  --on: var(--${foregroundToken});`);
+    expect(paperCss).toContain(
+      `.${className} {\n  --pc: var(--${tone});\n  --on: var(--${foregroundToken});`,
+    );
     expect(contrastRatio(backgrounds[0], foregrounds[0])).toBeGreaterThanOrEqual(4.5);
     expect(contrastRatio(backgrounds[1], foregrounds[1])).toBeGreaterThanOrEqual(4.5);
   });
