@@ -61,8 +61,7 @@ function albumGridReserveSx(tileCount: number): SxObject {
 function collageAlbumGridReserveSx(tileCount: number): SxObject {
   const reserve = (columns: number, gap: number) => {
     const rows = Math.ceil(tileCount / columns);
-    const fixedHeight =
-      rows * COLLAGE_ALBUM_CAPTION_RESERVE_PX + Math.max(0, rows - 1) * gap;
+    const fixedHeight = rows * COLLAGE_ALBUM_CAPTION_RESERVE_PX + Math.max(0, rows - 1) * gap;
     return `calc(${(rows / columns) * 100}% + ${fixedHeight}px)`;
   };
 
