@@ -4,7 +4,6 @@ import { Image } from '@dg/ui/dependent/Image';
 import styles from './CollageSideProjects.module.css';
 import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
-import type { PaperTone } from './types';
 
 type CollageSideProjectsProps = {
   projects: ReadonlyArray<RenderableSideProject>;
@@ -13,10 +12,6 @@ type CollageSideProjectsProps = {
 const MARK_SIZES: ImageSizes = {
   extraLarge: 44,
 };
-
-const MARK_TONES: ReadonlyArray<PaperTone> = ['ochre', 'ultramarine'];
-
-const ROW_EDGES = ['quad-a', 'quad-d'] as const;
 
 export function CollageSideProjects({ projects }: CollageSideProjectsProps) {
   return (
@@ -28,9 +23,10 @@ export function CollageSideProjects({ projects }: CollageSideProjectsProps) {
       </h2>
       <ul className={styles.list}>
         {projects.map((project, index) => {
-          const markTone = MARK_TONES[index % MARK_TONES.length] ?? 'ochre';
-          const edge = ROW_EDGES[index % ROW_EDGES.length] ?? 'quad-a';
-          const tiltDeg = index % 2 === 0 ? 1.5 : -1.2;
+          const even = index % 2 === 0;
+          const markTone = even ? 'ochre' : 'ultramarine';
+          const edge = even ? 'quad-a' : 'quad-d';
+          const tiltDeg = even ? 1.5 : -1.2;
           return (
             <li className={styles.item} key={project.url}>
               <PaperCard className={styles.rowWrap} edge={edge} tiltDeg={tiltDeg} tone="cream">
