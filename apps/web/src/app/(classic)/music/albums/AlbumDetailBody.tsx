@@ -333,11 +333,7 @@ export function AlbumDetailBody({
         </Box>
       </Box>
 
-      <Box
-        component="ol"
-        data-role="track-list"
-        sx={surfaceStyles.trackList}
-      >
+      <Box component="ol" data-role="track-list" sx={surfaceStyles.trackList}>
         {album.tracks.map((track) => (
           <Box
             className={surface === 'collage' ? styles.collageTrackRow : undefined}
