@@ -15,7 +15,7 @@ type CollageStravaCardProps = {
 
 export function CollageStravaCard({ activity, encodedPolyline }: CollageStravaCardProps) {
   return (
-    <div className={sheetStyles.strava} data-work-slot="st">
+    <div className={sheetStyles.strava} data-slot="st">
       <PaperCard edge="torn-b" innerClassName={styles.inner} tiltDeg={1.2} tone="olive">
         {encodedPolyline ? (
           <span aria-hidden="true" className={styles.route}>

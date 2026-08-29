@@ -1,10 +1,13 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { ContentGrid } from '@dg/ui/core/ContentGrid';
 import { getProjects } from '../../services/contentful';
+import { assignProjectSlots } from '../collage/assignProjectSlots';
+import { CodaSheet } from '../collage/CodaSheet';
 import { CutOut } from '../collage/CutOut';
 import { CutOutSymbols } from '../collage/CutOutSymbols';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
 import styles from '../collage/HelloSheet.module.css';
+import { MoreWorkSheet } from '../collage/MoreWorkSheet';
 import { WorkSheet } from '../collage/WorkSheet';
 import { GatteySitesCardSlot } from './GatteySitesCardSlot';
 import { IntroCardSlot } from './IntroCardSlot';
@@ -37,6 +40,7 @@ export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface 
   const projects = await getProjects();
 
   if (surface === 'collage') {
+    const slots = assignProjectSlots(projects);
     return (
       <>
         <CutOutSymbols />
@@ -50,10 +54,16 @@ export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface 
           </div>
         </section>
         <WorkSheet
-          projects={projects}
+          projects={slots.work}
           spotify={<SpotifyCardSlot surface="collage" />}
           strava={<StravaCardSlot surface="collage" />}
         />
+        <MoreWorkSheet
+          overflow={slots.overflow}
+          projects={slots.moreWork}
+          sites={<GatteySitesCardSlot surface="collage" />}
+        />
+        <CodaSheet project={slots.coda} />
       </>
     );
   }

@@ -1,10 +1,17 @@
 import type { RenderableProject } from '@dg/content-models/contentful/renderables/projects';
+import type { SlottedProject } from '../assignProjectSlots';
 import { projectFrameAspect, projectTagMeta, workSheetFrames } from '../workSheetFrames';
 
-const baseProject = (overrides: Partial<RenderableProject> = {}): RenderableProject => ({
-  thumbnail: { height: 400, url: 'https://images.test/cursor.jpg', width: 900 },
-  title: 'Cursor',
-  ...overrides,
+const slotted = (
+  sourceIndex: number,
+  overrides: Partial<RenderableProject> = {},
+): SlottedProject => ({
+  key: `p-${sourceIndex}`,
+  project: {
+    thumbnail: { height: 400, url: 'https://images.test/cursor.jpg', width: 900 },
+    title: 'Cursor',
+    ...overrides,
+  },
 });
 
 describe('workSheetFrames', () => {
@@ -13,21 +20,23 @@ describe('workSheetFrames', () => {
   });
 
   it('assigns the first project to c1', () => {
-    const project = baseProject();
+    const project = slotted(0);
     const frames = workSheetFrames([project]);
     expect(frames).toHaveLength(1);
     expect(frames[0]?.gridArea).toBe('c1');
-    expect(frames[0]?.project).toBe(project);
+    expect(frames[0]?.key).toBe('p-0');
+    expect(frames[0]?.project).toBe(project.project);
   });
 
-  it('takes only the first two projects in source order', () => {
+  it('takes only the first two slotted projects in source order', () => {
     const frames = workSheetFrames([
-      baseProject({ title: 'One' }),
-      baseProject({ title: 'Two' }),
-      baseProject({ title: 'Three' }),
+      slotted(0, { title: 'One' }),
+      slotted(1, { title: 'Two' }),
+      slotted(2, { title: 'Three' }),
     ]);
     expect(frames.map((frame) => frame.gridArea)).toEqual(['c1', 'ws']);
     expect(frames.map((frame) => frame.project.title)).toEqual(['One', 'Two']);
+    expect(frames.map((frame) => frame.key)).toEqual(['p-0', 'p-1']);
   });
 });
 
