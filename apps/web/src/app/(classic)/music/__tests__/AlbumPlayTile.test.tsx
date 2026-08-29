@@ -77,4 +77,35 @@ describe('AlbumPlayTile', () => {
 
     expect(screen.getByRole('tooltip')).toHaveTextContent('EAST – Earl Sweatshirt');
   });
+
+  it('renders a collage run as a full-color paper card with a separate caption', () => {
+    const { container } = render(<AlbumPlayTile {...props} cardIndex={1} surface="collage" />);
+
+    const link = screen.getByRole('link', { name: /Feet of Clay/ });
+    expect(link.querySelector('[data-role="album-caption"]')).toHaveTextContent(
+      'Feet of ClayEarl Sweatshirt',
+    );
+    expect(link.querySelector('[data-image-treatment="full-color"]')).not.toBeNull();
+    expect(container.querySelectorAll('img')).toHaveLength(3);
+    expect(screen.getByText('12 tracks')).toBeInTheDocument();
+  });
+
+  it('labels a single collage play with its track and artist without a count tag', () => {
+    const { container } = render(
+      <AlbumPlayTile
+        {...props}
+        linkUrl="https://open.spotify.com/track/east"
+        surface="collage"
+        trackCount={1}
+      />,
+    );
+
+    const link = screen.getByRole('link', { name: /EAST/ });
+    expect(link.querySelector('[data-role="album-caption"]')).toHaveTextContent(
+      'EASTEarl Sweatshirt',
+    );
+    expect(link).toHaveAttribute('href', 'https://open.spotify.com/track/east');
+    expect(container.querySelectorAll('img')).toHaveLength(1);
+    expect(screen.queryByText('1 track')).not.toBeInTheDocument();
+  });
 });
