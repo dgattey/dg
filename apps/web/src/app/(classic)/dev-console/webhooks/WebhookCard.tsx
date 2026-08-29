@@ -2,6 +2,7 @@ import 'server-only';
 
 import type { WebhookSubscriptionMetadata } from '@dg/services/strava/webhooks/getWebhookSubscriptions';
 import { getWebhookSubscriptions } from '@dg/services/strava/webhooks/getWebhookSubscriptions';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Skeleton, Stack, Typography } from '@mui/material';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
@@ -16,11 +17,13 @@ import { SubscriptionDetails } from './SubscriptionDetails';
  */
 function SubscriptionActions({
   subscriptions,
+  surface,
 }: {
   subscriptions: Array<WebhookSubscriptionMetadata>;
+  surface: SiteSurface;
 }) {
   if (subscriptions.length === 0) {
-    return <CreateWebhookButton />;
+    return <CreateWebhookButton surface={surface} />;
   }
 
   return (
@@ -37,7 +40,7 @@ function SubscriptionActions({
           />
         ))}
       </Stack>
-      <DeleteWebhookButton />
+      <DeleteWebhookButton surface={surface} />
     </>
   );
 }
@@ -50,7 +53,11 @@ function SubscriptionActions({
  * When Strava refuses the listing the card says so and offers no actions,
  * since creating or deleting would be guessing at state we don't have.
  */
-export async function WebhookCardContent() {
+export async function WebhookCardContent({
+  surface = 'classic',
+}: {
+  surface?: SiteSurface;
+} = {}) {
   await connection();
   const { subscriptions, error } = await getWebhookSubscriptions();
 
@@ -64,10 +71,10 @@ export async function WebhookCardContent() {
         }}
       >
         <Typography variant="h3">Strava webhooks</Typography>
-        <StatusChip isConnected={subscriptions.length > 0} />
+        <StatusChip isConnected={subscriptions.length > 0} surface={surface} />
       </Stack>
-      <ErrorMessage message={error} />
-      {error ? null : <SubscriptionActions subscriptions={subscriptions} />}
+      <ErrorMessage message={error} surface={surface} />
+      {error ? null : <SubscriptionActions subscriptions={subscriptions} surface={surface} />}
     </>
   );
 }
@@ -98,11 +105,11 @@ function WebhookCardContentSkeleton() {
   );
 }
 
-export function WebhookCard() {
+export function WebhookCard({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
   return (
-    <DevConsoleCardShell>
+    <DevConsoleCardShell surface={surface}>
       <Suspense fallback={<WebhookCardContentSkeleton />}>
-        <WebhookCardContent />
+        <WebhookCardContent surface={surface} />
       </Suspense>
     </DevConsoleCardShell>
   );

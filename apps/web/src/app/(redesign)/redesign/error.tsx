@@ -1,6 +1,6 @@
 'use client';
 
-import ClassicError from '../../(classic)/error';
+import { ErrorLayout } from '../../layouts/ErrorLayout';
 
 export default function RedesignError({
   error,
@@ -9,5 +9,7 @@ export default function RedesignError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  return <ClassicError error={error} reset={reset} />;
+  void error;
+  void reset;
+  return <ErrorLayout statusCode={500} surface="collage" />;
 }

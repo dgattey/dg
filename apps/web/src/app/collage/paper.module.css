@@ -142,3 +142,8 @@
   color: var(--cream);
   background: var(--ink);
 }
+
+.button:disabled {
+  cursor: wait;
+  opacity: 0.62;
+}

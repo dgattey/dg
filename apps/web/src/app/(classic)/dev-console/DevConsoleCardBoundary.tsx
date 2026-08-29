@@ -1,10 +1,12 @@
 'use client';
 
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Component, type ReactNode } from 'react';
 import { ErrorMessage } from './StatusIndicators';
 
 type DevConsoleCardBoundaryProps = {
   children: ReactNode;
+  surface?: SiteSurface;
 };
 
 type DevConsoleCardBoundaryState = {
@@ -39,6 +41,11 @@ export class DevConsoleCardBoundary extends Component<
 
     // The digest is the only handle on the server-side log line in production.
     const suffix = digest ? ` (digest ${digest})` : '';
-    return <ErrorMessage message={`This card failed to load${suffix}. Check the server logs.`} />;
+    return (
+      <ErrorMessage
+        message={`This card failed to load${suffix}. Check the server logs.`}
+        surface={this.props.surface}
+      />
+    );
   }
 }
