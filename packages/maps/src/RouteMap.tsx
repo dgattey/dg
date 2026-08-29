@@ -1,32 +1,18 @@
 'use client';
 
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import type { SxObject } from '@dg/ui/theme';
-import { BRAND } from '@dg/ui/theme/color';
 import { useColorScheme } from '@dg/ui/theme/useColorScheme';
 import { Box } from '@mui/material';
 import type { Point } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { fitRouteViewport, projectRouteToPixels, toSvgPath } from './routeGeometry';
+import { getRouteMapTokens } from './routeMapTokens';
 import { SmoothTile } from './SmoothTile';
 
 const ROUTE_PADDING = 42;
 const DEFAULT_SIZE = 320;
-
-const paperMix = (percent: number) =>
-  `color-mix(in srgb, var(--mui-palette-background-paper) ${percent}%, transparent)`;
-
-const containerSx: SxObject = {
-  backgroundColor: 'var(--mui-palette-background-paper)',
-  height: '100%',
-  // Groups the underlay, tiles, scrim and route into one layer so none of them
-  // can paint above whatever the host renders over the map.
-  isolation: 'isolate',
-  overflow: 'hidden',
-  pointerEvents: 'none',
-  position: 'relative',
-  width: '100%',
-};
 
 const underlaySx: SxObject = {
   filter: 'blur(8px)',
@@ -38,36 +24,6 @@ const underlaySx: SxObject = {
   transform: 'scale(1.05)',
   width: '110%',
   zIndex: 0,
-};
-
-const getTileLayerSx = (dark: boolean): SxObject => ({
-  // Pigeon paints its own opaque background, which would hide the placeholder.
-  '& > div': {
-    backgroundColor: 'transparent !important',
-  },
-  // Outdoors is vivid and fully labelled, so light mode also lifts its darkest
-  // ink — road casings and place labels — toward the landcover. Without that the
-  // basemap's own labels, not the route, become the worst thing under the copy.
-  filter: dark ? 'saturate(0.85)' : 'saturate(0.5) brightness(1.1) contrast(0.76)',
-  inset: 0,
-  position: 'absolute',
-  zIndex: 1,
-});
-
-/**
- * A mild, near-uniform knock-back that sets how present the basemap feels.
- * Legibility is the host's job: whatever renders text over this map is expected
- * to back its own text regions, since only it knows where the copy sits.
- */
-const getScrimSx = (dark: boolean): SxObject => {
-  const [top, bottom] = dark ? ([10, 20] as const) : ([20, 28] as const);
-
-  return {
-    background: `linear-gradient(180deg, ${paperMix(top)} 0%, ${paperMix(bottom)} 100%)`,
-    inset: 0,
-    position: 'absolute',
-    zIndex: 2,
-  };
 };
 
 const routeSvgSx: SxObject = {
@@ -128,10 +84,11 @@ function tileUrl({
 export type RouteMapProps = {
   points: Array<Point>;
   stadiaApiKey: string;
+  surface?: SiteSurface;
 };
 
 /** A non-interactive, theme-aware route map intended for card backgrounds. */
-export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
+export function RouteMap({ points, stadiaApiKey, surface = 'classic' }: RouteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ height: DEFAULT_SIZE, width: DEFAULT_SIZE });
   const { preference } = useColorScheme();
@@ -141,6 +98,7 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
     getServerSystemDarkSnapshot,
   );
   const dark = preference === 'dark' || (preference === 'system' && systemDark);
+  const tokens = getRouteMapTokens(surface, dark);
   const viewport = fitRouteViewport({
     height: size.height,
     padding: ROUTE_PADDING,
@@ -178,6 +136,33 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
     return () => observer.disconnect();
   }, []);
 
+  const containerSx: SxObject = {
+    backgroundColor: tokens.containerBackground,
+    height: '100%',
+    isolation: 'isolate',
+    overflow: 'hidden',
+    pointerEvents: 'none',
+    position: 'relative',
+    width: '100%',
+  };
+
+  const tileLayerSx: SxObject = {
+    '& > div': {
+      backgroundColor: 'transparent !important',
+    },
+    filter: tokens.tileFilter,
+    inset: 0,
+    position: 'absolute',
+    zIndex: 1,
+  };
+
+  const scrimSx: SxObject = {
+    background: tokens.scrimGradient,
+    inset: 0,
+    position: 'absolute',
+    zIndex: 2,
+  };
+
   return (
     <Box aria-hidden="true" ref={containerRef} sx={containerSx}>
       <Box
@@ -192,7 +177,7 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
         })}
         sx={underlaySx}
       />
-      <Box sx={getTileLayerSx(dark)}>
+      <Box sx={tileLayerSx}>
         <PigeonMapCore
           animate={false}
           attribution={false}
@@ -210,13 +195,13 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
           zoomSnap={false}
         />
       </Box>
-      <Box sx={getScrimSx(dark)} />
+      <Box sx={scrimSx} />
       <Box component="svg" sx={routeSvgSx} viewBox={`0 0 ${size.width} ${size.height}`}>
         <Box
           component="path"
           d={routePath}
           fill="none"
-          stroke={dark ? 'rgb(0 0 0 / 0.42)' : paperMix(86)}
+          stroke={tokens.casingStroke}
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeWidth={6}
@@ -226,10 +211,10 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
           component="path"
           d={routePath}
           fill="none"
-          stroke={BRAND.routeLine}
+          stroke={tokens.routeStroke}
           strokeLinecap="round"
           strokeLinejoin="round"
-          strokeWidth={2.5}
+          strokeWidth={tokens.routeStrokeWidth}
           vectorEffect="non-scaling-stroke"
         />
       </Box>

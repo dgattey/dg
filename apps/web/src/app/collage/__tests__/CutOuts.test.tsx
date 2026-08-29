@@ -41,6 +41,15 @@ describe('collage cut-outs', () => {
     }
   });
 
+  it('mirrors placements that request it', () => {
+    const mirrored = CUT_OUT_PLACEMENTS.workSheet.find((placement) => placement.mirrored);
+    invariant(mirrored, 'Expected a mirrored Work sheet cut-out');
+
+    const { container } = render(<CutOut placement={mirrored} />);
+    const cutOut = container.querySelector('svg');
+    expect(cutOut).toHaveStyle({ '--cut-scale-x': '-1' });
+  });
+
   it('keeps rendered decorations out of the accessibility tree', () => {
     const placement = CUT_OUT_PLACEMENTS.helloSheet[0];
     invariant(placement, 'Expected a Hello sheet placement');

@@ -5,6 +5,7 @@ import { CutOut } from '../collage/CutOut';
 import { CutOutSymbols } from '../collage/CutOutSymbols';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
 import styles from '../collage/HelloSheet.module.css';
+import { WorkSheet } from '../collage/WorkSheet';
 import { GatteySitesCardSlot } from './GatteySitesCardSlot';
 import { IntroCardSlot } from './IntroCardSlot';
 import { MapCardSlot } from './MapCardSlot';
@@ -28,16 +29,23 @@ export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface 
 
   if (surface === 'collage') {
     return (
-      <section aria-label="Hello" className={styles.sheet}>
+      <>
         <CutOutSymbols />
-        {CUT_OUT_PLACEMENTS.helloSheet.map((placement) => (
-          <CutOut key={placement.id} placement={placement} />
-        ))}
-        <div className={styles.grid}>
-          <IntroCardSlot surface="collage" />
-          <MapCardSlot surface="collage" />
-        </div>
-      </section>
+        <section aria-label="Hello" className={styles.sheet}>
+          {CUT_OUT_PLACEMENTS.helloSheet.map((placement) => (
+            <CutOut key={placement.id} placement={placement} />
+          ))}
+          <div className={styles.grid}>
+            <IntroCardSlot surface="collage" />
+            <MapCardSlot surface="collage" />
+          </div>
+        </section>
+        <WorkSheet
+          projects={projects}
+          spotify={<SpotifyCardSlot surface="collage" />}
+          strava={<StravaCardSlot surface="collage" />}
+        />
+      </>
     );
   }
 

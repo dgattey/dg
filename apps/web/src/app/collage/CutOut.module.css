@@ -12,6 +12,7 @@
   filter: var(--dshadow);
   fill: currentColor;
   rotate: var(--cut-rotation);
+  scale: var(--cut-scale-x, 1) 1;
 }
 
 .desktopOnly {
