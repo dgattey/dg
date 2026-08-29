@@ -10,10 +10,7 @@ import {
   albumTileFrameSx,
   albumTileSkeletonSx,
 } from '../albumTileGeometry';
-import {
-  collageAlbumCardClassName,
-  collageAlbumCardTreatment,
-} from './collageAlbumCardTreatments';
+import { collageAlbumCardClassName, collageAlbumCardTreatment } from './collageAlbumCardTreatments';
 import styles from './FavoriteAlbums.module.css';
 
 const sortSwitcherSx: SxObject = {

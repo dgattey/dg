@@ -4,10 +4,7 @@ import userEvent from '@testing-library/user-event';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { markClientHydrated, resetClientHydrated } from '../../../../layouts/clientHydrated';
 import { FavoriteAlbumsGrid } from '../FavoriteAlbumsGrid';
-import {
-  FavoriteAlbumsReserve,
-  FavoriteAlbumsSkeleton,
-} from '../FavoriteAlbumsSkeleton';
+import { FavoriteAlbumsReserve, FavoriteAlbumsSkeleton } from '../FavoriteAlbumsSkeleton';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
