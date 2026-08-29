@@ -46,6 +46,7 @@ const fullBleed = {
  */
 const topMaskSx: SxObject = {
   backgroundColor: BACKGROUND,
+  backgroundImage: 'var(--sticky-fade-texture, none)',
   'body:has([data-sticky-fade]) &': {
     display: 'block',
   },
@@ -81,6 +82,7 @@ const barSurfaceSx: SxObject = {
   ...fullBleed,
   ...stickyDecorSx,
   backgroundColor: BACKGROUND,
+  backgroundImage: 'var(--sticky-fade-texture, none)',
   bottom: `calc(${FADE_RESERVE} - 1px)`,
   pointerEvents: 'none',
   position: 'absolute',

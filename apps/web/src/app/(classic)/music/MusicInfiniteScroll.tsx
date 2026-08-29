@@ -116,12 +116,7 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
 
         <div className={styles.collageSentinel} ref={sentinelRef}>
           {isLoading ? (
-            <div
-              aria-live="polite"
-              className={styles.collageState}
-              data-role="collage-music-loading"
-              role="status"
-            >
+            <div className={styles.collageState} data-role="collage-music-loading" role="status">
               <PaperCard
                 edge="quad-c"
                 innerClassName={`${styles.collageStateInner} ${styles.collageLoadingInner}`}
