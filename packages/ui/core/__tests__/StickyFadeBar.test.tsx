@@ -28,11 +28,14 @@ describe('StickyFadeBar', () => {
 
     expect(screen.getByTestId('bar')).toHaveAttribute('data-site-surface', 'collage');
     expect(screen.getByTestId('bar')).toHaveStyle({
-      '--sticky-fade-background': 'var(--paper)',
+      '--sticky-fade-background': 'transparent',
+      '--sticky-surface-background': 'var(--paper)',
     });
     expect(container.querySelector('[data-sticky-surface]')).toHaveStyle({
-      backgroundColor: 'var(--sticky-fade-background, var(--mui-palette-background-default))',
+      backgroundColor:
+        'var(--sticky-surface-background, var(--sticky-fade-background, var(--mui-palette-background-default)))',
       backgroundImage: 'var(--sticky-fade-texture, none)',
+      backgroundSize: 'var(--sticky-fade-texture-size, auto)',
     });
   });
 
@@ -40,8 +43,10 @@ describe('StickyFadeBar', () => {
     render(<StickyBarTopMask surface="collage" />);
 
     expect(document.querySelector('[data-sticky-mask]')).toHaveStyle({
-      '--sticky-fade-background': 'var(--paper)',
+      '--sticky-fade-background': 'transparent',
+      '--sticky-surface-background': 'var(--paper)',
       backgroundImage: 'var(--sticky-fade-texture, none)',
+      backgroundSize: 'var(--sticky-fade-texture-size, auto)',
     });
   });
 
