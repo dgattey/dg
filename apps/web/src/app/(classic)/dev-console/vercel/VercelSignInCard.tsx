@@ -98,10 +98,7 @@ export async function VercelSignInCardContent({
  * Dev-console card for optional Sign in with Vercel (Flags identify only).
  * Session + searchParams are read inside Suspense so /dev-console can prerender.
  */
-export function VercelSignInCard({
-  searchParams,
-  surface = 'classic',
-}: VercelSignInCardProps) {
+export function VercelSignInCard({ searchParams, surface = 'classic' }: VercelSignInCardProps) {
   return (
     <DevConsoleCardShell surface={surface}>
       <Suspense fallback={<Typography variant="body2">Loading identity…</Typography>}>

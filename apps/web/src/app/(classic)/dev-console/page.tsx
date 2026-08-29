@@ -6,11 +6,11 @@ import type { ReactNode } from 'react';
 import { CutLetters } from '../../collage/CutLetters';
 import { CutOut } from '../../collage/CutOut';
 import { CutOutSymbols } from '../../collage/CutOutSymbols';
+import type { CutOutPlacement } from '../../collage/cutOutPlacements';
 import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
-import type { CutOutPlacement } from '../../collage/cutOutPlacements';
-import { OauthCard } from './oauth/OauthCard';
 import styles from './DevConsolePage.module.css';
+import { OauthCard } from './oauth/OauthCard';
 import { VercelSignInCard } from './vercel/VercelSignInCard';
 import { WebhookCard } from './webhooks/WebhookCard';
 
@@ -111,7 +111,10 @@ function CardSection({
 }) {
   if (surface === 'collage') {
     return (
-      <section aria-labelledby={`dev-console-${title.replaceAll(' ', '-')}`} className={styles.section}>
+      <section
+        aria-labelledby={`dev-console-${title.replaceAll(' ', '-')}`}
+        className={styles.section}
+      >
         <PaperTag
           className={styles.sectionTitle}
           tiltDeg={title === 'Flags identity' ? 1.5 : title === 'Tools' ? -1 : -2}

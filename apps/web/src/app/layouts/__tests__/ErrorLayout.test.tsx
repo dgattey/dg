@@ -11,6 +11,7 @@ describe('ErrorLayout', () => {
     expect(screen.getByRole('heading', { level: 1, name: String(statusCode) })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: heading })).toBeInTheDocument();
     expect(screen.getByText(message)).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: 'Back home' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+    expect(screen.getByText('Back home')).toBeInTheDocument();
   });
 });

@@ -1,7 +1,7 @@
 import { vercelAuthRoute } from '@dg/shared-core/routes/api';
 import { render, screen } from '@testing-library/react';
 
-jest.mock('../../../auth/vercel/getVercelSession', () => ({
+jest.mock('../../../../auth/vercel/getVercelSession', () => ({
   getVercelSession: jest.fn().mockResolvedValue(null),
 }));
 

@@ -74,8 +74,8 @@
   padding: 10px 15px 11px;
   font-size: 15px;
   line-height: 1.25;
-  letter-spacing: 0.11em;
   text-transform: uppercase;
+  letter-spacing: 0.11em;
 }
 
 .cards {
@@ -104,7 +104,7 @@
   }
 
   .collageLede {
-    margin-top: 0;
+    margin-top: 18px;
   }
 
   .cards {
