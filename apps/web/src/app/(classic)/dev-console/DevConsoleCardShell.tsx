@@ -10,10 +10,7 @@ type DevConsoleCardShellProps = {
   surface?: SiteSurface;
 };
 
-export function DevConsoleCardShell({
-  children,
-  surface = 'classic',
-}: DevConsoleCardShellProps) {
+export function DevConsoleCardShell({ children, surface = 'classic' }: DevConsoleCardShellProps) {
   if (surface === 'collage') {
     return (
       <PaperCard

@@ -53,11 +53,7 @@ function SubscriptionActions({
  * When Strava refuses the listing the card says so and offers no actions,
  * since creating or deleting would be guessing at state we don't have.
  */
-export async function WebhookCardContent({
-  surface = 'classic',
-}: {
-  surface?: SiteSurface;
-} = {}) {
+export async function WebhookCardContent({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
   await connection();
   const { subscriptions, error } = await getWebhookSubscriptions();
 

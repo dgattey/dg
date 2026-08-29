@@ -4,6 +4,7 @@
  * state instead of throwing, which is what took the whole route down.
  */
 import { log } from '@dg/shared-core/logging/log';
+import { oauthConnectRoute } from '@dg/shared-core/routes/api';
 import { mockEnv, setupMockLifecycle } from '@dg/testing/mocks';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { render, screen } from '@testing-library/react';
@@ -15,6 +16,7 @@ jest.mock('next/server', () => ({
 
 // Client buttons reach for the router, which only exists under a real request.
 jest.mock('next/navigation', () => ({
+  usePathname: () => '/dev-console',
   useRouter: () => ({ refresh: jest.fn() }),
 }));
 
@@ -129,7 +131,7 @@ describe('Dev console degradation', () => {
       expect(screen.getByText('Not connected')).toBeInTheDocument();
       expect(screen.getByRole('link', { name: 'Connect' })).toHaveAttribute(
         'href',
-        '/api/oauth/spotify/connect',
+        oauthConnectRoute('spotify'),
       );
     });
 
