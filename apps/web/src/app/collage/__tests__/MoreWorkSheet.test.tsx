@@ -43,10 +43,7 @@ jest.mock('../TornField', () => ({
   ),
 }));
 
-const slotted = (
-  sourceIndex: number,
-  title: string,
-): SlottedProject => ({
+const slotted = (sourceIndex: number, title: string): SlottedProject => ({
   key: `p-${sourceIndex}`,
   project: {
     link: { icon: null, title, url: `https://example.com/${title}` },
