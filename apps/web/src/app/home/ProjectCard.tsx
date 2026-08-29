@@ -4,8 +4,8 @@ import { Image } from '@dg/ui/dependent/Image';
 import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
 import type { SxObject } from '@dg/ui/theme';
 import { getShape } from '@dg/ui/theme/shape';
-import { CollageProjectFrame } from '../collage/CollageProjectFrame';
 import type { CollageProjectSlot } from '../collage/CollageProjectFrame';
+import { CollageProjectFrame } from '../collage/CollageProjectFrame';
 import type { ProjectFrameStyle } from '../collage/workSheetFrames';
 
 type ClassicProjectCardProps = RenderableProject & {
