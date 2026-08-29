@@ -54,8 +54,8 @@ export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
   if (surface === 'collage') {
     return (
       <>
-        <SiteHeaderHeight surface="collage" />
-        <header className={chrome.header} data-site-header={true}>
+        <SiteHeaderHeight />
+        <header className={chrome.header} data-sticky-header={true}>
           <PaperCard className={chrome.logo} edge="quad-b" tiltDeg={-4} tone="ochre">
             <div className={chrome.logoInner}>
               <Logo surface="collage" />
@@ -77,7 +77,7 @@ export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
   }
 
   return (
-    <Section sx={stickyContainerSx}>
+    <Section data-sticky-header={true} sx={stickyContainerSx}>
       <SiteHeaderHeight />
       <Box component="header" data-site-header={true} sx={siteHeaderSx}>
         <Nav sx={navSx}>

@@ -32,6 +32,7 @@ describe('StickyFadeBar', () => {
     });
     expect(container.querySelector('[data-sticky-surface]')).toHaveStyle({
       backgroundColor: 'var(--sticky-fade-background, var(--mui-palette-background-default))',
+      backgroundImage: 'var(--sticky-fade-texture, none)',
     });
   });
 
@@ -40,6 +41,7 @@ describe('StickyFadeBar', () => {
 
     expect(document.querySelector('[data-sticky-mask]')).toHaveStyle({
       '--sticky-fade-background': 'var(--paper)',
+      backgroundImage: 'var(--sticky-fade-texture, none)',
     });
   });
 
