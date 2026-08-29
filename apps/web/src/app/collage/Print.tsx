@@ -3,6 +3,8 @@ import { Image, type ImageSizes } from '@dg/ui/dependent/Image';
 import type { ImageProps as NextImageProps } from 'next/image';
 import styles from './Print.module.css';
 
+type PrintTreatment = 'portrait' | 'project';
+
 type PrintProps = {
   alt: NextImageProps['alt'];
   className?: string;
@@ -10,15 +12,30 @@ type PrintProps = {
   preload?: NextImageProps['preload'];
   quality: NonNullable<NextImageProps['quality']>;
   sizes: ImageSizes;
+  treatment?: PrintTreatment;
 };
 
 function classNames(...values: Array<string | undefined>): string {
   return values.filter((value) => value !== undefined).join(' ');
 }
 
-export function Print({ alt, className, image, preload, quality, sizes }: PrintProps) {
+export function Print({
+  alt,
+  className,
+  image,
+  preload,
+  quality,
+  sizes,
+  treatment = 'portrait',
+}: PrintProps) {
   return (
-    <span className={classNames(styles.print, className)}>
+    <span
+      className={classNames(
+        styles.print,
+        treatment === 'project' ? styles.project : styles.portrait,
+        className,
+      )}
+    >
       <Image
         alt={alt}
         cover={true}
