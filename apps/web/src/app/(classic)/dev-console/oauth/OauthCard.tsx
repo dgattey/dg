@@ -3,6 +3,7 @@ import 'server-only';
 import { getOauthStatus } from '@dg/services/oauth/getOauthStatus';
 import { capitalize } from '@dg/shared-core/formatting/capitalize';
 import type { OauthProviderKey } from '@dg/shared-core/routes/api';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Skeleton, Stack, Typography } from '@mui/material';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
@@ -15,13 +16,14 @@ import { TokenExpiry } from './TokenExpiry';
 /** Props for the OauthCard async server component. */
 type OauthCardProps = {
   provider: OauthProviderKey;
+  surface?: SiteSurface;
 };
 
 /**
  * Displays OAuth connection status for a single provider. Shows the current
  * connection state, a connect button, force refresh action, and token expiry info.
  */
-export async function OauthCardContent({ provider }: OauthCardProps) {
+export async function OauthCardContent({ provider, surface = 'classic' }: OauthCardProps) {
   await connection();
   const status = await getOauthStatus(provider);
 
@@ -35,12 +37,16 @@ export async function OauthCardContent({ provider }: OauthCardProps) {
         }}
       >
         <Typography variant="h3">{capitalize(provider)}</Typography>
-        <StatusChip isConnected={status.isConnected} />
+        <StatusChip isConnected={status.isConnected} surface={surface} />
       </Stack>
-      <ErrorMessage message={status.error} />
+      <ErrorMessage message={status.error} surface={surface} />
       <ButtonGrid>
-        <ConnectButton provider={provider} status={status} />
-        <ForceRefreshButton isConnected={status.isConnected} provider={provider} />
+        <ConnectButton provider={provider} status={status} surface={surface} />
+        <ForceRefreshButton
+          isConnected={status.isConnected}
+          provider={provider}
+          surface={surface}
+        />
       </ButtonGrid>
       <TokenExpiry expiresAt={status.expiresAt} />
     </>
@@ -93,11 +99,11 @@ function OauthCardContentSkeleton() {
  * the current state and available actions. Use with Suspense and
  * OauthCardContentSkeleton for streaming.
  */
-export function OauthCard({ provider }: OauthCardProps) {
+export function OauthCard({ provider, surface = 'classic' }: OauthCardProps) {
   return (
-    <DevConsoleCardShell>
+    <DevConsoleCardShell surface={surface}>
       <Suspense fallback={<OauthCardContentSkeleton />}>
-        <OauthCardContent provider={provider} />
+        <OauthCardContent provider={provider} surface={surface} />
       </Suspense>
     </DevConsoleCardShell>
   );
