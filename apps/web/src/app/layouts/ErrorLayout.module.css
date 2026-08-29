@@ -1,0 +1,81 @@
+.collageSheet {
+  position: relative;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 100vw;
+  min-height: calc(100dvh - 240px);
+  padding-block: 60px 120px;
+  margin-left: -50vw;
+  overflow-x: clip;
+}
+
+.collageContent {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  gap: 34px;
+  justify-items: center;
+  width: min(calc(100% - 2 * var(--pad)), 1060px);
+  margin-inline: auto;
+  text-align: center;
+}
+
+.statusCode {
+  justify-self: center;
+  padding-top: 0;
+  font-size: clamp(120px, 22vw, 260px);
+}
+
+.statusCode > span {
+  margin: 0;
+}
+
+.messageCard {
+  width: min(100%, 520px);
+}
+
+.messageCardInner {
+  display: grid;
+  gap: 12px;
+  padding: 28px 34px 30px;
+}
+
+.messageCardInner h2,
+.messageCardInner p {
+  margin: 0;
+}
+
+.messageCardInner h2 {
+  font-family: var(--display);
+  font-size: 27px;
+  line-height: 1.15;
+}
+
+.messageCardInner p {
+  font-size: 18px;
+  line-height: 1.5;
+}
+
+@media (max-width: 600px) {
+  .collageSheet {
+    min-height: calc(100dvh - 140px);
+    padding-block: 36px 72px;
+  }
+
+  .collageContent {
+    gap: 26px;
+  }
+
+  .statusCode {
+    font-size: clamp(100px, 35vw, 150px);
+  }
+
+  .messageCardInner {
+    padding: 24px 22px 26px;
+  }
+
+  .messageCardInner h2 {
+    font-size: 23px;
+  }
+}

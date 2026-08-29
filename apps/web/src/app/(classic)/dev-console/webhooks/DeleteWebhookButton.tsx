@@ -1,5 +1,6 @@
 'use client';
 
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { deleteWebhookSubscription } from '../../../../services/strava.actions';
 import { ServerActionButton } from '../ServerActionButton';
 
@@ -7,13 +8,18 @@ import { ServerActionButton } from '../ServerActionButton';
  * Client component that renders a button to delete a Strava webhook subscription.
  * The subscription ID is looked up server-side for security.
  */
-export function DeleteWebhookButton() {
+export function DeleteWebhookButton({
+  surface = 'classic',
+}: {
+  surface?: SiteSurface;
+} = {}) {
   return (
     <ServerActionButton
       action={deleteWebhookSubscription}
       color="error"
       label="Delete subscription"
       loadingLabel="Deleting..."
+      surface={surface}
       variant="outlined"
     />
   );

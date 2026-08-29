@@ -112,7 +112,7 @@ describe('Dev console degradation', () => {
         ]),
       );
 
-      renderCard(await WebhookCardContent());
+      renderCard(await WebhookCardContent({ surface: 'collage' }));
 
       expect(screen.getByText('Connected')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Delete subscription' })).toBeInTheDocument();
@@ -123,11 +123,14 @@ describe('Dev console degradation', () => {
     it('renders a disconnected card when the token is missing', async () => {
       mockGetOauthStatus.mockResolvedValue({ error: null, expiresAt: null, isConnected: false });
 
-      renderCard(await OauthCardContent({ provider: 'spotify' }));
+      renderCard(await OauthCardContent({ provider: 'spotify', surface: 'collage' }));
 
       expect(screen.getByText('Spotify')).toBeInTheDocument();
       expect(screen.getByText('Not connected')).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'Connect' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Connect' })).toHaveAttribute(
+        'href',
+        '/api/oauth/spotify/connect',
+      );
     });
 
     it('surfaces a lookup failure on the card', async () => {

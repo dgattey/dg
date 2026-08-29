@@ -8,6 +8,7 @@ type PaperButtonBase = {
   children: ReactNode;
   className?: string;
   current?: boolean;
+  disabled?: boolean;
   edge?: PaperEdge;
   tiltDeg?: number;
   tone?: PaperTone;
@@ -18,6 +19,7 @@ type PaperButtonProps = PaperButtonBase &
     | {
         href: string;
         title: string;
+        disabled?: undefined;
         onClick?: () => void;
         type?: undefined;
       }
@@ -33,6 +35,7 @@ export function PaperButton({
   children,
   className,
   current = false,
+  disabled = false,
   edge = 'quad-c',
   href,
   onClick,
@@ -72,6 +75,7 @@ export function PaperButton({
     <button
       aria-pressed={current}
       className={classNames}
+      disabled={disabled}
       onClick={onClick}
       style={style}
       type={type}
