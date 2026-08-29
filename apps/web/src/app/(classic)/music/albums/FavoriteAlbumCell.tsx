@@ -24,8 +24,8 @@ import {
   MAX_ALBUM_SLEEVES,
 } from '../albumTileGeometry';
 import {
-  collageAlbumCardClassName,
   type CollageAlbumCardTreatment,
+  collageAlbumCardClassName,
 } from './collageAlbumCardTreatments';
 import styles from './FavoriteAlbums.module.css';
 
