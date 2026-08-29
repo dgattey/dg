@@ -100,7 +100,6 @@ const collageFactsRowSx: SxObject = {
   alignItems: 'start',
   color: 'inherit',
   display: 'grid',
-  fontFamily: 'var(--display)',
   letterSpacing: '0.07em',
   rowGap: '14px',
   textTransform: 'uppercase',
@@ -120,20 +119,17 @@ const collageMetaTextSx: SxObject = {
 const collageArtistTextSx: SxObject = {
   ...overflowTextSx,
   color: 'inherit',
-  fontFamily: 'var(--display)',
   fontSize: '20px',
   fontWeight: 700,
 };
 
 const collageTrackTitleTextSx: SxObject = {
   ...overflowTextSx,
-  fontFamily: 'var(--display)',
   fontSize: '18px',
 };
 
 const collageTrackArtistTextSx: SxObject = {
   ...overflowTextSx,
-  fontFamily: 'var(--display)',
   opacity: 0.82,
 };
 
@@ -338,7 +334,6 @@ export function AlbumDetailBody({
       </Box>
 
       <Box
-        className={surface === 'collage' ? styles.collageTrackList : undefined}
         component="ol"
         data-role="track-list"
         sx={surfaceStyles.trackList}
