@@ -217,8 +217,7 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
   const selectedIndex = selectedAlbumId
     ? sortedAlbumCards.findIndex(({ album }) => album.id === selectedAlbumId)
     : -1;
-  const selectedAlbum =
-    selectedIndex >= 0 ? sortedAlbumCards[selectedIndex]?.album : undefined;
+  const selectedAlbum = selectedIndex >= 0 ? sortedAlbumCards[selectedIndex]?.album : undefined;
   const well = selectedAlbum ? (
     <Box key="album-well" sx={wellPlacementSx(selectedIndex, sortedAlbumCards.length, surface)}>
       <AlbumWell album={selectedAlbum} surface={surface}>
@@ -236,10 +235,7 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
     </Box>
   ) : null;
 
-  const renderAlbum = (
-    { album, treatment }: (typeof sortedAlbumCards)[number],
-    index: number,
-  ) => (
+  const renderAlbum = ({ album, treatment }: (typeof sortedAlbumCards)[number], index: number) => (
     <Box
       key={album.id}
       ref={(element: HTMLElement | null) => {
