@@ -12,7 +12,7 @@ import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
 import { groupTracksByDate } from './groupTracksByDate';
 import { MusicGrid } from './MusicGrid';
-import styles from './MusicHistory.module.css';
+import styles from './music.module.css';
 
 type Props = {
   initialTracks: Array<HistoryTrack>;
@@ -75,16 +75,16 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
   if (sections.length === 0) {
     if (surface === 'collage') {
       return (
-        <div className={styles.collageState} data-role="collage-music-empty" role="status">
+        <div className={styles.state} data-role="collage-music-empty" role="status">
           <PaperCard
             edge="quad-c"
-            innerClassName={styles.collageStateInner}
+            innerClassName={styles.stateInner}
             tiltDeg={-1.5}
             tone="cream"
           >
             <p>No listening history yet.</p>
           </PaperCard>
-          <PaperTag className={styles.collageStateTag} tiltDeg={-3} tone="ochre">
+          <PaperTag className={styles.stateTag} tiltDeg={-3} tone="ochre">
             Spotify
           </PaperTag>
         </div>
@@ -95,13 +95,13 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
 
   if (surface === 'collage') {
     return (
-      <div className={styles.collageHistory}>
+      <div className={styles.history}>
         {sections.map((section, sectionIndex) => (
-          <section aria-label={section.label} className={styles.collageSection} key={section.label}>
-            <StickyFadeBar className={styles.collageDateBar} surface="collage">
-              <h2 className={styles.collageDateHeading}>
+          <section aria-label={section.label} className={styles.section} key={section.label}>
+            <StickyFadeBar className={styles.dateBar} surface="collage">
+              <h2 className={styles.dateHeading}>
                 <PaperTag
-                  className={styles.collageDateTag}
+                  className={styles.dateTag}
                   edge="torn-b"
                   tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
                   tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
@@ -114,16 +114,16 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
           </section>
         ))}
 
-        <div className={styles.collageSentinel} ref={sentinelRef}>
+        <div className={styles.sentinel} ref={sentinelRef}>
           {isLoading ? (
-            <div className={styles.collageState} data-role="collage-music-loading" role="status">
+            <div className={styles.state} data-role="collage-music-loading" role="status">
               <PaperCard
                 edge="quad-c"
-                innerClassName={`${styles.collageStateInner} ${styles.collageLoadingInner}`}
+                innerClassName={`${styles.stateInner} ${styles.loadingInner}`}
                 tiltDeg={-1.5}
                 tone="cream"
               >
-                <span aria-hidden="true" className={styles.collageRing} />
+                <span aria-hidden="true" className={styles.ring} />
                 <span>Loading more plays…</span>
               </PaperCard>
             </div>

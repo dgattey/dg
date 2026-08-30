@@ -2,7 +2,7 @@ import { Fragment, type ReactNode } from 'react';
 import { ProjectCard } from '../home/ProjectCard';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS, moreWorkOverflowPlacements } from './cutOutPlacements';
-import styles from './MoreWorkSheet.module.css';
+import styles from './home.module.css';
 import { type MoreWorkOverflowUnit, moreWorkFrames, type SlottedProject } from './projectSlots';
 
 type MoreWorkSheetProps = {
@@ -30,7 +30,7 @@ function MoreWorkGrid({
   const order = ['mg', 'sd', 'cn', 'js', 'gn'] as const;
 
   return (
-    <div className={styles.grid}>
+    <div className={`collageMeasure collageMeasureGrid collageGridStack ${styles.moreWorkGrid}`}>
       {order.map((area) => {
         if (area === 'sd') {
           if (!sites) {
@@ -59,8 +59,8 @@ function MoreWorkGrid({
 
 export function MoreWorkSheet({ overflow, projects, sites }: MoreWorkSheetProps) {
   return (
-    <section aria-label="More work" className={styles.sheet}>
-      <div aria-hidden="true" className={`collageField ${styles.field}`} />
+    <section aria-label="More work" className={`collageBleed ${styles.moreWork}`}>
+      <div aria-hidden="true" className={`collageField ${styles.moreWorkField}`} />
       {CUT_OUT_PLACEMENTS.moreWork.map((placement) => (
         <CutOut key={placement.id} placement={placement} />
       ))}

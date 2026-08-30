@@ -1,7 +1,7 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Chip, Typography } from '@mui/material';
 import { StatusTag } from '../../collage/StatusTag';
-import styles from './StatusIndicators.module.css';
+import styles from './devConsole.module.css';
 
 /**
  * Status chip showing connected/not connected state.
@@ -40,7 +40,7 @@ export function ErrorMessage({
   }
   return (
     <Typography
-      className={surface === 'collage' ? styles.collageError : undefined}
+      className={surface === 'collage' ? styles.errorText : undefined}
       color={surface === 'collage' ? undefined : 'error'}
       variant="body2"
     >

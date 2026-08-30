@@ -6,10 +6,9 @@ import type { Colors } from '../spotify/colors';
 import { PlaybackProgressBar } from '../spotify/PlaybackProgressBar';
 import { PlaybackStatus } from '../spotify/PlaybackStatus';
 import { TrackTitle } from '../spotify/TrackTitle';
-import styles from './CollageSpotifyCard.module.css';
+import styles from './home.module.css';
 import { PaperCard } from './PaperCard';
 import { RecordDisc } from './RecordDisc';
-import sheetStyles from './WorkSheet.module.css';
 
 export const COLLAGE_TRACK_COLORS: Colors = {
   primary: 'var(--on)',
@@ -23,10 +22,10 @@ export function CollageSpotifyCard({ track }: { track: Track }) {
   const trackUrl = track.externalUrls.spotify;
 
   return (
-    <div className={sheetStyles.spotify} data-slot="sp">
+    <div className={styles.spotify} data-slot="sp">
       <RecordDisc track={track} />
-      <PaperCard className={styles.meta} edge="quad-b" tiltDeg={-2} tone="cream">
-        <div className={styles.metaInner}>
+      <PaperCard className={styles.spotifyMeta} edge="quad-b" tiltDeg={-2} tone="cream">
+        <div className={styles.spotifyMetaInner}>
           <PlaybackStatus
             color={COLLAGE_TRACK_COLORS.primary}
             isPlaying={track.isPlaying}
