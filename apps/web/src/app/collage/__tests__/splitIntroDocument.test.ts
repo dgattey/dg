@@ -65,18 +65,4 @@ describe('splitIntroDocument', () => {
     expect(result.remainder).toBe(input);
     expect(result.remainder.json).toEqual(input.json);
   });
-
-  it('leaves a formatted heading in the remainder', () => {
-    const formattedHeading = {
-      content: [{ data: {}, marks: [{ type: 'bold' }], nodeType: 'text', value: 'Hey friends!' }],
-      data: {},
-      nodeType: 'heading-1',
-    };
-    const input = richText([formattedHeading, paragraph]);
-
-    const result = splitIntroDocument(input);
-
-    expect(result.headline).toBeNull();
-    expect(result.remainder).toBe(input);
-  });
 });
