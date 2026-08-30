@@ -1,11 +1,9 @@
 import type { ReactNode } from 'react';
 import { ProjectCard } from '../home/ProjectCard';
-import type { SlottedProject } from './assignProjectSlots';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS } from './cutOutPlacements';
-import { TornField } from './TornField';
+import { type SlottedProject, workSheetFrames } from './projectSlots';
 import styles from './WorkSheet.module.css';
-import { workSheetFrames } from './workSheetFrames';
 
 type WorkSheetProps = {
   projects: ReadonlyArray<SlottedProject>;
@@ -25,7 +23,7 @@ export function WorkSheet({ projects, spotify, strava }: WorkSheetProps) {
 
   return (
     <section aria-label="Work" className={styles.sheet}>
-      <TornField className={styles.field} />
+      <div aria-hidden="true" className={`collageField ${styles.field}`} />
       {CUT_OUT_PLACEMENTS.workSheet.map((placement) => (
         <CutOut key={placement.id} placement={placement} />
       ))}

@@ -6,7 +6,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { getShape } from '@dg/ui/theme/shape';
 import type { CollageProjectSlot } from '../collage/CollageProjectFrame';
 import { CollageProjectFrame } from '../collage/CollageProjectFrame';
-import type { ProjectFrameStyle } from '../collage/workSheetFrames';
+import type { ProjectFrameStyle } from '../collage/projectSlots';
 
 type ClassicProjectCardProps = RenderableProject & {
   surface?: 'classic';
