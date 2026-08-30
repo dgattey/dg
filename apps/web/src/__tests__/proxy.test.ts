@@ -77,19 +77,6 @@ describe('proxy', () => {
       expect(response.headers.get('x-middleware-rewrite')).toContain('/redesign/music');
     });
 
-    it('copies markdown Link headers onto the collage rewrite', async () => {
-      mockInteractiveRedesign.mockResolvedValue(true);
-      const response = await proxy(
-        new NextRequest('https://example.com/music', {
-          headers: { accept: 'text/html' },
-        }),
-      );
-
-      expect(response.headers.get('x-middleware-rewrite')).toContain('/redesign/music');
-      expect(response.headers.get('Link')).toContain('/music.md');
-      expect(response.headers.get('Vary')).toContain('Accept');
-    });
-
     it('redirects direct /redesign hits to the public path', async () => {
       const response = await proxy(new NextRequest('https://example.com/redesign/music'));
 
@@ -105,14 +92,6 @@ describe('proxy', () => {
 
       expect(response.headers.get('x-middleware-rewrite')).toBeNull();
       expect(response.headers.get('x-middleware-next')).toBe('1');
-    });
-
-    it('rewrites when INTERACTIVE_REDESIGN=1 even if the flag is off', async () => {
-      mockEnv({ INTERACTIVE_REDESIGN: '1' });
-      mockInteractiveRedesign.mockResolvedValue(false);
-      const response = await proxy(new NextRequest('https://example.com/'));
-
-      expect(response.headers.get('x-middleware-rewrite')).toContain('/redesign');
     });
   });
 

@@ -1,6 +1,7 @@
 import { StickyBarTopMask } from '@dg/ui/core/StickyFadeBar';
 import { type ReactNode, Suspense } from 'react';
-import { CollageShell } from '../../collage/CollageShell';
+import '../../collage/collage.css';
+import { familjen } from '../../collage/familjen';
 import { Footer } from '../../layouts/Footer';
 import { Header } from '../../layouts/Header';
 import { PageScrollProvider } from '../../layouts/PageScrollContext';
@@ -8,7 +9,7 @@ import { PageViewTransition } from '../../layouts/PageViewTransition';
 
 export default function RedesignLayout({ children }: { children: ReactNode }) {
   return (
-    <CollageShell>
+    <div className={`collageRoot ${familjen.variable}`}>
       <PageScrollProvider>
         <Suspense fallback={null}>
           <Header surface="collage" />
@@ -21,6 +22,6 @@ export default function RedesignLayout({ children }: { children: ReactNode }) {
         </main>
         <Footer surface="collage" />
       </PageScrollProvider>
-    </CollageShell>
+    </div>
   );
 }

@@ -16,23 +16,6 @@
   rotate: none;
 }
 
-.link {
-  display: block;
-  color: inherit;
-  text-decoration: none;
-}
-
-.link:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  .wrap:has(> a):hover {
-    translate: 0 -2px;
-  }
-}
-
 .toneCream {
   --pc: var(--cream);
   --on: var(--ink-on-cream);
@@ -158,9 +141,4 @@
 .buttonCurrent {
   color: var(--cream);
   background: var(--ink);
-}
-
-.buttonSmall {
-  padding: 0.45em 0.75em 0.5em;
-  font-size: 14px;
 }
