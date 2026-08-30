@@ -23,7 +23,11 @@ const play = (name: string): HistoryTrack => ({
 });
 
 function Wrapper({ children }: { children: ReactNode }) {
-  return <ServerTimeProvider serverTime={Date.parse('2026-08-04T14:00:00Z')}>{children}</ServerTimeProvider>;
+  return (
+    <ServerTimeProvider serverTime={Date.parse('2026-08-04T14:00:00Z')}>
+      {children}
+    </ServerTimeProvider>
+  );
 }
 
 let observerCallback: IntersectionObserverCallback | undefined;
@@ -76,10 +80,12 @@ describe('MusicInfiniteScroll', () => {
       />,
       { wrapper: Wrapper },
     );
-    invariant(observerCallback && latestObserver, 'Expected an intersection observer');
+    const callback = observerCallback;
+    const observer = latestObserver;
+    invariant(callback && observer, 'Expected an intersection observer');
 
     act(() => {
-      observerCallback(
+      callback(
         [
           {
             boundingClientRect: new DOMRect(),
@@ -91,7 +97,7 @@ describe('MusicInfiniteScroll', () => {
             time: 0,
           },
         ],
-        latestObserver,
+        observer,
       );
     });
 
