@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import styles from './CutOut.module.css';
+import styles from './cutOut.module.css';
 import type { CutOutPlacement } from './cutOutPlacements';
 import { cutOutSymbolId } from './cutOutShapes';
 

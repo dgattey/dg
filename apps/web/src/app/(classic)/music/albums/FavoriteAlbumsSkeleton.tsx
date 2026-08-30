@@ -11,7 +11,7 @@ import {
   albumTileSkeletonSx,
 } from '../albumTileGeometry';
 import { collageAlbumCardClassName, collageAlbumCardTreatment } from './collageAlbumCardTreatments';
-import styles from './FavoriteAlbums.module.css';
+import styles from '../music.module.css';
 
 const sortSwitcherSx: SxObject = {
   borderRadius: 999,
@@ -57,18 +57,18 @@ function CollageSortSkeleton() {
   return (
     <div
       aria-label="Loading album sort controls"
-      className={styles.collageSortSkeleton}
+      className={styles.sortSkeleton}
       role="status"
     >
       {COLLAGE_SORT_SKELETONS.map((sort) => (
         <PaperTag
-          className={styles.collageSortTag}
+          className={styles.sortTag}
           edge="quad-a"
           key={sort.label}
           tiltDeg={sort.tiltDeg}
           tone={sort.tone}
         >
-          <Skeleton className={styles.collageSortSkeletonLine} variant="text" />
+          <Skeleton className={styles.sortSkeletonLine} variant="text" />
         </PaperTag>
       ))}
     </div>
@@ -90,20 +90,20 @@ export function FavoriteAlbumsSkeleton({
     return (
       <>
         <CollageSortSkeleton />
-        <div className={styles.collageGridSkeleton} data-role="collage-album-skeleton-grid">
+        <div className={styles.gridSkeleton} data-role="collage-album-skeleton-grid">
           {tiles.map((tile, index) => {
             const treatment = collageAlbumCardTreatment(index);
             return (
               <PaperCard
                 className={collageAlbumCardClassName(treatment)}
                 edge="quad-a"
-                innerClassName={styles.collageCardInner}
+                innerClassName={styles.cardInner}
                 key={tile}
                 tiltDeg={treatment.tiltDeg}
                 tone={treatment.tone}
               >
-                <Skeleton className={styles.collageArtSkeleton} variant="rectangular" />
-                <div className={styles.collageCaptionSkeleton}>
+                <Skeleton className={styles.artSkeleton} variant="rectangular" />
+                <div className={styles.captionSkeleton}>
                   <Skeleton variant="text" width="82%" />
                   <Skeleton variant="text" width="58%" />
                 </div>
@@ -151,7 +151,7 @@ export function FavoriteAlbumsReserve({
       <CollageSortSkeleton />
       <div
         aria-hidden="true"
-        className={`${styles.collageGridSkeleton} ${styles.collageAlbumReserve}`}
+        className={`${styles.gridSkeleton} ${styles.albumReserve}`}
         data-role="collage-album-reserve"
       >
         {albums.map((album, index) => {
@@ -160,15 +160,15 @@ export function FavoriteAlbumsReserve({
             <PaperCard
               className={collageAlbumCardClassName(treatment)}
               edge="quad-a"
-              innerClassName={styles.collageCardInner}
+              innerClassName={styles.cardInner}
               key={album.id}
               tiltDeg={treatment.tiltDeg}
               tone={treatment.tone}
             >
-              <div className={styles.collageReserveArt} />
-              <span className={styles.collageCaption}>
-                <strong className={styles.collageAlbumName}>{album.name}</strong>
-                <span className={styles.collageArtist}>{album.artistNames}</span>
+              <div className={styles.reserveArt} />
+              <span className={styles.caption}>
+                <strong className={styles.albumName}>{album.name}</strong>
+                <span className={styles.artist}>{album.artistNames}</span>
               </span>
             </PaperCard>
           );

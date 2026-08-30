@@ -27,7 +27,7 @@ import {
   type CollageAlbumCardTreatment,
   collageAlbumCardClassName,
 } from './collageAlbumCardTreatments';
-import styles from './FavoriteAlbums.module.css';
+import styles from '../music.module.css';
 
 /** Every favorite is a whole album, so every cell wears the full fan. */
 const SLEEVE_COUNT = MAX_ALBUM_SLEEVES;
@@ -113,33 +113,33 @@ export function FavoriteAlbumCell({
       <PaperCard
         className={collageAlbumCardClassName(collageTreatment, collapsed)}
         edge="quad-a"
-        innerClassName={styles.collageCardInner}
+        innerClassName={styles.cardInner}
         tiltDeg={collageTreatment.tiltDeg}
         tone={collageTreatment.tone}
       >
         <Tooltip title={collapsed ? `Close ${albumName}` : tooltip}>
           <Link
-            className={styles.collageAlbumLink}
+            className={styles.albumLink}
             href={href}
             title={title}
             transitionTypes={albumTransitionTypes(collapsed ? 'close' : 'open')}
           >
             <span
-              className={`${styles.collageArt} ${styles.fullColorArt}`}
+              className={`${styles.art} ${styles.fullColorArt}`}
               data-image-treatment="full-color"
             >
               <AlbumStack imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT}>
                 {cover}
                 {collapsed ? (
-                  <i aria-hidden="true" className={styles.collageCloseMark}>
+                  <i aria-hidden="true" className={styles.closeMark}>
                     ×
                   </i>
                 ) : null}
               </AlbumStack>
             </span>
-            <span className={styles.collageCaption} data-role="album-caption">
-              <strong className={styles.collageAlbumName}>{albumName}</strong>
-              <span className={styles.collageArtist}>{artistCaption}</span>
+            <span className={styles.caption} data-role="album-caption">
+              <strong className={styles.albumName}>{albumName}</strong>
+              <span className={styles.artist}>{artistCaption}</span>
             </span>
           </Link>
         </Tooltip>

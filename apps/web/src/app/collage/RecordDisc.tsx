@@ -4,7 +4,7 @@ import type { Track } from '@dg/content-models/spotify/Track';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { AlbumArtWithNotes } from '../spotify/AlbumArtWithNotes';
-import styles from './RecordDisc.module.css';
+import styles from './print.module.css';
 
 type RecordDiscProps = {
   track: Track;

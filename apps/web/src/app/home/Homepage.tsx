@@ -1,11 +1,10 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { ContentGrid } from '@dg/ui/core/ContentGrid';
 import { getProjects } from '../../services/contentful';
-import codaStyles from '../collage/CodaSheet.module.css';
 import { CutOut } from '../collage/CutOut';
 import { CutOutSymbols } from '../collage/CutOutSymbols';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
-import styles from '../collage/HelloSheet.module.css';
+import styles from '../collage/home.module.css';
 import { MoreWorkSheet } from '../collage/MoreWorkSheet';
 import { assignProjectSlots, type ProjectFrameStyle } from '../collage/projectSlots';
 import { WorkSheet } from '../collage/WorkSheet';
@@ -44,11 +43,11 @@ export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface 
     return (
       <>
         <CutOutSymbols />
-        <section aria-label="Hello" className={styles.sheet}>
+        <section aria-label="Hello" className={`collageBleed ${styles.hello}`}>
           {CUT_OUT_PLACEMENTS.helloSheet.map((placement) => (
             <CutOut key={placement.id} placement={placement} />
           ))}
-          <div className={styles.grid}>
+          <div className={`collageMeasure collageMeasureGrid collageGridStack ${styles.helloGrid}`}>
             <IntroCardSlot surface="collage" />
             <MapCardSlot surface="collage" />
           </div>
@@ -64,14 +63,14 @@ export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface 
           sites={<GatteySitesCardSlot surface="collage" />}
         />
         {slots.coda ? (
-          <section aria-label="And" className={codaStyles.sheet}>
+          <section aria-label="And" className={`collageBleed ${styles.coda}`}>
             {CUT_OUT_PLACEMENTS.coda.map((placement) => (
               <CutOut key={placement.id} placement={placement} />
             ))}
-            <div className={codaStyles.grid}>
+            <div className={`collageMeasure collageMeasureGrid collageGridStack ${styles.codaGrid}`}>
               <ProjectCard
                 {...slots.coda.project}
-                className={codaStyles.project}
+                className={styles.codaProject}
                 data-slot="li"
                 key={slots.coda.key}
                 style={CODA_FRAME_STYLE}

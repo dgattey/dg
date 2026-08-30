@@ -9,7 +9,7 @@ import {
   albumWellMetaRowSx,
   albumWellMetaTextSx,
 } from './albumWellStyles';
-import styles from './FavoriteAlbums.module.css';
+import styles from './albumWell.module.css';
 
 const factsRowSx: SxObject = {
   alignItems: 'center',
@@ -302,7 +302,7 @@ export function AlbumDetailBody({
     <Box sx={{ display: 'contents' }}>
       <Box sx={surfaceStyles.metaRow}>
         <Box
-          className={surface === 'collage' ? styles.collageWellMeta : undefined}
+          className={surface === 'collage' ? styles.wellMeta : undefined}
           data-role="album-meta"
           sx={surfaceStyles.metaText}
         >
@@ -336,7 +336,7 @@ export function AlbumDetailBody({
       <Box component="ol" data-role="track-list" sx={surfaceStyles.trackList}>
         {album.tracks.map((track) => (
           <Box
-            className={surface === 'collage' ? styles.collageTrackRow : undefined}
+            className={surface === 'collage' ? styles.trackRow : undefined}
             component="li"
             data-role="track-row"
             key={track.id}

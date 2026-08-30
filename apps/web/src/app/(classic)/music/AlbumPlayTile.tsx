@@ -13,9 +13,8 @@ import {
   collageAlbumCardClassName,
   collageAlbumCardTreatment,
 } from './albums/collageAlbumCardTreatments';
-import tileStyles from './albums/FavoriteAlbums.module.css';
 import { albumTileLinkSx, MAX_ALBUM_SLEEVES } from './albumTileGeometry';
-import styles from './MusicHistory.module.css';
+import styles from './music.module.css';
 
 const countChipSx: SxObject = {
   backdropFilter: 'blur(12px) saturate(150%)',
@@ -73,19 +72,19 @@ export function AlbumPlayTile({
       <PaperCard
         className={collageAlbumCardClassName(treatment)}
         edge="quad-a"
-        innerClassName={tileStyles.collageCardInner}
+        innerClassName={styles.cardInner}
         tiltDeg={treatment.tiltDeg}
         tone={treatment.tone}
       >
         <Tooltip title={tooltip}>
           <Link
-            className={tileStyles.collageAlbumLink}
+            className={styles.albumLink}
             href={linkUrl}
             isExternal={true}
             title={tooltip}
           >
             <span
-              className={`${tileStyles.collageArt} ${tileStyles.fullColorArt}`}
+              className={`${styles.art} ${styles.fullColorArt}`}
               data-image-treatment="full-color"
             >
               <AlbumStack imageUrl={imageUrl} sleeveCount={sleeveCount}>
@@ -98,7 +97,7 @@ export function AlbumPlayTile({
               </AlbumStack>
               {isRun ? (
                 <PaperTag
-                  className={styles.collageCountTag}
+                  className={styles.countTag}
                   tiltDeg={cardIndex % 2 === 0 ? 3 : -3}
                   tone="ochre"
                 >
@@ -106,11 +105,11 @@ export function AlbumPlayTile({
                 </PaperTag>
               ) : null}
             </span>
-            <span className={tileStyles.collageCaption} data-role="album-caption">
-              <strong className={tileStyles.collageAlbumName}>
+            <span className={styles.caption} data-role="album-caption">
+              <strong className={styles.albumName}>
                 {isRun ? albumName : trackName}
               </strong>
-              <span className={tileStyles.collageArtist}>{artistNames}</span>
+              <span className={styles.artist}>{artistNames}</span>
             </span>
           </Link>
         </Tooltip>

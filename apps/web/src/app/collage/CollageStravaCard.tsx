@@ -4,9 +4,8 @@ import { ActivityDescription } from '../strava/ActivityDescription';
 import { ActivityName } from '../strava/ActivityName';
 import { ActivityStats } from '../strava/ActivityStats';
 import { ActivityTypeWithIcon } from '../strava/ActivityTypeWithIcon';
-import styles from './CollageStravaCard.module.css';
+import styles from './home.module.css';
 import { PaperCard } from './PaperCard';
-import sheetStyles from './WorkSheet.module.css';
 
 type CollageStravaCardProps = {
   activity: StravaActivity;
@@ -15,16 +14,16 @@ type CollageStravaCardProps = {
 
 export function CollageStravaCard({ activity, encodedPolyline }: CollageStravaCardProps) {
   return (
-    <div className={sheetStyles.strava} data-slot="st">
-      <PaperCard edge="torn-b" innerClassName={styles.inner} tiltDeg={1.2} tone="olive">
+    <div className={styles.strava} data-slot="st">
+      <PaperCard edge="torn-b" innerClassName={styles.stravaInner} tiltDeg={1.2} tone="olive">
         {encodedPolyline ? (
-          <span aria-hidden="true" className={styles.route}>
+          <span aria-hidden="true" className={styles.stravaRoute}>
             <StravaRouteMap encodedPolyline={encodedPolyline} surface="collage" />
           </span>
         ) : null}
-        <div className={styles.content}>
+        <div className={styles.stravaContent}>
           <ActivityStats activity={activity} />
-          <div className={styles.copy}>
+          <div className={styles.stravaCopy}>
             <ActivityTypeWithIcon activity={activity} />
             <ActivityName activity={activity} />
             <ActivityDescription activity={activity} />

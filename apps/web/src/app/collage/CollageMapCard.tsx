@@ -1,6 +1,6 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import { MapCard } from '@dg/maps/MapCard';
-import styles from './HelloSheet.module.css';
+import styles from './home.module.css';
 import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
 

@@ -1,7 +1,7 @@
 import type { RenderableAsset } from '@dg/content-models/contentful/renderables/assets';
 import { Image, type ImageSizes } from '@dg/ui/dependent/Image';
 import type { ImageProps as NextImageProps } from 'next/image';
-import styles from './Print.module.css';
+import styles from './print.module.css';
 
 type PrintTreatment = 'portrait' | 'project';
 
@@ -32,7 +32,7 @@ export function Print({
     <span
       className={classNames(
         styles.print,
-        treatment === 'project' ? styles.project : styles.portrait,
+        treatment === 'project' ? styles.treatmentProject : styles.treatmentPortrait,
         className,
       )}
     >

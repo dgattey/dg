@@ -9,7 +9,7 @@ import {
   collageAlbumCardTreatment,
 } from './albums/collageAlbumCardTreatments';
 import { albumGridSx, albumTileFrameSx, albumTileSkeletonSx } from './albumTileGeometry';
-import styles from './MusicHistory.module.css';
+import styles from './music.module.css';
 
 const headingSx: SxObject = {
   marginBlock: 2,
@@ -31,36 +31,36 @@ export function MusicHistorySkeleton({ surface = 'classic' }: { surface?: SiteSu
     return (
       <div
         aria-label="Loading listening history"
-        className={styles.collageSkeleton}
+        className={styles.historySkeleton}
         data-role="collage-music-skeleton"
         role="status"
       >
         {PLACEHOLDER_SECTIONS.map((section, sectionIndex) => (
-          <section aria-hidden="true" className={styles.collageSection} key={section.label}>
-            <StickyFadeBar className={styles.collageDateBar} surface="collage">
+          <section aria-hidden="true" className={styles.section} key={section.label}>
+            <StickyFadeBar className={styles.dateBar} surface="collage">
               <PaperTag
-                className={`${styles.collageDateTag} ${styles.collageSkeletonDate}`}
+                className={`${styles.dateTag} ${styles.skeletonDate}`}
                 edge="torn-b"
                 tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
                 tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
               >
-                <Skeleton className={styles.collageSkeletonLine} variant="text" />
+                <Skeleton className={styles.skeletonLine} variant="text" />
               </PaperTag>
             </StickyFadeBar>
-            <div className={styles.collageSkeletonGrid} data-role="collage-music-skeleton-grid">
+            <div className={styles.historySkeletonGrid} data-role="collage-music-skeleton-grid">
               {section.tiles.map((tile, cardIndex) => {
                 const treatment = collageAlbumCardTreatment(cardIndex);
                 return (
                   <PaperCard
                     className={collageAlbumCardClassName(treatment)}
                     edge="quad-a"
-                    innerClassName={styles.collageCardInner}
+                    innerClassName={styles.cardInner}
                     key={tile}
                     tiltDeg={treatment.tiltDeg}
                     tone={treatment.tone}
                   >
-                    <Skeleton className={styles.collageArtSkeleton} variant="rectangular" />
-                    <div className={styles.collageCaptionSkeleton}>
+                    <Skeleton className={styles.historyArtSkeleton} variant="rectangular" />
+                    <div className={styles.captionSkeleton}>
                       <Skeleton variant="text" width="82%" />
                       <Skeleton variant="text" width="58%" />
                     </div>

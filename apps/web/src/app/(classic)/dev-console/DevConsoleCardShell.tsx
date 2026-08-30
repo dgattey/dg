@@ -3,7 +3,7 @@ import { Card, CardContent, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { DevConsoleCardBoundary } from './DevConsoleCardBoundary';
-import styles from './DevConsoleCardShell.module.css';
+import styles from './devConsole.module.css';
 
 type DevConsoleCardShellProps = {
   children: ReactNode;
@@ -14,12 +14,12 @@ export function DevConsoleCardShell({ children, surface = 'classic' }: DevConsol
   if (surface === 'collage') {
     return (
       <PaperCard
-        className={styles.collageCard}
+        className={styles.card}
         edge="quad-a"
-        innerClassName={styles.collageCardInner}
+        innerClassName={styles.cardInner}
         tiltDeg={-0.8}
       >
-        <Stack className={styles.collageCardContent}>
+        <Stack className={styles.cardContent}>
           <DevConsoleCardBoundary surface={surface}>{children}</DevConsoleCardBoundary>
         </Stack>
       </PaperCard>

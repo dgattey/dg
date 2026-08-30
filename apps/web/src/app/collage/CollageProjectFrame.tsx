@@ -1,7 +1,7 @@
 import type { RenderableProject } from '@dg/content-models/contentful/renderables/projects';
 import type { ImageSizes } from '@dg/ui/dependent/Image';
 import type { CSSProperties } from 'react';
-import styles from './CollageProjectFrame.module.css';
+import styles from './home.module.css';
 import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
 import { Print } from './Print';
@@ -43,7 +43,7 @@ export function CollageProjectFrame({
   const href = project.link?.url;
   const tag = (
     <PaperTag
-      className={classNames(styles.tag, styles[style.tagClassName])}
+      className={classNames(styles.frameTag, styles[style.tagClassName])}
       edge="quad-c"
       tiltDeg={style.tagTiltDeg}
       tone={style.tagTone}
@@ -55,16 +55,16 @@ export function CollageProjectFrame({
 
   const frame = (
     <PaperCard
-      className={styles.card}
+      className={styles.frameCard}
       edge={style.edge}
-      innerClassName={styles.frame}
+      innerClassName={styles.framePad}
       tiltDeg={style.tiltDeg}
       tone="cream"
     >
-      <span className={styles.shot} style={printStyle}>
+      <span className={styles.frameShot} style={printStyle}>
         <Print
           alt={project.title}
-          className={styles.print}
+          className={styles.framePrint}
           image={{
             height: project.thumbnail.height,
             title: project.title,
@@ -81,7 +81,7 @@ export function CollageProjectFrame({
 
   if (!href) {
     return (
-      <div className={classNames(styles.win, className)} data-slot={dataSlot}>
+      <div className={classNames(styles.frameWin, className)} data-slot={dataSlot}>
         {frame}
         {tag}
       </div>
@@ -90,7 +90,7 @@ export function CollageProjectFrame({
 
   return (
     <a
-      className={classNames(styles.win, className)}
+      className={classNames(styles.frameWin, className)}
       data-slot={dataSlot}
       href={href}
       rel="noreferrer"

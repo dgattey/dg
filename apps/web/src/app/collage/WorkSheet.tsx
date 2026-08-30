@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import { ProjectCard } from '../home/ProjectCard';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS } from './cutOutPlacements';
+import styles from './home.module.css';
 import { type SlottedProject, workSheetFrames } from './projectSlots';
-import styles from './WorkSheet.module.css';
 
 type WorkSheetProps = {
   projects: ReadonlyArray<SlottedProject>;
@@ -22,12 +22,12 @@ export function WorkSheet({ projects, spotify, strava }: WorkSheetProps) {
   const projectTwo = frames.find((frame) => frame.gridArea === 'ws');
 
   return (
-    <section aria-label="Work" className={styles.sheet}>
-      <div aria-hidden="true" className={`collageField ${styles.field}`} />
+    <section aria-label="Work" className={`collageBleed ${styles.work}`}>
+      <div aria-hidden="true" className={`collageField ${styles.workField}`} />
       {CUT_OUT_PLACEMENTS.workSheet.map((placement) => (
         <CutOut key={placement.id} placement={placement} />
       ))}
-      <div className={styles.grid}>
+      <div className={`collageMeasure collageMeasureGrid collageGridStack ${styles.workGrid}`}>
         {projectOne ? (
           <ProjectCard
             {...projectOne.project}
