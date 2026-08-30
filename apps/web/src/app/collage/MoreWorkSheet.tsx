@@ -3,11 +3,7 @@ import { ProjectCard } from '../home/ProjectCard';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS, moreWorkOverflowPlacements } from './cutOutPlacements';
 import styles from './MoreWorkSheet.module.css';
-import {
-  moreWorkFrames,
-  type MoreWorkOverflowUnit,
-  type SlottedProject,
-} from './projectSlots';
+import { type MoreWorkOverflowUnit, moreWorkFrames, type SlottedProject } from './projectSlots';
 
 type MoreWorkSheetProps = {
   overflow: ReadonlyArray<MoreWorkOverflowUnit>;

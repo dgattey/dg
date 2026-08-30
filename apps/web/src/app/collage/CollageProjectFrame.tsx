@@ -5,11 +5,7 @@ import styles from './CollageProjectFrame.module.css';
 import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
 import { Print } from './Print';
-import {
-  projectFrameAspectRatio,
-  type ProjectFrameStyle,
-  projectTagMeta,
-} from './projectSlots';
+import { type ProjectFrameStyle, projectFrameAspectRatio, projectTagMeta } from './projectSlots';
 
 const PROJECT_SIZES: ImageSizes = {
   extraLarge: 760,

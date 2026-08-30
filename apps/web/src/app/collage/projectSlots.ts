@@ -108,10 +108,12 @@ function framesFor<Area extends string>(
 }
 
 export function assignProjectSlots(projects: ReadonlyArray<RenderableProject>) {
-  const slotted = projects.map((project, index): SlottedProject => ({
-    key: `p-${index}`,
-    project,
-  }));
+  const slotted = projects.map(
+    (project, index): SlottedProject => ({
+      key: `p-${index}`,
+      project,
+    }),
+  );
   const overflow: Array<MoreWorkOverflowUnit> = [];
 
   for (let start = 7; start < slotted.length; start += 4) {

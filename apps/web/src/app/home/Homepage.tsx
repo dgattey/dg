@@ -7,10 +7,7 @@ import { CutOutSymbols } from '../collage/CutOutSymbols';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
 import styles from '../collage/HelloSheet.module.css';
 import { MoreWorkSheet } from '../collage/MoreWorkSheet';
-import {
-  assignProjectSlots,
-  type ProjectFrameStyle,
-} from '../collage/projectSlots';
+import { assignProjectSlots, type ProjectFrameStyle } from '../collage/projectSlots';
 import { WorkSheet } from '../collage/WorkSheet';
 import { GatteySitesCardSlot } from './GatteySitesCardSlot';
 import { IntroCardSlot } from './IntroCardSlot';
