@@ -1,11 +1,13 @@
 import { Fragment, type ReactNode } from 'react';
 import { ProjectCard } from '../home/ProjectCard';
-import type { MoreWorkOverflowUnit, SlottedProject } from './assignProjectSlots';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS, moreWorkOverflowPlacements } from './cutOutPlacements';
 import styles from './MoreWorkSheet.module.css';
-import { moreWorkFrames } from './moreWorkFrames';
-import { TornField } from './TornField';
+import {
+  moreWorkFrames,
+  type MoreWorkOverflowUnit,
+  type SlottedProject,
+} from './projectSlots';
 
 type MoreWorkSheetProps = {
   overflow: ReadonlyArray<MoreWorkOverflowUnit>;
@@ -62,7 +64,7 @@ function MoreWorkGrid({
 export function MoreWorkSheet({ overflow, projects, sites }: MoreWorkSheetProps) {
   return (
     <section aria-label="More work" className={styles.sheet}>
-      <TornField className={styles.field} />
+      <div aria-hidden="true" className={`collageField ${styles.field}`} />
       {CUT_OUT_PLACEMENTS.moreWork.map((placement) => (
         <CutOut key={placement.id} placement={placement} />
       ))}

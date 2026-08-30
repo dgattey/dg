@@ -80,6 +80,14 @@ html:has(.collageRoot) body {
   margin-inline: auto;
 }
 
+.collageField {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  clip-path: var(--torn-c);
+}
+
 @media (max-width: 480px) {
   .collageRoot {
     --site-header-height: 0px;
