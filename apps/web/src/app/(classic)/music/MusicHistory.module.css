@@ -170,7 +170,6 @@
     padding-top: 16px;
     font-size: clamp(54px, 16.5vw, 72px);
   }
-
 }
 
 @media (max-width: 390px) {
