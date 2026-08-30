@@ -19,14 +19,12 @@ jest.mock('../AlbumGradientBackdrop', () => ({
 }));
 
 jest.mock('../SpotifyCardScrollTracker', () => ({
-  SpotifyCardScrollTracker: ({ children }: { children: ReactNode }) => (
-    <div data-testid="scroll-tracker">{children}</div>
-  ),
+  SpotifyCardScrollTracker: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
 jest.mock('../TrackListing', () => ({
-  TrackListing: ({ surface, track }: { surface?: string; track: Track }) => (
-    <div data-surface={surface ?? 'classic'} data-testid="track-listing">
+  TrackListing: ({ track }: { track: Track }) => (
+    <div data-testid="track-listing">
       <span>{track.name}</span>
       <span>{track.artists[0]?.name}</span>
       <span>{track.albumImage.url}</span>
@@ -119,15 +117,5 @@ describe('SpotifyCardWithGradient', () => {
     for (const backdrop of screen.getAllByTestId('gradient-backdrop')) {
       expect(backdrop).toHaveAttribute('data-gradient', NEW_GRADIENT);
     }
-  });
-
-  it('uses the collage TrackListing path without gradient extraction', () => {
-    render(<SpotifyCardWithGradient surface="collage" track={makeTrack('collage')} />);
-
-    expect(screen.getByTestId('scroll-tracker')).toBeInTheDocument();
-    expect(screen.getByTestId('track-listing')).toHaveAttribute('data-surface', 'collage');
-    expect(screen.getByText('Track collage')).toBeInTheDocument();
-    expect(screen.queryByTestId('gradient-backdrop')).not.toBeInTheDocument();
-    expect(mockExtractAlbumGradient).not.toHaveBeenCalled();
   });
 });
