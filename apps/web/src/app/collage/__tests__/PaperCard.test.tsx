@@ -18,7 +18,11 @@ describe('PaperButton', () => {
   });
 
   it('renders current links with aria-current', () => {
-    render(<PaperButton current href="/music" title="Listening history">Music</PaperButton>);
+    render(
+      <PaperButton current href="/music" title="Listening history">
+        Music
+      </PaperButton>,
+    );
     expect(screen.getByRole('link', { name: 'Music' })).toHaveAttribute('aria-current', 'page');
   });
 });
