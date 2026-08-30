@@ -13,6 +13,7 @@ import {
   collageAlbumCardClassName,
   collageAlbumCardTreatment,
 } from './albums/collageAlbumCardTreatments';
+import tileStyles from './albums/FavoriteAlbums.module.css';
 import { albumTileLinkSx, MAX_ALBUM_SLEEVES } from './albumTileGeometry';
 import styles from './MusicHistory.module.css';
 
@@ -72,19 +73,19 @@ export function AlbumPlayTile({
       <PaperCard
         className={collageAlbumCardClassName(treatment)}
         edge="quad-a"
-        innerClassName={styles.collageCardInner}
+        innerClassName={tileStyles.collageCardInner}
         tiltDeg={treatment.tiltDeg}
         tone={treatment.tone}
       >
         <Tooltip title={tooltip}>
           <Link
-            className={styles.collageAlbumLink}
+            className={tileStyles.collageAlbumLink}
             href={linkUrl}
             isExternal={true}
             title={tooltip}
           >
             <span
-              className={`${styles.collageArt} ${styles.fullColorArt}`}
+              className={`${tileStyles.collageArt} ${tileStyles.fullColorArt}`}
               data-image-treatment="full-color"
             >
               <AlbumStack imageUrl={imageUrl} sleeveCount={sleeveCount}>
@@ -105,9 +106,11 @@ export function AlbumPlayTile({
                 </PaperTag>
               ) : null}
             </span>
-            <span className={styles.collageCaption} data-role="album-caption">
-              <strong className={styles.collagePrimary}>{isRun ? albumName : trackName}</strong>
-              <span className={styles.collageArtist}>{artistNames}</span>
+            <span className={tileStyles.collageCaption} data-role="album-caption">
+              <strong className={tileStyles.collageAlbumName}>
+                {isRun ? albumName : trackName}
+              </strong>
+              <span className={tileStyles.collageArtist}>{artistNames}</span>
             </span>
           </Link>
         </Tooltip>

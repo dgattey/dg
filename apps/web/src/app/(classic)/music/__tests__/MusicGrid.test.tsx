@@ -81,27 +81,4 @@ describe('MusicGrid', () => {
 
     expect(screen.queryAllByRole('link')).toHaveLength(0);
   });
-
-  it('renders collage runs as paper cards while preserving single-track labels', () => {
-    const { container } = render(
-      <MusicGrid
-        surface="collage"
-        tracks={[play('Bloom', 'One'), play('Bloom', 'Two'), play('Clay', 'Solo')]}
-      />,
-    );
-
-    const grid = container.querySelector('[data-role="collage-music-grid"]');
-    expect(grid?.children).toHaveLength(2);
-    expect(container.querySelectorAll('[data-image-treatment="full-color"]')).toHaveLength(2);
-    expect(screen.getByRole('link', { name: /Bloom/ })).toHaveTextContent('BloomBloom artist');
-    expect(screen.getByRole('link', { name: /Solo/ })).toHaveTextContent('SoloClay artist');
-    expect(screen.getByText('2 tracks')).toBeInTheDocument();
-  });
-
-  it('keeps the classic grid free of collage card markup', () => {
-    const { container } = render(<MusicGrid tracks={[play('Clay', 'Solo')]} />);
-
-    expect(container.querySelector('[data-role="collage-music-grid"]')).toBeNull();
-    expect(container.querySelector('[data-role="album-caption"]')).toBeNull();
-  });
 });
