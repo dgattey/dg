@@ -4,9 +4,9 @@ import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Box } from '@mui/material';
 import { AlbumPlayTile } from './AlbumPlayTile';
+import albumStyles from './albums/FavoriteAlbums.module.css';
 import { albumGridSx } from './albumTileGeometry';
 import { groupAdjacentAlbumPlays } from './groupAdjacentAlbumPlays';
-import styles from './MusicHistory.module.css';
 
 type Props = {
   surface?: SiteSurface;
@@ -38,7 +38,7 @@ export function MusicGrid({ surface = 'classic', tracks }: Props) {
 
   if (surface === 'collage') {
     return (
-      <div className={styles.collageGrid} data-role="collage-music-grid">
+      <div className={albumStyles.collageAlbumGrid} data-role="collage-music-grid">
         {tiles}
       </div>
     );
