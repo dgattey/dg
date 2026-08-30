@@ -21,7 +21,8 @@ import {
   ALBUM_WELL_STICKY_TOP,
   albumWellTextGridSx,
 } from './albumWellStyles';
-import styles from './FavoriteAlbums.module.css';
+import tileStyles from '../music.module.css';
+import styles from './albumWell.module.css';
 
 const WELL_ART_SIZE = 220;
 
@@ -329,13 +330,13 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
   const well = (
     <Box
       aria-label={`${album.name} details`}
-      className={surface === 'collage' ? styles.collageWell : undefined}
+      className={surface === 'collage' ? styles.well : undefined}
       component="section"
       data-surface={surface === 'collage' ? 'collage' : undefined}
       sx={{ ...surfaceStyles.well, ...reserveSx(reservePx) }}
     >
       <Link
-        className={surface === 'collage' ? styles.collageWellArt : undefined}
+        className={surface === 'collage' ? styles.wellArt : undefined}
         href={album.url}
         isExternal={true}
         sx={surfaceStyles.artLink}
@@ -347,7 +348,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
           share="vt-album-art"
         >
           <Box
-            className={surface === 'collage' ? styles.fullColorArt : undefined}
+            className={surface === 'collage' ? tileStyles.fullColorArt : undefined}
             data-image-treatment={surface === 'collage' ? 'full-color' : undefined}
             sx={surfaceStyles.artCard}
           >
@@ -363,7 +364,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
         {surface === 'collage' ? (
           <>
             <PaperTag
-              className={styles.collageWellAlbumTag}
+              className={styles.wellAlbumTag}
               edge="quad-c"
               tiltDeg={-5}
               tone="ochre"
@@ -372,7 +373,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
               <small>{album.releaseDate.slice(0, 4)}</small>
             </PaperTag>
             <PaperTag
-              className={styles.collageWellSpotifyTag}
+              className={styles.wellSpotifyTag}
               edge="quad-c"
               tiltDeg={3}
               tone="cream"
@@ -385,7 +386,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
 
       <Box sx={{ display: 'contents' }}>
         <Typography
-          className={surface === 'collage' ? styles.collageWellName : undefined}
+          className={surface === 'collage' ? styles.wellName : undefined}
           component="h2"
           sx={surfaceStyles.name}
           variant="h2"
@@ -405,9 +406,9 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
         {surface === 'collage' ? <BackdropLayer backdrop={ALBUM_DETAIL_BACKDROP} /> : null}
         {surface === 'collage' ? (
           <PaperCard
-            className={styles.collageWellCard}
+            className={styles.wellCard}
             edge="torn-c"
-            innerClassName={styles.collageWellInner}
+            innerClassName={styles.wellInner}
             tiltDeg={-0.7}
             tone="viridian"
           >

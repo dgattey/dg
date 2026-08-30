@@ -14,7 +14,7 @@ import { CutOutSymbols } from '../collage/CutOutSymbols';
 import type { CutOutPlacement } from '../collage/cutOutPlacements';
 import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
-import styles from './ErrorLayout.module.css';
+import styles from './error.module.css';
 
 type ErrorLayoutProps = {
   /**
@@ -108,12 +108,12 @@ export function ErrorLayout({ statusCode, surface = 'classic' }: ErrorLayoutProp
     const isNotFound = statusCode === 404;
 
     return (
-      <section aria-label={String(statusCode)} className={styles.collageSheet}>
+      <section aria-label={String(statusCode)} className={styles.sheet}>
         <CutOutSymbols />
         {ERROR_CUT_OUTS.map((placement) => (
           <CutOut key={placement.id} placement={placement} />
         ))}
-        <div className={styles.collageContent}>
+        <div className={styles.content}>
           <CutLetters className={styles.statusCode} text={String(statusCode)} />
           <PaperCard
             className={styles.messageCard}

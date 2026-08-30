@@ -21,7 +21,7 @@ import {
   collageAlbumCardTreatment,
 } from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
-import styles from './FavoriteAlbums.module.css';
+import styles from '../music.module.css';
 import { FavoriteAlbumsReserve } from './FavoriteAlbumsSkeleton';
 import { useOptimisticAlbumSelection } from './useOptimisticAlbumSelection';
 
@@ -271,12 +271,12 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
   if (surface === 'collage') {
     return (
       <>
-        <nav aria-label="Sort albums" className={styles.collageSort} {...jsOnlyProps}>
+        <nav aria-label="Sort albums" className={styles.sort} {...jsOnlyProps}>
           {SORT_OPTIONS.map((option) => {
             const current = option.key === sortKey;
             return (
               <PaperTag
-                className={styles.collageSortTag}
+                className={styles.sortTag}
                 edge="quad-a"
                 key={option.key}
                 tiltDeg={option.tiltDeg}
@@ -284,7 +284,7 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
               >
                 <button
                   aria-pressed={current}
-                  className={styles.collageSortButton}
+                  className={styles.sortButton}
                   onClick={() => handleSortChange(option.key)}
                   type="button"
                 >
@@ -294,7 +294,7 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
             );
           })}
         </nav>
-        <Box className={styles.collageAlbumGrid} onClickCapture={onAlbumNavigationCapture}>
+        <Box className={styles.albumGrid} onClickCapture={onAlbumNavigationCapture}>
           {cells}
         </Box>
       </>

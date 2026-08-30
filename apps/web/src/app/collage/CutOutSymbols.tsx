@@ -1,4 +1,4 @@
-import styles from './CutOutSymbols.module.css';
+import styles from './cutOut.module.css';
 import { CUT_OUT_SHAPE_NAMES, CUT_OUT_SHAPES, cutOutSymbolId } from './cutOutShapes';
 
 export const COLLAGE_PEBBLE_CLIP_ID = 'collage-pebble-clip';

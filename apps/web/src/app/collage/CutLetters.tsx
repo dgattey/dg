@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import styles from './CutLetters.module.css';
+import styles from './cutOut.module.css';
 
 const LETTER_TREATMENTS = [
   { accent: false, offsetEm: 0, rotationDeg: -2 },

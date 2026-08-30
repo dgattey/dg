@@ -1,6 +1,4 @@
 import type { CSSProperties, ReactNode } from 'react';
-import styles from './paper.module.css';
-import { EDGE_CLASS, TONE_CLASS } from './paperClasses';
 import type { PaperEdge, PaperTone } from './types';
 
 type PaperCardProps = {
@@ -28,10 +26,13 @@ export function PaperCard({
 }: PaperCardProps) {
   return (
     <div
-      className={cx(styles.wrap, TONE_CLASS[tone], className)}
+      className={cx('paperWrap', className)}
+      data-tone={tone}
       style={{ '--r': `${tiltDeg}deg` } as CSSProperties}
     >
-      <div className={cx(styles.inner, EDGE_CLASS[edge], innerClassName)}>{children}</div>
+      <div className={cx('paperInner', innerClassName)} data-edge={edge}>
+        {children}
+      </div>
       {tag}
     </div>
   );

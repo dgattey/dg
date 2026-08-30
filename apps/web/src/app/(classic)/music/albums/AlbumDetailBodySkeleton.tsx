@@ -7,7 +7,7 @@ import {
   albumWellMetaRowSx,
   albumWellMetaTextSx,
 } from './albumWellStyles';
-import styles from './FavoriteAlbums.module.css';
+import styles from './albumWell.module.css';
 
 const PLACEHOLDER_TRACKS = Array.from({ length: 6 }, (_, track) => `track-${track}`);
 
@@ -88,7 +88,7 @@ export function AlbumDetailBodySkeleton({ surface = 'classic' }: { surface?: Sit
       <Box sx={surfaceStyles.trackList}>
         {PLACEHOLDER_TRACKS.map((track) => (
           <Box
-            className={surface === 'collage' ? styles.collageTrackRow : undefined}
+            className={surface === 'collage' ? styles.trackRow : undefined}
             data-role="track-row-skeleton"
             key={track}
             sx={surfaceStyles.row}

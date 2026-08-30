@@ -4,7 +4,7 @@ import type { ImageSizes } from '@dg/ui/dependent/Image';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS } from './cutOutPlacements';
 import { PaperTag } from './PaperTag';
-import styles from './PortraitPrint.module.css';
+import styles from './print.module.css';
 import { Print } from './Print';
 
 const PORTRAIT_SIZES: ImageSizes = {

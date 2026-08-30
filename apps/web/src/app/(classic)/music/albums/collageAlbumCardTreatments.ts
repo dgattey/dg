@@ -1,6 +1,6 @@
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import type { PaperTone } from '../../../collage/types';
-import styles from './FavoriteAlbums.module.css';
+import styles from '../music.module.css';
 
 export type CollageAlbumCardTreatment = {
   className?: string;
@@ -41,7 +41,7 @@ export function collageAlbumCardClassName(
   treatment: CollageAlbumCardTreatment,
   selected = false,
 ): string {
-  return [styles.collageCard, treatment.className, selected ? styles.collageSelected : undefined]
+  return [styles.card, treatment.className, selected ? styles.selected : undefined]
     .filter((className) => className !== undefined)
     .join(' ');
 }

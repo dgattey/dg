@@ -1,0 +1,32 @@
+/* Album detail well */
+
+.wellCard { width: calc(100% + 20px); margin: 28px -10px 14px; }
+:global(html:active-view-transition-type(album-close)) .wellCard,
+:global(html:active-view-transition-type(album-open)) .wellCard { view-transition-name: album-well; }
+.wellInner { overflow: clip; }
+.well { color: var(--cream); }
+.well a { color: inherit; }
+.wellArt { position: relative; }
+.wellAlbumTag, .wellSpotifyTag { position: absolute; z-index: 3; font-size: 12px; }
+.wellAlbumTag {
+  bottom: 10px;
+  left: 10px;
+  gap: 0.7em;
+  align-items: baseline;
+  line-height: 1.1;
+}
+.wellAlbumTag small {
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.25;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+}
+.wellSpotifyTag { top: 10px; right: 10px; }
+.wellName { font-family: var(--display); }
+.wellMeta { color: inherit; }
+.trackRow { border-bottom: 1px solid color-mix(in oklab, var(--cream) 28%, var(--viridian)); }
+
+@media (max-width: 820px) {
+  .wellCard { width: 100%; margin: 10px 0 6px; }
+}

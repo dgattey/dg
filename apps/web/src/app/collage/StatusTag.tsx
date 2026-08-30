@@ -1,5 +1,4 @@
 import { PaperTag } from './PaperTag';
-import styles from './StatusTag.module.css';
 
 type StatusTagProps = {
   isConnected: boolean;
@@ -8,7 +7,7 @@ type StatusTagProps = {
 export function StatusTag({ isConnected }: StatusTagProps) {
   return (
     <PaperTag
-      className={styles.status}
+      className="collageStatusTag"
       tiltDeg={isConnected ? -2 : 2}
       tone={isConnected ? 'leaf' : 'vermilion'}
     >

@@ -9,7 +9,7 @@ import { CutOutSymbols } from '../../collage/CutOutSymbols';
 import type { CutOutPlacement } from '../../collage/cutOutPlacements';
 import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
-import styles from './DevConsolePage.module.css';
+import styles from './devConsole.module.css';
 import { OauthCard } from './oauth/OauthCard';
 import { VercelSignInCard } from './vercel/VercelSignInCard';
 import { WebhookCard } from './webhooks/WebhookCard';
@@ -55,12 +55,12 @@ const DEV_CONSOLE_CUT_OUTS = [
 function PageHeader({ surface }: { surface: SiteSurface }) {
   if (surface === 'collage') {
     return (
-      <div className={styles.collageHeader}>
-        <CutLetters className={styles.collageTitle} text="Dev console" />
+      <div className={styles.header}>
+        <CutLetters className={`collagePageTitle ${styles.title}`} text="Dev console" />
         <PaperCard
-          className={styles.collageLede}
+          className={styles.lede}
           edge="quad-c"
-          innerClassName={styles.collageLedeInner}
+          innerClassName={styles.ledeInner}
           tag={
             <PaperTag className={styles.protectedTag} tiltDeg={-3} tone="rose">
               Protected <small>basic auth</small>
@@ -181,12 +181,12 @@ export default function ConsolePage({ searchParams, surface = 'classic' }: Conso
 
   if (surface === 'collage') {
     return (
-      <main className={styles.collageSheet}>
+      <main className={styles.sheet}>
         <CutOutSymbols />
         {DEV_CONSOLE_CUT_OUTS.map((placement) => (
           <CutOut key={placement.id} placement={placement} />
         ))}
-        <div className={styles.collageGrid}>
+        <div className={styles.grid}>
           <PageHeader surface={surface} />
           <div className={styles.console}>{sections}</div>
         </div>
