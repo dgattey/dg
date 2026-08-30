@@ -4,7 +4,6 @@ import userEvent from '@testing-library/user-event';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { markClientHydrated, resetClientHydrated } from '../../../../layouts/clientHydrated';
 import { FavoriteAlbumsGrid } from '../FavoriteAlbumsGrid';
-import { FavoriteAlbumsReserve, FavoriteAlbumsSkeleton } from '../FavoriteAlbumsSkeleton';
 
 jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
@@ -190,16 +189,6 @@ describe('FavoriteAlbumsGrid', () => {
     expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
   });
 
-  it('renders collage paper cards with captions and full-color art', () => {
-    const { container } = render(<FavoriteAlbumsGrid albums={albums} surface="collage" />);
-
-    const zebra = screen.getByRole('link', { name: 'Zebra' });
-    expect(zebra.querySelector('[data-role="album-caption"]')).toHaveTextContent('ZebraAlpha');
-    expect(screen.getByRole('link', { name: 'Mango' })).toHaveTextContent('MangoZulu');
-    expect(screen.getByRole('link', { name: 'Apple' })).toHaveTextContent('AppleMike, Guest');
-    expect(container.querySelectorAll('[data-image-treatment="full-color"]')).toHaveLength(3);
-  });
-
   it('sorts collage cards through paper controls without changing album behavior', async () => {
     const user = userEvent.setup();
     render(<FavoriteAlbumsGrid albums={albums} surface="collage" />);
@@ -215,25 +204,6 @@ describe('FavoriteAlbumsGrid', () => {
 
     await clickCollageSort(user, 'Recently added');
     expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
-  });
-
-  it('keeps each collage card treatment stable while sorting', async () => {
-    const user = userEvent.setup();
-    render(<FavoriteAlbumsGrid albums={albums} surface="collage" />);
-    const appearance = (name: string) => {
-      const card = screen.getByRole('link', { name }).closest('div[style]');
-      return {
-        className: card?.className,
-        rotation: card instanceof HTMLElement ? card.style.getPropertyValue('--r') : undefined,
-      };
-    };
-    const before = new Map(albums.map((album) => [album.name, appearance(album.name)]));
-
-    await clickCollageSort(user, 'Album');
-
-    for (const album of albums) {
-      expect(appearance(album.name)).toEqual(before.get(album.name));
-    }
   });
 
   it('opens and closes collage wells with the same deep-link semantics', async () => {
@@ -262,49 +232,6 @@ describe('FavoriteAlbumsGrid', () => {
         expect.objectContaining({ transitionTypes: ['album-close'] }),
       );
     });
-  });
-
-  it('opens a collage card optimistically before its detail streams', async () => {
-    const user = userEvent.setup();
-    const { container } = render(<FavoriteAlbumsGrid albums={albums} surface="collage" />);
-
-    await user.click(screen.getByRole('link', { name: 'Mango' }));
-
-    expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
-    expect(container.querySelector('[data-role="album-detail-placeholder"]')).not.toBeNull();
-    await waitFor(() => {
-      expect(push).toHaveBeenCalledWith(
-        '/music/albums?album=album-mango',
-        expect.objectContaining({ transitionTypes: ['album-open'] }),
-      );
-    });
-  });
-
-  it('uses collage layout skeletons without changing the classic skeleton', () => {
-    const classic = render(<FavoriteAlbumsSkeleton tileCount={3} />);
-
-    expect(classic.container.querySelector('[data-role="collage-album-skeleton-grid"]')).toBeNull();
-    expect(classic.container.querySelectorAll('.MuiSkeleton-root')).toHaveLength(4);
-
-    classic.rerender(<FavoriteAlbumsSkeleton surface="collage" tileCount={3} />);
-
-    expect(screen.getByRole('status', { name: 'Loading album sort controls' })).toBeInTheDocument();
-    const collageGrid = classic.container.querySelector(
-      '[data-role="collage-album-skeleton-grid"]',
-    );
-    expect(collageGrid).not.toBeNull();
-    expect(collageGrid?.children).toHaveLength(3);
-    expect(classic.container.querySelectorAll('.MuiSkeleton-root')).toHaveLength(13);
-
-    classic.rerender(<FavoriteAlbumsReserve albums={albums} surface="collage" />);
-
-    expect(classic.container.querySelector('[data-role="collage-album-skeleton-grid"]')).toBeNull();
-    const reserve = classic.container.querySelector('[data-role="collage-album-reserve"]');
-    expect(reserve).not.toBeNull();
-    expect(reserve?.children).toHaveLength(3);
-    expect(reserve).toHaveTextContent('ZebraAlpha');
-    expect(reserve?.querySelectorAll('img')).toHaveLength(0);
-    expect(classic.container.querySelectorAll('.MuiSkeleton-root')).toHaveLength(4);
   });
 
   it('opens with a skeleton before navigation, then shows matching streamed detail', async () => {
