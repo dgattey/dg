@@ -50,7 +50,7 @@ export function CollageProjectFrame({
       tone="cream"
     >
       <span className={styles.frameShot} style={printStyle}>
-        <span className={cx(printStyles.print, printStyles.treatmentProject, styles.framePrint)}>
+        <span className={cx(printStyles.print, printStyles.treatmentProject)}>
           <Image
             alt={project.title}
             cover={true}

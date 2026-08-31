@@ -22,7 +22,6 @@ html:has(.collageRoot) body {
   --viridian: light-dark(#1a5240, #1f6e52);
   --leaf: light-dark(#3d7b4b, #356f43);
   --olive: light-dark(#7b8a3a, #8d9e46);
-  --chartreuse: light-dark(#b7c25a, #c3cf66);
   --ultramarine: light-dark(#2c4db0, #3557b8);
   --cerulean: light-dark(#4f8ec1, #5d9ccf);
   --cobalt: light-dark(#3a60c2, #3557b8);
@@ -63,7 +62,6 @@ html:has(.collageRoot) body {
     --viridian: #1a5240;
     --leaf: #3d7b4b;
     --olive: #7b8a3a;
-    --chartreuse: #b7c25a;
     --ultramarine: #2c4db0;
     --cerulean: #4f8ec1;
     --cobalt: #3a60c2;
@@ -184,8 +182,7 @@ html:has(.collageRoot) body {
   text-transform: uppercase;
   letter-spacing: 0.09em;
 }
-.paperButton:focus-visible,
-.paperTag:focus-visible {
+.paperButton:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
 }
@@ -220,9 +217,6 @@ html:has(.collageRoot) body {
   fill: currentColor;
   rotate: var(--cut-rotation);
   scale: var(--cut-scale-x, 1) 1;
-}
-.cutDesktopOnly {
-  --cut-display: block;
 }
 .cutNightOnly {
   --cut-display: none;
@@ -299,7 +293,6 @@ html[data-color-scheme="dark"] .cutNightOnly {
     --cut-max-size: 44vw;
   }
   .cutDesktopOnly {
-    --cut-display: none;
     display: none;
   }
   .collagePin {
