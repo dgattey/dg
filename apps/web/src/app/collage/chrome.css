@@ -26,6 +26,11 @@
   width: 100%;
   height: 100%;
 }
+.chrome__logo button:focus-visible,
+.chrome__logo a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
 .chrome__logo button,
 .chrome__logo a {
   padding: 0.4em 0.5em 0.48em;
