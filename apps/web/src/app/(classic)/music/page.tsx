@@ -12,9 +12,9 @@ import { CutLetters } from '../../collage/CutLetters';
 import { markdownAlternates } from '../../layouts/markdownAlternates';
 import { musicDestinationLabel } from '../../layouts/musicHeaderDestinations';
 import { PageTitle } from '../../layouts/PageTitle';
-import styles from './music.module.css';
 import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
+import styles from './music.module.css';
 
 const TITLE = musicDestinationLabel(musicRoute);
 

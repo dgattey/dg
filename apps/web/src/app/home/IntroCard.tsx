@@ -9,7 +9,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { CutLetters } from '../collage/CutLetters';
 import collageStyles from '../collage/home.module.css';
 import { PaperCard } from '../collage/PaperCard';
-import { PortraitPrint } from '../collage/PortraitPrint';
+import { introImageAlt, PortraitPrint } from '../collage/PortraitPrint';
 import { splitIntroDocument } from '../collage/splitIntroDocument';
 
 const SMALL_IMAGE_SIZE = '16em';
@@ -64,7 +64,7 @@ function ClassicIntroCard({ introBlock, linkedInLink }: IntroCardProps) {
         verticalSpan={1}
       >
         <Image
-          alt={introBlock.image.title ?? 'Introduction image'}
+          alt={introImageAlt(introBlock.image)}
           cover={true}
           height={height}
           preload={true}

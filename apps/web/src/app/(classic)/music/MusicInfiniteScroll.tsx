@@ -6,7 +6,7 @@ import { useServerTime } from '@dg/ui/core/ServerTimeContext';
 import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, CircularProgress, Stack, Typography } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
+import { type ReactNode, useEffect, useRef, useState } from 'react';
 import { loadMoreMusicHistory } from '../../../services/music.actions';
 import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
@@ -32,10 +32,22 @@ const sectionHeaderSx: SxObject = {
   paddingBlockStart: 2,
 };
 
-/**
- * Infinite scroll wrapper for music history.
- * Loads more tracks when sentinel element enters viewport.
- */
+function CollageStatus({ children, tag }: { children: ReactNode; tag?: ReactNode }) {
+  return (
+    <div className={styles.state} role="status">
+      <PaperCard
+        edge="quad-c"
+        innerClassName={`${styles.stateInner}${tag ? '' : ` ${styles.loadingInner}`}`}
+        tiltDeg={-1.5}
+        tone="cream"
+      >
+        {children}
+      </PaperCard>
+      {tag}
+    </div>
+  );
+}
+
 export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'classic' }: Props) {
   const serverTime = useServerTime();
   const [allTracks, setAllTracks] = useState<Array<HistoryTrack>>(initialTracks);
@@ -72,28 +84,21 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
 
   const sections = groupTracksByDate(allTracks, serverTime);
 
-  if (sections.length === 0) {
-    if (surface === 'collage') {
+  if (surface === 'collage') {
+    if (sections.length === 0) {
       return (
-        <div className={styles.state} data-role="collage-music-empty" role="status">
-          <PaperCard
-            edge="quad-c"
-            innerClassName={styles.stateInner}
-            tiltDeg={-1.5}
-            tone="cream"
-          >
-            <p>No listening history yet.</p>
-          </PaperCard>
-          <PaperTag className={styles.stateTag} tiltDeg={-3} tone="ochre">
-            Spotify
-          </PaperTag>
-        </div>
+        <CollageStatus
+          tag={
+            <PaperTag className={`collagePin ${styles.stateTag}`} tiltDeg={-3} tone="ochre">
+              Spotify
+            </PaperTag>
+          }
+        >
+          <p>No listening history yet.</p>
+        </CollageStatus>
       );
     }
-    return <Typography>No listening history yet.</Typography>;
-  }
 
-  if (surface === 'collage') {
     return (
       <div className={styles.history}>
         {sections.map((section, sectionIndex) => (
@@ -113,24 +118,20 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
             <MusicGrid surface="collage" tracks={section.tracks} />
           </section>
         ))}
-
         <div className={styles.sentinel} ref={sentinelRef}>
           {isLoading ? (
-            <div className={styles.state} data-role="collage-music-loading" role="status">
-              <PaperCard
-                edge="quad-c"
-                innerClassName={`${styles.stateInner} ${styles.loadingInner}`}
-                tiltDeg={-1.5}
-                tone="cream"
-              >
-                <span aria-hidden="true" className={styles.ring} />
-                <span>Loading more plays…</span>
-              </PaperCard>
-            </div>
+            <CollageStatus>
+              <span aria-hidden="true" className={styles.ring} />
+              <span>Loading more plays…</span>
+            </CollageStatus>
           ) : null}
         </div>
       </div>
     );
+  }
+
+  if (sections.length === 0) {
+    return <Typography>No listening history yet.</Typography>;
   }
 
   return (
@@ -146,7 +147,6 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
         </Stack>
       ))}
 
-      {/* Sentinel element for infinite scroll */}
       <Box ref={sentinelRef} sx={loadingContainerSx}>
         {isLoading ? <CircularProgress size={24} /> : null}
       </Box>

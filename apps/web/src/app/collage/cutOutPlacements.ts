@@ -2,7 +2,6 @@ import type { CutOutShape } from './cutOutShapes';
 import type { PaperTone } from './types';
 
 export type CutOutColor = PaperTone | 'star';
-type CutOutVisibility = 'all' | 'desktop' | 'dark-desktop';
 
 export type CutOutPlacement = {
   color: CutOutColor;
@@ -15,134 +14,249 @@ export type CutOutPlacement = {
     color: CutOutColor;
     offset: readonly [x: number, y: number];
   };
-  visibility: CutOutVisibility;
+  visibility: 'all' | 'desktop' | 'dark-desktop';
   xPercent: number;
   yPercent: number;
   zIndex: 0 | 1 | 3;
 };
 
-type PlacementRow = readonly [
-  id: string,
-  shape: CutOutShape,
-  color: CutOutColor,
-  sizePx: number,
-  rotationDeg: number,
-  xPercent: number,
-  yPercent: number,
-  visibility: CutOutVisibility,
-  zIndex: 0 | 1 | 3,
-  options?: {
-    mirrored?: true;
-    underprint?: readonly [color: CutOutColor, x: number, y: number];
-  },
-];
-
-function definePlacements(rows: ReadonlyArray<PlacementRow>): Array<CutOutPlacement> {
-  return rows.map(
-    ([id, shape, color, sizePx, rotationDeg, xPercent, yPercent, visibility, zIndex, options]) => {
-      const underprint = options?.underprint;
-      return {
-        color,
-        id,
-        ...(options?.mirrored ? { mirrored: true } : {}),
-        rotationDeg,
-        shape,
-        sizePx,
-        ...(underprint
-          ? { underprint: { color: underprint[0], offset: [underprint[1], underprint[2]] } }
-          : {}),
-        visibility,
-        xPercent,
-        yPercent,
-        zIndex,
-      };
-    },
-  );
-}
-
 export const CUT_OUT_PLACEMENTS = {
-  coda: definePlacements([
-    ['coda-monstera', 'monstera', 'olive', 460, 14, 4, -20, 'all', 0],
-    ['coda-banana', 'banana', 'viridian', 380, -30, 30, 8, 'desktop', 0],
-    [
-      'coda-bird',
-      'birdpara',
-      'vermilion',
-      260,
-      -10,
-      44,
-      34,
-      'all',
-      1,
-      { underprint: ['ultramarine', 6, 7] },
-    ],
-    ['coda-sun', 'sun', 'ochre', 180, 0, 18, 44, 'desktop', 0],
-    ['coda-star-upper', 'star5', 'star', 46, 8, 58, 8, 'desktop', 3],
-    ['coda-heart', 'heart', 'rose', 90, -12, 90, 70, 'all', 3],
-    ['coda-star-lower', 'star5', 'cream', 40, 16, 24, 78, 'dark-desktop', 3],
-    ['coda-star-right', 'star4', 'cream', 34, -6, 78, 22, 'dark-desktop', 3],
-    ['coda-philo', 'philo', 'leaf', 250, -18, 4, 64, 'desktop', 1],
-  ]),
-  helloSheet: definePlacements([
-    ['hello-seaweed-left', 'seaweed', 'ultramarine', 250, -12, -4, 20, 'desktop', 1],
-    ['hello-fern-left', 'fern', 'olive', 330, 22, -7, 42, 'all', 1],
-    ['hello-seaweed-lower-left', 'seaweed2', 'rose', 180, -8, -2, 78, 'all', 1],
-    ['hello-pods', 'pods', 'ochre', 210, -18, 33, 74, 'desktop', 1],
-    ['hello-star-upper', 'star5', 'star', 40, 12, 44, 10, 'desktop', 3],
-    ['hello-star-middle', 'star4', 'star', 30, -8, 47, 50, 'desktop', 3],
-    ['hello-algae', 'algae', 'rose', 210, 16, 39, -5, 'desktop', 1],
-    ['hello-moon', 'moon', 'cream', 64, 14, 46, -2, 'dark-desktop', 3],
-    ['hello-coral', 'coral', 'ultramarine', 170, -10, 49, 47, 'desktop', 1],
-    ['hello-seaweed-lower-middle', 'seaweed2', 'ultramarine', 200, 14, 53, 72, 'desktop', 1],
-    ['hello-fern-right', 'fern', 'leaf', 320, -28, 69, 78, 'desktop', 0],
-    [
-      'hello-bird',
-      'birdpara',
-      'vermilion',
-      300,
-      8,
-      60,
-      64,
-      'all',
-      1,
-      { underprint: ['ultramarine', 6, 7] },
-    ],
-    ['hello-banana', 'banana', 'viridian', 440, -24, 86, 26, 'desktop', 0],
-    ['hello-star-right', 'star4', 'ochre', 44, 10, 92, 40, 'desktop', 3],
-  ]),
-  moreWork: definePlacements([
-    ['more-monstera', 'monstera', 'viridian', 640, 150, 72, -12, 'all', 0],
-    ['more-gerbe', 'gerbe', 'vermilion', 380, 24, 38, -16, 'all', 0],
-    ['more-star-upper', 'star5', 'star', 44, -12, 48, 4, 'desktop', 3],
-    ['more-pods', 'pods', 'ultramarine', 230, 22, 27, 36, 'all', 1],
-    ['more-trefoil', 'trefoil', 'rose', 150, -16, 45, 44, 'desktop', 1],
-    ['more-algae', 'algae', 'leaf', 200, 10, 36, 52, 'desktop', 1],
-    ['more-banana', 'banana', 'leaf', 440, 40, 80, 52, 'desktop', 0],
-    ['more-star-lower', 'star4', 'ultramarine', 40, 10, 6, 92, 'all', 3],
-    ['more-seaweed', 'seaweed', 'cream', 240, -10, -3, 40, 'desktop', 1],
-    ['more-philo', 'philo', 'viridian', 300, -30, -6, 8, 'all', 1],
-    ['more-star-middle', 'star5', 'cream', 40, 20, 31, 54, 'desktop', 1],
-  ]),
-  portrait: definePlacements([
-    ['portrait-monstera', 'monstera', 'viridian', 1020, -34, -70, -62, 'all', 0],
-    ['portrait-philo', 'philo', 'olive', 380, 28, 58, 62, 'desktop', 0],
-  ]),
-  workSheet: definePlacements([
-    ['work-algae', 'algae', 'cream', 330, -8, -4, 2, 'all', 1],
-    ['work-star-upper', 'star5', 'cream', 54, 14, 21, 3, 'all', 1],
-    ['work-swallow-upper', 'swallow', 'cream', 170, -6, 55, -2, 'all', 1],
-    ['work-star-right', 'star4', 'cream', 44, 0, 81, 5, 'desktop', 1],
-    ['work-seaweed', 'seaweed', 'cream', 300, 10, 90, 26, 'all', 1],
-    ['work-coral', 'coral', 'cream', 250, -12, 27, 50, 'all', 1],
-    ['work-star-lower-left', 'star5', 'cream', 40, -20, 3, 84, 'all', 1],
-    ['work-trefoil', 'trefoil', 'cream', 140, 24, 4, 50, 'desktop', 1],
-    ['work-swallow-lower', 'swallow', 'cream', 130, 12, 74, 84, 'desktop', 1, { mirrored: true }],
-    ['work-star-bottom', 'star4', 'cream', 36, 12, 48, 92, 'all', 1],
-    ['work-star-middle', 'star5', 'cream', 34, 30, 66, 40, 'desktop', 1],
-    ['work-seaweed2', 'seaweed2', 'cream', 220, -14, 88, 70, 'desktop', 1],
-  ]),
+  coda: [
+    {
+      id: 'coda-monstera', shape: 'monstera', color: 'olive', sizePx: 460,
+      rotationDeg: 14, xPercent: 4, yPercent: -20, visibility: 'all', zIndex: 0,
+    },
+    {
+      id: 'coda-banana', shape: 'banana', color: 'viridian', sizePx: 380,
+      rotationDeg: -30, xPercent: 30, yPercent: 8, visibility: 'desktop', zIndex: 0,
+    },
+    {
+      id: 'coda-bird', shape: 'birdpara', color: 'vermilion', sizePx: 260,
+      rotationDeg: -10, xPercent: 44, yPercent: 34, visibility: 'all', zIndex: 1, underprint: { color: 'ultramarine', offset: [6, 7] },
+    },
+    {
+      id: 'coda-sun', shape: 'sun', color: 'ochre', sizePx: 180,
+      rotationDeg: 0, xPercent: 18, yPercent: 44, visibility: 'desktop', zIndex: 0,
+    },
+    {
+      id: 'coda-star-upper', shape: 'star5', color: 'star', sizePx: 46,
+      rotationDeg: 8, xPercent: 58, yPercent: 8, visibility: 'desktop', zIndex: 3,
+    },
+    {
+      id: 'coda-heart', shape: 'heart', color: 'rose', sizePx: 90,
+      rotationDeg: -12, xPercent: 90, yPercent: 70, visibility: 'all', zIndex: 3,
+    },
+    {
+      id: 'coda-star-lower', shape: 'star5', color: 'cream', sizePx: 40,
+      rotationDeg: 16, xPercent: 24, yPercent: 78, visibility: 'dark-desktop', zIndex: 3,
+    },
+    {
+      id: 'coda-star-right', shape: 'star4', color: 'cream', sizePx: 34,
+      rotationDeg: -6, xPercent: 78, yPercent: 22, visibility: 'dark-desktop', zIndex: 3,
+    },
+    {
+      id: 'coda-philo', shape: 'philo', color: 'leaf', sizePx: 250,
+      rotationDeg: -18, xPercent: 4, yPercent: 64, visibility: 'desktop', zIndex: 1,
+    },
+],
+  devConsole: [
+    {
+      id: 'dev-console-star', shape: 'star5', color: 'star', sizePx: 44,
+      rotationDeg: 12, xPercent: 58, yPercent: 4, visibility: 'desktop', zIndex: 3,
+    },
+    {
+      id: 'dev-console-algae-upper', shape: 'algae', color: 'leaf', sizePx: 170,
+      rotationDeg: -20, xPercent: 88, yPercent: 0, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'dev-console-algae-lower', shape: 'algae', color: 'leaf', sizePx: 220,
+      rotationDeg: 16, xPercent: 68, yPercent: 82, visibility: 'desktop', zIndex: 1,
+    },
+],
+  error: [
+    {
+      id: 'error-monstera', shape: 'monstera', color: 'viridian', sizePx: 520,
+      rotationDeg: 22, xPercent: 66, yPercent: -12, visibility: 'desktop', zIndex: 0,
+    },
+    {
+      id: 'error-fern', shape: 'fern', color: 'olive', sizePx: 340,
+      rotationDeg: -34, xPercent: -10, yPercent: 40, visibility: 'desktop', zIndex: 0,
+    },
+    {
+      id: 'error-seaweed', shape: 'seaweed2', color: 'olive', sizePx: 240,
+      rotationDeg: -16, xPercent: 56, yPercent: 64, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'error-star', shape: 'star5', color: 'star', sizePx: 46,
+      rotationDeg: 10, xPercent: 36, yPercent: 6, visibility: 'desktop', zIndex: 3,
+    },
+],
+  helloSheet: [
+    {
+      id: 'hello-seaweed-left', shape: 'seaweed', color: 'ultramarine', sizePx: 250,
+      rotationDeg: -12, xPercent: -4, yPercent: 20, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'hello-fern-left', shape: 'fern', color: 'olive', sizePx: 330,
+      rotationDeg: 22, xPercent: -7, yPercent: 42, visibility: 'all', zIndex: 1,
+    },
+    {
+      id: 'hello-seaweed-lower-left', shape: 'seaweed2', color: 'rose', sizePx: 180,
+      rotationDeg: -8, xPercent: -2, yPercent: 78, visibility: 'all', zIndex: 1,
+    },
+    {
+      id: 'hello-pods', shape: 'pods', color: 'ochre', sizePx: 210,
+      rotationDeg: -18, xPercent: 33, yPercent: 74, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'hello-star-upper', shape: 'star5', color: 'star', sizePx: 40,
+      rotationDeg: 12, xPercent: 44, yPercent: 10, visibility: 'desktop', zIndex: 3,
+    },
+    {
+      id: 'hello-star-middle', shape: 'star4', color: 'star', sizePx: 30,
+      rotationDeg: -8, xPercent: 47, yPercent: 50, visibility: 'desktop', zIndex: 3,
+    },
+    {
+      id: 'hello-algae', shape: 'algae', color: 'rose', sizePx: 210,
+      rotationDeg: 16, xPercent: 39, yPercent: -5, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'hello-moon', shape: 'moon', color: 'cream', sizePx: 64,
+      rotationDeg: 14, xPercent: 46, yPercent: -2, visibility: 'dark-desktop', zIndex: 3,
+    },
+    {
+      id: 'hello-coral', shape: 'coral', color: 'ultramarine', sizePx: 170,
+      rotationDeg: -10, xPercent: 49, yPercent: 47, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'hello-seaweed-lower-middle', shape: 'seaweed2', color: 'ultramarine', sizePx: 200,
+      rotationDeg: 14, xPercent: 53, yPercent: 72, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'hello-fern-right', shape: 'fern', color: 'leaf', sizePx: 320,
+      rotationDeg: -28, xPercent: 69, yPercent: 78, visibility: 'desktop', zIndex: 0,
+    },
+    {
+      id: 'hello-bird', shape: 'birdpara', color: 'vermilion', sizePx: 300,
+      rotationDeg: 8, xPercent: 60, yPercent: 64, visibility: 'all', zIndex: 1, underprint: { color: 'ultramarine', offset: [6, 7] },
+    },
+    {
+      id: 'hello-banana', shape: 'banana', color: 'viridian', sizePx: 440,
+      rotationDeg: -24, xPercent: 86, yPercent: 26, visibility: 'desktop', zIndex: 0,
+    },
+    {
+      id: 'hello-star-right', shape: 'star4', color: 'ochre', sizePx: 44,
+      rotationDeg: 10, xPercent: 92, yPercent: 40, visibility: 'desktop', zIndex: 3,
+    },
+],
+  moreWork: [
+    {
+      id: 'more-monstera', shape: 'monstera', color: 'viridian', sizePx: 640,
+      rotationDeg: 150, xPercent: 72, yPercent: -12, visibility: 'all', zIndex: 0,
+    },
+    {
+      id: 'more-gerbe', shape: 'gerbe', color: 'vermilion', sizePx: 380,
+      rotationDeg: 24, xPercent: 38, yPercent: -16, visibility: 'all', zIndex: 0,
+    },
+    {
+      id: 'more-star-upper', shape: 'star5', color: 'star', sizePx: 44,
+      rotationDeg: -12, xPercent: 48, yPercent: 4, visibility: 'desktop', zIndex: 3,
+    },
+    {
+      id: 'more-pods', shape: 'pods', color: 'ultramarine', sizePx: 230,
+      rotationDeg: 22, xPercent: 27, yPercent: 36, visibility: 'all', zIndex: 1,
+    },
+    {
+      id: 'more-trefoil', shape: 'trefoil', color: 'rose', sizePx: 150,
+      rotationDeg: -16, xPercent: 45, yPercent: 44, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'more-algae', shape: 'algae', color: 'leaf', sizePx: 200,
+      rotationDeg: 10, xPercent: 36, yPercent: 52, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'more-banana', shape: 'banana', color: 'leaf', sizePx: 440,
+      rotationDeg: 40, xPercent: 80, yPercent: 52, visibility: 'desktop', zIndex: 0,
+    },
+    {
+      id: 'more-star-lower', shape: 'star4', color: 'ultramarine', sizePx: 40,
+      rotationDeg: 10, xPercent: 6, yPercent: 92, visibility: 'all', zIndex: 3,
+    },
+    {
+      id: 'more-seaweed', shape: 'seaweed', color: 'cream', sizePx: 240,
+      rotationDeg: -10, xPercent: -3, yPercent: 40, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'more-philo', shape: 'philo', color: 'viridian', sizePx: 300,
+      rotationDeg: -30, xPercent: -6, yPercent: 8, visibility: 'all', zIndex: 1,
+    },
+    {
+      id: 'more-star-middle', shape: 'star5', color: 'cream', sizePx: 40,
+      rotationDeg: 20, xPercent: 31, yPercent: 54, visibility: 'desktop', zIndex: 1,
+    },
+],
+  portrait: [
+    {
+      id: 'portrait-monstera', shape: 'monstera', color: 'viridian', sizePx: 1020,
+      rotationDeg: -34, xPercent: -70, yPercent: -62, visibility: 'all', zIndex: 0,
+    },
+    {
+      id: 'portrait-philo', shape: 'philo', color: 'olive', sizePx: 380,
+      rotationDeg: 28, xPercent: 58, yPercent: 62, visibility: 'desktop', zIndex: 0,
+    },
+],
+  workSheet: [
+    {
+      id: 'work-algae', shape: 'algae', color: 'cream', sizePx: 330,
+      rotationDeg: -8, xPercent: -4, yPercent: 2, visibility: 'all', zIndex: 1,
+    },
+    {
+      id: 'work-star-upper', shape: 'star5', color: 'cream', sizePx: 54,
+      rotationDeg: 14, xPercent: 21, yPercent: 3, visibility: 'all', zIndex: 1,
+    },
+    {
+      id: 'work-swallow-upper', shape: 'swallow', color: 'cream', sizePx: 170,
+      rotationDeg: -6, xPercent: 55, yPercent: -2, visibility: 'all', zIndex: 1,
+    },
+    {
+      id: 'work-star-right', shape: 'star4', color: 'cream', sizePx: 44,
+      rotationDeg: 0, xPercent: 81, yPercent: 5, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'work-seaweed', shape: 'seaweed', color: 'cream', sizePx: 300,
+      rotationDeg: 10, xPercent: 90, yPercent: 26, visibility: 'all', zIndex: 1,
+    },
+    {
+      id: 'work-coral', shape: 'coral', color: 'cream', sizePx: 250,
+      rotationDeg: -12, xPercent: 27, yPercent: 50, visibility: 'all', zIndex: 1,
+    },
+    {
+      id: 'work-star-lower-left', shape: 'star5', color: 'cream', sizePx: 40,
+      rotationDeg: -20, xPercent: 3, yPercent: 84, visibility: 'all', zIndex: 1,
+    },
+    {
+      id: 'work-trefoil', shape: 'trefoil', color: 'cream', sizePx: 140,
+      rotationDeg: 24, xPercent: 4, yPercent: 50, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'work-swallow-lower', shape: 'swallow', color: 'cream', sizePx: 130,
+      rotationDeg: 12, xPercent: 74, yPercent: 84, visibility: 'desktop', zIndex: 1, mirrored: true,
+    },
+    {
+      id: 'work-star-bottom', shape: 'star4', color: 'cream', sizePx: 36,
+      rotationDeg: 12, xPercent: 48, yPercent: 92, visibility: 'all', zIndex: 1,
+    },
+    {
+      id: 'work-star-middle', shape: 'star5', color: 'cream', sizePx: 34,
+      rotationDeg: 30, xPercent: 66, yPercent: 40, visibility: 'desktop', zIndex: 1,
+    },
+    {
+      id: 'work-seaweed2', shape: 'seaweed2', color: 'cream', sizePx: 220,
+      rotationDeg: -14, xPercent: 88, yPercent: 70, visibility: 'desktop', zIndex: 1,
+    },
+],
 } satisfies Record<
-  'helloSheet' | 'portrait' | 'workSheet' | 'moreWork' | 'coda',
+  'helloSheet' | 'portrait' | 'workSheet' | 'moreWork' | 'coda' | 'devConsole' | 'error',
   ReadonlyArray<CutOutPlacement>
 >;
 
@@ -156,7 +270,18 @@ const MORE_WORK_OVERFLOW_SOURCE_IDS = new Set<string>([
 export function moreWorkOverflowPlacements(unitKey: string): Array<CutOutPlacement> {
   return CUT_OUT_PLACEMENTS.moreWork
     .filter((placement) => MORE_WORK_OVERFLOW_SOURCE_IDS.has(placement.id))
-    .map((placement) => ({ ...placement, id: `${unitKey}-${placement.id}` }));
+    .map((placement) => ({
+      ...placement,
+      id: `${unitKey}-${placement.id}`,
+    }));
 }
 
-export const ALL_CUT_OUT_PLACEMENTS = Object.values(CUT_OUT_PLACEMENTS).flat();
+export const ALL_CUT_OUT_PLACEMENTS: ReadonlyArray<CutOutPlacement> = [
+  ...CUT_OUT_PLACEMENTS.helloSheet,
+  ...CUT_OUT_PLACEMENTS.portrait,
+  ...CUT_OUT_PLACEMENTS.workSheet,
+  ...CUT_OUT_PLACEMENTS.moreWork,
+  ...CUT_OUT_PLACEMENTS.coda,
+  ...CUT_OUT_PLACEMENTS.devConsole,
+  ...CUT_OUT_PLACEMENTS.error,
+];

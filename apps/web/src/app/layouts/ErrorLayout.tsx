@@ -11,7 +11,7 @@ import { Stack, Typography } from '@mui/material';
 import { CutLetters } from '../collage/CutLetters';
 import { CutOut } from '../collage/CutOut';
 import { CutOutSymbols } from '../collage/CutOutSymbols';
-import type { CutOutPlacement } from '../collage/cutOutPlacements';
+import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
 import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
 import styles from './error.module.css';
@@ -21,58 +21,8 @@ type ErrorLayoutProps = {
    * The numeric code for the error's status
    */
   statusCode: number;
-  /**
-   * Visual surface for the error page
-   */
   surface?: SiteSurface;
 };
-
-const ERROR_CUT_OUTS = [
-  {
-    color: 'viridian',
-    id: 'error-monstera',
-    rotationDeg: 22,
-    shape: 'monstera',
-    sizePx: 520,
-    visibility: 'desktop',
-    xPercent: 66,
-    yPercent: -12,
-    zIndex: 0,
-  },
-  {
-    color: 'olive',
-    id: 'error-fern',
-    rotationDeg: -34,
-    shape: 'fern',
-    sizePx: 340,
-    visibility: 'desktop',
-    xPercent: -10,
-    yPercent: 40,
-    zIndex: 0,
-  },
-  {
-    color: 'olive',
-    id: 'error-seaweed',
-    rotationDeg: -16,
-    shape: 'seaweed2',
-    sizePx: 240,
-    visibility: 'desktop',
-    xPercent: 56,
-    yPercent: 64,
-    zIndex: 1,
-  },
-  {
-    color: 'star',
-    id: 'error-star',
-    rotationDeg: 10,
-    shape: 'star5',
-    sizePx: 46,
-    visibility: 'desktop',
-    xPercent: 36,
-    yPercent: 6,
-    zIndex: 3,
-  },
-] as const satisfies ReadonlyArray<CutOutPlacement>;
 
 const layoutSx: SxObject = {
   alignItems: 'center',
@@ -99,18 +49,31 @@ const backLinkSx: SxObject = {
   marginTop: 3,
 };
 
+const ERROR_COPY = {
+  404: {
+    classic: 'Sorry, couldn‘t find that page. Email me if something is wrong.',
+    detail: 'Email me if something is wrong.',
+    heading: 'Sorry, couldn‘t find that page.',
+  },
+  other: {
+    classic: 'Something went super wrong, sorry. Email me to let me know.',
+    detail: 'Email me if it keeps happening.',
+    heading: 'Something went wrong on my end.',
+  },
+} as const;
+
 /**
  * Basic page layout for error pages. Max-width'd content, left aligned,
  * with a go home button at the bottom
  */
 export function ErrorLayout({ statusCode, surface = 'classic' }: ErrorLayoutProps) {
-  if (surface === 'collage') {
-    const isNotFound = statusCode === 404;
+  const copy = statusCode === 404 ? ERROR_COPY[404] : ERROR_COPY.other;
 
+  if (surface === 'collage') {
     return (
-      <section aria-label={String(statusCode)} className={styles.sheet}>
+      <section aria-label={String(statusCode)} className={`collageBleed ${styles.sheet}`}>
         <CutOutSymbols />
-        {ERROR_CUT_OUTS.map((placement) => (
+        {CUT_OUT_PLACEMENTS.error.map((placement) => (
           <CutOut key={placement.id} placement={placement} />
         ))}
         <div className={styles.content}>
@@ -122,11 +85,9 @@ export function ErrorLayout({ statusCode, surface = 'classic' }: ErrorLayoutProp
             tiltDeg={-1.2}
           >
             <Typography component="h2" variant="h3">
-              {isNotFound ? 'Sorry, couldn‘t find that page.' : 'Something went wrong on my end.'}
+              {copy.heading}
             </Typography>
-            <Typography>
-              {isNotFound ? 'Email me if something is wrong.' : 'Email me if it keeps happening.'}
-            </Typography>
+            <Typography>{copy.detail}</Typography>
           </PaperCard>
           <PaperButton href={homeRoute} tiltDeg={2} title="Home" tone="ochre">
             Back home
@@ -142,9 +103,7 @@ export function ErrorLayout({ statusCode, surface = 'classic' }: ErrorLayoutProp
         {statusCode}
       </MouseAwareGlassContainer>
       <Typography sx={messageSx} variant="h5">
-        {statusCode === 404
-          ? 'Sorry, couldn‘t find that page. Email me if something is wrong.'
-          : 'Something went super wrong, sorry. Email me to let me know.'}
+        {copy.classic}
       </Typography>
       <Link
         buttonProps={{

@@ -5,12 +5,13 @@ import { PaperCard } from '../../collage/PaperCard';
 import { DevConsoleCardBoundary } from './DevConsoleCardBoundary';
 import styles from './devConsole.module.css';
 
-type DevConsoleCardShellProps = {
+export function DevConsoleCardShell({
+  children,
+  surface = 'classic',
+}: {
   children: ReactNode;
   surface?: SiteSurface;
-};
-
-export function DevConsoleCardShell({ children, surface = 'classic' }: DevConsoleCardShellProps) {
+}) {
   if (surface === 'collage') {
     return (
       <PaperCard
@@ -29,11 +30,7 @@ export function DevConsoleCardShell({ children, surface = 'classic' }: DevConsol
   return (
     <Card>
       <CardContent>
-        <Stack
-          sx={{
-            gap: 2,
-          }}
-        >
+        <Stack sx={{ gap: 2 }}>
           <DevConsoleCardBoundary>{children}</DevConsoleCardBoundary>
         </Stack>
       </CardContent>

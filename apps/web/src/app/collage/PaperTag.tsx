@@ -1,27 +1,26 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { cx, paperSurfaceVars } from './paperVars';
 import type { PaperEdge, PaperTone } from './types';
-
-type PaperTagProps = {
-  children: ReactNode;
-  className?: string;
-  edge?: PaperEdge;
-  tiltDeg?: number;
-  tone?: PaperTone;
-};
 
 export function PaperTag({
   children,
   className,
   edge = 'quad-c',
+  style,
   tiltDeg = 0,
   tone = 'cream',
-}: PaperTagProps) {
+}: {
+  children: ReactNode;
+  className?: string;
+  edge?: PaperEdge;
+  style?: CSSProperties;
+  tiltDeg?: number;
+  tone?: PaperTone;
+}) {
   return (
     <span
-      className={['paperTag', className].filter((part) => part !== undefined && part.length > 0).join(' ')}
-      data-edge={edge}
-      data-tone={tone}
-      style={{ '--r': `${tiltDeg}deg` } as CSSProperties}
+      className={cx('paperTag', className)}
+      style={{ ...paperSurfaceVars(tone, edge, tiltDeg), ...style }}
     >
       {children}
     </span>

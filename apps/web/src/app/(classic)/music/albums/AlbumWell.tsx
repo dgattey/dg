@@ -12,6 +12,7 @@ import type { ReactNode, TransitionEvent } from 'react';
 import { useLayoutEffect, useRef, useState, ViewTransition } from 'react';
 import { PaperCard } from '../../../collage/PaperCard';
 import { PaperTag } from '../../../collage/PaperTag';
+import styles from '../music.module.css';
 import {
   ALBUM_WELL_ART_SIZE_XS,
   ALBUM_WELL_NAME_GAP,
@@ -19,8 +20,6 @@ import {
   ALBUM_WELL_STICKY_TOP,
   albumWellTextGridSx,
 } from './albumWellStyles';
-import tileStyles from '../music.module.css';
-import styles from './albumWell.module.css';
 
 const WELL_ART_SIZE = 220;
 
@@ -41,18 +40,6 @@ const albumWellVtNameSx: SxObject = {
 /**
  * Floor the card at the height the outgoing album's detail measured, for exactly
  * as long as a placeholder is standing in for detail that has not landed.
- *
- * Switching straight from one album to another swaps a tracklist of dozens of
- * rows for a placeholder of six, so without a floor the card — and every grid row
- * under it — drops by the difference (~3300px at 1280) in the frame the click
- * commits, then climbs back as the real tracklist arrives. Holding the floor
- * turns that shrink-then-grow into a single eased step.
- *
- * `:has()` is what releases it: the moment real detail replaces the placeholder
- * the floor stops applying, the card falls to its natural height, and the resize
- * observer below tweens that one change. Nothing has to decide when detail has
- * "really" arrived — the URL lands well before the streamed tracklist does, so
- * every signal short of the placeholder's own absence releases too early.
  */
 function reserveSx(reservePx: number | null): SxObject {
   return reservePx == null
@@ -62,9 +49,6 @@ function reserveSx(reservePx: number | null): SxObject {
 
 const wellSx: SxObject = {
   ...albumWellVtNameSx,
-  // Content-height rows, so the floor below leaves its slack at the bottom of the
-  // card. Stretching would spread it between the name, meta, and tracklist rows
-  // and push everything but the title past the fold while the placeholder is up.
   alignContent: 'start',
   backgroundColor: 'color-mix(in srgb, var(--mui-palette-background-paper) 88%, transparent)',
   border: '1px solid color-mix(in srgb, CanvasText 10%, transparent)',
@@ -98,17 +82,6 @@ const artCardSx: SxObject = {
   width: '100%',
 };
 
-/**
- * The one thing in the well that pins, and the only thing that can: it has its
- * own column from `sm` up, so it travels beside the tracklist without ever
- * covering a row. Grid items stretch by default, which would both leave the
- * anchor covering the empty column beside the tracklist and give sticky no room
- * to travel inside the grid area.
- *
- * Static on mobile, where the single column puts it directly over the rows and
- * a pinned 160px cover claimed a fifth of the viewport with bare strips either
- * side of a centred square for the tracklist to scroll through.
- */
 const artLinkSx: SxObject = {
   alignSelf: 'start',
   display: 'block',
@@ -137,96 +110,6 @@ const nameLinkSx: SxObject = {
   whiteSpace: 'nowrap',
 };
 
-const collageWellSx: SxObject = {
-  alignContent: 'start',
-  columnGap: { sm: '36px', xs: 0 },
-  display: 'grid',
-  gridTemplateAreas: {
-    sm: '"art name" "art meta" "art tracks"',
-    xs: '"art" "name" "meta" "tracks"',
-  },
-  gridTemplateColumns: {
-    sm: 'minmax(200px, 300px) minmax(0, 1fr)',
-    xs: '1fr',
-  },
-  p: { sm: '36px 40px 40px', xs: '22px 20px 26px' },
-  rowGap: 0,
-};
-
-const collageArtCardSx: SxObject = {
-  '& img': {
-    display: 'block',
-    height: 'auto',
-    width: '100%',
-  },
-  clipPath: 'var(--quad-b)',
-  lineHeight: 0,
-  overflow: 'hidden',
-  width: '100%',
-};
-
-const collageArtLinkSx: SxObject = {
-  alignSelf: 'start',
-  display: 'block',
-  gridArea: 'art',
-  justifySelf: { sm: 'stretch', xs: 'center' },
-  maxWidth: { sm: 300, xs: 220 },
-  mb: { sm: 0, xs: '22px' },
-  position: 'relative',
-  width: '100%',
-};
-
-const collageNameSx: SxObject = {
-  fontFamily: 'var(--display)',
-  fontSize: 'clamp(36px, 4vw, 56px)',
-  fontWeight: 700,
-  gridArea: 'name',
-  letterSpacing: '-0.03em',
-  lineHeight: 0.95,
-  minWidth: 0,
-};
-
-const collageNameLinkSx: SxObject = {
-  lineHeight: 'inherit',
-  minWidth: 0,
-  overflowWrap: 'anywhere',
-};
-
-type AlbumWellSurfaceStyles = {
-  artCard: SxObject;
-  artLink: SxObject;
-  name: SxObject;
-  nameLink: SxObject;
-  well: SxObject;
-};
-
-const ALBUM_WELL_SURFACE_STYLES = {
-  classic: {
-    artCard: artCardSx,
-    artLink: artLinkSx,
-    name: nameSx,
-    nameLink: nameLinkSx,
-    well: wellSx,
-  },
-  collage: {
-    artCard: collageArtCardSx,
-    artLink: collageArtLinkSx,
-    name: collageNameSx,
-    nameLink: collageNameLinkSx,
-    well: collageWellSx,
-  },
-} satisfies Record<SiteSurface, AlbumWellSurfaceStyles>;
-
-/**
- * Outer shell height. Locked to a pixel value only while a content resize is
- * tweening, then released to `auto`.
- *
- * `clip` rather than `hidden`: `hidden` makes this a scroll container, which
- * re-parents the well's sticky art and name band to it. Their `top` offsets then
- * apply against a box scrolled to 0, so both slid ~100px down the card the frame
- * the height locked and snapped back when it released. `clip` hides the same
- * overflow without a scrollport, leaving sticky anchored to the page.
- */
 function shellSx(heightPx: number | null): SxObject {
   const locking = heightPx != null;
   return {
@@ -237,7 +120,6 @@ function shellSx(heightPx: number | null): SxObject {
     },
     height: locking ? heightPx : 'auto',
     overflow: locking ? 'clip' : 'visible',
-    // Same tier as SpotifyHeaderCard's fr expand, but medium — open felt slow at slow.
     transition: locking ? createTransition('height', TIMING_MEDIUM, EASING_DEFAULT) : undefined,
   };
 }
@@ -254,15 +136,6 @@ type Props = {
  * Expanded album well. Art and title come from the grid so the shared art name
  * is on screen the instant the URL changes and the morph has somewhere to land;
  * everything that needs a fetch arrives as children.
- *
- * Open/close height is a view-transition clip on `album-well` (scoped to
- * album-open/close only). After open, content that lands later — placeholder →
- * tracklist — resizes the shell with a measured height tween so the change never
- * reads as a jolt, then releases back to `auto` for sticky.
- *
- * Switching straight from one album to another goes further and floors the card
- * at the outgoing height until the arriving tracklist replaces the placeholder,
- * so that swap costs the page no layout at all. See `reserveSx`.
  */
 export function AlbumWell({ album, children, surface = 'classic' }: Props) {
   const measureRef = useRef<HTMLDivElement>(null);
@@ -270,13 +143,9 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
   const [heightPx, setHeightPx] = useState<number | null>(null);
   const [reservePx, setReservePx] = useState<number | null>(null);
   const [openAlbumId, setOpenAlbumId] = useState(album.id);
+  const isCollage = surface === 'collage';
 
   if (album.id !== openAlbumId) {
-    // Claim the reserve in the same render that swaps the content in, so the
-    // placeholder never gets a frame at its own height to paint at. The shell is
-    // pinned to the same height as well: the floor drops the instant real detail
-    // replaces the placeholder, but the tween that follows can only start on the
-    // next resize observation, and an `auto` shell would reflow in between.
     setOpenAlbumId(album.id);
     setReservePx(lastHeightRef.current);
     setHeightPx(lastHeightRef.current);
@@ -300,7 +169,6 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
         return;
       }
 
-      // Two-stage tween: pin the outgoing height, then ease to the new content.
       setHeightPx(previous);
       requestAnimationFrame(() => {
         setHeightPx(next);
@@ -318,81 +186,84 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
       return;
     }
     setHeightPx(null);
-    // The reserve has already been released by the placeholder leaving; dropping
-    // it here keeps a stale floor from applying to some later placeholder.
     setReservePx(null);
     lastHeightRef.current = measureRef.current?.scrollHeight ?? lastHeightRef.current;
   };
 
-  const surfaceStyles = ALBUM_WELL_SURFACE_STYLES[surface];
+  const art = (
+    <Link
+      className={isCollage ? styles.wellArtLink : undefined}
+      href={album.url}
+      isExternal={true}
+      sx={isCollage ? undefined : artLinkSx}
+      title={`Open ${album.name} on Spotify`}
+    >
+      <ViewTransition
+        default="none"
+        name={albumArtViewTransitionName(album.id)}
+        share="vt-album-art"
+      >
+        <Box
+          className={isCollage ? `${styles.wellArtCard} ${styles.fullColorArt}` : undefined}
+          sx={isCollage ? undefined : artCardSx}
+        >
+          <Image
+            alt={album.name}
+            height={WELL_ART_SIZE}
+            sizes={{ extraLarge: WELL_ART_SIZE, medium: WELL_ART_SIZE, tiny: 160 }}
+            url={album.imageUrl}
+            width={WELL_ART_SIZE}
+          />
+        </Box>
+      </ViewTransition>
+      {isCollage ? (
+        <>
+          <PaperTag
+            className={`collagePin ${styles.wellAlbumTag}`}
+            edge="quad-c"
+            tiltDeg={-5}
+            tone="ochre"
+          >
+            <span>Album</span>
+            <small>{album.releaseDate.slice(0, 4)}</small>
+          </PaperTag>
+          <PaperTag
+            className={`collagePin ${styles.wellSpotifyTag}`}
+            edge="quad-c"
+            tiltDeg={3}
+            tone="cream"
+          >
+            Spotify ↗
+          </PaperTag>
+        </>
+      ) : null}
+    </Link>
+  );
+
+  const title = isCollage ? (
+    <h2 className={styles.wellName}>
+      <Link href={album.url} isExternal={true} title={album.name}>
+        {album.name}
+      </Link>
+    </h2>
+  ) : (
+    <Typography component="h2" sx={nameSx} variant="h2">
+      <Link href={album.url} isExternal={true} sx={nameLinkSx} title={album.name}>
+        {album.name}
+      </Link>
+    </Typography>
+  );
+
   const well = (
     <Box
       aria-label={`${album.name} details`}
-      className={surface === 'collage' ? styles.well : undefined}
+      className={isCollage ? styles.wellShell : undefined}
       component="section"
-      data-surface={surface === 'collage' ? 'collage' : undefined}
-      sx={{ ...surfaceStyles.well, ...reserveSx(reservePx) }}
+      sx={isCollage ? reserveSx(reservePx) : { ...wellSx, ...reserveSx(reservePx) }}
     >
-      <Link
-        className={surface === 'collage' ? styles.wellArt : undefined}
-        href={album.url}
-        isExternal={true}
-        sx={surfaceStyles.artLink}
-        title={`Open ${album.name} on Spotify`}
-      >
-        <ViewTransition
-          default="none"
-          name={albumArtViewTransitionName(album.id)}
-          share="vt-album-art"
-        >
-          <Box
-            className={surface === 'collage' ? tileStyles.fullColorArt : undefined}
-            data-image-treatment={surface === 'collage' ? 'full-color' : undefined}
-            sx={surfaceStyles.artCard}
-          >
-            <Image
-              alt={album.name}
-              height={WELL_ART_SIZE}
-              sizes={{ extraLarge: WELL_ART_SIZE, medium: WELL_ART_SIZE, tiny: 160 }}
-              url={album.imageUrl}
-              width={WELL_ART_SIZE}
-            />
-          </Box>
-        </ViewTransition>
-        {surface === 'collage' ? (
-          <>
-            <PaperTag
-              className={styles.wellAlbumTag}
-              edge="quad-c"
-              tiltDeg={-5}
-              tone="ochre"
-            >
-              <span>Album</span>
-              <small>{album.releaseDate.slice(0, 4)}</small>
-            </PaperTag>
-            <PaperTag
-              className={styles.wellSpotifyTag}
-              edge="quad-c"
-              tiltDeg={3}
-              tone="cream"
-            >
-              Spotify ↗
-            </PaperTag>
-          </>
-        ) : null}
-      </Link>
-
+      {art}
       <Box sx={{ display: 'contents' }}>
-        <Typography
-          className={surface === 'collage' ? styles.wellName : undefined}
-          component="h2"
-          sx={surfaceStyles.name}
-          variant="h2"
-        >
-          <Link href={album.url} isExternal={true} sx={surfaceStyles.nameLink} title={album.name}>
-            {album.name}
-          </Link>
-        </Typography>
+        {title}
         {children}
       </Box>
     </Box>
@@ -401,7 +272,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
   return (
     <Box onTransitionEnd={handleTransitionEnd} sx={shellSx(heightPx)}>
       <Box ref={measureRef}>
-        {surface === 'collage' ? (
+        {isCollage ? (
           <PaperCard
             className={styles.wellCard}
             edge="torn-c"

@@ -6,7 +6,12 @@ import { CutOutSymbols } from '../collage/CutOutSymbols';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
 import styles from '../collage/home.module.css';
 import { MoreWorkSheet } from '../collage/MoreWorkSheet';
-import { assignProjectSlots, type ProjectFrameStyle } from '../collage/projectSlots';
+import {
+  assignProjectSlots,
+  CODA_GRID_AREAS,
+  HELLO_GRID_AREAS,
+  type ProjectFrameStyle,
+} from '../collage/projectSlots';
 import { WorkSheet } from '../collage/WorkSheet';
 import { GatteySitesCardSlot } from './GatteySitesCardSlot';
 import { IntroCardSlot } from './IntroCardSlot';
@@ -47,7 +52,10 @@ export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface 
           {CUT_OUT_PLACEMENTS.helloSheet.map((placement) => (
             <CutOut key={placement.id} placement={placement} />
           ))}
-          <div className={`collageMeasure collageMeasureGrid collageGridStack ${styles.helloGrid}`}>
+          <div
+            className={`collageMeasure collageMeasureGrid collageGridStack ${styles.helloGrid}`}
+            style={{ gridTemplateAreas: HELLO_GRID_AREAS }}
+          >
             <IntroCardSlot surface="collage" />
             <MapCardSlot surface="collage" />
           </div>
@@ -67,10 +75,12 @@ export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface 
             {CUT_OUT_PLACEMENTS.coda.map((placement) => (
               <CutOut key={placement.id} placement={placement} />
             ))}
-            <div className={`collageMeasure collageMeasureGrid collageGridStack ${styles.codaGrid}`}>
+            <div
+              className={`collageMeasure collageMeasureGrid collageGridStack ${styles.codaGrid}`}
+              style={{ gridTemplateAreas: CODA_GRID_AREAS }}
+            >
               <ProjectCard
                 {...slots.coda.project}
-                className={styles.codaProject}
                 data-slot="li"
                 key={slots.coda.key}
                 style={CODA_FRAME_STYLE}
