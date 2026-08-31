@@ -208,8 +208,13 @@
   color: var(--cream);
   filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.35));
 }
-.chrome__links a:hover {
+.chrome__links a:hover,
+.chrome__links a:focus-visible {
   color: var(--ochre);
+}
+.chrome__links a:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
 }
 .chrome__links a svg,
 .chrome__links a span {
