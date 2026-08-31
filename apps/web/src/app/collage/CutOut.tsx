@@ -13,6 +13,16 @@ type CutOutStyle = CSSProperties & {
   '--cut-z': number;
 };
 
+function cutDepthClass(placement: CutOutPlacement): string | undefined {
+  if (placement.sizePx < 120) {
+    return undefined;
+  }
+  if (placement.sizePx >= 320) {
+    return 'cutDepthMedium';
+  }
+  return 'cutDepthFast';
+}
+
 export function CutOut({
   className,
   placement,
@@ -40,7 +50,7 @@ export function CutOut({
   return (
     <svg
       aria-hidden="true"
-      className={cx('cutOut', visibility, className)}
+      className={cx('cutOut', cutDepthClass(placement), visibility, className)}
       data-cut-out={placement.id}
       focusable="false"
       style={style}
