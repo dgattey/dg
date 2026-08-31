@@ -6,50 +6,33 @@ const links: RenderableRichTextContent['links'] = {
   entries: { block: [], inline: [] },
 };
 
-function richText(content: Array<unknown>): RenderableRichTextContent {
-  return {
-    json: {
-      content,
-      data: {},
-      nodeType: 'document',
-    },
-    links,
-  };
+function text(value: string) {
+  return { data: {}, marks: [], nodeType: 'text', value };
 }
 
-const paragraph = {
-  content: [{ data: {}, marks: [], nodeType: 'text', value: 'Intro copy' }],
-  data: {},
-  nodeType: 'paragraph',
-};
+function node(nodeType: string, value: string) {
+  return { content: [text(value)], data: {}, nodeType };
+}
+
+function richText(content: Array<unknown>): RenderableRichTextContent {
+  return { json: { content, data: {}, nodeType: 'document' }, links };
+}
 
 describe('splitIntroDocument', () => {
   it('extracts the first plain-text heading and preserves every other node and link', () => {
-    const beforeHeading = {
-      content: [{ data: {}, marks: [], nodeType: 'text', value: 'Before' }],
-      data: {},
-      nodeType: 'paragraph',
-    };
+    const before = node('paragraph', 'Before');
     const heading = {
-      content: [
-        { data: {}, marks: [], nodeType: 'text', value: 'Hey ' },
-        { data: {}, marks: [], nodeType: 'text', value: 'friends!' },
-      ],
+      content: [text('Hey '), text('friends!')],
       data: {},
       nodeType: 'heading-1',
     };
-    const laterHeading = {
-      content: [{ data: {}, marks: [], nodeType: 'text', value: 'Still here' }],
-      data: {},
-      nodeType: 'heading-1',
-    };
-    const input = richText([beforeHeading, heading, paragraph, laterHeading]);
-
+    const body = node('paragraph', 'Intro copy');
+    const later = node('heading-1', 'Still here');
+    const input = richText([before, heading, body, later]);
     const result = splitIntroDocument(input);
-
     expect(result.headline).toBe('Hey friends!');
     expect(result.remainder.json).toEqual({
-      content: [beforeHeading, paragraph, laterHeading],
+      content: [before, body, later],
       data: {},
       nodeType: 'document',
     });
@@ -57,12 +40,9 @@ describe('splitIntroDocument', () => {
   });
 
   it('returns the untouched document when no heading exists', () => {
-    const input = richText([paragraph]);
-
+    const input = richText([node('paragraph', 'Intro copy')]);
     const result = splitIntroDocument(input);
-
     expect(result.headline).toBeNull();
     expect(result.remainder).toBe(input);
-    expect(result.remainder.json).toEqual(input.json);
   });
 });
