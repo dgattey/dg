@@ -168,8 +168,15 @@ export function moreWorkGridAreas(slots: {
   sd: boolean;
 }): { areas: string; rowGapPx: number } {
   const { cn, gn, js, mg, sd } = slots;
+  const rowTwo = js
+    ? gn
+      ? '"js js js js gn gn gn gn gn gn gn gn"'
+      : fullRow('js')
+    : gn
+      ? fullRow('gn')
+      : EMPTY_ROW;
   return gridAreas(
-    [evenRow(mg && 'mg', sd && 'sd', cn && 'cn'), evenRow(js && 'js', gn && 'gn')],
+    [evenRow(mg && 'mg', sd && 'sd', cn && 'cn'), rowTwo],
     56,
   );
 }
