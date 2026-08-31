@@ -227,7 +227,10 @@ html[data-color-scheme="dark"] .collageRoot::after {
 }
 .paperButtonCurrent {
   color: var(--cream);
-  background: var(--ink);
+  background: var(--black);
+}
+.paperWrap .paperButtonCurrent {
+  color: var(--cream);
 }
 .paperButton:disabled {
   cursor: wait;
