@@ -177,6 +177,9 @@ html[data-color-scheme="dark"] .collageRoot::after {
   clip-path: var(--clip, var(--quad-a));
   rotate: none;
 }
+.paperInner .MuiTypography-root {
+  color: inherit;
+}
 .paperTag,
 .paperButton {
   display: inline-flex;
@@ -215,6 +218,7 @@ html[data-color-scheme="dark"] .collageRoot::after {
   display: inline-flex;
 }
 .paperWrap .paperButton {
+  color: var(--on);
   filter: none;
   rotate: none;
 }
