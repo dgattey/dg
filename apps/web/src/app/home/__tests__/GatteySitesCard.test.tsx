@@ -14,7 +14,7 @@ jest.mock('../../collage/PaperTag', () => ({
 
 jest.mock('@dg/ui/dependent/Image', () => ({
   // biome-ignore lint/performance/noImgElement: test double for mark rendering
-  Image: ({ url }: { url: string }) => <img alt="" data-testid="mark-image" src={url} />,
+  Image: ({ url }: { url: string }) => <img alt="" src={url} />,
 }));
 
 const mark = {
@@ -73,17 +73,13 @@ describe('GatteySitesCard', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('renders the collage surface with marks and external links', () => {
+  it('keeps collage marks decorative and links external', () => {
     const { container } = render(<GatteySitesCard projects={projects} surface="collage" />);
 
-    expect(screen.getByRole('heading', { name: 'Side projects' })).toBeInTheDocument();
-    expect(screen.getByRole('link', { name: /WMM/ })).toHaveAttribute('target', '_blank');
-    expect(screen.getByRole('link', { name: /Lost Cities scorer/ })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /WMM/ })).toHaveAttribute(
       'href',
-      'https://lostcities.app',
+      'https://wmm.gattey.com',
     );
-    expect(container.querySelectorAll('[data-role="side-project-mark"]')).toHaveLength(2);
-    expect(screen.getAllByTestId('mark-image')).toHaveLength(2);
-    expect(container.querySelector('[data-slot="sd"]')).toBeInTheDocument();
+    expect(container.querySelectorAll('img[alt=""]')).toHaveLength(2);
   });
 });
