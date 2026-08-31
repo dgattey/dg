@@ -75,7 +75,7 @@
 }
 .errorText {
   font-weight: 700;
-  color: var(--vermilion);
+  color: color-mix(in srgb, var(--vermilion) 70%, var(--ink-on-cream) 30%);
 }
 
 @media (max-width: 820px) {

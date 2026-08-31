@@ -99,8 +99,13 @@
   color: var(--cream);
   filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.35));
 }
-.links a:hover {
+.links a:hover,
+.links a:focus-visible {
   color: var(--ochre);
+}
+.links a:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
 }
 .links a svg,
 .links a span {

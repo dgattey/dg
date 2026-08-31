@@ -39,8 +39,8 @@ html:has(.collageRoot) body {
   --shadow: 0 1px 0 rgb(0 0 0 / 0.22), 0 2px 3px rgb(0 0 0 / 0.1);
   --shadow-lift: 0 1px 0 rgb(0 0 0 / 0.22), 0 6px 10px rgb(0 0 0 / 0.14);
   --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.2)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.12));
-  --sticky-fade-texture: url("./img/paper.webp");
-  --sticky-fade-texture-size: 512px 512px;
+  --sticky-fade-texture: url("./img/grain.png");
+  --sticky-fade-texture-size: 200px 200px;
   --display: var(--font-familjen), "Avenir Next", "Helvetica Neue", system-ui, sans-serif;
   --body:
     system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, Cantarell,
@@ -53,8 +53,23 @@ html:has(.collageRoot) body {
   font-family: var(--body);
   color: var(--ink);
   background-color: var(--paper);
-  background-image: url("./img/paper.webp");
-  background-size: 512px 512px;
+}
+.collageRoot::after {
+  position: absolute;
+  inset: 0;
+  z-index: 60;
+  pointer-events: none;
+  content: "";
+  background-image: url("./img/grain.png");
+  background-size: 200px 200px;
+}
+html[data-color-scheme="dark"] .collageRoot::after {
+  opacity: 0.6;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-color-scheme="light"]) .collageRoot::after {
+    opacity: 0.6;
+  }
 }
 
 @supports not (color: light-dark(#000, #fff)) {
@@ -148,6 +163,14 @@ html:has(.collageRoot) body {
   filter: var(--dshadow);
   rotate: var(--r);
 }
+.paperWrap:has(:focus-visible) {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+.collageLift:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
 .paperInner {
   color: var(--on);
   background: var(--pc);
@@ -188,8 +211,7 @@ html:has(.collageRoot) body {
   text-transform: uppercase;
   letter-spacing: 0.09em;
 }
-.paperButton:focus-visible,
-.paperTag:focus-visible {
+.paperButton:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
 }

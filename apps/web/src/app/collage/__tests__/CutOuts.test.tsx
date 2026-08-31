@@ -59,6 +59,23 @@ describe('collage cut-outs', () => {
     expect(cutOut).toHaveAttribute('focusable', 'false');
   });
 
+  it('keeps dark-desktop cut-outs as small moon or star decorations', () => {
+    const darkDesktopPlacements = ALL_CUT_OUT_PLACEMENTS.filter(
+      (placement) => placement.visibility === 'dark-desktop',
+    );
+    expect(darkDesktopPlacements.length).toBeGreaterThan(0);
+    for (const placement of darkDesktopPlacements) {
+      expect(['moon', 'star4', 'star5']).toContain(placement.shape);
+      expect(placement.sizePx).toBeLessThan(120);
+      const { container, unmount } = render(<CutOut placement={placement} />);
+      const cutOut = container.querySelector('svg');
+      invariant(cutOut, 'Expected a rendered cut-out');
+      expect(cutOut).toHaveClass('cutNightOnly');
+      expect(cutOut).toHaveClass('cutDesktopOnly');
+      unmount();
+    }
+  });
+
   it('assigns parallax depth classes to cut-outs at least 120px wide', () => {
     const cases: Array<{ placement: CutOutPlacement; depthClass?: string }> = [
       { placement: testPlacement({ sizePx: 119 }) },
