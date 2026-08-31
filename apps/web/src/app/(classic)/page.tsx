@@ -27,5 +27,5 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default function Page() {
-  return <Homepage />;
+  return <Homepage surface="classic" />;
 }

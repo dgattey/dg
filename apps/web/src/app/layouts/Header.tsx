@@ -1,3 +1,4 @@
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
@@ -12,7 +13,6 @@ import { getLatestSong } from '../../services/spotify';
 import { CollageColorSchemeFieldset } from '../collage/CollageColorSchemeFieldset';
 import chrome from '../collage/chrome.module.css';
 import { PaperCard } from '../collage/PaperCard';
-import type { SiteSurface } from '../collage/types';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
 import { CollageMusicLinks } from './CollageMusicLinks';
 import { HeaderControls } from './HeaderControls';

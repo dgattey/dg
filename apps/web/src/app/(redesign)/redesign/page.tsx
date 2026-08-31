@@ -1,7 +1,8 @@
-import ClassicHome, { generateMetadata as generateHomeMetadata } from '../../(classic)/page';
+import { generateMetadata as generateHomeMetadata } from '../../(classic)/page';
+import { Homepage } from '../../home/Homepage';
 
 export const generateMetadata = generateHomeMetadata;
 
 export default function Page() {
-  return <ClassicHome />;
+  return <Homepage surface="collage" />;
 }

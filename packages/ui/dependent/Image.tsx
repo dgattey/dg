@@ -1,8 +1,9 @@
+import type { ImageProps as NextImageProps } from 'next/image';
 import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
 import { BREAKPOINT_MAX_SIZES } from '../helpers/imageSizes';
 
-type ImageSizes = {
+export type ImageSizes = {
   /**
    * Under 576px wide
    */
@@ -33,7 +34,7 @@ type ImageProps = {
   url: string;
   width: number;
   height: number;
-  fill?: boolean;
+  fill?: NextImageProps['fill'];
 
   /**
    * When true, image fills its container and uses object-fit: cover.
@@ -44,12 +45,17 @@ type ImageProps = {
   /**
    * Alt text, required, but defaults to title.
    */
-  alt: string;
+  alt: NextImageProps['alt'];
 
   /**
    * For the image that should be the LCP.
    */
-  priority?: boolean;
+  preload?: NextImageProps['preload'];
+
+  /**
+   * Must match an allowlisted quality from the consuming Next.js app.
+   */
+  quality?: NextImageProps['quality'];
 
   /**
    * Optional title, used as alt text when present.
