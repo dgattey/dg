@@ -119,6 +119,26 @@ export function projectTagMeta(
 
 const EMPTY_ROW = '". . . . . . . . . . . ."';
 
+function fullRow(area: string): string {
+  return `"${Array.from({ length: 12 }, () => area).join(' ')}"`;
+}
+
+function evenRow(...areas: Array<string | false>): string {
+  const visible = areas.filter((area): area is string => area !== false);
+  if (visible.length === 0) {
+    return EMPTY_ROW;
+  }
+  const span = 12 / visible.length;
+  return `"${visible.flatMap((area) => Array.from({ length: span }, () => area)).join(' ')}"`;
+}
+
+function gridAreas(rows: readonly [string, string], gap: number) {
+  return {
+    areas: rows.join(' '),
+    rowGapPx: rows.includes(EMPTY_ROW) ? 0 : gap,
+  };
+}
+
 export function workSheetGridAreas(slots: { c1: boolean; sp: boolean; st: boolean; ws: boolean }): {
   areas: string;
   rowGapPx: number;
@@ -126,23 +146,18 @@ export function workSheetGridAreas(slots: { c1: boolean; sp: boolean; st: boolea
   const rowOne = slots.c1
     ? slots.sp
       ? '"c1 c1 c1 c1 c1 c1 c1 c1 . sp sp sp"'
-      : '"c1 c1 c1 c1 c1 c1 c1 c1 c1 c1 c1 c1"'
+      : fullRow('c1')
     : slots.sp
-      ? '"sp sp sp sp sp sp sp sp sp sp sp sp"'
+      ? fullRow('sp')
       : EMPTY_ROW;
   const rowTwo = slots.st
     ? slots.ws
       ? '"st st st st . ws ws ws ws ws ws ws"'
-      : '"st st st st st st st st st st st st"'
+      : fullRow('st')
     : slots.ws
-      ? '"ws ws ws ws ws ws ws ws ws ws ws ws"'
+      ? fullRow('ws')
       : EMPTY_ROW;
-  const rowOneEmpty = !slots.c1 && !slots.sp;
-  const rowTwoEmpty = !slots.st && !slots.ws;
-  return {
-    areas: `${rowOne} ${rowTwo}`,
-    rowGapPx: rowOneEmpty || rowTwoEmpty ? 0 : 52,
-  };
+  return gridAreas([rowOne, rowTwo], 52);
 }
 
 export function moreWorkGridAreas(slots: {
@@ -153,41 +168,10 @@ export function moreWorkGridAreas(slots: {
   sd: boolean;
 }): { areas: string; rowGapPx: number } {
   const { cn, gn, js, mg, sd } = slots;
-  let rowOne: string;
-  if (mg && sd && cn) {
-    rowOne = '"mg mg mg mg sd sd sd sd cn cn cn cn"';
-  } else if (mg && !sd && !cn) {
-    rowOne = '"mg mg mg mg mg mg mg mg mg mg mg mg"';
-  } else if (cn && !sd && !mg) {
-    rowOne = '"cn cn cn cn cn cn cn cn cn cn cn cn"';
-  } else if (mg && cn && !sd) {
-    rowOne = '"mg mg mg mg mg mg cn cn cn cn cn cn"';
-  } else if (mg && sd && !cn) {
-    rowOne = '"mg mg mg mg mg mg sd sd sd sd sd sd"';
-  } else if (sd && cn && !mg) {
-    rowOne = '"sd sd sd sd sd sd cn cn cn cn cn cn"';
-  } else if (sd && !mg && !cn) {
-    rowOne = '"sd sd sd sd sd sd sd sd sd sd sd sd"';
-  } else if (!mg && !sd && !cn) {
-    rowOne = EMPTY_ROW;
-  } else {
-    rowOne = '"mg mg mg mg sd sd sd sd cn cn cn cn"';
-  }
-
-  const rowTwo = js
-    ? gn
-      ? '"js js js js gn gn gn gn gn gn gn gn"'
-      : '"js js js js js js js js js js js js"'
-    : gn
-      ? '"gn gn gn gn gn gn gn gn gn gn gn gn"'
-      : EMPTY_ROW;
-
-  const rowOneEmpty = !mg && !sd && !cn;
-  const rowTwoEmpty = !js && !gn;
-  return {
-    areas: `${rowOne} ${rowTwo}`,
-    rowGapPx: rowOneEmpty || rowTwoEmpty ? 0 : 56,
-  };
+  return gridAreas(
+    [evenRow(mg && 'mg', sd && 'sd', cn && 'cn'), evenRow(js && 'js', gn && 'gn')],
+    56,
+  );
 }
 
 export const MORE_WORK_OVERFLOW_GRID_AREAS =
