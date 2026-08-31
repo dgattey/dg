@@ -1,5 +1,4 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
-import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
@@ -16,22 +15,19 @@ const collageMapSx: SxObject = {
   width: '100%',
 };
 
-type MapCardProps = {
-  location: MapLocation | null | undefined;
-  surface?: SiteSurface;
-};
+type MapCardProps =
+  | { location: MapLocation; surface: 'collage' }
+  | { location: MapLocation | null | undefined; surface?: 'classic' };
 
-export function MapCard({ location, surface = 'classic' }: MapCardProps) {
+export function MapCard(props: MapCardProps) {
+  const { location } = props;
   if (!location) {
-    if (surface === 'collage') {
-      return <Box aria-label="Map unavailable" role="region" sx={collageMapSx} />;
-    }
     return <ContentCard sx={mapCardSx} verticalSpan={1} />;
   }
 
   const stadiaApiKey = process.env.STADIA_API_KEY ?? '';
 
-  if (surface === 'collage') {
+  if (props.surface === 'collage') {
     return (
       <Box aria-label="Current location map" role="region" sx={collageMapSx}>
         <PigeonMap location={location} stadiaApiKey={stadiaApiKey} surface="collage" />
