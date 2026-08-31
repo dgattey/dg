@@ -175,12 +175,13 @@ function wrapWithTooltip(
   showTooltip: boolean,
   title?: string,
   placement?: TooltipPlacement,
+  id?: string,
 ) {
   if (!showTooltip) {
     return element;
   }
   return (
-    <Tooltip placement={placement} title={title}>
+    <Tooltip id={id} placement={placement} title={title}>
       {element}
     </Tooltip>
   );
@@ -220,6 +221,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
   },
   ref,
 ) {
+  const generatedTooltipId = React.useId();
   if (!href) {
     return null;
   }
@@ -230,8 +232,10 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     layout: initialLayout,
     title,
   });
+  const tooltipId = showTooltip ? `tooltip-${generatedTooltipId}` : undefined;
   const anchorProps = {
     'aria-current': ariaCurrent,
+    'aria-describedby': tooltipId,
     'aria-label': title,
     onClick,
     ref,
@@ -240,7 +244,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
   const externalProps = isExternal ? { rel: 'noreferrer' as const, target: '_blank' as const } : {};
   const muiStyleProps = { className, color, sx, underline, variant };
   const wrap = (el: React.ReactElement) =>
-    wrapWithTooltip(el, showTooltip, title, tooltipPlacement);
+    wrapWithTooltip(el, showTooltip, title, tooltipPlacement, tooltipId);
 
   if (isButton) {
     return wrap(

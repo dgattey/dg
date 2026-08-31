@@ -4,6 +4,7 @@
  * state instead of throwing, which is what took the whole route down.
  */
 import { log } from '@dg/shared-core/logging/log';
+import { oauthConnectRoute } from '@dg/shared-core/routes/api';
 import { mockEnv, setupMockLifecycle } from '@dg/testing/mocks';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { render, screen } from '@testing-library/react';
@@ -15,6 +16,7 @@ jest.mock('next/server', () => ({
 
 // Client buttons reach for the router, which only exists under a real request.
 jest.mock('next/navigation', () => ({
+  usePathname: () => '/dev-console',
   useRouter: () => ({ refresh: jest.fn() }),
 }));
 
@@ -112,7 +114,7 @@ describe('Dev console degradation', () => {
         ]),
       );
 
-      renderCard(await WebhookCardContent());
+      renderCard(await WebhookCardContent({ surface: 'collage' }));
 
       expect(screen.getByText('Connected')).toBeInTheDocument();
       expect(screen.getByRole('button', { name: 'Delete subscription' })).toBeInTheDocument();
@@ -123,11 +125,14 @@ describe('Dev console degradation', () => {
     it('renders a disconnected card when the token is missing', async () => {
       mockGetOauthStatus.mockResolvedValue({ error: null, expiresAt: null, isConnected: false });
 
-      renderCard(await OauthCardContent({ provider: 'spotify' }));
+      renderCard(await OauthCardContent({ provider: 'spotify', surface: 'collage' }));
 
       expect(screen.getByText('Spotify')).toBeInTheDocument();
       expect(screen.getByText('Not connected')).toBeInTheDocument();
-      expect(screen.getByRole('link', { name: 'Connect' })).toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Connect' })).toHaveAttribute(
+        'href',
+        oauthConnectRoute('spotify'),
+      );
     });
 
     it('surfaces a lookup failure on the card', async () => {

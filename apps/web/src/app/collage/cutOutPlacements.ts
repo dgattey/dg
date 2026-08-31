@@ -83,6 +83,17 @@ export const CUT_OUT_PLACEMENTS = {
     ['coda-star-right', 'star4', 'cream', 34, -6, 78, 22, 'dark-desktop', 3],
     ['coda-philo', 'philo', 'leaf', 250, -18, 4, 64, 'desktop', 1],
   ]),
+  devConsole: definePlacements([
+    ['dev-console-star', 'star5', 'star', 44, 12, 58, 4, 'desktop', 3],
+    ['dev-console-algae-upper', 'algae', 'leaf', 170, -20, 88, 0, 'desktop', 1],
+    ['dev-console-algae-lower', 'algae', 'leaf', 220, 16, 68, 82, 'desktop', 1],
+  ]),
+  error: definePlacements([
+    ['error-monstera', 'monstera', 'viridian', 520, 22, 66, -12, 'desktop', 0],
+    ['error-fern', 'fern', 'olive', 340, -34, -10, 40, 'desktop', 0],
+    ['error-seaweed', 'seaweed2', 'olive', 240, -16, 56, 64, 'desktop', 1],
+    ['error-star', 'star5', 'star', 46, 10, 36, 6, 'desktop', 3],
+  ]),
   helloSheet: definePlacements([
     ['hello-seaweed-left', 'seaweed', 'ultramarine', 250, -12, -4, 20, 'desktop', 1],
     ['hello-fern-left', 'fern', 'olive', 330, 22, -7, 42, 'all', 1],
@@ -136,13 +147,24 @@ export const CUT_OUT_PLACEMENTS = {
     ['work-coral', 'coral', 'cream', 250, -12, 27, 50, 'all', 1],
     ['work-star-lower-left', 'star5', 'cream', 40, -20, 3, 84, 'all', 1],
     ['work-trefoil', 'trefoil', 'cream', 140, 24, 4, 50, 'desktop', 1],
-    ['work-swallow-lower', 'swallow', 'cream', 130, 12, 74, 84, 'desktop', 1, { mirrored: true }],
+    [
+      'work-swallow-lower',
+      'swallow',
+      'cream',
+      130,
+      12,
+      74,
+      84,
+      'desktop',
+      1,
+      { mirrored: true },
+    ],
     ['work-star-bottom', 'star4', 'cream', 36, 12, 48, 92, 'all', 1],
     ['work-star-middle', 'star5', 'cream', 34, 30, 66, 40, 'desktop', 1],
     ['work-seaweed2', 'seaweed2', 'cream', 220, -14, 88, 70, 'desktop', 1],
   ]),
 } satisfies Record<
-  'helloSheet' | 'portrait' | 'workSheet' | 'moreWork' | 'coda',
+  'helloSheet' | 'portrait' | 'workSheet' | 'moreWork' | 'coda' | 'devConsole' | 'error',
   ReadonlyArray<CutOutPlacement>
 >;
 

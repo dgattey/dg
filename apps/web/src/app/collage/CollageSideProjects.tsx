@@ -1,37 +1,37 @@
 import type { RenderableSideProject } from '@dg/content-models/contentful/renderables/sideProjects';
-import type { ImageSizes } from '@dg/ui/dependent/Image';
 import { Image } from '@dg/ui/dependent/Image';
-import styles from './CollageSideProjects.module.css';
+import styles from './home.module.css';
 import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
+import { paperToneVars } from './paperVars';
+import type { PaperTone } from './types';
 
-type CollageSideProjectsProps = {
+export function CollageSideProjects({
+  projects,
+}: {
   projects: ReadonlyArray<RenderableSideProject>;
-};
-
-const MARK_SIZES: ImageSizes = {
-  extraLarge: 44,
-};
-
-export function CollageSideProjects({ projects }: CollageSideProjectsProps) {
+}) {
   return (
-    <div className={styles.root} data-slot="sd">
-      <h2 className={styles.headingWrap}>
-        <PaperTag className={styles.heading} edge="quad-c" tiltDeg={-3} tone="vermilion">
+    <div className={styles.sideRoot} data-slot="sd" style={{ gridArea: 'sd', marginTop: 6 }}>
+      <h2 className={styles.sideHeadingWrap}>
+        <PaperTag className="collageEyebrow" edge="quad-c" tiltDeg={-3} tone="vermilion">
           Side projects
         </PaperTag>
       </h2>
-      <ul className={styles.list}>
+      <ul className={styles.sideList}>
         {projects.map((project, index) => {
           const even = index % 2 === 0;
-          const markTone = even ? 'ochre' : 'ultramarine';
-          const edge = even ? 'quad-a' : 'quad-d';
-          const tiltDeg = even ? 1.5 : -1.2;
+          const markTone = (even ? 'ochre' : 'ultramarine') satisfies PaperTone;
           return (
-            <li className={styles.item} key={project.url}>
-              <PaperCard className={styles.rowWrap} edge={edge} tiltDeg={tiltDeg} tone="cream">
+            <li className={styles.sideItem} key={project.url}>
+              <PaperCard
+                className={`${styles.sideRowWrap} collageLift`}
+                edge={even ? 'quad-a' : 'quad-d'}
+                tiltDeg={even ? 1.5 : -1.2}
+                tone="cream"
+              >
                 <a
-                  className={styles.row}
+                  className={styles.sideRow}
                   href={project.url}
                   rel="noreferrer"
                   target="_blank"
@@ -39,24 +39,24 @@ export function CollageSideProjects({ projects }: CollageSideProjectsProps) {
                 >
                   <span
                     aria-hidden="true"
-                    className={styles.mark}
+                    className={styles.sideMark}
                     data-role="side-project-mark"
-                    data-tone={markTone}
+                    style={paperToneVars(markTone)}
                   >
                     <Image
                       alt=""
                       cover={true}
                       height={project.mark.height}
-                      sizes={MARK_SIZES}
+                      sizes={{ extraLarge: 44 }}
                       url={project.mark.url}
                       width={project.mark.width}
                     />
                   </span>
-                  <span className={styles.text}>
-                    <b className={styles.title}>{project.title}</b>
-                    <span className={styles.description}>{project.description}</span>
+                  <span className={styles.sideText}>
+                    <b className={styles.sideTitle}>{project.title}</b>
+                    <span className={styles.sideDescription}>{project.description}</span>
                   </span>
-                  <span aria-hidden="true" className={styles.arrow}>
+                  <span aria-hidden="true" className={styles.sideArrow}>
                     ↗
                   </span>
                 </a>

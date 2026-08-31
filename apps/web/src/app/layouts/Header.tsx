@@ -55,7 +55,7 @@ export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
     return (
       <>
         <SiteHeaderHeight />
-        <header className={chrome.header} data-sticky-header={true}>
+        <header className={`collageMeasure ${chrome.header}`} data-sticky-header={true}>
           <PaperCard className={chrome.logo} edge="quad-b" tiltDeg={-4} tone="ochre">
             <div className={chrome.logoInner}>
               <Logo surface="collage" />

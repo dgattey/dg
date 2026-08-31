@@ -1,7 +1,7 @@
 import type { CSSProperties } from 'react';
-import styles from './CutOut.module.css';
 import type { CutOutPlacement } from './cutOutPlacements';
 import { cutOutSymbolId } from './cutOutShapes';
+import { cx } from './paperVars';
 
 type CutOutStyle = CSSProperties & {
   '--cut-color': string;
@@ -13,26 +13,13 @@ type CutOutStyle = CSSProperties & {
   '--cut-z': number;
 };
 
-type CutOutProps = {
+export function CutOut({
+  className,
+  placement,
+}: {
   className?: string;
   placement: CutOutPlacement;
-};
-
-function classNames(...values: Array<string | undefined>): string {
-  return values.filter((value) => value !== undefined).join(' ');
-}
-
-function visibilityClass(visibility: CutOutPlacement['visibility']): string | undefined {
-  if (visibility === 'all') {
-    return undefined;
-  }
-  if (visibility === 'desktop') {
-    return styles.desktopOnly;
-  }
-  return classNames(styles.desktopOnly, styles.nightOnly);
-}
-
-export function CutOut({ className, placement }: CutOutProps) {
+}) {
   const style: CutOutStyle = {
     '--cut-color': `var(--${placement.color})`,
     '--cut-rotation': `${placement.rotationDeg}deg`,
@@ -43,11 +30,17 @@ export function CutOut({ className, placement }: CutOutProps) {
     '--cut-z': placement.zIndex,
   };
   const symbolHref = `#${cutOutSymbolId(placement.shape)}`;
+  const visibility =
+    placement.visibility === 'all'
+      ? undefined
+      : placement.visibility === 'desktop'
+        ? 'cutDesktopOnly'
+        : 'cutDesktopOnly cutNightOnly';
 
   return (
     <svg
       aria-hidden="true"
-      className={classNames(styles.cutOut, visibilityClass(placement.visibility), className)}
+      className={cx('cutOut', visibility, className)}
       data-cut-out={placement.id}
       focusable="false"
       style={style}

@@ -10,30 +10,31 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack } from '@mui/material';
 import { ArrowDownUp } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { PaperTag } from '../../../collage/PaperTag';
 import { hasClientHydrated } from '../../../layouts/clientHydrated';
 import { ALBUM_GRID_COLUMNS, albumGridSx, albumTileSlotSx } from '../albumTileGeometry';
+import styles from '../music.module.css';
 import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
 import { AlbumWell } from './AlbumWell';
 import {
   COLLAGE_ALBUM_GRID_COLUMNS,
+  COLLAGE_ALBUM_SORT_OPTIONS,
   collageAlbumCardTreatment,
 } from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
-import styles from './FavoriteAlbums.module.css';
 import { FavoriteAlbumsReserve } from './FavoriteAlbumsSkeleton';
 import { useOptimisticAlbumSelection } from './useOptimisticAlbumSelection';
 
-/**
- * SSR and the matching hydrate must paint the real grid. After the app has
- * committed once, a new mount is a client navigation: photograph the
- * skeleton instead. `:active-view-transition` is not set yet inside React's
- * startViewTransition update, so we cannot key off that.
- */
-function paintAlbumsOnFirstPass() {
-  return !hasClientHydrated();
-}
+const subscribeToNothing = () => () => {};
+const serverWasNotHydrated = () => false;
 
 function viewTransitionPseudoElement(effect: AnimationEffect | null) {
   if (!effect || !('pseudoElement' in effect)) {
@@ -65,14 +66,7 @@ function afterNextPaint() {
   });
 }
 
-const SORT_OPTIONS = [
-  { key: 'added', label: 'Recently added', tiltDeg: -3 },
-  { key: 'album', label: 'Album', tiltDeg: 2 },
-  { key: 'artist', label: 'Artist', tiltDeg: -1.5 },
-  { key: 'released', label: 'Release date', tiltDeg: 2.5 },
-] as const;
-
-type AlbumSortKey = (typeof SORT_OPTIONS)[number]['key'];
+type AlbumSortKey = (typeof COLLAGE_ALBUM_SORT_OPTIONS)[number]['key'];
 
 type AlbumGridColumns = Record<keyof typeof ALBUM_GRID_COLUMNS, number>;
 
@@ -89,24 +83,14 @@ const comparators: Record<AlbumSortKey, (a: PlaylistAlbum, b: PlaylistAlbum) => 
 };
 
 function isAlbumSortKey(value: string): value is AlbumSortKey {
-  return SORT_OPTIONS.some((option) => option.key === value);
+  return COLLAGE_ALBUM_SORT_OPTIONS.some((option) => option.key === value);
 }
 
-/** A cell's slot in the grid, stretched around it and ordered ahead of a well. */
 function albumSlotSx(index: number): SxObject {
-  return {
-    ...albumTileSlotSx,
-    order: 2 * index + 1,
-  };
+  return { ...albumTileSlotSx, order: 2 * index + 1 };
 }
 
-/**
- * Albums claim the odd visual slots (album `i` gets `order: 2i + 1`), which
- * leaves every even slot free for the well. The well belongs at the end of the
- * selected album's row, and only CSS knows how many columns that row has, so
- * its slot is emitted once per breakpoint rather than measured in JS —
- * measuring would render a different tree on the server than on the client.
- */
+/** Well order is emitted per breakpoint so SSR and client trees match. */
 function wellPlacementSx(
   selectedIndex: number,
   albumCount: number,
@@ -134,21 +118,13 @@ type Props = {
   surface?: SiteSurface;
 };
 
-/**
- * Sortable grid of favorite album covers. When the URL names an album, a
- * content-width well is inserted after that album's row; the selected cell
- * stays put as a collapsed placeholder while art morphs into the well.
- *
- * The selection is read from the query rather than passed in, so this grid can
- * live in the layout — where a query change never refetches it — and stay
- * mounted across open and close. Clicks run ahead of the query so the well
- * opens on the click instead of on the payload that click goes and fetches.
- */
 export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Props) {
-  // Client navigations photograph a height-matched reserve instead of ~300
-  // next/image nodes. Reveal after the page-rise animations (plus a paint)
-  // so the grid commit cannot hitch the 300ms transition.
-  const [showGrid, setShowGrid] = useState(paintAlbumsOnFirstPass);
+  const wasClientHydrated = useSyncExternalStore(
+    subscribeToNothing,
+    hasClientHydrated,
+    serverWasNotHydrated,
+  );
+  const [showGrid, setShowGrid] = useState(!wasClientHydrated);
   useEffect(() => {
     let cancelled = false;
     void waitForViewTransitionAnimations()
@@ -179,8 +155,6 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
     setSortKey(next);
   };
 
-  // No dependency array: runs after every render but only animates when a
-  // sort change just captured the previous item positions.
   useLayoutEffect(() => {
     const previous = previousRects.current;
     previousRects.current = null;
@@ -221,13 +195,6 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
   const well = selectedAlbum ? (
     <Box key="album-well" sx={wellPlacementSx(selectedIndex, sortedAlbumCards.length, surface)}>
       <AlbumWell album={selectedAlbum} surface={surface}>
-        {/*
-         * Streamed detail always belongs to the album in the URL, so it is only
-         * rendered once the URL agrees with what the well is showing; until then
-         * the well holds the same skeleton the page streams behind. Keying by
-         * album makes that the single swap and stops one album's tracklist from
-         * lingering inside another album's well.
-         */}
         <Fragment key={selectedAlbum.id}>
           {isAwaitingDetail ? <AlbumDetailBodySkeleton surface={surface} /> : children}
         </Fragment>
@@ -260,8 +227,6 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
     </Box>
   );
 
-  // The well sits next to its album in the DOM for reading and tab order; CSS
-  // `order` is what floats it down to the end of that album's row.
   const cells = sortedAlbumCards.flatMap((albumCard, index) =>
     index === selectedIndex && well
       ? [renderAlbum(albumCard, index), well]
@@ -271,12 +236,12 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
   if (surface === 'collage') {
     return (
       <>
-        <nav aria-label="Sort albums" className={styles.collageSort} {...jsOnlyProps}>
-          {SORT_OPTIONS.map((option) => {
+        <nav aria-label="Sort albums" className={styles.sort} {...jsOnlyProps}>
+          {COLLAGE_ALBUM_SORT_OPTIONS.map((option) => {
             const current = option.key === sortKey;
             return (
               <PaperTag
-                className={styles.collageSortTag}
+                className={styles.sortTag}
                 edge="quad-a"
                 key={option.key}
                 tiltDeg={option.tiltDeg}
@@ -284,7 +249,7 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
               >
                 <button
                   aria-pressed={current}
-                  className={styles.collageSortButton}
+                  className={styles.sortButton}
                   onClick={() => handleSortChange(option.key)}
                   type="button"
                 >
@@ -294,7 +259,7 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
             );
           })}
         </nav>
-        <Box className={styles.collageAlbumGrid} onClickCapture={onAlbumNavigationCapture}>
+        <Box className={styles.albumGrid} onClickCapture={onAlbumNavigationCapture}>
           {cells}
         </Box>
       </>
@@ -303,13 +268,6 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
 
   return (
     <Stack spacing={2}>
-      {/*
-       * The whole bar goes with the sorter when scripting is off, rather than
-       * leaving a dead control or an empty band behind it. Sorting is the only
-       * thing this bar is for, and it reorders a grid that React holds in state;
-       * every album and every album link is already on the page in the default
-       * order, so nothing here is the only route to anything.
-       */}
       <StickyFadeBar {...jsOnlyProps}>
         <GlassSwitcher
           aria-label="Sort albums"
@@ -319,7 +277,10 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
               handleSortChange(next);
             }
           }}
-          options={SORT_OPTIONS.map((option) => ({ label: option.label, value: option.key }))}
+          options={COLLAGE_ALBUM_SORT_OPTIONS.map((option) => ({
+            label: option.label,
+            value: option.key,
+          }))}
           value={sortKey}
         />
       </StickyFadeBar>

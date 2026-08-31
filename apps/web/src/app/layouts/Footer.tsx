@@ -90,20 +90,6 @@ function FooterLink({ link }: { link: RenderableLink }) {
   );
 }
 
-function CollageFooterLink({ link }: { link: RenderableLink }) {
-  const { title, url, icon } = link;
-  return (
-    <Link
-      href={url}
-      icon={icon ?? undefined}
-      isExternal={url.startsWith('http')}
-      layout="icon"
-      title={title}
-      tooltipPlacement="top"
-    />
-  );
-}
-
 // biome-ignore lint/suspicious/useAwait: 'use cache' requires async
 async function getCopyrightYear() {
   'use cache';
@@ -125,7 +111,7 @@ export async function Footer({ surface = 'classic' }: { surface?: SiteSurface } 
   if (surface === 'collage') {
     return (
       <footer className={chrome.footer}>
-        <PaperCard className={chrome.strip} edge="torn-b" tiltDeg={-0.5} tone="black">
+        <PaperCard className="collageMeasure" edge="torn-b" tiltDeg={-0.5} tone="black">
           <div className={chrome.stripInner}>
             <div className={chrome.stripMeta}>
               <span>© {currentYear} Dylan Gattey</span>
@@ -159,11 +145,16 @@ export async function Footer({ surface = 'classic' }: { surface?: SiteSurface } 
               ) : null}
             </div>
             <div className={chrome.links}>
-              {nonIconFooterLinks.map((link) => (
-                <CollageFooterLink key={link.url} link={link} />
-              ))}
-              {iconFooterLinks.map((link) => (
-                <CollageFooterLink key={link.url} link={link} />
+              {[...nonIconFooterLinks, ...iconFooterLinks].map((link) => (
+                <Link
+                  href={link.url}
+                  icon={link.icon ?? undefined}
+                  isExternal={link.url.startsWith('http')}
+                  key={link.url}
+                  layout="icon"
+                  title={link.title}
+                  tooltipPlacement="top"
+                />
               ))}
             </div>
           </div>

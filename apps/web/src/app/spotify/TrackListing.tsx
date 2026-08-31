@@ -5,7 +5,9 @@ import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Card, Stack } from '@mui/material';
-import { CollageSpotifyCard } from '../collage/CollageSpotifyCard';
+import styles from '../collage/home.module.css';
+import { PaperCard } from '../collage/PaperCard';
+import { RecordDisc } from '../collage/RecordDisc';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
 import { AlbumImage } from './AlbumImage';
 import { ArtistList } from './ArtistList';
@@ -17,6 +19,14 @@ import { TrackTitle } from './TrackTitle';
 
 /** Size of the compact variant's album art thumbnail in px. */
 export const COMPACT_THUMBNAIL_SIZE = 44;
+
+const COLLAGE_TRACK_COLORS: Colors = {
+  primary: 'var(--on)',
+  primaryContrast: 'var(--pc)',
+  primaryShadow: 'none',
+  secondary: 'var(--soft)',
+  secondaryShadow: 'none',
+};
 
 type TrackListingProps = {
   /** The track to display. */
@@ -38,10 +48,6 @@ type TrackListingProps = {
   surface?: SiteSurface;
 };
 
-// ---------------------------------------------------------------------------
-// Card variant
-// ---------------------------------------------------------------------------
-
 const cardLayoutSx: SxObject = {
   flex: 1,
   gap: 1,
@@ -53,8 +59,53 @@ const cardHeaderSx: SxObject = {
   justifyContent: 'space-between',
 };
 
-function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) {
+function TrackCardMeta({
+  track,
+  colors,
+  textShadow,
+}: {
+  track: Track;
+  colors: Colors | null;
+  textShadow?: boolean;
+}) {
   const { primary, secondary, primaryShadow, secondaryShadow } = colors ?? {};
+  const trackUrl = track.externalUrls.spotify;
+  const shadows = textShadow !== false;
+
+  return (
+    <>
+      <PlaybackStatus
+        color={primary}
+        isPlaying={track.isPlaying}
+        listingVariant="card"
+        playedAt={track.playedAt}
+        textShadow={shadows ? primaryShadow : undefined}
+      />
+      <TrackTitle
+        color={primary}
+        listingVariant="card"
+        textShadow={shadows ? primaryShadow : undefined}
+        trackTitle={track.name}
+        url={trackUrl}
+      />
+      <ArtistList
+        artists={track.artists}
+        color={secondary}
+        listingVariant="card"
+        textShadow={shadows ? secondaryShadow : undefined}
+      />
+      <PlaybackProgressBar
+        colors={colors}
+        durationMs={track.durationMs}
+        isPlaying={track.isPlaying}
+        progressMs={track.progressMs}
+      />
+    </>
+  );
+}
+
+function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) {
+  const { primary, primaryShadow } = colors ?? {};
   const trackUrl = track.externalUrls.spotify;
 
   return (
@@ -69,40 +120,11 @@ function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) 
         <AlbumImage isPlaying={Boolean(track.isPlaying)} noteColor={primary} track={track} />
       </Stack>
       <Stack>
-        <PlaybackStatus
-          color={primary}
-          isPlaying={track.isPlaying}
-          listingVariant="card"
-          playedAt={track.playedAt}
-          textShadow={primaryShadow}
-        />
-        <TrackTitle
-          color={primary}
-          listingVariant="card"
-          textShadow={primaryShadow}
-          trackTitle={track.name}
-          url={trackUrl}
-        />
-        <ArtistList
-          artists={track.artists}
-          color={secondary}
-          listingVariant="card"
-          textShadow={secondaryShadow}
-        />
-        <PlaybackProgressBar
-          colors={colors}
-          durationMs={track.durationMs}
-          isPlaying={track.isPlaying}
-          progressMs={track.progressMs}
-        />
+        <TrackCardMeta colors={colors} track={track} />
       </Stack>
     </Stack>
   );
 }
-
-// ---------------------------------------------------------------------------
-// Compact variant
-// ---------------------------------------------------------------------------
 
 const COMPACT_HOVER_SIZE = 84;
 const COMPACT_HOVER_SCALE = COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE;
@@ -237,10 +259,6 @@ function CompactLayout({
   );
 }
 
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
-
 /**
  * Unified track display component. Colors are computed once from the track's
  * gradient and passed to all sub-components, avoiding redundant calculations.
@@ -257,7 +275,16 @@ export function TrackListing({
   surface = 'classic',
 }: TrackListingProps) {
   if (surface === 'collage') {
-    return <CollageSpotifyCard track={track} />;
+    return (
+      <div className={styles.spotify} data-slot="sp" style={{ gridArea: 'sp' }}>
+        <RecordDisc track={track} />
+        <PaperCard className={styles.spotifyMeta} edge="quad-b" tiltDeg={-2} tone="cream">
+          <div className={styles.spotifyMetaInner}>
+            <TrackCardMeta colors={COLLAGE_TRACK_COLORS} textShadow={false} track={track} />
+          </div>
+        </PaperCard>
+      </div>
+    );
   }
 
   const colors = getContrastingColors(track);

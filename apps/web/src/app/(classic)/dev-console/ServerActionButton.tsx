@@ -1,8 +1,12 @@
 'use client';
 
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import type { ButtonProps } from '@mui/material';
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, Stack } from '@mui/material';
 import { useState } from 'react';
+import { PaperButton } from '../../collage/PaperButton';
+import styles from './devConsole.module.css';
+import { ErrorMessage } from './StatusIndicators';
 
 type ServerActionButtonProps = {
   /** The server action to call when clicked */
@@ -15,6 +19,8 @@ type ServerActionButtonProps = {
   loadingLabel: string;
   /** Optional callback after successful action */
   onSuccess?: () => void;
+  /** Visual surface for the action */
+  surface?: SiteSurface;
   /** Button variant */
   variant?: ButtonProps['variant'];
 };
@@ -29,6 +35,7 @@ export function ServerActionButton({
   label,
   loadingLabel,
   onSuccess,
+  surface = 'classic',
   variant = 'contained',
 }: ServerActionButtonProps) {
   const [isLoading, setIsLoading] = useState(false);
@@ -58,20 +65,28 @@ export function ServerActionButton({
         gap: 1,
       }}
     >
-      {error && (
-        <Typography color="error" variant="body2">
-          {error}
-        </Typography>
+      <ErrorMessage message={error} surface={surface} />
+      {surface === 'collage' ? (
+        <PaperButton
+          className={styles.actionButton}
+          disabled={isLoading}
+          onClick={handleClick}
+          tiltDeg={variant === 'outlined' ? 2 : -2}
+          tone={color === 'error' ? 'vermilion' : variant === 'outlined' ? 'cream' : 'ochre'}
+        >
+          {isLoading ? loadingLabel : label}
+        </PaperButton>
+      ) : (
+        <Button
+          color={color}
+          disabled={isLoading}
+          onClick={handleClick}
+          size="small"
+          variant={variant}
+        >
+          {isLoading ? loadingLabel : label}
+        </Button>
       )}
-      <Button
-        color={color}
-        disabled={isLoading}
-        onClick={handleClick}
-        size="small"
-        variant={variant}
-      >
-        {isLoading ? loadingLabel : label}
-      </Button>
     </Stack>
   );
 }

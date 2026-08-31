@@ -12,9 +12,9 @@ import { CutLetters } from '../../collage/CutLetters';
 import { markdownAlternates } from '../../layouts/markdownAlternates';
 import { musicDestinationLabel } from '../../layouts/musicHeaderDestinations';
 import { PageTitle } from '../../layouts/PageTitle';
-import styles from './MusicHistory.module.css';
 import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
+import styles from './music.module.css';
 
 const TITLE = musicDestinationLabel(musicRoute);
 
@@ -62,8 +62,8 @@ async function MusicHistory({ surface = 'classic' }: { surface?: SiteSurface } =
 export default function MusicPage({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
   if (surface === 'collage') {
     return (
-      <section aria-label={TITLE} className={styles.collageLayout}>
-        <CutLetters className={styles.collageTitle} text={TITLE} />
+      <section aria-label={TITLE} className={styles.historyLayout}>
+        <CutLetters className="collagePageTitle" text={TITLE} />
         <Suspense fallback={<MusicHistorySkeleton surface="collage" />}>
           <MusicHistory surface="collage" />
         </Suspense>

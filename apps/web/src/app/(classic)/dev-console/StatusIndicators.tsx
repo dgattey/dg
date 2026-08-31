@@ -1,9 +1,27 @@
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Chip, Typography } from '@mui/material';
+import { PaperTag } from '../../collage/PaperTag';
+import styles from './devConsole.module.css';
 
-/**
- * Status chip showing connected/not connected state.
- */
-export function StatusChip({ isConnected }: { isConnected: boolean }) {
+export function StatusChip({
+  isConnected,
+  surface = 'classic',
+}: {
+  isConnected: boolean;
+  surface?: SiteSurface;
+}) {
+  if (surface === 'collage') {
+    return (
+      <PaperTag
+        className="collageStatusTag"
+        tiltDeg={isConnected ? -2 : 2}
+        tone={isConnected ? 'leaf' : 'vermilion'}
+      >
+        {isConnected ? 'Connected' : 'Not connected'}
+      </PaperTag>
+    );
+  }
+
   return (
     <Chip
       color={isConnected ? 'success' : 'default'}
@@ -12,15 +30,22 @@ export function StatusChip({ isConnected }: { isConnected: boolean }) {
   );
 }
 
-/**
- * Displays an error message.
- */
-export function ErrorMessage({ message }: { message: string | null }) {
+export function ErrorMessage({
+  message,
+  surface = 'classic',
+}: {
+  message: string | null;
+  surface?: SiteSurface;
+}) {
   if (!message) {
     return null;
   }
   return (
-    <Typography color="error" variant="body2">
+    <Typography
+      className={surface === 'collage' ? styles.errorText : undefined}
+      color={surface === 'collage' ? undefined : 'error'}
+      variant="body2"
+    >
       {message}
     </Typography>
   );

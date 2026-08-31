@@ -1,32 +1,26 @@
 import type { RenderableAsset } from '@dg/content-models/contentful/renderables/assets';
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
-import type { ImageSizes } from '@dg/ui/dependent/Image';
+import { Image } from '@dg/ui/dependent/Image';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS } from './cutOutPlacements';
 import { PaperTag } from './PaperTag';
-import styles from './PortraitPrint.module.css';
-import { Print } from './Print';
+import { cx } from './paperVars';
+import styles from './print.module.css';
 
-const PORTRAIT_SIZES: ImageSizes = {
-  extraLarge: 392,
-  large: 392,
-  medium: 300,
-  small: 300,
-  tiny: 300,
-};
+export function introImageAlt(image: Pick<RenderableAsset, 'title'>): string {
+  return image.title ?? 'Introduction image';
+}
 
-type PortraitPrintProps = {
+export function PortraitPrint({
+  className,
+  image,
+  linkedInLink,
+}: {
   className?: string;
   image: RenderableAsset;
   linkedInLink: RenderableLink | null;
-};
-
-function classNames(...values: Array<string | undefined>): string {
-  return values.filter((value) => value !== undefined).join(' ');
-}
-
-export function PortraitPrint({ className, image, linkedInLink }: PortraitPrintProps) {
-  const rootClassName = classNames(styles.portrait, className);
+}) {
+  const rootClassName = cx(styles.portrait, 'collageLift', className);
   const contents = (
     <>
       {CUT_OUT_PLACEMENTS.portrait.map((placement) => (
@@ -39,17 +33,21 @@ export function PortraitPrint({ className, image, linkedInLink }: PortraitPrintP
       <span className={styles.frame}>
         <span aria-hidden="true" className={styles.halo} />
         <span className={styles.window}>
-          <Print
-            alt={image.title ?? 'Introduction image'}
-            className={styles.image}
-            image={image}
-            preload={true}
-            quality={65}
-            sizes={PORTRAIT_SIZES}
-          />
+          <span className={cx(styles.print, styles.treatmentPortrait, styles.image)}>
+            <Image
+              alt={introImageAlt(image)}
+              cover={true}
+              height={image.height}
+              preload={true}
+              quality={65}
+              sizes={{ extraLarge: 392, large: 392, medium: 300, small: 300, tiny: 300 }}
+              url={image.url}
+              width={image.width}
+            />
+          </span>
         </span>
       </span>
-      <PaperTag className={styles.tag} edge="quad-c" tiltDeg={-5} tone="ochre">
+      <PaperTag className={`collagePin ${styles.tag}`} edge="quad-c" tiltDeg={-5} tone="ochre">
         <span>About</span>
         <small>{linkedInLink?.title ?? 'LinkedIn'}</small>
       </PaperTag>

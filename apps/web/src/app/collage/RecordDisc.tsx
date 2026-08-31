@@ -4,17 +4,9 @@ import type { Track } from '@dg/content-models/spotify/Track';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { AlbumArtWithNotes } from '../spotify/AlbumArtWithNotes';
-import styles from './RecordDisc.module.css';
+import styles from './print.module.css';
 
-type RecordDiscProps = {
-  track: Track;
-};
-
-export function RecordDisc({ track }: RecordDiscProps) {
-  const albumTitle = track.album.name;
-  const albumUrl = track.album.externalUrls.spotify;
-  const trackUrl = track.externalUrls.spotify;
-
+export function RecordDisc({ track }: { track: Track }) {
   return (
     <AlbumArtWithNotes
       isPlaying={Boolean(track.isPlaying)}
@@ -31,16 +23,21 @@ export function RecordDisc({ track }: RecordDiscProps) {
           <Link
             aria-label="Spotify"
             className={styles.logo}
-            href={trackUrl}
+            href={track.externalUrls.spotify}
             isExternal={true}
             title={track.name}
           >
             <span className={styles.logoMark} />
           </Link>
-          <Link className={styles.artLink} href={albumUrl} isExternal={true} title={albumTitle}>
+          <Link
+            className={styles.artLink}
+            href={track.album.externalUrls.spotify}
+            isExternal={true}
+            title={track.album.name}
+          >
             <span className={styles.art}>
               <Image
-                alt={albumTitle}
+                alt={track.album.name}
                 cover={true}
                 height={track.albumImage.height}
                 quality={60}

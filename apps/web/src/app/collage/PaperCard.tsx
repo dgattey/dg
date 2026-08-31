@@ -1,37 +1,32 @@
 import type { CSSProperties, ReactNode } from 'react';
-import styles from './paper.module.css';
-import { EDGE_CLASS, TONE_CLASS } from './paperClasses';
+import { cx, paperEdgeVars, paperToneVars } from './paperVars';
 import type { PaperEdge, PaperTone } from './types';
-
-type PaperCardProps = {
-  children?: ReactNode;
-  className?: string;
-  edge?: PaperEdge;
-  innerClassName?: string;
-  tag?: ReactNode;
-  tiltDeg?: number;
-  tone?: PaperTone;
-};
-
-function cx(...parts: Array<string | undefined>): string {
-  return parts.filter((part) => part !== undefined && part.length > 0).join(' ');
-}
 
 export function PaperCard({
   children,
   className,
   edge = 'quad-a',
   innerClassName,
+  style,
   tag,
   tiltDeg = 0,
   tone = 'cream',
-}: PaperCardProps) {
+}: {
+  children?: ReactNode;
+  className?: string;
+  edge?: PaperEdge;
+  innerClassName?: string;
+  style?: CSSProperties;
+  tag?: ReactNode;
+  tiltDeg?: number;
+  tone?: PaperTone;
+}) {
   return (
     <div
-      className={cx(styles.wrap, TONE_CLASS[tone], className)}
-      style={{ '--r': `${tiltDeg}deg` } as CSSProperties}
+      className={cx('paperWrap', className)}
+      style={{ ...paperToneVars(tone, tiltDeg), ...style }}
     >
-      <div className={cx(styles.inner, EDGE_CLASS[edge], innerClassName)}>
+      <div className={cx('paperInner', innerClassName)} style={paperEdgeVars(edge)}>
         {children}
         {tag}
       </div>

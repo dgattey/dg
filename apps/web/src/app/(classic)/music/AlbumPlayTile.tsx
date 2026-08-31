@@ -5,17 +5,12 @@ import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Typography } from '@mui/material';
-import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
 import { AlbumCover } from './AlbumCover';
 import { AlbumStack } from './AlbumStack';
-import {
-  collageAlbumCardClassName,
-  collageAlbumCardTreatment,
-} from './albums/collageAlbumCardTreatments';
-import tileStyles from './albums/FavoriteAlbums.module.css';
+import { CollageAlbumPaper, collageAlbumCardTreatment } from './albums/collageAlbumCardTreatments';
 import { albumTileLinkSx, MAX_ALBUM_SLEEVES } from './albumTileGeometry';
-import styles from './MusicHistory.module.css';
+import styles from './music.module.css';
 
 const countChipSx: SxObject = {
   backdropFilter: 'blur(12px) saturate(150%)',
@@ -35,21 +30,13 @@ type Props = {
   imageUrl: string;
   albumName: string;
   artistNames: string;
-  /** The album for a run of plays, the track itself for a single play. */
   linkUrl: string;
-  /** Plays collapsed into this cell. */
   trackCount: number;
-  /** Names a single play, which a lone cover is labelled with. */
   trackName: string;
   cardIndex?: number;
   surface?: SiteSurface;
 };
 
-/**
- * One cell of listening history. A run of plays from one album fans sleeves
- * behind its cover and counts itself; a single play stays a lone cover, which
- * is what tells a whole album listen apart from one song.
- */
 export function AlbumPlayTile({
   albumName,
   artistNames,
@@ -66,39 +53,23 @@ export function AlbumPlayTile({
   const tooltip = isRun
     ? `${albumName} – ${artistNames}, ${countLabel}`
     : `${trackName} – ${artistNames}`;
+  const title = isRun ? albumName : trackName;
+  const cover = (
+    <AlbumCover alt={albumName} depth={0} imageUrl={imageUrl} sleeveCount={sleeveCount} />
+  );
 
   if (surface === 'collage') {
-    const treatment = collageAlbumCardTreatment(cardIndex);
     return (
-      <PaperCard
-        className={collageAlbumCardClassName(treatment)}
-        edge="quad-a"
-        innerClassName={tileStyles.collageCardInner}
-        tiltDeg={treatment.tiltDeg}
-        tone={treatment.tone}
-      >
+      <CollageAlbumPaper treatment={collageAlbumCardTreatment(cardIndex)}>
         <Tooltip title={tooltip}>
-          <Link
-            className={tileStyles.collageAlbumLink}
-            href={linkUrl}
-            isExternal={true}
-            title={tooltip}
-          >
-            <span
-              className={`${tileStyles.collageArt} ${tileStyles.fullColorArt}`}
-              data-image-treatment="full-color"
-            >
+          <Link className={styles.albumLink} href={linkUrl} isExternal={true} title={tooltip}>
+            <span className={`${styles.art} ${styles.fullColorArt}`}>
               <AlbumStack imageUrl={imageUrl} sleeveCount={sleeveCount}>
-                <AlbumCover
-                  alt={albumName}
-                  depth={0}
-                  imageUrl={imageUrl}
-                  sleeveCount={sleeveCount}
-                />
+                {cover}
               </AlbumStack>
               {isRun ? (
                 <PaperTag
-                  className={styles.collageCountTag}
+                  className={styles.countTag}
                   tiltDeg={cardIndex % 2 === 0 ? 3 : -3}
                   tone="ochre"
                 >
@@ -106,15 +77,13 @@ export function AlbumPlayTile({
                 </PaperTag>
               ) : null}
             </span>
-            <span className={tileStyles.collageCaption} data-role="album-caption">
-              <strong className={tileStyles.collageAlbumName}>
-                {isRun ? albumName : trackName}
-              </strong>
-              <span className={tileStyles.collageArtist}>{artistNames}</span>
+            <span className={styles.caption}>
+              <strong className={styles.albumName}>{title}</strong>
+              <span className={styles.artist}>{artistNames}</span>
             </span>
           </Link>
         </Tooltip>
-      </PaperCard>
+      </CollageAlbumPaper>
     );
   }
 
