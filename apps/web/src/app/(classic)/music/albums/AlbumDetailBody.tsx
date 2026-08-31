@@ -1,4 +1,5 @@
 import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
@@ -8,6 +9,7 @@ import {
   albumWellMetaRowSx,
   albumWellMetaTextSx,
 } from './albumWellStyles';
+import styles from './FavoriteAlbums.module.css';
 
 const factsRowSx: SxObject = {
   alignItems: 'center',
@@ -89,6 +91,134 @@ const popularityFillSx: SxObject = {
   height: '100%',
 };
 
+const collageFactsRowSx: SxObject = {
+  '& p': {
+    fontSize: '15px',
+    fontWeight: 700,
+    lineHeight: 1.4,
+  },
+  alignItems: 'start',
+  color: 'inherit',
+  display: 'grid',
+  letterSpacing: '0.07em',
+  rowGap: '14px',
+  textTransform: 'uppercase',
+};
+
+const collageMetaRowSx: SxObject = {
+  gridArea: 'meta',
+  mt: '10px',
+};
+
+const collageMetaTextSx: SxObject = {
+  display: 'grid',
+  minWidth: 0,
+  rowGap: '6px',
+};
+
+const collageArtistTextSx: SxObject = {
+  ...overflowTextSx,
+  color: 'inherit',
+  fontSize: '20px',
+  fontWeight: 700,
+};
+
+const collageTrackTitleTextSx: SxObject = {
+  ...overflowTextSx,
+  fontSize: '18px',
+};
+
+const collageTrackArtistTextSx: SxObject = {
+  ...overflowTextSx,
+  opacity: 0.82,
+};
+
+const collageTrackListSx: SxObject = {
+  columnCount: { md: 2, xs: 1 },
+  columnGap: '34px',
+  display: 'block',
+  fontSize: '18px',
+  gridArea: 'tracks',
+  lineHeight: 1.45,
+  listStyle: 'none',
+  m: 0,
+  mt: '22px',
+  p: 0,
+};
+
+const collageTrackRowSx: SxObject = {
+  alignItems: 'center',
+  breakInside: 'avoid',
+  columnGap: '10px',
+  display: 'grid',
+  gridTemplateColumns: `${ALBUM_WELL_TRACK_NUMBER_COLUMN} minmax(0, 1fr) auto`,
+  py: '6px',
+};
+
+const collagePopularitySx: SxObject = {
+  display: 'block',
+  height: 10,
+  maxWidth: '100%',
+  position: 'relative',
+  width: 240,
+};
+
+const collagePopularityTrackSx: SxObject = {
+  backgroundColor: 'var(--cream)',
+  clipPath: 'var(--quad-c)',
+  height: 10,
+  overflow: 'hidden',
+  width: '100%',
+};
+
+const collagePopularityFillSx: SxObject = {
+  backgroundColor: 'var(--ochre)',
+  height: '100%',
+};
+
+type AlbumDetailSurfaceStyles = {
+  artistText: SxObject;
+  factsRow: SxObject;
+  metaRow: SxObject;
+  metaText: SxObject;
+  popularity: SxObject;
+  popularityFill: SxObject;
+  popularityTrack: SxObject;
+  trackArtistText: SxObject;
+  trackList: SxObject;
+  trackRow: SxObject;
+  trackTitleText: SxObject;
+};
+
+const ALBUM_DETAIL_SURFACE_STYLES = {
+  classic: {
+    artistText: overflowTextSx,
+    factsRow: factsRowSx,
+    metaRow: albumWellMetaRowSx,
+    metaText: albumWellMetaTextSx,
+    popularity: popularitySx,
+    popularityFill: popularityFillSx,
+    popularityTrack: popularityTrackSx,
+    trackArtistText: overflowTextSx,
+    trackList: trackListSx,
+    trackRow: trackRowSx,
+    trackTitleText: overflowTextSx,
+  },
+  collage: {
+    artistText: collageArtistTextSx,
+    factsRow: collageFactsRowSx,
+    metaRow: collageMetaRowSx,
+    metaText: collageMetaTextSx,
+    popularity: collagePopularitySx,
+    popularityFill: collagePopularityFillSx,
+    popularityTrack: collagePopularityTrackSx,
+    trackArtistText: collageTrackArtistTextSx,
+    trackList: collageTrackListSx,
+    trackRow: collageTrackRowSx,
+    trackTitleText: collageTrackTitleTextSx,
+  },
+} satisfies Record<SiteSurface, AlbumDetailSurfaceStyles>;
+
 function formatDuration(totalMs: number): string {
   const totalSeconds = Math.round(totalMs / 1000);
   const hours = Math.floor(totalSeconds / 3600);
@@ -118,19 +248,29 @@ function formatTrackDuration(ms: number | null): string {
  * stray year. The label and value are hidden from the tree because the wrapper
  * already speaks both.
  */
-function Popularity({ value }: { value: number }) {
+function Popularity({ surface, value }: { surface: SiteSurface; value: number }) {
+  const surfaceStyles = ALBUM_DETAIL_SURFACE_STYLES[surface];
   return (
-    <Box aria-label={`Popularity ${value} out of 100`} role="img" sx={popularitySx}>
-      <Typography aria-hidden component="span" variant="caption">
+    <Box aria-label={`Popularity ${value} out of 100`} role="img" sx={surfaceStyles.popularity}>
+      <Typography
+        aria-hidden
+        component="span"
+        sx={surface === 'collage' ? { display: 'none' } : undefined}
+        variant="caption"
+      >
         Popularity
       </Typography>
-      <Box sx={popularityTrackSx}>
-        <Box sx={{ ...popularityFillSx, width: `${value}%` }} />
+      <Box sx={surfaceStyles.popularityTrack}>
+        <Box sx={{ ...surfaceStyles.popularityFill, width: `${value}%` }} />
       </Box>
       <Typography
         aria-hidden
         component="span"
-        sx={{ ...tabularSx, color: 'text.primary', fontWeight: 700 }}
+        sx={
+          surface === 'collage'
+            ? { display: 'none' }
+            : { ...tabularSx, color: 'text.primary', fontWeight: 700 }
+        }
         variant="body2"
       >
         {value}
@@ -144,7 +284,14 @@ function Popularity({ value }: { value: number }) {
  * numbered tracklist. Everything sits on the well's shared text edge, with
  * track numbers hanging in the gutter the well reserves to its left.
  */
-export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
+export function AlbumDetailBody({
+  album,
+  surface = 'classic',
+}: {
+  album: AlbumDetail;
+  surface?: SiteSurface;
+}) {
+  const surfaceStyles = ALBUM_DETAIL_SURFACE_STYLES[surface];
   const facts = [
     album.releaseDate ? album.releaseDate.slice(0, 4) : null,
     `${album.totalTracks} track${album.totalTracks === 1 ? '' : 's'}`,
@@ -153,13 +300,17 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
 
   return (
     <Box sx={{ display: 'contents' }}>
-      <Box sx={albumWellMetaRowSx}>
-        <Box data-role="album-meta" sx={albumWellMetaTextSx}>
+      <Box sx={surfaceStyles.metaRow}>
+        <Box
+          className={surface === 'collage' ? styles.collageWellMeta : undefined}
+          data-role="album-meta"
+          sx={surfaceStyles.metaText}
+        >
           <Typography
-            color="text.secondary"
+            color={surface === 'collage' ? 'inherit' : 'text.secondary'}
             component="h3"
             data-role="album-artists"
-            sx={overflowTextSx}
+            sx={surfaceStyles.artistText}
             variant="h4"
           >
             {album.artists.map((artist, index) => (
@@ -171,20 +322,28 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
               </span>
             ))}
           </Typography>
-          <Box sx={factsRowSx}>
+          <Box sx={surfaceStyles.factsRow}>
             <Typography component="p" sx={tabularSx} variant="body2">
               {facts.join(' · ')}
             </Typography>
-            {album.popularity == null ? null : <Popularity value={album.popularity} />}
+            {album.popularity == null ? null : (
+              <Popularity surface={surface} value={album.popularity} />
+            )}
           </Box>
         </Box>
       </Box>
 
-      <Box component="ol" data-role="track-list" sx={trackListSx}>
+      <Box component="ol" data-role="track-list" sx={surfaceStyles.trackList}>
         {album.tracks.map((track) => (
-          <Box component="li" data-role="track-row" key={track.id} sx={trackRowSx}>
+          <Box
+            className={surface === 'collage' ? styles.collageTrackRow : undefined}
+            component="li"
+            data-role="track-row"
+            key={track.id}
+            sx={surfaceStyles.trackRow}
+          >
             <Typography
-              color="text.secondary"
+              color={surface === 'collage' ? 'inherit' : 'text.secondary'}
               component="span"
               data-role="track-number"
               sx={{ ...tabularSx, alignSelf: 'start', textAlign: 'end' }}
@@ -195,7 +354,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
             <Box data-role="track-text" sx={trackTextSx}>
               <Typography
                 data-role="track-title"
-                sx={overflowTextSx}
+                sx={surfaceStyles.trackTitleText}
                 title={track.name}
                 variant="body2"
               >
@@ -204,9 +363,9 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
                 </Link>
               </Typography>
               <Typography
-                color="text.secondary"
+                color={surface === 'collage' ? 'inherit' : 'text.secondary'}
                 data-role="track-artists"
-                sx={overflowTextSx}
+                sx={surfaceStyles.trackArtistText}
                 title={track.artists.map((artist) => artist.name).join(', ')}
                 variant="caption"
               >
@@ -225,7 +384,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
               </Typography>
             </Box>
             <Typography
-              color="text.secondary"
+              color={surface === 'collage' ? 'inherit' : 'text.secondary'}
               component="span"
               data-role="track-duration"
               sx={{ ...tabularSx, whiteSpace: 'nowrap' }}

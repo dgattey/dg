@@ -1,6 +1,7 @@
 'use client';
 
 import { albumRoute, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import {
   albumArtViewTransitionName,
@@ -12,6 +13,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { X } from 'lucide-react';
 import { ViewTransition } from 'react';
+import { PaperCard } from '../../../collage/PaperCard';
 import { AlbumCover } from '../AlbumCover';
 import { AlbumStack } from '../AlbumStack';
 import {
@@ -21,6 +23,11 @@ import {
   albumTileLinkSx,
   MAX_ALBUM_SLEEVES,
 } from '../albumTileGeometry';
+import {
+  type CollageAlbumCardTreatment,
+  collageAlbumCardClassName,
+} from './collageAlbumCardTreatments';
+import styles from './FavoriteAlbums.module.css';
 
 /** Every favorite is a whole album, so every cell wears the full fan. */
 const SLEEVE_COUNT = MAX_ALBUM_SLEEVES;
@@ -63,7 +70,10 @@ const closeMarkSx: SxObject = {
 type Props = {
   albumId: string;
   albumName: string;
+  artistCaption: string;
+  collageTreatment: CollageAlbumCardTreatment;
   imageUrl: string;
+  surface?: SiteSurface;
   tooltip: string;
   /** When true, keep the cell size but hide art (it lives in the well). */
   collapsed?: boolean;
@@ -77,10 +87,66 @@ type Props = {
 export function FavoriteAlbumCell({
   albumId,
   albumName,
+  artistCaption,
+  collageTreatment,
   imageUrl,
+  surface = 'classic',
   tooltip,
   collapsed = false,
 }: Props) {
+  if (surface === 'collage') {
+    const href = collapsed ? favoriteAlbumsRoute : albumRoute(albumId);
+    const title = collapsed ? `Close ${albumName}` : albumName;
+    const cover = collapsed ? (
+      <AlbumCover alt="" depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />
+    ) : (
+      <ViewTransition
+        default="none"
+        name={albumArtViewTransitionName(albumId)}
+        share="vt-album-art"
+      >
+        <AlbumCover alt={albumName} depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />
+      </ViewTransition>
+    );
+
+    return (
+      <PaperCard
+        className={collageAlbumCardClassName(collageTreatment, collapsed)}
+        edge="quad-a"
+        innerClassName={styles.collageCardInner}
+        tiltDeg={collageTreatment.tiltDeg}
+        tone={collageTreatment.tone}
+      >
+        <Tooltip title={collapsed ? `Close ${albumName}` : tooltip}>
+          <Link
+            className={styles.collageAlbumLink}
+            href={href}
+            title={title}
+            transitionTypes={albumTransitionTypes(collapsed ? 'close' : 'open')}
+          >
+            <span
+              className={`${styles.collageArt} ${styles.fullColorArt}`}
+              data-image-treatment="full-color"
+            >
+              <AlbumStack imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT}>
+                {cover}
+                {collapsed ? (
+                  <i aria-hidden="true" className={styles.collageCloseMark}>
+                    ×
+                  </i>
+                ) : null}
+              </AlbumStack>
+            </span>
+            <span className={styles.collageCaption} data-role="album-caption">
+              <strong className={styles.collageAlbumName}>{albumName}</strong>
+              <span className={styles.collageArtist}>{artistCaption}</span>
+            </span>
+          </Link>
+        </Tooltip>
+      </PaperCard>
+    );
+  }
+
   if (collapsed) {
     return (
       <Tooltip title={`Close ${albumName}`}>

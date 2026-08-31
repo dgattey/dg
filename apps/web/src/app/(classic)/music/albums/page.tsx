@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { ALBUM_PARAM } from '@dg/shared-core/routes/app';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Typography } from '@mui/material';
 import { notFound } from 'next/navigation';
 import { Suspense } from 'react';
@@ -10,9 +11,10 @@ import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
 
 type PageProps = {
   searchParams: Promise<Record<string, string | Array<string> | undefined>>;
+  surface?: SiteSurface;
 };
 
-async function SelectedAlbum({ searchParams }: PageProps) {
+async function SelectedAlbum({ searchParams, surface = 'classic' }: PageProps) {
   const albumId = (await searchParams)[ALBUM_PARAM];
 
   if (typeof albumId !== 'string' || !albumId) {
@@ -32,7 +34,7 @@ async function SelectedAlbum({ searchParams }: PageProps) {
     );
   }
 
-  return <AlbumDetailBody album={detail} />;
+  return <AlbumDetailBody album={detail} surface={surface} />;
 }
 
 /**
@@ -44,10 +46,10 @@ async function SelectedAlbum({ searchParams }: PageProps) {
  * Shell stays synchronous so `searchParams` is awaited inside the boundary
  * rather than blocking the route's static shell.
  */
-export default function FavoriteAlbumsPage({ searchParams }: PageProps) {
+export default function FavoriteAlbumsPage({ searchParams, surface = 'classic' }: PageProps) {
   return (
-    <Suspense fallback={<AlbumDetailBodySkeleton />}>
-      <SelectedAlbum searchParams={searchParams} />
+    <Suspense fallback={<AlbumDetailBodySkeleton surface={surface} />}>
+      <SelectedAlbum searchParams={searchParams} surface={surface} />
     </Suspense>
   );
 }

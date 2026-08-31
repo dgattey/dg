@@ -1,6 +1,7 @@
 'use client';
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { albumArtViewTransitionName } from '@dg/ui/core/transitions/pageTransitions';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
@@ -9,6 +10,8 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode, TransitionEvent } from 'react';
 import { useLayoutEffect, useRef, useState, ViewTransition } from 'react';
+import { PaperCard } from '../../../collage/PaperCard';
+import { PaperTag } from '../../../collage/PaperTag';
 import {
   ALBUM_WELL_ART_SIZE_XS,
   ALBUM_WELL_NAME_GAP,
@@ -16,6 +19,7 @@ import {
   ALBUM_WELL_STICKY_TOP,
   albumWellTextGridSx,
 } from './albumWellStyles';
+import styles from './FavoriteAlbums.module.css';
 
 const WELL_ART_SIZE = 220;
 
@@ -132,6 +136,86 @@ const nameLinkSx: SxObject = {
   whiteSpace: 'nowrap',
 };
 
+const collageWellSx: SxObject = {
+  alignContent: 'start',
+  columnGap: { sm: '36px', xs: 0 },
+  display: 'grid',
+  gridTemplateAreas: {
+    sm: '"art name" "art meta" "art tracks"',
+    xs: '"art" "name" "meta" "tracks"',
+  },
+  gridTemplateColumns: {
+    sm: 'minmax(200px, 300px) minmax(0, 1fr)',
+    xs: '1fr',
+  },
+  p: { sm: '36px 40px 40px', xs: '22px 20px 26px' },
+  rowGap: 0,
+};
+
+const collageArtCardSx: SxObject = {
+  '& img': {
+    display: 'block',
+    height: 'auto',
+    width: '100%',
+  },
+  clipPath: 'var(--quad-b)',
+  lineHeight: 0,
+  overflow: 'hidden',
+  width: '100%',
+};
+
+const collageArtLinkSx: SxObject = {
+  alignSelf: 'start',
+  display: 'block',
+  gridArea: 'art',
+  justifySelf: { sm: 'stretch', xs: 'center' },
+  maxWidth: { sm: 300, xs: 220 },
+  mb: { sm: 0, xs: '22px' },
+  position: 'relative',
+  width: '100%',
+};
+
+const collageNameSx: SxObject = {
+  fontFamily: 'var(--display)',
+  fontSize: 'clamp(36px, 4vw, 56px)',
+  fontWeight: 700,
+  gridArea: 'name',
+  letterSpacing: '-0.03em',
+  lineHeight: 0.95,
+  minWidth: 0,
+};
+
+const collageNameLinkSx: SxObject = {
+  lineHeight: 'inherit',
+  minWidth: 0,
+  overflowWrap: 'anywhere',
+};
+
+type AlbumWellSurfaceStyles = {
+  artCard: SxObject;
+  artLink: SxObject;
+  name: SxObject;
+  nameLink: SxObject;
+  well: SxObject;
+};
+
+const ALBUM_WELL_SURFACE_STYLES = {
+  classic: {
+    artCard: artCardSx,
+    artLink: artLinkSx,
+    name: nameSx,
+    nameLink: nameLinkSx,
+    well: wellSx,
+  },
+  collage: {
+    artCard: collageArtCardSx,
+    artLink: collageArtLinkSx,
+    name: collageNameSx,
+    nameLink: collageNameLinkSx,
+    well: collageWellSx,
+  },
+} satisfies Record<SiteSurface, AlbumWellSurfaceStyles>;
+
 /**
  * Outer shell height. Locked to a pixel value only while a content resize is
  * tweening, then released to `auto`.
@@ -162,6 +246,7 @@ type Props = {
   album: PlaylistAlbum;
   /** Streamed detail: artist links, meta, and the tracklist. */
   children?: ReactNode;
+  surface?: SiteSurface;
 };
 
 /**
@@ -178,7 +263,7 @@ type Props = {
  * at the outgoing height until the arriving tracklist replaces the placeholder,
  * so that swap costs the page no layout at all. See `reserveSx`.
  */
-export function AlbumWell({ album, children }: Props) {
+export function AlbumWell({ album, children, surface = 'classic' }: Props) {
   const measureRef = useRef<HTMLDivElement>(null);
   const lastHeightRef = useRef<number | null>(null);
   const [heightPx, setHeightPx] = useState<number | null>(null);
@@ -238,46 +323,96 @@ export function AlbumWell({ album, children }: Props) {
     lastHeightRef.current = measureRef.current?.scrollHeight ?? lastHeightRef.current;
   };
 
+  const surfaceStyles = ALBUM_WELL_SURFACE_STYLES[surface];
+  const well = (
+    <Box
+      aria-label={`${album.name} details`}
+      className={surface === 'collage' ? styles.collageWell : undefined}
+      component="section"
+      data-surface={surface === 'collage' ? 'collage' : undefined}
+      sx={{ ...surfaceStyles.well, ...reserveSx(reservePx) }}
+    >
+      <Link
+        className={surface === 'collage' ? styles.collageWellArt : undefined}
+        href={album.url}
+        isExternal={true}
+        sx={surfaceStyles.artLink}
+        title={`Open ${album.name} on Spotify`}
+      >
+        <ViewTransition
+          default="none"
+          name={albumArtViewTransitionName(album.id)}
+          share="vt-album-art"
+        >
+          <Box
+            className={surface === 'collage' ? styles.fullColorArt : undefined}
+            data-image-treatment={surface === 'collage' ? 'full-color' : undefined}
+            sx={surfaceStyles.artCard}
+          >
+            <Image
+              alt={album.name}
+              height={WELL_ART_SIZE}
+              sizes={{ extraLarge: WELL_ART_SIZE, medium: WELL_ART_SIZE, tiny: 160 }}
+              url={album.imageUrl}
+              width={WELL_ART_SIZE}
+            />
+          </Box>
+        </ViewTransition>
+        {surface === 'collage' ? (
+          <>
+            <PaperTag
+              className={styles.collageWellAlbumTag}
+              edge="quad-c"
+              tiltDeg={-5}
+              tone="ochre"
+            >
+              <span>Album</span>
+              <small>{album.releaseDate.slice(0, 4)}</small>
+            </PaperTag>
+            <PaperTag
+              className={styles.collageWellSpotifyTag}
+              edge="quad-c"
+              tiltDeg={3}
+              tone="cream"
+            >
+              Spotify ↗
+            </PaperTag>
+          </>
+        ) : null}
+      </Link>
+
+      <Box sx={{ display: 'contents' }}>
+        <Typography
+          className={surface === 'collage' ? styles.collageWellName : undefined}
+          component="h2"
+          sx={surfaceStyles.name}
+          variant="h2"
+        >
+          <Link href={album.url} isExternal={true} sx={surfaceStyles.nameLink} title={album.name}>
+            {album.name}
+          </Link>
+        </Typography>
+        {children}
+      </Box>
+    </Box>
+  );
+
   return (
     <Box onTransitionEnd={handleTransitionEnd} sx={shellSx(heightPx)}>
       <Box ref={measureRef}>
-        <Box
-          aria-label={`${album.name} details`}
-          component="section"
-          sx={{ ...wellSx, ...reserveSx(reservePx) }}
-        >
-          <Link
-            href={album.url}
-            isExternal={true}
-            sx={artLinkSx}
-            title={`Open ${album.name} on Spotify`}
+        {surface === 'collage' ? (
+          <PaperCard
+            className={styles.collageWellCard}
+            edge="torn-c"
+            innerClassName={styles.collageWellInner}
+            tiltDeg={-0.7}
+            tone="viridian"
           >
-            <ViewTransition
-              default="none"
-              name={albumArtViewTransitionName(album.id)}
-              share="vt-album-art"
-            >
-              <Box sx={artCardSx}>
-                <Image
-                  alt={album.name}
-                  height={WELL_ART_SIZE}
-                  sizes={{ extraLarge: WELL_ART_SIZE, medium: WELL_ART_SIZE, tiny: 160 }}
-                  url={album.imageUrl}
-                  width={WELL_ART_SIZE}
-                />
-              </Box>
-            </ViewTransition>
-          </Link>
-
-          <Box sx={{ display: 'contents' }}>
-            <Typography component="h2" sx={nameSx} variant="h2">
-              <Link href={album.url} isExternal={true} sx={nameLinkSx} title={album.name}>
-                {album.name}
-              </Link>
-            </Typography>
-            {children}
-          </Box>
-        </Box>
+            {well}
+          </PaperCard>
+        ) : (
+          well
+        )}
       </Box>
     </Box>
   );
