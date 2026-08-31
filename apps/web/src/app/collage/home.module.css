@@ -199,6 +199,9 @@
   aspect-ratio: var(--ar);
   overflow: clip;
 }
+.framePrint {
+  --d: var(--ultramarine);
+}
 .tagTopLeft {
   top: -12px;
   left: -14px;
@@ -215,11 +218,9 @@
 .sideRoot {
   position: relative;
   display: grid;
-  grid-area: sd;
   gap: 16px;
   align-content: start;
   padding: 26px 18px 0;
-  margin-top: 6px;
 }
 .sideHeadingWrap {
   justify-self: start;

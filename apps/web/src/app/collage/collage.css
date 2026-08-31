@@ -22,6 +22,7 @@ html:has(.collageRoot) body {
   --viridian: light-dark(#1a5240, #1f6e52);
   --leaf: light-dark(#3d7b4b, #356f43);
   --olive: light-dark(#7b8a3a, #8d9e46);
+  --chartreuse: light-dark(#b7c25a, #c3cf66);
   --ultramarine: light-dark(#2c4db0, #3557b8);
   --cerulean: light-dark(#4f8ec1, #5d9ccf);
   --cobalt: light-dark(#3a60c2, #3557b8);
@@ -30,6 +31,8 @@ html:has(.collageRoot) body {
   --rose: light-dark(#d9838f, #df909b);
   --black: light-dark(#1d1a15, #0c1424);
   --star: light-dark(#1d1a15, #f3ecdc);
+  --taupe: light-dark(#c7b59a, #3b4a66);
+  --taupe2: light-dark(#a8937a, #4e5f80);
   --gap: clamp(14px, 1.6vw, 24px);
   --pad: clamp(16px, 4vw, 80px);
   --measure: 1280px;
@@ -62,6 +65,7 @@ html:has(.collageRoot) body {
     --viridian: #1a5240;
     --leaf: #3d7b4b;
     --olive: #7b8a3a;
+    --chartreuse: #b7c25a;
     --ultramarine: #2c4db0;
     --cerulean: #4f8ec1;
     --cobalt: #3a60c2;
@@ -70,6 +74,8 @@ html:has(.collageRoot) body {
     --rose: #d9838f;
     --black: #1d1a15;
     --star: #1d1a15;
+    --taupe: #c7b59a;
+    --taupe2: #a8937a;
   }
 }
 
@@ -182,7 +188,8 @@ html:has(.collageRoot) body {
   text-transform: uppercase;
   letter-spacing: 0.09em;
 }
-.paperButton:focus-visible {
+.paperButton:focus-visible,
+.paperTag:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
 }
@@ -217,6 +224,9 @@ html:has(.collageRoot) body {
   fill: currentColor;
   rotate: var(--cut-rotation);
   scale: var(--cut-scale-x, 1) 1;
+}
+.cutDesktopOnly {
+  --cut-display: block;
 }
 .cutNightOnly {
   --cut-display: none;
@@ -293,6 +303,7 @@ html[data-color-scheme="dark"] .cutNightOnly {
     --cut-max-size: 44vw;
   }
   .cutDesktopOnly {
+    --cut-display: none;
     display: none;
   }
   .collagePin {

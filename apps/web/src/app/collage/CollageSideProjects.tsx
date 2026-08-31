@@ -12,7 +12,7 @@ export function CollageSideProjects({
   projects: ReadonlyArray<RenderableSideProject>;
 }) {
   return (
-    <div className={styles.sideRoot} data-slot="sd">
+    <div className={styles.sideRoot} data-slot="sd" style={{ gridArea: 'sd', marginTop: 6 }}>
       <h2 className={styles.sideHeadingWrap}>
         <PaperTag className="collageEyebrow" edge="quad-c" tiltDeg={-3} tone="vermilion">
           Side projects
