@@ -4,8 +4,6 @@ export const PAPER_TONES = [
   'viridian',
   'leaf',
   'olive',
-  'chartreuse',
-  'cerulean',
   'cobalt',
   'vermilion',
   'ochre',
@@ -28,8 +26,6 @@ export const PAPER_EDGES = [
 export type PaperEdge = (typeof PAPER_EDGES)[number];
 
 export const PAPER_INK_TONES = {
-  cerulean: true,
-  chartreuse: true,
   cream: true,
   ochre: true,
   olive: true,
