@@ -2,14 +2,17 @@ import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { devConsoleRoute, musicRoute } from '@dg/shared-core/routes/app';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Stack } from '@mui/material';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { getMusicHistory } from '../../../services/music';
+import { CutLetters } from '../../collage/CutLetters';
 import { markdownAlternates } from '../../layouts/markdownAlternates';
 import { musicDestinationLabel } from '../../layouts/musicHeaderDestinations';
 import { PageTitle } from '../../layouts/PageTitle';
+import styles from './MusicHistory.module.css';
 import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 
@@ -21,7 +24,7 @@ export const metadata: Metadata = {
   title: TITLE,
 };
 
-async function MusicHistory() {
+async function MusicHistory({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
   let tracks: Awaited<ReturnType<typeof getMusicHistory>>['tracks'];
   let nextCursor: Awaited<ReturnType<typeof getMusicHistory>>['nextCursor'];
 
@@ -37,6 +40,12 @@ async function MusicHistory() {
     throw error;
   }
 
+  if (surface === 'collage') {
+    return (
+      <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} surface="collage" />
+    );
+  }
+
   return (
     <Stack spacing={2}>
       <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />
@@ -50,7 +59,18 @@ async function MusicHistory() {
  * page would already be unmounted by the time this arrives, and the view
  * transition would have nothing to animate away from.
  */
-export default function MusicPage() {
+export default function MusicPage({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
+  if (surface === 'collage') {
+    return (
+      <section aria-label={TITLE} className={styles.collageLayout}>
+        <CutLetters className={styles.collageTitle} text={TITLE} />
+        <Suspense fallback={<MusicHistorySkeleton surface="collage" />}>
+          <MusicHistory surface="collage" />
+        </Suspense>
+      </section>
+    );
+  }
+
   return (
     <>
       <PageTitle>{TITLE}</PageTitle>

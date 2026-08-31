@@ -1,15 +1,27 @@
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import type { BoxProps } from '@mui/material';
 import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { SxObject } from '../theme';
 import { stickyDecorSx } from './transitions/pageTransitions';
 
-const BACKGROUND = 'var(--mui-palette-background-default)';
+const CLASSIC_BACKGROUND = 'var(--mui-palette-background-default)';
+const FADE_BACKGROUND = `var(--sticky-fade-background, ${CLASSIC_BACKGROUND})`;
+const SURFACE_BACKGROUND = `var(--sticky-surface-background, ${FADE_BACKGROUND})`;
+
+const surfaceBackgroundSx = {
+  classic: {},
+  collage: {
+    '--sticky-fade-background': 'transparent',
+    '--sticky-surface-background': 'var(--paper)',
+  },
+} satisfies Record<SiteSurface, SxObject>;
 
 /** Measured once by the header, so the bar tracks it across breakpoints. */
 const HEADER_HEIGHT = 'var(--site-header-height, 5.5rem)';
 
-const scrim = (percent: number) => `color-mix(in srgb, ${BACKGROUND} ${percent}%, transparent)`;
+const scrim = (percent: number) =>
+  `color-mix(in srgb, ${FADE_BACKGROUND} ${percent}%, transparent)`;
 
 /**
  * Stretches a bar-anchored layer from window edge to window edge. Bars live
@@ -38,7 +50,9 @@ const fullBleed = {
  * with nothing to hide would only leave the header glass with nothing to blur.
  */
 const topMaskSx: SxObject = {
-  backgroundColor: BACKGROUND,
+  backgroundColor: SURFACE_BACKGROUND,
+  backgroundImage: 'var(--sticky-fade-texture, none)',
+  backgroundSize: 'var(--sticky-fade-texture-size, auto)',
   'body:has([data-sticky-fade]) &': {
     display: 'block',
   },
@@ -73,7 +87,9 @@ const FADE_RESERVE = '1.375rem';
 const barSurfaceSx: SxObject = {
   ...fullBleed,
   ...stickyDecorSx,
-  backgroundColor: BACKGROUND,
+  backgroundColor: SURFACE_BACKGROUND,
+  backgroundImage: 'var(--sticky-fade-texture, none)',
+  backgroundSize: 'var(--sticky-fade-texture-size, auto)',
   bottom: `calc(${FADE_RESERVE} - 1px)`,
   pointerEvents: 'none',
   position: 'absolute',
@@ -96,7 +112,7 @@ const barSurfaceSx: SxObject = {
 const fadeOverlaySx: SxObject = {
   ...fullBleed,
   ...stickyDecorSx,
-  background: `linear-gradient(to bottom, ${BACKGROUND} 0%, ${scrim(94)} 15%, ${scrim(78)} 30%, ${scrim(57)} 45%, ${scrim(35)} 60%, ${scrim(16)} 75%, ${scrim(4)} 88%, transparent 100%)`,
+  background: `linear-gradient(to bottom, ${FADE_BACKGROUND} 0%, ${scrim(94)} 15%, ${scrim(78)} 30%, ${scrim(57)} 45%, ${scrim(35)} 60%, ${scrim(16)} 75%, ${scrim(4)} 88%, transparent 100%)`,
   bottom: `calc(-1 * (${FADE_HEIGHT} - ${FADE_RESERVE}))`,
   height: FADE_HEIGHT,
   pointerEvents: 'none',
@@ -120,6 +136,7 @@ const stickyInnerSx: SxObject = {
 
 type StickyFadeBarProps = Omit<BoxProps, 'sx' | 'children'> & {
   children: ReactNode;
+  surface?: SiteSurface;
   sx?: SxObject;
 };
 
@@ -132,10 +149,10 @@ type StickyFadeBarProps = Omit<BoxProps, 'sx' | 'children'> & {
  * The band reserves the perceptible part of the ramp below its children, so
  * children only need their own leading padding.
  */
-export function StickyFadeBar({ children, sx, ...props }: StickyFadeBarProps) {
-  const mergedSx = sx ? { ...stickyBarSx, ...sx } : stickyBarSx;
+export function StickyFadeBar({ children, surface = 'classic', sx, ...props }: StickyFadeBarProps) {
+  const mergedSx = { ...stickyBarSx, ...surfaceBackgroundSx[surface], ...sx };
   return (
-    <Box {...props} sx={mergedSx}>
+    <Box {...props} data-site-surface={surface} sx={mergedSx}>
       <Box aria-hidden data-sticky-surface sx={barSurfaceSx} />
       <Box sx={stickyInnerSx}>{children}</Box>
       <Box aria-hidden data-sticky-fade sx={fadeOverlaySx} />
@@ -149,6 +166,13 @@ export function StickyFadeBar({ children, sx, ...props }: StickyFadeBarProps) {
  * would paint the same pixels, and a layer that lives in the page rides that
  * page wherever a navigation takes it.
  */
-export function StickyBarTopMask() {
-  return <Box aria-hidden data-sticky-mask sx={topMaskSx} />;
+export function StickyBarTopMask({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
+  return (
+    <Box
+      aria-hidden
+      data-site-surface={surface}
+      data-sticky-mask
+      sx={{ ...topMaskSx, ...surfaceBackgroundSx[surface] }}
+    />
+  );
 }
