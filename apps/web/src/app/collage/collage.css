@@ -1,0 +1,89 @@
+@import "./edges.css";
+
+html:has(.collageRoot) {
+  color-scheme: light dark;
+  background: light-dark(#ede3cb, #152238);
+}
+
+html[data-color-scheme="light"]:has(.collageRoot) {
+  color-scheme: light;
+}
+
+html[data-color-scheme="dark"]:has(.collageRoot) {
+  color-scheme: dark;
+}
+
+html:has(.collageRoot) body {
+  background: transparent;
+}
+
+.collageRoot {
+  --paper: light-dark(#ede3cb, #152238);
+  --cream: light-dark(#f7f1e2, #efe6d2);
+  --ink: light-dark(#1d1a15, #f3ecdc);
+  --ink-on-cream: #1d1a15;
+  --viridian: light-dark(#1a5240, #1f6e52);
+  --leaf: light-dark(#3d7b4b, #4a945b);
+  --olive: light-dark(#7b8a3a, #8d9e46);
+  --chartreuse: light-dark(#b7c25a, #c3cf66);
+  --ultramarine: light-dark(#2c4db0, #4266cc);
+  --cerulean: light-dark(#4f8ec1, #5d9ccf);
+  --cobalt: light-dark(#3a60c2, #4a72d4);
+  --vermilion: light-dark(#d4512d, #e05f3a);
+  --ochre: light-dark(#dca63b, #e4b348);
+  --rose: light-dark(#d9838f, #df909b);
+  --black: light-dark(#1d1a15, #0c1424);
+  --gap: clamp(14px, 1.6vw, 24px);
+  --pad: clamp(16px, 4vw, 80px);
+  --measure: 1280px;
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.22), 0 2px 3px rgb(0 0 0 / 0.1);
+  --shadow-lift: 0 1px 0 rgb(0 0 0 / 0.22), 0 6px 10px rgb(0 0 0 / 0.14);
+  --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.2)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.12));
+  --display: var(--font-familjen), "Avenir Next", "Helvetica Neue", system-ui, sans-serif;
+  --body:
+    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, Cantarell,
+    "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  position: relative;
+  min-height: 100dvh;
+  overflow-x: clip;
+  font-family: var(--body);
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image: url("./img/paper.webp");
+  background-size: 512px 512px;
+}
+
+@supports not (color: light-dark(#000, #fff)) {
+  .collageRoot {
+    --paper: #ede3cb;
+    --cream: #f7f1e2;
+    --ink: #1d1a15;
+    --viridian: #1a5240;
+    --leaf: #3d7b4b;
+    --olive: #7b8a3a;
+    --chartreuse: #b7c25a;
+    --ultramarine: #2c4db0;
+    --cerulean: #4f8ec1;
+    --cobalt: #3a60c2;
+    --vermilion: #d4512d;
+    --ochre: #dca63b;
+    --rose: #d9838f;
+    --black: #1d1a15;
+  }
+}
+
+.collageMain {
+  width: min(100% - 2 * var(--pad), var(--measure));
+  padding-block: 8px 48px;
+  margin-inline: auto;
+}
+
+@media (max-width: 480px) {
+  .collageRoot {
+    --site-header-height: 0px;
+  }
+
+  .collageMain {
+    padding-block-start: 32px;
+  }
+}

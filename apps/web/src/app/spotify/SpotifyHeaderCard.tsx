@@ -8,6 +8,9 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import chrome from '../collage/chrome.module.css';
+import { PaperCard } from '../collage/PaperCard';
+import type { SiteSurface } from '../collage/types';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
 import { usePageScrollProgress } from '../layouts/PageScrollContext';
 import { NOW_PLAYING_CARD_ID } from './SpotifyCardScrollTracker';
@@ -70,6 +73,7 @@ const musicLinkSx: SxObject = {
 };
 
 type SpotifyHeaderCardProps = {
+  surface?: SiteSurface;
   track: Track;
 };
 
@@ -83,7 +87,7 @@ function scrollToNowPlayingCard() {
  * Off-home (and not already on music) navigates to listening history.
  * Track display is delegated to TrackListing variant="compact".
  */
-export function SpotifyHeaderCard({ track }: SpotifyHeaderCardProps) {
+export function SpotifyHeaderCard({ surface = 'classic', track }: SpotifyHeaderCardProps) {
   const pathname = usePathname();
   const scrollContext = usePageScrollProgress();
   const isHome = pathname === homeRoute;
@@ -110,6 +114,14 @@ export function SpotifyHeaderCard({ track }: SpotifyHeaderCardProps) {
   }, []);
 
   const isVisible = scrollProgress > 0.01;
+  const listing = (
+    <TrackListing
+      disableLinks={isHome || opensMusicPage}
+      shouldAnimate={isInViewport}
+      track={track}
+      variant="compact"
+    />
+  );
   const card = (
     <Box
       onClick={isHome ? scrollToNowPlayingCard : undefined}
@@ -128,12 +140,13 @@ export function SpotifyHeaderCard({ track }: SpotifyHeaderCardProps) {
       sx={getContainerSx(scrollProgress, isHome || opensMusicPage)}
       tabIndex={isHome ? 0 : undefined}
     >
-      <TrackListing
-        disableLinks={isHome || opensMusicPage}
-        shouldAnimate={isInViewport}
-        track={track}
-        variant="compact"
-      />
+      {surface === 'collage' ? (
+        <PaperCard edge="quad-a" innerClassName={chrome.nowPlayingInner} tiltDeg={1} tone="cream">
+          {listing}
+        </PaperCard>
+      ) : (
+        listing
+      )}
     </Box>
   );
 

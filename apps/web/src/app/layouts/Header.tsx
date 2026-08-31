@@ -9,17 +9,21 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { Suspense } from 'react';
 import { getLatestSong } from '../../services/spotify';
+import { CollageColorSchemeFieldset } from '../collage/CollageColorSchemeFieldset';
+import chrome from '../collage/chrome.module.css';
+import { PaperCard } from '../collage/PaperCard';
+import type { SiteSurface } from '../collage/types';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
+import { CollageMusicLinks } from './CollageMusicLinks';
 import { HeaderControls } from './HeaderControls';
 import { Logo } from './Logo';
 import { SiteHeaderHeight } from './SiteHeaderHeight';
 
-// Makes the header bar sticky and not responsive to user events by default
 const stickyContainerSx: SxObject = {
   maxWidth: 'unset',
   position: 'sticky',
   top: 0,
-  zIndex: 10, // Higher z-index to stay above grid content with transforms
+  zIndex: 10,
 };
 
 const siteHeaderSx: SxObject = pinnedChromeSx(SITE_HEADER_VIEW_TRANSITION_NAME);
@@ -29,7 +33,6 @@ const navSx: SxObject = {
   columnGap: { sm: 2, xs: 1.5 },
 };
 
-/** Glass container with logo + music content */
 const glassContainerSx: SxObject = {
   alignItems: 'center',
   display: 'inline-flex',
@@ -39,24 +42,37 @@ const glassContainerSx: SxObject = {
   py: 0.75,
 };
 
-/**
- * Async slot for Spotify header card. Fetches track data server-side.
- * Wrapped in Suspense because getLatestSong accesses runtime data (cookies).
- */
-async function SpotifyHeaderCardSlot() {
+async function SpotifyHeaderCardSlot({ surface }: { surface: SiteSurface }) {
   const track = await getLatestSong();
   if (!track) {
     return null;
   }
-  return <SpotifyHeaderCard track={track} />;
+  return <SpotifyHeaderCard surface={surface} track={track} />;
 }
 
-/**
- * Creates the site header component with glass background behind logo + music.
- * Logo and header controls are server-rendered immediately.
- * Music card streams in via Suspense to avoid blocking.
- */
-export function Header() {
+export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
+  if (surface === 'collage') {
+    return (
+      <header className={chrome.header}>
+        <PaperCard className={chrome.logo} edge="quad-b" tiltDeg={-4} tone="ochre">
+          <div className={chrome.logoInner}>
+            <Logo surface="collage" />
+          </div>
+        </PaperCard>
+        <div className={chrome.nowPlaying}>
+          <Suspense fallback={null}>
+            <SpotifyHeaderCardSlot surface="collage" />
+          </Suspense>
+        </div>
+        <div className={chrome.spacer} />
+        <nav className={chrome.nav}>
+          <CollageMusicLinks />
+          <CollageColorSchemeFieldset />
+        </nav>
+      </header>
+    );
+  }
+
   return (
     <Section sx={stickyContainerSx}>
       <SiteHeaderHeight />
@@ -67,7 +83,7 @@ export function Header() {
               <MouseAwareGlassContainer sx={glassContainerSx}>
                 <Logo />
                 <Suspense fallback={null}>
-                  <SpotifyHeaderCardSlot />
+                  <SpotifyHeaderCardSlot surface="classic" />
                 </Suspense>
               </MouseAwareGlassContainer>
             </NavItem>

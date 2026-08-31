@@ -5,10 +5,6 @@
 import { favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import { render, screen } from '@testing-library/react';
 
-jest.mock('../../../flags', () => ({
-  interactiveRedesign: jest.fn(),
-}));
-
 jest.mock('../../../services/contentful', () => ({
   getFooterLinks: jest.fn(async () => []),
 }));
@@ -41,34 +37,17 @@ jest.mock('@dg/ui/core/transitions/PageTransitionLink', () => ({
   ),
 }));
 
-import { interactiveRedesign } from '../../../flags';
 import { getFooterLinks } from '../../../services/contentful';
-import { Footer, RedesignBadge } from '../Footer';
+import { Footer } from '../Footer';
 
-const mockInteractiveRedesign = interactiveRedesign as jest.MockedFunction<
-  typeof interactiveRedesign
->;
 const mockGetFooterLinks = getFooterLinks as jest.MockedFunction<typeof getFooterLinks>;
 
-describe('Footer redesign badge', () => {
+describe('Footer', () => {
   afterEach(() => {
     jest.clearAllMocks();
   });
 
-  it('shows redesign on when the flag is true', async () => {
-    mockInteractiveRedesign.mockResolvedValue(true);
-    render(await RedesignBadge());
-    expect(screen.getByText('redesign on')).toBeInTheDocument();
-  });
-
-  it('hides the badge when the flag is false', async () => {
-    mockInteractiveRedesign.mockResolvedValue(false);
-    const { container } = render(await RedesignBadge());
-    expect(container).toBeEmptyDOMElement();
-  });
-
   it('renders the footer shell without music destination links', async () => {
-    mockInteractiveRedesign.mockResolvedValue(false);
     mockGetFooterLinks.mockResolvedValue([]);
     render(await Footer());
     expect(screen.getByText(/Dylan Gattey/)).toBeInTheDocument();
@@ -78,7 +57,6 @@ describe('Footer redesign badge', () => {
   });
 
   it('renders social icon links from Contentful without a music disc', async () => {
-    mockInteractiveRedesign.mockResolvedValue(false);
     mockGetFooterLinks.mockResolvedValue([
       { icon: 'cursor', title: 'Cursor', url: 'https://cursor.com' },
       { icon: 'github', title: 'GitHub', url: 'https://github.com/dgattey' },
@@ -95,5 +73,12 @@ describe('Footer redesign badge', () => {
     expect(cursor.compareDocumentPosition(github) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.queryByRole('link', { name: 'Favorite albums' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: favoriteAlbumsRoute })).not.toBeInTheDocument();
+  });
+
+  it('renders the torn strip and redesign tag on the collage surface', async () => {
+    mockGetFooterLinks.mockResolvedValue([]);
+    render(await Footer({ surface: 'collage' }));
+    expect(screen.getByText(/Dylan Gattey/)).toBeInTheDocument();
+    expect(screen.getByText('Redesign on')).toBeInTheDocument();
   });
 });
