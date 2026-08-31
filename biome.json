@@ -107,10 +107,6 @@
   },
   "overrides": [
     {
-      "includes": [
-        "apps/web/src/app/collage/cutOutPlacements.ts",
-        "apps/web/src/app/collage/projectSlots.ts"
-      ],
       "assist": {
         "actions": {
           "source": {
@@ -121,7 +117,11 @@
       },
       "formatter": {
         "enabled": false
-      }
+      },
+      "includes": [
+        "apps/web/src/app/collage/cutOutPlacements.ts",
+        "apps/web/src/app/collage/projectSlots.ts"
+      ]
     },
     {
       "includes": ["packages/shared-core/logging/log.ts"],
