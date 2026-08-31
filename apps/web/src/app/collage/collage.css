@@ -33,8 +33,6 @@ html:has(.collageRoot) body {
   --ochre: light-dark(#dca63b, #e4b348);
   --rose: light-dark(#d9838f, #df909b);
   --black: light-dark(#1d1a15, #0c1424);
-  --taupe: light-dark(#c7b59a, #3b4a66);
-  --taupe2: light-dark(#a8937a, #4e5f80);
   --gap: clamp(14px, 1.6vw, 24px);
   --pad: clamp(16px, 4vw, 80px);
   --measure: 1280px;
@@ -71,8 +69,6 @@ html:has(.collageRoot) body {
     --ochre: #dca63b;
     --rose: #d9838f;
     --black: #1d1a15;
-    --taupe: #c7b59a;
-    --taupe2: #a8937a;
   }
 }
 
