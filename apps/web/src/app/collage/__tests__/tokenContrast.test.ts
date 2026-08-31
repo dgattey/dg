@@ -33,9 +33,7 @@ function channel(value: number): number {
 
 function relativeLuminance(hex: string): number {
   const [red, green, blue] = parseHex(hex);
-  return (
-    0.2126 * channel(red) + 0.7152 * channel(green) + 0.0722 * channel(blue)
-  );
+  return 0.2126 * channel(red) + 0.7152 * channel(green) + 0.0722 * channel(blue);
 }
 
 function contrastRatio(foreground: string, background: string): number {
