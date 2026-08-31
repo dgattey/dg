@@ -10,7 +10,14 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack } from '@mui/material';
 import { ArrowDownUp } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { PaperTag } from '../../../collage/PaperTag';
 import { hasClientHydrated } from '../../../layouts/clientHydrated';
 import { ALBUM_GRID_COLUMNS, albumGridSx, albumTileSlotSx } from '../albumTileGeometry';
@@ -26,10 +33,8 @@ import { FavoriteAlbumCell } from './FavoriteAlbumCell';
 import { FavoriteAlbumsReserve } from './FavoriteAlbumsSkeleton';
 import { useOptimisticAlbumSelection } from './useOptimisticAlbumSelection';
 
-/** First paint shows the real grid; later mounts photograph a reserve instead. */
-function paintAlbumsOnFirstPass() {
-  return !hasClientHydrated();
-}
+const subscribeToNothing = () => () => {};
+const serverWasNotHydrated = () => false;
 
 function viewTransitionPseudoElement(effect: AnimationEffect | null) {
   if (!effect || !('pseudoElement' in effect)) {
@@ -114,7 +119,12 @@ type Props = {
 };
 
 export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Props) {
-  const [showGrid, setShowGrid] = useState(paintAlbumsOnFirstPass);
+  const wasClientHydrated = useSyncExternalStore(
+    subscribeToNothing,
+    hasClientHydrated,
+    serverWasNotHydrated,
+  );
+  const [showGrid, setShowGrid] = useState(!wasClientHydrated);
   useEffect(() => {
     let cancelled = false;
     void waitForViewTransitionAnimations()
