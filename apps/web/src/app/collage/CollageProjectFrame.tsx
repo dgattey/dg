@@ -1,46 +1,37 @@
 import type { RenderableProject } from '@dg/content-models/contentful/renderables/projects';
-import type { ImageSizes } from '@dg/ui/dependent/Image';
+import { Image } from '@dg/ui/dependent/Image';
 import type { CSSProperties } from 'react';
 import styles from './home.module.css';
 import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
-import { Print } from './Print';
+import { cx } from './paperVars';
+import printStyles from './print.module.css';
 import { type ProjectFrameStyle, projectFrameAspectRatio, projectTagMeta } from './projectSlots';
 
-const PROJECT_SIZES: ImageSizes = {
-  extraLarge: 760,
-  large: 760,
-  medium: 760,
-  small: 380,
-  tiny: 380,
-};
-
 export type CollageProjectSlot = 'c1' | 'cn' | 'gn' | 'js' | 'li' | 'mg' | 'ws';
-
-type CollageProjectFrameProps = {
-  className?: string;
-  'data-slot'?: CollageProjectSlot;
-  project: RenderableProject;
-  style: ProjectFrameStyle;
-};
-
-function classNames(...values: Array<string | undefined>): string {
-  return values.filter((value) => value !== undefined && value.length > 0).join(' ');
-}
 
 export function CollageProjectFrame({
   className,
   'data-slot': dataSlot,
   project,
   style,
-}: CollageProjectFrameProps) {
+}: {
+  className?: string;
+  'data-slot'?: CollageProjectSlot;
+  project: RenderableProject;
+  style: ProjectFrameStyle;
+}) {
   const meta = projectTagMeta(project);
-  const aspectRatio = projectFrameAspectRatio(project.layout);
-  const printStyle = { '--ar': String(aspectRatio) } as CSSProperties;
-  const href = project.link?.url;
+  const printStyle: CSSProperties & Record<`--${string}`, string> = {
+    '--ar': String(projectFrameAspectRatio(project.layout)),
+  };
+  const placementStyle: CSSProperties = {
+    ...(dataSlot ? { gridArea: dataSlot } : {}),
+    ...(style.marginTop != null ? { marginTop: style.marginTop } : {}),
+  };
   const tag = (
     <PaperTag
-      className={classNames(styles.frameTag, styles[style.tagClassName])}
+      className={cx('collagePin', styles[style.tagClassName])}
       edge="quad-c"
       tiltDeg={style.tagTiltDeg}
       tone={style.tagTone}
@@ -49,7 +40,6 @@ export function CollageProjectFrame({
       {meta ? <small>{meta}</small> : null}
     </PaperTag>
   );
-
   const frame = (
     <PaperCard
       className={styles.frameCard}
@@ -59,24 +49,29 @@ export function CollageProjectFrame({
       tone="cream"
     >
       <span className={styles.frameShot} style={printStyle}>
-        <Print
-          alt={project.title}
-          image={{
-            height: project.thumbnail.height,
-            title: project.title,
-            url: project.thumbnail.url,
-            width: project.thumbnail.width,
-          }}
-          quality={60}
-          sizes={PROJECT_SIZES}
-        />
+        <span className={printStyles.print}>
+          <Image
+            alt={project.title}
+            cover={true}
+            height={project.thumbnail.height}
+            quality={60}
+            sizes={{ extraLarge: 760, large: 760, medium: 760, small: 380, tiny: 380 }}
+            url={project.thumbnail.url}
+            width={project.thumbnail.width}
+          />
+        </span>
       </span>
     </PaperCard>
   );
+  const shared = {
+    className: cx(styles.frameWin, 'collageLift', className),
+    'data-slot': dataSlot,
+    style: placementStyle,
+  };
 
-  if (!href) {
+  if (!project.link?.url) {
     return (
-      <div className={classNames(styles.frameWin, className)} data-slot={dataSlot}>
+      <div {...shared}>
         {frame}
         {tag}
       </div>
@@ -84,14 +79,7 @@ export function CollageProjectFrame({
   }
 
   return (
-    <a
-      className={classNames(styles.frameWin, className)}
-      data-slot={dataSlot}
-      href={href}
-      rel="noreferrer"
-      target="_blank"
-      title={project.title}
-    >
+    <a {...shared} href={project.link.url} rel="noreferrer" target="_blank" title={project.title}>
       {frame}
       {tag}
     </a>

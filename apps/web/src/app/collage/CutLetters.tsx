@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import styles from './cutOut.module.css';
+import { cx } from './paperVars';
 
 const LETTER_TREATMENTS = [
   { accent: false, offsetEm: 0, rotationDeg: -2 },
@@ -15,29 +15,19 @@ const LETTER_TREATMENTS = [
   { accent: true, offsetEm: 0, rotationDeg: -3 },
 ] as const;
 
-type CutLettersProps = {
-  className?: string;
-  text: string;
-};
-
-function classNames(...values: Array<string | undefined>): string {
-  return values.filter((value) => value !== undefined).join(' ');
-}
-
-export function CutLetters({ className, text }: CutLettersProps) {
+export function CutLetters({ className, text }: { className?: string; text: string }) {
   const words = Array.from(text.trim().matchAll(/\S+/g));
   let treatmentIndex = 0;
 
   return (
-    <h1 aria-label={text} className={classNames(styles.heading, className)}>
+    <h1 aria-label={text} className={cx('cutHeading', className)}>
       {words.map((wordMatch, wordIndex) => {
         const word = wordMatch[0];
         const wordOffset = wordMatch.index;
-
         return (
           <span
             aria-hidden="true"
-            className={classNames(styles.word, wordIndex > 0 ? styles.indentedWord : undefined)}
+            className={cx('cutWord', wordIndex > 0 && 'cutIndentedWord')}
             key={`${wordOffset}-${word}`}
           >
             {Array.from(word.matchAll(/./gu)).map((letterMatch) => {
@@ -50,13 +40,9 @@ export function CutLetters({ className, text }: CutLettersProps) {
                 rotate: `${treatment.rotationDeg}deg`,
                 translate: `0 ${treatment.offsetEm}em`,
               };
-
               return (
                 <span
-                  className={classNames(
-                    styles.letter,
-                    treatment.accent ? styles.accent : undefined,
-                  )}
+                  className={cx('cutLetter', treatment.accent && 'cutAccent')}
                   key={`${wordOffset + letterMatch.index}-${letter}`}
                   style={style}
                 >
