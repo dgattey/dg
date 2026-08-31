@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import type { Track } from '@dg/content-models/spotify/Track';
 import { act, render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';

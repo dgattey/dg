@@ -1,7 +1,3 @@
-/**
- * @jest-environment jsdom
- */
-
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import { render, screen } from '@testing-library/react';
 import { StravaCard } from '../StravaCard';
