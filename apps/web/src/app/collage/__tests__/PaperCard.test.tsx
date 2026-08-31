@@ -6,8 +6,18 @@ import { render, screen } from '@testing-library/react';
 import { PaperButton } from '../PaperButton';
 
 jest.mock('@dg/ui/core/transitions/PageTransitionLink', () => ({
-  PageTransitionLink: ({ children, href }: { children: React.ReactNode; href: string }) => (
-    <a href={href}>{children}</a>
+  PageTransitionLink: ({
+    'aria-current': ariaCurrent,
+    children,
+    href,
+  }: {
+    'aria-current'?: 'page';
+    children: React.ReactNode;
+    href: string;
+  }) => (
+    <a aria-current={ariaCurrent} href={href}>
+      {children}
+    </a>
   ),
 }));
 

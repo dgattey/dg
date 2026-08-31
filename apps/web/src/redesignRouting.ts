@@ -1,7 +1,4 @@
 import {
-  apiCatalogRoute,
-  apiOpenApiRoute,
-  apiStatusRoute,
   internalMarkdownRoutePrefix,
   llmsFullTxtRoute,
   llmsTxtRoute,
@@ -20,9 +17,6 @@ export const REDESIGN_SKIP_PREFIXES = [
   llmsFullTxtRoute,
   '/opengraph-image',
   '/twitter-image',
-  apiCatalogRoute,
-  apiOpenApiRoute,
-  apiStatusRoute,
 ] as const;
 
 export function publicPathFromRedesign(pathname: string): string | null {
