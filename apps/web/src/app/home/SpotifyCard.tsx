@@ -1,5 +1,6 @@
 import 'server-only';
 
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { FaIcon } from '@dg/ui/icons/FaIcon';
 import type { SxObject } from '@dg/ui/theme';
@@ -83,22 +84,22 @@ function SpotifyCardLoading() {
  * Async data-fetching wrapper. Fetches the latest song server-side
  * and renders the client card that derives its gradient from album art.
  */
-async function SpotifyCardAsync() {
+export async function SpotifyCardAsync({ surface }: { surface: SiteSurface }) {
   const track = await getLatestSong();
   if (!track) {
     return null;
   }
-  return <SpotifyCardWithGradient track={track} />;
+  return <SpotifyCardWithGradient surface={surface} track={track} />;
 }
 
 /**
  * Public entry point for the Spotify card on the homepage.
  * Wraps the async content in Suspense with a loading skeleton.
  */
-export function SpotifyCardSlot() {
+export function SpotifyCardSlot({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
   return (
-    <Suspense fallback={<SpotifyCardLoading />}>
-      <SpotifyCardAsync />
+    <Suspense fallback={surface === 'collage' ? null : <SpotifyCardLoading />}>
+      <SpotifyCardAsync surface={surface} />
     </Suspense>
   );
 }

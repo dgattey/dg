@@ -1,8 +1,10 @@
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import { StravaRouteMap } from '@dg/maps/StravaRouteMap';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack } from '@mui/material';
+import { CollageStravaCard } from '../collage/CollageStravaCard';
 import { ActivityDescription } from '../strava/ActivityDescription';
 import { ActivityName } from '../strava/ActivityName';
 import { ActivityStats } from '../strava/ActivityStats';
@@ -74,15 +76,24 @@ const mapSx: SxObject = {
   zIndex: 0,
 };
 
+type StravaCardProps = {
+  activity: StravaActivity | null;
+  surface?: SiteSurface;
+};
+
 /**
  * Shows a card with the latest activity from Strava
  */
-export function StravaCard({ activity }: { activity: StravaActivity | null }) {
+export function StravaCard({ activity, surface = 'classic' }: StravaCardProps) {
   if (!activity) {
     return null;
   }
 
   const encodedPolyline = activity.map?.summaryPolyline ?? activity.map?.polyline;
+
+  if (surface === 'collage') {
+    return <CollageStravaCard activity={activity} encodedPolyline={encodedPolyline ?? undefined} />;
+  }
 
   return (
     <ContentCard sx={cardSx}>

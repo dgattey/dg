@@ -4,8 +4,21 @@ import { Image } from '@dg/ui/dependent/Image';
 import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
 import type { SxObject } from '@dg/ui/theme';
 import { getShape } from '@dg/ui/theme/shape';
+import { CollageProjectFrame } from '../collage/CollageProjectFrame';
+import type { ProjectFrameStyle } from '../collage/workSheetFrames';
 
-type ProjectCardProps = RenderableProject;
+type ClassicProjectCardProps = RenderableProject & {
+  surface?: 'classic';
+};
+
+type CollageProjectCardProps = RenderableProject & {
+  className?: string;
+  'data-work-slot'?: 'c1' | 'ws';
+  style: ProjectFrameStyle;
+  surface: 'collage';
+};
+
+type ProjectCardProps = ClassicProjectCardProps | CollageProjectCardProps;
 
 const { gridItemSize } = getShape();
 const smallMaxHeight = gridItemSize?.(0.75);
@@ -14,10 +27,7 @@ const projectCardSx: SxObject = {
   maxHeight: { md: 'unset', xs: smallMaxHeight ?? 'unset' },
 };
 
-/**
- * Uses the `ContentCard` to show a project's details
- */
-export function ProjectCard({ title, layout, link, thumbnail }: ProjectCardProps) {
+function ClassicProjectCard({ title, layout, link, thumbnail }: RenderableProject) {
   const { width, height, sizes, verticalSpan, horizontalSpan } = useCurrentImageSizes(
     layout ?? undefined,
   );
@@ -40,4 +50,20 @@ export function ProjectCard({ title, layout, link, thumbnail }: ProjectCardProps
       />
     </ContentCard>
   );
+}
+
+export function ProjectCard(props: ProjectCardProps) {
+  if (props.surface === 'collage') {
+    const { className, style, surface: _surface, 'data-work-slot': workSlot, ...project } = props;
+    return (
+      <CollageProjectFrame
+        className={className}
+        data-work-slot={workSlot}
+        project={project}
+        style={style}
+      />
+    );
+  }
+
+  return <ClassicProjectCard {...props} />;
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import type { Track } from '@dg/content-models/spotify/Track';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
@@ -65,6 +66,7 @@ function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
 }
 
 type SpotifyCardWithGradientProps = {
+  surface?: SiteSurface;
   track: Track;
 };
 
@@ -72,13 +74,19 @@ type SpotifyCardWithGradientProps = {
  * Client card that derives album-art gradient/contrast in the browser.
  * Keeps sharp (and its native libvips) out of the homepage server module graph.
  */
-export function SpotifyCardWithGradient({ track }: SpotifyCardWithGradientProps) {
+export function SpotifyCardWithGradient({
+  surface = 'classic',
+  track,
+}: SpotifyCardWithGradientProps) {
   const [gradientInformation, setGradientInformation] = useState<AlbumGradientInformation>({
     backgroundGradient: track.albumGradient ?? null,
     contrastSetting: track.albumGradientContrastSetting ?? null,
   });
 
   useEffect(() => {
+    if (surface === 'collage') {
+      return;
+    }
     let cancelled = false;
     extractAlbumGradientFromUrl(track.albumImage.url).then((info) => {
       if (cancelled) {
@@ -89,7 +97,15 @@ export function SpotifyCardWithGradient({ track }: SpotifyCardWithGradientProps)
     return () => {
       cancelled = true;
     };
-  }, [track.albumImage.url]);
+  }, [surface, track.albumImage.url]);
+
+  if (surface === 'collage') {
+    return (
+      <SpotifyCardScrollTracker>
+        <TrackListing surface="collage" track={track} />
+      </SpotifyCardScrollTracker>
+    );
+  }
 
   const trackWithCurrentGradient: Track = {
     ...track,

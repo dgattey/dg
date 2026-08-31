@@ -1,11 +1,18 @@
 import 'server-only';
 
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import type { Point } from 'pigeon-maps';
 import { RouteMap } from './src/RouteMap';
 import { decodePolyline } from './src/routeGeometry';
 
 /** Server wrapper that keeps the Stadia key out of the calling component. */
-export function StravaRouteMap({ encodedPolyline }: { encodedPolyline: string }) {
+export function StravaRouteMap({
+  encodedPolyline,
+  surface = 'classic',
+}: {
+  encodedPolyline: string;
+  surface?: SiteSurface;
+}) {
   let points: Array<Point>;
   try {
     points = decodePolyline(encodedPolyline);
@@ -17,5 +24,7 @@ export function StravaRouteMap({ encodedPolyline }: { encodedPolyline: string })
     return null;
   }
 
-  return <RouteMap points={points} stadiaApiKey={process.env.STADIA_API_KEY ?? ''} />;
+  return (
+    <RouteMap points={points} stadiaApiKey={process.env.STADIA_API_KEY ?? ''} surface={surface} />
+  );
 }

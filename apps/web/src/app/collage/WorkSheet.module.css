@@ -1,0 +1,112 @@
+.sheet {
+  --sp-top: 84px;
+  --sp-bottom: 92px;
+  --cw: 372px;
+  --ch: 290px;
+  position: relative;
+  left: 50%;
+  width: 100vw;
+  padding-block: var(--sp-top) var(--sp-bottom);
+  margin-top: -30px;
+  margin-left: -50vw;
+  overflow-x: clip;
+  color: var(--cream);
+}
+
+.field {
+  background:
+    conic-gradient(
+      from 90deg at 50% 50%,
+      var(--ultramarine) 25%,
+      var(--cobalt) 0 50%,
+      var(--ultramarine) 0 75%,
+      var(--cobalt) 0
+    )
+    -150px -70px / calc(var(--cw) * 2) calc(var(--ch) * 2);
+}
+
+.grid {
+  --row-one: "c1 c1 c1 c1 c1 c1 c1 c1 . sp sp sp";
+  --row-two: "st st st st . ws ws ws ws ws ws ws";
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-areas: var(--row-one) var(--row-two);
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  row-gap: 52px;
+  column-gap: var(--gap);
+  align-items: start;
+  width: min(calc(100% - 2 * var(--pad)), var(--measure));
+  margin-inline: auto;
+}
+
+.grid:has(> [data-work-slot="c1"]):not(:has(> [data-work-slot="sp"])) {
+  --row-one: "c1 c1 c1 c1 c1 c1 c1 c1 c1 c1 c1 c1";
+}
+
+.grid:has(> [data-work-slot="sp"]):not(:has(> [data-work-slot="c1"])) {
+  --row-one: "sp sp sp sp sp sp sp sp sp sp sp sp";
+}
+
+.grid:has(> [data-work-slot="st"]):not(:has(> [data-work-slot="ws"])) {
+  --row-two: "st st st st st st st st st st st st";
+}
+
+.grid:has(> [data-work-slot="ws"]):not(:has(> [data-work-slot="st"])) {
+  --row-two: "ws ws ws ws ws ws ws ws ws ws ws ws";
+}
+
+.grid:not(:has(> [data-work-slot="c1"])):not(:has(> [data-work-slot="sp"])) {
+  --row-one: ". . . . . . . . . . . .";
+  row-gap: 0;
+}
+
+.grid:not(:has(> [data-work-slot="st"])):not(:has(> [data-work-slot="ws"])) {
+  --row-two: ". . . . . . . . . . . .";
+  row-gap: 0;
+}
+
+.projectOne {
+  grid-area: c1;
+}
+
+.projectTwo {
+  grid-area: ws;
+}
+
+.spotify {
+  position: relative;
+  display: grid;
+  grid-area: sp;
+  align-content: start;
+  justify-items: center;
+  padding-top: 4px;
+}
+
+.strava {
+  position: relative;
+  grid-area: st;
+}
+
+@media (max-width: 820px) {
+  .sheet {
+    --sp-top: 70px;
+    --sp-bottom: 80px;
+    --cw: 220px;
+    --ch: 170px;
+  }
+
+  .grid {
+    grid-template-areas: none;
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 36px;
+  }
+
+  .grid:not(:has(> [data-work-slot])) {
+    row-gap: 0;
+  }
+
+  .grid > * {
+    grid-area: auto;
+  }
+}
