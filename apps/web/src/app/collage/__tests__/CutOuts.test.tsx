@@ -62,9 +62,9 @@ describe('collage cut-outs', () => {
   it('assigns parallax depth classes to cut-outs at least 120px wide', () => {
     const cases: Array<{ placement: CutOutPlacement; depthClass?: string }> = [
       { placement: testPlacement({ sizePx: 119 }) },
-      { placement: testPlacement({ sizePx: 120 }), depthClass: 'cutDepthFast' },
-      { placement: testPlacement({ sizePx: 319 }), depthClass: 'cutDepthFast' },
-      { placement: testPlacement({ sizePx: 320 }), depthClass: 'cutDepthMedium' },
+      { depthClass: 'cutDepthFast', placement: testPlacement({ sizePx: 120 }) },
+      { depthClass: 'cutDepthFast', placement: testPlacement({ sizePx: 319 }) },
+      { depthClass: 'cutDepthMedium', placement: testPlacement({ sizePx: 320 }) },
     ];
 
     for (const { placement, depthClass } of cases) {
