@@ -4,8 +4,28 @@ import { invariant } from '@dg/shared-core/assertions/invariant';
 import { render } from '@testing-library/react';
 import { CutOut } from '../CutOut';
 import { CutOutSymbols } from '../CutOutSymbols';
-import { ALL_CUT_OUT_PLACEMENTS, CUT_OUT_PLACEMENTS } from '../cutOutPlacements';
+import {
+  ALL_CUT_OUT_PLACEMENTS,
+  CUT_OUT_PLACEMENTS,
+  type CutOutPlacement,
+} from '../cutOutPlacements';
 import { CUT_OUT_SHAPE_NAMES, CUT_OUT_SHAPES, cutOutSymbolId } from '../cutOutShapes';
+
+function testPlacement(
+  overrides: Partial<CutOutPlacement> & Pick<CutOutPlacement, 'sizePx'>,
+): CutOutPlacement {
+  return {
+    color: 'star',
+    id: 'test-cut-out',
+    rotationDeg: 0,
+    shape: 'star5',
+    visibility: 'all',
+    xPercent: 0,
+    yPercent: 0,
+    zIndex: 1,
+    ...overrides,
+  };
+}
 
 const WEB_SRC_DIR = path.join(__dirname, '../../..');
 
@@ -49,6 +69,29 @@ describe('collage cut-outs', () => {
     const cutOut = container.querySelector('svg');
     expect(cutOut).toHaveAttribute('aria-hidden', 'true');
     expect(cutOut).toHaveAttribute('focusable', 'false');
+  });
+
+  it('assigns parallax depth classes to cut-outs at least 120px wide', () => {
+    const cases: Array<{ placement: CutOutPlacement; depthClass?: string }> = [
+      { placement: testPlacement({ sizePx: 119 }) },
+      { placement: testPlacement({ sizePx: 120 }), depthClass: 'cutDepthFast' },
+      { placement: testPlacement({ sizePx: 319 }), depthClass: 'cutDepthFast' },
+      { placement: testPlacement({ sizePx: 320 }), depthClass: 'cutDepthMedium' },
+    ];
+
+    for (const { placement, depthClass } of cases) {
+      const { container, unmount } = render(<CutOut placement={placement} />);
+      const cutOut = container.querySelector('svg');
+      invariant(cutOut, 'Expected a rendered cut-out');
+      expect(cutOut).toHaveClass('cutOut');
+      if (depthClass) {
+        expect(cutOut).toHaveClass(depthClass);
+      } else {
+        expect(cutOut).not.toHaveClass('cutDepthMedium');
+        expect(cutOut).not.toHaveClass('cutDepthFast');
+      }
+      unmount();
+    }
   });
 
   it('keeps stylesheets from restating geometry that cut-outs set inline, where it can never win', () => {
