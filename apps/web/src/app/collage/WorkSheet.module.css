@@ -40,28 +40,28 @@
   margin-inline: auto;
 }
 
-.grid:has(> [data-work-slot="c1"]):not(:has(> [data-work-slot="sp"])) {
+.grid:has(> [data-slot="c1"]):not(:has(> [data-slot="sp"])) {
   --row-one: "c1 c1 c1 c1 c1 c1 c1 c1 c1 c1 c1 c1";
 }
 
-.grid:has(> [data-work-slot="sp"]):not(:has(> [data-work-slot="c1"])) {
+.grid:has(> [data-slot="sp"]):not(:has(> [data-slot="c1"])) {
   --row-one: "sp sp sp sp sp sp sp sp sp sp sp sp";
 }
 
-.grid:has(> [data-work-slot="st"]):not(:has(> [data-work-slot="ws"])) {
+.grid:has(> [data-slot="st"]):not(:has(> [data-slot="ws"])) {
   --row-two: "st st st st st st st st st st st st";
 }
 
-.grid:has(> [data-work-slot="ws"]):not(:has(> [data-work-slot="st"])) {
+.grid:has(> [data-slot="ws"]):not(:has(> [data-slot="st"])) {
   --row-two: "ws ws ws ws ws ws ws ws ws ws ws ws";
 }
 
-.grid:not(:has(> [data-work-slot="c1"])):not(:has(> [data-work-slot="sp"])) {
+.grid:not(:has(> [data-slot="c1"])):not(:has(> [data-slot="sp"])) {
   --row-one: ". . . . . . . . . . . .";
   row-gap: 0;
 }
 
-.grid:not(:has(> [data-work-slot="st"])):not(:has(> [data-work-slot="ws"])) {
+.grid:not(:has(> [data-slot="st"])):not(:has(> [data-slot="ws"])) {
   --row-two: ". . . . . . . . . . . .";
   row-gap: 0;
 }
@@ -102,7 +102,7 @@
     row-gap: 36px;
   }
 
-  .grid:not(:has(> [data-work-slot])) {
+  .grid:not(:has(> [data-slot])) {
     row-gap: 0;
   }
 

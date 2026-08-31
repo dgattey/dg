@@ -1,4 +1,5 @@
 import type { RenderableSideProject } from '@dg/content-models/contentful/renderables/sideProjects';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
@@ -9,9 +10,11 @@ import type { SxObject } from '@dg/ui/theme';
 import { getShape } from '@dg/ui/theme/shape';
 import { Box, Stack, Typography } from '@mui/material';
 import { ArrowUpRight } from 'lucide-react';
+import { CollageSideProjects } from '../collage/CollageSideProjects';
 
 type GatteySitesCardProps = {
   projects: ReadonlyArray<RenderableSideProject>;
+  surface?: SiteSurface;
 };
 
 const MARK_ROLE = 'side-project-mark';
@@ -46,7 +49,6 @@ const projectListSx: SxObject = {
   '& > li + li': {
     borderTop: '1px solid var(--mui-palette-card-border)',
   },
-  // Hide the shared divider when either adjacent row is hovered.
   '& > li:hover': {
     borderTopColor: 'transparent',
   },
@@ -98,14 +100,7 @@ const markSizes = {
   extraLarge: 40,
 } as const;
 
-/**
- * Mid-grid collection of independently linked side projects.
- */
-export function GatteySitesCard({ projects }: GatteySitesCardProps) {
-  if (projects.length === 0) {
-    return null;
-  }
-
+function ClassicGatteySitesCard({ projects }: { projects: ReadonlyArray<RenderableSideProject> }) {
   return (
     <ContentCard sx={cardSx}>
       <Stack sx={layoutSx}>
@@ -144,4 +139,16 @@ export function GatteySitesCard({ projects }: GatteySitesCardProps) {
       </Stack>
     </ContentCard>
   );
+}
+
+export function GatteySitesCard({ projects, surface = 'classic' }: GatteySitesCardProps) {
+  if (projects.length === 0) {
+    return null;
+  }
+
+  if (surface === 'collage') {
+    return <CollageSideProjects projects={projects} />;
+  }
+
+  return <ClassicGatteySitesCard projects={projects} />;
 }

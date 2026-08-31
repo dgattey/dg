@@ -5,8 +5,7 @@ import styles from './CollageProjectFrame.module.css';
 import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
 import { Print } from './Print';
-import type { ProjectFrameStyle } from './workSheetFrames';
-import { projectFrameAspectRatio, projectTagMeta } from './workSheetFrames';
+import { type ProjectFrameStyle, projectFrameAspectRatio, projectTagMeta } from './projectSlots';
 
 const PROJECT_SIZES: ImageSizes = {
   extraLarge: 760,
@@ -16,9 +15,11 @@ const PROJECT_SIZES: ImageSizes = {
   tiny: 380,
 };
 
+export type CollageProjectSlot = 'c1' | 'cn' | 'gn' | 'js' | 'li' | 'mg' | 'ws';
+
 type CollageProjectFrameProps = {
   className?: string;
-  'data-work-slot'?: 'c1' | 'ws';
+  'data-slot'?: CollageProjectSlot;
   project: RenderableProject;
   style: ProjectFrameStyle;
 };
@@ -29,7 +30,7 @@ function classNames(...values: Array<string | undefined>): string {
 
 export function CollageProjectFrame({
   className,
-  'data-work-slot': workSlot,
+  'data-slot': dataSlot,
   project,
   style,
 }: CollageProjectFrameProps) {
@@ -80,7 +81,7 @@ export function CollageProjectFrame({
 
   if (!href) {
     return (
-      <div className={classNames(styles.win, className)} data-work-slot={workSlot}>
+      <div className={classNames(styles.win, className)} data-slot={dataSlot}>
         {frame}
         {tag}
       </div>
@@ -90,7 +91,7 @@ export function CollageProjectFrame({
   return (
     <a
       className={classNames(styles.win, className)}
-      data-work-slot={workSlot}
+      data-slot={dataSlot}
       href={href}
       rel="noreferrer"
       target="_blank"

@@ -61,6 +61,28 @@ function definePlacements(rows: ReadonlyArray<PlacementRow>): Array<CutOutPlacem
 }
 
 export const CUT_OUT_PLACEMENTS = {
+  coda: definePlacements([
+    ['coda-monstera', 'monstera', 'olive', 460, 14, 4, -20, 'all', 0],
+    ['coda-banana', 'banana', 'viridian', 380, -30, 30, 8, 'desktop', 0],
+    [
+      'coda-bird',
+      'birdpara',
+      'vermilion',
+      260,
+      -10,
+      44,
+      34,
+      'all',
+      1,
+      { underprint: ['ultramarine', 6, 7] },
+    ],
+    ['coda-sun', 'sun', 'ochre', 180, 0, 18, 44, 'desktop', 0],
+    ['coda-star-upper', 'star5', 'star', 46, 8, 58, 8, 'desktop', 3],
+    ['coda-heart', 'heart', 'rose', 90, -12, 90, 70, 'all', 3],
+    ['coda-star-lower', 'star5', 'cream', 40, 16, 24, 78, 'dark-desktop', 3],
+    ['coda-star-right', 'star4', 'cream', 34, -6, 78, 22, 'dark-desktop', 3],
+    ['coda-philo', 'philo', 'leaf', 250, -18, 4, 64, 'desktop', 1],
+  ]),
   helloSheet: definePlacements([
     ['hello-seaweed-left', 'seaweed', 'ultramarine', 250, -12, -4, 20, 'desktop', 1],
     ['hello-fern-left', 'fern', 'olive', 330, 22, -7, 42, 'all', 1],
@@ -88,6 +110,19 @@ export const CUT_OUT_PLACEMENTS = {
     ['hello-banana', 'banana', 'viridian', 440, -24, 86, 26, 'desktop', 0],
     ['hello-star-right', 'star4', 'ochre', 44, 10, 92, 40, 'desktop', 3],
   ]),
+  moreWork: definePlacements([
+    ['more-monstera', 'monstera', 'viridian', 640, 150, 72, -12, 'all', 0],
+    ['more-gerbe', 'gerbe', 'vermilion', 380, 24, 38, -16, 'all', 0],
+    ['more-star-upper', 'star5', 'star', 44, -12, 48, 4, 'desktop', 3],
+    ['more-pods', 'pods', 'ultramarine', 230, 22, 27, 36, 'all', 1],
+    ['more-trefoil', 'trefoil', 'rose', 150, -16, 45, 44, 'desktop', 1],
+    ['more-algae', 'algae', 'leaf', 200, 10, 36, 52, 'desktop', 1],
+    ['more-banana', 'banana', 'leaf', 440, 40, 80, 52, 'desktop', 0],
+    ['more-star-lower', 'star4', 'ultramarine', 40, 10, 6, 92, 'all', 3],
+    ['more-seaweed', 'seaweed', 'cream', 240, -10, -3, 40, 'desktop', 1],
+    ['more-philo', 'philo', 'viridian', 300, -30, -6, 8, 'all', 1],
+    ['more-star-middle', 'star5', 'cream', 40, 20, 31, 54, 'desktop', 1],
+  ]),
   portrait: definePlacements([
     ['portrait-monstera', 'monstera', 'viridian', 1020, -34, -70, -62, 'all', 0],
     ['portrait-philo', 'philo', 'olive', 380, 28, 58, 62, 'desktop', 0],
@@ -106,6 +141,22 @@ export const CUT_OUT_PLACEMENTS = {
     ['work-star-middle', 'star5', 'cream', 34, 30, 66, 40, 'desktop', 1],
     ['work-seaweed2', 'seaweed2', 'cream', 220, -14, 88, 70, 'desktop', 1],
   ]),
-} satisfies Record<'helloSheet' | 'portrait' | 'workSheet', ReadonlyArray<CutOutPlacement>>;
+} satisfies Record<
+  'helloSheet' | 'portrait' | 'workSheet' | 'moreWork' | 'coda',
+  ReadonlyArray<CutOutPlacement>
+>;
+
+const MORE_WORK_OVERFLOW_SOURCE_IDS = new Set<string>([
+  'more-banana',
+  'more-pods',
+  'more-star-upper',
+  'more-star-lower',
+]);
+
+export function moreWorkOverflowPlacements(unitKey: string): Array<CutOutPlacement> {
+  return CUT_OUT_PLACEMENTS.moreWork
+    .filter((placement) => MORE_WORK_OVERFLOW_SOURCE_IDS.has(placement.id))
+    .map((placement) => ({ ...placement, id: `${unitKey}-${placement.id}` }));
+}
 
 export const ALL_CUT_OUT_PLACEMENTS = Object.values(CUT_OUT_PLACEMENTS).flat();

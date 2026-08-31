@@ -1,10 +1,13 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { ContentGrid } from '@dg/ui/core/ContentGrid';
 import { getProjects } from '../../services/contentful';
+import codaStyles from '../collage/CodaSheet.module.css';
 import { CutOut } from '../collage/CutOut';
 import { CutOutSymbols } from '../collage/CutOutSymbols';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
 import styles from '../collage/HelloSheet.module.css';
+import { MoreWorkSheet } from '../collage/MoreWorkSheet';
+import { assignProjectSlots, type ProjectFrameStyle } from '../collage/projectSlots';
 import { WorkSheet } from '../collage/WorkSheet';
 import { GatteySitesCardSlot } from './GatteySitesCardSlot';
 import { IntroCardSlot } from './IntroCardSlot';
@@ -24,10 +27,20 @@ function mergeCards(
   );
 }
 
+const CODA_FRAME_STYLE: ProjectFrameStyle = {
+  edge: 'quad-b',
+  printTone: 'var(--cerulean)',
+  tagClassName: 'tagBottomLeft',
+  tagTiltDeg: 3,
+  tagTone: 'rose',
+  tiltDeg: -1.4,
+};
+
 export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
   const projects = await getProjects();
 
   if (surface === 'collage') {
+    const slots = assignProjectSlots(projects);
     return (
       <>
         <CutOutSymbols />
@@ -41,10 +54,32 @@ export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface 
           </div>
         </section>
         <WorkSheet
-          projects={projects}
+          projects={slots.work}
           spotify={<SpotifyCardSlot surface="collage" />}
           strava={<StravaCardSlot surface="collage" />}
         />
+        <MoreWorkSheet
+          overflow={slots.overflow}
+          projects={slots.moreWork}
+          sites={<GatteySitesCardSlot surface="collage" />}
+        />
+        {slots.coda ? (
+          <section aria-label="And" className={codaStyles.sheet}>
+            {CUT_OUT_PLACEMENTS.coda.map((placement) => (
+              <CutOut key={placement.id} placement={placement} />
+            ))}
+            <div className={codaStyles.grid}>
+              <ProjectCard
+                {...slots.coda.project}
+                className={codaStyles.project}
+                data-slot="li"
+                key={slots.coda.key}
+                style={CODA_FRAME_STYLE}
+                surface="collage"
+              />
+            </div>
+          </section>
+        ) : null}
       </>
     );
   }
