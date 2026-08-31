@@ -20,12 +20,12 @@ html:has(.collageRoot) body {
   --ink: light-dark(#1d1a15, #f3ecdc);
   --ink-on-cream: #1d1a15;
   --viridian: light-dark(#1a5240, #1f6e52);
-  --leaf: light-dark(#3d7b4b, #356f43);
+  --leaf: light-dark(#3d7b4b, #4a945b);
   --olive: light-dark(#7b8a3a, #8d9e46);
   --chartreuse: light-dark(#b7c25a, #c3cf66);
   --ultramarine: light-dark(#2c4db0, #3557b8);
   --cerulean: light-dark(#4f8ec1, #5d9ccf);
-  --cobalt: light-dark(#3a60c2, #3557b8);
+  --cobalt: light-dark(#3a60c2, #4a72d4);
   --vermilion: light-dark(#d95a36, #e05f3a);
   --ochre: light-dark(#dca63b, #e4b348);
   --rose: light-dark(#d9838f, #df909b);
@@ -211,9 +211,15 @@ html[data-color-scheme="dark"] .collageRoot::after {
   text-transform: uppercase;
   letter-spacing: 0.09em;
 }
+.paperWrap > span {
+  display: inline-flex;
+}
+.paperWrap .paperButton {
+  filter: none;
+  rotate: none;
+}
 .paperButton:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
+  outline: none;
 }
 .paperButtonCurrent {
   color: var(--cream);
@@ -260,7 +266,7 @@ html[data-color-scheme="dark"] .cutNightOnly {
   --cut-display: block;
 }
 @media (prefers-color-scheme: dark) {
-  .cutNightOnly {
+  html:not([data-color-scheme="light"]) .cutNightOnly {
     --cut-display: block;
   }
 }
@@ -289,6 +295,14 @@ html[data-color-scheme="dark"] .cutNightOnly {
     }
     .cutOut.cutDepthFast {
       animation-name: collageDriftFast;
+    }
+  }
+
+  @media (max-width: 820px) {
+    .collageField,
+    .cutOut.cutDepthMedium,
+    .cutOut.cutDepthFast {
+      animation: none;
     }
   }
 }

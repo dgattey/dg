@@ -27,6 +27,11 @@
   width: 100%;
   height: 100%;
 }
+.logo button:focus-visible,
+.logo a:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
 .logo button,
 .logo a {
   padding: 0;

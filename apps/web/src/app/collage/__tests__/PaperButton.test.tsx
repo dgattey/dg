@@ -23,6 +23,12 @@ describe('PaperButton', () => {
     expect(screen.getByRole('button', { name: 'Light' })).toHaveAttribute('aria-pressed', 'false');
   });
 
+  it('wraps controls in paperWrap so focus rings stay unclipped', () => {
+    render(<PaperButton>Light</PaperButton>);
+    const button = screen.getByRole('button', { name: 'Light' });
+    expect(button.closest('.paperWrap')).not.toBeNull();
+  });
+
   it('renders current links with aria-current', () => {
     render(
       <PaperButton current href="/music" title="Listening history">
