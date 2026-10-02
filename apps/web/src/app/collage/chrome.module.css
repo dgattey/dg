@@ -44,6 +44,10 @@
   border: 0;
 }
 
+.logo a > * {
+  font: inherit;
+  letter-spacing: inherit;
+}
 .nowPlaying {
   min-width: 0;
   max-width: min(420px, 52vw);
