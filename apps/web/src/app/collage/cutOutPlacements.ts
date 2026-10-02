@@ -90,8 +90,8 @@ export const CUT_OUT_PLACEMENTS = {
   ]),
   error: definePlacements([
     ['error-monstera', 'monstera', 'viridian', 520, 22, 66, -12, 'desktop', 0],
-    ['error-fern', 'fern', 'olive', 340, -34, -10, 40, 'desktop', 0],
-    ['error-seaweed', 'seaweed2', 'olive', 240, -16, 56, 64, 'desktop', 1],
+    ['error-fern', 'fern', 'olive', 340, -34, -10, 40, 'all', 0],
+    ['error-seaweed', 'seaweed2', 'olive', 240, -16, 56, 64, 'all', 1],
     ['error-star', 'star5', 'star', 46, 10, 36, 6, 'desktop', 3],
   ]),
   helloSheet: definePlacements([
