@@ -30,15 +30,16 @@
   line-height: 1.5;
 }
 .protectedTag {
-  top: -16px;
-  left: -14px;
-  display: grid;
-  gap: 0;
+  top: -14px;
+  left: -12px;
+  font-size: 12.5px;
+  font-weight: 700;
   text-transform: uppercase;
+  letter-spacing: 0.08em;
 }
 .protectedTag small {
-  font-size: 11px;
-  letter-spacing: 0.08em;
+  font-size: inherit;
+  font-weight: 500;
 }
 .console {
   display: grid;
@@ -69,6 +70,12 @@
 }
 .cardContent :global(.MuiTypography-root) {
   color: inherit;
+}
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px 14px;
+  align-items: center;
 }
 .actionButton {
   font-size: 14px;
