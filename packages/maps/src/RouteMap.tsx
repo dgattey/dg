@@ -132,7 +132,7 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
     }
 
     const updateSize = () => {
-      const { height, width } = element.getBoundingClientRect();
+      const { offsetHeight: height, offsetWidth: width } = element;
       if (height > 0 && width > 0) {
         setSize({ height, width });
       }
@@ -156,6 +156,9 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
   const tileLayerSx: SxObject = {
     '& > div': {
       backgroundColor: 'transparent !important',
+      // Pigeon re-measures its root with getBoundingClientRect, which grows under a
+      // rotated collage card and feeds back into its own inline size every frame.
+      ...(surface === 'classic' ? {} : { height: '100% !important', width: '100% !important' }),
     },
     filter: tokens.tileFilter,
     inset: 0,
