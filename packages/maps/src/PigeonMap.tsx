@@ -6,6 +6,7 @@ import { Box } from '@mui/material';
 import { Overlay, Map as PigeonMapCore } from 'pigeon-maps';
 import { useState } from 'react';
 import { Marker } from './Marker';
+import { stadiaTileUrl, type TileSource } from './tileSource';
 import { WatercolorTile } from './WatercolorTile';
 import { ZoomControls } from './ZoomControls';
 
@@ -20,14 +21,14 @@ const DEFAULT_MAX_ZOOM = 18;
 
 export type PigeonMapProps = {
   location: MapLocation;
-  stadiaApiKey: string;
+  tileSource: TileSource;
 };
 
 /**
  * Lightweight map component using Pigeon Maps with Stamen Watercolor tiles
  * and terrain labels overlay. Zoom range is driven by zoomLevels from Contentful.
  */
-export function PigeonMap({ location, stadiaApiKey }: PigeonMapProps) {
+export function PigeonMap({ location, tileSource }: PigeonMapProps) {
   const [center, setCenter] = useState<[number, number]>([
     location.point.latitude,
     location.point.longitude,
@@ -40,8 +41,8 @@ export function PigeonMap({ location, stadiaApiKey }: PigeonMapProps) {
   const minZoom = levels.at(0) ?? DEFAULT_MIN_ZOOM;
   const maxZoom = levels.at(-1) ?? DEFAULT_MAX_ZOOM;
 
-  const provider = (x: number, y: number, z: number) =>
-    `https://tiles.stadiamaps.com/tiles/stamen_watercolor/${z}/${x}/${y}.jpg?api_key=${stadiaApiKey}`;
+  const provider = (x: number, y: number, zoom: number) =>
+    stadiaTileUrl(tileSource, { extension: 'jpg', style: 'stamen_watercolor', x, y, zoom });
 
   const handleZoomIn = () => {
     setZoomIndex((i) => Math.min(i + 1, levels.length - 1));

@@ -39,20 +39,21 @@ function toLabelsUrl(watercolorUrl: string) {
 
 /**
  * Custom pigeon-maps tile that stacks Stamen Watercolor (base) with
- * Stamen Terrain Labels (overlay). Both images must load before
- * signaling tile completion to pigeon-maps.
+ * Stamen Terrain Labels (overlay). Every rendered image must load before
+ * signaling tile completion to pigeon-maps. Offline placeholder tiles
+ * have no labels layer.
  */
 export function WatercolorTile({ tile, tileLoaded }: TileComponentProps) {
   const loadedCount = useRef(0);
+  const labelsUrl = toLabelsUrl(tile.url);
+  const hasLabels = labelsUrl !== tile.url;
 
   const handleImageLoad = () => {
     loadedCount.current += 1;
-    if (loadedCount.current >= 2) {
+    if (loadedCount.current >= (hasLabels ? 2 : 1)) {
       tileLoaded();
     }
   };
-
-  const labelsUrl = toLabelsUrl(tile.url);
 
   const containerSx: SxObject = {
     height: tile.height,
@@ -67,10 +68,10 @@ export function WatercolorTile({ tile, tileLoaded }: TileComponentProps) {
 
   return (
     <Box sx={containerSx}>
-      {/* biome-ignore lint/performance/noImgElement: dynamic tile URLs from pigeon-maps, not optimizable by next/image */}
       <Box alt="" component="img" onLoad={handleImageLoad} src={tile.url} sx={tileImgSx} />
-      {/* biome-ignore lint/performance/noImgElement: dynamic tile URLs from pigeon-maps, not optimizable by next/image */}
-      <Box alt="" component="img" onLoad={handleImageLoad} src={labelsUrl} sx={tileImgSx} />
+      {hasLabels && (
+        <Box alt="" component="img" onLoad={handleImageLoad} src={labelsUrl} sx={tileImgSx} />
+      )}
     </Box>
   );
 }

@@ -12,8 +12,12 @@ This is `dg`, a single Next.js 16 app (`@dg/web`) in a pnpm + Turbo monorepo. Se
 - Vercel dashboard login ≠ Flags identity. Optional Sign in with Vercel on `/dev-console` feeds `identify` (`user.id` / `user.email`); targeting is via Flags Entities/Segments. Session does not bypass `/dev-console` Basic Auth. Details: `apps/web/src/auth/vercel/README.md`. Env: `NEXT_PUBLIC_VERCEL_APP_CLIENT_ID`, `VERCEL_APP_CLIENT_SECRET` (also in `config/env.secrets.keys`).
 - Real secrets for Contentful, Spotify, Strava, OAuth callback, and Turbo cache are injected as env vars, so the homepage renders real CMS content and OAuth flows redirect to the real providers.
 - The dev console lives at `/dev-console`. Basic auth is only enforced when `DEV_CONSOLE_BASIC_AUTH_USER`/`_PASS` are set; otherwise it is open in development.
-- `STADIA_API_KEY` may be absent; the homepage still renders (only the watercolor map tiles are affected).
+- `STADIA_API_KEY` is only sent to Stadia when `NODE_ENV=production`. Dev requests go out keyless, which Stadia allows from `localhost`/`127.0.0.1` (throttled, but off the account's monthly credits). Opening dev through a non-localhost host such as the Cloudflare tunnel gets 401 tiles; that's expected.
 - `turbo dev` does NOT start the Cloudflare tunnel (the `dev` task does not depend on `tunnel`), so a set `CLOUDFLARE_TUNNEL_TOKEN` is ignored during normal dev.
+
+### Map tiles (Stadia free tier)
+- Browser verification, screenshot and fuzz runs MUST start dev with `MAP_TILES=offline` (e.g. `MAP_TILES=offline pnpm exec turbo dev`) unless they are explicitly testing real tiles. Offline mode renders an inline paper placeholder and makes zero tile requests; Jest (`NODE_ENV=test`) is always offline.
+- The free tier is 200k credits per calendar month, after which production maps show "Account Limit Exceeded" until the month resets. Never loop resizes or reloads against real tiles.
 
 ### Agent surfaces
 - `/llms.txt`, `/llms-full.txt` — LLM site summaries
