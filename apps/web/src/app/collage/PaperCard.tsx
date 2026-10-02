@@ -31,10 +31,8 @@ export function PaperCard({
       className={cx(styles.wrap, TONE_CLASS[tone], className)}
       style={{ '--r': `${tiltDeg}deg` } as CSSProperties}
     >
-      <div className={cx(styles.inner, EDGE_CLASS[edge], innerClassName)}>
-        {children}
-        {tag}
-      </div>
+      <div className={cx(styles.inner, EDGE_CLASS[edge], innerClassName)}>{children}</div>
+      {tag}
     </div>
   );
 }
