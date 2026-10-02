@@ -9,6 +9,7 @@ import { Map as PigeonMapCore } from 'pigeon-maps';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { fitRouteViewport, projectRouteToPixels, toSvgPath } from './routeGeometry';
 import { SmoothTile } from './SmoothTile';
+import { stadiaTileUrl, type TileSource } from './tileSource';
 
 const ROUTE_PADDING = 42;
 const DEFAULT_SIZE = 320;
@@ -106,32 +107,38 @@ function tileCoordinates([latitude, longitude]: Point, zoom: number) {
 function tileUrl({
   dark,
   dpr,
-  stadiaApiKey,
+  tileSource,
   x,
   y,
   zoom,
 }: {
   dark: boolean;
   dpr?: number;
-  stadiaApiKey: string;
+  tileSource: TileSource;
   x: number;
   y: number;
   zoom: number;
 }) {
-  // Outdoors carries trails, contours and greenery, so it still reads as a map
-  // under a scrim. Alidade Smooth Dark is the closest dark counterpart.
-  const style = dark ? 'alidade_smooth_dark' : 'outdoors';
-  const density = dpr && dpr > 1 ? '@2x' : '';
-  return `https://tiles.stadiamaps.com/tiles/${style}/${zoom}/${x}/${y}${density}.png?api_key=${stadiaApiKey}`;
+  return stadiaTileUrl(tileSource, {
+    dark,
+    extension: 'png',
+    retina: Boolean(dpr && dpr > 1),
+    // Outdoors carries trails, contours and greenery, so it still reads as a map
+    // under a scrim. Alidade Smooth Dark is the closest dark counterpart.
+    style: dark ? 'alidade_smooth_dark' : 'outdoors',
+    x,
+    y,
+    zoom,
+  });
 }
 
 export type RouteMapProps = {
   points: Array<Point>;
-  stadiaApiKey: string;
+  tileSource: TileSource;
 };
 
 /** A non-interactive, theme-aware route map intended for card backgrounds. */
-export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
+export function RouteMap({ points, tileSource }: RouteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ height: DEFAULT_SIZE, width: DEFAULT_SIZE });
   const { preference } = useColorScheme();
@@ -158,7 +165,7 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
     }),
   );
   const provider = (x: number, y: number, zoom: number, dpr?: number) =>
-    tileUrl({ dark, dpr, stadiaApiKey, x, y, zoom });
+    tileUrl({ dark, dpr, tileSource, x, y, zoom });
 
   useEffect(() => {
     const element = containerRef.current;
@@ -185,7 +192,7 @@ export function RouteMap({ points, stadiaApiKey }: RouteMapProps) {
         component="img"
         src={tileUrl({
           dark,
-          stadiaApiKey,
+          tileSource,
           x: underlayTile.x,
           y: underlayTile.y,
           zoom: underlayTile.zoom,

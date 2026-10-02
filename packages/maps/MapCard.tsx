@@ -1,6 +1,7 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
+import { getTileSource } from './src/getTileSource';
 import { PigeonMap } from './src/PigeonMap';
 
 const mapCardSx: SxObject = {
@@ -9,20 +10,17 @@ const mapCardSx: SxObject = {
 };
 
 /**
- * Server component wrapper for the map. Reads the Stadia API key
+ * Server component wrapper for the map. Resolves the tile source
  * server-side and passes it to the client PigeonMap component.
- * PigeonMap renders an underlay image that's visible until tiles load.
  */
 export function MapCard({ location }: { location: MapLocation | null | undefined }) {
   if (!location) {
     return <ContentCard sx={mapCardSx} verticalSpan={1} />;
   }
 
-  const stadiaApiKey = process.env.STADIA_API_KEY ?? '';
-
   return (
     <ContentCard sx={mapCardSx} verticalSpan={1}>
-      <PigeonMap location={location} stadiaApiKey={stadiaApiKey} />
+      <PigeonMap location={location} tileSource={getTileSource()} />
     </ContentCard>
   );
 }
