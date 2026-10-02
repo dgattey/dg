@@ -8,6 +8,7 @@ import { Skeleton, Stack, Typography } from '@mui/material';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
 import { DevConsoleCardShell } from '../DevConsoleCardShell';
+import styles from '../devConsole.module.css';
 import { ErrorMessage, StatusChip } from '../StatusIndicators';
 import { ConnectButton } from './ConnectButton';
 import { ForceRefreshButton } from './ForceRefreshButton';
@@ -40,7 +41,7 @@ export async function OauthCardContent({ provider, surface = 'classic' }: OauthC
         <StatusChip isConnected={status.isConnected} surface={surface} />
       </Stack>
       <ErrorMessage message={status.error} surface={surface} />
-      <ButtonGrid>
+      <ButtonGrid surface={surface}>
         <ConnectButton provider={provider} status={status} surface={surface} />
         <ForceRefreshButton
           isConnected={status.isConnected}
@@ -53,7 +54,16 @@ export async function OauthCardContent({ provider, surface = 'classic' }: OauthC
   );
 }
 
-function ButtonGrid({ children }: { children: React.ReactNode }) {
+function ButtonGrid({
+  children,
+  surface = 'classic',
+}: {
+  children: React.ReactNode;
+  surface?: SiteSurface;
+}) {
+  if (surface === 'collage') {
+    return <div className={styles.actions}>{children}</div>;
+  }
   return (
     <Stack
       direction="row"
