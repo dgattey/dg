@@ -48,8 +48,9 @@
 
 @media (max-width: 600px) {
   .sheet {
-    min-height: calc(100dvh - 140px);
-    padding-block: 36px 72px;
+    place-items: start center;
+    min-height: calc(100dvh - 200px);
+    padding-block: 48px 96px;
   }
   .content {
     gap: 26px;
