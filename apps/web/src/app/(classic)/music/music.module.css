@@ -44,9 +44,7 @@
   outline: 2px solid var(--ink);
   outline-offset: 4px;
 }
-.albumGrid,
-.albumReserve,
-.gridSkeleton {
+.albumsLayout :is(.albumGrid, .albumReserve, .gridSkeleton) {
   grid-area: albums;
 }
 .albumReserve {
