@@ -255,11 +255,11 @@ html[data-color-scheme="dark"] .collageRoot::after {
   outline-offset: 3px;
 }
 .paperButtonCurrent {
-  color: var(--cream);
-  background: var(--black);
+  color: light-dark(var(--cream), var(--ink-on-cream));
+  background: light-dark(var(--black), var(--ochre));
 }
 .paperWrap .paperButtonCurrent {
-  color: var(--cream);
+  color: light-dark(var(--cream), var(--ink-on-cream));
 }
 .paperButton:disabled {
   cursor: wait;
