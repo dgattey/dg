@@ -308,6 +308,7 @@ html[data-color-scheme="dark"] .cutNightOnly {
     flex-direction: column;
     grid-template-areas: none;
     gap: 36px;
+    align-items: stretch;
   }
   .collageRoot .collageGridStack > * {
     grid-area: auto;
