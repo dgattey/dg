@@ -42,6 +42,7 @@ html:has(.collageRoot) body {
   --rose: light-dark(#d9838f, #df909b);
   --black: light-dark(#1d1a15, #0c1424);
   --star: light-dark(#1d1a15, #f3ecdc);
+  --title: var(--ink);
   --taupe: light-dark(#c7b59a, #3b4a66);
   --taupe2: light-dark(#a8937a, #4e5f80);
   --gap: clamp(14px, 1.6vw, 24px);
@@ -283,6 +284,11 @@ html[data-color-scheme="dark"] .cutNightOnly {
   font-size: clamp(64px, 10vw, 144px);
   font-weight: 800;
   line-height: 0.88;
+  color: var(--title);
+  letter-spacing: -0.01em;
+  filter: var(--dshadow);
+}
+.cutHeadingCut {
   letter-spacing: 0.01em;
   filter: url("#collage-rough") var(--dshadow);
 }
@@ -296,10 +302,6 @@ html[data-color-scheme="dark"] .cutNightOnly {
 .cutLetter {
   display: inline-block;
   margin-inline: 0.012em;
-  color: var(--ink);
-}
-.cutAccent {
-  color: var(--vermilion);
 }
 
 @media (max-width: 820px) {

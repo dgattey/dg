@@ -77,7 +77,7 @@ export function ErrorLayout({ statusCode, surface = 'classic' }: ErrorLayoutProp
           <CutOut key={placement.id} placement={placement} />
         ))}
         <div className={styles.content}>
-          <CutLetters className={styles.statusCode} text={String(statusCode)} />
+          <CutLetters className={styles.statusCode} cut={true} text={String(statusCode)} />
           <PaperCard
             className={styles.messageCard}
             edge="quad-b"
