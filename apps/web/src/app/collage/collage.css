@@ -214,8 +214,7 @@ html:has(.collageRoot) body {
   .paperTag:focus-visible,
   .chrome__musicSummary:focus-visible > .paperWrap,
   .home__sideRowWrap:has(.home__sideRow:focus-visible),
-  .print__portrait:focus-visible,
-  .music__sortButton:focus-visible
+  .print__portrait:focus-visible
 ) {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
