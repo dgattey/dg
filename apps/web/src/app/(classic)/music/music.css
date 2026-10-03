@@ -40,7 +40,9 @@
   padding: 11px 16px 12px;
   cursor: pointer;
 }
+/* `all: unset` on the button outranks a shared zero-specificity ring, so it keeps its own. */
 .music__sortButton:focus-visible {
+  outline: 2px solid var(--ink);
   outline-offset: 4px;
 }
 .music__albumsLayout :is(.music__albumGrid, .music__albumReserve, .music__gridSkeleton) {
