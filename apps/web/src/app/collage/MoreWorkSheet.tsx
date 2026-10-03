@@ -1,42 +1,48 @@
-import { Fragment, type ReactNode } from 'react';
+import { type CSSProperties, Fragment, type ReactNode } from 'react';
 import { ProjectCard } from '../home/ProjectCard';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS, moreWorkOverflowPlacements } from './cutOutPlacements';
-import styles from './MoreWorkSheet.module.css';
-import { type MoreWorkOverflowUnit, moreWorkFrames, type SlottedProject } from './projectSlots';
-
-type MoreWorkSheetProps = {
-  overflow: ReadonlyArray<MoreWorkOverflowUnit>;
-  projects: ReadonlyArray<SlottedProject>;
-  sites: ReactNode;
-};
-
-const FRAME_CLASS = {
-  cn: styles.projectCn,
-  gn: styles.projectGn,
-  js: styles.projectJs,
-  mg: styles.projectMg,
-} as const;
+import {
+  MORE_WORK_OVERFLOW_GRID_AREAS,
+  type MoreWorkOverflowUnit,
+  moreWorkFrames,
+  moreWorkGridAreas,
+  type SlottedProject,
+} from './projectSlots';
 
 function MoreWorkGrid({
   projects,
   sites,
+  overflow = false,
 }: {
+  overflow?: boolean;
   projects: ReadonlyArray<SlottedProject>;
   sites?: ReactNode;
 }) {
   const frames = moreWorkFrames(projects);
   const byArea = new Map(frames.map((frame) => [frame.gridArea, frame]));
   const order = ['mg', 'sd', 'cn', 'js', 'gn'] as const;
+  const grid = overflow
+    ? { areas: MORE_WORK_OVERFLOW_GRID_AREAS, rowGapPx: 56 }
+    : moreWorkGridAreas({
+        cn: byArea.has('cn'),
+        gn: byArea.has('gn'),
+        js: byArea.has('js'),
+        mg: byArea.has('mg'),
+      });
+  const gridStyle: CSSProperties = {
+    gridTemplateAreas: grid.areas,
+    rowGap: grid.rowGapPx,
+  };
 
   return (
-    <div className={styles.grid}>
+    <div
+      className="collageMeasure collageMeasureGrid collageGridStack home__moreWorkGrid"
+      style={gridStyle}
+    >
       {order.map((area) => {
         if (area === 'sd') {
-          if (!sites) {
-            return null;
-          }
-          return <Fragment key="sd">{sites}</Fragment>;
+          return sites ? <Fragment key="sd">{sites}</Fragment> : null;
         }
         const frame = byArea.get(area);
         if (!frame) {
@@ -45,7 +51,6 @@ function MoreWorkGrid({
         return (
           <ProjectCard
             {...frame.project}
-            className={FRAME_CLASS[frame.gridArea]}
             data-slot={frame.gridArea}
             key={frame.key}
             style={frame.style}
@@ -57,20 +62,28 @@ function MoreWorkGrid({
   );
 }
 
-export function MoreWorkSheet({ overflow, projects, sites }: MoreWorkSheetProps) {
+export function MoreWorkSheet({
+  overflow,
+  projects,
+  sites,
+}: {
+  overflow: ReadonlyArray<MoreWorkOverflowUnit>;
+  projects: ReadonlyArray<SlottedProject>;
+  sites: ReactNode;
+}) {
   return (
-    <section aria-label="More work" className={styles.sheet}>
-      <div aria-hidden="true" className={`collageField ${styles.field}`} />
+    <section aria-label="More work" className="collageBleed home__moreWork">
+      <div aria-hidden="true" className="collageField home__moreWorkField" />
       {CUT_OUT_PLACEMENTS.moreWork.map((placement) => (
         <CutOut key={placement.id} placement={placement} />
       ))}
       <MoreWorkGrid projects={projects} sites={sites} />
       {overflow.map((unit) => (
-        <div className={styles.overflow} key={unit.key}>
+        <div className="home__overflow" key={unit.key}>
           {moreWorkOverflowPlacements(unit.key).map((placement) => (
             <CutOut key={placement.id} placement={placement} />
           ))}
-          <MoreWorkGrid projects={unit.projects} />
+          <MoreWorkGrid overflow projects={unit.projects} />
         </div>
       ))}
     </section>

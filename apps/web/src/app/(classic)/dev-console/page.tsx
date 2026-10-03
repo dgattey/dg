@@ -1,6 +1,8 @@
 import 'server-only';
 
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Box, Divider, Stack, Typography } from '@mui/material';
+import { CollageConsole } from './CollageConsole';
 import { OauthCard } from './oauth/OauthCard';
 import { VercelSignInCard } from './vercel/VercelSignInCard';
 import { WebhookCard } from './webhooks/WebhookCard';
@@ -55,13 +57,18 @@ function CardSection({ title, children }: { title: string; children: React.React
 
 type ConsolePageProps = {
   searchParams?: Promise<Record<string, string | Array<string> | undefined>>;
+  surface?: SiteSurface;
 };
 
 /**
  * Dev console shell. Keep this sync — await `searchParams` / cookies only inside
  * Suspense boundaries (see VercelSignInCard) so the route can prerender.
  */
-export default function ConsolePage({ searchParams }: ConsolePageProps) {
+export default function ConsolePage({ searchParams, surface = 'classic' }: ConsolePageProps) {
+  if (surface === 'collage') {
+    return <CollageConsole searchParams={searchParams} />;
+  }
+
   return (
     <main>
       <Stack

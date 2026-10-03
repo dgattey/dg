@@ -4,17 +4,8 @@ import type { Track } from '@dg/content-models/spotify/Track';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { AlbumArtWithNotes } from '../spotify/AlbumArtWithNotes';
-import styles from './RecordDisc.module.css';
 
-type RecordDiscProps = {
-  track: Track;
-};
-
-export function RecordDisc({ track }: RecordDiscProps) {
-  const albumTitle = track.album.name;
-  const albumUrl = track.album.externalUrls.spotify;
-  const trackUrl = track.externalUrls.spotify;
-
+export function RecordDisc({ track }: { track: Track }) {
   return (
     <AlbumArtWithNotes
       isPlaying={Boolean(track.isPlaying)}
@@ -26,21 +17,26 @@ export function RecordDisc({ track }: RecordDiscProps) {
         width: 'min(100%, 240px)',
       }}
     >
-      <div className={styles.disc}>
-        <div className={styles.discPiece}>
+      <div className="print__disc">
+        <div className="print__discPiece">
           <Link
             aria-label="Spotify"
-            className={styles.logo}
-            href={trackUrl}
+            className="print__logo"
+            href={track.externalUrls.spotify}
             isExternal={true}
             title={track.name}
           >
-            <span className={styles.logoMark} />
+            <span className="print__logoMark" />
           </Link>
-          <Link className={styles.artLink} href={albumUrl} isExternal={true} title={albumTitle}>
-            <span className={styles.art}>
+          <Link
+            className="print__artLink"
+            href={track.album.externalUrls.spotify}
+            isExternal={true}
+            title={track.album.name}
+          >
+            <span className="print__art">
               <Image
-                alt={albumTitle}
+                alt={track.album.name}
                 cover={true}
                 height={track.albumImage.height}
                 quality={60}
@@ -50,7 +46,7 @@ export function RecordDisc({ track }: RecordDiscProps) {
               />
             </span>
           </Link>
-          <span aria-hidden="true" className={styles.hole} />
+          <span aria-hidden="true" className="print__hole" />
         </div>
       </div>
     </AlbumArtWithNotes>

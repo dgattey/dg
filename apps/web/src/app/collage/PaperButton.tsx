@@ -1,38 +1,37 @@
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
-import styles from './paper.module.css';
-import { EDGE_CLASS, TONE_CLASS } from './paperClasses';
+import { cx, paperSurfaceVars } from './paperVars';
 import type { PaperEdge, PaperTone } from './types';
 
-type PaperButtonBase = {
+type PaperButtonProps = {
   children: ReactNode;
   className?: string;
   current?: boolean;
   edge?: PaperEdge;
   tiltDeg?: number;
   tone?: PaperTone;
-};
-
-type PaperButtonProps = PaperButtonBase &
-  (
-    | {
-        href: string;
-        title: string;
-        onClick?: () => void;
-        type?: undefined;
-      }
-    | {
-        href?: undefined;
-        title?: undefined;
-        onClick?: ButtonHTMLAttributes<HTMLButtonElement>['onClick'];
-        type?: 'button' | 'submit';
-      }
-  );
+} & (
+  | {
+      href: string;
+      title: string;
+      disabled?: undefined;
+      onClick?: () => void;
+      type?: undefined;
+    }
+  | {
+      href?: undefined;
+      title?: undefined;
+      disabled?: boolean;
+      onClick?: ButtonHTMLAttributes<HTMLButtonElement>['onClick'];
+      type?: 'button' | 'submit';
+    }
+);
 
 export function PaperButton({
   children,
   className,
   current = false,
+  disabled = false,
   edge = 'quad-c',
   href,
   onClick,
@@ -41,16 +40,8 @@ export function PaperButton({
   tone = 'cream',
   type = 'button',
 }: PaperButtonProps) {
-  const classNames = [
-    styles.button,
-    TONE_CLASS[tone],
-    EDGE_CLASS[edge],
-    current ? styles.buttonCurrent : undefined,
-    className,
-  ]
-    .filter((part) => part !== undefined && part.length > 0)
-    .join(' ');
-  const style = { '--r': `${tiltDeg}deg` } as CSSProperties;
+  const classNames = cx('paperButton', current && 'paperButtonCurrent', className);
+  const style: CSSProperties = paperSurfaceVars(tone, edge, tiltDeg);
 
   if (href !== undefined) {
     return (
@@ -72,6 +63,7 @@ export function PaperButton({
     <button
       aria-pressed={current}
       className={classNames}
+      disabled={disabled}
       onClick={onClick}
       style={style}
       type={type}
