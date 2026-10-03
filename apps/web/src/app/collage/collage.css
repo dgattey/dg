@@ -281,46 +281,29 @@ html[data-color-scheme="dark"] .cutNightOnly {
     .collageField,
     .cutOut.cutDepthMedium,
     .cutOut.cutDepthFast {
-      animation: collageDriftSlow linear both;
+      animation: collageDrift linear both;
       animation-timeline: view();
       animation-range: entry 0% exit 100%;
     }
     .collageField {
+      --drift: 80px;
       scale: 1 1.2;
     }
     .cutOut.cutDepthMedium {
-      animation-name: collageDriftMedium;
+      --drift: 150px;
     }
     .cutOut.cutDepthFast {
-      animation-name: collageDriftFast;
+      --drift: 230px;
     }
   }
 }
 
-@keyframes collageDriftSlow {
+@keyframes collageDrift {
   from {
-    translate: 0 80px;
+    translate: 0 var(--drift);
   }
   to {
-    translate: 0 -80px;
-  }
-}
-
-@keyframes collageDriftMedium {
-  from {
-    translate: 0 150px;
-  }
-  to {
-    translate: 0 -150px;
-  }
-}
-
-@keyframes collageDriftFast {
-  from {
-    translate: 0 230px;
-  }
-  to {
-    translate: 0 -230px;
+    translate: 0 calc(-1 * var(--drift));
   }
 }
 .cutHeading {
