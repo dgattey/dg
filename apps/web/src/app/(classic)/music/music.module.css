@@ -82,6 +82,10 @@
   padding: 10px 10px 16px;
   overflow: clip;
 }
+/* The tooltip anchor shrink-wraps by default, which sized art to its caption length. */
+.cardInner > span {
+  display: grid;
+}
 .albumLink {
   display: grid;
   grid-template-rows: auto auto;
