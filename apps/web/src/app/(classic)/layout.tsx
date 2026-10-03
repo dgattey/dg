@@ -14,9 +14,12 @@ const mainSectionSx: SxObject = {
 
 export default function ClassicLayout({ children }: { children: ReactNode }) {
   return (
+    // Scroll provider wraps header + content for docked header thumbnail
     <PageScrollProvider>
       <Header />
+      {/* Covers the strip above a pinned bar, on pages that have one */}
       <StickyBarTopMask />
+      {/* Contained main content with consistent section spacing */}
       <Section sx={mainSectionSx}>
         <Container>
           <main>

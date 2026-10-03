@@ -27,6 +27,8 @@ const getFooterLinkSx = (hasIcon: boolean): SxObject => ({
   display: 'flex',
   fontSize: hasIcon ? { sm: FOOTER_ICON_DESKTOP_FONT_SIZE, xs: FOOTER_ICON_FONT_SIZE } : undefined,
   justifyContent: 'center',
+  // Slightly tighter on mobile so the icon row fits; 36px is below the
+  // ideal 44px a11y target (desktop stays at 40, already a trade-off).
   minHeight: { sm: 40, xs: 36 },
   minWidth: { sm: 40, xs: 36 },
 });
@@ -70,6 +72,9 @@ const footerIconLinkListSx: SxObject = {
   padding: 0,
 };
 
+/**
+ * Creates a singular footer link with top-positioned tooltip
+ */
 function FooterLink({ link }: { link: RenderableLink }) {
   const { title, url, icon } = link;
   return (
@@ -104,6 +109,9 @@ function CollageFooterLink({ link }: { link: RenderableLink }) {
   );
 }
 
+/**
+ * Returns the current year for copyright display, cached to avoid prerender issues.
+ */
 // biome-ignore lint/suspicious/useAwait: 'use cache' requires async
 async function getCopyrightYear() {
   'use cache';
@@ -111,6 +119,9 @@ async function getCopyrightYear() {
   return new Date().getFullYear();
 }
 
+/**
+ * Creates the site footer component - shows version data + copyright
+ */
 export async function Footer({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
   const [footerLinks, versionInfo, currentYear] = await Promise.all([
     getFooterLinks(),
