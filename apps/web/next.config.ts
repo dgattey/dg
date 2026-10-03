@@ -16,6 +16,8 @@ const nextConfig: NextConfig = {
     viewTransition: true,
   },
   images: {
+    formats: ['image/avif', 'image/webp'],
+    qualities: [60, 65, 75],
     remotePatterns: [
       {
         hostname: 'images.ctfassets.net',

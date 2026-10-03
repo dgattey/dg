@@ -14,6 +14,7 @@ import { getContentfulClient } from './contentfulClient';
 const QUERY = gql`
   query MyLocation {
     contentTypeLocation(id: "1RWFWMUzNgSKtL7qzAJ9bz") {
+      title
       point {
         latitude: lat
         longitude: lon
@@ -58,6 +59,7 @@ export async function fetchCurrentLocation(): Promise<MapLocation | null> {
     image: toRenderableAsset(location.image),
     initialZoom: location.initialZoom,
     point: { latitude, longitude },
+    title: location.title,
     zoomLevels:
       location.zoomLevels
         ?.filter(isNotNullish)
