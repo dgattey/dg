@@ -6,7 +6,7 @@ import { Box } from '@mui/material';
 import { AlbumPlayTile } from './AlbumPlayTile';
 import { albumGridSx } from './albumTileGeometry';
 import { groupAdjacentAlbumPlays } from './groupAdjacentAlbumPlays';
-import albumStyles from './music.module.css';
+import albumStyles from './music.classes';
 
 type Props = {
   surface?: SiteSurface;

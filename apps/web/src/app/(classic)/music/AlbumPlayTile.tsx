@@ -10,7 +10,7 @@ import { AlbumCover } from './AlbumCover';
 import { AlbumStack } from './AlbumStack';
 import { CollageAlbumPaper, collageAlbumCardTreatment } from './albums/collageAlbumCardTreatments';
 import { albumTileLinkSx, MAX_ALBUM_SLEEVES } from './albumTileGeometry';
-import styles from './music.module.css';
+import styles from './music.classes';
 
 const countChipSx: SxObject = {
   backdropFilter: 'blur(12px) saturate(150%)',

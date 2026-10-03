@@ -9,7 +9,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import chrome from '../collage/chrome.module.css';
+import chrome from '../collage/chrome.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
 import { usePageScrollProgress } from '../layouts/PageScrollContext';

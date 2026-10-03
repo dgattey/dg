@@ -3,7 +3,7 @@ import 'server-only';
 import { MapCard } from '@dg/maps/MapCard';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { getCurrentLocation } from '../../services/contentful';
-import styles from '../collage/home.module.css';
+import styles from '../collage/home.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 

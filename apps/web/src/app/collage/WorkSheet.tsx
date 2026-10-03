@@ -2,7 +2,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { ProjectCard } from '../home/ProjectCard';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS } from './cutOutPlacements';
-import styles from './home.module.css';
+import styles from './home.classes';
 import { type SlottedProject, workSheetFrames, workSheetGridAreas } from './projectSlots';
 
 export function WorkSheet({

@@ -5,7 +5,7 @@ import type { ButtonProps } from '@mui/material';
 import { Button, Stack } from '@mui/material';
 import { useState } from 'react';
 import { PaperButton } from '../../collage/PaperButton';
-import styles from './devConsole.module.css';
+import styles from './devConsole.classes';
 import { ErrorMessage } from './StatusIndicators';
 
 type ServerActionButtonProps = {

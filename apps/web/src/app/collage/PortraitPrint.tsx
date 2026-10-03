@@ -5,7 +5,7 @@ import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS } from './cutOutPlacements';
 import { PaperTag } from './PaperTag';
 import { cx } from './paperVars';
-import styles from './print.module.css';
+import styles from './print.classes';
 
 export function introImageAlt(image: Pick<RenderableAsset, 'title'>): string {
   return image.title ?? 'Introduction image';

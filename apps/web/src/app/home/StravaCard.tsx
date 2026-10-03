@@ -4,7 +4,7 @@ import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack } from '@mui/material';
-import styles from '../collage/home.module.css';
+import styles from '../collage/home.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { ActivityDescription } from '../strava/ActivityDescription';
 import { ActivityName } from '../strava/ActivityName';

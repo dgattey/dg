@@ -7,7 +7,7 @@ import { RichText } from '@dg/ui/dependent/RichText';
 import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
 import type { SxObject } from '@dg/ui/theme';
 import { CutLetters } from '../collage/CutLetters';
-import collageStyles from '../collage/home.module.css';
+import collageStyles from '../collage/home.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { introImageAlt, PortraitPrint } from '../collage/PortraitPrint';
 import { splitIntroDocument } from '../collage/splitIntroDocument';

@@ -5,7 +5,7 @@ import { type ColorSchemePreference, parseColorSchemePreference } from '@dg/ui/t
 import { useColorScheme } from '@dg/ui/theme/useColorScheme';
 import type { LucideIcon } from 'lucide-react';
 import { Monitor, Moon, Sun } from 'lucide-react';
-import chrome from './chrome.module.css';
+import chrome from './chrome.classes';
 import { PaperCard } from './PaperCard';
 
 const OPTIONS = [

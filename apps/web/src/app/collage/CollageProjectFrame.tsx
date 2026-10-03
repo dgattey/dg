@@ -1,11 +1,11 @@
 import type { RenderableProject } from '@dg/content-models/contentful/renderables/projects';
 import { Image } from '@dg/ui/dependent/Image';
 import type { CSSProperties } from 'react';
-import styles from './home.module.css';
+import styles from './home.classes';
 import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
 import { cx } from './paperVars';
-import printStyles from './print.module.css';
+import printStyles from './print.classes';
 import { type ProjectFrameStyle, projectFrameAspectRatio, projectTagMeta } from './projectSlots';
 
 export type CollageProjectSlot = 'c1' | 'cn' | 'gn' | 'js' | 'li' | 'mg' | 'ws';

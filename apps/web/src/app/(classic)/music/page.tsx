@@ -16,7 +16,7 @@ import { musicDestinationLabel } from '../../layouts/musicHeaderDestinations';
 import { PageTitle } from '../../layouts/PageTitle';
 import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
-import styles from './music.module.css';
+import styles from './music.classes';
 
 const TITLE = musicDestinationLabel(musicRoute);
 

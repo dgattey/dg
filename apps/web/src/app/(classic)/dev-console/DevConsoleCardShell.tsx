@@ -3,7 +3,7 @@ import { Card, CardContent, Stack } from '@mui/material';
 import type { ReactNode } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { DevConsoleCardBoundary } from './DevConsoleCardBoundary';
-import styles from './devConsole.module.css';
+import styles from './devConsole.classes';
 
 export function DevConsoleCardShell({
   children,

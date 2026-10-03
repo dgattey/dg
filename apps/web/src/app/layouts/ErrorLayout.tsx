@@ -14,7 +14,7 @@ import { CutOutSymbols } from '../collage/CutOutSymbols';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
 import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
-import styles from './error.module.css';
+import styles from './error.classes';
 
 type ErrorLayoutProps = {
   /**

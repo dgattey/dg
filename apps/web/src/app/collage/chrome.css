@@ -1,4 +1,4 @@
-.header {
+.chrome__header {
   position: sticky;
   top: 0;
   z-index: 20;
@@ -8,10 +8,10 @@
   padding-top: 20px;
   pointer-events: none;
 }
-.header > * {
+.chrome__header > * {
   pointer-events: auto;
 }
-.logo {
+.chrome__logo {
   display: grid;
   place-items: center;
   font-family: var(--display);
@@ -20,14 +20,14 @@
   line-height: 1;
   letter-spacing: -0.04em;
 }
-.logoInner {
+.chrome__logoInner {
   display: grid;
   place-items: center;
   width: 100%;
   height: 100%;
 }
-.logo button,
-.logo a {
+.chrome__logo button,
+.chrome__logo a {
   padding: 0.4em 0.5em 0.48em;
   font: inherit;
   color: inherit;
@@ -36,54 +36,54 @@
   background: none;
   border: 0;
 }
-.logo a > * {
+.chrome__logo a > * {
   font: inherit;
   letter-spacing: inherit;
 }
-.nowPlaying {
+.chrome__nowPlaying {
   min-width: 0;
   max-width: min(420px, 52vw);
   margin-top: 6px;
 }
-.nowPlayingInner {
+.chrome__nowPlayingInner {
   min-width: 0;
   padding: 7px 14px 7px 7px;
 }
-.spacer {
+.chrome__spacer {
   flex: 1;
 }
-.nav {
+.chrome__nav {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   justify-content: flex-end;
   margin-top: 8px;
 }
-.music {
+.chrome__music {
   position: relative;
 }
-.musicSummary {
+.chrome__musicSummary {
   display: block;
   cursor: pointer;
   list-style: none;
 }
-.musicSummary::-webkit-details-marker {
+.chrome__musicSummary::-webkit-details-marker {
   display: none;
 }
-.musicSummary:focus-visible {
+.chrome__musicSummary:focus-visible {
   outline: none;
 }
-.musicSummary:focus-visible > :global(.paperWrap) {
+.chrome__musicSummary:focus-visible > .paperWrap {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
 }
-.musicChevron {
+.chrome__musicChevron {
   transition: rotate 0.2s ease;
 }
-.music[open] .musicChevron {
+.chrome__music[open] .chrome__musicChevron {
   rotate: 180deg;
 }
-.musicPanel {
+.chrome__musicPanel {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
@@ -91,17 +91,17 @@
   width: max-content;
   min-width: 100%;
 }
-.musicPanelInner {
+.chrome__musicPanelInner {
   padding: 8px;
 }
-.musicList {
+.chrome__musicList {
   display: grid;
   gap: 2px;
   padding: 0;
   margin: 0;
   list-style: none;
 }
-.musicLink {
+.chrome__musicLink {
   display: flex;
   gap: 10px;
   align-items: center;
@@ -115,22 +115,22 @@
   border-radius: 10px;
   transition: background-color 0.2s ease;
 }
-.musicLink:hover {
+.chrome__musicLink:hover {
   background: color-mix(in oklab, var(--on) 10%, transparent);
 }
-.musicList a {
+.chrome__musicList a {
   display: block;
   border-radius: 10px;
 }
-.musicList a:focus-visible {
+.chrome__musicList a:focus-visible {
   outline: 2px solid var(--on);
   outline-offset: -2px;
 }
-[aria-current="page"] > .musicLink {
+[aria-current="page"] > .chrome__musicLink {
   color: light-dark(var(--cream), var(--ink-on-cream));
   background: light-dark(var(--black), var(--ochre));
 }
-.scheme {
+.chrome__scheme {
   display: flex;
   gap: 8px;
   min-width: 0;
@@ -138,12 +138,12 @@
   margin: 0;
   border: 0;
 }
-.schemeTrack {
+.chrome__schemeTrack {
   display: flex;
   gap: 2px;
   padding: 4px;
 }
-.schemeOption {
+.chrome__schemeOption {
   display: grid;
   place-items: center;
   width: 38px;
@@ -155,18 +155,18 @@
     background-color 0.2s ease,
     color 0.2s ease;
 }
-.schemeOption:hover {
+.chrome__schemeOption:hover {
   background: color-mix(in oklab, var(--on) 16%, transparent);
 }
-.schemeOption:has(:checked) {
+.chrome__schemeOption:has(:checked) {
   color: var(--ink-on-cream);
   background: var(--ochre);
 }
-.schemeOption:has(:focus-visible) {
+.chrome__schemeOption:has(:focus-visible) {
   outline: 2px solid var(--on);
   outline-offset: 1px;
 }
-.srOnly {
+.chrome__srOnly {
   position: absolute;
   width: 1px;
   height: 1px;
@@ -177,11 +177,11 @@
   border: 0;
   clip-path: inset(50%);
 }
-.footer {
+.chrome__footer {
   position: relative;
   padding: 0 0 44px;
 }
-.stripInner {
+.chrome__stripInner {
   display: flex;
   flex-wrap: wrap;
   gap: 16px 22px;
@@ -190,21 +190,21 @@
   font-size: 17.5px;
   line-height: 1.45;
 }
-.stripMeta {
+.chrome__stripMeta {
   display: flex;
   flex-wrap: wrap;
   gap: 8px 10px;
   align-items: center;
 }
-.dot {
+.chrome__dot {
   color: var(--soft, color-mix(in oklab, var(--cream) 66%, var(--black)));
 }
-.links {
+.chrome__links {
   display: flex;
   gap: 14px;
   margin-left: auto;
 }
-.links a {
+.chrome__links a {
   display: grid;
   place-items: center;
   width: 30px;
@@ -212,35 +212,35 @@
   color: var(--cream);
   filter: drop-shadow(0 1px 0 rgb(0 0 0 / 0.35));
 }
-.links a:hover {
+.chrome__links a:hover {
   color: var(--ochre);
 }
-.links a svg,
-.links a span {
+.chrome__links a svg,
+.chrome__links a span {
   width: 24px;
   height: 24px;
 }
 
 @media (max-width: 480px) {
-  .header {
+  .chrome__header {
     position: relative;
     flex-wrap: wrap;
     gap: 10px;
     row-gap: 8px;
     padding-top: 14px;
   }
-  .spacer {
+  .chrome__spacer {
     display: none;
   }
-  .logo {
+  .chrome__logo {
     font-size: 24px;
   }
-  .nav {
+  .chrome__nav {
     width: 100%;
   }
 }
 @media (max-width: 320px) {
-  .header {
+  .chrome__header {
     padding-top: 12px;
   }
 }

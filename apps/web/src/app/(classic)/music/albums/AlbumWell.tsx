@@ -14,7 +14,7 @@ import { ALBUM_DETAIL_BACKDROP } from '../../../collage/backdrops';
 import { BackdropLayer } from '../../../collage/CollageBackdrop';
 import { PaperCard } from '../../../collage/PaperCard';
 import { PaperTag } from '../../../collage/PaperTag';
-import styles from '../music.module.css';
+import styles from '../music.classes';
 import {
   ALBUM_WELL_ART_SIZE_XS,
   ALBUM_WELL_NAME_GAP,

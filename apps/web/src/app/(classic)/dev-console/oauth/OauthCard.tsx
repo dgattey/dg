@@ -8,7 +8,7 @@ import { Skeleton, Stack, Typography } from '@mui/material';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
 import { DevConsoleCardShell } from '../DevConsoleCardShell';
-import styles from '../devConsole.module.css';
+import styles from '../devConsole.classes';
 import { ErrorMessage, StatusChip } from '../StatusIndicators';
 import { ConnectButton } from './ConnectButton';
 import { ForceRefreshButton } from './ForceRefreshButton';
