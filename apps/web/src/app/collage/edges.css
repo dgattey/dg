@@ -254,4 +254,24 @@
     6px 14.3%,
     1.6px 7.1%
   );
+  /* The torn edge's bottom alone, for strips that stay straight on top. */
+  --torn-bottom: polygon(
+    0 0,
+    100% 0,
+    100% calc(100% - 5.7px),
+    92.9% calc(100% - 7.3px),
+    85.7% calc(100% - 18.9px),
+    78.6% calc(100% - 13px),
+    71.4% calc(100% - 11.6px),
+    64.3% calc(100% - 7.1px),
+    57.1% calc(100% - 2.9px),
+    50% calc(100% - 18.7px),
+    42.9% calc(100% - 6.8px),
+    35.7% calc(100% - 1.7px),
+    28.6% calc(100% - 14.1px),
+    21.4% calc(100% - 20.6px),
+    14.3% calc(100% - 1.6px),
+    7.1% calc(100% - 12px),
+    0% calc(100% - 10.2px)
+  );
 }

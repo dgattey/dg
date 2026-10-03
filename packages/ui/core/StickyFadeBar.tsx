@@ -1,3 +1,4 @@
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import type { BoxProps } from '@mui/material';
 import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
@@ -120,6 +121,7 @@ const stickyInnerSx: SxObject = {
 
 type StickyFadeBarProps = Omit<BoxProps, 'sx' | 'children'> & {
   children: ReactNode;
+  surface?: SiteSurface;
   sx?: SxObject;
 };
 
@@ -132,10 +134,10 @@ type StickyFadeBarProps = Omit<BoxProps, 'sx' | 'children'> & {
  * The band reserves the perceptible part of the ramp below its children, so
  * children only need their own leading padding.
  */
-export function StickyFadeBar({ children, sx, ...props }: StickyFadeBarProps) {
+export function StickyFadeBar({ children, surface = 'classic', sx, ...props }: StickyFadeBarProps) {
   const mergedSx = sx ? { ...stickyBarSx, ...sx } : stickyBarSx;
   return (
-    <Box {...props} sx={mergedSx}>
+    <Box {...props} data-site-surface={surfaceAttribute(surface)} sx={mergedSx}>
       <Box aria-hidden data-sticky-surface sx={barSurfaceSx} />
       <Box sx={stickyInnerSx}>{children}</Box>
       <Box aria-hidden data-sticky-fade sx={fadeOverlaySx} />
@@ -149,6 +151,18 @@ export function StickyFadeBar({ children, sx, ...props }: StickyFadeBarProps) {
  * would paint the same pixels, and a layer that lives in the page rides that
  * page wherever a navigation takes it.
  */
-export function StickyBarTopMask() {
-  return <Box aria-hidden data-sticky-mask sx={topMaskSx} />;
+export function StickyBarTopMask({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
+  return (
+    <Box
+      aria-hidden
+      data-site-surface={surfaceAttribute(surface)}
+      data-sticky-mask
+      sx={topMaskSx}
+    />
+  );
+}
+
+/** Only collage bars are tagged; classic markup must match the pre-collage site. */
+function surfaceAttribute(surface: SiteSurface) {
+  return surface === 'classic' ? undefined : surface;
 }

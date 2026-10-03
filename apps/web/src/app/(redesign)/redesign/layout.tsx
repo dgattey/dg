@@ -14,7 +14,7 @@ export default function RedesignLayout({ children }: { children: ReactNode }) {
         <Suspense fallback={null}>
           <Header surface="collage" />
         </Suspense>
-        <StickyBarTopMask />
+        <StickyBarTopMask surface="collage" />
         <main className="collageMain">
           <Suspense fallback={null}>
             <PageViewTransition>{children}</PageViewTransition>
