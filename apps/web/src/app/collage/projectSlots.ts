@@ -130,15 +130,6 @@ function fullRow(area: string): string {
   return `"${Array.from({ length: 12 }, () => area).join(' ')}"`;
 }
 
-function evenRow(...areas: Array<string | false>): string {
-  const visible = areas.filter((area): area is string => area !== false);
-  if (visible.length === 0) {
-    return EMPTY_ROW;
-  }
-  const span = 12 / visible.length;
-  return `"${visible.flatMap((area) => Array.from({ length: span }, () => area)).join(' ')}"`;
-}
-
 function gridAreas(rows: readonly [string, string], gap: number) {
   return {
     areas: rows.join(' '),
@@ -146,35 +137,31 @@ function gridAreas(rows: readonly [string, string], gap: number) {
   };
 }
 
-export function workSheetGridAreas(slots: { c1: boolean; sp: boolean; st: boolean; ws: boolean }): {
+export function workSheetGridAreas(slots: { c1: boolean; ws: boolean }): {
   areas: string;
   rowGapPx: number;
 } {
-  const rowOne = slots.c1
-    ? slots.sp
-      ? '"c1 c1 c1 c1 c1 c1 c1 c1 . sp sp sp"'
-      : fullRow('c1')
-    : slots.sp
-      ? fullRow('sp')
-      : EMPTY_ROW;
-  const rowTwo = slots.st
-    ? slots.ws
-      ? '"st st st st . ws ws ws ws ws ws ws"'
-      : fullRow('st')
-    : slots.ws
-      ? fullRow('ws')
-      : EMPTY_ROW;
-  return gridAreas([rowOne, rowTwo], 52);
+  return gridAreas(
+    [
+      slots.c1 ? '"c1 c1 c1 c1 c1 c1 c1 c1 . sp sp sp"' : fullRow('sp'),
+      slots.ws ? '"st st st st . ws ws ws ws ws ws ws"' : fullRow('st'),
+    ],
+    52,
+  );
 }
 
-export function moreWorkGridAreas(slots: {
-  cn: boolean;
-  gn: boolean;
-  js: boolean;
-  mg: boolean;
-  sd: boolean;
-}): { areas: string; rowGapPx: number } {
-  const { cn, gn, js, mg, sd } = slots;
+export function moreWorkGridAreas(slots: { cn: boolean; gn: boolean; js: boolean; mg: boolean }): {
+  areas: string;
+  rowGapPx: number;
+} {
+  const { cn, gn, js, mg } = slots;
+  const rowOne = mg
+    ? cn
+      ? '"mg mg mg mg sd sd sd sd cn cn cn cn"'
+      : '"mg mg mg mg mg mg sd sd sd sd sd sd"'
+    : cn
+      ? '"sd sd sd sd sd sd cn cn cn cn cn cn"'
+      : fullRow('sd');
   const rowTwo = js
     ? gn
       ? '"js js js js gn gn gn gn gn gn gn gn"'
@@ -182,10 +169,7 @@ export function moreWorkGridAreas(slots: {
     : gn
       ? fullRow('gn')
       : EMPTY_ROW;
-  return gridAreas(
-    [evenRow(mg && 'mg', sd && 'sd', cn && 'cn'), rowTwo],
-    56,
-  );
+  return gridAreas([rowOne, rowTwo], 56);
 }
 
 export const MORE_WORK_OVERFLOW_GRID_AREAS =

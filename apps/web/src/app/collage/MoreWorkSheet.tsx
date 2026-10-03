@@ -30,7 +30,6 @@ function MoreWorkGrid({
         gn: byArea.has('gn'),
         js: byArea.has('js'),
         mg: byArea.has('mg'),
-        sd: sites != null,
       });
   const gridStyle: CSSProperties = {
     gridTemplateAreas: grid.areas,
