@@ -21,7 +21,7 @@ export type CutOutPlacement = {
   zIndex: 0 | 1 | 3;
 };
 
-type PlacementRow = readonly [
+export type PlacementRow = readonly [
   id: string,
   shape: CutOutShape,
   color: CutOutColor,
@@ -37,7 +37,7 @@ type PlacementRow = readonly [
   },
 ];
 
-function definePlacements(rows: ReadonlyArray<PlacementRow>): Array<CutOutPlacement> {
+export function definePlacements(rows: ReadonlyArray<PlacementRow>): Array<CutOutPlacement> {
   return rows.map(
     ([id, shape, color, sizePx, rotationDeg, xPercent, yPercent, visibility, zIndex, options]) => {
       const underprint = options?.underprint;
