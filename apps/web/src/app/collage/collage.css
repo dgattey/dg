@@ -106,6 +106,7 @@ html:has(.collageRoot) body {
   background-image: var(--sticky-fade-texture, none);
   background-size: var(--sticky-fade-texture-size, auto);
 }
+/* Unpinned bars cross the page's backdrop, so their lower edge reads as a torn strip. */
 [data-site-surface="collage"] > [data-sticky-surface] {
   clip-path: var(--torn-bottom);
 }
