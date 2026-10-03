@@ -90,6 +90,14 @@ const MORE_WORK_FRAMES = [
   },
 ] satisfies ReadonlyArray<{ gridArea: 'mg' | 'cn' | 'js' | 'gn'; style: ProjectFrameStyle }>;
 
+export const CODA_FRAME_STYLE: ProjectFrameStyle = {
+  edge: 'quad-b',
+  tagClassName: 'tagBottomLeft',
+  tagTiltDeg: 3,
+  tagTone: 'rose',
+  tiltDeg: -1.4,
+};
+
 function framesFor<Area extends string>(
   projects: ReadonlyArray<SlottedProject>,
   definitions: ReadonlyArray<{ gridArea: Area; style: ProjectFrameStyle }>,
