@@ -88,7 +88,7 @@ export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
   }
 
   return (
-    <Section data-sticky-header={true} sx={stickyContainerSx}>
+    <Section sx={stickyContainerSx}>
       <SiteHeaderHeight />
       <Box component="header" data-site-header={true} sx={siteHeaderSx}>
         <Nav sx={navSx}>
