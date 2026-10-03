@@ -72,6 +72,10 @@ const clickSort = async (user: ReturnType<typeof userEvent.setup>, label: string
   await user.click(within(desktopSwitcher).getByRole('radio', { hidden: true, name: label }));
 };
 
+const clickCollageSort = async (user: ReturnType<typeof userEvent.setup>, label: string) => {
+  await user.click(screen.getByRole('button', { name: label }));
+};
+
 /**
  * Lays every element out at 100px per sibling so a cell that changes position
  * in the grid reports a different rect before and after a sort.
@@ -168,7 +172,7 @@ describe('FavoriteAlbumsGrid', () => {
     expect(screen.getAllByAltText('Zebra')).toHaveLength(1);
   });
 
-  it('sorts by each option and returns to recently added', async () => {
+  it('sorts the classic grid by each option and returns to recently added', async () => {
     const user = userEvent.setup();
     render(<FavoriteAlbumsGrid albums={albums} />);
 
@@ -183,6 +187,51 @@ describe('FavoriteAlbumsGrid', () => {
 
     await clickSort(user, 'Recently added');
     expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
+  });
+
+  it('sorts collage cards through paper controls without changing album behavior', async () => {
+    const user = userEvent.setup();
+    render(<FavoriteAlbumsGrid albums={albums} surface="collage" />);
+
+    await clickCollageSort(user, 'Album');
+    expect(renderedAlbumNames()).toEqual(['Apple', 'Mango', 'Zebra']);
+
+    await clickCollageSort(user, 'Artist');
+    expect(renderedAlbumNames()).toEqual(['Zebra', 'Apple', 'Mango']);
+
+    await clickCollageSort(user, 'Release date');
+    expect(renderedAlbumNames()).toEqual(['Apple', 'Mango', 'Zebra']);
+
+    await clickCollageSort(user, 'Recently added');
+    expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
+  });
+
+  it('opens and closes collage wells with the same deep-link semantics', async () => {
+    const user = userEvent.setup();
+    mockUrl('album=album-zebra');
+
+    render(
+      <FavoriteAlbumsGrid albums={albums} surface="collage">
+        <p>zebra tracklist</p>
+      </FavoriteAlbumsGrid>,
+    );
+
+    expect(screen.getByRole('region', { name: 'Zebra details' })).toBeInTheDocument();
+    expect(screen.getByText('zebra tracklist')).toBeInTheDocument();
+    expect(screen.getByText('Alpha')).toBeInTheDocument();
+    const close = screen.getByRole('link', { name: 'Close Zebra' });
+    expect(close).toHaveAttribute('href', '/music/albums');
+    expect(close).toHaveTextContent('×');
+
+    await user.click(close);
+
+    expect(screen.queryByRole('region', { name: 'Zebra details' })).not.toBeInTheDocument();
+    await waitFor(() => {
+      expect(push).toHaveBeenCalledWith(
+        '/music/albums',
+        expect.objectContaining({ transitionTypes: ['album-close'] }),
+      );
+    });
   });
 
   it('opens with a skeleton before navigation, then shows matching streamed detail', async () => {
