@@ -1,0 +1,74 @@
+/* Page backdrops: patterned paper sheets and cut-outs behind page content */
+
+.collageBackdropHost {
+  --backdrop-bleed: 96px;
+  position: relative;
+}
+.collageBackdropHost > :not(.collageBackdrop) {
+  position: relative;
+  z-index: 1;
+}
+.collageBackdrop {
+  position: absolute;
+  top: calc(-1 * var(--backdrop-bleed));
+  bottom: 0;
+  left: 50%;
+  z-index: 0;
+  width: 100vw;
+  margin-left: -50vw;
+  overflow: clip;
+  pointer-events: none;
+}
+.collageBand {
+  position: relative;
+  height: var(--band-h);
+}
+.collageBand:first-child {
+  margin-top: var(--backdrop-bleed);
+}
+.collageBackdrop[data-fill] .collageBand {
+  height: calc(100% - var(--backdrop-bleed));
+}
+
+.collageBackdrop .collageSheet {
+  inset: auto;
+  top: var(--sheet-y);
+  left: var(--sheet-x);
+  width: var(--sheet-w);
+  height: var(--sheet-h);
+  background: var(--sheet-a);
+  rotate: var(--sheet-rotation);
+  scale: none;
+}
+.collageBackdrop .collageSheetEdge-disc,
+.collageBackdrop .collageSheetEdge-pebble {
+  width: min(var(--sheet-size), 60vw);
+  height: auto;
+  aspect-ratio: 1;
+  clip-path: url("#collage-disc-clip");
+}
+.collageBackdrop .collageSheetEdge-pebble {
+  aspect-ratio: 0.82;
+  clip-path: url("#collage-pebble-clip");
+}
+.collageBackdrop .collageSheet-stripes {
+  background: repeating-linear-gradient(-38deg, var(--sheet-a) 0 22px, var(--sheet-b) 22px 34px);
+}
+.collageBackdrop .collageSheet-dots {
+  background:
+    radial-gradient(circle, var(--sheet-b) 0 5px, transparent 5.5px) 0 0 / 26px 26px,
+    var(--sheet-a);
+}
+.collageBackdrop .collageSheet-gingham {
+  --gingham: color-mix(in oklab, var(--sheet-b) 42%, transparent);
+  background:
+    linear-gradient(90deg, var(--gingham) 50%, transparent 0) 0 0 / 40px 40px,
+    linear-gradient(var(--gingham) 50%, transparent 0) 0 0 / 40px 40px,
+    var(--sheet-a);
+}
+
+@media (max-width: 600px) {
+  .collageSheetDesktopOnly {
+    display: none;
+  }
+}

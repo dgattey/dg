@@ -7,6 +7,8 @@ import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Suspense } from 'react';
 import { getFavoriteAlbums } from '../../../../services/albums';
+import { ALBUMS_BACKDROP } from '../../../collage/backdrops';
+import { CollageBackdrop } from '../../../collage/CollageBackdrop';
 import { CutLetters } from '../../../collage/CutLetters';
 import { markdownAlternates } from '../../../layouts/markdownAlternates';
 import { musicDestinationLabel } from '../../../layouts/musicHeaderDestinations';
@@ -67,7 +69,8 @@ export default function FavoriteAlbumsLayout({
 }) {
   if (surface === 'collage') {
     return (
-      <section aria-label={TITLE} className={styles.collageLayout}>
+      <section aria-label={TITLE} className={`collageBackdropHost ${styles.collageLayout}`}>
+        <CollageBackdrop backdrop={ALBUMS_BACKDROP} />
         <CutLetters className={styles.collageTitle} text={TITLE} />
         <Suspense fallback={<FavoriteAlbumsSkeleton surface="collage" />}>
           <AlbumsGrid surface="collage">{children}</AlbumsGrid>
