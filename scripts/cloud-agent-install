@@ -15,6 +15,13 @@ nvm alias default "$NODE_VERSION"
 nvm use "$NODE_VERSION"
 set -u
 
+# Agent shells (and this script, when refreshed from one) get /exec-daemon,
+# with its own older node, prepended to PATH before ~/.bashrc runs, and nvm
+# swaps its bin in place behind it.
+NVM_FIRST='export PATH="${NVM_BIN:+$NVM_BIN:}$PATH"'
+grep -qxF "$NVM_FIRST" "${HOME}/.bashrc" || echo "$NVM_FIRST" >>"${HOME}/.bashrc"
+eval "$NVM_FIRST"
+
 corepack enable pnpm
 PNPM_VERSION="$(node -p "require('${ROOT_DIR}/package.json').packageManager.match(/pnpm@([^+]+)/)[1]")"
 COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare "pnpm@${PNPM_VERSION}" --activate
