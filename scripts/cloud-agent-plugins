@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Links the dyl-stack, pstack and cursor-team-kit skills and subagents from
 # cursor/plugins into ~/.cursor. Cloud Agents don't reliably get marketplace
-# plugin skills, so .cursor/environment.json runs this on install.
+# plugin skills, so scripts/cloud-agent-install runs this.
 set -euo pipefail
 
 PLUGINS=(dyl-stack pstack cursor-team-kit)
