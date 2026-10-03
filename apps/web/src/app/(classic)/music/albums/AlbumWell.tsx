@@ -278,7 +278,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
         {isCollage ? (
           <PaperCard
             className={styles.wellCard}
-            edge="torn-c"
+            edge="soft-a"
             innerClassName={styles.wellInner}
             tiltDeg={-0.7}
             tone="viridian"

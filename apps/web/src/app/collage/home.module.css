@@ -198,6 +198,7 @@
   display: block;
   aspect-ratio: var(--ar);
   overflow: clip;
+  border-radius: 8px;
 }
 .tagTopLeft {
   top: -12px;

@@ -95,7 +95,7 @@ export function StravaCard({ activity, surface = 'classic' }: StravaCardProps) {
   if (surface === 'collage') {
     return (
       <div className={styles.strava} data-slot="st" style={{ gridArea: 'st' }}>
-        <PaperCard edge="torn-b" innerClassName={styles.stravaInner} tiltDeg={1.2} tone="olive">
+        <PaperCard edge="soft-b" innerClassName={styles.stravaInner} tiltDeg={1.2} tone="olive">
           {encodedPolyline ? (
             <span aria-hidden="true" className={styles.stravaRoute}>
               <StravaRouteMap encodedPolyline={encodedPolyline} surface="collage" />

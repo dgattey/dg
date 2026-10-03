@@ -107,7 +107,7 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
               <h2 className={styles.dateHeading}>
                 <PaperTag
                   className={styles.dateTag}
-                  edge="torn-b"
+                  edge="soft-b"
                   tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
                   tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
                 >
