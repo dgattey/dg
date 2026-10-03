@@ -105,29 +105,6 @@ const fadeOverlaySx: SxObject = {
   zIndex: 0,
 };
 
-/** Collage bars are torn from the page's own paper, so they carry its grain and drop the fade. */
-const collagePaperSx: SxObject = {
-  backgroundColor: 'var(--paper)',
-  backgroundImage: 'var(--sticky-fade-texture, none)',
-  backgroundSize: 'var(--sticky-fade-texture-size, auto)',
-};
-
-/** Unpinned bars cross the page's backdrop, so their lower edge reads as a torn strip. */
-const collageBarSx: SxObject = {
-  ...barSurfaceSx,
-  ...collagePaperSx,
-  clipPath: 'var(--torn-bottom)',
-};
-
-const surfaceLayerSx = {
-  classic: { bar: barSurfaceSx, fade: fadeOverlaySx, mask: topMaskSx },
-  collage: {
-    bar: collageBarSx,
-    fade: { ...fadeOverlaySx, background: 'none' },
-    mask: { ...topMaskSx, ...collagePaperSx },
-  },
-} satisfies Record<SiteSurface, Record<'bar' | 'fade' | 'mask', SxObject>>;
-
 const stickyBarSx: SxObject = {
   /* Room for the perceptible part of the ramp; its transparent tail overlaps. */
   paddingBlockEnd: FADE_RESERVE,
@@ -159,12 +136,11 @@ type StickyFadeBarProps = Omit<BoxProps, 'sx' | 'children'> & {
  */
 export function StickyFadeBar({ children, surface = 'classic', sx, ...props }: StickyFadeBarProps) {
   const mergedSx = sx ? { ...stickyBarSx, ...sx } : stickyBarSx;
-  const layers = surfaceLayerSx[surface];
   return (
     <Box {...props} data-site-surface={surfaceAttribute(surface)} sx={mergedSx}>
-      <Box aria-hidden data-sticky-surface sx={layers.bar} />
+      <Box aria-hidden data-sticky-surface sx={barSurfaceSx} />
       <Box sx={stickyInnerSx}>{children}</Box>
-      <Box aria-hidden data-sticky-fade sx={layers.fade} />
+      <Box aria-hidden data-sticky-fade sx={fadeOverlaySx} />
     </Box>
   );
 }
@@ -181,7 +157,7 @@ export function StickyBarTopMask({ surface = 'classic' }: { surface?: SiteSurfac
       aria-hidden
       data-site-surface={surfaceAttribute(surface)}
       data-sticky-mask
-      sx={surfaceLayerSx[surface].mask}
+      sx={topMaskSx}
     />
   );
 }

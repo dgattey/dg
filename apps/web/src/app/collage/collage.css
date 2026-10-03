@@ -99,6 +99,20 @@ html:has(.collageRoot) body {
   clip-path: var(--torn-c);
 }
 
+/* Sticky bars are torn from the page's own paper, so they carry its grain and drop the fade. */
+[data-site-surface="collage"] > [data-sticky-surface],
+[data-site-surface="collage"][data-sticky-mask] {
+  background-color: var(--paper);
+  background-image: var(--sticky-fade-texture, none);
+  background-size: var(--sticky-fade-texture-size, auto);
+}
+[data-site-surface="collage"] > [data-sticky-surface] {
+  clip-path: var(--torn-bottom);
+}
+[data-site-surface="collage"] > [data-sticky-fade] {
+  background: none;
+}
+
 @media (max-width: 480px) {
   .collageRoot {
     --site-header-height: 0px;
