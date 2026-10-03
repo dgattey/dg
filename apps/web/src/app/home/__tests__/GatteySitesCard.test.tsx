@@ -65,6 +65,7 @@ describe('GatteySitesCard', () => {
   it('marks each project icon so row hover can scale it', () => {
     const { container } = render(<GatteySitesCard projects={projects} />);
 
+    // The hover/focus pop is wired to this attribute from the row's sx.
     expect(container.querySelectorAll('[data-role="side-project-mark"]')).toHaveLength(2);
   });
 
