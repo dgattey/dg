@@ -77,11 +77,10 @@
     margin: 26px 0 0;
   }
 
-  .backdrop {
-    --cut-max-size: 140vw;
-    --cut-rotation: -12deg;
-    --cut-size: 140vw;
-    --cut-x: -24%;
-    --cut-y: -28%;
+  .portrait .backdrop {
+    top: 8%;
+    left: 26%;
+    width: min(100vw, 420px);
+    rotate: -12deg;
   }
 }
