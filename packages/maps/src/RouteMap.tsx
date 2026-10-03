@@ -131,14 +131,14 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
       return;
     }
 
-    const updateSize = () => {
-      const { offsetHeight: height, offsetWidth: width } = element;
-      if (height > 0 && width > 0) {
-        setSize({ height, width });
+    // borderBoxSize ignores ancestor transforms (rotated collage cards) but keeps
+    // fractional pixels, unlike getBoundingClientRect or offsetWidth.
+    const observer = new ResizeObserver(([entry]) => {
+      const box = entry?.borderBoxSize[0];
+      if (box && box.blockSize > 0 && box.inlineSize > 0) {
+        setSize({ height: box.blockSize, width: box.inlineSize });
       }
-    };
-    updateSize();
-    const observer = new ResizeObserver(updateSize);
+    });
     observer.observe(element);
     return () => observer.disconnect();
   }, []);
