@@ -52,15 +52,14 @@ export async function fetchCurrentLocation(): Promise<MapLocation | null> {
   const point = location?.point;
   const latitude = point?.latitude;
   const longitude = point?.longitude;
-  const title = location?.title?.trim();
-  if (!location || !title || latitude == null || longitude == null) {
+  if (!location || latitude == null || longitude == null) {
     return null;
   }
   return {
     image: toRenderableAsset(location.image),
     initialZoom: location.initialZoom,
     point: { latitude, longitude },
-    title,
+    title: location.title,
     zoomLevels:
       location.zoomLevels
         ?.filter(isNotNullish)
