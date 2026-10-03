@@ -1,9 +1,8 @@
 import { Typography } from '@mui/material';
 import type { ReactNode } from 'react';
+import { DEV_CONSOLE_BACKDROP } from '../../collage/backdrops';
+import { CollageBackdrop } from '../../collage/CollageBackdrop';
 import { CutLetters } from '../../collage/CutLetters';
-import { CutOut } from '../../collage/CutOut';
-import { CutOutSymbols } from '../../collage/CutOutSymbols';
-import { CUT_OUT_PLACEMENTS } from '../../collage/cutOutPlacements';
 import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
 import type { PaperTone } from '../../collage/types';
@@ -41,11 +40,8 @@ export function CollageConsole({
   searchParams?: Promise<Record<string, string | Array<string> | undefined>>;
 }) {
   return (
-    <main className={`collageBleed ${styles.sheet}`}>
-      <CutOutSymbols />
-      {CUT_OUT_PLACEMENTS.devConsole.map((placement) => (
-        <CutOut key={placement.id} placement={placement} />
-      ))}
+    <main className={`collageBleed collageBackdropHost ${styles.sheet}`}>
+      <CollageBackdrop backdrop={DEV_CONSOLE_BACKDROP} />
       <div className={`collageMeasure ${styles.grid}`}>
         <div className={styles.header}>
           <CutLetters className={`collagePageTitle ${styles.title}`} text="Dev console" />
