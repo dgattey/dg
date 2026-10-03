@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Cloud Agent install: pins Node and pnpm, installs deps.
+# The snapshot's nvm defaults to an older Node, so this makes .node-version the
+# nvm default for later agent shells and uses it for pnpm install here.
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+NODE_VERSION="$(cat "${ROOT_DIR}/.node-version")"
+
+set +u
+# shellcheck source=/dev/null
+. "${NVM_DIR:-${HOME}/.nvm}/nvm.sh"
+nvm install "$NODE_VERSION"
+nvm alias default "$NODE_VERSION"
+nvm use "$NODE_VERSION"
+set -u
+
+# Agent shells (and this script, when refreshed from one) get /exec-daemon,
+# with its own older node, prepended to PATH before ~/.bashrc runs, and nvm
+# swaps its bin in place behind it.
+NVM_FIRST='export PATH="${NVM_BIN:+$NVM_BIN:}$PATH"'
+grep -qxF "$NVM_FIRST" "${HOME}/.bashrc" || echo "$NVM_FIRST" >>"${HOME}/.bashrc"
+eval "$NVM_FIRST"
+
+corepack enable pnpm
+PNPM_VERSION="$(node -p "require('${ROOT_DIR}/package.json').packageManager.match(/pnpm@([^+]+)/)[1]")"
+COREPACK_ENABLE_DOWNLOAD_PROMPT=0 corepack prepare "pnpm@${PNPM_VERSION}" --activate
+echo "Using Node $(node -v) and pnpm $(pnpm -v)"
+
+cd "$ROOT_DIR"
+pnpm install
