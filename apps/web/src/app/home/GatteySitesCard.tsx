@@ -49,6 +49,7 @@ const projectListSx: SxObject = {
   '& > li + li': {
     borderTop: '1px solid var(--mui-palette-card-border)',
   },
+  // Hide the shared divider when either adjacent row is hovered.
   '& > li:hover': {
     borderTopColor: 'transparent',
   },
@@ -141,6 +142,9 @@ function ClassicGatteySitesCard({ projects }: { projects: ReadonlyArray<Renderab
   );
 }
 
+/**
+ * Mid-grid collection of independently linked side projects.
+ */
 export function GatteySitesCard({ projects, surface = 'classic' }: GatteySitesCardProps) {
   if (projects.length === 0) {
     return null;
