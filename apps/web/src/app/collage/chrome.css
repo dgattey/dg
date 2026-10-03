@@ -73,10 +73,6 @@
 .chrome__musicSummary:focus-visible {
   outline: none;
 }
-.chrome__musicSummary:focus-visible > .paperWrap {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
-}
 .chrome__musicChevron {
   transition: rotate 0.2s ease;
 }
