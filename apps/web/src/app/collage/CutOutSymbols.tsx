@@ -4,9 +4,6 @@ import { CUT_OUT_SHAPE_NAMES, CUT_OUT_SHAPES, cutOutSymbolId } from './cutOutSha
 export const COLLAGE_PEBBLE_CLIP_ID = 'collage-pebble-clip';
 export const COLLAGE_DISC_CLIP_ID = 'collage-disc-clip';
 export const COLLAGE_ROUGH_FILTER_ID = 'collage-rough';
-export const COLLAGE_DUO_FILTER_ID = 'collage-duo';
-
-const DUO_TABLE = '0 .08 .16 .26 .38 .52 .68 .85 1';
 
 export function CutOutSymbols() {
   return (
@@ -33,14 +30,6 @@ export function CutOutSymbols() {
             xChannelSelector="R"
             yChannelSelector="G"
           />
-        </filter>
-        <filter colorInterpolationFilters="sRGB" id={COLLAGE_DUO_FILTER_ID}>
-          <feColorMatrix type="saturate" values="0" />
-          <feComponentTransfer>
-            <feFuncR tableValues={DUO_TABLE} type="table" />
-            <feFuncG tableValues={DUO_TABLE} type="table" />
-            <feFuncB tableValues={DUO_TABLE} type="table" />
-          </feComponentTransfer>
         </filter>
       </defs>
       {CUT_OUT_SHAPE_NAMES.map((shape) => (

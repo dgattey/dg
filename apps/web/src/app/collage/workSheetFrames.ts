@@ -5,7 +5,6 @@ export type ProjectFrameAspect = 'square' | 'tall' | 'wide';
 
 export type ProjectFrameStyle = {
   edge: PaperEdge;
-  printTone: string;
   tagClassName: 'tagBottomRight' | 'tagTopLeft';
   tagTiltDeg: number;
   tagTone: PaperTone;
@@ -21,7 +20,6 @@ export type WorkSheetFrame = {
 const WORK_FRAME_STYLES: ReadonlyArray<ProjectFrameStyle> = [
   {
     edge: 'quad-a',
-    printTone: 'var(--ink-on-cream)',
     tagClassName: 'tagTopLeft',
     tagTiltDeg: -3,
     tagTone: 'ochre',
@@ -29,7 +27,6 @@ const WORK_FRAME_STYLES: ReadonlyArray<ProjectFrameStyle> = [
   },
   {
     edge: 'quad-d',
-    printTone: 'var(--viridian)',
     tagClassName: 'tagBottomRight',
     tagTiltDeg: 2,
     tagTone: 'cream',
