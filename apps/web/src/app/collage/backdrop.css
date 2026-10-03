@@ -1,5 +1,24 @@
 /* Page backdrops: patterned paper sheets and cut-outs behind page content */
 
+/*
+ * Cream stars cut through a sheet, like a star chart held up to light: the site's star4
+ * and star5 cutouts on coprime tiles, so the field never reads as a grid. The largest
+ * stars are the rarest and brightest.
+ */
+.collageSheet-starfield::before {
+  position: absolute;
+  inset: 0;
+  content: "";
+  background: var(--cream);
+  mask:
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='409' height='373'><symbol id='b' viewBox='0 0 400 400'><path d='M34 146 125 235 92 384 198 292 316 373 273 231 367 148 239 159 226 16 155 166z'/></symbol><symbol id='a' viewBox='0 0 400 400'><path d='M78 193 166 234 204 385 236 235 324 196 236 165 196 14 170 153z'/></symbol><use href='%23b' x='90.3' y='44.1' width='9' height='9'/><use href='%23a' x='50.7' y='308.9' width='10' height='10' transform='rotate(-11 55.7 313.9)'/><use href='%23b' x='165.4' y='161.1' width='6.5' height='6.5' opacity='0.9'/><use href='%23a' x='382.1' y='80.5' width='7' height='7' opacity='0.9' transform='rotate(22 385.6 84)'/><use href='%23b' x='305.1' y='68.5' width='6' height='6' opacity='0.9'/><use href='%23a' x='379.6' y='186.3' width='5.5' height='5.5' opacity='0.8' transform='rotate(9 382.3 189.1)'/><use href='%23b' x='213.8' y='82.2' width='5' height='5' opacity='0.8' transform='rotate(-27 216.3 84.7)'/><use href='%23a' x='45.4' y='129.8' width='5' height='5' opacity='0.7'/><use href='%23b' x='358.9' y='344.6' width='5.5' height='5.5' opacity='0.7'/><use href='%23a' x='322.7' y='266.9' width='5' height='5' opacity='0.6' transform='rotate(9 325.2 269.4)'/></svg>")
+    0px 0px / 409px 373px,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='293' height='271'><symbol id='b' viewBox='0 0 400 400'><path d='M34 146 125 235 92 384 198 292 316 373 273 231 367 148 239 159 226 16 155 166z'/></symbol><symbol id='a' viewBox='0 0 400 400'><path d='M78 193 166 234 204 385 236 235 324 196 236 165 196 14 170 153z'/></symbol><use href='%23b' x='257.6' y='82.5' width='8' height='8' transform='rotate(-27 261.6 86.5)'/><use href='%23a' x='228' y='253.9' width='6.5' height='6.5' opacity='0.9' transform='rotate(-11 231.3 257.2)'/><use href='%23b' x='44.1' y='12.8' width='5.5' height='5.5' opacity='0.8' transform='rotate(22 46.9 15.6)'/><use href='%23a' x='33' y='121.5' width='5' height='5' opacity='0.75'/><use href='%23b' x='141.5' y='221.6' width='5' height='5' opacity='0.75' transform='rotate(22 144 224.1)'/><use href='%23a' x='159.5' y='135.5' width='5.5' height='5.5' opacity='0.7' transform='rotate(-11 162.2 138.2)'/><use href='%23b' x='77.2' y='173.4' width='5' height='5' opacity='0.65'/><use href='%23a' x='282.4' y='221.5' width='5' height='5' opacity='0.6'/></svg>")
+    61px 37px / 293px 271px,
+    url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='211' height='197'><symbol id='a' viewBox='0 0 400 400'><path d='M78 193 166 234 204 385 236 235 324 196 236 165 196 14 170 153z'/></symbol><symbol id='b' viewBox='0 0 400 400'><path d='M34 146 125 235 92 384 198 292 316 373 273 231 367 148 239 159 226 16 155 166z'/></symbol><use href='%23a' x='137.9' y='64' width='5' height='5' opacity='0.65'/><use href='%23b' x='175.9' y='186.3' width='5' height='5' opacity='0.6' transform='rotate(9 178.4 188.8)'/><use href='%23a' x='45.3' y='72.7' width='5.5' height='5.5' opacity='0.7' transform='rotate(-11 48 75.4)'/><use href='%23b' x='36.7' y='167' width='5.5' height='5.5' opacity='0.6'/><use href='%23a' x='102.4' y='5.7' width='5' height='5' opacity='0.55' transform='rotate(9 104.9 8.2)'/></svg>")
+    23px 89px / 211px 197px;
+}
+
 .collageBackdropHost {
   --backdrop-bleed: 96px;
   position: relative;

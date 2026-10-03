@@ -1,7 +1,15 @@
 import { type CutOutPlacement, definePlacements, type PlacementRow } from './cutOutPlacements';
 import type { PaperTone } from './types';
 
-type SheetPattern = 'checker' | 'dots' | 'gingham' | 'grid' | 'ruled' | 'solid' | 'stripes';
+type SheetPattern =
+  | 'checker'
+  | 'dots'
+  | 'gingham'
+  | 'grid'
+  | 'ruled'
+  | 'solid'
+  | 'starfield'
+  | 'stripes';
 type SheetVisibility = 'all' | 'desktop';
 
 type SheetBase = {
@@ -156,7 +164,7 @@ export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
       ['history-heart', 'heart', 'rose', 80, -12, 92, 88, 'all', 1],
     ],
     sheets: [
-      ['history-record', 'disc', 'solid', 'ultramarine', 74, 1, 300, 0, 'desktop'],
+      ['history-record', 'disc', 'starfield', 'ultramarine', 74, 1, 300, 0, 'desktop'],
       ['history-record-label', 'disc', 'solid', 'chartreuse', 69, 14, 130, 0, 'desktop'],
       ['history-ledger', 'torn', 'ruled', ['cerulean', 'cream'], -6, 40, 24, 560, -3, 'all'],
     ],

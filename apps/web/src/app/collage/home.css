@@ -83,12 +83,19 @@
   color: var(--cream);
 }
 .home__workField {
+  background: var(--ultramarine);
+}
+/* The cobalt squares lie over the stars, so only the ultramarine squares show them. */
+.home__workField::after {
+  position: absolute;
+  inset: 0;
+  content: "";
   background:
     conic-gradient(
       from 90deg at 50% 50%,
-      var(--ultramarine) 25%,
+      transparent 25%,
       var(--cobalt) 0 50%,
-      var(--ultramarine) 0 75%,
+      transparent 0 75%,
       var(--cobalt) 0
     )
     -150px -70px / calc(var(--cw) * 2) calc(var(--ch) * 2);
