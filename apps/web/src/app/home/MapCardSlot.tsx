@@ -24,7 +24,7 @@ export async function MapCardSlot({ surface = 'classic' }: { surface?: SiteSurfa
     <div className={styles.map}>
       <PaperCard
         className={styles.mapPaper}
-        edge="torn-a"
+        edge="soft-a"
         innerClassName={styles.mapInner}
         tiltDeg={1.6}
         tone="cream"

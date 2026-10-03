@@ -20,8 +20,8 @@ export const PAPER_EDGES = [
   'quad-b',
   'quad-c',
   'quad-d',
-  'torn-a',
-  'torn-b',
+  'soft-a',
+  'soft-b',
   'torn-c',
 ] as const;
 

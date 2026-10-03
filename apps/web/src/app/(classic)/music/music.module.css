@@ -100,7 +100,9 @@
   width: 100%;
   aspect-ratio: 1;
   margin-bottom: 7px;
+  overflow: clip;
   line-height: 0;
+  border-radius: 8px;
   rotate: 1.5deg;
 }
 .fullColorArt,

@@ -163,7 +163,7 @@ export function CollageHistorySkeleton() {
           <StickyFadeBar className={styles.dateBar} surface="collage">
             <PaperTag
               className={styles.dateTag}
-              edge="torn-b"
+              edge="soft-b"
               tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
               tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
             >

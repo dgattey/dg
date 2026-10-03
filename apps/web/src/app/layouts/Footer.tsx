@@ -122,7 +122,7 @@ export async function Footer({ surface = 'classic' }: { surface?: SiteSurface } 
   if (surface === 'collage') {
     return (
       <footer className={chrome.footer}>
-        <PaperCard className="collageMeasure" edge="torn-b" tiltDeg={-0.5} tone="black">
+        <PaperCard className="collageMeasure" edge="soft-b" tiltDeg={-0.5} tone="black">
           <div className={chrome.stripInner}>
             <div className={chrome.stripMeta}>
               <span>© {currentYear} Dylan Gattey</span>
