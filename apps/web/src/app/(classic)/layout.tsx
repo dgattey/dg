@@ -2,7 +2,7 @@ import { Section } from '@dg/ui/core/Section';
 import { StickyBarTopMask } from '@dg/ui/core/StickyFadeBar';
 import type { SxObject } from '@dg/ui/theme';
 import Container from '@mui/material/Container';
-import { type ReactNode, Suspense } from 'react';
+import type { ReactNode } from 'react';
 import { Footer } from '../layouts/Footer';
 import { Header } from '../layouts/Header';
 import { PageScrollProvider } from '../layouts/PageScrollContext';
@@ -15,16 +15,12 @@ const mainSectionSx: SxObject = {
 export default function ClassicLayout({ children }: { children: ReactNode }) {
   return (
     <PageScrollProvider>
-      <Suspense fallback={null}>
-        <Header />
-      </Suspense>
+      <Header />
       <StickyBarTopMask />
       <Section sx={mainSectionSx}>
         <Container>
           <main>
-            <Suspense fallback={null}>
-              <PageViewTransition>{children}</PageViewTransition>
-            </Suspense>
+            <PageViewTransition>{children}</PageViewTransition>
           </main>
         </Container>
       </Section>
