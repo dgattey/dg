@@ -35,10 +35,7 @@ export function CollageProjectFrame({
 }: CollageProjectFrameProps) {
   const meta = projectTagMeta(project);
   const aspectRatio = projectFrameAspectRatio(project.layout);
-  const printStyle = {
-    '--ar': String(aspectRatio),
-    '--d': style.printTone,
-  } as CSSProperties;
+  const printStyle = { '--ar': String(aspectRatio) } as CSSProperties;
   const href = project.link?.url;
   const tag = (
     <PaperTag
@@ -63,7 +60,6 @@ export function CollageProjectFrame({
       <span className={styles.shot} style={printStyle}>
         <Print
           alt={project.title}
-          className={styles.print}
           image={{
             height: project.thumbnail.height,
             title: project.title,
@@ -72,7 +68,6 @@ export function CollageProjectFrame({
           }}
           quality={60}
           sizes={PROJECT_SIZES}
-          treatment="project"
         />
       </span>
     </PaperCard>
