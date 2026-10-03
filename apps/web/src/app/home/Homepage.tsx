@@ -7,7 +7,7 @@ import { CutOutSymbols } from '../collage/CutOutSymbols';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
 import styles from '../collage/HelloSheet.module.css';
 import { MoreWorkSheet } from '../collage/MoreWorkSheet';
-import { assignProjectSlots, type ProjectFrameStyle } from '../collage/projectSlots';
+import { assignProjectSlots, CODA_FRAME_STYLE } from '../collage/projectSlots';
 import { WorkSheet } from '../collage/WorkSheet';
 import { GatteySitesCardSlot } from './GatteySitesCardSlot';
 import { IntroCardSlot } from './IntroCardSlot';
@@ -30,14 +30,6 @@ function mergeCards(
     (_, i) => preciselyPlacedCards.get(i) ?? projectsIterator.next().value,
   );
 }
-
-const CODA_FRAME_STYLE: ProjectFrameStyle = {
-  edge: 'quad-b',
-  tagClassName: 'tagBottomLeft',
-  tagTiltDeg: 3,
-  tagTone: 'rose',
-  tiltDeg: -1.4,
-};
 
 /**
  * Puts all projects into a grid using `projects` data,
