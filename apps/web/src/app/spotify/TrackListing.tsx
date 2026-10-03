@@ -1,9 +1,11 @@
 import type { Track } from '@dg/content-models/spotify/Track';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Card, Stack } from '@mui/material';
+import { CollageSpotifyCard } from '../collage/CollageSpotifyCard';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
 import { AlbumImage } from './AlbumImage';
 import { ArtistList } from './ArtistList';
@@ -32,6 +34,8 @@ type TrackListingProps = {
 
   /** Control animation independently of playback state (e.g. pause when off-screen). Defaults to true. */
   shouldAnimate?: boolean;
+
+  surface?: SiteSurface;
 };
 
 // ---------------------------------------------------------------------------
@@ -250,7 +254,12 @@ export function TrackListing({
   variant = 'card',
   disableLinks,
   shouldAnimate = true,
+  surface = 'classic',
 }: TrackListingProps) {
+  if (surface === 'collage') {
+    return <CollageSpotifyCard track={track} />;
+  }
+
   const colors = getContrastingColors(track);
 
   if (variant === 'compact') {

@@ -6,6 +6,7 @@ import { cutOutSymbolId } from './cutOutShapes';
 type CutOutStyle = CSSProperties & {
   '--cut-color': string;
   '--cut-rotation': string;
+  '--cut-scale-x': number;
   '--cut-size': string;
   '--cut-x': string;
   '--cut-y': string;
@@ -35,6 +36,7 @@ export function CutOut({ className, placement }: CutOutProps) {
   const style: CutOutStyle = {
     '--cut-color': `var(--${placement.color})`,
     '--cut-rotation': `${placement.rotationDeg}deg`,
+    '--cut-scale-x': placement.mirrored === true ? -1 : 1,
     '--cut-size': `${placement.sizePx}px`,
     '--cut-x': `${placement.xPercent}%`,
     '--cut-y': `${placement.yPercent}%`,
