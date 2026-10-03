@@ -3,6 +3,9 @@ import { Chip, Typography } from '@mui/material';
 import { PaperTag } from '../../collage/PaperTag';
 import styles from './devConsole.classes';
 
+/**
+ * Status chip showing connected/not connected state.
+ */
 export function StatusChip({
   isConnected,
   surface = 'classic',
@@ -30,6 +33,9 @@ export function StatusChip({
   );
 }
 
+/**
+ * Displays an error message.
+ */
 export function ErrorMessage({
   message,
   surface = 'classic',

@@ -13,6 +13,10 @@ type Props = {
   tracks: Array<HistoryTrack>;
 };
 
+/**
+ * Grid of music track thumbnails with responsive columns. Consecutive plays
+ * from one album collapse into a single stacked cell.
+ */
 export function MusicGrid({ surface = 'classic', tracks }: Props) {
   const runs = groupAdjacentAlbumPlays(tracks);
 

@@ -48,6 +48,10 @@ type TrackListingProps = {
   surface?: SiteSurface;
 };
 
+// ---------------------------------------------------------------------------
+// Card variant
+// ---------------------------------------------------------------------------
+
 const cardLayoutSx: SxObject = {
   flex: 1,
   gap: 1,
@@ -125,6 +129,10 @@ function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) 
     </Stack>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Compact variant
+// ---------------------------------------------------------------------------
 
 const COMPACT_HOVER_SIZE = 84;
 const COMPACT_HOVER_SCALE = COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE;
@@ -258,6 +266,10 @@ function CompactLayout({
     </Box>
   );
 }
+
+// ---------------------------------------------------------------------------
+// Main component
+// ---------------------------------------------------------------------------
 
 /**
  * Unified track display component. Colors are computed once from the track's
