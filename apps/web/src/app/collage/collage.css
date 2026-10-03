@@ -47,8 +47,6 @@ html:has(.collageRoot) body {
   --pad: clamp(16px, 4vw, 80px);
   --measure: 1280px;
   --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.2)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.12));
-  --sticky-fade-texture: url("./img/grain.png");
-  --sticky-fade-texture-size: 200px 200px;
   --display: var(--font-familjen), "Avenir Next", "Helvetica Neue", system-ui, sans-serif;
   --body:
     system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, Cantarell,
@@ -116,12 +114,13 @@ html[data-color-scheme="dark"] .collageRoot::after {
   clip-path: var(--torn-c);
 }
 
-/* Sticky bars are torn from the page's own paper, so they carry its grain and drop the fade. */
+/*
+ * Sticky bars are torn from the page's own paper, so they drop the fade. The
+ * page's grain overlay paints above them, so they carry no texture of their own.
+ */
 [data-site-surface="collage"] > [data-sticky-surface],
 [data-site-surface="collage"][data-sticky-mask] {
   background-color: var(--paper);
-  background-image: var(--sticky-fade-texture, none);
-  background-size: var(--sticky-fade-texture-size, auto);
 }
 /* Unpinned bars cross the page's backdrop, so their lower edge reads as a torn strip. */
 [data-site-surface="collage"] > [data-sticky-surface] {
