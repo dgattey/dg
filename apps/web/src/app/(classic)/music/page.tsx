@@ -8,6 +8,8 @@ import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
 import { getMusicHistory } from '../../../services/music';
+import { HISTORY_BACKDROP } from '../../collage/backdrops';
+import { CollageBackdrop } from '../../collage/CollageBackdrop';
 import { CutLetters } from '../../collage/CutLetters';
 import { markdownAlternates } from '../../layouts/markdownAlternates';
 import { musicDestinationLabel } from '../../layouts/musicHeaderDestinations';
@@ -62,7 +64,8 @@ async function MusicHistory({ surface = 'classic' }: { surface?: SiteSurface } =
 export default function MusicPage({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
   if (surface === 'collage') {
     return (
-      <section aria-label={TITLE} className={styles.collageLayout}>
+      <section aria-label={TITLE} className={`collageBackdropHost ${styles.collageLayout}`}>
+        <CollageBackdrop backdrop={HISTORY_BACKDROP} />
         <CutLetters className={styles.collageTitle} text={TITLE} />
         <Suspense fallback={<MusicHistorySkeleton surface="collage" />}>
           <MusicHistory surface="collage" />
