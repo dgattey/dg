@@ -8,12 +8,14 @@ import {
 } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Container, Divider, Stack, Typography } from '@mui/material';
+import { Box, Container, Divider, Stack } from '@mui/material';
 import { cacheLife } from 'next/cache';
-import { Suspense } from 'react';
-import { interactiveRedesign } from '../../flags';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
+import chrome from '../collage/chrome.module.css';
+import { PaperCard } from '../collage/PaperCard';
+import { PaperTag } from '../collage/PaperTag';
+import type { SiteSurface } from '../collage/types';
 import { FOOTER_ICON_DESKTOP_FONT_SIZE, FOOTER_ICON_FONT_SIZE } from './footerIconSize';
 
 const navItemNoPaddingSx: SxObject = {
@@ -83,13 +85,27 @@ function FooterLink({ link }: { link: RenderableLink }) {
         href={url}
         icon={icon ?? undefined}
         isExternal={url.startsWith('http')}
-        layout="icon" // the ones that have no icon will resolve to just text
+        layout="icon"
         sx={getFooterLinkSx(Boolean(icon))}
         title={title}
         tooltipPlacement="top"
         variant="caption"
       />
     </NavItem>
+  );
+}
+
+function CollageFooterLink({ link }: { link: RenderableLink }) {
+  const { title, url, icon } = link;
+  return (
+    <Link
+      href={url}
+      icon={icon ?? undefined}
+      isExternal={url.startsWith('http')}
+      layout="icon"
+      title={title}
+      tooltipPlacement="top"
+    />
   );
 }
 
@@ -104,29 +120,9 @@ async function getCopyrightYear() {
 }
 
 /**
- * Quiet footer badge when the interactive-redesign flag is on.
- * Wrapped in Suspense because flag evaluation reads request-time data.
- */
-export async function RedesignBadge() {
-  if (!(await interactiveRedesign())) {
-    return null;
-  }
-  return (
-    <>
-      <NavItem sx={navItemNoPaddingSx}>•</NavItem>
-      <NavItem>
-        <Typography color="text.secondary" component="span" variant="caption">
-          redesign on
-        </Typography>
-      </NavItem>
-    </>
-  );
-}
-
-/**
  * Creates the site footer component - shows version data + copyright
  */
-export async function Footer() {
+export async function Footer({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
   const [footerLinks, versionInfo, currentYear] = await Promise.all([
     getFooterLinks(),
     getAppVersionInfo(),
@@ -136,6 +132,57 @@ export async function Footer() {
   const iconFooterLinks = footerLinks.filter((link) => link.icon);
   const releaseUrl = versionInfo.releaseUrl;
   const version = versionInfo.version;
+
+  if (surface === 'collage') {
+    return (
+      <footer className={chrome.footer}>
+        <PaperCard className={chrome.strip} edge="torn-b" tiltDeg={-0.5} tone="black">
+          <div className={chrome.stripInner}>
+            <div className={chrome.stripMeta}>
+              <span>© {currentYear} Dylan Gattey</span>
+              {version ? (
+                <>
+                  <span className={chrome.dot}>•</span>
+                  {releaseUrl ? (
+                    <Link
+                      href={releaseUrl}
+                      isExternal
+                      title={`GitHub release ${version}`}
+                      variant="caption"
+                    >
+                      {version}
+                    </Link>
+                  ) : (
+                    version
+                  )}
+                </>
+              ) : null}
+              <PaperTag edge="quad-c" tiltDeg={2} tone="ochre">
+                Redesign on
+              </PaperTag>
+              {process.env.NODE_ENV !== 'production' ? (
+                <>
+                  <span className={chrome.dot}>•</span>
+                  <Link forcePageNavigation href={devConsoleRoute} title="Developer tools">
+                    Dev console
+                  </Link>
+                </>
+              ) : null}
+            </div>
+            <div className={chrome.links}>
+              {nonIconFooterLinks.map((link) => (
+                <CollageFooterLink key={link.url} link={link} />
+              ))}
+              {iconFooterLinks.map((link) => (
+                <CollageFooterLink key={link.url} link={link} />
+              ))}
+            </div>
+          </div>
+        </PaperCard>
+      </footer>
+    );
+  }
+
   return (
     <Section sx={footerSectionSx}>
       <Container sx={footerContainerSx}>
@@ -165,9 +212,6 @@ export async function Footer() {
                   </NavItem>
                 </>
               ) : null}
-              <Suspense fallback={null}>
-                <RedesignBadge />
-              </Suspense>
               {process.env.NODE_ENV !== 'production' ? (
                 <>
                   <NavItem sx={navItemNoPaddingSx}>•</NavItem>
