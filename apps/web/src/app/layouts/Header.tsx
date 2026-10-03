@@ -11,7 +11,7 @@ import { Box } from '@mui/material';
 import { Suspense } from 'react';
 import { getLatestSong } from '../../services/spotify';
 import { CollageColorSchemeFieldset } from '../collage/CollageColorSchemeFieldset';
-import chrome from '../collage/chrome.module.css';
+import chrome from '../collage/chrome.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
 import { CollageMusicLinks } from './CollageMusicLinks';

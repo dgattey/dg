@@ -12,7 +12,7 @@ import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
 import { groupTracksByDate } from './groupTracksByDate';
 import { MusicGrid } from './MusicGrid';
-import styles from './music.module.css';
+import styles from './music.classes';
 
 type Props = {
   initialTracks: Array<HistoryTrack>;

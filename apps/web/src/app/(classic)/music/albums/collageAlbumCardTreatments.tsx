@@ -5,7 +5,7 @@ import type { CSSProperties, ReactNode } from 'react';
 import { PaperCard } from '../../../collage/PaperCard';
 import { PaperTag } from '../../../collage/PaperTag';
 import type { PaperTone } from '../../../collage/types';
-import styles from '../music.module.css';
+import styles from '../music.classes';
 
 export type CollageAlbumCardTreatment = {
   offsetPx: number;

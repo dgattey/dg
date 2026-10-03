@@ -13,7 +13,7 @@ import { Box, Container, Divider, Stack } from '@mui/material';
 import { cacheLife } from 'next/cache';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
-import chrome from '../collage/chrome.module.css';
+import chrome from '../collage/chrome.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import { FOOTER_ICON_DESKTOP_FONT_SIZE, FOOTER_ICON_FONT_SIZE } from './footerIconSize';

@@ -22,7 +22,7 @@ import {
   albumTileLinkSx,
   MAX_ALBUM_SLEEVES,
 } from '../albumTileGeometry';
-import styles from '../music.module.css';
+import styles from '../music.classes';
 import { type CollageAlbumCardTreatment, CollageAlbumPaper } from './collageAlbumCardTreatments';
 
 const SLEEVE_COUNT = MAX_ALBUM_SLEEVES;

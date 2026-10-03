@@ -6,7 +6,7 @@ import type { LucideIcon } from 'lucide-react';
 import { ChevronDown, DiscAlbum, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import chrome from '../collage/chrome.module.css';
+import chrome from '../collage/chrome.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { cx, paperSurfaceVars } from '../collage/paperVars';
 import {

@@ -1,6 +1,6 @@
 import type { RenderableSideProject } from '@dg/content-models/contentful/renderables/sideProjects';
 import { Image } from '@dg/ui/dependent/Image';
-import styles from './home.module.css';
+import styles from './home.classes';
 import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
 import { paperToneVars } from './paperVars';

@@ -4,7 +4,7 @@ import { getProjects } from '../../services/contentful';
 import { CutOut } from '../collage/CutOut';
 import { CutOutSymbols } from '../collage/CutOutSymbols';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
-import styles from '../collage/home.module.css';
+import styles from '../collage/home.classes';
 import { MoreWorkSheet } from '../collage/MoreWorkSheet';
 import {
   assignProjectSlots,

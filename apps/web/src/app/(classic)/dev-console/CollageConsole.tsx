@@ -7,7 +7,7 @@ import { CUT_OUT_PLACEMENTS } from '../../collage/cutOutPlacements';
 import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
 import type { PaperTone } from '../../collage/types';
-import styles from './devConsole.module.css';
+import styles from './devConsole.classes';
 import { OauthCard } from './oauth/OauthCard';
 import { VercelSignInCard } from './vercel/VercelSignInCard';
 import { WebhookCard } from './webhooks/WebhookCard';

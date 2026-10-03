@@ -4,7 +4,7 @@ import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import styles from '../music.module.css';
+import styles from '../music.classes';
 import {
   ALBUM_WELL_TRACK_COLUMN_GAP,
   ALBUM_WELL_TRACK_NUMBER_COLUMN,

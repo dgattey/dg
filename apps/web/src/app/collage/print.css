@@ -1,6 +1,6 @@
 /* Prints, portrait print, and record disc */
 
-.print {
+.print__print {
   position: relative;
   display: block;
   width: 100%;
@@ -10,7 +10,7 @@
   mix-blend-mode: multiply;
 }
 
-.portrait {
+.print__portrait {
   position: relative;
   z-index: 2;
   justify-self: center;
@@ -19,17 +19,17 @@
   color: inherit;
   text-decoration: none;
 }
-.portrait:focus-visible {
+.print__portrait:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 8px;
 }
-.frame {
+.print__frame {
   position: relative;
   display: block;
   filter: var(--dshadow);
   rotate: -3deg;
 }
-.halo {
+.print__halo {
   position: absolute;
   inset: -3.5%;
   z-index: 1;
@@ -37,7 +37,7 @@
   background: var(--cream);
   clip-path: url("#collage-pebble-clip");
 }
-.window {
+.print__window {
   position: relative;
   z-index: 2;
   display: grid;
@@ -46,16 +46,16 @@
   background: var(--cream);
   clip-path: url("#collage-pebble-clip");
 }
-.image {
+.print__image {
   position: absolute;
   inset: 0;
 }
-.tag {
+.print__tag {
   bottom: 10%;
   left: 2%;
 }
 
-.disc {
+.print__disc {
   position: relative;
   width: 100%;
   height: 100%;
@@ -63,7 +63,7 @@
   filter: var(--dshadow);
   clip-path: url(#collage-disc-clip);
 }
-.discPiece {
+.print__discPiece {
   position: relative;
   display: grid;
   place-items: center;
@@ -73,7 +73,7 @@
   background: var(--black);
   clip-path: url(#collage-disc-clip);
 }
-.logo {
+.print__logo {
   position: absolute;
   top: 13%;
   left: 15%;
@@ -81,19 +81,19 @@
   width: 26px;
   height: 26px;
 }
-.logoMark {
+.print__logoMark {
   display: block;
   width: 26px;
   height: 26px;
   background: var(--leaf);
   border-radius: 50%;
 }
-.artLink {
+.print__artLink {
   display: block;
   width: 100%;
   height: 100%;
 }
-.art {
+.print__art {
   position: absolute;
   inset: 0;
   display: block;
@@ -102,11 +102,11 @@
   isolation: isolate;
   mix-blend-mode: normal;
 }
-.art img {
+.print__art img {
   mix-blend-mode: normal;
   filter: none;
 }
-.hole {
+.print__hole {
   position: absolute;
   z-index: 2;
   width: 4%;
@@ -117,11 +117,11 @@
 }
 
 @media (max-width: 820px) {
-  .portrait {
+  .print__portrait {
     width: min(100%, 300px);
     margin: 26px 0 0;
   }
-  .portrait .backdrop {
+  .print__portrait .print__backdrop {
     top: 8%;
     left: 26%;
     width: min(100vw, 420px);

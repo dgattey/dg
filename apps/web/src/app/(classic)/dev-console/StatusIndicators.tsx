@@ -1,7 +1,7 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Chip, Typography } from '@mui/material';
 import { PaperTag } from '../../collage/PaperTag';
-import styles from './devConsole.module.css';
+import styles from './devConsole.classes';
 
 export function StatusChip({
   isConnected,
