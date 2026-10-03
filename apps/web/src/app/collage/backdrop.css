@@ -66,6 +66,11 @@
     linear-gradient(var(--gingham) 50%, transparent 0) 0 0 / 40px 40px,
     var(--sheet-a);
 }
+.collageBackdrop .collageSheet-ruled {
+  background:
+    linear-gradient(90deg, transparent 44px, var(--vermilion) 44px 47px, transparent 47px),
+    repeating-linear-gradient(transparent 0 26px, var(--sheet-b) 26px 29px), var(--sheet-a);
+}
 
 @media (max-width: 600px) {
   .collageSheetDesktopOnly {

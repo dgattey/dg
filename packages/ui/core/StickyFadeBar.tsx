@@ -112,10 +112,17 @@ const collagePaperSx: SxObject = {
   backgroundSize: 'var(--sticky-fade-texture-size, auto)',
 };
 
+/** Unpinned bars cross the page's backdrop, so their lower edge reads as a torn strip. */
+const collageBarSx: SxObject = {
+  ...barSurfaceSx,
+  ...collagePaperSx,
+  clipPath: 'var(--torn-bottom)',
+};
+
 const surfaceLayerSx = {
   classic: { bar: barSurfaceSx, fade: fadeOverlaySx, mask: topMaskSx },
   collage: {
-    bar: { ...barSurfaceSx, ...collagePaperSx },
+    bar: collageBarSx,
     fade: { ...fadeOverlaySx, background: 'none' },
     mask: { ...topMaskSx, ...collagePaperSx },
   },
