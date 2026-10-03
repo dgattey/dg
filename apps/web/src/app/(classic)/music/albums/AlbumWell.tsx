@@ -10,6 +10,8 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode, TransitionEvent } from 'react';
 import { useLayoutEffect, useRef, useState, ViewTransition } from 'react';
+import { ALBUM_DETAIL_BACKDROP } from '../../../collage/backdrops';
+import { BackdropLayer } from '../../../collage/CollageBackdrop';
 import { PaperCard } from '../../../collage/PaperCard';
 import { PaperTag } from '../../../collage/PaperTag';
 import {
@@ -399,7 +401,8 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
 
   return (
     <Box onTransitionEnd={handleTransitionEnd} sx={shellSx(heightPx)}>
-      <Box ref={measureRef}>
+      <Box className={surface === 'collage' ? 'collageBackdropHost' : undefined} ref={measureRef}>
+        {surface === 'collage' ? <BackdropLayer backdrop={ALBUM_DETAIL_BACKDROP} /> : null}
         {surface === 'collage' ? (
           <PaperCard
             className={styles.collageWellCard}
