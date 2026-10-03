@@ -76,7 +76,9 @@ function CollageSortSkeleton() {
 }
 
 /**
- * Occupies the same space the loaded grid will while albums stream in.
+ * Occupies the same space the loaded grid will, so the page does not resize
+ * under the view transition when albums stream in. Pass `tileCount` when the
+ * real length is already known so the opening snapshot matches the grid height.
  */
 export function FavoriteAlbumsSkeleton({
   surface = 'classic',
