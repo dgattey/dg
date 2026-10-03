@@ -1,5 +1,15 @@
 @import "./edges.css";
 
+/* Arial sized to Familjen Grotesk's metrics, so the swap doesn't shift layout. */
+@font-face {
+  font-family: familjenFallback;
+  src: local(Arial);
+  ascent-override: 107.64%;
+  descent-override: 23.63%;
+  line-gap-override: 0%;
+  size-adjust: 95.22%;
+}
+
 html:has(.collageRoot) {
   color-scheme: light dark;
   background: light-dark(#ede3cb, #152238);
