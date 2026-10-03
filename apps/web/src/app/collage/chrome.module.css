@@ -14,11 +14,10 @@
 .logo {
   display: grid;
   place-items: center;
-  width: 60px;
-  height: 60px;
   font-family: var(--display);
   font-size: 30px;
   font-weight: 800;
+  line-height: 1;
   letter-spacing: -0.04em;
 }
 .logoInner {
@@ -29,7 +28,7 @@
 }
 .logo button,
 .logo a {
-  padding: 0;
+  padding: 0.4em 0.5em 0.48em;
   font: inherit;
   color: inherit;
   letter-spacing: inherit;
@@ -124,8 +123,6 @@
     display: none;
   }
   .logo {
-    width: 48px;
-    height: 48px;
     font-size: 24px;
   }
   .nav {
