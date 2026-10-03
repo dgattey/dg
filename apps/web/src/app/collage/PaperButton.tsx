@@ -1,6 +1,6 @@
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
-import type { ButtonHTMLAttributes, CSSProperties, ReactNode } from 'react';
-import { cx, paperSurfaceVars } from './paperVars';
+import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { cx, paperEdgeVars, paperToneVars } from './paperVars';
 import type { PaperEdge, PaperTone } from './types';
 
 type PaperButtonProps = {
@@ -41,34 +41,40 @@ export function PaperButton({
   type = 'button',
 }: PaperButtonProps) {
   const classNames = cx('paperButton', current && 'paperButtonCurrent', className);
-  const style: CSSProperties = paperSurfaceVars(tone, edge, tiltDeg);
+  const wrapStyle = paperToneVars(tone, tiltDeg);
+  const surfaceStyle = paperEdgeVars(edge);
 
   if (href !== undefined) {
     return (
-      <span style={style}>
-        <PageTransitionLink
-          aria-current={current ? 'page' : undefined}
-          className={classNames}
-          href={href}
-          onClick={onClick}
-          title={title}
-        >
-          {children}
-        </PageTransitionLink>
-      </span>
+      <div className="paperWrap" style={wrapStyle}>
+        <span style={surfaceStyle}>
+          <PageTransitionLink
+            aria-current={current ? 'page' : undefined}
+            className={classNames}
+            href={href}
+            onClick={onClick}
+            title={title}
+          >
+            {children}
+          </PageTransitionLink>
+        </span>
+      </div>
     );
   }
 
   return (
-    <button
-      aria-pressed={current}
-      className={classNames}
-      disabled={disabled}
-      onClick={onClick}
-      style={style}
-      type={type}
-    >
-      {children}
-    </button>
+    <div className="paperWrap" style={wrapStyle}>
+      <span style={surfaceStyle}>
+        <button
+          aria-pressed={current}
+          className={classNames}
+          disabled={disabled}
+          onClick={onClick}
+          type={type}
+        >
+          {children}
+        </button>
+      </span>
+    </div>
   );
 }
