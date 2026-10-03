@@ -146,6 +146,8 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
   const containerSx: SxObject = {
     backgroundColor: tokens.containerBackground,
     height: '100%',
+    // Groups the underlay, tiles, scrim and route into one layer so none of them
+    // can paint above whatever the host renders over the map.
     isolation: 'isolate',
     overflow: 'hidden',
     pointerEvents: 'none',
@@ -154,6 +156,7 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
   };
 
   const tileLayerSx: SxObject = {
+    // Pigeon paints its own opaque background, which would hide the placeholder.
     '& > div': {
       backgroundColor: 'transparent !important',
       // Pigeon re-measures its root with getBoundingClientRect, which grows under a
@@ -166,6 +169,11 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
     zIndex: 1,
   };
 
+  /**
+   * A mild, near-uniform knock-back that sets how present the basemap feels.
+   * Legibility is the host's job: whatever renders text over this map is expected
+   * to back its own text regions, since only it knows where the copy sits.
+   */
   const scrimSx: SxObject = {
     background: tokens.scrimGradient,
     inset: 0,
