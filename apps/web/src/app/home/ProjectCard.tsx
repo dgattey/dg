@@ -27,6 +27,9 @@ const projectCardSx: SxObject = {
   maxHeight: { md: 'unset', xs: smallMaxHeight ?? 'unset' },
 };
 
+/**
+ * Uses the `ContentCard` to show a project's details
+ */
 function ClassicProjectCard({ title, layout, link, thumbnail }: RenderableProject) {
   const { width, height, sizes, verticalSpan, horizontalSpan } = useCurrentImageSizes(
     layout ?? undefined,

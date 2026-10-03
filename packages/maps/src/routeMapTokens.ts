@@ -33,6 +33,9 @@ export function getRouteMapTokens(surface: SiteSurface, dark: boolean): RouteMap
     routeStroke: BRAND.routeLine,
     routeStrokeWidth: 2.5,
     scrimGradient: `linear-gradient(180deg, ${paperMix(dark ? 10 : 20)} 0%, ${paperMix(dark ? 20 : 28)} 100%)`,
+    // Outdoors is vivid and fully labelled, so light mode also lifts its darkest
+    // ink — road casings and place labels — toward the landcover. Without that the
+    // basemap's own labels, not the route, become the worst thing under the copy.
     tileFilter: dark ? 'saturate(0.85)' : 'saturate(0.5) brightness(1.1) contrast(0.76)',
   };
 }
