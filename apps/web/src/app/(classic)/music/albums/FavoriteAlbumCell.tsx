@@ -25,8 +25,15 @@ import {
 import styles from '../music.classes';
 import { type CollageAlbumCardTreatment, CollageAlbumPaper } from './collageAlbumCardTreatments';
 
+/** Every favorite is a whole album, so every cell wears the full fan. */
 const SLEEVE_COUNT = MAX_ALBUM_SLEEVES;
 
+/**
+ * The art is away in the well, so the front of the stack keeps a dimmed,
+ * blurred copy as the socket it lifted out of and puts the close affordance
+ * where the album was. The sleeves behind it stay put, which is what keeps the
+ * cell reading as the same object while its cover is gone.
+ */
 const socketSx: SxObject = {
   ...albumCoverSx(0, SLEEVE_COUNT),
   '& img': {
@@ -64,6 +71,7 @@ type Props = {
   imageUrl: string;
   surface?: SiteSurface;
   tooltip: string;
+  /** When true, keep the cell size but hide art (it lives in the well). */
   collapsed?: boolean;
 };
 
@@ -82,12 +90,20 @@ function AlbumArtCover({
     return <AlbumCover alt="" depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />;
   }
   return (
+    // `default="none"` keeps this name off page-open/close. Without it
+    // every cover enters during homepage → albums, and React snapshots
+    // the whole grid as separate shared elements mid-flight.
     <ViewTransition default="none" name={albumArtViewTransitionName(albumId)} share="vt-album-art">
       <AlbumCover alt={albumName} depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />
     </ViewTransition>
   );
 }
 
+/**
+ * Favorite-albums grid cell. Opens the in-page album well via a typed view
+ * transition; the front cover shares a VT name with the well so it morphs on
+ * open and close, while the sleeves it fans stay out of the flight entirely.
+ */
 export function FavoriteAlbumCell({
   albumId,
   albumName,

@@ -48,6 +48,10 @@ function CollageStatus({ children, tag }: { children: ReactNode; tag?: ReactNode
   );
 }
 
+/**
+ * Infinite scroll wrapper for music history.
+ * Loads more tracks when sentinel element enters viewport.
+ */
 export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'classic' }: Props) {
   const serverTime = useServerTime();
   const [allTracks, setAllTracks] = useState<Array<HistoryTrack>>(initialTracks);
@@ -147,6 +151,7 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
         </Stack>
       ))}
 
+      {/* Sentinel element for infinite scroll */}
       <Box ref={sentinelRef} sx={loadingContainerSx}>
         {isLoading ? <CircularProgress size={24} /> : null}
       </Box>

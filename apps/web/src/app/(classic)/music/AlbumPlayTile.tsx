@@ -30,13 +30,21 @@ type Props = {
   imageUrl: string;
   albumName: string;
   artistNames: string;
+  /** The album for a run of plays, the track itself for a single play. */
   linkUrl: string;
+  /** Plays collapsed into this cell. */
   trackCount: number;
+  /** Names a single play, which a lone cover is labelled with. */
   trackName: string;
   cardIndex?: number;
   surface?: SiteSurface;
 };
 
+/**
+ * One cell of listening history. A run of plays from one album fans sleeves
+ * behind its cover and counts itself; a single play stays a lone cover, which
+ * is what tells a whole album listen apart from one song.
+ */
 export function AlbumPlayTile({
   albumName,
   artistNames,

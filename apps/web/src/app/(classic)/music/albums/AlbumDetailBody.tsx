@@ -43,6 +43,7 @@ const trackListSx: SxObject = {
   p: 0,
 };
 
+/** Cancels its own padding so the number column stays in the well's gutter. */
 const trackRowSx: SxObject = {
   '&:hover': {
     backgroundColor: 'color-mix(in srgb, var(--mui-palette-primary-main) 8%, transparent)',
@@ -136,6 +137,11 @@ function LinkedArtists({ artists }: { artists: ReadonlyArray<LinkedArtist> }): R
   ));
 }
 
+/**
+ * A named gauge rather than a bare number trailing the facts, which read as a
+ * stray year. The label and value are hidden from the tree because the wrapper
+ * already speaks both.
+ */
 function Popularity({ value }: { value: number }) {
   return (
     <Box aria-label={`Popularity ${value} out of 100`} role="img" sx={popularitySx}>
@@ -220,6 +226,11 @@ function CollageAlbumDetail({ album }: { album: AlbumDetail }) {
   );
 }
 
+/**
+ * The part of the well that needs a fetch: artist links, album meta, and the
+ * numbered tracklist. Everything sits on the well's shared text edge, with
+ * track numbers hanging in the gutter the well reserves to its left.
+ */
 export function AlbumDetailBody({
   album,
   surface = 'classic',
