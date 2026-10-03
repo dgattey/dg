@@ -5,23 +5,12 @@ import type { ReactNode } from 'react';
 import type { SxObject } from '../theme';
 import { stickyDecorSx } from './transitions/pageTransitions';
 
-const CLASSIC_BACKGROUND = 'var(--mui-palette-background-default)';
-const FADE_BACKGROUND = `var(--sticky-fade-background, ${CLASSIC_BACKGROUND})`;
-const SURFACE_BACKGROUND = `var(--sticky-surface-background, ${FADE_BACKGROUND})`;
-
-const surfaceBackgroundSx = {
-  classic: {},
-  collage: {
-    '--sticky-fade-background': 'transparent',
-    '--sticky-surface-background': 'var(--paper)',
-  },
-} satisfies Record<SiteSurface, SxObject>;
+const BACKGROUND = 'var(--mui-palette-background-default)';
 
 /** Measured once by the header, so the bar tracks it across breakpoints. */
 const HEADER_HEIGHT = 'var(--site-header-height, 5.5rem)';
 
-const scrim = (percent: number) =>
-  `color-mix(in srgb, ${FADE_BACKGROUND} ${percent}%, transparent)`;
+const scrim = (percent: number) => `color-mix(in srgb, ${BACKGROUND} ${percent}%, transparent)`;
 
 /**
  * Stretches a bar-anchored layer from window edge to window edge. Bars live
@@ -50,9 +39,7 @@ const fullBleed = {
  * with nothing to hide would only leave the header glass with nothing to blur.
  */
 const topMaskSx: SxObject = {
-  backgroundColor: SURFACE_BACKGROUND,
-  backgroundImage: 'var(--sticky-fade-texture, none)',
-  backgroundSize: 'var(--sticky-fade-texture-size, auto)',
+  backgroundColor: BACKGROUND,
   'body:has([data-sticky-fade]) &': {
     display: 'block',
   },
@@ -87,9 +74,7 @@ const FADE_RESERVE = '1.375rem';
 const barSurfaceSx: SxObject = {
   ...fullBleed,
   ...stickyDecorSx,
-  backgroundColor: SURFACE_BACKGROUND,
-  backgroundImage: 'var(--sticky-fade-texture, none)',
-  backgroundSize: 'var(--sticky-fade-texture-size, auto)',
+  backgroundColor: BACKGROUND,
   bottom: `calc(${FADE_RESERVE} - 1px)`,
   pointerEvents: 'none',
   position: 'absolute',
@@ -112,13 +97,29 @@ const barSurfaceSx: SxObject = {
 const fadeOverlaySx: SxObject = {
   ...fullBleed,
   ...stickyDecorSx,
-  background: `linear-gradient(to bottom, ${FADE_BACKGROUND} 0%, ${scrim(94)} 15%, ${scrim(78)} 30%, ${scrim(57)} 45%, ${scrim(35)} 60%, ${scrim(16)} 75%, ${scrim(4)} 88%, transparent 100%)`,
+  background: `linear-gradient(to bottom, ${BACKGROUND} 0%, ${scrim(94)} 15%, ${scrim(78)} 30%, ${scrim(57)} 45%, ${scrim(35)} 60%, ${scrim(16)} 75%, ${scrim(4)} 88%, transparent 100%)`,
   bottom: `calc(-1 * (${FADE_HEIGHT} - ${FADE_RESERVE}))`,
   height: FADE_HEIGHT,
   pointerEvents: 'none',
   position: 'absolute',
   zIndex: 0,
 };
+
+/** Collage bars are torn from the page's own paper, so they carry its grain and drop the fade. */
+const collagePaperSx: SxObject = {
+  backgroundColor: 'var(--paper)',
+  backgroundImage: 'var(--sticky-fade-texture, none)',
+  backgroundSize: 'var(--sticky-fade-texture-size, auto)',
+};
+
+const surfaceLayerSx = {
+  classic: { bar: barSurfaceSx, fade: fadeOverlaySx, mask: topMaskSx },
+  collage: {
+    bar: { ...barSurfaceSx, ...collagePaperSx },
+    fade: { ...fadeOverlaySx, background: 'none' },
+    mask: { ...topMaskSx, ...collagePaperSx },
+  },
+} satisfies Record<SiteSurface, Record<'bar' | 'fade' | 'mask', SxObject>>;
 
 const stickyBarSx: SxObject = {
   /* Room for the perceptible part of the ramp; its transparent tail overlaps. */
@@ -150,12 +151,13 @@ type StickyFadeBarProps = Omit<BoxProps, 'sx' | 'children'> & {
  * children only need their own leading padding.
  */
 export function StickyFadeBar({ children, surface = 'classic', sx, ...props }: StickyFadeBarProps) {
-  const mergedSx = { ...stickyBarSx, ...surfaceBackgroundSx[surface], ...sx };
+  const mergedSx = sx ? { ...stickyBarSx, ...sx } : stickyBarSx;
+  const layers = surfaceLayerSx[surface];
   return (
-    <Box {...props} data-site-surface={surface} sx={mergedSx}>
-      <Box aria-hidden data-sticky-surface sx={barSurfaceSx} />
+    <Box {...props} data-site-surface={surfaceAttribute(surface)} sx={mergedSx}>
+      <Box aria-hidden data-sticky-surface sx={layers.bar} />
       <Box sx={stickyInnerSx}>{children}</Box>
-      <Box aria-hidden data-sticky-fade sx={fadeOverlaySx} />
+      <Box aria-hidden data-sticky-fade sx={layers.fade} />
     </Box>
   );
 }
@@ -170,9 +172,14 @@ export function StickyBarTopMask({ surface = 'classic' }: { surface?: SiteSurfac
   return (
     <Box
       aria-hidden
-      data-site-surface={surface}
+      data-site-surface={surfaceAttribute(surface)}
       data-sticky-mask
-      sx={{ ...topMaskSx, ...surfaceBackgroundSx[surface] }}
+      sx={surfaceLayerSx[surface].mask}
     />
   );
+}
+
+/** Only collage bars are tagged; classic markup must match the pre-collage site. */
+function surfaceAttribute(surface: SiteSurface) {
+  return surface === 'classic' ? undefined : surface;
 }
