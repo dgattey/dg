@@ -74,6 +74,9 @@ const stopPropagation = (e: React.MouseEvent) => {
   e.stopPropagation();
 };
 
+/**
+ * Glass morphism zoom controls overlay, positioned in the top-left corner.
+ */
 export function ZoomControls({ onZoomIn, onZoomOut, surface = 'classic' }: ZoomControlsProps) {
   if (surface === 'collage') {
     return (

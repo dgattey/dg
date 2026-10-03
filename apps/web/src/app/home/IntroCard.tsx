@@ -12,6 +12,9 @@ import { PaperCard } from '../collage/PaperCard';
 import { PortraitPrint } from '../collage/PortraitPrint';
 import { splitIntroDocument } from '../collage/splitIntroDocument';
 
+/**
+ * Width of the intro image on small screens
+ */
 const SMALL_IMAGE_SIZE = '16em';
 
 const overlaySx: SxObject = {
@@ -35,6 +38,13 @@ const introTextCardSx: SxObject = {
   justifyContent: 'center',
 };
 
+/**
+ * The intro copy shares a row with fixed-height cards, so it has one grid cell
+ * of vertical room. Two things keep it there: the stack owns the rhythm with a
+ * single gap instead of per-element margins, and the paragraphs sit at the root
+ * font size rather than the responsively scaled `body1`, which grows enough on
+ * wide screens to push the last paragraph onto an extra line.
+ */
 const introTextSx: SxObject = {
   '& > .MuiTypography-root': {
     marginBottom: 0,
@@ -80,6 +90,12 @@ function ClassicIntroCard({ introBlock, linkedInLink }: IntroCardProps) {
   );
 }
 
+/**
+ * Creates an intro information card for use on the homepage. Technically
+ * creates two cards in a fragment. Also adds meta for the whole Homepage,
+ * as the data comes from the introBlock. The width/height here is for image
+ * resizing, and the actual width may be smaller.
+ */
 export function IntroCard({ introBlock, linkedInLink, surface = 'classic' }: IntroCardProps) {
   if (surface === 'collage') {
     const { headline, remainder } = splitIntroDocument(introBlock.textBlock.content);

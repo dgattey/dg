@@ -12,6 +12,10 @@ import { ProjectCard } from './ProjectCard';
 import { SpotifyCardSlot } from './SpotifyCard';
 import { StravaCardSlot } from './StravaCardSlot';
 
+/**
+ * Merges the projects and other cards into a single array, where the other cards
+ * are interleaved between the project cards at the given indices.
+ */
 function mergeCards(
   projects: Array<React.ReactNode>,
   preciselyPlacedCards: Map<number, React.ReactNode>,
@@ -23,6 +27,11 @@ function mergeCards(
   );
 }
 
+/**
+ * Puts all projects into a grid using `projects` data,
+ * interspersed with `introBlock` data, and dark/light mode
+ * toggle.
+ */
 export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
   const projects = await getProjects();
 
@@ -43,6 +52,8 @@ export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface 
 
   const projectCards = projects.map((project) => <ProjectCard key={project.title} {...project} />);
 
+  // These cards are interleaved between the project cards at the given indices. Project cards
+  // should maintain their original order, but not necessarily index.
   const preciselyPlacedCards = new Map([
     [0, <IntroCardSlot key="intro" surface="classic" />],
     [1, <MapCardSlot key="map" surface="classic" />],
