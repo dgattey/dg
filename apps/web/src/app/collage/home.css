@@ -252,10 +252,6 @@
   color: inherit;
   text-decoration: none;
 }
-.home__sideRowWrap:has(.home__sideRow:focus-visible) {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
-}
 .home__sideMark {
   position: relative;
   display: grid;

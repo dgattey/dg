@@ -43,8 +43,6 @@ html:has(.collageRoot) body {
   --black: light-dark(#1d1a15, #0c1424);
   --star: light-dark(#1d1a15, #f3ecdc);
   --title: var(--ink);
-  --taupe: light-dark(#c7b59a, #3b4a66);
-  --taupe2: light-dark(#a8937a, #4e5f80);
   --gap: clamp(14px, 1.6vw, 24px);
   --pad: clamp(16px, 4vw, 80px);
   --measure: 1280px;
@@ -84,8 +82,6 @@ html:has(.collageRoot) body {
     --rose: #d9838f;
     --black: #1d1a15;
     --star: #1d1a15;
-    --taupe: #c7b59a;
-    --taupe2: #a8937a;
   }
 }
 
@@ -206,16 +202,21 @@ html:has(.collageRoot) body {
   font-size: 14px;
   cursor: default;
 }
-.paperTag small,
-.collageTagMeta {
+.paperTag small {
   font-size: 14px;
   font-weight: 650;
   line-height: 1.25;
   text-transform: uppercase;
   letter-spacing: 0.09em;
 }
-.paperButton:focus-visible,
-.paperTag:focus-visible {
+:where(
+  .paperButton:focus-visible,
+  .paperTag:focus-visible,
+  .chrome__musicSummary:focus-visible > .paperWrap,
+  .home__sideRowWrap:has(.home__sideRow:focus-visible),
+  .print__portrait:focus-visible,
+  .music__sortButton:focus-visible
+) {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
 }
