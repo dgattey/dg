@@ -6,5 +6,6 @@ Allow: /
 Disallow: /dev-console
 Disallow: /api/
 Disallow: /llm-markdown
+Disallow: /redesign
 
 Sitemap: https://dylangattey.com/sitemap.xml
