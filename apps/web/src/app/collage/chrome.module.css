@@ -67,6 +67,45 @@
   margin: 0;
   border: 0;
 }
+.schemeTrack {
+  display: flex;
+  gap: 2px;
+  padding: 4px;
+}
+.schemeOption {
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 34px;
+  color: var(--on);
+  cursor: pointer;
+  border-radius: 10px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
+}
+.schemeOption:hover {
+  background: color-mix(in oklab, var(--on) 16%, transparent);
+}
+.schemeOption:has(:checked) {
+  color: var(--ink-on-cream);
+  background: var(--ochre);
+}
+.schemeOption:has(:focus-visible) {
+  outline: 2px solid var(--on);
+  outline-offset: 1px;
+}
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  white-space: nowrap;
+  border: 0;
+  clip-path: inset(50%);
+}
 .footer {
   position: relative;
   padding: 0 0 44px;
