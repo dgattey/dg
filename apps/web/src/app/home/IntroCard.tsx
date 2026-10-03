@@ -1,10 +1,16 @@
 import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { Image } from '@dg/ui/dependent/Image';
 import { RichText } from '@dg/ui/dependent/RichText';
 import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
 import type { SxObject } from '@dg/ui/theme';
+import { CutLetters } from '../collage/CutLetters';
+import collageStyles from '../collage/HelloSheet.module.css';
+import { PaperCard } from '../collage/PaperCard';
+import { PortraitPrint } from '../collage/PortraitPrint';
+import { splitIntroDocument } from '../collage/splitIntroDocument';
 
 /**
  * Width of the intro image on small screens
@@ -49,18 +55,13 @@ const introTextSx: SxObject = {
   gap: 2.5,
 };
 
-/**
- * Creates an intro information card for use on the homepage. Technically
- * creates two cards in a fragment. Also adds meta for the whole Homepage,
- * as the data comes from the introBlock. The width/height here is for image
- * resizing, and the actual width may be smaller.
- */
 type IntroCardProps = {
   linkedInLink: RenderableLink | null;
   introBlock: IntroContent;
+  surface?: SiteSurface;
 };
 
-export function IntroCard({ introBlock, linkedInLink }: IntroCardProps) {
+function ClassicIntroCard({ introBlock, linkedInLink }: IntroCardProps) {
   const { width, height, sizes } = useCurrentImageSizes();
 
   return (
@@ -76,7 +77,7 @@ export function IntroCard({ introBlock, linkedInLink }: IntroCardProps) {
           alt={introBlock.image.title ?? 'Introduction image'}
           cover={true}
           height={height}
-          priority={true}
+          preload={true}
           sizes={sizes}
           url={introBlock.image.url}
           width={width}
@@ -87,4 +88,38 @@ export function IntroCard({ introBlock, linkedInLink }: IntroCardProps) {
       </ContentCard>
     </>
   );
+}
+
+/**
+ * Creates an intro information card for use on the homepage. Technically
+ * creates two cards in a fragment. Also adds meta for the whole Homepage,
+ * as the data comes from the introBlock. The width/height here is for image
+ * resizing, and the actual width may be smaller.
+ */
+export function IntroCard({ introBlock, linkedInLink, surface = 'classic' }: IntroCardProps) {
+  if (surface === 'collage') {
+    const { headline, remainder } = splitIntroDocument(introBlock.textBlock.content);
+
+    return (
+      <>
+        <PortraitPrint
+          className={collageStyles.portrait}
+          image={introBlock.image}
+          linkedInLink={linkedInLink}
+        />
+        {headline ? <CutLetters className={collageStyles.headline} text={headline} /> : null}
+        <PaperCard
+          className={collageStyles.intro}
+          edge="quad-a"
+          innerClassName={collageStyles.introInner}
+          tiltDeg={-1}
+          tone="cream"
+        >
+          <RichText {...remainder} />
+        </PaperCard>
+      </>
+    );
+  }
+
+  return <ClassicIntroCard introBlock={introBlock} linkedInLink={linkedInLink} />;
 }
