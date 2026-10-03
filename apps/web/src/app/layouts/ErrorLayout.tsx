@@ -13,7 +13,6 @@ import { CollageBackdrop } from '../collage/CollageBackdrop';
 import { CutLetters } from '../collage/CutLetters';
 import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
-import styles from './error.classes';
 
 type ErrorLayoutProps = {
   /**
@@ -72,17 +71,17 @@ export function ErrorLayout({ statusCode, surface = 'classic' }: ErrorLayoutProp
     return (
       <section
         aria-label={String(statusCode)}
-        className={`collageBleed collageBackdropHost ${styles.sheet}`}
+        className="collageBleed collageBackdropHost error__sheet"
       >
         <CollageBackdrop
           backdrop={statusCode === 404 ? NOT_FOUND_BACKDROP : SERVER_ERROR_BACKDROP}
         />
-        <div className={styles.content}>
-          <CutLetters className={styles.statusCode} cut={true} text={String(statusCode)} />
+        <div className="error__content">
+          <CutLetters className="error__statusCode" cut={true} text={String(statusCode)} />
           <PaperCard
-            className={styles.messageCard}
+            className="error__messageCard"
             edge="quad-b"
-            innerClassName={styles.messageCardInner}
+            innerClassName="error__messageCardInner"
             tiltDeg={-1.2}
           >
             <Typography component="h2" variant="h3">

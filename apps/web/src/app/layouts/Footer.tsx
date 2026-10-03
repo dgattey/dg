@@ -13,7 +13,6 @@ import { Box, Container, Divider, Stack } from '@mui/material';
 import { cacheLife } from 'next/cache';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
-import chrome from '../collage/chrome.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import { FOOTER_ICON_DESKTOP_FONT_SIZE, FOOTER_ICON_FONT_SIZE } from './footerIconSize';
@@ -121,14 +120,14 @@ export async function Footer({ surface = 'classic' }: { surface?: SiteSurface } 
 
   if (surface === 'collage') {
     return (
-      <footer className={chrome.footer}>
+      <footer className="chrome__footer">
         <PaperCard className="collageMeasure" edge="soft-b" tiltDeg={-0.5} tone="black">
-          <div className={chrome.stripInner}>
-            <div className={chrome.stripMeta}>
+          <div className="chrome__stripInner">
+            <div className="chrome__stripMeta">
               <span>© {currentYear} Dylan Gattey</span>
               {version ? (
                 <>
-                  <span className={chrome.dot}>•</span>
+                  <span className="chrome__dot">•</span>
                   {releaseUrl ? (
                     <Link
                       href={releaseUrl}
@@ -148,14 +147,14 @@ export async function Footer({ surface = 'classic' }: { surface?: SiteSurface } 
               </PaperTag>
               {process.env.NODE_ENV !== 'production' ? (
                 <>
-                  <span className={chrome.dot}>•</span>
+                  <span className="chrome__dot">•</span>
                   <Link forcePageNavigation href={devConsoleRoute} title="Developer tools">
                     Dev console
                   </Link>
                 </>
               ) : null}
             </div>
-            <div className={chrome.links}>
+            <div className="chrome__links">
               {[...nonIconFooterLinks, ...iconFooterLinks].map((link) => (
                 <Link
                   href={link.url}

@@ -4,7 +4,6 @@ import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack } from '@mui/material';
-import styles from '../collage/home.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { ActivityDescription } from '../strava/ActivityDescription';
 import { ActivityName } from '../strava/ActivityName';
@@ -94,16 +93,16 @@ export function StravaCard({ activity, surface = 'classic' }: StravaCardProps) {
 
   if (surface === 'collage') {
     return (
-      <div className={styles.strava} data-slot="st" style={{ gridArea: 'st' }}>
-        <PaperCard edge="soft-b" innerClassName={styles.stravaInner} tiltDeg={1.2} tone="olive">
+      <div className="home__strava" data-slot="st" style={{ gridArea: 'st' }}>
+        <PaperCard edge="soft-b" innerClassName="home__stravaInner" tiltDeg={1.2} tone="olive">
           {encodedPolyline ? (
-            <span aria-hidden="true" className={styles.stravaRoute}>
+            <span aria-hidden="true" className="home__stravaRoute">
               <StravaRouteMap encodedPolyline={encodedPolyline} surface="collage" />
             </span>
           ) : null}
-          <div className={styles.stravaContent}>
+          <div className="home__stravaContent">
             <ActivityStats activity={activity} />
-            <div className={styles.stravaCopy}>
+            <div className="home__stravaCopy">
               <ActivityTypeWithIcon activity={activity} />
               <ActivityName activity={activity} />
               <ActivityDescription activity={activity} />

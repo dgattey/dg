@@ -14,7 +14,6 @@ import { ALBUM_DETAIL_BACKDROP } from '../../../collage/backdrops';
 import { BackdropLayer } from '../../../collage/CollageBackdrop';
 import { PaperCard } from '../../../collage/PaperCard';
 import { PaperTag } from '../../../collage/PaperTag';
-import styles from '../music.classes';
 import {
   ALBUM_WELL_ART_SIZE_XS,
   ALBUM_WELL_NAME_GAP,
@@ -248,7 +247,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
 
   const art = (
     <Link
-      className={isCollage ? styles.wellArtLink : undefined}
+      className={isCollage ? 'music__wellArtLink' : undefined}
       href={album.url}
       isExternal={true}
       sx={isCollage ? undefined : artLinkSx}
@@ -260,7 +259,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
         share="vt-album-art"
       >
         <Box
-          className={isCollage ? `${styles.wellArtCard} ${styles.fullColorArt}` : undefined}
+          className={isCollage ? `music__wellArtCard music__fullColorArt` : undefined}
           sx={isCollage ? undefined : artCardSx}
         >
           <Image
@@ -275,7 +274,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
       {isCollage ? (
         <>
           <PaperTag
-            className={`collagePin ${styles.wellAlbumTag}`}
+            className="collagePin music__wellAlbumTag"
             edge="quad-c"
             tiltDeg={-5}
             tone="ochre"
@@ -284,7 +283,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
             <small>{album.releaseDate.slice(0, 4)}</small>
           </PaperTag>
           <PaperTag
-            className={`collagePin ${styles.wellSpotifyTag}`}
+            className="collagePin music__wellSpotifyTag"
             edge="quad-c"
             tiltDeg={3}
             tone="cream"
@@ -297,7 +296,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
   );
 
   const title = isCollage ? (
-    <h2 className={styles.wellName}>
+    <h2 className="music__wellName">
       <Link href={album.url} isExternal={true} title={album.name}>
         {album.name}
       </Link>
@@ -313,7 +312,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
   const well = (
     <Box
       aria-label={`${album.name} details`}
-      className={isCollage ? styles.wellShell : undefined}
+      className={isCollage ? 'music__wellShell' : undefined}
       component="section"
       sx={isCollage ? reserveSx(reservePx) : { ...wellSx, ...reserveSx(reservePx) }}
     >
@@ -331,9 +330,9 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
         {isCollage ? <BackdropLayer backdrop={ALBUM_DETAIL_BACKDROP} /> : null}
         {isCollage ? (
           <PaperCard
-            className={styles.wellCard}
+            className="music__wellCard"
             edge="soft-a"
-            innerClassName={styles.wellInner}
+            innerClassName="music__wellInner"
             tiltDeg={-0.7}
             tone="viridian"
           >

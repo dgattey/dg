@@ -1,11 +1,9 @@
 import type { RenderableProject } from '@dg/content-models/contentful/renderables/projects';
 import { Image } from '@dg/ui/dependent/Image';
 import type { CSSProperties } from 'react';
-import styles from './home.classes';
 import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
 import { cx } from './paperVars';
-import printStyles from './print.classes';
 import { type ProjectFrameStyle, projectFrameAspectRatio, projectTagMeta } from './projectSlots';
 
 export type CollageProjectSlot = 'c1' | 'cn' | 'gn' | 'js' | 'li' | 'mg' | 'ws';
@@ -31,7 +29,7 @@ export function CollageProjectFrame({
   };
   const tag = (
     <PaperTag
-      className={cx('collagePin', styles[style.tagClassName])}
+      className={cx('collagePin', `home__${style.tagClassName}`)}
       edge="quad-c"
       tiltDeg={style.tagTiltDeg}
       tone={style.tagTone}
@@ -42,14 +40,14 @@ export function CollageProjectFrame({
   );
   const frame = (
     <PaperCard
-      className={styles.frameCard}
+      className="home__frameCard"
       edge={style.edge}
-      innerClassName={styles.framePad}
+      innerClassName="home__framePad"
       tiltDeg={style.tiltDeg}
       tone="cream"
     >
-      <span className={styles.frameShot} style={printStyle}>
-        <span className={printStyles.print}>
+      <span className="home__frameShot" style={printStyle}>
+        <span className="print__print">
           <Image
             alt={project.title}
             cover={true}
@@ -64,7 +62,7 @@ export function CollageProjectFrame({
     </PaperCard>
   );
   const shared = {
-    className: cx(styles.frameWin, 'collageLift', className),
+    className: cx('home__frameWin', 'collageLift', className),
     'data-slot': dataSlot,
     style: placementStyle,
   };

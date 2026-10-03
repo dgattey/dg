@@ -7,7 +7,6 @@ import { RichText } from '@dg/ui/dependent/RichText';
 import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
 import type { SxObject } from '@dg/ui/theme';
 import { CutLetters } from '../collage/CutLetters';
-import collageStyles from '../collage/home.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { introImageAlt, PortraitPrint } from '../collage/PortraitPrint';
 import { splitIntroDocument } from '../collage/splitIntroDocument';
@@ -103,15 +102,15 @@ export function IntroCard({ introBlock, linkedInLink, surface = 'classic' }: Int
     return (
       <>
         <PortraitPrint
-          className={collageStyles.portraitSlot}
+          className="home__portraitSlot"
           image={introBlock.image}
           linkedInLink={linkedInLink}
         />
-        {headline ? <CutLetters className={collageStyles.headline} text={headline} /> : null}
+        {headline ? <CutLetters className="home__headline" text={headline} /> : null}
         <PaperCard
-          className={collageStyles.intro}
+          className="home__intro"
           edge="quad-a"
-          innerClassName={collageStyles.introInner}
+          innerClassName="home__introInner"
           tiltDeg={-1}
           tone="cream"
         >

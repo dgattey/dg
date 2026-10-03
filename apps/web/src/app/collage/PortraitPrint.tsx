@@ -5,7 +5,6 @@ import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS } from './cutOutPlacements';
 import { PaperTag } from './PaperTag';
 import { cx } from './paperVars';
-import styles from './print.classes';
 
 export function introImageAlt(image: Pick<RenderableAsset, 'title'>): string {
   return image.title ?? 'Introduction image';
@@ -20,20 +19,20 @@ export function PortraitPrint({
   image: RenderableAsset;
   linkedInLink: RenderableLink | null;
 }) {
-  const rootClassName = cx(styles.portrait, 'collageLift', className);
+  const rootClassName = cx('print__portrait', 'collageLift', className);
   const contents = (
     <>
       {CUT_OUT_PLACEMENTS.portrait.map((placement) => (
         <CutOut
-          className={placement.id === 'portrait-monstera' ? styles.backdrop : undefined}
+          className={placement.id === 'portrait-monstera' ? 'print__backdrop' : undefined}
           key={placement.id}
           placement={placement}
         />
       ))}
-      <span className={styles.frame}>
-        <span aria-hidden="true" className={styles.halo} />
-        <span className={styles.window}>
-          <span className={cx(styles.print, styles.image)}>
+      <span className="print__frame">
+        <span aria-hidden="true" className="print__halo" />
+        <span className="print__window">
+          <span className={cx('print__print', 'print__image')}>
             <Image
               alt={introImageAlt(image)}
               cover={true}
@@ -47,7 +46,7 @@ export function PortraitPrint({
           </span>
         </span>
       </span>
-      <PaperTag className={`collagePin ${styles.tag}`} edge="quad-c" tiltDeg={-5} tone="ochre">
+      <PaperTag className="collagePin print__tag" edge="quad-c" tiltDeg={-5} tone="ochre">
         <span>About</span>
         <small>{linkedInLink?.title ?? 'LinkedIn'}</small>
       </PaperTag>

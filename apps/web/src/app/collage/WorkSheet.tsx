@@ -2,7 +2,6 @@ import type { CSSProperties, ReactNode } from 'react';
 import { ProjectCard } from '../home/ProjectCard';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS } from './cutOutPlacements';
-import styles from './home.classes';
 import { type SlottedProject, workSheetFrames, workSheetGridAreas } from './projectSlots';
 
 export function WorkSheet({
@@ -27,13 +26,13 @@ export function WorkSheet({
   };
 
   return (
-    <section aria-label="Work" className={`collageBleed ${styles.work}`}>
-      <div aria-hidden="true" className={`collageField ${styles.workField}`} />
+    <section aria-label="Work" className="collageBleed home__work">
+      <div aria-hidden="true" className="collageField home__workField" />
       {CUT_OUT_PLACEMENTS.workSheet.map((placement) => (
         <CutOut key={placement.id} placement={placement} />
       ))}
       <div
-        className={`collageMeasure collageMeasureGrid collageGridStack ${styles.workGrid}`}
+        className="collageMeasure collageMeasureGrid collageGridStack home__workGrid"
         style={gridStyle}
       >
         {projectOne ? (

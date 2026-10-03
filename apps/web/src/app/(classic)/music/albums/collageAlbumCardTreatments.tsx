@@ -5,7 +5,6 @@ import type { CSSProperties, ReactNode } from 'react';
 import { PaperCard } from '../../../collage/PaperCard';
 import { PaperTag } from '../../../collage/PaperTag';
 import type { PaperTone } from '../../../collage/types';
-import styles from '../music.classes';
 
 export type CollageAlbumCardTreatment = {
   offsetPx: number;
@@ -72,9 +71,9 @@ export function CollageAlbumPaper({
 }) {
   return (
     <PaperCard
-      className={selected ? `${styles.card} ${styles.selected}` : styles.card}
+      className={selected ? `music__card music__selected` : 'music__card'}
       edge="quad-a"
-      innerClassName={styles.cardInner}
+      innerClassName="music__cardInner"
       style={offsetStyle(treatment)}
       tiltDeg={treatment.tiltDeg}
       tone={treatment.tone}
@@ -87,8 +86,8 @@ export function CollageAlbumPaper({
 function SkeletonFace() {
   return (
     <>
-      <Skeleton className={styles.art} height="auto" variant="rectangular" />
-      <div className={styles.caption}>
+      <Skeleton className="music__art" height="auto" variant="rectangular" />
+      <div className="music__caption">
         <Skeleton variant="text" width="82%" />
         <Skeleton variant="text" width="58%" />
       </div>
@@ -98,10 +97,10 @@ function SkeletonFace() {
 
 export function CollageSortSkeleton() {
   return (
-    <div aria-label="Loading album sort controls" className={styles.sortSkeleton} role="status">
+    <div aria-label="Loading album sort controls" className="music__sortSkeleton" role="status">
       {COLLAGE_ALBUM_SORT_OPTIONS.map((sort, index) => (
         <PaperTag
-          className={styles.sortTag}
+          className="music__sortTag"
           edge="quad-a"
           key={sort.key}
           tiltDeg={sort.tiltDeg}
@@ -120,7 +119,7 @@ export function CollageAlbumSkeletonGrid({ tileCount }: { tileCount: number }) {
     treatment: collageAlbumCardTreatment(index),
   }));
   return (
-    <div className={styles.gridSkeleton}>
+    <div className="music__gridSkeleton">
       {tiles.map((tile) => (
         <CollageAlbumPaper key={tile.key} treatment={tile.treatment}>
           <SkeletonFace />
@@ -136,13 +135,13 @@ export function CollageAlbumReserveGrid({
   albums: ReadonlyArray<{ artistNames: string; id: string; name: string }>;
 }) {
   return (
-    <div aria-hidden="true" className={`${styles.gridSkeleton} ${styles.albumReserve}`}>
+    <div aria-hidden="true" className="music__gridSkeleton music__albumReserve">
       {albums.map((album, index) => (
         <CollageAlbumPaper key={album.id} treatment={collageAlbumCardTreatment(index)}>
-          <div className={styles.art} />
-          <span className={styles.caption}>
-            <strong className={styles.albumName}>{album.name}</strong>
-            <span className={styles.artist}>{album.artistNames}</span>
+          <div className="music__art" />
+          <span className="music__caption">
+            <strong className="music__albumName">{album.name}</strong>
+            <span className="music__artist">{album.artistNames}</span>
           </span>
         </CollageAlbumPaper>
       ))}
@@ -152,17 +151,17 @@ export function CollageAlbumReserveGrid({
 
 export function CollageHistorySkeleton() {
   return (
-    <div aria-label="Loading listening history" className={styles.historySkeleton} role="status">
+    <div aria-label="Loading listening history" className="music__historySkeleton" role="status">
       {(
         [
           { label: 'recent', tiles: 12 },
           { label: 'earlier', tiles: 12 },
         ] as const
       ).map((section, sectionIndex) => (
-        <section aria-hidden="true" className={styles.section} key={section.label}>
-          <StickyFadeBar className={styles.dateBar} surface="collage">
+        <section aria-hidden="true" className="music__section" key={section.label}>
+          <StickyFadeBar className="music__dateBar" surface="collage">
             <PaperTag
-              className={styles.dateTag}
+              className="music__dateTag"
               edge="soft-b"
               tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
               tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
@@ -170,7 +169,7 @@ export function CollageHistorySkeleton() {
               <Skeleton style={{ width: 120 }} variant="text" />
             </PaperTag>
           </StickyFadeBar>
-          <div className={styles.historySkeletonGrid}>
+          <div className="music__historySkeletonGrid">
             {Array.from({ length: section.tiles }, (_, cardIndex) => ({
               key: `${section.label}-${cardIndex}`,
               treatment: collageAlbumCardTreatment(cardIndex),

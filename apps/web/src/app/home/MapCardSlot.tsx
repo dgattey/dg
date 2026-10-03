@@ -3,7 +3,6 @@ import 'server-only';
 import { MapCard } from '@dg/maps/MapCard';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { getCurrentLocation } from '../../services/contentful';
-import styles from '../collage/home.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 
@@ -21,17 +20,17 @@ export async function MapCardSlot({ surface = 'classic' }: { surface?: SiteSurfa
   }
   const coordinates = `${formatCoordinate(location.point.latitude, 'N', 'S')} · ${formatCoordinate(location.point.longitude, 'E', 'W')}`;
   return (
-    <div className={styles.map}>
+    <div className="home__map">
       <PaperCard
-        className={styles.mapPaper}
+        className="home__mapPaper"
         edge="soft-a"
-        innerClassName={styles.mapInner}
+        innerClassName="home__mapInner"
         tiltDeg={1.6}
         tone="cream"
       >
         <MapCard location={location} surface="collage" />
       </PaperCard>
-      <PaperTag className={`collagePin ${styles.mapTag}`} edge="quad-c" tiltDeg={-2} tone="cream">
+      <PaperTag className="collagePin home__mapTag" edge="quad-c" tiltDeg={-2} tone="cream">
         <span>{location.title?.trim() || 'Current location'}</span>
         <small>{coordinates}</small>
       </PaperTag>

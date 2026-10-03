@@ -6,7 +6,6 @@ import { Box } from '@mui/material';
 import { AlbumPlayTile } from './AlbumPlayTile';
 import { albumGridSx } from './albumTileGeometry';
 import { groupAdjacentAlbumPlays } from './groupAdjacentAlbumPlays';
-import albumStyles from './music.classes';
 
 type Props = {
   surface?: SiteSurface;
@@ -22,7 +21,7 @@ export function MusicGrid({ surface = 'classic', tracks }: Props) {
 
   if (surface === 'collage') {
     return (
-      <div className={albumStyles.albumGrid}>
+      <div className="music__albumGrid">
         {runs.map((run, cardIndex) => {
           const [firstTrack] = run.tracks;
           return firstTrack ? (

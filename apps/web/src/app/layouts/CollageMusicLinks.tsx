@@ -6,7 +6,6 @@ import type { LucideIcon } from 'lucide-react';
 import { ChevronDown, DiscAlbum, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
-import chrome from '../collage/chrome.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { cx, paperSurfaceVars } from '../collage/paperVars';
 import {
@@ -57,22 +56,22 @@ export function CollageMusicLinks() {
   }, []);
 
   return (
-    <details className={chrome.music} key={pathname} ref={detailsRef}>
-      <summary className={chrome.musicSummary}>
+    <details className="chrome__music" key={pathname} ref={detailsRef}>
+      <summary className="chrome__musicSummary">
         <span className="paperWrap" style={paperSurfaceVars('cream', 'quad-c', -2)}>
           <span className={cx('paperButton', onMusicPage && 'paperButtonCurrent')}>
             Music
-            <ChevronDown aria-hidden={true} className={chrome.musicChevron} size={18} />
+            <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />
           </span>
         </span>
       </summary>
       <PaperCard
-        className={chrome.musicPanel}
+        className="chrome__musicPanel"
         edge="quad-a"
-        innerClassName={chrome.musicPanelInner}
+        innerClassName="chrome__musicPanelInner"
         tiltDeg={-1}
       >
-        <ul className={chrome.musicList}>
+        <ul className="chrome__musicList">
           {MUSIC_DESTINATIONS.map((destination) => {
             const Icon = DESTINATION_ICONS[destination.href];
             const current = pathname === destination.href;
@@ -80,7 +79,7 @@ export function CollageMusicLinks() {
               <li key={destination.href}>
                 <PageTransitionLink
                   aria-current={current ? 'page' : undefined}
-                  className={chrome.musicLink}
+                  className="chrome__musicLink"
                   href={destination.href}
                   title={destination.label}
                 >
