@@ -10,7 +10,6 @@ import { AlbumCover } from './AlbumCover';
 import { AlbumStack } from './AlbumStack';
 import { CollageAlbumPaper, collageAlbumCardTreatment } from './albums/collageAlbumCardTreatments';
 import { albumTileLinkSx, MAX_ALBUM_SLEEVES } from './albumTileGeometry';
-import styles from './music.classes';
 
 const countChipSx: SxObject = {
   backdropFilter: 'blur(12px) saturate(150%)',
@@ -70,14 +69,14 @@ export function AlbumPlayTile({
     return (
       <CollageAlbumPaper treatment={collageAlbumCardTreatment(cardIndex)}>
         <Tooltip title={tooltip}>
-          <Link className={styles.albumLink} href={linkUrl} isExternal={true} title={tooltip}>
-            <span className={`${styles.art} ${styles.fullColorArt}`}>
+          <Link className="music__albumLink" href={linkUrl} isExternal={true} title={tooltip}>
+            <span className="music__art music__fullColorArt">
               <AlbumStack imageUrl={imageUrl} sleeveCount={sleeveCount}>
                 {cover}
               </AlbumStack>
               {isRun ? (
                 <PaperTag
-                  className={styles.countTag}
+                  className="music__countTag"
                   tiltDeg={cardIndex % 2 === 0 ? 3 : -3}
                   tone="ochre"
                 >
@@ -85,9 +84,9 @@ export function AlbumPlayTile({
                 </PaperTag>
               ) : null}
             </span>
-            <span className={styles.caption}>
-              <strong className={styles.albumName}>{title}</strong>
-              <span className={styles.artist}>{artistNames}</span>
+            <span className="music__caption">
+              <strong className="music__albumName">{title}</strong>
+              <span className="music__artist">{artistNames}</span>
             </span>
           </Link>
         </Tooltip>

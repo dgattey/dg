@@ -2,7 +2,6 @@ import { type CSSProperties, Fragment, type ReactNode } from 'react';
 import { ProjectCard } from '../home/ProjectCard';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS, moreWorkOverflowPlacements } from './cutOutPlacements';
-import styles from './home.classes';
 import {
   MORE_WORK_OVERFLOW_GRID_AREAS,
   type MoreWorkOverflowUnit,
@@ -38,7 +37,7 @@ function MoreWorkGrid({
 
   return (
     <div
-      className={`collageMeasure collageMeasureGrid collageGridStack ${styles.moreWorkGrid}`}
+      className="collageMeasure collageMeasureGrid collageGridStack home__moreWorkGrid"
       style={gridStyle}
     >
       {order.map((area) => {
@@ -73,14 +72,14 @@ export function MoreWorkSheet({
   sites: ReactNode;
 }) {
   return (
-    <section aria-label="More work" className={`collageBleed ${styles.moreWork}`}>
-      <div aria-hidden="true" className={`collageField ${styles.moreWorkField}`} />
+    <section aria-label="More work" className="collageBleed home__moreWork">
+      <div aria-hidden="true" className="collageField home__moreWorkField" />
       {CUT_OUT_PLACEMENTS.moreWork.map((placement) => (
         <CutOut key={placement.id} placement={placement} />
       ))}
       <MoreWorkGrid projects={projects} sites={sites} />
       {overflow.map((unit) => (
-        <div className={styles.overflow} key={unit.key}>
+        <div className="home__overflow" key={unit.key}>
           {moreWorkOverflowPlacements(unit.key).map((placement) => (
             <CutOut key={placement.id} placement={placement} />
           ))}

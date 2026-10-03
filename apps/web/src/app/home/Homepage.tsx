@@ -4,7 +4,6 @@ import { getProjects } from '../../services/contentful';
 import { CutOut } from '../collage/CutOut';
 import { CutOutSymbols } from '../collage/CutOutSymbols';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
-import styles from '../collage/home.classes';
 import { MoreWorkSheet } from '../collage/MoreWorkSheet';
 import {
   assignProjectSlots,
@@ -48,12 +47,12 @@ export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface 
     return (
       <>
         <CutOutSymbols />
-        <section aria-label="Hello" className={`collageBleed ${styles.hello}`}>
+        <section aria-label="Hello" className="collageBleed home__hello">
           {CUT_OUT_PLACEMENTS.helloSheet.map((placement) => (
             <CutOut key={placement.id} placement={placement} />
           ))}
           <div
-            className={`collageMeasure collageMeasureGrid collageGridStack ${styles.helloGrid}`}
+            className="collageMeasure collageMeasureGrid collageGridStack home__helloGrid"
             style={{ gridTemplateAreas: HELLO_GRID_AREAS }}
           >
             <IntroCardSlot surface="collage" />
@@ -71,12 +70,12 @@ export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface 
           sites={<GatteySitesCardSlot surface="collage" />}
         />
         {slots.coda ? (
-          <section aria-label="And" className={`collageBleed ${styles.coda}`}>
+          <section aria-label="And" className="collageBleed home__coda">
             {CUT_OUT_PLACEMENTS.coda.map((placement) => (
               <CutOut key={placement.id} placement={placement} />
             ))}
             <div
-              className={`collageMeasure collageMeasureGrid collageGridStack ${styles.codaGrid}`}
+              className="collageMeasure collageMeasureGrid collageGridStack home__codaGrid"
               style={{ gridTemplateAreas: CODA_GRID_AREAS }}
             >
               <ProjectCard

@@ -1,7 +1,6 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Chip, Typography } from '@mui/material';
 import { PaperTag } from '../../collage/PaperTag';
-import styles from './devConsole.classes';
 
 /**
  * Status chip showing connected/not connected state.
@@ -48,7 +47,7 @@ export function ErrorMessage({
   }
   return (
     <Typography
-      className={surface === 'collage' ? styles.errorText : undefined}
+      className={surface === 'collage' ? 'devConsole__errorText' : undefined}
       color={surface === 'collage' ? undefined : 'error'}
       variant="body2"
     >

@@ -9,7 +9,6 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import chrome from '../collage/chrome.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
 import { usePageScrollProgress } from '../layouts/PageScrollContext';
@@ -141,7 +140,7 @@ export function SpotifyHeaderCard({ surface = 'classic', track }: SpotifyHeaderC
       tabIndex={isHome ? 0 : undefined}
     >
       {surface === 'collage' ? (
-        <PaperCard edge="quad-a" innerClassName={chrome.nowPlayingInner} tiltDeg={1} tone="cream">
+        <PaperCard edge="quad-a" innerClassName="chrome__nowPlayingInner" tiltDeg={1} tone="cream">
           {listing}
         </PaperCard>
       ) : (

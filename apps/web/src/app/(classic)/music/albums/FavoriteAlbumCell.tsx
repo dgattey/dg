@@ -22,7 +22,6 @@ import {
   albumTileLinkSx,
   MAX_ALBUM_SLEEVES,
 } from '../albumTileGeometry';
-import styles from '../music.classes';
 import { type CollageAlbumCardTreatment, CollageAlbumPaper } from './collageAlbumCardTreatments';
 
 /** Every favorite is a whole album, so every cell wears the full fan. */
@@ -121,12 +120,12 @@ export function FavoriteAlbumCell({
       <CollageAlbumPaper selected={collapsed} treatment={collageTreatment}>
         <Tooltip title={collapsed ? `Close ${albumName}` : tooltip}>
           <Link
-            className={styles.albumLink}
+            className="music__albumLink"
             href={href}
             title={title}
             transitionTypes={albumTransitionTypes(collapsed ? 'close' : 'open')}
           >
-            <span className={`${styles.art} ${styles.fullColorArt}`}>
+            <span className="music__art music__fullColorArt">
               <AlbumStack imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT}>
                 <AlbumArtCover
                   albumId={albumId}
@@ -135,15 +134,15 @@ export function FavoriteAlbumCell({
                   imageUrl={imageUrl}
                 />
                 {collapsed ? (
-                  <i aria-hidden="true" className={styles.closeMark}>
+                  <i aria-hidden="true" className="music__closeMark">
                     ×
                   </i>
                 ) : null}
               </AlbumStack>
             </span>
-            <span className={styles.caption}>
-              <strong className={styles.albumName}>{albumName}</strong>
-              <span className={styles.artist}>{artistCaption}</span>
+            <span className="music__caption">
+              <strong className="music__albumName">{albumName}</strong>
+              <span className="music__artist">{artistCaption}</span>
             </span>
           </Link>
         </Tooltip>

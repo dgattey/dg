@@ -8,7 +8,6 @@ import { Skeleton, Stack, Typography } from '@mui/material';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
 import { DevConsoleCardShell } from '../DevConsoleCardShell';
-import styles from '../devConsole.classes';
 import { ErrorMessage, StatusChip } from '../StatusIndicators';
 import { ConnectButton } from './ConnectButton';
 import { ForceRefreshButton } from './ForceRefreshButton';
@@ -62,7 +61,7 @@ function ButtonGrid({
   surface?: SiteSurface;
 }) {
   if (surface === 'collage') {
-    return <div className={styles.actions}>{children}</div>;
+    return <div className="devConsole__actions">{children}</div>;
   }
   return (
     <Stack

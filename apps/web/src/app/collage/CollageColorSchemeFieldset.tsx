@@ -5,7 +5,6 @@ import { type ColorSchemePreference, parseColorSchemePreference } from '@dg/ui/t
 import { useColorScheme } from '@dg/ui/theme/useColorScheme';
 import type { LucideIcon } from 'lucide-react';
 import { Monitor, Moon, Sun } from 'lucide-react';
-import chrome from './chrome.classes';
 import { PaperCard } from './PaperCard';
 
 const OPTIONS = [
@@ -23,15 +22,15 @@ export function CollageColorSchemeFieldset() {
   const { preference, setPreference } = useColorScheme();
 
   return (
-    <fieldset className={chrome.scheme} {...jsOnlyProps}>
-      <legend className={chrome.srOnly}>Color scheme</legend>
-      <PaperCard edge="quad-c" innerClassName={chrome.schemeTrack} tiltDeg={1.5} tone="black">
+    <fieldset className="chrome__scheme" {...jsOnlyProps}>
+      <legend className="chrome__srOnly">Color scheme</legend>
+      <PaperCard edge="quad-c" innerClassName="chrome__schemeTrack" tiltDeg={1.5} tone="black">
         {OPTIONS.map(({ Icon, label, value }) => (
-          <label className={chrome.schemeOption} key={value} title={label}>
+          <label className="chrome__schemeOption" key={value} title={label}>
             <input
               aria-label={label}
               checked={value === preference}
-              className={chrome.srOnly}
+              className="chrome__srOnly"
               name="collage-color-scheme"
               onChange={() => setPreference(parseColorSchemePreference(value))}
               type="radio"

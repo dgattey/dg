@@ -16,7 +16,6 @@ import { musicDestinationLabel } from '../../layouts/musicHeaderDestinations';
 import { PageTitle } from '../../layouts/PageTitle';
 import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
-import styles from './music.classes';
 
 const TITLE = musicDestinationLabel(musicRoute);
 
@@ -64,7 +63,7 @@ async function MusicHistory({ surface = 'classic' }: { surface?: SiteSurface } =
 export default function MusicPage({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
   if (surface === 'collage') {
     return (
-      <section aria-label={TITLE} className={`collageBackdropHost ${styles.historyLayout}`}>
+      <section aria-label={TITLE} className="collageBackdropHost music__historyLayout">
         <CollageBackdrop backdrop={HISTORY_BACKDROP} />
         <CutLetters className="collagePageTitle" text={TITLE} />
         <Suspense fallback={<MusicHistorySkeleton surface="collage" />}>

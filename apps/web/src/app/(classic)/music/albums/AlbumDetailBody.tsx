@@ -4,7 +4,6 @@ import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
-import styles from '../music.classes';
 import {
   ALBUM_WELL_TRACK_COLUMN_GAP,
   ALBUM_WELL_TRACK_NUMBER_COLUMN,
@@ -166,22 +165,22 @@ function Popularity({ value }: { value: number }) {
 function CollageAlbumDetail({ album }: { album: AlbumDetail }) {
   return (
     <div style={{ display: 'contents' }}>
-      <div className={styles.wellMeta}>
+      <div className="music__wellMeta">
         <div data-role="album-meta">
-          <h3 className={styles.wellArtists} data-role="album-artists">
+          <h3 className="music__wellArtists" data-role="album-artists">
             <LinkedArtists artists={album.artists} />
           </h3>
-          <div className={styles.wellFacts}>
+          <div className="music__wellFacts">
             <p style={{ fontVariantNumeric: 'tabular-nums' }}>{albumFacts(album).join(' · ')}</p>
             {album.popularity == null ? null : (
               <div
                 aria-label={`Popularity ${album.popularity} out of 100`}
-                className={styles.wellPopularity}
+                className="music__wellPopularity"
                 role="img"
               >
-                <div className={styles.wellPopularityTrack}>
+                <div className="music__wellPopularityTrack">
                   <div
-                    className={styles.wellPopularityFill}
+                    className="music__wellPopularityFill"
                     style={{ width: `${album.popularity}%` }}
                   />
                 </div>
@@ -190,9 +189,9 @@ function CollageAlbumDetail({ album }: { album: AlbumDetail }) {
           </div>
         </div>
       </div>
-      <ol className={styles.wellTracks} data-role="track-list">
+      <ol className="music__wellTracks" data-role="track-list">
         {album.tracks.map((track) => (
-          <li className={styles.wellTrack} data-role="track-row" key={track.id}>
+          <li className="music__wellTrack" data-role="track-row" key={track.id}>
             <span
               data-role="track-number"
               style={{ alignSelf: 'start', fontVariantNumeric: 'tabular-nums', textAlign: 'end' }}
@@ -200,13 +199,13 @@ function CollageAlbumDetail({ album }: { album: AlbumDetail }) {
               {track.trackNumber}
             </span>
             <span data-role="track-text" style={{ display: 'grid', minWidth: 0, rowGap: 2 }}>
-              <span className={styles.wellTrackTitle} data-role="track-title" title={track.name}>
+              <span className="music__wellTrackTitle" data-role="track-title" title={track.name}>
                 <Link href={track.url} isExternal={true} title={`Open ${track.name} on Spotify`}>
                   {track.name}
                 </Link>
               </span>
               <span
-                className={styles.wellTrackArtist}
+                className="music__wellTrackArtist"
                 data-role="track-artists"
                 title={track.artists.map((artist) => artist.name).join(', ')}
               >

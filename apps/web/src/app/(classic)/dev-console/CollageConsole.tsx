@@ -6,7 +6,6 @@ import { CutLetters } from '../../collage/CutLetters';
 import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
 import type { PaperTone } from '../../collage/types';
-import styles from './devConsole.classes';
 import { OauthCard } from './oauth/OauthCard';
 import { VercelSignInCard } from './vercel/VercelSignInCard';
 import { WebhookCard } from './webhooks/WebhookCard';
@@ -25,11 +24,11 @@ function Section({
   tone: PaperTone;
 }) {
   return (
-    <section aria-labelledby={`dev-console-${sectionId}`} className={styles.section}>
-      <PaperTag className={`collageEyebrow ${styles.sectionTitle}`} tiltDeg={tiltDeg} tone={tone}>
+    <section aria-labelledby={`dev-console-${sectionId}`} className="devConsole__section">
+      <PaperTag className="collageEyebrow devConsole__sectionTitle" tiltDeg={tiltDeg} tone={tone}>
         <span id={`dev-console-${sectionId}`}>{title}</span>
       </PaperTag>
-      <div className={styles.cards}>{children}</div>
+      <div className="devConsole__cards">{children}</div>
     </section>
   );
 }
@@ -40,17 +39,17 @@ export function CollageConsole({
   searchParams?: Promise<Record<string, string | Array<string> | undefined>>;
 }) {
   return (
-    <main className={`collageBleed collageBackdropHost ${styles.sheet}`}>
+    <main className="collageBleed collageBackdropHost devConsole__sheet">
       <CollageBackdrop backdrop={DEV_CONSOLE_BACKDROP} />
-      <div className={`collageMeasure ${styles.grid}`}>
-        <div className={styles.header}>
-          <CutLetters className={`collagePageTitle ${styles.title}`} text="Dev console" />
+      <div className="collageMeasure devConsole__grid">
+        <div className="devConsole__header">
+          <CutLetters className="collagePageTitle devConsole__title" text="Dev console" />
           <PaperCard
-            className={styles.lede}
+            className="devConsole__lede"
             edge="quad-c"
-            innerClassName={styles.ledeInner}
+            innerClassName="devConsole__ledeInner"
             tag={
-              <PaperTag className={`collagePin ${styles.protectedTag}`} tiltDeg={-3} tone="rose">
+              <PaperTag className="collagePin devConsole__protectedTag" tiltDeg={-3} tone="rose">
                 Protected <small>basic auth</small>
               </PaperTag>
             }
@@ -59,7 +58,7 @@ export function CollageConsole({
             <Typography>This page is protected and intended for developer access.</Typography>
           </PaperCard>
         </div>
-        <div className={styles.console}>
+        <div className="devConsole__console">
           <Section
             sectionId="OAuth-connections"
             tiltDeg={-2}

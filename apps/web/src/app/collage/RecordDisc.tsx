@@ -4,7 +4,6 @@ import type { Track } from '@dg/content-models/spotify/Track';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { AlbumArtWithNotes } from '../spotify/AlbumArtWithNotes';
-import styles from './print.classes';
 
 export function RecordDisc({ track }: { track: Track }) {
   return (
@@ -18,24 +17,24 @@ export function RecordDisc({ track }: { track: Track }) {
         width: 'min(100%, 240px)',
       }}
     >
-      <div className={styles.disc}>
-        <div className={styles.discPiece}>
+      <div className="print__disc">
+        <div className="print__discPiece">
           <Link
             aria-label="Spotify"
-            className={styles.logo}
+            className="print__logo"
             href={track.externalUrls.spotify}
             isExternal={true}
             title={track.name}
           >
-            <span className={styles.logoMark} />
+            <span className="print__logoMark" />
           </Link>
           <Link
-            className={styles.artLink}
+            className="print__artLink"
             href={track.album.externalUrls.spotify}
             isExternal={true}
             title={track.album.name}
           >
-            <span className={styles.art}>
+            <span className="print__art">
               <Image
                 alt={track.album.name}
                 cover={true}
@@ -47,7 +46,7 @@ export function RecordDisc({ track }: { track: Track }) {
               />
             </span>
           </Link>
-          <span aria-hidden="true" className={styles.hole} />
+          <span aria-hidden="true" className="print__hole" />
         </div>
       </div>
     </AlbumArtWithNotes>

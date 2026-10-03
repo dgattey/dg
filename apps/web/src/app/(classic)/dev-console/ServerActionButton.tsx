@@ -5,7 +5,6 @@ import type { ButtonProps } from '@mui/material';
 import { Button, Stack } from '@mui/material';
 import { useState } from 'react';
 import { PaperButton } from '../../collage/PaperButton';
-import styles from './devConsole.classes';
 import { ErrorMessage } from './StatusIndicators';
 
 type ServerActionButtonProps = {
@@ -68,7 +67,7 @@ export function ServerActionButton({
       <ErrorMessage message={error} surface={surface} />
       {surface === 'collage' ? (
         <PaperButton
-          className={styles.actionButton}
+          className="devConsole__actionButton"
           disabled={isLoading}
           onClick={handleClick}
           tiltDeg={variant === 'outlined' ? 2 : -2}

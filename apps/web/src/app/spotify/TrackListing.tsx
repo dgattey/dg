@@ -5,7 +5,6 @@ import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { Box, Card, Stack } from '@mui/material';
-import styles from '../collage/home.classes';
 import { PaperCard } from '../collage/PaperCard';
 import { RecordDisc } from '../collage/RecordDisc';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
@@ -288,10 +287,10 @@ export function TrackListing({
 }: TrackListingProps) {
   if (surface === 'collage') {
     return (
-      <div className={styles.spotify} data-slot="sp" style={{ gridArea: 'sp' }}>
+      <div className="home__spotify" data-slot="sp" style={{ gridArea: 'sp' }}>
         <RecordDisc track={track} />
-        <PaperCard className={styles.spotifyMeta} edge="quad-b" tiltDeg={-2} tone="cream">
-          <div className={styles.spotifyMetaInner}>
+        <PaperCard className="home__spotifyMeta" edge="quad-b" tiltDeg={-2} tone="cream">
+          <div className="home__spotifyMetaInner">
             <TrackCardMeta colors={COLLAGE_TRACK_COLORS} textShadow={false} track={track} />
           </div>
         </PaperCard>
