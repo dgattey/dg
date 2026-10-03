@@ -20,6 +20,7 @@ export const metadata: Metadata = baseMetadata;
 export { viewport };
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
+  // Cached server time for hydration-safe relative time rendering
   const serverTime = await getServerTime();
 
   return (
@@ -32,7 +33,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <AppRouterCacheProvider>
           <ServerTimeProvider serverTime={serverTime}>
             <GlobalStyleProvider>
+              {/* Restores the stored scheme that hydration strips off <html> */}
               <ColorSchemeSync />
+              {/* Refresh RSC data on focus or navigation */}
               <RefreshOnFocusProvider />
               <WebMcpTools />
               {children}

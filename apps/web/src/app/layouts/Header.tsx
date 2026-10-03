@@ -19,6 +19,7 @@ import { HeaderControls } from './HeaderControls';
 import { Logo } from './Logo';
 import { SiteHeaderHeight } from './SiteHeaderHeight';
 
+// Makes the header bar sticky and not responsive to user events by default
 const stickyContainerSx: SxObject = {
   maxWidth: 'unset',
   position: 'sticky',
@@ -33,6 +34,7 @@ const navSx: SxObject = {
   columnGap: { sm: 2, xs: 1.5 },
 };
 
+/** Glass container with logo + music content */
 const glassContainerSx: SxObject = {
   alignItems: 'center',
   display: 'inline-flex',
@@ -42,6 +44,10 @@ const glassContainerSx: SxObject = {
   py: 0.75,
 };
 
+/**
+ * Async slot for Spotify header card. Fetches track data server-side.
+ * Wrapped in Suspense because getLatestSong accesses runtime data (cookies).
+ */
 async function SpotifyHeaderCardSlot({ surface }: { surface: SiteSurface }) {
   const track = await getLatestSong();
   if (!track) {
@@ -50,6 +56,11 @@ async function SpotifyHeaderCardSlot({ surface }: { surface: SiteSurface }) {
   return <SpotifyHeaderCard surface={surface} track={track} />;
 }
 
+/**
+ * Creates the site header component with glass background behind logo + music.
+ * Logo and header controls are server-rendered immediately.
+ * Music card streams in via Suspense to avoid blocking.
+ */
 export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
   if (surface === 'collage') {
     return (
