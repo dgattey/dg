@@ -8,10 +8,9 @@ import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { BRAND } from '@dg/ui/theme/color';
 import { Stack, Typography } from '@mui/material';
+import { NOT_FOUND_BACKDROP, SERVER_ERROR_BACKDROP } from '../collage/backdrops';
+import { CollageBackdrop } from '../collage/CollageBackdrop';
 import { CutLetters } from '../collage/CutLetters';
-import { CutOut } from '../collage/CutOut';
-import { CutOutSymbols } from '../collage/CutOutSymbols';
-import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
 import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
 import styles from './error.classes';
@@ -71,11 +70,13 @@ export function ErrorLayout({ statusCode, surface = 'classic' }: ErrorLayoutProp
 
   if (surface === 'collage') {
     return (
-      <section aria-label={String(statusCode)} className={`collageBleed ${styles.sheet}`}>
-        <CutOutSymbols />
-        {CUT_OUT_PLACEMENTS.error.map((placement) => (
-          <CutOut key={placement.id} placement={placement} />
-        ))}
+      <section
+        aria-label={String(statusCode)}
+        className={`collageBleed collageBackdropHost ${styles.sheet}`}
+      >
+        <CollageBackdrop
+          backdrop={statusCode === 404 ? NOT_FOUND_BACKDROP : SERVER_ERROR_BACKDROP}
+        />
         <div className={styles.content}>
           <CutLetters className={styles.statusCode} cut={true} text={String(statusCode)} />
           <PaperCard
