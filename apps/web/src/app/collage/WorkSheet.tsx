@@ -19,8 +19,6 @@ export function WorkSheet({
   const projectTwo = frames.find((frame) => frame.gridArea === 'ws');
   const grid = workSheetGridAreas({
     c1: projectOne !== undefined,
-    sp: spotify != null,
-    st: strava != null,
     ws: projectTwo !== undefined,
   });
   const gridStyle: CSSProperties = {
