@@ -32,7 +32,7 @@ export function CollageMapCard({ location }: { location: MapLocation | null | un
         <MapCard location={location} surface="collage" />
       </PaperCard>
       <PaperTag className={styles.mapTag} edge="quad-c" tiltDeg={-2} tone="cream">
-        <span>{location.title}</span>
+        <span>{location.title?.trim() || 'Current location'}</span>
         <small>{coordinates}</small>
       </PaperTag>
     </div>

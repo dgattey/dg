@@ -5,11 +5,6 @@ import type { RenderableAsset } from './renderables/assets';
  */
 export type MapLocation = {
   /**
-   * Human-readable location name.
-   */
-  title: string;
-
-  /**
    * Coordinates to center the map.
    */
   point: {
@@ -26,6 +21,11 @@ export type MapLocation = {
    * Optional image used for the marker.
    */
   image?: RenderableAsset | null;
+
+  /**
+   * Optional human-readable location name.
+   */
+  title?: string | null;
 
   /**
    * Sorted zoom levels from Contentful. First = min, last = max.
