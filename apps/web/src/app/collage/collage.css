@@ -184,14 +184,6 @@ html[data-color-scheme="dark"] .collageRoot::after {
   filter: var(--dshadow);
   rotate: var(--r);
 }
-.paperWrap:has(:focus-visible) {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
-}
-.collageLift:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
-}
 .paperInner {
   color: var(--on);
   background: var(--pc);
@@ -246,6 +238,8 @@ html[data-color-scheme="dark"] .collageRoot::after {
   outline: none;
 }
 :where(
+  .paperWrap:has(:focus-visible),
+  .collageLift:focus-visible,
   .chrome__musicSummary:focus-visible > .paperWrap,
   .home__sideRowWrap:has(.home__sideRow:focus-visible),
   .print__portrait:focus-visible
