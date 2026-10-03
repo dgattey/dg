@@ -46,8 +46,6 @@ html:has(.collageRoot) body {
   --gap: clamp(14px, 1.6vw, 24px);
   --pad: clamp(16px, 4vw, 80px);
   --measure: 1280px;
-  --shadow: 0 1px 0 rgb(0 0 0 / 0.22), 0 2px 3px rgb(0 0 0 / 0.1);
-  --shadow-lift: 0 1px 0 rgb(0 0 0 / 0.22), 0 6px 10px rgb(0 0 0 / 0.14);
   --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.2)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.12));
   --display: var(--font-familjen), "Avenir Next", "Helvetica Neue", system-ui, sans-serif;
   --body:
