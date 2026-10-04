@@ -22,15 +22,15 @@ jest.mock('../../../../../auth/vercel/getVercelSession', () => ({
 import { VercelSignInCardContent } from '../VercelSignInCard';
 
 describe('VercelSignInCard', () => {
-  it.each<SiteSurface>([
-    'classic',
-    'collage',
-  ])('signs out through a form submit on the %s surface', async (surface) => {
-    render(await VercelSignInCardContent({ surface }));
+  it.each<SiteSurface>(['classic', 'collage'])(
+    'signs out through a form submit on the %s surface',
+    async (surface) => {
+      render(await VercelSignInCardContent({ surface }));
 
-    const signOut = screen.getByRole('button', { name: 'Sign out' });
-    expect(signOut).toHaveAttribute('type', 'submit');
-    expect(signOut.closest('form')).not.toBeNull();
-    expect(screen.queryByRole('link', { name: 'Sign out' })).toBeNull();
-  });
+      const signOut = screen.getByRole('button', { name: 'Sign out' });
+      expect(signOut).toHaveAttribute('type', 'submit');
+      expect(signOut.closest('form')).not.toBeNull();
+      expect(screen.queryByRole('link', { name: 'Sign out' })).toBeNull();
+    },
+  );
 });

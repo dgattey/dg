@@ -1,10 +1,11 @@
 import 'server-only';
 
-import { vercelAuthLogoutRoute, vercelAuthRoute } from '@dg/shared-core/routes/api';
+import { vercelAuthRoute } from '@dg/shared-core/routes/api';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Button, Stack, Typography } from '@mui/material';
 import { Suspense } from 'react';
 import { getVercelSession } from '../../../../auth/vercel/getVercelSession';
+import { signOutOfVercel } from '../../../../auth/vercel/session.actions';
 import { PaperButton } from '../../../collage/PaperButton';
 import { DevConsoleCardShell } from '../DevConsoleCardShell';
 import { ErrorMessage, StatusChip } from '../StatusIndicators';
@@ -72,19 +73,22 @@ export async function VercelSignInCardContent({
         </Stack>
       ) : null}
 
-      {surface === 'collage' ? (
-        <PaperButton
-          href={session ? vercelAuthLogoutRoute : vercelAuthRoute}
-          tiltDeg={session ? 2 : -2}
-          title={session ? 'Sign out' : 'Sign in with Vercel'}
-          tone={session ? 'cream' : 'ochre'}
-        >
-          {session ? 'Sign out' : 'Sign in with Vercel'}
+      {session ? (
+        <form action={signOutOfVercel}>
+          {surface === 'collage' ? (
+            <PaperButton tiltDeg={2} tone="cream" type="submit">
+              Sign out
+            </PaperButton>
+          ) : (
+            <Button size="small" type="submit" variant="outlined">
+              Sign out
+            </Button>
+          )}
+        </form>
+      ) : surface === 'collage' ? (
+        <PaperButton href={vercelAuthRoute} tiltDeg={-2} title="Sign in with Vercel" tone="ochre">
+          Sign in with Vercel
         </PaperButton>
-      ) : session ? (
-        <Button href={vercelAuthLogoutRoute} size="small" variant="outlined">
-          Sign out
-        </Button>
       ) : (
         <Button href={vercelAuthRoute} size="small" variant="contained">
           Sign in with Vercel
