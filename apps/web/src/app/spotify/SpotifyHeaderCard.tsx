@@ -87,7 +87,10 @@ function scrollToNowPlayingCard() {
  * Off-home (and not already on music) navigates to listening history.
  * Track display is delegated to TrackListing variant="compact".
  */
-export function SpotifyHeaderCard({ surface = 'classic', track: serverTrack }: SpotifyHeaderCardProps) {
+export function SpotifyHeaderCard({
+  surface = 'classic',
+  track: serverTrack,
+}: SpotifyHeaderCardProps) {
   const track = useNowPlaying(serverTrack);
   const pathname = usePathname();
   const scrollContext = usePageScrollProgress();
