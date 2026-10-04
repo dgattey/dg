@@ -33,7 +33,11 @@ type PaperButtonProps = {
  * prefetch them, and their redirects to OAuth hosts fail as cross-origin fetches.
  */
 function isAppPage(href: string): boolean {
-  return href.startsWith('/') && !href.startsWith('//') && !shouldSkipRedesignRewrite(href.split(/[?#]/)[0] ?? href);
+  return (
+    href.startsWith('/') &&
+    !href.startsWith('//') &&
+    !shouldSkipRedesignRewrite(href.split(/[?#]/)[0] ?? href)
+  );
 }
 
 export function PaperButton({
