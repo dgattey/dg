@@ -1,6 +1,7 @@
 'use client';
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { GlassSwitcher } from '@dg/ui/core/GlassSwitcher';
 import { jsOnlyProps } from '@dg/ui/core/JsOnlyStyle';
 import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
@@ -10,12 +11,18 @@ import { Box, Stack } from '@mui/material';
 import { ArrowDownUp } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { PaperTag } from '../../../collage/PaperTag';
 import { hasClientHydrated } from '../../../layouts/clientHydrated';
 import { ALBUM_GRID_COLUMNS, albumGridSx, albumTileSlotSx } from '../albumTileGeometry';
 import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
 import { AlbumWell } from './AlbumWell';
+import {
+  COLLAGE_ALBUM_GRID_COLUMNS,
+  collageAlbumCardTreatment,
+} from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
-import { FavoriteAlbumsSkeleton } from './FavoriteAlbumsSkeleton';
+import styles from './FavoriteAlbums.module.css';
+import { FavoriteAlbumsReserve } from './FavoriteAlbumsSkeleton';
 import { useOptimisticAlbumSelection } from './useOptimisticAlbumSelection';
 
 /**
@@ -59,13 +66,20 @@ function afterNextPaint() {
 }
 
 const SORT_OPTIONS = [
-  { key: 'added', label: 'Recently added' },
-  { key: 'album', label: 'Album' },
-  { key: 'artist', label: 'Artist' },
-  { key: 'released', label: 'Release date' },
+  { key: 'added', label: 'Recently added', tiltDeg: -3 },
+  { key: 'album', label: 'Album', tiltDeg: 2 },
+  { key: 'artist', label: 'Artist', tiltDeg: -1.5 },
+  { key: 'released', label: 'Release date', tiltDeg: 2.5 },
 ] as const;
 
 type AlbumSortKey = (typeof SORT_OPTIONS)[number]['key'];
+
+type AlbumGridColumns = Record<keyof typeof ALBUM_GRID_COLUMNS, number>;
+
+const ALBUM_GRID_COLUMNS_BY_SURFACE = {
+  classic: ALBUM_GRID_COLUMNS,
+  collage: COLLAGE_ALBUM_GRID_COLUMNS,
+} satisfies Record<SiteSurface, AlbumGridColumns>;
 
 const comparators: Record<AlbumSortKey, (a: PlaylistAlbum, b: PlaylistAlbum) => number> = {
   added: (a, b) => b.addedAt.localeCompare(a.addedAt),
@@ -73,6 +87,10 @@ const comparators: Record<AlbumSortKey, (a: PlaylistAlbum, b: PlaylistAlbum) => 
   artist: (a, b) => a.primaryArtist.localeCompare(b.primaryArtist) || a.name.localeCompare(b.name),
   released: (a, b) => b.releaseDate.localeCompare(a.releaseDate),
 };
+
+function isAlbumSortKey(value: string): value is AlbumSortKey {
+  return SORT_OPTIONS.some((option) => option.key === value);
+}
 
 /** A cell's slot in the grid, stretched around it and ordered ahead of a well. */
 function albumSlotSx(index: number): SxObject {
@@ -89,17 +107,22 @@ function albumSlotSx(index: number): SxObject {
  * its slot is emitted once per breakpoint rather than measured in JS —
  * measuring would render a different tree on the server than on the client.
  */
-function wellPlacementSx(selectedIndex: number, albumCount: number): SxObject {
+function wellPlacementSx(
+  selectedIndex: number,
+  albumCount: number,
+  surface: SiteSurface,
+): SxObject {
   const slotFor = (columns: number) =>
     2 * Math.min(albumCount, (Math.floor(selectedIndex / columns) + 1) * columns);
+  const columns = ALBUM_GRID_COLUMNS_BY_SURFACE[surface];
 
   return {
     gridColumn: '1 / -1',
     order: {
-      lg: slotFor(ALBUM_GRID_COLUMNS.lg),
-      md: slotFor(ALBUM_GRID_COLUMNS.md),
-      sm: slotFor(ALBUM_GRID_COLUMNS.sm),
-      xs: slotFor(ALBUM_GRID_COLUMNS.xs),
+      lg: slotFor(columns.lg),
+      md: slotFor(columns.md),
+      sm: slotFor(columns.sm),
+      xs: slotFor(columns.xs),
     },
   };
 }
@@ -108,6 +131,7 @@ type Props = {
   albums: Array<PlaylistAlbum>;
   /** Streamed detail for the album in the URL, rendered inside the well. */
   children?: ReactNode;
+  surface?: SiteSurface;
 };
 
 /**
@@ -120,7 +144,7 @@ type Props = {
  * mounted across open and close. Clicks run ahead of the query so the well
  * opens on the click instead of on the payload that click goes and fetches.
  */
-export function FavoriteAlbumsGrid({ albums, children }: Props) {
+export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Props) {
   // Client navigations photograph a height-matched reserve instead of ~300
   // next/image nodes. Reveal after the page-rise animations (plus a paint)
   // so the grid commit cannot hitch the 300ms transition.
@@ -182,17 +206,21 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
   });
 
   if (!showGrid) {
-    return <FavoriteAlbumsSkeleton reserveOnly tileCount={albums.length} />;
+    return <FavoriteAlbumsReserve albums={albums} surface={surface} />;
   }
 
-  const sortedAlbums = [...albums].sort(comparators[sortKey]);
+  const albumCards = albums.map((album, index) => ({
+    album,
+    treatment: collageAlbumCardTreatment(index),
+  }));
+  const sortedAlbumCards = albumCards.sort((a, b) => comparators[sortKey](a.album, b.album));
   const selectedIndex = selectedAlbumId
-    ? sortedAlbums.findIndex((album) => album.id === selectedAlbumId)
+    ? sortedAlbumCards.findIndex(({ album }) => album.id === selectedAlbumId)
     : -1;
-  const selectedAlbum = selectedIndex >= 0 ? sortedAlbums[selectedIndex] : undefined;
+  const selectedAlbum = selectedIndex >= 0 ? sortedAlbumCards[selectedIndex]?.album : undefined;
   const well = selectedAlbum ? (
-    <Box key="album-well" sx={wellPlacementSx(selectedIndex, sortedAlbums.length)}>
-      <AlbumWell album={selectedAlbum}>
+    <Box key="album-well" sx={wellPlacementSx(selectedIndex, sortedAlbumCards.length, surface)}>
+      <AlbumWell album={selectedAlbum} surface={surface}>
         {/*
          * Streamed detail always belongs to the album in the URL, so it is only
          * rendered once the URL agrees with what the well is showing; until then
@@ -201,13 +229,13 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
          * lingering inside another album's well.
          */}
         <Fragment key={selectedAlbum.id}>
-          {isAwaitingDetail ? <AlbumDetailBodySkeleton /> : children}
+          {isAwaitingDetail ? <AlbumDetailBodySkeleton surface={surface} /> : children}
         </Fragment>
       </AlbumWell>
     </Box>
   ) : null;
 
-  const renderAlbum = (album: PlaylistAlbum, index: number) => (
+  const renderAlbum = ({ album, treatment }: (typeof sortedAlbumCards)[number], index: number) => (
     <Box
       key={album.id}
       ref={(element: HTMLElement | null) => {
@@ -222,8 +250,11 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
       <FavoriteAlbumCell
         albumId={album.id}
         albumName={album.name}
+        artistCaption={album.artistNames}
+        collageTreatment={treatment}
         collapsed={album.id === selectedAlbumId}
         imageUrl={album.imageUrl}
+        surface={surface}
         tooltip={`${album.name} – ${album.artistNames}`}
       />
     </Box>
@@ -231,11 +262,44 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
 
   // The well sits next to its album in the DOM for reading and tab order; CSS
   // `order` is what floats it down to the end of that album's row.
-  const cells = sortedAlbums.flatMap((album, index) =>
+  const cells = sortedAlbumCards.flatMap((albumCard, index) =>
     index === selectedIndex && well
-      ? [renderAlbum(album, index), well]
-      : [renderAlbum(album, index)],
+      ? [renderAlbum(albumCard, index), well]
+      : [renderAlbum(albumCard, index)],
   );
+
+  if (surface === 'collage') {
+    return (
+      <>
+        <nav aria-label="Sort albums" className={styles.collageSort} {...jsOnlyProps}>
+          {SORT_OPTIONS.map((option) => {
+            const current = option.key === sortKey;
+            return (
+              <PaperTag
+                className={styles.collageSortTag}
+                edge="quad-a"
+                key={option.key}
+                tiltDeg={option.tiltDeg}
+                tone={current ? 'black' : 'cream'}
+              >
+                <button
+                  aria-pressed={current}
+                  className={styles.collageSortButton}
+                  onClick={() => handleSortChange(option.key)}
+                  type="button"
+                >
+                  {option.label}
+                </button>
+              </PaperTag>
+            );
+          })}
+        </nav>
+        <Box className={styles.collageAlbumGrid} onClickCapture={onAlbumNavigationCapture}>
+          {cells}
+        </Box>
+      </>
+    );
+  }
 
   return (
     <Stack spacing={2}>
@@ -250,7 +314,11 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
         <GlassSwitcher
           aria-label="Sort albums"
           mobileIcon={<ArrowDownUp size={18} />}
-          onChange={(next) => handleSortChange(next as AlbumSortKey)}
+          onChange={(next) => {
+            if (isAlbumSortKey(next)) {
+              handleSortChange(next);
+            }
+          }}
           options={SORT_OPTIONS.map((option) => ({ label: option.label, value: option.key }))}
           value={sortKey}
         />

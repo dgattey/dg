@@ -1,20 +1,16 @@
-import type { ReactElement, ReactNode } from 'react';
+import { Children, isValidElement } from 'react';
 import { PageTitle } from '../../../../layouts/PageTitle';
 import FavoriteAlbumsLayout from '../layout';
 
 describe('Favorite albums layout', () => {
   it('renders the page title so it survives album navigations', () => {
-    const element = FavoriteAlbumsLayout({ children: null }) as ReactElement<{
-      children: ReactNode;
-    }>;
-    const children = Array.isArray(element.props.children)
-      ? element.props.children
-      : [element.props.children];
-    const title = children.find(
-      (child): child is ReactElement<{ children: string }> =>
-        !!child && typeof child === 'object' && 'type' in child && child.type === PageTitle,
+    const element = FavoriteAlbumsLayout({ children: null });
+    const title = Children.toArray(element.props.children).find(
+      (child) => isValidElement(child) && child.type === PageTitle,
     );
     expect(title).toBeDefined();
-    expect(title?.props.children).toBe('Favorite albums');
+    expect(isValidElement<{ children: string }>(title) ? title.props.children : undefined).toBe(
+      'Favorite albums',
+    );
   });
 });
