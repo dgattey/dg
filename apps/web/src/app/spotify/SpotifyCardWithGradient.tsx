@@ -53,6 +53,8 @@ const cardSx: SxObject = {
   zIndex: 1,
 };
 
+const collageTrackerSx: SxObject = { gridArea: 'sp' };
+
 function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
   return (
     <Box sx={shellContainerSx}>
@@ -101,7 +103,7 @@ export function SpotifyCardWithGradient({
 
   if (surface === 'collage') {
     return (
-      <SpotifyCardScrollTracker>
+      <SpotifyCardScrollTracker sx={collageTrackerSx}>
         <TrackListing surface="collage" track={track} />
       </SpotifyCardScrollTracker>
     );

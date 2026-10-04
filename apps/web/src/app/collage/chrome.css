@@ -50,9 +50,25 @@
   max-width: min(420px, 52vw);
   margin-top: 6px;
 }
-.chrome__nowPlayingInner {
+/*
+ * The album art zooms past the paper's edge on hover and focus, so the torn
+ * shape is painted underneath rather than clipping the card's contents.
+ */
+.paperInner.chrome__nowPlayingInner {
+  position: relative;
+  isolation: isolate;
   min-width: 0;
   padding: 7px 14px 7px 7px;
+  background: none;
+  clip-path: none;
+}
+.chrome__nowPlayingInner::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background: var(--pc);
+  clip-path: var(--clip, var(--quad-a));
 }
 .chrome__spacer {
   flex: 1;

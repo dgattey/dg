@@ -117,6 +117,7 @@ export function SpotifyHeaderCard({ surface = 'classic', track }: SpotifyHeaderC
     <TrackListing
       disableLinks={isHome || opensMusicPage}
       shouldAnimate={isInViewport}
+      surface={surface}
       track={track}
       variant="compact"
     />
