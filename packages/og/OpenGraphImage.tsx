@@ -26,8 +26,8 @@ function Logo() {
 }
 
 /**
- * Creates an image using the Vercel edge runtime for an
- * Open Graph response. Contains DG branding and some text.
+ * Creates an image for an Open Graph response. Contains DG branding and
+ * some text.
  */
 export function OpenGraphImage({ text, subtitle }: { text: string; subtitle: string }) {
   return (

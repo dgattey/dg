@@ -118,7 +118,11 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
                 </PaperTag>
               </h2>
             </StickyFadeBar>
-            <MusicGrid surface="collage" tracks={section.tracks} />
+            <MusicGrid
+              hasLcpCandidate={sectionIndex === 0}
+              surface="collage"
+              tracks={section.tracks}
+            />
           </section>
         ))}
         <div className="music__sentinel" ref={sentinelRef}>

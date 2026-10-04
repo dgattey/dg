@@ -25,6 +25,11 @@ import {
 
 const WELL_ART_SIZE = 220;
 
+const CLASSIC_WELL_ART_SIZES = { extraLarge: WELL_ART_SIZE, medium: WELL_ART_SIZE, tiny: 160 };
+
+/** The collage well art is 220px through its 820px stack and up to 300px beside the tracklist. */
+const COLLAGE_WELL_ART_SIZES = { extraLarge: 300, large: 300, medium: 300, small: 220, tiny: 220 };
+
 const REDUCED_MOTION = '@media (prefers-reduced-motion: reduce)';
 
 /**
@@ -267,8 +272,10 @@ export function AlbumWell({ album, children, surface = 'classic', tone = 'viridi
         >
           <Image
             alt={album.name}
+            fetchPriority={isCollage ? 'high' : undefined}
             height={WELL_ART_SIZE}
-            sizes={{ extraLarge: WELL_ART_SIZE, medium: WELL_ART_SIZE, tiny: 160 }}
+            preload={isCollage}
+            sizes={isCollage ? COLLAGE_WELL_ART_SIZES : CLASSIC_WELL_ART_SIZES}
             url={album.imageUrl}
             width={WELL_ART_SIZE}
           />
