@@ -20,7 +20,7 @@ const rowSx: SxObject = {
 const collageMetaRowSx: SxObject = { gridArea: 'meta', mt: '10px' };
 const collageMetaTextSx: SxObject = { display: 'grid', minWidth: 0, rowGap: '6px' };
 const collageRowSx: SxObject = {
-  borderBottom: '1px solid color-mix(in oklab, var(--cream) 28%, var(--viridian))',
+  borderBottom: '1px solid color-mix(in oklab, var(--on) 28%, var(--pc))',
   columnGap: '10px',
   display: 'grid',
   gridTemplateColumns: `${ALBUM_WELL_TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,

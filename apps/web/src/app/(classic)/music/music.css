@@ -267,7 +267,10 @@ html:active-view-transition-type(album-open) .music__wellCard {
   column-gap: 36px;
   align-content: start;
   padding: 36px 40px 40px;
-  color: var(--cream);
+  color: var(--on);
+}
+.music__wellShell :is(h2, h3, p) {
+  margin: 0;
 }
 .music__wellShell a {
   color: inherit;
@@ -296,22 +299,26 @@ html:active-view-transition-type(album-open) .music__wellCard {
   grid-area: name;
   min-width: 0;
   font-family: var(--display);
-  font-size: clamp(36px, 4vw, 56px);
+  font-size: clamp(44px, 5.4vw, 80px);
   font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
 }
+/* The shared Link sets body1 type, which would shrink the title back to body size. */
 .music__wellName a {
   min-width: 0;
-  line-height: inherit;
+  font: inherit;
+  letter-spacing: inherit;
   overflow-wrap: anywhere;
 }
 .music__wellMeta {
   display: grid;
   grid-area: meta;
-  row-gap: 6px;
+  row-gap: 12px;
+  align-content: start;
   min-width: 0;
-  margin-top: 10px;
+  margin-top: 14px;
 }
 .music__wellArtists {
   display: block;
@@ -319,14 +326,15 @@ html:active-view-transition-type(album-open) .music__wellCard {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
+  line-height: 1.25;
   color: inherit;
   white-space: nowrap;
 }
 .music__wellFacts {
   display: grid;
-  row-gap: 14px;
+  row-gap: 10px;
   align-items: start;
   color: inherit;
   text-transform: uppercase;
@@ -348,12 +356,12 @@ html:active-view-transition-type(album-open) .music__wellCard {
   width: 100%;
   height: 10px;
   overflow: hidden;
-  background-color: var(--cream);
+  background-color: color-mix(in oklab, var(--on) 24%, var(--pc));
   clip-path: var(--quad-c);
 }
 .music__wellPopularityFill {
   height: 100%;
-  background-color: var(--ochre);
+  background-color: var(--on);
 }
 .music__wellTracks {
   column-count: 2;
@@ -372,7 +380,7 @@ html:active-view-transition-type(album-open) .music__wellCard {
   column-gap: 10px;
   align-items: center;
   padding-block: 6px;
-  border-bottom: 1px solid color-mix(in oklab, var(--cream) 28%, var(--viridian));
+  border-bottom: 1px solid color-mix(in oklab, var(--on) 28%, var(--pc));
   break-inside: avoid;
 }
 .music__wellTrackTitle {
