@@ -6,19 +6,18 @@ import { LOGO_FONT, TEXT_FONT } from './ogFonts';
 /**
  * Generates a basic OpenGraph image with font data
  */
-export async function generateOpenGraphImage({
+export function generateOpenGraphImage({
   url,
   normalFont,
   boldFont,
   size,
 }: {
   url: string | undefined;
-  normalFont: Promise<ArrayBuffer>;
-  boldFont: Promise<ArrayBuffer>;
+  normalFont: ArrayBuffer;
+  boldFont: ArrayBuffer;
   size?: { height: number; width: number };
 }) {
   invariant(url, 'URL is required');
-  const [normalFontData, boldFontData] = await Promise.all([normalFont, boldFont]);
   const params = new URL(url).searchParams;
   return new ImageResponse(
     <OpenGraphImage
@@ -28,11 +27,11 @@ export async function generateOpenGraphImage({
     {
       fonts: [
         {
-          data: normalFontData,
+          data: normalFont,
           name: TEXT_FONT,
         },
         {
-          data: boldFontData,
+          data: boldFont,
           name: LOGO_FONT,
         },
       ],
