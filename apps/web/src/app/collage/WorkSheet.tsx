@@ -27,7 +27,7 @@ export function WorkSheet({
 
   return (
     <section aria-label="Work" className="collageBleed home__work">
-      <div aria-hidden="true" className="collageField home__workField" />
+      <div aria-hidden="true" className="collageField collageSheet-starfield home__workField" />
       {CUT_OUT_PLACEMENTS.workSheet.map((placement) => (
         <CutOut key={placement.id} placement={placement} />
       ))}
