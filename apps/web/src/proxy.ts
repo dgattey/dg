@@ -89,9 +89,6 @@ function isTerminalMarkdownResponse(response: NextResponse): boolean {
 }
 
 async function isCollageEnabled(): Promise<boolean> {
-  if (process.env.INTERACTIVE_REDESIGN === '1') {
-    return true;
-  }
   try {
     return await interactiveRedesign();
   } catch {
