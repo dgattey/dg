@@ -55,7 +55,8 @@ html:has(.collageRoot) body {
   --collage-card-pad-mobile: 24px 22px 26px;
   position: relative;
   min-height: 100dvh;
-  overflow-x: clip;
+  /* Backdrops run behind the header and footer, so the page edge is their only clip. */
+  overflow: clip;
   font-family: var(--body);
   color: var(--ink);
   background-color: var(--paper);

@@ -35,7 +35,7 @@
   z-index: 0;
   width: 100vw;
   margin-left: -50vw;
-  overflow: clip;
+  overflow-x: clip;
   pointer-events: none;
 }
 .collageBand {
