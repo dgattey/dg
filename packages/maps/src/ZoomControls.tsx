@@ -52,6 +52,12 @@ const collageContainerSx: SxObject = {
 };
 
 const collageButtonSx: SxObject = {
+  // The quad clip-path cuts anything drawn outside the button, so the ring sits inside.
+  '&&:focus-visible': {
+    borderRadius: '9px 13px 10px 12px',
+    outline: '2px solid currentColor',
+    outlineOffset: '-3px',
+  },
   ':hover': {
     backgroundColor: 'color-mix(in srgb, var(--cream) 86%, var(--ochre))',
   },

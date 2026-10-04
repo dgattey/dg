@@ -83,10 +83,6 @@
   padding: 10px 10px 16px;
   overflow: clip;
 }
-/* The tooltip anchor shrink-wraps by default, which sized art to its caption length. */
-.music__cardInner > span {
-  display: grid;
-}
 .music__albumLink {
   display: grid;
   grid-template-rows: auto auto;

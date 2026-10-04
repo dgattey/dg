@@ -234,16 +234,52 @@ html[data-color-scheme="dark"] .collageRoot::after {
   filter: none;
   rotate: none;
 }
-.paperButton:focus-visible {
+/*
+ * One focus ring across the collage: 2px in the control's own text colour,
+ * which already reads against whatever it sits on. A control that is a whole
+ * paper piece rings the piece instead, since the paper's clip-path would cut
+ * a ring drawn inside it — so exactly one ring shows per focus.
+ */
+.collageRoot :focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+/*
+ * The record disc clips everything outside its circle and the art paints over
+ * the link, so its ring is an inset circle layered above the art.
+ */
+.collageRoot .print__artLink:focus-visible {
   outline: none;
 }
-:where(
-  .paperWrap:has(:focus-visible),
-  .collageLift:focus-visible,
-  .chrome__musicSummary:focus-visible > .paperWrap,
-  .home__sideRowWrap:has(.home__sideRow:focus-visible),
-  .print__portrait:focus-visible
-) {
+.collageRoot .print__artLink:focus-visible::after {
+  content: "";
+  position: absolute;
+  inset: 6px;
+  z-index: 1;
+  pointer-events: none;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+.collageRoot
+  :is(
+    .paperButton,
+    .chrome__musicSummary,
+    .chrome__logo :is(a, button),
+    .chrome__nowPlaying :has(.paperWrap),
+    .home__sideRow,
+    .music__card a
+  ):focus-visible {
+  outline: none;
+}
+.collageRoot
+  :is(
+    .paperWrap:has(> span > .paperButton:focus-visible),
+    .chrome__musicSummary:focus-visible > .paperWrap,
+    .chrome__logo:has(:focus-visible),
+    .chrome__nowPlaying :focus-visible .paperWrap,
+    .home__sideRowWrap:has(.home__sideRow:focus-visible),
+    .music__card:has(a:focus-visible)
+  ) {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
 }
