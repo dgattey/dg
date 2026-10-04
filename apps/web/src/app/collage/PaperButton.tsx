@@ -61,7 +61,13 @@ export function PaperButton({
     return (
       <div className="paperWrap" style={wrapStyle}>
         <span style={surfaceStyle}>
-          <a className={classNames} href={href} onClick={onClick} title={title}>
+          <a
+            aria-current={current ? 'page' : undefined}
+            aria-label={title}
+            className={classNames}
+            href={href}
+            onClick={onClick}
+          >
             {children}
           </a>
         </span>

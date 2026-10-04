@@ -42,13 +42,14 @@ describe('PaperButton', () => {
     'renders %s as a document anchor, not a prefetching router link',
     (href) => {
       render(
-        <PaperButton href={href} title="Connect">
+        <PaperButton href={href} title="Connect Spotify">
           Connect
         </PaperButton>,
       );
-      const link = screen.getByRole('link', { name: 'Connect' });
+      const link = screen.getByRole('link', { name: 'Connect Spotify' });
       expect(link).toHaveAttribute('href', href);
       expect(link).toHaveClass('paperButton');
+      expect(link).not.toHaveAttribute('title');
     },
   );
 
