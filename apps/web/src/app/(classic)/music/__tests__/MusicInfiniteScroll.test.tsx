@@ -10,17 +10,19 @@ jest.mock('../../../../services/music.actions', () => ({
   loadMoreMusicHistory: jest.fn(),
 }));
 
-const play = (name: string): HistoryTrack => ({
-  albumId: `album-${name}`,
-  albumImageUrl: `https://i.scdn.co/image/${name}`,
-  albumName: name,
-  albumUrl: `https://open.spotify.com/album/${name}`,
-  artistNames: `${name} artist`,
-  playedAt: '2026-08-04T12:00:00.000Z',
-  trackId: `track-${name}`,
-  trackName: name,
-  url: `https://open.spotify.com/track/${name}`,
-});
+function play(name: string): HistoryTrack {
+  return {
+    albumId: `album-${name}`,
+    albumImageUrl: `https://i.scdn.co/image/${name}`,
+    albumName: name,
+    albumUrl: `https://open.spotify.com/album/${name}`,
+    artistNames: `${name} artist`,
+    playedAt: '2026-08-04T12:00:00.000Z',
+    trackId: `track-${name}`,
+    trackName: name,
+    url: `https://open.spotify.com/track/${name}`,
+  };
+}
 
 function Wrapper({ children }: { children: ReactNode }) {
   return (
@@ -30,20 +32,18 @@ function Wrapper({ children }: { children: ReactNode }) {
   );
 }
 
-let observerCallback: IntersectionObserverCallback | undefined;
-let latestObserver: MockIntersectionObserver | undefined;
+let captured:
+  | { callback: IntersectionObserverCallback; instance: IntersectionObserver }
+  | undefined;
 
 class MockIntersectionObserver implements IntersectionObserver {
   readonly root = null;
   readonly rootMargin = '200px';
   readonly scrollMargin = '0px';
   readonly thresholds = [0];
-
   constructor(callback: IntersectionObserverCallback) {
-    observerCallback = callback;
-    latestObserver = this;
+    captured = { callback, instance: this };
   }
-
   disconnect() {}
   observe() {}
   takeRecords() {
@@ -55,8 +55,7 @@ class MockIntersectionObserver implements IntersectionObserver {
 describe('MusicInfiniteScroll', () => {
   beforeEach(() => {
     jest.mocked(loadMoreMusicHistory).mockReset();
-    latestObserver = undefined;
-    observerCallback = undefined;
+    captured = undefined;
     Object.defineProperty(globalThis, 'IntersectionObserver', {
       configurable: true,
       value: MockIntersectionObserver,
@@ -80,12 +79,10 @@ describe('MusicInfiniteScroll', () => {
       />,
       { wrapper: Wrapper },
     );
-    const callback = observerCallback;
-    const observer = latestObserver;
-    invariant(callback && observer, 'Expected an intersection observer');
-
+    invariant(captured, 'Expected an intersection observer');
+    const observer = captured;
     act(() => {
-      callback(
+      observer.callback(
         [
           {
             boundingClientRect: new DOMRect(),
@@ -97,10 +94,9 @@ describe('MusicInfiniteScroll', () => {
             time: 0,
           },
         ],
-        observer,
+        observer.instance,
       );
     });
-
     await waitFor(() => expect(loadMoreMusicHistory).toHaveBeenCalledWith('cursor-1'));
     expect(await screen.findByRole('link', { name: /Clay/ })).toBeInTheDocument();
   });

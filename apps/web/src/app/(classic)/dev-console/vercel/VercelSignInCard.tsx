@@ -1,16 +1,19 @@
 import 'server-only';
 
 import { vercelAuthLogoutRoute, vercelAuthRoute } from '@dg/shared-core/routes/api';
+import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Button, Stack, Typography } from '@mui/material';
 import { Suspense } from 'react';
 import { getVercelSession } from '../../../../auth/vercel/getVercelSession';
+import { PaperButton } from '../../../collage/PaperButton';
 import { DevConsoleCardShell } from '../DevConsoleCardShell';
-import { StatusChip } from '../StatusIndicators';
+import { ErrorMessage, StatusChip } from '../StatusIndicators';
 
 type SearchParams = Promise<Record<string, string | Array<string> | undefined>>;
 
 type VercelSignInCardProps = {
   searchParams?: SearchParams;
+  surface?: SiteSurface;
 };
 
 async function resolveAuthErrorReason(searchParams?: SearchParams): Promise<string | null> {
@@ -22,7 +25,10 @@ async function resolveAuthErrorReason(searchParams?: SearchParams): Promise<stri
   return typeof reasonValue === 'string' ? reasonValue : 'unknown';
 }
 
-async function VercelSignInCardContent({ searchParams }: VercelSignInCardProps) {
+export async function VercelSignInCardContent({
+  searchParams,
+  surface = 'classic',
+}: VercelSignInCardProps) {
   const [session, authErrorReason] = await Promise.all([
     getVercelSession(),
     resolveAuthErrorReason(searchParams),
@@ -39,7 +45,7 @@ async function VercelSignInCardContent({ searchParams }: VercelSignInCardProps) 
         }}
       >
         <Typography variant="h3">Vercel identity</Typography>
-        <StatusChip isConnected={isSignedIn} />
+        <StatusChip isConnected={isSignedIn} surface={surface} />
       </Stack>
 
       <Typography color="text.secondary" variant="body2">
@@ -47,11 +53,10 @@ async function VercelSignInCardContent({ searchParams }: VercelSignInCardProps) 
         OAuth; segment rules decide whether you match.
       </Typography>
 
-      {authErrorReason ? (
-        <Typography color="error" variant="body2">
-          Sign-in failed ({authErrorReason}). Try again.
-        </Typography>
-      ) : null}
+      <ErrorMessage
+        message={authErrorReason ? `Sign-in failed (${authErrorReason}). Try again.` : null}
+        surface={surface}
+      />
 
       {session ? (
         <Stack sx={{ gap: 0.5 }}>
@@ -67,7 +72,16 @@ async function VercelSignInCardContent({ searchParams }: VercelSignInCardProps) 
         </Stack>
       ) : null}
 
-      {session ? (
+      {surface === 'collage' ? (
+        <PaperButton
+          href={session ? vercelAuthLogoutRoute : vercelAuthRoute}
+          tiltDeg={session ? 2 : -2}
+          title={session ? 'Sign out' : 'Sign in with Vercel'}
+          tone={session ? 'cream' : 'ochre'}
+        >
+          {session ? 'Sign out' : 'Sign in with Vercel'}
+        </PaperButton>
+      ) : session ? (
         <Button href={vercelAuthLogoutRoute} size="small" variant="outlined">
           Sign out
         </Button>
@@ -84,11 +98,11 @@ async function VercelSignInCardContent({ searchParams }: VercelSignInCardProps) 
  * Dev-console card for optional Sign in with Vercel (Flags identify only).
  * Session + searchParams are read inside Suspense so /dev-console can prerender.
  */
-export function VercelSignInCard({ searchParams }: VercelSignInCardProps) {
+export function VercelSignInCard({ searchParams, surface = 'classic' }: VercelSignInCardProps) {
   return (
-    <DevConsoleCardShell>
+    <DevConsoleCardShell surface={surface}>
       <Suspense fallback={<Typography variant="body2">Loading identity…</Typography>}>
-        <VercelSignInCardContent searchParams={searchParams} />
+        <VercelSignInCardContent searchParams={searchParams} surface={surface} />
       </Suspense>
     </DevConsoleCardShell>
   );

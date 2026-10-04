@@ -1,26 +1,96 @@
 'use client';
 
+import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
+import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
+import type { LucideIcon } from 'lucide-react';
+import { ChevronDown, DiscAlbum, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { PaperButton } from '../collage/PaperButton';
-import { MUSIC_DESTINATIONS, normalizeMusicPath } from './musicHeaderDestinations';
+import { useEffect, useRef } from 'react';
+import { PaperCard } from '../collage/PaperCard';
+import { cx, paperSurfaceVars } from '../collage/paperVars';
+import {
+  isMusicDestinationPath,
+  MUSIC_DESTINATIONS,
+  normalizeMusicPath,
+} from './musicHeaderDestinations';
 
+const DESTINATION_ICONS: Record<string, LucideIcon> = {
+  [favoriteAlbumsRoute]: DiscAlbum,
+  [musicRoute]: History,
+};
+
+/**
+ * Music → destinations submenu. `<details>` owns the open state so the menu opens and
+ * its links work without script; script only closes it on outside press and Escape.
+ * Keying on the path remounts it closed after every navigation.
+ */
 export function CollageMusicLinks() {
   const pathname = normalizeMusicPath(usePathname());
+  const detailsRef = useRef<HTMLDetailsElement>(null);
+  const onMusicPage = isMusicDestinationPath(pathname);
+
+  useEffect(() => {
+    const close = (event: KeyboardEvent | PointerEvent) => {
+      const details = detailsRef.current;
+      if (!details?.open) {
+        return;
+      }
+      if (event instanceof KeyboardEvent) {
+        if (event.key !== 'Escape') {
+          return;
+        }
+        details.open = false;
+        details.querySelector('summary')?.focus();
+        return;
+      }
+      if (event.target instanceof Node && !details.contains(event.target)) {
+        details.open = false;
+      }
+    };
+    document.addEventListener('keydown', close);
+    document.addEventListener('pointerdown', close);
+    return () => {
+      document.removeEventListener('keydown', close);
+      document.removeEventListener('pointerdown', close);
+    };
+  }, []);
 
   return (
-    <>
-      {MUSIC_DESTINATIONS.map((destination, index) => (
-        <PaperButton
-          current={pathname === destination.href}
-          edge="quad-c"
-          href={destination.href}
-          key={destination.href}
-          tiltDeg={index === 0 ? -2 : 2}
-          title={destination.label}
-        >
-          {destination.label}
-        </PaperButton>
-      ))}
-    </>
+    <details className="chrome__music" key={pathname} ref={detailsRef}>
+      <summary className="chrome__musicSummary">
+        <span className="paperWrap" style={paperSurfaceVars('cream', 'quad-c', -2)}>
+          <span className={cx('paperButton', onMusicPage && 'paperButtonCurrent')}>
+            Music
+            <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />
+          </span>
+        </span>
+      </summary>
+      <PaperCard
+        className="chrome__musicPanel"
+        edge="quad-a"
+        innerClassName="chrome__musicPanelInner"
+        tiltDeg={-1}
+      >
+        <ul className="chrome__musicList">
+          {MUSIC_DESTINATIONS.map((destination) => {
+            const Icon = DESTINATION_ICONS[destination.href];
+            const current = pathname === destination.href;
+            return (
+              <li key={destination.href}>
+                <PageTransitionLink
+                  aria-current={current ? 'page' : undefined}
+                  className="chrome__musicLink"
+                  href={destination.href}
+                  title={destination.label}
+                >
+                  {Icon ? <Icon aria-hidden={true} size={20} /> : null}
+                  {destination.label}
+                </PageTransitionLink>
+              </li>
+            );
+          })}
+        </ul>
+      </PaperCard>
+    </details>
   );
 }

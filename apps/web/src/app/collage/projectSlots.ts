@@ -13,6 +13,7 @@ export type MoreWorkOverflowUnit = {
 
 export type ProjectFrameStyle = {
   edge: PaperEdge;
+  marginTop?: number;
   tagClassName: 'tagBottomLeft' | 'tagBottomRight' | 'tagTopLeft';
   tagTiltDeg: number;
   tagTone: PaperTone;
@@ -27,66 +28,30 @@ type ProjectFrame<Area extends string> = SlottedProject & {
 const WORK_FRAMES = [
   {
     gridArea: 'c1',
-    style: {
-      edge: 'quad-a',
-      tagClassName: 'tagTopLeft',
-      tagTiltDeg: -3,
-      tagTone: 'ochre',
-      tiltDeg: -0.8,
-    },
+    style: { edge: 'quad-a', tagClassName: 'tagTopLeft', tagTiltDeg: -3, tagTone: 'ochre', tiltDeg: -0.8 },
   },
   {
     gridArea: 'ws',
-    style: {
-      edge: 'quad-d',
-      tagClassName: 'tagBottomRight',
-      tagTiltDeg: 2,
-      tagTone: 'cream',
-      tiltDeg: 1,
-    },
+    style: { edge: 'quad-d', tagClassName: 'tagBottomRight', tagTiltDeg: 2, tagTone: 'cream', tiltDeg: 1 },
   },
 ] satisfies ReadonlyArray<{ gridArea: 'c1' | 'ws'; style: ProjectFrameStyle }>;
 
 const MORE_WORK_FRAMES = [
   {
     gridArea: 'mg',
-    style: {
-      edge: 'quad-b',
-      tagClassName: 'tagBottomLeft',
-      tagTiltDeg: 3,
-      tagTone: 'ultramarine',
-      tiltDeg: -1.6,
-    },
+    style: { edge: 'quad-b', tagClassName: 'tagBottomLeft', tagTiltDeg: 3, tagTone: 'ultramarine', tiltDeg: -1.6 },
   },
   {
     gridArea: 'cn',
-    style: {
-      edge: 'quad-c',
-      tagClassName: 'tagBottomRight',
-      tagTiltDeg: -2,
-      tagTone: 'cream',
-      tiltDeg: 1.4,
-    },
+    style: { edge: 'quad-c', marginTop: 44, tagClassName: 'tagBottomRight', tagTiltDeg: -2, tagTone: 'cream', tiltDeg: 1.4 },
   },
   {
     gridArea: 'js',
-    style: {
-      edge: 'quad-d',
-      tagClassName: 'tagTopLeft',
-      tagTiltDeg: 2.5,
-      tagTone: 'ochre',
-      tiltDeg: -1,
-    },
+    style: { edge: 'quad-d', marginTop: 10, tagClassName: 'tagTopLeft', tagTiltDeg: 2.5, tagTone: 'ochre', tiltDeg: -1 },
   },
   {
     gridArea: 'gn',
-    style: {
-      edge: 'quad-a',
-      tagClassName: 'tagBottomLeft',
-      tagTiltDeg: -2,
-      tagTone: 'vermilion',
-      tiltDeg: 0.7,
-    },
+    style: { edge: 'quad-a', tagClassName: 'tagBottomLeft', tagTiltDeg: -2, tagTone: 'vermilion', tiltDeg: 0.7 },
   },
 ] satisfies ReadonlyArray<{ gridArea: 'mg' | 'cn' | 'js' | 'gn'; style: ProjectFrameStyle }>;
 
@@ -158,3 +123,62 @@ export function projectTagMeta(
   const year = project.creationDate?.match(/^(\d{4})/)?.[1];
   return type && year ? `${type} · ${year}` : null;
 }
+
+const EMPTY_ROW = '". . . . . . . . . . . ."';
+
+function fullRow(area: string): string {
+  return `"${Array.from({ length: 12 }, () => area).join(' ')}"`;
+}
+
+function gridAreas(rows: readonly [string, string], gap: number) {
+  return {
+    areas: rows.join(' '),
+    rowGapPx: rows.includes(EMPTY_ROW) ? 0 : gap,
+  };
+}
+
+export function workSheetGridAreas(slots: { c1: boolean; ws: boolean }): {
+  areas: string;
+  rowGapPx: number;
+} {
+  return gridAreas(
+    [
+      slots.c1 ? '"c1 c1 c1 c1 c1 c1 c1 c1 . sp sp sp"' : fullRow('sp'),
+      slots.ws ? '"st st st st . ws ws ws ws ws ws ws"' : fullRow('st'),
+    ],
+    52,
+  );
+}
+
+export function moreWorkGridAreas(slots: { cn: boolean; gn: boolean; js: boolean; mg: boolean }): {
+  areas: string;
+  rowGapPx: number;
+} {
+  const { cn, gn, js, mg } = slots;
+  const rowOne = mg
+    ? cn
+      ? '"mg mg mg mg sd sd sd sd cn cn cn cn"'
+      : '"mg mg mg mg mg mg sd sd sd sd sd sd"'
+    : cn
+      ? '"sd sd sd sd sd sd cn cn cn cn cn cn"'
+      : fullRow('sd');
+  const rowTwo = js
+    ? gn
+      ? '"js js js js gn gn gn gn gn gn gn gn"'
+      : fullRow('js')
+    : gn
+      ? fullRow('gn')
+      : EMPTY_ROW;
+  return gridAreas([rowOne, rowTwo], 56);
+}
+
+export const MORE_WORK_OVERFLOW_GRID_AREAS =
+  '"mg mg mg mg mg mg cn cn cn cn cn cn" "js js js js gn gn gn gn gn gn gn gn"';
+
+export const HELLO_GRID_AREAS = `
+  "headline headline headline headline headline headline headline portrait portrait portrait portrait portrait"
+  "intro intro intro intro intro intro . portrait portrait portrait portrait portrait"
+  "map map map map map . . portrait portrait portrait portrait portrait"
+`;
+
+export const CODA_GRID_AREAS = '". . . . . . . . li li li li"';

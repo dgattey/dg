@@ -1,0 +1,355 @@
+/* Homepage sheets, project placement, side projects, work cards */
+
+.home__hello,
+.home__work,
+.home__moreWork,
+.home__coda {
+  padding-block: var(--sp-top) var(--sp-bottom);
+}
+.home__hello {
+  --sp-top: 14px;
+  --sp-bottom: 70px;
+}
+.home__helloGrid {
+  grid-template-rows: auto auto 1fr;
+  column-gap: 0;
+}
+.home__headline {
+  position: relative;
+  z-index: 3;
+  grid-area: headline;
+  padding-top: 4px;
+}
+.home__portraitSlot {
+  grid-area: portrait;
+}
+.home__intro {
+  grid-area: intro;
+  width: min(calc(100% - 24px), 600px);
+  margin-top: 10px;
+  margin-left: 24px;
+}
+.home__introInner {
+  display: grid;
+  gap: 14px;
+  padding: var(--collage-card-pad);
+  font-size: 21px;
+  line-height: 1.55;
+}
+.home__introInner > * {
+  display: grid;
+  gap: 14px;
+}
+.home__introInner p {
+  margin: 0;
+  font-size: inherit;
+  line-height: inherit;
+  text-wrap: pretty;
+}
+.home__introInner :is(h1, h2, h3, h4, h5, h6) {
+  margin: 0;
+  font-family: var(--display);
+  line-height: 1.1;
+}
+.home__map {
+  position: relative;
+  z-index: 2;
+  grid-area: map;
+  width: min(100%, 470px);
+  margin-top: 16px;
+  margin-left: 8px;
+}
+.home__mapPaper {
+  width: 100%;
+}
+.home__mapInner {
+  aspect-ratio: 2.3;
+  overflow: clip;
+}
+.home__mapInner > * {
+  height: 100%;
+}
+.home__mapTag {
+  bottom: -12px;
+  left: -10px;
+}
+
+.home__work {
+  --sp-top: 84px;
+  --sp-bottom: 92px;
+  --cw: 372px;
+  --ch: 290px;
+  margin-top: -30px;
+  color: var(--cream);
+}
+.home__workField {
+  background:
+    conic-gradient(
+      from 90deg at 50% 50%,
+      var(--ultramarine) 25%,
+      var(--cobalt) 0 50%,
+      var(--ultramarine) 0 75%,
+      var(--cobalt) 0
+    )
+    -150px -70px / calc(var(--cw) * 2) calc(var(--ch) * 2);
+}
+.home__workGrid,
+.home__codaGrid {
+  column-gap: var(--gap);
+}
+.home__spotify {
+  position: relative;
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  padding-top: 4px;
+}
+.home__strava {
+  position: relative;
+}
+.home__spotifyMeta {
+  width: min(100%, 250px);
+  margin-top: 8px;
+}
+.home__spotifyMetaInner {
+  display: grid;
+  gap: 3px;
+  padding: 14px 18px 16px;
+  color: var(--on);
+}
+.home__stravaInner {
+  position: relative;
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-height: 100%;
+  padding: 24px 26px 26px;
+  overflow: clip;
+}
+.home__stravaRoute {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+.home__stravaRoute > * {
+  width: 100%;
+  height: 100%;
+}
+.home__stravaContent {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: 8px;
+  color: var(--on);
+}
+.home__spotifyMetaInner a,
+.home__stravaContent a,
+.home__stravaContent .MuiTypography-root,
+.home__stravaContent .MuiLink-root {
+  color: inherit;
+}
+.home__stravaCopy {
+  display: grid;
+  gap: 8px;
+  margin-top: 64px;
+}
+
+.home__moreWork {
+  --sp-top: 50px;
+  --sp-bottom: 56px;
+  color: var(--ink);
+}
+.home__moreWorkField {
+  inset: 9% 57% -24px -60px;
+  background: var(--ochre);
+  rotate: -1.6deg;
+}
+.home__moreWorkGrid {
+  column-gap: clamp(18px, 2.4vw, 36px);
+}
+.home__overflow {
+  position: relative;
+  margin-top: 56px;
+}
+
+.home__coda {
+  --sp-top: 30px;
+  --sp-bottom: 90px;
+  color: var(--ink);
+}
+
+.home__frameWin {
+  position: relative;
+  z-index: 2;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+.home__frameCard {
+  width: 100%;
+}
+.home__framePad {
+  padding: 14px 14px 16px;
+}
+.home__frameShot {
+  --ar: 2.25;
+  position: relative;
+  display: block;
+  aspect-ratio: var(--ar);
+  overflow: clip;
+  border-radius: 8px;
+}
+.home__tagTopLeft {
+  top: -12px;
+  left: -14px;
+}
+.home__tagBottomLeft {
+  bottom: -14px;
+  left: -12px;
+}
+.home__tagBottomRight {
+  right: -12px;
+  bottom: -14px;
+}
+
+.home__sideRoot {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  align-content: start;
+  padding: 26px 18px 0;
+}
+.home__sideHeadingWrap {
+  justify-self: start;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+.home__sideList {
+  display: grid;
+  gap: 16px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.home__sideRowWrap {
+  width: 100%;
+}
+.home__sideItem:nth-child(1) .home__sideRowWrap {
+  margin-left: 18px;
+}
+.home__sideItem:nth-child(2) .home__sideRowWrap {
+  margin-top: 4px;
+  margin-right: 14px;
+}
+.home__sideRow {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  padding: 18px 20px 18px 16px;
+  color: inherit;
+  text-decoration: none;
+}
+.home__sideMark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  overflow: clip;
+  background: var(--pc);
+  clip-path: var(--quad-b);
+  transform: scale(1);
+}
+.home__sideMark img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.home__sideText {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+.home__sideTitle {
+  font-family: var(--display);
+  font-size: 19.5px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+.home__sideDescription {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  font-size: 16.5px;
+  line-height: 1.45;
+  color: var(--soft);
+}
+.home__sideArrow {
+  font-size: 20px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .home__sideRow:hover .home__sideMark,
+  .home__sideRow:focus-visible .home__sideMark {
+    transform: scale(1.1);
+  }
+}
+
+@media (max-width: 820px) {
+  .home__work {
+    --sp-top: 70px;
+    --sp-bottom: 80px;
+    --cw: 220px;
+    --ch: 170px;
+  }
+  .home__moreWork {
+    --sp-top: 40px;
+    --sp-bottom: 48px;
+  }
+  .home__overflow {
+    margin-top: 36px;
+  }
+  .home__coda {
+    --sp-top: 24px;
+    --sp-bottom: 72px;
+  }
+  .home__headline {
+    order: -1;
+    padding-top: 16px;
+  }
+  .home__intro {
+    width: 100%;
+    margin: 8px 0 0;
+  }
+  .home__introInner {
+    padding: var(--collage-card-pad-mobile);
+    font-size: 19px;
+  }
+  .home__portraitSlot {
+    justify-self: center;
+  }
+  .home__map {
+    width: 100%;
+    margin-top: 0;
+    margin-left: 0;
+  }
+  .home__mapInner {
+    aspect-ratio: 1.5;
+  }
+  .home__stravaCopy {
+    margin-top: 44px;
+  }
+  .home__sideRoot {
+    padding: 0;
+  }
+  .home__sideItem:nth-child(1) .home__sideRowWrap,
+  .home__sideItem:nth-child(2) .home__sideRowWrap {
+    margin: 0;
+  }
+}

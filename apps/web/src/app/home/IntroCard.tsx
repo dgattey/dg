@@ -7,9 +7,8 @@ import { RichText } from '@dg/ui/dependent/RichText';
 import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
 import type { SxObject } from '@dg/ui/theme';
 import { CutLetters } from '../collage/CutLetters';
-import collageStyles from '../collage/HelloSheet.module.css';
 import { PaperCard } from '../collage/PaperCard';
-import { PortraitPrint } from '../collage/PortraitPrint';
+import { introImageAlt, PortraitPrint } from '../collage/PortraitPrint';
 import { splitIntroDocument } from '../collage/splitIntroDocument';
 
 /**
@@ -74,7 +73,7 @@ function ClassicIntroCard({ introBlock, linkedInLink }: IntroCardProps) {
         verticalSpan={1}
       >
         <Image
-          alt={introBlock.image.title ?? 'Introduction image'}
+          alt={introImageAlt(introBlock.image)}
           cover={true}
           height={height}
           preload={true}
@@ -103,15 +102,15 @@ export function IntroCard({ introBlock, linkedInLink, surface = 'classic' }: Int
     return (
       <>
         <PortraitPrint
-          className={collageStyles.portrait}
+          className="home__portraitSlot"
           image={introBlock.image}
           linkedInLink={linkedInLink}
         />
-        {headline ? <CutLetters className={collageStyles.headline} text={headline} /> : null}
+        {headline ? <CutLetters className="home__headline" text={headline} /> : null}
         <PaperCard
-          className={collageStyles.intro}
+          className="home__intro"
           edge="quad-a"
-          innerClassName={collageStyles.introInner}
+          innerClassName="home__introInner"
           tiltDeg={-1}
           tone="cream"
         >

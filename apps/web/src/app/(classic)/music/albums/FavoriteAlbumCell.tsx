@@ -13,7 +13,6 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { X } from 'lucide-react';
 import { ViewTransition } from 'react';
-import { PaperCard } from '../../../collage/PaperCard';
 import { AlbumCover } from '../AlbumCover';
 import { AlbumStack } from '../AlbumStack';
 import {
@@ -23,11 +22,7 @@ import {
   albumTileLinkSx,
   MAX_ALBUM_SLEEVES,
 } from '../albumTileGeometry';
-import {
-  type CollageAlbumCardTreatment,
-  collageAlbumCardClassName,
-} from './collageAlbumCardTreatments';
-import styles from './FavoriteAlbums.module.css';
+import { type CollageAlbumCardTreatment, CollageAlbumPaper } from './collageAlbumCardTreatments';
 
 /** Every favorite is a whole album, so every cell wears the full fan. */
 const SLEEVE_COUNT = MAX_ALBUM_SLEEVES;
@@ -79,6 +74,30 @@ type Props = {
   collapsed?: boolean;
 };
 
+function AlbumArtCover({
+  albumId,
+  albumName,
+  collapsed,
+  imageUrl,
+}: {
+  albumId: string;
+  albumName: string;
+  collapsed: boolean;
+  imageUrl: string;
+}) {
+  if (collapsed) {
+    return <AlbumCover alt="" depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />;
+  }
+  return (
+    // `default="none"` keeps this name off page-open/close. Without it
+    // every cover enters during homepage → albums, and React snapshots
+    // the whole grid as separate shared elements mid-flight.
+    <ViewTransition default="none" name={albumArtViewTransitionName(albumId)} share="vt-album-art">
+      <AlbumCover alt={albumName} depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />
+    </ViewTransition>
+  );
+}
+
 /**
  * Favorite-albums grid cell. Opens the in-page album well via a typed view
  * transition; the front cover shares a VT name with the well so it morphs on
@@ -97,53 +116,37 @@ export function FavoriteAlbumCell({
   if (surface === 'collage') {
     const href = collapsed ? favoriteAlbumsRoute : albumRoute(albumId);
     const title = collapsed ? `Close ${albumName}` : albumName;
-    const cover = collapsed ? (
-      <AlbumCover alt="" depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />
-    ) : (
-      <ViewTransition
-        default="none"
-        name={albumArtViewTransitionName(albumId)}
-        share="vt-album-art"
-      >
-        <AlbumCover alt={albumName} depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />
-      </ViewTransition>
-    );
-
     return (
-      <PaperCard
-        className={collageAlbumCardClassName(collageTreatment, collapsed)}
-        edge="quad-a"
-        innerClassName={styles.collageCardInner}
-        tiltDeg={collageTreatment.tiltDeg}
-        tone={collageTreatment.tone}
-      >
+      <CollageAlbumPaper selected={collapsed} treatment={collageTreatment}>
         <Tooltip title={collapsed ? `Close ${albumName}` : tooltip}>
           <Link
-            className={styles.collageAlbumLink}
+            className="music__albumLink"
             href={href}
             title={title}
             transitionTypes={albumTransitionTypes(collapsed ? 'close' : 'open')}
           >
-            <span
-              className={`${styles.collageArt} ${styles.fullColorArt}`}
-              data-image-treatment="full-color"
-            >
+            <span className="music__art music__fullColorArt">
               <AlbumStack imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT}>
-                {cover}
+                <AlbumArtCover
+                  albumId={albumId}
+                  albumName={albumName}
+                  collapsed={collapsed}
+                  imageUrl={imageUrl}
+                />
                 {collapsed ? (
-                  <i aria-hidden="true" className={styles.collageCloseMark}>
+                  <i aria-hidden="true" className="music__closeMark">
                     ×
                   </i>
                 ) : null}
               </AlbumStack>
             </span>
-            <span className={styles.collageCaption} data-role="album-caption">
-              <strong className={styles.collageAlbumName}>{albumName}</strong>
-              <span className={styles.collageArtist}>{artistCaption}</span>
+            <span className="music__caption">
+              <strong className="music__albumName">{albumName}</strong>
+              <span className="music__artist">{artistCaption}</span>
             </span>
           </Link>
         </Tooltip>
-      </PaperCard>
+      </CollageAlbumPaper>
     );
   }
 
@@ -185,18 +188,12 @@ export function FavoriteAlbumCell({
         transitionTypes={albumTransitionTypes('open')}
       >
         <AlbumStack imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT}>
-          {/*
-           * `default="none"` keeps this name off page-open/close. Without it
-           * every cover enters during homepage → albums, and React snapshots
-           * the whole grid as separate shared elements mid-flight.
-           */}
-          <ViewTransition
-            default="none"
-            name={albumArtViewTransitionName(albumId)}
-            share="vt-album-art"
-          >
-            <AlbumCover alt={albumName} depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />
-          </ViewTransition>
+          <AlbumArtCover
+            albumId={albumId}
+            albumName={albumName}
+            collapsed={false}
+            imageUrl={imageUrl}
+          />
         </AlbumStack>
       </Link>
     </Tooltip>

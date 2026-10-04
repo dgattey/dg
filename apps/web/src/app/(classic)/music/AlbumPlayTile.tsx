@@ -5,17 +5,11 @@ import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { Typography } from '@mui/material';
-import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
 import { AlbumCover } from './AlbumCover';
 import { AlbumStack } from './AlbumStack';
-import {
-  collageAlbumCardClassName,
-  collageAlbumCardTreatment,
-} from './albums/collageAlbumCardTreatments';
-import tileStyles from './albums/FavoriteAlbums.module.css';
+import { CollageAlbumPaper, collageAlbumCardTreatment } from './albums/collageAlbumCardTreatments';
 import { albumTileLinkSx, MAX_ALBUM_SLEEVES } from './albumTileGeometry';
-import styles from './MusicHistory.module.css';
 
 const countChipSx: SxObject = {
   backdropFilter: 'blur(12px) saturate(150%)',
@@ -66,39 +60,23 @@ export function AlbumPlayTile({
   const tooltip = isRun
     ? `${albumName} – ${artistNames}, ${countLabel}`
     : `${trackName} – ${artistNames}`;
+  const title = isRun ? albumName : trackName;
+  const cover = (
+    <AlbumCover alt={albumName} depth={0} imageUrl={imageUrl} sleeveCount={sleeveCount} />
+  );
 
   if (surface === 'collage') {
-    const treatment = collageAlbumCardTreatment(cardIndex);
     return (
-      <PaperCard
-        className={collageAlbumCardClassName(treatment)}
-        edge="quad-a"
-        innerClassName={tileStyles.collageCardInner}
-        tiltDeg={treatment.tiltDeg}
-        tone={treatment.tone}
-      >
+      <CollageAlbumPaper treatment={collageAlbumCardTreatment(cardIndex)}>
         <Tooltip title={tooltip}>
-          <Link
-            className={tileStyles.collageAlbumLink}
-            href={linkUrl}
-            isExternal={true}
-            title={tooltip}
-          >
-            <span
-              className={`${tileStyles.collageArt} ${tileStyles.fullColorArt}`}
-              data-image-treatment="full-color"
-            >
+          <Link className="music__albumLink" href={linkUrl} isExternal={true} title={tooltip}>
+            <span className="music__art music__fullColorArt">
               <AlbumStack imageUrl={imageUrl} sleeveCount={sleeveCount}>
-                <AlbumCover
-                  alt={albumName}
-                  depth={0}
-                  imageUrl={imageUrl}
-                  sleeveCount={sleeveCount}
-                />
+                {cover}
               </AlbumStack>
               {isRun ? (
                 <PaperTag
-                  className={styles.collageCountTag}
+                  className="music__countTag"
                   tiltDeg={cardIndex % 2 === 0 ? 3 : -3}
                   tone="ochre"
                 >
@@ -106,15 +84,13 @@ export function AlbumPlayTile({
                 </PaperTag>
               ) : null}
             </span>
-            <span className={tileStyles.collageCaption} data-role="album-caption">
-              <strong className={tileStyles.collageAlbumName}>
-                {isRun ? albumName : trackName}
-              </strong>
-              <span className={tileStyles.collageArtist}>{artistNames}</span>
+            <span className="music__caption">
+              <strong className="music__albumName">{title}</strong>
+              <span className="music__artist">{artistNames}</span>
             </span>
           </Link>
         </Tooltip>
-      </PaperCard>
+      </CollageAlbumPaper>
     );
   }
 

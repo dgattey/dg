@@ -107,6 +107,23 @@
   },
   "overrides": [
     {
+      "assist": {
+        "actions": {
+          "source": {
+            "useSortedKeys": "off",
+            "useSortedProperties": "off"
+          }
+        }
+      },
+      "formatter": {
+        "enabled": false
+      },
+      "includes": [
+        "apps/web/src/app/collage/cutOutPlacements.ts",
+        "apps/web/src/app/collage/projectSlots.ts"
+      ]
+    },
+    {
       "includes": ["packages/shared-core/logging/log.ts"],
       "linter": {
         "rules": {

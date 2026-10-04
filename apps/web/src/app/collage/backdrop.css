@@ -51,6 +51,17 @@
   aspect-ratio: 0.82;
   clip-path: url("#collage-pebble-clip");
 }
+.collageBackdrop .collageSheet-checker {
+  background:
+    conic-gradient(
+      from 90deg,
+      var(--sheet-a) 25%,
+      var(--sheet-b) 0 50%,
+      var(--sheet-a) 0 75%,
+      var(--sheet-b) 0
+    )
+    0 0 / 132px 132px;
+}
 .collageBackdrop .collageSheet-stripes {
   background: repeating-linear-gradient(-38deg, var(--sheet-a) 0 22px, var(--sheet-b) 22px 34px);
 }
@@ -64,6 +75,12 @@
   background:
     linear-gradient(90deg, var(--gingham) 50%, transparent 0) 0 0 / 40px 40px,
     linear-gradient(var(--gingham) 50%, transparent 0) 0 0 / 40px 40px,
+    var(--sheet-a);
+}
+.collageBackdrop .collageSheet-grid {
+  background:
+    linear-gradient(90deg, var(--sheet-b) 0 2px, transparent 2px) 0 0 / 28px 28px,
+    linear-gradient(var(--sheet-b) 0 2px, transparent 2px) 0 0 / 28px 28px,
     var(--sheet-a);
 }
 .collageBackdrop .collageSheet-ruled {

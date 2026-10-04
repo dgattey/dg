@@ -13,7 +13,6 @@ import { Box, Container, Divider, Stack } from '@mui/material';
 import { cacheLife } from 'next/cache';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
-import chrome from '../collage/chrome.module.css';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import { FOOTER_ICON_DESKTOP_FONT_SIZE, FOOTER_ICON_FONT_SIZE } from './footerIconSize';
@@ -95,20 +94,6 @@ function FooterLink({ link }: { link: RenderableLink }) {
   );
 }
 
-function CollageFooterLink({ link }: { link: RenderableLink }) {
-  const { title, url, icon } = link;
-  return (
-    <Link
-      href={url}
-      icon={icon ?? undefined}
-      isExternal={url.startsWith('http')}
-      layout="icon"
-      title={title}
-      tooltipPlacement="top"
-    />
-  );
-}
-
 /**
  * Returns the current year for copyright display, cached to avoid prerender issues.
  */
@@ -135,14 +120,14 @@ export async function Footer({ surface = 'classic' }: { surface?: SiteSurface } 
 
   if (surface === 'collage') {
     return (
-      <footer className={chrome.footer}>
-        <PaperCard className={chrome.strip} edge="torn-b" tiltDeg={-0.5} tone="black">
-          <div className={chrome.stripInner}>
-            <div className={chrome.stripMeta}>
+      <footer className="chrome__footer">
+        <PaperCard className="collageMeasure" edge="soft-b" tiltDeg={-0.5} tone="black">
+          <div className="chrome__stripInner">
+            <div className="chrome__stripMeta">
               <span>© {currentYear} Dylan Gattey</span>
               {version ? (
                 <>
-                  <span className={chrome.dot}>•</span>
+                  <span className="chrome__dot">•</span>
                   {releaseUrl ? (
                     <Link
                       href={releaseUrl}
@@ -162,19 +147,24 @@ export async function Footer({ surface = 'classic' }: { surface?: SiteSurface } 
               </PaperTag>
               {process.env.NODE_ENV !== 'production' ? (
                 <>
-                  <span className={chrome.dot}>•</span>
+                  <span className="chrome__dot">•</span>
                   <Link forcePageNavigation href={devConsoleRoute} title="Developer tools">
                     Dev console
                   </Link>
                 </>
               ) : null}
             </div>
-            <div className={chrome.links}>
-              {nonIconFooterLinks.map((link) => (
-                <CollageFooterLink key={link.url} link={link} />
-              ))}
-              {iconFooterLinks.map((link) => (
-                <CollageFooterLink key={link.url} link={link} />
+            <div className="chrome__links">
+              {[...nonIconFooterLinks, ...iconFooterLinks].map((link) => (
+                <Link
+                  href={link.url}
+                  icon={link.icon ?? undefined}
+                  isExternal={link.url.startsWith('http')}
+                  key={link.url}
+                  layout="icon"
+                  title={link.title}
+                  tooltipPlacement="top"
+                />
               ))}
             </div>
           </div>

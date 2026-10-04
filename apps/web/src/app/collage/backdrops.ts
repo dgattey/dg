@@ -1,7 +1,7 @@
 import { type CutOutPlacement, definePlacements, type PlacementRow } from './cutOutPlacements';
 import type { PaperTone } from './types';
 
-type SheetPattern = 'dots' | 'gingham' | 'ruled' | 'solid' | 'stripes';
+type SheetPattern = 'checker' | 'dots' | 'gingham' | 'grid' | 'ruled' | 'solid' | 'stripes';
 type SheetVisibility = 'all' | 'desktop';
 
 type SheetBase = {
@@ -185,6 +185,66 @@ export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
       ['history-ledger-green', 'torn', 'ruled', ['olive', 'chartreuse'], -4, 12, 24, 480, -2, 'desktop'],
       ['history-record-low', 'disc', 'solid', 'cobalt', 78, 60, 340, 0, 'all'],
       ['history-record-low-label', 'disc', 'solid', 'vermilion', 84, 68, 120, 0, 'desktop'],
+    ],
+  },
+]);
+
+/** Blueprint grid paper with small water plants and no broad leaves. */
+// biome-ignore format: placement rows read as a table
+export const DEV_CONSOLE_BACKDROP = defineBackdrop('fill', 1, [
+  {
+    cutOuts: [
+      ['dev-console-star', 'star5', 'star', 44, 12, 58, 4, 'desktop', 1],
+      ['dev-console-algae-upper', 'algae', 'leaf', 170, -20, 88, 0, 'desktop', 1],
+      ['dev-console-algae-lower', 'algae', 'leaf', 220, 16, 68, 82, 'desktop', 1],
+      ['dev-console-swallow', 'swallow', 'cream', 160, -8, 74, 52, 'desktop', 1],
+      ['dev-console-pods', 'pods', 'ochre', 210, 14, -3, 30, 'desktop', 1],
+      ['dev-console-seaweed', 'seaweed', 'rose', 220, -10, 93, 66, 'all', 1],
+      ['dev-console-star-small', 'star4', 'star', 34, -6, 46, 44, 'desktop', 1],
+      ['dev-console-moon', 'moon', 'cream', 60, 12, 40, 6, 'dark-desktop', 1],
+    ],
+    sheets: [
+      ['dev-console-blueprint', 'torn', 'grid', ['cobalt', 'cerulean'], 55, 40, 50, 560, -1.5, 'desktop'],
+      ['dev-console-disc', 'disc', 'solid', 'ochre', 83, 3, 230, 0, 'desktop'],
+      ['dev-console-stripes', 'torn', 'stripes', ['viridian', 'leaf'], -6, 74, 22, 300, 2, 'all'],
+    ],
+  },
+]);
+
+/** A lost swallow leaving a blue checker map behind. */
+// biome-ignore format: placement rows read as a table
+export const NOT_FOUND_BACKDROP = defineBackdrop('fill', 1, [
+  {
+    cutOuts: [
+      ['not-found-seaweed', 'seaweed2', 'ochre', 220, 18, -3, 4, 'desktop', 1],
+      ['not-found-swallow', 'swallow', 'vermilion', 190, 8, 76, 14, 'desktop', 1],
+      ['not-found-star', 'star5', 'star', 44, -10, 66, 6, 'desktop', 1],
+      ['not-found-star-trail', 'star4', 'cream', 32, 14, 70, 24, 'desktop', 1],
+      ['not-found-philo', 'philo', 'olive', 280, 24, 80, 52, 'all', 0],
+      ['not-found-coral', 'coral', 'rose', 170, -12, 8, 66, 'desktop', 1],
+      ['not-found-moon', 'moon', 'cream', 64, 14, 30, 6, 'dark-desktop', 1],
+    ],
+    sheets: [
+      ['not-found-checker', 'torn', 'checker', ['ultramarine', 'cobalt'], -5, 4, 30, 280, -4, 'desktop'],
+      ['not-found-dots', 'torn', 'dots', ['viridian', 'leaf'], -6, 52, 32, 420, 3, 'all'],
+    ],
+  },
+]);
+
+/** Hazard stripes over a monstera. */
+// biome-ignore format: placement rows read as a table
+export const SERVER_ERROR_BACKDROP = defineBackdrop('fill', 1, [
+  {
+    cutOuts: [
+      ['error-monstera', 'monstera', 'viridian', 520, 22, 74, -12, 'desktop', 0],
+      ['error-fern', 'fern', 'olive', 340, -34, -10, 40, 'all', 0],
+      ['error-seaweed', 'seaweed2', 'olive', 240, -16, 56, 64, 'all', 1],
+      ['error-star', 'star5', 'star', 46, 10, 36, 6, 'desktop', 3],
+      ['error-sun', 'sun', 'ochre', 170, 0, 12, 4, 'desktop', 0],
+    ],
+    sheets: [
+      ['error-stripes', 'torn', 'stripes', ['vermilion', 'ochre'], 72, -4, 40, 380, 6, 'desktop'],
+      ['error-disc', 'disc', 'solid', 'cerulean', 3, 66, 200, 0, 'all'],
     ],
   },
 ]);

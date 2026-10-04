@@ -11,7 +11,6 @@ import { Box } from '@mui/material';
 import { Suspense } from 'react';
 import { getLatestSong } from '../../services/spotify';
 import { CollageColorSchemeFieldset } from '../collage/CollageColorSchemeFieldset';
-import chrome from '../collage/chrome.module.css';
 import { PaperCard } from '../collage/PaperCard';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
 import { CollageMusicLinks } from './CollageMusicLinks';
@@ -66,19 +65,19 @@ export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
     return (
       <>
         <SiteHeaderHeight />
-        <header className={chrome.header} data-sticky-header={true}>
-          <PaperCard className={chrome.logo} edge="quad-b" tiltDeg={-4} tone="ochre">
-            <div className={chrome.logoInner}>
+        <header className="collageMeasure chrome__header" data-sticky-header={true}>
+          <PaperCard className="chrome__logo" edge="quad-b" tiltDeg={-4} tone="ochre">
+            <div className="chrome__logoInner">
               <Logo surface="collage" />
             </div>
           </PaperCard>
-          <div className={chrome.nowPlaying}>
+          <div className="chrome__nowPlaying">
             <Suspense fallback={null}>
               <SpotifyHeaderCardSlot surface="collage" />
             </Suspense>
           </div>
-          <div className={chrome.spacer} />
-          <nav className={chrome.nav}>
+          <div className="chrome__spacer" />
+          <nav className="chrome__nav">
             <CollageMusicLinks />
             <CollageColorSchemeFieldset />
           </nav>

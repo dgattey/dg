@@ -10,7 +10,14 @@ import type { SxObject } from '@dg/ui/theme';
 import { Box, Stack } from '@mui/material';
 import { ArrowDownUp } from 'lucide-react';
 import type { ReactNode } from 'react';
-import { Fragment, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import {
+  Fragment,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 import { PaperTag } from '../../../collage/PaperTag';
 import { hasClientHydrated } from '../../../layouts/clientHydrated';
 import { ALBUM_GRID_COLUMNS, albumGridSx, albumTileSlotSx } from '../albumTileGeometry';
@@ -18,10 +25,10 @@ import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
 import { AlbumWell } from './AlbumWell';
 import {
   COLLAGE_ALBUM_GRID_COLUMNS,
+  COLLAGE_ALBUM_SORT_OPTIONS,
   collageAlbumCardTreatment,
 } from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
-import styles from './FavoriteAlbums.module.css';
 import { FavoriteAlbumsReserve } from './FavoriteAlbumsSkeleton';
 import { useOptimisticAlbumSelection } from './useOptimisticAlbumSelection';
 
@@ -31,9 +38,8 @@ import { useOptimisticAlbumSelection } from './useOptimisticAlbumSelection';
  * skeleton instead. `:active-view-transition` is not set yet inside React's
  * startViewTransition update, so we cannot key off that.
  */
-function paintAlbumsOnFirstPass() {
-  return !hasClientHydrated();
-}
+const subscribeToNothing = () => () => {};
+const serverWasNotHydrated = () => false;
 
 function viewTransitionPseudoElement(effect: AnimationEffect | null) {
   if (!effect || !('pseudoElement' in effect)) {
@@ -65,14 +71,7 @@ function afterNextPaint() {
   });
 }
 
-const SORT_OPTIONS = [
-  { key: 'added', label: 'Recently added', tiltDeg: -3 },
-  { key: 'album', label: 'Album', tiltDeg: 2 },
-  { key: 'artist', label: 'Artist', tiltDeg: -1.5 },
-  { key: 'released', label: 'Release date', tiltDeg: 2.5 },
-] as const;
-
-type AlbumSortKey = (typeof SORT_OPTIONS)[number]['key'];
+type AlbumSortKey = (typeof COLLAGE_ALBUM_SORT_OPTIONS)[number]['key'];
 
 type AlbumGridColumns = Record<keyof typeof ALBUM_GRID_COLUMNS, number>;
 
@@ -89,15 +88,12 @@ const comparators: Record<AlbumSortKey, (a: PlaylistAlbum, b: PlaylistAlbum) => 
 };
 
 function isAlbumSortKey(value: string): value is AlbumSortKey {
-  return SORT_OPTIONS.some((option) => option.key === value);
+  return COLLAGE_ALBUM_SORT_OPTIONS.some((option) => option.key === value);
 }
 
 /** A cell's slot in the grid, stretched around it and ordered ahead of a well. */
 function albumSlotSx(index: number): SxObject {
-  return {
-    ...albumTileSlotSx,
-    order: 2 * index + 1,
-  };
+  return { ...albumTileSlotSx, order: 2 * index + 1 };
 }
 
 /**
@@ -145,10 +141,15 @@ type Props = {
  * opens on the click instead of on the payload that click goes and fetches.
  */
 export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Props) {
+  const wasClientHydrated = useSyncExternalStore(
+    subscribeToNothing,
+    hasClientHydrated,
+    serverWasNotHydrated,
+  );
   // Client navigations photograph a height-matched reserve instead of ~300
   // next/image nodes. Reveal after the page-rise animations (plus a paint)
   // so the grid commit cannot hitch the 300ms transition.
-  const [showGrid, setShowGrid] = useState(paintAlbumsOnFirstPass);
+  const [showGrid, setShowGrid] = useState(!wasClientHydrated);
   useEffect(() => {
     let cancelled = false;
     void waitForViewTransitionAnimations()
@@ -271,12 +272,12 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
   if (surface === 'collage') {
     return (
       <>
-        <nav aria-label="Sort albums" className={styles.collageSort} {...jsOnlyProps}>
-          {SORT_OPTIONS.map((option) => {
+        <nav aria-label="Sort albums" className="music__sort" {...jsOnlyProps}>
+          {COLLAGE_ALBUM_SORT_OPTIONS.map((option) => {
             const current = option.key === sortKey;
             return (
               <PaperTag
-                className={styles.collageSortTag}
+                className="music__sortTag"
                 edge="quad-a"
                 key={option.key}
                 tiltDeg={option.tiltDeg}
@@ -284,7 +285,7 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
               >
                 <button
                   aria-pressed={current}
-                  className={styles.collageSortButton}
+                  className="music__sortButton"
                   onClick={() => handleSortChange(option.key)}
                   type="button"
                 >
@@ -294,7 +295,7 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
             );
           })}
         </nav>
-        <Box className={styles.collageAlbumGrid} onClickCapture={onAlbumNavigationCapture}>
+        <Box className="music__albumGrid" onClickCapture={onAlbumNavigationCapture}>
           {cells}
         </Box>
       </>
@@ -319,7 +320,10 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
               handleSortChange(next);
             }
           }}
-          options={SORT_OPTIONS.map((option) => ({ label: option.label, value: option.key }))}
+          options={COLLAGE_ALBUM_SORT_OPTIONS.map((option) => ({
+            label: option.label,
+            value: option.key,
+          }))}
           value={sortKey}
         />
       </StickyFadeBar>

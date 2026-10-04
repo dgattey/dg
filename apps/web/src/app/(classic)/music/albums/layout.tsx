@@ -13,7 +13,6 @@ import { CutLetters } from '../../../collage/CutLetters';
 import { markdownAlternates } from '../../../layouts/markdownAlternates';
 import { musicDestinationLabel } from '../../../layouts/musicHeaderDestinations';
 import { PageTitle } from '../../../layouts/PageTitle';
-import styles from './FavoriteAlbums.module.css';
 import { FavoriteAlbumsGrid } from './FavoriteAlbumsGrid';
 import { FavoriteAlbumsSkeleton } from './FavoriteAlbumsSkeleton';
 
@@ -69,9 +68,9 @@ export default function FavoriteAlbumsLayout({
 }) {
   if (surface === 'collage') {
     return (
-      <section aria-label={TITLE} className={`collageBackdropHost ${styles.collageLayout}`}>
+      <section aria-label={TITLE} className="collageBackdropHost music__albumsLayout">
         <CollageBackdrop backdrop={ALBUMS_BACKDROP} />
-        <CutLetters className={styles.collageTitle} text={TITLE} />
+        <CutLetters className="collagePageTitle" text={TITLE} />
         <Suspense fallback={<FavoriteAlbumsSkeleton surface="collage" />}>
           <AlbumsGrid surface="collage">{children}</AlbumsGrid>
         </Suspense>
