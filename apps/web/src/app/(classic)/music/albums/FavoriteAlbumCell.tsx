@@ -118,9 +118,9 @@ export function FavoriteAlbumCell({
     return (
       <CollageAlbumPaper selected={collapsed} treatment={collageTreatment}>
         <Link
-          aria-label={collapsed ? `Close ${albumName}` : undefined}
           className="music__albumLink"
           href={href}
+          title={collapsed ? `Close ${albumName}` : undefined}
           transitionTypes={albumTransitionTypes(collapsed ? 'close' : 'open')}
         >
           <span className="music__art music__fullColorArt">
