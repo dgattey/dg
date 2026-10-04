@@ -3,7 +3,7 @@ packages:
   - packages/*
   - apps/*
 
-# pnpm 11 reads .npmrc for auth and registries only, so these live here now.
+# pnpm reads .npmrc for auth and registries only, so these live here.
 autoInstallPeers: true
 engineStrict: true
 saveExact: true
@@ -12,13 +12,8 @@ saveExact: true
 # dependencies on each `pnpm run` is pure overhead.
 verifyDepsBeforeRun: false
 
-# node_modules is fully reproducible from the lockfile, so don't stop and ask
-# before rebuilding it. Without this pnpm hard-fails outside a TTY, which is
-# what a developer hits the first time they install on the pnpm 11 store.
-confirmModulesPurge: false
-
 # Replaces onlyBuiltDependencies. Anything not listed here is blocked from
-# running install scripts, and pnpm 11 fails the install rather than warning.
+# running install scripts, and pnpm fails the install rather than warning.
 allowBuilds:
   '@parcel/watcher': false
   '@swc/core': true
@@ -65,7 +60,7 @@ overrides:
   browserslist: ^4.29.3
   sharp: 'catalog:'
 
-# pnpm quarantines releases younger than minimumReleaseAge (1 day by default).
-# pnpm appends to this list itself when a pinned version is newer than that; it
-# never prunes, so entries for packages that have since moved on can be deleted.
-minimumReleaseAgeExclude: []
+# pnpm quarantines releases younger than minimumReleaseAge (1 day by default)
+# and adds a minimumReleaseAgeExclude entry when a pinned version is newer than
+# that. Pruning drops each entry once the lockfile no longer records it.
+minimumReleaseAgeExcludePrune: true

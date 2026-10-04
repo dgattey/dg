@@ -41,7 +41,7 @@ jobs:
           fetch-depth: 0
           token: ${{ secrets.PAT_FOR_ACTIONS }}
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6.1.0
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
@@ -111,7 +111,7 @@ jobs:
           ref: ${{ github.event.pull_request.merge_commit_sha }}
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v6.1.0
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
