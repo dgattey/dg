@@ -115,19 +115,11 @@ html[data-color-scheme="dark"] .collageRoot::after {
 }
 
 /*
- * Sticky bars are torn from the page's own paper, so they drop the fade. The
- * page's grain overlay paints above them, so they carry no texture of their own.
+ * Like the header, a pinned collage bar is just its paper chip: a full-width
+ * band would cover the page title and everything scrolling beside the chip.
  */
-[data-site-surface="collage"] > [data-sticky-surface],
-[data-site-surface="collage"][data-sticky-mask] {
-  background-color: var(--paper);
-}
-/* Unpinned bars cross the page's backdrop, so their lower edge reads as a torn strip. */
-[data-site-surface="collage"] > [data-sticky-surface] {
-  clip-path: var(--torn-bottom);
-}
-[data-site-surface="collage"] > [data-sticky-fade] {
-  background: none;
+[data-site-surface="collage"] > :is([data-sticky-surface], [data-sticky-fade]) {
+  display: none;
 }
 
 .collageBleed {

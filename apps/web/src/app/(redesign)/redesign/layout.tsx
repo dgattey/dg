@@ -1,4 +1,3 @@
-import { StickyBarTopMask } from '@dg/ui/core/StickyFadeBar';
 import { type ReactNode, Suspense } from 'react';
 import '../../collage/collage.css';
 import '../../collage/chrome.css';
@@ -20,7 +19,6 @@ export default function RedesignLayout({ children }: { children: ReactNode }) {
         <Suspense fallback={null}>
           <Header surface="collage" />
         </Suspense>
-        <StickyBarTopMask surface="collage" />
         <main className="collageMain">
           <Suspense fallback={null}>
             <PageViewTransition>{children}</PageViewTransition>
