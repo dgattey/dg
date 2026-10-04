@@ -346,14 +346,14 @@ html[data-color-scheme="dark"] .cutNightOnly {
       animation-range: entry 0% exit 100%;
     }
     .collageField {
-      --drift: 80px;
-      scale: 1 1.2;
+      --drift: 40px;
+      scale: 1 1.1;
     }
     .cutOut.cutDepthMedium {
-      --drift: 150px;
+      --drift: 75px;
     }
     .cutOut.cutDepthFast {
-      --drift: 230px;
+      --drift: 115px;
     }
   }
 
