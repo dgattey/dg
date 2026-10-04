@@ -1,3 +1,4 @@
+import '../../../(classic)/music/music.css';
 import ClassicMusic, { metadata as musicMetadata } from '../../../(classic)/music/page';
 
 export const metadata = musicMetadata;

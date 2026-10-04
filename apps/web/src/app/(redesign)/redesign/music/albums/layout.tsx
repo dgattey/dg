@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import '../../../../(classic)/music/music.css';
 import ClassicAlbumsLayout, {
   metadata as albumsMetadata,
 } from '../../../../(classic)/music/albums/layout';

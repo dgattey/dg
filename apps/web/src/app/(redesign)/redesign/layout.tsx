@@ -1,11 +1,6 @@
 import type { ReactNode } from 'react';
 import '../../collage/collage.css';
 import '../../collage/chrome.css';
-import '../../collage/home.css';
-import '../../collage/print.css';
-import '../../(classic)/music/music.css';
-import '../../layouts/error.css';
-import '../../(classic)/dev-console/devConsole.css';
 import { familjen } from '../../collage/familjen';
 import { Footer } from '../../layouts/Footer';
 import { Header } from '../../layouts/Header';
