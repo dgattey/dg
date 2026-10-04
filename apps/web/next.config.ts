@@ -14,7 +14,6 @@ const nextConfig: NextConfig = {
     },
     turbopackFileSystemCacheForBuild: true,
     turbopackFileSystemCacheForDev: true,
-    viewTransition: true,
   },
   images: {
     formats: ['image/avif', 'image/webp'],

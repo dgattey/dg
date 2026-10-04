@@ -32,3 +32,14 @@ This is `dg`, a single Next.js 16 app (`@dg/web`) in a pnpm + Turbo monorepo. Se
 - The app needs `DATABASE_URL` (dev) and `DATABASE_URL_TEST` (tests). If `turbo migrate` or app startup fails with `password authentication failed`, the injected DB credentials are stale and need to be refreshed; any reachable Postgres (e.g. a fresh Neon branch) works if you override those two env vars for the process.
 - Test-DB migration deadlock: the initial migration opens a transaction but calls `createTable` on a fresh connection, and the test env forces `pool.max = 1`. Running *pending* migrations against the test DB therefore deadlocks (`SequelizeConnectionAcquireTimeoutError`). `turbo test`'s global setup only runs *pending* migrations, so make sure `DATABASE_URL_TEST` already has every migration applied before running tests — the reliable way is to migrate it once through the dev pool (point `DATABASE_URL` at the test DB and run `turbo migrate`, which uses the default multi-connection pool and does not deadlock).
 - `turbo test` runs the two DB-backed packages (`@dg/services`, `@dg/web`) in parallel; both connect to `DATABASE_URL_TEST`. This is fine once the test DB is already migrated.
+
+<!-- BEGIN:turborepo-agent-rules -->
+
+# This is NOT the Turborepo you know
+
+Turborepo configuration, task behavior, and CLI commands can vary between installed versions and may differ from your training data. Resolve the `turbo` package from this file's directory or relevant workspace; in monorepos, it may not be visible from the repository root. For example, run `node -p "require.resolve('turbo/package.json')"` from a workspace that depends on `turbo`.
+
+Read `docs/README.md` inside that installed package first, then read the relevant pages from its `docs/` directory before changing Turborepo configuration or commands. Heed deprecation notices. These bundled docs match the installed package version and are available without network access.
+
+This block is written and re-added by `turbo` before repository-scoped commands when an AI agent is detected. In the Turborepo source repository, its template is defined in `crates/turborepo-cli/src/cli/agent_guidance.rs`. Removing the managed block while updates are enabled means a later qualifying invocation will add it again. Set `"agentGuidance": false` in the root `turbo.json` or `turbo.jsonc` to opt out; this does not remove an existing block. Keep the block committed with your work to avoid an uncommitted change on the next agent invocation.
+<!-- END:turborepo-agent-rules -->

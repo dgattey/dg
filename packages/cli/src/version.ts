@@ -37,9 +37,10 @@ function readEvent(eventPath: string): { prBody: string; event: Record<string, u
   return { event, prBody: (pr?.body as string) ?? '' };
 }
 
+// Keep in sync with the bump job's `if:` in .github/workflows/release.yml.
 function parseReleaseType(prBody: string): ReleaseType {
-  if (/- \[x\]\s*Major/i.test(prBody)) return 'major';
-  if (/- \[x\]\s*Minor/i.test(prBody)) return 'minor';
+  if (/- \[x\] Major/i.test(prBody)) return 'major';
+  if (/- \[x\] Minor/i.test(prBody)) return 'minor';
   return 'patch';
 }
 

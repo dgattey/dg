@@ -12,6 +12,7 @@ import { ArrowDownUp } from 'lucide-react';
 import type { ReactNode } from 'react';
 import {
   Fragment,
+  Suspense,
   useEffect,
   useLayoutEffect,
   useRef,
@@ -26,11 +27,17 @@ import { AlbumWell } from './AlbumWell';
 import {
   COLLAGE_ALBUM_GRID_COLUMNS,
   COLLAGE_ALBUM_SORT_OPTIONS,
+  type CollageAlbumCardTreatment,
   collageAlbumCardTreatment,
 } from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
 import { FavoriteAlbumsReserve } from './FavoriteAlbumsSkeleton';
-import { useOptimisticAlbumSelection } from './useOptimisticAlbumSelection';
+import {
+  type PendingSelection,
+  resolveAlbumSelection,
+  useOptimisticAlbumSelection,
+  useUrlAlbumId,
+} from './useOptimisticAlbumSelection';
 
 /**
  * SSR and the matching hydrate must paint the real grid. After the app has
@@ -123,6 +130,50 @@ function wellPlacementSx(
   };
 }
 
+type AlbumCard = {
+  album: PlaylistAlbum;
+  treatment: CollageAlbumCardTreatment;
+};
+
+type SelectedAlbumWellProps = {
+  albumCards: Array<AlbumCard>;
+  children?: ReactNode;
+  pending: PendingSelection | null;
+  surface: SiteSurface;
+};
+
+/**
+ * The well for the selected album, the only part of the grid that reads the
+ * query during prerender. It postpones to its own boundary, so a deep link
+ * still server-renders its well while every tile stays in the static shell.
+ */
+function SelectedAlbumWell({ albumCards, children, pending, surface }: SelectedAlbumWellProps) {
+  const { isAwaitingDetail, selectedAlbumId } = resolveAlbumSelection(pending, useUrlAlbumId());
+  const selectedIndex = albumCards.findIndex(({ album }) => album.id === selectedAlbumId);
+  const selectedCard = albumCards[selectedIndex];
+
+  if (!selectedCard) {
+    return null;
+  }
+
+  return (
+    <Box sx={wellPlacementSx(selectedIndex, albumCards.length, surface)}>
+      <AlbumWell album={selectedCard.album} surface={surface} tone={selectedCard.treatment.tone}>
+        {/*
+         * Streamed detail always belongs to the album in the URL, so it is only
+         * rendered once the URL agrees with what the well is showing; until then
+         * the well holds the same skeleton the page streams behind. Keying by
+         * album makes that the single swap and stops one album's tracklist from
+         * lingering inside another album's well.
+         */}
+        <Fragment key={selectedCard.album.id}>
+          {isAwaitingDetail ? <AlbumDetailBodySkeleton surface={surface} /> : children}
+        </Fragment>
+      </AlbumWell>
+    </Box>
+  );
+}
+
 type Props = {
   albums: Array<PlaylistAlbum>;
   /** Streamed detail for the album in the URL, rendered inside the well. */
@@ -137,8 +188,10 @@ type Props = {
  *
  * The selection is read from the query rather than passed in, so this grid can
  * live in the layout — where a query change never refetches it — and stay
- * mounted across open and close. Clicks run ahead of the query so the well
- * opens on the click instead of on the payload that click goes and fetches.
+ * mounted across open and close. Only the well reads it during prerender, so
+ * the tiles render into the static shell and collapse once hydrated. Clicks run
+ * ahead of the query so the well opens on the click instead of on the payload
+ * that click goes and fetches.
  */
 export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Props) {
   const wasClientHydrated = useSyncExternalStore(
@@ -164,8 +217,7 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
     };
   }, []);
 
-  const { isAwaitingDetail, onAlbumNavigationCapture, selectedAlbumId } =
-    useOptimisticAlbumSelection();
+  const { onAlbumNavigationCapture, pending, selectedAlbumId } = useOptimisticAlbumSelection();
   const [sortKey, setSortKey] = useState<AlbumSortKey>('added');
   const itemRefs = useRef(new Map<string, HTMLElement>());
   const previousRects = useRef<Map<string, DOMRect> | null>(null);
@@ -210,34 +262,25 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
     return <FavoriteAlbumsReserve albums={albums} surface={surface} />;
   }
 
-  const albumCards = albums.map((album, index) => ({
-    album,
-    treatment: collageAlbumCardTreatment(index),
-  }));
+  const albumCards = albums.map(
+    (album, index): AlbumCard => ({
+      album,
+      treatment: collageAlbumCardTreatment(index),
+    }),
+  );
   const sortedAlbumCards = albumCards.sort((a, b) => comparators[sortKey](a.album, b.album));
   const selectedIndex = selectedAlbumId
     ? sortedAlbumCards.findIndex(({ album }) => album.id === selectedAlbumId)
     : -1;
-  const selectedCard = selectedIndex >= 0 ? sortedAlbumCards[selectedIndex] : undefined;
-  const selectedAlbum = selectedCard?.album;
-  const well = selectedAlbum ? (
-    <Box key="album-well" sx={wellPlacementSx(selectedIndex, sortedAlbumCards.length, surface)}>
-      <AlbumWell album={selectedAlbum} surface={surface} tone={selectedCard.treatment.tone}>
-        {/*
-         * Streamed detail always belongs to the album in the URL, so it is only
-         * rendered once the URL agrees with what the well is showing; until then
-         * the well holds the same skeleton the page streams behind. Keying by
-         * album makes that the single swap and stops one album's tracklist from
-         * lingering inside another album's well.
-         */}
-        <Fragment key={selectedAlbum.id}>
-          {isAwaitingDetail ? <AlbumDetailBodySkeleton surface={surface} /> : children}
-        </Fragment>
-      </AlbumWell>
-    </Box>
-  ) : null;
+  const wellSlot = (
+    <Suspense fallback={null} key="album-well">
+      <SelectedAlbumWell albumCards={sortedAlbumCards} pending={pending} surface={surface}>
+        {children}
+      </SelectedAlbumWell>
+    </Suspense>
+  );
 
-  const renderAlbum = ({ album, treatment }: (typeof sortedAlbumCards)[number], index: number) => (
+  const renderAlbum = ({ album, treatment }: AlbumCard, index: number) => (
     <Box
       key={album.id}
       ref={(element: HTMLElement | null) => {
@@ -262,11 +305,15 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
     </Box>
   );
 
-  // The well sits next to its album in the DOM for reading and tab order; CSS
-  // `order` is what floats it down to the end of that album's row.
+  // Once the grid knows the selection, the well sits next to its album in the
+  // DOM for reading and tab order. In the static shell and through hydration it
+  // waits after the last album instead. Either way CSS `order` floats
+  // it down to the end of that album's row, and the slot stays one keyed
+  // instance that moves rather than remounts.
+  const wellIndex = selectedIndex >= 0 ? selectedIndex : sortedAlbumCards.length - 1;
   const cells = sortedAlbumCards.flatMap((albumCard, index) =>
-    index === selectedIndex && well
-      ? [renderAlbum(albumCard, index), well]
+    index === wellIndex
+      ? [renderAlbum(albumCard, index), wellSlot]
       : [renderAlbum(albumCard, index)],
   );
 

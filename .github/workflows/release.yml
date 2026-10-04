@@ -6,10 +6,6 @@ on:
     types: [opened, edited, synchronize, closed]
     branches: [main]
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 env:
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
@@ -17,7 +13,22 @@ env:
 jobs:
   bump:
     name: "📦 Bump version"
-    if: github.event.action != 'closed'
+    # Edits only matter when they retarget the PR or change the release type.
+    # The checkbox strings must match parseReleaseType in packages/cli/src/version.ts
+    # (contains() is case-insensitive, like its /i regexes).
+    if: >-
+      github.event.pull_request.state == 'open' && (
+        github.event.action != 'edited' ||
+        github.event.changes.base ||
+        (github.event.changes.body && (
+          contains(github.event.changes.body.from, '- [x] Major') != contains(github.event.pull_request.body, '- [x] Major') ||
+          contains(github.event.changes.body.from, '- [x] Minor') != contains(github.event.pull_request.body, '- [x] Minor')
+        ))
+      )
+    # Job-level so skipped edit runs don't cancel an in-flight bump or release.
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     runs-on: ubuntu-latest
     permissions:
       contents: write

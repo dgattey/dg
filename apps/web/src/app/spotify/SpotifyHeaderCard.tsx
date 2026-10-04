@@ -7,11 +7,11 @@ import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { createTransition, TIMING_MEDIUM, TIMING_NORMAL, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
-import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
 import { usePageScrollProgress } from '../layouts/PageScrollContext';
+import { usePublicPathname } from '../layouts/usePublicPathname';
 import { useNowPlaying } from './NowPlayingContext';
 import { NOW_PLAYING_CARD_ID } from './SpotifyCardScrollTracker';
 import { TrackListing } from './TrackListing';
@@ -92,7 +92,7 @@ export function SpotifyHeaderCard({
   track: serverTrack,
 }: SpotifyHeaderCardProps) {
   const track = useNowPlaying(serverTrack);
-  const pathname = usePathname();
+  const pathname = usePublicPathname();
   const scrollContext = usePageScrollProgress();
   const isHome = pathname === homeRoute;
   const isMusic = pathname === musicRoute;
