@@ -134,11 +134,6 @@ html[data-color-scheme="dark"] .collageRoot::after {
   position: relative;
   z-index: 2;
 }
-.collageMeasureGrid {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  align-items: start;
-}
 .collagePageTitle {
   padding-top: 20px;
   font-size: clamp(48px, 6.2vw, 88px);
@@ -150,21 +145,12 @@ html[data-color-scheme="dark"] .collageRoot::after {
   gap: 0.7em;
   align-items: baseline;
 }
-.collageLift {
-  transition: translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
 .collageEyebrow {
   font-size: 15px;
   font-weight: 700;
   line-height: 1.25;
   text-transform: uppercase;
   letter-spacing: 0.11em;
-}
-@media (prefers-reduced-motion: no-preference) {
-  .collageLift:hover,
-  .collageLift:has(:focus-visible) {
-    translate: 0 -3px;
-  }
 }
 
 .paperWrap {
@@ -237,30 +223,12 @@ html[data-color-scheme="dark"] .collageRoot::after {
   outline: 2px solid currentColor;
   outline-offset: 3px;
 }
-/*
- * The record disc clips everything outside its circle and the art paints over
- * the link, so its ring is an inset circle layered above the art.
- */
-.collageRoot .print__artLink:focus-visible {
-  outline: none;
-}
-.collageRoot .print__artLink:focus-visible::after {
-  position: absolute;
-  inset: 6px;
-  z-index: 1;
-  pointer-events: none;
-  content: "";
-  border: 2px solid currentColor;
-  border-radius: 50%;
-}
 .collageRoot
   :is(
     .paperButton,
     .chrome__musicSummary,
     .chrome__logo :is(a, button),
-    .chrome__nowPlaying :has(.paperWrap),
-    .home__sideRow,
-    .music__card a
+    .chrome__nowPlaying :has(.paperWrap)
   ):focus-visible {
   outline: none;
 }
@@ -269,14 +237,11 @@ html[data-color-scheme="dark"] .collageRoot::after {
     .paperWrap:has(> span > .paperButton:focus-visible),
     .chrome__musicSummary:focus-visible > .paperWrap,
     .chrome__logo:has(:focus-visible),
-    .chrome__nowPlaying :focus-visible .paperWrap,
-    .home__sideRowWrap:has(.home__sideRow:focus-visible),
-    .music__card:has(a:focus-visible)
+    .chrome__nowPlaying :focus-visible .paperWrap
   ) {
   /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
   outline: 2px solid var(--ink);
   outline-offset: 3px;
-  /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
   border-radius: 14px;
 }
 .paperButtonCurrent {
@@ -289,13 +254,6 @@ html[data-color-scheme="dark"] .collageRoot::after {
 .paperButton:disabled {
   cursor: wait;
   opacity: 0.62;
-}
-.collageStatusTag {
-  flex-shrink: 0;
-  padding: 0.45em 0.75em 0.5em;
-  font-size: 14.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
 }
 
 .cutOut {
@@ -407,17 +365,6 @@ html[data-color-scheme="dark"] .cutNightOnly {
 }
 
 @media (max-width: 820px) {
-  .collageRoot .collageGridStack {
-    display: flex;
-    flex-direction: column;
-    grid-template-areas: none;
-    gap: 36px;
-    align-items: stretch;
-  }
-  .collageRoot .collageGridStack > * {
-    grid-area: auto;
-    margin-top: 0;
-  }
   .collagePageTitle,
   .cutHeading {
     font-size: clamp(54px, 16.5vw, 72px);

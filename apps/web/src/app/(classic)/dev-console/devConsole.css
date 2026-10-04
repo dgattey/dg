@@ -1,5 +1,13 @@
 /* Dev console sections and action cards */
 
+.collageStatusTag {
+  flex-shrink: 0;
+  padding: 0.45em 0.75em 0.5em;
+  font-size: 14.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
 .devConsole__sheet {
   min-height: calc(100dvh - 180px);
   padding-block: 40px 90px;

@@ -1,5 +1,22 @@
 /* Prints, portrait print, and record disc */
 
+/*
+ * The record disc clips everything outside its circle and the art paints over
+ * the link, so its ring is an inset circle layered above the art.
+ */
+.collageRoot .print__artLink:focus-visible {
+  outline: none;
+}
+.collageRoot .print__artLink:focus-visible::after {
+  position: absolute;
+  inset: 6px;
+  z-index: 1;
+  pointer-events: none;
+  content: "";
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
 .print__print {
   position: relative;
   display: block;
