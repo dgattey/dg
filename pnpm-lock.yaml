@@ -221,6 +221,9 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
       '@typescript/native':
         specifier: 'catalog:'
         version: typescript@7.0.2
