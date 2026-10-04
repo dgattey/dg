@@ -2,6 +2,21 @@ import type { RenderableSideProject } from '@dg/content-models/contentful/render
 import { render, screen } from '@testing-library/react';
 import { GatteySitesCard } from '../GatteySitesCard';
 
+jest.mock('../../collage/PaperCard', () => ({
+  PaperCard: ({ children, className }: { children: React.ReactNode; className?: string }) => (
+    <div className={className}>{children}</div>
+  ),
+}));
+
+jest.mock('../../collage/PaperTag', () => ({
+  PaperTag: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
+}));
+
+jest.mock('@dg/ui/dependent/Image', () => ({
+  // biome-ignore lint/performance/noImgElement: test double for mark rendering
+  Image: ({ url }: { url: string }) => <img alt="" src={url} />,
+}));
+
 const mark = {
   height: 80,
   title: 'Mark',
@@ -57,5 +72,15 @@ describe('GatteySitesCard', () => {
   it('renders nothing when there are no projects', () => {
     const { container } = render(<GatteySitesCard projects={[]} />);
     expect(container).toBeEmptyDOMElement();
+  });
+
+  it('keeps collage marks decorative and links external', () => {
+    const { container } = render(<GatteySitesCard projects={projects} surface="collage" />);
+
+    expect(screen.getByRole('link', { name: /WMM/ })).toHaveAttribute(
+      'href',
+      'https://wmm.gattey.com',
+    );
+    expect(container.querySelectorAll('img[alt=""]')).toHaveLength(2);
   });
 });

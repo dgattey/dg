@@ -1,14 +1,12 @@
-import type { RenderableProject } from '@dg/content-models/contentful/renderables/projects';
 import type { ReactNode } from 'react';
 import { ProjectCard } from '../home/ProjectCard';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS } from './cutOutPlacements';
-import { TornField } from './TornField';
+import { type SlottedProject, workSheetFrames } from './projectSlots';
 import styles from './WorkSheet.module.css';
-import { workSheetFrames } from './workSheetFrames';
 
 type WorkSheetProps = {
-  projects: ReadonlyArray<RenderableProject>;
+  projects: ReadonlyArray<SlottedProject>;
   spotify: ReactNode;
   strava: ReactNode;
 };
@@ -25,7 +23,7 @@ export function WorkSheet({ projects, spotify, strava }: WorkSheetProps) {
 
   return (
     <section aria-label="Work" className={styles.sheet}>
-      <TornField className={styles.field} />
+      <div aria-hidden="true" className={`collageField ${styles.field}`} />
       {CUT_OUT_PLACEMENTS.workSheet.map((placement) => (
         <CutOut key={placement.id} placement={placement} />
       ))}
@@ -34,7 +32,8 @@ export function WorkSheet({ projects, spotify, strava }: WorkSheetProps) {
           <ProjectCard
             {...projectOne.project}
             className={FRAME_CLASS.c1}
-            data-work-slot="c1"
+            data-slot="c1"
+            key={projectOne.key}
             style={projectOne.style}
             surface="collage"
           />
@@ -45,7 +44,8 @@ export function WorkSheet({ projects, spotify, strava }: WorkSheetProps) {
           <ProjectCard
             {...projectTwo.project}
             className={FRAME_CLASS.ws}
-            data-work-slot="ws"
+            data-slot="ws"
+            key={projectTwo.key}
             style={projectTwo.style}
             surface="collage"
           />

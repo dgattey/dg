@@ -23,7 +23,7 @@ export function CollageSpotifyCard({ track }: { track: Track }) {
   const trackUrl = track.externalUrls.spotify;
 
   return (
-    <div className={sheetStyles.spotify} data-work-slot="sp">
+    <div className={sheetStyles.spotify} data-slot="sp">
       <RecordDisc track={track} />
       <PaperCard className={styles.meta} edge="quad-b" tiltDeg={-2} tone="cream">
         <div className={styles.metaInner}>
