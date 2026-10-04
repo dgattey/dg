@@ -112,6 +112,24 @@
   border-radius: 8px;
   rotate: 1.5deg;
 }
+.music__skeleton {
+  display: block;
+  background-color: color-mix(in srgb, CanvasText 12%, transparent);
+  animation: music__skeletonPulse 2s ease-in-out 0.5s infinite;
+}
+.music__skeletonText {
+  border-radius: 4px / 6.7px;
+  transform: scale(1, 0.6);
+  transform-origin: 0 55%;
+}
+.music__skeletonText:empty::before {
+  content: "\00a0";
+}
+@keyframes music__skeletonPulse {
+  50% {
+    opacity: 0.4;
+  }
+}
 .music__fullColorArt,
 .music__fullColorArt img {
   background: transparent;
