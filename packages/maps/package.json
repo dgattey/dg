@@ -7,7 +7,7 @@
     "lucide-react": "catalog:",
     "pigeon-maps": "0.22.1",
     "react": "catalog:",
-    "react-dom": "19.2.7",
+    "react-dom": "catalog:",
     "server-only": "catalog:"
   },
   "devDependencies": {
@@ -16,7 +16,7 @@
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
-    "@types/react-dom": "19.2.3",
+    "@types/react-dom": "catalog:",
     "@typescript/native": "catalog:",
     "dotenv-mono": "catalog:",
     "jest": "catalog:",

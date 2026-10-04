@@ -16,17 +16,20 @@ const sharedConfig: Config = {
 // Auto-detect environment by file extension:
 // - .test.tsx → jsdom (React components need DOM)
 // - .test.ts → node (API routes, utilities)
+// Jest 30.5 rejects maxWorkers inside a project, so it stays top-level only.
+const { maxWorkers: _maxWorkers, ...projectConfig } = sharedConfig;
+
 const config: Config = {
   ...sharedConfig,
   projects: [
     {
-      ...sharedConfig,
+      ...projectConfig,
       displayName: 'components',
       testEnvironment: 'jsdom',
       testMatch: ['<rootDir>/**/*.test.tsx'],
     },
     {
-      ...sharedConfig,
+      ...projectConfig,
       displayName: 'server',
       testEnvironment: 'node',
       testMatch: ['<rootDir>/**/*.test.ts'],

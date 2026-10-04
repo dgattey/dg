@@ -2,9 +2,9 @@
   "dependencies": {
     "@dg/content-models": "workspace:*",
     "@dg/shared-core": "workspace:*",
-    "@types/pg": "8.20.0",
+    "@types/pg": "8.23.1",
     "dotenv-mono": "catalog:",
-    "pg": "8.22.0",
+    "pg": "8.23.1",
     "sequelize": "6.37.8",
     "sequelize-typescript": "2.1.6"
   },
