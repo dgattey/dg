@@ -1,11 +1,6 @@
-import { type ReactNode, Suspense } from 'react';
+import type { ReactNode } from 'react';
 import '../../collage/collage.css';
 import '../../collage/chrome.css';
-import '../../collage/home.css';
-import '../../collage/print.css';
-import '../../(classic)/music/music.css';
-import '../../layouts/error.css';
-import '../../(classic)/dev-console/devConsole.css';
 import { familjen } from '../../collage/familjen';
 import { Footer } from '../../layouts/Footer';
 import { Header } from '../../layouts/Header';
@@ -18,13 +13,9 @@ export default function RedesignLayout({ children }: { children: ReactNode }) {
     <div className={`collageRoot ${familjen.variable}`}>
       <PageScrollProvider>
         <NowPlayingProvider>
-          <Suspense fallback={null}>
-            <Header surface="collage" />
-          </Suspense>
+          <Header surface="collage" />
           <main className="collageMain">
-            <Suspense fallback={null}>
-              <PageViewTransition>{children}</PageViewTransition>
-            </Suspense>
+            <PageViewTransition>{children}</PageViewTransition>
           </main>
         </NowPlayingProvider>
         <Footer surface="collage" />

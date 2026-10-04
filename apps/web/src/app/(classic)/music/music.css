@@ -1,5 +1,15 @@
 /* Shared album + history tiles, layouts, grids, states, and album well */
 
+.collageRoot .music__card a:focus-visible {
+  outline: none;
+}
+.collageRoot .music__card:has(a:focus-visible) {
+  /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 14px;
+}
+
 .music__albumsLayout,
 .music__historyLayout {
   display: grid;

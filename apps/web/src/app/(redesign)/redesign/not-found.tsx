@@ -1,3 +1,4 @@
+import '../../layouts/error.css';
 import { metadata as notFoundMetadata } from '../../(classic)/not-found';
 import { ErrorLayout } from '../../layouts/ErrorLayout';
 
