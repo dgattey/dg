@@ -135,9 +135,6 @@
   background: transparent;
   mix-blend-mode: normal;
 }
-.music__fullColorArt.music__fullColorArt img {
-  filter: none;
-}
 .music__caption {
   position: relative;
   z-index: 4;
@@ -318,6 +315,9 @@ html:active-view-transition-type(album-open) .music__wellCard {
   display: block;
   width: 100%;
   height: auto;
+}
+.music__fullColorArt.music__fullColorArt img {
+  filter: none;
 }
 .music__wellName {
   grid-area: name;
