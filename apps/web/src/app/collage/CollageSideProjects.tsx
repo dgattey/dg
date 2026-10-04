@@ -26,17 +26,8 @@ export function CollageSideProjects({
                 tiltDeg={even ? 1.5 : -1.2}
                 tone="cream"
               >
-                <a
-                  className="home__sideRow"
-                  href={project.url}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  <span
-                    aria-hidden="true"
-                    className="home__sideMark"
-                    data-role="side-project-mark"
-                  >
+                <a className="home__sideRow" href={project.url} rel="noreferrer" target="_blank">
+                  <span aria-hidden="true" className="home__sideMark" data-role="side-project-mark">
                     <Image
                       alt=""
                       height={project.mark.height}

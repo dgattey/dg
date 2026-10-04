@@ -271,11 +271,7 @@ function CompactLayout({
             trackTitle={track.name}
             url={disableLinks ? undefined : trackUrl}
           />
-          <ArtistList
-            artists={track.artists}
-            color={colors?.secondary}
-            listingVariant="compact"
-          />
+          <ArtistList artists={track.artists} color={colors?.secondary} listingVariant="compact" />
         </Stack>
       </Box>
     </Box>

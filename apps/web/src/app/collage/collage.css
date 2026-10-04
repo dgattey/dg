@@ -245,11 +245,11 @@ html[data-color-scheme="dark"] .collageRoot::after {
   outline: none;
 }
 .collageRoot .print__artLink:focus-visible::after {
-  content: "";
   position: absolute;
   inset: 6px;
   z-index: 1;
   pointer-events: none;
+  content: "";
   border: 2px solid currentColor;
   border-radius: 50%;
 }

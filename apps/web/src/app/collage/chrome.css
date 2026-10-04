@@ -51,10 +51,10 @@
  */
 .paperInner.chrome__nowPlayingInner {
   position: relative;
-  isolation: isolate;
   min-width: 0;
   padding: 7px 14px 7px 7px;
   background: none;
+  isolation: isolate;
   clip-path: none;
 }
 .chrome__nowPlayingInner::before {
