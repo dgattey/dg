@@ -55,7 +55,8 @@ html:has(.collageRoot) body {
   --collage-card-pad-mobile: 24px 22px 26px;
   position: relative;
   min-height: 100dvh;
-  overflow-x: clip;
+  /* Backdrops run behind the header and footer, so the page edge is their only clip. */
+  overflow: clip;
   font-family: var(--body);
   color: var(--ink);
   background-color: var(--paper);
@@ -115,19 +116,11 @@ html[data-color-scheme="dark"] .collageRoot::after {
 }
 
 /*
- * Sticky bars are torn from the page's own paper, so they drop the fade. The
- * page's grain overlay paints above them, so they carry no texture of their own.
+ * Like the header, a pinned collage bar is just its paper chip: a full-width
+ * band would cover the page title and everything scrolling beside the chip.
  */
-[data-site-surface="collage"] > [data-sticky-surface],
-[data-site-surface="collage"][data-sticky-mask] {
-  background-color: var(--paper);
-}
-/* Unpinned bars cross the page's backdrop, so their lower edge reads as a torn strip. */
-[data-site-surface="collage"] > [data-sticky-surface] {
-  clip-path: var(--torn-bottom);
-}
-[data-site-surface="collage"] > [data-sticky-fade] {
-  background: none;
+[data-site-surface="collage"] > :is([data-sticky-surface], [data-sticky-fade]) {
+  display: none;
 }
 
 .collageBleed {
@@ -234,18 +227,57 @@ html[data-color-scheme="dark"] .collageRoot::after {
   filter: none;
   rotate: none;
 }
-.paperButton:focus-visible {
+/*
+ * One focus ring across the collage: 2px in the control's own text colour,
+ * which already reads against whatever it sits on. A control that is a whole
+ * paper piece rings the piece instead, since the paper's clip-path would cut
+ * a ring drawn inside it — so exactly one ring shows per focus.
+ */
+.collageRoot :focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+/*
+ * The record disc clips everything outside its circle and the art paints over
+ * the link, so its ring is an inset circle layered above the art.
+ */
+.collageRoot .print__artLink:focus-visible {
   outline: none;
 }
-:where(
-  .paperWrap:has(:focus-visible),
-  .collageLift:focus-visible,
-  .chrome__musicSummary:focus-visible > .paperWrap,
-  .home__sideRowWrap:has(.home__sideRow:focus-visible),
-  .print__portrait:focus-visible
-) {
+.collageRoot .print__artLink:focus-visible::after {
+  position: absolute;
+  inset: 6px;
+  z-index: 1;
+  pointer-events: none;
+  content: "";
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+.collageRoot
+  :is(
+    .paperButton,
+    .chrome__musicSummary,
+    .chrome__logo :is(a, button),
+    .chrome__nowPlaying :has(.paperWrap),
+    .home__sideRow,
+    .music__card a
+  ):focus-visible {
+  outline: none;
+}
+.collageRoot
+  :is(
+    .paperWrap:has(> span > .paperButton:focus-visible),
+    .chrome__musicSummary:focus-visible > .paperWrap,
+    .chrome__logo:has(:focus-visible),
+    .chrome__nowPlaying :focus-visible .paperWrap,
+    .home__sideRowWrap:has(.home__sideRow:focus-visible),
+    .music__card:has(a:focus-visible)
+  ) {
+  /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
   outline: 2px solid var(--ink);
   outline-offset: 3px;
+  /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
+  border-radius: 14px;
 }
 .paperButtonCurrent {
   color: light-dark(var(--cream), var(--ink-on-cream));
@@ -317,14 +349,14 @@ html[data-color-scheme="dark"] .cutNightOnly {
       animation-range: entry 0% exit 100%;
     }
     .collageField {
-      --drift: 80px;
-      scale: 1 1.2;
+      --drift: 40px;
+      scale: 1 1.1;
     }
     .cutOut.cutDepthMedium {
-      --drift: 150px;
+      --drift: 75px;
     }
     .cutOut.cutDepthFast {
-      --drift: 230px;
+      --drift: 115px;
     }
   }
 

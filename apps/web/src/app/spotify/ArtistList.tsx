@@ -50,6 +50,8 @@ function getArtistListSx(
       ? {
           '& a': { color: 'inherit' },
           color,
+          // An explicit color is already tuned for contrast; fading it again washes it out.
+          opacity: 1,
         }
       : {}),
     ...(textShadow ? { textShadow } : {}),

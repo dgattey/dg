@@ -115,37 +115,34 @@ export function FavoriteAlbumCell({
 }: Props) {
   if (surface === 'collage') {
     const href = collapsed ? favoriteAlbumsRoute : albumRoute(albumId);
-    const title = collapsed ? `Close ${albumName}` : albumName;
     return (
       <CollageAlbumPaper selected={collapsed} treatment={collageTreatment}>
-        <Tooltip title={collapsed ? `Close ${albumName}` : tooltip}>
-          <Link
-            className="music__albumLink"
-            href={href}
-            title={title}
-            transitionTypes={albumTransitionTypes(collapsed ? 'close' : 'open')}
-          >
-            <span className="music__art music__fullColorArt">
-              <AlbumStack imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT}>
-                <AlbumArtCover
-                  albumId={albumId}
-                  albumName={albumName}
-                  collapsed={collapsed}
-                  imageUrl={imageUrl}
-                />
-                {collapsed ? (
-                  <i aria-hidden="true" className="music__closeMark">
-                    ×
-                  </i>
-                ) : null}
-              </AlbumStack>
-            </span>
-            <span className="music__caption">
-              <strong className="music__albumName">{albumName}</strong>
-              <span className="music__artist">{artistCaption}</span>
-            </span>
-          </Link>
-        </Tooltip>
+        <Link
+          className="music__albumLink"
+          href={href}
+          title={collapsed ? `Close ${albumName}` : undefined}
+          transitionTypes={albumTransitionTypes(collapsed ? 'close' : 'open')}
+        >
+          <span className="music__art music__fullColorArt">
+            <AlbumStack imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT}>
+              <AlbumArtCover
+                albumId={albumId}
+                albumName={albumName}
+                collapsed={collapsed}
+                imageUrl={imageUrl}
+              />
+              {collapsed ? (
+                <i aria-hidden="true" className="music__closeMark">
+                  ×
+                </i>
+              ) : null}
+            </AlbumStack>
+          </span>
+          <span className="music__caption">
+            <strong className="music__albumName">{albumName}</strong>
+            <span className="music__artist">{artistCaption}</span>
+          </span>
+        </Link>
       </CollageAlbumPaper>
     );
   }

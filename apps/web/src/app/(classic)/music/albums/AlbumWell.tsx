@@ -14,6 +14,7 @@ import { ALBUM_DETAIL_BACKDROP } from '../../../collage/backdrops';
 import { BackdropLayer } from '../../../collage/CollageBackdrop';
 import { PaperCard } from '../../../collage/PaperCard';
 import { PaperTag } from '../../../collage/PaperTag';
+import type { PaperTone } from '../../../collage/types';
 import {
   ALBUM_WELL_ART_SIZE_XS,
   ALBUM_WELL_NAME_GAP,
@@ -168,6 +169,8 @@ type Props = {
   /** Streamed detail: artist links, meta, and the tracklist. */
   children?: ReactNode;
   surface?: SiteSurface;
+  /** Collage only: the paper of the card that opened this well, so the two read as one. */
+  tone?: PaperTone;
 };
 
 /**
@@ -184,7 +187,7 @@ type Props = {
  * at the outgoing height until the arriving tracklist replaces the placeholder,
  * so that swap costs the page no layout at all. See `reserveSx`.
  */
-export function AlbumWell({ album, children, surface = 'classic' }: Props) {
+export function AlbumWell({ album, children, surface = 'classic', tone = 'viridian' }: Props) {
   const measureRef = useRef<HTMLDivElement>(null);
   const lastHeightRef = useRef<number | null>(null);
   const [heightPx, setHeightPx] = useState<number | null>(null);
@@ -334,7 +337,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
             edge="soft-a"
             innerClassName="music__wellInner"
             tiltDeg={-0.7}
-            tone="viridian"
+            tone={tone}
           >
             {well}
           </PaperCard>

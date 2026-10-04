@@ -218,10 +218,11 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
   const selectedIndex = selectedAlbumId
     ? sortedAlbumCards.findIndex(({ album }) => album.id === selectedAlbumId)
     : -1;
-  const selectedAlbum = selectedIndex >= 0 ? sortedAlbumCards[selectedIndex]?.album : undefined;
+  const selectedCard = selectedIndex >= 0 ? sortedAlbumCards[selectedIndex] : undefined;
+  const selectedAlbum = selectedCard?.album;
   const well = selectedAlbum ? (
     <Box key="album-well" sx={wellPlacementSx(selectedIndex, sortedAlbumCards.length, surface)}>
-      <AlbumWell album={selectedAlbum} surface={surface}>
+      <AlbumWell album={selectedAlbum} surface={surface} tone={selectedCard.treatment.tone}>
         {/*
          * Streamed detail always belongs to the album in the URL, so it is only
          * rendered once the URL agrees with what the well is showing; until then

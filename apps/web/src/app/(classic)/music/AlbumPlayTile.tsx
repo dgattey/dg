@@ -68,28 +68,26 @@ export function AlbumPlayTile({
   if (surface === 'collage') {
     return (
       <CollageAlbumPaper treatment={collageAlbumCardTreatment(cardIndex)}>
-        <Tooltip title={tooltip}>
-          <Link className="music__albumLink" href={linkUrl} isExternal={true} title={tooltip}>
-            <span className="music__art music__fullColorArt">
-              <AlbumStack imageUrl={imageUrl} sleeveCount={sleeveCount}>
-                {cover}
-              </AlbumStack>
-              {isRun ? (
-                <PaperTag
-                  className="music__countTag"
-                  tiltDeg={cardIndex % 2 === 0 ? 3 : -3}
-                  tone="ochre"
-                >
-                  {countLabel}
-                </PaperTag>
-              ) : null}
-            </span>
-            <span className="music__caption">
-              <strong className="music__albumName">{title}</strong>
-              <span className="music__artist">{artistNames}</span>
-            </span>
-          </Link>
-        </Tooltip>
+        <Link className="music__albumLink" href={linkUrl} isExternal={true}>
+          <span className="music__art music__fullColorArt">
+            <AlbumStack imageUrl={imageUrl} sleeveCount={sleeveCount}>
+              {cover}
+            </AlbumStack>
+            {isRun ? (
+              <PaperTag
+                className="music__countTag"
+                tiltDeg={cardIndex % 2 === 0 ? 3 : -3}
+                tone="ochre"
+              >
+                {countLabel}
+              </PaperTag>
+            ) : null}
+          </span>
+          <span className="music__caption">
+            <strong className="music__albumName">{title}</strong>
+            <span className="music__artist">{artistNames}</span>
+          </span>
+        </Link>
       </CollageAlbumPaper>
     );
   }
