@@ -12,6 +12,7 @@ import { useEffect, useRef, useState } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
 import { usePageScrollProgress } from '../layouts/PageScrollContext';
+import { useNowPlaying } from './NowPlayingContext';
 import { NOW_PLAYING_CARD_ID } from './SpotifyCardScrollTracker';
 import { TrackListing } from './TrackListing';
 
@@ -86,7 +87,8 @@ function scrollToNowPlayingCard() {
  * Off-home (and not already on music) navigates to listening history.
  * Track display is delegated to TrackListing variant="compact".
  */
-export function SpotifyHeaderCard({ surface = 'classic', track }: SpotifyHeaderCardProps) {
+export function SpotifyHeaderCard({ surface = 'classic', track: serverTrack }: SpotifyHeaderCardProps) {
+  const track = useNowPlaying(serverTrack);
   const pathname = usePathname();
   const scrollContext = usePageScrollProgress();
   const isHome = pathname === homeRoute;

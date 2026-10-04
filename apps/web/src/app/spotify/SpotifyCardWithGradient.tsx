@@ -8,6 +8,7 @@ import { Box } from '@mui/material';
 import { type ReactNode, useEffect, useState } from 'react';
 import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
 import { type AlbumGradientInformation, extractAlbumGradientFromUrl } from './extractAlbumGradient';
+import { usePublishNowPlaying } from './NowPlayingContext';
 import { SpotifyCardScrollTracker } from './SpotifyCardScrollTracker';
 import { TrackListing } from './TrackListing';
 
@@ -80,6 +81,7 @@ export function SpotifyCardWithGradient({
   surface = 'classic',
   track,
 }: SpotifyCardWithGradientProps) {
+  usePublishNowPlaying(track);
   const [gradientInformation, setGradientInformation] = useState<AlbumGradientInformation>({
     backgroundGradient: track.albumGradient ?? null,
     contrastSetting: track.albumGradientContrastSetting ?? null,
