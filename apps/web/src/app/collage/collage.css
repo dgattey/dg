@@ -273,6 +273,8 @@ html[data-color-scheme="dark"] .collageRoot::after {
     .home__sideRowWrap:has(.home__sideRow:focus-visible),
     .music__card:has(a:focus-visible)
   ) {
+  /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
+  border-radius: 14px;
   outline: 2px solid var(--ink);
   outline-offset: 3px;
 }
