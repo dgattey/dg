@@ -4,7 +4,7 @@ import {
   mapRecentlyPlayedFromApi,
   recentlyPlayedApiSchema,
 } from '@dg/content-models/spotify/RecentlyPlayed';
-import { db } from '@dg/db';
+import { db, Op } from '@dg/db';
 import { log } from '@dg/shared-core/logging/log';
 import { serializeError } from '@dg/shared-core/logging/maskSecrets';
 import { parseResponse } from '../clients/parseResponse';
@@ -138,15 +138,19 @@ export async function syncSpotifyPlaysSince(): Promise<{
     );
   }
 
-  // Count before insert to get accurate inserted count
-  // (bulkCreate with ignoreDuplicates doesn't reliably set isNewRecord)
-  const countBefore = await db.SpotifyPlay.count();
+  // Count this batch's primary keys before and after insert
+  // (bulkCreate with ignoreDuplicates doesn't reliably set isNewRecord).
+  // Scoping to the batch keeps other writers to the table out of the delta.
+  const batchKeys = {
+    [Op.or]: plays.map(({ playedAt, trackId }) => ({ playedAt, trackId })),
+  };
+  const countBefore = await db.SpotifyPlay.count({ where: batchKeys });
 
   await db.SpotifyPlay.bulkCreate(plays, {
     ignoreDuplicates: true,
   });
 
-  const countAfter = await db.SpotifyPlay.count();
+  const countAfter = await db.SpotifyPlay.count({ where: batchKeys });
   const inserted = countAfter - countBefore;
   log.info('Spotify plays synced', {
     gapDetected,
