@@ -53,12 +53,10 @@ catalog:
   valibot: 1.5.0
   wretch: 3.0.9
 
-# Security pins for transitive deps whose parents allow vulnerable ranges:
-# @vercel/og pins an old optional sharp, and the Babel chain resolves an old
-# browserslist without this.
+# Security pin for a transitive dep whose parents allow vulnerable ranges: the
+# Babel chain resolves an old browserslist without this.
 overrides:
   browserslist: ^4.29.3
-  sharp: 'catalog:'
 
 # pnpm quarantines releases younger than minimumReleaseAge (1 day by default)
 # and adds a minimumReleaseAgeExclude entry when a pinned version is newer than
