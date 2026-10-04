@@ -56,7 +56,7 @@
   z-index: 2;
   grid-area: map;
   width: min(100%, 470px);
-  margin-top: 16px;
+  margin-top: 40px;
   margin-left: 8px;
 }
 .home__mapPaper {
@@ -259,21 +259,24 @@
   color: inherit;
   text-decoration: none;
 }
+/*
+ * Marks are transparent logos of any shape, so each sits inset on one quiet
+ * tile: a bright or edge-to-edge tile reads as a stray border around them.
+ */
 .home__sideMark {
   position: relative;
   display: grid;
   place-items: center;
   width: 44px;
   height: 44px;
-  overflow: clip;
-  background: var(--pc);
-  clip-path: var(--quad-b);
+  padding: 5px;
+  background: color-mix(in srgb, var(--ink-on-cream) 6%, var(--cream));
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink-on-cream) 12%, transparent);
   transform: scale(1);
 }
 .home__sideMark img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+  max-height: 100%;
 }
 .home__sideText {
   display: grid;
@@ -343,7 +346,7 @@
   }
   .home__map {
     width: 100%;
-    margin-top: 0;
+    margin-top: 28px;
     margin-left: 0;
   }
   .home__mapInner {
