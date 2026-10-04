@@ -38,20 +38,19 @@ describe('PaperButton', () => {
     expect(screen.getByRole('link', { name: 'Music' })).toHaveAttribute('aria-current', 'page');
   });
 
-  it.each([
-    '/api/oauth?provider=spotify',
-    '/api/auth/vercel',
-    'https://example.com/elsewhere',
-  ])('renders %s as a document anchor, not a prefetching router link', (href) => {
-    render(
-      <PaperButton href={href} title="Connect">
-        Connect
-      </PaperButton>,
-    );
-    const link = screen.getByRole('link', { name: 'Connect' });
-    expect(link).toHaveAttribute('href', href);
-    expect(link).toHaveClass('paperButton');
-  });
+  it.each(['/api/oauth?provider=spotify', '/api/auth/vercel', 'https://example.com/elsewhere'])(
+    'renders %s as a document anchor, not a prefetching router link',
+    (href) => {
+      render(
+        <PaperButton href={href} title="Connect">
+          Connect
+        </PaperButton>,
+      );
+      const link = screen.getByRole('link', { name: 'Connect' });
+      expect(link).toHaveAttribute('href', href);
+      expect(link).toHaveClass('paperButton');
+    },
+  );
 
   it('keeps app pages on the transition link', () => {
     render(

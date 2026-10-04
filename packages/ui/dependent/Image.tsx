@@ -111,7 +111,9 @@ export const generateSizesString = (sizes: ImageSizes): string => {
       maxWidth: BREAKPOINT_MAX_SIZES[breakpoint as keyof typeof BREAKPOINT_MAX_SIZES],
       width,
     }))
-    .sort((a, b) => (a.maxWidth ?? Number.POSITIVE_INFINITY) - (b.maxWidth ?? Number.POSITIVE_INFINITY))
+    .sort(
+      (a, b) => (a.maxWidth ?? Number.POSITIVE_INFINITY) - (b.maxWidth ?? Number.POSITIVE_INFINITY),
+    )
     .map(({ maxWidth, width }) =>
       maxWidth ? `(max-width: ${maxWidth}px) ${width}px` : `${width}px`,
     )

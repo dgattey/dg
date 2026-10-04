@@ -43,8 +43,8 @@ export function AlbumCover({
         alt={alt}
         fetchPriority={isLcpCandidate ? 'high' : undefined}
         fill={true}
-        loading={isLcpCandidate ? 'eager' : undefined}
         height={ALBUM_TILE_ART_SIZE}
+        loading={isLcpCandidate ? 'eager' : undefined}
         sizes={ALBUM_TILE_ART_SIZES}
         url={imageUrl}
         width={ALBUM_TILE_ART_SIZE}
