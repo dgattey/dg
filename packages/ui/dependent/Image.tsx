@@ -53,6 +53,16 @@ type ImageProps = {
   preload?: NextImageProps['preload'];
 
   /**
+   * Also lands on the preload link when `preload` is set.
+   */
+  fetchPriority?: NextImageProps['fetchPriority'];
+
+  /**
+   * Overrides Next's lazy default, e.g. for an LCP candidate that isn't preloaded.
+   */
+  loading?: NextImageProps['loading'];
+
+  /**
    * Must match an allowlisted quality from the consuming Next.js app.
    */
   quality?: NextImageProps['quality'];
@@ -91,17 +101,20 @@ const coverImageStyle: CSSProperties = {
 };
 
 /**
- * Turns the breakpoint to width map into a sizes string
+ * Turns the breakpoint to width map into a sizes string. Browsers take the
+ * first entry whose media condition matches, so conditions run narrowest
+ * first and the unconditioned fallback goes last.
  */
-const generateSizesString = (sizes: ImageSizes): string => {
+export const generateSizesString = (sizes: ImageSizes): string => {
   const sizesString = Object.entries(sizes)
-    .map(([breakpoint, width]) => {
-      const maxWidth = BREAKPOINT_MAX_SIZES[breakpoint as keyof typeof BREAKPOINT_MAX_SIZES];
-      if (!maxWidth) {
-        return `${width}px`;
-      }
-      return `(max-width: ${maxWidth}px) ${width}px`;
-    })
+    .map(([breakpoint, width]) => ({
+      maxWidth: BREAKPOINT_MAX_SIZES[breakpoint as keyof typeof BREAKPOINT_MAX_SIZES],
+      width,
+    }))
+    .sort((a, b) => (a.maxWidth ?? Number.POSITIVE_INFINITY) - (b.maxWidth ?? Number.POSITIVE_INFINITY))
+    .map(({ maxWidth, width }) =>
+      maxWidth ? `(max-width: ${maxWidth}px) ${width}px` : `${width}px`,
+    )
     .join(', ');
   if (sizesString.length === 0) {
     throw new Error('No sizes provided for image');
