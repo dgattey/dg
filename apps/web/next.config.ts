@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   experimental: {
     authInterrupts: true,
+    inlineCss: true,
     scrollRestoration: true,
     serverActions: {
       bodySizeLimit: '20mb',
