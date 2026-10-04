@@ -274,9 +274,10 @@ html[data-color-scheme="dark"] .collageRoot::after {
     .music__card:has(a:focus-visible)
   ) {
   /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
-  border-radius: 14px;
   outline: 2px solid var(--ink);
   outline-offset: 3px;
+  /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
+  border-radius: 14px;
 }
 .paperButtonCurrent {
   color: light-dark(var(--cream), var(--ink-on-cream));
