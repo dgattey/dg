@@ -306,9 +306,8 @@ describe('syncSpotifyPlaysSince', () => {
     const result = await syncSpotifyPlaysSince();
 
     // Same track at a new timestamp should appear as another play row.
-    // Prefer row assertions over result.inserted: that count is a whole-table
-    // delta and drifts under parallel suites sharing DATABASE_URL_TEST.
     expect(result.total).toBe(1);
+    expect(result.inserted).toBe(1);
 
     // Should now have 2 rows for this track (different timestamps)
     const rows = await db.SpotifyPlay.findAll({

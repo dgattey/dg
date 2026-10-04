@@ -1,7 +1,7 @@
 import { type CutOutPlacement, definePlacements, type PlacementRow } from './cutOutPlacements';
 import type { PaperTone } from './types';
 
-type SheetPattern = 'dots' | 'gingham' | 'solid' | 'stripes';
+type SheetPattern = 'dots' | 'gingham' | 'ruled' | 'solid' | 'stripes';
 type SheetVisibility = 'all' | 'desktop';
 
 type SheetBase = {
@@ -140,6 +140,51 @@ export const ALBUM_DETAIL_BACKDROP = defineBackdrop('fill', 1, [
     sheets: [
       ['album-detail-stripes', 'torn', 'stripes', ['rose', 'vermilion'], -4, -6, 14, 300, -3, 'desktop'],
       ['album-detail-disc', 'disc', 'solid', 'rose', 88, -6, 190, 0, 'desktop'],
+    ],
+  },
+]);
+
+/** A listening log: ledger paper, records stacked as discs, water and sky cut-outs. */
+// biome-ignore format: placement rows read as a table
+export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
+  {
+    cutOuts: [
+      ['history-bird', 'birdpara', 'vermilion', 250, -8, 80, 13, 'desktop', 1, { underprint: ['cream', 6, 7] }],
+      ['history-star', 'star5', 'star', 44, 10, 62, 9, 'desktop', 1],
+      ['history-seaweed', 'seaweed2', 'olive', 220, -12, 1, 36, 'all', 0],
+      ['history-fern', 'fern', 'leaf', 300, 26, 88, 56, 'desktop', 0],
+      ['history-heart', 'heart', 'rose', 80, -12, 92, 88, 'all', 1],
+    ],
+    sheets: [
+      ['history-record', 'disc', 'solid', 'ultramarine', 74, 1, 300, 0, 'desktop'],
+      ['history-record-label', 'disc', 'solid', 'chartreuse', 69, 14, 130, 0, 'desktop'],
+      ['history-ledger', 'torn', 'ruled', ['cerulean', 'cream'], -6, 40, 24, 560, -3, 'all'],
+    ],
+  },
+  {
+    cutOuts: [
+      ['history-coral', 'coral', 'ultramarine', 240, -10, -4, 6, 'all', 0],
+      ['history-swallow', 'swallow', 'cream', 150, -6, 84, 28, 'desktop', 1],
+      ['history-algae', 'algae', 'leaf', 260, 20, 88, 62, 'desktop', 0],
+      ['history-star-ochre', 'star4', 'ochre', 40, 10, 4, 50, 'desktop', 1],
+      ['history-trefoil', 'trefoil', 'vermilion', 140, 24, 1, 84, 'desktop', 1],
+    ],
+    sheets: [
+      ['history-stripes', 'torn', 'stripes', ['rose', 'cream'], 74, 10, 30, 600, 1.6, 'desktop'],
+      ['history-pebble', 'pebble', 'solid', 'ochre', -7, 58, 320, -10, 'all'],
+    ],
+  },
+  {
+    cutOuts: [
+      ['history-seaweed-blue', 'seaweed', 'ultramarine', 260, 12, 86, 4, 'desktop', 0],
+      ['history-pods', 'pods', 'vermilion', 220, -16, 1, 58, 'all', 1],
+      ['history-coral-ochre', 'coral', 'ochre', 190, 16, 90, 54, 'desktop', 1],
+      ['history-moon', 'moon', 'cream', 60, 14, 6, 4, 'dark-desktop', 1],
+    ],
+    sheets: [
+      ['history-ledger-green', 'torn', 'ruled', ['olive', 'chartreuse'], -4, 12, 24, 480, -2, 'desktop'],
+      ['history-record-low', 'disc', 'solid', 'cobalt', 78, 60, 340, 0, 'all'],
+      ['history-record-low-label', 'disc', 'solid', 'vermilion', 84, 68, 120, 0, 'desktop'],
     ],
   },
 ]);
