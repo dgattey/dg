@@ -16,7 +16,7 @@ Toolbar / Flags Explorer overrides still work without this flow (per-browser ove
 4. `apps/web/src/flags.ts` `identify` reads that cookie and returns `{ user?: { id, email } }` for flags that share it (e.g. `interactive-redesign`).
 5. Flags dashboard Entities + Segment rules match on `user.id` / `user.email` and attach to the flag.
 
-Logout clears the session cookie via `/api/auth/vercel/logout`.
+Sign out is a form bound to the `signOutOfVercel` Server Action, which clears the session cookie. It must stay a POST: Next prefetches every in-viewport `Link` in production, so a GET sign-out URL would run as soon as the signed-in card rendered.
 
 ## Dashboard setup
 
@@ -54,8 +54,8 @@ Vercel Toolbar → Flags / Flags Explorer override for `interactive-redesign` st
 | Session cookie sign/verify | `apps/web/src/auth/vercel/session.ts` |
 | Authorize (PKCE) | `apps/web/src/app/api/auth/vercel/route.ts` |
 | Callback | `apps/web/src/app/api/auth/vercel/callback/route.ts` |
-| Logout | `apps/web/src/app/api/auth/vercel/logout/route.ts` |
-| Dev-console UI | `apps/web/src/app/dev-console/vercel/VercelSignInCard.tsx` |
+| Sign out (Server Action) | `apps/web/src/auth/vercel/session.actions.ts` |
+| Dev-console UI | `apps/web/src/app/(classic)/dev-console/vercel/VercelSignInCard.tsx` |
 | Basic Auth on `/dev-console` | `apps/web/src/proxy.ts` |
 | Env key list | `config/env.secrets.keys` |
 | Flags discovery | `apps/web/src/app/.well-known/vercel/flags/route.ts` |
