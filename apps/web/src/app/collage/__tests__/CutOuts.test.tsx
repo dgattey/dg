@@ -51,6 +51,19 @@ describe('collage cut-outs', () => {
     expect(cutOut).toHaveAttribute('focusable', 'false');
   });
 
+  it.each([
+    [119, undefined],
+    [120, 'cutDepthFast'],
+    [319, 'cutDepthFast'],
+    [320, 'cutDepthMedium'],
+  ])('gives a %ipx cut-out parallax depth %s', (sizePx, depthClass) => {
+    const placement = CUT_OUT_PLACEMENTS.helloSheet[0];
+    invariant(placement, 'Expected a Hello sheet placement');
+    const { container } = render(<CutOut placement={{ ...placement, sizePx }} />);
+    const classes = container.querySelector('svg')?.getAttribute('class') ?? '';
+    expect(classes.match(/cutDepth\w+/)?.[0]).toBe(depthClass);
+  });
+
   it('keeps stylesheets from restating geometry that cut-outs set inline, where it can never win', () => {
     const placement = CUT_OUT_PLACEMENTS.helloSheet[0];
     invariant(placement, 'Expected a Hello sheet placement');
