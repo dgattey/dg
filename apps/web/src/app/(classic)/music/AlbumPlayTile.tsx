@@ -36,6 +36,8 @@ type Props = {
   /** Names a single play, which a lone cover is labelled with. */
   trackName: string;
   cardIndex?: number;
+  /** Collage only: loads the front cover eagerly at high priority. */
+  isLcpCandidate?: boolean;
   surface?: SiteSurface;
 };
 
@@ -49,6 +51,7 @@ export function AlbumPlayTile({
   artistNames,
   cardIndex = 0,
   imageUrl,
+  isLcpCandidate = false,
   linkUrl,
   surface = 'classic',
   trackCount,
@@ -61,16 +64,26 @@ export function AlbumPlayTile({
     ? `${albumName} – ${artistNames}, ${countLabel}`
     : `${trackName} – ${artistNames}`;
   const title = isRun ? albumName : trackName;
-  const cover = (
-    <AlbumCover alt={albumName} depth={0} imageUrl={imageUrl} sleeveCount={sleeveCount} />
-  );
-
   if (surface === 'collage') {
+    const cover = (
+      <AlbumCover
+        alt={albumName}
+        depth={0}
+        imageUrl={imageUrl}
+        isLcpCandidate={isLcpCandidate}
+        sleeveCount={sleeveCount}
+      />
+    );
+
     return (
       <CollageAlbumPaper treatment={collageAlbumCardTreatment(cardIndex)}>
         <Link className="music__albumLink" href={linkUrl} isExternal={true}>
           <span className="music__art music__fullColorArt">
-            <AlbumStack imageUrl={imageUrl} sleeveCount={sleeveCount}>
+            <AlbumStack
+              imageUrl={imageUrl}
+              isLcpCandidate={isLcpCandidate}
+              sleeveCount={sleeveCount}
+            >
               {cover}
             </AlbumStack>
             {isRun ? (
