@@ -53,10 +53,12 @@ catalog:
   valibot: 1.5.0
   wretch: 3.0.9
 
-# Security pin for a transitive dep whose parents allow vulnerable ranges: the
-# Babel chain resolves an old browserslist without this.
+# Security pins for transitive deps whose parents allow vulnerable ranges: the
+# Babel chain resolves an old browserslist, and sequelize 6 asks for uuid ^8.
+# uuid 11 is the newest patched line that still ships CommonJS for sequelize.
 overrides:
   browserslist: ^4.29.3
+  sequelize>uuid: ^11.1.1
 
 # pnpm quarantines releases younger than minimumReleaseAge (1 day by default)
 # and adds a minimumReleaseAgeExclude entry when a pinned version is newer than
