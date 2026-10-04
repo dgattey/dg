@@ -1,10 +1,14 @@
 import 'server-only';
 
-import { getAgentSkill, isAgentSkillName } from '../../agentSkills';
+import { agentSkills, getAgentSkill, isAgentSkillName } from '../../agentSkills';
 
 type RouteContext = {
   params: Promise<{ name: string }>;
 };
+
+export function generateStaticParams() {
+  return agentSkills.map(({ name }) => ({ name }));
+}
 
 export async function GET(_request: Request, context: RouteContext) {
   const { name } = await context.params;
