@@ -42,9 +42,13 @@ One-time human setup under team `dylan-gattey`:
 - The Flags session does **not** bypass `/dev-console` Basic Auth (`apps/web/src/proxy.ts`). Those are independent gates.
 - Cookie is HttpOnly, HMAC-signed, 30-day max age; payload is identity only.
 
+## Where rules apply
+
+Dashboard rules and Segments only run on production deployments. Every evaluation there costs a Flag Request (the Hobby team pauses at 10,000 a month), so local dev, CI, and previews skip Vercel and return `false`. Each instance also reuses a visitor's production decision for 60 seconds, so a rule change can take up to a minute to show. To see the redesign outside production, use a Toolbar override or `INTERACTIVE_REDESIGN=1`.
+
 ## Fallback
 
-Vercel Toolbar → Flags / Flags Explorer override for `interactive-redesign` still works without Sign in. Override is browser-local and requires `FLAGS_SECRET` on the project.
+Vercel Toolbar → Flags / Flags Explorer override for `interactive-redesign` still works without Sign in, in every environment. Override is browser-local and requires `FLAGS_SECRET` on the project.
 
 ## Code map
 
