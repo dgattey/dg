@@ -35,6 +35,7 @@ function Wrapper({ children }: { children: ReactNode }) {
 let captured:
   | { callback: IntersectionObserverCallback; instance: IntersectionObserver }
   | undefined;
+const activeObservers = new Set<IntersectionObserver>();
 
 class MockIntersectionObserver implements IntersectionObserver {
   readonly root = null;
@@ -44,8 +45,12 @@ class MockIntersectionObserver implements IntersectionObserver {
   constructor(callback: IntersectionObserverCallback) {
     captured = { callback, instance: this };
   }
-  disconnect() {}
-  observe() {}
+  disconnect() {
+    activeObservers.delete(this);
+  }
+  observe() {
+    activeObservers.add(this);
+  }
   takeRecords() {
     return [];
   }
@@ -56,6 +61,7 @@ describe('MusicInfiniteScroll', () => {
   beforeEach(() => {
     jest.mocked(loadMoreMusicHistory).mockReset();
     captured = undefined;
+    activeObservers.clear();
     Object.defineProperty(globalThis, 'IntersectionObserver', {
       configurable: true,
       value: MockIntersectionObserver,
@@ -99,6 +105,39 @@ describe('MusicInfiniteScroll', () => {
     });
     await waitFor(() => expect(loadMoreMusicHistory).toHaveBeenCalledWith('cursor-1'));
     expect(await screen.findByRole('link', { name: /Clay/ })).toBeInTheDocument();
+  });
+
+  it('stops observing a cursor whose page failed to load', async () => {
+    jest.mocked(loadMoreMusicHistory).mockRejectedValue(new Error('offline'));
+    render(
+      <MusicInfiniteScroll
+        initialCursor="cursor-1"
+        initialTracks={[play('Bloom')]}
+        surface="collage"
+      />,
+      { wrapper: Wrapper },
+    );
+    invariant(captured, 'Expected an intersection observer');
+    const failingObserver = captured;
+    await act(() =>
+      failingObserver.callback(
+        [
+          {
+            boundingClientRect: new DOMRect(),
+            intersectionRatio: 1,
+            intersectionRect: new DOMRect(),
+            isIntersecting: true,
+            rootBounds: null,
+            target: document.createElement('div'),
+            time: 0,
+          },
+        ],
+        failingObserver.instance,
+      ),
+    );
+
+    expect(loadMoreMusicHistory).toHaveBeenCalledTimes(1);
+    expect(activeObservers.size).toBe(0);
   });
 
   it('renders the collage empty state', () => {

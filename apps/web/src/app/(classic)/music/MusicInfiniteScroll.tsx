@@ -56,23 +56,28 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
   const [allTracks, setAllTracks] = useState<Array<HistoryTrack>>(initialTracks);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [isLoading, setIsLoading] = useState(false);
+  const [failedCursor, setFailedCursor] = useState<string | null>(null);
   const sentinelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const sentinel = sentinelRef.current;
-    if (!sentinel || !cursor) {
+    // A fresh observer reports the still-visible sentinel immediately, so retrying a failed
+    // cursor here would fire the server action in a tight loop.
+    if (!sentinel || !cursor || cursor === failedCursor) {
       return;
     }
 
     const observer = new IntersectionObserver(
       async (entries) => {
         const entry = entries[0];
-        if (entry?.isIntersecting && cursor && !isLoading) {
+        if (entry?.isIntersecting && !isLoading) {
           setIsLoading(true);
           try {
             const result = await loadMoreMusicHistory(cursor);
             setAllTracks((prev) => [...prev, ...result.tracks]);
             setCursor(result.nextCursor);
+          } catch {
+            setFailedCursor(cursor);
           } finally {
             setIsLoading(false);
           }
@@ -83,7 +88,7 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [cursor, isLoading]);
+  }, [cursor, failedCursor, isLoading]);
 
   const sections = groupTracksByDate(allTracks, serverTime);
 
