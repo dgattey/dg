@@ -86,6 +86,20 @@ describe('proxy', () => {
       expect(new URL(location).pathname).toBe('/music');
     });
 
+    it.each([
+      '/1895a86cd22d73ea/insights/script.js',
+      '/1895a86cd22d73ea/insights/view',
+      '/wp-login.php',
+    ])('does not evaluate the flag for non-page path %s', async (pathname) => {
+      mockEnv({ NEXT_PUBLIC_VERCEL_OBSERVABILITY_BASEPATH: '/1895a86cd22d73ea' });
+      mockInteractiveRedesign.mockClear();
+
+      const response = await proxy(new NextRequest(`https://example.com${pathname}`));
+
+      expect(mockInteractiveRedesign).not.toHaveBeenCalled();
+      expect(response.headers.get('x-middleware-next')).toBe('1');
+    });
+
     it('does not rewrite well-known handlers', async () => {
       mockInteractiveRedesign.mockResolvedValue(true);
       const response = await proxy(new NextRequest('https://example.com/.well-known/api-catalog'));
