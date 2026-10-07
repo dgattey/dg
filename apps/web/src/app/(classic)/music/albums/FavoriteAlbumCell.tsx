@@ -72,6 +72,8 @@ type Props = {
   tooltip: string;
   /** When true, keep the cell size but hide art (it lives in the well). */
   collapsed?: boolean;
+  /** Collage only: loads the covers eagerly at high priority. */
+  isLcpCandidate?: boolean;
 };
 
 function AlbumArtCover({
@@ -79,21 +81,37 @@ function AlbumArtCover({
   albumName,
   collapsed,
   imageUrl,
+  isLcpCandidate = false,
 }: {
   albumId: string;
   albumName: string;
   collapsed: boolean;
   imageUrl: string;
+  isLcpCandidate?: boolean;
 }) {
   if (collapsed) {
-    return <AlbumCover alt="" depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />;
+    return (
+      <AlbumCover
+        alt=""
+        depth={0}
+        imageUrl={imageUrl}
+        isLcpCandidate={isLcpCandidate}
+        sleeveCount={SLEEVE_COUNT}
+      />
+    );
   }
   return (
     // `default="none"` keeps this name off page-open/close. Without it
     // every cover enters during homepage → albums, and React snapshots
     // the whole grid as separate shared elements mid-flight.
     <ViewTransition default="none" name={albumArtViewTransitionName(albumId)} share="vt-album-art">
-      <AlbumCover alt={albumName} depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />
+      <AlbumCover
+        alt={albumName}
+        depth={0}
+        imageUrl={imageUrl}
+        isLcpCandidate={isLcpCandidate}
+        sleeveCount={SLEEVE_COUNT}
+      />
     </ViewTransition>
   );
 }
@@ -112,6 +130,7 @@ export function FavoriteAlbumCell({
   surface = 'classic',
   tooltip,
   collapsed = false,
+  isLcpCandidate = false,
 }: Props) {
   if (surface === 'collage') {
     const href = collapsed ? favoriteAlbumsRoute : albumRoute(albumId);
@@ -124,12 +143,17 @@ export function FavoriteAlbumCell({
           transitionTypes={albumTransitionTypes(collapsed ? 'close' : 'open')}
         >
           <span className="music__art music__fullColorArt">
-            <AlbumStack imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT}>
+            <AlbumStack
+              imageUrl={imageUrl}
+              isLcpCandidate={isLcpCandidate}
+              sleeveCount={SLEEVE_COUNT}
+            >
               <AlbumArtCover
                 albumId={albumId}
                 albumName={albumName}
                 collapsed={collapsed}
                 imageUrl={imageUrl}
+                isLcpCandidate={isLcpCandidate}
               />
               {collapsed ? (
                 <i aria-hidden="true" className="music__closeMark">
