@@ -25,18 +25,25 @@ jest.mock('@dg/services/spotify/fetchRecentlyPlayed', () => ({
 
 import { fetchRecentlyPlayed } from '@dg/services/spotify/fetchRecentlyPlayed';
 import { MissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
-import { getLatestSong } from '../spotify';
+import { cacheLife } from 'next/cache';
+import { getLastKnownSong, getLatestSong } from '../spotify';
 
 const track = { id: 'track-1', name: 'Test Song' } as Track;
 
-describe('getLatestSong', () => {
+// `minutes` is the shortest profile Next prerenders into the static shell;
+// `seconds` makes the read a request-time hole.
+describe.each([
+  ['getLatestSong', getLatestSong, 'seconds'],
+  ['getLastKnownSong', getLastKnownSong, 'minutes'],
+] as const)('%s', (_name, getSong, profile) => {
   it('resolves the latest track even where after() is unavailable', async () => {
     jest.mocked(fetchRecentlyPlayed).mockResolvedValue(track);
-    await expect(getLatestSong()).resolves.toBe(track);
+    await expect(getSong()).resolves.toBe(track);
+    expect(cacheLife).toHaveBeenLastCalledWith(profile);
   });
 
   it('returns null when tokens are missing', async () => {
     jest.mocked(fetchRecentlyPlayed).mockRejectedValue(new MissingTokenError('spotify'));
-    await expect(getLatestSong()).resolves.toBeNull();
+    await expect(getSong()).resolves.toBeNull();
   });
 });

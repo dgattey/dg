@@ -9,9 +9,10 @@ import {
 import type { SxObject } from '@dg/ui/theme';
 import { Box } from '@mui/material';
 import { Suspense } from 'react';
-import { getLatestSong } from '../../services/spotify';
+import { getLastKnownSong, getLatestSong } from '../../services/spotify';
 import { CollageColorSchemeFieldset } from '../collage/CollageColorSchemeFieldset';
 import { PaperCard } from '../collage/PaperCard';
+import { PublishNowPlaying } from '../spotify/NowPlayingContext';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
 import { CollageMusicLinks } from './CollageMusicLinks';
 import { HeaderControls } from './HeaderControls';
@@ -56,9 +57,26 @@ async function SpotifyHeaderCardSlot({ surface }: { surface: SiteSurface }) {
 }
 
 /**
+ * Collage header card from the last-known song, so the prerendered shell
+ * already holds the card's final box instead of it streaming in and pushing
+ * the header taller.
+ */
+async function LastKnownSpotifyHeaderCard() {
+  const track = await getLastKnownSong();
+  return <SpotifyHeaderCard surface="collage" track={track} />;
+}
+
+/** Streams the live song in and publishes it to the shell's header card. */
+async function LiveNowPlaying() {
+  const track = await getLatestSong();
+  return track ? <PublishNowPlaying track={track} /> : null;
+}
+
+/**
  * Creates the site header component with glass background behind logo + music.
  * Logo and header controls are server-rendered immediately.
- * Music card streams in via Suspense to avoid blocking.
+ * Classic streams the music card in via Suspense; collage prerenders the
+ * last-known song and streams only the live update.
  */
 export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
   if (surface === 'collage') {
@@ -72,8 +90,9 @@ export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
             </div>
           </PaperCard>
           <div className="chrome__nowPlaying">
+            <LastKnownSpotifyHeaderCard />
             <Suspense fallback={null}>
-              <SpotifyHeaderCardSlot surface="collage" />
+              <LiveNowPlaying />
             </Suspense>
           </div>
           <div className="chrome__spacer" />
