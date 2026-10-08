@@ -155,6 +155,42 @@ describe('FavoriteAlbumsGrid', () => {
     expect(coversPerCell).toEqual([3, 3, 3]);
   });
 
+  it('loads the collage first mobile screen eagerly at high priority', () => {
+    const fiveAlbums = [
+      ...albums,
+      ...albums.slice(0, 2).map((album) => ({
+        ...album,
+        addedAt: album.addedAt.replace('2026', '2025'),
+        id: `${album.id}-again`,
+      })),
+    ];
+    const { container } = render(<FavoriteAlbumsGrid albums={fiveAlbums} surface="collage" />);
+
+    // Every cover in a cell, sleeves included, shares one priority.
+    const cellPriorities = [...container.querySelectorAll('a')].map((link) => {
+      const priorities = [...link.querySelectorAll('img')].map(
+        (image) =>
+          `${image.getAttribute('loading')}/${image.getAttribute('fetchpriority') ?? 'auto'}`,
+      );
+      return [...new Set(priorities)].join(',');
+    });
+    expect(cellPriorities).toEqual([
+      'eager/high',
+      'eager/high',
+      'eager/high',
+      'eager/high',
+      'lazy/auto',
+    ]);
+  });
+
+  it('leaves classic covers lazy', () => {
+    const { container } = render(<FavoriteAlbumsGrid albums={albums} />);
+
+    const images = [...container.querySelectorAll('img')];
+    expect(images.every((image) => image.getAttribute('loading') === 'lazy')).toBe(true);
+    expect(images.some((image) => image.hasAttribute('fetchpriority'))).toBe(false);
+  });
+
   it('expands the URL album while preserving its sleeved close socket', () => {
     mockUrl('album=album-zebra');
 

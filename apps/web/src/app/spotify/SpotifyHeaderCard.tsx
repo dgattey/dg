@@ -74,7 +74,8 @@ const musicLinkSx: SxObject = {
 
 type SpotifyHeaderCardProps = {
   surface?: SiteSurface;
-  track: Track;
+  /** Server track; the newest published one wins. Null renders nothing until one is published. */
+  track: Track | null;
 };
 
 function scrollToNowPlayingCard() {
@@ -92,6 +93,10 @@ export function SpotifyHeaderCard({
   track: serverTrack,
 }: SpotifyHeaderCardProps) {
   const track = useNowPlaying(serverTrack);
+  return track ? <DockedHeaderCard surface={surface} track={track} /> : null;
+}
+
+function DockedHeaderCard({ surface, track }: { surface: SiteSurface; track: Track }) {
   const pathname = usePublicPathname();
   const scrollContext = usePageScrollProgress();
   const isHome = pathname === homeRoute;

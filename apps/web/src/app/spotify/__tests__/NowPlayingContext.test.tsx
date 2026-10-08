@@ -1,7 +1,7 @@
 import type { Track } from '@dg/content-models/spotify/Track';
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { NowPlayingProvider } from '../NowPlayingContext';
+import { NowPlayingProvider, PublishNowPlaying } from '../NowPlayingContext';
 import { SpotifyCardWithGradient } from '../SpotifyCardWithGradient';
 import { SpotifyHeaderCard } from '../SpotifyHeaderCard';
 
@@ -87,5 +87,50 @@ describe('NowPlayingProvider', () => {
     render(<SpotifyHeaderCard track={STALE} />);
 
     expect(screen.getByTestId('compact')).toHaveTextContent('Track stale');
+  });
+
+  it('switches the shell track to the live one without the shell overwriting it', () => {
+    const { rerender } = render(
+      <NowPlayingProvider>
+        <SpotifyHeaderCard surface="collage" track={STALE} />
+      </NowPlayingProvider>,
+    );
+    expect(screen.getByTestId('compact')).toHaveTextContent('Track stale');
+
+    // A refresh re-sends the shell's minutes-cached track as a new object.
+    rerender(
+      <NowPlayingProvider>
+        <SpotifyHeaderCard surface="collage" track={{ ...STALE }} />
+        <PublishNowPlaying track={FRESH} />
+      </NowPlayingProvider>,
+    );
+    expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
+
+    rerender(
+      <NowPlayingProvider>
+        <SpotifyHeaderCard surface="collage" track={{ ...STALE }} />
+        <PublishNowPlaying track={FRESH} />
+      </NowPlayingProvider>,
+    );
+    expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
+  });
+
+  it('shows the live track when the shell had none', () => {
+    render(
+      <NowPlayingProvider>
+        <SpotifyHeaderCard surface="collage" track={null} />
+        <PublishNowPlaying track={FRESH} />
+      </NowPlayingProvider>,
+    );
+    expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
+  });
+
+  it('renders nothing without any track', () => {
+    render(
+      <NowPlayingProvider>
+        <SpotifyHeaderCard surface="collage" track={null} />
+      </NowPlayingProvider>,
+    );
+    expect(screen.queryByTestId('compact')).not.toBeInTheDocument();
   });
 });

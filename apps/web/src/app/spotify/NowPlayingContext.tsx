@@ -14,7 +14,8 @@ const NowPlayingContext = createContext<NowPlayingContextValue | null>(null);
  * Shares the newest server-rendered track across the page. The header card
  * lives in the layout, which client navigations keep as-is, so on its own it
  * would show the track from the first page load while the page's widget shows
- * the track fetched for the current page.
+ * the track fetched for the current page. The header also paints the shell's
+ * last-known track first and switches once the live one is published.
  */
 export function NowPlayingProvider({ children }: { children: ReactNode }) {
   const [track, setTrack] = useState<Track | null>(null);
@@ -33,11 +34,17 @@ export function usePublishNowPlaying(track: Track) {
   }, [publish, track]);
 }
 
-/**
- * Publishes `track`, then returns the newest published track, falling back to
- * `track` until something is published or outside the provider.
- */
-export function useNowPlaying(track: Track): Track {
+/** Publishes a freshly fetched track without rendering anything. */
+export function PublishNowPlaying({ track }: { track: Track }) {
   usePublishNowPlaying(track);
+  return null;
+}
+
+/**
+ * Returns the newest published track, falling back to `track` until something
+ * is published or outside the provider. Read-only: `track` may be the shell's
+ * last-known song, which must not overwrite a newer published one.
+ */
+export function useNowPlaying(track: Track | null): Track | null {
   return useContext(NowPlayingContext)?.track ?? track;
 }

@@ -82,6 +82,12 @@ type AlbumSortKey = (typeof COLLAGE_ALBUM_SORT_OPTIONS)[number]['key'];
 
 type AlbumGridColumns = Record<keyof typeof ALBUM_GRID_COLUMNS, number>;
 
+/**
+ * Two mobile rows fit the first screen, and the largest painted cover among
+ * them is the LCP, so they load eagerly at high priority.
+ */
+const COLLAGE_FIRST_SCREEN_CELLS = COLLAGE_ALBUM_GRID_COLUMNS.xs * 2;
+
 const ALBUM_GRID_COLUMNS_BY_SURFACE = {
   classic: ALBUM_GRID_COLUMNS,
   collage: COLLAGE_ALBUM_GRID_COLUMNS,
@@ -299,6 +305,7 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
         collageTreatment={treatment}
         collapsed={album.id === selectedAlbumId}
         imageUrl={album.imageUrl}
+        isLcpCandidate={surface === 'collage' && index < COLLAGE_FIRST_SCREEN_CELLS}
         surface={surface}
         tooltip={`${album.name} – ${album.artistNames}`}
       />

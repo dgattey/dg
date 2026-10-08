@@ -6,12 +6,12 @@ import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { ColorSchemeScript } from '@dg/ui/theme/ColorSchemeScript';
 import { ColorSchemeSync } from '@dg/ui/theme/ColorSchemeSync';
 import { GlobalStyleProvider } from '@dg/ui/theme/GlobalStyleProvider';
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v16-appRouter';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { getServerTime } from '../services/getServerTime';
+import { EmotionStyleRegistry } from './layouts/EmotionStyleRegistry';
 import { RefreshOnFocusProvider } from './layouts/RefreshOnFocusProvider';
 import { WebMcpTools } from './layouts/WebMcpTools';
 import { baseMetadata, viewport } from './metadata';
@@ -30,7 +30,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <JsOnlyStyle />
       </head>
       <body>
-        <AppRouterCacheProvider>
+        <EmotionStyleRegistry>
           <ServerTimeProvider serverTime={serverTime}>
             <GlobalStyleProvider>
               {/* Restores the stored scheme that hydration strips off <html> */}
@@ -43,7 +43,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
               <Analytics />
             </GlobalStyleProvider>
           </ServerTimeProvider>
-        </AppRouterCacheProvider>
+        </EmotionStyleRegistry>
       </body>
     </html>
   );
