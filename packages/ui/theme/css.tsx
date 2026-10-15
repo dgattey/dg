@@ -15,6 +15,10 @@ const BREAKPOINT_MEDIA: Record<BreakpointKey, string> = {
 
 const SPACING_SHORTHANDS: Record<string, ReadonlyArray<string>> = {
   m: ['margin'],
+  marginBlock: ['margin-block'],
+  marginInline: ['margin-inline'],
+  marginX: ['margin-inline'],
+  marginY: ['margin-block'],
   mb: ['margin-bottom'],
   ml: ['margin-left'],
   mr: ['margin-right'],
@@ -22,6 +26,10 @@ const SPACING_SHORTHANDS: Record<string, ReadonlyArray<string>> = {
   mx: ['margin-inline'],
   my: ['margin-block'],
   p: ['padding'],
+  paddingBlock: ['padding-block'],
+  paddingInline: ['padding-inline'],
+  paddingX: ['padding-inline'],
+  paddingY: ['padding-block'],
   pb: ['padding-bottom'],
   pl: ['padding-left'],
   pr: ['padding-right'],
@@ -38,6 +46,8 @@ const SPACING_PROPERTIES = new Set([
   'ml',
   'mx',
   'my',
+  'marginX',
+  'marginY',
   'p',
   'pt',
   'pr',
@@ -45,6 +55,8 @@ const SPACING_PROPERTIES = new Set([
   'pl',
   'px',
   'py',
+  'paddingX',
+  'paddingY',
   'gap',
   'rowGap',
   'columnGap',
@@ -128,10 +140,11 @@ function toKebabCase(prop: string): string {
   if (prop.startsWith('--')) {
     return prop;
   }
-  if (prop.startsWith('Webkit') || prop.startsWith('Moz') || prop.startsWith('ms')) {
-    return `-${prop.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`)}`;
+  const kebab = prop.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
+  if (kebab.startsWith('webkit-') || kebab.startsWith('moz-') || kebab.startsWith('ms-')) {
+    return `-${kebab}`;
   }
-  return prop.replace(/[A-Z]/g, (match) => `-${match.toLowerCase()}`);
+  return kebab;
 }
 
 function formatCssValue(prop: string, value: string | number): string {
@@ -329,6 +342,31 @@ function flattenSxItems(sx: SxProps, out: Array<SxObject>): void {
   out.push(sx as SxObject);
 }
 
+function mergeTwoSxObjects(target: SxObject, source: SxObject): SxObject {
+  const result: SxObject = { ...target };
+  for (const [k, v] of Object.entries(source)) {
+    if (v === undefined) {
+      continue;
+    }
+    const existing = result[k];
+    if (
+      existing &&
+      typeof existing === 'object' &&
+      !Array.isArray(existing) &&
+      v &&
+      typeof v === 'object' &&
+      !Array.isArray(v) &&
+      !isBreakpointObject(existing) &&
+      !isBreakpointObject(v)
+    ) {
+      result[k] = mergeTwoSxObjects(existing as SxObject, v as SxObject);
+    } else {
+      result[k] = v;
+    }
+  }
+  return result;
+}
+
 function mergeSxObjects(sx?: SxProps): SxObject | null {
   if (!sx) {
     return null;
@@ -341,23 +379,9 @@ function mergeSxObjects(sx?: SxProps): SxObject | null {
   if (items.length === 0) {
     return null;
   }
-  const merged: SxObject = {};
+  let merged: SxObject = {};
   for (const item of items) {
-    for (const [k, v] of Object.entries(item)) {
-      const existing = merged[k];
-      if (
-        existing &&
-        typeof existing === 'object' &&
-        !Array.isArray(existing) &&
-        v &&
-        typeof v === 'object' &&
-        !Array.isArray(v)
-      ) {
-        merged[k] = { ...(existing as Record<string, unknown>), ...(v as Record<string, unknown>) };
-      } else {
-        merged[k] = v;
-      }
-    }
+    merged = mergeTwoSxObjects(merged, item);
   }
   return merged;
 }

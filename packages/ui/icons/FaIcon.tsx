@@ -37,21 +37,25 @@ type FaIconProps = {
 
 export function FaIcon({ icon, size = '1em' }: FaIconProps) {
   return (
-    <svg
-      aria-hidden="true"
-      focusable="false"
-      role="img"
-      style={{
-        display: 'inline-block',
-        height: size,
-        overflow: 'visible',
-        verticalAlign: '-0.125em',
-        width: size,
-      }}
-      viewBox={icon.viewBox}
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <path d={icon.path} fill="currentColor" />
-    </svg>
+    <span style={{ display: 'inline-flex', height: size, width: size }}>
+      <svg
+        aria-hidden="true"
+        focusable="false"
+        height={size}
+        role="img"
+        style={{
+          display: 'inline-block',
+          height: size,
+          overflow: 'visible',
+          verticalAlign: '-0.125em',
+          width: size,
+        }}
+        viewBox={icon.viewBox}
+        width={size}
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path d={icon.path} fill="currentColor" />
+      </svg>
+    </span>
   );
 }

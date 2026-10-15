@@ -3,8 +3,10 @@ import type { SxObject, SxProps } from '../theme';
 import { compileSx, joinClasses, SxStyle } from '../theme/css';
 
 const dividerBaseSx: SxObject = {
-  border: 0,
-  borderBottom: '1px solid var(--mui-palette-divider)',
+  borderBottomWidth: 'thin',
+  borderColor: 'var(--mui-palette-divider)',
+  borderStyle: 'solid',
+  borderWidth: 0,
   flexShrink: 0,
   margin: 0,
 };

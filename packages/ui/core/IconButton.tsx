@@ -11,14 +11,17 @@ const iconButtonBaseSx: SxObject = {
   backgroundColor: 'transparent',
   border: 0,
   borderRadius: '50%',
+  boxSizing: 'border-box',
   color: 'var(--mui-palette-action-active)',
   cursor: 'pointer',
   display: 'inline-flex',
+  flex: '0 0 auto',
   justifyContent: 'center',
   margin: 0,
   outline: 0,
   padding: '8px',
   position: 'relative',
+  textAlign: 'center',
   textDecoration: 'none',
   transition: 'background-color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
   userSelect: 'none',
@@ -42,8 +45,11 @@ export function IconButton({
   ...rest
 }: IconButtonProps) {
   const sizePadding = size === 'small' ? '5px' : size === 'large' ? '12px' : '8px';
+  const sizeFontSize =
+    size === 'small' ? '1.40625rem' : size === 'large' ? '2.1875rem' : '1.875rem';
   const baseSx: SxObject = {
     ...iconButtonBaseSx,
+    fontSize: sizeFontSize,
     padding: sizePadding,
   };
   const mergedSx: SxProps = Array.isArray(sx) ? [baseSx, ...sx] : [baseSx, sx];

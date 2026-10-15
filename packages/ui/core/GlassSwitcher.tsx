@@ -69,6 +69,8 @@ export function createGridStyles(optionCount: number): SxObject {
     alignItems: 'stretch',
     columnGap: gap,
     display: 'grid',
+    flexDirection: 'column',
+    flexWrap: 'wrap',
     gridAutoFlow: 'column',
     gridTemplateColumns: `repeat(${optionCount}, minmax(0, 1fr))`,
     height: '100%',

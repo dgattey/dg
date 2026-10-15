@@ -94,6 +94,8 @@ export function getGlobalThemeCss(): string {
   --mui-shape-borderRadius: 4px;
   --mui-shape-cardBorderRadius: ${shape.cardBorderRadius}px;
   --dg-skeleton-bg: ${onCanvas(12)};
+  --font-sans: ${typography.fontFamily};
+  font-size: 15px;
   font-variant: tabular-nums;
   word-break: break-word;
 }
@@ -127,12 +129,14 @@ body {
   background-color: var(--mui-palette-background-default);
   color: var(--mui-palette-text-primary);
   font-family: ${typography.fontFamily};
-  font-size: 1.0625rem;
+  font-size: 1.03125rem;
   font-weight: 400;
   line-height: 1.5;
   margin: 0;
   overscroll-behavior-x: none;
 }
+@media (min-width: 576px) { body { font-size: 1rem; } }
+@media (min-width: 992px) { body { font-size: 1.0625rem; } }
 h1, h2, h3, h4 {
   text-wrap: balance;
 }

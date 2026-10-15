@@ -1,6 +1,9 @@
+'use client';
+
 import { homeRoute } from '@dg/shared-core/routes/app';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
+import { Section } from '@dg/ui/core/Section';
 import { Stack } from '@dg/ui/core/Stack';
 import { Typography } from '@dg/ui/core/Typography';
 import { Link } from '@dg/ui/dependent/Link';
@@ -96,12 +99,8 @@ export function ErrorLayout({ statusCode, surface = 'classic' }: ErrorLayoutProp
   }
 
   return (
-    <Stack component="section" sx={layoutSx}>
-      <MouseAwareGlassContainer
-        className="MuiTypography-root MuiTypography-h1"
-        component="h1"
-        sx={statusCodeSx}
-      >
+    <Stack component={Section} sx={layoutSx}>
+      <MouseAwareGlassContainer component={Typography} sx={statusCodeSx} variant="h1">
         {statusCode}
       </MouseAwareGlassContainer>
       <Typography sx={messageSx} variant="h5">

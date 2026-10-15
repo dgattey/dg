@@ -23,13 +23,7 @@ export const metadata: Metadata = {
   title: TITLE,
 };
 
-async function AlbumsGrid({
-  children,
-  surface = 'classic',
-}: {
-  children: ReactNode;
-  surface?: SiteSurface;
-}) {
+async function AlbumsGrid({ surface = 'classic' }: { surface?: SiteSurface }) {
   const albums = await getFavoriteAlbums();
 
   if (albums === null) {
@@ -43,11 +37,7 @@ async function AlbumsGrid({
     return <Typography color="text.secondary">No favorite albums yet.</Typography>;
   }
 
-  return (
-    <FavoriteAlbumsGrid albums={albums} surface={surface}>
-      {children}
-    </FavoriteAlbumsGrid>
-  );
+  return <FavoriteAlbumsGrid albums={albums} surface={surface} />;
 }
 
 /**
@@ -72,8 +62,9 @@ export default function FavoriteAlbumsLayout({
         <CollageBackdrop backdrop={ALBUMS_BACKDROP} />
         <CutLetters className="collagePageTitle" text={TITLE} />
         <Suspense fallback={<FavoriteAlbumsSkeleton surface="collage" />}>
-          <AlbumsGrid surface="collage">{children}</AlbumsGrid>
+          <AlbumsGrid surface="collage" />
         </Suspense>
+        {children}
       </section>
     );
   }
@@ -82,8 +73,9 @@ export default function FavoriteAlbumsLayout({
     <>
       <PageTitle>{TITLE}</PageTitle>
       <Suspense fallback={<FavoriteAlbumsSkeleton />}>
-        <AlbumsGrid>{children}</AlbumsGrid>
+        <AlbumsGrid />
       </Suspense>
+      {children}
     </>
   );
 }

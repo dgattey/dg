@@ -1,10 +1,12 @@
 'use client';
 
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import type { SxObject } from '@dg/ui/theme';
 import { useColorScheme } from '@dg/ui/theme/useColorScheme';
 import type { Point } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
-import { type CSSProperties, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { fitRouteViewport, projectRouteToPixels, toSvgPath } from './routeGeometry';
 import { getRouteMapTokens } from './routeMapTokens';
 import { SmoothTile } from './SmoothTile';
@@ -13,7 +15,7 @@ import { stadiaTileUrl, type TileSource } from './tileSource';
 const ROUTE_PADDING = 42;
 const DEFAULT_SIZE = 320;
 
-const underlayStyle: CSSProperties = {
+const underlaySx: SxObject = {
   filter: 'blur(8px)',
   height: '110%',
   inset: '-5%',
@@ -25,7 +27,7 @@ const underlayStyle: CSSProperties = {
   zIndex: 0,
 };
 
-const routeSvgStyle: CSSProperties = {
+const routeSvgSx: SxObject = {
   height: '100%',
   left: 0,
   overflow: 'visible',
@@ -34,17 +36,6 @@ const routeSvgStyle: CSSProperties = {
   width: '100%',
   zIndex: 3,
 };
-
-const ROUTE_TILE_LAYER_CSS = `
-.dg-route-tile-layer > div {
-  background-color: transparent !important;
-}
-.dg-route-tile-layer-collage > div {
-  background-color: transparent !important;
-  height: 100% !important;
-  width: 100% !important;
-}
-`;
 
 const subscribeToSystemDark = (onStoreChange: () => void) => {
   const media = window.matchMedia('(prefers-color-scheme: dark)');
@@ -152,7 +143,7 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
     return () => observer.disconnect();
   }, []);
 
-  const containerStyle: CSSProperties = {
+  const containerSx: SxObject = {
     backgroundColor: tokens.containerBackground,
     height: '100%',
     // Groups the underlay, tiles, scrim and route into one layer so none of them
@@ -164,7 +155,14 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
     width: '100%',
   };
 
-  const tileLayerStyle: CSSProperties = {
+  const tileLayerSx: SxObject = {
+    // Pigeon paints its own opaque background, which would hide the placeholder.
+    '& > div': {
+      backgroundColor: 'transparent !important',
+      // Pigeon re-measures its root with getBoundingClientRect, which grows under a
+      // rotated collage card and feeds back into its own inline size every frame.
+      ...(surface === 'classic' ? {} : { height: '100% !important', width: '100% !important' }),
+    },
     filter: tokens.tileFilter,
     inset: 0,
     position: 'absolute',
@@ -176,7 +174,7 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
    * Legibility is the host's job: whatever renders text over this map is expected
    * to back its own text regions, since only it knows where the copy sits.
    */
-  const scrimStyle: CSSProperties = {
+  const scrimSx: SxObject = {
     background: tokens.scrimGradient,
     inset: 0,
     position: 'absolute',
@@ -184,11 +182,10 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
   };
 
   return (
-    <div aria-hidden="true" ref={containerRef} style={containerStyle}>
-      <style>{ROUTE_TILE_LAYER_CSS}</style>
-      {/* biome-ignore lint/performance/noImgElement: map tile underlay uses external tile URL directly */}
-      <img
+    <Box aria-hidden="true" ref={containerRef} sx={containerSx}>
+      <Box
         alt=""
+        component="img"
         src={tileUrl({
           dark,
           tileSource,
@@ -196,12 +193,9 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
           y: underlayTile.y,
           zoom: underlayTile.zoom,
         })}
-        style={underlayStyle}
+        sx={underlaySx}
       />
-      <div
-        className={surface === 'classic' ? 'dg-route-tile-layer' : 'dg-route-tile-layer-collage'}
-        style={tileLayerStyle}
-      >
+      <Box sx={tileLayerSx}>
         <PigeonMapCore
           animate={false}
           attribution={false}
@@ -218,10 +212,11 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
           zoom={viewport.zoom}
           zoomSnap={false}
         />
-      </div>
-      <div style={scrimStyle} />
-      <svg aria-hidden="true" style={routeSvgStyle} viewBox={`0 0 ${size.width} ${size.height}`}>
-        <path
+      </Box>
+      <Box sx={scrimSx} />
+      <Box component="svg" sx={routeSvgSx} viewBox={`0 0 ${size.width} ${size.height}`}>
+        <Box
+          component="path"
           d={routePath}
           fill="none"
           stroke={tokens.casingStroke}
@@ -230,7 +225,8 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
           strokeWidth={6}
           vectorEffect="non-scaling-stroke"
         />
-        <path
+        <Box
+          component="path"
           d={routePath}
           fill="none"
           stroke={tokens.routeStroke}
@@ -239,7 +235,7 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
           strokeWidth={tokens.routeStrokeWidth}
           vectorEffect="non-scaling-stroke"
         />
-      </svg>
-    </div>
+      </Box>
+    </Box>
   );
 }

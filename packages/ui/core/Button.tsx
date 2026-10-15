@@ -8,51 +8,81 @@ export type ButtonVariant = 'contained' | 'outlined' | 'text';
 
 const SIZE_STYLES: Record<ButtonSize, SxObject> = {
   large: {
-    fontSize: '0.8125rem',
+    fontSize: '1.1607142857142858rem',
     padding: '8px 20px',
   },
   medium: {
-    fontSize: '0.75rem',
+    fontSize: '1.0714285714285714rem',
     padding: '6px 16px',
   },
   small: {
-    fontSize: '0.6875rem',
+    fontSize: '0.9821428571428572rem',
     padding: '4px 12px',
   },
 };
 
-function getVariantStyles(variant: ButtonVariant, color: ButtonColor): SxObject {
+function getVariantStyles(
+  variant: ButtonVariant,
+  color: ButtonColor,
+  disabled?: boolean,
+): SxObject {
   const main = `var(--mui-palette-${color}-main)`;
   const dark = `var(--mui-palette-${color}-dark)`;
   const contrast = `var(--mui-palette-${color}-contrastText)`;
 
   switch (variant) {
     case 'contained':
+      if (disabled) {
+        return {
+          backgroundColor: 'var(--mui-palette-action-disabledBackground)',
+          border: 0,
+          boxShadow: 'none',
+          color: 'var(--mui-palette-action-disabled)',
+        };
+      }
       return {
         '&:hover': {
           backgroundColor: dark,
+          boxShadow:
+            '0px 2px 4px -1px rgba(0,0,0,0.2),0px 4px 5px 0px rgba(0,0,0,0.14),0px 1px 10px 0px rgba(0,0,0,0.12)',
         },
         backgroundColor: main,
-        border: 'none',
+        border: 0,
+        boxShadow:
+          '0px 3px 1px -2px rgba(0,0,0,0.2),0px 2px 2px 0px rgba(0,0,0,0.14),0px 1px 5px 0px rgba(0,0,0,0.12)',
         color: contrast,
       };
     case 'outlined':
+      if (disabled) {
+        return {
+          backgroundColor: 'transparent',
+          border: '1px solid var(--mui-palette-action-disabledBackground)',
+          color: 'var(--mui-palette-action-disabled)',
+        };
+      }
       return {
         '&:hover': {
-          backgroundColor: `color-mix(in srgb, ${main} 8%, transparent)`,
+          backgroundColor: `color-mix(in srgb, ${main} 4%, transparent)`,
           borderColor: main,
         },
         backgroundColor: 'transparent',
-        border: `1px solid color-mix(in srgb, ${main} 50%, transparent)`,
+        border: `1px solid ${main}`,
         color: main,
       };
     case 'text':
+      if (disabled) {
+        return {
+          backgroundColor: 'transparent',
+          border: 0,
+          color: 'var(--mui-palette-action-disabled)',
+        };
+      }
       return {
         '&:hover': {
-          backgroundColor: `color-mix(in srgb, ${main} 8%, transparent)`,
+          backgroundColor: `color-mix(in srgb, ${main} 4%, transparent)`,
         },
         backgroundColor: 'transparent',
-        border: 'none',
+        border: 0,
         color: main,
       };
     default: {
@@ -112,22 +142,26 @@ export function Button<T extends ElementType = 'button'>({
   const baseSx: SxObject = {
     alignItems: 'center',
     borderRadius: '8px',
+    boxSizing: 'border-box',
     cursor: disabled ? 'default' : 'pointer',
     display: 'inline-flex',
     fontFamily: 'inherit',
     fontWeight: 600,
-    gap: '8px',
     justifyContent: 'center',
     lineHeight: 1.75,
-    opacity: disabled ? 0.5 : 1,
+    margin: 0,
+    minWidth: '64px',
+    outline: 0,
     pointerEvents: disabled ? 'none' : 'auto',
+    position: 'relative',
     textDecoration: 'none',
     textTransform: 'initial',
-    transition: 'background-color 150ms ease, border-color 150ms ease, color 150ms ease',
+    transition:
+      'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms, color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
     userSelect: 'none',
     verticalAlign: 'middle',
     ...SIZE_STYLES[size],
-    ...getVariantStyles(variant, color),
+    ...getVariantStyles(variant, color, disabled),
   };
   const mergedSx: SxProps = Array.isArray(sx) ? [baseSx, ...sx] : [baseSx, sx];
   const compiled = compileSx(mergedSx);
@@ -145,9 +179,31 @@ export function Button<T extends ElementType = 'button'>({
         type={buttonType}
         {...rest}
       >
-        {startIcon ? <span style={{ display: 'inline-flex' }}>{startIcon}</span> : null}
+        {startIcon ? (
+          <span
+            style={{
+              alignItems: 'center',
+              display: 'inherit',
+              marginLeft: '-4px',
+              marginRight: '8px',
+            }}
+          >
+            {startIcon}
+          </span>
+        ) : null}
         {children}
-        {endIcon ? <span style={{ display: 'inline-flex' }}>{endIcon}</span> : null}
+        {endIcon ? (
+          <span
+            style={{
+              alignItems: 'center',
+              display: 'inherit',
+              marginLeft: '8px',
+              marginRight: '-4px',
+            }}
+          >
+            {endIcon}
+          </span>
+        ) : null}
       </Component>
     </>
   );

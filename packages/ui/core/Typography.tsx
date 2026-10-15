@@ -38,21 +38,23 @@ const VARIANT_STYLES: Record<TypographyVariant, SxObject> = {
   body1: {
     ...TYPOGRAPHY.body1,
     color: 'var(--mui-palette-text-primary)',
+    fontSize: { lg: '1.0625rem', sm: '1rem', xs: '1.03125rem' },
+    fontWeight: 400,
     lineHeight: 1.5,
   },
   body2: {
     ...TYPOGRAPHY.body2,
     color: 'var(--mui-palette-text-secondary)',
+    fontSize: { lg: '1.0625rem', sm: '1.049rem', xs: '1.03125rem' },
+    fontWeight: 400,
     lineHeight: 1.43,
   },
   button: {
     ...TYPOGRAPHY.button,
-    color: 'var(--mui-palette-text-primary)',
     lineHeight: 1.75,
   },
   caption: {
     ...TYPOGRAPHY.caption,
-    color: 'var(--mui-palette-text-primary)',
     lineHeight: 1.66,
   },
   code: {
@@ -78,11 +80,13 @@ const VARIANT_STYLES: Record<TypographyVariant, SxObject> = {
   h4: {
     ...TYPOGRAPHY.h4,
     color: 'var(--mui-palette-text-h4)',
+    fontSize: { lg: '1.2813rem', sm: '1.2146rem', xs: '1.140625rem' },
     lineHeight: 1.235,
   },
   h5: {
     ...TYPOGRAPHY.h5,
     color: 'var(--mui-palette-text-h5)',
+    fontSize: { lg: '1.0313rem', sm: '0.937rem', xs: '1.015625rem' },
     lineHeight: 1.334,
   },
   h6: {
@@ -92,13 +96,12 @@ const VARIANT_STYLES: Record<TypographyVariant, SxObject> = {
   },
   overline: {
     ...TYPOGRAPHY.overline,
-    color: 'var(--mui-palette-text-primary)',
     lineHeight: 2.66,
     textTransform: 'uppercase',
   },
 };
 
-function resolveTypographyColor(color: string): string {
+function resolveTypographyColor(color: string): string | undefined {
   switch (color) {
     case 'error':
       return 'var(--mui-palette-error-main)';
@@ -112,8 +115,14 @@ function resolveTypographyColor(color: string): string {
       return 'var(--mui-palette-info-main)';
     case 'success':
       return 'var(--mui-palette-success-main)';
+    case 'textPrimary':
+      return 'var(--mui-palette-text-primary)';
+    case 'textSecondary':
+      return 'var(--mui-palette-text-secondary)';
+    case 'inherit':
+      return 'inherit';
     default:
-      return color;
+      return undefined;
   }
 }
 
@@ -156,12 +165,14 @@ export function Typography<T extends ElementType = 'p'>({
   ...rest
 }: TypographyProps<T>) {
   const Component = (component ?? DEFAULT_ELEMENT[variant]) as ElementType;
+  const resolvedColor = color ? resolveTypographyColor(color) : undefined;
   const baseSx: SxObject = {
+    fontFamily: 'var(--font-sans)',
     margin: 0,
     textRendering: 'optimizeLegibility',
     WebkitFontSmoothing: 'auto',
     ...VARIANT_STYLES[variant],
-    ...(color ? { color: resolveTypographyColor(color) } : {}),
+    ...(resolvedColor ? { color: resolvedColor } : {}),
     ...(fontWeight !== undefined ? { fontWeight } : {}),
     ...(gutterBottom ? { marginBottom: '0.35em' } : {}),
     ...(noWrap
