@@ -1,4 +1,3 @@
-import { Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import { DEV_CONSOLE_BACKDROP } from '../../collage/backdrops';
 import { CollageBackdrop } from '../../collage/CollageBackdrop';
@@ -55,7 +54,7 @@ export function CollageConsole({
             }
             tiltDeg={1}
           >
-            <Typography>This page is protected and intended for developer access.</Typography>
+            <p>This page is protected and intended for developer access.</p>
           </PaperCard>
         </div>
         <div className="devConsole__console">

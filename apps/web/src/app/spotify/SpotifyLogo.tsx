@@ -1,7 +1,6 @@
 import { Link } from '@dg/ui/dependent/Link';
-import { FaIcon } from '@dg/ui/icons/FaIcon';
+import { FaIcon, faSpotify } from '@dg/ui/icons/FaIcon';
 import type { SxObject } from '@dg/ui/theme';
-import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
 
 type SpotifyLogoProps = {
   trackTitle: string;

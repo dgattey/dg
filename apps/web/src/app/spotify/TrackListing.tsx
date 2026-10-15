@@ -1,10 +1,12 @@
 import type { Track } from '@dg/content-models/spotify/Track';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import { Card } from '@dg/ui/core/Card';
+import { Stack } from '@dg/ui/core/Stack';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Card, Stack } from '@mui/material';
 import { PaperCard } from '../collage/PaperCard';
 import { RecordDisc } from '../collage/RecordDisc';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
@@ -136,25 +138,33 @@ function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) 
 const COMPACT_HOVER_SIZE = 84;
 const COMPACT_HOVER_SCALE = COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE;
 
+const compactZoomSx: SxObject = {
+  '[data-album-art]': {
+    boxShadow: 'var(--mui-extraShadows-card-hovered)',
+    transform: `scale(${COMPACT_HOVER_SCALE})`,
+    zIndex: 1,
+  },
+  '[data-thumbnail-outer]': {
+    width: COMPACT_HOVER_SIZE,
+  },
+};
+
 const compactContainerSx: SxObject = {
   /** Scale album art on hover — only on devices with true hover capability. */
   '@media (hover: hover)': {
-    '&:hover': {
-      '[data-album-art]': {
-        boxShadow: 'var(--mui-extraShadows-card-hovered)',
-        transform: `scale(${COMPACT_HOVER_SCALE})`,
-        zIndex: 1,
-      },
-      '[data-thumbnail-outer]': {
-        width: COMPACT_HOVER_SIZE,
-      },
-    },
+    '&:hover': compactZoomSx,
   },
   alignItems: 'center',
   display: 'flex',
   gap: 1,
   minWidth: 0,
   overflow: 'visible',
+};
+
+/** On collage the card, or the link wrapping it, zooms for keyboard focus too. */
+const collageCompactContainerSx: SxObject = {
+  ...compactContainerSx,
+  '*:focus-visible &, &:has(:focus-visible)': compactZoomSx,
 };
 
 /** Outer wrapper — width transitions on parent hover via [data-thumbnail-outer]. */
@@ -197,10 +207,12 @@ const compactTextStackSx: SxObject = {
 
 function CompactLayout({
   track,
+  colors,
   disableLinks,
   shouldAnimate,
 }: {
   track: Track;
+  colors?: Colors;
   disableLinks?: boolean;
   shouldAnimate: boolean;
 }) {
@@ -224,7 +236,7 @@ function CompactLayout({
   );
 
   return (
-    <Box sx={compactContainerSx}>
+    <Box sx={colors ? collageCompactContainerSx : compactContainerSx}>
       <Box data-thumbnail-outer sx={compactThumbnailOuterSx}>
         <AlbumArtWithNotes
           isPlaying={isPlaying}
@@ -247,19 +259,21 @@ function CompactLayout({
         </AlbumArtWithNotes>
       </Box>
       <Box sx={compactTextWrapperSx}>
-        <Stack sx={compactTextStackSx}>
+        <Stack sx={colors ? { ...compactTextStackSx, color: colors.primary } : compactTextStackSx}>
           <PlaybackStatus
             animating={shouldAnimate && isPlaying}
+            color={colors?.primary}
             isPlaying={track.isPlaying}
             listingVariant="compact"
             playedAt={track.playedAt}
           />
           <TrackTitle
+            color={colors?.primary}
             listingVariant="compact"
             trackTitle={track.name}
             url={disableLinks ? undefined : trackUrl}
           />
-          <ArtistList artists={track.artists} listingVariant="compact" />
+          <ArtistList artists={track.artists} color={colors?.secondary} listingVariant="compact" />
         </Stack>
       </Box>
     </Box>
@@ -285,9 +299,20 @@ export function TrackListing({
   shouldAnimate = true,
   surface = 'classic',
 }: TrackListingProps) {
+  if (variant === 'compact') {
+    return (
+      <CompactLayout
+        colors={surface === 'collage' ? COLLAGE_TRACK_COLORS : undefined}
+        disableLinks={disableLinks}
+        shouldAnimate={shouldAnimate}
+        track={track}
+      />
+    );
+  }
+
   if (surface === 'collage') {
     return (
-      <div className="home__spotify" data-slot="sp" style={{ gridArea: 'sp' }}>
+      <div className="home__spotify" data-slot="sp">
         <RecordDisc track={track} />
         <PaperCard className="home__spotifyMeta" edge="quad-b" tiltDeg={-2} tone="cream">
           <div className="home__spotifyMetaInner">
@@ -298,12 +323,5 @@ export function TrackListing({
     );
   }
 
-  const colors = getContrastingColors(track);
-
-  if (variant === 'compact') {
-    return (
-      <CompactLayout disableLinks={disableLinks} shouldAnimate={shouldAnimate} track={track} />
-    );
-  }
-  return <CardLayout colors={colors} track={track} />;
+  return <CardLayout colors={getContrastingColors(track)} track={track} />;
 }

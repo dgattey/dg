@@ -1,8 +1,7 @@
-import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import type { TileComponentProps } from 'pigeon-maps';
+import type { CSSProperties } from 'react';
 
-const tileImageSx: SxObject = {
+const tileImageStyle: CSSProperties = {
   display: 'block',
   height: '100%',
   width: '100%',
@@ -10,7 +9,7 @@ const tileImageSx: SxObject = {
 
 /** A single-layer tile with a fade that keeps theme changes from flashing. */
 export function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
-  const containerSx: SxObject = {
+  const containerStyle: CSSProperties = {
     height: tile.height,
     left: tile.left,
     opacity: tile.active ? 1 : 0,
@@ -22,15 +21,9 @@ export function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
   };
 
   return (
-    <Box sx={containerSx}>
-      <Box
-        alt=""
-        component="img"
-        onLoad={tileLoaded}
-        src={tile.url}
-        srcSet={tile.srcSet}
-        sx={tileImageSx}
-      />
-    </Box>
+    <div style={containerStyle}>
+      {/* biome-ignore lint/performance/noImgElement: pigeon-maps tile uses custom srcSet and onLoad */}
+      <img alt="" onLoad={tileLoaded} src={tile.url} srcSet={tile.srcSet} style={tileImageStyle} />
+    </div>
   );
 }

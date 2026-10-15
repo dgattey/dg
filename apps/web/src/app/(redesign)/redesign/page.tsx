@@ -1,3 +1,5 @@
+import '../../collage/home.css';
+import '../../collage/print.css';
 import { generateMetadata as generateHomeMetadata } from '../../(classic)/page';
 import { Homepage } from '../../home/Homepage';
 

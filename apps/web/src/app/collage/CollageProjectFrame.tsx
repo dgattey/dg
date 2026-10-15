@@ -77,7 +77,7 @@ export function CollageProjectFrame({
   }
 
   return (
-    <a {...shared} href={project.link.url} rel="noreferrer" target="_blank" title={project.title}>
+    <a {...shared} href={project.link.url} rel="noreferrer" target="_blank">
       {frame}
       {tag}
     </a>

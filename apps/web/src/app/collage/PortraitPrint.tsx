@@ -36,6 +36,7 @@ export function PortraitPrint({
             <Image
               alt={introImageAlt(image)}
               cover={true}
+              fetchPriority="high"
               height={image.height}
               preload={true}
               quality={65}

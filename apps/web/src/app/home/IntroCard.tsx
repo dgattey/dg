@@ -45,7 +45,7 @@ const introTextCardSx: SxObject = {
  * wide screens to push the last paragraph onto an extra line.
  */
 const introTextSx: SxObject = {
-  '& > .MuiTypography-root': {
+  '& > [data-typography]': {
     marginBottom: 0,
   },
   '& p': {

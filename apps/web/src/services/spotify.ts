@@ -26,3 +26,15 @@ export const getLatestSong = async () => {
   cacheTag(LATEST_SONG_TAG);
   return await withMissingTokenFallback(fetchRecentlyPlayed());
 };
+
+/**
+ * Same data as `getLatestSong`, cached long enough (`minutes`) to be
+ * prerendered into the static shell. It can be a few minutes behind, so pair
+ * it with `getLatestSong` streamed in for the live value.
+ */
+export const getLastKnownSong = async () => {
+  'use cache';
+  cacheLife('minutes');
+  cacheTag(LATEST_SONG_TAG);
+  return await withMissingTokenFallback(fetchRecentlyPlayed());
+};

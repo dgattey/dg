@@ -1,5 +1,6 @@
 'use client';
 
+import '../../layouts/error.css';
 import { ErrorLayout } from '../../layouts/ErrorLayout';
 
 export default function RedesignError({

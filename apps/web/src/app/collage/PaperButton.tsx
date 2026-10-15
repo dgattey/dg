@@ -1,5 +1,6 @@
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { shouldSkipRedesignRewrite } from '../../redesignRouting';
 import { cx, paperEdgeVars, paperToneVars } from './paperVars';
 import type { PaperEdge, PaperTone } from './types';
 
@@ -27,6 +28,18 @@ type PaperButtonProps = {
     }
 );
 
+/**
+ * Route handlers and other origins aren't router pages: a client Link would
+ * prefetch them, and their redirects to OAuth hosts fail as cross-origin fetches.
+ */
+function isAppPage(href: string): boolean {
+  return (
+    href.startsWith('/') &&
+    !href.startsWith('//') &&
+    !shouldSkipRedesignRewrite(href.split(/[?#]/)[0] ?? href)
+  );
+}
+
 export function PaperButton({
   children,
   className,
@@ -43,6 +56,24 @@ export function PaperButton({
   const classNames = cx('paperButton', current && 'paperButtonCurrent', className);
   const wrapStyle = paperToneVars(tone, tiltDeg);
   const surfaceStyle = paperEdgeVars(edge);
+
+  if (href !== undefined && !isAppPage(href)) {
+    return (
+      <div className="paperWrap" style={wrapStyle}>
+        <span style={surfaceStyle}>
+          <a
+            aria-current={current ? 'page' : undefined}
+            aria-label={title}
+            className={classNames}
+            href={href}
+            onClick={onClick}
+          >
+            {children}
+          </a>
+        </span>
+      </div>
+    );
+  }
 
   if (href !== undefined) {
     return (

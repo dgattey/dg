@@ -1,6 +1,6 @@
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
+import { Typography } from '@dg/ui/core/Typography';
 import type { SxObject } from '@dg/ui/theme';
-import { Typography } from '@mui/material';
 import type { LucideIcon } from 'lucide-react';
 import { Activity, Bike, Dumbbell, Footprints, Mountain, MountainSnow } from 'lucide-react';
 

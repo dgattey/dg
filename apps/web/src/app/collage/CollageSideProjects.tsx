@@ -2,8 +2,6 @@ import type { RenderableSideProject } from '@dg/content-models/contentful/render
 import { Image } from '@dg/ui/dependent/Image';
 import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
-import { paperToneVars } from './paperVars';
-import type { PaperTone } from './types';
 
 export function CollageSideProjects({
   projects,
@@ -20,7 +18,6 @@ export function CollageSideProjects({
       <ul className="home__sideList">
         {projects.map((project, index) => {
           const even = index % 2 === 0;
-          const markTone = (even ? 'ochre' : 'ultramarine') satisfies PaperTone;
           return (
             <li className="home__sideItem" key={project.url}>
               <PaperCard
@@ -29,22 +26,10 @@ export function CollageSideProjects({
                 tiltDeg={even ? 1.5 : -1.2}
                 tone="cream"
               >
-                <a
-                  className="home__sideRow"
-                  href={project.url}
-                  rel="noreferrer"
-                  target="_blank"
-                  title={project.title}
-                >
-                  <span
-                    aria-hidden="true"
-                    className="home__sideMark"
-                    data-role="side-project-mark"
-                    style={paperToneVars(markTone)}
-                  >
+                <a className="home__sideRow" href={project.url} rel="noreferrer" target="_blank">
+                  <span aria-hidden="true" className="home__sideMark" data-role="side-project-mark">
                     <Image
                       alt=""
-                      cover={true}
                       height={project.mark.height}
                       sizes={{ extraLarge: 44 }}
                       url={project.mark.url}

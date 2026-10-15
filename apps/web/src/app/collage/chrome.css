@@ -26,11 +26,6 @@
   width: 100%;
   height: 100%;
 }
-.chrome__logo button:focus-visible,
-.chrome__logo a:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 3px;
-}
 .chrome__logo button,
 .chrome__logo a {
   padding: 0.4em 0.5em 0.48em;
@@ -50,9 +45,25 @@
   max-width: min(420px, 52vw);
   margin-top: 6px;
 }
-.chrome__nowPlayingInner {
+/*
+ * The album art zooms past the paper's edge on hover and focus, so the torn
+ * shape is painted underneath rather than clipping the card's contents.
+ */
+.paperInner.chrome__nowPlayingInner {
+  position: relative;
   min-width: 0;
   padding: 7px 14px 7px 7px;
+  background: none;
+  isolation: isolate;
+  clip-path: none;
+}
+.chrome__nowPlayingInner::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background: var(--pc);
+  clip-path: var(--clip, var(--quad-a));
 }
 .chrome__spacer {
   flex: 1;
@@ -74,9 +85,6 @@
 }
 .chrome__musicSummary::-webkit-details-marker {
   display: none;
-}
-.chrome__musicSummary:focus-visible {
-  outline: none;
 }
 .chrome__musicChevron {
   transition: rotate 0.2s ease;

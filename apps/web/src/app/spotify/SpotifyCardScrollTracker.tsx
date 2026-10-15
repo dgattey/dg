@@ -1,6 +1,7 @@
 'use client';
 
-import { Box } from '@mui/material';
+import { Box } from '@dg/ui/core/Box';
+import type { SxObject } from '@dg/ui/theme';
 import type { ReactNode } from 'react';
 import { useSpotifyCardVisibility } from '../../hooks/useSpotifyCardVisibility';
 
@@ -11,10 +12,17 @@ import { useSpotifyCardVisibility } from '../../hooks/useSpotifyCardVisibility';
  */
 export const NOW_PLAYING_CARD_ID = 'now-playing-card';
 
-export function SpotifyCardScrollTracker({ children }: { children: ReactNode }) {
+export function SpotifyCardScrollTracker({
+  children,
+  sx,
+}: {
+  children: ReactNode;
+  /** The tracker is the grid item, so grid placement belongs here. */
+  sx?: SxObject;
+}) {
   const cardRef = useSpotifyCardVisibility();
   return (
-    <Box id={NOW_PLAYING_CARD_ID} ref={cardRef} sx={{ scrollMarginTop: 120 }}>
+    <Box id={NOW_PLAYING_CARD_ID} ref={cardRef} sx={{ scrollMarginTop: 120, ...sx }}>
       {children}
     </Box>
   );

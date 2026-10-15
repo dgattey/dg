@@ -16,7 +16,7 @@ Toolbar / Flags Explorer overrides still work without this flow (per-browser ove
 4. `apps/web/src/flags.ts` `identify` reads that cookie and returns `{ user?: { id, email } }` for flags that share it (e.g. `interactive-redesign`).
 5. Flags dashboard Entities + Segment rules match on `user.id` / `user.email` and attach to the flag.
 
-Logout clears the session cookie via `/api/auth/vercel/logout`.
+Sign out is a form bound to the `signOutOfVercel` Server Action, which clears the session cookie. It must stay a POST: Next prefetches every in-viewport `Link` in production, so a GET sign-out URL would run as soon as the signed-in card rendered.
 
 ## Dashboard setup
 
@@ -42,9 +42,13 @@ One-time human setup under team `dylan-gattey`:
 - The Flags session does **not** bypass `/dev-console` Basic Auth (`apps/web/src/proxy.ts`). Those are independent gates.
 - Cookie is HttpOnly, HMAC-signed, 30-day max age; payload is identity only.
 
+## Where rules apply
+
+Dashboard rules and Segments only run on production deployments. Every evaluation there costs a Flag Request (the Hobby team pauses at 10,000 a month), so local dev, CI, and previews skip Vercel and return `false`. Each instance also reuses a visitor's production decision for 60 seconds, so a rule change can take up to a minute to show. To see the redesign outside production, use a Toolbar override or `INTERACTIVE_REDESIGN=1`.
+
 ## Fallback
 
-Vercel Toolbar → Flags / Flags Explorer override for `interactive-redesign` still works without Sign in. Override is browser-local and requires `FLAGS_SECRET` on the project.
+Vercel Toolbar → Flags / Flags Explorer override for `interactive-redesign` still works without Sign in, in every environment. Override is browser-local and requires `FLAGS_SECRET` on the project.
 
 ## Code map
 
@@ -54,8 +58,8 @@ Vercel Toolbar → Flags / Flags Explorer override for `interactive-redesign` st
 | Session cookie sign/verify | `apps/web/src/auth/vercel/session.ts` |
 | Authorize (PKCE) | `apps/web/src/app/api/auth/vercel/route.ts` |
 | Callback | `apps/web/src/app/api/auth/vercel/callback/route.ts` |
-| Logout | `apps/web/src/app/api/auth/vercel/logout/route.ts` |
-| Dev-console UI | `apps/web/src/app/dev-console/vercel/VercelSignInCard.tsx` |
+| Sign out (Server Action) | `apps/web/src/auth/vercel/session.actions.ts` |
+| Dev-console UI | `apps/web/src/app/(classic)/dev-console/vercel/VercelSignInCard.tsx` |
 | Basic Auth on `/dev-console` | `apps/web/src/proxy.ts` |
 | Env key list | `config/env.secrets.keys` |
 | Flags discovery | `apps/web/src/app/.well-known/vercel/flags/route.ts` |

@@ -1,9 +1,9 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
+import { Box } from '@dg/ui/core/Box';
 import { GlassContainer } from '@dg/ui/core/GlassContainer';
 import { Image } from '@dg/ui/dependent/Image';
 import { MAP_MARKER_IMAGE_SIZE } from '@dg/ui/helpers/imageSizes';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 
 const DIMENSION = 100;
 const IMAGE_DIMENSION = MAP_MARKER_IMAGE_SIZE;

@@ -1,9 +1,10 @@
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import { StravaRouteMap } from '@dg/maps/StravaRouteMap';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import { Stack } from '@dg/ui/core/Stack';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Stack } from '@mui/material';
 import { PaperCard } from '../collage/PaperCard';
 import { ActivityDescription } from '../strava/ActivityDescription';
 import { ActivityName } from '../strava/ActivityName';

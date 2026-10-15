@@ -3,7 +3,7 @@
  */
 
 jest.mock('@flags-sdk/vercel', () => ({
-  vercelAdapter: {},
+  vercelAdapter: () => ({ decide: () => false }),
 }));
 
 jest.mock('flags/next', () => ({

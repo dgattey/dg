@@ -1,4 +1,4 @@
-import { Typography } from '@mui/material';
+import { Typography } from '@dg/ui/core/Typography';
 
 export function TokenExpiry({ expiresAt }: { expiresAt: Date | null }) {
   if (!expiresAt) {

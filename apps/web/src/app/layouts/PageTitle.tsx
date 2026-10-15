@@ -1,6 +1,6 @@
+import { Typography } from '@dg/ui/core/Typography';
 import { PAGE_TITLE_VIEW_TRANSITION_NAME } from '@dg/ui/core/transitions/pageTransitions';
 import type { SxObject } from '@dg/ui/theme';
-import { Typography } from '@mui/material';
 
 const titleSx: SxObject = {
   marginBottom: 3,

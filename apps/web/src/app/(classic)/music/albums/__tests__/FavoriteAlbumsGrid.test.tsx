@@ -10,6 +10,10 @@ jest.mock('next/navigation', () => ({
   useSearchParams: jest.fn(),
 }));
 
+jest.mock('../../../../../services/albumDetail.actions', () => ({
+  loadAlbumDetail: jest.fn().mockResolvedValue(null),
+}));
+
 const push = jest.fn();
 
 /** Points the mocked router hooks at a query, as the URL would after a nav. */
@@ -114,7 +118,7 @@ describe('FavoriteAlbumsGrid', () => {
     render(<FavoriteAlbumsGrid albums={albums} />);
 
     expect(screen.queryByRole('link', { name: 'Zebra' })).not.toBeInTheDocument();
-    expect(document.querySelectorAll('.MuiSkeleton-root').length).toBe(1);
+    expect(document.querySelectorAll('[data-skeleton]').length).toBe(1);
   });
 
   it('reveals albums after view-transition animations finish', async () => {
@@ -153,6 +157,41 @@ describe('FavoriteAlbumsGrid', () => {
       (link) => link.querySelectorAll('img').length,
     );
     expect(coversPerCell).toEqual([3, 3, 3]);
+  });
+
+  it('loads the collage first mobile screen eagerly at high priority', () => {
+    const fiveAlbums = [
+      ...albums,
+      ...albums.slice(0, 2).map((album) => ({
+        ...album,
+        addedAt: album.addedAt.replace('2026', '2025'),
+        id: `${album.id}-again`,
+      })),
+    ];
+    const { container } = render(<FavoriteAlbumsGrid albums={fiveAlbums} surface="collage" />);
+
+    const cellPriorities = [...container.querySelectorAll('a')].map((link) => {
+      const priorities = [...link.querySelectorAll('img')].map(
+        (image) =>
+          `${image.getAttribute('loading')}/${image.getAttribute('fetchpriority') ?? 'auto'}`,
+      );
+      return priorities.join(',');
+    });
+    expect(cellPriorities).toEqual([
+      'lazy/auto,lazy/auto,eager/high',
+      'lazy/auto,lazy/auto,eager/high',
+      'lazy/auto,lazy/auto,eager/high',
+      'lazy/auto,lazy/auto,eager/high',
+      'lazy/auto,lazy/auto,lazy/auto',
+    ]);
+  });
+
+  it('leaves classic covers lazy', () => {
+    const { container } = render(<FavoriteAlbumsGrid albums={albums} />);
+
+    const images = [...container.querySelectorAll('img')];
+    expect(images.every((image) => image.getAttribute('loading') === 'lazy')).toBe(true);
+    expect(images.some((image) => image.hasAttribute('fetchpriority'))).toBe(false);
   });
 
   it('expands the URL album while preserving its sleeved close socket', () => {
@@ -248,7 +287,7 @@ describe('FavoriteAlbumsGrid', () => {
 
     expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
     expect(screen.queryByText('zebra tracklist')).not.toBeInTheDocument();
-    expect(view.container.querySelectorAll('.MuiSkeleton-root').length).toBeGreaterThan(0);
+    expect(view.container.querySelectorAll('[data-skeleton]').length).toBeGreaterThan(0);
     await waitFor(() => {
       expect(push).toHaveBeenCalledWith(
         '/music/albums?album=album-mango',

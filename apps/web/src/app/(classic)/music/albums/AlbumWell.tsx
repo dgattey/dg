@@ -2,18 +2,20 @@
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import { Typography } from '@dg/ui/core/Typography';
 import { albumArtViewTransitionName } from '@dg/ui/core/transitions/pageTransitions';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_DEFAULT, TIMING_MEDIUM } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Typography } from '@mui/material';
 import type { ReactNode, TransitionEvent } from 'react';
 import { useLayoutEffect, useRef, useState, ViewTransition } from 'react';
 import { ALBUM_DETAIL_BACKDROP } from '../../../collage/backdrops';
 import { BackdropLayer } from '../../../collage/CollageBackdrop';
 import { PaperCard } from '../../../collage/PaperCard';
 import { PaperTag } from '../../../collage/PaperTag';
+import type { PaperTone } from '../../../collage/types';
 import {
   ALBUM_WELL_ART_SIZE_XS,
   ALBUM_WELL_NAME_GAP,
@@ -23,6 +25,11 @@ import {
 } from './albumWellStyles';
 
 const WELL_ART_SIZE = 220;
+
+const CLASSIC_WELL_ART_SIZES = { extraLarge: WELL_ART_SIZE, medium: WELL_ART_SIZE, tiny: 160 };
+
+/** The collage well art is 220px through its 820px stack and up to 300px beside the tracklist. */
+const COLLAGE_WELL_ART_SIZES = { extraLarge: 300, large: 300, medium: 300, small: 220, tiny: 220 };
 
 const REDUCED_MOTION = '@media (prefers-reduced-motion: reduce)';
 
@@ -168,6 +175,8 @@ type Props = {
   /** Streamed detail: artist links, meta, and the tracklist. */
   children?: ReactNode;
   surface?: SiteSurface;
+  /** Collage only: the paper of the card that opened this well, so the two read as one. */
+  tone?: PaperTone;
 };
 
 /**
@@ -184,7 +193,7 @@ type Props = {
  * at the outgoing height until the arriving tracklist replaces the placeholder,
  * so that swap costs the page no layout at all. See `reserveSx`.
  */
-export function AlbumWell({ album, children, surface = 'classic' }: Props) {
+export function AlbumWell({ album, children, surface = 'classic', tone = 'viridian' }: Props) {
   const measureRef = useRef<HTMLDivElement>(null);
   const lastHeightRef = useRef<number | null>(null);
   const [heightPx, setHeightPx] = useState<number | null>(null);
@@ -264,8 +273,10 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
         >
           <Image
             alt={album.name}
+            fetchPriority={isCollage ? 'high' : undefined}
             height={WELL_ART_SIZE}
-            sizes={{ extraLarge: WELL_ART_SIZE, medium: WELL_ART_SIZE, tiny: 160 }}
+            preload={isCollage}
+            sizes={isCollage ? COLLAGE_WELL_ART_SIZES : CLASSIC_WELL_ART_SIZES}
             url={album.imageUrl}
             width={WELL_ART_SIZE}
           />
@@ -334,7 +345,7 @@ export function AlbumWell({ album, children, surface = 'classic' }: Props) {
             edge="soft-a"
             innerClassName="music__wellInner"
             tiltDeg={-0.7}
-            tone="viridian"
+            tone={tone}
           >
             {well}
           </PaperCard>

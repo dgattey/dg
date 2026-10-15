@@ -4,7 +4,13 @@ import { ALBUM_PARAM, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import { albumTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { useRouter, useSearchParams } from 'next/navigation';
 import type { MouseEvent } from 'react';
-import { addTransitionType, startTransition, useEffect, useState } from 'react';
+import {
+  addTransitionType,
+  startTransition,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 
 /**
  * A click the URL has not caught up with yet. `fromAlbumId` records the
@@ -12,10 +18,49 @@ import { addTransitionType, startTransition, useEffect, useState } from 'react';
  * navigation landing, back/forward, a link from elsewhere — retires it rather
  * than letting a guess outlive the click that made it.
  */
-type PendingSelection = {
+export type PendingSelection = {
   albumId: string | null;
   fromAlbumId: string | null;
 };
+
+/** The album in the URL. Reading it during prerender postpones the caller. */
+export function useUrlAlbumId() {
+  return useSearchParams().get(ALBUM_PARAM);
+}
+
+/**
+ * The server never reads the query for the grid, so the grid can prerender
+ * into the static shell instead of postponing whole. Each environment always
+ * makes the same hook calls, which is all hook order requires.
+ */
+const useClientUrlAlbumId: () => string | null =
+  typeof window === 'undefined' ? () => null : useUrlAlbumId;
+
+const subscribeToNothing = () => () => {};
+const isPastHydration = () => true;
+const isServerOrHydrating = () => false;
+
+/**
+ * The album in the URL as the static grid may render it: none on the server
+ * and through hydration (matching the prerendered tiles), the URL's from the
+ * commit after.
+ */
+function useHydratedUrlAlbumId() {
+  const urlAlbumId = useClientUrlAlbumId();
+  const hydrated = useSyncExternalStore(subscribeToNothing, isPastHydration, isServerOrHydrating);
+  return hydrated ? urlAlbumId : null;
+}
+
+/** What the well shows: a live click's guess, else the URL. */
+export function resolveAlbumSelection(pending: PendingSelection | null, urlAlbumId: string | null) {
+  const liveGuess = pending && pending.fromAlbumId === urlAlbumId ? pending : null;
+  const selectedAlbumId = liveGuess ? liveGuess.albumId : urlAlbumId;
+  return {
+    /** True while the well is open for an album the streamed detail isn't for. */
+    isAwaitingDetail: selectedAlbumId !== urlAlbumId,
+    selectedAlbumId,
+  };
+}
 
 /** A left click with no modifiers, i.e. one the browser would navigate for. */
 function isPlainNavigationClick(event: MouseEvent<HTMLElement>) {
@@ -65,7 +110,7 @@ function albumsRouteAnchor(event: MouseEvent<HTMLElement>) {
  */
 export function useOptimisticAlbumSelection() {
   const router = useRouter();
-  const urlAlbumId = useSearchParams().get(ALBUM_PARAM);
+  const urlAlbumId = useHydratedUrlAlbumId();
   const [pending, setPending] = useState<PendingSelection | null>(null);
 
   // Retire the guess whenever the URL moves — including when the navigation we
@@ -77,9 +122,6 @@ export function useOptimisticAlbumSelection() {
     // urlAlbumId is the trigger; the updater ignores the value on purpose.
     void urlAlbumId;
   }, [urlAlbumId]);
-
-  const liveGuess = pending && pending.fromAlbumId === urlAlbumId ? pending : null;
-  const selectedAlbumId = liveGuess ? liveGuess.albumId : urlAlbumId;
 
   /**
    * Capture-phase handler for the grid: opens or closes the well in an
@@ -125,9 +167,8 @@ export function useOptimisticAlbumSelection() {
   };
 
   return {
-    /** True while the well is open for an album the streamed detail isn't for. */
-    isAwaitingDetail: selectedAlbumId !== urlAlbumId,
     onAlbumNavigationCapture,
-    selectedAlbumId,
+    pending,
+    selectedAlbumId: resolveAlbumSelection(pending, urlAlbumId).selectedAlbumId,
   };
 }

@@ -1,4 +1,5 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
 import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
@@ -7,11 +8,11 @@ import {
   SITE_HEADER_VIEW_TRANSITION_NAME,
 } from '@dg/ui/core/transitions/pageTransitions';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { Suspense } from 'react';
-import { getLatestSong } from '../../services/spotify';
+import { getLastKnownSong, getLatestSong } from '../../services/spotify';
 import { CollageColorSchemeFieldset } from '../collage/CollageColorSchemeFieldset';
 import { PaperCard } from '../collage/PaperCard';
+import { PublishNowPlaying } from '../spotify/NowPlayingContext';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
 import { CollageMusicLinks } from './CollageMusicLinks';
 import { HeaderControls } from './HeaderControls';
@@ -44,21 +45,28 @@ const glassContainerSx: SxObject = {
 };
 
 /**
- * Async slot for Spotify header card. Fetches track data server-side.
- * Wrapped in Suspense because getLatestSong accesses runtime data (cookies).
+ * Header card from the last-known song, so the prerendered shell
+ * already holds the card's final box instead of it streaming in and pushing
+ * the header taller.
  */
-async function SpotifyHeaderCardSlot({ surface }: { surface: SiteSurface }) {
-  const track = await getLatestSong();
+async function LastKnownSpotifyHeaderCard({ surface = 'collage' }: { surface?: SiteSurface }) {
+  const track = await getLastKnownSong();
   if (!track) {
     return null;
   }
   return <SpotifyHeaderCard surface={surface} track={track} />;
 }
 
+/** Streams the live song in and publishes it to the shell's header and body cards. */
+async function LiveNowPlaying() {
+  const track = await getLatestSong();
+  return track ? <PublishNowPlaying track={track} /> : null;
+}
+
 /**
  * Creates the site header component with glass background behind logo + music.
  * Logo and header controls are server-rendered immediately.
- * Music card streams in via Suspense to avoid blocking.
+ * Both surfaces prerender the last-known song and stream only the live update.
  */
 export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
   if (surface === 'collage') {
@@ -72,8 +80,9 @@ export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
             </div>
           </PaperCard>
           <div className="chrome__nowPlaying">
+            <LastKnownSpotifyHeaderCard surface="collage" />
             <Suspense fallback={null}>
-              <SpotifyHeaderCardSlot surface="collage" />
+              <LiveNowPlaying />
             </Suspense>
           </div>
           <div className="chrome__spacer" />
@@ -95,8 +104,9 @@ export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
             <NavItem variant="body2">
               <MouseAwareGlassContainer sx={glassContainerSx}>
                 <Logo />
+                <LastKnownSpotifyHeaderCard surface="classic" />
                 <Suspense fallback={null}>
-                  <SpotifyHeaderCardSlot surface="classic" />
+                  <LiveNowPlaying />
                 </Suspense>
               </MouseAwareGlassContainer>
             </NavItem>

@@ -3,15 +3,16 @@
 import type { Track } from '@dg/content-models/spotify/Track';
 import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { createTransition, TIMING_MEDIUM, TIMING_NORMAL, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
-import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
 import { usePageScrollProgress } from '../layouts/PageScrollContext';
+import { usePublicPathname } from '../layouts/usePublicPathname';
+import { useNowPlaying } from './NowPlayingContext';
 import { NOW_PLAYING_CARD_ID } from './SpotifyCardScrollTracker';
 import { TrackListing } from './TrackListing';
 
@@ -73,7 +74,8 @@ const musicLinkSx: SxObject = {
 
 type SpotifyHeaderCardProps = {
   surface?: SiteSurface;
-  track: Track;
+  /** Server track; the newest published one wins. Null renders nothing until one is published. */
+  track: Track | null;
 };
 
 function scrollToNowPlayingCard() {
@@ -86,8 +88,16 @@ function scrollToNowPlayingCard() {
  * Off-home (and not already on music) navigates to listening history.
  * Track display is delegated to TrackListing variant="compact".
  */
-export function SpotifyHeaderCard({ surface = 'classic', track }: SpotifyHeaderCardProps) {
-  const pathname = usePathname();
+export function SpotifyHeaderCard({
+  surface = 'classic',
+  track: serverTrack,
+}: SpotifyHeaderCardProps) {
+  const track = useNowPlaying(serverTrack);
+  return track ? <DockedHeaderCard surface={surface} track={track} /> : null;
+}
+
+function DockedHeaderCard({ surface, track }: { surface: SiteSurface; track: Track }) {
+  const pathname = usePublicPathname();
   const scrollContext = usePageScrollProgress();
   const isHome = pathname === homeRoute;
   const isMusic = pathname === musicRoute;
@@ -117,6 +127,7 @@ export function SpotifyHeaderCard({ surface = 'classic', track }: SpotifyHeaderC
     <TrackListing
       disableLinks={isHome || opensMusicPage}
       shouldAnimate={isInViewport}
+      surface={surface}
       track={track}
       variant="compact"
     />

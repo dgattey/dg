@@ -37,8 +37,24 @@ export function redesignRewritePath(pathname: string): string {
   return `${redesignRoutePrefix}${pathname}`;
 }
 
+/** No page route has a file extension; these are assets, handlers, or bot probes. */
+const FILE_LIKE_PATH = /\.[^/]+$/;
+
+/**
+ * Paths that never render a page, so the proxy can skip the Flag Request a
+ * collage decision costs. On Vercel, Web Analytics and Speed Insights load
+ * scripts and post beacons under the observability base path, which the proxy
+ * matcher can't exclude because the path is per-project.
+ */
 export function shouldSkipRedesignRewrite(pathname: string): boolean {
-  return REDESIGN_SKIP_PREFIXES.some(
-    (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+  const observabilityBasePath = process.env.NEXT_PUBLIC_VERCEL_OBSERVABILITY_BASEPATH;
+  return (
+    FILE_LIKE_PATH.test(pathname) ||
+    (observabilityBasePath !== undefined &&
+      observabilityBasePath !== '' &&
+      pathname.startsWith(`${observabilityBasePath}/`)) ||
+    REDESIGN_SKIP_PREFIXES.some(
+      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`),
+    )
   );
 }

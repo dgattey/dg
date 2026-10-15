@@ -1,7 +1,5 @@
-'use client';
-
+import { Box } from '@dg/ui/core/Box';
 import { Image } from '@dg/ui/dependent/Image';
-import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import {
   ALBUM_TILE_ART_SIZE,
@@ -21,19 +19,31 @@ type Props = {
   sleeveCount: number;
   /** Pinned inside the cover and clipped by it, e.g. the play-count chip. */
   children?: ReactNode;
+  /** Loads eagerly at high priority, for the cover that paints as the page's LCP. */
+  isLcpCandidate?: boolean;
 };
 
 /**
  * One album cover, the piece every music grid cell is built from. Covers
  * behind the front carry a scrim of page background so the fan recedes.
  */
-export function AlbumCover({ imageUrl, alt, depth, sleeveCount, children }: Props) {
+export function AlbumCover({
+  imageUrl,
+  alt,
+  depth,
+  sleeveCount,
+  children,
+  isLcpCandidate = false,
+}: Props) {
+  const isEagerFrontCover = isLcpCandidate && depth === 0;
   return (
     <Box aria-hidden={depth > 0 || undefined} sx={albumCoverSx(depth, sleeveCount)}>
       <Image
         alt={alt}
+        fetchPriority={isEagerFrontCover ? 'high' : undefined}
         fill={true}
         height={ALBUM_TILE_ART_SIZE}
+        loading={isEagerFrontCover ? 'eager' : undefined}
         sizes={ALBUM_TILE_ART_SIZES}
         url={imageUrl}
         width={ALBUM_TILE_ART_SIZE}

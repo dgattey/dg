@@ -1,7 +1,7 @@
+import { Typography } from '@dg/ui/core/Typography';
 import { Link } from '@dg/ui/dependent/Link';
 import { truncated } from '@dg/ui/helpers/truncated';
 import type { SxObject } from '@dg/ui/theme';
-import { Typography } from '@mui/material';
 
 type ListingVariant = 'card' | 'compact';
 

@@ -1,10 +1,10 @@
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import { formattedDistance } from '@dg/shared-core/formatting/formattedDistance';
 import { RelativeTime } from '@dg/ui/core/RelativeTime';
-import { FaIcon } from '@dg/ui/icons/FaIcon';
+import { Stack } from '@dg/ui/core/Stack';
+import { Typography } from '@dg/ui/core/Typography';
+import { FaIcon, faStrava } from '@dg/ui/icons/FaIcon';
 import type { SxObject } from '@dg/ui/theme';
-import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
-import { Stack, Typography } from '@mui/material';
 
 const layoutSx: SxObject = {
   gap: 1,

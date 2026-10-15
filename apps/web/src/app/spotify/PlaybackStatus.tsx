@@ -1,9 +1,10 @@
 'use client';
 
 import type { Track } from '@dg/content-models/spotify/Track';
+import { Box } from '@dg/ui/core/Box';
 import { RelativeTime } from '@dg/ui/core/RelativeTime';
+import { Typography } from '@dg/ui/core/Typography';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Typography } from '@mui/material';
 import { Music } from 'lucide-react';
 import { useWaveformBounce } from './useWaveformBounce';
 

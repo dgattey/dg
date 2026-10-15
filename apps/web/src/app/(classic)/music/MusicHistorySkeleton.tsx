@@ -1,6 +1,8 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import { Skeleton } from '@dg/ui/core/Skeleton';
+import { Stack } from '@dg/ui/core/Stack';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Skeleton, Stack } from '@mui/material';
 import { CollageHistorySkeleton } from './albums/collageAlbumCardTreatments';
 import { albumGridSx, albumTileFrameSx, albumTileSkeletonSx } from './albumTileGeometry';
 

@@ -1,7 +1,7 @@
 'use client';
 
+import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, keyframes } from '@mui/material';
 import { Music, Music2, Music3, Music4 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
@@ -46,29 +46,30 @@ const COMPACT = {
   scaleRange: 0.3,
 };
 
-// GPU-accelerated float animation for notes
-const floatAndFade = keyframes`
-  0% {
-    opacity: 0;
-    transform: translate3d(-50%, -50%, 0) scale3d(var(--note-scale), var(--note-scale), 1) rotate(0deg);
-  }
-  8% {
-    opacity: 0.75;
-    transform: translate3d(calc(-50% + var(--note-x) * 0.08), calc(-50% + var(--note-y) * 0.08), 0) scale3d(var(--note-scale), var(--note-scale), 1) rotate(calc(var(--note-rotation) * 0.08));
-  }
-  50% {
-    opacity: 0.5;
-  }
-  80% {
-    opacity: 0.25;
-  }
-  100% {
-    opacity: 0;
-    transform: translate3d(calc(-50% + var(--note-x)), calc(-50% + var(--note-y)), 0) scale3d(calc(var(--note-scale) * 0.7), calc(var(--note-scale) * 0.7), 1) rotate(var(--note-rotation));
-  }
-`;
-
 const notesContainerSx: SxObject = {
+  '@keyframes musicNoteFloatAndFade': {
+    '0%': {
+      opacity: 0,
+      transform:
+        'translate3d(-50%, -50%, 0) scale3d(var(--note-scale), var(--note-scale), 1) rotate(0deg)',
+    },
+    '8%': {
+      opacity: 0.75,
+      transform:
+        'translate3d(calc(-50% + var(--note-x) * 0.08), calc(-50% + var(--note-y) * 0.08), 0) scale3d(var(--note-scale), var(--note-scale), 1) rotate(calc(var(--note-rotation) * 0.08))',
+    },
+    '50%': {
+      opacity: 0.5,
+    },
+    '80%': {
+      opacity: 0.25,
+    },
+    '100%': {
+      opacity: 0,
+      transform:
+        'translate3d(calc(-50% + var(--note-x)), calc(-50% + var(--note-y)), 0) scale3d(calc(var(--note-scale) * 0.7), calc(var(--note-scale) * 0.7), 1) rotate(var(--note-rotation))',
+    },
+  },
   backfaceVisibility: 'hidden',
   height: 0,
   left: 0,
@@ -84,7 +85,7 @@ const getNoteSx = (note: MusicNote, noteColor?: string): SxObject => ({
   '--note-scale': note.scale,
   '--note-x': `${Math.cos((note.angle * Math.PI) / 180) * note.distance}px`,
   '--note-y': `${Math.sin((note.angle * Math.PI) / 180) * note.distance}px`,
-  animation: `${floatAndFade} ${note.duration}ms ease-out forwards`,
+  animation: `musicNoteFloatAndFade ${note.duration}ms ease-out forwards`,
   animationDelay: `${note.delay}ms`,
   backfaceVisibility: 'hidden',
   color: noteColor ?? 'currentColor',

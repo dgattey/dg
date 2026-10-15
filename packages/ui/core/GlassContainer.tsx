@@ -1,10 +1,10 @@
-import type { BoxProps } from '@mui/material';
-import { Box } from '@mui/material';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
 import type { SxObject } from '../theme';
 import { getShape } from '../theme/shape';
+import { Box, type BoxProps } from './Box';
 
-export interface GlassContainerProps extends Omit<BoxProps, 'sx'> {
+export interface GlassContainerProps extends Omit<BoxProps, 'component' | 'sx'> {
+  component?: React.ElementType;
   /**
    * Additional styling to apply to the container
    */

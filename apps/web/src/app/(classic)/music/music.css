@@ -1,5 +1,15 @@
 /* Shared album + history tiles, layouts, grids, states, and album well */
 
+.collageRoot .music__card a:focus-visible {
+  outline: none;
+}
+.collageRoot .music__card:has(a:focus-visible) {
+  /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+  border-radius: 14px;
+}
+
 .music__albumsLayout,
 .music__historyLayout {
   display: grid;
@@ -83,10 +93,6 @@
   padding: 10px 10px 16px;
   overflow: clip;
 }
-/* The tooltip anchor shrink-wraps by default, which sized art to its caption length. */
-.music__cardInner > span {
-  display: grid;
-}
 .music__albumLink {
   display: grid;
   grid-template-rows: auto auto;
@@ -106,13 +112,28 @@
   border-radius: 8px;
   rotate: 1.5deg;
 }
+.music__skeleton {
+  display: block;
+  background-color: color-mix(in srgb, CanvasText 12%, transparent);
+  animation: music__skeletonPulse 2s ease-in-out 0.5s infinite;
+}
+.music__skeletonText {
+  border-radius: 4px / 6.7px;
+  transform: scale(1, 0.6);
+  transform-origin: 0 55%;
+}
+.music__skeletonText:empty::before {
+  content: "\00a0";
+}
+@keyframes music__skeletonPulse {
+  50% {
+    opacity: 0.4;
+  }
+}
 .music__fullColorArt,
 .music__fullColorArt img {
   background: transparent;
   mix-blend-mode: normal;
-}
-.music__fullColorArt.music__fullColorArt img {
-  filter: none;
 }
 .music__caption {
   position: relative;
@@ -267,7 +288,10 @@ html:active-view-transition-type(album-open) .music__wellCard {
   column-gap: 36px;
   align-content: start;
   padding: 36px 40px 40px;
-  color: var(--cream);
+  color: var(--on);
+}
+.music__wellShell :is(h2, h3, p) {
+  margin: 0;
 }
 .music__wellShell a {
   color: inherit;
@@ -292,26 +316,33 @@ html:active-view-transition-type(album-open) .music__wellCard {
   width: 100%;
   height: auto;
 }
+.music__fullColorArt.music__fullColorArt img {
+  filter: none;
+}
 .music__wellName {
   grid-area: name;
   min-width: 0;
   font-family: var(--display);
-  font-size: clamp(36px, 4vw, 56px);
+  font-size: clamp(44px, 5.4vw, 80px);
   font-weight: 700;
-  line-height: 0.95;
-  letter-spacing: -0.03em;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
 }
+/* The shared Link sets body1 type, which would shrink the title back to body size. */
 .music__wellName a {
   min-width: 0;
-  line-height: inherit;
+  font: inherit;
+  letter-spacing: inherit;
   overflow-wrap: anywhere;
 }
 .music__wellMeta {
   display: grid;
   grid-area: meta;
-  row-gap: 6px;
+  row-gap: 12px;
+  align-content: start;
   min-width: 0;
-  margin-top: 10px;
+  margin-top: 14px;
 }
 .music__wellArtists {
   display: block;
@@ -319,14 +350,15 @@ html:active-view-transition-type(album-open) .music__wellCard {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 700;
+  line-height: 1.25;
   color: inherit;
   white-space: nowrap;
 }
 .music__wellFacts {
   display: grid;
-  row-gap: 14px;
+  row-gap: 10px;
   align-items: start;
   color: inherit;
   text-transform: uppercase;
@@ -348,12 +380,12 @@ html:active-view-transition-type(album-open) .music__wellCard {
   width: 100%;
   height: 10px;
   overflow: hidden;
-  background-color: var(--cream);
+  background-color: color-mix(in oklab, var(--on) 24%, var(--pc));
   clip-path: var(--quad-c);
 }
 .music__wellPopularityFill {
   height: 100%;
-  background-color: var(--ochre);
+  background-color: var(--on);
 }
 .music__wellTracks {
   column-count: 2;
@@ -372,7 +404,7 @@ html:active-view-transition-type(album-open) .music__wellCard {
   column-gap: 10px;
   align-items: center;
   padding-block: 6px;
-  border-bottom: 1px solid color-mix(in oklab, var(--cream) 28%, var(--viridian));
+  border-bottom: 1px solid color-mix(in oklab, var(--on) 28%, var(--pc));
   break-inside: avoid;
 }
 .music__wellTrackTitle {
@@ -472,10 +504,6 @@ html:active-view-transition-type(album-open) .music__wellCard {
     position: static;
     top: auto;
     padding-block-end: 0;
-  }
-  .music__dateBar > [data-sticky-surface],
-  .music__dateBar > [data-sticky-fade] {
-    display: none;
   }
   .music__dateTag {
     padding: 5px 12px 7px;

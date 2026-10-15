@@ -4,7 +4,6 @@ import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import type { LucideIcon } from 'lucide-react';
 import { ChevronDown, DiscAlbum, History } from 'lucide-react';
-import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { cx, paperSurfaceVars } from '../collage/paperVars';
@@ -13,6 +12,7 @@ import {
   MUSIC_DESTINATIONS,
   normalizeMusicPath,
 } from './musicHeaderDestinations';
+import { usePublicPathname } from './usePublicPathname';
 
 const DESTINATION_ICONS: Record<string, LucideIcon> = {
   [favoriteAlbumsRoute]: DiscAlbum,
@@ -25,7 +25,7 @@ const DESTINATION_ICONS: Record<string, LucideIcon> = {
  * Keying on the path remounts it closed after every navigation.
  */
 export function CollageMusicLinks() {
-  const pathname = normalizeMusicPath(usePathname());
+  const pathname = normalizeMusicPath(usePublicPathname());
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const onMusicPage = isMusicDestinationPath(pathname);
 

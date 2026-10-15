@@ -1,6 +1,4 @@
-'use client';
-
-import { Box } from '@mui/material';
+import { Box } from '@dg/ui/core/Box';
 import type { ReactNode } from 'react';
 import { AlbumCover } from './AlbumCover';
 import { albumTileFrameSx } from './albumTileGeometry';
@@ -12,6 +10,8 @@ type Props = {
   sleeveCount: number;
   /** The front of the stack: a cover, or the socket left when art is away. */
   children: ReactNode;
+  /** The sleeves share the front cover's request, and any of them can be the painted LCP. */
+  isLcpCandidate?: boolean;
 };
 
 /**
@@ -23,7 +23,7 @@ type Props = {
  * transition that morphs into the album well. Sleeves never take a transition
  * name, so a morph lifts only the front cover and the fan stays where it is.
  */
-export function AlbumStack({ imageUrl, sleeveCount, children }: Props) {
+export function AlbumStack({ imageUrl, sleeveCount, children, isLcpCandidate = false }: Props) {
   // Back to front, so the front cover paints last and sits on top.
   const sleeveDepths = Array.from({ length: sleeveCount }, (_, index) => sleeveCount - index);
 
@@ -34,6 +34,7 @@ export function AlbumStack({ imageUrl, sleeveCount, children }: Props) {
           alt=""
           depth={depth}
           imageUrl={imageUrl}
+          isLcpCandidate={isLcpCandidate}
           key={depth}
           sleeveCount={sleeveCount}
         />

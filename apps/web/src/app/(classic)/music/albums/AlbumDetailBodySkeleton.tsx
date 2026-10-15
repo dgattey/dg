@@ -1,6 +1,7 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import { Skeleton } from '@dg/ui/core/Skeleton';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Skeleton } from '@mui/material';
 import {
   ALBUM_WELL_TRACK_COLUMN_GAP,
   ALBUM_WELL_TRACK_NUMBER_COLUMN,
@@ -20,7 +21,7 @@ const rowSx: SxObject = {
 const collageMetaRowSx: SxObject = { gridArea: 'meta', mt: '10px' };
 const collageMetaTextSx: SxObject = { display: 'grid', minWidth: 0, rowGap: '6px' };
 const collageRowSx: SxObject = {
-  borderBottom: '1px solid color-mix(in oklab, var(--cream) 28%, var(--viridian))',
+  borderBottom: '1px solid color-mix(in oklab, var(--on) 28%, var(--pc))',
   columnGap: '10px',
   display: 'grid',
   gridTemplateColumns: `${ALBUM_WELL_TRACK_NUMBER_COLUMN} minmax(0, 1fr)`,

@@ -1,8 +1,8 @@
 import type { Artist } from '@dg/content-models/spotify/Track';
+import { Typography } from '@dg/ui/core/Typography';
 import { Link } from '@dg/ui/dependent/Link';
 import { truncated } from '@dg/ui/helpers/truncated';
 import type { SxObject } from '@dg/ui/theme';
-import { Typography } from '@mui/material';
 import { Fragment } from 'react';
 
 type ListingVariant = 'card' | 'compact';
@@ -50,6 +50,8 @@ function getArtistListSx(
       ? {
           '& a': { color: 'inherit' },
           color,
+          // An explicit color is already tuned for contrast; fading it again washes it out.
+          opacity: 1,
         }
       : {}),
     ...(textShadow ? { textShadow } : {}),

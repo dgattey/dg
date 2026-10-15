@@ -1,10 +1,8 @@
-'use client';
-
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Tooltip } from '@dg/ui/core/Tooltip';
+import { Typography } from '@dg/ui/core/Typography';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
-import { Typography } from '@mui/material';
 import { PaperTag } from '../../collage/PaperTag';
 import { AlbumCover } from './AlbumCover';
 import { AlbumStack } from './AlbumStack';
@@ -36,6 +34,8 @@ type Props = {
   /** Names a single play, which a lone cover is labelled with. */
   trackName: string;
   cardIndex?: number;
+  /** Collage only: loads the front cover eagerly at high priority. */
+  isLcpCandidate?: boolean;
   surface?: SiteSurface;
 };
 
@@ -49,6 +49,7 @@ export function AlbumPlayTile({
   artistNames,
   cardIndex = 0,
   imageUrl,
+  isLcpCandidate = false,
   linkUrl,
   surface = 'classic',
   trackCount,
@@ -61,35 +62,43 @@ export function AlbumPlayTile({
     ? `${albumName} – ${artistNames}, ${countLabel}`
     : `${trackName} – ${artistNames}`;
   const title = isRun ? albumName : trackName;
-  const cover = (
-    <AlbumCover alt={albumName} depth={0} imageUrl={imageUrl} sleeveCount={sleeveCount} />
-  );
-
   if (surface === 'collage') {
+    const cover = (
+      <AlbumCover
+        alt={albumName}
+        depth={0}
+        imageUrl={imageUrl}
+        isLcpCandidate={isLcpCandidate}
+        sleeveCount={sleeveCount}
+      />
+    );
+
     return (
       <CollageAlbumPaper treatment={collageAlbumCardTreatment(cardIndex)}>
-        <Tooltip title={tooltip}>
-          <Link className="music__albumLink" href={linkUrl} isExternal={true} title={tooltip}>
-            <span className="music__art music__fullColorArt">
-              <AlbumStack imageUrl={imageUrl} sleeveCount={sleeveCount}>
-                {cover}
-              </AlbumStack>
-              {isRun ? (
-                <PaperTag
-                  className="music__countTag"
-                  tiltDeg={cardIndex % 2 === 0 ? 3 : -3}
-                  tone="ochre"
-                >
-                  {countLabel}
-                </PaperTag>
-              ) : null}
-            </span>
-            <span className="music__caption">
-              <strong className="music__albumName">{title}</strong>
-              <span className="music__artist">{artistNames}</span>
-            </span>
-          </Link>
-        </Tooltip>
+        <Link className="music__albumLink" href={linkUrl} isExternal={true}>
+          <span className="music__art music__fullColorArt">
+            <AlbumStack
+              imageUrl={imageUrl}
+              isLcpCandidate={isLcpCandidate}
+              sleeveCount={sleeveCount}
+            >
+              {cover}
+            </AlbumStack>
+            {isRun ? (
+              <PaperTag
+                className="music__countTag"
+                tiltDeg={cardIndex % 2 === 0 ? 3 : -3}
+                tone="ochre"
+              >
+                {countLabel}
+              </PaperTag>
+            ) : null}
+          </span>
+          <span className="music__caption">
+            <strong className="music__albumName">{title}</strong>
+            <span className="music__artist">{artistNames}</span>
+          </span>
+        </Link>
       </CollageAlbumPaper>
     );
   }

@@ -1,6 +1,3 @@
-'use client';
-
-import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
 import {
@@ -11,7 +8,9 @@ import {
   TIMING_NORMAL,
 } from '../helpers/timing';
 import type { SxObject } from '../theme';
+import { Box } from './Box';
 import { GlassContainer } from './GlassContainer';
+import { Typography } from './Typography';
 
 /** Shared geometry for header disclosures that hang under a trigger. */
 export const DISCLOSURE_ICON_SIZE = 22;

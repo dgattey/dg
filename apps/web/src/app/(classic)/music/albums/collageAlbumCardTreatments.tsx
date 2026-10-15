@@ -1,6 +1,5 @@
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
-import { Skeleton } from '@mui/material';
 import type { CSSProperties, ReactNode } from 'react';
 import { PaperCard } from '../../../collage/PaperCard';
 import { PaperTag } from '../../../collage/PaperTag';
@@ -83,13 +82,17 @@ export function CollageAlbumPaper({
   );
 }
 
+function SkeletonLine({ width }: { width: CSSProperties['width'] }) {
+  return <span className="music__skeleton music__skeletonText" style={{ width }} />;
+}
+
 function SkeletonFace() {
   return (
     <>
-      <Skeleton className="music__art" height="auto" variant="rectangular" />
+      <span className="music__skeleton music__art" />
       <div className="music__caption">
-        <Skeleton variant="text" width="82%" />
-        <Skeleton variant="text" width="58%" />
+        <SkeletonLine width="82%" />
+        <SkeletonLine width="58%" />
       </div>
     </>
   );
@@ -106,7 +109,7 @@ export function CollageSortSkeleton() {
           tiltDeg={sort.tiltDeg}
           tone={index === 0 ? 'black' : 'cream'}
         >
-          <Skeleton style={{ width: 74 }} variant="text" />
+          <SkeletonLine width={74} />
         </PaperTag>
       ))}
     </div>
@@ -166,7 +169,7 @@ export function CollageHistorySkeleton() {
               tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
               tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
             >
-              <Skeleton style={{ width: 120 }} variant="text" />
+              <SkeletonLine width={120} />
             </PaperTag>
           </StickyFadeBar>
           <div className="music__historySkeletonGrid">

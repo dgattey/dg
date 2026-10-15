@@ -1,7 +1,6 @@
-'use client';
-
 import { albumRoute, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import {
   albumArtViewTransitionName,
@@ -10,7 +9,6 @@ import {
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { X } from 'lucide-react';
 import { ViewTransition } from 'react';
 import { AlbumCover } from '../AlbumCover';
@@ -72,6 +70,8 @@ type Props = {
   tooltip: string;
   /** When true, keep the cell size but hide art (it lives in the well). */
   collapsed?: boolean;
+  /** Collage only: loads the covers eagerly at high priority. */
+  isLcpCandidate?: boolean;
 };
 
 function AlbumArtCover({
@@ -79,21 +79,37 @@ function AlbumArtCover({
   albumName,
   collapsed,
   imageUrl,
+  isLcpCandidate = false,
 }: {
   albumId: string;
   albumName: string;
   collapsed: boolean;
   imageUrl: string;
+  isLcpCandidate?: boolean;
 }) {
   if (collapsed) {
-    return <AlbumCover alt="" depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />;
+    return (
+      <AlbumCover
+        alt=""
+        depth={0}
+        imageUrl={imageUrl}
+        isLcpCandidate={isLcpCandidate}
+        sleeveCount={SLEEVE_COUNT}
+      />
+    );
   }
   return (
     // `default="none"` keeps this name off page-open/close. Without it
     // every cover enters during homepage → albums, and React snapshots
     // the whole grid as separate shared elements mid-flight.
     <ViewTransition default="none" name={albumArtViewTransitionName(albumId)} share="vt-album-art">
-      <AlbumCover alt={albumName} depth={0} imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT} />
+      <AlbumCover
+        alt={albumName}
+        depth={0}
+        imageUrl={imageUrl}
+        isLcpCandidate={isLcpCandidate}
+        sleeveCount={SLEEVE_COUNT}
+      />
     </ViewTransition>
   );
 }
@@ -112,40 +128,43 @@ export function FavoriteAlbumCell({
   surface = 'classic',
   tooltip,
   collapsed = false,
+  isLcpCandidate = false,
 }: Props) {
   if (surface === 'collage') {
     const href = collapsed ? favoriteAlbumsRoute : albumRoute(albumId);
-    const title = collapsed ? `Close ${albumName}` : albumName;
     return (
       <CollageAlbumPaper selected={collapsed} treatment={collageTreatment}>
-        <Tooltip title={collapsed ? `Close ${albumName}` : tooltip}>
-          <Link
-            className="music__albumLink"
-            href={href}
-            title={title}
-            transitionTypes={albumTransitionTypes(collapsed ? 'close' : 'open')}
-          >
-            <span className="music__art music__fullColorArt">
-              <AlbumStack imageUrl={imageUrl} sleeveCount={SLEEVE_COUNT}>
-                <AlbumArtCover
-                  albumId={albumId}
-                  albumName={albumName}
-                  collapsed={collapsed}
-                  imageUrl={imageUrl}
-                />
-                {collapsed ? (
-                  <i aria-hidden="true" className="music__closeMark">
-                    ×
-                  </i>
-                ) : null}
-              </AlbumStack>
-            </span>
-            <span className="music__caption">
-              <strong className="music__albumName">{albumName}</strong>
-              <span className="music__artist">{artistCaption}</span>
-            </span>
-          </Link>
-        </Tooltip>
+        <Link
+          className="music__albumLink"
+          href={href}
+          title={collapsed ? `Close ${albumName}` : undefined}
+          transitionTypes={albumTransitionTypes(collapsed ? 'close' : 'open')}
+        >
+          <span className="music__art music__fullColorArt">
+            <AlbumStack
+              imageUrl={imageUrl}
+              isLcpCandidate={isLcpCandidate}
+              sleeveCount={SLEEVE_COUNT}
+            >
+              <AlbumArtCover
+                albumId={albumId}
+                albumName={albumName}
+                collapsed={collapsed}
+                imageUrl={imageUrl}
+                isLcpCandidate={isLcpCandidate}
+              />
+              {collapsed ? (
+                <i aria-hidden="true" className="music__closeMark">
+                  ×
+                </i>
+              ) : null}
+            </AlbumStack>
+          </span>
+          <span className="music__caption">
+            <strong className="music__albumName">{albumName}</strong>
+            <span className="music__artist">{artistCaption}</span>
+          </span>
+        </Link>
       </CollageAlbumPaper>
     );
   }

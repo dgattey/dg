@@ -1,8 +1,9 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
 import { GlassContainer } from '@dg/ui/core/GlassContainer';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { Minus, Plus } from 'lucide-react';
+import type { MouseEvent } from 'react';
 
 type ZoomControlsProps = {
   onZoomIn: () => void;
@@ -55,6 +56,12 @@ const collageButtonSx: SxObject = {
   ':hover': {
     backgroundColor: 'color-mix(in srgb, var(--cream) 86%, var(--ochre))',
   },
+  // The quad clip-path cuts anything drawn outside the button, so the ring sits inside.
+  '&&:focus-visible': {
+    borderRadius: '9px 13px 10px 12px',
+    outline: '2px solid currentColor',
+    outlineOffset: '-3px',
+  },
   alignItems: 'center',
   backgroundColor: 'var(--cream)',
   border: 0,
@@ -70,7 +77,7 @@ const collageButtonSx: SxObject = {
   width: 28,
 };
 
-const stopPropagation = (e: React.MouseEvent) => {
+const stopPropagation = (e: MouseEvent) => {
   e.stopPropagation();
 };
 
