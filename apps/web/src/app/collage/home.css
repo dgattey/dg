@@ -92,23 +92,19 @@
   position: relative;
   z-index: 2;
   grid-area: map;
-  width: min(100%, 470px);
-  margin-top: 40px;
+  width: min(100%, 540px);
+  margin-top: 76px;
   margin-left: 8px;
 }
 .home__mapPaper {
   width: 100%;
 }
 .home__mapInner {
-  aspect-ratio: 2.3;
+  aspect-ratio: 2.04;
   overflow: clip;
 }
 .home__mapInner > * {
   height: 100%;
-}
-.home__mapTag {
-  bottom: -12px;
-  left: -10px;
 }
 
 .home__work {
@@ -380,13 +376,13 @@
   .home__portraitSlot {
     justify-self: center;
   }
-  .home__map {
+  .collageRoot .collageGridStack > .home__map {
     width: 100%;
-    margin-top: 28px;
+    margin-top: 20px;
     margin-left: 0;
   }
   .home__mapInner {
-    aspect-ratio: 1.5;
+    aspect-ratio: 1.15;
   }
   .home__stravaCopy {
     margin-top: 44px;
