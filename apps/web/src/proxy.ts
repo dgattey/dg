@@ -138,12 +138,14 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     /*
-     * Run on document navigations and `.md` twins. Skip Next/Vercel
-     * internals, API routes, and common static asset extensions.
+     * Run only on page paths and `.md` twins. Every match is a billed
+     * function invocation, even when the page itself is a CDN hit, so skip
+     * Next/Vercel internals, route handlers, social images, and any path with
+     * a file extension other than `.md` (assets and bot probes like `.php`).
      * Registered Markdown pages are filtered again in negotiateMarkdown,
      * so new public pages only need the shared registry — not this list.
      */
-    '/((?!_next/|_vercel/|api/|.*\\.(?:ico|png|jpg|jpeg|gif|svg|webp|txt|xml|webmanifest)$).*)',
+    '/((?!_next/|_vercel/|api/|\\.well-known/|llm-markdown/|(?:.*/)?(?:opengraph|twitter)-image|.*\\.(?!md$)[^/]+$).*)',
     '/dev-console/:path*',
   ],
 };
