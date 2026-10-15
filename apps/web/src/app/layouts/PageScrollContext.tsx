@@ -27,6 +27,8 @@ const PageScrollContext = createContext<PageScrollContextValue | null>(null);
 /**
  * Provider for scroll progress state. Must wrap both the header
  * (which reads scroll progress) and the content area (which writes it).
+ * The collage surface omits it, so its header pill stays shown and no scroll
+ * listener runs.
  */
 export function PageScrollProvider({ children }: { children: ReactNode }) {
   const [scrollProgress, setScrollProgress] = useState<number | null>(null);

@@ -83,8 +83,8 @@ function scrollToNowPlayingCard() {
 }
 
 /**
- * Docked Spotify card in the header. Manages scroll-based visibility,
- * viewport detection for animation pausing, and home-page scroll-to-card behavior.
+ * Docked Spotify card in the header. Under a PageScrollProvider (classic) it
+ * fades in once the page's now-playing card scrolls away; manages viewport detection for animation pausing, and home-page scroll-to-card behavior.
  * Off-home (and not already on music) navigates to listening history.
  * Track display is delegated to TrackListing variant="compact".
  */
@@ -102,8 +102,9 @@ function DockedHeaderCard({ surface, track }: { surface: SiteSurface; track: Tra
   const isHome = pathname === homeRoute;
   const isMusic = pathname === musicRoute;
   const opensMusicPage = !isHome && !isMusic;
-  // null = not measured yet; on home page stay hidden until measured, elsewhere show immediately
-  const scrollProgress = scrollContext?.scrollProgress ?? (isHome ? 0 : 1);
+  // No provider (collage) = always shown. null = not measured yet; on home page stay
+  // hidden until measured, elsewhere show immediately.
+  const scrollProgress = scrollContext ? (scrollContext.scrollProgress ?? (isHome ? 0 : 1)) : 1;
   const containerRef = useRef<HTMLDivElement>(null);
   const [isInViewport, setIsInViewport] = useState(true);
 
