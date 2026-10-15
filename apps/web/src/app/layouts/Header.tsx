@@ -74,12 +74,12 @@ export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
       <>
         <SiteHeaderHeight />
         <header className="collageMeasure chrome__header" data-sticky-header={true}>
-          <PaperCard className="chrome__logo" edge="quad-b" tiltDeg={-4} tone="ochre">
+          <PaperCard className="chrome__logo collageLift" edge="quad-b" tiltDeg={-4} tone="ochre">
             <div className="chrome__logoInner">
               <Logo surface="collage" />
             </div>
           </PaperCard>
-          <div className="chrome__nowPlaying">
+          <div className="chrome__nowPlaying collageLift">
             <LastKnownSpotifyHeaderCard surface="collage" />
             <Suspense fallback={null}>
               <LiveNowPlaying />

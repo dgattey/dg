@@ -47,6 +47,9 @@ html:has(.collageRoot) body {
   --pad: clamp(16px, 4vw, 80px);
   --measure: 1280px;
   --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.2)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.12));
+  /* Same two shadows as --dshadow, so the filter interpolates between them. */
+  --dshadow-lift: drop-shadow(0 3px 0 light-dark(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.4)))
+    drop-shadow(0 16px 22px light-dark(rgb(0 0 0 / 0.36), rgb(0 0 0 / 0.62)));
   --display: var(--font-familjen), "Avenir Next", "Helvetica Neue", system-ui, sans-serif;
   --body:
     system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, Cantarell,
@@ -243,6 +246,41 @@ html[data-color-scheme="dark"] .collageRoot::after {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
   border-radius: 14px;
+}
+/*
+ * Interactive paper lifts off the page on hover and keyboard focus. The deeper
+ * shadow reaches every piece inside through --dshadow and is not motion, so it
+ * stays under reduced motion; only the nudge and the easing drop out.
+ */
+.collageLift:is(:any-link, summary, :has(:any-link, button, [role="button"])):is(
+  :focus-visible,
+  :has(:focus-visible)
+) {
+  --dshadow: var(--dshadow-lift);
+}
+@media (hover: hover) {
+  .collageLift:is(:any-link, summary, :has(:any-link, button, [role="button"])):hover {
+    --dshadow: var(--dshadow-lift);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .collageLift,
+  .collageLift :is(.paperWrap, .paperTag, .print__frame) {
+    transition:
+      translate 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
+      filter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .collageLift:is(:any-link, summary, :has(:any-link, button, [role="button"])):is(
+    :focus-visible,
+    :has(:focus-visible)
+  ) {
+    translate: 0 -4px;
+  }
+}
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+  .collageLift:is(:any-link, summary, :has(:any-link, button, [role="button"])):hover {
+    translate: 0 -4px;
+  }
 }
 .paperButtonCurrent {
   color: light-dark(var(--cream), var(--ink-on-cream));

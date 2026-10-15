@@ -57,7 +57,7 @@ export function CollageMusicLinks() {
 
   return (
     <details className="chrome__music" key={pathname} ref={detailsRef}>
-      <summary className="chrome__musicSummary">
+      <summary className="chrome__musicSummary collageLift">
         <span className="paperWrap" style={paperSurfaceVars('cream', 'quad-c', -2)}>
           <span className={cx('paperButton', onMusicPage && 'paperButtonCurrent')}>
             Music
