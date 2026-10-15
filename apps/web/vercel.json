@@ -1,4 +1,18 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "cleanUrls": true
+  "cleanUrls": true,
+  "crons": [
+    {
+      "path": "/api/books/goodreads-sync",
+      "schedule": "0 9 * * *"
+    }
+  ],
+  "functions": {
+    "src/app/api/books/goodreads-sync/route.ts": {
+      "maxDuration": 60
+    },
+    "src/app/api/books/sync/route.ts": {
+      "maxDuration": 60
+    }
+  }
 }

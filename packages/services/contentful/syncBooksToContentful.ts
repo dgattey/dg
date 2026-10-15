@@ -1,0 +1,238 @@
+import 'server-only';
+
+import {
+  buildRichTextDocument,
+  cleanWhitespace,
+  DEFAULT_SHELVES,
+  isUsableGoodreadsCoverUrl,
+  normalizeReviewText,
+  upgradeGoodreadsCoverUrl,
+} from '@dg/content-models/books/bookDomain';
+import {
+  type BookMutationInput,
+  validateBookMutationInput,
+} from '@dg/content-models/books/bookSchema';
+import {
+  buildCmaBookFields,
+  computeBookDiff,
+  findMatchingContentfulEntry,
+  type MergedBookFields,
+  type NormalizedContentfulBookEntry,
+} from '@dg/content-models/books/contentfulBook';
+import {
+  buildGoodreadsRssUrl,
+  type GoodreadsBookItem,
+  mergeShelfBooks,
+  parseGoodreadsRssXml,
+} from '@dg/content-models/books/goodreadsRss';
+import { ContentfulCmaClient } from './contentfulCmaClient';
+
+export type BookMutationOutcome = Omit<
+  NormalizedContentfulBookEntry,
+  'isPublished' | 'publishedVersion' | 'rawFields' | 'reviewDescription'
+> & {
+  action: 'created' | 'deleted' | 'skipped' | 'updated';
+  coverAssetId: string | null;
+};
+
+export type GoodreadsSyncBookError = { author: string; message: string; title: string };
+
+export type GoodreadsSyncSummary = {
+  created: number;
+  createdCount: number;
+  durationMs: number;
+  errors: Array<GoodreadsSyncBookError>;
+  goodreadsItemsFetched: number;
+  ok: boolean;
+  revalidated: boolean;
+  scanned: number;
+  skippedCount: number;
+  unchanged: number;
+  updated: number;
+  updatedCount: number;
+};
+
+export function resolveCoverUrl(book: {
+  coverImageUrl?: string | null;
+  goodreadsCoverUrl?: string | null;
+  isbn?: number | null;
+}): string | null {
+  const upgraded = upgradeGoodreadsCoverUrl(book.coverImageUrl ?? book.goodreadsCoverUrl);
+  if (upgraded) return upgraded;
+  if (book.coverImageUrl && isUsableGoodreadsCoverUrl(book.coverImageUrl)) {
+    return book.coverImageUrl.trim();
+  }
+  return book.isbn
+    ? `https://covers.openlibrary.org/b/isbn/${encodeURIComponent(String(book.isbn))}-L.jpg?default=false`
+    : null;
+}
+
+const pick = <T>(raw: unknown, val: T | null | undefined, ex: T | null | undefined): T | null =>
+  raw !== undefined ? (val ?? null) : (ex ?? null);
+
+const toOutcome = (
+  action: BookMutationOutcome['action'],
+  {
+    isPublished: _i,
+    publishedVersion: _p,
+    rawFields: _r,
+    reviewDescription: _d,
+    ...rest
+  }: NormalizedContentfulBookEntry,
+): BookMutationOutcome => ({ action, coverAssetId: rest.coverImageId, ...rest });
+
+export async function upsertBookToContentful(
+  cma: ContentfulCmaClient,
+  input: BookMutationInput,
+): Promise<BookMutationOutcome> {
+  const validated = validateBookMutationInput(input);
+  if (!validated.ok) throw new Error(validated.error);
+  const b = validated.book;
+  const author = b.author ?? '';
+  const query = { author, id: b.id, isbn: b.isbn, title: b.title };
+  const ex =
+    (b.id ? await cma.fetchBookById(b.id) : null) ??
+    findMatchingContentfulEntry(query, await cma.fetchAllBooks());
+  const isbn = b.isbn ?? ex?.isbn ?? null;
+  const reviewDescription =
+    b.reviewPlainText !== undefined
+      ? buildRichTextDocument(b.reviewPlainText)
+      : (ex?.reviewDescription ?? null);
+  const reviewText =
+    b.reviewPlainText !== undefined
+      ? normalizeReviewText(b.reviewPlainText) || null
+      : (ex?.reviewText ?? null);
+
+  let coverImageId = b.coverAssetId ?? ex?.coverImageId ?? null;
+  const candidateCoverUrl = resolveCoverUrl({ coverImageUrl: b.coverImageUrl, isbn });
+  if (b.coverImageUrl || (!coverImageId && candidateCoverUrl)) {
+    const uploaded = candidateCoverUrl
+      ? await cma
+          .createAndPublishCoverAsset({ imageUrl: candidateCoverUrl, title: b.title })
+          .catch(() => null)
+      : null;
+    if (uploaded) coverImageId = uploaded;
+  }
+
+  const merged: MergedBookFields = {
+    author: author || ex?.author || '',
+    coverImageId,
+    isbn,
+    rating: pick(b.rating, b.rating, ex?.rating),
+    readDateFinished: pick(b.readDateFinished, b.readDateFinished, ex?.readDateFinished),
+    readDateStarted: pick(b.readDateStarted, b.readDateStarted, ex?.readDateStarted),
+    reviewDescription,
+    reviewText,
+    title: b.title,
+  };
+
+  const fields = ex
+    ? { ...ex.rawFields, ...buildCmaBookFields(merged, cma.locale) }
+    : buildCmaBookFields(merged, cma.locale);
+  if (ex) return toOutcome('updated', await cma.updateAndPublishBook(ex.id, ex.version, fields));
+  const newId = b.id ? cleanWhitespace(b.id).toUpperCase() : undefined;
+  return toOutcome('created', await cma.createAndPublishBook(fields, newId));
+}
+
+export async function fetchGoodreadsShelfItems(opts: {
+  fetchImpl?: typeof fetch;
+  rssKey?: string | null;
+  shelves?: ReadonlyArray<string>;
+  userId: string;
+}): Promise<Array<GoodreadsBookItem>> {
+  const { fetchImpl = fetch, rssKey, shelves = DEFAULT_SHELVES, userId } = opts;
+  const headers = {
+    Accept: 'application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8',
+    'User-Agent': 'Saga-Goodreads-Sync/1.0',
+  };
+  const results = await Promise.all(
+    shelves.map(async (shelf) => {
+      const res = await fetchImpl(buildGoodreadsRssUrl({ rssKey, shelf, userId }), { headers });
+      if (!res.ok)
+        throw new Error(`Goodreads RSS fetch failed for shelf "${shelf}" (${res.status})`);
+      return parseGoodreadsRssXml(await res.text(), shelf);
+    }),
+  );
+  return mergeShelfBooks(results.flat());
+}
+
+export async function runGoodreadsSync(opts: {
+  contentfulEnvironmentId?: string;
+  contentfulManagementToken: string;
+  contentfulSpaceId: string;
+  fetchImpl?: typeof fetch;
+  goodreadsRssKey?: string | null;
+  goodreadsUserId: string;
+  shelves?: ReadonlyArray<string>;
+}): Promise<GoodreadsSyncSummary> {
+  const startedAt = Date.now();
+  const { fetchImpl = fetch, shelves = DEFAULT_SHELVES } = opts;
+  const cma = new ContentfulCmaClient({
+    environmentId: opts.contentfulEnvironmentId,
+    fetchImpl,
+    managementToken: opts.contentfulManagementToken,
+    spaceId: opts.contentfulSpaceId,
+  });
+  const [grBooks, existing] = await Promise.all([
+    fetchGoodreadsShelfItems({
+      fetchImpl,
+      rssKey: opts.goodreadsRssKey,
+      shelves,
+      userId: opts.goodreadsUserId,
+    }),
+    cma.fetchAllBooks(),
+  ]);
+  const applicable = grBooks.filter(
+    (b) => b.status !== 'notStarted' || findMatchingContentfulEntry(b, existing) !== null,
+  );
+  let createdCount = 0;
+  let updatedCount = 0;
+  let skippedCount = 0;
+  const errors: Array<GoodreadsSyncBookError> = [];
+
+  for (const b of applicable) {
+    try {
+      const ex = findMatchingContentfulEntry(b, existing);
+      const diff = computeBookDiff(b, ex);
+      if (diff.action === 'skip') {
+        skippedCount += 1;
+        continue;
+      }
+      const m: MergedBookFields = { ...diff.merged };
+      if (!m.coverImageId) {
+        const coverUrl = resolveCoverUrl(b);
+        if (coverUrl) {
+          m.coverImageId = await cma
+            .createAndPublishCoverAsset({ imageUrl: coverUrl, title: m.title })
+            .catch(() => null);
+        }
+      }
+      if (diff.action === 'create') {
+        existing.push(await cma.createAndPublishBook(buildCmaBookFields(m)));
+        createdCount += 1;
+      } else if (diff.action === 'update' && ex) {
+        const mergedFields = { ...ex.rawFields, ...buildCmaBookFields(m) };
+        await cma.updateAndPublishBook(ex.id, ex.version, mergedFields);
+        updatedCount += 1;
+      }
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      errors.push({ author: b.author, message, title: b.title });
+    }
+  }
+
+  return {
+    created: createdCount,
+    createdCount,
+    durationMs: Date.now() - startedAt,
+    errors,
+    goodreadsItemsFetched: grBooks.length,
+    ok: errors.length === 0,
+    revalidated: createdCount > 0 || updatedCount > 0,
+    scanned: grBooks.length,
+    skippedCount,
+    unchanged: skippedCount,
+    updated: updatedCount,
+    updatedCount,
+  };
+}
