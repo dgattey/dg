@@ -141,6 +141,10 @@
             "noRestrictedImports": {
               "level": "error",
               "options": {
+                "paths": {
+                  "@vercel/analytics/next": "Use @vercel/analytics/react. The /next entry reads useSearchParams, which adds a dynamic hole to every page.",
+                  "@vercel/speed-insights/next": "Use @vercel/speed-insights/react. The /next entry reads useSearchParams, which adds a dynamic hole to every page."
+                },
                 "patterns": [
                   {
                     "group": ["../**/packages/**"],
