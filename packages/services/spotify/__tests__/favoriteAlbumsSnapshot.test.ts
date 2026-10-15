@@ -31,6 +31,15 @@ describe('favorite albums snapshot', () => {
     await expect(readFavoriteAlbumsSnapshot()).resolves.toEqual([album]);
   });
 
+  it('reports whether the stored list changed and skips identical writes', async () => {
+    await expect(writeFavoriteAlbumsSnapshot([album])).resolves.toBe(true);
+    await expect(writeFavoriteAlbumsSnapshot([{ ...album }])).resolves.toBe(false);
+    await expect(writeFavoriteAlbumsSnapshot([{ ...album, name: 'Renamed' }])).resolves.toBe(true);
+    await expect(writeFavoriteAlbumsSnapshot([])).resolves.toBe(true);
+    await expect(writeFavoriteAlbumsSnapshot([])).resolves.toBe(false);
+    await expect(readFavoriteAlbumsSnapshot()).resolves.toEqual([]);
+  });
+
   it('reads populated rows without requiring the newer marker table state', async () => {
     await db.FavoriteAlbum.create(album);
 

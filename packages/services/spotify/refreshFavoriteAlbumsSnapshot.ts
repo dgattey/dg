@@ -15,11 +15,14 @@ const FAVORITE_ALBUMS_PLAYLIST_ID = '1bbwGrz6rSq5APjRfZp63U';
  * stored snapshot remains valid and the scheduled sync tries again in 30
  * minutes, after the supplied Retry-After has had time to elapse.
  */
-export async function refreshFavoriteAlbumsSnapshot(): Promise<{ count: number }> {
+export async function refreshFavoriteAlbumsSnapshot(): Promise<{
+  changed: boolean;
+  count: number;
+}> {
   const albums = await fetchPlaylistAlbums(FAVORITE_ALBUMS_PLAYLIST_ID);
-  await writeFavoriteAlbumsSnapshot(albums);
-  log.info('Favorite albums snapshot refreshed', { count: albums.length });
-  return { count: albums.length };
+  const changed = await writeFavoriteAlbumsSnapshot(albums);
+  log.info('Favorite albums snapshot refreshed', { changed, count: albums.length });
+  return { changed, count: albums.length };
 }
 
 /** Runs a snapshot refresh without allowing it to fail the history sync. */

@@ -77,7 +77,7 @@ beforeAll(() => {
 
 beforeEach(async () => {
   jest.clearAllMocks();
-  mockRefreshFavoriteAlbums.mockResolvedValue({ count: 3 });
+  mockRefreshFavoriteAlbums.mockResolvedValue({ changed: true, count: 3 });
   mockGetSpotifyClient.mockReturnValue({ get: mockSpotifyGet } as ReturnType<
     typeof spotifyClient.getSpotifyClient
   >);
@@ -248,6 +248,7 @@ describe('Spotify sync route', () => {
       playedAt: new Date('2025-01-01T00:00:00.000Z'),
       trackId: `${PREFIX}-track-quiet`,
     });
+    mockRefreshFavoriteAlbums.mockResolvedValue({ changed: false, count: 3 });
     mockSpotifyGet.mockResolvedValue({
       response: { json: async () => ({ items: [], next: null }) },
       status: 200,
@@ -258,6 +259,6 @@ describe('Spotify sync route', () => {
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
     expect(response.body.inserted).toBe(0);
-    expect(mockRevalidateTag).not.toHaveBeenCalledWith('music-history', 'max');
+    expect(mockRevalidateTag).not.toHaveBeenCalled();
   });
 });

@@ -45,14 +45,31 @@ export async function readFavoriteAlbumsSnapshot(): Promise<Array<PlaylistAlbum>
   }
 }
 
+const snapshotKey = (album: PlaylistAlbum) =>
+  JSON.stringify(SNAPSHOT_FIELDS.map((field) => album[field]));
+
+const isStoredSnapshot = (stored: Array<PlaylistAlbum> | null, albums: Array<PlaylistAlbum>) => {
+  if (stored === null || stored.length !== albums.length) {
+    return false;
+  }
+  const storedKeys = new Set(stored.map(snapshotKey));
+  return albums.every((album) => storedKeys.has(snapshotKey(album)));
+};
+
 /**
- * Replaces the stored favorites list with a fresh one. The playlist is the
- * source of truth, so removals have to disappear here too — hence replace
- * rather than upsert. Never throws; failing to store is not worth failing a
- * request that already has its data. The marker row records a successful empty
- * playlist too, so the UI can tell empty from temporarily unavailable.
+ * Replaces the stored favorites list with a fresh one and resolves whether the
+ * stored list changed. An identical list is left alone, so the 30-minute sync
+ * only revalidates the albums page when the playlist actually moved. The
+ * playlist is the source of truth, so removals have to disappear here too —
+ * hence replace rather than upsert. Never throws; failing to store is not
+ * worth failing a request that already has its data. The marker row records a
+ * successful empty playlist too, so the UI can tell empty from temporarily
+ * unavailable.
  */
-export async function writeFavoriteAlbumsSnapshot(albums: Array<PlaylistAlbum>): Promise<void> {
+export async function writeFavoriteAlbumsSnapshot(albums: Array<PlaylistAlbum>): Promise<boolean> {
+  if (isStoredSnapshot(await readFavoriteAlbumsSnapshot(), albums)) {
+    return false;
+  }
   try {
     await dbClient.transaction(async (transaction) => {
       await db.FavoriteAlbum.destroy({ transaction, where: {} });
@@ -64,7 +81,9 @@ export async function writeFavoriteAlbumsSnapshot(albums: Array<PlaylistAlbum>):
         { transaction },
       );
     });
+    return true;
   } catch (error) {
     log.warn('Could not store favorite albums', { error });
+    return false;
   }
 }
