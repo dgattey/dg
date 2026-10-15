@@ -47,10 +47,9 @@ const decisions = new Map<string, { expiresAt: number; value: Promise<boolean> }
 /**
  * Gates the interactive redesign surface.
  * Only production deployments read Vercel Flags. Local dev, CI, and previews
- * stay on the default unless a Vercel Toolbar override or
- * `INTERACTIVE_REDESIGN=1` turns it on. When Sign in with Vercel has
- * established a session, `user.id` / `user.email` are sent for segment
- * targeting.
+ * stay on the default unless a Vercel Toolbar override turns it on. When
+ * Sign in with Vercel has established a session, `user.id` / `user.email`
+ * are sent for segment targeting.
  */
 export const interactiveRedesign = flag<boolean, FlagEntities>({
   adapter,

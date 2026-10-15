@@ -42,7 +42,6 @@ const createRequest = ({
 describe('proxy', () => {
   beforeEach(() => {
     mockInteractiveRedesign.mockResolvedValue(false);
-    mockEnv({ INTERACTIVE_REDESIGN: undefined });
   });
 
   describe('markdown negotiation on public pages', () => {
@@ -75,6 +74,21 @@ describe('proxy', () => {
       const response = await proxy(new NextRequest('https://example.com/music'));
 
       expect(response.headers.get('x-middleware-rewrite')).toContain('/redesign/music');
+    });
+
+    it('serves the classic page when the flag is off', async () => {
+      const response = await proxy(new NextRequest('https://example.com/music'));
+
+      expect(response.headers.get('x-middleware-rewrite')).toBeNull();
+      expect(response.headers.get('x-middleware-next')).toBe('1');
+    });
+
+    it('serves the classic page when flag evaluation throws', async () => {
+      mockInteractiveRedesign.mockRejectedValue(new Error('FLAGS unavailable'));
+      const response = await proxy(new NextRequest('https://example.com/music'));
+
+      expect(response.headers.get('x-middleware-rewrite')).toBeNull();
+      expect(response.headers.get('x-middleware-next')).toBe('1');
     });
 
     it('redirects direct /redesign hits to the public path', async () => {
