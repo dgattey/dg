@@ -6,7 +6,7 @@ import { getGlobalThemeCss } from '@dg/ui/theme';
 import { ColorSchemeScript } from '@dg/ui/theme/ColorSchemeScript';
 import { ColorSchemeSync } from '@dg/ui/theme/ColorSchemeSync';
 import { Analytics } from '@vercel/analytics/react';
-import { SpeedInsights } from '@vercel/speed-insights/next';
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { getServerTime } from '../services/getServerTime';

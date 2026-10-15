@@ -1,10 +1,11 @@
 import 'server-only';
 
 import { apiCatalogRoute } from '@dg/shared-core/routes/app';
+import { AGENT_DOCUMENT_CACHE_CONTROL } from '../../agentDocumentCacheControl';
 import { getApiCatalog } from './getApiCatalog';
 
 const headers = {
-  'Cache-Control': 's-maxage=60, stale-while-revalidate=86400',
+  'Cache-Control': AGENT_DOCUMENT_CACHE_CONTROL,
   'Content-Type': 'application/linkset+json; profile="https://www.rfc-editor.org/info/rfc9727"',
   Link: `<${apiCatalogRoute}>; rel="api-catalog"; type="application/linkset+json"`,
 };
