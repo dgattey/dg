@@ -44,7 +44,7 @@ One-time human setup under team `dylan-gattey`:
 
 ## Where rules apply
 
-Dashboard rules and Segments only run on production deployments. Every evaluation there costs a Flag Request (the Hobby team pauses at 10,000 a month), so local dev, CI, and previews skip Vercel and return `false`. Each instance also reuses a visitor's production decision for 60 seconds, so a rule change can take up to a minute to show. To see the redesign outside production, use a Toolbar override or `INTERACTIVE_REDESIGN=1`.
+Dashboard rules and Segments only run on production deployments. Every evaluation there costs a Flag Request (the Hobby team pauses at 10,000 a month), so local dev, CI, and previews skip Vercel and return `false`. Each instance also reuses a visitor's production decision for 60 seconds, so a rule change can take up to a minute to show. To see the redesign outside production, use a Toolbar override.
 
 ## Fallback
 
