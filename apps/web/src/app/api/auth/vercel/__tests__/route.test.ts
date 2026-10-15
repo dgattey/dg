@@ -32,6 +32,8 @@ describe('Vercel auth authorize route', () => {
     cookieStore.clear();
     process.env = {
       ...originalEnv,
+      DEV_CONSOLE_BASIC_AUTH_PASS: undefined,
+      DEV_CONSOLE_BASIC_AUTH_USER: undefined,
       NEXT_PUBLIC_VERCEL_APP_CLIENT_ID: 'test-client-id',
     };
   });
@@ -39,6 +41,18 @@ describe('Vercel auth authorize route', () => {
   afterEach(() => {
     process.env = originalEnv;
     jest.clearAllMocks();
+  });
+
+  it('requires Basic Auth when dev console credentials are configured', async () => {
+    process.env.DEV_CONSOLE_BASIC_AUTH_USER = 'admin';
+    process.env.DEV_CONSOLE_BASIC_AUTH_PASS = 'secret';
+
+    const request = new NextRequest(`https://example.com${vercelAuthRoute}`);
+    const response = await authorize(request);
+
+    expect(response.status).toBe(401);
+    expect(response.headers.get('WWW-Authenticate')).toBe('Basic realm="Dev Console"');
+    expect(cookieStore.size).toBe(0);
   });
 
   it('redirects to Vercel authorize with PKCE params', async () => {

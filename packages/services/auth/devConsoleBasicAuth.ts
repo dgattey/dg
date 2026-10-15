@@ -1,3 +1,18 @@
+const encoder = new TextEncoder();
+
+function timingSafeEqualStrings(left: string, right: string): boolean {
+  const leftBytes = encoder.encode(left);
+  const rightBytes = encoder.encode(right);
+  let mismatch = leftBytes.length ^ rightBytes.length;
+  const maxLength = Math.max(leftBytes.length, rightBytes.length);
+  for (let index = 0; index < maxLength; index += 1) {
+    const leftByte = index < leftBytes.length ? (leftBytes[index] ?? 0) : 0;
+    const rightByte = index < rightBytes.length ? (rightBytes[index] ?? 0) : 0;
+    mismatch |= leftByte ^ rightByte;
+  }
+  return mismatch === 0;
+}
+
 /**
  * Returns true when dev console credentials are configured in the environment
  * via `DEV_CONSOLE_BASIC_AUTH_USER` and `DEV_CONSOLE_BASIC_AUTH_PASS`.
@@ -38,10 +53,9 @@ export function isValidDevConsoleAuth(authorizationHeader: string | null): boole
       return false;
     }
 
-    return (
-      decoded.slice(0, separatorIndex) === username &&
-      decoded.slice(separatorIndex + 1) === password
-    );
+    const userMatches = timingSafeEqualStrings(decoded.slice(0, separatorIndex), username);
+    const passMatches = timingSafeEqualStrings(decoded.slice(separatorIndex + 1), password);
+    return userMatches && passMatches;
   } catch {
     return false;
   }

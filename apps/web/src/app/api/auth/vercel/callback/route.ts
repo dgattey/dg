@@ -1,3 +1,4 @@
+import { timingSafeEqual } from 'node:crypto';
 import { vercelAuthCallbackRoute } from '@dg/shared-core/routes/api';
 import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import { cookies } from 'next/headers';
@@ -29,7 +30,15 @@ type UserInfoResponse = {
 };
 
 function valuesMatch(value: string | null, storedValue: string | undefined): boolean {
-  return Boolean(value && storedValue && value === storedValue);
+  if (!value || !storedValue) {
+    return false;
+  }
+  const valueBuffer = Buffer.from(value, 'utf8');
+  const storedBuffer = Buffer.from(storedValue, 'utf8');
+  if (valueBuffer.length !== storedBuffer.length) {
+    return false;
+  }
+  return timingSafeEqual(valueBuffer, storedBuffer);
 }
 
 function decodeIdTokenNonce(idToken: string): string | null {

@@ -1,4 +1,8 @@
 import {
+  hasDevConsoleCredentials,
+  isDevConsoleAccessAllowed,
+} from '@dg/services/auth/devConsoleBasicAuth';
+import {
   generateCodeChallenge,
   generateCodeVerifier,
   generateSecureState,
@@ -20,6 +24,16 @@ import { redirectToConsoleWithAuthError } from './redirectToConsole';
  * https://vercel.com/oauth/authorize.
  */
 export async function GET(request: NextRequest) {
+  if (!isDevConsoleAccessAllowed(request.headers.get('authorization'))) {
+    if (!hasDevConsoleCredentials()) {
+      return new NextResponse('Not Found', { status: 404 });
+    }
+    return new NextResponse('Authentication required', {
+      headers: { 'WWW-Authenticate': 'Basic realm="Dev Console"' },
+      status: 401,
+    });
+  }
+
   const clientId = process.env.NEXT_PUBLIC_VERCEL_APP_CLIENT_ID;
   if (!clientId) {
     return redirectToConsoleWithAuthError(request, 'missing_client_id');

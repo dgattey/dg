@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { timingSafeEqual } from 'node:crypto';
 import { log } from '@dg/shared-core/logging/log';
 
 type Query = Partial<Record<string, string | Array<string>>> | URLSearchParams;
@@ -17,6 +18,21 @@ const getQueryValue = (query: Query, key: string) => {
   return Array.isArray(value) ? value[0] : value;
 };
 
+const tokensMatchConstantTime = (
+  verifyToken: string | undefined,
+  expectedToken: string | undefined,
+): boolean => {
+  if (!verifyToken || !expectedToken) {
+    return false;
+  }
+  const receivedBuffer = Buffer.from(verifyToken, 'utf8');
+  const expectedBuffer = Buffer.from(expectedToken, 'utf8');
+  if (receivedBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+  return timingSafeEqual(receivedBuffer, expectedBuffer);
+};
+
 /**
  * Checks if a set of query params has a valid Strava subscription within
  * it. There may be MORE query params than present in the `StravaSubscription`
@@ -29,19 +45,18 @@ const getQueryValue = (query: Query, key: string) => {
 const isSubscription = (query: Query) => {
   const mode = getQueryValue(query, MODE_KEY);
   const verifyToken = getQueryValue(query, VERIFY_KEY);
-  const expectedToken = process.env.STRAVA_VERIFY_TOKEN;
+  const expectedToken = process.env.STRAVA_VERIFY_TOKEN?.trim();
 
   const modeMatches = mode === VALID_MODE;
-
-  const tokenMatches = verifyToken === expectedToken;
+  const tokenMatches = tokensMatchConstantTime(verifyToken, expectedToken);
 
   if (!modeMatches || !tokenMatches) {
     log.info('Strava challenge validation details', {
+      hasExpectedToken: Boolean(expectedToken),
+      hasReceivedToken: Boolean(verifyToken),
       modeMatches,
       modeReceived: mode,
-      tokenExpected: expectedToken,
       tokenMatches,
-      tokenReceived: verifyToken,
     });
   }
 
@@ -60,7 +75,6 @@ export const echoStravaChallengeIfValid = (query: Query): Record<string, string>
   if (!challenge) {
     log.info('Strava challenge missing', {
       mode: getQueryValue(query, MODE_KEY),
-      tokenReceived: getQueryValue(query, VERIFY_KEY),
     });
     return null;
   }
