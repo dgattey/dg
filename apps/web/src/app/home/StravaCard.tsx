@@ -95,19 +95,19 @@ export function StravaCard({ activity, surface = 'classic' }: StravaCardProps) {
   if (surface === 'collage') {
     return (
       <div className="home__strava" data-slot="st" style={{ gridArea: 'st' }}>
-        <PaperCard edge="soft-b" innerClassName="home__stravaInner" tiltDeg={1.2} tone="olive">
+        <PaperCard edge="soft-b" innerClassName="home__stravaInner" tiltDeg={1.2} tone="cream">
           {encodedPolyline ? (
             <span aria-hidden="true" className="home__stravaRoute">
               <StravaRouteMap encodedPolyline={encodedPolyline} surface="collage" />
             </span>
           ) : null}
-          <div className="home__stravaContent">
+          <div className="home__stravaStats">
             <ActivityStats activity={activity} />
-            <div className="home__stravaCopy">
-              <ActivityTypeWithIcon activity={activity} />
-              <ActivityName activity={activity} />
-              <ActivityDescription activity={activity} />
-            </div>
+          </div>
+          <div className="home__stravaCopy">
+            <ActivityTypeWithIcon activity={activity} />
+            <ActivityName activity={activity} />
+            <ActivityDescription activity={activity} />
           </div>
         </PaperCard>
       </div>

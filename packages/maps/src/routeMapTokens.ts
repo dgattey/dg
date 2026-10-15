@@ -13,17 +13,21 @@ export type RouteMapTokens = {
 const paperMix = (percent: number) =>
   `color-mix(in srgb, var(--mui-palette-background-paper) ${percent}%, transparent)`;
 
-const oliveMix = (percent: number) => `color-mix(in srgb, var(--olive) ${percent}%, transparent)`;
+const creamMix = (percent: number) => `color-mix(in srgb, var(--cream) ${percent}%, transparent)`;
 
 export function getRouteMapTokens(surface: SiteSurface, dark: boolean): RouteMapTokens {
   if (surface === 'collage') {
+    // A printed map matted on cream paper: the host backs its own copy, so the
+    // basemap stays near full strength and the route reads as a cut red line.
     return {
-      casingStroke: oliveMix(72),
-      containerBackground: 'var(--olive)',
-      routeStroke: 'var(--cream)',
-      routeStrokeWidth: 3,
-      scrimGradient: `linear-gradient(180deg, ${oliveMix(42)} 0%, ${oliveMix(58)} 100%)`,
-      tileFilter: 'saturate(0.35) brightness(0.92) contrast(0.85) sepia(0.12)',
+      casingStroke: 'var(--cream)',
+      containerBackground: 'var(--cream)',
+      routeStroke: 'var(--vermilion)',
+      routeStrokeWidth: 3.5,
+      scrimGradient: dark
+        ? 'linear-gradient(180deg, rgb(0 0 0 / 0.04) 0%, rgb(0 0 0 / 0.12) 100%)'
+        : `linear-gradient(180deg, ${creamMix(6)} 0%, ${creamMix(14)} 100%)`,
+      tileFilter: dark ? 'saturate(0.9)' : 'saturate(0.85) contrast(1.04)',
     };
   }
 
