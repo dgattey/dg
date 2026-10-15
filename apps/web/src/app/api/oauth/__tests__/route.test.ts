@@ -28,12 +28,12 @@ import * as stravaService from '@dg/services/oauth/exchangeStravaCodeForToken';
 const mockExchangeStravaCode = jest.mocked(stravaService.exchangeStravaCodeForToken);
 const mockExchangeSpotifyCode = jest.mocked(spotifyService.exchangeSpotifyCodeForToken);
 
-const createGetRequest = (params: Record<string, string>) => {
+const createGetRequest = (params: Record<string, string>, headers?: Record<string, string>) => {
   const url = new URL(`https://example.com${oauthRoute}`);
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.set(key, value);
   }
-  return new NextRequest(url, { method: 'GET' });
+  return new NextRequest(url, { headers, method: 'GET' });
 };
 
 describe('OAuth Route', () => {
@@ -161,6 +161,8 @@ describe('OAuth Route', () => {
     beforeEach(() => {
       process.env = {
         ...originalEnv,
+        DEV_CONSOLE_BASIC_AUTH_PASS: undefined,
+        DEV_CONSOLE_BASIC_AUTH_USER: undefined,
         OAUTH_CALLBACK_URL: `https://example.com${oauthRoute}`,
         SPOTIFY_CLIENT_ID: 'test-spotify-client-id',
         STRAVA_CLIENT_ID: 'test-strava-client-id',
@@ -169,6 +171,22 @@ describe('OAuth Route', () => {
 
     afterEach(() => {
       process.env = originalEnv;
+    });
+
+    it('requires Basic Auth when dev console credentials are configured', async () => {
+      process.env.DEV_CONSOLE_BASIC_AUTH_USER = 'admin';
+      process.env.DEV_CONSOLE_BASIC_AUTH_PASS = 'secret';
+
+      const unauthedResponse = await GET(createGetRequest({ provider: 'spotify' }));
+      expect(unauthedResponse.status).toBe(401);
+      expect(unauthedResponse.headers.get('WWW-Authenticate')).toBe('Basic realm="Dev Console"');
+      expect(mockSaveOauthState).not.toHaveBeenCalled();
+
+      const authHeader = `Basic ${Buffer.from('admin:secret').toString('base64')}`;
+      const authedResponse = await GET(
+        createGetRequest({ provider: 'spotify' }, { authorization: authHeader }),
+      );
+      expect(authedResponse.status).toBe(307);
     });
 
     it('redirects to console for invalid provider', async () => {

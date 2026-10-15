@@ -303,6 +303,8 @@ async function writeAlbumThrough(detail: AlbumDetail): Promise<void> {
   await MusicTrackArtist.bulkCreate(trackArtists, { ignoreDuplicates: true });
 }
 
+const SPOTIFY_ID_PATTERN = /^[0-9A-Za-z]{1,64}$/;
+
 /**
  * Album detail with tracks and artists. Prefers a complete Music* cache row,
  * otherwise fetches from Spotify and writes through so the next load is local.
@@ -310,6 +312,10 @@ async function writeAlbumThrough(detail: AlbumDetail): Promise<void> {
  * and Spotify is unavailable with a 404).
  */
 export async function fetchAlbumDetail(albumId: string): Promise<AlbumDetail | null> {
+  if (!SPOTIFY_ID_PATTERN.test(albumId)) {
+    return null;
+  }
+
   const cached = await readAlbumFromDb(albumId);
   if (cached) {
     return cached;

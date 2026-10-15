@@ -226,4 +226,10 @@ describe('fetchAlbumDetail', () => {
 
     await expect(getFetchAlbumDetail()(`${PREFIX}missing00000000001`)).resolves.toBeNull();
   });
+
+  it('rejects non-alphanumeric album ids before querying Spotify', async () => {
+    await expect(getFetchAlbumDetail()('../me/player/recently-played')).resolves.toBeNull();
+    await expect(getFetchAlbumDetail()('album123?market=US')).resolves.toBeNull();
+    expect(mockSpotifyGetWithRetry).not.toHaveBeenCalled();
+  });
 });

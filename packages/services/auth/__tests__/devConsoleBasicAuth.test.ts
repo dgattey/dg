@@ -77,10 +77,12 @@ describe('isValidDevConsoleAuth', () => {
 
   it('returns false for wrong username', () => {
     expect(isValidDevConsoleAuth(encode('wrong', 'secret'))).toBe(false);
+    expect(isValidDevConsoleAuth(encode('admin-extended', 'secret'))).toBe(false);
   });
 
   it('returns false for wrong password', () => {
     expect(isValidDevConsoleAuth(encode('admin', 'wrong'))).toBe(false);
+    expect(isValidDevConsoleAuth(encode('admin', 'secret-extended'))).toBe(false);
   });
 
   it('returns true for correct credentials', () => {

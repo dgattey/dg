@@ -1,12 +1,25 @@
+import { timingSafeEqual } from 'node:crypto';
 import { refreshFavoriteAlbumsSnapshotWithLogging } from '@dg/services/spotify/refreshFavoriteAlbumsSnapshot';
 import { syncSpotifyHistoryWithLogging } from '@dg/services/spotify/syncSpotifyHistory';
 import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 
+const BEARER_PREFIX = 'Bearer ';
+
 const isAuthorized = (request: NextRequest) => {
+  const secret = process.env.CRON_SECRET?.trim();
   const authHeader = request.headers.get('authorization');
-  return authHeader === `Bearer ${process.env.CRON_SECRET}`;
+  if (!secret || !authHeader?.startsWith(BEARER_PREFIX)) {
+    return false;
+  }
+  const provided = authHeader.slice(BEARER_PREFIX.length);
+  const providedBuffer = Buffer.from(provided, 'utf8');
+  const expectedBuffer = Buffer.from(secret, 'utf8');
+  if (providedBuffer.length !== expectedBuffer.length) {
+    return false;
+  }
+  return timingSafeEqual(providedBuffer, expectedBuffer);
 };
 
 type SyncResponse = {

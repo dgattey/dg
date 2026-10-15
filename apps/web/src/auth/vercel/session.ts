@@ -15,6 +15,10 @@ export type FlagEntities = {
   user?: { id: string; email: string };
 };
 
+type SignedSessionPayload = VercelSessionUser & {
+  exp?: number;
+};
+
 function getSigningSecret(): string | undefined {
   return process.env.VERCEL_APP_CLIENT_SECRET;
 }
@@ -23,22 +27,31 @@ function getSigningSecret(): string | undefined {
  * Signs a session payload as `base64url(json).base64url(hmac-sha256)`.
  * Returns null when `VERCEL_APP_CLIENT_SECRET` is not configured.
  */
-export function signSession(user: VercelSessionUser): string | null {
+export function signSession(user: VercelSessionUser, nowMs: number = Date.now()): string | null {
   const secret = getSigningSecret();
   if (!secret) {
     return null;
   }
 
-  const payload = Buffer.from(JSON.stringify(user), 'utf8').toString('base64url');
+  const payload = Buffer.from(
+    JSON.stringify({
+      ...user,
+      exp: nowMs + SESSION_MAX_AGE_SECONDS * 1000,
+    }),
+    'utf8',
+  ).toString('base64url');
   const signature = createHmac('sha256', secret).update(payload).digest('base64url');
   return `${payload}.${signature}`;
 }
 
 /**
  * Verifies and parses a signed Vercel session cookie value.
- * Returns null when missing, unsigned, tampered, or secret is unset.
+ * Returns null when missing, unsigned, tampered, expired, or secret is unset.
  */
-export function parseVercelSessionCookie(value: string | undefined): VercelSessionUser | null {
+export function parseVercelSessionCookie(
+  value: string | undefined,
+  nowMs: number = Date.now(),
+): VercelSessionUser | null {
   if (!value) {
     return null;
   }
@@ -73,8 +86,15 @@ export function parseVercelSessionCookie(value: string | undefined): VercelSessi
   try {
     const user = JSON.parse(
       Buffer.from(payload, 'base64url').toString('utf8'),
-    ) as VercelSessionUser;
-    if (typeof user.id !== 'string' || typeof user.email !== 'string' || !user.id || !user.email) {
+    ) as SignedSessionPayload;
+    if (
+      typeof user.id !== 'string' ||
+      typeof user.email !== 'string' ||
+      !user.id ||
+      !user.email ||
+      typeof user.exp !== 'number' ||
+      user.exp <= nowMs
+    ) {
       return null;
     }
     return {

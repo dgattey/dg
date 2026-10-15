@@ -106,6 +106,19 @@ describe('Spotify sync route', () => {
     expect(mockSpotifyGet).not.toHaveBeenCalled();
   });
 
+  it('fails closed when CRON_SECRET is missing', async () => {
+    delete process.env.CRON_SECRET;
+    try {
+      const response = await handleSpotifySync(createRequest('Bearer undefined'));
+
+      expect(response.status).toBe(401);
+      expect(response.body).toEqual({ error: 'Unauthorized' });
+      expect(mockSpotifyGet).not.toHaveBeenCalled();
+    } finally {
+      process.env.CRON_SECRET = 'test-secret';
+    }
+  });
+
   it('seeds history when the database is empty', async () => {
     // Sync reads the whole SpotifyPlay table and derives `after` from the newest
     // row, so one row from another suite changes the request it makes. Suites in

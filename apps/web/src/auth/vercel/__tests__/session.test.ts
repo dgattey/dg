@@ -41,6 +41,19 @@ describe('Vercel session cookie', () => {
     expect(parseVercelSessionCookie(`${signed}tampered`)).toBeNull();
   });
 
+  it('rejects expired cookies', () => {
+    const issuedAt = 1_700_000_000_000;
+    const signed = signSession({ email: 'a@b.com', id: 'x' }, issuedAt);
+    expect(signed).toBeTruthy();
+    expect(parseVercelSessionCookie(signed ?? undefined, issuedAt + 1_000)).toEqual({
+      email: 'a@b.com',
+      id: 'x',
+    });
+    expect(
+      parseVercelSessionCookie(signed ?? undefined, issuedAt + 31 * 24 * 60 * 60 * 1000),
+    ).toBeNull();
+  });
+
   it('returns empty entities when cookie is absent', () => {
     expect(entitiesFromSessionCookie(undefined)).toEqual({});
   });
