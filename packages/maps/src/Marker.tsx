@@ -3,7 +3,7 @@ import { GlassContainer } from '@dg/ui/core/GlassContainer';
 import { Image } from '@dg/ui/dependent/Image';
 import { MAP_MARKER_IMAGE_SIZE } from '@dg/ui/helpers/imageSizes';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
+import type { CSSProperties } from 'react';
 
 const DIMENSION = 100;
 const IMAGE_DIMENSION = MAP_MARKER_IMAGE_SIZE;
@@ -19,7 +19,7 @@ const containerSx: SxObject = {
   width: DIMENSION,
 };
 
-const imageSx: SxObject = {
+const imageStyle: CSSProperties = {
   left: `${(DIMENSION - IMAGE_DIMENSION) / 2}px`,
   position: 'absolute',
   top: `${(DIMENSION - IMAGE_DIMENSION) / 2}px`,
@@ -37,7 +37,7 @@ export function Marker({ image }: MarkerProps) {
   return (
     <GlassContainer sx={containerSx}>
       {image ? (
-        <Box component="span" sx={imageSx}>
+        <span style={imageStyle}>
           <Image
             alt="Location marker"
             height={IMAGE_DIMENSION}
@@ -45,7 +45,7 @@ export function Marker({ image }: MarkerProps) {
             url={image.url}
             width={IMAGE_DIMENSION}
           />
-        </Box>
+        </span>
       ) : null}
     </GlassContainer>
   );

@@ -1,6 +1,7 @@
 'use client';
 
 import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
+import { Box } from '@dg/ui/core/Box';
 import {
   DISCLOSURE_ICON_SIZE,
   DISCLOSURE_ROW_HEIGHT,
@@ -12,7 +13,6 @@ import { Tooltip } from '@dg/ui/core/Tooltip';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import type { LucideIcon } from 'lucide-react';
 import { Disc3, DiscAlbum, History } from 'lucide-react';
 import type { FocusEvent, KeyboardEvent } from 'react';

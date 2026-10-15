@@ -2,23 +2,21 @@
 
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { Overlay, Map as PigeonMapCore } from 'pigeon-maps';
-import { useState } from 'react';
+import { type CSSProperties, useState } from 'react';
 import { Marker } from './Marker';
 import { stadiaTileUrl, type TileSource } from './tileSource';
 import { WatercolorTile } from './WatercolorTile';
 import { ZoomControls } from './ZoomControls';
 
-const containerSx: SxObject = {
+const containerStyle: CSSProperties = {
   height: '100%',
   position: 'relative',
   width: '100%',
 };
 
-const collageContainerSx: SxObject = {
-  ...containerSx,
+const collageContainerStyle: CSSProperties = {
+  ...containerStyle,
   backgroundColor: 'var(--ultramarine)',
 };
 
@@ -60,7 +58,7 @@ export function PigeonMap({ location, tileSource, surface = 'classic' }: PigeonM
   };
 
   return (
-    <Box sx={surface === 'collage' ? collageContainerSx : containerSx}>
+    <div style={surface === 'collage' ? collageContainerStyle : containerStyle}>
       <PigeonMapCore
         attribution={false}
         center={center}
@@ -88,6 +86,6 @@ export function PigeonMap({ location, tileSource, surface = 'classic' }: PigeonM
         </Overlay>
       </PigeonMapCore>
       <ZoomControls onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} surface={surface} />
-    </Box>
+    </div>
   );
 }

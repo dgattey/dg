@@ -1,6 +1,7 @@
 import type { WebhookSubscriptionMetadata } from '@dg/services/strava/webhooks/getWebhookSubscriptions';
 import { RelativeTime } from '@dg/ui/core/RelativeTime';
-import { Stack, Typography } from '@mui/material';
+import { Stack } from '@dg/ui/core/Stack';
+import { Typography } from '@dg/ui/core/Typography';
 
 export function SubscriptionDetails({ details }: { details: WebhookSubscriptionMetadata }) {
   return (

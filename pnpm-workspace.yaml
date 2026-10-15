@@ -23,10 +23,6 @@ allowBuilds:
 
 catalog:
   '@contentful/rich-text-types': 17.2.7
-  '@fortawesome/free-brands-svg-icons': 7.3.1
-  '@mui/material': 9.4.0
-  '@mui/system': 9.4.0
-  '@mui/utils': 9.4.0
   '@testing-library/dom': 10.4.2
   '@testing-library/jest-dom': 7.0.1
   '@testing-library/react': 16.3.3

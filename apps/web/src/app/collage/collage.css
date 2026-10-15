@@ -169,7 +169,7 @@ html[data-color-scheme="dark"] .collageRoot::after {
   clip-path: var(--clip, var(--quad-a));
   rotate: none;
 }
-.paperInner .MuiTypography-root {
+.paperInner [data-typography] {
   color: inherit;
 }
 .paperTag,

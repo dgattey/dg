@@ -1,9 +1,26 @@
-import type { Theme, TypographyVariantsOptions } from '@mui/material/styles';
+import type { CSSProperties } from 'react';
+
+export type TypographyVariants = {
+  body1: CSSProperties;
+  body2: CSSProperties;
+  button: CSSProperties;
+  caption: CSSProperties;
+  code: CSSProperties;
+  fontFamily: string;
+  fontSize: number;
+  h1: CSSProperties;
+  h2: CSSProperties;
+  h3: CSSProperties;
+  h4: CSSProperties;
+  h5: CSSProperties;
+  h6: CSSProperties;
+  overline: CSSProperties;
+};
 
 /**
- * Get typography styles for a certain color mode.
+ * Get typography styles for the theme.
  */
-export function getTypography(theme: Theme): TypographyVariantsOptions {
+export function getTypography(): TypographyVariants {
   return {
     body1: {
       fontSize: 17,
@@ -21,12 +38,12 @@ export function getTypography(theme: Theme): TypographyVariantsOptions {
       fontWeight: 500,
     },
     code: {
-      borderRadius: theme.spacing(2),
+      borderRadius: '16px',
       fontFamily:
         '"Menlo","Consolas","Roboto Mono","Ubuntu Monospace","Noto Mono","Oxygen Mono","Liberation Mono",monospace,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji"',
       fontSize: 15,
-      lineHeight: 1.875, // 30px
-      padding: theme.spacing(0.75, 1),
+      lineHeight: 1.875,
+      padding: '6px 8px',
     },
     fontFamily: [
       'system-ui',

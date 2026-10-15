@@ -1,6 +1,4 @@
-import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
-import { useRef } from 'react';
+import { type CSSProperties, useRef } from 'react';
 
 type Tile = {
   url: string;
@@ -17,7 +15,7 @@ type TileComponentProps = {
   tileLoaded: () => void;
 };
 
-const tileImgSx: SxObject = {
+const tileImgStyle: CSSProperties = {
   display: 'block',
   height: '100%',
   left: 0,
@@ -55,7 +53,7 @@ export function WatercolorTile({ tile, tileLoaded }: TileComponentProps) {
     }
   };
 
-  const containerSx: SxObject = {
+  const containerStyle: CSSProperties = {
     height: tile.height,
     left: tile.left,
     opacity: tile.active ? 1 : 0,
@@ -67,11 +65,13 @@ export function WatercolorTile({ tile, tileLoaded }: TileComponentProps) {
   };
 
   return (
-    <Box sx={containerSx}>
-      <Box alt="" component="img" onLoad={handleImageLoad} src={tile.url} sx={tileImgSx} />
+    <div style={containerStyle}>
+      {/* biome-ignore lint/performance/noImgElement: pigeon-maps tile uses external tile URL and onLoad */}
+      <img alt="" onLoad={handleImageLoad} src={tile.url} style={tileImgStyle} />
       {hasLabels && (
-        <Box alt="" component="img" onLoad={handleImageLoad} src={labelsUrl} sx={tileImgSx} />
+        // biome-ignore lint/performance/noImgElement: pigeon-maps tile uses external tile URL and onLoad
+        <img alt="" onLoad={handleImageLoad} src={labelsUrl} style={tileImgStyle} />
       )}
-    </Box>
+    </div>
   );
 }

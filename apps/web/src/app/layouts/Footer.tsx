@@ -1,15 +1,18 @@
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
 import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import { Container } from '@dg/ui/core/Container';
+import { Divider } from '@dg/ui/core/Divider';
 import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
 import { Section } from '@dg/ui/core/Section';
+import { Stack } from '@dg/ui/core/Stack';
 import {
   pinnedChromeSx,
   SITE_FOOTER_VIEW_TRANSITION_NAME,
 } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Container, Divider, Stack } from '@mui/material';
 import { cacheLife } from 'next/cache';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';

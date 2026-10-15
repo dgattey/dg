@@ -10,6 +10,10 @@ jest.mock('next/navigation', () => ({
   useSearchParams: jest.fn(),
 }));
 
+jest.mock('../../../../../services/albumDetail.actions', () => ({
+  loadAlbumDetail: jest.fn().mockResolvedValue(null),
+}));
+
 const push = jest.fn();
 
 /** Points the mocked router hooks at a query, as the URL would after a nav. */
@@ -114,7 +118,7 @@ describe('FavoriteAlbumsGrid', () => {
     render(<FavoriteAlbumsGrid albums={albums} />);
 
     expect(screen.queryByRole('link', { name: 'Zebra' })).not.toBeInTheDocument();
-    expect(document.querySelectorAll('.MuiSkeleton-root').length).toBe(1);
+    expect(document.querySelectorAll('[data-skeleton]').length).toBe(1);
   });
 
   it('reveals albums after view-transition animations finish', async () => {
@@ -166,20 +170,19 @@ describe('FavoriteAlbumsGrid', () => {
     ];
     const { container } = render(<FavoriteAlbumsGrid albums={fiveAlbums} surface="collage" />);
 
-    // Every cover in a cell, sleeves included, shares one priority.
     const cellPriorities = [...container.querySelectorAll('a')].map((link) => {
       const priorities = [...link.querySelectorAll('img')].map(
         (image) =>
           `${image.getAttribute('loading')}/${image.getAttribute('fetchpriority') ?? 'auto'}`,
       );
-      return [...new Set(priorities)].join(',');
+      return priorities.join(',');
     });
     expect(cellPriorities).toEqual([
-      'eager/high',
-      'eager/high',
-      'eager/high',
-      'eager/high',
-      'lazy/auto',
+      'lazy/auto,lazy/auto,eager/high',
+      'lazy/auto,lazy/auto,eager/high',
+      'lazy/auto,lazy/auto,eager/high',
+      'lazy/auto,lazy/auto,eager/high',
+      'lazy/auto,lazy/auto,lazy/auto',
     ]);
   });
 
@@ -284,7 +287,7 @@ describe('FavoriteAlbumsGrid', () => {
 
     expect(screen.getByRole('region', { name: 'Mango details' })).toBeInTheDocument();
     expect(screen.queryByText('zebra tracklist')).not.toBeInTheDocument();
-    expect(view.container.querySelectorAll('.MuiSkeleton-root').length).toBeGreaterThan(0);
+    expect(view.container.querySelectorAll('[data-skeleton]').length).toBeGreaterThan(0);
     await waitFor(() => {
       expect(push).toHaveBeenCalledWith(
         '/music/albums?album=album-mango',

@@ -1,6 +1,7 @@
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
-import { Card, Typography } from '@mui/material';
+import { Card } from '../core/Card';
 import { MouseAwareGlassContainer } from '../core/MouseAwareGlassContainer';
+import { Typography } from '../core/Typography';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
 import { truncated } from '../helpers/truncated';
 import type { SxObject } from '../theme';

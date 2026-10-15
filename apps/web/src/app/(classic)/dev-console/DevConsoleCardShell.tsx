@@ -1,5 +1,6 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import { Card, CardContent, Stack } from '@mui/material';
+import { Card, CardContent } from '@dg/ui/core/Card';
+import { Stack } from '@dg/ui/core/Stack';
 import type { ReactNode } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { DevConsoleCardBoundary } from './DevConsoleCardBoundary';

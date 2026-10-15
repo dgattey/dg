@@ -1,5 +1,8 @@
 import type { RenderableSideProject } from '@dg/content-models/contentful/renderables/sideProjects';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import { Stack } from '@dg/ui/core/Stack';
+import { Typography } from '@dg/ui/core/Typography';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
@@ -8,7 +11,6 @@ import { getConcentricBorderRadius } from '@dg/ui/helpers/concentricBorderRadius
 import { truncated } from '@dg/ui/helpers/truncated';
 import type { SxObject } from '@dg/ui/theme';
 import { getShape } from '@dg/ui/theme/shape';
-import { Box, Stack, Typography } from '@mui/material';
 import { ArrowUpRight } from 'lucide-react';
 import { CollageSideProjects } from '../collage/CollageSideProjects';
 

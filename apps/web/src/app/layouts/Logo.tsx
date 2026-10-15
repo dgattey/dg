@@ -2,11 +2,11 @@
 
 import { homeRoute } from '@dg/shared-core/routes/app';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Button } from '@dg/ui/core/Button';
 import { pageTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
-import { Button } from '@mui/material';
 import { isMusicDestinationPath } from './musicHeaderDestinations';
 import { usePublicPathname } from './usePublicPathname';
 

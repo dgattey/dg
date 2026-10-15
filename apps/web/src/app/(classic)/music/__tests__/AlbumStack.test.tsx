@@ -39,4 +39,24 @@ describe('AlbumStack', () => {
     const alts = [...container.querySelectorAll('img')].map((image) => image.getAttribute('alt'));
     expect(alts).toEqual(['', '', 'Feet of Clay']);
   });
+
+  it('loads only the front cover (depth === 0) eagerly when marked as LCP candidate', () => {
+    const { container } = render(
+      <AlbumStack imageUrl={imageUrl} sleeveCount={2}>
+        <AlbumCover
+          alt="Feet of Clay"
+          depth={0}
+          imageUrl={imageUrl}
+          isLcpCandidate={true}
+          sleeveCount={2}
+        />
+      </AlbumStack>,
+    );
+
+    const priorities = [...container.querySelectorAll('img')].map(
+      (image) =>
+        `${image.getAttribute('loading')}/${image.getAttribute('fetchpriority') ?? 'auto'}`,
+    );
+    expect(priorities).toEqual(['lazy/auto', 'lazy/auto', 'eager/high']);
+  });
 });

@@ -1,13 +1,11 @@
-'use client';
-
 import { homeRoute } from '@dg/shared-core/routes/app';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
-import { Section } from '@dg/ui/core/Section';
+import { Stack } from '@dg/ui/core/Stack';
+import { Typography } from '@dg/ui/core/Typography';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { BRAND } from '@dg/ui/theme/color';
-import { Stack, Typography } from '@mui/material';
 import { NOT_FOUND_BACKDROP, SERVER_ERROR_BACKDROP } from '../collage/backdrops';
 import { CollageBackdrop } from '../collage/CollageBackdrop';
 import { CutLetters } from '../collage/CutLetters';
@@ -98,8 +96,12 @@ export function ErrorLayout({ statusCode, surface = 'classic' }: ErrorLayoutProp
   }
 
   return (
-    <Stack component={Section} sx={layoutSx}>
-      <MouseAwareGlassContainer component={Typography} sx={statusCodeSx} variant="h1">
+    <Stack component="section" sx={layoutSx}>
+      <MouseAwareGlassContainer
+        className="MuiTypography-root MuiTypography-h1"
+        component="h1"
+        sx={statusCodeSx}
+      >
         {statusCode}
       </MouseAwareGlassContainer>
       <Typography sx={messageSx} variant="h5">

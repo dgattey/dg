@@ -76,7 +76,7 @@
 .devConsole__cardContent {
   gap: 16px;
 }
-.devConsole__cardContent .MuiTypography-root {
+.devConsole__cardContent [data-typography] {
   color: inherit;
 }
 .devConsole__actions {

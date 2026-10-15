@@ -1,6 +1,5 @@
 'use client';
 
-import { Box } from '@mui/material';
 import { ChevronUp, Moon, Sun, SunMoon } from 'lucide-react';
 import type { ChangeEvent, FocusEvent, KeyboardEvent, ReactNode } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
@@ -9,6 +8,7 @@ import { createTransition, TIMING_MEDIUM, TIMING_SLOW } from '../helpers/timing'
 import type { SxObject } from '../theme';
 import { type ColorSchemePreference, parseColorSchemePreference } from '../theme/colorScheme';
 import { useColorScheme } from '../theme/useColorScheme';
+import { Box } from './Box';
 import {
   DISCLOSURE_ICON_SIZE,
   DISCLOSURE_PANEL_PADDING,

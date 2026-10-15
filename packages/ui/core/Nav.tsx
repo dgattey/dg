@@ -1,6 +1,7 @@
-import type { BoxProps, ContainerProps, TypographyProps } from '@mui/material';
-import { Box, Container, Typography } from '@mui/material';
 import type { SxObject } from '../theme';
+import { Box, type BoxProps } from './Box';
+import { Container, type ContainerProps } from './Container';
+import { Typography, type TypographyProps } from './Typography';
 
 const navGroupBaseSx: SxObject = {
   alignItems: 'center',

@@ -1,10 +1,11 @@
 'use client';
 
-import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import React, { useId, useRef } from 'react';
 import { EASING_EASE_OUT, TIMING_FAST } from '../helpers/timing';
 import type { SxObject } from '../theme';
+import { Box } from './Box';
+import { Typography } from './Typography';
 
 export type TooltipPlacement = 'top' | 'bottom';
 
@@ -106,7 +107,7 @@ const TRIGGER_INSIDE_FOCUSED_SELECTOR = `[${ANCHOR_ATTRIBUTE}]:has(:focus-visibl
  * read as attaching to the element being styled, so `:focus-visible > …` would
  * compile to the surface focusing itself rather than an ancestor doing so.
  */
-const TRIGGER_AROUND_FOCUSED_SELECTOR = `*:focus-visible > [${ANCHOR_ATTRIBUTE}] > &`;
+const TRIGGER_AROUND_FOCUSED_SELECTOR = `*:focus-visible>[${ANCHOR_ATTRIBUTE}]>&`;
 
 /** Anchor for the tooltip's positioning, named per instance so surfaces can't cross. */
 function createAnchorSx(anchorName: string): TooltipAnchorSx {

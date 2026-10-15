@@ -1,8 +1,9 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
 import { GlassContainer } from '@dg/ui/core/GlassContainer';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { Minus, Plus } from 'lucide-react';
+import type { CSSProperties, MouseEvent } from 'react';
 
 type ZoomControlsProps = {
   onZoomIn: () => void;
@@ -20,29 +21,12 @@ const containerSx: SxObject = {
   zIndex: 1,
 };
 
-const dividerSx: SxObject = {
-  backgroundColor: 'divider',
+const dividerStyle: CSSProperties = {
+  backgroundColor: 'var(--mui-palette-divider)',
   width: '1px',
 };
 
-const buttonSx: SxObject = {
-  ':hover': {
-    backgroundColor: 'action.hover',
-  },
-  alignItems: 'center',
-  background: 'none',
-  border: 'none',
-  color: 'text.primary',
-  cursor: 'pointer',
-  display: 'flex',
-  fontSize: '1rem',
-  justifyContent: 'center',
-  lineHeight: 1,
-  padding: '0.4rem 0.5rem',
-  transition: 'background-color 0.2s',
-};
-
-const collageContainerSx: SxObject = {
+const collageContainerStyle: CSSProperties = {
   display: 'grid',
   gap: '5px',
   position: 'absolute',
@@ -51,32 +35,49 @@ const collageContainerSx: SxObject = {
   zIndex: 2,
 };
 
-const collageButtonSx: SxObject = {
-  ':hover': {
-    backgroundColor: 'color-mix(in srgb, var(--cream) 86%, var(--ochre))',
-  },
-  // The quad clip-path cuts anything drawn outside the button, so the ring sits inside.
-  '&&:focus-visible': {
-    borderRadius: '9px 13px 10px 12px',
-    outline: '2px solid currentColor',
-    outlineOffset: '-3px',
-  },
-  alignItems: 'center',
-  backgroundColor: 'var(--cream)',
-  border: 0,
-  clipPath: 'var(--quad-b)',
-  color: 'var(--ink-on-cream)',
-  cursor: 'pointer',
-  display: 'flex',
-  fontSize: 17,
-  fontWeight: 800,
-  height: 28,
-  justifyContent: 'center',
-  padding: 0,
-  width: 28,
-};
+const ZOOM_CONTROLS_CSS = `
+.dg-zoom-btn-classic {
+  align-items: center;
+  background: none;
+  border: none;
+  color: var(--mui-palette-text-primary);
+  cursor: pointer;
+  display: flex;
+  font-size: 1rem;
+  justify-content: center;
+  line-height: 1;
+  padding: 0.4rem 0.5rem;
+  transition: background-color 0.2s;
+}
+.dg-zoom-btn-classic:hover {
+  background-color: var(--mui-palette-action-hover);
+}
+.dg-zoom-btn-collage {
+  align-items: center;
+  background-color: var(--cream);
+  border: 0;
+  clip-path: var(--quad-b);
+  color: var(--ink-on-cream);
+  cursor: pointer;
+  display: flex;
+  font-size: 17px;
+  font-weight: 800;
+  height: 28px;
+  justify-content: center;
+  padding: 0;
+  width: 28px;
+}
+.dg-zoom-btn-collage:hover {
+  background-color: color-mix(in srgb, var(--cream) 86%, var(--ochre));
+}
+.dg-zoom-btn-collage:focus-visible {
+  border-radius: 9px 13px 10px 12px;
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+}
+`;
 
-const stopPropagation = (e: React.MouseEvent) => {
+const stopPropagation = (e: MouseEvent) => {
   e.stopPropagation();
 };
 
@@ -86,38 +87,43 @@ const stopPropagation = (e: React.MouseEvent) => {
 export function ZoomControls({ onZoomIn, onZoomOut, surface = 'classic' }: ZoomControlsProps) {
   if (surface === 'collage') {
     return (
-      <Box onMouseDown={stopPropagation} onMouseUp={stopPropagation} sx={collageContainerSx}>
-        <Box
+      <Box onMouseDown={stopPropagation} onMouseUp={stopPropagation} style={collageContainerStyle}>
+        <style>{ZOOM_CONTROLS_CSS}</style>
+        <button
           aria-label="Zoom in"
-          component="button"
+          className="dg-zoom-btn-collage"
           onClick={onZoomIn}
-          sx={collageButtonSx}
           type="button"
         >
           <Plus aria-hidden="true" size="1em" />
-        </Box>
-        <Box
+        </button>
+        <button
           aria-label="Zoom out"
-          component="button"
+          className="dg-zoom-btn-collage"
           onClick={onZoomOut}
-          sx={collageButtonSx}
           type="button"
         >
           <Minus aria-hidden="true" size="1em" />
-        </Box>
+        </button>
       </Box>
     );
   }
 
   return (
     <GlassContainer onMouseDown={stopPropagation} onMouseUp={stopPropagation} sx={containerSx}>
-      <Box aria-label="Zoom in" component="button" onClick={onZoomIn} sx={buttonSx} type="button">
+      <style>{ZOOM_CONTROLS_CSS}</style>
+      <button aria-label="Zoom in" className="dg-zoom-btn-classic" onClick={onZoomIn} type="button">
         <Plus size="1em" />
-      </Box>
-      <Box sx={dividerSx} />
-      <Box aria-label="Zoom out" component="button" onClick={onZoomOut} sx={buttonSx} type="button">
+      </button>
+      <div style={dividerStyle} />
+      <button
+        aria-label="Zoom out"
+        className="dg-zoom-btn-classic"
+        onClick={onZoomOut}
+        type="button"
+      >
         <Minus size="1em" />
-      </Box>
+      </button>
     </GlassContainer>
   );
 }

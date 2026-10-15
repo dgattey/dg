@@ -1,7 +1,9 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import { Skeleton } from '@dg/ui/core/Skeleton';
+import { Stack } from '@dg/ui/core/Stack';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Skeleton, Stack } from '@mui/material';
 import {
   ALBUM_GRID_COLUMNS,
   albumGridSx,
@@ -29,20 +31,18 @@ const DEFAULT_PLACEHOLDER_COUNT = 12;
  */
 function albumGridReserveSx(tileCount: number): SxObject {
   const rows = (columns: number) => Math.ceil(tileCount / columns);
-  const reserve = (columns: number, gapSum: string) => {
+  const gapSum = (columns: number) => `${2 * Math.max(0, rows(columns) - 1) * 8}px`;
+  const reserve = (columns: number) => {
     const rowCount = rows(columns);
-    return `calc(${(rowCount / columns) * 100}% + ${gapSum})`;
+    return `calc(${(rowCount / columns) * 100}% + ${gapSum(columns)})`;
   };
 
   return {
-    paddingBottom: (theme) => {
-      const gapSum = (columns: number) => theme.spacing(2 * Math.max(0, rows(columns) - 1));
-      return {
-        lg: reserve(ALBUM_GRID_COLUMNS.lg, gapSum(ALBUM_GRID_COLUMNS.lg)),
-        md: reserve(ALBUM_GRID_COLUMNS.md, gapSum(ALBUM_GRID_COLUMNS.md)),
-        sm: reserve(ALBUM_GRID_COLUMNS.sm, gapSum(ALBUM_GRID_COLUMNS.sm)),
-        xs: reserve(ALBUM_GRID_COLUMNS.xs, gapSum(ALBUM_GRID_COLUMNS.xs)),
-      };
+    paddingBottom: {
+      lg: reserve(ALBUM_GRID_COLUMNS.lg),
+      md: reserve(ALBUM_GRID_COLUMNS.md),
+      sm: reserve(ALBUM_GRID_COLUMNS.sm),
+      xs: reserve(ALBUM_GRID_COLUMNS.xs),
     },
   };
 }

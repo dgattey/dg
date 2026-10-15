@@ -1,7 +1,5 @@
-'use client';
-
+import { Box } from '@dg/ui/core/Box';
 import { Image } from '@dg/ui/dependent/Image';
-import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import {
   ALBUM_TILE_ART_SIZE,
@@ -37,14 +35,15 @@ export function AlbumCover({
   children,
   isLcpCandidate = false,
 }: Props) {
+  const isEagerFrontCover = isLcpCandidate && depth === 0;
   return (
     <Box aria-hidden={depth > 0 || undefined} sx={albumCoverSx(depth, sleeveCount)}>
       <Image
         alt={alt}
-        fetchPriority={isLcpCandidate ? 'high' : undefined}
+        fetchPriority={isEagerFrontCover ? 'high' : undefined}
         fill={true}
         height={ALBUM_TILE_ART_SIZE}
-        loading={isLcpCandidate ? 'eager' : undefined}
+        loading={isEagerFrontCover ? 'eager' : undefined}
         sizes={ALBUM_TILE_ART_SIZES}
         url={imageUrl}
         width={ALBUM_TILE_ART_SIZE}

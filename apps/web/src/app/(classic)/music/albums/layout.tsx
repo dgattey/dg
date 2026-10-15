@@ -2,7 +2,7 @@ import 'server-only';
 
 import { favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import { Typography } from '@mui/material';
+import { Typography } from '@dg/ui/core/Typography';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Suspense } from 'react';

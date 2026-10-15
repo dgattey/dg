@@ -1,8 +1,8 @@
 'use client';
 
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import type { ButtonProps } from '@mui/material';
-import { Button, Stack } from '@mui/material';
+import { Button, type ButtonProps } from '@dg/ui/core/Button';
+import { Stack } from '@dg/ui/core/Stack';
 import { useState } from 'react';
 import { PaperButton } from '../../collage/PaperButton';
 import { ErrorMessage } from './StatusIndicators';

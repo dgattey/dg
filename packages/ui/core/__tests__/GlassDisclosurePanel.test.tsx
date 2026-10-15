@@ -1,8 +1,8 @@
-import { Box } from '@mui/material';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Disc3, Sun } from 'lucide-react';
 import { EASING_BOUNCY, TIMING_BOUNCY, TIMING_NORMAL } from '../../helpers/timing';
+import { Box } from '../Box';
 import {
   DISCLOSURE_HOST_ATTRIBUTE,
   disclosureHostProps,

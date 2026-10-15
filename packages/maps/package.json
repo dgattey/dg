@@ -3,7 +3,6 @@
     "@dg/content-models": "workspace:*",
     "@dg/shared-core": "workspace:*",
     "@dg/ui": "workspace:*",
-    "@mui/material": "catalog:",
     "lucide-react": "catalog:",
     "pigeon-maps": "0.22.1",
     "react": "catalog:",

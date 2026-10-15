@@ -1,4 +1,3 @@
-import type { PaletteOptions } from '@mui/material';
 import { BRAND, onCanvas, type SchemeColor } from './color';
 
 type AdaptivePaletteColor = Readonly<{
@@ -33,7 +32,7 @@ const adaptivePaletteColor = ({
   mainChannel: undefined,
 });
 
-export function getPalette(): PaletteOptions {
+export function getPalette() {
   const palette = {
     action: {
       active: onCanvas(54),
