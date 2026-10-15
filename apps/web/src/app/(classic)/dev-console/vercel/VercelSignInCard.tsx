@@ -2,7 +2,9 @@ import 'server-only';
 
 import { vercelAuthRoute } from '@dg/shared-core/routes/api';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import { Button, Stack, Typography } from '@mui/material';
+import { Button } from '@dg/ui/core/Button';
+import { Stack } from '@dg/ui/core/Stack';
+import { Typography } from '@dg/ui/core/Typography';
 import { Suspense } from 'react';
 import { getVercelSession } from '../../../../auth/vercel/getVercelSession';
 import { signOutOfVercel } from '../../../../auth/vercel/session.actions';

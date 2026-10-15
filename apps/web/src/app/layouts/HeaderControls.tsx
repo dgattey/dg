@@ -1,10 +1,10 @@
 'use client';
 
+import { Box } from '@dg/ui/core/Box';
 import { ColorSchemeToggleClient } from '@dg/ui/core/ColorSchemeToggleClient';
 import { GlassContainer } from '@dg/ui/core/GlassContainer';
 import { GRAVITY_TRANSFORM_PREFIX, useMouseGravity } from '@dg/ui/helpers/useMouseGravity';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { useState } from 'react';
 import { MusicHeaderMenu } from './MusicHeaderMenu';
 

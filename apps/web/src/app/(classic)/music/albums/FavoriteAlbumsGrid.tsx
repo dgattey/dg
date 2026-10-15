@@ -1,16 +1,20 @@
 'use client';
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
+import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
 import { GlassSwitcher } from '@dg/ui/core/GlassSwitcher';
 import { jsOnlyProps } from '@dg/ui/core/JsOnlyStyle';
+import { Stack } from '@dg/ui/core/Stack';
 import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
+import { Typography } from '@dg/ui/core/Typography';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Stack } from '@mui/material';
 import { ArrowDownUp } from 'lucide-react';
 import type { ReactNode } from 'react';
 import {
+  Children,
   Fragment,
   Suspense,
   useEffect,
@@ -19,9 +23,11 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react';
+import { loadAlbumDetail } from '../../../../services/albumDetail.actions';
 import { PaperTag } from '../../../collage/PaperTag';
 import { hasClientHydrated } from '../../../layouts/clientHydrated';
 import { ALBUM_GRID_COLUMNS, albumGridSx, albumTileSlotSx } from '../albumTileGeometry';
+import { AlbumDetailBody } from './AlbumDetailBody';
 import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
 import { AlbumWell } from './AlbumWell';
 import {
@@ -148,6 +154,58 @@ type SelectedAlbumWellProps = {
   surface: SiteSurface;
 };
 
+type AlbumDetailState =
+  | { albumId: string; status: 'loading' }
+  | { albumId: string; detail: AlbumDetail | null | undefined; status: 'loaded' };
+
+/**
+ * Resolves and renders the selected album's detail body via the cached
+ * `loadAlbumDetail` server action (`cacheLife('hours')`) when no explicit
+ * `children` slot is supplied.
+ */
+function ClientSelectedAlbumDetail({
+  albumId,
+  surface,
+}: {
+  albumId: string;
+  surface: SiteSurface;
+}) {
+  const [state, setState] = useState<AlbumDetailState>({ albumId, status: 'loading' });
+
+  useEffect(() => {
+    let cancelled = false;
+    setState({ albumId, status: 'loading' });
+    void loadAlbumDetail(albumId)
+      .then((detail) => {
+        if (!cancelled) {
+          setState({ albumId, detail, status: 'loaded' });
+        }
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setState({ albumId, detail: undefined, status: 'loaded' });
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [albumId]);
+
+  if (state.albumId !== albumId || state.status === 'loading') {
+    return <AlbumDetailBodySkeleton surface={surface} />;
+  }
+
+  if (!state.detail) {
+    return (
+      <Typography color="text.secondary">
+        Album details are temporarily unavailable. Please try again soon.
+      </Typography>
+    );
+  }
+
+  return <AlbumDetailBody album={state.detail} surface={surface} />;
+}
+
 /**
  * The well for the selected album, the only part of the grid that reads the
  * query during prerender. It postpones to its own boundary, so a deep link
@@ -162,18 +220,19 @@ function SelectedAlbumWell({ albumCards, children, pending, surface }: SelectedA
     return null;
   }
 
+  const hasExplicitChildren = Children.count(children) > 0;
+
   return (
     <Box sx={wellPlacementSx(selectedIndex, albumCards.length, surface)}>
       <AlbumWell album={selectedCard.album} surface={surface} tone={selectedCard.treatment.tone}>
-        {/*
-         * Streamed detail always belongs to the album in the URL, so it is only
-         * rendered once the URL agrees with what the well is showing; until then
-         * the well holds the same skeleton the page streams behind. Keying by
-         * album makes that the single swap and stops one album's tracklist from
-         * lingering inside another album's well.
-         */}
         <Fragment key={selectedCard.album.id}>
-          {isAwaitingDetail ? <AlbumDetailBodySkeleton surface={surface} /> : children}
+          {isAwaitingDetail ? (
+            <AlbumDetailBodySkeleton surface={surface} />
+          ) : hasExplicitChildren ? (
+            children
+          ) : (
+            <ClientSelectedAlbumDetail albumId={selectedCard.album.id} surface={surface} />
+          )}
         </Fragment>
       </AlbumWell>
     </Box>

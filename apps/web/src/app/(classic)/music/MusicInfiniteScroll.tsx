@@ -2,20 +2,24 @@
 
 import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import { CircularProgress } from '@dg/ui/core/CircularProgress';
 import { useServerTime } from '@dg/ui/core/ServerTimeContext';
-import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
+import { Stack } from '@dg/ui/core/Stack';
+import { Typography } from '@dg/ui/core/Typography';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, CircularProgress, Stack, Typography } from '@mui/material';
-import { type ReactNode, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { loadMoreMusicHistory } from '../../../services/music.actions';
-import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
 import { groupTracksByDate } from './groupTracksByDate';
-import { MusicGrid } from './MusicGrid';
+import { CollageMusicStatus, MusicHistorySections } from './MusicHistorySections';
 
 type Props = {
-  initialTracks: Array<HistoryTrack>;
   initialCursor: string | null;
+  initialSectionOffset?: number;
+  initialTracks?: Array<HistoryTrack>;
+  /** When true, the initial tracks were already rendered on the server by `MusicHistory`. */
+  serverRenderedInitial?: boolean;
   surface?: SiteSurface;
 };
 
@@ -26,34 +30,21 @@ const loadingContainerSx: SxObject = {
   py: 2,
 };
 
-/** Trailing space comes from the bar's fade ramp, so only lead the label. */
-const sectionHeaderSx: SxObject = {
-  paddingBlockStart: 2,
-};
-
-function CollageStatus({ children, tag }: { children: ReactNode; tag?: ReactNode }) {
-  return (
-    <div className="music__state" role="status">
-      <PaperCard
-        edge="quad-c"
-        innerClassName={`music__stateInner${tag ? '' : ` music__loadingInner`}`}
-        tiltDeg={-1.5}
-        tone="cream"
-      >
-        {children}
-      </PaperCard>
-      {tag}
-    </div>
-  );
-}
-
 /**
- * Infinite scroll wrapper for music history.
+ * Infinite scroll continuation for music history.
  * Loads more tracks when sentinel element enters viewport.
  */
-export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'classic' }: Props) {
+export function MusicInfiniteScroll({
+  initialCursor,
+  initialSectionOffset = 0,
+  initialTracks = [],
+  serverRenderedInitial = false,
+  surface = 'classic',
+}: Props) {
   const serverTime = useServerTime();
-  const [allTracks, setAllTracks] = useState<Array<HistoryTrack>>(initialTracks);
+  const [extraTracks, setExtraTracks] = useState<Array<HistoryTrack>>(
+    serverRenderedInitial ? [] : initialTracks,
+  );
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [isLoading, setIsLoading] = useState(false);
   const [failedCursor, setFailedCursor] = useState<string | null>(null);
@@ -74,7 +65,7 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
           setIsLoading(true);
           try {
             const result = await loadMoreMusicHistory(cursor);
-            setAllTracks((prev) => [...prev, ...result.tracks]);
+            setExtraTracks((prev) => [...prev, ...result.tracks]);
             setCursor(result.nextCursor);
           } catch {
             setFailedCursor(cursor);
@@ -90,12 +81,12 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
     return () => observer.disconnect();
   }, [cursor, failedCursor, isLoading]);
 
-  const sections = groupTracksByDate(allTracks, serverTime);
+  const sections = groupTracksByDate(extraTracks, serverTime);
 
   if (surface === 'collage') {
-    if (sections.length === 0) {
+    if (!serverRenderedInitial && sections.length === 0) {
       return (
-        <CollageStatus
+        <CollageMusicStatus
           tag={
             <PaperTag className="collagePin music__stateTag" tiltDeg={-3} tone="ochre">
               Spotify
@@ -103,66 +94,50 @@ export function MusicInfiniteScroll({ initialTracks, initialCursor, surface = 'c
           }
         >
           <p>No listening history yet.</p>
-        </CollageStatus>
+        </CollageMusicStatus>
       );
     }
 
-    return (
-      <div className="music__history">
-        {sections.map((section, sectionIndex) => (
-          <section aria-label={section.label} className="music__section" key={section.label}>
-            <StickyFadeBar className="music__dateBar" surface="collage">
-              <h2 className="music__dateHeading">
-                <PaperTag
-                  className="music__dateTag"
-                  edge="soft-b"
-                  tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
-                  tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
-                >
-                  {section.label}
-                </PaperTag>
-              </h2>
-            </StickyFadeBar>
-            <MusicGrid
-              hasLcpCandidate={sectionIndex === 0}
-              surface="collage"
-              tracks={section.tracks}
-            />
-          </section>
-        ))}
+    const body = (
+      <>
+        <MusicHistorySections
+          sectionOffset={initialSectionOffset}
+          sections={sections}
+          surface="collage"
+          withLcpCandidate={!serverRenderedInitial}
+        />
         <div className="music__sentinel" ref={sentinelRef}>
           {isLoading ? (
-            <CollageStatus>
+            <CollageMusicStatus>
               <span aria-hidden="true" className="music__ring" />
               <span>Loading more plays…</span>
-            </CollageStatus>
+            </CollageMusicStatus>
           ) : null}
         </div>
-      </div>
+      </>
     );
+
+    return serverRenderedInitial ? body : <div className="music__history">{body}</div>;
   }
 
-  if (sections.length === 0) {
+  if (!serverRenderedInitial && sections.length === 0) {
     return <Typography>No listening history yet.</Typography>;
   }
 
-  return (
-    <Stack spacing={3}>
-      {sections.map((section) => (
-        <Stack key={section.label} spacing={1}>
-          <StickyFadeBar>
-            <Typography sx={sectionHeaderSx} variant="h2">
-              {section.label}
-            </Typography>
-          </StickyFadeBar>
-          <MusicGrid surface="classic" tracks={section.tracks} />
-        </Stack>
-      ))}
-
+  const body = (
+    <>
+      <MusicHistorySections
+        sectionOffset={initialSectionOffset}
+        sections={sections}
+        surface="classic"
+        withLcpCandidate={!serverRenderedInitial}
+      />
       {/* Sentinel element for infinite scroll */}
       <Box ref={sentinelRef} sx={loadingContainerSx}>
         {isLoading ? <CircularProgress size={24} /> : null}
       </Box>
-    </Stack>
+    </>
   );
+
+  return serverRenderedInitial ? body : <Stack spacing={3}>{body}</Stack>;
 }

@@ -2,8 +2,8 @@
 
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { Overlay, Map as PigeonMapCore } from 'pigeon-maps';
 import { useState } from 'react';
 import { Marker } from './Marker';

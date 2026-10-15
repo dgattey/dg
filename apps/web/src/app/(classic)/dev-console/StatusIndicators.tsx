@@ -1,5 +1,6 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import { Chip, Typography } from '@mui/material';
+import { Chip } from '@dg/ui/core/Chip';
+import { Typography } from '@dg/ui/core/Typography';
 import { PaperTag } from '../../collage/PaperTag';
 
 /**

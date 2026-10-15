@@ -1,11 +1,11 @@
 'use client';
 
 import type { Track } from '@dg/content-models/spotify/Track';
+import { Card } from '@dg/ui/core/Card';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
-import { Card } from '@mui/material';
 import {
   ALBUM_ART_BORDER_RADIUS,
   ALBUM_ART_DIMENSIONS,

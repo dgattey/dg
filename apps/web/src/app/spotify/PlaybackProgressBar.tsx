@@ -1,7 +1,7 @@
 'use client';
 
-import type { SxProps } from '@dg/ui/theme';
-import { Box } from '@mui/material';
+import { Box } from '@dg/ui/core/Box';
+import type { SxObject } from '@dg/ui/theme';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import type { Colors } from './colors';
@@ -38,24 +38,24 @@ export function PlaybackProgressBar({
   );
   const startTimeRef = useRef<number>(0);
   const startProgressRef = useRef<number>(progressMs ?? 0);
-  const trackSx: SxProps = (theme) => ({
-    backgroundColor: `color-mix(in srgb, ${colors?.primary ?? theme.vars.palette.text.primary} 20%, transparent)`,
+  const trackSx: SxObject = {
+    backgroundColor: `color-mix(in srgb, ${colors?.primary ?? 'var(--mui-palette-text-primary)'} 20%, transparent)`,
     borderRadius: 999,
     height: 6,
-    marginTop: theme.spacing(2),
+    marginTop: 2,
     overflow: 'hidden',
     pointerEvents: 'none',
     width: '100%',
-  });
-  const progressSx: SxProps = (theme) => ({
-    backgroundColor: colors ? colors.primary : theme.vars.palette.text.primary,
+  };
+  const progressSx: SxObject = {
+    backgroundColor: colors ? colors.primary : 'var(--mui-palette-text-primary)',
     borderRadius: 'inherit',
     height: '100%',
     transform: `scaleX(${progress})`,
     transformOrigin: 'left',
     transition: `transform ${PROGRESS_UPDATE_INTERVAL_MS}ms linear`,
     width: '100%',
-  });
+  };
 
   // When the server sends fresh timing data, reset our baseline and snap the bar.
   useEffect(() => {

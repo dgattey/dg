@@ -1,7 +1,5 @@
 import ClassicAlbumPage from '../../../../(classic)/music/albums/page';
 
-export default function Page(props: {
-  searchParams: Promise<Record<string, string | Array<string> | undefined>>;
-}) {
-  return <ClassicAlbumPage {...props} surface="collage" />;
+export default function Page() {
+  return <ClassicAlbumPage />;
 }

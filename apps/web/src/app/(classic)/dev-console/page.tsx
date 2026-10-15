@@ -1,7 +1,10 @@
 import 'server-only';
 
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import { Box, Divider, Stack, Typography } from '@mui/material';
+import { Box } from '@dg/ui/core/Box';
+import { Divider } from '@dg/ui/core/Divider';
+import { Stack } from '@dg/ui/core/Stack';
+import { Typography } from '@dg/ui/core/Typography';
 import { CollageConsole } from './CollageConsole';
 import { OauthCard } from './oauth/OauthCard';
 import { VercelSignInCard } from './vercel/VercelSignInCard';

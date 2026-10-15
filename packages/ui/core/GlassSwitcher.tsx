@@ -1,11 +1,11 @@
 'use client';
 
-import { Box, IconButton, Radio, RadioGroup, Typography } from '@mui/material';
-import type { FocusEvent, KeyboardEvent, ReactNode } from 'react';
+import type { ChangeEvent, FocusEvent, KeyboardEvent, ReactNode } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { createBouncyTransition } from '../helpers/bouncyTransition';
 import { createTransition, TIMING_MEDIUM } from '../helpers/timing';
 import type { SxElement, SxObject } from '../theme';
+import { Box } from './Box';
 import { GlassContainer } from './GlassContainer';
 import {
   DISCLOSURE_ROW_GAP,
@@ -14,8 +14,10 @@ import {
   GlassDisclosureRow,
   GlassDisclosureThumb,
 } from './GlassDisclosurePanel';
+import { IconButton } from './IconButton';
 import { MouseAwareGlassContainer } from './MouseAwareGlassContainer';
 import { Tooltip } from './Tooltip';
+import { Typography } from './Typography';
 
 /** Spacing constants (in theme spacing units) */
 export const SPACING = {
@@ -67,6 +69,8 @@ export function createGridStyles(optionCount: number): SxObject {
     alignItems: 'stretch',
     columnGap: gap,
     display: 'grid',
+    flexDirection: 'column',
+    flexWrap: 'wrap',
     gridAutoFlow: 'column',
     gridTemplateColumns: `repeat(${optionCount}, minmax(0, 1fr))`,
     height: '100%',
@@ -198,6 +202,7 @@ const desktopOnlySx: SxObject = {
 };
 
 interface SwitcherOptionProps {
+  name: string;
   option: GlassSwitcherOption;
   isSelected: boolean;
   onChange: (value: string) => void;
@@ -207,15 +212,18 @@ interface SwitcherOptionProps {
  * Desktop: individual clickable option with hidden radio input. Icon options
  * get a tooltip with the label; text options show the label directly.
  */
-function SwitcherOption({ option, isSelected, onChange }: SwitcherOptionProps) {
+function SwitcherOption({ name, option, isSelected, onChange }: SwitcherOptionProps) {
   const element = (
     <Box component="label" sx={optionStyles}>
-      <Radio
-        checked={isSelected}
-        onChange={(event) => onChange(event.target.value)}
-        sx={hiddenRadioSx}
-        value={option.value}
-      />
+      <Box component="span" sx={hiddenRadioSx}>
+        <input
+          checked={isSelected}
+          name={name}
+          onChange={(event: ChangeEvent<HTMLInputElement>) => onChange(event.target.value)}
+          type="radio"
+          value={option.value}
+        />
+      </Box>
       {option.icon ?? (
         <Typography component="span" sx={optionLabelSx} variant="caption">
           {option.label}
@@ -403,22 +411,17 @@ export function GlassSwitcher({
 
       {/* Desktop: Horizontal RadioGroup with thumb indicator */}
       <MouseAwareGlassContainer data-role="glass-switcher" sx={desktopSx}>
-        <RadioGroup
-          aria-label={ariaLabel}
-          name={radioGroupName}
-          onChange={(event) => onChange(event.target.value)}
-          sx={radioGroupSx}
-          value={value}
-        >
+        <Box aria-label={ariaLabel} role="radiogroup" sx={radioGroupSx}>
           {options.map((option) => (
             <SwitcherOption
               isSelected={value === option.value}
               key={option.value}
+              name={radioGroupName}
               onChange={onChange}
               option={option}
             />
           ))}
-        </RadioGroup>
+        </Box>
       </MouseAwareGlassContainer>
     </>
   );

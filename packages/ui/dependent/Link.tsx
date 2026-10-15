@@ -1,17 +1,28 @@
-import { faGithub } from '@fortawesome/free-brands-svg-icons/faGithub';
-import { faInstagram } from '@fortawesome/free-brands-svg-icons/faInstagram';
-import { faLinkedinIn } from '@fortawesome/free-brands-svg-icons/faLinkedinIn';
-import { faSpotify } from '@fortawesome/free-brands-svg-icons/faSpotify';
-import { faStrava } from '@fortawesome/free-brands-svg-icons/faStrava';
-import type { ButtonProps, LinkProps as MuiLinkProps } from '@mui/material';
-import { Box, Button, Link as MuiLink } from '@mui/material';
 import { Send } from 'lucide-react';
 import NextLink from 'next/link';
 import React from 'react';
+import { Box } from '../core/Box';
+import { Button, type ButtonProps } from '../core/Button';
 import type { TooltipPlacement } from '../core/Tooltip';
 import { Tooltip } from '../core/Tooltip';
-import { FaIcon } from '../icons/FaIcon';
-import type { SxProps } from '../theme';
+import { Typography, type TypographyVariant } from '../core/Typography';
+import { FaIcon, faGithub, faInstagram, faLinkedinIn, faSpotify, faStrava } from '../icons/FaIcon';
+import type { SxObject, SxProps } from '../theme';
+
+type LinkColor =
+  | 'inherit'
+  | 'primary'
+  | 'secondary'
+  | 'success'
+  | 'error'
+  | 'info'
+  | 'warning'
+  | 'textPrimary'
+  | 'textSecondary'
+  | 'text.primary'
+  | 'text.secondary';
+
+type LinkUnderline = 'none' | 'hover' | 'always';
 
 export type BaseLinkProps = {
   title?: string;
@@ -24,7 +35,7 @@ export type BaseLinkProps = {
   children?: React.ReactNode;
 
   /**
-   * MUI sx prop for styling
+   * Style prop for link styling
    */
   sx?: SxProps;
 
@@ -45,19 +56,19 @@ export type BaseLinkProps = {
   isExternal?: boolean;
 
   /**
-   * MUI Link color prop for theme colors
+   * Link color token
    */
-  color?: MuiLinkProps['color'];
+  color?: LinkColor;
 
   /**
-   * MUI Link underline behavior
+   * Link underline behavior
    */
-  underline?: MuiLinkProps['underline'];
+  underline?: LinkUnderline;
 
   /**
-   * MUI typography variant
+   * Typography variant
    */
-  variant?: MuiLinkProps['variant'];
+  variant?: TypographyVariant | 'inherit';
 
   /**
    * Tooltip placement for icon-only links.
@@ -102,6 +113,64 @@ export type BaseLinkProps = {
 type LinkProps = BaseLinkProps &
   ({ isButton: true; buttonProps?: ButtonProps<'a'> } | { isButton?: false; buttonProps?: never });
 
+const PALETTE_LINK_COLORS = new Set([
+  'primary',
+  'secondary',
+  'info',
+  'success',
+  'error',
+  'warning',
+]);
+
+function buildLinkSx(
+  color: LinkColor = 'inherit',
+  underline: LinkUnderline = 'hover',
+  sx?: SxProps,
+): SxProps {
+  const colorStyles: SxObject = PALETTE_LINK_COLORS.has(color)
+    ? {
+        '&:hover': {
+          color: `var(--mui-palette-${color}-dark)`,
+        },
+        color: `var(--mui-palette-${color}-main)`,
+        transition: 'color 150ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+      }
+    : color === 'textPrimary' || color === 'text.primary'
+      ? { color: 'var(--mui-palette-text-primary)' }
+      : color === 'textSecondary' || color === 'text.secondary'
+        ? { color: 'var(--mui-palette-text-secondary)' }
+        : { color: 'inherit' };
+
+  const underlineStyles: SxObject =
+    underline === 'always'
+      ? {
+          '&:hover': {
+            textDecorationColor: 'inherit',
+            ...(colorStyles['&:hover'] as SxObject),
+          },
+          textDecoration: 'underline',
+          textDecorationColor: 'color-mix(in srgb, currentColor 40%, transparent)',
+        }
+      : underline === 'hover'
+        ? {
+            '&:hover': {
+              textDecoration: 'underline',
+              ...(colorStyles['&:hover'] as SxObject),
+            },
+            textDecoration: 'none',
+          }
+        : {
+            textDecoration: 'none',
+          };
+
+  const base: SxObject = {
+    cursor: 'pointer',
+    ...colorStyles,
+    ...underlineStyles,
+  };
+  return Array.isArray(sx) ? [base, ...sx] : sx ? [base, sx] : base;
+}
+
 /**
  * Official Cursor cube mark (simple-icons / cursor brand), sized like FaIcon
  * peers so footer icons share caption color via currentColor.
@@ -128,8 +197,7 @@ function CursorIcon({ size = '1em' }: { size?: string }) {
 }
 
 /**
- * All built in mappings for icon name to element. Brand marks come from Font
- * Awesome since lucide-react v1 dropped brand icons for trademark reasons.
+ * All built in mappings for icon name to element.
  * Cursor is not in FA; map the Contentful `icon: "cursor"` string the same way.
  */
 const BUILT_IN_ICONS: Record<string, React.ReactNode> = {
@@ -190,14 +258,7 @@ function wrapWithTooltip(
 }
 
 /**
- * Server-compatible Link component with Next.js navigation and MUI theming.
- *
- * - Internal links: NextLink wraps MuiLink `<span>` (prefetching + client nav)
- * - External links: MuiLink `<a>` with `target="_blank"` (no NextLink needed)
- * - `forcePageNavigation`: MuiLink `<a>` without NextLink (full page load,
- *   useful for auth-protected pages where client-side nav interferes)
- *
- * Supports icons, tooltips, and button variant.
+ * Server-compatible Link component with Next.js navigation and theme styling.
  */
 export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link(
   {
@@ -244,7 +305,8 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     role,
   };
   const externalProps = isExternal ? { rel: 'noreferrer' as const, target: '_blank' as const } : {};
-  const muiStyleProps = { className, color, sx, underline, variant };
+  const resolvedVariant = variant && variant !== 'inherit' ? variant : 'body1';
+  const mergedLinkSx = buildLinkSx(color, underline, sx);
   const wrap = (el: React.ReactElement) =>
     wrapWithTooltip(el, showTooltip, title, tooltipPlacement, tooltipId);
 
@@ -254,6 +316,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
         {...buttonProps}
         {...anchorProps}
         className={className}
+        component="a"
         href={href}
         {...externalProps}
         sx={sx}
@@ -263,16 +326,22 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     );
   }
 
-  // External links and forcePageNavigation: plain <a> via MuiLink
   if (isExternal || forcePageNavigation) {
     return wrap(
-      <MuiLink {...anchorProps} href={href} {...muiStyleProps} {...externalProps}>
+      <Typography
+        {...anchorProps}
+        className={className}
+        component="a"
+        href={href}
+        sx={mergedLinkSx}
+        variant={resolvedVariant}
+        {...externalProps}
+      >
         {contents}
-      </MuiLink>,
+      </Typography>,
     );
   }
 
-  // Internal links: NextLink <a> wrapping MuiLink <span> for client-side nav
   return wrap(
     <NextLink
       {...anchorProps}
@@ -280,9 +349,14 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
       style={{ color: 'inherit', textDecoration: 'none' }}
       transitionTypes={transitionTypes ? [...transitionTypes] : undefined}
     >
-      <MuiLink component="span" {...muiStyleProps}>
+      <Typography
+        className={className}
+        component="span"
+        sx={mergedLinkSx}
+        variant={resolvedVariant}
+      >
         {contents}
-      </MuiLink>
+      </Typography>
     </NextLink>,
   );
 });

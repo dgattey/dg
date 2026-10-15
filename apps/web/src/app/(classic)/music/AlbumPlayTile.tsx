@@ -1,10 +1,8 @@
-'use client';
-
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Tooltip } from '@dg/ui/core/Tooltip';
+import { Typography } from '@dg/ui/core/Typography';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
-import { Typography } from '@mui/material';
 import { PaperTag } from '../../collage/PaperTag';
 import { AlbumCover } from './AlbumCover';
 import { AlbumStack } from './AlbumStack';

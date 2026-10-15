@@ -1,6 +1,4 @@
-'use client';
-
-import { Box } from '@mui/material';
+import { Box } from '@dg/ui/core/Box';
 import type { ReactNode } from 'react';
 import { AlbumCover } from './AlbumCover';
 import { albumTileFrameSx } from './albumTileGeometry';

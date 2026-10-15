@@ -2,12 +2,13 @@
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import { Typography } from '@dg/ui/core/Typography';
 import { albumArtViewTransitionName } from '@dg/ui/core/transitions/pageTransitions';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_DEFAULT, TIMING_MEDIUM } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Typography } from '@mui/material';
 import type { ReactNode, TransitionEvent } from 'react';
 import { useLayoutEffect, useRef, useState, ViewTransition } from 'react';
 import { ALBUM_DETAIL_BACKDROP } from '../../../collage/backdrops';

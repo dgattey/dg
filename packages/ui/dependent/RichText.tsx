@@ -10,7 +10,9 @@ import {
   type RenderableRichTextContent,
 } from '@dg/content-models/contentful/renderables/richText';
 import { isRecord } from '@dg/shared-core/types/typeguards';
-import { Divider, Stack, Typography } from '@mui/material';
+import { Divider } from '../core/Divider';
+import { Stack } from '../core/Stack';
+import { Typography } from '../core/Typography';
 import { PROJECT_MAX_IMAGE_DIMENSION } from '../helpers/imageSizes';
 import type { SxObject, SxProps } from '../theme';
 import { Image } from './Image';

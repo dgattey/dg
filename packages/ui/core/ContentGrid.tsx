@@ -1,6 +1,6 @@
-import { Box } from '@mui/material';
 import type { SxObject } from '../theme';
 import { getShape } from '../theme/shape';
+import { Box } from './Box';
 
 type Props = Pick<React.ComponentProps<'div'>, 'children'>;
 

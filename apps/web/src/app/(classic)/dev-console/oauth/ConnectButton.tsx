@@ -4,7 +4,7 @@ import type { OauthStatus } from '@dg/services/oauth/types';
 import type { OauthProviderKey } from '@dg/shared-core/routes/api';
 import { oauthConnectRoute } from '@dg/shared-core/routes/api';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import { Button } from '@mui/material';
+import { Button } from '@dg/ui/core/Button';
 import { PaperButton } from '../../../collage/PaperButton';
 
 export function ConnectButton({

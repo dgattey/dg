@@ -12,6 +12,10 @@ jest.mock('next/navigation', () => ({
   useSearchParams: jest.fn(),
 }));
 
+jest.mock('../../../../../services/albumDetail.actions', () => ({
+  loadAlbumDetail: jest.fn().mockResolvedValue(null),
+}));
+
 const album = (id: string, name: string): PlaylistAlbum => ({
   addedAt: '2026-01-01T00:00:00Z',
   artistNames: 'Artist',

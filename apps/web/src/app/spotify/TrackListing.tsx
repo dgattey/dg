@@ -1,10 +1,12 @@
 import type { Track } from '@dg/content-models/spotify/Track';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import { Card } from '@dg/ui/core/Card';
+import { Stack } from '@dg/ui/core/Stack';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Card, Stack } from '@mui/material';
 import { PaperCard } from '../collage/PaperCard';
 import { RecordDisc } from '../collage/RecordDisc';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';

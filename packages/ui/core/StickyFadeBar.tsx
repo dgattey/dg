@@ -1,8 +1,7 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import type { BoxProps } from '@mui/material';
-import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import type { SxObject } from '../theme';
+import { Box, type BoxProps } from './Box';
 import { stickyDecorSx } from './transitions/pageTransitions';
 
 const BACKGROUND = 'var(--mui-palette-background-default)';

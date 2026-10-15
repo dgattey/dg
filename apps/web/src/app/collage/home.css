@@ -189,8 +189,7 @@
 }
 .home__spotifyMetaInner a,
 .home__stravaContent a,
-.home__stravaContent .MuiTypography-root,
-.home__stravaContent .MuiLink-root {
+.home__stravaContent [data-typography] {
   color: inherit;
 }
 .home__stravaCopy {

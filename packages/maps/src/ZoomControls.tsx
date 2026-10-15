@@ -1,8 +1,9 @@
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
 import { GlassContainer } from '@dg/ui/core/GlassContainer';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { Minus, Plus } from 'lucide-react';
+import type { MouseEvent } from 'react';
 
 type ZoomControlsProps = {
   onZoomIn: () => void;
@@ -76,7 +77,7 @@ const collageButtonSx: SxObject = {
   width: 28,
 };
 
-const stopPropagation = (e: React.MouseEvent) => {
+const stopPropagation = (e: MouseEvent) => {
   e.stopPropagation();
 };
 

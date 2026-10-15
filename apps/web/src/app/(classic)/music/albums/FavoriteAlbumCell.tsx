@@ -1,7 +1,6 @@
-'use client';
-
 import { albumRoute, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import {
   albumArtViewTransitionName,
@@ -10,7 +9,6 @@ import {
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { X } from 'lucide-react';
 import { ViewTransition } from 'react';
 import { AlbumCover } from '../AlbumCover';

@@ -1,8 +1,6 @@
-'use client';
-
 import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import { Box } from '@mui/material';
+import { Box } from '@dg/ui/core/Box';
 import { AlbumPlayTile } from './AlbumPlayTile';
 import { albumGridSx } from './albumTileGeometry';
 import { groupAdjacentAlbumPlays } from './groupAdjacentAlbumPlays';

@@ -1,7 +1,7 @@
 'use client';
 
+import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import type { ReactNode } from 'react';
 import { MusicNotes } from './MusicNotes';
 import { useWaveformBounce } from './useWaveformBounce';

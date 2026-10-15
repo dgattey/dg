@@ -1,8 +1,8 @@
 'use client';
 
+import { Box } from '@dg/ui/core/Box';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { useState } from 'react';
 
 /** How long a new album's colors take to dissolve over the outgoing ones. */

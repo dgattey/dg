@@ -1,7 +1,7 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
+import { Box } from '@dg/ui/core/Box';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { getTileSource } from './src/getTileSource';
 import { PigeonMap } from './src/PigeonMap';
 

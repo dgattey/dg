@@ -1,9 +1,9 @@
 'use client';
 
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
 import { useColorScheme } from '@dg/ui/theme/useColorScheme';
-import { Box } from '@mui/material';
 import type { Point } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react';

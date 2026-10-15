@@ -1,7 +1,6 @@
-import type { BoxProps } from '@mui/material';
-import { Box } from '@mui/material';
 import { forwardRef } from 'react';
 import type { SxObject } from '../theme';
+import { Box, type BoxProps } from './Box';
 
 const sectionSx: SxObject = {
   marginBottom: { lg: 4.32, md: 3.6, sm: 3, xl: 5.184 },

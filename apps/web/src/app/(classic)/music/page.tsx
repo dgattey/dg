@@ -3,17 +3,22 @@ import 'server-only';
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { devConsoleRoute, musicRoute } from '@dg/shared-core/routes/app';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import { Stack } from '@mui/material';
+import { Stack } from '@dg/ui/core/Stack';
+import { Typography } from '@dg/ui/core/Typography';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
+import { getServerTime } from '../../../services/getServerTime';
 import { getMusicHistory } from '../../../services/music';
 import { HISTORY_BACKDROP } from '../../collage/backdrops';
 import { CollageBackdrop } from '../../collage/CollageBackdrop';
 import { CutLetters } from '../../collage/CutLetters';
+import { PaperTag } from '../../collage/PaperTag';
 import { markdownAlternates } from '../../layouts/markdownAlternates';
 import { musicDestinationLabel } from '../../layouts/musicHeaderDestinations';
 import { PageTitle } from '../../layouts/PageTitle';
+import { groupTracksByDate } from './groupTracksByDate';
+import { CollageMusicStatus, MusicHistorySections } from './MusicHistorySections';
 import { MusicHistorySkeleton } from './MusicHistorySkeleton';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 
@@ -41,15 +46,52 @@ async function MusicHistory({ surface = 'classic' }: { surface?: SiteSurface } =
     throw error;
   }
 
+  const serverTime = await getServerTime();
+  const sections = groupTracksByDate(tracks, serverTime);
+
   if (surface === 'collage') {
+    if (sections.length === 0) {
+      return (
+        <CollageMusicStatus
+          tag={
+            <PaperTag className="collagePin music__stateTag" tiltDeg={-3} tone="ochre">
+              Spotify
+            </PaperTag>
+          }
+        >
+          <p>No listening history yet.</p>
+        </CollageMusicStatus>
+      );
+    }
+
     return (
-      <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} surface="collage" />
+      <div className="music__history">
+        <MusicHistorySections sections={sections} surface="collage" withLcpCandidate={true} />
+        <MusicInfiniteScroll
+          initialCursor={nextCursor}
+          initialSectionOffset={sections.length}
+          serverRenderedInitial={true}
+          surface="collage"
+        />
+      </div>
     );
+  }
+
+  if (sections.length === 0) {
+    return <Typography>No listening history yet.</Typography>;
   }
 
   return (
     <Stack spacing={2}>
-      <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />
+      <Stack spacing={3}>
+        <MusicHistorySections sections={sections} surface="classic" withLcpCandidate={true} />
+        <MusicInfiniteScroll
+          initialCursor={nextCursor}
+          initialSectionOffset={sections.length}
+          serverRenderedInitial={true}
+          surface="classic"
+        />
+      </Stack>
     </Stack>
   );
 }

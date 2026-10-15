@@ -2,7 +2,7 @@ import type { Track } from '@dg/content-models/spotify/Track';
 import { render, screen } from '@testing-library/react';
 import type { ReactNode } from 'react';
 import { NowPlayingProvider, PublishNowPlaying } from '../NowPlayingContext';
-import { SpotifyCardWithGradient } from '../SpotifyCardWithGradient';
+import { SpotifyCollageCard } from '../SpotifyCollageCard';
 import { SpotifyHeaderCard } from '../SpotifyHeaderCard';
 
 jest.mock('next/navigation', () => ({
@@ -48,13 +48,12 @@ beforeAll(() => {
 });
 
 describe('NowPlayingProvider', () => {
-  it('shows the page widget track in the layout header card', () => {
-    // The header keeps the first load's track across client navigations, while
-    // the page widget renders the track fetched for the current page.
+  it('updates both the header card and the body card when the live track streams in', () => {
     render(
       <NowPlayingProvider>
         <SpotifyHeaderCard surface="collage" track={STALE} />
-        <SpotifyCardWithGradient surface="collage" track={FRESH} />
+        <SpotifyCollageCard track={STALE} />
+        <PublishNowPlaying track={FRESH} />
       </NowPlayingProvider>,
     );
 
@@ -62,20 +61,21 @@ describe('NowPlayingProvider', () => {
     expect(screen.getByTestId('card')).toHaveTextContent('Track fresh');
   });
 
-  it('follows the widget when the server sends the next track', () => {
-    const header = <SpotifyHeaderCard surface="collage" track={STALE} />;
+  it('follows the live publisher when the server sends the next track', () => {
     const { rerender } = render(
       <NowPlayingProvider>
-        {header}
-        <SpotifyCardWithGradient surface="collage" track={STALE} />
+        <SpotifyHeaderCard surface="collage" track={STALE} />
+        <SpotifyCollageCard track={STALE} />
       </NowPlayingProvider>,
     );
     expect(screen.getByTestId('compact')).toHaveTextContent('Track stale');
+    expect(screen.getByTestId('card')).toHaveTextContent('Track stale');
 
     rerender(
       <NowPlayingProvider>
-        {header}
-        <SpotifyCardWithGradient surface="collage" track={FRESH} />
+        <SpotifyHeaderCard surface="collage" track={STALE} />
+        <SpotifyCollageCard track={STALE} />
+        <PublishNowPlaying track={FRESH} />
       </NowPlayingProvider>,
     );
 

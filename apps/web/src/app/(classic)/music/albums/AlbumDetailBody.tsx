@@ -1,8 +1,9 @@
 import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
+import { Typography } from '@dg/ui/core/Typography';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
-import { Box, Typography } from '@mui/material';
 import type { ReactNode } from 'react';
 import {
   ALBUM_WELL_TRACK_COLUMN_GAP,

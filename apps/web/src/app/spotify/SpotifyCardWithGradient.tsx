@@ -1,14 +1,13 @@
 'use client';
 
 import type { Track } from '@dg/content-models/spotify/Track';
-import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { Box } from '@dg/ui/core/Box';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
-import { Box } from '@mui/material';
 import { type ReactNode, useEffect, useState } from 'react';
 import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
 import { type AlbumGradientInformation, extractAlbumGradientFromUrl } from './extractAlbumGradient';
-import { usePublishNowPlaying } from './NowPlayingContext';
+import { useNowPlaying } from './NowPlayingContext';
 import { SpotifyCardScrollTracker } from './SpotifyCardScrollTracker';
 import { TrackListing } from './TrackListing';
 
@@ -54,8 +53,6 @@ const cardSx: SxObject = {
   zIndex: 1,
 };
 
-const collageTrackerSx: SxObject = { gridArea: 'sp' };
-
 function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
   return (
     <Box sx={shellContainerSx}>
@@ -69,28 +66,22 @@ function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
 }
 
 type SpotifyCardWithGradientProps = {
-  surface?: SiteSurface;
   track: Track;
 };
 
 /**
- * Client card that derives album-art gradient/contrast in the browser.
+ * Classic client card that derives album-art gradient/contrast in the browser.
  * Keeps sharp (and its native libvips) out of the homepage server module graph.
+ * Collage bypasses this wrapper and renders `SpotifyCollageCard` directly.
  */
-export function SpotifyCardWithGradient({
-  surface = 'classic',
-  track,
-}: SpotifyCardWithGradientProps) {
-  usePublishNowPlaying(track);
+export function SpotifyCardWithGradient({ track: serverTrack }: SpotifyCardWithGradientProps) {
+  const track = useNowPlaying(serverTrack) ?? serverTrack;
   const [gradientInformation, setGradientInformation] = useState<AlbumGradientInformation>({
     backgroundGradient: track.albumGradient ?? null,
     contrastSetting: track.albumGradientContrastSetting ?? null,
   });
 
   useEffect(() => {
-    if (surface === 'collage') {
-      return;
-    }
     let cancelled = false;
     extractAlbumGradientFromUrl(track.albumImage.url).then((info) => {
       if (cancelled) {
@@ -101,15 +92,7 @@ export function SpotifyCardWithGradient({
     return () => {
       cancelled = true;
     };
-  }, [surface, track.albumImage.url]);
-
-  if (surface === 'collage') {
-    return (
-      <SpotifyCardScrollTracker sx={collageTrackerSx}>
-        <TrackListing surface="collage" track={track} />
-      </SpotifyCardScrollTracker>
-    );
-  }
+  }, [track.albumImage.url]);
 
   const trackWithCurrentGradient: Track = {
     ...track,
