@@ -34,6 +34,13 @@ export const EASING_BOUNCE = 'cubic-bezier(0.34, 1.56, 0.64, 1)';
 export const EASING_DECELERATE = 'cubic-bezier(0.05, 0.7, 0.1, 1)';
 
 /**
+ * Front-loaded like EASING_DECELERATE (90% of the travel inside 40% of the time)
+ * but eased through the first frames, so short, long-distance moves such as page
+ * transitions answer at once without jumping.
+ */
+export const EASING_SNAPPY = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
+
+/**
  * Bouncy timing function for spring-like animations.
  * This creates an overshoot effect that settles naturally.
  */
@@ -50,6 +57,7 @@ export function getTimingCssVars(): Record<`--${string}`, string> {
     '--easing-decelerate': EASING_DECELERATE,
     '--easing-default': EASING_DEFAULT,
     '--easing-ease-out': EASING_EASE_OUT,
+    '--easing-snappy': EASING_SNAPPY,
     '--timing-fast': `${TIMING_FAST}ms`,
     '--timing-medium': `${TIMING_MEDIUM}ms`,
     '--timing-slow': `${TIMING_SLOW}ms`,
