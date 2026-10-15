@@ -1,11 +1,12 @@
 import 'server-only';
 
+import { AGENT_DOCUMENT_CACHE_CONTROL } from '../agentDocumentCacheControl';
 import { getLlmsTxt } from './getLlmsTxt';
 
 export async function GET() {
   return new Response(await getLlmsTxt(), {
     headers: {
-      'Cache-Control': 's-maxage=60, stale-while-revalidate=86400',
+      'Cache-Control': AGENT_DOCUMENT_CACHE_CONTROL,
       'Content-Type': 'text/markdown; charset=utf-8',
     },
   });
