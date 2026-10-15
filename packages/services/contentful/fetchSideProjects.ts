@@ -18,7 +18,7 @@ import { getContentfulClient } from './contentfulClient';
  */
 const QUERY = gql`
   query SideProjects {
-    projectCollection(limit: 2, where: { isSideProject: true }, order: creationDate_DESC) {
+    projectCollection(limit: ${SIDE_PROJECTS_LIMIT}, where: { isSideProject: true }, order: creationDate_DESC) {
       items {
         title
         summary
@@ -39,7 +39,7 @@ const QUERY = gql`
 `;
 
 /**
- * Fetches at most the two newest published side projects (flagged projects).
+ * Fetches at most SIDE_PROJECTS_LIMIT newest published side projects (flagged projects).
  */
 export async function fetchSideProjects(): Promise<Array<RenderableSideProject>> {
   const data = parseResponse(projectsResponseSchema, await getContentfulClient().request(QUERY), {
