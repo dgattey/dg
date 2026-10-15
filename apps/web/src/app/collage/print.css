@@ -1,8 +1,8 @@
-/* Prints, portrait print, and record disc */
+/* Prints, portrait print, and album sleeve */
 
 /*
- * The record disc clips everything outside its circle and the art paints over
- * the link, so its ring is an inset circle layered above the art.
+ * The album sleeve clips everything outside its rounded edge and the art paints
+ * over the link, so its ring is an inset rounded rect layered above the art.
  */
 .collageRoot .print__artLink:focus-visible {
   outline: none;
@@ -14,7 +14,7 @@
   pointer-events: none;
   content: "";
   border: 2px solid currentColor;
-  border-radius: 50%;
+  border-radius: 14px;
 }
 
 .print__print {
@@ -71,38 +71,38 @@
   left: 2%;
 }
 
-.print__disc {
+.print__sleeve {
   position: relative;
   width: 100%;
   height: 100%;
   aspect-ratio: 1;
   filter: var(--dshadow);
-  clip-path: url(#collage-disc-clip);
+  rotate: -2deg;
 }
-.print__discPiece {
+.print__sleevePiece {
   position: relative;
   display: grid;
-  place-items: center;
   width: 100%;
   height: 100%;
   overflow: clip;
   background: var(--black);
-  clip-path: url(#collage-disc-clip);
+  clip-path: var(--soft-a);
 }
 .print__logo {
   position: absolute;
-  top: 13%;
-  left: 15%;
+  top: 12px;
+  left: 12px;
   z-index: 2;
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
 }
 .print__logoMark {
   display: block;
-  width: 26px;
-  height: 26px;
+  width: 22px;
+  height: 22px;
   background: var(--leaf);
   border-radius: 50%;
+  box-shadow: 0 0 0 2px var(--cream);
 }
 .print__artLink {
   display: block;
@@ -122,16 +122,6 @@
   mix-blend-mode: normal;
   filter: none;
 }
-.print__hole {
-  position: absolute;
-  z-index: 2;
-  width: 4%;
-  aspect-ratio: 1;
-  pointer-events: none;
-  background: var(--paper);
-  border-radius: 50%;
-}
-
 @media (max-width: 820px) {
   .print__portrait {
     width: min(100%, 300px);

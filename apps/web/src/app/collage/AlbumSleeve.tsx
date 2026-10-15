@@ -4,11 +4,12 @@ import type { Track } from '@dg/content-models/spotify/Track';
 import { Image } from '@dg/ui/dependent/Image';
 import { AlbumArtWithNotes } from '../spotify/AlbumArtWithNotes';
 
-export function RecordDisc({ track }: { track: Track }) {
+export function AlbumSleeve({ track }: { track: Track }) {
   return (
     <AlbumArtWithNotes
       isPlaying={Boolean(track.isPlaying)}
       noteColor="var(--cream)"
+      notesVariant="collage"
       wrapperSx={{
         aspectRatio: '1',
         overflow: 'visible',
@@ -16,8 +17,8 @@ export function RecordDisc({ track }: { track: Track }) {
         width: 'min(100%, 240px)',
       }}
     >
-      <div className="print__disc">
-        <div className="print__discPiece">
+      <div className="print__sleeve">
+        <div className="print__sleevePiece">
           <a
             aria-label="Spotify"
             className="print__logo"
@@ -48,7 +49,6 @@ export function RecordDisc({ track }: { track: Track }) {
               />
             </span>
           </a>
-          <span aria-hidden="true" className="print__hole" />
         </div>
       </div>
     </AlbumArtWithNotes>
