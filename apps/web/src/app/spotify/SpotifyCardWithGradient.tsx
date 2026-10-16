@@ -4,11 +4,11 @@ import type { Track } from '@dg/content-models/spotify/Track';
 import { Box } from '@dg/ui/core/Box';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
-import { type ReactNode, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
-import { type AlbumGradientInformation, extractAlbumGradientFromUrl } from './extractAlbumGradient';
 import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
+import { useAlbumGradient } from './useAlbumGradient';
 
 type SpotifyCardShellProps = {
   children: ReactNode;
@@ -72,34 +72,10 @@ type SpotifyCardWithGradientProps = {
 
 /**
  * Classic client card that derives album-art gradient/contrast in the browser.
- * Keeps sharp (and its native libvips) out of the homepage server module graph.
  * Collage bypasses this wrapper and renders `SpotifyCollageCard` directly.
  */
 export function SpotifyCardWithGradient({ track: serverTrack }: SpotifyCardWithGradientProps) {
-  const track = useNowPlaying(serverTrack) ?? serverTrack;
-  const [gradientInformation, setGradientInformation] = useState<AlbumGradientInformation>({
-    backgroundGradient: track.albumGradient ?? null,
-    contrastSetting: track.albumGradientContrastSetting ?? null,
-  });
-
-  useEffect(() => {
-    let cancelled = false;
-    extractAlbumGradientFromUrl(track.albumImage.url).then((info) => {
-      if (cancelled) {
-        return;
-      }
-      setGradientInformation(info);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [track.albumImage.url]);
-
-  const trackWithCurrentGradient: Track = {
-    ...track,
-    albumGradient: gradientInformation.backgroundGradient ?? undefined,
-    albumGradientContrastSetting: gradientInformation.contrastSetting ?? undefined,
-  };
+  const trackWithCurrentGradient = useAlbumGradient(useNowPlaying(serverTrack) ?? serverTrack);
 
   return (
     <Box id={NOW_PLAYING_CARD_ID} sx={anchorSx}>
