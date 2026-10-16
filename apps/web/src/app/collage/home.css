@@ -148,7 +148,7 @@
 .home__spotifySlot {
   position: relative;
   z-index: 1;
-  margin-top: calc(-1 * var(--sp-top) - 112px);
+  margin-top: calc(-1 * var(--sp-top) - 168px);
 }
 .home__spotify {
   position: relative;
@@ -414,7 +414,7 @@
   /* Leads the sheet, offset right so it overlaps the map's corner, not its tag. */
   .collageRoot .collageGridStack > .home__spotifySlot {
     order: -1;
-    margin-top: calc(-1 * var(--sp-top) - 88px);
+    margin-top: calc(-1 * var(--sp-top) - 120px);
   }
   .home__spotify {
     width: min(100%, 264px);
