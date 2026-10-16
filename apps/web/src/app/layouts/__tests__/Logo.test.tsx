@@ -13,20 +13,20 @@ import { Logo } from '../Logo';
 
 describe('Logo', () => {
   it.each(['/', '/redesign'])(
-    'renders the collage home logo as a scroll-to-top button at %s',
+    'renders the home logo as a scroll-to-top button at %s',
     (pathname) => {
       jest.mocked(usePathname).mockReturnValue(pathname);
-      render(<Logo surface="collage" />);
+      render(<Logo />);
 
       expect(screen.getByRole('button', { name: 'dg.' })).toBeInTheDocument();
       expect(screen.queryByRole('link')).not.toBeInTheDocument();
     },
   );
 
-  it('links the collage logo home from the prerendered albums path', () => {
+  it('links the logo home from the prerendered albums path', () => {
     jest.mocked(usePathname).mockReturnValue('/redesign/music/albums');
-    render(<Logo surface="collage" />);
+    render(<Logo />);
 
-    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+    expect(screen.getByRole('link', { name: 'dg.' })).toHaveAttribute('href', '/');
   });
 });

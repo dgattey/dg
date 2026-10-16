@@ -11,7 +11,6 @@ import type { SxObject } from '@dg/ui/theme';
 import { Suspense } from 'react';
 import { getLastKnownSong, getLatestSong } from '../../services/spotify';
 import { CollageColorSchemeFieldset } from '../collage/CollageColorSchemeFieldset';
-import { PaperCard } from '../collage/PaperCard';
 import { PublishNowPlaying } from '../spotify/NowPlayingContext';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
 import { CollageMusicLinks } from './CollageMusicLinks';
@@ -74,11 +73,9 @@ export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
       <>
         <SiteHeaderHeight />
         <header className="collageMeasure chrome__header" data-sticky-header={true}>
-          <PaperCard className="chrome__logo collageLift" edge="quad-b" tiltDeg={-4} tone="ochre">
-            <div className="chrome__logoInner">
-              <Logo surface="collage" />
-            </div>
-          </PaperCard>
+          <MouseAwareGlassContainer sx={glassContainerSx}>
+            <Logo />
+          </MouseAwareGlassContainer>
           <div className="chrome__nowPlaying collageLift">
             <LastKnownSpotifyHeaderCard surface="collage" />
             <Suspense fallback={null}>

@@ -1,7 +1,6 @@
 'use client';
 
 import { homeRoute } from '@dg/shared-core/routes/app';
-import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Button } from '@dg/ui/core/Button';
 import { pageTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
@@ -73,32 +72,12 @@ const logoLinkMergedSx: SxObject = {
  * Going home uses the close view-transition type so the page falls away and
  * its heading morphs into the homepage headline instead of snapping.
  */
-export function Logo({ surface = 'classic' }: { surface?: SiteSurface }) {
+export function Logo() {
   const pathname = usePublicPathname();
 
   const scrollToTop = () => {
     window.scrollTo({ behavior: 'smooth', top: 0 });
   };
-
-  if (surface === 'collage') {
-    if (pathname === homeRoute) {
-      return (
-        <button onClick={scrollToTop} type="button">
-          dg.
-        </button>
-      );
-    }
-    return (
-      <Link
-        href={homeRoute}
-        sx={{ color: 'inherit', textDecoration: 'none' }}
-        title="Home"
-        transitionTypes={pageTransitionTypes('close')}
-      >
-        dg.
-      </Link>
-    );
-  }
 
   if (pathname === homeRoute) {
     return (
