@@ -14,7 +14,7 @@ export function AlbumSleeve({ track }: { track: Track }) {
         aspectRatio: '1',
         overflow: 'visible',
         position: 'relative',
-        width: 'min(100%, 240px)',
+        width: 'min(100%, 300px)',
       }}
     >
       <div className="print__sleeve">
@@ -33,7 +33,7 @@ export function AlbumSleeve({ track }: { track: Track }) {
                 cover={true}
                 height={track.albumImage.height}
                 quality={60}
-                sizes={{ extraLarge: 240 }}
+                sizes={{ extraLarge: 300 }}
                 url={track.albumImage.url}
                 width={track.albumImage.width}
               />

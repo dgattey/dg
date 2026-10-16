@@ -143,13 +143,13 @@
   position: relative;
 }
 .home__spotifyMeta {
-  width: min(100%, 250px);
+  width: min(100%, 300px);
   margin-top: 8px;
 }
 .home__spotifyMetaInner {
   display: grid;
   gap: 3px;
-  padding: 14px 18px 16px;
+  padding: 16px 20px 18px;
   color: var(--on);
 }
 .home__stravaInner {
@@ -189,6 +189,13 @@
 .home__stravaInner a,
 .home__stravaInner [data-typography] {
   color: inherit;
+}
+.home__spotifyMetaInner > :nth-child(2) {
+  font-size: 24px;
+}
+.home__spotifyMetaInner > :nth-child(3),
+.home__spotifyMetaInner > :nth-child(3) a {
+  font-size: 24px;
 }
 .home__stravaCopy {
   display: grid;
