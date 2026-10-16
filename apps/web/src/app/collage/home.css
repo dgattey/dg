@@ -187,6 +187,15 @@
   padding: 16px 20px 18px;
   color: var(--on);
 }
+/*
+ * The card's tilt makes it the containing block for the fixed tooltip, so room
+ * is measured inside the card: a flip would drop the hint onto the title, and
+ * safe alignment would pin it over its own trigger. It overflows the card instead.
+ */
+.home__spotifyMeta [role="tooltip"] {
+  position-try-fallbacks: none;
+  align-self: unsafe end;
+}
 .home__stravaInner {
   display: grid;
   grid-template-rows: 1fr auto;

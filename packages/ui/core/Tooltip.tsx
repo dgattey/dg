@@ -138,6 +138,7 @@ function createSurfaceSx(anchorName: string, placement: TooltipPlacement): Toolt
     borderRadius: '12px',
     boxShadow: 'var(--mui-extraShadows-card-main)',
     color: 'var(--mui-palette-text-primary)',
+    fontVariantCaps: 'normal',
     fontWeight: 600,
     letterSpacing: 'normal',
     lineHeight: 1.3,
