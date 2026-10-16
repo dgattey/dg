@@ -133,19 +133,24 @@
 .home__codaGrid {
   column-gap: var(--gap);
 }
+/* Rises past the sheet's padding so the sleeve straddles the torn top edge. */
+.home__spotifySlot {
+  position: relative;
+  z-index: 1;
+  margin-top: calc(-1 * var(--sp-top) - 112px);
+}
 .home__spotify {
   position: relative;
   display: grid;
   align-content: start;
   justify-items: center;
-  padding-top: 4px;
 }
 .home__strava {
   position: relative;
 }
 .home__spotifyMeta {
   width: min(100%, 300px);
-  margin-top: 8px;
+  margin-top: -10px;
 }
 .home__spotifyMetaInner {
   display: grid;
@@ -397,6 +402,16 @@
   }
   .home__stravaRoute {
     min-height: 180px;
+  }
+  /* Leads the sheet, offset right so it overlaps the map's corner, not its tag. */
+  .collageRoot .collageGridStack > .home__spotifySlot {
+    order: -1;
+    margin-top: calc(-1 * var(--sp-top) - 88px);
+  }
+  .home__spotify {
+    width: min(100%, 264px);
+    margin-right: 6px;
+    margin-left: auto;
   }
   .home__sideRoot {
     padding: 0;

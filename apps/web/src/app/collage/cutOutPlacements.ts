@@ -131,7 +131,7 @@ export const CUT_OUT_PLACEMENTS = {
     ['work-algae', 'algae', 'cream', 330, -8, -4, 2, 'all', 1],
     ['work-star-upper', 'star5', 'cream', 54, 14, 21, 3, 'all', 1],
     ['work-swallow-upper', 'swallow', 'cream', 170, -6, 55, -2, 'all', 1],
-    ['work-star-right', 'star4', 'cream', 44, 0, 81, 5, 'desktop', 1],
+    ['work-star-right', 'star4', 'cream', 44, 0, 70, 3, 'desktop', 1],
     ['work-seaweed', 'seaweed', 'cream', 300, 10, 90, 26, 'all', 1],
     ['work-coral', 'coral', 'cream', 250, -12, 27, 50, 'all', 1],
     ['work-star-lower-left', 'star5', 'cream', 40, -20, 3, 84, 'all', 1],
