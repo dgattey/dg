@@ -9,10 +9,12 @@ import { TrackTitle } from './TrackTitle';
 export function TrackCardMeta({
   track,
   colors,
+  service,
   textShadow,
 }: {
   track: Track;
   colors: Colors | null;
+  service?: string;
   textShadow?: boolean;
 }) {
   const { primary, secondary, primaryShadow, secondaryShadow } = colors ?? {};
@@ -26,6 +28,7 @@ export function TrackCardMeta({
         isPlaying={track.isPlaying}
         listingVariant="card"
         playedAt={track.playedAt}
+        service={service}
         textShadow={shadows ? primaryShadow : undefined}
       />
       <TrackTitle

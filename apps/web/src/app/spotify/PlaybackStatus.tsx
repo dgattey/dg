@@ -19,6 +19,8 @@ type PlaybackStatusProps = {
   /** Override animation state separately from playback status. Defaults to matching isPlaying. */
   animating?: boolean;
   listingVariant?: ListingVariant;
+  /** Names where it's playing, trading the relative time for a plain "recently played". */
+  service?: string;
 };
 
 function getStatusSx(
@@ -57,12 +59,15 @@ const compactTextSx: SxObject = {
 function StatusText({
   isNowPlaying,
   playedAt,
+  service,
   tooltipPlacement,
 }: {
   isNowPlaying: boolean;
   playedAt: Date | string | undefined;
+  service: string | undefined;
   tooltipPlacement: TooltipPlacement;
 }) {
+  if (service) return `${isNowPlaying ? 'Now playing' : 'Recently played'} on ${service}`;
   if (isNowPlaying) return 'Now playing';
   if (playedAt)
     return (
@@ -84,6 +89,7 @@ export function PlaybackStatus({
   textShadow,
   animating,
   listingVariant = 'card',
+  service,
 }: PlaybackStatusProps) {
   const isNowPlaying = isPlaying ?? !playedAt;
   const shouldAnimate = animating ?? isNowPlaying;
@@ -99,6 +105,7 @@ export function PlaybackStatus({
     <StatusText
       isNowPlaying={isNowPlaying}
       playedAt={playedAt}
+      service={service}
       tooltipPlacement={isCompact ? 'bottom' : 'top'}
     />
   );

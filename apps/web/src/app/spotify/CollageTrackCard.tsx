@@ -9,7 +9,6 @@ import {
   AlbumGradientBackdrop,
 } from './AlbumGradientBackdrop';
 import { type Colors, getContrastingColors } from './colors';
-import { SpotifyLogo } from './SpotifyLogo';
 import { TrackCardMeta } from './TrackCardMeta';
 
 export const COLLAGE_TRACK_COLORS: Colors = {
@@ -49,13 +48,7 @@ export function CollageTrackCard({ track }: { track: Track }) {
         >
           <AlbumGradientBackdrop containerSx={tornGradientSurfaceSx} gradient={gradient} />
           <div className="home__spotifyMetaInner">
-            <SpotifyLogo
-              color={colors?.primary}
-              textShadow={colors?.primaryShadow}
-              trackTitle={track.name}
-              url={track.externalUrls.spotify}
-            />
-            <TrackCardMeta colors={colors} track={track} />
+            <TrackCardMeta colors={colors} service="Spotify" track={track} />
           </div>
         </PaperCard>
       </div>
