@@ -83,7 +83,7 @@
   position: relative;
   z-index: 2;
   grid-area: map;
-  width: min(100%, 540px);
+  width: min(100%, 720px);
   margin-top: 76px;
   margin-left: 8px;
 }
@@ -91,7 +91,7 @@
   width: 100%;
 }
 .home__mapInner {
-  aspect-ratio: 2.04;
+  aspect-ratio: 1.8;
   overflow: clip;
 }
 .home__mapInner > * {
@@ -381,7 +381,7 @@
     margin-left: 0;
   }
   .home__mapInner {
-    aspect-ratio: 1.15;
+    aspect-ratio: 1;
   }
   .home__stravaRoute {
     min-height: 180px;
