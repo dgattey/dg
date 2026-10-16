@@ -73,9 +73,7 @@ export function Header({ surface = 'classic' }: { surface?: SiteSurface }) {
       <>
         <SiteHeaderHeight />
         <header className="collageMeasure chrome__header" data-sticky-header={true}>
-          <MouseAwareGlassContainer sx={glassContainerSx}>
-            <Logo />
-          </MouseAwareGlassContainer>
+          <Logo />
           <div className="chrome__nowPlaying collageLift">
             <LastKnownSpotifyHeaderCard surface="collage" />
             <Suspense fallback={null}>
