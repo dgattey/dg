@@ -398,6 +398,10 @@
 }
 
 @media (max-width: 820px) {
+  /* Leaves room under the map for the sleeve rising out of the work sheet. */
+  .home__hello {
+    --sp-bottom: 150px;
+  }
   .home__work {
     --sp-top: 70px;
     --sp-bottom: 80px;
@@ -441,7 +445,8 @@
   /* Leads the sheet, offset right so it overlaps the map's corner, not its tag. */
   .collageRoot .collageGridStack > .home__spotifySlot {
     order: -1;
-    margin-top: calc(-1 * var(--sp-top) - 120px);
+    margin-top: calc(-1 * var(--sp-top) - 100px);
+    margin-bottom: 28px;
   }
   .home__spotify {
     width: min(100%, 264px);
