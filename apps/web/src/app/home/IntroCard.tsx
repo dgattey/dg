@@ -8,7 +8,6 @@ import { RichText } from '@dg/ui/dependent/RichText';
 import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
 import type { SxObject } from '@dg/ui/theme';
 import { CutLetters } from '../collage/CutLetters';
-import { PaperCard } from '../collage/PaperCard';
 import { introImageAlt, PortraitPrint } from '../collage/PortraitPrint';
 import { splitIntroDocument } from '../collage/splitIntroDocument';
 
@@ -111,15 +110,9 @@ export function IntroCard({ introBlock, linkedInLink, surface = 'classic' }: Int
           linkedInLink={linkedInLink}
         />
         {headline ? <CutLetters className="home__headline" text={headline} /> : null}
-        <PaperCard
-          className="home__intro"
-          edge="quad-a"
-          innerClassName="home__introInner"
-          tiltDeg={-1}
-          tone="cream"
-        >
+        <div className="home__intro">
           <RichText {...remainder} />
-        </PaperCard>
+        </div>
       </>
     );
   }

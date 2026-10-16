@@ -51,30 +51,41 @@
 .home__portraitSlot {
   grid-area: portrait;
 }
+/*
+ * Sits straight on the hero sheet, so it takes the sheet's ink in either scheme.
+ * Rides above the cut-outs, with a halo of the sheet's color to keep glyphs
+ * crisp where a leaf passes behind them.
+ */
 .home__intro {
+  position: relative;
+  z-index: 4;
+  display: grid;
   grid-area: intro;
+  gap: 14px;
   width: min(calc(100% - 24px), 600px);
   margin-top: 10px;
   margin-left: 24px;
-}
-.home__introInner {
-  display: grid;
-  gap: 14px;
-  padding: var(--collage-card-pad);
   font-size: 21px;
   line-height: 1.55;
+  color: var(--ink);
+  text-shadow:
+    0 0 2px var(--paper),
+    0 0 10px var(--paper);
 }
-.home__introInner > * {
+.home__intro > * {
   display: grid;
   gap: 14px;
 }
-.home__introInner p {
+.home__intro :is([data-typography], a) {
+  color: inherit;
+}
+.home__intro p {
   margin: 0;
   font-size: inherit;
   line-height: inherit;
   text-wrap: pretty;
 }
-.home__introInner :is(h1, h2, h3, h4, h5, h6) {
+.home__intro :is(h1, h2, h3, h4, h5, h6) {
   margin: 0;
   font-family: var(--display);
   line-height: 1.1;
@@ -384,9 +395,6 @@
   .home__intro {
     width: 100%;
     margin: 8px 0 0;
-  }
-  .home__introInner {
-    padding: var(--collage-card-pad-mobile);
     font-size: 19px;
   }
   .home__portraitSlot {
