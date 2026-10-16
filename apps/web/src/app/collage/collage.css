@@ -142,6 +142,7 @@ html[data-color-scheme="dark"] .collageRoot::after {
   font-size: clamp(48px, 6.2vw, 88px);
 }
 /* Every page's lead heading, so it morphs into the next page's heading. */
+html:not(:active-view-transition-type(album-open, album-close))
 :is(.collagePageTitle, .home__headline, .error__statusCode) {
   view-transition-name: page-title;
 }

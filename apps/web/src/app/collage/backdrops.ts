@@ -104,7 +104,7 @@ export const ALBUMS_BACKDROP = defineBackdrop(1300, 14, [
       ['albums-banana', 'banana', 'olive', 380, 30, -6, 70, 'desktop', 0, { mirrored: true }],
     ],
     sheets: [
-      ['albums-gingham', 'torn', 'gingham', ['ochre', 'vermilion'], 60, 1, 44, 330, -2, 'desktop'],
+      ['albums-gingham', 'torn', 'gingham', ['ochre', 'vermilion'], 50, 1, 54, 330, -2, 'desktop'],
       ['albums-pebble', 'pebble', 'solid', 'viridian', -9, 38, 420, -8, 'all'],
     ],
   },

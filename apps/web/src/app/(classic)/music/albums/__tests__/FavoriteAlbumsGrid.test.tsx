@@ -121,6 +121,33 @@ describe('FavoriteAlbumsGrid', () => {
     expect(document.querySelectorAll('[data-skeleton]').length).toBe(1);
   });
 
+  it('keeps collage sort buttons rendered while holding the album reserve during a view transition', () => {
+    markClientHydrated();
+    Object.defineProperty(document, 'getAnimations', {
+      configurable: true,
+      value: () => [
+        {
+          effect: { pseudoElement: '::view-transition-new(root)' },
+          finished: new Promise<void>(() => {
+            /* stay pending for this render */
+          }),
+        },
+      ],
+    });
+
+    render(<FavoriteAlbumsGrid albums={albums} surface="collage" />);
+
+    expect(screen.queryByRole('link', { name: 'Zebra' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Recently added' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(screen.getByRole('button', { name: 'Album' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Artist' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Release date' })).toBeInTheDocument();
+    expect(screen.queryByLabelText('Loading album sort controls')).not.toBeInTheDocument();
+  });
+
   it('reveals albums after view-transition animations finish', async () => {
     markClientHydrated();
     let resolveFinished = () => {};
