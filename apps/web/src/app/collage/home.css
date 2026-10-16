@@ -52,9 +52,9 @@
   grid-area: portrait;
 }
 /*
- * Sits straight on the hero sheet, so it takes the sheet's ink in either scheme.
- * Rides above the cut-outs, with a halo of the sheet's color to keep glyphs
- * crisp where a leaf passes behind them.
+ * Frosted glass in the sheet's own color: cream by day, ink navy by night, so
+ * it never reads as a bright card. The blur softens the cut-outs behind the
+ * copy, and the padding sits outside the old text column so the words stay put.
  */
 .home__intro {
   position: relative;
@@ -62,15 +62,16 @@
   display: grid;
   grid-area: intro;
   gap: 14px;
-  width: min(calc(100% - 24px), 600px);
+  width: min(100%, 648px);
+  padding: 18px 24px 20px;
   margin-top: 10px;
-  margin-left: 24px;
   font-size: 21px;
   line-height: 1.55;
   color: var(--ink);
-  text-shadow:
-    0 0 2px var(--paper),
-    0 0 10px var(--paper);
+  background: color-mix(in oklab, var(--paper) 58%, transparent);
+  border: 1px solid color-mix(in oklab, var(--ink) 10%, transparent);
+  border-radius: 20px;
+  backdrop-filter: blur(16px) saturate(1.1);
 }
 .home__intro > * {
   display: grid;
@@ -431,6 +432,7 @@
   }
   .home__intro {
     width: 100%;
+    padding: 14px 16px 16px;
     margin: 8px 0 0;
     font-size: 19px;
   }
