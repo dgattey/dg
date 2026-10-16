@@ -5,15 +5,6 @@
   grid-template-columns: repeat(12, minmax(0, 1fr));
   align-items: start;
 }
-.collageLift {
-  transition: translate 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
-}
-@media (prefers-reduced-motion: no-preference) {
-  .collageLift:hover,
-  .collageLift:has(:focus-visible) {
-    translate: 0 -3px;
-  }
-}
 .collageRoot .home__sideRow:focus-visible {
   outline: none;
 }
@@ -92,23 +83,19 @@
   position: relative;
   z-index: 2;
   grid-area: map;
-  width: min(100%, 470px);
-  margin-top: 40px;
+  width: min(100%, 720px);
+  margin-top: 76px;
   margin-left: 8px;
 }
 .home__mapPaper {
   width: 100%;
 }
 .home__mapInner {
-  aspect-ratio: 2.3;
+  aspect-ratio: 1.8;
   overflow: clip;
 }
 .home__mapInner > * {
   height: 100%;
-}
-.home__mapTag {
-  bottom: -12px;
-  left: -10px;
 }
 
 .home__work {
@@ -162,40 +149,48 @@
   color: var(--on);
 }
 .home__stravaInner {
-  position: relative;
   display: grid;
-  gap: 8px;
-  align-content: start;
+  grid-template-rows: 1fr auto;
   min-height: 100%;
-  padding: 24px 26px 26px;
+  padding: 8px;
   overflow: clip;
+  color: var(--on);
 }
+/*
+ * The route map is a print matted in the card's cream, like the project frames,
+ * with its caption on the mat below, so nothing covers the map but the stats.
+ */
 .home__stravaRoute {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
+  grid-area: 1 / 1;
+  min-height: 210px;
   pointer-events: none;
+  clip-path: var(--quad-b);
 }
 .home__stravaRoute > * {
   width: 100%;
   height: 100%;
 }
-.home__stravaContent {
-  position: relative;
+.home__stravaStats {
   z-index: 1;
-  display: grid;
-  gap: 8px;
-  color: var(--on);
+  grid-area: 1 / 1;
+  align-self: start;
+  padding: 12px;
+}
+.home__stravaStats > * > * {
+  padding: 4px 10px 5px;
+  background: var(--cream);
+  clip-path: var(--quad-c);
 }
 .home__spotifyMetaInner a,
-.home__stravaContent a,
-.home__stravaContent [data-typography] {
+.home__stravaInner a,
+.home__stravaInner [data-typography] {
   color: inherit;
 }
 .home__stravaCopy {
   display: grid;
+  grid-row: 2;
   gap: 8px;
-  margin-top: 64px;
+  padding: 16px 16px 14px;
 }
 
 .home__moreWork {
@@ -380,16 +375,16 @@
   .home__portraitSlot {
     justify-self: center;
   }
-  .home__map {
+  .collageRoot .collageGridStack > .home__map {
     width: 100%;
-    margin-top: 28px;
+    margin-top: 20px;
     margin-left: 0;
   }
   .home__mapInner {
-    aspect-ratio: 1.5;
+    aspect-ratio: 1;
   }
-  .home__stravaCopy {
-    margin-top: 44px;
+  .home__stravaRoute {
+    min-height: 180px;
   }
   .home__sideRoot {
     padding: 0;

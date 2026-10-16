@@ -164,7 +164,6 @@ function shellSx(heightPx: number | null): SxObject {
     },
     height: locking ? heightPx : 'auto',
     overflow: locking ? 'clip' : 'visible',
-    // Same tier as SpotifyHeaderCard's fr expand, but medium — open felt slow at slow.
     transition: locking ? createTransition('height', TIMING_MEDIUM, EASING_DEFAULT) : undefined,
   };
 }

@@ -7,8 +7,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { type ReactNode, useEffect, useState } from 'react';
 import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
 import { type AlbumGradientInformation, extractAlbumGradientFromUrl } from './extractAlbumGradient';
-import { useNowPlaying } from './NowPlayingContext';
-import { SpotifyCardScrollTracker } from './SpotifyCardScrollTracker';
+import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
 
 type SpotifyCardShellProps = {
@@ -16,8 +15,10 @@ type SpotifyCardShellProps = {
   gradient?: string;
 };
 
-// The shell sits inside the scroll-tracker grid item, so it has to pass the
-// cell height down or the card sizes to its contents and sits short of neighbors.
+const anchorSx: SxObject = { scrollMarginTop: 120 };
+
+// The shell sits inside the anchor grid item, so it has to pass the cell
+// height down or the card sizes to its contents and sits short of neighbors.
 const shellContainerSx: SxObject = {
   height: '100%',
   isolation: 'isolate',
@@ -101,10 +102,10 @@ export function SpotifyCardWithGradient({ track: serverTrack }: SpotifyCardWithG
   };
 
   return (
-    <SpotifyCardScrollTracker>
+    <Box id={NOW_PLAYING_CARD_ID} sx={anchorSx}>
       <SpotifyCardShell gradient={trackWithCurrentGradient.albumGradient}>
         <TrackListing track={trackWithCurrentGradient} />
       </SpotifyCardShell>
-    </SpotifyCardScrollTracker>
+    </Box>
   );
 }

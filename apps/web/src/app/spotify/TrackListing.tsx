@@ -7,8 +7,8 @@ import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
+import { AlbumSleeve } from '../collage/AlbumSleeve';
 import { PaperCard } from '../collage/PaperCard';
-import { RecordDisc } from '../collage/RecordDisc';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
 import { AlbumImage } from './AlbumImage';
 import { ArtistList } from './ArtistList';
@@ -313,7 +313,7 @@ export function TrackListing({
   if (surface === 'collage') {
     return (
       <div className="home__spotify" data-slot="sp">
-        <RecordDisc track={track} />
+        <AlbumSleeve track={track} />
         <PaperCard className="home__spotifyMeta" edge="quad-b" tiltDeg={-2} tone="cream">
           <div className="home__spotifyMetaInner">
             <TrackCardMeta colors={COLLAGE_TRACK_COLORS} textShadow={false} track={track} />

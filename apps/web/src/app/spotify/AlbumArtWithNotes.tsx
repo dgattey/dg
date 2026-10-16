@@ -2,7 +2,7 @@
 
 import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
-import type { ReactNode } from 'react';
+import type { ComponentProps, ReactNode } from 'react';
 import { MusicNotes } from './MusicNotes';
 import { useWaveformBounce } from './useWaveformBounce';
 
@@ -15,7 +15,7 @@ type AlbumArtWithNotesProps = {
   isPlaying: boolean;
   /** Override note color. Defaults to inherited text color. */
   noteColor?: string;
-  notesVariant?: 'default' | 'compact';
+  notesVariant?: ComponentProps<typeof MusicNotes>['variant'];
   /** When false, notes and bounce are off (e.g. when off-screen). Default true. */
   shouldAnimate?: boolean;
   wrapperSx: SxObject;

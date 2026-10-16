@@ -5,7 +5,6 @@ import type { SxObject } from '@dg/ui/theme';
 import type { ReactNode } from 'react';
 import { Footer } from '../layouts/Footer';
 import { Header } from '../layouts/Header';
-import { PageScrollProvider } from '../layouts/PageScrollContext';
 import { PageViewTransition } from '../layouts/PageViewTransition';
 import { NowPlayingProvider } from '../spotify/NowPlayingContext';
 
@@ -15,8 +14,7 @@ const mainSectionSx: SxObject = {
 
 export default function ClassicLayout({ children }: { children: ReactNode }) {
   return (
-    // Scroll provider wraps header + content for docked header thumbnail
-    <PageScrollProvider>
+    <>
       <NowPlayingProvider>
         <Header />
         {/* Covers the strip above a pinned bar, on pages that have one */}
@@ -31,6 +29,6 @@ export default function ClassicLayout({ children }: { children: ReactNode }) {
         </Section>
       </NowPlayingProvider>
       <Footer />
-    </PageScrollProvider>
+    </>
   );
 }

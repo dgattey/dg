@@ -5,21 +5,16 @@ import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Box } from '@dg/ui/core/Box';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
-import { createTransition, TIMING_MEDIUM, TIMING_NORMAL, TIMING_SLOW } from '@dg/ui/helpers/timing';
+import { TIMING_MEDIUM } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { useEffect, useRef, useState } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
-import { usePageScrollProgress } from '../layouts/PageScrollContext';
 import { usePublicPathname } from '../layouts/usePublicPathname';
-import { useNowPlaying } from './NowPlayingContext';
-import { NOW_PLAYING_CARD_ID } from './SpotifyCardScrollTracker';
+import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
 
-/**
- * Outer container with entrance animation. Scroll progress drives opacity.
- */
-const getContainerSx = (scrollProgress: number, isClickable: boolean): SxObject => ({
+const getContainerSx = (isClickable: boolean): SxObject => ({
   '@keyframes headerCardEnter': {
     from: {
       transform: 'translateX(-8px)',
@@ -35,35 +30,19 @@ const getContainerSx = (scrollProgress: number, isClickable: boolean): SxObject 
   flexShrink: 1,
   maxWidth: 'max(25vw, 16rem)',
   minWidth: 0,
-  opacity: scrollProgress,
   overflow: 'visible',
-  pointerEvents: scrollProgress > 0.1 ? 'auto' : 'none',
   transformOrigin: 'left center',
-  transition: createTransition('opacity', TIMING_NORMAL),
-  willChange: 'opacity',
 });
 
-/**
- * Grid wrapper: 0fr→1fr animates width so the section can collapse/expand horizontally.
- */
-const getWidthWrapperSx = (isVisible: boolean): SxObject => ({
+const slotSx: SxObject = {
   alignItems: 'center',
   display: 'grid',
-  gridTemplateColumns: isVisible ? '1fr' : '0fr',
+  gridTemplateColumns: '1fr',
   justifyItems: 'start',
-  minWidth: 0,
-  ml: isVisible ? 1 : 0,
-  overflow: 'visible',
-  transition: createTransition(['grid-template-columns', 'margin-left'], TIMING_SLOW),
-});
-
-/** Allows the grid parent to collapse content to zero in both axes. */
-const getCollapsibleInnerSx = (isVisible: boolean): SxObject => ({
   maxWidth: '100%',
-  minHeight: 0,
   minWidth: 0,
-  overflow: isVisible ? 'visible' : 'hidden',
-});
+  ml: 1,
+};
 
 const musicLinkSx: SxObject = {
   color: 'inherit',
@@ -83,8 +62,8 @@ function scrollToNowPlayingCard() {
 }
 
 /**
- * Docked Spotify card in the header. Manages scroll-based visibility,
- * viewport detection for animation pausing, and home-page scroll-to-card behavior.
+ * Docked Spotify card in the header, always shown. Manages viewport detection
+ * for animation pausing and home-page scroll-to-card behavior.
  * Off-home (and not already on music) navigates to listening history.
  * Track display is delegated to TrackListing variant="compact".
  */
@@ -98,12 +77,9 @@ export function SpotifyHeaderCard({
 
 function DockedHeaderCard({ surface, track }: { surface: SiteSurface; track: Track }) {
   const pathname = usePublicPathname();
-  const scrollContext = usePageScrollProgress();
   const isHome = pathname === homeRoute;
   const isMusic = pathname === musicRoute;
   const opensMusicPage = !isHome && !isMusic;
-  // null = not measured yet; on home page stay hidden until measured, elsewhere show immediately
-  const scrollProgress = scrollContext?.scrollProgress ?? (isHome ? 0 : 1);
   const containerRef = useRef<HTMLDivElement>(null);
   const [isInViewport, setIsInViewport] = useState(true);
 
@@ -122,7 +98,6 @@ function DockedHeaderCard({ surface, track }: { surface: SiteSurface; track: Tra
     return () => observer.disconnect();
   }, []);
 
-  const isVisible = scrollProgress > 0.01;
   const listing = (
     <TrackListing
       disableLinks={isHome || opensMusicPage}
@@ -147,7 +122,7 @@ function DockedHeaderCard({ surface, track }: { surface: SiteSurface; track: Tra
       }
       ref={containerRef}
       role={isHome ? 'button' : undefined}
-      sx={getContainerSx(scrollProgress, isHome || opensMusicPage)}
+      sx={getContainerSx(isHome || opensMusicPage)}
       tabIndex={isHome ? 0 : undefined}
     >
       {surface === 'collage' ? (
@@ -161,20 +136,18 @@ function DockedHeaderCard({ surface, track }: { surface: SiteSurface; track: Tra
   );
 
   return (
-    <Box aria-hidden={!isVisible} sx={getWidthWrapperSx(isVisible)}>
-      <Box sx={getCollapsibleInnerSx(isVisible)}>
-        {opensMusicPage ? (
-          <PageTransitionLink
-            href={musicRoute}
-            sx={musicLinkSx}
-            title={musicDestinationLabel(musicRoute)}
-          >
-            {card}
-          </PageTransitionLink>
-        ) : (
-          card
-        )}
-      </Box>
+    <Box sx={slotSx}>
+      {opensMusicPage ? (
+        <PageTransitionLink
+          href={musicRoute}
+          sx={musicLinkSx}
+          title={musicDestinationLabel(musicRoute)}
+        >
+          {card}
+        </PageTransitionLink>
+      ) : (
+        card
+      )}
     </Box>
   );
 }

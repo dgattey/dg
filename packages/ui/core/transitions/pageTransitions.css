@@ -4,7 +4,9 @@
  * arriving page slides without ever going translucent. Nothing cross-fades two
  * full screens, so no frame shows both layouts at once.
  *
- * Durations and easings come from :root vars set by getTimingCssVars().
+ * Durations and easings come from :root vars set by getTimingCssVars(). Page
+ * motion is short and front-loaded: most of the travel lands in the first
+ * frames, so the arriving page answers the click and the rest is settle.
  */
 
 ::view-transition {
@@ -35,8 +37,8 @@
  */
 ::view-transition-group(site-header),
 ::view-transition-group(site-footer) {
-  animation-duration: var(--timing-slow);
-  animation-timing-function: var(--easing-ease-out);
+  animation-duration: var(--timing-medium);
+  animation-timing-function: var(--easing-snappy);
 }
 
 /* The header overlays content when it is sticky, so it does here too. */
@@ -73,8 +75,8 @@
  */
 ::view-transition-group(page-title) {
   z-index: 200;
-  animation-duration: var(--timing-slow);
-  animation-timing-function: var(--easing-ease-out);
+  animation-duration: var(--timing-medium);
+  animation-timing-function: var(--easing-snappy);
 }
 
 /*
@@ -110,8 +112,8 @@
  */
 ::view-transition-group(.vt-album-art) {
   z-index: 150;
-  animation-duration: var(--timing-slow);
-  animation-timing-function: var(--easing-ease-out);
+  animation-duration: var(--timing-medium);
+  animation-timing-function: var(--easing-snappy);
 }
 
 /*
@@ -135,8 +137,7 @@
 /*
  * Album well open/close. Vertical clip rather than a second shared-art flight:
  * the cover already morphs under `.vt-album-art`, and this layer only reveals
- * the surface around it. Duration matches SpotifyHeaderCard's fr expand tier
- * but at `--timing-medium` — `--timing-slow` read as laggy next to other UI.
+ * the surface around it, over the same duration as the art.
  * Under art (z 150) so the morph still clears the well surface.
  */
 ::view-transition-group(album-well) {
@@ -184,19 +185,19 @@
 }
 
 ::view-transition-old(.vt-page-recede) {
-  animation: var(--timing-slow) var(--easing-ease-out) both vt-page-recede;
+  animation: var(--timing-medium) var(--easing-snappy) both vt-page-recede;
 }
 
 ::view-transition-new(.vt-page-reveal) {
-  animation: var(--timing-slow) var(--easing-ease-out) both vt-page-reveal;
+  animation: var(--timing-medium) var(--easing-snappy) both vt-page-reveal;
 }
 
 ::view-transition-new(.vt-page-rise) {
-  animation: var(--timing-slow) var(--easing-ease-out) both vt-page-rise;
+  animation: var(--timing-medium) var(--easing-snappy) both vt-page-rise;
 }
 
 ::view-transition-old(.vt-page-fall) {
-  animation: var(--timing-slow) var(--easing-ease-out) both vt-page-fall;
+  animation: var(--timing-medium) var(--easing-snappy) both vt-page-fall;
 }
 
 /* Match Next VT guide: force-disable UA transition animations for reduced motion. */

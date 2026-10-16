@@ -1,17 +1,16 @@
 'use client';
 
 import type { Track } from '@dg/content-models/spotify/Track';
+import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
-import { useNowPlaying } from './NowPlayingContext';
-import { SpotifyCardScrollTracker } from './SpotifyCardScrollTracker';
+import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
 
-const collageTrackerSx: SxObject = { gridArea: 'sp' };
+const collageCardSx: SxObject = { gridArea: 'sp', scrollMarginTop: 120 };
 
 /**
  * Lightweight collage Spotify card wrapper that subscribes to live NowPlayingContext
- * updates and tracks scroll position without pulling in gradient extraction or
- * classic card chrome.
+ * updates without pulling in gradient extraction or classic card chrome.
  */
 export function SpotifyCollageCard({ track: serverTrack }: { track: Track | null }) {
   const track = useNowPlaying(serverTrack);
@@ -19,8 +18,8 @@ export function SpotifyCollageCard({ track: serverTrack }: { track: Track | null
     return null;
   }
   return (
-    <SpotifyCardScrollTracker sx={collageTrackerSx}>
+    <Box id={NOW_PLAYING_CARD_ID} sx={collageCardSx}>
       <TrackListing surface="collage" track={track} />
-    </SpotifyCardScrollTracker>
+    </Box>
   );
 }
