@@ -11,6 +11,8 @@ export const SPOTIFY_ART_NOTES_Z_INDEX = 0;
 export const SPOTIFY_ART_ABOVE_NOTES_Z_INDEX = 2;
 
 type AlbumArtWithNotesProps = {
+  /** Scales the bounce, so small art moves enough to read as a beat. Default 1. */
+  bounceIntensity?: number;
   children: ReactNode;
   isPlaying: boolean;
   /** Override note color. Defaults to inherited text color. */
@@ -44,6 +46,7 @@ const bounceWrapperSx: SxObject = {
  * Used by both the now-playing card and the header thumbnail.
  */
 export function AlbumArtWithNotes({
+  bounceIntensity,
   children,
   isPlaying,
   noteColor,
@@ -52,7 +55,10 @@ export function AlbumArtWithNotes({
   wrapperSx,
 }: AlbumArtWithNotesProps) {
   const animate = isPlaying && shouldAnimate;
-  const bounceRef = useWaveformBounce<HTMLDivElement>({ isPlaying: animate });
+  const bounceRef = useWaveformBounce<HTMLDivElement>({
+    intensity: bounceIntensity,
+    isPlaying: animate,
+  });
 
   return (
     <Box sx={{ overflow: 'visible', position: 'relative', ...wrapperSx }}>

@@ -136,6 +136,8 @@ function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) 
 // ---------------------------------------------------------------------------
 
 const COMPACT_HOVER_SIZE = 84;
+/** The 44px header art needs a bigger swing than the card's to read as a bounce. */
+const COLLAGE_COMPACT_BOUNCE = 3;
 const COMPACT_HOVER_SCALE = COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE;
 
 const compactZoomSx: SxObject = {
@@ -239,8 +241,10 @@ function CompactLayout({
     <Box sx={colors ? collageCompactContainerSx : compactContainerSx}>
       <Box data-thumbnail-outer sx={compactThumbnailOuterSx}>
         <AlbumArtWithNotes
+          bounceIntensity={colors ? COLLAGE_COMPACT_BOUNCE : undefined}
           isPlaying={isPlaying}
-          notesVariant="compact"
+          noteColor={colors ? 'var(--ink)' : undefined}
+          notesVariant={colors ? 'collageCompact' : 'compact'}
           shouldAnimate={shouldAnimate}
           wrapperSx={{
             height: COMPACT_THUMBNAIL_SIZE,
