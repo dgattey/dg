@@ -8,6 +8,9 @@ type NowPlayingContextValue = {
   track: Track | null;
 };
 
+/** The page's now playing card, which the home header pill scrolls to. */
+export const NOW_PLAYING_CARD_ID = 'now-playing-card';
+
 const NowPlayingContext = createContext<NowPlayingContextValue | null>(null);
 
 /**

@@ -14,10 +14,6 @@ jest.mock('../AlbumGradientBackdrop', () => ({
   ),
 }));
 
-jest.mock('../SpotifyCardScrollTracker', () => ({
-  SpotifyCardScrollTracker: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}));
-
 jest.mock('../TrackListing', () => ({
   TrackListing: ({ track }: { track: Track }) => (
     <div data-testid="track-listing">

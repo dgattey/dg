@@ -1,17 +1,11 @@
 import type { Track } from '@dg/content-models/spotify/Track';
 import { render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
 import { NowPlayingProvider, PublishNowPlaying } from '../NowPlayingContext';
 import { SpotifyCollageCard } from '../SpotifyCollageCard';
 import { SpotifyHeaderCard } from '../SpotifyHeaderCard';
 
 jest.mock('next/navigation', () => ({
   usePathname: () => '/',
-}));
-
-jest.mock('../SpotifyCardScrollTracker', () => ({
-  NOW_PLAYING_CARD_ID: 'now-playing',
-  SpotifyCardScrollTracker: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
 jest.mock('../TrackListing', () => ({
