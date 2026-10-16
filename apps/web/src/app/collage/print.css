@@ -61,7 +61,7 @@
   position: relative;
   z-index: 2;
   display: grid;
-  aspect-ratio: 0.82;
+  aspect-ratio: 0.76;
   overflow: clip;
   background: var(--cream);
   clip-path: url("#collage-portrait-clip");
