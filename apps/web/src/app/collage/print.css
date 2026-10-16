@@ -92,22 +92,6 @@
   background: var(--black);
   clip-path: var(--soft-a);
 }
-.print__logo {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  z-index: 2;
-  width: 22px;
-  height: 22px;
-}
-.print__logoMark {
-  display: block;
-  width: 22px;
-  height: 22px;
-  background: var(--leaf);
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px var(--cream);
-}
 .print__artLink {
   display: block;
   width: 100%;

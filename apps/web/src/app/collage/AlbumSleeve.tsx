@@ -20,16 +20,6 @@ export function AlbumSleeve({ track }: { track: Track }) {
       <div className="print__sleeve">
         <div className="print__sleevePiece">
           <a
-            aria-label="Spotify"
-            className="print__logo"
-            href={track.externalUrls.spotify}
-            rel="noreferrer"
-            target="_blank"
-            title={track.name}
-          >
-            <span className="print__logoMark" />
-          </a>
-          <a
             aria-label={track.album.name}
             className="print__artLink"
             href={track.album.externalUrls.spotify}
