@@ -94,7 +94,15 @@ export function StravaCard({ activity, surface = 'classic' }: StravaCardProps) {
 
   if (surface === 'collage') {
     return (
-      <div className="home__strava" data-slot="st" style={{ gridArea: 'st' }}>
+      <a
+        aria-label={`${activity.name} on Strava`}
+        className="home__strava collageLift"
+        data-slot="st"
+        href={activity.url}
+        rel="noopener noreferrer"
+        style={{ gridArea: 'st' }}
+        target="_blank"
+      >
         <PaperCard edge="soft-b" innerClassName="home__stravaInner" tiltDeg={1.2} tone="cream">
           {encodedPolyline ? (
             <span aria-hidden="true" className="home__stravaRoute">
@@ -106,11 +114,11 @@ export function StravaCard({ activity, surface = 'classic' }: StravaCardProps) {
           </div>
           <div className="home__stravaCopy">
             <ActivityTypeWithIcon activity={activity} />
-            <ActivityName activity={activity} />
-            <ActivityDescription activity={activity} />
+            <ActivityName activity={activity} isLinked={false} />
+            <ActivityDescription activity={activity} isLinked={false} />
           </div>
         </PaperCard>
-      </div>
+      </a>
     );
   }
 
