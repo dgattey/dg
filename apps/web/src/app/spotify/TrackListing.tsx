@@ -7,29 +7,18 @@ import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import type { CSSProperties } from 'react';
-import { AlbumSleeve } from '../collage/AlbumSleeve';
-import { PaperCard } from '../collage/PaperCard';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
-import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
 import { AlbumImage } from './AlbumImage';
 import { ArtistList } from './ArtistList';
+import { COLLAGE_TRACK_COLORS, CollageTrackCard } from './CollageTrackCard';
 import { type Colors, getContrastingColors } from './colors';
-import { PlaybackProgressBar } from './PlaybackProgressBar';
 import { PlaybackStatus } from './PlaybackStatus';
 import { SpotifyLogo } from './SpotifyLogo';
+import { TrackCardMeta } from './TrackCardMeta';
 import { TrackTitle } from './TrackTitle';
 
 /** Size of the compact variant's album art thumbnail in px. */
 export const COMPACT_THUMBNAIL_SIZE = 44;
-
-const COLLAGE_TRACK_COLORS: Colors = {
-  primary: 'var(--on)',
-  primaryContrast: 'var(--pc)',
-  primaryShadow: 'none',
-  secondary: 'var(--soft)',
-  secondaryShadow: 'none',
-};
 
 type TrackListingProps = {
   /** The track to display. */
@@ -66,51 +55,6 @@ const cardHeaderSx: SxObject = {
   justifyContent: 'space-between',
 };
 
-function TrackCardMeta({
-  track,
-  colors,
-  textShadow,
-}: {
-  track: Track;
-  colors: Colors | null;
-  textShadow?: boolean;
-}) {
-  const { primary, secondary, primaryShadow, secondaryShadow } = colors ?? {};
-  const trackUrl = track.externalUrls.spotify;
-  const shadows = textShadow !== false;
-
-  return (
-    <>
-      <PlaybackStatus
-        color={primary}
-        isPlaying={track.isPlaying}
-        listingVariant="card"
-        playedAt={track.playedAt}
-        textShadow={shadows ? primaryShadow : undefined}
-      />
-      <TrackTitle
-        color={primary}
-        listingVariant="card"
-        textShadow={shadows ? primaryShadow : undefined}
-        trackTitle={track.name}
-        url={trackUrl}
-      />
-      <ArtistList
-        artists={track.artists}
-        color={secondary}
-        listingVariant="card"
-        textShadow={shadows ? secondaryShadow : undefined}
-      />
-      <PlaybackProgressBar
-        colors={colors}
-        durationMs={track.durationMs}
-        isPlaying={track.isPlaying}
-        progressMs={track.progressMs}
-      />
-    </>
-  );
-}
-
 function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) {
   const { primary, primaryShadow } = colors ?? {};
   const trackUrl = track.externalUrls.spotify;
@@ -130,57 +74,6 @@ function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) 
         <TrackCardMeta colors={colors} track={track} />
       </Stack>
     </Stack>
-  );
-}
-
-/** The album's colors bloom out behind the sleeve and card, onto the sheet. */
-const collageGlowSx: SxObject = {
-  borderRadius: '45%',
-  filter: 'blur(36px)',
-  inset: '-28px -40px',
-  opacity: 0.8,
-  zIndex: -1,
-};
-
-/** Tints the card's paper, clipped to its torn edge, under the text. */
-const collageTintSx: SxObject = {
-  clipPath: 'var(--clip, var(--quad-a))',
-  inset: 0,
-  zIndex: -1,
-};
-
-/**
- * A dark album gradient lays over ink-dark paper with cream text, so the
- * colors deepen like the classic dark card's instead of washing out on cream.
- */
-const COLLAGE_LIGHT_INK: CSSProperties & Record<`--${string}`, string> = {
-  '--on': 'var(--cream)',
-  '--pc': 'var(--ink-on-cream)',
-  '--soft': 'color-mix(in oklab, var(--cream) 80%, transparent)',
-};
-
-function CollageCardLayout({ track }: { track: Track }) {
-  const gradient = track.albumGradient;
-  return (
-    <div className="home__spotify" data-slot="sp">
-      <AlbumGradientBackdrop containerSx={collageGlowSx} gradient={gradient} />
-      <AlbumSleeve track={track} />
-      <PaperCard
-        className="home__spotifyMeta"
-        edge="quad-b"
-        innerClassName="paperInnerUnclipped"
-        style={
-          gradient && track.albumGradientContrastSetting === 'dark' ? COLLAGE_LIGHT_INK : undefined
-        }
-        tiltDeg={-2}
-        tone="cream"
-      >
-        <AlbumGradientBackdrop containerSx={collageTintSx} gradient={gradient} />
-        <div className="home__spotifyMetaInner">
-          <TrackCardMeta colors={COLLAGE_TRACK_COLORS} textShadow={false} track={track} />
-        </div>
-      </PaperCard>
-    </div>
   );
 }
 
@@ -368,7 +261,7 @@ export function TrackListing({
   }
 
   if (surface === 'collage') {
-    return <CollageCardLayout track={track} />;
+    return <CollageTrackCard track={track} />;
   }
 
   return <CardLayout colors={getContrastingColors(track)} track={track} />;
