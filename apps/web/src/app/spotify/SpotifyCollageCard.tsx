@@ -18,7 +18,7 @@ export function SpotifyCollageCard({ track: serverTrack }: { track: Track | null
     return null;
   }
   return (
-    <Box id={NOW_PLAYING_CARD_ID} sx={collageCardSx}>
+    <Box className="home__spotifySlot" id={NOW_PLAYING_CARD_ID} sx={collageCardSx}>
       <TrackListing surface="collage" track={track} />
     </Box>
   );
