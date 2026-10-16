@@ -97,6 +97,10 @@
 .home__mapInner > * {
   height: 100%;
 }
+.home__mapTag {
+  bottom: -12px;
+  left: -10px;
+}
 
 .home__work {
   --sp-top: 84px;
