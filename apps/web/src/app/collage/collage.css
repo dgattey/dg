@@ -176,7 +176,8 @@ html:not(:active-view-transition-type(album-open, album-close))
   clip-path: var(--clip, var(--quad-a));
   rotate: none;
 }
-.paperInner [data-typography] {
+/* The music card keeps the classic card's album-contrast text colors. */
+.paperInner [data-typography]:not(.home__spotifyMetaInner *) {
   color: inherit;
 }
 /*
