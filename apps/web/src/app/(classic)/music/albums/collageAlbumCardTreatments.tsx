@@ -1,4 +1,5 @@
 import { invariant } from '@dg/shared-core/assertions/invariant';
+import { jsOnlyProps } from '@dg/ui/core/JsOnlyStyle';
 import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
 import type { CSSProperties, ReactNode } from 'react';
 import { PaperCard } from '../../../collage/PaperCard';
@@ -98,9 +99,50 @@ function SkeletonFace() {
   );
 }
 
+export type AlbumSortKey = (typeof COLLAGE_ALBUM_SORT_OPTIONS)[number]['key'];
+
+export function CollageSortControls({
+  onSortChange,
+  sortKey,
+}: {
+  onSortChange: (key: AlbumSortKey) => void;
+  sortKey: AlbumSortKey;
+}) {
+  return (
+    <nav aria-label="Sort albums" className="music__sort" {...jsOnlyProps}>
+      {COLLAGE_ALBUM_SORT_OPTIONS.map((option) => {
+        const current = option.key === sortKey;
+        return (
+          <PaperTag
+            className="music__sortTag"
+            edge="quad-a"
+            key={option.key}
+            tiltDeg={option.tiltDeg}
+            tone={current ? 'black' : 'cream'}
+          >
+            <button
+              aria-pressed={current}
+              className="music__sortButton"
+              onClick={() => onSortChange(option.key)}
+              type="button"
+            >
+              {option.label}
+            </button>
+          </PaperTag>
+        );
+      })}
+    </nav>
+  );
+}
+
 export function CollageSortSkeleton() {
   return (
-    <div aria-label="Loading album sort controls" className="music__sortSkeleton" role="status">
+    <div
+      aria-label="Loading album sort controls"
+      className="music__sortSkeleton"
+      role="status"
+      {...jsOnlyProps}
+    >
       {COLLAGE_ALBUM_SORT_OPTIONS.map((sort, index) => (
         <PaperTag
           className="music__sortTag"
@@ -109,7 +151,7 @@ export function CollageSortSkeleton() {
           tiltDeg={sort.tiltDeg}
           tone={index === 0 ? 'black' : 'cream'}
         >
-          <SkeletonLine width={74} />
+          <span className="music__sortButton">{sort.label}</span>
         </PaperTag>
       ))}
     </div>

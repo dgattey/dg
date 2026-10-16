@@ -91,12 +91,7 @@ export function FavoriteAlbumsReserve({
   surface?: SiteSurface;
 }) {
   if (surface === 'collage') {
-    return (
-      <>
-        <CollageSortSkeleton />
-        <CollageAlbumReserveGrid albums={albums} />
-      </>
-    );
+    return <CollageAlbumReserveGrid albums={albums} />;
   }
 
   return (

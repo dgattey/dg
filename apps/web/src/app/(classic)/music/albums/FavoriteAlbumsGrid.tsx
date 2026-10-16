@@ -24,16 +24,17 @@ import {
   useSyncExternalStore,
 } from 'react';
 import { loadAlbumDetail } from '../../../../services/albumDetail.actions';
-import { PaperTag } from '../../../collage/PaperTag';
 import { hasClientHydrated } from '../../../layouts/clientHydrated';
 import { ALBUM_GRID_COLUMNS, albumGridSx, albumTileSlotSx } from '../albumTileGeometry';
 import { AlbumDetailBody } from './AlbumDetailBody';
 import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
 import { AlbumWell } from './AlbumWell';
 import {
+  type AlbumSortKey,
   COLLAGE_ALBUM_GRID_COLUMNS,
   COLLAGE_ALBUM_SORT_OPTIONS,
   type CollageAlbumCardTreatment,
+  CollageSortControls,
   collageAlbumCardTreatment,
 } from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
@@ -83,8 +84,6 @@ function afterNextPaint() {
     });
   });
 }
-
-type AlbumSortKey = (typeof COLLAGE_ALBUM_SORT_OPTIONS)[number]['key'];
 
 type AlbumGridColumns = Record<keyof typeof ALBUM_GRID_COLUMNS, number>;
 
@@ -324,7 +323,14 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
   });
 
   if (!showGrid) {
-    return <FavoriteAlbumsReserve albums={albums} surface={surface} />;
+    return (
+      <>
+        {surface === 'collage' ? (
+          <CollageSortControls onSortChange={handleSortChange} sortKey={sortKey} />
+        ) : null}
+        <FavoriteAlbumsReserve albums={albums} surface={surface} />
+      </>
+    );
   }
 
   const albumCards = albums.map(
@@ -386,29 +392,7 @@ export function FavoriteAlbumsGrid({ albums, children, surface = 'classic' }: Pr
   if (surface === 'collage') {
     return (
       <>
-        <nav aria-label="Sort albums" className="music__sort" {...jsOnlyProps}>
-          {COLLAGE_ALBUM_SORT_OPTIONS.map((option) => {
-            const current = option.key === sortKey;
-            return (
-              <PaperTag
-                className="music__sortTag"
-                edge="quad-a"
-                key={option.key}
-                tiltDeg={option.tiltDeg}
-                tone={current ? 'black' : 'cream'}
-              >
-                <button
-                  aria-pressed={current}
-                  className="music__sortButton"
-                  onClick={() => handleSortChange(option.key)}
-                  type="button"
-                >
-                  {option.label}
-                </button>
-              </PaperTag>
-            );
-          })}
-        </nav>
+        <CollageSortControls onSortChange={handleSortChange} sortKey={sortKey} />
         <Box className="music__albumGrid" onClickCapture={onAlbumNavigationCapture}>
           {cells}
         </Box>
