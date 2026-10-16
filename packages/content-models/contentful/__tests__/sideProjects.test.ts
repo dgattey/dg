@@ -76,30 +76,49 @@ describe('side project renderables', () => {
   it('orders newest first by creationDate and keeps only the homepage max', () => {
     const selected = takeNewestSideProjects([
       {
-        creationDate: '2024-01-01T00:00:00.000Z',
-        description: 'Oldest',
+        creationDate: '2019-01-01T00:00:00.000Z',
+        description: 'Dropped older project',
         mark: thumbnail,
-        title: 'Oldest',
-        url: 'https://example.com/oldest',
+        title: 'Dropped',
+        url: 'https://example.com/dropped',
       },
       {
-        creationDate: '2026-07-01T00:00:00.000Z',
-        description: 'Newest',
+        creationDate: '2026-10-15T00:00:00.000Z',
+        description: 'Track books and reading progress',
         mark: thumbnail,
-        title: 'Newest',
-        url: 'https://example.com/newest',
+        title: 'Saga',
+        url: 'https://saga.gattey.com',
       },
       {
-        creationDate: '2025-06-01T00:00:00.000Z',
-        description: 'Middle',
+        creationDate: '2022-05-01T00:00:00.000Z',
+        description: 'See what you own and where it sits',
         mark: thumbnail,
-        title: 'Middle',
-        url: 'https://example.com/middle',
+        title: 'WMM',
+        url: 'https://wmm.gattey.com',
+      },
+      {
+        creationDate: '2026-10-14T00:00:00.000Z',
+        description: 'Spatial audio for Sonos and Spotify',
+        mark: thumbnail,
+        title: 'Sconeos',
+        url: 'https://sconeos.gattey.com',
+      },
+      {
+        creationDate: '2026-01-12T00:00:00.000Z',
+        description: 'Score Lost Cities by photo or manual entry',
+        mark: thumbnail,
+        title: 'Lost Cities scorer',
+        url: 'https://lostcities.gattey.com',
       },
     ]);
 
-    expect(SIDE_PROJECTS_LIMIT).toBe(2);
-    expect(selected).toHaveLength(2);
-    expect(selected.map((project) => project.title)).toEqual(['Newest', 'Middle']);
+    expect(SIDE_PROJECTS_LIMIT).toBe(4);
+    expect(selected).toHaveLength(4);
+    expect(selected.map((project) => project.title)).toEqual([
+      'Saga',
+      'Sconeos',
+      'Lost Cities scorer',
+      'WMM',
+    ]);
   });
 });

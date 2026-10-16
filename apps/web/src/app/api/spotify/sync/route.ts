@@ -50,7 +50,7 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
   });
   const favoriteAlbums = await refreshFavoriteAlbumsSnapshotWithLogging();
 
-  if (favoriteAlbums) {
+  if (favoriteAlbums?.changed) {
     revalidateTag('favorite-albums', 'max');
   }
 

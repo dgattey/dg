@@ -43,8 +43,6 @@ const cardSx: SxObject = {
 
 const layoutSx: SxObject = {
   gap: 1,
-  height: '100%',
-  justifyContent: 'space-between',
 };
 
 const projectListSx: SxObject = {
@@ -105,7 +103,7 @@ const markSizes = {
 
 function ClassicGatteySitesCard({ projects }: { projects: ReadonlyArray<RenderableSideProject> }) {
   return (
-    <ContentCard sx={cardSx}>
+    <ContentCard sx={cardSx} verticalSpan={2}>
       <Stack sx={layoutSx}>
         <Typography component="h2" variant="overline">
           Side projects

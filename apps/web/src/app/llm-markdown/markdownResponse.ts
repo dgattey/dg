@@ -2,6 +2,7 @@ import 'server-only';
 
 import { log } from '@dg/shared-core/logging/log';
 import { NextResponse } from 'next/server';
+import { AGENT_DOCUMENT_CACHE_CONTROL } from '../agentDocumentCacheControl';
 
 /**
  * Markdown response with Link/Vary headers for AI clients.
@@ -18,7 +19,7 @@ export function markdownResponse(
 
   return new NextResponse(body, {
     headers: {
-      'Cache-Control': 's-maxage=60, stale-while-revalidate=86400',
+      'Cache-Control': AGENT_DOCUMENT_CACHE_CONTROL,
       'Content-Type': 'text/markdown; charset=utf-8',
       Link: `<${htmlPath}>; rel="alternate"; type="text/html"`,
       Vary: 'Accept',

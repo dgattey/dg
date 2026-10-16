@@ -274,10 +274,10 @@
 .home__sideRowWrap {
   width: 100%;
 }
-.home__sideItem:nth-child(1) .home__sideRowWrap {
+.home__sideItem:nth-child(odd) .home__sideRowWrap {
   margin-left: 18px;
 }
-.home__sideItem:nth-child(2) .home__sideRowWrap {
+.home__sideItem:nth-child(even) .home__sideRowWrap {
   margin-top: 4px;
   margin-right: 14px;
 }
@@ -389,8 +389,8 @@
   .home__sideRoot {
     padding: 0;
   }
-  .home__sideItem:nth-child(1) .home__sideRowWrap,
-  .home__sideItem:nth-child(2) .home__sideRowWrap {
+  .home__sideItem:nth-child(odd) .home__sideRowWrap,
+  .home__sideItem:nth-child(even) .home__sideRowWrap {
     margin: 0;
   }
 }

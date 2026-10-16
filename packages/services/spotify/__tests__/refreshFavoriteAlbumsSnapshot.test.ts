@@ -21,9 +21,9 @@ describe('refreshFavoriteAlbumsSnapshot', () => {
 
   it('stores a successful playlist read, including an intentionally empty one', async () => {
     mockFetchPlaylistAlbums.mockResolvedValue([]);
-    mockWriteSnapshot.mockResolvedValue(undefined);
+    mockWriteSnapshot.mockResolvedValue(true);
 
-    await expect(refreshFavoriteAlbumsSnapshot()).resolves.toEqual({ count: 0 });
+    await expect(refreshFavoriteAlbumsSnapshot()).resolves.toEqual({ changed: true, count: 0 });
     expect(mockWriteSnapshot).toHaveBeenCalledWith([]);
   });
 

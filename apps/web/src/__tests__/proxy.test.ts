@@ -1,5 +1,6 @@
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import { mockEnv } from '@dg/testing/mocks';
+import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server';
 import { NextRequest } from 'next/server';
 
 jest.mock('../flags', () => ({
@@ -7,7 +8,7 @@ jest.mock('../flags', () => ({
 }));
 
 import { interactiveRedesign } from '../flags';
-import { proxy } from '../proxy';
+import { config, proxy } from '../proxy';
 
 const mockInteractiveRedesign = interactiveRedesign as jest.MockedFunction<
   typeof interactiveRedesign
@@ -185,5 +186,44 @@ describe('proxy', () => {
       expect(response.status).toBe(401);
       expect(response.headers.get('WWW-Authenticate')).toBeNull();
     });
+  });
+});
+
+describe('proxy matcher', () => {
+  const matches = (path: string) =>
+    unstable_doesMiddlewareMatch({ config, url: `https://example.com${path}` });
+
+  it.each([
+    '/',
+    '/music',
+    '/music/albums',
+    '/music.md',
+    '/index.md',
+    '/redesign/music',
+    '/dev-console',
+    '/dev-console/oauth',
+  ])('runs on %s', (path) => {
+    expect(matches(path)).toBe(true);
+  });
+
+  it.each([
+    '/_next/static/chunks/app.js',
+    '/api/spotify/sync',
+    '/.well-known/openapi.json',
+    '/.well-known/agent-skills/index.json',
+    '/.well-known/agent-skills/dg/SKILL.md',
+    '/llm-markdown/music',
+    '/llms.txt',
+    '/llms-full.txt',
+    '/robots.txt',
+    '/sitemap.xml',
+    '/opengraph-image',
+    '/twitter-image-abc123',
+    '/manifest.webmanifest',
+    '/favicon.ico',
+    '/wp-login.php',
+    '/.env',
+  ])('skips %s', (path) => {
+    expect(matches(path)).toBe(false);
   });
 });

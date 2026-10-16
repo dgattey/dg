@@ -1,7 +1,7 @@
 import type { Project } from '../schema/shared';
 import { toRenderableAsset } from './assets';
 
-export const SIDE_PROJECTS_LIMIT = 2;
+export const SIDE_PROJECTS_LIMIT = 4;
 
 export type RenderableSideProject = {
   creationDate: string | null;
