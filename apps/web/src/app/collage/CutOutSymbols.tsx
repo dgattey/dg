@@ -2,6 +2,7 @@ import { CUT_OUT_SHAPE_NAMES, CUT_OUT_SHAPES, cutOutSymbolId } from './cutOutSha
 
 export const COLLAGE_PEBBLE_CLIP_ID = 'collage-pebble-clip';
 export const COLLAGE_DISC_CLIP_ID = 'collage-disc-clip';
+export const COLLAGE_PORTRAIT_CLIP_ID = 'collage-portrait-clip';
 export const COLLAGE_ROUGH_FILTER_ID = 'collage-rough';
 
 export function CutOutSymbols() {
@@ -13,6 +14,10 @@ export function CutOutSymbols() {
         </clipPath>
         <clipPath clipPathUnits="objectBoundingBox" id={COLLAGE_DISC_CLIP_ID}>
           <path d="M0.3842 0.0192C0.2507 0.0521 0.1580 0.1205 0.0899 0.2301L0.0599 0.2795 0.0436 0.3260C0.0000 0.4685 0.0000 0.5315 0.0463 0.6822C0.0736 0.7644 0.1090 0.8110 0.2071 0.8959L0.2480 0.9315 0.2834 0.9452C0.3297 0.9671 0.3815 0.9808 0.4387 0.9918L0.4877 1.0000 0.5450 0.9945L0.6022 0.9890 0.6649 0.9671L0.7275 0.9452 0.7575 0.9260C0.8965 0.8329 0.9673 0.7178 0.9918 0.5452L1.0000 0.4932 0.9918 0.4411C0.9591 0.2521 0.8692 0.1233 0.7139 0.0466L0.6839 0.0301 0.6076 0.0137C0.5640 0.0055 0.5150 0.0000 0.4959 0.0000L0.4632 0.0000 0.3842 0.0192" />
+        </clipPath>
+        {/* Every joint's handles share one horizontal or vertical line, so the oval has no corners. */}
+        <clipPath clipPathUnits="objectBoundingBox" id={COLLAGE_PORTRAIT_CLIP_ID}>
+          <path d="M0.46 0C0.76 0 1 0.19 1 0.44C1 0.72 0.775 1 0.55 1C0.231 1 0 0.803 0 0.53C0 0.201 0.175 0 0.46 0Z" />
         </clipPath>
         <filter
           colorInterpolationFilters="sRGB"

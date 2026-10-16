@@ -14,21 +14,11 @@ export function AlbumSleeve({ track }: { track: Track }) {
         aspectRatio: '1',
         overflow: 'visible',
         position: 'relative',
-        width: 'min(100%, 240px)',
+        width: 'min(100%, 300px)',
       }}
     >
       <div className="print__sleeve">
         <div className="print__sleevePiece">
-          <a
-            aria-label="Spotify"
-            className="print__logo"
-            href={track.externalUrls.spotify}
-            rel="noreferrer"
-            target="_blank"
-            title={track.name}
-          >
-            <span className="print__logoMark" />
-          </a>
           <a
             aria-label={track.album.name}
             className="print__artLink"
@@ -43,7 +33,7 @@ export function AlbumSleeve({ track }: { track: Track }) {
                 cover={true}
                 height={track.albumImage.height}
                 quality={60}
-                sizes={{ extraLarge: 240 }}
+                sizes={{ extraLarge: 300 }}
                 url={track.albumImage.url}
                 width={track.albumImage.width}
               />

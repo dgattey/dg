@@ -33,10 +33,14 @@
   justify-self: center;
   width: min(100%, 392px);
   margin-top: 44px;
+}
+.print__portraitLink {
+  position: relative;
+  display: block;
   color: inherit;
   text-decoration: none;
 }
-.print__portrait:focus-visible {
+.print__portraitLink:focus-visible {
   outline-offset: 8px;
 }
 .print__frame {
@@ -51,7 +55,7 @@
   z-index: 1;
   pointer-events: none;
   background: var(--cream);
-  clip-path: url("#collage-pebble-clip");
+  clip-path: url("#collage-portrait-clip");
 }
 .print__window {
   position: relative;
@@ -60,7 +64,7 @@
   aspect-ratio: 0.82;
   overflow: clip;
   background: var(--cream);
-  clip-path: url("#collage-pebble-clip");
+  clip-path: url("#collage-portrait-clip");
 }
 .print__image {
   position: absolute;
@@ -87,22 +91,6 @@
   overflow: clip;
   background: var(--black);
   clip-path: var(--soft-a);
-}
-.print__logo {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  z-index: 2;
-  width: 22px;
-  height: 22px;
-}
-.print__logoMark {
-  display: block;
-  width: 22px;
-  height: 22px;
-  background: var(--leaf);
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px var(--cream);
 }
 .print__artLink {
   display: block;
