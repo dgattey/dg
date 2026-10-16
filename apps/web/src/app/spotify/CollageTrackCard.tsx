@@ -3,8 +3,13 @@ import type { SxObject } from '@dg/ui/theme';
 import type { CSSProperties } from 'react';
 import { AlbumSleeve } from '../collage/AlbumSleeve';
 import { PaperCard } from '../collage/PaperCard';
-import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
-import type { Colors } from './colors';
+import {
+  ALBUM_GRADIENT_GLOW_SX,
+  ALBUM_GRADIENT_SURFACE_SX,
+  AlbumGradientBackdrop,
+} from './AlbumGradientBackdrop';
+import { type Colors, getContrastingColors } from './colors';
+import { SpotifyLogo } from './SpotifyLogo';
 import { TrackCardMeta } from './TrackCardMeta';
 
 export const COLLAGE_TRACK_COLORS: Colors = {
@@ -15,54 +20,45 @@ export const COLLAGE_TRACK_COLORS: Colors = {
   secondaryShadow: 'none',
 };
 
-/** The album's colors bloom out behind the sleeve and card, onto the sheet. */
-const collageGlowSx: SxObject = {
-  borderRadius: '45%',
-  filter: 'blur(36px)',
-  inset: '-28px -40px',
-  opacity: 0.8,
-  zIndex: -1,
-};
-
-/** Tints the card's paper, clipped to its torn edge, under the text. */
-const collageTintSx: SxObject = {
+/** The classic card's gradient surface, cut to the paper's torn edge. */
+const tornGradientSurfaceSx: SxObject = {
+  ...ALBUM_GRADIENT_SURFACE_SX,
   clipPath: 'var(--clip, var(--quad-a))',
-  inset: 0,
-  zIndex: -1,
 };
 
-/**
- * A dark album gradient lays over ink-dark paper with cream text, so the
- * colors deepen like the classic dark card's instead of washing out on cream.
- */
-const COLLAGE_LIGHT_INK: CSSProperties & Record<`--${string}`, string> = {
-  '--on': 'var(--cream)',
-  '--pc': 'var(--ink-on-cream)',
-  '--soft': 'color-mix(in oklab, var(--cream) 80%, transparent)',
+/** The paper under the gradient is the classic card's, so the colors blend the same. */
+const CLASSIC_CARD_PAPER: CSSProperties & Record<`--${string}`, string> = {
+  '--on': 'var(--mui-palette-text-primary)',
+  '--pc': 'var(--mui-palette-background-paper)',
 };
 
-/** The collage now playing card: album sleeve over a torn paper card tinted by the art. */
+/** The collage now playing card: album sleeve over the classic gradient card, torn. */
 export function CollageTrackCard({ track }: { track: Track }) {
   const gradient = track.albumGradient;
+  const colors = getContrastingColors(track);
   return (
     <div className="home__spotify" data-slot="sp">
-      <AlbumGradientBackdrop containerSx={collageGlowSx} gradient={gradient} />
       <AlbumSleeve track={track} />
-      <PaperCard
-        className="home__spotifyMeta"
-        edge="quad-b"
-        innerClassName="paperInnerUnclipped"
-        style={
-          gradient && track.albumGradientContrastSetting === 'dark' ? COLLAGE_LIGHT_INK : undefined
-        }
-        tiltDeg={-2}
-        tone="cream"
-      >
-        <AlbumGradientBackdrop containerSx={collageTintSx} gradient={gradient} />
-        <div className="home__spotifyMetaInner">
-          <TrackCardMeta colors={COLLAGE_TRACK_COLORS} textShadow={false} track={track} />
-        </div>
-      </PaperCard>
+      <div className="home__spotifyCard">
+        <AlbumGradientBackdrop containerSx={ALBUM_GRADIENT_GLOW_SX} gradient={gradient} />
+        <PaperCard
+          className="home__spotifyMeta"
+          edge="quad-b"
+          innerClassName="paperInnerUnclipped"
+          style={CLASSIC_CARD_PAPER}
+        >
+          <AlbumGradientBackdrop containerSx={tornGradientSurfaceSx} gradient={gradient} />
+          <div className="home__spotifyMetaInner">
+            <SpotifyLogo
+              color={colors?.primary}
+              textShadow={colors?.primaryShadow}
+              trackTitle={track.name}
+              url={track.externalUrls.spotify}
+            />
+            <TrackCardMeta colors={colors} track={track} />
+          </div>
+        </PaperCard>
+      </div>
     </div>
   );
 }

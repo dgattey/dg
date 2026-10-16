@@ -177,15 +177,22 @@
     scale: 1.02;
   }
 }
-.home__spotifyMeta {
+/* The glow sits outside the paper, so the tilt turns both together. */
+.home__spotifyCard {
+  position: relative;
   width: min(100%, 300px);
   margin-top: -10px;
+  isolation: isolate;
+  rotate: -2deg;
 }
 .home__spotifyMetaInner {
   display: grid;
   gap: 3px;
-  padding: 16px 20px 18px;
+  padding: 18px 20px 20px;
   color: var(--on);
+}
+.home__spotifyMetaInner > :first-child {
+  margin-bottom: 14px;
 }
 /*
  * The card's tilt makes it the containing block for the fixed tooltip, so room
@@ -229,16 +236,15 @@
   background: var(--cream);
   clip-path: var(--quad-c);
 }
-.home__spotifyMetaInner a,
 .home__stravaInner a,
 .home__stravaInner [data-typography] {
   color: inherit;
 }
-.home__spotifyMetaInner > :nth-child(2) {
+.home__spotifyMetaInner > :nth-child(3) {
   font-size: 24px;
 }
-.home__spotifyMetaInner > :nth-child(3),
-.home__spotifyMetaInner > :nth-child(3) a {
+.home__spotifyMetaInner > :nth-child(4),
+.home__spotifyMetaInner > :nth-child(4) a {
   font-size: 24px;
 }
 .home__stravaCopy {

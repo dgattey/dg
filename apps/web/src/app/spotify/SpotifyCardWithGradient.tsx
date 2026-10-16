@@ -5,7 +5,11 @@ import { Box } from '@dg/ui/core/Box';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
 import type { ReactNode } from 'react';
-import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
+import {
+  ALBUM_GRADIENT_GLOW_SX,
+  ALBUM_GRADIENT_SURFACE_SX,
+  AlbumGradientBackdrop,
+} from './AlbumGradientBackdrop';
 import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
 import { useAlbumGradient } from './useAlbumGradient';
@@ -26,24 +30,6 @@ const shellContainerSx: SxObject = {
   position: 'relative',
 };
 
-const gradientGlowSx: SxObject = {
-  borderRadius: 6,
-  filter: 'blur(16px)',
-  inset: -2,
-  opacity: 0.5,
-  zIndex: 0,
-};
-
-/**
- * Sits behind the card's contents but above its paper background, inset by the
- * hairline border so the gradient still reaches the card's edges.
- */
-const gradientSurfaceSx: SxObject = {
-  borderRadius: 'inherit',
-  inset: '-1px',
-  zIndex: -1,
-};
-
 const cardSx: SxObject = {
   display: 'flex',
   height: '100%',
@@ -57,9 +43,9 @@ const cardSx: SxObject = {
 function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
   return (
     <Box sx={shellContainerSx}>
-      <AlbumGradientBackdrop containerSx={gradientGlowSx} gradient={gradient} />
+      <AlbumGradientBackdrop containerSx={ALBUM_GRADIENT_GLOW_SX} gradient={gradient} />
       <ContentCard sx={cardSx}>
-        <AlbumGradientBackdrop containerSx={gradientSurfaceSx} gradient={gradient} />
+        <AlbumGradientBackdrop containerSx={ALBUM_GRADIENT_SURFACE_SX} gradient={gradient} />
         {children}
       </ContentCard>
     </Box>
