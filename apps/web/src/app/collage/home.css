@@ -52,9 +52,10 @@
   grid-area: portrait;
 }
 /*
- * Frosted glass in the sheet's own color: cream by day, ink navy by night, so
- * it never reads as a bright card. The blur softens the cut-outs behind the
- * copy, and the padding sits outside the old text column so the words stay put.
+ * A lightly frosted pane a step off the sheet: lighter cream by day, deeper navy
+ * by night, so the copy has a surface without reading as a bright card. The
+ * blur only takes the edge off the cut-outs behind it, and the padding sits
+ * outside the old text column so the words stay put.
  */
 .home__intro {
   position: relative;
@@ -68,10 +69,13 @@
   font-size: 21px;
   line-height: 1.55;
   color: var(--ink);
-  background: color-mix(in oklab, var(--paper) 58%, transparent);
-  border: 1px solid color-mix(in oklab, var(--ink) 10%, transparent);
+  background: light-dark(
+    color-mix(in oklab, var(--cream) 78%, transparent),
+    color-mix(in oklab, var(--black) 55%, transparent)
+  );
+  border: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
   border-radius: 20px;
-  backdrop-filter: blur(16px) saturate(1.1);
+  backdrop-filter: blur(4px);
 }
 .home__intro > * {
   display: grid;
