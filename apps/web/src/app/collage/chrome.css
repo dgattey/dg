@@ -11,14 +11,18 @@
 .chrome__header > * {
   pointer-events: auto;
 }
+/* The classic lockup: system sans pushed wide and heavy, then squeezed tight. */
 .chrome__logo {
   display: grid;
   place-items: center;
-  font-family: var(--display);
-  font-size: 30px;
+  font-family: var(--font-sans);
+  font-size: 34px;
+  font-variation-settings:
+    "wght" 800,
+    "wdth" 120;
   font-weight: 800;
   line-height: 1;
-  letter-spacing: -0.04em;
+  letter-spacing: -0.12em;
 }
 .chrome__logoInner {
   display: grid;
@@ -28,7 +32,7 @@
 }
 .chrome__logo button,
 .chrome__logo a {
-  padding: 0.4em 0.5em 0.48em;
+  padding: 0.36em calc(0.46em + 0.12em) 0.42em 0.46em;
   font: inherit;
   color: inherit;
   letter-spacing: inherit;
@@ -247,7 +251,7 @@
     display: none;
   }
   .chrome__logo {
-    font-size: 24px;
+    font-size: 28px;
   }
   .chrome__nav {
     width: 100%;
