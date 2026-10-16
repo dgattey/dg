@@ -126,7 +126,12 @@ function DockedHeaderCard({ surface, track }: { surface: SiteSurface; track: Tra
       tabIndex={isHome ? 0 : undefined}
     >
       {surface === 'collage' ? (
-        <PaperCard edge="quad-a" innerClassName="chrome__nowPlayingInner" tiltDeg={1} tone="cream">
+        <PaperCard
+          edge="quad-a"
+          innerClassName="chrome__nowPlayingInner paperInnerUnclipped"
+          tiltDeg={1}
+          tone="cream"
+        >
           {listing}
         </PaperCard>
       ) : (

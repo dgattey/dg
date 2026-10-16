@@ -3,6 +3,7 @@
 import type { Track } from '@dg/content-models/spotify/Track';
 import { Box } from '@dg/ui/core/Box';
 import { RelativeTime } from '@dg/ui/core/RelativeTime';
+import type { TooltipPlacement } from '@dg/ui/core/Tooltip';
 import { Typography } from '@dg/ui/core/Typography';
 import type { SxObject } from '@dg/ui/theme';
 import { Music } from 'lucide-react';
@@ -56,15 +57,17 @@ const compactTextSx: SxObject = {
 function StatusText({
   isNowPlaying,
   playedAt,
+  tooltipPlacement,
 }: {
   isNowPlaying: boolean;
   playedAt: Date | string | undefined;
+  tooltipPlacement: TooltipPlacement;
 }) {
   if (isNowPlaying) return 'Now playing';
   if (playedAt)
     return (
       <>
-        Played <RelativeTime date={playedAt} />
+        Played <RelativeTime date={playedAt} tooltipPlacement={tooltipPlacement} />
       </>
     );
   return 'Just played';
@@ -91,7 +94,14 @@ export function PlaybackStatus({
     isPlaying: shouldAnimate,
   });
 
-  const statusContent = <StatusText isNowPlaying={isNowPlaying} playedAt={playedAt} />;
+  // The card's title sits right under the status, so its hint opens upward.
+  const statusContent = (
+    <StatusText
+      isNowPlaying={isNowPlaying}
+      playedAt={playedAt}
+      tooltipPlacement={isCompact ? 'bottom' : 'top'}
+    />
+  );
   const iconSize = isCompact ? '1em' : '1.25em';
 
   return (

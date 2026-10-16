@@ -179,6 +179,39 @@ html:not(:active-view-transition-type(album-open, album-close))
 .paperInner [data-typography] {
   color: inherit;
 }
+/*
+ * Paints the torn shape underneath rather than clipping the contents, so zoomed
+ * art and tooltips can pass the paper's edge.
+ */
+.paperInner.paperInnerUnclipped {
+  position: relative;
+  background: none;
+  isolation: isolate;
+  clip-path: none;
+}
+.paperInnerUnclipped::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background: var(--pc);
+  clip-path: var(--clip, var(--quad-a));
+}
+/*
+ * Tooltips are ink chips on the collage. Paper sets its text to inherit, so the
+ * surface names its own colors, inverted from the page in either scheme.
+ */
+.collageRoot [data-tooltip-anchor] > [role="tooltip"] {
+  padding: 7px 12px 8px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cream);
+  background: var(--black);
+  border: 1.5px solid color-mix(in oklab, var(--cream) 22%, transparent);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgb(0 0 0 / 28%);
+}
 .paperTag,
 .paperButton {
   display: inline-flex;

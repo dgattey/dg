@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { formatRelativeTime } from '../helpers/relativeTime';
 import { useServerTime } from './ServerTimeContext';
-import { Tooltip } from './Tooltip';
+import { Tooltip, type TooltipPlacement } from './Tooltip';
 
 type RelativeTimeProps = {
   /** The date to display relative to now. */
@@ -12,6 +12,8 @@ type RelativeTimeProps = {
   updateIntervalMs?: number;
   /** Whether to show a tooltip with the full date and time. Defaults to true. */
   hasTooltip?: boolean;
+  /** Preferred side for the tooltip. Defaults to below. */
+  tooltipPlacement?: TooltipPlacement;
 };
 
 const DEFAULT_UPDATE_INTERVAL_MS = 60_000;
@@ -37,6 +39,7 @@ export function RelativeTime({
   date,
   updateIntervalMs = DEFAULT_UPDATE_INTERVAL_MS,
   hasTooltip = true,
+  tooltipPlacement,
 }: RelativeTimeProps) {
   const serverTime = useServerTime();
 
@@ -65,7 +68,11 @@ export function RelativeTime({
   const time = <time dateTime={dateTimeAttr}>{relativeTime}</time>;
 
   if (hasTooltip) {
-    return <Tooltip title={fullDate}>{time}</Tooltip>;
+    return (
+      <Tooltip placement={tooltipPlacement} title={fullDate}>
+        {time}
+      </Tooltip>
+    );
   }
 
   return time;
