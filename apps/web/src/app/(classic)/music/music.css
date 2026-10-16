@@ -17,7 +17,7 @@
 }
 .music__albumsLayout {
   grid-template-areas:
-    "title title title title title title title title sort sort sort sort"
+    "title title title title title title sort sort sort sort sort sort"
     "albums albums albums albums albums albums albums albums albums albums albums albums";
   grid-template-columns: repeat(12, minmax(0, 1fr));
   row-gap: 44px;
@@ -111,7 +111,6 @@
   width: 100%;
   aspect-ratio: 1;
   margin-bottom: 7px;
-  overflow: clip;
   line-height: 0;
   border-radius: 8px;
   rotate: 1.5deg;
