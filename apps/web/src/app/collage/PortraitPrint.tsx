@@ -19,16 +19,8 @@ export function PortraitPrint({
   image: RenderableAsset;
   linkedInLink: RenderableLink | null;
 }) {
-  const rootClassName = cx('print__portrait', 'collageLift', className);
-  const contents = (
+  const frameAndTag = (
     <>
-      {CUT_OUT_PLACEMENTS.portrait.map((placement) => (
-        <CutOut
-          className={placement.id === 'portrait-monstera' ? 'print__backdrop' : undefined}
-          key={placement.id}
-          placement={placement}
-        />
-      ))}
       <span className="print__frame">
         <span aria-hidden="true" className="print__halo" />
         <span className="print__window">
@@ -54,19 +46,28 @@ export function PortraitPrint({
     </>
   );
 
-  if (!linkedInLink) {
-    return <div className={rootClassName}>{contents}</div>;
-  }
-
   return (
-    <a
-      aria-label={`About on ${linkedInLink.title}`}
-      className={rootClassName}
-      href={linkedInLink.url}
-      rel="noreferrer"
-      target="_blank"
-    >
-      {contents}
-    </a>
+    <div className={cx('print__portrait', className)}>
+      {CUT_OUT_PLACEMENTS.portrait.map((placement) => (
+        <CutOut
+          className={placement.id === 'portrait-monstera' ? 'print__backdrop' : undefined}
+          key={placement.id}
+          placement={placement}
+        />
+      ))}
+      {linkedInLink ? (
+        <a
+          aria-label={`About on ${linkedInLink.title}`}
+          className="print__portraitLink collageLift"
+          href={linkedInLink.url}
+          rel="noreferrer"
+          target="_blank"
+        >
+          {frameAndTag}
+        </a>
+      ) : (
+        <div className="print__portraitLink">{frameAndTag}</div>
+      )}
+    </div>
   );
 }
