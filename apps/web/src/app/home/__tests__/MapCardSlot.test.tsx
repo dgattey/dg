@@ -14,22 +14,22 @@ jest.mock('@dg/maps/MapCard', () => ({
 }));
 
 describe('MapCardSlot', () => {
-  it('tags the collage map as Home is SF without coordinates or the location title', async () => {
+  it('tags the collage map as Home SF without coordinates or the location title', async () => {
     render(await MapCardSlot({ surface: 'collage' }));
 
-    const tag = screen.getByText('Home is').parentElement;
-    expect(tag).toHaveTextContent('Home isSF');
+    const tag = screen.getByText('Home').parentElement;
+    expect(tag).toHaveTextContent('HomeSF');
     expect(screen.getByText('SF')).toBeInTheDocument();
     expect(screen.queryByText(/°/)).toBeNull();
     expect(screen.queryByText('My home')).toBeNull();
     expect(screen.getByTestId('map-card')).toBeInTheDocument();
   });
 
-  it('renders the classic map with no Home is tag', async () => {
+  it('renders the classic map with no Home tag', async () => {
     render(await MapCardSlot({ surface: 'classic' }));
 
     expect(screen.getByTestId('map-card')).toBeInTheDocument();
-    expect(screen.queryByText('Home is')).toBeNull();
+    expect(screen.queryByText('Home')).toBeNull();
     expect(screen.queryByText('SF')).toBeNull();
   });
 });

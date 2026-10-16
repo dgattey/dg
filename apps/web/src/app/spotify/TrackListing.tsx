@@ -7,27 +7,18 @@ import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { AlbumSleeve } from '../collage/AlbumSleeve';
-import { PaperCard } from '../collage/PaperCard';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
 import { AlbumImage } from './AlbumImage';
 import { ArtistList } from './ArtistList';
+import { COLLAGE_TRACK_COLORS, CollageTrackCard } from './CollageTrackCard';
 import { type Colors, getContrastingColors } from './colors';
-import { PlaybackProgressBar } from './PlaybackProgressBar';
 import { PlaybackStatus } from './PlaybackStatus';
 import { SpotifyLogo } from './SpotifyLogo';
+import { TrackCardMeta } from './TrackCardMeta';
 import { TrackTitle } from './TrackTitle';
 
 /** Size of the compact variant's album art thumbnail in px. */
 export const COMPACT_THUMBNAIL_SIZE = 44;
-
-const COLLAGE_TRACK_COLORS: Colors = {
-  primary: 'var(--on)',
-  primaryContrast: 'var(--pc)',
-  primaryShadow: 'none',
-  secondary: 'var(--soft)',
-  secondaryShadow: 'none',
-};
 
 type TrackListingProps = {
   /** The track to display. */
@@ -64,51 +55,6 @@ const cardHeaderSx: SxObject = {
   justifyContent: 'space-between',
 };
 
-function TrackCardMeta({
-  track,
-  colors,
-  textShadow,
-}: {
-  track: Track;
-  colors: Colors | null;
-  textShadow?: boolean;
-}) {
-  const { primary, secondary, primaryShadow, secondaryShadow } = colors ?? {};
-  const trackUrl = track.externalUrls.spotify;
-  const shadows = textShadow !== false;
-
-  return (
-    <>
-      <PlaybackStatus
-        color={primary}
-        isPlaying={track.isPlaying}
-        listingVariant="card"
-        playedAt={track.playedAt}
-        textShadow={shadows ? primaryShadow : undefined}
-      />
-      <TrackTitle
-        color={primary}
-        listingVariant="card"
-        textShadow={shadows ? primaryShadow : undefined}
-        trackTitle={track.name}
-        url={trackUrl}
-      />
-      <ArtistList
-        artists={track.artists}
-        color={secondary}
-        listingVariant="card"
-        textShadow={shadows ? secondaryShadow : undefined}
-      />
-      <PlaybackProgressBar
-        colors={colors}
-        durationMs={track.durationMs}
-        isPlaying={track.isPlaying}
-        progressMs={track.progressMs}
-      />
-    </>
-  );
-}
-
 function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) {
   const { primary, primaryShadow } = colors ?? {};
   const trackUrl = track.externalUrls.spotify;
@@ -136,6 +82,8 @@ function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) 
 // ---------------------------------------------------------------------------
 
 const COMPACT_HOVER_SIZE = 84;
+/** The 44px header art needs a bigger swing than the card's to read as a bounce. */
+const COLLAGE_COMPACT_BOUNCE = 3;
 const COMPACT_HOVER_SCALE = COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE;
 
 const compactZoomSx: SxObject = {
@@ -239,8 +187,10 @@ function CompactLayout({
     <Box sx={colors ? collageCompactContainerSx : compactContainerSx}>
       <Box data-thumbnail-outer sx={compactThumbnailOuterSx}>
         <AlbumArtWithNotes
+          bounceIntensity={colors ? COLLAGE_COMPACT_BOUNCE : undefined}
           isPlaying={isPlaying}
-          notesVariant="compact"
+          noteColor={colors ? 'var(--ink)' : undefined}
+          notesVariant={colors ? 'collageCompact' : 'compact'}
           shouldAnimate={shouldAnimate}
           wrapperSx={{
             height: COMPACT_THUMBNAIL_SIZE,
@@ -311,16 +261,7 @@ export function TrackListing({
   }
 
   if (surface === 'collage') {
-    return (
-      <div className="home__spotify" data-slot="sp">
-        <AlbumSleeve track={track} />
-        <PaperCard className="home__spotifyMeta" edge="quad-b" tiltDeg={-2} tone="cream">
-          <div className="home__spotifyMetaInner">
-            <TrackCardMeta colors={COLLAGE_TRACK_COLORS} textShadow={false} track={track} />
-          </div>
-        </PaperCard>
-      </div>
-    );
+    return <CollageTrackCard track={track} />;
   }
 
   return <CardLayout colors={getContrastingColors(track)} track={track} />;

@@ -29,7 +29,7 @@ describe('PortraitPrint', () => {
     expect(link).toHaveAttribute('href', 'https://linkedin.com/in/x');
     expect(link).toContainElement(portrait);
     expect(portrait).toHaveAttribute('src', 'https://images.example/portrait.jpg');
-    expect(link).toHaveTextContent('AboutLinkedIn');
+    expect(link).toHaveTextContent('AboutDylan');
     expect(link.querySelector('.cutOut')).toBeNull();
     expect(
       [...container.querySelectorAll('.cutOut')].map((element) =>
@@ -47,7 +47,7 @@ describe('PortraitPrint', () => {
       'https://images.example/portrait.jpg',
     );
     expect(screen.getByText('About')).toBeInTheDocument();
-    expect(screen.getByText('LinkedIn')).toBeInTheDocument();
+    expect(screen.getByText('Dylan')).toBeInTheDocument();
     expect(
       [...container.querySelectorAll('.cutOut')].map((element) =>
         element.getAttribute('data-cut-out'),

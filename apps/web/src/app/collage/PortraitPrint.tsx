@@ -41,7 +41,7 @@ export function PortraitPrint({
       </span>
       <PaperTag className="collagePin print__tag" edge="quad-c" tiltDeg={-5} tone="ochre">
         <span>About</span>
-        <small>{linkedInLink?.title ?? 'LinkedIn'}</small>
+        <small>Dylan</small>
       </PaperTag>
     </>
   );

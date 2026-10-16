@@ -179,6 +179,39 @@ html:not(:active-view-transition-type(album-open, album-close))
 .paperInner [data-typography] {
   color: inherit;
 }
+/*
+ * Paints the torn shape underneath rather than clipping the contents, so zoomed
+ * art and tooltips can pass the paper's edge.
+ */
+.paperInner.paperInnerUnclipped {
+  position: relative;
+  background: none;
+  isolation: isolate;
+  clip-path: none;
+}
+.paperInnerUnclipped::before {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  content: "";
+  background: var(--pc);
+  clip-path: var(--clip, var(--quad-a));
+}
+/*
+ * Tooltips are ink chips on the collage. Paper sets its text to inherit, so the
+ * surface names its own colors, inverted from the page in either scheme.
+ */
+.collageRoot [data-tooltip-anchor] > [role="tooltip"] {
+  padding: 7px 12px 8px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--cream);
+  background: var(--black);
+  border: 1.5px solid color-mix(in oklab, var(--cream) 22%, transparent);
+  border-radius: 10px;
+  box-shadow: 0 6px 16px rgb(0 0 0 / 28%);
+}
 .paperTag,
 .paperButton {
   display: inline-flex;
@@ -202,11 +235,11 @@ html:not(:active-view-transition-type(album-open, album-close))
 }
 .paperTag {
   padding: 0.5em 0.85em 0.55em;
-  font-size: 16px;
+  font-size: 19px;
   cursor: default;
 }
 .paperTag small {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 650;
   line-height: 1.25;
   text-transform: uppercase;
@@ -231,19 +264,13 @@ html:not(:active-view-transition-type(album-open, album-close))
   outline-offset: 3px;
 }
 .collageRoot
-  :is(
-    .paperButton,
-    .chrome__musicSummary,
-    .chrome__logo :is(a, button),
-    .chrome__nowPlaying :has(.paperWrap)
-  ):focus-visible {
+  :is(.paperButton, .chrome__musicSummary, .chrome__nowPlaying :has(.paperWrap)):focus-visible {
   outline: none;
 }
 .collageRoot
   :is(
     .paperWrap:has(> span > .paperButton:focus-visible),
     .chrome__musicSummary:focus-visible > .paperWrap,
-    .chrome__logo:has(:focus-visible),
     .chrome__nowPlaying :focus-visible .paperWrap
   ) {
   /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
@@ -427,7 +454,10 @@ html[data-color-scheme="dark"] .cutNightOnly {
     display: none;
   }
   .collagePin {
-    font-size: 12.5px;
+    font-size: 15px;
+  }
+  .collagePin small {
+    font-size: 16.5px;
   }
 }
 @media (max-width: 480px) {

@@ -5,21 +5,24 @@ import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
 import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
+import { useAlbumGradient } from './useAlbumGradient';
 
 const collageCardSx: SxObject = { gridArea: 'sp', scrollMarginTop: 120 };
 
 /**
- * Lightweight collage Spotify card wrapper that subscribes to live NowPlayingContext
- * updates without pulling in gradient extraction or classic card chrome.
+ * Collage Spotify card wrapper that subscribes to live NowPlayingContext
+ * updates and tints the card with the album art's gradient.
  */
 export function SpotifyCollageCard({ track: serverTrack }: { track: Track | null }) {
   const track = useNowPlaying(serverTrack);
-  if (!track) {
-    return null;
-  }
+  return track ? <CollageCardWithGradient track={track} /> : null;
+}
+
+function CollageCardWithGradient({ track }: { track: Track }) {
+  const trackWithGradient = useAlbumGradient(track);
   return (
     <Box className="home__spotifySlot" id={NOW_PLAYING_CARD_ID} sx={collageCardSx}>
-      <TrackListing surface="collage" track={track} />
+      <TrackListing surface="collage" track={trackWithGradient} />
     </Box>
   );
 }

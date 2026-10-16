@@ -4,11 +4,15 @@ import type { Track } from '@dg/content-models/spotify/Track';
 import { Box } from '@dg/ui/core/Box';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import type { SxObject } from '@dg/ui/theme';
-import { type ReactNode, useEffect, useState } from 'react';
-import { AlbumGradientBackdrop } from './AlbumGradientBackdrop';
-import { type AlbumGradientInformation, extractAlbumGradientFromUrl } from './extractAlbumGradient';
+import type { ReactNode } from 'react';
+import {
+  ALBUM_GRADIENT_GLOW_SX,
+  ALBUM_GRADIENT_SURFACE_SX,
+  AlbumGradientBackdrop,
+} from './AlbumGradientBackdrop';
 import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
+import { useAlbumGradient } from './useAlbumGradient';
 
 type SpotifyCardShellProps = {
   children: ReactNode;
@@ -26,24 +30,6 @@ const shellContainerSx: SxObject = {
   position: 'relative',
 };
 
-const gradientGlowSx: SxObject = {
-  borderRadius: 6,
-  filter: 'blur(16px)',
-  inset: -2,
-  opacity: 0.5,
-  zIndex: 0,
-};
-
-/**
- * Sits behind the card's contents but above its paper background, inset by the
- * hairline border so the gradient still reaches the card's edges.
- */
-const gradientSurfaceSx: SxObject = {
-  borderRadius: 'inherit',
-  inset: '-1px',
-  zIndex: -1,
-};
-
 const cardSx: SxObject = {
   display: 'flex',
   height: '100%',
@@ -57,9 +43,9 @@ const cardSx: SxObject = {
 function SpotifyCardShell({ children, gradient }: SpotifyCardShellProps) {
   return (
     <Box sx={shellContainerSx}>
-      <AlbumGradientBackdrop containerSx={gradientGlowSx} gradient={gradient} />
+      <AlbumGradientBackdrop containerSx={ALBUM_GRADIENT_GLOW_SX} gradient={gradient} />
       <ContentCard sx={cardSx}>
-        <AlbumGradientBackdrop containerSx={gradientSurfaceSx} gradient={gradient} />
+        <AlbumGradientBackdrop containerSx={ALBUM_GRADIENT_SURFACE_SX} gradient={gradient} />
         {children}
       </ContentCard>
     </Box>
@@ -72,34 +58,10 @@ type SpotifyCardWithGradientProps = {
 
 /**
  * Classic client card that derives album-art gradient/contrast in the browser.
- * Keeps sharp (and its native libvips) out of the homepage server module graph.
  * Collage bypasses this wrapper and renders `SpotifyCollageCard` directly.
  */
 export function SpotifyCardWithGradient({ track: serverTrack }: SpotifyCardWithGradientProps) {
-  const track = useNowPlaying(serverTrack) ?? serverTrack;
-  const [gradientInformation, setGradientInformation] = useState<AlbumGradientInformation>({
-    backgroundGradient: track.albumGradient ?? null,
-    contrastSetting: track.albumGradientContrastSetting ?? null,
-  });
-
-  useEffect(() => {
-    let cancelled = false;
-    extractAlbumGradientFromUrl(track.albumImage.url).then((info) => {
-      if (cancelled) {
-        return;
-      }
-      setGradientInformation(info);
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [track.albumImage.url]);
-
-  const trackWithCurrentGradient: Track = {
-    ...track,
-    albumGradient: gradientInformation.backgroundGradient ?? undefined,
-    albumGradientContrastSetting: gradientInformation.contrastSetting ?? undefined,
-  };
+  const trackWithCurrentGradient = useAlbumGradient(useNowPlaying(serverTrack) ?? serverTrack);
 
   return (
     <Box id={NOW_PLAYING_CARD_ID} sx={anchorSx}>

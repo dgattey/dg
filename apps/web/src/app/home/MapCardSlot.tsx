@@ -26,7 +26,7 @@ export async function MapCardSlot({ surface = 'classic' }: { surface?: SiteSurfa
         <MapCard location={location} surface="collage" />
       </PaperCard>
       <PaperTag className="collagePin home__mapTag" edge="quad-c" tiltDeg={-2} tone="cream">
-        <span>Home is</span>
+        <span>Home</span>
         <small>SF</small>
       </PaperTag>
     </div>

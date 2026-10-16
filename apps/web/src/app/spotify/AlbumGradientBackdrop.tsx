@@ -24,6 +24,25 @@ const layerSx: SxObject = {
   position: 'absolute',
 };
 
+/** The album's colors bloom softly past the now playing card's edges. */
+export const ALBUM_GRADIENT_GLOW_SX: SxObject = {
+  borderRadius: 6,
+  filter: 'blur(16px)',
+  inset: -2,
+  opacity: 0.5,
+  zIndex: 0,
+};
+
+/**
+ * Sits behind the card's contents but above its paper background, inset by the
+ * hairline border so the gradient still reaches the card's edges.
+ */
+export const ALBUM_GRADIENT_SURFACE_SX: SxObject = {
+  borderRadius: 'inherit',
+  inset: '-1px',
+  zIndex: -1,
+};
+
 type GradientLayer = {
   gradient: string;
   id: number;

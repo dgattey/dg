@@ -5,7 +5,7 @@ import type { SxObject } from '@dg/ui/theme';
 import { Music, Music2, Music3, Music4 } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 
-type NotesVariant = 'default' | 'compact' | 'collage';
+type NotesVariant = 'default' | 'compact' | 'collage' | 'collageCompact';
 
 type MusicNotesProps = {
   /**
@@ -18,7 +18,9 @@ type MusicNotesProps = {
   noteColor?: string;
   /**
    * `compact` for small contexts (e.g. header thumbnail); `collage` for the
-   * collage now-playing sleeve, where notes must read against saturated paper.
+   * collage now-playing sleeve, where notes must read against saturated paper;
+   * `collageCompact` for the collage header pill, whose notes leave the paper
+   * for whatever the page shows behind the header.
    */
   variant?: NotesVariant;
 };
@@ -72,6 +74,22 @@ const NOTES_CONFIG: Record<NotesVariant, NotesConfig> = {
     scaleRange: 0.4,
     startDistance: 110,
     strokeWidth: 2.5,
+  },
+  collageCompact: {
+    delayMaxMs: 60,
+    distanceMin: 44,
+    distanceRange: 30,
+    durationMs: 2200,
+    durationRandomMs: 400,
+    filter:
+      'drop-shadow(0 0 1.5px light-dark(rgba(247, 241, 226, 0.95), rgba(0, 0, 0, 0.7))) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))',
+    iconSize: 18,
+    maxNotes: 12,
+    opacity: [1, 0.9, 0.5],
+    scaleMin: 0.85,
+    scaleRange: 0.3,
+    startDistance: 20,
+    strokeWidth: 2.25,
   },
   compact: {
     delayMaxMs: 60,

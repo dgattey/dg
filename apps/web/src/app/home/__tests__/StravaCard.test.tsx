@@ -23,6 +23,18 @@ describe('StravaCard', () => {
     expect(screen.queryByTestId('route-map')).not.toBeInTheDocument();
   });
 
+  it('links the whole collage card to the activity, with no nested links', () => {
+    render(
+      <StravaCard activity={{ ...activity, description: 'Hills', map: null }} surface="collage" />,
+    );
+
+    const links = screen.getAllByRole('link');
+    expect(links).toHaveLength(1);
+    expect(links[0]).toHaveAccessibleName('Morning run on Strava');
+    expect(links[0]).toHaveAttribute('href', activity.url);
+    expect(links[0]).toHaveTextContent('Hills');
+  });
+
   it('prefers the summary polyline for the background route', () => {
     render(
       <StravaCard

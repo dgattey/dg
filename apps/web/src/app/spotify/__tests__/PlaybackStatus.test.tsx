@@ -40,6 +40,17 @@ describe('PlaybackStatus', () => {
     expect(screen.getByText('3 hours ago')).toBeInTheDocument();
   });
 
+  it('names the service instead of a relative time when given one', () => {
+    const { rerender } = render(<PlaybackStatus isPlaying={true} service="Spotify" />, {
+      wrapper: TestWrapper,
+    });
+    expect(screen.getByText('Now playing on Spotify')).toBeInTheDocument();
+
+    rerender(<PlaybackStatus playedAt="2026-02-10T09:00:00Z" service="Spotify" />);
+    expect(screen.getByText('Recently played on Spotify')).toBeInTheDocument();
+    expect(screen.queryByText('3 hours ago')).not.toBeInTheDocument();
+  });
+
   it('prefers isPlaying over playedAt when both are present', () => {
     render(<PlaybackStatus isPlaying={true} playedAt="2026-02-10T09:00:00Z" />, {
       wrapper: TestWrapper,
