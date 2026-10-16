@@ -17,7 +17,6 @@ import { cacheLife } from 'next/cache';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
 import { PaperCard } from '../collage/PaperCard';
-import { PaperTag } from '../collage/PaperTag';
 import { FOOTER_ICON_DESKTOP_FONT_SIZE, FOOTER_ICON_FONT_SIZE } from './footerIconSize';
 
 const navItemNoPaddingSx: SxObject = {
@@ -145,9 +144,6 @@ export async function Footer({ surface = 'classic' }: { surface?: SiteSurface } 
                   )}
                 </>
               ) : null}
-              <PaperTag edge="quad-c" tiltDeg={2} tone="ochre">
-                Redesign on
-              </PaperTag>
               {process.env.NODE_ENV !== 'production' ? (
                 <>
                   <span className="chrome__dot">•</span>

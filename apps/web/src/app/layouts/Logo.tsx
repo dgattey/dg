@@ -7,7 +7,6 @@ import { pageTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
-import { isMusicDestinationPath } from './musicHeaderDestinations';
 import { usePublicPathname } from './usePublicPathname';
 
 const paddingStyles: SxObject = {
@@ -71,8 +70,8 @@ const logoLinkMergedSx: SxObject = {
 
 /**
  * Logo that scrolls to top on home page, or links to home on other pages.
- * Leaving a music destination uses the close view-transition type so the page
- * falls away instead of snapping.
+ * Going home uses the close view-transition type so the page falls away and
+ * its heading morphs into the homepage headline instead of snapping.
  */
 export function Logo({ surface = 'classic' }: { surface?: SiteSurface }) {
   const pathname = usePublicPathname();
@@ -94,9 +93,7 @@ export function Logo({ surface = 'classic' }: { surface?: SiteSurface }) {
         href={homeRoute}
         sx={{ color: 'inherit', textDecoration: 'none' }}
         title="Home"
-        transitionTypes={
-          isMusicDestinationPath(pathname) ? pageTransitionTypes('close') : undefined
-        }
+        transitionTypes={pageTransitionTypes('close')}
       >
         dg.
       </Link>
@@ -112,11 +109,7 @@ export function Logo({ surface = 'classic' }: { surface?: SiteSurface }) {
   }
 
   return (
-    <Link
-      href={homeRoute}
-      sx={logoLinkMergedSx}
-      transitionTypes={isMusicDestinationPath(pathname) ? pageTransitionTypes('close') : undefined}
-    >
+    <Link href={homeRoute} sx={logoLinkMergedSx} transitionTypes={pageTransitionTypes('close')}>
       dg.
     </Link>
   );

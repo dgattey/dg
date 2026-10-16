@@ -6,6 +6,10 @@ import { MouseAwareGlassContainer } from '@dg/ui/core/MouseAwareGlassContainer';
 import { Section } from '@dg/ui/core/Section';
 import { Stack } from '@dg/ui/core/Stack';
 import { Typography } from '@dg/ui/core/Typography';
+import {
+  PAGE_TITLE_VIEW_TRANSITION_NAME,
+  pageTransitionTypes,
+} from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import type { SxObject } from '@dg/ui/theme';
 import { BRAND } from '@dg/ui/theme/color';
@@ -36,6 +40,7 @@ const statusCodeSx: SxObject = {
   fontStretch: 'extra-expanded',
   fontWeight: 900,
   textWrap: 'nowrap',
+  viewTransitionName: PAGE_TITLE_VIEW_TRANSITION_NAME,
 };
 
 const messageSx: SxObject = {
@@ -114,6 +119,7 @@ export function ErrorLayout({ statusCode, surface = 'classic' }: ErrorLayoutProp
         isButton={true}
         sx={backLinkSx}
         title="Home"
+        transitionTypes={pageTransitionTypes('close')}
       >
         Back home
       </Link>

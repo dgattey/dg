@@ -83,7 +83,8 @@
   position: relative;
   z-index: 2;
   grid-area: map;
-  width: min(100%, 720px);
+  /* Reaches into the slack beside the centered portrait. */
+  width: min(calc(100% + 48px), 780px);
   margin-top: 76px;
   margin-left: 8px;
 }
@@ -91,7 +92,7 @@
   width: 100%;
 }
 .home__mapInner {
-  aspect-ratio: 1.8;
+  aspect-ratio: 2.5;
   overflow: clip;
 }
 .home__mapInner > * {
@@ -392,7 +393,7 @@
     margin-left: 0;
   }
   .home__mapInner {
-    aspect-ratio: 1;
+    aspect-ratio: 1.25;
   }
   .home__stravaRoute {
     min-height: 180px;

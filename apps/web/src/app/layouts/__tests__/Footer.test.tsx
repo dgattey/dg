@@ -75,10 +75,10 @@ describe('Footer', () => {
     expect(screen.queryByRole('link', { name: favoriteAlbumsRoute })).not.toBeInTheDocument();
   });
 
-  it('renders the torn strip and redesign tag on the collage surface', async () => {
+  it('renders the torn strip with no redesign tag on the collage surface', async () => {
     mockGetFooterLinks.mockResolvedValue([]);
     render(await Footer({ surface: 'collage' }));
     expect(screen.getByText(/Dylan Gattey/)).toBeInTheDocument();
-    expect(screen.getByText('Redesign on')).toBeInTheDocument();
+    expect(screen.queryByText(/redesign/i)).not.toBeInTheDocument();
   });
 });

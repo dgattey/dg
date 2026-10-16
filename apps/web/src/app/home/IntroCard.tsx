@@ -1,6 +1,7 @@
 import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
 import type { SiteSurface } from '@dg/shared-core/siteSurface';
+import { PAGE_TITLE_VIEW_TRANSITION_NAME } from '@dg/ui/core/transitions/pageTransitions';
 import { ContentCard } from '@dg/ui/dependent/ContentCard';
 import { Image } from '@dg/ui/dependent/Image';
 import { RichText } from '@dg/ui/dependent/RichText';
@@ -47,6 +48,9 @@ const introTextCardSx: SxObject = {
 const introTextSx: SxObject = {
   '& > [data-typography]': {
     marginBottom: 0,
+  },
+  '& > h1:first-of-type': {
+    viewTransitionName: PAGE_TITLE_VIEW_TRANSITION_NAME,
   },
   '& p': {
     fontSize: '1rem',
