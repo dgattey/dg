@@ -3,6 +3,7 @@
  */
 
 import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { usePathname } from 'next/navigation';
 
 jest.mock('next/navigation', () => ({
@@ -12,21 +13,40 @@ jest.mock('next/navigation', () => ({
 import { Logo } from '../Logo';
 
 describe('Logo', () => {
-  it.each(['/', '/redesign'])(
-    'renders the collage home logo as a scroll-to-top button at %s',
+  it.each(['', '/', '/redesign', '/redesign/music/albums'])(
+    'always renders the collage logo as a home link at %s to avoid hydration mismatches',
     (pathname) => {
       jest.mocked(usePathname).mockReturnValue(pathname);
       render(<Logo surface="collage" />);
 
-      expect(screen.getByRole('button', { name: 'dg.' })).toBeInTheDocument();
-      expect(screen.queryByRole('link')).not.toBeInTheDocument();
+      expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
     },
   );
 
-  it('links the collage logo home from the prerendered albums path', () => {
-    jest.mocked(usePathname).mockReturnValue('/redesign/music/albums');
-    render(<Logo surface="collage" />);
+  it.each(['/', '/redesign'])(
+    'scrolls to top instead of navigating when clicking the home logo at %s',
+    async (pathname) => {
+      const user = userEvent.setup();
+      const scrollToSpy = jest.spyOn(window, 'scrollTo').mockImplementation(() => undefined);
+      jest.mocked(usePathname).mockReturnValue(pathname);
+      render(<Logo surface="collage" />);
 
-    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', '/');
-  });
+      await user.click(screen.getByRole('link', { name: 'Home' }));
+
+      expect(scrollToSpy).toHaveBeenCalledWith({ behavior: 'smooth', top: 0 });
+      scrollToSpy.mockRestore();
+    },
+  );
+
+  it.each(['', '/', '/music'])(
+    'always renders the classic logo as a home link at %s to avoid hydration mismatches',
+    (pathname) => {
+      jest.mocked(usePathname).mockReturnValue(pathname);
+      render(<Logo surface="classic" />);
+
+      expect(screen.getByRole('link', { name: 'dg.' })).toHaveAttribute('href', '/');
+      expect(screen.queryByRole('button')).not.toBeInTheDocument();
+    },
+  );
 });
