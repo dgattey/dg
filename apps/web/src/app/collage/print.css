@@ -55,7 +55,7 @@
   z-index: 1;
   pointer-events: none;
   background: var(--cream);
-  border-radius: 48% 52% 50% 50% / 52% 52% 48% 48%;
+  clip-path: url("#collage-portrait-clip");
 }
 .print__window {
   position: relative;
@@ -64,7 +64,7 @@
   aspect-ratio: 0.82;
   overflow: clip;
   background: var(--cream);
-  border-radius: 48% 52% 50% 50% / 52% 52% 48% 48%;
+  clip-path: url("#collage-portrait-clip");
 }
 .print__image {
   position: absolute;
