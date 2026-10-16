@@ -311,18 +311,17 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     wrapWithTooltip(el, showTooltip, title, tooltipPlacement, tooltipId);
 
   if (isButton) {
+    const shared = { ...buttonProps, ...anchorProps, children: contents, className, href, sx };
     return wrap(
-      <Button
-        {...buttonProps}
-        {...anchorProps}
-        className={className}
-        component="a"
-        href={href}
-        {...externalProps}
-        sx={sx}
-      >
-        {contents}
-      </Button>,
+      isExternal || forcePageNavigation ? (
+        <Button {...shared} component="a" {...externalProps} />
+      ) : (
+        <Button
+          {...shared}
+          component={NextLink}
+          transitionTypes={transitionTypes ? [...transitionTypes] : undefined}
+        />
+      ),
     );
   }
 
