@@ -73,52 +73,34 @@ describe('GatteySitesCard', () => {
 
     expect(screen.getByRole('heading', { name: 'Side projects' })).toBeInTheDocument();
 
-    const sagaLink = screen.getByRole('link', { name: 'Saga' });
+    const sagaLink = screen.getByRole('link', { name: /Saga/ });
     expect(sagaLink).toHaveAttribute('href', 'https://saga.gattey.com');
     expect(sagaLink).toHaveAttribute('target', '_blank');
 
-    const sconeosLink = screen.getByRole('link', { name: 'Sconeos' });
+    const sconeosLink = screen.getByRole('link', { name: /Sconeos/ });
     expect(sconeosLink).toHaveAttribute('href', 'https://sconeos.gattey.com');
     expect(sconeosLink).toHaveAttribute('target', '_blank');
 
-    const wmmLink = screen.getByRole('link', { name: 'WMM' });
+    const wmmLink = screen.getByRole('link', { name: /WMM/ });
     expect(wmmLink).toHaveAttribute('href', 'https://wmm.gattey.com');
     expect(wmmLink).toHaveAttribute('target', '_blank');
 
-    const lostLink = screen.getByRole('link', { name: 'Lost Cities scorer' });
+    const lostLink = screen.getByRole('link', { name: /Lost Cities scorer/ });
     expect(lostLink).toHaveAttribute('href', 'https://lostcities.app');
     expect(lostLink).toHaveAttribute('target', '_blank');
 
     expect(screen.getAllByRole('link')).toHaveLength(4);
   });
 
-  it('marks each project icon so row hover can scale it', () => {
+  it('marks each project icon and keeps marks decorative', () => {
     const { container } = render(<GatteySitesCard projects={projects} />);
 
-    // The hover/focus pop is wired to this attribute from the row's sx.
     expect(container.querySelectorAll('[data-role="side-project-mark"]')).toHaveLength(4);
+    expect(container.querySelectorAll('img[alt=""]')).toHaveLength(4);
   });
 
   it('renders nothing when there are no projects', () => {
     const { container } = render(<GatteySitesCard projects={[]} />);
     expect(container).toBeEmptyDOMElement();
-  });
-
-  it('keeps collage marks decorative and links external', () => {
-    const { container } = render(<GatteySitesCard projects={projects} surface="collage" />);
-
-    expect(screen.getByRole('link', { name: /Saga/ })).toHaveAttribute(
-      'href',
-      'https://saga.gattey.com',
-    );
-    expect(screen.getByRole('link', { name: /Sconeos/ })).toHaveAttribute(
-      'href',
-      'https://sconeos.gattey.com',
-    );
-    expect(screen.getByRole('link', { name: /WMM/ })).toHaveAttribute(
-      'href',
-      'https://wmm.gattey.com',
-    );
-    expect(container.querySelectorAll('img[alt=""]')).toHaveLength(4);
   });
 });

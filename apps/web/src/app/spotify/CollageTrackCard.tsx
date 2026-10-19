@@ -3,11 +3,7 @@ import type { SxObject } from '@dg/ui/theme';
 import type { CSSProperties } from 'react';
 import { AlbumSleeve } from '../collage/AlbumSleeve';
 import { PaperCard } from '../collage/PaperCard';
-import {
-  ALBUM_GRADIENT_GLOW_SX,
-  ALBUM_GRADIENT_SURFACE_SX,
-  AlbumGradientBackdrop,
-} from './AlbumGradientBackdrop';
+import { ALBUM_GRADIENT_GLOW_SX, AlbumGradientBackdrop } from './AlbumGradientBackdrop';
 import { type Colors, getContrastingColors } from './colors';
 import { TrackCardMeta } from './TrackCardMeta';
 
@@ -19,19 +15,18 @@ export const COLLAGE_TRACK_COLORS: Colors = {
   secondaryShadow: 'none',
 };
 
-/** The classic card's gradient surface, cut to the paper's torn edge. */
 const tornGradientSurfaceSx: SxObject = {
-  ...ALBUM_GRADIENT_SURFACE_SX,
+  borderRadius: 'inherit',
   clipPath: 'var(--clip, var(--quad-a))',
+  inset: '-1px',
+  zIndex: -1,
 };
 
-/** The paper under the gradient is the classic card's, so the colors blend the same. */
-const CLASSIC_CARD_PAPER: CSSProperties & Record<`--${string}`, string> = {
+const CARD_PAPER: CSSProperties & Record<`--${string}`, string> = {
   '--on': 'var(--mui-palette-text-primary)',
   '--pc': 'var(--mui-palette-background-paper)',
 };
 
-/** The collage now playing card: album sleeve over the classic gradient card, torn. */
 export function CollageTrackCard({ track }: { track: Track }) {
   const gradient = track.albumGradient;
   const colors = getContrastingColors(track);
@@ -44,7 +39,7 @@ export function CollageTrackCard({ track }: { track: Track }) {
           className="home__spotifyMeta"
           edge="quad-b"
           innerClassName="paperInnerUnclipped"
-          style={CLASSIC_CARD_PAPER}
+          style={CARD_PAPER}
         >
           <AlbumGradientBackdrop containerSx={tornGradientSurfaceSx} gradient={gradient} />
           <div className="home__spotifyMetaInner">

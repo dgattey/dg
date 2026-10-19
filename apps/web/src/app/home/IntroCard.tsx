@@ -1,121 +1,29 @@
 import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
 import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
-import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import { PAGE_TITLE_VIEW_TRANSITION_NAME } from '@dg/ui/core/transitions/pageTransitions';
-import { ContentCard } from '@dg/ui/dependent/ContentCard';
-import { Image } from '@dg/ui/dependent/Image';
 import { RichText } from '@dg/ui/dependent/RichText';
-import { useCurrentImageSizes } from '@dg/ui/helpers/useCurrentImageSizes';
-import type { SxObject } from '@dg/ui/theme';
 import { CutLetters } from '../collage/CutLetters';
-import { introImageAlt, PortraitPrint } from '../collage/PortraitPrint';
+import { PortraitPrint } from '../collage/PortraitPrint';
 import { splitIntroDocument } from '../collage/splitIntroDocument';
-
-/**
- * Width of the intro image on small screens
- */
-const SMALL_IMAGE_SIZE = '16em';
-
-const overlaySx: SxObject = {
-  visibility: { md: 'visible', xs: 'hidden' },
-};
-
-const introImageCardSx: SxObject = {
-  maxHeight: { md: 'unset', xs: SMALL_IMAGE_SIZE },
-  maxWidth: { md: 'unset', xs: SMALL_IMAGE_SIZE },
-  minWidth: { md: 'unset', xs: SMALL_IMAGE_SIZE },
-};
-
-const introTextCardSx: SxObject = {
-  alignItems: 'center',
-  background: 'none',
-  border: 'none',
-  borderRadius: 0,
-  boxShadow: 'none',
-  display: 'flex',
-  flexDirection: 'column',
-  justifyContent: 'center',
-};
-
-/**
- * The intro copy shares a row with fixed-height cards, so it has one grid cell
- * of vertical room. Two things keep it there: the stack owns the rhythm with a
- * single gap instead of per-element margins, and the paragraphs sit at the root
- * font size rather than the responsively scaled `body1`, which grows enough on
- * wide screens to push the last paragraph onto an extra line.
- */
-const introTextSx: SxObject = {
-  '& > [data-typography]': {
-    marginBottom: 0,
-  },
-  '& > h1:first-of-type': {
-    viewTransitionName: PAGE_TITLE_VIEW_TRANSITION_NAME,
-  },
-  '& p': {
-    fontSize: '1rem',
-  },
-  gap: 2.5,
-};
 
 type IntroCardProps = {
   linkedInLink: RenderableLink | null;
   introBlock: IntroContent;
-  surface?: SiteSurface;
 };
 
-function ClassicIntroCard({ introBlock, linkedInLink }: IntroCardProps) {
-  const { width, height, sizes } = useCurrentImageSizes();
+export function IntroCard({ introBlock, linkedInLink }: IntroCardProps) {
+  const { headline, remainder } = splitIntroDocument(introBlock.textBlock.content);
 
   return (
     <>
-      <ContentCard
-        link={linkedInLink}
-        overlay="About"
-        overlaySx={overlaySx}
-        sx={introImageCardSx}
-        verticalSpan={1}
-      >
-        <Image
-          alt={introImageAlt(introBlock.image)}
-          cover={true}
-          height={height}
-          preload={true}
-          sizes={sizes}
-          url={introBlock.image.url}
-          width={width}
-        />
-      </ContentCard>
-      <ContentCard sx={introTextCardSx}>
-        <RichText {...introBlock.textBlock.content} sx={introTextSx} />
-      </ContentCard>
+      <PortraitPrint
+        className="home__portraitSlot"
+        image={introBlock.image}
+        linkedInLink={linkedInLink}
+      />
+      {headline ? <CutLetters className="home__headline" text={headline} /> : null}
+      <div className="home__intro">
+        <RichText {...remainder} />
+      </div>
     </>
   );
-}
-
-/**
- * Creates an intro information card for use on the homepage. Technically
- * creates two cards in a fragment. Also adds meta for the whole Homepage,
- * as the data comes from the introBlock. The width/height here is for image
- * resizing, and the actual width may be smaller.
- */
-export function IntroCard({ introBlock, linkedInLink, surface = 'classic' }: IntroCardProps) {
-  if (surface === 'collage') {
-    const { headline, remainder } = splitIntroDocument(introBlock.textBlock.content);
-
-    return (
-      <>
-        <PortraitPrint
-          className="home__portraitSlot"
-          image={introBlock.image}
-          linkedInLink={linkedInLink}
-        />
-        {headline ? <CutLetters className="home__headline" text={headline} /> : null}
-        <div className="home__intro">
-          <RichText {...remainder} />
-        </div>
-      </>
-    );
-  }
-
-  return <ClassicIntroCard introBlock={introBlock} linkedInLink={linkedInLink} />;
 }

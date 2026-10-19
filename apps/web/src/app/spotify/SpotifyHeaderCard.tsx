@@ -2,15 +2,14 @@
 
 import type { Track } from '@dg/content-models/spotify/Track';
 import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
-import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Box } from '@dg/ui/core/Box';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { TIMING_MEDIUM } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
-import { usePublicPathname } from '../layouts/usePublicPathname';
 import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
 
@@ -52,8 +51,6 @@ const musicLinkSx: SxObject = {
 };
 
 type SpotifyHeaderCardProps = {
-  surface?: SiteSurface;
-  /** Server track; the newest published one wins. Null renders nothing until one is published. */
   track: Track | null;
 };
 
@@ -61,22 +58,13 @@ function scrollToNowPlayingCard() {
   document.getElementById(NOW_PLAYING_CARD_ID)?.scrollIntoView({ behavior: 'smooth' });
 }
 
-/**
- * Docked Spotify card in the header, always shown. Manages viewport detection
- * for animation pausing and home-page scroll-to-card behavior.
- * Off-home (and not already on music) navigates to listening history.
- * Track display is delegated to TrackListing variant="compact".
- */
-export function SpotifyHeaderCard({
-  surface = 'classic',
-  track: serverTrack,
-}: SpotifyHeaderCardProps) {
+export function SpotifyHeaderCard({ track: serverTrack }: SpotifyHeaderCardProps) {
   const track = useNowPlaying(serverTrack);
-  return track ? <DockedHeaderCard surface={surface} track={track} /> : null;
+  return track ? <DockedHeaderCard track={track} /> : null;
 }
 
-function DockedHeaderCard({ surface, track }: { surface: SiteSurface; track: Track }) {
-  const pathname = usePublicPathname();
+function DockedHeaderCard({ track }: { track: Track }) {
+  const pathname = usePathname() ?? '/';
   const isHome = pathname === homeRoute;
   const isMusic = pathname === musicRoute;
   const opensMusicPage = !isHome && !isMusic;
@@ -98,15 +86,6 @@ function DockedHeaderCard({ surface, track }: { surface: SiteSurface; track: Tra
     return () => observer.disconnect();
   }, []);
 
-  const listing = (
-    <TrackListing
-      disableLinks={isHome || opensMusicPage}
-      shouldAnimate={isInViewport}
-      surface={surface}
-      track={track}
-      variant="compact"
-    />
-  );
   const card = (
     <Box
       onClick={isHome ? scrollToNowPlayingCard : undefined}
@@ -125,18 +104,19 @@ function DockedHeaderCard({ surface, track }: { surface: SiteSurface; track: Tra
       sx={getContainerSx(isHome || opensMusicPage)}
       tabIndex={isHome ? 0 : undefined}
     >
-      {surface === 'collage' ? (
-        <PaperCard
-          edge="quad-a"
-          innerClassName="chrome__nowPlayingInner paperInnerUnclipped"
-          tiltDeg={1}
-          tone="cream"
-        >
-          {listing}
-        </PaperCard>
-      ) : (
-        listing
-      )}
+      <PaperCard
+        edge="quad-a"
+        innerClassName="chrome__nowPlayingInner paperInnerUnclipped"
+        tiltDeg={1}
+        tone="cream"
+      >
+        <TrackListing
+          disableLinks={isHome || opensMusicPage}
+          shouldAnimate={isInViewport}
+          track={track}
+          variant="compact"
+        />
+      </PaperCard>
     </Box>
   );
 

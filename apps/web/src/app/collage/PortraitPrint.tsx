@@ -6,7 +6,7 @@ import { CUT_OUT_PLACEMENTS } from './cutOutPlacements';
 import { PaperTag } from './PaperTag';
 import { cx } from './paperVars';
 
-export function introImageAlt(image: Pick<RenderableAsset, 'title'>): string {
+function introImageAlt(image: Pick<RenderableAsset, 'title'>): string {
   return image.title ?? 'Introduction image';
 }
 

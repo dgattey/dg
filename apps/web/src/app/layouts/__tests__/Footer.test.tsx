@@ -17,26 +17,6 @@ jest.mock('next/cache', () => ({
   cacheLife: jest.fn(),
 }));
 
-jest.mock('next/navigation', () => ({
-  usePathname: jest.fn(() => '/'),
-}));
-
-jest.mock('@dg/ui/core/transitions/PageTransitionLink', () => ({
-  PageTransitionLink: ({
-    children,
-    href,
-    title,
-  }: {
-    children: React.ReactNode;
-    href: string;
-    title: string;
-  }) => (
-    <a href={href} title={title}>
-      {children}
-    </a>
-  ),
-}));
-
 import { getFooterLinks } from '../../../services/contentful';
 import { Footer } from '../Footer';
 
@@ -73,12 +53,5 @@ describe('Footer', () => {
     expect(cursor.compareDocumentPosition(github) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
     expect(screen.queryByRole('link', { name: 'Favorite albums' })).not.toBeInTheDocument();
     expect(screen.queryByRole('link', { name: favoriteAlbumsRoute })).not.toBeInTheDocument();
-  });
-
-  it('renders the torn strip with no redesign tag on the collage surface', async () => {
-    mockGetFooterLinks.mockResolvedValue([]);
-    render(await Footer({ surface: 'collage' }));
-    expect(screen.getByText(/Dylan Gattey/)).toBeInTheDocument();
-    expect(screen.queryByText(/redesign/i)).not.toBeInTheDocument();
   });
 });

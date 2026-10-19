@@ -2,13 +2,8 @@
  * @jest-environment node
  */
 
-jest.mock('@flags-sdk/vercel', () => ({
-  vercelAdapter: () => ({ decide: () => false }),
-}));
-
 jest.mock('flags/next', () => ({
   dedupe: <T>(fn: T) => fn,
-  flag: <T>(definition: T) => definition,
 }));
 
 import type { ReadonlyRequestCookies } from 'flags';

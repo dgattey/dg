@@ -1,6 +1,5 @@
-import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import { ContentGrid } from '@dg/ui/core/ContentGrid';
 import { getProjects } from '../../services/contentful';
+import { CollageProjectFrame } from '../collage/CollageProjectFrame';
 import { CutOut } from '../collage/CutOut';
 import { CutOutSymbols } from '../collage/CutOutSymbols';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
@@ -15,94 +14,52 @@ import { WorkSheet } from '../collage/WorkSheet';
 import { GatteySitesCardSlot } from './GatteySitesCardSlot';
 import { IntroCardSlot } from './IntroCardSlot';
 import { MapCardSlot } from './MapCardSlot';
-import { ProjectCard } from './ProjectCard';
 import { SpotifyCardSlot } from './SpotifyCard';
 import { StravaCardSlot } from './StravaCardSlot';
 
-/**
- * Merges the projects and other cards into a single array, where the other cards
- * are interleaved between the project cards at the given indices.
- */
-function mergeCards(
-  projects: Array<React.ReactNode>,
-  preciselyPlacedCards: Map<number, React.ReactNode>,
-): Array<React.ReactNode> {
-  const projectsIterator = projects.values();
-  return Array.from(
-    { length: projects.length + preciselyPlacedCards.size },
-    (_, i) => preciselyPlacedCards.get(i) ?? projectsIterator.next().value,
-  );
-}
-
-/**
- * Puts all projects into a grid using `projects` data,
- * interspersed with `introBlock` data, and dark/light mode
- * toggle.
- */
-export async function Homepage({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
+export async function Homepage() {
   const projects = await getProjects();
+  const slots = assignProjectSlots(projects);
 
-  if (surface === 'collage') {
-    const slots = assignProjectSlots(projects);
-    return (
-      <>
-        <CutOutSymbols />
-        <section aria-label="Hello" className="collageBleed home__hello">
-          {CUT_OUT_PLACEMENTS.helloSheet.map((placement) => (
+  return (
+    <>
+      <CutOutSymbols />
+      <section aria-label="Hello" className="collageBleed home__hello">
+        {CUT_OUT_PLACEMENTS.helloSheet.map((placement) => (
+          <CutOut key={placement.id} placement={placement} />
+        ))}
+        <div
+          className="collageMeasure collageMeasureGrid collageGridStack home__helloGrid"
+          style={{ gridTemplateAreas: HELLO_GRID_AREAS }}
+        >
+          <IntroCardSlot />
+          <MapCardSlot />
+        </div>
+      </section>
+      <WorkSheet projects={slots.work} spotify={<SpotifyCardSlot />} strava={<StravaCardSlot />} />
+      <MoreWorkSheet
+        overflow={slots.overflow}
+        projects={slots.moreWork}
+        sites={<GatteySitesCardSlot />}
+      />
+      {slots.coda ? (
+        <section aria-label="And" className="collageBleed home__coda">
+          {CUT_OUT_PLACEMENTS.coda.map((placement) => (
             <CutOut key={placement.id} placement={placement} />
           ))}
           <div
-            className="collageMeasure collageMeasureGrid collageGridStack home__helloGrid"
-            style={{ gridTemplateAreas: HELLO_GRID_AREAS }}
+            className="collageMeasure collageMeasureGrid collageGridStack home__codaGrid"
+            style={{ gridTemplateAreas: CODA_GRID_AREAS }}
           >
-            <IntroCardSlot surface="collage" />
-            <MapCardSlot surface="collage" />
+            <CollageProjectFrame
+              data-slot="li"
+              key={slots.coda.key}
+              project={slots.coda.project}
+              style={CODA_FRAME_STYLE}
+            />
           </div>
         </section>
-        <WorkSheet
-          projects={slots.work}
-          spotify={<SpotifyCardSlot surface="collage" />}
-          strava={<StravaCardSlot surface="collage" />}
-        />
-        <MoreWorkSheet
-          overflow={slots.overflow}
-          projects={slots.moreWork}
-          sites={<GatteySitesCardSlot surface="collage" />}
-        />
-        {slots.coda ? (
-          <section aria-label="And" className="collageBleed home__coda">
-            {CUT_OUT_PLACEMENTS.coda.map((placement) => (
-              <CutOut key={placement.id} placement={placement} />
-            ))}
-            <div
-              className="collageMeasure collageMeasureGrid collageGridStack home__codaGrid"
-              style={{ gridTemplateAreas: CODA_GRID_AREAS }}
-            >
-              <ProjectCard
-                {...slots.coda.project}
-                data-slot="li"
-                key={slots.coda.key}
-                style={CODA_FRAME_STYLE}
-                surface="collage"
-              />
-            </div>
-          </section>
-        ) : null}
-      </>
-    );
-  }
-
-  const projectCards = projects.map((project) => <ProjectCard key={project.title} {...project} />);
-
-  // These cards are interleaved between the project cards at the given indices. Project cards
-  // should maintain their original order, but not necessarily index.
-  const preciselyPlacedCards = new Map([
-    [0, <IntroCardSlot key="intro" surface="classic" />],
-    [1, <MapCardSlot key="map" surface="classic" />],
-    [3, <SpotifyCardSlot key="spotify" />],
-    [4, <StravaCardSlot key="strava" />],
-    [7, <GatteySitesCardSlot key="gattey-sites" />],
-  ]);
-
-  return <ContentGrid>{mergeCards(projectCards, preciselyPlacedCards)}</ContentGrid>;
+      ) : null}
+    </>
+  );
 }

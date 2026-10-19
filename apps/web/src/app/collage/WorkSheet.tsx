@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { ProjectCard } from '../home/ProjectCard';
+import { CollageProjectFrame } from './CollageProjectFrame';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS } from './cutOutPlacements';
 import { type SlottedProject, workSheetFrames, workSheetGridAreas } from './projectSlots';
@@ -36,23 +36,21 @@ export function WorkSheet({
         style={gridStyle}
       >
         {projectOne ? (
-          <ProjectCard
-            {...projectOne.project}
+          <CollageProjectFrame
             data-slot="c1"
             key={projectOne.key}
+            project={projectOne.project}
             style={projectOne.style}
-            surface="collage"
           />
         ) : null}
         {spotify}
         {strava}
         {projectTwo ? (
-          <ProjectCard
-            {...projectTwo.project}
+          <CollageProjectFrame
             data-slot="ws"
             key={projectTwo.key}
+            project={projectTwo.project}
             style={projectTwo.style}
-            surface="collage"
           />
         ) : null}
       </div>

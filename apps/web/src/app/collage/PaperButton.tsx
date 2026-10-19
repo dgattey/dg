@@ -1,6 +1,5 @@
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
-import { shouldSkipRedesignRewrite } from '../../redesignRouting';
 import { cx, paperEdgeVars, paperToneVars } from './paperVars';
 import type { PaperEdge, PaperTone } from './types';
 
@@ -33,10 +32,12 @@ type PaperButtonProps = {
  * prefetch them, and their redirects to OAuth hosts fail as cross-origin fetches.
  */
 function isAppPage(href: string): boolean {
+  const pathname = href.split(/[?#]/)[0] ?? href;
   return (
-    href.startsWith('/') &&
-    !href.startsWith('//') &&
-    !shouldSkipRedesignRewrite(href.split(/[?#]/)[0] ?? href)
+    pathname.startsWith('/') &&
+    !pathname.startsWith('//') &&
+    pathname !== '/api' &&
+    !pathname.startsWith('/api/')
   );
 }
 

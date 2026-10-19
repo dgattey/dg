@@ -1,4 +1,6 @@
 import '@dg/ui/core/transitions/pageTransitions.css';
+import './collage/collage.css';
+import './collage/chrome.css';
 
 import { JsOnlyStyle } from '@dg/ui/core/JsOnlyStyle';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
@@ -10,9 +12,14 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { getServerTime } from '../services/getServerTime';
+import { familjen } from './collage/familjen';
+import { Footer } from './layouts/Footer';
+import { Header } from './layouts/Header';
+import { PageViewTransition } from './layouts/PageViewTransition';
 import { RefreshOnFocusProvider } from './layouts/RefreshOnFocusProvider';
 import { WebMcpTools } from './layouts/WebMcpTools';
 import { baseMetadata, viewport } from './metadata';
+import { NowPlayingProvider } from './spotify/NowPlayingContext';
 
 export const metadata: Metadata = baseMetadata;
 export { viewport };
@@ -20,7 +27,6 @@ export { viewport };
 const globalThemeCss = getGlobalThemeCss();
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
-  // Cached server time for hydration-safe relative time rendering
   const serverTime = await getServerTime();
 
   return (
@@ -32,12 +38,18 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </head>
       <body>
         <ServerTimeProvider serverTime={serverTime}>
-          {/* Restores the stored scheme that hydration strips off <html> */}
           <ColorSchemeSync />
-          {/* Refresh RSC data on focus or navigation */}
           <RefreshOnFocusProvider />
           <WebMcpTools />
-          {children}
+          <div className={`collageRoot ${familjen.variable}`}>
+            <NowPlayingProvider>
+              <Header />
+              <main className="collageMain">
+                <PageViewTransition>{children}</PageViewTransition>
+              </main>
+            </NowPlayingProvider>
+            <Footer />
+          </div>
           <SpeedInsights />
           <Analytics />
         </ServerTimeProvider>

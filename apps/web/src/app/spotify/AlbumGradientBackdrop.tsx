@@ -5,8 +5,7 @@ import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { useState } from 'react';
 
-/** How long a new album's colors take to dissolve over the outgoing ones. */
-export const GRADIENT_CROSSFADE_MS = TIMING_SLOW;
+const GRADIENT_CROSSFADE_MS = TIMING_SLOW;
 
 const containerBaseSx: SxObject = {
   '@keyframes albumGradientFadeIn': {
@@ -24,7 +23,6 @@ const layerSx: SxObject = {
   position: 'absolute',
 };
 
-/** The album's colors bloom softly past the now playing card's edges. */
 export const ALBUM_GRADIENT_GLOW_SX: SxObject = {
   borderRadius: 6,
   filter: 'blur(16px)',
@@ -33,26 +31,13 @@ export const ALBUM_GRADIENT_GLOW_SX: SxObject = {
   zIndex: 0,
 };
 
-/**
- * Sits behind the card's contents but above its paper background, inset by the
- * hairline border so the gradient still reaches the card's edges.
- */
-export const ALBUM_GRADIENT_SURFACE_SX: SxObject = {
-  borderRadius: 'inherit',
-  inset: '-1px',
-  zIndex: -1,
-};
-
 type GradientLayer = {
   gradient: string;
   id: number;
 };
 
 type AlbumGradientBackdropProps = {
-  /** Album gradient to show. Undefined until the art's colors are extracted. */
   gradient?: string;
-
-  /** Placement of the whole backdrop: inset, radius, blur, stacking. */
   containerSx: SxObject;
 };
 
@@ -60,9 +45,7 @@ type AlbumGradientBackdropProps = {
  * Paints the album gradient behind the now-playing card and dissolves between
  * tracks. Gradient stacks can't be interpolated by the browser, so each new
  * gradient fades in on its own layer above the one it replaces, and spent
- * layers are dropped once the incoming one is fully opaque. Under
- * `prefers-reduced-motion` the theme collapses the animation to ~0ms, so the
- * swap is instant and the layer bookkeeping still resolves the same way.
+ * layers are dropped once the incoming one is fully opaque.
  */
 export function AlbumGradientBackdrop({ gradient, containerSx }: AlbumGradientBackdropProps) {
   const [layers, setLayers] = useState<Array<GradientLayer>>([]);
@@ -72,7 +55,6 @@ export function AlbumGradientBackdrop({ gradient, containerSx }: AlbumGradientBa
     setLayers(gradient ? [...layers, { gradient, id: (newest?.id ?? -1) + 1 }] : []);
   }
 
-  /** Only the topmost layer is opaque enough to hide the ones beneath it. */
   const dropSpentLayers = (finishedId: number) => {
     setLayers((current) => (current.at(-1)?.id === finishedId ? current.slice(-1) : current));
   };

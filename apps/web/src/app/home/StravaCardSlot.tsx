@@ -1,10 +1,9 @@
 import 'server-only';
 
-import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { getLatestActivity } from '../../services/strava';
 import { StravaCard } from './StravaCard';
 
-export async function StravaCardSlot({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
+export async function StravaCardSlot() {
   const activity = await getLatestActivity();
-  return <StravaCard activity={activity} surface={surface} />;
+  return <StravaCard activity={activity} />;
 }

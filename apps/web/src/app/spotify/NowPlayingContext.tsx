@@ -26,11 +26,7 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
   return <NowPlayingContext.Provider value={value}>{children}</NowPlayingContext.Provider>;
 }
 
-/**
- * Publishes `track` as the newest one whenever the server sends it. No-op
- * outside the provider.
- */
-export function usePublishNowPlaying(track: Track) {
+function usePublishNowPlaying(track: Track) {
   const publish = useContext(NowPlayingContext)?.publish;
   useEffect(() => {
     publish?.(track);

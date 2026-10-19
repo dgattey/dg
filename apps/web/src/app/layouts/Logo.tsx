@@ -5,8 +5,8 @@ import { pageTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
 import type { SxObject } from '@dg/ui/theme';
+import { usePathname } from 'next/navigation';
 import type { CSSProperties, MouseEvent } from 'react';
-import { usePublicPathname } from './usePublicPathname';
 
 /**
  * Outlines of the `dg.` mark from `public/icon-*.svg`, so it renders the same
@@ -29,15 +29,8 @@ const MARK_PATHS = [
   },
 ];
 
-/** Union of the shifted paths' bounding boxes, in favicon units. */
 const MARK_VIEW_BOX = '44.7 153.26 413.01 259.92';
 
-/**
- * Sized and offset in ems of the original 2.25em text logo, so the outline
- * lands where the text glyphs did: its line box stays 1em tall, the mark sits
- * low like a baseline-aligned `dg.` would, and the trailing -0.12em tracking
- * still pulls the next item in.
- */
 const markStyle: CSSProperties = {
   display: 'block',
   filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15))',
@@ -47,7 +40,6 @@ const markStyle: CSSProperties = {
   width: 'auto',
 };
 
-/** The mark scales up and darkens on hover. */
 const logoLinkSx: SxObject = {
   '&:focus-visible': {
     outline: '-webkit-focus-ring-color auto 1px',
@@ -71,15 +63,8 @@ const logoLinkSx: SxObject = {
   willChange: 'transform',
 };
 
-/**
- * Logo that scrolls to top on home page, or links to home on other pages.
- * Always renders as a Link so the prerendered shell and client hydration
- * produce identical DOM elements regardless of pathname resolution.
- * Going home uses the close view-transition type so the page falls away and
- * its heading morphs into the homepage headline instead of snapping.
- */
 export function Logo() {
-  const pathname = usePublicPathname();
+  const pathname = usePathname() ?? '/';
 
   const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
     if (pathname === homeRoute) {

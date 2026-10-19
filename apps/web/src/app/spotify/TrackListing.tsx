@@ -1,5 +1,4 @@
 import type { Track } from '@dg/content-models/spotify/Track';
-import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Box } from '@dg/ui/core/Box';
 import { Card } from '@dg/ui/core/Card';
 import { Stack } from '@dg/ui/core/Stack';
@@ -8,81 +7,21 @@ import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { AlbumArtWithNotes } from './AlbumArtWithNotes';
-import { AlbumImage } from './AlbumImage';
 import { ArtistList } from './ArtistList';
 import { COLLAGE_TRACK_COLORS, CollageTrackCard } from './CollageTrackCard';
-import { type Colors, getContrastingColors } from './colors';
 import { PlaybackStatus } from './PlaybackStatus';
-import { SpotifyLogo } from './SpotifyLogo';
-import { TrackCardMeta } from './TrackCardMeta';
 import { TrackTitle } from './TrackTitle';
 
-/** Size of the compact variant's album art thumbnail in px. */
-export const COMPACT_THUMBNAIL_SIZE = 44;
+const COMPACT_THUMBNAIL_SIZE = 44;
 
 type TrackListingProps = {
-  /** The track to display. */
   track: Track;
-
-  /**
-   * Layout variant:
-   * - `card` (default): Full card with logo, large album art, status, title, artists, progress bar
-   * - `compact`: Small album art with truncated status/title/artists for tight spaces
-   */
   variant?: 'card' | 'compact';
-
-  /** Disable external links (e.g. compact variant on the home page). */
   disableLinks?: boolean;
-
-  /** Control animation independently of playback state (e.g. pause when off-screen). Defaults to true. */
   shouldAnimate?: boolean;
-
-  surface?: SiteSurface;
 };
-
-// ---------------------------------------------------------------------------
-// Card variant
-// ---------------------------------------------------------------------------
-
-const cardLayoutSx: SxObject = {
-  flex: 1,
-  gap: 1,
-  justifyContent: 'space-between',
-};
-
-const cardHeaderSx: SxObject = {
-  gap: 6,
-  justifyContent: 'space-between',
-};
-
-function CardLayout({ track, colors }: { track: Track; colors: Colors | null }) {
-  const { primary, primaryShadow } = colors ?? {};
-  const trackUrl = track.externalUrls.spotify;
-
-  return (
-    <Stack sx={cardLayoutSx}>
-      <Stack direction="row" sx={cardHeaderSx}>
-        <SpotifyLogo
-          color={primary}
-          textShadow={primaryShadow}
-          trackTitle={track.name}
-          url={trackUrl}
-        />
-        <AlbumImage isPlaying={Boolean(track.isPlaying)} noteColor={primary} track={track} />
-      </Stack>
-      <Stack>
-        <TrackCardMeta colors={colors} track={track} />
-      </Stack>
-    </Stack>
-  );
-}
-
-// ---------------------------------------------------------------------------
-// Compact variant
-// ---------------------------------------------------------------------------
 
 const COMPACT_HOVER_SIZE = 84;
-/** The 44px header art needs a bigger swing than the card's to read as a bounce. */
 const COLLAGE_COMPACT_BOUNCE = 3;
 const COMPACT_HOVER_SCALE = COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE;
 
@@ -98,10 +37,10 @@ const compactZoomSx: SxObject = {
 };
 
 const compactContainerSx: SxObject = {
-  /** Scale album art on hover — only on devices with true hover capability. */
   '@media (hover: hover)': {
     '&:hover': compactZoomSx,
   },
+  '*:focus-visible &, &:has(:focus-visible)': compactZoomSx,
   alignItems: 'center',
   display: 'flex',
   gap: 1,
@@ -109,13 +48,6 @@ const compactContainerSx: SxObject = {
   overflow: 'visible',
 };
 
-/** On collage the card, or the link wrapping it, zooms for keyboard focus too. */
-const collageCompactContainerSx: SxObject = {
-  ...compactContainerSx,
-  '*:focus-visible &, &:has(:focus-visible)': compactZoomSx,
-};
-
-/** Outer wrapper — width transitions on parent hover via [data-thumbnail-outer]. */
 const compactThumbnailOuterSx: SxObject = {
   flexShrink: 0,
   height: COMPACT_THUMBNAIL_SIZE,
@@ -126,7 +58,6 @@ const compactThumbnailOuterSx: SxObject = {
   width: COMPACT_THUMBNAIL_SIZE,
 };
 
-/** Album art card — transform transitions on parent hover via [data-album-art]. */
 const compactAlbumCardSx: SxObject = {
   borderRadius: 1,
   boxShadow: 'var(--mui-extraShadows-card-main)',
@@ -148,19 +79,17 @@ const compactTextWrapperSx: SxObject = {
 };
 
 const compactTextStackSx: SxObject = {
-  color: 'var(--mui-palette-text-primary)',
+  color: COLLAGE_TRACK_COLORS.primary,
   minWidth: 0,
   width: '100%',
 };
 
 function CompactLayout({
   track,
-  colors,
   disableLinks,
   shouldAnimate,
 }: {
   track: Track;
-  colors?: Colors;
   disableLinks?: boolean;
   shouldAnimate: boolean;
 }) {
@@ -184,13 +113,13 @@ function CompactLayout({
   );
 
   return (
-    <Box sx={colors ? collageCompactContainerSx : compactContainerSx}>
+    <Box sx={compactContainerSx}>
       <Box data-thumbnail-outer sx={compactThumbnailOuterSx}>
         <AlbumArtWithNotes
-          bounceIntensity={colors ? COLLAGE_COMPACT_BOUNCE : undefined}
+          bounceIntensity={COLLAGE_COMPACT_BOUNCE}
           isPlaying={isPlaying}
-          noteColor={colors ? 'var(--ink)' : undefined}
-          notesVariant={colors ? 'collageCompact' : 'compact'}
+          noteColor="var(--ink)"
+          notesVariant="collageCompact"
           shouldAnimate={shouldAnimate}
           wrapperSx={{
             height: COMPACT_THUMBNAIL_SIZE,
@@ -209,60 +138,42 @@ function CompactLayout({
         </AlbumArtWithNotes>
       </Box>
       <Box sx={compactTextWrapperSx}>
-        <Stack sx={colors ? { ...compactTextStackSx, color: colors.primary } : compactTextStackSx}>
+        <Stack sx={compactTextStackSx}>
           <PlaybackStatus
             animating={shouldAnimate && isPlaying}
-            color={colors?.primary}
+            color={COLLAGE_TRACK_COLORS.primary}
             isPlaying={track.isPlaying}
             listingVariant="compact"
             playedAt={track.playedAt}
           />
           <TrackTitle
-            color={colors?.primary}
+            color={COLLAGE_TRACK_COLORS.primary}
             listingVariant="compact"
             trackTitle={track.name}
             url={disableLinks ? undefined : trackUrl}
           />
-          <ArtistList artists={track.artists} color={colors?.secondary} listingVariant="compact" />
+          <ArtistList
+            artists={track.artists}
+            color={COLLAGE_TRACK_COLORS.secondary}
+            listingVariant="compact"
+          />
         </Stack>
       </Box>
     </Box>
   );
 }
 
-// ---------------------------------------------------------------------------
-// Main component
-// ---------------------------------------------------------------------------
-
-/**
- * Unified track display component. Colors are computed once from the track's
- * gradient and passed to all sub-components, avoiding redundant calculations.
- *
- * Variants:
- * - `card` — full now-playing card with logo, large art, progress bar
- * - `compact` — inline header thumbnail with small art + truncated text
- */
 export function TrackListing({
   track,
   variant = 'card',
   disableLinks,
   shouldAnimate = true,
-  surface = 'classic',
 }: TrackListingProps) {
   if (variant === 'compact') {
     return (
-      <CompactLayout
-        colors={surface === 'collage' ? COLLAGE_TRACK_COLORS : undefined}
-        disableLinks={disableLinks}
-        shouldAnimate={shouldAnimate}
-        track={track}
-      />
+      <CompactLayout disableLinks={disableLinks} shouldAnimate={shouldAnimate} track={track} />
     );
   }
 
-  if (surface === 'collage') {
-    return <CollageTrackCard track={track} />;
-  }
-
-  return <CardLayout colors={getContrastingColors(track)} track={track} />;
+  return <CollageTrackCard track={track} />;
 }

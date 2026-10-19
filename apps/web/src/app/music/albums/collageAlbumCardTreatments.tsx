@@ -1,0 +1,231 @@
+import { invariant } from '@dg/shared-core/assertions/invariant';
+import { jsOnlyProps } from '@dg/ui/core/JsOnlyStyle';
+import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
+import type { CSSProperties, ReactNode } from 'react';
+import { PaperCard } from '../../collage/PaperCard';
+import { PaperTag } from '../../collage/PaperTag';
+import type { PaperTone } from '../../collage/types';
+
+export type CollageAlbumCardTreatment = {
+  offsetPx: number;
+  tiltDeg: number;
+  tone: PaperTone;
+};
+
+type CardOffsetStyle = CSSProperties & {
+  '--card-offset': string;
+  '--card-offset-mobile': string;
+};
+
+export const COLLAGE_ALBUM_GRID_COLUMNS = { lg: 5, md: 4, sm: 3, xs: 2 } as const;
+
+const COLLAGE_ALBUM_SORT_OPTIONS = [
+  { key: 'added', label: 'Recently added', tiltDeg: -3 },
+  { key: 'album', label: 'Album', tiltDeg: 2 },
+  { key: 'artist', label: 'Artist', tiltDeg: -1.5 },
+  { key: 'released', label: 'Release date', tiltDeg: 2.5 },
+] as const;
+
+const TONES = [
+  'ultramarine',
+  'rose',
+  'vermilion',
+  'cream',
+  'olive',
+  'leaf',
+  'viridian',
+  'ochre',
+] as const satisfies ReadonlyArray<PaperTone>;
+
+const LAYOUTS = [
+  { offsetPx: 0, tiltDeg: -2 },
+  { offsetPx: 10, tiltDeg: 1.5 },
+  { offsetPx: 0, tiltDeg: -1 },
+  { offsetPx: 14, tiltDeg: 2.4 },
+  { offsetPx: 0, tiltDeg: -1.6 },
+  { offsetPx: 8, tiltDeg: 1 },
+] as const satisfies ReadonlyArray<Omit<CollageAlbumCardTreatment, 'tone'>>;
+
+export function collageAlbumCardTreatment(index: number): CollageAlbumCardTreatment {
+  const tone = TONES[index % TONES.length];
+  const layout = LAYOUTS[index % LAYOUTS.length];
+  invariant(tone && layout, 'Collage album card treatment registries must not be empty');
+  return { ...layout, tone };
+}
+
+function offsetStyle(treatment: CollageAlbumCardTreatment): CardOffsetStyle {
+  return {
+    '--card-offset': `${treatment.offsetPx}px`,
+    '--card-offset-mobile': `${treatment.offsetPx === 0 ? 0 : 8}px`,
+  };
+}
+
+export function CollageAlbumPaper({
+  children,
+  selected = false,
+  treatment,
+}: {
+  children: ReactNode;
+  selected?: boolean;
+  treatment: CollageAlbumCardTreatment;
+}) {
+  return (
+    <PaperCard
+      className={selected ? `music__card music__selected` : 'music__card'}
+      edge="quad-a"
+      innerClassName="music__cardInner"
+      style={offsetStyle(treatment)}
+      tiltDeg={treatment.tiltDeg}
+      tone={treatment.tone}
+    >
+      {children}
+    </PaperCard>
+  );
+}
+
+function SkeletonLine({ width }: { width: CSSProperties['width'] }) {
+  return <span className="music__skeleton music__skeletonText" style={{ width }} />;
+}
+
+function SkeletonFace() {
+  return (
+    <>
+      <span className="music__skeleton music__art" />
+      <div className="music__caption">
+        <SkeletonLine width="82%" />
+        <SkeletonLine width="58%" />
+      </div>
+    </>
+  );
+}
+
+export type AlbumSortKey = (typeof COLLAGE_ALBUM_SORT_OPTIONS)[number]['key'];
+
+export function CollageSortControls({
+  onSortChange,
+  sortKey,
+}: {
+  onSortChange: (key: AlbumSortKey) => void;
+  sortKey: AlbumSortKey;
+}) {
+  return (
+    <nav aria-label="Sort albums" className="music__sort" {...jsOnlyProps}>
+      {COLLAGE_ALBUM_SORT_OPTIONS.map((option) => {
+        const current = option.key === sortKey;
+        return (
+          <PaperTag
+            className="music__sortTag"
+            edge="quad-a"
+            key={option.key}
+            tiltDeg={option.tiltDeg}
+            tone={current ? 'black' : 'cream'}
+          >
+            <button
+              aria-pressed={current}
+              className="music__sortButton"
+              onClick={() => onSortChange(option.key)}
+              type="button"
+            >
+              {option.label}
+            </button>
+          </PaperTag>
+        );
+      })}
+    </nav>
+  );
+}
+
+export function CollageSortSkeleton() {
+  return (
+    <div
+      aria-label="Loading album sort controls"
+      className="music__sortSkeleton"
+      role="status"
+      {...jsOnlyProps}
+    >
+      {COLLAGE_ALBUM_SORT_OPTIONS.map((sort, index) => (
+        <PaperTag
+          className="music__sortTag"
+          edge="quad-a"
+          key={sort.key}
+          tiltDeg={sort.tiltDeg}
+          tone={index === 0 ? 'black' : 'cream'}
+        >
+          <span className="music__sortButton">{sort.label}</span>
+        </PaperTag>
+      ))}
+    </div>
+  );
+}
+
+export function CollageAlbumSkeletonGrid({ tileCount }: { tileCount: number }) {
+  const tiles = Array.from({ length: tileCount }, (_, index) => ({
+    key: `album-${index}`,
+    treatment: collageAlbumCardTreatment(index),
+  }));
+  return (
+    <div className="music__gridSkeleton">
+      {tiles.map((tile) => (
+        <CollageAlbumPaper key={tile.key} treatment={tile.treatment}>
+          <SkeletonFace />
+        </CollageAlbumPaper>
+      ))}
+    </div>
+  );
+}
+
+export function CollageAlbumReserveGrid({
+  albums,
+}: {
+  albums: ReadonlyArray<{ artistNames: string; id: string; name: string }>;
+}) {
+  return (
+    <div aria-hidden="true" className="music__gridSkeleton music__albumReserve">
+      {albums.map((album, index) => (
+        <CollageAlbumPaper key={album.id} treatment={collageAlbumCardTreatment(index)}>
+          <div className="music__art" />
+          <span className="music__caption">
+            <strong className="music__albumName">{album.name}</strong>
+            <span className="music__artist">{album.artistNames}</span>
+          </span>
+        </CollageAlbumPaper>
+      ))}
+    </div>
+  );
+}
+
+export function CollageHistorySkeleton() {
+  return (
+    <div aria-label="Loading listening history" className="music__historySkeleton" role="status">
+      {(
+        [
+          { label: 'recent', tiles: 12 },
+          { label: 'earlier', tiles: 12 },
+        ] as const
+      ).map((section, sectionIndex) => (
+        <section aria-hidden="true" className="music__section" key={section.label}>
+          <StickyFadeBar className="music__dateBar">
+            <PaperTag
+              className="music__dateTag"
+              edge="soft-b"
+              tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
+              tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
+            >
+              <SkeletonLine width={120} />
+            </PaperTag>
+          </StickyFadeBar>
+          <div className="music__historySkeletonGrid">
+            {Array.from({ length: section.tiles }, (_, cardIndex) => ({
+              key: `${section.label}-${cardIndex}`,
+              treatment: collageAlbumCardTreatment(cardIndex),
+            })).map((tile) => (
+              <CollageAlbumPaper key={tile.key} treatment={tile.treatment}>
+                <SkeletonFace />
+              </CollageAlbumPaper>
+            ))}
+          </div>
+        </section>
+      ))}
+    </div>
+  );
+}

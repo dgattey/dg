@@ -2,10 +2,10 @@
 
 import { takePageOrigin } from '@dg/ui/core/transitions/pageScrollMemory';
 import { pageViewTransitionProps } from '@dg/ui/core/transitions/pageTransitions';
+import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { useLayoutEffect, ViewTransition } from 'react';
 import { markClientHydrated } from './clientHydrated';
-import { usePublicPathname } from './usePublicPathname';
 
 /**
  * Gives each route its own view transition boundary. Keying by pathname is
@@ -14,10 +14,8 @@ import { usePublicPathname } from './usePublicPathname';
  * other and squash them, since page heights differ wildly.
  */
 export function PageViewTransition({ children }: { children: ReactNode }) {
-  const pathname = usePublicPathname();
+  const pathname = usePathname();
 
-  // Scroll has to land before the browser photographs the new page, so this
-  // is a layout effect rather than an effect.
   useLayoutEffect(() => {
     markClientHydrated();
     const scrollY = takePageOrigin(pathname);
@@ -31,10 +29,8 @@ export function PageViewTransition({ children }: { children: ReactNode }) {
       {/*
        * One wrapper so the boundary has a single child. React names every
        * direct child itself, which overwrites any `view-transition-name` the
-       * page set — the heading loses `page-title`, stops pairing with the
-       * footer control, and dips away with the page instead of morphing into
-       * it. Naming this wrapper leaves the page's own names intact and makes
-       * the page rise and fall as one piece.
+       * page set. Naming this wrapper leaves the page's own names intact and
+       * makes the page rise and fall as one piece.
        */}
       <div>{children}</div>
     </ViewTransition>
