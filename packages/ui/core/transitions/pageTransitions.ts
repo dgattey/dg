@@ -1,5 +1,3 @@
-import type { SxObject } from '../../theme';
-
 export type PageNavigationIntent = 'open' | 'close';
 
 const PAGE_TRANSITION_TYPES = {
@@ -30,91 +28,6 @@ export function albumTransitionTypes(intent: PageNavigationIntent): Array<AlbumT
 /** Shared element name so album art flies between the grid cell and the well. */
 export function albumArtViewTransitionName(albumId: string): string {
   return `album-art-${albumId}`;
-}
-
-export const SITE_HEADER_VIEW_TRANSITION_NAME = 'site-header';
-export const SITE_FOOTER_VIEW_TRANSITION_NAME = 'site-footer';
-
-/**
- * Sticky bar chrome — the window-top mask, the bar fill, and the fade under it —
- * is a full-bleed opaque band, and it gets photographed into whichever snapshot
- * catches it. A navigation then sweeps that band across mid-page content: the
- * row under a bar washes to cream from the top down and reads as blank tiles
- * with a sliver of artwork below.
- *
- * So the chrome just doesn't paint while a navigation's transition runs. Both
- * sides read this rule at capture time, so neither page carries a band, and the
- * strip above a pinned bar is briefly unmasked instead — the lesser of the two,
- * and it lands back the instant the flight ends. Hiding beats a group of its own:
- * a name per piece is the only way to lift them out of the page bitmap, and a
- * page with several bars needs a unique one for each, which no widely supported
- * keyword gives us.
- *
- * Album open/close is exempt, because there is no sweep to guard against: those
- * transitions deliberately miss the page rise/fall map, so the page underneath
- * never travels. Hiding there only costs — the chrome is what covers the artwork
- * scrolled up behind the heading and the sorter, so dropping it flashes a band of
- * album covers through the pinned bar for the length of the transition.
- *
- * The selector leads with `html` rather than `:root`, which Emotion would read
- * as a pseudo-class on this element and never match.
- */
-export const stickyDecorSx: SxObject = {
-  [[
-    'html:active-view-transition',
-    `:not(:active-view-transition-type(${ALBUM_TRANSITION_TYPES.open}))`,
-    `:not(:active-view-transition-type(${ALBUM_TRANSITION_TYPES.close}))`,
-    ' &',
-  ].join('')]: {
-    opacity: 0,
-  },
-};
-
-/**
- * Chrome that has to stay pinned across a navigation needs a
- * view-transition-name, but a named element is also a backdrop root: any
- * `backdrop-filter` inside it samples that element instead of the page, so
- * glass surfaces in the header flatten out to a plain tint. The name is only
- * read while a transition is capturing, so it is claimed only then and the
- * glass keeps the page as its backdrop the rest of the time.
- *
- * The selector leads with `html` rather than `:root`, which Emotion would read
- * as a pseudo-class on this element and never match.
- */
-export function pinnedChromeSx(name: string): SxObject {
-  return {
-    'html:active-view-transition &': {
-      viewTransitionName: name,
-    },
-  };
-}
-
-/**
- * Shared between music destination headings so "Listening history" and
- * "Favorite albums" morph in place. Do not put this on the header disc: that
- * pairs a 48px icon in the northeast chrome with a full-width h1 and the
- * browser FLIPs the type ~1000px at 23× scale.
- *
- * Exactly one element may carry it at any capture; a duplicate aborts the
- * transition outright.
- */
-export const PAGE_TITLE_VIEW_TRANSITION_NAME = 'page-title';
-
-/**
- * Held by the control the heading flew out of, for as long as the heading is
- * away. A control with no name of its own stays part of the footer snapshot,
- * which then paints its label in the slot the heading just left, so the
- * heading reads as two texts stacked at the start of the flight.
- */
-export const PAGE_TITLE_SLOT_VIEW_TRANSITION_NAME = 'page-title-slot';
-
-/**
- * Name for the single control that morphs into a page heading. While a page
- * that shares that control is open, the control holds the slot name so the
- * heading alone owns `page-title` at capture time.
- */
-export function pageTitleMorphName(destinationIsOpen: boolean): string {
-  return destinationIsOpen ? PAGE_TITLE_SLOT_VIEW_TRANSITION_NAME : PAGE_TITLE_VIEW_TRANSITION_NAME;
 }
 
 /**

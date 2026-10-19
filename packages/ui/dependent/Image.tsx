@@ -3,7 +3,12 @@ import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
 import { BREAKPOINT_MAX_SIZES } from '../helpers/imageSizes';
 
-export type ImageSizes = {
+type ImageSizes = {
+  /**
+   * Under 340px wide
+   */
+  extraTiny?: number;
+
   /**
    * Under 576px wide
    */

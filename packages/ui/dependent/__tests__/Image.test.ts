@@ -1,4 +1,3 @@
-import { PROJECT_IMAGE_SIZES } from '../../helpers/imageSizes';
 import { generateSizesString } from '../Image';
 
 describe('generateSizesString', () => {
@@ -11,7 +10,16 @@ describe('generateSizesString', () => {
   });
 
   it('orders extraTiny ahead of tiny', () => {
-    expect(generateSizesString(PROJECT_IMAGE_SIZES)).toBe(
+    expect(
+      generateSizesString({
+        extraLarge: 330,
+        extraTiny: 340,
+        large: 313.5,
+        medium: 297,
+        small: 510,
+        tiny: 543,
+      }),
+    ).toBe(
       '(max-width: 340px) 340px, (max-width: 576px) 543px, (max-width: 768px) 510px, (max-width: 992px) 297px, (max-width: 1200px) 313.5px, 330px',
     );
   });

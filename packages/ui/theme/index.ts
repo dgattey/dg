@@ -25,9 +25,6 @@ export type SxElement = SxObject;
 
 export type SxProps = SxObject | boolean | null | undefined | ReadonlyArray<SxProps>;
 
-/**
- * Generates global CSS rules and custom properties for the classic surface.
- */
 export function getGlobalThemeCss(): string {
   const palette = getPalette();
   const shadows = getShadows();

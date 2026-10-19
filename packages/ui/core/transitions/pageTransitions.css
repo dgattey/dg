@@ -29,49 +29,9 @@
 }
 
 /*
- * Header and footer live in the root layout, so both sides of a navigation
- * hold the same DOM. Painting only the incoming snapshot keeps a single copy
- * on screen; cross-fading two near-identical copies is what reads as ghosted
- * chrome. The group still animates, so chrome that lands at a different offset
- * slides there instead of jumping.
- */
-::view-transition-group(site-header),
-::view-transition-group(site-footer) {
-  animation-duration: var(--timing-medium);
-  animation-timing-function: var(--easing-snappy);
-}
-
-/* The header overlays content when it is sticky, so it does here too. */
-::view-transition-group(site-header) {
-  z-index: 100;
-}
-
-/*
- * The footer sits above the page it belongs to but under the arriving one, so
- * the arriving page occludes it on the way in and uncovers it on the way out
- * instead of chrome floating over album art.
- */
-::view-transition-group(site-footer) {
-  z-index: 15;
-}
-
-::view-transition-old(site-header),
-::view-transition-old(site-footer) {
-  opacity: 0;
-  animation: none;
-}
-
-::view-transition-new(site-header),
-::view-transition-new(site-footer) {
-  opacity: 1;
-  animation: none;
-}
-
-/*
- * The heading travels between the footer control and the page heading, so it
- * paints above both pages for the whole trip. Sizing both snapshots to the
- * group makes the two type scales grow into each other rather than one text
- * stretching over the other.
+ * The heading morphs between pages, so it paints above both pages for the
+ * whole trip. Sizing both snapshots to the group makes the two type scales
+ * grow into each other rather than one text stretching over the other.
  */
 ::view-transition-group(page-title) {
   z-index: 200;
@@ -79,21 +39,7 @@
   animation-timing-function: var(--easing-snappy);
 }
 
-/*
- * Only the arriving heading paints, in the same spirit as the chrome above.
- * The default is a full-length plus-lighter cross-fade, and because the two
- * sides differ in case, weight and underline, any overlap at all shows the
- * heading spelled two ways at once with a rule struck through the middle.
- * One snapshot flying and scaling into place is the morph; two is a ghost.
- */
 ::view-transition-old(page-title) {
-  opacity: 0;
-  animation: none;
-}
-
-/* The slot the heading vacated is a hole, not a second copy of the heading. */
-::view-transition-old(page-title-slot),
-::view-transition-new(page-title-slot) {
   opacity: 0;
   animation: none;
 }

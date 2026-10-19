@@ -43,34 +43,3 @@ export function Card<T extends ElementType = 'div'>({
     </>
   );
 }
-
-const cardContentBaseSx: SxObject = {
-  '&:last-child': {
-    paddingBottom: 3,
-  },
-  padding: 2,
-};
-
-export function CardContent<T extends ElementType = 'div'>({
-  children,
-  className,
-  component,
-  ref,
-  sx,
-  ...rest
-}: CardProps<T>) {
-  const Component = (component ?? 'div') as ElementType;
-  const mergedSx: SxProps = Array.isArray(sx)
-    ? [cardContentBaseSx, ...sx]
-    : [cardContentBaseSx, sx];
-  const compiled = compileSx(mergedSx);
-
-  return (
-    <>
-      <SxStyle compiled={compiled} />
-      <Component className={joinClasses(compiled?.className, className)} ref={ref} {...rest}>
-        {children}
-      </Component>
-    </>
-  );
-}
