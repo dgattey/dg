@@ -293,15 +293,21 @@ a:focus-visible > .c-logo {
   align-items: start;
   justify-content: space-between;
 }
-.chrome__helloCol,
-.chrome__elsewhereCol {
+.chrome__helloCol {
   display: grid;
   gap: 14px;
   justify-items: start;
   min-width: 0;
 }
+.chrome__elsewhereCol {
+  display: grid;
+  gap: 14px;
+  justify-items: stretch;
+  min-width: 0;
+}
 .chrome__footerTag {
-  padding: 5px 12px 6px;
+  justify-self: start;
+  padding: 6px 14px 7px;
   font-size: var(--type-label);
   font-weight: 800;
   line-height: 1.1;
@@ -394,71 +400,79 @@ a:focus-visible > .c-logo {
 .chrome__copyChip:focus-visible {
   background: var(--cream);
 }
-.chrome__elsewhereList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 9px;
+.chrome__elsewhereLedger {
+  width: 100%;
+  border-bottom: 1px solid rgb(247 241 226 / 0.18);
 }
-.chrome__elsewhereChip {
-  display: inline-flex;
-  gap: 8px;
+.chrome__elsewhereRow {
+  display: flex;
+  gap: 14px;
   align-items: center;
-  padding: 8px 14px;
-  font-family: var(--display);
-  font-size: var(--type-meta);
-  font-weight: 700;
-  line-height: 1.2;
+  height: 48px;
+  padding: 0 14px 0 12px;
   color: var(--cream);
   text-decoration: none;
-  background: color-mix(in oklab, var(--cream) 10%, var(--viridian));
-  border: var(--collage-border-width) solid color-mix(in oklab, var(--cream) 24%, transparent);
-  border-radius: 12px 14px 11px 13px;
-  box-shadow: 0 2px 0 rgb(0 0 0 / 0.16);
+  border-top: 1px solid rgb(247 241 226 / 0.18);
   transition:
     background-color 0.18s ease,
     border-color 0.18s ease,
-    color 0.18s ease,
-    translate 0.18s ease;
-}
-.chrome__elsewhereChip:hover,
-.chrome__elsewhereChip:focus-visible {
-  color: var(--ochre);
-  background: color-mix(in oklab, var(--cream) 16%, var(--viridian));
-  border-color: var(--ochre);
+    color 0.18s ease;
 }
 .chrome__elsewhereIcon {
   display: grid;
   flex: none;
   place-items: center;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
+  transition: color 0.18s ease;
 }
 .chrome__elsewhereIcon svg {
-  width: 16px;
-  height: 16px;
+  width: 18px;
+  height: 18px;
 }
 .chrome__elsewhereTitle {
+  font-family: var(--display);
+  font-size: var(--type-label);
+  font-weight: 700;
+  line-height: 1;
   white-space: nowrap;
+  transition: color 0.18s ease;
+}
+.chrome__elsewhereHandle {
+  min-width: 0;
+  margin-left: auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--type-meta);
+  font-variant-numeric: tabular-nums;
+  color: rgb(247 241 226 / 0.62);
+  white-space: nowrap;
+  transition: color 0.18s ease;
 }
 .chrome__elsewhereArrow {
   flex: none;
-  color: color-mix(in oklab, var(--cream) 64%, transparent);
+  color: rgb(247 241 226 / 0.62);
   transition:
     color 0.18s ease,
     translate 0.18s ease;
 }
-.chrome__elsewhereChip:hover .chrome__elsewhereArrow,
-.chrome__elsewhereChip:focus-visible .chrome__elsewhereArrow {
+.chrome__elsewhereRow:is(:hover, :focus-visible) {
+  background: rgb(247 241 226 / 0.06);
+  border-top-color: var(--ochre);
+}
+.chrome__elsewhereRow:is(:hover, :focus-visible) + .chrome__elsewhereRow {
+  border-top-color: var(--ochre);
+}
+.chrome__elsewhereRow:is(:hover, :focus-visible)
+  :is(.chrome__elsewhereTitle, .chrome__elsewhereIcon, .chrome__elsewhereArrow) {
   color: var(--ochre);
 }
+.chrome__elsewhereRow:is(:hover, :focus-visible) .chrome__elsewhereHandle {
+  color: var(--cream);
+}
 @media (prefers-reduced-motion: no-preference) {
-  .chrome__elsewhereChip:hover,
-  .chrome__elsewhereChip:focus-visible {
-    translate: 0 -2px;
-  }
-  .chrome__elsewhereChip:hover .chrome__elsewhereArrow,
-  .chrome__elsewhereChip:focus-visible .chrome__elsewhereArrow {
-    translate: 2px -2px;
+  .chrome__elsewhereRow:is(:hover, :focus-visible) .chrome__elsewhereArrow {
+    translate: 3px -3px;
   }
 }
 .chrome__colophon {
@@ -570,11 +584,13 @@ a:focus-visible > .c-logo {
   .chrome__elsewhereCol {
     gap: 10px;
   }
-  .chrome__elsewhereList {
-    gap: 8px;
+  .chrome__elsewhereRow {
+    gap: 10px;
+    height: 44px;
+    padding: 0 10px 0 8px;
   }
-  .chrome__elsewhereChip {
-    padding: 7px 12px;
+  .chrome__elsewhereHandle {
+    font-size: 14px;
   }
   .chrome__colophon {
     gap: 8px 16px;

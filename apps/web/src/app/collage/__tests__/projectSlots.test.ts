@@ -55,6 +55,10 @@ describe('projectSlots', () => {
       'Website · 2026',
     );
     expect(projectTagMeta({ creationDate: '2022-01-01', type: 'Web App' })).toBe('Web app · 2022');
+    expect(projectTagMeta({ creationDate: '2020-05-01', type: 'macOS App' })).toBe(
+      'macOS app · 2020',
+    );
+    expect(projectTagMeta({ creationDate: '2021-08-01', type: 'iOS App' })).toBe('iOS app · 2021');
     expect(projectTagMeta({ creationDate: null, type: 'Website' })).toBeNull();
   });
 

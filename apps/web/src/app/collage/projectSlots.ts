@@ -29,9 +29,11 @@ export function projectTagTone(fieldTone: PaperTone): PaperTone {
     case 'black':
     case 'cerulean':
     case 'cobalt':
+    case 'leaf':
     case 'ultramarine':
     case 'viridian':
       return 'ochre';
+    case 'olive':
     case 'vermilion':
       return 'cream';
     case 'chartreuse':
@@ -139,14 +141,25 @@ export function projectFrameAspectRatio(layout: string | null | undefined): numb
   return 1;
 }
 
+function formatProjectType(rawType: string): string {
+  return rawType
+    .trim()
+    .split(/\s+/)
+    .map((word, index) => {
+      if (/[A-Z]/.test(word.slice(1))) {
+        return word;
+      }
+      const lower = word.toLowerCase();
+      return index === 0 ? lower.charAt(0).toUpperCase() + lower.slice(1) : lower;
+    })
+    .join(' ');
+}
+
 export function projectTagMeta(
   project: Pick<RenderableProject, 'creationDate' | 'type'>,
 ): string | null {
   const rawType = Array.isArray(project.type) ? project.type[0] : project.type;
-  const type =
-    typeof rawType === 'string' && rawType.length > 0
-      ? rawType.charAt(0).toUpperCase() + rawType.slice(1).toLowerCase()
-      : null;
+  const type = typeof rawType === 'string' && rawType.trim().length > 0 ? formatProjectType(rawType) : null;
   const year = project.creationDate?.match(/^(\d{4})/)?.[1];
   return type && year ? `${type} · ${year}` : null;
 }

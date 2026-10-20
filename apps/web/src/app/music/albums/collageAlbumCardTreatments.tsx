@@ -31,8 +31,8 @@ const TONES = [
   'rose',
   'vermilion',
   'cream',
-  'chartreuse',
-  'cerulean',
+  'olive',
+  'leaf',
   'viridian',
   'ochre',
 ] as const satisfies ReadonlyArray<PaperTone>;

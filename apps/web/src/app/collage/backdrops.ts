@@ -97,11 +97,11 @@ function defineBackdrop(
 export const ALBUMS_BACKDROP = defineBackdrop(1300, 14, [
   {
     cutOuts: [
-      ['albums-philo', 'philo', 'viridian', 300, -20, 47, -3, 'desktop', 0],
+      ['albums-philo', 'philo', 'leaf', 300, -20, 47, -3, 'desktop', 0],
       ['albums-gerbe', 'gerbe', 'vermilion', 300, 18, 87, 21, 'desktop', 1],
       ['albums-star', 'star5', 'star', 46, 12, 52, 4, 'desktop', 1],
       ['albums-trefoil', 'trefoil', 'rose', 150, -10, 2, 48, 'all', 1],
-      ['albums-banana', 'banana', 'chartreuse', 380, 30, -6, 70, 'desktop', 0, { mirrored: true }],
+      ['albums-banana', 'banana', 'olive', 380, 30, -6, 70, 'desktop', 0, { mirrored: true }],
     ],
     sheets: [
       ['albums-gingham', 'torn', 'gingham', ['ochre', 'vermilion'], 50, 1, 54, 330, -2, 'desktop'],
@@ -118,18 +118,18 @@ export const ALBUMS_BACKDROP = defineBackdrop(1300, 14, [
     ],
     sheets: [
       ['albums-dots', 'torn', 'dots', ['rose', 'cream'], 74, 20, 30, 560, 2.5, 'all'],
-      ['albums-pebble-dots', 'pebble', 'dots', ['chartreuse', 'viridian'], -8, 62, 320, -6, 'desktop'],
+      ['albums-pebble-dots', 'pebble', 'dots', ['chartreuse', 'olive'], -8, 62, 320, -6, 'desktop'],
     ],
   },
   {
     cutOuts: [
-      ['albums-monstera', 'monstera', 'viridian', 520, -150, 84, -6, 'desktop', 0],
+      ['albums-monstera', 'monstera', 'olive', 520, -150, 84, -6, 'desktop', 0],
       ['albums-gerbe-rose', 'gerbe', 'rose', 220, 18, 3, 46, 'desktop', 1],
       ['albums-trefoil-cream', 'trefoil', 'cream', 140, -14, 87, 70, 'desktop', 1],
       ['albums-heart-rose', 'heart', 'rose', 80, 10, 6, 86, 'all', 1],
     ],
     sheets: [
-      ['albums-gingham-green', 'torn', 'gingham', ['viridian', 'chartreuse'], -6, 8, 30, 460, 1.8, 'all'],
+      ['albums-gingham-green', 'torn', 'gingham', ['viridian', 'leaf'], -6, 8, 30, 460, 1.8, 'all'],
       ['albums-pebble-ochre', 'pebble', 'dots', ['ochre', 'cream'], 80, 58, 340, 6, 'desktop'],
     ],
   },
@@ -159,8 +159,8 @@ export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
     cutOuts: [
       ['history-bird', 'birdpara', 'vermilion', 250, -8, 80, 13, 'desktop', 1, { underprint: ['cream', 6, 7] }],
       ['history-star', 'star5', 'star', 44, 10, 62, 9, 'desktop', 1],
-      ['history-seaweed', 'seaweed2', 'viridian', 220, -12, 1, 36, 'all', 0],
-      ['history-fern', 'fern', 'viridian', 300, 26, 88, 56, 'desktop', 0],
+      ['history-seaweed', 'seaweed2', 'olive', 220, -12, 1, 36, 'all', 0],
+      ['history-fern', 'fern', 'leaf', 300, 26, 88, 56, 'desktop', 0],
       ['history-heart', 'heart', 'rose', 80, -12, 92, 88, 'all', 1],
     ],
     sheets: [
@@ -173,7 +173,7 @@ export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
     cutOuts: [
       ['history-coral', 'coral', 'ultramarine', 240, -10, -4, 6, 'all', 0],
       ['history-swallow', 'swallow', 'cream', 150, -6, 84, 28, 'desktop', 1],
-      ['history-algae', 'algae', 'viridian', 260, 20, 88, 62, 'desktop', 0],
+      ['history-algae', 'algae', 'leaf', 260, 20, 88, 62, 'desktop', 0],
       ['history-star-ochre', 'star4', 'ochre', 40, 10, 4, 50, 'desktop', 1],
       ['history-trefoil', 'trefoil', 'vermilion', 140, 24, 1, 84, 'desktop', 1],
     ],
@@ -190,7 +190,7 @@ export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
       ['history-moon', 'moon', 'cream', 60, 14, 6, 4, 'dark-desktop', 1],
     ],
     sheets: [
-      ['history-ledger-green', 'torn', 'ruled', ['viridian', 'chartreuse'], -4, 12, 24, 480, -2, 'desktop'],
+      ['history-ledger-green', 'torn', 'ruled', ['olive', 'chartreuse'], -4, 12, 24, 480, -2, 'desktop'],
       ['history-record-low', 'disc', 'solid', 'cobalt', 78, 60, 340, 0, 'all'],
       ['history-record-low-label', 'disc', 'solid', 'vermilion', 84, 68, 120, 0, 'desktop'],
     ],
@@ -203,8 +203,8 @@ export const DEV_CONSOLE_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
       ['dev-console-star', 'star5', 'star', 44, 12, 58, 4, 'desktop', 1],
-      ['dev-console-algae-upper', 'algae', 'viridian', 170, -20, 88, 0, 'desktop', 1],
-      ['dev-console-algae-lower', 'algae', 'viridian', 220, 16, 68, 82, 'desktop', 1],
+      ['dev-console-algae-upper', 'algae', 'leaf', 170, -20, 88, 0, 'desktop', 1],
+      ['dev-console-algae-lower', 'algae', 'leaf', 220, 16, 68, 82, 'desktop', 1],
       ['dev-console-swallow', 'swallow', 'cream', 160, -8, 74, 52, 'desktop', 1],
       ['dev-console-pods', 'pods', 'ochre', 210, 14, -3, 30, 'desktop', 1],
       ['dev-console-seaweed', 'seaweed', 'rose', 220, -10, 93, 66, 'all', 1],
@@ -214,7 +214,7 @@ export const DEV_CONSOLE_BACKDROP = defineBackdrop('fill', 1, [
     sheets: [
       ['dev-console-blueprint', 'torn', 'grid', ['cobalt', 'cerulean'], 55, 40, 50, 560, -1.5, 'desktop'],
       ['dev-console-disc', 'disc', 'solid', 'ochre', 83, 3, 230, 0, 'desktop'],
-      ['dev-console-stripes', 'torn', 'stripes', ['viridian', 'chartreuse'], -6, 74, 22, 300, 2, 'all'],
+      ['dev-console-stripes', 'torn', 'stripes', ['viridian', 'leaf'], -6, 74, 22, 300, 2, 'all'],
     ],
   },
 ]);
@@ -228,13 +228,13 @@ export const NOT_FOUND_BACKDROP = defineBackdrop('fill', 1, [
       ['not-found-swallow', 'swallow', 'vermilion', 190, 8, 76, 14, 'desktop', 1],
       ['not-found-star', 'star5', 'star', 44, -10, 66, 6, 'desktop', 1],
       ['not-found-star-trail', 'star4', 'cream', 32, 14, 70, 24, 'desktop', 1],
-      ['not-found-philo', 'philo', 'viridian', 280, 24, 80, 52, 'all', 0],
+      ['not-found-philo', 'philo', 'olive', 280, 24, 80, 52, 'all', 0],
       ['not-found-coral', 'coral', 'rose', 170, -12, 8, 66, 'desktop', 1],
       ['not-found-moon', 'moon', 'cream', 64, 14, 30, 6, 'dark-desktop', 1],
     ],
     sheets: [
       ['not-found-checker', 'torn', 'checker', ['ultramarine', 'cobalt'], -5, 4, 30, 280, -4, 'desktop'],
-      ['not-found-dots', 'torn', 'dots', ['viridian', 'chartreuse'], -6, 52, 32, 420, 3, 'all'],
+      ['not-found-dots', 'torn', 'dots', ['viridian', 'leaf'], -6, 52, 32, 420, 3, 'all'],
     ],
   },
 ]);
@@ -245,8 +245,8 @@ export const SERVER_ERROR_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
       ['error-monstera', 'monstera', 'viridian', 520, 22, 74, -12, 'desktop', 0],
-      ['error-fern', 'fern', 'chartreuse', 340, -34, -10, 40, 'all', 0],
-      ['error-seaweed', 'seaweed2', 'viridian', 240, -16, 56, 64, 'all', 1],
+      ['error-fern', 'fern', 'olive', 340, -34, -10, 40, 'all', 0],
+      ['error-seaweed', 'seaweed2', 'olive', 240, -16, 56, 64, 'all', 1],
       ['error-star', 'star5', 'star', 46, 10, 36, 6, 'desktop', 3],
       ['error-sun', 'sun', 'ochre', 170, 0, 12, 4, 'desktop', 0],
     ],

@@ -189,7 +189,7 @@ describe('Footer', () => {
     );
   });
 
-  it('renders Elsewhere compact chips without raw URLs and with X ordered directly after Instagram', async () => {
+  it('renders Elsewhere stacked ledger rows with formatted handles and X ordered directly after Instagram', async () => {
     mockGetFooterContent.mockResolvedValue({
       description: SAMPLE_DESCRIPTION,
       links: SAMPLE_LINKS,
@@ -221,8 +221,13 @@ describe('Footer', () => {
       instagram.compareDocumentPosition(xLink) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
     expect(xLink.compareDocumentPosition(linkedin) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(screen.queryByText('x.com/dyl_gat')).not.toBeInTheDocument();
-    expect(screen.queryByText(/strava\.com\/athletes/i)).not.toBeInTheDocument();
+    expect(screen.getByText('cursor.com/@dyl')).toBeInTheDocument();
+    expect(screen.getByText('github.com/dgattey')).toBeInTheDocument();
+    expect(screen.getByText('strava.com/athletes/17469310')).toBeInTheDocument();
+    expect(screen.getByText('open.spotify.com/user/dylangattey')).toBeInTheDocument();
+    expect(screen.getByText('instagram.com/dylangattey')).toBeInTheDocument();
+    expect(screen.getByText('x.com/dyl_gat')).toBeInTheDocument();
+    expect(screen.getByText('linkedin.com/in/dgattey')).toBeInTheDocument();
   });
 
   it('obfuscates the email in static SSR HTML and decodes on client for mailto and copy', async () => {
@@ -251,5 +256,48 @@ describe('Footer', () => {
     await user.click(copyButton);
     expect(writeText).toHaveBeenCalledWith('dylan@gattey.com');
     expect(copyButton).toHaveTextContent('Copied');
+  });
+
+  it('keeps --footer-progress at 0 above the footer and interpolates to 1 as the footer scrolls into view', async () => {
+    mockGetFooterContent.mockResolvedValue({
+      description: SAMPLE_DESCRIPTION,
+      links: SAMPLE_LINKS,
+    });
+
+    const ui = await Footer();
+    const { container } = render(
+      <ServerTimeProvider serverTime={1_760_000_000_000}>
+        <div className="collageSheet">main content</div>
+        {ui}
+      </ServerTimeProvider>,
+    );
+
+    const sheet = container.querySelector<HTMLElement>('.collageSheet');
+    const footer = container.querySelector<HTMLElement>('.chrome__footer');
+    expect(sheet).not.toBeNull();
+    expect(footer).not.toBeNull();
+
+    Object.defineProperty(footer, 'offsetHeight', { configurable: true, value: 400 });
+    Object.defineProperty(document.documentElement, 'scrollHeight', {
+      configurable: true,
+      value: 2400,
+    });
+    Object.defineProperty(window, 'innerHeight', { configurable: true, value: 900 });
+    Object.defineProperty(window, 'scrollY', { configurable: true, value: 0, writable: true });
+
+    window.dispatchEvent(new Event('scroll'));
+    expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('0');
+
+    window.scrollY = 1100;
+    window.dispatchEvent(new Event('scroll'));
+    expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('0.0000');
+
+    window.scrollY = 1300;
+    window.dispatchEvent(new Event('scroll'));
+    expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('0.5000');
+
+    window.scrollY = 1500;
+    window.dispatchEvent(new Event('scroll'));
+    expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('1.0000');
   });
 });

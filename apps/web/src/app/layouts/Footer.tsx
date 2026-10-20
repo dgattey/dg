@@ -20,6 +20,7 @@ import { getAppVersionInfo } from '../../services/version';
 import { PaperTag } from '../collage/PaperTag';
 import { FooterEmailAction } from './FooterEmailAction';
 import { FooterNowStrip } from './FooterNowStrip';
+import { FooterRevealScroll } from './FooterRevealScroll';
 
 const CHAR_CODE_SHIFT = 7;
 
@@ -44,22 +45,29 @@ async function getCopyrightYear() {
 function renderElsewhereIcon(icon: string | null | undefined): ReactNode {
   switch (icon) {
     case 'cursor':
-      return <CursorIcon size="16px" />;
+      return <CursorIcon size="18px" />;
     case 'github':
-      return <FaIcon icon={faGithub} size="16px" />;
+      return <FaIcon icon={faGithub} size="18px" />;
     case 'strava':
-      return <FaIcon icon={faStrava} size="16px" />;
+      return <FaIcon icon={faStrava} size="18px" />;
     case 'spotify':
-      return <FaIcon icon={faSpotify} size="16px" />;
+      return <FaIcon icon={faSpotify} size="18px" />;
     case 'instagram':
-      return <FaIcon icon={faInstagram} size="16px" />;
+      return <FaIcon icon={faInstagram} size="18px" />;
     case 'x':
-      return <FaIcon icon={faXTwitter} size="16px" />;
+      return <FaIcon icon={faXTwitter} size="18px" />;
     case 'linkedin':
-      return <FaIcon icon={faLinkedinIn} size="16px" />;
+      return <FaIcon icon={faLinkedinIn} size="18px" />;
     default:
       return null;
   }
+}
+
+export function formatElsewhereHandle(url: string): string {
+  return url
+    .replace(/^https?:\/\/(www\.)?/i, '')
+    .replace(/\?.*$/, '')
+    .replace(/\/$/, '');
 }
 
 export async function Footer() {
@@ -86,6 +94,7 @@ export async function Footer() {
 
   return (
     <footer className="chrome__footer">
+      <FooterRevealScroll />
       <FooterNowStrip initialTrack={lastKnownSong} latestActivity={latestActivity} />
       <div className="collageMeasure chrome__footerBody">
         <div className="chrome__footerGrid">
@@ -107,13 +116,14 @@ export async function Footer() {
               Elsewhere
             </PaperTag>
             {elsewhereLinks.length > 0 ? (
-              <div className="chrome__elsewhereList">
+              <div className="chrome__elsewhereLedger">
                 {elsewhereLinks.map((link) => {
                   const displayTitle = link.title === 'Github' ? 'GitHub' : link.title;
+                  const handle = formatElsewhereHandle(link.url);
                   return (
                     <a
                       aria-label={displayTitle}
-                      className="chrome__elsewhereChip"
+                      className="chrome__elsewhereRow"
                       href={link.url}
                       key={link.url}
                       rel="noopener noreferrer"
@@ -123,17 +133,18 @@ export async function Footer() {
                         {renderElsewhereIcon(link.icon)}
                       </span>
                       <span className="chrome__elsewhereTitle">{displayTitle}</span>
+                      <span className="chrome__elsewhereHandle">{handle}</span>
                       <svg
                         aria-hidden="true"
                         className="chrome__elsewhereArrow"
                         fill="none"
-                        height={13}
+                        height={16}
                         stroke="currentColor"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2.2}
                         viewBox="0 0 24 24"
-                        width={13}
+                        width={16}
                       >
                         <path d="M7 17 17 7M8 7h9v9" />
                       </svg>
