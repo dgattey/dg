@@ -2,6 +2,12 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import {
+  checkCssClassesAndVariables,
+  checkOrphanCssFiles,
+  extractDefinedCssClasses,
+  extractReferencedCssClasses,
+} from './check-css.js';
 
 export const MAX_SOURCE_FILE_LINES = 350;
 export const MAX_TEST_FILE_LINES = 500;
@@ -154,56 +160,132 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
   return violations;
 }
 
-const CSS_IMPORT_PATTERN =
-  /(?:^\s*import\s+['"]([^'"]+\.css)['"]|^\s*@import\s+['"]([^'"]+\.css)['"])/gm;
-
-export function checkOrphanCssFiles(
-  cssPaths: ReadonlyArray<string>,
-  importers: ReadonlyMap<string, string>,
+export function checkRouteCssImports(
+  cssFiles: ReadonlyMap<string, string>,
+  sourceFiles: ReadonlyMap<string, string>,
 ): Array<StructureViolation> {
-  const importedCss = new Set<string>();
-  for (const [relPath, content] of importers) {
-    const dir = path.posix.dirname(relPath);
-    for (const match of content.matchAll(CSS_IMPORT_PATTERN)) {
-      const specifier = match[1] ?? match[2];
-      if (!specifier?.startsWith('.')) {
-        continue;
+  const definedClasses = extractDefinedCssClasses(cssFiles);
+  const usagesByFile = new Map<string, Array<{ cls: string; file: string; line: number }>>();
+  for (const usage of extractReferencedCssClasses(sourceFiles)) {
+    const list = usagesByFile.get(usage.file) ?? [];
+    list.push(usage);
+    usagesByFile.set(usage.file, list);
+  }
+
+  const resolveImport = (fromFile: string, spec: string): string | null => {
+    const base = spec.startsWith('.')
+      ? path.posix.normalize(path.posix.join(path.posix.dirname(fromFile), spec))
+      : spec.startsWith('@dg/')
+        ? path.posix.normalize(`packages/${spec.slice('@dg/'.length)}`)
+        : null;
+    if (!base) {
+      return null;
+    }
+    if (base.endsWith('.css')) {
+      return cssFiles.has(base) ? base : null;
+    }
+    for (const ext of ['', '.ts', '.tsx', '/index.ts', '/index.tsx']) {
+      if (sourceFiles.has(`${base}${ext}`)) {
+        return `${base}${ext}`;
       }
-      importedCss.add(path.posix.normalize(path.posix.join(dir, specifier)));
+    }
+    return null;
+  };
+
+  const rootLayout = 'apps/web/src/app/layout.tsx';
+  const rootCss = new Set<string>();
+  for (const m of (sourceFiles.get(rootLayout) ?? '').matchAll(
+    /(?:\bfrom\s+|\bimport\s+)['"]([^'"]+\.css)['"]/g,
+  )) {
+    const resolved = m[1] ? resolveImport(rootLayout, m[1]) : null;
+    if (resolved) {
+      rootCss.add(resolved);
     }
   }
 
   const violations: Array<StructureViolation> = [];
-  for (const cssPath of cssPaths) {
-    if (!importedCss.has(cssPath)) {
-      violations.push({
-        file: cssPath,
-        line: 1,
-        message: 'Stylesheet is not imported by any source or CSS file',
-        rule: 'no-orphan-css',
-      });
+  for (const entry of sourceFiles.keys()) {
+    if (
+      !/^apps\/web\/src\/app\/(?:.*\/)?(?:page|not-found|error)\.tsx$/.test(entry) ||
+      entry.includes('[...rest]')
+    ) {
+      continue;
+    }
+    const queue: Array<string> = [entry];
+    for (
+      let dir = path.posix.dirname(entry);
+      dir.startsWith('apps/web/src/app/');
+      dir = path.posix.dirname(dir)
+    ) {
+      if (sourceFiles.has(`${dir}/layout.tsx`)) {
+        queue.push(`${dir}/layout.tsx`);
+      }
+    }
+
+    const visitedSources = new Set<string>();
+    const routeCss = new Set<string>(rootCss);
+    while (queue.length > 0) {
+      const current = queue.pop();
+      if (!current || visitedSources.has(current)) {
+        continue;
+      }
+      visitedSources.add(current);
+      for (const m of (sourceFiles.get(current) ?? '').matchAll(
+        /(?:\bfrom\s+|\bimport\s+)['"]([^'"]+)['"]/g,
+      )) {
+        const resolved = m[1] ? resolveImport(current, m[1]) : null;
+        if (resolved?.endsWith('.css')) {
+          routeCss.add(resolved);
+        } else if (resolved && !visitedSources.has(resolved)) {
+          queue.push(resolved);
+        }
+      }
+    }
+
+    const cssQueue = [...routeCss];
+    while (cssQueue.length > 0) {
+      const currentCss = cssQueue.pop();
+      for (const m of (currentCss ? (cssFiles.get(currentCss) ?? '') : '').matchAll(
+        /^\s*@import\s+['"]([^'"]+\.css)['"]/gm,
+      )) {
+        const resolved = currentCss && m[1] ? resolveImport(currentCss, m[1]) : null;
+        if (resolved && !routeCss.has(resolved)) {
+          routeCss.add(resolved);
+          cssQueue.push(resolved);
+        }
+      }
+    }
+
+    const reportedCss = new Set<string>();
+    for (const srcFile of visitedSources) {
+      for (const usage of usagesByFile.get(srcFile) ?? []) {
+        const def = definedClasses.get(usage.cls);
+        if (def && ![...def.files].some((f) => routeCss.has(f)) && !reportedCss.has(def.file)) {
+          reportedCss.add(def.file);
+          violations.push({
+            file: entry,
+            line: 1,
+            message: `Route uses ".${usage.cls}" (via ${srcFile}) without importing "${def.file}"`,
+            rule: 'route-missing-css',
+          });
+        }
+      }
     }
   }
   return violations;
 }
 
 export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolation> {
-  const trackedOutput = execFileSync('git', ['ls-files', 'apps', 'packages'], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-  });
-  const untrackedOutput = execFileSync(
+  const gitOpts = { cwd: repoRoot, encoding: 'utf8' as const };
+  const tracked = execFileSync('git', ['ls-files', 'apps', 'packages'], gitOpts);
+  const untracked = execFileSync(
     'git',
     ['ls-files', '--others', '--exclude-standard', 'apps', 'packages'],
-    {
-      cwd: repoRoot,
-      encoding: 'utf8',
-    },
+    gitOpts,
   );
-
   const allTrackedPaths = [
     ...new Set(
-      [...trackedOutput.split('\n'), ...untrackedOutput.split('\n')]
+      [...tracked.split('\n'), ...untracked.split('\n')]
         .map((line) => line.trim())
         .filter(
           (relPath) =>
@@ -216,30 +298,36 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
   ].sort();
 
   const relPaths = allTrackedPaths.filter((relPath) => /\.(ts|tsx)$/.test(relPath));
-  const webCssPaths = allTrackedPaths.filter(
-    (relPath) => relPath.startsWith('apps/web/src/') && relPath.endsWith('.css'),
+  const cssPaths = allTrackedPaths.filter(
+    (relPath) =>
+      (relPath.startsWith('apps/web/src/') || relPath.startsWith('packages/')) &&
+      relPath.endsWith('.css'),
   );
-  const webImporters = new Map<string, string>();
-
+  const sourceFiles = new Map<string, string>();
+  const cssFiles = new Map<string, string>();
+  const cssImporters = new Map<string, string>();
   const violations: Array<StructureViolation> = [];
+
   for (const relPath of relPaths) {
     const fullPath = path.join(repoRoot, relPath);
-    if (!fs.existsSync(fullPath)) {
-      continue;
-    }
-    const content = fs.readFileSync(fullPath, 'utf8');
-    violations.push(...checkFileStructure(relPath, content));
-    if (relPath.startsWith('apps/web/src/')) {
-      webImporters.set(relPath, content);
+    if (fs.existsSync(fullPath)) {
+      const content = fs.readFileSync(fullPath, 'utf8');
+      violations.push(...checkFileStructure(relPath, content));
+      sourceFiles.set(relPath, content);
+      cssImporters.set(relPath, content);
     }
   }
-  for (const cssPath of webCssPaths) {
+  for (const cssPath of cssPaths) {
     const fullPath = path.join(repoRoot, cssPath);
     if (fs.existsSync(fullPath)) {
-      webImporters.set(cssPath, fs.readFileSync(fullPath, 'utf8'));
+      const content = fs.readFileSync(fullPath, 'utf8');
+      cssFiles.set(cssPath, content);
+      cssImporters.set(cssPath, content);
     }
   }
-  violations.push(...checkOrphanCssFiles(webCssPaths, webImporters));
+  violations.push(...checkOrphanCssFiles(cssPaths, cssImporters));
+  violations.push(...checkCssClassesAndVariables(cssFiles, sourceFiles));
+  violations.push(...checkRouteCssImports(cssFiles, sourceFiles));
   return violations;
 }
 

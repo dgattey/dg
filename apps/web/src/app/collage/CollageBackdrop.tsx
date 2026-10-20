@@ -2,6 +2,7 @@ import type { CSSProperties } from 'react';
 import type { Backdrop, SheetPlacement } from './backdrops';
 import { CutOut } from './CutOut';
 import { CutOutSymbols } from './CutOutSymbols';
+import { cx } from './paperVars';
 
 type SheetStyle = CSSProperties & {
   '--sheet-a': string;
@@ -25,10 +26,15 @@ function Sheet({ sheet }: { sheet: SheetPlacement }) {
       ? { '--sheet-h': `${sheet.heightPx}px`, '--sheet-w': `${sheet.widthPercent}%` }
       : { '--sheet-size': `${sheet.sizePx}px` }),
   };
-  const desktopOnly = sheet.visibility === 'desktop' ? ' collageSheetDesktopOnly' : '';
   return (
     <span
-      className={`collageField collageSheet collageSheet-${sheet.pattern} collageSheetEdge-${sheet.edge}${desktopOnly}`}
+      className={cx(
+        'collageField',
+        'collageSheet',
+        sheet.pattern !== 'solid' && `collageSheet-${sheet.pattern}`,
+        sheet.edge !== 'torn' && `collageSheetEdge-${sheet.edge}`,
+        sheet.visibility === 'desktop' && 'collageSheetDesktopOnly',
+      )}
       data-sheet={sheet.id}
       style={style}
     />

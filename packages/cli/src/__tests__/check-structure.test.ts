@@ -2,9 +2,10 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { checkCssClassesAndVariables, checkOrphanCssFiles } from '../check-css.js';
 import {
   checkFileStructure,
-  checkOrphanCssFiles,
+  checkRouteCssImports,
   checkWorkspaceStructure,
   MAX_SOURCE_FILE_LINES,
 } from '../check-structure.js';
@@ -66,6 +67,40 @@ describe('check-structure', () => {
     assert.equal(orphanCss.length, 1);
     assert.equal(orphanCss[0]?.file, 'apps/web/src/app/dev-console/devConsole.css');
     assert.equal(orphanCss[0]?.rule, 'no-orphan-css');
+
+    const cssAuditViolations = checkCssClassesAndVariables(
+      new Map([
+        [
+          'apps/web/src/app/music/music.css',
+          '.musicHeader { color: var(--defined-tone); }\n.deadRule { color: var(--missing-tone); }\n',
+        ],
+      ]),
+      new Map([
+        [
+          'apps/web/src/app/music/page.tsx',
+          'export const P = () => <div className="musicHeader typoClass" style={{ "--defined-tone": "#000" }} />;\n',
+        ],
+      ]),
+    );
+    const rules = cssAuditViolations.map((v) => v.rule).sort();
+    assert.deepEqual(rules, ['undefined-css-class', 'undefined-css-variable', 'unused-css-class']);
+
+    const routeMissingCss = checkRouteCssImports(
+      new Map([['apps/web/src/app/music/music.css', '.music__grid { display: grid; }\n']]),
+      new Map([
+        [
+          'apps/web/src/app/music/albums/layout.tsx',
+          "import '../music.css';\nexport default function L({ children }: { children: unknown }) { return children; }\n",
+        ],
+        [
+          'apps/web/src/app/music/page.tsx',
+          'export default function P() { return <div className="music__grid" />; }\n',
+        ],
+      ]),
+    );
+    assert.equal(routeMissingCss.length, 1);
+    assert.equal(routeMissingCss[0]?.file, 'apps/web/src/app/music/page.tsx');
+    assert.equal(routeMissingCss[0]?.rule, 'route-missing-css');
   });
 
   it('validates the entire workspace in under 200ms with zero violations', () => {
