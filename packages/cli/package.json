@@ -24,8 +24,7 @@
     "tunnel": "tsx src/tunnel.ts",
     "version:bump": "tsx src/version.ts bump",
     "version:pr-comment": "tsx src/version.ts pr-comment",
-    "version:release-info": "tsx src/version.ts release-info",
-    "version:release-pr": "tsx src/version.ts release-pr"
+    "version:release-info": "tsx src/version.ts release-info"
   },
   "type": "module",
   "version": "1.0.0"
