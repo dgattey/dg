@@ -4,6 +4,7 @@ import {
   buildRichTextDocument,
   cleanWhitespace,
   DEFAULT_SHELVES,
+  decodeCoverImageBase64,
   isUsableGoodreadsCoverUrl,
   normalizeReviewText,
   upgradeGoodreadsCoverUrl,
@@ -33,6 +34,7 @@ export type BookMutationOutcome = Omit<
 > & {
   action: 'created' | 'deleted' | 'skipped' | 'updated';
   coverAssetId: string | null;
+  coverImageUrl: string | null;
 };
 
 export type GoodreadsSyncBookError = { author: string; message: string; title: string };
@@ -79,7 +81,13 @@ const toOutcome = (
     reviewDescription: _d,
     ...rest
   }: NormalizedContentfulBookEntry,
-): BookMutationOutcome => ({ action, coverAssetId: rest.coverImageId, ...rest });
+  coverImageUrl: string | null,
+): BookMutationOutcome => ({
+  action,
+  coverAssetId: rest.coverImageId,
+  coverImageUrl,
+  ...rest,
+});
 
 export async function upsertBookToContentful(
   cma: ContentfulCmaClient,
@@ -93,6 +101,8 @@ export async function upsertBookToContentful(
   const ex =
     (b.id ? await cma.fetchBookById(b.id) : null) ??
     findMatchingContentfulEntry(query, await cma.fetchAllBooks());
+  const newId = b.id ? cleanWhitespace(b.id).toUpperCase() : undefined;
+  const targetBookId = ex?.id ?? newId;
   const isbn = b.isbn ?? ex?.isbn ?? null;
   const reviewDescription =
     b.reviewPlainText !== undefined
@@ -104,14 +114,36 @@ export async function upsertBookToContentful(
       : (ex?.reviewText ?? null);
 
   let coverImageId = b.coverAssetId ?? ex?.coverImageId ?? null;
-  const candidateCoverUrl = resolveCoverUrl({ coverImageUrl: b.coverImageUrl, isbn });
-  if (b.coverImageUrl || (!coverImageId && candidateCoverUrl)) {
-    const uploaded = candidateCoverUrl
-      ? await cma
-          .createAndPublishCoverAsset({ imageUrl: candidateCoverUrl, title: b.title })
-          .catch(() => null)
-      : null;
-    if (uploaded) coverImageId = uploaded;
+  let coverImageUrl: string | null = null;
+
+  if (b.coverImageBase64 && b.coverImageContentType) {
+    const decoded = decodeCoverImageBase64(b.coverImageBase64);
+    if (!decoded.ok) throw new Error(decoded.error);
+    const uploaded = await cma.createAndPublishBinaryCoverAsset({
+      bytes: decoded.bytes,
+      contentType: b.coverImageContentType,
+      fileNameBase: targetBookId,
+      title: b.title,
+    });
+    coverImageId = uploaded.assetId;
+    coverImageUrl = uploaded.url;
+  } else {
+    const candidateCoverUrl = resolveCoverUrl({ coverImageUrl: b.coverImageUrl, isbn });
+    if (b.coverImageUrl || (!coverImageId && candidateCoverUrl)) {
+      const uploaded = candidateCoverUrl
+        ? await cma
+            .createAndPublishCoverAsset({ imageUrl: candidateCoverUrl, title: b.title })
+            .catch(() => null)
+        : null;
+      if (uploaded) {
+        coverImageId = uploaded.assetId;
+        coverImageUrl = uploaded.url;
+      }
+    }
+  }
+
+  if (coverImageId && !coverImageUrl) {
+    coverImageUrl = await cma.fetchAssetUrl(coverImageId).catch(() => null);
   }
 
   const merged: MergedBookFields = {
@@ -129,9 +161,14 @@ export async function upsertBookToContentful(
   const fields = ex
     ? { ...ex.rawFields, ...buildCmaBookFields(merged, cma.locale) }
     : buildCmaBookFields(merged, cma.locale);
-  if (ex) return toOutcome('updated', await cma.updateAndPublishBook(ex.id, ex.version, fields));
-  const newId = b.id ? cleanWhitespace(b.id).toUpperCase() : undefined;
-  return toOutcome('created', await cma.createAndPublishBook(fields, newId));
+  if (ex) {
+    return toOutcome(
+      'updated',
+      await cma.updateAndPublishBook(ex.id, ex.version, fields),
+      coverImageUrl,
+    );
+  }
+  return toOutcome('created', await cma.createAndPublishBook(fields, newId), coverImageUrl);
 }
 
 export async function fetchGoodreadsShelfItems(opts: {
@@ -202,9 +239,10 @@ export async function runGoodreadsSync(opts: {
       if (!m.coverImageId) {
         const coverUrl = resolveCoverUrl(b);
         if (coverUrl) {
-          m.coverImageId = await cma
+          const uploaded = await cma
             .createAndPublishCoverAsset({ imageUrl: coverUrl, title: m.title })
             .catch(() => null);
+          m.coverImageId = uploaded?.assetId ?? null;
         }
       }
       if (diff.action === 'create') {
