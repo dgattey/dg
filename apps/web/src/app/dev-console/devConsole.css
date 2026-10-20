@@ -3,9 +3,10 @@
 .collageStatusTag {
   flex-shrink: 0;
   padding: 0.45em 0.75em 0.5em;
-  font-size: 14.5px;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  font-size: var(--type-meta);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0;
 }
 
 .devConsole__sheet {
@@ -34,16 +35,17 @@
 }
 .devConsole__ledeInner p {
   margin: 0;
-  font-size: 18px;
-  line-height: 1.5;
+  font-size: var(--type-body-lg);
+  font-weight: 500;
+  line-height: 1.45;
 }
 .devConsole__protectedTag {
   top: -14px;
   left: -12px;
-  font-size: 12.5px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
+  font-size: var(--type-meta);
+  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0;
 }
 .devConsole__protectedTag small {
   font-size: inherit;
@@ -86,7 +88,7 @@
   align-items: center;
 }
 .devConsole__actionButton {
-  font-size: 14px;
+  font-size: var(--type-meta);
 }
 .devConsole__errorText {
   font-weight: 700;
