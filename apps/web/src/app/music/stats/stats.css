@@ -212,9 +212,9 @@
 }
 .stats__column {
   display: grid;
+  grid-template-rows: auto 196px auto;
   /* Pinned to the track, so a wide value label overflows instead of widening its bar. */
   grid-template-columns: minmax(0, 1fr);
-  grid-template-rows: auto 196px auto;
   gap: 6px;
   justify-items: center;
 }
@@ -306,8 +306,8 @@
 .stats__hour {
   --shift: var(--soft);
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: auto 128px auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: 5px;
   justify-items: center;
 }

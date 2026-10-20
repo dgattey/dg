@@ -77,15 +77,16 @@ describe('ListeningStatsSections', () => {
   it('names each card with a heading', () => {
     render(<ListeningStatsSections stats={stats} />);
 
-    expect(screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent))
-      .toEqual(
-        expect.arrayContaining([
-          'Plays per year',
-          'Top albums, all time',
-          'On repeat',
-          'Front to back',
-          'Day of week',
-        ]),
-      );
+    expect(
+      screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent),
+    ).toEqual(
+      expect.arrayContaining([
+        'Plays per year',
+        'Top albums, all time',
+        'On repeat',
+        'Front to back',
+        'Day of week',
+      ]),
+    );
   });
 });
