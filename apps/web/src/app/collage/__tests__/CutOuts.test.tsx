@@ -126,5 +126,13 @@ describe('collage cut-outs', () => {
       expect(placement.zIndex).toBeGreaterThanOrEqual(0);
       expect(placement.zIndex).toBeLessThan(2);
     }
+
+    const codaRotations = new Set(
+      CUT_OUT_PLACEMENTS.coda.map((placement) => placement.rotationDeg),
+    );
+    expect(codaRotations.size).toBeGreaterThanOrEqual(6);
+    expect(CUT_OUT_PLACEMENTS.coda.some((placement) => Math.abs(placement.rotationDeg) >= 12)).toBe(
+      true,
+    );
   });
 });
