@@ -18,7 +18,7 @@ export type CutOutPlacement = {
   visibility: CutOutVisibility;
   xPercent: number;
   yPercent: number;
-  zIndex: 0 | 1 | 3;
+  zIndex: 0 | 1;
 };
 
 export type PlacementRow = readonly [
@@ -30,7 +30,7 @@ export type PlacementRow = readonly [
   xPercent: number,
   yPercent: number,
   visibility: CutOutVisibility,
-  zIndex: 0 | 1 | 3,
+  zIndex: 0 | 1,
   options?: {
     mirrored?: true;
     underprint?: readonly [color: CutOutColor, x: number, y: number];
@@ -77,10 +77,10 @@ export const CUT_OUT_PLACEMENTS = {
       { underprint: ['ultramarine', 6, 7] },
     ],
     ['coda-sun', 'sun', 'ochre', 180, 0, 18, 44, 'desktop', 0],
-    ['coda-star-upper', 'star5', 'star', 46, 8, 58, 8, 'desktop', 3],
-    ['coda-heart', 'heart', 'rose', 90, -12, 90, 70, 'all', 3],
-    ['coda-star-lower', 'star5', 'cream', 40, 16, 24, 78, 'dark-desktop', 3],
-    ['coda-star-right', 'star4', 'cream', 34, -6, 78, 22, 'dark-desktop', 3],
+    ['coda-star-upper', 'star5', 'star', 46, 8, 58, 8, 'desktop', 1],
+    ['coda-heart', 'heart', 'rose', 90, -12, 90, 70, 'all', 1],
+    ['coda-star-lower', 'star5', 'cream', 40, 16, 24, 78, 'dark-desktop', 1],
+    ['coda-star-right', 'star4', 'cream', 34, -6, 78, 22, 'dark-desktop', 1],
     ['coda-philo', 'philo', 'leaf', 250, -18, 4, 64, 'desktop', 1],
   ]),
   helloSheet: definePlacements([
@@ -88,10 +88,10 @@ export const CUT_OUT_PLACEMENTS = {
     ['hello-fern-left', 'fern', 'olive', 330, 22, -7, 42, 'all', 1],
     ['hello-seaweed-lower-left', 'seaweed2', 'rose', 180, -8, -2, 78, 'all', 1],
     ['hello-pods', 'pods', 'ochre', 210, -18, 33, 74, 'desktop', 1],
-    ['hello-star-upper', 'star5', 'star', 40, 12, 44, 10, 'desktop', 3],
-    ['hello-star-middle', 'star4', 'star', 30, -8, 47, 50, 'desktop', 3],
+    ['hello-star-upper', 'star5', 'star', 40, 12, 44, 10, 'desktop', 1],
+    ['hello-star-middle', 'star4', 'star', 30, -8, 47, 50, 'desktop', 1],
     ['hello-algae', 'algae', 'rose', 210, 16, 39, -5, 'desktop', 1],
-    ['hello-moon', 'moon', 'cream', 64, 14, 46, -2, 'dark-desktop', 3],
+    ['hello-moon', 'moon', 'cream', 64, 14, 46, -2, 'dark-desktop', 1],
     ['hello-coral', 'coral', 'ultramarine', 170, -10, 49, 47, 'desktop', 1],
     ['hello-seaweed-lower-middle', 'seaweed2', 'ultramarine', 200, 14, 53, 72, 'desktop', 1],
     ['hello-fern-right', 'fern', 'leaf', 320, -28, 69, 78, 'desktop', 0],
@@ -108,17 +108,17 @@ export const CUT_OUT_PLACEMENTS = {
       { underprint: ['ultramarine', 6, 7] },
     ],
     ['hello-banana', 'banana', 'viridian', 440, -24, 86, 26, 'desktop', 0],
-    ['hello-star-right', 'star4', 'ochre', 44, 10, 92, 40, 'desktop', 3],
+    ['hello-star-right', 'star4', 'ochre', 44, 10, 92, 40, 'desktop', 1],
   ]),
   moreWork: definePlacements([
     ['more-monstera', 'monstera', 'viridian', 640, 150, 72, -12, 'all', 0],
     ['more-gerbe', 'gerbe', 'vermilion', 380, 24, 38, -16, 'all', 0],
-    ['more-star-upper', 'star5', 'star', 44, -12, 48, 4, 'desktop', 3],
+    ['more-star-upper', 'star5', 'star', 44, -12, 48, 4, 'desktop', 1],
     ['more-pods', 'pods', 'ultramarine', 230, 22, 27, 36, 'all', 1],
     ['more-trefoil', 'trefoil', 'rose', 150, -16, 45, 44, 'desktop', 1],
     ['more-algae', 'algae', 'leaf', 200, 10, 36, 52, 'desktop', 1],
     ['more-banana', 'banana', 'leaf', 440, 40, 80, 52, 'desktop', 0],
-    ['more-star-lower', 'star4', 'ultramarine', 40, 10, 6, 92, 'all', 3],
+    ['more-star-lower', 'star4', 'ultramarine', 40, 10, 6, 92, 'all', 1],
     ['more-seaweed', 'seaweed', 'cream', 240, -10, -3, 40, 'desktop', 1],
     ['more-philo', 'philo', 'viridian', 300, -30, -6, 8, 'all', 1],
     ['more-star-middle', 'star5', 'cream', 40, 20, 31, 54, 'desktop', 1],

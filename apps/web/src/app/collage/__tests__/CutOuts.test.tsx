@@ -2,9 +2,21 @@ import { readdirSync, readFileSync } from 'node:fs';
 import path from 'node:path';
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import { render } from '@testing-library/react';
+import {
+  ALBUM_DETAIL_BACKDROP,
+  ALBUMS_BACKDROP,
+  DEV_CONSOLE_BACKDROP,
+  HISTORY_BACKDROP,
+  NOT_FOUND_BACKDROP,
+  SERVER_ERROR_BACKDROP,
+} from '../backdrops';
 import { CutOut } from '../CutOut';
 import { CutOutSymbols } from '../CutOutSymbols';
-import { ALL_CUT_OUT_PLACEMENTS, CUT_OUT_PLACEMENTS } from '../cutOutPlacements';
+import {
+  ALL_CUT_OUT_PLACEMENTS,
+  CUT_OUT_PLACEMENTS,
+  moreWorkOverflowPlacements,
+} from '../cutOutPlacements';
 import { CUT_OUT_SHAPE_NAMES, CUT_OUT_SHAPES, cutOutSymbolId } from '../cutOutShapes';
 
 const WEB_SRC_DIR = path.join(__dirname, '../../..');
@@ -92,5 +104,27 @@ describe('collage cut-outs', () => {
     );
     expect(inlineProperties).toEqual(expect.arrayContaining(['--cut-size', '--cut-x', '--cut-y']));
     expect(inlineProperties.flatMap(stylesheetsAssigning)).toEqual([]);
+  });
+
+  it('keeps all decorative cut-outs strictly behind foreground content (zIndex < 2)', () => {
+    const backdropCutOuts = [
+      ALBUMS_BACKDROP,
+      ALBUM_DETAIL_BACKDROP,
+      HISTORY_BACKDROP,
+      DEV_CONSOLE_BACKDROP,
+      NOT_FOUND_BACKDROP,
+      SERVER_ERROR_BACKDROP,
+    ].flatMap((backdrop) => backdrop.bands.flatMap((band) => band.cutOuts));
+
+    const allPlacements = [
+      ...ALL_CUT_OUT_PLACEMENTS,
+      ...moreWorkOverflowPlacements('test-overflow'),
+      ...backdropCutOuts,
+    ];
+
+    for (const placement of allPlacements) {
+      expect(placement.zIndex).toBeGreaterThanOrEqual(0);
+      expect(placement.zIndex).toBeLessThan(2);
+    }
   });
 });

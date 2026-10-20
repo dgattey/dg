@@ -1,3 +1,4 @@
+import './devConsole.css';
 import 'server-only';
 
 import type { ReactNode } from 'react';

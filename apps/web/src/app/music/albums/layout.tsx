@@ -1,3 +1,4 @@
+import '../music.css';
 import 'server-only';
 
 import { favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
