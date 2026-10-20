@@ -66,7 +66,6 @@ export function getTypography(): TypographyVariants {
     h1: {
       fontSize: 'clamp(1.75rem, 1.2rem + 2.5vw, 2.125rem)',
       fontStretch: 'expanded',
-      fontVariant: 'all-small-caps',
       fontWeight: 700,
     },
     h2: {
@@ -91,10 +90,8 @@ export function getTypography(): TypographyVariants {
       fontWeight: 600,
     },
     overline: {
-      fontSize: 13,
-      fontStretch: 'expanded',
-      fontVariant: 'all-small-caps',
-      fontWeight: 500,
+      fontSize: 14,
+      fontWeight: 600,
     },
   };
 }

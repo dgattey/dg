@@ -54,6 +54,22 @@ html:has(.collageRoot) body {
   --body:
     system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, Cantarell,
     "Noto Sans", "Helvetica Neue", Arial, sans-serif;
+  --type-display: clamp(56px, 11vw, 144px);
+  --type-h1: clamp(44px, 7vw, 88px);
+  --type-h2: clamp(20px, 2.2vw, 24px);
+  --type-h3: 20px;
+  --type-body-lg: clamp(17px, 1.5vw, 20px);
+  --type-body: 16px;
+  --type-label: 16px;
+  --type-meta: 14px;
+  --mat: 10px;
+  --mat-feature: 14px;
+  --mat-radius: 6px;
+  --border-width: 1.5px;
+  --logo-fill: var(--ink);
+  --logo-stamp-bg: var(--logo-fill);
+  --logo-stamp-fg: var(--cream);
+  --shadow: 0 1px 0 rgb(0 0 0 / 0.2), 0 2px 3px rgb(0 0 0 / 0.12);
   --collage-card-pad: 28px 34px 30px;
   --collage-card-pad-mobile: 24px 22px 26px;
   position: relative;
@@ -61,6 +77,9 @@ html:has(.collageRoot) body {
   /* Backdrops run behind the header and footer, so the page edge is their only clip. */
   overflow: clip;
   font-family: var(--body);
+  font-size: var(--type-body);
+  font-weight: 500;
+  line-height: 1.55;
   color: var(--ink);
   background-color: var(--paper);
 }
@@ -129,9 +148,12 @@ html[data-color-scheme="dark"] .collageRoot::after {
   position: relative;
   z-index: 2;
 }
-.collagePageTitle {
+.collageRoot .collagePageTitle {
   padding-top: 20px;
-  font-size: clamp(48px, 6.2vw, 88px);
+  font-size: var(--type-h1);
+  font-weight: 800;
+  line-height: 0.94;
+  letter-spacing: -0.035em;
 }
 /* Every page's lead heading, so it morphs into the next page's heading. */
 html:not(:active-view-transition-type(album-open, album-close))
@@ -145,11 +167,10 @@ html:not(:active-view-transition-type(album-open, album-close))
   align-items: baseline;
 }
 .collageEyebrow {
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.25;
-  text-transform: uppercase;
-  letter-spacing: 0.11em;
+  font-size: var(--type-label);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 
 .paperWrap {
@@ -196,11 +217,13 @@ html:not(:active-view-transition-type(album-open, album-close))
 .collageRoot [data-tooltip-anchor] > [role="tooltip"] {
   padding: 7px 12px 8px;
   font-family: var(--display);
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--type-meta);
+  font-weight: 600;
+  line-height: 1.25;
   color: var(--cream);
+  letter-spacing: 0;
   background: var(--black);
-  border: 1.5px solid color-mix(in oklab, var(--cream) 22%, transparent);
+  border: var(--border-width) solid color-mix(in oklab, var(--cream) 22%, transparent);
   border-radius: 10px;
   box-shadow: 0 6px 16px rgb(0 0 0 / 28%);
 }
@@ -211,11 +234,11 @@ html:not(:active-view-transition-type(album-open, album-close))
   align-items: center;
   padding: 0.65em 0.95em 0.7em;
   font-family: var(--display);
-  font-size: 16.5px;
-  font-weight: 700;
-  line-height: 1.2;
+  font-size: var(--type-label);
+  font-weight: 800;
+  line-height: 1.1;
   color: var(--on);
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
@@ -227,15 +250,18 @@ html:not(:active-view-transition-type(album-open, album-close))
 }
 .paperTag {
   padding: 0.5em 0.85em 0.55em;
-  font-size: 19px;
+  font-size: var(--type-h3);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.015em;
   cursor: default;
 }
 .paperTag small {
-  font-size: 18px;
-  font-weight: 650;
+  font-size: var(--type-meta);
+  font-weight: 600;
   line-height: 1.25;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+  color: color-mix(in oklab, var(--on, var(--ink)) 68%, transparent);
+  letter-spacing: 0;
 }
 .paperWrap > span {
   display: inline-flex;
@@ -402,11 +428,11 @@ html[data-color-scheme="dark"] .cutNightOnly {
   justify-items: start;
   margin: 0;
   font-family: var(--display);
-  font-size: clamp(64px, 10vw, 144px);
+  font-size: var(--type-display);
   font-weight: 800;
-  line-height: 0.88;
+  line-height: 0.9;
   color: var(--title);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.04em;
   filter: var(--dshadow);
 }
 .cutHeadingCut {
@@ -426,11 +452,7 @@ html[data-color-scheme="dark"] .cutNightOnly {
 }
 
 @media (max-width: 820px) {
-  .collagePageTitle,
-  .cutHeading {
-    font-size: clamp(54px, 16.5vw, 72px);
-  }
-  .collagePageTitle {
+  .collageRoot .collagePageTitle {
     padding-top: 16px;
   }
   .cutIndentedWord {
@@ -446,10 +468,7 @@ html[data-color-scheme="dark"] .cutNightOnly {
     display: none;
   }
   .collagePin {
-    font-size: 15px;
-  }
-  .collagePin small {
-    font-size: 16.5px;
+    font-size: var(--type-label);
   }
 }
 @media (max-width: 480px) {

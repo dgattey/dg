@@ -113,6 +113,7 @@ export function PlaybackStatus({
 
   return (
     <Typography
+      className="chrome__nowPlayingStatus"
       component="div"
       sx={getStatusSx(listingVariant, color, textShadow)}
       variant="overline"
