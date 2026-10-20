@@ -197,6 +197,38 @@ export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
   },
 ]);
 
+/**
+ * The listening history's ledger margin, so nothing sits behind the page nav, with the
+ * record-store leaves and coral down the margins.
+ */
+// biome-ignore format: placement rows read as a table
+export const STATS_BACKDROP = defineBackdrop(1100, 3, [
+  {
+    cutOuts: [
+      ['stats-star', 'star5', 'star', 40, 4, 47, 4, 'desktop', 1],
+      ['stats-philo', 'philo', 'viridian', 300, 4, 93, 62, 'desktop', 0, { mirrored: true }],
+    ],
+    sheets: [
+      ['stats-ledger', 'torn', 'ruled', ['cerulean', 'cream'], -6, 40, 24, 560, -3, 'all'],
+      ['stats-disc', 'disc', 'solid', 'ochre', 92, 36, 300, 0, 'desktop'],
+    ],
+  },
+  {
+    cutOuts: [
+      ['stats-coral', 'coral', 'vermilion', 220, -4, -6, 36, 'desktop', 1],
+      ['stats-trefoil', 'trefoil', 'rose', 140, 4, 94, 66, 'all', 1],
+    ],
+    sheets: [],
+  },
+  {
+    cutOuts: [
+      ['stats-seaweed', 'seaweed2', 'olive', 240, -4, -4, 20, 'desktop', 0],
+      ['stats-heart', 'heart', 'rose', 80, 3, 94, 40, 'desktop', 1],
+    ],
+    sheets: [],
+  },
+]);
+
 /** Blueprint grid paper with small water plants and no broad leaves. */
 // biome-ignore format: placement rows read as a table
 export const DEV_CONSOLE_BACKDROP = defineBackdrop('fill', 1, [

@@ -5,11 +5,13 @@ import {
   homeRoute,
   type MarkdownPagePath,
   musicRoute,
+  musicStatsRoute,
 } from '@dg/shared-core/routes/app';
 import { cacheLife } from 'next/cache';
 import { getHomepageMarkdown } from '../home/homepageMarkdown';
 import { getFavoriteAlbumsMarkdown } from '../music/albums/favoriteAlbumsMarkdown';
 import { getMusicMarkdown } from '../music/musicMarkdown';
+import { getListeningStatsMarkdown } from '../music/stats/listeningStatsMarkdown';
 
 /**
  * Wires each registered public path to the Markdown module next to that page.
@@ -21,6 +23,7 @@ export const pageMarkdownGenerators: {
   [favoriteAlbumsRoute]: getFavoriteAlbumsMarkdown,
   [homeRoute]: getHomepageMarkdown,
   [musicRoute]: getMusicMarkdown,
+  [musicStatsRoute]: getListeningStatsMarkdown,
 };
 
 /**

@@ -1,9 +1,9 @@
 'use client';
 
-import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
+import { favoriteAlbumsRoute, musicRoute, musicStatsRoute } from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import type { LucideIcon } from 'lucide-react';
-import { ChevronDown, DiscAlbum, History } from 'lucide-react';
+import { ChartColumn, ChevronDown, DiscAlbum, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { PaperCard } from '../collage/PaperCard';
@@ -17,6 +17,7 @@ import {
 const DESTINATION_ICONS: Record<string, LucideIcon> = {
   [favoriteAlbumsRoute]: DiscAlbum,
   [musicRoute]: History,
+  [musicStatsRoute]: ChartColumn,
 };
 
 /**
