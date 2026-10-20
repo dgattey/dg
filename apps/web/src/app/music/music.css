@@ -180,7 +180,7 @@
   color: var(--cream);
   background: var(--vermilion);
   clip-path: var(--quad-b);
-  rotate: 6deg;
+  rotate: 4deg;
 }
 .music__history,
 .music__historySkeleton {

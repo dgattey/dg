@@ -20,6 +20,14 @@ import {
 import { CUT_OUT_SHAPE_NAMES, CUT_OUT_SHAPES, cutOutSymbolId } from '../cutOutShapes';
 
 const WEB_SRC_DIR = path.join(__dirname, '../../..');
+const ALL_BACKDROPS = [
+  ALBUMS_BACKDROP,
+  ALBUM_DETAIL_BACKDROP,
+  HISTORY_BACKDROP,
+  DEV_CONSOLE_BACKDROP,
+  NOT_FOUND_BACKDROP,
+  SERVER_ERROR_BACKDROP,
+];
 
 function stylesheetsAssigning(property: string): Array<string> {
   const declaration = new RegExp(`${property}\\s*:`);
@@ -106,16 +114,13 @@ describe('collage cut-outs', () => {
     expect(inlineProperties.flatMap(stylesheetsAssigning)).toEqual([]);
   });
 
-  it('keeps all decorative cut-outs strictly behind foreground content (zIndex < 2)', () => {
-    const backdropCutOuts = [
-      ALBUMS_BACKDROP,
-      ALBUM_DETAIL_BACKDROP,
-      HISTORY_BACKDROP,
-      DEV_CONSOLE_BACKDROP,
-      NOT_FOUND_BACKDROP,
-      SERVER_ERROR_BACKDROP,
-    ].flatMap((backdrop) => backdrop.bands.flatMap((band) => band.cutOuts));
-
+  it('keeps all decorative cut-outs strictly behind foreground content (zIndex < 2) and within max 4deg tilt', () => {
+    const backdropCutOuts = ALL_BACKDROPS.flatMap((backdrop) =>
+      backdrop.bands.flatMap((band) => band.cutOuts),
+    );
+    const backdropSheets = ALL_BACKDROPS.flatMap((backdrop) =>
+      backdrop.bands.flatMap((band) => band.sheets),
+    );
     const allPlacements = [
       ...ALL_CUT_OUT_PLACEMENTS,
       ...moreWorkOverflowPlacements('test-overflow'),
@@ -125,6 +130,10 @@ describe('collage cut-outs', () => {
     for (const placement of allPlacements) {
       expect(placement.zIndex).toBeGreaterThanOrEqual(0);
       expect(placement.zIndex).toBeLessThan(2);
+      expect(Math.abs(placement.rotationDeg)).toBeLessThanOrEqual(4);
+    }
+    for (const sheet of backdropSheets) {
+      expect(Math.abs(sheet.rotationDeg)).toBeLessThanOrEqual(4);
     }
   });
 });

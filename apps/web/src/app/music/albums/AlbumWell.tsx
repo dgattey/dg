@@ -167,7 +167,7 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
           />
         </Box>
       </ViewTransition>
-      <PaperTag className="collagePin music__wellAlbumTag" edge="quad-c" tiltDeg={-5} tone="ochre">
+      <PaperTag className="collagePin music__wellAlbumTag" edge="quad-c" tiltDeg={-4} tone="ochre">
         <span>Album</span>
         <small>{album.releaseDate.slice(0, 4)}</small>
       </PaperTag>

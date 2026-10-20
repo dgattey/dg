@@ -39,7 +39,7 @@ export function PortraitPrint({
           </span>
         </span>
       </span>
-      <PaperTag className="collagePin print__tag" edge="quad-c" tiltDeg={-5} tone="ochre">
+      <PaperTag className="collagePin print__tag" edge="quad-c" tiltDeg={-4} tone="ochre">
         <span>About</span>
         <small>Dylan</small>
       </PaperTag>
