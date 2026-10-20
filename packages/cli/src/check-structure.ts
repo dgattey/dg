@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkOrphanCssFiles, checkRouteCssImports } from './check-css.js';
 
 export const MAX_SOURCE_FILE_LINES = 350;
 export const MAX_TEST_FILE_LINES = 500;
@@ -154,56 +155,17 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
   return violations;
 }
 
-const CSS_IMPORT_PATTERN =
-  /(?:^\s*import\s+['"]([^'"]+\.css)['"]|^\s*@import\s+['"]([^'"]+\.css)['"])/gm;
-
-export function checkOrphanCssFiles(
-  cssPaths: ReadonlyArray<string>,
-  importers: ReadonlyMap<string, string>,
-): Array<StructureViolation> {
-  const importedCss = new Set<string>();
-  for (const [relPath, content] of importers) {
-    const dir = path.posix.dirname(relPath);
-    for (const match of content.matchAll(CSS_IMPORT_PATTERN)) {
-      const specifier = match[1] ?? match[2];
-      if (!specifier?.startsWith('.')) {
-        continue;
-      }
-      importedCss.add(path.posix.normalize(path.posix.join(dir, specifier)));
-    }
-  }
-
-  const violations: Array<StructureViolation> = [];
-  for (const cssPath of cssPaths) {
-    if (!importedCss.has(cssPath)) {
-      violations.push({
-        file: cssPath,
-        line: 1,
-        message: 'Stylesheet is not imported by any source or CSS file',
-        rule: 'no-orphan-css',
-      });
-    }
-  }
-  return violations;
-}
-
 export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolation> {
-  const trackedOutput = execFileSync('git', ['ls-files', 'apps', 'packages'], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-  });
-  const untrackedOutput = execFileSync(
+  const gitOpts = { cwd: repoRoot, encoding: 'utf8' as const };
+  const tracked = execFileSync('git', ['ls-files', 'apps', 'packages'], gitOpts);
+  const untracked = execFileSync(
     'git',
     ['ls-files', '--others', '--exclude-standard', 'apps', 'packages'],
-    {
-      cwd: repoRoot,
-      encoding: 'utf8',
-    },
+    gitOpts,
   );
-
   const allTrackedPaths = [
     ...new Set(
-      [...trackedOutput.split('\n'), ...untrackedOutput.split('\n')]
+      [...tracked.split('\n'), ...untracked.split('\n')]
         .map((line) => line.trim())
         .filter(
           (relPath) =>
@@ -219,18 +181,19 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
   const webCssPaths = allTrackedPaths.filter(
     (relPath) => relPath.startsWith('apps/web/src/') && relPath.endsWith('.css'),
   );
+  const webSources = new Map<string, string>();
   const webImporters = new Map<string, string>();
-
   const violations: Array<StructureViolation> = [];
+
   for (const relPath of relPaths) {
     const fullPath = path.join(repoRoot, relPath);
-    if (!fs.existsSync(fullPath)) {
-      continue;
-    }
-    const content = fs.readFileSync(fullPath, 'utf8');
-    violations.push(...checkFileStructure(relPath, content));
-    if (relPath.startsWith('apps/web/src/')) {
-      webImporters.set(relPath, content);
+    if (fs.existsSync(fullPath)) {
+      const content = fs.readFileSync(fullPath, 'utf8');
+      violations.push(...checkFileStructure(relPath, content));
+      if (relPath.startsWith('apps/web/src/')) {
+        webSources.set(relPath, content);
+        webImporters.set(relPath, content);
+      }
     }
   }
   for (const cssPath of webCssPaths) {
@@ -240,6 +203,7 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
     }
   }
   violations.push(...checkOrphanCssFiles(webCssPaths, webImporters));
+  violations.push(...checkRouteCssImports(webCssPaths, webSources));
   return violations;
 }
 
