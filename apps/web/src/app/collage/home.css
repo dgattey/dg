@@ -125,18 +125,28 @@
 .home__work {
   --sp-top: 84px;
   --sp-bottom: 92px;
+  --cw: 372px;
+  --ch: 290px;
   margin-top: -30px;
   color: var(--cream);
 }
 .home__workField {
-  --kraft-major: light-dark(rgb(29 26 21 / 0.16), rgb(243 236 220 / 0.13));
-  --kraft-minor: light-dark(rgb(29 26 21 / 0.07), rgb(243 236 220 / 0.055));
+  background: var(--ultramarine);
+}
+/* The cobalt squares lie over the stars, so only the ultramarine squares show them. */
+.home__workField::after {
+  position: absolute;
+  inset: 0;
+  content: "";
   background:
-    linear-gradient(90deg, var(--kraft-major) 1px, transparent 1px) 0 0 / 80px 80px,
-    linear-gradient(var(--kraft-major) 1px, transparent 1px) 0 0 / 80px 80px,
-    linear-gradient(90deg, var(--kraft-minor) 1px, transparent 1px) 0 0 / 16px 16px,
-    linear-gradient(var(--kraft-minor) 1px, transparent 1px) 0 0 / 16px 16px,
-    light-dark(#c8a874, #4a3b29);
+    conic-gradient(
+      from 90deg at 50% 50%,
+      transparent 25%,
+      var(--cobalt) 0 50%,
+      transparent 0 75%,
+      var(--cobalt) 0
+    )
+    -150px -70px / calc(var(--cw) * 2) calc(var(--ch) * 2);
 }
 .home__workGrid,
 .home__codaGrid {
@@ -439,6 +449,8 @@
   .home__work {
     --sp-top: 70px;
     --sp-bottom: 80px;
+    --cw: 220px;
+    --ch: 170px;
   }
   .home__moreWork {
     --sp-top: 40px;

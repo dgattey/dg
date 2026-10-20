@@ -65,6 +65,7 @@ describe('projectSlots', () => {
     for (const frame of [...WORK_FRAMES, ...MORE_WORK_FRAMES, { style: CODA_FRAME_STYLE }]) {
       expect(projectTagTone(frame.style.fieldTone)).not.toBe(frame.style.fieldTone);
     }
+    expect(projectTagTone('cobalt')).toBe('ochre');
     expect(projectTagTone('ochre')).toBe('viridian');
   });
 });

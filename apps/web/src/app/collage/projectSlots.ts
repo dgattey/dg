@@ -52,7 +52,7 @@ type ProjectFrame<Area extends string> = SlottedProject & {
 export const WORK_FRAMES = [
   {
     gridArea: 'c1',
-    style: { edge: 'quad-a', fieldTone: 'ochre', tagClassName: 'tagTopLeft', tagTiltDeg: -3, tiltDeg: -0.8 },
+    style: { edge: 'quad-a', fieldTone: 'cobalt', tagClassName: 'tagTopLeft', tagTiltDeg: -3, tiltDeg: -0.8 },
   },
   {
     gridArea: 'ws',
