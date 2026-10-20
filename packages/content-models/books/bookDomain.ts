@@ -15,7 +15,10 @@ export const ALLOWED_COVER_IMAGE_HOSTS = [
 ] as const;
 
 const ALLOWED_HOST_SET: ReadonlySet<string> = new Set(ALLOWED_COVER_IMAGE_HOSTS);
-export const MAX_SYNC_RAW_BODY_BYTES = 1_000_000;
+export const ALLOWED_COVER_IMAGE_CONTENT_TYPES = ['image/jpeg', 'image/png'] as const;
+export type CoverImageContentType = (typeof ALLOWED_COVER_IMAGE_CONTENT_TYPES)[number];
+export const MAX_COVER_IMAGE_BYTES = 3 * 1024 * 1024;
+export const MAX_SYNC_RAW_BODY_BYTES = 4_500_000;
 export const MAX_SYNC_BATCH_SIZE = 100;
 export const MAX_BOOK_ID_LENGTH = 64;
 export const MAX_BOOK_TITLE_LENGTH = 500;
@@ -193,3 +196,61 @@ export const upgradeGoodreadsCoverUrl = (url: string | null | undefined): string
   url && isUsableGoodreadsCoverUrl(url)
     ? url.trim().replace(/\._S[XY]\d+_(?=\.[a-zA-Z]+$)/, '')
     : null;
+
+const STANDARD_BASE64_PATTERN = /^[A-Za-z0-9+/]+={0,2}$/;
+
+export type DecodedCoverImageResult =
+  | { bytes: Uint8Array; ok: true }
+  | { error: string; ok: false };
+
+export function decodeCoverImageBase64(raw: string): DecodedCoverImageResult {
+  if (/^\s*data:/i.test(raw)) {
+    return {
+      error: 'Book coverImageBase64 must not include a data: URI prefix',
+      ok: false,
+    };
+  }
+  if (raw.length === 0 || raw.length % 4 !== 0 || !STANDARD_BASE64_PATTERN.test(raw)) {
+    return {
+      error:
+        'Book coverImageBase64 must be a valid standard base64 string with padding and no line breaks',
+      ok: false,
+    };
+  }
+  const padding = raw.endsWith('==') ? 2 : raw.endsWith('=') ? 1 : 0;
+  const expectedByteLength = (raw.length / 4) * 3 - padding;
+  if (expectedByteLength <= 0) {
+    return {
+      error:
+        'Book coverImageBase64 must be a valid standard base64 string with padding and no line breaks',
+      ok: false,
+    };
+  }
+  if (expectedByteLength > MAX_COVER_IMAGE_BYTES) {
+    return {
+      error: `Book coverImageBase64 exceeds maximum decoded size of ${MAX_COVER_IMAGE_BYTES} bytes (3 MiB)`,
+      ok: false,
+    };
+  }
+  const buffer = Buffer.from(raw, 'base64');
+  if (buffer.byteLength !== expectedByteLength || buffer.toString('base64') !== raw) {
+    return {
+      error:
+        'Book coverImageBase64 must be a valid standard base64 string with padding and no line breaks',
+      ok: false,
+    };
+  }
+  return {
+    bytes: new Uint8Array(buffer.buffer, buffer.byteOffset, buffer.byteLength),
+    ok: true,
+  };
+}
+
+export function normalizeContentfulAssetUrl(rawUrl: unknown): string | null {
+  if (typeof rawUrl !== 'string') return null;
+  const trimmed = rawUrl.trim();
+  if (!trimmed) return null;
+  if (trimmed.startsWith('//')) return `https:${trimmed}`;
+  if (trimmed.startsWith('https://')) return trimmed;
+  return null;
+}
