@@ -57,7 +57,8 @@ const SAMPLE_DESCRIPTION: FooterContent['description'] = {
             data: {},
             marks: [],
             nodeType: 'text',
-            value: 'Making software in San Francisco. Say hi anytime.',
+            value:
+              'Building from San Francisco. Always happy to connect about product, craft, and the outdoors.',
           },
         ],
         data: {},
@@ -169,7 +170,9 @@ describe('Footer', () => {
     expect(screen.getByText('Say hello')).toBeInTheDocument();
     expect(screen.getByText('Elsewhere')).toBeInTheDocument();
     expect(
-      screen.getByText('Making software in San Francisco. Say hi anytime.'),
+      screen.getByText(
+        'Building from San Francisco. Always happy to connect about product, craft, and the outdoors.',
+      ),
     ).toBeInTheDocument();
 
     expect(screen.queryByText(/37\.76/)).not.toBeInTheDocument();

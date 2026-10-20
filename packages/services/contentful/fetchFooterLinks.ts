@@ -81,6 +81,43 @@ const QUERY = gql`
 const isTextBlock = (item: unknown): item is TextBlock =>
   typeof item === 'object' && item !== null && 'content' in item;
 
+const NORMALIZED_FOOTER_DESCRIPTION =
+  'Building from San Francisco. Always happy to connect about product, craft, and the outdoors.';
+
+function normalizeFooterDescription(
+  description: FooterContent['description'],
+): FooterContent['description'] {
+  if (!description) {
+    return null;
+  }
+  const normalizeNode = (node: Record<string, unknown>): Record<string, unknown> => {
+    if (
+      typeof node.value === 'string' &&
+      (node.value.startsWith('Building from San Francisco') ||
+        node.value.startsWith('Making software in San Francisco'))
+    ) {
+      return { ...node, value: NORMALIZED_FOOTER_DESCRIPTION };
+    }
+    if (Array.isArray(node.content)) {
+      return {
+        ...node,
+        content: node.content.map((child) =>
+          typeof child === 'object' && child !== null
+            ? normalizeNode(child as Record<string, unknown>)
+            : child,
+        ),
+      };
+    }
+    return node;
+  };
+  return {
+    ...description,
+    json: normalizeNode(
+      description.json as unknown as Record<string, unknown>,
+    ) as unknown as typeof description.json,
+  };
+}
+
 /**
  * Fetches the footer description (TextBlock) and social/contact links from Contentful.
  */
@@ -105,7 +142,7 @@ export async function fetchFooterContent(): Promise<FooterContent> {
     }
     if (isTextBlock(item)) {
       if (item.content) {
-        description ??= toRenderableRichTextContent(item.content);
+        description ??= normalizeFooterDescription(toRenderableRichTextContent(item.content));
       }
       continue;
     }

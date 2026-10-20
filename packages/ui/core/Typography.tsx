@@ -96,8 +96,7 @@ const VARIANT_STYLES: Record<TypographyVariant, SxObject> = {
   },
   overline: {
     ...TYPOGRAPHY.overline,
-    lineHeight: 2.66,
-    textTransform: 'uppercase',
+    lineHeight: 1.25,
   },
 };
 

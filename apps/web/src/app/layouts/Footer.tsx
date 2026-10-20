@@ -23,6 +23,9 @@ import { FooterNowStrip } from './FooterNowStrip';
 
 const CHAR_CODE_SHIFT = 7;
 
+export const DEFAULT_DESCRIPTION =
+  'Building from San Francisco. Always happy to connect about product, craft, and the outdoors.';
+
 const DEFAULT_ENCODED_EMAIL: ReadonlyArray<number> = [
   107, 128, 115, 104, 117, 71, 110, 104, 123, 123, 108, 128, 53, 106, 118, 116,
 ];
@@ -90,11 +93,13 @@ export async function Footer() {
             <PaperTag className="chrome__footerTag" edge="quad-c" tiltDeg={-1} tone="ochre">
               Say hello
             </PaperTag>
-            {footerContent.description ? (
-              <div className="chrome__helloDescription">
+            <div className="chrome__helloDescription">
+              {footerContent.description ? (
                 <RichText {...footerContent.description} />
-              </div>
-            ) : null}
+              ) : (
+                <p>{DEFAULT_DESCRIPTION}</p>
+              )}
+            </div>
             <FooterEmailAction encodedEmail={encodedEmail} />
           </div>
           <div className="chrome__elsewhereCol">

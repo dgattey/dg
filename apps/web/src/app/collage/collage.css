@@ -46,14 +46,22 @@ html:has(.collageRoot) body {
   --pad: clamp(16px, 4vw, 80px);
   --measure: 1280px;
   --collage-border-width: 1.5px;
-  --type-h1: clamp(48px, 6.2vw, 84px);
+  --collage-border: var(--collage-border-width) solid var(--ink);
+  --mat: 10px;
+  --mat-feature: 14px;
+  --mat-radius: 6px;
+  --print-radius: 6px;
+  --shadow: 0 2px 0 rgb(0 0 0 / 0.2), 0 7px 14px rgb(0 0 0 / 0.16);
+  --shadow-card: var(--shadow);
+  --shadow-lift: 0 3px 0 rgb(0 0 0 / 0.24), 0 10px 18px rgb(0 0 0 / 0.22);
+  --type-display: clamp(56px, 11vw, 144px);
+  --type-h1: clamp(44px, 7vw, 88px);
   --type-h2: clamp(20px, 2.2vw, 24px);
   --type-h3: 20px;
-  --type-title: 18px;
-  --type-label: 16px;
+  --type-body-lg: clamp(17px, 1.5vw, 20px);
   --type-body: 16px;
+  --type-label: 16px;
   --type-meta: 14px;
-  --type-micro: 12px;
   --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.2)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.12));
   /* Same two shadows as --dshadow, so the filter interpolates between them. */
   --dshadow-lift: drop-shadow(0 2px 0 light-dark(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.36)))
@@ -151,7 +159,10 @@ html[data-color-scheme="dark"] .collageRoot::after {
 }
 .collagePageTitle {
   padding-top: 20px;
-  font-size: clamp(48px, 6.2vw, 88px);
+  font-size: var(--type-h1);
+  font-weight: 800;
+  line-height: 0.94;
+  letter-spacing: -0.035em;
 }
 /* Every page's lead heading, so it morphs into the next page's heading. */
 html:not(:active-view-transition-type(album-open, album-close))
@@ -165,11 +176,11 @@ html:not(:active-view-transition-type(album-open, album-close))
   align-items: baseline;
 }
 .collageEyebrow {
-  font-size: 15px;
-  font-weight: 700;
+  font-size: var(--type-meta);
+  font-weight: 600;
   line-height: 1.25;
-  text-transform: uppercase;
-  letter-spacing: 0.11em;
+  color: color-mix(in oklab, var(--on, var(--ink)) 68%, transparent);
+  letter-spacing: 0;
 }
 
 .paperWrap {
@@ -216,8 +227,9 @@ html:not(:active-view-transition-type(album-open, album-close))
 .collageRoot [data-tooltip-anchor] > [role="tooltip"] {
   padding: 7px 12px 8px;
   font-family: var(--display);
-  font-size: 14px;
-  font-weight: 700;
+  font-size: var(--type-meta);
+  font-weight: 600;
+  line-height: 1.25;
   color: var(--cream);
   background: var(--black);
   border: 1.5px solid color-mix(in oklab, var(--cream) 22%, transparent);
@@ -231,11 +243,11 @@ html:not(:active-view-transition-type(album-open, album-close))
   align-items: center;
   padding: 0.65em 0.95em 0.7em;
   font-family: var(--display);
-  font-size: 16.5px;
-  font-weight: 700;
-  line-height: 1.2;
+  font-size: var(--type-label);
+  font-weight: 800;
+  line-height: 1.1;
   color: var(--on);
-  letter-spacing: 0;
+  letter-spacing: -0.01em;
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
@@ -247,15 +259,15 @@ html:not(:active-view-transition-type(album-open, album-close))
 }
 .paperTag {
   padding: 0.5em 0.85em 0.55em;
-  font-size: 19px;
+  font-size: var(--type-label);
   cursor: default;
 }
 .paperTag small {
-  font-size: 18px;
-  font-weight: 650;
+  font-size: var(--type-meta);
+  font-weight: 600;
   line-height: 1.25;
-  text-transform: uppercase;
-  letter-spacing: 0.09em;
+  letter-spacing: 0;
+  opacity: 0.78;
 }
 .paperWrap > span {
   display: inline-flex;
@@ -422,11 +434,11 @@ html[data-color-scheme="dark"] .cutNightOnly {
   justify-items: start;
   margin: 0;
   font-family: var(--display);
-  font-size: clamp(64px, 10vw, 144px);
+  font-size: var(--type-display);
   font-weight: 800;
-  line-height: 0.88;
+  line-height: 0.9;
   color: var(--title);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.04em;
   filter: var(--dshadow);
 }
 .cutHeadingCut {
@@ -450,10 +462,6 @@ html[data-color-scheme="dark"] .cutNightOnly {
     --sheet-inset: 10px;
     --sheet-radius: 18px;
   }
-  .collagePageTitle,
-  .cutHeading {
-    font-size: clamp(54px, 16.5vw, 72px);
-  }
   .collagePageTitle {
     padding-top: 16px;
   }
@@ -468,12 +476,6 @@ html[data-color-scheme="dark"] .cutNightOnly {
   .cutDesktopOnly {
     --cut-display: none;
     display: none;
-  }
-  .collagePin {
-    font-size: 15px;
-  }
-  .collagePin small {
-    font-size: 16.5px;
   }
 }
 @media (max-width: 480px) {

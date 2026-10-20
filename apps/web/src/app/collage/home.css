@@ -66,8 +66,8 @@
   width: min(100%, 648px);
   padding: 18px 24px 20px;
   margin-top: 10px;
-  font-size: 21px;
-  line-height: 1.55;
+  font-size: var(--type-body-lg);
+  line-height: 1.45;
   color: var(--ink);
   background: light-dark(
     color-mix(in oklab, var(--cream) 78%, transparent),
@@ -109,10 +109,13 @@
 }
 .home__mapInner {
   aspect-ratio: 2.5;
+  padding: var(--mat);
   overflow: clip;
 }
 .home__mapInner > * {
   height: 100%;
+  overflow: clip;
+  border-radius: var(--print-radius);
 }
 .home__mapTag {
   bottom: -12px;
@@ -122,28 +125,18 @@
 .home__work {
   --sp-top: 84px;
   --sp-bottom: 92px;
-  --cw: 372px;
-  --ch: 290px;
   margin-top: -30px;
   color: var(--cream);
 }
 .home__workField {
-  background: var(--ultramarine);
-}
-/* The cobalt squares lie over the stars, so only the ultramarine squares show them. */
-.home__workField::after {
-  position: absolute;
-  inset: 0;
-  content: "";
+  --kraft-major: light-dark(rgb(29 26 21 / 0.16), rgb(243 236 220 / 0.13));
+  --kraft-minor: light-dark(rgb(29 26 21 / 0.07), rgb(243 236 220 / 0.055));
   background:
-    conic-gradient(
-      from 90deg at 50% 50%,
-      transparent 25%,
-      var(--cobalt) 0 50%,
-      transparent 0 75%,
-      var(--cobalt) 0
-    )
-    -150px -70px / calc(var(--cw) * 2) calc(var(--ch) * 2);
+    linear-gradient(90deg, var(--kraft-major) 1px, transparent 1px) 0 0 / 80px 80px,
+    linear-gradient(var(--kraft-major) 1px, transparent 1px) 0 0 / 80px 80px,
+    linear-gradient(90deg, var(--kraft-minor) 1px, transparent 1px) 0 0 / 16px 16px,
+    linear-gradient(var(--kraft-minor) 1px, transparent 1px) 0 0 / 16px 16px,
+    light-dark(#c8a874, #4a3b29);
 }
 .home__workGrid,
 .home__codaGrid {
@@ -162,7 +155,7 @@
 .home__spotify {
   --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.24))
     drop-shadow(0 6px 12px light-dark(rgb(0 0 0 / 0.22), rgb(0 0 0 / 0.42)));
-  --rim: 4px;
+  --rim: var(--mat);
   position: relative;
   display: grid;
   align-content: start;
@@ -241,7 +234,7 @@
   display: grid;
   grid-template-rows: 1fr auto;
   min-height: 100%;
-  padding: 8px;
+  padding: var(--mat);
   overflow: clip;
   color: var(--on);
 }
@@ -252,8 +245,9 @@
 .home__stravaRoute {
   grid-area: 1 / 1;
   min-height: 280px;
+  overflow: clip;
   pointer-events: none;
-  clip-path: var(--quad-b);
+  border-radius: var(--print-radius);
 }
 .home__stravaRoute > * {
   width: 100%;
@@ -275,11 +269,11 @@
   color: inherit;
 }
 .home__spotifyMetaInner > :nth-child(2) {
-  font-size: 24px;
+  font-size: var(--type-h2);
 }
 .home__spotifyMetaInner > :nth-child(3),
 .home__spotifyMetaInner > :nth-child(3) a {
-  font-size: 24px;
+  font-size: var(--type-h2);
 }
 .home__stravaCopy {
   display: grid;
@@ -323,7 +317,7 @@
   width: 100%;
 }
 .home__framePad {
-  padding: 14px 14px 16px;
+  padding: var(--mat-feature);
 }
 .home__frameShot {
   --ar: 2.25;
@@ -331,7 +325,7 @@
   display: block;
   aspect-ratio: var(--ar);
   overflow: clip;
-  border-radius: 8px;
+  border-radius: var(--print-radius);
 }
 .home__tagTopLeft {
   top: -12px;
@@ -411,7 +405,7 @@
 }
 .home__sideTitle {
   font-family: var(--display);
-  font-size: 19.5px;
+  font-size: var(--type-h3);
   font-weight: 700;
   line-height: 1.25;
 }
@@ -420,12 +414,12 @@
   -webkit-box-orient: vertical;
   overflow: hidden;
   -webkit-line-clamp: 2;
-  font-size: 16.5px;
-  line-height: 1.45;
+  font-size: var(--type-body);
+  line-height: 1.55;
   color: var(--soft);
 }
 .home__sideArrow {
-  font-size: 20px;
+  font-size: var(--type-h3);
   font-weight: 800;
   line-height: 1;
 }
@@ -445,8 +439,6 @@
   .home__work {
     --sp-top: 70px;
     --sp-bottom: 80px;
-    --cw: 220px;
-    --ch: 170px;
   }
   .home__moreWork {
     --sp-top: 40px;
@@ -467,7 +459,6 @@
     width: 100%;
     padding: 14px 16px 16px;
     margin: 8px 0 0;
-    font-size: 19px;
   }
   .home__portraitSlot {
     justify-self: center;

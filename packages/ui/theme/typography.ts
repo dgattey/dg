@@ -91,10 +91,8 @@ export function getTypography(): TypographyVariants {
       fontWeight: 600,
     },
     overline: {
-      fontSize: 13,
-      fontStretch: 'expanded',
-      fontVariant: 'all-small-caps',
-      fontWeight: 500,
+      fontSize: 14,
+      fontWeight: 600,
     },
   };
 }

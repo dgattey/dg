@@ -13,53 +13,77 @@ export type MoreWorkOverflowUnit = {
 
 export type ProjectFrameStyle = {
   edge: PaperEdge;
+  fieldTone: PaperTone;
   marginTop?: number;
   tagClassName: 'tagBottomLeft' | 'tagBottomRight' | 'tagTopLeft';
   tagTiltDeg: number;
-  tagTone: PaperTone;
   tiltDeg: number;
 };
+
+export function projectTagTone(fieldTone: PaperTone): PaperTone {
+  switch (fieldTone) {
+    case 'ochre':
+      return 'viridian';
+    case 'cream':
+      return 'vermilion';
+    case 'black':
+    case 'cerulean':
+    case 'cobalt':
+    case 'ultramarine':
+    case 'viridian':
+      return 'ochre';
+    case 'vermilion':
+      return 'cream';
+    case 'chartreuse':
+    case 'rose':
+      return 'black';
+    default: {
+      const exhaustiveCheck: never = fieldTone;
+      return exhaustiveCheck;
+    }
+  }
+}
 
 type ProjectFrame<Area extends string> = SlottedProject & {
   gridArea: Area;
   style: ProjectFrameStyle;
 };
 
-const WORK_FRAMES = [
+export const WORK_FRAMES = [
   {
     gridArea: 'c1',
-    style: { edge: 'quad-a', tagClassName: 'tagTopLeft', tagTiltDeg: -3, tagTone: 'ochre', tiltDeg: -0.8 },
+    style: { edge: 'quad-a', fieldTone: 'ochre', tagClassName: 'tagTopLeft', tagTiltDeg: -3, tiltDeg: -0.8 },
   },
   {
     gridArea: 'ws',
-    style: { edge: 'quad-d', tagClassName: 'tagBottomRight', tagTiltDeg: 2, tagTone: 'cream', tiltDeg: 1 },
+    style: { edge: 'quad-d', fieldTone: 'vermilion', tagClassName: 'tagBottomRight', tagTiltDeg: 2, tiltDeg: 1 },
   },
 ] satisfies ReadonlyArray<{ gridArea: 'c1' | 'ws'; style: ProjectFrameStyle }>;
 
-const MORE_WORK_FRAMES = [
+export const MORE_WORK_FRAMES = [
   {
     gridArea: 'mg',
-    style: { edge: 'quad-b', tagClassName: 'tagBottomLeft', tagTiltDeg: 3, tagTone: 'ultramarine', tiltDeg: -1.6 },
+    style: { edge: 'quad-b', fieldTone: 'ochre', tagClassName: 'tagBottomLeft', tagTiltDeg: 3, tiltDeg: -1.6 },
   },
   {
     gridArea: 'cn',
-    style: { edge: 'quad-c', marginTop: 44, tagClassName: 'tagBottomRight', tagTiltDeg: -2, tagTone: 'cream', tiltDeg: 1.4 },
+    style: { edge: 'quad-c', fieldTone: 'vermilion', marginTop: 44, tagClassName: 'tagBottomRight', tagTiltDeg: -2, tiltDeg: 1.4 },
   },
   {
     gridArea: 'js',
-    style: { edge: 'quad-d', marginTop: 10, tagClassName: 'tagTopLeft', tagTiltDeg: 2.5, tagTone: 'ochre', tiltDeg: -1 },
+    style: { edge: 'quad-d', fieldTone: 'ochre', marginTop: 10, tagClassName: 'tagTopLeft', tagTiltDeg: 2.5, tiltDeg: -1 },
   },
   {
     gridArea: 'gn',
-    style: { edge: 'quad-a', tagClassName: 'tagBottomLeft', tagTiltDeg: -2, tagTone: 'vermilion', tiltDeg: 0.7 },
+    style: { edge: 'quad-a', fieldTone: 'cream', tagClassName: 'tagBottomLeft', tagTiltDeg: -2, tiltDeg: 0.7 },
   },
 ] satisfies ReadonlyArray<{ gridArea: 'mg' | 'cn' | 'js' | 'gn'; style: ProjectFrameStyle }>;
 
 export const CODA_FRAME_STYLE: ProjectFrameStyle = {
   edge: 'quad-b',
+  fieldTone: 'ultramarine',
   tagClassName: 'tagBottomLeft',
   tagTiltDeg: 3,
-  tagTone: 'rose',
   tiltDeg: -1.4,
 };
 
@@ -119,7 +143,10 @@ export function projectTagMeta(
   project: Pick<RenderableProject, 'creationDate' | 'type'>,
 ): string | null {
   const rawType = Array.isArray(project.type) ? project.type[0] : project.type;
-  const type = typeof rawType === 'string' && rawType.length > 0 ? rawType : null;
+  const type =
+    typeof rawType === 'string' && rawType.length > 0
+      ? rawType.charAt(0).toUpperCase() + rawType.slice(1).toLowerCase()
+      : null;
   const year = project.creationDate?.match(/^(\d{4})/)?.[1];
   return type && year ? `${type} · ${year}` : null;
 }
