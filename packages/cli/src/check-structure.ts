@@ -7,11 +7,6 @@ export const MAX_SOURCE_FILE_LINES = 350;
 export const MAX_TEST_FILE_LINES = 500;
 
 const LEGACY_LINE_COUNT_ALLOWLIST: Record<string, number> = {
-  'apps/web/src/app/(classic)/music/albums/AlbumWell.tsx': 360,
-  'apps/web/src/app/(classic)/music/albums/FavoriteAlbumsGrid.tsx': 460,
-  'packages/ui/core/ColorSchemeToggleClient.tsx': 380,
-  'packages/ui/core/GlassSwitcher.tsx': 430,
-  'packages/ui/dependent/Link.tsx': 370,
   'packages/ui/theme/css.tsx': 455,
 };
 

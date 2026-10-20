@@ -1,104 +1,10 @@
-import type { RenderableLink } from '@dg/content-models/contentful/renderables/links';
 import { devConsoleRoute } from '@dg/shared-core/routes/app';
-import type { SiteSurface } from '@dg/shared-core/siteSurface';
-import { Box } from '@dg/ui/core/Box';
-import { Container } from '@dg/ui/core/Container';
-import { Divider } from '@dg/ui/core/Divider';
-import { Nav, NavGroup, NavItem } from '@dg/ui/core/Nav';
-import { Section } from '@dg/ui/core/Section';
-import { Stack } from '@dg/ui/core/Stack';
-import {
-  pinnedChromeSx,
-  SITE_FOOTER_VIEW_TRANSITION_NAME,
-} from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
-import type { SxObject } from '@dg/ui/theme';
 import { cacheLife } from 'next/cache';
 import { getFooterLinks } from '../../services/contentful';
 import { getAppVersionInfo } from '../../services/version';
 import { PaperCard } from '../collage/PaperCard';
-import { FOOTER_ICON_DESKTOP_FONT_SIZE, FOOTER_ICON_FONT_SIZE } from './footerIconSize';
 
-const navItemNoPaddingSx: SxObject = {
-  padding: 0,
-};
-
-const getFooterLinkSx = (hasIcon: boolean): SxObject => ({
-  alignItems: 'center',
-  display: 'flex',
-  fontSize: hasIcon ? { sm: FOOTER_ICON_DESKTOP_FONT_SIZE, xs: FOOTER_ICON_FONT_SIZE } : undefined,
-  justifyContent: 'center',
-  // Slightly tighter on mobile so the icon row fits; 36px is below the
-  // ideal 44px a11y target (desktop stays at 40, already a trade-off).
-  minHeight: { sm: 40, xs: 36 },
-  minWidth: { sm: 40, xs: 36 },
-});
-
-const footerSectionSx: SxObject = {
-  marginTop: 12,
-};
-
-const footerContainerSx: SxObject = {
-  padding: 0,
-};
-
-const siteFooterSx: SxObject = pinnedChromeSx(SITE_FOOTER_VIEW_TRANSITION_NAME);
-
-const dividerSx: SxObject = {
-  marginBottom: 3,
-};
-
-const footerNavSx: SxObject = {
-  alignItems: { sm: 'center', xs: 'stretch' },
-  columnGap: 3,
-  flexDirection: { sm: 'row', xs: 'column-reverse' },
-  flexWrap: 'wrap-reverse',
-};
-
-const footerNavGroupSx: SxObject = {
-  columnGap: 2,
-};
-
-const footerLinkListSx: SxObject = {
-  margin: 0,
-  padding: 0,
-};
-
-const footerIconLinkListSx: SxObject = {
-  flex: 1,
-  justifyContent: 'space-between',
-  margin: 0,
-  marginLeft: { sm: -2.5, xs: -3 },
-  marginRight: { sm: -1.5, xs: -2 },
-  padding: 0,
-};
-
-/**
- * Creates a singular footer link with top-positioned tooltip
- */
-function FooterLink({ link }: { link: RenderableLink }) {
-  const { title, url, icon } = link;
-  return (
-    <NavItem sx={navItemNoPaddingSx}>
-      <Link
-        aria-label={title}
-        color="secondary"
-        href={url}
-        icon={icon ?? undefined}
-        isExternal={url.startsWith('http')}
-        layout="icon"
-        sx={getFooterLinkSx(Boolean(icon))}
-        title={title}
-        tooltipPlacement="top"
-        variant="caption"
-      />
-    </NavItem>
-  );
-}
-
-/**
- * Returns the current year for copyright display, cached to avoid prerender issues.
- */
 // biome-ignore lint/suspicious/useAwait: 'use cache' requires async
 async function getCopyrightYear() {
   'use cache';
@@ -106,10 +12,7 @@ async function getCopyrightYear() {
   return new Date().getFullYear();
 }
 
-/**
- * Creates the site footer component - shows version data + copyright
- */
-export async function Footer({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
+export async function Footer() {
   const [footerLinks, versionInfo, currentYear] = await Promise.all([
     getFooterLinks(),
     getAppVersionInfo(),
@@ -117,123 +20,55 @@ export async function Footer({ surface = 'classic' }: { surface?: SiteSurface } 
   ]);
   const nonIconFooterLinks = footerLinks.filter((link) => !link.icon);
   const iconFooterLinks = footerLinks.filter((link) => link.icon);
-  const releaseUrl = versionInfo.releaseUrl;
-  const version = versionInfo.version;
-
-  if (surface === 'collage') {
-    return (
-      <footer className="chrome__footer">
-        <PaperCard className="collageMeasure" edge="soft-b" tiltDeg={-0.5} tone="black">
-          <div className="chrome__stripInner">
-            <div className="chrome__stripMeta">
-              <span>© {currentYear} Dylan Gattey</span>
-              {version ? (
-                <>
-                  <span className="chrome__dot">•</span>
-                  {releaseUrl ? (
-                    <Link
-                      href={releaseUrl}
-                      isExternal
-                      title={`GitHub release ${version}`}
-                      variant="caption"
-                    >
-                      {version}
-                    </Link>
-                  ) : (
-                    version
-                  )}
-                </>
-              ) : null}
-              {process.env.NODE_ENV !== 'production' ? (
-                <>
-                  <span className="chrome__dot">•</span>
-                  <Link forcePageNavigation href={devConsoleRoute} title="Developer tools">
-                    Dev console
-                  </Link>
-                </>
-              ) : null}
-            </div>
-            <div className="chrome__links">
-              {[...nonIconFooterLinks, ...iconFooterLinks].map((link) => (
-                <Link
-                  href={link.url}
-                  icon={link.icon ?? undefined}
-                  isExternal={link.url.startsWith('http')}
-                  key={link.url}
-                  layout="icon"
-                  title={link.title}
-                  tooltipPlacement="top"
-                />
-              ))}
-            </div>
-          </div>
-        </PaperCard>
-      </footer>
-    );
-  }
+  const { releaseUrl, version } = versionInfo;
 
   return (
-    <Section sx={footerSectionSx}>
-      <Container sx={footerContainerSx}>
-        <Box component="footer" sx={siteFooterSx}>
-          <Divider sx={dividerSx} />
-          <Nav sx={footerNavSx}>
-            <NavGroup>
-              <NavItem>© {currentYear} Dylan Gattey</NavItem>
-              {version ? (
-                <>
-                  <NavItem sx={navItemNoPaddingSx}>•</NavItem>
-                  <NavItem>
-                    {releaseUrl ? (
-                      <Link
-                        aria-label={`GitHub release ${version}`}
-                        color="inherit"
-                        href={releaseUrl}
-                        isExternal
-                        title={`GitHub release ${version}`}
-                        variant="caption"
-                      >
-                        {version}
-                      </Link>
-                    ) : (
-                      version
-                    )}
-                  </NavItem>
-                </>
-              ) : null}
-              {process.env.NODE_ENV !== 'production' ? (
-                <>
-                  <NavItem sx={navItemNoPaddingSx}>•</NavItem>
-                  <NavItem>
-                    <Link
-                      aria-label="Developer tools"
-                      color="inherit"
-                      forcePageNavigation
-                      href={devConsoleRoute}
-                      title="Developer tools"
-                      variant="caption"
-                    >
-                      Dev console
-                    </Link>
-                  </NavItem>
-                </>
-              ) : null}
-            </NavGroup>
-            <NavGroup component="div" sx={footerNavGroupSx}>
-              <Stack component="ul" direction="row" sx={footerLinkListSx}>
-                {nonIconFooterLinks?.map((link) => (
-                  <FooterLink key={link.url} link={link} />
-                ))}
-              </Stack>
-              <Stack component="ul" direction="row" sx={footerIconLinkListSx}>
-                {iconFooterLinks?.map((link) => (
-                  <FooterLink key={link.url} link={link} />
-                ))}
-              </Stack>
-            </NavGroup>
-          </Nav>
-        </Box>
-      </Container>
-    </Section>
+    <footer className="chrome__footer">
+      <PaperCard className="collageMeasure" edge="soft-b" tiltDeg={-0.5} tone="black">
+        <div className="chrome__stripInner">
+          <div className="chrome__stripMeta">
+            <span>© {currentYear} Dylan Gattey</span>
+            {version ? (
+              <>
+                <span className="chrome__dot">•</span>
+                {releaseUrl ? (
+                  <Link
+                    href={releaseUrl}
+                    isExternal
+                    title={`GitHub release ${version}`}
+                    variant="caption"
+                  >
+                    {version}
+                  </Link>
+                ) : (
+                  version
+                )}
+              </>
+            ) : null}
+            {process.env.NODE_ENV !== 'production' ? (
+              <>
+                <span className="chrome__dot">•</span>
+                <Link forcePageNavigation href={devConsoleRoute} title="Developer tools">
+                  Dev console
+                </Link>
+              </>
+            ) : null}
+          </div>
+          <div className="chrome__links">
+            {[...nonIconFooterLinks, ...iconFooterLinks].map((link) => (
+              <Link
+                href={link.url}
+                icon={link.icon ?? undefined}
+                isExternal={link.url.startsWith('http')}
+                key={link.url}
+                layout="icon"
+                title={link.title}
+                tooltipPlacement="top"
+              />
+            ))}
+          </div>
+        </div>
+      </PaperCard>
+    </footer>
   );
 }

@@ -1,6 +1,5 @@
 'use client';
 
-import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
 import { useColorScheme } from '@dg/ui/theme/useColorScheme';
@@ -91,11 +90,10 @@ function tileUrl({
 export type RouteMapProps = {
   points: Array<Point>;
   tileSource: TileSource;
-  surface?: SiteSurface;
 };
 
 /** A non-interactive, theme-aware route map intended for card backgrounds. */
-export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapProps) {
+export function RouteMap({ points, tileSource }: RouteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ height: DEFAULT_SIZE, width: DEFAULT_SIZE });
   const { preference } = useColorScheme();
@@ -105,7 +103,7 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
     getServerSystemDarkSnapshot,
   );
   const dark = preference === 'dark' || (preference === 'system' && systemDark);
-  const tokens = getRouteMapTokens(surface, dark);
+  const tokens = getRouteMapTokens(dark);
   const viewport = fitRouteViewport({
     height: size.height,
     padding: ROUTE_PADDING,
@@ -161,7 +159,8 @@ export function RouteMap({ points, tileSource, surface = 'classic' }: RouteMapPr
       backgroundColor: 'transparent !important',
       // Pigeon re-measures its root with getBoundingClientRect, which grows under a
       // rotated collage card and feeds back into its own inline size every frame.
-      ...(surface === 'classic' ? {} : { height: '100% !important', width: '100% !important' }),
+      height: '100% !important',
+      width: '100% !important',
     },
     filter: tokens.tileFilter,
     inset: 0,

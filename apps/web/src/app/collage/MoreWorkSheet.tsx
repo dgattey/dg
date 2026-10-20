@@ -1,5 +1,5 @@
 import { type CSSProperties, Fragment, type ReactNode } from 'react';
-import { ProjectCard } from '../home/ProjectCard';
+import { CollageProjectFrame } from './CollageProjectFrame';
 import { CutOut } from './CutOut';
 import { CUT_OUT_PLACEMENTS, moreWorkOverflowPlacements } from './cutOutPlacements';
 import {
@@ -49,12 +49,11 @@ function MoreWorkGrid({
           return null;
         }
         return (
-          <ProjectCard
-            {...frame.project}
+          <CollageProjectFrame
             data-slot={frame.gridArea}
             key={frame.key}
+            project={frame.project}
             style={frame.style}
-            surface="collage"
           />
         );
       })}

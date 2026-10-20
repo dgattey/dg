@@ -1,9 +1,9 @@
 import { CUT_OUT_SHAPE_NAMES, CUT_OUT_SHAPES, cutOutSymbolId } from './cutOutShapes';
 
-export const COLLAGE_PEBBLE_CLIP_ID = 'collage-pebble-clip';
-export const COLLAGE_DISC_CLIP_ID = 'collage-disc-clip';
-export const COLLAGE_PORTRAIT_CLIP_ID = 'collage-portrait-clip';
-export const COLLAGE_ROUGH_FILTER_ID = 'collage-rough';
+const COLLAGE_PEBBLE_CLIP_ID = 'collage-pebble-clip';
+const COLLAGE_DISC_CLIP_ID = 'collage-disc-clip';
+const COLLAGE_PORTRAIT_CLIP_ID = 'collage-portrait-clip';
+const COLLAGE_ROUGH_FILTER_ID = 'collage-rough';
 
 export function CutOutSymbols() {
   return (

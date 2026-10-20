@@ -16,17 +16,15 @@ const activity: StravaActivity = {
 };
 
 describe('StravaCard', () => {
-  it('keeps the standard card treatment when the activity has no route', () => {
+  it('omits the route map when the activity has no route', () => {
     render(<StravaCard activity={{ ...activity, map: null }} />);
 
-    expect(screen.getByRole('link', { name: 'Morning run' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Morning run on Strava' })).toBeInTheDocument();
     expect(screen.queryByTestId('route-map')).not.toBeInTheDocument();
   });
 
-  it('links the whole collage card to the activity, with no nested links', () => {
-    render(
-      <StravaCard activity={{ ...activity, description: 'Hills', map: null }} surface="collage" />,
-    );
+  it('links the whole card to the activity, with no nested links', () => {
+    render(<StravaCard activity={{ ...activity, description: 'Hills', map: null }} />);
 
     const links = screen.getAllByRole('link');
     expect(links).toHaveLength(1);

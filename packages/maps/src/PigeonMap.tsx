@@ -1,7 +1,6 @@
 'use client';
 
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
-import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
 import { Overlay, Map as PigeonMapCore } from 'pigeon-maps';
@@ -12,14 +11,10 @@ import { WatercolorTile } from './WatercolorTile';
 import { ZoomControls } from './ZoomControls';
 
 const containerSx: SxObject = {
+  backgroundColor: 'var(--ultramarine)',
   height: '100%',
   position: 'relative',
   width: '100%',
-};
-
-const collageContainerSx: SxObject = {
-  ...containerSx,
-  backgroundColor: 'var(--ultramarine)',
 };
 
 const DEFAULT_MIN_ZOOM = 3;
@@ -28,14 +23,13 @@ const DEFAULT_MAX_ZOOM = 18;
 export type PigeonMapProps = {
   location: MapLocation;
   tileSource: TileSource;
-  surface?: SiteSurface;
 };
 
 /**
  * Lightweight map component using Pigeon Maps with Stamen Watercolor tiles
  * and terrain labels overlay. Zoom range is driven by zoomLevels from Contentful.
  */
-export function PigeonMap({ location, tileSource, surface = 'classic' }: PigeonMapProps) {
+export function PigeonMap({ location, tileSource }: PigeonMapProps) {
   const [center, setCenter] = useState<[number, number]>([
     location.point.latitude,
     location.point.longitude,
@@ -60,7 +54,7 @@ export function PigeonMap({ location, tileSource, surface = 'classic' }: PigeonM
   };
 
   return (
-    <Box sx={surface === 'collage' ? collageContainerSx : containerSx}>
+    <Box sx={containerSx}>
       <PigeonMapCore
         attribution={false}
         center={center}
@@ -87,7 +81,7 @@ export function PigeonMap({ location, tileSource, surface = 'classic' }: PigeonM
           <Marker image={location.image} />
         </Overlay>
       </PigeonMapCore>
-      <ZoomControls onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} surface={surface} />
+      <ZoomControls onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} />
     </Box>
   );
 }

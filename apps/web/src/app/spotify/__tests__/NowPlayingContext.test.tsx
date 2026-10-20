@@ -45,7 +45,7 @@ describe('NowPlayingProvider', () => {
   it('updates both the header card and the body card when the live track streams in', () => {
     render(
       <NowPlayingProvider>
-        <SpotifyHeaderCard surface="collage" track={STALE} />
+        <SpotifyHeaderCard track={STALE} />
         <SpotifyCollageCard track={STALE} />
         <PublishNowPlaying track={FRESH} />
       </NowPlayingProvider>,
@@ -58,7 +58,7 @@ describe('NowPlayingProvider', () => {
   it('follows the live publisher when the server sends the next track', () => {
     const { rerender } = render(
       <NowPlayingProvider>
-        <SpotifyHeaderCard surface="collage" track={STALE} />
+        <SpotifyHeaderCard track={STALE} />
         <SpotifyCollageCard track={STALE} />
       </NowPlayingProvider>,
     );
@@ -67,7 +67,7 @@ describe('NowPlayingProvider', () => {
 
     rerender(
       <NowPlayingProvider>
-        <SpotifyHeaderCard surface="collage" track={STALE} />
+        <SpotifyHeaderCard track={STALE} />
         <SpotifyCollageCard track={STALE} />
         <PublishNowPlaying track={FRESH} />
       </NowPlayingProvider>,
@@ -86,15 +86,14 @@ describe('NowPlayingProvider', () => {
   it('switches the shell track to the live one without the shell overwriting it', () => {
     const { rerender } = render(
       <NowPlayingProvider>
-        <SpotifyHeaderCard surface="collage" track={STALE} />
+        <SpotifyHeaderCard track={STALE} />
       </NowPlayingProvider>,
     );
     expect(screen.getByTestId('compact')).toHaveTextContent('Track stale');
 
-    // A refresh re-sends the shell's minutes-cached track as a new object.
     rerender(
       <NowPlayingProvider>
-        <SpotifyHeaderCard surface="collage" track={{ ...STALE }} />
+        <SpotifyHeaderCard track={{ ...STALE }} />
         <PublishNowPlaying track={FRESH} />
       </NowPlayingProvider>,
     );
@@ -102,7 +101,7 @@ describe('NowPlayingProvider', () => {
 
     rerender(
       <NowPlayingProvider>
-        <SpotifyHeaderCard surface="collage" track={{ ...STALE }} />
+        <SpotifyHeaderCard track={{ ...STALE }} />
         <PublishNowPlaying track={FRESH} />
       </NowPlayingProvider>,
     );
@@ -112,7 +111,7 @@ describe('NowPlayingProvider', () => {
   it('shows the live track when the shell had none', () => {
     render(
       <NowPlayingProvider>
-        <SpotifyHeaderCard surface="collage" track={null} />
+        <SpotifyHeaderCard track={null} />
         <PublishNowPlaying track={FRESH} />
       </NowPlayingProvider>,
     );
@@ -122,7 +121,7 @@ describe('NowPlayingProvider', () => {
   it('renders nothing without any track', () => {
     render(
       <NowPlayingProvider>
-        <SpotifyHeaderCard surface="collage" track={null} />
+        <SpotifyHeaderCard track={null} />
       </NowPlayingProvider>,
     );
     expect(screen.queryByTestId('compact')).not.toBeInTheDocument();

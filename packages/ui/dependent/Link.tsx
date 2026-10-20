@@ -2,7 +2,6 @@ import { Send } from 'lucide-react';
 import NextLink from 'next/link';
 import React from 'react';
 import { Box } from '../core/Box';
-import { Button, type ButtonProps } from '../core/Button';
 import type { TooltipPlacement } from '../core/Tooltip';
 import { Tooltip } from '../core/Tooltip';
 import { Typography, type TypographyVariant } from '../core/Typography';
@@ -106,12 +105,6 @@ export type BaseLinkProps = {
    */
   'aria-current'?: 'page';
 };
-
-/**
- * Either a standard link or a button-styled link
- */
-type LinkProps = BaseLinkProps &
-  ({ isButton: true; buttonProps?: ButtonProps<'a'> } | { isButton?: false; buttonProps?: never });
 
 const PALETTE_LINK_COLORS = new Set([
   'primary',
@@ -260,19 +253,17 @@ function wrapWithTooltip(
 /**
  * Server-compatible Link component with Next.js navigation and theme styling.
  */
-export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link(
+export const Link = React.forwardRef<HTMLAnchorElement, BaseLinkProps>(function Link(
   {
     title,
     href,
     icon,
     children,
-    isButton,
     isExternal,
     forcePageNavigation,
     layout: initialLayout = 'text',
     className,
     sx,
-    buttonProps,
     color = 'inherit',
     underline = 'hover',
     variant,
@@ -309,21 +300,6 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
   const mergedLinkSx = buildLinkSx(color, underline, sx);
   const wrap = (el: React.ReactElement) =>
     wrapWithTooltip(el, showTooltip, title, tooltipPlacement, tooltipId);
-
-  if (isButton) {
-    const shared = { ...buttonProps, ...anchorProps, children: contents, className, href, sx };
-    return wrap(
-      isExternal || forcePageNavigation ? (
-        <Button {...shared} component="a" {...externalProps} />
-      ) : (
-        <Button
-          {...shared}
-          component={NextLink}
-          transitionTypes={transitionTypes ? [...transitionTypes] : undefined}
-        />
-      ),
-    );
-  }
 
   if (isExternal || forcePageNavigation) {
     return wrap(

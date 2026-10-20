@@ -3,14 +3,13 @@ import 'server-only';
 import {
   favoriteAlbumsRoute,
   homeRoute,
-  isMarkdownPagePath,
   type MarkdownPagePath,
   musicRoute,
 } from '@dg/shared-core/routes/app';
 import { cacheLife } from 'next/cache';
-import { getFavoriteAlbumsMarkdown } from '../(classic)/music/albums/favoriteAlbumsMarkdown';
-import { getMusicMarkdown } from '../(classic)/music/musicMarkdown';
 import { getHomepageMarkdown } from '../home/homepageMarkdown';
+import { getFavoriteAlbumsMarkdown } from '../music/albums/favoriteAlbumsMarkdown';
+import { getMusicMarkdown } from '../music/musicMarkdown';
 
 /**
  * Wires each registered public path to the Markdown module next to that page.
@@ -34,11 +33,4 @@ export async function getPageMarkdown(pathname: MarkdownPagePath): Promise<strin
   'use cache';
   cacheLife('hours');
   return await pageMarkdownGenerators[pathname]();
-}
-
-export function tryGetPageMarkdown(pathname: string): Promise<string | null> {
-  if (!isMarkdownPagePath(pathname)) {
-    return Promise.resolve(null);
-  }
-  return getPageMarkdown(pathname);
 }

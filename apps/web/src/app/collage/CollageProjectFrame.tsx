@@ -6,7 +6,7 @@ import { PaperTag } from './PaperTag';
 import { cx } from './paperVars';
 import { type ProjectFrameStyle, projectFrameAspectRatio, projectTagMeta } from './projectSlots';
 
-export type CollageProjectSlot = 'c1' | 'cn' | 'gn' | 'js' | 'li' | 'mg' | 'ws';
+type CollageProjectSlot = 'c1' | 'cn' | 'gn' | 'js' | 'li' | 'mg' | 'ws';
 
 export function CollageProjectFrame({
   className,

@@ -34,19 +34,6 @@ describe('SiteHeaderHeight', () => {
     expect(document.documentElement).toHaveStyle({ '--site-header-height': '84px' });
   });
 
-  it('publishes the height of the section around the classic site header', () => {
-    render(
-      <>
-        <SiteHeaderHeight />
-        <section>
-          <header data-site-header />
-        </section>
-      </>,
-    );
-
-    expect(document.documentElement).toHaveStyle({ '--site-header-height': '84px' });
-  });
-
   it('does not publish a height without a header marker', () => {
     render(<SiteHeaderHeight />);
 

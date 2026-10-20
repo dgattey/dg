@@ -1,16 +1,12 @@
 import 'server-only';
 
 import { MapCard } from '@dg/maps/MapCard';
-import type { SiteSurface } from '@dg/shared-core/siteSurface';
 import { getCurrentLocation } from '../../services/contentful';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 
-export async function MapCardSlot({ surface = 'classic' }: { surface?: SiteSurface } = {}) {
+export async function MapCardSlot() {
   const location = await getCurrentLocation();
-  if (surface !== 'collage') {
-    return <MapCard location={location} surface="classic" />;
-  }
   if (!location) {
     return null;
   }
@@ -23,7 +19,7 @@ export async function MapCardSlot({ surface = 'classic' }: { surface?: SiteSurfa
         tiltDeg={1.6}
         tone="cream"
       >
-        <MapCard location={location} surface="collage" />
+        <MapCard location={location} />
       </PaperCard>
       <PaperTag className="collagePin home__mapTag" edge="quad-c" tiltDeg={-2} tone="cream">
         <span>Home</span>

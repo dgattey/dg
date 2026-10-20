@@ -118,14 +118,6 @@ html[data-color-scheme="dark"] .collageRoot::after {
   clip-path: var(--torn-c);
 }
 
-/*
- * Like the header, a pinned collage bar is just its paper chip: a full-width
- * band would cover the page title and everything scrolling beside the chip.
- */
-[data-site-surface="collage"] > :is([data-sticky-surface], [data-sticky-fade]) {
-  display: none;
-}
-
 .collageBleed {
   position: relative;
   left: 50%;
@@ -176,7 +168,6 @@ html:not(:active-view-transition-type(album-open, album-close))
   clip-path: var(--clip, var(--quad-a));
   rotate: none;
 }
-/* The music card keeps the classic card's album-contrast text colors. */
 .paperInner [data-typography]:not(.home__spotifyMetaInner *) {
   color: inherit;
 }

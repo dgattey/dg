@@ -6,19 +6,15 @@ import type { ComponentProps, ReactNode } from 'react';
 import { MusicNotes } from './MusicNotes';
 import { useWaveformBounce } from './useWaveformBounce';
 
-/** z-index for notes (behind art) and art (above notes) — shared with card and header */
-export const SPOTIFY_ART_NOTES_Z_INDEX = 0;
-export const SPOTIFY_ART_ABOVE_NOTES_Z_INDEX = 2;
+const SPOTIFY_ART_NOTES_Z_INDEX = 0;
+const SPOTIFY_ART_ABOVE_NOTES_Z_INDEX = 2;
 
 type AlbumArtWithNotesProps = {
-  /** Scales the bounce, so small art moves enough to read as a beat. Default 1. */
   bounceIntensity?: number;
   children: ReactNode;
   isPlaying: boolean;
-  /** Override note color. Defaults to inherited text color. */
   noteColor?: string;
   notesVariant?: ComponentProps<typeof MusicNotes>['variant'];
-  /** When false, notes and bounce are off (e.g. when off-screen). Default true. */
   shouldAnimate?: boolean;
   wrapperSx: SxObject;
 };
@@ -41,16 +37,12 @@ const bounceWrapperSx: SxObject = {
   zIndex: SPOTIFY_ART_ABOVE_NOTES_Z_INDEX,
 };
 
-/**
- * Shared frame for Spotify album art: notes layer behind, bounce wrapper, then art.
- * Used by both the now-playing card and the header thumbnail.
- */
 export function AlbumArtWithNotes({
   bounceIntensity,
   children,
   isPlaying,
   noteColor,
-  notesVariant = 'default',
+  notesVariant = 'collage',
   shouldAnimate = true,
   wrapperSx,
 }: AlbumArtWithNotesProps) {

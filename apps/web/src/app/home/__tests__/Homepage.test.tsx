@@ -1,7 +1,7 @@
 import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
-import { ColorSchemeToggleClient } from '@dg/ui/core/ColorSchemeToggleClient';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { CollageColorSchemeFieldset } from '../../collage/CollageColorSchemeFieldset';
 import { IntroCard } from '../IntroCard';
 
 const mockSetPreference = jest.fn();
@@ -63,19 +63,14 @@ describe('Homepage basics', () => {
     render(
       <>
         <IntroCard introBlock={introBlock} linkedInLink={null} />
-        <ColorSchemeToggleClient />
+        <CollageColorSchemeFieldset />
       </>,
     );
 
     expect(screen.getByText('About me')).toBeInTheDocument();
 
-    // The picker is collapsed until its trigger is pressed
-    await user.click(screen.getByRole('button', { name: 'Color scheme: system' }));
-
-    const themePicker = screen.getByRole('radiogroup', {
-      name: 'Choose color scheme',
-    });
-    await user.click(within(themePicker).getByRole('radio', { name: 'Dark' }));
+    const schemeGroup = screen.getByRole('group', { name: 'Color scheme' });
+    await user.click(within(schemeGroup).getByRole('radio', { name: 'Dark' }));
 
     expect(mockSetPreference).toHaveBeenCalledWith('dark');
   });
