@@ -13,10 +13,10 @@ export type MoreWorkOverflowUnit = {
 
 export type ProjectFrameStyle = {
   edge: PaperEdge;
+  fieldTone: PaperTone;
   marginTop?: number;
   tagClassName: 'tagBottomLeft' | 'tagBottomRight' | 'tagTopLeft';
   tagTiltDeg: number;
-  tagTone: PaperTone;
   tiltDeg: number;
 };
 
@@ -25,41 +25,105 @@ type ProjectFrame<Area extends string> = SlottedProject & {
   style: ProjectFrameStyle;
 };
 
+export function projectTabTone(fieldTone: PaperTone): PaperTone {
+  switch (fieldTone) {
+    case 'ochre':
+      return 'viridian';
+    case 'cream':
+      return 'vermilion';
+    case 'black':
+    case 'cerulean':
+    case 'cobalt':
+    case 'viridian':
+    case 'leaf':
+    case 'ultramarine':
+      return 'ochre';
+    case 'vermilion':
+    case 'olive':
+      return 'cream';
+    case 'rose':
+    case 'chartreuse':
+      return 'black';
+    default: {
+      const exhaustive: never = fieldTone;
+      return exhaustive;
+    }
+  }
+}
+
 const WORK_FRAMES = [
   {
     gridArea: 'c1',
-    style: { edge: 'quad-a', tagClassName: 'tagTopLeft', tagTiltDeg: -3, tagTone: 'ochre', tiltDeg: -0.8 },
+    style: {
+      edge: 'quad-a',
+      fieldTone: 'ultramarine',
+      tagClassName: 'tagTopLeft',
+      tagTiltDeg: -3,
+      tiltDeg: -0.8,
+    },
   },
   {
     gridArea: 'ws',
-    style: { edge: 'quad-d', tagClassName: 'tagBottomRight', tagTiltDeg: 2, tagTone: 'cream', tiltDeg: 1 },
+    style: {
+      edge: 'quad-d',
+      fieldTone: 'ultramarine',
+      tagClassName: 'tagBottomRight',
+      tagTiltDeg: 2,
+      tiltDeg: 1,
+    },
   },
 ] satisfies ReadonlyArray<{ gridArea: 'c1' | 'ws'; style: ProjectFrameStyle }>;
 
 const MORE_WORK_FRAMES = [
   {
     gridArea: 'mg',
-    style: { edge: 'quad-b', tagClassName: 'tagBottomLeft', tagTiltDeg: 3, tagTone: 'ultramarine', tiltDeg: -1.6 },
+    style: {
+      edge: 'quad-b',
+      fieldTone: 'ochre',
+      tagClassName: 'tagBottomLeft',
+      tagTiltDeg: 3,
+      tiltDeg: -1.6,
+    },
   },
   {
     gridArea: 'cn',
-    style: { edge: 'quad-c', marginTop: 44, tagClassName: 'tagBottomRight', tagTiltDeg: -2, tagTone: 'cream', tiltDeg: 1.4 },
+    style: {
+      edge: 'quad-c',
+      fieldTone: 'cream',
+      marginTop: 44,
+      tagClassName: 'tagBottomRight',
+      tagTiltDeg: -2,
+      tiltDeg: 1.4,
+    },
   },
   {
     gridArea: 'js',
-    style: { edge: 'quad-d', marginTop: 10, tagClassName: 'tagTopLeft', tagTiltDeg: 2.5, tagTone: 'ochre', tiltDeg: -1 },
+    style: {
+      edge: 'quad-d',
+      fieldTone: 'ochre',
+      marginTop: 10,
+      tagClassName: 'tagTopLeft',
+      tagTiltDeg: 2.5,
+      tiltDeg: -1,
+    },
   },
   {
     gridArea: 'gn',
-    style: { edge: 'quad-a', tagClassName: 'tagBottomLeft', tagTiltDeg: -2, tagTone: 'vermilion', tiltDeg: 0.7 },
+    style: {
+      edge: 'quad-a',
+      fieldTone: 'cream',
+      tagClassName: 'tagBottomLeft',
+      tagTiltDeg: -2,
+      tiltDeg: 0.7,
+    },
   },
 ] satisfies ReadonlyArray<{ gridArea: 'mg' | 'cn' | 'js' | 'gn'; style: ProjectFrameStyle }>;
 
 export const CODA_FRAME_STYLE: ProjectFrameStyle = {
   edge: 'quad-b',
+  fieldTone: 'cream',
   tagClassName: 'tagBottomLeft',
   tagTiltDeg: 3,
-  tagTone: 'rose',
   tiltDeg: -1.4,
 };
 

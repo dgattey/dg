@@ -1,11 +1,14 @@
 import type { RenderableProject } from '@dg/content-models/contentful/renderables/projects';
 import {
   assignProjectSlots,
+  CODA_FRAME_STYLE,
   moreWorkFrames,
   projectFrameAspectRatio,
+  projectTabTone,
   projectTagMeta,
   workSheetFrames,
 } from '../projectSlots';
+import { PAPER_TONES } from '../types';
 
 function projects(count: number): Array<RenderableProject> {
   return Array.from({ length: count }, (_, index) => ({
@@ -50,5 +53,32 @@ describe('projectSlots', () => {
       'Website · 2026',
     );
     expect(projectTagMeta({ creationDate: null, type: 'Website' })).toBeNull();
+  });
+
+  it('derives a contrasting tab tone for every paper tone and every project slot', () => {
+    expect(projectTabTone('ochre')).toBe('viridian');
+    expect(projectTabTone('cream')).toBe('vermilion');
+    expect(projectTabTone('black')).toBe('ochre');
+    expect(projectTabTone('cerulean')).toBe('ochre');
+    expect(projectTabTone('viridian')).toBe('ochre');
+    expect(projectTabTone('vermilion')).toBe('cream');
+    expect(projectTabTone('rose')).toBe('black');
+    expect(projectTabTone('chartreuse')).toBe('black');
+    expect(projectTabTone('ultramarine')).toBe('ochre');
+
+    for (const tone of PAPER_TONES) {
+      expect(projectTabTone(tone)).not.toBe(tone);
+    }
+
+    const slots = assignProjectSlots(projects(7));
+    const allStyles = [
+      ...workSheetFrames(slots.work).map(({ style }) => style),
+      ...moreWorkFrames(slots.moreWork).map(({ style }) => style),
+      CODA_FRAME_STYLE,
+    ];
+
+    for (const style of allStyles) {
+      expect(projectTabTone(style.fieldTone)).not.toBe(style.fieldTone);
+    }
   });
 });

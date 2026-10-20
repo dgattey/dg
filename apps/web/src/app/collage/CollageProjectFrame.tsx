@@ -4,7 +4,12 @@ import type { CSSProperties } from 'react';
 import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
 import { cx } from './paperVars';
-import { type ProjectFrameStyle, projectFrameAspectRatio, projectTagMeta } from './projectSlots';
+import {
+  type ProjectFrameStyle,
+  projectFrameAspectRatio,
+  projectTabTone,
+  projectTagMeta,
+} from './projectSlots';
 
 type CollageProjectSlot = 'c1' | 'cn' | 'gn' | 'js' | 'li' | 'mg' | 'ws';
 
@@ -32,10 +37,10 @@ export function CollageProjectFrame({
       className={cx('collagePin', `home__${style.tagClassName}`)}
       edge="quad-c"
       tiltDeg={style.tagTiltDeg}
-      tone={style.tagTone}
+      tone={projectTabTone(style.fieldTone)}
     >
       <span>{project.title}</span>
-      {meta ? <small>{meta}</small> : null}
+      {meta ? <small className="home__projectMeta">{meta}</small> : null}
     </PaperTag>
   );
   const frame = (
