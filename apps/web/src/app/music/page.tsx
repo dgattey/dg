@@ -1,4 +1,5 @@
 import 'server-only';
+import './music.css';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { devConsoleRoute, musicRoute } from '@dg/shared-core/routes/app';
