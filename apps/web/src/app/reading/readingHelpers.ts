@@ -105,7 +105,7 @@ export function formatFinishedMonthYear(isoDate: string | null | undefined): str
   if (!isoDate) {
     return null;
   }
-  const match = isoDate.match(/^(\d{4})-(\d{2})/);
+  const match = isoDate.match(/^(\d{4})-(\d{2})(?:-(\d{2}))?/);
   if (!match?.[1] || !match[2]) {
     return null;
   }
@@ -113,6 +113,12 @@ export function formatFinishedMonthYear(isoDate: string | null | undefined): str
   const monthName = MONTH_ABBREVS[monthIdx];
   if (!monthName) {
     return match[1];
+  }
+  if (match[3]) {
+    const day = Number.parseInt(match[3], 10);
+    if (day > 0) {
+      return `${monthName} ${day}, ${match[1]}`;
+    }
   }
   return `${monthName} ${match[1]}`;
 }

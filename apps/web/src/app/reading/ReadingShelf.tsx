@@ -25,7 +25,7 @@ type CoverTiltStyle = CSSProperties & {
   '--cover-r': string;
 };
 
-function StarRating({ rating, size = 14 }: { rating: number | null; size?: number }) {
+function StarRating({ rating, size = 15 }: { rating: number | null; size?: number }) {
   if (rating === null || rating < 1) {
     return null;
   }
@@ -98,7 +98,7 @@ function LatestFeatureCard({ book }: { book: RenderableBook }) {
       </div>
       <section aria-label={`Latest read: ${book.title}`} className="reading__featureBody">
         <div className="reading__featureKicker">
-          <svg aria-hidden="true" fill="currentColor" height={15} viewBox="0 0 100 100" width={15}>
+          <svg aria-hidden="true" fill="currentColor" height={16} viewBox="0 0 100 100" width={16}>
             <use href="#co-star5" />
           </svg>
           <span>Latest read</span>
@@ -106,7 +106,7 @@ function LatestFeatureCard({ book }: { book: RenderableBook }) {
         <h2 className="reading__featureTitle">{book.title}</h2>
         <p className="reading__featureAuthor">{book.author}</p>
         <div className="reading__featureMeta">
-          <StarRating rating={book.rating} size={15} />
+          <StarRating rating={book.rating} size={16} />
           {finishedLabel ? <span className="reading__date">Finished {finishedLabel}</span> : null}
         </div>
         {pullQuote ? <p className="reading__featurePull">“{pullQuote}”</p> : null}
@@ -154,7 +154,7 @@ function StreamBookCard({
           <h3 className="reading__bookTitle">{book.title}</h3>
           <p className="reading__bookAuthor">{book.author}</p>
           <div className="reading__metaRow">
-            <StarRating rating={book.rating} size={14} />
+            <StarRating rating={book.rating} size={15} />
             {finishedLabel ? <span className="reading__date">{finishedLabel}</span> : null}
           </div>
         </div>

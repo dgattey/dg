@@ -11,9 +11,10 @@ import {
 } from '../readingHelpers';
 
 describe('readingHelpers', () => {
-  it('formats finished dates as abbreviated month and year', () => {
-    expect(formatFinishedMonthYear('2026-09-16T00:00:00Z')).toBe('Sep 2026');
-    expect(formatFinishedMonthYear('2025-01-04T00:00:00Z')).toBe('Jan 2025');
+  it('formats finished dates in sentence case with abbreviated month, day, and year', () => {
+    expect(formatFinishedMonthYear('2026-09-16T00:00:00Z')).toBe('Sep 16, 2026');
+    expect(formatFinishedMonthYear('2025-09-01T00:00:00Z')).toBe('Sep 1, 2025');
+    expect(formatFinishedMonthYear('2025-01')).toBe('Jan 2025');
     expect(formatFinishedMonthYear(null)).toBeNull();
   });
 
@@ -57,7 +58,8 @@ describe('ReadingShelf', () => {
       }),
     ).toBeInTheDocument();
     expect(within(featureCard).getByText('Oprah Winfrey')).toBeInTheDocument();
-    expect(within(featureCard).getByText('Finished Sep 2026')).toBeInTheDocument();
+    expect(within(featureCard).getByText('Latest read')).toBeInTheDocument();
+    expect(within(featureCard).getByText('Finished Sep 16, 2026')).toBeInTheDocument();
 
     const section2026 = screen.getByRole('region', { name: 'Books finished in 2026' });
     expect(within(section2026).getByText('4 books')).toBeInTheDocument();

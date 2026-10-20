@@ -1,6 +1,12 @@
 /* Reading library page (Direction 11: Latest feature + year-margin stream) */
 
 .reading__layout {
+  --type-h2: clamp(22px, 2.2vw, 24px);
+  --type-h3: 20px;
+  --type-body-lg: clamp(18px, 1.6vw, 20px);
+  --type-body: 16px;
+  --type-label: clamp(18px, 1.6vw, 20px);
+  --type-meta: 15px;
   position: relative;
   display: grid;
   row-gap: 44px;
@@ -34,7 +40,9 @@
 
 .reading__pillTag {
   padding: 0;
-  font-size: 16px;
+  font-family: var(--display);
+  font-size: var(--type-label, clamp(18px, 1.6vw, 20px));
+  font-weight: 700;
   line-height: 1.2;
 }
 
@@ -85,7 +93,7 @@
   aspect-ratio: 2 / 3;
   padding: 12px;
   font-family: var(--display);
-  font-size: 14px;
+  font-size: var(--type-meta, 15px);
   font-weight: 700;
   line-height: 1.2;
   color: var(--ink-on-cream);
@@ -106,17 +114,17 @@
   display: inline-flex;
   gap: 10px;
   align-items: center;
-  font-size: 12px;
+  font-family: var(--display);
+  font-size: var(--type-label, clamp(18px, 1.6vw, 20px));
   font-weight: 700;
+  line-height: 1.2;
   color: var(--ochre);
-  text-transform: uppercase;
-  letter-spacing: 0.12em;
 }
 
 .reading__featureTitle {
   margin: 0;
   font-family: var(--display);
-  font-size: 24px;
+  font-size: var(--type-h2, 24px);
   font-weight: 800;
   line-height: 1.15;
   letter-spacing: -0.01em;
@@ -124,8 +132,9 @@
 
 .reading__featureAuthor {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--type-meta, 15px);
   font-weight: 600;
+  line-height: 1.35;
   color: var(--soft);
 }
 
@@ -138,18 +147,17 @@
 }
 
 .reading__date {
-  font-size: 12px;
-  font-weight: 700;
+  font-size: var(--type-meta, 15px);
+  font-weight: 600;
+  line-height: 1.35;
   color: var(--soft);
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
 }
 
 .reading__featurePull {
   max-width: 58ch;
   margin: 6px 0 0;
   font-family: var(--display);
-  font-size: 20px;
+  font-size: var(--type-body-lg, 20px);
   font-weight: 700;
   line-height: 1.32;
 }
@@ -157,7 +165,7 @@
 .reading__featureRest {
   max-width: 65ch;
   margin: 2px 0 0;
-  font-size: 16px;
+  font-size: var(--type-body, 16px);
   line-height: 1.6;
   color: color-mix(in oklab, var(--on) 88%, var(--pc));
 }
@@ -221,7 +229,8 @@
 
 .reading__yearTag {
   padding: 10px 18px 12px;
-  font-size: 24px;
+  font-family: var(--display);
+  font-size: var(--type-h2, 24px);
   font-weight: 800;
   line-height: 1;
 }
@@ -229,22 +238,23 @@
 .reading__railStats {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 4px;
   padding-left: 6px;
-  font-size: 14px;
+  font-size: var(--type-meta, 15px);
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.45;
   color: var(--ink);
 }
 
 .reading__railCount {
   font-family: var(--display);
-  font-size: 16px;
+  font-size: var(--type-label, clamp(18px, 1.6vw, 20px));
   font-weight: 800;
+  line-height: 1.2;
 }
 
 .reading__railSub {
-  font-size: 12px;
+  font-size: var(--type-meta, 15px);
   font-weight: 600;
   color: color-mix(in oklab, var(--ink) 74%, var(--paper));
 }
@@ -287,7 +297,7 @@
 .reading__bookTitle {
   margin: 0;
   font-family: var(--display);
-  font-size: 18px;
+  font-size: var(--type-h3, 20px);
   font-weight: 800;
   line-height: 1.22;
   letter-spacing: -0.005em;
@@ -295,7 +305,7 @@
 
 .reading__bookAuthor {
   margin: 0;
-  font-size: 14px;
+  font-size: var(--type-meta, 15px);
   font-weight: 600;
   line-height: 1.35;
   color: var(--soft);
