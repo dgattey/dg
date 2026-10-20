@@ -26,15 +26,27 @@ describe('extractNotes', () => {
     );
   });
 
-  it('falls back to ## Summary when # What changed? is absent and stops before ## Verification', () => {
+  it('supports What changed at any heading level and strips HTML comments and trailing --- footers', () => {
+    const body = [
+      '<!-- CURSOR_AGENT_PR_BODY_BEGIN -->',
+      '## What changed?',
+      '',
+      '- Restored `music.css` and `devConsole.css` imports.',
+      '',
+      '---',
+      'Footer metadata',
+      '<!-- CURSOR_AGENT_PR_BODY_END -->',
+    ].join('\r\n');
+
+    assert.equal(extractNotes(body), '- Restored `music.css` and `devConsole.css` imports.');
+  });
+
+  it('falls back to body without Release info when What changed heading is absent', () => {
     const body = [
       '<!-- CURSOR_AGENT_PR_BODY_BEGIN -->',
       '## Summary',
       '- Add `coverImageBase64` + `coverImageContentType` support to `/api/books/sync`.',
       '- Validate raw standard base64 payloads.',
-      '',
-      '## Verification',
-      '- `pnpm --filter @dg/services test` passed.',
       '',
       '# Release info',
       '- [ ] Major',
@@ -46,52 +58,25 @@ describe('extractNotes', () => {
     assert.equal(
       extractNotes(body),
       [
+        '## Summary',
         '- Add `coverImageBase64` + `coverImageContentType` support to `/api/books/sync`.',
         '- Validate raw standard base64 payloads.',
       ].join('\n'),
     );
   });
 
-  it('supports ## What changed? and ## What changed headings at h2 level', () => {
-    const withQuestion = [
-      '## What changed?',
-      '',
-      '- Restored `music.css` and `devConsole.css` imports.',
-      '',
-      '---',
-      'Footer metadata',
-    ].join('\n');
-
-    const withoutQuestion = [
-      '## What changed',
-      '',
-      '- Added fallback headings for release note extraction.',
-      '',
-      '# Release info',
-      '- [x] Patch',
-    ].join('\n');
+  it('uses fallback when body has no notes content', () => {
+    const templateOnly = ['# What changed?', '', '- ', '', '# Release info', '- [x] Patch'].join(
+      '\n',
+    );
 
     assert.equal(
-      extractNotes(withQuestion),
-      '- Restored `music.css` and `devConsole.css` imports.',
+      extractNotes(templateOnly, '- Fix release note extraction'),
+      '- Fix release note extraction',
     );
     assert.equal(
-      extractNotes(withoutQuestion),
-      '- Added fallback headings for release note extraction.',
+      extractNotes('', '- Fix release note extraction'),
+      '- Fix release note extraction',
     );
-  });
-
-  it('falls back to body lines or PR title when no known section heading is present', () => {
-    const plainBody = [
-      'Closes #123',
-      '',
-      '- Direct bullet summary without heading.',
-      '',
-      '# Release info',
-      '- [x] Patch',
-    ].join('\n');
-
-    assert.equal(extractNotes(plainBody), '- Direct bullet summary without heading.');
-    assert.equal(extractNotes('', 'Fix release note extraction'), '- Fix release note extraction');
   });
 });

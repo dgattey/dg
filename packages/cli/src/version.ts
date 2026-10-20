@@ -17,27 +17,6 @@ import { fail, findRoot, fmt, log, out, parseArgs, withSpinner } from './lib/uti
 
 type ReleaseType = 'major' | 'minor' | 'patch';
 
-const NOTE_HEADINGS = [
-  'what changed',
-  'release notes',
-  'highlights',
-  'summary',
-  'changes',
-  'overview',
-  'description',
-];
-
-const STOPPED_HEADINGS = new Set([
-  'release info',
-  'verification',
-  'testing',
-  'test plan',
-  'tests',
-  'screenshots',
-  'demo',
-  'checklist',
-]);
-
 function computeNext(base: string, type: ReleaseType): string {
   const [major = 0, minor = 0, patch = 0] = base.split('-')[0]?.split('.').map(Number) ?? [];
   if (type === 'major') return `${major + 1}.0.0`;
@@ -66,60 +45,28 @@ function parseReleaseType(prBody: string): ReleaseType {
   return 'patch';
 }
 
-function stripAgentWrapper(body: string): string {
-  const beginMarker = '<!-- CURSOR_AGENT_PR_BODY_BEGIN -->';
-  const endMarker = '<!-- CURSOR_AGENT_PR_BODY_END -->';
-  const beginIndex = body.indexOf(beginMarker);
-  const afterBegin = beginIndex !== -1 ? body.slice(beginIndex + beginMarker.length) : body;
-  const endIndex = afterBegin.indexOf(endMarker);
-  const unwrapped = endIndex !== -1 ? afterBegin.slice(0, endIndex) : afterBegin;
-  return unwrapped.replace(/<!--[\s\S]*?-->/g, '').trim();
-}
+export function extractNotes(body: string, fallback = ''): string {
+  const cleaned = body
+    .replace(/\r\n/g, '\n')
+    .replace(/<!--[\s\S]*?-->/g, '')
+    .replace(/\n---+\s*(?:\n[\s\S]*)?$/, '')
+    .trim();
 
-function parseHeading(line: string): { level: number; norm: string } | null {
-  const match = /^\s*(#{1,6})\s+(.+?)\s*$/.exec(line);
-  if (!match?.[1] || !match[2]) return null;
-  const norm = match[2]
-    .replace(/\s*[?:]\s*$/, '')
-    .trim()
-    .toLowerCase();
-  return { level: match[1].length, norm };
-}
-
-function collectSectionLines(cleanedBody: string, targetNorm?: string): string {
-  let sectionLevel: number | null = targetNorm ? null : 0;
-  let skipLevel: number | null = null;
-  const collected: Array<string> = [];
-
-  for (const line of cleanedBody.split('\n')) {
-    const trimmed = line.trim();
-    const heading = parseHeading(line);
-    if (sectionLevel === null) {
-      if (heading && heading.norm === targetNorm) sectionLevel = heading.level;
-      continue;
-    }
-    if (/^-+\s*$/.test(trimmed)) break;
-    if (!targetNorm && /^(?:closes|fixes|resolves)\b/i.test(trimmed)) continue;
-    if (heading) {
-      if (targetNorm && heading.level <= sectionLevel) break;
-      if (STOPPED_HEADINGS.has(heading.norm)) skipLevel = heading.level;
-      else if (skipLevel !== null && heading.level <= skipLevel) skipLevel = null;
-      if (!targetNorm || STOPPED_HEADINGS.has(heading.norm)) continue;
-    }
-    if (skipLevel !== null || /^[-*]\s*$/.test(trimmed)) continue;
-    if (!targetNorm && /^-\s*\[[ xX]\]\s*/.test(trimmed)) continue;
-    collected.push(line);
+  const whatChangedMatch =
+    /(?:^|\n)#{1,6}[ \t]+What changed\b[^\n]*\n([\s\S]*?)(?=\n#{1,6}[ \t]|$)/i.exec(cleaned);
+  if (whatChangedMatch) {
+    const section = (whatChangedMatch[1] ?? '').trim();
+    return section && !/^[-*]\s*$/.test(section) ? section : fallback.trim();
   }
-  return collected.join('\n').trim();
-}
 
-export function extractNotes(prBody: string, prTitle?: string): string {
-  const cleaned = stripAgentWrapper(prBody);
-  for (const heading of NOTE_HEADINGS) {
-    const section = collectSectionLines(cleaned, heading);
-    if (section) return section;
+  const withoutReleaseInfo = cleaned
+    .replace(/(?:^|\n)#{1,6}[ \t]+Release info\b[\s\S]*$/i, '')
+    .trim();
+  if (withoutReleaseInfo && !/^[-*]\s*$/.test(withoutReleaseInfo)) {
+    return withoutReleaseInfo;
   }
-  return collectSectionLines(cleaned) || (prTitle?.trim() ? `- ${prTitle.trim()}` : '');
+
+  return fallback.trim();
 }
 
 function getLatestTag(): string | null {
@@ -230,7 +177,7 @@ async function main(): Promise<void> {
       const version = readPkg().version;
       log(fmt.info(`Version: ${fmt.bold(version)}`));
 
-      const notes = extractNotes(prBody, prTitle);
+      const notes = extractNotes(prBody, prTitle ? `- ${prTitle.trim()}` : '');
       log(fmt.info(`Release notes: ${notes ? `${notes.split('\n').length} line(s)` : 'empty'}`));
 
       const delimiter = `NOTES_DELIM_${Date.now()}`;
