@@ -9,7 +9,7 @@ export function StatusChip({ isConnected }: { isConnected: boolean }) {
     <PaperTag
       className="collageStatusTag"
       tiltDeg={isConnected ? -2 : 2}
-      tone={isConnected ? 'leaf' : 'vermilion'}
+      tone={isConnected ? 'viridian' : 'vermilion'}
     >
       {isConnected ? 'Connected' : 'Not connected'}
     </PaperTag>

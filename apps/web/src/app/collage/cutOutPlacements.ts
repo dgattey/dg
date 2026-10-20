@@ -62,7 +62,7 @@ export function definePlacements(rows: ReadonlyArray<PlacementRow>): Array<CutOu
 
 export const CUT_OUT_PLACEMENTS = {
   coda: definePlacements([
-    ['coda-monstera', 'monstera', 'olive', 460, 14, 4, -20, 'all', 0],
+    ['coda-monstera', 'monstera', 'viridian', 460, 14, 4, -20, 'all', 0],
     ['coda-banana', 'banana', 'viridian', 380, -30, 30, 8, 'desktop', 0],
     [
       'coda-bird',
@@ -81,11 +81,11 @@ export const CUT_OUT_PLACEMENTS = {
     ['coda-heart', 'heart', 'rose', 90, -12, 90, 70, 'all', 3],
     ['coda-star-lower', 'star5', 'cream', 40, 16, 24, 78, 'dark-desktop', 3],
     ['coda-star-right', 'star4', 'cream', 34, -6, 78, 22, 'dark-desktop', 3],
-    ['coda-philo', 'philo', 'leaf', 250, -18, 4, 64, 'desktop', 1],
+    ['coda-philo', 'philo', 'chartreuse', 250, -18, 4, 64, 'desktop', 1],
   ]),
   helloSheet: definePlacements([
     ['hello-seaweed-left', 'seaweed', 'ultramarine', 250, -12, -4, 20, 'desktop', 1],
-    ['hello-fern-left', 'fern', 'olive', 330, 22, -7, 42, 'all', 1],
+    ['hello-fern-left', 'fern', 'viridian', 330, 22, -7, 42, 'all', 1],
     ['hello-seaweed-lower-left', 'seaweed2', 'rose', 180, -8, -2, 78, 'all', 1],
     ['hello-pods', 'pods', 'ochre', 210, -18, 33, 74, 'desktop', 1],
     ['hello-star-upper', 'star5', 'star', 40, 12, 44, 10, 'desktop', 3],
@@ -94,7 +94,7 @@ export const CUT_OUT_PLACEMENTS = {
     ['hello-moon', 'moon', 'cream', 64, 14, 46, -2, 'dark-desktop', 3],
     ['hello-coral', 'coral', 'ultramarine', 170, -10, 49, 47, 'desktop', 1],
     ['hello-seaweed-lower-middle', 'seaweed2', 'ultramarine', 200, 14, 53, 72, 'desktop', 1],
-    ['hello-fern-right', 'fern', 'leaf', 320, -28, 69, 78, 'desktop', 0],
+    ['hello-fern-right', 'fern', 'chartreuse', 320, -28, 69, 78, 'desktop', 0],
     [
       'hello-bird',
       'birdpara',
@@ -116,8 +116,8 @@ export const CUT_OUT_PLACEMENTS = {
     ['more-star-upper', 'star5', 'star', 44, -12, 48, 4, 'desktop', 3],
     ['more-pods', 'pods', 'ultramarine', 230, 22, 27, 36, 'all', 1],
     ['more-trefoil', 'trefoil', 'rose', 150, -16, 45, 44, 'desktop', 1],
-    ['more-algae', 'algae', 'leaf', 200, 10, 36, 52, 'desktop', 1],
-    ['more-banana', 'banana', 'leaf', 440, 40, 80, 52, 'desktop', 0],
+    ['more-algae', 'algae', 'viridian', 200, 10, 36, 52, 'desktop', 1],
+    ['more-banana', 'banana', 'chartreuse', 440, 40, 80, 52, 'desktop', 0],
     ['more-star-lower', 'star4', 'ultramarine', 40, 10, 6, 92, 'all', 3],
     ['more-seaweed', 'seaweed', 'cream', 240, -10, -3, 40, 'desktop', 1],
     ['more-philo', 'philo', 'viridian', 300, -30, -6, 8, 'all', 1],
@@ -125,7 +125,7 @@ export const CUT_OUT_PLACEMENTS = {
   ]),
   portrait: definePlacements([
     ['portrait-monstera', 'monstera', 'viridian', 1020, -34, -70, -62, 'all', 0],
-    ['portrait-philo', 'philo', 'olive', 380, 28, 58, 62, 'desktop', 0],
+    ['portrait-philo', 'philo', 'chartreuse', 380, 28, 58, 62, 'desktop', 0],
   ]),
   workSheet: definePlacements([
     ['work-algae', 'algae', 'cream', 330, -8, -4, 2, 'all', 1],

@@ -2,8 +2,6 @@ export const PAPER_TONES = [
   'cream',
   'ultramarine',
   'viridian',
-  'leaf',
-  'olive',
   'chartreuse',
   'cerulean',
   'cobalt',
@@ -32,7 +30,6 @@ export const PAPER_INK_TONES = {
   chartreuse: true,
   cream: true,
   ochre: true,
-  olive: true,
   rose: true,
   vermilion: true,
 } as const satisfies Partial<Record<PaperTone, true>>;
