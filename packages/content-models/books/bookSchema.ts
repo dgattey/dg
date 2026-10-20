@@ -1,7 +1,10 @@
 import * as v from 'valibot';
 import {
+  ALLOWED_COVER_IMAGE_CONTENT_TYPES,
   ALLOWED_COVER_IMAGE_HOSTS,
+  type CoverImageContentType,
   cleanWhitespace,
+  decodeCoverImageBase64,
   isAllowedCoverImageUrl,
   isValidContentfulEntityId,
   MAX_BOOK_AUTHOR_LENGTH,
@@ -18,6 +21,8 @@ import {
 export type BookMutationInput = {
   author?: string | null;
   coverAssetId?: string | null;
+  coverImageBase64?: string | null;
+  coverImageContentType?: CoverImageContentType | null;
   coverImageUrl?: string | null;
   id?: string | null;
   isbn?: number | null;
@@ -36,6 +41,9 @@ export type ValidatedBooksSyncPayload = {
 const idErr = `Entity ID must be 1-${MAX_BOOK_ID_LENGTH} alphanumeric, underscore, or hyphen characters`;
 const ratingErr = `Book rating must be an integer between ${MIN_BOOK_RATING} and ${MAX_BOOK_RATING}`;
 const hostErr = `Book coverImageUrl must be an HTTPS URL from an allowed cover host (${ALLOWED_COVER_IMAGE_HOSTS.join(', ')})`;
+const contentTypeErr = `Book coverImageContentType must be one of: ${ALLOWED_COVER_IMAGE_CONTENT_TYPES.join(', ')}`;
+const coverPairErr =
+  'Book coverImageBase64 and coverImageContentType must both be provided together';
 
 const entityIdSchema = v.pipe(
   v.string('Entity ID must be a string'),
@@ -112,20 +120,36 @@ const titleSchema = v.pipe(
   ),
 );
 
-export const bookMutationInputSchema = v.looseObject(
-  {
-    author: maxStr('author', MAX_BOOK_AUTHOR_LENGTH, true),
-    coverAssetId: optId('coverAssetId', 'Book coverAssetId must be a valid Contentful asset ID'),
-    coverImageUrl: optStr('coverImageUrl', isAllowedCoverImageUrl, hostErr, (s) => s),
-    id: optId('id', idErr.replace('Entity ID', 'Book id')),
-    isbn: optNull(isbnSchema),
-    rating: optNull(ratingSchema),
-    readDateFinished: isoDate('readDateFinished'),
-    readDateStarted: isoDate('readDateStarted'),
-    reviewPlainText: maxStr('reviewPlainText', MAX_BOOK_REVIEW_LENGTH),
-    title: titleSchema,
-  },
-  'Each book entry must be a JSON object',
+const coverImageBase64Schema = v.pipe(
+  v.string('Book coverImageBase64 must be a string'),
+  v.rawCheck(({ addIssue, dataset }) => {
+    if (dataset.typed) {
+      const decoded = decodeCoverImageBase64(dataset.value);
+      if (!decoded.ok) addIssue({ message: decoded.error });
+    }
+  }),
+);
+const coverImageContentTypeSchema = v.picklist(ALLOWED_COVER_IMAGE_CONTENT_TYPES, contentTypeErr);
+
+export const bookMutationInputSchema = v.pipe(
+  v.looseObject(
+    {
+      author: maxStr('author', MAX_BOOK_AUTHOR_LENGTH, true),
+      coverAssetId: optId('coverAssetId', 'Book coverAssetId must be a valid Contentful asset ID'),
+      coverImageBase64: optNull(coverImageBase64Schema),
+      coverImageContentType: optNull(coverImageContentTypeSchema),
+      coverImageUrl: optStr('coverImageUrl', isAllowedCoverImageUrl, hostErr, (s) => s),
+      id: optId('id', idErr.replace('Entity ID', 'Book id')),
+      isbn: optNull(isbnSchema),
+      rating: optNull(ratingSchema),
+      readDateFinished: isoDate('readDateFinished'),
+      readDateStarted: isoDate('readDateStarted'),
+      reviewPlainText: maxStr('reviewPlainText', MAX_BOOK_REVIEW_LENGTH),
+      title: titleSchema,
+    },
+    'Each book entry must be a JSON object',
+  ),
+  v.check((b) => Boolean(b.coverImageBase64) === Boolean(b.coverImageContentType), coverPairErr),
 );
 
 export const validateBookMutationInput = (

@@ -2,7 +2,10 @@ import {
   buildRichTextDocument,
   cleanWhitespace,
   DEFAULT_SHELVES,
+  decodeCoverImageBase64,
   isUsableGoodreadsCoverUrl,
+  MAX_COVER_IMAGE_BYTES,
+  normalizeContentfulAssetUrl,
   normalizeReviewText,
   parseIsbn13Number,
   type ReadingStatus,
@@ -89,6 +92,103 @@ describe('bookDomain & bookSchema', () => {
     expect(
       validateBookMutationInput({ coverImageUrl: 'https://evil.example/x.jpg', title: 'Dune' }).ok,
     ).toBe(false);
+  });
+
+  it('validates coverImageBase64 + coverImageContentType, 3 MiB limit, data: prefix rejection, and URL normalization', () => {
+    const sampleBytes = new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00, 0x10]);
+    const validB64 = Buffer.from(sampleBytes).toString('base64');
+
+    const decoded = decodeCoverImageBase64(validB64);
+    expect(decoded).toEqual({ bytes: sampleBytes, ok: true });
+
+    expect(
+      validateBookMutationInput({
+        coverImageBase64: validB64,
+        coverImageContentType: 'image/jpeg',
+        id: 'BOOK-1',
+        title: 'Dune',
+      }),
+    ).toEqual({
+      book: {
+        coverImageBase64: validB64,
+        coverImageContentType: 'image/jpeg',
+        id: 'BOOK-1',
+        title: 'Dune',
+      },
+      ok: true,
+    });
+
+    expect(
+      validateBookMutationInput({
+        coverImageBase64: validB64,
+        coverImageContentType: 'image/png',
+        title: 'Dune',
+      }).ok,
+    ).toBe(true);
+
+    const dataUriResult = validateBookMutationInput({
+      coverImageBase64: `data:image/jpeg;base64,${validB64}`,
+      coverImageContentType: 'image/jpeg',
+      title: 'Dune',
+    });
+    expect(dataUriResult.ok).toBe(false);
+    if (!dataUriResult.ok) {
+      expect(dataUriResult.error).toContain('data: URI prefix');
+    }
+
+    expect(decodeCoverImageBase64(`${validB64.slice(0, 4)}\n${validB64.slice(4)}`).ok).toBe(false);
+    expect(decodeCoverImageBase64('not-valid-base64!!!').ok).toBe(false);
+
+    const badTypeResult = validateBookMutationInput({
+      coverImageBase64: validB64,
+      coverImageContentType: 'image/webp' as 'image/jpeg',
+      title: 'Dune',
+    });
+    expect(badTypeResult.ok).toBe(false);
+    if (!badTypeResult.ok) {
+      expect(badTypeResult.error).toContain('image/jpeg');
+    }
+
+    expect(
+      validateBookMutationInput({
+        coverImageBase64: validB64,
+        title: 'Dune',
+      }),
+    ).toEqual({
+      error: 'Book coverImageBase64 and coverImageContentType must both be provided together',
+      ok: false,
+    });
+    expect(
+      validateBookMutationInput({
+        coverImageContentType: 'image/jpeg',
+        title: 'Dune',
+      }),
+    ).toEqual({
+      error: 'Book coverImageBase64 and coverImageContentType must both be provided together',
+      ok: false,
+    });
+
+    const exactMaxB64 = Buffer.alloc(MAX_COVER_IMAGE_BYTES, 0x41).toString('base64');
+    expect(decodeCoverImageBase64(exactMaxB64).ok).toBe(true);
+    const overLimitB64 = Buffer.alloc(MAX_COVER_IMAGE_BYTES + 1, 0x41).toString('base64');
+    const overLimitResult = validateBookMutationInput({
+      coverImageBase64: overLimitB64,
+      coverImageContentType: 'image/jpeg',
+      title: 'Dune',
+    });
+    expect(overLimitResult).toEqual({
+      error: `Book coverImageBase64 exceeds maximum decoded size of ${MAX_COVER_IMAGE_BYTES} bytes (3 MiB)`,
+      ok: false,
+    });
+
+    expect(normalizeContentfulAssetUrl('//images.ctfassets.net/sp/cov-1/book.jpg')).toBe(
+      'https://images.ctfassets.net/sp/cov-1/book.jpg',
+    );
+    expect(normalizeContentfulAssetUrl('https://images.ctfassets.net/sp/cov-1/book.jpg')).toBe(
+      'https://images.ctfassets.net/sp/cov-1/book.jpg',
+    );
+    expect(normalizeContentfulAssetUrl('http://images.ctfassets.net/sp/cov-1/book.jpg')).toBeNull();
+    expect(normalizeContentfulAssetUrl('')).toBeNull();
   });
 });
 
