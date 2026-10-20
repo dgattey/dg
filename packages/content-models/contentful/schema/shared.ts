@@ -145,3 +145,4 @@ export type Project = v.InferOutput<typeof projectSchema>;
 export type ProjectWithSys = v.InferOutput<typeof projectWithSysSchema>;
 export type Entry = v.InferOutput<typeof entrySchema>;
 export type RichTextContent = v.InferOutput<typeof richTextContentSchema>;
+export type TextBlock = v.InferOutput<typeof textBlockSchema>;

@@ -1,7 +1,7 @@
 import 'server-only';
 
 import { fetchCurrentLocation } from '@dg/services/contentful/fetchCurrentLocation';
-import { fetchFooterLinks } from '@dg/services/contentful/fetchFooterLinks';
+import { fetchFooterContent, fetchFooterLinks } from '@dg/services/contentful/fetchFooterLinks';
 import { fetchIntroContent } from '@dg/services/contentful/fetchIntroContent';
 import { fetchLinkByName } from '@dg/services/contentful/fetchLinkByName';
 import { fetchProjects } from '@dg/services/contentful/fetchProjects';
@@ -34,6 +34,11 @@ export const getSideProjects = async () => {
 export const getIntroContent = async () => {
   'use cache';
   return await cachedContentful(fetchIntroContent);
+};
+
+export const getFooterContent = async () => {
+  'use cache';
+  return await cachedContentful(fetchFooterContent);
 };
 
 export const getFooterLinks = async () => {
