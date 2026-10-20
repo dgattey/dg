@@ -2,10 +2,12 @@ import 'server-only';
 
 import crypto from 'node:crypto';
 import {
+  type CoverImageContentType,
   DEFAULT_ENVIRONMENT_ID,
   DEFAULT_LOCALE,
   isAllowedCoverImageUrl,
   isValidContentfulEntityId,
+  normalizeContentfulAssetUrl,
 } from '@dg/content-models/books/bookDomain';
 import {
   type NormalizedContentfulBookEntry,
@@ -13,6 +15,11 @@ import {
 } from '@dg/content-models/books/contentfulBook';
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import { isRecord } from '@dg/shared-core/types/typeguards';
+
+export type PublishedCoverAsset = {
+  assetId: string;
+  url: string;
+};
 
 export class ContentfulCmaError extends Error {
   readonly status: number;
@@ -53,6 +60,7 @@ export class ContentfulCmaClient {
   readonly locale: string;
   readonly fetchImpl: typeof fetch;
   readonly baseUrl: string;
+  readonly uploadBaseUrl: string;
 
   constructor(cfg: ContentfulCmaClientConfig) {
     invariant(cfg.spaceId, 'Missing CONTENTFUL_SPACE_ID');
@@ -63,24 +71,13 @@ export class ContentfulCmaClient {
     this.locale = cfg.locale ?? DEFAULT_LOCALE;
     this.fetchImpl = cfg.fetchImpl ?? fetch;
     this.baseUrl = `https://api.contentful.com/spaces/${this.spaceId}/environments/${this.environmentId}`;
+    this.uploadBaseUrl = `https://upload.contentful.com/spaces/${this.spaceId}`;
   }
 
-  async request(
-    path: string,
-    opts: { body?: unknown; headers?: Record<string, string>; method?: string } = {},
-  ): Promise<unknown> {
-    const { body, headers = {}, method = 'GET' } = opts;
-    const reqHeaders = {
-      Authorization: `Bearer ${this.managementToken}`,
-      'Content-Type': 'application/vnd.contentful.management.v1+json',
-      ...headers,
-    };
+  private async sendWithRetry(url: string, init: RequestInit, label: string): Promise<unknown> {
+    const method = init.method ?? 'GET';
     for (let attempt = 0; attempt < 3; attempt += 1) {
-      const res = await this.fetchImpl(`${this.baseUrl}${path}`, {
-        body: body !== undefined ? JSON.stringify(body) : undefined,
-        headers: reqHeaders,
-        method,
-      });
+      const res = await this.fetchImpl(url, init);
       if ((res.status === 429 || (res.status >= 500 && res.status < 600)) && attempt < 2) {
         const resetSec =
           Number.parseFloat(res.headers.get('x-contentful-ratelimit-reset') ?? '1') || 1;
@@ -89,12 +86,32 @@ export class ContentfulCmaClient {
       }
       const text = await res.text();
       if (!res.ok) {
-        const msg = `Contentful CMA ${method} ${path} failed (${res.status}): ${text.slice(0, 300)}`;
+        const msg = `Contentful CMA ${method} ${label} failed (${res.status}): ${text.slice(0, 300)}`;
         throw new ContentfulCmaError(msg, res.status, tryJson(text));
       }
       return tryJson(text);
     }
-    throw new Error(`Contentful CMA ${method} ${path} exhausted retries`);
+    throw new Error(`Contentful CMA ${method} ${label} exhausted retries`);
+  }
+
+  request(
+    path: string,
+    opts: { body?: unknown; headers?: Record<string, string>; method?: string } = {},
+  ): Promise<unknown> {
+    const { body, headers = {}, method = 'GET' } = opts;
+    return this.sendWithRetry(
+      `${this.baseUrl}${path}`,
+      {
+        body: body !== undefined ? JSON.stringify(body) : undefined,
+        headers: {
+          Authorization: `Bearer ${this.managementToken}`,
+          'Content-Type': 'application/vnd.contentful.management.v1+json',
+          ...headers,
+        },
+        method,
+      },
+      path,
+    );
   }
 
   async fetchAllBooks(): Promise<Array<NormalizedContentfulBookEntry>> {
@@ -123,23 +140,54 @@ export class ContentfulCmaClient {
     }
   }
 
-  async createAndPublishCoverAsset(opts: {
-    assetId?: string;
-    imageUrl: string;
-    title?: string | null;
-  }): Promise<string> {
-    const { assetId = crypto.randomUUID().toUpperCase(), imageUrl, title } = opts;
-    if (!isAllowedCoverImageUrl(imageUrl)) {
-      throw new Error(
-        `Refusing to fetch cover image from untrusted host: ${imageUrl.slice(0, 120)}`,
-      );
+  async fetchAssetUrl(assetId: string): Promise<string | null> {
+    if (!isValidContentfulEntityId(assetId)) return null;
+    try {
+      const asset = await this.request(`/assets/${encodeURIComponent(assetId)}`);
+      return this.extractAssetFileUrl(asset);
+    } catch (error) {
+      if (error instanceof ContentfulCmaError && error.status === 404) return null;
+      throw error;
     }
+  }
 
-    const filePayload = {
-      contentType: 'image/jpeg',
-      fileName: `${assetId}.jpg`,
-      upload: imageUrl,
-    };
+  private extractAssetFileUrl(asset: unknown): string | null {
+    const fieldsRec = isRecord(asset) && isRecord(asset.fields) ? asset.fields : null;
+    const f = fieldsRec && isRecord(fieldsRec.file) ? fieldsRec.file[this.locale] : null;
+    return isRecord(f) ? normalizeContentfulAssetUrl(f.url) : null;
+  }
+
+  async uploadBinary(bytes: Uint8Array): Promise<string> {
+    const body = new Uint8Array(bytes.byteLength);
+    body.set(bytes);
+    const parsed = await this.sendWithRetry(
+      `${this.uploadBaseUrl}/uploads`,
+      {
+        body,
+        headers: {
+          Authorization: `Bearer ${this.managementToken}`,
+          'Content-Type': 'application/octet-stream',
+        },
+        method: 'POST',
+      },
+      '/uploads',
+    );
+    const uploadId =
+      isRecord(parsed) && isRecord(parsed.sys) && typeof parsed.sys.id === 'string'
+        ? parsed.sys.id
+        : null;
+    if (!uploadId) {
+      throw new Error('Contentful CMA upload did not return a valid sys.id');
+    }
+    return uploadId;
+  }
+
+  private async putProcessAndPublishAsset(opts: {
+    assetId: string;
+    filePayload: Record<string, unknown>;
+    title?: string | null;
+  }): Promise<PublishedCoverAsset> {
+    const { assetId, filePayload, title } = opts;
     const fields: Record<string, unknown> = { file: { [this.locale]: filePayload } };
     if (title) fields.title = { [this.locale]: title };
     const created = await this.request(`/assets/${assetId}`, { body: { fields }, method: 'PUT' });
@@ -151,17 +199,75 @@ export class ContentfulCmaClient {
     for (let attempt = 0; attempt < 15; attempt += 1) {
       await sleep(attempt === 0 ? 750 : Math.min(1000 * 2 ** Math.min(attempt, 3), 8000));
       const candidate = await this.request(`/assets/${assetId}`);
-      const fieldsRec = isRecord(candidate) && isRecord(candidate.fields) ? candidate.fields : null;
-      const f = fieldsRec && isRecord(fieldsRec.file) ? fieldsRec.file[this.locale] : null;
-      if (isRecord(f) && typeof f.url === 'string') {
+      const url = this.extractAssetFileUrl(candidate);
+      if (url) {
         await this.request(`/assets/${assetId}/published`, {
           headers: verHdr(candidate),
           method: 'PUT',
         });
-        return assetId;
+        return { assetId, url };
       }
     }
     throw new Error(`Timed out waiting for Contentful asset ${assetId} to process`);
+  }
+
+  async createAndPublishCoverAsset(opts: {
+    assetId?: string;
+    imageUrl: string;
+    title?: string | null;
+  }): Promise<PublishedCoverAsset> {
+    const { assetId = crypto.randomUUID().toUpperCase(), imageUrl, title } = opts;
+    if (!isAllowedCoverImageUrl(imageUrl)) {
+      throw new Error(
+        `Refusing to fetch cover image from untrusted host: ${imageUrl.slice(0, 120)}`,
+      );
+    }
+
+    return await this.putProcessAndPublishAsset({
+      assetId,
+      filePayload: {
+        contentType: 'image/jpeg',
+        fileName: `${assetId}.jpg`,
+        upload: imageUrl,
+      },
+      title,
+    });
+  }
+
+  async createAndPublishBinaryCoverAsset(opts: {
+    assetId?: string;
+    bytes: Uint8Array;
+    contentType: CoverImageContentType;
+    fileNameBase?: string | null;
+    title?: string | null;
+  }): Promise<PublishedCoverAsset> {
+    const {
+      assetId = crypto.randomUUID().toUpperCase(),
+      bytes,
+      contentType,
+      fileNameBase,
+      title,
+    } = opts;
+    const uploadId = await this.uploadBinary(bytes);
+    const ext = contentType === 'image/png' ? 'png' : 'jpg';
+    const baseName =
+      fileNameBase && isValidContentfulEntityId(fileNameBase) ? fileNameBase.trim() : assetId;
+
+    return await this.putProcessAndPublishAsset({
+      assetId,
+      filePayload: {
+        contentType,
+        fileName: `${baseName}.${ext}`,
+        uploadFrom: {
+          sys: {
+            id: uploadId,
+            linkType: 'Upload',
+            type: 'Link',
+          },
+        },
+      },
+      title,
+    });
   }
 
   private async putAndPublishEntry(

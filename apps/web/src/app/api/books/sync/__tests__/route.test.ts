@@ -82,6 +82,7 @@ describe('Books mutation/sync API route', () => {
       author: 'Ray Bradbury',
       coverAssetId: 'ASSET-1',
       coverImageId: 'ASSET-1',
+      coverImageUrl: 'https://images.ctfassets.net/space-id/ASSET-1/BOOK-123.jpg',
       id: 'BOOK-123',
       isbn: 9780007491568,
       rating: 5,
@@ -92,12 +93,15 @@ describe('Books mutation/sync API route', () => {
       version: 4,
     });
 
+    const coverBase64 = Buffer.from([0xff, 0xd8, 0xff, 0xd9]).toString('base64');
     const rawBody = JSON.stringify({
       deleteIds: ['BOOK-DEL-1'],
       upserts: [
         {
           author: 'Ray Bradbury',
           coverAssetId: 'ASSET-1',
+          coverImageBase64: coverBase64,
+          coverImageContentType: 'image/jpeg',
           id: 'BOOK-123',
           isbn: 9780007491568,
           rating: 5,
@@ -134,6 +138,8 @@ describe('Books mutation/sync API route', () => {
     expect(mockUpsertBook).toHaveBeenCalledWith(expect.anything(), {
       author: 'Ray Bradbury',
       coverAssetId: 'ASSET-1',
+      coverImageBase64: coverBase64,
+      coverImageContentType: 'image/jpeg',
       id: 'BOOK-123',
       isbn: 9780007491568,
       rating: 5,
@@ -144,6 +150,14 @@ describe('Books mutation/sync API route', () => {
     });
     expect(res.body).toMatchObject({
       deleted: 1,
+      entries: [
+        expect.objectContaining({
+          action: 'updated',
+          coverAssetId: 'ASSET-1',
+          coverImageUrl: 'https://images.ctfassets.net/space-id/ASSET-1/BOOK-123.jpg',
+          id: 'BOOK-123',
+        }),
+      ],
       ok: true,
       revalidated: true,
       upserted: 1,
@@ -193,6 +207,30 @@ describe('Books mutation/sync API route', () => {
     expect(invalidRatingRes.status).toBe(400);
     expect(invalidRatingRes.body).toEqual({
       error: 'Book rating must be an integer between 1 and 5',
+      ok: false,
+    });
+
+    const dataUriCoverReq = new NextRequest('http://localhost/api/books/sync', {
+      body: JSON.stringify({
+        upserts: [
+          {
+            coverImageBase64: 'data:image/jpeg;base64,/9j/2Q==',
+            coverImageContentType: 'image/jpeg',
+            id: '1',
+            title: 'Data URI Cover Book',
+          },
+        ],
+      }),
+      headers: {
+        authorization: 'Bearer test-cron-secret',
+        'content-type': 'application/json',
+      },
+      method: 'POST',
+    });
+    const dataUriCoverRes = await handleBooksSync(dataUriCoverReq);
+    expect(dataUriCoverRes.status).toBe(400);
+    expect(dataUriCoverRes.body).toEqual({
+      error: expect.stringContaining('data: URI prefix'),
       ok: false,
     });
   });
