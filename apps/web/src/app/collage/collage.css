@@ -27,6 +27,7 @@ html:has(.collageRoot) body {
 
 .collageRoot {
   --paper: light-dark(#ede3cb, #152238);
+  --paper-2: #1c2d48;
   --cream: light-dark(#f7f1e2, #efe6d2);
   --ink: light-dark(#1d1a15, #f3ecdc);
   --ink-on-cream: #1d1a15;
@@ -44,6 +45,15 @@ html:has(.collageRoot) body {
   --gap: clamp(14px, 1.6vw, 24px);
   --pad: clamp(16px, 4vw, 80px);
   --measure: 1280px;
+  --collage-border-width: 1.5px;
+  --type-h1: clamp(48px, 6.2vw, 84px);
+  --type-h2: clamp(20px, 2.2vw, 24px);
+  --type-h3: 20px;
+  --type-title: 18px;
+  --type-label: 16px;
+  --type-body: 16px;
+  --type-meta: 14px;
+  --type-micro: 12px;
   --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.2)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.12));
   /* Same two shadows as --dshadow, so the filter interpolates between them. */
   --dshadow-lift: drop-shadow(0 2px 0 light-dark(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.36)))

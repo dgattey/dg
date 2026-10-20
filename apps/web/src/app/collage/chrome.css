@@ -144,74 +144,90 @@
 .chrome__footer {
   position: relative;
   z-index: 3;
-  padding: 0 0 44px;
+  padding: 0 0 36px;
   color: var(--cream);
 }
 .chrome__nowWrap {
   position: relative;
   z-index: 5;
-  margin-top: -30px;
+  margin-top: -28px;
   filter: var(--dshadow-lift);
 }
 .chrome__nowStrip {
-  --now-rule: rgb(29 26 21 / 0.16);
-  --now-dim: rgb(29 26 21 / 0.62);
+  --now-dim: color-mix(in oklab, var(--ink) 68%, transparent);
   display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
   align-items: center;
-  min-height: 60px;
-  padding: 10px 22px;
-  color: var(--ink-on-cream);
-  background: var(--cream);
-  clip-path: var(--quad-a);
+  min-height: 54px;
+  padding: 10px 20px;
+  color: var(--ink);
+  background: light-dark(var(--cream), var(--paper-2));
+  border: var(--collage-border-width) solid
+    light-dark(color-mix(in oklab, var(--ink) 18%, transparent), rgb(243 236 220 / 0.18));
+  border-radius: 14px 12px 16px 13px;
 }
 .chrome__nowCell {
   display: flex;
-  gap: 10px;
+  gap: 8px;
   align-items: center;
   min-width: 0;
-  min-height: 30px;
-  padding: 0 22px;
   color: inherit;
   white-space: nowrap;
   text-decoration: none;
-  border-left: 1px solid var(--now-rule);
-}
-.chrome__nowCellLead {
-  flex: none;
-  padding-left: 0;
-  border-left: 0;
-}
-.chrome__nowCellLink {
-  transition: color 0.18s ease;
-}
-.chrome__nowCellLast {
-  flex: none;
-  padding-right: 0;
-  margin-left: auto;
-}
-.chrome__nowLive {
-  flex: none;
-  width: 8px;
-  height: 8px;
-  background: var(--viridian);
-  border-radius: 50%;
 }
 .chrome__nowKey {
   flex: none;
-  font-size: 13.5px;
-  font-weight: 650;
-  line-height: 1.2;
+  font-size: var(--type-meta);
+  font-weight: 600;
+  line-height: 1.25;
   color: var(--now-dim);
-  letter-spacing: 0.01em;
 }
 .chrome__nowValue {
   overflow: hidden;
   text-overflow: ellipsis;
   font-family: var(--display);
-  font-size: 16px;
+  font-size: var(--type-body);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1.2;
+}
+.chrome__nowCellLead {
+  flex: none;
+  padding: 4px 10px 4px 8px;
+  background: color-mix(in oklab, var(--ink) 7%, transparent);
+  border-radius: 9px 11px 10px 8px;
+}
+.chrome__nowCellLead .chrome__nowKey {
+  font-family: var(--display);
+  font-weight: 800;
+  color: var(--ink);
+}
+.chrome__nowCellLink {
+  padding: 4px 10px;
+  background: color-mix(in oklab, var(--ink) 5%, transparent);
+  border-radius: 10px 9px 11px 8px;
+  transition:
+    background-color 0.18s ease,
+    color 0.18s ease;
+}
+.chrome__nowCellLink:hover,
+.chrome__nowCellLink:focus-visible {
+  background: color-mix(in oklab, var(--ink) 11%, transparent);
+}
+.chrome__nowCellLast {
+  flex: none;
+  margin-left: auto;
+}
+.chrome__nowCityShort {
+  display: none;
+}
+.chrome__nowLive {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  background: light-dark(var(--viridian), var(--chartreuse));
+  border-radius: 50%;
 }
 .chrome__nowCellLink:hover .chrome__nowValue,
 .chrome__nowCellLink:focus-visible .chrome__nowValue {
@@ -221,23 +237,23 @@
 }
 .chrome__nowArtImg {
   flex: none;
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   object-fit: cover;
-  border-radius: 4px;
+  border-radius: 5px;
 }
 .chrome__nowArtFallback {
   display: grid;
   flex: none;
   place-items: center;
-  width: 28px;
-  height: 28px;
+  width: 22px;
+  height: 22px;
   background: var(--vermilion);
-  border-radius: 4px;
+  border-radius: 5px;
 }
 .chrome__nowArtFallback > span {
-  width: 15px;
-  height: 15px;
+  width: 11px;
+  height: 11px;
   background: var(--ochre);
   border-radius: 50%;
 }
@@ -248,42 +264,40 @@
   color: var(--vermilion);
 }
 .chrome__footerBody {
-  padding-top: 54px;
+  padding-top: 36px;
 }
 .chrome__footerGrid {
   display: grid;
-  grid-template-columns: minmax(0, 560px) minmax(0, 640px);
-  gap: 48px;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
+  gap: 32px 44px;
   align-items: start;
   justify-content: space-between;
 }
-.chrome__helloCol {
+.chrome__helloCol,
+.chrome__elsewhereCol {
+  display: grid;
+  gap: 14px;
+  justify-items: start;
   min-width: 0;
 }
-.chrome__footerLabel {
-  margin: 0;
-  font-family: var(--display);
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.25;
-  color: var(--ochre);
-  letter-spacing: 0.01em;
-}
-.chrome__elsewhereLabel {
-  padding-left: 12px;
+.chrome__footerTag {
+  padding: 5px 12px 6px;
+  font-size: var(--type-label);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
 }
 .chrome__helloDescription {
-  margin-top: 18px;
   font-family: var(--display);
-  font-size: clamp(26px, 2.75vw, 38px);
-  font-weight: 700;
-  line-height: 1.12;
+  font-size: var(--type-h2);
+  font-weight: 800;
+  line-height: 1.15;
   color: var(--cream);
-  letter-spacing: -0.005em;
+  letter-spacing: -0.02em;
 }
 .chrome__helloDescription > * {
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 .chrome__helloDescription :is([data-typography], p) {
   margin: 0;
@@ -299,29 +313,39 @@
   color: var(--ochre);
   text-decoration: underline;
   text-decoration-thickness: 2px;
-  text-underline-offset: 5px;
+  text-underline-offset: 4px;
 }
 .chrome__helloEmailRow {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px 18px;
+  gap: 10px;
   align-items: center;
-  margin-top: 34px;
+  margin-top: 2px;
 }
 .chrome__emailLink {
+  display: inline-flex;
+  align-items: center;
+  padding: 8px 14px;
   font-family: var(--display);
-  font-size: clamp(22px, 2vw, 28px);
+  font-size: var(--type-body);
   font-weight: 700;
-  line-height: 1.15;
-  color: var(--ochre);
-  text-decoration-line: underline;
-  text-decoration-thickness: 2px;
-  text-underline-offset: 7px;
-  transition: color 0.18s ease;
+  line-height: 1.2;
+  color: var(--cream);
+  text-decoration: none;
+  background: color-mix(in oklab, var(--cream) 10%, var(--viridian));
+  border: var(--collage-border-width) solid color-mix(in oklab, var(--cream) 28%, transparent);
+  border-radius: 13px 11px 14px 12px;
+  box-shadow: 0 2px 0 rgb(0 0 0 / 0.16);
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease;
 }
 .chrome__emailLink:hover,
 .chrome__emailLink:focus-visible {
-  color: var(--cream);
+  color: var(--ochre);
+  background: color-mix(in oklab, var(--cream) 15%, var(--viridian));
+  border-color: var(--ochre);
 }
 .chrome__emailObfuscated {
   direction: rtl;
@@ -330,134 +354,117 @@
 .chrome__copyChip {
   display: inline-flex;
   align-items: center;
-  height: 34px;
-  padding: 0 14px;
+  padding: 8px 13px;
   font-family: var(--display);
-  font-size: 15px;
+  font-size: var(--type-meta);
   font-weight: 700;
-  line-height: 1;
-  color: var(--cream);
+  line-height: 1.2;
+  color: var(--ink-on-cream);
   cursor: pointer;
-  background: transparent;
-  border: 1.5px solid rgb(247 241 226 / 0.32);
-  border-radius: 10px;
+  background: var(--ochre);
+  border: var(--collage-border-width) solid
+    color-mix(in oklab, var(--ink-on-cream) 20%, transparent);
+  border-radius: 11px 13px 12px 14px;
+  box-shadow: 0 2px 0 rgb(0 0 0 / 0.18);
   transition:
     background-color 0.18s ease,
-    border-color 0.18s ease,
-    color 0.18s ease;
+    transform 0.18s ease;
 }
 .chrome__copyChip:hover,
 .chrome__copyChip:focus-visible {
-  color: var(--ochre);
-  background: rgb(247 241 226 / 0.06);
-  border-color: var(--ochre);
+  background: var(--cream);
 }
-.chrome__elsewhereCol {
-  min-width: 0;
-}
-.chrome__ledger {
-  margin-top: 18px;
-  border-bottom: 1px solid rgb(247 241 226 / 0.18);
-}
-.chrome__ledgerRow {
+.chrome__elsewhereList {
   display: flex;
-  gap: 14px;
+  flex-wrap: wrap;
+  gap: 9px;
+}
+.chrome__elsewhereChip {
+  display: inline-flex;
+  gap: 8px;
   align-items: center;
-  height: 54px;
-  padding: 0 14px 0 12px;
+  padding: 8px 14px;
+  font-family: var(--display);
+  font-size: var(--type-meta);
+  font-weight: 700;
+  line-height: 1.2;
   color: var(--cream);
   text-decoration: none;
-  border-top: 1px solid rgb(247 241 226 / 0.18);
+  background: color-mix(in oklab, var(--cream) 10%, var(--viridian));
+  border: var(--collage-border-width) solid color-mix(in oklab, var(--cream) 24%, transparent);
+  border-radius: 12px 14px 11px 13px;
+  box-shadow: 0 2px 0 rgb(0 0 0 / 0.16);
   transition:
     background-color 0.18s ease,
     border-color 0.18s ease,
-    color 0.18s ease;
+    color 0.18s ease,
+    translate 0.18s ease;
 }
-.chrome__ledgerRow:hover,
-.chrome__ledgerRow:focus-visible {
-  background: rgb(247 241 226 / 0.06);
-  border-top-color: var(--ochre);
+.chrome__elsewhereChip:hover,
+.chrome__elsewhereChip:focus-visible {
+  color: var(--ochre);
+  background: color-mix(in oklab, var(--cream) 16%, var(--viridian));
+  border-color: var(--ochre);
 }
-.chrome__ledgerRow:hover + .chrome__ledgerRow,
-.chrome__ledgerRow:focus-visible + .chrome__ledgerRow {
-  border-top-color: var(--ochre);
-}
-.chrome__ledgerIcon {
+.chrome__elsewhereIcon {
   display: grid;
   flex: none;
   place-items: center;
-  width: 20px;
-  height: 20px;
-  transition: color 0.18s ease;
+  width: 16px;
+  height: 16px;
 }
-.chrome__ledgerIcon svg {
-  width: 20px;
-  height: 20px;
+.chrome__elsewhereIcon svg {
+  width: 16px;
+  height: 16px;
 }
-.chrome__ledgerTitle {
-  flex: none;
-  font-family: var(--display);
-  font-size: 20px;
-  font-weight: 700;
-  line-height: 1;
-  transition: color 0.18s ease;
-}
-.chrome__ledgerHandle {
-  min-width: 0;
-  margin-left: auto;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 15px;
-  font-variant-numeric: tabular-nums;
-  color: rgb(247 241 226 / 0.62);
+.chrome__elsewhereTitle {
   white-space: nowrap;
-  transition: color 0.18s ease;
 }
-.chrome__ledgerArrow {
+.chrome__elsewhereArrow {
   flex: none;
-  color: rgb(247 241 226 / 0.62);
+  color: color-mix(in oklab, var(--cream) 64%, transparent);
   transition:
     color 0.18s ease,
     translate 0.18s ease;
 }
-.chrome__ledgerRow:hover :is(.chrome__ledgerTitle, .chrome__ledgerIcon, .chrome__ledgerArrow),
-.chrome__ledgerRow:focus-visible
-  :is(.chrome__ledgerTitle, .chrome__ledgerIcon, .chrome__ledgerArrow) {
+.chrome__elsewhereChip:hover .chrome__elsewhereArrow,
+.chrome__elsewhereChip:focus-visible .chrome__elsewhereArrow {
   color: var(--ochre);
 }
-.chrome__ledgerRow:hover .chrome__ledgerHandle,
-.chrome__ledgerRow:focus-visible .chrome__ledgerHandle {
-  color: var(--cream);
-}
 @media (prefers-reduced-motion: no-preference) {
-  .chrome__ledgerRow:hover .chrome__ledgerArrow,
-  .chrome__ledgerRow:focus-visible .chrome__ledgerArrow {
-    translate: 3px -3px;
+  .chrome__elsewhereChip:hover,
+  .chrome__elsewhereChip:focus-visible {
+    translate: 0 -2px;
+  }
+  .chrome__elsewhereChip:hover .chrome__elsewhereArrow,
+  .chrome__elsewhereChip:focus-visible .chrome__elsewhereArrow {
+    translate: 2px -2px;
   }
 }
 .chrome__colophon {
   display: flex;
   flex-wrap: wrap;
-  gap: 14px 24px;
+  gap: 10px 24px;
   align-items: center;
   justify-content: space-between;
-  padding-top: 20px;
-  margin-top: 52px;
-  font-size: 15px;
-  line-height: 1.4;
-  color: rgb(247 241 226 / 0.74);
-  border-top: 1px solid rgb(247 241 226 / 0.18);
+  padding-top: 16px;
+  margin-top: 32px;
+  font-size: var(--type-meta);
+  font-weight: 600;
+  line-height: 1.25;
+  color: color-mix(in oklab, var(--cream) 78%, transparent);
+  border-top: var(--collage-border-width) solid color-mix(in oklab, var(--cream) 16%, transparent);
 }
 .chrome__colophonGroup {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px 22px;
+  gap: 8px 18px;
   align-items: center;
 }
 .chrome__colophonVersion {
   color: inherit;
   text-decoration: underline;
-  text-decoration-color: rgb(247 241 226 / 0.42);
+  text-decoration-color: color-mix(in oklab, var(--cream) 42%, transparent);
   text-underline-offset: 4px;
   transition: color 0.18s ease;
 }
@@ -474,26 +481,11 @@
 .chrome__colophonLink:focus-visible {
   color: var(--cream);
 }
-.chrome__colophonTop {
-  font-weight: 600;
-  color: var(--cream);
-  text-decoration: none;
-  transition: color 0.18s ease;
-}
-.chrome__colophonTop:hover,
-.chrome__colophonTop:focus-visible {
-  color: var(--ochre);
-}
 
 @media (max-width: 1024px) {
-  .chrome__nowCell {
-    padding: 0 14px;
-  }
-  .chrome__nowCellLead {
-    padding-left: 0;
-  }
-  .chrome__nowCellLast {
-    padding-right: 0;
+  .chrome__nowStrip {
+    gap: 8px 12px;
+    padding: 10px 16px;
   }
 }
 
@@ -502,72 +494,72 @@
     padding-bottom: 24px;
   }
   .chrome__nowWrap {
-    margin-top: -26px;
+    margin-top: -24px;
   }
   .chrome__nowStrip {
     display: grid;
-    grid-template-columns: auto 1fr;
-    padding: 4px 16px;
-  }
-  .chrome__nowCell {
-    min-height: 32px;
-    padding: 6px 0;
-    border-left: 0;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 10px 12px;
   }
   .chrome__nowCellLead {
     grid-row: 1;
     grid-column: 1;
-    padding-right: 12px;
+    justify-self: start;
+    padding: 3px 9px 3px 7px;
   }
   .chrome__nowCellLast {
     grid-row: 1;
     grid-column: 2;
+    gap: 4px;
     justify-self: end;
-    padding-left: 12px;
     margin-left: 0;
-    border-left: 1px solid var(--now-rule);
+  }
+  .chrome__nowCityFull {
+    display: none;
+  }
+  .chrome__nowCityShort {
+    display: inline;
+  }
+  .chrome__nowCellLast .chrome__nowValue {
+    font-size: var(--type-meta);
   }
   .chrome__nowCellLink {
-    grid-column: 1 / -1;
-    border-top: 1px solid var(--now-rule);
+    grid-row: 2;
+    padding: 6px 9px;
+  }
+  .chrome__nowCellLink .chrome__nowKey {
+    display: none;
+  }
+  .chrome__nowCellLink .chrome__nowValue {
+    font-size: var(--type-meta);
+  }
+  .chrome__nowArtImg,
+  .chrome__nowArtFallback {
+    width: 18px;
+    height: 18px;
   }
   .chrome__footerBody {
-    padding-top: 26px;
+    padding-top: 22px;
   }
   .chrome__footerGrid {
     grid-template-columns: minmax(0, 1fr);
-    gap: 24px;
+    gap: 20px;
   }
-  .chrome__elsewhereLabel {
-    padding-left: 0;
-  }
-  .chrome__helloDescription {
-    margin-top: 10px;
-    font-size: 22px;
-    line-height: 1.16;
-  }
-  .chrome__helloEmailRow {
-    margin-top: 14px;
-  }
-  .chrome__ledger {
-    margin-top: 10px;
-  }
-  .chrome__ledgerRow {
+  .chrome__helloCol,
+  .chrome__elsewhereCol {
     gap: 10px;
-    height: 44px;
-    padding: 0 6px;
   }
-  .chrome__ledgerTitle {
-    font-size: 17px;
+  .chrome__elsewhereList {
+    gap: 8px;
   }
-  .chrome__ledgerHandle {
-    font-size: 13px;
+  .chrome__elsewhereChip {
+    padding: 7px 12px;
   }
   .chrome__colophon {
-    gap: 8px 18px;
-    padding-top: 14px;
+    gap: 8px 16px;
+    padding-top: 12px;
     margin-top: 20px;
-    font-size: 14px;
   }
 }
 

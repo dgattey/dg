@@ -57,8 +57,7 @@ const SAMPLE_DESCRIPTION: FooterContent['description'] = {
             data: {},
             marks: [],
             nodeType: 'text',
-            value:
-              'Building software and design tools in San Francisco. Always happy to chat about product, craft, or a good ride.',
+            value: 'Making software in San Francisco. Say hi anytime.',
           },
         ],
         data: {},
@@ -170,15 +169,14 @@ describe('Footer', () => {
     expect(screen.getByText('Say hello')).toBeInTheDocument();
     expect(screen.getByText('Elsewhere')).toBeInTheDocument();
     expect(
-      screen.getByText(
-        'Building software and design tools in San Francisco. Always happy to chat about product, craft, or a good ride.',
-      ),
+      screen.getByText('Making software in San Francisco. Say hi anytime.'),
     ).toBeInTheDocument();
 
     expect(screen.queryByText(/37\.76/)).not.toBeInTheDocument();
     expect(screen.queryByText(/122\.45/)).not.toBeInTheDocument();
     expect(screen.queryByText(/llms\.txt/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Dev console/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Back to top/i)).not.toBeInTheDocument();
 
     expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', homeRoute);
     expect(screen.getByRole('link', { name: 'Music' })).toHaveAttribute('href', musicRoute);
@@ -186,10 +184,9 @@ describe('Footer', () => {
       'href',
       favoriteAlbumsRoute,
     );
-    expect(screen.getByRole('link', { name: 'Back to top ↑' })).toHaveAttribute('href', '#top');
   });
 
-  it('renders Elsewhere ledger links with X ordered directly underneath Instagram', async () => {
+  it('renders Elsewhere compact chips without raw URLs and with X ordered directly after Instagram', async () => {
     mockGetFooterContent.mockResolvedValue({
       description: SAMPLE_DESCRIPTION,
       links: SAMPLE_LINKS,
@@ -221,7 +218,8 @@ describe('Footer', () => {
       instagram.compareDocumentPosition(xLink) & Node.DOCUMENT_POSITION_FOLLOWING,
     ).toBeTruthy();
     expect(xLink.compareDocumentPosition(linkedin) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
-    expect(screen.getByText('x.com/dyl_gat')).toBeInTheDocument();
+    expect(screen.queryByText('x.com/dyl_gat')).not.toBeInTheDocument();
+    expect(screen.queryByText(/strava\.com\/athletes/i)).not.toBeInTheDocument();
   });
 
   it('obfuscates the email in static SSR HTML and decodes on client for mailto and copy', async () => {

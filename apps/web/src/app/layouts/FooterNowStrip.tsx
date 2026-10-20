@@ -93,7 +93,10 @@ export function FooterNowStrip({ initialTrack, latestActivity }: FooterNowStripP
           </a>
         ) : null}
         <div className="chrome__nowCell chrome__nowCellLast">
-          <span className="chrome__nowKey">San Francisco</span>
+          <span className="chrome__nowKey chrome__nowCityFull">San Francisco</span>
+          <span aria-hidden="true" className="chrome__nowKey chrome__nowCityShort">
+            SF ·
+          </span>
           <span className="chrome__nowValue">{sfTime}</span>
         </div>
       </section>

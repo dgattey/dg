@@ -17,6 +17,7 @@ import { getFooterContent } from '../../services/contentful';
 import { getLastKnownSong } from '../../services/spotify';
 import { getLatestActivity } from '../../services/strava';
 import { getAppVersionInfo } from '../../services/version';
+import { PaperTag } from '../collage/PaperTag';
 import { FooterEmailAction } from './FooterEmailAction';
 import { FooterNowStrip } from './FooterNowStrip';
 
@@ -37,33 +38,22 @@ async function getCopyrightYear() {
   return new Date().getFullYear();
 }
 
-function formatElsewhereHandle(rawUrl: string): string {
-  try {
-    const parsed = new URL(rawUrl);
-    const host = parsed.hostname.replace(/^www\./, '');
-    const pathname = parsed.pathname.replace(/\/$/, '');
-    return `${host}${pathname}`;
-  } catch {
-    return rawUrl.replace(/^https?:\/\/(www\.)?/, '').replace(/\/$/, '');
-  }
-}
-
-function renderLedgerIcon(icon: string | null | undefined): ReactNode {
+function renderElsewhereIcon(icon: string | null | undefined): ReactNode {
   switch (icon) {
     case 'cursor':
-      return <CursorIcon size="20px" />;
+      return <CursorIcon size="16px" />;
     case 'github':
-      return <FaIcon icon={faGithub} size="20px" />;
+      return <FaIcon icon={faGithub} size="16px" />;
     case 'strava':
-      return <FaIcon icon={faStrava} size="20px" />;
+      return <FaIcon icon={faStrava} size="16px" />;
     case 'spotify':
-      return <FaIcon icon={faSpotify} size="20px" />;
+      return <FaIcon icon={faSpotify} size="16px" />;
     case 'instagram':
-      return <FaIcon icon={faInstagram} size="20px" />;
+      return <FaIcon icon={faInstagram} size="16px" />;
     case 'x':
-      return <FaIcon icon={faXTwitter} size="20px" />;
+      return <FaIcon icon={faXTwitter} size="16px" />;
     case 'linkedin':
-      return <FaIcon icon={faLinkedinIn} size="20px" />;
+      return <FaIcon icon={faLinkedinIn} size="16px" />;
     default:
       return null;
   }
@@ -97,7 +87,9 @@ export async function Footer() {
       <div className="collageMeasure chrome__footerBody">
         <div className="chrome__footerGrid">
           <div className="chrome__helloCol">
-            <p className="chrome__footerLabel">Say hello</p>
+            <PaperTag className="chrome__footerTag" edge="quad-c" tiltDeg={-1} tone="ochre">
+              Say hello
+            </PaperTag>
             {footerContent.description ? (
               <div className="chrome__helloDescription">
                 <RichText {...footerContent.description} />
@@ -106,39 +98,37 @@ export async function Footer() {
             <FooterEmailAction encodedEmail={encodedEmail} />
           </div>
           <div className="chrome__elsewhereCol">
-            <p className="chrome__footerLabel chrome__elsewhereLabel">Elsewhere</p>
+            <PaperTag className="chrome__footerTag" edge="quad-b" tiltDeg={1} tone="cream">
+              Elsewhere
+            </PaperTag>
             {elsewhereLinks.length > 0 ? (
-              <div className="chrome__ledger">
+              <div className="chrome__elsewhereList">
                 {elsewhereLinks.map((link) => {
                   const displayTitle = link.title === 'Github' ? 'GitHub' : link.title;
-                  const handle = formatElsewhereHandle(link.url);
                   return (
                     <a
                       aria-label={displayTitle}
-                      className="chrome__ledgerRow"
+                      className="chrome__elsewhereChip"
                       href={link.url}
                       key={link.url}
                       rel="noopener noreferrer"
                       target="_blank"
                     >
-                      <span aria-hidden="true" className="chrome__ledgerIcon">
-                        {renderLedgerIcon(link.icon)}
+                      <span aria-hidden="true" className="chrome__elsewhereIcon">
+                        {renderElsewhereIcon(link.icon)}
                       </span>
-                      <span className="chrome__ledgerTitle">{displayTitle}</span>
-                      <span aria-hidden="true" className="chrome__ledgerHandle">
-                        {handle}
-                      </span>
+                      <span className="chrome__elsewhereTitle">{displayTitle}</span>
                       <svg
                         aria-hidden="true"
-                        className="chrome__ledgerArrow"
+                        className="chrome__elsewhereArrow"
                         fill="none"
-                        height={16}
+                        height={13}
                         stroke="currentColor"
                         strokeLinecap="round"
                         strokeLinejoin="round"
                         strokeWidth={2.2}
                         viewBox="0 0 24 24"
-                        width={16}
+                        width={13}
                       >
                         <path d="M7 17 17 7M8 7h9v9" />
                       </svg>
@@ -182,9 +172,6 @@ export async function Footer() {
             >
               Favorite albums
             </PageTransitionLink>
-            <a className="chrome__colophonTop" href="#top">
-              Back to top ↑
-            </a>
           </nav>
         </div>
       </div>
