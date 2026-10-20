@@ -36,10 +36,12 @@ describe('Logo', () => {
     scrollToSpy.mockRestore();
   });
 
-  it('draws the mark as an outline instead of system-font text', () => {
+  it('draws the mark as an ink stamp outline instead of system-font text', () => {
     jest.mocked(usePathname).mockReturnValue('/');
     render(<Logo />);
 
+    const link = screen.getByRole('link', { name: 'dg.' });
+    expect(link.querySelector('.chrome__logo')).not.toBeNull();
     const mark = screen.getByRole('img', { name: 'dg.' });
     expect(mark.tagName.toLowerCase()).toBe('svg');
     expect(mark.querySelectorAll('path')).toHaveLength(3);

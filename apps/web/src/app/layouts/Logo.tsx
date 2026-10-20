@@ -33,31 +33,31 @@ const MARK_VIEW_BOX = '44.7 153.26 413.01 259.92';
 
 const markStyle: CSSProperties = {
   display: 'block',
-  filter: 'drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15))',
-  height: '0.88em',
-  margin: '0.18em -0.062em -0.06em 0.022em',
+  height: '28px',
   overflow: 'visible',
   width: 'auto',
 };
 
 const logoLinkSx: SxObject = {
   '&:focus-visible': {
-    outline: '-webkit-focus-ring-color auto 1px',
+    outline: '2px solid var(--ink)',
+    outlineOffset: '5px',
   },
   '&:hover': {
-    color: 'var(--mui-palette-primary-dark)',
+    color: 'var(--logo-stamp-fg, var(--cream))',
     textDecoration: 'none',
     transform: 'scale(1.05)',
   },
   alignItems: 'center',
-  color: 'var(--mui-palette-primary-main)',
-  display: 'flex',
+  background: 'var(--logo-stamp-bg, var(--logo-fill, var(--ink)))',
+  borderRadius: '13px 15px 12px 16px',
+  boxShadow: '0 0 0 3px var(--cream), var(--shadow)',
+  color: 'var(--logo-stamp-fg, var(--cream))',
+  display: 'inline-flex',
   flexShrink: 0,
-  fontSize: '2.25em',
   justifyContent: 'center',
   lineHeight: 1,
-  paddingBlock: 1,
-  paddingInline: 1.5,
+  padding: '9px 12px 10px',
   textDecoration: 'none',
   ...createBouncyTransition(['color', 'transform']),
   willChange: 'transform',
@@ -75,6 +75,7 @@ export function Logo() {
 
   return (
     <Link
+      className="chrome__logo"
       href={homeRoute}
       onClick={handleClick}
       sx={logoLinkSx}
