@@ -154,6 +154,39 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
   return violations;
 }
 
+const CSS_IMPORT_PATTERN =
+  /(?:^\s*import\s+['"]([^'"]+\.css)['"]|^\s*@import\s+['"]([^'"]+\.css)['"])/gm;
+
+export function checkOrphanCssFiles(
+  cssPaths: ReadonlyArray<string>,
+  importers: ReadonlyMap<string, string>,
+): Array<StructureViolation> {
+  const importedCss = new Set<string>();
+  for (const [relPath, content] of importers) {
+    const dir = path.posix.dirname(relPath);
+    for (const match of content.matchAll(CSS_IMPORT_PATTERN)) {
+      const specifier = match[1] ?? match[2];
+      if (!specifier?.startsWith('.')) {
+        continue;
+      }
+      importedCss.add(path.posix.normalize(path.posix.join(dir, specifier)));
+    }
+  }
+
+  const violations: Array<StructureViolation> = [];
+  for (const cssPath of cssPaths) {
+    if (!importedCss.has(cssPath)) {
+      violations.push({
+        file: cssPath,
+        line: 1,
+        message: 'Stylesheet is not imported by any source or CSS file',
+        rule: 'no-orphan-css',
+      });
+    }
+  }
+  return violations;
+}
+
 export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolation> {
   const trackedOutput = execFileSync('git', ['ls-files', 'apps', 'packages'], {
     cwd: repoRoot,
@@ -168,19 +201,25 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
     },
   );
 
-  const relPaths = [
+  const allTrackedPaths = [
     ...new Set(
       [...trackedOutput.split('\n'), ...untrackedOutput.split('\n')]
         .map((line) => line.trim())
         .filter(
           (relPath) =>
-            /\.(ts|tsx)$/.test(relPath) &&
+            Boolean(relPath) &&
             !relPath.includes('/migrations/') &&
             !relPath.includes('/dist/') &&
             !relPath.includes('/.next/'),
         ),
     ),
   ].sort();
+
+  const relPaths = allTrackedPaths.filter((relPath) => /\.(ts|tsx)$/.test(relPath));
+  const webCssPaths = allTrackedPaths.filter(
+    (relPath) => relPath.startsWith('apps/web/src/') && relPath.endsWith('.css'),
+  );
+  const webImporters = new Map<string, string>();
 
   const violations: Array<StructureViolation> = [];
   for (const relPath of relPaths) {
@@ -190,7 +229,17 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
     }
     const content = fs.readFileSync(fullPath, 'utf8');
     violations.push(...checkFileStructure(relPath, content));
+    if (relPath.startsWith('apps/web/src/')) {
+      webImporters.set(relPath, content);
+    }
   }
+  for (const cssPath of webCssPaths) {
+    const fullPath = path.join(repoRoot, cssPath);
+    if (fs.existsSync(fullPath)) {
+      webImporters.set(cssPath, fs.readFileSync(fullPath, 'utf8'));
+    }
+  }
+  violations.push(...checkOrphanCssFiles(webCssPaths, webImporters));
   return violations;
 }
 

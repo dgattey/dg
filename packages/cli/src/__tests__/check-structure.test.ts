@@ -4,6 +4,7 @@ import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
 import {
   checkFileStructure,
+  checkOrphanCssFiles,
   checkWorkspaceStructure,
   MAX_SOURCE_FILE_LINES,
 } from '../check-structure.js';
@@ -57,6 +58,14 @@ describe('check-structure', () => {
     );
     assert.equal(inlineTypeof.length, 1);
     assert.equal(inlineTypeof[0]?.rule, 'no-inline-typeof-import');
+
+    const orphanCss = checkOrphanCssFiles(
+      ['apps/web/src/app/music/music.css', 'apps/web/src/app/dev-console/devConsole.css'],
+      new Map([['apps/web/src/app/music/page.tsx', "import './music.css';\n"]]),
+    );
+    assert.equal(orphanCss.length, 1);
+    assert.equal(orphanCss[0]?.file, 'apps/web/src/app/dev-console/devConsole.css');
+    assert.equal(orphanCss[0]?.rule, 'no-orphan-css');
   });
 
   it('validates the entire workspace in under 200ms with zero violations', () => {
