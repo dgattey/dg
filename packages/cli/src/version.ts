@@ -1,18 +1,12 @@
 #!/usr/bin/env tsx
-import { appendFileSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { exec, execSafe, fail, fmt, log } from './lib/utils.js';
+import { exec, execSafe, fail, findRoot, fmt, log, out, parseArgs } from './lib/utils.js';
 
 export type ReleaseType = 'major' | 'minor' | 'patch';
-type CommentState = 'will-be' | 'released';
 export type SemverTuple = readonly [major: number, minor: number, patch: number];
-
-interface GitHubEvent {
-  pull_request?: { body?: string; number?: number; title?: string };
-  repository?: { name?: string; owner?: { login?: string } };
-}
 
 export interface PullRequestReleaseMetadata {
   body: string;
@@ -47,29 +41,9 @@ const STOPPED_HEADINGS = new Set(
   'release info|verification|testing|test plan|tests|screenshots|demo|checklist'.split('|'),
 );
 
-function readGitHubEvent(): GitHubEvent {
-  const eventPath = process.env.GITHUB_EVENT_PATH;
-  if (!eventPath) fail('GITHUB_EVENT_PATH environment variable required');
-  return JSON.parse(readFileSync(eventPath, 'utf8')) as GitHubEvent;
-}
-
-function writeGitHubOutputs(outputs: Record<string, string>): void {
-  const outputPath = process.env.GITHUB_OUTPUT;
-  if (!outputPath) return;
-  for (const [k, v] of Object.entries(outputs)) {
-    const line = v.includes('\n') ? `${k}<<EOF_${k}\n${v}\nEOF_${k}\n` : `${k}=${v}\n`;
-    appendFileSync(outputPath, line);
-  }
-}
-
-export function parseReleaseType(prBody: string): ReleaseType {
-  if (/^\s*-\s*\[x\]\s*Major\b/im.test(prBody)) return 'major';
-  if (/^\s*-\s*\[x\]\s*Minor\b/im.test(prBody)) return 'minor';
-  return 'patch';
-}
-
 export function parseVersion(raw: string): SemverTuple {
-  const parts = raw.trim().replace(/^v/, '').split('.');
+  const clean = raw.trim().replace(/^v/, '').split('-')[0] ?? '';
+  const parts = clean.split('.');
   return [Number(parts[0]) || 0, Number(parts[1]) || 0, Number(parts[2]) || 0];
 }
 
@@ -79,26 +53,18 @@ export function compareVersions(lhs: string, rhs: string): number {
   return lMaj - rMaj || lMin - rMin || lPat - rPat;
 }
 
-export function bumpVersion(version: string, releaseType: ReleaseType): string {
-  const [major, minor, patch] = parseVersion(version);
-  switch (releaseType) {
-    case 'major':
-      return `${major + 1}.0.0`;
-    case 'minor':
-      return `${major}.${minor + 1}.0`;
-    case 'patch':
-      return `${major}.${minor}.${patch + 1}`;
-    default: {
-      const exhaustive: never = releaseType;
-      return exhaustive;
-    }
-  }
+export function bumpVersion(base: string, type: ReleaseType): string {
+  const [major, minor, patch] = parseVersion(base);
+  if (type === 'major') return `${major + 1}.0.0`;
+  if (type === 'minor') return `${major}.${minor + 1}.0`;
+  return `${major}.${minor}.${patch + 1}`;
 }
 
-function getLatestTagVersion(excludeTag?: string | null): string {
-  const tags = execSafe('git tag --list "v*" --sort=-v:refname')?.split('\n').filter(Boolean) ?? [];
-  const list = excludeTag ? tags.filter((t) => t !== excludeTag && t !== `v${excludeTag}`) : tags;
-  return list[0] ? list[0].replace(/^v/, '') : '0.0.0';
+// Keep in sync with the bump job's `if:` in .github/workflows/release.yml.
+export function parseReleaseType(prBody: string): ReleaseType {
+  if (/^\s*-\s*\[x\]\s*Major\b/im.test(prBody)) return 'major';
+  if (/^\s*-\s*\[x\]\s*Minor\b/im.test(prBody)) return 'minor';
+  return 'patch';
 }
 
 function stripAgentWrapper(body: string): string {
@@ -154,14 +120,6 @@ export function extractNotes(prBody: string, prTitle?: string): string {
   return collectSectionLines(cleaned) || (prTitle?.trim() ? `- ${prTitle.trim()}` : '');
 }
 
-function formatPrCommentBody(version: string, state: CommentState, releaseUrl?: string): string {
-  if (state === 'released') {
-    if (!releaseUrl) fail('RELEASE_URL environment variable required when state is "released"');
-    return `${PR_COMMENT_MARKER}\n🎉 This PR is included in version ${version} 🎉\n\nThe release is available on [GitHub release](${releaseUrl})`;
-  }
-  return `${PR_COMMENT_MARKER}\n🎉 This PR will be included in version ${version} 🎉`;
-}
-
 export function buildReleasePlan(
   pr: PullRequestReleaseMetadata,
   opts: BuildReleasePlanOptions,
@@ -183,86 +141,65 @@ export function buildReleasePlan(
   };
 }
 
+function getLatestTag(excludeTag?: string | null): string | null {
+  const tags = execSafe('git tag --list --sort=-v:refname')?.split('\n').filter(Boolean) ?? [];
+  const filtered = excludeTag
+    ? tags.filter((t) => t !== excludeTag && t !== `v${excludeTag}`)
+    : tags;
+  const match = filtered.find((t) => /^v?\d+\.\d+\.\d+/.test(t));
+  return match?.replace(/^v/, '') ?? null;
+}
+
+interface EventPayload {
+  pull_request?: { body?: string; number?: number; title?: string };
+  repository?: { name?: string; owner?: { login?: string } };
+}
+
+function readEvent(eventPath: string): { event: EventPayload; prBody: string; prTitle?: string } {
+  const event = JSON.parse(readFileSync(eventPath, 'utf8')) as EventPayload;
+  return { event, prBody: event.pull_request?.body ?? '', prTitle: event.pull_request?.title };
+}
+
+function formatCommentBody(version: string, state: string, releaseUrl?: string): string {
+  if (state === 'released') {
+    if (!releaseUrl) fail('RELEASE_URL required for released state');
+    return `${PR_COMMENT_MARKER}\n🎉 This PR is included in version ${version} 🎉\n\nRelease: [GitHub](${releaseUrl})`;
+  }
+  return `${PR_COMMENT_MARKER}\n🎉 This PR will be included in version ${version} 🎉`;
+}
+
+async function githubRequest<T>(method: string, path: string, body?: object): Promise<T> {
+  const token = process.env.GITHUB_TOKEN;
+  if (!token) throw new Error('GITHUB_TOKEN required');
+  const headers = {
+    Accept: 'application/vnd.github+json',
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    'User-Agent': 'dg-cli',
+  };
+  const res = await fetch(`https://api.github.com${path}`, {
+    body: body ? JSON.stringify(body) : undefined,
+    headers,
+    method,
+  });
+  if (!res.ok) throw new Error(`GitHub API ${res.status}: ${await res.text()}`);
+  const text = await res.text();
+  return (text ? JSON.parse(text) : null) as T;
+}
+
 function getFlag(args: ReadonlyArray<string>, flag: string): string | undefined {
   const idx = args.indexOf(flag);
   return idx !== -1 ? args[idx + 1] : undefined;
 }
 
-function bump(): void {
-  const event = readGitHubEvent();
-  const releaseType = parseReleaseType(event.pull_request?.body ?? '');
-  const latestTag = getLatestTagVersion();
-  const target = bumpVersion(latestTag, releaseType);
-  const pkg = JSON.parse(readFileSync('package.json', 'utf8')) as { version: string };
-  const changed = pkg.version !== target;
-  log(`Latest: v${latestTag}, type: ${releaseType}, current: ${pkg.version}, target: ${target}`);
-  if (changed) {
-    pkg.version = target;
-    writeFileSync('package.json', `${JSON.stringify(pkg, null, 2)}\n`);
-    log(fmt.success(`Bumped package.json to ${target}`));
-  } else {
-    log(fmt.success(`Already at target ${target}, skipping`));
-  }
-  writeGitHubOutputs({ CHANGED: String(changed), VERSION: target });
-}
-
-function releaseInfo(): void {
-  const event = readGitHubEvent();
-  const pkg = JSON.parse(readFileSync('package.json', 'utf8')) as { version: string };
-  const notes = extractNotes(event.pull_request?.body ?? '', event.pull_request?.title);
-  log(
-    `Version: ${pkg.version} | Notes: ${notes ? `${notes.split('\n').length} line(s)` : '(empty)'}`,
-  );
-  writeGitHubOutputs({ NOTES: notes, VERSION: pkg.version });
-}
-
-async function prComment(): Promise<void> {
-  const args = process.argv.slice(3);
-  const version = getFlag(args, '--version');
-  const state = getFlag(args, '--state') as CommentState | undefined;
-  if (!version) fail('--version is required');
-  if (state !== 'will-be' && state !== 'released') fail('--state must be "will-be" or "released"');
-  const token = process.env.GITHUB_TOKEN;
-  if (!token) fail('GITHUB_TOKEN environment variable required');
-
-  const event = readGitHubEvent();
-  const owner = event.repository?.owner?.login;
-  const repo = event.repository?.name;
-  const issueNumber = event.pull_request?.number;
-  if (!owner || !repo || !issueNumber) fail('Missing repository or pull_request info in event');
-
-  const body = formatPrCommentBody(version, state, process.env.RELEASE_URL);
-  const headers = {
-    Accept: 'application/vnd.github+json',
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-  };
-  const base = `https://api.github.com/repos/${owner}/${repo}`;
-  const listRes = await fetch(`${base}/issues/${issueNumber}/comments?per_page=100`, { headers });
-  if (!listRes.ok) fail(`GitHub API error listing comments: ${listRes.status}`);
-
-  const comments = (await listRes.json()) as Array<{ body?: string; id: number }>;
-  const existing = comments.find((c) => c.body?.includes(PR_COMMENT_MARKER));
-  const endpoint = existing ? `issues/comments/${existing.id}` : `issues/${issueNumber}/comments`;
-  const method = existing ? 'PATCH' : 'POST';
-  const res = await fetch(`${base}/${endpoint}`, {
-    body: JSON.stringify({ body }),
-    headers,
-    method,
-  });
-  if (!res.ok) fail(`GitHub API error updating comment: ${res.status}`);
-  log(fmt.success(`${existing ? 'Updated' : 'Created'} PR #${issueNumber} comment (${state})`));
-}
-
-function releasePr(): void {
-  const args = process.argv.slice(3);
+function runReleasePr(args: ReadonlyArray<string>): void {
   const dryRun = args.includes('--dry-run') || args.includes('-n');
   const prArg = args.find(
     (a, i) => !a.startsWith('-') && args[i - 1] !== '--bump-type' && args[i - 1] !== '--repo',
   );
   const prNumber = prArg ? Number.parseInt(prArg.replace(/^#/, ''), 10) : Number.NaN;
   if (!Number.isInteger(prNumber) || prNumber <= 0)
-    fail('Usage: version.ts release-pr <pr-number> [--dry-run]');
+    fail('Usage: version release-pr <pr-number> [--dry-run]');
   const bumpRaw = getFlag(args, '--bump-type')?.toLowerCase();
   if (bumpRaw && bumpRaw !== 'major' && bumpRaw !== 'minor' && bumpRaw !== 'patch')
     fail(`Invalid --bump-type "${bumpRaw}"`);
@@ -297,12 +234,13 @@ function releasePr(): void {
   const plan = buildReleasePlan(prMeta, {
     bumpTypeOverride: bumpRaw as ReleaseType | undefined,
     existingTagOnCommit,
-    latestTag: getLatestTagVersion(existingTagOnCommit),
+    latestTag: getLatestTag(existingTagOnCommit) ?? '0.0.0',
     mergedPackageVersion,
   });
 
-  log(`PR #${plan.prNumber} (${rawPr.state}) -> v${plan.version} (${plan.releaseType})`);
-  log(`Notes:\n${plan.notes || '(empty)'}`);
+  log(
+    `PR #${plan.prNumber} (${rawPr.state}) -> v${plan.version} (${plan.releaseType})\nNotes:\n${plan.notes || '(empty)'}`,
+  );
   if (dryRun) {
     log(fmt.info(`[DRY RUN] Would release v${plan.version} and comment on PR #${plan.prNumber}`));
     return;
@@ -325,22 +263,82 @@ function releasePr(): void {
     const comments = JSON.parse(listJson) as Array<{ body?: string; id: number }>;
     const existing = comments.find((c) => c.body?.includes(PR_COMMENT_MARKER));
     const payloadPath = join(tmpDir, 'comment.json');
-    const body = formatPrCommentBody(plan.version, 'released', releaseUrl);
+    const body = formatCommentBody(plan.version, 'released', releaseUrl);
     writeFileSync(payloadPath, JSON.stringify({ body }), 'utf8');
     const ep = existing ? `issues/comments/${existing.id}` : `issues/${plan.prNumber}/comments`;
-    const method = existing ? 'PATCH' : 'POST';
-    exec(`gh api --method ${method} "repos/${repo}/${ep}" --input "${payloadPath}"`);
+    exec(
+      `gh api --method ${existing ? 'PATCH' : 'POST'} "repos/${repo}/${ep}" --input "${payloadPath}"`,
+    );
     log(fmt.success(`Released ${tag} and updated PR #${plan.prNumber} -> ${releaseUrl}`));
   } finally {
     rmSync(tmpDir, { force: true, recursive: true });
   }
 }
 
-const command = process.argv[2];
+async function main(): Promise<void> {
+  const pkgPath = join(findRoot(), 'package.json');
+  const readPkg = (): { version: string } => JSON.parse(readFileSync(pkgPath, 'utf8'));
+  const [cmd, ...args] = parseArgs();
+
+  switch (cmd) {
+    case 'bump': {
+      if (!args[0]) fail('Usage: version bump <event-path>');
+      const { prBody } = readEvent(args[0]);
+      const releaseType = parseReleaseType(prBody);
+      const current = readPkg().version;
+      const base = getLatestTag() ?? current;
+      const target = bumpVersion(base, releaseType);
+      log(fmt.info(`Release: ${releaseType} | Current: ${current} | Base: ${base} -> ${target}`));
+      if (current !== target) {
+        const pkg = readPkg();
+        pkg.version = target;
+        writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`, 'utf8');
+      }
+      out(`VERSION_FROM=${base}\nVERSION_TO=${target}\nCHANGED=${current !== target}`);
+      break;
+    }
+
+    case 'release-info': {
+      if (!args[0]) fail('Usage: version release-info <event-path>');
+      const { prBody, prTitle } = readEvent(args[0]);
+      const version = readPkg().version;
+      const notes = extractNotes(prBody, prTitle);
+      const d = `NOTES_DELIM_${Date.now()}`;
+      out(`VERSION=${version}\nNOTES<<${d}\n${notes}\n${d}`);
+      break;
+    }
+
+    case 'pr-comment': {
+      const [eventPath, version, state] = args;
+      if (!eventPath || !version || !state)
+        fail('Usage: version pr-comment <event> <version> <will-be|released>');
+      const { event } = readEvent(eventPath);
+      const owner = event.repository?.owner?.login;
+      const repoName = event.repository?.name;
+      const number = event.pull_request?.number;
+      if (!owner || !repoName || !number) fail('Missing repo info in event');
+
+      const body = formatCommentBody(version, state, process.env.RELEASE_URL);
+      const path = `/repos/${owner}/${repoName}/issues/${number}/comments?per_page=100`;
+      const comments = await githubRequest<Array<{ id: number; body?: string }>>('GET', path);
+      const existing = comments.find((c) => c.body?.includes(PR_COMMENT_MARKER));
+      const ep = existing ? `comments/${existing.id}` : `${number}/comments`;
+      await githubRequest(existing ? 'PATCH' : 'POST', `/repos/${owner}/${repoName}/issues/${ep}`, {
+        body,
+      });
+      log(fmt.success(`Updated PR #${number} comment (${state} v${version})`));
+      break;
+    }
+
+    case 'release-pr':
+      runReleasePr(args);
+      break;
+
+    default:
+      fail(`Unknown command: ${cmd ?? ''}`);
+  }
+}
+
 if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
-  if (command === 'bump') bump();
-  else if (command === 'release-info') releaseInfo();
-  else if (command === 'pr-comment') await prComment();
-  else if (command === 'release-pr') releasePr();
-  else fail(`Unknown subcommand: "${command ?? ''}"`);
+  await main();
 }
