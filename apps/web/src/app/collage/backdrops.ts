@@ -256,3 +256,39 @@ export const SERVER_ERROR_BACKDROP = defineBackdrop('fill', 1, [
     ],
   },
 ]);
+
+/** Library ledger: ruled notebook paper, gingham, dots, and botanical bookmarks. */
+// biome-ignore format: placement rows read as a table
+export const READING_BACKDROP = defineBackdrop(1300, 10, [
+  {
+    cutOuts: [
+      ['reading-swallow', 'swallow', 'vermilion', 190, -14, 78, 8, 'desktop', 1],
+      ['reading-fern', 'fern', 'olive', 320, 18, -7, 46, 'desktop', 0],
+      ['reading-coral', 'coral', 'rose', 230, -12, 82, 72, 'desktop', 1],
+    ],
+    sheets: [
+      ['reading-ruled', 'torn', 'ruled', ['cream', 'cerulean'], 50, 2, 52, 440, -1.8, 'desktop'],
+      ['reading-gingham', 'torn', 'gingham', ['ochre', 'vermilion'], -6, 44, 42, 380, 2.2, 'all'],
+    ],
+  },
+  {
+    cutOuts: [
+      ['reading-pods', 'pods', 'ochre', 210, 22, -5, 36, 'all', 1],
+      ['reading-seaweed2', 'seaweed2', 'ultramarine', 220, 12, 81, 58, 'desktop', 1],
+      ['reading-star', 'star5', 'star', 42, -10, 86, 14, 'desktop', 1],
+    ],
+    sheets: [
+      ['reading-dots', 'torn', 'dots', ['viridian', 'leaf'], 52, 6, 50, 420, -2.4, 'all'],
+      ['reading-stripes', 'torn', 'stripes', ['cerulean', 'cream'], -4, 58, 40, 360, 1.9, 'desktop'],
+    ],
+  },
+  {
+    cutOuts: [
+      ['reading-philo', 'philo', 'viridian', 290, -18, 82, 18, 'desktop', 0],
+      ['reading-trefoil', 'trefoil', 'ochre', 150, 14, 2, 62, 'all', 1],
+    ],
+    sheets: [
+      ['reading-checker', 'torn', 'checker', ['rose', 'cream'], 48, 22, 52, 400, -1.6, 'all'],
+    ],
+  },
+]);

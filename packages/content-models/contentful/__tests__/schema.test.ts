@@ -1,4 +1,7 @@
 import { safeParse } from 'valibot';
+import { FALLBACK_BOOKS } from '../../books/fallbackBooks';
+import { cleanBookTitle, toRenderableBook } from '../renderables/books';
+import { booksResponseSchema } from '../schema/books';
 import { footerLinksResponseSchema } from '../schema/footer';
 import { introBlockResponseSchema } from '../schema/intro';
 import { currentLocationResponseSchema } from '../schema/location';
@@ -115,5 +118,67 @@ describe('contentful schemas', () => {
     };
 
     expect(safeParse(currentLocationResponseSchema, input).success).toBe(true);
+  });
+
+  it('parses book collection responses and maps renderable books', () => {
+    const input = {
+      bookCollection: {
+        __typename: 'BookCollection',
+        items: [
+          {
+            __typename: 'Book',
+            author: 'Frank Herbert',
+            rating: 5,
+            readDateFinished: '2025-01-04T00:00:00Z',
+            readingStatus: 'read',
+            reviewDescription: {
+              json: {
+                content: [
+                  {
+                    content: [{ data: {}, marks: [], nodeType: 'text', value: 'Epic novel.' }],
+                    data: {},
+                    nodeType: 'paragraph',
+                  },
+                ],
+                data: {},
+                nodeType: 'document',
+              },
+            },
+            sys: { id: 'book-dune' },
+            thumbnail: {
+              height: 475,
+              url: 'https://images.ctfassets.net/space/dune.webp',
+              width: 316,
+            },
+            title: 'Dune (Dune, #1)',
+          },
+        ],
+      },
+    };
+
+    const parsed = safeParse(booksResponseSchema, input);
+    expect(parsed.success).toBe(true);
+
+    const renderable = toRenderableBook(input.bookCollection.items[0]);
+    expect(renderable).toEqual({
+      author: 'Frank Herbert',
+      id: 'book-dune',
+      rating: 5,
+      readDateFinished: '2025-01-04T00:00:00Z',
+      readingStatus: 'read',
+      review: 'Epic novel.',
+      thumbnail: {
+        height: 475,
+        url: 'https://images.ctfassets.net/space/dune.webp',
+        width: 316,
+      },
+      title: 'Dune',
+    });
+    expect(
+      cleanBookTitle(
+        "The Hitchhiker's Guide to the Galaxy (The Hitchhiker's Guide to the Galaxy, #1)",
+      ),
+    ).toBe("The Hitchhiker's Guide to the Galaxy");
+    expect(FALLBACK_BOOKS.length).toBeGreaterThanOrEqual(20);
   });
 });

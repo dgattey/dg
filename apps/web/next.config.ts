@@ -27,6 +27,18 @@ const nextConfig: NextConfig = {
         hostname: 'i.scdn.co',
         protocol: 'https',
       },
+      {
+        hostname: 'i.gr-assets.com',
+        protocol: 'https',
+      },
+      {
+        hostname: 's.gr-assets.com',
+        protocol: 'https',
+      },
+      {
+        hostname: 'covers.openlibrary.org',
+        protocol: 'https',
+      },
     ],
   },
   reactCompiler: true,

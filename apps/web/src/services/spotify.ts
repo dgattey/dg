@@ -24,6 +24,9 @@ export const getLatestSong = async () => {
   'use cache';
   cacheLife('seconds');
   cacheTag(LATEST_SONG_TAG);
+  if (process.env.NODE_ENV !== 'test' && !process.env.SPOTIFY_CLIENT_ID) {
+    return null;
+  }
   return await withMissingTokenFallback(fetchRecentlyPlayed());
 };
 
@@ -36,5 +39,8 @@ export const getLastKnownSong = async () => {
   'use cache';
   cacheLife('minutes');
   cacheTag(LATEST_SONG_TAG);
+  if (process.env.NODE_ENV !== 'test' && !process.env.SPOTIFY_CLIENT_ID) {
+    return null;
+  }
   return await withMissingTokenFallback(fetchRecentlyPlayed());
 };

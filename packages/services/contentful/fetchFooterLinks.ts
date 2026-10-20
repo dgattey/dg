@@ -122,6 +122,9 @@ function normalizeFooterDescription(
  * Fetches the footer description (TextBlock) and social/contact links from Contentful.
  */
 export async function fetchFooterContent(): Promise<FooterContent> {
+  if (!process.env.CONTENTFUL_SPACE_ID || !process.env.CONTENTFUL_ACCESS_TOKEN) {
+    return { description: null, links: [] };
+  }
   const data = parseResponse(
     footerLinksResponseSchema,
     await getContentfulClient().request(QUERY),

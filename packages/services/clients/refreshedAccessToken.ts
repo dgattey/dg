@@ -1,5 +1,4 @@
 import 'server-only';
-import { db } from '@dg/db';
 import type { CreateTokenProps, FetchTokenProps } from '@dg/db/models/Token';
 import { assertHttpsEndpoint } from '@dg/shared-core/assertions/assertHttpsEndpoint';
 import { MissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
@@ -23,6 +22,7 @@ async function createOrUpdateToken({
   expiryAt,
   refreshToken,
 }: CreateTokenProps) {
+  const { db } = await import('@dg/db');
   const token = await db.Token.upsert({
     accessToken,
     expiryAt,
@@ -38,6 +38,7 @@ async function createOrUpdateToken({
  * and access tokens if valid.
  */
 async function getLatestTokenIfValid({ name }: FetchTokenProps) {
+  const { db } = await import('@dg/db');
   const token = await db.Token.findOne({
     attributes: ['accessToken', 'refreshToken', 'expiryAt'],
     where: { name },

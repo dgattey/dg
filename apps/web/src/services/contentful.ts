@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { fetchBooks } from '@dg/services/contentful/fetchBooks';
 import { fetchCurrentLocation } from '@dg/services/contentful/fetchCurrentLocation';
 import { fetchFooterContent, fetchFooterLinks } from '@dg/services/contentful/fetchFooterLinks';
 import { fetchIntroContent } from '@dg/services/contentful/fetchIntroContent';
@@ -57,4 +58,9 @@ export const getLinkByName = async (name: string) => {
 export const getCurrentLocation = async () => {
   'use cache';
   return await cachedContentful(fetchCurrentLocation);
+};
+
+export const getBooks = async () => {
+  'use cache';
+  return await cachedContentful(fetchBooks);
 };

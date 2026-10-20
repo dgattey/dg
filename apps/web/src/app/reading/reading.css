@@ -1,0 +1,429 @@
+/* Reading library page (Direction 11: Latest feature + year-margin stream) */
+
+.reading__layout {
+  position: relative;
+  display: grid;
+  row-gap: 44px;
+  width: 100%;
+  padding-block: 40px 56px;
+}
+
+.reading__titleRow {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 32px;
+  align-items: flex-end;
+  justify-content: space-between;
+}
+
+.reading__title {
+  padding-top: 12px;
+}
+
+.reading__controls {
+  position: relative;
+  z-index: 3;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  padding-bottom: 6px;
+}
+
+.reading__pillTag {
+  padding: 0;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.reading__pillButton {
+  all: unset;
+  padding: 11px 16px 12px;
+  cursor: pointer;
+}
+
+.reading__pillButton:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+
+/* Feature card: Latest finished read */
+.reading__feature {
+  z-index: 3;
+}
+
+.reading__featureInner {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 36px;
+  align-items: start;
+  padding: 36px 40px;
+}
+
+.reading__featureCover {
+  width: 200px;
+  line-height: 0;
+  filter: var(--dshadow-lift);
+  rotate: -2deg;
+}
+
+.reading__featureCover img,
+.reading__cardCover img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 6px;
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.28);
+}
+
+.reading__coverFallback {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  padding: 12px;
+  font-family: var(--display);
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--ink-on-cream);
+  text-align: center;
+  background: color-mix(in oklab, var(--ochre) 65%, var(--cream));
+  border-radius: 6px;
+  box-shadow: 0 1px 0 rgb(0 0 0 / 0.28);
+}
+
+.reading__featureBody {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+}
+
+.reading__featureKicker {
+  display: inline-flex;
+  gap: 10px;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ochre);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.reading__featureTitle {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+}
+
+.reading__featureAuthor {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--soft);
+}
+
+.reading__featureMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.reading__date {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--soft);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.reading__featurePull {
+  max-width: 58ch;
+  margin: 6px 0 0;
+  font-family: var(--display);
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.32;
+}
+
+.reading__featureRest {
+  max-width: 65ch;
+  margin: 2px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: color-mix(in oklab, var(--on) 88%, var(--pc));
+}
+
+/* Stars */
+.reading__stars {
+  display: inline-flex;
+  gap: 2px;
+  align-items: center;
+  line-height: 1;
+}
+
+.reading__star {
+  flex: none;
+  color: var(--on);
+}
+
+.reading__starEmpty {
+  opacity: 0.24;
+}
+
+.reading__cardOnDark .reading__starOn {
+  color: var(--ochre);
+}
+
+.reading__cardOnLight .reading__starOn {
+  color: var(--ink-on-cream);
+}
+
+/* Kraft paper variant for non-5-star stream cards */
+.reading__cardKraft {
+  --pc: light-dark(#e3d4b4, #dfd2b5);
+  --on: var(--ink-on-cream);
+  --soft: color-mix(in oklab, var(--on) 66%, var(--pc));
+}
+
+/* Year section: 200px sticky margin rail + 2-across stream */
+.reading__sections {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  row-gap: 56px;
+}
+
+.reading__yearSection {
+  display: grid;
+  grid-template-columns: 200px minmax(0, 1fr);
+  gap: 36px;
+  align-items: start;
+}
+
+.reading__yearRail {
+  position: sticky;
+  top: calc(var(--site-header-height, 96px) + 18px);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  padding-top: 6px;
+}
+
+.reading__yearTag {
+  padding: 10px 18px 12px;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.reading__railStats {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+  color: var(--ink);
+}
+
+.reading__railCount {
+  font-family: var(--display);
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.reading__railSub {
+  font-size: 12px;
+  font-weight: 600;
+  color: color-mix(in oklab, var(--ink) 74%, var(--paper));
+}
+
+.reading__stream {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 44px;
+  align-items: start;
+}
+
+.reading__cardInner {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px 26px 26px;
+}
+
+.reading__cardTop {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.reading__coverWrap {
+  width: 96px;
+  line-height: 0;
+  filter: var(--dshadow);
+  rotate: var(--cover-r, -1.5deg);
+}
+
+.reading__cardHead {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.reading__bookTitle {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 800;
+  line-height: 1.22;
+  letter-spacing: -0.005em;
+}
+
+.reading__bookAuthor {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--soft);
+}
+
+.reading__metaRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 2px;
+}
+
+.reading__note {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  max-width: 62ch;
+  padding-top: 12px;
+  margin: 0;
+  overflow: hidden;
+  -webkit-line-clamp: 4;
+  font-size: 16px;
+  line-height: 1.55;
+  color: color-mix(in oklab, var(--on) 90%, var(--pc));
+  border-top: 1px solid color-mix(in oklab, var(--on) 16%, transparent);
+}
+
+/* Odd trailing card in a year spans both columns */
+.reading__cardWide {
+  grid-column: 1 / -1;
+}
+
+.reading__cardWide .reading__cardInner {
+  display: grid;
+  grid-template-columns: 112px minmax(220px, 280px) minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.reading__cardWide .reading__cardTop {
+  display: contents;
+}
+
+.reading__cardWide .reading__coverWrap {
+  width: 112px;
+}
+
+.reading__cardWide .reading__note {
+  padding-top: 0;
+  padding-left: 22px;
+  -webkit-line-clamp: 5;
+  border-top: 0;
+  border-left: 1px solid color-mix(in oklab, var(--on) 16%, transparent);
+}
+
+.reading__cardWideNoNote .reading__cardInner {
+  grid-template-columns: 112px minmax(0, 1fr);
+}
+
+.reading__empty {
+  padding: 28px 32px;
+  font-family: var(--display);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+@media (max-width: 960px) {
+  .reading__yearSection {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .reading__yearRail {
+    position: relative;
+    top: auto;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 14px 20px;
+    align-items: center;
+  }
+
+  .reading__railStats {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    align-items: baseline;
+    padding-left: 0;
+  }
+
+  .reading__cardWide .reading__cardInner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .reading__cardWide .reading__cardTop {
+    display: grid;
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 18px;
+  }
+
+  .reading__cardWide .reading__coverWrap {
+    width: 96px;
+  }
+
+  .reading__cardWide .reading__note {
+    padding-top: 12px;
+    padding-left: 0;
+    border-top: 1px solid color-mix(in oklab, var(--on) 16%, transparent);
+    border-left: 0;
+  }
+}
+
+@media (max-width: 720px) {
+  .reading__featureInner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 22px;
+    padding: 26px 24px 28px;
+  }
+
+  .reading__featureCover {
+    width: 148px;
+  }
+
+  .reading__stream {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 28px;
+  }
+
+  .reading__controls {
+    justify-content: flex-start;
+  }
+}
