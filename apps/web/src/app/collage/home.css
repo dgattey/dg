@@ -73,7 +73,7 @@
     color-mix(in oklab, var(--cream) 78%, transparent),
     color-mix(in oklab, var(--black) 55%, transparent)
   );
-  border: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
+  border: var(--collage-border-width) solid color-mix(in oklab, var(--ink) 12%, transparent);
   border-radius: 20px;
   backdrop-filter: blur(4px);
 }
@@ -109,10 +109,13 @@
 }
 .home__mapInner {
   aspect-ratio: 2.5;
+  padding: var(--collage-mat-width);
   overflow: clip;
 }
 .home__mapInner > * {
   height: 100%;
+  overflow: clip;
+  border-radius: 10px;
 }
 .home__mapTag {
   bottom: -12px;
@@ -132,6 +135,7 @@
 }
 /* The cobalt squares lie over the stars, so only the ultramarine squares show them. */
 .home__workField::after {
+  --checker-cobalt: color-mix(in oklab, var(--cobalt) 62%, var(--ultramarine));
   position: absolute;
   inset: 0;
   content: "";
@@ -139,9 +143,9 @@
     conic-gradient(
       from 90deg at 50% 50%,
       transparent 25%,
-      var(--cobalt) 0 50%,
+      var(--checker-cobalt) 0 50%,
       transparent 0 75%,
-      var(--cobalt) 0
+      var(--checker-cobalt) 0
     )
     -150px -70px / calc(var(--cw) * 2) calc(var(--ch) * 2);
 }
@@ -162,7 +166,7 @@
 .home__spotify {
   --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.24))
     drop-shadow(0 6px 12px light-dark(rgb(0 0 0 / 0.22), rgb(0 0 0 / 0.42)));
-  --rim: 4px;
+  --rim: var(--collage-mat-width);
   position: relative;
   display: grid;
   align-content: start;
@@ -241,7 +245,7 @@
   display: grid;
   grid-template-rows: 1fr auto;
   min-height: 100%;
-  padding: 8px;
+  padding: var(--collage-mat-width);
   overflow: clip;
   color: var(--on);
 }
@@ -323,7 +327,7 @@
   width: 100%;
 }
 .home__framePad {
-  padding: 14px 14px 16px;
+  padding: var(--collage-mat-width);
 }
 .home__frameShot {
   --ar: 2.25;
@@ -331,7 +335,7 @@
   display: block;
   aspect-ratio: var(--ar);
   overflow: clip;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 .home__tagTopLeft {
   top: -12px;
@@ -398,7 +402,8 @@
   padding: 5px;
   background: color-mix(in srgb, var(--ink-on-cream) 6%, var(--cream));
   border-radius: 12px;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink-on-cream) 12%, transparent);
+  box-shadow: inset 0 0 0 var(--collage-border-width)
+    color-mix(in srgb, var(--ink-on-cream) 12%, transparent);
   transform: scale(1);
 }
 .home__sideMark img {

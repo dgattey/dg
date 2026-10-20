@@ -51,7 +51,7 @@
 }
 .print__halo {
   position: absolute;
-  inset: -3.5%;
+  inset: calc(-1 * var(--collage-mat-width));
   z-index: 1;
   pointer-events: none;
   background: var(--cream);
@@ -119,6 +119,6 @@
     top: 8%;
     left: 26%;
     width: min(100vw, 420px);
-    rotate: -12deg;
+    rotate: -4deg;
   }
 }
