@@ -89,6 +89,7 @@ export const CUT_OUT_PLACEMENTS = {
     ['hello-seaweed-lower-left', 'seaweed2', 'rose', 180, -8, -2, 78, 'all', 1],
     ['hello-pods', 'pods', 'ochre', 210, -18, 33, 74, 'desktop', 1],
     ['hello-star-upper', 'star5', 'star', 40, 12, 44, 10, 'desktop', 1],
+    ['hello-star-middle', 'star4', 'star', 30, -8, 47, 50, 'desktop', 1],
     ['hello-algae', 'algae', 'rose', 210, 16, 39, -5, 'desktop', 1],
     ['hello-moon', 'moon', 'cream', 64, 14, 46, -2, 'dark-desktop', 1],
     ['hello-coral', 'coral', 'ultramarine', 170, -10, 49, 47, 'desktop', 1],
@@ -148,6 +149,7 @@ export const CUT_OUT_PLACEMENTS = {
       { mirrored: true },
     ],
     ['work-star-bottom', 'star4', 'cream', 36, 12, 48, 92, 'all', 1],
+    ['work-star-middle', 'star5', 'cream', 34, 30, 66, 40, 'desktop', 1],
     ['work-seaweed2', 'seaweed2', 'cream', 220, -14, 88, 70, 'desktop', 1],
   ]),
 } satisfies Record<

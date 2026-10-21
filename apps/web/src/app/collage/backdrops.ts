@@ -206,9 +206,10 @@ export const DEV_CONSOLE_BACKDROP = defineBackdrop('fill', 1, [
       ['dev-console-algae-upper', 'algae', 'leaf', 170, -20, 88, 0, 'desktop', 1],
       ['dev-console-algae-lower', 'algae', 'leaf', 220, 16, 68, 82, 'desktop', 1],
       ['dev-console-swallow', 'swallow', 'cream', 160, -8, 74, 52, 'desktop', 1],
-    ['dev-console-pods', 'pods', 'ochre', 210, 14, -3, 30, 'desktop', 1],
-    ['dev-console-seaweed', 'seaweed', 'rose', 220, -10, 93, 66, 'all', 1],
-    ['dev-console-moon', 'moon', 'cream', 60, 12, 40, 6, 'dark-desktop', 1],
+      ['dev-console-pods', 'pods', 'ochre', 210, 14, -3, 30, 'desktop', 1],
+      ['dev-console-seaweed', 'seaweed', 'rose', 220, -10, 93, 66, 'all', 1],
+      ['dev-console-star-small', 'star4', 'star', 34, -6, 46, 44, 'desktop', 1],
+      ['dev-console-moon', 'moon', 'cream', 60, 12, 40, 6, 'dark-desktop', 1],
     ],
     sheets: [
       ['dev-console-blueprint', 'torn', 'grid', ['cobalt', 'cerulean'], 55, 40, 50, 560, -1.5, 'desktop'],
@@ -224,9 +225,10 @@ export const NOT_FOUND_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
       ['not-found-seaweed', 'seaweed2', 'ochre', 220, 18, -3, 4, 'desktop', 1],
-    ['not-found-swallow', 'swallow', 'vermilion', 190, 8, 76, 14, 'desktop', 1],
-    ['not-found-star', 'star5', 'star', 44, -10, 66, 6, 'desktop', 1],
-    ['not-found-philo', 'philo', 'olive', 280, 24, 80, 52, 'all', 0],
+      ['not-found-swallow', 'swallow', 'vermilion', 190, 8, 76, 14, 'desktop', 1],
+      ['not-found-star', 'star5', 'star', 44, -10, 66, 6, 'desktop', 1],
+      ['not-found-star-trail', 'star4', 'cream', 32, 14, 70, 24, 'desktop', 1],
+      ['not-found-philo', 'philo', 'olive', 280, 24, 80, 52, 'all', 0],
       ['not-found-coral', 'coral', 'rose', 170, -12, 8, 66, 'desktop', 1],
       ['not-found-moon', 'moon', 'cream', 64, 14, 30, 6, 'dark-desktop', 1],
     ],
