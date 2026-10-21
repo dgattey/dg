@@ -12,6 +12,7 @@
 }
 
 html:has(.collageRoot) {
+  scrollbar-gutter: auto;
   color-scheme: light dark;
   background: light-dark(#ede3cb, #152238);
 }

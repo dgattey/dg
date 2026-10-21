@@ -337,4 +337,60 @@ describe('Footer', () => {
     window.dispatchEvent(new Event('scroll'));
     expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('1.0000');
   });
+
+  it('continues shrinking the sheet even when prefers-reduced-motion is reduce and honors data-footer-progress-lock', async () => {
+    const originalMatchMedia = window.matchMedia;
+    window.matchMedia = jest.fn().mockImplementation((query: string) => ({
+      addEventListener: jest.fn(),
+      addListener: jest.fn(),
+      dispatchEvent: jest.fn(),
+      matches: query.includes('prefers-reduced-motion'),
+      media: query,
+      onchange: null,
+      removeEventListener: jest.fn(),
+      removeListener: jest.fn(),
+    }));
+
+    try {
+      mockGetFooterContent.mockResolvedValue({
+        description: SAMPLE_DESCRIPTION,
+        links: SAMPLE_LINKS,
+      });
+
+      const ui = await Footer();
+      const { container } = render(
+        <ServerTimeProvider serverTime={1_760_000_000_000}>
+          <div className="collageRoot">
+            <div className="collageSheet">page content with backdrop</div>
+            {ui}
+          </div>
+        </ServerTimeProvider>,
+      );
+
+      const sheet = container.querySelector<HTMLElement>('.collageSheet');
+      const footer = container.querySelector<HTMLElement>('.chrome__footer');
+      expect(sheet).not.toBeNull();
+      expect(footer).not.toBeNull();
+
+      Object.defineProperty(footer, 'offsetHeight', { configurable: true, value: 400 });
+      Object.defineProperty(document.documentElement, 'scrollHeight', {
+        configurable: true,
+        value: 2400,
+      });
+      Object.defineProperty(window, 'innerHeight', { configurable: true, value: 900 });
+      Object.defineProperty(window, 'scrollY', { configurable: true, value: 1500, writable: true });
+
+      window.dispatchEvent(new Event('scroll'));
+      expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('1.0000');
+
+      if (sheet) {
+        sheet.dataset.footerProgressLock = '1';
+      }
+      window.scrollY = 0;
+      window.dispatchEvent(new Event('scroll'));
+      expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('1');
+    } finally {
+      window.matchMedia = originalMatchMedia;
+    }
+  });
 });

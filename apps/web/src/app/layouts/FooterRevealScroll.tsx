@@ -12,13 +12,9 @@ export function FooterRevealScroll() {
       return;
     }
 
-    const reducedMotion =
-      typeof window.matchMedia === 'function'
-        ? window.matchMedia('(prefers-reduced-motion: reduce)')
-        : null;
     const updateProgress = () => {
-      if (reducedMotion?.matches) {
-        sheet.style.setProperty('--footer-progress', '0');
+      if (sheet.dataset.footerProgressLock) {
+        sheet.style.setProperty('--footer-progress', sheet.dataset.footerProgressLock);
         return;
       }
       const footerHeight = footer.offsetHeight;
@@ -29,7 +25,7 @@ export function FooterRevealScroll() {
       }
       const startScroll = Math.max(0, maxScroll - footerHeight);
       const distance = Math.max(1, maxScroll - startScroll);
-      const raw = (window.scrollY - startScroll) / distance;
+      const raw = maxScroll - window.scrollY <= 1 ? 1 : (window.scrollY - startScroll) / distance;
       const progress = Math.min(1, Math.max(0, raw));
       sheet.style.setProperty('--footer-progress', progress.toFixed(4));
     };
@@ -41,6 +37,7 @@ export function FooterRevealScroll() {
       typeof ResizeObserver !== 'undefined' ? new ResizeObserver(updateProgress) : null;
     observer?.observe(footer);
     observer?.observe(sheet);
+    observer?.observe(document.documentElement);
     return () => {
       window.removeEventListener('scroll', updateProgress);
       window.removeEventListener('resize', updateProgress);
