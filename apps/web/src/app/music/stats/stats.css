@@ -34,7 +34,7 @@
 .stats__lede {
   max-width: 400px;
   padding: 14px 18px 15px;
-  font: var(--type-body);
+  font: 400 var(--type-body) / 1.5 var(--body);
   text-align: right;
 }
 .stats__empty {
@@ -91,17 +91,17 @@
 }
 .stats__heading {
   margin: 0;
-  font: var(--type-heading);
+  font: 700 var(--type-h2) / 1.2 var(--display);
 }
 .stats__subheading {
   margin: 22px 0 0;
-  font: var(--type-label);
+  font: 700 var(--type-label) / 1.2 var(--display);
 }
 .stats__aside,
 .stats__note,
 .stats__meta {
   margin: 0;
-  font: var(--type-meta);
+  font: 600 var(--type-meta) / 1.35 var(--body);
   color: var(--soft);
 }
 .stats__note {
@@ -113,19 +113,19 @@
   color: var(--on);
 }
 .stats__label {
-  font: var(--type-label);
+  font: 700 var(--type-label) / 1.2 var(--display);
 }
 .stats__rowTitle {
   margin-top: 1px;
-  font: var(--type-title);
+  font: 700 var(--type-h3) / 1.25 var(--display);
 }
 .stats__count {
-  font: var(--type-heading);
+  font: 700 var(--type-h2) / 1.2 var(--display);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
 .stats__rank {
-  font: var(--type-meta);
+  font: 600 var(--type-meta) / 1.35 var(--body);
   font-variant-numeric: tabular-nums;
   color: var(--soft);
 }
@@ -196,7 +196,7 @@
 }
 .stats__columnValue,
 .stats__columnTick {
-  font: var(--type-meta);
+  font: 600 var(--type-meta) / 1.35 var(--body);
   font-variant-numeric: tabular-nums;
   color: var(--soft);
   white-space: nowrap;
@@ -286,7 +286,7 @@
   border-radius: 50%;
 }
 .stats__shiftShare {
-  font: var(--type-title);
+  font: 700 var(--type-h3) / 1.25 var(--display);
   font-variant-numeric: tabular-nums;
 }
 
@@ -330,7 +330,7 @@
 .stats__table {
   width: 100%;
   margin-top: 14px;
-  font: var(--type-body);
+  font: 400 var(--type-body) / 1.5 var(--body);
   border-collapse: collapse;
 }
 .stats__table th,
@@ -340,7 +340,7 @@
   text-align: left;
 }
 .stats__table thead th {
-  font: var(--type-meta);
+  font: 600 var(--type-meta) / 1.35 var(--body);
   color: var(--soft);
 }
 .stats__table .stats__cell,
@@ -380,7 +380,7 @@
   align-content: center;
   padding: 0;
   margin: 0;
-  font: var(--type-body);
+  font: 400 var(--type-body) / 1.5 var(--body);
   list-style: none;
 }
 .stats__splitKey li {
@@ -404,7 +404,7 @@
   grid-template-columns: 1fr 1fr;
   gap: 4px 16px;
   margin: 14px 0 0;
-  font: var(--type-meta);
+  font: 600 var(--type-meta) / 1.35 var(--body);
   color: var(--soft);
 }
 .stats__dayRepeats {
