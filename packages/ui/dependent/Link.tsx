@@ -224,7 +224,7 @@ function resolveContents({
     return { contents: children, showTooltip: false };
   }
 
-  const iconElement = icon ? BUILT_IN_ICONS[icon] : undefined;
+  const iconElement = icon ? (BUILT_IN_ICONS[icon] ?? <span>{icon}</span>) : null;
 
   if (layout === 'icon' && iconElement) {
     return { contents: iconElement, showTooltip: Boolean(title) };

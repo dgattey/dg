@@ -6,24 +6,32 @@ import {
   type MarkdownPagePath,
   musicRoute,
   musicStatsRoute,
+  readingRoute,
 } from '@dg/shared-core/routes/app';
 import { cacheLife } from 'next/cache';
-import { getHomepageMarkdown } from '../home/homepageMarkdown';
-import { getFavoriteAlbumsMarkdown } from '../music/albums/favoriteAlbumsMarkdown';
-import { getMusicMarkdown } from '../music/musicMarkdown';
-import { getListeningStatsMarkdown } from '../music/stats/listeningStatsMarkdown';
-
-/**
- * Wires each registered public path to the Markdown module next to that page.
- * TypeScript requires every MarkdownPagePath to appear here.
- */
 export const pageMarkdownGenerators: {
   [Path in MarkdownPagePath]: () => Promise<string>;
 } = {
-  [favoriteAlbumsRoute]: getFavoriteAlbumsMarkdown,
-  [homeRoute]: getHomepageMarkdown,
-  [musicRoute]: getMusicMarkdown,
-  [musicStatsRoute]: getListeningStatsMarkdown,
+  [favoriteAlbumsRoute]: async () => {
+    const { getFavoriteAlbumsMarkdown } = await import('../music/albums/favoriteAlbumsMarkdown');
+    return await getFavoriteAlbumsMarkdown();
+  },
+  [homeRoute]: async () => {
+    const { getHomepageMarkdown } = await import('../home/homepageMarkdown');
+    return await getHomepageMarkdown();
+  },
+  [musicRoute]: async () => {
+    const { getMusicMarkdown } = await import('../music/musicMarkdown');
+    return await getMusicMarkdown();
+  },
+  [musicStatsRoute]: async () => {
+    const { getListeningStatsMarkdown } = await import('../music/stats/listeningStatsMarkdown');
+    return await getListeningStatsMarkdown();
+  },
+  [readingRoute]: async () => {
+    const { getReadingMarkdown } = await import('../reading/readingMarkdown');
+    return await getReadingMarkdown();
+  },
 };
 
 /**

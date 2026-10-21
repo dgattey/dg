@@ -5,7 +5,12 @@
 import type { FooterContent } from '@dg/content-models/contentful/renderables/footer';
 import type { Track } from '@dg/content-models/spotify/Track';
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
-import { favoriteAlbumsRoute, homeRoute, musicRoute } from '@dg/shared-core/routes/app';
+import {
+  favoriteAlbumsRoute,
+  homeRoute,
+  musicRoute,
+  readingRoute,
+} from '@dg/shared-core/routes/app';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -187,6 +192,7 @@ describe('Footer', () => {
       'href',
       favoriteAlbumsRoute,
     );
+    expect(screen.getByRole('link', { name: 'Reading' })).toHaveAttribute('href', readingRoute);
   });
 
   it('renders Elsewhere stacked ledger rows with formatted handles and X ordered directly after Instagram', async () => {

@@ -18,6 +18,7 @@ describe('markdown page registry', () => {
     expect(htmlPathToMarkdownPath('/')).toBe('/index.md');
     expect(htmlPathToMarkdownPath('/music')).toBe('/music.md');
     expect(htmlPathToMarkdownPath('/music/albums')).toBe('/music/albums.md');
+    expect(htmlPathToMarkdownPath('/reading')).toBe('/reading.md');
     expect(tryHtmlPathToMarkdownPath('/dev-console')).toBeNull();
   });
 
@@ -25,6 +26,7 @@ describe('markdown page registry', () => {
     expect(markdownPathToHtmlPath('/index.md')).toBe('/');
     expect(markdownPathToHtmlPath('/music.md')).toBe('/music');
     expect(markdownPathToHtmlPath('/music/albums.md')).toBe('/music/albums');
+    expect(markdownPathToHtmlPath('/reading.md')).toBe('/reading');
     expect(markdownPathToHtmlPath('/about.md')).toBeNull();
   });
 
