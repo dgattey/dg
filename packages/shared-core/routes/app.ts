@@ -10,6 +10,8 @@ export const musicRoute = '/music' as const;
 
 export const favoriteAlbumsRoute = '/music/albums' as const;
 
+export const readingRoute = '/reading' as const;
+
 /** Query key naming the album expanded in place on the favorite albums page. */
 export const ALBUM_PARAM = 'album' as const;
 
@@ -68,6 +70,13 @@ export const markdownPages = [
     priority: 0.6,
     summary: 'All-time favorite albums',
     title: 'Favorite albums',
+  },
+  {
+    changeFrequency: 'weekly',
+    path: readingRoute,
+    priority: 0.6,
+    summary: 'Books read, star ratings, and notes by year',
+    title: 'Reading',
   },
 ] as const satisfies ReadonlyArray<MarkdownPageDefinition>;
 

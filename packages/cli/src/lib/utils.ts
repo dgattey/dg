@@ -91,14 +91,12 @@ export const fmt = {
 
 /** Print to stderr (status messages) */
 export function log(msg: string): void {
-  // biome-ignore lint/suspicious/noConsole: CLI stderr output
-  console.error(msg);
+  process.stderr.write(`${msg}\n`);
 }
 
 /** Print to stdout (command output for piping) */
 export function out(msg: string): void {
-  // biome-ignore lint/suspicious/noConsole: CLI stdout output
-  console.log(msg);
+  process.stdout.write(`${msg}\n`);
 }
 
 /**

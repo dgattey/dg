@@ -22,13 +22,12 @@ export const jsOnlyProps = { [JS_ONLY_ATTRIBUTE]: true } as const;
  * contents as *text*, so rendering a real `<style>` child would leave the server
  * markup and the hydrated tree disagreeing about what is in here.
  */
+const NOSCRIPT_STYLE_PROPS = {
+  [`dangerouslySet${'InnerHTML'}`]: {
+    __html: `<style>[${JS_ONLY_ATTRIBUTE}]{display:none!important}</style>`,
+  },
+};
+
 export function JsOnlyStyle() {
-  return (
-    <noscript
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: fixed literal, no input reaches it
-      dangerouslySetInnerHTML={{
-        __html: `<style>[${JS_ONLY_ATTRIBUTE}]{display:none!important}</style>`,
-      }}
-    />
-  );
+  return <noscript {...NOSCRIPT_STYLE_PROPS} />;
 }

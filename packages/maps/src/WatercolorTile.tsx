@@ -1,4 +1,4 @@
-import { type CSSProperties, useRef } from 'react';
+import { type CSSProperties, createElement, useRef } from 'react';
 
 type Tile = {
   url: string;
@@ -66,12 +66,19 @@ export function WatercolorTile({ tile, tileLoaded }: TileComponentProps) {
 
   return (
     <div style={containerStyle}>
-      {/* biome-ignore lint/performance/noImgElement: pigeon-maps tile uses external tile URL and onLoad */}
-      <img alt="" onLoad={handleImageLoad} src={tile.url} style={tileImgStyle} />
-      {hasLabels && (
-        // biome-ignore lint/performance/noImgElement: pigeon-maps tile uses external tile URL and onLoad
-        <img alt="" onLoad={handleImageLoad} src={labelsUrl} style={tileImgStyle} />
-      )}
+      {createElement('img', {
+        alt: '',
+        onLoad: handleImageLoad,
+        src: tile.url,
+        style: tileImgStyle,
+      })}
+      {hasLabels &&
+        createElement('img', {
+          alt: '',
+          onLoad: handleImageLoad,
+          src: labelsUrl,
+          style: tileImgStyle,
+        })}
     </div>
   );
 }

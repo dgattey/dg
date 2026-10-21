@@ -17,9 +17,8 @@ type WebhookActionResult = {
  * Server Action to create a Strava webhook subscription.
  * Requires dev console authentication.
  */
-// biome-ignore lint/suspicious/useAwait: Server actions must be async
 export async function createWebhookSubscription(): Promise<WebhookActionResult> {
-  return withDevConsoleAuth(async () => {
+  return await withDevConsoleAuth(async () => {
     try {
       await createSubscription();
       revalidatePath(devConsoleRoute);
@@ -37,9 +36,8 @@ export async function createWebhookSubscription(): Promise<WebhookActionResult> 
  * Looks up the subscription ID server-side - no need to pass from client.
  * Requires dev console authentication.
  */
-// biome-ignore lint/suspicious/useAwait: Server actions must be async
 export async function deleteWebhookSubscription(): Promise<WebhookActionResult> {
-  return withDevConsoleAuth(async () => {
+  return await withDevConsoleAuth(async () => {
     try {
       const subscriptions = await listSubscriptions();
       const subscription = subscriptions[0];

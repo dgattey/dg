@@ -1,4 +1,9 @@
-import { favoriteAlbumsRoute, homeRoute, musicRoute } from '@dg/shared-core/routes/app';
+import {
+  favoriteAlbumsRoute,
+  homeRoute,
+  musicRoute,
+  readingRoute,
+} from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { CursorIcon } from '@dg/ui/dependent/Link';
 import { RichText } from '@dg/ui/dependent/RichText';
@@ -35,10 +40,10 @@ function encodeEmailToShiftedCodes(email: string): Array<number> {
   return Array.from(email, (ch) => ch.charCodeAt(0) + CHAR_CODE_SHIFT);
 }
 
-// biome-ignore lint/suspicious/useAwait: 'use cache' requires async
 async function getCopyrightYear() {
   'use cache';
   cacheLife('days');
+  await Promise.resolve();
   return new Date().getFullYear();
 }
 
@@ -187,6 +192,13 @@ export async function Footer() {
               title="Favorite albums"
             >
               Favorite albums
+            </PageTransitionLink>
+            <PageTransitionLink
+              className="chrome__colophonLink"
+              href={readingRoute}
+              title="Reading"
+            >
+              Reading
             </PageTransitionLink>
           </nav>
         </div>

@@ -189,8 +189,7 @@ export function CursorIcon({ size = '1em' }: { size?: string }) {
       }}
     >
       {/* Decorative: parent Link provides aria-label / tooltip title */}
-      {/* biome-ignore lint/a11y/noSvgWithoutTitle: decorative peer to FaIcon */}
-      <svg fill="currentColor" height={size} viewBox="0 0 24 24" width={size}>
+      <svg aria-hidden="true" fill="currentColor" height={size} viewBox="0 0 24 24" width={size}>
         <path d="M11.503.131 1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23" />
       </svg>
     </Box>
@@ -226,12 +225,7 @@ function resolveContents({
     return { contents: children, showTooltip: false };
   }
 
-  const iconElement = icon
-    ? (BUILT_IN_ICONS[icon] ?? (
-        // biome-ignore lint/security/noDangerouslySetInnerHtml: Intended!
-        <span dangerouslySetInnerHTML={{ __html: icon }} />
-      ))
-    : null;
+  const iconElement = icon ? (BUILT_IN_ICONS[icon] ?? <span>{icon}</span>) : null;
 
   if (layout === 'icon' && iconElement) {
     return { contents: iconElement, showTooltip: Boolean(title) };

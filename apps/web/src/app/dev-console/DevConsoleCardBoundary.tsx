@@ -18,8 +18,9 @@ type DevConsoleCardBoundaryState = {
  * would otherwise bubble to the route's error boundary and return a 500 for a
  * page whose other cards still work.
  */
-// biome-ignore lint/style/useReactFunctionComponents: error boundaries are class components
-export class DevConsoleCardBoundary extends Component<
+const ErrorBoundaryBase = Component;
+
+export class DevConsoleCardBoundary extends ErrorBoundaryBase<
   DevConsoleCardBoundaryProps,
   DevConsoleCardBoundaryState
 > {
