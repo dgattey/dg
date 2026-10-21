@@ -72,41 +72,51 @@
   clip-path: url("#collage-pebble-clip");
 }
 .collageBackdrop .collageSheet-checker {
+  --checker-accent: color-mix(in oklab, var(--sheet-b) 82%, var(--sheet-a));
   background:
     conic-gradient(
       from 90deg,
       var(--sheet-a) 25%,
-      var(--sheet-b) 0 50%,
+      var(--checker-accent) 0 50%,
       var(--sheet-a) 0 75%,
-      var(--sheet-b) 0
+      var(--checker-accent) 0
     )
-    0 0 / 132px 132px;
+    0 0 / 120px 120px;
 }
 .collageBackdrop .collageSheet-stripes {
-  background: repeating-linear-gradient(-38deg, var(--sheet-a) 0 22px, var(--sheet-b) 22px 34px);
+  --stripe-accent: color-mix(in oklab, var(--sheet-b) 80%, var(--sheet-a));
+  background: repeating-linear-gradient(
+    -38deg,
+    var(--sheet-a) 0 22px,
+    var(--stripe-accent) 22px 32px
+  );
 }
 .collageBackdrop .collageSheet-dots {
+  --dot-accent: color-mix(in oklab, var(--sheet-b) 88%, var(--sheet-a));
   background:
-    radial-gradient(circle, var(--sheet-b) 0 5px, transparent 5.5px) 0 0 / 26px 26px,
+    radial-gradient(circle, var(--dot-accent) 0 4.5px, transparent 5px) 0 0 / 26px 26px,
     var(--sheet-a);
 }
 .collageBackdrop .collageSheet-gingham {
-  --gingham: color-mix(in oklab, var(--sheet-b) 42%, transparent);
+  --gingham: color-mix(in oklab, var(--sheet-b) 38%, transparent);
   background:
-    linear-gradient(90deg, var(--gingham) 50%, transparent 0) 0 0 / 40px 40px,
-    linear-gradient(var(--gingham) 50%, transparent 0) 0 0 / 40px 40px,
+    linear-gradient(90deg, var(--gingham) 50%, transparent 0) 0 0 / 38px 38px,
+    linear-gradient(var(--gingham) 50%, transparent 0) 0 0 / 38px 38px,
     var(--sheet-a);
 }
 .collageBackdrop .collageSheet-grid {
+  --grid-line: color-mix(in oklab, var(--sheet-b) 82%, var(--sheet-a));
   background:
-    linear-gradient(90deg, var(--sheet-b) 0 2px, transparent 2px) 0 0 / 28px 28px,
-    linear-gradient(var(--sheet-b) 0 2px, transparent 2px) 0 0 / 28px 28px,
+    linear-gradient(90deg, var(--grid-line) 0 1.5px, transparent 1.5px) 0 0 / 28px 28px,
+    linear-gradient(var(--grid-line) 0 1.5px, transparent 1.5px) 0 0 / 28px 28px,
     var(--sheet-a);
 }
 .collageBackdrop .collageSheet-ruled {
+  --rule-margin: color-mix(in oklab, var(--vermilion) 85%, var(--sheet-a));
+  --rule-line: color-mix(in oklab, var(--sheet-b) 85%, var(--sheet-a));
   background:
-    linear-gradient(90deg, transparent 44px, var(--vermilion) 44px 47px, transparent 47px),
-    repeating-linear-gradient(transparent 0 26px, var(--sheet-b) 26px 29px), var(--sheet-a);
+    linear-gradient(90deg, transparent 44px, var(--rule-margin) 44px 46.5px, transparent 46.5px),
+    repeating-linear-gradient(transparent 0 26px, var(--rule-line) 26px 28.5px), var(--sheet-a);
 }
 
 @media (max-width: 600px) {

@@ -1,4 +1,5 @@
 import 'server-only';
+import '../music.css';
 import './stats.css';
 import './statsShapes.css';
 

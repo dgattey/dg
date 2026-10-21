@@ -279,7 +279,7 @@ export const SERVER_ERROR_BACKDROP = defineBackdrop('fill', 1, [
       ['error-monstera', 'monstera', 'viridian', 520, 22, 74, -12, 'desktop', 0],
       ['error-fern', 'fern', 'olive', 340, -34, -10, 40, 'all', 0],
       ['error-seaweed', 'seaweed2', 'olive', 240, -16, 56, 64, 'all', 1],
-      ['error-star', 'star5', 'star', 46, 10, 36, 6, 'desktop', 3],
+      ['error-star', 'star5', 'star', 46, 10, 36, 6, 'desktop', 1],
       ['error-sun', 'sun', 'ochre', 170, 0, 12, 4, 'desktop', 0],
     ],
     sheets: [
