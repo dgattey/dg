@@ -9,23 +9,15 @@ import { Scallop, Stub, Vinyl } from './StatsShapes';
 
 type RunnerUpCut = {
   matTone: PaperTone;
-  sticker: 'circle' | 'scallop' | 'ticket';
+  sticker: 'circle' | 'ticket';
   stickerTiltDeg: number;
   stickerTone: PaperTone;
   tiltDeg: number;
 };
 
-const SECOND_PLACE: RunnerUpCut = {
-  matTone: 'ochre',
-  sticker: 'circle',
-  stickerTiltDeg: 14,
-  stickerTone: 'cream',
-  tiltDeg: 3,
-};
-
 /** Second and third place hang off the hero at their own angles. */
 const RUNNER_UP_CUTS: ReadonlyArray<RunnerUpCut> = [
-  SECOND_PLACE,
+  { matTone: 'ochre', sticker: 'circle', stickerTiltDeg: 14, stickerTone: 'cream', tiltDeg: 3 },
   {
     matTone: 'rose',
     sticker: 'ticket',
@@ -33,58 +25,27 @@ const RUNNER_UP_CUTS: ReadonlyArray<RunnerUpCut> = [
     stickerTone: 'viridian',
     tiltDeg: -2.8,
   },
-  {
-    matTone: 'cream',
-    sticker: 'scallop',
-    stickerTiltDeg: 10,
-    stickerTone: 'vermilion',
-    tiltDeg: 1.6,
-  },
 ];
 
-function rankLabel(rank: number): string {
-  return `#${String(rank).padStart(2, '0')}`;
-}
-
 function RankSticker({ cut, rank }: { cut: RunnerUpCut; rank: number }) {
-  const label = rankLabel(rank);
-  switch (cut.sticker) {
-    case 'ticket':
-      return (
-        <Stub
-          className="stats__rankSticker"
-          kind="ticket"
-          tiltDeg={cut.stickerTiltDeg}
-          tone={cut.stickerTone}
-        >
-          {label}
-        </Stub>
-      );
-    case 'scallop':
-      return (
-        <Scallop
-          className="stats__rankSticker"
-          size="sticker"
-          tiltDeg={cut.stickerTiltDeg}
-          tone={cut.stickerTone}
-        >
-          {label}
-        </Scallop>
-      );
-    case 'circle':
-      return (
-        <span
-          className="stats__rankSticker stats__rankCircle"
-          style={paperSurfaceVars(cut.stickerTone, 'quad-a', cut.stickerTiltDeg)}
-        >
-          {label}
-        </span>
-      );
-    default: {
-      const unhandled: never = cut.sticker;
-      return unhandled;
-    }
-  }
+  const label = `#${String(rank).padStart(2, '0')}`;
+  return cut.sticker === 'ticket' ? (
+    <Stub
+      className="stats__rankSticker"
+      kind="ticket"
+      tiltDeg={cut.stickerTiltDeg}
+      tone={cut.stickerTone}
+    >
+      {label}
+    </Stub>
+  ) : (
+    <span
+      className="stats__rankSticker stats__rankCircle"
+      style={paperSurfaceVars(cut.stickerTone, 'quad-a', cut.stickerTiltDeg)}
+    >
+      {label}
+    </span>
+  );
 }
 
 /**
@@ -133,7 +94,10 @@ export function TopAlbumsPodium({ stats }: { stats: ListeningStats }) {
       {rest.length > 0 ? (
         <ol className="stats__runnersUp" start={2}>
           {rest.map(({ album, plays }, i) => {
-            const cut = RUNNER_UP_CUTS[i % RUNNER_UP_CUTS.length] ?? SECOND_PLACE;
+            const cut = RUNNER_UP_CUTS[i];
+            if (!cut) {
+              return null;
+            }
             return (
               <li
                 className={cx('stats__runnerUp', i % 2 === 1 && 'stats__runnerUp--offset')}

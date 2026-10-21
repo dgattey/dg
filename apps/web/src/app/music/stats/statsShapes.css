@@ -203,9 +203,7 @@
   padding: 18%;
 }
 .stats__heroRank {
-  font: 800 var(--type-h1) / 0.92 var(--display);
-  font-size: 40px;
-  line-height: 1;
+  font: 800 40px / 1 var(--display);
 }
 .stats__heroInner {
   display: grid;
@@ -260,9 +258,6 @@
   mask:
     radial-gradient(circle 6px at 0 50%, #0000 96%, #000) left / 51% 100% no-repeat,
     radial-gradient(circle 6px at 100% 50%, #0000 96%, #000) right / 51% 100% no-repeat;
-}
-.stats__rankSticker.stats__cut:has(.stats__scallop) {
-  width: 64px;
 }
 .stats__rankCircle {
   display: grid;

@@ -35,7 +35,7 @@ function OnRepeatCard({ stats }: { stats: ListeningStats }) {
             <span aria-hidden="true" className="stats__meter" style={bar(plays, top)} />
             <span className="stats__count">{plays}</span>
             <span className="stats__meta stats__date">
-              <span className="stats__visuallyHidden">Week of </span>
+              <span className="chrome__srOnly">Week of </span>
               {formatDay(week)}
             </span>
           </li>
@@ -118,7 +118,7 @@ function DepthCard({ stats }: { stats: ListeningStats }) {
         <thead>
           <tr>
             <th className="stats__rank" scope="col">
-              <span className="stats__visuallyHidden">Rank</span>
+              <span className="chrome__srOnly">Rank</span>
             </th>
             <th scope="col">Artist</th>
             <th className="stats__cell" scope="col">

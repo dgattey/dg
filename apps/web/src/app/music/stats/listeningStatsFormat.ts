@@ -123,18 +123,23 @@ export const WEEKDAY_NAMES = [
   'Sunday',
 ] as const;
 
-/** Which `weekdayGroups` entry each Monday-first day falls in. */
-export const WEEKDAY_GROUP_OF_DAY: ReadonlyArray<number> = [1, 0, 0, 0, 1, 2, 2];
+/** Mid-week, the weekdays either side, and the weekend, as Monday-first day indexes. */
+const WEEKDAY_GROUPS: ReadonlyArray<{ days: ReadonlyArray<number>; label: string }> = [
+  { days: [1, 2, 3], label: 'Tue to Thu' },
+  { days: [0, 4], label: 'Mon and Fri' },
+  { days: [5, 6], label: 'Sat and Sun' },
+];
 
-/** Mid-week, the weekdays either side, and the weekend, from Monday-first counts. */
+/** Which `weekdayGroups` entry a Monday-first day falls in. */
+export function weekdayGroupOf(day: number): number {
+  return WEEKDAY_GROUPS.findIndex(({ days }) => days.includes(day));
+}
+
 export function weekdayGroups(weekdays: ReadonlyArray<number>) {
-  const sum = (...days: Array<number>) =>
-    days.reduce((total, day) => total + (weekdays[day] ?? 0), 0);
-  return [
-    { label: 'Tue to Thu', plays: sum(1, 2, 3) },
-    { label: 'Mon and Fri', plays: sum(0, 4) },
-    { label: 'Sat and Sun', plays: sum(5, 6) },
-  ];
+  return WEEKDAY_GROUPS.map(({ days, label }) => ({
+    label,
+    plays: days.reduce((total, day) => total + (weekdays[day] ?? 0), 0),
+  }));
 }
 
 /** The single busiest and quietest weekdays, Monday-first counts. */

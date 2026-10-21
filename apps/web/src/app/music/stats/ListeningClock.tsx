@@ -50,18 +50,19 @@ function wedgePath(hour: number, outer: number): string {
   ].join(' ');
 }
 
-function Turntable({ stats }: { stats: ListeningStats }) {
-  const max = Math.max(...stats.hours, 1);
-  const peak = peakHours(stats.hours, 2);
-  const isPeak = (hour: number) => (hour - peak.start + 24) % 24 < 2;
+type HourPlays = { hour: number; plays: number };
+
+function Turntable({ byHour, peakStart }: { byHour: ReadonlyArray<HourPlays>; peakStart: number }) {
+  const max = Math.max(...byHour.map(({ plays }) => plays), 1);
+  const isPeak = (hour: number) => (hour - peakStart + 24) % 24 < 2;
   // Wedges are narrower than a value label, so only the busiest one carries a number.
-  const busiest = stats.hours.indexOf(max);
+  const busiest = byHour.find(({ plays }) => plays === max);
   const outer = (plays: number) => INNER + Math.max(4, (REACH * plays) / max);
   return (
     <svg aria-hidden="true" className="stats__clock" viewBox="-172 -172 344 344">
       <circle className="stats__clockGuide" r={INNER + REACH} />
       <circle className="stats__clockGuide" r={INNER + REACH / 2} />
-      {stats.hours.map((plays, hour) => (
+      {byHour.map(({ hour, plays }) => (
         <path
           className={cx(
             'stats__wedge',
@@ -69,7 +70,6 @@ function Turntable({ stats }: { stats: ListeningStats }) {
             isPeak(hour) && 'stats__wedge--peak',
           )}
           d={wedgePath(hour, outer(plays))}
-          // biome-ignore lint/suspicious/noArrayIndexKey: the index is the hour itself
           key={hour}
         />
       ))}
@@ -87,8 +87,8 @@ function Turntable({ stats }: { stats: ListeningStats }) {
       ))}
       <circle className="stats__vinylLabel" r={18} />
       <circle className="stats__vinylHole" r={3.5} />
-      {busiest >= 0 ? (
-        <text className="stats__clockValue" {...point(outer(max) + 18, hourAngle(busiest))}>
+      {busiest ? (
+        <text className="stats__clockValue" {...point(outer(max) + 18, hourAngle(busiest.hour))}>
           {formatCompact(max)}
         </text>
       ) : null}
@@ -99,6 +99,7 @@ function Turntable({ stats }: { stats: ListeningStats }) {
 /** Plays by hour as petals around a record, with the share of each part of the day. */
 export function ListeningClock({ stats }: { stats: ListeningStats }) {
   const peak = peakHours(stats.hours, 2);
+  const byHour = stats.hours.map((plays, hour) => ({ hour, plays }));
   return (
     <PaperCard
       className="stats__card stats__day"
@@ -116,10 +117,9 @@ export function ListeningClock({ stats }: { stats: ListeningStats }) {
         title="A day of listening, Pacific time"
       />
       <div className="stats__dayBody">
-        <Turntable stats={stats} />
-        <ol className="stats__visuallyHidden">
-          {stats.hours.map((plays, hour) => (
-            // biome-ignore lint/suspicious/noArrayIndexKey: the index is the hour itself
+        <Turntable byHour={byHour} peakStart={peak.start} />
+        <ol className="chrome__srOnly">
+          {byHour.map(({ hour, plays }) => (
             <li key={hour}>
               {String(hour).padStart(2, '0')}:00, {formatCount(plays)} plays
             </li>

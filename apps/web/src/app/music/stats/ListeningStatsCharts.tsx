@@ -9,9 +9,9 @@ import {
   formatPacificDay,
   formatPercent,
   formatYearTick,
-  WEEKDAY_GROUP_OF_DAY,
   WEEKDAY_NAMES,
   weekdayExtremes,
+  weekdayGroupOf,
   weekdayGroups,
 } from './listeningStatsFormat';
 import { bar, CardHead } from './StatsCardParts';
@@ -54,10 +54,10 @@ export function YearsCard({ stats }: { stats: ListeningStats }) {
             </span>
             <span aria-hidden="true" className="stats__columnBar" style={bar(year.plays, max)} />
             <span className="stats__columnTick">
-              <span className="stats__visuallyHidden">{year.year}</span>
+              <span className="chrome__srOnly">{year.year}</span>
               <span aria-hidden="true">{formatYearTick(year.year)}</span>
             </span>
-            <span className="stats__visuallyHidden">: {formatCount(year.plays)} plays</span>
+            <span className="chrome__srOnly">: {formatCount(year.plays)} plays</span>
           </li>
         ))}
       </ol>
@@ -81,7 +81,7 @@ function WeekFlower({ weekdays }: { weekdays: ReadonlyArray<number> }) {
         return (
           <g key={WEEKDAY_NAMES[day]} transform={`rotate(${deg.toFixed(2)})`}>
             <path
-              className={`stats__petal stats__splitPart--${WEEKDAY_GROUP_OF_DAY[day] ?? 0}`}
+              className={`stats__petal stats__splitPart--${weekdayGroupOf(day)}`}
               d={`M0 0 C${width} ${-length * 0.32} ${width} ${-length * 0.86} 0 ${-length} C${-width} ${-length * 0.86} ${-width} ${-length * 0.32} 0 0 Z`}
             />
             <text
