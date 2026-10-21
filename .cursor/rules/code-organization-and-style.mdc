@@ -86,6 +86,14 @@ export type { Token } from '@dg/db';
 export { getStravaActivity } from '@dg/services/strava/getStravaActivity';
 ```
 
+## No Biome suppressions
+
+Never suppress a Biome finding with an inline suppression comment. Fix the
+underlying issue instead. When a rule is wrong for a whole file or package
+(e.g. the `next` domain in the plain React `packages/maps`), scope it off in
+`biome.json` `overrides`. `turbo check` fails on any suppression comment
+(`no-biome-suppressions` in `packages/cli/src/check-structure.ts`).
+
 ## No manual memoization
 
 React Compiler is enabled (`reactCompiler: true` in `next.config.ts`), so manual memoization is unnecessary.

@@ -33,6 +33,8 @@ const BANNED_GENERIC_COMPONENT_FILENAMES: ReadonlySet<string> = new Set([
 ]);
 
 const INLINE_TYPEOF_IMPORT_TOKEN = `${'typeof'} ${'import('}`;
+const BIOME_SUPPRESSION_TOKEN = `${'biome'}-${'ignore'}`;
+const BIOME_CHECKED_FILE = /\.(?:c?js|mjs|tsx?|css|jsonc?)$/;
 
 export type StructureViolation = {
   file: string;
@@ -56,13 +58,32 @@ function isPureTypeModule(content: string): boolean {
   );
 }
 
+/** Lint findings get fixed, never suppressed: no suppression comment in any file Biome checks. */
+function checkNoBiomeSuppressions(
+  relPath: string,
+  lines: Array<string>,
+): Array<StructureViolation> {
+  return lines.flatMap((lineText, i) =>
+    lineText.includes(BIOME_SUPPRESSION_TOKEN)
+      ? [
+          {
+            file: relPath,
+            line: i + 1,
+            message: 'Fix the lint instead of suppressing it',
+            rule: 'no-biome-suppressions',
+          },
+        ]
+      : [],
+  );
+}
+
 export function checkFileStructure(relPath: string, content: string): Array<StructureViolation> {
-  const violations: Array<StructureViolation> = [];
-  if (!/\.(ts|tsx)$/.test(relPath)) {
+  const lines = content.split('\n');
+  const violations = checkNoBiomeSuppressions(relPath, lines);
+  if (!/^(?:apps|packages)\/.*\.(ts|tsx)$/.test(relPath)) {
     return violations;
   }
 
-  const lines = content.split('\n');
   const lineCount = lines.length;
   const baseName = path.posix.basename(relPath);
   const isTest = isTestFile(relPath);
@@ -155,18 +176,11 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
 }
 
 export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolation> {
-  const trackedOutput = execFileSync('git', ['ls-files', 'apps', 'packages'], {
+  const trackedOutput = execFileSync('git', ['ls-files'], { cwd: repoRoot, encoding: 'utf8' });
+  const untrackedOutput = execFileSync('git', ['ls-files', '--others', '--exclude-standard'], {
     cwd: repoRoot,
     encoding: 'utf8',
   });
-  const untrackedOutput = execFileSync(
-    'git',
-    ['ls-files', '--others', '--exclude-standard', 'apps', 'packages'],
-    {
-      cwd: repoRoot,
-      encoding: 'utf8',
-    },
-  );
 
   const relPaths = [
     ...new Set(
@@ -174,7 +188,7 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
         .map((line) => line.trim())
         .filter(
           (relPath) =>
-            /\.(ts|tsx)$/.test(relPath) &&
+            BIOME_CHECKED_FILE.test(relPath) &&
             !relPath.includes('/migrations/') &&
             !relPath.includes('/dist/') &&
             !relPath.includes('/.next/'),
