@@ -51,7 +51,7 @@
 }
 .print__halo {
   position: absolute;
-  inset: -3.5%;
+  inset: calc(-1 * var(--mat-feature));
   z-index: 1;
   pointer-events: none;
   background: var(--cream);

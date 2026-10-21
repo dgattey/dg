@@ -5,7 +5,15 @@ import { Box } from '../core/Box';
 import type { TooltipPlacement } from '../core/Tooltip';
 import { Tooltip } from '../core/Tooltip';
 import { Typography, type TypographyVariant } from '../core/Typography';
-import { FaIcon, faGithub, faInstagram, faLinkedinIn, faSpotify, faStrava } from '../icons/FaIcon';
+import {
+  FaIcon,
+  faGithub,
+  faInstagram,
+  faLinkedinIn,
+  faSpotify,
+  faStrava,
+  faXTwitter,
+} from '../icons/FaIcon';
 import type { SxObject, SxProps } from '../theme';
 
 type LinkColor =
@@ -168,7 +176,7 @@ function buildLinkSx(
  * Official Cursor cube mark (simple-icons / cursor brand), sized like FaIcon
  * peers so footer icons share caption color via currentColor.
  */
-function CursorIcon({ size = '1em' }: { size?: string }) {
+export function CursorIcon({ size = '1em' }: { size?: string }) {
   return (
     // sx rather than an inline style, so surfaces that size icon spans in CSS still can
     <Box
@@ -201,6 +209,7 @@ const BUILT_IN_ICONS: Record<string, React.ReactNode> = {
   linkedin: <FaIcon icon={faLinkedinIn} />,
   spotify: <FaIcon icon={faSpotify} />,
   strava: <FaIcon icon={faStrava} />,
+  x: <FaIcon icon={faXTwitter} />,
 };
 
 /**

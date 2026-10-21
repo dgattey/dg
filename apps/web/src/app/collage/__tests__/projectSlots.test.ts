@@ -1,11 +1,16 @@
 import type { RenderableProject } from '@dg/content-models/contentful/renderables/projects';
 import {
   assignProjectSlots,
+  CODA_FRAME_STYLE,
+  MORE_WORK_FRAMES,
   moreWorkFrames,
   projectFrameAspectRatio,
   projectTagMeta,
+  projectTagTone,
+  WORK_FRAMES,
   workSheetFrames,
 } from '../projectSlots';
+import { PAPER_TONES } from '../types';
 
 function projects(count: number): Array<RenderableProject> {
   return Array.from({ length: count }, (_, index) => ({
@@ -49,6 +54,22 @@ describe('projectSlots', () => {
     expect(projectTagMeta({ creationDate: '2026-03-01', type: ['Website', 'App'] })).toBe(
       'Website · 2026',
     );
+    expect(projectTagMeta({ creationDate: '2022-01-01', type: 'Web App' })).toBe('Web app · 2022');
+    expect(projectTagMeta({ creationDate: '2020-05-01', type: 'macOS App' })).toBe(
+      'macOS app · 2020',
+    );
+    expect(projectTagMeta({ creationDate: '2021-08-01', type: 'iOS App' })).toBe('iOS app · 2021');
     expect(projectTagMeta({ creationDate: null, type: 'Website' })).toBeNull();
+  });
+
+  it('derives a contrasting tab tone for every paper tone and project slot', () => {
+    for (const tone of PAPER_TONES) {
+      expect(projectTagTone(tone)).not.toBe(tone);
+    }
+    for (const frame of [...WORK_FRAMES, ...MORE_WORK_FRAMES, { style: CODA_FRAME_STYLE }]) {
+      expect(projectTagTone(frame.style.fieldTone)).not.toBe(frame.style.fieldTone);
+    }
+    expect(projectTagTone('cobalt')).toBe('ochre');
+    expect(projectTagTone('ochre')).toBe('viridian');
   });
 });
