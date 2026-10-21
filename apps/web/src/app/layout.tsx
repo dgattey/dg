@@ -43,12 +43,14 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <WebMcpTools />
           <div className={`collageRoot ${familjen.variable}`}>
             <NowPlayingProvider>
-              <Header />
-              <main className="collageMain">
-                <PageViewTransition>{children}</PageViewTransition>
-              </main>
+              <div className="collageSheet">
+                <Header />
+                <main className="collageMain">
+                  <PageViewTransition>{children}</PageViewTransition>
+                </main>
+              </div>
+              <Footer />
             </NowPlayingProvider>
-            <Footer />
           </div>
           <SpeedInsights />
           <Analytics />

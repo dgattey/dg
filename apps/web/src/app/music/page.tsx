@@ -2,6 +2,7 @@ import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { devConsoleRoute, musicRoute } from '@dg/shared-core/routes/app';
+import './music.css';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
