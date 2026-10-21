@@ -978,14 +978,6 @@
   grid-template-columns: minmax(0, 1fr) 184px;
 }
 
-.reading__dogEarCard--reverse .reading__dogEarCoverCol {
-  order: 2;
-}
-
-.reading__dogEarCard--reverse .reading__checkoutSlip {
-  order: 1;
-}
-
 .reading__dogEarCornerCutout {
   position: absolute;
   right: -18px;
@@ -1005,6 +997,10 @@
   position: relative;
   display: grid;
   justify-items: center;
+}
+
+.reading__dogEarCard--reverse .reading__dogEarCoverCol {
+  order: 2;
 }
 
 .reading__dogEarPolaroid {
@@ -1037,6 +1033,10 @@
   align-content: start;
   min-width: 0;
   padding: 6px 8px;
+}
+
+.reading__dogEarCard--reverse .reading__checkoutSlip {
+  order: 1;
 }
 
 .reading__checkoutHeader {

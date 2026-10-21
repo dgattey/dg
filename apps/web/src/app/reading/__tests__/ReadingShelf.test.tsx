@@ -2,14 +2,13 @@ import { FALLBACK_BOOKS } from '@dg/content-models/books/fallbackBooks';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ReadingShelf } from '../ReadingShelf';
+import { streamCardTreatment, yearBadgeStyle } from '../readingCardStyles';
 import {
   buildYearGroups,
   filterAndSortBooks,
   formatFinishedMonthYear,
   formatRailStarSummary,
   splitReviewIntoPullAndRest,
-  streamCardTreatment,
-  yearBadgeStyle,
 } from '../readingHelpers';
 
 describe('readingHelpers', () => {
