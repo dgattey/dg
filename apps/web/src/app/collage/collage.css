@@ -82,14 +82,18 @@ html:has(.collageRoot) body {
   color: var(--ink);
   background-color: var(--viridian);
 }
-.collageSheet:not(.collageField) {
+.collageRoot > .collageSheet,
+.collageSheet:not(.collageBackdrop .collageSheet) {
   --footer-progress: 0;
+  --sheet-max-inset: clamp(10px, 1.8vw, 24px);
   --sheet-max-radius: 24px;
-  --sheet-scale-delta: 0.028;
+  --sheet-inset: calc(var(--sheet-max-inset) * var(--footer-progress));
   --sheet-radius: calc(var(--sheet-max-radius) * var(--footer-progress));
   position: relative;
   z-index: 2;
   min-height: 100dvh;
+  margin-right: var(--sheet-inset);
+  margin-left: var(--sheet-inset);
   overflow: clip;
   color: var(--ink);
   background-color: var(--paper);
@@ -97,8 +101,6 @@ html:has(.collageRoot) body {
   box-shadow:
     0 2px 0 rgb(0 0 0 / calc(0.2 * var(--footer-progress))),
     0 18px 32px rgb(8 12 30 / calc(0.32 * var(--footer-progress)));
-  transform-origin: 50% 100%;
-  scale: calc(1 - var(--sheet-scale-delta) * var(--footer-progress)) 1;
 }
 .collageRoot::after {
   position: absolute;
@@ -468,9 +470,9 @@ html[data-color-scheme="dark"] .cutNightOnly {
 }
 
 @media (max-width: 820px) {
-  .collageSheet:not(.collageField) {
+  .collageRoot > .collageSheet,
+  .collageSheet:not(.collageBackdrop .collageSheet) {
     --sheet-max-radius: 18px;
-    --sheet-scale-delta: 0.045;
   }
   .collagePageTitle {
     padding-top: 16px;

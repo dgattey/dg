@@ -4,7 +4,9 @@ import { useEffect } from 'react';
 
 export function FooterRevealScroll() {
   useEffect(() => {
-    const sheet = document.querySelector<HTMLElement>('.collageSheet:not(.collageField)');
+    const sheet = document.querySelector<HTMLElement>(
+      '.collageRoot > .collageSheet, .collageSheet:not(.collageBackdrop .collageSheet)',
+    );
     const footer = document.querySelector<HTMLElement>('.chrome__footer');
     if (!sheet || !footer) {
       return;

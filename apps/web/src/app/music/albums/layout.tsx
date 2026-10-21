@@ -1,4 +1,5 @@
 import 'server-only';
+import '../music.css';
 
 import { favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import { Typography } from '@dg/ui/core/Typography';
