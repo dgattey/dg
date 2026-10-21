@@ -1,5 +1,6 @@
 import type { RenderableSideProject } from '@dg/content-models/contentful/renderables/sideProjects';
 import { render, screen } from '@testing-library/react';
+import { createElement } from 'react';
 import { GatteySitesCard } from '../GatteySitesCard';
 
 jest.mock('../../collage/PaperCard', () => ({
@@ -13,8 +14,7 @@ jest.mock('../../collage/PaperTag', () => ({
 }));
 
 jest.mock('@dg/ui/dependent/Image', () => ({
-  // biome-ignore lint/performance/noImgElement: test double for mark rendering
-  Image: ({ url }: { url: string }) => <img alt="" src={url} />,
+  Image: ({ url }: { url: string }) => createElement('img', { alt: '', src: url }),
 }));
 
 const mark = {

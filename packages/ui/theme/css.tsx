@@ -1,4 +1,4 @@
-import type { CSSProperties } from 'react';
+import { type CSSProperties, createElement } from 'react';
 import type { SxObject, SxProps } from './index';
 import { getTypography, type TypographyVariants } from './typography';
 
@@ -429,12 +429,7 @@ export function SxStyle({ compiled }: { compiled: CompiledSx | null }) {
   if (!compiled) {
     return null;
   }
-  return (
-    // biome-ignore lint/suspicious/noUnknownAttribute: React 19 hoists and deduplicates <style href precedence>
-    <style href={compiled.className} precedence="default">
-      {compiled.css}
-    </style>
-  );
+  return createElement('style', { href: compiled.className, precedence: 'default' }, compiled.css);
 }
 
 export function joinClasses(

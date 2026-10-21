@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
+import { checkOrphanCssFiles, checkRouteCssImports } from '../check-css.js';
 import {
   checkFileStructure,
   checkWorkspaceStructure,
@@ -9,7 +10,7 @@ import {
 } from '../check-structure.js';
 
 describe('check-structure', () => {
-  it('enforces max file lines, server-only in services, db-imports, section dividers, component naming, and inline typeof import', () => {
+  it('enforces max file lines, server-only in services, db-imports, section dividers, component naming, inline typeof import, and CSS imports', () => {
     const oversized = Array.from({ length: MAX_SOURCE_FILE_LINES + 5 }, () => 'const x = 1;').join(
       '\n',
     );
@@ -57,6 +58,29 @@ describe('check-structure', () => {
     );
     assert.equal(inlineTypeof.length, 1);
     assert.equal(inlineTypeof[0]?.rule, 'no-inline-typeof-import');
+
+    const orphanCss = checkOrphanCssFiles(
+      ['apps/web/src/app/music/music.css', 'apps/web/src/app/dev-console/devConsole.css'],
+      new Map([['apps/web/src/app/music/page.tsx', "import './music.css';\n"]]),
+    );
+    assert.equal(orphanCss.length, 1);
+    assert.equal(orphanCss[0]?.file, 'apps/web/src/app/dev-console/devConsole.css');
+    assert.equal(orphanCss[0]?.rule, 'no-orphan-css');
+
+    const routeMissingCss = checkRouteCssImports(
+      ['apps/web/src/app/music/music.css'],
+      new Map([
+        [
+          'apps/web/src/app/music/albums/layout.tsx',
+          "import '../music.css';\nexport default function L({ children }: { children: unknown }) { return children; }\n",
+        ],
+        ['apps/web/src/app/music/albums/[id]/page.tsx', 'export default function A() {}\n'],
+        ['apps/web/src/app/music/page.tsx', 'export default function P() {}\n'],
+      ]),
+    );
+    assert.equal(routeMissingCss.length, 1);
+    assert.equal(routeMissingCss[0]?.file, 'apps/web/src/app/music/page.tsx');
+    assert.equal(routeMissingCss[0]?.rule, 'route-missing-css');
   });
 
   it('validates the entire workspace in under 200ms with zero violations', () => {

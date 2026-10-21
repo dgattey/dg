@@ -1,5 +1,4 @@
 /* Paper edges: softly rounded cut cards, plus one hand-torn edge for sheet fields. */
-/* biome-ignore format: generated path coordinates mirror the approved prototype */
 .collageRoot {
   --quad-a: inset(0 round 14px 12px 16px 13px);
   --quad-b: inset(0 round 12px 16px 13px 15px);

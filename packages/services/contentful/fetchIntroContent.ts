@@ -77,6 +77,9 @@ const QUERY = gql`
  * for the home page.
  */
 export async function fetchIntroContent(): Promise<IntroContent | null> {
+  if (!process.env.CONTENTFUL_SPACE_ID || !process.env.CONTENTFUL_ACCESS_TOKEN) {
+    return null;
+  }
   const data = parseResponse(introBlockResponseSchema, await getContentfulClient().request(QUERY), {
     kind: 'graphql',
     source: 'contentful.fetchIntroContent',

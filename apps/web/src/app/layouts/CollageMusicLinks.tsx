@@ -1,11 +1,12 @@
 'use client';
 
-import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
+import { favoriteAlbumsRoute, musicRoute, readingRoute } from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import type { LucideIcon } from 'lucide-react';
 import { ChevronDown, DiscAlbum, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
+import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
 import { cx, paperSurfaceVars } from '../collage/paperVars';
 import {
@@ -28,6 +29,7 @@ export function CollageMusicLinks() {
   const pathname = normalizeMusicPath(usePathname() ?? '/');
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const onMusicPage = isMusicDestinationPath(pathname);
+  const onReadingPage = pathname === readingRoute || pathname.startsWith(`${readingRoute}/`);
 
   useEffect(() => {
     const close = (event: KeyboardEvent | PointerEvent) => {
@@ -56,41 +58,55 @@ export function CollageMusicLinks() {
   }, []);
 
   return (
-    <details className="chrome__music" key={pathname} ref={detailsRef}>
-      <summary className="chrome__musicSummary collageLift">
-        <span className="paperWrap" style={paperSurfaceVars('cream', 'quad-c', -2)}>
-          <span className={cx('paperButton', onMusicPage && 'paperButtonCurrent')}>
-            Music
-            <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />
+    <>
+      <details className="chrome__music" key={pathname} ref={detailsRef}>
+        <summary className="chrome__musicSummary collageLift">
+          <span className="paperWrap" style={paperSurfaceVars('cream', 'quad-c', -2)}>
+            <span className={cx('paperButton', onMusicPage && 'paperButtonCurrent')}>
+              Music
+              <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />
+            </span>
           </span>
-        </span>
-      </summary>
-      <PaperCard
-        className="chrome__musicPanel"
-        edge="quad-a"
-        innerClassName="chrome__musicPanelInner"
-        tiltDeg={-1}
-      >
-        <ul className="chrome__musicList">
-          {MUSIC_DESTINATIONS.map((destination) => {
-            const Icon = DESTINATION_ICONS[destination.href];
-            const current = pathname === destination.href;
-            return (
-              <li key={destination.href}>
-                <PageTransitionLink
-                  aria-current={current ? 'page' : undefined}
-                  className="chrome__musicLink"
-                  href={destination.href}
-                  title={destination.label}
-                >
-                  {Icon ? <Icon aria-hidden={true} size={20} /> : null}
-                  {destination.label}
-                </PageTransitionLink>
-              </li>
-            );
-          })}
-        </ul>
-      </PaperCard>
-    </details>
+        </summary>
+        <PaperCard
+          className="chrome__musicPanel"
+          edge="quad-a"
+          innerClassName="chrome__musicPanelInner"
+          tiltDeg={-1}
+        >
+          <ul className="chrome__musicList">
+            {MUSIC_DESTINATIONS.map((destination) => {
+              const Icon = DESTINATION_ICONS[destination.href];
+              const current = pathname === destination.href;
+              return (
+                <li key={destination.href}>
+                  <PageTransitionLink
+                    aria-current={current ? 'page' : undefined}
+                    className="chrome__musicLink"
+                    href={destination.href}
+                    title={destination.label}
+                  >
+                    {Icon ? <Icon aria-hidden={true} size={20} /> : null}
+                    {destination.label}
+                  </PageTransitionLink>
+                </li>
+              );
+            })}
+          </ul>
+        </PaperCard>
+      </details>
+      <div className="collageLift">
+        <PaperButton
+          current={onReadingPage}
+          edge="quad-b"
+          href={readingRoute}
+          tiltDeg={1.5}
+          title="Reading"
+          tone="cream"
+        >
+          Reading
+        </PaperButton>
+      </div>
+    </>
   );
 }

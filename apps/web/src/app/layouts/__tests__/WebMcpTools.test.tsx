@@ -1,4 +1,9 @@
-import { favoriteAlbumsRoute, homeRoute, musicRoute } from '@dg/shared-core/routes/app';
+import {
+  favoriteAlbumsRoute,
+  homeRoute,
+  musicRoute,
+  readingRoute,
+} from '@dg/shared-core/routes/app';
 import { render } from '@testing-library/react';
 import { WebMcpTools } from '../WebMcpTools';
 
@@ -53,6 +58,7 @@ describe('WebMcpTools', () => {
         expect.objectContaining({ path: homeRoute }),
         expect.objectContaining({ path: musicRoute }),
         expect.objectContaining({ path: favoriteAlbumsRoute }),
+        expect.objectContaining({ path: readingRoute }),
       ]),
     );
 

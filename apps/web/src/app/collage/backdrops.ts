@@ -93,7 +93,6 @@ function defineBackdrop(
 }
 
 /** Record-store warmth: gingham and dotted paper, pebbles, broad tropical leaves. */
-// biome-ignore format: placement rows read as a table
 export const ALBUMS_BACKDROP = defineBackdrop(1300, 14, [
   {
     cutOuts: [
@@ -136,7 +135,6 @@ export const ALBUMS_BACKDROP = defineBackdrop(1300, 14, [
 ]);
 
 /** Fills the margins beside the open album's well. */
-// biome-ignore format: placement rows read as a table
 export const ALBUM_DETAIL_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
@@ -153,7 +151,6 @@ export const ALBUM_DETAIL_BACKDROP = defineBackdrop('fill', 1, [
 ]);
 
 /** A listening log: ledger paper, records stacked as discs, water and sky cut-outs. */
-// biome-ignore format: placement rows read as a table
 export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
   {
     cutOuts: [
@@ -198,7 +195,6 @@ export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
 ]);
 
 /** Blueprint grid paper with small water plants and no broad leaves. */
-// biome-ignore format: placement rows read as a table
 export const DEV_CONSOLE_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
@@ -220,7 +216,6 @@ export const DEV_CONSOLE_BACKDROP = defineBackdrop('fill', 1, [
 ]);
 
 /** A lost swallow leaving a blue checker map behind. */
-// biome-ignore format: placement rows read as a table
 export const NOT_FOUND_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
@@ -240,19 +235,64 @@ export const NOT_FOUND_BACKDROP = defineBackdrop('fill', 1, [
 ]);
 
 /** Hazard stripes over a monstera. */
-// biome-ignore format: placement rows read as a table
 export const SERVER_ERROR_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
       ['error-monstera', 'monstera', 'viridian', 520, 22, 74, -12, 'desktop', 0],
       ['error-fern', 'fern', 'olive', 340, -34, -10, 40, 'all', 0],
       ['error-seaweed', 'seaweed2', 'olive', 240, -16, 56, 64, 'all', 1],
-      ['error-star', 'star5', 'star', 46, 10, 36, 6, 'desktop', 3],
+      ['error-star', 'star5', 'star', 46, 10, 36, 6, 'desktop', 1],
       ['error-sun', 'sun', 'ochre', 170, 0, 12, 4, 'desktop', 0],
     ],
     sheets: [
       ['error-stripes', 'torn', 'stripes', ['vermilion', 'ochre'], 72, -4, 40, 380, 6, 'desktop'],
       ['error-disc', 'disc', 'solid', 'cerulean', 3, 66, 200, 0, 'all'],
+    ],
+  },
+]);
+
+/** Library ledger: ruled notebook paper, gingham, dots, pebbles, and botanical bookmarks. */
+export const READING_BACKDROP = defineBackdrop(1100, 12, [
+  {
+    cutOuts: [
+      ['reading-monstera', 'monstera', 'viridian', 440, -18, 78, -6, 'desktop', 0],
+      ['reading-swallow', 'swallow', 'vermilion', 190, -14, 72, 12, 'desktop', 1, { underprint: ['cream', 5, 6] }],
+      ['reading-fern', 'fern', 'olive', 330, 19, -8, 38, 'desktop', 0],
+      ['reading-coral', 'coral', 'rose', 240, -15, 81, 66, 'desktop', 1],
+      ['reading-star-top', 'star5', 'ochre', 54, 16, 46, 8, 'desktop', 1],
+      ['reading-trefoil-top', 'trefoil', 'chartreuse', 140, -21, 3, 82, 'all', 1],
+    ],
+    sheets: [
+      ['reading-ruled', 'torn', 'ruled', ['cream', 'cerulean'], 50, 1, 52, 430, -3.2, 'desktop'],
+      ['reading-pebble-ochre', 'pebble', 'solid', 'ochre', -9, 18, 380, -12, 'all'],
+      ['reading-gingham', 'torn', 'gingham', ['ochre', 'vermilion'], 58, 52, 44, 380, 3.4, 'all'],
+    ],
+  },
+  {
+    cutOuts: [
+      ['reading-pods', 'pods', 'ochre', 230, 22, -6, 22, 'all', 1],
+      ['reading-bird', 'birdpara', 'vermilion', 260, -12, 80, 18, 'desktop', 1, { underprint: ['ochre', -5, 6] }],
+      ['reading-seaweed2', 'seaweed2', 'ultramarine', 240, 15, 82, 58, 'desktop', 1],
+      ['reading-star', 'star5', 'star', 48, -14, 86, 8, 'desktop', 1],
+      ['reading-banana', 'banana', 'leaf', 350, -24, -7, 68, 'desktop', 0, { mirrored: true }],
+    ],
+    sheets: [
+      ['reading-dots', 'torn', 'dots', ['viridian', 'leaf'], 52, 6, 50, 420, -2.8, 'all'],
+      ['reading-disc-cobalt', 'disc', 'starfield', 'ultramarine', -7, 46, 300, 0, 'desktop'],
+      ['reading-stripes', 'torn', 'stripes', ['cerulean', 'cream'], 56, 62, 42, 360, 2.6, 'desktop'],
+    ],
+  },
+  {
+    cutOuts: [
+      ['reading-philo', 'philo', 'viridian', 310, -19, 80, 14, 'desktop', 0],
+      ['reading-gerbe', 'gerbe', 'vermilion', 250, 21, -5, 24, 'desktop', 1],
+      ['reading-trefoil', 'trefoil', 'ochre', 160, 14, 2, 66, 'all', 1],
+      ['reading-heart', 'heart', 'rose', 96, -16, 86, 76, 'all', 1],
+      ['reading-moon', 'moon', 'cream', 64, 15, 8, 8, 'dark-desktop', 1],
+    ],
+    sheets: [
+      ['reading-checker', 'torn', 'checker', ['rose', 'cream'], 48, 16, 52, 400, -2.4, 'all'],
+      ['reading-pebble-rose', 'pebble', 'dots', ['rose', 'cream'], -8, 56, 340, 11, 'desktop'],
     ],
   },
 ]);

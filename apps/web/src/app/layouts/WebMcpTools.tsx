@@ -5,6 +5,7 @@ import {
   homeRoute,
   markdownPages,
   musicRoute,
+  readingRoute,
 } from '@dg/shared-core/routes/app';
 import { useEffect } from 'react';
 
@@ -41,7 +42,7 @@ type DocumentWithModelContext = Document & {
   modelContext?: ModelContext;
 };
 
-const navigablePaths = [homeRoute, musicRoute, favoriteAlbumsRoute] as const;
+const navigablePaths = [homeRoute, musicRoute, favoriteAlbumsRoute, readingRoute] as const;
 
 type NavigablePath = (typeof navigablePaths)[number];
 
@@ -113,7 +114,7 @@ export function WebMcpTools() {
         name: 'list_public_pages',
       },
       {
-        description: 'Navigate the browser to the home, music, or favorite albums page.',
+        description: 'Navigate the browser to the home, music, favorite albums, or reading page.',
         execute: (args) => {
           const path = args.path;
           if (!isNavigablePath(path)) {

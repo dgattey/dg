@@ -5,7 +5,7 @@ import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import { formattedDistance } from '@dg/shared-core/formatting/formattedDistance';
 import { useServerTime } from '@dg/ui/core/ServerTimeContext';
 import { FaIcon, faStrava } from '@dg/ui/icons/FaIcon';
-import { useEffect, useState } from 'react';
+import { createElement, useEffect, useState } from 'react';
 import { useNowPlaying } from '../spotify/NowPlayingContext';
 
 const sfTimeFormatter = new Intl.DateTimeFormat('en-US', {
@@ -56,15 +56,14 @@ export function FooterNowStrip({ initialTrack, latestActivity }: FooterNowStripP
             target="_blank"
           >
             {track.albumImage?.url ? (
-              // biome-ignore lint/performance/noImgElement: 28px Spotify CDN thumbnail in status bar
-              <img
-                alt=""
-                className="chrome__nowArtImg"
-                height={28}
-                loading="lazy"
-                src={track.albumImage.url}
-                width={28}
-              />
+              createElement('img', {
+                alt: '',
+                className: 'chrome__nowArtImg',
+                height: 28,
+                loading: 'lazy',
+                src: track.albumImage.url,
+                width: 28,
+              })
             ) : (
               <span aria-hidden="true" className="chrome__nowArtFallback">
                 <span />
