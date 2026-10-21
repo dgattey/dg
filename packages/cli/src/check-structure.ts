@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkOrphanCssFiles, checkRouteCssImports } from './check-css.js';
 
 export const MAX_SOURCE_FILE_LINES = 350;
 export const MAX_TEST_FILE_LINES = 500;
@@ -155,26 +156,20 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
 }
 
 export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolation> {
-  const trackedOutput = execFileSync('git', ['ls-files', 'apps', 'packages'], {
-    cwd: repoRoot,
-    encoding: 'utf8',
-  });
-  const untrackedOutput = execFileSync(
+  const gitOpts = { cwd: repoRoot, encoding: 'utf8' as const };
+  const tracked = execFileSync('git', ['ls-files', 'apps', 'packages'], gitOpts);
+  const untracked = execFileSync(
     'git',
     ['ls-files', '--others', '--exclude-standard', 'apps', 'packages'],
-    {
-      cwd: repoRoot,
-      encoding: 'utf8',
-    },
+    gitOpts,
   );
-
-  const relPaths = [
+  const allTrackedPaths = [
     ...new Set(
-      [...trackedOutput.split('\n'), ...untrackedOutput.split('\n')]
+      [...tracked.split('\n'), ...untracked.split('\n')]
         .map((line) => line.trim())
         .filter(
           (relPath) =>
-            /\.(ts|tsx)$/.test(relPath) &&
+            Boolean(relPath) &&
             !relPath.includes('/migrations/') &&
             !relPath.includes('/dist/') &&
             !relPath.includes('/.next/'),
@@ -182,15 +177,33 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
     ),
   ].sort();
 
+  const relPaths = allTrackedPaths.filter((relPath) => /\.(ts|tsx)$/.test(relPath));
+  const webCssPaths = allTrackedPaths.filter(
+    (relPath) => relPath.startsWith('apps/web/src/') && relPath.endsWith('.css'),
+  );
+  const webSources = new Map<string, string>();
+  const webImporters = new Map<string, string>();
   const violations: Array<StructureViolation> = [];
+
   for (const relPath of relPaths) {
     const fullPath = path.join(repoRoot, relPath);
-    if (!fs.existsSync(fullPath)) {
-      continue;
+    if (fs.existsSync(fullPath)) {
+      const content = fs.readFileSync(fullPath, 'utf8');
+      violations.push(...checkFileStructure(relPath, content));
+      if (relPath.startsWith('apps/web/src/')) {
+        webSources.set(relPath, content);
+        webImporters.set(relPath, content);
+      }
     }
-    const content = fs.readFileSync(fullPath, 'utf8');
-    violations.push(...checkFileStructure(relPath, content));
   }
+  for (const cssPath of webCssPaths) {
+    const fullPath = path.join(repoRoot, cssPath);
+    if (fs.existsSync(fullPath)) {
+      webImporters.set(cssPath, fs.readFileSync(fullPath, 'utf8'));
+    }
+  }
+  violations.push(...checkOrphanCssFiles(webCssPaths, webImporters));
+  violations.push(...checkRouteCssImports(webCssPaths, webSources));
   return violations;
 }
 
