@@ -6,14 +6,11 @@ import {
   formatCompact,
   formatCount,
   formatDay,
-  formatHourRange,
   formatPacificDay,
   formatPercent,
   formatYearTick,
-  HOUR_SHIFTS,
-  hourShift,
-  peakHours,
-  playsInShift,
+  WEEKDAY_GROUP_OF_DAY,
+  WEEKDAY_NAMES,
   weekdayExtremes,
   weekdayGroups,
 } from './listeningStatsFormat';
@@ -25,9 +22,10 @@ export function YearsCard({ stats }: { stats: ListeningStats }) {
   const last = stats.years.length - 1;
   return (
     <PaperCard
-      className="stats__card stats__years"
+      className="stats__card stats__years stats__taped"
+      edge="soft-a"
       innerClassName="stats__pad"
-      tiltDeg={-0.5}
+      tiltDeg={-1.1}
       tone="viridian"
     >
       <CardHead
@@ -71,50 +69,32 @@ export function YearsCard({ stats }: { stats: ListeningStats }) {
   );
 }
 
-export function DayCard({ stats }: { stats: ListeningStats }) {
-  const max = Math.max(...stats.hours);
-  const peak = peakHours(stats.hours, 2);
-  const isPeak = (hour: number) => (hour - peak.start + 24) % 24 < 2;
-  // Hour columns are narrower than a value label, so only the busiest one carries a number.
-  const busiest = stats.hours.indexOf(max);
+/** A petal per weekday, Monday at the top, each as long as its share of plays. */
+function WeekFlower({ weekdays }: { weekdays: ReadonlyArray<number> }) {
+  const max = Math.max(...weekdays, 1);
   return (
-    <PaperCard className="stats__card stats__day" innerClassName="stats__pad">
-      <CardHead
-        aside={`${formatHourRange(peak.start, 2)} peak: ${formatCount(peak.plays)} plays, ${formatPercent(peak.plays, stats.plays)}`}
-        title="A day of listening, Pacific time"
-      />
-      <ol className="stats__hours">
-        {stats.hours.map((plays, hour) => (
-          <li
-            className={cx(
-              'stats__hour',
-              `stats__hour--${hourShift(hour)}`,
-              isPeak(hour) && 'stats__hour--peak',
-            )}
-            // biome-ignore lint/suspicious/noArrayIndexKey: the index is the hour itself
-            key={hour}
-          >
-            <span className="stats__hourValue">
-              {hour === busiest ? formatCompact(plays) : null}
-            </span>
-            <span aria-hidden="true" className="stats__hourBar" style={bar(plays, max)} />
-            <span className="stats__hourTick">{String(hour).padStart(2, '0')}</span>
-            <span className="stats__visuallyHidden">: {formatCount(plays)} plays</span>
-          </li>
-        ))}
-      </ol>
-      <ul className="stats__shifts">
-        {HOUR_SHIFTS.map(({ label, shift }) => (
-          <li className={`stats__shift stats__shift--${shift}`} key={shift}>
-            <span aria-hidden="true" className="stats__swatch" />
-            <span className="stats__shiftShare">
-              {formatPercent(playsInShift(stats.hours, shift), stats.plays)}
-            </span>
-            <span className="stats__meta">{label}</span>
-          </li>
-        ))}
-      </ul>
-    </PaperCard>
+    <svg aria-hidden="true" className="stats__flower" viewBox="-110 -110 220 220">
+      {weekdays.map((plays, day) => {
+        const length = 46 + (50 * plays) / max;
+        const width = 19;
+        const deg = (day * 360) / weekdays.length;
+        return (
+          <g key={WEEKDAY_NAMES[day]} transform={`rotate(${deg.toFixed(2)})`}>
+            <path
+              className={`stats__petal stats__splitPart--${WEEKDAY_GROUP_OF_DAY[day] ?? 0}`}
+              d={`M0 0 C${width} ${-length * 0.32} ${width} ${-length * 0.86} 0 ${-length} C${-width} ${-length * 0.86} ${-width} ${-length * 0.32} 0 0 Z`}
+            />
+            <text
+              className="stats__petalDay"
+              transform={`translate(0 ${-length - 9}) rotate(${-deg.toFixed(2)})`}
+            >
+              {WEEKDAY_NAMES[day]?.charAt(0)}
+            </text>
+          </g>
+        );
+      })}
+      <circle className="stats__flowerHeart" r="15" />
+    </svg>
   );
 }
 
@@ -124,30 +104,25 @@ export function WeekCard({ stats }: { stats: ListeningStats }) {
   return (
     <PaperCard
       className="stats__card stats__week"
+      edge="soft-b"
       innerClassName="stats__pad"
-      tiltDeg={-0.6}
+      tiltDeg={1.4}
       tone="rose"
     >
       <CardHead title="Day of week" />
-      <div aria-hidden="true" className="stats__split">
-        {groups.map((group, i) => (
-          <span
-            className={`stats__splitPart stats__splitPart--${i}`}
-            key={group.label}
-            style={{ flexGrow: group.plays }}
-          />
-        ))}
+      <div className="stats__weekBody">
+        <WeekFlower weekdays={stats.weekdays} />
+        <ul className="stats__splitKey">
+          {groups.map((group, i) => (
+            <li key={group.label}>
+              <span aria-hidden="true" className={`stats__swatch stats__splitPart--${i}`} />
+              <span>{group.label}</span>
+              <span className="stats__meta">{formatCount(group.plays)}</span>
+              <span className="stats__splitShare">{formatPercent(group.plays, stats.plays)}</span>
+            </li>
+          ))}
+        </ul>
       </div>
-      <ul className="stats__splitKey">
-        {groups.map((group, i) => (
-          <li key={group.label}>
-            <span aria-hidden="true" className={`stats__swatch stats__splitPart--${i}`} />
-            <span>{group.label}</span>
-            <span className="stats__meta">{formatCount(group.plays)}</span>
-            <span className="stats__splitShare">{formatPercent(group.plays, stats.plays)}</span>
-          </li>
-        ))}
-      </ul>
       <p className="stats__facts">
         <span>
           Busiest: <strong>{busiest.name}</strong>, {formatCount(busiest.plays)}

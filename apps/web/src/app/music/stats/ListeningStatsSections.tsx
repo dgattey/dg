@@ -1,111 +1,26 @@
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import { ALBUM_SESSION_MIN_PLAYS } from '@dg/services/spotify/listeningStatsQueries';
+import type { CSSProperties } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { cx } from '../../collage/paperVars';
-import { DayCard, WeekCard, YearsCard } from './ListeningStatsCharts';
-import { formatCount, formatDay, formatMonth, formatPercent } from './listeningStatsFormat';
+import { ListeningClock } from './ListeningClock';
+import { WeekCard, YearsCard } from './ListeningStatsCharts';
+import { ListeningStatsTotals } from './ListeningStatsTotals';
+import { formatCount, formatDay, formatPercent } from './listeningStatsFormat';
 import { bar, CardHead, Cover } from './StatsCardParts';
+import { Scallop } from './StatsShapes';
+import { TopAlbumsPodium } from './TopAlbumsPodium';
 
-function Figure({
-  label,
-  sub,
-  tiltDeg,
-  value,
-}: {
-  label: string;
-  sub: string;
-  tiltDeg: number;
-  value: string;
-}) {
-  return (
-    <PaperCard className="stats__figure" innerClassName="stats__figureInner" tiltDeg={tiltDeg}>
-      <span className="stats__meta">{label}</span>
-      <span className="stats__number">{value}</span>
-      <span className="stats__meta">{sub}</span>
-    </PaperCard>
-  );
-}
-
-function Figures({ stats }: { stats: ListeningStats }) {
-  const hours = (stats.plays * stats.minutesPerPlay) / 60;
-  return (
-    <section aria-label="Totals" className="stats__figures">
-      <Figure
-        label="Plays"
-        sub={`${formatCount(stats.tracks)} tracks, ${formatCount(stats.artists)} artists`}
-        tiltDeg={-0.6}
-        value={formatCount(stats.plays)}
-      />
-      <Figure
-        label="Listening time"
-        sub={`Est. at ${stats.minutesPerPlay.toFixed(2)} min per play`}
-        tiltDeg={0.5}
-        value={`${formatCount(hours)}h`}
-      />
-      <Figure
-        label="Active days"
-        sub={`${formatCount(stats.activeDays)} of ${formatCount(stats.spanDays)} days`}
-        tiltDeg={-0.4}
-        value={formatPercent(stats.activeDays, stats.spanDays)}
-      />
-      <Figure
-        label="Months in a row"
-        sub={`${formatMonth(stats.monthStreak.start)} to ${formatMonth(stats.monthStreak.end)}`}
-        tiltDeg={0.6}
-        value={formatCount(stats.monthStreak.months)}
-      />
-      <Figure
-        label="Whole albums"
-        sub={`of plays, in ${formatCount(stats.sessions)} sessions`}
-        tiltDeg={-0.5}
-        value={formatPercent(stats.sessionPlays, stats.plays)}
-      />
-      <Figure
-        label="From the shelf"
-        sub={`${formatCount(stats.shelf.plays)} plays, ${formatCount(stats.shelf.albums)} albums`}
-        tiltDeg={0.4}
-        value={formatPercent(stats.shelf.plays, stats.plays)}
-      />
-    </section>
-  );
-}
-
-function TopAlbumsCard({ stats }: { stats: ListeningStats }) {
-  return (
-    <PaperCard
-      className="stats__card stats__albums"
-      innerClassName="stats__pad"
-      tiltDeg={0.6}
-      tone="ochre"
-    >
-      <CardHead title="Top albums, all time" />
-      <ol className="stats__albumList">
-        {stats.topAlbums.map(({ album, plays }, i) => (
-          <li className="stats__album" key={album.id}>
-            <Cover album={album} size={76} />
-            <div>
-              <span className="stats__meta">#{i + 1}</span>
-              <span className="stats__rowTitle">{album.name}</span>
-              <span className="stats__meta">{album.artistNames}</span>
-            </div>
-            <span className="stats__count">{formatCount(plays)}</span>
-          </li>
-        ))}
-      </ol>
-      <p className="stats__note">
-        <strong>{stats.shelf.topTenOnShelf} of the top 10</strong> are on my shelf
-      </p>
-    </PaperCard>
-  );
-}
+const CRATE_TILTS = [-3, 2.4, -1.6, 3] as const;
 
 function OnRepeatCard({ stats }: { stats: ListeningStats }) {
   const top = stats.onRepeat[0]?.plays ?? 0;
   return (
     <PaperCard
       className="stats__card stats__repeat"
+      edge="quad-b"
       innerClassName="stats__pad"
-      tiltDeg={0.5}
+      tiltDeg={1.2}
       tone="vermilion"
     >
       <CardHead aside="Most plays of one track in a week" title="On repeat" />
@@ -137,7 +52,9 @@ function FrontToBackCard({ stats }: { stats: ListeningStats }) {
   return (
     <PaperCard
       className="stats__card stats__rituals"
+      edge="soft-b"
       innerClassName="stats__ritualsInner"
+      tiltDeg={0.9}
       tone="black"
     >
       <div className="stats__ritualsLead">
@@ -148,13 +65,25 @@ function FrontToBackCard({ stats }: { stats: ListeningStats }) {
         </p>
       </div>
       <ul className="stats__ritualList">
-        {albums.map(({ album, plays, sessionPlays, sessions }) => (
+        {albums.map(({ album, plays, sessionPlays, sessions }, i) => (
           <li className="stats__ritual" key={album.id}>
-            <Cover album={album} size={62} />
+            <span
+              className="stats__ritualArt"
+              style={{ '--r': `${CRATE_TILTS[i % CRATE_TILTS.length] ?? 0}deg` } as CSSProperties}
+            >
+              <Cover album={album} size={96} />
+              <Scallop
+                className="stats__ritualSticker"
+                size="sticker"
+                tiltDeg={i % 2 === 0 ? 12 : -10}
+                tone="ochre"
+              >
+                {formatPercent(sessionPlays, plays, 0)}
+              </Scallop>
+            </span>
             <div>
               <span className="stats__label">{album.name}</span>
               <span className="stats__meta">{album.artistNames}</span>
-              <span className="stats__share">{formatPercent(sessionPlays, plays, 0)}</span>
             </div>
             <span aria-hidden="true" className="stats__meter" style={bar(sessionPlays, plays)} />
             <span className="stats__meta stats__ritualFoot">
@@ -175,7 +104,12 @@ function DepthCard({ stats }: { stats: ListeningStats }) {
   const highlight = (value: number, max: number) =>
     cx('stats__cell', value === max && 'stats__cell--max');
   return (
-    <PaperCard className="stats__card stats__depth" innerClassName="stats__pad">
+    <PaperCard
+      className="stats__card stats__depth stats__taped"
+      edge="quad-d"
+      innerClassName="stats__pad"
+      tiltDeg={-0.7}
+    >
       <CardHead
         aside={`Top artists by plays. Months with a play, of ${formatCount(stats.activeMonths)}`}
         title="Depth and loyalty"
@@ -244,29 +178,25 @@ function DepthCard({ stats }: { stats: ListeningStats }) {
 }
 
 /**
- * Everything below the page title on `/music/stats`: six totals, then four
- * bands of cards in the approved bento order.
+ * Everything below the page title on `/music/stats`: totals on stubs and seals,
+ * the top album podium, then three ragged bands of cards.
  */
 export function ListeningStatsSections({ stats }: { stats: ListeningStats }) {
   return (
     <div className="stats__sections">
-      <Figures stats={stats} />
+      <ListeningStatsTotals stats={stats} />
+      <TopAlbumsPodium stats={stats} />
       <div className="stats__band">
         <YearsCard stats={stats} />
-        {stats.topAlbums.length > 0 ? <TopAlbumsCard stats={stats} /> : null}
+        <WeekCard stats={stats} />
       </div>
       <div className="stats__band">
         {stats.onRepeat.length > 0 ? <OnRepeatCard stats={stats} /> : null}
-        <DayCard stats={stats} />
+        <ListeningClock stats={stats} />
       </div>
-      {stats.frontToBack.length > 0 ? (
-        <div className="stats__band">
-          <FrontToBackCard stats={stats} />
-        </div>
-      ) : null}
       <div className="stats__band">
         {stats.depth.length > 0 ? <DepthCard stats={stats} /> : null}
-        <WeekCard stats={stats} />
+        {stats.frontToBack.length > 0 ? <FrontToBackCard stats={stats} /> : null}
       </div>
     </div>
   );

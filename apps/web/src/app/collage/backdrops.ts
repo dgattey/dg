@@ -207,6 +207,8 @@ export const STATS_BACKDROP = defineBackdrop(1100, 3, [
     cutOuts: [
       ['stats-star', 'star5', 'star', 40, 4, 47, 4, 'desktop', 1],
       ['stats-philo', 'philo', 'viridian', 300, 4, 93, 62, 'desktop', 0, { mirrored: true }],
+      ['stats-star-podium', 'star4', 'ochre', 46, -10, 66, 57, 'desktop', 1],
+      ['stats-moon', 'moon', 'cream', 64, 14, 58, 3, 'dark-desktop', 1],
     ],
     sheets: [
       ['stats-ledger', 'torn', 'ruled', ['cerulean', 'cream'], -6, 40, 24, 560, -3, 'all'],
@@ -217,6 +219,8 @@ export const STATS_BACKDROP = defineBackdrop(1100, 3, [
     cutOuts: [
       ['stats-coral', 'coral', 'vermilion', 220, -4, -6, 36, 'desktop', 1],
       ['stats-trefoil', 'trefoil', 'rose', 140, 4, 94, 66, 'all', 1],
+      ['stats-monstera', 'monstera', 'leaf', 280, 18, 97, 2, 'desktop', 0],
+      ['stats-star-band', 'star4', 'star', 34, 12, 41, 38, 'desktop', 1],
     ],
     sheets: [],
   },
@@ -224,6 +228,9 @@ export const STATS_BACKDROP = defineBackdrop(1100, 3, [
     cutOuts: [
       ['stats-seaweed', 'seaweed2', 'olive', 240, -4, -4, 20, 'desktop', 0],
       ['stats-heart', 'heart', 'rose', 80, 3, 94, 40, 'desktop', 1],
+      ['stats-fern', 'fern', 'viridian', 300, -24, 18, 38, 'desktop', 0],
+      ['stats-sun', 'sun', 'ochre', 120, 0, 34, 46, 'desktop', 0],
+      ['stats-star-low', 'star5', 'star', 36, -8, 27, 66, 'desktop', 1],
     ],
     sheets: [],
   },

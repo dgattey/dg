@@ -39,7 +39,11 @@ const stats: ListeningStats = {
   sessions: 30,
   shelf: { albums: 3, plays: 80, topTenOnShelf: 1 },
   spanDays: 100,
-  topAlbums: [{ album: album('apart'), plays: 120 }],
+  topAlbums: [
+    { album: album('apart'), plays: 120 },
+    { album: album('rush'), plays: 90 },
+    { album: album('avalanche'), plays: 80 },
+  ],
   tracks: 300,
   weekdays: [10, 20, 30, 40, 15, 5, 8],
   years: [
@@ -49,29 +53,52 @@ const stats: ListeningStats = {
 };
 
 describe('ListeningStatsSections', () => {
-  it('draws every card from paper tones the music pages already use', () => {
+  it('draws every card and cut from paper tones the collage pages already use', () => {
     const { container } = render(<ListeningStatsSections stats={stats} />);
 
     const tones = new Set(
-      [...container.querySelectorAll<HTMLElement>('.paperWrap')].map((card) =>
-        card.style.getPropertyValue('--pc'),
+      [...container.querySelectorAll<HTMLElement>('.paperWrap, .stats__cut, .paperTag')].map(
+        (card) => card.style.getPropertyValue('--pc'),
       ),
     );
-    const allowed = ['black', 'cream', 'ochre', 'rose', 'vermilion', 'viridian'].map(
+    const allowed = ['black', 'cobalt', 'cream', 'ochre', 'rose', 'vermilion', 'viridian'].map(
       (tone) => `var(--${tone})`,
     );
 
     expect([...tones].filter((tone) => !allowed.includes(tone))).toEqual([]);
   });
 
-  it('labels only the busiest hour, so neighbouring labels never collide', () => {
+  it('labels only the busiest hour on the clock, so neighbouring labels never collide', () => {
     const { container } = render(<ListeningStatsSections stats={stats} />);
 
-    const labels = [...container.querySelectorAll('.stats__hourValue')]
-      .map((label) => label.textContent)
-      .filter(Boolean);
+    expect(container.querySelectorAll('.stats__wedge')).toHaveLength(24);
+    expect(
+      [...container.querySelectorAll('.stats__clockValue')].map((label) => label.textContent),
+    ).toEqual(['25.8k']);
+    expect(screen.getByText('3 to 5 PM peak')).toBeInTheDocument();
+  });
 
-    expect(labels).toEqual(['25.8k']);
+  it('cuts the totals into stubs, stamps, and seals instead of matching boxes', () => {
+    const { container } = render(<ListeningStatsSections stats={stats} />);
+
+    const totals = container.querySelector('[aria-label="Totals"]');
+    const kinds = ['.stats__ticket', '.stats__stamp', '.stats__scallop'].map(
+      (kind) => totals?.querySelectorAll(kind).length,
+    );
+
+    expect(kinds).toEqual([2, 2, 2]);
+  });
+
+  it('spotlights the top album on a record and ranks the runners-up with stickers', () => {
+    const { container } = render(<ListeningStatsSections stats={stats} />);
+
+    const podium = container.querySelector('.stats__podium');
+
+    expect(podium?.querySelector('.stats__hero .stats__vinyl')).not.toBeNull();
+    expect(screen.getByText('Album apart')).toBeInTheDocument();
+    expect(
+      [...(podium?.querySelectorAll('.stats__rankSticker') ?? [])].map((s) => s.textContent),
+    ).toEqual(['#02', '#03']);
   });
 
   it('names each card with a heading', () => {

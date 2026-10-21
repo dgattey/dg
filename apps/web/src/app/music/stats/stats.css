@@ -1,4 +1,4 @@
-/* Listening stats: intro cluster, six totals, then a 12-column bento of paper cards. */
+/* Listening stats: intro cluster, then cut paper totals, the podium, and ragged bands of cards. */
 
 .stats__layout {
   display: grid;
@@ -48,48 +48,28 @@
   grid-template-columns: minmax(0, 1fr);
   row-gap: 44px;
 }
-.stats__figures {
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  gap: 24px;
-}
-.stats__figureInner {
-  display: grid;
-  gap: 6px;
-  align-content: start;
-  height: 100%;
-  min-height: 118px;
-  padding: 18px 20px 20px;
-}
-.stats__number {
-  font: var(--type-heading);
-  font-variant-numeric: tabular-nums;
-}
 .stats__band {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 44px 40px;
+  align-items: start;
+}
+/* The second card in a band drops a little, so the edges never line up into a grid. */
+.stats__band > .stats__card:nth-child(2) {
+  margin-top: 40px;
 }
 .stats__card {
   --track: color-mix(in oklab, var(--on) 16%, transparent);
   grid-column: span 12;
-}
-.stats__card .paperInner {
-  height: 100%;
 }
 .stats__years,
 .stats__depth,
 .stats__day {
   grid-column: span 7;
 }
-.stats__years {
-  grid-column: span 8;
-}
-.stats__albums {
-  grid-column: span 4;
-}
 .stats__repeat,
-.stats__week {
+.stats__week,
+.stats__rituals {
   grid-column: span 5;
 }
 .stats__card:only-child {
@@ -100,9 +80,6 @@
 }
 .stats__skeleton {
   min-height: 360px;
-}
-.stats__figure .stats__skeleton {
-  min-height: 118px;
 }
 
 .stats__head {
@@ -181,14 +158,13 @@
   display: block;
   flex: none;
   padding: var(--mat);
-  background: var(--cream);
+  background: var(--mat-bg, var(--cream));
   border-radius: calc(var(--print-radius) + 2px);
   filter: var(--dshadow);
 }
 .stats__mat img {
   border-radius: var(--print-radius);
 }
-.stats__album > div,
 .stats__ritual > div,
 .stats__repeatName {
   display: grid;
@@ -246,27 +222,6 @@
   color: var(--ochre);
 }
 
-/* Top albums */
-.stats__albumList {
-  display: grid;
-  gap: 16px;
-  padding: 0;
-  margin: 18px 0 0;
-  list-style: none;
-}
-.stats__album {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  column-gap: 16px;
-  align-items: center;
-}
-.stats__album:nth-child(odd) .stats__mat {
-  rotate: -1deg;
-}
-.stats__album:nth-child(even) .stats__mat {
-  rotate: 1deg;
-}
-
 /* On repeat */
 .stats__repeat {
   --meter: var(--soft);
@@ -294,68 +249,24 @@
 }
 
 /* A day of listening */
-.stats__hours {
-  display: grid;
-  grid-template-columns: repeat(24, minmax(0, 1fr));
-  column-gap: 4px;
-  align-items: end;
-  padding: 0;
-  margin: 20px 0 0;
-  list-style: none;
-}
-.stats__hour {
-  --shift: var(--soft);
-  display: grid;
-  grid-template-rows: auto 128px auto;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 5px;
-  justify-items: center;
-}
-.stats__hour--desk,
 .stats__shift--desk {
-  --shift: var(--on);
+  --shift: var(--cobalt);
 }
-.stats__hour--evening,
 .stats__shift--evening {
   --shift: var(--viridian);
 }
 .stats__shift--rest {
-  --shift: var(--soft);
-}
-.stats__hour--night,
-.stats__shift--night {
   --shift: var(--ochre);
 }
-.stats__hour--peak {
-  --shift: var(--vermilion);
-}
-.stats__hourValue {
-  min-height: 1.35em;
-  font: var(--type-meta);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  color: var(--vermilion);
-  white-space: nowrap;
-}
-.stats__hourBar {
-  align-self: end;
-  width: 100%;
-  height: max(2px, calc(var(--bar) * 100%));
-  background: var(--shift);
-}
-.stats__hourTick {
-  font: var(--type-meta);
-  font-variant-numeric: tabular-nums;
-  color: var(--soft);
-  white-space: nowrap;
+.stats__shift--night {
+  --shift: var(--rose);
 }
 .stats__shifts {
   display: grid;
-  grid-template-columns: repeat(4, auto);
-  gap: 12px;
-  justify-content: space-between;
+  gap: 14px;
+  align-content: center;
   padding: 0;
-  margin: 18px 0 0;
+  margin: 0;
   list-style: none;
 }
 .stats__shift {
@@ -372,6 +283,7 @@
   width: 12px;
   height: 12px;
   background: var(--shift);
+  border-radius: 50%;
 }
 .stats__shiftShare {
   font: var(--type-title);
@@ -384,9 +296,8 @@
 }
 .stats__ritualsInner {
   display: grid;
-  grid-template-columns: 228px minmax(0, 1fr);
-  column-gap: 32px;
-  padding: 26px 32px 28px;
+  row-gap: 22px;
+  padding: 26px 30px 28px;
 }
 .stats__ritualsLead {
   display: grid;
@@ -395,33 +306,16 @@
 }
 .stats__ritualList {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 24px 32px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 26px;
   padding: 0;
   margin: 0;
   list-style: none;
 }
 .stats__ritual {
   display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  gap: 10px 14px;
+  gap: 10px;
   align-content: start;
-}
-.stats__ritual:nth-child(even) .stats__mat {
-  rotate: -1deg;
-}
-.stats__ritual:nth-child(odd) .stats__mat {
-  rotate: 1deg;
-}
-.stats__share {
-  margin-top: 3px;
-  font: var(--type-heading);
-  font-variant-numeric: tabular-nums;
-  color: var(--ochre);
-}
-.stats__ritual .stats__meter,
-.stats__ritualFoot {
-  grid-column: 1 / -1;
 }
 
 /* Depth and loyalty */
@@ -466,38 +360,35 @@
 }
 
 /* Day of week */
-.stats__split {
-  display: flex;
-  gap: 2px;
-  height: 14px;
-  margin-top: 16px;
-}
-.stats__splitPart {
-  display: block;
-  flex-basis: 0;
-}
 .stats__splitPart--0 {
-  background: var(--on);
+  --part: var(--on);
 }
 .stats__splitPart--1 {
-  background: var(--soft);
+  --part: var(--cream);
 }
 .stats__splitPart--2 {
-  background: var(--track);
+  --part: var(--viridian);
+}
+.stats__swatch.stats__splitPart--0,
+.stats__swatch.stats__splitPart--1,
+.stats__swatch.stats__splitPart--2 {
+  background: var(--part);
 }
 .stats__splitKey {
   display: grid;
-  gap: 6px;
+  gap: 8px;
+  align-content: center;
   padding: 0;
-  margin: 12px 0 0;
+  margin: 0;
   font: var(--type-body);
   list-style: none;
 }
 .stats__splitKey li {
   display: grid;
-  grid-template-columns: 12px minmax(0, 1fr) auto 64px;
-  column-gap: 10px;
+  grid-template-columns: 12px minmax(0, 1fr) auto 56px;
+  column-gap: 8px;
   align-items: baseline;
+  white-space: nowrap;
 }
 .stats__splitKey .stats__swatch {
   align-self: center;
@@ -530,15 +421,6 @@
   align-items: baseline;
 }
 
-@media (max-width: 1180px) {
-  .stats__figures {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-  .stats__ritualList {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
 @media (max-width: 1000px) {
   .stats__intro {
     grid-template-areas: "title" "nav";
@@ -560,9 +442,8 @@
   .stats__band > .stats__card {
     grid-column: auto;
   }
-  .stats__ritualsInner {
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 20px;
+  .stats__band > .stats__card:nth-child(2) {
+    margin-top: 0;
   }
 }
 
@@ -575,14 +456,10 @@
 @media (max-width: 600px) {
   .stats__layout,
   .stats__sections {
-    row-gap: 32px;
-  }
-  .stats__figures {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 16px;
+    row-gap: 36px;
   }
   .stats__band {
-    row-gap: 32px;
+    row-gap: 36px;
   }
   .stats__pad,
   .stats__ritualsInner {
@@ -591,20 +468,8 @@
   .stats__columns {
     column-gap: 4px;
   }
-  .stats__column:nth-child(even) .stats__columnTick,
-  .stats__hourValue,
-  .stats__hourTick {
+  .stats__column:nth-child(even) .stats__columnTick {
     visibility: hidden;
-  }
-  .stats__hours {
-    column-gap: 2px;
-  }
-  .stats__hour:nth-child(6n + 1) .stats__hourTick {
-    visibility: visible;
-  }
-  .stats__shifts {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    justify-content: stretch;
   }
   .stats__repeatRow {
     grid-template-columns: 24px minmax(0, 1fr) 34px;
@@ -616,9 +481,6 @@
   }
   .stats__repeatRow .stats__date {
     display: none;
-  }
-  .stats__ritualList {
-    grid-template-columns: minmax(0, 1fr);
   }
   .stats__table th:nth-child(4),
   .stats__table td:nth-child(4),

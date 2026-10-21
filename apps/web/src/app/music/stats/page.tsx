@@ -1,5 +1,6 @@
 import 'server-only';
 import './stats.css';
+import './statsShapes.css';
 
 import { musicStatsRoute } from '@dg/shared-core/routes/app';
 import type { Metadata } from 'next';

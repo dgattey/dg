@@ -113,7 +113,7 @@ export function playsInShift(hours: ReadonlyArray<number>, shift: HourShift): nu
   return hours.reduce((sum, plays, hour) => (hourShift(hour) === shift ? sum + plays : sum), 0);
 }
 
-const WEEKDAY_NAMES = [
+export const WEEKDAY_NAMES = [
   'Monday',
   'Tuesday',
   'Wednesday',
@@ -122,6 +122,9 @@ const WEEKDAY_NAMES = [
   'Saturday',
   'Sunday',
 ] as const;
+
+/** Which `weekdayGroups` entry each Monday-first day falls in. */
+export const WEEKDAY_GROUP_OF_DAY: ReadonlyArray<number> = [1, 0, 0, 0, 1, 2, 2];
 
 /** Mid-week, the weekdays either side, and the weekend, from Monday-first counts. */
 export function weekdayGroups(weekdays: ReadonlyArray<number>) {
