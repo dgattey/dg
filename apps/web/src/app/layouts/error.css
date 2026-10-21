@@ -19,7 +19,7 @@
 .error__statusCode {
   justify-self: center;
   padding-top: 0;
-  font-size: clamp(120px, 22vw, 260px);
+  font-size: var(--type-display);
 }
 .error__statusCode > span {
   margin: 0;
@@ -38,12 +38,12 @@
 }
 .error__messageCardInner h2 {
   font-family: var(--display);
-  font-size: 27px;
+  font-size: var(--type-h2);
   line-height: 1.15;
 }
 .error__messageCardInner p {
-  font-size: 18px;
-  line-height: 1.5;
+  font-size: var(--type-body-lg);
+  line-height: 1.45;
 }
 
 @media (max-width: 600px) {
@@ -55,13 +55,7 @@
   .error__content {
     gap: 26px;
   }
-  .error__statusCode {
-    font-size: clamp(100px, 35vw, 150px);
-  }
   .error__messageCardInner {
     padding: var(--collage-card-pad-mobile);
-  }
-  .error__messageCardInner h2 {
-    font-size: 23px;
   }
 }

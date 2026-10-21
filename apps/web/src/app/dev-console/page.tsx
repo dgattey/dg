@@ -1,4 +1,5 @@
 import 'server-only';
+import './devConsole.css';
 
 import type { ReactNode } from 'react';
 import { DEV_CONSOLE_BACKDROP } from '../collage/backdrops';

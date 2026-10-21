@@ -33,14 +33,25 @@ describe('contentful schemas', () => {
     expect(safeParse(introBlockResponseSchema, input).success).toBe(true);
   });
 
-  it('parses footer link responses', () => {
+  it('parses footer link and textBlock responses', () => {
     const input = {
       sectionCollection: {
         __typename: 'SectionCollection',
         items: [
           {
             blocksCollection: {
-              items: [{ icon: null, title: 'Link', url: 'https://example.com' }],
+              items: [
+                {
+                  content: {
+                    json: { content: [], nodeType: 'document' },
+                    links: {
+                      assets: { block: [] },
+                      entries: { block: [], inline: [] },
+                    },
+                  },
+                },
+                { icon: null, title: 'Link', url: 'https://example.com' },
+              ],
             },
           },
         ],

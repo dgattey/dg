@@ -29,11 +29,11 @@ export function getTypography(): TypographyVariants {
       fontSize: 17,
     },
     button: {
-      fontSize: 16,
+      fontSize: 'clamp(18px, 1.6vw, 20px)',
       fontWeight: 600,
     },
     caption: {
-      fontSize: 14,
+      fontSize: 15,
       fontStretch: 'semi-expanded',
       fontWeight: 500,
     },
@@ -91,10 +91,8 @@ export function getTypography(): TypographyVariants {
       fontWeight: 600,
     },
     overline: {
-      fontSize: 13,
-      fontStretch: 'expanded',
-      fontVariant: 'all-small-caps',
-      fontWeight: 500,
+      fontSize: 16,
+      fontWeight: 600,
     },
   };
 }
