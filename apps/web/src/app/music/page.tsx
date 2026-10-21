@@ -1,4 +1,3 @@
-import './music.css';
 import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';

@@ -1,4 +1,3 @@
-import './devConsole.css';
 import 'server-only';
 import './devConsole.css';
 
