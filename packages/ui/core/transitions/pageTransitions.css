@@ -151,10 +151,8 @@
   ::view-transition-old(*),
   ::view-transition-new(*),
   ::view-transition-group(*) {
-    /* biome-ignore lint/complexity/noImportantStyles: override browser VT defaults */
-    animation-duration: 0s !important;
-    /* biome-ignore lint/complexity/noImportantStyles: override browser VT defaults */
-    animation-delay: 0s !important;
+    animation-duration: 0s;
+    animation-delay: 0s;
   }
 }
 

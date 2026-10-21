@@ -2,187 +2,190 @@
 
 import type { RenderableBook } from '@dg/content-models/contentful/renderables/books';
 import { jsOnlyProps } from '@dg/ui/core/JsOnlyStyle';
-import type { CSSProperties } from 'react';
-import { useState } from 'react';
-import { CutLetters } from '../collage/CutLetters';
-import { cutOutSymbolId } from '../collage/cutOutShapes';
-import { PaperTag } from '../collage/PaperTag';
+import { type CSSProperties, useState } from 'react';
+import { PaperCard } from '../collage/PaperCard';
 import { cx } from '../collage/paperVars';
-import { NightstandHeroCollage } from './NightstandHeroCollage';
-import { ScallopedStampBadge, StreamBookCard } from './ReadingCollageCards';
-import { yearBadgeStyle } from './readingCardStyles';
+import {
+  CutOutGlyph,
+  NightstandHeroCollage,
+  ScallopedStampBadge,
+  StreamBookCard,
+} from './ReadingCards';
 import {
   buildYearGroups,
   filterAndSortBooks,
   formatRailStarSummary,
   READING_FILTER_OPTIONS,
   type ReadingFilterKey,
+  yearBadgeStyle,
 } from './readingHelpers';
 
-export function ReadingShelf({
-  books,
-  title = 'Reading',
-}: {
+type ReadingInlineStyle = CSSProperties & Record<`--${string}`, string | number>;
+
+type ReadingShelfProps = {
   books: ReadonlyArray<RenderableBook>;
   title?: string;
-}) {
-  const [filterKey, setFilterKey] = useState<ReadingFilterKey>('all');
+};
 
-  const orderedAllBooks = filterAndSortBooks(books, 'all');
-  const visibleBooks = filterAndSortBooks(books, filterKey);
-  const latestBook = visibleBooks[0] ?? orderedAllBooks[0] ?? null;
-  const yearGroups = buildYearGroups(
-    orderedAllBooks,
-    visibleBooks,
-    latestBook ? latestBook.id : null,
-  );
+export function ReadingShelf({ books, title = 'Reading' }: ReadingShelfProps) {
+  const [activeFilter, setActiveFilter] = useState<ReadingFilterKey>('all');
 
-  const fiveStarTotal = orderedAllBooks.filter((book) => book.rating === 5).length;
+  const allBooksInOrder = filterAndSortBooks(books, 'all');
+  const visibleBooks = filterAndSortBooks(books, activeFilter);
+  const fiveStarTotal = allBooksInOrder.filter((book) => book.rating === 5).length;
 
-  let runningCardIndex = 0;
+  const latestBook = visibleBooks[0] ?? null;
+  const yearGroups = buildYearGroups(allBooksInOrder, visibleBooks, latestBook?.id ?? null);
 
   return (
-    <>
-      <div className="reading__titleRow">
+    <div className="reading">
+      <header className="reading__header">
         <div className="reading__titleCluster">
-          <CutLetters className="collagePageTitle reading__title" text={title} />
-          <ScallopedStampBadge className="reading__headerSubStamp" tiltDeg={9} variant="butter">
+          <ScallopedStampBadge
+            className="reading__exLibrisStamp"
+            tiltDeg={-6.5}
+            variant="terracotta"
+          >
+            <CutOutGlyph className="reading__stampIcon" shape="star4" />
             <span>Ex libris · notes & ratings</span>
           </ScallopedStampBadge>
+          <h1
+            className="paperTag paper--ochre edge--quad-a reading__title"
+            style={{ '--r': '-1.8deg' } as ReadingInlineStyle}
+          >
+            <span>{title}</span>
+          </h1>
+          <p
+            className="paperTag paper--viridian edge--quad-b reading__subtitle"
+            style={{ '--r': '1.4deg' } as ReadingInlineStyle}
+          >
+            <span>Books off the nightstand, with dog-eared notes and star ratings.</span>
+          </p>
         </div>
 
-        <nav aria-label="Filter and sort books" className="reading__controls" {...jsOnlyProps}>
+        <fieldset {...jsOnlyProps} aria-label="Filter books" className="reading__controls">
+          <legend className="reading__srOnly">Filter books</legend>
           {READING_FILTER_OPTIONS.map((option) => {
-            const current = option.key === filterKey;
+            const isActive = activeFilter === option.key;
             return (
-              <PaperTag
-                className="reading__pillTag"
-                edge="quad-a"
+              <button
+                aria-pressed={isActive}
+                className={cx(
+                  'paperTag',
+                  isActive ? 'paper--vermilion' : 'paper--cream',
+                  'edge--quad-a',
+                  'reading__pill',
+                  isActive && 'reading__pillActive',
+                )}
                 key={option.key}
-                tiltDeg={option.tiltDeg}
-                tone={current ? 'black' : 'cream'}
+                onClick={() => setActiveFilter(option.key)}
+                style={{ '--r': `${option.tiltDeg}deg` } as ReadingInlineStyle}
+                type="button"
               >
-                <button
-                  aria-pressed={current}
-                  className="reading__pillButton"
-                  onClick={() => setFilterKey(option.key)}
-                  type="button"
-                >
-                  {option.label}
-                </button>
-              </PaperTag>
+                <span>{option.label}</span>
+              </button>
             );
           })}
-        </nav>
-      </div>
+        </fieldset>
+      </header>
 
       {latestBook ? (
         <NightstandHeroCollage
           book={latestBook}
           fiveStarTotal={fiveStarTotal}
-          totalBookCount={orderedAllBooks.length}
+          totalBookCount={allBooksInOrder.length}
         />
       ) : null}
 
-      {yearGroups.length > 0 ? (
-        <div className="reading__sections">
-          {yearGroups.map((group, groupIndex) => {
-            const badge = yearBadgeStyle(group.year, groupIndex);
-            const avgSummary = formatRailStarSummary(group.averageRating);
-            return (
-              <section
-                aria-label={`Books finished in ${group.year}`}
-                className="reading__yearSection"
-                key={group.year}
+      {yearGroups.map((group, groupIndex) => {
+        const badge = yearBadgeStyle(group.year, groupIndex);
+        const starSummary = formatRailStarSummary(group.averageRating);
+        const isLastGroup = groupIndex === yearGroups.length - 1;
+        const countLabel = `${group.totalCount} ${group.totalCount === 1 ? 'book' : 'books'}`;
+
+        return (
+          <section
+            aria-label={`Books finished in ${group.year}`}
+            className={cx('reading__yearSection', isLastGroup && 'reading__yearSectionLast')}
+            key={group.year}
+          >
+            <div className="reading__rail">
+              <div className="reading__railBadgeCluster">
+                <CutOutGlyph
+                  className="reading__railBotanical"
+                  shape={badge.botanicalShape}
+                  style={
+                    {
+                      '--botanical-color': `var(--${badge.botanicalColor})`,
+                      '--botanical-r': `${badge.botanicalRotationDeg}deg`,
+                    } as ReadingInlineStyle
+                  }
+                />
+                <CutOutGlyph
+                  className="reading__railStarAccent"
+                  shape={badge.secondaryShape}
+                  style={
+                    {
+                      '--accent-color': `var(--${badge.secondaryColor})`,
+                      '--accent-r': `${badge.secondaryRotationDeg}deg`,
+                    } as ReadingInlineStyle
+                  }
+                />
+                <h2
+                  className={cx(
+                    'reading__yearTag',
+                    'reading__dieCutYearStamp',
+                    `paper--${badge.tone}`,
+                  )}
+                  id={`reading-year-${group.year}`}
+                  style={{ '--r': `${badge.tiltDeg}deg` } as ReadingInlineStyle}
+                >
+                  <span className="reading__yearStampSub">Shelf year</span>
+                  <span className="reading__yearStampMain">{group.year}</span>
+                </h2>
+              </div>
+
+              <PaperCard
+                className="reading__railMetaSlip"
+                edge={badge.edge}
+                innerClassName="reading__railMetaSlipInner"
+                tiltDeg={groupIndex % 2 === 0 ? 2.4 : -2.2}
+                tone="cream"
               >
-                <aside className="reading__yearRail">
-                  <div className="reading__yearStampCluster">
-                    <svg
-                      aria-hidden="true"
-                      className="reading__railCutout reading__railCutout--primary"
-                      focusable="false"
-                      style={
-                        {
-                          '--rail-cut-color': `var(--${badge.botanicalColor})`,
-                          '--rail-cut-r': `${badge.botanicalRotationDeg}deg`,
-                        } as CSSProperties
-                      }
-                      viewBox="0 0 400 400"
-                    >
-                      <use href={`#${cutOutSymbolId(badge.botanicalShape)}`} />
-                    </svg>
-                    <svg
-                      aria-hidden="true"
-                      className="reading__railCutout reading__railCutout--secondary"
-                      focusable="false"
-                      style={
-                        {
-                          '--rail-cut-color': `var(--${badge.secondaryColor})`,
-                          '--rail-cut-r': `${badge.secondaryRotationDeg}deg`,
-                        } as CSSProperties
-                      }
-                      viewBox="0 0 400 400"
-                    >
-                      <use href={`#${cutOutSymbolId(badge.secondaryShape)}`} />
-                    </svg>
+                <p className="reading__railCount">{countLabel}</p>
+                {starSummary ? <p className="reading__railStars">{starSummary}</p> : null}
+                {group.fiveStarCount > 0 ? (
+                  <p className="reading__railFiveStarNote">
+                    ★ {group.fiveStarCount} five-star{' '}
+                    {group.fiveStarCount === 1 ? 'favorite' : 'favorites'}
+                  </p>
+                ) : null}
+                {group.includesLatest ? (
+                  <p className="reading__railSub">Latest read is up top</p>
+                ) : null}
+              </PaperCard>
+            </div>
 
-                    <div
-                      className={cx(
-                        'reading__dieCutYearStamp',
-                        `reading__dieCutYearStamp--${badge.tone}`,
-                      )}
-                      style={{ '--year-r': `${badge.tiltDeg}deg` } as CSSProperties}
-                    >
-                      <span className="reading__dieCutYearNotch reading__dieCutYearNotch--left" />
-                      <span className="reading__dieCutYearNotch reading__dieCutYearNotch--right" />
-                      <span className="reading__dieCutYearLabel">{group.year}</span>
-                    </div>
-
-                    <PaperTag
-                      className="reading__yearCountPill"
-                      edge={badge.edge}
-                      tiltDeg={badge.tiltDeg > 0 ? -3.5 : 3.8}
-                      tone="cream"
-                    >
-                      <span className="reading__railCount">
-                        {group.totalCount} {group.totalCount === 1 ? 'book' : 'books'}
-                      </span>
-                    </PaperTag>
-                  </div>
-
-                  <div className="reading__railStats">
-                    {avgSummary ? <span className="reading__railAvg">{avgSummary}</span> : null}
-                    {group.fiveStarCount > 0 ? (
-                      <span className="reading__railSub">
-                        {group.fiveStarCount} five-star{' '}
-                        {group.fiveStarCount === 1 ? 'read' : 'reads'}
-                      </span>
-                    ) : null}
-                    {group.includesLatest ? (
-                      <span className="reading__railSub">Latest read is up top</span>
-                    ) : null}
-                  </div>
-                </aside>
-
-                <div className="reading__stream">
-                  {group.streamBooks.map((book, idxInYear) => {
-                    const cardIndex = runningCardIndex;
-                    runningCardIndex += 1;
-                    const nonDogEarCount = group.streamBooks.filter((b) => b.rating !== 5).length;
-                    const isWide =
-                      book.rating !== 5 &&
-                      nonDogEarCount % 2 === 1 &&
-                      idxInYear === group.streamBooks.length - 1;
-                    return (
-                      <StreamBookCard book={book} index={cardIndex} isWide={isWide} key={book.id} />
-                    );
-                  })}
-                </div>
-              </section>
-            );
-          })}
-        </div>
-      ) : null}
-    </>
+            <div className="reading__stream">
+              {group.streamBooks.map((book, index) => {
+                const isDogEar = book.rating === 5;
+                const isLastAlone =
+                  !isDogEar &&
+                  index === group.streamBooks.length - 1 &&
+                  group.streamBooks.filter((b) => b.rating !== 5).length % 2 === 1;
+                return (
+                  <StreamBookCard
+                    book={book}
+                    index={index + groupIndex * 2}
+                    isWide={isLastAlone}
+                    key={book.id}
+                  />
+                );
+              })}
+            </div>
+          </section>
+        );
+      })}
+    </div>
   );
 }

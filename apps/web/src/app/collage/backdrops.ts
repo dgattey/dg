@@ -93,7 +93,6 @@ function defineBackdrop(
 }
 
 /** Record-store warmth: gingham and dotted paper, pebbles, broad tropical leaves. */
-// biome-ignore format: placement rows read as a table
 export const ALBUMS_BACKDROP = defineBackdrop(1300, 14, [
   {
     cutOuts: [
@@ -136,7 +135,6 @@ export const ALBUMS_BACKDROP = defineBackdrop(1300, 14, [
 ]);
 
 /** Fills the margins beside the open album's well. */
-// biome-ignore format: placement rows read as a table
 export const ALBUM_DETAIL_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
@@ -153,7 +151,6 @@ export const ALBUM_DETAIL_BACKDROP = defineBackdrop('fill', 1, [
 ]);
 
 /** A listening log: ledger paper, records stacked as discs, water and sky cut-outs. */
-// biome-ignore format: placement rows read as a table
 export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
   {
     cutOuts: [
@@ -198,7 +195,6 @@ export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
 ]);
 
 /** Blueprint grid paper with small water plants and no broad leaves. */
-// biome-ignore format: placement rows read as a table
 export const DEV_CONSOLE_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
@@ -220,7 +216,6 @@ export const DEV_CONSOLE_BACKDROP = defineBackdrop('fill', 1, [
 ]);
 
 /** A lost swallow leaving a blue checker map behind. */
-// biome-ignore format: placement rows read as a table
 export const NOT_FOUND_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
@@ -240,7 +235,6 @@ export const NOT_FOUND_BACKDROP = defineBackdrop('fill', 1, [
 ]);
 
 /** Hazard stripes over a monstera. */
-// biome-ignore format: placement rows read as a table
 export const SERVER_ERROR_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
@@ -258,7 +252,6 @@ export const SERVER_ERROR_BACKDROP = defineBackdrop('fill', 1, [
 ]);
 
 /** Library ledger: ruled notebook paper, gingham, dots, pebbles, and botanical bookmarks. */
-// biome-ignore format: placement rows read as a table
 export const READING_BACKDROP = defineBackdrop(1100, 12, [
   {
     cutOuts: [

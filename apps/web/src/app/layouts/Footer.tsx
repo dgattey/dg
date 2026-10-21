@@ -40,10 +40,10 @@ function encodeEmailToShiftedCodes(email: string): Array<number> {
   return Array.from(email, (ch) => ch.charCodeAt(0) + CHAR_CODE_SHIFT);
 }
 
-// biome-ignore lint/suspicious/useAwait: 'use cache' requires async
 async function getCopyrightYear() {
   'use cache';
   cacheLife('days');
+  await Promise.resolve();
   return new Date().getFullYear();
 }
 

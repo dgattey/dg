@@ -119,7 +119,9 @@
         "enabled": false
       },
       "includes": [
+        "apps/web/src/app/collage/backdrops.ts",
         "apps/web/src/app/collage/cutOutPlacements.ts",
+        "apps/web/src/app/collage/edges.css",
         "apps/web/src/app/collage/projectSlots.ts"
       ]
     },

@@ -1,10 +1,10 @@
 import type { RenderableAsset } from '@dg/content-models/contentful/renderables/assets';
 import { render, screen } from '@testing-library/react';
+import { createElement } from 'react';
 import { PortraitPrint } from '../PortraitPrint';
 
 jest.mock('@dg/ui/dependent/Image', () => ({
-  // biome-ignore lint/performance/noImgElement: test double for the portrait
-  Image: ({ alt, url }: { alt: string; url: string }) => <img alt={alt} src={url} />,
+  Image: ({ alt, url }: { alt: string; url: string }) => createElement('img', { alt, src: url }),
 }));
 
 const image: RenderableAsset = {

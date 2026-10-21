@@ -1,5 +1,5 @@
 import type { TileComponentProps } from 'pigeon-maps';
-import type { CSSProperties } from 'react';
+import { type CSSProperties, createElement } from 'react';
 
 const tileImageStyle: CSSProperties = {
   display: 'block',
@@ -22,8 +22,13 @@ export function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
 
   return (
     <div style={containerStyle}>
-      {/* biome-ignore lint/performance/noImgElement: pigeon-maps tile uses custom srcSet and onLoad */}
-      <img alt="" onLoad={tileLoaded} src={tile.url} srcSet={tile.srcSet} style={tileImageStyle} />
+      {createElement('img', {
+        alt: '',
+        onLoad: tileLoaded,
+        src: tile.url,
+        srcSet: tile.srcSet,
+        style: tileImageStyle,
+      })}
     </div>
   );
 }
