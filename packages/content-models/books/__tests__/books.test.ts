@@ -46,7 +46,7 @@ describe('bookDomain & bookSchema', () => {
     );
   });
 
-  it('validates Saga BookServerSyncRequest payloads with upserts, deleteIds, reviewPlainText, and coverAssetId', () => {
+  it('validates Saga BookServerSyncRequest payloads with upserts, deleteIds, reviewPlainText, notesPlainText, and coverAssetId', () => {
     const sagaPayload = validateBooksSyncPayload({
       deleteIds: ['DEL-1', 'DEL-1'],
       upserts: [
@@ -56,6 +56,7 @@ describe('bookDomain & bookSchema', () => {
           coverImageUrl: 'https://covers.openlibrary.org/b/isbn/9780441172719-L.jpg',
           id: 'BOOK-1',
           isbn: 9780441172719,
+          notesPlainText: 'Private thought on spice ecology.',
           rating: 5,
           readDateFinished: '2025-03-01T00:00:00Z',
           readDateStarted: '2025-02-01T00:00:00Z',
@@ -73,6 +74,7 @@ describe('bookDomain & bookSchema', () => {
             coverImageUrl: 'https://covers.openlibrary.org/b/isbn/9780441172719-L.jpg',
             id: 'BOOK-1',
             isbn: 9780441172719,
+            notesPlainText: 'Private thought on spice ecology.',
             rating: 5,
             readDateFinished: '2025-03-01T00:00:00Z',
             readDateStarted: '2025-02-01T00:00:00Z',
@@ -213,16 +215,19 @@ describe('goodreadsRss & contentfulBook', () => {
       'review/list_rss/u1?per_page=200&shelf=read&key=k',
     );
 
+    const existingNotesDoc = buildRichTextDocument('Keep these private notes intact.');
     const entry: NormalizedContentfulBookEntry = normalizeContentfulBookEntry({
       fields: {
         author: { 'en-US': 'Frank Herbert' },
         coverImage: { 'en-US': { sys: { id: 'cov-1' } } },
         isbn: { 'en-US': 9780441172719 },
+        notes: { 'en-US': existingNotesDoc },
         rating: { 'en-US': 4 },
         title: { 'en-US': 'Dune' },
       },
       sys: { id: 'B1', publishedVersion: 2, version: 3 },
     });
+    expect(entry.notesText).toBe('Keep these private notes intact.');
     expect(findMatchingContentfulEntry(firstItem, [entry])?.id).toBe('B1');
     const diff = computeBookDiff(firstItem, entry);
     expect(diff.action).toBe('update');
@@ -232,8 +237,11 @@ describe('goodreadsRss & contentfulBook', () => {
       'readDateFinished',
       'readDateStarted',
     ]);
+    expect(diff.merged.notes).toEqual(existingNotesDoc);
+    expect(diff.merged.notesText).toBe('Keep these private notes intact.');
     const cmaFields = buildCmaBookFields(diff.merged);
     expect(cmaFields.rating).toEqual({ 'en-US': 5 });
+    expect(cmaFields.notes).toEqual({ 'en-US': existingNotesDoc });
     expect(cleanWhitespace(' a  b ')).toBe('a b');
     expect(normalizeReviewText('a\n\nb')).toBe('a\n\nb');
     expect(DEFAULT_SHELVES).toEqual(['currently-reading', 'read']);

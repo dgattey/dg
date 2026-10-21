@@ -15,6 +15,8 @@ export type NormalizedContentfulBookEntry = {
   id: string;
   isPublished: boolean;
   isbn: number | null;
+  notes: unknown;
+  notesText: string | null;
   publishedVersion: number | null;
   rating: number | null;
   rawFields: Record<string, unknown>;
@@ -30,6 +32,8 @@ export type MergedBookFields = {
   author: string;
   coverImageId: string | null;
   isbn: number | null;
+  notes: unknown;
+  notesText: string | null;
   rating: number | null;
   readDateFinished: string | null;
   readDateStarted: string | null;
@@ -67,6 +71,7 @@ export function normalizeContentfulBookEntry(
   const rawRating = unwrapField(fields.rating, locale);
   const rawCover = unwrapField(fields.coverImage, locale);
   const reviewDescription = unwrapField(fields.reviewDescription, locale);
+  const notes = unwrapField(fields.notes, locale);
 
   return {
     author: cleanWhitespace(getStr('author') ?? ''),
@@ -82,6 +87,8 @@ export function normalizeContentfulBookEntry(
     isPublished:
       typeof entry.sys?.publishedVersion === 'number' &&
       entry.sys.version === entry.sys.publishedVersion + 1,
+    notes,
+    notesText: extractPlainTextFromRichText(notes) || null,
     publishedVersion: entry.sys?.publishedVersion ?? null,
     rating: typeof rawRating === 'number' && rawRating > 0 ? rawRating : null,
     rawFields: fields,
@@ -136,6 +143,8 @@ export function computeBookDiff(
         author: gr.author,
         coverImageId: null,
         isbn: gr.isbn ?? null,
+        notes: null,
+        notesText: null,
         rating: gr.rating ?? null,
         readDateFinished: gr.readDateFinished ?? null,
         readDateStarted: gr.readDateStarted ?? null,
@@ -167,6 +176,8 @@ export function computeBookDiff(
       author,
       coverImageId: ex.coverImageId,
       isbn,
+      notes: ex.notes,
+      notesText: ex.notesText,
       rating: gr.rating ?? ex.rating ?? null,
       readDateFinished: ex.readDateFinished ?? gr.readDateFinished ?? null,
       readDateStarted: ex.readDateStarted ?? gr.readDateStarted ?? null,
@@ -195,5 +206,6 @@ export function buildCmaBookFields(
     };
   }
   if (merged.reviewDescription) fields.reviewDescription = { [locale]: merged.reviewDescription };
+  if (merged.notes) fields.notes = { [locale]: merged.notes };
   return fields;
 }

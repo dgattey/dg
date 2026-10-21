@@ -9,6 +9,7 @@ import {
   isValidContentfulEntityId,
   MAX_BOOK_AUTHOR_LENGTH,
   MAX_BOOK_ID_LENGTH,
+  MAX_BOOK_NOTES_LENGTH,
   MAX_BOOK_RATING,
   MAX_BOOK_REVIEW_LENGTH,
   MAX_BOOK_TITLE_LENGTH,
@@ -26,6 +27,7 @@ export type BookMutationInput = {
   coverImageUrl?: string | null;
   id?: string | null;
   isbn?: number | null;
+  notesPlainText?: string | null;
   rating?: number | null;
   readDateFinished?: string | null;
   readDateStarted?: string | null;
@@ -141,6 +143,7 @@ export const bookMutationInputSchema = v.pipe(
       coverImageUrl: optStr('coverImageUrl', isAllowedCoverImageUrl, hostErr, (s) => s),
       id: optId('id', idErr.replace('Entity ID', 'Book id')),
       isbn: optNull(isbnSchema),
+      notesPlainText: maxStr('notesPlainText', MAX_BOOK_NOTES_LENGTH),
       rating: optNull(ratingSchema),
       readDateFinished: isoDate('readDateFinished'),
       readDateStarted: isoDate('readDateStarted'),

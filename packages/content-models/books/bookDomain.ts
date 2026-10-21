@@ -24,6 +24,7 @@ export const MAX_BOOK_ID_LENGTH = 64;
 export const MAX_BOOK_TITLE_LENGTH = 500;
 export const MAX_BOOK_AUTHOR_LENGTH = 500;
 export const MAX_BOOK_REVIEW_LENGTH = 50_000;
+export const MAX_BOOK_NOTES_LENGTH = 50_000;
 export const MAX_COVER_IMAGE_URL_LENGTH = 2048;
 export const MIN_BOOK_RATING = 1;
 export const MAX_BOOK_RATING = 5;
