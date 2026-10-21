@@ -1,5 +1,5 @@
 import { log } from '@dg/shared-core/logging/log';
-import { Op } from 'sequelize';
+import { Op, QueryTypes } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
 import { getDatabaseUrl, sequelizeOptions } from './dbConfig';
 import { FavoriteAlbum } from './models/FavoriteAlbum';
@@ -36,7 +36,7 @@ export const dbClient = new Sequelize(getDatabaseUrl(), {
   ...sequelizeOptions,
 });
 
-export { Op };
+export { Op, QueryTypes };
 
 /**
  * Verify database connection. Call on app startup.

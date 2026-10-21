@@ -146,11 +146,14 @@
   animation: var(--timing-medium) var(--easing-snappy) both vt-page-fall;
 }
 
-/* Match Next VT guide: force-disable UA transition animations for reduced motion. */
+/*
+ * Reduced motion stops every layer, the browser's own and the named ones above.
+ * `:root` puts this ahead of `::view-transition-*(name)`, which counts as one type selector.
+ */
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(*),
-  ::view-transition-new(*),
-  ::view-transition-group(*) {
+  :root::view-transition-old(*),
+  :root::view-transition-new(*),
+  :root::view-transition-group(*) {
     animation-duration: 0s;
     animation-delay: 0s;
   }

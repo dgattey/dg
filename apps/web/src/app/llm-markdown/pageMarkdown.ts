@@ -5,6 +5,7 @@ import {
   homeRoute,
   type MarkdownPagePath,
   musicRoute,
+  musicStatsRoute,
   readingRoute,
 } from '@dg/shared-core/routes/app';
 import { cacheLife } from 'next/cache';
@@ -22,6 +23,10 @@ export const pageMarkdownGenerators: {
   [musicRoute]: async () => {
     const { getMusicMarkdown } = await import('../music/musicMarkdown');
     return await getMusicMarkdown();
+  },
+  [musicStatsRoute]: async () => {
+    const { getListeningStatsMarkdown } = await import('../music/stats/listeningStatsMarkdown');
+    return await getListeningStatsMarkdown();
   },
   [readingRoute]: async () => {
     const { getReadingMarkdown } = await import('../reading/readingMarkdown');

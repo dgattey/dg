@@ -23,7 +23,8 @@
   --backdrop-bleed: 96px;
   position: relative;
 }
-.collageBackdropHost > :not(.collageBackdrop) {
+/* The symbol sheet stays out of flow, so it never opens a grid row gap above the title. */
+.collageBackdropHost > :not(.collageBackdrop, .cutSymbols) {
   position: relative;
   z-index: 1;
 }

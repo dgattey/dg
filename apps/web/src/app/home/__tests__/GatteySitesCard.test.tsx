@@ -1,6 +1,5 @@
 import type { RenderableSideProject } from '@dg/content-models/contentful/renderables/sideProjects';
 import { render, screen } from '@testing-library/react';
-import { createElement } from 'react';
 import { GatteySitesCard } from '../GatteySitesCard';
 
 jest.mock('../../collage/PaperCard', () => ({
@@ -11,10 +10,6 @@ jest.mock('../../collage/PaperCard', () => ({
 
 jest.mock('../../collage/PaperTag', () => ({
   PaperTag: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
-}));
-
-jest.mock('@dg/ui/dependent/Image', () => ({
-  Image: ({ url }: { url: string }) => createElement('img', { alt: '', src: url }),
 }));
 
 const mark = {

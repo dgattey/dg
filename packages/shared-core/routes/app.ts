@@ -10,6 +10,8 @@ export const musicRoute = '/music' as const;
 
 export const favoriteAlbumsRoute = '/music/albums' as const;
 
+export const musicStatsRoute = '/music/stats' as const;
+
 export const readingRoute = '/reading' as const;
 
 /** Query key naming the album expanded in place on the favorite albums page. */
@@ -70,6 +72,13 @@ export const markdownPages = [
     priority: 0.6,
     summary: 'All-time favorite albums',
     title: 'Favorite albums',
+  },
+  {
+    changeFrequency: 'daily',
+    path: musicStatsRoute,
+    priority: 0.6,
+    summary: 'Totals, top albums, and listening habits from my Spotify history',
+    title: 'Listening stats',
   },
   {
     changeFrequency: 'weekly',

@@ -16,9 +16,9 @@ import {
   faStrava,
   faXTwitter,
 } from '@dg/ui/icons/FaIcon';
-import { cacheLife } from 'next/cache';
 import type { ReactNode } from 'react';
 import { getFooterContent } from '../../services/contentful';
+import { getServerTime } from '../../services/getServerTime';
 import { getLastKnownSong } from '../../services/spotify';
 import { getLatestActivity } from '../../services/strava';
 import { getAppVersionInfo } from '../../services/version';
@@ -38,13 +38,6 @@ const DEFAULT_ENCODED_EMAIL: ReadonlyArray<number> = [
 
 function encodeEmailToShiftedCodes(email: string): Array<number> {
   return Array.from(email, (ch) => ch.charCodeAt(0) + CHAR_CODE_SHIFT);
-}
-
-async function getCopyrightYear() {
-  'use cache';
-  cacheLife('days');
-  await Promise.resolve();
-  return new Date().getFullYear();
 }
 
 function renderElsewhereIcon(icon: string | null | undefined): ReactNode {
@@ -76,14 +69,15 @@ export function formatElsewhereHandle(url: string): string {
 }
 
 export async function Footer() {
-  const [footerContent, versionInfo, currentYear, lastKnownSong, latestActivity] =
-    await Promise.all([
+  const [footerContent, versionInfo, serverTime, lastKnownSong, latestActivity] = await Promise.all(
+    [
       getFooterContent(),
       getAppVersionInfo(),
-      getCopyrightYear(),
+      getServerTime(),
       getLastKnownSong(),
       getLatestActivity(),
-    ]);
+    ],
+  );
 
   const emailLink = footerContent.links.find(
     (link) => link.icon === 'email' || link.url.startsWith('mailto:'),
@@ -162,7 +156,7 @@ export async function Footer() {
         </div>
         <div className="chrome__colophon">
           <div className="chrome__colophonGroup">
-            <span>© {currentYear} Dylan Gattey</span>
+            <span>© {new Date(serverTime).getFullYear()} Dylan Gattey</span>
             {version ? (
               releaseUrl ? (
                 <a

@@ -83,6 +83,22 @@ describe('check-structure', () => {
     assert.equal(routeMissingCss[0]?.rule, 'route-missing-css');
   });
 
+  it('bans Biome suppression comments in every file Biome checks, anywhere in the repo', () => {
+    const suppression = `${'biome'}-${'ignore'}`;
+    for (const [relPath, content] of [
+      ['apps/web/src/app/Foo.tsx', `// ${suppression} lint/a11y/x: reason\n<svg />;\n`],
+      ['packages/ui/core/foo.css', `/* ${suppression} format: reason */\n.a {}\n`],
+      ['scripts/tool.mjs', `// ${suppression}-all lint: reason\n`],
+    ] as const) {
+      const violations = checkFileStructure(relPath, content);
+      assert.deepEqual(
+        violations.map(({ line, rule }) => ({ line, rule })),
+        [{ line: 1, rule: 'no-biome-suppressions' }],
+        relPath,
+      );
+    }
+  });
+
   it('validates the entire workspace in under 200ms with zero violations', () => {
     const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
     const start = performance.now();

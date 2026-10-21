@@ -1,0 +1,490 @@
+/* Listening stats: intro cluster, then cut paper totals, the podium, and ragged bands of cards. */
+
+.stats__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 44px;
+  width: 100%;
+  padding-block: 40px 56px;
+}
+/* Same title-left, controls-right split as the favorite albums header. */
+.stats__intro {
+  display: grid;
+  grid-template-areas: "title title title title title title nav nav nav nav nav nav";
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: center;
+}
+.stats__intro > .collagePageTitle {
+  grid-area: title;
+}
+.stats__cluster {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-area: nav;
+  gap: 16px;
+  justify-items: end;
+}
+.stats__nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+}
+.stats__lede {
+  max-width: 400px;
+  padding: 14px 18px 15px;
+  font: 400 var(--type-body) / 1.5 var(--body);
+  text-align: right;
+}
+.stats__empty {
+  justify-self: start;
+}
+
+.stats__sections {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 44px;
+}
+.stats__band {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 44px 40px;
+  align-items: start;
+}
+/* The second card in a band drops a little, so the edges never line up into a grid. */
+.stats__band > .stats__card:nth-child(2) {
+  margin-top: 40px;
+}
+.stats__card {
+  --track: color-mix(in oklab, var(--on) 16%, transparent);
+  grid-column: span 12;
+}
+.stats__years,
+.stats__depth,
+.stats__day {
+  grid-column: span 7;
+}
+.stats__repeat,
+.stats__week,
+.stats__rituals {
+  grid-column: span 5;
+}
+.stats__card:only-child {
+  grid-column: span 12;
+}
+.stats__pad {
+  padding: 26px 30px 28px;
+}
+.stats__skeleton {
+  min-height: 360px;
+}
+
+.stats__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.stats__heading {
+  margin: 0;
+  font: 700 var(--type-h2) / 1.2 var(--display);
+}
+.stats__subheading {
+  margin: 22px 0 0;
+  font: 700 var(--type-label) / 1.2 var(--display);
+}
+.stats__aside,
+.stats__note,
+.stats__meta {
+  margin: 0;
+  font: 600 var(--type-meta) / 1.35 var(--body);
+  color: var(--soft);
+}
+.stats__note {
+  margin-top: 14px;
+}
+.stats__note strong,
+.stats__facts strong {
+  font-weight: 700;
+  color: var(--on);
+}
+.stats__label {
+  font: 700 var(--type-label) / 1.2 var(--display);
+}
+.stats__rowTitle {
+  margin-top: 1px;
+  font: 700 var(--type-h3) / 1.25 var(--display);
+}
+.stats__count {
+  font: 700 var(--type-h2) / 1.2 var(--display);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.stats__rank {
+  font: 600 var(--type-meta) / 1.35 var(--body);
+  font-variant-numeric: tabular-nums;
+  color: var(--soft);
+}
+.stats__date {
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+  white-space: nowrap;
+}
+.stats__meter {
+  display: block;
+  height: 6px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--meter, var(--on)) calc(var(--bar) * 100%),
+      transparent calc(var(--bar) * 100%)
+    ),
+    var(--track);
+  border-radius: 3px;
+}
+.stats__mat {
+  display: block;
+  flex: none;
+  padding: var(--mat);
+  background: var(--mat-bg, var(--cream));
+  border-radius: calc(var(--print-radius) + 2px);
+  filter: var(--dshadow);
+}
+.stats__mat img {
+  border-radius: var(--print-radius);
+}
+.stats__ritual > div,
+.stats__repeatName {
+  display: grid;
+  min-width: 0;
+}
+
+/* Plays per year */
+.stats__peak {
+  font-weight: 700;
+  color: var(--ochre);
+}
+.stats__columns {
+  display: grid;
+  grid-template-columns: repeat(var(--count), minmax(0, 1fr));
+  column-gap: 10px;
+  align-items: end;
+  height: 262px;
+  padding: 0;
+  margin: 24px 0 0;
+  list-style: none;
+}
+.stats__column {
+  display: grid;
+  grid-template-rows: auto 196px auto;
+  /* Pinned to the track, so a wide value label overflows instead of widening its bar. */
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+  justify-items: center;
+}
+.stats__columnValue,
+.stats__columnTick {
+  font: 600 var(--type-meta) / 1.35 var(--body);
+  font-variant-numeric: tabular-nums;
+  color: var(--soft);
+  white-space: nowrap;
+}
+.stats__columnValue {
+  align-self: end;
+  min-height: 1.35em;
+}
+.stats__columnBar {
+  align-self: end;
+  width: 100%;
+  height: calc(var(--bar) * 100%);
+  background: var(--on);
+}
+.stats__column--partial .stats__columnBar {
+  background: var(--soft);
+}
+.stats__column--peak .stats__columnBar {
+  background: var(--ochre);
+}
+.stats__column--peak .stats__columnValue {
+  font-weight: 700;
+  color: var(--ochre);
+}
+
+/* On repeat */
+.stats__repeat {
+  --meter: var(--soft);
+}
+.stats__repeatList {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  margin: 16px 0 0;
+  list-style: none;
+}
+.stats__repeatRow {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) 72px 34px 96px;
+  column-gap: 12px;
+  align-items: center;
+}
+.stats__repeatName > * {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stats__repeatRow--top {
+  --meter: var(--on);
+}
+
+/* A day of listening */
+.stats__shift--desk {
+  --shift: var(--cobalt);
+}
+.stats__shift--evening {
+  --shift: var(--viridian);
+}
+.stats__shift--rest {
+  --shift: var(--ochre);
+}
+.stats__shift--night {
+  --shift: var(--rose);
+}
+.stats__shifts {
+  display: grid;
+  gap: 14px;
+  align-content: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.stats__shift {
+  display: grid;
+  grid-template-columns: 12px auto;
+  gap: 2px 8px;
+  align-items: center;
+}
+.stats__shift .stats__meta {
+  grid-column: 2;
+}
+.stats__swatch {
+  display: block;
+  width: 12px;
+  height: 12px;
+  background: var(--shift);
+  border-radius: 50%;
+}
+.stats__shiftShare {
+  font: 700 var(--type-h3) / 1.25 var(--display);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Front to back */
+.stats__rituals {
+  --meter: var(--ochre);
+}
+.stats__ritualsInner {
+  display: grid;
+  row-gap: 22px;
+  padding: 26px 30px 28px;
+}
+.stats__ritualsLead {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+}
+.stats__ritualList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 26px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.stats__ritual {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+}
+
+/* Depth and loyalty */
+.stats__cell {
+  font-family: var(--display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.stats__cell--max {
+  color: var(--vermilion);
+}
+.stats__table {
+  width: 100%;
+  margin-top: 14px;
+  font: 400 var(--type-body) / 1.5 var(--body);
+  border-collapse: collapse;
+}
+.stats__table th,
+.stats__table td {
+  height: 32px;
+  padding: 0 12px 0 0;
+  text-align: left;
+}
+.stats__table thead th {
+  font: 600 var(--type-meta) / 1.35 var(--body);
+  color: var(--soft);
+}
+.stats__table .stats__cell,
+.stats__table .stats__monthsHead {
+  text-align: right;
+}
+.stats__artist {
+  font-weight: 600;
+}
+.stats__months {
+  display: grid;
+  grid-template-columns: minmax(64px, 1fr) 32px;
+  column-gap: 8px;
+  align-items: center;
+  min-width: 140px;
+  text-align: right;
+}
+
+/* Day of week */
+.stats__splitPart--0 {
+  --part: var(--on);
+}
+.stats__splitPart--1 {
+  --part: var(--cream);
+}
+.stats__splitPart--2 {
+  --part: var(--viridian);
+}
+.stats__swatch.stats__splitPart--0,
+.stats__swatch.stats__splitPart--1,
+.stats__swatch.stats__splitPart--2 {
+  background: var(--part);
+}
+.stats__splitKey {
+  display: grid;
+  gap: 8px;
+  align-content: center;
+  padding: 0;
+  margin: 0;
+  font: 400 var(--type-body) / 1.5 var(--body);
+  list-style: none;
+}
+.stats__splitKey li {
+  display: grid;
+  grid-template-columns: 12px minmax(0, 1fr) auto 56px;
+  column-gap: 8px;
+  align-items: baseline;
+  white-space: nowrap;
+}
+.stats__splitKey .stats__swatch {
+  align-self: center;
+}
+.stats__splitShare {
+  font-family: var(--display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.stats__facts {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4px 16px;
+  margin: 14px 0 0;
+  font: 600 var(--type-meta) / 1.35 var(--body);
+  color: var(--soft);
+}
+.stats__dayRepeats {
+  display: grid;
+  gap: 6px;
+  padding: 0;
+  margin: 8px 0 0;
+  list-style: none;
+}
+.stats__dayRepeats li {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto 104px;
+  column-gap: 12px;
+  align-items: baseline;
+}
+
+@media (max-width: 1000px) {
+  .stats__intro {
+    grid-template-areas: "title" "nav";
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 24px;
+  }
+  .stats__cluster {
+    justify-items: start;
+  }
+  .stats__nav {
+    justify-content: flex-start;
+  }
+  .stats__lede {
+    text-align: left;
+  }
+  .stats__band {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .stats__band > .stats__card {
+    grid-column: auto;
+  }
+  .stats__band > .stats__card:nth-child(2) {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 820px) {
+  .stats__layout {
+    padding-block-start: 16px;
+  }
+}
+
+@media (max-width: 600px) {
+  .stats__layout,
+  .stats__sections {
+    row-gap: 36px;
+  }
+  .stats__band {
+    row-gap: 36px;
+  }
+  .stats__pad,
+  .stats__ritualsInner {
+    padding: var(--collage-card-pad-mobile);
+  }
+  .stats__columns {
+    column-gap: 4px;
+  }
+  .stats__column:nth-child(even) .stats__columnTick {
+    visibility: hidden;
+  }
+  .stats__repeatRow {
+    grid-template-columns: 24px minmax(0, 1fr) 34px;
+    row-gap: 6px;
+  }
+  .stats__repeatRow .stats__meter {
+    grid-row: 2;
+    grid-column: 2 / -1;
+  }
+  .stats__repeatRow .stats__date {
+    display: none;
+  }
+  .stats__table th:nth-child(4),
+  .stats__table td:nth-child(4),
+  .stats__table th:nth-child(5),
+  .stats__table td:nth-child(5) {
+    display: none;
+  }
+  .stats__months {
+    grid-template-columns: minmax(40px, 1fr) 28px;
+    min-width: 88px;
+  }
+  .stats__facts {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

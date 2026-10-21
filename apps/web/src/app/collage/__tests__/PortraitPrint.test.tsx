@@ -1,11 +1,6 @@
 import type { RenderableAsset } from '@dg/content-models/contentful/renderables/assets';
 import { render, screen } from '@testing-library/react';
-import { createElement } from 'react';
 import { PortraitPrint } from '../PortraitPrint';
-
-jest.mock('@dg/ui/dependent/Image', () => ({
-  Image: ({ alt, url }: { alt: string; url: string }) => createElement('img', { alt, src: url }),
-}));
 
 const image: RenderableAsset = {
   height: 800,
@@ -28,7 +23,7 @@ describe('PortraitPrint', () => {
 
     expect(link).toHaveAttribute('href', 'https://linkedin.com/in/x');
     expect(link).toContainElement(portrait);
-    expect(portrait).toHaveAttribute('src', 'https://images.example/portrait.jpg');
+    expect(portrait).toHaveAttribute('src', expect.stringContaining(encodeURIComponent(image.url)));
     expect(link).toHaveTextContent('AboutDylan');
     expect(link.querySelector('.cutOut')).toBeNull();
     expect(
@@ -44,7 +39,7 @@ describe('PortraitPrint', () => {
     expect(screen.queryByRole('link', { name: 'About on LinkedIn' })).toBeNull();
     expect(screen.getByRole('img', { name: 'Drew' })).toHaveAttribute(
       'src',
-      'https://images.example/portrait.jpg',
+      expect.stringContaining(encodeURIComponent(image.url)),
     );
     expect(screen.getByText('About')).toBeInTheDocument();
     expect(screen.getByText('Dylan')).toBeInTheDocument();

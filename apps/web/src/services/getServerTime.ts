@@ -10,6 +10,5 @@ import { cacheLife } from 'next/cache';
 export async function getServerTime(): Promise<number> {
   'use cache';
   cacheLife('minutes');
-  await Promise.resolve();
   return Date.now();
 }

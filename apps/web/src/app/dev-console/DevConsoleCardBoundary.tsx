@@ -1,16 +1,14 @@
 'use client';
 
-import { Component, type ReactNode } from 'react';
+import { catchError, type ErrorInfo } from 'next/error';
 import { ErrorMessage } from './StatusIndicators';
 
-type DevConsoleCardBoundaryProps = {
-  children: ReactNode;
-};
-
-type DevConsoleCardBoundaryState = {
-  digest: string | null;
-  hasError: boolean;
-};
+function CardFailed(_props: object, { error }: ErrorInfo) {
+  const digest =
+    error && typeof error === 'object' && 'digest' in error ? String(error.digest) : null;
+  const suffix = digest ? ` (digest ${digest})` : '';
+  return <ErrorMessage message={`This card failed to load${suffix}. Check the server logs.`} />;
+}
 
 /**
  * Keeps one failing card from taking down the whole console. Cards fetch from
@@ -18,27 +16,4 @@ type DevConsoleCardBoundaryState = {
  * would otherwise bubble to the route's error boundary and return a 500 for a
  * page whose other cards still work.
  */
-const ErrorBoundaryBase = Component;
-
-export class DevConsoleCardBoundary extends ErrorBoundaryBase<
-  DevConsoleCardBoundaryProps,
-  DevConsoleCardBoundaryState
-> {
-  state: DevConsoleCardBoundaryState = { digest: null, hasError: false };
-
-  static getDerivedStateFromError(error: unknown): DevConsoleCardBoundaryState {
-    const digest =
-      error && typeof error === 'object' && 'digest' in error ? String(error.digest) : null;
-    return { digest, hasError: true };
-  }
-
-  render() {
-    const { digest, hasError } = this.state;
-    if (!hasError) {
-      return this.props.children;
-    }
-
-    const suffix = digest ? ` (digest ${digest})` : '';
-    return <ErrorMessage message={`This card failed to load${suffix}. Check the server logs.`} />;
-  }
-}
+export const DevConsoleCardBoundary = catchError(CardFailed);

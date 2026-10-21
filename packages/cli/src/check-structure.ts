@@ -34,6 +34,8 @@ const BANNED_GENERIC_COMPONENT_FILENAMES: ReadonlySet<string> = new Set([
 ]);
 
 const INLINE_TYPEOF_IMPORT_TOKEN = `${'typeof'} ${'import('}`;
+const BIOME_SUPPRESSION_TOKEN = `${'biome'}-${'ignore'}`;
+const BIOME_CHECKED_FILE = /\.(?:c?js|mjs|tsx?|css|jsonc?)$/;
 
 export type StructureViolation = {
   file: string;
@@ -57,13 +59,32 @@ function isPureTypeModule(content: string): boolean {
   );
 }
 
+/** Lint findings get fixed, never suppressed: no suppression comment in any file Biome checks. */
+function checkNoBiomeSuppressions(
+  relPath: string,
+  lines: Array<string>,
+): Array<StructureViolation> {
+  return lines.flatMap((lineText, i) =>
+    lineText.includes(BIOME_SUPPRESSION_TOKEN)
+      ? [
+          {
+            file: relPath,
+            line: i + 1,
+            message: 'Fix the lint instead of suppressing it',
+            rule: 'no-biome-suppressions',
+          },
+        ]
+      : [],
+  );
+}
+
 export function checkFileStructure(relPath: string, content: string): Array<StructureViolation> {
-  const violations: Array<StructureViolation> = [];
-  if (!/\.(ts|tsx)$/.test(relPath)) {
+  const lines = content.split('\n');
+  const violations = checkNoBiomeSuppressions(relPath, lines);
+  if (!/^(?:apps|packages)\/.*\.(ts|tsx)$/.test(relPath)) {
     return violations;
   }
 
-  const lines = content.split('\n');
   const lineCount = lines.length;
   const baseName = path.posix.basename(relPath);
   const isTest = isTestFile(relPath);
@@ -157,12 +178,8 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
 
 export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolation> {
   const gitOpts = { cwd: repoRoot, encoding: 'utf8' as const };
-  const tracked = execFileSync('git', ['ls-files', 'apps', 'packages'], gitOpts);
-  const untracked = execFileSync(
-    'git',
-    ['ls-files', '--others', '--exclude-standard', 'apps', 'packages'],
-    gitOpts,
-  );
+  const tracked = execFileSync('git', ['ls-files'], gitOpts);
+  const untracked = execFileSync('git', ['ls-files', '--others', '--exclude-standard'], gitOpts);
   const allTrackedPaths = [
     ...new Set(
       [...tracked.split('\n'), ...untracked.split('\n')]
@@ -177,7 +194,7 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
     ),
   ].sort();
 
-  const relPaths = allTrackedPaths.filter((relPath) => /\.(ts|tsx)$/.test(relPath));
+  const relPaths = allTrackedPaths.filter((relPath) => BIOME_CHECKED_FILE.test(relPath));
   const webCssPaths = allTrackedPaths.filter(
     (relPath) => relPath.startsWith('apps/web/src/') && relPath.endsWith('.css'),
   );
@@ -190,7 +207,7 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
     if (fs.existsSync(fullPath)) {
       const content = fs.readFileSync(fullPath, 'utf8');
       violations.push(...checkFileStructure(relPath, content));
-      if (relPath.startsWith('apps/web/src/')) {
+      if (relPath.startsWith('apps/web/src/') && /\.(ts|tsx)$/.test(relPath)) {
         webSources.set(relPath, content);
         webImporters.set(relPath, content);
       }

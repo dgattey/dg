@@ -1,4 +1,4 @@
-import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
+import { favoriteAlbumsRoute, musicRoute, musicStatsRoute } from '@dg/shared-core/routes/app';
 
 export type MusicDestination = {
   href: string;
@@ -8,6 +8,7 @@ export type MusicDestination = {
 export const MUSIC_DESTINATIONS: ReadonlyArray<MusicDestination> = [
   { href: favoriteAlbumsRoute, label: 'Favorite albums' },
   { href: musicRoute, label: 'Listening history' },
+  { href: musicStatsRoute, label: 'Listening stats' },
 ];
 
 const MUSIC_DESTINATION_PATHS = new Set(MUSIC_DESTINATIONS.map((route) => route.href));

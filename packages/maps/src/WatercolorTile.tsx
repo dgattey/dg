@@ -1,4 +1,4 @@
-import { type CSSProperties, createElement, useRef } from 'react';
+import { type CSSProperties, useRef } from 'react';
 
 type Tile = {
   url: string;
@@ -66,19 +66,8 @@ export function WatercolorTile({ tile, tileLoaded }: TileComponentProps) {
 
   return (
     <div style={containerStyle}>
-      {createElement('img', {
-        alt: '',
-        onLoad: handleImageLoad,
-        src: tile.url,
-        style: tileImgStyle,
-      })}
-      {hasLabels &&
-        createElement('img', {
-          alt: '',
-          onLoad: handleImageLoad,
-          src: labelsUrl,
-          style: tileImgStyle,
-        })}
+      <img alt="" onLoad={handleImageLoad} src={tile.url} style={tileImgStyle} />
+      {hasLabels && <img alt="" onLoad={handleImageLoad} src={labelsUrl} style={tileImgStyle} />}
     </div>
   );
 }

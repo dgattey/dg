@@ -1,4 +1,4 @@
-import { type CSSProperties, createElement } from 'react';
+import type { CSSProperties } from 'react';
 import type { SxObject, SxProps } from './index';
 import { getTypography, type TypographyVariants } from './typography';
 
@@ -429,7 +429,11 @@ export function SxStyle({ compiled }: { compiled: CompiledSx | null }) {
   if (!compiled) {
     return null;
   }
-  return createElement('style', { href: compiled.className, precedence: 'default' }, compiled.css);
+  return (
+    <style href={compiled.className} precedence="default">
+      {compiled.css}
+    </style>
+  );
 }
 
 export function joinClasses(
