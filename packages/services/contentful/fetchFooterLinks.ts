@@ -84,6 +84,21 @@ const isTextBlock = (item: unknown): item is TextBlock =>
 const NORMALIZED_FOOTER_DESCRIPTION =
   'Building from San Francisco. Always happy to connect about product, craft, and the outdoors.';
 
+const FALLBACK_FOOTER_LINKS: Array<RenderableLink> = [
+  { icon: 'cursor', title: 'Cursor', url: 'https://cursor.com/@dyl' },
+  { icon: 'github', title: 'GitHub', url: 'https://github.com/dgattey' },
+  { icon: 'strava', title: 'Strava', url: 'https://www.strava.com/athletes/17469310' },
+  {
+    icon: 'spotify',
+    title: 'Spotify',
+    url: 'https://open.spotify.com/user/dylangattey?si=yXvHMsSLR9au8bTjdjJsUA',
+  },
+  { icon: 'instagram', title: 'Instagram', url: 'https://www.instagram.com/dylangattey' },
+  { icon: 'x', title: 'X', url: 'https://x.com/dyl_gat' },
+  { icon: 'linkedin', title: 'LinkedIn', url: 'https://www.linkedin.com/in/dgattey' },
+  { icon: 'email', title: 'Email me', url: 'mailto:dylan@gattey.com' },
+];
+
 function normalizeFooterDescription(
   description: FooterContent['description'],
 ): FooterContent['description'] {
@@ -123,7 +138,7 @@ function normalizeFooterDescription(
  */
 export async function fetchFooterContent(): Promise<FooterContent> {
   if (!process.env.CONTENTFUL_SPACE_ID || !process.env.CONTENTFUL_ACCESS_TOKEN) {
-    return { description: null, links: [] };
+    return { description: null, links: FALLBACK_FOOTER_LINKS };
   }
   const data = parseResponse(
     footerLinksResponseSchema,
