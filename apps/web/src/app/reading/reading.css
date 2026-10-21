@@ -1,9 +1,7 @@
 /* /reading library page — tactile paper-cut collage, nightstand hero, die-cut year stamps, and dog-eared 5-star callout cards */
 
 .reading__layout {
-  /* Guardrail typography tokens + collage palette aliases */
-  --type-label: clamp(18px, 1.6vw, 20px);
-  --type-meta: 15px;
+  /* Collage palette aliases */
   --terracotta: var(--vermilion);
   --butter: color-mix(in oklab, var(--ochre) 38%, var(--cream));
   --plum: color-mix(in oklab, var(--ultramarine) 64%, var(--rose));
