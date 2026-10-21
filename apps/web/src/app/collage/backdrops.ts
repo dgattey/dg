@@ -257,38 +257,49 @@ export const SERVER_ERROR_BACKDROP = defineBackdrop('fill', 1, [
   },
 ]);
 
-/** Library ledger: ruled notebook paper, gingham, dots, and botanical bookmarks. */
+/** Library ledger: ruled notebook paper, gingham, dots, pebbles, and botanical bookmarks. */
 // biome-ignore format: placement rows read as a table
-export const READING_BACKDROP = defineBackdrop(1300, 10, [
+export const READING_BACKDROP = defineBackdrop(1100, 12, [
   {
     cutOuts: [
-      ['reading-swallow', 'swallow', 'vermilion', 190, -14, 78, 8, 'desktop', 1],
-      ['reading-fern', 'fern', 'olive', 320, 18, -7, 46, 'desktop', 0],
-      ['reading-coral', 'coral', 'rose', 230, -12, 82, 72, 'desktop', 1],
+      ['reading-monstera', 'monstera', 'viridian', 440, -18, 78, -6, 'desktop', 0],
+      ['reading-swallow', 'swallow', 'vermilion', 190, -14, 72, 12, 'desktop', 1, { underprint: ['cream', 5, 6] }],
+      ['reading-fern', 'fern', 'olive', 330, 19, -8, 38, 'desktop', 0],
+      ['reading-coral', 'coral', 'rose', 240, -15, 81, 66, 'desktop', 1],
+      ['reading-star-top', 'star5', 'ochre', 54, 16, 46, 8, 'desktop', 1],
+      ['reading-trefoil-top', 'trefoil', 'chartreuse', 140, -21, 3, 82, 'all', 1],
     ],
     sheets: [
-      ['reading-ruled', 'torn', 'ruled', ['cream', 'cerulean'], 50, 2, 52, 440, -1.8, 'desktop'],
-      ['reading-gingham', 'torn', 'gingham', ['ochre', 'vermilion'], -6, 44, 42, 380, 2.2, 'all'],
+      ['reading-ruled', 'torn', 'ruled', ['cream', 'cerulean'], 50, 1, 52, 430, -3.2, 'desktop'],
+      ['reading-pebble-ochre', 'pebble', 'solid', 'ochre', -9, 18, 380, -12, 'all'],
+      ['reading-gingham', 'torn', 'gingham', ['ochre', 'vermilion'], 58, 52, 44, 380, 3.4, 'all'],
     ],
   },
   {
     cutOuts: [
-      ['reading-pods', 'pods', 'ochre', 210, 22, -5, 36, 'all', 1],
-      ['reading-seaweed2', 'seaweed2', 'ultramarine', 220, 12, 81, 58, 'desktop', 1],
-      ['reading-star', 'star5', 'star', 42, -10, 86, 14, 'desktop', 1],
+      ['reading-pods', 'pods', 'ochre', 230, 22, -6, 22, 'all', 1],
+      ['reading-bird', 'birdpara', 'vermilion', 260, -12, 80, 18, 'desktop', 1, { underprint: ['ochre', -5, 6] }],
+      ['reading-seaweed2', 'seaweed2', 'ultramarine', 240, 15, 82, 58, 'desktop', 1],
+      ['reading-star', 'star5', 'star', 48, -14, 86, 8, 'desktop', 1],
+      ['reading-banana', 'banana', 'leaf', 350, -24, -7, 68, 'desktop', 0, { mirrored: true }],
     ],
     sheets: [
-      ['reading-dots', 'torn', 'dots', ['viridian', 'leaf'], 52, 6, 50, 420, -2.4, 'all'],
-      ['reading-stripes', 'torn', 'stripes', ['cerulean', 'cream'], -4, 58, 40, 360, 1.9, 'desktop'],
+      ['reading-dots', 'torn', 'dots', ['viridian', 'leaf'], 52, 6, 50, 420, -2.8, 'all'],
+      ['reading-disc-cobalt', 'disc', 'starfield', 'ultramarine', -7, 46, 300, 0, 'desktop'],
+      ['reading-stripes', 'torn', 'stripes', ['cerulean', 'cream'], 56, 62, 42, 360, 2.6, 'desktop'],
     ],
   },
   {
     cutOuts: [
-      ['reading-philo', 'philo', 'viridian', 290, -18, 82, 18, 'desktop', 0],
-      ['reading-trefoil', 'trefoil', 'ochre', 150, 14, 2, 62, 'all', 1],
+      ['reading-philo', 'philo', 'viridian', 310, -19, 80, 14, 'desktop', 0],
+      ['reading-gerbe', 'gerbe', 'vermilion', 250, 21, -5, 24, 'desktop', 1],
+      ['reading-trefoil', 'trefoil', 'ochre', 160, 14, 2, 66, 'all', 1],
+      ['reading-heart', 'heart', 'rose', 96, -16, 86, 76, 'all', 1],
+      ['reading-moon', 'moon', 'cream', 64, 15, 8, 8, 'dark-desktop', 1],
     ],
     sheets: [
-      ['reading-checker', 'torn', 'checker', ['rose', 'cream'], 48, 22, 52, 400, -1.6, 'all'],
+      ['reading-checker', 'torn', 'checker', ['rose', 'cream'], 48, 16, 52, 400, -2.4, 'all'],
+      ['reading-pebble-rose', 'pebble', 'dots', ['rose', 'cream'], -8, 56, 340, 11, 'desktop'],
     ],
   },
 ]);

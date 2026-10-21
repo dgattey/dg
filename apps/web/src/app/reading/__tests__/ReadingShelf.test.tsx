@@ -8,6 +8,8 @@ import {
   formatFinishedMonthYear,
   formatRailStarSummary,
   splitReviewIntoPullAndRest,
+  streamCardTreatment,
+  yearBadgeStyle,
 } from '../readingHelpers';
 
 describe('readingHelpers', () => {
@@ -33,7 +35,7 @@ describe('readingHelpers', () => {
   });
 
   it('groups books by year excluding the latest feature book from streamBooks while preserving totalCount', () => {
-    const ordered = filterAndSortBooks(FALLBACK_BOOKS, 'newest');
+    const ordered = filterAndSortBooks(FALLBACK_BOOKS, 'all');
     const latest = ordered[0];
     const groups = buildYearGroups(ordered, ordered, latest?.id ?? null);
 
@@ -43,13 +45,36 @@ describe('readingHelpers', () => {
     expect(group2026?.streamBooks).toHaveLength(3);
     expect(group2026?.includesLatest).toBe(true);
   });
+
+  it('assigns organic tilts, varied mat treatments, and dog-eared 5-star callouts', () => {
+    const fiveStarBook = FALLBACK_BOOKS.find((b) => b.rating === 5);
+    const fourStarBook = FALLBACK_BOOKS.find((b) => b.rating === 4);
+    expect(fiveStarBook).toBeDefined();
+    expect(fourStarBook).toBeDefined();
+
+    if (fiveStarBook && fourStarBook) {
+      const dogEar = streamCardTreatment(fiveStarBook, 0);
+      expect(dogEar.isDogEarPick).toBe(true);
+      expect(Math.abs(dogEar.tiltDeg)).toBeLessThanOrEqual(4);
+
+      const standard = streamCardTreatment(fourStarBook, 1);
+      expect(standard.isDogEarPick).toBe(false);
+      expect(Math.abs(standard.tiltDeg)).toBeGreaterThanOrEqual(1.5);
+    }
+
+    const badge2026 = yearBadgeStyle('2026', 0);
+    expect(Math.abs(badge2026.tiltDeg)).toBeGreaterThanOrEqual(6);
+  });
 });
 
 describe('ReadingShelf', () => {
-  it('renders the latest feature card, year rails, and stream cards', () => {
+  it('renders the nightstand hero collage, die-cut year stamps, and dog-eared 5-star cards', () => {
     render(<ReadingShelf books={FALLBACK_BOOKS} />);
 
     expect(screen.getByRole('heading', { level: 1, name: 'Reading' })).toBeInTheDocument();
+    expect(screen.getByText('On the nightstand')).toBeInTheDocument();
+    expect(screen.getByText(/68% read/i)).toBeInTheDocument();
+
     const featureCard = screen.getByLabelText(/Latest read:/i);
     expect(
       within(featureCard).getByRole('heading', {
@@ -67,13 +92,15 @@ describe('ReadingShelf', () => {
     expect(
       within(section2026).getByRole('heading', { level: 3, name: 'Theo of Golden' }),
     ).toBeInTheDocument();
+
+    expect(screen.getAllByText(/Dog-eared pick/i).length).toBeGreaterThan(0);
   });
 
-  it('filters to five-star reads when Five stars pill is clicked', async () => {
+  it('filters to five-star reads when 5 stars pill is clicked', async () => {
     const user = userEvent.setup();
     render(<ReadingShelf books={FALLBACK_BOOKS} />);
 
-    const fiveStarsButton = screen.getByRole('button', { name: 'Five stars' });
+    const fiveStarsButton = screen.getByRole('button', { name: '5 stars' });
     await user.click(fiveStarsButton);
     expect(fiveStarsButton).toHaveAttribute('aria-pressed', 'true');
 
@@ -82,6 +109,20 @@ describe('ReadingShelf', () => {
       within(featureCard).getByRole('heading', { level: 2, name: 'Pachinko' }),
     ).toBeInTheDocument();
     expect(screen.queryByRole('heading', { name: 'Theo of Golden' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 3, name: 'Dune' })).toBeInTheDocument();
+  });
+
+  it('filters to currently reading and finished books via filter pills', async () => {
+    const user = userEvent.setup();
+    render(<ReadingShelf books={FALLBACK_BOOKS} />);
+
+    const readingButton = screen.getByRole('button', { name: 'Currently reading' });
+    await user.click(readingButton);
+    expect(readingButton).toHaveAttribute('aria-pressed', 'true');
+
+    const finishedButton = screen.getByRole('button', { name: 'Finished' });
+    await user.click(finishedButton);
+    expect(finishedButton).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('heading', { level: 3, name: 'Dune' })).toBeInTheDocument();
   });
 
