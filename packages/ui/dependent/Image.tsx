@@ -52,6 +52,8 @@ type ImageProps = {
    */
   alt: NextImageProps['alt'];
 
+  className?: string;
+
   /**
    * For the image that should be the LCP.
    */

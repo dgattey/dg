@@ -17,18 +17,11 @@ export const jsOnlyProps = { [JS_ONLY_ATTRIBUTE]: true } as const;
  * toggled by script flashes the control it is about to remove.
  *
  * Belongs in `<head>`, where `<noscript>` may hold a stylesheet.
- *
- * Written as raw HTML because a browser that runs scripts parses `<noscript>`
- * contents as *text*, so rendering a real `<style>` child would leave the server
- * markup and the hydrated tree disagreeing about what is in here.
  */
 export function JsOnlyStyle() {
   return (
-    <noscript
-      // biome-ignore lint/security/noDangerouslySetInnerHtml: fixed literal, no input reaches it
-      dangerouslySetInnerHTML={{
-        __html: `<style>[${JS_ONLY_ATTRIBUTE}]{display:none!important}</style>`,
-      }}
-    />
+    <noscript>
+      <style>{`[${JS_ONLY_ATTRIBUTE}]{display:none!important}`}</style>
+    </noscript>
   );
 }

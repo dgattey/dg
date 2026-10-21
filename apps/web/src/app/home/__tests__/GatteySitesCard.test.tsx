@@ -12,11 +12,6 @@ jest.mock('../../collage/PaperTag', () => ({
   PaperTag: ({ children }: { children: React.ReactNode }) => <span>{children}</span>,
 }));
 
-jest.mock('@dg/ui/dependent/Image', () => ({
-  // biome-ignore lint/performance/noImgElement: test double for mark rendering
-  Image: ({ url }: { url: string }) => <img alt="" src={url} />,
-}));
-
 const mark = {
   height: 80,
   title: 'Mark',

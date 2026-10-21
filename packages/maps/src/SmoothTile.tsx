@@ -22,7 +22,6 @@ export function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
 
   return (
     <div style={containerStyle}>
-      {/* biome-ignore lint/performance/noImgElement: pigeon-maps tile uses custom srcSet and onLoad */}
       <img alt="" onLoad={tileLoaded} src={tile.url} srcSet={tile.srcSet} style={tileImageStyle} />
     </div>
   );

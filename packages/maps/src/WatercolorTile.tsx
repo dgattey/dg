@@ -66,12 +66,8 @@ export function WatercolorTile({ tile, tileLoaded }: TileComponentProps) {
 
   return (
     <div style={containerStyle}>
-      {/* biome-ignore lint/performance/noImgElement: pigeon-maps tile uses external tile URL and onLoad */}
       <img alt="" onLoad={handleImageLoad} src={tile.url} style={tileImgStyle} />
-      {hasLabels && (
-        // biome-ignore lint/performance/noImgElement: pigeon-maps tile uses external tile URL and onLoad
-        <img alt="" onLoad={handleImageLoad} src={labelsUrl} style={tileImgStyle} />
-      )}
+      {hasLabels && <img alt="" onLoad={handleImageLoad} src={labelsUrl} style={tileImgStyle} />}
     </div>
   );
 }

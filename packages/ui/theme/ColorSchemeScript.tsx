@@ -9,6 +9,5 @@ import { COLOR_SCHEME_INIT_SCRIPT } from './colorScheme';
  * on the network sits between the HTML arriving and the first paint.
  */
 export function ColorSchemeScript() {
-  // biome-ignore lint/security/noDangerouslySetInnerHtml: fixed literal, no interpolated input
-  return <script dangerouslySetInnerHTML={{ __html: COLOR_SCHEME_INIT_SCRIPT }} />;
+  return <script>{COLOR_SCHEME_INIT_SCRIPT}</script>;
 }

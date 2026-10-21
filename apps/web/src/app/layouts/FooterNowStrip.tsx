@@ -4,6 +4,7 @@ import type { Track } from '@dg/content-models/spotify/Track';
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import { formattedDistance } from '@dg/shared-core/formatting/formattedDistance';
 import { useServerTime } from '@dg/ui/core/ServerTimeContext';
+import { Image } from '@dg/ui/dependent/Image';
 import { FaIcon, faStrava } from '@dg/ui/icons/FaIcon';
 import { useEffect, useState } from 'react';
 import { useNowPlaying } from '../spotify/NowPlayingContext';
@@ -56,13 +57,12 @@ export function FooterNowStrip({ initialTrack, latestActivity }: FooterNowStripP
             target="_blank"
           >
             {track.albumImage?.url ? (
-              // biome-ignore lint/performance/noImgElement: 28px Spotify CDN thumbnail in status bar
-              <img
+              <Image
                 alt=""
                 className="chrome__nowArtImg"
                 height={28}
-                loading="lazy"
-                src={track.albumImage.url}
+                sizes={{ extraLarge: 28 }}
+                url={track.albumImage.url}
                 width={28}
               />
             ) : (

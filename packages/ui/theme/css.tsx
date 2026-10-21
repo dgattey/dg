@@ -430,7 +430,6 @@ export function SxStyle({ compiled }: { compiled: CompiledSx | null }) {
     return null;
   }
   return (
-    // biome-ignore lint/suspicious/noUnknownAttribute: React 19 hoists and deduplicates <style href precedence>
     <style href={compiled.className} precedence="default">
       {compiled.css}
     </style>

@@ -101,6 +101,12 @@
         "noEvolvingTypes": "error",
         "noImportCycles": "error",
         "noLeakedRender": "off",
+        "noUnknownAttribute": {
+          "level": "error",
+          "options": {
+            "ignore": ["precedence"]
+          }
+        },
         "useAwait": "error"
       }
     }
@@ -119,9 +125,29 @@
         "enabled": false
       },
       "includes": [
+        "apps/web/src/app/collage/backdrops.ts",
         "apps/web/src/app/collage/cutOutPlacements.ts",
+        "apps/web/src/app/collage/edges.css",
         "apps/web/src/app/collage/projectSlots.ts"
       ]
+    },
+    {
+      "includes": ["apps/web/src/services/getServerTime.ts"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "useAwait": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["packages/maps/**"],
+      "linter": {
+        "domains": {
+          "next": "none"
+        }
+      }
     },
     {
       "includes": ["packages/shared-core/logging/log.ts"],
