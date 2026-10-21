@@ -1,4 +1,4 @@
-directive @contentSourceMaps on QUERY
+directive @contentSourceMaps(outsidePreview: Boolean) on QUERY
 
 directive @contentfulSchemaMetadata(contentTypePublishedCounters: JSON) on SCHEMA
 
@@ -156,6 +156,7 @@ type Book implements Entry & _Node {
   coverImage(locale: String, preview: Boolean, useFallbackLocale: Boolean): Asset
   isbn(locale: String, useFallbackLocale: Boolean): Int
   linkedFrom(allowedLocales: [String]): BookLinkingCollections
+  notes(locale: String, useFallbackLocale: Boolean): BookNotes
   rating(locale: String, useFallbackLocale: Boolean): Int
   readDateFinished(locale: String, useFallbackLocale: Boolean): DateTime
   readDateStarted(locale: String, useFallbackLocale: Boolean): DateTime
@@ -198,6 +199,9 @@ input BookFilter {
   isbn_lte: Int
   isbn_not: Int
   isbn_not_in: [Int]
+  notes_contains: String
+  notes_exists: Boolean
+  notes_not_contains: String
   rating: Int
   rating_exists: Boolean
   rating_gt: Int
@@ -273,6 +277,46 @@ enum BookLinkingCollectionsSectionCursorCollectionOrder {
   sys_publishedVersion_DESC
   title_ASC
   title_DESC
+}
+
+type BookNotes {
+  json: JSON!
+  links: BookNotesLinks!
+}
+
+type BookNotesAssets {
+  block: [Asset]!
+  hyperlink: [Asset]!
+}
+
+type BookNotesEntries {
+  block: [Entry]!
+  hyperlink: [Entry]!
+  inline: [Entry]!
+}
+
+type BookNotesLinks {
+  assets: BookNotesAssets!
+  entries: BookNotesEntries!
+  resources: BookNotesResources!
+}
+
+type BookNotesResources {
+  block: [BookNotesResourcesBlock!]!
+  hyperlink: [BookNotesResourcesHyperlink!]!
+  inline: [BookNotesResourcesInline!]!
+}
+
+type BookNotesResourcesBlock implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type BookNotesResourcesHyperlink implements ResourceLink {
+  sys: ResourceSys!
+}
+
+type BookNotesResourcesInline implements ResourceLink {
+  sys: ResourceSys!
 }
 
 enum BookOrder {
@@ -1152,7 +1196,7 @@ input SectionBlocksFilter {
   title_not_in: [String]
 }
 
-union SectionBlocksItem = Book | Link | Project
+union SectionBlocksItem = Book | Link | Project | TextBlock
 
 type SectionCollection {
   items: [Section]!
@@ -1352,6 +1396,38 @@ input TextBlockFilter {
 type TextBlockLinkingCollections {
   entryCollection(limit: Int = 100, locale: String, preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): EntryCollection
   entryCursorCollection(limit: Int = 100, locale: String, pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): EntryCursorCollection
+  sectionCollection(limit: Int = 100, locale: String, order: [TextBlockLinkingCollectionsSectionCollectionOrder], preview: Boolean, skip: Int = 0, useFallbackLocale: Boolean): SectionCollection
+  sectionCursorCollection(limit: Int = 100, locale: String, order: [TextBlockLinkingCollectionsSectionCursorCollectionOrder], pageNext: String, pagePrev: String, preview: Boolean, useFallbackLocale: Boolean): SectionCursorCollection
+}
+
+enum TextBlockLinkingCollectionsSectionCollectionOrder {
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+  title_ASC
+  title_DESC
+}
+
+enum TextBlockLinkingCollectionsSectionCursorCollectionOrder {
+  slug_ASC
+  slug_DESC
+  sys_firstPublishedAt_ASC
+  sys_firstPublishedAt_DESC
+  sys_id_ASC
+  sys_id_DESC
+  sys_publishedAt_ASC
+  sys_publishedAt_DESC
+  sys_publishedVersion_ASC
+  sys_publishedVersion_DESC
+  title_ASC
+  title_DESC
 }
 
 enum TextBlockOrder {

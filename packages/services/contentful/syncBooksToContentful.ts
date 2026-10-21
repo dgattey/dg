@@ -30,7 +30,7 @@ import { ContentfulCmaClient } from './contentfulCmaClient';
 
 export type BookMutationOutcome = Omit<
   NormalizedContentfulBookEntry,
-  'isPublished' | 'publishedVersion' | 'rawFields' | 'reviewDescription'
+  'isPublished' | 'notes' | 'publishedVersion' | 'rawFields' | 'reviewDescription'
 > & {
   action: 'created' | 'deleted' | 'skipped' | 'updated';
   coverAssetId: string | null;
@@ -76,6 +76,7 @@ const toOutcome = (
   action: BookMutationOutcome['action'],
   {
     isPublished: _i,
+    notes: _n,
     publishedVersion: _p,
     rawFields: _r,
     reviewDescription: _d,
@@ -112,6 +113,12 @@ export async function upsertBookToContentful(
     b.reviewPlainText !== undefined
       ? normalizeReviewText(b.reviewPlainText) || null
       : (ex?.reviewText ?? null);
+  const notes =
+    b.notesPlainText !== undefined ? buildRichTextDocument(b.notesPlainText) : (ex?.notes ?? null);
+  const notesText =
+    b.notesPlainText !== undefined
+      ? normalizeReviewText(b.notesPlainText) || null
+      : (ex?.notesText ?? null);
 
   let coverImageId = b.coverAssetId ?? ex?.coverImageId ?? null;
   let coverImageUrl: string | null = null;
@@ -150,6 +157,8 @@ export async function upsertBookToContentful(
     author: author || ex?.author || '',
     coverImageId,
     isbn,
+    notes,
+    notesText,
     rating: pick(b.rating, b.rating, ex?.rating),
     readDateFinished: pick(b.readDateFinished, b.readDateFinished, ex?.readDateFinished),
     readDateStarted: pick(b.readDateStarted, b.readDateStarted, ex?.readDateStarted),
@@ -158,9 +167,19 @@ export async function upsertBookToContentful(
     title: b.title,
   };
 
-  const fields = ex
-    ? { ...ex.rawFields, ...buildCmaBookFields(merged, cma.locale) }
-    : buildCmaBookFields(merged, cma.locale);
+  const preservedRawFields = ex
+    ? Object.fromEntries(
+        Object.entries(ex.rawFields).filter(
+          ([key]) =>
+            (key !== 'reviewDescription' || b.reviewPlainText === undefined) &&
+            (key !== 'notes' || b.notesPlainText === undefined),
+        ),
+      )
+    : {};
+  const fields: Record<string, unknown> = {
+    ...preservedRawFields,
+    ...buildCmaBookFields(merged, cma.locale),
+  };
   if (ex) {
     return toOutcome(
       'updated',
