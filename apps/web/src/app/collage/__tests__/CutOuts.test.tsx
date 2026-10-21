@@ -134,5 +134,8 @@ describe('collage cut-outs', () => {
     expect(CUT_OUT_PLACEMENTS.coda.some((placement) => Math.abs(placement.rotationDeg) >= 12)).toBe(
       true,
     );
+    for (const placement of CUT_OUT_PLACEMENTS.coda) {
+      expect(placement.yPercent).toBeGreaterThanOrEqual(-20);
+    }
   });
 });
