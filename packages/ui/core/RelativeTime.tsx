@@ -1,5 +1,6 @@
 'use client';
 
+import { capitalize } from '@dg/shared-core/formatting/capitalize';
 import { useEffect, useState } from 'react';
 import { formatRelativeTime } from '../helpers/relativeTime';
 import { useServerTime } from './ServerTimeContext';
@@ -14,6 +15,8 @@ type RelativeTimeProps = {
   hasTooltip?: boolean;
   /** Preferred side for the tooltip. Defaults to below. */
   tooltipPlacement?: TooltipPlacement;
+  /** Capitalize the first letter, for text that starts a line. Defaults to false. */
+  isCapitalized?: boolean;
 };
 
 const DEFAULT_UPDATE_INTERVAL_MS = 60_000;
@@ -40,6 +43,7 @@ export function RelativeTime({
   updateIntervalMs = DEFAULT_UPDATE_INTERVAL_MS,
   hasTooltip = true,
   tooltipPlacement,
+  isCapitalized = false,
 }: RelativeTimeProps) {
   const serverTime = useServerTime();
 
@@ -65,7 +69,9 @@ export function RelativeTime({
 
   const fullDate = formatFullDate(date);
   const dateTimeAttr = toDate(date).toISOString();
-  const time = <time dateTime={dateTimeAttr}>{relativeTime}</time>;
+  const time = (
+    <time dateTime={dateTimeAttr}>{isCapitalized ? capitalize(relativeTime) : relativeTime}</time>
+  );
 
   if (hasTooltip) {
     return (

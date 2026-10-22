@@ -53,7 +53,7 @@ export function RoutePolaroid({
           <span className="strava__polaroidMeta">
             <SportChip sport={outing.sport} />
             <span>
-              <RelativeTime date={outing.startDate} hasTooltip={false} /> ·{' '}
+              <RelativeTime date={outing.startDate} hasTooltip={false} isCapitalized /> ·{' '}
               {formatOutingDay(outing.startDate)}
             </span>
           </span>

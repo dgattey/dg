@@ -46,6 +46,16 @@ describe('RelativeTime', () => {
     expect(screen.getByText('2 days ago')).toBeInTheDocument();
   });
 
+  it('reads lowercase mid-sentence and capitalizes only when asked to start a line', () => {
+    const { rerender } = render(<RelativeTime date="2026-02-10T10:50:00Z" />, {
+      wrapper: TestWrapper,
+    });
+    expect(screen.getByText('an hour ago')).toBeInTheDocument();
+
+    rerender(<RelativeTime date="2026-02-10T10:50:00Z" isCapitalized />);
+    expect(screen.getByText('An hour ago')).toBeInTheDocument();
+  });
+
   it('updates relative time after interval', () => {
     render(<RelativeTime date="2026-02-10T11:55:00Z" updateIntervalMs={1000} />, {
       wrapper: TestWrapper,
@@ -104,8 +114,7 @@ describe('RelativeTime', () => {
     const ts = new Date('2026-02-09T00:00:00Z').getTime();
     render(<RelativeTime date={ts} />, { wrapper: TestWrapper });
 
-    // Formatter may show "1 day ago" or "Yesterday"
-    const timeEl = screen.getByText(/1 day ago|Yesterday/).closest('time');
+    const timeEl = screen.getByText('yesterday').closest('time');
     expect(timeEl).toHaveAttribute('dateTime', '2026-02-09T00:00:00.000Z');
     expect(fullDateTooltip()).toHaveTextContent(/2026/);
   });

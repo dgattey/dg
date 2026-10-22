@@ -49,7 +49,7 @@ export function StravaCard({ history }: { history: StravaHistory | null }) {
         <Scallop className="home__stravaWhen" size="sticker" tiltDeg={10} tone="vermilion">
           <span className="strava__sealKey">Latest</span>
           <span className="strava__sealWhen">
-            <RelativeTime date={latest.startDate} hasTooltip={false} />
+            <RelativeTime date={latest.startDate} hasTooltip={false} isCapitalized />
           </span>
         </Scallop>
       </RoutePolaroid>
