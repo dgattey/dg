@@ -51,30 +51,44 @@
   grid-area: portrait;
 }
 /*
- * A lightly frosted pane a step off the sheet: lighter cream by day, deeper navy
- * by night, so the copy has a surface without reading as a bright card. The
- * blur only takes the edge off the cut-outs behind it, and the padding sits
- * outside the old text column so the words stay put.
+ * Cream paper stacked on an offset ochre mat. Both are pseudo-elements so the
+ * mat can sit under the card's surface. It stays cream with dark ink by night,
+ * like every other paper card.
  */
 .home__intro {
+  --mat-offset: 13px;
   position: relative;
   z-index: 4;
   display: grid;
   grid-area: intro;
   gap: 14px;
   width: min(100%, 648px);
-  padding: 18px 24px 20px;
+  padding: 24px 30px 26px;
   margin-top: 10px;
   font-size: var(--type-body-lg);
   line-height: 1.45;
-  color: var(--ink);
-  background: light-dark(
-    color-mix(in oklab, var(--cream) 78%, transparent),
-    color-mix(in oklab, var(--black) 55%, transparent)
-  );
-  border: 1px solid color-mix(in oklab, var(--ink) 12%, transparent);
-  border-radius: 20px;
-  backdrop-filter: blur(4px);
+  color: var(--ink-on-cream);
+  isolation: isolate;
+  filter: var(--dshadow);
+  rotate: -1.5deg;
+}
+.home__intro::before,
+.home__intro::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+}
+.home__intro::before {
+  z-index: -2;
+  background: var(--ochre);
+  border-radius: var(--quad-c);
+  rotate: 2deg;
+  translate: var(--mat-offset) var(--mat-offset);
+}
+.home__intro::after {
+  z-index: -1;
+  background: var(--cream);
+  border-radius: var(--quad-a);
 }
 .home__intro > * {
   display: grid;
@@ -509,8 +523,9 @@
     padding-top: 16px;
   }
   .home__intro {
-    width: 100%;
-    padding: 14px 16px 16px;
+    --mat-offset: 9px;
+    width: calc(100% - var(--mat-offset));
+    padding: 18px 20px 20px;
     margin: 8px 0 0;
   }
   .home__portraitSlot {
