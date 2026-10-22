@@ -4,6 +4,8 @@ import type { SequelizeOptions } from 'sequelize-typescript';
 
 type DbEnv = 'development' | 'production' | 'test';
 
+const singleConnectionTestIsolationPool = { pool: { max: 1 } };
+
 // Shared options for all environments - unified SSL
 export const sequelizeOptions = {
   dialect: 'postgres',
@@ -11,10 +13,8 @@ export const sequelizeOptions = {
   dialectOptions: {
     ssl: { rejectUnauthorized: true },
   },
-  // In test, limit pool to 1 connection per worker so that each test's
-  // wrapping BEGIN/ROLLBACK transaction covers every query on the same
-  // physical connection, providing full isolation between parallel workers.
-  ...(process.env.NODE_ENV === 'test' && { logging: false, pool: { max: 1 } }),
+  logging: false,
+  ...(process.env.NODE_ENV === 'test' && singleConnectionTestIsolationPool),
   ssl: true,
 } satisfies SequelizeOptions;
 

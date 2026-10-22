@@ -7,14 +7,14 @@ jest.mock('next/og', () => ({
   ImageResponse: jest.fn(() => new Response(new Uint8Array([0x89, 0x50, 0x4e, 0x47]))),
 }));
 
-jest.mock('../../services/contentful', () => ({
-  getIntroContent: jest.fn(),
+jest.mock('@dg/services/contentful/fetchIntroContent', () => ({
+  fetchIntroContent: jest.fn(),
 }));
 
 import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
+import { fetchIntroContent } from '@dg/services/contentful/fetchIntroContent';
 import { ImageResponse } from 'next/og';
 import { isValidElement } from 'react';
-import { getIntroContent } from '../../services/contentful';
 import { createSocialImage } from '../createSocialImage';
 import { HOMEPAGE_TITLE, SITE_NAME } from '../metadata';
 
@@ -55,7 +55,7 @@ describe('createSocialImage', () => {
   });
 
   it('serves a PNG of the collage card with the intro headline, a JPEG portrait, and both font weights', async () => {
-    jest.mocked(getIntroContent).mockResolvedValue(intro);
+    jest.mocked(fetchIntroContent).mockResolvedValue(intro);
     const { card, options, response } = await renderCard();
 
     expect(response.headers.get('Content-Type')).toBe('image/png');
@@ -80,7 +80,7 @@ describe('createSocialImage', () => {
   });
 
   it('falls back to the site name without a portrait when Contentful has no intro', async () => {
-    jest.mocked(getIntroContent).mockResolvedValue(null);
+    jest.mocked(fetchIntroContent).mockResolvedValue(null);
     const { card } = await renderCard();
 
     expect(card.props).toMatchObject({ headline: SITE_NAME, portraitUrl: null });

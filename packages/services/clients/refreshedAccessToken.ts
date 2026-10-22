@@ -75,6 +75,7 @@ async function fetchRefreshedTokenFromApi(
 
   const rawData = await fetch(endpoint, {
     body: encodedBody,
+    cache: 'no-store',
     headers,
     method: 'POST',
   });

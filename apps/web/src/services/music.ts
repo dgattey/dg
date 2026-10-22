@@ -26,14 +26,11 @@ export function parseMusicHistoryCursor(before?: string): Date | undefined {
   return Number.isNaN(parsed.valueOf()) ? undefined : parsed;
 }
 
-/**
- * Fetches a page of music listening history with caching.
- */
 export async function getMusicHistory({
   before,
 }: MusicHistoryOptions): Promise<MusicHistoryResult> {
   'use cache';
-  cacheLife('minutes');
+  cacheLife('hours');
   cacheTag(MUSIC_HISTORY_TAG);
 
   return await fetchMusicHistoryPage({

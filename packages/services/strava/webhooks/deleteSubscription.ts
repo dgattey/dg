@@ -15,6 +15,7 @@ export async function deleteSubscription(subscriptionId: number): Promise<boolea
   url.search = new URLSearchParams(standardParams(config)).toString();
 
   const response = await fetch(url.toString(), {
+    cache: 'no-store',
     headers,
     method: 'DELETE',
   });

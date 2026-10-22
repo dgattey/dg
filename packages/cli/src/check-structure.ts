@@ -171,6 +171,36 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
         rule: 'no-inline-typeof-import',
       });
     }
+
+    if (
+      relPath.startsWith('apps/web/src/') &&
+      !isTest &&
+      /\bcacheLife\(\s*['"](?:minutes|default)['"]\s*\)/.test(lineText)
+    ) {
+      violations.push({
+        file: relPath,
+        line: lineNum,
+        message:
+          "Use `cacheLife('hours')` or longer for prerendered caches (or `cacheLife('seconds')` behind `connection()`) so routes do not revalidate every 1 to 15 minutes",
+        rule: 'no-short-prerender-cache-life',
+      });
+    }
+
+    if (
+      relPath.startsWith('packages/services/') &&
+      !isTest &&
+      /\b(?:fetch|wretch)\(|\bnew\s+GraphQLClient\(/.test(lineText) &&
+      !content.includes("cache: 'no-store'") &&
+      !content.includes('cache: "no-store"')
+    ) {
+      violations.push({
+        file: relPath,
+        line: lineNum,
+        message:
+          "Upstream HTTP clients in packages/services must set `cache: 'no-store'` so Next.js does not double-write raw responses into the fetch Data Cache",
+        rule: 'service-fetch-no-store',
+      });
+    }
   }
 
   return violations;

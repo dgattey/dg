@@ -30,14 +30,9 @@ export const getLatestSong = async () => {
   return await withMissingTokenFallback(fetchRecentlyPlayed());
 };
 
-/**
- * Same data as `getLatestSong`, cached long enough (`minutes`) to be
- * prerendered into the static shell. It can be a few minutes behind, so pair
- * it with `getLatestSong` streamed in for the live value.
- */
 export const getLastKnownSong = async () => {
   'use cache';
-  cacheLife('minutes');
+  cacheLife('hours');
   cacheTag(LATEST_SONG_TAG);
   if (process.env.NODE_ENV !== 'test' && !process.env.SPOTIFY_CLIENT_ID) {
     return null;

@@ -24,24 +24,12 @@ export type ClientProps = {
   refreshTokenConfig: RefreshTokenConfig;
 };
 
-/**
- * Creates a REST client that can be used to fetch resources from a base API, with auto-refreshing
- * access tokens built into the fetch function.
- */
-/**
- * Ceiling for a single upstream request. Without this a slow third party can
- * hold a server render open indefinitely, which the user experiences as a page
- * that never finishes loading.
- */
 const REQUEST_TIMEOUT_MS = 8_000;
 
 export function createClient({ endpoint, accessKey, refreshTokenConfig }: ClientProps) {
   assertHttpsEndpoint(endpoint);
-  const api = wretch(endpoint).content('application/json');
+  const api = wretch(endpoint, { cache: 'no-store' }).content('application/json');
 
-  /**
-   * Generates an auth header with a refreshed access token
-   */
   async function addAuth<Self, Chain, Resolver>(
     request: Self & Wretch<Self, Chain, Resolver>,
     forceRefresh: boolean,

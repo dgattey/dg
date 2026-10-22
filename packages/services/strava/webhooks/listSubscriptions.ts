@@ -29,6 +29,7 @@ export async function listSubscriptions(): Promise<Array<WebhookSubscription>> {
   url.search = new URLSearchParams(standardParams(config)).toString();
 
   const response = await fetch(url.toString(), {
+    cache: 'no-store',
     headers,
     method: 'GET',
   });

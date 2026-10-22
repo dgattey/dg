@@ -56,8 +56,10 @@ describe('Vercel Function Storage configuration', () => {
         '../../node_modules/**/moment/locale/**',
         '../../node_modules/**/react/**/*.development.js',
         '../../node_modules/**/next/dist/compiled/@vercel/og/index.edge.js',
-        '../../node_modules/**/next/dist/compiled/@vercel/og/Geist-Regular.ttf',
       ]),
+    );
+    expect(excludes['**']).not.toContain(
+      '../../node_modules/**/next/dist/compiled/@vercel/og/Geist-Regular.ttf',
     );
     expect(excludes['**/page']).toEqual(
       expect.arrayContaining([

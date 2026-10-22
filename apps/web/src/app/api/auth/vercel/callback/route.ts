@@ -77,6 +77,7 @@ async function exchangeCodeForToken(
       grant_type: 'authorization_code',
       redirect_uri: redirectUri,
     }),
+    cache: 'no-store',
     method: 'POST',
   });
 
@@ -90,6 +91,7 @@ async function exchangeCodeForToken(
 
 async function fetchUserInfo(accessToken: string): Promise<UserInfoResponse> {
   const response = await fetch(VERCEL_USERINFO_URL, {
+    cache: 'no-store',
     headers: {
       Authorization: `Bearer ${accessToken}`,
     },
