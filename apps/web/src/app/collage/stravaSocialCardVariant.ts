@@ -4,7 +4,6 @@ import {
   frameAround,
   framePaths,
   type GeoBounds,
-  homeBounds,
   type RouteFrame,
 } from '@dg/maps/src/routeFrame';
 import { projectRouteToPixels, toSvgPath } from '@dg/maps/src/routeGeometry';
@@ -16,7 +15,7 @@ import {
   formatOutingDate,
   formatRouteCount,
 } from '../strava/stravaFormat';
-import { SPORT_DETAILS } from '../strava/stravaSports';
+import { SPORT_DETAILS, toMapRoutes } from '../strava/stravaSports';
 import type { PaperColor } from './SocialCardParts';
 import {
   STRAVA_CARD_MAP_FRAME,
@@ -26,10 +25,12 @@ import {
 import { currentPacificYear, stripUnsupportedGlyphs } from './socialCardVariants';
 
 const TILE_SIZE = 256;
+const CLUSTER_RADIUS_DEG = 0.22;
+const CLUSTER_QUANTILE = 0.04;
 
-const BAY_AREA_BOUNDS: GeoBounds = [
-  [37.35, -122.8],
-  [38.12, -121.85],
+const DEFAULT_SF_BAY_BOUNDS: GeoBounds = [
+  [37.685, -122.52],
+  [37.865, -122.34],
 ];
 
 type GeoPoint = GeoBounds[number];
@@ -67,29 +68,59 @@ const BAY_AREA_LAND_POLYGONS: ReadonlyArray<ReadonlyArray<GeoPoint>> = [
   ],
 ];
 
-function sportRouteTone(sport: StravaHistory['routes'][number]['sport']): PaperColor {
-  switch (sport) {
-    case 'ride':
-      return 'cobalt';
-    case 'run':
-      return 'ultramarine';
-    case 'hike':
-      return 'viridian';
-    case 'other':
-      return 'cerulean';
-    default: {
-      const unhandled: never = sport;
-      return unhandled;
-    }
-  }
-}
-
 function projectMercator([latitude, longitude]: GeoPoint) {
   const latitudeRadians = (latitude * Math.PI) / 180;
   return {
     x: (longitude + 180) / 360,
     y: (1 - Math.log(Math.tan(latitudeRadians) + 1 / Math.cos(latitudeRadians)) / Math.PI) / 2,
   };
+}
+
+function quantileRange(values: Array<number>, q: number): [number, number] {
+  const sorted = values.toSorted((a, b) => a - b);
+  const idx = Math.floor(sorted.length * q);
+  return [sorted[idx] ?? 0, sorted[sorted.length - 1 - idx] ?? 0];
+}
+
+function coreClusterBounds(history: StravaHistory | null): GeoBounds {
+  if (!history) {
+    return DEFAULT_SF_BAY_BOUNDS;
+  }
+  const decoded = decodeRoutes(toMapRoutes(history.outings));
+  const starts = decoded.flatMap(({ points: [start] }) => (start ? [start] : []));
+  if (starts.length === 0) {
+    return DEFAULT_SF_BAY_BOUNDS;
+  }
+  const medianLat = quantileRange(
+    starts.map(([lat]) => lat),
+    0.5,
+  )[0];
+  const medianLng = quantileRange(
+    starts.map(([, lng]) => lng),
+    0.5,
+  )[0];
+  const clusterPoints = decoded.flatMap(({ points }) =>
+    points.filter(
+      ([lat, lng]) =>
+        Math.abs(lat - medianLat) <= CLUSTER_RADIUS_DEG &&
+        Math.abs(lng - medianLng) <= CLUSTER_RADIUS_DEG,
+    ),
+  );
+  if (clusterPoints.length < 10) {
+    return DEFAULT_SF_BAY_BOUNDS;
+  }
+  const [south, north] = quantileRange(
+    clusterPoints.map(([lat]) => lat),
+    CLUSTER_QUANTILE,
+  );
+  const [west, east] = quantileRange(
+    clusterPoints.map(([, lng]) => lng),
+    CLUSTER_QUANTILE,
+  );
+  return [
+    [south - 0.012, west - 0.015],
+    [north + 0.02, east + 0.015],
+  ];
 }
 
 export type StravaTileCoord = {
@@ -102,17 +133,11 @@ export type StravaTileCoord = {
 };
 
 export function computeStravaFrame(history: StravaHistory | null): RouteFrame {
-  const decoded = history
-    ? decodeRoutes(
-        history.routes.map(({ id, polyline, sport }) => ({
-          id,
-          polyline,
-          tone: sportRouteTone(sport),
-        })),
-      )
-    : [];
-  const bounds = homeBounds(decoded) ?? BAY_AREA_BOUNDS;
-  return frameAround(bounds, STRAVA_CARD_MAP_FRAME);
+  const rawFrame = frameAround(coreClusterBounds(history), STRAVA_CARD_MAP_FRAME);
+  return {
+    ...rawFrame,
+    zoom: Math.round(rawFrame.zoom),
+  };
 }
 
 export function computeStravaTileGrid(frame: RouteFrame): Array<StravaTileCoord> {
@@ -167,18 +192,13 @@ export function buildStravaCardVariant(
     };
   }
 
-  const decoded = decodeRoutes(
-    history.routes.map(({ id, polyline, sport }) => ({
-      id,
-      polyline,
-      tone: sportRouteTone(sport),
-    })),
-  );
+  const mapRoutes = toMapRoutes(history.outings);
+  const decoded = decodeRoutes(mapRoutes);
   const routePaths = framePaths(frame, decoded).map(({ d, tone }) => ({
     d,
     tone: (tone as PaperColor) || 'cobalt',
   }));
-  const latest = history.recent[0] ?? history.latest;
+  const latest = history.outings[0] ?? history.latest;
   const recentStat =
     latest.elevationGainMeters > 0
       ? `Latest: ${formatMiles(latest.distanceMeters)} mi · ${formatFeet(latest.elevationGainMeters)} ft`
@@ -195,7 +215,7 @@ export function buildStravaCardVariant(
     miles: formatMiles(history.totals.distanceMeters),
     outings: formatCount(history.totals.outings),
     recentStat,
-    routeCountLabel: formatRouteCount(history.routes.length || history.totals.outings),
+    routeCountLabel: formatRouteCount(mapRoutes.length),
     routePaths,
     variant: 'strava',
   };

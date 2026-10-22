@@ -20,6 +20,8 @@ describe('markdown page registry', () => {
     expect(htmlPathToMarkdownPath('/music/albums')).toBe('/music/albums.md');
     expect(htmlPathToMarkdownPath('/reading')).toBe('/reading.md');
     expect(htmlPathToMarkdownPath('/strava')).toBe('/strava.md');
+    expect(htmlPathToMarkdownPath('/changelog')).toBe('/changelog.md');
+    expect(htmlPathToMarkdownPath('/site-map')).toBe('/site-map.md');
     expect(tryHtmlPathToMarkdownPath('/dev-console')).toBeNull();
   });
 
@@ -29,6 +31,8 @@ describe('markdown page registry', () => {
     expect(markdownPathToHtmlPath('/music/albums.md')).toBe('/music/albums');
     expect(markdownPathToHtmlPath('/reading.md')).toBe('/reading');
     expect(markdownPathToHtmlPath('/strava.md')).toBe('/strava');
+    expect(markdownPathToHtmlPath('/changelog.md')).toBe('/changelog');
+    expect(markdownPathToHtmlPath('/site-map.md')).toBe('/site-map');
     expect(markdownPathToHtmlPath('/about.md')).toBeNull();
   });
 

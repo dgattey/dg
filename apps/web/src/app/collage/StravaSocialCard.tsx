@@ -165,7 +165,7 @@ export function StravaSocialCard({
           >
             <div
               style={{
-                background: '#cfe3f0',
+                background: '#d6e5f0',
                 borderRadius: 10,
                 display: 'flex',
                 height: STRAVA_CARD_MAP_FRAME.height,
@@ -218,8 +218,8 @@ export function StravaSocialCard({
                     stroke={PAPER_PALETTE.cream}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeOpacity={0.82}
-                    strokeWidth={4.2}
+                    strokeOpacity={0.62}
+                    strokeWidth={3.1}
                   />
                 ))}
                 {routePaths.map(({ d, tone }) => (
@@ -230,8 +230,8 @@ export function StravaSocialCard({
                     stroke={PAPER_PALETTE[tone]}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeOpacity={0.92}
-                    strokeWidth={2.2}
+                    strokeOpacity={0.86}
+                    strokeWidth={1.65}
                   />
                 ))}
               </svg>

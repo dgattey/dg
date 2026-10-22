@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { type ChangelogCardVariant, ChangelogSocialCard } from './ChangelogSocialCard';
 import { PORTRAIT_OVAL_PATH } from './cutOutShapes';
 import {
   type FavoriteAlbumsCardVariant,
@@ -9,6 +10,7 @@ import {
 import { type MusicStatsCardVariant, MusicStatsSocialCard } from './MusicStatsSocialCard';
 import { PAPER_PALETTE } from './paperPalette';
 import { type ReadingCardVariant, ReadingSocialCard } from './ReadingSocialCard';
+import { type SiteMapCardVariant, SiteMapSocialCard } from './SiteMapSocialCard';
 import {
   type CutOutPiece,
   LIFTED_SHADOW,
@@ -34,7 +36,9 @@ export type SocialCardVariant =
   | MusicHistoryCardVariant
   | FavoriteAlbumsCardVariant
   | ReadingCardVariant
-  | StravaCardVariant;
+  | StravaCardVariant
+  | ChangelogCardVariant
+  | SiteMapCardVariant;
 
 export type SocialCardProps = {
   grainUrl: string;
@@ -109,10 +113,10 @@ function PortraitPrint({ portraitUrl }: { portraitUrl: string }) {
     <div
       style={{
         display: 'flex',
-        height: haloHeight + 44,
+        height: haloHeight + 36,
         position: 'absolute',
         right: 36,
-        top: 22,
+        top: 52,
         width: haloWidth + 44,
       }}
     >
@@ -150,7 +154,7 @@ function PortraitPrint({ portraitUrl }: { portraitUrl: string }) {
           width={PORTRAIT.width}
         />
       </div>
-      <AboutTag style={{ bottom: 18, left: 96 }} />
+      <AboutTag style={{ left: 94, top: -6 }} />
     </div>
   );
 }
@@ -231,6 +235,10 @@ export function SocialCard(props: SocialCardProps) {
       return <ReadingSocialCard {...props} />;
     case 'strava':
       return <StravaSocialCard {...props} />;
+    case 'changelog':
+      return <ChangelogSocialCard {...props} />;
+    case 'site-map':
+      return <SiteMapSocialCard {...props} />;
     default: {
       const unhandled: never = props;
       return unhandled;

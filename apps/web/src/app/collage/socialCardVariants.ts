@@ -1,17 +1,27 @@
 import { extractPlainTextFromRichText } from '@dg/content-models/books/bookDomain';
 import type { RenderableBook } from '@dg/content-models/contentful/renderables/books';
 import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
+import type { RenderableProject } from '@dg/content-models/contentful/renderables/projects';
 import type { RenderableRichTextContent } from '@dg/content-models/contentful/renderables/richText';
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
+import type { ChangelogRelease } from '@dg/services/github/fetchReleases';
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
+import {
+  formatReleaseDate,
+  RELEASE_KIND_LABELS,
+  RELEASE_KIND_TONES,
+} from '../changelog/changelogHelpers';
 import { SITE_NAME } from '../metadata';
 import { groupAdjacentAlbumPlays } from '../music/groupAdjacentAlbumPlays';
 import { formatCount, formatPercent } from '../music/stats/listeningStatsFormat';
 import { extractBookYear, featuredBook, shelfStats, sortBooks } from '../reading/readingHelpers';
+import { SITE_MAP_AGENT_SURFACES, SITE_MAP_PAGES } from '../site-map/siteMapCatalog';
+import type { ChangelogCardRelease, ChangelogCardVariant } from './ChangelogSocialCard';
 import type { FavoriteAlbumsCardVariant, MusicHistoryCardVariant } from './MusicSocialCards';
 import type { MusicStatsCardVariant } from './MusicStatsSocialCard';
 import type { ReadingCardBook, ReadingCardVariant } from './ReadingSocialCard';
+import type { SiteMapCardVariant } from './SiteMapSocialCard';
 import { type HomeCardVariant, PORTRAIT } from './SocialCard';
 import { splitIntroDocument } from './splitIntroDocument';
 
@@ -199,5 +209,63 @@ export function buildReadingCardVariant(books: ReadonlyArray<RenderableBook>): R
     picks,
     totalBooks: stats.total,
     variant: 'reading',
+  };
+}
+
+function stripReleaseMarkdown(line: string): string {
+  return stripUnsupportedGlyphs(line).replace(/\*\*|`/g, '');
+}
+
+function toChangelogCardRelease(release: ChangelogRelease): ChangelogCardRelease {
+  return {
+    dateLabel: formatReleaseDate(release.publishedAt),
+    kindLabel: RELEASE_KIND_LABELS[release.kind],
+    kindTone: RELEASE_KIND_TONES[release.kind],
+    notes: release.notes.map(stripReleaseMarkdown).filter(Boolean),
+    tag: release.tag,
+  };
+}
+
+export function buildChangelogCardVariant(
+  releases: ReadonlyArray<ChangelogRelease>,
+  fallbackVersionTag: string,
+): ChangelogCardVariant {
+  const latest = releases[0];
+  const majorAndMinorCount = releases.filter(
+    (release) => release.kind === 'major' || release.kind === 'minor',
+  ).length;
+  const patchCount = releases.filter((release) => release.kind === 'patch').length;
+  return {
+    latestRelease: latest ? toChangelogCardRelease(latest) : null,
+    latestVersionTag: latest?.tag ?? fallbackVersionTag,
+    majorAndMinorCount,
+    patchCount,
+    recentReleases: releases.slice(1, 4).map(toChangelogCardRelease),
+    totalReleases: releases.length,
+    variant: 'changelog',
+  };
+}
+
+export function buildSiteMapCardVariant(
+  sideProjects: ReadonlyArray<Pick<RenderableProject, 'title'>>,
+): SiteMapCardVariant {
+  return {
+    agentSurfaceCount: SITE_MAP_AGENT_SURFACES.length,
+    agentSurfaces: SITE_MAP_AGENT_SURFACES.map(({ badge, href, label }) => ({
+      badge,
+      href,
+      label,
+    })),
+    pageCount: SITE_MAP_PAGES.length,
+    pages: SITE_MAP_PAGES.map(({ label, markdownPath, path, tone }) => ({
+      label,
+      markdownPath,
+      path,
+      tone,
+    })),
+    sideProjects: sideProjects
+      .map((project) => stripUnsupportedGlyphs(project.title))
+      .filter(Boolean),
+    variant: 'site-map',
   };
 }

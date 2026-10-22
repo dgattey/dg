@@ -175,4 +175,64 @@ describe('SocialCard', () => {
     expect(screen.getByText('1.64M')).toBeInTheDocument();
     expect(screen.getByText('1,857')).toBeInTheDocument();
   });
+
+  it('renders the changelog social card with version badge, totals, and latest notes', () => {
+    render(
+      <SocialCard
+        grainUrl={GRAIN}
+        latestRelease={{
+          dateLabel: 'Oct 22, 2026',
+          kindLabel: 'Patch',
+          kindTone: 'viridian',
+          notes: ['Keep one Today section on /music listening history (#663)'],
+          tag: 'v2.81.1',
+        }}
+        latestVersionTag="v2.81.1"
+        majorAndMinorCount={81}
+        patchCount={219}
+        recentReleases={[
+          {
+            dateLabel: 'Oct 22, 2026',
+            kindLabel: 'Minor',
+            kindTone: 'cobalt',
+            notes: ['Big map filterable /strava'],
+            tag: 'v2.81.0',
+          },
+        ]}
+        totalReleases={300}
+        variant="changelog"
+      />,
+    );
+
+    expect(screen.getByText('Changelog')).toBeInTheDocument();
+    expect(screen.getByText('300 shipped releases on GitHub')).toBeInTheDocument();
+    expect(screen.getByText('81')).toBeInTheDocument();
+    expect(screen.getByText('219')).toBeInTheDocument();
+    expect(screen.getByText(/Keep one Today section/)).toBeInTheDocument();
+  });
+
+  it('renders the site map social card with all 8 routes, side projects, and agent surfaces', () => {
+    render(
+      <SocialCard
+        agentSurfaceCount={8}
+        agentSurfaces={[
+          { badge: 'Markdown', href: '/llms.txt', label: 'LLM summary' },
+          { badge: 'OpenAPI 3.1', href: '/openapi.json', label: 'OpenAPI spec' },
+        ]}
+        grainUrl={GRAIN}
+        pageCount={8}
+        pages={[
+          { label: 'Home', markdownPath: '/index.md', path: '/', tone: 'cream' },
+          { label: 'Site map', markdownPath: '/site-map.md', path: '/site-map', tone: 'cream' },
+        ]}
+        sideProjects={['Saga', 'Sconeos', 'Gattey Photos']}
+        variant="site-map"
+      />,
+    );
+
+    expect(screen.getByText('8 pages · 8 agent endpoints')).toBeInTheDocument();
+    expect(screen.getByText('Saga · Sconeos · Gattey Photos')).toBeInTheDocument();
+    expect(screen.getByText('/llms.txt')).toBeInTheDocument();
+    expect(screen.getByText('/index.md')).toBeInTheDocument();
+  });
 });

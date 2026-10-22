@@ -5,21 +5,26 @@ import { getTileSource } from '@dg/maps/src/getTileSource';
 import { stadiaTileUrl } from '@dg/maps/src/tileSource';
 import { fetchBooks } from '@dg/services/contentful/fetchBooks';
 import { fetchIntroContent } from '@dg/services/contentful/fetchIntroContent';
+import { fetchSideProjects } from '@dg/services/contentful/fetchSideProjects';
+import { fetchReleases } from '@dg/services/github/fetchReleases';
 import { readFavoriteAlbumsSnapshot } from '@dg/services/spotify/favoriteAlbumsSnapshot';
 import { fetchListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import { fetchMusicHistoryPage } from '@dg/services/spotify/fetchMusicHistoryPage';
 import { fetchStravaHistoryFromDb } from '@dg/services/strava/fetchStravaHistoryFromDb';
 import { cacheLife, cacheTag } from 'next/cache';
 import { ImageResponse } from 'next/og';
+import { version } from '../../../../package.json';
 import { SocialCard, type SocialCardVariant } from './collage/SocialCard';
 import { SOCIAL_CARD_FONT } from './collage/SocialCardParts';
 import type { StravaMapTile } from './collage/StravaSocialCard';
 import {
+  buildChangelogCardVariant,
   buildFavoriteAlbumsCardVariant,
   buildHomeCardVariant,
   buildMusicHistoryCardVariant,
   buildMusicStatsCardVariant,
   buildReadingCardVariant,
+  buildSiteMapCardVariant,
   currentPacificYear,
 } from './collage/socialCardVariants';
 import {
@@ -36,7 +41,9 @@ export type SocialImagePage =
   | 'favorite-albums'
   | 'music-stats'
   | 'reading'
-  | 'strava';
+  | 'strava'
+  | 'changelog'
+  | 'site-map';
 
 export const SOCIAL_IMAGE_SIZE = {
   height: 630,
@@ -46,11 +53,13 @@ export const SOCIAL_IMAGE_SIZE = {
 export const SOCIAL_IMAGE_TAG = 'social-image';
 
 export const SOCIAL_IMAGE_ALTS: Record<SocialImagePage, string> = {
+  changelog: `Version history and release notes on a paper-cut collage from ${SITE_NAME}`,
   'favorite-albums': `Favorite albums on a paper-cut collage from ${SITE_NAME}`,
   home: `${SITE_NAME}'s portrait and the dg. logo on a paper-cut collage`,
   'music-history': `Recent Spotify listening history on a paper-cut collage from ${SITE_NAME}`,
   'music-stats': `Spotify listening stats and yearly plays on a paper-cut collage from ${SITE_NAME}`,
   reading: `Books read and five-star reviews on a paper-cut collage from ${SITE_NAME}`,
+  'site-map': `Site map of pages, side projects, and agent endpoints on a paper-cut collage from ${SITE_NAME}`,
   strava: `Bay Area Strava route map and lifetime miles on a paper-cut collage from ${SITE_NAME}`,
 };
 
@@ -83,7 +92,7 @@ async function fetchTileDataUri(coord: StravaTileCoord): Promise<StravaMapTile |
     dark: false,
     extension: 'png',
     retina: true,
-    style: 'outdoors',
+    style: 'alidade_smooth',
     x: coord.x,
     y: coord.y,
     zoom: coord.zoom,
@@ -92,10 +101,6 @@ async function fetchTileDataUri(coord: StravaTileCoord): Promise<StravaMapTile |
     {
       headers: { Origin: 'http://localhost:3000', Referer: 'http://localhost:3000/' },
       url: stadiaUrl,
-    },
-    {
-      headers: { 'User-Agent': 'dylangattey.com-og/1.0' },
-      url: `https://basemaps.cartocdn.com/rastertiles/voyager/${coord.zoom}/${coord.x}/${coord.y}@2x.png`,
     },
   ];
   for (const candidate of candidates) {
@@ -136,7 +141,7 @@ async function loadSocialCardVariant(page: SocialImagePage): Promise<SocialCardV
       return buildMusicStatsCardVariant(stats, year);
     }
     case 'music-history': {
-      const history = await safeLoad(() => fetchMusicHistoryPage({ pageSize: 24 }), {
+      const history = await safeLoad(() => fetchMusicHistoryPage({ pageSize: 60 }), {
         nextCursor: null,
         tracks: [],
       });
@@ -150,6 +155,14 @@ async function loadSocialCardVariant(page: SocialImagePage): Promise<SocialCardV
       const history = await safeLoad(fetchStravaHistoryFromDb, null);
       const mapTiles = await loadStravaMapTiles(history);
       return buildStravaCardVariant(history, mapTiles);
+    }
+    case 'changelog': {
+      const releases = await safeLoad(() => fetchReleases({ fallbackVersion: version }), []);
+      return buildChangelogCardVariant(releases, `v${version}`);
+    }
+    case 'site-map': {
+      const sideProjects = await safeLoad(fetchSideProjects, []);
+      return buildSiteMapCardVariant(sideProjects);
     }
     default: {
       const unhandled: never = page;

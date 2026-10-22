@@ -175,6 +175,23 @@ const nextConfig: NextConfig = {
   },
   reactCompiler: true,
   reactStrictMode: true,
+  redirects() {
+    return Promise.resolve([
+      {
+        destination: '/site-map',
+        permanent: false,
+        source: '/sitemap',
+      },
+    ]);
+  },
+  rewrites() {
+    return Promise.resolve([
+      {
+        destination: '/.well-known/openapi.json',
+        source: '/openapi.json',
+      },
+    ]);
+  },
   // Disables the Sequelize warning about the `sequelize` package not being found
   serverExternalPackages: ['sequelize'],
   // Have to do this for each of the packages we import

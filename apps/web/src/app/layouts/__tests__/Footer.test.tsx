@@ -6,11 +6,13 @@ import type { FooterContent } from '@dg/content-models/contentful/renderables/fo
 import type { Track } from '@dg/content-models/spotify/Track';
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import {
+  changelogRoute,
   favoriteAlbumsRoute,
   homeRoute,
   musicRoute,
   musicStatsRoute,
   readingRoute,
+  siteMapRoute,
   stravaRoute,
 } from '@dg/shared-core/routes/app';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
@@ -191,6 +193,14 @@ describe('Footer', () => {
     expect(screen.queryByText(/llms\.txt/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Dev console/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Back to top/i)).not.toBeInTheDocument();
+
+    const versionLink = screen.getByRole('link', { name: 'v2.72.0' });
+    expect(versionLink).toHaveAttribute('href', changelogRoute);
+    const siteMapLink = screen.getByRole('link', { name: 'Site map' });
+    expect(siteMapLink).toHaveAttribute('href', siteMapRoute);
+    expect(
+      versionLink.compareDocumentPosition(siteMapLink) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
 
     const footerNav = screen.getByRole('navigation', { name: 'Footer navigation' });
     expect(

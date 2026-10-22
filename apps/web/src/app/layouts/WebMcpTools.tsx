@@ -1,11 +1,15 @@
 'use client';
 
 import {
+  changelogRoute,
   favoriteAlbumsRoute,
   homeRoute,
   markdownPages,
   musicRoute,
+  musicStatsRoute,
   readingRoute,
+  siteMapRoute,
+  stravaRoute,
 } from '@dg/shared-core/routes/app';
 import { useEffect } from 'react';
 
@@ -42,7 +46,16 @@ type DocumentWithModelContext = Document & {
   modelContext?: ModelContext;
 };
 
-const navigablePaths = [homeRoute, musicRoute, favoriteAlbumsRoute, readingRoute] as const;
+const navigablePaths = [
+  homeRoute,
+  musicRoute,
+  favoriteAlbumsRoute,
+  musicStatsRoute,
+  readingRoute,
+  stravaRoute,
+  changelogRoute,
+  siteMapRoute,
+] as const;
 
 type NavigablePath = (typeof navigablePaths)[number];
 
