@@ -63,6 +63,11 @@ const FILL: CSSProperties = {
   width: '100%',
 };
 const UNDERPRINT_OFFSET = { x: 6, y: 7 };
+/** The homepage intro's paper stack: the hand-cut corners of `--quad-a` and `--quad-c`, and `--dshadow` as a box shadow. */
+const QUAD_A = '14px 12px 16px 13px';
+const QUAD_C = '13px 15px 12px 16px';
+const PAPER_SHADOW = '0 1px 0 rgba(0,0,0,0.2), 0 2px 3px rgba(0,0,0,0.12)';
+const MAT_OFFSET = 13;
 const PIECE_SHADOW = 'drop-shadow(0 1px 0 rgba(0,0,0,0.2)) drop-shadow(0 2px 3px rgba(0,0,0,0.12))';
 const LIFTED_SHADOW =
   'drop-shadow(0 2px 0 rgba(0,0,0,0.2)) drop-shadow(0 7px 10px rgba(0,0,0,0.18))';
@@ -287,21 +292,41 @@ export function SocialCard({ grainUrl, headline, name, portraitUrl, tagline }: S
         <div
           style={{
             alignSelf: 'flex-start',
-            background: 'rgba(247,241,226,0.78)',
-            border: '1px solid rgba(29,26,21,0.12)',
-            borderRadius: 20,
-            color: PAPER_PALETTE.ink,
             display: 'flex',
-            flexDirection: 'column',
-            gap: 4,
             marginTop: 26,
-            padding: '16px 28px 18px 24px',
+            position: 'relative',
+            transform: 'rotate(-1.5deg)',
           }}
         >
-          {name === headline ? null : (
-            <span style={{ fontSize: 42, fontWeight: 700, letterSpacing: '-0.02em' }}>{name}</span>
-          )}
-          <span style={{ fontSize: 32 }}>{tagline}</span>
+          <div
+            style={{
+              ...FILL,
+              background: PAPER_PALETTE.ochre,
+              borderRadius: QUAD_C,
+              boxShadow: PAPER_SHADOW,
+              display: 'flex',
+              transform: `translate(${MAT_OFFSET}px, ${MAT_OFFSET}px) rotate(2deg)`,
+            }}
+          />
+          <div
+            style={{
+              background: PAPER_PALETTE.cream,
+              borderRadius: QUAD_A,
+              boxShadow: PAPER_SHADOW,
+              color: PAPER_PALETTE.ink,
+              display: 'flex',
+              flexDirection: 'column',
+              gap: 4,
+              padding: '18px 30px 20px 26px',
+            }}
+          >
+            {name === headline ? null : (
+              <span style={{ fontSize: 42, fontWeight: 700, letterSpacing: '-0.02em' }}>
+                {name}
+              </span>
+            )}
+            <span style={{ fontSize: 32 }}>{tagline}</span>
+          </div>
         </div>
       </div>
       <div
