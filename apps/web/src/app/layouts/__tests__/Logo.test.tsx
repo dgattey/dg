@@ -36,12 +36,13 @@ describe('Logo', () => {
     scrollToSpy.mockRestore();
   });
 
-  it('draws the mark as an outline instead of system-font text', () => {
+  it('draws the mark as outlines on a die-cut mat instead of system-font text', () => {
     jest.mocked(usePathname).mockReturnValue('/');
     render(<Logo />);
 
     const mark = screen.getByRole('img', { name: 'dg.' });
     expect(mark.tagName.toLowerCase()).toBe('svg');
-    expect(mark.querySelectorAll('path')).toHaveLength(3);
+    expect(mark.querySelectorAll('g > path')).toHaveLength(3);
+    expect(mark.querySelectorAll(':scope > path')).toHaveLength(3);
   });
 });

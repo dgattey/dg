@@ -2,45 +2,56 @@ import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import sharp from 'sharp';
 import { PAPER_PALETTE } from '../src/app/collage/paperPalette';
-import { MARK_PATHS, MARK_VIEW_BOX } from '../src/app/layouts/logoMark';
+import {
+  STICKER_ASPECT,
+  STICKER_MAT_WIDTH,
+  STICKER_PALETTE_INKS,
+  STICKER_VIEW_BOX,
+  stickerPaths,
+} from '../src/app/layouts/logoMark';
 
 const PUBLIC_DIR = join(__dirname, '../public');
-const [, , markBoxWidth = 1, markBoxHeight = 1] = MARK_VIEW_BOX.split(' ').map(Number);
 
-/** A stamp layout in a 100-unit square canvas. */
-type StampLayout = {
-  height: number;
-  markWidth: number;
-  radius: number;
-  ring: number;
+/** The sticker's place in a 100-unit square canvas. */
+type IconLayout = {
+  background?: string;
+  shadow: boolean;
   width: number;
 };
 
-/** Fills the favicon so the mark stays legible at 16px. */
-const FAVICON_STAMP: StampLayout = { height: 68, markWidth: 68, radius: 12, ring: 5, width: 84 };
-/** Its corners stay inside the maskable safe circle (radius 40). */
-const APP_STAMP: StampLayout = { height: 42, markWidth: 40, radius: 8, ring: 3.5, width: 56 };
+/** Upright and edge to edge, so stems land on whole pixels and the mark fills 16px. */
+const FAVICON: IconLayout = { shadow: false, width: 100 };
+/** Leaves room for the shadow. */
+const APP_ICON: IconLayout = { shadow: true, width: 88 };
+/** iOS paints a transparent touch icon's background black, so it sits on the page's paper. */
+const TOUCH_ICON: IconLayout = { background: PAPER_PALETTE.paper, shadow: true, width: 76 };
 
-function stampSvg({ height, markWidth, radius, ring, width }: StampLayout, opaque: boolean) {
-  const x = 50 - width / 2;
-  const y = 50 - height / 2;
-  const markHeight = markWidth / (markBoxWidth / markBoxHeight);
-  const marks = MARK_PATHS.map(
-    ({ d, dx }) => `<path d="${d}"${dx ? ` transform="translate(${dx} 0)"` : ''}/>`,
-  ).join('');
-  const ringRect = `x="${x - ring}" y="${y - ring}" width="${width + 2 * ring}" height="${height + 2 * ring}" rx="${radius + ring}"`;
-  const shadow = opaque
-    ? `<filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="2"/></filter><rect ${ringRect} fill="#000" opacity="0.2" filter="url(#s)" transform="translate(0 2.5)"/>`
-    : '';
+/** `StickerMark` as a string, for librsvg. */
+function stickerSvg(x: number, y: number, width: number, height: number) {
+  const { glyphs, mat } = stickerPaths(STICKER_PALETTE_INKS);
+  const paper = STICKER_PALETTE_INKS.mat;
+  const at = (transform: string | undefined) => (transform ? ` transform="${transform}"` : '');
+  return [
+    `<svg x="${x}" y="${y}" width="${width}" height="${height}" viewBox="${STICKER_VIEW_BOX}">`,
+    `<g fill="${paper}" stroke="${paper}" stroke-linecap="round" stroke-linejoin="round" stroke-width="${STICKER_MAT_WIDTH}">`,
+    ...mat.map(({ d, transform }) => `<path d="${d}"${at(transform)}/>`),
+    '</g>',
+    ...glyphs.map(({ d, fill, transform }) => `<path d="${d}" fill="${fill}"${at(transform)}/>`),
+    '</svg>',
+  ].join('');
+}
+
+function iconSvg({ background, shadow, width }: IconLayout) {
+  const height = width / STICKER_ASPECT;
+  const placed = stickerSvg(50 - width / 2, 50 - height / 2, width, height);
   return [
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">',
-    opaque ? `<rect width="100" height="100" fill="${PAPER_PALETTE.paper}"/>` : '',
-    '<g transform="rotate(-4 50 50)">',
-    shadow,
-    `<rect ${ringRect} fill="${PAPER_PALETTE.cream}"/>`,
-    `<rect x="${x}" y="${y}" width="${width}" height="${height}" rx="${radius}" fill="${PAPER_PALETTE.viridian}"/>`,
-    `<svg x="${50 - markWidth / 2}" y="${50 - markHeight / 2}" width="${markWidth}" height="${markHeight}" viewBox="${MARK_VIEW_BOX}" fill="${PAPER_PALETTE.cream}">${marks}</svg>`,
-    '</g></svg>',
+    shadow
+      ? '<filter id="s" x="-20%" y="-20%" width="140%" height="140%"><feDropShadow dy="1.5" stdDeviation="1.5" flood-opacity="0.22"/></filter>'
+      : '',
+    background ? `<rect width="100" height="100" fill="${background}"/>` : '',
+    shadow ? `<g filter="url(#s)">${placed}</g>` : placed,
+    '</svg>',
   ].join('');
 }
 
@@ -70,13 +81,13 @@ function encodeIco(pngs: ReadonlyArray<{ data: Buffer; size: number }>) {
 }
 
 async function main() {
-  const favicon = stampSvg(FAVICON_STAMP, false);
-  const appIcon = stampSvg(APP_STAMP, true);
+  const favicon = iconSvg(FAVICON);
+  const appIcon = iconSvg(APP_ICON);
   const icoPngs = await Promise.all(
     [16, 32, 48].map(async (size) => ({ data: await renderPng(favicon, size), size })),
   );
   const files: Record<string, string | Buffer> = {
-    'apple-touch-icon.png': await renderPng(appIcon, 180),
+    'apple-touch-icon.png': await renderPng(iconSvg(TOUCH_ICON), 180),
     'favicon.ico': encodeIco(icoPngs),
     'icon-192.png': await renderPng(appIcon, 192),
     'icon-512.png': await renderPng(appIcon, 512),
