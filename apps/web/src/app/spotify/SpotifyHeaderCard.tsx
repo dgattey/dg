@@ -8,7 +8,7 @@ import { TIMING_MEDIUM } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { usePathname } from 'next/navigation';
 import { PaperCard } from '../collage/PaperCard';
-import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
+import { musicDestinationTitle } from '../layouts/musicHeaderDestinations';
 import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
 
@@ -99,7 +99,7 @@ function DockedHeaderCard({ track }: { track: Track }) {
         <PageTransitionLink
           className="chrome__nowPlayingLink"
           href={musicRoute}
-          title={musicDestinationLabel(musicRoute)}
+          title={musicDestinationTitle(musicRoute)}
         >
           {card}
         </PageTransitionLink>

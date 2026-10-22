@@ -9,13 +9,13 @@ import { Suspense } from 'react';
 import { getListeningStats } from '../../../services/musicStats';
 import { STATS_BACKDROP } from '../../collage/backdrops';
 import { markdownAlternates } from '../../layouts/markdownAlternates';
-import { musicDestinationLabel } from '../../layouts/musicHeaderDestinations';
+import { musicDestinationTitle } from '../../layouts/musicHeaderDestinations';
 import { NoListeningHistory } from '../MusicHistorySections';
 import { MusicPageShell } from '../MusicPageShell';
 import { ListeningStatsSections } from './ListeningStatsSections';
 import { ListeningStatsSkeleton } from './ListeningStatsSkeleton';
 
-const TITLE = musicDestinationLabel(musicStatsRoute);
+const TITLE = musicDestinationTitle(musicStatsRoute);
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(musicStatsRoute),
