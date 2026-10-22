@@ -14,7 +14,47 @@ import {
   siteMapRoute,
   stravaRoute,
 } from '@dg/shared-core/routes/app';
+import { defineBackdrop } from '../collage/backdrops';
 import type { PaperEdge, PaperTone } from '../collage/types';
+
+export const SITE_MAP_BACKDROP = defineBackdrop(1100, 3, [
+  {
+    cutOuts: [
+      ['sitemap-monstera', 'monstera', 'viridian', 420, -18, 84, -4, 'desktop', 0],
+      [
+        'sitemap-swallow',
+        'swallow',
+        'vermilion',
+        180,
+        -14,
+        82,
+        14,
+        'desktop',
+        1,
+        { underprint: ['cream', 5, 6] },
+      ],
+      ['sitemap-fern', 'fern', 'olive', 310, 19, -8, 42, 'desktop', 0],
+      ['sitemap-coral', 'coral', 'rose', 230, -15, 84, 68, 'desktop', 1],
+      ['sitemap-trefoil-top', 'trefoil', 'chartreuse', 140, -21, 3, 82, 'all', 1],
+    ],
+    sheets: [
+      ['sitemap-ruled', 'torn', 'ruled', ['cream', 'cerulean'], 72, 16, 34, 380, -3.2, 'desktop'],
+      ['sitemap-pebble-ochre', 'pebble', 'solid', 'ochre', -9, 22, 360, -12, 'all'],
+      ['sitemap-gingham', 'torn', 'gingham', ['ochre', 'vermilion'], 62, 56, 40, 360, 3.4, 'all'],
+    ],
+  },
+  {
+    cutOuts: [
+      ['sitemap-pods', 'pods', 'ochre', 220, 22, -6, 24, 'all', 1],
+      ['sitemap-seaweed2', 'seaweed2', 'ultramarine', 230, 15, 84, 58, 'desktop', 1],
+      ['sitemap-star', 'star5', 'star', 46, -14, 88, 10, 'desktop', 1],
+    ],
+    sheets: [
+      ['sitemap-dots', 'torn', 'dots', ['viridian', 'leaf'], 56, 10, 44, 380, -2.8, 'all'],
+      ['sitemap-disc-cobalt', 'disc', 'starfield', 'ultramarine', -7, 46, 280, 0, 'desktop'],
+    ],
+  },
+]);
 
 export type SiteMapPageEntry = {
   description: string;
@@ -33,16 +73,9 @@ export type SiteMapSurfaceEntry = {
   label: string;
 };
 
-export type SiteMapExternalEntry = {
-  description: string;
-  domain: string;
-  href: string;
-  label: string;
-};
-
 export const SITE_MAP_PAGES: ReadonlyArray<SiteMapPageEntry> = [
   {
-    description: 'Bio, featured work, live Spotify & Strava cards, and side projects.',
+    description: 'About, featured work, live music and Strava activity, and side projects.',
     edge: 'quad-a',
     label: 'Home',
     markdownPath: htmlPathToMarkdownPath(homeRoute),
@@ -51,7 +84,7 @@ export const SITE_MAP_PAGES: ReadonlyArray<SiteMapPageEntry> = [
     tone: 'cream',
   },
   {
-    description: 'Totals, top albums podium, 24-hour turntable clock, and listening habits.',
+    description: 'Totals, top albums, and listening habits from my Spotify history.',
     edge: 'quad-b',
     label: 'Listening stats',
     markdownPath: htmlPathToMarkdownPath(musicStatsRoute),
@@ -60,7 +93,7 @@ export const SITE_MAP_PAGES: ReadonlyArray<SiteMapPageEntry> = [
     tone: 'cobalt',
   },
   {
-    description: 'Live and recent Spotify plays grouped by day and album stacks.',
+    description: 'Recent Spotify plays grouped by day and album.',
     edge: 'quad-c',
     label: 'Plays',
     markdownPath: htmlPathToMarkdownPath(musicRoute),
@@ -69,7 +102,7 @@ export const SITE_MAP_PAGES: ReadonlyArray<SiteMapPageEntry> = [
     tone: 'viridian',
   },
   {
-    description: 'All-time favorite albums crate with in-place tracklist wells.',
+    description: 'All-time favorite albums with in-place tracklists.',
     edge: 'quad-d',
     label: 'Favorite albums',
     markdownPath: htmlPathToMarkdownPath(favoriteAlbumsRoute),
@@ -78,7 +111,7 @@ export const SITE_MAP_PAGES: ReadonlyArray<SiteMapPageEntry> = [
     tone: 'vermilion',
   },
   {
-    description: 'Books read, star ratings, and review slips shelved by year.',
+    description: 'Books read, star ratings, and notes by year.',
     edge: 'quad-a',
     label: 'Reads',
     markdownPath: htmlPathToMarkdownPath(readingRoute),
@@ -87,7 +120,7 @@ export const SITE_MAP_PAGES: ReadonlyArray<SiteMapPageEntry> = [
     tone: 'leaf',
   },
   {
-    description: 'Interactive route atlas, yearly miles tickets, and biggest climbs.',
+    description: 'Interactive route map, yearly miles, and biggest climbs.',
     edge: 'quad-b',
     label: 'Big map',
     markdownPath: htmlPathToMarkdownPath(stravaRoute),
@@ -96,7 +129,7 @@ export const SITE_MAP_PAGES: ReadonlyArray<SiteMapPageEntry> = [
     tone: 'ultramarine',
   },
   {
-    description: 'Every version and release shipped on dylangattey.com since 2021.',
+    description: 'Version history and release notes.',
     edge: 'quad-c',
     label: 'Changelog',
     markdownPath: htmlPathToMarkdownPath(changelogRoute),
@@ -105,7 +138,7 @@ export const SITE_MAP_PAGES: ReadonlyArray<SiteMapPageEntry> = [
     tone: 'rose',
   },
   {
-    description: 'Complete directory of pages, agent endpoints, apps, and external links.',
+    description: 'Directory of public routes, side projects, and agent endpoints.',
     edge: 'quad-d',
     label: 'Site map',
     markdownPath: htmlPathToMarkdownPath(siteMapRoute),
@@ -124,7 +157,7 @@ export const SITE_MAP_AGENT_SURFACES: ReadonlyArray<SiteMapSurfaceEntry> = [
   },
   {
     badge: 'Markdown',
-    description: 'Every public page concatenated into a single token-efficient document.',
+    description: 'Every public page concatenated into a single document.',
     href: llmsFullTxtRoute,
     label: 'Full LLM context',
   },
@@ -136,7 +169,7 @@ export const SITE_MAP_AGENT_SURFACES: ReadonlyArray<SiteMapSurfaceEntry> = [
   },
   {
     badge: 'OpenAPI 3.1',
-    description: 'Machine-readable schema for all public content discovery endpoints.',
+    description: 'Machine-readable schema for public content discovery endpoints.',
     href: '/openapi.json',
     label: 'OpenAPI spec',
   },
@@ -154,92 +187,14 @@ export const SITE_MAP_AGENT_SURFACES: ReadonlyArray<SiteMapSurfaceEntry> = [
   },
   {
     badge: 'JSON',
-    description: 'Lightweight health check endpoint for API catalog consumers.',
+    description: 'Health check endpoint for API catalog consumers.',
     href: apiStatusRoute,
     label: 'API status',
   },
   {
     badge: 'PNG',
-    description: 'Paper-cut collage Open Graph social preview card (1200×630).',
+    description: 'Open Graph social preview image (1200×630).',
     href: '/opengraph-image',
     label: 'Social card',
-  },
-];
-
-export const SITE_MAP_APPS: ReadonlyArray<SiteMapExternalEntry> = [
-  {
-    description: 'Personal relationship manager and notes for staying close to people.',
-    domain: 'saga.gattey.com',
-    href: 'https://saga.gattey.com',
-    label: 'Saga',
-  },
-  {
-    description: 'Smart home and household operating system.',
-    domain: 'sconeos.gattey.com',
-    href: 'https://sconeos.gattey.com',
-    label: 'Sconeos',
-  },
-  {
-    description: 'Curated photography portfolio and high-resolution galleries.',
-    domain: 'photos.gattey.com',
-    href: 'https://photos.gattey.com',
-    label: 'Gattey Photos',
-  },
-  {
-    description: 'Fast two-player expedition calculator for the Lost Cities card game.',
-    domain: 'lostcities.gattey.com',
-    href: 'https://lostcities.gattey.com',
-    label: 'Lost Cities scorer',
-  },
-  {
-    description: 'Where Did My Money Go — lightweight personal finance tracker.',
-    domain: 'wmm.gattey.com',
-    href: 'https://wmm.gattey.com',
-    label: 'WMM',
-  },
-];
-
-export const DEFAULT_ELSEWHERE_LINKS: ReadonlyArray<SiteMapExternalEntry> = [
-  {
-    description: 'cursor.com/@dyl',
-    domain: 'cursor.com',
-    href: 'https://cursor.com/@dyl',
-    label: 'Cursor',
-  },
-  {
-    description: 'github.com/dgattey',
-    domain: 'github.com',
-    href: 'https://github.com/dgattey',
-    label: 'GitHub',
-  },
-  {
-    description: 'strava.com/athletes/17469310',
-    domain: 'strava.com',
-    href: 'https://www.strava.com/athletes/17469310',
-    label: 'Strava',
-  },
-  {
-    description: 'open.spotify.com/user/dylangattey',
-    domain: 'open.spotify.com',
-    href: 'https://open.spotify.com/user/dylangattey',
-    label: 'Spotify',
-  },
-  {
-    description: 'instagram.com/dylangattey',
-    domain: 'instagram.com',
-    href: 'https://www.instagram.com/dylangattey',
-    label: 'Instagram',
-  },
-  {
-    description: 'x.com/dyl_gat',
-    domain: 'x.com',
-    href: 'https://x.com/dyl_gat',
-    label: 'X',
-  },
-  {
-    description: 'linkedin.com/in/dgattey',
-    domain: 'linkedin.com',
-    href: 'https://www.linkedin.com/in/dgattey',
-    label: 'LinkedIn',
   },
 ];

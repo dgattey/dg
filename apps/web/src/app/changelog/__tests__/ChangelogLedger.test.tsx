@@ -83,7 +83,8 @@ describe('ChangelogLedger', () => {
     const user = userEvent.setup();
     render(<ChangelogLedger releases={SAMPLE_RELEASES} />);
 
-    expect(screen.getByText('Latest cut')).toBeInTheDocument();
+    expect(screen.getByText('Latest')).toBeInTheDocument();
+    expect(screen.getByText('Minor & major')).toBeInTheDocument();
     expect(screen.getAllByText('v2.80.1').length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('v2.80.0')).toBeInTheDocument();
     expect(screen.getByText('v2.46.23')).toBeInTheDocument();

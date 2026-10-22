@@ -11,7 +11,7 @@ export async function getChangelogMarkdown(): Promise<string> {
     const releases = await getChangelogReleases();
     const sections: Array<string> = [
       '# Changelog',
-      `> Every release shipped on ${SITE_NAME} (dylangattey.com), from the latest cut back to the beginning.`,
+      `> Version history and release notes for ${SITE_NAME}.`,
     ];
 
     if (releases.length === 0) {

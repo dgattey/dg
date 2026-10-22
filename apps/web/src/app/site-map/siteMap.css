@@ -8,12 +8,15 @@
 }
 .siteMap__intro {
   display: grid;
-  gap: 14px;
+  gap: 0;
   justify-items: start;
 }
+.siteMap__intro .collagePageTitle {
+  padding-bottom: 0.24em;
+}
 .siteMap__lede {
-  max-width: 38em;
-  margin: 0;
+  max-width: 34em;
+  margin: 20px 0 0;
   font-family: var(--body);
   font-size: var(--type-body-lg);
   line-height: 1.45;
@@ -39,7 +42,8 @@
   font-size: var(--type-h2);
 }
 
-.siteMap__pagesGrid {
+.siteMap__pagesGrid,
+.siteMap__appsGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 24px;
@@ -47,10 +51,12 @@
   margin: 0;
   list-style: none;
 }
-.siteMap__pageItem {
+.siteMap__pageItem,
+.siteMap__appItem {
   display: grid;
 }
-.siteMap__pageCard {
+.siteMap__pageCard,
+.siteMap__appCard {
   height: 100%;
 }
 .siteMap__pageCardInner {
@@ -137,30 +143,90 @@
   color: var(--soft);
 }
 
-.siteMap__twoCol {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 32px;
-  align-items: start;
+.siteMap__appCardInner {
+  height: 100%;
+  box-shadow: inset 5px 0 0 var(--vermilion);
 }
+.siteMap__appRow {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  gap: 16px;
+  align-items: center;
+  height: 100%;
+  padding: 18px 20px 18px 18px;
+  color: inherit;
+  text-decoration: none;
+}
+.siteMap__appMark {
+  position: relative;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 5px;
+  background: color-mix(in srgb, var(--ink-on-cream) 6%, var(--cream));
+  border-radius: 12px;
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink-on-cream) 12%, transparent);
+  transition: transform 0.2s ease;
+}
+.siteMap__appMark img {
+  max-height: 100%;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .siteMap__appRow:hover .siteMap__appMark,
+  .siteMap__appRow:focus-visible .siteMap__appMark {
+    transform: scale(1.08);
+  }
+}
+.siteMap__appBody {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+.siteMap__appHeader {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 10px;
+  align-items: baseline;
+}
+.siteMap__appTitle {
+  font-family: var(--display);
+  font-size: var(--type-h3);
+  font-weight: 700;
+  line-height: 1.2;
+}
+.siteMap__appRow:hover .siteMap__appTitle,
+.siteMap__appRow:focus-visible .siteMap__appTitle {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.siteMap__appDomain {
+  font-family: var(--display);
+  font-size: var(--type-caption);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--cobalt);
+}
+.siteMap__appDesc {
+  margin: 0;
+  font-family: var(--body);
+  font-size: var(--type-body);
+  line-height: 1.45;
+  color: var(--soft);
+}
+.siteMap__appArrow {
+  font-family: var(--display);
+  font-size: var(--type-h3);
+  font-weight: 700;
+  line-height: 1;
+  color: var(--soft);
+}
+
 .siteMap__ledgerInner {
   display: grid;
   gap: 14px;
   padding: 24px 26px 26px;
   box-shadow: inset 5px 0 0 var(--cobalt);
-}
-.siteMap__ledgerInner--apps {
-  box-shadow: inset 5px 0 0 var(--vermilion);
-}
-.siteMap__ledgerInner--elsewhere {
-  box-shadow: inset 5px 0 0 var(--viridian);
-}
-.siteMap__ledgerList {
-  display: grid;
-  gap: 10px;
-  padding: 0;
-  margin: 0;
-  list-style: none;
 }
 .siteMap__ledgerRow {
   display: grid;
@@ -227,7 +293,7 @@
 
 @media (max-width: 860px) {
   .siteMap__pagesGrid,
-  .siteMap__twoCol,
+  .siteMap__appsGrid,
   .siteMap__surfacesGrid {
     grid-template-columns: minmax(0, 1fr);
   }

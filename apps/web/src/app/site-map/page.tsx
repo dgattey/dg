@@ -3,26 +3,20 @@ import './siteMap.css';
 
 import { siteMapRoute } from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
+import { Image } from '@dg/ui/dependent/Image';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
-import { getFooterLinks, getSideProjects } from '../../services/contentful';
-import { READING_BACKDROP } from '../collage/backdrops';
+import { getSideProjects } from '../../services/contentful';
 import { CollageBackdrop } from '../collage/CollageBackdrop';
 import { CutLetters } from '../collage/CutLetters';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import { formatElsewhereHandle } from '../layouts/Footer';
 import { markdownAlternates } from '../layouts/markdownAlternates';
-import {
-  DEFAULT_ELSEWHERE_LINKS,
-  SITE_MAP_AGENT_SURFACES,
-  SITE_MAP_APPS,
-  SITE_MAP_PAGES,
-} from './siteMapCatalog';
+import { SITE_MAP_AGENT_SURFACES, SITE_MAP_BACKDROP, SITE_MAP_PAGES } from './siteMapCatalog';
 
 const TITLE = 'Site map';
-const DESCRIPTION =
-  'Every page, Markdown twin, agent endpoint, and side project across dylangattey.com.';
+const DESCRIPTION = 'All pages, side projects, and machine-readable endpoints.';
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(siteMapRoute),
@@ -31,43 +25,7 @@ export const metadata: Metadata = {
 };
 
 export async function SiteMapDirectory() {
-  const [sideProjects, footerLinks] = await Promise.all([
-    getSideProjects().catch(() => []),
-    getFooterLinks().catch(() => []),
-  ]);
-
-  const byHost = new Map(
-    sideProjects.map((project) => {
-      try {
-        return [new URL(project.url).hostname, project] as const;
-      } catch {
-        return [project.url, project] as const;
-      }
-    }),
-  );
-
-  const apps = SITE_MAP_APPS.map((entry) => {
-    const live = byHost.get(entry.domain);
-    return {
-      description: live?.description || entry.description,
-      domain: entry.domain,
-      href: live?.url || entry.href,
-      label: live?.title || entry.label,
-    };
-  });
-
-  const nonEmailLinks = footerLinks.filter(
-    (link) => link.icon !== 'email' && !link.url.startsWith('mailto:'),
-  );
-  const elsewhereLinks =
-    nonEmailLinks.length > 0
-      ? nonEmailLinks.map((link) => ({
-          description: formatElsewhereHandle(link.url),
-          domain: formatElsewhereHandle(link.url),
-          href: link.url,
-          label: link.title === 'Github' ? 'GitHub' : link.title,
-        }))
-      : DEFAULT_ELSEWHERE_LINKS;
+  const sideProjects = await getSideProjects().catch(() => []);
 
   return (
     <div className="siteMap__sections">
@@ -102,7 +60,7 @@ export async function SiteMapDirectory() {
                   <a
                     className="siteMap__mdLink"
                     href={page.markdownPath}
-                    title={`${page.label} Markdown twin (${page.markdownPath})`}
+                    title={`${page.label} Markdown (${page.markdownPath})`}
                   >
                     {page.markdownPath}
                   </a>
@@ -115,6 +73,64 @@ export async function SiteMapDirectory() {
           ))}
         </ul>
       </section>
+
+      {sideProjects.length > 0 ? (
+        <section aria-label="Side projects" className="siteMap__section">
+          <h2 className="siteMap__sectionHeading">
+            <PaperTag className="siteMap__sectionTag" edge="quad-c" tiltDeg={-1.5} tone="ochre">
+              Side projects
+            </PaperTag>
+          </h2>
+          <ul className="siteMap__appsGrid">
+            {sideProjects.map((project, index) => {
+              const even = index % 2 === 0;
+              const domain = formatElsewhereHandle(project.url);
+              return (
+                <li className="siteMap__appItem" key={project.url}>
+                  <PaperCard
+                    className="siteMap__appCard collageLift"
+                    edge={even ? 'quad-a' : 'quad-d'}
+                    innerClassName="siteMap__appCardInner"
+                    tiltDeg={even ? 0.6 : -0.6}
+                    tone="cream"
+                  >
+                    <a
+                      className="siteMap__appRow"
+                      href={project.url}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
+                      <span
+                        aria-hidden="true"
+                        className="siteMap__appMark"
+                        data-role="side-project-mark"
+                      >
+                        <Image
+                          alt=""
+                          height={project.mark.height}
+                          sizes={{ extraLarge: 44 }}
+                          url={project.mark.url}
+                          width={project.mark.width}
+                        />
+                      </span>
+                      <span className="siteMap__appBody">
+                        <span className="siteMap__appHeader">
+                          <b className="siteMap__appTitle">{project.title}</b>
+                          <span className="siteMap__appDomain">{domain}</span>
+                        </span>
+                        <p className="siteMap__appDesc">{project.description}</p>
+                      </span>
+                      <span aria-hidden="true" className="siteMap__appArrow">
+                        ↗
+                      </span>
+                    </a>
+                  </PaperCard>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
 
       <section aria-label="Agent and API surfaces" className="siteMap__section">
         <h2 className="siteMap__sectionHeading">
@@ -139,77 +155,6 @@ export async function SiteMapDirectory() {
           </ul>
         </PaperCard>
       </section>
-
-      <div className="siteMap__twoCol">
-        <section aria-label="Dylan's apps" className="siteMap__section">
-          <h2 className="siteMap__sectionHeading">
-            <PaperTag className="siteMap__sectionTag" edge="quad-c" tiltDeg={-1.5} tone="ochre">
-              Dylan&apos;s apps
-            </PaperTag>
-          </h2>
-          <PaperCard
-            edge="quad-d"
-            innerClassName="siteMap__ledgerInner siteMap__ledgerInner--apps"
-            tiltDeg={0.6}
-            tone="cream"
-          >
-            <ul className="siteMap__ledgerList">
-              {apps.map((app) => (
-                <li key={app.href}>
-                  <a
-                    className="siteMap__ledgerRow"
-                    href={app.href}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    <div className="siteMap__ledgerTop">
-                      <span className="siteMap__ledgerTitle">
-                        {app.label} <span aria-hidden="true">↗</span>
-                      </span>
-                      <span className="siteMap__ledgerPath">{app.domain}</span>
-                    </div>
-                    <p className="siteMap__ledgerDesc">{app.description}</p>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </PaperCard>
-        </section>
-
-        <section aria-label="Elsewhere" className="siteMap__section">
-          <h2 className="siteMap__sectionHeading">
-            <PaperTag className="siteMap__sectionTag" edge="quad-a" tiltDeg={1.4} tone="viridian">
-              Elsewhere
-            </PaperTag>
-          </h2>
-          <PaperCard
-            edge="quad-b"
-            innerClassName="siteMap__ledgerInner siteMap__ledgerInner--elsewhere"
-            tiltDeg={-0.6}
-            tone="cream"
-          >
-            <ul className="siteMap__ledgerList">
-              {elsewhereLinks.map((link) => (
-                <li key={link.href}>
-                  <a
-                    className="siteMap__ledgerRow"
-                    href={link.href}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    <div className="siteMap__ledgerTop">
-                      <span className="siteMap__ledgerTitle">
-                        {link.label} <span aria-hidden="true">↗</span>
-                      </span>
-                      <span className="siteMap__ledgerPath">{link.description}</span>
-                    </div>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </PaperCard>
-        </section>
-      </div>
     </div>
   );
 }
@@ -217,7 +162,7 @@ export async function SiteMapDirectory() {
 export default function SiteMapPage() {
   return (
     <section aria-label={TITLE} className="collageBackdropHost siteMap__layout">
-      <CollageBackdrop backdrop={READING_BACKDROP} />
+      <CollageBackdrop backdrop={SITE_MAP_BACKDROP} />
       <div className="siteMap__intro">
         <CutLetters className="collagePageTitle" text={TITLE} />
         <p className="siteMap__lede">{DESCRIPTION}</p>

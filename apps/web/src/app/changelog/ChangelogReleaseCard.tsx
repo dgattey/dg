@@ -77,7 +77,7 @@ export function ChangelogReleaseCard({
               tiltDeg={3}
               tone="ochre"
             >
-              Latest cut
+              Latest
             </PaperTag>
           ) : undefined
         }

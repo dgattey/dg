@@ -8,7 +8,7 @@ const CHANGELOG_TAG = 'changelog';
 
 export async function getChangelogReleases(): Promise<Array<ChangelogRelease>> {
   'use cache';
-  cacheLife('hours');
+  cacheLife('days');
   cacheTag(CHANGELOG_TAG);
   return await fetchReleases({ fallbackVersion: version });
 }

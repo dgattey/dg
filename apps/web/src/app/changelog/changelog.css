@@ -1,19 +1,22 @@
 .changelog__layout {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  row-gap: 32px;
+  row-gap: 36px;
   width: min(100%, 1120px);
   padding-block: 40px 56px;
   margin-inline: auto;
 }
 .changelog__intro {
   display: grid;
-  gap: 14px;
+  gap: 0;
   justify-items: start;
+}
+.changelog__intro .collagePageTitle {
+  padding-bottom: 0.3em;
 }
 .changelog__lede {
   max-width: 38em;
-  margin: 0;
+  margin: 28px 0 0;
   font-family: var(--body);
   font-size: var(--type-body-lg);
   line-height: 1.45;

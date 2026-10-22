@@ -104,14 +104,14 @@ export const markdownPages = [
     changeFrequency: 'daily',
     path: changelogRoute,
     priority: 0.5,
-    summary: 'Every version and release shipped on dylangattey.com',
+    summary: 'Version history and release notes',
     title: 'Changelog',
   },
   {
     changeFrequency: 'weekly',
     path: siteMapRoute,
     priority: 0.5,
-    summary: 'Directory of pages, agent endpoints, side projects, and external links',
+    summary: 'All pages, side projects, and machine-readable endpoints',
     title: 'Site map',
   },
 ] as const satisfies ReadonlyArray<MarkdownPageDefinition>;

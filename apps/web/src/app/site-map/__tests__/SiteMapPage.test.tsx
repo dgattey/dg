@@ -10,16 +10,25 @@ jest.mock('next/cache', () => ({
 }));
 
 jest.mock('../../../services/contentful', () => ({
-  getFooterLinks: jest.fn(async () => [
-    { icon: 'github', title: 'Github', url: 'https://github.com/dgattey' },
-    { icon: 'x', title: 'X', url: 'https://x.com/dyl_gat' },
-  ]),
   getSideProjects: jest.fn(async () => [
     {
+      creationDate: '2026-10-01',
       description: 'Personal relationship manager.',
       mark: { height: 128, title: 'Saga', url: 'https://saga.gattey.com/icon.png', width: 128 },
       title: 'Saga',
       url: 'https://saga.gattey.com',
+    },
+    {
+      creationDate: '2026-09-01',
+      description: 'Curated photography portfolio.',
+      mark: {
+        height: 128,
+        title: 'Gattey Photos',
+        url: 'https://photos.gattey.com/icon.png',
+        width: 128,
+      },
+      title: 'Gattey Photos',
+      url: 'https://photos.gattey.com',
     },
   ]),
 }));
@@ -27,9 +36,9 @@ jest.mock('../../../services/contentful', () => ({
 import SiteMapPage, { SiteMapDirectory } from '../page';
 
 describe('SiteMapPage', () => {
-  it('renders pages, agent surfaces, Dylan apps, and elsewhere links', async () => {
+  it('renders pages, Contentful side projects with icons, and agent surfaces without repeating Elsewhere', async () => {
     const directory = await SiteMapDirectory();
-    render(
+    const { container } = render(
       <>
         <SiteMapPage />
         {directory}
@@ -37,12 +46,15 @@ describe('SiteMapPage', () => {
     );
 
     expect(screen.getByRole('heading', { level: 1, name: 'Site map' })).toBeInTheDocument();
+    expect(
+      screen.getByText('All pages, side projects, and machine-readable endpoints.'),
+    ).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: 'Pages' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { level: 2, name: 'Side projects' })).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 2, name: 'Agent and API surfaces' }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 2, name: "Dylan's apps" })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { level: 2, name: 'Elsewhere' })).toBeInTheDocument();
+    expect(screen.queryByRole('heading', { level: 2, name: 'Elsewhere' })).not.toBeInTheDocument();
 
     expect(screen.getByRole('link', { name: 'Changelog' })).toHaveAttribute('href', '/changelog');
     expect(screen.getByRole('link', { name: /LLM summary/i })).toHaveAttribute('href', '/llms.txt');
@@ -50,9 +62,10 @@ describe('SiteMapPage', () => {
       'href',
       'https://saga.gattey.com',
     );
-    expect(screen.getByRole('link', { name: /Lost Cities scorer/i })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: /Gattey Photos/i })).toHaveAttribute(
       'href',
-      'https://lostcities.gattey.com',
+      'https://photos.gattey.com',
     );
+    expect(container.querySelectorAll('[data-role="side-project-mark"]')).toHaveLength(2);
   });
 });

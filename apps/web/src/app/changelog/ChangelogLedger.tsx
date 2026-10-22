@@ -80,7 +80,7 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
             <span className="changelog__statKey">Current version</span>
             <span className="changelog__statValue">{latestRelease?.tag ?? 'v2.80.1'}</span>
             <span className="changelog__statSub">
-              {formatReleaseDate(latestRelease?.publishedAt ?? null) ?? 'Latest cut'}
+              {formatReleaseDate(latestRelease?.publishedAt ?? null) ?? 'Latest release'}
             </span>
           </Stub>
         </li>
@@ -92,7 +92,7 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
         </li>
         <li>
           <Stub className="stats__total" kind="stamp" tiltDeg={2.2} tone="cream">
-            <span className="changelog__statKey">Feature cuts</span>
+            <span className="changelog__statKey">Minor &amp; major</span>
             <span className="changelog__statValue">{majorCount + minorCount}</span>
             <span className="changelog__statSub">
               {majorCount} major · {minorCount} minor
@@ -104,7 +104,7 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
             <span className="changelog__statKey">First tagged</span>
             <span className="changelog__statValue">{oldestRelease?.tag ?? 'v1.21.5'}</span>
             <span className="changelog__statSub">
-              {formatReleaseDate(oldestRelease?.publishedAt ?? null) ?? 'Archive start'}
+              {formatReleaseDate(oldestRelease?.publishedAt ?? null) ?? 'Earliest release'}
             </span>
           </Stub>
         </li>
@@ -158,7 +158,7 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
                   >
                     <span>{group.year}</span>
                     <small>
-                      {group.totalCount} {group.totalCount === 1 ? 'cut' : 'cuts'}
+                      {group.totalCount} {group.totalCount === 1 ? 'release' : 'releases'}
                     </small>
                   </PaperTag>
                 </h2>

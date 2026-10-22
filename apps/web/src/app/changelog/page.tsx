@@ -15,8 +15,7 @@ import { markdownAlternates } from '../layouts/markdownAlternates';
 import { ChangelogLedger } from './ChangelogLedger';
 
 const TITLE = 'Changelog';
-const DESCRIPTION =
-  'Every release shipped on dylangattey.com, from the latest cut back to the beginning.';
+const DESCRIPTION = 'Version history and release notes.';
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(changelogRoute),

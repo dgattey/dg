@@ -154,22 +154,6 @@ describe('fetchReleases', () => {
     expect(releases).toEqual([createFallbackRelease('2.80.1')]);
   });
 
-  it('merges baseline archive releases when includeBaseline is enabled', async () => {
-    global.fetch = jest.fn().mockResolvedValue({
-      json: async () => [],
-      ok: false,
-      status: 403,
-    }) as unknown as typeof fetch;
-
-    const releases = await fetchReleases({
-      fallbackVersion: '2.80.1',
-      includeBaseline: true,
-    });
-    expect(releases.length).toBeGreaterThanOrEqual(296);
-    expect(releases[0]?.tag).toBe('v2.80.1');
-    expect(releases.at(-1)?.tag).toBe('v1.21.5');
-  });
-
   it('sorts releases by major, minor, then patch descending', () => {
     const a = createFallbackRelease('1.24.0');
     const b = createFallbackRelease('2.0.0');

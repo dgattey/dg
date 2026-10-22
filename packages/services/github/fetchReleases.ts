@@ -1,7 +1,6 @@
 import 'server-only';
 
 import { log } from '@dg/shared-core/logging/log';
-import baselineTuples from './releasesBaseline.json' with { type: 'json' };
 
 export const GITHUB_REPOSITORY = 'dgattey/dg';
 export const GITHUB_REPOSITORY_URL = `https://github.com/${GITHUB_REPOSITORY}`;
@@ -231,50 +230,15 @@ export function compareReleasesDesc(a: ChangelogRelease, b: ChangelogRelease): n
   return b.patch - a.patch;
 }
 
-type BaselineReleaseTuple = [
-  tag: string,
-  publishedAt: string | null,
-  notes: Array<string>,
-  prNumbers: Array<number>,
-];
-
-function loadBaselineReleases(): Array<ChangelogRelease> {
-  const releases: Array<ChangelogRelease> = [];
-  for (const tuple of baselineTuples as unknown as Array<BaselineReleaseTuple>) {
-    const [rawTag, publishedAt, notes, prNumbers] = tuple;
-    const semver = parseSemverTag(rawTag);
-    if (!semver) {
-      continue;
-    }
-    const tag = `v${semver.version}`;
-    releases.push({
-      htmlUrl: `${GITHUB_REPOSITORY_URL}/releases/tag/${tag}`,
-      kind: semver.kind,
-      major: semver.major,
-      minor: semver.minor,
-      name: tag,
-      notes,
-      patch: semver.patch,
-      prNumbers,
-      publishedAt,
-      tag,
-      version: semver.version,
-    });
-  }
-  return releases;
-}
-
 /**
  * Fetches all published GitHub releases for `dgattey/dg`, paging until
- * exhausted. Merges with the baseline release archive and falls back to the
- * current version if the GitHub API is unreachable.
+ * exhausted. Falls back to the current version if the GitHub API is
+ * unreachable.
  */
 export async function fetchReleases(options?: {
   fallbackVersion?: string;
-  includeBaseline?: boolean;
 }): Promise<Array<ChangelogRelease>> {
   const fallbackVersion = options?.fallbackVersion ?? '2.80.1';
-  const includeBaseline = options?.includeBaseline ?? process.env.NODE_ENV !== 'test';
   const collected: Array<ChangelogRelease> = [];
   const seenTags = new Set<string>();
 
@@ -321,15 +285,6 @@ export async function fetchReleases(options?: {
     }
   } catch (error) {
     log.warn('GitHub releases fetch failed, using fallback version', { error });
-  }
-
-  if (includeBaseline) {
-    for (const baselineRelease of loadBaselineReleases()) {
-      if (!seenTags.has(baselineRelease.tag)) {
-        seenTags.add(baselineRelease.tag);
-        collected.push(baselineRelease);
-      }
-    }
   }
 
   const fallback = createFallbackRelease(fallbackVersion);
