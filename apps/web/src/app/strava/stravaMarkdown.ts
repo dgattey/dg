@@ -42,8 +42,20 @@ const outingLink = (outing: StravaLogEntry) => `[${outing.name}](${outing.url})`
 
 const day = (outing: StravaLogEntry) => dayFormatter.format(new Date(outing.startDate));
 
+const yearSpan = ({ years }: StravaBike) => {
+  const first = years.at(0)?.year;
+  const last = years.at(-1)?.year;
+  return first === last ? `in ${first}` : `from ${first} to ${last}`;
+};
+
 const bikeLine = (bike: StravaBike) =>
-  `- ${bike.name} (bike): ${miles(bike.odometerMeters)} on the odometer, ${bike.rides.toLocaleString('en-US')} ${bike.rides === 1 ? 'ride' : 'rides'} ${bike.firstYear === bike.lastYear ? `in ${bike.firstYear}` : `from ${bike.firstYear} to ${bike.lastYear}`}`;
+  [
+    `- ${bike.name}: ${miles(bike.odometerMeters)} on the odometer`,
+    `${feet(bike.elevationGainMeters)} climbed`,
+    `${Math.round(bike.movingTimeSeconds / 3600).toLocaleString('en-US')} hours in the saddle`,
+    `${bike.rides.toLocaleString('en-US')} ${bike.rides === 1 ? 'ride' : 'rides'} ${yearSpan(bike)}`,
+    `longest ride ${miles(bike.longest.distanceMeters)}, [${bike.longest.name}](${bike.longest.url}) on ${dayFormatter.format(new Date(bike.longest.startDate))}`,
+  ].join(', ');
 
 /**
  * Markdown representation of the Strava atlas — kept next to the page.

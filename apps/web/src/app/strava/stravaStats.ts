@@ -2,7 +2,7 @@ import type { StravaLogEntry, StravaYearTotals } from '@dg/content-models/strava
 
 const MONTHS_PER_YEAR = 12;
 
-export type OutingTotals = Omit<StravaYearTotals, 'year'>;
+export type OutingTotals = Omit<StravaYearTotals, 'year'> & { movingTimeSeconds: number };
 
 /** Years and months are UTC calendar buckets of `startDate`, matching the stored history. */
 export const yearOf = (outing: Pick<StravaLogEntry, 'startDate'>) =>
@@ -14,6 +14,7 @@ const monthOf = (outing: Pick<StravaLogEntry, 'startDate'>) =>
 export const totalsOf = (outings: ReadonlyArray<StravaLogEntry>): OutingTotals => ({
   distanceMeters: outings.reduce((sum, outing) => sum + outing.distanceMeters, 0),
   elevationGainMeters: outings.reduce((sum, outing) => sum + outing.elevationGainMeters, 0),
+  movingTimeSeconds: outings.reduce((sum, outing) => sum + outing.movingTimeSeconds, 0),
   outings: outings.length,
 });
 

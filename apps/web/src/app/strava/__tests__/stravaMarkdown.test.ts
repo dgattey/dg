@@ -34,12 +34,22 @@ const hike = outing({
 const history: StravaHistory = {
   bikes: [
     {
-      firstYear: 2023,
+      elevationGainMeters: 125_578,
       id: 'b1',
-      lastYear: 2026,
+      longest: {
+        distanceMeters: 189_907,
+        name: 'Marshall Wall Sunday',
+        startDate: '2025-05-18T16:00:00.000Z',
+        url: 'https://www.strava.com/activities/9',
+      },
+      movingTimeSeconds: 1_368_000,
       name: 'Cruz',
       odometerMeters: 7_828_686,
       rides: 399,
+      years: [
+        { distanceMeters: 2_000_000, year: 2023 },
+        { distanceMeters: 5_828_686, year: 2026 },
+      ],
     },
   ],
   latest: { ...latest, description: null },
@@ -75,7 +85,7 @@ describe('getStravaMarkdown', () => {
       '## Longest rides\n\n- [Hawk Hill loop](https://www.strava.com/activities/1) — 10 miles, 1,000 feet climbed, Oct 20, 2026',
     );
     expect(markdown).toContain(
-      '## Bike odometers\n\n- Cruz (bike): 4,864.5 miles on the odometer, 399 rides from 2023 to 2026',
+      '## Bike odometers\n\n- Cruz: 4,864.5 miles on the odometer, 412,001 feet climbed, 380 hours in the saddle, 399 rides from 2023 to 2026, longest ride 118 miles, [Marshall Wall Sunday](https://www.strava.com/activities/9) on May 18, 2025',
     );
     expect(markdown).toContain('[Reading](/reading.md)');
     expect(markdown).not.toContain('[Big map](/strava.md)');

@@ -59,20 +59,43 @@ const century = outing(4, {
 const full: StravaHistory = {
   bikes: [
     {
-      firstYear: 2023,
+      elevationGainMeters: 125_578,
       id: 'b1',
-      lastYear: 2026,
+      longest: {
+        distanceMeters: 190_000,
+        name: 'Oysters and garlic bread',
+        startDate: '2024-05-19T16:00:00Z',
+        url: 'https://www.strava.com/activities/40',
+      },
+      movingTimeSeconds: 1_368_000,
       name: 'Cruz',
       odometerMeters: 9_086_356,
       rides: 399,
+      years: [
+        { distanceMeters: 2_000_000, year: 2023 },
+        { distanceMeters: 3_000_000, year: 2024 },
+        { distanceMeters: 2_500_000, year: 2025 },
+        { distanceMeters: 1_586_356, year: 2026 },
+      ],
     },
     {
-      firstYear: 2024,
+      elevationGainMeters: 75_590,
       id: 'b2',
-      lastYear: 2026,
+      longest: {
+        distanceMeters: 180_000,
+        name: 'Marshall Wall Sunday',
+        startDate: '2025-05-18T16:00:00Z',
+        url: 'https://www.strava.com/activities/41',
+      },
+      movingTimeSeconds: 774_000,
       name: 'Prince',
       odometerMeters: 5_333_366,
       rides: 100,
+      years: [
+        { distanceMeters: 1_500_000, year: 2024 },
+        { distanceMeters: 2_500_000, year: 2025 },
+        { distanceMeters: 1_333_366, year: 2026 },
+      ],
     },
   ],
   latest,
@@ -103,13 +126,10 @@ const renderSections = (history: StravaHistory) =>
     </ServerTimeProvider>,
   );
 
-/** The headline totals are the page's only description list. */
-const tallyFigures = () =>
-  Object.fromEntries(
-    screen
-      .getAllByRole('term')
-      .map((term) => [term.textContent, term.nextElementSibling?.textContent]),
-  );
+const headlineTotals = () =>
+  within(screen.getByRole('list', { name: /^Totals/ }))
+    .getAllByRole('listitem')
+    .map((cut) => cut.textContent);
 
 const listNames = (heading: string) =>
   within(screen.getByRole('heading', { name: heading }).parentElement as HTMLElement)
@@ -186,11 +206,19 @@ describe('StravaHistorySections', () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     renderSections(full);
 
-    expect(tallyFigures()).toEqual({ 'Feet climbed': '7.02k', Miles: '107', Outings: '4' });
+    expect(headlineTotals()).toEqual([
+      'Every sport · All time107miles',
+      '7.02kft climbed≈ 24% of Everest',
+      '4outings9 hrs moving',
+    ]);
     expect(listNames('Longest rides')).toEqual(['Marin century', 'Presidio loop']);
 
     await user.click(screen.getByRole('button', { name: 'Runs' }));
-    expect(tallyFigures()).toEqual({ 'Feet climbed': '394', Miles: '10.0', Outing: '1' });
+    expect(headlineTotals()).toEqual([
+      'Runs · All time10.0miles',
+      '394ft climbed≈ 1% of Everest',
+      '1outing1 hr moving',
+    ]);
     expect(listNames('Recent outings')).toEqual(['Lake Merritt run']);
     expect(listNames('Longest runs')).toEqual(['Lake Merritt run']);
     expect(screen.getByText('1 route')).toBeInTheDocument();
@@ -206,7 +234,12 @@ describe('StravaHistorySections', () => {
       'aria-pressed',
       'false',
     );
-    expect(tallyFigures()).toEqual({ 'Feet climbed': '4.59k', Miles: '50.0', Outing: '1' });
+    expect(screen.getByRole('list', { name: 'Totals, Every sport · 2025' })).toBeInTheDocument();
+    expect(headlineTotals()).toEqual([
+      'Every sport · 202550.0miles',
+      '4.59kft climbed≈ 16% of Everest',
+      '1outing6 hrs moving',
+    ]);
     expect(listNames('Longest rides')).toEqual(['Nothing here for these filters']);
     expect(screen.getAllByText('Longest outing')).toHaveLength(1);
     expect(
@@ -216,16 +249,29 @@ describe('StravaHistorySections', () => {
     ).toBe(true);
   });
 
-  it('labels each bike odometer so the names read as bikes', () => {
+  it('gives each bike its odometer, climbing, saddle time, yearly miles, and longest ride', () => {
     renderSections(full);
 
     const bikes = screen.getByRole('heading', { name: 'Bike odometers' })
       .parentElement as HTMLElement;
-    const tickets = within(bikes).getAllByRole('listitem');
-    expect(tickets.map((ticket) => ticket.textContent)).toEqual([
-      'Cruz · bike5,646 mi399 rides · 2023–2026',
-      'Prince · bike3,314 mi100 rides · 2024–2026',
-    ]);
+    const [cruz, prince] = within(bikes).getAllByRole('listitem') as [HTMLElement, HTMLElement];
+
+    expect(cruz).toHaveTextContent(
+      /^Cruz2023–20265,646mi412k ftclimbed380 hrsin the saddle399rides.*Longest · 118 mi · May 19, 2024Oysters and garlic bread$/,
+    );
+    expect(prince).toHaveTextContent(
+      /^Prince2024–20263,314mi248k ftclimbed215 hrsin the saddle100rides.*Longest · 112 mi · May 18, 2025Marshall Wall Sunday$/,
+    );
+    expect(bikes.querySelector('ul')?.textContent).not.toMatch(/bike/i);
+    expect(
+      within(cruz).getByRole('img', {
+        name: 'Miles by year. 2023: 1,243 mi, 2024: 1,864 mi, 2025: 1,553 mi, 2026: 986 mi',
+      }),
+    ).toBeInTheDocument();
+    expect(within(prince).getByRole('link')).toHaveAttribute(
+      'href',
+      'https://www.strava.com/activities/41',
+    );
   });
 
   it('keeps its footprint for a sparse history without inventing numbers', () => {

@@ -4,14 +4,20 @@ import type { StravaBike } from '@dg/content-models/strava/StravaHistory';
 import { RouteAtlasMap } from '@dg/maps/src/RouteAtlasMap';
 import type { GeoBounds } from '@dg/maps/src/routeFrame';
 import type { TileSource } from '@dg/maps/src/tileSource';
-import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
+import { Scallop, Stub } from '../music/stats/StatsShapes';
 import { BikeOdometers } from './BikeOdometers';
 import { ClimbingFlower } from './ClimbingFlower';
 import { BiggestClimbs, LongestOutings, RecentOutings } from './OutingLog';
 import { RoutePolaroid } from './RoutePolaroid';
 import { useFilteredOutings } from './StravaFilters';
-import { formatCompactFeet, formatCount, formatMiles } from './stravaFormat';
+import {
+  formatCompactFeet,
+  formatCount,
+  formatEverests,
+  formatHours,
+  formatMiles,
+} from './stravaFormat';
 import { SPORT_DETAILS, toMapRoutes } from './stravaSports';
 import {
   biggestClimbs,
@@ -25,36 +31,42 @@ import { YearlyMiles } from './YearlyMiles';
 const LISTED_OUTINGS = 6;
 const LONGEST_ROWS = 8;
 
-/** Miles, feet, and outings for whatever the filters pick, at the top of the field notes. */
+/**
+ * Miles, feet, and outings for whatever the filters pick, cut as a ticket, a
+ * seal, and a stamp at the top of the field notes.
+ */
 export function HeadlineTotals() {
   const { outings, sport, spanLabel } = useFilteredOutings();
   const totals = totalsOf(outings);
+  const scope = `${sport === 'all' ? 'Every sport' : SPORT_DETAILS[sport].filter} · ${spanLabel}`;
   return (
-    <PaperCard
-      className="strava__tally"
-      edge="soft-b"
-      innerClassName="strava__tallyInner"
-      tiltDeg={-1.2}
-    >
-      <span className="strava__tallyHead">
-        <span>{sport === 'all' ? 'Every sport' : SPORT_DETAILS[sport].filter}</span>
-        <span>{spanLabel}</span>
-      </span>
-      <dl className="strava__tallyFigures">
-        <div className="strava__tallyFigure">
-          <dt>Miles</dt>
-          <dd>{formatMiles(totals.distanceMeters)}</dd>
-        </div>
-        <div className="strava__tallyFigure">
-          <dt>Feet climbed</dt>
-          <dd>{formatCompactFeet(totals.elevationGainMeters)}</dd>
-        </div>
-        <div className="strava__tallyFigure">
-          <dt>{totals.outings === 1 ? 'Outing' : 'Outings'}</dt>
-          <dd>{formatCount(totals.outings)}</dd>
-        </div>
-      </dl>
-    </PaperCard>
+    <ul aria-label={`Totals, ${scope}`} className="strava__totals">
+      <li className="strava__totalMiles">
+        <Stub kind="ticket" tiltDeg={-1.5} tone="ochre">
+          <span className="strava__totalScope">{scope}</span>
+          <span className="strava__totalFigure">
+            <span className="strava__totalNumber">{formatMiles(totals.distanceMeters)}</span>
+            <span className="strava__totalUnit">miles</span>
+          </span>
+        </Stub>
+      </li>
+      <li className="strava__totalClimb">
+        <Scallop tiltDeg={-4} tone="cobalt">
+          <span className="strava__totalNumber">
+            {formatCompactFeet(totals.elevationGainMeters)}
+          </span>
+          <span className="strava__totalUnit">ft climbed</span>
+          <span className="strava__totalAside">{formatEverests(totals.elevationGainMeters)}</span>
+        </Scallop>
+      </li>
+      <li className="strava__totalOutings">
+        <Stub kind="stamp" tiltDeg={1.2} tone="vermilion">
+          <span className="strava__totalNumber">{formatCount(totals.outings)}</span>
+          <span className="strava__totalUnit">{totals.outings === 1 ? 'outing' : 'outings'}</span>
+          <span className="strava__totalAside">{formatHours(totals.movingTimeSeconds)} moving</span>
+        </Stub>
+      </li>
+    </ul>
   );
 }
 

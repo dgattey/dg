@@ -7,12 +7,7 @@ export function StravaHistorySkeleton() {
     <div aria-busy="true" aria-label="Loading outings" className="strava__sections" role="status">
       <div className="strava__atlas">
         <div className="strava__field">
-          <PaperCard
-            className="strava__tally"
-            edge="soft-b"
-            innerClassName="strava__tallyInner strava__tallyInner--blank"
-            tiltDeg={-1.2}
-          />
+          <div className="strava__totals strava__totals--blank" />
           <PaperCard
             className="strava__recentPrint"
             edge="quad-a"

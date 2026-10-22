@@ -344,6 +344,6 @@ export const STRAVA_BACKDROP = defineBackdrop(1250, 3, [
       ['strava-fern', 'fern', 'leaf', 260, -20, -9, 48, 'desktop', 0],
       ['strava-trefoil', 'trefoil', 'ochre', 120, -8, 96, 82, 'all', 1],
     ],
-    sheets: [['strava-gingham', 'torn', 'gingham', ['rose', 'cream'], -4, 18, 22, 220, -6, 'all']],
+    sheets: [['strava-gingham', 'torn', 'gingham', ['rose', 'cream'], -4, 25, 22, 220, -6, 'all']],
   },
 ]);

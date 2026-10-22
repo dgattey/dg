@@ -14,11 +14,12 @@
   display: grid;
   grid-row: 1;
   grid-column: 1 / 7;
-  gap: 16px;
+  gap: 20px;
   justify-items: start;
 }
 .strava__title.cutHeading {
   grid-auto-flow: column;
+  padding-bottom: 0.16em;
 }
 .strava__title .cutIndentedWord {
   margin-left: 0.28em;
@@ -106,9 +107,6 @@
   overflow: clip;
   border-radius: var(--print-radius);
 }
-.strava__tallyInner--blank {
-  min-height: 118px;
-}
 .strava__atlasBlank,
 .strava__printBlank {
   background: color-mix(in oklab, var(--cerulean) 34%, var(--cream));
@@ -118,48 +116,75 @@
   bottom: 36px;
 }
 
-.strava__tally .strava__tallyInner {
+.strava__totals {
   display: grid;
-  gap: 14px;
-  padding: 18px 22px 20px;
-}
-.strava__tallyHead {
-  display: flex;
-  gap: 12px;
-  justify-content: space-between;
-  font-family: var(--display);
-  font-size: var(--type-body);
-  font-weight: 700;
-  color: var(--soft);
-}
-.strava__tallyFigures {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, auto));
-  gap: 12px;
-  justify-content: space-between;
+  grid-template-areas:
+    "miles miles"
+    "climb outings";
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px 14px;
+  align-items: center;
+  padding: 0;
   margin: 0;
+  list-style: none;
 }
-.strava__tallyFigure {
-  display: flex;
-  flex-direction: column-reverse;
-  gap: 2px;
-  min-width: 0;
+.strava__totals--blank {
+  min-height: 320px;
 }
-.strava__tallyFigure dt {
+.strava__totals .stats__cut {
+  width: 100%;
+}
+.strava__totalMiles {
+  grid-area: miles;
+}
+.strava__totalMiles .stats__ticket > .stats__face {
+  min-height: 0;
+  padding: 16px 24px 18px 40px;
+}
+.strava__totalClimb {
+  grid-area: climb;
+  justify-self: center;
+  width: min(100%, 188px);
+}
+.strava__totalOutings {
+  grid-area: outings;
+  translate: 0 14px;
+}
+.strava__totalOutings .stats__stamp > .stats__face {
+  justify-items: start;
+  padding: 14px 14px 16px;
+}
+.strava__totalScope,
+.strava__totalAside {
   font-family: var(--display);
-  font-size: var(--type-body);
-  font-weight: 600;
+  font-size: var(--type-caption);
+  font-weight: 700;
   line-height: 1.2;
   color: var(--soft);
 }
-.strava__tallyFigure dd {
-  margin: 0;
+.strava__totalFigure {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  align-items: baseline;
+}
+.strava__totalNumber,
+.strava__bikeMiles {
   font-family: var(--display);
-  font-size: calc(var(--type-h2) * 1.5);
+  font-size: var(--type-title-lg);
   font-weight: 800;
   font-variant-numeric: tabular-nums;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.strava__totalMiles .strava__totalNumber {
+  font-size: var(--type-display-md);
+}
+.strava__totalUnit {
+  font-family: var(--display);
+  font-size: var(--type-label);
+  font-weight: 700;
+  line-height: 1.15;
 }
 
 .strava__recentRoutes {
@@ -232,11 +257,9 @@
 .strava__distance {
   grid-column: span 8;
 }
-.strava__years {
-  grid-column: span 5;
-}
+.strava__years,
 .strava__bikes {
-  grid-column: span 3;
+  grid-column: span 4;
 }
 .strava__longest {
   justify-self: center;
@@ -538,17 +561,105 @@
 }
 .strava__bikeList {
   display: grid;
-  gap: 14px;
-  justify-items: start;
+  gap: 22px;
+  width: 100%;
   padding: 0;
   margin: 0;
   list-style: none;
 }
+.strava__bikeTicket {
+  width: 100%;
+}
 .strava__bikeTicket .stats__ticket > .stats__face {
   display: grid;
-  gap: 2px;
+  gap: 10px;
   min-height: 0;
-  padding: 12px 22px 13px 38px;
+  padding: 16px 24px 18px 40px;
+}
+.strava__bikeHead {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.strava__bikeName {
+  font-family: var(--display);
+  font-size: var(--type-title-md);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+.strava__bikeSpan,
+.strava__bikeStatLabel,
+.strava__bikeYearLabel,
+.strava__bikeLongestKey {
+  font-family: var(--display);
+  font-size: var(--type-caption);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--soft);
+}
+.strava__bikeStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, auto));
+  gap: 12px;
+  justify-content: space-between;
+  padding-top: 10px;
+  border-top: 2px dashed color-mix(in oklab, var(--on) 30%, transparent);
+}
+.strava__bikeStat {
+  display: grid;
+  gap: 2px;
+}
+.strava__bikeStatValue {
+  font-family: var(--display);
+  font-size: var(--type-label);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.strava__bikeYears {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  height: 64px;
+}
+.strava__bikeYear {
+  display: grid;
+  flex: 1 1 0;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 4px;
+  justify-items: center;
+  height: 100%;
+}
+.strava__bikeBar {
+  align-self: end;
+  width: 100%;
+  height: max(3px, calc(var(--bar) * 100%));
+  background: color-mix(in oklab, var(--on) 78%, var(--pc));
+  border-radius: 3px 3px 1px 1px;
+}
+.strava__bikeLongest {
+  display: grid;
+  gap: 2px;
+  color: inherit;
+  text-decoration: none;
+}
+.strava__bikeLongestName {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 700;
+  line-height: 1.25;
+}
+.strava__bikeLongest:hover .strava__bikeLongestName,
+.strava__bikeLongest:focus-visible .strava__bikeLongestName {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 @media (max-width: 1180px) {
@@ -565,7 +676,7 @@
   .strava__field {
     display: contents;
   }
-  .strava__tally,
+  .strava__totals,
   .strava__recentRoutes {
     position: relative;
     z-index: 3;
@@ -573,7 +684,7 @@
     justify-self: center;
     width: min(100%, 640px);
   }
-  .strava__tally {
+  .strava__totals {
     order: -2;
   }
   .strava__flowerCard,
@@ -592,8 +703,7 @@
     grid-column: 1 / -1;
   }
   .strava__bikeList {
-    display: flex;
-    flex-wrap: wrap;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
   }
 }
 
