@@ -31,11 +31,8 @@
   grid-area: sort;
   justify-self: end;
 }
-.music__albumsLayout :is(.music__albumGrid, .music__albumReserve, .music__gridSkeleton) {
+.music__albumsLayout :is(.music__albumGrid, .music__gridSkeleton) {
   grid-area: albums;
-}
-.music__albumReserve {
-  visibility: hidden;
 }
 .music__albumGrid,
 .music__gridSkeleton,

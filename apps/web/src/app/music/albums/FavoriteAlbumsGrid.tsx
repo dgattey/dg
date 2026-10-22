@@ -7,22 +7,12 @@ import { Typography } from '@dg/ui/core/Typography';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import type { ReactNode } from 'react';
-import {
-  Children,
-  Fragment,
-  Suspense,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-  useSyncExternalStore,
-} from 'react';
+import { Children, Fragment, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { loadAlbumDetail } from '../../../services/albumDetail.actions';
 import {
   type CollageCardTreatment,
   collageCardTreatment,
 } from '../../collage/collageCardTreatment';
-import { hasClientHydrated } from '../../layouts/clientHydrated';
 import { albumTileSlotSx } from '../albumTileGeometry';
 import { AlbumDetailBody } from './AlbumDetailBody';
 import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
@@ -30,7 +20,6 @@ import { AlbumWell } from './AlbumWell';
 import {
   type AlbumSortKey,
   COLLAGE_ALBUM_GRID_COLUMNS,
-  CollageAlbumReserveGrid,
   CollageSortControls,
 } from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
@@ -40,39 +29,6 @@ import {
   useOptimisticAlbumSelection,
   useUrlAlbumId,
 } from './useOptimisticAlbumSelection';
-
-const subscribeToNothing = () => () => {};
-const serverWasNotHydrated = () => false;
-
-function viewTransitionPseudoElement(effect: AnimationEffect | null) {
-  if (!effect || !('pseudoElement' in effect)) {
-    return null;
-  }
-  const pseudo = effect.pseudoElement;
-  return typeof pseudo === 'string' ? pseudo : null;
-}
-
-function waitForViewTransitionAnimations() {
-  const listed = typeof document.getAnimations === 'function' ? document.getAnimations() : [];
-  const animations = listed.filter((animation) =>
-    Boolean(viewTransitionPseudoElement(animation.effect)?.startsWith('::view-transition')),
-  );
-  if (animations.length === 0) {
-    return Promise.resolve();
-  }
-  return Promise.all(animations.map((animation) => animation.finished.catch(() => undefined)));
-}
-
-function afterNextPaint() {
-  if (typeof requestAnimationFrame !== 'function') {
-    return Promise.resolve();
-  }
-  return new Promise<void>((resolve) => {
-    requestAnimationFrame(() => {
-      requestAnimationFrame(() => resolve());
-    });
-  });
-}
 
 const COLLAGE_FIRST_SCREEN_CELLS = COLLAGE_ALBUM_GRID_COLUMNS.xs * 2;
 
@@ -193,26 +149,6 @@ type Props = {
 };
 
 export function FavoriteAlbumsGrid({ albums, children }: Props) {
-  const wasClientHydrated = useSyncExternalStore(
-    subscribeToNothing,
-    hasClientHydrated,
-    serverWasNotHydrated,
-  );
-  const [showGrid, setShowGrid] = useState(!wasClientHydrated);
-  useEffect(() => {
-    let cancelled = false;
-    void waitForViewTransitionAnimations()
-      .then(afterNextPaint)
-      .then(() => {
-        if (!cancelled) {
-          setShowGrid(true);
-        }
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
   const { onAlbumNavigationCapture, pending, selectedAlbumId } = useOptimisticAlbumSelection();
   const [sortKey, setSortKey] = useState<AlbumSortKey>('added');
   const itemRefs = useRef(new Map<string, HTMLElement>());
@@ -251,15 +187,6 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
       );
     }
   });
-
-  if (!showGrid) {
-    return (
-      <>
-        <CollageSortControls onSortChange={handleSortChange} sortKey={sortKey} />
-        <CollageAlbumReserveGrid albums={albums} />
-      </>
-    );
-  }
 
   const albumCards = albums.map(
     (album, index): AlbumCard => ({

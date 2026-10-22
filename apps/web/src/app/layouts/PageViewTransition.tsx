@@ -5,7 +5,6 @@ import { pageViewTransitionProps } from '@dg/ui/core/transitions/pageTransitions
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { useLayoutEffect, ViewTransition } from 'react';
-import { markClientHydrated } from './clientHydrated';
 
 /**
  * Gives each route its own view transition boundary. Keying by pathname is
@@ -17,7 +16,6 @@ export function PageViewTransition({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useLayoutEffect(() => {
-    markClientHydrated();
     const scrollY = takePageOrigin(pathname);
     if (scrollY !== null) {
       window.scrollTo({ behavior: 'instant', top: scrollY });

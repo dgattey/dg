@@ -1,9 +1,4 @@
 /*
- * A destination opened from the footer music control rises over the page it was
- * opened from. The page it covers dims in place and stays underneath; the
- * arriving page slides without ever going translucent. Nothing cross-fades two
- * full screens, so no frame shows both layouts at once.
- *
  * Durations and easings come from :root vars set by getTimingCssVars(). Page
  * motion is short and front-loaded: most of the travel lands in the first
  * frames, so the arriving page answers the click and the rest is settle.
@@ -24,6 +19,27 @@
 }
 
 ::view-transition-new(root) {
+  opacity: 1;
+  animation: none;
+}
+
+/*
+ * The sticky header lives in the root layout, so both sides of a navigation
+ * hold the same chrome. Lifting it above the page groups keeps page backdrops
+ * from sweeping over the nav controls during the transition.
+ */
+::view-transition-group(site-header) {
+  z-index: 100;
+  animation-duration: var(--timing-medium);
+  animation-timing-function: var(--easing-snappy);
+}
+
+::view-transition-old(site-header) {
+  opacity: 0;
+  animation: none;
+}
+
+::view-transition-new(site-header) {
   opacity: 1;
   animation: none;
 }
@@ -160,63 +176,52 @@
 }
 
 /*
- * Translation only. An opacity fade on the arriving page would let the page
- * underneath show through it mid-flight, which is the double exposure this
- * motion exists to avoid. A percentage resolves against the snapshot's own
- * height, and these pages run as long as their content, so the travel is
- * capped to a slice of the viewport: an uncapped page-height slide reads as a
- * scroll rather than a rise.
+ * Collage pages share `.collageSheet`'s background, so the page wrapper is
+ * transparent between cards. Pairing travel with an opacity fade keeps the
+ * arriving layout from popping in at full opacity on frame 0 and the departing
+ * layout from snapping off on the last frame.
  */
 
 @keyframes vt-page-rise {
   from {
-    transform: translateY(min(100%, 30dvh));
+    opacity: 0;
+    transform: translateY(24px);
   }
   to {
+    opacity: 1;
     transform: none;
   }
 }
 
 @keyframes vt-page-fall {
   from {
+    opacity: 1;
     transform: none;
   }
   to {
-    transform: translateY(min(100%, 30dvh));
+    opacity: 0;
+    transform: translateY(24px);
   }
 }
 
-/*
- * The covered page drops to a dim hold for most of the transition so it reads
- * as one scene with the arriving page, then clears in the tail once that page
- * has landed. Going straight to transparent would blank the viewport around it;
- * stopping at the hold would pop when the snapshot is discarded.
- *
- * No `mix-blend-mode: plus-lighter`. Adding two layers is what produced the
- * double-exposed frames these keyframes replace. Pages are as tall as their
- * content, so this dims in place: scaling would pivot around a mid-document
- * origin that is usually off screen.
- */
 @keyframes vt-page-recede {
-  0% {
+  from {
     opacity: 1;
+    transform: none;
   }
-  55% {
-    opacity: 0.3;
-  }
-  100% {
+  to {
     opacity: 0;
+    transform: translateY(-12px);
   }
 }
 
 @keyframes vt-page-reveal {
-  0% {
+  from {
     opacity: 0;
+    transform: translateY(-12px);
   }
-  45% {
-    opacity: 0.3;
-  }
-  100% {
+  to {
     opacity: 1;
+    transform: none;
   }
 }
