@@ -15,7 +15,6 @@ type AlbumArtWithNotesProps = {
   isPlaying: boolean;
   noteColor?: string;
   notesVariant?: ComponentProps<typeof MusicNotes>['variant'];
-  shouldAnimate?: boolean;
   wrapperSx: SxObject;
 };
 
@@ -43,19 +42,17 @@ export function AlbumArtWithNotes({
   isPlaying,
   noteColor,
   notesVariant = 'collage',
-  shouldAnimate = true,
   wrapperSx,
 }: AlbumArtWithNotesProps) {
-  const animate = isPlaying && shouldAnimate;
   const bounceRef = useWaveformBounce<HTMLDivElement>({
     intensity: bounceIntensity,
-    isPlaying: animate,
+    isPlaying,
   });
 
   return (
     <Box sx={{ overflow: 'visible', position: 'relative', ...wrapperSx }}>
       <Box aria-hidden="true" sx={notesLayerSx}>
-        <MusicNotes isPlaying={animate} noteColor={noteColor} variant={notesVariant} />
+        <MusicNotes isPlaying={isPlaying} noteColor={noteColor} variant={notesVariant} />
       </Box>
       <Box ref={bounceRef} sx={bounceWrapperSx}>
         {children}

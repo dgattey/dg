@@ -1,5 +1,5 @@
 import type { Track } from '@dg/content-models/spotify/Track';
-import { act, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import { SpotifyHeaderCard } from '../SpotifyHeaderCard';
 
 let mockPathname = '/';
@@ -8,9 +8,9 @@ jest.mock('next/navigation', () => ({
   usePathname: () => mockPathname,
 }));
 
-jest.mock('../TrackListing', () => ({
-  TrackListing: ({ shouldAnimate }: { shouldAnimate: boolean }) => (
-    <div data-animating={String(shouldAnimate)} data-testid="compact" />
+jest.mock('../MusicNotes', () => ({
+  MusicNotes: ({ isPlaying }: { isPlaying: boolean }) => (
+    <div data-playing={String(isPlaying)} data-testid="notes" />
   ),
 }));
 
@@ -34,59 +34,18 @@ const TRACK: Track = {
   uri: 'spotify:track:track',
 };
 
-/** Reports an element in view while it's attached, the way a browser sees a sticky header. */
-class AttachedElementObserver {
-  static instances: Array<AttachedElementObserver> = [];
-  private readonly elements = new Set<Element>();
-
-  constructor(private readonly callback: IntersectionObserverCallback) {
-    AttachedElementObserver.instances.push(this);
-  }
-
-  observe(element: Element) {
-    this.elements.add(element);
-  }
-
-  disconnect() {
-    this.elements.clear();
-  }
-
-  report() {
-    const entries = [...this.elements].map(
-      (target) => ({ isIntersecting: target.isConnected, target }) as IntersectionObserverEntry,
-    );
-    if (entries.length) {
-      this.callback(entries, this as unknown as IntersectionObserver);
-    }
-  }
-}
-
-const reportIntersections = () =>
-  act(() => {
-    for (const observer of AttachedElementObserver.instances) {
-      observer.report();
-    }
-  });
-
-beforeEach(() => {
-  AttachedElementObserver.instances = [];
-  window.IntersectionObserver = AttachedElementObserver as unknown as typeof IntersectionObserver;
-});
-
 describe('SpotifyHeaderCard', () => {
   it.each([
     ['/music', '/reading'],
     ['/reading', '/music'],
-  ])('keeps animating a playing track after navigating from %s to %s', (from, to) => {
+  ])('keeps floating notes for a playing track after navigating from %s to %s', (from, to) => {
     mockPathname = from;
     const { rerender } = render(<SpotifyHeaderCard track={TRACK} />);
-    reportIntersections();
-    expect(screen.getByTestId('compact')).toHaveAttribute('data-animating', 'true');
+    expect(screen.getByTestId('notes')).toHaveAttribute('data-playing', 'true');
 
     mockPathname = to;
     rerender(<SpotifyHeaderCard track={TRACK} />);
-    reportIntersections();
 
-    expect(screen.getByTestId('compact')).toHaveAttribute('data-animating', 'true');
+    expect(screen.getByTestId('notes')).toHaveAttribute('data-playing', 'true');
   });
 });
