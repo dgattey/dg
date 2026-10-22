@@ -1,11 +1,16 @@
 import { fetchSideProjects } from '../fetchSideProjects';
 
 const request = jest.fn();
+const fetchAppSiteIcon = jest.fn();
 
 jest.mock('../contentfulClient', () => ({
   getContentfulClient: () => ({
     request,
   }),
+}));
+
+jest.mock('../../appSites/fetchAppSiteIcon', () => ({
+  fetchAppSiteIcon: (siteUrl: string) => fetchAppSiteIcon(siteUrl),
 }));
 
 const thumbnail = {
@@ -15,12 +20,21 @@ const thumbnail = {
   width: 80,
 };
 
+const liveMark = {
+  height: 256,
+  title: null,
+  url: 'https://saga.gattey.com/icon.png',
+  width: 256,
+};
+
 describe('fetchSideProjects', () => {
   beforeEach(() => {
     request.mockReset();
+    fetchAppSiteIcon.mockReset();
+    fetchAppSiteIcon.mockResolvedValue(null);
   });
 
-  it('returns newest-first flagged projects and drops extras beyond four', async () => {
+  it('returns newest-first flagged projects and drops extras beyond five', async () => {
     request.mockResolvedValue({
       projectCollection: {
         items: [
@@ -60,19 +74,30 @@ describe('fetchSideProjects', () => {
             creationDate: '2019-01-01T00:00:00.000Z',
             isSideProject: true,
             link: { url: 'https://example.com/fifth' },
-            summary: 'Should be ignored',
+            summary: 'Still inside the homepage max',
             thumbnail,
             title: 'Fifth',
+          },
+          {
+            creationDate: '2018-01-01T00:00:00.000Z',
+            isSideProject: true,
+            link: { url: 'https://example.com/sixth' },
+            summary: 'Older than the homepage max',
+            thumbnail,
+            title: 'Sixth',
           },
         ],
       },
     });
+    fetchAppSiteIcon.mockImplementation((siteUrl: string) =>
+      siteUrl === 'https://saga.gattey.com' ? liveMark : null,
+    );
 
     await expect(fetchSideProjects()).resolves.toEqual([
       {
         creationDate: '2026-10-15T00:00:00.000Z',
         description: 'Track books and reading progress',
-        mark: thumbnail,
+        mark: liveMark,
         title: 'Saga',
         url: 'https://saga.gattey.com',
       },
@@ -97,10 +122,17 @@ describe('fetchSideProjects', () => {
         title: 'WMM',
         url: 'https://wmm.gattey.com',
       },
+      {
+        creationDate: '2019-01-01T00:00:00.000Z',
+        description: 'Still inside the homepage max',
+        mark: thumbnail,
+        title: 'Fifth',
+        url: 'https://example.com/fifth',
+      },
     ]);
     expect(request).toHaveBeenCalledWith(
       expect.stringContaining(
-        'projectCollection(limit: 4, where: { isSideProject: true }, order: creationDate_DESC)',
+        'projectCollection(limit: 5, where: { isSideProject: true }, order: creationDate_DESC)',
       ),
     );
   });
