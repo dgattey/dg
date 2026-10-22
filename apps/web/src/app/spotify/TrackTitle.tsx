@@ -1,3 +1,4 @@
+import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Typography } from '@dg/ui/core/Typography';
 import { Link } from '@dg/ui/dependent/Link';
 import { truncated } from '@dg/ui/helpers/truncated';
@@ -43,8 +44,9 @@ function getTrackTitleSx(
 }
 
 /**
- * Shows a track title, optionally linked to the song on Spotify.
- * Styling is driven by the parent TrackListing's variant.
+ * Shows a track title, optionally linked to the song on Spotify, with the full
+ * title in a tooltip when it's cut off. Styling is driven by the parent
+ * TrackListing's variant.
  */
 export function TrackTitle({
   trackTitle,
@@ -56,17 +58,17 @@ export function TrackTitle({
   const sx = getTrackTitleSx(listingVariant, color, textShadow);
   const typographyVariant = TYPOGRAPHY_VARIANT[listingVariant];
 
-  if (!url) {
-    return (
-      <Typography sx={sx} variant={typographyVariant}>
-        {trackTitle}
-      </Typography>
-    );
-  }
-
   return (
-    <Link href={url} isExternal={true} sx={sx} title={trackTitle} variant={typographyVariant}>
-      {trackTitle}
-    </Link>
+    <Tooltip title={trackTitle} whenTruncated>
+      {url ? (
+        <Link href={url} isExternal={true} sx={sx} variant={typographyVariant}>
+          {trackTitle}
+        </Link>
+      ) : (
+        <Typography sx={sx} variant={typographyVariant}>
+          {trackTitle}
+        </Typography>
+      )}
+    </Tooltip>
   );
 }

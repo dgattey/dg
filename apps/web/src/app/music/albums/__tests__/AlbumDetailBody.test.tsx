@@ -92,13 +92,19 @@ describe('AlbumDetailBody', () => {
     expect(screen.getByText('2')).toBeInTheDocument();
   });
 
-  it('makes complete truncated track text available as native titles', () => {
+  it('puts complete truncated track text in tooltips', () => {
     render(<AlbumDetailBody album={album} />);
 
-    expect(
-      screen.getByTitle('Closer with a title that needs to truncate on narrow screens'),
-    ).toBeInTheDocument();
-    expect(screen.getByTitle('Guest, Another guest with a long name')).toBeInTheDocument();
+    const tooltips = screen
+      .getAllByRole('tooltip', { hidden: true })
+      .map((tooltip) => tooltip.textContent);
+    expect(tooltips).toEqual(
+      expect.arrayContaining([
+        'Primary Artist',
+        'Closer with a title that needs to truncate on narrow screens',
+        'Guest, Another guest with a long name',
+      ]),
+    );
   });
 
   it('summarizes the album without naming the label', () => {

@@ -27,6 +27,11 @@ export const PAPER_EDGES = [
 
 export type PaperEdge = (typeof PAPER_EDGES)[number];
 
+/** Edges cut along a polygon. Every other edge is four corner radii. */
+export const TORN_PAPER_EDGES = {
+  'torn-c': true,
+} as const satisfies Partial<Record<PaperEdge, true>>;
+
 export const PAPER_INK_TONES = {
   cerulean: true,
   chartreuse: true,

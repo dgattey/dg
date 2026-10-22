@@ -139,4 +139,69 @@ describe('Tooltip', () => {
 
     expect(tooltip.style.translate).toBe('-20px');
   });
+
+  describe('whenTruncated', () => {
+    const renderTruncatable = () => {
+      render(
+        <Tooltip title="Together (feat. Nikki Nair, Jessy Lanza & Prentiss)" whenTruncated>
+          <a href="/track" style={{ overflow: 'hidden' }}>
+            Together (feat. Nikki Nair, Jessy Lanza & Prentiss)
+          </a>
+        </Tooltip>,
+      );
+      const link = screen.getByRole('link');
+      const anchor = link.parentElement;
+      if (!anchor) {
+        throw new Error('Tooltip anchor not found');
+      }
+      return { anchor, link };
+    };
+
+    const overflowBy = (element: HTMLElement, pixels: number) => {
+      Object.defineProperty(element, 'clientWidth', { configurable: true, value: 200 });
+      Object.defineProperty(element, 'scrollWidth', { configurable: true, value: 200 + pixels });
+    };
+
+    it('stays shut when the text fits', async () => {
+      const user = userEvent.setup();
+      const { anchor, link } = renderTruncatable();
+      overflowBy(link, 1);
+
+      await user.hover(anchor);
+
+      expect(anchor).toHaveAttribute('data-tooltip-muted');
+      expect(rulesMatching(/\[data-tooltip-muted\]/).join()).toContain('display: none');
+    });
+
+    it('opens once the text is cut off, and again stops when it fits', async () => {
+      const user = userEvent.setup();
+      const { anchor, link } = renderTruncatable();
+      overflowBy(link, 40);
+
+      await user.hover(anchor);
+      expect(anchor).not.toHaveAttribute('data-tooltip-muted');
+
+      await user.unhover(anchor);
+      overflowBy(link, 0);
+      await user.hover(anchor);
+      expect(anchor).toHaveAttribute('data-tooltip-muted');
+    });
+
+    it('measures on keyboard focus too', async () => {
+      const user = userEvent.setup();
+      const { anchor, link } = renderTruncatable();
+      overflowBy(link, 40);
+
+      await user.tab();
+
+      expect(link).toHaveFocus();
+      expect(anchor).not.toHaveAttribute('data-tooltip-muted');
+    });
+
+    it('leaves the trigger undescribed, since it already holds the full text', () => {
+      const { link } = renderTruncatable();
+
+      expect(link).not.toHaveAttribute('aria-describedby');
+    });
+  });
 });

@@ -278,8 +278,8 @@
   padding: 12px 16px 14px;
   color: var(--ink-on-cream);
   background: var(--cream);
+  border-radius: var(--quad-b);
   filter: var(--dshadow);
-  clip-path: var(--quad-b);
 }
 .stats__runnerCaption .stats__meta {
   color: color-mix(in oklab, var(--ink-on-cream) 66%, var(--cream));

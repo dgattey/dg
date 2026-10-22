@@ -4,10 +4,9 @@
   outline: none;
 }
 .collageRoot .music__card:has(a:focus-visible) {
-  /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
   outline: 2px solid var(--ink);
   outline-offset: 3px;
-  border-radius: 14px;
+  border-radius: var(--edge-radius);
 }
 
 /* Every music page: title, then that page's content, on one grid. */
@@ -156,7 +155,7 @@
   line-height: 1;
   color: var(--cream);
   background: var(--vermilion);
-  clip-path: var(--quad-b);
+  border-radius: var(--quad-b);
   rotate: 6deg;
 }
 .music__history,
@@ -293,7 +292,7 @@ html:active-view-transition-type(album-open) .music__wellCard {
   width: 100%;
   overflow: hidden;
   line-height: 0;
-  clip-path: var(--quad-b);
+  border-radius: var(--quad-b);
 }
 .music__wellArtCard img {
   display: block;
@@ -329,16 +328,16 @@ html:active-view-transition-type(album-open) .music__wellCard {
   margin-top: 14px;
 }
 .music__wellArtists {
-  display: block;
-  width: 100%;
   min-width: 0;
-  overflow: hidden;
-  text-overflow: ellipsis;
   font-size: var(--type-h2);
   font-weight: 800;
   line-height: 1.15;
   color: inherit;
   white-space: nowrap;
+}
+.music__wellArtistsText {
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .music__wellFacts {
   display: grid;
@@ -363,7 +362,7 @@ html:active-view-transition-type(album-open) .music__wellCard {
   height: 10px;
   overflow: hidden;
   background-color: color-mix(in oklab, var(--on) 24%, var(--pc));
-  clip-path: var(--quad-c);
+  border-radius: var(--quad-c);
 }
 .music__wellPopularityFill {
   height: 100%;

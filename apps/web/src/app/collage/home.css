@@ -9,10 +9,9 @@
   outline: none;
 }
 .collageRoot .home__sideRowWrap:has(.home__sideRow:focus-visible) {
-  /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
   outline: 2px solid var(--ink);
   outline-offset: 3px;
-  border-radius: 14px;
+  border-radius: var(--edge-radius);
 }
 @media (max-width: 820px) {
   .collageRoot .collageGridStack {
@@ -108,14 +107,14 @@
   width: 100%;
 }
 .home__mapInner {
+  --inset: var(--mat);
   aspect-ratio: 2.5;
-  padding: var(--mat);
-  overflow: clip;
+  padding: var(--inset);
 }
 .home__mapInner > * {
   height: 100%;
   overflow: clip;
-  border-radius: var(--print-radius);
+  border-radius: var(--nested-radius);
 }
 .home__mapTag {
   bottom: -12px;
@@ -180,11 +179,14 @@
   content: "";
   background: var(--cream);
 }
+/* Each rim corner is its paper's corner plus the rim, so the cream band stays even. */
 .home__spotify .print__sleeve::before {
-  border-radius: 24px 20px 26px 22px;
+  border-radius: calc(var(--soft-a-tl) + var(--rim)) calc(var(--soft-a-tr) + var(--rim))
+    calc(var(--soft-a-br) + var(--rim)) calc(var(--soft-a-bl) + var(--rim));
 }
 .home__spotifyMeta::before {
-  border-radius: 16px 20px 17px 19px;
+  border-radius: calc(var(--edge-tl) + var(--rim)) calc(var(--edge-tr) + var(--rim))
+    calc(var(--edge-br) + var(--rim)) calc(var(--edge-bl) + var(--rim));
 }
 /*
  * A gatefold: the Bay of every route fanned out behind the latest print, its
@@ -211,11 +213,12 @@
   text-decoration: none;
 }
 .home__stravaAtlasMat {
-  padding: var(--mat);
+  --inset: var(--mat);
+  padding: var(--inset);
 }
 .home__stravaMap {
   overflow: clip;
-  border-radius: var(--print-radius);
+  border-radius: var(--nested-radius);
 }
 .home__stravaRoutes {
   top: -14px;
@@ -295,9 +298,13 @@
 .home__spotifyCard {
   position: relative;
   width: min(100%, 300px);
-  margin-top: -10px;
+  margin-top: 2px;
   isolation: isolate;
   rotate: -2deg;
+}
+.home__spotifyMetaPaper {
+  position: relative;
+  isolation: isolate;
 }
 .home__spotifyMetaInner {
   display: grid;
@@ -320,11 +327,10 @@
   position-try-fallbacks: none;
   align-self: unsafe end;
 }
-.home__spotifyMetaInner > :nth-child(2) {
-  font-size: var(--type-h2);
-}
-.home__spotifyMetaInner > :nth-child(3),
-.home__spotifyMetaInner > :nth-child(3) a {
+/* Title and artists, each wrapped in a truncation tooltip whose surface keeps its own size. */
+.home__spotifyMetaInner
+  > :is(:nth-child(2), :nth-child(3))
+  :is(a, [data-typography]):not([role="tooltip"]) {
   font-size: var(--type-h2);
 }
 
@@ -363,7 +369,8 @@
   width: 100%;
 }
 .home__framePad {
-  padding: var(--mat-feature);
+  --inset: var(--mat-feature);
+  padding: var(--inset);
 }
 .home__frameShot {
   --ar: 2.25;
@@ -371,7 +378,7 @@
   display: block;
   aspect-ratio: var(--ar);
   overflow: clip;
-  border-radius: var(--print-radius);
+  border-radius: var(--nested-radius);
 }
 .home__tagTopLeft {
   top: -12px;

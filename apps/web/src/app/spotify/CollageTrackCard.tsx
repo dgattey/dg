@@ -15,10 +15,8 @@ export const COLLAGE_TRACK_COLORS: Colors = {
   secondaryShadow: 'none',
 };
 
-const tornGradientSurfaceSx: SxObject = {
-  borderRadius: 'inherit',
-  clipPath: 'var(--clip, var(--quad-a))',
-  inset: '-1px',
+const gradientSurfaceSx: SxObject = {
+  inset: 0,
   zIndex: -1,
 };
 
@@ -38,10 +36,10 @@ export function CollageTrackCard({ track }: { track: Track }) {
         <PaperCard
           className="home__spotifyMeta"
           edge="quad-b"
-          innerClassName="paperInnerUnclipped"
+          innerClassName="home__spotifyMetaPaper"
           style={CARD_PAPER}
         >
-          <AlbumGradientBackdrop containerSx={tornGradientSurfaceSx} gradient={gradient} />
+          <AlbumGradientBackdrop containerSx={gradientSurfaceSx} gradient={gradient} />
           <div className="home__spotifyMetaInner">
             <TrackCardMeta colors={colors} service="Spotify" track={track} />
           </div>

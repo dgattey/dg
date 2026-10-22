@@ -49,4 +49,17 @@ describe('PortraitPrint', () => {
       ),
     ).toEqual(['portrait-monstera', 'portrait-philo']);
   });
+
+  /**
+   * The window is taller than wide, so a square photo covers it at the window's
+   * height. Asking for just the frame width would fetch too few pixels.
+   */
+  it('sizes the photo for how wide it renders when covering the window', () => {
+    render(<PortraitPrint image={{ ...image, height: 800, width: 800 }} linkedInLink={null} />);
+
+    expect(screen.getByRole('img', { name: 'Drew' })).toHaveAttribute(
+      'sizes',
+      '(max-width: 576px) 395px, (max-width: 768px) 395px, (max-width: 992px) 516px, (max-width: 1200px) 516px, 516px',
+    );
+  });
 });

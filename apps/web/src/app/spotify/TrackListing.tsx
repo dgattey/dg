@@ -59,7 +59,7 @@ const compactThumbnailOuterSx: SxObject = {
 };
 
 const compactAlbumCardSx: SxObject = {
-  borderRadius: 1,
+  borderRadius: 'var(--nested-radius)',
   boxShadow: 'var(--mui-extraShadows-card-main)',
   height: COMPACT_THUMBNAIL_SIZE,
   overflow: 'hidden',
