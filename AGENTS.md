@@ -33,6 +33,16 @@ This is `dg`, a single Next.js 16 app (`@dg/web`) in a pnpm + Turbo monorepo. Se
 - Test-DB migration deadlock: the initial migration opens a transaction but calls `createTable` on a fresh connection, and the test env forces `pool.max = 1`. Running *pending* migrations against the test DB therefore deadlocks (`SequelizeConnectionAcquireTimeoutError`). `turbo test`'s global setup only runs *pending* migrations, so make sure `DATABASE_URL_TEST` already has every migration applied before running tests — the reliable way is to migrate it once through the dev pool (point `DATABASE_URL` at the test DB and run `turbo migrate`, which uses the default multi-connection pool and does not deadlock).
 - `turbo test` runs the two DB-backed packages (`@dg/services`, `@dg/web`) in parallel; both connect to `DATABASE_URL_TEST`. This is fine once the test DB is already migrated.
 
+## Side projects
+
+Side projects are Contentful `project` entries with `isSideProject=true`. Each entry has a `link` to the app site and a `thumbnail`.
+
+Icons come live from `<app>.gattey.com` via `APP_SITE_ICON_PATHS`. That list is DylKit's generated `/icon.png`, then the legacy `/app-icon.png`. The Contentful thumbnail is the fallback.
+
+A new app needs only a Contentful project entry linking to its gattey.com site. An icon refresh shows up within the `contentful` cache life, about 15 minutes, or immediately after invalidating the `contentful` tag.
+
+If DylKit changes its icon URL, change `APP_SITE_ICON_PATHS`. Keep the Contentful title and summary in sync with the app site when the app's pitch changes.
+
 <!-- BEGIN:turborepo-agent-rules -->
 
 # This is NOT the Turborepo you know

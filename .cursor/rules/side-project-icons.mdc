@@ -1,0 +1,15 @@
+---
+description: Load homepage side-project icons from each app's gattey.com site
+globs: packages/services/appSites/**, packages/services/contentful/fetchSideProjects.ts, packages/content-models/contentful/renderables/sideProjects.ts, apps/web/src/app/home/GatteySitesCard*.tsx
+alwaysApply: false
+---
+
+# Side project icons
+
+Side projects are Contentful `project` entries with `isSideProject=true`. Each entry has a `link` to the app site and a `thumbnail`.
+
+Icons come live from `<app>.gattey.com` via `APP_SITE_ICON_PATHS`. That list is DylKit's generated `/icon.png`, then the legacy `/app-icon.png`. The Contentful thumbnail is the fallback.
+
+A new app needs only a Contentful project entry linking to its gattey.com site. An icon refresh shows up within the `contentful` cache life, about 15 minutes, or immediately after invalidating the `contentful` tag.
+
+If DylKit changes its icon URL, change `APP_SITE_ICON_PATHS`. Keep the Contentful title and summary in sync with the app site when the app's pitch changes.
