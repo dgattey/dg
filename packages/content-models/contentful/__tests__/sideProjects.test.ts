@@ -77,10 +77,17 @@ describe('side project renderables', () => {
     const selected = takeNewestSideProjects([
       {
         creationDate: '2019-01-01T00:00:00.000Z',
-        description: 'Dropped older project',
+        description: 'Still inside the homepage max',
         mark: thumbnail,
-        title: 'Dropped',
-        url: 'https://example.com/dropped',
+        title: 'Older',
+        url: 'https://example.com/older',
+      },
+      {
+        creationDate: '2018-01-01T00:00:00.000Z',
+        description: 'Older than the homepage max',
+        mark: thumbnail,
+        title: 'Ancient',
+        url: 'https://example.com/ancient',
       },
       {
         creationDate: '2026-10-15T00:00:00.000Z',
@@ -112,13 +119,14 @@ describe('side project renderables', () => {
       },
     ]);
 
-    expect(SIDE_PROJECTS_LIMIT).toBe(4);
-    expect(selected).toHaveLength(4);
+    expect(SIDE_PROJECTS_LIMIT).toBe(5);
+    expect(selected).toHaveLength(5);
     expect(selected.map((project) => project.title)).toEqual([
       'Saga',
       'Sconeos',
       'Lost Cities scorer',
       'WMM',
+      'Older',
     ]);
   });
 });
