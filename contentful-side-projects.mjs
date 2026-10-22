@@ -27,7 +27,8 @@ async function cma(path, init = {}) {
     ...init,
     headers: { ...headers, ...init.headers },
   });
-  const body = await response.json();
+  const text = await response.text();
+  const body = text ? JSON.parse(text) : {};
   if (!response.ok) throw new Error(`${init.method ?? 'GET'} ${path} -> ${response.status} ${body.message ?? ''}`);
   return body;
 }
@@ -68,8 +69,22 @@ async function inspect() {
 
 async function replaceAsset({ assetId, file, title, expectedVersion }) {
   const asset = await cma(`/assets/${assetId}`);
-  if (asset.sys.version !== expectedVersion) throw new Error(`asset ${assetId} is at version ${asset.sys.version}, expected ${expectedVersion}`);
   const bytes = readFileSync(file);
+  if (asset.sys.version !== expectedVersion) {
+    const draft = asset.fields.file?.[LOCALE];
+    const unpublishedDraft = asset.sys.version > (asset.sys.publishedVersion ?? 0) + 1;
+    if (!unpublishedDraft || (!draft?.uploadFrom && draft?.details?.size !== bytes.length)) {
+      throw new Error(`asset ${assetId} is at version ${asset.sys.version}, expected ${expectedVersion}`);
+    }
+    console.log(`asset ${assetId} resuming from draft v${asset.sys.version} (size ${draft?.details?.size ?? 'unprocessed'})`);
+    const published = draft.url ? await cma(`/assets/${assetId}/published`, {
+      headers: { 'X-Contentful-Version': String(asset.sys.version) },
+      method: 'PUT',
+    }) : await processAndPublishAsset(asset);
+    const result = published.fields.file[LOCALE];
+    console.log(`asset ${assetId} published v${published.sys.publishedVersion} ${result.fileName} ${result.details?.image?.width}x${result.details?.image?.height} ${result.details?.size}B https:${result.url}`);
+    return;
+  }
   const upload = await cma(`https://upload.contentful.com/spaces/${SPACE}/uploads`, {
     body: bytes,
     headers: { 'Content-Type': 'application/octet-stream' },
