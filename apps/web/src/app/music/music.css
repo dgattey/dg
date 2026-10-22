@@ -28,31 +28,9 @@
   width: min(100%, 1120px);
   margin-inline: auto;
 }
-.music__sort,
-.music__sortSkeleton {
-  position: relative;
-  z-index: 3;
-  display: flex;
-  flex-wrap: wrap;
+.music__sort {
   grid-area: sort;
-  gap: 10px;
-  justify-content: flex-end;
   justify-self: end;
-}
-.music__sortTag {
-  padding: 0;
-  font-size: var(--type-label);
-  line-height: 1.1;
-}
-.music__sortButton {
-  all: unset;
-  padding: 13px 20px 14px;
-  cursor: pointer;
-}
-/* `all: unset` on the button outranks a shared zero-specificity ring, so it keeps its own. */
-.music__sortButton:focus-visible {
-  outline: 2px solid var(--ink);
-  outline-offset: 4px;
 }
 .music__albumsLayout :is(.music__albumGrid, .music__albumReserve, .music__gridSkeleton) {
   grid-area: albums;
@@ -497,9 +475,7 @@ html:active-view-transition-type(album-open) .music__wellCard {
   .music__layout {
     padding-block-start: 16px;
   }
-  .music__sort,
-  .music__sortSkeleton {
-    justify-content: flex-start;
+  .music__sort {
     justify-self: start;
   }
   .music__card {

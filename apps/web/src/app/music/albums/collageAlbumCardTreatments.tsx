@@ -1,16 +1,12 @@
-import { invariant } from '@dg/shared-core/assertions/invariant';
-import { jsOnlyProps } from '@dg/ui/core/JsOnlyStyle';
 import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
 import type { CSSProperties, ReactNode } from 'react';
+import {
+  type CollageCardTreatment,
+  collageCardTreatment,
+} from '../../collage/collageCardTreatment';
 import { PaperCard } from '../../collage/PaperCard';
+import { type PaperPillOption, PaperPills } from '../../collage/PaperPills';
 import { PaperTag } from '../../collage/PaperTag';
-import type { PaperTone } from '../../collage/types';
-
-export type CollageAlbumCardTreatment = {
-  offsetPx: number;
-  tiltDeg: number;
-  tone: PaperTone;
-};
 
 type CardOffsetStyle = CSSProperties & {
   '--card-offset': string;
@@ -24,36 +20,9 @@ const COLLAGE_ALBUM_SORT_OPTIONS = [
   { key: 'album', label: 'Album', tiltDeg: 2 },
   { key: 'artist', label: 'Artist', tiltDeg: -1.5 },
   { key: 'released', label: 'Release date', tiltDeg: 2.5 },
-] as const;
+] as const satisfies ReadonlyArray<PaperPillOption<string>>;
 
-const TONES = [
-  'ultramarine',
-  'rose',
-  'vermilion',
-  'cream',
-  'olive',
-  'leaf',
-  'viridian',
-  'ochre',
-] as const satisfies ReadonlyArray<PaperTone>;
-
-const LAYOUTS = [
-  { offsetPx: 0, tiltDeg: -2 },
-  { offsetPx: 10, tiltDeg: 1.5 },
-  { offsetPx: 0, tiltDeg: -1 },
-  { offsetPx: 14, tiltDeg: 2.4 },
-  { offsetPx: 0, tiltDeg: -1.6 },
-  { offsetPx: 8, tiltDeg: 1 },
-] as const satisfies ReadonlyArray<Omit<CollageAlbumCardTreatment, 'tone'>>;
-
-export function collageAlbumCardTreatment(index: number): CollageAlbumCardTreatment {
-  const tone = TONES[index % TONES.length];
-  const layout = LAYOUTS[index % LAYOUTS.length];
-  invariant(tone && layout, 'Collage album card treatment registries must not be empty');
-  return { ...layout, tone };
-}
-
-function offsetStyle(treatment: CollageAlbumCardTreatment): CardOffsetStyle {
+function offsetStyle(treatment: CollageCardTreatment): CardOffsetStyle {
   return {
     '--card-offset': `${treatment.offsetPx}px`,
     '--card-offset-mobile': `${treatment.offsetPx === 0 ? 0 : 8}px`,
@@ -67,7 +36,7 @@ export function CollageAlbumPaper({
 }: {
   children: ReactNode;
   selected?: boolean;
-  treatment: CollageAlbumCardTreatment;
+  treatment: CollageCardTreatment;
 }) {
   return (
     <PaperCard
@@ -105,63 +74,24 @@ export function CollageSortControls({
   onSortChange,
   sortKey,
 }: {
-  onSortChange: (key: AlbumSortKey) => void;
+  onSortChange?: (key: AlbumSortKey) => void;
   sortKey: AlbumSortKey;
 }) {
   return (
-    <nav aria-label="Sort albums" className="music__sort" {...jsOnlyProps}>
-      {COLLAGE_ALBUM_SORT_OPTIONS.map((option) => {
-        const current = option.key === sortKey;
-        return (
-          <PaperTag
-            className="music__sortTag"
-            edge="quad-a"
-            key={option.key}
-            tiltDeg={option.tiltDeg}
-            tone={current ? 'black' : 'cream'}
-          >
-            <button
-              aria-pressed={current}
-              className="music__sortButton"
-              onClick={() => onSortChange(option.key)}
-              type="button"
-            >
-              {option.label}
-            </button>
-          </PaperTag>
-        );
-      })}
-    </nav>
-  );
-}
-
-export function CollageSortSkeleton() {
-  return (
-    <div
-      aria-label="Loading album sort controls"
-      className="music__sortSkeleton"
-      role="status"
-      {...jsOnlyProps}
-    >
-      {COLLAGE_ALBUM_SORT_OPTIONS.map((sort, index) => (
-        <PaperTag
-          className="music__sortTag"
-          edge="quad-a"
-          key={sort.key}
-          tiltDeg={sort.tiltDeg}
-          tone={index === 0 ? 'black' : 'cream'}
-        >
-          <span className="music__sortButton">{sort.label}</span>
-        </PaperTag>
-      ))}
-    </div>
+    <PaperPills
+      className="music__sort"
+      label={onSortChange ? 'Sort albums' : 'Loading album sort controls'}
+      onSelect={onSortChange}
+      options={COLLAGE_ALBUM_SORT_OPTIONS}
+      selected={sortKey}
+    />
   );
 }
 
 export function CollageAlbumSkeletonGrid({ tileCount }: { tileCount: number }) {
   const tiles = Array.from({ length: tileCount }, (_, index) => ({
     key: `album-${index}`,
-    treatment: collageAlbumCardTreatment(index),
+    treatment: collageCardTreatment(index),
   }));
   return (
     <div className="music__gridSkeleton">
@@ -182,7 +112,7 @@ export function CollageAlbumReserveGrid({
   return (
     <div aria-hidden="true" className="music__gridSkeleton music__albumReserve">
       {albums.map((album, index) => (
-        <CollageAlbumPaper key={album.id} treatment={collageAlbumCardTreatment(index)}>
+        <CollageAlbumPaper key={album.id} treatment={collageCardTreatment(index)}>
           <div className="music__art" />
           <span className="music__caption">
             <strong className="music__albumName">{album.name}</strong>
@@ -217,7 +147,7 @@ export function CollageHistorySkeleton() {
           <div className="music__historySkeletonGrid">
             {Array.from({ length: section.tiles }, (_, cardIndex) => ({
               key: `${section.label}-${cardIndex}`,
-              treatment: collageAlbumCardTreatment(cardIndex),
+              treatment: collageCardTreatment(cardIndex),
             })).map((tile) => (
               <CollageAlbumPaper key={tile.key} treatment={tile.treatment}>
                 <SkeletonFace />

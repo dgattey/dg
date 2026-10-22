@@ -18,6 +18,10 @@ import {
   useSyncExternalStore,
 } from 'react';
 import { loadAlbumDetail } from '../../../services/albumDetail.actions';
+import {
+  type CollageCardTreatment,
+  collageCardTreatment,
+} from '../../collage/collageCardTreatment';
 import { hasClientHydrated } from '../../layouts/clientHydrated';
 import { albumTileSlotSx } from '../albumTileGeometry';
 import { AlbumDetailBody } from './AlbumDetailBody';
@@ -26,10 +30,8 @@ import { AlbumWell } from './AlbumWell';
 import {
   type AlbumSortKey,
   COLLAGE_ALBUM_GRID_COLUMNS,
-  type CollageAlbumCardTreatment,
   CollageAlbumReserveGrid,
   CollageSortControls,
-  collageAlbumCardTreatment,
 } from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
 import {
@@ -107,7 +109,7 @@ function wellPlacementSx(selectedIndex: number, albumCount: number): SxObject {
 
 type AlbumCard = {
   album: PlaylistAlbum;
-  treatment: CollageAlbumCardTreatment;
+  treatment: CollageCardTreatment;
 };
 
 type SelectedAlbumWellProps = {
@@ -262,7 +264,7 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
   const albumCards = albums.map(
     (album, index): AlbumCard => ({
       album,
-      treatment: collageAlbumCardTreatment(index),
+      treatment: collageCardTreatment(index),
     }),
   );
   const sortedAlbumCards = albumCards.sort((a, b) => comparators[sortKey](a.album, b.album));
