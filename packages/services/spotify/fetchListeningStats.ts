@@ -134,7 +134,10 @@ type CachedAlbumArtist = MusicArtist & { MusicAlbumArtist: { position: number } 
  * Album display data from the Music* cache, then the favorite-albums shelf,
  * then Spotify (which also writes the album's tracks and durations through).
  */
-async function resolveAlbums(albumIds: Array<string>): Promise<Map<string, StatsAlbum>> {
+async function resolveAlbums(
+  albumIds: Array<string>,
+  favoriteAlbums: ReadonlyArray<InstanceType<typeof db.FavoriteAlbum>>,
+): Promise<Map<string, StatsAlbum>> {
   const albums = new Map<string, StatsAlbum>();
   const cached = await MusicAlbum.findAll({
     include: [{ model: MusicArtist, through: { attributes: ['position'] } }],
@@ -156,17 +159,19 @@ async function resolveAlbums(albumIds: Array<string>): Promise<Map<string, Stats
     }
   }
 
-  const shelved = await db.FavoriteAlbum.findAll({
-    where: { id: { [Op.in]: albumIds.filter((id) => !albums.has(id)) } },
-  });
-  for (const album of shelved) {
-    albums.set(album.id, {
-      artistNames: album.artistNames,
-      id: album.id,
-      imageUrl: album.imageUrl,
-      name: album.name,
-      url: album.url,
-    });
+  const shelvedById = new Map(favoriteAlbums.map((album) => [album.id, album]));
+  for (const id of albumIds) {
+    if (albums.has(id)) continue;
+    const album = shelvedById.get(id);
+    if (album) {
+      albums.set(album.id, {
+        artistNames: album.artistNames,
+        id: album.id,
+        imageUrl: album.imageUrl,
+        name: album.name,
+        url: album.url,
+      });
+    }
   }
 
   for (const id of albumIds.filter((albumId) => !albums.has(albumId))) {
@@ -208,6 +213,7 @@ export async function fetchListeningStats(): Promise<ListeningStats | null> {
     onRepeat,
     dayRepeats,
     depth,
+    favoriteAlbums,
   ] = await Promise.all([
     selectSummary(),
     selectArtistCount(),
@@ -222,18 +228,20 @@ export async function fetchListeningStats(): Promise<ListeningStats | null> {
     selectRepeats('week', ON_REPEAT_TRACKS),
     selectRepeats('day', DAY_REPEAT_TRACKS),
     selectArtistDepth(),
+    db.FavoriteAlbum.findAll(),
   ]);
 
   if (!summary?.firstPlayedAt || !summary.lastPlayedAt || summary.plays === 0) {
     return null;
   }
 
-  const shelfIds = new Set(
-    (await db.FavoriteAlbum.findAll({ attributes: ['id'] })).map((album) => album.id),
-  );
+  const shelfIds = new Set(favoriteAlbums.map((album) => album.id));
   const shownAlbums = topAlbumIds.slice(0, TOP_ALBUMS);
   const [albums, tracks, artistNames] = await Promise.all([
-    resolveAlbums([...new Set([...shownAlbums, ...sessions].map((row) => row.albumId))]),
+    resolveAlbums(
+      [...new Set([...shownAlbums, ...sessions].map((row) => row.albumId))],
+      favoriteAlbums,
+    ),
     resolveTrackDisplays([...onRepeat, ...dayRepeats].map((row) => row.trackId)),
     resolveArtistNames(depth.map((row) => row.artistId)),
   ]);

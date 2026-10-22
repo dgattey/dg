@@ -1,3 +1,4 @@
+import { connection } from 'next/server';
 import { Suspense } from 'react';
 import { getLastKnownSong, getLatestSong } from '../../services/spotify';
 import { CollageColorSchemeFieldset } from '../collage/CollageColorSchemeFieldset';
@@ -16,6 +17,7 @@ async function LastKnownSpotifyHeaderCard() {
 }
 
 async function LiveNowPlaying() {
+  await connection();
   const track = await getLatestSong();
   return track ? <PublishNowPlaying track={track} /> : null;
 }
