@@ -1,5 +1,10 @@
 import type { CSSProperties } from 'react';
-import { STICKER_ASPECT, STICKER_PALETTE_INKS } from '../layouts/logoMark';
+import {
+  STICKER_ASPECT,
+  STICKER_PALETTE_INKS,
+  STICKER_SHADOW_PAD,
+  STICKER_WIDTH,
+} from '../layouts/logoMark';
 import { StickerMark } from '../layouts/StickerMark';
 import { CUT_OUT_SHAPES, type CutOutShape } from './cutOutShapes';
 import { PAPER_PALETTE } from './paperPalette';
@@ -122,15 +127,17 @@ function CutOutSvg({ color, rotationDeg, shape, size, underprint, x, y }: CutOut
   );
 }
 
-/** The header logo's die-cut sticker. */
+/** The header logo's die-cut sticker. The negative margin keeps its shadow room out of the layout. */
 function Stamp({ rotationDeg, width }: { rotationDeg: number; width: number }) {
+  const pad = (STICKER_SHADOW_PAD * width) / STICKER_WIDTH;
   return (
     <StickerMark
-      height={Math.round(width / STICKER_ASPECT)}
+      height={Math.round(width / STICKER_ASPECT + 2 * pad)}
       inks={STICKER_PALETTE_INKS}
       label={null}
-      style={{ filter: LIFTED_SHADOW, transform: `rotate(${rotationDeg}deg)` }}
-      width={width}
+      shadow
+      style={{ margin: -pad, transform: `rotate(${rotationDeg}deg)` }}
+      width={Math.round(width + 2 * pad)}
     />
   );
 }

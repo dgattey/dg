@@ -36,14 +36,26 @@ export const STICKER_MAT_WIDTH = 80;
 
 const [markX = 0, markY = 0, markWidth = 1, markHeight = 1] = MARK_VIEW_BOX.split(' ').map(Number);
 
-export const STICKER_VIEW_BOX = [
-  markX - STICKER_MAT_WIDTH / 2,
-  markY - STICKER_MAT_WIDTH / 2,
-  markWidth + STICKER_MAT_WIDTH,
-  markHeight + STICKER_MAT_WIDTH,
-].join(' ');
+export const STICKER_WIDTH = markWidth + STICKER_MAT_WIDTH;
+export const STICKER_ASPECT = STICKER_WIDTH / (markHeight + STICKER_MAT_WIDTH);
 
-export const STICKER_ASPECT = (markWidth + STICKER_MAT_WIDTH) / (markHeight + STICKER_MAT_WIDTH);
+function stickerViewBox(pad: number) {
+  return [
+    markX - STICKER_MAT_WIDTH / 2 - pad,
+    markY - STICKER_MAT_WIDTH / 2 - pad,
+    STICKER_WIDTH + 2 * pad,
+    markHeight + STICKER_MAT_WIDTH + 2 * pad,
+  ].join(' ');
+}
+
+export const STICKER_VIEW_BOX = stickerViewBox(0);
+
+/**
+ * Room on every side for a shadow painted inside the SVG, in mark units. Satori
+ * clips a CSS drop shadow to the SVG's own box, so the shadow has to fit inside it.
+ */
+export const STICKER_SHADOW_PAD = 100;
+export const STICKER_SHADOW_VIEW_BOX = stickerViewBox(STICKER_SHADOW_PAD);
 
 export type StickerInks = Record<MarkPart | 'mat', string>;
 
