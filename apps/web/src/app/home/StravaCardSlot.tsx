@@ -1,9 +1,8 @@
 import 'server-only';
 
-import { getLatestActivity } from '../../services/strava';
+import { getStravaHistory } from '../../services/strava';
 import { StravaCard } from './StravaCard';
 
 export async function StravaCardSlot() {
-  const activity = await getLatestActivity();
-  return <StravaCard activity={activity} />;
+  return <StravaCard history={await getStravaHistory()} />;
 }

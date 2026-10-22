@@ -14,6 +14,8 @@ export const musicStatsRoute = '/music/stats' as const;
 
 export const readingRoute = '/reading' as const;
 
+export const stravaRoute = '/strava' as const;
+
 /** Query key naming the album expanded in place on the favorite albums page. */
 export const ALBUM_PARAM = 'album' as const;
 
@@ -86,6 +88,13 @@ export const markdownPages = [
     priority: 0.6,
     summary: 'Books read, star ratings, and notes by year',
     title: 'Reading',
+  },
+  {
+    changeFrequency: 'daily',
+    path: stravaRoute,
+    priority: 0.6,
+    summary: 'Routes, yearly miles, and recent outings from my Strava history',
+    title: 'Bay Area miles',
   },
 ] as const satisfies ReadonlyArray<MarkdownPageDefinition>;
 

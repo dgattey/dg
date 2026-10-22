@@ -1,0 +1,191 @@
+.bayMap {
+  --bay-water: light-dark(color-mix(in oklab, var(--cerulean) 64%, var(--cream)), #22356a);
+  --bay-shore: light-dark(color-mix(in oklab, var(--ultramarine) 70%, var(--cerulean)), #0f1c40);
+  --bay-land: light-dark(color-mix(in oklab, var(--ochre) 24%, var(--cream)), #3c4560);
+  --bay-blush: light-dark(var(--rose), #6b5a78);
+  --bay-rim: light-dark(color-mix(in oklab, var(--ochre) 60%, var(--vermilion)), #1a2240);
+  --bay-foot: light-dark(color-mix(in oklab, var(--olive) 46%, var(--cream)), #46563f);
+  --bay-slope: light-dark(color-mix(in oklab, var(--leaf) 50%, var(--ochre)), #4f6a45);
+  --bay-crest: light-dark(color-mix(in oklab, var(--ochre) 60%, var(--vermilion)), #8a6a3a);
+  --bay-park: light-dark(color-mix(in oklab, var(--leaf) 62%, var(--chartreuse)), #3f7a52);
+  --bay-lake: light-dark(color-mix(in oklab, var(--cerulean) 74%, var(--cream)), #2a4378);
+  --bay-ink: light-dark(#2a2c3a, #f3ecdc);
+  --bay-halo: light-dark(rgb(247 241 226 / 0.85), rgb(20 28 56 / 0.85));
+  --bay-sea: light-dark(color-mix(in oklab, var(--ultramarine) 80%, #000), #b9c9f0);
+  --bay-glow: light-dark(var(--ochre), #ffcf6a);
+  --bay-ride: light-dark(var(--vermilion), #ff9a5c);
+  --bay-run: light-dark(var(--cobalt), #8fb4ff);
+  --bay-hike: light-dark(var(--viridian), #8fe0b0);
+  --bay-other: light-dark(var(--rose), #f2a9b5);
+  --bay-route-width: 1.6px;
+  --bay-route-opacity: 0.48;
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.bayMap__water {
+  fill: var(--bay-water);
+}
+.bayMap__mottle {
+  opacity: 0.6;
+  fill: var(--cerulean);
+}
+.bayMap__pool {
+  opacity: 0.55;
+  fill: none;
+  stroke: var(--bay-shore);
+  stroke-width: var(--bay-pool);
+  stroke-linejoin: round;
+}
+.bayMap__land {
+  fill: var(--bay-land);
+}
+.bayMap__blush {
+  opacity: 0.32;
+  fill: var(--bay-blush);
+}
+.bayMap__hill--foot {
+  opacity: 0.85;
+  fill: var(--bay-foot);
+}
+.bayMap__hill--slope {
+  opacity: 0.6;
+  fill: var(--bay-slope);
+}
+.bayMap__hill--shoulder {
+  opacity: 0.45;
+  fill: var(--bay-slope);
+}
+.bayMap__hill--crest {
+  opacity: 0.4;
+  fill: var(--bay-crest);
+}
+.bayMap__park {
+  opacity: 0.85;
+  fill: var(--bay-park);
+}
+.bayMap__lake {
+  fill: var(--bay-lake);
+}
+.bayMap__rim {
+  opacity: 0.45;
+  fill: none;
+  stroke: var(--bay-rim);
+  stroke-width: 5px;
+}
+.bayMap__grain {
+  opacity: 0.35;
+  fill: #000;
+}
+.bayMap__shore {
+  opacity: 0.4;
+  fill: none;
+  stroke: var(--bay-shore);
+  stroke-width: 1.1px;
+}
+
+.bayMap__bridges path {
+  fill: none;
+  stroke-linecap: round;
+}
+.bayMap__bridgeHalo {
+  stroke: var(--bay-halo);
+  stroke-width: calc(var(--bay-bridge) + 3px);
+}
+.bayMap__bridge {
+  opacity: 0.75;
+  stroke: var(--bay-ink);
+  stroke-width: var(--bay-bridge);
+}
+.bayMap__goldenGate {
+  stroke: var(--vermilion);
+  stroke-width: var(--bay-bridge);
+}
+.bayMap__bridges .bayMap__tower {
+  fill: var(--vermilion);
+}
+
+.bayMap__route {
+  fill: none;
+  stroke: var(--bay-other);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.bayMap__route[data-sport="ride"] {
+  stroke: var(--bay-ride);
+}
+.bayMap__route[data-sport="run"] {
+  stroke: var(--bay-run);
+}
+.bayMap__route[data-sport="hike"] {
+  stroke: var(--bay-hike);
+}
+/* The glow is a shadow of the ink itself, so every route ships once. */
+.bayMap__ink {
+  mix-blend-mode: multiply;
+  filter: drop-shadow(0 0 2.4px color-mix(in oklab, var(--bay-glow) 70%, transparent));
+}
+.bayMap__ink .bayMap__route {
+  opacity: var(--bay-route-opacity);
+  stroke-width: var(--bay-route-width);
+}
+.bayMap--focused .bayMap__ink {
+  filter: none;
+}
+.bayMap--focused .bayMap__ink .bayMap__route {
+  opacity: 0.16;
+}
+html[data-color-scheme="dark"] .bayMap__ink {
+  mix-blend-mode: screen;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([data-color-scheme="light"]) .bayMap__ink {
+    mix-blend-mode: screen;
+  }
+}
+.bayMap__highlight path {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.bayMap__casing {
+  stroke: var(--cream);
+  stroke-width: 7.5px;
+}
+.bayMap__focus {
+  stroke: var(--vermilion);
+  stroke-width: 3.5px;
+}
+
+.bayMap__label text {
+  stroke-linejoin: round;
+  paint-order: stroke;
+}
+.bayMap__label--small text {
+  font-size: var(--type-body);
+}
+.bayMap__label--large text {
+  font-size: var(--type-label);
+}
+.bayMap__label--water text {
+  font-family: var(--body);
+  font-style: italic;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  fill: var(--bay-sea);
+}
+.bayMap__label--place text,
+.bayMap__label--peak text {
+  font-family: var(--display);
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  fill: var(--bay-ink);
+  stroke: var(--bay-halo);
+  stroke-width: 3.5px;
+}
+.bayMap__pip {
+  fill: var(--bay-ink);
+  stroke: var(--bay-halo);
+  stroke-width: 2px;
+}

@@ -77,6 +77,7 @@ describe('Webhook Route', () => {
         expect(response.status).toBe(200);
         expect(mockSyncWebhook).toHaveBeenCalledWith(body);
         expect(mockRevalidateTag).toHaveBeenCalledWith('latest-activity', 'max');
+        expect(mockRevalidateTag).toHaveBeenCalledWith('strava-history', 'max');
       });
 
       it('processes update event and returns 200', async () => {

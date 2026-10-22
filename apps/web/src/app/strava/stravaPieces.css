@@ -1,0 +1,75 @@
+/* Strava paper shared by /strava and the homepage card: route polaroids, sport chips, outing stats, and sticker labels. */
+
+.strava__polaroid {
+  position: relative;
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+.strava__polaroidInner {
+  display: grid;
+  gap: 4px;
+  padding: var(--mat) var(--mat) 14px;
+}
+.strava__print {
+  margin-bottom: 8px;
+  overflow: clip;
+  border-radius: var(--print-radius);
+}
+.strava__polaroidName {
+  padding-inline: 4px;
+  font-family: var(--display);
+  font-size: var(--type-h3);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.015em;
+}
+.strava__stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 14px;
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+  color: var(--soft);
+}
+.strava__polaroid .strava__stats {
+  padding-inline: 4px;
+}
+.strava__sport {
+  display: inline-flex;
+  padding: 3px 8px 4px;
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 800;
+  line-height: 1;
+  color: var(--on);
+  white-space: nowrap;
+  background: var(--pc);
+  border-radius: 7px 9px 6px 8px;
+}
+
+.strava__sealKey {
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 600;
+  line-height: 1.2;
+  color: var(--soft);
+}
+.strava__sealValue {
+  font-family: var(--display);
+  font-size: var(--type-h2);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.05;
+  letter-spacing: -0.02em;
+}
+.strava__sealWhen {
+  font-family: var(--display);
+  font-size: var(--type-label);
+  font-weight: 800;
+  line-height: 1.05;
+  letter-spacing: -0.01em;
+}
