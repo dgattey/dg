@@ -13,6 +13,18 @@ describe('stravaActivityApiSchema', () => {
 
     expect(safeParse(stravaActivityApiSchema, input).success).toBe(true);
   });
+
+  it('reads an empty coordinate pair from a GPS-less activity as null', () => {
+    const parsed = safeParse(stravaActivityApiSchema, {
+      end_latlng: [],
+      id: 123,
+      start_latlng: [37.77, -122.41],
+      type: 'VirtualRide',
+    });
+
+    expect(parsed.success && parsed.output.end_latlng).toBeNull();
+    expect(parsed.success && parsed.output.start_latlng).toEqual([37.77, -122.41]);
+  });
 });
 
 describe('stravaWebhookEventSchema', () => {

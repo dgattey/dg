@@ -127,6 +127,11 @@
       "cache": false,
       "dependsOn": ["env"]
     },
+    "strava:backfill": {
+      "cache": false,
+      "dependsOn": ["env", "^migrate"],
+      "env": ["DATABASE_URL", "STRAVA_CLIENT_ID", "STRAVA_CLIENT_SECRET"]
+    },
     "test": {
       "dependsOn": ["topo"],
       "env": ["DATABASE_URL_TEST"],
