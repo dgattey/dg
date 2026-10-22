@@ -29,32 +29,31 @@ export function AtlasSheet({ children }: { children: ReactNode }) {
 }
 
 /**
- * Everything below the title on `/strava`: the filterable atlas beside the
- * field notes, then the climbing flower, logbooks, and yearly tickets.
+ * Everything after the title on `/strava`, as items of the page's grid so the
+ * filters can sit beside the title: the filterable atlas beside the field
+ * notes, then the climbing flower, logbooks, and yearly tickets.
  */
 export function StravaHistorySections({ history }: { history: StravaHistory }) {
   const climbs = history.biggestClimbs.filter((outing) => outing.elevationGainMeters > 0);
   return (
-    <div className="strava__sections">
-      <div className="strava__explore">
-        <RouteFilter
+    <>
+      <RouteFilter
           routes={history.routes.map(({ id, sport, year }) => ({ id, sport, year }))}
           thisYear={history.thisYear.year}
-        >
-          <div className="strava__atlas">
-            <FieldNotes history={history} />
-            <AtlasSheet>
-              <div className="strava__atlasMap">
-                <RouteAtlas
-                  label="Map of every route I've tracked on Strava"
-                  routes={toMapRoutes(history.routes)}
-                />
-              </div>
-              <RouteCountTag className="collagePin strava__routeCount" />
-            </AtlasSheet>
-          </div>
-        </RouteFilter>
-      </div>
+      >
+        <div className="strava__atlas">
+          <FieldNotes history={history} />
+          <AtlasSheet>
+            <div className="strava__atlasMap">
+              <RouteAtlas
+                label="Map of every route I've tracked on Strava"
+                routes={toMapRoutes(history.routes)}
+              />
+            </div>
+            <RouteCountTag className="collagePin strava__routeCount" />
+          </AtlasSheet>
+        </div>
+      </RouteFilter>
       <div className="strava__band">
         <ClimbingFlower months={history.monthlyClimbingMeters} year={history.thisYear.year} />
         <RecentOutings outings={history.recent} />
@@ -70,6 +69,6 @@ export function StravaHistorySections({ history }: { history: StravaHistory }) {
           </RoutePolaroid>
         ) : null}
       </div>
-    </div>
+    </>
   );
 }

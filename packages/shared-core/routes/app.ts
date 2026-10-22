@@ -94,7 +94,7 @@ export const markdownPages = [
     path: stravaRoute,
     priority: 0.6,
     summary: 'Routes, yearly miles, and recent outings from my Strava history',
-    title: 'Bay Area miles',
+    title: 'Big map',
   },
 ] as const satisfies ReadonlyArray<MarkdownPageDefinition>;
 

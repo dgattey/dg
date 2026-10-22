@@ -7,7 +7,7 @@ import { getStravaHistory } from '../../services/strava';
 import { relatedPageLinksMarkdown } from '../llm-markdown/relatedPageLinksMarkdown';
 import { SITE_NAME } from '../metadata';
 
-const UNAVAILABLE_MARKDOWN = '# Bay Area miles\n\n> Strava history is unavailable right now.\n';
+const UNAVAILABLE_MARKDOWN = '# Big map\n\n> Strava history is unavailable right now.\n';
 
 const FEET_PER_METER = 3.28084;
 
@@ -46,7 +46,7 @@ export async function getStravaMarkdown(): Promise<string> {
     }
     const { biggestClimbs, odometer, recent, thisYear, totals, years } = history;
     const sections: Array<string> = [
-      '# Bay Area miles',
+      '# Big map',
       `> Routes, yearly miles, and recent outings from ${SITE_NAME}'s Strava history`,
       '## Totals',
       [

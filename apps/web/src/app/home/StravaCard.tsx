@@ -11,9 +11,9 @@ import { formatMiles, formatRouteCount } from '../strava/stravaFormat';
 import { toMapRoutes } from '../strava/stravaSports';
 
 /**
- * The homepage's Strava gatefold: the latest outing's print up front, every
- * route around home peeking out behind it toward `/strava` with the lifetime
- * total sealed on its corner, and this year's miles stuck on below.
+ * The homepage's Strava gatefold: every route around home up top, linking to
+ * `/strava` with the lifetime total sealed on its corner, the latest outing's
+ * print stepped down beside this year's miles.
  */
 export function StravaCard({ history }: { history: StravaHistory | null }) {
   if (!history) {
@@ -26,7 +26,7 @@ export function StravaCard({ history }: { history: StravaHistory | null }) {
         <PageTransitionLink
           className="home__stravaAtlasLink"
           href={stravaRoute}
-          title="Bay Area miles"
+          title="Big map"
         >
           <PaperCard edge="quad-c" innerClassName="home__stravaAtlasMat" tiltDeg={3}>
             <span aria-hidden="true" className="home__stravaMap">

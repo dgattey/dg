@@ -58,7 +58,7 @@ describe('getStravaMarkdown', () => {
 
     const markdown = await getStravaMarkdown();
 
-    expect(markdown).toContain('# Bay Area miles');
+    expect(markdown).toContain('# Big map');
     expect(markdown).toContain('- 15 miles over 2 outings since 2025\n- 3,000 feet climbed');
     expect(markdown).toContain('- Cruz odometer: 4,864.5 miles');
     expect(markdown).toContain('## This year\n\n- 2026: 10 miles, 1,000 feet climbed, 1 outing');
@@ -72,7 +72,7 @@ describe('getStravaMarkdown', () => {
       '## Biggest climbs\n\n- [Mount Tam](https://www.strava.com/activities/2) — 2,000 feet over 5 miles, Mar 4, 2025',
     );
     expect(markdown).toContain('[Reading](/reading.md)');
-    expect(markdown).not.toContain('[Bay Area miles](/strava.md)');
+    expect(markdown).not.toContain('[Big map](/strava.md)');
   });
 
   it('keeps a sparse history readable', async () => {
@@ -96,7 +96,7 @@ describe('getStravaMarkdown', () => {
   });
 
   it('returns the unavailable stub without history or when loading fails', async () => {
-    const stub = '# Bay Area miles\n\n> Strava history is unavailable right now.\n';
+    const stub = '# Big map\n\n> Strava history is unavailable right now.\n';
 
     jest.mocked(getStravaHistory).mockResolvedValueOnce(null);
     await expect(getStravaMarkdown()).resolves.toBe(stub);

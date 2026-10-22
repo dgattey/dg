@@ -1,16 +1,27 @@
-/* Strava miles: the atlas beside its field notes, then the scrapbook bands below. */
+/* The big map: title beside its filters, the atlas beside its field notes, then the scrapbook bands. */
 
 .strava__layout {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  row-gap: 28px;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 56px 32px;
   width: 100%;
   padding-block: 40px 72px;
 }
+.strava__layout > * {
+  grid-column: 1 / -1;
+}
 .strava__intro {
   display: grid;
+  grid-row: 1;
+  grid-column: 1 / 7;
   gap: 16px;
   justify-items: start;
+}
+.strava__title.cutHeading {
+  grid-auto-flow: column;
+}
+.strava__title .cutIndentedWord {
+  margin-left: 0.28em;
 }
 .strava__lede {
   max-width: 34em;
@@ -30,25 +41,25 @@
   line-height: 1.5;
 }
 
-.strava__sections {
+.strava__sections,
+.strava__atlas {
   position: relative;
   z-index: 2;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  row-gap: 64px;
-}
-.strava__explore {
-  display: grid;
-  row-gap: 30px;
 }
 
 .strava__filters {
+  position: relative;
+  z-index: 2;
   display: flex;
   flex-wrap: wrap;
+  grid-row: 1;
+  grid-column: 7 / -1;
   gap: 10px;
+  align-self: center;
+  justify-content: flex-end;
 }
 .strava__filters > .paperPills {
-  justify-content: flex-start;
+  justify-content: flex-end;
 }
 .strava__filterDot {
   align-self: center;
@@ -162,10 +173,10 @@
 }
 .stats__cut.strava__latestSeal {
   position: absolute;
-  top: -14px;
-  right: -8px;
+  top: -30px;
+  right: -18px;
   z-index: 4;
-  width: 128px;
+  width: 160px;
 }
 
 .strava__fieldPrint {
@@ -549,11 +560,25 @@
   }
 }
 
+@media (max-width: 820px) {
+  .strava__intro,
+  .strava__filters {
+    grid-column: 1 / -1;
+  }
+  .strava__filters {
+    grid-row: 2;
+  }
+  .strava__filters,
+  .strava__filters > .paperPills {
+    justify-content: flex-start;
+  }
+}
+
 @media (max-width: 600px) {
   .strava__layout {
+    row-gap: 40px;
     padding-block-start: 16px;
   }
-  .strava__sections,
   .strava__band {
     row-gap: 40px;
   }
@@ -580,7 +605,7 @@
   .stats__cut.strava__bestYear {
     position: static;
     justify-self: end;
-    width: 104px;
+    width: 116px;
     margin-top: -12px;
   }
 }
