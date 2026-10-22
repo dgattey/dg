@@ -1,6 +1,8 @@
 'use client';
 
+import { Check } from 'lucide-react';
 import { type MouseEvent, useEffect, useState } from 'react';
+import { PaperButton } from '../collage/PaperButton';
 
 const CHAR_CODE_SHIFT = 7;
 
@@ -66,14 +68,20 @@ export function FooterEmailAction({ encodedEmail }: FooterEmailActionProps) {
           </span>
         )}
       </a>
-      <button
-        aria-label="Copy email address"
-        className="chrome__copyChip"
-        onClick={handleCopy}
-        type="button"
-      >
-        {copied ? 'Copied' : 'Copy'}
-      </button>
+      <div className="collageLift">
+        <PaperButton onClick={handleCopy} tiltDeg={-1.5} tone="ochre">
+          {copied ? (
+            <>
+              <Check aria-hidden={true} size={18} strokeWidth={3} />
+              Copied
+            </>
+          ) : (
+            <>
+              Copy<span className="chrome__srOnly"> email address</span>
+            </>
+          )}
+        </PaperButton>
+      </div>
     </div>
   );
 }

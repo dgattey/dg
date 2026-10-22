@@ -1,9 +1,3 @@
-import {
-  favoriteAlbumsRoute,
-  homeRoute,
-  musicRoute,
-  readingRoute,
-} from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { CursorIcon } from '@dg/ui/dependent/Link';
 import { RichText } from '@dg/ui/dependent/RichText';
@@ -26,6 +20,7 @@ import { PaperTag } from '../collage/PaperTag';
 import { FooterEmailAction } from './FooterEmailAction';
 import { FooterNowStrip } from './FooterNowStrip';
 import { FooterRevealScroll } from './FooterRevealScroll';
+import { FOOTER_DESTINATIONS } from './musicHeaderDestinations';
 
 const CHAR_CODE_SHIFT = 7;
 
@@ -174,26 +169,16 @@ export async function Footer() {
             ) : null}
           </div>
           <nav aria-label="Footer navigation" className="chrome__colophonGroup chrome__colophonNav">
-            <PageTransitionLink className="chrome__colophonLink" href={homeRoute} title="Home">
-              Home
-            </PageTransitionLink>
-            <PageTransitionLink className="chrome__colophonLink" href={musicRoute} title="Music">
-              Music
-            </PageTransitionLink>
-            <PageTransitionLink
-              className="chrome__colophonLink"
-              href={favoriteAlbumsRoute}
-              title="Favorite albums"
-            >
-              Favorite albums
-            </PageTransitionLink>
-            <PageTransitionLink
-              className="chrome__colophonLink"
-              href={readingRoute}
-              title="Reading"
-            >
-              Reading
-            </PageTransitionLink>
+            {FOOTER_DESTINATIONS.map((destination) => (
+              <PageTransitionLink
+                className="chrome__colophonLink"
+                href={destination.href}
+                key={destination.href}
+                title={destination.label}
+              >
+                {destination.label}
+              </PageTransitionLink>
+            ))}
           </nav>
         </div>
       </div>

@@ -1,48 +1,45 @@
 'use client';
 
+import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { Link } from '../../dependent/Link';
-import type { SxProps } from '../../theme';
 import { rememberPageOrigin } from './pageScrollMemory';
 import { pageTransitionTypes } from './pageTransitions';
 
 export type PageTransitionLinkProps = {
+  'aria-current'?: 'page';
   children?: ReactNode;
   className?: string;
-  color?: 'inherit';
   href: string;
-  'aria-current'?: 'page';
   onClick?: () => void;
-  role?: React.AriaRole;
-  sx?: SxProps;
   title: string;
-  variant?: 'caption';
 };
 
+/**
+ * A bare anchor, so the caller's class owns every type and color rule. Routing it
+ * through `Typography` stamped the system sans and body size over paper buttons.
+ */
 export function PageTransitionLink({
   children,
   href,
   onClick,
-  sx,
   title,
   ...rest
 }: PageTransitionLinkProps) {
   const pathname = usePathname();
 
   return (
-    <Link
+    <NextLink
       {...rest}
+      aria-label={title}
       href={href}
       onClick={() => {
         rememberPageOrigin(pathname);
         onClick?.();
       }}
-      sx={sx}
-      title={title}
       transitionTypes={pageTransitionTypes('open')}
     >
       {children}
-    </Link>
+    </NextLink>
   );
 }

@@ -203,7 +203,7 @@
   padding: 18%;
 }
 .stats__heroRank {
-  font: 800 40px / 1 var(--display);
+  font: 700 var(--type-title-lg) / 1 var(--display);
 }
 .stats__heroInner {
   display: grid;
@@ -466,9 +466,6 @@
     top: -26px;
     left: -24px;
     width: 92px;
-  }
-  .stats__heroRank {
-    font-size: 32px;
   }
   .stats__runnersUp {
     gap: 28px 18px;

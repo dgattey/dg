@@ -41,6 +41,54 @@ export function checkOrphanCssFiles(
   return violations;
 }
 
+const FONT_SIZE_DECLARATION = /(?<![-\w])(?:font-size|font)\s*:([^;{}]+)/g;
+const LITERAL_FONT_SIZE = /\d(?:px|rem)\b/;
+const TYPE_TOKEN_DECLARATION = /(--type-[a-z0-9-]+)\s*:/g;
+const TYPE_TOKEN_USE = /var\(\s*(--type-[a-z0-9-]+)/g;
+
+function lineAt(content: string, index: number): number {
+  return content.slice(0, index).split('\n').length;
+}
+
+/**
+ * Type sizes come from the `--type-*` scale on `.collageRoot`, so a literal size or a
+ * token nobody declares fails here instead of rendering at a stray or inherited size.
+ */
+export function checkTypeScale(cssFiles: ReadonlyMap<string, string>): Array<StructureViolation> {
+  const declared = new Set<string>();
+  for (const content of cssFiles.values()) {
+    for (const match of content.matchAll(TYPE_TOKEN_DECLARATION)) {
+      declared.add(match[1] ?? '');
+    }
+  }
+
+  const violations: Array<StructureViolation> = [];
+  for (const [file, content] of cssFiles) {
+    for (const match of content.matchAll(FONT_SIZE_DECLARATION)) {
+      if (LITERAL_FONT_SIZE.test(match[1] ?? '')) {
+        violations.push({
+          file,
+          line: lineAt(content, match.index),
+          message: 'Set font sizes with a --type-* token, not a literal length',
+          rule: 'css-type-scale',
+        });
+      }
+    }
+    for (const match of content.matchAll(TYPE_TOKEN_USE)) {
+      const token = match[1] ?? '';
+      if (!declared.has(token)) {
+        violations.push({
+          file,
+          line: lineAt(content, match.index),
+          message: `${token} is not declared in any stylesheet`,
+          rule: 'css-type-scale',
+        });
+      }
+    }
+  }
+  return violations;
+}
+
 export function checkRouteCssImports(
   cssPaths: ReadonlyArray<string>,
   sourceFiles: ReadonlyMap<string, string>,

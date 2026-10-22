@@ -18,8 +18,14 @@ jest.mock('@dg/ui/core/transitions/PageTransitionLink', () => ({
 }));
 
 describe('PaperButton', () => {
-  it('renders a native button with pressed state', () => {
-    render(<PaperButton>Light</PaperButton>);
+  it('renders a native button that only reports pressed state when it is a toggle', () => {
+    render(
+      <>
+        <PaperButton>Copy</PaperButton>
+        <PaperButton current={false}>Light</PaperButton>
+      </>,
+    );
+    expect(screen.getByRole('button', { name: 'Copy' })).not.toHaveAttribute('aria-pressed');
     expect(screen.getByRole('button', { name: 'Light' })).toHaveAttribute('aria-pressed', 'false');
   });
 

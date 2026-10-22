@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { checkOrphanCssFiles, checkRouteCssImports } from '../check-css.js';
+import { checkOrphanCssFiles, checkRouteCssImports, checkTypeScale } from '../check-css.js';
 import {
   checkFileStructure,
   checkWorkspaceStructure,
@@ -81,6 +81,32 @@ describe('check-structure', () => {
     assert.equal(routeMissingCss.length, 1);
     assert.equal(routeMissingCss[0]?.file, 'apps/web/src/app/music/page.tsx');
     assert.equal(routeMissingCss[0]?.rule, 'route-missing-css');
+  });
+
+  it('requires declared --type-* tokens for every font size in web CSS', () => {
+    const violations = checkTypeScale(
+      new Map([
+        ['apps/web/src/app/collage/collage.css', '.collageRoot {\n  --type-body: 16px;\n}\n'],
+        [
+          'apps/web/src/app/music/music.css',
+          [
+            '.a { font-size: var(--type-body); }',
+            '.b { font-size: 14px; }',
+            '.c {\n  font:\n    700 1.2rem / 1 var(--display);\n}',
+            '.d { font: italic 600 var(--type-missing) / 1.2 serif; }',
+            '.e { font: inherit; --x-font-size: 9px; }',
+          ].join('\n'),
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      violations.map(({ line, message }) => ({ line, message })),
+      [
+        { line: 2, message: 'Set font sizes with a --type-* token, not a literal length' },
+        { line: 4, message: 'Set font sizes with a --type-* token, not a literal length' },
+        { line: 7, message: '--type-missing is not declared in any stylesheet' },
+      ],
+    );
   });
 
   it('bans Biome suppression comments in every file Biome checks, anywhere in the repo', () => {

@@ -97,19 +97,21 @@
     radial-gradient(circle, var(--dot-accent) 0 4.5px, transparent 5px) 0 0 / 26px 26px,
     var(--sheet-a);
 }
+/*
+ * Line patterns repeat inside one gradient rather than across sized tiles. A tile edge
+ * that cuts through a stripe rasterizes as a hairline seam once the sheet is rotated.
+ */
 .collageBackdrop .collageSheet-gingham {
   --gingham: color-mix(in oklab, var(--sheet-b) 38%, transparent);
   background:
-    linear-gradient(90deg, var(--gingham) 50%, transparent 0) 0 0 / 38px 38px,
-    linear-gradient(var(--gingham) 50%, transparent 0) 0 0 / 38px 38px,
-    var(--sheet-a);
+    repeating-linear-gradient(90deg, var(--gingham) 0 19px, transparent 19px 38px),
+    repeating-linear-gradient(var(--gingham) 0 19px, transparent 19px 38px), var(--sheet-a);
 }
 .collageBackdrop .collageSheet-grid {
   --grid-line: color-mix(in oklab, var(--sheet-b) 82%, var(--sheet-a));
   background:
-    linear-gradient(90deg, var(--grid-line) 0 1.5px, transparent 1.5px) 0 0 / 28px 28px,
-    linear-gradient(var(--grid-line) 0 1.5px, transparent 1.5px) 0 0 / 28px 28px,
-    var(--sheet-a);
+    repeating-linear-gradient(90deg, var(--grid-line) 0 1.5px, transparent 1.5px 28px),
+    repeating-linear-gradient(var(--grid-line) 0 1.5px, transparent 1.5px 28px), var(--sheet-a);
 }
 .collageBackdrop .collageSheet-ruled {
   --rule-margin: color-mix(in oklab, var(--vermilion) 85%, var(--sheet-a));

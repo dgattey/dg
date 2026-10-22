@@ -6,7 +6,7 @@ describe('Dev console page', () => {
       const result = ConsolePage({});
 
       expect(result).toBeDefined();
-      expect(result.type).toBe('main');
+      expect(result.type).toBe('section');
     });
   });
 });

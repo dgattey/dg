@@ -45,7 +45,10 @@ type ConsolePageProps = {
  */
 export default function ConsolePage({ searchParams }: ConsolePageProps) {
   return (
-    <main className="collageBleed collageBackdropHost devConsole__sheet">
+    <section
+      aria-label="Dev console"
+      className="collageBleed collageBackdropHost devConsole__sheet"
+    >
       <CollageBackdrop backdrop={DEV_CONSOLE_BACKDROP} />
       <div className="collageMeasure devConsole__grid">
         <div className="devConsole__header">
@@ -87,6 +90,6 @@ export default function ConsolePage({ searchParams }: ConsolePageProps) {
           </Section>
         </div>
       </div>
-    </main>
+    </section>
   );
 }
