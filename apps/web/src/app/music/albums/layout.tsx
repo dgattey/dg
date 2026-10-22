@@ -9,13 +9,13 @@ import { Suspense } from 'react';
 import { getFavoriteAlbums } from '../../../services/albums';
 import { ALBUMS_BACKDROP } from '../../collage/backdrops';
 import { markdownAlternates } from '../../layouts/markdownAlternates';
-import { musicDestinationLabel } from '../../layouts/musicHeaderDestinations';
+import { musicDestinationTitle } from '../../layouts/musicHeaderDestinations';
 import { CollageMusicStatus } from '../MusicHistorySections';
 import { MusicPageShell } from '../MusicPageShell';
 import { FavoriteAlbumsGrid } from './FavoriteAlbumsGrid';
 import { FavoriteAlbumsSkeleton } from './FavoriteAlbumsSkeleton';
 
-const TITLE = musicDestinationLabel(favoriteAlbumsRoute);
+const TITLE = musicDestinationTitle(favoriteAlbumsRoute);
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(favoriteAlbumsRoute),

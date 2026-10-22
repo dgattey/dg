@@ -1,6 +1,11 @@
-import type { StravaHistory, StravaOuting } from '@dg/content-models/strava/StravaHistory';
+import type {
+  StravaHistory,
+  StravaLogEntry,
+  StravaOuting,
+} from '@dg/content-models/strava/StravaHistory';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { PAPER_TONES } from '../../collage/types';
 import { StravaHistorySections } from '../StravaHistorySections';
 
@@ -10,11 +15,9 @@ const PRESIDIO = '_yueFn|njVo}@n}@_|BoKn}@_nD~{B~{B';
 const LAKE_MERRITT = '_yueFnhfiV_q@wj@f^_q@vj@fw@_Xnd@';
 const TAHOE = 'owqmFnjr{Uo}@o}@o}@~{B';
 
-const outing = (id: number, overrides: Partial<StravaOuting>): StravaOuting => ({
-  description: null,
+const outing = (id: number, overrides: Partial<StravaLogEntry>): StravaLogEntry => ({
   distanceMeters: 16_093,
   elevationGainMeters: 120,
-  gearName: null,
   id,
   movingTimeSeconds: 3_600,
   name: `Outing ${id}`,
@@ -25,13 +28,12 @@ const outing = (id: number, overrides: Partial<StravaOuting>): StravaOuting => (
   ...overrides,
 });
 
-const latest = outing(1, {
-  description: 'Fog burned off by the bridge.',
-  gearName: 'Cervelo',
+const presidio = outing(1, {
   name: 'Presidio loop',
   polyline: PRESIDIO,
   startDate: '2026-10-20T15:00:00Z',
 });
+const latest: StravaOuting = { ...presidio, description: 'Fog burned off by the bridge.' };
 const merritt = outing(2, {
   name: 'Lake Merritt run',
   polyline: LAKE_MERRITT,
@@ -41,30 +43,65 @@ const merritt = outing(2, {
 const tahoe = outing(3, {
   distanceMeters: 80_467,
   elevationGainMeters: 1_400,
+  movingTimeSeconds: 19_800,
   name: 'Tahoe rim hike',
   polyline: TAHOE,
   sport: 'hike',
   startDate: '2025-07-04T15:00:00Z',
 });
+const century = outing(4, {
+  distanceMeters: 60_000,
+  elevationGainMeters: 500,
+  name: 'Marin century',
+  startDate: '2024-05-11T15:00:00Z',
+});
 
 const full: StravaHistory = {
-  biggestClimbs: [tahoe, latest, merritt],
+  bikes: [
+    {
+      elevationGainMeters: 125_578,
+      id: 'b1',
+      longest: {
+        distanceMeters: 190_000,
+        name: 'Oysters and garlic bread',
+        startDate: '2024-05-19T16:00:00Z',
+        url: 'https://www.strava.com/activities/40',
+      },
+      movingTimeSeconds: 1_368_000,
+      name: 'Cruz',
+      odometerMeters: 9_086_356,
+      rides: 399,
+      years: [
+        { distanceMeters: 2_000_000, year: 2023 },
+        { distanceMeters: 3_000_000, year: 2024 },
+        { distanceMeters: 2_500_000, year: 2025 },
+        { distanceMeters: 1_586_356, year: 2026 },
+      ],
+    },
+    {
+      elevationGainMeters: 75_590,
+      id: 'b2',
+      longest: {
+        distanceMeters: 180_000,
+        name: 'Marshall Wall Sunday',
+        startDate: '2025-05-18T16:00:00Z',
+        url: 'https://www.strava.com/activities/41',
+      },
+      movingTimeSeconds: 774_000,
+      name: 'Prince',
+      odometerMeters: 5_333_366,
+      rides: 100,
+      years: [
+        { distanceMeters: 1_500_000, year: 2024 },
+        { distanceMeters: 2_500_000, year: 2025 },
+        { distanceMeters: 1_333_366, year: 2026 },
+      ],
+    },
+  ],
   latest,
-  longest: tahoe,
-  monthlyClimbingMeters: [0, 0, 300, 0, 0, 0, 0, 0, 0, 240, 0, 0],
-  odometer: { distanceMeters: 7_829_000, gearName: 'Cervelo' },
-  recent: [latest, merritt, tahoe],
-  routes: [
-    { id: 1, polyline: PRESIDIO, sport: 'ride', year: 2026 },
-    { id: 2, polyline: LAKE_MERRITT, sport: 'run', year: 2026 },
-    { id: 3, polyline: TAHOE, sport: 'hike', year: 2025 },
-  ],
-  thisYear: { distanceMeters: 32_186, elevationGainMeters: 540, outings: 2, year: 2026 },
-  totals: { distanceMeters: 112_653, elevationGainMeters: 1_640, firstYear: 2025, outings: 3 },
-  years: [
-    { distanceMeters: 80_467, elevationGainMeters: 1_400, outings: 1, year: 2025 },
-    { distanceMeters: 32_186, elevationGainMeters: 540, outings: 2, year: 2026 },
-  ],
+  outings: [presidio, merritt, tahoe, century],
+  thisYear: { distanceMeters: 32_186, elevationGainMeters: 240, outings: 2, year: 2026 },
+  totals: { distanceMeters: 172_653, elevationGainMeters: 2_140, firstYear: 2024, outings: 4 },
 };
 
 const lone = outing(9, {
@@ -75,16 +112,11 @@ const lone = outing(9, {
 });
 
 const sparse: StravaHistory = {
-  biggestClimbs: [lone],
-  latest: lone,
-  longest: lone,
-  monthlyClimbingMeters: Array.from({ length: 12 }, () => 0),
-  odometer: null,
-  recent: [lone],
-  routes: [],
+  bikes: [],
+  latest: { ...lone, description: null },
+  outings: [lone],
   thisYear: { distanceMeters: 0, elevationGainMeters: 0, outings: 0, year: 2026 },
   totals: { distanceMeters: 16_093, elevationGainMeters: 0, firstYear: 2024, outings: 1 },
-  years: [{ distanceMeters: 16_093, elevationGainMeters: 0, outings: 1, year: 2024 }],
 };
 
 const renderSections = (history: StravaHistory) =>
@@ -93,6 +125,16 @@ const renderSections = (history: StravaHistory) =>
       <StravaHistorySections history={history} />
     </ServerTimeProvider>,
   );
+
+const headlineTotals = () =>
+  within(screen.getByRole('list', { name: /^Totals/ }))
+    .getAllByRole('listitem')
+    .map((cut) => cut.textContent);
+
+const listNames = (heading: string) =>
+  within(screen.getByRole('heading', { name: heading }).parentElement as HTMLElement)
+    .queryAllByRole('listitem')
+    .map((row) => within(row).queryByRole('link')?.textContent ?? row.textContent);
 
 /** Card maps measure themselves; jsdom has no layout, so the frame's own size stands. */
 class StillResizeObserver {
@@ -120,53 +162,136 @@ describe('StravaHistorySections', () => {
 
     expect(
       screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent),
-    ).toEqual(['Climbing by month', 'Recent outings', 'Yearly miles', 'Biggest climbs']);
+    ).toEqual([
+      'Recent routes',
+      'Climbing by month',
+      'Recent outings',
+      'Longest rides',
+      'Yearly miles',
+      'Biggest climbs',
+      'Bike odometers',
+    ]);
     expect(
       screen.getByRole('region', { name: "Map of every route I've tracked on Strava" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole('img', { name: '1,772 feet climbed in 2026, by month' })).toBeVisible();
+    expect(
+      screen.getByRole('img', { name: '7,021 feet climbed, all time, by month' }),
+    ).toBeVisible();
     expect(screen.getByText('3 routes')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Runs' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Hikes' })).toBeInTheDocument();
-    expect(screen.getByText('Cervelo odometer')).toBeInTheDocument();
-    expect(screen.getByText('4,865 mi')).toBeInTheDocument();
-    expect(screen.getByText('Best year')).toBeInTheDocument();
+    expect(screen.getByRole('combobox', { name: 'Year' })).toBeInTheDocument();
   });
 
-  it('notes the latest outing with how long ago it was', () => {
+  it('prints the newest outings in order, each captioned with its sport and day', () => {
     renderSections(full);
 
-    const hrefs = screen
-      .getAllByRole('link', { name: 'Presidio loop' })
-      .map((link) => link.getAttribute('href'));
-    expect(new Set(hrefs)).toEqual(new Set(['https://www.strava.com/activities/1']));
-    expect(screen.getByText('Fog burned off by the bridge.')).toBeInTheDocument();
-    expect(screen.getByText('2 days ago')).toBeInTheDocument();
+    const recent = screen.getByRole('region', { name: 'Recent routes' });
+    const prints = within(recent).getAllByRole('link');
+    expect(prints.map((print) => print.getAttribute('aria-label'))).toEqual([
+      'Presidio loop on Strava',
+      'Lake Merritt run on Strava',
+      'Tahoe rim hike on Strava',
+    ]);
+    expect(prints[0]).toHaveAttribute('href', 'https://www.strava.com/activities/1');
+    expect(prints[0]).toHaveTextContent('Ride2 days ago · Oct 20Presidio loop');
+    expect(within(prints[0] as HTMLElement).getByText('Latest')).toBeInTheDocument();
+    expect(prints[0]).toHaveTextContent('Fog burned off by the bridge.');
+    expect(prints[1]).toHaveTextContent('Run4 days ago · Oct 18Lake Merritt run');
+    expect(prints[2]).toHaveTextContent('Hike');
+    expect(prints[2]).toHaveTextContent('Jul 4Tahoe rim hike');
   });
 
-  it('prints a polaroid for outings with a route wherever they went', () => {
+  it('totals and lists whatever the sport and time filters pick', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     renderSections(full);
 
-    expect(screen.getByRole('link', { name: 'Lake Merritt run on Strava' })).toHaveAttribute(
-      'href',
-      'https://www.strava.com/activities/2',
+    expect(headlineTotals()).toEqual([
+      'Every sport · All time107miles',
+      '7.02kft climbed≈ 24% of Everest',
+      '4outings9 hrs moving',
+    ]);
+    expect(listNames('Longest rides')).toEqual(['Marin century', 'Presidio loop']);
+
+    await user.click(screen.getByRole('button', { name: 'Runs' }));
+    expect(headlineTotals()).toEqual([
+      'Runs · All time10.0miles',
+      '394ft climbed≈ 1% of Everest',
+      '1outing1 hr moving',
+    ]);
+    expect(listNames('Recent outings')).toEqual(['Lake Merritt run']);
+    expect(listNames('Longest runs')).toEqual(['Lake Merritt run']);
+    expect(screen.getByText('1 route')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'All routes' }));
+    await user.click(screen.getByRole('button', { name: 'Last week' }));
+    expect(screen.getAllByText('Last 7 days')).not.toHaveLength(0);
+    expect(listNames('Recent outings')).toEqual(['Presidio loop', 'Lake Merritt run']);
+    expect(listNames('Biggest climbs')).toEqual(['Presidio loop', 'Lake Merritt run']);
+
+    await user.selectOptions(screen.getByRole('combobox', { name: 'Year' }), '2025');
+    expect(screen.getByRole('button', { name: 'Last week' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
     );
-    expect(screen.getAllByRole('link', { name: 'Tahoe rim hike on Strava' })).toHaveLength(2);
-    expect(screen.getByText('Longest outing')).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Totals, Every sport · 2025' })).toBeInTheDocument();
+    expect(headlineTotals()).toEqual([
+      'Every sport · 202550.0miles',
+      '4.59kft climbed≈ 16% of Everest',
+      '1outing6 hrs moving',
+    ]);
+    expect(listNames('Longest rides')).toEqual(['Nothing here for these filters']);
+    expect(screen.getAllByText('Longest outing')).toHaveLength(1);
+    expect(
+      screen
+        .getAllByRole('link', { name: 'Tahoe rim hike on Strava' })
+        .some((link) => link.textContent?.includes('Longest outing')),
+    ).toBe(true);
   });
 
-  it('skips empty pieces for a sparse history instead of drawing blanks', () => {
+  it('gives each bike its odometer, climbing, saddle time, yearly miles, and longest ride', () => {
+    renderSections(full);
+
+    const bikes = screen.getByRole('heading', { name: 'Bike odometers' })
+      .parentElement as HTMLElement;
+    const [cruz, prince] = within(bikes).getAllByRole('listitem') as [HTMLElement, HTMLElement];
+
+    expect(cruz).toHaveTextContent(
+      /^Cruz2023–20265,646mi412k ftclimbed380 hrsin the saddle399rides.*Longest · 118 mi · May 19, 2024Oysters and garlic bread$/,
+    );
+    expect(prince).toHaveTextContent(
+      /^Prince2024–20263,314mi248k ftclimbed215 hrsin the saddle100rides.*Longest · 112 mi · May 18, 2025Marshall Wall Sunday$/,
+    );
+    expect(bikes.querySelector('ul')?.textContent).not.toMatch(/bike/i);
+    expect(
+      within(cruz).getByRole('img', {
+        name: 'Miles by year. 2023: 1,243 mi, 2024: 1,864 mi, 2025: 1,553 mi, 2026: 986 mi',
+      }),
+    ).toBeInTheDocument();
+    expect(within(prince).getByRole('link')).toHaveAttribute(
+      'href',
+      'https://www.strava.com/activities/41',
+    );
+  });
+
+  it('keeps its footprint for a sparse history without inventing numbers', () => {
     const { container } = renderSections(sparse);
 
     expect(
       screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent),
-    ).toEqual(['Recent outings', 'Yearly miles']);
+    ).toEqual([
+      'Recent routes',
+      'Climbing by month',
+      'Recent outings',
+      'Longest rides',
+      'Yearly miles',
+      'Biggest climbs',
+    ]);
     expect(screen.queryByRole('group', { name: 'Sport' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Year' })).not.toBeInTheDocument();
     expect(screen.getByText('No routes')).toBeInTheDocument();
-    expect(screen.queryByText(/odometer/)).not.toBeInTheDocument();
+    expect(screen.queryByText('Longest outing')).not.toBeInTheDocument();
     expect(screen.queryByText('Best year')).not.toBeInTheDocument();
-    expect(screen.queryByRole('link', { name: /on Strava$/ })).not.toBeInTheDocument();
-    expect(screen.getAllByRole('link', { name: 'Treadmill' })).toHaveLength(2);
     expect(container.textContent).not.toMatch(/NaN|undefined|Infinity/);
   });
 

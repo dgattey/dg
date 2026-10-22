@@ -16,12 +16,11 @@ import { markdownAlternates } from '../layouts/markdownAlternates';
 import { StravaHistorySections } from './StravaHistorySections';
 import { StravaHistorySkeleton } from './StravaHistorySkeleton';
 
-const TITLE = 'Bay Area miles';
+const TITLE = 'Big map';
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(stravaRoute),
-  description:
-    'Every ride, run, and hike I have tracked on Strava, mapped wherever it went. Most start around the Bay Area.',
+  description: "Every outing I've tracked over the years.",
   title: TITLE,
 };
 
@@ -51,11 +50,8 @@ export default function StravaPage() {
     <section aria-label={TITLE} className="collageBackdropHost strava__layout">
       <CollageBackdrop backdrop={STRAVA_BACKDROP} />
       <div className="strava__intro">
-        <CutLetters className="collagePageTitle" text={TITLE} />
-        <p className="strava__lede">
-          Every ride, run, and hike I've tracked on Strava, mapped wherever it went. Most start
-          around the Bay Area.
-        </p>
+        <CutLetters className="collagePageTitle strava__title" text={TITLE} />
+        <p className="strava__lede">Every outing I've tracked over the years.</p>
       </div>
       <Suspense fallback={<StravaHistorySkeleton />}>
         <StravaHistoryView />

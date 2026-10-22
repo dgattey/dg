@@ -1,4 +1,4 @@
-import type { StravaOuting, StravaSport } from '@dg/content-models/strava/StravaHistory';
+import type { StravaLogEntry, StravaSport } from '@dg/content-models/strava/StravaHistory';
 import { paperToneVars } from '../collage/paperVars';
 import { formatDuration, formatFeet, formatMiles } from './stravaFormat';
 import { SPORT_DETAILS } from './stravaSports';
@@ -13,7 +13,7 @@ export function SportChip({ sport }: { sport: StravaSport }) {
   );
 }
 
-export function OutingStats({ outing }: { outing: StravaOuting }) {
+export function OutingStats({ outing }: { outing: StravaLogEntry }) {
   return (
     <span className="strava__stats">
       <span>{formatMiles(outing.distanceMeters)} mi</span>

@@ -1,4 +1,4 @@
-import type { StravaHistory, StravaOuting } from '@dg/content-models/strava/StravaHistory';
+import type { StravaHistory, StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 
 jest.mock('../../../services/strava', () => ({
   getStravaHistory: jest.fn(),
@@ -7,11 +7,11 @@ jest.mock('../../../services/strava', () => ({
 import { getStravaHistory } from '../../../services/strava';
 import { getStravaMarkdown } from '../stravaMarkdown';
 
-const outing = (overrides: Partial<StravaOuting> & Pick<StravaOuting, 'id'>): StravaOuting => ({
-  description: null,
+const outing = (
+  overrides: Partial<StravaLogEntry> & Pick<StravaLogEntry, 'id'>,
+): StravaLogEntry => ({
   distanceMeters: 16_093.44,
   elevationGainMeters: 304.8,
-  gearName: null,
   movingTimeSeconds: 3600,
   name: `Outing ${overrides.id}`,
   polyline: null,
@@ -32,13 +32,28 @@ const hike = outing({
 });
 
 const history: StravaHistory = {
-  biggestClimbs: [hike, latest],
-  latest,
-  longest: latest,
-  monthlyClimbingMeters: [0, 0, 0, 0, 0, 0, 0, 0, 0, 304.8, 0, 0],
-  odometer: { distanceMeters: 7_828_686, gearName: 'Cruz' },
-  recent: [latest, hike],
-  routes: [],
+  bikes: [
+    {
+      elevationGainMeters: 125_578,
+      id: 'b1',
+      longest: {
+        distanceMeters: 189_907,
+        name: 'Marshall Wall Sunday',
+        startDate: '2025-05-18T16:00:00.000Z',
+        url: 'https://www.strava.com/activities/9',
+      },
+      movingTimeSeconds: 1_368_000,
+      name: 'Cruz',
+      odometerMeters: 7_828_686,
+      rides: 399,
+      years: [
+        { distanceMeters: 2_000_000, year: 2023 },
+        { distanceMeters: 5_828_686, year: 2026 },
+      ],
+    },
+  ],
+  latest: { ...latest, description: null },
+  outings: [latest, hike],
   thisYear: { distanceMeters: 16_093.44, elevationGainMeters: 304.8, outings: 1, year: 2026 },
   totals: {
     distanceMeters: 24_140.16,
@@ -46,21 +61,16 @@ const history: StravaHistory = {
     firstYear: 2025,
     outings: 2,
   },
-  years: [
-    { distanceMeters: 8046.72, elevationGainMeters: 609.6, outings: 1, year: 2025 },
-    { distanceMeters: 16_093.44, elevationGainMeters: 304.8, outings: 1, year: 2026 },
-  ],
 };
 
 describe('getStravaMarkdown', () => {
-  it('lists totals, this year, yearly miles, recent outings, and climbs', async () => {
+  it('lists totals, this year, yearly miles, recent outings, records, and bikes', async () => {
     jest.mocked(getStravaHistory).mockResolvedValue(history);
 
     const markdown = await getStravaMarkdown();
 
-    expect(markdown).toContain('# Bay Area miles');
+    expect(markdown).toContain('# Big map');
     expect(markdown).toContain('- 15 miles over 2 outings since 2025\n- 3,000 feet climbed');
-    expect(markdown).toContain('- Cruz odometer: 4,864.5 miles');
     expect(markdown).toContain('## This year\n\n- 2026: 10 miles, 1,000 feet climbed, 1 outing');
     expect(markdown).toContain(
       '## Yearly miles\n\n- 2025: 5 miles (1 outing)\n- 2026: 10 miles (1 outing)',
@@ -71,19 +81,23 @@ describe('getStravaMarkdown', () => {
     expect(markdown).toContain(
       '## Biggest climbs\n\n- [Mount Tam](https://www.strava.com/activities/2) — 2,000 feet over 5 miles, Mar 4, 2025',
     );
+    expect(markdown).toContain(
+      '## Longest rides\n\n- [Hawk Hill loop](https://www.strava.com/activities/1) — 10 miles, 1,000 feet climbed, Oct 20, 2026',
+    );
+    expect(markdown).toContain(
+      '## Bike odometers\n\n- Cruz: 4,864.5 miles on the odometer, 412,001 feet climbed, 380 hours in the saddle, 399 rides from 2023 to 2026, longest ride 118 miles, [Marshall Wall Sunday](https://www.strava.com/activities/9) on May 18, 2025',
+    );
     expect(markdown).toContain('[Reading](/reading.md)');
-    expect(markdown).not.toContain('[Bay Area miles](/strava.md)');
+    expect(markdown).not.toContain('[Big map](/strava.md)');
   });
 
   it('keeps a sparse history readable', async () => {
     const quiet = outing({ distanceMeters: 0, elevationGainMeters: 0, id: 3, sport: 'other' });
     jest.mocked(getStravaHistory).mockResolvedValue({
       ...history,
-      biggestClimbs: [],
-      latest: quiet,
-      longest: quiet,
-      odometer: null,
-      recent: [quiet],
+      bikes: [],
+      latest: { ...quiet, description: null },
+      outings: [quiet],
       thisYear: { distanceMeters: 0, elevationGainMeters: 0, outings: 0, year: 2026 },
     });
 
@@ -93,10 +107,11 @@ describe('getStravaMarkdown', () => {
     expect(markdown).toContain('— Outing, 0 miles, 0 feet climbed');
     expect(markdown).not.toContain('odometer');
     expect(markdown).not.toContain('## Biggest climbs');
+    expect(markdown).not.toContain('## Longest rides');
   });
 
   it('returns the unavailable stub without history or when loading fails', async () => {
-    const stub = '# Bay Area miles\n\n> Strava history is unavailable right now.\n';
+    const stub = '# Big map\n\n> Strava history is unavailable right now.\n';
 
     jest.mocked(getStravaHistory).mockResolvedValueOnce(null);
     await expect(getStravaMarkdown()).resolves.toBe(stub);

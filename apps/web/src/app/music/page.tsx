@@ -10,14 +10,14 @@ import { getServerTime } from '../../services/getServerTime';
 import { getMusicHistory } from '../../services/music';
 import { HISTORY_BACKDROP } from '../collage/backdrops';
 import { markdownAlternates } from '../layouts/markdownAlternates';
-import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
+import { musicDestinationTitle } from '../layouts/musicHeaderDestinations';
 import { CollageHistorySkeleton } from './albums/collageAlbumCardTreatments';
 import { groupTracksByDate } from './groupTracksByDate';
 import { MusicHistorySections, NoListeningHistory } from './MusicHistorySections';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 import { MusicPageShell } from './MusicPageShell';
 
-const TITLE = musicDestinationLabel(musicRoute);
+const TITLE = musicDestinationTitle(musicRoute);
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(musicRoute),

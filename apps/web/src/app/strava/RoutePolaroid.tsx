@@ -1,23 +1,34 @@
-import type { StravaOuting } from '@dg/content-models/strava/StravaHistory';
-import { StravaRouteMap } from '@dg/maps/StravaRouteMap';
+import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
+import { RoutePrint } from '@dg/maps/RoutePrint';
+import type { TileSource } from '@dg/maps/src/tileSource';
+import { RelativeTime } from '@dg/ui/core/RelativeTime';
 import type { ReactNode } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { cx } from '../collage/paperVars';
-import { OutingStats } from './OutingMeta';
+import { OutingStats, SportChip } from './OutingMeta';
+import { formatOutingDay } from './stravaFormat';
+import { SPORT_DETAILS } from './stravaSports';
 
 /**
  * A polaroid of one outing linking to the activity on Strava, its route inked
- * in vermilion over a Stadia map when it has one. `children` pin stickers to it.
+ * in its sport's tone over a Stadia map when it has one. `dated` captions it
+ * with the sport and when it happened, and `children` pin stickers to it.
  */
 export function RoutePolaroid({
   children,
   className,
+  dated = false,
+  note,
   outing,
+  tileSource,
   tiltDeg,
 }: {
   children?: ReactNode;
   className?: string;
-  outing: StravaOuting;
+  dated?: boolean;
+  note?: string | null;
+  outing: StravaLogEntry;
+  tileSource: TileSource;
   tiltDeg: number;
 }) {
   return (
@@ -31,11 +42,25 @@ export function RoutePolaroid({
       <PaperCard edge="quad-a" innerClassName="strava__polaroidInner" tiltDeg={tiltDeg}>
         {outing.polyline ? (
           <span aria-hidden="true" className="strava__print">
-            <StravaRouteMap encodedPolyline={outing.polyline} />
+            <RoutePrint
+              encodedPolyline={outing.polyline}
+              tileSource={tileSource}
+              tone={SPORT_DETAILS[outing.sport].tone}
+            />
+          </span>
+        ) : null}
+        {dated ? (
+          <span className="strava__polaroidMeta">
+            <SportChip sport={outing.sport} />
+            <span>
+              <RelativeTime date={outing.startDate} hasTooltip={false} /> ·{' '}
+              {formatOutingDay(outing.startDate)}
+            </span>
           </span>
         ) : null}
         <span className="strava__polaroidName">{outing.name}</span>
         <OutingStats outing={outing} />
+        {note ? <span className="strava__polaroidNote">{note}</span> : null}
       </PaperCard>
       {children}
     </a>

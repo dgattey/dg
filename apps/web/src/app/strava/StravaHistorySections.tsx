@@ -1,15 +1,12 @@
 import type { StravaHistory } from '@dg/content-models/strava/StravaHistory';
-import { RouteAtlas } from '@dg/maps/RouteAtlas';
+import { atlasBounds, simplifyPolyline } from '@dg/maps/atlasGeometry';
+import { getTileSource } from '@dg/maps/src/getTileSource';
 import type { ReactNode } from 'react';
 import { PaperCard } from '../collage/PaperCard';
-import { PaperTag } from '../collage/PaperTag';
-import { ClimbingFlower } from './ClimbingFlower';
 import { FieldNotes } from './FieldNotes';
-import { BiggestClimbs, RecentOutings } from './OutingLog';
-import { RouteCountTag, RouteFilter } from './RouteFilter';
-import { RoutePolaroid } from './RoutePolaroid';
+import { StravaAtlas, StravaBands } from './FilteredSections';
+import { RouteCountTag, StravaFilters } from './StravaFilters';
 import { toMapRoutes } from './stravaSports';
-import { YearlyMiles } from './YearlyMiles';
 
 /** The cerulean backing and cream print the atlas sits on, shared with the skeleton. */
 export function AtlasSheet({ children }: { children: ReactNode }) {
@@ -29,47 +26,29 @@ export function AtlasSheet({ children }: { children: ReactNode }) {
 }
 
 /**
- * Everything below the title on `/strava`: the filterable atlas beside the
- * field notes, then the climbing flower, logbooks, and yearly tickets.
+ * Everything after the title on `/strava`, as items of the page's grid so the
+ * filters can sit beside the title: the filterable atlas beside the field
+ * notes, then the scrapbook bands. Routes are simplified once here and shared
+ * by the atlas, the logbook loops, and the longest outing's print.
  */
 export function StravaHistorySections({ history }: { history: StravaHistory }) {
-  const climbs = history.biggestClimbs.filter((outing) => outing.elevationGainMeters > 0);
+  const tileSource = getTileSource();
+  const outings = history.outings.map((outing) => ({
+    ...outing,
+    polyline: outing.polyline ? simplifyPolyline(outing.polyline) || null : null,
+  }));
   return (
-    <div className="strava__sections">
-      <div className="strava__explore">
-        <RouteFilter
-          routes={history.routes.map(({ id, sport, year }) => ({ id, sport, year }))}
-          thisYear={history.thisYear.year}
-        >
-          <div className="strava__atlas">
-            <FieldNotes history={history} />
-            <AtlasSheet>
-              <div className="strava__atlasMap">
-                <RouteAtlas
-                  label="Map of every route I've tracked on Strava"
-                  routes={toMapRoutes(history.routes)}
-                />
-              </div>
-              <RouteCountTag className="collagePin strava__routeCount" />
-            </AtlasSheet>
+    <StravaFilters outings={outings}>
+      <div className="strava__atlas">
+        <FieldNotes history={history} tileSource={tileSource} />
+        <AtlasSheet>
+          <div className="strava__atlasMap">
+            <StravaAtlas bounds={atlasBounds(toMapRoutes(outings))} tileSource={tileSource} />
           </div>
-        </RouteFilter>
+          <RouteCountTag className="collagePin strava__routeCount" />
+        </AtlasSheet>
       </div>
-      <div className="strava__band">
-        <ClimbingFlower months={history.monthlyClimbingMeters} year={history.thisYear.year} />
-        <RecentOutings outings={history.recent} />
-      </div>
-      <div className="strava__band">
-        <YearlyMiles years={history.years} />
-        {climbs.length > 0 ? <BiggestClimbs outings={climbs} /> : null}
-        {history.longest.polyline ? (
-          <RoutePolaroid className="strava__longest" outing={history.longest} tiltDeg={3.2}>
-            <PaperTag className="collagePin strava__longestTag" tiltDeg={-7} tone="rose">
-              Longest outing
-            </PaperTag>
-          </RoutePolaroid>
-        ) : null}
-      </div>
-    </div>
+      <StravaBands bikes={history.bikes} tileSource={tileSource} />
+    </StravaFilters>
   );
 }

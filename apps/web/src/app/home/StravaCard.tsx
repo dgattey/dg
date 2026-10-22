@@ -1,5 +1,6 @@
 import type { StravaHistory } from '@dg/content-models/strava/StravaHistory';
 import { RoutePeek } from '@dg/maps/RoutePeek';
+import { getTileSource } from '@dg/maps/src/getTileSource';
 import { stravaRoute } from '@dg/shared-core/routes/app';
 import { RelativeTime } from '@dg/ui/core/RelativeTime';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
@@ -11,26 +12,23 @@ import { formatMiles, formatRouteCount } from '../strava/stravaFormat';
 import { toMapRoutes } from '../strava/stravaSports';
 
 /**
- * The homepage's Strava gatefold: the latest outing's print up front, every
- * route around home peeking out behind it toward `/strava` with the lifetime
- * total sealed on its corner, and this year's miles stuck on below.
+ * The homepage's Strava gatefold: every route around home up top, linking to
+ * `/strava` with the lifetime total sealed on its corner, the latest outing's
+ * print stepped down beside this year's miles.
  */
 export function StravaCard({ history }: { history: StravaHistory | null }) {
   if (!history) {
     return null;
   }
-  const { latest, routes, thisYear, totals } = history;
+  const { latest, outings, thisYear, totals } = history;
+  const routes = toMapRoutes(outings);
   return (
     <div className="home__strava" data-slot="st" style={{ gridArea: 'st' }}>
       <div className="home__stravaAtlas collageLift">
-        <PageTransitionLink
-          className="home__stravaAtlasLink"
-          href={stravaRoute}
-          title="Bay Area miles"
-        >
+        <PageTransitionLink className="home__stravaAtlasLink" href={stravaRoute} title="Big map">
           <PaperCard edge="quad-c" innerClassName="home__stravaAtlasMat" tiltDeg={3}>
             <span aria-hidden="true" className="home__stravaMap">
-              <RoutePeek routes={toMapRoutes(routes)} />
+              <RoutePeek routes={routes} />
             </span>
           </PaperCard>
           <PaperTag className="collagePin home__stravaRoutes" tiltDeg={5} tone="ochre">
@@ -42,7 +40,12 @@ export function StravaCard({ history }: { history: StravaHistory | null }) {
           <span className="strava__sealWhen">{formatMiles(totals.distanceMeters)} mi</span>
         </Scallop>
       </div>
-      <RoutePolaroid className="home__stravaLatest" outing={latest} tiltDeg={-2.2}>
+      <RoutePolaroid
+        className="home__stravaLatest"
+        outing={latest}
+        tileSource={getTileSource()}
+        tiltDeg={-2.2}
+      >
         <Scallop className="home__stravaWhen" size="sticker" tiltDeg={10} tone="vermilion">
           <span className="strava__sealKey">Latest</span>
           <span className="strava__sealWhen">

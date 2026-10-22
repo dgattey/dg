@@ -11,6 +11,7 @@ import {
   musicRoute,
   musicStatsRoute,
   readingRoute,
+  stravaRoute,
 } from '@dg/shared-core/routes/app';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { render, screen, within } from '@testing-library/react';
@@ -198,10 +199,11 @@ describe('Footer', () => {
         .map((link) => [link.textContent, link.getAttribute('href')]),
     ).toEqual([
       ['Home', homeRoute],
-      ['Favorite albums', favoriteAlbumsRoute],
-      ['Listening history', musicRoute],
       ['Listening stats', musicStatsRoute],
-      ['Reading', readingRoute],
+      ['Plays', musicRoute],
+      ['Favorite albums', favoriteAlbumsRoute],
+      ['Reads', readingRoute],
+      ['Big map', stravaRoute],
     ]);
   });
 

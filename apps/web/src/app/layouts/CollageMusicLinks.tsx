@@ -12,6 +12,7 @@ import {
   MUSIC_DESTINATIONS,
   normalizeMusicPath,
   READING_DESTINATION,
+  STRAVA_DESTINATION,
 } from './musicHeaderDestinations';
 
 const DESTINATION_ICONS: Record<string, LucideIcon> = {
@@ -86,8 +87,7 @@ function bindMusicMenu(details: HTMLDetailsElement | null) {
 export function CollageMusicLinks() {
   const pathname = normalizeMusicPath(usePathname() ?? '/');
   const onMusicPage = isMusicDestinationPath(pathname);
-  const onReadingPage =
-    pathname === READING_DESTINATION.href || pathname.startsWith(`${READING_DESTINATION.href}/`);
+  const isAt = (href: string) => pathname === href || pathname.startsWith(`${href}/`);
 
   return (
     <>
@@ -127,12 +127,22 @@ export function CollageMusicLinks() {
       </details>
       <div className="collageLift">
         <PaperButton
-          current={onReadingPage}
+          current={isAt(READING_DESTINATION.href)}
           href={READING_DESTINATION.href}
           tiltDeg={1.5}
           title={READING_DESTINATION.label}
         >
           {READING_DESTINATION.label}
+        </PaperButton>
+      </div>
+      <div className="collageLift">
+        <PaperButton
+          current={isAt(STRAVA_DESTINATION.href)}
+          href={STRAVA_DESTINATION.href}
+          tiltDeg={-1}
+          title={STRAVA_DESTINATION.label}
+        >
+          {STRAVA_DESTINATION.label}
         </PaperButton>
       </div>
     </>

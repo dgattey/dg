@@ -47,14 +47,11 @@ function petal(meters: number, most: number) {
 }
 
 /**
- * This year's climbing as a cut-paper flower: one petal per month, longer for
- * more feet. Renders nothing before the year's first climb.
+ * Climbing as a cut-paper flower: one petal per calendar month, longer for
+ * more feet. `span` names the stretch of time the months cover.
  */
-export function ClimbingFlower({ months, year }: { months: ReadonlyArray<number>; year: number }) {
+export function ClimbingFlower({ months, span }: { months: ReadonlyArray<number>; span: string }) {
   const most = Math.max(0, ...months);
-  if (most === 0) {
-    return null;
-  }
   const total = months.reduce((sum, meters) => sum + meters, 0);
   return (
     <PaperCard
@@ -65,10 +62,10 @@ export function ClimbingFlower({ months, year }: { months: ReadonlyArray<number>
     >
       <div className="strava__head">
         <h2 className="strava__heading">Climbing by month</h2>
-        <span className="strava__aside">{year}</span>
+        <span className="strava__aside">{span}</span>
       </div>
       <svg
-        aria-label={`${formatFeet(total)} feet climbed in ${year}, by month`}
+        aria-label={`${formatFeet(total)} feet climbed, ${span.toLowerCase()}, by month`}
         className="strava__flower"
         role="img"
         viewBox={`0 0 ${SIZE} ${SIZE}`}
