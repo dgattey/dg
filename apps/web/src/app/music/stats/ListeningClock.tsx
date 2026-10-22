@@ -3,21 +3,24 @@ import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
 import { cx } from '../../collage/paperVars';
 import {
+  DAY_PARTS,
+  dayPartOf,
   formatCompact,
   formatCount,
+  formatDayPartHours,
+  formatHour,
   formatHourRange,
+  formatHourTick,
   formatPercent,
-  HOUR_SHIFTS,
-  hourShift,
   peakHours,
-  playsInShift,
+  playsInDayPart,
 } from './listeningStatsFormat';
 import { CardHead } from './StatsCardParts';
 
 const INNER = 58;
 const REACH = 92;
 const HALF_SPAN_DEG = 6.4;
-const TICK_HOURS = [0, 6, 12, 18];
+const TICK_HOURS = DAY_PARTS.map(({ startHour }) => startHour);
 
 function point(radius: number, deg: number): { x: number; y: number } {
   const rad = (deg * Math.PI) / 180;
@@ -66,7 +69,7 @@ function Turntable({ byHour, peakStart }: { byHour: ReadonlyArray<HourPlays>; pe
         <path
           className={cx(
             'stats__wedge',
-            `stats__shift--${hourShift(hour)}`,
+            `stats__shift--${dayPartOf(hour)}`,
             isPeak(hour) && 'stats__wedge--peak',
           )}
           d={wedgePath(hour, outer(plays))}
@@ -77,7 +80,7 @@ function Turntable({ byHour, peakStart }: { byHour: ReadonlyArray<HourPlays>; pe
         const { x, y } = point(INNER + REACH + 14, hourAngle(hour));
         return (
           <text className="stats__clockTick" key={hour} x={x} y={y}>
-            {String(hour).padStart(2, '0')}
+            {formatHourTick(hour)}
           </text>
         );
       })}
@@ -107,13 +110,13 @@ export function ListeningClock({ stats }: { stats: ListeningStats }) {
       innerClassName="stats__pad"
       tag={
         <PaperTag className="stats__pin" tiltDeg={6} tone="vermilion">
-          {formatHourRange(peak.start, 2)} peak
+          Peak {formatHourRange(peak.start, 2)}
         </PaperTag>
       }
       tiltDeg={-0.8}
     >
       <CardHead
-        aside={`${formatCount(peak.plays)} plays at the peak, ${formatPercent(peak.plays, stats.plays)}`}
+        aside={`${formatPercent(peak.plays, stats.plays)} of plays land in those two hours`}
         title="A day of listening, Pacific time"
       />
       <div className="stats__dayBody">
@@ -121,18 +124,20 @@ export function ListeningClock({ stats }: { stats: ListeningStats }) {
         <ol className="chrome__srOnly">
           {byHour.map(({ hour, plays }) => (
             <li key={hour}>
-              {String(hour).padStart(2, '0')}:00, {formatCount(plays)} plays
+              {formatHour(hour)}, {formatCount(plays)} plays
             </li>
           ))}
         </ol>
         <ul className="stats__shifts">
-          {HOUR_SHIFTS.map(({ label, shift }) => (
-            <li className={`stats__shift stats__shift--${shift}`} key={shift}>
+          {DAY_PARTS.map(({ label, part, startHour }) => (
+            <li className={`stats__shift stats__shift--${part}`} key={part}>
               <span aria-hidden="true" className="stats__swatch" />
               <span className="stats__shiftShare">
-                {formatPercent(playsInShift(stats.hours, shift), stats.plays)}
+                {formatPercent(playsInDayPart(stats.hours, part), stats.plays)}
               </span>
-              <span className="stats__meta">{label}</span>
+              <span className="stats__meta">
+                {label}, {formatDayPartHours(startHour)}
+              </span>
             </li>
           ))}
         </ul>

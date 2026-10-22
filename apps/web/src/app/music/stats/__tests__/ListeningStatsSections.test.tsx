@@ -75,7 +75,16 @@ describe('ListeningStatsSections', () => {
     expect(
       [...container.querySelectorAll('.stats__clockValue')].map((label) => label.textContent),
     ).toEqual(['25.8k']);
-    expect(screen.getByText('3 to 5 PM peak')).toBeInTheDocument();
+    expect(screen.getByText('Peak 3 to 5 PM')).toBeInTheDocument();
+    expect(
+      [...container.querySelectorAll('.stats__clockTick')].map((tick) => tick.textContent),
+    ).toEqual(['6a', '12p', '6p', '12a']);
+  });
+
+  it('says how far back the history goes', () => {
+    render(<ListeningStatsSections stats={stats} />);
+
+    expect(screen.getByText('Plays since Jul 2011')).toBeInTheDocument();
   });
 
   it('cuts the totals into stubs, stamps, and seals instead of matching boxes', () => {

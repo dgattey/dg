@@ -1,7 +1,12 @@
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import type { ReactNode } from 'react';
 import type { PaperTone } from '../../collage/types';
-import { formatCount, formatMonth, formatPercent } from './listeningStatsFormat';
+import {
+  formatCount,
+  formatMonth,
+  formatPacificMonth,
+  formatPercent,
+} from './listeningStatsFormat';
 import { Scallop, Stub } from './StatsShapes';
 
 export type TotalCut = { kind: 'seal' | 'stamp' | 'ticket'; tiltDeg: number; tone: PaperTone };
@@ -33,7 +38,7 @@ export function ListeningStatsTotals({ stats }: { stats: ListeningStats }) {
   const totals = [
     {
       cut: TOTAL_CUTS.plays,
-      label: 'Plays',
+      label: `Plays since ${formatPacificMonth(stats.firstPlayedAt)}`,
       sub: `${formatCount(stats.tracks)} tracks, ${formatCount(stats.artists)} artists`,
       value: formatCount(stats.plays),
     },
