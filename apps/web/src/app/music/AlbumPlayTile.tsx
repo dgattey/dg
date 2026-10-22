@@ -1,8 +1,9 @@
 import { Link } from '@dg/ui/dependent/Link';
+import { collageCardTreatment } from '../collage/collageCardTreatment';
 import { PaperTag } from '../collage/PaperTag';
 import { AlbumCover } from './AlbumCover';
 import { AlbumStack } from './AlbumStack';
-import { CollageAlbumPaper, collageAlbumCardTreatment } from './albums/collageAlbumCardTreatments';
+import { CollageAlbumPaper } from './albums/collageAlbumCardTreatments';
 import { MAX_ALBUM_SLEEVES } from './albumTileGeometry';
 
 type Props = {
@@ -51,7 +52,7 @@ export function AlbumPlayTile({
   );
 
   return (
-    <CollageAlbumPaper treatment={collageAlbumCardTreatment(cardIndex)}>
+    <CollageAlbumPaper treatment={collageCardTreatment(cardIndex)}>
       <Link className="music__albumLink" href={linkUrl} isExternal={true}>
         <span className="music__art music__fullColorArt">
           <AlbumStack imageUrl={imageUrl} isLcpCandidate={isLcpCandidate} sleeveCount={sleeveCount}>

@@ -1,5 +1,6 @@
 import 'server-only';
 import '../music.css';
+import '../../collage/pills.css';
 
 import { favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import type { Metadata } from 'next';

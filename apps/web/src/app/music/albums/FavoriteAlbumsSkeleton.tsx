@@ -1,4 +1,4 @@
-import { CollageAlbumSkeletonGrid, CollageSortSkeleton } from './collageAlbumCardTreatments';
+import { CollageAlbumSkeletonGrid, CollageSortControls } from './collageAlbumCardTreatments';
 
 const DEFAULT_PLACEHOLDER_COUNT = 12;
 
@@ -9,7 +9,7 @@ export function FavoriteAlbumsSkeleton({
 } = {}) {
   return (
     <>
-      <CollageSortSkeleton />
+      <CollageSortControls sortKey="added" />
       <CollageAlbumSkeletonGrid tileCount={tileCount} />
     </>
   );

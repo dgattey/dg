@@ -1,0 +1,57 @@
+import { jsOnlyProps } from '@dg/ui/core/JsOnlyStyle';
+import type { ReactNode } from 'react';
+import { PaperTag } from './PaperTag';
+import { cx } from './paperVars';
+
+export type PaperPillOption<Key extends string> = {
+  key: Key;
+  label: ReactNode;
+  tiltDeg: number;
+};
+
+/**
+ * Sort and filter pills on collage index pages. Without `onSelect` the pills
+ * render inert, as a loading placeholder that holds the same footprint.
+ */
+export function PaperPills<Key extends string>({
+  className,
+  label,
+  onSelect,
+  options,
+  selected,
+}: {
+  className?: string;
+  label: string;
+  onSelect?: (key: Key) => void;
+  options: ReadonlyArray<PaperPillOption<Key>>;
+  selected: Key;
+}) {
+  return (
+    <fieldset aria-label={label} className={cx('paperPills', className)} {...jsOnlyProps}>
+      {options.map((option) => {
+        const current = option.key === selected;
+        return (
+          <PaperTag
+            className={cx('paperPill', current && 'paperButtonCurrent')}
+            edge="quad-a"
+            key={option.key}
+            tiltDeg={option.tiltDeg}
+          >
+            {onSelect ? (
+              <button
+                aria-pressed={current}
+                className="paperPillButton"
+                onClick={() => onSelect(option.key)}
+                type="button"
+              >
+                {option.label}
+              </button>
+            ) : (
+              <span className="paperPillButton">{option.label}</span>
+            )}
+          </PaperTag>
+        );
+      })}
+    </fieldset>
+  );
+}

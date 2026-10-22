@@ -5,10 +5,11 @@ import {
 } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import { ViewTransition } from 'react';
+import type { CollageCardTreatment } from '../../collage/collageCardTreatment';
 import { AlbumCover } from '../AlbumCover';
 import { AlbumStack } from '../AlbumStack';
 import { MAX_ALBUM_SLEEVES } from '../albumTileGeometry';
-import { type CollageAlbumCardTreatment, CollageAlbumPaper } from './collageAlbumCardTreatments';
+import { CollageAlbumPaper } from './collageAlbumCardTreatments';
 
 /** Every favorite is a whole album, so every cell wears the full fan. */
 const SLEEVE_COUNT = MAX_ALBUM_SLEEVES;
@@ -17,7 +18,7 @@ type Props = {
   albumId: string;
   albumName: string;
   artistCaption: string;
-  collageTreatment: CollageAlbumCardTreatment;
+  collageTreatment: CollageCardTreatment;
   imageUrl: string;
   /** When true, keep the cell size but hide art (it lives in the well). */
   collapsed?: boolean;

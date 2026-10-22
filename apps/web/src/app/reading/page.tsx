@@ -1,4 +1,5 @@
 import 'server-only';
+import '../collage/pills.css';
 import './reading.css';
 
 import { readingRoute } from '@dg/shared-core/routes/app';
@@ -20,43 +21,32 @@ export const metadata: Metadata = {
   title: TITLE,
 };
 
-function ReadingSkeleton() {
+function ReadingStatus({ children }: { children: string }) {
   return (
-    <div aria-label="Loading reading list" role="status">
-      <div className="reading__titleRow">
-        <CutLetters className="collagePageTitle reading__title" text={TITLE} />
-      </div>
-      <PaperCard className="reading__feature" edge="soft-a" tiltDeg={-0.5} tone="viridian">
-        <div className="reading__empty">Loading reading shelf…</div>
-      </PaperCard>
-    </div>
+    <PaperCard className="reading__status" tiltDeg={-1} tone="cream">
+      <p role="status">{children}</p>
+    </PaperCard>
   );
 }
 
 async function ReadingContent() {
   const books = await getBooks();
-
   if (books.length === 0) {
-    return (
-      <>
-        <div className="reading__titleRow">
-          <CutLetters className="collagePageTitle reading__title" text={TITLE} />
-        </div>
-        <PaperCard edge="soft-a" tiltDeg={-0.5} tone="cream">
-          <p className="reading__empty">No books on the shelf yet.</p>
-        </PaperCard>
-      </>
-    );
+    return <ReadingStatus>No books yet.</ReadingStatus>;
   }
-
-  return <ReadingShelf books={books} title={TITLE} />;
+  return <ReadingShelf books={books} />;
 }
 
+/**
+ * Page shell stays synchronous so the title commits in the same render as the
+ * outgoing page and morphs into it; the shelf streams in underneath.
+ */
 export default function ReadingPage() {
   return (
     <section aria-label={TITLE} className="collageBackdropHost reading__layout">
       <CollageBackdrop backdrop={READING_BACKDROP} />
-      <Suspense fallback={<ReadingSkeleton />}>
+      <CutLetters className="collagePageTitle" text={TITLE} />
+      <Suspense fallback={<ReadingStatus>Loading books…</ReadingStatus>}>
         <ReadingContent />
       </Suspense>
     </section>

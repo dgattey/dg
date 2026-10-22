@@ -1,191 +1,114 @@
 'use client';
 
 import type { RenderableBook } from '@dg/content-models/contentful/renderables/books';
-import { jsOnlyProps } from '@dg/ui/core/JsOnlyStyle';
-import { type CSSProperties, useState } from 'react';
-import { PaperCard } from '../collage/PaperCard';
-import { cx } from '../collage/paperVars';
+import { startTransition, useState, ViewTransition } from 'react';
+import { collageCardTreatment } from '../collage/collageCardTreatment';
+import { PaperPills } from '../collage/PaperPills';
+import { PaperTag } from '../collage/PaperTag';
+import type { PaperTone } from '../collage/types';
+import { CoverCard, ReviewCard } from './ReadingCards';
+import { ReadingHero } from './ReadingHero';
 import {
-  CutOutGlyph,
-  NightstandHeroCollage,
-  ScallopedStampBadge,
-  StreamBookCard,
-} from './ReadingCards';
-import {
-  buildYearGroups,
-  filterAndSortBooks,
-  formatRailStarSummary,
-  READING_FILTER_OPTIONS,
+  bookCardKind,
+  featuredBook,
+  filterBooks,
   type ReadingFilterKey,
-  yearBadgeStyle,
+  readingFilterOptions,
+  shelfSections,
+  shelfStats,
+  sortBooks,
 } from './readingHelpers';
 
-type ReadingInlineStyle = CSSProperties & Record<`--${string}`, string | number>;
+/** Shared view-transition class, so every moving piece of the shelf runs on one clock. */
+const SHELF_TRANSITION = 'reading-shelf';
 
-type ReadingShelfProps = {
-  books: ReadonlyArray<RenderableBook>;
-  title?: string;
-};
+const YEAR_TAGS = [
+  { tiltDeg: -3, tone: 'cream' },
+  { tiltDeg: 2.5, tone: 'vermilion' },
+  { tiltDeg: -2, tone: 'cobalt' },
+  { tiltDeg: 3, tone: 'rose' },
+] as const satisfies ReadonlyArray<{ tiltDeg: number; tone: PaperTone }>;
 
-export function ReadingShelf({ books, title = 'Reading' }: ReadingShelfProps) {
-  const [activeFilter, setActiveFilter] = useState<ReadingFilterKey>('all');
+/** Paper comes from the unfiltered shelf position, so a card keeps its look as it moves. */
+function ShelfCard({ book, shelfIndex }: { book: RenderableBook; shelfIndex: number }) {
+  const treatment = collageCardTreatment(shelfIndex);
+  const kind = bookCardKind(book);
+  switch (kind) {
+    case 'cover':
+      return <CoverCard book={book} treatment={treatment} />;
+    case 'feature':
+    case 'review':
+      return (
+        <ReviewCard book={book} flip={shelfIndex % 2 === 1} kind={kind} treatment={treatment} />
+      );
+    default: {
+      const unhandled: never = kind;
+      return unhandled;
+    }
+  }
+}
 
-  const allBooksInOrder = filterAndSortBooks(books, 'all');
-  const visibleBooks = filterAndSortBooks(books, activeFilter);
-  const fiveStarTotal = allBooksInOrder.filter((book) => book.rating === 5).length;
+export function ReadingShelf({ books }: { books: ReadonlyArray<RenderableBook> }) {
+  const [filterKey, setFilterKey] = useState<ReadingFilterKey>('all');
 
-  const latestBook = visibleBooks[0] ?? null;
-  const yearGroups = buildYearGroups(allBooksInOrder, visibleBooks, latestBook?.id ?? null);
+  const shelf = sortBooks(books);
+  const featured = filterKey === 'all' ? featuredBook(shelf) : null;
+  const sections = shelfSections(
+    filterBooks(shelf, filterKey).filter((book) => book.id !== featured?.book.id),
+  );
+  const filterOptions = readingFilterOptions(shelf).map(({ count, key, label, tiltDeg }) => ({
+    key,
+    label: (
+      <>
+        {label} <small>{count}</small>
+      </>
+    ),
+    tiltDeg,
+  }));
 
   return (
-    <div className="reading">
-      <header className="reading__header">
-        <div className="reading__titleCluster">
-          <ScallopedStampBadge
-            className="reading__exLibrisStamp"
-            tiltDeg={-6.5}
-            variant="terracotta"
-          >
-            <CutOutGlyph className="reading__stampIcon" shape="star4" />
-            <span>Ex libris · notes & ratings</span>
-          </ScallopedStampBadge>
-          <h1
-            className="paperTag paper--ochre edge--quad-a reading__title"
-            style={{ '--r': '-1.8deg' } as ReadingInlineStyle}
-          >
-            <span>{title}</span>
-          </h1>
-          <p
-            className="paperTag paper--viridian edge--quad-b reading__subtitle"
-            style={{ '--r': '1.4deg' } as ReadingInlineStyle}
-          >
-            <span>Books off the nightstand, with dog-eared notes and star ratings.</span>
-          </p>
-        </div>
-
-        <fieldset {...jsOnlyProps} aria-label="Filter books" className="reading__controls">
-          <legend className="reading__srOnly">Filter books</legend>
-          {READING_FILTER_OPTIONS.map((option) => {
-            const isActive = activeFilter === option.key;
-            return (
-              <button
-                aria-pressed={isActive}
-                className={cx(
-                  'paperTag',
-                  isActive ? 'paper--vermilion' : 'paper--cream',
-                  'edge--quad-a',
-                  'reading__pill',
-                  isActive && 'reading__pillActive',
-                )}
-                key={option.key}
-                onClick={() => setActiveFilter(option.key)}
-                style={{ '--r': `${option.tiltDeg}deg` } as ReadingInlineStyle}
-                type="button"
-              >
-                <span>{option.label}</span>
-              </button>
-            );
-          })}
-        </fieldset>
-      </header>
-
-      {latestBook ? (
-        <NightstandHeroCollage
-          book={latestBook}
-          fiveStarTotal={fiveStarTotal}
-          totalBookCount={allBooksInOrder.length}
-        />
+    <>
+      <PaperPills
+        className="reading__filters"
+        label="Filter books"
+        onSelect={(key) => startTransition(() => setFilterKey(key))}
+        options={filterOptions}
+        selected={filterKey}
+      />
+      {featured ? (
+        <ViewTransition default={SHELF_TRANSITION} key={featured.book.id}>
+          <ReadingHero featured={featured} stats={shelfStats(shelf)} />
+        </ViewTransition>
       ) : null}
-
-      {yearGroups.map((group, groupIndex) => {
-        const badge = yearBadgeStyle(group.year, groupIndex);
-        const starSummary = formatRailStarSummary(group.averageRating);
-        const isLastGroup = groupIndex === yearGroups.length - 1;
-        const countLabel = `${group.totalCount} ${group.totalCount === 1 ? 'book' : 'books'}`;
-
+      {sections.map((section, sectionIndex) => {
+        const yearTag = YEAR_TAGS[sectionIndex % YEAR_TAGS.length] ?? YEAR_TAGS[0];
         return (
-          <section
-            aria-label={`Books finished in ${group.year}`}
-            className={cx('reading__yearSection', isLastGroup && 'reading__yearSectionLast')}
-            key={group.year}
-          >
-            <div className="reading__rail">
-              <div className="reading__railBadgeCluster">
-                <CutOutGlyph
-                  className="reading__railBotanical"
-                  shape={badge.botanicalShape}
-                  style={
-                    {
-                      '--botanical-color': `var(--${badge.botanicalColor})`,
-                      '--botanical-r': `${badge.botanicalRotationDeg}deg`,
-                    } as ReadingInlineStyle
-                  }
-                />
-                <CutOutGlyph
-                  className="reading__railStarAccent"
-                  shape={badge.secondaryShape}
-                  style={
-                    {
-                      '--accent-color': `var(--${badge.secondaryColor})`,
-                      '--accent-r': `${badge.secondaryRotationDeg}deg`,
-                    } as ReadingInlineStyle
-                  }
-                />
-                <h2
-                  className={cx(
-                    'reading__yearTag',
-                    'reading__dieCutYearStamp',
-                    `paper--${badge.tone}`,
-                  )}
-                  id={`reading-year-${group.year}`}
-                  style={{ '--r': `${badge.tiltDeg}deg` } as ReadingInlineStyle}
+          <section aria-label={section.label} className="reading__section" key={section.label}>
+            <ViewTransition default={SHELF_TRANSITION}>
+              <h2 className="reading__sectionHeading">
+                <PaperTag
+                  className="reading__sectionTag"
+                  edge="quad-c"
+                  tiltDeg={yearTag.tiltDeg}
+                  tone={yearTag.tone}
                 >
-                  <span className="reading__yearStampSub">Shelf year</span>
-                  <span className="reading__yearStampMain">{group.year}</span>
-                </h2>
-              </div>
-
-              <PaperCard
-                className="reading__railMetaSlip"
-                edge={badge.edge}
-                innerClassName="reading__railMetaSlipInner"
-                tiltDeg={groupIndex % 2 === 0 ? 2.4 : -2.2}
-                tone="cream"
-              >
-                <p className="reading__railCount">{countLabel}</p>
-                {starSummary ? <p className="reading__railStars">{starSummary}</p> : null}
-                {group.fiveStarCount > 0 ? (
-                  <p className="reading__railFiveStarNote">
-                    ★ {group.fiveStarCount} five-star{' '}
-                    {group.fiveStarCount === 1 ? 'favorite' : 'favorites'}
-                  </p>
-                ) : null}
-                {group.includesLatest ? (
-                  <p className="reading__railSub">Latest read is up top</p>
-                ) : null}
-              </PaperCard>
-            </div>
-
-            <div className="reading__stream">
-              {group.streamBooks.map((book, index) => {
-                const isDogEar = book.rating === 5;
-                const isLastAlone =
-                  !isDogEar &&
-                  index === group.streamBooks.length - 1 &&
-                  group.streamBooks.filter((b) => b.rating !== 5).length % 2 === 1;
-                return (
-                  <StreamBookCard
-                    book={book}
-                    index={index + groupIndex * 2}
-                    isWide={isLastAlone}
-                    key={book.id}
-                  />
-                );
-              })}
+                  {section.label}
+                  <small>
+                    {section.books.length} {section.books.length === 1 ? 'book' : 'books'}
+                  </small>
+                </PaperTag>
+              </h2>
+            </ViewTransition>
+            <div className="reading__grid">
+              {section.books.map((book) => (
+                <ViewTransition default={SHELF_TRANSITION} key={book.id}>
+                  <ShelfCard book={book} shelfIndex={shelf.indexOf(book)} />
+                </ViewTransition>
+              ))}
             </div>
           </section>
         );
       })}
-    </div>
+    </>
   );
 }
