@@ -1,5 +1,12 @@
 import type { Point } from 'pigeon-maps';
-import { decodeRoutes, frameAround, framePaths, homeBounds, routeSilhouette } from '../routeFrame';
+import {
+  decodeRoutes,
+  frameAround,
+  framePaths,
+  homeBounds,
+  routeLegs,
+  routeSilhouette,
+} from '../routeFrame';
 import { encodePolyline } from '../routeGeometry';
 
 const loop = ([latitude, longitude]: Point): Array<Point> => [
@@ -32,7 +39,7 @@ describe('route frames', () => {
     ).toEqual([3]);
   });
 
-  it('centers home on where most routes start, not on outliers', () => {
+  it('frames home around the routes that start there, not the outliers', () => {
     const bounds = homeBounds(decodeRoutes([...bay, ...away]));
     expect(bounds).not.toBeNull();
     const [[south, west], [north, east]] = bounds ?? [
@@ -61,6 +68,19 @@ describe('route frames', () => {
     const paths = framePaths(frame, decoded);
     expect(paths.map(({ tone }) => tone)).toEqual(['vermilion', 'cobalt']);
     expect(paths[0]?.d.match(/M/g)).toHaveLength(2);
+  });
+
+  it('breaks a route where a paused recording jumps across town', () => {
+    const mission: Array<Point> = [
+      [37.76, -122.42],
+      [37.765, -122.415],
+    ];
+    const oakland: Array<Point> = [
+      [37.8, -122.27],
+      [37.805, -122.265],
+    ];
+    expect(routeLegs([...mission, ...oakland, [37.9, -122.0]])).toEqual([mission, oakland]);
+    expect(routeLegs(loop([37.77, -122.42]))).toEqual([loop([37.77, -122.42])]);
   });
 
   it('fits a lone route into a silhouette square', () => {

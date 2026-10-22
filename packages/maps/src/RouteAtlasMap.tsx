@@ -9,7 +9,7 @@ import { use, useEffect, useRef } from 'react';
 import { VisibleRoutes } from '../VisibleRoutes';
 import { OFFLINE_TILES } from './offlineTile';
 import { RouteAtlasSketch } from './RouteAtlasSketch';
-import { decodeRoutes, type GeoBounds, type MapRoute } from './routeFrame';
+import { decodeRoutes, type GeoBounds, type MapRoute, routeLegs } from './routeFrame';
 import { stadiaStyleUrl, type TileSource, withStadiaKey } from './tileSource';
 import { useDarkMap } from './useDarkMap';
 import { ZoomControls } from './ZoomControls';
@@ -33,6 +33,9 @@ const canvasSx: SxObject = {
   position: 'absolute',
 };
 
+/** `.maplibregl-map` forces `position: relative`, so the map container can't size by `inset`. */
+const mapSx: SxObject = { height: '100%', width: '100%' };
+
 const toLngLat = ([latitude, longitude]: Point): [number, number] => [longitude, latitude];
 
 const lngLatBounds = ([southwest, northeast]: GeoBounds): [[number, number], [number, number]] => [
@@ -40,16 +43,20 @@ const lngLatBounds = ([southwest, northeast]: GeoBounds): [[number, number], [nu
   toLngLat(northeast),
 ];
 
-/** Paper tones are `light-dark()` pairs, which only resolve to a color on an element. */
+/**
+ * Paper tones are `light-dark()` pairs, which only resolve to a color on an
+ * element. Each tone gets a fresh probe: restyling one probe can report the
+ * previous tone's color.
+ */
 function resolveTones(host: HTMLElement, tones: Iterable<string>) {
-  const probe = document.createElement('span');
-  host.append(probe);
   const colors = new Map<string, string>();
   for (const tone of tones) {
+    const probe = document.createElement('span');
     probe.style.color = `var(--${tone})`;
+    host.append(probe);
     colors.set(tone, getComputedStyle(probe).color);
+    probe.remove();
   }
-  probe.remove();
   return colors;
 }
 
@@ -64,7 +71,10 @@ function addRoutes(map: MapLibreMap, host: HTMLElement, routes: ReadonlyArray<Ma
   map.addSource(SOURCE, {
     data: {
       features: decodeRoutes(routes).map(({ id, points, tone }) => ({
-        geometry: { coordinates: points.map(toLngLat), type: 'LineString' },
+        geometry: {
+          coordinates: routeLegs(points).map((leg) => leg.map(toLngLat)),
+          type: 'MultiLineString',
+        },
         properties: { color: colors.get(tone), id },
         type: 'Feature',
       })),
@@ -131,10 +141,12 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
     }
     let cancelled = false;
     let created: MapLibreMap | null = null;
-    void import('maplibre-gl').then(({ Map: MapLibre }) => {
+    void import('maplibre-gl').then(({ Map: MapLibre, setWorkerUrl }) => {
       if (cancelled) {
         return;
       }
+      // MapLibre finds its worker next to its own module, which bundling moves.
+      setWorkerUrl(new URL('maplibre-gl/dist/maplibre-gl-worker.mjs', import.meta.url).href);
       const map = new MapLibre({
         attributionControl: { compact: true },
         bounds: lngLatBounds(bounds),
@@ -180,7 +192,7 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
         </Box>
       ) : (
         <>
-          <Box ref={canvasRef} sx={canvasSx} />
+          <Box ref={canvasRef} sx={mapSx} />
           <ZoomControls
             onReset={() =>
               mapRef.current?.fitBounds(lngLatBounds(bounds), { padding: FIT_PADDING })
