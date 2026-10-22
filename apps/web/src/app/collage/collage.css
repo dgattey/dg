@@ -59,12 +59,18 @@ html:has(.collageRoot) body {
   --shadow-lift: 0 3px 0 rgb(0 0 0 / 0.24), 0 10px 18px rgb(0 0 0 / 0.22);
   --type-display: clamp(56px, 11vw, 144px);
   --type-h1: clamp(44px, 7vw, 88px);
+  --type-display-md: clamp(40px, 6vw, 72px);
+  --type-title-lg: clamp(26px, 2.6vw, 36px);
+  --type-title-md: clamp(22px, 2.3vw, 28px);
   --type-h2: clamp(20px, 2.2vw, 24px);
+  --type-title-sm: var(--type-h2);
   --type-h3: 20px;
+  --type-label: clamp(18px, 1.6vw, 20px);
   --type-body-lg: clamp(17px, 1.5vw, 20px);
   --type-body: 16px;
-  --type-label: clamp(18px, 1.6vw, 20px);
   --type-meta: 16px;
+  --type-caption: 14px;
+  --type-micro: 12px;
   --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.2)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.12));
   /* Same two shadows as --dshadow, so the filter interpolates between them. */
   --dshadow-lift: drop-shadow(0 2px 0 light-dark(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.36)))
@@ -103,20 +109,30 @@ html:has(.collageRoot) body {
     0 2px 0 rgb(0 0 0 / calc(0.2 * var(--footer-progress))),
     0 18px 32px rgb(8 12 30 / calc(0.32 * var(--footer-progress)));
 }
-.collageRoot::after {
+/*
+ * Grain belongs to the surface it sits on. The sheet's travels with the sheet. The
+ * root's is pinned to the viewport above the footer, which holds still while the
+ * sheet scrolls off it, so the green and its grain stay put through the reveal.
+ */
+.collageRoot::after,
+.collageRoot > .collageSheet::after {
   position: absolute;
   inset: 0;
   z-index: 60;
   pointer-events: none;
   content: "";
   background-image: url("./img/grain.png");
-  background-size: 200px 200px;
+  background-size: 256px 256px;
 }
-html[data-color-scheme="dark"] .collageRoot::after {
+.collageRoot::after {
+  position: fixed;
+  z-index: 1;
+}
+html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::after {
   opacity: 0.6;
 }
 @media (prefers-color-scheme: dark) {
-  html:not([data-color-scheme="light"]) .collageRoot::after {
+  html:not([data-color-scheme="light"]) :is(.collageRoot, .collageRoot > .collageSheet)::after {
     opacity: 0.6;
   }
 }
@@ -171,14 +187,8 @@ html[data-color-scheme="dark"] .collageRoot::after {
 .collagePageTitle {
   padding-top: 20px;
   font-size: var(--type-h1);
-  font-weight: 800;
   line-height: 0.94;
   letter-spacing: -0.035em;
-}
-/* Every page's lead heading, so it morphs into the next page's heading. */
-html:not(:active-view-transition-type(album-open, album-close))
-:is(.collagePageTitle, .home__headline, .error__statusCode) {
-  view-transition-name: page-title;
 }
 .collagePin {
   position: absolute;
@@ -190,7 +200,7 @@ html:not(:active-view-transition-type(album-open, album-close))
 .c-label {
   font-family: var(--display);
   font-size: var(--type-label);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.1;
   color: var(--on, var(--ink));
   letter-spacing: -0.01em;
@@ -257,7 +267,7 @@ html:not(:active-view-transition-type(album-open, album-close))
   padding: 0.65em 0.95em 0.7em;
   font-family: var(--display);
   font-size: var(--type-label);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1.1;
   color: var(--on);
   letter-spacing: -0.01em;
@@ -272,7 +282,6 @@ html:not(:active-view-transition-type(album-open, album-close))
 }
 .paperTag {
   padding: 0.5em 0.85em 0.55em;
-  font-size: var(--type-label);
   cursor: default;
 }
 .paperTag small {
@@ -282,8 +291,10 @@ html:not(:active-view-transition-type(album-open, album-close))
   letter-spacing: 0;
   opacity: 0.78;
 }
-.paperWrap > span {
+/* Inline-level so it can sit in a `<summary>`, but a box, since `rotate` skips inline boxes. */
+.paperButtonWrap {
   display: inline-flex;
+  vertical-align: top;
 }
 .paperWrap .paperButton {
   color: var(--on);
@@ -306,7 +317,7 @@ html:not(:active-view-transition-type(album-open, album-close))
 }
 .collageRoot
   :is(
-    .paperWrap:has(> span > .paperButton:focus-visible),
+    .paperWrap:has(> .paperButton:focus-visible),
     .chrome__musicSummary:focus-visible > .paperWrap,
     .chrome__nowPlaying :focus-visible .paperWrap
   ) {
@@ -448,7 +459,7 @@ html[data-color-scheme="dark"] .cutNightOnly {
   margin: 0;
   font-family: var(--display);
   font-size: var(--type-display);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 0.9;
   color: var(--title);
   letter-spacing: -0.04em;
@@ -468,6 +479,10 @@ html[data-color-scheme="dark"] .cutNightOnly {
 .cutLetter {
   display: inline-block;
   margin-inline: 0.012em;
+}
+/* Each page renders exactly one, so every page's title morphs into the next one's. */
+html:not(:active-view-transition-type(album-open, album-close)) .cutHeading {
+  view-transition-name: page-title;
 }
 
 @media (max-width: 820px) {

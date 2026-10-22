@@ -9,10 +9,11 @@ import {
   favoriteAlbumsRoute,
   homeRoute,
   musicRoute,
+  musicStatsRoute,
   readingRoute,
 } from '@dg/shared-core/routes/app';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { renderToStaticMarkup } from 'react-dom/server';
 
@@ -186,13 +187,18 @@ describe('Footer', () => {
     expect(screen.queryByText(/Dev console/i)).not.toBeInTheDocument();
     expect(screen.queryByText(/Back to top/i)).not.toBeInTheDocument();
 
-    expect(screen.getByRole('link', { name: 'Home' })).toHaveAttribute('href', homeRoute);
-    expect(screen.getByRole('link', { name: 'Music' })).toHaveAttribute('href', musicRoute);
-    expect(screen.getByRole('link', { name: 'Favorite albums' })).toHaveAttribute(
-      'href',
-      favoriteAlbumsRoute,
-    );
-    expect(screen.getByRole('link', { name: 'Reading' })).toHaveAttribute('href', readingRoute);
+    const footerNav = screen.getByRole('navigation', { name: 'Footer navigation' });
+    expect(
+      within(footerNav)
+        .getAllByRole('link')
+        .map((link) => [link.textContent, link.getAttribute('href')]),
+    ).toEqual([
+      ['Home', homeRoute],
+      ['Favorite albums', favoriteAlbumsRoute],
+      ['Listening history', musicRoute],
+      ['Listening stats', musicStatsRoute],
+      ['Reading', readingRoute],
+    ]);
   });
 
   it('renders Elsewhere stacked ledger rows with formatted handles and X ordered directly after Instagram', async () => {
@@ -262,6 +268,7 @@ describe('Footer', () => {
     await user.click(copyButton);
     expect(writeText).toHaveBeenCalledWith('dylan@gattey.com');
     expect(copyButton).toHaveTextContent('Copied');
+    expect(copyButton.querySelector('svg')).not.toBeNull();
   });
 
   it('keeps --footer-progress at 0 above the footer and interpolates to 1 as the footer scrolls into view', async () => {
