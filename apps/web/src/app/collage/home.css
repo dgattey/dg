@@ -423,6 +423,14 @@
   margin: 0;
   list-style: none;
 }
+/* Each tilted card paints its own layer, so the active one rises to keep its tooltip over the next. */
+.home__sideItem {
+  position: relative;
+  z-index: 0;
+}
+.home__sideItem:is(:hover, :focus-within) {
+  z-index: 1;
+}
 .home__sideRowWrap {
   width: 100%;
 }
