@@ -94,12 +94,24 @@ const renderSections = (history: StravaHistory) =>
     </ServerTimeProvider>,
   );
 
+/** Card maps measure themselves; jsdom has no layout, so the frame's own size stands. */
+class StillResizeObserver {
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+}
+
 beforeEach(() => {
   jest.useFakeTimers({ now: NOW });
+  Object.defineProperty(globalThis, 'ResizeObserver', {
+    configurable: true,
+    value: StillResizeObserver,
+  });
 });
 
 afterEach(() => {
   jest.useRealTimers();
+  Reflect.deleteProperty(globalThis, 'ResizeObserver');
 });
 
 describe('StravaHistorySections', () => {
@@ -110,14 +122,12 @@ describe('StravaHistorySections', () => {
       screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent),
     ).toEqual(['Climbing by month', 'Recent outings', 'Yearly miles', 'Biggest climbs']);
     expect(
-      screen.getByRole('img', {
-        name: "Every route I've tracked, on a watercolor map of the Bay Area",
-      }),
+      screen.getByRole('region', { name: "Map of every route I've tracked on Strava" }),
     ).toBeInTheDocument();
     expect(screen.getByRole('img', { name: '1,772 feet climbed in 2026, by month' })).toBeVisible();
-    expect(screen.getByText('2 routes')).toBeInTheDocument();
+    expect(screen.getByText('3 routes')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Runs' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Hikes' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Hikes' })).toBeInTheDocument();
     expect(screen.getByText('Cervelo odometer')).toBeInTheDocument();
     expect(screen.getByText('4,865 mi')).toBeInTheDocument();
     expect(screen.getByText('Best year')).toBeInTheDocument();
@@ -134,17 +144,15 @@ describe('StravaHistorySections', () => {
     expect(screen.getByText('2 days ago')).toBeInTheDocument();
   });
 
-  it('prints polaroids only for routes over the painted Bay', () => {
+  it('prints a polaroid for outings with a route wherever they went', () => {
     renderSections(full);
 
     expect(screen.getByRole('link', { name: 'Lake Merritt run on Strava' })).toHaveAttribute(
       'href',
       'https://www.strava.com/activities/2',
     );
-    expect(
-      screen.queryByRole('link', { name: 'Tahoe rim hike on Strava' }),
-    ).not.toBeInTheDocument();
-    expect(screen.queryByText('Longest outing')).not.toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'Tahoe rim hike on Strava' })).toHaveLength(2);
+    expect(screen.getByText('Longest outing')).toBeInTheDocument();
   });
 
   it('skips empty pieces for a sparse history instead of drawing blanks', () => {

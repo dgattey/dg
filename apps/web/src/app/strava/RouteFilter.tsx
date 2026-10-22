@@ -1,17 +1,10 @@
 'use client';
 
-import type { RouteGroup } from '@dg/maps/bay/bayRoutes';
-import {
-  createContext,
-  type ReactNode,
-  startTransition,
-  use,
-  useState,
-  ViewTransition,
-} from 'react';
+import type { StravaRouteTrace } from '@dg/content-models/strava/StravaHistory';
+import { VisibleRoutes } from '@dg/maps/VisibleRoutes';
+import { createContext, type ReactNode, startTransition, use, useState } from 'react';
 import { type PaperPillOption, PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
-import { RouteInk } from './RouteInk';
 import { formatRouteCount } from './stravaFormat';
 import { SPORT_DETAILS } from './stravaSports';
 
@@ -28,7 +21,10 @@ const SPAN_OPTIONS = [
 
 const SPORT_TILTS = [-1, 1.2, -0.6, 0.9] as const;
 
-const RouteFilterContext = createContext<ReadonlyArray<RouteGroup>>([]);
+/** What the filter needs from a route; polylines go straight to the map instead. */
+export type FilterableRoute = Pick<StravaRouteTrace, 'id' | 'sport' | 'year'>;
+
+const VisibleRouteCount = createContext(0);
 
 const sportOption = (key: SportFilter, index: number): PaperPillOption<SportFilter> => ({
   key,
@@ -48,29 +44,27 @@ const sportOption = (key: SportFilter, index: number): PaperPillOption<SportFilt
   tiltDeg: SPORT_TILTS[index % SPORT_TILTS.length] ?? 0,
 });
 
-/**
- * Sport and time filters over the projected route groups. The groups come
- * pre-projected from the server; this only picks which ones to ink.
- */
+/** Sport and time filters that pick which routes the `RouteAtlas` below inks. */
 export function RouteFilter({
   children,
-  groups,
+  routes,
   thisYear,
 }: {
   children: ReactNode;
-  groups: ReadonlyArray<RouteGroup>;
+  routes: ReadonlyArray<FilterableRoute>;
   thisYear: number;
 }) {
   const [sport, setSport] = useState<SportFilter>('all');
   const [span, setSpan] = useState<SpanFilter>('all');
-  const sports = FILTER_SPORTS.filter((key) => groups.some((group) => group.sport === key));
-  const spans = new Set(groups.map((group) => (group.year === thisYear ? 'year' : 'all')));
-  const visible = groups.filter(
-    (group) =>
-      (sport === 'all' || group.sport === sport) && (span === 'all' || group.year === thisYear),
+  const sports = FILTER_SPORTS.filter((key) => routes.some((route) => route.sport === key));
+  const spans = new Set(routes.map((route) => (route.year === thisYear ? 'year' : 'all')));
+  const visible = routes.filter(
+    (route) =>
+      (sport === 'all' || route.sport === sport) && (span === 'all' || route.year === thisYear),
   );
+  const filtered = sport !== 'all' || span !== 'all';
   return (
-    <RouteFilterContext value={visible}>
+    <VisibleRouteCount value={visible.length}>
       {sports.length > 1 || spans.size > 1 ? (
         <div className="strava__filters">
           {sports.length > 1 ? (
@@ -91,29 +85,17 @@ export function RouteFilter({
           ) : null}
         </div>
       ) : null}
-      {children}
-    </RouteFilterContext>
+      <VisibleRoutes value={filtered ? new Set(visible.map(({ id }) => id)) : null}>
+        {children}
+      </VisibleRoutes>
+    </VisibleRouteCount>
   );
-}
-
-/** Cross-fades the map print when the filter changes. */
-export function FilteredMap({ children }: { children: ReactNode }) {
-  return (
-    <ViewTransition default="none" update="auto">
-      <div className="strava__filteredMap">{children}</div>
-    </ViewTransition>
-  );
-}
-
-export function FilteredRouteInk() {
-  return <RouteInk groups={use(RouteFilterContext)} />;
 }
 
 export function RouteCountTag({ className }: { className?: string }) {
-  const routes = use(RouteFilterContext).reduce((sum, group) => sum + group.routes, 0);
   return (
     <PaperTag className={className} tiltDeg={6} tone="black">
-      {formatRouteCount(routes)}
+      {formatRouteCount(use(VisibleRouteCount))}
     </PaperTag>
   );
 }

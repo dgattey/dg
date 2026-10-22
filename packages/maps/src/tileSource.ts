@@ -1,5 +1,7 @@
 import { OFFLINE_TILES } from './offlineTile';
 
+const STADIA_ORIGIN = 'https://tiles.stadiamaps.com';
+
 /** Where map tiles come from. Serializable so server wrappers can pass it to client maps. */
 export type TileSource = { mode: 'offline' } | { apiKey: string | null; mode: 'stadia' };
 
@@ -34,6 +36,20 @@ type TileRequest = {
   zoom: number;
 };
 
+/** Adds the API key, when there is one, to any request bound for Stadia. */
+export function withStadiaKey(source: TileSource, url: string) {
+  if (source.mode !== 'stadia' || !source.apiKey || !url.startsWith(STADIA_ORIGIN)) {
+    return url;
+  }
+  const keyed = new URL(url);
+  keyed.searchParams.set('api_key', source.apiKey);
+  return keyed.toString();
+}
+
+/** The vector style the interactive map draws, matching the card maps' raster styles. */
+export const stadiaStyleUrl = (dark: boolean) =>
+  `${STADIA_ORIGIN}/styles/${dark ? 'alidade_smooth_dark' : 'outdoors'}.json`;
+
 export function stadiaTileUrl(
   source: TileSource,
   { dark = false, extension, retina = false, style, x, y, zoom }: TileRequest,
@@ -42,6 +58,8 @@ export function stadiaTileUrl(
     return dark ? OFFLINE_TILES.dark : OFFLINE_TILES.light;
   }
   const density = retina ? '@2x' : '';
-  const url = `https://tiles.stadiamaps.com/tiles/${style}/${zoom}/${x}/${y}${density}.${extension}`;
-  return source.apiKey ? `${url}?api_key=${encodeURIComponent(source.apiKey)}` : url;
+  return withStadiaKey(
+    source,
+    `${STADIA_ORIGIN}/tiles/${style}/${zoom}/${x}/${y}${density}.${extension}`,
+  );
 }

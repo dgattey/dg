@@ -52,6 +52,85 @@ export function decodePolyline(encoded: string): Array<Point> {
   return points;
 }
 
+function encodeValue(value: number) {
+  let remaining = value < 0 ? ~(value << 1) : value << 1;
+  let encoded = '';
+  while (remaining >= 0x20) {
+    encoded += String.fromCharCode((0x20 | (remaining & 0x1f)) + 63);
+    remaining >>= 5;
+  }
+  return encoded + String.fromCharCode(remaining + 63);
+}
+
+/** Encodes latitude/longitude points as a Google encoded polyline, the inverse of `decodePolyline`. */
+export function encodePolyline(points: ReadonlyArray<Point>) {
+  let encoded = '';
+  let previousLatitude = 0;
+  let previousLongitude = 0;
+  for (const [latitude, longitude] of points) {
+    const scaledLatitude = Math.round(latitude * 1e5);
+    const scaledLongitude = Math.round(longitude * 1e5);
+    encoded +=
+      encodeValue(scaledLatitude - previousLatitude) +
+      encodeValue(scaledLongitude - previousLongitude);
+    previousLatitude = scaledLatitude;
+    previousLongitude = scaledLongitude;
+  }
+  return encoded;
+}
+
+function distanceToSegment(
+  [px, py]: [number, number],
+  [ax, ay]: [number, number],
+  [bx, by]: [number, number],
+) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const lengthSquared = dx * dx + dy * dy;
+  const t =
+    lengthSquared === 0
+      ? 0
+      : Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lengthSquared));
+  return Math.hypot(ax + t * dx - px, ay + t * dy - py);
+}
+
+/**
+ * Douglas-Peucker: drops every point that sits within `tolerance` of the line
+ * its neighbors already draw. `toXY` picks the plane the tolerance is measured in.
+ */
+export function simplifyLine<T>(
+  points: ReadonlyArray<T>,
+  tolerance: number,
+  toXY: (point: T) => [number, number],
+): Array<T> {
+  if (points.length < 3) {
+    return [...points];
+  }
+  const coordinates = points.map(toXY);
+  const at = (index: number): [number, number] => coordinates[index] ?? [0, 0];
+  const keep = new Uint8Array(points.length);
+  keep[0] = 1;
+  keep[points.length - 1] = 1;
+  const spans: Array<[number, number]> = [[0, points.length - 1]];
+  for (let span = spans.pop(); span; span = spans.pop()) {
+    const [start, end] = span;
+    let farthest = -1;
+    let farthestDistance = tolerance;
+    for (let index = start + 1; index < end; index += 1) {
+      const distance = distanceToSegment(at(index), at(start), at(end));
+      if (distance > farthestDistance) {
+        farthest = index;
+        farthestDistance = distance;
+      }
+    }
+    if (farthest !== -1) {
+      keep[farthest] = 1;
+      spans.push([start, farthest], [farthest, end]);
+    }
+  }
+  return points.filter((_, index) => keep[index] === 1);
+}
+
 function project([latitude, longitude]: Point): ProjectedPoint {
   const clampedLatitude = Math.max(
     -MAX_MERCATOR_LATITUDE,

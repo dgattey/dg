@@ -1,4 +1,3 @@
-import './collage/bayMap.css';
 import './collage/home.css';
 import './collage/print.css';
 import './music/stats/statsShapes.css';

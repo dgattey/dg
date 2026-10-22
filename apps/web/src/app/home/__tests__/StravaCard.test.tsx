@@ -68,6 +68,9 @@ const history: StravaHistory = {
   years: [],
 };
 
+const inkedTones = (element: HTMLElement) =>
+  [...element.querySelectorAll('path[data-tone]')].map((path) => path.getAttribute('data-tone'));
+
 const renderCard = (value: StravaHistory | null) =>
   render(
     <ServerTimeProvider serverTime={NOW}>
@@ -75,12 +78,24 @@ const renderCard = (value: StravaHistory | null) =>
     </ServerTimeProvider>,
   );
 
+/** Card maps measure themselves; jsdom has no layout, so the frame's own size stands. */
+class StillResizeObserver {
+  disconnect() {}
+  observe() {}
+  unobserve() {}
+}
+
 beforeEach(() => {
   jest.useFakeTimers({ now: NOW });
+  Object.defineProperty(globalThis, 'ResizeObserver', {
+    configurable: true,
+    value: StillResizeObserver,
+  });
 });
 
 afterEach(() => {
   jest.useRealTimers();
+  Reflect.deleteProperty(globalThis, 'ResizeObserver');
 });
 
 describe('StravaCard', () => {
@@ -90,15 +105,13 @@ describe('StravaCard', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('opens the atlas from the map of every route, counting the routes it shows', () => {
+  it('opens the atlas from a map of the routes around home, counting every route', () => {
     renderCard(history);
 
     const atlas = screen.getByRole('link', { name: 'Bay Area miles' });
     expect(atlas).toHaveAttribute('href', '/strava');
-    expect(
-      within(atlas).getByRole('img', { name: "Every route I've tracked around the Bay" }),
-    ).toBeInTheDocument();
-    expect(within(atlas).getByText('2 routes')).toBeInTheDocument();
+    expect(inkedTones(atlas)).toEqual(['vermilion', 'cobalt']);
+    expect(within(atlas).getByText('3 routes')).toBeInTheDocument();
   });
 
   it('links the latest print to the outing on Strava with how long ago it was', () => {
@@ -106,30 +119,26 @@ describe('StravaCard', () => {
 
     const print = screen.getByRole('link', { name: 'Goals on Strava' });
     expect(print).toHaveAttribute('href', 'https://www.strava.com/activities/101');
-    expect(within(print).getByRole('img', { name: 'Goals' })).toBeInTheDocument();
+    expect(inkedTones(print)).toEqual(['vermilion']);
     expect(within(print).getByText('15.9 mi')).toBeInTheDocument();
     expect(within(print).getByText('Latest')).toBeInTheDocument();
     expect(within(print).getByText('2 days ago')).toBeInTheDocument();
   });
 
-  it('sticks on this year’s miles and climbing, and seals the atlas with the lifetime total', () => {
+  it('sticks on this year’s miles and seals the atlas with the lifetime total', () => {
     renderCard(history);
 
-    const totals = screen.getByRole('list', { name: 'Strava totals' });
-    expect(
-      within(totals)
-        .getAllByRole('listitem')
-        .map((item) => item.textContent),
-    ).toEqual(['This year1,420 mi', 'Climbed61.5k ft']);
+    expect(screen.getByText('This year')).toBeInTheDocument();
+    expect(screen.getByText('1,420 mi')).toBeInTheDocument();
     expect(screen.getByText('Total')).toBeInTheDocument();
     expect(screen.getByText('18,240 mi')).toBeInTheDocument();
   });
 
-  it('keeps the latest outing as a plain print when its route is off the painted Bay', () => {
-    renderCard({ ...history, latest: { ...latest, polyline: TAHOE } });
+  it('keeps the latest outing as a plain print when it has no route', () => {
+    renderCard({ ...history, latest: { ...latest, polyline: null } });
 
     const print = screen.getByRole('link', { name: 'Goals on Strava' });
-    expect(within(print).queryByRole('img')).not.toBeInTheDocument();
+    expect(inkedTones(print)).toEqual([]);
     expect(within(print).getByText('Goals')).toBeInTheDocument();
   });
 

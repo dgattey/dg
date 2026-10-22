@@ -1,9 +1,10 @@
 import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
-import { Minus, Plus } from 'lucide-react';
+import { Minus, Plus, Shrink } from 'lucide-react';
 import type { MouseEvent } from 'react';
 
 type ZoomControlsProps = {
+  onReset?: () => void;
   onZoomIn: () => void;
   onZoomOut: () => void;
 };
@@ -46,7 +47,7 @@ const stopPropagation = (e: MouseEvent) => {
   e.stopPropagation();
 };
 
-export function ZoomControls({ onZoomIn, onZoomOut }: ZoomControlsProps) {
+export function ZoomControls({ onReset, onZoomIn, onZoomOut }: ZoomControlsProps) {
   return (
     <Box onMouseDown={stopPropagation} onMouseUp={stopPropagation} sx={containerSx}>
       <Box aria-label="Zoom in" component="button" onClick={onZoomIn} sx={buttonSx} type="button">
@@ -55,6 +56,17 @@ export function ZoomControls({ onZoomIn, onZoomOut }: ZoomControlsProps) {
       <Box aria-label="Zoom out" component="button" onClick={onZoomOut} sx={buttonSx} type="button">
         <Minus aria-hidden="true" size="1em" />
       </Box>
+      {onReset ? (
+        <Box
+          aria-label="Reset view"
+          component="button"
+          onClick={onReset}
+          sx={buttonSx}
+          type="button"
+        >
+          <Shrink aria-hidden="true" size="0.8em" />
+        </Box>
+      ) : null}
     </Box>
   );
 }

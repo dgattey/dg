@@ -1,4 +1,4 @@
-/* Bay Area miles: the atlas beside its field notes, then the scrapbook bands below. */
+/* Strava miles: the atlas beside its field notes, then the scrapbook bands below. */
 
 .strava__layout {
   display: grid;
@@ -89,13 +89,13 @@
   position: relative;
   padding: var(--mat-feature);
 }
-.strava__filteredMap,
+.strava__atlasMap,
 .strava__atlasBlank {
+  aspect-ratio: 780 / 940;
   overflow: clip;
   border-radius: var(--print-radius);
 }
 .strava__atlasBlank {
-  aspect-ratio: 780 / 940;
   background: color-mix(in oklab, var(--cerulean) 34%, var(--cream));
 }
 .strava__routeCount {

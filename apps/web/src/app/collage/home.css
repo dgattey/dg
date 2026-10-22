@@ -203,22 +203,22 @@
     calc(var(--edge-br) + var(--rim)) calc(var(--edge-bl) + var(--rim));
 }
 /*
- * A gatefold: the Bay of every route fanned out behind the latest print, its
- * corner tucked under, reaching into the empty column beside the slot.
+ * A gatefold: the latest print up front, every route around home peeking out
+ * behind its top-right corner. It stays inside its own columns, leaving the
+ * gutter clear for the Watershed card beside it.
  */
 .home__strava {
   position: relative;
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
   align-items: start;
-  width: min(114%, 540px);
-  padding-top: 18px;
+  padding-top: 44px;
 }
 .home__stravaAtlas {
   position: relative;
   z-index: 1;
   grid-row: 1;
-  grid-column: 4 / -1;
+  grid-column: 6 / -1;
 }
 .home__stravaAtlasLink,
 .home__stravaAtlasLink:hover {
@@ -231,46 +231,41 @@
   padding: var(--inset);
 }
 .home__stravaMap {
+  display: block;
+  aspect-ratio: 4 / 3;
   overflow: clip;
   border-radius: var(--nested-radius);
 }
 .home__stravaRoutes {
   top: -14px;
-  right: -8px;
+  left: 18px;
 }
 .stats__cut.home__stravaTotal {
   position: absolute;
-  right: -14px;
-  bottom: -40px;
+  right: 6px;
+  bottom: -34px;
   z-index: 3;
-  width: 108px;
+  width: 100px;
 }
 /* Percent margins follow the polaroid's own columns, so the tuck scales with the slot. */
 .home__stravaLatest {
   z-index: 2;
   grid-row: 2;
-  grid-column: 1 / 8;
-  margin-top: -40%;
+  grid-column: 1 / 11;
+  margin-top: -26%;
 }
 .stats__cut.home__stravaWhen {
   position: absolute;
-  top: -30px;
-  left: -26px;
+  top: -22px;
+  right: -18px;
   z-index: 3;
-  width: 104px;
+  width: 100px;
 }
-.home__stravaStickers {
-  display: flex;
+.home__stravaTicket {
   grid-row: 3;
-  grid-column: 1 / -1;
-  gap: 14px;
-  align-items: center;
-  padding: 0 0 0 14px;
-  margin: 18px 0 0;
-  list-style: none;
-}
-.home__stravaStickers > li:nth-child(2) {
-  translate: 0 -10px;
+  grid-column: 6 / -1;
+  justify-self: end;
+  margin: -18px 4px 0 0;
 }
 .home__stravaTicket .stats__ticket > .stats__face {
   min-height: 0;
@@ -279,9 +274,9 @@
 .home__stravaTicket .stats__ticket > .stats__face::before {
   left: 16px;
 }
-.home__stravaStamp .stats__stamp > .stats__face {
-  min-height: 0;
-  padding: 8px 12px 9px;
+/* Settles beside the gatefold's middle instead of leaving a gap below it. */
+.home__workGrid > [data-slot="ws"] {
+  align-self: center;
 }
 /* Whole-card links on the homepage zoom a touch as they lift, so they feel alike. */
 @media (prefers-reduced-motion: no-preference) {
@@ -542,19 +537,11 @@
   .collageRoot .collageGridStack > .home__strava {
     width: 100%;
     max-width: 480px;
+    padding-top: 12px;
   }
   .stats__cut.home__stravaWhen {
-    top: -24px;
-    left: -4px;
+    right: -4px;
     width: 92px;
-  }
-  .home__stravaStickers {
-    gap: 6px;
-    padding-left: 0;
-  }
-  .stats__cut.home__stravaTotal {
-    right: 6px;
-    width: 96px;
   }
   /* Leads the sheet, offset right so it overlaps the map's corner, not its tag. */
   .collageRoot .collageGridStack > .home__spotifySlot {

@@ -4,7 +4,7 @@ import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import { Scallop, Stub } from '../music/stats/StatsShapes';
 import { OutingStats, SportChip } from './OutingMeta';
-import { RoutePolaroid, routePrint } from './RoutePolaroid';
+import { RoutePolaroid } from './RoutePolaroid';
 import { formatCompactFeet, formatMiles, formatOutingDay } from './stravaFormat';
 
 const FIELD_PRINTS = 2;
@@ -51,15 +51,12 @@ export function FieldNotes({ history }: { history: StravaHistory }) {
   const { latest, odometer, totals } = history;
   const [first, second] = history.recent
     .slice(1)
-    .flatMap((outing) => {
-      const print = routePrint(outing);
-      return print ? [{ outing, print }] : [];
-    })
+    .filter((outing) => outing.polyline)
     .slice(0, FIELD_PRINTS);
   return (
     <div className="strava__field">
       <LatestNote outing={latest} />
-      {first ? <RoutePolaroid className="strava__fieldPrint" tiltDeg={2.6} {...first} /> : null}
+      {first ? <RoutePolaroid className="strava__fieldPrint" outing={first} tiltDeg={2.6} /> : null}
       <div className="strava__seals">
         <Scallop className="strava__seal" tiltDeg={-10} tone="ochre">
           <span className="strava__sealKey">Total miles</span>
@@ -83,7 +80,9 @@ export function FieldNotes({ history }: { history: StravaHistory }) {
           <span className="strava__sealValue">{formatMiles(odometer.distanceMeters)} mi</span>
         </Stub>
       ) : null}
-      {second ? <RoutePolaroid className="strava__fieldPrint" tiltDeg={-2.4} {...second} /> : null}
+      {second ? (
+        <RoutePolaroid className="strava__fieldPrint" outing={second} tiltDeg={-2.4} />
+      ) : null}
     </div>
   );
 }

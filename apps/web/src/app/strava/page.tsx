@@ -1,5 +1,4 @@
 import 'server-only';
-import '../collage/bayMap.css';
 import '../collage/pills.css';
 import '../music/stats/statsShapes.css';
 import './strava.css';
@@ -21,7 +20,8 @@ const TITLE = 'Bay Area miles';
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(stravaRoute),
-  description: 'Every ride, run, and hike I have tracked on Strava, mapped across the Bay Area.',
+  description:
+    'Every ride, run, and hike I have tracked on Strava, mapped wherever it went. Most start around the Bay Area.',
   title: TITLE,
 };
 
@@ -53,7 +53,8 @@ export default function StravaPage() {
       <div className="strava__intro">
         <CutLetters className="collagePageTitle" text={TITLE} />
         <p className="strava__lede">
-          Every ride, run, and hike I've tracked on Strava, mapped across the Bay Area.
+          Every ride, run, and hike I've tracked on Strava, mapped wherever it went. Most start
+          around the Bay Area.
         </p>
       </div>
       <Suspense fallback={<StravaHistorySkeleton />}>

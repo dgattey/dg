@@ -1,12 +1,11 @@
 import { getRouteMapTokens } from '../routeMapTokens';
 
 describe('getRouteMapTokens', () => {
-  it('draws the route as a cream-cased vermilion line in both schemes', () => {
+  it('cases routes in cream over a cream placeholder in both schemes', () => {
     for (const dark of [false, true]) {
       expect(getRouteMapTokens(dark)).toMatchObject({
         casingStroke: 'var(--cream)',
         containerBackground: 'var(--cream)',
-        routeStroke: 'var(--vermilion)',
       });
     }
   });

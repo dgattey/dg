@@ -1,4 +1,5 @@
-import type { StravaSport } from '@dg/content-models/strava/StravaHistory';
+import type { StravaRouteTrace, StravaSport } from '@dg/content-models/strava/StravaHistory';
+import type { MapRoute } from '@dg/maps/src/routeFrame';
 import type { PaperTone } from '../collage/types';
 
 type SportDetails = {
@@ -12,7 +13,13 @@ type SportDetails = {
 
 export const SPORT_DETAILS = {
   hike: { filter: 'Hikes', label: 'Hike', tone: 'viridian' },
-  other: { filter: null, label: 'Outing', tone: 'rose' },
+  other: { filter: null, label: 'Outing', tone: 'ochre' },
   ride: { filter: 'Rides', label: 'Ride', tone: 'vermilion' },
   run: { filter: 'Runs', label: 'Run', tone: 'cobalt' },
 } as const satisfies Record<StravaSport, SportDetails>;
+
+/** Routes as map ink in their sport's tone, rides first so the rarer sports draw over them. */
+export const toMapRoutes = (routes: ReadonlyArray<StravaRouteTrace>): Array<MapRoute> =>
+  routes
+    .map(({ id, polyline, sport }) => ({ id, polyline, tone: SPORT_DETAILS[sport].tone }))
+    .toSorted((a, b) => Number(b.tone === 'vermilion') - Number(a.tone === 'vermilion'));

@@ -1,7 +1,9 @@
 import {
   decodePolyline,
+  encodePolyline,
   fitRouteViewport,
   projectRouteToPixels,
+  simplifyLine,
   toSvgPath,
 } from '../routeGeometry';
 
@@ -11,6 +13,27 @@ describe('route geometry', () => {
       [38.5, -120.2],
       [40.7, -120.95],
       [43.252, -126.453],
+    ]);
+  });
+
+  it('encodes points back into the same polyline', () => {
+    const encoded = '_p~iF~ps|U_ulLnnqC_mqNvxq`@';
+    expect(encodePolyline(decodePolyline(encoded))).toBe(encoded);
+  });
+
+  it('simplifies away points that sit on the line their neighbors draw', () => {
+    const line: Array<[number, number]> = [
+      [0, 0],
+      [1, 0.01],
+      [2, 0],
+      [3, 5],
+      [4, 0],
+    ];
+    expect(simplifyLine(line, 0.1, (point) => point)).toEqual([
+      [0, 0],
+      [2, 0],
+      [3, 5],
+      [4, 0],
     ]);
   });
 
