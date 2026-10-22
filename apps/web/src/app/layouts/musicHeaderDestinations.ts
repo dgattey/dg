@@ -1,4 +1,10 @@
-import { favoriteAlbumsRoute, musicRoute, musicStatsRoute } from '@dg/shared-core/routes/app';
+import {
+  favoriteAlbumsRoute,
+  homeRoute,
+  musicRoute,
+  musicStatsRoute,
+  readingRoute,
+} from '@dg/shared-core/routes/app';
 
 export type MusicDestination = {
   href: string;
@@ -9,6 +15,15 @@ export const MUSIC_DESTINATIONS: ReadonlyArray<MusicDestination> = [
   { href: favoriteAlbumsRoute, label: 'Favorite albums' },
   { href: musicRoute, label: 'Listening history' },
   { href: musicStatsRoute, label: 'Listening stats' },
+];
+
+export const READING_DESTINATION: MusicDestination = { href: readingRoute, label: 'Reading' };
+
+/** The header's pages in header order, with its Music menu flattened. */
+export const FOOTER_DESTINATIONS: ReadonlyArray<MusicDestination> = [
+  { href: homeRoute, label: 'Home' },
+  ...MUSIC_DESTINATIONS,
+  READING_DESTINATION,
 ];
 
 const MUSIC_DESTINATION_PATHS = new Set(MUSIC_DESTINATIONS.map((route) => route.href));

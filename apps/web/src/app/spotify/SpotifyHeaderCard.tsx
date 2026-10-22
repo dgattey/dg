@@ -43,13 +43,6 @@ const slotSx: SxObject = {
   ml: 1,
 };
 
-const musicLinkSx: SxObject = {
-  color: 'inherit',
-  display: 'block',
-  minWidth: 0,
-  textDecoration: 'none',
-};
-
 type SpotifyHeaderCardProps = {
   track: Track | null;
 };
@@ -124,8 +117,8 @@ function DockedHeaderCard({ track }: { track: Track }) {
     <Box sx={slotSx}>
       {opensMusicPage ? (
         <PageTransitionLink
+          className="chrome__nowPlayingLink"
           href={musicRoute}
-          sx={musicLinkSx}
           title={musicDestinationLabel(musicRoute)}
         >
           {card}

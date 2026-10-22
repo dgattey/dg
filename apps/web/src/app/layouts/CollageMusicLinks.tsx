@@ -1,23 +1,17 @@
 'use client';
 
-import {
-  favoriteAlbumsRoute,
-  musicRoute,
-  musicStatsRoute,
-  readingRoute,
-} from '@dg/shared-core/routes/app';
+import { favoriteAlbumsRoute, musicRoute, musicStatsRoute } from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import type { LucideIcon } from 'lucide-react';
 import { ChartColumn, ChevronDown, DiscAlbum, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef } from 'react';
-import { PaperButton } from '../collage/PaperButton';
+import { PaperButton, PaperButtonFace } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
-import { cx, paperSurfaceVars } from '../collage/paperVars';
 import {
   isMusicDestinationPath,
   MUSIC_DESTINATIONS,
   normalizeMusicPath,
+  READING_DESTINATION,
 } from './musicHeaderDestinations';
 
 const DESTINATION_ICONS: Record<string, LucideIcon> = {
@@ -27,52 +21,82 @@ const DESTINATION_ICONS: Record<string, LucideIcon> = {
 };
 
 /**
+ * Opens the menu on mouse hover. A ref callback, so the listeners live exactly as long
+ * as each keyed `<details>` does.
+ */
+function bindMusicMenu(details: HTMLDetailsElement | null) {
+  const summary = details?.querySelector('summary');
+  if (!details || !summary) {
+    return;
+  }
+  /** Hover only closes what hover opened, and a mouse click can't toggle that shut. */
+  let openedByHover = false;
+
+  const setOpen = (open: boolean) => {
+    details.open = open;
+    openedByHover = false;
+  };
+  const hover = (open: boolean) => (event: PointerEvent) => {
+    if (event.pointerType !== 'mouse' || details.open === open) {
+      return;
+    }
+    if (open || openedByHover) {
+      details.open = open;
+      openedByHover = open;
+    }
+  };
+  const enter = hover(true);
+  const leave = hover(false);
+  const keepHoverOpen = (event: MouseEvent) => {
+    if (openedByHover) {
+      event.preventDefault();
+    }
+  };
+  const closeOnEscape = (event: KeyboardEvent) => {
+    if (details.open && event.key === 'Escape') {
+      setOpen(false);
+      summary.focus();
+    }
+  };
+  const closeOnOutsidePress = (event: PointerEvent) => {
+    if (details.open && event.target instanceof Node && !details.contains(event.target)) {
+      setOpen(false);
+    }
+  };
+
+  details.addEventListener('pointerenter', enter);
+  details.addEventListener('pointerleave', leave);
+  summary.addEventListener('click', keepHoverOpen);
+  document.addEventListener('keydown', closeOnEscape);
+  document.addEventListener('pointerdown', closeOnOutsidePress);
+  return () => {
+    details.removeEventListener('pointerenter', enter);
+    details.removeEventListener('pointerleave', leave);
+    summary.removeEventListener('click', keepHoverOpen);
+    document.removeEventListener('keydown', closeOnEscape);
+    document.removeEventListener('pointerdown', closeOnOutsidePress);
+  };
+}
+
+/**
  * Music → destinations submenu. `<details>` owns the open state so the menu opens and
- * its links work without script; script only closes it on outside press and Escape.
- * Keying on the path remounts it closed after every navigation.
+ * its links work without script; script opens it on mouse hover, and closes it on
+ * outside press and Escape. Keying on the path remounts it closed after every navigation.
  */
 export function CollageMusicLinks() {
   const pathname = normalizeMusicPath(usePathname() ?? '/');
-  const detailsRef = useRef<HTMLDetailsElement>(null);
   const onMusicPage = isMusicDestinationPath(pathname);
-  const onReadingPage = pathname === readingRoute || pathname.startsWith(`${readingRoute}/`);
-
-  useEffect(() => {
-    const close = (event: KeyboardEvent | PointerEvent) => {
-      const details = detailsRef.current;
-      if (!details?.open) {
-        return;
-      }
-      if (event instanceof KeyboardEvent) {
-        if (event.key !== 'Escape') {
-          return;
-        }
-        details.open = false;
-        details.querySelector('summary')?.focus();
-        return;
-      }
-      if (event.target instanceof Node && !details.contains(event.target)) {
-        details.open = false;
-      }
-    };
-    document.addEventListener('keydown', close);
-    document.addEventListener('pointerdown', close);
-    return () => {
-      document.removeEventListener('keydown', close);
-      document.removeEventListener('pointerdown', close);
-    };
-  }, []);
+  const onReadingPage =
+    pathname === READING_DESTINATION.href || pathname.startsWith(`${READING_DESTINATION.href}/`);
 
   return (
     <>
-      <details className="chrome__music" key={pathname} ref={detailsRef}>
+      <details className="chrome__music" key={pathname} ref={bindMusicMenu}>
         <summary className="chrome__musicSummary collageLift">
-          <span className="paperWrap" style={paperSurfaceVars('cream', 'quad-c', -2)}>
-            <span className={cx('paperButton', onMusicPage && 'paperButtonCurrent')}>
-              Music
-              <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />
-            </span>
-          </span>
+          <PaperButtonFace current={onMusicPage} tiltDeg={-2}>
+            Music
+            <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />
+          </PaperButtonFace>
         </summary>
         <PaperCard
           className="chrome__musicPanel"
@@ -104,13 +128,11 @@ export function CollageMusicLinks() {
       <div className="collageLift">
         <PaperButton
           current={onReadingPage}
-          edge="quad-b"
-          href={readingRoute}
+          href={READING_DESTINATION.href}
           tiltDeg={1.5}
-          title="Reading"
-          tone="cream"
+          title={READING_DESTINATION.label}
         >
-          Reading
+          {READING_DESTINATION.label}
         </PaperButton>
       </div>
     </>
