@@ -162,21 +162,33 @@ describe('summarizeStravaHistory', () => {
     });
   });
 
-  it('names each bike from any ride that carries its gear and counts every ride on it', () => {
+  it('names each bike from any ride that carries its gear and adds up every ride on it', () => {
     const rides = [
       activity({
+        distance: 40_000,
         gear: { distance: 9_000_000, id: 'b1', name: 'Cruz' },
         id: 20,
+        movingTime: 5400,
         startDate: '2026-10-01T10:00:00Z',
+        totalElevationGain: 600,
       }),
-      activity({ gearId: 'b1', id: 21, startDate: '2023-08-12T10:00:00Z' }),
       activity({
+        distance: 190_000,
+        gearId: 'b1',
+        id: 21,
+        movingTime: 27_000,
+        name: 'Marshall Wall Sunday',
+        startDate: '2023-08-12T10:00:00Z',
+        totalElevationGain: 2400,
+      }),
+      activity({
+        distance: 20_000,
         gear: { distance: 5_300_000, id: 'b2', name: 'Prince' },
         id: 22,
         startDate: '2026-10-20T10:00:00Z',
       }),
-      activity({ gearId: 'b2', id: 23, startDate: '2024-07-26T10:00:00Z' }),
-      activity({ gearId: 'b2', id: 24, startDate: '2025-05-01T10:00:00Z' }),
+      activity({ distance: 60_000, gearId: 'b2', id: 23, startDate: '2024-07-26T10:00:00Z' }),
+      activity({ distance: 30_000, gearId: 'b2', id: 24, startDate: '2025-05-01T10:00:00Z' }),
       activity({ gearId: 'b3', id: 25, startDate: '2021-01-01T10:00:00Z' }),
       activity({
         gear: { distance: 800_000, id: 'g4', name: 'Trail shoes' },
@@ -188,20 +200,43 @@ describe('summarizeStravaHistory', () => {
 
     expect(summarizeStravaHistory(rides, NOW)?.bikes).toEqual([
       {
-        firstYear: 2023,
+        elevationGainMeters: 3000,
         id: 'b1',
-        lastYear: 2026,
+        longest: {
+          distanceMeters: 190_000,
+          name: 'Marshall Wall Sunday',
+          startDate: '2023-08-12T10:00:00.000Z',
+          url: 'https://www.strava.com/activities/21',
+        },
+        movingTimeSeconds: 32_400,
         name: 'Cruz',
         odometerMeters: 9_000_000,
         rides: 2,
+        years: [
+          { distanceMeters: 190_000, year: 2023 },
+          { distanceMeters: 0, year: 2024 },
+          { distanceMeters: 0, year: 2025 },
+          { distanceMeters: 40_000, year: 2026 },
+        ],
       },
       {
-        firstYear: 2024,
+        elevationGainMeters: 0,
         id: 'b2',
-        lastYear: 2026,
+        longest: {
+          distanceMeters: 60_000,
+          name: 'Outing 23',
+          startDate: '2024-07-26T10:00:00.000Z',
+          url: 'https://www.strava.com/activities/23',
+        },
+        movingTimeSeconds: 0,
         name: 'Prince',
         odometerMeters: 5_300_000,
         rides: 3,
+        years: [
+          { distanceMeters: 60_000, year: 2024 },
+          { distanceMeters: 30_000, year: 2025 },
+          { distanceMeters: 20_000, year: 2026 },
+        ],
       },
     ]);
   });
@@ -209,12 +244,19 @@ describe('summarizeStravaHistory', () => {
   it('skips a named bike Strava reports no odometer for', () => {
     expect(summary?.bikes).toEqual([
       {
-        firstYear: 2026,
+        elevationGainMeters: 400,
         id: 'b1',
-        lastYear: 2026,
+        longest: {
+          distanceMeters: 30_000,
+          name: 'Outing 1',
+          startDate: '2026-03-14T16:00:00.000Z',
+          url: 'https://www.strava.com/activities/1',
+        },
+        movingTimeSeconds: 3600,
         name: 'Cruz',
         odometerMeters: 7_828_686,
         rides: 1,
+        years: [{ distanceMeters: 30_000, year: 2026 }],
       },
     ]);
   });

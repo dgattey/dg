@@ -71,12 +71,19 @@ describe('fetchStravaHistoryFromDb', () => {
     expect(history?.thisYear).toMatchObject({ outings: 1, year: 2026 });
     expect(history?.bikes).toEqual([
       {
-        firstYear: 2026,
+        elevationGainMeters: 300,
         id: 'b1',
-        lastYear: 2026,
+        longest: {
+          distanceMeters: 40_000,
+          name: 'Camel ride',
+          startDate: '2026-09-01T15:00:00.000Z',
+          url: 'https://www.strava.com/activities/101',
+        },
+        movingTimeSeconds: 0,
         name: 'Cruz',
         odometerMeters: 9_000_000,
         rides: 1,
+        years: [{ distanceMeters: 40_000, year: 2026 }],
       },
     ]);
   });

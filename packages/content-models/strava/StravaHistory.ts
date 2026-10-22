@@ -28,14 +28,17 @@ export type StravaYearTotals = {
   outings: number;
 };
 
-/** A named bike, with Strava's odometer for it and the stored rides on it. */
+/** A named bike, with Strava's odometer for it and what the stored rides on it add up to. */
 export type StravaBike = {
   id: string;
   name: string;
   odometerMeters: number;
   rides: number;
-  firstYear: number;
-  lastYear: number;
+  elevationGainMeters: number;
+  movingTimeSeconds: number;
+  longest: Pick<StravaLogEntry, 'distanceMeters' | 'name' | 'startDate' | 'url'>;
+  /** Miles per UTC year from the first ride's year to the last's, oldest first, gaps zeroed. */
+  years: ReadonlyArray<{ year: number; distanceMeters: number }>;
 };
 
 export type StravaHistory = {

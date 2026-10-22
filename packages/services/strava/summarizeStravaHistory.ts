@@ -75,6 +75,22 @@ const bikeIdOf = ({ gear, gearId }: StravaActivity) => {
   return id?.startsWith('b') ? id : null;
 };
 
+/** Distance per UTC year across the rides' span, so quiet years show up as gaps. */
+const yearlyDistance = (rides: ReadonlyArray<StravaLogEntry>): StravaBike['years'] => {
+  const years = rides.map(yearOf);
+  const first = Math.min(...years);
+  return Array.from({ length: Math.max(...years) - first + 1 }, (_, index) => {
+    const year = first + index;
+    return {
+      distanceMeters: sumOf(
+        rides.filter((ride) => yearOf(ride) === year),
+        (ride) => ride.distanceMeters,
+      ),
+      year,
+    };
+  });
+};
+
 /**
  * Bikes from the outings ridden on them, newest first. Only fully fetched
  * activities carry the gear's name and odometer, so a bike no stored activity
@@ -89,21 +105,31 @@ const findBikes = (dated: ReadonlyArray<DatedActivity>): Array<StravaBike> => {
     ({ id }) => id,
   );
   return [...byBike.entries()]
-    .flatMap(([id, rides]): Array<StravaBike> => {
-      const named = rides.find(({ activity }) => activity.gear?.name);
-      const odometer = rides.find(({ activity }) => typeof activity.gear?.distance === 'number');
-      const name = named?.activity.gear?.name;
-      const odometerMeters = odometer?.activity.gear?.distance;
-      const years = rides.map(({ startedAt }) => startedAt.getUTCFullYear());
+    .flatMap(([id, entries]): Array<StravaBike> => {
+      const name = entries.find(({ activity }) => activity.gear?.name)?.activity.gear?.name;
+      const odometerMeters = entries.find(
+        ({ activity }) => typeof activity.gear?.distance === 'number',
+      )?.activity.gear?.distance;
+      const rides = entries.map((entry) => toLogEntry(toOuting(entry)));
+      const longest = rides.reduce((best, ride) =>
+        ride.distanceMeters > best.distanceMeters ? ride : best,
+      );
       return name && typeof odometerMeters === 'number'
         ? [
             {
-              firstYear: Math.min(...years),
+              elevationGainMeters: sumOf(rides, (ride) => ride.elevationGainMeters),
               id,
-              lastYear: Math.max(...years),
+              longest: {
+                distanceMeters: longest.distanceMeters,
+                name: longest.name,
+                startDate: longest.startDate,
+                url: longest.url,
+              },
+              movingTimeSeconds: sumOf(rides, (ride) => ride.movingTimeSeconds),
               name,
               odometerMeters,
               rides: rides.length,
+              years: yearlyDistance(rides),
             },
           ]
         : [];
