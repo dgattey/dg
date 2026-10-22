@@ -154,7 +154,7 @@ export function SfStreetCoverageSection({ coverage }: { coverage: SfStreetCovera
         </PaperTag>
       </h2>
       <ul className="sfStreets__callouts">
-        <li>
+        <li className="sfStreets__seal">
           <Scallop tiltDeg={-5} tone="cobalt">
             <span className="strava__totalNumber">{formatShare(summary.city.share)}</span>
             <span className="strava__totalUnit">of SF</span>
