@@ -1,8 +1,6 @@
 export type RouteMapTokens = {
   casingStroke: string;
   containerBackground: string;
-  routeStroke: string;
-  routeStrokeWidth: number;
   scrimGradient: string;
   tileFilter: string;
 };
@@ -13,8 +11,6 @@ export function getRouteMapTokens(dark: boolean): RouteMapTokens {
   return {
     casingStroke: 'var(--cream)',
     containerBackground: 'var(--cream)',
-    routeStroke: 'var(--vermilion)',
-    routeStrokeWidth: 3.5,
     scrimGradient: dark
       ? 'linear-gradient(180deg, rgb(0 0 0 / 0.04) 0%, rgb(0 0 0 / 0.12) 100%)'
       : `linear-gradient(180deg, ${creamMix(6)} 0%, ${creamMix(14)} 100%)`,

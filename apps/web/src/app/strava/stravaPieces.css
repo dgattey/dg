@@ -12,6 +12,8 @@
   padding: var(--mat) var(--mat) 14px;
 }
 .strava__print {
+  display: block;
+  aspect-ratio: 3 / 2;
   margin-bottom: 8px;
   overflow: clip;
   border-radius: var(--print-radius);

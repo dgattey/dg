@@ -1,24 +1,15 @@
 import type { StravaHistory } from '@dg/content-models/strava/StravaHistory';
-import { routeGroups } from '@dg/maps/bay/bayRoutes';
-import type { MercatorFrame } from '@dg/maps/bay/mercatorFrame';
+import { RouteAtlas } from '@dg/maps/RouteAtlas';
 import type { ReactNode } from 'react';
-import { BayMap } from '../collage/BayMap';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import { ClimbingFlower } from './ClimbingFlower';
 import { FieldNotes } from './FieldNotes';
 import { BiggestClimbs, RecentOutings } from './OutingLog';
-import { FilteredMap, FilteredRouteInk, RouteCountTag, RouteFilter } from './RouteFilter';
-import { RoutePolaroid, routePrint } from './RoutePolaroid';
+import { RouteCountTag, RouteFilter } from './RouteFilter';
+import { RoutePolaroid } from './RoutePolaroid';
+import { toMapRoutes } from './stravaSports';
 import { YearlyMiles } from './YearlyMiles';
-
-/** Portrait frame from the Golden Gate Park edge up past Angel Island and across to Oakland. */
-const ATLAS_FRAME: MercatorFrame = {
-  center: [37.828, -122.4],
-  height: 940,
-  lonSpan: 0.4,
-  width: 780,
-};
 
 /** The cerulean backing and cream print the atlas sits on, shared with the skeleton. */
 export function AtlasSheet({ children }: { children: ReactNode }) {
@@ -42,26 +33,23 @@ export function AtlasSheet({ children }: { children: ReactNode }) {
  * field notes, then the climbing flower, logbooks, and yearly tickets.
  */
 export function StravaHistorySections({ history }: { history: StravaHistory }) {
-  const longest = routePrint(history.longest);
   const climbs = history.biggestClimbs.filter((outing) => outing.elevationGainMeters > 0);
   return (
     <div className="strava__sections">
       <div className="strava__explore">
         <RouteFilter
-          groups={routeGroups(ATLAS_FRAME, history.routes)}
+          routes={history.routes.map(({ id, sport, year }) => ({ id, sport, year }))}
           thisYear={history.thisYear.year}
         >
           <div className="strava__atlas">
             <FieldNotes history={history} />
             <AtlasSheet>
-              <FilteredMap>
-                <BayMap
-                  frame={ATLAS_FRAME}
-                  labels
-                  routes={<FilteredRouteInk />}
-                  title="Every route I've tracked, on a watercolor map of the Bay Area"
+              <div className="strava__atlasMap">
+                <RouteAtlas
+                  label="Map of every route I've tracked on Strava"
+                  routes={toMapRoutes(history.routes)}
                 />
-              </FilteredMap>
+              </div>
               <RouteCountTag className="collagePin strava__routeCount" />
             </AtlasSheet>
           </div>
@@ -74,13 +62,8 @@ export function StravaHistorySections({ history }: { history: StravaHistory }) {
       <div className="strava__band">
         <YearlyMiles years={history.years} />
         {climbs.length > 0 ? <BiggestClimbs outings={climbs} /> : null}
-        {longest ? (
-          <RoutePolaroid
-            className="strava__longest"
-            outing={history.longest}
-            print={longest}
-            tiltDeg={3.2}
-          >
+        {history.longest.polyline ? (
+          <RoutePolaroid className="strava__longest" outing={history.longest} tiltDeg={3.2}>
             <PaperTag className="collagePin strava__longestTag" tiltDeg={-7} tone="rose">
               Longest outing
             </PaperTag>

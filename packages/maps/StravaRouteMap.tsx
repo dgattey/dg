@@ -1,22 +1,25 @@
 import 'server-only';
 
-import type { Point } from 'pigeon-maps';
 import { getTileSource } from './src/getTileSource';
 import { RouteMap } from './src/RouteMap';
-import { decodePolyline } from './src/routeGeometry';
+import { decodeRoutes, frameAround, framePaths } from './src/routeFrame';
 
-/** Server wrapper that keeps tile config out of the calling component. */
+const FRAME = { height: 320, padding: 40, width: 480 };
+
+/** One route fitted to a card, inked in vermilion. Renders nothing when the polyline has no route. */
 export function StravaRouteMap({ encodedPolyline }: { encodedPolyline: string }) {
-  let points: Array<Point>;
-  try {
-    points = decodePolyline(encodedPolyline);
-  } catch {
+  const routes = decodeRoutes([{ id: 0, polyline: encodedPolyline, tone: 'vermilion' }]);
+  const [route] = routes;
+  if (!route) {
     return null;
   }
-
-  if (points.length < 2) {
-    return null;
-  }
-
-  return <RouteMap points={points} tileSource={getTileSource()} />;
+  const frame = frameAround(route.points, FRAME);
+  return (
+    <RouteMap
+      frame={frame}
+      paths={framePaths(frame, routes)}
+      strokeWidth={3.5}
+      tileSource={getTileSource()}
+    />
+  );
 }

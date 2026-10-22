@@ -2,17 +2,14 @@
 
 import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
-import { useColorScheme } from '@dg/ui/theme/useColorScheme';
 import type { Point } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
-import { fitRouteViewport, projectRouteToPixels, toSvgPath } from './routeGeometry';
+import { useEffect, useRef, useState } from 'react';
+import type { FramedPath, RouteFrame } from './routeFrame';
 import { getRouteMapTokens } from './routeMapTokens';
 import { SmoothTile } from './SmoothTile';
 import { stadiaTileUrl, type TileSource } from './tileSource';
-
-const ROUTE_PADDING = 42;
-const DEFAULT_SIZE = 320;
+import { useDarkMap } from './useDarkMap';
 
 const underlaySx: SxObject = {
   filter: 'blur(8px)',
@@ -35,15 +32,6 @@ const routeSvgSx: SxObject = {
   width: '100%',
   zIndex: 3,
 };
-
-const subscribeToSystemDark = (onStoreChange: () => void) => {
-  const media = window.matchMedia('(prefers-color-scheme: dark)');
-  media.addEventListener('change', onStoreChange);
-  return () => media.removeEventListener('change', onStoreChange);
-};
-
-const getSystemDarkSnapshot = () => window.matchMedia('(prefers-color-scheme: dark)').matches;
-const getServerSystemDarkSnapshot = () => false;
 
 function tileCoordinates([latitude, longitude]: Point, zoom: number) {
   const tileZoom = Math.round(zoom);
@@ -88,38 +76,25 @@ function tileUrl({
 }
 
 export type RouteMapProps = {
-  points: Array<Point>;
+  frame: RouteFrame;
+  paths: ReadonlyArray<FramedPath>;
+  strokeWidth: number;
   tileSource: TileSource;
 };
 
-/** A non-interactive, theme-aware route map intended for card backgrounds. */
-export function RouteMap({ points, tileSource }: RouteMapProps) {
+/**
+ * A non-interactive, theme-aware map for card backgrounds, inking paths the
+ * server already projected into `frame`. The frame scales to cover the card,
+ * and the tiles zoom by the same factor so the ink stays registered to them.
+ */
+export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ height: DEFAULT_SIZE, width: DEFAULT_SIZE });
-  const { preference } = useColorScheme();
-  const systemDark = useSyncExternalStore(
-    subscribeToSystemDark,
-    getSystemDarkSnapshot,
-    getServerSystemDarkSnapshot,
-  );
-  const dark = preference === 'dark' || (preference === 'system' && systemDark);
+  const [size, setSize] = useState({ height: frame.height, width: frame.width });
+  const dark = useDarkMap();
   const tokens = getRouteMapTokens(dark);
-  const viewport = fitRouteViewport({
-    height: size.height,
-    padding: ROUTE_PADDING,
-    points,
-    width: size.width,
-  });
-  const underlayTile = tileCoordinates(viewport.center, viewport.zoom);
-  const routePath = toSvgPath(
-    projectRouteToPixels({
-      center: viewport.center,
-      height: size.height,
-      points,
-      width: size.width,
-      zoom: viewport.zoom,
-    }),
-  );
+  const zoom =
+    frame.zoom + Math.log2(Math.max(size.width / frame.width, size.height / frame.height));
+  const underlayTile = tileCoordinates(frame.center, zoom);
   const provider = (x: number, y: number, zoom: number, dpr?: number) =>
     tileUrl({ dark, dpr, tileSource, x, y, zoom });
 
@@ -198,7 +173,7 @@ export function RouteMap({ points, tileSource }: RouteMapProps) {
         <PigeonMapCore
           animate={false}
           attribution={false}
-          center={viewport.center}
+          center={frame.center}
           dprs={[1, 2]}
           height={size.height}
           // Pigeon only reads width/height in its constructor, so remount on resize.
@@ -208,32 +183,44 @@ export function RouteMap({ points, tileSource }: RouteMapProps) {
           tileComponent={SmoothTile}
           touchEvents={false}
           width={size.width}
-          zoom={viewport.zoom}
+          zoom={zoom}
           zoomSnap={false}
         />
       </Box>
       <Box sx={scrimSx} />
-      <Box component="svg" sx={routeSvgSx} viewBox={`0 0 ${size.width} ${size.height}`}>
-        <Box
-          component="path"
-          d={routePath}
-          fill="none"
-          stroke={tokens.casingStroke}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={6}
-          vectorEffect="non-scaling-stroke"
-        />
-        <Box
-          component="path"
-          d={routePath}
-          fill="none"
-          stroke={tokens.routeStroke}
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={tokens.routeStrokeWidth}
-          vectorEffect="non-scaling-stroke"
-        />
+      <Box
+        component="svg"
+        preserveAspectRatio="xMidYMid slice"
+        sx={routeSvgSx}
+        viewBox={`0 0 ${frame.width} ${frame.height}`}
+      >
+        {paths.map(({ d, tone }) => (
+          <Box
+            component="path"
+            d={d}
+            fill="none"
+            key={`casing-${tone}`}
+            stroke={tokens.casingStroke}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={strokeWidth + 2.5}
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
+        {paths.map(({ d, tone }) => (
+          <Box
+            component="path"
+            d={d}
+            data-tone={tone}
+            fill="none"
+            key={tone}
+            stroke={`var(--${tone})`}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={strokeWidth}
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
       </Box>
     </Box>
   );

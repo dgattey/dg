@@ -184,7 +184,7 @@ export function workSheetGridAreas(slots: { c1: boolean; ws: boolean }): {
   return gridAreas(
     [
       slots.c1 ? '"c1 c1 c1 c1 c1 c1 c1 c1 . sp sp sp"' : fullRow('sp'),
-      slots.ws ? '"st st st st . ws ws ws ws ws ws ws"' : fullRow('st'),
+      slots.ws ? '"st st st st st . ws ws ws ws ws ws"' : fullRow('st'),
     ],
     52,
   );

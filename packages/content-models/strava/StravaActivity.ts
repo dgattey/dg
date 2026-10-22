@@ -1,5 +1,17 @@
 import * as v from 'valibot';
 
+/** Strava sends `[]` instead of a coordinate pair for activities recorded without GPS. */
+const latLngSchema = v.optional(
+  v.nullable(
+    v.pipe(
+      v.array(v.number()),
+      v.transform(([lat, lng]): [number, number] | null =>
+        lat === undefined || lng === undefined ? null : [lat, lng],
+      ),
+    ),
+  ),
+);
+
 // Nested object schemas for API response
 const gearSchema = v.object({
   distance: v.optional(v.nullable(v.number())),
@@ -41,7 +53,7 @@ const apiSchemaEntries = {
   elapsed_time: v.optional(v.nullable(v.number())),
   elev_high: v.optional(v.nullable(v.number())),
   elev_low: v.optional(v.nullable(v.number())),
-  end_latlng: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
+  end_latlng: latLngSchema,
   gear: v.optional(v.nullable(gearSchema)),
   gear_id: v.optional(v.nullable(v.string())),
   id: v.number(),
@@ -60,7 +72,7 @@ const apiSchemaEntries = {
   private: v.optional(v.nullable(v.boolean())),
   sport_type: v.optional(v.nullable(v.string())),
   start_date: v.optional(v.nullable(v.string())),
-  start_latlng: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
+  start_latlng: latLngSchema,
   total_elevation_gain: v.optional(v.nullable(v.number())),
   type: v.string(),
   visibility: v.optional(v.nullable(v.string())),
@@ -105,7 +117,7 @@ const storedSchemaEntries = {
   elapsedTime: v.optional(v.nullable(v.number())),
   elevHigh: v.optional(v.nullable(v.number())),
   elevLow: v.optional(v.nullable(v.number())),
-  endLatlng: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
+  endLatlng: latLngSchema,
   gear: v.optional(v.nullable(gearStoredSchema)),
   gearId: v.optional(v.nullable(v.string())),
   id: v.number(),
@@ -125,7 +137,7 @@ const storedSchemaEntries = {
   relativeStartDate: v.optional(v.nullable(v.string())),
   sportType: v.optional(v.nullable(v.string())),
   startDate: v.optional(v.nullable(v.string())),
-  startLatlng: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
+  startLatlng: latLngSchema,
   totalElevationGain: v.optional(v.nullable(v.number())),
   type: v.string(),
   url: v.optional(v.nullable(v.string())),

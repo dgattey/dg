@@ -1,5 +1,5 @@
 import type { StravaOuting } from '@dg/content-models/strava/StravaHistory';
-import { routeSilhouette } from '@dg/maps/bay/bayRoutes';
+import { routeSilhouette } from '@dg/maps/src/routeFrame';
 import { PaperCard } from '../collage/PaperCard';
 import { paperToneVars } from '../collage/paperVars';
 import { SportChip } from './OutingMeta';
@@ -20,7 +20,7 @@ function OutingLink({ className, outing }: { className: string; outing: StravaOu
 
 /** The route's shape alone, in the sport's ink, for the logbook margin. */
 function Loop({ outing }: { outing: StravaOuting }) {
-  const d = outing.polyline ? routeSilhouette(outing.polyline, LOOP_SIZE, LOOP_SIZE, 3) : null;
+  const d = outing.polyline ? routeSilhouette(outing.polyline, LOOP_SIZE, 3) : null;
   return (
     <span className="strava__loop">
       {d ? (
