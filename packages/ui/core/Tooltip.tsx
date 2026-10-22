@@ -19,16 +19,6 @@ const ANCHOR_ATTRIBUTE = 'data-tooltip-anchor';
 const MUTED_ATTRIBUTE = 'data-tooltip-muted';
 
 /**
- * Nudges a tooltip inline so it stays inset from the viewport edges.
- *
- * Anchor positioning centers the tooltip on its trigger, so triggers near a
- * screen edge push the tooltip flush against it (or off screen entirely).
- *
- * Purely an enhancement: the tooltip reveals itself in CSS, and this only
- * refines where an already-positioned surface sits. Measuring needs a layout
- * box, which a `visibility: hidden` surface still has.
- */
-/**
  * Whether any clipping box in the trigger cuts its content off. Covers ellipsis
  * (wider than its box) and line clamps (taller). The 1px slack absorbs subpixel
  * rounding, which reports text that exactly fits as overflowing.
@@ -42,6 +32,16 @@ const hasTruncatedText = (trigger: Element) =>
     );
   });
 
+/**
+ * Nudges a tooltip inline so it stays inset from the viewport edges.
+ *
+ * Anchor positioning centers the tooltip on its trigger, so triggers near a
+ * screen edge push the tooltip flush against it (or off screen entirely).
+ *
+ * Purely an enhancement: the tooltip reveals itself in CSS, and this only
+ * refines where an already-positioned surface sits. Measuring needs a layout
+ * box, which a `visibility: hidden` surface still has.
+ */
 const insetFromViewportEdges = (tooltip: HTMLElement) => {
   tooltip.style.translate = '0';
   const { left, right, width } = tooltip.getBoundingClientRect();
@@ -80,6 +80,8 @@ export interface TooltipProps {
    * For text that ellipsizes. The anchor lets the trigger shrink, and the
    * tooltip only opens when the trigger's text is actually cut off. The trigger
    * already holds the full text, so it isn't also described by the tooltip.
+   * Truncated text sits in paper, whose card is the containing block, so the
+   * tooltip keeps its placement rather than flipping on room inside the card.
    */
   whenTruncated?: boolean;
 }
@@ -156,7 +158,18 @@ function createAnchorSx(anchorName: string): TooltipAnchorSx {
   };
 }
 
-function createSurfaceSx(anchorName: string, placement: TooltipPlacement): TooltipPopoverSx {
+/**
+ * A tilted or shadowed ancestor becomes the fixed surface's containing block,
+ * and `position-area` measures room inside it. In a small card that room is a
+ * sliver, and the default safe alignment then pins the surface over its own
+ * trigger. Unsafe alignment keeps it on its side of the anchor and lets it
+ * overflow the card instead.
+ */
+function createSurfaceSx(
+  anchorName: string,
+  placement: TooltipPlacement,
+  canFlip: boolean,
+): TooltipPopoverSx {
   const isAbove = placement === 'top';
   return {
     /* Browsers without anchor positioning fall back to centring on the anchor. */
@@ -170,6 +183,7 @@ function createSurfaceSx(anchorName: string, placement: TooltipPlacement): Toolt
     [TRIGGER_AROUND_FOCUSED_SELECTOR]: revealedSx,
     [TRIGGER_INSIDE_FOCUSED_SELECTOR]: revealedSx,
     [MUTED_SELECTOR]: { display: 'none' },
+    alignSelf: isAbove ? 'unsafe end' : 'unsafe start',
     background: 'var(--mui-palette-background-paper)',
     border: 'thin solid var(--mui-palette-card-border)',
     borderRadius: '12px',
@@ -177,6 +191,7 @@ function createSurfaceSx(anchorName: string, placement: TooltipPlacement): Toolt
     color: 'var(--mui-palette-text-primary)',
     fontVariantCaps: 'normal',
     fontWeight: 600,
+    justifySelf: 'unsafe anchor-center',
     letterSpacing: 'normal',
     lineHeight: 1.3,
     marginBlockEnd: isAbove ? '8px' : 0,
@@ -187,7 +202,7 @@ function createSurfaceSx(anchorName: string, placement: TooltipPlacement): Toolt
     position: 'fixed',
     positionAnchor: anchorName,
     positionArea: isAbove ? 'block-start' : 'block-end',
-    positionTryFallbacks: 'flip-block',
+    positionTryFallbacks: canFlip ? 'flip-block' : 'none',
     textTransform: 'none',
     translate: '0',
     visibility: 'hidden',
@@ -277,7 +292,7 @@ export function Tooltip({
         id={tooltipId}
         ref={surfaceRef}
         role="tooltip"
-        sx={createSurfaceSx(anchorName, placement)}
+        sx={createSurfaceSx(anchorName, placement, !whenTruncated)}
         variant="caption"
       >
         {title}

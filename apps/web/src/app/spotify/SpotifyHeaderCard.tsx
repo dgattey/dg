@@ -22,6 +22,10 @@ const getContainerSx = (isClickable: boolean): SxObject => ({
       transform: 'translateX(0)',
     },
   },
+  // A single-line title's min-content is its full text, so the paper must opt into shrinking.
+  '& > .paperWrap': {
+    minWidth: 0,
+  },
   alignItems: 'center',
   animation: `headerCardEnter ${TIMING_MEDIUM}ms ease-out`,
   cursor: isClickable ? 'pointer' : undefined,

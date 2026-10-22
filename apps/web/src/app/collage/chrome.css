@@ -258,9 +258,16 @@ a:focus-visible > .c-logo {
 .chrome__nowCellLink:focus-visible {
   background: color-mix(in oklab, var(--ink) 11%, transparent);
 }
-/* Only the track and ride shrink. Their full text lives in a tooltip. */
+/*
+ * Only the track and ride shrink, and their full text lives in a tooltip. The ride
+ * keeps its width up to a cap, so a long track gives way before a short ride does.
+ */
 .chrome__nowTip {
   flex: 0 1 auto;
+}
+.chrome__nowTipRide {
+  flex-shrink: 0;
+  max-width: 32%;
 }
 .chrome__nowCellLast {
   flex: none;
@@ -557,6 +564,9 @@ a:focus-visible > .c-logo {
   }
   .chrome__nowTip {
     grid-column: 1 / -1;
+  }
+  .chrome__nowTipRide {
+    max-width: none;
   }
   .chrome__nowCellLink {
     gap: 10px;

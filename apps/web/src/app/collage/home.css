@@ -319,13 +319,11 @@
   margin-top: 12px;
 }
 /*
- * The card's tilt makes it the containing block for the fixed tooltip, so room
- * is measured inside the card: a flip would drop the hint onto the title, and
- * safe alignment would pin it over its own trigger. It overflows the card instead.
+ * The card's tilt makes it the fixed tooltip's containing block, so a flip would be
+ * measured inside the card and drop the status hint onto the title.
  */
 .home__spotifyMeta [role="tooltip"] {
   position-try-fallbacks: none;
-  align-self: unsafe end;
 }
 /* Title and artists, each wrapped in a truncation tooltip whose surface keeps its own size. */
 .home__spotifyMetaInner

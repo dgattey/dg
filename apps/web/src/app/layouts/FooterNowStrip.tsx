@@ -84,7 +84,12 @@ export function FooterNowStrip({ initialTrack, latestActivity }: FooterNowStripP
           </Tooltip>
         ) : null}
         {latestActivity ? (
-          <Tooltip className="chrome__nowTip" placement="top" title={rideSummary} whenTruncated>
+          <Tooltip
+            className="chrome__nowTip chrome__nowTipRide"
+            placement="top"
+            title={rideSummary}
+            whenTruncated
+          >
             <a
               className="chrome__nowCell chrome__nowCellLink"
               href={latestActivity.url}
