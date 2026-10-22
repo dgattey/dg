@@ -94,6 +94,14 @@ describe('GatteySitesCard', () => {
     expect(container.querySelectorAll('img[alt=""]')).toHaveLength(4);
   });
 
+  it('offers each one-line description in full as a truncation tooltip', () => {
+    render(<GatteySitesCard projects={projects} />);
+
+    expect(
+      screen.getAllByRole('tooltip', { hidden: true }).map((tooltip) => tooltip.textContent),
+    ).toEqual(projects.map((project) => project.description));
+  });
+
   it('renders nothing when there are no projects', () => {
     const { container } = render(<GatteySitesCard projects={[]} />);
     expect(container).toBeEmptyDOMElement();

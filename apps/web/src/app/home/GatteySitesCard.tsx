@@ -1,4 +1,5 @@
 import type { RenderableSideProject } from '@dg/content-models/contentful/renderables/sideProjects';
+import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Image } from '@dg/ui/dependent/Image';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
@@ -42,7 +43,9 @@ export function GatteySitesCard({ projects }: GatteySitesCardProps) {
                   </span>
                   <span className="home__sideText">
                     <b className="home__sideTitle">{project.title}</b>
-                    <span className="home__sideDescription">{project.description}</span>
+                    <Tooltip title={project.description} whenTruncated>
+                      <span className="home__sideDescription">{project.description}</span>
+                    </Tooltip>
                   </span>
                   <span aria-hidden="true" className="home__sideArrow">
                     ↗

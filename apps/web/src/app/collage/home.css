@@ -404,19 +404,21 @@
 .home__sideRoot {
   position: relative;
   display: grid;
-  gap: 16px;
   align-content: start;
-  padding: 26px 18px 0;
+  padding: 0 4px 0 8px;
 }
+/* Overlaps the first row like the tags on project frames, so the list fits beside them. */
 .home__sideHeadingWrap {
+  position: relative;
+  z-index: 3;
   justify-self: start;
-  margin: 0;
+  margin: 0 0 -10px -4px;
   font-size: inherit;
   font-weight: inherit;
 }
 .home__sideList {
   display: grid;
-  gap: 16px;
+  gap: 8px;
   padding: 0;
   margin: 0;
   list-style: none;
@@ -425,18 +427,17 @@
   width: 100%;
 }
 .home__sideItem:nth-child(odd) .home__sideRowWrap {
-  margin-left: 18px;
+  margin-left: 10px;
 }
 .home__sideItem:nth-child(even) .home__sideRowWrap {
-  margin-top: 4px;
-  margin-right: 14px;
+  margin-right: 8px;
 }
 .home__sideRow {
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto;
-  gap: 16px;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  gap: 12px;
   align-items: center;
-  padding: 18px 20px 18px 16px;
+  padding: 9px 14px 9px 12px;
   color: inherit;
   text-decoration: none;
 }
@@ -448,11 +449,11 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 5px;
+  width: 36px;
+  height: 36px;
+  padding: 4px;
   background: color-mix(in srgb, var(--ink-on-cream) 6%, var(--cream));
-  border-radius: 12px;
+  border-radius: 10px;
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ink-on-cream) 12%, transparent);
   transform: scale(1);
 }
@@ -461,28 +462,47 @@
 }
 .home__sideText {
   display: grid;
-  gap: 2px;
   min-width: 0;
 }
 .home__sideTitle {
   font-family: var(--display);
   font-size: var(--type-h3);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 .home__sideDescription {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
   overflow: hidden;
-  -webkit-line-clamp: 2;
-  font-size: var(--type-body);
-  line-height: 1.55;
+  text-overflow: ellipsis;
+  font-size: var(--type-caption);
+  line-height: 1.45;
   color: var(--soft);
+  white-space: nowrap;
 }
 .home__sideArrow {
   font-size: var(--type-h3);
   font-weight: 700;
   line-height: 1;
+}
+
+/* Keeps five rows within the height of the frames beside them as the columns narrow. */
+@media (max-width: 1240px) {
+  .home__sideList {
+    gap: 6px;
+  }
+  .home__sideRow {
+    grid-template-columns: 32px minmax(0, 1fr) auto;
+    gap: 10px;
+    padding: 7px 12px 7px 10px;
+  }
+  .home__sideMark {
+    width: 32px;
+    height: 32px;
+    padding: 3px;
+    border-radius: 9px;
+  }
+  .home__sideTitle {
+    font-size: var(--type-meta);
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -568,5 +588,12 @@
   .home__sideItem:nth-child(odd) .home__sideRowWrap,
   .home__sideItem:nth-child(even) .home__sideRowWrap {
     margin: 0;
+  }
+  /* Stacked rows have the height to spare, and touch has no hover to reveal a clipped line. */
+  .home__sideDescription {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
   }
 }
