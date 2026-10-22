@@ -1,4 +1,10 @@
-import { decodePolyline, encodePolyline, projectToGrid } from '../streetGridGeometry';
+import {
+  decodePolyline,
+  encodePolyline,
+  OUTLINE_UNIT_METERS,
+  outlineProjection,
+  projectToGrid,
+} from '../streetGridGeometry';
 
 describe('encodePolyline', () => {
   it('matches Google’s reference encoding', () => {
@@ -33,5 +39,16 @@ describe('projectToGrid', () => {
     const [east, north] = projectToGrid(origin, 37.77, -122.43);
     expect(north).toBeCloseTo(1105.74, 1);
     expect(east).toBeCloseTo(880.1, 0);
+  });
+});
+
+describe('outlineProjection', () => {
+  it('lands a point where its grid meters fall in outline units, north up', () => {
+    const origin = { lat: 37.76, lng: -122.44 };
+    const { perDegree } = outlineProjection(origin);
+    const [lat, lng] = [37.78, -122.41];
+    const [x, y] = projectToGrid(origin, lat, lng);
+    expect((lng - origin.lng) * perDegree.lng).toBeCloseTo(x / OUTLINE_UNIT_METERS, 6);
+    expect((lat - origin.lat) * perDegree.lat).toBeCloseTo(-y / OUTLINE_UNIT_METERS, 6);
   });
 });

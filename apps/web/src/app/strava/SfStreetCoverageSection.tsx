@@ -2,11 +2,13 @@
 
 import type { SfStreetCoverage } from '@dg/content-models/strava/SfStreetCoverage';
 import { type CSSProperties, useId, useState } from 'react';
+import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import { Scallop, Stub } from '../music/stats/StatsShapes';
 import { useFilteredOutings } from './StravaFilters';
 import { formatShare, type SfNeighborhoodCoverage, summarizeSfCoverage } from './sfCoverageStats';
+import { sfRoutePath } from './sfRoutePath';
 import { formatMiles } from './stravaFormat';
 
 const COLLAPSED_ROWS = 10;
@@ -28,7 +30,8 @@ const milesOf = ({
   `${formatMiles(riddenMeters)} of ${formatMiles(streetMeters)} mi`;
 
 /**
- * A paper-cut map of the neighborhoods, filled by how much of each is ridden.
+ * A paper-cut map of the neighborhoods, filled by how much of each is ridden,
+ * with the routes traced over the land and under the cuts between pieces.
  * Pointer only: the leaderboard beside it is the keyboard and screen reader path.
  */
 function NeighborhoodMap({
@@ -36,14 +39,18 @@ function NeighborhoodMap({
   neighborhoods,
   onHover,
   onPick,
+  routes,
   viewBox,
 }: {
   focused: SfNeighborhoodCoverage | null;
   neighborhoods: ReadonlyArray<SfNeighborhoodCoverage>;
   onHover: (index: number | null) => void;
   onPick: (index: number) => void;
+  routes: string;
   viewBox: string;
 }) {
+  const landId = useId();
+  const land = neighborhoods.map((hood) => hood.outline).join('');
   return (
     <svg
       aria-hidden="true"
@@ -69,6 +76,15 @@ function NeighborhoodMap({
           />
         ))}
       </g>
+      {routes ? (
+        <>
+          <clipPath id={landId}>
+            <path d={land} />
+          </clipPath>
+          <path className="sfStreets__routes" clipPath={`url(#${landId})`} d={routes} />
+        </>
+      ) : null}
+      <path className="sfStreets__cuts" d={land} />
       {focused ? <path className="sfStreets__focus" d={focused.outline} /> : null}
     </svg>
   );
@@ -115,14 +131,16 @@ function Leaderboard({
         ))}
       </ol>
       {ranked.length > COLLAPSED_ROWS ? (
-        <button
-          aria-expanded={expanded}
-          className="paperButton sfStreets__more"
-          onClick={() => setExpanded(!expanded)}
-          type="button"
-        >
-          {expanded ? `Top ${COLLAPSED_ROWS}` : `All ${ranked.length} neighborhoods`}
-        </button>
+        <div className="sfStreets__more">
+          <PaperButton
+            expanded={expanded}
+            onClick={() => setExpanded(!expanded)}
+            tiltDeg={-1.2}
+            tone="ochre"
+          >
+            {expanded ? `Top ${COLLAPSED_ROWS}` : `All ${ranked.length} neighborhoods`}
+          </PaperButton>
+        </div>
       ) : null}
     </>
   );
@@ -134,7 +152,7 @@ function Leaderboard({
  * all of them. Hovering or picking a neighborhood on either shows its figures.
  */
 export function SfStreetCoverageSection({ coverage }: { coverage: SfStreetCoverage }) {
-  const { span, sport } = useFilteredOutings();
+  const { outings, span, sport } = useFilteredOutings();
   const headingId = useId();
   const [hovered, setHovered] = useState<number | null>(null);
   const [picked, setPicked] = useState<number | null>(null);
@@ -194,6 +212,7 @@ export function SfStreetCoverageSection({ coverage }: { coverage: SfStreetCovera
           neighborhoods={summary.neighborhoods}
           onHover={setHovered}
           onPick={pick}
+          routes={sfRoutePath(outings, coverage)}
           viewBox={coverage.viewBox}
         />
         <ol aria-label="Share of streets ridden" className="sfStreets__legend">

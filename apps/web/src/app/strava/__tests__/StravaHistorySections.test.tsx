@@ -105,6 +105,7 @@ const full: StravaHistory = {
       { name: 'Mission', outline: 'M0 0l10 0 0 10z', streetMeters: 3218.688 },
       { name: 'Presidio', outline: 'M10 0l10 0 0 10z', streetMeters: 3218.688 },
     ],
+    projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
     ridden: { 'all all': [2414.016, 804.672], 'ride all': [0, 804.672] },
     viewBox: '0 0 20 10',
   },
@@ -123,7 +124,12 @@ const sparse: StravaHistory = {
   bikes: [],
   latest: { ...lone, description: null },
   outings: [lone],
-  sfCoverage: { neighborhoods: [], ridden: {}, viewBox: '0 0 10 10' },
+  sfCoverage: {
+    neighborhoods: [],
+    projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
+    ridden: {},
+    viewBox: '0 0 10 10',
+  },
   thisYear: { distanceMeters: 0, elevationGainMeters: 0, outings: 0, year: 2026 },
   totals: { distanceMeters: 16_093, elevationGainMeters: 0, firstYear: 2024, outings: 1 },
 };

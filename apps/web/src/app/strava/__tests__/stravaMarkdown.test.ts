@@ -38,6 +38,7 @@ const sfCoverage: SfStreetCoverage = {
     { name: 'Mission', outline: 'M10 0l10 0 0 10z', streetMeters: 32_186.88 },
     { name: 'Treasure Island', outline: 'M20 0l10 0 0 10z', streetMeters: 8046.72 },
   ],
+  projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
   ridden: { 'all all': [8046.72, 24_140.16, 0], 'ride 2026': [0, 1609.344, 0] },
   viewBox: '0 0 30 10',
 };

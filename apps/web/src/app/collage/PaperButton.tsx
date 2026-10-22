@@ -18,6 +18,7 @@ type PaperButtonProps = PaperButtonLook &
         href: string;
         title: string;
         disabled?: undefined;
+        expanded?: undefined;
         onClick?: () => void;
         type?: undefined;
       }
@@ -25,6 +26,8 @@ type PaperButtonProps = PaperButtonLook &
         href?: undefined;
         title?: undefined;
         disabled?: boolean;
+        /** Whether the content this button shows and hides is showing. */
+        expanded?: boolean;
         onClick?: ButtonHTMLAttributes<HTMLButtonElement>['onClick'];
         type?: 'button' | 'submit';
       }
@@ -75,6 +78,7 @@ export function PaperButton({
   className,
   current,
   disabled = false,
+  expanded,
   href,
   onClick,
   title,
@@ -88,6 +92,7 @@ export function PaperButton({
     <PaperButtonWrap {...look}>
       {href === undefined ? (
         <button
+          aria-expanded={expanded}
           aria-pressed={current}
           className={classNames}
           disabled={disabled}

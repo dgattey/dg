@@ -6,10 +6,13 @@ export type GridOrigin = { lat: number; lng: number };
 /** Streets are cut into pieces about this long; a piece is ridden or it isn't. */
 export const STREET_PIECE_METERS = 10;
 
+/** Meters per `StreetGrid.viewBox` unit. */
+export const OUTLINE_UNIT_METERS = 10;
+
 /** A city's neighborhoods and the rideable streets in each, on a flat meter grid. */
 export type StreetGrid = {
   origin: GridOrigin;
-  /** SVG view box for every `outline`, in tens of meters with north up. */
+  /** SVG view box for every `outline`, in `OUTLINE_UNIT_METERS` with north up. */
   viewBox: string;
   neighborhoods: ReadonlyArray<{
     name: string;
@@ -33,6 +36,16 @@ const METERS_PER_DEGREE_LNG_AT_EQUATOR = 111_320;
 export function projectToGrid(origin: GridOrigin, lat: number, lng: number): [number, number] {
   const lngScale = METERS_PER_DEGREE_LNG_AT_EQUATOR * Math.cos((origin.lat * Math.PI) / 180);
   return [(lng - origin.lng) * lngScale, (lat - origin.lat) * METERS_PER_DEGREE_LAT];
+}
+
+/** `projectToGrid` in outline units, so routes in degrees can be drawn over the outlines. */
+export function outlineProjection(origin: GridOrigin) {
+  const [lngMeters] = projectToGrid(origin, origin.lat, origin.lng + 1);
+  const [, latMeters] = projectToGrid(origin, origin.lat + 1, origin.lng);
+  return {
+    origin,
+    perDegree: { lat: -latMeters / OUTLINE_UNIT_METERS, lng: lngMeters / OUTLINE_UNIT_METERS },
+  };
 }
 
 /**

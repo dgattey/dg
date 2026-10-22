@@ -16,6 +16,14 @@ export const sfCoverageKey = (sport: SfCoverageSport, span: SfCoverageSpan) => `
 export type SfStreetCoverage = {
   /** SVG view box for every neighborhood `outline`. */
   viewBox: string;
+  /**
+   * Degrees to `viewBox` units, for drawing routes over the outlines:
+   * `x = (lng - origin.lng) * perDegree.lng`, and `y` likewise from `lat`.
+   */
+  projection: {
+    origin: { lat: number; lng: number };
+    perDegree: { lat: number; lng: number };
+  };
   /** DataSF's analysis neighborhoods, alphabetical. */
   neighborhoods: ReadonlyArray<{
     name: string;

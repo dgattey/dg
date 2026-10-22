@@ -12,6 +12,7 @@ import { log } from '@dg/shared-core/logging/log';
 import {
   encodePolyline,
   type GridOrigin,
+  OUTLINE_UNIT_METERS,
   projectToGrid,
   STREET_PIECE_METERS,
 } from '../strava/streetGridGeometry';
@@ -26,8 +27,7 @@ const SF_BBOX = '37.703,-122.519,37.835,-122.355';
 const OVERPASS_QUERY = `[out:json][timeout:600];way["highway"](${SF_BBOX});out tags geom;`;
 const ORIGIN: GridOrigin = { lat: 37.76, lng: -122.44 };
 const OUTPUT = new URL('../strava/sfStreetGrid.ts', import.meta.url);
-/** Outlines are drawn in tens of meters, simplified to within this many meters. */
-const OUTLINE_UNIT_METERS = 10;
+/** Outlines are simplified to within this many meters. */
 const OUTLINE_TOLERANCE_METERS = 8;
 const BIOME_LINE_WIDTH = 100;
 

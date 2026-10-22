@@ -9,7 +9,12 @@ import {
 } from '@dg/content-models/strava/SfStreetCoverage';
 import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 import { SF_STREET_GRID } from './sfStreetGrid';
-import { decodePolyline, projectToGrid, type StreetGrid } from './streetGridGeometry';
+import {
+  decodePolyline,
+  outlineProjection,
+  projectToGrid,
+  type StreetGrid,
+} from './streetGridGeometry';
 
 /** A street piece counts as ridden when a route passes within this many meters of its middle... */
 const REACH_METERS = 20;
@@ -254,6 +259,7 @@ export function measureStreetCoverage(
       outline,
       streetMeters: Math.round(streetMeters[index] ?? 0),
     })),
+    projection: outlineProjection(grid.origin),
     ridden: Object.fromEntries([...groups].map(([key, members]) => [key, metersPerHood(members)])),
     viewBox: grid.viewBox,
   };

@@ -29,6 +29,17 @@ describe('PaperButton', () => {
     expect(screen.getByRole('button', { name: 'Light' })).toHaveAttribute('aria-pressed', 'false');
   });
 
+  it('only reports expanded state when it shows and hides content', () => {
+    render(
+      <>
+        <PaperButton>Copy</PaperButton>
+        <PaperButton expanded={false}>More</PaperButton>
+      </>,
+    );
+    expect(screen.getByRole('button', { name: 'Copy' })).not.toHaveAttribute('aria-expanded');
+    expect(screen.getByRole('button', { name: 'More' })).toHaveAttribute('aria-expanded', 'false');
+  });
+
   it('wraps controls in paperWrap so focus rings stay unclipped', () => {
     render(<PaperButton>Light</PaperButton>);
     const button = screen.getByRole('button', { name: 'Light' });

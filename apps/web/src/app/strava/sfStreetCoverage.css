@@ -97,14 +97,29 @@
 .sfStreets__hood {
   cursor: pointer;
   fill: var(--tier);
-  stroke: var(--cream);
-  stroke-width: 1.5px;
-  stroke-linejoin: round;
-  vector-effect: non-scaling-stroke;
   transition: filter 120ms ease;
 }
 .sfStreets__hood:hover {
   filter: brightness(1.08);
+}
+/* Fixed ink, since the fills it crosses are the same cream through viridian in either scheme. */
+.sfStreets__routes {
+  pointer-events: none;
+  fill: none;
+  stroke: var(--ink-on-cream);
+  stroke-width: 1px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.34;
+  vector-effect: non-scaling-stroke;
+}
+.sfStreets__cuts {
+  pointer-events: none;
+  fill: none;
+  stroke: var(--cream);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
 }
 .sfStreets__focus {
   pointer-events: none;
@@ -193,16 +208,7 @@
   border-radius: 3px;
 }
 .sfStreets__more {
-  padding: 8px 14px;
-  margin-top: 14px;
-  font-family: var(--display);
-  font-size: var(--type-body);
-  font-weight: 700;
-  color: var(--on);
-  cursor: pointer;
-  background: color-mix(in oklab, var(--on) 8%, transparent);
-  border: 1.5px solid color-mix(in oklab, var(--on) 40%, transparent);
-  border-radius: 4px;
+  margin-top: 16px;
 }
 
 @media (max-width: 900px) {
