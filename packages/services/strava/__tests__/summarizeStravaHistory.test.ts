@@ -1,4 +1,5 @@
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
+import { encodePolyline } from '../streetGridGeometry';
 import { summarizeStravaHistory } from '../summarizeStravaHistory';
 
 const NOW = new Date('2026-10-22T12:00:00Z');
@@ -271,8 +272,34 @@ describe('summarizeStravaHistory', () => {
       bikes: [],
       latest: expect.objectContaining({ distanceMeters: 0, id: 7, polyline: null, sport: 'hike' }),
       outings: [expect.objectContaining({ id: 7 })],
+      sfCoverage: expect.objectContaining({ ridden: {} }),
       thisYear: { distanceMeters: 0, elevationGainMeters: 0, outings: 0, year: 2026 },
       totals: { distanceMeters: 0, elevationGainMeters: 0, firstYear: 2023, outings: 1 },
     });
+  });
+
+  it('measures San Francisco street coverage from the outings’ polylines', () => {
+    const valencia = encodePolyline([
+      [3_776_510, -12_242_183],
+      [3_775_235, -12_242_040],
+    ]);
+    const { sfCoverage } =
+      summarizeStravaHistory(
+        [
+          activity({
+            id: 30,
+            map: { summaryPolyline: valencia },
+            startDate: '2026-10-21T12:00:00Z',
+          }),
+        ],
+        NOW,
+      ) ?? {};
+    const names = sfCoverage?.neighborhoods.map(({ name }) => name) ?? [];
+    expect(names).toHaveLength(41);
+    const ridden = sfCoverage?.ridden['ride week'] ?? [];
+    const mission = ridden[names.indexOf('Mission')] ?? 0;
+    expect(mission).toBeGreaterThan(900);
+    expect(mission).toBeLessThan(1700);
+    expect(ridden.reduce((sum, meters) => sum + meters, 0)).toBe(mission);
   });
 });

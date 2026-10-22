@@ -100,6 +100,15 @@ const full: StravaHistory = {
   ],
   latest,
   outings: [presidio, merritt, tahoe, century],
+  sfCoverage: {
+    neighborhoods: [
+      { name: 'Mission', outline: 'M0 0l10 0 0 10z', streetMeters: 3218.688 },
+      { name: 'Presidio', outline: 'M10 0l10 0 0 10z', streetMeters: 3218.688 },
+    ],
+    projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
+    ridden: { 'all all': [2414.016, 804.672], 'ride all': [0, 804.672] },
+    viewBox: '0 0 20 10',
+  },
   thisYear: { distanceMeters: 32_186, elevationGainMeters: 240, outings: 2, year: 2026 },
   totals: { distanceMeters: 172_653, elevationGainMeters: 2_140, firstYear: 2024, outings: 4 },
 };
@@ -115,6 +124,12 @@ const sparse: StravaHistory = {
   bikes: [],
   latest: { ...lone, description: null },
   outings: [lone],
+  sfCoverage: {
+    neighborhoods: [],
+    projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
+    ridden: {},
+    viewBox: '0 0 10 10',
+  },
   thisYear: { distanceMeters: 0, elevationGainMeters: 0, outings: 0, year: 2026 },
   totals: { distanceMeters: 16_093, elevationGainMeters: 0, firstYear: 2024, outings: 1 },
 };
@@ -164,6 +179,7 @@ describe('StravaHistorySections', () => {
       screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent),
     ).toEqual([
       'Recent routes',
+      'San Francisco streets',
       'Climbing by month',
       'Recent outings',
       'Longest rides',
@@ -181,6 +197,20 @@ describe('StravaHistorySections', () => {
     expect(screen.getByRole('button', { name: 'Runs' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Hikes' })).toBeInTheDocument();
     expect(screen.getByRole('combobox', { name: 'Year' })).toBeInTheDocument();
+  });
+
+  it('measures San Francisco street coverage for whatever the filters pick', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    renderSections(full);
+    const streets = () => screen.getByRole('region', { name: 'San Francisco streets' });
+
+    expect(within(streets()).getByRole('heading', { name: 'San Francisco' })).toBeInTheDocument();
+    expect(within(streets()).getByText('2.0 of 4.0 mi ridden')).toBeInTheDocument();
+    expect(within(streets()).getByText('Mission · 75.0%')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Rides' }));
+    expect(within(streets()).getByText('0.5 of 4.0 mi ridden')).toBeInTheDocument();
+    expect(within(streets()).getByText('Presidio · 25.0%')).toBeInTheDocument();
   });
 
   it('prints the newest outings in order, each captioned with its sport and day', () => {

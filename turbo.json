@@ -132,6 +132,9 @@
       "dependsOn": ["env", "^migrate"],
       "env": ["DATABASE_URL", "STRAVA_CLIENT_ID", "STRAVA_CLIENT_SECRET"]
     },
+    "strava:sf-grid": {
+      "cache": false
+    },
     "test": {
       "dependsOn": ["topo"],
       "env": ["DATABASE_URL_TEST"],

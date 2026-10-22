@@ -1,5 +1,6 @@
 import 'server-only';
 
+import type { SfStreetCoverage } from '@dg/content-models/strava/SfStreetCoverage';
 import type {
   StravaBike,
   StravaLogEntry,
@@ -10,9 +11,13 @@ import { stravaRoute } from '@dg/shared-core/routes/app';
 import { getStravaHistory } from '../../services/strava';
 import { relatedPageLinksMarkdown } from '../llm-markdown/relatedPageLinksMarkdown';
 import { SITE_NAME } from '../metadata';
+import { formatShare, summarizeSfCoverage } from './sfCoverageStats';
+import { formatMiles } from './stravaFormat';
 import { biggestClimbs, longestOutings, yearlyTotals } from './stravaStats';
 
 const LISTED_OUTINGS = 6;
+
+const LISTED_NEIGHBORHOODS = 5;
 
 const UNAVAILABLE_MARKDOWN = '# Big map\n\n> Strava history is unavailable right now.\n';
 
@@ -57,6 +62,20 @@ const bikeLine = (bike: StravaBike) =>
     `longest ride ${miles(bike.longest.distanceMeters)}, [${bike.longest.name}](${bike.longest.url}) on ${dayFormatter.format(new Date(bike.longest.startDate))}`,
   ].join(', ');
 
+const sfCoverageLines = (coverage: SfStreetCoverage) => {
+  const { city, explored, neighborhoods, ranked } = summarizeSfCoverage(coverage, 'all', 'all');
+  return [
+    `- City: ${formatShare(city.share)} of rideable streets, ${formatMiles(city.riddenMeters)} of ${formatMiles(city.streetMeters)} miles, ${explored} of ${neighborhoods.length} neighborhoods explored`,
+    ...ranked
+      .slice(0, LISTED_NEIGHBORHOODS)
+      .filter((hood) => hood.riddenMeters > 0)
+      .map(
+        (hood) =>
+          `- ${hood.name}: ${formatShare(hood.share)}, ${formatMiles(hood.riddenMeters)} of ${formatMiles(hood.streetMeters)} miles`,
+      ),
+  ].join('\n');
+};
+
 /**
  * Markdown representation of the Strava atlas — kept next to the page.
  */
@@ -66,7 +85,7 @@ export async function getStravaMarkdown(): Promise<string> {
     if (!history) {
       return UNAVAILABLE_MARKDOWN;
     }
-    const { bikes, outings, thisYear, totals } = history;
+    const { bikes, outings, sfCoverage, thisYear, totals } = history;
     const climbs = biggestClimbs(outings, LISTED_OUTINGS);
     const longestRides = longestOutings(
       outings.filter((outing) => outing.sport === 'ride'),
@@ -126,6 +145,10 @@ export async function getStravaMarkdown(): Promise<string> {
 
     if (bikes.length > 0) {
       sections.push('## Bike odometers', bikes.map(bikeLine).join('\n'));
+    }
+
+    if (sfCoverage.neighborhoods.some((hood) => hood.streetMeters > 0)) {
+      sections.push('## San Francisco street coverage', sfCoverageLines(sfCoverage));
     }
 
     sections.push(relatedPageLinksMarkdown(stravaRoute));

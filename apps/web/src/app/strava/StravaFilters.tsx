@@ -1,5 +1,10 @@
 'use client';
 
+import {
+  type SfCoverageSpan,
+  STRAVA_WINDOW_DAYS,
+  type StravaWindow,
+} from '@dg/content-models/strava/SfStreetCoverage';
 import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 import { VisibleRoutes } from '@dg/maps/VisibleRoutes';
 import { createContext, type ReactNode, startTransition, use, useState } from 'react';
@@ -14,19 +19,15 @@ const FILTER_SPORTS = ['ride', 'run', 'hike'] as const;
 
 export type SportFilter = 'all' | (typeof FILTER_SPORTS)[number];
 
-type WindowKey = 'week' | 'month';
-
-const WINDOW_DAYS = { month: 30, week: 7 } as const satisfies Record<WindowKey, number>;
-
 const DAY_MS = 24 * 60 * 60 * 1000;
 
 /** A rolling window keeps the moment it was picked, so rendering never reads the clock. */
 type Span =
   | { kind: 'all' }
-  | { kind: 'window'; key: WindowKey; since: number }
+  | { kind: 'window'; key: StravaWindow; since: number }
   | { kind: 'year'; year: number };
 
-type SpanKey = 'all' | WindowKey;
+type SpanKey = 'all' | StravaWindow;
 
 const SPAN_OPTIONS = [
   { key: 'all', label: 'All time', tiltDeg: 0.8 },
@@ -46,11 +47,13 @@ type Filtered = {
   sport: SportFilter;
   /** The span in words, `All time`, `Last 7 days`, or a year. */
   spanLabel: string;
+  span: SfCoverageSpan;
 };
 
 const FilteredOutings = createContext<Filtered>({
   all: [],
   outings: [],
+  span: 'all',
   spanLabel: SPAN_OPTIONS[0].label,
   sport: 'all',
   sportOutings: [],
@@ -81,7 +84,7 @@ function inSpan(span: Span, outing: StravaLogEntry) {
     case 'all':
       return true;
     case 'window':
-      return Date.parse(outing.startDate) >= span.since - WINDOW_DAYS[span.key] * DAY_MS;
+      return Date.parse(outing.startDate) >= span.since - STRAVA_WINDOW_DAYS[span.key] * DAY_MS;
     case 'year':
       return yearOf(outing) === span.year;
     default: {
@@ -96,7 +99,7 @@ function spanLabel(span: Span) {
     case 'all':
       return SPAN_OPTIONS[0].label;
     case 'window':
-      return `Last ${WINDOW_DAYS[span.key]} days`;
+      return `Last ${STRAVA_WINDOW_DAYS[span.key]} days`;
     case 'year':
       return String(span.year);
     default: {
@@ -165,7 +168,14 @@ export function StravaFilters({
   const pickSpan = (next: Span) => startTransition(() => setSpan(next));
   return (
     <FilteredOutings
-      value={{ all: outings, outings: visible, spanLabel: spanLabel(span), sport, sportOutings }}
+      value={{
+        all: outings,
+        outings: visible,
+        span: span.kind === 'all' ? 'all' : span.kind === 'year' ? span.year : span.key,
+        spanLabel: spanLabel(span),
+        sport,
+        sportOutings,
+      }}
     >
       <div className="strava__filters">
         {sports.length > 1 ? (

@@ -65,6 +65,12 @@ const history: StravaHistory = {
     route(103, TAHOE, 'hike'),
     { ...route(104, '', 'ride'), polyline: null },
   ],
+  sfCoverage: {
+    neighborhoods: [],
+    projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
+    ridden: {},
+    viewBox: '0 0 10 10',
+  },
   thisYear: {
     distanceMeters: 1_420 * METERS_PER_MILE,
     elevationGainMeters: 61_500 * METERS_PER_FOOT,

@@ -1,0 +1,222 @@
+.sfStreets {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 28px 40px;
+  align-items: start;
+}
+.sfStreets [data-tier="0"] {
+  --tier: color-mix(in oklab, var(--ink-on-cream) 9%, var(--cream));
+}
+.sfStreets [data-tier="1"] {
+  --tier: color-mix(in oklab, var(--ochre) 45%, var(--cream));
+}
+.sfStreets [data-tier="2"] {
+  --tier: var(--ochre);
+}
+.sfStreets [data-tier="3"] {
+  --tier: var(--cobalt);
+}
+.sfStreets [data-tier="4"] {
+  --tier: var(--viridian);
+}
+
+.sfStreets__eyebrow,
+.sfStreets__callouts {
+  grid-column: 1 / -1;
+}
+.sfStreets__callouts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 36px;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.sfStreets__seal {
+  width: 220px;
+}
+.sfStreets__seal .strava__totalNumber {
+  white-space: nowrap;
+}
+.sfStreets__callouts .stats__ticket > .stats__face {
+  min-height: 0;
+  padding: 16px 28px 18px 40px;
+}
+.sfStreets__calloutLine {
+  font-family: var(--display);
+  font-size: var(--type-title-md);
+  font-weight: 800;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+.sfStreets__mapCard {
+  grid-column: span 7;
+}
+.sfStreets__board {
+  grid-column: span 5;
+  margin-top: 18px;
+}
+.sfStreets__head {
+  display: flex;
+  gap: 16px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.sfStreets__head .strava__heading {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sfStreets__figures {
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+  align-items: baseline;
+}
+.sfStreets__focusShare {
+  font-family: var(--display);
+  font-size: var(--type-title-md);
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  color: var(--on);
+}
+
+.sfStreets__map {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 640px;
+  margin-top: 14px;
+}
+.sfStreets__hoods {
+  filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
+}
+.sfStreets__hood {
+  cursor: pointer;
+  fill: var(--tier);
+  transition: filter 120ms ease;
+}
+.sfStreets__hood:hover {
+  filter: brightness(1.08);
+}
+/* Fixed ink, since the fills it crosses are the same cream through viridian in either scheme. */
+.sfStreets__routes {
+  pointer-events: none;
+  fill: none;
+  stroke: var(--ink-on-cream);
+  stroke-width: 1px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.34;
+  vector-effect: non-scaling-stroke;
+}
+.sfStreets__cuts {
+  pointer-events: none;
+  fill: none;
+  stroke: var(--cream);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.sfStreets__focus {
+  pointer-events: none;
+  fill: none;
+  stroke: var(--vermilion);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.sfStreets__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 0;
+  margin: 12px 0 0;
+  list-style: none;
+}
+.sfStreets__key {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-family: var(--display);
+  font-size: var(--type-caption);
+  font-weight: 700;
+  color: var(--soft);
+}
+.sfStreets__key::before {
+  width: 14px;
+  height: 14px;
+  content: "";
+  background: var(--tier);
+  border: 1px solid color-mix(in oklab, var(--on) 30%, transparent);
+  border-radius: 2px;
+}
+
+.sfStreets__rows {
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  margin: 12px 0 0;
+  list-style: none;
+}
+.sfStreets__row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  align-items: baseline;
+  width: 100%;
+  padding: 8px 10px;
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 700;
+  line-height: 1.15;
+  color: var(--on);
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+}
+.sfStreets__row[data-focused="true"] {
+  background: color-mix(in oklab, var(--on) 8%, transparent);
+}
+.sfStreets__row[aria-pressed="true"] {
+  box-shadow: inset 3px 0 0 var(--vermilion);
+}
+.sfStreets__rank {
+  font-variant-numeric: tabular-nums;
+  color: var(--soft);
+}
+.sfStreets__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sfStreets__share {
+  font-variant-numeric: tabular-nums;
+}
+.sfStreets__bar {
+  grid-column: 2 / -1;
+  height: 6px;
+  background:
+    linear-gradient(var(--tier), var(--tier)) 0 0 / calc(var(--share) * 100%) 100% no-repeat,
+    color-mix(in oklab, var(--on) 10%, transparent);
+  border-radius: 3px;
+}
+.sfStreets__more {
+  margin-top: 16px;
+}
+
+@media (max-width: 900px) {
+  .sfStreets__mapCard,
+  .sfStreets__board {
+    grid-column: 1 / -1;
+  }
+  .sfStreets__board {
+    margin-top: 0;
+  }
+}

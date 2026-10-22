@@ -1,3 +1,4 @@
+import type { SfStreetCoverage } from '@dg/content-models/strava/SfStreetCoverage';
 import type { StravaHistory, StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 
 jest.mock('../../../services/strava', () => ({
@@ -31,6 +32,17 @@ const hike = outing({
   startDate: '2025-03-04T17:00:00.000Z',
 });
 
+const sfCoverage: SfStreetCoverage = {
+  neighborhoods: [
+    { name: 'Castro/Upper Market', outline: 'M0 0l10 0 0 10z', streetMeters: 16_093.44 },
+    { name: 'Mission', outline: 'M10 0l10 0 0 10z', streetMeters: 32_186.88 },
+    { name: 'Treasure Island', outline: 'M20 0l10 0 0 10z', streetMeters: 8046.72 },
+  ],
+  projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
+  ridden: { 'all all': [8046.72, 24_140.16, 0], 'ride 2026': [0, 1609.344, 0] },
+  viewBox: '0 0 30 10',
+};
+
 const history: StravaHistory = {
   bikes: [
     {
@@ -54,6 +66,7 @@ const history: StravaHistory = {
   ],
   latest: { ...latest, description: null },
   outings: [latest, hike],
+  sfCoverage,
   thisYear: { distanceMeters: 16_093.44, elevationGainMeters: 304.8, outings: 1, year: 2026 },
   totals: {
     distanceMeters: 24_140.16,
@@ -87,6 +100,9 @@ describe('getStravaMarkdown', () => {
     expect(markdown).toContain(
       '## Bike odometers\n\n- Cruz: 4,864.5 miles on the odometer, 412,001 feet climbed, 380 hours in the saddle, 399 rides from 2023 to 2026, longest ride 118 miles, [Marshall Wall Sunday](https://www.strava.com/activities/9) on May 18, 2025',
     );
+    expect(markdown).toContain(
+      '## San Francisco street coverage\n\n- City: 57.1% of rideable streets, 20.0 of 35.0 miles, 2 of 3 neighborhoods explored\n- Mission: 75.0%, 15.0 of 20.0 miles\n- Castro / Upper Market: 50.0%, 5.0 of 10.0 miles\n\n',
+    );
     expect(markdown).toContain('[Reading](/reading.md)');
     expect(markdown).not.toContain('[Big map](/strava.md)');
   });
@@ -98,6 +114,7 @@ describe('getStravaMarkdown', () => {
       bikes: [],
       latest: { ...quiet, description: null },
       outings: [quiet],
+      sfCoverage: { ...sfCoverage, ridden: {} },
       thisYear: { distanceMeters: 0, elevationGainMeters: 0, outings: 0, year: 2026 },
     });
 
@@ -108,6 +125,9 @@ describe('getStravaMarkdown', () => {
     expect(markdown).not.toContain('odometer');
     expect(markdown).not.toContain('## Biggest climbs');
     expect(markdown).not.toContain('## Longest rides');
+    expect(markdown).toContain(
+      '- City: 0.0% of rideable streets, 0.0 of 35.0 miles, 0 of 3 neighborhoods explored\n\n',
+    );
   });
 
   it('returns the unavailable stub without history or when loading fails', async () => {
