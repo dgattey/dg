@@ -109,13 +109,16 @@ export function SocialCardHeadline({
   fontSize = 104,
   headline,
   indentEm = 0.44,
+  singleLine = false,
 }: {
   color?: string;
   fontSize?: number;
   headline: string;
   indentEm?: number;
+  singleLine?: boolean;
 }) {
   const [firstWord = headline, ...restWords] = headline.split(' ');
+  const showSecondLine = !singleLine && restWords.length > 0;
   return (
     <div
       style={{
@@ -126,11 +129,11 @@ export function SocialCardHeadline({
         fontSize,
         fontWeight: 700,
         letterSpacing: '-0.04em',
-        lineHeight: 0.9,
+        lineHeight: 0.92,
       }}
     >
-      <span>{firstWord}</span>
-      {restWords.length > 0 ? (
+      <span>{singleLine ? headline : firstWord}</span>
+      {showSecondLine ? (
         <span style={{ marginLeft: `${indentEm}em` }}>{restWords.join(' ')}</span>
       ) : null}
     </div>

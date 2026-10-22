@@ -155,125 +155,127 @@ export function ReadingSocialCard({
             <SocialCardStamp rotationDeg={-4} width={114} />
             <SocialCardTag tiltDeg={2.2} tone="cobalt">
               <span>
-                {totalBooks} books · {fiveStarCount} 5-star
+                {totalBooks} books · {fiveStarCount} favorites
               </span>
             </SocialCardTag>
           </div>
           <SocialCardHeadline fontSize={94} headline="Books I've read" indentEm={0.32} />
-          <SocialCardMattedCard
-            matTiltDeg={2}
-            matTone="ochre"
-            padding="16px 22px 18px"
-            style={{ marginTop: 24, maxWidth: 445 }}
-            tiltDeg={-1.4}
-          >
-            <div style={{ alignItems: 'center', display: 'flex', gap: 10 }}>
-              <StarRow color="vermilion" rating={slipBook?.rating ?? 5} size={18} />
-              <span style={{ fontSize: 15, fontWeight: 700, opacity: 0.75 }}>
-                {slipBook ? `${slipBook.title} · ${slipBook.author}` : 'Notes & star ratings'}
-              </span>
-            </div>
-            <span style={{ fontSize: 18, lineHeight: 1.32, marginTop: 4 }}>
-              {slipBook?.review
-                ? `“${slipBook.review.slice(0, 128)}${slipBook.review.length > 128 ? '…' : ''}”`
-                : 'Reviews, notes, and favorite reads by year.'}
-            </span>
-          </SocialCardMattedCard>
+          {slipBook ? (
+            <SocialCardMattedCard
+              matTiltDeg={2}
+              matTone="ochre"
+              padding="16px 22px 18px"
+              style={{ marginTop: 24, width: 445 }}
+              tiltDeg={-1.4}
+            >
+              <div style={{ alignItems: 'center', display: 'flex', gap: 10 }}>
+                <StarRow color="vermilion" rating={slipBook.rating} size={18} />
+                <span style={{ fontSize: 15, fontWeight: 700, opacity: 0.75 }}>
+                  {`${slipBook.title} · ${slipBook.author}`}
+                </span>
+              </div>
+              {slipBook.review ? (
+                <span style={{ fontSize: 18, lineHeight: 1.32, marginTop: 4 }}>
+                  {`“${slipBook.review.slice(0, 128)}${slipBook.review.length > 128 ? '…' : ''}”`}
+                </span>
+              ) : null}
+            </SocialCardMattedCard>
+          ) : null}
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: 535 }}>
-          <div
-            style={{
-              background: PAPER_PALETTE.viridian,
-              borderRadius: QUAD_A,
-              boxShadow: PAPER_SHADOW,
-              color: PAPER_PALETTE.cream,
-              display: 'flex',
-              gap: 18,
-              padding: '22px 22px 20px',
-              position: 'relative',
-              transform: 'rotate(-1.2deg)',
-            }}
-          >
+          {featured ? (
             <div
               style={{
-                background: PAPER_PALETTE.cream,
-                borderRadius: QUAD_C,
+                background: PAPER_PALETTE.viridian,
+                borderRadius: QUAD_A,
                 boxShadow: PAPER_SHADOW,
-                color: PAPER_PALETTE.ink,
+                color: PAPER_PALETTE.cream,
                 display: 'flex',
-                fontSize: 15,
-                fontWeight: 700,
-                left: 18,
-                padding: '5px 14px',
-                position: 'absolute',
-                top: -14,
-                transform: 'rotate(-3deg)',
+                gap: 18,
+                padding: '22px 22px 20px',
+                position: 'relative',
+                transform: 'rotate(-1.2deg)',
               }}
             >
-              {featured?.tag ?? 'Latest review'}
-            </div>
-            <div style={{ display: 'flex', position: 'relative' }}>
-              <BookCoverThumb
-                coverUrl={featured?.coverUrl ?? null}
-                height={186}
-                title={featured?.title ?? 'The Path Made Clear'}
-                tone="ochre"
-                width={126}
-              />
-              <svg
-                aria-hidden="true"
-                height={76}
-                style={{ left: 12, position: 'absolute', top: -8 }}
-                viewBox="0 0 28 110"
-                width={22}
+              <div
+                style={{
+                  background: PAPER_PALETTE.cream,
+                  borderRadius: QUAD_C,
+                  boxShadow: PAPER_SHADOW,
+                  color: PAPER_PALETTE.ink,
+                  display: 'flex',
+                  fontSize: 15,
+                  fontWeight: 700,
+                  left: 18,
+                  padding: '5px 14px',
+                  position: 'absolute',
+                  top: -14,
+                  transform: 'rotate(-3deg)',
+                }}
               >
-                <path d="M0,0 H28 V110 L14,98 L0,110 Z" fill={PAPER_PALETTE.vermilion} />
-                <path
-                  d="M7,0 V98 M21,0 V98"
-                  fill="none"
-                  stroke={PAPER_PALETTE.ochre}
-                  strokeDasharray="4 4"
-                  strokeWidth="2"
+                {featured.tag}
+              </div>
+              <div style={{ display: 'flex', position: 'relative' }}>
+                <BookCoverThumb
+                  coverUrl={featured.coverUrl}
+                  height={186}
+                  title={featured.title}
+                  tone="ochre"
+                  width={126}
                 />
-              </svg>
-            </div>
-            <div
-              style={{
-                display: 'flex',
-                flex: 1,
-                flexDirection: 'column',
-                justifyContent: 'center',
-              }}
-            >
-              <StarRow color="ochre" rating={featured?.rating ?? 5} size={18} />
-              <span style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginTop: 4 }}>
-                {featured?.title ?? 'The Path Made Clear'}
-              </span>
-              <span style={{ fontSize: 16, marginTop: 4, opacity: 0.86 }}>
-                {featured?.author ?? 'Oprah Winfrey'}
-              </span>
-              {featured?.review ? (
-                <div
-                  style={{
-                    background: PAPER_PALETTE.cream,
-                    borderRadius: QUAD_C,
-                    color: PAPER_PALETTE.ink,
-                    display: 'flex',
-                    fontSize: 14,
-                    lineHeight: 1.3,
-                    marginTop: 10,
-                    padding: '10px 12px',
-                    transform: 'rotate(0.8deg)',
-                  }}
+                <svg
+                  aria-hidden="true"
+                  height={76}
+                  style={{ left: 12, position: 'absolute', top: -8 }}
+                  viewBox="0 0 28 110"
+                  width={22}
                 >
-                  <span>
-                    {featured.review.slice(0, 108)}
-                    {featured.review.length > 108 ? '…' : ''}
-                  </span>
-                </div>
-              ) : null}
+                  <path d="M0,0 H28 V110 L14,98 L0,110 Z" fill={PAPER_PALETTE.vermilion} />
+                  <path
+                    d="M7,0 V98 M21,0 V98"
+                    fill="none"
+                    stroke={PAPER_PALETTE.ochre}
+                    strokeDasharray="4 4"
+                    strokeWidth="2"
+                  />
+                </svg>
+              </div>
+              <div
+                style={{
+                  display: 'flex',
+                  flex: 1,
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                }}
+              >
+                <StarRow color="ochre" rating={featured.rating} size={18} />
+                <span style={{ fontSize: 24, fontWeight: 700, lineHeight: 1.15, marginTop: 4 }}>
+                  {featured.title}
+                </span>
+                <span style={{ fontSize: 16, marginTop: 4, opacity: 0.86 }}>{featured.author}</span>
+                {featured.review ? (
+                  <div
+                    style={{
+                      background: PAPER_PALETTE.cream,
+                      borderRadius: QUAD_C,
+                      color: PAPER_PALETTE.ink,
+                      display: 'flex',
+                      fontSize: 14,
+                      lineHeight: 1.3,
+                      marginTop: 10,
+                      padding: '10px 12px',
+                      transform: 'rotate(0.8deg)',
+                    }}
+                  >
+                    <span>
+                      {featured.review.slice(0, 108)}
+                      {featured.review.length > 108 ? '…' : ''}
+                    </span>
+                  </div>
+                ) : null}
+              </div>
             </div>
-          </div>
+          ) : null}
           <div style={{ display: 'flex', gap: 16 }}>
             {picks.slice(0, 2).map((book, idx) => {
               const tone = PICK_TONES[idx % PICK_TONES.length] ?? 'rose';

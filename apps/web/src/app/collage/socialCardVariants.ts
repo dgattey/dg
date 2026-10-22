@@ -1,52 +1,44 @@
+import { extractPlainTextFromRichText } from '@dg/content-models/books/bookDomain';
 import type { RenderableBook } from '@dg/content-models/contentful/renderables/books';
 import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
+import type { RenderableRichTextContent } from '@dg/content-models/contentful/renderables/richText';
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
-import type { StravaHistory } from '@dg/content-models/strava/StravaHistory';
-import {
-  decodeRoutes,
-  frameAround,
-  framePaths,
-  type GeoBounds,
-  homeBounds,
-} from '@dg/maps/src/routeFrame';
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
-import { HOMEPAGE_TITLE, SITE_NAME } from '../metadata';
+import { SITE_NAME } from '../metadata';
 import { groupAdjacentAlbumPlays } from '../music/groupAdjacentAlbumPlays';
 import { formatCount, formatPercent } from '../music/stats/listeningStatsFormat';
 import { extractBookYear, featuredBook, shelfStats, sortBooks } from '../reading/readingHelpers';
-import { formatCompactFeet, formatMiles } from '../strava/stravaFormat';
 import type { FavoriteAlbumsCardVariant, MusicHistoryCardVariant } from './MusicSocialCards';
 import type { MusicStatsCardVariant } from './MusicStatsSocialCard';
 import type { ReadingCardBook, ReadingCardVariant } from './ReadingSocialCard';
 import { type HomeCardVariant, PORTRAIT } from './SocialCard';
-import type { PaperColor } from './SocialCardParts';
-import { STRAVA_CARD_MAP_FRAME, type StravaCardVariant } from './StravaSocialCard';
 import { splitIntroDocument } from './splitIntroDocument';
 
-const BAY_AREA_BOUNDS: GeoBounds = [
-  [37.35, -122.8],
-  [38.12, -121.85],
-];
+const PACIFIC_YEAR_FORMAT = new Intl.DateTimeFormat('en-US', {
+  timeZone: 'America/Los_Angeles',
+  year: 'numeric',
+});
 
-const FALLBACK_YEARS: ReadonlyArray<{ plays: number; year: number }> = [
-  { plays: 9384, year: 2011 },
-  { plays: 21273, year: 2012 },
-  { plays: 18921, year: 2013 },
-  { plays: 21331, year: 2014 },
-  { plays: 16712, year: 2015 },
-  { plays: 17035, year: 2016 },
-  { plays: 15377, year: 2017 },
-  { plays: 14757, year: 2018 },
-  { plays: 17830, year: 2019 },
-  { plays: 21842, year: 2020 },
-  { plays: 23665, year: 2021 },
-  { plays: 32979, year: 2022 },
-  { plays: 27488, year: 2023 },
-  { plays: 25702, year: 2024 },
-  { plays: 23510, year: 2025 },
-  { plays: 8526, year: 2026 },
-];
+export function currentPacificYear(now = new Date()): number {
+  return Number(PACIFIC_YEAR_FORMAT.format(now));
+}
+
+export function stripUnsupportedGlyphs(text: string): string {
+  return text
+    .replace(/\p{Extended_Pictographic}|\uFE0F/gu, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+function extractIntroExcerpt(remainder: RenderableRichTextContent): string | null {
+  const firstParagraph = extractPlainTextFromRichText(remainder.json).split('\n\n')[0];
+  if (!firstParagraph) {
+    return null;
+  }
+  const cleaned = stripUnsupportedGlyphs(firstParagraph);
+  return cleaned.length > 0 ? cleaned : null;
+}
 
 /**
  * Satori can't decode the WebP the homepage serves, so the card asks Contentful
@@ -72,46 +64,44 @@ export function toJpegUrl(
 }
 
 export function buildHomeCardVariant(intro: IntroContent | null): HomeCardVariant {
-  const headline = intro ? splitIntroDocument(intro.textBlock.content).headline : null;
+  const split = intro ? splitIntroDocument(intro.textBlock.content) : null;
   return {
-    headline: headline ?? SITE_NAME,
+    headline: split?.headline ?? SITE_NAME,
     name: SITE_NAME,
     portraitUrl: intro ? toJpegUrl(intro.image.url) : null,
-    tagline: HOMEPAGE_TITLE,
+    tagline: split ? extractIntroExcerpt(split.remainder) : null,
     variant: 'home',
   };
 }
 
-export function buildMusicStatsCardVariant(stats: ListeningStats | null): MusicStatsCardVariant {
+export function buildMusicStatsCardVariant(
+  stats: ListeningStats | null,
+  year = currentPacificYear(),
+): MusicStatsCardVariant {
   if (!stats) {
     return {
-      activeDaysPercent: '82%',
-      activeDaysSub: '4,562 of 5,566d',
-      listeningHours: '20,111h',
-      monthStreak: 177,
-      playsCompact: '316k+',
-      playsFull: '316,332',
-      topAlbums: [
-        { artistNames: 'ODESZA', imageUrl: null, name: 'A Moment Apart', plays: '1,966' },
-      ],
-      topArtists: [
-        { months: 71, name: 'Burna Boy', plays: '6,673' },
-        { months: 176, name: 'Muse', plays: '6,032' },
-        { months: 113, name: 'ODESZA', plays: '5,589' },
-      ],
-      tracksAndArtistsSub: '61,441 tracks · 18,306 artists',
+      activeDaysPercent: '0%',
+      activeDaysSub: '0 of 0d',
+      activeMonths: 0,
+      listeningHours: '0h',
+      playsCompact: '0',
+      playsFull: '0',
+      topAlbums: [],
+      topArtists: [],
+      tracksAndArtistsSub: '0 tracks · 0 artists',
       variant: 'music-stats',
-      years: FALLBACK_YEARS,
+      year,
+      years: [],
     };
   }
   const hours = (stats.plays * stats.minutesPerPlay) / 60;
   const playsCompact =
-    stats.plays >= 1000 ? `${Math.floor(stats.plays / 1000)}k+` : formatCount(stats.plays);
+    stats.plays >= 10_000 ? `${Math.floor(stats.plays / 1000)}k+` : formatCount(stats.plays);
   return {
     activeDaysPercent: formatPercent(stats.activeDays, stats.spanDays, 0),
     activeDaysSub: `${formatCount(stats.activeDays)} of ${formatCount(stats.spanDays)}d`,
+    activeMonths: stats.activeMonths,
     listeningHours: `${formatCount(hours)}h`,
-    monthStreak: stats.monthStreak.months,
     playsCompact,
     playsFull: formatCount(stats.plays),
     topAlbums: stats.topAlbums.slice(0, 3).map(({ album, plays }) => ({
@@ -127,7 +117,8 @@ export function buildMusicStatsCardVariant(stats: ListeningStats | null): MusicS
     })),
     tracksAndArtistsSub: `${formatCount(stats.tracks)} tracks · ${formatCount(stats.artists)} artists`,
     variant: 'music-stats',
-    years: stats.years.length > 0 ? stats.years : FALLBACK_YEARS,
+    year,
+    years: stats.years,
   };
 }
 
@@ -158,13 +149,9 @@ export function buildMusicHistoryCardVariant(
     ...new Set(recentAlbums.map((item) => item.artistNames.split(',')[0]?.trim()).filter(Boolean)),
   ];
   return {
-    latestSummary:
-      artistNames.length > 0
-        ? artistNames.slice(0, 3).join(' · ')
-        : 'Every track played on Spotify, live as it happens',
+    latestSummary: artistNames.length > 0 ? artistNames.slice(0, 3).join(' · ') : null,
     recentAlbums,
-    recentLabel: 'Today & recent',
-    totalRecentTracks: tracks.length || 24,
+    totalRecentTracks: tracks.length,
     variant: 'music-history',
   };
 }
@@ -180,7 +167,7 @@ export function buildFavoriteAlbumsCardVariant(
       name: album.name,
       releaseYear: album.releaseDate ? album.releaseDate.slice(0, 4) : null,
     })),
-    totalCount: list.length || 104,
+    totalCount: list.length,
     variant: 'favorite-albums',
   };
 }
@@ -190,7 +177,7 @@ function toReadingCardBook(book: RenderableBook): ReadingCardBook {
     author: book.author,
     coverUrl: book.thumbnail ? toJpegUrl(book.thumbnail.url, 320, 480) : null,
     rating: book.rating,
-    review: book.review,
+    review: book.review ? stripUnsupportedGlyphs(book.review) : null,
     title: book.title,
     year: extractBookYear(book),
   };
@@ -208,63 +195,9 @@ export function buildReadingCardVariant(books: ReadonlyArray<RenderableBook>): R
 
   return {
     featured: featured ? { ...toReadingCardBook(featured.book), tag: featured.tag } : null,
-    fiveStarCount: stats.fiveStars || 39,
+    fiveStarCount: stats.fiveStars,
     picks,
-    totalBooks: stats.total || 151,
+    totalBooks: stats.total,
     variant: 'reading',
-  };
-}
-
-function sportRouteTone(sport: StravaHistory['routes'][number]['sport']): PaperColor {
-  switch (sport) {
-    case 'ride':
-      return 'cobalt';
-    case 'run':
-      return 'ultramarine';
-    case 'hike':
-      return 'viridian';
-    case 'other':
-      return 'cerulean';
-    default: {
-      const unhandled: never = sport;
-      return unhandled;
-    }
-  }
-}
-
-export function buildStravaCardVariant(history: StravaHistory | null): StravaCardVariant {
-  if (!history) {
-    return {
-      feetClimbed: '1.64M',
-      firstYear: 2016,
-      latestTitle: null,
-      miles: '27,657',
-      outings: '1,857',
-      routePaths: [],
-      variant: 'strava',
-    };
-  }
-  const decoded = decodeRoutes(
-    history.routes.map(({ id, polyline, sport }) => ({
-      id,
-      polyline,
-      tone: sportRouteTone(sport),
-    })),
-  );
-  const bounds = homeBounds(decoded) ?? BAY_AREA_BOUNDS;
-  const frame = frameAround(bounds, STRAVA_CARD_MAP_FRAME);
-  const routePaths = framePaths(frame, decoded).map(({ d, tone }) => ({
-    d,
-    tone: (tone as PaperColor) || 'cobalt',
-  }));
-
-  return {
-    feetClimbed: formatCompactFeet(history.totals.elevationGainMeters),
-    firstYear: history.totals.firstYear,
-    latestTitle: history.latest.name,
-    miles: formatMiles(history.totals.distanceMeters),
-    outings: formatCount(history.totals.outings),
-    routePaths,
-    variant: 'strava',
   };
 }

@@ -5,9 +5,7 @@ import {
   inkForTone,
   PAPER_SHADOW,
   type PaperColor,
-  PIECE_SHADOW,
   QUAD_A,
-  QUAD_C,
   SocialCardFrame,
   SocialCardHeadline,
   SocialCardMattedCard,
@@ -17,14 +15,13 @@ import {
 import { SocialCardScallop } from './SocialCardScallop';
 
 export type MusicHistoryCardVariant = {
-  latestSummary: string;
+  latestSummary: string | null;
   recentAlbums: ReadonlyArray<{
     albumName: string;
     artistNames: string;
     imageUrl: string | null;
     trackCount: number;
   }>;
-  recentLabel: string;
   totalRecentTracks: number;
   variant: 'music-history';
 };
@@ -77,7 +74,6 @@ export function MusicHistorySocialCard({
   grainUrl,
   latestSummary,
   recentAlbums,
-  recentLabel,
   totalRecentTracks,
 }: MusicHistoryCardVariant & { grainUrl: string }) {
   return (
@@ -95,44 +91,51 @@ export function MusicHistorySocialCard({
         <div style={{ display: 'flex', flexDirection: 'column', width: 470 }}>
           <div style={{ alignItems: 'center', display: 'flex', gap: 14, marginBottom: 20 }}>
             <SocialCardStamp rotationDeg={-4} width={116} />
-            <SocialCardTag tiltDeg={-2.5} tone="vermilion">
-              <span>{recentLabel}</span>
-            </SocialCardTag>
             <SocialCardTag tiltDeg={2.2} tone="ochre">
               <span>{totalRecentTracks} recent plays</span>
             </SocialCardTag>
           </div>
           <SocialCardHeadline fontSize={94} headline="Listening history" indentEm={0.36} />
-          <SocialCardMattedCard
-            matTiltDeg={2.2}
-            matTone="vermilion"
-            style={{ marginTop: 26, maxWidth: 450 }}
-            tiltDeg={-1.5}
-          >
-            <span
-              style={{
-                color: PAPER_PALETTE.cobalt,
-                fontSize: 16,
-                fontWeight: 700,
-                letterSpacing: '0.02em',
-              }}
+          {latestSummary ? (
+            <SocialCardMattedCard
+              matTiltDeg={2.2}
+              matTone="vermilion"
+              style={{ marginTop: 26, width: 440 }}
+              tiltDeg={-1.5}
             >
-              RECENTLY SPINNING ON SPOTIFY
-            </span>
-            <span
-              style={{ fontSize: 25, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.18 }}
-            >
-              {latestSummary}
-            </span>
-          </SocialCardMattedCard>
+              <span
+                style={{
+                  color: PAPER_PALETTE.cobalt,
+                  fontSize: 16,
+                  fontWeight: 700,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                RECENTLY SPINNING ON SPOTIFY
+              </span>
+              <span
+                style={{
+                  fontSize: 25,
+                  fontWeight: 700,
+                  letterSpacing: '-0.02em',
+                  lineHeight: 1.18,
+                }}
+              >
+                {latestSummary}
+              </span>
+            </SocialCardMattedCard>
+          ) : null}
         </div>
         <div style={{ display: 'flex', height: 500, position: 'relative', width: 520 }}>
           {GALLERY_SLOTS.map((slot, index) => {
             const album = recentAlbums[index];
+            if (!album) {
+              return null;
+            }
             const matTone = SLEEVE_TINTS[index % SLEEVE_TINTS.length] ?? 'ultramarine';
             return (
               <div
-                key={album ? `${album.albumName}-${index}` : `fallback-${index}`}
+                key={`${album.albumName}-${slot.left}-${slot.top}`}
                 style={{
                   background: PAPER_PALETTE[matTone],
                   borderRadius: QUAD_A,
@@ -148,11 +151,7 @@ export function MusicHistorySocialCard({
                   width: 232,
                 }}
               >
-                <AlbumCoverBox
-                  fallbackTone={matTone}
-                  imageUrl={album?.imageUrl ?? null}
-                  size={172}
-                />
+                <AlbumCoverBox fallbackTone={matTone} imageUrl={album.imageUrl} size={172} />
                 <span
                   style={{
                     fontSize: 17,
@@ -165,7 +164,7 @@ export function MusicHistorySocialCard({
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {album?.albumName ?? 'On the turntable'}
+                  {album.albumName}
                 </span>
                 <span
                   style={{
@@ -176,7 +175,7 @@ export function MusicHistorySocialCard({
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {album?.artistNames ?? 'Spotify'}
+                  {album.artistNames}
                 </span>
                 <div
                   style={{
@@ -194,9 +193,7 @@ export function MusicHistorySocialCard({
                     transform: `rotate(${index % 2 === 0 ? 7 : -7}deg)`,
                   }}
                 >
-                  {album
-                    ? `${album.trackCount} ${album.trackCount === 1 ? 'play' : 'plays'}`
-                    : 'LP'}
+                  {`${album.trackCount} ${album.trackCount === 1 ? 'play' : 'plays'}`}
                 </div>
               </div>
             );
@@ -242,34 +239,39 @@ export function FavoriteAlbumsSocialCard({
             </SocialCardScallop>
           </div>
           <SocialCardHeadline fontSize={98} headline="Favorite albums" indentEm={0.42} />
-          <SocialCardMattedCard
-            matTiltDeg={2}
-            matTone="rose"
-            style={{ marginTop: 24, maxWidth: 450 }}
-            tiltDeg={-1.6}
-          >
-            <span
-              style={{
-                color: PAPER_PALETTE.vermilion,
-                fontSize: 16,
-                fontWeight: 700,
-                letterSpacing: '0.02em',
-              }}
+          {artistPreview ? (
+            <SocialCardMattedCard
+              matTiltDeg={2}
+              matTone="rose"
+              style={{ marginTop: 24, width: 440 }}
+              tiltDeg={-1.6}
             >
-              RECORD CRATE FAVORITES
-            </span>
-            <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em' }}>
-              {artistPreview || 'All-time favorite albums on Spotify'}
-            </span>
-          </SocialCardMattedCard>
+              <span
+                style={{
+                  color: PAPER_PALETTE.vermilion,
+                  fontSize: 16,
+                  fontWeight: 700,
+                  letterSpacing: '0.02em',
+                }}
+              >
+                RECORD CRATE FAVORITES
+              </span>
+              <span style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.02em' }}>
+                {artistPreview}
+              </span>
+            </SocialCardMattedCard>
+          ) : null}
         </div>
         <div style={{ display: 'flex', height: 500, position: 'relative', width: 520 }}>
           {GALLERY_SLOTS.map((slot, index) => {
             const album = albums[index];
+            if (!album) {
+              return null;
+            }
             const matTone = FAVORITE_TINTS[index % FAVORITE_TINTS.length] ?? 'ochre';
             return (
               <div
-                key={album ? `${album.name}-${index}` : `fav-${index}`}
+                key={`${album.name}-${slot.left}-${slot.top}`}
                 style={{
                   background: PAPER_PALETTE[matTone],
                   borderRadius: QUAD_A,
@@ -285,11 +287,7 @@ export function FavoriteAlbumsSocialCard({
                   width: 232,
                 }}
               >
-                <AlbumCoverBox
-                  fallbackTone={matTone}
-                  imageUrl={album?.imageUrl ?? null}
-                  size={172}
-                />
+                <AlbumCoverBox fallbackTone={matTone} imageUrl={album.imageUrl} size={172} />
                 <span
                   style={{
                     fontSize: 17,
@@ -302,7 +300,7 @@ export function FavoriteAlbumsSocialCard({
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {album?.name ?? `Favorite #${index + 1}`}
+                  {album.name}
                 </span>
                 <span
                   style={{
@@ -313,29 +311,8 @@ export function FavoriteAlbumsSocialCard({
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {album?.artistNames ?? 'Spotify'}
+                  {album.artistNames}
                 </span>
-                <div
-                  style={{
-                    alignItems: 'center',
-                    background: PAPER_PALETTE.cream,
-                    borderRadius: QUAD_C,
-                    boxShadow: PAPER_SHADOW,
-                    color: PAPER_PALETTE.ink,
-                    display: 'flex',
-                    filter: PIECE_SHADOW,
-                    fontSize: 18,
-                    fontWeight: 700,
-                    justifyContent: 'center',
-                    left: -10,
-                    padding: '4px 11px',
-                    position: 'absolute',
-                    top: -10,
-                    transform: `rotate(${index % 2 === 0 ? -9 : 8}deg)`,
-                  }}
-                >
-                  #{index + 1}
-                </div>
               </div>
             );
           })}

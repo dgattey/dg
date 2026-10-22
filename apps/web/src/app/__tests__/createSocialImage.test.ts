@@ -42,6 +42,7 @@ import { fetchStravaHistoryFromDb } from '@dg/services/strava/fetchStravaHistory
 import { cacheLife, cacheTag } from 'next/cache';
 import { ImageResponse } from 'next/og';
 import { isValidElement } from 'react';
+import { currentPacificYear } from '../collage/socialCardVariants';
 import {
   createSocialImage,
   SOCIAL_IMAGE_ALTS,
@@ -49,7 +50,7 @@ import {
   SOCIAL_IMAGE_TAG,
   type SocialImagePage,
 } from '../createSocialImage';
-import { HOMEPAGE_TITLE, SITE_NAME } from '../metadata';
+import { SITE_NAME } from '../metadata';
 import * as favoriteAlbumsOg from '../music/albums/opengraph-image';
 import * as favoriteAlbumsTwitter from '../music/albums/twitter-image';
 import * as musicHistoryOg from '../music/opengraph-image';
@@ -76,6 +77,18 @@ const intro: IntroContent = {
             data: {},
             nodeType: 'heading-1',
           },
+          {
+            content: [
+              {
+                data: {},
+                marks: [],
+                nodeType: 'text',
+                value: "I'm Dylan, a SF-based engineering leader & serial builder. ❤",
+              },
+            ],
+            data: {},
+            nodeType: 'paragraph',
+          },
         ],
         data: {},
         nodeType: 'document',
@@ -99,7 +112,7 @@ describe('createSocialImage', () => {
     jest.clearAllMocks();
   });
 
-  it('serves a PNG of the homepage collage card with a dedicated social-image cache tag and days lifetime', async () => {
+  it('serves a PNG of the homepage collage card with a live Contentful bio excerpt, JPEG portrait, and both font weights', async () => {
     jest.mocked(fetchIntroContent).mockResolvedValue(intro);
     const { card, options, response } = await renderCard();
 
@@ -112,7 +125,7 @@ describe('createSocialImage', () => {
       headline: 'Hey friends!',
       name: SITE_NAME,
       portraitUrl: 'https://images.ctfassets.net/dylan.png?fm=jpg&w=640&h=840&fit=fill',
-      tagline: HOMEPAGE_TITLE,
+      tagline: "I'm Dylan, a SF-based engineering leader & serial builder.",
       variant: 'home',
     });
     expect(card.props.grainUrl).toMatch(/^data:image\/png;base64,/);
@@ -128,56 +141,67 @@ describe('createSocialImage', () => {
     }
   });
 
-  it('falls back to the site name without a portrait when Contentful has no intro', async () => {
+  it('falls back to the site name without a portrait or hardcoded tagline when Contentful has no intro', async () => {
     jest.mocked(fetchIntroContent).mockResolvedValue(null);
     const { card } = await renderCard();
 
-    expect(card.props).toMatchObject({ headline: SITE_NAME, portraitUrl: null, variant: 'home' });
+    expect(card.props).toMatchObject({
+      headline: SITE_NAME,
+      portraitUrl: null,
+      tagline: null,
+      variant: 'home',
+    });
   });
 
-  it('builds the listening stats social card from Spotify stats data', async () => {
+  it('builds the listening stats social card for the current year', async () => {
+    const year = currentPacificYear();
     jest.mocked(fetchListeningStats).mockResolvedValue({
-      activeDays: 4562,
-      activeMonths: 177,
-      artists: 18306,
+      activeDays: 218,
+      activeMonths: 10,
+      artists: 912,
       dayRepeats: [],
-      depth: [{ months: 71, name: 'Burna Boy', plays: 6673, tracks: 457 }],
-      firstPlayedAt: '2011-07-28T00:00:00.000Z',
+      depth: [{ months: 10, name: 'ROSALÍA', plays: 612, tracks: 42 }],
+      firstPlayedAt: '2026-01-01T00:00:00.000Z',
       frontToBack: [],
       hours: Array.from({ length: 24 }, () => 0),
       lastPlayedAt: '2026-10-22T00:00:00.000Z',
       minutesPerPlay: 3.81,
-      monthStreak: { end: '2026-03', months: 177, start: '2011-07' },
+      monthStreak: { end: '2026-10', months: 10, start: '2026-01' },
       onRepeat: [],
-      plays: 316332,
-      sessionPlays: 96000,
-      sessions: 8092,
-      shelf: { albums: 104, plays: 54000, topTenOnShelf: 8 },
-      spanDays: 5566,
+      plays: 8526,
+      sessionPlays: 2400,
+      sessions: 190,
+      shelf: { albums: 104, plays: 1800, topTenOnShelf: 8 },
+      spanDays: 295,
       topAlbums: [
         {
           album: {
-            artistNames: 'ODESZA',
+            artistNames: 'ROSALÍA',
             id: 'a1',
-            imageUrl: 'https://i.scdn.co/image/odesza.jpg',
-            name: 'A Moment Apart',
+            imageUrl: 'https://i.scdn.co/image/rosalia.jpg',
+            name: 'LUX (Complete Works)',
             url: 'https://open.spotify.com/album/a1',
           },
-          plays: 1966,
+          plays: 412,
         },
       ],
-      tracks: 61441,
+      tracks: 2418,
       weekdays: [0, 0, 0, 0, 0, 0, 0],
-      years: [{ plays: 32979, year: 2022 }],
+      years: [
+        { plays: 23510, year: 2025 },
+        { plays: 8526, year: 2026 },
+      ],
     });
 
     const { card } = await renderCard('music-stats');
+    expect(fetchListeningStats).toHaveBeenCalledWith({ range: 'year', year });
     expect(card.props).toMatchObject({
-      activeDaysPercent: '82%',
-      listeningHours: '20,087h',
-      monthStreak: 177,
-      playsCompact: '316k+',
+      activeDaysPercent: '74%',
+      listeningHours: '541h',
+      playsCompact: '8,526',
+      playsFull: '8,526',
       variant: 'music-stats',
+      year,
     });
   });
 
@@ -303,7 +327,7 @@ describe('createSocialImage', () => {
     });
   });
 
-  it('builds the Strava social card with projected route paths and lifetime seals', async () => {
+  it('builds the Strava social card with projected route paths, recent stat, and lifetime seals', async () => {
     jest.mocked(fetchStravaHistoryFromDb).mockResolvedValue({
       biggestClimbs: [],
       latest: {
@@ -313,7 +337,7 @@ describe('createSocialImage', () => {
         gearName: 'Prince',
         id: 1,
         movingTimeSeconds: 3600,
-        name: 'Going maximalist',
+        name: 'Going maximalist 🌈',
         polyline: '__neFn_kjVg^g^g^g^',
         sport: 'ride',
         startDate: '2026-10-20T00:00:00.000Z',
@@ -326,7 +350,7 @@ describe('createSocialImage', () => {
         gearName: null,
         id: 1,
         movingTimeSeconds: 3600,
-        name: 'Going maximalist',
+        name: 'Going maximalist 🌈',
         polyline: '__neFn_kjVg^g^g^g^',
         sport: 'ride',
         startDate: '2026-10-20T00:00:00.000Z',
@@ -360,9 +384,12 @@ describe('createSocialImage', () => {
       latestTitle: 'Going maximalist',
       miles: '27,657',
       outings: '1,857',
+      recentStat: 'Latest: 19.2 mi · 1,086 ft',
+      routeCountLabel: '1 route',
       variant: 'strava',
     });
     expect((card.props.routePaths as Array<{ d: string; tone: string }>).length).toBeGreaterThan(0);
+    expect((card.props.landPaths as Array<string>).length).toBeGreaterThan(0);
   });
 
   it('degrades gracefully when upstream loaders throw', async () => {
@@ -370,7 +397,7 @@ describe('createSocialImage', () => {
     const { card } = await renderCard('music-stats');
 
     expect(card.props).toMatchObject({
-      playsCompact: '316k+',
+      playsCompact: '0',
       variant: 'music-stats',
     });
   });

@@ -14,12 +14,24 @@ import {
 } from './SocialCardParts';
 import { SocialCardScallop } from './SocialCardScallop';
 
+export type StravaMapTile = {
+  left: number;
+  size: number;
+  top: number;
+  url: string;
+};
+
 export type StravaCardVariant = {
   feetClimbed: string;
   firstYear: number;
+  landPaths: ReadonlyArray<string>;
+  latestKicker: string | null;
   latestTitle: string | null;
+  mapTiles?: ReadonlyArray<StravaMapTile>;
   miles: string;
   outings: string;
+  recentStat: string | null;
+  routeCountLabel: string;
   routePaths: ReadonlyArray<{
     d: string;
     tone: PaperColor;
@@ -40,9 +52,14 @@ export function StravaSocialCard({
   feetClimbed,
   firstYear,
   grainUrl,
+  landPaths,
+  latestKicker,
   latestTitle,
+  mapTiles = [],
   miles,
   outings,
+  recentStat,
+  routeCountLabel,
   routePaths,
 }: StravaCardVariant & { grainUrl: string }) {
   return (
@@ -58,35 +75,41 @@ export function StravaSocialCard({
         }}
       >
         <div style={{ display: 'flex', flexDirection: 'column', width: 485 }}>
-          <div style={{ alignItems: 'center', display: 'flex', gap: 16, marginBottom: 16 }}>
+          <div style={{ alignItems: 'center', display: 'flex', gap: 16, marginBottom: 18 }}>
             <SocialCardStamp rotationDeg={-4} width={114} />
-            <SocialCardTag tiltDeg={2.4} tone="cobalt">
-              <span>Bay Area miles</span>
-            </SocialCardTag>
+            {recentStat ? (
+              <SocialCardTag tiltDeg={2.4} tone="cobalt">
+                <span>{recentStat}</span>
+              </SocialCardTag>
+            ) : null}
           </div>
-          <SocialCardHeadline fontSize={118} headline="Big map" indentEm={0.48} />
-          <SocialCardMattedCard
-            matTiltDeg={1.8}
-            matTone="ochre"
-            padding="14px 22px 16px"
-            style={{ marginTop: 18, maxWidth: 460 }}
-            tiltDeg={-1.4}
-          >
-            <span
-              style={{
-                color: PAPER_PALETTE.vermilion,
-                fontSize: 14,
-                fontWeight: 700,
-                letterSpacing: '0.02em',
-              }}
+          <SocialCardHeadline fontSize={106} headline="Big map" singleLine />
+          {latestTitle ? (
+            <SocialCardMattedCard
+              matTiltDeg={1.8}
+              matTone="ochre"
+              padding="14px 22px 16px"
+              style={{ marginTop: 22, width: 450 }}
+              tiltDeg={-1.4}
             >
-              EVERY RIDE, RUN & HIKE ON STRAVA
-            </span>
-            <span style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em' }}>
-              {latestTitle ? `Latest: ${latestTitle}` : 'Mapped across the San Francisco Bay Area'}
-            </span>
-          </SocialCardMattedCard>
-          <div style={{ alignItems: 'center', display: 'flex', gap: 12, marginTop: 22 }}>
+              {latestKicker ? (
+                <span
+                  style={{
+                    color: PAPER_PALETTE.vermilion,
+                    fontSize: 14,
+                    fontWeight: 700,
+                    letterSpacing: '0.02em',
+                  }}
+                >
+                  {latestKicker}
+                </span>
+              ) : null}
+              <span style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em' }}>
+                {latestTitle}
+              </span>
+            </SocialCardMattedCard>
+          ) : null}
+          <div style={{ alignItems: 'center', display: 'flex', gap: 12, marginTop: 24 }}>
             <SocialCardScallop size={136} tiltDeg={-7} tone="ochre">
               <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.8 }}>Total miles</span>
               <span
@@ -142,7 +165,7 @@ export function StravaSocialCard({
           >
             <div
               style={{
-                background: '#f2ead7',
+                background: '#cfe3f0',
                 borderRadius: 10,
                 display: 'flex',
                 height: STRAVA_CARD_MAP_FRAME.height,
@@ -151,18 +174,54 @@ export function StravaSocialCard({
                 width: STRAVA_CARD_MAP_FRAME.width,
               }}
             >
+              {mapTiles.length > 0
+                ? mapTiles.map((tile) => (
+                    <img
+                      alt=""
+                      height={tile.size}
+                      key={`${tile.left}-${tile.top}`}
+                      src={tile.url}
+                      style={{
+                        height: tile.size,
+                        left: tile.left,
+                        position: 'absolute',
+                        top: tile.top,
+                        width: tile.size,
+                      }}
+                      width={tile.size}
+                    />
+                  ))
+                : null}
               <svg
                 aria-hidden="true"
                 height={STRAVA_CARD_MAP_FRAME.height}
+                style={{ left: 0, position: 'absolute', top: 0 }}
                 viewBox={`0 0 ${STRAVA_CARD_MAP_FRAME.width} ${STRAVA_CARD_MAP_FRAME.height}`}
                 width={STRAVA_CARD_MAP_FRAME.width}
               >
-                <path
-                  d="M0 84 H484 M0 168 H484 M0 252 H484 M0 336 H484 M96 0 V420 M192 0 V420 M288 0 V420 M384 0 V420"
-                  fill="none"
-                  stroke="rgba(79,142,193,0.22)"
-                  strokeWidth="1"
-                />
+                {mapTiles.length === 0
+                  ? landPaths.map((d) => (
+                      <path
+                        d={d}
+                        fill="#f2ead7"
+                        key={d.slice(0, 24)}
+                        stroke="rgba(79,142,193,0.45)"
+                        strokeWidth="1.5"
+                      />
+                    ))
+                  : null}
+                {routePaths.map(({ d, tone }) => (
+                  <path
+                    d={d}
+                    fill="none"
+                    key={`casing-${tone}`}
+                    stroke={PAPER_PALETTE.cream}
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeOpacity={0.82}
+                    strokeWidth={4.2}
+                  />
+                ))}
                 {routePaths.map(({ d, tone }) => (
                   <path
                     d={d}
@@ -171,8 +230,8 @@ export function StravaSocialCard({
                     stroke={PAPER_PALETTE[tone]}
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    strokeOpacity={tone === 'cobalt' ? 0.82 : 0.9}
-                    strokeWidth={tone === 'cobalt' ? 2.1 : 2.5}
+                    strokeOpacity={0.92}
+                    strokeWidth={2.2}
                   />
                 ))}
               </svg>
@@ -182,7 +241,7 @@ export function StravaSocialCard({
               tiltDeg={-3}
               tone="cobalt"
             >
-              <span>{outings} routes · Bay Area</span>
+              <span>{routeCountLabel}</span>
             </SocialCardTag>
           </div>
         </div>

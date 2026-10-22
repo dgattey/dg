@@ -12,7 +12,7 @@ import { type ReadingCardVariant, ReadingSocialCard } from './ReadingSocialCard'
 import {
   type CutOutPiece,
   LIFTED_SHADOW,
-  PIECE_SHADOW,
+  PAPER_SHADOW,
   SocialCardFrame,
   SocialCardHeadline,
   SocialCardMattedCard,
@@ -24,7 +24,7 @@ export type HomeCardVariant = {
   headline: string;
   name: string;
   portraitUrl: string | null;
-  tagline: string;
+  tagline: string | null;
   variant?: 'home';
 };
 
@@ -85,13 +85,14 @@ function AboutTag({ style }: { style: CSSProperties }) {
         alignItems: 'baseline',
         background: PAPER_PALETTE.ochre,
         borderRadius: '13px 15px 12px 16px',
+        boxShadow: PAPER_SHADOW,
         color: PAPER_PALETTE.ink,
         display: 'flex',
-        filter: PIECE_SHADOW,
         gap: 10,
-        padding: '10px 18px 12px',
+        padding: '10px 20px 12px',
         position: 'absolute',
-        transform: 'rotate(-5deg)',
+        transform: 'rotate(-4deg)',
+        whiteSpace: 'nowrap',
         ...style,
       }}
     >
@@ -108,46 +109,68 @@ function PortraitPrint({ portraitUrl }: { portraitUrl: string }) {
     <div
       style={{
         display: 'flex',
-        height: haloHeight,
+        height: haloHeight + 44,
         position: 'absolute',
-        right: 64,
-        top: 40,
-        transform: 'rotate(-3deg)',
-        width: haloWidth,
+        right: 36,
+        top: 22,
+        width: haloWidth + 44,
       }}
     >
-      <svg
-        aria-hidden="true"
-        height={haloHeight}
-        style={{ filter: LIFTED_SHADOW, left: 0, position: 'absolute', top: 0 }}
-        viewBox={`0 0 ${haloWidth} ${haloHeight}`}
-        width={haloWidth}
-      >
-        <path d={ovalPath(haloWidth, haloHeight)} fill={PAPER_PALETTE.cream} />
-      </svg>
-      <img
-        alt=""
-        height={PORTRAIT.height}
-        src={portraitUrl}
+      <div
         style={{
-          clipPath: `path('${ovalPath(PORTRAIT.width, PORTRAIT.height)}')`,
-          left: PORTRAIT.mat,
-          objectFit: 'cover',
+          display: 'flex',
+          height: haloHeight,
+          left: 22,
           position: 'absolute',
-          top: PORTRAIT.mat,
+          top: 12,
+          transform: 'rotate(-3deg)',
+          width: haloWidth,
         }}
-        width={PORTRAIT.width}
-      />
-      <AboutTag style={{ bottom: 44, left: -36 }} />
+      >
+        <svg
+          aria-hidden="true"
+          height={haloHeight}
+          style={{ filter: LIFTED_SHADOW, left: 0, position: 'absolute', top: 0 }}
+          viewBox={`0 0 ${haloWidth} ${haloHeight}`}
+          width={haloWidth}
+        >
+          <path d={ovalPath(haloWidth, haloHeight)} fill={PAPER_PALETTE.cream} />
+        </svg>
+        <img
+          alt=""
+          height={PORTRAIT.height}
+          src={portraitUrl}
+          style={{
+            clipPath: `path('${ovalPath(PORTRAIT.width, PORTRAIT.height)}')`,
+            left: PORTRAIT.mat,
+            objectFit: 'cover',
+            position: 'absolute',
+            top: PORTRAIT.mat,
+          }}
+          width={PORTRAIT.width}
+        />
+      </div>
+      <AboutTag style={{ bottom: 18, left: 96 }} />
     </div>
   );
 }
 
 function StampFeature() {
   return (
-    <div style={{ display: 'flex', position: 'absolute', right: 110, top: 150 }}>
-      <SocialCardStamp rotationDeg={4} width={300} />
-      <AboutTag style={{ bottom: -46, left: -30 }} />
+    <div
+      style={{
+        display: 'flex',
+        height: 280,
+        position: 'absolute',
+        right: 76,
+        top: 130,
+        width: 340,
+      }}
+    >
+      <div style={{ display: 'flex', left: 20, position: 'absolute', top: 10 }}>
+        <SocialCardStamp rotationDeg={4} width={300} />
+      </div>
+      <AboutTag style={{ bottom: 16, left: 12 }} />
     </div>
   );
 }
@@ -165,26 +188,30 @@ function HomeSocialCard({
   ];
   return (
     <SocialCardFrame borderTone="viridian" cutOuts={cutOuts} grainUrl={grainUrl}>
+      <div style={{ display: 'flex', flexDirection: 'column', position: 'relative', width: 560 }}>
+        {portraitUrl ? (
+          <div style={{ display: 'flex', marginBottom: 18 }}>
+            <SocialCardStamp rotationDeg={-4} width={118} />
+          </div>
+        ) : null}
+        <SocialCardHeadline fontSize={124} headline={headline} indentEm={0.52} />
+        <SocialCardMattedCard
+          matOffset={12}
+          matTiltDeg={2}
+          matTone="ochre"
+          padding="16px 26px 18px 22px"
+          style={{ marginTop: 22, width: 548 }}
+          tiltDeg={-1.5}
+        >
+          {name === headline ? null : (
+            <span style={{ fontSize: 34, fontWeight: 700, letterSpacing: '-0.02em' }}>{name}</span>
+          )}
+          {tagline ? (
+            <span style={{ fontSize: 20, lineHeight: 1.34, opacity: 0.88 }}>{tagline}</span>
+          ) : null}
+        </SocialCardMattedCard>
+      </div>
       {portraitUrl ? <PortraitPrint portraitUrl={portraitUrl} /> : <StampFeature />}
-      {portraitUrl ? (
-        <div style={{ display: 'flex', marginBottom: 26 }}>
-          <SocialCardStamp rotationDeg={-4} width={124} />
-        </div>
-      ) : null}
-      <SocialCardHeadline fontSize={144} headline={headline} indentEm={0.62} />
-      <SocialCardMattedCard
-        matOffset={13}
-        matTiltDeg={2}
-        matTone="ochre"
-        padding="18px 30px 20px 26px"
-        style={{ marginTop: 26 }}
-        tiltDeg={-1.5}
-      >
-        {name === headline ? null : (
-          <span style={{ fontSize: 42, fontWeight: 700, letterSpacing: '-0.02em' }}>{name}</span>
-        )}
-        <span style={{ fontSize: 32 }}>{tagline}</span>
-      </SocialCardMattedCard>
     </SocialCardFrame>
   );
 }

@@ -16,8 +16,8 @@ import { SocialCardScallop } from './SocialCardScallop';
 export type MusicStatsCardVariant = {
   activeDaysPercent: string;
   activeDaysSub: string;
+  activeMonths: number;
   listeningHours: string;
-  monthStreak: number;
   playsCompact: string;
   playsFull: string;
   topAlbums: ReadonlyArray<{
@@ -33,6 +33,7 @@ export type MusicStatsCardVariant = {
   }>;
   tracksAndArtistsSub: string;
   variant: 'music-stats';
+  year: number;
   years: ReadonlyArray<{
     plays: number;
     year: number;
@@ -148,15 +149,15 @@ export function MusicStatsSocialCard({
   activeDaysSub,
   grainUrl,
   listeningHours,
-  monthStreak,
   playsCompact,
+  playsFull,
   topAlbums,
   topArtists,
   tracksAndArtistsSub,
+  year,
   years,
 }: MusicStatsCardVariant & { grainUrl: string }) {
   const maxYearPlays = Math.max(...years.map((item) => item.plays), 1);
-  const peakYear = years.find((item) => item.plays === maxYearPlays);
   const topAlbum = topAlbums[0];
   return (
     <SocialCardFrame borderTone="ultramarine" cutOuts={STATS_CUT_OUTS} grainUrl={grainUrl}>
@@ -174,13 +175,13 @@ export function MusicStatsSocialCard({
           <div style={{ alignItems: 'center', display: 'flex', gap: 16, marginBottom: 18 }}>
             <SocialCardStamp rotationDeg={-4} width={114} />
             <SocialCardTag tiltDeg={2.5} tone="cobalt">
-              <span>{monthStreak} mo streak</span>
+              <span>{year}</span>
             </SocialCardTag>
           </div>
           <SocialCardHeadline fontSize={94} headline="Listening stats" indentEm={0.44} />
           <div style={{ alignItems: 'center', display: 'flex', gap: 14, marginTop: 26 }}>
             <StatStub
-              label="Total plays"
+              label={`Plays in ${year}`}
               sub={tracksAndArtistsSub}
               tiltDeg={-2.4}
               tone="ochre"
@@ -188,7 +189,7 @@ export function MusicStatsSocialCard({
             />
             <StatStub
               label="Listening time"
-              sub="Since Jul 2011"
+              sub={`In ${year}`}
               tiltDeg={2.1}
               tone="cream"
               value={listeningHours}
@@ -204,93 +205,93 @@ export function MusicStatsSocialCard({
         </div>
         <div style={{ display: 'flex', flexDirection: 'column', gap: 16, width: 530 }}>
           <div style={{ alignItems: 'stretch', display: 'flex', gap: 14 }}>
+            {topAlbum ? (
+              <div
+                style={{
+                  alignItems: 'center',
+                  background: PAPER_PALETTE.cream,
+                  borderRadius: QUAD_A,
+                  boxShadow: PAPER_SHADOW,
+                  color: PAPER_PALETTE.ink,
+                  display: 'flex',
+                  flex: 1,
+                  gap: 14,
+                  padding: 14,
+                  transform: 'rotate(-1.8deg)',
+                }}
+              >
+                <AlbumCoverBox fallbackTone="ochre" imageUrl={topAlbum.imageUrl} size={104} />
+                <div style={{ display: 'flex', flex: 1, flexDirection: 'column', gap: 3 }}>
+                  <span style={{ color: PAPER_PALETTE.vermilion, fontSize: 13, fontWeight: 700 }}>
+                    {`#1 ALBUM IN ${year}`}
+                  </span>
+                  <span style={{ fontSize: 21, fontWeight: 700, lineHeight: 1.1 }}>
+                    {topAlbum.name}
+                  </span>
+                  <span style={{ fontSize: 15, opacity: 0.76 }}>{topAlbum.artistNames}</span>
+                  <span style={{ fontSize: 17, fontWeight: 700, marginTop: 2 }}>
+                    {topAlbum.plays} plays
+                  </span>
+                </div>
+              </div>
+            ) : null}
+            {topArtists.length > 0 ? (
+              <div
+                style={{
+                  background: PAPER_PALETTE.rose,
+                  borderRadius: QUAD_C,
+                  boxShadow: PAPER_SHADOW,
+                  color: PAPER_PALETTE.ink,
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                  padding: '14px 16px',
+                  transform: 'rotate(2.2deg)',
+                  width: 196,
+                }}
+              >
+                <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.78 }}>
+                  {`TOP ARTISTS · ${year}`}
+                </span>
+                {topArtists.slice(0, 3).map((artist, idx) => (
+                  <div
+                    key={artist.name}
+                    style={{
+                      alignItems: 'baseline',
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      marginTop: idx === 0 ? 6 : 4,
+                    }}
+                  >
+                    <span style={{ fontSize: 16, fontWeight: 700 }}>
+                      {idx + 1}. {artist.name}
+                    </span>
+                    <span style={{ fontSize: 13, opacity: 0.82 }}>{artist.plays}</span>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+          </div>
+          {years.length > 0 ? (
             <div
               style={{
-                alignItems: 'center',
-                background: PAPER_PALETTE.cream,
+                background: PAPER_PALETTE.viridian,
                 borderRadius: QUAD_A,
                 boxShadow: PAPER_SHADOW,
-                color: PAPER_PALETTE.ink,
-                display: 'flex',
-                flex: 1,
-                gap: 14,
-                padding: 14,
-                transform: 'rotate(-1.8deg)',
-              }}
-            >
-              <AlbumCoverBox
-                fallbackTone="ochre"
-                imageUrl={topAlbum?.imageUrl ?? null}
-                size={104}
-              />
-              <div style={{ display: 'flex', flex: 1, flexDirection: 'column', gap: 3 }}>
-                <span style={{ color: PAPER_PALETTE.vermilion, fontSize: 13, fontWeight: 700 }}>
-                  #1 ALBUM ALL TIME
-                </span>
-                <span style={{ fontSize: 21, fontWeight: 700, lineHeight: 1.1 }}>
-                  {topAlbum?.name ?? 'A Moment Apart'}
-                </span>
-                <span style={{ fontSize: 15, opacity: 0.76 }}>
-                  {topAlbum?.artistNames ?? 'ODESZA'}
-                </span>
-                <span style={{ fontSize: 17, fontWeight: 700, marginTop: 2 }}>
-                  {topAlbum?.plays ?? '1,966'} plays
-                </span>
-              </div>
-            </div>
-            <div
-              style={{
-                background: PAPER_PALETTE.rose,
-                borderRadius: QUAD_C,
-                boxShadow: PAPER_SHADOW,
-                color: PAPER_PALETTE.ink,
+                color: PAPER_PALETTE.cream,
                 display: 'flex',
                 flexDirection: 'column',
-                justifyContent: 'center',
-                padding: '14px 16px',
-                transform: 'rotate(2.2deg)',
-                width: 196,
+                gap: 10,
+                padding: '18px 22px 16px',
+                transform: 'rotate(1.2deg)',
               }}
             >
-              <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.78 }}>TOP ARTISTS</span>
-              {topArtists.slice(0, 3).map((artist, idx) => (
-                <div
-                  key={artist.name}
-                  style={{
-                    alignItems: 'baseline',
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    marginTop: idx === 0 ? 6 : 4,
-                  }}
-                >
-                  <span style={{ fontSize: 16, fontWeight: 700 }}>
-                    {idx + 1}. {artist.name}
-                  </span>
-                  <span style={{ fontSize: 13, opacity: 0.82 }}>{artist.plays}</span>
-                </div>
-              ))}
-            </div>
-          </div>
-          <div
-            style={{
-              background: PAPER_PALETTE.viridian,
-              borderRadius: QUAD_A,
-              boxShadow: PAPER_SHADOW,
-              color: PAPER_PALETTE.cream,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 10,
-              padding: '18px 22px 16px',
-              transform: 'rotate(1.2deg)',
-            }}
-          >
-            <div
-              style={{ alignItems: 'baseline', display: 'flex', justifyContent: 'space-between' }}
-            >
-              <span style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em' }}>
-                Plays per year
-              </span>
-              {peakYear ? (
+              <div
+                style={{ alignItems: 'baseline', display: 'flex', justifyContent: 'space-between' }}
+              >
+                <span style={{ fontSize: 24, fontWeight: 700, letterSpacing: '-0.02em' }}>
+                  Plays per year
+                </span>
                 <span
                   style={{
                     background: PAPER_PALETTE.ochre,
@@ -301,42 +302,44 @@ export function MusicStatsSocialCard({
                     padding: '3px 10px',
                   }}
                 >
-                  Peak {peakYear.year} · {(peakYear.plays / 1000).toFixed(1)}k
+                  {year} · {playsFull} plays
                 </span>
-              ) : null}
-            </div>
-            <div style={{ alignItems: 'flex-end', display: 'flex', gap: 7, height: 128 }}>
-              {years.map((item) => {
-                const isPeak = item.plays === maxYearPlays;
-                const barHeight = Math.max(12, Math.round((item.plays / maxYearPlays) * 98));
-                return (
-                  <div
-                    key={item.year}
-                    style={{
-                      alignItems: 'center',
-                      display: 'flex',
-                      flex: 1,
-                      flexDirection: 'column',
-                      gap: 5,
-                    }}
-                  >
+              </div>
+              <div style={{ alignItems: 'flex-end', display: 'flex', gap: 7, height: 128 }}>
+                {years.map((item) => {
+                  const isHighlighted = item.year === year;
+                  const barHeight = Math.max(12, Math.round((item.plays / maxYearPlays) * 98));
+                  return (
                     <div
+                      key={item.year}
                       style={{
-                        background: isPeak ? PAPER_PALETTE.ochre : PAPER_PALETTE.chartreuse,
-                        borderRadius: '4px 4px 2px 2px',
-                        height: barHeight,
-                        opacity: isPeak ? 1 : 0.85,
-                        width: '100%',
+                        alignItems: 'center',
+                        display: 'flex',
+                        flex: 1,
+                        flexDirection: 'column',
+                        gap: 5,
                       }}
-                    />
-                    <span style={{ fontSize: 12, opacity: isPeak ? 1 : 0.75 }}>
-                      ’{String(item.year).slice(-2)}
-                    </span>
-                  </div>
-                );
-              })}
+                    >
+                      <div
+                        style={{
+                          background: isHighlighted
+                            ? PAPER_PALETTE.ochre
+                            : PAPER_PALETTE.chartreuse,
+                          borderRadius: '4px 4px 2px 2px',
+                          height: barHeight,
+                          opacity: isHighlighted ? 1 : 0.78,
+                          width: '100%',
+                        }}
+                      />
+                      <span style={{ fontSize: 12, opacity: isHighlighted ? 1 : 0.75 }}>
+                        ’{String(item.year).slice(-2)}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          ) : null}
         </div>
       </div>
     </SocialCardFrame>

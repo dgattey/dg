@@ -1,6 +1,8 @@
 import 'server-only';
 
 import { readFile } from 'node:fs/promises';
+import { getTileSource } from '@dg/maps/src/getTileSource';
+import { stadiaTileUrl } from '@dg/maps/src/tileSource';
 import { fetchBooks } from '@dg/services/contentful/fetchBooks';
 import { fetchIntroContent } from '@dg/services/contentful/fetchIntroContent';
 import { readFavoriteAlbumsSnapshot } from '@dg/services/spotify/favoriteAlbumsSnapshot';
@@ -11,14 +13,21 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { ImageResponse } from 'next/og';
 import { SocialCard, type SocialCardVariant } from './collage/SocialCard';
 import { SOCIAL_CARD_FONT } from './collage/SocialCardParts';
+import type { StravaMapTile } from './collage/StravaSocialCard';
 import {
   buildFavoriteAlbumsCardVariant,
   buildHomeCardVariant,
   buildMusicHistoryCardVariant,
   buildMusicStatsCardVariant,
   buildReadingCardVariant,
-  buildStravaCardVariant,
+  currentPacificYear,
 } from './collage/socialCardVariants';
+import {
+  buildStravaCardVariant,
+  computeStravaFrame,
+  computeStravaTileGrid,
+  type StravaTileCoord,
+} from './collage/stravaSocialCardVariant';
 import { SITE_NAME } from './metadata';
 
 export type SocialImagePage =
@@ -65,12 +74,67 @@ async function safeLoad<T>(loader: () => Promise<T>, fallback: T): Promise<T> {
   }
 }
 
+async function fetchTileDataUri(coord: StravaTileCoord): Promise<StravaMapTile | null> {
+  const tileSource = getTileSource();
+  if (tileSource.mode === 'offline') {
+    return null;
+  }
+  const stadiaUrl = stadiaTileUrl(tileSource, {
+    dark: false,
+    extension: 'png',
+    retina: true,
+    style: 'outdoors',
+    x: coord.x,
+    y: coord.y,
+    zoom: coord.zoom,
+  });
+  const candidates: ReadonlyArray<{ headers: Record<string, string>; url: string }> = [
+    {
+      headers: { Origin: 'http://localhost:3000', Referer: 'http://localhost:3000/' },
+      url: stadiaUrl,
+    },
+    {
+      headers: { 'User-Agent': 'dylangattey.com-og/1.0' },
+      url: `https://basemaps.cartocdn.com/rastertiles/voyager/${coord.zoom}/${coord.x}/${coord.y}@2x.png`,
+    },
+  ];
+  for (const candidate of candidates) {
+    try {
+      const response = await fetch(candidate.url, {
+        cache: 'no-store',
+        headers: candidate.headers,
+      });
+      if (response.ok) {
+        const bytes = Buffer.from(await response.arrayBuffer());
+        return {
+          left: coord.left,
+          size: coord.size,
+          top: coord.top,
+          url: `data:image/png;base64,${bytes.toString('base64')}`,
+        };
+      }
+    } catch {}
+  }
+  return null;
+}
+
+async function loadStravaMapTiles(
+  history: Awaited<ReturnType<typeof fetchStravaHistoryFromDb>>,
+): Promise<Array<StravaMapTile>> {
+  const coords = computeStravaTileGrid(computeStravaFrame(history));
+  const resolved = await Promise.all(coords.map(fetchTileDataUri));
+  return resolved.filter((tile): tile is StravaMapTile => tile !== null);
+}
+
 async function loadSocialCardVariant(page: SocialImagePage): Promise<SocialCardVariant> {
   switch (page) {
     case 'home':
       return buildHomeCardVariant(await safeLoad(fetchIntroContent, null));
-    case 'music-stats':
-      return buildMusicStatsCardVariant(await safeLoad(fetchListeningStats, null));
+    case 'music-stats': {
+      const year = currentPacificYear();
+      const stats = await safeLoad(() => fetchListeningStats({ range: 'year', year }), null);
+      return buildMusicStatsCardVariant(stats, year);
+    }
     case 'music-history': {
       const history = await safeLoad(() => fetchMusicHistoryPage({ pageSize: 24 }), {
         nextCursor: null,
@@ -82,8 +146,11 @@ async function loadSocialCardVariant(page: SocialImagePage): Promise<SocialCardV
       return buildFavoriteAlbumsCardVariant(await safeLoad(readFavoriteAlbumsSnapshot, null));
     case 'reading':
       return buildReadingCardVariant(await safeLoad(fetchBooks, []));
-    case 'strava':
-      return buildStravaCardVariant(await safeLoad(fetchStravaHistoryFromDb, null));
+    case 'strava': {
+      const history = await safeLoad(fetchStravaHistoryFromDb, null);
+      const mapTiles = await loadStravaMapTiles(history);
+      return buildStravaCardVariant(history, mapTiles);
+    }
     default: {
       const unhandled: never = page;
       return unhandled;
