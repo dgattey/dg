@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { FALLBACK_BOOKS } from '@dg/content-models/books/fallbackBooks';
 import type { RenderableBook } from '@dg/content-models/contentful/renderables/books';
 import { render, screen, within } from '@testing-library/react';
@@ -12,6 +14,10 @@ import {
   shelfStats,
   sortBooks,
 } from '../readingHelpers';
+
+const readingCss = readFileSync(join(__dirname, '..', 'reading.css'), 'utf8');
+const chromeCss = readFileSync(join(__dirname, '..', '..', 'collage', 'chrome.css'), 'utf8');
+const collageCss = readFileSync(join(__dirname, '..', '..', 'collage', 'collage.css'), 'utf8');
 
 const IN_PROGRESS: RenderableBook = {
   author: 'Ursula K. Le Guin',
@@ -120,5 +126,39 @@ describe('ReadingShelf', () => {
 
     expect(screen.queryByRole('heading', { name: 'Pachinko' })).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 3, name: 'Dune' })).toBeInTheDocument();
+  });
+
+  it('keeps year section headings sticky with consistent width below the site header across desktop and mobile layouts', () => {
+    const sectionBlock =
+      readingCss.match(/\.reading__section\s*\{([\s\S]*?)\n\}\n\.reading__sectionHeading/)?.[1] ??
+      '';
+    const headingBlock =
+      readingCss.match(
+        /\.reading__sectionHeading\s*\{([\s\S]*?)\n\}\n\.reading__sectionTag/,
+      )?.[1] ?? '';
+    const tagBlock = readingCss.match(/\.reading__sectionTag\s*\{([^}]*)\}/)?.[1] ?? '';
+    const mobileHeaderBlock =
+      chromeCss.match(/@media\s*\(max-width:\s*480px\)\s*\{([\s\S]*?)\n\}/)?.[1] ?? '';
+
+    expect(sectionBlock).toContain('display: flex;');
+    expect(sectionBlock).toContain('flex-direction: column;');
+    expect(sectionBlock).toMatch(/@media\s*\(min-width:\s*1100px\)[\s\S]*?display:\s*grid;/);
+    expect(sectionBlock).toMatch(
+      /@media\s*\(min-width:\s*1100px\)[\s\S]*?grid-template-columns:\s*220px\s+minmax\(0,\s*1fr\);/,
+    );
+    expect(sectionBlock).toMatch(/@media\s*\(min-width:\s*1100px\)[\s\S]*?align-items:\s*start;/);
+
+    expect(headingBlock).toContain('position: sticky;');
+    expect(headingBlock).toContain('top: calc(var(--site-header-height, 80px) + 16px);');
+    expect(headingBlock).toContain('z-index: 5;');
+    expect(headingBlock).toContain('align-self: flex-start;');
+    expect(headingBlock).toContain('width: 220px;');
+
+    expect(tagBlock).toContain('display: flex;');
+    expect(tagBlock).toContain('justify-content: space-between;');
+    expect(tagBlock).toContain('width: 100%;');
+
+    expect(mobileHeaderBlock).not.toContain('position: relative;');
+    expect(collageCss).not.toContain('--site-header-height: 0px;');
   });
 });

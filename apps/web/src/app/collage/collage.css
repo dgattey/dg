@@ -497,9 +497,6 @@ html:active-view-transition-type(page-open, page-close) .cutHeading {
   }
 }
 @media (max-width: 480px) {
-  .collageRoot {
-    --site-header-height: 0px;
-  }
   .collageMain {
     padding-block-start: 32px;
   }
