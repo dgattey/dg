@@ -49,7 +49,7 @@ export function ReadingHero({
               className="collagePin reading__heroTag"
               edge="quad-b"
               tiltDeg={-3}
-              tone="ochre"
+              tone="cream"
             >
               {tag}
             </PaperTag>
@@ -79,7 +79,7 @@ export function ReadingHero({
           {book.review ? (
             <PaperCard
               className="reading__slip reading__heroSlip"
-              edge="torn-c"
+              edge="quad-c"
               innerClassName="reading__slipInner"
               tiltDeg={0.8}
               tone="cream"

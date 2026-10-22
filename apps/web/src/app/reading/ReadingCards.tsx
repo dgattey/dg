@@ -16,9 +16,9 @@ const CARD_LOOKS: Record<BookCardKind, CardLook> = {
   review: { coverWidth: 140, edge: 'quad-a', tiltScale: 0.7 },
 };
 
-/** Light slips read on every card tone, so a cream card takes an ochre slip instead. */
-function slipTone(cardTone: PaperTone): PaperTone {
-  return cardTone === 'cream' ? 'ochre' : 'cream';
+/** Stamps are cream so dark text reads, except on cream paper where they'd disappear. */
+function stampTone(cardTone: PaperTone): PaperTone {
+  return cardTone === 'cream' ? 'vermilion' : 'cream';
 }
 
 export function BookCover({
@@ -112,7 +112,7 @@ export function ReviewCard({
             className="reading__stamp"
             edge="quad-d"
             tiltDeg={flip ? 2.5 : -2.5}
-            tone={slipTone(treatment.tone)}
+            tone={stampTone(treatment.tone)}
           >
             <BookMeta book={book} withYear={false} />
           </PaperTag>
@@ -120,10 +120,10 @@ export function ReviewCard({
       </div>
       <PaperCard
         className="reading__slip"
-        edge="torn-c"
+        edge="quad-c"
         innerClassName="reading__slipInner"
         tiltDeg={flip ? -0.6 : 0.6}
-        tone={slipTone(treatment.tone)}
+        tone="cream"
       >
         <p>{book.review}</p>
       </PaperCard>

@@ -15,7 +15,6 @@ const TONES = [
   'olive',
   'leaf',
   'viridian',
-  'ochre',
 ] as const satisfies ReadonlyArray<PaperTone>;
 
 const LAYOUTS = [

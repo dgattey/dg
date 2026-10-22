@@ -23,7 +23,7 @@ import {
 const SHELF_TRANSITION = 'reading-shelf';
 
 const YEAR_TAGS = [
-  { tiltDeg: -3, tone: 'ochre' },
+  { tiltDeg: -3, tone: 'cream' },
   { tiltDeg: 2.5, tone: 'vermilion' },
   { tiltDeg: -2, tone: 'cobalt' },
   { tiltDeg: 3, tone: 'rose' },
