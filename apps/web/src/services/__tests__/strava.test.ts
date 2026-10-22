@@ -46,6 +46,7 @@ const history: StravaHistory = {
   bikes: [],
   latest: outing,
   outings: [entry],
+  sfCoverage: { neighborhoods: [], ridden: {}, viewBox: '0 0 10 10' },
   thisYear: { distanceMeters: 1000, elevationGainMeters: 10, outings: 1, year: 2026 },
   totals: { distanceMeters: 1000, elevationGainMeters: 10, firstYear: 2026, outings: 1 },
 };

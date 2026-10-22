@@ -9,6 +9,7 @@ import type {
   StravaSport,
   StravaYearTotals,
 } from '@dg/content-models/strava/StravaHistory';
+import { measureSfStreetCoverage } from './measureSfStreetCoverage';
 
 const SPORT_BY_STRAVA_TYPE: Partial<Record<string, StravaSport>> = {
   EBikeRide: 'ride',
@@ -157,6 +158,7 @@ export const summarizeStravaHistory = (
     bikes: findBikes(dated),
     latest: toOuting(newest),
     outings,
+    sfCoverage: measureSfStreetCoverage(outings, now),
     thisYear: yearTotals(
       currentYear,
       outings.filter((outing) => yearOf(outing) === currentYear),

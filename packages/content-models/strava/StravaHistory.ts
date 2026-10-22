@@ -1,3 +1,5 @@
+import type { SfStreetCoverage } from './SfStreetCoverage';
+
 export const STRAVA_SPORTS = ['ride', 'run', 'hike', 'other'] as const;
 
 export type StravaSport = (typeof STRAVA_SPORTS)[number];
@@ -55,4 +57,5 @@ export type StravaHistory = {
   thisYear: StravaYearTotals;
   /** Bikes Strava has named, most miles first. */
   bikes: ReadonlyArray<StravaBike>;
+  sfCoverage: SfStreetCoverage;
 };

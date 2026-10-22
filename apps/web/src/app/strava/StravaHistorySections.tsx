@@ -5,6 +5,7 @@ import type { ReactNode } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { FieldNotes } from './FieldNotes';
 import { StravaAtlas, StravaBands } from './FilteredSections';
+import { SfStreetCoverageSection } from './SfStreetCoverageSection';
 import { RouteCountTag, StravaFilters } from './StravaFilters';
 import { toMapRoutes } from './stravaSports';
 
@@ -48,6 +49,7 @@ export function StravaHistorySections({ history }: { history: StravaHistory }) {
           <RouteCountTag className="collagePin strava__routeCount" />
         </AtlasSheet>
       </div>
+      <SfStreetCoverageSection coverage={history.sfCoverage} />
       <StravaBands bikes={history.bikes} tileSource={tileSource} />
     </StravaFilters>
   );

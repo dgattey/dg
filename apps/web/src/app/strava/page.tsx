@@ -1,6 +1,7 @@
 import 'server-only';
 import '../collage/pills.css';
 import '../music/stats/statsShapes.css';
+import './sfStreetCoverage.css';
 import './strava.css';
 import './stravaPieces.css';
 
