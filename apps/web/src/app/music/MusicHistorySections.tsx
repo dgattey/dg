@@ -36,49 +36,27 @@ export function NoListeningHistory() {
   );
 }
 
-type Props = {
-  /** Index offset for section tilt/tone alternation. */
-  sectionOffset?: number;
-  sections: Array<TrackSection>;
-  /** Whether the first section should mark its first tile as an LCP candidate. */
-  withLcpCandidate?: boolean;
-};
-
-/**
- * Renders date-grouped sections of listening history.
- * Shared between the server-rendered initial page and client infinite-scroll
- * continuation.
- */
-export function MusicHistorySections({
-  sectionOffset = 0,
-  sections,
-  withLcpCandidate = true,
-}: Props) {
+/** Renders date-grouped sections of listening history. */
+export function MusicHistorySections({ sections }: { sections: Array<TrackSection> }) {
   return (
     <>
-      {sections.map((section, index) => {
-        const sectionIndex = sectionOffset + index;
-        return (
-          <section aria-label={section.label} className="music__section" key={section.label}>
-            <StickyFadeBar className="music__dateBar">
-              <h2 className="music__dateHeading">
-                <PaperTag
-                  className="music__dateTag"
-                  edge="soft-b"
-                  tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
-                  tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
-                >
-                  {section.label}
-                </PaperTag>
-              </h2>
-            </StickyFadeBar>
-            <MusicGrid
-              hasLcpCandidate={withLcpCandidate && sectionIndex === 0}
-              tracks={section.tracks}
-            />
-          </section>
-        );
-      })}
+      {sections.map((section, sectionIndex) => (
+        <section aria-label={section.label} className="music__section" key={section.label}>
+          <StickyFadeBar className="music__dateBar">
+            <h2 className="music__dateHeading">
+              <PaperTag
+                className="music__dateTag"
+                edge="soft-b"
+                tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
+                tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
+              >
+                {section.label}
+              </PaperTag>
+            </h2>
+          </StickyFadeBar>
+          <MusicGrid hasLcpCandidate={sectionIndex === 0} tracks={section.tracks} />
+        </section>
+      ))}
     </>
   );
 }

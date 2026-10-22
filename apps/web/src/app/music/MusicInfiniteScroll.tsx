@@ -13,26 +13,16 @@ import {
 
 type Props = {
   initialCursor: string | null;
-  initialSectionOffset?: number;
-  initialTracks?: Array<HistoryTrack>;
-  /** When true, the initial tracks were already rendered on the server by `MusicHistory`. */
-  serverRenderedInitial?: boolean;
+  initialTracks: Array<HistoryTrack>;
 };
 
 /**
- * Infinite scroll continuation for music history.
- * Loads more tracks when sentinel element enters viewport.
+ * Music history with infinite scroll. Owns every loaded play so the first
+ * page and later pages group as one list.
  */
-export function MusicInfiniteScroll({
-  initialCursor,
-  initialSectionOffset = 0,
-  initialTracks = [],
-  serverRenderedInitial = false,
-}: Props) {
+export function MusicInfiniteScroll({ initialCursor, initialTracks }: Props) {
   const serverTime = useServerTime();
-  const [extraTracks, setExtraTracks] = useState<Array<HistoryTrack>>(
-    serverRenderedInitial ? [] : initialTracks,
-  );
+  const [tracks, setTracks] = useState<Array<HistoryTrack>>(initialTracks);
   const [cursor, setCursor] = useState<string | null>(initialCursor);
   const [isLoading, setIsLoading] = useState(false);
   const [failedCursor, setFailedCursor] = useState<string | null>(null);
@@ -53,7 +43,7 @@ export function MusicInfiniteScroll({
           setIsLoading(true);
           try {
             const result = await loadMoreMusicHistory(cursor);
-            setExtraTracks((prev) => [...prev, ...result.tracks]);
+            setTracks((prev) => [...prev, ...result.tracks]);
             setCursor(result.nextCursor);
           } catch {
             setFailedCursor(cursor);
@@ -69,19 +59,15 @@ export function MusicInfiniteScroll({
     return () => observer.disconnect();
   }, [cursor, failedCursor, isLoading]);
 
-  const sections = groupTracksByDate(extraTracks, serverTime);
+  const sections = groupTracksByDate(tracks, serverTime);
 
-  if (!serverRenderedInitial && sections.length === 0) {
+  if (sections.length === 0) {
     return <NoListeningHistory />;
   }
 
-  const body = (
-    <>
-      <MusicHistorySections
-        sectionOffset={initialSectionOffset}
-        sections={sections}
-        withLcpCandidate={!serverRenderedInitial}
-      />
+  return (
+    <div className="music__history">
+      <MusicHistorySections sections={sections} />
       <div className="music__sentinel" ref={sentinelRef}>
         {isLoading ? (
           <CollageMusicStatus>
@@ -90,8 +76,6 @@ export function MusicInfiniteScroll({
           </CollageMusicStatus>
         ) : null}
       </div>
-    </>
+    </div>
   );
-
-  return serverRenderedInitial ? body : <div className="music__history">{body}</div>;
 }
