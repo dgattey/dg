@@ -24,6 +24,10 @@ const nextConfig: NextConfig = {
         protocol: 'https',
       },
       {
+        hostname: '*.gattey.com',
+        protocol: 'https',
+      },
+      {
         hostname: 'i.scdn.co',
         protocol: 'https',
       },

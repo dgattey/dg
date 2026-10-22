@@ -1,17 +1,19 @@
 import type { Project } from '../schema/shared';
 import { toRenderableAsset } from './assets';
 
-export const SIDE_PROJECTS_LIMIT = 4;
+export const SIDE_PROJECTS_LIMIT = 5;
+
+export type SideProjectMark = {
+  height: number;
+  title?: string | null;
+  url: string;
+  width: number;
+};
 
 export type RenderableSideProject = {
   creationDate: string | null;
   description: string;
-  mark: {
-    height: number;
-    title?: string | null;
-    url: string;
-    width: number;
-  };
+  mark: SideProjectMark;
   title: string;
   url: string;
 };

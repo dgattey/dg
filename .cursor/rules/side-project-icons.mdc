@@ -1,0 +1,15 @@
+---
+description: Load homepage side-project icons from Dylan's DylKit app sites
+globs: packages/services/appSites/**, packages/services/contentful/fetchSideProjects.ts, packages/content-models/contentful/renderables/sideProjects.ts, apps/web/src/app/home/GatteySitesCard*.tsx
+alwaysApply: false
+---
+
+# Side project icons
+
+Side projects are Contentful `project` entries with `isSideProject=true`. Each entry has a `link` to the app site and a `thumbnail`.
+
+Dylan's DylKit apps (Sconeos, Saga, Gattey Photos) are listed in `DYLKIT_APP_HOSTS`. For those, the icon comes live from the app site via `APP_SITE_ICON_PATHS`: DylKit's canonical `/icon.png`, then the legacy `/app-icon.png`. Every other side project, including other `gattey.com` sites such as WMM, uses its Contentful thumbnail, which is also the fallback when an app site is down.
+
+A new DylKit app needs a Contentful project entry linking to its `https://<app>.gattey.com` site and its host added to `DYLKIT_APP_HOSTS`. An icon refresh shows up within the `contentful` cache life, about 15 minutes, or immediately after invalidating the `contentful` tag.
+
+When a DylKit app's icon or pitch changes, also refresh its Contentful thumbnail, title, and summary so the fallback stays current. If DylKit changes its icon URL, change `APP_SITE_ICON_PATHS`.

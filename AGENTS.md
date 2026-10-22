@@ -33,6 +33,16 @@ This is `dg`, a single Next.js 16 app (`@dg/web`) in a pnpm + Turbo monorepo. Se
 - Test-DB migration deadlock: the initial migration opens a transaction but calls `createTable` on a fresh connection, and the test env forces `pool.max = 1`. Running *pending* migrations against the test DB therefore deadlocks (`SequelizeConnectionAcquireTimeoutError`). `turbo test`'s global setup only runs *pending* migrations, so make sure `DATABASE_URL_TEST` already has every migration applied before running tests — the reliable way is to migrate it once through the dev pool (point `DATABASE_URL` at the test DB and run `turbo migrate`, which uses the default multi-connection pool and does not deadlock).
 - `turbo test` runs the two DB-backed packages (`@dg/services`, `@dg/web`) in parallel; both connect to `DATABASE_URL_TEST`. This is fine once the test DB is already migrated.
 
+## Side projects
+
+Side projects are Contentful `project` entries with `isSideProject=true`. Each entry has a `link` to the app site and a `thumbnail`.
+
+Dylan's DylKit apps (Sconeos, Saga, Gattey Photos) are listed in `DYLKIT_APP_HOSTS`. For those, the icon comes live from the app site via `APP_SITE_ICON_PATHS`: DylKit's canonical `/icon.png`, then the legacy `/app-icon.png`. Every other side project, including other `gattey.com` sites such as WMM, uses its Contentful thumbnail, which is also the fallback when an app site is down.
+
+A new DylKit app needs a Contentful project entry linking to its `https://<app>.gattey.com` site and its host added to `DYLKIT_APP_HOSTS`. An icon refresh shows up within the `contentful` cache life, about 15 minutes, or immediately after invalidating the `contentful` tag.
+
+When a DylKit app's icon or pitch changes, also refresh its Contentful thumbnail, title, and summary so the fallback stays current. If DylKit changes its icon URL, change `APP_SITE_ICON_PATHS`.
+
 <!-- BEGIN:turborepo-agent-rules -->
 
 # This is NOT the Turborepo you know

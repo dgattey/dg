@@ -9,6 +9,7 @@ import {
 import { projectsResponseSchema } from '@dg/content-models/contentful/schema/projects';
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import { gql } from 'graphql-request';
+import { fetchAppSiteIcon } from '../appSites/fetchAppSiteIcon';
 import { parseResponse } from '../clients/parseResponse';
 import { getContentfulClient } from './contentfulClient';
 
@@ -39,15 +40,22 @@ const QUERY = gql`
 `;
 
 /**
- * Fetches at most SIDE_PROJECTS_LIMIT newest published side projects (flagged projects).
+ * Fetches at most SIDE_PROJECTS_LIMIT newest side projects and uses each
+ * app site's live icon when that site serves one.
  */
 export async function fetchSideProjects(): Promise<Array<RenderableSideProject>> {
   const data = parseResponse(projectsResponseSchema, await getContentfulClient().request(QUERY), {
     kind: 'graphql',
     source: 'contentful.fetchSideProjects',
   });
-  const projects = (data.projectCollection?.items ?? [])
-    .map(toRenderableSideProject)
-    .filter(isNotNullish);
-  return takeNewestSideProjects(projects, SIDE_PROJECTS_LIMIT);
+  const projects = takeNewestSideProjects(
+    (data.projectCollection?.items ?? []).map(toRenderableSideProject).filter(isNotNullish),
+    SIDE_PROJECTS_LIMIT,
+  );
+  return Promise.all(
+    projects.map(async (project) => ({
+      ...project,
+      mark: (await fetchAppSiteIcon(project.url)) ?? project.mark,
+    })),
+  );
 }
