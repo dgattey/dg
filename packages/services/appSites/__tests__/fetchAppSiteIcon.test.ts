@@ -76,9 +76,12 @@ describe('fetchAppSiteIcon', () => {
     ]);
   });
 
-  it('returns null for a non-gattey host without fetching', async () => {
+  it('returns null for a non-DylKit host without fetching', async () => {
     await expect(fetchAppSiteIcon('https://example.com')).resolves.toBeNull();
     await expect(fetchAppSiteIcon('https://notgattey.com')).resolves.toBeNull();
+    await expect(fetchAppSiteIcon('https://wmm.gattey.com')).resolves.toBeNull();
+    await expect(fetchAppSiteIcon('https://tuneful.gattey.com')).resolves.toBeNull();
+    await expect(fetchAppSiteIcon('http://saga.gattey.com')).resolves.toBeNull();
     expect(fetchMock).not.toHaveBeenCalled();
   });
 

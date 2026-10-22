@@ -3,18 +3,30 @@ import 'server-only';
 import type { SideProjectMark } from '@dg/content-models/contentful/renderables/sideProjects';
 
 /**
+ * Hosts of Dylan's DylKit apps. Only these serve the DylKit icon contract;
+ * other gattey.com sites keep their Contentful thumbnail.
+ */
+export const DYLKIT_APP_HOSTS = [
+  'photos.gattey.com',
+  'saga.gattey.com',
+  'sconeos.gattey.com',
+] as const;
+
+/**
  * Ordered icon paths on a DylKit app site. The first PNG wins.
- * `/icon.png` is the 256 px rounded PNG generated from the app icon at build time,
- * and older sites serve `/app-icon.png`, a 1024 px rounded PNG.
+ * `/icon.png` is the canonical macOS-rendered squircle, and older sites serve
+ * `/app-icon.png`.
  */
 export const APP_SITE_ICON_PATHS = ['/icon.png', '/app-icon.png'] as const;
 
 const PNG_HEADER_BYTES = 24;
 
-function isGatteyAppSite(siteUrl: string): boolean {
+function isDylKitAppSite(siteUrl: string): boolean {
   try {
     const parsed = new URL(siteUrl);
-    return parsed.protocol === 'https:' && parsed.hostname.endsWith('.gattey.com');
+    return (
+      parsed.protocol === 'https:' && DYLKIT_APP_HOSTS.some((host) => host === parsed.hostname)
+    );
   } catch {
     return false;
   }
@@ -69,11 +81,11 @@ async function readPngSize(
 }
 
 /**
- * Loads the live icon for a `*.gattey.com` app site.
+ * Loads the live icon for a DylKit app site.
  * Returns null for any other URL, and when no registered path serves a PNG.
  */
 export async function fetchAppSiteIcon(siteUrl: string): Promise<SideProjectMark | null> {
-  if (!isGatteyAppSite(siteUrl)) {
+  if (!isDylKitAppSite(siteUrl)) {
     return null;
   }
   for (const path of APP_SITE_ICON_PATHS) {
