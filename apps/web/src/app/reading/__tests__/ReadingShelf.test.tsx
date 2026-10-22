@@ -4,10 +4,12 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ReadingShelf } from '../ReadingShelf';
 import {
+  bookCardKind,
   featuredBook,
   formatFinishedDate,
   readingFilterOptions,
   shelfSections,
+  shelfStats,
   sortBooks,
 } from '../readingHelpers';
 
@@ -51,6 +53,24 @@ describe('readingHelpers', () => {
     });
   });
 
+  it('gives five-star reviews a wide card, other reviews a half card, and bare ratings a print', () => {
+    const byTitle = (title: string) => {
+      const book = FALLBACK_BOOKS.find((candidate) => candidate.title === title);
+      if (!book) {
+        throw new Error(`Missing fallback book ${title}`);
+      }
+      return book;
+    };
+    expect(bookCardKind(byTitle('Dune'))).toBe('feature');
+    expect(bookCardKind(byTitle('Theo of Golden'))).toBe('review');
+    expect(bookCardKind(byTitle('Pachinko'))).toBe('cover');
+    expect(bookCardKind(IN_PROGRESS)).toBe('cover');
+  });
+
+  it('counts the shelf and its five-star books', () => {
+    expect(shelfStats(FALLBACK_BOOKS)).toEqual({ fiveStars: 5, total: 23 });
+  });
+
   it('groups the shelf into a reading section and then years, newest first', () => {
     const labels = shelfSections(sortBooks([...FALLBACK_BOOKS, IN_PROGRESS])).map(
       ({ label }) => label,
@@ -64,6 +84,7 @@ describe('ReadingShelf', () => {
     render(<ReadingShelf books={FALLBACK_BOOKS} />);
 
     expect(screen.getByText('Latest review')).toBeInTheDocument();
+    expect(screen.getByText('23 books · 5 five-star picks')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 2, name: /^The Path Made Clear/ }),
     ).toBeInTheDocument();

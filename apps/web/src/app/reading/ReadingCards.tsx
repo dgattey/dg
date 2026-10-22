@@ -4,21 +4,34 @@ import type { CollageCardTreatment } from '../collage/collageCardTreatment';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import { cx } from '../collage/paperVars';
-import { type FeaturedBook, formatFinishedDate } from './readingHelpers';
+import type { PaperEdge, PaperTone } from '../collage/types';
+import { type BookCardKind, formatFinishedDate } from './readingHelpers';
 
-function BookCover({
+type CardLook = { coverWidth: number; edge: PaperEdge; tiltScale: number };
+
+/** Bigger paper tilts less, so wide cards stay readable and cover prints get the swing. */
+const CARD_LOOKS: Record<BookCardKind, CardLook> = {
+  cover: { coverWidth: 220, edge: 'quad-b', tiltScale: 1.4 },
+  feature: { coverWidth: 220, edge: 'soft-b', tiltScale: 0.4 },
+  review: { coverWidth: 140, edge: 'quad-a', tiltScale: 0.7 },
+};
+
+/** Light slips read on every card tone, so a cream card takes an ochre slip instead. */
+function slipTone(cardTone: PaperTone): PaperTone {
+  return cardTone === 'cream' ? 'ochre' : 'cream';
+}
+
+export function BookCover({
   book,
-  className,
   preload = false,
   width,
 }: {
   book: RenderableBook;
-  className?: string;
   preload?: boolean;
   width: number;
 }) {
   return (
-    <div className={cx('reading__cover', className)}>
+    <div className="reading__cover">
       {book.thumbnail ? (
         <Image
           alt=""
@@ -35,14 +48,12 @@ function BookCover({
   );
 }
 
-function BookMeta({ book, withYear }: { book: RenderableBook; withYear: boolean }) {
+/** Stars and finished date as inline pieces, for a meta line or a stamp. */
+export function BookMeta({ book, withYear }: { book: RenderableBook; withYear: boolean }) {
   const finished =
     book.readingStatus === 'read' ? formatFinishedDate(book.readDateFinished, { withYear }) : null;
-  if (book.rating === null && finished === null) {
-    return null;
-  }
   return (
-    <p className="reading__meta">
+    <>
       {book.rating === null ? null : (
         <span aria-label={`${book.rating} out of 5 stars`} className="reading__stars" role="img">
           {'★'.repeat(book.rating)}
@@ -50,58 +61,100 @@ function BookMeta({ book, withYear }: { book: RenderableBook; withYear: boolean 
         </span>
       )}
       {finished ? <span>{finished}</span> : null}
-    </p>
+    </>
   );
 }
 
-export function FeaturedBookCard({ featured: { book, tag } }: { featured: FeaturedBook }) {
+function hasMeta(book: RenderableBook): boolean {
+  return book.rating !== null || (book.readingStatus === 'read' && book.readDateFinished !== null);
+}
+
+function CoverPrint({ book, width }: { book: RenderableBook; width: number }) {
+  return (
+    <div className="reading__print">
+      <BookCover book={book} width={width} />
+      {book.rating === 5 ? (
+        <span aria-hidden="true" className="reading__seal">
+          5★
+        </span>
+      ) : null}
+    </div>
+  );
+}
+
+/** A reviewed book. Wide cards sit the cover beside the slip, alternating sides down the shelf. */
+export function ReviewCard({
+  book,
+  flip,
+  kind,
+  treatment,
+}: {
+  book: RenderableBook;
+  flip: boolean;
+  kind: 'feature' | 'review';
+  treatment: CollageCardTreatment;
+}) {
+  const look = CARD_LOOKS[kind];
   return (
     <PaperCard
-      className="reading__feature"
-      edge="soft-a"
-      innerClassName="reading__featureInner"
-      tiltDeg={-1}
-      tone="cream"
+      className={cx('reading__card', `reading__card--${kind}`, flip && 'reading__card--flip')}
+      edge={look.edge}
+      innerClassName="reading__reviewInner"
+      tiltDeg={treatment.tiltDeg * look.tiltScale}
+      tone={treatment.tone}
     >
-      <BookCover book={book} className="reading__featureCover" preload={true} width={240} />
-      <div className="reading__featureBody">
-        <PaperTag className="reading__featureTag" tiltDeg={-2.5} tone="ochre">
-          {tag}
-        </PaperTag>
-        <h2 className="reading__featureTitle">{book.title}</h2>
+      <CoverPrint book={book} width={look.coverWidth} />
+      <div className="reading__head">
+        <h3 className="reading__bookTitle">{book.title}</h3>
         <p className="reading__author">{book.author}</p>
-        <BookMeta book={book} withYear={true} />
-        {book.review ? <p className="reading__featureReview">{book.review}</p> : null}
+        {hasMeta(book) ? (
+          <PaperTag
+            className="reading__stamp"
+            edge="quad-d"
+            tiltDeg={flip ? 2.5 : -2.5}
+            tone={slipTone(treatment.tone)}
+          >
+            <BookMeta book={book} withYear={false} />
+          </PaperTag>
+        ) : null}
       </div>
+      <PaperCard
+        className="reading__slip"
+        edge="torn-c"
+        innerClassName="reading__slipInner"
+        tiltDeg={flip ? -0.6 : 0.6}
+        tone={slipTone(treatment.tone)}
+      >
+        <p>{book.review}</p>
+      </PaperCard>
     </PaperCard>
   );
 }
 
-export function BookCard({
+/** A book with no review, as a small tilted print. */
+export function CoverCard({
   book,
   treatment,
 }: {
   book: RenderableBook;
   treatment: CollageCardTreatment;
 }) {
+  const look = CARD_LOOKS.cover;
   return (
     <PaperCard
-      className="reading__book"
-      edge="quad-a"
-      innerClassName="reading__bookInner"
-      tiltDeg={treatment.tiltDeg}
+      className="reading__card reading__card--cover"
+      edge={look.edge}
+      innerClassName="reading__coverInner"
+      tiltDeg={treatment.tiltDeg * look.tiltScale}
       tone={treatment.tone}
     >
-      <BookCover book={book} width={260} />
-      <h3 className="reading__title">{book.title}</h3>
+      <CoverPrint book={book} width={look.coverWidth} />
+      <h3 className="reading__bookTitle">{book.title}</h3>
       <p className="reading__author">{book.author}</p>
-      <BookMeta book={book} withYear={false} />
-      {book.review ? (
-        <details className="reading__note">
-          <summary>
-            <span className="reading__review">{book.review}</span>
-          </summary>
-        </details>
+      {hasMeta(book) ? (
+        <p className="reading__meta">
+          <BookMeta book={book} withYear={false} />
+        </p>
       ) : null}
     </PaperCard>
   );

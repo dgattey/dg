@@ -127,6 +127,12 @@ export const CUT_OUT_PLACEMENTS = {
     ['portrait-monstera', 'monstera', 'viridian', 1020, -34, -70, -62, 'all', 0],
     ['portrait-philo', 'philo', 'olive', 380, 28, 58, 62, 'desktop', 0],
   ]),
+  readingHero: definePlacements([
+    ['reading-monstera', 'monstera', 'leaf', 150, -22, -6, -14, 'desktop', 0],
+    ['reading-fern', 'fern', 'olive', 170, 28, 92, 62, 'desktop', 0],
+    ['reading-star-upper', 'star5', 'ochre', 42, 14, 64, -6, 'desktop', 1],
+    ['reading-star-lower', 'star4', 'rose', 36, -18, 24, 94, 'desktop', 1],
+  ]),
   workSheet: definePlacements([
     ['work-algae', 'algae', 'cream', 330, -8, -4, 2, 'all', 1],
     ['work-star-upper', 'star5', 'cream', 54, 14, 21, 3, 'all', 1],
@@ -153,7 +159,7 @@ export const CUT_OUT_PLACEMENTS = {
     ['work-seaweed2', 'seaweed2', 'cream', 220, -14, 88, 70, 'desktop', 1],
   ]),
 } satisfies Record<
-  'helloSheet' | 'portrait' | 'workSheet' | 'moreWork' | 'coda',
+  'helloSheet' | 'portrait' | 'readingHero' | 'workSheet' | 'moreWork' | 'coda',
   ReadonlyArray<CutOutPlacement>
 >;
 

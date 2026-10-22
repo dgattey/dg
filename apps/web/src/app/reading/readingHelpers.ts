@@ -71,6 +71,26 @@ export function featuredBook(books: ReadonlyArray<RenderableBook>): FeaturedBook
   return reviewed ? { book: reviewed, tag: 'Latest review' } : null;
 }
 
+/** A five-star review gets a full-width card, any other review a half-width card, and a bare rating a small cover print. */
+export type BookCardKind = 'feature' | 'review' | 'cover';
+
+export function bookCardKind(book: RenderableBook): BookCardKind {
+  if (book.review === null) {
+    return 'cover';
+  }
+  return book.rating === 5 ? 'feature' : 'review';
+}
+
+export function shelfStats(books: ReadonlyArray<RenderableBook>): {
+  fiveStars: number;
+  total: number;
+} {
+  return {
+    fiveStars: books.filter(READING_FILTERS.fiveStars.matches).length,
+    total: books.length,
+  };
+}
+
 export function extractBookYear(book: RenderableBook): string {
   return book.readDateFinished?.match(/^(\d{4})/)?.[1] ?? 'Earlier';
 }
