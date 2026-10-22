@@ -471,7 +471,7 @@ html[data-color-scheme="dark"] .cutNightOnly {
   margin-inline: 0.012em;
 }
 /* Each page renders exactly one, so every page's title morphs into the next one's. */
-html:not(:active-view-transition-type(album-open, album-close)) .cutHeading {
+html:active-view-transition-type(page-open, page-close) .cutHeading {
   view-transition-name: page-title;
 }
 

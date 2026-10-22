@@ -8,6 +8,9 @@
   padding-top: 20px;
   pointer-events: none;
 }
+html:active-view-transition-type(page-open, page-close) .chrome__header {
+  view-transition-name: site-header;
+}
 .chrome__header > * {
   pointer-events: auto;
 }

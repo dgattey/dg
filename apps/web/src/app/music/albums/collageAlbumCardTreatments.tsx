@@ -104,26 +104,6 @@ export function CollageAlbumSkeletonGrid({ tileCount }: { tileCount: number }) {
   );
 }
 
-export function CollageAlbumReserveGrid({
-  albums,
-}: {
-  albums: ReadonlyArray<{ artistNames: string; id: string; name: string }>;
-}) {
-  return (
-    <div aria-hidden="true" className="music__gridSkeleton music__albumReserve">
-      {albums.map((album, index) => (
-        <CollageAlbumPaper key={album.id} treatment={collageCardTreatment(index)}>
-          <div className="music__art" />
-          <span className="music__caption">
-            <strong className="music__albumName">{album.name}</strong>
-            <span className="music__artist">{album.artistNames}</span>
-          </span>
-        </CollageAlbumPaper>
-      ))}
-    </div>
-  );
-}
-
 export function CollageHistorySkeleton() {
   return (
     <div aria-label="Loading listening history" className="music__historySkeleton" role="status">
