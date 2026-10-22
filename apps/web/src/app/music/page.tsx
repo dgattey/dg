@@ -9,15 +9,13 @@ import { Suspense } from 'react';
 import { getServerTime } from '../../services/getServerTime';
 import { getMusicHistory } from '../../services/music';
 import { HISTORY_BACKDROP } from '../collage/backdrops';
-import { CollageBackdrop } from '../collage/CollageBackdrop';
-import { CutLetters } from '../collage/CutLetters';
-import { PaperTag } from '../collage/PaperTag';
 import { markdownAlternates } from '../layouts/markdownAlternates';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
 import { CollageHistorySkeleton } from './albums/collageAlbumCardTreatments';
 import { groupTracksByDate } from './groupTracksByDate';
-import { CollageMusicStatus, MusicHistorySections } from './MusicHistorySections';
+import { MusicHistorySections, NoListeningHistory } from './MusicHistorySections';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
+import { MusicPageShell } from './MusicPageShell';
 
 const TITLE = musicDestinationLabel(musicRoute);
 
@@ -46,17 +44,7 @@ async function MusicHistory() {
   const sections = groupTracksByDate(tracks, serverTime);
 
   if (sections.length === 0) {
-    return (
-      <CollageMusicStatus
-        tag={
-          <PaperTag className="collagePin music__stateTag" tiltDeg={-3} tone="ochre">
-            Spotify
-          </PaperTag>
-        }
-      >
-        <p>No listening history yet.</p>
-      </CollageMusicStatus>
-    );
+    return <NoListeningHistory />;
   }
 
   return (
@@ -71,20 +59,12 @@ async function MusicHistory() {
   );
 }
 
-/**
- * Page shell stays synchronous so it commits in the same render as the
- * outgoing page. Awaiting here instead would suspend the whole route, the old
- * page would already be unmounted by the time this arrives, and the view
- * transition would have nothing to animate away from.
- */
 export default function MusicPage() {
   return (
-    <section aria-label={TITLE} className="collageBackdropHost music__historyLayout">
-      <CollageBackdrop backdrop={HISTORY_BACKDROP} />
-      <CutLetters className="collagePageTitle" text={TITLE} />
+    <MusicPageShell backdrop={HISTORY_BACKDROP} title={TITLE}>
       <Suspense fallback={<CollageHistorySkeleton />}>
         <MusicHistory />
       </Suspense>
-    </section>
+    </MusicPageShell>
   );
 }

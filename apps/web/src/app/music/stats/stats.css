@@ -1,45 +1,4 @@
-/* Listening stats: intro cluster, then cut paper totals, the podium, and ragged bands of cards. */
-
-.stats__layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  row-gap: 44px;
-  width: 100%;
-  padding-block: 40px 56px;
-}
-/* Same title-left, controls-right split as the favorite albums header. */
-.stats__intro {
-  display: grid;
-  grid-template-areas: "title title title title title title nav nav nav nav nav nav";
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  align-items: center;
-}
-.stats__intro > .collagePageTitle {
-  grid-area: title;
-}
-.stats__cluster {
-  position: relative;
-  z-index: 3;
-  display: grid;
-  grid-area: nav;
-  gap: 16px;
-  justify-items: end;
-}
-.stats__nav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  justify-content: flex-end;
-}
-.stats__lede {
-  max-width: 400px;
-  padding: 14px 18px 15px;
-  font: 400 var(--type-body) / 1.5 var(--body);
-  text-align: right;
-}
-.stats__empty {
-  justify-self: start;
-}
+/* Listening stats: cut paper totals, the podium, and ragged bands of cards. */
 
 .stats__sections {
   position: relative;
@@ -241,16 +200,16 @@
 }
 
 /* A day of listening */
-.stats__shift--desk {
+.stats__shift--morning {
+  --shift: var(--ochre);
+}
+.stats__shift--afternoon {
   --shift: var(--cobalt);
 }
 .stats__shift--evening {
   --shift: var(--viridian);
 }
-.stats__shift--rest {
-  --shift: var(--ochre);
-}
-.stats__shift--night {
+.stats__shift--lateNight {
   --shift: var(--rose);
 }
 .stats__shifts {
@@ -414,20 +373,6 @@
 }
 
 @media (max-width: 1000px) {
-  .stats__intro {
-    grid-template-areas: "title" "nav";
-    grid-template-columns: minmax(0, 1fr);
-    row-gap: 24px;
-  }
-  .stats__cluster {
-    justify-items: start;
-  }
-  .stats__nav {
-    justify-content: flex-start;
-  }
-  .stats__lede {
-    text-align: left;
-  }
   .stats__band {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -439,14 +384,7 @@
   }
 }
 
-@media (max-width: 820px) {
-  .stats__layout {
-    padding-block-start: 16px;
-  }
-}
-
 @media (max-width: 600px) {
-  .stats__layout,
   .stats__sections {
     row-gap: 36px;
   }

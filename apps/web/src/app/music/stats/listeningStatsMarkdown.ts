@@ -5,13 +5,16 @@ import { getListeningStats } from '../../../services/musicStats';
 import { relatedPageLinksMarkdown } from '../../llm-markdown/relatedPageLinksMarkdown';
 import { SITE_NAME } from '../../metadata';
 import {
+  DAY_PARTS,
   formatCount,
   formatDay,
+  formatDayPartHours,
   formatHourRange,
   formatMonth,
   formatPacificDay,
   formatPercent,
   peakHours,
+  playsInDayPart,
   weekdayExtremes,
 } from './listeningStatsFormat';
 
@@ -60,6 +63,10 @@ export async function getListeningStatsMarkdown(): Promise<string> {
         '## When',
         [
           `- Peak hours: ${formatHourRange(peak.start, 2)} Pacific, ${formatPercent(peak.plays, stats.plays)} of plays`,
+          ...DAY_PARTS.map(
+            ({ label, part, startHour }) =>
+              `- ${label} (${formatDayPartHours(startHour)}): ${formatPercent(playsInDayPart(stats.hours, part), stats.plays)} of plays`,
+          ),
           `- Busiest day: ${busiest.name} (${formatCount(busiest.plays)}); quietest: ${quietest.name} (${formatCount(quietest.plays)})`,
         ].join('\n'),
         '## Front to back',

@@ -1,4 +1,5 @@
 import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
+import { groupAdjacentAlbumPlays } from './groupAdjacentAlbumPlays';
 
 export type TrackSection = {
   label: string;
@@ -52,6 +53,39 @@ function formatMonthYear(date: Date): string {
   return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
 }
 
+/** Windows relative to now, each one inside the next. */
+const RECENT_LABELS = ['Today', 'This week', 'This month'];
+
+/** Fewer album cards than this reads as a stranded row rather than a section. */
+const MIN_SECTION_CARDS = 3;
+
+/**
+ * Folds a sparse recent section into the next one when that one is also
+ * relative, so one play today joins "This week" instead of sitting alone.
+ * Calendar months never absorb a recent section, since "September 2026" would
+ * then claim plays from October.
+ */
+function foldSparseRecentSections(sections: Array<TrackSection>): Array<TrackSection> {
+  const folded: Array<TrackSection> = [];
+  for (const section of sections) {
+    const previous = folded.at(-1);
+    if (
+      previous &&
+      RECENT_LABELS.includes(previous.label) &&
+      RECENT_LABELS.includes(section.label) &&
+      groupAdjacentAlbumPlays(previous.tracks).length < MIN_SECTION_CARDS
+    ) {
+      folded[folded.length - 1] = {
+        label: section.label,
+        tracks: [...previous.tracks, ...section.tracks],
+      };
+    } else {
+      folded.push(section);
+    }
+  }
+  return folded;
+}
+
 /**
  * Gets the section label for a track based on when it was played.
  */
@@ -78,7 +112,8 @@ function getSectionLabel(playedAt: Date, now: Date): string {
  * - Calendar months — "January 2026", "December 2025", etc.
  *
  * Tracks are expected to arrive in playedAt DESC order, so sections
- * naturally appear in chronological order (newest first).
+ * naturally appear in chronological order (newest first). A recent section
+ * with fewer than three album cards folds into the next recent one.
  */
 export function groupTracksByDate(
   tracks: Array<HistoryTrack>,
@@ -104,5 +139,5 @@ export function groupTracksByDate(
     currentSection.tracks.push(track);
   }
 
-  return sections;
+  return foldSparseRecentSections(sections);
 }

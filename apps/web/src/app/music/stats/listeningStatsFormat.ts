@@ -18,6 +18,11 @@ const monthFormat = new Intl.DateTimeFormat('en-GB', {
   timeZone: 'UTC',
   year: 'numeric',
 });
+const pacificMonthFormat = new Intl.DateTimeFormat('en-GB', {
+  month: 'short',
+  timeZone: TIME_ZONE,
+  year: 'numeric',
+});
 
 export function formatCount(value: number): string {
   return countFormat.format(Math.round(value));
@@ -45,6 +50,11 @@ export function formatPacificDay(timestamp: string): string {
 /** `2011-07` → `Jul 2011`. */
 export function formatMonth(month: string): string {
   return monthFormat.format(new Date(`${month}-15T12:00:00Z`));
+}
+
+/** A timestamp as the Pacific month it fell in, `Jul 2011`. */
+export function formatPacificMonth(timestamp: string): string {
+  return pacificMonthFormat.format(new Date(timestamp));
 }
 
 /** `2017` → `’17`. */
@@ -86,31 +96,44 @@ export function peakHours(hours: ReadonlyArray<number>, span: number) {
   return { plays: Math.max(best.plays, 0), start: best.start };
 }
 
-export type HourShift = 'desk' | 'evening' | 'rest' | 'night';
-
-/** Which part of the listening day an hour belongs to. */
-export function hourShift(hour: number): HourShift {
-  if (hour >= 13 && hour <= 18) {
-    return 'desk';
-  }
-  if (hour >= 19 || hour === 0) {
-    return 'evening';
-  }
-  if (hour >= 3 && hour <= 6) {
-    return 'night';
-  }
-  return 'rest';
+/** `15` → `3 PM`, `0` → `12 AM`. */
+export function formatHour(hour: number): string {
+  return `${hourOfDay(hour)} ${meridiem(hour)}`;
 }
 
-export const HOUR_SHIFTS: ReadonlyArray<{ label: string; shift: HourShift }> = [
-  { label: 'Desk, 13:00 to 18:59', shift: 'desk' },
-  { label: 'Evening, 19:00 to 00:59', shift: 'evening' },
-  { label: 'Mornings and 01:00 to 02:59', shift: 'rest' },
-  { label: 'Dead of night, 03:00 to 06:59', shift: 'night' },
-];
+/** `15` → `3p`, for dial ticks too tight for a full meridiem. */
+export function formatHourTick(hour: number): string {
+  return `${hourOfDay(hour)}${meridiem(hour) === 'AM' ? 'a' : 'p'}`;
+}
 
-export function playsInShift(hours: ReadonlyArray<number>, shift: HourShift): number {
-  return hours.reduce((sum, plays, hour) => (hourShift(hour) === shift ? sum + plays : sum), 0);
+const DAY_PART_HOURS = 6;
+
+/** The day in four even parts, listed from the start of a waking day. */
+export const DAY_PARTS = [
+  { label: 'Morning', part: 'morning', startHour: 6 },
+  { label: 'Afternoon', part: 'afternoon', startHour: 12 },
+  { label: 'Evening', part: 'evening', startHour: 18 },
+  { label: 'Late night', part: 'lateNight', startHour: 0 },
+] as const;
+
+export type DayPart = (typeof DAY_PARTS)[number]['part'];
+
+/** `6 AM to 12 PM`, naming both ends so every part reads on its own. */
+export function formatDayPartHours(startHour: number): string {
+  return `${formatHour(startHour)} to ${formatHour(startHour + DAY_PART_HOURS)}`;
+}
+
+/** Which part of the day an hour belongs to. */
+export function dayPartOf(hour: number): DayPart {
+  const wrapped = ((hour % 24) + 24) % 24;
+  const found = DAY_PARTS.find(
+    ({ startHour }) => wrapped >= startHour && wrapped < startHour + DAY_PART_HOURS,
+  );
+  return found?.part ?? 'lateNight';
+}
+
+export function playsInDayPart(hours: ReadonlyArray<number>, part: DayPart): number {
+  return hours.reduce((sum, plays, hour) => (dayPartOf(hour) === part ? sum + plays : sum), 0);
 }
 
 export const WEEKDAY_NAMES = [

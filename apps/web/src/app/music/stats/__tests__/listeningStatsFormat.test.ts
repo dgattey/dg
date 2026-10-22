@@ -1,12 +1,16 @@
 import {
+  DAY_PARTS,
+  dayPartOf,
   formatCompact,
+  formatDayPartHours,
+  formatHour,
   formatHourRange,
+  formatHourTick,
   formatMonth,
   formatPercent,
   formatYearTick,
-  hourShift,
   peakHours,
-  playsInShift,
+  playsInDayPart,
   weekdayExtremes,
   weekdayGroups,
 } from '../listeningStatsFormat';
@@ -46,26 +50,39 @@ describe('peakHours', () => {
   });
 });
 
-describe('hourShift', () => {
-  it('splits the day into desk, evening, dead of night, and the rest', () => {
-    expect([13, 18, 19, 0, 1, 3, 6, 7].map(hourShift)).toEqual([
-      'desk',
-      'desk',
+describe('formatHour', () => {
+  it('reads midnight and noon as 12 on a 12-hour clock', () => {
+    expect([0, 6, 12, 18].map(formatHour)).toEqual(['12 AM', '6 AM', '12 PM', '6 PM']);
+    expect([0, 6, 12, 18].map(formatHourTick)).toEqual(['12a', '6a', '12p', '6p']);
+  });
+});
+
+describe('dayPartOf', () => {
+  it('splits the day into four six-hour parts on the 6s', () => {
+    expect([6, 11, 12, 17, 18, 23, 0, 5].map(dayPartOf)).toEqual([
+      'morning',
+      'morning',
+      'afternoon',
+      'afternoon',
       'evening',
       'evening',
-      'rest',
-      'night',
-      'night',
-      'rest',
+      'lateNight',
+      'lateNight',
     ]);
   });
 
-  it('accounts for every play exactly once across the shifts', () => {
+  it('labels each part with both ends of its hours', () => {
+    expect(DAY_PARTS.map(({ startHour }) => formatDayPartHours(startHour))).toEqual([
+      '6 AM to 12 PM',
+      '12 PM to 6 PM',
+      '6 PM to 12 AM',
+      '12 AM to 6 AM',
+    ]);
+  });
+
+  it('accounts for every play exactly once across the parts', () => {
     const hours = Array.from({ length: 24 }, (_, hour) => hour + 1);
-    const total = (['desk', 'evening', 'rest', 'night'] as const).reduce(
-      (sum, shift) => sum + playsInShift(hours, shift),
-      0,
-    );
+    const total = DAY_PARTS.reduce((sum, { part }) => sum + playsInDayPart(hours, part), 0);
 
     expect(total).toBe(hours.reduce((sum, plays) => sum + plays, 0));
   });

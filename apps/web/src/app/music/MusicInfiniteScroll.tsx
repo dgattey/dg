@@ -4,9 +4,12 @@ import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
 import { useServerTime } from '@dg/ui/core/ServerTimeContext';
 import { useEffect, useRef, useState } from 'react';
 import { loadMoreMusicHistory } from '../../services/music.actions';
-import { PaperTag } from '../collage/PaperTag';
 import { groupTracksByDate } from './groupTracksByDate';
-import { CollageMusicStatus, MusicHistorySections } from './MusicHistorySections';
+import {
+  CollageMusicStatus,
+  MusicHistorySections,
+  NoListeningHistory,
+} from './MusicHistorySections';
 
 type Props = {
   initialCursor: string | null;
@@ -69,17 +72,7 @@ export function MusicInfiniteScroll({
   const sections = groupTracksByDate(extraTracks, serverTime);
 
   if (!serverRenderedInitial && sections.length === 0) {
-    return (
-      <CollageMusicStatus
-        tag={
-          <PaperTag className="collagePin music__stateTag" tiltDeg={-3} tone="ochre">
-            Spotify
-          </PaperTag>
-        }
-      >
-        <p>No listening history yet.</p>
-      </CollageMusicStatus>
-    );
+    return <NoListeningHistory />;
   }
 
   const body = (
