@@ -1,3 +1,5 @@
+import 'server-only';
+
 /** Where a flat meter grid is centered, in degrees. */
 export type GridOrigin = { lat: number; lng: number };
 
