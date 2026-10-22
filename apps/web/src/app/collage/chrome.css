@@ -603,7 +603,6 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 
 @media (max-width: 480px) {
   .chrome__header {
-    position: relative;
     flex-wrap: wrap;
     gap: 10px;
     row-gap: 8px;
