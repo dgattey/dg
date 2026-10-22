@@ -1,5 +1,5 @@
-import { BRAND_PAIRS } from '@dg/ui/theme/color';
 import type { Metadata, Viewport } from 'next';
+import { NIGHT_PAPER, PAPER_PALETTE } from './collage/paperPalette';
 
 export const SITE_NAME = 'Dylan Gattey';
 export const HOMEPAGE_TITLE = 'Engineer. Problem Solver.';
@@ -47,16 +47,7 @@ export const baseMetadata: Metadata = {
     apple: '/apple-touch-icon.png',
     icon: [
       { sizes: '32x32', url: '/favicon.ico' },
-      {
-        media: '(prefers-color-scheme: light)',
-        type: 'image/svg+xml',
-        url: '/icon-light.svg',
-      },
-      {
-        media: '(prefers-color-scheme: dark)',
-        type: 'image/svg+xml',
-        url: '/icon-dark.svg',
-      },
+      { type: 'image/svg+xml', url: '/icon.svg' },
     ],
   },
   manifest: '/manifest.webmanifest',
@@ -72,11 +63,11 @@ export const baseMetadata: Metadata = {
 export const viewport: Viewport = {
   themeColor: [
     {
-      color: BRAND_PAIRS.defaultBackground[0],
+      color: PAPER_PALETTE.paper,
       media: '(prefers-color-scheme: light)',
     },
     {
-      color: BRAND_PAIRS.defaultBackground[1],
+      color: NIGHT_PAPER,
       media: '(prefers-color-scheme: dark)',
     },
   ],

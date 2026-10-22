@@ -279,9 +279,6 @@ importers:
       '@dg/maps':
         specifier: workspace:*
         version: link:../../packages/maps
-      '@dg/og':
-        specifier: workspace:*
-        version: link:../../packages/og
       '@dg/services':
         specifier: workspace:*
         version: link:../../packages/services
@@ -367,6 +364,9 @@ importers:
       jest-environment-jsdom:
         specifier: 'catalog:'
         version: 30.5.2(supports-color@8.1.1)
+      sharp:
+        specifier: 'catalog:'
+        version: 0.35.5(@types/node@26.6.4)
       tsx:
         specifier: 'catalog:'
         version: 4.23.15
@@ -551,40 +551,6 @@ importers:
       jest:
         specifier: 'catalog:'
         version: 30.5.2(@types/node@26.6.4)(babel-plugin-macros@3.1.0)(esbuild-register@3.6.0(esbuild@0.28.1)(supports-color@8.1.1))(supports-color@8.1.1)
-      typescript:
-        specifier: 'catalog:'
-        version: '@typescript/typescript6@6.0.2'
-
-  packages/og:
-    dependencies:
-      '@dg/shared-core':
-        specifier: workspace:*
-        version: link:../shared-core
-      '@dg/ui':
-        specifier: workspace:*
-        version: link:../ui
-      next:
-        specifier: 'catalog:'
-        version: 16.3.8(@babel/core@7.29.7(supports-color@8.1.1))(@types/node@26.6.4)(babel-plugin-macros@3.1.0)(babel-plugin-react-compiler@1.0.0)(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
-      react:
-        specifier: 'catalog:'
-        version: 19.3.0
-    devDependencies:
-      '@dg/tsconfig':
-        specifier: workspace:*
-        version: link:../tsconfig
-      '@types/node':
-        specifier: 'catalog:'
-        version: 26.6.4
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.3.0
-      '@typescript/native':
-        specifier: 'catalog:'
-        version: typescript@7.0.2
-      dotenv-mono:
-        specifier: 'catalog:'
-        version: 1.5.1
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
