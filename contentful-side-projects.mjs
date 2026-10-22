@@ -59,7 +59,7 @@ async function inspect() {
     }
   }
   for (const query of ['Photos', 'Sconeos', 'Scone', 'Saga']) {
-    const { items } = await cma(`/entries?query=${encodeURIComponent(query)}&limit=20&select=sys.id,sys.contentType,sys.version,sys.publishedVersion,fields.title,fields.name,fields.slug,fields.url`);
+    const { items } = await cma(`/entries?query=${encodeURIComponent(query)}&limit=20`);
     console.log(`== search ${query}: ${items.map((item) => `${item.sys.contentType.sys.id}:${item.sys.id}:${JSON.stringify(local(item.fields))}`).join(' | ') || 'none'}`);
     const assets = await cma(`/assets?query=${encodeURIComponent(query)}&limit=20`);
     console.log(`== asset search ${query}: ${assets.items.map((asset) => `${asset.sys.id}:${asset.fields.title?.[LOCALE]}:${asset.fields.file?.[LOCALE]?.fileName}`).join(' | ') || 'none'}`);
@@ -127,6 +127,81 @@ async function patchEntry({ entryId, fields: patch, expectedVersion }) {
   console.log(`entry ${entryId} published v${published.sys.publishedVersion} ${JSON.stringify(local(published.fields))}`);
 }
 
+async function processAndPublishAsset(asset) {
+  await cma(`/assets/${asset.sys.id}/files/${LOCALE}/process`, {
+    headers: { 'X-Contentful-Version': String(asset.sys.version) },
+    method: 'PUT',
+  });
+  let processed = asset;
+  for (let attempt = 0; attempt < 20; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    processed = await cma(`/assets/${asset.sys.id}`);
+    if (processed.fields.file?.[LOCALE]?.url) break;
+  }
+  if (!processed.fields.file?.[LOCALE]?.url) throw new Error(`asset ${asset.sys.id} did not finish processing`);
+  return await cma(`/assets/${asset.sys.id}/published`, {
+    headers: { 'X-Contentful-Version': String(processed.sys.version) },
+    method: 'PUT',
+  });
+}
+
+const localize = (fields, refs) =>
+  Object.fromEntries(
+    Object.entries(fields).map(([key, value]) => {
+      const ref = value?.$ref && refs.get(value.$ref);
+      if (value?.$ref && !ref) throw new Error(`unknown ref ${value.$ref}`);
+      return [key, { [LOCALE]: ref ? { sys: { id: ref.id, linkType: ref.linkType, type: 'Link' } } : value }];
+    }),
+  );
+
+async function createAll(steps, dir) {
+  const refs = new Map();
+  for (const step of steps) {
+    if (step.kind === 'asset') {
+      const upload = await cma(`https://upload.contentful.com/spaces/${SPACE}/uploads`, {
+        body: readFileSync(join(dir, step.file)),
+        headers: { 'Content-Type': 'application/octet-stream' },
+        method: 'POST',
+      });
+      const asset = await cma('/assets', {
+        body: JSON.stringify({
+          fields: {
+            description: { [LOCALE]: step.description },
+            file: {
+              [LOCALE]: {
+                contentType: 'image/png',
+                fileName: step.file,
+                uploadFrom: { sys: { id: upload.sys.id, linkType: 'Upload', type: 'Link' } },
+              },
+            },
+            title: { [LOCALE]: step.title },
+          },
+        }),
+        method: 'POST',
+      });
+      const published = await processAndPublishAsset(asset);
+      refs.set(step.key, { id: published.sys.id, linkType: 'Asset' });
+      console.log(`created asset ${step.key} ${published.sys.id} published v${published.sys.publishedVersion}`);
+    } else if (step.kind === 'entry') {
+      for (const [field, value] of Object.entries(step.uniqueBy ?? {})) {
+        const { items } = await cma(`/entries?content_type=${step.contentType}&fields.${field}=${encodeURIComponent(value)}&limit=1`);
+        if (items.length > 0) throw new Error(`${step.contentType} with ${field}=${value} already exists: ${items[0].sys.id}`);
+      }
+      const entry = await cma('/entries', {
+        body: JSON.stringify({ fields: localize(step.fields, refs) }),
+        headers: { 'X-Contentful-Content-Type': step.contentType },
+        method: 'POST',
+      });
+      const published = await cma(`/entries/${entry.sys.id}/published`, {
+        headers: { 'X-Contentful-Version': String(entry.sys.version) },
+        method: 'PUT',
+      });
+      refs.set(step.key, { id: published.sys.id, linkType: 'Entry' });
+      console.log(`created entry ${step.key} ${step.contentType} ${published.sys.id} published v${published.sys.publishedVersion}`);
+    }
+  }
+}
+
 const [mode, planPath] = process.argv.slice(2);
 if (mode === 'inspect') {
   await inspect();
@@ -134,6 +209,7 @@ if (mode === 'inspect') {
   const plan = JSON.parse(readFileSync(planPath, 'utf8'));
   for (const step of plan.assets ?? []) await replaceAsset({ ...step, file: join(dirname(planPath), step.file) });
   for (const step of plan.entries ?? []) await patchEntry(step);
+  await createAll(plan.create ?? [], dirname(planPath));
   await inspect();
 } else {
   throw new Error('mode must be inspect or apply');

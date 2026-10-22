@@ -1,0 +1,106 @@
+{
+  "assets": [
+    {
+      "assetId": "4W9lYCpzsDfuEuWBRDOYSi",
+      "expectedVersion": 9,
+      "file": "saga-app-icon.png"
+    },
+    {
+      "assetId": "2a9fQUV3pYHQtpIWviOcbi",
+      "expectedVersion": 9,
+      "file": "sconeos-app-icon.png"
+    }
+  ],
+  "entries": [
+    {
+      "entryId": "2ZDEM3yNoA3xI8E7phfJhR",
+      "expectedVersion": 2,
+      "fields": {
+        "summary": "Track books, notes, and reading progress",
+        "description": {
+          "nodeType": "document",
+          "data": {},
+          "content": [
+            {
+              "nodeType": "paragraph",
+              "data": {},
+              "content": [
+                {
+                  "nodeType": "text",
+                  "value": "Track books, private notes, and reading progress.",
+                  "marks": [],
+                  "data": {}
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "create": [
+    {
+      "kind": "asset",
+      "key": "icon",
+      "file": "gattey-photos-icon.png",
+      "title": "Gattey Photos app icon",
+      "description": "Gattey Photos app icon for side projects card"
+    },
+    {
+      "kind": "entry",
+      "key": "link",
+      "contentType": "link",
+      "uniqueBy": {
+        "url": "https://photos.gattey.com"
+      },
+      "fields": {
+        "title": "Gattey Photos",
+        "url": "https://photos.gattey.com"
+      }
+    },
+    {
+      "kind": "entry",
+      "key": "project",
+      "contentType": "project",
+      "uniqueBy": {
+        "title": "Gattey Photos"
+      },
+      "fields": {
+        "title": "Gattey Photos",
+        "creationDate": "2026-05-28",
+        "type": [
+          "macOS App",
+          "iOS App"
+        ],
+        "layout": "regular",
+        "link": {
+          "$ref": "link"
+        },
+        "thumbnail": {
+          "$ref": "icon"
+        },
+        "description": {
+          "nodeType": "document",
+          "data": {},
+          "content": [
+            {
+              "nodeType": "paragraph",
+              "data": {},
+              "content": [
+                {
+                  "nodeType": "text",
+                  "value": "Family photo gallery with daily Now Showing picks, kept in sync on Bloomin8 e-ink frames.",
+                  "marks": [],
+                  "data": {}
+                }
+              ]
+            }
+          ]
+        },
+        "annotationDirection": "bottomMiddle",
+        "isSideProject": true,
+        "summary": "Family photos on e-ink frames"
+      }
+    }
+  ]
+}
