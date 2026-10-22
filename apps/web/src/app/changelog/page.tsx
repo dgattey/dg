@@ -1,0 +1,56 @@
+import 'server-only';
+import '../collage/pills.css';
+import '../music/stats/statsShapes.css';
+import './changelog.css';
+
+import { changelogRoute } from '@dg/shared-core/routes/app';
+import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import { getChangelogReleases } from '../../services/github';
+import { HISTORY_BACKDROP } from '../collage/backdrops';
+import { CollageBackdrop } from '../collage/CollageBackdrop';
+import { CutLetters } from '../collage/CutLetters';
+import { PaperCard } from '../collage/PaperCard';
+import { markdownAlternates } from '../layouts/markdownAlternates';
+import { ChangelogLedger } from './ChangelogLedger';
+
+const TITLE = 'Changelog';
+const DESCRIPTION =
+  'Every release shipped on dylangattey.com, from the latest cut back to the beginning.';
+
+export const metadata: Metadata = {
+  alternates: markdownAlternates(changelogRoute),
+  description: DESCRIPTION,
+  title: TITLE,
+};
+
+function ChangelogStatus({ children }: { children: string }) {
+  return (
+    <PaperCard className="changelog__status" tiltDeg={-1} tone="cream">
+      <p role="status">{children}</p>
+    </PaperCard>
+  );
+}
+
+async function ChangelogContent() {
+  const releases = await getChangelogReleases();
+  if (releases.length === 0) {
+    return <ChangelogStatus>No releases found.</ChangelogStatus>;
+  }
+  return <ChangelogLedger releases={releases} />;
+}
+
+export default function ChangelogPage() {
+  return (
+    <section aria-label={TITLE} className="collageBackdropHost changelog__layout">
+      <CollageBackdrop backdrop={HISTORY_BACKDROP} />
+      <div className="changelog__intro">
+        <CutLetters className="collagePageTitle" text={TITLE} />
+        <p className="changelog__lede">{DESCRIPTION}</p>
+      </div>
+      <Suspense fallback={<ChangelogStatus>Loading releases…</ChangelogStatus>}>
+        <ChangelogContent />
+      </Suspense>
+    </section>
+  );
+}

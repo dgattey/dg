@@ -16,6 +16,10 @@ export const readingRoute = '/reading' as const;
 
 export const stravaRoute = '/strava' as const;
 
+export const changelogRoute = '/changelog' as const;
+
+export const siteMapRoute = '/site-map' as const;
+
 /** Query key naming the album expanded in place on the favorite albums page. */
 export const ALBUM_PARAM = 'album' as const;
 
@@ -95,6 +99,20 @@ export const markdownPages = [
     priority: 0.6,
     summary: 'Routes, yearly miles, and recent outings from my Strava history',
     title: 'Big map',
+  },
+  {
+    changeFrequency: 'daily',
+    path: changelogRoute,
+    priority: 0.5,
+    summary: 'Every version and release shipped on dylangattey.com',
+    title: 'Changelog',
+  },
+  {
+    changeFrequency: 'weekly',
+    path: siteMapRoute,
+    priority: 0.5,
+    summary: 'Directory of pages, agent endpoints, side projects, and external links',
+    title: 'Site map',
   },
 ] as const satisfies ReadonlyArray<MarkdownPageDefinition>;
 
