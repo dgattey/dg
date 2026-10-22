@@ -41,6 +41,23 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  outputFileTracingExcludes: {
+    '**': [
+      '../../node_modules/.pnpm/@img+sharp*/**',
+      '../../node_modules/.pnpm/sharp@*/**',
+      '../../node_modules/**/@img/sharp*/**',
+      '../../node_modules/**/sharp/**',
+      '../../node_modules/**/moment/locale/**',
+      '../../node_modules/**/react/**/*.development.js',
+      '../../node_modules/**/next/dist/compiled/@vercel/og/index.edge.js',
+      '../../node_modules/**/next/dist/compiled/@vercel/og/Geist-Regular.ttf',
+      '../../node_modules/**/sequelize/lib/dialects/{db2,ibmi,mariadb,mssql,mysql,oracle,snowflake,sqlite}/{connection-manager,index,query,query-generator,query-interface}*',
+    ],
+    '**/page': [
+      '../../node_modules/**/next/dist/compiled/@vercel/og/**',
+      './.next/server/assets/SFPro*.ttf',
+    ],
+  },
   reactCompiler: true,
   reactStrictMode: true,
   // Disables the Sequelize warning about the `sequelize` package not being found
