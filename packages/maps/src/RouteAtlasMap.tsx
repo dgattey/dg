@@ -174,11 +174,15 @@ function apply(atlas: KeptAtlas) {
   showOnly(map, wanted.visible);
 }
 
-/** Builds the map inside `host` so it opens fitted to the host's real size. */
-async function createAtlas(host: HTMLElement, bounds: GeoBounds, want: Wanted) {
+/**
+ * Builds the map inside `host` so it opens fitted to the host's real size, in
+ * whichever theme is wanted once MapLibre has loaded.
+ */
+async function createAtlas(host: HTMLElement, bounds: GeoBounds, first: Wanted) {
   const { Map: MapLibre, setWorkerUrl } = await import('maplibre-gl');
   // MapLibre finds its worker next to its own module, which bundling moves.
   setWorkerUrl(new URL('maplibre-gl/dist/maplibre-gl-worker.mjs', import.meta.url).href);
+  const want = wanted ?? first;
   const element = document.createElement('div');
   element.style.height = '100%';
   element.style.width = '100%';

@@ -82,12 +82,11 @@ describe('summarizeStravaHistory', () => {
   });
 
   it('orders outings newest first and flattens the fields the views read', () => {
-    expect(summary?.recent.map((outing) => outing.id)).toEqual([3, 1, 2, 5, 4]);
+    expect(summary?.outings.map((outing) => outing.id)).toEqual([3, 1, 2, 5, 4]);
     expect(summary?.latest).toEqual({
       description: null,
       distanceMeters: 120_000,
       elevationGainMeters: 1500,
-      gearName: 'Loaner',
       id: 3,
       movingTimeSeconds: 0,
       name: 'Outing 3',
@@ -96,11 +95,25 @@ describe('summarizeStravaHistory', () => {
       startDate: '2026-10-20T15:00:00.000Z',
       url: 'https://www.strava.com/activities/3',
     });
-    expect(summary?.recent[2]).toMatchObject({
-      description: 'Fog the whole way',
+    expect(summary?.outings[2]).toEqual({
+      distanceMeters: 8000,
+      elevationGainMeters: 250,
+      id: 2,
+      movingTimeSeconds: 0,
+      name: 'Outing 2',
       polyline: 'detailed2',
       sport: 'run',
+      startDate: '2026-01-01T03:00:00.000Z',
+      url: 'https://www.strava.com/activities/2',
     });
+  });
+
+  it('keeps the latest outing’s note, trimmed', () => {
+    const noted = summarizeStravaHistory(
+      [activity({ description: '  Fog the whole way  ', id: 8, startDate: NOW.toISOString() })],
+      NOW,
+    );
+    expect(noted?.latest.description).toBe('Fog the whole way');
   });
 
   it('maps Strava sport types onto the four sports', () => {
@@ -109,7 +122,7 @@ describe('summarizeStravaHistory', () => {
         types.map((type, i) => activity({ id: i + 1, startDate: NOW.toISOString(), ...type })),
         NOW,
       )
-        ?.recent.toSorted((a, b) => a.id - b.id)
+        ?.outings.toSorted((a, b) => a.id - b.id)
         .map((outing) => outing.sport);
 
     expect(
@@ -129,38 +142,12 @@ describe('summarizeStravaHistory', () => {
         { sportType: 'VirtualRun', type: 'Run' },
         { type: 'Hike' },
         { type: 'Walk' },
-        { sportType: 'Kayaking', type: 'Ride' },
+        { sportType: 'AlpineSki', type: 'AlpineSki' },
       ]),
     ).toEqual(['run', 'run', 'run', 'hike', 'hike', 'other']);
   });
 
-  it('caps recent outings at six', () => {
-    const many = Array.from({ length: 8 }, (_, i) =>
-      activity({ id: i + 1, startDate: `2026-02-0${i + 1}T10:00:00Z` }),
-    );
-    expect(summarizeStravaHistory(many, NOW)?.recent.map((outing) => outing.id)).toEqual([
-      8, 7, 6, 5, 4, 3,
-    ]);
-  });
-
-  it('ranks climbs by gain and skips flat outings', () => {
-    expect(summary?.biggestClimbs.map((outing) => outing.id)).toEqual([3, 4, 1, 2]);
-  });
-
-  it('picks the longest outing by distance', () => {
-    expect(summary?.longest.id).toBe(3);
-  });
-
-  it('keeps one route per outing with a polyline, newest first, tagged by UTC year', () => {
-    expect(summary?.routes).toEqual([
-      { id: 3, polyline: 'summary3', sport: 'ride', year: 2026 },
-      { id: 1, polyline: 'summary1', sport: 'ride', year: 2026 },
-      { id: 2, polyline: 'detailed2', sport: 'run', year: 2026 },
-      { id: 5, polyline: 'summary5', sport: 'other', year: 2025 },
-    ]);
-  });
-
-  it('totals lifetime, this year, and every year with an outing', () => {
+  it('totals lifetime and this year', () => {
     expect(summary?.totals).toEqual({
       distanceMeters: 165_000,
       elevationGainMeters: 2750,
@@ -173,19 +160,63 @@ describe('summarizeStravaHistory', () => {
       outings: 3,
       year: 2026,
     });
-    expect(summary?.years).toEqual([
-      { distanceMeters: 5000, elevationGainMeters: 600, outings: 1, year: 2024 },
-      { distanceMeters: 2000, elevationGainMeters: 0, outings: 1, year: 2025 },
-      { distanceMeters: 158_000, elevationGainMeters: 2150, outings: 3, year: 2026 },
+  });
+
+  it('names each bike from any ride that carries its gear and counts every ride on it', () => {
+    const rides = [
+      activity({
+        gear: { distance: 9_000_000, id: 'b1', name: 'Cruz' },
+        id: 20,
+        startDate: '2026-10-01T10:00:00Z',
+      }),
+      activity({ gearId: 'b1', id: 21, startDate: '2023-08-12T10:00:00Z' }),
+      activity({
+        gear: { distance: 5_300_000, id: 'b2', name: 'Prince' },
+        id: 22,
+        startDate: '2026-10-20T10:00:00Z',
+      }),
+      activity({ gearId: 'b2', id: 23, startDate: '2024-07-26T10:00:00Z' }),
+      activity({ gearId: 'b2', id: 24, startDate: '2025-05-01T10:00:00Z' }),
+      activity({ gearId: 'b3', id: 25, startDate: '2021-01-01T10:00:00Z' }),
+      activity({
+        gear: { distance: 800_000, id: 'g4', name: 'Trail shoes' },
+        id: 26,
+        startDate: '2026-03-01T10:00:00Z',
+        type: 'Run',
+      }),
+    ];
+
+    expect(summarizeStravaHistory(rides, NOW)?.bikes).toEqual([
+      {
+        firstYear: 2023,
+        id: 'b1',
+        lastYear: 2026,
+        name: 'Cruz',
+        odometerMeters: 9_000_000,
+        rides: 2,
+      },
+      {
+        firstYear: 2024,
+        id: 'b2',
+        lastYear: 2026,
+        name: 'Prince',
+        odometerMeters: 5_300_000,
+        rides: 3,
+      },
     ]);
   });
 
-  it('buckets this year’s climbing by UTC month', () => {
-    expect(summary?.monthlyClimbingMeters).toEqual([250, 0, 400, 0, 0, 0, 0, 0, 0, 1500, 0, 0]);
-  });
-
-  it('reads the odometer from the newest outing whose gear reports a distance', () => {
-    expect(summary?.odometer).toEqual({ distanceMeters: 7_828_686, gearName: 'Cruz' });
+  it('skips a named bike Strava reports no odometer for', () => {
+    expect(summary?.bikes).toEqual([
+      {
+        firstYear: 2026,
+        id: 'b1',
+        lastYear: 2026,
+        name: 'Cruz',
+        odometerMeters: 7_828_686,
+        rides: 1,
+      },
+    ]);
   });
 
   it('handles a sparse history with one old outing and nothing else', () => {
@@ -195,16 +226,11 @@ describe('summarizeStravaHistory', () => {
     );
 
     expect(sparse).toEqual({
-      biggestClimbs: [],
+      bikes: [],
       latest: expect.objectContaining({ distanceMeters: 0, id: 7, polyline: null, sport: 'hike' }),
-      longest: expect.objectContaining({ id: 7 }),
-      monthlyClimbingMeters: Array.from({ length: 12 }, () => 0),
-      odometer: null,
-      recent: [expect.objectContaining({ id: 7 })],
-      routes: [],
+      outings: [expect.objectContaining({ id: 7 })],
       thisYear: { distanceMeters: 0, elevationGainMeters: 0, outings: 0, year: 2026 },
       totals: { distanceMeters: 0, elevationGainMeters: 0, firstYear: 2023, outings: 1 },
-      years: [{ distanceMeters: 0, elevationGainMeters: 0, outings: 1, year: 2023 }],
     });
   });
 });

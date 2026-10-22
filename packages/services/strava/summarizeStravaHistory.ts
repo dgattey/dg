@@ -2,17 +2,13 @@ import 'server-only';
 
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import type {
+  StravaBike,
   StravaHistory,
-  StravaOdometer,
+  StravaLogEntry,
   StravaOuting,
-  StravaRouteTrace,
   StravaSport,
   StravaYearTotals,
 } from '@dg/content-models/strava/StravaHistory';
-
-const LISTED_OUTINGS = 6;
-
-const MONTHS_PER_YEAR = 12;
 
 const SPORT_BY_STRAVA_TYPE: Partial<Record<string, StravaSport>> = {
   EBikeRide: 'ride',
@@ -50,7 +46,6 @@ const toOuting = ({ activity, startedAt }: DatedActivity): StravaOuting => ({
   description: activity.description?.trim() || null,
   distanceMeters: activity.distance ?? 0,
   elevationGainMeters: activity.totalElevationGain ?? 0,
-  gearName: activity.gear?.name ?? null,
   id: activity.id,
   movingTimeSeconds: activity.movingTime ?? 0,
   name: activity.name,
@@ -60,103 +55,91 @@ const toOuting = ({ activity, startedAt }: DatedActivity): StravaOuting => ({
   url: activity.url,
 });
 
-const toOdometer = ({ activity: { gear } }: DatedActivity): StravaOdometer | null =>
-  gear?.name && typeof gear.distance === 'number'
-    ? { distanceMeters: gear.distance, gearName: gear.name }
-    : null;
+const yearOf = (outing: StravaLogEntry) => new Date(outing.startDate).getUTCFullYear();
 
-const yearOf = (outing: StravaOuting) => new Date(outing.startDate).getUTCFullYear();
-
-const monthOf = (outing: StravaOuting) => new Date(outing.startDate).getUTCMonth();
-
-const sumOf = (outings: ReadonlyArray<StravaOuting>, pick: (outing: StravaOuting) => number) =>
+const sumOf = (outings: ReadonlyArray<StravaLogEntry>, pick: (outing: StravaLogEntry) => number) =>
   outings.reduce((total, outing) => total + pick(outing), 0);
 
-const yearTotals = (year: number, outings: ReadonlyArray<StravaOuting>): StravaYearTotals => ({
+const yearTotals = (year: number, outings: ReadonlyArray<StravaLogEntry>): StravaYearTotals => ({
   distanceMeters: sumOf(outings, (outing) => outing.distanceMeters),
   elevationGainMeters: sumOf(outings, (outing) => outing.elevationGainMeters),
   outings: outings.length,
   year,
 });
 
-const groupByYear = (outings: ReadonlyArray<StravaOuting>) => {
-  const byYear = new Map<number, Array<StravaOuting>>();
-  for (const outing of outings) {
-    const year = yearOf(outing);
-    const yearOutings = byYear.get(year);
-    if (yearOutings) {
-      yearOutings.push(outing);
-    } else {
-      byYear.set(year, [outing]);
-    }
-  }
-  return byYear;
+const toLogEntry = ({ description: _, ...entry }: StravaOuting): StravaLogEntry => entry;
+
+/** Strava prefixes bike ids with `b` and shoe ids with `g`. */
+const bikeIdOf = ({ gear, gearId }: StravaActivity) => {
+  const id = gear?.id ?? gearId;
+  return id?.startsWith('b') ? id : null;
 };
 
-const findOdometer = (dated: ReadonlyArray<DatedActivity>): StravaOdometer | null => {
-  for (const entry of dated) {
-    const odometer = toOdometer(entry);
-    if (odometer) {
-      return odometer;
-    }
-  }
-  return null;
+/**
+ * Bikes from the outings ridden on them, newest first. Only fully fetched
+ * activities carry the gear's name and odometer, so a bike no stored activity
+ * names is left out; its rides still count once one does.
+ */
+const findBikes = (dated: ReadonlyArray<DatedActivity>): Array<StravaBike> => {
+  const byBike = Map.groupBy(
+    dated.flatMap((entry) => {
+      const id = bikeIdOf(entry.activity);
+      return id ? [{ ...entry, id }] : [];
+    }),
+    ({ id }) => id,
+  );
+  return [...byBike.entries()]
+    .flatMap(([id, rides]): Array<StravaBike> => {
+      const named = rides.find(({ activity }) => activity.gear?.name);
+      const odometer = rides.find(({ activity }) => typeof activity.gear?.distance === 'number');
+      const name = named?.activity.gear?.name;
+      const odometerMeters = odometer?.activity.gear?.distance;
+      const years = rides.map(({ startedAt }) => startedAt.getUTCFullYear());
+      return name && typeof odometerMeters === 'number'
+        ? [
+            {
+              firstYear: Math.min(...years),
+              id,
+              lastYear: Math.max(...years),
+              name,
+              odometerMeters,
+              rides: rides.length,
+            },
+          ]
+        : [];
+    })
+    .toSorted((a, b) => b.odometerMeters - a.odometerMeters);
 };
 
 /**
  * Folds stored activities into the history the atlas and homepage card read.
- * Years and months are UTC calendar buckets of `startDate`; activities without
- * a parseable start date have nowhere to go and are left out.
+ * Years are UTC calendar buckets of `startDate`; activities without a
+ * parseable start date have nowhere to go and are left out.
  */
 export const summarizeStravaHistory = (
   activities: ReadonlyArray<StravaActivity>,
   now: Date,
 ): StravaHistory | null => {
   const dated = activities.flatMap(toDated).toSorted(newestFirst);
-  const outings = dated.map(toOuting);
-  const [latest] = outings;
-  if (!latest) {
+  const [newest] = dated;
+  if (!newest) {
     return null;
   }
-
-  const byYear = groupByYear(outings);
+  const outings = dated.map((entry) => toLogEntry(toOuting(entry)));
   const currentYear = now.getUTCFullYear();
-  const thisYearOutings = byYear.get(currentYear) ?? [];
-  const routes = outings.flatMap(
-    (outing): Array<StravaRouteTrace> =>
-      outing.polyline
-        ? [{ id: outing.id, polyline: outing.polyline, sport: outing.sport, year: yearOf(outing) }]
-        : [],
-  );
-
   return {
-    biggestClimbs: outings
-      .filter((outing) => outing.elevationGainMeters > 0)
-      .toSorted((a, b) => b.elevationGainMeters - a.elevationGainMeters)
-      .slice(0, LISTED_OUTINGS),
-    latest,
-    longest: outings.reduce(
-      (longest, outing) => (outing.distanceMeters > longest.distanceMeters ? outing : longest),
-      latest,
+    bikes: findBikes(dated),
+    latest: toOuting(newest),
+    outings,
+    thisYear: yearTotals(
+      currentYear,
+      outings.filter((outing) => yearOf(outing) === currentYear),
     ),
-    monthlyClimbingMeters: Array.from({ length: MONTHS_PER_YEAR }, (_, month) =>
-      sumOf(
-        thisYearOutings.filter((outing) => monthOf(outing) === month),
-        (outing) => outing.elevationGainMeters,
-      ),
-    ),
-    odometer: findOdometer(dated),
-    recent: outings.slice(0, LISTED_OUTINGS),
-    routes,
-    thisYear: yearTotals(currentYear, thisYearOutings),
     totals: {
       distanceMeters: sumOf(outings, (outing) => outing.distanceMeters),
       elevationGainMeters: sumOf(outings, (outing) => outing.elevationGainMeters),
-      firstYear: Math.min(...byYear.keys()),
+      firstYear: Math.min(...outings.map(yearOf)),
       outings: outings.length,
     },
-    years: [...byYear.entries()]
-      .map(([year, yearOutings]) => yearTotals(year, yearOutings))
-      .toSorted((a, b) => a.year - b.year),
   };
 };

@@ -14,17 +14,12 @@ export type StravaOuting = {
   distanceMeters: number;
   elevationGainMeters: number;
   movingTimeSeconds: number;
-  gearName: string | null;
   /** Encoded Google polyline (summary resolution), or null when Strava stored none. */
   polyline: string | null;
 };
 
-export type StravaRouteTrace = {
-  id: number;
-  sport: StravaSport;
-  year: number;
-  polyline: string;
-};
+/** An outing in the full log, which leaves notes to `latest` to keep the log light. */
+export type StravaLogEntry = Omit<StravaOuting, 'description'>;
 
 export type StravaYearTotals = {
   year: number;
@@ -33,20 +28,20 @@ export type StravaYearTotals = {
   outings: number;
 };
 
-export type StravaOdometer = {
-  gearName: string;
-  distanceMeters: number;
+/** A named bike, with Strava's odometer for it and the stored rides on it. */
+export type StravaBike = {
+  id: string;
+  name: string;
+  odometerMeters: number;
+  rides: number;
+  firstYear: number;
+  lastYear: number;
 };
 
 export type StravaHistory = {
   latest: StravaOuting;
-  /** Newest first, at most six, starting with `latest`. */
-  recent: ReadonlyArray<StravaOuting>;
-  /** At most six outings with the most elevation gain, biggest first. */
-  biggestClimbs: ReadonlyArray<StravaOuting>;
-  longest: StravaOuting;
-  /** Every outing that has a polyline, newest first. */
-  routes: ReadonlyArray<StravaRouteTrace>;
+  /** Every outing, newest first, starting with `latest`. */
+  outings: ReadonlyArray<StravaLogEntry>;
   totals: {
     distanceMeters: number;
     elevationGainMeters: number;
@@ -55,10 +50,6 @@ export type StravaHistory = {
   };
   /** The calendar year of `now`, zeroed when nothing happened yet this year. */
   thisYear: StravaYearTotals;
-  /** Every year with at least one outing, oldest first. */
-  years: ReadonlyArray<StravaYearTotals>;
-  /** Elevation gain per month (index 0 is January) for `thisYear.year`. */
-  monthlyClimbingMeters: ReadonlyArray<number>;
-  /** Lifetime distance on the gear used most recently, from Strava's gear odometer. */
-  odometer: StravaOdometer | null;
+  /** Bikes Strava has named, most miles first. */
+  bikes: ReadonlyArray<StravaBike>;
 };

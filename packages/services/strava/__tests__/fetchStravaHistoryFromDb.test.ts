@@ -55,13 +55,13 @@ describe('fetchStravaHistoryFromDb', () => {
 
     const history = await fetchStravaHistoryFromDb(NOW);
 
-    expect(history?.recent.map((outing) => [outing.id, outing.sport])).toEqual([
+    expect(history?.outings.map((outing) => [outing.id, outing.sport])).toEqual([
       [101, 'ride'],
       [103, 'hike'],
       [102, 'run'],
     ]);
-    expect(history?.recent[1]?.startDate).toBe('2022-07-04T17:00:00.000Z');
-    expect(history?.routes.map((route) => route.polyline)).toEqual(['camel', 'snake']);
+    expect(history?.outings[1]?.startDate).toBe('2022-07-04T17:00:00.000Z');
+    expect(history?.outings.map((outing) => outing.polyline)).toEqual(['camel', null, 'snake']);
     expect(history?.totals).toEqual({
       distanceMeters: 50_000,
       elevationGainMeters: 380,
@@ -69,6 +69,15 @@ describe('fetchStravaHistoryFromDb', () => {
       outings: 3,
     });
     expect(history?.thisYear).toMatchObject({ outings: 1, year: 2026 });
-    expect(history?.odometer).toEqual({ distanceMeters: 9_000_000, gearName: 'Cruz' });
+    expect(history?.bikes).toEqual([
+      {
+        firstYear: 2026,
+        id: 'b1',
+        lastYear: 2026,
+        name: 'Cruz',
+        odometerMeters: 9_000_000,
+        rides: 1,
+      },
+    ]);
   });
 });
