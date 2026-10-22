@@ -57,11 +57,13 @@ const apiSchemaEntries = {
   photo_count: v.optional(v.nullable(v.number())),
   photos: v.optional(v.nullable(photosSchema)),
   pr_count: v.optional(v.nullable(v.number())),
+  private: v.optional(v.nullable(v.boolean())),
   sport_type: v.optional(v.nullable(v.string())),
   start_date: v.optional(v.nullable(v.string())),
   start_latlng: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
   total_elevation_gain: v.optional(v.nullable(v.number())),
   type: v.string(),
+  visibility: v.optional(v.nullable(v.string())),
 };
 
 // Nested object schemas for stored data (camelCase)
@@ -119,6 +121,7 @@ const storedSchemaEntries = {
   photoCount: v.optional(v.nullable(v.number())),
   photos: v.optional(v.nullable(photosStoredSchema)),
   prCount: v.optional(v.nullable(v.number())),
+  private: v.optional(v.nullable(v.boolean())),
   relativeStartDate: v.optional(v.nullable(v.string())),
   sportType: v.optional(v.nullable(v.string())),
   startDate: v.optional(v.nullable(v.string())),
@@ -126,6 +129,7 @@ const storedSchemaEntries = {
   totalElevationGain: v.optional(v.nullable(v.number())),
   type: v.string(),
   url: v.optional(v.nullable(v.string())),
+  visibility: v.optional(v.nullable(v.string())),
 };
 
 /** API validation schema - uses looseObject to allow extra API fields */
@@ -206,10 +210,12 @@ export const mapStravaActivityFromApi = (activity: StravaActivityApi): StravaAct
       }
     : null,
   prCount: activity.pr_count,
+  private: activity.private,
   sportType: activity.sport_type,
   startDate: activity.start_date,
   startLatlng: activity.start_latlng,
   totalElevationGain: activity.total_elevation_gain,
   type: activity.type,
   url: `https://www.strava.com/activities/${activity.id}`,
+  visibility: activity.visibility,
 });
