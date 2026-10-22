@@ -1,38 +1,45 @@
 import type { CSSProperties } from 'react';
+import { PORTRAIT_OVAL_PATH } from './cutOutShapes';
 import {
-  STICKER_ASPECT,
-  STICKER_PALETTE_INKS,
-  STICKER_SHADOW_PAD,
-  STICKER_WIDTH,
-} from '../layouts/logoMark';
-import { StickerMark } from '../layouts/StickerMark';
-import { CUT_OUT_SHAPES, type CutOutShape } from './cutOutShapes';
+  type FavoriteAlbumsCardVariant,
+  FavoriteAlbumsSocialCard,
+  type MusicHistoryCardVariant,
+  MusicHistorySocialCard,
+} from './MusicSocialCards';
+import { type MusicStatsCardVariant, MusicStatsSocialCard } from './MusicStatsSocialCard';
 import { PAPER_PALETTE } from './paperPalette';
+import { type ReadingCardVariant, ReadingSocialCard } from './ReadingSocialCard';
+import {
+  type CutOutPiece,
+  LIFTED_SHADOW,
+  PIECE_SHADOW,
+  SocialCardFrame,
+  SocialCardHeadline,
+  SocialCardMattedCard,
+  SocialCardStamp,
+} from './SocialCardParts';
+import { type StravaCardVariant, StravaSocialCard } from './StravaSocialCard';
 
-export const SOCIAL_CARD_FONT = 'Familjen Grotesk';
-
-type PaperColor = keyof typeof PAPER_PALETTE;
-
-type SocialCardProps = {
-  grainUrl: string;
+export type HomeCardVariant = {
   headline: string;
   name: string;
   portraitUrl: string | null;
   tagline: string;
+  variant?: 'home';
 };
 
-/** A cut-out's box on the sheet, in sheet pixels before rotation. */
-type CutOutPiece = {
-  color: PaperColor;
-  rotationDeg: number;
-  shape: CutOutShape;
-  size: number;
-  underprint?: PaperColor;
-  x: number;
-  y: number;
-};
+export type SocialCardVariant =
+  | HomeCardVariant
+  | MusicStatsCardVariant
+  | MusicHistoryCardVariant
+  | FavoriteAlbumsCardVariant
+  | ReadingCardVariant
+  | StravaCardVariant;
 
-/** Behind the portrait like the site's print; olive behind the stamp so viridian doesn't swallow it. */
+export type SocialCardProps = {
+  grainUrl: string;
+} & SocialCardVariant;
+
 const MONSTERA: CutOutPiece = {
   color: 'viridian',
   rotationDeg: -34,
@@ -42,7 +49,7 @@ const MONSTERA: CutOutPiece = {
   y: -230,
 };
 
-const CUT_OUTS: ReadonlyArray<CutOutPiece> = [
+const HOME_CUT_OUTS: ReadonlyArray<CutOutPiece> = [
   { color: 'ultramarine', rotationDeg: -12, shape: 'seaweed', size: 240, x: -118, y: 96 },
   { color: 'olive', rotationDeg: 22, shape: 'fern', size: 320, x: -96, y: 312 },
   { color: 'ultramarine', rotationDeg: 168, shape: 'coral', size: 170, x: 548, y: -52 },
@@ -60,86 +67,15 @@ const CUT_OUTS: ReadonlyArray<CutOutPiece> = [
   { color: 'ochre', rotationDeg: 10, shape: 'star4', size: 46, x: 700, y: 300 },
 ];
 
-/** Satori has no `inset`, so overlays spell out their box. */
-const FILL: CSSProperties = {
-  height: '100%',
-  left: 0,
-  position: 'absolute',
-  top: 0,
-  width: '100%',
-};
-const UNDERPRINT_OFFSET = { x: 6, y: 7 };
-/** The homepage intro's paper stack: the hand-cut corners of `--quad-a` and `--quad-c`, and `--dshadow` as a box shadow. */
-const QUAD_A = '14px 12px 16px 13px';
-const QUAD_C = '13px 15px 12px 16px';
-const PAPER_SHADOW = '0 1px 0 rgba(0,0,0,0.2), 0 2px 3px rgba(0,0,0,0.12)';
-const MAT_OFFSET = 13;
-const PIECE_SHADOW = 'drop-shadow(0 1px 0 rgba(0,0,0,0.2)) drop-shadow(0 2px 3px rgba(0,0,0,0.12))';
-const LIFTED_SHADOW =
-  'drop-shadow(0 2px 0 rgba(0,0,0,0.2)) drop-shadow(0 7px 10px rgba(0,0,0,0.18))';
-
-/** The print's oval from `CutOutSymbols`, in objectBoundingBox units. */
-const PORTRAIT_OVAL =
-  'M0.46 0C0.76 0 1 0.19 1 0.44C1 0.72 0.775 1 0.55 1C0.231 1 0 0.803 0 0.53C0 0.201 0.175 0 0.46 0Z';
 export const PORTRAIT = { height: 420, mat: 14, width: 320 };
 
 /** Satori's `clip-path: path()` takes pixels, so the unit oval is scaled to each box. */
 function ovalPath(width: number, height: number) {
   let axis = 0;
-  return PORTRAIT_OVAL.replace(/[\d.]+/g, (unit) => {
+  return PORTRAIT_OVAL_PATH.replace(/[\d.]+/g, (unit) => {
     const length = axis++ % 2 === 0 ? width : height;
     return String(Math.round(Number(unit) * length * 100) / 100);
   });
-}
-
-function CutOutSvg({ color, rotationDeg, shape, size, underprint, x, y }: CutOutPiece) {
-  const transform = `rotate(${rotationDeg}deg)`;
-  return (
-    <div
-      style={{ display: 'flex', height: size, left: x, position: 'absolute', top: y, width: size }}
-    >
-      {underprint ? (
-        <svg
-          aria-hidden="true"
-          height={size}
-          style={{
-            left: UNDERPRINT_OFFSET.x,
-            position: 'absolute',
-            top: UNDERPRINT_OFFSET.y,
-            transform,
-          }}
-          viewBox="0 0 400 400"
-          width={size}
-        >
-          <path d={CUT_OUT_SHAPES[shape]} fill={PAPER_PALETTE[underprint]} />
-        </svg>
-      ) : null}
-      <svg
-        aria-hidden="true"
-        height={size}
-        style={{ filter: PIECE_SHADOW, left: 0, position: 'absolute', top: 0, transform }}
-        viewBox="0 0 400 400"
-        width={size}
-      >
-        <path d={CUT_OUT_SHAPES[shape]} fill={PAPER_PALETTE[color]} />
-      </svg>
-    </div>
-  );
-}
-
-/** The header logo's die-cut sticker. The negative margin keeps its shadow room out of the layout. */
-function Stamp({ rotationDeg, width }: { rotationDeg: number; width: number }) {
-  const pad = (STICKER_SHADOW_PAD * width) / STICKER_WIDTH;
-  return (
-    <StickerMark
-      height={Math.round(width / STICKER_ASPECT + 2 * pad)}
-      inks={STICKER_PALETTE_INKS}
-      label={null}
-      shadow
-      style={{ margin: -pad, transform: `rotate(${rotationDeg}deg)` }}
-      width={Math.round(width + 2 * pad)}
-    />
-  );
 }
 
 function AboutTag({ style }: { style: CSSProperties }) {
@@ -210,122 +146,67 @@ function PortraitPrint({ portraitUrl }: { portraitUrl: string }) {
 function StampFeature() {
   return (
     <div style={{ display: 'flex', position: 'absolute', right: 110, top: 150 }}>
-      <Stamp rotationDeg={4} width={300} />
+      <SocialCardStamp rotationDeg={4} width={300} />
       <AboutTag style={{ bottom: -46, left: -30 }} />
     </div>
   );
 }
 
-/**
- * The homepage hello sheet as a 1200×630 social card, laid out for Satori.
- */
-export function SocialCard({ grainUrl, headline, name, portraitUrl, tagline }: SocialCardProps) {
-  const [firstWord = headline, ...restWords] = headline.split(' ');
+function HomeSocialCard({
+  grainUrl,
+  headline,
+  name,
+  portraitUrl,
+  tagline,
+}: HomeCardVariant & { grainUrl: string }) {
+  const cutOuts = [
+    { ...MONSTERA, color: portraitUrl ? MONSTERA.color : ('olive' as const) },
+    ...HOME_CUT_OUTS,
+  ];
   return (
-    <div
-      style={{
-        background: PAPER_PALETTE.viridian,
-        display: 'flex',
-        fontFamily: SOCIAL_CARD_FONT,
-        height: '100%',
-        padding: 18,
-        position: 'relative',
-        width: '100%',
-      }}
-    >
-      <div
-        style={{
-          background: PAPER_PALETTE.paper,
-          borderRadius: 24,
-          display: 'flex',
-          flexDirection: 'column',
-          height: '100%',
-          justifyContent: 'center',
-          padding: '0 56px',
-          position: 'relative',
-          width: '100%',
-        }}
+    <SocialCardFrame borderTone="viridian" cutOuts={cutOuts} grainUrl={grainUrl}>
+      {portraitUrl ? <PortraitPrint portraitUrl={portraitUrl} /> : <StampFeature />}
+      {portraitUrl ? (
+        <div style={{ display: 'flex', marginBottom: 26 }}>
+          <SocialCardStamp rotationDeg={-4} width={124} />
+        </div>
+      ) : null}
+      <SocialCardHeadline fontSize={144} headline={headline} indentEm={0.62} />
+      <SocialCardMattedCard
+        matOffset={13}
+        matTiltDeg={2}
+        matTone="ochre"
+        padding="18px 30px 20px 26px"
+        style={{ marginTop: 26 }}
+        tiltDeg={-1.5}
       >
-        <div style={{ ...FILL, borderRadius: 24, display: 'flex', overflow: 'hidden' }}>
-          {[{ ...MONSTERA, color: portraitUrl ? MONSTERA.color : 'olive' }, ...CUT_OUTS].map(
-            (piece) => (
-              <CutOutSvg key={`${piece.shape}-${piece.x}-${piece.y}`} {...piece} />
-            ),
-          )}
-        </div>
-        {/* Satori lays a fragment out as its own box, which would move the absolute print. */}
-        {portraitUrl ? <PortraitPrint portraitUrl={portraitUrl} /> : <StampFeature />}
-        {portraitUrl ? (
-          <div style={{ display: 'flex', marginBottom: 26 }}>
-            <Stamp rotationDeg={-4} width={124} />
-          </div>
-        ) : null}
-        <div
-          style={{
-            color: PAPER_PALETTE.ink,
-            display: 'flex',
-            filter: PIECE_SHADOW,
-            flexDirection: 'column',
-            fontSize: 144,
-            fontWeight: 700,
-            letterSpacing: '-0.04em',
-            lineHeight: 0.9,
-          }}
-        >
-          <span>{firstWord}</span>
-          {restWords.length > 0 ? (
-            <span style={{ marginLeft: '0.62em' }}>{restWords.join(' ')}</span>
-          ) : null}
-        </div>
-        <div
-          style={{
-            alignSelf: 'flex-start',
-            display: 'flex',
-            marginTop: 26,
-            position: 'relative',
-            transform: 'rotate(-1.5deg)',
-          }}
-        >
-          <div
-            style={{
-              ...FILL,
-              background: PAPER_PALETTE.ochre,
-              borderRadius: QUAD_C,
-              boxShadow: PAPER_SHADOW,
-              display: 'flex',
-              transform: `translate(${MAT_OFFSET}px, ${MAT_OFFSET}px) rotate(2deg)`,
-            }}
-          />
-          <div
-            style={{
-              background: PAPER_PALETTE.cream,
-              borderRadius: QUAD_A,
-              boxShadow: PAPER_SHADOW,
-              color: PAPER_PALETTE.ink,
-              display: 'flex',
-              flexDirection: 'column',
-              gap: 4,
-              padding: '18px 30px 20px 26px',
-            }}
-          >
-            {name === headline ? null : (
-              <span style={{ fontSize: 42, fontWeight: 700, letterSpacing: '-0.02em' }}>
-                {name}
-              </span>
-            )}
-            <span style={{ fontSize: 32 }}>{tagline}</span>
-          </div>
-        </div>
-      </div>
-      <div
-        style={{
-          ...FILL,
-          backgroundImage: `url(${grainUrl})`,
-          backgroundRepeat: 'repeat',
-          backgroundSize: '200px 200px',
-          display: 'flex',
-        }}
-      />
-    </div>
+        {name === headline ? null : (
+          <span style={{ fontSize: 42, fontWeight: 700, letterSpacing: '-0.02em' }}>{name}</span>
+        )}
+        <span style={{ fontSize: 32 }}>{tagline}</span>
+      </SocialCardMattedCard>
+    </SocialCardFrame>
   );
+}
+
+export function SocialCard(props: SocialCardProps) {
+  switch (props.variant) {
+    case undefined:
+    case 'home':
+      return <HomeSocialCard {...props} />;
+    case 'music-stats':
+      return <MusicStatsSocialCard {...props} />;
+    case 'music-history':
+      return <MusicHistorySocialCard {...props} />;
+    case 'favorite-albums':
+      return <FavoriteAlbumsSocialCard {...props} />;
+    case 'reading':
+      return <ReadingSocialCard {...props} />;
+    case 'strava':
+      return <StravaSocialCard {...props} />;
+    default: {
+      const unhandled: never = props;
+      return unhandled;
+    }
+  }
 }
