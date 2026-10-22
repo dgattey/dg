@@ -1,28 +1,6 @@
 import { Op } from '@dg/db';
-
-let db: typeof import('@dg/db').db | null = null;
-type FetchAlbumDetail = (albumId: string) => Promise<{
-  id: string;
-  name: string;
-  totalTracks: number;
-  tracks: Array<{ id: string; name: string; trackNumber: number }>;
-} | null>;
-
-let fetchAlbumDetail: FetchAlbumDetail | null = null;
-
-const getDb = () => {
-  if (!db) {
-    throw new Error('Test database not initialized');
-  }
-  return db;
-};
-
-const getFetchAlbumDetail = () => {
-  if (!fetchAlbumDetail) {
-    throw new Error('fetchAlbumDetail not initialized');
-  }
-  return fetchAlbumDetail;
-};
+import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
+import { fetchAlbumDetail } from '../fetchAlbumDetail';
 
 const mockSpotifyGetWithRetry = jest.fn();
 
@@ -30,6 +8,8 @@ jest.mock('../trackMetadataShared', () => ({
   ...jest.requireActual('../trackMetadataShared'),
   spotifyGet: (...args: Array<unknown>) => mockSpotifyGetWithRetry(...args),
 }));
+
+const db = setupTestDatabase();
 
 const PREFIX = 'ad';
 const ALBUM_ID = `${PREFIX}album00000000000001`;
@@ -91,55 +71,50 @@ const spotifyAlbumResponse = {
 };
 
 describe('fetchAlbumDetail', () => {
-  beforeAll(async () => {
-    ({ db } = await import('@dg/db'));
-    ({ fetchAlbumDetail } = await import('../fetchAlbumDetail'));
-  });
-
   beforeEach(async () => {
     jest.clearAllMocks();
-    await getDb().MusicTrackArtist.destroy({
+    await db.MusicTrackArtist.destroy({
       where: { trackId: { [Op.like]: `${PREFIX}%` } },
     });
-    await getDb().MusicAlbumArtist.destroy({
+    await db.MusicAlbumArtist.destroy({
       where: { albumId: { [Op.like]: `${PREFIX}%` } },
     });
-    await getDb().MusicTrack.destroy({
+    await db.MusicTrack.destroy({
       where: { id: { [Op.like]: `${PREFIX}%` } },
     });
-    await getDb().MusicAlbum.destroy({
+    await db.MusicAlbum.destroy({
       where: { id: { [Op.like]: `${PREFIX}%` } },
     });
-    await getDb().MusicArtist.destroy({
+    await db.MusicArtist.destroy({
       where: { id: { [Op.like]: `${PREFIX}%` } },
     });
   });
 
   afterEach(async () => {
-    await getDb().MusicTrackArtist.destroy({
+    await db.MusicTrackArtist.destroy({
       where: { trackId: { [Op.like]: `${PREFIX}%` } },
     });
-    await getDb().MusicAlbumArtist.destroy({
+    await db.MusicAlbumArtist.destroy({
       where: { albumId: { [Op.like]: `${PREFIX}%` } },
     });
-    await getDb().MusicTrack.destroy({
+    await db.MusicTrack.destroy({
       where: { id: { [Op.like]: `${PREFIX}%` } },
     });
-    await getDb().MusicAlbum.destroy({
+    await db.MusicAlbum.destroy({
       where: { id: { [Op.like]: `${PREFIX}%` } },
     });
-    await getDb().MusicArtist.destroy({
+    await db.MusicArtist.destroy({
       where: { id: { [Op.like]: `${PREFIX}%` } },
     });
   });
 
   it('returns a complete album from the database without calling Spotify', async () => {
-    await getDb().MusicArtist.create({
+    await db.MusicArtist.create({
       id: ARTIST_ID,
       name: 'Test Artist',
       url: `https://open.spotify.com/artist/${ARTIST_ID}`,
     });
-    await getDb().MusicAlbum.create({
+    await db.MusicAlbum.create({
       id: ALBUM_ID,
       imageUrl: 'https://image.test/album.jpg',
       label: 'Test Label',
@@ -149,12 +124,12 @@ describe('fetchAlbumDetail', () => {
       totalTracks: 2,
       url: `https://open.spotify.com/album/${ALBUM_ID}`,
     });
-    await getDb().MusicAlbumArtist.create({
+    await db.MusicAlbumArtist.create({
       albumId: ALBUM_ID,
       artistId: ARTIST_ID,
       position: 0,
     });
-    await getDb().MusicTrack.bulkCreate([
+    await db.MusicTrack.bulkCreate([
       {
         albumId: ALBUM_ID,
         discNumber: 1,
@@ -174,12 +149,12 @@ describe('fetchAlbumDetail', () => {
         url: `https://open.spotify.com/track/${TRACK_B}`,
       },
     ]);
-    await getDb().MusicTrackArtist.bulkCreate([
+    await db.MusicTrackArtist.bulkCreate([
       { artistId: ARTIST_ID, position: 0, trackId: TRACK_A },
       { artistId: ARTIST_ID, position: 0, trackId: TRACK_B },
     ]);
 
-    const detail = await getFetchAlbumDetail()(ALBUM_ID);
+    const detail = await fetchAlbumDetail(ALBUM_ID);
 
     expect(mockSpotifyGetWithRetry).not.toHaveBeenCalled();
     expect(detail?.name).toBe('Test Album');
@@ -194,7 +169,7 @@ describe('fetchAlbumDetail', () => {
       success: true,
     });
 
-    const detail = await getFetchAlbumDetail()(ALBUM_ID);
+    const detail = await fetchAlbumDetail(ALBUM_ID);
 
     expect(mockSpotifyGetWithRetry).toHaveBeenCalledWith(
       `albums/${ALBUM_ID}`,
@@ -203,16 +178,16 @@ describe('fetchAlbumDetail', () => {
     );
     expect(detail?.tracks).toHaveLength(2);
 
-    const cachedAlbum = await getDb().MusicAlbum.findByPk(ALBUM_ID);
+    const cachedAlbum = await db.MusicAlbum.findByPk(ALBUM_ID);
     expect(cachedAlbum?.totalTracks).toBe(2);
     expect(cachedAlbum?.label).toBe('Test Label');
 
-    const cachedTracks = await getDb().MusicTrack.findAll({ where: { albumId: ALBUM_ID } });
+    const cachedTracks = await db.MusicTrack.findAll({ where: { albumId: ALBUM_ID } });
     expect(cachedTracks).toHaveLength(2);
     expect(cachedTracks.every((track) => track.trackNumber != null)).toBe(true);
 
     mockSpotifyGetWithRetry.mockClear();
-    const second = await getFetchAlbumDetail()(ALBUM_ID);
+    const second = await fetchAlbumDetail(ALBUM_ID);
     expect(mockSpotifyGetWithRetry).not.toHaveBeenCalled();
     expect(second?.id).toBe(ALBUM_ID);
   });
@@ -224,12 +199,12 @@ describe('fetchAlbumDetail', () => {
       success: false,
     });
 
-    await expect(getFetchAlbumDetail()(`${PREFIX}missing00000000001`)).resolves.toBeNull();
+    await expect(fetchAlbumDetail(`${PREFIX}missing00000000001`)).resolves.toBeNull();
   });
 
   it('rejects non-alphanumeric album ids before querying Spotify', async () => {
-    await expect(getFetchAlbumDetail()('../me/player/recently-played')).resolves.toBeNull();
-    await expect(getFetchAlbumDetail()('album123?market=US')).resolves.toBeNull();
+    await expect(fetchAlbumDetail('../me/player/recently-played')).resolves.toBeNull();
+    await expect(fetchAlbumDetail('album123?market=US')).resolves.toBeNull();
     expect(mockSpotifyGetWithRetry).not.toHaveBeenCalled();
   });
 });

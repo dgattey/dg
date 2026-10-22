@@ -1,7 +1,14 @@
 import type { ImageProps as NextImageProps } from 'next/image';
 import NextImage from 'next/image';
 import type { CSSProperties } from 'react';
-import { BREAKPOINT_MAX_SIZES } from '../helpers/imageSizes';
+
+const BREAKPOINT_MAX_SIZES = {
+  extraTiny: 340,
+  large: 1200,
+  medium: 992,
+  small: 768,
+  tiny: 576,
+};
 
 type ImageSizes = {
   /**

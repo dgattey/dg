@@ -89,7 +89,7 @@ export function FavoriteAlbumCell({
         title={collapsed ? `Close ${albumName}` : undefined}
         transitionTypes={albumTransitionTypes(collapsed ? 'close' : 'open')}
       >
-        <span className="music__art music__fullColorArt">
+        <span className="music__art">
           <AlbumStack
             imageUrl={imageUrl}
             isLcpCandidate={isLcpCandidate}

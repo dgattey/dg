@@ -1,8 +1,4 @@
 import {
-  hasDevConsoleCredentials,
-  isDevConsoleAccessAllowed,
-} from '@dg/services/auth/devConsoleBasicAuth';
-import {
   generateCodeChallenge,
   generateCodeVerifier,
   generateSecureState,
@@ -18,20 +14,16 @@ import {
   VERCEL_OAUTH_SCOPES,
   VERCEL_OAUTH_STATE_COOKIE,
 } from '../../../../auth/vercel/oauthCookies';
-import { redirectToConsoleWithAuthError } from './redirectToConsole';
+import { redirectToConsoleWithAuthError, requireDevConsoleBasicAuth } from '../../apiResponses';
+
 /**
  * Starts Sign in with Vercel: PKCE + state/nonce cookies, then redirect to
  * https://vercel.com/oauth/authorize.
  */
 export async function GET(request: NextRequest) {
-  if (!isDevConsoleAccessAllowed(request.headers.get('authorization'))) {
-    if (!hasDevConsoleCredentials()) {
-      return new NextResponse('Not Found', { status: 404 });
-    }
-    return new NextResponse('Authentication required', {
-      headers: { 'WWW-Authenticate': 'Basic realm="Dev Console"' },
-      status: 401,
-    });
+  const unauthorized = requireDevConsoleBasicAuth(request);
+  if (unauthorized) {
+    return unauthorized;
   }
 
   const clientId = process.env.NEXT_PUBLIC_VERCEL_APP_CLIENT_ID;

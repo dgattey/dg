@@ -55,7 +55,7 @@ export function ClimbingFlower({ months, span }: { months: ReadonlyArray<number>
   const total = months.reduce((sum, meters) => sum + meters, 0);
   return (
     <PaperCard
-      className="strava__card strava__flowerCard"
+      className="strava__flowerCard"
       edge="soft-b"
       innerClassName="strava__pad"
       tiltDeg={-2}

@@ -50,7 +50,7 @@ function Loop({ outing }: { outing: StravaLogEntry }) {
 export function RecentOutings({ outings }: { outings: ReadonlyArray<StravaLogEntry> }) {
   return (
     <PaperCard
-      className="strava__card strava__slip strava__log"
+      className="strava__slip strava__log"
       edge="quad-a"
       innerClassName="strava__slipInner"
       tag={fold}
@@ -80,7 +80,7 @@ export function RecentOutings({ outings }: { outings: ReadonlyArray<StravaLogEnt
 export function BiggestClimbs({ outings }: { outings: ReadonlyArray<StravaLogEntry> }) {
   return (
     <PaperCard
-      className="strava__card strava__slip strava__climbs"
+      className="strava__slip strava__climbs"
       edge="quad-a"
       innerClassName="strava__slipInner strava__slipInner--margin"
       tag={fold}
@@ -115,7 +115,7 @@ export function LongestOutings({
 }) {
   return (
     <PaperCard
-      className="strava__card strava__slip strava__distance"
+      className="strava__slip strava__distance"
       edge="quad-a"
       innerClassName="strava__slipInner strava__slipInner--margin"
       tag={fold}

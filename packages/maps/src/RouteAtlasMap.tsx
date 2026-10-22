@@ -212,7 +212,7 @@ async function createAtlas(host: HTMLElement, bounds: GeoBounds, first: Wanted) 
   return atlas;
 }
 
-export type RouteAtlasMapProps = {
+type RouteAtlasMapProps = {
   bounds: GeoBounds;
   label: string;
   routes: ReadonlyArray<MapRoute>;
@@ -274,13 +274,6 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
       }
     };
   }, [offline]);
-
-  useEffect(() => {
-    wanted = { dark, routes, tileSource, visible };
-    if (kept) {
-      apply(kept);
-    }
-  }, [dark, routes, tileSource, visible]);
 
   return (
     <Box aria-label={label} role="region" sx={containerSx}>

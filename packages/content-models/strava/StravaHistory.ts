@@ -1,6 +1,6 @@
 import type { SfStreetCoverage } from './SfStreetCoverage';
 
-export const STRAVA_SPORTS = ['ride', 'run', 'hike', 'other'] as const;
+const STRAVA_SPORTS = ['ride', 'run', 'hike', 'other'] as const;
 
 export type StravaSport = (typeof STRAVA_SPORTS)[number];
 

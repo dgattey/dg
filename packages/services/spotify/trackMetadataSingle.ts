@@ -1,7 +1,7 @@
 import 'server-only';
 
 import * as v from 'valibot';
-import { spotifyGet } from './trackMetadataShared';
+import { bestSpotifyImage, spotifyGet } from './trackMetadataShared';
 
 /**
  * Extended track schema for fetching display-ready data.
@@ -57,14 +57,6 @@ export type TrackDisplayData = {
 };
 
 /**
- * Selects the best album image (prefers 640px width, falls back to first).
- */
-function bestImage(images: Array<{ height: number; url: string; width: number }>): string {
-  const preferred = images.find((img) => img.width === 640) ?? images[0];
-  return preferred?.url ?? '';
-}
-
-/**
  * Fetches full display-ready track data from Spotify API.
  * Returns structured data ready for Music* table inserts.
  */
@@ -77,7 +69,7 @@ export async function fetchTrackDisplayData(trackId: string): Promise<TrackDispl
   return {
     album: {
       id: track.album.id,
-      imageUrl: bestImage(track.album.images),
+      imageUrl: bestSpotifyImage(track.album.images),
       name: track.album.name,
       url: track.album.external_urls.spotify,
     },

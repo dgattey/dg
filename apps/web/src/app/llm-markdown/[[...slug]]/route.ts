@@ -1,7 +1,9 @@
 import 'server-only';
 
+import { log } from '@dg/shared-core/logging/log';
 import { homeRoute, isMarkdownPagePath } from '@dg/shared-core/routes/app';
-import { markdownResponse } from '../markdownResponse';
+import { NextResponse } from 'next/server';
+import { AGENT_DOCUMENT_CACHE_CONTROL } from '../../agentDocumentCacheControl';
 import { getPageMarkdown } from '../pageMarkdown';
 
 type RouteContext = {
@@ -20,8 +22,19 @@ export async function GET(request: Request, context: RouteContext) {
     return new Response('Not found', { status: 404 });
   }
 
-  return markdownResponse(await getPageMarkdown(pathname), {
-    htmlPath: pathname,
-    request,
+  const body = await getPageMarkdown(pathname);
+  log.info('markdown_fetch', {
+    path: pathname,
+    ref: request.headers.get('referer') ?? '',
+    ua: request.headers.get('user-agent') ?? '',
+  });
+
+  return new NextResponse(body, {
+    headers: {
+      'Cache-Control': AGENT_DOCUMENT_CACHE_CONTROL,
+      'Content-Type': 'text/markdown; charset=utf-8',
+      Link: `<${pathname}>; rel="alternate"; type="text/html"`,
+      Vary: 'Accept',
+    },
   });
 }

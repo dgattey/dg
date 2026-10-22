@@ -34,17 +34,3 @@ export function setupTestDatabase() {
 
   return db;
 }
-
-/**
- * Resets the test database by truncating all tables.
- */
-export async function resetTestDatabase(): Promise<void> {
-  await dbClient.truncate({ cascade: true });
-}
-
-/**
- * Closes the test database connection.
- */
-export async function closeTestDatabase(): Promise<void> {
-  await closeDbConnection();
-}

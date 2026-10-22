@@ -58,67 +58,61 @@ function LinkedArtists({ artists }: { artists: ReadonlyArray<LinkedArtist> }): R
  */
 export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
   return (
-    <div style={{ display: 'contents' }}>
+    <>
       <div className="music__wellMeta">
-        <div data-role="album-meta">
-          <h3 className="music__wellArtists" data-role="album-artists">
-            <Tooltip title={artistNames(album.artists)} whenTruncated>
-              <span className="music__wellArtistsText">
-                <LinkedArtists artists={album.artists} />
-              </span>
-            </Tooltip>
-          </h3>
-          <div className="music__wellFacts">
-            <p style={{ fontVariantNumeric: 'tabular-nums' }}>{albumFacts(album).join(' · ')}</p>
-            {album.popularity == null ? null : (
-              <div
-                aria-label={`Popularity ${album.popularity} out of 100`}
-                className="music__wellPopularity"
-                role="img"
-              >
-                <div className="music__wellPopularityTrack">
-                  <div
-                    className="music__wellPopularityFill"
-                    style={{ width: `${album.popularity}%` }}
-                  />
-                </div>
+        <h3 className="music__wellArtists">
+          <Tooltip title={artistNames(album.artists)} whenTruncated>
+            <span className="music__wellArtistsText">
+              <LinkedArtists artists={album.artists} />
+            </span>
+          </Tooltip>
+        </h3>
+        <div className="music__wellFacts">
+          <p style={{ fontVariantNumeric: 'tabular-nums' }}>{albumFacts(album).join(' · ')}</p>
+          {album.popularity == null ? null : (
+            <div
+              aria-label={`Popularity ${album.popularity} out of 100`}
+              className="music__wellPopularity"
+              role="img"
+            >
+              <div className="music__wellPopularityTrack">
+                <div
+                  className="music__wellPopularityFill"
+                  style={{ width: `${album.popularity}%` }}
+                />
               </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
-      <ol className="music__wellTracks" data-role="track-list">
+      <ol className="music__wellTracks">
         {album.tracks.map((track) => (
-          <li className="music__wellTrack" data-role="track-row" key={track.id}>
+          <li className="music__wellTrack" key={track.id}>
             <span
-              data-role="track-number"
               style={{ alignSelf: 'start', fontVariantNumeric: 'tabular-nums', textAlign: 'end' }}
             >
               {track.trackNumber}
             </span>
-            <span data-role="track-text" style={{ display: 'grid', minWidth: 0, rowGap: 2 }}>
+            <span style={{ display: 'grid', minWidth: 0, rowGap: 2 }}>
               <Tooltip title={track.name} whenTruncated>
-                <span className="music__wellTrackTitle" data-role="track-title">
+                <span className="music__wellTrackTitle">
                   <Link href={track.url} isExternal={true} title={`Open ${track.name} on Spotify`}>
                     {track.name}
                   </Link>
                 </span>
               </Tooltip>
               <Tooltip title={artistNames(track.artists)} whenTruncated>
-                <span className="music__wellTrackArtist" data-role="track-artists">
+                <span className="music__wellTrackArtist">
                   <LinkedArtists artists={track.artists} />
                 </span>
               </Tooltip>
             </span>
-            <span
-              data-role="track-duration"
-              style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}
-            >
+            <span style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
               {formatTrackDuration(track.durationMs)}
             </span>
           </li>
         ))}
       </ol>
-    </div>
+    </>
   );
 }

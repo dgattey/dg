@@ -95,7 +95,7 @@ describe('OAuth Route', () => {
       });
 
       it('exchanges code for token and redirects to /console', async () => {
-        mockExchangeStravaCode.mockResolvedValue('<html>Strava Success</html>');
+        mockExchangeStravaCode.mockResolvedValue(undefined);
 
         const response = await GET(createGetRequest({ code: 'strava_code', state }));
 
@@ -128,7 +128,7 @@ describe('OAuth Route', () => {
       });
 
       it('exchanges code for token and redirects to /console', async () => {
-        mockExchangeSpotifyCode.mockResolvedValue('<html>Spotify Success</html>');
+        mockExchangeSpotifyCode.mockResolvedValue(undefined);
 
         const response = await GET(createGetRequest({ code: 'spotify_code', state }));
 

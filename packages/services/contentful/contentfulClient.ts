@@ -1,8 +1,9 @@
 import 'server-only';
+import { assertHttpsEndpoint } from '@dg/shared-core/assertions/assertHttpsEndpoint';
 import { invariant } from '@dg/shared-core/assertions/invariant';
-import { createClient } from '../clients/authenticatedGraphQLClient';
+import { GraphQLClient } from 'graphql-request';
 
-let _contentfulClient: ReturnType<typeof createClient> | undefined;
+let _contentfulClient: GraphQLClient | undefined;
 
 /**
  * Returns the GraphQL client for Contentful requests.
@@ -15,9 +16,14 @@ export function getContentfulClient() {
     invariant(spaceId, 'Missing CONTENTFUL_SPACE_ID env variable');
     invariant(accessToken, 'Missing CONTENTFUL_ACCESS_TOKEN env variable');
 
-    _contentfulClient = createClient({
-      accessToken,
-      endpoint: `https://graphql.contentful.com/content/v1/spaces/${spaceId}`,
+    const endpoint = `https://graphql.contentful.com/content/v1/spaces/${spaceId}`;
+    assertHttpsEndpoint(endpoint);
+    _contentfulClient = new GraphQLClient(endpoint, {
+      cache: 'no-store',
+      headers: {
+        authorization: `Bearer ${accessToken}`,
+        'content-type': 'application/json',
+      },
     });
   }
   return _contentfulClient;

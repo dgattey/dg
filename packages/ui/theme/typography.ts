@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-export type TypographyVariants = {
+type TypographyVariants = {
   body1: CSSProperties;
   body2: CSSProperties;
   button: CSSProperties;

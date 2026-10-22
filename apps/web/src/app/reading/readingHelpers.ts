@@ -22,7 +22,7 @@ const READING_FILTERS: Record<ReadingFilterKey, ReadingFilter> = {
   },
 };
 
-export type ReadingFilterOption = {
+type ReadingFilterOption = {
   count: number;
   key: ReadingFilterKey;
   label: string;
@@ -95,7 +95,7 @@ export function extractBookYear(book: RenderableBook): string {
   return book.readDateFinished?.match(/^(\d{4})/)?.[1] ?? 'Earlier';
 }
 
-export type ShelfSection = {
+type ShelfSection = {
   books: Array<RenderableBook>;
   label: string;
 };

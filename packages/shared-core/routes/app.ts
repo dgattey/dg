@@ -46,9 +46,9 @@ export const apiOpenApiRoute = '/.well-known/openapi.json' as const;
 export const apiStatusRoute = '/.well-known/api-status' as const;
 
 /** Internal rewrite target for Markdown (not a public agent URL). */
-export const internalMarkdownRoutePrefix = '/llm-markdown' as const;
+const internalMarkdownRoutePrefix = '/llm-markdown' as const;
 
-export type MarkdownPageDefinition = {
+type MarkdownPageDefinition = {
   path: string;
   title: string;
   summary: string;
@@ -129,11 +129,6 @@ export function isMarkdownPagePath(pathname: string): pathname is MarkdownPagePa
 /** `.md` twin for a registered HTML path (`/` → `/index.md`). */
 export function htmlPathToMarkdownPath(pathname: MarkdownPagePath): string {
   return pathname === homeRoute ? '/index.md' : `${pathname}.md`;
-}
-
-/** `.md` twin when the path might not be registered. */
-export function tryHtmlPathToMarkdownPath(pathname: string): string | null {
-  return isMarkdownPagePath(pathname) ? htmlPathToMarkdownPath(pathname) : null;
 }
 
 /** HTML path for a `.md` twin (`/index.md` → `/`). */

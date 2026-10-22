@@ -7,9 +7,7 @@ import { MusicTrack } from '@dg/db/models/MusicTrack';
 import { MusicTrackArtist } from '@dg/db/models/MusicTrackArtist';
 import * as v from 'valibot';
 import type { AlbumDetail, AlbumDetailArtist, AlbumDetailTrack } from './albumDetailTypes';
-import { spotifyGet } from './trackMetadataShared';
-
-export type { AlbumDetail, AlbumDetailArtist, AlbumDetailTrack } from './albumDetailTypes';
+import { bestSpotifyImage, spotifyGet } from './trackMetadataShared';
 
 const albumArtistSchema = v.looseObject({
   external_urls: v.looseObject({ spotify: v.string() }),
@@ -58,11 +56,6 @@ const albumTracksPageSchema = v.looseObject({
 });
 
 type ArtistRow = { id: string; name: string; url: string; position: number };
-
-function bestImage(images: Array<{ height: number; url: string; width: number }>): string {
-  const preferred = images.find((img) => img.width === 640) ?? images[0];
-  return preferred?.url ?? '';
-}
 
 function mapArtist(artist: v.InferOutput<typeof albumArtistSchema>, position: number): ArtistRow {
   return {
@@ -235,7 +228,7 @@ async function fetchAlbumFromSpotify(albumId: string): Promise<AlbumDetail | nul
     artists,
     durationMs: tracks.reduce((sum, track) => sum + (track.durationMs ?? 0), 0),
     id: album.id,
-    imageUrl: bestImage(album.images),
+    imageUrl: bestSpotifyImage(album.images),
     label: album.label ?? null,
     name: album.name,
     popularity: album.popularity ?? null,

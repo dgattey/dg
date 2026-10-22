@@ -1,16 +1,6 @@
 'use client';
 
-import {
-  changelogRoute,
-  favoriteAlbumsRoute,
-  homeRoute,
-  markdownPages,
-  musicRoute,
-  musicStatsRoute,
-  readingRoute,
-  siteMapRoute,
-  stravaRoute,
-} from '@dg/shared-core/routes/app';
+import { isMarkdownPagePath, markdownPagePaths, markdownPages } from '@dg/shared-core/routes/app';
 import { useEffect } from 'react';
 
 type JsonSchema = {
@@ -45,23 +35,6 @@ type NavigatorWithModelContext = Navigator & {
 type DocumentWithModelContext = Document & {
   modelContext?: ModelContext;
 };
-
-const navigablePaths = [
-  homeRoute,
-  musicRoute,
-  favoriteAlbumsRoute,
-  musicStatsRoute,
-  readingRoute,
-  stravaRoute,
-  changelogRoute,
-  siteMapRoute,
-] as const;
-
-type NavigablePath = (typeof navigablePaths)[number];
-
-function isNavigablePath(value: unknown): value is NavigablePath {
-  return typeof value === 'string' && (navigablePaths as ReadonlyArray<string>).includes(value);
-}
 
 async function summarizeLlmsTxt(): Promise<{ summary: string; preview: string }> {
   const response = await fetch('/llms.txt');
@@ -130,9 +103,9 @@ export function WebMcpTools() {
         description: 'Navigate the browser to the home, music, favorite albums, or reading page.',
         execute: (args) => {
           const path = args.path;
-          if (!isNavigablePath(path)) {
+          if (typeof path !== 'string' || !isMarkdownPagePath(path)) {
             throw new Error(
-              `Invalid path. Use one of: ${navigablePaths.map((entry) => JSON.stringify(entry)).join(', ')}`,
+              `Invalid path. Use one of: ${markdownPagePaths.map((entry) => JSON.stringify(entry)).join(', ')}`,
             );
           }
           window.location.href = path;
@@ -143,7 +116,7 @@ export function WebMcpTools() {
           properties: {
             path: {
               description: 'Public page path to open',
-              enum: [...navigablePaths],
+              enum: [...markdownPagePaths],
               type: 'string',
             },
           },

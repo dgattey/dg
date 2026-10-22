@@ -4,7 +4,7 @@ import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
  * A run of consecutive plays from the same album. A one-off play is a run of
  * one, so callers can treat every grid cell uniformly.
  */
-export type AlbumPlayRun = {
+type AlbumPlayRun = {
   /** Stable React key, taken from the play that opened the run. */
   key: string;
   albumId: string;

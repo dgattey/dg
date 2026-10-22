@@ -25,7 +25,7 @@ export const MAX_BOOK_TITLE_LENGTH = 500;
 export const MAX_BOOK_AUTHOR_LENGTH = 500;
 export const MAX_BOOK_REVIEW_LENGTH = 50_000;
 export const MAX_BOOK_NOTES_LENGTH = 50_000;
-export const MAX_COVER_IMAGE_URL_LENGTH = 2048;
+const MAX_COVER_IMAGE_URL_LENGTH = 2048;
 export const MIN_BOOK_RATING = 1;
 export const MAX_BOOK_RATING = 5;
 
@@ -68,7 +68,7 @@ export const cleanWhitespace = (input: string | null | undefined): string =>
 export const normalizeAuthor = (author: string | null | undefined): string =>
   cleanWhitespace(author).toLowerCase();
 
-export const normalizeTitle = (title: string | null | undefined): string =>
+const normalizeTitle = (title: string | null | undefined): string =>
   cleanWhitespace(title).toLowerCase();
 
 export const isDuplicateTitle = (
@@ -92,7 +92,7 @@ export function decodeXmlEntities(input: string | null | undefined): string {
   });
 }
 
-export function isbn13CheckDigit(twelveDigits: string): string | null {
+function isbn13CheckDigit(twelveDigits: string): string | null {
   if (!/^\d{12}$/.test(twelveDigits)) return null;
   let sum = 0;
   for (let i = 0; i < 12; i += 1) {
@@ -200,9 +200,7 @@ export const upgradeGoodreadsCoverUrl = (url: string | null | undefined): string
 
 const STANDARD_BASE64_PATTERN = /^[A-Za-z0-9+/]+={0,2}$/;
 
-export type DecodedCoverImageResult =
-  | { bytes: Uint8Array; ok: true }
-  | { error: string; ok: false };
+type DecodedCoverImageResult = { bytes: Uint8Array; ok: true } | { error: string; ok: false };
 
 export function decodeCoverImageBase64(raw: string): DecodedCoverImageResult {
   if (/^\s*data:/i.test(raw)) {

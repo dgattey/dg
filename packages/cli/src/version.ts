@@ -15,9 +15,9 @@ import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fail, findRoot, fmt, log, out, parseArgs, withSpinner } from './lib/utils.js';
 
-export type ReleaseType = 'major' | 'minor' | 'patch';
+type ReleaseType = 'major' | 'minor' | 'patch';
 
-export function parseSemver(raw: string): [number, number, number] | null {
+function parseSemver(raw: string): [number, number, number] | null {
   const match = /^v?(\d+)\.(\d+)\.(\d+)$/.exec(raw.trim());
   if (!match) {
     return null;

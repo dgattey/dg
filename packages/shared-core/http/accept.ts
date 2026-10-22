@@ -3,7 +3,7 @@
  * Follows RFC 9110 §12.4–12.5 preference matching used by acceptmarkdown.com.
  */
 
-export type AcceptEntry = {
+type AcceptEntry = {
   type: string;
   q: number;
   specificity: number;

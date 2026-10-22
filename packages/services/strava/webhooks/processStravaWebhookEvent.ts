@@ -8,7 +8,7 @@ import { log } from '@dg/shared-core/logging/log';
 import { syncStravaWebhookUpdateWithDb } from '../syncStravaWebhookUpdateWithDb';
 import { isValidSubscriptionId } from './isValidSubscriptionId';
 
-export type StravaWebhookProcessResult =
+type StravaWebhookProcessResult =
   | { status: 'bad-request' }
   | { status: 'forbidden' }
   | { status: 'ok'; shouldRevalidate: boolean };

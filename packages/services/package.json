@@ -14,7 +14,6 @@
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
     "@typescript/native": "catalog:",
-    "dotenv-mono": "catalog:",
     "graphql": "catalog:",
     "jest": "catalog:",
     "tsx": "catalog:",

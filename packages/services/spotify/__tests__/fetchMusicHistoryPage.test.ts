@@ -1,34 +1,6 @@
 import { Op } from '@dg/db';
-
-let db: typeof import('@dg/db').db | null = null;
-type FetchMusicHistoryPage = (options: { before?: Date; pageSize?: number }) => Promise<{
-  nextCursor: string | null;
-  tracks: Array<{
-    trackId: string;
-    trackName: string;
-    artistNames: string;
-    albumName: string;
-    albumImageUrl: string;
-    url: string;
-    playedAt: string;
-  }>;
-}>;
-
-let fetchMusicHistoryPage: FetchMusicHistoryPage | null = null;
-
-const getDb = () => {
-  if (!db) {
-    throw new Error('Test database not initialized');
-  }
-  return db;
-};
-
-const getFetchMusicHistoryPage = () => {
-  if (!fetchMusicHistoryPage) {
-    throw new Error('fetchMusicHistoryPage not initialized');
-  }
-  return fetchMusicHistoryPage;
-};
+import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
+import { fetchMusicHistoryPage } from '../fetchMusicHistoryPage';
 
 const mockSpotifyGetWithRetry = jest.fn();
 
@@ -36,6 +8,8 @@ jest.mock('../trackMetadataShared', () => ({
   ...jest.requireActual('../trackMetadataShared'),
   spotifyGet: (...args: Array<unknown>) => mockSpotifyGetWithRetry(...args),
 }));
+
+const db = setupTestDatabase();
 
 // Use unique prefix for this test file to avoid conflicts with parallel tests
 // Keep short to stay within 22-char ID limit
@@ -84,58 +58,53 @@ const buildApiResponse = (id: string) => ({
 });
 
 describe('fetchMusicHistoryPage', () => {
-  beforeAll(async () => {
-    ({ db } = await import('@dg/db'));
-    ({ fetchMusicHistoryPage } = await import('../fetchMusicHistoryPage'));
-  });
-
   beforeEach(async () => {
     jest.clearAllMocks();
     // Clean up test data from all tables
-    await getDb().MusicTrackArtist.destroy({
+    await db.MusicTrackArtist.destroy({
       where: { trackId: { [Op.like]: `${PREFIX}-%` } },
     });
-    await getDb().MusicTrack.destroy({
+    await db.MusicTrack.destroy({
       where: { id: { [Op.like]: `${PREFIX}-%` } },
     });
-    await getDb().MusicAlbum.destroy({
+    await db.MusicAlbum.destroy({
       where: { id: { [Op.like]: `${PREFIX}-%` } },
     });
-    await getDb().MusicArtist.destroy({
+    await db.MusicArtist.destroy({
       where: { id: { [Op.like]: `${PREFIX}-%` } },
     });
-    await getDb().SpotifyPlay.destroy({
+    await db.SpotifyPlay.destroy({
       where: { trackId: { [Op.like]: `${PREFIX}-%` } },
     });
   });
 
   afterEach(async () => {
-    await getDb().MusicTrackArtist.destroy({
+    await db.MusicTrackArtist.destroy({
       where: { trackId: { [Op.like]: `${PREFIX}-%` } },
     });
-    await getDb().MusicTrack.destroy({
+    await db.MusicTrack.destroy({
       where: { id: { [Op.like]: `${PREFIX}-%` } },
     });
-    await getDb().MusicAlbum.destroy({
+    await db.MusicAlbum.destroy({
       where: { id: { [Op.like]: `${PREFIX}-%` } },
     });
-    await getDb().MusicArtist.destroy({
+    await db.MusicArtist.destroy({
       where: { id: { [Op.like]: `${PREFIX}-%` } },
     });
-    await getDb().SpotifyPlay.destroy({
+    await db.SpotifyPlay.destroy({
       where: { trackId: { [Op.like]: `${PREFIX}-%` } },
     });
   });
 
   it('returns empty array when no plays exist', async () => {
-    const result = await getFetchMusicHistoryPage()({});
+    const result = await fetchMusicHistoryPage({});
     expect(result.tracks).toHaveLength(0);
     expect(result.nextCursor).toBeNull();
   });
 
   it('fetches tracks from API when not cached', async () => {
     // Create play records
-    await getDb().SpotifyPlay.bulkCreate([
+    await db.SpotifyPlay.bulkCreate([
       {
         albumId: `${PREFIX}-album-1`,
         artistIds: [`${PREFIX}-artist-1`],
@@ -151,7 +120,7 @@ describe('fetchMusicHistoryPage', () => {
       success: true,
     });
 
-    const result = await getFetchMusicHistoryPage()({});
+    const result = await fetchMusicHistoryPage({});
 
     expect(result.tracks).toHaveLength(1);
     expect(result.tracks[0]).toMatchObject({
@@ -165,7 +134,7 @@ describe('fetchMusicHistoryPage', () => {
     });
 
     // Verify track was cached
-    const cachedTrack = await getDb().MusicTrack.findByPk(`${PREFIX}-track-1`);
+    const cachedTrack = await db.MusicTrack.findByPk(`${PREFIX}-track-1`);
     expect(cachedTrack).not.toBeNull();
   });
 
@@ -176,31 +145,31 @@ describe('fetchMusicHistoryPage', () => {
     if (!artist) {
       throw new Error('Expected artist in test data');
     }
-    await getDb().MusicArtist.create({
+    await db.MusicArtist.create({
       id: artist.id,
       name: artist.name,
       url: artist.url,
     });
-    await getDb().MusicAlbum.create(displayData.album);
-    await getDb().MusicTrack.create({
+    await db.MusicAlbum.create(displayData.album);
+    await db.MusicTrack.create({
       ...displayData.track,
       url: displayData.track.url,
     });
-    await getDb().MusicTrackArtist.create({
+    await db.MusicTrackArtist.create({
       artistId: artist.id,
       position: 0,
       trackId: displayData.track.id,
     });
 
     // Create play record for cached track
-    await getDb().SpotifyPlay.create({
+    await db.SpotifyPlay.create({
       albumId: displayData.album.id,
       artistIds: [artist.id],
       playedAt: new Date('2025-02-01T12:00:00.000Z'),
       trackId: displayData.track.id,
     });
 
-    const result = await getFetchMusicHistoryPage()({});
+    const result = await fetchMusicHistoryPage({});
 
     // Should return data without calling API
     expect(mockSpotifyGetWithRetry).not.toHaveBeenCalled();
@@ -219,7 +188,7 @@ describe('fetchMusicHistoryPage', () => {
       playedAt: new Date(Date.now() - i * 1000), // Staggered times
       trackId: `${PREFIX}-track-page-${i}`,
     }));
-    await getDb().SpotifyPlay.bulkCreate(plays);
+    await db.SpotifyPlay.bulkCreate(plays);
 
     // Mock API for all tracks
     mockSpotifyGetWithRetry.mockImplementation((resource: string) => {
@@ -233,7 +202,7 @@ describe('fetchMusicHistoryPage', () => {
     });
 
     // Request with small page size
-    const result = await getFetchMusicHistoryPage()({ pageSize: 3 });
+    const result = await fetchMusicHistoryPage({ pageSize: 3 });
 
     expect(result.tracks).toHaveLength(3);
     expect(result.nextCursor).not.toBeNull();

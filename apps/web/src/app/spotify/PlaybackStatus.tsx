@@ -16,8 +16,6 @@ type PlaybackStatusProps = {
   playedAt?: Track['playedAt'];
   color?: string;
   textShadow?: string;
-  /** Override animation state separately from playback status. Defaults to matching isPlaying. */
-  animating?: boolean;
   listingVariant?: ListingVariant;
   /** Names where it's playing, trading the relative time for a plain "recently played". */
   service?: string;
@@ -87,17 +85,15 @@ export function PlaybackStatus({
   playedAt,
   color,
   textShadow,
-  animating,
   listingVariant = 'card',
   service,
 }: PlaybackStatusProps) {
   const isNowPlaying = isPlaying ?? !playedAt;
-  const shouldAnimate = animating ?? isNowPlaying;
   const isCompact = listingVariant === 'compact';
 
   const bounceRef = useWaveformBounce<HTMLSpanElement>({
     intensity: 0.8,
-    isPlaying: shouldAnimate,
+    isPlaying: isNowPlaying,
   });
 
   // The card's title sits right under the status, so its hint opens upward.

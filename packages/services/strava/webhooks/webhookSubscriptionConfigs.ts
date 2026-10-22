@@ -1,6 +1,13 @@
 import 'server-only';
 
-import type { WebhookSubscriptionConfig } from './WebhookSubscriptionConfig';
+type WebhookSubscriptionConfig = {
+  endpoint: string;
+  id: string | undefined;
+  secret: string | undefined;
+  verifyToken: string | undefined;
+  callbackUrl: string | undefined;
+  headers: Record<string, string>;
+};
 
 /**
  * These are the standard parameters that go into the body of

@@ -103,13 +103,6 @@
   inset: 0;
   display: block;
   overflow: clip;
-  background: transparent;
-  isolation: isolate;
-  mix-blend-mode: normal;
-}
-.print__art img {
-  mix-blend-mode: normal;
-  filter: none;
 }
 @media (max-width: 820px) {
   .print__portrait {

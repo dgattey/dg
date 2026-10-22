@@ -7,7 +7,6 @@ import {
   agentSkills,
   getAgentSkill,
   getAgentSkillsIndex,
-  isAgentSkillName,
   sha256Digest,
   skillArtifactUrl,
 } from '../agentSkills';
@@ -23,7 +22,6 @@ describe('agentSkills', () => {
       expect(entry.type).toBe('skill-md');
       expect(entry.url).toBe(skillArtifactUrl(entry.name));
       expect(entry.name).toMatch(/^[a-z0-9]+(?:-[a-z0-9]+)*$/);
-      expect(isAgentSkillName(entry.name)).toBe(true);
 
       const skill = getAgentSkill(entry.name);
       expect(skill).toBeDefined();
@@ -37,7 +35,6 @@ describe('agentSkills', () => {
   });
 
   it('rejects unknown skill names', () => {
-    expect(isAgentSkillName('not-a-skill')).toBe(false);
     expect(getAgentSkill('not-a-skill')).toBeUndefined();
   });
 });

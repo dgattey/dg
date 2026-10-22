@@ -180,7 +180,6 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
 
                 {group.compactReleases.length > 0 ? (
                   <PaperCard
-                    className="changelog__compactLedger"
                     edge="quad-b"
                     innerClassName="changelog__compactLedgerInner"
                     tiltDeg={groupIndex % 2 === 0 ? 0.4 : -0.4}
@@ -211,7 +210,7 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
                                 className="changelog__compactDot"
                                 data-kind={release.kind}
                               />
-                              <span className="changelog__compactTag">{release.tag}</span>
+                              <span>{release.tag}</span>
                               {shortDate ? (
                                 <span className="changelog__compactDate">{shortDate}</span>
                               ) : null}

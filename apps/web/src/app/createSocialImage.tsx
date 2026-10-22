@@ -63,8 +63,6 @@ export const SOCIAL_IMAGE_ALTS: Record<SocialImagePage, string> = {
   strava: `Bay Area Strava route map and lifetime miles on a paper-cut collage from ${SITE_NAME}`,
 };
 
-export const SOCIAL_IMAGE_ALT = SOCIAL_IMAGE_ALTS.home;
-
 const REGULAR_FONT_URL = new URL('./collage/fonts/Familjen-Grotesk-Regular.ttf', import.meta.url);
 const BOLD_FONT_URL = new URL('./collage/fonts/Familjen-Grotesk-Bold.ttf', import.meta.url);
 const GRAIN_URL = new URL('./collage/img/grain.png', import.meta.url);
@@ -97,29 +95,21 @@ async function fetchTileDataUri(coord: StravaTileCoord): Promise<StravaMapTile |
     y: coord.y,
     zoom: coord.zoom,
   });
-  const candidates: ReadonlyArray<{ headers: Record<string, string>; url: string }> = [
-    {
+  try {
+    const response = await fetch(stadiaUrl, {
+      cache: 'no-store',
       headers: { Origin: 'http://localhost:3000', Referer: 'http://localhost:3000/' },
-      url: stadiaUrl,
-    },
-  ];
-  for (const candidate of candidates) {
-    try {
-      const response = await fetch(candidate.url, {
-        cache: 'no-store',
-        headers: candidate.headers,
-      });
-      if (response.ok) {
-        const bytes = Buffer.from(await response.arrayBuffer());
-        return {
-          left: coord.left,
-          size: coord.size,
-          top: coord.top,
-          url: `data:image/png;base64,${bytes.toString('base64')}`,
-        };
-      }
-    } catch {}
-  }
+    });
+    if (response.ok) {
+      const bytes = Buffer.from(await response.arrayBuffer());
+      return {
+        left: coord.left,
+        size: coord.size,
+        top: coord.top,
+        url: `data:image/png;base64,${bytes.toString('base64')}`,
+      };
+    }
+  } catch {}
   return null;
 }
 

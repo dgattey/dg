@@ -41,7 +41,7 @@ export { Op, QueryTypes };
 /**
  * Verify database connection. Call on app startup.
  */
-export async function connectToDatabase(): Promise<void> {
+async function connectToDatabase(): Promise<void> {
   await dbClient.authenticate();
   log.info('Database connected');
 }

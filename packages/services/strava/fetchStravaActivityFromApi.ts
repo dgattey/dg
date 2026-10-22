@@ -1,9 +1,11 @@
 import 'server-only';
 
-import { stravaActivityApiSchema } from '@dg/content-models/strava/StravaActivity';
+import {
+  mapStravaActivityFromApi,
+  stravaActivityApiSchema,
+} from '@dg/content-models/strava/StravaActivity';
 import { log } from '@dg/shared-core/logging/log';
 import { parseResponse } from '../clients/parseResponse';
-import { mapActivityFromApi } from './mapActivityFromApi';
 import { getStravaClient } from './stravaClient';
 
 /**
@@ -21,5 +23,5 @@ export const fetchStravaActivityFromApi = async (id: number) => {
     source: 'strava.fetchStravaActivityFromApi',
   });
   log.info('Fetched and parsed Strava activity from API', { apiData, id });
-  return mapActivityFromApi(apiData);
+  return mapStravaActivityFromApi(apiData);
 };

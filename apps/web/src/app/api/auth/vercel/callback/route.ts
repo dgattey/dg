@@ -1,8 +1,7 @@
 import { timingSafeEqual } from 'node:crypto';
 import { vercelAuthCallbackRoute } from '@dg/shared-core/routes/api';
-import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import { cookies } from 'next/headers';
-import { type NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 import { clearCookieOptions, sessionCookieOptions } from '../../../../../auth/vercel/cookieOptions';
 import {
   VERCEL_OAUTH_CODE_VERIFIER_COOKIE,
@@ -12,7 +11,7 @@ import {
   VERCEL_USERINFO_URL,
 } from '../../../../../auth/vercel/oauthCookies';
 import { signSession, VERCEL_SESSION_COOKIE } from '../../../../../auth/vercel/session';
-import { redirectToConsoleWithAuthError } from '../redirectToConsole';
+import { redirectToConsole, redirectToConsoleWithAuthError } from '../../../apiResponses';
 
 type TokenResponse = {
   access_token: string;
@@ -166,11 +165,7 @@ export async function GET(request: NextRequest) {
     cookieStore.set(VERCEL_SESSION_COOKIE, signed, sessionCookieOptions());
     await clearOauthTempCookies();
 
-    const consoleUrl = new URL(devConsoleRoute, request.url);
-    if (consoleUrl.hostname === 'localhost') {
-      consoleUrl.protocol = 'http:';
-    }
-    return NextResponse.redirect(consoleUrl);
+    return redirectToConsole(request);
   } catch {
     await clearOauthTempCookies().catch(() => undefined);
     return redirectToConsoleWithAuthError(request, 'callback_failed');

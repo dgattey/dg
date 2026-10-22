@@ -1,6 +1,6 @@
 import { PAPER_PALETTE } from '../collage/paperPalette';
 
-export type MarkPart = 'letter' | 'dot';
+type MarkPart = 'letter' | 'dot';
 
 /**
  * Outlines of the `dg.` mark, so the logo, icons, and social card draw the same
@@ -8,7 +8,7 @@ export type MarkPart = 'letter' | 'dot';
  * `g` and `.` sit a few units tighter than the font's own spacing to match the
  * original text logo's -0.12em tracking.
  */
-export const MARK_PATHS = [
+const MARK_PATHS = [
   {
     d: 'M121.48 362.59c-15.478 0-28.976-3.296-40.493-9.887-11.517-6.59-20.444-15.91-26.78-27.957-6.337-12.048-9.505-26.262-9.505-42.642v-.214c0-16.444 3.172-30.686 9.517-42.727 6.345-12.04 15.272-21.34 26.78-27.898 11.509-6.559 25.01-9.838 40.504-9.838 9.806 0 18.662 1.315 26.567 3.945 7.905 2.63 14.772 6.322 20.603 11.075 5.83 4.752 10.488 10.296 13.973 16.632h.974V153.26h53.705V359H183.62v-27.635h-.974c-3.454 6.257-8.088 11.722-13.902 16.395s-12.681 8.313-20.603 10.92c-7.92 2.606-16.808 3.91-26.66 3.91zm19.747-39.188c8.555 0 16.008-1.667 22.36-5 6.353-3.335 11.272-8.091 14.757-14.27 3.486-6.178 5.23-13.505 5.23-21.981v-.214c0-8.476-1.756-15.8-5.265-21.97-3.51-6.17-8.429-10.922-14.757-14.257-6.328-3.335-13.77-5.003-22.325-5.003-8.585 0-16.011 1.64-22.277 4.92-6.266 3.278-11.11 7.995-14.532 14.15-3.422 6.155-5.133 13.526-5.133 22.113v.214c0 8.602 1.703 15.984 5.11 22.146 3.406 6.162 8.25 10.895 14.531 14.198 6.282 3.303 13.716 4.954 22.301 4.954z',
     dx: 0,
@@ -26,7 +26,7 @@ export const MARK_PATHS = [
   },
 ] as const satisfies ReadonlyArray<{ d: string; dx: number; part: MarkPart }>;
 
-export const MARK_VIEW_BOX = '44.7 153.26 413.01 259.92';
+const MARK_VIEW_BOX = '44.7 153.26 413.01 259.92';
 
 /**
  * The die-cut mat's stroke, in mark units. Wide enough to read as a sticker in

@@ -6,8 +6,6 @@ export type OauthProviderKey = 'strava' | 'spotify';
 /**
  * Shared API route path constants.
  */
-export const booksSyncRoute = '/api/books/sync' as const;
-export const goodreadsSyncRoute = '/api/books/goodreads-sync' as const;
 export const oauthRoute = '/api/oauth' as const;
 export const webhooksRoute = '/api/webhooks' as const;
 

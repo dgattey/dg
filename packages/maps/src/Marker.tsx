@@ -1,21 +1,34 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import { Box } from '@dg/ui/core/Box';
-import { GlassContainer } from '@dg/ui/core/GlassContainer';
 import { Image } from '@dg/ui/dependent/Image';
-import { MAP_MARKER_IMAGE_SIZE } from '@dg/ui/helpers/imageSizes';
+import { createTransition, EASING_BOUNCY } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 
 const DIMENSION = 100;
-const IMAGE_DIMENSION = MAP_MARKER_IMAGE_SIZE;
+const IMAGE_DIMENSION = 85;
+
+const GLASS_SHADOW = `
+  inset 0 1px 0 color-mix(in srgb, var(--mui-palette-common-white) 15%, transparent),
+  0px 1px 5px color-mix(in srgb, var(--mui-palette-common-black) 12%, transparent),
+  0px 6px 16px color-mix(in srgb, var(--mui-palette-common-black) 8%, transparent)`;
 
 const containerSx: SxObject = {
+  backdropFilter: 'blur(12px) saturate(150%)',
+  backgroundColor: 'color-mix(in srgb, var(--mui-palette-background-default) 70%, transparent)',
   border: '2px solid color-mix(in srgb, var(--mui-palette-background-default) 60%, transparent)',
   borderRadius: '50%',
+  boxShadow: GLASS_SHADOW,
   cursor: 'grab',
   height: DIMENSION,
   opacity: 0.85,
   overflow: 'hidden',
+  position: 'relative',
   transform: 'translate(-50%, -50%)',
+  transition: createTransition(
+    ['background-color', 'border-color', 'box-shadow'],
+    375,
+    EASING_BOUNCY,
+  ),
   width: DIMENSION,
 };
 
@@ -31,11 +44,10 @@ type MarkerProps = {
 
 /**
  * Custom map marker with optional image overlay.
- * Uses the shared glass morphism container at higher transparency.
  */
 export function Marker({ image }: MarkerProps) {
   return (
-    <GlassContainer sx={containerSx}>
+    <Box sx={containerSx}>
       {image ? (
         <Box component="span" sx={imageSx}>
           <Image
@@ -47,6 +59,6 @@ export function Marker({ image }: MarkerProps) {
           />
         </Box>
       ) : null}
-    </GlassContainer>
+    </Box>
   );
 }

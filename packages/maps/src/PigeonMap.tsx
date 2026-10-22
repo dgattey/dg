@@ -20,7 +20,7 @@ const containerSx: SxObject = {
 const DEFAULT_MIN_ZOOM = 3;
 const DEFAULT_MAX_ZOOM = 18;
 
-export type PigeonMapProps = {
+type PigeonMapProps = {
   location: MapLocation;
   tileSource: TileSource;
 };

@@ -17,11 +17,11 @@ type TrackTitleProps = {
 
 const VARIANT_SX: Record<ListingVariant, SxObject> = {
   card: {
-    ...truncated(1),
+    ...truncated(),
     marginBottom: 1,
   },
   compact: {
-    ...truncated(1),
+    ...truncated(),
     lineHeight: 1.2,
   },
 };

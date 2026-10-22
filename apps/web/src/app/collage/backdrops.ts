@@ -27,7 +27,7 @@ export type SheetPlacement =
   | (SheetBase & { edge: 'torn'; heightPx: number; widthPercent: number })
   | (SheetBase & { edge: 'disc' | 'pebble'; sizePx: number });
 
-export type BackdropBand = {
+type BackdropBand = {
   cutOuts: ReadonlyArray<CutOutPlacement>;
   sheets: ReadonlyArray<SheetPlacement>;
 };

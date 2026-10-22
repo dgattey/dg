@@ -8,9 +8,6 @@
 /** Quick feedback for micro-interactions like opacity fades (100ms) */
 export const TIMING_FAST = 100;
 
-/** Standard duration for most interactions and state changes (150ms) */
-const TIMING_NORMAL = 150;
-
 /** Slightly longer for emphasis or multi-property transitions (200ms) */
 export const TIMING_MEDIUM = 200;
 
@@ -62,8 +59,8 @@ export function getTimingCssVars(): Record<`--${string}`, string> {
  */
 export function createTransition(
   properties: string | Array<string>,
-  duration: number = TIMING_NORMAL,
-  easing: string = EASING_EASE_OUT,
+  duration: number,
+  easing: string,
 ) {
   const props = Array.isArray(properties) ? properties : [properties];
   return props.map((property) => `${property} ${duration}ms ${easing}`).join(', ');

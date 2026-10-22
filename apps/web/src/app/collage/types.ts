@@ -15,15 +15,7 @@ export const PAPER_TONES = [
 
 export type PaperTone = (typeof PAPER_TONES)[number];
 
-export const PAPER_EDGES = [
-  'quad-a',
-  'quad-b',
-  'quad-c',
-  'quad-d',
-  'soft-a',
-  'soft-b',
-  'torn-c',
-] as const;
+const PAPER_EDGES = ['quad-a', 'quad-b', 'quad-c', 'quad-d', 'soft-a', 'soft-b', 'torn-c'] as const;
 
 export type PaperEdge = (typeof PAPER_EDGES)[number];
 

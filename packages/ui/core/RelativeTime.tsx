@@ -2,13 +2,57 @@
 
 import { capitalize } from '@dg/shared-core/formatting/capitalize';
 import { useEffect, useState } from 'react';
-import { formatRelativeTime } from '../helpers/relativeTime';
 import { useServerTime } from './ServerTimeContext';
 import { Tooltip, type TooltipPlacement } from './Tooltip';
 
+type DateValue = Date | string | number;
+
+const FALLBACK: readonly [Intl.RelativeTimeFormatUnit, number] = ['second', 1000];
+
+const UNITS: ReadonlyArray<readonly [Intl.RelativeTimeFormatUnit, number]> = [
+  ['day', 24 * 60 * 60 * 1000],
+  ['hour', 60 * 60 * 1000],
+  ['minute', 60 * 1000],
+  ['month', (24 * 60 * 60 * 1000 * 365) / 12],
+  ['second', 1000],
+  ['year', 24 * 60 * 60 * 1000 * 365],
+];
+
+const OVERRIDES: Partial<Record<Intl.RelativeTimeFormatUnit, Record<number, string>>> = {
+  hour: {
+    1: 'an hour ago',
+  },
+  minute: {
+    1: 'a minute ago',
+    4: 'a few minutes ago',
+  },
+  second: {
+    30: 'just now',
+  },
+};
+
+const relativeTimeFormatter = new Intl.RelativeTimeFormat('en', {
+  numeric: 'auto',
+});
+
+function formatRelativeTime({ fromDate, toDate }: { fromDate: DateValue; toDate: number }): string {
+  const fromNumeric = Number(new Date(fromDate));
+  if (Number.isNaN(fromNumeric) || Number.isNaN(toDate)) {
+    return '';
+  }
+  const elapsedMs = fromNumeric - toDate;
+  const [unit, value] = UNITS.find((entry) => Math.abs(elapsedMs) > entry[1]) ?? FALLBACK;
+  const amount = Math.round(elapsedMs / value);
+  const overrides = OVERRIDES[unit];
+  const overridden = overrides
+    ? Object.entries(overrides).find(([threshold]) => Math.abs(amount) <= Number(threshold))?.[1]
+    : undefined;
+  return overridden ?? relativeTimeFormatter.format(amount, unit);
+}
+
 type RelativeTimeProps = {
   /** The date to display relative to now. */
-  date: Date | string | number;
+  date: DateValue;
   /** How often to refresh the relative time (in ms). Defaults to 60s. */
   updateIntervalMs?: number;
   /** Whether to show a tooltip with the full date and time. Defaults to true. */
@@ -21,11 +65,11 @@ type RelativeTimeProps = {
 
 const DEFAULT_UPDATE_INTERVAL_MS = 60_000;
 
-function toDate(value: Date | string | number): Date {
+function toDate(value: DateValue): Date {
   return value instanceof Date ? value : new Date(value);
 }
 
-function formatFullDate(date: Date | string | number): string {
+function formatFullDate(date: DateValue): string {
   return new Intl.DateTimeFormat(undefined, {
     dateStyle: 'long',
     timeStyle: 'short',

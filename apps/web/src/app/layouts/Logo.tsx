@@ -3,7 +3,7 @@
 import { homeRoute } from '@dg/shared-core/routes/app';
 import { pageTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
-import { createBouncyTransition } from '@dg/ui/helpers/bouncyTransition';
+import { createTransition, EASING_BOUNCY, TIMING_BOUNCY } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { usePathname } from 'next/navigation';
 import type { CSSProperties, MouseEvent } from 'react';
@@ -39,7 +39,7 @@ const logoLinkSx: SxObject = {
   lineHeight: 1,
   padding: 0.5,
   textDecoration: 'none',
-  ...createBouncyTransition(['filter', 'transform']),
+  transition: createTransition(['filter', 'transform'], TIMING_BOUNCY, EASING_BOUNCY),
   willChange: 'transform',
 };
 

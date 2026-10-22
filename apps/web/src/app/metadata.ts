@@ -4,7 +4,7 @@ import { NIGHT_PAPER, PAPER_PALETTE } from './collage/paperPalette';
 export const SITE_NAME = 'Dylan Gattey';
 export const HOMEPAGE_TITLE = 'Engineer. Problem Solver.';
 // Max length for meta descriptions before truncation.
-export const MAX_DESC_LENGTH = 300;
+const MAX_DESC_LENGTH = 300;
 
 const toUrl = (value: string) => {
   if (value.startsWith('http://') || value.startsWith('https://')) {

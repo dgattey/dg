@@ -49,20 +49,15 @@ html:has(.collageRoot) body {
   --pad: clamp(16px, 4vw, 80px);
   --measure: 1280px;
   --collage-border-width: 1.5px;
-  --collage-border: var(--collage-border-width) solid var(--ink);
   --mat: 10px;
   --mat-feature: 14px;
   --print-radius: 6px;
-  --shadow: 0 2px 0 rgb(0 0 0 / 0.2), 0 7px 14px rgb(0 0 0 / 0.16);
-  --shadow-card: var(--shadow);
-  --shadow-lift: 0 3px 0 rgb(0 0 0 / 0.24), 0 10px 18px rgb(0 0 0 / 0.22);
   --type-display: clamp(56px, 11vw, 144px);
   --type-h1: clamp(44px, 7vw, 88px);
   --type-display-md: clamp(40px, 6vw, 72px);
   --type-title-lg: clamp(26px, 2.6vw, 36px);
   --type-title-md: clamp(22px, 2.3vw, 28px);
   --type-h2: clamp(20px, 2.2vw, 24px);
-  --type-title-sm: var(--type-h2);
   --type-h3: 20px;
   --type-label: clamp(18px, 1.6vw, 20px);
   --type-body-lg: clamp(17px, 1.5vw, 20px);
@@ -195,8 +190,7 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   gap: 0.7em;
   align-items: baseline;
 }
-.collageEyebrow,
-.c-label {
+.collageEyebrow {
   font-family: var(--display);
   font-size: var(--type-label);
   font-weight: 700;

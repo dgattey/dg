@@ -23,7 +23,6 @@ describe('contentful renderables', () => {
   it('filters out projects missing required fields', () => {
     const validProject = toRenderableProject({
       creationDate: '2024-01-01',
-      description: { json: { content: [], nodeType: 'document' } },
       layout: 'default',
       link: { url: 'https://example.com' },
       thumbnail: {
@@ -37,7 +36,6 @@ describe('contentful renderables', () => {
 
     expect(validProject).toEqual({
       creationDate: '2024-01-01',
-      description: { json: { content: [], nodeType: 'document' } },
       layout: 'default',
       link: { icon: null, title: 'Project', url: 'https://example.com' },
       thumbnail: {
@@ -78,18 +76,16 @@ describe('contentful renderables', () => {
         entries: {
           block: [
             {
-              sys: { id: 'project-good' },
-              thumbnail: {
-                height: 480,
-                url: 'https://example.com/image.webp',
-                width: 640,
-              },
-              title: 'Project',
+              icon: null,
+              sys: { id: 'block-link-good' },
+              title: 'Block link',
+              url: 'https://example.com/block',
             },
             {
-              sys: { id: 'project-bad' },
-              thumbnail: { height: 480, url: null, width: 640 },
-              title: 'Project',
+              icon: null,
+              sys: { id: 'block-link-bad' },
+              title: null,
+              url: 'https://example.com/block',
             },
           ],
           inline: [
@@ -119,6 +115,6 @@ describe('contentful renderables', () => {
     expect(renderable.links.entries.inline[0]?.sys.id).toBe('link-good');
 
     expect(renderable.links.entries.block).toHaveLength(1);
-    expect(renderable.links.entries.block[0]?.sys.id).toBe('project-good');
+    expect(renderable.links.entries.block[0]?.sys.id).toBe('block-link-good');
   });
 });

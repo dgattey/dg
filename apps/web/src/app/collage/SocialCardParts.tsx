@@ -35,7 +35,7 @@ const UNDERPRINT_OFFSET = { x: 6, y: 7 };
 export const QUAD_A = '14px 12px 16px 13px';
 export const QUAD_C = '13px 15px 12px 16px';
 export const PAPER_SHADOW = '0 1px 0 rgba(0,0,0,0.2), 0 2px 3px rgba(0,0,0,0.12)';
-export const MAT_OFFSET = 12;
+const MAT_OFFSET = 12;
 export const PIECE_SHADOW =
   'drop-shadow(0 1px 0 rgba(0,0,0,0.2)) drop-shadow(0 2px 3px rgba(0,0,0,0.12))';
 export const LIFTED_SHADOW =
@@ -55,7 +55,7 @@ export function inkForTone(tone: PaperColor): string {
   return DARK_TONES.has(tone) ? PAPER_PALETTE.cream : PAPER_PALETTE.ink;
 }
 
-export function CutOutSvg({ color, rotationDeg, shape, size, underprint, x, y }: CutOutPiece) {
+function CutOutSvg({ color, rotationDeg, shape, size, underprint, x, y }: CutOutPiece) {
   const transform = `rotate(${rotationDeg}deg)`;
   return (
     <div

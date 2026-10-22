@@ -56,7 +56,6 @@ const QUERY = gql`
                 title
                 width
                 height
-                description
               }
             }
           }

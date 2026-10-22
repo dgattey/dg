@@ -17,7 +17,7 @@ import { yearOf } from './stravaStats';
 
 const FILTER_SPORTS = ['ride', 'run', 'hike'] as const;
 
-export type SportFilter = 'all' | (typeof FILTER_SPORTS)[number];
+type SportFilter = 'all' | (typeof FILTER_SPORTS)[number];
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 

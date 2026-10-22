@@ -7,10 +7,6 @@ import {
   printSchema,
 } from 'graphql';
 
-// ─────────────────────────────────────────────────────────────────────────────
-// Type guards
-// ─────────────────────────────────────────────────────────────────────────────
-
 type JsonObject = Record<string, unknown>;
 
 const isJsonObject = (value: unknown): value is JsonObject =>
@@ -18,10 +14,6 @@ const isJsonObject = (value: unknown): value is JsonObject =>
 
 const isIntrospectionResult = (value: unknown): value is IntrospectionQuery =>
   isJsonObject(value) && isJsonObject(value.__schema);
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Helpers
-// ─────────────────────────────────────────────────────────────────────────────
 
 /** Reads required environment variables or throws */
 function getContentfulConfig() {
@@ -81,10 +73,6 @@ function parseIntrospectionPayload(payload: unknown): IntrospectionQuery {
 
   return payload.data;
 }
-
-// ─────────────────────────────────────────────────────────────────────────────
-// Main
-// ─────────────────────────────────────────────────────────────────────────────
 
 const { spaceId, accessToken } = getContentfulConfig();
 const payload = await fetchIntrospection(spaceId, accessToken);

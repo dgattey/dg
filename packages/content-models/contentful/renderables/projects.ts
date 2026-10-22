@@ -1,4 +1,4 @@
-import type { Project, ProjectWithSys } from '../schema/shared';
+import type { Project } from '../schema/shared';
 import type { RenderableLink } from './links';
 
 export type RenderableProject = {
@@ -11,13 +11,6 @@ export type RenderableProject = {
     url: string;
     width: number;
     height: number;
-  };
-  description?: { json: unknown } | null;
-};
-
-export type RenderableProjectWithSys = RenderableProject & {
-  sys: {
-    id: string;
   };
 };
 
@@ -41,7 +34,6 @@ export const toRenderableProject = (
     : null;
   return {
     creationDate: project.creationDate ?? null,
-    description: project.description ?? null,
     layout: project.layout ?? null,
     link,
     thumbnail: {
@@ -51,18 +43,5 @@ export const toRenderableProject = (
     },
     title: project.title,
     type: project.type ?? null,
-  };
-};
-
-export const toRenderableProjectWithSys = (
-  project: ProjectWithSys | null | undefined,
-): RenderableProjectWithSys | null => {
-  const renderable = toRenderableProject(project);
-  if (!renderable || !project?.sys?.id) {
-    return null;
-  }
-  return {
-    ...renderable,
-    sys: { id: project.sys.id },
   };
 };

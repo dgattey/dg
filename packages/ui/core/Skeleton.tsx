@@ -2,9 +2,9 @@ import type { HTMLAttributes } from 'react';
 import type { SxObject, SxProps } from '../theme';
 import { compileSx, joinClasses, SxStyle } from '../theme/css';
 
-export type SkeletonVariant = 'text' | 'rectangular' | 'rounded' | 'circular';
+type SkeletonVariant = 'text' | 'rounded';
 
-export type SkeletonProps = HTMLAttributes<HTMLSpanElement> & {
+type SkeletonProps = HTMLAttributes<HTMLSpanElement> & {
   height?: number | string;
   sx?: SxProps;
   variant?: SkeletonVariant;
@@ -19,8 +19,7 @@ export function Skeleton({
   width,
   ...rest
 }: SkeletonProps) {
-  const radius =
-    variant === 'circular' ? '50%' : variant === 'rounded' ? '8px' : variant === 'text' ? '4px' : 0;
+  const radius = variant === 'rounded' ? '8px' : '4px';
 
   const baseSx: SxObject = {
     animation: 'dg-pulse 2s ease-in-out 0.5s infinite',

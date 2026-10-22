@@ -16,12 +16,12 @@ import {
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import { isRecord } from '@dg/shared-core/types/typeguards';
 
-export type PublishedCoverAsset = {
+type PublishedCoverAsset = {
   assetId: string;
   url: string;
 };
 
-export class ContentfulCmaError extends Error {
+class ContentfulCmaError extends Error {
   readonly status: number;
   readonly body: unknown;
   constructor(message: string, status: number, body: unknown) {
@@ -45,7 +45,7 @@ const tryJson = (text: string): unknown => {
   }
 };
 
-export type ContentfulCmaClientConfig = {
+type ContentfulCmaClientConfig = {
   environmentId?: string;
   fetchImpl?: typeof fetch;
   locale?: string;

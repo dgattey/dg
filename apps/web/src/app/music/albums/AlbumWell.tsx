@@ -155,7 +155,7 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
         name={albumArtViewTransitionName(album.id)}
         share="vt-album-art"
       >
-        <Box className="music__wellArtCard music__fullColorArt">
+        <Box className="music__wellArtCard">
           <Image
             alt={album.name}
             fetchPriority="high"
@@ -193,10 +193,8 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
       sx={reserveSx(reservePx)}
     >
       {art}
-      <Box sx={{ display: 'contents' }}>
-        {title}
-        {children}
-      </Box>
+      {title}
+      {children}
     </Box>
   );
 

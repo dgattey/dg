@@ -7,7 +7,7 @@ import {
   stravaRoute,
 } from '@dg/shared-core/routes/app';
 
-export type MusicDestination = {
+type MusicDestination = {
   href: string;
   label: string;
 };
@@ -43,14 +43,7 @@ export function normalizeMusicPath(path: string) {
 }
 
 export function isMusicDestinationPath(path: string) {
-  const normalized = normalizeMusicPath(path);
-  if (MUSIC_DESTINATION_PATHS.has(normalized)) {
-    return true;
-  }
-  return (
-    normalized.startsWith(`${favoriteAlbumsRoute}/`) &&
-    normalized.length > favoriteAlbumsRoute.length + 1
-  );
+  return MUSIC_DESTINATION_PATHS.has(normalizeMusicPath(path));
 }
 
 export function musicDestinationTitle(href: string): string {

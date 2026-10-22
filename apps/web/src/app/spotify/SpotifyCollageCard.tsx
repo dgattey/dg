@@ -3,11 +3,37 @@
 import type { Track } from '@dg/content-models/spotify/Track';
 import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
+import { useEffect, useState } from 'react';
+import { type AlbumGradientInformation, extractAlbumGradientFromUrl } from './extractAlbumGradient';
 import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
-import { useAlbumGradient } from './useAlbumGradient';
 
 const collageCardSx: SxObject = { gridArea: 'sp', scrollMarginTop: 120 };
+
+function useAlbumGradient(track: Track): Track {
+  const [gradientInformation, setGradientInformation] = useState<AlbumGradientInformation>({
+    backgroundGradient: track.albumGradient ?? null,
+    contrastSetting: track.albumGradientContrastSetting ?? null,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    extractAlbumGradientFromUrl(track.albumImage.url).then((info) => {
+      if (!cancelled) {
+        setGradientInformation(info);
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [track.albumImage.url]);
+
+  return {
+    ...track,
+    albumGradient: gradientInformation.backgroundGradient ?? undefined,
+    albumGradientContrastSetting: gradientInformation.contrastSetting ?? undefined,
+  };
+}
 
 export function SpotifyCollageCard({ track: serverTrack }: { track: Track | null }) {
   const track = useNowPlaying(serverTrack);

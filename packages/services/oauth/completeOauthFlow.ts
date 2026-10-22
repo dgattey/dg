@@ -8,7 +8,7 @@ import { retrieveAndDeleteOauthState } from './oauthStateStorage';
 /**
  * Possible results of completing an OAuth callback flow.
  */
-export type OauthCallbackResult =
+type OauthCallbackResult =
   | { status: 'missing-code' }
   | { status: 'missing-state' }
   | { status: 'invalid-state' }

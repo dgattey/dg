@@ -16,7 +16,6 @@ const sysSchema = v.looseObject({
  * Base asset fields used across responses.
  */
 const assetFields = {
-  description: v.optional(v.nullable(v.string())),
   height: v.optional(v.nullable(v.number())),
   title: v.optional(v.nullable(v.string())),
   url: v.optional(v.nullable(v.string())),
@@ -34,7 +33,7 @@ export const assetSchema = v.looseObject({
 /**
  * Asset with `sys` (used in rich text links).
  */
-export const assetWithSysSchema = v.looseObject({
+const assetWithSysSchema = v.looseObject({
   ...assetFields,
   sys: sysSchema,
 });
@@ -56,7 +55,7 @@ export const linkSchema = v.looseObject(linkFields);
 /**
  * Link with `sys` (used in rich text links).
  */
-export const linkWithSysSchema = v.looseObject({
+const linkWithSysSchema = v.looseObject({
   ...linkFields,
   sys: sysSchema,
 });
@@ -66,13 +65,6 @@ export const linkWithSysSchema = v.looseObject({
  */
 const projectFields = {
   creationDate: v.optional(v.nullable(v.string())),
-  description: v.optional(
-    v.nullable(
-      v.looseObject({
-        json: v.unknown(),
-      }),
-    ),
-  ),
   isSideProject: v.optional(v.nullable(v.boolean())),
   layout: v.optional(v.nullable(v.string())),
   link: v.optional(
@@ -102,30 +94,17 @@ const projectFields = {
 export const projectSchema = v.looseObject(projectFields);
 
 /**
- * Project entry with `sys` (used in rich text links).
- */
-export const projectWithSysSchema = v.looseObject({
-  ...projectFields,
-  sys: sysSchema,
-});
-
-/**
- * Rich text entries we can render inline or as blocks.
- */
-export const entrySchema = v.union([linkWithSysSchema, projectWithSysSchema]);
-
-/**
  * Rich text content payload with linked assets/entries.
  */
-export const richTextContentSchema = v.looseObject({
+const richTextContentSchema = v.looseObject({
   json: v.unknown(),
   links: v.looseObject({
     assets: v.looseObject({
       block: v.array(v.nullable(assetWithSysSchema)),
     }),
     entries: v.looseObject({
-      block: v.array(v.nullable(entrySchema)),
-      inline: v.array(v.nullable(entrySchema)),
+      block: v.array(v.nullable(linkWithSysSchema)),
+      inline: v.array(v.nullable(linkWithSysSchema)),
     }),
   }),
 });
@@ -142,7 +121,5 @@ export type AssetWithSys = v.InferOutput<typeof assetWithSysSchema>;
 export type Link = v.InferOutput<typeof linkSchema>;
 export type LinkWithSys = v.InferOutput<typeof linkWithSysSchema>;
 export type Project = v.InferOutput<typeof projectSchema>;
-export type ProjectWithSys = v.InferOutput<typeof projectWithSysSchema>;
-export type Entry = v.InferOutput<typeof entrySchema>;
 export type RichTextContent = v.InferOutput<typeof richTextContentSchema>;
 export type TextBlock = v.InferOutput<typeof textBlockSchema>;

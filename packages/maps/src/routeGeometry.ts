@@ -4,12 +4,12 @@ const TILE_SIZE = 256;
 const MAX_MERCATOR_LATITUDE = 85.051_128_78;
 const DEFAULT_ROUTE_ZOOM = 15;
 
-export type ProjectedPoint = {
+type ProjectedPoint = {
   x: number;
   y: number;
 };
 
-export type RouteViewport = {
+type RouteViewport = {
   center: Point;
   zoom: number;
 };
@@ -227,9 +227,11 @@ export function projectRouteToPixels({
   });
 }
 
-/** Builds an SVG path command string from already-projected route pixels. */
-export function toSvgPath(pixels: Array<ProjectedPoint>) {
-  return pixels
-    .map(({ x, y }, index) => `${index === 0 ? 'M' : 'L'}${x.toFixed(2)} ${y.toFixed(2)}`)
+export function toSvgPath(points: Array<ProjectedPoint>) {
+  return points
+    .map(
+      ({ x, y }, index) =>
+        `${index === 0 ? 'M' : 'L'} ${Math.round(x * 10) / 10} ${Math.round(y * 10) / 10}`,
+    )
     .join(' ');
 }

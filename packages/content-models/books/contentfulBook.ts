@@ -42,13 +42,13 @@ export type MergedBookFields = {
   title: string;
 };
 
-export type BookDiffResult = {
+type BookDiffResult = {
   action: 'create' | 'skip' | 'update';
   changedFields: Array<string>;
   merged: MergedBookFields;
 };
 
-export const unwrapField = (fieldValue: unknown, locale = DEFAULT_LOCALE): unknown =>
+const unwrapField = (fieldValue: unknown, locale = DEFAULT_LOCALE): unknown =>
   fieldValue === null || fieldValue === undefined
     ? null
     : isRecord(fieldValue) && Object.hasOwn(fieldValue, locale)

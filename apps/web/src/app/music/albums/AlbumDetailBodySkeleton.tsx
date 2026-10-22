@@ -33,7 +33,7 @@ const collageTrackListSx: SxObject = {
 export function AlbumDetailBodySkeleton() {
   return (
     <Box data-role="album-detail-placeholder" sx={{ display: 'contents' }}>
-      <Box data-role="album-meta-skeleton" sx={collageMetaRowSx}>
+      <Box sx={collageMetaRowSx}>
         <Box sx={collageMetaTextSx}>
           <Skeleton sx={{ maxWidth: 320 }} variant="text" width="55%" />
           <Skeleton height={28} sx={{ maxWidth: 380 }} variant="text" width="65%" />

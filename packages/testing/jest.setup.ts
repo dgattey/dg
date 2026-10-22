@@ -5,21 +5,6 @@ import '@testing-library/jest-dom';
 globalThis.TextDecoder ??= TextDecoder;
 globalThis.TextEncoder ??= TextEncoder;
 
-const ensurePopoverMethod = (method: 'showPopover' | 'hidePopover') => {
-  if (typeof HTMLElement === 'undefined') {
-    return;
-  }
-  if (!(method in HTMLElement.prototype)) {
-    Object.defineProperty(HTMLElement.prototype, method, {
-      configurable: true,
-      value: () => {},
-    });
-  }
-};
-
-ensurePopoverMethod('showPopover');
-ensurePopoverMethod('hidePopover');
-
 // Mock matchMedia for components using useMediaQuery or matchMedia directly
 const matchMediaMock = (query: string) => ({
   addEventListener: () => {},

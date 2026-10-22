@@ -4,9 +4,9 @@ import crypto from 'node:crypto';
 
 export const SAGA_TIMESTAMP_HEADER = 'x-saga-timestamp' as const;
 export const SAGA_SIGNATURE_HEADER = 'x-saga-signature' as const;
-export const SAGA_HMAC_REPLAY_WINDOW_MS = 5 * 60 * 1000;
+const SAGA_HMAC_REPLAY_WINDOW_MS = 5 * 60 * 1000;
 
-export type SagaRequestAuthResult =
+type SagaRequestAuthResult =
   | { method: 'bearer' | 'hmac'; ok: true }
   | {
       ok: false;

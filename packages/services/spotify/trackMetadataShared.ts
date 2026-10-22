@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { db, Op } from '@dg/db';
 import { log } from '@dg/shared-core/logging/log';
 import * as v from 'valibot';
 import { getSpotifyClient } from './spotifyClient';
@@ -14,55 +13,13 @@ export type TrackMetadata = {
 };
 
 /**
- * Shared schema for track data from Spotify API responses.
- * Used by both batch and single track endpoints.
+ * Selects the best album image (prefers 640px width, falls back to first).
  */
-export const trackSchema = v.looseObject({
-  album: v.looseObject({ id: v.string() }),
-  artists: v.array(v.looseObject({ id: v.string() })),
-  id: v.string(),
-  uri: v.optional(v.string()),
-});
-
-export type SpotifyTrack = v.InferOutput<typeof trackSchema>;
-
-/**
- * Extracts TrackMetadata from a Spotify track response.
- */
-export function extractMetadataFromTrack(track: SpotifyTrack): TrackMetadata {
-  return {
-    albumId: track.album.id,
-    artistIds: track.artists.map((artist) => artist.id),
-  };
-}
-
-/**
- * Extracts a track ID from a Spotify URI (e.g. "spotify:track:abc123" -> "abc123").
- */
-export function extractTrackId(uri: string): string {
-  return uri.split(':')[2] ?? '';
-}
-
-/**
- * Looks up track metadata from existing SpotifyPlay rows in the database.
- * This allows us to skip API calls for tracks we've already seen.
- */
-export async function getExistingTrackMetadata(
-  trackIds: Array<string>,
-): Promise<Map<string, TrackMetadata>> {
-  if (trackIds.length === 0) {
-    return new Map();
-  }
-
-  const existingRows = await db.SpotifyPlay.findAll({
-    attributes: ['trackId', 'albumId', 'artistIds'],
-    group: ['trackId', 'albumId', 'artistIds'],
-    where: { trackId: { [Op.in]: trackIds } },
-  });
-
-  return new Map(
-    existingRows.map((row) => [row.trackId, { albumId: row.albumId, artistIds: row.artistIds }]),
-  );
+export function bestSpotifyImage(
+  images: ReadonlyArray<{ height: number; url: string; width: number }>,
+): string {
+  const preferred = images.find((img) => img.width === 640) ?? images[0];
+  return preferred?.url ?? '';
 }
 
 /**
@@ -75,7 +32,7 @@ export function sleep(ms: number): Promise<void> {
 /**
  * Result of a Spotify API request.
  */
-export type SpotifyRequestResult<T> =
+type SpotifyRequestResult<T> =
   | { success: true; data: T; status: 200 }
   | { success: false; status: number; error: string };
 

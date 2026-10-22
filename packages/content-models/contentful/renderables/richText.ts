@@ -1,14 +1,12 @@
 import type { Document } from '@contentful/rich-text-types';
 import { isNotNullish, isRecord } from '@dg/shared-core/types/typeguards';
-import type { Entry, RichTextContent } from '../schema/shared';
+import type { RichTextContent } from '../schema/shared';
 import type { RenderableAssetWithSys } from './assets';
 import { toRenderableAssetWithSys } from './assets';
 import type { RenderableLinkWithSys } from './links';
 import { toRenderableLinkWithSys } from './links';
-import type { RenderableProjectWithSys } from './projects';
-import { toRenderableProjectWithSys } from './projects';
 
-export type RenderableEntry = RenderableLinkWithSys | RenderableProjectWithSys;
+export type RenderableEntry = RenderableLinkWithSys;
 
 export type RenderableRichTextContent = {
   json: unknown;
@@ -26,16 +24,6 @@ export type RenderableRichTextContent = {
 export const isRichTextDocument = (value: unknown): value is Document =>
   isRecord(value) && value.nodeType === 'document' && Array.isArray(value.content);
 
-const toRenderableEntry = (entry: Entry | null | undefined): RenderableEntry | null => {
-  if (!entry) {
-    return null;
-  }
-  if ('thumbnail' in entry) {
-    return toRenderableProjectWithSys(entry);
-  }
-  return toRenderableLinkWithSys(entry);
-};
-
 export const toRenderableRichTextContent = (
   content: RichTextContent,
 ): RenderableRichTextContent => {
@@ -50,8 +38,8 @@ export const toRenderableRichTextContent = (
         block: assetBlocks.map(toRenderableAssetWithSys).filter(isNotNullish),
       },
       entries: {
-        block: entryBlocks.map(toRenderableEntry).filter(isNotNullish),
-        inline: entryInline.map(toRenderableEntry).filter(isNotNullish),
+        block: entryBlocks.map(toRenderableLinkWithSys).filter(isNotNullish),
+        inline: entryInline.map(toRenderableLinkWithSys).filter(isNotNullish),
       },
     },
   };

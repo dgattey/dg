@@ -2,28 +2,19 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkOrphanCssFiles, checkRouteCssImports, checkTypeScale } from './check-css.js';
+import {
+  checkOrphanCssFiles,
+  checkRouteCssImports,
+  checkTypeScale,
+  checkUnusedCssRules,
+} from './check-css.js';
 
 export const MAX_SOURCE_FILE_LINES = 350;
-export const MAX_TEST_FILE_LINES = 500;
-
-const LEGACY_LINE_COUNT_ALLOWLIST: Record<string, number> = {
-  'packages/ui/theme/css.tsx': 455,
-};
+const MAX_TEST_FILE_LINES = 500;
 
 const SERVER_ONLY_EXEMPT_FILES: ReadonlySet<string> = new Set([
   'packages/services/auth/devConsoleBasicAuth.ts',
   'packages/services/strava/webhooks/parseStravaError.ts',
-]);
-
-const LEGACY_SECTION_DIVIDER_ALLOWLIST: ReadonlySet<string> = new Set([
-  'apps/web/src/app/spotify/TrackListing.tsx',
-  'packages/content-models/scripts/graphql-schema.ts',
-]);
-
-const LEGACY_TYPEOF_IMPORT_ALLOWLIST: ReadonlySet<string> = new Set([
-  'packages/services/spotify/__tests__/fetchAlbumDetail.test.ts',
-  'packages/services/spotify/__tests__/fetchMusicHistoryPage.test.ts',
 ]);
 
 const BANNED_GENERIC_COMPONENT_FILENAMES: ReadonlySet<string> = new Set([
@@ -69,9 +60,13 @@ function isPureTypeModule(content: string): boolean {
 /** Lint findings get fixed, never suppressed: no suppression comment in any file Biome checks. */
 function checkNoBiomeSuppressions(
   relPath: string,
-  lines: Array<string>,
+  content: string,
+  lines?: Array<string>,
 ): Array<StructureViolation> {
-  return lines.flatMap((lineText, i) =>
+  if (!content.includes(BIOME_SUPPRESSION_TOKEN)) {
+    return [];
+  }
+  return (lines ?? content.split('\n')).flatMap((lineText, i) =>
     lineText.includes(BIOME_SUPPRESSION_TOKEN)
       ? [
           {
@@ -86,11 +81,11 @@ function checkNoBiomeSuppressions(
 }
 
 export function checkFileStructure(relPath: string, content: string): Array<StructureViolation> {
-  const lines = content.split('\n');
-  const violations = checkNoBiomeSuppressions(relPath, lines);
   if (!/^(?:apps|packages)\/.*\.(ts|tsx)$/.test(relPath)) {
-    return violations;
+    return checkNoBiomeSuppressions(relPath, content);
   }
+  const lines = content.split('\n');
+  const violations = checkNoBiomeSuppressions(relPath, content, lines);
 
   const lineCount = lines.length;
   const baseName = path.posix.basename(relPath);
@@ -105,8 +100,7 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
     });
   }
 
-  const maxLines =
-    LEGACY_LINE_COUNT_ALLOWLIST[relPath] ?? (isTest ? MAX_TEST_FILE_LINES : MAX_SOURCE_FILE_LINES);
+  const maxLines = isTest ? MAX_TEST_FILE_LINES : MAX_SOURCE_FILE_LINES;
   if (lineCount > maxLines) {
     violations.push({
       file: relPath,
@@ -137,13 +131,37 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
 
   const canImportDb =
     relPath.startsWith('packages/services/') || relPath.startsWith('packages/db/') || isTest;
+  const checkDbImport = !canImportDb && content.includes('@dg/db');
+  const checkInlineTypeof = content.includes(INLINE_TYPEOF_IMPORT_TOKEN);
+  const checkShortCacheLife =
+    relPath.startsWith('apps/web/src/') && !isTest && content.includes('cacheLife(');
+  const checkServiceFetchNoStore =
+    relPath.startsWith('packages/services/') &&
+    !isTest &&
+    !content.includes("cache: 'no-store'") &&
+    !content.includes('cache: "no-store"') &&
+    (content.includes('fetch(') ||
+      content.includes('wretch(') ||
+      content.includes('GraphQLClient('));
+  const checkDividers =
+    content.includes('---') || content.includes('===') || content.includes('\u2500\u2500\u2500');
+
+  if (
+    !checkDbImport &&
+    !checkInlineTypeof &&
+    !checkShortCacheLife &&
+    !checkServiceFetchNoStore &&
+    !checkDividers
+  ) {
+    return violations;
+  }
 
   for (let i = 0; i < lines.length; i += 1) {
     const lineText = lines[i] ?? '';
     const lineNum = i + 1;
 
     if (
-      !canImportDb &&
+      checkDbImport &&
       /\bfrom\s+['"]@dg\/db(?:['"]|\/)/.test(lineText) &&
       !lineText.includes('@dg/db/testing')
     ) {
@@ -155,10 +173,7 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
       });
     }
 
-    if (
-      !LEGACY_SECTION_DIVIDER_ALLOWLIST.has(relPath) &&
-      /^\s*\/\/\s*(?:[-=]{3,}|\u2500{3,})/.test(lineText)
-    ) {
+    if (checkDividers && /^\s*\/\/\s*(?:[-=]{3,}|\u2500{3,})/.test(lineText)) {
       violations.push({
         file: relPath,
         line: lineNum,
@@ -167,10 +182,7 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
       });
     }
 
-    if (
-      !LEGACY_TYPEOF_IMPORT_ALLOWLIST.has(relPath) &&
-      lineText.includes(INLINE_TYPEOF_IMPORT_TOKEN)
-    ) {
+    if (checkInlineTypeof && lineText.includes(INLINE_TYPEOF_IMPORT_TOKEN)) {
       violations.push({
         file: relPath,
         line: lineNum,
@@ -179,11 +191,7 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
       });
     }
 
-    if (
-      relPath.startsWith('apps/web/src/') &&
-      !isTest &&
-      /\bcacheLife\(\s*['"](?:minutes|default)['"]\s*\)/.test(lineText)
-    ) {
+    if (checkShortCacheLife && /\bcacheLife\(\s*['"](?:minutes|default)['"]\s*\)/.test(lineText)) {
       violations.push({
         file: relPath,
         line: lineNum,
@@ -193,13 +201,7 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
       });
     }
 
-    if (
-      relPath.startsWith('packages/services/') &&
-      !isTest &&
-      /\b(?:fetch|wretch)\(|\bnew\s+GraphQLClient\(/.test(lineText) &&
-      !content.includes("cache: 'no-store'") &&
-      !content.includes('cache: "no-store"')
-    ) {
+    if (checkServiceFetchNoStore && /\b(?:fetch|wretch)\(|\bnew\s+GraphQLClient\(/.test(lineText)) {
       violations.push({
         file: relPath,
         line: lineNum,
@@ -242,12 +244,14 @@ export function checkSocialImageRouteParity(
 }
 
 export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolation> {
-  const gitOpts = { cwd: repoRoot, encoding: 'utf8' as const };
-  const tracked = execFileSync('git', ['ls-files'], gitOpts);
-  const untracked = execFileSync('git', ['ls-files', '--others', '--exclude-standard'], gitOpts);
+  const gitOutput = execFileSync('git', ['ls-files', '-c', '-o', '--exclude-standard'], {
+    cwd: repoRoot,
+    encoding: 'utf8',
+  });
   const allTrackedPaths = [
     ...new Set(
-      [...tracked.split('\n'), ...untracked.split('\n')]
+      gitOutput
+        .split('\n')
         .map((line) => line.trim())
         .filter(
           (relPath) =>
@@ -260,37 +264,41 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
   ].sort();
 
   const relPaths = allTrackedPaths.filter((relPath) => BIOME_CHECKED_FILE.test(relPath));
-  const webCssPaths = allTrackedPaths.filter(
-    (relPath) => relPath.startsWith('apps/web/src/') && relPath.endsWith('.css'),
-  );
+  const webCssPaths: Array<string> = [];
   const webSources = new Map<string, string>();
+  const cssCodeSources = new Map<string, string>();
   const webImporters = new Map<string, string>();
+  const webCss = new Map<string, string>();
   const violations: Array<StructureViolation> = [];
 
   for (const relPath of relPaths) {
     const fullPath = path.join(repoRoot, relPath);
-    if (fs.existsSync(fullPath)) {
-      const content = fs.readFileSync(fullPath, 'utf8');
-      violations.push(...checkFileStructure(relPath, content));
-      if (relPath.startsWith('apps/web/src/') && /\.(ts|tsx)$/.test(relPath)) {
+    let content: string;
+    try {
+      content = fs.readFileSync(fullPath, 'utf8');
+    } catch {
+      continue;
+    }
+    violations.push(...checkFileStructure(relPath, content));
+    if (relPath.startsWith('apps/web/src/')) {
+      if (relPath.endsWith('.css')) {
+        webCssPaths.push(relPath);
+        webImporters.set(relPath, content);
+        webCss.set(relPath, content);
+      } else if (/\.(ts|tsx)$/.test(relPath)) {
         webSources.set(relPath, content);
+        cssCodeSources.set(relPath, content);
         webImporters.set(relPath, content);
       }
-    }
-  }
-  const webCss = new Map<string, string>();
-  for (const cssPath of webCssPaths) {
-    const fullPath = path.join(repoRoot, cssPath);
-    if (fs.existsSync(fullPath)) {
-      const content = fs.readFileSync(fullPath, 'utf8');
-      webImporters.set(cssPath, content);
-      webCss.set(cssPath, content);
+    } else if (relPath.startsWith('packages/ui/') && /\.(ts|tsx)$/.test(relPath)) {
+      cssCodeSources.set(relPath, content);
     }
   }
   violations.push(...checkOrphanCssFiles(webCssPaths, webImporters));
   violations.push(...checkRouteCssImports(webCssPaths, webSources));
   violations.push(...checkSocialImageRouteParity(webSources));
   violations.push(...checkTypeScale(webCss));
+  violations.push(...checkUnusedCssRules(webCss, cssCodeSources));
   return violations;
 }
 

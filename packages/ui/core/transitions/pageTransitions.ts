@@ -1,4 +1,4 @@
-export type PageNavigationIntent = 'open' | 'close';
+type PageNavigationIntent = 'open' | 'close';
 
 const PAGE_TRANSITION_TYPES = {
   close: 'page-close',
@@ -10,8 +10,8 @@ const ALBUM_TRANSITION_TYPES = {
   open: 'album-open',
 } as const;
 
-export type PageTransitionType = (typeof PAGE_TRANSITION_TYPES)[PageNavigationIntent];
-export type AlbumTransitionType = (typeof ALBUM_TRANSITION_TYPES)[PageNavigationIntent];
+type PageTransitionType = (typeof PAGE_TRANSITION_TYPES)[PageNavigationIntent];
+type AlbumTransitionType = (typeof ALBUM_TRANSITION_TYPES)[PageNavigationIntent];
 
 export function pageTransitionTypes(intent: PageNavigationIntent): Array<PageTransitionType> {
   return [PAGE_TRANSITION_TYPES[intent]];

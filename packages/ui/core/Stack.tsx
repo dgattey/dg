@@ -4,19 +4,15 @@ import { compileSx, joinClasses, SxStyle } from '../theme/css';
 
 type StackDirection = 'row' | 'row-reverse' | 'column' | 'column-reverse';
 
-export type StackProps<T extends ElementType = 'div'> = {
+type StackProps<T extends ElementType = 'div'> = {
   children?: ReactNode;
   className?: string;
   component?: T;
   direction?: ResponsiveValue<StackDirection>;
   ref?: Ref<HTMLElement>;
-  spacing?: ResponsiveValue<number | string>;
   sx?: SxProps;
 } & Omit<HTMLAttributes<HTMLElement>, 'children' | 'className'> &
-  Omit<
-    ComponentPropsWithRef<T>,
-    'children' | 'className' | 'component' | 'direction' | 'spacing' | 'sx'
-  >;
+  Omit<ComponentPropsWithRef<T>, 'children' | 'className' | 'component' | 'direction' | 'sx'>;
 
 export function Stack<T extends ElementType = 'div'>({
   children,
@@ -24,7 +20,6 @@ export function Stack<T extends ElementType = 'div'>({
   component,
   direction = 'column',
   ref,
-  spacing,
   sx,
   ...rest
 }: StackProps<T>) {
@@ -32,7 +27,6 @@ export function Stack<T extends ElementType = 'div'>({
   const baseSx: SxObject = {
     display: 'flex',
     flexDirection: direction,
-    ...(spacing !== undefined ? { gap: spacing } : {}),
   };
   const mergedSx: SxProps = Array.isArray(sx) ? [baseSx, ...sx] : [baseSx, sx];
   const compiled = compileSx(mergedSx);
