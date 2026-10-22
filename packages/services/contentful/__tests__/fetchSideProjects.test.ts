@@ -28,10 +28,20 @@ const liveMark = {
 };
 
 describe('fetchSideProjects', () => {
+  const originalSpaceId = process.env.CONTENTFUL_SPACE_ID;
+  const originalAccessToken = process.env.CONTENTFUL_ACCESS_TOKEN;
+
   beforeEach(() => {
+    process.env.CONTENTFUL_SPACE_ID = 'space-123';
+    process.env.CONTENTFUL_ACCESS_TOKEN = 'token-123';
     request.mockReset();
     fetchAppSiteIcon.mockReset();
     fetchAppSiteIcon.mockResolvedValue(null);
+  });
+
+  afterEach(() => {
+    process.env.CONTENTFUL_SPACE_ID = originalSpaceId;
+    process.env.CONTENTFUL_ACCESS_TOKEN = originalAccessToken;
   });
 
   it('returns newest-first flagged projects and drops extras beyond five', async () => {

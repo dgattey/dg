@@ -142,7 +142,7 @@
       }
     },
     {
-      "includes": ["apps/web/src/app/collage/SocialCard.tsx"],
+      "includes": ["apps/web/src/app/collage/*SocialCard*.tsx"],
       "linter": {
         "domains": {
           "next": "none"

@@ -1,19 +1,69 @@
 import 'server-only';
 
 import { readFile } from 'node:fs/promises';
+import { getTileSource } from '@dg/maps/src/getTileSource';
+import { stadiaTileUrl } from '@dg/maps/src/tileSource';
+import { fetchBooks } from '@dg/services/contentful/fetchBooks';
 import { fetchIntroContent } from '@dg/services/contentful/fetchIntroContent';
-import { cacheLife } from 'next/cache';
+import { fetchSideProjects } from '@dg/services/contentful/fetchSideProjects';
+import { fetchReleases } from '@dg/services/github/fetchReleases';
+import { readFavoriteAlbumsSnapshot } from '@dg/services/spotify/favoriteAlbumsSnapshot';
+import { fetchListeningStats } from '@dg/services/spotify/fetchListeningStats';
+import { fetchMusicHistoryPage } from '@dg/services/spotify/fetchMusicHistoryPage';
+import { fetchStravaHistoryFromDb } from '@dg/services/strava/fetchStravaHistoryFromDb';
+import { cacheLife, cacheTag } from 'next/cache';
 import { ImageResponse } from 'next/og';
-import { PORTRAIT, SOCIAL_CARD_FONT, SocialCard } from './collage/SocialCard';
-import { splitIntroDocument } from './collage/splitIntroDocument';
-import { HOMEPAGE_TITLE, SITE_NAME } from './metadata';
+import { version } from '../../../../package.json';
+import { SocialCard, type SocialCardVariant } from './collage/SocialCard';
+import { SOCIAL_CARD_FONT } from './collage/SocialCardParts';
+import type { StravaMapTile } from './collage/StravaSocialCard';
+import {
+  buildChangelogCardVariant,
+  buildFavoriteAlbumsCardVariant,
+  buildHomeCardVariant,
+  buildMusicHistoryCardVariant,
+  buildMusicStatsCardVariant,
+  buildReadingCardVariant,
+  buildSiteMapCardVariant,
+  currentPacificYear,
+} from './collage/socialCardVariants';
+import {
+  buildStravaCardVariant,
+  computeStravaFrame,
+  computeStravaTileGrid,
+  type StravaTileCoord,
+} from './collage/stravaSocialCardVariant';
+import { SITE_NAME } from './metadata';
+
+export type SocialImagePage =
+  | 'home'
+  | 'music-history'
+  | 'favorite-albums'
+  | 'music-stats'
+  | 'reading'
+  | 'strava'
+  | 'changelog'
+  | 'site-map';
 
 export const SOCIAL_IMAGE_SIZE = {
   height: 630,
   width: 1200,
 };
 
-export const SOCIAL_IMAGE_ALT = `${SITE_NAME}'s portrait and the dg. logo on a paper-cut collage`;
+export const SOCIAL_IMAGE_TAG = 'social-image';
+
+export const SOCIAL_IMAGE_ALTS: Record<SocialImagePage, string> = {
+  changelog: `Version history and release notes on a paper-cut collage from ${SITE_NAME}`,
+  'favorite-albums': `Favorite albums on a paper-cut collage from ${SITE_NAME}`,
+  home: `${SITE_NAME}'s portrait and the dg. logo on a paper-cut collage`,
+  'music-history': `Recent Spotify listening history on a paper-cut collage from ${SITE_NAME}`,
+  'music-stats': `Spotify listening stats and yearly plays on a paper-cut collage from ${SITE_NAME}`,
+  reading: `Books read and five-star reviews on a paper-cut collage from ${SITE_NAME}`,
+  'site-map': `Site map of pages, side projects, and agent endpoints on a paper-cut collage from ${SITE_NAME}`,
+  strava: `Bay Area Strava route map and lifetime miles on a paper-cut collage from ${SITE_NAME}`,
+};
+
+export const SOCIAL_IMAGE_ALT = SOCIAL_IMAGE_ALTS.home;
 
 const REGULAR_FONT_URL = new URL('./collage/fonts/Familjen-Grotesk-Regular.ttf', import.meta.url);
 const BOLD_FONT_URL = new URL('./collage/fonts/Familjen-Grotesk-Bold.ttf', import.meta.url);
@@ -25,57 +75,123 @@ const readFontData = async (fontUrl: URL) => new Uint8Array(await readFile(fontU
 const readPngDataUri = async (pngUrl: URL) =>
   `data:image/png;base64,${(await readFile(pngUrl)).toString('base64')}`;
 
-/**
- * Satori can't decode the WebP the homepage serves, so the card asks Contentful
- * for a JPEG, cropped to the card's portrait at 2x rather than the full original.
- */
-function toJpegUrl(contentfulImageUrl: string): string {
-  const url = new URL(contentfulImageUrl);
-  url.searchParams.set('fm', 'jpg');
-  url.searchParams.set('w', String(PORTRAIT.width * 2));
-  url.searchParams.set('h', String(PORTRAIT.height * 2));
-  url.searchParams.set('fit', 'fill');
-  return url.toString();
+async function safeLoad<T>(loader: () => Promise<T>, fallback: T): Promise<T> {
+  try {
+    return await loader();
+  } catch {
+    return fallback;
+  }
 }
 
-/**
- * `ImageResponse` reads fonts and loads its renderer while it streams, and
- * that uncached I/O would keep the image routes from prerendering under Cache
- * Components. Caching the finished PNG lets the build bake it in.
- */
-async function renderSocialImagePng() {
+async function fetchTileDataUri(coord: StravaTileCoord): Promise<StravaMapTile | null> {
+  const tileSource = getTileSource();
+  if (tileSource.mode === 'offline') {
+    return null;
+  }
+  const stadiaUrl = stadiaTileUrl(tileSource, {
+    dark: false,
+    extension: 'png',
+    retina: true,
+    style: 'alidade_smooth',
+    x: coord.x,
+    y: coord.y,
+    zoom: coord.zoom,
+  });
+  const candidates: ReadonlyArray<{ headers: Record<string, string>; url: string }> = [
+    {
+      headers: { Origin: 'http://localhost:3000', Referer: 'http://localhost:3000/' },
+      url: stadiaUrl,
+    },
+  ];
+  for (const candidate of candidates) {
+    try {
+      const response = await fetch(candidate.url, {
+        cache: 'no-store',
+        headers: candidate.headers,
+      });
+      if (response.ok) {
+        const bytes = Buffer.from(await response.arrayBuffer());
+        return {
+          left: coord.left,
+          size: coord.size,
+          top: coord.top,
+          url: `data:image/png;base64,${bytes.toString('base64')}`,
+        };
+      }
+    } catch {}
+  }
+  return null;
+}
+
+async function loadStravaMapTiles(
+  history: Awaited<ReturnType<typeof fetchStravaHistoryFromDb>>,
+): Promise<Array<StravaMapTile>> {
+  const coords = computeStravaTileGrid(computeStravaFrame(history));
+  const resolved = await Promise.all(coords.map(fetchTileDataUri));
+  return resolved.filter((tile): tile is StravaMapTile => tile !== null);
+}
+
+async function loadSocialCardVariant(page: SocialImagePage): Promise<SocialCardVariant> {
+  switch (page) {
+    case 'home':
+      return buildHomeCardVariant(await safeLoad(fetchIntroContent, null));
+    case 'music-stats': {
+      const year = currentPacificYear();
+      const stats = await safeLoad(() => fetchListeningStats({ range: 'year', year }), null);
+      return buildMusicStatsCardVariant(stats, year);
+    }
+    case 'music-history': {
+      const history = await safeLoad(() => fetchMusicHistoryPage({ pageSize: 60 }), {
+        nextCursor: null,
+        tracks: [],
+      });
+      return buildMusicHistoryCardVariant(history.tracks);
+    }
+    case 'favorite-albums':
+      return buildFavoriteAlbumsCardVariant(await safeLoad(readFavoriteAlbumsSnapshot, null));
+    case 'reading':
+      return buildReadingCardVariant(await safeLoad(fetchBooks, []));
+    case 'strava': {
+      const history = await safeLoad(fetchStravaHistoryFromDb, null);
+      const mapTiles = await loadStravaMapTiles(history);
+      return buildStravaCardVariant(history, mapTiles);
+    }
+    case 'changelog': {
+      const releases = await safeLoad(() => fetchReleases({ fallbackVersion: version }), []);
+      return buildChangelogCardVariant(releases, `v${version}`);
+    }
+    case 'site-map': {
+      const sideProjects = await safeLoad(fetchSideProjects, []);
+      return buildSiteMapCardVariant(sideProjects);
+    }
+    default: {
+      const unhandled: never = page;
+      return unhandled;
+    }
+  }
+}
+
+async function renderSocialImagePng(page: SocialImagePage) {
   'use cache';
-  cacheLife('max');
-  const [regularFont, boldFont, grainUrl, intro] = await Promise.all([
+  cacheLife('days');
+  cacheTag(SOCIAL_IMAGE_TAG);
+  const [regularFont, boldFont, grainUrl, variant] = await Promise.all([
     readFontData(REGULAR_FONT_URL),
     readFontData(BOLD_FONT_URL),
     readPngDataUri(GRAIN_URL),
-    fetchIntroContent(),
+    loadSocialCardVariant(page),
   ]);
-  const headline = intro ? splitIntroDocument(intro.textBlock.content).headline : null;
-  return new ImageResponse(
-    <SocialCard
-      grainUrl={grainUrl}
-      headline={headline ?? SITE_NAME}
-      name={SITE_NAME}
-      portraitUrl={intro ? toJpegUrl(intro.image.url) : null}
-      tagline={HOMEPAGE_TITLE}
-    />,
-    {
-      ...SOCIAL_IMAGE_SIZE,
-      fonts: [
-        { data: regularFont, name: SOCIAL_CARD_FONT, weight: 400 },
-        { data: boldFont, name: SOCIAL_CARD_FONT, weight: 700 },
-      ],
-    },
-  ).arrayBuffer();
+  return new ImageResponse(<SocialCard grainUrl={grainUrl} {...variant} />, {
+    ...SOCIAL_IMAGE_SIZE,
+    fonts: [
+      { data: regularFont, name: SOCIAL_CARD_FONT, weight: 400 },
+      { data: boldFont, name: SOCIAL_CARD_FONT, weight: 700 },
+    ],
+  }).arrayBuffer();
 }
 
-/**
- * Serves the homepage's Open Graph and Twitter card image.
- */
-export async function createSocialImage() {
-  return new Response(await renderSocialImagePng(), {
+export async function createSocialImage(page: SocialImagePage = 'home') {
+  return new Response(await renderSocialImagePng(page), {
     headers: { 'Content-Type': 'image/png' },
   });
 }

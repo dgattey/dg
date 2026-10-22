@@ -77,7 +77,7 @@ function defineSheet(row: SheetRow): SheetPlacement {
   return { ...base, edge, rotationDeg, sizePx, visibility };
 }
 
-function defineBackdrop(
+export function defineBackdrop(
   bandHeightPx: Backdrop['bandHeightPx'],
   repeat: number,
   bands: ReadonlyArray<{ cutOuts: ReadonlyArray<PlacementRow>; sheets: ReadonlyArray<SheetRow> }>,

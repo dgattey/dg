@@ -18,6 +18,7 @@ import {
   selectShelf,
   selectSummary,
   selectTopAlbumIds,
+  yearPlayFilter,
 } from './listeningStatsQueries';
 import { resolveTrackDisplays } from './trackDisplays';
 import { spotifyGet } from './trackMetadataShared';
@@ -28,6 +29,11 @@ const FALLBACK_MINUTES_PER_PLAY = 3.81;
 const TOP_ALBUMS = 3;
 const ON_REPEAT_TRACKS = 6;
 const DAY_REPEAT_TRACKS = 2;
+
+export type ListeningStatsOptions = {
+  range?: 'all' | 'year';
+  year?: number;
+};
 
 export type StatsAlbum = {
   artistNames: string;
@@ -198,7 +204,13 @@ async function resolveAlbums(
  * for the few albums, tracks, and artists on show resolve through the Music*
  * cache; anything Spotify can't name is left out. Null when nothing was played.
  */
-export async function fetchListeningStats(): Promise<ListeningStats | null> {
+export async function fetchListeningStats(
+  options?: ListeningStatsOptions,
+): Promise<ListeningStats | null> {
+  const filter =
+    options?.range === 'year' && options.year !== undefined
+      ? yearPlayFilter(options.year)
+      : undefined;
   const [
     [summary],
     [artistCount],
@@ -215,19 +227,19 @@ export async function fetchListeningStats(): Promise<ListeningStats | null> {
     depth,
     favoriteAlbums,
   ] = await Promise.all([
-    selectSummary(),
-    selectArtistCount(),
-    selectKnownDurations(),
+    selectSummary(filter),
+    selectArtistCount(filter),
+    selectKnownDurations(filter),
     selectLocalBuckets('year'),
-    selectLocalBuckets('hour'),
-    selectLocalBuckets('isodow'),
-    selectActiveMonths(),
-    selectTopAlbumIds(),
-    selectShelf(),
-    selectAlbumSessions(),
-    selectRepeats('week', ON_REPEAT_TRACKS),
-    selectRepeats('day', DAY_REPEAT_TRACKS),
-    selectArtistDepth(),
+    selectLocalBuckets('hour', filter),
+    selectLocalBuckets('isodow', filter),
+    selectActiveMonths(filter),
+    selectTopAlbumIds(filter),
+    selectShelf(filter),
+    selectAlbumSessions(filter),
+    selectRepeats('week', ON_REPEAT_TRACKS, filter),
+    selectRepeats('day', DAY_REPEAT_TRACKS, filter),
+    selectArtistDepth(filter),
     db.FavoriteAlbum.findAll(),
   ]);
 

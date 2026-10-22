@@ -19,6 +19,7 @@ const TITLE = musicDestinationTitle(favoriteAlbumsRoute);
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(favoriteAlbumsRoute),
+  description: 'All-time favorite albums on Spotify.',
   title: TITLE,
 };
 

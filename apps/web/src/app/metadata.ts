@@ -34,7 +34,7 @@ export const baseOpenGraph: NonNullable<Metadata['openGraph']> = {
   locale: 'en_US',
   siteName: SITE_NAME,
   type: 'website',
-  url: '/',
+  url: './',
 };
 
 export const baseTwitter: NonNullable<Metadata['twitter']> = {

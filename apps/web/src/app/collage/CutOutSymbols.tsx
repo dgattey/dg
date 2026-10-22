@@ -1,4 +1,9 @@
-import { CUT_OUT_SHAPE_NAMES, CUT_OUT_SHAPES, cutOutSymbolId } from './cutOutShapes';
+import {
+  CUT_OUT_SHAPE_NAMES,
+  CUT_OUT_SHAPES,
+  cutOutSymbolId,
+  PORTRAIT_OVAL_PATH,
+} from './cutOutShapes';
 
 const COLLAGE_PEBBLE_CLIP_ID = 'collage-pebble-clip';
 const COLLAGE_DISC_CLIP_ID = 'collage-disc-clip';
@@ -17,7 +22,7 @@ export function CutOutSymbols() {
         </clipPath>
         {/* Every joint's handles share one horizontal or vertical line, so the oval has no corners. */}
         <clipPath clipPathUnits="objectBoundingBox" id={COLLAGE_PORTRAIT_CLIP_ID}>
-          <path d="M0.46 0C0.76 0 1 0.19 1 0.44C1 0.72 0.775 1 0.55 1C0.231 1 0 0.803 0 0.53C0 0.201 0.175 0 0.46 0Z" />
+          <path d={PORTRAIT_OVAL_PATH} />
         </clipPath>
         <filter
           colorInterpolationFilters="sRGB"

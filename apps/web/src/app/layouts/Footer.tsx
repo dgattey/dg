@@ -1,3 +1,4 @@
+import { changelogRoute, siteMapRoute } from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { CursorIcon } from '@dg/ui/dependent/Link';
 import { RichText } from '@dg/ui/dependent/RichText';
@@ -84,7 +85,7 @@ export async function Footer() {
   const elsewhereLinks = footerContent.links.filter(
     (link) => link.icon !== 'email' && !link.url.startsWith('mailto:'),
   );
-  const { releaseUrl, version } = versionInfo;
+  const { version } = versionInfo;
 
   return (
     <footer className="chrome__footer">
@@ -153,20 +154,21 @@ export async function Footer() {
           <div className="chrome__colophonGroup">
             <span>© {new Date(serverTime).getFullYear()} Dylan Gattey</span>
             {version ? (
-              releaseUrl ? (
-                <a
-                  className="chrome__colophonVersion"
-                  href={releaseUrl}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                  title={`GitHub release ${version}`}
-                >
-                  {version}
-                </a>
-              ) : (
-                <span>{version}</span>
-              )
+              <PageTransitionLink
+                className="chrome__colophonVersion"
+                href={changelogRoute}
+                title={version}
+              >
+                {version}
+              </PageTransitionLink>
             ) : null}
+            <PageTransitionLink
+              className="chrome__colophonVersion"
+              href={siteMapRoute}
+              title="Site map"
+            >
+              Site map
+            </PageTransitionLink>
           </div>
           <nav aria-label="Footer navigation" className="chrome__colophonGroup chrome__colophonNav">
             {FOOTER_DESTINATIONS.map((destination) => (

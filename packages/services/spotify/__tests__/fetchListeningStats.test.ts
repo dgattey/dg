@@ -157,6 +157,29 @@ describe('fetchListeningStats', () => {
     expect(stats?.weekdays).toEqual([0, 7, 3, 1, 1, 1, 0]);
     await expect(db.MusicArtist.findByPk(GUEST)).resolves.toMatchObject({ name: 'Guest Artist' });
   });
+
+  it('filters aggregates to a single Pacific calendar year while preserving the full years list', async () => {
+    await seedCatalog();
+    await db.SpotifyPlay.bulkCreate([
+      {
+        ...play('2023-06-15T20:00:00Z', 'ls-track-2023'),
+        playedAt: new Date('2023-06-15T20:00:00Z'),
+      },
+      ...plays.map((row) => ({ ...row, playedAt: new Date(row.playedAt) })),
+    ]);
+
+    const stats2024 = await fetchListeningStats({ range: 'year', year: 2024 });
+    expect(stats2024).toMatchObject({
+      activeDays: 7,
+      activeMonths: 4,
+      plays: 13,
+      tracks: 7,
+      years: [
+        { plays: 1, year: 2023 },
+        { plays: 13, year: 2024 },
+      ],
+    });
+  });
 });
 
 describe('longestMonthStreak', () => {
