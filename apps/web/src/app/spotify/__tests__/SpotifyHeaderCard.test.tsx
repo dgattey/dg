@@ -8,6 +8,10 @@ jest.mock('next/navigation', () => ({
   usePathname: () => mockPathname,
 }));
 
+jest.mock('../../../services/spotify.actions', () => ({
+  loadLatestSong: jest.fn(async () => null),
+}));
+
 jest.mock('../MusicNotes', () => ({
   MusicNotes: ({ isPlaying }: { isPlaying: boolean }) => (
     <div data-playing={String(isPlaying)} data-testid="notes" />
