@@ -1,4 +1,5 @@
 import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
+import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Link } from '@dg/ui/dependent/Link';
 import type { ReactNode } from 'react';
 
@@ -36,6 +37,10 @@ function albumFacts(album: AlbumDetail): Array<string> {
   ].filter((fact): fact is string => fact != null);
 }
 
+function artistNames(artists: ReadonlyArray<LinkedArtist>): string {
+  return artists.map((artist) => artist.name).join(', ');
+}
+
 function LinkedArtists({ artists }: { artists: ReadonlyArray<LinkedArtist> }): ReactNode {
   return artists.map((artist, index) => (
     <span key={artist.id}>
@@ -57,7 +62,11 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
       <div className="music__wellMeta">
         <div data-role="album-meta">
           <h3 className="music__wellArtists" data-role="album-artists">
-            <LinkedArtists artists={album.artists} />
+            <Tooltip title={artistNames(album.artists)} whenTruncated>
+              <span className="music__wellArtistsText">
+                <LinkedArtists artists={album.artists} />
+              </span>
+            </Tooltip>
           </h3>
           <div className="music__wellFacts">
             <p style={{ fontVariantNumeric: 'tabular-nums' }}>{albumFacts(album).join(' · ')}</p>
@@ -88,18 +97,18 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
               {track.trackNumber}
             </span>
             <span data-role="track-text" style={{ display: 'grid', minWidth: 0, rowGap: 2 }}>
-              <span className="music__wellTrackTitle" data-role="track-title" title={track.name}>
-                <Link href={track.url} isExternal={true} title={`Open ${track.name} on Spotify`}>
-                  {track.name}
-                </Link>
-              </span>
-              <span
-                className="music__wellTrackArtist"
-                data-role="track-artists"
-                title={track.artists.map((artist) => artist.name).join(', ')}
-              >
-                <LinkedArtists artists={track.artists} />
-              </span>
+              <Tooltip title={track.name} whenTruncated>
+                <span className="music__wellTrackTitle" data-role="track-title">
+                  <Link href={track.url} isExternal={true} title={`Open ${track.name} on Spotify`}>
+                    {track.name}
+                  </Link>
+                </span>
+              </Tooltip>
+              <Tooltip title={artistNames(track.artists)} whenTruncated>
+                <span className="music__wellTrackArtist" data-role="track-artists">
+                  <LinkedArtists artists={track.artists} />
+                </span>
+              </Tooltip>
             </span>
             <span
               data-role="track-duration"

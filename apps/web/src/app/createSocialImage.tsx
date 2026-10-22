@@ -4,7 +4,7 @@ import { readFile } from 'node:fs/promises';
 import { cacheLife } from 'next/cache';
 import { ImageResponse } from 'next/og';
 import { getIntroContent } from '../services/contentful';
-import { SOCIAL_CARD_FONT, SocialCard } from './collage/SocialCard';
+import { PORTRAIT, SOCIAL_CARD_FONT, SocialCard } from './collage/SocialCard';
 import { splitIntroDocument } from './collage/splitIntroDocument';
 import { HOMEPAGE_TITLE, SITE_NAME } from './metadata';
 
@@ -25,10 +25,16 @@ const readFontData = async (fontUrl: URL) => new Uint8Array(await readFile(fontU
 const readPngDataUri = async (pngUrl: URL) =>
   `data:image/png;base64,${(await readFile(pngUrl)).toString('base64')}`;
 
-/** Satori can't decode the WebP the homepage serves, so the card asks Contentful for a JPEG. */
+/**
+ * Satori can't decode the WebP the homepage serves, so the card asks Contentful
+ * for a JPEG, cropped to the card's portrait at 2x rather than the full original.
+ */
 function toJpegUrl(contentfulImageUrl: string): string {
   const url = new URL(contentfulImageUrl);
   url.searchParams.set('fm', 'jpg');
+  url.searchParams.set('w', String(PORTRAIT.width * 2));
+  url.searchParams.set('h', String(PORTRAIT.height * 2));
+  url.searchParams.set('fit', 'fill');
   return url.toString();
 }
 

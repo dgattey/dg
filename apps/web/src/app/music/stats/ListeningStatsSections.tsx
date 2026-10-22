@@ -1,5 +1,6 @@
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import { ALBUM_SESSION_MIN_PLAYS } from '@dg/services/spotify/listeningStatsQueries';
+import { Tooltip } from '@dg/ui/core/Tooltip';
 import type { CSSProperties } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { cx } from '../../collage/paperVars';
@@ -29,8 +30,12 @@ function OnRepeatCard({ stats }: { stats: ListeningStats }) {
           <li className={cx('stats__repeatRow', i === 0 && 'stats__repeatRow--top')} key={track.id}>
             <span className="stats__rank">{String(i + 1).padStart(2, '0')}</span>
             <span className="stats__repeatName">
-              <span className="stats__label">{track.name}</span>
-              <span className="stats__meta">{track.artistNames}</span>
+              <Tooltip title={track.name} whenTruncated>
+                <span className="stats__label">{track.name}</span>
+              </Tooltip>
+              <Tooltip title={track.artistNames} whenTruncated>
+                <span className="stats__meta">{track.artistNames}</span>
+              </Tooltip>
             </span>
             <span aria-hidden="true" className="stats__meter" style={bar(plays, top)} />
             <span className="stats__count">{plays}</span>

@@ -1,4 +1,5 @@
 import type { Artist } from '@dg/content-models/spotify/Track';
+import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Typography } from '@dg/ui/core/Typography';
 import { Link } from '@dg/ui/dependent/Link';
 import { truncated } from '@dg/ui/helpers/truncated';
@@ -75,8 +76,9 @@ const separator = ({ index, fullList }: SeparatorProps) => {
 };
 
 /**
- * Creates a list of artists with smart separators. Card variant renders each
- * artist as a link; compact variant renders plain text.
+ * Creates a list of artists with smart separators, with the whole list in a
+ * tooltip when it's cut off. Card variant renders each artist as a link;
+ * compact variant renders plain text.
  */
 export function ArtistList({
   artists,
@@ -86,30 +88,35 @@ export function ArtistList({
 }: ArtistListProps) {
   const isLinked = listingVariant === 'card';
   const typographyVariant = TYPOGRAPHY_VARIANT[listingVariant];
+  const fullList = artists
+    .map((artist, index) => `${artist.name}${separator({ fullList: artists, index }) ?? ''}`)
+    .join('');
 
   return (
-    <Typography
-      component="span"
-      sx={getArtistListSx(listingVariant, color, textShadow)}
-      variant={typographyVariant}
-    >
-      {artists.map((artist, index) => (
-        <Fragment key={artist.id}>
-          {isLinked ? (
-            <Link
-              href={artist.externalUrls.spotify}
-              isExternal={true}
-              title={artist.name}
-              variant={typographyVariant}
-            >
-              {artist.name}
-            </Link>
-          ) : (
-            artist.name
-          )}
-          <span>{separator({ fullList: artists, index })}</span>
-        </Fragment>
-      ))}
-    </Typography>
+    <Tooltip title={fullList} whenTruncated>
+      <Typography
+        component="span"
+        sx={getArtistListSx(listingVariant, color, textShadow)}
+        variant={typographyVariant}
+      >
+        {artists.map((artist, index) => (
+          <Fragment key={artist.id}>
+            {isLinked ? (
+              <Link
+                href={artist.externalUrls.spotify}
+                isExternal={true}
+                title={artist.name}
+                variant={typographyVariant}
+              >
+                {artist.name}
+              </Link>
+            ) : (
+              artist.name
+            )}
+            <span>{separator({ fullList: artists, index })}</span>
+          </Fragment>
+        ))}
+      </Typography>
+    </Tooltip>
   );
 }

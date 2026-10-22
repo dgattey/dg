@@ -14,7 +14,8 @@
   pointer-events: none;
   content: "";
   border: 2px solid currentColor;
-  border-radius: 14px;
+  border-radius: calc(var(--soft-a-tl) - 6px) calc(var(--soft-a-tr) - 6px)
+    calc(var(--soft-a-br) - 6px) calc(var(--soft-a-bl) - 6px);
 }
 
 .print__print {
@@ -31,7 +32,7 @@
   position: relative;
   z-index: 2;
   justify-self: center;
-  width: min(100%, 392px);
+  width: min(100%, var(--portrait-width));
   margin-top: 44px;
 }
 .print__portraitLink {
@@ -61,7 +62,7 @@
   position: relative;
   z-index: 2;
   display: grid;
-  aspect-ratio: 0.76;
+  aspect-ratio: var(--portrait-aspect);
   overflow: clip;
   background: var(--cream);
   clip-path: url("#collage-portrait-clip");
@@ -90,7 +91,7 @@
   height: 100%;
   overflow: clip;
   background: var(--black);
-  clip-path: var(--soft-a);
+  border-radius: var(--soft-a);
 }
 .print__artLink {
   display: block;
@@ -112,7 +113,7 @@
 }
 @media (max-width: 820px) {
   .print__portrait {
-    width: min(100%, 300px);
+    width: min(100%, var(--portrait-width-narrow));
     margin: 26px 0 0;
   }
   .print__portrait .print__backdrop {

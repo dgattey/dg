@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import type { ReactNode, SyntheticEvent } from 'react';
 import React, { useId, useRef } from 'react';
 import { EASING_EASE_OUT, TIMING_FAST } from '../helpers/timing';
 import type { SxObject } from '../theme';
@@ -14,6 +14,23 @@ const VIEWPORT_EDGE_PADDING = 8;
 
 /** Marks the wrapper that owns a tooltip, so the surface can select on its state. */
 const ANCHOR_ATTRIBUTE = 'data-tooltip-anchor';
+
+/** Set on a `whenTruncated` anchor whose text fits, so its tooltip stays shut. */
+const MUTED_ATTRIBUTE = 'data-tooltip-muted';
+
+/**
+ * Whether any clipping box in the trigger cuts its content off. Covers ellipsis
+ * (wider than its box) and line clamps (taller). The 1px slack absorbs subpixel
+ * rounding, which reports text that exactly fits as overflowing.
+ */
+const hasTruncatedText = (trigger: Element) =>
+  [trigger, ...trigger.querySelectorAll('*')].some((element) => {
+    const { overflowX, overflowY } = getComputedStyle(element);
+    return (
+      (overflowX !== 'visible' && element.scrollWidth - element.clientWidth > 1) ||
+      (overflowY !== 'visible' && element.scrollHeight - element.clientHeight > 1)
+    );
+  });
 
 /**
  * Nudges a tooltip inline so it stays inset from the viewport edges.
@@ -57,6 +74,16 @@ export interface TooltipProps {
    * whole tap target reveals the hint rather than just the glyph inside it.
    */
   sx?: SxObject;
+  /** Class for the anchor, so a layout can size it like the trigger it wraps. */
+  className?: string;
+  /**
+   * For text that ellipsizes. The anchor lets the trigger shrink, and the
+   * tooltip only opens when the trigger's text is actually cut off. The trigger
+   * already holds the full text, so it isn't also described by the tooltip.
+   * Truncated text sits in paper, whose card is the containing block, so the
+   * tooltip keeps its placement rather than flipping on room inside the card.
+   */
+  whenTruncated?: boolean;
 }
 
 type TooltipAnchorSx = SxObject & { anchorName?: string };
@@ -108,6 +135,17 @@ const TRIGGER_INSIDE_FOCUSED_SELECTOR = `[${ANCHOR_ATTRIBUTE}]:has(:focus-visibl
  * compile to the surface focusing itself rather than an ancestor doing so.
  */
 const TRIGGER_AROUND_FOCUSED_SELECTOR = `*:focus-visible>[${ANCHOR_ATTRIBUTE}]>&`;
+const MUTED_SELECTOR = `[${MUTED_ATTRIBUTE}] > &`;
+
+/** Lets a truncating trigger shrink to its container instead of pushing past it. */
+const shrinkableAnchorSx: SxObject = {
+  '& > :not([role="tooltip"])': {
+    minWidth: 0,
+  },
+  display: 'flex',
+  maxWidth: '100%',
+  minWidth: 0,
+};
 
 /** Anchor for the tooltip's positioning, named per instance so surfaces can't cross. */
 function createAnchorSx(anchorName: string): TooltipAnchorSx {
@@ -120,7 +158,18 @@ function createAnchorSx(anchorName: string): TooltipAnchorSx {
   };
 }
 
-function createSurfaceSx(anchorName: string, placement: TooltipPlacement): TooltipPopoverSx {
+/**
+ * A tilted or shadowed ancestor becomes the fixed surface's containing block,
+ * and `position-area` measures room inside it. In a small card that room is a
+ * sliver, and the default safe alignment then pins the surface over its own
+ * trigger. Unsafe alignment keeps it on its side of the anchor and lets it
+ * overflow the card instead.
+ */
+function createSurfaceSx(
+  anchorName: string,
+  placement: TooltipPlacement,
+  canFlip: boolean,
+): TooltipPopoverSx {
   const isAbove = placement === 'top';
   return {
     /* Browsers without anchor positioning fall back to centring on the anchor. */
@@ -133,6 +182,8 @@ function createSurfaceSx(anchorName: string, placement: TooltipPlacement): Toolt
     [HOVERED_SELECTOR]: revealedSx,
     [TRIGGER_AROUND_FOCUSED_SELECTOR]: revealedSx,
     [TRIGGER_INSIDE_FOCUSED_SELECTOR]: revealedSx,
+    [MUTED_SELECTOR]: { display: 'none' },
+    alignSelf: isAbove ? 'unsafe end' : 'unsafe start',
     background: 'var(--mui-palette-background-paper)',
     border: 'thin solid var(--mui-palette-card-border)',
     borderRadius: '12px',
@@ -140,6 +191,7 @@ function createSurfaceSx(anchorName: string, placement: TooltipPlacement): Toolt
     color: 'var(--mui-palette-text-primary)',
     fontVariantCaps: 'normal',
     fontWeight: 600,
+    justifySelf: 'unsafe anchor-center',
     letterSpacing: 'normal',
     lineHeight: 1.3,
     marginBlockEnd: isAbove ? '8px' : 0,
@@ -150,7 +202,7 @@ function createSurfaceSx(anchorName: string, placement: TooltipPlacement): Toolt
     position: 'fixed',
     positionAnchor: anchorName,
     positionArea: isAbove ? 'block-start' : 'block-end',
-    positionTryFallbacks: 'flip-block',
+    positionTryFallbacks: canFlip ? 'flip-block' : 'none',
     textTransform: 'none',
     translate: '0',
     visibility: 'hidden',
@@ -184,13 +236,30 @@ export function Tooltip({
   id: providedId,
   placement = 'bottom',
   sx,
+  className,
+  whenTruncated = false,
 }: TooltipProps) {
   const generatedId = useId();
   const tooltipId = providedId ?? `tooltip-${generatedId}`;
   const anchorName = `--anchor-${tooltipId.replace(/:/g, '-')}`;
   const surfaceRef = useRef<HTMLSpanElement>(null);
 
-  const refinePlacement = () => {
+  /**
+   * Runs before the hover or focus restyles, so a tooltip that should stay shut
+   * never paints. Text can start or stop fitting on any resize, hence measuring
+   * each time rather than once.
+   */
+  const refinePlacement = (event: SyntheticEvent<HTMLElement>) => {
+    const anchor = event.currentTarget;
+    if (whenTruncated) {
+      const fits = ![...anchor.children].some(
+        (child) => child !== surfaceRef.current && hasTruncatedText(child),
+      );
+      anchor.toggleAttribute(MUTED_ATTRIBUTE, fits);
+      if (fits) {
+        return;
+      }
+    }
     if (surfaceRef.current) {
       insetFromViewportEdges(surfaceRef.current);
     }
@@ -204,13 +273,17 @@ export function Tooltip({
   return (
     <Box
       {...{ [ANCHOR_ATTRIBUTE]: true }}
+      className={className}
       component="span"
       onFocus={refinePlacement}
       onMouseEnter={refinePlacement}
-      sx={{ ...createAnchorSx(anchorName), ...sx }}
+      sx={{
+        ...createAnchorSx(anchorName),
+        ...(whenTruncated ? shrinkableAnchorSx : undefined),
+        ...sx,
+      }}
     >
-      {/* Clone children to add aria-describedby */}
-      {React.isValidElement<{ 'aria-describedby'?: string }>(children)
+      {!whenTruncated && React.isValidElement<{ 'aria-describedby'?: string }>(children)
         ? React.cloneElement(children, { 'aria-describedby': tooltipId })
         : children}
       <Typography
@@ -219,7 +292,7 @@ export function Tooltip({
         id={tooltipId}
         ref={surfaceRef}
         role="tooltip"
-        sx={createSurfaceSx(anchorName, placement)}
+        sx={createSurfaceSx(anchorName, placement, !whenTruncated)}
         variant="caption"
       >
         {title}

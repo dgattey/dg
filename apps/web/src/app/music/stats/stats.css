@@ -110,7 +110,7 @@
   flex: none;
   padding: var(--mat);
   background: var(--mat-bg, var(--cream));
-  border-radius: calc(var(--print-radius) + 2px);
+  border-radius: calc(var(--print-radius) + var(--mat));
   filter: var(--dshadow);
 }
 .stats__mat img {
@@ -190,7 +190,7 @@
   column-gap: 12px;
   align-items: center;
 }
-.stats__repeatName > * {
+.stats__repeatName :is(.stats__label, .stats__meta) {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;

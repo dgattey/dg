@@ -168,10 +168,14 @@ describe('Footer', () => {
     render(<ServerTimeProvider serverTime={1_760_000_000_000}>{ui}</ServerTimeProvider>);
 
     expect(screen.getByText('Now')).toBeInTheDocument();
-    expect(screen.getByText('Playing')).toBeInTheDocument();
-    expect(screen.getByText('Innerbloom · RÜFÜS DU SOL')).toBeInTheDocument();
-    expect(screen.getByText('Last ride')).toBeInTheDocument();
-    expect(screen.getByText('Morning ride · 24.1 mi')).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: 'Playing Innerbloom · RÜFÜS DU SOL' })).toHaveAttribute(
+      'href',
+      'https://open.spotify.com/track/innerbloom',
+    );
+    expect(screen.getByRole('link', { name: 'Last ride Morning ride · 24.1 mi' })).toHaveAttribute(
+      'href',
+      'https://www.strava.com/activities/12345',
+    );
     expect(screen.getByText('San Francisco')).toBeInTheDocument();
     expect(screen.getByText('Say hello')).toBeInTheDocument();
     expect(screen.getByText('Elsewhere')).toBeInTheDocument();
@@ -199,6 +203,37 @@ describe('Footer', () => {
       ['Listening stats', musicStatsRoute],
       ['Reading', readingRoute],
     ]);
+  });
+
+  it('shows the full track in a tooltip only when the strip cuts it off', async () => {
+    const user = userEvent.setup();
+    mockGetLastKnownSong.mockResolvedValue({
+      ...SAMPLE_TRACK,
+      name: 'Together (feat. Nikki Nair, Jessy Lanza & Prentiss)',
+    });
+    mockGetLatestActivity.mockResolvedValue(SAMPLE_ACTIVITY);
+
+    const ui = await Footer();
+    render(<ServerTimeProvider serverTime={1_760_000_000_000}>{ui}</ServerTimeProvider>);
+
+    const summary = 'Together (feat. Nikki Nair, Jessy Lanza & Prentiss) · RÜFÜS DU SOL';
+    const trackLink = screen.getByRole('link', { name: `Playing ${summary}` });
+    const anchor = trackLink.parentElement;
+    const value = within(trackLink).getByText(summary);
+    if (!anchor) {
+      throw new Error('Track tooltip anchor not found');
+    }
+    expect(within(anchor).getByRole('tooltip', { hidden: true })).toHaveTextContent(summary);
+
+    await user.hover(anchor);
+    expect(anchor).toHaveAttribute('data-tooltip-muted');
+
+    value.style.overflow = 'hidden';
+    Object.defineProperty(value, 'clientWidth', { configurable: true, value: 180 });
+    Object.defineProperty(value, 'scrollWidth', { configurable: true, value: 420 });
+    await user.unhover(anchor);
+    await user.hover(anchor);
+    expect(anchor).not.toHaveAttribute('data-tooltip-muted');
   });
 
   it('renders Elsewhere stacked ledger rows with formatted handles and X ordered directly after Instagram', async () => {

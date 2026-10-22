@@ -15,13 +15,7 @@ import { getContentfulClient } from './contentfulClient';
 const QUERY = gql`
   query IntroBlock {
     asset(id: "1P5peDFKfzDHjWd6mcytc8") {
-      url(
-        transform: {
-          width: 660 # PROJECT_MAX_IMAGE_DIMENSION * 2
-          height: 660 # PROJECT_MAX_IMAGE_DIMENSION * 2
-          format: WEBP
-        }
-      )
+      url(transform: { quality: 90, format: WEBP })
       width
       height
       title

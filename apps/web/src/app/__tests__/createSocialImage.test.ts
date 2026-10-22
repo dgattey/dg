@@ -63,7 +63,7 @@ describe('createSocialImage', () => {
     expect(card.props).toMatchObject({
       headline: 'Hey friends!',
       name: SITE_NAME,
-      portraitUrl: 'https://images.ctfassets.net/dylan.png?fm=jpg&w=800',
+      portraitUrl: 'https://images.ctfassets.net/dylan.png?fm=jpg&w=640&h=840&fit=fill',
       tagline: HOMEPAGE_TITLE,
     });
     expect(card.props.grainUrl).toMatch(/^data:image\/png;base64,/);

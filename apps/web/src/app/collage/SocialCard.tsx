@@ -70,7 +70,7 @@ const LIFTED_SHADOW =
 /** The print's oval from `CutOutSymbols`, in objectBoundingBox units. */
 const PORTRAIT_OVAL =
   'M0.46 0C0.76 0 1 0.19 1 0.44C1 0.72 0.775 1 0.55 1C0.231 1 0 0.803 0 0.53C0 0.201 0.175 0 0.46 0Z';
-const PORTRAIT = { height: 420, mat: 14, width: 320 };
+export const PORTRAIT = { height: 420, mat: 14, width: 320 };
 
 /** Satori's `clip-path: path()` takes pixels, so the unit oval is scaled to each box. */
 function ovalPath(width: number, height: number) {

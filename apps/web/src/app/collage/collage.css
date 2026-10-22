@@ -52,7 +52,6 @@ html:has(.collageRoot) body {
   --collage-border: var(--collage-border-width) solid var(--ink);
   --mat: 10px;
   --mat-feature: 14px;
-  --mat-radius: 6px;
   --print-radius: 6px;
   --shadow: 0 2px 0 rgb(0 0 0 / 0.2), 0 7px 14px rgb(0 0 0 / 0.16);
   --shadow-card: var(--shadow);
@@ -217,31 +216,22 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   rotate: var(--r);
 }
 .paperInner {
+  --nested-radius: max(3px, calc(var(--edge-tl) - var(--inset)))
+    max(3px, calc(var(--edge-tr) - var(--inset))) max(3px, calc(var(--edge-br) - var(--inset)))
+    max(3px, calc(var(--edge-bl) - var(--inset)));
+  overflow: clip;
   color: var(--on);
   background: var(--pc);
-  clip-path: var(--clip, var(--quad-a));
+  border-radius: var(--edge-radius);
+  clip-path: var(--clip);
   rotate: none;
 }
 .paperInner [data-typography]:not(.home__spotifyMetaInner *) {
   color: inherit;
 }
-/*
- * Paints the torn shape underneath rather than clipping the contents, so zoomed
- * art and tooltips can pass the paper's edge.
- */
+/* Lets zoomed art pass the paper's edge. Tooltips escape either way, being fixed. */
 .paperInner.paperInnerUnclipped {
-  position: relative;
-  background: none;
-  isolation: isolate;
-  clip-path: none;
-}
-.paperInnerUnclipped::before {
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  content: "";
-  background: var(--pc);
-  clip-path: var(--clip, var(--quad-a));
+  overflow: visible;
 }
 /*
  * Tooltips are ink chips on the collage. Paper sets its text to inherit, so the
@@ -276,8 +266,9 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   cursor: pointer;
   background: var(--pc);
   border: 0;
+  border-radius: var(--edge-radius);
   filter: var(--dshadow);
-  clip-path: var(--clip, var(--quad-c));
+  clip-path: var(--clip);
   rotate: var(--r, 0deg);
 }
 .paperTag {
@@ -304,8 +295,8 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
 /*
  * One focus ring across the collage: 2px in the control's own text colour,
  * which already reads against whatever it sits on. A control that is a whole
- * paper piece rings the piece instead, since the paper's clip-path would cut
- * a ring drawn inside it — so exactly one ring shows per focus.
+ * paper piece rings the tilted piece instead, following its corners, so exactly
+ * one ring shows per focus.
  */
 .collageRoot :focus-visible {
   outline: 2px solid currentColor;
@@ -321,10 +312,9 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
     .chrome__musicSummary:focus-visible > .paperWrap,
     .chrome__nowPlaying :focus-visible .paperWrap
   ) {
-  /* Papers round their corners by clip-path at 12–16px; the ring follows the middle. */
   outline: 2px solid var(--ink);
   outline-offset: 3px;
-  border-radius: 14px;
+  border-radius: var(--edge-radius);
 }
 /*
  * Interactive paper lifts off the page on hover and keyboard focus. The deeper

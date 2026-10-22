@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { cx, paperEdgeVars, paperToneVars } from './paperVars';
+import { cx, paperSurfaceVars } from './paperVars';
 import type { PaperEdge, PaperTone } from './types';
 
 export function PaperCard({
@@ -24,11 +24,9 @@ export function PaperCard({
   return (
     <div
       className={cx('paperWrap', className)}
-      style={{ ...paperToneVars(tone, tiltDeg), ...style }}
+      style={{ ...paperSurfaceVars(tone, edge, tiltDeg), ...style }}
     >
-      <div className={cx('paperInner', innerClassName)} style={paperEdgeVars(edge)}>
-        {children}
-      </div>
+      <div className={cx('paperInner', innerClassName)}>{children}</div>
       {tag}
     </div>
   );

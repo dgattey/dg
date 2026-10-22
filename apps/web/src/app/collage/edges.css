@@ -1,11 +1,45 @@
-/* Paper edges: softly rounded cut cards, plus one hand-torn edge for sheet fields. */
+/*
+ * Paper edges. Rounded cuts are per-corner radii, so a panel matted inside one, or a
+ * rim outside it, can offset each corner by the same distance and stay concentric.
+ * Only torn edges are polygons, and those stay clip paths.
+ */
+/* The padding a matted panel sits in. Not inherited, so nested paper starts at zero. */
+@property --inset {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
 .collageRoot {
-  --quad-a: inset(0 round 14px 12px 16px 13px);
-  --quad-b: inset(0 round 12px 16px 13px 15px);
-  --quad-c: inset(0 round 13px 15px 12px 16px);
-  --quad-d: inset(0 round 16px 13px 15px 12px);
-  --soft-a: inset(0 round 20px 16px 22px 18px);
-  --soft-b: inset(0 round 18px 22px 16px 20px);
+  --quad-a-tl: 14px;
+  --quad-a-tr: 12px;
+  --quad-a-br: 16px;
+  --quad-a-bl: 13px;
+  --quad-a: var(--quad-a-tl) var(--quad-a-tr) var(--quad-a-br) var(--quad-a-bl);
+  --quad-b-tl: 12px;
+  --quad-b-tr: 16px;
+  --quad-b-br: 13px;
+  --quad-b-bl: 15px;
+  --quad-b: var(--quad-b-tl) var(--quad-b-tr) var(--quad-b-br) var(--quad-b-bl);
+  --quad-c-tl: 13px;
+  --quad-c-tr: 15px;
+  --quad-c-br: 12px;
+  --quad-c-bl: 16px;
+  --quad-c: var(--quad-c-tl) var(--quad-c-tr) var(--quad-c-br) var(--quad-c-bl);
+  --quad-d-tl: 16px;
+  --quad-d-tr: 13px;
+  --quad-d-br: 15px;
+  --quad-d-bl: 12px;
+  --quad-d: var(--quad-d-tl) var(--quad-d-tr) var(--quad-d-br) var(--quad-d-bl);
+  --soft-a-tl: 20px;
+  --soft-a-tr: 16px;
+  --soft-a-br: 22px;
+  --soft-a-bl: 18px;
+  --soft-a: var(--soft-a-tl) var(--soft-a-tr) var(--soft-a-br) var(--soft-a-bl);
+  --soft-b-tl: 18px;
+  --soft-b-tr: 22px;
+  --soft-b-br: 16px;
+  --soft-b-bl: 20px;
+  --soft-b: var(--soft-b-tl) var(--soft-b-tr) var(--soft-b-br) var(--soft-b-bl);
   --torn-c: polygon( 0% 5.4px, 7.1% 8px, 14.3% 12.5px, 21.4% 11.4px, 28.6% 15.7px, 35.7% 18px, 42.9% 5.7px, 50% 15.7px, 57.1% 4.6px, 64.3% 19.9px, 71.4% 5.1px, 78.6% 10.7px, 85.7% 1.8px, 92.9% 17.1px, 100% 5.7px, calc(100% - 5.2px) 7.1%, calc(100% - 5.1px) 14.3%, calc(100% - 14.5px) 21.4%, calc(100% - 5.5px) 28.6%, calc(100% - 0.9px) 35.7%, calc(100% - 9.2px) 42.9%, calc(100% - 10.7px) 50%, calc(100% - 17.9px) 57.1%, calc(100% - 19.7px) 64.3%, calc(100% - 15.7px) 71.4%, calc(100% - 9.4px) 78.6%, calc(100% - 16.9px) 85.7%, calc(100% - 5.6px) 92.9%, calc(100% - 1.8px) 100%, 92.9% calc(100% - 7.3px), 85.7% calc(100% - 18.9px), 78.6% calc(100% - 13px), 71.4% calc(100% - 11.6px), 64.3% calc(100% - 7.1px), 57.1% calc(100% - 2.9px), 50% calc(100% - 18.7px), 42.9% calc(100% - 6.8px), 35.7% calc(100% - 1.7px), 28.6% calc(100% - 14.1px), 21.4% calc(100% - 20.6px), 14.3% calc(100% - 1.6px), 7.1% calc(100% - 12px), 0% calc(100% - 10.2px), 13.6px 92.9%, 21.4px 85.7%, 3.2px 78.6%, 5px 71.4%, 10.9px 64.3%, 3.2px 57.1%, 14.6px 50%, 12.4px 42.9%, 20.6px 35.7%, 1.3px 28.6%, 9.4px 21.4%, 6px 14.3%, 1.6px 7.1% );
   /* The torn edge's bottom alone, for strips that stay straight on top. */
   --torn-bottom: polygon( 0 0, 100% 0, 100% calc(100% - 5.7px), 92.9% calc(100% - 7.3px), 85.7% calc(100% - 18.9px), 78.6% calc(100% - 13px), 71.4% calc(100% - 11.6px), 64.3% calc(100% - 7.1px), 57.1% calc(100% - 2.9px), 50% calc(100% - 18.7px), 42.9% calc(100% - 6.8px), 35.7% calc(100% - 1.7px), 28.6% calc(100% - 14.1px), 21.4% calc(100% - 20.6px), 14.3% calc(100% - 1.6px), 7.1% calc(100% - 12px), 0% calc(100% - 10.2px) );
