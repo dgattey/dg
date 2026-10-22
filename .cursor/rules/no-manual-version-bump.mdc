@@ -1,16 +1,18 @@
 ---
-description: Never manually bump the root package.json version — CI owns it
+description: Never manually bump the root package.json version — releases are derived from git tags
 alwaysApply: true
 ---
 
 # No manual version bumps
 
-The root `package.json` `version` field is owned exclusively by the Release
-workflow (`.github/workflows/release.yml`). CI auto-bumps it from the PR
-template Major/Minor/Patch checkboxes and commits as `github-actions[bot]`.
+Release versions are derived from git tags and the PR template Major/Minor/Patch
+checkboxes by `.github/workflows/release.yml` (`@dg/cli` `version:bump` and
+`version:release-info`) and injected at build time via `NEXT_PUBLIC_APP_VERSION`
+in `apps/web/next.config.ts`. The Release workflow never pushes version-bump
+commits onto PR branches, so open PRs never conflict on `package.json`.
 
-Agents and humans must never change that field in commits. CI writing the
-version is expected and allowed.
+Agents and humans must never change the `version` field in the root
+`package.json`.
 
 ## Hard ban
 
@@ -23,14 +25,13 @@ version is expected and allowed.
 
 ## Allowed
 
-- Leave `version` untouched in every human/agent commit
-- Resolve version conflicts with `turbo drop-bot-commits`, then force-push; the
-  Release workflow will rewrite the bump
-- Check Major/Minor/Patch in the PR template so CI can bump
-- CI/Release workflow commits that change `version` are fine — do not revert them
-  unless you are deliberately running `turbo drop-bot-commits`
+- Leave `version` untouched in every commit
+- Check Major/Minor/Patch in the PR template so `.github/workflows/release.yml`
+  computes the release version and tags the squash merge commit on `main`
+- Run `turbo drop-bot-commits` on older branches that still carry a legacy
+  `github-actions[bot]` `Bump version to v...` commit
 
 ## If you already changed it
 
-Revert only the `version` field to whatever it was before your edit (typically
-the value on the base branch or the last bot bump). Do not invent a new semver.
+Revert only the `version` field to whatever it was on `origin/main`. Do not
+invent a new semver.

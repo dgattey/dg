@@ -9,8 +9,9 @@ const getRepositoryUrl = () => {
 };
 
 const getAppVersion = () => {
-  invariant(version, 'App version missing in package.json');
-  return `v${version}`;
+  const resolved = process.env.NEXT_PUBLIC_APP_VERSION?.trim() || version;
+  invariant(resolved, 'App version missing in package.json');
+  return resolved.startsWith('v') ? resolved : `v${resolved}`;
 };
 
 export const getAppVersionInfo = () => {

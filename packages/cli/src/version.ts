@@ -4,21 +4,42 @@
  * Usage: tsx src/version.ts <command> [args...]
  *
  * Commands:
- *   bump <event-path>                 Parse PR, compute target from tags, bump package.json
- *   release-info <event-path>         Read version + extract release notes from PR
+ *   bump <event-path>                 Parse PR and compute target version from tags
+ *   release-info <event-path>         Compute release version from tags + extract release notes
  *   pr-comment <event> <ver> <state>  Upsert PR comment
  */
 import { execSync } from 'node:child_process';
-import { readFileSync, writeFileSync } from 'node:fs';
+import { readFileSync } from 'node:fs';
 import https from 'node:https';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { fail, findRoot, fmt, log, out, parseArgs, withSpinner } from './lib/utils.js';
 
-type ReleaseType = 'major' | 'minor' | 'patch';
+export type ReleaseType = 'major' | 'minor' | 'patch';
 
-function computeNext(base: string, type: ReleaseType): string {
-  const [major = 0, minor = 0, patch = 0] = base.split('-')[0]?.split('.').map(Number) ?? [];
+export function parseSemver(raw: string): [number, number, number] | null {
+  const match = /^v?(\d+)\.(\d+)\.(\d+)$/.exec(raw.trim());
+  if (!match) {
+    return null;
+  }
+  return [Number(match[1]), Number(match[2]), Number(match[3])];
+}
+
+export function compareSemver(a: string, b: string): number {
+  const parsedA = parseSemver(a);
+  const parsedB = parseSemver(b);
+  if (!parsedA && !parsedB) return 0;
+  if (!parsedA) return -1;
+  if (!parsedB) return 1;
+  for (let i = 0; i < 3; i++) {
+    const diff = (parsedA[i] ?? 0) - (parsedB[i] ?? 0);
+    if (diff !== 0) return diff;
+  }
+  return 0;
+}
+
+export function computeNext(base: string, type: ReleaseType): string {
+  const [major = 0, minor = 0, patch = 0] = parseSemver(base) ?? [0, 0, 0];
   if (type === 'major') return `${major + 1}.0.0`;
   if (type === 'minor') return `${major}.${minor + 1}.0`;
   return `${major}.${minor}.${patch + 1}`;
@@ -39,10 +60,28 @@ function readEvent(eventPath: string): {
 }
 
 // Keep in sync with the bump job's `if:` in .github/workflows/release.yml.
-function parseReleaseType(prBody: string): ReleaseType {
+export function parseReleaseType(prBody: string): ReleaseType {
   if (/- \[x\] Major/i.test(prBody)) return 'major';
   if (/- \[x\] Minor/i.test(prBody)) return 'minor';
   return 'patch';
+}
+
+export function resolveTargetVersion({
+  fallbackVersion,
+  latestTag,
+  prBody,
+}: {
+  fallbackVersion: string;
+  latestTag: string | null;
+  prBody: string;
+}): { base: string; releaseType: ReleaseType; target: string } {
+  const releaseType = parseReleaseType(prBody);
+  const base = latestTag ?? fallbackVersion;
+  return {
+    base,
+    releaseType,
+    target: computeNext(base, releaseType),
+  };
 }
 
 export function extractNotes(body: string, fallback = ''): string {
@@ -69,6 +108,17 @@ export function extractNotes(body: string, fallback = ''): string {
   return fallback.trim();
 }
 
+export function pickHighestSemverTag(tags: ReadonlyArray<string>): string | null {
+  const valid = tags
+    .map((tag) => tag.trim().replace(/^refs\/tags\//, ''))
+    .filter((tag) => parseSemver(tag) !== null)
+    .map((tag) => tag.replace(/^v/, ''));
+  if (valid.length === 0) {
+    return null;
+  }
+  return valid.sort((a, b) => compareSemver(b, a))[0] ?? null;
+}
+
 function getLatestTag(): string | null {
   try {
     const tags = execSync('git tag --list --sort=-v:refname', {
@@ -77,8 +127,21 @@ function getLatestTag(): string | null {
     })
       .split('\n')
       .filter(Boolean);
-    const match = tags.find((t) => /^v?\d+\.\d+\.\d+/.test(t));
-    return match?.replace(/^v/, '') ?? null;
+    return pickHighestSemverTag(tags);
+  } catch {
+    return null;
+  }
+}
+
+function getHeadTag(): string | null {
+  try {
+    const tags = execSync('git tag --points-at HEAD', {
+      encoding: 'utf8',
+      stdio: ['ignore', 'pipe', 'ignore'],
+    })
+      .split('\n')
+      .filter(Boolean);
+    return pickHighestSemverTag(tags);
   } catch {
     return null;
   }
@@ -133,48 +196,38 @@ async function main(): Promise<void> {
     case 'bump': {
       if (!args[0]) fail('Usage: version bump <event-path>');
       const { prBody } = readEvent(args[0]);
-
-      const releaseType = parseReleaseType(prBody);
-      log(fmt.info(`Release type: ${fmt.bold(releaseType)}`));
-
       const current = readPkg().version;
-      log(fmt.info(`Current version: ${fmt.bold(current)}`));
-
       const latestTag = getLatestTag();
-      const base = latestTag ?? current;
+      const { base, releaseType, target } = resolveTargetVersion({
+        fallbackVersion: current,
+        latestTag,
+        prBody,
+      });
+
+      log(fmt.info(`Release type: ${fmt.bold(releaseType)}`));
       log(
         fmt.info(
-          `Base from tags: ${fmt.bold(base)}${latestTag ? '' : ' (no tags, using current)'}`,
+          `Base from tags: ${fmt.bold(base)}${latestTag ? '' : ' (no tags, using package.json)'}`,
         ),
       );
+      log(fmt.success(`Target version on merge: ${fmt.bold(target)}`));
 
-      const target = computeNext(base, releaseType);
-
-      if (current === target) {
-        log(fmt.success(`Already at target ${target}, skipping`));
-      } else {
-        await withSpinner(
-          `Bumping ${current} → ${target}`,
-          () => {
-            const pkg = readPkg();
-            pkg.version = target;
-            writeFileSync(pkgPath, `${JSON.stringify(pkg, null, 2)}\n`, 'utf8');
-          },
-          undefined,
-          { stderr: true },
-        );
-      }
       out(`VERSION_FROM=${base}`);
       out(`VERSION_TO=${target}`);
-      out(`CHANGED=${current !== target}`);
       break;
     }
 
     case 'release-info': {
       if (!args[0]) fail('Usage: version release-info <event-path>');
       const { prBody, prTitle } = readEvent(args[0]);
-
-      const version = readPkg().version;
+      const headTag = getHeadTag();
+      const version =
+        headTag ??
+        resolveTargetVersion({
+          fallbackVersion: readPkg().version,
+          latestTag: getLatestTag(),
+          prBody,
+        }).target;
       log(fmt.info(`Version: ${fmt.bold(version)}`));
 
       const notes = extractNotes(prBody, prTitle ? `- ${prTitle.trim()}` : '');

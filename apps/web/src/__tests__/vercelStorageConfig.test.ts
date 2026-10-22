@@ -2,12 +2,13 @@ import { spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
-import nextConfig from '../../next.config';
+import nextConfig, { resolveVersionFromTagRefs } from '../../next.config';
 import vercelConfig from '../../vercel.json' with { type: 'json' };
+import { getAppVersionInfo } from '../services/version';
 
 const WEB_ROOT = resolve(__dirname, '../..');
 
-function createTempRepo({ bumped }: { bumped: boolean }) {
+function createTempRepo({ botHead }: { botHead: boolean }) {
   const repoDir = mkdtempSync(join(tmpdir(), 'dg-ignore-cmd-'));
   const webDir = join(repoDir, 'apps', 'web');
 
@@ -24,7 +25,7 @@ function createTempRepo({ bumped }: { bumped: boolean }) {
     stdio: 'ignore',
   });
 
-  if (bumped) {
+  if (botHead) {
     writeFileSync(join(repoDir, 'package.json'), JSON.stringify({ version: '2.74.1' }));
     spawnSync('git', ['-C', repoDir, 'add', 'package.json'], { stdio: 'ignore' });
     spawnSync('git', ['-C', repoDir, 'commit', '-m', 'Bump version to v2.74.1'], {
@@ -44,7 +45,7 @@ function runIgnoreCommand(cwd: string, env: Record<string, string>) {
   }).status;
 }
 
-describe('Vercel Function Storage configuration', () => {
+describe('Vercel Function Storage and deployment configuration', () => {
   it('excludes sharp, moment locales, non-postgres dialects, and page-level OG renderer from NFT traces', () => {
     const excludes = nextConfig.outputFileTracingExcludes ?? {};
     expect(excludes['**']).toEqual(
@@ -85,29 +86,81 @@ describe('Vercel Function Storage configuration', () => {
     ).toBe(1);
   });
 
-  it('skips unbumped preview branch pushes and builds version-bumped PR heads', () => {
-    const unbumped = createTempRepo({ bumped: false });
+  it('builds normal preview branch commits and skips legacy bot version-bump commits', () => {
+    const featureBranch = createTempRepo({ botHead: false });
     try {
       expect(
-        runIgnoreCommand(unbumped.webDir, {
-          VERCEL_ENV: 'preview',
-          VERCEL_GIT_COMMIT_REF: 'dgattey/feature-branch',
-        }),
-      ).toBe(0);
-    } finally {
-      unbumped.cleanup();
-    }
-
-    const bumped = createTempRepo({ bumped: true });
-    try {
-      expect(
-        runIgnoreCommand(bumped.webDir, {
+        runIgnoreCommand(featureBranch.webDir, {
           VERCEL_ENV: 'preview',
           VERCEL_GIT_COMMIT_REF: 'dgattey/feature-branch',
         }),
       ).toBe(1);
     } finally {
-      bumped.cleanup();
+      featureBranch.cleanup();
+    }
+
+    const botBranch = createTempRepo({ botHead: true });
+    try {
+      expect(
+        runIgnoreCommand(botBranch.webDir, {
+          VERCEL_ENV: 'preview',
+          VERCEL_GIT_COMMIT_REF: 'dgattey/feature-branch',
+        }),
+      ).toBe(0);
+    } finally {
+      botBranch.cleanup();
+    }
+  });
+
+  it('resolves the build version from git release tags and the commit Release info checkbox', () => {
+    const tagRefs = [
+      'b404267f7b7a3233c21fb3582f921f7388a0858f\trefs/tags/v2.9.1',
+      '072f4193820edda7ba40f48ebfba5581d818f4da\trefs/tags/v2.81.0',
+      'c19781c34bce4cd8c0e24744de6387148d1011a2\trefs/tags/v2.81.1',
+    ].join('\n');
+
+    expect(
+      resolveVersionFromTagRefs({
+        commitBody: '# Release info\n- [x] Patch',
+        fallbackVersion: '2.80.0',
+        headSha: 'c19781c34bce4cd8c0e24744de6387148d1011a2',
+        tagRefsOutput: tagRefs,
+      }),
+    ).toBe('2.81.1');
+
+    expect(
+      resolveVersionFromTagRefs({
+        commitBody: '# Release info\n- [x] Minor',
+        fallbackVersion: '2.80.0',
+        headSha: 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
+        tagRefsOutput: tagRefs,
+      }),
+    ).toBe('2.82.0');
+
+    expect(
+      resolveVersionFromTagRefs({
+        commitBody: '# Release info\n- [x] Patch',
+        fallbackVersion: '2.80.0',
+        headSha: 'deadbeefdeadbeefdeadbeefdeadbeefdeadbeef',
+        tagRefsOutput: tagRefs,
+      }),
+    ).toBe('2.81.2');
+  });
+
+  it('prefers NEXT_PUBLIC_APP_VERSION in getAppVersionInfo when present', () => {
+    const previous = process.env.NEXT_PUBLIC_APP_VERSION;
+    process.env.NEXT_PUBLIC_APP_VERSION = '2.82.0';
+    try {
+      expect(getAppVersionInfo()).toEqual({
+        releaseUrl: 'https://github.com/dgattey/dg/releases/tag/v2.82.0',
+        version: 'v2.82.0',
+      });
+    } finally {
+      if (previous === undefined) {
+        delete process.env.NEXT_PUBLIC_APP_VERSION;
+      } else {
+        process.env.NEXT_PUBLIC_APP_VERSION = previous;
+      }
     }
   });
 });

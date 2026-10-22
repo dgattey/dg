@@ -1,4 +1,4 @@
-# Auto-bump version on PRs and create releases on merge
+# Preview target version on PRs and create releases on merge
 name: Release
 
 on:
@@ -31,18 +31,13 @@ jobs:
       cancel-in-progress: true
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
       pull-requests: write
     steps:
-      - name: Checkout PR head with full history
+      - name: Checkout PR with tags
         uses: actions/checkout@v7.0.1
-        # The bump push must authenticate with the PAT (not GITHUB_TOKEN) so it
-        # triggers CI, this workflow's synchronize run, and the Vercel preview.
         with:
-          ref: ${{ github.head_ref }}
           fetch-depth: 0
-          token: ${{ secrets.PAT_FOR_ACTIONS }}
-          persist-credentials: true
 
       - uses: pnpm/action-setup@v6.1.0
       - uses: actions/setup-node@v7.0.0
@@ -53,56 +48,28 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
-      - name: Configure git
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-
-      - name: Check if last commit is bot version bump
-        id: check-bot-commit
-        run: |
-          set -euo pipefail
-          LAST_AUTHOR=$(git log -1 --format='%an')
-          if [ "$LAST_AUTHOR" = "github-actions[bot]" ]; then
-            echo "Last commit was by bot. Skipping version bump."
-            echo "SKIP=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "Last commit by ${LAST_AUTHOR}. Proceeding with version bump check."
-            echo "SKIP=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Bump version
+      - name: Compute target version
         id: bump
-        if: steps.check-bot-commit.outputs.SKIP == 'false'
         run: |
           set -euo pipefail
-          git fetch --tags
+          git fetch --tags --force
           OUTPUT=$(pnpm --filter=@dg/cli --silent version:bump "$GITHUB_EVENT_PATH")
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
 
       - name: Upsert PR version comment
-        if: steps.check-bot-commit.outputs.SKIP == 'false'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           pnpm --filter=@dg/cli --silent version:pr-comment "$GITHUB_EVENT_PATH" "${{ steps.bump.outputs.VERSION_TO }}" will-be
 
-      - name: Commit version bump
-        if: steps.check-bot-commit.outputs.SKIP == 'false' && steps.bump.outputs.CHANGED == 'true'
-        run: |
-          if git diff --quiet package.json; then
-            echo "No version change needed"
-            exit 0
-          fi
-          git add package.json
-          git commit -m "Bump version to v${{ steps.bump.outputs.VERSION_TO }}"
-          git push
-
   release:
     name: "🚀 Create release"
     if: github.event.pull_request.merged == true
+    concurrency:
+      group: ${{ github.workflow }}-release
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -127,6 +94,7 @@ jobs:
         id: info
         run: |
           set -euo pipefail
+          git fetch --tags --force
           OUTPUT=$(pnpm --filter=@dg/cli --silent version:release-info "$GITHUB_EVENT_PATH")
           echo "$OUTPUT"
           echo "$OUTPUT" >> "$GITHUB_OUTPUT"
