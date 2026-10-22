@@ -334,3 +334,16 @@ export const READING_BACKDROP = defineBackdrop(1100, 12, [
     ],
   },
 ]);
+
+/** A field scrapbook: a gingham scrap, a star, and leaves along the trail edges. */
+export const STRAVA_BACKDROP = defineBackdrop(1250, 3, [
+  {
+    cutOuts: [
+      ['strava-star', 'star4', 'vermilion', 44, 14, 55, 6, 'desktop', 1],
+      ['strava-monstera', 'monstera', 'viridian', 340, 18, 95, 30, 'desktop', 0, { mirrored: true }],
+      ['strava-fern', 'fern', 'leaf', 260, -20, -9, 48, 'desktop', 0],
+      ['strava-trefoil', 'trefoil', 'ochre', 120, -8, 96, 82, 'all', 1],
+    ],
+    sheets: [['strava-gingham', 'torn', 'gingham', ['rose', 'cream'], -4, 18, 22, 220, -6, 'all']],
+  },
+]);
