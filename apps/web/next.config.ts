@@ -55,7 +55,7 @@ const nextConfig: NextConfig = {
     ],
     '**/page': [
       '../../node_modules/**/next/dist/compiled/@vercel/og/**',
-      './.next/server/assets/SFPro*.ttf',
+      './.next/server/assets/Familjen-Grotesk-*.ttf',
     ],
   },
   reactCompiler: true,
@@ -69,7 +69,6 @@ const nextConfig: NextConfig = {
     '@dg/services',
     '@dg/ui',
     '@dg/maps',
-    '@dg/og',
   ],
 };
 

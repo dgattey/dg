@@ -102,6 +102,9 @@
     "graphql:schema": {
       "cache": false
     },
+    "icons": {
+      "cache": false
+    },
     "migrate": {
       "cache": false,
       "dependsOn": ["env", "topo"],

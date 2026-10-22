@@ -142,6 +142,14 @@
       }
     },
     {
+      "includes": ["apps/web/src/app/collage/SocialCard.tsx"],
+      "linter": {
+        "domains": {
+          "next": "none"
+        }
+      }
+    },
+    {
       "includes": ["packages/maps/**"],
       "linter": {
         "domains": {
@@ -196,7 +204,6 @@
                     "group": [
                       "../db/**",
                       "../maps/**",
-                      "../og/**",
                       "../release/**",
                       "../services/**",
                       "../shared-core/**",

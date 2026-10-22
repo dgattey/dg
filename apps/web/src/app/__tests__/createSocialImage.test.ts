@@ -3,33 +3,86 @@ jest.mock('next/cache', () => ({
 }));
 
 // @vercel/og ships ESM with `import.meta`, which this Jest setup cannot load.
-jest.mock('@dg/og/generateOpenGraphImage', () => ({
-  generateOpenGraphImage: jest.fn(() => new Response(new Uint8Array([0x89, 0x50, 0x4e, 0x47]))),
+jest.mock('next/og', () => ({
+  ImageResponse: jest.fn(() => new Response(new Uint8Array([0x89, 0x50, 0x4e, 0x47]))),
 }));
 
-import { generateOpenGraphImage } from '@dg/og/generateOpenGraphImage';
+jest.mock('../../services/contentful', () => ({
+  getIntroContent: jest.fn(),
+}));
+
+import type { IntroContent } from '@dg/content-models/contentful/renderables/intro';
+import { ImageResponse } from 'next/og';
+import { isValidElement } from 'react';
+import { getIntroContent } from '../../services/contentful';
 import { createSocialImage } from '../createSocialImage';
+import { HOMEPAGE_TITLE, SITE_NAME } from '../metadata';
 
 const TRUETYPE_SFNT_VERSION = 0x00010000;
 
+const intro: IntroContent = {
+  image: { height: 800, url: 'https://images.ctfassets.net/dylan.png?fm=webp&w=800', width: 800 },
+  textBlock: {
+    content: {
+      json: {
+        content: [
+          {
+            content: [{ data: {}, marks: [], nodeType: 'text', value: 'Hey friends!' }],
+            data: {},
+            nodeType: 'heading-1',
+          },
+        ],
+        data: {},
+        nodeType: 'document',
+      },
+      links: { assets: { block: [] }, entries: { block: [], inline: [] } },
+    },
+  },
+};
+
+async function renderCard() {
+  const response = await createSocialImage();
+  const [card, options] = jest.mocked(ImageResponse).mock.lastCall ?? [];
+  if (!isValidElement<Record<string, unknown>>(card) || !options) {
+    throw new Error('ImageResponse was not called with a card element');
+  }
+  return { card, options, response };
+}
+
 describe('createSocialImage', () => {
-  it('serves the rendered PNG for the given text using both brand fonts from disk', async () => {
-    const response = await createSocialImage('/opengraph-image', 'Hello', 'World');
+  beforeEach(() => {
+    jest.mocked(ImageResponse).mockClear();
+  });
+
+  it('serves a PNG of the collage card with the intro headline, a JPEG portrait, and both font weights', async () => {
+    jest.mocked(getIntroContent).mockResolvedValue(intro);
+    const { card, options, response } = await renderCard();
 
     expect(response.headers.get('Content-Type')).toBe('image/png');
     expect([...new Uint8Array(await response.arrayBuffer())]).toEqual([0x89, 0x50, 0x4e, 0x47]);
-
-    const [args] = jest.mocked(generateOpenGraphImage).mock.lastCall ?? [];
-    if (!args) {
-      throw new Error('generateOpenGraphImage was not called');
-    }
-    const { boldFont, normalFont, size, url } = args;
-    expect(Object.fromEntries(new URL(url ?? '').searchParams)).toEqual({
-      subtitle: 'World',
-      text: 'Hello',
+    expect(card.props).toMatchObject({
+      headline: 'Hey friends!',
+      name: SITE_NAME,
+      portraitUrl: 'https://images.ctfassets.net/dylan.png?fm=jpg&w=800',
+      tagline: HOMEPAGE_TITLE,
     });
-    expect(size).toEqual({ height: 630, width: 1200 });
-    expect(new DataView(normalFont).getUint32(0)).toBe(TRUETYPE_SFNT_VERSION);
-    expect(new DataView(boldFont).getUint32(0)).toBe(TRUETYPE_SFNT_VERSION);
+    expect(card.props.grainUrl).toMatch(/^data:image\/png;base64,/);
+    expect(options).toMatchObject({ height: 630, width: 1200 });
+    expect(options.fonts?.map(({ name, weight }) => ({ name, weight }))).toEqual([
+      { name: 'Familjen Grotesk', weight: 400 },
+      { name: 'Familjen Grotesk', weight: 700 },
+    ]);
+    for (const font of options.fonts ?? []) {
+      expect(font.data instanceof ArrayBuffer && new DataView(font.data).getUint32(0)).toBe(
+        TRUETYPE_SFNT_VERSION,
+      );
+    }
+  });
+
+  it('falls back to the site name without a portrait when Contentful has no intro', async () => {
+    jest.mocked(getIntroContent).mockResolvedValue(null);
+    const { card } = await renderCard();
+
+    expect(card.props).toMatchObject({ headline: SITE_NAME, portraitUrl: null });
   });
 });

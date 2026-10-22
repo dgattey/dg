@@ -2,7 +2,6 @@
   "dependencies": {
     "@dg/content-models": "workspace:*",
     "@dg/maps": "workspace:*",
-    "@dg/og": "workspace:*",
     "@dg/services": "workspace:*",
     "@dg/shared-core": "workspace:*",
     "@dg/ui": "workspace:*",
@@ -33,6 +32,7 @@
     "babel-plugin-react-compiler": "catalog:",
     "jest": "catalog:",
     "jest-environment-jsdom": "catalog:",
+    "sharp": "catalog:",
     "tsx": "catalog:",
     "typescript": "catalog:"
   },
@@ -47,6 +47,7 @@
     "check:types": "tsc",
     "clean": "rm -rf .next .turbo *.tsbuildinfo",
     "dev": "next dev --turbopack",
+    "icons": "tsx scripts/renderAppIcons.ts",
     "test": "jest"
   }
 }

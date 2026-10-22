@@ -62,7 +62,7 @@ describe('Vercel Function Storage configuration', () => {
     expect(excludes['**/page']).toEqual(
       expect.arrayContaining([
         '../../node_modules/**/next/dist/compiled/@vercel/og/**',
-        './.next/server/assets/SFPro*.ttf',
+        './.next/server/assets/Familjen-Grotesk-*.ttf',
       ]),
     );
   });
