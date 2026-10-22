@@ -1,6 +1,13 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { extractNotes } from '../version.js';
+import {
+  compareSemver,
+  computeNext,
+  extractNotes,
+  parseReleaseType,
+  pickHighestSemverTag,
+  resolveTargetVersion,
+} from '../version.js';
 
 describe('extractNotes', () => {
   it('extracts notes from standard # What changed? template section', () => {
@@ -77,6 +84,38 @@ describe('extractNotes', () => {
     assert.equal(
       extractNotes('', '- Fix release note extraction'),
       '- Fix release note extraction',
+    );
+  });
+});
+
+describe('version resolution from tags and PR checkboxes', () => {
+  it('sorts semver tags numerically rather than lexicographically', () => {
+    assert.ok(compareSemver('2.81.1', '2.9.1') > 0);
+    assert.equal(
+      pickHighestSemverTag(['refs/tags/v2.9.1', 'refs/tags/v2.81.1', 'refs/tags/v2.80.3']),
+      '2.81.1',
+    );
+  });
+
+  it('computes major, minor, and patch target versions from the highest tag', () => {
+    assert.equal(parseReleaseType('- [x] Major'), 'major');
+    assert.equal(parseReleaseType('- [X] Minor'), 'minor');
+    assert.equal(parseReleaseType('- [x] Patch'), 'patch');
+    assert.equal(computeNext('2.81.1', 'patch'), '2.81.2');
+    assert.equal(computeNext('2.81.1', 'minor'), '2.82.0');
+    assert.equal(computeNext('2.81.1', 'major'), '3.0.0');
+
+    assert.deepEqual(
+      resolveTargetVersion({
+        fallbackVersion: '2.80.0',
+        latestTag: '2.81.1',
+        prBody: '# Release info\n- [x] Minor',
+      }),
+      {
+        base: '2.81.1',
+        releaseType: 'minor',
+        target: '2.82.0',
+      },
     );
   });
 });

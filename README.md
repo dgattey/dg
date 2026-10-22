@@ -157,14 +157,10 @@ The tunnel will fail if `CLOUDFLARE_TUNNEL_TOKEN` isn't configured in your `.env
 
 ### Versioning
 
-Versioning uses auto-generated version bumps on PRs with GitHub releases on merge. The version is stored in the root `package.json` and read directly by the app at build time. Check the appropriate checkbox in the PR template (Major/Minor/Patch) - the workflow will auto-commit the version bump to your branch and create a GitHub release on merge with notes from the "What changed?" section.
+Versioning derives each release version from the latest semver git tag and the PR template checkbox (`Major`, `Minor`, or `Patch`) without committing back to PR branches:
 
-#### Version conflicts
-
-If multiple PRs each have their own version bump and one merges, other PRs will have conflicts in `package.json`. To fix:
-
-1. Run `turbo drop-bot-commits` to remove bot-authored version bumps and rebase onto `origin/main`
-2. Force push: `git push --force-with-lease`
-3. The workflow will automatically create a fresh version bump commit
+1. On open PRs, `.github/workflows/release.yml` (`📦 Bump version`) computes the target version from git tags and posts/updates the PR version preview comment without mutating `package.json`.
+2. On merge to `main`, `🚀 Create release` computes the release version from the merged PR's checkbox and tags the squash merge commit with a GitHub Release (`vX.Y.Z`).
+3. At build time (`apps/web/next.config.ts`), `resolveBuildVersion()` queries the repository's semver git tags (`git ls-remote --tags --refs`) and the commit's `# Release info` checkbox to inject `NEXT_PUBLIC_APP_VERSION` for `getAppVersionInfo()`.
 
 [gh]: https://github.com/dgattey/dg
