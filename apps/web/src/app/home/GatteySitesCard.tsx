@@ -4,6 +4,9 @@ import { Image } from '@dg/ui/dependent/Image';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 
+/** Neighbours never share an angle, so the stack reads as hand-placed paper. */
+const ROW_TILTS = [-1.6, 1.4, -1.9, 1.5, -1.3] as const;
+
 type GatteySitesCardProps = {
   projects: ReadonlyArray<RenderableSideProject>;
 };
@@ -28,7 +31,7 @@ export function GatteySitesCard({ projects }: GatteySitesCardProps) {
               <PaperCard
                 className="home__sideRowWrap collageLift"
                 edge={even ? 'quad-a' : 'quad-d'}
-                tiltDeg={even ? 0.5 : -0.5}
+                tiltDeg={ROW_TILTS[index % ROW_TILTS.length]}
                 tone="cream"
               >
                 <a className="home__sideRow" href={project.url} rel="noreferrer" target="_blank">

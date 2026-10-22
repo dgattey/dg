@@ -412,16 +412,31 @@
   position: relative;
   z-index: 3;
   justify-self: start;
-  margin: 0 0 14px -4px;
+  margin: 0 0 18px -4px;
   font-size: inherit;
   font-weight: inherit;
 }
 .home__sideList {
   display: grid;
-  gap: 12px;
+  gap: 18px;
   padding: 0;
   margin: 0;
   list-style: none;
+}
+/*
+ * Opposite tilts bring neighbouring corners together, hence the wide gap. The
+ * list then hangs into the row gap above the wide frame below, keeping row one
+ * as tall as the frames beside it.
+ */
+@media (min-width: 1100px) {
+  .home__sideRoot {
+    margin-bottom: -48px;
+  }
+}
+@media (min-width: 821px) and (max-width: 1099px) {
+  .home__sideRoot {
+    margin-bottom: -24px;
+  }
 }
 /* Each tilted card paints its own layer, so the active one rises to keep its tooltip over the next. */
 .home__sideItem {
@@ -494,17 +509,8 @@
   line-height: 1;
 }
 
-/* Halving the tilt keeps a clear gap between corners as the rows tighten. */
+/* Five rows stay within the frames beside them as the columns narrow. */
 @media (max-width: 1300px) {
-  .home__sideHeadingWrap {
-    margin-bottom: 13px;
-  }
-  .home__sideList {
-    gap: 10px;
-  }
-  .home__sideItem .home__sideRowWrap {
-    rotate: calc(var(--r) / 2);
-  }
   .home__sideRow {
     grid-template-columns: 36px minmax(0, 1fr) auto;
     gap: 12px;
@@ -607,12 +613,6 @@
   .home__sideItem:nth-child(odd) .home__sideRowWrap,
   .home__sideItem:nth-child(even) .home__sideRowWrap {
     margin: 0;
-  }
-  .home__sideHeadingWrap {
-    margin-bottom: 14px;
-  }
-  .home__sideList {
-    gap: 12px;
   }
   .home__sideRow {
     padding: 10px 14px 10px 10px;
