@@ -24,7 +24,8 @@ export function PaperPills<Key extends string>({
   label: string;
   onSelect?: (key: Key) => void;
   options: ReadonlyArray<PaperPillOption<Key>>;
-  selected: Key;
+  /** Null when the pick lives outside these pills. */
+  selected: Key | null;
 }) {
   return (
     <fieldset aria-label={label} className={cx('paperPills', className)} {...jsOnlyProps}>

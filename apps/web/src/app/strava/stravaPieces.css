@@ -26,6 +26,24 @@
   line-height: 1.1;
   letter-spacing: -0.015em;
 }
+.strava__polaroidMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  align-items: center;
+  padding-inline: 4px;
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--soft);
+}
+.strava__polaroidNote {
+  padding: 4px 4px 0;
+  font-family: var(--body);
+  font-size: var(--type-body);
+  line-height: 1.45;
+}
 .strava__stats {
   display: flex;
   flex-wrap: wrap;

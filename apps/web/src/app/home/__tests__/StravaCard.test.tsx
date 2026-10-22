@@ -1,4 +1,8 @@
-import type { StravaHistory, StravaOuting } from '@dg/content-models/strava/StravaHistory';
+import type {
+  StravaHistory,
+  StravaLogEntry,
+  StravaOuting,
+} from '@dg/content-models/strava/StravaHistory';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { render, screen, within } from '@testing-library/react';
 import { StravaCard } from '../StravaCard';
@@ -31,7 +35,6 @@ const latest: StravaOuting = {
   description: null,
   distanceMeters: 15.9 * METERS_PER_MILE,
   elevationGainMeters: 892 * METERS_PER_FOOT,
-  gearName: 'Cruz',
   id: 101,
   movingTimeSeconds: 4_320,
   name: 'Goals',
@@ -41,17 +44,26 @@ const latest: StravaOuting = {
   url: 'https://www.strava.com/activities/101',
 };
 
+const { description: _, ...latestEntry } = latest;
+
+const route = (id: number, polyline: string, sport: StravaLogEntry['sport']): StravaLogEntry => ({
+  ...latestEntry,
+  id,
+  name: `Outing ${id}`,
+  polyline,
+  sport,
+  startDate: '2024-06-01T15:00:00Z',
+  url: `https://www.strava.com/activities/${id}`,
+});
+
 const history: StravaHistory = {
-  biggestClimbs: [latest],
+  bikes: [],
   latest,
-  longest: latest,
-  monthlyClimbingMeters: Array.from({ length: 12 }, () => 0),
-  odometer: null,
-  recent: [latest],
-  routes: [
-    { id: 101, polyline: PRESIDIO, sport: 'ride', year: 2026 },
-    { id: 102, polyline: LAKE_MERRITT, sport: 'run', year: 2025 },
-    { id: 103, polyline: TAHOE, sport: 'hike', year: 2024 },
+  outings: [
+    latestEntry,
+    route(102, LAKE_MERRITT, 'run'),
+    route(103, TAHOE, 'hike'),
+    { ...route(104, '', 'ride'), polyline: null },
   ],
   thisYear: {
     distanceMeters: 1_420 * METERS_PER_MILE,
@@ -65,7 +77,6 @@ const history: StravaHistory = {
     firstYear: 2014,
     outings: 1_906,
   },
-  years: [],
 };
 
 const inkedTones = (element: HTMLElement) =>

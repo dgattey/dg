@@ -31,7 +31,6 @@ const outing: StravaOuting = {
   description: null,
   distanceMeters: 1000,
   elevationGainMeters: 10,
-  gearName: null,
   id: 1,
   movingTimeSeconds: 300,
   name: 'Morning ride',
@@ -41,17 +40,14 @@ const outing: StravaOuting = {
   url: 'https://www.strava.com/activities/1',
 };
 
+const { description: _, ...entry } = outing;
+
 const history: StravaHistory = {
-  biggestClimbs: [outing],
+  bikes: [],
   latest: outing,
-  longest: outing,
-  monthlyClimbingMeters: [0, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
-  odometer: null,
-  recent: [outing],
-  routes: [],
+  outings: [entry],
   thisYear: { distanceMeters: 1000, elevationGainMeters: 10, outings: 1, year: 2026 },
   totals: { distanceMeters: 1000, elevationGainMeters: 10, firstYear: 2026, outings: 1 },
-  years: [{ distanceMeters: 1000, elevationGainMeters: 10, outings: 1, year: 2026 }],
 };
 
 describe('getLatestActivity', () => {

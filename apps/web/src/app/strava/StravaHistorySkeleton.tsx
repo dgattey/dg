@@ -1,5 +1,4 @@
 import { PaperCard } from '../collage/PaperCard';
-import { Scallop } from '../music/stats/StatsShapes';
 import { AtlasSheet } from './StravaHistorySections';
 
 /** Blank paper in the shape of the atlas and its notes, so the page holds still while they load. */
@@ -9,25 +8,19 @@ export function StravaHistorySkeleton() {
       <div className="strava__atlas">
         <div className="strava__field">
           <PaperCard
-            className="strava__note"
-            edge="torn-c"
-            innerClassName="strava__noteInner strava__noteInner--blank"
-            tiltDeg={-1.6}
-            tone="ochre"
+            className="strava__tally"
+            edge="soft-b"
+            innerClassName="strava__tallyInner strava__tallyInner--blank"
+            tiltDeg={-1.2}
           />
-          <div className="strava__seals">
-            <Scallop className="strava__seal" tiltDeg={-10} tone="ochre">
-              {null}
-            </Scallop>
-            <Scallop
-              className="strava__seal strava__seal--small"
-              size="sticker"
-              tiltDeg={9}
-              tone="viridian"
-            >
-              {null}
-            </Scallop>
-          </div>
+          <PaperCard
+            className="strava__recentPrint"
+            edge="quad-a"
+            innerClassName="strava__polaroidInner"
+            tiltDeg={-1.4}
+          >
+            <span className="strava__print strava__printBlank" />
+          </PaperCard>
         </div>
         <AtlasSheet>
           <div className="strava__atlasBlank" />

@@ -1,30 +1,62 @@
 'use client';
 
-import type { StravaRouteTrace } from '@dg/content-models/strava/StravaHistory';
+import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 import { VisibleRoutes } from '@dg/maps/VisibleRoutes';
 import { createContext, type ReactNode, startTransition, use, useState } from 'react';
 import { type PaperPillOption, PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
+import { cx } from '../collage/paperVars';
 import { formatRouteCount } from './stravaFormat';
 import { SPORT_DETAILS } from './stravaSports';
+import { yearOf } from './stravaStats';
 
 const FILTER_SPORTS = ['ride', 'run', 'hike'] as const;
 
-type SportFilter = 'all' | (typeof FILTER_SPORTS)[number];
+export type SportFilter = 'all' | (typeof FILTER_SPORTS)[number];
 
-type SpanFilter = 'all' | 'year';
+type WindowKey = 'week' | 'month';
+
+const WINDOW_DAYS = { month: 30, week: 7 } as const satisfies Record<WindowKey, number>;
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+
+/** A rolling window keeps the moment it was picked, so rendering never reads the clock. */
+type Span =
+  | { kind: 'all' }
+  | { kind: 'window'; key: WindowKey; since: number }
+  | { kind: 'year'; year: number };
+
+type SpanKey = 'all' | WindowKey;
 
 const SPAN_OPTIONS = [
   { key: 'all', label: 'All time', tiltDeg: 0.8 },
-  { key: 'year', label: 'This year', tiltDeg: -1.2 },
-] as const satisfies ReadonlyArray<{ key: SpanFilter; label: string; tiltDeg: number }>;
+  { key: 'week', label: 'Last week', tiltDeg: -1.2 },
+  { key: 'month', label: 'Last month', tiltDeg: 0.6 },
+] as const satisfies ReadonlyArray<PaperPillOption<SpanKey>>;
 
 const SPORT_TILTS = [-1, 1.2, -0.6, 0.9] as const;
 
-/** What the filter needs from a route; polylines go straight to the map instead. */
-export type FilterableRoute = Pick<StravaRouteTrace, 'id' | 'sport' | 'year'>;
+type Filtered = {
+  /** Every outing, newest first, whatever is picked. */
+  all: ReadonlyArray<StravaLogEntry>;
+  /** Outings in the picked sport and span, newest first. */
+  outings: ReadonlyArray<StravaLogEntry>;
+  /** Outings in the picked sport across every year, for views that are already per year. */
+  sportOutings: ReadonlyArray<StravaLogEntry>;
+  sport: SportFilter;
+  /** The span in words, `All time`, `Last 7 days`, or a year. */
+  spanLabel: string;
+};
 
-const VisibleRouteCount = createContext(0);
+const FilteredOutings = createContext<Filtered>({
+  all: [],
+  outings: [],
+  spanLabel: SPAN_OPTIONS[0].label,
+  sport: 'all',
+  sportOutings: [],
+});
+
+export const useFilteredOutings = () => use(FilteredOutings);
 
 const sportOption = (key: SportFilter, index: number): PaperPillOption<SportFilter> => ({
   key,
@@ -44,58 +76,136 @@ const sportOption = (key: SportFilter, index: number): PaperPillOption<SportFilt
   tiltDeg: SPORT_TILTS[index % SPORT_TILTS.length] ?? 0,
 });
 
-/** Sport and time filters that pick which routes the `RouteAtlas` below inks. */
-export function RouteFilter({
+function inSpan(span: Span, outing: StravaLogEntry) {
+  switch (span.kind) {
+    case 'all':
+      return true;
+    case 'window':
+      return Date.parse(outing.startDate) >= span.since - WINDOW_DAYS[span.key] * DAY_MS;
+    case 'year':
+      return yearOf(outing) === span.year;
+    default: {
+      const unhandled: never = span;
+      return unhandled;
+    }
+  }
+}
+
+function spanLabel(span: Span) {
+  switch (span.kind) {
+    case 'all':
+      return SPAN_OPTIONS[0].label;
+    case 'window':
+      return `Last ${WINDOW_DAYS[span.key]} days`;
+    case 'year':
+      return String(span.year);
+    default: {
+      const unhandled: never = span;
+      return unhandled;
+    }
+  }
+}
+
+/** A paper pill holding a native select of every year with an outing. */
+function YearPill({
+  onPick,
+  selected,
+  years,
+}: {
+  onPick: (year: number) => void;
+  selected: number | null;
+  years: ReadonlyArray<number>;
+}) {
+  return (
+    <PaperTag
+      className={cx('paperPill strava__yearPill', selected !== null && 'paperButtonCurrent')}
+      edge="quad-a"
+      tiltDeg={-0.9}
+    >
+      <select
+        aria-label="Year"
+        className="paperPillButton strava__yearSelect"
+        onChange={(event) => onPick(Number(event.target.value))}
+        value={selected ?? ''}
+      >
+        <option disabled value="">
+          Year
+        </option>
+        {years.map((year) => (
+          <option key={year} value={year}>
+            {year}
+          </option>
+        ))}
+      </select>
+    </PaperTag>
+  );
+}
+
+/**
+ * Sport and time filters for everything on the page. The pills sit beside the
+ * title; the outings they pick reach the sections through `useFilteredOutings`
+ * and the atlas through `VisibleRoutes`, so the map filters in place.
+ */
+export function StravaFilters({
   children,
-  routes,
-  thisYear,
+  outings,
 }: {
   children: ReactNode;
-  routes: ReadonlyArray<FilterableRoute>;
-  thisYear: number;
+  outings: ReadonlyArray<StravaLogEntry>;
 }) {
   const [sport, setSport] = useState<SportFilter>('all');
-  const [span, setSpan] = useState<SpanFilter>('all');
-  const sports = FILTER_SPORTS.filter((key) => routes.some((route) => route.sport === key));
-  const spans = new Set(routes.map((route) => (route.year === thisYear ? 'year' : 'all')));
-  const visible = routes.filter(
-    (route) =>
-      (sport === 'all' || route.sport === sport) && (span === 'all' || route.year === thisYear),
-  );
-  const filtered = sport !== 'all' || span !== 'all';
+  const [span, setSpan] = useState<Span>({ kind: 'all' });
+  const sports = FILTER_SPORTS.filter((key) => outings.some((outing) => outing.sport === key));
+  const years = [...new Set(outings.map(yearOf))].toSorted((a, b) => b - a);
+  const sportOutings =
+    sport === 'all' ? outings : outings.filter((outing) => outing.sport === sport);
+  const visible =
+    span.kind === 'all' ? sportOutings : sportOutings.filter((outing) => inSpan(span, outing));
+  const filtered = sport !== 'all' || span.kind !== 'all';
+  const pickSpan = (next: Span) => startTransition(() => setSpan(next));
   return (
-    <VisibleRouteCount value={visible.length}>
-      {sports.length > 1 || spans.size > 1 ? (
-        <div className="strava__filters">
-          {sports.length > 1 ? (
-            <PaperPills
-              label="Sport"
-              onSelect={(key) => startTransition(() => setSport(key))}
-              options={(['all', ...sports] as const).map(sportOption)}
-              selected={sport}
-            />
-          ) : null}
-          {spans.size > 1 ? (
-            <PaperPills
-              label="Time span"
-              onSelect={(key) => startTransition(() => setSpan(key))}
-              options={SPAN_OPTIONS}
-              selected={span}
+    <FilteredOutings
+      value={{ all: outings, outings: visible, spanLabel: spanLabel(span), sport, sportOutings }}
+    >
+      <div className="strava__filters">
+        {sports.length > 1 ? (
+          <PaperPills
+            label="Sport"
+            onSelect={(key) => startTransition(() => setSport(key))}
+            options={(['all', ...sports] as const).map(sportOption)}
+            selected={sport}
+          />
+        ) : null}
+        <div className="strava__spans">
+          <PaperPills
+            label="Time span"
+            onSelect={(key) =>
+              pickSpan(key === 'all' ? { kind: 'all' } : { key, kind: 'window', since: Date.now() })
+            }
+            options={SPAN_OPTIONS}
+            selected={span.kind === 'window' ? span.key : span.kind === 'all' ? 'all' : null}
+          />
+          {years.length > 1 ? (
+            <YearPill
+              onPick={(year) => pickSpan({ kind: 'year', year })}
+              selected={span.kind === 'year' ? span.year : null}
+              years={years}
             />
           ) : null}
         </div>
-      ) : null}
+      </div>
       <VisibleRoutes value={filtered ? new Set(visible.map(({ id }) => id)) : null}>
         {children}
       </VisibleRoutes>
-    </VisibleRouteCount>
+    </FilteredOutings>
   );
 }
 
 export function RouteCountTag({ className }: { className?: string }) {
+  const { outings } = useFilteredOutings();
   return (
     <PaperTag className={className} tiltDeg={6} tone="black">
-      {formatRouteCount(use(VisibleRouteCount))}
+      {formatRouteCount(outings.filter((outing) => outing.polyline).length)}
     </PaperTag>
   );
 }

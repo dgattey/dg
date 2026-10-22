@@ -20,7 +20,7 @@ const TITLE = 'Big map';
 
 export const metadata: Metadata = {
   alternates: markdownAlternates(stravaRoute),
-  description: "Every ride, run, and hike I've tracked over the years.",
+  description: "Every outing I've tracked over the years.",
   title: TITLE,
 };
 
@@ -51,7 +51,7 @@ export default function StravaPage() {
       <CollageBackdrop backdrop={STRAVA_BACKDROP} />
       <div className="strava__intro">
         <CutLetters className="collagePageTitle strava__title" text={TITLE} />
-        <p className="strava__lede">Every ride, run, and hike I've tracked over the years.</p>
+        <p className="strava__lede">Every outing I've tracked over the years.</p>
       </div>
       <Suspense fallback={<StravaHistorySkeleton />}>
         <StravaHistoryView />
