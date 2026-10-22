@@ -40,6 +40,17 @@ describe('PlaybackStatus', () => {
     expect(screen.getByText('3 hours ago')).toBeInTheDocument();
   });
 
+  it.each([
+    ['2026-02-10T10:50:00Z', 'Played an hour ago'],
+    ['2026-02-09T09:00:00Z', 'Played yesterday'],
+  ])('keeps the relative time lowercase mid-sentence (%s)', (playedAt, sentence) => {
+    const { container } = render(<PlaybackStatus playedAt={playedAt} />, {
+      wrapper: TestWrapper,
+    });
+
+    expect(container).toHaveTextContent(sentence);
+  });
+
   it('names the service instead of a relative time when given one', () => {
     const { rerender } = render(<PlaybackStatus isPlaying={true} service="Spotify" />, {
       wrapper: TestWrapper,
