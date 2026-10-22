@@ -38,6 +38,7 @@ export async function createSubscription(): Promise<WebhookSubscription> {
 
   const response = await fetch(endpoint, {
     body: params,
+    cache: 'no-store',
     headers,
     method: 'POST',
   });

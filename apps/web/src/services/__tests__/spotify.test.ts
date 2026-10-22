@@ -30,11 +30,9 @@ import { getLastKnownSong, getLatestSong } from '../spotify';
 
 const track = { id: 'track-1', name: 'Test Song' } as Track;
 
-// `minutes` is the shortest profile Next prerenders into the static shell;
-// `seconds` makes the read a request-time hole.
 describe.each([
   ['getLatestSong', getLatestSong, 'seconds'],
-  ['getLastKnownSong', getLastKnownSong, 'minutes'],
+  ['getLastKnownSong', getLastKnownSong, 'hours'],
 ] as const)('%s', (_name, getSong, profile) => {
   it('resolves the latest track even where after() is unavailable', async () => {
     jest.mocked(fetchRecentlyPlayed).mockResolvedValue(track);

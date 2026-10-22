@@ -14,5 +14,5 @@ export type ClientProps = {
  */
 export function createClient({ endpoint }: ClientProps) {
   assertHttpsEndpoint(endpoint);
-  return wretch(endpoint).content('application/json');
+  return wretch(endpoint, { cache: 'no-store' }).content('application/json');
 }

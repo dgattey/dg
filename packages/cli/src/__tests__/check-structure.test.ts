@@ -59,6 +59,20 @@ describe('check-structure', () => {
     assert.equal(inlineTypeof.length, 1);
     assert.equal(inlineTypeof[0]?.rule, 'no-inline-typeof-import');
 
+    const shortCacheLife = checkFileStructure(
+      'apps/web/src/services/foo.ts',
+      "import 'server-only';\nimport { cacheLife } from 'next/cache';\nexport async function f() { 'use cache'; cacheLife('minutes'); }\n",
+    );
+    assert.equal(shortCacheLife.length, 1);
+    assert.equal(shortCacheLife[0]?.rule, 'no-short-prerender-cache-life');
+
+    const uncachedServiceFetch = checkFileStructure(
+      'packages/services/foo.ts',
+      "import 'server-only';\nexport const f = () => fetch('https://example.com');\n",
+    );
+    assert.equal(uncachedServiceFetch.length, 1);
+    assert.equal(uncachedServiceFetch[0]?.rule, 'service-fetch-no-store');
+
     const orphanCss = checkOrphanCssFiles(
       ['apps/web/src/app/music/music.css', 'apps/web/src/app/dev-console/devConsole.css'],
       new Map([['apps/web/src/app/music/page.tsx', "import './music.css';\n"]]),

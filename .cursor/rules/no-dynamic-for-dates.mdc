@@ -38,8 +38,9 @@ export default function Layout({ children }) {
 
 ## Correct approach: Cached Server Time + Context
 
-Cache `Date.now()` with `cacheLife('minutes')` - for relative times like "2 days
-ago", being off by a few minutes is acceptable and avoids page blocking:
+Cache `Date.now()` with `cacheLife('hours')` so the root layout does not cap
+every route's ISR revalidate at 60 seconds, while keeping prerender and
+hydration timestamps identical before `useEffect` switches to live `Date.now()`:
 
 ```tsx
 // getServerTime.ts
@@ -47,7 +48,7 @@ import { cacheLife } from 'next/cache';
 
 export async function getServerTime() {
   'use cache';
-  cacheLife('minutes'); // 'seconds' still blocks; 'minutes' doesn't
+  cacheLife('hours');
   return Date.now();
 }
 

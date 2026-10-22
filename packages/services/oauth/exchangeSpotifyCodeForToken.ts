@@ -40,6 +40,7 @@ export async function exchangeSpotifyCodeForToken(
 
   const response = await fetch('https://accounts.spotify.com/api/token', {
     body,
+    cache: 'no-store',
     headers: {
       'Content-Type': 'application/x-www-form-urlencoded',
     },

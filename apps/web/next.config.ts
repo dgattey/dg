@@ -54,7 +54,6 @@ const nextConfig: NextConfig = {
       '../../node_modules/**/moment/locale/**',
       '../../node_modules/**/react/**/*.development.js',
       '../../node_modules/**/next/dist/compiled/@vercel/og/index.edge.js',
-      '../../node_modules/**/next/dist/compiled/@vercel/og/Geist-Regular.ttf',
       '../../node_modules/**/sequelize/lib/dialects/{db2,ibmi,mariadb,mssql,mysql,oracle,snowflake,sqlite}/{connection-manager,index,query,query-generator,query-interface}*',
     ],
     '**/page': [

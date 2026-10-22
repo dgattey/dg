@@ -1,9 +1,9 @@
 import 'server-only';
 
 import { readFile } from 'node:fs/promises';
+import { fetchIntroContent } from '@dg/services/contentful/fetchIntroContent';
 import { cacheLife } from 'next/cache';
 import { ImageResponse } from 'next/og';
-import { getIntroContent } from '../services/contentful';
 import { PORTRAIT, SOCIAL_CARD_FONT, SocialCard } from './collage/SocialCard';
 import { splitIntroDocument } from './collage/splitIntroDocument';
 import { HOMEPAGE_TITLE, SITE_NAME } from './metadata';
@@ -50,7 +50,7 @@ async function renderSocialImagePng() {
     readFontData(REGULAR_FONT_URL),
     readFontData(BOLD_FONT_URL),
     readPngDataUri(GRAIN_URL),
-    getIntroContent(),
+    fetchIntroContent(),
   ]);
   const headline = intro ? splitIntroDocument(intro.textBlock.content).headline : null;
   return new ImageResponse(

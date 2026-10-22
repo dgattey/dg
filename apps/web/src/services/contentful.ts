@@ -17,7 +17,7 @@ const CONTENTFUL_TAG = 'contentful';
  * when the fetcher callback is not serializable).
  */
 async function cachedContentful<T>(fn: () => Promise<T>): Promise<T> {
-  cacheLife('default');
+  cacheLife('hours');
   cacheTag(CONTENTFUL_TAG);
   return await fn();
 }
