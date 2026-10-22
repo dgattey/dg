@@ -76,7 +76,9 @@
   border: 2px dashed color-mix(in oklab, var(--on) 36%, transparent);
   border-radius: 50%;
 }
+/* The polygon's valleys sit at 45% of the box, so the padding keeps text off the teeth. */
 .stats__scallop--sticker {
+  padding: 14%;
   font: 700 var(--type-label) / 1.2 var(--display);
   font-variant-numeric: tabular-nums;
 }
