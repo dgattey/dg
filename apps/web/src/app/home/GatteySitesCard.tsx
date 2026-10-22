@@ -28,7 +28,7 @@ export function GatteySitesCard({ projects }: GatteySitesCardProps) {
               <PaperCard
                 className="home__sideRowWrap collageLift"
                 edge={even ? 'quad-a' : 'quad-d'}
-                tiltDeg={even ? 1.5 : -1.2}
+                tiltDeg={even ? 0.5 : -0.5}
                 tone="cream"
               >
                 <a className="home__sideRow" href={project.url} rel="noreferrer" target="_blank">
