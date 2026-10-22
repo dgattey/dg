@@ -108,9 +108,9 @@ describe('StravaCard', () => {
   it('opens the atlas from a map of the routes around home, counting every route', () => {
     renderCard(history);
 
-    const atlas = screen.getByRole('link', { name: 'Bay Area miles' });
+    const atlas = screen.getByRole('link', { name: 'Big map' });
     expect(atlas).toHaveAttribute('href', '/strava');
-    expect(inkedTones(atlas)).toEqual(['vermilion', 'cobalt']);
+    expect(inkedTones(atlas)).toEqual(['cobalt', 'vermilion']);
     expect(within(atlas).getByText('3 routes')).toBeInTheDocument();
   });
 
@@ -119,7 +119,7 @@ describe('StravaCard', () => {
 
     const print = screen.getByRole('link', { name: 'Goals on Strava' });
     expect(print).toHaveAttribute('href', 'https://www.strava.com/activities/101');
-    expect(inkedTones(print)).toEqual(['vermilion']);
+    expect(inkedTones(print)).toEqual(['cobalt']);
     expect(within(print).getByText('15.9 mi')).toBeInTheDocument();
     expect(within(print).getByText('Latest')).toBeInTheDocument();
     expect(within(print).getByText('2 days ago')).toBeInTheDocument();

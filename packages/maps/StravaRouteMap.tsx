@@ -6,9 +6,9 @@ import { decodeRoutes, frameAround, framePaths } from './src/routeFrame';
 
 const FRAME = { height: 320, padding: 40, width: 480 };
 
-/** One route fitted to a card, inked in vermilion. Renders nothing when the polyline has no route. */
-export function StravaRouteMap({ encodedPolyline }: { encodedPolyline: string }) {
-  const routes = decodeRoutes([{ id: 0, polyline: encodedPolyline, tone: 'vermilion' }]);
+/** One route fitted to a card, inked in a paper `tone`. Renders nothing when the polyline has no route. */
+export function StravaRouteMap({ encodedPolyline, tone }: { encodedPolyline: string; tone: string }) {
+  const routes = decodeRoutes([{ id: 0, polyline: encodedPolyline, tone }]);
   const [route] = routes;
   if (!route) {
     return null;

@@ -56,7 +56,7 @@ describe('RouteFilter', () => {
     expect(screen.getByRole('button', { name: 'Rides' })).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByRole('button', { name: 'Runs' })).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: 'Hikes' })).not.toBeInTheDocument();
-    expect(inkedTones()).toEqual(['vermilion', 'cobalt', 'ochre']);
+    expect(inkedTones()).toEqual(['cobalt', 'vermilion', 'ochre']);
     expect(screen.getByText('52 routes')).toBeInTheDocument();
   });
 
@@ -71,7 +71,7 @@ describe('RouteFilter', () => {
       'aria-pressed',
       'false',
     );
-    expect(inkedTones()).toEqual(['vermilion']);
+    expect(inkedTones()).toEqual(['cobalt']);
     expect(screen.getByText('38 routes')).toBeInTheDocument();
   });
 
@@ -80,7 +80,7 @@ describe('RouteFilter', () => {
     const { inkedTones } = renderFilter(routes);
 
     await user.click(screen.getByRole('button', { name: 'This year' }));
-    expect(inkedTones()).toEqual(['vermilion', 'ochre']);
+    expect(inkedTones()).toEqual(['cobalt', 'ochre']);
     expect(screen.getByText('10 routes')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'Runs' }));
@@ -88,7 +88,7 @@ describe('RouteFilter', () => {
     expect(screen.getByText('No routes')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'All time' }));
-    expect(inkedTones()).toEqual(['cobalt']);
+    expect(inkedTones()).toEqual(['vermilion']);
     expect(screen.getByText('12 routes')).toBeInTheDocument();
   });
 
@@ -96,7 +96,7 @@ describe('RouteFilter', () => {
     const { inkedTones } = renderFilter(routesOf('ride', 2026, 1));
 
     expect(screen.queryByRole('group')).not.toBeInTheDocument();
-    expect(inkedTones()).toEqual(['vermilion']);
+    expect(inkedTones()).toEqual(['cobalt']);
     expect(screen.getByText('1 route')).toBeInTheDocument();
   });
 });
