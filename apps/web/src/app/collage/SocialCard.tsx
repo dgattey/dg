@@ -1,5 +1,11 @@
 import type { CSSProperties } from 'react';
-import { MARK_PATHS, MARK_VIEW_BOX } from '../layouts/logoMark';
+import {
+  STICKER_ASPECT,
+  STICKER_PALETTE_INKS,
+  STICKER_SHADOW_PAD,
+  STICKER_WIDTH,
+} from '../layouts/logoMark';
+import { StickerMark } from '../layouts/StickerMark';
 import { CUT_OUT_SHAPES, type CutOutShape } from './cutOutShapes';
 import { PAPER_PALETTE } from './paperPalette';
 
@@ -121,36 +127,18 @@ function CutOutSvg({ color, rotationDeg, shape, size, underprint, x, y }: CutOut
   );
 }
 
-const [, , markBoxWidth = 1, markBoxHeight = 1] = MARK_VIEW_BOX.split(' ').map(Number);
-const MARK_ASPECT = markBoxWidth / markBoxHeight;
-
-/** The `.c-logo` stamp, scaled from its 89px-wide mark. */
-function Stamp({ markWidth, rotationDeg }: { markWidth: number; rotationDeg: number }) {
-  const scale = markWidth / 89;
-  const px = (length: number) => `${Math.round(length * scale)}px`;
+/** The header logo's die-cut sticker. The negative margin keeps its shadow room out of the layout. */
+function Stamp({ rotationDeg, width }: { rotationDeg: number; width: number }) {
+  const pad = (STICKER_SHADOW_PAD * width) / STICKER_WIDTH;
   return (
-    <div
-      style={{
-        background: PAPER_PALETTE.viridian,
-        borderRadius: [14, 12, 16, 13].map(px).join(' '),
-        boxShadow: `0 0 0 ${px(3)} ${PAPER_PALETTE.cream}, 0 2px 0 rgba(0,0,0,0.2), 0 7px 14px rgba(0,0,0,0.16)`,
-        display: 'flex',
-        padding: `${px(10)} ${px(16)}`,
-        transform: `rotate(${rotationDeg}deg)`,
-      }}
-    >
-      <svg
-        aria-hidden="true"
-        fill={PAPER_PALETTE.cream}
-        height={Math.round(markWidth / MARK_ASPECT)}
-        viewBox={MARK_VIEW_BOX}
-        width={markWidth}
-      >
-        {MARK_PATHS.map(({ d, dx }) => (
-          <path d={d} key={dx} transform={dx ? `translate(${dx} 0)` : undefined} />
-        ))}
-      </svg>
-    </div>
+    <StickerMark
+      height={Math.round(width / STICKER_ASPECT + 2 * pad)}
+      inks={STICKER_PALETTE_INKS}
+      label={null}
+      shadow
+      style={{ margin: -pad, transform: `rotate(${rotationDeg}deg)` }}
+      width={Math.round(width + 2 * pad)}
+    />
   );
 }
 
@@ -222,7 +210,7 @@ function PortraitPrint({ portraitUrl }: { portraitUrl: string }) {
 function StampFeature() {
   return (
     <div style={{ display: 'flex', position: 'absolute', right: 110, top: 150 }}>
-      <Stamp markWidth={250} rotationDeg={4} />
+      <Stamp rotationDeg={4} width={300} />
       <AboutTag style={{ bottom: -46, left: -30 }} />
     </div>
   );
@@ -269,7 +257,7 @@ export function SocialCard({ grainUrl, headline, name, portraitUrl, tagline }: S
         {portraitUrl ? <PortraitPrint portraitUrl={portraitUrl} /> : <StampFeature />}
         {portraitUrl ? (
           <div style={{ display: 'flex', marginBottom: 26 }}>
-            <Stamp markWidth={96} rotationDeg={-4} />
+            <Stamp rotationDeg={-4} width={124} />
           </div>
         ) : null}
         <div

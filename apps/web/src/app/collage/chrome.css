@@ -11,25 +11,13 @@
 .chrome__header > * {
   pointer-events: auto;
 }
-.c-logo,
 .chrome__logo {
-  color: var(--cream);
-  background: var(--viridian);
-  border-radius: var(--quad-a);
-  box-shadow:
-    0 0 0 3px var(--cream),
-    var(--shadow-card);
-  rotate: -3deg;
+  filter: var(--dshadow);
+  rotate: -4deg;
 }
-.c-logo:hover,
-.c-logo:focus-visible,
 .chrome__logo:hover,
-.chrome__logo:focus-visible,
-a:focus-visible > .c-logo {
-  color: var(--cream);
-  box-shadow:
-    0 0 0 3px var(--cream),
-    var(--shadow-lift);
+.chrome__logo:focus-visible {
+  filter: var(--dshadow-lift);
 }
 .chrome__nowPlaying {
   min-width: 0;
