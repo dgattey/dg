@@ -7,7 +7,7 @@ import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { TIMING_MEDIUM } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { usePathname } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { musicDestinationLabel } from '../layouts/musicHeaderDestinations';
 import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
@@ -65,12 +65,12 @@ function DockedHeaderCard({ track }: { track: Track }) {
   const isHome = pathname === homeRoute;
   const isMusic = pathname === musicRoute;
   const opensMusicPage = !isHome && !isMusic;
-  const containerRef = useRef<HTMLDivElement>(null);
+  // State rather than a ref: wrapping the card in a link remounts it, and the observer must follow.
+  const [cardElement, setCardElement] = useState<HTMLElement | null>(null);
   const [isInViewport, setIsInViewport] = useState(true);
 
   useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
+    if (!cardElement) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry) {
@@ -79,9 +79,9 @@ function DockedHeaderCard({ track }: { track: Track }) {
       },
       { rootMargin: '20px', threshold: 0 },
     );
-    observer.observe(el);
+    observer.observe(cardElement);
     return () => observer.disconnect();
-  }, []);
+  }, [cardElement]);
 
   const card = (
     <Box
@@ -96,7 +96,7 @@ function DockedHeaderCard({ track }: { track: Track }) {
             }
           : undefined
       }
-      ref={containerRef}
+      ref={setCardElement}
       role={isHome ? 'button' : undefined}
       sx={getContainerSx(isHome || opensMusicPage)}
       tabIndex={isHome ? 0 : undefined}
