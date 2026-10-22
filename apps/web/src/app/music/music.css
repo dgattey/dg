@@ -10,9 +10,12 @@
   border-radius: 14px;
 }
 
-.music__albumsLayout,
-.music__historyLayout {
+/* Every music page: title, then that page's content, on one grid. */
+.music__layout {
   display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 36px;
+  width: 100%;
   padding-block: 40px 42px;
 }
 .music__albumsLayout {
@@ -24,10 +27,6 @@
   align-items: center;
   width: min(100%, 1120px);
   margin-inline: auto;
-}
-.music__historyLayout {
-  row-gap: 36px;
-  width: 100%;
 }
 .music__sort,
 .music__sortSkeleton {
@@ -495,8 +494,7 @@ html:active-view-transition-type(album-open) .music__wellCard {
     grid-template-columns: minmax(0, 1fr);
     row-gap: 36px;
   }
-  .music__albumsLayout,
-  .music__historyLayout {
+  .music__layout {
     padding-block-start: 16px;
   }
   .music__sort,

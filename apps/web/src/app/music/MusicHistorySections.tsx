@@ -21,6 +21,21 @@ export function CollageMusicStatus({ children, tag }: { children: ReactNode; tag
   );
 }
 
+/** Empty state shared by the history and stats pages. */
+export function NoListeningHistory() {
+  return (
+    <CollageMusicStatus
+      tag={
+        <PaperTag className="collagePin music__stateTag" tiltDeg={-3} tone="ochre">
+          Spotify
+        </PaperTag>
+      }
+    >
+      <p>No listening history yet.</p>
+    </CollageMusicStatus>
+  );
+}
+
 type Props = {
   /** Index offset for section tilt/tone alternation. */
   sectionOffset?: number;
