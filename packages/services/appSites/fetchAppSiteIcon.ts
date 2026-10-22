@@ -92,6 +92,7 @@ export async function fetchAppSiteIcon(siteUrl: string): Promise<SideProjectMark
     try {
       const iconUrl = new URL(path, siteUrl);
       const response = await fetch(iconUrl, {
+        cache: 'no-store',
         headers: { Range: 'bytes=0-23' },
         signal: AbortSignal.timeout(3000),
       });

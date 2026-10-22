@@ -50,6 +50,7 @@ describe('fetchAppSiteIcon', () => {
     expect(requestUrl(input ?? '')).toBe('https://photos.gattey.com/icon.png');
     expect(init).toEqual(
       expect.objectContaining({
+        cache: 'no-store',
         headers: { Range: 'bytes=0-23' },
       }),
     );
