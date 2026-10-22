@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkOrphanCssFiles, checkRouteCssImports } from './check-css.js';
+import { checkOrphanCssFiles, checkRouteCssImports, checkTypeScale } from './check-css.js';
 
 export const MAX_SOURCE_FILE_LINES = 350;
 export const MAX_TEST_FILE_LINES = 500;
@@ -213,14 +213,18 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
       }
     }
   }
+  const webCss = new Map<string, string>();
   for (const cssPath of webCssPaths) {
     const fullPath = path.join(repoRoot, cssPath);
     if (fs.existsSync(fullPath)) {
-      webImporters.set(cssPath, fs.readFileSync(fullPath, 'utf8'));
+      const content = fs.readFileSync(fullPath, 'utf8');
+      webImporters.set(cssPath, content);
+      webCss.set(cssPath, content);
     }
   }
   violations.push(...checkOrphanCssFiles(webCssPaths, webImporters));
   violations.push(...checkRouteCssImports(webCssPaths, webSources));
+  violations.push(...checkTypeScale(webCss));
   return violations;
 }
 
