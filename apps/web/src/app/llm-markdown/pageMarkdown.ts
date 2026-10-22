@@ -7,6 +7,7 @@ import {
   musicRoute,
   musicStatsRoute,
   readingRoute,
+  stravaRoute,
 } from '@dg/shared-core/routes/app';
 import { cacheLife } from 'next/cache';
 export const pageMarkdownGenerators: {
@@ -31,6 +32,10 @@ export const pageMarkdownGenerators: {
   [readingRoute]: async () => {
     const { getReadingMarkdown } = await import('../reading/readingMarkdown');
     return await getReadingMarkdown();
+  },
+  [stravaRoute]: async () => {
+    const { getStravaMarkdown } = await import('../strava/stravaMarkdown');
+    return await getStravaMarkdown();
   },
 };
 
