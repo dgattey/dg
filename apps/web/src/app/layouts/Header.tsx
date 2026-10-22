@@ -9,11 +9,7 @@ import { Logo } from './Logo';
 import { SiteHeaderHeight } from './SiteHeaderHeight';
 
 async function LastKnownSpotifyHeaderCard() {
-  const track = await getLastKnownSong();
-  if (!track) {
-    return null;
-  }
-  return <SpotifyHeaderCard track={track} />;
+  return <SpotifyHeaderCard track={await getLastKnownSong()} />;
 }
 
 async function LiveNowPlaying() {

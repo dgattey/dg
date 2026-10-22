@@ -1,11 +1,20 @@
 import type { Track } from '@dg/content-models/spotify/Track';
-import { render, screen } from '@testing-library/react';
+import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
+import { act, render, screen, waitFor } from '@testing-library/react';
+import { loadLatestSong } from '../../../services/spotify.actions';
+import { FooterNowStrip } from '../../layouts/FooterNowStrip';
 import { NowPlayingProvider, PublishNowPlaying } from '../NowPlayingContext';
 import { SpotifyCollageCard } from '../SpotifyCollageCard';
 import { SpotifyHeaderCard } from '../SpotifyHeaderCard';
 
+let mockPathname = '/';
+
 jest.mock('next/navigation', () => ({
-  usePathname: () => '/',
+  usePathname: () => mockPathname,
+}));
+
+jest.mock('../../../services/spotify.actions', () => ({
+  loadLatestSong: jest.fn(async () => null),
 }));
 
 jest.mock('../TrackListing', () => ({
@@ -14,7 +23,7 @@ jest.mock('../TrackListing', () => ({
   ),
 }));
 
-const makeTrack = (id: string): Track => {
+const makeTrack = (id: string, overrides: Partial<Track> = {}): Track => {
   const core = {
     externalUrls: { spotify: `https://open.spotify.com/${id}` },
     href: `https://api.spotify.com/${id}`,
@@ -25,49 +34,74 @@ const makeTrack = (id: string): Track => {
   return {
     ...core,
     album: { ...core, images: [], name: `Album ${id}`, releaseDate: '2026-01-01' },
-    albumImage: { height: 640, url: `https://images.test/${id}.jpg`, width: 640 },
+    albumImage: { height: 640, url: `https://i.scdn.co/image/${id}.jpg`, width: 640 },
     artists: [{ ...core, id: `artist-${id}`, name: `Artist ${id}` }],
     isPlaying: true,
+    ...overrides,
   };
 };
 
 const STALE = makeTrack('stale');
 const FRESH = makeTrack('fresh');
+const NEXT_PLAYING = makeTrack('next');
+
+beforeEach(() => {
+  mockPathname = '/';
+  jest.mocked(loadLatestSong).mockReset().mockResolvedValue(null);
+});
 
 describe('NowPlayingProvider', () => {
-  it('updates both the header card and the body card when the live track streams in', () => {
+  it('updates the header card, homepage card, and footer strip when the live track streams in', () => {
     render(
-      <NowPlayingProvider>
-        <SpotifyHeaderCard track={STALE} />
-        <SpotifyCollageCard track={STALE} />
-        <PublishNowPlaying track={FRESH} />
-      </NowPlayingProvider>,
+      <ServerTimeProvider serverTime={1_760_000_000_000}>
+        <NowPlayingProvider>
+          <SpotifyHeaderCard track={STALE} />
+          <SpotifyCollageCard track={STALE} />
+          <FooterNowStrip initialTrack={STALE} latestActivity={null} />
+          <PublishNowPlaying track={FRESH} />
+        </NowPlayingProvider>
+      </ServerTimeProvider>,
     );
 
     expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
     expect(screen.getByTestId('card')).toHaveTextContent('Track fresh');
+    expect(
+      screen.getByRole('link', { name: 'Playing Track fresh · Artist fresh' }),
+    ).toHaveAttribute('href', 'https://open.spotify.com/fresh');
   });
 
   it('follows the live publisher when the server sends the next track', () => {
     const { rerender } = render(
-      <NowPlayingProvider>
-        <SpotifyHeaderCard track={STALE} />
-        <SpotifyCollageCard track={STALE} />
-      </NowPlayingProvider>,
+      <ServerTimeProvider serverTime={1_760_000_000_000}>
+        <NowPlayingProvider>
+          <SpotifyHeaderCard track={STALE} />
+          <SpotifyCollageCard track={STALE} />
+          <FooterNowStrip initialTrack={STALE} latestActivity={null} />
+        </NowPlayingProvider>
+      </ServerTimeProvider>,
     );
     expect(screen.getByTestId('compact')).toHaveTextContent('Track stale');
     expect(screen.getByTestId('card')).toHaveTextContent('Track stale');
+    expect(
+      screen.getByRole('link', { name: 'Playing Track stale · Artist stale' }),
+    ).toBeInTheDocument();
 
     rerender(
-      <NowPlayingProvider>
-        <SpotifyHeaderCard track={STALE} />
-        <SpotifyCollageCard track={STALE} />
-        <PublishNowPlaying track={FRESH} />
-      </NowPlayingProvider>,
+      <ServerTimeProvider serverTime={1_760_000_000_000}>
+        <NowPlayingProvider>
+          <SpotifyHeaderCard track={STALE} />
+          <SpotifyCollageCard track={STALE} />
+          <FooterNowStrip initialTrack={STALE} latestActivity={null} />
+          <PublishNowPlaying track={FRESH} />
+        </NowPlayingProvider>
+      </ServerTimeProvider>,
     );
 
     expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
     expect(screen.getByTestId('card')).toHaveTextContent('Track fresh');
+    expect(
+      screen.getByRole('link', { name: 'Playing Track fresh · Artist fresh' }),
+    ).toBeInTheDocument();
   });
 
   it('keeps the header on its own track outside the provider', () => {
@@ -101,14 +135,22 @@ describe('NowPlayingProvider', () => {
     expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
   });
 
-  it('shows the live track when the shell had none', () => {
+  it('shows the live track across header, home card, and footer strip when the shell had none', () => {
     render(
-      <NowPlayingProvider>
-        <SpotifyHeaderCard track={null} />
-        <PublishNowPlaying track={FRESH} />
-      </NowPlayingProvider>,
+      <ServerTimeProvider serverTime={1_760_000_000_000}>
+        <NowPlayingProvider>
+          <SpotifyHeaderCard track={null} />
+          <SpotifyCollageCard track={null} />
+          <FooterNowStrip initialTrack={null} latestActivity={null} />
+          <PublishNowPlaying track={FRESH} />
+        </NowPlayingProvider>
+      </ServerTimeProvider>,
     );
     expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
+    expect(screen.getByTestId('card')).toHaveTextContent('Track fresh');
+    expect(
+      screen.getByRole('link', { name: 'Playing Track fresh · Artist fresh' }),
+    ).toBeInTheDocument();
   });
 
   it('renders nothing without any track', () => {
@@ -118,5 +160,50 @@ describe('NowPlayingProvider', () => {
       </NowPlayingProvider>,
     );
     expect(screen.queryByTestId('compact')).not.toBeInTheDocument();
+  });
+
+  it('refreshes all three surfaces on client route navigation and window focus', async () => {
+    jest.mocked(loadLatestSong).mockResolvedValueOnce(FRESH).mockResolvedValueOnce(NEXT_PLAYING);
+
+    const { rerender } = render(
+      <ServerTimeProvider serverTime={1_760_000_000_000}>
+        <NowPlayingProvider>
+          <SpotifyHeaderCard track={STALE} />
+          <SpotifyCollageCard track={STALE} />
+          <FooterNowStrip initialTrack={STALE} latestActivity={null} />
+        </NowPlayingProvider>
+      </ServerTimeProvider>,
+    );
+
+    mockPathname = '/music';
+    rerender(
+      <ServerTimeProvider serverTime={1_760_000_000_000}>
+        <NowPlayingProvider>
+          <SpotifyHeaderCard track={STALE} />
+          <SpotifyCollageCard track={STALE} />
+          <FooterNowStrip initialTrack={STALE} latestActivity={null} />
+        </NowPlayingProvider>
+      </ServerTimeProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
+      expect(screen.getByTestId('card')).toHaveTextContent('Track fresh');
+      expect(
+        screen.getByRole('link', { name: 'Playing Track fresh · Artist fresh' }),
+      ).toBeInTheDocument();
+    });
+
+    act(() => {
+      window.dispatchEvent(new Event('focus'));
+    });
+
+    await waitFor(() => {
+      expect(screen.getByTestId('compact')).toHaveTextContent('Track next');
+      expect(screen.getByTestId('card')).toHaveTextContent('Track next');
+      expect(
+        screen.getByRole('link', { name: 'Playing Track next · Artist next' }),
+      ).toBeInTheDocument();
+    });
   });
 });
