@@ -135,8 +135,12 @@ describe('proxy', () => {
 });
 
 describe('proxy matcher', () => {
-  const matches = (path: string) =>
-    unstable_doesMiddlewareMatch({ config, url: `https://example.com${path}` });
+  const matches = (path: string, headers?: Record<string, string>) =>
+    unstable_doesMiddlewareMatch({
+      config,
+      headers,
+      url: `https://example.com${path}`,
+    });
 
   it.each([
     '/',
@@ -148,6 +152,31 @@ describe('proxy matcher', () => {
     '/dev-console/oauth',
   ])('runs on %s', (path) => {
     expect(matches(path)).toBe(true);
+  });
+
+  it.each<{ desc: string; headers: Record<string, string>; path: string }>([
+    { desc: 'RSC flight request on /', headers: { rsc: '1' }, path: '/' },
+    {
+      desc: 'router prefetch on /music',
+      headers: { 'next-router-prefetch': '1' },
+      path: '/music',
+    },
+    {
+      desc: 'purpose prefetch on /reading',
+      headers: { purpose: 'prefetch' },
+      path: '/reading',
+    },
+  ])('skips public-page $desc', ({ headers, path }) => {
+    expect(matches(path, headers)).toBe(false);
+  });
+
+  it.each<{ desc: string; headers: Record<string, string> }>([
+    { desc: 'RSC flight request', headers: { rsc: '1' } },
+    { desc: 'router prefetch', headers: { 'next-router-prefetch': '1' } },
+    { desc: 'purpose prefetch', headers: { purpose: 'prefetch' } },
+  ])('still runs on /dev-console for $desc', ({ headers }) => {
+    expect(matches('/dev-console', headers)).toBe(true);
+    expect(matches('/dev-console/oauth', headers)).toBe(true);
   });
 
   it.each([

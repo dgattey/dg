@@ -297,9 +297,9 @@ async function writeAlbumThrough(detail: AlbumDetail): Promise<void> {
   await MusicAlbumArtist.destroy({ where: { albumId: detail.id } });
   await MusicAlbumArtist.bulkCreate(albumArtists, { ignoreDuplicates: true });
 
-  for (const track of tracks) {
-    await MusicTrack.upsert(track);
-  }
+  await MusicTrack.bulkCreate(tracks, {
+    updateOnDuplicate: ['albumId', 'discNumber', 'durationMs', 'name', 'trackNumber', 'url'],
+  });
   await MusicTrackArtist.bulkCreate(trackArtists, { ignoreDuplicates: true });
 }
 

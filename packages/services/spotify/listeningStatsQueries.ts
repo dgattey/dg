@@ -26,13 +26,17 @@ async function select<Schema extends v.GenericSchema>(
 
 export function selectSummary() {
   return select(
-    `SELECT count(*)::int AS plays,
-       count(DISTINCT "trackId")::int AS tracks,
-       min("playedAt") AS "firstPlayedAt",
-       max("playedAt") AS "lastPlayedAt",
-       count(DISTINCT ${LOCAL_PLAYED_AT}::date)::int AS "activeDays",
-       (max(${LOCAL_PLAYED_AT})::date - min(${LOCAL_PLAYED_AT})::date + 1)::int AS "spanDays"
-     FROM "SpotifyPlay"`,
+    `SELECT
+       (SELECT count(*)::int FROM "SpotifyPlay") AS plays,
+       (SELECT count(*)::int FROM (SELECT DISTINCT "trackId" FROM "SpotifyPlay") t) AS tracks,
+       bounds."firstPlayedAt",
+       bounds."lastPlayedAt",
+       (SELECT count(*)::int FROM (SELECT DISTINCT ${LOCAL_PLAYED_AT}::date FROM "SpotifyPlay") d) AS "activeDays",
+       ((bounds."lastPlayedAt" AT TIME ZONE '${TIME_ZONE}')::date - (bounds."firstPlayedAt" AT TIME ZONE '${TIME_ZONE}')::date + 1)::int AS "spanDays"
+     FROM (
+       SELECT min("playedAt") AS "firstPlayedAt", max("playedAt") AS "lastPlayedAt"
+       FROM "SpotifyPlay"
+     ) bounds`,
     v.object({
       activeDays: int,
       firstPlayedAt: v.nullable(v.date()),
@@ -46,8 +50,8 @@ export function selectSummary() {
 
 export function selectArtistCount() {
   return select(
-    `SELECT count(DISTINCT artist)::int AS artists
-     FROM "SpotifyPlay", unnest("artistIds") AS artist`,
+    `SELECT count(*)::int AS artists
+     FROM (SELECT DISTINCT unnest("artistIds") AS artist FROM "SpotifyPlay") a`,
     v.object({ artists: int }),
   );
 }
@@ -73,8 +77,9 @@ export function selectLocalBuckets(part: 'hour' | 'isodow' | 'year') {
 
 export function selectActiveMonths() {
   return select(
-    `SELECT DISTINCT to_char(${LOCAL_PLAYED_AT}, 'YYYY-MM') AS month
-     FROM "SpotifyPlay" ORDER BY 1`,
+    `SELECT to_char(m, 'YYYY-MM') AS month
+     FROM (SELECT DISTINCT date_trunc('month', ${LOCAL_PLAYED_AT})::date AS m FROM "SpotifyPlay") months
+     ORDER BY m`,
     v.object({ month: v.string() }),
   );
 }
@@ -140,12 +145,16 @@ export function selectAlbumSessions() {
 /** Each track's single busiest `week` or `day`, keeping the busiest tracks overall. */
 export function selectRepeats(unit: 'day' | 'week', limit: number) {
   return select(
-    `SELECT "trackId", period, plays FROM (
-       SELECT DISTINCT ON ("trackId") "trackId", period, plays FROM (
-         SELECT "trackId", to_char(date_trunc('${unit}', ${LOCAL_PLAYED_AT}), 'YYYY-MM-DD') AS period,
-           count(*)::int AS plays
-         FROM "SpotifyPlay" GROUP BY 1, 2
-       ) counted
+    `WITH counted AS MATERIALIZED (
+       SELECT "trackId", date_trunc('${unit}', ${LOCAL_PLAYED_AT})::date AS period,
+         count(*)::int AS plays
+       FROM "SpotifyPlay"
+       GROUP BY 1, 2
+       HAVING count(*) > 1
+     )
+     SELECT "trackId", to_char(period, 'YYYY-MM-DD') AS period, plays FROM (
+       SELECT DISTINCT ON ("trackId") "trackId", period, plays
+       FROM counted
        ORDER BY "trackId", plays DESC, period
      ) best
      ORDER BY plays DESC, period, "trackId"
@@ -156,11 +165,20 @@ export function selectRepeats(unit: 'day' | 'week', limit: number) {
 
 export function selectArtistDepth() {
   return select(
-    `SELECT artist AS "artistId", count(*)::int AS plays,
-       count(DISTINCT "trackId")::int AS tracks,
-       count(DISTINCT to_char(${LOCAL_PLAYED_AT}, 'YYYY-MM'))::int AS months
-     FROM "SpotifyPlay", unnest("artistIds") AS artist
-     GROUP BY artist ORDER BY plays DESC, artist LIMIT ${DEPTH_ARTISTS}`,
+    `WITH top_artists AS (
+       SELECT artist AS "artistId", count(*)::int AS plays
+       FROM "SpotifyPlay", unnest("artistIds") AS artist
+       GROUP BY artist
+       ORDER BY plays DESC, artist
+       LIMIT ${DEPTH_ARTISTS}
+     )
+     SELECT ta."artistId", ta.plays,
+       count(DISTINCT p."trackId")::int AS tracks,
+       count(DISTINCT date_trunc('month', (p."playedAt" AT TIME ZONE '${TIME_ZONE}'))::date)::int AS months
+     FROM top_artists ta
+     JOIN "SpotifyPlay" p ON p."artistIds" @> ARRAY[ta."artistId"]::varchar(64)[]
+     GROUP BY ta."artistId", ta.plays
+     ORDER BY ta.plays DESC, ta."artistId"`,
     v.object({ artistId: v.string(), months: int, plays: int, tracks: int }),
   );
 }
