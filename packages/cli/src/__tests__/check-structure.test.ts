@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { checkOrphanCssFiles, checkRouteCssImports, checkTypeScale } from '../check-css.js';
 import {
   checkFileStructure,
+  checkSocialImageRouteParity,
   checkWorkspaceStructure,
   MAX_SOURCE_FILE_LINES,
 } from '../check-structure.js';
@@ -95,6 +96,27 @@ describe('check-structure', () => {
     assert.equal(routeMissingCss.length, 1);
     assert.equal(routeMissingCss[0]?.file, 'apps/web/src/app/music/page.tsx');
     assert.equal(routeMissingCss[0]?.rule, 'route-missing-css');
+
+    const routeMissingSocialImages = checkSocialImageRouteParity(
+      new Map([
+        ['apps/web/src/app/page.tsx', 'export default function Home() {}\n'],
+        ['apps/web/src/app/opengraph-image.tsx', 'export default function Og() {}\n'],
+        ['apps/web/src/app/twitter-image.tsx', 'export default function Tw() {}\n'],
+        ['apps/web/src/app/reading/page.tsx', 'export default function Reading() {}\n'],
+        ['apps/web/src/app/reading/opengraph-image.tsx', 'export default function Og() {}\n'],
+        ['apps/web/src/app/dev-console/page.tsx', 'export default function DevConsole() {}\n'],
+        ['apps/web/src/app/[...rest]/page.tsx', 'export default function CatchAll() {}\n'],
+      ]),
+    );
+    assert.deepEqual(routeMissingSocialImages, [
+      {
+        file: 'apps/web/src/app/reading/page.tsx',
+        line: 1,
+        message:
+          'Public page route "apps/web/src/app/reading" is missing "apps/web/src/app/reading/twitter-image.tsx"',
+        rule: 'og-image-route-parity',
+      },
+    ]);
   });
 
   it('requires declared --type-* tokens for every font size in web CSS', () => {

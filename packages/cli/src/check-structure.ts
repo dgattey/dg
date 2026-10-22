@@ -33,6 +33,13 @@ const BANNED_GENERIC_COMPONENT_FILENAMES: ReadonlySet<string> = new Set([
   'utils.tsx',
 ]);
 
+const NON_PUBLIC_PAGE_ROUTES: ReadonlySet<string> = new Set([
+  'apps/web/src/app/[...rest]/page.tsx',
+  'apps/web/src/app/dev-console/page.tsx',
+]);
+
+const SOCIAL_IMAGE_FILENAMES = ['opengraph-image.tsx', 'twitter-image.tsx'] as const;
+
 const INLINE_TYPEOF_IMPORT_TOKEN = `${'typeof'} ${'import('}`;
 const BIOME_SUPPRESSION_TOKEN = `${'biome'}-${'ignore'}`;
 const BIOME_CHECKED_FILE = /\.(?:c?js|mjs|tsx?|css|jsonc?)$/;
@@ -206,6 +213,34 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
   return violations;
 }
 
+export function checkSocialImageRouteParity(
+  sourceFiles: ReadonlyMap<string, string>,
+): Array<StructureViolation> {
+  const pageEntries = [...sourceFiles.keys()]
+    .filter(
+      (file) =>
+        /^apps\/web\/src\/app\/(?:.*\/)?page\.tsx$/.test(file) && !NON_PUBLIC_PAGE_ROUTES.has(file),
+    )
+    .sort();
+
+  const violations: Array<StructureViolation> = [];
+  for (const pageEntry of pageEntries) {
+    const routeDir = path.posix.dirname(pageEntry);
+    for (const imageFile of SOCIAL_IMAGE_FILENAMES) {
+      const expectedPath = `${routeDir}/${imageFile}`;
+      if (!sourceFiles.has(expectedPath)) {
+        violations.push({
+          file: pageEntry,
+          line: 1,
+          message: `Public page route "${routeDir}" is missing "${expectedPath}"`,
+          rule: 'og-image-route-parity',
+        });
+      }
+    }
+  }
+  return violations;
+}
+
 export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolation> {
   const gitOpts = { cwd: repoRoot, encoding: 'utf8' as const };
   const tracked = execFileSync('git', ['ls-files'], gitOpts);
@@ -254,6 +289,7 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
   }
   violations.push(...checkOrphanCssFiles(webCssPaths, webImporters));
   violations.push(...checkRouteCssImports(webCssPaths, webSources));
+  violations.push(...checkSocialImageRouteParity(webSources));
   violations.push(...checkTypeScale(webCss));
   return violations;
 }
