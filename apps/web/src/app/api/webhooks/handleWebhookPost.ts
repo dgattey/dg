@@ -52,6 +52,7 @@ export async function handleWebhookPost(request: NextRequest): Promise<NextRespo
       case 'ok':
         if (result.shouldRevalidate) {
           revalidateTag('latest-activity', 'max');
+          revalidateTag('strava-history', 'max');
         }
         return new NextResponse(null, { status: 200 });
     }

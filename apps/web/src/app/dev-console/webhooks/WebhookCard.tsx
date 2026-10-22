@@ -9,6 +9,7 @@ import { connection } from 'next/server';
 import { Suspense } from 'react';
 import { DevConsoleCardShell } from '../DevConsoleCardShell';
 import { ErrorMessage, StatusChip } from '../StatusIndicators';
+import { BackfillHistoryButton } from './BackfillHistoryButton';
 import { CreateWebhookButton } from './CreateWebhookButton';
 import { DeleteWebhookButton } from './DeleteWebhookButton';
 import { SubscriptionDetails } from './SubscriptionDetails';
@@ -102,6 +103,7 @@ export function WebhookCard() {
       <Suspense fallback={<WebhookCardContentSkeleton />}>
         <WebhookCardContent />
       </Suspense>
+      <BackfillHistoryButton />
     </DevConsoleCardShell>
   );
 }
