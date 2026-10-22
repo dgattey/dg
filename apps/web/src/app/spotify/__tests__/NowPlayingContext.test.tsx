@@ -34,13 +34,6 @@ const makeTrack = (id: string): Track => {
 const STALE = makeTrack('stale');
 const FRESH = makeTrack('fresh');
 
-beforeAll(() => {
-  window.IntersectionObserver = class {
-    observe() {}
-    disconnect() {}
-  } as unknown as typeof IntersectionObserver;
-});
-
 describe('NowPlayingProvider', () => {
   it('updates both the header card and the body card when the live track streams in', () => {
     render(

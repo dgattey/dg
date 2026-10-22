@@ -18,7 +18,6 @@ type TrackListingProps = {
   track: Track;
   variant?: 'card' | 'compact';
   disableLinks?: boolean;
-  shouldAnimate?: boolean;
 };
 
 const COMPACT_HOVER_SIZE = 84;
@@ -84,15 +83,7 @@ const compactTextStackSx: SxObject = {
   width: '100%',
 };
 
-function CompactLayout({
-  track,
-  disableLinks,
-  shouldAnimate,
-}: {
-  track: Track;
-  disableLinks?: boolean;
-  shouldAnimate: boolean;
-}) {
+function CompactLayout({ track, disableLinks }: { track: Track; disableLinks?: boolean }) {
   const isPlaying = track.isPlaying ?? false;
   const albumTitle = track.album.name;
   const albumUrl = track.album.externalUrls.spotify;
@@ -120,7 +111,6 @@ function CompactLayout({
           isPlaying={isPlaying}
           noteColor="var(--ink)"
           notesVariant="collageCompact"
-          shouldAnimate={shouldAnimate}
           wrapperSx={{
             height: COMPACT_THUMBNAIL_SIZE,
             width: COMPACT_THUMBNAIL_SIZE,
@@ -140,7 +130,7 @@ function CompactLayout({
       <Box sx={compactTextWrapperSx}>
         <Stack sx={compactTextStackSx}>
           <PlaybackStatus
-            animating={shouldAnimate && isPlaying}
+            animating={isPlaying}
             color={COLLAGE_TRACK_COLORS.primary}
             isPlaying={track.isPlaying}
             listingVariant="compact"
@@ -163,16 +153,9 @@ function CompactLayout({
   );
 }
 
-export function TrackListing({
-  track,
-  variant = 'card',
-  disableLinks,
-  shouldAnimate = true,
-}: TrackListingProps) {
+export function TrackListing({ track, variant = 'card', disableLinks }: TrackListingProps) {
   if (variant === 'compact') {
-    return (
-      <CompactLayout disableLinks={disableLinks} shouldAnimate={shouldAnimate} track={track} />
-    );
+    return <CompactLayout disableLinks={disableLinks} track={track} />;
   }
 
   return <CollageTrackCard track={track} />;
