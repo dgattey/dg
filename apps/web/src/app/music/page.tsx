@@ -6,14 +6,11 @@ import './music.css';
 import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { Suspense } from 'react';
-import { getServerTime } from '../../services/getServerTime';
 import { getMusicHistory } from '../../services/music';
 import { HISTORY_BACKDROP } from '../collage/backdrops';
 import { markdownAlternates } from '../layouts/markdownAlternates';
 import { musicDestinationTitle } from '../layouts/musicHeaderDestinations';
 import { CollageHistorySkeleton } from './albums/collageAlbumCardTreatments';
-import { groupTracksByDate } from './groupTracksByDate';
-import { MusicHistorySections, NoListeningHistory } from './MusicHistorySections';
 import { MusicInfiniteScroll } from './MusicInfiniteScroll';
 import { MusicPageShell } from './MusicPageShell';
 
@@ -40,23 +37,7 @@ async function MusicHistory() {
     throw error;
   }
 
-  const serverTime = await getServerTime();
-  const sections = groupTracksByDate(tracks, serverTime);
-
-  if (sections.length === 0) {
-    return <NoListeningHistory />;
-  }
-
-  return (
-    <div className="music__history">
-      <MusicHistorySections sections={sections} withLcpCandidate={true} />
-      <MusicInfiniteScroll
-        initialCursor={nextCursor}
-        initialSectionOffset={sections.length}
-        serverRenderedInitial={true}
-      />
-    </div>
-  );
+  return <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />;
 }
 
 export default function MusicPage() {

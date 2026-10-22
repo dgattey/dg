@@ -7,50 +7,47 @@ export type TrackSection = {
 };
 
 /**
- * Gets the start of the ISO week (Monday) for a given date.
+ * Sections follow Dylan's calendar, not the runtime's: the server renders in
+ * UTC and the browser hydrates in the visitor's zone, and both must agree on
+ * where "Today" ends.
  */
-function getStartOfWeek(date: Date): Date {
-  const result = new Date(date);
-  const day = result.getDay();
-  // Adjust so Monday = 0
-  const diff = day === 0 ? -6 : 1 - day;
-  result.setDate(result.getDate() + diff);
-  result.setHours(0, 0, 0, 0);
-  return result;
-}
+const TIME_ZONE = 'America/Los_Angeles';
 
-/**
- * Checks if two dates are on the same calendar day.
- */
-function isSameDay(d1: Date, d2: Date): boolean {
-  return (
-    d1.getFullYear() === d2.getFullYear() &&
-    d1.getMonth() === d2.getMonth() &&
-    d1.getDate() === d2.getDate()
-  );
-}
+const DAY_MS = 86_400_000;
 
-/**
- * Checks if two dates are in the same ISO week.
- */
-function isSameWeek(d1: Date, d2: Date): boolean {
-  const week1 = getStartOfWeek(d1).getTime();
-  const week2 = getStartOfWeek(d2).getTime();
-  return week1 === week2;
-}
+const calendarDateFormat = new Intl.DateTimeFormat('en-US', {
+  day: 'numeric',
+  month: 'numeric',
+  timeZone: TIME_ZONE,
+  year: 'numeric',
+});
 
-/**
- * Checks if two dates are in the same calendar month.
- */
-function isSameMonth(d1: Date, d2: Date): boolean {
-  return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth();
-}
+const monthYearFormat = new Intl.DateTimeFormat('en-US', {
+  month: 'long',
+  timeZone: TIME_ZONE,
+  year: 'numeric',
+});
 
-/**
- * Formats a date as "Month Year" (e.g., "January 2026").
- */
-function formatMonthYear(date: Date): string {
-  return date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
+/** Where a moment falls on the calendar, as indices that compare with `===`. */
+type CalendarPosition = {
+  day: number;
+  month: number;
+  week: number;
+};
+
+function calendarPosition(date: Date): CalendarPosition {
+  const parts = calendarDateFormat.formatToParts(date);
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(parts.find((candidate) => candidate.type === type)?.value);
+  const year = part('year');
+  const month = part('month');
+  const day = Date.UTC(year, month - 1, part('day')) / DAY_MS;
+  return {
+    day,
+    month: year * 12 + month,
+    // Epoch day 0 was a Thursday, so +3 lands week boundaries on Mondays.
+    week: Math.floor((day + 3) / 7),
+  };
 }
 
 /** Windows relative to now, each one inside the next. */
@@ -89,17 +86,18 @@ function foldSparseRecentSections(sections: Array<TrackSection>): Array<TrackSec
 /**
  * Gets the section label for a track based on when it was played.
  */
-function getSectionLabel(playedAt: Date, now: Date): string {
-  if (isSameDay(playedAt, now)) {
+function getSectionLabel(playedAt: Date, now: CalendarPosition): string {
+  const played = calendarPosition(playedAt);
+  if (played.day === now.day) {
     return 'Today';
   }
-  if (isSameWeek(playedAt, now)) {
+  if (played.week === now.week) {
     return 'This week';
   }
-  if (isSameMonth(playedAt, now)) {
+  if (played.month === now.month) {
     return 'This month';
   }
-  return formatMonthYear(playedAt);
+  return monthYearFormat.format(playedAt);
 }
 
 /**
@@ -114,6 +112,9 @@ function getSectionLabel(playedAt: Date, now: Date): string {
  * Tracks are expected to arrive in playedAt DESC order, so sections
  * naturally appear in chronological order (newest first). A recent section
  * with fewer than three album cards folds into the next recent one.
+ *
+ * Pass every loaded play at once. Grouping pages separately splits a day that
+ * straddles a page boundary into two sections with the same label.
  */
 export function groupTracksByDate(
   tracks: Array<HistoryTrack>,
@@ -123,7 +124,7 @@ export function groupTracksByDate(
     return [];
   }
 
-  const now = new Date(nowTimestamp);
+  const now = calendarPosition(new Date(nowTimestamp));
   const sections: Array<TrackSection> = [];
   let currentSection: TrackSection | null = null;
 

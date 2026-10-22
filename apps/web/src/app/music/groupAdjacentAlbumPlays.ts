@@ -46,9 +46,9 @@ function startRun(track: HistoryTrack): AlbumPlayRun {
  * two runs.
  *
  * Callers pass the accumulated track list for one date section. Because
- * infinite scroll appends to that list before grouping runs, a run that
- * straddles a page boundary merges into one; because each date section groups
- * separately, a run never spans "Today" into "This week".
+ * infinite scroll appends every page, the first included, to one list before
+ * grouping, a run that straddles a page boundary merges into one; because each
+ * date section groups separately, a run never spans "Today" into "This week".
  */
 export function groupAdjacentAlbumPlays(tracks: Array<HistoryTrack>): Array<AlbumPlayRun> {
   const runs: Array<AlbumPlayRun> = [];
