@@ -26,6 +26,7 @@
     "check:ci": "biome ci .",
     "check:types": "tsc",
     "clean": "rm -rf .turbo *.tsbuildinfo",
+    "spotify:import": "NODE_ENV=development tsx --tsconfig ../db/tsconfig.json --conditions=react-server scripts/importSpotifyHistory.ts",
     "strava:backfill": "NODE_ENV=development tsx --tsconfig ../db/tsconfig.json --conditions=react-server scripts/syncStravaHistory.ts",
     "strava:sf-grid": "tsx --conditions=react-server scripts/generateSfStreetGrid.ts",
     "test": "jest"

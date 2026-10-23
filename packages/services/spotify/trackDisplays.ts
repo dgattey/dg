@@ -92,7 +92,7 @@ async function fetchMissingTracks(trackIds: Array<string>): Promise<Array<TrackD
   return results;
 }
 
-async function cacheTrackData(displayData: Array<TrackDisplayData>): Promise<void> {
+export async function cacheTrackData(displayData: Array<TrackDisplayData>): Promise<void> {
   if (displayData.length === 0) {
     return;
   }
