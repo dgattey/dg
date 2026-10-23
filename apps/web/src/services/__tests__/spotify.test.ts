@@ -5,11 +5,6 @@ jest.mock('next/cache', () => ({
   cacheTag: jest.fn(),
 }));
 
-// Simulates environments without `waitUntil` (Vercel PPR resume, ISR
-// revalidation, dynamic RSC renders): any `after()` call throws Next error
-// E91 there. `getLatestSong` runs inside 'use cache', so calling `after()`
-// from it fatally breaks the homepage stream (truncated HTML shell, 0-byte
-// /index.rsc, "Connection closed" in the browser).
 jest.mock('next/server', () => ({
   ...jest.requireActual('next/server'),
   after: jest.fn(() => {
@@ -30,18 +25,32 @@ import { getLastKnownSong, getLatestSong } from '../spotify';
 
 const track = { id: 'track-1', name: 'Test Song' } as Track;
 
-describe.each([
-  ['getLatestSong', getLatestSong, 'seconds'],
-  ['getLastKnownSong', getLastKnownSong, 'hours'],
-] as const)('%s', (_name, getSong, profile) => {
-  it('resolves the latest track even where after() is unavailable', async () => {
+describe('getLatestSong', () => {
+  beforeEach(() => {
+    jest.mocked(cacheLife).mockClear();
+  });
+
+  it('fetches the live track directly without Next use-cache stale windows', async () => {
     jest.mocked(fetchRecentlyPlayed).mockResolvedValue(track);
-    await expect(getSong()).resolves.toBe(track);
-    expect(cacheLife).toHaveBeenLastCalledWith(profile);
+    await expect(getLatestSong()).resolves.toBe(track);
+    expect(cacheLife).not.toHaveBeenCalled();
   });
 
   it('returns null when tokens are missing', async () => {
     jest.mocked(fetchRecentlyPlayed).mockRejectedValue(new MissingTokenError('spotify'));
-    await expect(getSong()).resolves.toBeNull();
+    await expect(getLatestSong()).resolves.toBeNull();
+  });
+});
+
+describe('getLastKnownSong', () => {
+  it('caches the prerendered shell track with hours lifetime', async () => {
+    jest.mocked(fetchRecentlyPlayed).mockResolvedValue(track);
+    await expect(getLastKnownSong()).resolves.toBe(track);
+    expect(cacheLife).toHaveBeenLastCalledWith('hours');
+  });
+
+  it('returns null when tokens are missing', async () => {
+    jest.mocked(fetchRecentlyPlayed).mockRejectedValue(new MissingTokenError('spotify'));
+    await expect(getLastKnownSong()).resolves.toBeNull();
   });
 });

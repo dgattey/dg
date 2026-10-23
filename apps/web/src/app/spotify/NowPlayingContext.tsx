@@ -2,13 +2,16 @@
 
 import type { Track } from '@dg/content-models/spotify/Track';
 import { usePathname } from 'next/navigation';
-import { createContext, type ReactNode, useContext, useEffect, useRef, useState } from 'react';
+import {
+  createContext,
+  type ReactNode,
+  useContext,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { loadLatestSong } from '../../services/spotify.actions';
-
-type NowPlayingContextValue = {
-  publish: (track: Track) => void;
-  track: Track | null;
-};
 
 /** The page's now playing card, which the home header pill scrolls to. */
 export const NOW_PLAYING_CARD_ID = 'now-playing-card';
@@ -16,8 +19,41 @@ export const NOW_PLAYING_CARD_ID = 'now-playing-card';
 const POLL_INTERVAL_MS = 30_000;
 const MIN_TRACK_END_DELAY_MS = 5_000;
 const TRACK_END_BUFFER_MS = 1_500;
+const SESSION_STORAGE_KEY = 'dg:now-playing';
+const MAX_SESSION_CACHE_AGE_MS = 10 * 60 * 1000;
 
-const NowPlayingContext = createContext<NowPlayingContextValue | null>(null);
+const NowPlayingContext = createContext<Track | null>(null);
+
+function readSessionTrack(): Track | null {
+  try {
+    const raw = window.sessionStorage.getItem(SESSION_STORAGE_KEY);
+    if (!raw) {
+      return null;
+    }
+    const parsed = JSON.parse(raw) as { savedAt?: number; track?: Track };
+    if (
+      !parsed?.track ||
+      typeof parsed.savedAt !== 'number' ||
+      Date.now() - parsed.savedAt > MAX_SESSION_CACHE_AGE_MS
+    ) {
+      return null;
+    }
+    return parsed.track;
+  } catch {
+    return null;
+  }
+}
+
+function writeSessionTrack(track: Track): void {
+  try {
+    window.sessionStorage.setItem(
+      SESSION_STORAGE_KEY,
+      JSON.stringify({ savedAt: Date.now(), track }),
+    );
+  } catch {
+    return;
+  }
+}
 
 function nextRefreshDelayMs(track: Track | null): number {
   if (
@@ -32,46 +68,49 @@ function nextRefreshDelayMs(track: Track | null): number {
 }
 
 async function refreshLatestSong(
-  inFlightRef: { current: boolean },
+  requestIdRef: { current: number },
   setTrack: (track: Track) => void,
 ) {
-  if (inFlightRef.current) {
-    return;
-  }
-  inFlightRef.current = true;
+  const requestId = ++requestIdRef.current;
   try {
     const latest = await loadLatestSong();
-    if (latest) {
+    if (latest && requestIdRef.current === requestId) {
+      writeSessionTrack(latest);
       setTrack(latest);
     }
   } catch {
     return;
-  } finally {
-    inFlightRef.current = false;
   }
 }
 
 export function NowPlayingProvider({ children }: { children: ReactNode }) {
   const [track, setTrack] = useState<Track | null>(null);
   const pathname = usePathname();
-  const lastPathnameRef = useRef(pathname);
-  const inFlightRef = useRef(false);
+  const lastPathnameRef = useRef<string | null>(null);
+  const requestIdRef = useRef(0);
+
+  useLayoutEffect(() => {
+    const cached = readSessionTrack();
+    if (cached) {
+      setTrack(cached);
+    }
+  }, []);
 
   useEffect(() => {
     if (lastPathnameRef.current === pathname) {
       return;
     }
     lastPathnameRef.current = pathname;
-    void refreshLatestSong(inFlightRef, setTrack);
+    void refreshLatestSong(requestIdRef, setTrack);
   }, [pathname]);
 
   useEffect(() => {
     const onFocus = () => {
-      void refreshLatestSong(inFlightRef, setTrack);
+      void refreshLatestSong(requestIdRef, setTrack);
     };
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        void refreshLatestSong(inFlightRef, setTrack);
+        void refreshLatestSong(requestIdRef, setTrack);
       }
     };
     window.addEventListener('focus', onFocus);
@@ -92,7 +131,7 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
           return;
         }
         if (document.visibilityState !== 'hidden') {
-          await refreshLatestSong(inFlightRef, setTrack);
+          await refreshLatestSong(requestIdRef, setTrack);
         }
         if (!cancelled) {
           schedule(POLL_INTERVAL_MS);
@@ -107,22 +146,9 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
     };
   }, [track]);
 
-  return (
-    <NowPlayingContext.Provider value={{ publish: setTrack, track }}>
-      {children}
-    </NowPlayingContext.Provider>
-  );
-}
-
-/** Publishes a freshly fetched track without rendering anything. */
-export function PublishNowPlaying({ track }: { track: Track }) {
-  const publish = useContext(NowPlayingContext)?.publish;
-  useEffect(() => {
-    publish?.(track);
-  }, [publish, track]);
-  return null;
+  return <NowPlayingContext.Provider value={track}>{children}</NowPlayingContext.Provider>;
 }
 
 export function useNowPlaying(track: Track | null): Track | null {
-  return useContext(NowPlayingContext)?.track ?? track;
+  return useContext(NowPlayingContext) ?? track;
 }
