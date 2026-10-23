@@ -27,15 +27,13 @@ export type SheetPlacement =
   | (SheetBase & { edge: 'torn'; heightPx: number; widthPercent: number })
   | (SheetBase & { edge: 'disc' | 'pebble'; sizePx: number });
 
-type BackdropBand = {
-  cutOuts: ReadonlyArray<CutOutPlacement>;
-  sheets: ReadonlyArray<SheetPlacement>;
-};
-
 export type Backdrop = {
   /** `fill` stretches one band over the whole page instead of stacking fixed bands. */
   bandHeightPx: number | 'fill';
-  bands: ReadonlyArray<BackdropBand>;
+  bands: ReadonlyArray<{
+    cutOuts: ReadonlyArray<CutOutPlacement>;
+    sheets: ReadonlyArray<SheetPlacement>;
+  }>;
   repeat: number;
 };
 
@@ -194,11 +192,7 @@ export const HISTORY_BACKDROP = defineBackdrop(1200, 12, [
   },
 ]);
 
-/**
- * The listening history's ledger margin, so nothing sits behind the page nav, with the
- * record-store leaves and coral down the margins.
- */
-export const STATS_BACKDROP = defineBackdrop(1100, 3, [
+export const STATS_BACKDROP = defineBackdrop(960, 4, [
   {
     cutOuts: [
       ['stats-star', 'star5', 'star', 40, 4, 47, 4, 'desktop', 1],
@@ -213,26 +207,34 @@ export const STATS_BACKDROP = defineBackdrop(1100, 3, [
   },
   {
     cutOuts: [
-      ['stats-coral', 'coral', 'vermilion', 220, -4, -6, 36, 'desktop', 1],
+      ['stats-coral', 'coral', 'vermilion', 220, -4, -6, 36, 'all', 1],
       ['stats-trefoil', 'trefoil', 'rose', 140, 4, 94, 66, 'all', 1],
-      ['stats-monstera', 'monstera', 'leaf', 280, 18, 97, 2, 'desktop', 0],
-      ['stats-star-band', 'star4', 'star', 34, 12, 41, 38, 'desktop', 1],
+      ['stats-monstera', 'monstera', 'leaf', 280, 18, 92, 2, 'desktop', 0],
+      ['stats-swallow', 'swallow', 'ochre', 165, -12, 86, 34, 'desktop', 1],
+      ['stats-star-band', 'star4', 'star', 38, 12, 41, 38, 'all', 1],
     ],
-    sheets: [],
+    sheets: [
+      ['stats-gingham', 'torn', 'gingham', ['ochre', 'vermilion'], 64, 8, 38, 420, 2.4, 'all'],
+      ['stats-pebble-mid', 'pebble', 'dots', ['viridian', 'leaf'], -8, 52, 340, -9, 'all'],
+    ],
   },
   {
     cutOuts: [
-      ['stats-seaweed', 'seaweed2', 'olive', 240, -4, -4, 20, 'desktop', 0],
-      ['stats-heart', 'heart', 'rose', 80, 3, 94, 40, 'desktop', 1],
-      ['stats-fern', 'fern', 'viridian', 300, -24, 18, 38, 'desktop', 0],
-      ['stats-sun', 'sun', 'ochre', 120, 0, 34, 46, 'desktop', 0],
-      ['stats-star-low', 'star5', 'star', 36, -8, 27, 66, 'desktop', 1],
+      ['stats-seaweed', 'seaweed2', 'olive', 240, -4, -4, 18, 'all', 0],
+      ['stats-gerbe', 'gerbe', 'vermilion', 240, 16, 90, 12, 'desktop', 1],
+      ['stats-heart', 'heart', 'rose', 88, 3, 92, 48, 'all', 1],
+      ['stats-fern', 'fern', 'viridian', 300, -24, 14, 42, 'desktop', 0],
+      ['stats-sun', 'sun', 'ochre', 130, 0, 34, 48, 'desktop', 0],
+      ['stats-pods', 'pods', 'ochre', 210, 18, -3, 74, 'all', 1],
+      ['stats-star-low', 'star5', 'star', 42, -8, 86, 82, 'all', 1],
     ],
-    sheets: [],
+    sheets: [
+      ['stats-dots-low', 'torn', 'dots', ['rose', 'cream'], -5, 16, 34, 460, -2.5, 'all'],
+      ['stats-disc-low', 'disc', 'starfield', 'ultramarine', 82, 56, 310, 0, 'all'],
+    ],
   },
 ]);
 
-/** Blueprint grid paper with small water plants and no broad leaves. */
 export const DEV_CONSOLE_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
@@ -253,7 +255,6 @@ export const DEV_CONSOLE_BACKDROP = defineBackdrop('fill', 1, [
   },
 ]);
 
-/** A lost swallow leaving a blue checker map behind. */
 export const NOT_FOUND_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [
@@ -272,7 +273,6 @@ export const NOT_FOUND_BACKDROP = defineBackdrop('fill', 1, [
   },
 ]);
 
-/** Hazard stripes over a monstera. */
 export const SERVER_ERROR_BACKDROP = defineBackdrop('fill', 1, [
   {
     cutOuts: [

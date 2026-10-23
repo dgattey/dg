@@ -173,14 +173,16 @@ describe('createSocialImage', () => {
       activeDays: 137,
       activeMonths: 10,
       artists: 2215,
+      champions: { aside: '#1 song each month in 2026', entries: [], title: 'Soundtrack by month' },
       dayStreak: { days: 14, end: '2026-02-14', start: '2026-02-01' },
       depth: [{ months: 7, name: 'Burna Boy', plays: 457, tracks: 161 }],
       firstPlayedAt: '2026-01-01T00:00:00.000Z',
       frontToBack: [],
+      genres: [{ artists: ['Burna Boy'], genre: 'afrobeats', plays: 457, tracks: 161 }],
       hours: Array.from({ length: 24 }, () => 0),
       lastPlayedAt: '2026-10-22T00:00:00.000Z',
+      matrix: { columns: [], rows: [], title: 'Every week of 2026' },
       minutesPerPlay: 3.95,
-      monthlyPlays: [],
       monthStreak: { end: '2026-10', months: 10, start: '2026-01' },
       onRepeat: [],
       plays: 8476,
@@ -189,6 +191,7 @@ describe('createSocialImage', () => {
       sessions: 190,
       shelf: { albums: 102, plays: 1800, topTenOnShelf: 8 },
       spanDays: 294,
+      timeline: { points: [], title: 'Plays per month, 2026' },
       topAlbums: [
         {
           album: {
@@ -204,8 +207,6 @@ describe('createSocialImage', () => {
       topArtists: [],
       topTracks: [],
       tracks: 4818,
-      weekdays: [0, 0, 0, 0, 0, 0, 0],
-      yearChampions: [],
       years: [
         { plays: 23510, year: 2025 },
         { plays: 8476, year: 2026 },

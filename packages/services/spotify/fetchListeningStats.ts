@@ -1,21 +1,18 @@
 import 'server-only';
 
 import { db } from '@dg/db';
-import { isNotNullish } from '@dg/shared-core/types/typeguards';
-import {
-  buildYearChampions,
-  resolveAlbums,
-  resolveArtists,
-  toStatsTopTrack,
-} from './listeningStatsCatalog';
+import { buildRangeBreakdowns } from './listeningStatsBreakdowns';
+import { mapCatalogSlices, resolveAlbums, resolveArtists } from './listeningStatsCatalog';
 import {
   rollingDaysPlayFilter,
   type SqlPlayFilter,
-  selectActiveDays,
   selectActiveMonths,
   selectAlbumSessions,
   selectArtistCount,
   selectArtistDepth,
+  selectBucketTopTracks,
+  selectDailyPlays,
+  selectDayHourPlays,
   selectKnownDurations,
   selectLatestPlayedAt,
   selectLocalBuckets,
@@ -24,8 +21,8 @@ import {
   selectShelf,
   selectSummary,
   selectTopAlbumIds,
+  selectTopGenres,
   selectTopTrackIds,
-  selectYearlyTopTracks,
   yearPlayFilter,
 } from './listeningStatsQueries';
 import { resolveTrackDisplays } from './trackDisplays';
@@ -33,6 +30,7 @@ import { resolveTrackDisplays } from './trackDisplays';
 const FALLBACK_MINUTES_PER_PLAY = 3.81;
 const TOP_ALBUMS = 3;
 const TOP_TRACKS = 6;
+const TOP_DEPTH_ARTISTS = 8;
 const ON_REPEAT_TRACKS = 6;
 
 export type StatsRange =
@@ -57,14 +55,7 @@ export type StatsAlbum = {
   name: string;
   url: string;
 };
-
-export type StatsTrack = {
-  artistNames: string;
-  id: string;
-  name: string;
-  url: string;
-};
-
+export type StatsTrack = { artistNames: string; id: string; name: string; url: string };
 export type StatsTopTrack = {
   albumImageUrl: string;
   albumName: string;
@@ -74,7 +65,6 @@ export type StatsTopTrack = {
   plays: number;
   url: string;
 };
-
 export type StatsTopArtist = {
   id: string;
   months: number;
@@ -83,24 +73,56 @@ export type StatsTopArtist = {
   tracks: number;
   url: string;
 };
-
-export type StatsYearChampion = {
-  track: StatsTopTrack;
-  year: number;
+export type StatsGenre = {
+  artists: Array<string>;
+  genre: string;
+  plays: number;
+  tracks: number;
 };
+export type StatsTimelinePoint = {
+  key: string;
+  label: string;
+  partial?: boolean;
+  plays: number;
+  tick: string;
+  yearFilter?: number;
+};
+export type StatsTimeline = { points: Array<StatsTimelinePoint>; title: string };
+export type StatsMatrixCell = { key: string; label: string; plays: number; yearFilter?: number };
+export type StatsMatrixRow = {
+  cells: Array<StatsMatrixCell>;
+  key: string;
+  label: string;
+  yearFilter?: number;
+};
+export type StatsMatrix = {
+  columns: Array<{ full: string; key: string; short: string }>;
+  peakCell?: { key: string; label: string; plays: number };
+  rows: Array<StatsMatrixRow>;
+  title: string;
+};
+export type StatsChampionEntry = {
+  badge: string;
+  key: string;
+  track: StatsTopTrack;
+  yearFilter?: number;
+};
+export type StatsChampions = { aside: string; entries: Array<StatsChampionEntry>; title: string };
 
 export type ListeningStats = {
   activeDays: number;
   activeMonths: number;
   artists: number;
+  champions: StatsChampions;
   dayStreak: { days: number; end: string; start: string };
   depth: Array<{ months: number; name: string; plays: number; tracks: number }>;
   firstPlayedAt: string;
   frontToBack: Array<{ album: StatsAlbum; plays: number; sessionPlays: number; sessions: number }>;
+  genres: Array<StatsGenre>;
   hours: Array<number>;
   lastPlayedAt: string;
+  matrix: StatsMatrix;
   minutesPerPlay: number;
-  monthlyPlays: Array<{ month: number; plays: number; year: number }>;
   monthStreak: { end: string; months: number; start: string };
   onRepeat: Array<{ plays: number; track: StatsTrack; week: string }>;
   plays: number;
@@ -109,12 +131,11 @@ export type ListeningStats = {
   sessions: number;
   shelf: { albums: number; plays: number; topTenOnShelf: number };
   spanDays: number;
+  timeline: StatsTimeline;
   topAlbums: Array<{ album: StatsAlbum; plays: number }>;
   topArtists: Array<StatsTopArtist>;
   topTracks: Array<StatsTopTrack>;
   tracks: number;
-  weekdays: Array<number>;
-  yearChampions: Array<StatsYearChampion>;
   years: Array<{ plays: number; year: number }>;
 };
 
@@ -187,23 +208,34 @@ async function resolvePlayFilter(range: StatsRange): Promise<SqlPlayFilter | und
 
 export async function fetchListeningStats(
   range: StatsRange = { kind: 'all' },
+  options?: { knownYears?: Array<{ plays: number; year: number }> },
 ): Promise<ListeningStats | null> {
   const filter = await resolvePlayFilter(range);
   if (filter === null) return null;
+
+  const championUnit =
+    range.kind === 'all'
+      ? 'year'
+      : range.kind === 'year'
+        ? 'month'
+        : range.kind === 'month'
+          ? 'week'
+          : 'day';
+  const repeatUnit = range.kind === 'week' ? 'day' : 'week';
 
   const [
     [summary],
     [artistCount],
     [durations],
-    years,
+    rawYears,
     monthlyPlays,
     hours,
-    weekdays,
     months,
-    days,
+    dailyPlays,
+    dayHourPlays,
     topAlbumIds,
     topTrackIds,
-    yearlyTopTracks,
+    bucketTopTracks,
     [shelf],
     sessions,
     onRepeat,
@@ -213,24 +245,26 @@ export async function fetchListeningStats(
     selectSummary(filter),
     selectArtistCount(filter),
     selectKnownDurations(filter),
-    selectLocalBuckets('year'),
-    selectMonthlyPlays(),
+    options?.knownYears ? Promise.resolve(null) : selectLocalBuckets('year'),
+    range.kind === 'all' ? selectMonthlyPlays() : Promise.resolve([]),
     selectLocalBuckets('hour', filter),
-    selectLocalBuckets('isodow', filter),
     selectActiveMonths(filter),
-    selectActiveDays(filter),
+    selectDailyPlays(filter),
+    range.kind === 'week' ? selectDayHourPlays(filter) : Promise.resolve([]),
     selectTopAlbumIds(filter),
     selectTopTrackIds(filter),
-    selectYearlyTopTracks(),
+    selectBucketTopTracks(championUnit, filter),
     selectShelf(filter),
     selectAlbumSessions(filter),
-    selectRepeats('week', ON_REPEAT_TRACKS, filter),
+    selectRepeats(repeatUnit, ON_REPEAT_TRACKS, filter),
     selectArtistDepth(filter),
     db.FavoriteAlbum.findAll(),
   ]);
 
   if (!summary?.firstPlayedAt || !summary.lastPlayedAt || summary.plays === 0) return null;
 
+  const years =
+    options?.knownYears ?? (rawYears ?? []).map((row) => ({ plays: row.plays, year: row.bucket }));
   const shelfIds = new Set(favoriteAlbums.map((album) => album.id));
   const shownAlbums = topAlbumIds.slice(0, TOP_ALBUMS);
   const shownTracks = topTrackIds.slice(0, TOP_TRACKS);
@@ -240,58 +274,53 @@ export async function fetchListeningStats(
       favoriteAlbums,
     ),
     resolveTrackDisplays(
-      [...shownTracks, ...onRepeat, ...yearlyTopTracks].map((row) => row.trackId),
+      [...shownTracks, ...onRepeat, ...bucketTopTracks].map((row) => row.trackId),
     ),
     resolveArtists(depth.map((row) => row.artistId)),
   ]);
+
+  const genres = await selectTopGenres(filter);
 
   const minutesPerPlay =
     durations && durations.knownPlays > 0
       ? durations.knownMs / durations.knownPlays / 60_000
       : FALLBACK_MINUTES_PER_PLAY;
 
+  const { champions, matrix, timeline } = buildRangeBreakdowns({
+    bucketTopTracks,
+    dailyPlays,
+    dayHourPlays,
+    monthlyPlays,
+    range,
+    tracks,
+    years,
+  });
+
+  const slices = mapCatalogSlices({
+    albums,
+    artistMap,
+    onRepeat,
+    sessions,
+    shownAlbums,
+    shownTracks,
+    topDepthRows: depth.slice(0, TOP_DEPTH_ARTISTS),
+    tracks,
+  });
+
   return {
     activeDays: summary.activeDays,
     activeMonths: months.length,
     artists: artistCount?.artists ?? 0,
-    dayStreak: longestDayStreak(days.map((row) => row.day)),
-    depth: depth
-      .map(({ artistId, months: artistMonths, plays, tracks: artistTracks }) => {
-        const artist = artistMap.get(artistId);
-        return artist
-          ? { months: artistMonths, name: artist.name, plays, tracks: artistTracks }
-          : null;
-      })
-      .filter(isNotNullish),
+    champions,
+    dayStreak: longestDayStreak(dailyPlays.map((row) => row.day)),
+    ...slices,
     firstPlayedAt: summary.firstPlayedAt.toISOString(),
-    frontToBack: sessions
-      .map(({ albumId, plays, sessionPlays, sessions: count }) => {
-        const album = albums.get(albumId);
-        return album ? { album, plays, sessionPlays, sessions: count } : null;
-      })
-      .filter(isNotNullish),
+    genres,
     hours: fillBuckets(hours, 24, 0),
     lastPlayedAt: summary.lastPlayedAt.toISOString(),
+    matrix,
     minutesPerPlay,
-    monthlyPlays,
     monthStreak: longestMonthStreak(months.map((row) => row.month)),
-    onRepeat: onRepeat
-      .map(({ period, plays, trackId }) => {
-        const track = tracks.get(trackId);
-        return track
-          ? {
-              plays,
-              track: {
-                artistNames: track.artistNames,
-                id: track.id,
-                name: track.name,
-                url: track.url,
-              },
-              week: period,
-            }
-          : null;
-      })
-      .filter(isNotNullish),
     plays: summary.plays,
     range,
     sessionPlays: sessions[0]?.totalSessionPlays ?? 0,
@@ -302,37 +331,8 @@ export async function fetchListeningStats(
       topTenOnShelf: topAlbumIds.filter((row) => shelfIds.has(row.albumId)).length,
     },
     spanDays: range.kind === 'week' ? 7 : range.kind === 'month' ? 30 : (summary.spanDays ?? 1),
-    topAlbums: shownAlbums
-      .map(({ albumId, plays }) => {
-        const album = albums.get(albumId);
-        return album ? { album, plays } : null;
-      })
-      .filter(isNotNullish),
-    topArtists: depth
-      .map(({ artistId, months: artistMonths, plays, tracks: artistTracks }) => {
-        const artist = artistMap.get(artistId);
-        return artist
-          ? {
-              id: artistId,
-              months: artistMonths,
-              name: artist.name,
-              plays,
-              tracks: artistTracks,
-              url: artist.url,
-            }
-          : null;
-      })
-      .filter(isNotNullish),
-    topTracks: shownTracks
-      .map(({ plays, trackId }) => toStatsTopTrack(tracks, trackId, plays))
-      .filter(isNotNullish),
+    timeline,
     tracks: summary.tracks,
-    weekdays: fillBuckets(weekdays, 7, 1),
-    yearChampions: buildYearChampions({
-      tracks,
-      yearlyTopTracks,
-      years,
-    }),
-    years: years.map((row) => ({ plays: row.plays, year: row.bucket })),
+    years,
   };
 }

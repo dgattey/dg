@@ -64,8 +64,9 @@ async function isolateTables() {
 
 async function seedCatalog() {
   await db.MusicArtist.create({
+    genres: ['chillwave', 'chillstep'],
     id: ARTIST,
-    name: 'Cached Artist',
+    name: 'ODESZA',
     url: 'https://open.spotify.com/artist/cached',
   });
   await db.MusicAlbum.create({
@@ -84,11 +85,11 @@ async function seedCatalog() {
   await db.MusicTrackArtist.create({ artistId: ARTIST, position: 0, trackId: REPEAT_TRACK });
   await db.FavoriteAlbum.create({
     addedAt: '2024-01-01T00:00:00Z',
-    artistNames: 'Cached Artist',
+    artistNames: 'ODESZA',
     id: ALBUM,
     imageUrl: 'https://image.test/shelf.jpg',
     name: 'Shelf album',
-    primaryArtist: 'Cached Artist',
+    primaryArtist: 'ODESZA',
     releaseDate: '2020-01-01',
     url: 'https://open.spotify.com/album/shelf',
   });
@@ -105,7 +106,7 @@ describe('fetchListeningStats', () => {
     await expect(fetchListeningStats()).resolves.toBeNull();
   });
 
-  it('aggregates plays in Pacific time with sessions, repeats, top tracks, top artists, and depth', async () => {
+  it('aggregates plays in Pacific time with sessions, repeats, genres, top tracks, top artists, and depth', async () => {
     await seedCatalog();
     await db.SpotifyPlay.bulkCreate(
       plays.map((row) => ({ ...row, playedAt: new Date(row.playedAt) })),
@@ -116,8 +117,9 @@ describe('fetchListeningStats', () => {
           ? {
               data: {
                 external_urls: { spotify: 'https://open.spotify.com/artist/guest' },
+                genres: ['afrobeats'],
                 id: GUEST,
-                name: 'Guest Artist',
+                name: 'Burna Boy',
               },
               status: 200,
               success: true,
@@ -136,11 +138,15 @@ describe('fetchListeningStats', () => {
       firstPlayedAt: '2023-11-12T20:00:00.000Z',
       frontToBack: [
         {
-          album: { artistNames: 'Cached Artist', name: 'Shelf album' },
+          album: { artistNames: 'ODESZA', name: 'Shelf album' },
           plays: 10,
           sessionPlays: 9,
           sessions: 1,
         },
+      ],
+      genres: [
+        { artists: ['ODESZA'], genre: 'chillwave', plays: 14, tracks: 7 },
+        { artists: ['Burna Boy'], genre: 'afrobeats', plays: 4, tracks: 1 },
       ],
       lastPlayedAt: '2024-05-01T20:00:00.000Z',
       minutesPerPlay: 3,
@@ -165,7 +171,7 @@ describe('fetchListeningStats', () => {
       {
         albumImageUrl: 'https://image.test/singles.jpg',
         albumName: 'Singles',
-        artistNames: 'Cached Artist',
+        artistNames: 'ODESZA',
         id: REPEAT_TRACK,
         name: 'Repeat me',
         plays: 4,
@@ -176,7 +182,7 @@ describe('fetchListeningStats', () => {
       {
         id: ARTIST,
         months: 5,
-        name: 'Cached Artist',
+        name: 'ODESZA',
         plays: 14,
         tracks: 7,
         url: 'https://open.spotify.com/artist/cached',
@@ -184,44 +190,53 @@ describe('fetchListeningStats', () => {
       {
         id: GUEST,
         months: 1,
-        name: 'Guest Artist',
+        name: 'Burna Boy',
         plays: 4,
         tracks: 1,
         url: 'https://open.spotify.com/artist/guest',
       },
     ]);
-    expect(stats?.monthlyPlays).toEqual([
-      { month: 11, plays: 1, year: 2023 },
-      { month: 1, plays: 1, year: 2024 },
-      { month: 2, plays: 1, year: 2024 },
-      { month: 3, plays: 10, year: 2024 },
-      { month: 5, plays: 1, year: 2024 },
-    ]);
-    expect(stats?.yearChampions).toEqual([
-      {
-        track: {
-          albumImageUrl: 'https://image.test/singles.jpg',
-          albumName: 'Singles',
-          artistNames: 'Cached Artist',
-          id: REPEAT_TRACK,
-          name: 'Repeat me',
-          plays: 4,
-          url: 'https://open.spotify.com/track/repeat',
+    expect(stats?.timeline).toMatchObject({
+      points: [
+        { key: '2023', label: '2023', plays: 1, tick: '’23', yearFilter: 2023 },
+        { key: '2024', label: '2024', plays: 13, tick: '’24', yearFilter: 2024 },
+      ],
+      title: 'Plays per year',
+    });
+    expect(stats?.matrix).toMatchObject({
+      peakCell: { key: '2024-03', label: 'Mar 2024', plays: 10 },
+      title: 'Every month',
+    });
+    expect(stats?.champions).toEqual({
+      aside: '#1 song each year',
+      entries: [
+        {
+          badge: '2024',
+          key: '2024',
+          track: {
+            albumImageUrl: 'https://image.test/singles.jpg',
+            albumName: 'Singles',
+            artistNames: 'ODESZA',
+            id: REPEAT_TRACK,
+            name: 'Repeat me',
+            plays: 4,
+            url: 'https://open.spotify.com/track/repeat',
+          },
+          yearFilter: 2024,
         },
-        year: 2024,
-      },
-    ]);
+      ],
+      title: 'Soundtrack by year',
+    });
     expect(stats?.depth).toEqual([
-      { months: 5, name: 'Cached Artist', plays: 14, tracks: 7 },
-      { months: 1, name: 'Guest Artist', plays: 4, tracks: 1 },
+      { months: 5, name: 'ODESZA', plays: 14, tracks: 7 },
+      { months: 1, name: 'Burna Boy', plays: 4, tracks: 1 },
     ]);
     expect(stats?.hours[15]).toBe(6);
     expect(stats?.hours[19]).toBe(4);
-    expect(stats?.weekdays).toEqual([0, 7, 3, 1, 1, 1, 1]);
-    await expect(db.MusicArtist.findByPk(GUEST)).resolves.toMatchObject({ name: 'Guest Artist' });
+    await expect(db.MusicArtist.findByPk(GUEST)).resolves.toMatchObject({ name: 'Burna Boy' });
   });
 
-  it('filters stats by specific year while preserving all available years', async () => {
+  it('filters stats by specific year and adapts timeline, matrix, and champions to monthly/weekly granularity', async () => {
     await seedCatalog();
     await db.SpotifyPlay.bulkCreate(
       plays.map((row) => ({ ...row, playedAt: new Date(row.playedAt) })),
@@ -231,9 +246,19 @@ describe('fetchListeningStats', () => {
     expect(stats2024).toMatchObject({
       activeDays: 7,
       activeMonths: 4,
+      champions: {
+        aside: '#1 song each month in 2024',
+        title: 'Soundtrack by month',
+      },
+      matrix: {
+        title: 'Every week of 2024',
+      },
       plays: 13,
       range: { kind: 'year', year: 2024 },
       spanDays: 113,
+      timeline: {
+        title: 'Plays per month, 2024',
+      },
       years: [
         { plays: 1, year: 2023 },
         { plays: 13, year: 2024 },
@@ -254,7 +279,7 @@ describe('fetchListeningStats', () => {
     });
   });
 
-  it('filters stats by rolling week and month windows anchored at the latest play', async () => {
+  it('filters stats by rolling week and month windows and adapts breakdowns to days and shifts', async () => {
     await seedCatalog();
     await db.SpotifyPlay.bulkCreate(
       plays.map((row) => ({ ...row, playedAt: new Date(row.playedAt) })),
@@ -263,20 +288,42 @@ describe('fetchListeningStats', () => {
     const weekStats = await fetchListeningStats({ kind: 'week' });
     expect(weekStats).toMatchObject({
       activeDays: 1,
+      champions: {
+        aside: '#1 song each day',
+        title: 'Soundtrack by day',
+      },
+      matrix: {
+        title: 'Every day & shift',
+      },
       plays: 1,
       range: { kind: 'week' },
       spanDays: 7,
+      timeline: {
+        title: 'Plays per day, last week',
+      },
       tracks: 1,
     });
+    expect(weekStats?.timeline.points).toHaveLength(7);
 
     const monthStats = await fetchListeningStats({ kind: 'month' });
     expect(monthStats).toMatchObject({
       activeDays: 1,
+      champions: {
+        aside: '#1 song each week',
+        title: 'Soundtrack by week',
+      },
+      matrix: {
+        title: 'Every day, last month',
+      },
       plays: 1,
       range: { kind: 'month' },
       spanDays: 30,
+      timeline: {
+        title: 'Plays per day, last month',
+      },
       tracks: 1,
     });
+    expect(monthStats?.timeline.points).toHaveLength(30);
   });
 });
 

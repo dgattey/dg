@@ -16,8 +16,6 @@ import {
   formatYearTick,
   peakHours,
   playsInDayPart,
-  weekdayExtremes,
-  weekdayGroups,
 } from '../listeningStatsFormat';
 
 describe('formatCompact and formatHours', () => {
@@ -143,25 +141,6 @@ describe('dayPartOf', () => {
     const total = DAY_PARTS.reduce((sum, { part }) => sum + playsInDayPart(hours, part), 0);
 
     expect(total).toBe(hours.reduce((sum, plays) => sum + plays, 0));
-  });
-});
-
-describe('weekdays', () => {
-  const weekdays = [10, 20, 30, 40, 15, 5, 8];
-
-  it('groups mid-week, the weekdays either side, and the weekend', () => {
-    expect(weekdayGroups(weekdays)).toEqual([
-      { label: 'Tue to Thu', plays: 90 },
-      { label: 'Mon and Fri', plays: 25 },
-      { label: 'Sat and Sun', plays: 13 },
-    ]);
-  });
-
-  it('names the busiest and quietest days', () => {
-    expect(weekdayExtremes(weekdays)).toEqual({
-      busiest: { name: 'Thursday', plays: 40 },
-      quietest: { name: 'Saturday', plays: 5 },
-    });
   });
 });
 

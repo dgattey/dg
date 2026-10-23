@@ -1,4 +1,4 @@
-/* Listening stats cut paper: stubs, stamps, seals, the record, the podium, the clock, and the flower. */
+/* Listening stats cut paper: stubs, stamps, seals, the record, the podium, and the clock. */
 
 .stats__cut {
   --soft: color-mix(in oklab, var(--on) 68%, var(--pc));
@@ -202,6 +202,44 @@
   font-size: var(--type-title-md);
 }
 
+/* Collage sticker clusters in the open pockets beneath Every month and Depth and loyalty */
+.stats__pocketCluster {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) auto minmax(0, 1.15fr);
+  gap: 16px 22px;
+  align-items: center;
+  padding: 6px 8px 2px;
+}
+.stats__pocketStub {
+  width: 100%;
+}
+.stats__pocketStub .stats__ticket > .stats__face {
+  gap: 3px;
+  min-height: 112px;
+  padding: 16px 18px 16px 36px;
+}
+.stats__pocketStub .stats__ticket > .stats__face::before {
+  left: 19px;
+}
+.stats__pocketStub .stats__stamp > .stats__face {
+  gap: 3px;
+  min-height: 106px;
+  padding: 14px 16px;
+}
+.stats__pocketNumber {
+  font: 800 var(--type-title-md) / 1.05 var(--display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+.stats__pocketSeal {
+  justify-self: center;
+  width: 152px;
+}
+.stats__pocketSealVal {
+  font: 800 var(--type-h2) / 1 var(--display);
+  font-variant-numeric: tabular-nums;
+}
+
 /* The record */
 .stats__vinyl {
   display: block;
@@ -383,12 +421,67 @@
   text-align: left;
 }
 
-/* Pin tag on clock card */
+/* Corner stamps, tickets, and seals on lower cards */
 .stats__pin {
   position: absolute;
   top: -16px;
   right: 26px;
   z-index: 3;
+}
+.stats__cardStamp {
+  position: absolute;
+  top: -18px;
+  right: 22px;
+  z-index: 3;
+}
+.stats__cardStamp .stats__stamp {
+  --bite: 4px;
+}
+.stats__cardStamp .stats__stamp > .stats__face {
+  gap: 2px;
+  min-height: 0;
+  padding: 8px 14px;
+  text-align: center;
+}
+.stats__cardStamp .stats__ticket {
+  mask:
+    radial-gradient(circle 7px at 0 50%, #0000 96%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle 7px at 100% 50%, #0000 96%, #000) right / 51% 100% no-repeat;
+}
+.stats__cardStamp .stats__ticket > .stats__face {
+  gap: 2px;
+  min-height: 0;
+  padding: 9px 14px 9px 24px;
+}
+.stats__cardStamp .stats__ticket > .stats__face::before {
+  inset-block: 6px;
+  left: 12px;
+}
+.stats__cardStampKicker {
+  font: 700 var(--type-micro) / 1.1 var(--display);
+  color: var(--soft);
+  white-space: nowrap;
+}
+.stats__cardStampValue {
+  font: 800 var(--type-caption) / 1.15 var(--display);
+  font-variant-numeric: tabular-nums;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+.stats__cardSeal {
+  position: absolute;
+  top: -28px;
+  right: 16px;
+  z-index: 3;
+  width: 108px;
+}
+.stats__cardSealTop {
+  font: 800 var(--type-caption) / 1.05 var(--display);
+  font-variant-numeric: tabular-nums;
+}
+.stats__cardSealSub {
+  font: 700 var(--type-micro) / 1.1 var(--display);
+  color: var(--soft);
 }
 
 /* A day of listening */
@@ -447,52 +540,6 @@
 .stats__clockValue {
   font-weight: 700;
   fill: var(--vermilion);
-}
-
-/* Day of week: the key drops under the flower once its rows no longer fit beside it. */
-.stats__weekBody {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 22px;
-  align-items: center;
-  justify-content: center;
-  margin-top: 12px;
-}
-.stats__flower {
-  display: block;
-  flex: 0 0 172px;
-  width: 100%;
-  height: auto;
-  overflow: visible;
-}
-.stats__petalGroup {
-  cursor: pointer;
-  transition: opacity 200ms ease;
-}
-.stats__petal {
-  fill: var(--part);
-  stroke: color-mix(in oklab, var(--on) 28%, transparent);
-  stroke-width: 1;
-  transform-origin: 0 0;
-  transition:
-    transform 300ms cubic-bezier(0.22, 1, 0.36, 1),
-    fill 200ms ease;
-}
-.stats__petalGroup--active .stats__petal {
-  fill: var(--ochre);
-  transform: scale(1.1);
-}
-.stats__petalGroup--dim {
-  opacity: 0.5;
-}
-.stats__petalDay {
-  font: 600 var(--type-meta) / 1.35 var(--body);
-  dominant-baseline: central;
-  text-anchor: middle;
-  fill: var(--on);
-}
-.stats__flowerHeart {
-  fill: var(--ochre);
 }
 
 /* Front to back */
@@ -576,6 +623,10 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 20px 14px;
   }
+  .stats__pocketCluster {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+  }
   .stats__ticket > .stats__face {
     min-height: 118px;
     padding: 16px 16px 16px 32px;
@@ -636,19 +687,16 @@
   .stats__clock {
     max-width: 300px;
   }
-  .stats__flower {
-    flex-basis: 200px;
-    max-width: 200px;
-  }
   .stats__shifts {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    justify-self: stretch;
-  }
-  .stats__splitKey {
     justify-self: stretch;
   }
   .stats__ritualSticker {
     right: -18px;
     width: 58px;
+  }
+  .stats__cardStamp,
+  .stats__cardSeal {
+    display: none;
   }
 }

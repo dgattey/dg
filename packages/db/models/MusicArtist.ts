@@ -14,4 +14,11 @@ export class MusicArtist extends Model {
 
   @Column({ allowNull: true, type: DataType.STRING })
   declare url: string | null;
+
+  @Column({
+    allowNull: false,
+    defaultValue: [],
+    type: DataType.ARRAY(DataType.STRING),
+  })
+  declare genres: Array<string>;
 }

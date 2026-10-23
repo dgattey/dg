@@ -7,37 +7,110 @@ import { log } from '@dg/shared-core/logging/log';
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import * as v from 'valibot';
 import { fetchAlbumDetail } from './fetchAlbumDetail';
-import type { StatsAlbum, StatsTopTrack, StatsYearChampion } from './fetchListeningStats';
+import type {
+  ListeningStats,
+  StatsAlbum,
+  StatsTopArtist,
+  StatsTopTrack,
+} from './fetchListeningStats';
 import type { TrackDisplay } from './trackDisplays';
 import { spotifyGet } from './trackMetadataShared';
 
+const MAX_SPOTIFY_ARTIST_FETCHES = 8;
+
 const artistSchema = v.looseObject({
   external_urls: v.looseObject({ spotify: v.string() }),
+  genres: v.optional(v.array(v.string())),
   id: v.string(),
   name: v.string(),
 });
 
+const artistsBatchSchema = v.looseObject({
+  artists: v.array(v.nullable(artistSchema)),
+});
+
+export type ResolvedArtist = {
+  genres: ReadonlyArray<string>;
+  name: string;
+  url: string;
+};
+
 export async function resolveArtists(
   artistIds: Array<string>,
-): Promise<Map<string, { name: string; url: string }>> {
-  const cached = await MusicArtist.findAll({ where: { id: { [Op.in]: artistIds } } });
-  const artists = new Map(
-    cached.map((artist) => [artist.id, { name: artist.name, url: artist.url ?? '' }]),
+): Promise<Map<string, ResolvedArtist>> {
+  const uniqueIds = [...new Set(artistIds)];
+  if (uniqueIds.length === 0) {
+    return new Map();
+  }
+  const cached = await MusicArtist.findAll({ where: { id: { [Op.in]: uniqueIds } } });
+  const artists = new Map<string, ResolvedArtist>(
+    cached.map((artist) => [
+      artist.id,
+      { genres: artist.genres ?? [], name: artist.name, url: artist.url ?? '' },
+    ]),
   );
-  const fetched: Array<{ id: string; name: string; url: string }> = [];
-  for (const id of artistIds.filter((artistId) => !artists.has(artistId))) {
+
+  const fetched: Array<{ genres: Array<string>; id: string; name: string; url: string }> = [];
+  const missingIds = uniqueIds
+    .filter((artistId) => !artists.has(artistId))
+    .slice(0, MAX_SPOTIFY_ARTIST_FETCHES);
+
+  for (const id of missingIds) {
     try {
       const result = await spotifyGet(`artists/${id}`, artistSchema, 'stats artist');
       if (result.success) {
-        fetched.push({ id, name: result.data.name, url: result.data.external_urls.spotify });
+        fetched.push({
+          genres: result.data.genres ?? [],
+          id,
+          name: result.data.name,
+          url: result.data.external_urls.spotify,
+        });
       }
     } catch (error) {
       log.warn('Failed to fetch artist for listening stats', { error, id });
     }
   }
-  await MusicArtist.bulkCreate(fetched, { ignoreDuplicates: true });
-  for (const artist of fetched) {
-    artists.set(artist.id, { name: artist.name, url: artist.url });
+
+  if (
+    process.env.NODE_ENV !== 'test' &&
+    cached.length > 0 &&
+    cached.every((artist) => (artist.genres ?? []).length === 0)
+  ) {
+    const batchIds = uniqueIds.slice(0, 50);
+    try {
+      const batchResult = await spotifyGet(
+        `artists?ids=${batchIds.join(',')}`,
+        artistsBatchSchema,
+        'stats artists batch',
+      );
+      if (batchResult.success) {
+        for (const item of batchResult.data.artists) {
+          if (item) {
+            fetched.push({
+              genres: item.genres ?? [],
+              id: item.id,
+              name: item.name,
+              url: item.external_urls.spotify,
+            });
+          }
+        }
+      }
+    } catch (error) {
+      log.warn('Failed to batch-fetch artist genres for listening stats', { error });
+    }
+  }
+
+  if (fetched.length > 0) {
+    await MusicArtist.bulkCreate(fetched, {
+      updateOnDuplicate: ['genres', 'name', 'url'],
+    });
+    for (const artist of fetched) {
+      artists.set(artist.id, {
+        genres: artist.genres,
+        name: artist.name,
+        url: artist.url,
+      });
+    }
   }
   return artists;
 }
@@ -121,24 +194,81 @@ export function toStatsTopTrack(
     : null;
 }
 
-export function buildYearChampions({
+export function mapCatalogSlices({
+  albums,
+  artistMap,
+  onRepeat,
+  sessions,
+  shownAlbums,
+  shownTracks,
+  topDepthRows,
   tracks,
-  yearlyTopTracks,
-  years,
 }: {
+  albums: ReadonlyMap<string, StatsAlbum>;
+  artistMap: ReadonlyMap<string, ResolvedArtist>;
+  onRepeat: ReadonlyArray<{ period: string; plays: number; trackId: string }>;
+  sessions: ReadonlyArray<{
+    albumId: string;
+    plays: number;
+    sessionPlays: number;
+    sessions: number;
+  }>;
+  shownAlbums: ReadonlyArray<{ albumId: string; plays: number }>;
+  shownTracks: ReadonlyArray<{ plays: number; trackId: string }>;
+  topDepthRows: ReadonlyArray<{ artistId: string; months: number; plays: number; tracks: number }>;
   tracks: ReadonlyMap<string, TrackDisplay>;
-  yearlyTopTracks: ReadonlyArray<{ plays: number; trackId: string; year: number }>;
-  years: ReadonlyArray<{ bucket: number; plays: number }>;
-}): Array<StatsYearChampion> {
-  const tracksByYear = new Map(yearlyTopTracks.map((row) => [row.year, row]));
-  return [...years]
-    .sort((a, b) => b.bucket - a.bucket)
-    .map(({ bucket: year }) => {
-      const topTrackRow = tracksByYear.get(year);
-      const track = topTrackRow
-        ? toStatsTopTrack(tracks, topTrackRow.trackId, topTrackRow.plays)
+}): Pick<
+  ListeningStats,
+  'depth' | 'frontToBack' | 'onRepeat' | 'topAlbums' | 'topArtists' | 'topTracks'
+> {
+  const topArtists: Array<StatsTopArtist> = topDepthRows
+    .map(({ artistId, months, plays, tracks: artistTracks }) => {
+      const artist = artistMap.get(artistId);
+      return artist
+        ? { id: artistId, months, name: artist.name, plays, tracks: artistTracks, url: artist.url }
         : null;
-      return track ? { track, year } : null;
     })
     .filter(isNotNullish);
+
+  return {
+    depth: topArtists.map(({ months, name, plays, tracks: artistTracks }) => ({
+      months,
+      name,
+      plays,
+      tracks: artistTracks,
+    })),
+    frontToBack: sessions
+      .map(({ albumId, plays, sessionPlays, sessions: count }) => {
+        const album = albums.get(albumId);
+        return album ? { album, plays, sessionPlays, sessions: count } : null;
+      })
+      .filter(isNotNullish),
+    onRepeat: onRepeat
+      .map(({ period, plays, trackId }) => {
+        const track = tracks.get(trackId);
+        return track
+          ? {
+              plays,
+              track: {
+                artistNames: track.artistNames,
+                id: track.id,
+                name: track.name,
+                url: track.url,
+              },
+              week: period,
+            }
+          : null;
+      })
+      .filter(isNotNullish),
+    topAlbums: shownAlbums
+      .map(({ albumId, plays }) => {
+        const album = albums.get(albumId);
+        return album ? { album, plays } : null;
+      })
+      .filter(isNotNullish),
+    topArtists,
+    topTracks: shownTracks
+      .map(({ plays, trackId }) => toStatsTopTrack(tracks, trackId, plays))
+      .filter(isNotNullish),
+  };
 }
