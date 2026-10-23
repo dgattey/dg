@@ -25,6 +25,11 @@ export function StravaCard({ history }: { history: StravaHistory | null }) {
   return (
     <div className="home__strava" data-slot="st" style={{ gridArea: 'st' }}>
       <div className="home__stravaAtlas collageLift">
+        <h2 className="home__stravaHeading">
+          <PaperTag className="collageEyebrow" tiltDeg={-4} tone="viridian">
+            Exercise stats
+          </PaperTag>
+        </h2>
         <PageTransitionLink className="home__stravaAtlasLink" href={stravaRoute} title="Big map">
           <PaperCard edge="quad-c" innerClassName="home__stravaAtlasMat" tiltDeg={3}>
             <span aria-hidden="true" className="home__stravaMap">

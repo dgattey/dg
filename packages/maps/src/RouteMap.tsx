@@ -2,13 +2,13 @@
 
 import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
+import { COLOR_SCHEME_ATTRIBUTE } from '@dg/ui/theme/colorScheme';
 import type { Point, TileComponentProps } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
 import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import type { FramedPath, RouteFrame } from './routeFrame';
-import { getRouteMapTokens } from './routeMapTokens';
+import { ROUTE_MAP_TOKENS } from './routeMapTokens';
 import { stadiaTileUrl, type TileSource } from './tileSource';
-import { useDarkMap } from './useDarkMap';
 
 const tileImageStyle: CSSProperties = {
   display: 'block',
@@ -16,7 +16,7 @@ const tileImageStyle: CSSProperties = {
   width: '100%',
 };
 
-/** A single-layer tile with a fade that keeps theme changes from flashing. */
+/** Lazy, so the hidden scheme's tiles never load until that scheme shows. */
 function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
   return (
     <div
@@ -31,7 +31,14 @@ function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
         width: tile.width,
       }}
     >
-      <img alt="" onLoad={tileLoaded} src={tile.url} srcSet={tile.srcSet} style={tileImageStyle} />
+      <img
+        alt=""
+        loading="lazy"
+        onLoad={tileLoaded}
+        src={tile.url}
+        srcSet={tile.srcSet}
+        style={tileImageStyle}
+      />
     </div>
   );
 }
@@ -56,6 +63,22 @@ const routeSvgSx: SxObject = {
   top: 0,
   width: '100%',
   zIndex: 3,
+};
+
+const SCHEMES = ['light', 'dark'] as const;
+
+const schemeLayerSx = (scheme: (typeof SCHEMES)[number]): SxObject => {
+  const dark = scheme === 'dark';
+  const showDark = { display: dark ? 'block' : 'none' };
+  return {
+    display: dark ? 'none' : 'block',
+    inset: 0,
+    position: 'absolute',
+    [`html[${COLOR_SCHEME_ATTRIBUTE}="dark"] &`]: showDark,
+    '@media (prefers-color-scheme: dark)': {
+      [`html:not([${COLOR_SCHEME_ATTRIBUTE}="light"]) &`]: showDark,
+    },
+  };
 };
 
 function tileCoordinates([latitude, longitude]: Point, zoom: number) {
@@ -111,17 +134,14 @@ type RouteMapProps = {
  * A non-interactive, theme-aware map for card backgrounds, inking paths the
  * server already projected into `frame`. The frame scales to cover the card,
  * and the tiles zoom by the same factor so the ink stays registered to them.
+ * Hosts that render text over the map must back their own text regions.
  */
 export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ height: frame.height, width: frame.width });
-  const dark = useDarkMap();
-  const tokens = getRouteMapTokens(dark);
   const zoom =
     frame.zoom + Math.log2(Math.max(size.width / frame.width, size.height / frame.height));
   const underlayTile = tileCoordinates(frame.center, zoom);
-  const provider = (x: number, y: number, zoom: number, dpr?: number) =>
-    tileUrl({ dark, dpr, tileSource, x, y, zoom });
 
   useEffect(() => {
     const element = containerRef.current;
@@ -142,7 +162,6 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
   }, []);
 
   const containerSx: SxObject = {
-    backgroundColor: tokens.containerBackground,
     height: '100%',
     // Groups the underlay, tiles, scrim and route into one layer so none of them
     // can paint above whatever the host renders over the map.
@@ -153,66 +172,69 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
     width: '100%',
   };
 
-  const tileLayerSx: SxObject = {
-    // Pigeon paints its own opaque background, which would hide the placeholder.
-    '& > div': {
-      backgroundColor: 'transparent !important',
-      // Pigeon re-measures its root with getBoundingClientRect, which grows under a
-      // rotated collage card and feeds back into its own inline size every frame.
-      height: '100% !important',
-      width: '100% !important',
-    },
-    filter: tokens.tileFilter,
-    inset: 0,
-    position: 'absolute',
-    zIndex: 1,
-  };
-
-  /**
-   * A mild, near-uniform knock-back that sets how present the basemap feels.
-   * Legibility is the host's job: whatever renders text over this map is expected
-   * to back its own text regions, since only it knows where the copy sits.
-   */
-  const scrimSx: SxObject = {
-    background: tokens.scrimGradient,
-    inset: 0,
-    position: 'absolute',
-    zIndex: 2,
-  };
-
   return (
     <Box aria-hidden="true" ref={containerRef} sx={containerSx}>
-      <Box
-        alt=""
-        component="img"
-        src={tileUrl({
-          dark,
-          tileSource,
-          x: underlayTile.x,
-          y: underlayTile.y,
-          zoom: underlayTile.zoom,
-        })}
-        sx={underlaySx}
-      />
-      <Box sx={tileLayerSx}>
-        <PigeonMapCore
-          animate={false}
-          attribution={false}
-          center={frame.center}
-          dprs={[1, 2]}
-          height={size.height}
-          // Pigeon only reads width/height in its constructor, so remount on resize.
-          key={`${Math.round(size.width)}x${Math.round(size.height)}`}
-          mouseEvents={false}
-          provider={provider}
-          tileComponent={SmoothTile}
-          touchEvents={false}
-          width={size.width}
-          zoom={zoom}
-          zoomSnap={false}
-        />
-      </Box>
-      <Box sx={scrimSx} />
+      {SCHEMES.map((scheme) => {
+        const dark = scheme === 'dark';
+        const tokens = ROUTE_MAP_TOKENS[scheme];
+        const tileLayerSx: SxObject = {
+          // Pigeon paints its own opaque background, which would hide the placeholder.
+          '& > div': {
+            backgroundColor: 'transparent !important',
+            // Pigeon re-measures its root with getBoundingClientRect, which grows under a
+            // rotated collage card and feeds back into its own inline size every frame.
+            height: '100% !important',
+            width: '100% !important',
+          },
+          filter: tokens.tileFilter,
+          inset: 0,
+          position: 'absolute',
+          zIndex: 1,
+        };
+        const scrimSx: SxObject = {
+          background: tokens.scrimGradient,
+          inset: 0,
+          position: 'absolute',
+          zIndex: 2,
+        };
+        return (
+          <Box key={scheme} sx={{ ...schemeLayerSx(scheme), backgroundColor: tokens.background }}>
+            <Box
+              alt=""
+              component="img"
+              loading="lazy"
+              src={tileUrl({
+                dark,
+                tileSource,
+                x: underlayTile.x,
+                y: underlayTile.y,
+                zoom: underlayTile.zoom,
+              })}
+              sx={underlaySx}
+            />
+            <Box sx={tileLayerSx}>
+              <PigeonMapCore
+                animate={false}
+                attribution={false}
+                center={frame.center}
+                dprs={[1, 2]}
+                height={size.height}
+                key={`${Math.round(size.width)}x${Math.round(size.height)}`}
+                mouseEvents={false}
+                provider={(x, y, tileZoom, dpr) =>
+                  tileUrl({ dark, dpr, tileSource, x, y, zoom: tileZoom })
+                }
+                tileComponent={SmoothTile}
+                touchEvents={false}
+                width={size.width}
+                zoom={zoom}
+                zoomSnap={false}
+              />
+            </Box>
+            <Box sx={scrimSx} />
+          </Box>
+        );
+      })}
       <Box
         component="svg"
         preserveAspectRatio="xMidYMid slice"
@@ -225,7 +247,7 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
             d={d}
             fill="none"
             key={`casing-${tone}`}
-            stroke={tokens.casingStroke}
+            stroke={`light-dark(${ROUTE_MAP_TOKENS.light.casingStroke}, ${ROUTE_MAP_TOKENS.dark.casingStroke})`}
             strokeLinecap="round"
             strokeLinejoin="round"
             strokeWidth={strokeWidth + 2.5}

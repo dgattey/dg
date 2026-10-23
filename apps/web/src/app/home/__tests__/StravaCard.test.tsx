@@ -125,6 +125,7 @@ describe('StravaCard', () => {
   it('opens the atlas from a map of the routes around home, counting every route', () => {
     renderCard(history);
 
+    expect(screen.getByRole('heading', { name: 'Exercise stats' })).toBeInTheDocument();
     const atlas = screen.getByRole('link', { name: 'Big map' });
     expect(atlas).toHaveAttribute('href', '/strava');
     expect(inkedTones(atlas)).toEqual(['cobalt', 'vermilion']);
