@@ -214,6 +214,15 @@
   align-items: start;
   padding-top: 44px;
 }
+.home__stravaHeading {
+  position: absolute;
+  top: -18px;
+  left: 14px;
+  z-index: 4;
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
 .home__stravaAtlas {
   position: relative;
   z-index: 1;
@@ -237,8 +246,8 @@
   border-radius: var(--nested-radius);
 }
 .home__stravaRoutes {
-  top: -14px;
-  left: 18px;
+  right: 26px;
+  bottom: -12px;
 }
 .stats__cut.home__stravaTotal {
   position: absolute;
@@ -587,6 +596,9 @@
   }
   .stats__cut.home__stravaTotal {
     right: -6px;
+  }
+  .home__stravaRoutes {
+    right: -4px;
   }
   .stats__cut.home__stravaWhen {
     width: 120px;
