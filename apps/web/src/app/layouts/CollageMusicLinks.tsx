@@ -64,15 +64,22 @@ function bindMusicMenu(details: HTMLDetailsElement | null) {
       setOpen(false);
     }
   };
+  const closeOnLinkClick = (event: MouseEvent) => {
+    if (event.target instanceof Element && event.target.closest('a[href]')) {
+      setOpen(false);
+    }
+  };
 
   details.addEventListener('pointerenter', enter);
   details.addEventListener('pointerleave', leave);
+  details.addEventListener('click', closeOnLinkClick);
   summary.addEventListener('click', keepHoverOpen);
   document.addEventListener('keydown', closeOnEscape);
   document.addEventListener('pointerdown', closeOnOutsidePress);
   return () => {
     details.removeEventListener('pointerenter', enter);
     details.removeEventListener('pointerleave', leave);
+    details.removeEventListener('click', closeOnLinkClick);
     summary.removeEventListener('click', keepHoverOpen);
     document.removeEventListener('keydown', closeOnEscape);
     document.removeEventListener('pointerdown', closeOnOutsidePress);
@@ -82,7 +89,7 @@ function bindMusicMenu(details: HTMLDetailsElement | null) {
 /**
  * Music → destinations submenu. `<details>` owns the open state so the menu opens and
  * its links work without script; script opens it on mouse hover, and closes it on
- * outside press and Escape. Keying on the path remounts it closed after every navigation.
+ * link click, outside press, and Escape.
  */
 export function CollageMusicLinks() {
   const pathname = normalizeMusicPath(usePathname() ?? '/');
@@ -91,7 +98,7 @@ export function CollageMusicLinks() {
 
   return (
     <>
-      <details className="chrome__music" key={pathname} ref={bindMusicMenu}>
+      <details className="chrome__music" ref={bindMusicMenu}>
         <summary className="chrome__musicSummary collageLift">
           <PaperButtonFace current={onMusicPage} tiltDeg={-2}>
             Music

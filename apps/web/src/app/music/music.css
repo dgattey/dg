@@ -27,6 +27,9 @@
   width: min(100%, 1120px);
   margin-inline: auto;
 }
+.music__albumsLayout > .collagePageTitle {
+  grid-area: title;
+}
 .music__sort {
   grid-area: sort;
   justify-self: end;

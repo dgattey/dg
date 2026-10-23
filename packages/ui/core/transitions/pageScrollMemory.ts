@@ -12,7 +12,17 @@ type PageOrigin = {
 
 let origin: PageOrigin | null = null;
 
+export function setViewTransitionScrollOffset(scrollY = window.scrollY) {
+  if (typeof document !== 'undefined') {
+    document.documentElement.style.setProperty(
+      '--vt-scroll-offset',
+      `${Math.max(0, Math.round(scrollY))}px`,
+    );
+  }
+}
+
 export function rememberPageOrigin(pathname: string) {
+  setViewTransitionScrollOffset(window.scrollY);
   origin = { pathname, scrollY: window.scrollY };
 }
 

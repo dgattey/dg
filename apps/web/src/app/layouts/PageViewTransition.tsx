@@ -5,6 +5,7 @@ import { pageViewTransitionProps } from '@dg/ui/core/transitions/pageTransitions
 import { usePathname } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { useLayoutEffect, ViewTransition } from 'react';
+import { syncFooterRevealProgress } from './FooterRevealScroll';
 
 /**
  * Gives each route its own view transition boundary. Keying by pathname is
@@ -20,6 +21,7 @@ export function PageViewTransition({ children }: { children: ReactNode }) {
     if (scrollY !== null) {
       window.scrollTo({ behavior: 'instant', top: scrollY });
     }
+    syncFooterRevealProgress();
   }, [pathname]);
 
   return (

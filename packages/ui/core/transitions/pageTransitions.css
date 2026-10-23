@@ -45,30 +45,6 @@
 }
 
 /*
- * The heading morphs between pages, so it paints above both pages for the
- * whole trip. Sizing both snapshots to the group makes the two type scales
- * grow into each other rather than one text stretching over the other.
- */
-::view-transition-group(page-title) {
-  z-index: 200;
-  animation-duration: var(--timing-medium);
-  animation-timing-function: var(--easing-snappy);
-}
-
-::view-transition-old(page-title) {
-  opacity: 0;
-  animation: none;
-}
-
-::view-transition-new(page-title) {
-  width: auto;
-  block-size: 100%;
-  object-fit: contain;
-  opacity: 1;
-  animation: none;
-}
-
-/*
  * Album art travels between its grid cell and the expanded well. It has to
  * clear the well's own surface, which is painted by the page group underneath.
  */

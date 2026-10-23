@@ -56,3 +56,16 @@ export const pageViewTransitionProps = {
     default: 'none',
   },
 } as const;
+
+/**
+ * Scopes an in-page `<ViewTransition>` (such as filter pill updates on `/reading`
+ * or `/music/stats`) so it stays `none` during `page-open` and `page-close`
+ * route navigations instead of measuring and animating nested groups mid-flight.
+ */
+export function inPageViewTransitionProps(className: string) {
+  return {
+    [PAGE_TRANSITION_TYPES.close]: 'none',
+    [PAGE_TRANSITION_TYPES.open]: 'none',
+    default: className,
+  } as const;
+}

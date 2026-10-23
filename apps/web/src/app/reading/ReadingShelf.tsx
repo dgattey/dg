@@ -1,6 +1,7 @@
 'use client';
 
 import type { RenderableBook } from '@dg/content-models/contentful/renderables/books';
+import { inPageViewTransitionProps } from '@dg/ui/core/transitions/pageTransitions';
 import { startTransition, useState, ViewTransition } from 'react';
 import { collageCardTreatment } from '../collage/collageCardTreatment';
 import { PaperPills } from '../collage/PaperPills';
@@ -20,7 +21,7 @@ import {
 } from './readingHelpers';
 
 /** Shared view-transition class, so every moving piece of the shelf runs on one clock. */
-const SHELF_TRANSITION = 'reading-shelf';
+const SHELF_TRANSITION = inPageViewTransitionProps('reading-shelf');
 
 const YEAR_TAGS = [
   { tiltDeg: -3, tone: 'cream' },
