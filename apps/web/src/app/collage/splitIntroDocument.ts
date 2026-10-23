@@ -4,7 +4,7 @@ import {
 } from '@dg/content-models/contentful/renderables/richText';
 import { isRecord } from '@dg/shared-core/types/typeguards';
 
-export type SplitIntroDocument = {
+type SplitIntroDocument = {
   headline: string | null;
   remainder: RenderableRichTextContent;
 };

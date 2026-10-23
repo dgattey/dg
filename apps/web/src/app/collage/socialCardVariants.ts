@@ -54,7 +54,7 @@ function extractIntroExcerpt(remainder: RenderableRichTextContent): string | nul
  * Satori can't decode the WebP the homepage serves, so the card asks Contentful
  * for a JPEG, cropped to the target box at 2x rather than the full original.
  */
-export function toJpegUrl(
+function toJpegUrl(
   contentfulImageUrl: string,
   width = PORTRAIT.width * 2,
   height = PORTRAIT.height * 2,

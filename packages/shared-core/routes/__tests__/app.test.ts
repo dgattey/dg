@@ -10,7 +10,6 @@ import {
   markdownPagePaths,
   markdownPages,
   markdownPathToHtmlPath,
-  tryHtmlPathToMarkdownPath,
 } from '../app';
 
 describe('markdown page registry', () => {
@@ -22,7 +21,7 @@ describe('markdown page registry', () => {
     expect(htmlPathToMarkdownPath('/strava')).toBe('/strava.md');
     expect(htmlPathToMarkdownPath('/changelog')).toBe('/changelog.md');
     expect(htmlPathToMarkdownPath('/site-map')).toBe('/site-map.md');
-    expect(tryHtmlPathToMarkdownPath('/dev-console')).toBeNull();
+    expect(isMarkdownPagePath('/dev-console')).toBe(false);
   });
 
   it('maps .md paths back to html', () => {

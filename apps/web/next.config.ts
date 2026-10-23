@@ -118,7 +118,6 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_APP_VERSION: resolveBuildVersion(),
   },
   experimental: {
-    authInterrupts: true,
     inlineCss: true,
     scrollRestoration: true,
     serverActions: {

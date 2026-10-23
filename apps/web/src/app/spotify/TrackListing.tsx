@@ -1,6 +1,5 @@
 import type { Track } from '@dg/content-models/spotify/Track';
 import { Box } from '@dg/ui/core/Box';
-import { Card } from '@dg/ui/core/Card';
 import { Stack } from '@dg/ui/core/Stack';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
@@ -91,7 +90,7 @@ function CompactLayout({ track, disableLinks }: { track: Track; disableLinks?: b
   const trackUrl = track.externalUrls.spotify;
 
   const albumArtCard = (
-    <Card data-album-art sx={compactAlbumCardSx}>
+    <Box data-album-art sx={compactAlbumCardSx}>
       <Image
         alt={albumTitle}
         fill={true}
@@ -100,7 +99,7 @@ function CompactLayout({ track, disableLinks }: { track: Track; disableLinks?: b
         url={albumImageUrl}
         width={COMPACT_THUMBNAIL_SIZE}
       />
-    </Card>
+    </Box>
   );
 
   return (
@@ -130,7 +129,6 @@ function CompactLayout({ track, disableLinks }: { track: Track; disableLinks?: b
       <Box sx={compactTextWrapperSx}>
         <Stack sx={compactTextStackSx}>
           <PlaybackStatus
-            animating={isPlaying}
             color={COLLAGE_TRACK_COLORS.primary}
             isPlaying={track.isPlaying}
             listingVariant="compact"

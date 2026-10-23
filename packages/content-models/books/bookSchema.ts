@@ -35,7 +35,7 @@ export type BookMutationInput = {
   title: string;
 };
 
-export type ValidatedBooksSyncPayload = {
+type ValidatedBooksSyncPayload = {
   booksToUpsert: Array<BookMutationInput>;
   deletedIdsToProcess: Array<string>;
 };
@@ -133,7 +133,7 @@ const coverImageBase64Schema = v.pipe(
 );
 const coverImageContentTypeSchema = v.picklist(ALLOWED_COVER_IMAGE_CONTENT_TYPES, contentTypeErr);
 
-export const bookMutationInputSchema = v.pipe(
+const bookMutationInputSchema = v.pipe(
   v.looseObject(
     {
       author: maxStr('author', MAX_BOOK_AUTHOR_LENGTH, true),

@@ -40,7 +40,6 @@ export function ReadingHero({
         <CutOut key={placement.id} placement={placement} />
       ))}
       <PaperCard
-        className="reading__feature"
         edge="soft-a"
         innerClassName="reading__featureInner"
         tag={

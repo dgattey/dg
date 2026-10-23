@@ -3,24 +3,33 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ServerActionButton } from '../ServerActionButton';
 
+const refresh = jest.fn();
+
+jest.mock('next/navigation', () => ({
+  useRouter: () => ({ refresh }),
+}));
+
 describe('ServerActionButton', () => {
-  it('handles loading and success behavior', async () => {
+  beforeEach(() => {
+    refresh.mockClear();
+  });
+
+  it('handles loading, message display, and optional router refresh on success', async () => {
     const user = userEvent.setup();
-    let resolveAction: ((result: { success: boolean }) => void) | undefined;
+    let resolveAction: ((result: { message?: string; success: boolean }) => void) | undefined;
     const action = jest.fn(
       () =>
-        new Promise<{ success: boolean }>((resolve) => {
+        new Promise<{ message?: string; success: boolean }>((resolve) => {
           resolveAction = resolve;
         }),
     );
-    const onSuccess = jest.fn();
 
     render(
       <ServerActionButton
         action={action}
         label="Force refresh token"
         loadingLabel="Refreshing..."
-        onSuccess={onSuccess}
+        refreshOnSuccess
       />,
     );
 
@@ -28,11 +37,12 @@ describe('ServerActionButton', () => {
 
     expect(screen.getByRole('button', { name: 'Refreshing...' })).toBeDisabled();
     invariant(resolveAction, 'Expected the server action to start');
-    resolveAction({ success: true });
+    resolveAction({ message: '203 added, 2 updated, 2 pages read.', success: true });
 
     await waitFor(() => {
-      expect(onSuccess).toHaveBeenCalledTimes(1);
+      expect(refresh).toHaveBeenCalledTimes(1);
       expect(screen.getByRole('button', { name: 'Force refresh token' })).toBeEnabled();
+      expect(screen.getByText('203 added, 2 updated, 2 pages read.')).toBeInTheDocument();
     });
   });
 

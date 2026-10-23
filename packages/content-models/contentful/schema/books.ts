@@ -4,7 +4,7 @@ import { assetSchema } from './shared';
 /**
  * Schema for a Book entry returned by the Contentful GraphQL API.
  */
-export const bookSchema = v.looseObject({
+const bookSchema = v.looseObject({
   author: v.optional(v.nullable(v.string())),
   isbn13: v.optional(v.nullable(v.number())),
   rating: v.optional(v.nullable(v.number())),
@@ -40,4 +40,3 @@ export const booksResponseSchema = v.looseObject({
 });
 
 export type Book = v.InferOutput<typeof bookSchema>;
-export type BooksResponse = v.InferOutput<typeof booksResponseSchema>;

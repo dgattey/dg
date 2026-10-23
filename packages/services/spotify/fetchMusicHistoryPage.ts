@@ -9,7 +9,7 @@ import { resolveTrackDisplays } from './trackDisplays';
  * Lightweight history track for UI rendering.
  * Uses valibot for schema definition and runtime validation.
  */
-export const historyTrackSchema = v.object({
+const historyTrackSchema = v.object({
   albumId: v.string(),
   albumImageUrl: v.string(),
   albumName: v.string(),

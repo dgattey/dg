@@ -114,16 +114,12 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
   );
 }
 
-function usePublishNowPlaying(track: Track) {
+/** Publishes a freshly fetched track without rendering anything. */
+export function PublishNowPlaying({ track }: { track: Track }) {
   const publish = useContext(NowPlayingContext)?.publish;
   useEffect(() => {
     publish?.(track);
   }, [publish, track]);
-}
-
-/** Publishes a freshly fetched track without rendering anything. */
-export function PublishNowPlaying({ track }: { track: Track }) {
-  usePublishNowPlaying(track);
   return null;
 }
 

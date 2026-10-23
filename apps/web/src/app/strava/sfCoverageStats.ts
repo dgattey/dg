@@ -16,7 +16,7 @@ export type SfNeighborhoodCoverage = {
   share: number;
 };
 
-export type SfCoverageSummary = {
+type SfCoverageSummary = {
   /** Alphabetical, matching `SfStreetCoverage.neighborhoods`. */
   neighborhoods: ReadonlyArray<SfNeighborhoodCoverage>;
   /** Most covered first, ties alphabetical. */

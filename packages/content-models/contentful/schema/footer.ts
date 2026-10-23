@@ -1,7 +1,7 @@
 import * as v from 'valibot';
 import { linkSchema, textBlockSchema } from './shared';
 
-export const footerBlockSchema = v.union([textBlockSchema, linkSchema]);
+const footerBlockSchema = v.union([textBlockSchema, linkSchema]);
 
 /**
  * Schema for footer blocks (TextBlock description + Link items).

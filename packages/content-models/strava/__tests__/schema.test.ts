@@ -1,17 +1,75 @@
-import { safeParse } from 'valibot';
-import { stravaActivityApiSchema } from '../StravaActivity';
+import { parse, safeParse } from 'valibot';
+import { mapStravaActivityFromApi, stravaActivityApiSchema } from '../StravaActivity';
 import { stravaWebhookEventSchema, validateStravaWebhookEvent } from '../StravaWebhookEvent';
 
 describe('stravaActivityApiSchema', () => {
-  it('parses activity payloads', () => {
+  it('parses activity payloads and maps snake_case fields to camelCase domain shape', () => {
     const input = {
+      achievement_count: 1,
+      average_speed: 5.944,
+      calories: 346,
+      commute: true,
+      description: 'Great ride!',
       distance: 1000,
+      elapsed_time: 16356,
+      end_latlng: [37.717798, -122.450229] as [number, number],
+      gear: {
+        distance: 7828686,
+        id: 'b12917761',
+        name: 'Cruz',
+        primary: false,
+        resource_state: 2,
+      },
+      gear_id: 'b12917761',
       id: 123,
+      map: {
+        id: 'a123',
+        polyline: 'abc123',
+        summary_polyline: 'abc',
+      },
+      moving_time: 1610,
+      sport_type: 'Ride',
       start_date: '2024-01-01T00:00:00Z',
+      start_latlng: [37.77296, -122.410974] as [number, number],
+      total_elevation_gain: 134.5,
       type: 'Ride',
     };
 
-    expect(safeParse(stravaActivityApiSchema, input).success).toBe(true);
+    const parsed = parse(stravaActivityApiSchema, input);
+    const mapped = mapStravaActivityFromApi(parsed);
+
+    expect(mapped).toMatchObject({
+      achievementCount: 1,
+      averageSpeed: 5.944,
+      calories: 346,
+      commute: true,
+      description: 'Great ride!',
+      distance: 1000,
+      elapsedTime: 16356,
+      endLatlng: [37.717798, -122.450229],
+      gear: {
+        distance: 7828686,
+        id: 'b12917761',
+        name: 'Cruz',
+        primary: false,
+        resourceState: 2,
+      },
+      gearId: 'b12917761',
+      id: 123,
+      map: {
+        id: 'a123',
+        polyline: 'abc123',
+        summaryPolyline: 'abc',
+      },
+      movingTime: 1610,
+      name: 'Strava Activity',
+      sportType: 'Ride',
+      startDate: '2024-01-01T00:00:00Z',
+      startLatlng: [37.77296, -122.410974],
+      totalElevationGain: 134.5,
+      type: 'Ride',
+      url: 'https://www.strava.com/activities/123',
+    });
   });
 
   it('reads an empty coordinate pair from a GPS-less activity as null', () => {

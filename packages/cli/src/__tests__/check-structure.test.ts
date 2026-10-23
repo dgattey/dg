@@ -2,7 +2,12 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath } from 'node:url';
-import { checkOrphanCssFiles, checkRouteCssImports, checkTypeScale } from '../check-css.js';
+import {
+  checkOrphanCssFiles,
+  checkRouteCssImports,
+  checkTypeScale,
+  checkUnusedCssRules,
+} from '../check-css.js';
 import {
   checkFileStructure,
   checkSocialImageRouteParity,
@@ -117,6 +122,29 @@ describe('check-structure', () => {
         rule: 'og-image-route-parity',
       },
     ]);
+
+    const unusedCssViolations = checkUnusedCssRules(
+      new Map([
+        [
+          'apps/web/src/app/collage/collage.css',
+          '.usedCard { color: red; }\n.deadCard { color: blue; }\n@keyframes deadSpin { to { rotate: 1turn; } }\n',
+        ],
+      ]),
+      new Map([
+        [
+          'apps/web/src/app/Home.tsx',
+          'export const Home = () => <div className="usedCard phantomClass" />;\n',
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      unusedCssViolations.map(({ file, line, rule }) => ({ file, line, rule })),
+      [
+        { file: 'apps/web/src/app/collage/collage.css', line: 2, rule: 'no-unused-css-class' },
+        { file: 'apps/web/src/app/collage/collage.css', line: 3, rule: 'no-unused-css-keyframes' },
+        { file: 'apps/web/src/app/Home.tsx', line: 1, rule: 'no-undefined-css-class' },
+      ],
+    );
   });
 
   it('requires declared --type-* tokens for every font size in web CSS', () => {

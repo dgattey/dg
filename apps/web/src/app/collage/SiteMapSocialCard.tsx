@@ -13,7 +13,7 @@ import {
   SocialCardTag,
 } from './SocialCardParts';
 
-export type SiteMapCardPage = {
+type SiteMapCardPage = {
   label: string;
   markdownPath: string;
   path: string;

@@ -3,16 +3,17 @@ import 'server-only';
 import { getOauthStatus } from '@dg/services/oauth/getOauthStatus';
 import { capitalize } from '@dg/shared-core/formatting/capitalize';
 import type { OauthProviderKey } from '@dg/shared-core/routes/api';
+import { oauthConnectRoute } from '@dg/shared-core/routes/api';
 import { Skeleton } from '@dg/ui/core/Skeleton';
 import { Stack } from '@dg/ui/core/Stack';
 import { Typography } from '@dg/ui/core/Typography';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
+import { forceRefreshToken } from '../../../services/oauth.actions';
+import { PaperButton } from '../../collage/PaperButton';
 import { DevConsoleCardShell } from '../DevConsoleCardShell';
+import { ServerActionButton } from '../ServerActionButton';
 import { ErrorMessage, StatusChip } from '../StatusIndicators';
-import { ConnectButton } from './ConnectButton';
-import { ForceRefreshButton } from './ForceRefreshButton';
-import { TokenExpiry } from './TokenExpiry';
 
 type OauthCardProps = {
   provider: OauthProviderKey;
@@ -25,6 +26,7 @@ type OauthCardProps = {
 export async function OauthCardContent({ provider }: OauthCardProps) {
   await connection();
   const status = await getOauthStatus(provider);
+  const connectLabel = status.isConnected ? 'Reconnect' : 'Connect';
 
   return (
     <>
@@ -40,10 +42,30 @@ export async function OauthCardContent({ provider }: OauthCardProps) {
       </Stack>
       <ErrorMessage message={status.error} />
       <div className="devConsole__actions">
-        <ConnectButton provider={provider} status={status} />
-        <ForceRefreshButton isConnected={status.isConnected} provider={provider} />
+        <PaperButton
+          href={oauthConnectRoute(provider)}
+          tiltDeg={-2}
+          title={connectLabel}
+          tone="ochre"
+        >
+          {connectLabel}
+        </PaperButton>
+        {status.isConnected ? (
+          <ServerActionButton
+            action={forceRefreshToken.bind(null, provider)}
+            label="Force refresh token"
+            loadingLabel="Refreshing..."
+            refreshOnSuccess
+            tiltDeg={2}
+            tone="cream"
+          />
+        ) : null}
       </div>
-      <TokenExpiry expiresAt={status.expiresAt} />
+      {status.expiresAt ? (
+        <Typography sx={{ color: 'text.secondary' }} variant="body2">
+          Access token expires at {status.expiresAt.toLocaleString()}
+        </Typography>
+      ) : null}
     </>
   );
 }

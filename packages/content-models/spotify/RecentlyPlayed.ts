@@ -29,7 +29,7 @@ type RecentlyPlayedApi = v.InferOutput<typeof recentlyPlayedApiSchema>;
 /**
  * Domain payload for recently played data (camelCase).
  */
-export type RecentlyPlayed = {
+type RecentlyPlayed = {
   items: Array<{ track: Track; playedAt: string }>;
   next?: string | null;
 };

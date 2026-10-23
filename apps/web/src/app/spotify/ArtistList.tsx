@@ -21,11 +21,11 @@ type SeparatorProps = {
 };
 
 const cardBaseSx: SxObject = {
-  ...truncated(1),
+  ...truncated(),
 };
 
 const compactBaseSx: SxObject = {
-  ...truncated(1),
+  ...truncated(),
   lineHeight: 1.2,
   opacity: 0.6,
 };

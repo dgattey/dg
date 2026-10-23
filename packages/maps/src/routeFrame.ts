@@ -9,7 +9,7 @@ import {
 /** One route to ink, colored by a paper tone (`vermilion` reads `var(--vermilion)`). */
 export type MapRoute = { id: number; polyline: string; tone: string };
 
-export type DecodedRoute = { id: number; points: Array<Point>; tone: string };
+type DecodedRoute = { id: number; points: Array<Point>; tone: string };
 
 /** Southwest and northeast corners. */
 export type GeoBounds = [Point, Point];

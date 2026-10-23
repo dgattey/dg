@@ -1,5 +1,3 @@
-'use client';
-
 import { homeRoute } from '@dg/shared-core/routes/app';
 import { Typography } from '@dg/ui/core/Typography';
 import { NOT_FOUND_BACKDROP, SERVER_ERROR_BACKDROP } from '../collage/backdrops';

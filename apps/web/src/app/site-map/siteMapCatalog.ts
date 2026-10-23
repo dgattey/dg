@@ -56,7 +56,7 @@ export const SITE_MAP_BACKDROP = defineBackdrop(1100, 3, [
   },
 ]);
 
-export type SiteMapPageEntry = {
+type SiteMapPageEntry = {
   description: string;
   edge: PaperEdge;
   label: string;
@@ -66,7 +66,7 @@ export type SiteMapPageEntry = {
   tone: PaperTone;
 };
 
-export type SiteMapSurfaceEntry = {
+type SiteMapSurfaceEntry = {
   badge: string;
   description: string;
   href: string;

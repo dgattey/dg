@@ -27,7 +27,7 @@ type CurrentlyPlayingApi = v.InferOutput<typeof currentlyPlayingApiSchema>;
 /**
  * Domain payload for currently playing data (camelCase).
  */
-export type CurrentlyPlaying = {
+type CurrentlyPlaying = {
   isPlaying: boolean;
   progressMs?: number;
   item: Track | null;

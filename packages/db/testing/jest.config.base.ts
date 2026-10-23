@@ -12,5 +12,4 @@ const dir = dirname(fileURLToPath(import.meta.url));
 export const dbConfig: Config = {
   ...baseConfig,
   globalSetup: resolve(dir, 'jest.globalSetup.ts'),
-  globalTeardown: resolve(dir, 'jest.globalTeardown.ts'),
 };

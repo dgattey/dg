@@ -1,4 +1,13 @@
-import { getProjects } from '../../services/contentful';
+import 'server-only';
+
+import {
+  getIntroContent,
+  getLinkByName,
+  getProjects,
+  getSideProjects,
+} from '../../services/contentful';
+import { getLastKnownSong } from '../../services/spotify';
+import { getStravaHistory } from '../../services/strava';
 import { CollageProjectFrame } from '../collage/CollageProjectFrame';
 import { CutOut } from '../collage/CutOut';
 import { CutOutSymbols } from '../collage/CutOutSymbols';
@@ -11,11 +20,35 @@ import {
   HELLO_GRID_AREAS,
 } from '../collage/projectSlots';
 import { WorkSheet } from '../collage/WorkSheet';
-import { GatteySitesCardSlot } from './GatteySitesCardSlot';
-import { IntroCardSlot } from './IntroCardSlot';
+import { SpotifyCollageCard } from '../spotify/SpotifyCollageCard';
+import { GatteySitesCard } from './GatteySitesCard';
+import { IntroCard } from './IntroCard';
 import { MapCardSlot } from './MapCardSlot';
-import { SpotifyCardSlot } from './SpotifyCard';
-import { StravaCardSlot } from './StravaCardSlot';
+import { StravaCard } from './StravaCard';
+
+async function IntroCardSlot() {
+  const [introBlock, linkedInLink] = await Promise.all([
+    getIntroContent(),
+    getLinkByName('LinkedIn'),
+  ]);
+  if (!introBlock) {
+    return null;
+  }
+  return <IntroCard introBlock={introBlock} linkedInLink={linkedInLink} />;
+}
+
+async function SpotifyCardSlot() {
+  return <SpotifyCollageCard track={await getLastKnownSong()} />;
+}
+
+async function StravaCardSlot() {
+  return <StravaCard history={await getStravaHistory()} />;
+}
+
+async function GatteySitesCardSlot() {
+  const projects = await getSideProjects();
+  return projects.length > 0 ? <GatteySitesCard projects={projects} /> : null;
+}
 
 export async function Homepage() {
   const projects = await getProjects();

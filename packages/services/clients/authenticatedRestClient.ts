@@ -3,11 +3,23 @@ import { assertHttpsEndpoint } from '@dg/shared-core/assertions/assertHttpsEndpo
 import { log } from '@dg/shared-core/logging/log';
 import type { Wretch } from 'wretch';
 import wretch from 'wretch';
-import { getStatus } from './getStatus';
 import type { RefreshTokenConfig } from './RefreshTokenConfig';
 import { refreshedAccessToken } from './refreshedAccessToken';
 
-export type ClientProps = {
+function getStatus(resp: unknown): number {
+  if (typeof resp === 'number') {
+    return resp;
+  }
+  if (resp instanceof Response) {
+    return resp.status;
+  }
+  if (typeof resp === 'object' && resp !== null && 'status' in resp) {
+    return getStatus(resp.status);
+  }
+  return 0;
+}
+
+type ClientProps = {
   /**
    * The name of this client, used to store access tokens in the database
    */

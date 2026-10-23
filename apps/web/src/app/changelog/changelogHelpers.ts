@@ -5,7 +5,7 @@ const GITHUB_REPOSITORY_URL = 'https://github.com/dgattey/dg';
 
 export type ReleaseFilterKey = 'all' | ReleaseKind;
 
-export type ChangelogYearGroup = {
+type ChangelogYearGroup = {
   compactReleases: Array<ChangelogRelease>;
   featuredReleases: Array<ChangelogRelease>;
   totalCount: number;
@@ -137,7 +137,7 @@ export function githubPullRequestUrl(prNumber: number): string {
   return `${GITHUB_REPOSITORY_URL}/pull/${prNumber}`;
 }
 
-export type InlineNoteToken =
+type InlineNoteToken =
   | { kind: 'text'; value: string }
   | { kind: 'bold'; value: string }
   | { kind: 'code'; value: string }

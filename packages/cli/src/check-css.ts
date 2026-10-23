@@ -45,9 +45,132 @@ const FONT_SIZE_DECLARATION = /(?<![-\w])(?:font-size|font)\s*:([^;{}]+)/g;
 const LITERAL_FONT_SIZE = /\d(?:px|rem)\b/;
 const TYPE_TOKEN_DECLARATION = /(--type-[a-z0-9-]+)\s*:/g;
 const TYPE_TOKEN_USE = /var\(\s*(--type-[a-z0-9-]+)/g;
+const CLASS_SELECTOR_TOKEN = /\.([a-zA-Z_][a-zA-Z0-9_-]*)/g;
+const KEYFRAMES_DECLARATION = /@keyframes\s+([a-zA-Z0-9_-]+)/g;
+const IDENTIFIER_TOKEN = /[a-zA-Z_][a-zA-Z0-9_-]*/g;
+const TEMPLATE_CLASS_PREFIX = /([a-zA-Z_][a-zA-Z0-9_-]*)\$\{/g;
+const STATIC_JSX_CLASS_ATTR = /\b(?:className|innerClassName)\s*=\s*"([^"]+)"/g;
 
 function lineAt(content: string, index: number): number {
   return content.slice(0, index).split('\n').length;
+}
+
+function maskCssCommentsAndDeclarations(content: string): string {
+  const withoutComments = content.replace(/\/\*[\s\S]*?\*\//g, (match) =>
+    match.replace(/[^\n]/g, ' '),
+  );
+  return withoutComments
+    .replace(/"[^"\n]*"|'[^'\n]*'/g, (match) => ' '.repeat(match.length))
+    .replace(/(?<=[{;\s])[a-zA-Z-]+\s*:[^;{}]+/g, (match) => match.replace(/[^\n]/g, ' '));
+}
+
+/**
+ * Flags CSS class selectors and `@keyframes` in web stylesheets that have zero
+ * references in source files, plus static JSX `className` tokens that have no
+ * matching rule in any stylesheet.
+ */
+export function checkUnusedCssRules(
+  cssFiles: ReadonlyMap<string, string>,
+  sourceFiles: ReadonlyMap<string, string>,
+): Array<StructureViolation> {
+  const corpusParts: Array<string> = [];
+  const dynamicPrefixes: Array<string> = [];
+
+  for (const [file, content] of sourceFiles) {
+    if (
+      file.includes('__tests__/') ||
+      /\.test\.(ts|tsx)$/.test(file) ||
+      file.endsWith('cutOutShapes.ts')
+    ) {
+      continue;
+    }
+    corpusParts.push(content);
+    if (content.includes('${')) {
+      for (const match of content.matchAll(TEMPLATE_CLASS_PREFIX)) {
+        if (match[1]) {
+          dynamicPrefixes.push(match[1]);
+        }
+      }
+    }
+  }
+
+  const usedTokens = new Set<string>(corpusParts.join('\n').match(IDENTIFIER_TOKEN) ?? []);
+
+  const allCssWithoutComments = [...cssFiles.values()]
+    .map((c) => c.replace(/\/\*[\s\S]*?\*\//g, ''))
+    .join('\n');
+  const declaredClasses = new Set<string>();
+  const violations: Array<StructureViolation> = [];
+
+  for (const [file, content] of cssFiles) {
+    const selectorOnlyCss = maskCssCommentsAndDeclarations(content);
+    const seenInFile = new Set<string>();
+
+    for (const match of selectorOnlyCss.matchAll(CLASS_SELECTOR_TOKEN)) {
+      const className = match[1] ?? '';
+      if (!className) {
+        continue;
+      }
+      declaredClasses.add(className);
+      if (seenInFile.has(className) || file.startsWith('apps/web/src/app/music/stats/')) {
+        continue;
+      }
+      seenInFile.add(className);
+
+      const isUsed =
+        usedTokens.has(className) || dynamicPrefixes.some((prefix) => className.startsWith(prefix));
+      if (!isUsed) {
+        violations.push({
+          file,
+          line: lineAt(content, match.index),
+          message: `.${className} is not referenced in any source file`,
+          rule: 'no-unused-css-class',
+        });
+      }
+    }
+
+    for (const match of selectorOnlyCss.matchAll(KEYFRAMES_DECLARATION)) {
+      const name = match[1] ?? '';
+      if (!name) {
+        continue;
+      }
+      const cssMatches = allCssWithoutComments.match(new RegExp(`\\b${name}\\b`, 'g')) ?? [];
+      if (cssMatches.length <= 1 && !usedTokens.has(name)) {
+        violations.push({
+          file,
+          line: lineAt(content, match.index),
+          message: `@keyframes ${name} is never referenced`,
+          rule: 'no-unused-css-keyframes',
+        });
+      }
+    }
+  }
+
+  for (const [file, content] of sourceFiles) {
+    if (
+      !file.endsWith('.tsx') ||
+      file.includes('__tests__/') ||
+      file.endsWith('.test.tsx') ||
+      file.startsWith('apps/web/src/app/music/stats/')
+    ) {
+      continue;
+    }
+    for (const match of content.matchAll(STATIC_JSX_CLASS_ATTR)) {
+      const tokens = (match[1] ?? '').split(/\s+/).filter(Boolean);
+      for (const token of tokens) {
+        if (!declaredClasses.has(token)) {
+          violations.push({
+            file,
+            line: lineAt(content, match.index),
+            message: `Class "${token}" is not declared in any stylesheet`,
+            rule: 'no-undefined-css-class',
+          });
+        }
+      }
+    }
+  }
+
+  return violations;
 }
 
 /**

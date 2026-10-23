@@ -15,7 +15,7 @@ export type WebhookSubscriptionMetadata = {
  * Subscriptions plus the reason Strava refused to list them, if it did.
  * An error means the subscriptions are unknown, not that there are none.
  */
-export type WebhookSubscriptionsStatus = {
+type WebhookSubscriptionsStatus = {
   error: string | null;
   subscriptions: Array<WebhookSubscriptionMetadata>;
 };

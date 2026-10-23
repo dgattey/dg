@@ -66,7 +66,6 @@ export function ChangelogReleaseCard({
   return (
     <article className="changelog__entry" id={release.tag}>
       <PaperCard
-        className="changelog__card"
         edge={edge}
         innerClassName="changelog__cardInner"
         tag={

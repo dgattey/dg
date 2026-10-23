@@ -17,7 +17,7 @@ import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 
-export type BooksSyncRouteResponse = {
+type BooksSyncRouteResponse = {
   body:
     | {
         deleted: number;

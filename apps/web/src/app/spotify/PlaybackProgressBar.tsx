@@ -4,7 +4,6 @@ import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
-import type { Colors } from './colors';
 
 const PROGRESS_UPDATE_INTERVAL_MS = 250;
 const REFRESH_BUFFER_MS = 500;
@@ -13,7 +12,7 @@ type PlaybackProgressBarProps = {
   durationMs?: number;
   progressMs?: number;
   isPlaying?: boolean;
-  colors: Colors | null;
+  color?: string;
 };
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
@@ -29,7 +28,7 @@ export function PlaybackProgressBar({
   durationMs,
   progressMs,
   isPlaying,
-  colors,
+  color,
 }: PlaybackProgressBarProps) {
   const router = useRouter();
   const hasTiming = durationMs !== undefined && durationMs > 0 && progressMs !== undefined;
@@ -38,8 +37,9 @@ export function PlaybackProgressBar({
   );
   const startTimeRef = useRef<number>(0);
   const startProgressRef = useRef<number>(progressMs ?? 0);
+  const resolvedColor = color ?? 'var(--mui-palette-text-primary)';
   const trackSx: SxObject = {
-    backgroundColor: `color-mix(in srgb, ${colors?.primary ?? 'var(--mui-palette-text-primary)'} 20%, transparent)`,
+    backgroundColor: `color-mix(in srgb, ${resolvedColor} 20%, transparent)`,
     borderRadius: 999,
     height: 6,
     marginTop: 2,
@@ -48,7 +48,7 @@ export function PlaybackProgressBar({
     width: '100%',
   };
   const progressSx: SxObject = {
-    backgroundColor: colors ? colors.primary : 'var(--mui-palette-text-primary)',
+    backgroundColor: resolvedColor,
     borderRadius: 'inherit',
     height: '100%',
     transform: `scaleX(${progress})`,

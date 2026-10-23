@@ -37,7 +37,7 @@ export type BookMutationOutcome = Omit<
   coverImageUrl: string | null;
 };
 
-export type GoodreadsSyncBookError = { author: string; message: string; title: string };
+type GoodreadsSyncBookError = { author: string; message: string; title: string };
 
 export type GoodreadsSyncSummary = {
   created: number;
@@ -190,7 +190,7 @@ export async function upsertBookToContentful(
   return toOutcome('created', await cma.createAndPublishBook(fields, newId), coverImageUrl);
 }
 
-export async function fetchGoodreadsShelfItems(opts: {
+async function fetchGoodreadsShelfItems(opts: {
   fetchImpl?: typeof fetch;
   rssKey?: string | null;
   shelves?: ReadonlyArray<string>;

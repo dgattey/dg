@@ -1,7 +1,7 @@
 import type { CutOutShape } from './cutOutShapes';
 import type { PaperTone } from './types';
 
-export type CutOutColor = PaperTone | 'star';
+type CutOutColor = PaperTone | 'star';
 type CutOutVisibility = 'all' | 'desktop' | 'dark-desktop';
 
 export type CutOutPlacement = {
@@ -175,5 +175,3 @@ export function moreWorkOverflowPlacements(unitKey: string): Array<CutOutPlaceme
     .filter((placement) => MORE_WORK_OVERFLOW_SOURCE_IDS.has(placement.id))
     .map((placement) => ({ ...placement, id: `${unitKey}-${placement.id}` }));
 }
-
-export const ALL_CUT_OUT_PLACEMENTS = Object.values(CUT_OUT_PLACEMENTS).flat();

@@ -2,17 +2,33 @@ import 'server-only';
 
 import type { WebhookSubscriptionMetadata } from '@dg/services/strava/webhooks/getWebhookSubscriptions';
 import { getWebhookSubscriptions } from '@dg/services/strava/webhooks/getWebhookSubscriptions';
+import { RelativeTime } from '@dg/ui/core/RelativeTime';
 import { Skeleton } from '@dg/ui/core/Skeleton';
 import { Stack } from '@dg/ui/core/Stack';
 import { Typography } from '@dg/ui/core/Typography';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
+import {
+  backfillStravaHistory,
+  createWebhookSubscription,
+  deleteWebhookSubscription,
+} from '../../../services/strava.actions';
 import { DevConsoleCardShell } from '../DevConsoleCardShell';
+import { ServerActionButton } from '../ServerActionButton';
 import { ErrorMessage, StatusChip } from '../StatusIndicators';
-import { BackfillHistoryButton } from './BackfillHistoryButton';
-import { CreateWebhookButton } from './CreateWebhookButton';
-import { DeleteWebhookButton } from './DeleteWebhookButton';
-import { SubscriptionDetails } from './SubscriptionDetails';
+
+function SubscriptionDetails({ details }: { details: WebhookSubscriptionMetadata }) {
+  return (
+    <Stack sx={{ gap: 0.5 }}>
+      <Typography sx={{ color: 'text.secondary' }} variant="body2">
+        <strong>Callback URL:</strong> {details.callbackUrl}
+      </Typography>
+      <Typography sx={{ color: 'text.secondary' }} variant="body2">
+        <strong>Created:</strong> <RelativeTime date={details.createdAt} />
+      </Typography>
+    </Stack>
+  );
+}
 
 /**
  * Subscriptions we know about, plus the action that makes sense for them.
@@ -23,7 +39,13 @@ function SubscriptionActions({
   subscriptions: Array<WebhookSubscriptionMetadata>;
 }) {
   if (subscriptions.length === 0) {
-    return <CreateWebhookButton />;
+    return (
+      <ServerActionButton
+        action={createWebhookSubscription}
+        label="Create subscription"
+        loadingLabel="Creating..."
+      />
+    );
   }
 
   return (
@@ -36,7 +58,13 @@ function SubscriptionActions({
           />
         ))}
       </Stack>
-      <DeleteWebhookButton />
+      <ServerActionButton
+        action={deleteWebhookSubscription}
+        label="Delete subscription"
+        loadingLabel="Deleting..."
+        tiltDeg={2}
+        tone="vermilion"
+      />
     </>
   );
 }
@@ -103,7 +131,13 @@ export function WebhookCard() {
       <Suspense fallback={<WebhookCardContentSkeleton />}>
         <WebhookCardContent />
       </Suspense>
-      <BackfillHistoryButton />
+      <ServerActionButton
+        action={backfillStravaHistory}
+        label="Backfill history"
+        loadingLabel="Backfilling..."
+        tiltDeg={1.5}
+        tone="cream"
+      />
     </DevConsoleCardShell>
   );
 }

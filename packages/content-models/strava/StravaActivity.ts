@@ -151,12 +151,10 @@ export const stravaActivityApiSchema = v.looseObject(apiSchemaEntries);
 export const stravaActivitySchema = v.looseObject(storedSchemaEntries);
 
 /** API response type - inferred from strict v.object (no index signature) */
-export type StravaActivityApi = v.InferOutput<ReturnType<typeof v.object<typeof apiSchemaEntries>>>;
+type StravaActivityApi = v.InferOutput<ReturnType<typeof v.object<typeof apiSchemaEntries>>>;
 
 /** Stored activity type - inferred from strict v.object (no index signature) */
-export type StravaActivityStored = v.InferOutput<
-  ReturnType<typeof v.object<typeof storedSchemaEntries>>
->;
+type StravaActivityStored = v.InferOutput<ReturnType<typeof v.object<typeof storedSchemaEntries>>>;
 
 /** Domain activity type with required name/url */
 export type StravaActivity = Omit<StravaActivityStored, 'name' | 'url'> & {

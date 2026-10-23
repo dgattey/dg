@@ -31,9 +31,6 @@ const QUERY = gql`
           width
           height
         }
-        description {
-          json
-        }
       }
     }
   }

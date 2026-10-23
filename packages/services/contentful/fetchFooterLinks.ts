@@ -60,7 +60,6 @@ const QUERY = gql`
                       title
                       width
                       height
-                      description
                     }
                   }
                 }
@@ -171,12 +170,4 @@ export async function fetchFooterContent(): Promise<FooterContent> {
   }
 
   return { description, links };
-}
-
-/**
- * Fetches all our site footer link blocks from the Contentful API.
- */
-export async function fetchFooterLinks(): Promise<Array<RenderableLink>> {
-  const { links } = await fetchFooterContent();
-  return links;
 }

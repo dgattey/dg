@@ -11,7 +11,7 @@ import { fetchTrackDisplayData, type TrackDisplayData } from './trackMetadataSin
 /**
  * Display-ready track with its album, flattened for rendering.
  */
-export type TrackDisplay = {
+type TrackDisplay = {
   albumId: string;
   albumImageUrl: string;
   albumName: string;

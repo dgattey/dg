@@ -100,54 +100,18 @@ const VARIANT_STYLES: Record<TypographyVariant, SxObject> = {
   },
 };
 
-function resolveTypographyColor(color: string): string | undefined {
-  switch (color) {
-    case 'error':
-      return 'var(--mui-palette-error-main)';
-    case 'primary':
-      return 'var(--mui-palette-primary-main)';
-    case 'secondary':
-      return 'var(--mui-palette-secondary-main)';
-    case 'warning':
-      return 'var(--mui-palette-warning-main)';
-    case 'info':
-      return 'var(--mui-palette-info-main)';
-    case 'success':
-      return 'var(--mui-palette-success-main)';
-    case 'textPrimary':
-      return 'var(--mui-palette-text-primary)';
-    case 'textSecondary':
-      return 'var(--mui-palette-text-secondary)';
-    case 'inherit':
-      return 'inherit';
-    default:
-      return undefined;
-  }
-}
-
-export type TypographyProps<T extends ElementType = 'p'> = {
+type TypographyProps<T extends ElementType = 'p'> = {
   children?: ReactNode;
   className?: string;
   color?: string;
   component?: T;
-  fontWeight?: number | string;
-  gutterBottom?: boolean;
-  noWrap?: boolean;
   ref?: Ref<HTMLElement>;
   sx?: SxProps;
   variant?: TypographyVariant;
 } & Omit<HTMLAttributes<HTMLElement>, 'children' | 'className' | 'color'> &
   Omit<
     ComponentPropsWithRef<T>,
-    | 'children'
-    | 'className'
-    | 'color'
-    | 'component'
-    | 'fontWeight'
-    | 'gutterBottom'
-    | 'noWrap'
-    | 'sx'
-    | 'variant'
+    'children' | 'className' | 'color' | 'component' | 'sx' | 'variant'
   >;
 
 export function Typography<T extends ElementType = 'p'>({
@@ -155,32 +119,19 @@ export function Typography<T extends ElementType = 'p'>({
   className,
   color,
   component,
-  fontWeight,
-  gutterBottom,
-  noWrap,
   ref,
   sx,
   variant = 'body1',
   ...rest
 }: TypographyProps<T>) {
   const Component = (component ?? DEFAULT_ELEMENT[variant]) as ElementType;
-  const resolvedColor = color ? resolveTypographyColor(color) : undefined;
   const baseSx: SxObject = {
     fontFamily: 'var(--font-sans)',
     margin: 0,
     textRendering: 'optimizeLegibility',
     WebkitFontSmoothing: 'auto',
     ...VARIANT_STYLES[variant],
-    ...(resolvedColor ? { color: resolvedColor } : {}),
-    ...(fontWeight !== undefined ? { fontWeight } : {}),
-    ...(gutterBottom ? { marginBottom: '0.35em' } : {}),
-    ...(noWrap
-      ? {
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }
-      : {}),
+    ...(color ? { color } : {}),
   };
   const mergedSx: SxProps = Array.isArray(sx) ? [baseSx, ...sx] : [baseSx, sx];
   const compiled = compileSx(mergedSx);

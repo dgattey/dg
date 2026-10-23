@@ -3,24 +3,20 @@ import { documentToReactComponents } from '@contentful/rich-text-react-renderer'
 import type { NodeData } from '@contentful/rich-text-types';
 import { BLOCKS, INLINES } from '@contentful/rich-text-types';
 import type { RenderableAssetWithSys } from '@dg/content-models/contentful/renderables/assets';
-import type { RenderableProjectWithSys } from '@dg/content-models/contentful/renderables/projects';
 import {
   isRichTextDocument,
   type RenderableEntry,
   type RenderableRichTextContent,
 } from '@dg/content-models/contentful/renderables/richText';
 import { isRecord } from '@dg/shared-core/types/typeguards';
-import { Divider } from '../core/Divider';
+import { Box } from '../core/Box';
 import { Stack } from '../core/Stack';
 import { Typography } from '../core/Typography';
-import { PROJECT_MAX_IMAGE_DIMENSION } from '../helpers/imageSizes';
-import type { SxObject, SxProps } from '../theme';
+import type { SxObject } from '../theme';
 import { Image } from './Image';
 import { Link } from './Link';
 
-type RichTextProps = RenderableRichTextContent & {
-  sx?: SxProps;
-};
+const PROJECT_MAX_IMAGE_DIMENSION = 330;
 
 /**
  * Defines a Node's Data with actual data
@@ -49,6 +45,15 @@ const paragraphSx: SxObject = {
   marginBottom: 3.5,
 };
 
+const dividerSx: SxObject = {
+  borderBottomWidth: 'thin',
+  borderColor: 'var(--mui-palette-divider)',
+  borderStyle: 'solid',
+  borderWidth: 0,
+  flexShrink: 0,
+  margin: 0,
+};
+
 /**
  * Typeguard for converting the `any` to a structured object
  */
@@ -63,9 +68,6 @@ const isDataWithId = (data: NodeData): data is DataWithId =>
  */
 const isDataWithLink = (data: NodeData): data is { uri: string } =>
   isRecord(data) && typeof data.uri === 'string';
-
-const isRenderableProjectEntry = (entry: RenderableEntry): entry is RenderableProjectWithSys =>
-  'thumbnail' in entry;
 
 /**
  * Creates an element for a single entry in our rich text
@@ -84,10 +86,7 @@ function EntryElement({
   if (!entry) {
     return null;
   }
-  if (isRenderableProjectEntry(entry)) {
-    return null;
-  }
-  return <Link href={entry.url} icon={entry.icon ?? undefined} title={entry.title} />;
+  return <Link href={entry.url} title={entry.title} />;
 }
 
 /**
@@ -153,7 +152,7 @@ function HeadingWithId({
 /**
  * Takes links and converts them into rich text through rendering specific types of content.
  */
-const renderOptions = (links: RichTextProps['links']): Options => {
+const renderOptions = (links: RenderableRichTextContent['links']): Options => {
   // Map the assets - we only need the sys.id for mapping, and we'll cast as Asset for rendering
   const assetMap = new Map<string, RenderableAssetWithSys>();
   links.assets.block.forEach((asset) => {
@@ -179,7 +178,7 @@ const renderOptions = (links: RichTextProps['links']): Options => {
           {children}
         </Typography>
       ),
-      [BLOCKS.HR]: () => <Divider />,
+      [BLOCKS.HR]: () => <Box component="hr" sx={dividerSx} />,
       [INLINES.HYPERLINK]: ({ data }, children) => {
         if (!isDataWithLink(data)) {
           return children;
@@ -197,9 +196,9 @@ const renderOptions = (links: RichTextProps['links']): Options => {
  * Complicated component to render rich text from Contentful's rich
  * text renderer, resolving all items to components
  */
-export function RichText({ json, links, sx }: RichTextProps) {
+export function RichText({ json, links }: RenderableRichTextContent) {
   if (!isRichTextDocument(json)) {
     return null;
   }
-  return <Stack sx={sx}>{documentToReactComponents(json, renderOptions(links))}</Stack>;
+  return <Stack>{documentToReactComponents(json, renderOptions(links))}</Stack>;
 }

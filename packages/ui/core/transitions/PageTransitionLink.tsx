@@ -6,7 +6,7 @@ import type { ReactNode } from 'react';
 import { rememberPageOrigin } from './pageScrollMemory';
 import { pageTransitionTypes } from './pageTransitions';
 
-export type PageTransitionLinkProps = {
+type PageTransitionLinkProps = {
   'aria-current'?: 'page';
   children?: ReactNode;
   className?: string;

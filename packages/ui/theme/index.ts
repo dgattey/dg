@@ -1,10 +1,7 @@
 import type { CSSProperties } from 'react';
 import { getTimingCssVars } from '../helpers/timing';
-import { onCanvas } from './color';
+import { BRAND, onCanvas } from './color';
 import { COLOR_SCHEME_ATTRIBUTE } from './colorScheme';
-import { getShadows } from './extraShadows';
-import { getPalette } from './palette';
-import { getShape } from './shape';
 import { getTypography } from './typography';
 
 export type ResponsiveValue<T> = T | { xs?: T; sm?: T; md?: T; lg?: T; xl?: T };
@@ -21,14 +18,14 @@ export type SxObject = SxProperties & {
   [key: string]: unknown;
 };
 
-export type SxElement = SxObject;
-
 export type SxProps = SxObject | boolean | null | undefined | ReadonlyArray<SxProps>;
 
+const CARD_SHADOW_MAIN =
+  '0.0145rem 0.029rem 0.174rem rgba(0,0,0,.017),0.0335rem 0.067rem 0.402rem rgba(0,0,0,.024),0.0625rem 0.125rem 0.75rem rgba(0,0,0,.03),0.1125rem 0.225rem 1.35rem rgba(0,0,0,.036),0.2085rem 0.417rem 2.502rem rgba(0,0,0,.043),0.5rem 1rem 6rem rgba(0,0,0,.06),0 0 0 0.0625rem rgba(0,0,0,.015)';
+const CARD_SHADOW_HOVERED =
+  '0 0.125rem 2rem rgba(0, 0, 0, 0.06),0 0.125rem 4rem rgba(0, 0, 0, 0.12),0 0 0 0.125rem rgba(0, 0, 0, 0.036)';
+
 export function getGlobalThemeCss(): string {
-  const palette = getPalette();
-  const shadows = getShadows();
-  const shape = getShape();
   const typography = getTypography();
   const timingVars = getTimingCssVars();
 
@@ -41,55 +38,20 @@ export function getGlobalThemeCss(): string {
   ${timingDeclarations}
   --mui-palette-common-black: #000;
   --mui-palette-common-white: #fff;
-  --mui-palette-background-default: ${palette.background.default};
-  --mui-palette-background-paper: ${palette.background.paper};
-  --mui-palette-text-primary: ${palette.text.primary};
-  --mui-palette-text-secondary: ${palette.text.secondary};
-  --mui-palette-text-disabled: ${palette.text.disabled};
-  --mui-palette-text-h1: ${palette.text.h1};
-  --mui-palette-text-h2: ${palette.text.h2};
-  --mui-palette-text-h3: ${palette.text.h3};
-  --mui-palette-text-h4: ${palette.text.h4};
-  --mui-palette-text-h5: ${palette.text.h5};
-  --mui-palette-text-h6: ${palette.text.h6};
-  --mui-palette-primary-main: ${palette.primary.main};
-  --mui-palette-primary-light: ${palette.primary.light};
-  --mui-palette-primary-dark: ${palette.primary.dark};
-  --mui-palette-primary-contrastText: ${palette.primary.contrastText};
-  --mui-palette-secondary-main: ${palette.secondary.main};
-  --mui-palette-secondary-light: ${palette.secondary.light};
-  --mui-palette-secondary-dark: ${palette.secondary.dark};
-  --mui-palette-secondary-contrastText: ${palette.secondary.contrastText};
-  --mui-palette-error-main: ${palette.error.main};
-  --mui-palette-error-light: ${palette.error.light};
-  --mui-palette-error-dark: ${palette.error.dark};
-  --mui-palette-error-contrastText: ${palette.error.contrastText};
-  --mui-palette-warning-main: ${palette.warning.main};
-  --mui-palette-warning-light: ${palette.warning.light};
-  --mui-palette-warning-dark: ${palette.warning.dark};
-  --mui-palette-warning-contrastText: ${palette.warning.contrastText};
-  --mui-palette-info-main: ${palette.info.main};
-  --mui-palette-info-light: ${palette.info.light};
-  --mui-palette-info-dark: ${palette.info.dark};
-  --mui-palette-info-contrastText: ${palette.info.contrastText};
-  --mui-palette-success-main: ${palette.success.main};
-  --mui-palette-success-light: ${palette.success.light};
-  --mui-palette-success-dark: ${palette.success.dark};
-  --mui-palette-success-contrastText: ${palette.success.contrastText};
-  --mui-palette-card-border: ${palette.card.border};
-  --mui-palette-divider: ${palette.divider};
-  --mui-palette-action-active: ${palette.action.active};
-  --mui-palette-action-hover: ${palette.action.hover};
-  --mui-palette-action-selected: ${palette.action.selected};
-  --mui-palette-action-disabled: ${palette.action.disabled};
-  --mui-palette-action-disabledBackground: ${palette.action.disabledBackground};
-  --mui-palette-action-focus: ${palette.action.focus};
-  --mui-extraShadows-card-main: ${shadows.card.main};
-  --mui-extraShadows-card-hovered: ${shadows.card.hovered};
-  --mui-extraShadows-card-overlayHovered: ${shadows.card.overlayHovered};
-  --mui-extraShadows-map-control: ${shadows.map.control};
-  --mui-shape-borderRadius: 4px;
-  --mui-shape-cardBorderRadius: ${shape.cardBorderRadius}px;
+  --mui-palette-background-default: ${BRAND.defaultBackground};
+  --mui-palette-background-paper: ${BRAND.paperBackground};
+  --mui-palette-text-primary: ${BRAND.text};
+  --mui-palette-text-secondary: ${BRAND.mutedText};
+  --mui-palette-text-h1: ${BRAND.h1};
+  --mui-palette-text-h2: ${BRAND.h2};
+  --mui-palette-text-h3: ${BRAND.h3};
+  --mui-palette-text-h4: ${BRAND.h4};
+  --mui-palette-text-h5: ${BRAND.h5};
+  --mui-palette-text-h6: ${BRAND.h6};
+  --mui-palette-card-border: ${BRAND.cardBorder};
+  --mui-palette-divider: ${onCanvas(12)};
+  --mui-extraShadows-card-main: ${CARD_SHADOW_MAIN};
+  --mui-extraShadows-card-hovered: ${CARD_SHADOW_HOVERED};
   --dg-skeleton-bg: ${onCanvas(12)};
   --font-sans: ${typography.fontFamily};
   font-size: 15px;
@@ -148,10 +110,6 @@ h1, h2, h3, h4 {
   0% { opacity: 1; }
   50% { opacity: 0.4; }
   100% { opacity: 1; }
-}
-@keyframes dg-spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
 }
 `;
 }

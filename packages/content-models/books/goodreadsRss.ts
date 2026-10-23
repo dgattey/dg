@@ -30,7 +30,7 @@ export type GoodreadsBookItem = {
   userShelves: string;
 };
 
-export function extractXmlTag(itemXml: string, tagName: string): string | null {
+function extractXmlTag(itemXml: string, tagName: string): string | null {
   const match = itemXml.match(
     new RegExp(`<${tagName}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${tagName}>`, 'i'),
   );
@@ -41,7 +41,7 @@ export function extractXmlTag(itemXml: string, tagName: string): string | null {
   return text.length > 0 ? text : null;
 }
 
-export function resolveReadDates({
+function resolveReadDates({
   shelf,
   userDateAdded,
   userDateCreated,

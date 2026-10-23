@@ -17,7 +17,6 @@ export function RouteAtlasSketch({
   return (
     <svg
       aria-hidden="true"
-      className="routeAtlas__sketch"
       preserveAspectRatio="xMidYMid slice"
       viewBox={`0 0 ${frame.width} ${frame.height}`}
     >

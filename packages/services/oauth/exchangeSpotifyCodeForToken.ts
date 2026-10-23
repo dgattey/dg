@@ -15,7 +15,7 @@ const SPOTIFY_TOKEN_NAME = 'spotify';
 export async function exchangeSpotifyCodeForToken(
   code: string,
   codeVerifier?: string,
-): Promise<string> {
+): Promise<void> {
   const callbackUrl = process.env.OAUTH_CALLBACK_URL;
   const clientId = process.env.SPOTIFY_CLIENT_ID;
   invariant(callbackUrl, 'Missing OAUTH_CALLBACK_URL env variable');
@@ -90,7 +90,4 @@ export async function exchangeSpotifyCodeForToken(
     refreshToken,
   });
   log.info('Persisted token to DB', { updatedAt: token.updatedAt });
-
-  return `
-    <p>Success! Token persisted to ${SPOTIFY_TOKEN_NAME} and expires at ${expiryAt.toLocaleString()}</p>`;
 }

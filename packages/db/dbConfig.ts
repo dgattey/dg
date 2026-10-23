@@ -19,7 +19,7 @@ export const sequelizeOptions = {
 } satisfies SequelizeOptions;
 
 // CLI options - adds use_env_variable for Sequelize CLI
-export const cliOptionsByEnv = {
+const cliOptionsByEnv = {
   development: { ...sequelizeOptions, use_env_variable: 'DATABASE_URL' },
   production: { ...sequelizeOptions, use_env_variable: 'DATABASE_URL' },
   test: { ...sequelizeOptions, use_env_variable: 'DATABASE_URL_TEST' },

@@ -40,7 +40,7 @@ export type SocialCardVariant =
   | ChangelogCardVariant
   | SiteMapCardVariant;
 
-export type SocialCardProps = {
+type SocialCardProps = {
   grainUrl: string;
 } & SocialCardVariant;
 

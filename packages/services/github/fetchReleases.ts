@@ -2,7 +2,7 @@ import 'server-only';
 
 import { log } from '@dg/shared-core/logging/log';
 
-export const GITHUB_REPOSITORY = 'dgattey/dg';
+const GITHUB_REPOSITORY = 'dgattey/dg';
 export const GITHUB_REPOSITORY_URL = `https://github.com/${GITHUB_REPOSITORY}`;
 const RELEASES_PER_PAGE = 100;
 const MAX_RELEASE_PAGES = 10;

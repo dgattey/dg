@@ -1,6 +1,6 @@
 import type { CSSProperties } from 'react';
 
-export type BrandIconDefinition = {
+type BrandIconDefinition = {
   path: string;
   viewBox: string;
 };

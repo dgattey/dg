@@ -1,6 +1,5 @@
 import { Box } from '@dg/ui/core/Box';
 import { Image } from '@dg/ui/dependent/Image';
-import type { ReactNode } from 'react';
 import {
   ALBUM_TILE_ART_SIZE,
   ALBUM_TILE_ART_SIZES,
@@ -17,8 +16,6 @@ type Props = {
   depth: number;
   /** Sleeves behind the front cover, which is what centres the fan. */
   sleeveCount: number;
-  /** Pinned inside the cover and clipped by it, e.g. the play-count chip. */
-  children?: ReactNode;
   /** Loads eagerly at high priority, for the cover that paints as the page's LCP. */
   isLcpCandidate?: boolean;
 };
@@ -27,14 +24,7 @@ type Props = {
  * One album cover, the piece every music grid cell is built from. Covers
  * behind the front carry a scrim of page background so the fan recedes.
  */
-export function AlbumCover({
-  imageUrl,
-  alt,
-  depth,
-  sleeveCount,
-  children,
-  isLcpCandidate = false,
-}: Props) {
+export function AlbumCover({ imageUrl, alt, depth, sleeveCount, isLcpCandidate = false }: Props) {
   const isEagerFrontCover = isLcpCandidate && depth === 0;
   return (
     <Box aria-hidden={depth > 0 || undefined} sx={albumCoverSx(depth, sleeveCount)}>
@@ -49,7 +39,6 @@ export function AlbumCover({
         width={ALBUM_TILE_ART_SIZE}
       />
       {depth > 0 ? <Box sx={albumSleeveScrimSx(depth)} /> : null}
-      {children}
     </Box>
   );
 }

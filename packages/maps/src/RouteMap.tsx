@@ -2,14 +2,39 @@
 
 import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
-import type { Point } from 'pigeon-maps';
+import type { Point, TileComponentProps } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
-import { useEffect, useRef, useState } from 'react';
+import { type CSSProperties, useEffect, useRef, useState } from 'react';
 import type { FramedPath, RouteFrame } from './routeFrame';
 import { getRouteMapTokens } from './routeMapTokens';
-import { SmoothTile } from './SmoothTile';
 import { stadiaTileUrl, type TileSource } from './tileSource';
 import { useDarkMap } from './useDarkMap';
+
+const tileImageStyle: CSSProperties = {
+  display: 'block',
+  height: '100%',
+  width: '100%',
+};
+
+/** A single-layer tile with a fade that keeps theme changes from flashing. */
+function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
+  return (
+    <div
+      style={{
+        height: tile.height,
+        left: tile.left,
+        opacity: tile.active ? 1 : 0,
+        overflow: 'hidden',
+        position: 'absolute',
+        top: tile.top,
+        transition: 'opacity 0.2s',
+        width: tile.width,
+      }}
+    >
+      <img alt="" onLoad={tileLoaded} src={tile.url} srcSet={tile.srcSet} style={tileImageStyle} />
+    </div>
+  );
+}
 
 const underlaySx: SxObject = {
   filter: 'blur(8px)',
@@ -75,7 +100,7 @@ function tileUrl({
   });
 }
 
-export type RouteMapProps = {
+type RouteMapProps = {
   frame: RouteFrame;
   paths: ReadonlyArray<FramedPath>;
   strokeWidth: number;

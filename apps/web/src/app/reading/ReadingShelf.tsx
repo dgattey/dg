@@ -69,7 +69,6 @@ export function ReadingShelf({ books }: { books: ReadonlyArray<RenderableBook> }
   return (
     <>
       <PaperPills
-        className="reading__filters"
         label="Filter books"
         onSelect={(key) => startTransition(() => setFilterKey(key))}
         options={filterOptions}

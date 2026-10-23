@@ -28,12 +28,7 @@ const album = (id: string, name: string): PlaylistAlbum => ({
 
 const albums = [album('album-zebra', 'Zebra'), album('album-mango', 'Mango')];
 
-const renderGrid = () =>
-  renderToString(
-    <FavoriteAlbumsGrid albums={albums}>
-      <p>Mango tracklist</p>
-    </FavoriteAlbumsGrid>,
-  );
+const renderGrid = () => renderToString(<FavoriteAlbumsGrid albums={albums} />);
 
 const albumLinks = (html: string) =>
   [...html.matchAll(/href="\/music\/albums\?album=([^"]+)"/g)].map(([, id]) => id);
@@ -72,6 +67,6 @@ describe('FavoriteAlbumsGrid on the server', () => {
 
     expect(albumLinks(html)).toEqual(['album-zebra', 'album-mango']);
     expect(html).toContain('aria-label="Mango details"');
-    expect(html).toContain('Mango tracklist');
+    expect(html).toContain('data-role="album-detail-placeholder"');
   });
 });

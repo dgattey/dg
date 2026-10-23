@@ -12,12 +12,10 @@ import {
 } from '../backdrops';
 import { CutOut } from '../CutOut';
 import { CutOutSymbols } from '../CutOutSymbols';
-import {
-  ALL_CUT_OUT_PLACEMENTS,
-  CUT_OUT_PLACEMENTS,
-  moreWorkOverflowPlacements,
-} from '../cutOutPlacements';
+import { CUT_OUT_PLACEMENTS, moreWorkOverflowPlacements } from '../cutOutPlacements';
 import { CUT_OUT_SHAPE_NAMES, CUT_OUT_SHAPES, cutOutSymbolId } from '../cutOutShapes';
+
+const ALL_CUT_OUT_PLACEMENTS = Object.values(CUT_OUT_PLACEMENTS).flat();
 
 const WEB_SRC_DIR = path.join(__dirname, '../../..');
 

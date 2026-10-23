@@ -62,13 +62,7 @@ const renderInline = (node: RichTextNode, entries: EntryLookup): string => {
     case INLINES.EMBEDDED_ENTRY: {
       const id = getTargetId(node.data);
       const entry = id ? entries.get(id) : undefined;
-      if (!entry) {
-        return '';
-      }
-      if ('thumbnail' in entry) {
-        return entry.link ? `[${entry.title}](${entry.link.url})` : entry.title;
-      }
-      return `[${entry.title}](${entry.url})`;
+      return entry ? `[${entry.title}](${entry.url})` : '';
     }
     default:
       return (node.content ?? []).map((child) => renderInline(child, entries)).join('');
@@ -149,13 +143,7 @@ const renderBlock = (
     case BLOCKS.EMBEDDED_ENTRY: {
       const id = getTargetId(node.data);
       const entry = id ? entries.get(id) : undefined;
-      if (!entry) {
-        return null;
-      }
-      if ('thumbnail' in entry) {
-        return entry.link ? `[${entry.title}](${entry.link.url})` : entry.title;
-      }
-      return `[${entry.title}](${entry.url})`;
+      return entry ? `[${entry.title}](${entry.url})` : null;
     }
     case BLOCKS.EMBEDDED_ASSET: {
       const id = getTargetId(node.data);

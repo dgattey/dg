@@ -23,11 +23,6 @@ export type MapLocation = {
   image?: RenderableAsset | null;
 
   /**
-   * Optional human-readable location name.
-   */
-  title?: string | null;
-
-  /**
    * Sorted zoom levels from Contentful. First = min, last = max.
    */
   zoomLevels: Array<number>;

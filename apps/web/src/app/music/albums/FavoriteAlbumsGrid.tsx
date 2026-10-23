@@ -6,8 +6,7 @@ import { Box } from '@dg/ui/core/Box';
 import { Typography } from '@dg/ui/core/Typography';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import type { ReactNode } from 'react';
-import { Children, Fragment, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { Fragment, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { loadAlbumDetail } from '../../../services/albumDetail.actions';
 import {
   type CollageCardTreatment,
@@ -70,7 +69,6 @@ type AlbumCard = {
 
 type SelectedAlbumWellProps = {
   albumCards: Array<AlbumCard>;
-  children?: ReactNode;
   pending: PendingSelection | null;
 };
 
@@ -115,7 +113,7 @@ function ClientSelectedAlbumDetail({ albumId }: { albumId: string }) {
   return <AlbumDetailBody album={state.detail} />;
 }
 
-function SelectedAlbumWell({ albumCards, children, pending }: SelectedAlbumWellProps) {
+function SelectedAlbumWell({ albumCards, pending }: SelectedAlbumWellProps) {
   const { isAwaitingDetail, selectedAlbumId } = resolveAlbumSelection(pending, useUrlAlbumId());
   const selectedIndex = albumCards.findIndex(({ album }) => album.id === selectedAlbumId);
   const selectedCard = albumCards[selectedIndex];
@@ -124,16 +122,12 @@ function SelectedAlbumWell({ albumCards, children, pending }: SelectedAlbumWellP
     return null;
   }
 
-  const hasExplicitChildren = Children.count(children) > 0;
-
   return (
     <Box sx={wellPlacementSx(selectedIndex, albumCards.length)}>
       <AlbumWell album={selectedCard.album} tone={selectedCard.treatment.tone}>
         <Fragment key={selectedCard.album.id}>
           {isAwaitingDetail ? (
             <AlbumDetailBodySkeleton />
-          ) : hasExplicitChildren ? (
-            children
           ) : (
             <ClientSelectedAlbumDetail albumId={selectedCard.album.id} />
           )}
@@ -145,10 +139,9 @@ function SelectedAlbumWell({ albumCards, children, pending }: SelectedAlbumWellP
 
 type Props = {
   albums: Array<PlaylistAlbum>;
-  children?: ReactNode;
 };
 
-export function FavoriteAlbumsGrid({ albums, children }: Props) {
+export function FavoriteAlbumsGrid({ albums }: Props) {
   const { onAlbumNavigationCapture, pending, selectedAlbumId } = useOptimisticAlbumSelection();
   const [sortKey, setSortKey] = useState<AlbumSortKey>('added');
   const itemRefs = useRef(new Map<string, HTMLElement>());
@@ -200,9 +193,7 @@ export function FavoriteAlbumsGrid({ albums, children }: Props) {
     : -1;
   const wellSlot = (
     <Suspense fallback={null} key="album-well">
-      <SelectedAlbumWell albumCards={sortedAlbumCards} pending={pending}>
-        {children}
-      </SelectedAlbumWell>
+      <SelectedAlbumWell albumCards={sortedAlbumCards} pending={pending} />
     </Suspense>
   );
 

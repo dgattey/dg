@@ -4,7 +4,7 @@ import { richTextToMarkdown } from '@dg/content-models/contentful/richTextToMark
 import { homeRoute } from '@dg/shared-core/routes/app';
 import {
   getCurrentLocation,
-  getFooterLinks,
+  getFooterContent,
   getIntroContent,
   getProjects,
 } from '../../services/contentful';
@@ -22,11 +22,11 @@ const formatProjectTypes = (type: string | Array<string> | null | undefined): st
  * Markdown representation of the homepage — kept next to Homepage UI.
  */
 export async function getHomepageMarkdown(): Promise<string> {
-  const [intro, projects, location, footerLinks] = await Promise.all([
+  const [intro, projects, location, { links: footerLinks }] = await Promise.all([
     getIntroContent(),
     getProjects(),
     getCurrentLocation(),
-    getFooterLinks(),
+    getFooterContent(),
   ]);
 
   const sections: Array<string> = [`# ${SITE_NAME}`, `> ${HOMEPAGE_TITLE}`];

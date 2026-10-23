@@ -18,7 +18,6 @@ export const currentLocationResponseSchema = v.looseObject({
             }),
           ),
         ),
-        title: v.optional(v.nullable(v.string())),
         zoomLevels: v.optional(v.nullable(v.array(v.union([v.string(), v.number()])))),
       }),
     ),

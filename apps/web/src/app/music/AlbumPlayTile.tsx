@@ -54,7 +54,7 @@ export function AlbumPlayTile({
   return (
     <CollageAlbumPaper treatment={collageCardTreatment(cardIndex)}>
       <Link className="music__albumLink" href={linkUrl} isExternal={true}>
-        <span className="music__art music__fullColorArt">
+        <span className="music__art">
           <AlbumStack imageUrl={imageUrl} isLcpCandidate={isLcpCandidate} sleeveCount={sleeveCount}>
             {cover}
           </AlbumStack>

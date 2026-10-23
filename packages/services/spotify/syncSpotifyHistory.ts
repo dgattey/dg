@@ -172,7 +172,7 @@ type SyncWithLoggingOptions = {
  * The result of a sync attempt. A failed attempt carries its reason so callers
  * can report it instead of returning a success-shaped body with zeroes in it.
  */
-export type SpotifySyncOutcome =
+type SpotifySyncOutcome =
   | {
       gapDetected: boolean;
       inserted: number;

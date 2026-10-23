@@ -2,7 +2,7 @@ import 'server-only';
 
 import { fetchBooks } from '@dg/services/contentful/fetchBooks';
 import { fetchCurrentLocation } from '@dg/services/contentful/fetchCurrentLocation';
-import { fetchFooterContent, fetchFooterLinks } from '@dg/services/contentful/fetchFooterLinks';
+import { fetchFooterContent } from '@dg/services/contentful/fetchFooterLinks';
 import { fetchIntroContent } from '@dg/services/contentful/fetchIntroContent';
 import { fetchLinkByName } from '@dg/services/contentful/fetchLinkByName';
 import { fetchProjects } from '@dg/services/contentful/fetchProjects';
@@ -40,11 +40,6 @@ export const getIntroContent = async () => {
 export const getFooterContent = async () => {
   'use cache';
   return await cachedContentful(fetchFooterContent);
-};
-
-export const getFooterLinks = async () => {
-  'use cache';
-  return await cachedContentful(fetchFooterLinks);
 };
 
 /**

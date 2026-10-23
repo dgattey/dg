@@ -9,7 +9,7 @@ type CookieOptions = {
 };
 
 /** Secure cookies on Vercel / production; allow HTTP localhost. */
-export function shouldUseSecureCookies(): boolean {
+function shouldUseSecureCookies(): boolean {
   return process.env.NODE_ENV === 'production' || process.env.VERCEL === '1';
 }
 

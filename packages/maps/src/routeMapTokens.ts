@@ -1,4 +1,4 @@
-export type RouteMapTokens = {
+type RouteMapTokens = {
   casingStroke: string;
   containerBackground: string;
   scrimGradient: string;

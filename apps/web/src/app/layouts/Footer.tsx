@@ -25,7 +25,7 @@ import { FOOTER_DESTINATIONS } from './musicHeaderDestinations';
 
 const CHAR_CODE_SHIFT = 7;
 
-export const DEFAULT_DESCRIPTION =
+const DEFAULT_DESCRIPTION =
   'Building from San Francisco. Always happy to connect about product, craft, and the outdoors.';
 
 const DEFAULT_ENCODED_EMAIL: ReadonlyArray<number> = [
@@ -170,7 +170,7 @@ export async function Footer() {
               Site map
             </PageTransitionLink>
           </div>
-          <nav aria-label="Footer navigation" className="chrome__colophonGroup chrome__colophonNav">
+          <nav aria-label="Footer navigation" className="chrome__colophonGroup">
             {FOOTER_DESTINATIONS.map((destination) => (
               <PageTransitionLink
                 className="chrome__colophonLink"

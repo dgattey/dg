@@ -91,7 +91,7 @@ type ArtistApi = v.InferOutput<typeof referenceApiSchema>;
 type AlbumApi = v.InferOutput<typeof albumApiSchema>;
 type TrackApi = v.InferOutput<typeof trackApiSchema>;
 
-export type Core = {
+type Core = {
   externalUrls: {
     spotify: string;
   };
@@ -109,7 +109,7 @@ export type Artist = Core;
 /**
  * Domain album type (camelCase).
  */
-export type Album = Artist & {
+type Album = Artist & {
   images: Array<{
     height: number;
     width: number;
@@ -118,7 +118,7 @@ export type Album = Artist & {
   releaseDate: string;
 };
 
-export type AlbumImage = {
+type AlbumImage = {
   height: number;
   width: number;
   url: string;

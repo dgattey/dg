@@ -14,12 +14,7 @@ export function AtlasSheet({ children }: { children: ReactNode }) {
   return (
     <div className="strava__atlasPrint">
       <PaperCard className="strava__atlasBacking" edge="torn-c" tiltDeg={2.4} tone="cerulean" />
-      <PaperCard
-        className="strava__atlasSheet"
-        edge="quad-c"
-        innerClassName="strava__atlasMat"
-        tiltDeg={-1}
-      >
+      <PaperCard edge="quad-c" innerClassName="strava__atlasMat" tiltDeg={-1}>
         {children}
       </PaperCard>
     </div>

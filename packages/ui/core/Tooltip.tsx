@@ -56,7 +56,7 @@ const insetFromViewportEdges = (tooltip: HTMLElement) => {
   }
 };
 
-export interface TooltipProps {
+interface TooltipProps {
   /** The content to display in the tooltip. */
   title: ReactNode;
   /** The element that triggers the tooltip on hover/focus. */
