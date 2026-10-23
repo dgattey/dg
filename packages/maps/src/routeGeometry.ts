@@ -227,11 +227,9 @@ export function projectRouteToPixels({
   });
 }
 
-export function toSvgPath(points: Array<ProjectedPoint>) {
-  return points
-    .map(
-      ({ x, y }, index) =>
-        `${index === 0 ? 'M' : 'L'} ${Math.round(x * 10) / 10} ${Math.round(y * 10) / 10}`,
-    )
+/** Builds an SVG path command string from already-projected route pixels. */
+export function toSvgPath(pixels: Array<ProjectedPoint>) {
+  return pixels
+    .map(({ x, y }, index) => `${index === 0 ? 'M' : 'L'}${x.toFixed(2)} ${y.toFixed(2)}`)
     .join(' ');
 }

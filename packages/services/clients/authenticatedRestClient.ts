@@ -6,17 +6,21 @@ import wretch from 'wretch';
 import type { RefreshTokenConfig } from './RefreshTokenConfig';
 import { refreshedAccessToken } from './refreshedAccessToken';
 
-function getStatus(resp: unknown): number {
+export function getStatus(resp: unknown): number {
+  if (!resp) {
+    return 500;
+  }
   if (typeof resp === 'number') {
     return resp;
   }
-  if (resp instanceof Response) {
-    return resp.status;
+  if (typeof resp === 'string') {
+    return Number.parseInt(resp, 10);
   }
-  if (typeof resp === 'object' && resp !== null && 'status' in resp) {
+  if (typeof resp === 'object' && 'status' in resp) {
     return getStatus(resp.status);
   }
-  return 0;
+  log.error('Could not parse status', { resp });
+  return 500;
 }
 
 type ClientProps = {

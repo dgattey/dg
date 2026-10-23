@@ -58,18 +58,8 @@ const buildTrackApi = (overrides: Partial<Record<string, unknown>> = {}) => ({
 // Single shared db instance for all tests in this file
 const db = setupTestDatabase();
 
-beforeEach(async () => {
+beforeEach(() => {
   jest.clearAllMocks();
-  // Only delete rows with our prefix to avoid conflicts with parallel tests
-  await db.SpotifyPlay.destroy({
-    where: { trackId: { [Op.like]: `${PREFIX}-%` } },
-  });
-});
-
-afterEach(async () => {
-  await db.SpotifyPlay.destroy({
-    where: { trackId: { [Op.like]: `${PREFIX}-%` } },
-  });
 });
 
 describe('syncSpotifyPlaysSince', () => {

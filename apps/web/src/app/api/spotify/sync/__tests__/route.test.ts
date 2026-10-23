@@ -75,22 +75,12 @@ beforeAll(() => {
   >);
 });
 
-beforeEach(async () => {
+beforeEach(() => {
   jest.clearAllMocks();
   mockRefreshFavoriteAlbums.mockResolvedValue({ changed: true, count: 3 });
   mockGetSpotifyClient.mockReturnValue({ get: mockSpotifyGet } as ReturnType<
     typeof spotifyClient.getSpotifyClient
   >);
-  // Only delete rows with our prefix to avoid conflicts with parallel tests
-  await db.SpotifyPlay.destroy({
-    where: { trackId: { [Op.like]: `${PREFIX}-%` } },
-  });
-});
-
-afterEach(async () => {
-  await db.SpotifyPlay.destroy({
-    where: { trackId: { [Op.like]: `${PREFIX}-%` } },
-  });
 });
 
 afterAll(() => {
