@@ -58,7 +58,6 @@ function isPureTypeModule(content: string): boolean {
   );
 }
 
-/** Lint findings get fixed, never suppressed: no suppression comment in any file Biome checks. */
 function checkNoBiomeSuppressions(
   relPath: string,
   content: string,
@@ -131,7 +130,9 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
   }
 
   const canImportDb =
-    relPath.startsWith('packages/services/') || relPath.startsWith('packages/db/') || isTest;
+    relPath.startsWith('packages/services/') ||
+    relPath.startsWith('packages/db/') ||
+    (isTest && !relPath.startsWith('apps/'));
   const checkDbImport = !canImportDb && content.includes('@dg/db');
   const checkInlineTypeof = content.includes(INLINE_TYPEOF_IMPORT_TOKEN);
   const checkShortCacheLife =
@@ -161,15 +162,11 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
     const lineText = lines[i] ?? '';
     const lineNum = i + 1;
 
-    if (
-      checkDbImport &&
-      /\bfrom\s+['"]@dg\/db(?:['"]|\/)/.test(lineText) &&
-      !lineText.includes('@dg/db/testing')
-    ) {
+    if (checkDbImport && /\bfrom\s+['"]@dg\/db(?:['"]|\/)/.test(lineText)) {
       violations.push({
         file: relPath,
         line: lineNum,
-        message: 'Only packages/services may import @dg/db in runtime code',
+        message: 'Only packages/services and packages/db may import @dg/db',
         rule: 'db-imports',
       });
     }

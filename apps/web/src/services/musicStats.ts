@@ -12,7 +12,7 @@ const MUSIC_STATS_TAG = 'music-stats';
 
 async function getCachedAllTimeStats(): Promise<ListeningStats | null> {
   'use cache';
-  cacheLife('hours');
+  cacheLife('days');
   cacheTag(MUSIC_STATS_TAG);
   return await fetchListeningStats({ kind: 'all' });
 }
@@ -45,9 +45,6 @@ export function normalizeStatsRangeKey(raw?: string | null): StatsRangeKey {
   }
 }
 
-/**
- * Aggregates over SpotifyPlay history for the requested range, cached for an hour.
- */
 export async function getListeningStats(rawRange?: string | null): Promise<ListeningStats | null> {
   const rangeKey = normalizeStatsRangeKey(rawRange);
   if (rangeKey === 'all') {

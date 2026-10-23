@@ -53,6 +53,16 @@ describe('proxy', () => {
       expect(response.headers.get('x-middleware-next')).toBe('1');
       expect(response.headers.get('Link')).toContain('/music.md');
     });
+
+    it('rewrites unmatched page paths to the prerendered /not-found shell', () => {
+      const response = proxy(
+        new NextRequest('https://example.com/sample-page', {
+          headers: { accept: 'text/html' },
+        }),
+      );
+
+      expect(response.headers.get('x-middleware-rewrite')).toBe('https://example.com/not-found');
+    });
   });
 
   describe('without credentials configured', () => {

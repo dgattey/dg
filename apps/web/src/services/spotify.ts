@@ -11,12 +11,6 @@ const LATEST_SONG_FRESH_MS = 1_500;
 let cachedLatestSong: { expiresAt: number; track: Track | null } | null = null;
 let inFlightLatestSong: Promise<Track | null> | null = null;
 
-/**
- * Returns the live playback state for `loadLatestSong`:
- * - coalesces concurrent calls on the same instance and reuses a 1.5s fresh window
- * - avoids Next.js `'use cache'` `cacheLife('seconds')` (`stale: 30, expire: 60`),
- *   which served stale tracks for up to 60s after a song change on refresh
- */
 export const getLatestSong = async (): Promise<Track | null> => {
   if (process.env.NODE_ENV !== 'test' && !process.env.SPOTIFY_CLIENT_ID) {
     return null;
@@ -48,7 +42,7 @@ export const getLatestSong = async (): Promise<Track | null> => {
 
 export const getLastKnownSong = async () => {
   'use cache';
-  cacheLife('hours');
+  cacheLife('days');
   cacheTag(LATEST_SONG_TAG);
   if (process.env.NODE_ENV !== 'test' && !process.env.SPOTIFY_CLIENT_ID) {
     return null;

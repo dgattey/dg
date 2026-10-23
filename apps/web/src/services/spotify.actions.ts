@@ -5,6 +5,7 @@ import { getLatestSong } from './spotify';
 import { scheduleSpotifySyncIfStale } from './spotifySync';
 
 export async function loadLatestSong(): Promise<Track | null> {
-  scheduleSpotifySyncIfStale();
-  return await getLatestSong();
+  const track = await getLatestSong();
+  scheduleSpotifySyncIfStale(track);
+  return track;
 }

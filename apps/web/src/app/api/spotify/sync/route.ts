@@ -54,9 +54,6 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
     revalidateTag('favorite-albums', 'max');
   }
 
-  // A run that could not read Spotify must not answer 2xx. The scheduled
-  // workflow uses `curl -f`, so a success status is the only thing standing
-  // between a broken sync and a green check.
   if (result.status === 'failed') {
     return {
       body: {
@@ -71,6 +68,7 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
 
   if (result.inserted > 0) {
     revalidateTag('music-history', 'max');
+    revalidateTag('latest-song', 'max');
   }
 
   return {

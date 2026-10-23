@@ -1,9 +1,8 @@
-# Sync Spotify listening history and favorite albums every 15 minutes at off-peak minutes
 name: Spotify sync
 
 on:
   schedule:
-    - cron: '7,22,37,52 * * * *'
+    - cron: '23 * * * *'
   workflow_dispatch:
 
 jobs:
@@ -12,8 +11,6 @@ jobs:
     runs-on: ubuntu-latest
     permissions: {}
     steps:
-      # The route answers 2xx only when it actually read Spotify, so a non-200
-      # here means the sync failed rather than "nothing new was playing".
       - name: Trigger sync
         run: |
           set -euo pipefail
@@ -42,8 +39,6 @@ jobs:
             exit 1
           fi
 
-          # Spotify only keeps the last 50 plays, so a full window means plays
-          # between runs are already gone for good.
           if grep -q '"gapDetected":true' response.json; then
             echo "::warning::Spotify returned a full 50-track window; plays between runs may have been lost."
           fi

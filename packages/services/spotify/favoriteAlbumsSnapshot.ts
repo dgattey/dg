@@ -15,10 +15,6 @@ const SNAPSHOT_FIELDS = [
   'url',
 ] as const;
 
-/**
- * Timestamp of the most recent successful favorite-albums refresh check, or
- * null when no refresh has ever been recorded.
- */
 export async function readFavoriteAlbumsRefreshedAt(): Promise<Date | null> {
   try {
     const snapshot = await db.FavoriteAlbumSnapshot.findOne({
@@ -32,14 +28,6 @@ export async function readFavoriteAlbumsRefreshedAt(): Promise<Date | null> {
   }
 }
 
-/**
- * Last stored favorites list, newest playlist addition first, or null when no
- * refresh has ever completed. An empty array means Spotify was reached and the
- * playlist was genuinely empty.
- *
- * Never throws: a missing table (a preview deployment reading a database that
- * hasn't migrated) has to degrade rather than take the page down.
- */
 export async function readFavoriteAlbumsSnapshot(): Promise<Array<PlaylistAlbum> | null> {
   try {
     const rows = (await db.FavoriteAlbum.findAll({
@@ -51,9 +39,6 @@ export async function readFavoriteAlbumsSnapshot(): Promise<Array<PlaylistAlbum>
       return rows;
     }
 
-    // Preview builds skip migrations. Only the marker needs the new table, and
-    // only an empty snapshot needs the marker, so populated snapshots remain
-    // readable in previews immediately after the FavoriteAlbum migration.
     const snapshot = await db.FavoriteAlbumSnapshot.findOne({ where: { singleton: true } });
     return snapshot ? [] : null;
   } catch (error) {
@@ -73,19 +58,11 @@ const isStoredSnapshot = (stored: Array<PlaylistAlbum> | null, albums: Array<Pla
   return albums.every((album) => storedKeys.has(snapshotKey(album)));
 };
 
-/**
- * Replaces the stored favorites list with a fresh one and resolves whether the
- * stored list changed. When the list is unchanged, the album rows are left
- * untouched and only the snapshot `refreshedAt` marker is updated, so the sync
- * only revalidates `/music/albums` when the playlist actually moved.
- */
 export async function writeFavoriteAlbumsSnapshot(albums: Array<PlaylistAlbum>): Promise<boolean> {
-  const unchanged = isStoredSnapshot(await readFavoriteAlbumsSnapshot(), albums);
+  if (isStoredSnapshot(await readFavoriteAlbumsSnapshot(), albums)) {
+    return false;
+  }
   try {
-    if (unchanged) {
-      await db.FavoriteAlbumSnapshot.upsert({ refreshedAt: new Date(), singleton: true });
-      return false;
-    }
     await dbClient.transaction(async (transaction) => {
       await db.FavoriteAlbum.destroy({ transaction, where: {} });
       if (albums.length > 0) {

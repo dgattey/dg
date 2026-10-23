@@ -7,30 +7,14 @@ import { cacheLife, cacheTag } from 'next/cache';
 
 const ALBUM_DETAIL_TAG = 'album-detail';
 
-/**
- * Cached album-detail read. Isolated so Spotify failures do not poison the
- * hours-long cache with a null entry.
- *
- * Local rather than `remote` on purpose: `fetchAlbumDetail` already reads the
- * database first and writes through, so a miss here costs a fast query rather
- * than a Spotify call. The favorites playlist needs `remote` because it has no
- * such store in front of it.
- */
 async function getAlbumDetailCached(albumId: string) {
   'use cache';
-  cacheLife('hours');
+  cacheLife('days');
   cacheTag(ALBUM_DETAIL_TAG);
   cacheTag(`${ALBUM_DETAIL_TAG}-${albumId}`);
   return await fetchAlbumDetail(albumId);
 }
 
-/**
- * Album detail for the favorite-albums well. Hours-long cache matches the
- * playlist albums page. Missing tokens, rate limits, and other Spotify
- * failures degrade to undefined so the well can show a temporary unavailable
- * state; null remains reserved for a real Spotify 404.
- * Failures are not written into the successful-read cache.
- */
 export async function getAlbumDetail(albumId: string) {
   try {
     return await getAlbumDetailCached(albumId);

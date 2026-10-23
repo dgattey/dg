@@ -2,11 +2,18 @@ import {
   hasDevConsoleCredentials,
   isDevConsoleAccessAllowed,
 } from '@dg/services/auth/devConsoleBasicAuth';
-import { devConsoleRoute, homeRoute } from '@dg/shared-core/routes/app';
+import {
+  devConsoleRoute,
+  homeRoute,
+  isMarkdownPagePath,
+  markdownPathToHtmlPath,
+} from '@dg/shared-core/routes/app';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { isNextFlightRequest } from './services/isNextFlightRequest';
 import { negotiateMarkdown } from './services/markdown/contentNegotiation';
+
+const NOT_FOUND_PATH = '/not-found';
 
 function protectDevConsole(request: NextRequest): NextResponse | null {
   if (!request.nextUrl.pathname.startsWith(devConsoleRoute)) {
@@ -37,22 +44,32 @@ function protectDevConsole(request: NextRequest): NextResponse | null {
   });
 }
 
+function rewriteUnknownPathToNotFound(request: NextRequest): NextResponse | null {
+  const { pathname } = request.nextUrl;
+  if (
+    pathname === NOT_FOUND_PATH ||
+    pathname.startsWith(devConsoleRoute) ||
+    isMarkdownPagePath(pathname) ||
+    markdownPathToHtmlPath(pathname) !== null
+  ) {
+    return null;
+  }
+  const notFoundUrl = request.nextUrl.clone();
+  notFoundUrl.pathname = NOT_FOUND_PATH;
+  return NextResponse.rewrite(notFoundUrl);
+}
+
 export function proxy(request: NextRequest): NextResponse {
-  return protectDevConsole(request) ?? negotiateMarkdown(request) ?? NextResponse.next();
+  return (
+    protectDevConsole(request) ??
+    negotiateMarkdown(request) ??
+    rewriteUnknownPathToNotFound(request) ??
+    NextResponse.next()
+  );
 }
 
 export const config = {
   matcher: [
-    /*
-     * Run only on page paths and `.md` twins, and skip Flight/prefetch
-     * requests outside `/dev-console`. Every match is a billed function
-     * invocation, even when the page itself is a CDN hit, so skip
-     * Next/Vercel internals, route handlers, social images, client link
-     * prefetches, and any path with a file extension other than `.md`
-     * (assets and bot probes like `.php`). Registered Markdown pages are
-     * filtered again in negotiateMarkdown, so new public pages only need
-     * the shared registry — not this list.
-     */
     {
       missing: [
         { key: 'rsc', type: 'header' },

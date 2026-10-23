@@ -37,15 +37,14 @@ describe('favorite albums snapshot', () => {
     await expect(readFavoriteAlbumsSnapshot()).resolves.toEqual([album]);
   });
 
-  it('reports whether the stored list changed, skips identical album writes, and advances refreshedAt', async () => {
+  it('reports whether the stored list changed and skips identical album writes', async () => {
     await expect(writeFavoriteAlbumsSnapshot([album])).resolves.toBe(true);
     const firstRefreshedAt = await readFavoriteAlbumsRefreshedAt();
     expect(firstRefreshedAt).toBeInstanceOf(Date);
 
-    await new Promise((resolve) => setTimeout(resolve, 10));
     await expect(writeFavoriteAlbumsSnapshot([{ ...album }])).resolves.toBe(false);
     const secondRefreshedAt = await readFavoriteAlbumsRefreshedAt();
-    expect(secondRefreshedAt?.getTime()).toBeGreaterThanOrEqual(firstRefreshedAt?.getTime() ?? 0);
+    expect(secondRefreshedAt?.getTime()).toBe(firstRefreshedAt?.getTime());
 
     await expect(writeFavoriteAlbumsSnapshot([{ ...album, name: 'Renamed' }])).resolves.toBe(true);
     await expect(writeFavoriteAlbumsSnapshot([])).resolves.toBe(true);

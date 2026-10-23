@@ -174,12 +174,9 @@ describe('NowPlayingProvider', () => {
     expect(screen.queryByTestId('compact')).not.toBeInTheDocument();
   });
 
-  it('refreshes all three surfaces on client route navigation and window focus', async () => {
-    jest
-      .mocked(loadLatestSong)
-      .mockResolvedValueOnce(null)
-      .mockResolvedValueOnce(FRESH)
-      .mockResolvedValueOnce(NEXT_PLAYING);
+  it('preserves live track across client route navigations without re-posting and refreshes on focus after cooldown', async () => {
+    const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(1_760_000_000_000);
+    jest.mocked(loadLatestSong).mockResolvedValueOnce(FRESH).mockResolvedValueOnce(NEXT_PLAYING);
 
     const { rerender } = render(
       <ServerTimeProvider serverTime={1_760_000_000_000}>
@@ -191,6 +188,11 @@ describe('NowPlayingProvider', () => {
       </ServerTimeProvider>,
     );
 
+    await waitFor(() => {
+      expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
+    });
+    expect(loadLatestSong).toHaveBeenCalledTimes(1);
+
     mockPathname = '/music';
     rerender(
       <ServerTimeProvider serverTime={1_760_000_000_000}>
@@ -201,18 +203,19 @@ describe('NowPlayingProvider', () => {
         </NowPlayingProvider>
       </ServerTimeProvider>,
     );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
-      expect(screen.getByTestId('card')).toHaveTextContent('Track fresh');
-      expect(
-        screen.getByRole('link', { name: 'Playing Track fresh · Artist fresh' }),
-      ).toBeInTheDocument();
-    });
+    expect(loadLatestSong).toHaveBeenCalledTimes(1);
 
     act(() => {
       window.dispatchEvent(new Event('focus'));
     });
+    expect(loadLatestSong).toHaveBeenCalledTimes(1);
+
+    nowSpy.mockReturnValue(1_760_000_010_000);
+    act(() => {
+      window.dispatchEvent(new Event('focus'));
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    expect(loadLatestSong).toHaveBeenCalledTimes(2);
 
     await waitFor(() => {
       expect(screen.getByTestId('compact')).toHaveTextContent('Track next');
@@ -221,5 +224,7 @@ describe('NowPlayingProvider', () => {
         screen.getByRole('link', { name: 'Playing Track next · Artist next' }),
       ).toBeInTheDocument();
     });
+
+    nowSpy.mockRestore();
   });
 });

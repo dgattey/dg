@@ -15,9 +15,6 @@ type MusicHistoryResult = {
   nextCursor: string | null;
 };
 
-/**
- * Parses a cursor string into a Date for pagination.
- */
 export function parseMusicHistoryCursor(before?: string): Date | undefined {
   if (!before) {
     return undefined;
@@ -30,7 +27,7 @@ export async function getMusicHistory({
   before,
 }: MusicHistoryOptions): Promise<MusicHistoryResult> {
   'use cache';
-  cacheLife('hours');
+  cacheLife('days');
   cacheTag(MUSIC_HISTORY_TAG);
 
   return await fetchMusicHistoryPage({

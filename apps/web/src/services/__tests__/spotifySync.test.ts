@@ -22,6 +22,7 @@ jest.mock('@dg/services/spotify/syncSpotifyHistory', () => ({
   syncSpotifyHistoryWithLogging: jest.fn(),
 }));
 
+import type { Track } from '@dg/content-models/spotify/Track';
 import { readFavoriteAlbumsRefreshedAt } from '@dg/services/spotify/favoriteAlbumsSnapshot';
 import { refreshFavoriteAlbumsSnapshotWithLogging } from '@dg/services/spotify/refreshFavoriteAlbumsSnapshot';
 import { syncSpotifyHistoryWithLogging } from '@dg/services/spotify/syncSpotifyHistory';
@@ -34,6 +35,19 @@ import {
   syncSpotifyIfStale,
 } from '../spotifySync';
 
+const PLAYING_TRACK = {
+  id: 'track-1',
+  isPlaying: true,
+  name: 'Active Track',
+} as Track;
+
+const IDLE_TRACK = {
+  id: 'track-1',
+  isPlaying: false,
+  name: 'Idle Track',
+  playedAt: '2026-10-23T08:00:00.000Z',
+} as Track;
+
 describe('spotifySync', () => {
   beforeEach(() => {
     scheduledCallbacks.length = 0;
@@ -41,7 +55,7 @@ describe('spotifySync', () => {
     jest.clearAllMocks();
   });
 
-  it('skips syncing when FavoriteAlbumSnapshot.refreshedAt is within the 20-minute window', async () => {
+  it('skips syncing when FavoriteAlbumSnapshot.refreshedAt is within the 60-minute window', async () => {
     const nowMs = 1_760_000_000_000;
     jest
       .mocked(readFavoriteAlbumsRefreshedAt)
@@ -52,12 +66,11 @@ describe('spotifySync', () => {
     expect(refreshFavoriteAlbumsSnapshotWithLogging).not.toHaveBeenCalled();
     expect(revalidateTag).not.toHaveBeenCalled();
 
-    // Subsequent check within the remaining window skips the DB query via the in-memory gate
     await expect(syncSpotifyIfStale(nowMs + 60_000)).resolves.toBe(false);
     expect(readFavoriteAlbumsRefreshedAt).toHaveBeenCalledTimes(1);
   });
 
-  it('syncs history and favorite albums when refreshedAt is older than 20 minutes and revalidates changed tags', async () => {
+  it('syncs history and favorite albums when refreshedAt is older than 60 minutes and revalidates changed tags', async () => {
     const nowMs = 1_760_000_000_000;
     jest
       .mocked(readFavoriteAlbumsRefreshedAt)
@@ -81,6 +94,7 @@ describe('spotifySync', () => {
     expect(refreshFavoriteAlbumsSnapshotWithLogging).toHaveBeenCalledTimes(1);
     expect(revalidateTag).toHaveBeenCalledWith('favorite-albums', 'max');
     expect(revalidateTag).toHaveBeenCalledWith('music-history', 'max');
+    expect(revalidateTag).toHaveBeenCalledWith('latest-song', 'max');
   });
 
   it('does not call revalidateTag when the background sync finds no changes', async () => {
@@ -100,7 +114,16 @@ describe('spotifySync', () => {
     expect(revalidateTag).not.toHaveBeenCalled();
   });
 
-  it('schedules the background check via after() without blocking', async () => {
+  it('does not schedule a DB check on cold start when playback is idle', () => {
+    const nowMs = 1_760_000_000_000;
+    scheduleSpotifySyncIfStale(IDLE_TRACK, nowMs);
+    expect(after).not.toHaveBeenCalled();
+
+    scheduleSpotifySyncIfStale(IDLE_TRACK, nowMs + STALE_SPOTIFY_SYNC_INTERVAL_MS + 10_000);
+    expect(after).not.toHaveBeenCalled();
+  });
+
+  it('schedules the background check via after() when a track is actively playing', async () => {
     jest.mocked(readFavoriteAlbumsRefreshedAt).mockResolvedValueOnce(null);
     jest.mocked(syncSpotifyHistoryWithLogging).mockResolvedValueOnce({
       gapDetected: false,
@@ -113,7 +136,7 @@ describe('spotifySync', () => {
       count: 104,
     });
 
-    scheduleSpotifySyncIfStale();
+    scheduleSpotifySyncIfStale(PLAYING_TRACK);
     expect(after).toHaveBeenCalledTimes(1);
     expect(scheduledCallbacks).toHaveLength(1);
 
