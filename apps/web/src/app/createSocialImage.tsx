@@ -127,7 +127,7 @@ async function loadSocialCardVariant(page: SocialImagePage): Promise<SocialCardV
       return buildHomeCardVariant(await safeLoad(fetchIntroContent, null));
     case 'music-stats': {
       const year = currentPacificYear();
-      const stats = await safeLoad(() => fetchListeningStats({ range: 'year', year }), null);
+      const stats = await safeLoad(() => fetchListeningStats({ kind: 'year', year }), null);
       return buildMusicStatsCardVariant(stats, year);
     }
     case 'music-history': {

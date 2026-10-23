@@ -1,12 +1,77 @@
-/* Listening stats: cut paper totals, the podium, and ragged bands of cards. */
+/* Listening stats: cut paper totals, the podium, top songs/artists, and ragged bands of cards. */
 
-.stats__sections {
+.stats__sections,
+.stats__body {
   position: relative;
   z-index: 2;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   row-gap: 44px;
 }
+
+.stats__toolbar {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  align-items: center;
+  justify-content: space-between;
+}
+.stats__musicNav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
+.stats__rangePills {
+  align-items: center;
+}
+.stats__yearMenu {
+  position: relative;
+}
+.stats__yearSummary:focus-visible {
+  outline: none;
+}
+.stats__yearSummary:focus-visible .paperPill {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+.stats__yearSummaryFace {
+  align-items: center;
+}
+.stats__yearPanel {
+  right: 0;
+  z-index: 40;
+  min-width: 244px;
+}
+.stats__yearMenuGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.stats__yearOption {
+  justify-content: center;
+  width: 100%;
+  padding: 8px 12px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+.stats__yearOption--current {
+  color: light-dark(var(--cream), var(--ink-on-cream));
+  background: light-dark(var(--black), var(--ochre));
+}
+
+::view-transition-group(.stats-filter) {
+  animation-duration: 260ms;
+  animation-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
 .stats__band {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -15,7 +80,7 @@
 }
 /* The second card in a band drops a little, so the edges never line up into a grid. */
 .stats__band > .stats__card:nth-child(2) {
-  margin-top: 40px;
+  margin-top: 32px;
 }
 .stats__card {
   --track: color-mix(in oklab, var(--on) 16%, transparent);
@@ -23,12 +88,16 @@
 }
 .stats__years,
 .stats__depth,
-.stats__day {
+.stats__day,
+.stats__topSongs,
+.stats__monthly {
   grid-column: span 7;
 }
 .stats__repeat,
 .stats__week,
-.stats__rituals {
+.stats__rituals,
+.stats__topArtists,
+.stats__champions {
   grid-column: span 5;
 }
 .stats__card:only-child {
@@ -52,10 +121,6 @@
   margin: 0;
   font: 700 var(--type-h2) / 1.2 var(--display);
 }
-.stats__subheading {
-  margin: 22px 0 0;
-  font: 700 var(--type-label) / 1.2 var(--display);
-}
 .stats__aside,
 .stats__note,
 .stats__meta {
@@ -74,9 +139,15 @@
 .stats__label {
   font: 700 var(--type-label) / 1.2 var(--display);
 }
-.stats__rowTitle {
-  margin-top: 1px;
-  font: 700 var(--type-h3) / 1.25 var(--display);
+.stats__itemLink {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--on) 35%, transparent);
+  text-underline-offset: 3px;
+}
+.stats__itemLink:hover,
+.stats__itemLink:focus-visible {
+  text-decoration-color: var(--on);
 }
 .stats__count {
   font: 700 var(--type-h2) / 1.2 var(--display);
@@ -122,9 +193,76 @@
   min-width: 0;
 }
 
-/* Plays per year */
+/* Top songs & Top artists */
+.stats__topSongs {
+  --meter: var(--soft);
+}
+.stats__topArtists {
+  --meter: var(--ochre);
+}
+.stats__topList {
+  display: grid;
+  gap: 12px;
+  padding: 0;
+  margin: 18px 0 0;
+  list-style: none;
+}
+.stats__topSongRow {
+  display: grid;
+  grid-template-columns: 30px auto minmax(0, 1fr) 84px auto;
+  column-gap: 12px;
+  align-items: center;
+}
+.stats__topArtistRow {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) 80px auto;
+  column-gap: 12px;
+  align-items: center;
+}
+.stats__topRow--lead {
+  --meter: var(--on);
+}
+.stats__rankBadge {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  font: 700 var(--type-caption) / 1 var(--display);
+  font-variant-numeric: tabular-nums;
+  color: var(--soft);
+  background: color-mix(in oklab, var(--on) 12%, transparent);
+  border-radius: 50%;
+}
+.stats__topRow--lead .stats__rankBadge {
+  color: var(--pc);
+  background: var(--on);
+}
+.stats__songMat {
+  padding: 4px;
+  border-radius: 8px;
+  rotate: var(--r, 0deg);
+}
+.stats__songMat img {
+  display: block;
+  width: 44px;
+  height: 44px;
+  object-fit: cover;
+  border-radius: 5px;
+}
+.stats__topCountGroup {
+  display: grid;
+  justify-items: end;
+  min-width: 58px;
+}
+.stats__topCountGroup .stats__meta {
+  font-size: var(--type-caption);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Plays per year (interactive) */
 .stats__peak {
   font-weight: 700;
+  font-variant-numeric: tabular-nums;
   color: var(--ochre);
 }
 .stats__columns {
@@ -144,6 +282,17 @@
   grid-template-columns: minmax(0, 1fr);
   gap: 6px;
   justify-items: center;
+  cursor: pointer;
+  border-radius: 6px;
+  transition:
+    opacity 200ms ease,
+    translate 260ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.stats__columns--engaged .stats__column:not(.stats__column--active) {
+  opacity: 0.62;
+}
+.stats__column--active {
+  translate: 0 -4px;
 }
 .stats__columnValue,
 .stats__columnTick {
@@ -151,6 +300,9 @@
   font-variant-numeric: tabular-nums;
   color: var(--soft);
   white-space: nowrap;
+  transition:
+    color 180ms ease,
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .stats__columnValue {
   align-self: end;
@@ -161,16 +313,210 @@
   width: 100%;
   height: calc(var(--bar) * 100%);
   background: var(--on);
+  border-radius: 4px 4px 2px 2px;
+  transform-origin: bottom center;
+  transition:
+    background-color 180ms ease,
+    transform 260ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .stats__column--partial .stats__columnBar {
   background: var(--soft);
 }
-.stats__column--peak .stats__columnBar {
+.stats__column--peak .stats__columnBar,
+.stats__column--active .stats__columnBar {
   background: var(--ochre);
 }
-.stats__column--peak .stats__columnValue {
+.stats__column--active .stats__columnBar {
+  transform: scaleX(1.08);
+}
+.stats__column--peak .stats__columnValue,
+.stats__column--active .stats__columnValue,
+.stats__column--active .stats__columnTick {
   font-weight: 700;
   color: var(--ochre);
+}
+
+/* Every month (16 years × 12 months heatmap matrix) */
+.stats__monthReadout {
+  font-variant-numeric: tabular-nums;
+  color: var(--on);
+}
+.stats__monthMatrix {
+  display: grid;
+  gap: 5px;
+  margin-top: 18px;
+}
+.stats__monthHeaderRow,
+.stats__monthRow {
+  display: grid;
+  grid-template-columns: 36px repeat(12, minmax(0, 1fr));
+  column-gap: 5px;
+  align-items: center;
+}
+.stats__monthRow {
+  padding: 2px 4px;
+  margin-inline: -4px;
+  border-radius: 8px;
+  transition: background-color 180ms ease;
+}
+.stats__monthRow--selected {
+  outline: 1.5px solid var(--on);
+  background: color-mix(in oklab, var(--ochre) 26%, transparent);
+}
+.stats__monthColHead {
+  font: 700 var(--type-micro) / 1.1 var(--display);
+  color: var(--soft);
+  text-align: center;
+}
+.stats__monthColShort {
+  display: none;
+}
+.stats__monthYearBtn {
+  padding: 2px 4px 2px 0;
+  font: 700 var(--type-caption) / 1.1 var(--display);
+  font-variant-numeric: tabular-nums;
+  color: var(--soft);
+  text-align: left;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  border-radius: 4px;
+  transition: color 160ms ease;
+}
+.stats__monthYearBtn:hover,
+.stats__monthYearBtn:focus-visible,
+.stats__monthRow--selected .stats__monthYearBtn {
+  color: var(--on);
+}
+.stats__monthCell {
+  display: block;
+  width: 100%;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  border-radius: 5px;
+  transition:
+    transform 240ms cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 180ms ease;
+}
+.stats__monthCell--t0 {
+  background: color-mix(in oklab, var(--on) 6%, transparent);
+  border: 1px dashed color-mix(in oklab, var(--on) 20%, transparent);
+}
+.stats__monthCell--t1 {
+  cursor: pointer;
+  background: color-mix(in oklab, var(--ochre) 34%, var(--pc));
+}
+.stats__monthCell--t2 {
+  cursor: pointer;
+  background: color-mix(in oklab, var(--ochre) 66%, var(--pc));
+}
+.stats__monthCell--t3 {
+  cursor: pointer;
+  background: var(--ochre);
+}
+.stats__monthCell--t4 {
+  cursor: pointer;
+  background: var(--vermilion);
+}
+.stats__monthCell--peak {
+  box-shadow: inset 0 0 0 2px var(--on);
+}
+.stats__monthCell--active {
+  z-index: 2;
+  box-shadow: 0 0 0 2px var(--on);
+  transform: scale(1.2);
+}
+
+/* Soundtrack by year (Annual champions) */
+.stats__championList {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  margin: 16px 0 0;
+  list-style: none;
+}
+.stats__championRow {
+  display: grid;
+  grid-template-columns: 46px minmax(0, 1fr);
+  column-gap: 10px;
+  align-items: center;
+  padding: 5px 8px;
+  margin-inline: -8px;
+  border-radius: 10px;
+  transition: background-color 180ms ease;
+}
+.stats__championRow:hover,
+.stats__championRow--selected {
+  background: color-mix(in oklab, var(--on) 10%, transparent);
+}
+.stats__championRow--selected {
+  outline: 1.5px solid var(--ochre);
+}
+.stats__championYear {
+  padding: 4px 6px;
+  font: 700 var(--type-caption) / 1.1 var(--display);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-on-cream);
+  cursor: pointer;
+  background: var(--ochre);
+  border: 0;
+  border-radius: 6px;
+}
+.stats__championLink {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  column-gap: 10px;
+  align-items: center;
+  min-width: 0;
+  color: inherit;
+  text-decoration: none;
+}
+.stats__championMat {
+  padding: 3px;
+  border-radius: 6px;
+  rotate: var(--r, 0deg);
+}
+.stats__championMat img {
+  display: block;
+  width: 34px;
+  height: 34px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+.stats__championArtEmpty {
+  width: 40px;
+  height: 40px;
+}
+.stats__championMain {
+  display: grid;
+  gap: 1px;
+  min-width: 0;
+}
+.stats__championTrack,
+.stats__championArtist {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stats__championTrack {
+  font: 700 var(--type-body) / 1.25 var(--display);
+}
+.stats__championLink:hover .stats__championTrack,
+.stats__championLink:focus-visible .stats__championTrack {
+  text-decoration: underline;
+  text-decoration-color: color-mix(in oklab, var(--on) 45%, transparent);
+  text-underline-offset: 3px;
+}
+.stats__championArtist {
+  font-size: var(--type-caption);
+}
+.stats__championPlays {
+  font: 700 var(--type-caption) / 1.2 var(--display);
+  font-variant-numeric: tabular-nums;
+  color: var(--ochre);
+  text-align: right;
+  white-space: nowrap;
 }
 
 /* On repeat */
@@ -199,7 +545,7 @@
   --meter: var(--on);
 }
 
-/* A day of listening */
+/* A day of listening (interactive) */
 .stats__shift--morning {
   --shift: var(--ochre);
 }
@@ -214,7 +560,7 @@
 }
 .stats__shifts {
   display: grid;
-  gap: 14px;
+  gap: 10px;
   align-content: center;
   padding: 0;
   margin: 0;
@@ -225,9 +571,23 @@
   grid-template-columns: 12px auto;
   gap: 2px 8px;
   align-items: center;
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 10px;
+  transition:
+    background-color 180ms ease,
+    translate 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.stats__shift--active {
+  background: color-mix(in oklab, var(--on) 10%, transparent);
+  translate: 4px 0;
 }
 .stats__shift .stats__meta {
   grid-column: 2;
+}
+.stats__shiftCounts {
+  font-size: var(--type-caption);
+  font-variant-numeric: tabular-nums;
 }
 .stats__swatch {
   display: block;
@@ -239,6 +599,11 @@
 .stats__shiftShare {
   font: 700 var(--type-h3) / 1.25 var(--display);
   font-variant-numeric: tabular-nums;
+}
+.stats__clockReadout,
+.stats__weekReadout {
+  font-variant-numeric: tabular-nums;
+  color: var(--on);
 }
 
 /* Front to back */
@@ -310,7 +675,7 @@
   text-align: right;
 }
 
-/* Day of week */
+/* Day of week (interactive) */
 .stats__splitPart--0 {
   --part: var(--on);
 }
@@ -327,19 +692,29 @@
 }
 .stats__splitKey {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   align-content: center;
   padding: 0;
   margin: 0;
   font: 400 var(--type-body) / 1.5 var(--body);
   list-style: none;
 }
-.stats__splitKey li {
+.stats__splitKeyRow {
   display: grid;
   grid-template-columns: 12px minmax(0, 1fr) auto 56px;
   column-gap: 8px;
   align-items: baseline;
+  padding: 4px 8px;
   white-space: nowrap;
+  cursor: pointer;
+  border-radius: 8px;
+  transition:
+    background-color 180ms ease,
+    translate 220ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.stats__splitKeyRow--active {
+  background: color-mix(in oklab, var(--on) 12%, transparent);
+  translate: 3px 0;
 }
 .stats__splitKey .stats__swatch {
   align-self: center;
@@ -350,6 +725,40 @@
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
+.stats__weekdayChips {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+  padding: 0;
+  margin: 16px 0 0;
+  list-style: none;
+}
+.stats__weekdayChip {
+  display: grid;
+  gap: 2px;
+  justify-items: center;
+  padding: 6px 4px;
+  cursor: pointer;
+  background: color-mix(in oklab, var(--on) 8%, transparent);
+  border-radius: 8px;
+  transition:
+    background-color 180ms ease,
+    color 180ms ease,
+    translate 240ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.stats__weekdayChip--active {
+  color: var(--ink-on-cream);
+  background: var(--ochre);
+  translate: 0 -3px;
+}
+.stats__weekdayShort {
+  font: 700 var(--type-caption) / 1.1 var(--display);
+}
+.stats__weekdayVal {
+  font: 600 var(--type-micro) / 1.2 var(--body);
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+}
 .stats__facts {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -357,19 +766,6 @@
   margin: 14px 0 0;
   font: 600 var(--type-meta) / 1.35 var(--body);
   color: var(--soft);
-}
-.stats__dayRepeats {
-  display: grid;
-  gap: 6px;
-  padding: 0;
-  margin: 8px 0 0;
-  list-style: none;
-}
-.stats__dayRepeats li {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto 104px;
-  column-gap: 12px;
-  align-items: baseline;
 }
 
 @media (max-width: 1000px) {
@@ -384,8 +780,16 @@
   }
 }
 
+@media (max-width: 820px) {
+  .stats__yearPanel {
+    right: auto;
+    left: 0;
+  }
+}
+
 @media (max-width: 600px) {
-  .stats__sections {
+  .stats__sections,
+  .stats__body {
     row-gap: 36px;
   }
   .stats__band {
@@ -400,6 +804,31 @@
   }
   .stats__column:nth-child(even) .stats__columnTick {
     visibility: hidden;
+  }
+  .stats__monthColFull {
+    display: none;
+  }
+  .stats__monthColShort {
+    display: inline;
+  }
+  .stats__monthHeaderRow,
+  .stats__monthRow {
+    grid-template-columns: 28px repeat(12, minmax(0, 1fr));
+    column-gap: 3px;
+  }
+  .stats__monthCell {
+    height: 16px;
+    border-radius: 3px;
+  }
+  .stats__topSongRow {
+    grid-template-columns: 26px auto minmax(0, 1fr) auto;
+  }
+  .stats__topSongRow .stats__meter,
+  .stats__topArtistRow .stats__meter {
+    display: none;
+  }
+  .stats__topArtistRow {
+    grid-template-columns: 26px minmax(0, 1fr) auto;
   }
   .stats__repeatRow {
     grid-template-columns: 24px minmax(0, 1fr) 34px;

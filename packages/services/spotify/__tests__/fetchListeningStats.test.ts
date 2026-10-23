@@ -1,6 +1,11 @@
 import { dbClient } from '@dg/db';
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
-import { fetchListeningStats, longestMonthStreak } from '../fetchListeningStats';
+import {
+  fetchListeningStats,
+  longestDayStreak,
+  longestMonthStreak,
+  parseStatsRange,
+} from '../fetchListeningStats';
 
 const mockSpotifyGet = jest.fn();
 
@@ -35,6 +40,7 @@ const session = Array.from({ length: 6 }, (_, i) =>
 );
 
 const plays: Array<Play> = [
+  play('2023-11-12T20:00:00Z', 'ls-track-1'),
   play('2024-01-10T20:00:00Z', 'ls-track-1'),
   play('2024-02-10T20:00:00Z', 'ls-track-2'),
   ...session,
@@ -57,7 +63,11 @@ async function isolateTables() {
 }
 
 async function seedCatalog() {
-  await db.MusicArtist.create({ id: ARTIST, name: 'Cached Artist', url: null });
+  await db.MusicArtist.create({
+    id: ARTIST,
+    name: 'Cached Artist',
+    url: 'https://open.spotify.com/artist/cached',
+  });
   await db.MusicAlbum.create({
     id: SINGLES,
     imageUrl: 'https://image.test/singles.jpg',
@@ -95,7 +105,7 @@ describe('fetchListeningStats', () => {
     await expect(fetchListeningStats()).resolves.toBeNull();
   });
 
-  it('aggregates plays in Pacific time with sessions, repeats, and depth', async () => {
+  it('aggregates plays in Pacific time with sessions, repeats, top tracks, top artists, and depth', async () => {
     await seedCatalog();
     await db.SpotifyPlay.bulkCreate(
       plays.map((row) => ({ ...row, playedAt: new Date(row.playedAt) })),
@@ -119,16 +129,16 @@ describe('fetchListeningStats', () => {
     const stats = await fetchListeningStats();
 
     expect(stats).toMatchObject({
-      activeDays: 7,
-      activeMonths: 4,
+      activeDays: 8,
+      activeMonths: 5,
       artists: 2,
-      dayRepeats: [],
-      firstPlayedAt: '2024-01-10T20:00:00.000Z',
+      dayStreak: { days: 4, end: '2024-03-08', start: '2024-03-05' },
+      firstPlayedAt: '2023-11-12T20:00:00.000Z',
       frontToBack: [
         {
           album: { artistNames: 'Cached Artist', name: 'Shelf album' },
-          plays: 9,
-          sessionPlays: 8,
+          plays: 10,
+          sessionPlays: 9,
           sessions: 1,
         },
       ],
@@ -136,62 +146,165 @@ describe('fetchListeningStats', () => {
       minutesPerPlay: 3,
       monthStreak: { end: '2024-03', months: 3, start: '2024-01' },
       onRepeat: [{ plays: 4, track: { name: 'Repeat me' }, week: '2024-03-04' }],
-      plays: 13,
-      sessionPlays: 8,
+      plays: 14,
+      range: { kind: 'all' },
+      sessionPlays: 9,
       sessions: 1,
-      shelf: { albums: 1, plays: 9, topTenOnShelf: 1 },
-      spanDays: 113,
-      tracks: 7,
-      years: [{ plays: 13, year: 2024 }],
-    });
-    expect(stats?.topAlbums.map((row) => [row.album.name, row.plays])).toEqual([
-      ['Shelf album', 9],
-    ]);
-    expect(stats?.depth).toEqual([
-      { months: 4, name: 'Cached Artist', plays: 13, tracks: 7 },
-      { months: 1, name: 'Guest Artist', plays: 4, tracks: 1 },
-    ]);
-    expect(stats?.hours[15]).toBe(6);
-    expect(stats?.hours[19]).toBe(4);
-    // Monday first: the session and first repeat land on Tuesday, the rest Wednesday to Saturday.
-    expect(stats?.weekdays).toEqual([0, 7, 3, 1, 1, 1, 0]);
-    await expect(db.MusicArtist.findByPk(GUEST)).resolves.toMatchObject({ name: 'Guest Artist' });
-  });
-
-  it('filters aggregates to a single Pacific calendar year while preserving the full years list', async () => {
-    await seedCatalog();
-    await db.SpotifyPlay.bulkCreate([
-      {
-        ...play('2023-06-15T20:00:00Z', 'ls-track-2023'),
-        playedAt: new Date('2023-06-15T20:00:00Z'),
-      },
-      ...plays.map((row) => ({ ...row, playedAt: new Date(row.playedAt) })),
-    ]);
-
-    const stats2024 = await fetchListeningStats({ range: 'year', year: 2024 });
-    expect(stats2024).toMatchObject({
-      activeDays: 7,
-      activeMonths: 4,
-      plays: 13,
+      shelf: { albums: 1, plays: 10, topTenOnShelf: 1 },
+      spanDays: 172,
       tracks: 7,
       years: [
         { plays: 1, year: 2023 },
         { plays: 13, year: 2024 },
       ],
     });
+    expect(stats?.topAlbums.map((row) => [row.album.name, row.plays])).toEqual([
+      ['Shelf album', 10],
+    ]);
+    expect(stats?.topTracks).toEqual([
+      {
+        albumImageUrl: 'https://image.test/singles.jpg',
+        albumName: 'Singles',
+        artistNames: 'Cached Artist',
+        id: REPEAT_TRACK,
+        name: 'Repeat me',
+        plays: 4,
+        url: 'https://open.spotify.com/track/repeat',
+      },
+    ]);
+    expect(stats?.topArtists).toEqual([
+      {
+        id: ARTIST,
+        months: 5,
+        name: 'Cached Artist',
+        plays: 14,
+        tracks: 7,
+        url: 'https://open.spotify.com/artist/cached',
+      },
+      {
+        id: GUEST,
+        months: 1,
+        name: 'Guest Artist',
+        plays: 4,
+        tracks: 1,
+        url: 'https://open.spotify.com/artist/guest',
+      },
+    ]);
+    expect(stats?.monthlyPlays).toEqual([
+      { month: 11, plays: 1, year: 2023 },
+      { month: 1, plays: 1, year: 2024 },
+      { month: 2, plays: 1, year: 2024 },
+      { month: 3, plays: 10, year: 2024 },
+      { month: 5, plays: 1, year: 2024 },
+    ]);
+    expect(stats?.yearChampions).toEqual([
+      {
+        track: {
+          albumImageUrl: 'https://image.test/singles.jpg',
+          albumName: 'Singles',
+          artistNames: 'Cached Artist',
+          id: REPEAT_TRACK,
+          name: 'Repeat me',
+          plays: 4,
+          url: 'https://open.spotify.com/track/repeat',
+        },
+        year: 2024,
+      },
+    ]);
+    expect(stats?.depth).toEqual([
+      { months: 5, name: 'Cached Artist', plays: 14, tracks: 7 },
+      { months: 1, name: 'Guest Artist', plays: 4, tracks: 1 },
+    ]);
+    expect(stats?.hours[15]).toBe(6);
+    expect(stats?.hours[19]).toBe(4);
+    expect(stats?.weekdays).toEqual([0, 7, 3, 1, 1, 1, 1]);
+    await expect(db.MusicArtist.findByPk(GUEST)).resolves.toMatchObject({ name: 'Guest Artist' });
+  });
+
+  it('filters stats by specific year while preserving all available years', async () => {
+    await seedCatalog();
+    await db.SpotifyPlay.bulkCreate(
+      plays.map((row) => ({ ...row, playedAt: new Date(row.playedAt) })),
+    );
+
+    const stats2024 = await fetchListeningStats({ kind: 'year', year: 2024 });
+    expect(stats2024).toMatchObject({
+      activeDays: 7,
+      activeMonths: 4,
+      plays: 13,
+      range: { kind: 'year', year: 2024 },
+      spanDays: 113,
+      years: [
+        { plays: 1, year: 2023 },
+        { plays: 13, year: 2024 },
+      ],
+    });
+
+    const stats2023 = await fetchListeningStats({ kind: 'year', year: 2023 });
+    expect(stats2023).toMatchObject({
+      activeDays: 1,
+      activeMonths: 1,
+      plays: 1,
+      range: { kind: 'year', year: 2023 },
+      spanDays: 1,
+      years: [
+        { plays: 1, year: 2023 },
+        { plays: 13, year: 2024 },
+      ],
+    });
+  });
+
+  it('filters stats by rolling week and month windows anchored at the latest play', async () => {
+    await seedCatalog();
+    await db.SpotifyPlay.bulkCreate(
+      plays.map((row) => ({ ...row, playedAt: new Date(row.playedAt) })),
+    );
+
+    const weekStats = await fetchListeningStats({ kind: 'week' });
+    expect(weekStats).toMatchObject({
+      activeDays: 1,
+      plays: 1,
+      range: { kind: 'week' },
+      spanDays: 7,
+      tracks: 1,
+    });
+
+    const monthStats = await fetchListeningStats({ kind: 'month' });
+    expect(monthStats).toMatchObject({
+      activeDays: 1,
+      plays: 1,
+      range: { kind: 'month' },
+      spanDays: 30,
+      tracks: 1,
+    });
   });
 });
 
-describe('longestMonthStreak', () => {
+describe('streaks and range parsing', () => {
   it('finds the longest run of consecutive months, across year boundaries', () => {
     expect(longestMonthStreak(['2023-11', '2023-12', '2024-01', '2024-03', '2024-04'])).toEqual({
       end: '2024-01',
       months: 3,
       start: '2023-11',
     });
+    expect(longestMonthStreak([])).toEqual({ end: '', months: 0, start: '' });
   });
 
-  it('is empty with no months', () => {
-    expect(longestMonthStreak([])).toEqual({ end: '', months: 0, start: '' });
+  it('finds the longest run of consecutive calendar days', () => {
+    expect(longestDayStreak(['2024-02-28', '2024-02-29', '2024-03-01', '2024-03-03'])).toEqual({
+      days: 3,
+      end: '2024-03-01',
+      start: '2024-02-28',
+    });
+    expect(longestDayStreak([])).toEqual({ days: 0, end: '', start: '' });
+  });
+
+  it('parses range query keys into typed StatsRange values', () => {
+    expect(parseStatsRange(undefined)).toEqual({ kind: 'all' });
+    expect(parseStatsRange('all')).toEqual({ kind: 'all' });
+    expect(parseStatsRange('week')).toEqual({ kind: 'week' });
+    expect(parseStatsRange('month')).toEqual({ kind: 'month' });
+    expect(parseStatsRange('2024')).toEqual({ kind: 'year', year: 2024 });
+    expect(parseStatsRange('invalid')).toEqual({ kind: 'all' });
   });
 });

@@ -12,7 +12,7 @@ export function ListeningStatsSkeleton() {
     >
       <ul className="stats__totals">
         {Object.entries(TOTAL_CUTS).map(([key, cut]) => (
-          <li key={key}>
+          <li className={`stats__totalSlot stats__totalSlot--${key}`} key={key}>
             <TotalPaper cut={cut}>{null}</TotalPaper>
           </li>
         ))}

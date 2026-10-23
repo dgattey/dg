@@ -3,7 +3,7 @@ import type { CSSProperties } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { cx, paperSurfaceVars } from '../../collage/paperVars';
 import type { PaperTone } from '../../collage/types';
-import { formatCount } from './listeningStatsFormat';
+import { formatCount, formatRangeSuffix } from './listeningStatsFormat';
 import { Cover } from './StatsCardParts';
 import { Scallop, Stub, Vinyl } from './StatsShapes';
 
@@ -57,10 +57,11 @@ export function TopAlbumsPodium({ stats }: { stats: ListeningStats }) {
   if (!first) {
     return null;
   }
+  const suffix = formatRangeSuffix(stats.range);
   return (
     <section className="stats__podium">
       <h2 className="paperTag stats__sectionTag" style={paperSurfaceVars('black', 'quad-c', -2)}>
-        Top albums, all time
+        Top albums, {suffix}
       </h2>
       <div className="stats__hero">
         <div className="stats__heroArt">
@@ -71,15 +72,10 @@ export function TopAlbumsPodium({ stats }: { stats: ListeningStats }) {
           </span>
           <Scallop className="stats__heroStamp" tiltDeg={-12} tone="ochre">
             <span className="stats__heroRank">#1</span>
-            <span className="stats__meta">all time</span>
+            <span className="stats__meta">{suffix}</span>
           </Scallop>
         </div>
-        <PaperCard
-          className="stats__heroCard"
-          edge="soft-b"
-          innerClassName="stats__heroInner"
-          tiltDeg={1.2}
-        >
+        <PaperCard edge="soft-b" innerClassName="stats__heroInner" tiltDeg={1.2}>
           <span className="stats__meta">Most played album</span>
           <span className="stats__heroTitle">{first.album.name}</span>
           <span className="stats__meta">{first.album.artistNames}</span>

@@ -112,7 +112,7 @@ export function checkUnusedCssRules(
         continue;
       }
       declaredClasses.add(className);
-      if (seenInFile.has(className) || file.startsWith('apps/web/src/app/music/stats/')) {
+      if (seenInFile.has(className)) {
         continue;
       }
       seenInFile.add(className);
@@ -147,12 +147,7 @@ export function checkUnusedCssRules(
   }
 
   for (const [file, content] of sourceFiles) {
-    if (
-      !file.endsWith('.tsx') ||
-      file.includes('__tests__/') ||
-      file.endsWith('.test.tsx') ||
-      file.startsWith('apps/web/src/app/music/stats/')
-    ) {
+    if (!file.endsWith('.tsx') || file.includes('__tests__/') || file.endsWith('.test.tsx')) {
       continue;
     }
     for (const match of content.matchAll(STATIC_JSX_CLASS_ATTR)) {

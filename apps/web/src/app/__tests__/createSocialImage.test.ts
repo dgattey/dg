@@ -173,16 +173,18 @@ describe('createSocialImage', () => {
       activeDays: 137,
       activeMonths: 10,
       artists: 2215,
-      dayRepeats: [],
+      dayStreak: { days: 14, end: '2026-02-14', start: '2026-02-01' },
       depth: [{ months: 7, name: 'Burna Boy', plays: 457, tracks: 161 }],
       firstPlayedAt: '2026-01-01T00:00:00.000Z',
       frontToBack: [],
       hours: Array.from({ length: 24 }, () => 0),
       lastPlayedAt: '2026-10-22T00:00:00.000Z',
       minutesPerPlay: 3.95,
+      monthlyPlays: [],
       monthStreak: { end: '2026-10', months: 10, start: '2026-01' },
       onRepeat: [],
       plays: 8476,
+      range: { kind: 'year', year },
       sessionPlays: 2400,
       sessions: 190,
       shelf: { albums: 102, plays: 1800, topTenOnShelf: 8 },
@@ -199,8 +201,11 @@ describe('createSocialImage', () => {
           plays: 344,
         },
       ],
+      topArtists: [],
+      topTracks: [],
       tracks: 4818,
       weekdays: [0, 0, 0, 0, 0, 0, 0],
+      yearChampions: [],
       years: [
         { plays: 23510, year: 2025 },
         { plays: 8476, year: 2026 },
@@ -208,7 +213,7 @@ describe('createSocialImage', () => {
     });
 
     const { card } = await renderCard('music-stats');
-    expect(fetchListeningStats).toHaveBeenCalledWith({ range: 'year', year });
+    expect(fetchListeningStats).toHaveBeenCalledWith({ kind: 'year', year });
     expect(card.props).toMatchObject({
       activeDaysPercent: '47%',
       listeningHours: '558h',
