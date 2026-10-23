@@ -30,30 +30,43 @@ export type RenderableBook = {
   } | null;
 };
 
-const VALID_READING_STATUSES: ReadonlySet<string> = new Set(['notStarted', 'read', 'reading']);
-
-function parseReadingStatus(raw: string | null | undefined): ReadingStatus {
-  if (raw && VALID_READING_STATUSES.has(raw)) {
-    return raw as ReadingStatus;
+/**
+ * Derives reading status from `readDateFinished` and `readDateStarted`, matching Saga (`Book.swift`).
+ */
+export function deriveReadingStatus({
+  readDateFinished,
+  readDateStarted,
+}: {
+  readDateFinished?: string | null;
+  readDateStarted?: string | null;
+}): ReadingStatus {
+  if (cleanWhitespace(readDateFinished)) {
+    return 'read';
   }
-  return 'read';
+  if (cleanWhitespace(readDateStarted)) {
+    return 'reading';
+  }
+  return 'notStarted';
 }
 
 export function toRenderableBook(book: Book | null | undefined): RenderableBook | null {
   const title = cleanBookTitle(book?.title);
   const author = cleanWhitespace(book?.author);
-  if (!title || !author) {
+  const readDateFinished = cleanWhitespace(book?.readDateFinished) || null;
+  const readDateStarted = cleanWhitespace(book?.readDateStarted) || null;
+  const readingStatus = deriveReadingStatus({ readDateFinished, readDateStarted });
+  if (!title || !author || readingStatus === 'notStarted') {
     return null;
   }
 
-  const rawThumbnail = book?.thumbnail;
-  const thumbnailUrl = normalizeContentfulAssetUrl(rawThumbnail?.url);
+  const rawCover = book?.coverImage;
+  const thumbnailUrl = normalizeContentfulAssetUrl(rawCover?.url);
   const thumbnail =
-    thumbnailUrl && rawThumbnail?.width != null && rawThumbnail?.height != null
+    thumbnailUrl && rawCover?.width != null && rawCover?.height != null
       ? {
-          height: rawThumbnail.height,
+          height: rawCover.height,
           url: thumbnailUrl,
-          width: rawThumbnail.width,
+          width: rawCover.width,
         }
       : null;
 
@@ -69,8 +82,8 @@ export function toRenderableBook(book: Book | null | undefined): RenderableBook 
     author,
     id: book?.sys?.id?.trim() || `${title}-${author}`.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
     rating,
-    readDateFinished: book?.readDateFinished ?? null,
-    readingStatus: parseReadingStatus(book?.readingStatus),
+    readDateFinished,
+    readingStatus,
     review: reviewText || null,
     thumbnail,
     title,

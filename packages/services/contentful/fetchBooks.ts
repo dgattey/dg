@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { FALLBACK_BOOKS } from '@dg/content-models/books/fallbackBooks';
 import {
   type RenderableBook,
   toRenderableBook,
@@ -11,9 +10,24 @@ import { gql } from 'graphql-request';
 import { parseResponse } from '../clients/parseResponse';
 import { getContentfulClient } from './contentfulClient';
 
+const PAGE_SIZE = 200;
+
+/**
+ * Queries read and currently-reading books from Contentful.
+ * Excludes `notStarted` entries (`readDateFinished` and `readDateStarted` both null)
+ * at the GraphQL layer so want-to-read entries do not consume page budget, and omits
+ * `Book.isbn` because Contentful's GraphQL schema types `isbn` as a 32-bit `Int`
+ * which overflows on 13-digit ISBN-13 values.
+ */
 const QUERY = gql`
-  query Books {
-    bookCollection(order: [readDateFinished_DESC, title_ASC], limit: 200) {
+  query Books($limit: Int!, $skip: Int!) {
+    bookCollection(
+      where: { OR: [{ readDateFinished_exists: true }, { readDateStarted_exists: true }] }
+      order: [readDateFinished_DESC, readDateStarted_DESC, title_ASC]
+      limit: $limit
+      skip: $skip
+    ) {
+      total
       items {
         sys {
           id
@@ -21,12 +35,12 @@ const QUERY = gql`
         title
         author
         rating
+        readDateStarted
         readDateFinished
-        readingStatus
         reviewDescription {
           json
         }
-        thumbnail {
+        coverImage {
           url(transform: { quality: 90, format: WEBP })
           width
           height
@@ -37,23 +51,41 @@ const QUERY = gql`
 `;
 
 /**
- * Fetches books sorted by finished date descending from Contentful.
- * Falls back to the curated Goodreads dataset when Contentful credentials
- * are absent or bookCollection returns empty.
+ * Fetches all read and currently-reading books from Contentful, paginating across
+ * 200-book pages if needed. Returns an empty array only when Contentful credentials
+ * are absent; GraphQL and schema errors propagate directly.
  */
 export async function fetchBooks(): Promise<Array<RenderableBook>> {
   if (!process.env.CONTENTFUL_SPACE_ID || !process.env.CONTENTFUL_ACCESS_TOKEN) {
-    return [...FALLBACK_BOOKS];
+    return [];
   }
 
-  try {
-    const data = parseResponse(booksResponseSchema, await getContentfulClient().request(QUERY), {
-      kind: 'graphql',
-      source: 'contentful.fetchBooks',
-    });
-    const books = (data.bookCollection?.items ?? []).map(toRenderableBook).filter(isNotNullish);
-    return books.length > 0 ? books : [...FALLBACK_BOOKS];
-  } catch {
-    return [...FALLBACK_BOOKS];
+  const client = getContentfulClient();
+  const books: Array<RenderableBook> = [];
+  let skip = 0;
+
+  while (true) {
+    const data = parseResponse(
+      booksResponseSchema,
+      await client.request(QUERY, { limit: PAGE_SIZE, skip }),
+      {
+        kind: 'graphql',
+        source: 'contentful.fetchBooks',
+      },
+    );
+    const pageItems = data.bookCollection?.items ?? [];
+    for (const item of pageItems) {
+      const renderable = toRenderableBook(item);
+      if (isNotNullish(renderable)) {
+        books.push(renderable);
+      }
+    }
+    skip += pageItems.length;
+    const total = data.bookCollection?.total ?? 0;
+    if (pageItems.length === 0 || skip >= total) {
+      break;
+    }
   }
+
+  return books;
 }

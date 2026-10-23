@@ -1,6 +1,5 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { FALLBACK_BOOKS } from '@dg/content-models/books/fallbackBooks';
 import type { RenderableBook } from '@dg/content-models/contentful/renderables/books';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -18,6 +17,69 @@ import {
 const readingCss = readFileSync(join(__dirname, '..', 'reading.css'), 'utf8');
 const chromeCss = readFileSync(join(__dirname, '..', '..', 'collage', 'chrome.css'), 'utf8');
 const collageCss = readFileSync(join(__dirname, '..', '..', 'collage', 'collage.css'), 'utf8');
+
+const SHELF_BOOKS: ReadonlyArray<RenderableBook> = [
+  {
+    author: 'Oprah Winfrey',
+    id: 'goodreads-0',
+    rating: 4,
+    readDateFinished: '2026-09-16T00:00:00Z',
+    readingStatus: 'read',
+    review: 'A simple yet profound statement of compassion and positivity.',
+    thumbnail: { height: 393, url: 'https://example.com/path.jpg', width: 318 },
+    title: "The Path Made Clear: Discovering Your Life's Direction and Purpose",
+  },
+  {
+    author: 'Allen Levi',
+    id: 'goodreads-3',
+    rating: 4,
+    readDateFinished: '2026-09-05T00:00:00Z',
+    readingStatus: 'read',
+    review: 'Inspiring and heartwarming.',
+    thumbnail: { height: 900, url: 'https://example.com/theo.jpg', width: 579 },
+    title: 'Theo of Golden',
+  },
+  {
+    author: 'Min Jin Lee',
+    id: 'goodreads-4',
+    rating: 5,
+    readDateFinished: '2025-12-26T00:00:00Z',
+    readingStatus: 'read',
+    review: null,
+    thumbnail: { height: 1500, url: 'https://example.com/pachinko.jpg', width: 987 },
+    title: 'Pachinko',
+  },
+  {
+    author: 'Frank Herbert',
+    id: 'goodreads-5',
+    rating: 5,
+    readDateFinished: '2025-01-04T00:00:00Z',
+    readingStatus: 'read',
+    review: 'Wow, what an epic.',
+    thumbnail: { height: 475, url: 'https://example.com/dune.jpg', width: 316 },
+    title: 'Dune',
+  },
+  {
+    author: 'Ayanna Lloyd Banwo',
+    id: 'goodreads-17',
+    rating: 5,
+    readDateFinished: '2024-01-26T00:00:00Z',
+    readingStatus: 'read',
+    review: 'A magical experience.',
+    thumbnail: { height: 400, url: 'https://example.com/birds.jpg', width: 265 },
+    title: 'When We Were Birds',
+  },
+  {
+    author: 'Chimamanda Ngozi Adichie',
+    id: 'goodreads-18',
+    rating: 5,
+    readDateFinished: '2023-07-02T00:00:00Z',
+    readingStatus: 'read',
+    review: 'One of the best books I have ever read.',
+    thumbnail: { height: 472, url: 'https://example.com/americanah.jpg', width: 318 },
+    title: 'Americanah',
+  },
+];
 
 const IN_PROGRESS: RenderableBook = {
   author: 'Ursula K. Le Guin',
@@ -38,22 +100,26 @@ describe('readingHelpers', () => {
   });
 
   it('only offers filters that narrow the shelf', () => {
-    expect(readingFilterOptions(FALLBACK_BOOKS).map(({ label }) => label)).toEqual([
+    expect(readingFilterOptions(SHELF_BOOKS).map(({ label }) => label)).toEqual([
       'All',
       '5 stars',
       'Notes',
     ]);
-    expect(
-      readingFilterOptions([IN_PROGRESS, ...FALLBACK_BOOKS]).map(({ label }) => label),
-    ).toEqual(['All', 'Reading', 'Finished', '5 stars', 'Notes']);
+    expect(readingFilterOptions([IN_PROGRESS, ...SHELF_BOOKS]).map(({ label }) => label)).toEqual([
+      'All',
+      'Reading',
+      'Finished',
+      '5 stars',
+      'Notes',
+    ]);
   });
 
   it('features the book in progress, else the newest review', () => {
-    expect(featuredBook(sortBooks(FALLBACK_BOOKS))).toMatchObject({
+    expect(featuredBook(sortBooks(SHELF_BOOKS))).toMatchObject({
       book: { title: expect.stringMatching(/^The Path Made Clear/) },
       tag: 'Latest review',
     });
-    expect(featuredBook(sortBooks([...FALLBACK_BOOKS, IN_PROGRESS]))).toMatchObject({
+    expect(featuredBook(sortBooks([...SHELF_BOOKS, IN_PROGRESS]))).toMatchObject({
       book: { id: 'in-progress' },
       tag: 'Currently reading',
     });
@@ -61,9 +127,9 @@ describe('readingHelpers', () => {
 
   it('gives five-star reviews a wide card, other reviews a half card, and bare ratings a print', () => {
     const byTitle = (title: string) => {
-      const book = FALLBACK_BOOKS.find((candidate) => candidate.title === title);
+      const book = SHELF_BOOKS.find((candidate) => candidate.title === title);
       if (!book) {
-        throw new Error(`Missing fallback book ${title}`);
+        throw new Error(`Missing test book ${title}`);
       }
       return book;
     };
@@ -74,11 +140,11 @@ describe('readingHelpers', () => {
   });
 
   it('counts the shelf and its five-star books', () => {
-    expect(shelfStats(FALLBACK_BOOKS)).toEqual({ fiveStars: 5, total: 23 });
+    expect(shelfStats(SHELF_BOOKS)).toEqual({ fiveStars: 4, total: 6 });
   });
 
   it('groups the shelf into a reading section and then years, newest first', () => {
-    const labels = shelfSections(sortBooks([...FALLBACK_BOOKS, IN_PROGRESS])).map(
+    const labels = shelfSections(sortBooks([...SHELF_BOOKS, IN_PROGRESS])).map(
       ({ label }) => label,
     );
     expect(labels).toEqual(['Currently reading', '2026', '2025', '2024', '2023']);
@@ -87,10 +153,10 @@ describe('readingHelpers', () => {
 
 describe('ReadingShelf', () => {
   it('features the latest review and shelves the rest by year', () => {
-    render(<ReadingShelf books={FALLBACK_BOOKS} />);
+    render(<ReadingShelf books={SHELF_BOOKS} />);
 
     expect(screen.getByText('Latest review')).toBeInTheDocument();
-    expect(screen.getByText('23 books · 5 five-star picks')).toBeInTheDocument();
+    expect(screen.getByText('6 books · 4 five-star picks')).toBeInTheDocument();
     expect(
       screen.getByRole('heading', { level: 2, name: /^The Path Made Clear/ }),
     ).toBeInTheDocument();
@@ -107,7 +173,7 @@ describe('ReadingShelf', () => {
 
   it('narrows to five-star books and drops the feature when 5 stars is picked', async () => {
     const user = userEvent.setup();
-    render(<ReadingShelf books={FALLBACK_BOOKS} />);
+    render(<ReadingShelf books={SHELF_BOOKS} />);
 
     const fiveStars = screen.getByRole('button', { name: /^5 stars/ });
     await user.click(fiveStars);
@@ -120,7 +186,7 @@ describe('ReadingShelf', () => {
 
   it('narrows to books with notes when Notes is picked', async () => {
     const user = userEvent.setup();
-    render(<ReadingShelf books={FALLBACK_BOOKS} />);
+    render(<ReadingShelf books={SHELF_BOOKS} />);
 
     await user.click(screen.getByRole('button', { name: /^Notes/ }));
 

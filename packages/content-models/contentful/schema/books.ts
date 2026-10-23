@@ -1,22 +1,22 @@
 import * as v from 'valibot';
 import { assetSchema } from './shared';
 
+const richTextJsonSchema = v.looseObject({
+  json: v.unknown(),
+});
+
 /**
  * Schema for a Book entry returned by the Contentful GraphQL API.
  */
 const bookSchema = v.looseObject({
   author: v.optional(v.nullable(v.string())),
-  isbn13: v.optional(v.nullable(v.number())),
+  coverImage: v.optional(v.nullable(assetSchema)),
+  isbn: v.optional(v.nullable(v.number())),
+  notes: v.optional(v.nullable(richTextJsonSchema)),
   rating: v.optional(v.nullable(v.number())),
   readDateFinished: v.optional(v.nullable(v.string())),
-  readingStatus: v.optional(v.nullable(v.string())),
-  reviewDescription: v.optional(
-    v.nullable(
-      v.looseObject({
-        json: v.unknown(),
-      }),
-    ),
-  ),
+  readDateStarted: v.optional(v.nullable(v.string())),
+  reviewDescription: v.optional(v.nullable(richTextJsonSchema)),
   sys: v.optional(
     v.nullable(
       v.looseObject({
@@ -24,7 +24,6 @@ const bookSchema = v.looseObject({
       }),
     ),
   ),
-  thumbnail: v.optional(v.nullable(assetSchema)),
   title: v.optional(v.nullable(v.string())),
 });
 
@@ -35,6 +34,7 @@ export const booksResponseSchema = v.looseObject({
   bookCollection: v.nullable(
     v.looseObject({
       items: v.optional(v.nullable(v.array(v.nullable(bookSchema)))),
+      total: v.optional(v.nullable(v.number())),
     }),
   ),
 });
