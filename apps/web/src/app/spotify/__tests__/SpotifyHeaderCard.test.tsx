@@ -42,14 +42,19 @@ describe('SpotifyHeaderCard', () => {
   it.each([
     ['/music', '/reading'],
     ['/reading', '/music'],
-  ])('keeps floating notes for a playing track after navigating from %s to %s', (from, to) => {
+    ['/', '/reading'],
+    ['/reading', '/'],
+  ])('keeps the same floating notes DOM node mounted when navigating from %s to %s', (from, to) => {
     mockPathname = from;
     const { rerender } = render(<SpotifyHeaderCard track={TRACK} />);
-    expect(screen.getByTestId('notes')).toHaveAttribute('data-playing', 'true');
+    const notesBefore = screen.getByTestId('notes');
+    expect(notesBefore).toHaveAttribute('data-playing', 'true');
 
     mockPathname = to;
     rerender(<SpotifyHeaderCard track={TRACK} />);
 
-    expect(screen.getByTestId('notes')).toHaveAttribute('data-playing', 'true');
+    const notesAfter = screen.getByTestId('notes');
+    expect(notesAfter).toBe(notesBefore);
+    expect(notesAfter).toHaveAttribute('data-playing', 'true');
   });
 });

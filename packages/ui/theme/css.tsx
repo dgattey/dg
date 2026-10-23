@@ -138,14 +138,15 @@ function isBreakpointObject(val: unknown): val is Partial<Record<BreakpointKey, 
 }
 
 function resolveSelector(parentSelector: string, nestedKey: string): string {
+  const parents = parentSelector.split(',').map((parent) => parent.trim());
   return nestedKey
     .split(',')
-    .map((part) => {
+    .flatMap((part) => {
       const trimmed = part.trim();
-      if (trimmed.includes('&')) return trimmed.replaceAll('&', parentSelector);
-      return trimmed.startsWith(':') || trimmed.startsWith('[')
-        ? `${parentSelector}${trimmed}`
-        : `${parentSelector} ${trimmed}`;
+      return parents.map((parent) => {
+        if (trimmed.includes('&')) return trimmed.replaceAll('&', parent);
+        return trimmed.startsWith(':') ? `${parent}${trimmed}` : `${parent} ${trimmed}`;
+      });
     })
     .join(', ');
 }

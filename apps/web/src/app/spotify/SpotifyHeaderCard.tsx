@@ -4,37 +4,28 @@ import type { Track } from '@dg/content-models/spotify/Track';
 import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
 import { Box } from '@dg/ui/core/Box';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
-import { TIMING_MEDIUM } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
 import { usePathname } from 'next/navigation';
+import type { MouseEvent } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { musicDestinationTitle } from '../layouts/musicHeaderDestinations';
 import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
 
-const getContainerSx = (isClickable: boolean): SxObject => ({
-  '@keyframes headerCardEnter': {
-    from: {
-      transform: 'translateX(-8px)',
-    },
-    to: {
-      transform: 'translateX(0)',
-    },
-  },
+const containerSx: SxObject = {
   // A single-line title's min-content is its full text, so the paper must opt into shrinking.
   '& > .paperWrap': {
     minWidth: 0,
   },
   alignItems: 'center',
-  animation: `headerCardEnter ${TIMING_MEDIUM}ms ease-out`,
-  cursor: isClickable ? 'pointer' : undefined,
+  cursor: 'pointer',
   display: 'flex',
   flexShrink: 1,
   maxWidth: 'max(25vw, 16rem)',
   minWidth: 0,
   overflow: 'visible',
   transformOrigin: 'left center',
-});
+};
 
 const slotSx: SxObject = {
   alignItems: 'center',
@@ -61,51 +52,36 @@ export function SpotifyHeaderCard({ track: serverTrack }: SpotifyHeaderCardProps
 
 function DockedHeaderCard({ track }: { track: Track }) {
   const pathname = usePathname() ?? '/';
-  const isHome = pathname === homeRoute;
-  const isMusic = pathname === musicRoute;
-  const opensMusicPage = !isHome && !isMusic;
 
-  const card = (
-    <Box
-      onClick={isHome ? scrollToNowPlayingCard : undefined}
-      onKeyDown={
-        isHome
-          ? (e) => {
-              if (e.key === 'Enter' || e.key === ' ') {
-                e.preventDefault();
-                scrollToNowPlayingCard();
-              }
-            }
-          : undefined
-      }
-      role={isHome ? 'button' : undefined}
-      sx={getContainerSx(isHome || opensMusicPage)}
-      tabIndex={isHome ? 0 : undefined}
-    >
-      <PaperCard
-        edge="quad-a"
-        innerClassName="chrome__nowPlayingInner paperInnerUnclipped"
-        tiltDeg={1}
-        tone="cream"
-      >
-        <TrackListing disableLinks={isHome || opensMusicPage} track={track} variant="compact" />
-      </PaperCard>
-    </Box>
-  );
+  const handleClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (pathname === homeRoute) {
+      event.preventDefault();
+      scrollToNowPlayingCard();
+    } else if (pathname === musicRoute) {
+      event.preventDefault();
+      window.scrollTo({ behavior: 'smooth', top: 0 });
+    }
+  };
 
   return (
     <Box sx={slotSx}>
-      {opensMusicPage ? (
-        <PageTransitionLink
-          className="chrome__nowPlayingLink"
-          href={musicRoute}
-          title={musicDestinationTitle(musicRoute)}
-        >
-          {card}
-        </PageTransitionLink>
-      ) : (
-        card
-      )}
+      <PageTransitionLink
+        className="chrome__nowPlayingLink"
+        href={musicRoute}
+        onClick={handleClick}
+        title={musicDestinationTitle(musicRoute)}
+      >
+        <Box sx={containerSx}>
+          <PaperCard
+            edge="quad-a"
+            innerClassName="chrome__nowPlayingInner paperInnerUnclipped"
+            tiltDeg={1}
+            tone="cream"
+          >
+            <TrackListing disableLinks={true} track={track} variant="compact" />
+          </PaperCard>
+        </Box>
+      </PageTransitionLink>
     </Box>
   );
 }

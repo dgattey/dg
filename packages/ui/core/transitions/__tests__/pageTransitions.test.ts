@@ -1,9 +1,14 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { rememberPageOrigin, takePageOrigin } from '../pageScrollMemory';
+import {
+  rememberPageOrigin,
+  setViewTransitionScrollOffset,
+  takePageOrigin,
+} from '../pageScrollMemory';
 import {
   albumArtViewTransitionName,
   albumTransitionTypes,
+  inPageViewTransitionProps,
   pageTransitionTypes,
   pageViewTransitionProps,
 } from '../pageTransitions';
@@ -38,6 +43,16 @@ describe('pageTransitions', () => {
         'page-open': 'vt-page-recede',
       },
     });
+    expect(inPageViewTransitionProps('reading-shelf')).toEqual({
+      default: 'reading-shelf',
+      'page-close': 'none',
+      'page-open': 'none',
+    });
+  });
+
+  it('updates --vt-scroll-offset on the document element when remembering page origin', () => {
+    setViewTransitionScrollOffset(640);
+    expect(document.documentElement.style.getPropertyValue('--vt-scroll-offset')).toBe('640px');
   });
 
   it('fades arriving page content in from 0 to 1 and departing page content out from 1 to 0', () => {

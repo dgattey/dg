@@ -2,7 +2,7 @@
 
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
-import type { ReactNode } from 'react';
+import type { MouseEvent, ReactNode } from 'react';
 import { rememberPageOrigin } from './pageScrollMemory';
 import { pageTransitionTypes } from './pageTransitions';
 
@@ -11,7 +11,7 @@ type PageTransitionLinkProps = {
   children?: ReactNode;
   className?: string;
   href: string;
-  onClick?: () => void;
+  onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
   title: string;
 };
 
@@ -33,9 +33,11 @@ export function PageTransitionLink({
       {...rest}
       aria-label={title}
       href={href}
-      onClick={() => {
-        rememberPageOrigin(pathname);
-        onClick?.();
+      onClick={(event) => {
+        onClick?.(event);
+        if (!event.defaultPrevented) {
+          rememberPageOrigin(pathname);
+        }
       }}
       transitionTypes={pageTransitionTypes('open')}
     >

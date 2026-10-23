@@ -2,6 +2,7 @@
 
 import type { ListeningStats, StatsRangeKey } from '@dg/services/spotify/fetchListeningStats';
 import { Tooltip } from '@dg/ui/core/Tooltip';
+import { inPageViewTransitionProps } from '@dg/ui/core/transitions/pageTransitions';
 import {
   type CSSProperties,
   startTransition,
@@ -280,7 +281,7 @@ export function ListeningStatsSections({
         onSelectRange={(nextKey) => applyRange(nextKey)}
         selectedKey={selectedKey}
       />
-      <ViewTransition default="stats-filter">
+      <ViewTransition default={inPageViewTransitionProps('stats-filter')}>
         <div className="stats__body" key={formatStatsRangeKey(stats.range)}>
           <ListeningStatsTotals stats={stats} />
           <TopAlbumsPodium stats={stats} />

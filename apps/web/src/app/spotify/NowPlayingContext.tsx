@@ -67,16 +67,26 @@ function nextRefreshDelayMs(track: Track | null): number {
   return POLL_INTERVAL_MS;
 }
 
+function isSameTrack(a: Track | null, b: Track): boolean {
+  return (
+    a !== null &&
+    a.id === b.id &&
+    a.isPlaying === b.isPlaying &&
+    a.playedAt === b.playedAt &&
+    a.progressMs === b.progressMs
+  );
+}
+
 async function refreshLatestSong(
   requestIdRef: { current: number },
-  setTrack: (track: Track) => void,
+  setTrack: (updater: (prev: Track | null) => Track | null) => void,
 ) {
   const requestId = ++requestIdRef.current;
   try {
     const latest = await loadLatestSong();
     if (latest && requestIdRef.current === requestId) {
       writeSessionTrack(latest);
-      setTrack(latest);
+      setTrack((prev) => (isSameTrack(prev, latest) ? prev : latest));
     }
   } catch {
     return;

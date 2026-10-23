@@ -33,4 +33,26 @@ describe('compileSx', () => {
     expect(compiled?.css).toContain('-webkit-font-smoothing: auto;');
     expect(compiled?.css).not.toContain('--webkit-font-smoothing');
   });
+
+  it('distributes comma-separated parent selectors across nested descendant attribute selectors', () => {
+    const compiled = compileSx({
+      '@media (hover: hover)': {
+        '&:hover': {
+          '[data-album-art]': {
+            transform: 'scale(1.9)',
+          },
+        },
+      },
+      '*:focus-visible &, &:has(:focus-visible)': {
+        '[data-album-art]': {
+          transform: 'scale(1.9)',
+        },
+      },
+    });
+
+    expect(compiled?.css).toContain(
+      `*:focus-visible .${compiled?.className} [data-album-art], .${compiled?.className}:has(:focus-visible) [data-album-art]`,
+    );
+    expect(compiled?.css).toContain(`.${compiled?.className}:hover [data-album-art]`);
+  });
 });
