@@ -16,6 +16,23 @@ const SNAPSHOT_FIELDS = [
 ] as const;
 
 /**
+ * Timestamp of the most recent successful favorite-albums refresh check, or
+ * null when no refresh has ever been recorded.
+ */
+export async function readFavoriteAlbumsRefreshedAt(): Promise<Date | null> {
+  try {
+    const snapshot = await db.FavoriteAlbumSnapshot.findOne({
+      attributes: ['refreshedAt'],
+      where: { singleton: true },
+    });
+    return snapshot?.refreshedAt ?? null;
+  } catch (error) {
+    log.warn('Could not read favorite albums snapshot timestamp', { error });
+    return null;
+  }
+}
+
+/**
  * Last stored favorites list, newest playlist addition first, or null when no
  * refresh has ever completed. An empty array means Spotify was reached and the
  * playlist was genuinely empty.
@@ -58,19 +75,17 @@ const isStoredSnapshot = (stored: Array<PlaylistAlbum> | null, albums: Array<Pla
 
 /**
  * Replaces the stored favorites list with a fresh one and resolves whether the
- * stored list changed. An identical list is left alone, so the 30-minute sync
- * only revalidates the albums page when the playlist actually moved. The
- * playlist is the source of truth, so removals have to disappear here too —
- * hence replace rather than upsert. Never throws; failing to store is not
- * worth failing a request that already has its data. The marker row records a
- * successful empty playlist too, so the UI can tell empty from temporarily
- * unavailable.
+ * stored list changed. When the list is unchanged, the album rows are left
+ * untouched and only the snapshot `refreshedAt` marker is updated, so the sync
+ * only revalidates `/music/albums` when the playlist actually moved.
  */
 export async function writeFavoriteAlbumsSnapshot(albums: Array<PlaylistAlbum>): Promise<boolean> {
-  if (isStoredSnapshot(await readFavoriteAlbumsSnapshot(), albums)) {
-    return false;
-  }
+  const unchanged = isStoredSnapshot(await readFavoriteAlbumsSnapshot(), albums);
   try {
+    if (unchanged) {
+      await db.FavoriteAlbumSnapshot.upsert({ refreshedAt: new Date(), singleton: true });
+      return false;
+    }
     await dbClient.transaction(async (transaction) => {
       await db.FavoriteAlbum.destroy({ transaction, where: {} });
       if (albums.length > 0) {
