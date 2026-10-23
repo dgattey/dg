@@ -126,6 +126,7 @@ There are two tables:
 
 - Spotify only exposes the 50 most recent plays. Sync runs every 30 minutes via GitHub Actions calling `/api/spotify/sync`.
 - An empty DB is seeded by the first cron sync from that recent-plays window; later runs fetch only plays after the latest stored timestamp.
+- Historical gaps older than 50 plays can be backfilled from a Spotify Extended Streaming History `.zip` or `.json` export via `turbo spotify:import -- <path.zip | dir | file.json ...> [--dry-run] [--from=YYYY-MM-DD] [--to=YYYY-MM-DD]`.
 - Track metadata for history uses individual `GET /tracks/{id}` requests.
 - The homepage "latest song" card uses `fetchRecentlyPlayed`, which returns now-playing or last-played data for UI.
 
