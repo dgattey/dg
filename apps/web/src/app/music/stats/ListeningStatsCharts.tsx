@@ -1,101 +1,124 @@
 'use client';
 
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
+import { Tooltip } from '@dg/ui/core/Tooltip';
 import { type CSSProperties, useState } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
+import { PaperTag } from '../../collage/PaperTag';
 import { cx } from '../../collage/paperVars';
 import {
   formatCompact,
   formatCount,
   formatHours,
   formatPercent,
-  formatYearTick,
-  WEEKDAY_NAMES,
-  weekdayExtremes,
-  weekdayGroupOf,
-  weekdayGroups,
+  formatRangeSuffix,
 } from './listeningStatsFormat';
 import { bar, CardHead } from './StatsCardParts';
+import { Stub } from './StatsShapes';
 
-export function YearsCard({
+export function TimelineBarsCard({
+  onPrefetchYear,
   onSelectYear,
   stats,
 }: {
+  onPrefetchYear?: (year: number) => void;
   onSelectYear?: (year: number) => void;
   stats: ListeningStats;
 }) {
-  const [hoveredYear, setHoveredYear] = useState<number | null>(null);
-  const max = Math.max(...stats.years.map((year) => year.plays), 1);
-  const totalYearsPlays = stats.years.reduce((sum, year) => sum + year.plays, 0);
-  const peak = stats.years.find((year) => year.plays === max);
-  const last = stats.years.length - 1;
-  const selectedYear = stats.range.kind === 'year' ? stats.range.year : null;
-  const activeYearNum = hoveredYear ?? selectedYear;
-  const activeEntry =
-    activeYearNum !== null ? stats.years.find((year) => year.year === activeYearNum) : undefined;
+  const [hoveredKey, setHoveredKey] = useState<string | null>(null);
+  const { points, title } = stats.timeline;
+  const max = Math.max(...points.map((point) => point.plays), 1);
+  const totalPlays = points.reduce((sum, point) => sum + point.plays, 0);
+  const peak = points.find((point) => point.plays === max && point.plays > 0) ?? points[0];
+  const isDense = points.length > 16;
+  const activePoint = hoveredKey ? points.find((point) => point.key === hoveredKey) : undefined;
 
   return (
     <PaperCard
       className="stats__card stats__years"
       edge="soft-a"
       innerClassName="stats__pad"
+      tag={
+        peak ? (
+          <PaperTag className="stats__pin" tiltDeg={-4.2} tone="ochre">
+            Peak {peak.tick}
+          </PaperTag>
+        ) : undefined
+      }
       tiltDeg={-1.1}
       tone="viridian"
     >
       <CardHead
         aside={
-          activeEntry ? (
+          activePoint ? (
             <span className="stats__peak">
-              {activeEntry === peak ? `Peak ${activeEntry.year}` : activeEntry.year}:{' '}
-              {formatCount(activeEntry.plays)} plays,{' '}
-              {formatCount((activeEntry.plays * stats.minutesPerPlay) / 60)} hours ·{' '}
-              {formatPercent(activeEntry.plays, totalYearsPlays)}
+              {activePoint === peak ? `Peak ${activePoint.label}` : activePoint.label}:{' '}
+              {formatCount(activePoint.plays)} plays,{' '}
+              {formatHours((activePoint.plays * stats.minutesPerPlay) / 60)} ·{' '}
+              {formatPercent(activePoint.plays, totalPlays)}
             </span>
           ) : peak ? (
             <span className="stats__peak">
-              Peak {peak.year}: {formatCount(peak.plays)} plays,{' '}
-              {formatCount((peak.plays * stats.minutesPerPlay) / 60)} hours
+              Peak {peak.label}: {formatCount(peak.plays)} plays,{' '}
+              {formatHours((peak.plays * stats.minutesPerPlay) / 60)}
             </span>
           ) : null
         }
-        title="Plays per year"
+        title={title}
       />
       <ol
-        className={cx('stats__columns', activeYearNum !== null && 'stats__columns--engaged')}
-        style={{ '--count': stats.years.length } as CSSProperties}
+        className={cx(
+          'stats__columns',
+          isDense && 'stats__columns--dense',
+          hoveredKey !== null && 'stats__columns--engaged',
+        )}
+        style={{ '--count': points.length } as CSSProperties}
       >
-        {stats.years.map((year, i) => {
-          const isActive = activeYearNum === year.year;
-          const showValue = year === peak || isActive;
+        {points.map((point, idx) => {
+          const isActive = hoveredKey === point.key;
+          const isPeak = point === peak && point.plays > 0;
+          const showValue = isActive || (!isDense && isPeak) || (isDense && isPeak && !hoveredKey);
+          const showTick =
+            !isDense || idx === 0 || idx === points.length - 1 || idx % 5 === 0 || isActive;
+          const yearFilter = point.yearFilter;
           return (
             <li
-              aria-label={`${year.year}: ${formatCount(year.plays)} plays`}
+              aria-label={`${point.label}: ${formatCount(point.plays)} plays`}
               className={cx(
                 'stats__column',
-                year === peak && 'stats__column--peak',
-                year !== peak && (i === 0 || i === last) && 'stats__column--partial',
+                isPeak && 'stats__column--peak',
+                !isPeak && point.partial && 'stats__column--partial',
                 isActive && 'stats__column--active',
               )}
-              key={year.year}
-              onClick={() => onSelectYear?.(year.year)}
-              onKeyDown={(event) => {
-                if (event.key === 'Enter' || event.key === ' ') {
-                  event.preventDefault();
-                  onSelectYear?.(year.year);
+              key={point.key}
+              onClick={yearFilter ? () => onSelectYear?.(yearFilter) : undefined}
+              onKeyDown={
+                yearFilter
+                  ? (event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault();
+                        onSelectYear?.(yearFilter);
+                      }
+                    }
+                  : undefined
+              }
+              onMouseEnter={() => {
+                setHoveredKey(point.key);
+                if (yearFilter) {
+                  onPrefetchYear?.(yearFilter);
                 }
               }}
-              onMouseEnter={() => setHoveredYear(year.year)}
-              onMouseLeave={() => setHoveredYear(null)}
+              onMouseLeave={() => setHoveredKey(null)}
             >
               <span className="stats__columnValue">
-                {showValue ? formatCompact(year.plays) : null}
+                {showValue ? formatCompact(point.plays) : null}
               </span>
-              <span aria-hidden="true" className="stats__columnBar" style={bar(year.plays, max)} />
+              <span aria-hidden="true" className="stats__columnBar" style={bar(point.plays, max)} />
               <span className="stats__columnTick">
-                <span className="chrome__srOnly">{year.year}</span>
-                <span aria-hidden="true">{formatYearTick(year.year)}</span>
+                <span className="chrome__srOnly">{point.label}</span>
+                <span aria-hidden="true">{showTick ? point.tick : ''}</span>
               </span>
-              <span className="chrome__srOnly">: {formatCount(year.plays)} plays</span>
+              <span className="chrome__srOnly">: {formatCount(point.plays)} plays</span>
             </li>
           );
         })}
@@ -104,151 +127,120 @@ export function YearsCard({
   );
 }
 
-/** A petal per weekday, Monday at the top, each as long as its share of plays. */
-function WeekFlower({
-  hoveredDay,
-  hoveredGroup,
-  onHoverDay,
-  weekdays,
-}: {
-  hoveredDay: number | null;
-  hoveredGroup: number | null;
-  onHoverDay: (day: number | null) => void;
-  weekdays: ReadonlyArray<number>;
-}) {
-  const max = Math.max(...weekdays, 1);
-  const engaged = hoveredDay !== null || hoveredGroup !== null;
-  return (
-    <svg
-      aria-hidden="true"
-      className="stats__flower"
-      onPointerLeave={() => onHoverDay(null)}
-      onPointerOver={(event) => {
-        const target = (event.target as Element | null)?.closest?.('[data-day]');
-        const attr = target?.getAttribute('data-day');
-        onHoverDay(attr !== null && attr !== undefined ? Number(attr) : null);
-      }}
-      viewBox="-110 -110 220 220"
-    >
-      {weekdays.map((plays, day) => {
-        const length = 46 + (50 * plays) / max;
-        const width = 19;
-        const deg = (day * 360) / weekdays.length;
-        const groupIdx = weekdayGroupOf(day);
-        const isActive = hoveredDay === day || (hoveredDay === null && hoveredGroup === groupIdx);
-        return (
-          <g
-            className={cx(
-              'stats__petalGroup',
-              isActive && 'stats__petalGroup--active',
-              engaged && !isActive && 'stats__petalGroup--dim',
-            )}
-            data-day={day}
-            key={WEEKDAY_NAMES[day]}
-            transform={`rotate(${deg.toFixed(2)})`}
-          >
-            <path
-              className={`stats__petal stats__splitPart--${groupIdx}`}
-              d={`M0 0 C${width} ${-length * 0.32} ${width} ${-length * 0.86} 0 ${-length} C${-width} ${-length * 0.86} ${-width} ${-length * 0.32} 0 0 Z`}
-            />
-            <text
-              className="stats__petalDay"
-              transform={`translate(0 ${-length - 9}) rotate(${-deg.toFixed(2)})`}
-            >
-              {WEEKDAY_NAMES[day]?.charAt(0)}
-            </text>
-          </g>
-        );
-      })}
-      <circle className="stats__flowerHeart" r="15" />
-    </svg>
-  );
-}
+const GENRE_TONE_CLASSES = [
+  'stats__genreTone--0',
+  'stats__genreTone--1',
+  'stats__genreTone--2',
+  'stats__genreTone--3',
+  'stats__genreTone--4',
+  'stats__genreTone--5',
+  'stats__genreTone--6',
+  'stats__genreTone--7',
+] as const;
 
-export function WeekCard({ stats }: { stats: ListeningStats }) {
-  const [hoveredDay, setHoveredDay] = useState<number | null>(null);
-  const [hoveredGroup, setHoveredGroup] = useState<number | null>(null);
-  const groups = weekdayGroups(stats.weekdays);
-  const { busiest, quietest } = weekdayExtremes(stats.weekdays);
-  const hoveredDayPlays = hoveredDay !== null ? (stats.weekdays[hoveredDay] ?? 0) : null;
-  const activeGroup = hoveredGroup !== null ? groups[hoveredGroup] : undefined;
+export function GenresCard({ stats }: { stats: ListeningStats }) {
+  const [hoveredGenre, setHoveredGenre] = useState<string | null>(null);
+  const genres = stats.genres.slice(0, 7);
+  if (genres.length === 0) {
+    return null;
+  }
+  const totalGenrePlays = Math.max(
+    genres.reduce((sum, item) => sum + item.plays, 0),
+    1,
+  );
+  const topGenrePlays = Math.max(genres[0]?.plays ?? 1, 1);
+  const leadGenre = genres[0];
+  const activeGenre = hoveredGenre ? genres.find((item) => item.genre === hoveredGenre) : undefined;
+  const suffix = formatRangeSuffix(stats.range);
 
   return (
     <PaperCard
-      className="stats__card stats__week"
+      className="stats__card stats__genres"
       edge="soft-b"
       innerClassName="stats__pad"
+      tag={
+        leadGenre ? (
+          <Stub className="stats__cardStamp" kind="stamp" tiltDeg={4.4} tone="ochre">
+            <span className="stats__cardStampKicker">#1 genre</span>
+            <span className="stats__cardStampValue">{leadGenre.genre}</span>
+          </Stub>
+        ) : undefined
+      }
       tiltDeg={1.4}
       tone="rose"
     >
       <CardHead
         aside={
-          hoveredDay !== null && hoveredDayPlays !== null ? (
-            <span className="stats__weekReadout">
-              <strong>{WEEKDAY_NAMES[hoveredDay]}</strong>: {formatCount(hoveredDayPlays)} plays ·{' '}
-              {formatHours((hoveredDayPlays * stats.minutesPerPlay) / 60)} (
-              {formatPercent(hoveredDayPlays, stats.plays)})
+          activeGenre ? (
+            <span className="stats__genreReadout">
+              <strong>{activeGenre.genre}</strong>: {formatCount(activeGenre.plays)} plays ·{' '}
+              {formatHours((activeGenre.plays * stats.minutesPerPlay) / 60)} (
+              {formatPercent(activeGenre.plays, totalGenrePlays)})
             </span>
-          ) : activeGroup ? (
-            <span className="stats__weekReadout">
-              <strong>{activeGroup.label}</strong>: {formatCount(activeGroup.plays)} plays (
-              {formatPercent(activeGroup.plays, stats.plays)})
-            </span>
-          ) : null
+          ) : (
+            `Top ${genres.length} Spotify genres`
+          )
         }
-        title="Day of week"
+        title={`Genres, ${suffix}`}
       />
-      <div className="stats__weekBody">
-        <WeekFlower
-          hoveredDay={hoveredDay}
-          hoveredGroup={hoveredGroup}
-          onHoverDay={setHoveredDay}
-          weekdays={stats.weekdays}
-        />
-        <ul className="stats__splitKey">
-          {groups.map((group, i) => (
-            <li
+      <div
+        aria-hidden="true"
+        className={cx('stats__genreRibbon', hoveredGenre !== null && 'stats__genreRibbon--engaged')}
+      >
+        {genres.map((item, idx) => {
+          const toneClass = GENRE_TONE_CLASSES[idx % GENRE_TONE_CLASSES.length] ?? '';
+          const isActive = hoveredGenre === item.genre;
+          return (
+            <span
               className={cx(
-                'stats__splitKeyRow',
-                hoveredGroup === i && 'stats__splitKeyRow--active',
+                'stats__genreSegment',
+                toneClass,
+                isActive && 'stats__genreSegment--active',
               )}
-              key={group.label}
-              onMouseEnter={() => setHoveredGroup(i)}
-              onMouseLeave={() => setHoveredGroup(null)}
-            >
-              <span aria-hidden="true" className={`stats__swatch stats__splitPart--${i}`} />
-              <span>{group.label}</span>
-              <span className="stats__meta">{formatCount(group.plays)}</span>
-              <span className="stats__splitShare">{formatPercent(group.plays, stats.plays)}</span>
-            </li>
-          ))}
-        </ul>
+              key={item.genre}
+              style={{ '--share': String(item.plays / totalGenrePlays) } as CSSProperties}
+            />
+          );
+        })}
       </div>
-      <ul aria-label="Plays by weekday" className="stats__weekdayChips">
-        {WEEKDAY_NAMES.map((name, day) => {
-          const plays = stats.weekdays[day] ?? 0;
-          const isActive = hoveredDay === day;
+      <ol className="stats__genreList">
+        {genres.map((item, idx) => {
+          const toneClass = GENRE_TONE_CLASSES[idx % GENRE_TONE_CLASSES.length] ?? '';
+          const isActive = hoveredGenre === item.genre;
+          const artistsLabel = item.artists.join(' · ');
           return (
             <li
-              className={cx('stats__weekdayChip', isActive && 'stats__weekdayChip--active')}
-              key={name}
-              onMouseEnter={() => setHoveredDay(day)}
-              onMouseLeave={() => setHoveredDay(null)}
+              className={cx(
+                'stats__genreRow',
+                idx === 0 && 'stats__topRow--lead',
+                isActive && 'stats__genreRow--active',
+              )}
+              key={item.genre}
+              onMouseEnter={() => setHoveredGenre(item.genre)}
+              onMouseLeave={() => setHoveredGenre(null)}
             >
-              <span className="stats__weekdayShort">{name.slice(0, 3)}</span>
-              <span className="stats__weekdayVal">{formatCompact(plays)}</span>
+              <span aria-hidden="true" className={cx('stats__genreSwatch', toneClass)} />
+              <span className="stats__repeatName">
+                <Tooltip title={item.genre} whenTruncated>
+                  <span className="stats__label stats__genreName">{item.genre}</span>
+                </Tooltip>
+                <Tooltip title={artistsLabel} whenTruncated>
+                  <span className="stats__meta">{artistsLabel}</span>
+                </Tooltip>
+              </span>
+              <span
+                aria-hidden="true"
+                className={cx('stats__meter', toneClass)}
+                style={bar(item.plays, topGenrePlays)}
+              />
+              <span className="stats__topCountGroup">
+                <span className="stats__count">{formatCount(item.plays)}</span>
+                <span className="stats__meta">{formatPercent(item.plays, totalGenrePlays)}</span>
+              </span>
             </li>
           );
         })}
-      </ul>
-      <p className="stats__facts">
-        <span>
-          Busiest: <strong>{busiest.name}</strong>, {formatCount(busiest.plays)}
-        </span>
-        <span>
-          Quietest: <strong>{quietest.name}</strong>, {formatCount(quietest.plays)}
-        </span>
-      </p>
+      </ol>
     </PaperCard>
   );
 }

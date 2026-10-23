@@ -39,9 +39,12 @@ async function runMigrations(dbClient: Sequelize): Promise<void> {
       up: (qi: typeof queryInterface, Seq: typeof Sequelize) => Promise<void>;
     };
     await migration.up(queryInterface, Sequelize);
-    await dbClient.query('INSERT INTO "SequelizeMeta" (name) VALUES (?)', {
-      replacements: [file],
-    });
+    await dbClient.query(
+      'INSERT INTO "SequelizeMeta" (name) VALUES (?) ON CONFLICT (name) DO NOTHING',
+      {
+        replacements: [file],
+      },
+    );
   }
 }
 

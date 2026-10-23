@@ -15,7 +15,6 @@ import {
   formatPercent,
   peakHours,
   playsInDayPart,
-  weekdayExtremes,
 } from './listeningStatsFormat';
 
 /**
@@ -26,14 +25,13 @@ export async function getListeningStatsMarkdown(): Promise<string> {
     const stats = await getListeningStats();
     const sections: Array<string> = [
       '# Listening stats',
-      `> Totals, top albums, top songs, top artists, and listening habits from ${SITE_NAME}'s Spotify history`,
+      `> Totals, top albums, top songs, top artists, genres, and listening habits from ${SITE_NAME}'s Spotify history`,
     ];
 
     if (!stats) {
       sections.push('No listening history yet.');
     } else {
       const peak = peakHours(stats.hours, 2);
-      const { busiest, quietest } = weekdayExtremes(stats.weekdays);
       sections.push(
         '## Totals',
         [
@@ -46,6 +44,13 @@ export async function getListeningStatsMarkdown(): Promise<string> {
         ].join('\n'),
         '## Plays per year',
         stats.years.map((year) => `- ${year.year}: ${formatCount(year.plays)}`).join('\n'),
+        '## Genres',
+        stats.genres
+          .map(
+            (item, i) =>
+              `${i + 1}. ${item.genre}: ${formatCount(item.plays)} plays (${item.artists.join(', ')})`,
+          )
+          .join('\n'),
         '## Top albums, all time',
         stats.topAlbums
           .map(
@@ -81,7 +86,6 @@ export async function getListeningStatsMarkdown(): Promise<string> {
             ({ label, part, startHour }) =>
               `- ${label} (${formatDayPartHours(startHour)}): ${formatPercent(playsInDayPart(stats.hours, part), stats.plays)} of plays`,
           ),
-          `- Busiest day: ${busiest.name} (${formatCount(busiest.plays)}); quietest: ${quietest.name} (${formatCount(quietest.plays)})`,
         ].join('\n'),
         '## Front to back',
         stats.frontToBack

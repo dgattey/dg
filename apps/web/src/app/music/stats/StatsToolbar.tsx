@@ -105,10 +105,12 @@ function bindYearMenu(details: HTMLDetailsElement | null) {
 
 export function StatsToolbar({
   availableYears,
+  onPrefetchRange,
   onSelectRange,
   selectedKey,
 }: {
   availableYears: ReadonlyArray<number>;
+  onPrefetchRange?: (key: StatsRangeKey) => void;
   onSelectRange: (key: StatsRangeKey) => void;
   selectedKey: StatsRangeKey;
 }) {
@@ -125,6 +127,12 @@ export function StatsToolbar({
       detailsRef.current.open = false;
     }
     onSelectRange(yearKey);
+  };
+
+  const handleMenuWarmup = () => {
+    for (const year of availableYears.slice(0, 4)) {
+      onPrefetchRange?.(`${year}`);
+    }
   };
 
   return (
@@ -157,6 +165,7 @@ export function StatsToolbar({
                 aria-pressed={current}
                 className="paperPillButton"
                 onClick={() => onSelectRange(option.key)}
+                onMouseEnter={() => onPrefetchRange?.(option.key)}
                 type="button"
               >
                 {option.label}
@@ -165,7 +174,11 @@ export function StatsToolbar({
           );
         })}
         {availableYears.length > 0 ? (
-          <details className="chrome__music stats__yearMenu" ref={setDetailsRef}>
+          <details
+            className="chrome__music stats__yearMenu"
+            onPointerEnter={handleMenuWarmup}
+            ref={setDetailsRef}
+          >
             <summary className="chrome__musicSummary stats__yearSummary collageLift">
               <PaperTag
                 className={cx('paperPill', isYearSelected && 'paperButtonCurrent')}
@@ -198,6 +211,8 @@ export function StatsToolbar({
                         )}
                         data-year-option={year}
                         onClick={() => handleYearPick(yearKey)}
+                        onFocus={() => onPrefetchRange?.(yearKey)}
+                        onMouseEnter={() => onPrefetchRange?.(yearKey)}
                         type="button"
                       >
                         {year}

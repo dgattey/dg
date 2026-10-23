@@ -26,18 +26,68 @@ const stats: ListeningStats = {
   activeDays: 90,
   activeMonths: 4,
   artists: 12,
+  champions: {
+    aside: '#1 song each year',
+    entries: [
+      {
+        badge: '2012',
+        key: '2012',
+        track: {
+          albumImageUrl: 'https://i.scdn.co/image/apart',
+          albumName: 'A Moment Apart',
+          artistNames: 'ODESZA',
+          id: 'track-line-of-sight',
+          name: 'Line Of Sight',
+          plays: 62,
+          url: 'https://open.spotify.com/track/line-of-sight',
+        },
+        yearFilter: 2012,
+      },
+    ],
+    title: 'Soundtrack by year',
+  },
   dayStreak: { days: 14, end: '2024-03-14', start: '2024-03-01' },
   depth: [{ months: 4, name: 'Burna Boy', plays: 400, tracks: 20 }],
   firstPlayedAt: '2011-07-29T19:00:00.000Z',
   frontToBack: [{ album: album('dreamland'), plays: 100, sessionPlays: 87, sessions: 7 }],
+  genres: [
+    {
+      artists: ['Burna Boy', 'Fireboy DML'],
+      genre: 'afrobeats',
+      plays: 420,
+      tracks: 28,
+    },
+    {
+      artists: ['ODESZA', 'Tycho'],
+      genre: 'chillwave',
+      plays: 310,
+      tracks: 19,
+    },
+  ],
   hours,
   lastPlayedAt: '2026-08-07T19:00:00.000Z',
+  matrix: {
+    columns: [
+      { full: 'Jan', key: 'Jan', short: 'J' },
+      { full: 'Jul', key: 'Jul', short: 'J' },
+      { full: 'Aug', key: 'Aug', short: 'A' },
+    ],
+    peakCell: { key: '2012-03', label: 'Mar 2012', plays: 600 },
+    rows: [
+      {
+        cells: [
+          { key: '2011-01', label: 'Jan 2011', plays: 0, yearFilter: 2011 },
+          { key: '2011-07', label: 'Jul 2011', plays: 180, yearFilter: 2011 },
+          { key: '2011-08', label: 'Aug 2011', plays: 220, yearFilter: 2011 },
+        ],
+        key: '2011',
+        label: '’11',
+        yearFilter: 2011,
+      },
+    ],
+    title: 'Every month',
+  },
   minutesPerPlay: 3.92,
-  monthlyPlays: [
-    { month: 7, plays: 180, year: 2011 },
-    { month: 8, plays: 220, year: 2011 },
-    { month: 3, plays: 600, year: 2012 },
-  ],
   monthStreak: { end: '2011-10', months: 4, start: '2011-07' },
   onRepeat: [{ plays: 36, track: track('jet-pack'), week: '2017-05-29' }],
   plays: 1_000,
@@ -46,6 +96,13 @@ const stats: ListeningStats = {
   sessions: 30,
   shelf: { albums: 3, plays: 80, topTenOnShelf: 1 },
   spanDays: 100,
+  timeline: {
+    points: [
+      { key: '2011', label: '2011', partial: true, plays: 400, tick: '’11', yearFilter: 2011 },
+      { key: '2012', label: '2012', partial: true, plays: 600, tick: '’12', yearFilter: 2012 },
+    ],
+    title: 'Plays per year',
+  },
   topAlbums: [
     { album: album('apart'), plays: 120 },
     { album: album('rush'), plays: 90 },
@@ -90,21 +147,6 @@ const stats: ListeningStats = {
     },
   ],
   tracks: 300,
-  weekdays: [10, 20, 30, 40, 15, 5, 8],
-  yearChampions: [
-    {
-      track: {
-        albumImageUrl: 'https://i.scdn.co/image/apart',
-        albumName: 'A Moment Apart',
-        artistNames: 'ODESZA',
-        id: 'track-line-of-sight',
-        name: 'Line Of Sight',
-        plays: 62,
-        url: 'https://open.spotify.com/track/line-of-sight',
-      },
-      year: 2012,
-    },
-  ],
   years: [
     { plays: 400, year: 2011 },
     { plays: 600, year: 2012 },
@@ -164,26 +206,42 @@ describe('ListeningStatsSections', () => {
     expect(screen.getByText(/12 to 1 AM/)).toBeInTheDocument();
   });
 
-  it('says how far back the history goes and adapts totals when filtered by range or Year dropdown', async () => {
+  it('switches immediately using preloaded snapshots or onLoadRange when filtered by range or Year dropdown', async () => {
     const user = userEvent.setup();
+    const weekSnapshot: ListeningStats = {
+      ...stats,
+      champions: { ...stats.champions, title: 'Soundtrack by day' },
+      matrix: { ...stats.matrix, title: 'Every day & shift' },
+      plays: 142,
+      range: { kind: 'week' },
+      timeline: { ...stats.timeline, title: 'Plays per day, last week' },
+    };
     const onLoadRange = jest.fn().mockImplementation(async (key: string) => ({
       ...stats,
+      champions: { ...stats.champions, title: 'Soundtrack by month' },
+      matrix: { ...stats.matrix, title: `Every week of ${key}` },
       plays: 420,
-      range: key === 'week' ? { kind: 'week' } : { kind: 'year', year: Number(key) },
+      range: { kind: 'year', year: Number(key) },
+      timeline: { ...stats.timeline, title: `Plays per month, ${key}` },
     }));
 
     const { container } = render(
-      <ListeningStatsSections onLoadRange={onLoadRange} stats={stats} />,
+      <ListeningStatsSections
+        initialSnapshots={{ all: stats, week: weekSnapshot }}
+        onLoadRange={onLoadRange}
+        stats={stats}
+      />,
     );
 
     expect(screen.getByText('Plays since Jul 2011')).toBeInTheDocument();
     expect(container.querySelector('.stats__yearRail')).toBeNull();
 
     await user.click(screen.getByRole('button', { name: 'Last week' }));
-    await waitFor(() => {
-      expect(screen.getByText('Plays last week')).toBeInTheDocument();
-    });
-    expect(screen.getByText('Days in a row')).toBeInTheDocument();
+    expect(screen.getByText('Plays last week')).toBeInTheDocument();
+    expect(screen.getByText('Plays per day, last week')).toBeInTheDocument();
+    expect(screen.getByText('Every day & shift')).toBeInTheDocument();
+    expect(screen.getByText('Soundtrack by day')).toBeInTheDocument();
+    expect(onLoadRange).not.toHaveBeenCalledWith('week');
 
     const yearDetails = container.querySelector<HTMLDetailsElement>('.stats__yearMenu');
     if (!yearDetails) {
@@ -200,6 +258,9 @@ describe('ListeningStatsSections', () => {
     await waitFor(() => {
       expect(screen.getByText('Plays in 2012')).toBeInTheDocument();
     });
+    expect(screen.getByText('Plays per month, 2012')).toBeInTheDocument();
+    expect(screen.getByText('Every week of 2012')).toBeInTheDocument();
+    expect(screen.getByText('Soundtrack by month')).toBeInTheDocument();
   });
 
   it('cuts the totals into stubs, stamps, and seals in a 2D collage mosaic', () => {
@@ -234,13 +295,13 @@ describe('ListeningStatsSections', () => {
     );
   });
 
-  it('updates Plays per year, Every month, and Day of week readouts on hover with zero instructional copy', async () => {
+  it('updates Plays per year, Every month, and Genres readouts on hover with zero instructional copy', async () => {
     const user = userEvent.setup();
     const { container } = render(<ListeningStatsSections stats={stats} />);
 
+    expect(screen.queryByText('Day of week')).not.toBeInTheDocument();
     expect(screen.queryByText('One track, one day')).not.toBeInTheDocument();
     expect(screen.queryByText(/Hover or tap/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/Hover a petal/i)).not.toBeInTheDocument();
 
     const year2011 = screen.getByLabelText('2011: 400 plays');
     await user.hover(year2011);
@@ -252,12 +313,17 @@ describe('ListeningStatsSections', () => {
       'Jul 2011: 180 plays',
     );
 
-    const mondayChip = screen.getByText('Mon');
-    await user.hover(mondayChip);
-    expect(container.querySelector('.stats__weekReadout')).toHaveTextContent('Monday: 10 plays');
+    const afrobeatsRow = screen.getAllByText('afrobeats')[0];
+    if (!afrobeatsRow) {
+      throw new Error('Expected afrobeats row');
+    }
+    await user.hover(afrobeatsRow);
+    expect(container.querySelector('.stats__genreReadout')).toHaveTextContent(
+      'afrobeats: 420 plays',
+    );
   });
 
-  it('names each card with a heading including Every month and Soundtrack by year', () => {
+  it('names each card with a heading including Genres, Every month, and Soundtrack by year', () => {
     render(<ListeningStatsSections stats={stats} />);
 
     expect(
@@ -265,6 +331,7 @@ describe('ListeningStatsSections', () => {
     ).toEqual(
       expect.arrayContaining([
         'Plays per year',
+        'Genres, all time',
         'Every month',
         'Soundtrack by year',
         'Top albums, all time',
@@ -272,7 +339,6 @@ describe('ListeningStatsSections', () => {
         'Top artists, all time',
         'On repeat',
         'Front to back',
-        'Day of week',
       ]),
     );
   });

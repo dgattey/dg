@@ -26,7 +26,7 @@ export function ListeningStatsSkeleton() {
           tone="viridian"
         />
         <PaperCard
-          className="stats__card stats__week"
+          className="stats__card stats__genres"
           edge="soft-b"
           innerClassName="stats__pad stats__skeleton"
           tiltDeg={1.4}

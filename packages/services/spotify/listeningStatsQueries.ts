@@ -13,7 +13,8 @@ export const ALBUM_SESSION_MIN_PLAYS = 5;
 const TOP_ALBUM_CANDIDATES = 10;
 const TOP_TRACK_CANDIDATES = 8;
 const FRONT_TO_BACK_ALBUMS = 4;
-const DEPTH_ARTISTS = 8;
+const DEPTH_ARTISTS = 25;
+const TOP_GENRES_LIMIT = 8;
 
 const int = v.number();
 
@@ -22,28 +23,17 @@ export type SqlPlayFilter = {
   predicate: (alias?: string) => string;
 };
 
-const ALL_TIME_FILTER: SqlPlayFilter = {
-  predicate: () => '',
-};
-
-function columnRef(alias?: string): string {
-  return alias ? `${alias}."playedAt"` : '"playedAt"';
-}
-
-function whereClause(filter: SqlPlayFilter, alias?: string): string {
+const ALL_TIME_FILTER: SqlPlayFilter = { predicate: () => '' };
+const columnRef = (alias?: string): string => (alias ? `${alias}."playedAt"` : '"playedAt"');
+const whereClause = (filter: SqlPlayFilter, alias?: string): string => {
   const cond = filter.predicate(alias);
   return cond ? `WHERE ${cond}` : '';
-}
-
-function andClause(filter: SqlPlayFilter, alias?: string): string {
+};
+const andClause = (filter: SqlPlayFilter, alias?: string): string => {
   const cond = filter.predicate(alias);
   return cond ? `AND ${cond}` : '';
-}
+};
 
-/**
- * Builds an index-friendly `"playedAt" >= ... AND "playedAt" < ...` filter for a
- * Pacific calendar year (`YYYY`).
- */
 export function yearPlayFilter(year: number): SqlPlayFilter {
   const safeYear = Math.trunc(year);
   const startExpr = `('${safeYear}-01-01 00:00:00'::timestamp AT TIME ZONE '${TIME_ZONE}')`;
@@ -56,10 +46,6 @@ export function yearPlayFilter(year: number): SqlPlayFilter {
   };
 }
 
-/**
- * Builds an index-friendly `"playedAt" >= ... AND "playedAt" <= ...` filter for a
- * rolling window of `days` Pacific calendar days ending at `anchor`.
- */
 export function rollingDaysPlayFilter(anchor: Date, days: number): SqlPlayFilter {
   const safeDays = Math.max(1, Math.trunc(days));
   const iso = anchor.toISOString();
@@ -132,11 +118,7 @@ export function selectKnownDurations(filter: SqlPlayFilter = ALL_TIME_FILTER) {
   );
 }
 
-/** Plays per local `year`, `hour`, or ISO weekday. */
-export function selectLocalBuckets(
-  part: 'hour' | 'isodow' | 'year',
-  filter: SqlPlayFilter = ALL_TIME_FILTER,
-) {
+export function selectLocalBuckets(part: 'hour' | 'year', filter: SqlPlayFilter = ALL_TIME_FILTER) {
   return select(
     `SELECT extract(${part} FROM ${LOCAL_PLAYED_AT})::int AS bucket, count(*)::int AS plays
      FROM "SpotifyPlay" ${whereClause(filter)} GROUP BY 1 ORDER BY 1`,
@@ -144,13 +126,13 @@ export function selectLocalBuckets(
   );
 }
 
-export function selectMonthlyPlays() {
+export function selectMonthlyPlays(filter: SqlPlayFilter = ALL_TIME_FILTER) {
   return select(
     `SELECT
        extract(year FROM ${LOCAL_PLAYED_AT})::int AS year,
        extract(month FROM ${LOCAL_PLAYED_AT})::int AS month,
        count(*)::int AS plays
-     FROM "SpotifyPlay"
+     FROM "SpotifyPlay" ${whereClause(filter)}
      GROUP BY 1, 2
      ORDER BY 1, 2`,
     v.object({ month: int, plays: int, year: int }),
@@ -166,12 +148,20 @@ export function selectActiveMonths(filter: SqlPlayFilter = ALL_TIME_FILTER) {
   );
 }
 
-export function selectActiveDays(filter: SqlPlayFilter = ALL_TIME_FILTER) {
+export function selectDailyPlays(filter: SqlPlayFilter = ALL_TIME_FILTER) {
   return select(
-    `SELECT to_char(d, 'YYYY-MM-DD') AS day
-     FROM (SELECT DISTINCT ${LOCAL_PLAYED_AT}::date AS d FROM "SpotifyPlay" ${whereClause(filter)}) days
-     ORDER BY d`,
-    v.object({ day: v.string() }),
+    `SELECT to_char(${LOCAL_PLAYED_AT}::date, 'YYYY-MM-DD') AS day, count(*)::int AS plays
+     FROM "SpotifyPlay" ${whereClause(filter)} GROUP BY 1 ORDER BY 1`,
+    v.object({ day: v.string(), plays: int }),
+  );
+}
+
+export function selectDayHourPlays(filter: SqlPlayFilter = ALL_TIME_FILTER) {
+  return select(
+    `SELECT to_char(${LOCAL_PLAYED_AT}::date, 'YYYY-MM-DD') AS day,
+       extract(hour FROM ${LOCAL_PLAYED_AT})::int AS hour, count(*)::int AS plays
+     FROM "SpotifyPlay" ${whereClause(filter)} GROUP BY 1, 2 ORDER BY 1, 2`,
+    v.object({ day: v.string(), hour: int, plays: int }),
   );
 }
 
@@ -191,20 +181,26 @@ export function selectTopTrackIds(filter: SqlPlayFilter = ALL_TIME_FILTER) {
   );
 }
 
-export function selectYearlyTopTracks() {
+export function selectBucketTopTracks(
+  unit: 'day' | 'month' | 'week' | 'year',
+  filter: SqlPlayFilter = ALL_TIME_FILTER,
+) {
+  const bucketExpr =
+    unit === 'year'
+      ? `to_char(date_trunc('year', ${LOCAL_PLAYED_AT})::date, 'YYYY')`
+      : unit === 'month'
+        ? `to_char(date_trunc('month', ${LOCAL_PLAYED_AT})::date, 'YYYY-MM')`
+        : unit === 'week'
+          ? `to_char(date_trunc('week', ${LOCAL_PLAYED_AT})::date, 'YYYY-MM-DD')`
+          : `to_char(${LOCAL_PLAYED_AT}::date, 'YYYY-MM-DD')`;
   return select(
     `WITH counted AS (
-       SELECT
-         extract(year FROM ${LOCAL_PLAYED_AT})::int AS year,
-         "trackId",
-         count(*)::int AS plays
-       FROM "SpotifyPlay"
-       GROUP BY 1, 2
+       SELECT ${bucketExpr} AS bucket, "trackId", count(*)::int AS plays
+       FROM "SpotifyPlay" ${whereClause(filter)} GROUP BY 1, 2
      )
-     SELECT DISTINCT ON (year) year, "trackId", plays
-     FROM counted
-     ORDER BY year DESC, plays DESC, "trackId"`,
-    v.object({ plays: int, trackId: v.string(), year: int }),
+     SELECT DISTINCT ON (bucket) bucket, "trackId", plays
+     FROM counted ORDER BY bucket DESC, plays DESC, "trackId"`,
+    v.object({ bucket: v.string(), plays: int, trackId: v.string() }),
   );
 }
 
@@ -264,16 +260,13 @@ export function selectRepeats(
        SELECT "trackId", date_trunc('${unit}', ${LOCAL_PLAYED_AT})::date AS period,
          count(*)::int AS plays
        FROM "SpotifyPlay" ${whereClause(filter)}
-       GROUP BY 1, 2
-       HAVING count(*) > 1
+       GROUP BY 1, 2 HAVING count(*) > 1
      )
      SELECT "trackId", to_char(period, 'YYYY-MM-DD') AS period, plays FROM (
        SELECT DISTINCT ON ("trackId") "trackId", period, plays
-       FROM counted
-       ORDER BY "trackId", plays DESC, period
+       FROM counted ORDER BY "trackId", plays DESC, period
      ) best
-     ORDER BY plays DESC, period, "trackId"
-     LIMIT ${limit}`,
+     ORDER BY plays DESC, period, "trackId" LIMIT ${limit}`,
     v.object({ period: v.string(), plays: int, trackId: v.string() }),
   );
 }
@@ -284,9 +277,7 @@ export function selectArtistDepth(filter: SqlPlayFilter = ALL_TIME_FILTER) {
        SELECT artist AS "artistId", count(*)::int AS plays
        FROM "SpotifyPlay", unnest("artistIds") AS artist
        ${whereClause(filter)}
-       GROUP BY artist
-       ORDER BY plays DESC, artist
-       LIMIT ${DEPTH_ARTISTS}
+       GROUP BY artist ORDER BY plays DESC, artist LIMIT ${DEPTH_ARTISTS}
      )
      SELECT ta."artistId", ta.plays,
        count(DISTINCT p."trackId")::int AS tracks,
@@ -296,5 +287,34 @@ export function selectArtistDepth(filter: SqlPlayFilter = ALL_TIME_FILTER) {
      GROUP BY ta."artistId", ta.plays
      ORDER BY ta.plays DESC, ta."artistId"`,
     v.object({ artistId: v.string(), months: int, plays: int, tracks: int }),
+  );
+}
+
+export function selectTopGenres(filter: SqlPlayFilter = ALL_TIME_FILTER) {
+  return select(
+    `WITH artist_plays AS (
+       SELECT artist AS "artistId", count(*)::int AS plays, count(DISTINCT "trackId")::int AS tracks
+       FROM "SpotifyPlay", unnest("artistIds") AS artist
+       ${whereClause(filter)} GROUP BY artist
+     ),
+     artist_genres AS (
+       SELECT ma.name, ap.plays, ap.tracks, ma.genres[1] AS genre
+       FROM artist_plays ap
+       JOIN "MusicArtist" ma ON ma.id = ap."artistId"
+       WHERE coalesce(array_length(ma.genres, 1), 0) > 0
+     ),
+     ranked AS (
+       SELECT genre, name, plays, tracks,
+         row_number() OVER (PARTITION BY genre ORDER BY plays DESC, name) AS rn,
+         sum(plays) OVER (PARTITION BY genre)::int AS total_plays,
+         sum(tracks) OVER (PARTITION BY genre)::int AS total_tracks
+       FROM artist_genres
+     )
+     SELECT genre, total_plays AS plays, total_tracks AS tracks,
+       coalesce(array_agg(name ORDER BY rn) FILTER (WHERE rn <= 3), ARRAY[]::varchar[]) AS artists
+     FROM ranked
+     GROUP BY genre, total_plays, total_tracks
+     ORDER BY total_plays DESC, genre LIMIT ${TOP_GENRES_LIMIT}`,
+    v.object({ artists: v.array(v.string()), genre: v.string(), plays: int, tracks: int }),
   );
 }

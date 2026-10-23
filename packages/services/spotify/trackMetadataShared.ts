@@ -76,7 +76,7 @@ async function fetchPublicCatalogResource<T>(
   resource: string,
   schema: v.GenericSchema<unknown, T>,
 ): Promise<SpotifyRequestResult<T> | null> {
-  if (!/^(?:(?:tracks|albums|artists)\/|search\?)/.test(resource)) {
+  if (!/^(?:(?:tracks|albums|artists)(?:\/|\?)|search\?)/.test(resource)) {
     return null;
   }
   const token = await getClientCredentialsToken();
