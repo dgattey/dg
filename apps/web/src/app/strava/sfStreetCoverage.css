@@ -64,7 +64,8 @@
 }
 .sfStreets__head {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 4px 16px;
   align-items: baseline;
   justify-content: space-between;
 }
