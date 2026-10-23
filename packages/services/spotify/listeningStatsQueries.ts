@@ -11,12 +11,14 @@ const LOCAL_PLAYED_AT = `("playedAt" AT TIME ZONE '${TIME_ZONE}')`;
 export const ALBUM_SESSION_MIN_PLAYS = 5;
 
 const TOP_ALBUM_CANDIDATES = 10;
+const TOP_TRACK_CANDIDATES = 8;
 const FRONT_TO_BACK_ALBUMS = 4;
 const DEPTH_ARTISTS = 8;
 
 const int = v.number();
 
 export type SqlPlayFilter = {
+  /** SQL predicate over `{alias}."playedAt"` using only index-friendly timestamp bounds. */
   predicate: (alias?: string) => string;
 };
 
@@ -38,6 +40,10 @@ function andClause(filter: SqlPlayFilter, alias?: string): string {
   return cond ? `AND ${cond}` : '';
 }
 
+/**
+ * Builds an index-friendly `"playedAt" >= ... AND "playedAt" < ...` filter for a
+ * Pacific calendar year (`YYYY`).
+ */
 export function yearPlayFilter(year: number): SqlPlayFilter {
   const safeYear = Math.trunc(year);
   const startExpr = `('${safeYear}-01-01 00:00:00'::timestamp AT TIME ZONE '${TIME_ZONE}')`;
@@ -50,12 +56,37 @@ export function yearPlayFilter(year: number): SqlPlayFilter {
   };
 }
 
+/**
+ * Builds an index-friendly `"playedAt" >= ... AND "playedAt" <= ...` filter for a
+ * rolling window of `days` Pacific calendar days ending at `anchor`.
+ */
+export function rollingDaysPlayFilter(anchor: Date, days: number): SqlPlayFilter {
+  const safeDays = Math.max(1, Math.trunc(days));
+  const iso = anchor.toISOString();
+  const startExpr = `((('${iso}'::timestamptz AT TIME ZONE '${TIME_ZONE}')::date - ${safeDays - 1})::timestamp AT TIME ZONE '${TIME_ZONE}')`;
+  const endExpr = `'${iso}'::timestamptz`;
+  return {
+    predicate: (alias) => {
+      const col = columnRef(alias);
+      return `${col} >= ${startExpr} AND ${col} <= ${endExpr}`;
+    },
+  };
+}
+
 async function select<Schema extends v.GenericSchema>(
   sql: string,
   row: Schema,
 ): Promise<Array<v.InferOutput<Schema>>> {
   const rows = await dbClient.query(sql, { type: QueryTypes.SELECT });
   return v.parse(v.array(row), rows);
+}
+
+export async function selectLatestPlayedAt(): Promise<Date | null> {
+  const [row] = await select(
+    'SELECT max("playedAt") AS "lastPlayedAt" FROM "SpotifyPlay"',
+    v.object({ lastPlayedAt: v.nullable(v.date()) }),
+  );
+  return row?.lastPlayedAt ?? null;
 }
 
 export function selectSummary(filter: SqlPlayFilter = ALL_TIME_FILTER) {
@@ -113,6 +144,19 @@ export function selectLocalBuckets(
   );
 }
 
+export function selectMonthlyPlays() {
+  return select(
+    `SELECT
+       extract(year FROM ${LOCAL_PLAYED_AT})::int AS year,
+       extract(month FROM ${LOCAL_PLAYED_AT})::int AS month,
+       count(*)::int AS plays
+     FROM "SpotifyPlay"
+     GROUP BY 1, 2
+     ORDER BY 1, 2`,
+    v.object({ month: int, plays: int, year: int }),
+  );
+}
+
 export function selectActiveMonths(filter: SqlPlayFilter = ALL_TIME_FILTER) {
   return select(
     `SELECT to_char(m, 'YYYY-MM') AS month
@@ -122,11 +166,45 @@ export function selectActiveMonths(filter: SqlPlayFilter = ALL_TIME_FILTER) {
   );
 }
 
+export function selectActiveDays(filter: SqlPlayFilter = ALL_TIME_FILTER) {
+  return select(
+    `SELECT to_char(d, 'YYYY-MM-DD') AS day
+     FROM (SELECT DISTINCT ${LOCAL_PLAYED_AT}::date AS d FROM "SpotifyPlay" ${whereClause(filter)}) days
+     ORDER BY d`,
+    v.object({ day: v.string() }),
+  );
+}
+
 export function selectTopAlbumIds(filter: SqlPlayFilter = ALL_TIME_FILTER) {
   return select(
     `SELECT "albumId", count(*)::int AS plays
      FROM "SpotifyPlay" ${whereClause(filter)} GROUP BY 1 ORDER BY 2 DESC, 1 LIMIT ${TOP_ALBUM_CANDIDATES}`,
     v.object({ albumId: v.string(), plays: int }),
+  );
+}
+
+export function selectTopTrackIds(filter: SqlPlayFilter = ALL_TIME_FILTER) {
+  return select(
+    `SELECT "trackId", count(*)::int AS plays
+     FROM "SpotifyPlay" ${whereClause(filter)} GROUP BY 1 ORDER BY 2 DESC, 1 LIMIT ${TOP_TRACK_CANDIDATES}`,
+    v.object({ plays: int, trackId: v.string() }),
+  );
+}
+
+export function selectYearlyTopTracks() {
+  return select(
+    `WITH counted AS (
+       SELECT
+         extract(year FROM ${LOCAL_PLAYED_AT})::int AS year,
+         "trackId",
+         count(*)::int AS plays
+       FROM "SpotifyPlay"
+       GROUP BY 1, 2
+     )
+     SELECT DISTINCT ON (year) year, "trackId", plays
+     FROM counted
+     ORDER BY year DESC, plays DESC, "trackId"`,
+    v.object({ plays: int, trackId: v.string(), year: int }),
   );
 }
 
@@ -140,10 +218,6 @@ export function selectShelf(filter: SqlPlayFilter = ALL_TIME_FILTER) {
   );
 }
 
-/**
- * Splits the full play history into runs of consecutive plays from one album,
- * then keeps the albums most often heard in runs long enough to be a session.
- */
 export function selectAlbumSessions(filter: SqlPlayFilter = ALL_TIME_FILTER) {
   return select(
     `WITH ordered AS (
@@ -180,7 +254,6 @@ export function selectAlbumSessions(filter: SqlPlayFilter = ALL_TIME_FILTER) {
   );
 }
 
-/** Each track's single busiest `week` or `day`, keeping the busiest tracks overall. */
 export function selectRepeats(
   unit: 'day' | 'week',
   limit: number,

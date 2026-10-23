@@ -5,9 +5,14 @@ import {
   formatDayPartHours,
   formatHour,
   formatHourRange,
+  formatHours,
   formatHourTick,
   formatMonth,
   formatPercent,
+  formatPlaysHeading,
+  formatRangeSuffix,
+  formatStatsRangeKey,
+  formatStreakTotal,
   formatYearTick,
   peakHours,
   playsInDayPart,
@@ -15,10 +20,12 @@ import {
   weekdayGroups,
 } from '../listeningStatsFormat';
 
-describe('formatCompact', () => {
+describe('formatCompact and formatHours', () => {
   it('keeps small counts and shortens thousands to one decimal', () => {
     expect(formatCompact(999)).toBe('999');
     expect(formatCompact(32_979)).toBe('33.0k');
+    expect(formatHours(4.25)).toBe('4.3h');
+    expect(formatHours(120.4)).toBe('120h');
   });
 });
 
@@ -26,6 +33,57 @@ describe('formatPercent', () => {
   it('reads as zero when there is nothing to divide by', () => {
     expect(formatPercent(5, 0)).toBe('0.0%');
     expect(formatPercent(1, 3, 0)).toBe('33%');
+  });
+});
+
+describe('range formatting', () => {
+  it('formats range keys, suffixes, play headings, and streak labels', () => {
+    expect(formatStatsRangeKey({ kind: 'all' })).toBe('all');
+    expect(formatStatsRangeKey({ kind: 'week' })).toBe('week');
+    expect(formatStatsRangeKey({ kind: 'month' })).toBe('month');
+    expect(formatStatsRangeKey({ kind: 'year', year: 2024 })).toBe('2024');
+
+    expect(formatRangeSuffix({ kind: 'all' })).toBe('all time');
+    expect(formatRangeSuffix({ kind: 'week' })).toBe('last week');
+    expect(formatRangeSuffix({ kind: 'month' })).toBe('last month');
+    expect(formatRangeSuffix({ kind: 'year', year: 2024 })).toBe('2024');
+
+    expect(formatPlaysHeading({ kind: 'all' }, '2011-07-29T19:00:00.000Z')).toBe(
+      'Plays since Jul 2011',
+    );
+    expect(formatPlaysHeading({ kind: 'week' }, '2011-07-29T19:00:00.000Z')).toBe(
+      'Plays last week',
+    );
+    expect(formatPlaysHeading({ kind: 'month' }, '2011-07-29T19:00:00.000Z')).toBe(
+      'Plays last month',
+    );
+    expect(formatPlaysHeading({ kind: 'year', year: 2024 }, '2011-07-29T19:00:00.000Z')).toBe(
+      'Plays in 2024',
+    );
+
+    expect(
+      formatStreakTotal({
+        dayStreak: { days: 5, end: '2024-03-05', start: '2024-03-01' },
+        monthStreak: { end: '2024-03', months: 3, start: '2024-01' },
+        range: { kind: 'all' },
+      }),
+    ).toEqual({
+      label: 'Months in a row',
+      sub: 'Jan 2024 to Mar 2024',
+      value: '3',
+    });
+
+    expect(
+      formatStreakTotal({
+        dayStreak: { days: 5, end: '2024-03-05', start: '2024-03-01' },
+        monthStreak: { end: '2024-03', months: 3, start: '2024-01' },
+        range: { kind: 'year', year: 2024 },
+      }),
+    ).toEqual({
+      label: 'Days in a row',
+      sub: '1 Mar 2024 to 5 Mar 2024',
+      value: '5',
+    });
   });
 });
 

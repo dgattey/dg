@@ -1,18 +1,39 @@
-import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
-import { ALBUM_SESSION_MIN_PLAYS } from '@dg/services/spotify/listeningStatsQueries';
+'use client';
+
+import type { ListeningStats, StatsRangeKey } from '@dg/services/spotify/fetchListeningStats';
 import { Tooltip } from '@dg/ui/core/Tooltip';
-import type { CSSProperties } from 'react';
+import {
+  type CSSProperties,
+  startTransition,
+  useEffect,
+  useRef,
+  useState,
+  ViewTransition,
+} from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { cx } from '../../collage/paperVars';
 import { ListeningClock } from './ListeningClock';
 import { WeekCard, YearsCard } from './ListeningStatsCharts';
 import { ListeningStatsTotals } from './ListeningStatsTotals';
-import { formatCount, formatDay, formatPercent } from './listeningStatsFormat';
+import { formatCount, formatDay, formatPercent, formatStatsRangeKey } from './listeningStatsFormat';
 import { bar, CardHead, Cover } from './StatsCardParts';
+import { MonthlyMatrixCard, YearChampionsCard } from './StatsHistoryVisuals';
 import { Scallop } from './StatsShapes';
+import { StatsToolbar } from './StatsToolbar';
 import { TopAlbumsPodium } from './TopAlbumsPodium';
+import { TopArtistsCard, TopSongsCard } from './TopSongsAndArtists';
 
 const CRATE_TILTS = [-3, 2.4, -1.6, 3] as const;
+
+function parseClientRangeKey(raw: string | null): StatsRangeKey {
+  if (raw === 'week' || raw === 'month') {
+    return raw;
+  }
+  if (raw && /^(?:19|20)\d{2}$/.test(raw)) {
+    return `${Number(raw)}`;
+  }
+  return 'all';
+}
 
 function OnRepeatCard({ stats }: { stats: ListeningStats }) {
   const top = stats.onRepeat[0]?.plays ?? 0;
@@ -64,10 +85,7 @@ function FrontToBackCard({ stats }: { stats: ListeningStats }) {
     >
       <div className="stats__ritualsLead">
         <h2 className="stats__heading">Front to back</h2>
-        <p className="stats__meta">
-          Albums I play start to finish: the share of each album heard in runs of{' '}
-          {ALBUM_SESSION_MIN_PLAYS} or more tracks.
-        </p>
+        <p className="stats__meta">Share of each album heard in runs of 5 or more tracks.</p>
       </div>
       <ul className="stats__ritualList">
         {albums.map(({ album, plays, sessionPlays, sessions }, i) => (
@@ -91,7 +109,7 @@ function FrontToBackCard({ stats }: { stats: ListeningStats }) {
               <span className="stats__meta">{album.artistNames}</span>
             </div>
             <span aria-hidden="true" className="stats__meter" style={bar(sessionPlays, plays)} />
-            <span className="stats__meta stats__ritualFoot">
+            <span className="stats__meta">
               {formatCount(sessionPlays)} of {formatCount(plays)} plays, {formatCount(sessions)}{' '}
               sessions
             </span>
@@ -110,13 +128,13 @@ function DepthCard({ stats }: { stats: ListeningStats }) {
     cx('stats__cell', value === max && 'stats__cell--max');
   return (
     <PaperCard
-      className="stats__card stats__depth stats__taped"
+      className="stats__card stats__depth"
       edge="quad-d"
       innerClassName="stats__pad"
       tiltDeg={-0.7}
     >
       <CardHead
-        aside={`Top artists by plays. Months with a play, of ${formatCount(stats.activeMonths)}`}
+        aside={`${formatCount(stats.activeMonths)} active months`}
         title="Depth and loyalty"
       />
       <table className="stats__table">
@@ -182,27 +200,116 @@ function DepthCard({ stats }: { stats: ListeningStats }) {
   );
 }
 
-/**
- * Everything below the page title on `/music/stats`: totals on stubs and seals,
- * the top album podium, then three ragged bands of cards.
- */
-export function ListeningStatsSections({ stats }: { stats: ListeningStats }) {
+export function ListeningStatsSections({
+  onLoadRange,
+  stats: initialStats,
+}: {
+  onLoadRange?: (rangeKey: StatsRangeKey) => Promise<ListeningStats | null>;
+  stats: ListeningStats;
+}) {
+  const [stats, setStats] = useState<ListeningStats>(initialStats);
+  const [selectedKey, setSelectedKey] = useState<StatsRangeKey>(() =>
+    formatStatsRangeKey(initialStats.range),
+  );
+  const cacheRef = useRef<Map<StatsRangeKey, ListeningStats>>(
+    new Map([[formatStatsRangeKey(initialStats.range), initialStats]]),
+  );
+  const requestSeq = useRef(0);
+  const onLoadRangeRef = useRef(onLoadRange);
+  onLoadRangeRef.current = onLoadRange;
+
+  const availableYears = [...stats.years].map((entry) => entry.year).sort((a, b) => b - a);
+
+  const applyRange = (nextKey: StatsRangeKey, updateHistory = true) => {
+    setSelectedKey(nextKey);
+    if (updateHistory && typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      if (nextKey === 'all') {
+        url.searchParams.delete('range');
+      } else {
+        url.searchParams.set('range', nextKey);
+      }
+      window.history.pushState(null, '', url.toString());
+    }
+    const cached = cacheRef.current.get(nextKey);
+    if (cached) {
+      startTransition(() => setStats(cached));
+      return;
+    }
+    const load = onLoadRangeRef.current;
+    if (!load) {
+      return;
+    }
+    const seq = ++requestSeq.current;
+    void load(nextKey).then((loaded) => {
+      if (!loaded || seq !== requestSeq.current) {
+        return;
+      }
+      cacheRef.current.set(nextKey, loaded);
+      startTransition(() => setStats(loaded));
+    });
+  };
+
+  const applyRangeRef = useRef(applyRange);
+  applyRangeRef.current = applyRange;
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+    const syncFromUrl = () => {
+      const urlKey = parseClientRangeKey(new URLSearchParams(window.location.search).get('range'));
+      applyRangeRef.current(urlKey, false);
+    };
+    const initialUrlKey = parseClientRangeKey(
+      new URLSearchParams(window.location.search).get('range'),
+    );
+    if (initialUrlKey !== formatStatsRangeKey(initialStats.range)) {
+      applyRangeRef.current(initialUrlKey, false);
+    }
+    window.addEventListener('popstate', syncFromUrl);
+    return () => window.removeEventListener('popstate', syncFromUrl);
+  }, [initialStats]);
+
+  const selectYear = (year: number) => applyRange(`${year}`);
+
   return (
-    <div className="stats__sections">
-      <ListeningStatsTotals stats={stats} />
-      <TopAlbumsPodium stats={stats} />
-      <div className="stats__band">
-        <YearsCard stats={stats} />
-        <WeekCard stats={stats} />
-      </div>
-      <div className="stats__band">
-        {stats.onRepeat.length > 0 ? <OnRepeatCard stats={stats} /> : null}
-        <ListeningClock stats={stats} />
-      </div>
-      <div className="stats__band">
-        {stats.depth.length > 0 ? <DepthCard stats={stats} /> : null}
-        {stats.frontToBack.length > 0 ? <FrontToBackCard stats={stats} /> : null}
-      </div>
+    <div className="stats__sections" data-active-range={selectedKey}>
+      <StatsToolbar
+        availableYears={availableYears}
+        onSelectRange={(nextKey) => applyRange(nextKey)}
+        selectedKey={selectedKey}
+      />
+      <ViewTransition default="stats-filter">
+        <div className="stats__body" key={formatStatsRangeKey(stats.range)}>
+          <ListeningStatsTotals stats={stats} />
+          <TopAlbumsPodium stats={stats} />
+          {stats.topTracks.length > 0 || stats.topArtists.length > 0 ? (
+            <div className="stats__band">
+              <TopSongsCard stats={stats} />
+              <TopArtistsCard stats={stats} />
+            </div>
+          ) : null}
+          <div className="stats__band">
+            <YearsCard onSelectYear={selectYear} stats={stats} />
+            <WeekCard stats={stats} />
+          </div>
+          {stats.monthlyPlays.length > 0 || stats.yearChampions.length > 0 ? (
+            <div className="stats__band">
+              <MonthlyMatrixCard onSelectYear={selectYear} stats={stats} />
+              <YearChampionsCard onSelectYear={selectYear} stats={stats} />
+            </div>
+          ) : null}
+          <div className="stats__band">
+            {stats.onRepeat.length > 0 ? <OnRepeatCard stats={stats} /> : null}
+            <ListeningClock stats={stats} />
+          </div>
+          <div className="stats__band">
+            {stats.depth.length > 0 ? <DepthCard stats={stats} /> : null}
+            {stats.frontToBack.length > 0 ? <FrontToBackCard stats={stats} /> : null}
+          </div>
+        </div>
+      </ViewTransition>
     </div>
   );
 }

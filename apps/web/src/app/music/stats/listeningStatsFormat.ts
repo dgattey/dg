@@ -1,3 +1,9 @@
+import type {
+  ListeningStats,
+  StatsRange,
+  StatsRangeKey,
+} from '@dg/services/spotify/fetchListeningStats';
+
 const TIME_ZONE = 'America/Los_Angeles';
 
 const countFormat = new Intl.NumberFormat('en-US');
@@ -26,6 +32,13 @@ const pacificMonthFormat = new Intl.DateTimeFormat('en-GB', {
 
 export function formatCount(value: number): string {
   return countFormat.format(Math.round(value));
+}
+
+export function formatHours(hours: number): string {
+  if (hours > 0 && hours < 10) {
+    return `${hours.toFixed(1)}h`;
+  }
+  return `${formatCount(hours)}h`;
 }
 
 export function formatPercent(part: number, whole: number, digits = 1): string {
@@ -60,6 +73,81 @@ export function formatPacificMonth(timestamp: string): string {
 /** `2017` → `’17`. */
 export function formatYearTick(year: number): string {
   return `\u2019${String(year).slice(-2)}`;
+}
+
+export function formatStatsRangeKey(range: StatsRange): StatsRangeKey {
+  switch (range.kind) {
+    case 'all':
+      return 'all';
+    case 'week':
+      return 'week';
+    case 'month':
+      return 'month';
+    case 'year':
+      return `${range.year}`;
+    default: {
+      const unhandled: never = range;
+      return unhandled;
+    }
+  }
+}
+
+export function formatRangeSuffix(range: StatsRange): string {
+  switch (range.kind) {
+    case 'all':
+      return 'all time';
+    case 'week':
+      return 'last week';
+    case 'month':
+      return 'last month';
+    case 'year':
+      return String(range.year);
+    default: {
+      const unhandled: never = range;
+      return unhandled;
+    }
+  }
+}
+
+export function formatPlaysHeading(range: StatsRange, firstPlayedAt: string): string {
+  switch (range.kind) {
+    case 'all':
+      return `Plays since ${formatPacificMonth(firstPlayedAt)}`;
+    case 'week':
+      return 'Plays last week';
+    case 'month':
+      return 'Plays last month';
+    case 'year':
+      return `Plays in ${range.year}`;
+    default: {
+      const unhandled: never = range;
+      return unhandled;
+    }
+  }
+}
+
+export function formatStreakTotal(
+  stats: Pick<ListeningStats, 'dayStreak' | 'monthStreak' | 'range'>,
+): { label: string; sub: string; value: string } {
+  if (stats.range.kind === 'all') {
+    return {
+      label: 'Months in a row',
+      sub: `${formatMonth(stats.monthStreak.start)} to ${formatMonth(stats.monthStreak.end)}`,
+      value: formatCount(stats.monthStreak.months),
+    };
+  }
+  const { days, end, start } = stats.dayStreak;
+  const sub =
+    start && end
+      ? start === end
+        ? formatDay(start)
+        : `${formatDay(start)} to ${formatDay(end)}`
+      : 'Consecutive days';
+  return {
+    label: 'Days in a row',
+    sub,
+    value: formatCount(days),
+  };
 }
 
 function hourOfDay(hour: number): string {

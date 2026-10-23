@@ -26,7 +26,7 @@ export async function getListeningStatsMarkdown(): Promise<string> {
     const stats = await getListeningStats();
     const sections: Array<string> = [
       '# Listening stats',
-      `> Totals, top albums, and listening habits from ${SITE_NAME}'s Spotify history`,
+      `> Totals, top albums, top songs, top artists, and listening habits from ${SITE_NAME}'s Spotify history`,
     ];
 
     if (!stats) {
@@ -51,6 +51,20 @@ export async function getListeningStatsMarkdown(): Promise<string> {
           .map(
             ({ album, plays }, i) =>
               `${i + 1}. [${album.name}](${album.url}) — ${album.artistNames}, ${formatCount(plays)} plays`,
+          )
+          .join('\n'),
+        '## Top songs, all time',
+        stats.topTracks
+          .map(
+            (track, i) =>
+              `${i + 1}. [${track.name}](${track.url}) — ${track.artistNames}, ${formatCount(track.plays)} plays`,
+          )
+          .join('\n'),
+        '## Top artists, all time',
+        stats.topArtists
+          .map(
+            (artist, i) =>
+              `${i + 1}. [${artist.name}](${artist.url}) — ${formatCount(artist.plays)} plays across ${artist.tracks} tracks`,
           )
           .join('\n'),
         '## On repeat',

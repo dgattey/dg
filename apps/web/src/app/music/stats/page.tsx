@@ -1,4 +1,5 @@
 import 'server-only';
+import '../../collage/pills.css';
 import '../music.css';
 import './stats.css';
 import './statsShapes.css';
@@ -7,6 +8,7 @@ import { musicStatsRoute } from '@dg/shared-core/routes/app';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getListeningStats } from '../../../services/musicStats';
+import { loadListeningStats } from '../../../services/musicStats.actions';
 import { STATS_BACKDROP } from '../../collage/backdrops';
 import { markdownAlternates } from '../../layouts/markdownAlternates';
 import { musicDestinationTitle } from '../../layouts/musicHeaderDestinations';
@@ -25,7 +27,11 @@ export const metadata: Metadata = {
 
 async function ListeningStats() {
   const stats = await getListeningStats();
-  return stats ? <ListeningStatsSections stats={stats} /> : <NoListeningHistory />;
+  return stats ? (
+    <ListeningStatsSections onLoadRange={loadListeningStats} stats={stats} />
+  ) : (
+    <NoListeningHistory />
+  );
 }
 
 export default function MusicStatsPage() {

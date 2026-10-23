@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { log } from '@dg/shared-core/logging/log';
 import * as v from 'valibot';
 import { getSpotifyClient } from './spotifyClient';
@@ -36,6 +37,63 @@ type SpotifyRequestResult<T> =
   | { success: true; data: T; status: 200 }
   | { success: false; status: number; error: string };
 
+let cachedAppToken: { expiresAt: number; token: string } | null = null;
+
+async function getClientCredentialsToken(): Promise<string | null> {
+  if (cachedAppToken && cachedAppToken.expiresAt > Date.now()) {
+    return cachedAppToken.token;
+  }
+  const clientId = process.env.SPOTIFY_CLIENT_ID;
+  const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
+  if (!clientId || !clientSecret) {
+    return null;
+  }
+  const credentials = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
+  const res = await fetch('https://accounts.spotify.com/api/token', {
+    body: 'grant_type=client_credentials',
+    cache: 'no-store',
+    headers: {
+      Authorization: `Basic ${credentials}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    method: 'POST',
+  });
+  if (!res.ok) {
+    return null;
+  }
+  const payload = (await res.json()) as { access_token?: string; expires_in?: number };
+  if (!payload.access_token) {
+    return null;
+  }
+  cachedAppToken = {
+    expiresAt: Date.now() + ((payload.expires_in ?? 3600) - 60) * 1000,
+    token: payload.access_token,
+  };
+  return payload.access_token;
+}
+
+async function fetchPublicCatalogResource<T>(
+  resource: string,
+  schema: v.GenericSchema<unknown, T>,
+): Promise<SpotifyRequestResult<T> | null> {
+  if (!/^(?:tracks|albums|artists)\//.test(resource)) {
+    return null;
+  }
+  const token = await getClientCredentialsToken();
+  if (!token) {
+    return null;
+  }
+  const res = await fetch(`https://api.spotify.com/v1/${resource}`, {
+    cache: 'no-store',
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (res.status !== 200) {
+    return { error: `HTTP ${res.status}`, status: res.status, success: false };
+  }
+  const data = v.parse(schema, await res.json());
+  return { data, status: 200, success: true };
+}
+
 /**
  * Makes a GET request to Spotify and validates the payload.
  *
@@ -50,15 +108,25 @@ export async function spotifyGet<T>(
   schema: v.GenericSchema<unknown, T>,
   context: string,
 ): Promise<SpotifyRequestResult<T>> {
-  const { response, retryAfterSeconds, status } = await getSpotifyClient().get(resource);
+  try {
+    const { response, retryAfterSeconds, status } = await getSpotifyClient().get(resource);
 
-  if (status !== 200) {
-    if (status === 429) {
-      log.warn(`Spotify rate limited (${context})`, { resource, retryAfterSeconds });
+    if (status !== 200) {
+      if (status === 429) {
+        log.warn(`Spotify rate limited (${context})`, { resource, retryAfterSeconds });
+      }
+      return { error: `HTTP ${status}`, status, success: false };
     }
-    return { error: `HTTP ${status}`, status, success: false };
-  }
 
-  const data = v.parse(schema, await response.json());
-  return { data, status: 200, success: true };
+    const data = v.parse(schema, await response.json());
+    return { data, status: 200, success: true };
+  } catch (error) {
+    if (isMissingTokenError(error)) {
+      const fallback = await fetchPublicCatalogResource(resource, schema);
+      if (fallback) {
+        return fallback;
+      }
+    }
+    throw error;
+  }
 }

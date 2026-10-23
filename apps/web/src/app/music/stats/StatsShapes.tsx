@@ -62,7 +62,7 @@ export function Stub({
 }) {
   return (
     <span className={cx('stats__cut', className)} style={paperToneVars(tone, tiltDeg)}>
-      <span className={`stats__${kind}`}>
+      <span className={kind === 'ticket' ? 'stats__ticket' : 'stats__stamp'}>
         <span className="stats__face">{children}</span>
       </span>
     </span>
