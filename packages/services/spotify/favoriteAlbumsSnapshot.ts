@@ -15,19 +15,6 @@ const SNAPSHOT_FIELDS = [
   'url',
 ] as const;
 
-export async function readFavoriteAlbumsRefreshedAt(): Promise<Date | null> {
-  try {
-    const snapshot = await db.FavoriteAlbumSnapshot.findOne({
-      attributes: ['refreshedAt'],
-      where: { singleton: true },
-    });
-    return snapshot?.refreshedAt ?? null;
-  } catch (error) {
-    log.warn('Could not read favorite albums snapshot timestamp', { error });
-    return null;
-  }
-}
-
 export async function readFavoriteAlbumsSnapshot(): Promise<Array<PlaylistAlbum> | null> {
   try {
     const rows = (await db.FavoriteAlbum.findAll({
@@ -58,8 +45,13 @@ const isStoredSnapshot = (stored: Array<PlaylistAlbum> | null, albums: Array<Pla
   return albums.every((album) => storedKeys.has(snapshotKey(album)));
 };
 
-export async function writeFavoriteAlbumsSnapshot(albums: Array<PlaylistAlbum>): Promise<boolean> {
-  if (isStoredSnapshot(await readFavoriteAlbumsSnapshot(), albums)) {
+export async function writeFavoriteAlbumsSnapshot(
+  albums: Array<PlaylistAlbum>,
+  storedSnapshot?: Array<PlaylistAlbum> | null,
+): Promise<boolean> {
+  const existing =
+    storedSnapshot !== undefined ? storedSnapshot : await readFavoriteAlbumsSnapshot();
+  if (isStoredSnapshot(existing, albums)) {
     return false;
   }
   try {

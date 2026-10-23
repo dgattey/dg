@@ -1,34 +1,34 @@
 import 'server-only';
 
+import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { log } from '@dg/shared-core/logging/log';
 import { serializeError } from '@dg/shared-core/logging/maskSecrets';
 import { writeFavoriteAlbumsSnapshot } from './favoriteAlbumsSnapshot';
 import { fetchPlaylistAlbums } from './fetchPlaylistAlbums';
 
-/** Playlist holding one or more tracks from each favorite album. */
 const FAVORITE_ALBUMS_PLAYLIST_ID = '1bbwGrz6rSq5APjRfZp63U';
 
-/**
- * Refreshes the favorite-albums snapshot from Spotify once.
- *
- * There is deliberately no retry here. If Spotify returns a rate limit, the
- * stored snapshot remains valid and the scheduled sync tries again in 30
- * minutes, after the supplied Retry-After has had time to elapse.
- */
-export async function refreshFavoriteAlbumsSnapshot(): Promise<{
+type RefreshFavoriteAlbumsOptions = {
+  storedAlbums?: Array<PlaylistAlbum> | null;
+};
+
+export async function refreshFavoriteAlbumsSnapshot(
+  options?: RefreshFavoriteAlbumsOptions,
+): Promise<{
   changed: boolean;
   count: number;
 }> {
   const albums = await fetchPlaylistAlbums(FAVORITE_ALBUMS_PLAYLIST_ID);
-  const changed = await writeFavoriteAlbumsSnapshot(albums);
+  const changed = await writeFavoriteAlbumsSnapshot(albums, options?.storedAlbums);
   log.info('Favorite albums snapshot refreshed', { changed, count: albums.length });
   return { changed, count: albums.length };
 }
 
-/** Runs a snapshot refresh without allowing it to fail the history sync. */
-export async function refreshFavoriteAlbumsSnapshotWithLogging() {
+export async function refreshFavoriteAlbumsSnapshotWithLogging(
+  options?: RefreshFavoriteAlbumsOptions,
+) {
   try {
-    return await refreshFavoriteAlbumsSnapshot();
+    return await refreshFavoriteAlbumsSnapshot(options);
   } catch (error) {
     log.warn('Favorite albums snapshot refresh failed; keeping stored snapshot', {
       error: serializeError(error as Error),

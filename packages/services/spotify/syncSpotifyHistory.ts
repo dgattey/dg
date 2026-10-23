@@ -17,19 +17,11 @@ import type { TrackMetadata } from './trackMetadataShared';
  */
 const SPOTIFY_HISTORY_LIMIT = 50;
 
-/**
- * A play record ready for database insertion.
- * Extends TrackMetadata with the play-specific fields.
- */
 type SpotifyPlayRow = TrackMetadata & {
   playedAt: Date;
   trackId: string;
 };
 
-/**
- * Raised when Spotify could not be read. Distinct from "read Spotify fine, and
- * there was genuinely nothing new", which is a normal quiet outcome.
- */
 export class SpotifyHistoryUnavailableError extends Error {
   readonly status: number;
   readonly retryAfterSeconds: number | undefined;
@@ -46,16 +38,6 @@ export class SpotifyHistoryUnavailableError extends Error {
   }
 }
 
-/**
- * Fetches recently played tracks from Spotify.
- *
- * IMPORTANT: Spotify only returns the 50 most recent tracks total.
- * This is NOT pagination - once 50 new tracks play, older ones are gone forever.
- *
- * Throws when Spotify cannot be read. A caller that turned that into an empty
- * list would report a successful run that quietly collected nothing, which is
- * indistinguishable from a listener who simply had not played anything.
- */
 async function fetchRecentPlays(afterTimestamp?: number): Promise<Array<SpotifyPlayRow>> {
   const params = new URLSearchParams({ limit: String(SPOTIFY_HISTORY_LIMIT) });
   if (afterTimestamp) {
@@ -78,8 +60,6 @@ async function fetchRecentPlays(afterTimestamp?: number): Promise<Array<SpotifyP
 
   const mapped = mapRecentlyPlayedFromApi(data);
 
-  // Mapping drops tracks it cannot represent (an album with no artwork). Losing
-  // every track means the payload shape changed rather than the listener idling.
   if (data.items.length > 0 && mapped.items.length === 0) {
     throw new Error(
       `Spotify returned ${data.items.length} plays but none could be mapped; the payload shape likely changed`,
@@ -100,7 +80,7 @@ async function fetchRecentPlays(afterTimestamp?: number): Promise<Array<SpotifyP
   }));
 }
 
-async function getLatestPlayedAt(): Promise<Date | null> {
+export async function getLatestPlayedAt(): Promise<Date | null> {
   const latest = await db.SpotifyPlay.findOne({
     attributes: ['playedAt'],
     order: [['playedAt', 'DESC']],
@@ -108,17 +88,19 @@ async function getLatestPlayedAt(): Promise<Date | null> {
   return latest?.playedAt ?? null;
 }
 
-/**
- * Persists listening history from Spotify's recently-played endpoint.
- * An empty DB seeds from the current recent-plays window (no `after` filter).
- * This is separate from the "latest song" UI fetch.
- */
-export async function syncSpotifyPlaysSince(): Promise<{
+type SyncPlaysOptions = {
+  knownLatestPlayedAt?: Date | null;
+};
+
+export async function syncSpotifyPlaysSince(options?: SyncPlaysOptions): Promise<{
   inserted: number;
   total: number;
   gapDetected: boolean;
 }> {
-  const latestPlayedAt = await getLatestPlayedAt();
+  const latestPlayedAt =
+    options?.knownLatestPlayedAt !== undefined
+      ? options.knownLatestPlayedAt
+      : await getLatestPlayedAt();
 
   log.info('Syncing Spotify plays', {
     since: latestPlayedAt?.toISOString() ?? null,
@@ -166,12 +148,9 @@ type SyncContext = 'backfill' | 'cron';
 type SyncWithLoggingOptions = {
   context: SyncContext;
   failureLogLevel?: 'error' | 'warn';
+  knownLatestPlayedAt?: Date | null;
 };
 
-/**
- * The result of a sync attempt. A failed attempt carries its reason so callers
- * can report it instead of returning a success-shaped body with zeroes in it.
- */
 type SpotifySyncOutcome =
   | {
       gapDetected: boolean;
@@ -187,15 +166,13 @@ type SpotifySyncOutcome =
 
 const getContextLabel = (context: SyncContext) => (context === 'cron' ? 'Cron' : 'Backfill');
 
-/**
- * Runs a history sync with consistent, centralized error handling.
- */
 export async function syncSpotifyHistoryWithLogging({
   context,
   failureLogLevel = 'error',
+  knownLatestPlayedAt,
 }: SyncWithLoggingOptions): Promise<SpotifySyncOutcome> {
   try {
-    const result = await syncSpotifyPlaysSince();
+    const result = await syncSpotifyPlaysSince({ knownLatestPlayedAt });
     log.info(`${getContextLabel(context)}: Spotify history sync complete`, result);
     return { ...result, status: 'ok' };
   } catch (error) {

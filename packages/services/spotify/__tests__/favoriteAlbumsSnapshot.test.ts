@@ -1,10 +1,6 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
-import {
-  readFavoriteAlbumsRefreshedAt,
-  readFavoriteAlbumsSnapshot,
-  writeFavoriteAlbumsSnapshot,
-} from '../favoriteAlbumsSnapshot';
+import { readFavoriteAlbumsSnapshot, writeFavoriteAlbumsSnapshot } from '../favoriteAlbumsSnapshot';
 
 const db = setupTestDatabase();
 
@@ -27,25 +23,26 @@ describe('favorite albums snapshot', () => {
 
   it('distinguishes never refreshed, empty, and populated snapshots', async () => {
     await expect(readFavoriteAlbumsSnapshot()).resolves.toBeNull();
-    await expect(readFavoriteAlbumsRefreshedAt()).resolves.toBeNull();
 
     await writeFavoriteAlbumsSnapshot([]);
     await expect(readFavoriteAlbumsSnapshot()).resolves.toEqual([]);
-    await expect(readFavoriteAlbumsRefreshedAt()).resolves.toBeInstanceOf(Date);
 
     await writeFavoriteAlbumsSnapshot([album]);
     await expect(readFavoriteAlbumsSnapshot()).resolves.toEqual([album]);
   });
 
-  it('reports whether the stored list changed and skips identical album writes', async () => {
+  it('reports whether the stored list changed and skips identical album writes without querying the DB when storedSnapshot is provided', async () => {
     await expect(writeFavoriteAlbumsSnapshot([album])).resolves.toBe(true);
-    const firstRefreshedAt = await readFavoriteAlbumsRefreshedAt();
-    expect(firstRefreshedAt).toBeInstanceOf(Date);
+
+    const findAllSpy = jest.spyOn(db.FavoriteAlbum, 'findAll');
+    try {
+      await expect(writeFavoriteAlbumsSnapshot([{ ...album }], [album])).resolves.toBe(false);
+      expect(findAllSpy).not.toHaveBeenCalled();
+    } finally {
+      findAllSpy.mockRestore();
+    }
 
     await expect(writeFavoriteAlbumsSnapshot([{ ...album }])).resolves.toBe(false);
-    const secondRefreshedAt = await readFavoriteAlbumsRefreshedAt();
-    expect(secondRefreshedAt?.getTime()).toBe(firstRefreshedAt?.getTime());
-
     await expect(writeFavoriteAlbumsSnapshot([{ ...album, name: 'Renamed' }])).resolves.toBe(true);
     await expect(writeFavoriteAlbumsSnapshot([])).resolves.toBe(true);
     await expect(writeFavoriteAlbumsSnapshot([])).resolves.toBe(false);

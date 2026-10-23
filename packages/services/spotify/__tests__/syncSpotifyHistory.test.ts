@@ -1,4 +1,3 @@
-import { Op } from '@dg/db';
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 import {
   SpotifyHistoryUnavailableError,
@@ -19,7 +18,6 @@ jest.mock('../spotifyClient', () => ({
   getSpotifyClient: () => ({ get: mockSpotifyGet }),
 }));
 
-// Use unique prefix for this test file to avoid conflicts with parallel tests
 const PREFIX = 'sync';
 
 const buildTrackApi = (overrides: Partial<Record<string, unknown>> = {}) => ({
@@ -55,22 +53,15 @@ const buildTrackApi = (overrides: Partial<Record<string, unknown>> = {}) => ({
   ...overrides,
 });
 
-// Single shared db instance for all tests in this file
 const db = setupTestDatabase();
 
-beforeEach(() => {
+beforeEach(async () => {
   jest.clearAllMocks();
+  await db.SpotifyPlay.destroy({ where: {} });
 });
 
 describe('syncSpotifyPlaysSince', () => {
   it('seeds an empty database from recent plays', async () => {
-    // Sync reads the whole SpotifyPlay table. Parallel suites share
-    // DATABASE_URL_TEST, so skip when other tests have visible rows.
-    const totalCount = await db.SpotifyPlay.count();
-    if (totalCount > 0) {
-      return;
-    }
-
     const responseBody = {
       items: [
         {
@@ -137,7 +128,6 @@ describe('syncSpotifyPlaysSince', () => {
     expect(result.gapDetected).toBe(false);
     expect(result.total).toBe(1);
 
-    // Verify our track was inserted
     const insertedRow = await db.SpotifyPlay.findOne({
       where: { trackId: `${PREFIX}-track-id` },
     });
@@ -154,7 +144,6 @@ describe('syncSpotifyPlaysSince', () => {
       trackId: `${PREFIX}-track-seed-gap`,
     });
 
-    // Create 50 items to trigger gap detection
     const items = Array.from({ length: 50 }, (_, i) => ({
       played_at: new Date(Date.now() + i * 1000).toISOString(),
       track: buildTrackApi({
@@ -194,6 +183,31 @@ describe('syncSpotifyPlaysSince', () => {
       inserted: 0,
       total: 0,
     });
+  });
+
+  it('skips querying the database when knownLatestPlayedAt is provided and Spotify has no new plays', async () => {
+    const knownLatestPlayedAt = new Date('2026-10-23T08:57:42.890Z');
+    mockSpotifyGet.mockResolvedValue({
+      response: { json: async () => ({ items: [], next: null }) },
+      status: 200,
+    });
+
+    const findOneSpy = jest.spyOn(db.SpotifyPlay, 'findOne');
+    try {
+      const result = await syncSpotifyPlaysSince({ knownLatestPlayedAt });
+
+      expect(result).toEqual({
+        gapDetected: false,
+        inserted: 0,
+        total: 0,
+      });
+      expect(mockSpotifyGet).toHaveBeenCalledWith(
+        `me/player/recently-played?limit=50&after=${knownLatestPlayedAt.getTime()}`,
+      );
+      expect(findOneSpy).not.toHaveBeenCalled();
+    } finally {
+      findOneSpy.mockRestore();
+    }
   });
 
   it('throws instead of reporting an empty sync when the API fails', async () => {
@@ -241,8 +255,6 @@ describe('syncSpotifyPlaysSince', () => {
       trackId: `${PREFIX}-track-seed-shape`,
     });
 
-    // An album with no artwork is dropped during mapping. Losing every play
-    // means the payload changed, which must not look like an idle listener.
     mockSpotifyGet.mockResolvedValue({
       response: {
         json: async () => ({
@@ -264,11 +276,9 @@ describe('syncSpotifyPlaysSince', () => {
   });
 
   it('inserts multiple plays of the same track at different timestamps', async () => {
-    // Use a very recent timestamp to ensure this is the latest row
     const now = new Date();
-    const seedPlayedAt = new Date(now.getTime() - 60000); // 1 minute ago
+    const seedPlayedAt = new Date(now.getTime() - 60000);
 
-    // Seed with an existing play using the default track from buildTrackApi
     await db.SpotifyPlay.create({
       albumId: `${PREFIX}-album-id`,
       artistIds: [`${PREFIX}-artist-id`],
@@ -276,15 +286,14 @@ describe('syncSpotifyPlaysSince', () => {
       trackId: `${PREFIX}-track-id`,
     });
 
-    // API returns the SAME track (buildTrackApi default) but at a NEW timestamp
-    const newPlayedAt = new Date(now.getTime() + 60000); // 1 minute from now
+    const newPlayedAt = new Date(now.getTime() + 60000);
     mockSpotifyGet.mockResolvedValue({
       response: {
         json: async () => ({
           items: [
             {
               played_at: newPlayedAt.toISOString(),
-              track: buildTrackApi(), // Uses default track IDs
+              track: buildTrackApi(),
             },
           ],
           next: null,
@@ -295,11 +304,9 @@ describe('syncSpotifyPlaysSince', () => {
 
     const result = await syncSpotifyPlaysSince();
 
-    // Same track at a new timestamp should appear as another play row.
     expect(result.total).toBe(1);
     expect(result.inserted).toBe(1);
 
-    // Should now have 2 rows for this track (different timestamps)
     const rows = await db.SpotifyPlay.findAll({
       where: { trackId: `${PREFIX}-track-id` },
     });
@@ -308,19 +315,7 @@ describe('syncSpotifyPlaysSince', () => {
 });
 
 describe('syncSpotifyHistoryWithLogging', () => {
-  // Clean up between tests since some tests seed data
-  beforeEach(async () => {
-    await db.SpotifyPlay.destroy({
-      where: { trackId: { [Op.like]: `${PREFIX}-%` } },
-    });
-  });
-
   it('returns result when seeding an empty database', async () => {
-    const totalCount = await db.SpotifyPlay.count();
-    if (totalCount > 0) {
-      return;
-    }
-
     mockSpotifyGet.mockResolvedValue({
       response: { json: async () => ({ items: [], next: null }) },
       status: 200,

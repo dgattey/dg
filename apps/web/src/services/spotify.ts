@@ -3,6 +3,7 @@ import 'server-only';
 import type { Track } from '@dg/content-models/spotify/Track';
 import { fetchRecentlyPlayed } from '@dg/services/spotify/fetchRecentlyPlayed';
 import { cacheLife, cacheTag } from 'next/cache';
+import './oauthTokenCache';
 import { withMissingTokenFallback } from './withMissingTokenFallback';
 
 const LATEST_SONG_TAG = 'latest-song';

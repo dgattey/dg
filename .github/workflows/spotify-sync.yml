@@ -2,7 +2,7 @@ name: Spotify sync
 
 on:
   schedule:
-    - cron: '23 * * * *'
+    - cron: '7,22,37,52 * * * *'
   workflow_dispatch:
 
 jobs:

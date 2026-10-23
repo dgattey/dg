@@ -4,6 +4,7 @@ import { fetchAlbumDetail } from '@dg/services/spotify/fetchAlbumDetail';
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { log } from '@dg/shared-core/logging/log';
 import { cacheLife, cacheTag } from 'next/cache';
+import './oauthTokenCache';
 
 const ALBUM_DETAIL_TAG = 'album-detail';
 

@@ -5,17 +5,52 @@ import { MissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { log } from '@dg/shared-core/logging/log';
 import type { RefreshTokenConfig, ValidatedToken } from './RefreshTokenConfig';
 
+export type StoredTokenRecord = {
+  accessToken: string | null;
+  expiryAt: Date | null;
+  refreshToken: string;
+};
+
 type StoredTokenLookup = {
   accessToken: string | null;
   refreshToken: string;
 };
 
+type TokenCacheHooks = {
+  onTokenUpdated?: (name: string) => void;
+  readToken?: (name: string) => Promise<StoredTokenRecord>;
+};
+
 const cachedTokens = new Map<string, ValidatedToken>();
 const pendingLookups = new Map<string, Promise<StoredTokenLookup>>();
 const pendingRefreshes = new Map<string, Promise<ValidatedToken>>();
+let tokenCacheHooks: TokenCacheHooks = {};
+
+export function registerTokenCacheHooks(hooks: TokenCacheHooks): void {
+  tokenCacheHooks = hooks;
+}
 
 export function clearTokenCache(): void {
   cachedTokens.clear();
+}
+
+export async function readStoredTokenFromDb(name: string): Promise<StoredTokenRecord> {
+  const { db } = await import('@dg/db');
+  const token = await db.Token.findOne({
+    attributes: ['accessToken', 'refreshToken', 'expiryAt'],
+    where: { name },
+  });
+
+  if (!token?.refreshToken) {
+    log.error('Missing token', { name });
+    throw new MissingTokenError(name);
+  }
+
+  return {
+    accessToken: token.accessToken ?? null,
+    expiryAt: token.expiryAt ?? null,
+    refreshToken: token.refreshToken,
+  };
 }
 
 export async function upsertAndCacheToken({
@@ -36,22 +71,25 @@ export async function upsertAndCacheToken({
   } else {
     cachedTokens.delete(name);
   }
+  tokenCacheHooks.onTokenUpdated?.(name);
   return token;
 }
 
-async function queryLatestTokenFromDb({ name }: FetchTokenProps): Promise<StoredTokenLookup> {
-  const { db } = await import('@dg/db');
-  const token = await db.Token.findOne({
-    attributes: ['accessToken', 'refreshToken', 'expiryAt'],
-    where: { name },
-  });
-
-  if (!token?.refreshToken) {
-    log.error('Missing token', { name });
-    throw new MissingTokenError(name);
+async function readTokenWithHooks(name: string): Promise<StoredTokenRecord> {
+  if (process.env.NODE_ENV !== 'test' && tokenCacheHooks.readToken) {
+    try {
+      return await tokenCacheHooks.readToken(name);
+    } catch (error) {
+      if (error instanceof MissingTokenError) {
+        throw error;
+      }
+    }
   }
+  return await readStoredTokenFromDb(name);
+}
 
-  const { refreshToken, accessToken, expiryAt } = token;
+async function queryLatestTokenFromDb({ name }: FetchTokenProps): Promise<StoredTokenLookup> {
+  const { refreshToken, accessToken, expiryAt } = await readTokenWithHooks(name);
   const isValid = Boolean(expiryAt && Number(expiryAt) > Date.now());
   if (isValid && accessToken && expiryAt) {
     cachedTokens.set(name, { accessToken, expiryAt, refreshToken });
@@ -114,6 +152,7 @@ async function refreshTokenAndPersistInternal(
   name: string,
   refreshTokenConfig: RefreshTokenConfig,
   refreshToken: string,
+  forcePersist: boolean,
 ): Promise<ValidatedToken> {
   log.info('Fetching refreshed token', { name });
   const {
@@ -122,13 +161,19 @@ async function refreshTokenAndPersistInternal(
     expiryAt,
   } = await fetchRefreshedTokenFromApi(name, refreshTokenConfig, refreshToken);
   log.info('Fetched refreshed token', { name });
-  await upsertAndCacheToken({
-    accessToken,
-    expiryAt,
-    name,
-    refreshToken: newRefreshToken,
-  });
-  log.info('Updated token in db, returning', { name });
+  if (forcePersist || newRefreshToken !== refreshToken) {
+    await upsertAndCacheToken({
+      accessToken,
+      expiryAt,
+      name,
+      refreshToken: newRefreshToken,
+    });
+    log.info('Updated token in db, returning', { name });
+  } else if (Number(expiryAt) > Date.now()) {
+    cachedTokens.set(name, { accessToken, expiryAt, refreshToken: newRefreshToken });
+  } else {
+    cachedTokens.delete(name);
+  }
   return { accessToken, expiryAt, refreshToken: newRefreshToken };
 }
 
@@ -136,6 +181,7 @@ async function refreshTokenAndPersist(
   name: string,
   refreshTokenConfig: RefreshTokenConfig,
   refreshToken: string,
+  forcePersist = false,
 ): Promise<ValidatedToken> {
   const existingRefresh = pendingRefreshes.get(name);
   if (existingRefresh) {
@@ -143,7 +189,12 @@ async function refreshTokenAndPersist(
     return existingRefresh;
   }
 
-  const refreshPromise = refreshTokenAndPersistInternal(name, refreshTokenConfig, refreshToken);
+  const refreshPromise = refreshTokenAndPersistInternal(
+    name,
+    refreshTokenConfig,
+    refreshToken,
+    forcePersist,
+  );
   pendingRefreshes.set(name, refreshPromise);
 
   try {
@@ -159,7 +210,7 @@ export async function forceRefreshTokenData(
 ): Promise<ValidatedToken> {
   cachedTokens.delete(name);
   const currentData = await getLatestTokenIfValid({ name });
-  return await refreshTokenAndPersist(name, refreshTokenConfig, currentData.refreshToken);
+  return await refreshTokenAndPersist(name, refreshTokenConfig, currentData.refreshToken, true);
 }
 
 export async function refreshedAccessToken(
@@ -185,6 +236,7 @@ export async function refreshedAccessToken(
     name,
     refreshTokenConfig,
     currentData.refreshToken,
+    false,
   );
   return accessToken;
 }
