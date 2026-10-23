@@ -725,6 +725,9 @@
 }
 
 @media (max-width: 820px) {
+  .strava__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .strava__intro,
   .strava__filters {
     grid-column: 1 / -1;
