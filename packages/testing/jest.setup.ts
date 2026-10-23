@@ -4,6 +4,9 @@ import '@testing-library/jest-dom';
 
 globalThis.TextDecoder ??= TextDecoder;
 globalThis.TextEncoder ??= TextEncoder;
+globalThis.Headers ??= class Headers {} as typeof globalThis.Headers;
+globalThis.Request ??= class Request {} as typeof globalThis.Request;
+globalThis.Response ??= class Response {} as typeof globalThis.Response;
 
 // Mock matchMedia for components using useMediaQuery or matchMedia directly
 const matchMediaMock = (query: string) => ({
