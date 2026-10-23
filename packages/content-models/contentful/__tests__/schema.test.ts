@@ -1,6 +1,5 @@
 import { safeParse } from 'valibot';
-import { FALLBACK_BOOKS } from '../../books/fallbackBooks';
-import { cleanBookTitle, toRenderableBook } from '../renderables/books';
+import { cleanBookTitle, deriveReadingStatus, toRenderableBook } from '../renderables/books';
 import { booksResponseSchema } from '../schema/books';
 import { footerLinksResponseSchema } from '../schema/footer';
 import { introBlockResponseSchema } from '../schema/intro';
@@ -120,7 +119,7 @@ describe('contentful schemas', () => {
     expect(safeParse(currentLocationResponseSchema, input).success).toBe(true);
   });
 
-  it('parses book collection responses and maps renderable books', () => {
+  it('parses book collection responses, derives readingStatus from dates, and filters out notStarted books', () => {
     const input = {
       bookCollection: {
         __typename: 'BookCollection',
@@ -128,9 +127,14 @@ describe('contentful schemas', () => {
           {
             __typename: 'Book',
             author: 'Frank Herbert',
+            coverImage: {
+              height: 475,
+              url: 'https://images.ctfassets.net/space/dune.webp',
+              width: 316,
+            },
             rating: 5,
             readDateFinished: '2025-01-04T00:00:00Z',
-            readingStatus: 'read',
+            readDateStarted: '2024-12-20T00:00:00Z',
             reviewDescription: {
               json: {
                 content: [
@@ -145,22 +149,49 @@ describe('contentful schemas', () => {
               },
             },
             sys: { id: 'book-dune' },
-            thumbnail: {
-              height: 475,
-              url: 'https://images.ctfassets.net/space/dune.webp',
-              width: 316,
-            },
             title: 'Dune (Dune, #1)',
           },
+          {
+            __typename: 'Book',
+            author: 'Ursula K. Le Guin',
+            readDateFinished: null,
+            readDateStarted: '2026-10-01T00:00:00Z',
+            sys: { id: 'book-dispossessed' },
+            title: 'The Dispossessed',
+          },
+          {
+            __typename: 'Book',
+            author: 'Neal Stephenson',
+            readDateFinished: null,
+            readDateStarted: null,
+            sys: { id: 'book-anathem' },
+            title: 'Anathem',
+          },
         ],
+        total: 3,
       },
     };
 
     const parsed = safeParse(booksResponseSchema, input);
     expect(parsed.success).toBe(true);
 
-    const renderable = toRenderableBook(input.bookCollection.items[0]);
-    expect(renderable).toEqual({
+    expect(
+      deriveReadingStatus({
+        readDateFinished: '2025-01-04T00:00:00Z',
+        readDateStarted: '2024-12-20T00:00:00Z',
+      }),
+    ).toBe('read');
+    expect(
+      deriveReadingStatus({
+        readDateFinished: null,
+        readDateStarted: '2026-10-01T00:00:00Z',
+      }),
+    ).toBe('reading');
+    expect(deriveReadingStatus({ readDateFinished: null, readDateStarted: null })).toBe(
+      'notStarted',
+    );
+
+    expect(toRenderableBook(input.bookCollection.items[0])).toEqual({
       author: 'Frank Herbert',
       id: 'book-dune',
       rating: 5,
@@ -174,11 +205,24 @@ describe('contentful schemas', () => {
       },
       title: 'Dune',
     });
+
+    expect(toRenderableBook(input.bookCollection.items[1])).toEqual({
+      author: 'Ursula K. Le Guin',
+      id: 'book-dispossessed',
+      rating: null,
+      readDateFinished: null,
+      readingStatus: 'reading',
+      review: null,
+      thumbnail: null,
+      title: 'The Dispossessed',
+    });
+
+    expect(toRenderableBook(input.bookCollection.items[2])).toBeNull();
+
     expect(
       cleanBookTitle(
         "The Hitchhiker's Guide to the Galaxy (The Hitchhiker's Guide to the Galaxy, #1)",
       ),
     ).toBe("The Hitchhiker's Guide to the Galaxy");
-    expect(FALLBACK_BOOKS.length).toBeGreaterThanOrEqual(20);
   });
 });
