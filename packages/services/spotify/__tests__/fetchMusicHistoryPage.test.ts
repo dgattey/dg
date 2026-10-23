@@ -1,4 +1,3 @@
-import { Op } from '@dg/db';
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 import { fetchMusicHistoryPage } from '../fetchMusicHistoryPage';
 
@@ -58,42 +57,8 @@ const buildApiResponse = (id: string) => ({
 });
 
 describe('fetchMusicHistoryPage', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
-    // Clean up test data from all tables
-    await db.MusicTrackArtist.destroy({
-      where: { trackId: { [Op.like]: `${PREFIX}-%` } },
-    });
-    await db.MusicTrack.destroy({
-      where: { id: { [Op.like]: `${PREFIX}-%` } },
-    });
-    await db.MusicAlbum.destroy({
-      where: { id: { [Op.like]: `${PREFIX}-%` } },
-    });
-    await db.MusicArtist.destroy({
-      where: { id: { [Op.like]: `${PREFIX}-%` } },
-    });
-    await db.SpotifyPlay.destroy({
-      where: { trackId: { [Op.like]: `${PREFIX}-%` } },
-    });
-  });
-
-  afterEach(async () => {
-    await db.MusicTrackArtist.destroy({
-      where: { trackId: { [Op.like]: `${PREFIX}-%` } },
-    });
-    await db.MusicTrack.destroy({
-      where: { id: { [Op.like]: `${PREFIX}-%` } },
-    });
-    await db.MusicAlbum.destroy({
-      where: { id: { [Op.like]: `${PREFIX}-%` } },
-    });
-    await db.MusicArtist.destroy({
-      where: { id: { [Op.like]: `${PREFIX}-%` } },
-    });
-    await db.SpotifyPlay.destroy({
-      where: { trackId: { [Op.like]: `${PREFIX}-%` } },
-    });
   });
 
   it('returns empty array when no plays exist', async () => {

@@ -1,4 +1,3 @@
-import { Op } from '@dg/db';
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 import { fetchAlbumDetail } from '../fetchAlbumDetail';
 
@@ -71,41 +70,8 @@ const spotifyAlbumResponse = {
 };
 
 describe('fetchAlbumDetail', () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     jest.clearAllMocks();
-    await db.MusicTrackArtist.destroy({
-      where: { trackId: { [Op.like]: `${PREFIX}%` } },
-    });
-    await db.MusicAlbumArtist.destroy({
-      where: { albumId: { [Op.like]: `${PREFIX}%` } },
-    });
-    await db.MusicTrack.destroy({
-      where: { id: { [Op.like]: `${PREFIX}%` } },
-    });
-    await db.MusicAlbum.destroy({
-      where: { id: { [Op.like]: `${PREFIX}%` } },
-    });
-    await db.MusicArtist.destroy({
-      where: { id: { [Op.like]: `${PREFIX}%` } },
-    });
-  });
-
-  afterEach(async () => {
-    await db.MusicTrackArtist.destroy({
-      where: { trackId: { [Op.like]: `${PREFIX}%` } },
-    });
-    await db.MusicAlbumArtist.destroy({
-      where: { albumId: { [Op.like]: `${PREFIX}%` } },
-    });
-    await db.MusicTrack.destroy({
-      where: { id: { [Op.like]: `${PREFIX}%` } },
-    });
-    await db.MusicAlbum.destroy({
-      where: { id: { [Op.like]: `${PREFIX}%` } },
-    });
-    await db.MusicArtist.destroy({
-      where: { id: { [Op.like]: `${PREFIX}%` } },
-    });
   });
 
   it('returns a complete album from the database without calling Spotify', async () => {

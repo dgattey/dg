@@ -4,6 +4,7 @@ import {
   fitRouteViewport,
   projectRouteToPixels,
   simplifyLine,
+  toSvgPath,
 } from '../routeGeometry';
 
 describe('route geometry', () => {
@@ -55,7 +56,7 @@ describe('route geometry', () => {
     }
   });
 
-  it('centers a single-point route', () => {
+  it('centers a single-point route and renders it as a one-command path', () => {
     const points = decodePolyline('_p~iF~ps|U');
     const pixels = projectRouteToPixels({
       center: points[0] as [number, number],
@@ -66,6 +67,7 @@ describe('route geometry', () => {
     });
 
     expect(pixels).toEqual([{ x: 150, y: 100 }]);
+    expect(toSvgPath(pixels)).toBe('M150.00 100.00');
   });
 
   it('uses a close zoom for a single-point route', () => {

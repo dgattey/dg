@@ -290,7 +290,10 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
         cssCodeSources.set(relPath, content);
         webImporters.set(relPath, content);
       }
-    } else if (relPath.startsWith('packages/ui/') && /\.(ts|tsx)$/.test(relPath)) {
+    } else if (
+      (relPath.startsWith('packages/ui/') || relPath.startsWith('packages/maps/')) &&
+      /\.(ts|tsx)$/.test(relPath)
+    ) {
       cssCodeSources.set(relPath, content);
     }
   }
