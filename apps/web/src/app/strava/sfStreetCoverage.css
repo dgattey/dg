@@ -37,6 +37,9 @@
 .sfStreets__seal {
   width: 220px;
 }
+.sfStreets__seal .stats__cut {
+  width: 100%;
+}
 .sfStreets__seal .strava__totalNumber {
   white-space: nowrap;
 }
@@ -61,7 +64,8 @@
 }
 .sfStreets__head {
   display: flex;
-  gap: 16px;
+  flex-wrap: wrap;
+  gap: 4px 16px;
   align-items: baseline;
   justify-content: space-between;
 }
@@ -212,6 +216,9 @@
 }
 
 @media (max-width: 900px) {
+  .sfStreets {
+    grid-template-columns: minmax(0, 1fr);
+  }
   .sfStreets__mapCard,
   .sfStreets__board {
     grid-column: 1 / -1;

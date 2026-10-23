@@ -8,6 +8,7 @@ import {
   checkTypeScale,
   checkUnusedCssRules,
 } from './check-css.js';
+import { checkGridGapsFit, checkScallopPadding } from './check-css-geometry.js';
 
 export const MAX_SOURCE_FILE_LINES = 350;
 const MAX_TEST_FILE_LINES = 500;
@@ -301,6 +302,8 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
   violations.push(...checkRouteCssImports(webCssPaths, webSources));
   violations.push(...checkSocialImageRouteParity(webSources));
   violations.push(...checkTypeScale(webCss));
+  violations.push(...checkScallopPadding(webCss));
+  violations.push(...checkGridGapsFit(webCss));
   violations.push(...checkUnusedCssRules(webCss, cssCodeSources));
   return violations;
 }

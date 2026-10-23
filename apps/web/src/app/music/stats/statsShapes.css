@@ -65,13 +65,15 @@
   text-align: center;
   background: var(--pc);
 }
+/* Text fills the square inscribed in the ring, 2px clear of its 2px stroke, so no corner reaches it. */
 .stats__scallop--seal {
+  --ring-inset: 9.5%;
   gap: 3px;
-  padding: 21%;
+  padding: calc(50% - (50% - var(--ring-inset) - 4px) * 0.7071);
 }
 .stats__scallop--seal::before {
   position: absolute;
-  inset: 9.5%;
+  inset: var(--ring-inset);
   content: "";
   border: 2px dashed color-mix(in oklab, var(--on) 36%, transparent);
   border-radius: 50%;
@@ -285,16 +287,17 @@
 }
 .stats__heroStamp {
   position: absolute;
-  top: -34px;
-  left: -36px;
+  top: -40px;
+  left: -42px;
   z-index: 3;
-  width: 116px;
-}
-.stats__heroStamp .stats__scallop {
-  padding: 18%;
+  width: 132px;
 }
 .stats__heroRank {
-  font: 700 var(--type-title-lg) / 1 var(--display);
+  font: 700 var(--type-h2) / 1 var(--display);
+}
+.stats__heroStamp .stats__meta {
+  font-size: var(--type-caption);
+  line-height: 1.15;
 }
 .stats__heroInner {
   display: grid;
@@ -446,16 +449,18 @@
   fill: var(--vermilion);
 }
 
-/* Day of week */
+/* Day of week: the key drops under the flower once its rows no longer fit beside it. */
 .stats__weekBody {
-  display: grid;
-  grid-template-columns: 172px minmax(0, 1fr);
+  display: flex;
+  flex-wrap: wrap;
   gap: 22px;
   align-items: center;
+  justify-content: center;
   margin-top: 12px;
 }
 .stats__flower {
   display: block;
+  flex: 0 0 172px;
   width: 100%;
   height: auto;
   overflow: visible;
@@ -503,6 +508,10 @@
   right: -30px;
   z-index: 2;
   width: 62px;
+}
+.stats__ritualSticker .stats__scallop {
+  font-size: var(--type-meta);
+  white-space: nowrap;
 }
 
 @media (max-width: 1180px) {
@@ -606,9 +615,9 @@
     margin: 36px 32% 44px 8%;
   }
   .stats__heroStamp {
-    top: -26px;
-    left: -24px;
-    width: 92px;
+    top: -32px;
+    left: -30px;
+    width: 108px;
   }
   .stats__runnersUp {
     gap: 28px 18px;
@@ -620,8 +629,7 @@
   .stats__runnerArt {
     width: min(100%, 140px);
   }
-  .stats__dayBody,
-  .stats__weekBody {
+  .stats__dayBody {
     grid-template-columns: minmax(0, 1fr);
     justify-items: center;
   }
@@ -629,6 +637,7 @@
     max-width: 300px;
   }
   .stats__flower {
+    flex-basis: 200px;
     max-width: 200px;
   }
   .stats__shifts {
@@ -640,6 +649,6 @@
   }
   .stats__ritualSticker {
     right: -18px;
-    width: 54px;
+    width: 58px;
   }
 }
