@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import { describe, it } from 'node:test';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import {
   checkOrphanCssFiles,
   checkRouteCssImports,
@@ -196,5 +196,19 @@ describe('check-structure', () => {
     const elapsedMs = performance.now() - start;
     assert.deepEqual(violations, []);
     assert.ok(elapsedMs < 500, `Expected fast execution, took ${elapsedMs.toFixed(1)}ms`);
+  });
+
+  it('exports valid Sequelize CLI environments from packages/db/database.config.mts', async () => {
+    const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
+    const configUrl = pathToFileURL(path.join(repoRoot, 'packages/db/database.config.mts')).href;
+    const configModule = (await import(configUrl)) as {
+      default?: Record<string, { dialect?: string; use_env_variable?: string }>;
+    };
+    assert.equal(configModule.default?.development?.dialect, 'postgres');
+    assert.equal(configModule.default?.development?.use_env_variable, 'DATABASE_URL');
+    assert.equal(configModule.default?.production?.dialect, 'postgres');
+    assert.equal(configModule.default?.production?.use_env_variable, 'DATABASE_URL');
+    assert.equal(configModule.default?.test?.dialect, 'postgres');
+    assert.equal(configModule.default?.test?.use_env_variable, 'DATABASE_URL_TEST');
   });
 });

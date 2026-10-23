@@ -19,7 +19,7 @@ export const sequelizeOptions = {
 } satisfies SequelizeOptions;
 
 // CLI options - adds use_env_variable for Sequelize CLI
-const cliOptionsByEnv = {
+export const cliOptionsByEnv = {
   development: { ...sequelizeOptions, use_env_variable: 'DATABASE_URL' },
   production: { ...sequelizeOptions, use_env_variable: 'DATABASE_URL' },
   test: { ...sequelizeOptions, use_env_variable: 'DATABASE_URL_TEST' },
@@ -39,10 +39,3 @@ export function getDatabaseUrl(): string {
   invariant(url, `Database URL not set for NODE_ENV="${nodeEnv}"`);
   return url;
 }
-
-// Default export for Sequelize CLI (database.config.mts)
-const dbConfig = {
-  cliOptionsByEnv,
-};
-
-export default dbConfig;
