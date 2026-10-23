@@ -1,7 +1,11 @@
 import type { RenderableSideProject } from '@dg/content-models/contentful/renderables/sideProjects';
+import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Image } from '@dg/ui/dependent/Image';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
+
+/** Neighbours never share an angle, so the stack reads as hand-placed paper. */
+const ROW_TILTS = [-1.6, 1.4, -1.9, 1.5, -1.3] as const;
 
 type GatteySitesCardProps = {
   projects: ReadonlyArray<RenderableSideProject>;
@@ -27,7 +31,7 @@ export function GatteySitesCard({ projects }: GatteySitesCardProps) {
               <PaperCard
                 className="home__sideRowWrap collageLift"
                 edge={even ? 'quad-a' : 'quad-d'}
-                tiltDeg={even ? 1.5 : -1.2}
+                tiltDeg={ROW_TILTS[index % ROW_TILTS.length]}
                 tone="cream"
               >
                 <a className="home__sideRow" href={project.url} rel="noreferrer" target="_blank">
@@ -42,7 +46,9 @@ export function GatteySitesCard({ projects }: GatteySitesCardProps) {
                   </span>
                   <span className="home__sideText">
                     <b className="home__sideTitle">{project.title}</b>
-                    <span className="home__sideDescription">{project.description}</span>
+                    <Tooltip title={project.description} whenTruncated>
+                      <span className="home__sideDescription">{project.description}</span>
+                    </Tooltip>
                   </span>
                   <span aria-hidden="true" className="home__sideArrow">
                     ↗

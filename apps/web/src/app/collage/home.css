@@ -404,39 +404,65 @@
 .home__sideRoot {
   position: relative;
   display: grid;
-  gap: 16px;
   align-content: start;
-  padding: 26px 18px 0;
+  padding: 0 4px 0 8px;
 }
+/* The tag tilts past its box, so the margin leaves room for its low corner. */
 .home__sideHeadingWrap {
+  position: relative;
+  z-index: 3;
   justify-self: start;
-  margin: 0;
+  margin: 0 0 18px -4px;
   font-size: inherit;
   font-weight: inherit;
 }
 .home__sideList {
   display: grid;
-  gap: 16px;
+  gap: 18px;
   padding: 0;
   margin: 0;
   list-style: none;
+}
+/*
+ * Opposite tilts bring neighbouring corners together, hence the wide gap. The
+ * list then hangs into the row gap above the wide frame below, keeping row one
+ * as tall as the frames beside it.
+ */
+@media (min-width: 1100px) {
+  .home__sideRoot {
+    margin-bottom: -48px;
+  }
+}
+@media (min-width: 821px) and (max-width: 1099px) {
+  .home__sideRoot {
+    margin-bottom: -24px;
+  }
+}
+/* Each tilted card paints its own layer, so the active one rises to keep its tooltip over the next. */
+.home__sideItem {
+  position: relative;
+  z-index: 0;
+}
+.home__sideItem:is(:hover, :focus-within) {
+  z-index: 1;
 }
 .home__sideRowWrap {
   width: 100%;
 }
 .home__sideItem:nth-child(odd) .home__sideRowWrap {
-  margin-left: 18px;
+  margin-left: 10px;
 }
 .home__sideItem:nth-child(even) .home__sideRowWrap {
-  margin-top: 4px;
-  margin-right: 14px;
+  margin-right: 8px;
 }
+/* Padding eases off toward 1300px so five rows stay within the frames beside them. */
 .home__sideRow {
+  --pad-y: clamp(7px, 7px + (100vw - 1300px) * 0.028, 11px);
   display: grid;
-  grid-template-columns: 44px minmax(0, 1fr) auto;
-  gap: 16px;
+  grid-template-columns: 42px minmax(0, 1fr) auto;
+  gap: 14px;
   align-items: center;
-  padding: 18px 20px 18px 16px;
+  padding: var(--pad-y) 16px var(--pad-y) 12px;
   color: inherit;
   text-decoration: none;
 }
@@ -448,8 +474,8 @@
   position: relative;
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 42px;
+  height: 42px;
   padding: 5px;
   background: color-mix(in srgb, var(--ink-on-cream) 6%, var(--cream));
   border-radius: 12px;
@@ -461,28 +487,47 @@
 }
 .home__sideText {
   display: grid;
-  gap: 2px;
   min-width: 0;
 }
 .home__sideTitle {
   font-family: var(--display);
   font-size: var(--type-h3);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: 1.2;
 }
 .home__sideDescription {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
   overflow: hidden;
-  -webkit-line-clamp: 2;
-  font-size: var(--type-body);
-  line-height: 1.55;
+  text-overflow: ellipsis;
+  font-size: var(--type-caption);
+  line-height: 1.5;
   color: var(--soft);
+  white-space: nowrap;
 }
 .home__sideArrow {
   font-size: var(--type-h3);
   font-weight: 700;
   line-height: 1;
+}
+
+/* Five rows stay within the frames beside them as the columns narrow. */
+@media (max-width: 1300px) {
+  .home__sideRow {
+    grid-template-columns: 36px minmax(0, 1fr) auto;
+    gap: 12px;
+    padding: 7px 14px 7px 10px;
+  }
+  .home__sideMark {
+    width: 36px;
+    height: 36px;
+    padding: 4px;
+    border-radius: 10px;
+  }
+  .home__sideTitle {
+    font-size: var(--type-meta);
+  }
+  .home__sideDescription {
+    line-height: 1.4;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -568,5 +613,15 @@
   .home__sideItem:nth-child(odd) .home__sideRowWrap,
   .home__sideItem:nth-child(even) .home__sideRowWrap {
     margin: 0;
+  }
+  .home__sideRow {
+    padding: 10px 14px 10px 10px;
+  }
+  /* Stacked rows have the height to spare, and touch has no hover to reveal a clipped line. */
+  .home__sideDescription {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    white-space: normal;
   }
 }
