@@ -14,8 +14,10 @@
     "@types/jest": "catalog:",
     "@types/node": "catalog:",
     "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
     "@typescript/native": "catalog:",
     "jest": "catalog:",
+    "react-dom": "catalog:",
     "typescript": "catalog:"
   },
   "name": "@dg/maps",

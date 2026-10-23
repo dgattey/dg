@@ -536,12 +536,18 @@ importers:
       '@types/react':
         specifier: 'catalog:'
         version: 19.3.0
+      '@types/react-dom':
+        specifier: 'catalog:'
+        version: 19.3.0(@types/react@19.3.0)
       '@typescript/native':
         specifier: 'catalog:'
         version: typescript@7.0.2
       jest:
         specifier: 'catalog:'
         version: 30.5.2(@types/node@26.6.4)(babel-plugin-macros@3.1.0)(esbuild-register@3.6.0(esbuild@0.28.1)(supports-color@8.1.1))(supports-color@8.1.1)
+      react-dom:
+        specifier: 'catalog:'
+        version: 19.3.0(react@19.3.0)
       typescript:
         specifier: 'catalog:'
         version: '@typescript/typescript6@6.0.2'
