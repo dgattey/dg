@@ -1,18 +1,13 @@
-import { getRouteMapTokens } from '../routeMapTokens';
+import { ROUTE_MAP_TOKENS } from '../routeMapTokens';
 
-describe('getRouteMapTokens', () => {
-  it('cases routes in cream over a cream placeholder in both schemes', () => {
-    for (const dark of [false, true]) {
-      expect(getRouteMapTokens(dark)).toMatchObject({
-        casingStroke: 'var(--cream)',
-        containerBackground: 'var(--cream)',
-      });
-    }
+describe('ROUTE_MAP_TOKENS', () => {
+  it('cases light routes in cream and dark routes in a dark edge that cannot glow', () => {
+    expect(ROUTE_MAP_TOKENS.light.casingStroke).toBe('var(--cream)');
+    expect(ROUTE_MAP_TOKENS.dark.casingStroke).not.toContain('--cream');
   });
 
   it('keeps the basemap free of a tinted wash', () => {
-    for (const dark of [false, true]) {
-      const { scrimGradient, tileFilter } = getRouteMapTokens(dark);
+    for (const { scrimGradient, tileFilter } of Object.values(ROUTE_MAP_TOKENS)) {
       expect(scrimGradient).not.toContain('--olive');
       expect(tileFilter).not.toMatch(/sepia|brightness/);
     }
