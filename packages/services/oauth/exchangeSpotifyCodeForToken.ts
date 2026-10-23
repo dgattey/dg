@@ -1,9 +1,9 @@
 import 'server-only';
 
-import { db } from '@dg/db';
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import { log } from '@dg/shared-core/logging/log';
 import { isRecord } from '@dg/shared-core/types/typeguards';
+import { upsertAndCacheToken } from '../clients/refreshedAccessToken';
 import { createExpirationDate } from '../spotify/spotifyClient';
 
 const SPOTIFY_TOKEN_NAME = 'spotify';
@@ -83,7 +83,7 @@ export async function exchangeSpotifyCodeForToken(
   const expiryAt = createExpirationDate(expiresIn);
 
   log.info('Persisting token to DB', { accessToken, expiryAt, refreshToken });
-  const [token] = await db.Token.upsert({
+  const token = await upsertAndCacheToken({
     accessToken,
     expiryAt,
     name: SPOTIFY_TOKEN_NAME,

@@ -1,33 +1,49 @@
 import 'server-only';
 
+import type { Track } from '@dg/content-models/spotify/Track';
 import { fetchRecentlyPlayed } from '@dg/services/spotify/fetchRecentlyPlayed';
 import { cacheLife, cacheTag } from 'next/cache';
 import { withMissingTokenFallback } from './withMissingTokenFallback';
 
 const LATEST_SONG_TAG = 'latest-song';
+const LATEST_SONG_FRESH_MS = 1_500;
+
+let cachedLatestSong: { expiresAt: number; track: Track | null } | null = null;
+let inFlightLatestSong: Promise<Track | null> | null = null;
 
 /**
- * Returns the most relevant playback state for UI:
- * - currently playing track if available
- * - otherwise the most recently played track
- * - null if tokens are missing
- *
- * Do not schedule `after()` work here: this 'use cache' scope re-executes
- * during ISR revalidation, PPR resume, and dynamic RSC renders, where
- * `waitUntil` can be unavailable. `after()` then throws (Next error E91)
- * and fatally kills the whole stream — the homepage ships a truncated
- * shell and `/index.rsc` responds with an empty body, so the client dies
- * with "Connection closed". History syncing runs via the
- * /api/spotify/sync cron instead.
+ * Returns the live playback state for `loadLatestSong`:
+ * - coalesces concurrent calls on the same instance and reuses a 1.5s fresh window
+ * - avoids Next.js `'use cache'` `cacheLife('seconds')` (`stale: 30, expire: 60`),
+ *   which served stale tracks for up to 60s after a song change on refresh
  */
-export const getLatestSong = async () => {
-  'use cache';
-  cacheLife('seconds');
-  cacheTag(LATEST_SONG_TAG);
+export const getLatestSong = async (): Promise<Track | null> => {
   if (process.env.NODE_ENV !== 'test' && !process.env.SPOTIFY_CLIENT_ID) {
     return null;
   }
-  return await withMissingTokenFallback(fetchRecentlyPlayed());
+  const useMemoryCache = process.env.NODE_ENV !== 'test';
+  if (useMemoryCache && cachedLatestSong && cachedLatestSong.expiresAt > Date.now()) {
+    return cachedLatestSong.track;
+  }
+  if (useMemoryCache && inFlightLatestSong) {
+    return inFlightLatestSong;
+  }
+  const promise = withMissingTokenFallback(fetchRecentlyPlayed()).then((track) => {
+    if (useMemoryCache) {
+      cachedLatestSong = {
+        expiresAt: Date.now() + LATEST_SONG_FRESH_MS,
+        track,
+      };
+    }
+    return track;
+  });
+  if (useMemoryCache) {
+    inFlightLatestSong = promise.finally(() => {
+      inFlightLatestSong = null;
+    });
+    return await inFlightLatestSong;
+  }
+  return await promise;
 };
 
 export const getLastKnownSong = async () => {

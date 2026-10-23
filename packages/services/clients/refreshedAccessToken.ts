@@ -5,60 +5,74 @@ import { MissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { log } from '@dg/shared-core/logging/log';
 import type { RefreshTokenConfig, ValidatedToken } from './RefreshTokenConfig';
 
-/**
- * In-memory map of pending token refresh promises per token name.
- * This prevents concurrent refresh requests from the same instance
- * from racing to refresh the same token simultaneously.
- */
+type StoredTokenLookup = {
+  accessToken: string | null;
+  refreshToken: string;
+};
+
+const cachedTokens = new Map<string, ValidatedToken>();
+const pendingLookups = new Map<string, Promise<StoredTokenLookup>>();
 const pendingRefreshes = new Map<string, Promise<ValidatedToken>>();
 
-/**
- * Creates or updates a possibly-existing token given a unique name and
- * access token/refresh token/expiry period.
- */
-async function createOrUpdateToken({
+export function clearTokenCache(): void {
+  cachedTokens.clear();
+}
+
+export async function upsertAndCacheToken({
   name,
   accessToken,
   expiryAt,
   refreshToken,
 }: CreateTokenProps) {
   const { db } = await import('@dg/db');
-  const token = await db.Token.upsert({
+  const [token] = await db.Token.upsert({
     accessToken,
     expiryAt,
     name,
     refreshToken,
   });
-  return token[0];
+  if (accessToken && expiryAt && refreshToken && Number(expiryAt) > Date.now()) {
+    cachedTokens.set(name, { accessToken, expiryAt, refreshToken });
+  } else {
+    cachedTokens.delete(name);
+  }
+  return token;
 }
 
-/**
- * Gets a token if still valid/not expired. Throws an error if the token is
- * missing. Returns just the refresh token if invalid. Returns both the refresh
- * and access tokens if valid.
- */
-async function getLatestTokenIfValid({ name }: FetchTokenProps) {
+async function queryLatestTokenFromDb({ name }: FetchTokenProps): Promise<StoredTokenLookup> {
   const { db } = await import('@dg/db');
   const token = await db.Token.findOne({
     attributes: ['accessToken', 'refreshToken', 'expiryAt'],
     where: { name },
   });
 
-  // Shouldn't happen unless invalid name, so it's a big error
   if (!token?.refreshToken) {
     log.error('Missing token', { name });
     throw new MissingTokenError(name);
   }
 
-  // Return either refresh + access, or just refresh if invalid
   const { refreshToken, accessToken, expiryAt } = token;
-  const isValid = expiryAt && Number(expiryAt) > Date.now();
-  return { accessToken: isValid ? accessToken : null, refreshToken };
+  const isValid = Boolean(expiryAt && Number(expiryAt) > Date.now());
+  if (isValid && accessToken && expiryAt) {
+    cachedTokens.set(name, { accessToken, expiryAt, refreshToken });
+  } else {
+    cachedTokens.delete(name);
+  }
+  return { accessToken: isValid && accessToken ? accessToken : null, refreshToken };
 }
 
-/**
- * When necessary, gets a new access token/refresh token from the API
- */
+function getLatestTokenIfValid({ name }: FetchTokenProps): Promise<StoredTokenLookup> {
+  const existingLookup = pendingLookups.get(name);
+  if (existingLookup) {
+    return existingLookup;
+  }
+  const lookupPromise = queryLatestTokenFromDb({ name }).finally(() => {
+    pendingLookups.delete(name);
+  });
+  pendingLookups.set(name, lookupPromise);
+  return lookupPromise;
+}
+
 async function fetchRefreshedTokenFromApi(
   name: string,
   refreshTokenConfig: RefreshTokenConfig,
@@ -81,7 +95,6 @@ async function fetchRefreshedTokenFromApi(
   });
   const data: unknown = await rawData.json();
   if (!rawData.ok) {
-    // Log only status, not response data which could contain sensitive info
     log.error('Failed to fetch refreshed token', {
       name,
       status: rawData.status,
@@ -97,10 +110,6 @@ async function fetchRefreshedTokenFromApi(
   return validate(data, refreshToken);
 }
 
-/**
- * Refreshes a token using the API and persists it to the database.
- * This is the internal implementation that actually does the refresh.
- */
 async function refreshTokenAndPersistInternal(
   name: string,
   refreshTokenConfig: RefreshTokenConfig,
@@ -113,7 +122,7 @@ async function refreshTokenAndPersistInternal(
     expiryAt,
   } = await fetchRefreshedTokenFromApi(name, refreshTokenConfig, refreshToken);
   log.info('Fetched refreshed token', { name });
-  await createOrUpdateToken({
+  await upsertAndCacheToken({
     accessToken,
     expiryAt,
     name,
@@ -123,64 +132,50 @@ async function refreshTokenAndPersistInternal(
   return { accessToken, expiryAt, refreshToken: newRefreshToken };
 }
 
-/**
- * Refreshes a token using the API and persists it to the database.
- * Uses deduplication to prevent concurrent refresh requests from racing.
- *
- * When multiple requests need to refresh the same token simultaneously:
- * 1. The first request starts the refresh and stores the promise
- * 2. Subsequent requests await the same promise instead of starting new refreshes
- * 3. After the promise resolves, it's removed so future requests can refresh again
- */
 async function refreshTokenAndPersist(
   name: string,
   refreshTokenConfig: RefreshTokenConfig,
   refreshToken: string,
 ): Promise<ValidatedToken> {
-  // Check if there's already a pending refresh for this token
   const existingRefresh = pendingRefreshes.get(name);
   if (existingRefresh) {
     log.info('Token refresh already in progress, waiting for existing refresh', { name });
     return existingRefresh;
   }
 
-  // Start a new refresh and store the promise
   const refreshPromise = refreshTokenAndPersistInternal(name, refreshTokenConfig, refreshToken);
   pendingRefreshes.set(name, refreshPromise);
 
   try {
-    const result = await refreshPromise;
-    return result;
+    return await refreshPromise;
   } finally {
-    // Always clean up the pending refresh, whether it succeeded or failed
     pendingRefreshes.delete(name);
   }
 }
 
-/**
- * Forces a token refresh and returns the updated token data.
- */
 export async function forceRefreshTokenData(
   name: string,
   refreshTokenConfig: RefreshTokenConfig,
 ): Promise<ValidatedToken> {
+  cachedTokens.delete(name);
   const currentData = await getLatestTokenIfValid({ name });
   return await refreshTokenAndPersist(name, refreshTokenConfig, currentData.refreshToken);
 }
 
-/**
- * Checks if our access token/key is still valid. If so, returns the access token.
- * Otherwise, grabs a new refresh/access token pair, updates the DB with the new
- * data, and returns the updated access token. May throw an error if something is
- * misconfigured. Should be caught higher up. If you force refresh, that means
- * it'll attempt to get a refreshed token even if the current token appears valid.
- * Should be used in case of 4xx codes from users.
- */
 export async function refreshedAccessToken(
   name: string,
   refreshTokenConfig: RefreshTokenConfig,
   forceRefresh?: boolean,
 ) {
+  if (forceRefresh) {
+    cachedTokens.delete(name);
+  } else {
+    const cached = cachedTokens.get(name);
+    if (cached && Number(cached.expiryAt) > Date.now()) {
+      return cached.accessToken;
+    }
+  }
+
   const currentData = await getLatestTokenIfValid({ name });
   if (currentData.accessToken && !forceRefresh) {
     return currentData.accessToken;

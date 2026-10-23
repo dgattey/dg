@@ -1,8 +1,8 @@
 import 'server-only';
 
-import { db } from '@dg/db';
 import { invariant } from '@dg/shared-core/assertions/invariant';
 import { log } from '@dg/shared-core/logging/log';
+import { upsertAndCacheToken } from '../clients/refreshedAccessToken';
 import { validateRawDataToToken } from '../strava/stravaClient';
 
 /**
@@ -37,7 +37,7 @@ export async function exchangeStravaCodeForToken(code: string): Promise<void> {
   const { accessToken, expiryAt, refreshToken } = validateRawDataToToken(rawTokenData);
 
   log.info('Persisting token to DB', { accessToken, expiryAt, refreshToken });
-  const [token] = await db.Token.upsert({
+  const token = await upsertAndCacheToken({
     accessToken,
     expiryAt,
     name: 'strava',

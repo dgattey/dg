@@ -1,7 +1,7 @@
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 import { setupMockLifecycle } from '@dg/testing/mocks';
 import type { RefreshTokenConfig } from '../RefreshTokenConfig';
-import { refreshedAccessToken } from '../refreshedAccessToken';
+import { clearTokenCache, refreshedAccessToken } from '../refreshedAccessToken';
 
 const getUrl = (input: RequestInfo): string =>
   typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url;
@@ -45,7 +45,29 @@ describe('refreshedAccessToken', () => {
   });
 
   beforeEach(() => {
+    clearTokenCache();
     (global.fetch as jest.Mock).mockReset();
+  });
+
+  it('serves subsequent calls for a valid token from the in-memory cache without querying the DB', async () => {
+    await db.Token.upsert({
+      accessToken: 'cached-access-token',
+      expiryAt: new Date(Date.now() + 3600 * 1000),
+      name: 'cached-token',
+      refreshToken: 'cached-refresh',
+    });
+
+    const findOneSpy = jest.spyOn(db.Token, 'findOne');
+    try {
+      const first = await refreshedAccessToken('cached-token', mockRefreshConfig);
+      const second = await refreshedAccessToken('cached-token', mockRefreshConfig);
+
+      expect(first).toBe('cached-access-token');
+      expect(second).toBe('cached-access-token');
+      expect(findOneSpy).toHaveBeenCalledTimes(1);
+    } finally {
+      findOneSpy.mockRestore();
+    }
   });
 
   it('returns existing valid access token without refreshing', async () => {
