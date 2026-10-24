@@ -121,6 +121,128 @@ export function checkScallopPadding(
   return violations;
 }
 
+const lastCompound = (selector: string): string => selector.split(/[\s>+~]+/).at(-1) ?? '';
+
+/**
+ * Card heads swap their subtitle for a hover readout. A wrapping head moves that
+ * subtitle onto a new line once the readout outgrows the space beside the title, which
+ * drags the rows under the pointer away and makes the hover flicker. The head stacks
+ * title over subtitle, and the subtitle stays one line.
+ */
+export function checkCardHeadStable(
+  cssFiles: ReadonlyMap<string, string>,
+): Array<StructureViolation> {
+  const violations: Array<StructureViolation> = [];
+  for (const [file, content] of cssFiles) {
+    let asideBase: CssRule | undefined;
+    let asideFirst: CssRule | undefined;
+    for (const rule of cssRules(content)) {
+      const compounds = rule.selectors.map(lastCompound);
+      if (
+        compounds.includes('.stats__head') &&
+        declaration(rule.body, 'flex-wrap')?.startsWith('wrap')
+      ) {
+        violations.push({
+          file,
+          line: lineAt(content, rule.index),
+          message:
+            'Stack the card title over its subtitle instead of wrapping, so a hover readout never changes the head height',
+          rule: 'css-card-head-wrap',
+        });
+      }
+      if (!compounds.includes('.stats__aside')) {
+        continue;
+      }
+      asideFirst ??= rule;
+      const whiteSpace = declaration(rule.body, 'white-space');
+      if (
+        !rule.media &&
+        rule.selectors.includes('.stats__aside') &&
+        whiteSpace === 'nowrap' &&
+        declaration(rule.body, 'text-overflow') === 'ellipsis'
+      ) {
+        asideBase = rule;
+      } else if (whiteSpace && whiteSpace !== 'nowrap') {
+        violations.push({
+          file,
+          line: lineAt(content, rule.index),
+          message: 'Keep the card subtitle on one line, since it doubles as a hover readout',
+          rule: 'css-card-head-wrap',
+        });
+      }
+    }
+    if (asideFirst && !asideBase) {
+      violations.push({
+        file,
+        line: lineAt(content, asideFirst.index),
+        message:
+          '`.stats__aside` needs `white-space: nowrap` and `text-overflow: ellipsis` so a hover readout stays one line',
+        rule: 'css-card-head-wrap',
+      });
+    }
+  }
+  return violations;
+}
+
+/**
+ * A tag hung over a card's top edge and inside its right edge covers the end of the
+ * card head. Each one needs a bounded width and a `:has(> tag)` rule that pads the head
+ * clear of it, or a long title or readout runs underneath.
+ */
+export function checkCornerTagRoom(
+  cssFiles: ReadonlyMap<string, string>,
+): Array<StructureViolation> {
+  const rulesByFile = new Map([...cssFiles].map(([file, content]) => [file, cssRules(content)]));
+  const roomFor = new Set<string>();
+  for (const rules of rulesByFile.values()) {
+    for (const rule of rules) {
+      if (!/(?:^|[;\s])padding(?:-right|-inline-end|-inline)?\s*:/.test(rule.body)) {
+        continue;
+      }
+      for (const selector of rule.selectors) {
+        for (const match of selector.matchAll(/:has\(>\s*(\.[\w-]+)\)/g)) {
+          if (match[1] && /\.stats__head|\.stats__heading/.test(selector)) {
+            roomFor.add(match[1]);
+          }
+        }
+      }
+    }
+  }
+  const violations: Array<StructureViolation> = [];
+  for (const [file, rules] of rulesByFile) {
+    for (const rule of rules) {
+      const tag = rule.selectors.length === 1 ? rule.selectors[0] : undefined;
+      if (!tag || !/^\.[\w-]+$/.test(tag) || rule.media) {
+        continue;
+      }
+      const hangs =
+        declaration(rule.body, 'position') === 'absolute' &&
+        declaration(rule.body, 'top')?.startsWith('-') &&
+        declaration(rule.body, 'right') !== undefined &&
+        !declaration(rule.body, 'right')?.startsWith('-') &&
+        !declaration(rule.body, 'z-index')?.startsWith('-');
+      if (!hangs) {
+        continue;
+      }
+      const problems = [
+        declaration(rule.body, 'width') || declaration(rule.body, 'max-width')
+          ? null
+          : 'a `width` or `max-width`',
+        roomFor.has(tag) ? null : `a \`.paperWrap:has(> ${tag})\` rule padding the card head`,
+      ].filter(Boolean);
+      if (problems.length > 0) {
+        violations.push({
+          file,
+          line: lineAt(cssFiles.get(file) ?? '', rule.index),
+          message: `Corner tag \`${tag}\` needs ${problems.join(' and ')} so card text keeps clear of it`,
+          rule: 'css-corner-tag-room',
+        });
+      }
+    }
+  }
+  return violations;
+}
+
 /**
  * A `repeat(n, …)` grid whose column gaps alone are wider than a phone collapses every
  * track to zero and pushes full-width children past the page edge. It must switch to
@@ -168,4 +290,13 @@ export function checkGridGapsFit(cssFiles: ReadonlyMap<string, string>): Array<S
     }
   }
   return violations;
+}
+
+export function checkCssGeometry(cssFiles: ReadonlyMap<string, string>): Array<StructureViolation> {
+  return [
+    ...checkScallopPadding(cssFiles),
+    ...checkGridGapsFit(cssFiles),
+    ...checkCardHeadStable(cssFiles),
+    ...checkCornerTagRoom(cssFiles),
+  ];
 }

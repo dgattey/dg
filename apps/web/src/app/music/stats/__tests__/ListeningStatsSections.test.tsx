@@ -222,7 +222,7 @@ describe('ListeningStatsSections', () => {
     expect(
       [...container.querySelectorAll('.stats__clockValue')].map((label) => label.textContent),
     ).toEqual(['25.8k']);
-    expect(screen.getByText('Peak 3 to 5 PM')).toBeInTheDocument();
+    expect(screen.getByText('Peak 3p–5p')).toBeInTheDocument();
     expect(
       [...container.querySelectorAll('.stats__clockTick')].map((tick) => tick.textContent),
     ).toEqual(['6a', '12p', '6p', '12a']);

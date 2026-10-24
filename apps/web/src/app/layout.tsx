@@ -39,7 +39,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <ServerTimeProvider serverTime={serverTime}>
           <ColorSchemeSync />
           <WebMcpTools />
-          <div className="collageRoot">
+          <div className="collageRoot" data-tooltip-root>
             <NowPlayingProvider>
               <div className="collageSheet">
                 <Header />

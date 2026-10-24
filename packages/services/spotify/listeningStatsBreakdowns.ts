@@ -261,16 +261,13 @@ export function buildRangeBreakdowns({
         title: 'Every day, this month',
       },
       timeline: {
-        points: days.map((dayIso, idx) => {
-          const dayNum = Number(dayIso.slice(8, 10));
-          return {
-            key: dayIso,
-            label: fullDateLabel(dayIso),
-            phase: phaseOf(dayIso, now),
-            plays: playsByDay.get(dayIso) ?? 0,
-            tick: dayNum === 1 || idx === 0 ? shortDateBadge(dayIso) : `${dayNum}`,
-          };
-        }),
+        points: days.map((dayIso) => ({
+          key: dayIso,
+          label: fullDateLabel(dayIso),
+          phase: phaseOf(dayIso, now),
+          plays: playsByDay.get(dayIso) ?? 0,
+          tick: `${Number(dayIso.slice(8, 10))}`,
+        })),
         title: 'Plays per day, this month',
       },
     };

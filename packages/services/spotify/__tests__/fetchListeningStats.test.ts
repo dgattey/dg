@@ -360,6 +360,9 @@ describe('fetchListeningStats', () => {
       tracks: 1,
     });
     expect(monthStats?.timeline.points).toHaveLength(30);
+    expect(monthStats?.timeline.points.map((point) => point.tick)).toEqual(
+      monthStats?.timeline.points.map((point) => String(Number(point.key.slice(8, 10)))),
+    );
   });
 });
 

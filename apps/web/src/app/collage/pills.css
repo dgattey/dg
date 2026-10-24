@@ -10,6 +10,10 @@
   margin: 0;
   border: 0;
 }
+/* A backdrop host lifts every child to 1, which would let the next section's cut-outs cover the pills. */
+.collageBackdropHost > .paperPills {
+  z-index: 3;
+}
 .paperPill {
   padding: 0;
   font-size: var(--type-label);

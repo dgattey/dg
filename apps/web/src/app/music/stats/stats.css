@@ -73,12 +73,9 @@
 }
 
 .stats__head {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 16px;
-  align-items: baseline;
-  justify-content: space-between;
-  padding-right: 76px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: 4px;
 }
 .stats__heading {
   margin: 0;
@@ -90,6 +87,11 @@
   margin: 0;
   font: 600 var(--type-meta) / var(--leading-meta) var(--body);
   color: var(--soft);
+}
+.stats__aside {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 .stats__note {
   margin-top: 14px;
@@ -283,9 +285,12 @@
     color 180ms ease,
     transform 240ms cubic-bezier(0.22, 1, 0.36, 1);
 }
+.stats__columnValue,
+.stats__columnTick {
+  min-height: 1.35em;
+}
 .stats__columnValue {
   align-self: end;
-  min-height: 1.35em;
 }
 .stats__columnBar {
   align-self: end;
@@ -514,6 +519,9 @@
   box-shadow: 0 0 0 2px var(--on);
   transform: scale(1.2);
 }
+.stats__monthRow > :first-child + .stats__monthCell {
+  transform-origin: left center;
+}
 
 /* Soundtrack by year / month / week / day */
 .stats__championList {
@@ -732,7 +740,6 @@
   display: grid;
   gap: 8px;
   align-content: start;
-  padding-right: 76px;
 }
 .stats__ritualList {
   display: grid;
@@ -812,10 +819,6 @@
   .stats__pad,
   .stats__ritualsInner {
     padding: var(--collage-card-pad-mobile);
-  }
-  .stats__head,
-  .stats__ritualsLead {
-    padding-right: 0;
   }
   .stats__columns {
     column-gap: 4px;

@@ -157,7 +157,7 @@ export function ListeningClock({ stats }: { stats: ListeningStats }) {
       innerClassName="stats__pad"
       tag={
         <PaperTag className="stats__pin" tiltDeg={6} tone="vermilion">
-          Peak {formatHourRange(peak.start, 2)}
+          Peak {formatHourTick(peak.start)}–{formatHourTick(peak.start + 2)}
         </PaperTag>
       }
       tiltDeg={-0.8}

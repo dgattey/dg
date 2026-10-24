@@ -6,12 +6,13 @@ import { EASING_EASE_OUT, TIMING_FAST } from '../helpers/timing';
 import type { SxObject } from '../theme';
 import { Box } from './Box';
 import { Typography } from './Typography';
+import { surfaceLookSx, useFloatingTooltip } from './useFloatingTooltip';
 
 export type TooltipPlacement = 'top' | 'bottom';
 
-const VIEWPORT_EDGE_PADDING = 8;
 const ANCHOR_ATTRIBUTE = 'data-tooltip-anchor';
 const MUTED_ATTRIBUTE = 'data-tooltip-muted';
+const FLOATING_ATTRIBUTE = 'data-tooltip-floating';
 
 /**
  * Whether any clipping box in the trigger cuts its content off. Covers ellipsis
@@ -26,20 +27,6 @@ const hasTruncatedText = (trigger: Element) =>
       (overflowY !== 'visible' && element.scrollHeight - element.clientHeight > 1)
     );
   });
-
-const insetFromViewportEdges = (tooltip: HTMLElement) => {
-  tooltip.style.translate = '0';
-  const { left, right, width } = tooltip.getBoundingClientRect();
-  if (!width) {
-    return;
-  }
-  const startOverflow = VIEWPORT_EDGE_PADDING - left;
-  const endOverflow = right - (window.innerWidth - VIEWPORT_EDGE_PADDING);
-  const shift = startOverflow > 0 ? startOverflow : Math.min(-endOverflow, 0);
-  if (shift) {
-    tooltip.style.translate = `${Math.round(shift)}px`;
-  }
-};
 
 interface TooltipProps {
   /** The content to display in the tooltip. */
@@ -92,6 +79,7 @@ const HOVERED_SELECTOR = `[${ANCHOR_ATTRIBUTE}]:hover > &`;
 const TRIGGER_INSIDE_FOCUSED_SELECTOR = `[${ANCHOR_ATTRIBUTE}]:has(:focus-visible) > &`;
 const TRIGGER_AROUND_FOCUSED_SELECTOR = `:focus-visible>[${ANCHOR_ATTRIBUTE}]>&`;
 const MUTED_SELECTOR = `[${MUTED_ATTRIBUTE}] > &`;
+const FLOATING_SELECTOR = `[${FLOATING_ATTRIBUTE}] > &`;
 
 const shrinkableAnchorSx: SxObject = {
   '& > :not([role="tooltip"])': {
@@ -136,28 +124,17 @@ function createSurfaceSx(
     [TRIGGER_AROUND_FOCUSED_SELECTOR]: revealedSx,
     [TRIGGER_INSIDE_FOCUSED_SELECTOR]: revealedSx,
     [MUTED_SELECTOR]: { display: 'none' },
+    [FLOATING_SELECTOR]: { display: 'none' },
+    ...surfaceLookSx,
     alignSelf: isAbove ? 'unsafe end' : 'unsafe start',
-    background: 'var(--dg-palette-background-paper)',
-    border: 'thin solid var(--dg-palette-card-border)',
-    borderRadius: '12px',
-    boxShadow: 'var(--dg-shadow-card-main)',
-    color: 'var(--dg-palette-text-primary)',
-    fontVariantCaps: 'normal',
-    fontWeight: 600,
     justifySelf: 'unsafe anchor-center',
-    letterSpacing: 'normal',
-    lineHeight: 1.3,
     marginBlockEnd: isAbove ? '8px' : 0,
     marginBlockStart: isAbove ? 0 : '8px',
     opacity: 0,
-    padding: '6px 12px',
-    pointerEvents: 'none',
     position: 'fixed',
     positionAnchor: anchorName,
     positionArea: isAbove ? 'block-start' : 'block-end',
     positionTryFallbacks: canFlip ? 'flip-block' : 'none',
-    textTransform: 'none',
-    translate: '0',
     visibility: 'hidden',
     whiteSpace: 'nowrap',
     zIndex: 1500,
@@ -166,11 +143,11 @@ function createSurfaceSx(
 }
 
 /**
- * Tooltip with adaptive bottom/top placement, revealed entirely in CSS.
+ * Tooltip with adaptive bottom/top placement.
  *
- * Hover and `:focus-visible` do the showing, so the hint works with scripting
- * off; CSS anchor positioning does the placing and flips the surface to the
- * other side of the trigger when there is no room. Because the tooltip is a
+ * Until hydration, hover and `:focus-visible` reveal an inline surface in CSS,
+ * so the hint works with scripting off. Once hydrated, the same triggers open
+ * the floating copy from `useFloatingTooltip` instead. Because the tooltip is a
  * hint rather than the only home for its text, every trigger that uses one also
  * names itself — `aria-label` on icon-only controls, visible text otherwise.
  *
@@ -195,22 +172,37 @@ export function Tooltip({
   const generatedId = useId();
   const tooltipId = providedId ?? `tooltip-${generatedId}`;
   const anchorName = `--anchor-${tooltipId.replace(/:/g, '-')}`;
+  const anchorRef = useRef<HTMLElement>(null);
   const surfaceRef = useRef<HTMLSpanElement>(null);
 
-  const refinePlacement = (event: SyntheticEvent<HTMLElement>) => {
-    const anchor = event.currentTarget;
-    if (whenTruncated) {
-      const fits = ![...anchor.children].some(
-        (child) => child !== surfaceRef.current && hasTruncatedText(child),
-      );
-      anchor.toggleAttribute(MUTED_ATTRIBUTE, fits);
-      if (fits) {
-        return;
-      }
+  /**
+   * A `whenTruncated` tooltip only opens when its text is actually cut off. Text
+   * can start or stop fitting on any resize, hence measuring on every open.
+   */
+  const isMuted = (anchor: HTMLElement) => {
+    if (!whenTruncated) {
+      return false;
     }
-    if (surfaceRef.current) {
-      insetFromViewportEdges(surfaceRef.current);
-    }
+    const fits = ![...anchor.children].some(
+      (child) => child !== surfaceRef.current && hasTruncatedText(child),
+    );
+    anchor.toggleAttribute(MUTED_ATTRIBUTE, fits);
+    return fits;
+  };
+
+  const { close, isFloating, open, openOnKeyboardFocus, surface } = useFloatingTooltip({
+    anchorRef,
+    isMuted,
+    placement,
+    title,
+  });
+
+  /**
+   * Before hydration the inline surface reveals itself in CSS, so a tooltip that
+   * should stay shut must be muted before the hover restyles it.
+   */
+  const muteInlineSurface = (event: SyntheticEvent<HTMLElement>) => {
+    isMuted(event.currentTarget);
   };
 
   if (!title) {
@@ -219,11 +211,14 @@ export function Tooltip({
 
   return (
     <Box
-      {...{ [ANCHOR_ATTRIBUTE]: true }}
+      {...{ [ANCHOR_ATTRIBUTE]: true, [FLOATING_ATTRIBUTE]: isFloating || undefined }}
       className={className}
       component="span"
-      onFocus={refinePlacement}
-      onMouseEnter={refinePlacement}
+      onBlur={() => close('focus')}
+      onFocus={isFloating ? openOnKeyboardFocus : muteInlineSurface}
+      onMouseEnter={isFloating ? () => open('hover') : muteInlineSurface}
+      onMouseLeave={() => close('hover')}
+      ref={anchorRef}
       sx={{
         ...createAnchorSx(anchorName),
         ...(whenTruncated ? shrinkableAnchorSx : undefined),
@@ -244,6 +239,7 @@ export function Tooltip({
       >
         {title}
       </Typography>
+      {surface}
     </Box>
   );
 }
