@@ -78,9 +78,9 @@ function cleanNoteLine(line: string): string {
 export function extractPrNumbers(text: string): Array<number> {
   const numbers = new Set<number>();
   const pattern =
-    /(?:https:\/\/github\.com\/dgattey\/dg\/(?:pull|issues)\/(\d+)|(?<![a-z0-9])#(\d+)\b)/gi;
+    /(?:https:\/\/github\.com\/dgattey\/dg\/(?:pull|issues)\/(\d+)|\(\s*#(\d+)\s*\)|\b(?:pr|pull\s+request|in)\s+#(\d+)\b)/gi;
   for (const match of text.matchAll(pattern)) {
-    const raw = match[1] ?? match[2];
+    const raw = match[1] ?? match[2] ?? match[3];
     const parsed = raw ? Number(raw) : Number.NaN;
     if (Number.isInteger(parsed) && parsed > 0) {
       numbers.add(parsed);

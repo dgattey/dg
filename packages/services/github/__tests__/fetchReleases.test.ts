@@ -87,10 +87,15 @@ describe('fetchReleases', () => {
     });
   });
 
-  it('extracts unique PR numbers from release text', () => {
+  it('extracts explicit pull request references and ignores bare hash numbers in prose', () => {
     expect(
       extractPrNumbers('Merged #517 and https://github.com/dgattey/dg/pull/652 plus (#517) again.'),
-    ).toEqual([517, 652]);
+    ).toEqual([652, 517]);
+    expect(
+      extractPrNumbers('Added a Top playlists card with the #1 song from each playlist (#702).'),
+    ).toEqual([702]);
+    expect(extractPrNumbers('the #1 song')).toEqual([]);
+    expect(extractPrNumbers('#1 neighborhood')).toEqual([]);
   });
 
   it('skips draft and prerelease entries when normalizing', () => {
