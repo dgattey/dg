@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import {
+  enableRootPageViewTransition,
   rememberPageOrigin,
   setViewTransitionScrollOffset,
   takePageOrigin,
@@ -50,9 +51,19 @@ describe('pageTransitions', () => {
     });
   });
 
-  it('updates --vt-scroll-offset on the document element when remembering page origin', () => {
+  it('updates --vt-scroll-offset and preserves root view-transition-name during page navigation', () => {
     setViewTransitionScrollOffset(640);
+    enableRootPageViewTransition();
     expect(document.documentElement.style.getPropertyValue('--vt-scroll-offset')).toBe('640px');
+    expect(document.documentElement.style.viewTransitionName).toBe('root');
+    expect(css).toContain('html:active-view-transition-type(page-open)::view-transition-old(root)');
+    expect(css).toContain('html:active-view-transition-type(page-open)::view-transition-new(root)');
+    expect(css).toContain(
+      'html:active-view-transition-type(page-close)::view-transition-old(root)',
+    );
+    expect(css).toContain(
+      'html:active-view-transition-type(page-close)::view-transition-new(root)',
+    );
   });
 
   it('fades arriving page content in from 0 to 1 and departing page content out from 1 to 0', () => {

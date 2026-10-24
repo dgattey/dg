@@ -152,20 +152,11 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
 
 .collageMain,
 .collageMeasure {
-  width: min(calc(100% - 2 * var(--pad)), var(--measure));
+  width: min(calc(100% - 2 * max(0px, var(--pad) - var(--sheet-inset, 0px))), var(--measure));
   margin-inline: auto;
 }
 .collageMain {
   padding-block: 8px 72px;
-}
-/*
- * Clips the transitioning page wrapper to the active viewport slice so the
- * browser never rasterizes multi-thousand-pixel offscreen document heights
- * into GPU view-transition textures.
- */
-html:active-view-transition-type(page-open, page-close) .collageMain > div {
-  max-height: calc(100dvh + var(--vt-scroll-offset, 0px));
-  overflow: clip;
 }
 .collageField {
   position: absolute;

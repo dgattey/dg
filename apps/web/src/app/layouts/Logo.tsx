@@ -1,7 +1,10 @@
 'use client';
 
 import { homeRoute } from '@dg/shared-core/routes/app';
-import { setViewTransitionScrollOffset } from '@dg/ui/core/transitions/pageScrollMemory';
+import {
+  enableRootPageViewTransition,
+  setViewTransitionScrollOffset,
+} from '@dg/ui/core/transitions/pageScrollMemory';
 import { pageTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCY, TIMING_BOUNCY } from '@dg/ui/helpers/timing';
@@ -53,6 +56,7 @@ export function Logo() {
       window.scrollTo({ behavior: 'smooth', top: 0 });
       return;
     }
+    enableRootPageViewTransition();
     setViewTransitionScrollOffset(window.scrollY);
   };
 

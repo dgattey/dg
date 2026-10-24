@@ -5,7 +5,7 @@ import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
 import type { Map as MapLibreMap } from 'maplibre-gl';
 import type { Point } from 'pigeon-maps';
-import { use, useEffect, useRef } from 'react';
+import { use, useEffect, useRef, useState } from 'react';
 import { VisibleRoutes } from '../VisibleRoutes';
 import { OFFLINE_TILES } from './offlineTile';
 import { RouteAtlasSketch } from './RouteAtlasSketch';
@@ -230,6 +230,7 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
   const visible = use(VisibleRoutes);
   const dark = useDarkMap();
   const offline = tileSource.mode === 'offline';
+  const [mapReady, setMapReady] = useState(() => Boolean(kept?.ready));
 
   useEffect(() => {
     wanted = { dark, routes, tileSource, visible };
@@ -244,6 +245,17 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
       return;
     }
     let mounted = true;
+    const markReadyWhenLoaded = (atlas: KeptAtlas) => {
+      if (atlas.ready) {
+        setMapReady(true);
+        return;
+      }
+      atlas.map.once('load', () => {
+        if (mounted) {
+          setMapReady(true);
+        }
+      });
+    };
     const attach = (atlas: KeptAtlas) => {
       if (!mounted) {
         return;
@@ -253,12 +265,27 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
       }
       atlas.map.resize();
       apply(atlas);
+      markReadyWhenLoaded(atlas);
     };
     if (kept) {
       attach(kept);
     } else {
-      creating ??= createAtlas(host, boundsRef.current, wanted);
-      void creating.then(attach);
+      const initialWanted = wanted;
+      const start = () => {
+        if (!mounted) {
+          return;
+        }
+        creating ??= createAtlas(host, boundsRef.current, wanted ?? initialWanted);
+        void creating.then(attach);
+      };
+      const activeVt = (
+        document as Document & { __reactViewTransition?: { finished: Promise<unknown> } }
+      ).__reactViewTransition;
+      if (activeVt) {
+        void activeVt.finished.finally(start);
+      } else {
+        start();
+      }
     }
     const observer = new ResizeObserver(() => {
       if (kept?.element.parentElement === host && host.clientWidth > 0) {
@@ -275,9 +302,11 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
     };
   }, [offline]);
 
+  const showSketch = offline || !mapReady;
+
   return (
     <Box aria-label={label} role="region" sx={containerSx}>
-      {offline ? (
+      {showSketch ? (
         <Box
           sx={{
             ...canvasSx,
@@ -289,7 +318,8 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
             routes={visible ? routes.filter(({ id }) => visible.has(id)) : routes}
           />
         </Box>
-      ) : (
+      ) : null}
+      {offline ? null : (
         <>
           <Box ref={hostRef} sx={hostSx} />
           <ZoomControls

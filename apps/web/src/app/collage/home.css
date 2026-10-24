@@ -222,6 +222,7 @@
   margin: 0;
   font-size: inherit;
   font-weight: inherit;
+  pointer-events: none;
 }
 .home__stravaAtlas {
   position: relative;
@@ -255,6 +256,7 @@
   right: -22px;
   z-index: 3;
   width: 124px;
+  pointer-events: none;
 }
 /* Percent margins follow the polaroid's own columns, so the tuck scales with the slot. */
 .home__stravaLatest {
