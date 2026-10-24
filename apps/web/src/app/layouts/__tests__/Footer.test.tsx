@@ -398,7 +398,7 @@ describe('Footer', () => {
     expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('1.0000');
   });
 
-  it('continues shrinking the sheet even when prefers-reduced-motion is reduce and honors data-footer-progress-lock', async () => {
+  it('continues shrinking the sheet even when prefers-reduced-motion is reduce', async () => {
     const originalMatchMedia = window.matchMedia;
     window.matchMedia = jest.fn().mockImplementation((query: string) => ({
       addEventListener: jest.fn(),
@@ -442,13 +442,6 @@ describe('Footer', () => {
 
       window.dispatchEvent(new Event('scroll'));
       expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('1.0000');
-
-      if (sheet) {
-        sheet.dataset.footerProgressLock = '1';
-      }
-      window.scrollY = 0;
-      window.dispatchEvent(new Event('scroll'));
-      expect(sheet?.style.getPropertyValue('--footer-progress')).toBe('1');
     } finally {
       window.matchMedia = originalMatchMedia;
     }

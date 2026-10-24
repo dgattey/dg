@@ -16,7 +16,6 @@ import { familjen } from './collage/familjen';
 import { Footer } from './layouts/Footer';
 import { Header } from './layouts/Header';
 import { PageViewTransition } from './layouts/PageViewTransition';
-import { RefreshOnFocusProvider } from './layouts/RefreshOnFocusProvider';
 import { WebMcpTools } from './layouts/WebMcpTools';
 import { baseMetadata, viewport } from './metadata';
 import { NowPlayingProvider } from './spotify/NowPlayingContext';
@@ -39,7 +38,6 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <body>
         <ServerTimeProvider serverTime={serverTime}>
           <ColorSchemeSync />
-          <RefreshOnFocusProvider />
           <WebMcpTools />
           <div className={`collageRoot ${familjen.variable}`}>
             <NowPlayingProvider>

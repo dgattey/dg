@@ -121,10 +121,9 @@ describe('check-structure', () => {
       ['apps/web/src/app/music/music.css'],
       new Map([
         [
-          'apps/web/src/app/music/albums/layout.tsx',
-          "import '../music.css';\nexport default function L({ children }: { children: unknown }) { return children; }\n",
+          'apps/web/src/app/music/albums/page.tsx',
+          "import '../music.css';\nexport default function A() {}\n",
         ],
-        ['apps/web/src/app/music/albums/[id]/page.tsx', 'export default function A() {}\n'],
         ['apps/web/src/app/music/page.tsx', 'export default function P() {}\n'],
       ]),
     );

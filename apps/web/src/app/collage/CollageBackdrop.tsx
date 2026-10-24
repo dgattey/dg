@@ -28,7 +28,7 @@ function Sheet({ sheet }: { sheet: SheetPlacement }) {
   const desktopOnly = sheet.visibility === 'desktop' ? ' collageSheetDesktopOnly' : '';
   return (
     <span
-      className={`collageField collageSheet collageSheet-${sheet.pattern} collageSheetEdge-${sheet.edge}${desktopOnly}`}
+      className={`collageField collageBackdropSheet collageSheet-${sheet.pattern} collageSheetEdge-${sheet.edge}${desktopOnly}`}
       data-sheet={sheet.id}
       style={style}
     />

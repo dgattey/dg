@@ -229,19 +229,12 @@ export function checkRouteCssImports(
       if (pageEntry !== `${cssDir}/page.tsx` && !pageEntry.startsWith(`${cssDir}/`)) {
         continue;
       }
-      let covered = importsByFile.get(pageEntry)?.has(cssPath) ?? false;
-      for (
-        let dir = path.posix.dirname(pageEntry);
-        !covered && dir.startsWith(cssDir);
-        dir = path.posix.dirname(dir)
-      ) {
-        covered = importsByFile.get(`${dir}/layout.tsx`)?.has(cssPath) ?? false;
-      }
+      const covered = importsByFile.get(pageEntry)?.has(cssPath) ?? false;
       if (!covered) {
         violations.push({
           file: pageEntry,
           line: 1,
-          message: `Route under "${cssDir}" does not import "${cssPath}" in page.tsx or layout.tsx`,
+          message: `Route under "${cssDir}" does not import "${cssPath}" in page.tsx`,
           rule: 'route-missing-css',
         });
       }

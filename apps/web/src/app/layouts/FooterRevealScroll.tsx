@@ -5,15 +5,9 @@ import { useEffect } from 'react';
 
 export function syncFooterRevealProgress() {
   setViewTransitionScrollOffset(window.scrollY);
-  const sheet = document.querySelector<HTMLElement>(
-    '.collageRoot > .collageSheet, .collageSheet:not(.collageBackdrop .collageSheet)',
-  );
+  const sheet = document.querySelector<HTMLElement>('.collageSheet');
   const footer = document.querySelector<HTMLElement>('.chrome__footer');
   if (!sheet || !footer) {
-    return;
-  }
-  if (sheet.dataset.footerProgressLock) {
-    sheet.style.setProperty('--footer-progress', sheet.dataset.footerProgressLock);
     return;
   }
   const footerHeight = footer.offsetHeight;
@@ -31,9 +25,7 @@ export function syncFooterRevealProgress() {
 
 export function FooterRevealScroll() {
   useEffect(() => {
-    const sheet = document.querySelector<HTMLElement>(
-      '.collageRoot > .collageSheet, .collageSheet:not(.collageBackdrop .collageSheet)',
-    );
+    const sheet = document.querySelector<HTMLElement>('.collageSheet');
     const footer = document.querySelector<HTMLElement>('.chrome__footer');
     if (!sheet || !footer) {
       return;
