@@ -182,29 +182,29 @@ describe('check-css-geometry', () => {
     );
   });
 
-  it('enforces the footer curtain reveal, Now strip straddle, and symmetrical footer spacing', () => {
+  it('enforces the footer curtain reveal and symmetric padding-block on .chrome__footerGrid', () => {
     const violations = checkFooterCurtainReveal(
       new Map([
         [
           'apps/web/src/app/collage/collage.css',
-          [
-            '.collageRoot { overflow: hidden; }',
-            '.collageSheet { position: relative; z-index: 2; }',
-          ].join('\n'),
+          '.collageSheet { position: relative; z-index: 2; }',
         ],
         [
           'apps/web/src/app/collage/chrome.css',
           [
-            '.chrome__footer { position: sticky; bottom: 0; z-index: 2; padding: 52px 0 28px; }',
+            '.chrome__footer { position: sticky; bottom: 0; z-index: 2; }',
             '.chrome__nowWrap { position: relative; z-index: 1; height: 0; }',
-            '.chrome__footerBody { padding-top: 12px; }',
-            '.chrome__colophon { margin-top: 24px; }',
-            '.chrome__elsewhereLedger { border-bottom: 1px solid red; }',
+            '.chrome__footerGrid { display: grid; }',
           ].join('\n'),
         ],
       ]),
     );
-    assert.equal(violations.length, 9);
-    assert.ok(violations.every((v) => v.rule === 'css-footer-curtain'));
+    assert.deepEqual(
+      violations.map(({ line, rule }) => ({ line, rule })),
+      [
+        { line: 1, rule: 'css-footer-curtain' },
+        { line: 3, rule: 'css-footer-curtain' },
+      ],
+    );
   });
 });

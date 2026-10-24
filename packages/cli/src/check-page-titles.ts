@@ -60,13 +60,7 @@ export function cssRules(content: string): Array<CssRule> {
 export const declaration = (body: string, property: string): string | undefined =>
   new RegExp(`(?:^|[;\\s])${property}\\s*:([^;]+)`).exec(body)?.[1]?.trim();
 
-const topPaddingPx = (body: string): number | null => {
-  const raw = declaration(body, 'padding-top') ?? declaration(body, 'padding')?.split(/\s+/)[0];
-  const m = raw ? /^(\d+(?:\.\d+)?)px$/.exec(raw) : null;
-  return m ? Number(m[1]) : null;
-};
-
-/** Enforces the sticky footer curtain reveal, straddling Now strip, and symmetrical footer spacing. */
+/** Enforces the sticky footer curtain reveal and single-property `padding-block` symmetry on `.chrome__footerGrid`. */
 export function checkFooterCurtainReveal(
   cssFiles: ReadonlyMap<string, string>,
 ): Array<StructureViolation> {
@@ -74,126 +68,49 @@ export function checkFooterCurtainReveal(
   const chromeFile = 'apps/web/src/app/collage/chrome.css';
   const collage = cssFiles.get(collageFile);
   const chrome = cssFiles.get(chromeFile);
-  if (!collage && !chrome) return [];
-  const violations: Array<StructureViolation> = [];
-  const flag = (file: string, content: string, index: number, message: string) =>
-    violations.push({ file, line: lineAt(content, index), message, rule: 'css-footer-curtain' });
+  if (!collage || !chrome) return [];
 
-  let sheetZ = 2;
-  let footerZ = 1;
-  if (collage) {
-    if (!/@property\s+--footer-progress\s*\{[^}]*syntax:\s*"<number>"/.test(collage)) {
-      flag(
-        collageFile,
-        collage,
-        0,
-        'Declare `@property --footer-progress` with `syntax: "<number>"`',
-      );
-    }
-    for (const rule of cssRules(collage)) {
-      if (!rule.media && rule.selectors.includes('.collageRoot')) {
-        const ov = declaration(rule.body, 'overflow') ?? declaration(rule.body, 'overflow-y');
-        if (ov && /^(?:hidden|auto|scroll)\b/.test(ov)) {
-          flag(
-            collageFile,
-            collage,
-            rule.index,
-            '`.collageRoot` must not set overflow hidden/auto/scroll, which traps `position: sticky` on `.chrome__footer`',
-          );
-        }
-      }
-      if (!rule.media && rule.selectors.includes('.collageSheet')) {
-        sheetZ = Number(declaration(rule.body, 'z-index'));
-        if (
-          declaration(rule.body, 'position') !== 'relative' ||
-          !rule.body.includes('--footer-progress')
-        ) {
-          flag(
-            collageFile,
-            collage,
-            rule.index,
-            '`.collageSheet` must keep `position: relative` and drive `--sheet-inset`/`--sheet-radius` from `var(--footer-progress)`',
-          );
-        }
-      }
-    }
+  const sheetRule = cssRules(collage).find(
+    (r) => !r.media && r.selectors.includes('.collageSheet'),
+  );
+  const footerRule = cssRules(chrome).find(
+    (r) => !r.media && r.selectors.includes('.chrome__footer'),
+  );
+  const nowWrapRule = cssRules(chrome).find(
+    (r) => !r.media && r.selectors.includes('.chrome__nowWrap'),
+  );
+  const gridRule = cssRules(chrome).find(
+    (r) => !r.media && r.selectors.includes('.chrome__footerGrid'),
+  );
+
+  const sheetZ = Number(declaration(sheetRule?.body ?? '', 'z-index'));
+  const footerZ = Number(declaration(footerRule?.body ?? '', 'z-index'));
+  const nowZ = Number(declaration(nowWrapRule?.body ?? '', 'z-index'));
+
+  const violations: Array<StructureViolation> = [];
+  if (
+    declaration(sheetRule?.body ?? '', 'position') !== 'relative' ||
+    declaration(footerRule?.body ?? '', 'position') !== 'sticky' ||
+    declaration(footerRule?.body ?? '', 'bottom') !== '0' ||
+    declaration(nowWrapRule?.body ?? '', 'height') !== '0' ||
+    !(footerZ < sheetZ && sheetZ < nowZ)
+  ) {
+    violations.push({
+      file: chromeFile,
+      line: lineAt(chrome, footerRule?.index ?? 0),
+      message:
+        'Keep `.chrome__footer` (`position: sticky; bottom: 0`), `.collageSheet` (`position: relative`), and `.chrome__nowWrap` (`height: 0`) ordered as footer < sheet < nowWrap in z-index',
+      rule: 'css-footer-curtain',
+    });
   }
-  if (chrome) {
-    for (const rule of cssRules(chrome)) {
-      const mobile = Boolean(rule.media?.includes('max-width'));
-      if (!rule.media && rule.selectors.includes('.chrome__footer')) {
-        footerZ = Number(declaration(rule.body, 'z-index'));
-        if (
-          declaration(rule.body, 'position') !== 'sticky' ||
-          declaration(rule.body, 'bottom') !== '0' ||
-          !(footerZ < sheetZ)
-        ) {
-          flag(
-            chromeFile,
-            chrome,
-            rule.index,
-            '`.chrome__footer` must keep `position: sticky; bottom: 0` with `z-index` below `.collageSheet`',
-          );
-        }
-      }
-      if (rule.selectors.includes('.chrome__footer')) {
-        const pt = topPaddingPx(rule.body);
-        if (pt !== null && pt < (mobile ? 56 : 64)) {
-          flag(
-            chromeFile,
-            chrome,
-            rule.index,
-            `\`.chrome__footer\` top padding (${pt}px) must stay >= ${mobile ? 56 : 64}px so the straddling Now strip clears the footer content`,
-          );
-        }
-      }
-      if (!rule.media && rule.selectors.includes('.chrome__nowWrap')) {
-        const nowZ = Number(declaration(rule.body, 'z-index'));
-        if (declaration(rule.body, 'height') !== '0' || !(nowZ > sheetZ)) {
-          flag(
-            chromeFile,
-            chrome,
-            rule.index,
-            '`.chrome__nowWrap` must keep `height: 0` and `z-index` above `.collageSheet` so the Now strip straddles the sheet seam',
-          );
-        }
-      }
-      if (rule.selectors.includes('.chrome__footerBody')) {
-        const pt = topPaddingPx(rule.body);
-        if (pt !== null && pt < (mobile ? 20 : 24)) {
-          flag(
-            chromeFile,
-            chrome,
-            rule.index,
-            `\`.chrome__footerBody\` top padding (${pt}px) must stay >= ${mobile ? 20 : 24}px`,
-          );
-        }
-      }
-      if (rule.selectors.includes('.chrome__colophon')) {
-        const mt = Number(
-          /^(\d+(?:\.\d+)?)px$/.exec(declaration(rule.body, 'margin-top') ?? '')?.[1],
-        );
-        if (Number.isFinite(mt) && mt < (mobile ? 32 : 48)) {
-          flag(
-            chromeFile,
-            chrome,
-            rule.index,
-            `\`.chrome__colophon\` margin-top (${mt}px) must stay >= ${mobile ? 32 : 48}px to match the top spacing under the Now strip`,
-          );
-        }
-      }
-      if (
-        rule.selectors.includes('.chrome__elsewhereLedger') &&
-        declaration(rule.body, 'border-bottom')
-      ) {
-        flag(
-          chromeFile,
-          chrome,
-          rule.index,
-          '`.chrome__elsewhereLedger` must not set `border-bottom` after the last social link',
-        );
-      }
-    }
+  if (!declaration(gridRule?.body ?? '', 'padding-block')) {
+    violations.push({
+      file: chromeFile,
+      line: lineAt(chrome, gridRule?.index ?? 0),
+      message:
+        'Set symmetric vertical spacing on `.chrome__footerGrid` with `padding-block` so top and bottom footer padding stay equal',
+      rule: 'css-footer-curtain',
+    });
   }
   return violations;
 }

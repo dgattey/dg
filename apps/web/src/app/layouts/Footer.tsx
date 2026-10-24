@@ -164,7 +164,7 @@ export async function Footer() {
       <FooterNowStrip initialTrack={lastKnownSong} latestActivity={footerActivity} />
       <footer className="chrome__footer">
         <FooterRevealScroll />
-        <div className="collageMeasure chrome__footerBody">
+        <div className="collageMeasure">
           <div className="chrome__footerGrid">
             {sectionOrder.map((key) => (key === 'hello' ? helloColumn : elsewhereColumn))}
           </div>
