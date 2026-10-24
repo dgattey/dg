@@ -793,7 +793,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   }
   .chrome__logo {
     padding: 2px;
-    font-size: 1.85em;
+    font-size: 2.1em;
   }
   .chrome__nav {
     margin: 0 0 0 auto;
@@ -804,15 +804,15 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
     padding: 4px;
   }
   .chrome__segment {
-    gap: 0.25em;
-    padding-inline: 0.3em;
+    gap: 0.22em;
+    padding-inline: 0.25em;
     font-size: clamp(var(--type-caption), 4vw, var(--type-meta));
   }
   .chrome__scheme {
     margin-left: 2px;
   }
   .chrome__schemeOption {
-    width: 24px;
+    width: 22px;
   }
 }
 @media (max-width: 320px) {
