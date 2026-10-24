@@ -39,6 +39,15 @@
   );
   translate: -50%;
 }
+/*
+ * The header paints above sticky filter bars so its dropdown wins, so a fade past its
+ * bottom would blur the pinned pills. Their own scrim covers the seam instead.
+ */
+.collageRoot:has(
+  :is(.reading__filters, .stats__toolbar, .music__sort, .strava__filters, .changelog__toolbar)
+) .chrome__header::before {
+  height: 100%;
+}
 html:active-view-transition-type(page-open, page-close) .chrome__header {
   view-transition-name: site-header;
 }
