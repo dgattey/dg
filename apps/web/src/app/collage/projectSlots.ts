@@ -128,7 +128,17 @@ export function workSheetFrames(projects: ReadonlyArray<SlottedProject>) {
 }
 
 export function moreWorkFrames(projects: ReadonlyArray<SlottedProject>) {
-  return framesFor(projects, MORE_WORK_FRAMES);
+  const [first, second, third, fourth] = projects;
+  const ordered =
+    first &&
+    second &&
+    third &&
+    fourth &&
+    third.project.layout === 'wide' &&
+    fourth.project.layout !== 'wide'
+      ? [first, second, fourth, third]
+      : projects;
+  return framesFor(ordered, MORE_WORK_FRAMES);
 }
 
 export function projectFrameAspectRatio(layout: string | null | undefined): number {
@@ -141,25 +151,14 @@ export function projectFrameAspectRatio(layout: string | null | undefined): numb
   return 1;
 }
 
-function formatProjectType(rawType: string): string {
-  return rawType
-    .trim()
-    .split(/\s+/)
-    .map((word, index) => {
-      if (/[A-Z]/.test(word.slice(1))) {
-        return word;
-      }
-      const lower = word.toLowerCase();
-      return index === 0 ? lower.charAt(0).toUpperCase() + lower.slice(1) : lower;
-    })
-    .join(' ');
-}
-
 export function projectTagMeta(
   project: Pick<RenderableProject, 'creationDate' | 'type'>,
 ): string | null {
-  const rawType = Array.isArray(project.type) ? project.type[0] : project.type;
-  const type = typeof rawType === 'string' && rawType.trim().length > 0 ? formatProjectType(rawType) : null;
+  const rawTypes = (Array.isArray(project.type) ? project.type : [project.type])
+    .filter((item): item is string => typeof item === 'string')
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0);
+  const type = rawTypes.length > 0 ? rawTypes.join(', ') : null;
   const year = project.creationDate?.match(/^(\d{4})/)?.[1];
   return type && year ? `${type} · ${year}` : null;
 }

@@ -195,8 +195,11 @@ html:active-view-transition-type(page-open, page-close) .collageMain > div {
 .collagePin {
   position: absolute;
   z-index: 4;
-  gap: 0.7em;
+  flex-wrap: wrap;
+  row-gap: 0.15em;
+  column-gap: 0.7em;
   align-items: baseline;
+  max-width: calc(100% + 12px);
 }
 .collageEyebrow {
   font-family: var(--display);
