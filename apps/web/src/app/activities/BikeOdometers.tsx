@@ -112,17 +112,19 @@ function BikeTicket({ bike, index }: { bike: StravaBike; index: number }) {
       tone={BIKE_TONES[index % BIKE_TONES.length] ?? 'cobalt'}
     >
       <span className="strava__bikeHead">
-        <span className="strava__bikeTitle">
-          <BikeIllustration name={bike.name} />
-          <span className="strava__bikeName">{bike.name}</span>
+        <span className="strava__bikeLead">
+          <span className="strava__bikeTitle">
+            <span className="strava__bikeName">{bike.name}</span>
+            <span aria-live="polite" className="strava__bikeSpan">
+              {shown.span}
+            </span>
+          </span>
+          <span className="strava__totalFigure">
+            <span className="strava__bikeMiles">{formatMiles(shown.distanceMeters)}</span>
+            <span className="strava__totalUnit">mi</span>
+          </span>
         </span>
-        <span aria-live="polite" className="strava__bikeSpan">
-          {shown.span}
-        </span>
-      </span>
-      <span className="strava__totalFigure">
-        <span className="strava__bikeMiles">{formatMiles(shown.distanceMeters)}</span>
-        <span className="strava__totalUnit">mi</span>
+        <BikeIllustration name={bike.name} />
       </span>
       <span className="strava__bikeStats">
         <BikeStat label="climbed" value={`${formatCompactFeet(shown.elevationGainMeters)} ft`} />
