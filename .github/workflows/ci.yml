@@ -14,7 +14,6 @@ concurrency:
 env:
   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
   TURBO_TEAM: ${{ vars.TURBO_TEAM }}
-  DATABASE_URL_TEST: ${{ secrets.DATABASE_URL_TEST }}
 
 jobs:
   ci:
@@ -42,5 +41,13 @@ jobs:
           node-version-file: .node-version
           cache: "pnpm"
       - run: pnpm install
+      - name: Start local PostgreSQL for tests
+        if: matrix.command == 'test'
+        run: |
+          sudo service postgresql start
+          sudo -u postgres psql -c "ALTER USER postgres WITH PASSWORD 'postgres';"
+          sudo -u postgres psql -c "CREATE DATABASE dg_test;"
       - name: ${{ matrix.command }}
+        env:
+          DATABASE_URL_TEST: postgresql://postgres:postgres@localhost:5432/dg_test?sslmode=disable
         run: NODE_OPTIONS=--max_old_space_size=8192 pnpm turbo ${{ matrix.command }}

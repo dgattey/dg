@@ -194,6 +194,27 @@ describe('fetchReleases', () => {
     expect(releases).toEqual([createFallbackRelease('2.80.1')]);
   });
 
+  it('returns the normalized release even when persisting to the database fails', async () => {
+    const upsertSpy = jest
+      .spyOn(db.Release, 'upsert')
+      .mockRejectedValueOnce(new Error('Neon network transfer limit exceeded'));
+    try {
+      const release = await upsertRelease({
+        body: '- Graceful changelog release sync (#711).',
+        publishedAt: '2026-10-24T15:00:00.000Z',
+        url: 'https://github.com/dgattey/dg/releases/tag/v2.90.4',
+        version: '2.90.4',
+      });
+      expect(release).toMatchObject({
+        notes: ['Graceful changelog release sync (#711).'],
+        tag: 'v2.90.4',
+        version: '2.90.4',
+      });
+    } finally {
+      upsertSpy.mockRestore();
+    }
+  });
+
   it('sorts releases by major, minor, then patch descending', () => {
     const a = createFallbackRelease('1.24.0');
     const b = createFallbackRelease('2.0.0');

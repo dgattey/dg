@@ -134,7 +134,7 @@ export async function syncSpotifyIfStale(
       (result.status === 'ok' && result.inserted > 0) || (await shouldRefreshFavoriteAlbums(nowMs));
     const favoriteAlbums = refreshAlbums
       ? await refreshFavoriteAlbumsSnapshotWithLogging({
-          storedAlbums: await getFavoriteAlbums(),
+          storedAlbums: await getFavoriteAlbums().catch(() => null),
         })
       : null;
 

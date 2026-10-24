@@ -205,12 +205,16 @@ export async function upsertRelease(input: {
   const url = input.url.trim() || `${GITHUB_REPOSITORY_URL}/releases/tag/${tag}`;
   const body = input.body.trim();
 
-  await db.Release.upsert({
-    body,
-    publishedAt: validPublishedDate,
-    url,
-    version: tag,
-  });
+  try {
+    await db.Release.upsert({
+      body,
+      publishedAt: validPublishedDate,
+      url,
+      version: tag,
+    });
+  } catch (error) {
+    log.warn('Could not persist release to database', { error, tag });
+  }
 
   return normalizeGitHubRelease({
     body,
@@ -222,9 +226,14 @@ export async function upsertRelease(input: {
 }
 
 async function fetchReleasesFromDatabase(): Promise<Array<ChangelogRelease>> {
+  if (process.env.NODE_ENV !== 'test' && !process.env.DATABASE_URL) {
+    return [];
+  }
   try {
     const rows = await db.Release.findAll({
+      attributes: ['version', 'publishedAt', 'url', 'body'],
       order: [['publishedAt', 'DESC']],
+      raw: true,
     });
     const parsed: Array<ChangelogRelease> = [];
     for (const row of rows) {

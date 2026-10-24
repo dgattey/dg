@@ -67,6 +67,20 @@ describe('fetchMusicHistoryPage', () => {
     expect(result.nextCursor).toBeNull();
   });
 
+  it('degrades to an empty page when the database is unreachable', async () => {
+    const spy = jest
+      .spyOn(db.SpotifyPlay, 'findAll')
+      .mockRejectedValueOnce(new Error('Neon network transfer limit exceeded'));
+    try {
+      await expect(fetchMusicHistoryPage({})).resolves.toEqual({
+        nextCursor: null,
+        tracks: [],
+      });
+    } finally {
+      spy.mockRestore();
+    }
+  });
+
   it('fetches tracks from API when not cached', async () => {
     // Create play records
     await db.SpotifyPlay.bulkCreate([

@@ -1,5 +1,5 @@
 import 'server-only';
-import type { CreateTokenProps, FetchTokenProps } from '@dg/db/models/Token';
+import type { CreateTokenProps, FetchTokenProps, Token } from '@dg/db/models/Token';
 import { assertHttpsEndpoint } from '@dg/shared-core/assertions/assertHttpsEndpoint';
 import { MissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { log } from '@dg/shared-core/logging/log';
@@ -35,11 +35,20 @@ export function clearTokenCache(): void {
 }
 
 export async function readStoredTokenFromDb(name: string): Promise<StoredTokenRecord> {
-  const { db } = await import('@dg/db');
-  const token = await db.Token.findOne({
-    attributes: ['accessToken', 'refreshToken', 'expiryAt'],
-    where: { name },
-  });
+  if (process.env.NODE_ENV !== 'test' && !process.env.DATABASE_URL) {
+    throw new MissingTokenError(name);
+  }
+  let token: Token | null;
+  try {
+    const { db } = await import('@dg/db');
+    token = await db.Token.findOne({
+      attributes: ['accessToken', 'refreshToken', 'expiryAt'],
+      where: { name },
+    });
+  } catch (error) {
+    log.warn('Could not read token from database', { error, name });
+    throw new MissingTokenError(name);
+  }
 
   if (!token?.refreshToken) {
     log.error('Missing token', { name });
@@ -166,13 +175,26 @@ async function refreshTokenAndPersistInternal(
   } = await fetchRefreshedTokenFromApi(name, refreshTokenConfig, refreshToken);
   log.info('Fetched refreshed token', { name });
   if (forcePersist || newRefreshToken !== refreshToken) {
-    await upsertAndCacheToken({
-      accessToken,
-      expiryAt,
-      name,
-      refreshToken: newRefreshToken,
-    });
-    log.info('Updated token in db, returning', { name });
+    if (Number(expiryAt) > Date.now()) {
+      cachedTokens.set(name, { accessToken, expiryAt, refreshToken: newRefreshToken });
+    }
+    try {
+      await upsertAndCacheToken({
+        accessToken,
+        expiryAt,
+        name,
+        refreshToken: newRefreshToken,
+      });
+      log.info('Updated token in db, returning', { name });
+    } catch (error) {
+      if (forcePersist) {
+        throw error;
+      }
+      log.warn('Could not persist refreshed token to database; keeping in memory', {
+        error,
+        name,
+      });
+    }
   } else if (Number(expiryAt) > Date.now()) {
     cachedTokens.set(name, { accessToken, expiryAt, refreshToken: newRefreshToken });
   } else {

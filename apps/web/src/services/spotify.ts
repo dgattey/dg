@@ -3,6 +3,7 @@ import 'server-only';
 import type { Track } from '@dg/content-models/spotify/Track';
 import { fetchRecentlyPlayed } from '@dg/services/spotify/fetchRecentlyPlayed';
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
+import { log } from '@dg/shared-core/logging/log';
 import { cacheLife, cacheTag } from 'next/cache';
 import { CACHE_TAGS } from './cacheTags';
 
@@ -15,7 +16,8 @@ async function withMissingTokenFallback<T>(promise: Promise<T>): Promise<T | nul
     if (isMissingTokenError(error)) {
       return null;
     }
-    throw error;
+    log.warn('Latest song read failed; degrading to empty state', { error });
+    return null;
   }
 }
 

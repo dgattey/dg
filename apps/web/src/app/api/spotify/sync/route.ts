@@ -66,7 +66,7 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
 
   const favoriteAlbums = refreshAlbums
     ? await refreshFavoriteAlbumsSnapshotWithLogging({
-        storedAlbums: await getFavoriteAlbums(),
+        storedAlbums: await getFavoriteAlbums().catch(() => null),
       })
     : null;
 

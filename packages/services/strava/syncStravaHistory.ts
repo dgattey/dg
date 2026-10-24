@@ -5,8 +5,9 @@ import {
   mapStravaActivityFromApi,
   stravaActivityApiSchema,
 } from '@dg/content-models/strava/StravaActivity';
-import { db } from '@dg/db';
+import { db, dbClient } from '@dg/db';
 import { log } from '@dg/shared-core/logging/log';
+import { serializeError } from '@dg/shared-core/logging/maskSecrets';
 import { array } from 'valibot';
 import { parseResponse } from '../clients/parseResponse';
 import { parseStoredStravaActivity } from './parseStoredStravaActivity';
@@ -47,9 +48,17 @@ const fillSummaryGaps = (
   return { ...stored, gearId, map: { ...stored.map, summaryPolyline }, sportType };
 };
 
+const SPARSE_ACTIVITY_DATA_SQL = `CASE
+  WHEN COALESCE(NULLIF("activityData"->'map'->>'summaryPolyline', ''), '') = ''
+    OR COALESCE(NULLIF("activityData"->>'sportType', ''), '') = ''
+    OR COALESCE(NULLIF("activityData"->>'gearId', ''), '') = ''
+  THEN "activityData"
+  ELSE NULL
+END`;
+
 const savePage = async (summaries: ReadonlyArray<StravaActivity>) => {
   const existingRows = await db.StravaActivity.findAll({
-    attributes: ['id', 'activityData'],
+    attributes: ['id', [dbClient.literal(SPARSE_ACTIVITY_DATA_SQL), 'activityData']],
     where: { id: summaries.map((summary) => summary.id) },
   });
   // pg returns BIGINT columns as strings
@@ -114,9 +123,20 @@ export const syncStravaHistory = async (): Promise<StravaHistorySyncOutcome> => 
       kind: 'rest',
       source: 'strava.syncStravaHistory',
     }).map(mapStravaActivityFromApi);
-    const saved = await savePage(summaries);
-    counts.inserted += saved.inserted;
-    counts.updated += saved.updated;
+    try {
+      const saved = await savePage(summaries);
+      counts.inserted += saved.inserted;
+      counts.updated += saved.updated;
+    } catch (error) {
+      log.error('Database write failed during Strava history sync', {
+        error: serializeError(error as Error),
+        page,
+      });
+      return stopped(
+        counts,
+        error instanceof Error ? error.message : 'Database unavailable during Strava sync',
+      );
+    }
     counts.pages = page;
     pageLength = summaries.length;
   }

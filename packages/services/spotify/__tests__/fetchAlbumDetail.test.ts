@@ -173,4 +173,26 @@ describe('fetchAlbumDetail', () => {
     await expect(fetchAlbumDetail('album123?market=US')).resolves.toBeNull();
     expect(mockSpotifyGetWithRetry).not.toHaveBeenCalled();
   });
+
+  it('serves live album details from Spotify when the database is unreachable', async () => {
+    const findSpy = jest
+      .spyOn(db.MusicAlbum, 'findByPk')
+      .mockRejectedValueOnce(new Error('Neon network transfer limit exceeded'));
+    const upsertSpy = jest
+      .spyOn(db.MusicAlbum, 'upsert')
+      .mockRejectedValueOnce(new Error('Neon network transfer limit exceeded'));
+    mockSpotifyGetWithRetry.mockResolvedValueOnce({
+      data: spotifyAlbumResponse,
+      status: 200,
+      success: true,
+    });
+    try {
+      const detail = await fetchAlbumDetail(ALBUM_ID);
+      expect(detail?.name).toBe('Test Album');
+      expect(detail?.tracks).toHaveLength(2);
+    } finally {
+      findSpy.mockRestore();
+      upsertSpy.mockRestore();
+    }
+  });
 });

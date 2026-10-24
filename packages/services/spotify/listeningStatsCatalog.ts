@@ -1,6 +1,6 @@
 import 'server-only';
 
-import { type db, Op } from '@dg/db';
+import { db, Op } from '@dg/db';
 import { MusicAlbum } from '@dg/db/models/MusicAlbum';
 import { MusicArtist } from '@dg/db/models/MusicArtist';
 import { log } from '@dg/shared-core/logging/log';
@@ -38,6 +38,14 @@ export type ResolvedArtist = {
   url: string;
 };
 
+export type FavoriteAlbumSummary = {
+  artistNames: string;
+  id: string;
+  imageUrl: string;
+  name: string;
+  url: string;
+};
+
 function toFetchedArtist(item: v.InferOutput<typeof artistSchema>) {
   return {
     genres: item.genres ?? [],
@@ -54,7 +62,15 @@ export async function resolveArtists(
   if (uniqueIds.length === 0) {
     return new Map();
   }
-  const cached = await MusicArtist.findAll({ where: { id: { [Op.in]: uniqueIds } } });
+  let cached: Array<MusicArtist> = [];
+  try {
+    cached = await MusicArtist.findAll({
+      attributes: ['id', 'name', 'url', 'genres'],
+      where: { id: { [Op.in]: uniqueIds } },
+    });
+  } catch (error) {
+    log.warn('Could not read cached artists for listening stats', { error });
+  }
   const artists = new Map<string, ResolvedArtist>(
     cached.map((artist) => [
       artist.id,
@@ -107,14 +123,35 @@ export async function resolveArtists(
   }
 
   if (fetched.length > 0) {
-    await MusicArtist.bulkCreate(fetched, {
-      updateOnDuplicate: ['genres', 'name', 'url'],
-    });
+    try {
+      await MusicArtist.bulkCreate(fetched, {
+        updateOnDuplicate: ['genres', 'name', 'url'],
+      });
+    } catch (error) {
+      log.warn('Could not persist fetched artists for listening stats', { error });
+    }
     for (const { genres, id, name, url } of fetched) {
       artists.set(id, { genres, name, url });
     }
   }
   return artists;
+}
+
+async function readMatchingFavoriteAlbums(
+  albumIds: ReadonlyArray<string>,
+): Promise<Array<FavoriteAlbumSummary>> {
+  const uniqueIds = [...new Set(albumIds)];
+  if (uniqueIds.length === 0) return [];
+  try {
+    return (await db.FavoriteAlbum.findAll({
+      attributes: ['artistNames', 'id', 'imageUrl', 'name', 'url'],
+      raw: true,
+      where: { id: { [Op.in]: uniqueIds } },
+    })) as unknown as Array<FavoriteAlbumSummary>;
+  } catch (error) {
+    log.warn('Could not read matching favorite albums for listening stats', { error });
+    return [];
+  }
 }
 
 /**
@@ -123,29 +160,45 @@ export async function resolveArtists(
  */
 export async function resolveAlbums(
   albumIds: Array<string>,
-  favoriteAlbums: ReadonlyArray<InstanceType<typeof db.FavoriteAlbum>>,
-): Promise<Map<string, StatsAlbum>> {
+  trackAlbumIds: ReadonlyArray<string> = [],
+): Promise<{ albums: Map<string, StatsAlbum>; favoriteIds: Set<string> }> {
+  const uniqueAlbumIds = [...new Set(albumIds)];
+  const favoriteAlbums = await readMatchingFavoriteAlbums([...uniqueAlbumIds, ...trackAlbumIds]);
   const favoriteIds = new Set(favoriteAlbums.map((album) => album.id));
+  if (uniqueAlbumIds.length === 0) {
+    return { albums: new Map(), favoriteIds };
+  }
   const albums = new Map<string, StatsAlbum>();
-  const cached = await MusicAlbum.findAll({
-    include: [{ model: MusicArtist, through: { attributes: ['position'] } }],
-    where: { id: { [Op.in]: albumIds } },
-  });
-  for (const album of cached) {
-    const artists = toOrderedArtistLinks(album.artists);
-    if (album.name && album.imageUrl && artists.length > 0) {
-      albums.set(album.id, {
-        artists,
-        id: album.id,
-        imageUrl: album.imageUrl,
-        isFavorite: favoriteIds.has(album.id),
-        name: album.name,
-        url: spotifyUrl('album', album.id, album.url),
-      });
+  try {
+    const cached = await MusicAlbum.findAll({
+      attributes: ['id', 'name', 'imageUrl', 'url'],
+      include: [
+        {
+          attributes: ['id', 'name', 'url'],
+          model: MusicArtist,
+          through: { attributes: ['position'] },
+        },
+      ],
+      where: { id: { [Op.in]: uniqueAlbumIds } },
+    });
+    for (const album of cached) {
+      const artists = toOrderedArtistLinks(album.artists);
+      if (album.name && album.imageUrl && artists.length > 0) {
+        albums.set(album.id, {
+          artists,
+          id: album.id,
+          imageUrl: album.imageUrl,
+          isFavorite: favoriteIds.has(album.id),
+          name: album.name,
+          url: spotifyUrl('album', album.id, album.url),
+        });
+      }
     }
+  } catch (error) {
+    log.warn('Could not read cached albums for listening stats', { error });
   }
 
-  for (const id of albumIds.filter((albumId) => !albums.has(albumId))) {
+  for (const id of uniqueAlbumIds.filter((albumId) => !albums.has(albumId))) {
     try {
       const detail = await fetchAlbumDetail(id);
       if (detail) {
@@ -164,7 +217,7 @@ export async function resolveAlbums(
   }
 
   for (const album of favoriteAlbums) {
-    if (albums.has(album.id) || !albumIds.includes(album.id)) continue;
+    if (albums.has(album.id) || !uniqueAlbumIds.includes(album.id)) continue;
     albums.set(album.id, {
       artists: album.artistNames.split(', ').map((name) => ({
         id: name,
@@ -178,7 +231,7 @@ export async function resolveAlbums(
       url: spotifyUrl('album', album.id, album.url),
     });
   }
-  return albums;
+  return { albums, favoriteIds };
 }
 
 /** Each resolved track, with its album flagged when it is one of the favorite albums. */

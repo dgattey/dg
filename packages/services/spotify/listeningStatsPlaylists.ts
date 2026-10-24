@@ -60,32 +60,35 @@ export type PlaylistCatalogEntry = {
 };
 
 export type TopPlaylistRow = {
+  imageUrl: string;
+  name: string;
   playedTracks: number;
   playlistId: string;
   plays: number;
   topTrackId: string;
+  totalTracks: number;
+  url: string | null;
 };
 
 let memoryCachedPlaylists: { entries: Array<PlaylistCatalogEntry>; expiresAt: number } | null =
   null;
 let inFlightPlaylists: Promise<Array<PlaylistCatalogEntry>> | null = null;
 
-async function readCachedPlaylists(): Promise<Array<PlaylistCatalogEntry>> {
+async function hasCachedPlaylistsInDb(): Promise<boolean> {
   try {
-    const rows = await MusicPlaylist.findAll();
-    return rows
-      .filter((row) => row.id !== FAVORITE_ALBUMS_PLAYLIST_ID && row.trackIds.length > 0)
-      .map((row) => ({
-        id: row.id,
-        imageUrl: row.imageUrl,
-        name: row.name,
-        totalTracks: Math.max(row.totalTracks, row.trackIds.length),
-        trackIds: row.trackIds,
-        url: spotifyUrl('playlist', row.id, row.url),
-      }));
+    const [row] = await select(
+      `SELECT EXISTS (
+         SELECT 1 FROM "MusicPlaylist"
+         WHERE id <> :favoriteAlbumsPlaylistId
+           AND coalesce(array_length("trackIds", 1), 0) > 0
+       ) AS "hasPlaylists"`,
+      v.object({ hasPlaylists: v.boolean() }),
+      { favoriteAlbumsPlaylistId: FAVORITE_ALBUMS_PLAYLIST_ID },
+    );
+    return row?.hasPlaylists ?? false;
   } catch (error) {
-    log.warn('Could not read cached playlists from database', { error });
-    return [];
+    log.warn('Could not check cached playlists in database', { error });
+    return false;
   }
 }
 
@@ -195,14 +198,15 @@ async function fetchPlaylistsFromSpotify(): Promise<Array<PlaylistCatalogEntry>>
   return fetched;
 }
 
-export async function resolvePlaylists(): Promise<Array<PlaylistCatalogEntry>> {
-  const cached = await readCachedPlaylists();
-  if (cached.length > 0) return cached;
+async function seedPlaylistsIfNeeded(): Promise<void> {
   const useMemoryCache = process.env.NODE_ENV !== 'test';
   if (useMemoryCache && memoryCachedPlaylists && memoryCachedPlaylists.expiresAt > Date.now()) {
-    return memoryCachedPlaylists.entries;
+    return;
   }
-  if (useMemoryCache && inFlightPlaylists) return await inFlightPlaylists;
+  if (useMemoryCache && inFlightPlaylists) {
+    await inFlightPlaylists;
+    return;
+  }
   const promise = fetchPlaylistsFromSpotify().then((entries) => {
     if (useMemoryCache && entries.length > 0) {
       memoryCachedPlaylists = { entries, expiresAt: Date.now() + MEMORY_CACHE_TTL_MS };
@@ -213,30 +217,27 @@ export async function resolvePlaylists(): Promise<Array<PlaylistCatalogEntry>> {
     inFlightPlaylists = promise.finally(() => {
       inFlightPlaylists = null;
     });
-    return await inFlightPlaylists;
+    await inFlightPlaylists;
+    return;
   }
-  return await promise;
+  await promise;
 }
 
-export async function selectTopPlaylists(
-  playlists: ReadonlyArray<PlaylistCatalogEntry>,
+/**
+ * Joins `"MusicPlaylist"` against `"SpotifyPlay"` directly inside Postgres so the
+ * multi-thousand-element `trackIds` arrays stay in Postgres memory and only the top 6
+ * playlist summary rows cross the network.
+ */
+async function selectTopPlaylistsFromDb(
   filter: SqlPlayFilter = ALL_TIME_FILTER,
 ): Promise<Array<TopPlaylistRow>> {
-  const playlistIds: Array<string> = [];
-  const trackIds: Array<string> = [];
-  for (const playlist of playlists) {
-    for (const trackId of new Set(playlist.trackIds)) {
-      playlistIds.push(playlist.id);
-      trackIds.push(trackId);
-    }
-  }
-  if (playlistIds.length === 0) return [];
   return await select(
     `WITH playlist_tracks AS (
-       SELECT * FROM unnest(
-         ARRAY[:playlistIds]::varchar(64)[],
-         ARRAY[:trackIds]::varchar(64)[]
-       ) AS pt("playlistId", "trackId")
+       SELECT DISTINCT mp.id AS "playlistId", track_id AS "trackId"
+       FROM "MusicPlaylist" mp,
+       LATERAL unnest(mp."trackIds") AS track_id
+       WHERE mp.id <> :favoriteAlbumsPlaylistId
+         AND coalesce(array_length(mp."trackIds", 1), 0) > 0
      ),
      matched AS (
        SELECT pt."playlistId", p."trackId", count(*)::int AS plays
@@ -244,53 +245,80 @@ export async function selectTopPlaylists(
        JOIN "SpotifyPlay" p ON p."trackId" = pt."trackId"
        ${whereClause(filter, 'p')}
        GROUP BY pt."playlistId", p."trackId"
+     ),
+     ranked AS (
+       SELECT "playlistId",
+         sum(plays)::int AS plays,
+         count(*)::int AS "playedTracks",
+         (array_agg("trackId" ORDER BY plays DESC, "trackId"))[1] AS "topTrackId"
+       FROM matched
+       GROUP BY "playlistId"
+       ORDER BY plays DESC, "playlistId"
+       LIMIT ${TOP_PLAYLISTS_LIMIT}
      )
-     SELECT "playlistId",
-       sum(plays)::int AS plays,
-       count(*)::int AS "playedTracks",
-       (array_agg("trackId" ORDER BY plays DESC, "trackId"))[1] AS "topTrackId"
-     FROM matched
-     GROUP BY "playlistId"
-     ORDER BY plays DESC, "playlistId"
-     LIMIT ${TOP_PLAYLISTS_LIMIT}`,
+     SELECT
+       mp.id AS "playlistId",
+       mp.name,
+       mp."imageUrl",
+       mp.url,
+       GREATEST(mp."totalTracks", coalesce(array_length(mp."trackIds", 1), 0))::int AS "totalTracks",
+       r.plays,
+       r."playedTracks",
+       r."topTrackId"
+     FROM ranked r
+     JOIN "MusicPlaylist" mp ON mp.id = r."playlistId"
+     ORDER BY r.plays DESC, mp.id`,
     v.object({
+      imageUrl: v.string(),
+      name: v.string(),
       playedTracks: v.number(),
       playlistId: v.string(),
       plays: v.number(),
       topTrackId: v.string(),
+      totalTracks: v.number(),
+      url: v.nullable(v.string()),
     }),
-    { playlistIds, trackIds },
+    { favoriteAlbumsPlaylistId: FAVORITE_ALBUMS_PLAYLIST_ID },
   );
 }
 
-export async function fetchTopPlaylistRows(filter: SqlPlayFilter = ALL_TIME_FILTER) {
-  const catalog = await resolvePlaylists();
-  const rows = await selectTopPlaylists(catalog, filter);
-  return { catalog, rows };
+export async function fetchTopPlaylistRows(
+  filter: SqlPlayFilter = ALL_TIME_FILTER,
+): Promise<Array<TopPlaylistRow>> {
+  try {
+    const initialRows = await selectTopPlaylistsFromDb(filter);
+    if (initialRows.length > 0) {
+      return initialRows;
+    }
+    if (await hasCachedPlaylistsInDb()) {
+      return [];
+    }
+    await seedPlaylistsIfNeeded();
+    return await selectTopPlaylistsFromDb(filter);
+  } catch (error) {
+    log.warn('Could not query top playlists from database', { error });
+    return [];
+  }
 }
 
 export function toStatsPlaylists(
   rows: ReadonlyArray<TopPlaylistRow>,
-  catalog: ReadonlyArray<PlaylistCatalogEntry>,
   tracks: ReadonlyMap<string, StatsTrack>,
 ): Array<StatsPlaylist> {
-  const byId = new Map(catalog.map((playlist) => [playlist.id, playlist]));
   return rows
     .map((row) => {
-      const playlist = byId.get(row.playlistId);
-      if (!playlist) return null;
       const topTrack = tracks.get(row.topTrackId);
-      const imageUrl = playlist.imageUrl || topTrack?.album.imageUrl || '';
+      const imageUrl = row.imageUrl || topTrack?.album.imageUrl || '';
       if (!imageUrl) return null;
       return {
-        id: playlist.id,
+        id: row.playlistId,
         imageUrl,
-        name: playlist.name,
+        name: row.name,
         playedTracks: row.playedTracks,
         plays: row.plays,
         ...(topTrack ? { topTrack } : {}),
-        totalTracks: Math.max(playlist.totalTracks, row.playedTracks),
-        url: playlist.url,
+        totalTracks: Math.max(row.totalTracks, row.playedTracks),
+        url: spotifyUrl('playlist', row.playlistId, row.url),
       };
     })
     .filter(isNotNullish);

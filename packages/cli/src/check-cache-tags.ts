@@ -163,6 +163,8 @@ export function checkCacheTagParity(
 const BANNED_CONTENTFUL_FALLBACK_PATTERN =
   /\b(?:FALLBACK_|NORMALIZED_|DEFAULT_DESCRIPTION|DEFAULT_ENCODED_EMAIL|normalizeFooterDescription|cleanBookTitle)\w*|\bprocess\.env\.CONTENTFUL_/;
 const MAPLIBRE_TOKEN = ['maplibre', 'gl'].join('-');
+const UNPROJECTED_DB_QUERY_PATTERN =
+  /\bMusicPlaylist\.findAll\s*\(|\b(?:SpotifyPlay|StravaActivity|FavoriteAlbum|Release)\.findAll\s*\(\s*\)|attributes:\s*\[\s*['"]activityData['"]\s*\]/;
 
 export function checkContentfulFallbacks(
   relPath: string,
@@ -173,6 +175,22 @@ export function checkContentfulFallbacks(
     return [];
   }
   const sourceLines = lines ?? content.split('\n');
+  const dbQueryViolations =
+    relPath.startsWith('packages/services/') && UNPROJECTED_DB_QUERY_PATTERN.test(content)
+      ? sourceLines.flatMap((lineText, i) =>
+          UNPROJECTED_DB_QUERY_PATTERN.test(lineText)
+            ? [
+                {
+                  file: relPath,
+                  line: i + 1,
+                  message:
+                    'Project only required columns (and strip raw Strava map.polyline / MusicPlaylist.trackIds in SQL) instead of pulling full rows over the wire',
+                  rule: 'unprojected-db-query',
+                },
+              ]
+            : [],
+        )
+      : [];
   const maplibreViolations =
     !relPath.startsWith('packages/cli/') && content.includes(MAPLIBRE_TOKEN)
       ? sourceLines.flatMap((lineText, i) =>
@@ -194,9 +212,10 @@ export function checkContentfulFallbacks(
       relPath !== 'apps/web/src/app/layouts/Footer.tsx') ||
     !BANNED_CONTENTFUL_FALLBACK_PATTERN.test(content)
   ) {
-    return maplibreViolations;
+    return [...dbQueryViolations, ...maplibreViolations];
   }
   return [
+    ...dbQueryViolations,
     ...maplibreViolations,
     ...sourceLines.flatMap((lineText, i) =>
       BANNED_CONTENTFUL_FALLBACK_PATTERN.test(lineText)
