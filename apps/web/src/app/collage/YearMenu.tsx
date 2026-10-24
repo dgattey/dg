@@ -6,6 +6,9 @@ import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
 import { cx } from './paperVars';
 
+const bindYearMenu = (node: HTMLDetailsElement | null) =>
+  bindHoverMenu(node, 'button[data-year-option]');
+
 /**
  * A `Year ▾` paper pill that opens a grid of years on hover or click. The pill
  * reads the picked year once there is one.
@@ -27,11 +30,7 @@ export function YearMenu({
   years: ReadonlyArray<number>;
 }) {
   return (
-    <details
-      className="chrome__music yearMenu"
-      onPointerEnter={onWarmup}
-      ref={(node) => bindHoverMenu(node, 'button[data-year-option]')}
-    >
+    <details className="chrome__music yearMenu" onPointerEnter={onWarmup} ref={bindYearMenu}>
       <summary className="chrome__musicSummary yearMenu__summary collageLift">
         <PaperTag
           className={cx('paperPill', selected !== null && 'paperButtonCurrent')}

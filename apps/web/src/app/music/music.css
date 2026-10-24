@@ -71,8 +71,8 @@
   translate: 0 var(--card-offset);
 }
 .music__card:is(:hover, :has(.music__albumLink:focus-visible)) {
+  --pshadow: var(--pshadow-lift);
   --dshadow: var(--dshadow-lift);
-  z-index: 4;
 }
 .music__cardInner {
   display: block;
@@ -294,9 +294,11 @@
   width: calc(100% + 20px);
   margin: 28px -10px 14px;
 }
-html:active-view-transition-type(album-close) .music__wellCard,
-html:active-view-transition-type(album-open) .music__wellCard {
-  view-transition-name: album-well;
+@supports not (-moz-appearance: none) {
+  html:active-view-transition-type(album-close) .music__wellCard,
+  html:active-view-transition-type(album-open) .music__wellCard {
+    view-transition-name: album-well;
+  }
 }
 .music__wellInner {
   overflow: clip;
@@ -498,8 +500,7 @@ html:active-view-transition-type(album-open) .music__wellCard {
     );
     transition:
       scale 750ms var(--music-spring),
-      translate 350ms cubic-bezier(0.2, 0.8, 0.2, 1),
-      filter 350ms;
+      translate 350ms cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   .music__card:is(:hover, :has(.music__albumLink:focus-visible)) {
     scale: 1.08;

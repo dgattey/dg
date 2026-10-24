@@ -5,7 +5,7 @@ import {
   type CoverageCity,
   type StreetCoverage,
 } from '@dg/content-models/strava/StreetCoverage';
-import { type CSSProperties, useId, useState } from 'react';
+import { type CSSProperties, useId, useRef, useState } from 'react';
 import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperPills } from '../collage/PaperPills';
@@ -75,6 +75,7 @@ function NeighborhoodMap({
       onPointerOver={(event) => onHover(neighborhoodAt(event.target))}
       viewBox={viewBox}
     >
+      <path className="streets__hoodShadow" d={land} transform="translate(0 1.5)" />
       <g className="streets__hoods">
         {neighborhoods.map((hood) => (
           <path
@@ -178,7 +179,31 @@ export function StreetCoverageSection({
   const city = cities.includes(chosenCity) ? chosenCity : (cities[0] ?? chosenCity);
   const coverage = byCity[city];
   const { name: cityName, short: cityShort } = CITIES[city];
-  const summary = summarizeCoverage(coverage, sport, span);
+  const cacheRef = useRef<{
+    coverage: StreetCoverage;
+    outings: typeof outings;
+    routes: string;
+    span: typeof span;
+    sport: typeof sport;
+    summary: ReturnType<typeof summarizeCoverage>;
+  } | null>(null);
+  if (
+    !cacheRef.current ||
+    cacheRef.current.outings !== outings ||
+    cacheRef.current.coverage !== coverage ||
+    cacheRef.current.sport !== sport ||
+    cacheRef.current.span !== span
+  ) {
+    cacheRef.current = {
+      coverage,
+      outings,
+      routes: coverageRoutePath(outings, coverage),
+      span,
+      sport,
+      summary: summarizeCoverage(coverage, sport, span),
+    };
+  }
+  const { routes, summary } = cacheRef.current;
   const chooseCity = (key: CoverageCity) => {
     setCity(key);
     setHovered(null);
@@ -252,7 +277,7 @@ export function StreetCoverageSection({
           neighborhoods={summary.neighborhoods}
           onHover={setHovered}
           onPick={pick}
-          routes={coverageRoutePath(outings, coverage)}
+          routes={routes}
           viewBox={coverage.viewBox}
         />
         <ol aria-label="Share of streets ridden" className="streets__legend">

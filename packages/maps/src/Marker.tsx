@@ -13,14 +13,12 @@ const GLASS_SHADOW = `
   0px 6px 16px color-mix(in srgb, var(--dg-palette-common-black) 8%, transparent)`;
 
 const containerSx: SxObject = {
-  backdropFilter: 'blur(12px) saturate(150%)',
-  backgroundColor: 'color-mix(in srgb, var(--dg-palette-background-default) 70%, transparent)',
-  border: '2px solid color-mix(in srgb, var(--dg-palette-background-default) 60%, transparent)',
+  backgroundColor: 'color-mix(in srgb, var(--dg-palette-background-default) 84%, transparent)',
+  border: '2px solid color-mix(in srgb, var(--dg-palette-background-default) 72%, transparent)',
   borderRadius: '50%',
   boxShadow: GLASS_SHADOW,
   cursor: 'grab',
   height: DIMENSION,
-  opacity: 0.85,
   overflow: 'hidden',
   position: 'relative',
   transform: 'translate(-50%, -50%)',

@@ -126,28 +126,34 @@ html:active-view-transition-type(page-close)::view-transition-new(root) {
 }
 
 ::view-transition-old(album-well) {
+  transform-origin: top center;
   animation: var(--timing-medium) var(--easing-default) both vt-album-well-collapse;
 }
 
 ::view-transition-new(album-well) {
+  transform-origin: top center;
   animation: var(--timing-medium) var(--easing-default) both vt-album-well-expand;
 }
 
 @keyframes vt-album-well-expand {
   from {
-    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+    transform: translateY(-8px) scaleY(0.96);
   }
   to {
-    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    transform: none;
   }
 }
 
 @keyframes vt-album-well-collapse {
   from {
-    clip-path: inset(0 0 0 0);
+    opacity: 1;
+    transform: none;
   }
   to {
-    clip-path: inset(0 0 100% 0);
+    opacity: 0;
+    transform: translateY(-8px) scaleY(0.96);
   }
 }
 

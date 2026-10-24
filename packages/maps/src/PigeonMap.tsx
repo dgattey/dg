@@ -11,10 +11,17 @@ import { WatercolorTile } from './WatercolorTile';
 import { ZoomControls } from './ZoomControls';
 
 const containerSx: SxObject = {
+  '& > div': {
+    height: '100% !important',
+    width: '100% !important',
+  },
   backgroundColor: 'var(--ultramarine)',
   height: '100%',
+  isolation: 'isolate',
+  overflow: 'hidden',
   position: 'relative',
   width: '100%',
+  willChange: 'transform',
 };
 
 const DEFAULT_MIN_ZOOM = 3;

@@ -56,6 +56,7 @@ export function CutOut({
       style={style}
       viewBox="0 0 400 400"
     >
+      <use fill="rgb(0 0 0 / 0.18)" href={symbolHref} transform="translate(0 5)" />
       {placement.underprint ? (
         <use
           fill={`var(--${placement.underprint.color})`}

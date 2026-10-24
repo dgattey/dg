@@ -24,8 +24,6 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  isolation: isolate;
-  mix-blend-mode: multiply;
 }
 
 .print__portrait {
@@ -47,8 +45,9 @@
 .print__frame {
   position: relative;
   display: block;
-  filter: var(--dshadow);
+  filter: drop-shadow(0 2px 0 rgb(0 0 0 / 0.22));
   rotate: -3deg;
+  will-change: transform;
 }
 .print__halo {
   position: absolute;
@@ -81,7 +80,6 @@
   width: 100%;
   height: 100%;
   aspect-ratio: 1;
-  filter: var(--dshadow);
   rotate: -2deg;
 }
 .print__sleevePiece {
@@ -92,6 +90,7 @@
   overflow: clip;
   background: var(--black);
   border-radius: var(--soft-a);
+  box-shadow: var(--pshadow);
 }
 .print__artLink {
   display: block;

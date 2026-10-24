@@ -43,7 +43,7 @@ const logoLinkSx: SxObject = {
   lineHeight: 1,
   padding: 0.5,
   textDecoration: 'none',
-  transition: createTransition(['filter', 'transform'], TIMING_BOUNCY, EASING_BOUNCY),
+  transition: createTransition('transform', TIMING_BOUNCY, EASING_BOUNCY),
   willChange: 'transform',
 };
 

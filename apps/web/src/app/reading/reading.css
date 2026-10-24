@@ -35,7 +35,7 @@
   position: relative;
   padding: 6px;
   background: var(--cream);
-  filter: var(--dshadow);
+  box-shadow: var(--pshadow);
   rotate: -2deg;
 }
 .reading__card--flip .reading__print {
@@ -178,7 +178,7 @@
   position: relative;
   padding: var(--mat-feature);
   background: var(--cream);
-  filter: var(--dshadow);
+  box-shadow: var(--pshadow);
   rotate: -3deg;
 }
 .reading__ribbon {

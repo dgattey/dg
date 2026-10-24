@@ -2,6 +2,7 @@
 
 import {
   enableRootPageViewTransition,
+  setViewTransitionScrollOffset,
   takePageOrigin,
 } from '@dg/ui/core/transitions/pageScrollMemory';
 import { pageViewTransitionProps } from '@dg/ui/core/transitions/pageTransitions';
@@ -33,6 +34,7 @@ export function PageViewTransition({ children }: { children: ReactNode }) {
     if (scrollY !== null) {
       window.scrollTo({ behavior: 'instant', top: scrollY });
     }
+    setViewTransitionScrollOffset(window.scrollY);
     syncFooterRevealProgress();
   }, [pathname]);
 

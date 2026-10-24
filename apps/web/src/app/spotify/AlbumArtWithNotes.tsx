@@ -50,7 +50,7 @@ export function AlbumArtWithNotes({
   });
 
   return (
-    <Box sx={{ overflow: 'visible', position: 'relative', ...wrapperSx }}>
+    <Box sx={{ isolation: 'isolate', overflow: 'visible', position: 'relative', ...wrapperSx }}>
       <Box aria-hidden="true" sx={notesLayerSx}>
         <MusicNotes isPlaying={isPlaying} noteColor={noteColor} variant={notesVariant} />
       </Box>

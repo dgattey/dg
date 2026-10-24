@@ -1,26 +1,51 @@
 'use client';
 
-import { setViewTransitionScrollOffset } from '@dg/ui/core/transitions/pageScrollMemory';
 import { useEffect } from 'react';
 
+function setSheetProgress(
+  sheet: HTMLElement,
+  footer: HTMLElement,
+  value: string,
+  occluded: boolean,
+) {
+  if (sheet.style.getPropertyValue('--footer-progress') !== value) {
+    sheet.style.setProperty('--footer-progress', value);
+  }
+  if (occluded) {
+    if (footer.dataset.occluded !== 'true') {
+      footer.dataset.occluded = 'true';
+    }
+  } else if (footer.dataset.occluded) {
+    delete footer.dataset.occluded;
+  }
+}
+
 export function syncFooterRevealProgress() {
-  setViewTransitionScrollOffset(window.scrollY);
   const sheet = document.querySelector<HTMLElement>('.collageSheet');
   const footer = document.querySelector<HTMLElement>('.chrome__footer');
   if (!sheet || !footer) {
     return;
   }
+  if (sheet.dataset.footerProgressLock) {
+    setSheetProgress(
+      sheet,
+      footer,
+      sheet.dataset.footerProgressLock,
+      sheet.dataset.footerProgressLock === '0',
+    );
+    return;
+  }
   const footerHeight = footer.offsetHeight;
   const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
   if (footerHeight <= 0 || maxScroll <= 0 || window.scrollY <= 0) {
-    sheet.style.setProperty('--footer-progress', '0');
+    setSheetProgress(sheet, footer, '0', footerHeight > 0 && maxScroll > 0);
     return;
   }
   const startScroll = Math.max(0, maxScroll - footerHeight);
   const distance = Math.max(1, maxScroll - startScroll);
   const raw = maxScroll - window.scrollY <= 1 ? 1 : (window.scrollY - startScroll) / distance;
   const progress = Math.min(1, Math.max(0, raw));
-  sheet.style.setProperty('--footer-progress', progress.toFixed(4));
+  setSheetProgress(sheet, footer, progress.toFixed(4), progress === 0);
 }
 
 export function FooterRevealScroll() {

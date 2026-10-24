@@ -1,6 +1,6 @@
 'use client';
 
-import type { ReactNode, SyntheticEvent } from 'react';
+import type { CSSProperties, ReactNode, SyntheticEvent } from 'react';
 import React, { useId, useRef } from 'react';
 import { EASING_EASE_OUT, TIMING_FAST } from '../helpers/timing';
 import type { SxObject } from '../theme';
@@ -58,9 +58,6 @@ interface TooltipProps {
   whenTruncated?: boolean;
 }
 
-type TooltipAnchorSx = SxObject & { anchorName?: string };
-type TooltipPopoverSx = SxObject & { positionAnchor?: string };
-
 const createTransition = (isRevealed: boolean) => ({
   transition: [
     `opacity ${TIMING_FAST}ms ${EASING_EASE_OUT} ${isRevealed ? 0 : TIMING_FAST}ms`,
@@ -90,28 +87,14 @@ const shrinkableAnchorSx: SxObject = {
   minWidth: 0,
 };
 
-function createAnchorSx(anchorName: string): TooltipAnchorSx {
-  return {
-    '@supports not (position-area: block-end)': {
-      position: 'relative',
-    },
-    anchorName,
-    display: 'inline-flex',
-  };
-}
+const baseAnchorSx: SxObject = {
+  '@supports not (position-area: block-end)': {
+    position: 'relative',
+  },
+  display: 'inline-flex',
+};
 
-/**
- * A tilted or shadowed ancestor becomes the fixed surface's containing block,
- * and `position-area` measures room inside it. In a small card that room is a
- * sliver, and the default safe alignment then pins the surface over its own
- * trigger. Unsafe alignment keeps it on its side of the anchor and lets it
- * overflow the card instead.
- */
-function createSurfaceSx(
-  anchorName: string,
-  placement: TooltipPlacement,
-  canFlip: boolean,
-): TooltipPopoverSx {
+function createSurfaceSx(placement: TooltipPlacement, canFlip: boolean): SxObject {
   const isAbove = placement === 'top';
   return {
     '@supports not (position-area: block-end)': {
@@ -132,7 +115,6 @@ function createSurfaceSx(
     marginBlockStart: isAbove ? 0 : '8px',
     opacity: 0,
     position: 'fixed',
-    positionAnchor: anchorName,
     positionArea: isAbove ? 'block-start' : 'block-end',
     positionTryFallbacks: canFlip ? 'flip-block' : 'none',
     visibility: 'hidden',
@@ -219,8 +201,9 @@ export function Tooltip({
       onMouseEnter={isFloating ? () => open('hover') : muteInlineSurface}
       onMouseLeave={() => close('hover')}
       ref={anchorRef}
+      style={{ anchorName } as CSSProperties}
       sx={{
-        ...createAnchorSx(anchorName),
+        ...baseAnchorSx,
         ...(whenTruncated ? shrinkableAnchorSx : undefined),
         ...sx,
       }}
@@ -234,7 +217,8 @@ export function Tooltip({
         id={tooltipId}
         ref={surfaceRef}
         role="tooltip"
-        sx={createSurfaceSx(anchorName, placement, !whenTruncated)}
+        style={{ positionAnchor: anchorName } as CSSProperties}
+        sx={createSurfaceSx(placement, !whenTruncated)}
         variant="caption"
       >
         {title}
