@@ -17,6 +17,7 @@ import { useWaveformBounce } from './useWaveformBounce';
 const COMPACT_THUMBNAIL_SIZE = 44;
 const COMPACT_HOVER_SIZE = 84;
 const COLLAGE_COMPACT_BOUNCE = 3;
+const COMPACT_SCALE = COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE;
 
 type ListingVariant = 'card' | 'compact';
 
@@ -36,55 +37,35 @@ const CONTRASTING_COLORS = {
 } as const;
 
 const TRACK_LISTING_CSS = `
-[data-track-artists] a {
-  color: inherit;
+[data-track-title], [data-track-artists] { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+[data-track-artists] a { color: inherit; }
+[data-art-notes] { isolation: isolate; overflow: visible; position: relative; }
+[data-art-notes-center] { left: 50%; pointer-events: none; position: absolute; top: 50%; transform: translate(-50%, -50%); z-index: 0; }
+[data-art-notes-bounce] { backface-visibility: hidden; height: 100%; overflow: visible; position: relative; width: 100%; z-index: 2; }
+[data-compact-track] { align-items: center; display: flex; gap: 8px; min-width: 0; overflow: visible; }
+[data-compact-text] { color: var(--on); display: flex; flex: 0 1 auto; flex-direction: column; max-width: 100%; min-width: 0; overflow: hidden; width: fit-content; }
+[data-thumbnail-outer] {
+  flex-shrink: 0; height: ${COMPACT_THUMBNAIL_SIZE}px; min-width: 0; overflow: visible;
+  position: relative; transition: ${createTransition('width', TIMING_SLOW, EASING_BOUNCE)}; width: ${COMPACT_THUMBNAIL_SIZE}px;
+}
+[data-album-art] {
+  border-radius: var(--nested-radius); box-shadow: var(--dg-shadow-card-main); height: ${COMPACT_THUMBNAIL_SIZE}px;
+  overflow: hidden; position: relative; transform-origin: left center;
+  transition: ${createTransition('transform', TIMING_SLOW, EASING_BOUNCE)}; width: ${COMPACT_THUMBNAIL_SIZE}px; will-change: transform;
 }
 :focus-visible [data-compact-track] [data-album-art],
 [data-compact-track]:has(:focus-visible) [data-album-art] {
-  box-shadow: var(--dg-shadow-card-hovered);
-  transform: scale(${COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE});
-  z-index: 1;
+  box-shadow: var(--dg-shadow-card-hovered); transform: scale(${COMPACT_SCALE}); z-index: 1;
 }
 :focus-visible [data-compact-track] [data-thumbnail-outer],
-[data-compact-track]:has(:focus-visible) [data-thumbnail-outer] {
-  width: ${COMPACT_HOVER_SIZE}px !important;
-}
+[data-compact-track]:has(:focus-visible) [data-thumbnail-outer] { width: ${COMPACT_HOVER_SIZE}px; }
 @media (hover: hover) {
   [data-compact-track]:hover [data-album-art] {
-    box-shadow: var(--dg-shadow-card-hovered);
-    transform: scale(${COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE});
-    z-index: 1;
+    box-shadow: var(--dg-shadow-card-hovered); transform: scale(${COMPACT_SCALE}); z-index: 1;
   }
-  [data-compact-track]:hover [data-thumbnail-outer] {
-    width: ${COMPACT_HOVER_SIZE}px !important;
-  }
+  [data-compact-track]:hover [data-thumbnail-outer] { width: ${COMPACT_HOVER_SIZE}px; }
 }
 `;
-
-const truncatedStyle: CSSProperties = {
-  display: 'block',
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-};
-
-const notesCenterStyle: CSSProperties = {
-  left: '50%',
-  pointerEvents: 'none',
-  position: 'absolute',
-  top: '50%',
-  transform: 'translate(-50%, -50%)',
-  zIndex: 0,
-};
-
-const bounceBoxStyle: CSSProperties = {
-  backfaceVisibility: 'hidden',
-  height: '100%',
-  overflow: 'visible',
-  position: 'relative',
-  width: '100%',
-  zIndex: 2,
-};
 
 function AlbumArtWithNotes({
   bounceIntensity,
@@ -103,13 +84,11 @@ function AlbumArtWithNotes({
 }) {
   const bounceRef = useWaveformBounce<HTMLDivElement>({ intensity: bounceIntensity, isPlaying });
   return (
-    <div
-      style={{ isolation: 'isolate', overflow: 'visible', position: 'relative', ...wrapperStyle }}
-    >
-      <div aria-hidden="true" style={notesCenterStyle}>
+    <div data-art-notes="" style={wrapperStyle}>
+      <div aria-hidden="true" data-art-notes-center="">
         <MusicNotes isPlaying={isPlaying} noteColor={noteColor} variant={notesVariant} />
       </div>
-      <div ref={bounceRef} style={bounceBoxStyle}>
+      <div data-art-notes-bounce="" ref={bounceRef}>
         {children}
       </div>
     </div>
@@ -143,13 +122,11 @@ function TrackMeta({
   const titleVariant = isCard ? 'h5' : 'caption';
   const artistVariant = isCard ? 'body2' : 'caption';
   const titleStyle: CSSProperties = {
-    ...truncatedStyle,
     ...(isCard ? { marginBottom: 8 } : { lineHeight: 1.2 }),
     ...(color ? { color } : {}),
     ...(textShadow ? { textShadow } : {}),
   };
   const artistStyle: CSSProperties = {
-    ...truncatedStyle,
     ...(isCard ? {} : { lineHeight: 1.2, opacity: 0.6 }),
     ...(secondaryColor ? { color: secondaryColor, opacity: 1 } : {}),
     ...(secondaryShadow ? { textShadow: secondaryShadow } : {}),
@@ -162,11 +139,17 @@ function TrackMeta({
     <>
       <Tooltip title={track.name} whenTruncated>
         {disableLinks ? (
-          <Typography style={titleStyle} variant={titleVariant}>
+          <Typography data-track-title="" style={titleStyle} variant={titleVariant}>
             {track.name}
           </Typography>
         ) : (
-          <Link href={track.url} isExternal={true} style={titleStyle} variant={titleVariant}>
+          <Link
+            data-track-title=""
+            href={track.url}
+            isExternal={true}
+            style={titleStyle}
+            variant={titleVariant}
+          >
             {track.name}
           </Link>
         )}
@@ -201,44 +184,6 @@ function TrackMeta({
   );
 }
 
-const compactOuterStyle: CSSProperties = {
-  alignItems: 'center',
-  display: 'flex',
-  gap: 8,
-  minWidth: 0,
-  overflow: 'visible',
-};
-
-const compactThumbWrapStyle: CSSProperties = {
-  flexShrink: 0,
-  height: COMPACT_THUMBNAIL_SIZE,
-  minWidth: 0,
-  overflow: 'visible',
-  position: 'relative',
-  transition: createTransition('width', TIMING_SLOW, EASING_BOUNCE),
-  width: COMPACT_THUMBNAIL_SIZE,
-};
-
-const compactArtCardStyle: CSSProperties = {
-  borderRadius: 'var(--nested-radius)',
-  boxShadow: 'var(--dg-shadow-card-main)',
-  height: COMPACT_THUMBNAIL_SIZE,
-  overflow: 'hidden',
-  position: 'relative',
-  transformOrigin: 'left center',
-  transition: createTransition('transform', TIMING_SLOW, EASING_BOUNCE),
-  width: COMPACT_THUMBNAIL_SIZE,
-  willChange: 'transform',
-};
-
-const compactTextClipStyle: CSSProperties = {
-  flexShrink: 1,
-  maxWidth: '100%',
-  minWidth: 0,
-  overflow: 'hidden',
-  width: 'fit-content',
-};
-
 const CARD_PAPER: CSSProperties & Record<`--${string}`, string> = {
   '--on': 'var(--dg-palette-text-primary)',
   '--pc': 'var(--dg-palette-background-paper)',
@@ -256,7 +201,7 @@ export function TrackListing({
   if (variant === 'compact') {
     const albumTitle = track.album.name;
     const albumArtCard = (
-      <div data-album-art style={compactArtCardStyle}>
+      <div data-album-art="">
         <Image
           alt={albumTitle}
           fill={true}
@@ -269,11 +214,11 @@ export function TrackListing({
     );
 
     return (
-      <div data-compact-track="" style={compactOuterStyle}>
+      <div data-compact-track="">
         <style href="dg-track-listing" precedence="default">
           {TRACK_LISTING_CSS}
         </style>
-        <div data-thumbnail-outer style={compactThumbWrapStyle}>
+        <div data-thumbnail-outer="">
           <AlbumArtWithNotes
             bounceIntensity={COLLAGE_COMPACT_BOUNCE}
             isPlaying={track.isPlaying ?? false}
@@ -290,30 +235,20 @@ export function TrackListing({
             )}
           </AlbumArtWithNotes>
         </div>
-        <div style={compactTextClipStyle}>
-          <div
-            style={{
-              color: 'var(--on)',
-              display: 'flex',
-              flexDirection: 'column',
-              minWidth: 0,
-              width: '100%',
-            }}
-          >
-            <PlaybackStatus
-              color="var(--on)"
-              isPlaying={track.isPlaying}
-              listingVariant="compact"
-              playedAt={track.playedAt}
-            />
-            <TrackMeta
-              color="var(--on)"
-              disableLinks={disableLinks}
-              secondaryColor="var(--soft)"
-              track={track}
-              variant="compact"
-            />
-          </div>
+        <div data-compact-text="">
+          <PlaybackStatus
+            color="var(--on)"
+            isPlaying={track.isPlaying}
+            listingVariant="compact"
+            playedAt={track.playedAt}
+          />
+          <TrackMeta
+            color="var(--on)"
+            disableLinks={disableLinks}
+            secondaryColor="var(--soft)"
+            track={track}
+            variant="compact"
+          />
         </div>
       </div>
     );
@@ -334,12 +269,7 @@ export function TrackListing({
         isPlaying={Boolean(track.isPlaying)}
         noteColor="var(--cream)"
         notesVariant="collage"
-        wrapperStyle={{
-          aspectRatio: '1',
-          overflow: 'visible',
-          position: 'relative',
-          width: 'min(100%, 300px)',
-        }}
+        wrapperStyle={{ aspectRatio: '1', width: 'min(100%, 300px)' }}
       >
         <div className="print__sleeve">
           <div className="print__sleevePiece">
