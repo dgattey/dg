@@ -364,9 +364,13 @@ describe('StravaHistorySections', () => {
     expect(
       within(cruz).getByRole('img', { name: 'Black Santa Cruz Stigmata gravel bike' }),
     ).toBeVisible();
+    const princeArt = within(prince).getByRole('img', {
+      name: 'White Pinarello Prince road bike',
+    });
+    expect(princeArt).toBeVisible();
     expect(
-      within(prince).getByRole('img', { name: 'White Pinarello Prince road bike' }),
-    ).toBeVisible();
+      princeArt.querySelector('.strava__bikeContour + .strava__bikeTape--pink'),
+    ).not.toBeNull();
     expect(within(prince).getByRole('link')).toHaveAttribute(
       'href',
       'https://www.strava.com/activities/41',
