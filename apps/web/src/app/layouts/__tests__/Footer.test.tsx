@@ -230,6 +230,34 @@ describe('Footer', () => {
     expect(screen.queryByRole('button', { name: 'Copy email address' })).not.toBeInTheDocument();
   });
 
+  it('renders Contentful section titles, column order, and Now strip outside .chrome__footer so it straddles the sheet edge', async () => {
+    mockGetFooterContent.mockResolvedValue({
+      description: SAMPLE_DESCRIPTION,
+      elsewhereTitle: 'Follow along',
+      helloTitle: 'Get in touch',
+      links: SAMPLE_LINKS,
+      sectionOrder: ['elsewhere', 'hello'],
+    });
+    mockGetLastKnownSong.mockResolvedValue(SAMPLE_TRACK);
+
+    const ui = await Footer();
+    const { container } = render(
+      <ServerTimeProvider serverTime={1_760_000_000_000}>{ui}</ServerTimeProvider>,
+    );
+
+    const followTag = screen.getByText('Follow along');
+    const touchTag = screen.getByText('Get in touch');
+    expect(
+      followTag.compareDocumentPosition(touchTag) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+
+    const nowWrap = container.querySelector('.chrome__nowWrap');
+    const footerEl = container.querySelector('footer.chrome__footer');
+    expect(nowWrap).not.toBeNull();
+    expect(footerEl).not.toBeNull();
+    expect(footerEl?.contains(nowWrap)).toBe(false);
+  });
+
   it('shows the full track in a tooltip only when the strip cuts it off', async () => {
     const user = userEvent.setup();
     mockGetLastKnownSong.mockResolvedValue({
