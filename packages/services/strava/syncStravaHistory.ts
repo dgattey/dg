@@ -10,6 +10,7 @@ import { log } from '@dg/shared-core/logging/log';
 import { serializeError } from '@dg/shared-core/logging/maskSecrets';
 import { array } from 'valibot';
 import { parseResponse } from '../clients/parseResponse';
+import { refreshStravaHistorySummary } from './fetchStravaHistoryFromDb';
 import { parseStoredStravaActivity } from './parseStoredStravaActivity';
 import { getStravaClient } from './stravaClient';
 
@@ -90,11 +91,23 @@ const savePage = async (summaries: ReadonlyArray<StravaActivity>) => {
   return { inserted: newRows.length, updated };
 };
 
-const stopped = (
+const refreshSummaryIfChanged = async (counts: SyncCounts) => {
+  if (counts.inserted === 0 && counts.updated === 0) {
+    return;
+  }
+  try {
+    await refreshStravaHistorySummary();
+  } catch (error) {
+    log.warn('Could not refresh Strava history summary after sync', { error });
+  }
+};
+
+const stopped = async (
   counts: SyncCounts,
   reason: string,
   retryAfterSeconds?: number,
-): StravaHistorySyncOutcome => {
+): Promise<StravaHistorySyncOutcome> => {
+  await refreshSummaryIfChanged(counts);
   log.warn('Stopped Strava history sync', { ...counts, reason, retryAfterSeconds });
   return { ...counts, reason, retryAfterSeconds, status: 'failed' };
 };
@@ -114,10 +127,10 @@ export const syncStravaHistory = async (): Promise<StravaHistorySyncOutcome> => 
       `athlete/activities?per_page=${PAGE_SIZE}&page=${page}`,
     );
     if (status === 429) {
-      return stopped(counts, `Strava rate limit reached on page ${page}`, retryAfterSeconds);
+      return await stopped(counts, `Strava rate limit reached on page ${page}`, retryAfterSeconds);
     }
     if (status !== 200) {
-      return stopped(counts, `Strava returned ${status} for page ${page}`);
+      return await stopped(counts, `Strava returned ${status} for page ${page}`);
     }
     const summaries = parseResponse(activityPageSchema, await response.json(), {
       kind: 'rest',
@@ -132,7 +145,7 @@ export const syncStravaHistory = async (): Promise<StravaHistorySyncOutcome> => 
         error: serializeError(error as Error),
         page,
       });
-      return stopped(
+      return await stopped(
         counts,
         error instanceof Error ? error.message : 'Database unavailable during Strava sync',
       );
@@ -140,6 +153,7 @@ export const syncStravaHistory = async (): Promise<StravaHistorySyncOutcome> => 
     counts.pages = page;
     pageLength = summaries.length;
   }
+  await refreshSummaryIfChanged(counts);
   log.info('Synced Strava history', counts);
   return { ...counts, status: 'ok' };
 };

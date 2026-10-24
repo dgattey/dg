@@ -85,6 +85,9 @@ describe('syncStravaHistory', () => {
       sportType: 'GravelRide',
     });
     expect(row?.activityData).not.toHaveProperty('summary_polyline');
+    const cachedSummary = await db.StravaHistorySummary.findOne({ where: { singleton: true } });
+    expect(cachedSummary?.activityCount).toBe(203);
+    expect(cachedSummary?.payload?.totals.outings).toBe(203);
   });
 
   it('fills only missing route, sport, and gear on rows that already exist', async () => {

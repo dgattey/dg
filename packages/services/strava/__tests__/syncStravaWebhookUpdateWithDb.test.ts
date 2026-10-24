@@ -83,6 +83,11 @@ describe('syncStravaWebhookUpdateWithDb', () => {
       expect(savedData).not.toHaveProperty('start_date');
       expect(savedData).not.toHaveProperty('sport_type');
       expect(savedActivity?.activityStartDate).toEqual(new Date('2026-01-31T02:36:33Z'));
+
+      const cachedSummary = await db.StravaHistorySummary.findOne({ where: { singleton: true } });
+      expect(cachedSummary?.activityCount).toBe(1);
+      expect(Number(cachedSummary?.latestActivityId)).toBe(17234236452);
+      expect(cachedSummary?.payload?.latest.name).toBe('Morning Ride');
     });
 
     it('throws when API returns 404', async () => {
@@ -183,6 +188,9 @@ describe('syncStravaWebhookUpdateWithDb', () => {
         where: { id: 17234236452 },
       });
       expect(savedActivity).toBeNull();
+      const cachedSummary = await db.StravaHistorySummary.findOne({ where: { singleton: true } });
+      expect(cachedSummary?.activityCount).toBe(0);
+      expect(cachedSummary?.payload).toBeNull();
     });
 
     it('succeeds even when activity does not exist', async () => {
