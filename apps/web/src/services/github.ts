@@ -7,21 +7,11 @@ import { cacheLife, cacheTag } from 'next/cache';
 import { CACHE_TAGS } from './cacheTags';
 import { getAppVersionInfo } from './version';
 
-<<<<<<< HEAD
 async function fetchCachedChangelogReleases(appVersion: string): Promise<Array<ChangelogRelease>> {
   'use cache';
   cacheLife('max');
   cacheTag(CACHE_TAGS.changelog);
-  return await fetchReleases({ fallbackVersion: appVersion });
-=======
-const CHANGELOG_TAG = 'changelog';
-const CONTENTFUL_TAG = 'contentful';
-
-async function fetchCachedChangelogReleases(appVersion: string): Promise<Array<ChangelogRelease>> {
-  'use cache';
-  cacheLife('max');
-  cacheTag(CHANGELOG_TAG);
-  cacheTag(CONTENTFUL_TAG);
+  cacheTag(CACHE_TAGS.contentful);
   const [releases, snapshots] = await Promise.all([
     fetchReleases({ fallbackVersion: appVersion }),
     fetchChangelogSnapshots().catch(() => new Map<string, RenderableChangelogSnapshot>()),
@@ -30,7 +20,6 @@ async function fetchCachedChangelogReleases(appVersion: string): Promise<Array<C
     ...release,
     snapshot: snapshots.get(release.tag) ?? null,
   }));
->>>>>>> e6781be6 (Show historical snapshot polaroids on the changelog)
 }
 
 export async function getChangelogReleases(): Promise<Array<ChangelogRelease>> {
