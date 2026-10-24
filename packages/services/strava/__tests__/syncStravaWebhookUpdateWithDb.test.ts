@@ -45,6 +45,7 @@ describe('syncStravaWebhookUpdateWithDb', () => {
   const existingActivityData = {
     id: 17234236452,
     name: 'Existing Activity',
+    startDate: '2026-01-31T02:36:33Z',
     type: 'Ride',
     url: 'https://www.strava.com/activities/17234236452',
   };

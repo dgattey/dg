@@ -10,7 +10,7 @@ describe('fetchStravaHistoryFromDb', () => {
     await expect(fetchStravaHistoryFromDb(NOW)).resolves.toBeNull();
   });
 
-  it('summarizes camelCase and legacy snake_case rows and skips unreadable ones', async () => {
+  it('summarizes canonical camelCase rows and skips unreadable ones', async () => {
     await db.StravaActivity.bulkCreate([
       {
         activityData: {
@@ -32,17 +32,24 @@ describe('fetchStravaHistoryFromDb', () => {
         activityData: {
           distance: 10_000,
           id: 102,
-          map: { summary_polyline: 'snake' },
-          name: 'Snake run',
-          start_date: '2018-04-01T14:00:00Z',
-          total_elevation_gain: 80,
+          map: { summaryPolyline: 'trail' },
+          name: 'Morning run',
+          startDate: '2018-04-01T14:00:00Z',
+          totalElevationGain: 80,
           type: 'Run',
+          url: 'https://www.strava.com/activities/102',
         },
         activityStartDate: new Date('2018-04-01T14:00:00Z'),
         id: 102,
       },
       {
-        activityData: { id: 103, type: 'Hike' },
+        activityData: {
+          id: 103,
+          name: 'Afternoon hike',
+          startDate: '2022-07-04T17:00:00Z',
+          type: 'Hike',
+          url: 'https://www.strava.com/activities/103',
+        },
         activityStartDate: new Date('2022-07-04T17:00:00Z'),
         id: 103,
       },
@@ -61,7 +68,7 @@ describe('fetchStravaHistoryFromDb', () => {
       [102, 'run'],
     ]);
     expect(history?.outings[1]?.startDate).toBe('2022-07-04T17:00:00.000Z');
-    expect(history?.outings.map((outing) => outing.polyline)).toEqual(['camel', null, 'snake']);
+    expect(history?.outings.map((outing) => outing.polyline)).toEqual(['camel', null, 'trail']);
     expect(history?.totals).toEqual({
       distanceMeters: 50_000,
       elevationGainMeters: 380,

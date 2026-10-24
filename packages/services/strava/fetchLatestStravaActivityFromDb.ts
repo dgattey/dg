@@ -11,11 +11,11 @@ export const fetchLatestStravaActivityFromDb = async () => {
   }
   const { db } = await import('@dg/db');
   const data = await db.StravaActivity.findOne({
-    attributes: ['activityData', 'activityStartDate'],
+    attributes: ['activityData'],
     order: [['activityStartDate', 'DESC']],
   });
   if (!data) {
     return null;
   }
-  return parseStoredStravaActivity(data.activityData, data.activityStartDate);
+  return parseStoredStravaActivity(data.activityData);
 };

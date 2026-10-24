@@ -14,11 +14,11 @@ export const fetchStravaHistoryFromDb = async (now = new Date()): Promise<Strava
   }
   const { db } = await import('@dg/db');
   const rows = await db.StravaActivity.findAll({
-    attributes: ['activityData', 'activityStartDate'],
+    attributes: ['activityData'],
     order: [['activityStartDate', 'DESC']],
   });
   const activities = rows.flatMap((row) => {
-    const activity = parseStoredStravaActivity(row.activityData, row.activityStartDate);
+    const activity = parseStoredStravaActivity(row.activityData);
     return activity ? [activity] : [];
   });
   return summarizeStravaHistory(activities, now);

@@ -38,9 +38,7 @@ const fetchFromApiAndSaveToDb = async (id: number) => {
   }
   const updatedActivity = await db.StravaActivity.upsert({
     activityData: latestActivityData,
-    // Assertion needed: startDate is runtime-validated above, but valibot's looseObject
-    // inference doesn't narrow the type properly after the guard check
-    activityStartDate: new Date(latestActivityData.startDate as string),
+    activityStartDate: new Date(latestActivityData.startDate),
     id,
     lastUpdate: new Date(),
   });
