@@ -9,7 +9,8 @@ import {
   SocialCardFrame,
   SocialCardHeadline,
   SocialCardMattedCard,
-  SocialCardStamp,
+  SocialCardSplit,
+  SocialCardStampRow,
   SocialCardTag,
 } from './SocialCardParts';
 import { SocialCardScallop } from './SocialCardScallop';
@@ -64,25 +65,15 @@ export function StravaSocialCard({
 }: StravaCardVariant & { grainUrl: string }) {
   return (
     <SocialCardFrame borderTone="cerulean" cutOuts={STRAVA_CUT_OUTS} grainUrl={grainUrl}>
-      <div
-        style={{
-          alignItems: 'center',
-          display: 'flex',
-          height: '100%',
-          justifyContent: 'space-between',
-          position: 'relative',
-          width: '100%',
-        }}
-      >
+      <SocialCardSplit>
         <div style={{ display: 'flex', flexDirection: 'column', width: 485 }}>
-          <div style={{ alignItems: 'center', display: 'flex', gap: 16, marginBottom: 18 }}>
-            <SocialCardStamp rotationDeg={-4} width={114} />
+          <SocialCardStampRow>
             {recentStat ? (
               <SocialCardTag tiltDeg={2.4} tone="cobalt">
                 <span>{recentStat}</span>
               </SocialCardTag>
             ) : null}
-          </div>
+          </SocialCardStampRow>
           <SocialCardHeadline fontSize={106} headline="Big map" singleLine />
           {latestTitle ? (
             <SocialCardMattedCard
@@ -245,7 +236,7 @@ export function StravaSocialCard({
             </SocialCardTag>
           </div>
         </div>
-      </div>
+      </SocialCardSplit>
     </SocialCardFrame>
   );
 }

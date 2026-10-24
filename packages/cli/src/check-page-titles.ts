@@ -1,5 +1,17 @@
 import type { StructureViolation } from './check-structure.js';
 
+export function isTestFile(relPath: string): boolean {
+  return (
+    relPath.includes('__tests__/') ||
+    /\.test\.(ts|tsx)$/.test(relPath) ||
+    relPath.endsWith('jest.config.ts')
+  );
+}
+
+export function lineAt(content: string, index: number): number {
+  return content.slice(0, index).split('\n').length;
+}
+
 const PAGE_TITLE_THEN_PARAGRAPH =
   /<CutLetters\b[^>]*\bclassName="[^"]*\bcollagePageTitle\b[^"]*"[^>]*\/>\s*(?:\{[^}]*\}\s*)?<p\b/g;
 
@@ -9,13 +21,13 @@ export function checkNoPageSubtitles(
 ): Array<StructureViolation> {
   const violations: Array<StructureViolation> = [];
   for (const [file, content] of webSources) {
-    if (!file.endsWith('.tsx') || file.includes('__tests__/')) {
+    if (!file.endsWith('.tsx') || isTestFile(file)) {
       continue;
     }
     for (const match of content.matchAll(PAGE_TITLE_THEN_PARAGRAPH)) {
       violations.push({
         file,
-        line: content.slice(0, match.index).split('\n').length,
+        line: lineAt(content, match.index),
         message: 'Page titles have no subtitle; drop the paragraph under the CutLetters title',
         rule: 'no-page-subtitle',
       });

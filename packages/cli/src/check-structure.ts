@@ -14,7 +14,7 @@ import {
   checkUnusedCssRules,
 } from './check-css.js';
 import { checkCssGeometry } from './check-css-geometry.js';
-import { checkNoPageSubtitles } from './check-page-titles.js';
+import { checkNoPageSubtitles, isTestFile } from './check-page-titles.js';
 
 export const MAX_SOURCE_FILE_LINES = 350;
 const MAX_TEST_FILE_LINES = 500;
@@ -45,14 +45,6 @@ export type StructureViolation = {
   message: string;
   rule: string;
 };
-
-function isTestFile(relPath: string): boolean {
-  return (
-    relPath.includes('__tests__/') ||
-    /\.test\.(ts|tsx)$/.test(relPath) ||
-    relPath.endsWith('jest.config.ts')
-  );
-}
 
 function isPureTypeModule(content: string): boolean {
   const withoutComments = content.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');

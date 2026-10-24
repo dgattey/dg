@@ -9,7 +9,8 @@ import {
   SocialCardFrame,
   SocialCardHeadline,
   SocialCardMattedCard,
-  SocialCardStamp,
+  SocialCardSplit,
+  SocialCardStampRow,
   SocialCardTag,
 } from './SocialCardParts';
 import { SocialCardScallop } from './SocialCardScallop';
@@ -90,21 +91,13 @@ export function ChangelogSocialCard({
 }: ChangelogCardVariant & { grainUrl: string }) {
   return (
     <SocialCardFrame borderTone="rose" cutOuts={CHANGELOG_CUT_OUTS} grainUrl={grainUrl}>
-      <div
-        style={{
-          ...BETWEEN_ROW,
-          height: '100%',
-          position: 'relative',
-          width: '100%',
-        }}
-      >
+      <SocialCardSplit>
         <div style={{ display: 'flex', flexDirection: 'column', width: 470 }}>
-          <div style={{ alignItems: 'center', display: 'flex', gap: 16, marginBottom: 18 }}>
-            <SocialCardStamp rotationDeg={-4} width={114} />
+          <SocialCardStampRow>
             <SocialCardTag tiltDeg={2.4} tone="cobalt">
               <span>{latestVersionTag}</span>
             </SocialCardTag>
-          </div>
+          </SocialCardStampRow>
           <SocialCardHeadline fontSize={100} headline="Changelog" singleLine />
           <SocialCardMattedCard
             matTiltDeg={1.8}
@@ -228,7 +221,7 @@ export function ChangelogSocialCard({
             })}
           </div>
         </div>
-      </div>
+      </SocialCardSplit>
     </SocialCardFrame>
   );
 }

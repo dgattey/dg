@@ -8,6 +8,7 @@ import {
 import { StickerMark } from '../layouts/StickerMark';
 import { CUT_OUT_SHAPES, type CutOutShape } from './cutOutShapes';
 import { PAPER_PALETTE } from './paperPalette';
+import { PAPER_INK_TONES } from './types';
 
 export const SOCIAL_CARD_FONT = 'Familjen Grotesk';
 
@@ -41,18 +42,44 @@ export const PIECE_SHADOW =
 export const LIFTED_SHADOW =
   'drop-shadow(0 2px 0 rgba(0,0,0,0.2)) drop-shadow(0 7px 10px rgba(0,0,0,0.18))';
 
-const DARK_TONES: ReadonlySet<PaperColor> = new Set([
-  'black',
-  'cobalt',
-  'ink',
-  'leaf',
-  'ultramarine',
-  'vermilion',
-  'viridian',
-]);
-
 export function inkForTone(tone: PaperColor): string {
-  return DARK_TONES.has(tone) ? PAPER_PALETTE.cream : PAPER_PALETTE.ink;
+  return tone === 'paper' || tone in PAPER_INK_TONES ? PAPER_PALETTE.ink : PAPER_PALETTE.cream;
+}
+
+export function SocialCardSplit({ children }: { children: ReactNode }) {
+  return (
+    <div
+      style={{
+        alignItems: 'center',
+        display: 'flex',
+        height: '100%',
+        justifyContent: 'space-between',
+        position: 'relative',
+        width: '100%',
+      }}
+    >
+      {children}
+    </div>
+  );
+}
+
+export function SocialCardStampRow({
+  children,
+  gap = 16,
+  marginBottom = 18,
+  stampWidth = 114,
+}: {
+  children?: ReactNode;
+  gap?: number;
+  marginBottom?: number;
+  stampWidth?: number;
+}) {
+  return (
+    <div style={{ alignItems: 'center', display: 'flex', gap, marginBottom }}>
+      <SocialCardStamp rotationDeg={-4} width={stampWidth} />
+      {children}
+    </div>
+  );
 }
 
 function CutOutSvg({ color, rotationDeg, shape, size, underprint, x, y }: CutOutPiece) {

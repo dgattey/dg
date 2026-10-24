@@ -8,7 +8,8 @@ import {
   QUAD_C,
   SocialCardFrame,
   SocialCardHeadline,
-  SocialCardStamp,
+  SocialCardSplit,
+  SocialCardStampRow,
   SocialCardTag,
 } from './SocialCardParts';
 import { SocialCardScallop } from './SocialCardScallop';
@@ -161,23 +162,13 @@ export function MusicStatsSocialCard({
   const topAlbum = topAlbums[0];
   return (
     <SocialCardFrame borderTone="ultramarine" cutOuts={STATS_CUT_OUTS} grainUrl={grainUrl}>
-      <div
-        style={{
-          alignItems: 'center',
-          display: 'flex',
-          height: '100%',
-          justifyContent: 'space-between',
-          position: 'relative',
-          width: '100%',
-        }}
-      >
+      <SocialCardSplit>
         <div style={{ display: 'flex', flexDirection: 'column', width: 490 }}>
-          <div style={{ alignItems: 'center', display: 'flex', gap: 16, marginBottom: 18 }}>
-            <SocialCardStamp rotationDeg={-4} width={114} />
+          <SocialCardStampRow>
             <SocialCardTag tiltDeg={2.5} tone="cobalt">
               <span>{year}</span>
             </SocialCardTag>
-          </div>
+          </SocialCardStampRow>
           <SocialCardHeadline fontSize={94} headline="Listening stats" indentEm={0.44} />
           <div style={{ alignItems: 'center', display: 'flex', gap: 14, marginTop: 26 }}>
             <StatStub
@@ -341,7 +332,7 @@ export function MusicStatsSocialCard({
             </div>
           ) : null}
         </div>
-      </div>
+      </SocialCardSplit>
     </SocialCardFrame>
   );
 }

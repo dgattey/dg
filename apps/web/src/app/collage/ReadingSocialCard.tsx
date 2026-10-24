@@ -10,7 +10,8 @@ import {
   SocialCardFrame,
   SocialCardHeadline,
   SocialCardMattedCard,
-  SocialCardStamp,
+  SocialCardSplit,
+  SocialCardStampRow,
   SocialCardTag,
 } from './SocialCardParts';
 
@@ -140,25 +141,15 @@ export function ReadingSocialCard({
   const slipBook = picks.find((book) => book.review) ?? featured;
   return (
     <SocialCardFrame borderTone="viridian" cutOuts={READING_CUT_OUTS} grainUrl={grainUrl}>
-      <div
-        style={{
-          alignItems: 'center',
-          display: 'flex',
-          height: '100%',
-          justifyContent: 'space-between',
-          position: 'relative',
-          width: '100%',
-        }}
-      >
+      <SocialCardSplit>
         <div style={{ display: 'flex', flexDirection: 'column', width: 465 }}>
-          <div style={{ alignItems: 'center', display: 'flex', gap: 14, marginBottom: 18 }}>
-            <SocialCardStamp rotationDeg={-4} width={114} />
+          <SocialCardStampRow gap={14}>
             <SocialCardTag tiltDeg={2.2} tone="cobalt">
               <span>
                 {totalBooks} books · {fiveStarCount} favorites
               </span>
             </SocialCardTag>
-          </div>
+          </SocialCardStampRow>
           <SocialCardHeadline fontSize={94} headline="Books I've read" indentEm={0.32} />
           {slipBook ? (
             <SocialCardMattedCard
@@ -317,7 +308,7 @@ export function ReadingSocialCard({
             })}
           </div>
         </div>
-      </div>
+      </SocialCardSplit>
     </SocialCardFrame>
   );
 }

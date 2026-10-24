@@ -17,6 +17,7 @@ export function PaperPills<Key extends string>({
   children,
   className,
   label,
+  onPrefetch,
   onSelect,
   options,
   selected,
@@ -25,6 +26,7 @@ export function PaperPills<Key extends string>({
   children?: ReactNode;
   className?: string;
   label: string;
+  onPrefetch?: (key: Key) => void;
   onSelect?: (key: Key) => void;
   options: ReadonlyArray<PaperPillOption<Key>>;
   /** Null when the pick lives outside these pills. */
@@ -46,6 +48,8 @@ export function PaperPills<Key extends string>({
                 aria-pressed={current}
                 className="paperPillButton"
                 onClick={() => onSelect(option.key)}
+                onFocus={onPrefetch ? () => onPrefetch(option.key) : undefined}
+                onMouseEnter={onPrefetch ? () => onPrefetch(option.key) : undefined}
                 type="button"
               >
                 {option.label}
