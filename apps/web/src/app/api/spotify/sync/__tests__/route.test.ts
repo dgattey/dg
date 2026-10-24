@@ -108,6 +108,7 @@ describe('Spotify sync route', () => {
       knownLatestPlayedAt,
     });
     expect(mockRevalidateTag).toHaveBeenCalledWith('music-history', 'max');
+    expect(mockRevalidateTag).toHaveBeenCalledWith('music-stats', 'max');
     expect(mockRevalidateTag).toHaveBeenCalledWith('latest-song', 'max');
     expect(mockRevalidateTag).toHaveBeenCalledWith('favorite-albums', 'max');
   });

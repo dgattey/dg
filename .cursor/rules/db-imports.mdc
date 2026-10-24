@@ -5,15 +5,15 @@ alwaysApply: true
 
 # Database imports restricted to services
 
-- Only `packages/services` may import `@dg/db`.
-- `apps/*` and other packages must NOT import `@dg/db` directly.
-- Instead, expose database operations through `packages/services` functions.
+- Only `packages/services` and `packages/db` may import `@dg/db` or `@dg/db/testing`.
+- `apps/*` (including tests and `jest.config.ts`) and other packages must NOT import `@dg/db` or `@dg/db/testing`.
+- Instead, expose database operations through `packages/services` functions and mock those service functions in `apps/*` tests.
 
 ## Why
 
-- Keeps database logic centralized and testable.
+- Keeps database logic centralized and testable in `packages/services`.
 - Prevents apps from coupling directly to the ORM.
-- Makes it easier to swap database implementations.
+- Ensures `@dg/web#test` runs purely in memory without waking the `DATABASE_URL_TEST` Neon compute endpoint or colliding with `@dg/services#test` in CI.
 
 ## Example
 
@@ -31,19 +31,15 @@ const status = await getStravaOauthStatus();
 
 ## Testing
 
-Runtime app code must not import `@dg/db`. Tests may import `@dg/db/testing`
-(for example `setupTestDatabase` from `@dg/db/testing/databaseSetup`).
-`apps/web` tests may also import `@dg/db` for Sequelize operators such as `Op`
-when asserting query shape. That is a test-only exception; runtime app code
-still goes through `@dg/services`.
+- Only `packages/services` tests may import `@dg/db` or `@dg/db/testing` (for example `setupTestDatabase` from `@dg/db/testing/databaseSetup` and `dbConfig` from `@dg/db/testing/jest.config.base`).
+- `apps/*` tests and `apps/*/jest.config.ts` must NEVER import `@dg/db` or `@dg/db/testing`; use `@dg/testing/jest.config.base` and mock `@dg/services/*` boundaries instead.
 
 ```ts
-// ❌ Bad - app runtime importing db
+// ❌ Bad - app runtime or app test importing db or db/testing
 import { db } from '@dg/db';
-
-// ✅ Good - tests using the db testing helpers
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 
-// ✅ Allowed in apps/web tests only - Sequelize operators
-import { Op } from '@dg/db';
+// ✅ Good - packages/services tests using db testing helpers
+// packages/services/spotify/__tests__/syncSpotifyHistory.test.ts
+import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 ```

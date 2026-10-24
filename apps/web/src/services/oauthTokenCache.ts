@@ -18,7 +18,7 @@ type SerializedTokenRecord = {
 
 async function readRemoteCachedTokenRecord(name: string): Promise<SerializedTokenRecord> {
   'use cache: remote';
-  cacheLife('days');
+  cacheLife('weeks');
   cacheTag(OAUTH_TOKEN_TAG);
   cacheTag(oauthProviderTokenTag(name));
   const record = await readStoredTokenFromDb(name);

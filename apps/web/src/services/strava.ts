@@ -12,14 +12,14 @@ const STRAVA_HISTORY_TAG = 'strava-history';
 
 export const getLatestActivity = async () => {
   'use cache';
-  cacheLife('days');
+  cacheLife('weeks');
   cacheTag(LATEST_ACTIVITY_TAG);
   return await withMissingTokenFallback(fetchLatestStravaActivityFromDb());
 };
 
 export const getStravaHistory = async (): Promise<StravaHistory | null> => {
   'use cache';
-  cacheLife('days');
+  cacheLife('weeks');
   cacheTag(STRAVA_HISTORY_TAG);
   return await withMissingTokenFallback(fetchStravaHistoryFromDb());
 };

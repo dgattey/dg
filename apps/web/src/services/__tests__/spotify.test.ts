@@ -43,10 +43,10 @@ describe('getLatestSong', () => {
 });
 
 describe('getLastKnownSong', () => {
-  it('caches the prerendered shell track with days lifetime', async () => {
+  it('caches the prerendered shell track with weeks lifetime', async () => {
     jest.mocked(fetchRecentlyPlayed).mockResolvedValue(track);
     await expect(getLastKnownSong()).resolves.toBe(track);
-    expect(cacheLife).toHaveBeenLastCalledWith('days');
+    expect(cacheLife).toHaveBeenLastCalledWith('weeks');
   });
 
   it('returns null when tokens are missing', async () => {

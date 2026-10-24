@@ -10,7 +10,7 @@ const ALBUM_DETAIL_TAG = 'album-detail';
 
 async function getAlbumDetailCached(albumId: string) {
   'use cache';
-  cacheLife('days');
+  cacheLife('weeks');
   cacheTag(ALBUM_DETAIL_TAG);
   cacheTag(`${ALBUM_DETAIL_TAG}-${albumId}`);
   return await fetchAlbumDetail(albumId);

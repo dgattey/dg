@@ -7,7 +7,7 @@ const FAVORITE_ALBUMS_TAG = 'favorite-albums';
 
 export async function getFavoriteAlbums() {
   'use cache: remote';
-  cacheLife('days');
+  cacheLife('weeks');
   cacheTag(FAVORITE_ALBUMS_TAG);
   return await readFavoriteAlbumsSnapshot();
 }

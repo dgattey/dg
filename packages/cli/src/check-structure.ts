@@ -34,6 +34,7 @@ const SOCIAL_IMAGE_FILENAMES = ['opengraph-image.tsx', 'twitter-image.tsx'] as c
 
 const INLINE_TYPEOF_IMPORT_TOKEN = `${'typeof'} ${'import('}`;
 const BIOME_SUPPRESSION_TOKEN = `${'biome'}-${'ignore'}`;
+const DB_PACKAGE_TOKEN = `@dg/${'db'}`;
 const BIOME_CHECKED_FILE = /\.(?:c?js|mjs|tsx?|css|jsonc?)$/;
 
 export type StructureViolation = {
@@ -129,11 +130,26 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
     }
   }
 
+  if (
+    relPath === 'packages/db/scripts/runMigrate.ts' &&
+    (!content.includes('computeMigrationStamp') || !content.includes('migrate-stamp.txt'))
+  ) {
+    violations.push({
+      file: relPath,
+      line: 1,
+      message:
+        'runMigrate.ts must cache migration stamps in .turbo/migrate-stamp.txt so local turbo dev starts do not wake Neon when migrations are unchanged',
+      rule: 'migrate-stamp-cache',
+    });
+  }
+
   const canImportDb =
-    relPath.startsWith('packages/services/') ||
-    relPath.startsWith('packages/db/') ||
-    (isTest && !relPath.startsWith('apps/'));
-  const checkDbImport = !canImportDb && content.includes('@dg/db');
+    relPath.startsWith('packages/services/') || relPath.startsWith('packages/db/');
+  const isAppFile = relPath.startsWith('apps/');
+  const checkDbImport =
+    !canImportDb &&
+    (content.includes(DB_PACKAGE_TOKEN) ||
+      (isAppFile && (content.includes('setupTestDatabase') || content.includes('dbConfig'))));
   const checkInlineTypeof = content.includes(INLINE_TYPEOF_IMPORT_TOKEN);
   const checkShortCacheLife =
     relPath.startsWith('apps/web/src/') && !isTest && content.includes('cacheLife(');
@@ -162,7 +178,12 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
     const lineText = lines[i] ?? '';
     const lineNum = i + 1;
 
-    if (checkDbImport && /\bfrom\s+['"]@dg\/db(?:['"]|\/)/.test(lineText)) {
+    if (
+      checkDbImport &&
+      (/\bfrom\s+['"]@dg\/db(?:['"]|\/)/.test(lineText) ||
+        /\b(?:import|require)\(\s*['"]@dg\/db(?:['"]|\/)/.test(lineText) ||
+        (isAppFile && /\bsetupTestDatabase\s*\(/.test(lineText)))
+    ) {
       violations.push({
         file: relPath,
         line: lineNum,

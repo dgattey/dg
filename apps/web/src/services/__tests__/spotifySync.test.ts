@@ -114,6 +114,7 @@ describe('spotifySync', () => {
     expect(refreshFavoriteAlbumsSnapshotWithLogging).toHaveBeenCalledTimes(1);
     expect(revalidateTag).toHaveBeenCalledWith('favorite-albums', 'max');
     expect(revalidateTag).toHaveBeenCalledWith('music-history', 'max');
+    expect(revalidateTag).toHaveBeenCalledWith('music-stats', 'max');
     expect(revalidateTag).toHaveBeenCalledWith('latest-song', 'max');
   });
 

@@ -13,6 +13,7 @@ import './oauthTokenCache';
 import { getLastKnownSong } from './spotify';
 
 const MUSIC_HISTORY_TAG = 'music-history';
+const MUSIC_STATS_TAG = 'music-stats';
 const LATEST_SONG_TAG = 'latest-song';
 const FAVORITE_ALBUMS_TAG = 'favorite-albums';
 const FAVORITE_ALBUMS_CHECK_TAG = 'favorite-albums-check';
@@ -38,7 +39,7 @@ export function resetSpotifySyncStateForTests(): void {
 
 async function readCachedLatestPlayedAtIso(): Promise<string | null> {
   'use cache: remote';
-  cacheLife('days');
+  cacheLife('weeks');
   cacheTag(MUSIC_HISTORY_TAG);
   cacheTag(LATEST_SONG_TAG);
   const latest = await getLatestPlayedAt();
@@ -145,12 +146,14 @@ export async function syncSpotifyIfStale(
 
     if (favoriteAlbums?.changed) {
       revalidateTag(FAVORITE_ALBUMS_TAG, 'max');
+      revalidateTag(MUSIC_STATS_TAG, 'max');
     }
     if (result.status === 'ok' && (result.inserted > 0 || result.total > 0)) {
       if (!Number.isNaN(trackPlayedAtMs)) {
         lastKnownLatestPlayedAtMs = Math.max(lastKnownLatestPlayedAtMs, trackPlayedAtMs);
       }
       revalidateTag(MUSIC_HISTORY_TAG, 'max');
+      revalidateTag(MUSIC_STATS_TAG, 'max');
       revalidateTag(LATEST_SONG_TAG, 'max');
     }
     return true;

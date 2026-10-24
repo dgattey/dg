@@ -37,19 +37,34 @@ describe('check-structure', () => {
     );
     assert.equal(pureTypes.length, 0);
 
+    const dbPkg = `@dg/${'db'}`;
     const dbViolation = checkFileStructure(
       'apps/web/src/services/foo.ts',
-      "import { db } from '@dg/db';\nexport const x = db;\n",
+      `import { db } from '${dbPkg}';\nexport const x = db;\n`,
     );
     assert.equal(dbViolation.length, 1);
     assert.equal(dbViolation[0]?.rule, 'db-imports');
 
     const webTestDbViolation = checkFileStructure(
       'apps/web/src/app/__tests__/foo.test.ts',
-      "import { setupTestDatabase } from '@dg/db/testing/databaseSetup';\nexport const x = setupTestDatabase;\n",
+      `import { setupTestDatabase } from '${dbPkg}/testing/databaseSetup';\nexport const x = setupTestDatabase;\n`,
     );
     assert.equal(webTestDbViolation.length, 1);
     assert.equal(webTestDbViolation[0]?.rule, 'db-imports');
+
+    const webJestConfigDbViolation = checkFileStructure(
+      'apps/web/jest.config.ts',
+      `import { dbConfig } from '${dbPkg}/testing/jest.config.base';\nexport default dbConfig;\n`,
+    );
+    assert.equal(webJestConfigDbViolation.length, 1);
+    assert.equal(webJestConfigDbViolation[0]?.rule, 'db-imports');
+
+    const migrateStampViolation = checkFileStructure(
+      'packages/db/scripts/runMigrate.ts',
+      "import { execSync } from 'node:child_process';\nexecSync('pnpm exec sequelize-cli db:migrate');\n",
+    );
+    assert.equal(migrateStampViolation.length, 1);
+    assert.equal(migrateStampViolation[0]?.rule, 'migrate-stamp-cache');
 
     const dividerViolation = checkFileStructure(
       'apps/web/src/services/foo.ts',

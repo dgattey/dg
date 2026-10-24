@@ -1,6 +1,7 @@
 'use client';
 
 import type { Track } from '@dg/content-models/spotify/Track';
+import { usePathname } from 'next/navigation';
 import {
   createContext,
   type ReactNode,
@@ -103,6 +104,8 @@ async function refreshLatestSong(
 
 export function NowPlayingProvider({ children }: { children: ReactNode }) {
   const [track, setTrack] = useState<Track | null>(null);
+  const pathname = usePathname();
+  const lastPathnameRef = useRef<string | null>(null);
   const requestIdRef = useRef(0);
   const inFlightRef = useRef(false);
   const lastCompletedAtRef = useRef(0);
@@ -115,8 +118,18 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
+    if (lastPathnameRef.current === pathname) {
+      return;
+    }
+    lastPathnameRef.current = pathname;
+    if (
+      lastCompletedAtRef.current > 0 &&
+      Date.now() - lastCompletedAtRef.current < MIN_FOCUS_REFRESH_GAP_MS
+    ) {
+      return;
+    }
     void refreshLatestSong(requestIdRef, inFlightRef, lastCompletedAtRef, setTrack);
-  }, []);
+  }, [pathname]);
 
   useEffect(() => {
     const refreshIfCooledDown = () => {

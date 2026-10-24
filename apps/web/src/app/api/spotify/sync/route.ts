@@ -71,6 +71,7 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
 
   if (favoriteAlbums?.changed) {
     revalidateTag('favorite-albums', 'max');
+    revalidateTag('music-stats', 'max');
   }
 
   if (result.status === 'failed') {
@@ -87,6 +88,7 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
 
   if (result.inserted > 0 || result.total > 0) {
     revalidateTag('music-history', 'max');
+    revalidateTag('music-stats', 'max');
     revalidateTag('latest-song', 'max');
   }
 

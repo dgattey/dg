@@ -27,7 +27,7 @@ export async function getMusicHistory({
   before,
 }: MusicHistoryOptions): Promise<MusicHistoryResult> {
   'use cache';
-  cacheLife('days');
+  cacheLife('weeks');
   cacheTag(MUSIC_HISTORY_TAG);
 
   return await fetchMusicHistoryPage({

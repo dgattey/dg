@@ -12,7 +12,7 @@ const MUSIC_STATS_TAG = 'music-stats';
 
 async function getCachedAllTimeStats(): Promise<ListeningStats | null> {
   'use cache';
-  cacheLife('days');
+  cacheLife('weeks');
   cacheTag(MUSIC_STATS_TAG);
   return await fetchListeningStats({ kind: 'all' });
 }
@@ -22,7 +22,7 @@ async function getCachedRangeStats(
   knownYears?: Array<{ plays: number; year: number }>,
 ): Promise<ListeningStats | null> {
   'use cache';
-  cacheLife('hours');
+  cacheLife('weeks');
   cacheTag(MUSIC_STATS_TAG);
   return await fetchListeningStats(parseStatsRange(rangeKey), { knownYears });
 }

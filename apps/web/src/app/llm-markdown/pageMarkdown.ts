@@ -51,6 +51,6 @@ export const pageMarkdownGenerators: {
 
 export async function getPageMarkdown(pathname: MarkdownPagePath): Promise<string> {
   'use cache';
-  cacheLife('days');
+  cacheLife('weeks');
   return await pageMarkdownGenerators[pathname]();
 }
