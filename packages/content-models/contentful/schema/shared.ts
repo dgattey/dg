@@ -16,6 +16,7 @@ const sysSchema = v.looseObject({
  * Base asset fields used across responses.
  */
 const assetFields = {
+  fileName: v.optional(v.nullable(v.string())),
   height: v.optional(v.nullable(v.number())),
   title: v.optional(v.nullable(v.string())),
   url: v.optional(v.nullable(v.string())),

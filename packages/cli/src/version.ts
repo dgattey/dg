@@ -47,6 +47,7 @@ export function computeNext(base: string, type: ReleaseType): string {
 
 function readEvent(eventPath: string): {
   prBody: string;
+  prNumber?: number;
   prTitle?: string;
   event: Record<string, unknown>;
 } {
@@ -55,6 +56,7 @@ function readEvent(eventPath: string): {
   return {
     event,
     prBody: (pr?.body as string) ?? '',
+    prNumber: typeof pr?.number === 'number' ? pr.number : undefined,
     prTitle: pr?.title as string | undefined,
   };
 }
@@ -104,28 +106,43 @@ export function extractReleaseNotesSection(body: string): string | null {
   return section && !/^[-*]\s*$/.test(section) ? section : '';
 }
 
-export function extractNotes(body: string, fallback = ''): string {
+export function extractNotes(body: string, fallback = '', prNumber?: number): string {
   const releaseNotesSection = extractReleaseNotesSection(body);
+  let notes: string;
   if (releaseNotesSection) {
-    return releaseNotesSection;
+    notes = releaseNotesSection;
+  } else {
+    const cleaned = cleanPrBody(body);
+    const whatChangedMatch =
+      /(?:^|\n)#{1,6}[ \t]+What changed\b[^\n]*\n([\s\S]*?)(?=\n#{1,6}[ \t]|$)/i.exec(cleaned);
+    if (whatChangedMatch) {
+      const section = (whatChangedMatch[1] ?? '').trim();
+      notes = section && !/^[-*]\s*$/.test(section) ? section : fallback.trim();
+    } else {
+      const withoutReleaseInfo = cleaned
+        .replace(/(?:^|\n)#{1,6}[ \t]+Release (?:notes|info)\b[\s\S]*$/i, '')
+        .trim();
+      notes =
+        withoutReleaseInfo && !/^[-*]\s*$/.test(withoutReleaseInfo)
+          ? withoutReleaseInfo
+          : fallback.trim();
+    }
   }
 
-  const cleaned = cleanPrBody(body);
-  const whatChangedMatch =
-    /(?:^|\n)#{1,6}[ \t]+What changed\b[^\n]*\n([\s\S]*?)(?=\n#{1,6}[ \t]|$)/i.exec(cleaned);
-  if (whatChangedMatch) {
-    const section = (whatChangedMatch[1] ?? '').trim();
-    return section && !/^[-*]\s*$/.test(section) ? section : fallback.trim();
+  if (!prNumber || !Number.isInteger(prNumber) || prNumber <= 0 || notes.length === 0) {
+    return notes;
   }
-
-  const withoutReleaseInfo = cleaned
-    .replace(/(?:^|\n)#{1,6}[ \t]+Release (?:notes|info)\b[\s\S]*$/i, '')
-    .trim();
-  if (withoutReleaseInfo && !/^[-*]\s*$/.test(withoutReleaseInfo)) {
-    return withoutReleaseInfo;
+  const alreadyReferenced = new RegExp(
+    `(?:\\(\\s*#${prNumber}\\s*\\)|/pull/${prNumber}\\b|\\b(?:pr|pull\\s+request|in)\\s+#${prNumber}\\b)`,
+    'i',
+  );
+  if (alreadyReferenced.test(notes)) {
+    return notes;
   }
-
-  return fallback.trim();
+  return notes.replace(
+    /([.!?])?$/,
+    (_, punct: string | undefined) => ` (#${prNumber})${punct ?? ''}`,
+  );
 }
 
 export function pickHighestSemverTag(tags: ReadonlyArray<string>): string | null {
@@ -239,7 +256,7 @@ async function main(): Promise<void> {
 
     case 'release-info': {
       if (!args[0]) fail('Usage: version release-info <event-path>');
-      const { prBody, prTitle } = readEvent(args[0]);
+      const { prBody, prNumber, prTitle } = readEvent(args[0]);
       const headTag = getHeadTag();
       const version =
         headTag ??
@@ -250,7 +267,7 @@ async function main(): Promise<void> {
         }).target;
       log(fmt.info(`Version: ${fmt.bold(version)}`));
 
-      const notes = extractNotes(prBody, prTitle ? `- ${prTitle.trim()}` : '');
+      const notes = extractNotes(prBody, prTitle ? `- ${prTitle.trim()}` : '', prNumber);
       log(fmt.info(`Release notes: ${notes ? `${notes.split('\n').length} line(s)` : 'empty'}`));
 
       const delimiter = `NOTES_DELIM_${Date.now()}`;

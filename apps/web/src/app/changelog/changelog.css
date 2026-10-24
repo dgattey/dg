@@ -126,6 +126,52 @@
 .changelog__entry:first-child .changelog__cardInner {
   box-shadow: inset 6px 0 0 var(--vermilion);
 }
+.changelog__cardBody {
+  display: grid;
+}
+.changelog__cardBody[data-has-snapshot="true"] {
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+  gap: 24px;
+  align-items: start;
+  @media (max-width: 760px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.changelog__cardCopy {
+  display: grid;
+  gap: 14px;
+  min-width: 0;
+}
+.changelog__polaroid {
+  padding: 10px;
+  margin: 0;
+  background: var(--cream);
+  border: 1px solid color-mix(in oklab, var(--ink-on-cream) 10%, transparent);
+  border-radius: 12px 10px 13px 11px;
+  box-shadow: var(--pshadow);
+}
+.changelog__polaroidFrame {
+  overflow: hidden;
+  background: color-mix(in oklab, var(--ink-on-cream) 6%, var(--cream));
+  border-radius: 6px;
+}
+.changelog__polaroidImg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.changelog__polaroidCaption {
+  display: grid;
+  gap: 3px;
+  padding: 8px 4px 0;
+}
+.changelog__polaroidTitle {
+  font-family: var(--display);
+  font-size: var(--type-meta);
+  font-weight: 700;
+  line-height: var(--leading-title);
+  color: var(--ink-on-cream);
+}
 .changelog__cardHeader {
   display: flex;
   flex-wrap: wrap;

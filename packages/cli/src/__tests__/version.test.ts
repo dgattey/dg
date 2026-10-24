@@ -119,6 +119,32 @@ describe('extractNotes', () => {
       '- Fix release note extraction',
     );
   });
+
+  it('appends the pull request number before trailing punctuation when the notes omit it', () => {
+    const body = [
+      '# Release notes',
+      '',
+      '- Added a Top playlists card with the #1 song from each playlist.',
+    ].join('\n');
+
+    assert.equal(
+      extractNotes(body, '', 702),
+      '- Added a Top playlists card with the #1 song from each playlist (#702).',
+    );
+  });
+
+  it('leaves notes unchanged when they already cite the pull request', () => {
+    const body = [
+      '# Release notes',
+      '',
+      '- Added a Top playlists card with the #1 song from each playlist (#702).',
+    ].join('\n');
+
+    assert.equal(
+      extractNotes(body, '', 702),
+      '- Added a Top playlists card with the #1 song from each playlist (#702).',
+    );
+  });
 });
 
 describe('version resolution from tags and PR checkboxes', () => {

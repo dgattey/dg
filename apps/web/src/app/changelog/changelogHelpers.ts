@@ -36,11 +36,18 @@ const YEAR_TAG_TONES: ReadonlyArray<PaperTone> = [
 
 const CARD_EDGES: ReadonlyArray<PaperEdge> = ['quad-a', 'quad-b', 'quad-c', 'quad-d'];
 const CARD_TILTS: ReadonlyArray<number> = [-0.6, 0.5, -0.4, 0.7, -0.5, 0.4];
+const POLAROID_TILTS: ReadonlyArray<number> = [-2.6, 2.4, -2.1, 2.8, -2.3, 2.2];
 
 export function releaseCardTreatment(index: number): { edge: PaperEdge; tiltDeg: number } {
   return {
     edge: CARD_EDGES[index % CARD_EDGES.length] ?? 'quad-a',
     tiltDeg: CARD_TILTS[index % CARD_TILTS.length] ?? 0,
+  };
+}
+
+export function snapshotPolaroidTreatment(index: number): { tiltDeg: number } {
+  return {
+    tiltDeg: POLAROID_TILTS[index % POLAROID_TILTS.length] ?? -2.6,
   };
 }
 
@@ -120,7 +127,12 @@ export function groupReleasesByYear(
     const featuredReleases: Array<ChangelogRelease> = [];
     const compactReleases: Array<ChangelogRelease> = [];
     for (const release of yearReleases) {
-      if (release.notes.length > 0 || release.tag === latestTag || release.kind === 'major') {
+      if (
+        release.notes.length > 0 ||
+        release.tag === latestTag ||
+        release.kind === 'major' ||
+        release.snapshot
+      ) {
         featuredReleases.push(release);
       } else {
         compactReleases.push(release);
@@ -139,4 +151,8 @@ export function groupReleasesByYear(
 
 export function githubPullRequestUrl(prNumber: number): string {
   return `${GITHUB_REPOSITORY_URL}/pull/${prNumber}`;
+}
+
+export function formatReleaseNote(note: string): string {
+  return note.replace(/\s*\(#\d+\)(?=[.!?]?$)/g, '').trim();
 }
