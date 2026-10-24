@@ -1,49 +1,14 @@
 'use client';
 
-import { Box } from '@dg/ui/core/Box';
-import type { SxObject } from '@dg/ui/theme';
 import { COLOR_SCHEME_ATTRIBUTE } from '@dg/ui/theme/colorScheme';
-import type { TileComponentProps } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
-import { type CSSProperties, useEffect, useRef, useState } from 'react';
+import { type CSSProperties, useRef } from 'react';
 import type { FramedPath, RouteFrame } from './routeFrame';
 import { ROUTE_MAP_TOKENS } from './routeMapTokens';
-import { stadiaTileUrl, type TileSource } from './tileSource';
+import { SmoothTile, useHostSize } from './SmoothTile';
+import { outdoorsTileUrl, type TileSource } from './tileSource';
 
-const tileImageStyle: CSSProperties = {
-  display: 'block',
-  height: '100%',
-  width: '100%',
-};
-
-/** Lazy, so the hidden scheme's tiles never load until that scheme shows. */
-function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
-  return (
-    <div
-      style={{
-        height: tile.height,
-        left: tile.left,
-        opacity: tile.active ? 1 : 0,
-        overflow: 'hidden',
-        position: 'absolute',
-        top: tile.top,
-        transition: 'opacity 0.2s',
-        width: tile.width,
-      }}
-    >
-      <img
-        alt=""
-        loading="lazy"
-        onLoad={tileLoaded}
-        src={tile.url}
-        srcSet={tile.srcSet}
-        style={tileImageStyle}
-      />
-    </div>
-  );
-}
-
-const routeSvgSx: SxObject = {
+const routeSvgStyle: CSSProperties = {
   height: '100%',
   left: 0,
   overflow: 'visible',
@@ -53,49 +18,55 @@ const routeSvgSx: SxObject = {
   zIndex: 3,
 };
 
-const SCHEMES = ['light', 'dark'] as const;
-
-const schemeLayerSx = (scheme: (typeof SCHEMES)[number]): SxObject => {
-  const dark = scheme === 'dark';
-  const showDark = { display: dark ? 'block' : 'none' };
-  return {
-    display: dark ? 'none' : 'block',
-    inset: 0,
-    position: 'absolute',
-    [`html[${COLOR_SCHEME_ATTRIBUTE}="dark"] &`]: showDark,
-    '@media (prefers-color-scheme: dark)': {
-      [`html:not([${COLOR_SCHEME_ATTRIBUTE}="light"]) &`]: showDark,
-    },
-  };
+const containerStyle: CSSProperties = {
+  height: '100%',
+  isolation: 'isolate',
+  overflow: 'hidden',
+  pointerEvents: 'none',
+  position: 'relative',
+  width: '100%',
+  willChange: 'transform',
 };
 
-function tileUrl({
-  dark,
-  dpr,
-  tileSource,
-  x,
-  y,
-  zoom,
-}: {
-  dark: boolean;
-  dpr?: number;
-  tileSource: TileSource;
-  x: number;
-  y: number;
-  zoom: number;
-}) {
-  return stadiaTileUrl(tileSource, {
-    dark,
-    extension: 'png',
-    retina: Boolean(dpr && dpr > 1),
-    // Outdoors carries trails, contours and greenery, so it still reads as a map
-    // under a scrim. Alidade Smooth Dark is the closest dark counterpart.
-    style: dark ? 'alidade_smooth_dark' : 'outdoors',
-    x,
-    y,
-    zoom,
-  });
+const tileLayerStyle: CSSProperties = {
+  inset: 0,
+  position: 'absolute',
+  zIndex: 1,
+};
+
+const SCHEMES = ['light', 'dark'] as const;
+
+const ROUTE_MAP_CSS = `
+[data-map-scheme] {
+  inset: 0;
+  position: absolute;
 }
+[data-map-scheme="light"] {
+  display: block;
+}
+[data-map-scheme="dark"] {
+  display: none;
+}
+html[${COLOR_SCHEME_ATTRIBUTE}="dark"] [data-map-scheme="light"] {
+  display: none;
+}
+html[${COLOR_SCHEME_ATTRIBUTE}="dark"] [data-map-scheme="dark"] {
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  html:not([${COLOR_SCHEME_ATTRIBUTE}="light"]) [data-map-scheme="light"] {
+    display: none;
+  }
+  html:not([${COLOR_SCHEME_ATTRIBUTE}="light"]) [data-map-scheme="dark"] {
+    display: block;
+  }
+}
+[data-map-tile-layer] > div {
+  background-color: transparent !important;
+  height: 100% !important;
+  width: 100% !important;
+}
+`;
 
 type RouteMapProps = {
   frame: RouteFrame;
@@ -112,62 +83,21 @@ type RouteMapProps = {
  */
 export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ height: frame.height, width: frame.width });
+  const size = useHostSize(containerRef, { height: frame.height, width: frame.width });
   const zoom =
     frame.zoom + Math.log2(Math.max(size.width / frame.width, size.height / frame.height));
 
-  useEffect(() => {
-    const element = containerRef.current;
-    if (!element) {
-      return;
-    }
-
-    // borderBoxSize ignores ancestor transforms (rotated collage cards) but keeps
-    // fractional pixels, unlike getBoundingClientRect or offsetWidth.
-    const observer = new ResizeObserver(([entry]) => {
-      const box = entry?.borderBoxSize[0];
-      if (box && box.blockSize > 0 && box.inlineSize > 0) {
-        setSize({ height: box.blockSize, width: box.inlineSize });
-      }
-    });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
-
-  const containerSx: SxObject = {
-    height: '100%',
-    isolation: 'isolate',
-    overflow: 'hidden',
-    pointerEvents: 'none',
-    position: 'relative',
-    width: '100%',
-    willChange: 'transform',
-  };
-
   return (
-    <Box aria-hidden="true" ref={containerRef} sx={containerSx}>
+    <div aria-hidden="true" ref={containerRef} style={containerStyle}>
+      <style href="dg-route-map" precedence="default">
+        {ROUTE_MAP_CSS}
+      </style>
       {SCHEMES.map((scheme) => {
         const dark = scheme === 'dark';
         const tokens = ROUTE_MAP_TOKENS[scheme];
-        const tileLayerSx: SxObject = {
-          '& > div': {
-            backgroundColor: 'transparent !important',
-            height: '100% !important',
-            width: '100% !important',
-          },
-          inset: 0,
-          position: 'absolute',
-          zIndex: 1,
-        };
-        const scrimSx: SxObject = {
-          background: tokens.scrimGradient,
-          inset: 0,
-          position: 'absolute',
-          zIndex: 2,
-        };
         return (
-          <Box key={scheme} sx={{ ...schemeLayerSx(scheme), backgroundColor: tokens.background }}>
-            <Box sx={tileLayerSx}>
+          <div data-map-scheme={scheme} key={scheme} style={{ backgroundColor: tokens.background }}>
+            <div data-map-tile-layer="" style={tileLayerStyle}>
               <PigeonMapCore
                 animate={false}
                 attribution={false}
@@ -177,7 +107,7 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
                 key={`${Math.round(size.width)}x${Math.round(size.height)}`}
                 mouseEvents={false}
                 provider={(x, y, tileZoom, dpr) =>
-                  tileUrl({ dark, dpr, tileSource, x, y, zoom: tileZoom })
+                  outdoorsTileUrl(tileSource, { dark, dpr, x, y, zoom: tileZoom })
                 }
                 tileComponent={SmoothTile}
                 touchEvents={false}
@@ -185,20 +115,26 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
                 zoom={zoom}
                 zoomSnap={false}
               />
-            </Box>
-            <Box sx={scrimSx} />
-          </Box>
+            </div>
+            <div
+              style={{
+                background: tokens.scrimGradient,
+                inset: 0,
+                position: 'absolute',
+                zIndex: 2,
+              }}
+            />
+          </div>
         );
       })}
-      <Box
-        component="svg"
+      <svg
+        aria-hidden="true"
         preserveAspectRatio="xMidYMid slice"
-        sx={routeSvgSx}
+        style={routeSvgStyle}
         viewBox={`0 0 ${frame.width} ${frame.height}`}
       >
         {paths.map(({ d, tone }) => (
-          <Box
-            component="path"
+          <path
             d={d}
             fill="none"
             key={`casing-${tone}`}
@@ -210,8 +146,7 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
           />
         ))}
         {paths.map(({ d, tone }) => (
-          <Box
-            component="path"
+          <path
             d={d}
             data-tone={tone}
             fill="none"
@@ -223,7 +158,7 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
             vectorEffect="non-scaling-stroke"
           />
         ))}
-      </Box>
-    </Box>
+      </svg>
+    </div>
   );
 }

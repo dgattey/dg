@@ -95,7 +95,7 @@ function toTrackDisplayData(track: v.InferOutput<typeof trackDisplaySchema>): Tr
 
 async function spotifyGetWithRateLimitRetry<T>(
   resource: string,
-  schema: v.GenericSchema<unknown, T>,
+  schema: v.BaseSchema<unknown, T, v.BaseIssue<unknown>>,
   context: string,
 ): Promise<SpotifyRequestResult<T>> {
   let attempt = 0;

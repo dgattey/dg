@@ -1,17 +1,17 @@
 import 'server-only';
 
+import type { StatsRange } from '@dg/shared-core/dates/statsRange';
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import type {
   StatsChampions,
   StatsMatrix,
   StatsMatrixCell,
   StatsMatrixRow,
-  StatsRange,
   StatsTimeline,
   StatsTrack,
 } from './fetchListeningStats';
 import { toStatsTopTrack } from './listeningStatsCatalog';
-import { phaseOf, type StatsNow, shiftPhase, spanPhase } from './listeningStatsPhase';
+import { phaseOf, type StatsNow, shiftPhase } from './listeningStatsPhase';
 
 const MONTH_ABBR = [
   'Jan',
@@ -179,16 +179,15 @@ export function buildRangeBreakdowns({
     const matrixRows: Array<StatsMatrixRow> = MONTH_ABBR.map((monthName, mIdx) => {
       const month = `${year}-${String(mIdx + 1).padStart(2, '0')}`;
       return {
-        cells: weekRanges.map((span, wIdx) => ({
-          key: `${month}-w${wIdx + 1}`,
-          label: `${monthName} ${span}, ${year}`,
-          phase: spanPhase(
-            `${month}-${String(wIdx * 7 + 1).padStart(2, '0')}`,
-            `${month}-${wIdx === weekRanges.length - 1 ? '31' : String(wIdx * 7 + 7).padStart(2, '0')}`,
-            now,
-          ),
-          plays: monthWeekTotals[mIdx]?.[wIdx] ?? 0,
-        })),
+        cells: weekRanges.map((span, wIdx) => {
+          const key = `${month}-w${wIdx + 1}`;
+          return {
+            key,
+            label: `${monthName} ${span}, ${year}`,
+            phase: phaseOf(key, now),
+            plays: monthWeekTotals[mIdx]?.[wIdx] ?? 0,
+          };
+        }),
         key: month,
         label: monthName,
       };

@@ -1,11 +1,7 @@
 import { dbClient } from '@dg/db';
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
-import {
-  fetchListeningStats,
-  longestDayStreak,
-  longestMonthStreak,
-  parseStatsRange,
-} from '../fetchListeningStats';
+import { parseStatsRange } from '@dg/shared-core/dates/statsRange';
+import { fetchListeningStats, longestDayStreak, longestMonthStreak } from '../fetchListeningStats';
 
 const mockSpotifyGet = jest.fn();
 

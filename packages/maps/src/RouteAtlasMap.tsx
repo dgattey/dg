@@ -1,10 +1,8 @@
 'use client';
 
-import { Box } from '@dg/ui/core/Box';
-import type { SxObject } from '@dg/ui/theme';
-import type { Point, TileComponentProps } from 'pigeon-maps';
+import type { Point } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
-import { type CSSProperties, use, useEffect, useRef, useState } from 'react';
+import { type CSSProperties, use, useRef, useState } from 'react';
 import { VisibleRoutes } from '../VisibleRoutes';
 import { OFFLINE_TILES } from './offlineTile';
 import { RouteAtlasSketch } from './RouteAtlasSketch';
@@ -18,7 +16,8 @@ import {
   type RouteFrame,
 } from './routeFrame';
 import { ROUTE_MAP_TOKENS } from './routeMapTokens';
-import { stadiaTileUrl, type TileSource } from './tileSource';
+import { SmoothTile, useHostSize } from './SmoothTile';
+import { outdoorsTileUrl, type TileSource } from './tileSource';
 import { useDarkMap } from './useDarkMap';
 import { ZoomControls } from './ZoomControls';
 
@@ -30,12 +29,6 @@ const DEFAULT_SIZE = { height: 600, width: 800 };
 const REPROJECT_ZOOM_DELTA = 0.75;
 const REPROJECT_PAN_FRACTION = 0.5;
 
-const tileImageStyle: CSSProperties = {
-  display: 'block',
-  height: '100%',
-  width: '100%',
-};
-
 const overlaySvgStyle: CSSProperties = {
   display: 'block',
   height: '100%',
@@ -45,32 +38,6 @@ const overlaySvgStyle: CSSProperties = {
   position: 'absolute',
   width: '100%',
 };
-
-function AtlasTile({ tile, tileLoaded }: TileComponentProps) {
-  return (
-    <div
-      style={{
-        height: tile.height,
-        left: tile.left,
-        opacity: tile.active ? 1 : 0,
-        overflow: 'hidden',
-        position: 'absolute',
-        top: tile.top,
-        transition: 'opacity 0.2s',
-        width: tile.width,
-      }}
-    >
-      <img
-        alt=""
-        loading="lazy"
-        onLoad={tileLoaded}
-        src={tile.url}
-        srcSet={tile.srcSet}
-        style={tileImageStyle}
-      />
-    </div>
-  );
-}
 
 type AtlasRoutesOverlayProps = {
   anchor: Point;
@@ -143,7 +110,7 @@ function pixelSeparation(a: Point, b: Point, zoom: number): number {
   return Math.hypot(dx, dy);
 }
 
-const containerSx: SxObject = {
+const containerStyle: CSSProperties = {
   height: '100%',
   isolation: 'isolate',
   overflow: 'hidden',
@@ -152,11 +119,16 @@ const containerSx: SxObject = {
   willChange: 'transform',
 };
 
-const canvasSx: SxObject = {
-  '& > svg': { display: 'block', height: '100%', width: '100%' },
-  inset: 0,
-  position: 'absolute',
-};
+const ROUTE_ATLAS_CSS = `
+[data-atlas-canvas] > svg {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+[data-atlas-tiles] > div {
+  background-color: transparent !important;
+}
+`;
 
 type ViewportSnapshot = {
   boundsKey: string;
@@ -179,31 +151,16 @@ export function RouteAtlasMap({
   tileSource,
   view = null,
 }: RouteAtlasMapProps) {
-  const hostRef = useRef<HTMLDivElement>(null);
+  const hostRef = useRef<HTMLElement>(null);
   const visible = use(VisibleRoutes);
   const dark = useDarkMap();
   const offline = tileSource.mode === 'offline';
   const activeBounds = view ?? bounds;
   const boundsKey = `${activeBounds[0][0]},${activeBounds[0][1]}:${activeBounds[1][0]},${activeBounds[1][1]}`;
 
-  const [size, setSize] = useState(DEFAULT_SIZE);
+  const size = useHostSize(hostRef, DEFAULT_SIZE, { disabled: offline, round: true });
   const [viewportState, setViewportState] = useState<ViewportSnapshot | null>(null);
   const [projectedViewport, setProjectedViewport] = useState<ViewportSnapshot | null>(null);
-
-  useEffect(() => {
-    const host = hostRef.current;
-    if (offline || !host) {
-      return;
-    }
-    const observer = new ResizeObserver(([entry]) => {
-      const box = entry?.borderBoxSize[0];
-      if (box && box.blockSize > 0 && box.inlineSize > 0) {
-        setSize({ height: Math.round(box.blockSize), width: Math.round(box.inlineSize) });
-      }
-    });
-    observer.observe(host);
-    return () => observer.disconnect();
-  }, [offline]);
 
   const filteredRoutes = visible ? routes.filter(({ id }) => visible.has(id)) : routes;
   const defaultFrame = frameAround(activeBounds, {
@@ -228,30 +185,34 @@ export function RouteAtlasMap({
   const paths = offline ? [] : framePaths(baseFrame, decodeRoutes(filteredRoutes), frameMargin);
 
   const tokens = dark ? ROUTE_MAP_TOKENS.dark : ROUTE_MAP_TOKENS.light;
-  const tileLayerSx: SxObject = {
-    '& > div': {
-      backgroundColor: 'transparent !important',
-    },
-    backgroundColor: tokens.background,
-    inset: 0,
-    position: 'absolute',
-    zIndex: 1,
-  };
 
   return (
-    <Box aria-label={label} ref={hostRef} role="region" sx={containerSx}>
+    <section aria-label={label} ref={hostRef} style={containerStyle}>
+      <style href="dg-route-atlas" precedence="default">
+        {ROUTE_ATLAS_CSS}
+      </style>
       {offline ? (
-        <Box
-          sx={{
-            ...canvasSx,
+        <div
+          data-atlas-canvas=""
+          style={{
             backgroundImage: `url("${dark ? OFFLINE_TILES.dark : OFFLINE_TILES.light}")`,
+            inset: 0,
+            position: 'absolute',
           }}
         >
           <RouteAtlasSketch bounds={activeBounds} routes={filteredRoutes} />
-        </Box>
+        </div>
       ) : (
         <>
-          <Box sx={tileLayerSx}>
+          <div
+            data-atlas-tiles=""
+            style={{
+              backgroundColor: tokens.background,
+              inset: 0,
+              position: 'absolute',
+              zIndex: 1,
+            }}
+          >
             <PigeonMapCore
               attribution={false}
               center={activeCenter}
@@ -277,17 +238,9 @@ export function RouteAtlasMap({
                 }
               }}
               provider={(x, y, tileZoom, dpr) =>
-                stadiaTileUrl(tileSource, {
-                  dark,
-                  extension: 'png',
-                  retina: Boolean(dpr && dpr > 1),
-                  style: dark ? 'alidade_smooth_dark' : 'outdoors',
-                  x,
-                  y,
-                  zoom: tileZoom,
-                })
+                outdoorsTileUrl(tileSource, { dark, dpr, x, y, zoom: tileZoom })
               }
-              tileComponent={AtlasTile}
+              tileComponent={SmoothTile}
               twoFingerDrag={true}
               zoom={activeZoom}
               zoomSnap={false}
@@ -299,7 +252,7 @@ export function RouteAtlasMap({
                 paths={paths}
               />
             </PigeonMapCore>
-          </Box>
+          </div>
           <ZoomControls
             onReset={() => {
               setViewportState(null);
@@ -322,6 +275,6 @@ export function RouteAtlasMap({
           />
         </>
       )}
-    </Box>
+    </section>
   );
 }

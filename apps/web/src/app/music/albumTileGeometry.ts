@@ -1,11 +1,4 @@
-import { createTransition, EASING_DEFAULT, TIMING_FAST } from '@dg/ui/helpers/timing';
-import type { SxObject } from '@dg/ui/theme';
-
-const ALBUM_TILE_BORDER_RADIUS = 1.5;
-
-const albumArtHoverTransitionSx: SxObject = {
-  transition: createTransition('transform', TIMING_FAST, EASING_DEFAULT),
-};
+import type { CSSProperties } from 'react';
 
 /** Sleeves drawn behind a front cover at most, however long the run is. */
 export const MAX_ALBUM_SLEEVES = 2;
@@ -29,38 +22,19 @@ const FAN_TILT_GROWTH = (() => {
 
 const COVER_INSET_PERCENT = Math.ceil(2 * (50 - (50 - MAX_FAN_SHIFT) / FAN_TILT_GROWTH)) / 2;
 
-export const albumTileSlotSx: SxObject = {
-  '& > *, & a': { display: 'block', width: '100%' },
-};
-
-export const albumTileFrameSx: SxObject = {
-  aspectRatio: '1 / 1',
-  position: 'relative',
-  width: '100%',
-};
-
-export function albumCoverSx(depth: number, sleeveCount: number): SxObject {
+export function albumCoverStyle(depth: number, sleeveCount: number): CSSProperties {
   const shift = (depth - sleeveCount / 2) * LAYER_SHIFT_PERCENT;
   const spread = 'var(--album-fan-spread, 1)';
   const offset = `calc(${shift}% * ${spread})`;
 
   return {
-    border: 'thin solid var(--dg-palette-card-border)',
-    borderRadius: ALBUM_TILE_BORDER_RADIUS,
-    ...(depth === 0 ? { boxShadow: '0 1.5px 0 rgb(0 0 0 / 0.18)' } : {}),
     inset: `${COVER_INSET_PERCENT}%`,
-    lineHeight: 0,
-    overflow: 'hidden',
-    position: 'absolute',
     transform: `translate(${offset}, calc(-1 * ${offset})) rotate(${depth * LAYER_TILT_DEG}deg)`,
-    ...albumArtHoverTransitionSx,
   };
 }
 
-export function albumSleeveScrimSx(depth: number): SxObject {
+export function albumSleeveScrimStyle(depth: number): CSSProperties {
   return {
     backgroundColor: `color-mix(in srgb, var(--dg-palette-background-default) ${depth * SLEEVE_RECESSION_PERCENT}%, transparent)`,
-    inset: 0,
-    position: 'absolute',
   };
 }

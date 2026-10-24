@@ -1,31 +1,25 @@
 import 'server-only';
 
 import { db, Op } from '@dg/db';
+import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
-import * as v from 'valibot';
-import { selectArtistFirstPlays, TIME_ZONE } from './listeningStatsQueries';
+import { selectArtistFirstPlays } from './listeningStatsQueries';
 import { resolveTrackDisplays } from './trackDisplays';
 
-/**
- * Lightweight history track for UI rendering.
- * Uses valibot for schema definition and runtime validation.
- */
-const historyTrackSchema = v.object({
-  albumId: v.string(),
-  albumImageUrl: v.string(),
-  albumName: v.string(),
+export type HistoryTrack = {
+  albumId: string;
+  albumImageUrl: string;
+  albumName: string;
   /** Spotify album page, empty when we never captured one. */
-  albumUrl: v.string(),
-  artistNames: v.string(),
+  albumUrl: string;
+  artistNames: string;
   /** `New artist this week|month|year` when one of the track's artists was first played then. */
-  newArtist: v.nullable(v.string()),
-  playedAt: v.string(),
-  trackId: v.string(),
-  trackName: v.string(),
-  url: v.string(),
-});
-
-export type HistoryTrack = v.InferOutput<typeof historyTrackSchema>;
+  newArtist: string | null;
+  playedAt: string;
+  trackId: string;
+  trackName: string;
+  url: string;
+};
 
 type MusicHistoryPage = {
   tracks: Array<HistoryTrack>;
@@ -44,7 +38,7 @@ type SpotifyHistoryRow = {
 
 const DEFAULT_PAGE_SIZE = 24;
 
-const pacificDayFormat = new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE });
+const pacificDayFormat = new Intl.DateTimeFormat('en-CA', { timeZone: SITE_TIME_ZONE });
 
 /** The Pacific calendar day as `YYYY-MM-DD`, then the Monday that starts its week. */
 function pacificCalendar(date: Date) {
@@ -123,7 +117,7 @@ export async function fetchMusicHistoryPage({
       const newestFirstPlay = Math.max(
         ...display.artists.map((artist) => firstPlays.get(artist.id)?.getTime() ?? 0),
       );
-      return v.parse(historyTrackSchema, {
+      return {
         albumId: display.album.id,
         albumImageUrl: display.album.imageUrl,
         albumName: display.album.name,
@@ -134,7 +128,7 @@ export async function fetchMusicHistoryPage({
         trackId: display.id,
         trackName: display.name,
         url: display.url,
-      });
+      };
     })
     .filter(isNotNullish);
 

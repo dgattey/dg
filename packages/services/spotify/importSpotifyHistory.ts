@@ -1,7 +1,6 @@
 import 'server-only';
 
 import { db, Op } from '@dg/db';
-import { MusicAlbum } from '@dg/db/models/MusicAlbum';
 import { MusicArtist } from '@dg/db/models/MusicArtist';
 import { MusicTrack } from '@dg/db/models/MusicTrack';
 import { log } from '@dg/shared-core/logging/log';
@@ -12,13 +11,10 @@ import {
   type ParseHistoryFilterOptions,
   parseExtendedStreamingHistory,
 } from './parseSpotifyHistoryExport';
-import { cacheTrackData } from './trackDisplays';
-import { sleep, type TrackMetadata } from './trackMetadataShared';
-import {
-  fetchTrackDisplayData,
-  searchTrackDisplayData,
-  type TrackDisplayData,
-} from './trackMetadataSingle';
+import { insertSpotifyPlayBatch } from './syncSpotifyHistory';
+import { cacheTrackData, resolveTrackDisplays } from './trackDisplays';
+import { mapInBatches, type TrackMetadata } from './trackMetadataShared';
+import { searchTrackDisplayData, type TrackDisplayData } from './trackMetadataSingle';
 
 /**
  * Spotify's Extended Streaming History export records `ts` in whole seconds,
@@ -30,8 +26,6 @@ const API_TIMESTAMP_SKEW_MS = 10_000;
 const MINUTE_TIMESTAMP_SKEW_MS = 60_000;
 const INSERT_BATCH_SIZE = 2_000;
 const METADATA_LOOKUP_BATCH_SIZE = 1_000;
-const FETCH_CONCURRENCY = 5;
-const FETCH_THROTTLE_MS = 100;
 
 export type ImportSpotifyHistoryOptions = ParseHistoryFilterOptions & { dryRun?: boolean };
 export type SpotifyHistoryImportResult = {
@@ -88,24 +82,14 @@ async function resolveBasicHistoryTrackIds(
     }
 
     const stillMissing = [...missingPairs.entries()].filter(([key]) => !byName.has(key));
+    const searched = await mapInBatches(stillMissing, async ([key, pair]) => {
+      const data = await searchTrackDisplayData(pair.trackName, pair.artistName);
+      return data ? { data, key } : null;
+    });
     const searchedDisplays: Array<TrackDisplayData> = [];
-    for (let i = 0; i < stillMissing.length; i += FETCH_CONCURRENCY) {
-      const batch = stillMissing.slice(i, i + FETCH_CONCURRENCY);
-      const results = await Promise.allSettled(
-        batch.map(async ([key, pair]) => ({
-          data: await searchTrackDisplayData(pair.trackName, pair.artistName),
-          key,
-        })),
-      );
-      for (const res of results) {
-        if (res.status === 'fulfilled' && res.value.data) {
-          byName.set(res.value.key, res.value.data.track.id);
-          searchedDisplays.push(res.value.data);
-        }
-      }
-      if (i + FETCH_CONCURRENCY < stillMissing.length) {
-        await sleep(FETCH_THROTTLE_MS);
-      }
+    for (const { data, key } of searched) {
+      byName.set(key, data.track.id);
+      searchedDisplays.push(data);
     }
     await cacheTrackData(searchedDisplays);
   }
@@ -199,47 +183,14 @@ async function resolveTrackMetadata(
 
   const missingAfterPlayTable = trackIds.filter((id) => !metadata.has(id));
   if (missingAfterPlayTable.length > 0) {
-    const cachedTracks = await MusicTrack.findAll({
-      include: [MusicAlbum, { model: MusicArtist, through: { attributes: ['position'] } }],
-      where: { id: { [Op.in]: missingAfterPlayTable } },
-    });
-    for (const track of cachedTracks) {
-      const artists = track.artists ?? [];
-      if (track.albumId && artists.length > 0) {
-        metadata.set(track.id, {
-          albumId: track.albumId,
-          artistIds: artists.map((artist) => artist.id),
-        });
-      }
+    const displays = await resolveTrackDisplays(missingAfterPlayTable);
+    for (const [id, display] of displays) {
+      metadata.set(id, {
+        albumId: display.album.id,
+        artistIds: display.artists.map((artist) => artist.id),
+      });
     }
   }
-
-  const missingIds = trackIds.filter((id) => !metadata.has(id));
-  const fetchedDisplays: Array<TrackDisplayData> = [];
-  for (let i = 0; i < missingIds.length; i += FETCH_CONCURRENCY) {
-    const batch = missingIds.slice(i, i + FETCH_CONCURRENCY);
-    const results = await Promise.allSettled(
-      batch.map(async (trackId) => ({
-        data: await fetchTrackDisplayData(trackId),
-        requestedId: trackId,
-      })),
-    );
-    for (const result of results) {
-      if (result.status === 'fulfilled' && result.value.data) {
-        const { data, requestedId } = result.value;
-        fetchedDisplays.push(data);
-        metadata.set(requestedId, {
-          albumId: data.album.id,
-          artistIds: data.artists.map((artist) => artist.id),
-        });
-      }
-    }
-    if (i + FETCH_CONCURRENCY < missingIds.length) {
-      await sleep(FETCH_THROTTLE_MS);
-    }
-  }
-
-  await cacheTrackData(fetchedDisplays);
   return metadata;
 }
 
@@ -306,12 +257,7 @@ export async function importSpotifyHistoryEntries(
 
   let imported = 0;
   for (let i = 0; i < rowsToInsert.length; i += INSERT_BATCH_SIZE) {
-    const batch = rowsToInsert.slice(i, i + INSERT_BATCH_SIZE);
-    const batchKeys = { [Op.or]: batch.map(({ playedAt, trackId }) => ({ playedAt, trackId })) };
-    const beforeCount = await db.SpotifyPlay.count({ where: batchKeys });
-    await db.SpotifyPlay.bulkCreate(batch, { ignoreDuplicates: true });
-    const afterCount = await db.SpotifyPlay.count({ where: batchKeys });
-    imported += afterCount - beforeCount;
+    imported += await insertSpotifyPlayBatch(rowsToInsert.slice(i, i + INSERT_BATCH_SIZE));
   }
 
   const failedIds = [...failedTrackIds];

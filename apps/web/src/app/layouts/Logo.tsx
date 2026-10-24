@@ -8,7 +8,6 @@ import {
 import { pageTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCY, TIMING_BOUNCY } from '@dg/ui/helpers/timing';
-import type { SxObject } from '@dg/ui/theme';
 import { usePathname } from 'next/navigation';
 import type { CSSProperties, MouseEvent } from 'react';
 import type { StickerInks } from './logoMark';
@@ -26,26 +25,28 @@ const markInks: StickerInks = {
   mat: 'var(--cream)',
 };
 
-const logoLinkSx: SxObject = {
-  '&:focus-visible': {
-    outline: '-webkit-focus-ring-color auto 1px',
-  },
-  '&:hover': {
-    textDecoration: 'none',
-    transform: 'scale(1.05)',
-  },
-  alignItems: 'center',
-  color: 'var(--ink)',
-  display: 'flex',
-  flexShrink: 0,
-  fontSize: '2.25em',
-  justifyContent: 'center',
-  lineHeight: 1,
-  padding: 0.5,
-  textDecoration: 'none',
-  transition: createTransition('transform', TIMING_BOUNCY, EASING_BOUNCY),
-  willChange: 'transform',
-};
+const LOGO_CSS = `
+.chrome__logo {
+  align-items: center;
+  color: var(--ink);
+  display: flex;
+  flex-shrink: 0;
+  font-size: 2.25em;
+  justify-content: center;
+  line-height: 1;
+  padding: 4px;
+  text-decoration: none;
+  transition: ${createTransition('transform', TIMING_BOUNCY, EASING_BOUNCY)};
+  will-change: transform;
+}
+.chrome__logo:hover {
+  text-decoration: none;
+  transform: scale(1.05);
+}
+.chrome__logo:focus-visible {
+  outline: -webkit-focus-ring-color auto 1px;
+}
+`;
 
 export function Logo() {
   const pathname = usePathname() ?? '/';
@@ -61,14 +62,18 @@ export function Logo() {
   };
 
   return (
-    <Link
-      className="chrome__logo"
-      href={homeRoute}
-      onClick={handleClick}
-      sx={logoLinkSx}
-      transitionTypes={pageTransitionTypes('close')}
-    >
-      <StickerMark inks={markInks} label="dg." style={markStyle} />
-    </Link>
+    <>
+      <style href="dg-logo" precedence="default">
+        {LOGO_CSS}
+      </style>
+      <Link
+        className="chrome__logo"
+        href={homeRoute}
+        onClick={handleClick}
+        transitionTypes={pageTransitionTypes('close')}
+      >
+        <StickerMark inks={markInks} label="dg." style={markStyle} />
+      </Link>
+    </>
   );
 }

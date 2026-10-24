@@ -17,10 +17,30 @@ import type { TrackMetadata } from './trackMetadataShared';
  */
 const SPOTIFY_HISTORY_LIMIT = 50;
 
-type SpotifyPlayRow = TrackMetadata & {
+export type SpotifyPlayRow = TrackMetadata & {
   playedAt: Date;
   trackId: string;
 };
+
+/**
+ * Inserts a batch of `SpotifyPlay` rows with `ignoreDuplicates` and returns the
+ * exact number of newly inserted rows by counting matching primary keys before
+ * and after (`bulkCreate` with `ignoreDuplicates` does not reliably set `isNewRecord`).
+ */
+export async function insertSpotifyPlayBatch(
+  plays: ReadonlyArray<SpotifyPlayRow>,
+): Promise<number> {
+  if (plays.length === 0) {
+    return 0;
+  }
+  const batchKeys = {
+    [Op.or]: plays.map(({ playedAt, trackId }) => ({ playedAt, trackId })),
+  };
+  const countBefore = await db.SpotifyPlay.count({ where: batchKeys });
+  await db.SpotifyPlay.bulkCreate([...plays], { ignoreDuplicates: true });
+  const countAfter = await db.SpotifyPlay.count({ where: batchKeys });
+  return countAfter - countBefore;
+}
 
 export class SpotifyHistoryUnavailableError extends Error {
   readonly status: number;
@@ -120,20 +140,7 @@ export async function syncSpotifyPlaysSince(options?: SyncPlaysOptions): Promise
     );
   }
 
-  // Count this batch's primary keys before and after insert
-  // (bulkCreate with ignoreDuplicates doesn't reliably set isNewRecord).
-  // Scoping to the batch keeps other writers to the table out of the delta.
-  const batchKeys = {
-    [Op.or]: plays.map(({ playedAt, trackId }) => ({ playedAt, trackId })),
-  };
-  const countBefore = await db.SpotifyPlay.count({ where: batchKeys });
-
-  await db.SpotifyPlay.bulkCreate(plays, {
-    ignoreDuplicates: true,
-  });
-
-  const countAfter = await db.SpotifyPlay.count({ where: batchKeys });
-  const inserted = countAfter - countBefore;
+  const inserted = await insertSpotifyPlayBatch(plays);
   log.info('Spotify plays synced', {
     gapDetected,
     inserted,

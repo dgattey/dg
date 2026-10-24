@@ -12,18 +12,18 @@ const layersIn = (container: HTMLElement) => [
 
 describe('AlbumGradientBackdrop', () => {
   it('paints nothing until a gradient is known', () => {
-    const { container } = render(<AlbumGradientBackdrop containerSx={{}} />);
+    const { container } = render(<AlbumGradientBackdrop containerStyle={{}} />);
 
     expect(layersIn(container)).toHaveLength(0);
   });
 
   it('keeps the outgoing gradient painted while the new one fades in', () => {
     const { container, rerender } = render(
-      <AlbumGradientBackdrop containerSx={{}} gradient={BLUE} />,
+      <AlbumGradientBackdrop containerStyle={{}} gradient={BLUE} />,
     );
     const outgoing = layersIn(container)[0];
 
-    rerender(<AlbumGradientBackdrop containerSx={{}} gradient={ORANGE} />);
+    rerender(<AlbumGradientBackdrop containerStyle={{}} gradient={ORANGE} />);
 
     const layers = layersIn(container);
     expect(layers).toHaveLength(2);
@@ -32,9 +32,9 @@ describe('AlbumGradientBackdrop', () => {
 
   it('drops the spent layer once the incoming one is fully opaque', () => {
     const { container, rerender } = render(
-      <AlbumGradientBackdrop containerSx={{}} gradient={BLUE} />,
+      <AlbumGradientBackdrop containerStyle={{}} gradient={BLUE} />,
     );
-    rerender(<AlbumGradientBackdrop containerSx={{}} gradient={ORANGE} />);
+    rerender(<AlbumGradientBackdrop containerStyle={{}} gradient={ORANGE} />);
     const incoming = layersIn(container)[1];
 
     if (incoming) {
@@ -46,9 +46,9 @@ describe('AlbumGradientBackdrop', () => {
 
   it('leaves the stack alone when an already-replaced layer finishes late', () => {
     const { container, rerender } = render(
-      <AlbumGradientBackdrop containerSx={{}} gradient={BLUE} />,
+      <AlbumGradientBackdrop containerStyle={{}} gradient={BLUE} />,
     );
-    rerender(<AlbumGradientBackdrop containerSx={{}} gradient={ORANGE} />);
+    rerender(<AlbumGradientBackdrop containerStyle={{}} gradient={ORANGE} />);
     const outgoing = layersIn(container)[0];
 
     if (outgoing) {
@@ -60,21 +60,21 @@ describe('AlbumGradientBackdrop', () => {
 
   it('reuses the same layer when the gradient is unchanged', () => {
     const { container, rerender } = render(
-      <AlbumGradientBackdrop containerSx={{}} gradient={BLUE} />,
+      <AlbumGradientBackdrop containerStyle={{}} gradient={BLUE} />,
     );
     const original = layersIn(container)[0];
 
-    rerender(<AlbumGradientBackdrop containerSx={{}} gradient={BLUE} />);
+    rerender(<AlbumGradientBackdrop containerStyle={{}} gradient={BLUE} />);
 
     expect(layersIn(container)).toEqual([original]);
   });
 
   it('clears every layer when the gradient goes away', () => {
     const { container, rerender } = render(
-      <AlbumGradientBackdrop containerSx={{}} gradient={BLUE} />,
+      <AlbumGradientBackdrop containerStyle={{}} gradient={BLUE} />,
     );
 
-    rerender(<AlbumGradientBackdrop containerSx={{}} />);
+    rerender(<AlbumGradientBackdrop containerStyle={{}} />);
 
     expect(layersIn(container)).toHaveLength(0);
   });

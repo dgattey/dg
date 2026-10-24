@@ -81,7 +81,7 @@ export const mapPlaylistAlbumsFromApi = (items: Array<unknown>): Array<PlaylistA
       name: track.album.name,
       primaryArtist: track.artists[0]?.name ?? '',
       releaseDate: track.album.releaseDate,
-      url: track.album.externalUrls.spotify,
+      url: track.album.url,
     });
   }
   return [...albums.values()].sort((a, b) => b.addedAt.localeCompare(a.addedAt));

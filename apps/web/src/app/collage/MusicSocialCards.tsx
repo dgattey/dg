@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { AlbumCoverBox } from './MusicStatsSocialCard';
 import { PAPER_PALETTE } from './paperPalette';
 import {
@@ -9,7 +10,8 @@ import {
   SocialCardFrame,
   SocialCardHeadline,
   SocialCardMattedCard,
-  SocialCardStamp,
+  SocialCardSplit,
+  SocialCardStampRow,
   SocialCardTag,
 } from './SocialCardParts';
 import { SocialCardScallop } from './SocialCardScallop';
@@ -70,6 +72,80 @@ const GALLERY_SLOTS = [
   { left: 276, tiltDeg: -2.5, top: 248 },
 ] as const;
 
+type GalleryAlbumTile = {
+  artistNames: string;
+  badge?: ReactNode;
+  imageUrl: string | null;
+  title: string;
+};
+
+function SocialCardAlbumGallery({
+  items,
+  tints,
+}: {
+  items: ReadonlyArray<GalleryAlbumTile>;
+  tints: ReadonlyArray<PaperColor>;
+}) {
+  return (
+    <div style={{ display: 'flex', height: 500, position: 'relative', width: 520 }}>
+      {GALLERY_SLOTS.map((slot, index) => {
+        const album = items[index];
+        if (!album) {
+          return null;
+        }
+        const matTone = tints[index % tints.length] ?? 'ochre';
+        return (
+          <div
+            key={`${album.title}-${slot.left}-${slot.top}`}
+            style={{
+              background: PAPER_PALETTE[matTone],
+              borderRadius: QUAD_A,
+              boxShadow: PAPER_SHADOW,
+              color: inkForTone(matTone),
+              display: 'flex',
+              flexDirection: 'column',
+              left: slot.left,
+              padding: 10,
+              position: 'absolute',
+              top: slot.top,
+              transform: `rotate(${slot.tiltDeg}deg)`,
+              width: 232,
+            }}
+          >
+            <AlbumCoverBox fallbackTone={matTone} imageUrl={album.imageUrl} size={172} />
+            <span
+              style={{
+                fontSize: 17,
+                fontWeight: 700,
+                letterSpacing: '-0.01em',
+                lineHeight: 1.15,
+                marginTop: 8,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {album.title}
+            </span>
+            <span
+              style={{
+                fontSize: 14,
+                opacity: 0.84,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+              }}
+            >
+              {album.artistNames}
+            </span>
+            {album.badge}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 export function MusicHistorySocialCard({
   grainUrl,
   latestSummary,
@@ -78,23 +154,13 @@ export function MusicHistorySocialCard({
 }: MusicHistoryCardVariant & { grainUrl: string }) {
   return (
     <SocialCardFrame borderTone="cobalt" cutOuts={HISTORY_CUT_OUTS} grainUrl={grainUrl}>
-      <div
-        style={{
-          alignItems: 'center',
-          display: 'flex',
-          height: '100%',
-          justifyContent: 'space-between',
-          position: 'relative',
-          width: '100%',
-        }}
-      >
+      <SocialCardSplit>
         <div style={{ display: 'flex', flexDirection: 'column', width: 470 }}>
-          <div style={{ alignItems: 'center', display: 'flex', gap: 14, marginBottom: 20 }}>
-            <SocialCardStamp rotationDeg={-4} width={116} />
+          <SocialCardStampRow gap={14} marginBottom={20} stampWidth={116}>
             <SocialCardTag tiltDeg={2.2} tone="ochre">
               <span>{totalRecentTracks} recent plays</span>
             </SocialCardTag>
-          </div>
+          </SocialCardStampRow>
           <SocialCardHeadline fontSize={94} headline="Listening history" indentEm={0.36} />
           {latestSummary ? (
             <SocialCardMattedCard
@@ -126,80 +192,35 @@ export function MusicHistorySocialCard({
             </SocialCardMattedCard>
           ) : null}
         </div>
-        <div style={{ display: 'flex', height: 500, position: 'relative', width: 520 }}>
-          {GALLERY_SLOTS.map((slot, index) => {
-            const album = recentAlbums[index];
-            if (!album) {
-              return null;
-            }
-            const matTone = SLEEVE_TINTS[index % SLEEVE_TINTS.length] ?? 'ultramarine';
-            return (
+        <SocialCardAlbumGallery
+          items={recentAlbums.map((album, index) => ({
+            artistNames: album.artistNames,
+            badge: (
               <div
-                key={`${album.albumName}-${slot.left}-${slot.top}`}
                 style={{
-                  background: PAPER_PALETTE[matTone],
-                  borderRadius: QUAD_A,
+                  background: PAPER_PALETTE.cream,
+                  borderRadius: 10,
                   boxShadow: PAPER_SHADOW,
-                  color: inkForTone(matTone),
+                  color: PAPER_PALETTE.ink,
                   display: 'flex',
-                  flexDirection: 'column',
-                  left: slot.left,
-                  padding: 10,
+                  fontSize: 14,
+                  fontWeight: 700,
+                  padding: '4px 10px',
                   position: 'absolute',
-                  top: slot.top,
-                  transform: `rotate(${slot.tiltDeg}deg)`,
-                  width: 232,
+                  right: -8,
+                  top: -10,
+                  transform: `rotate(${index % 2 === 0 ? 7 : -7}deg)`,
                 }}
               >
-                <AlbumCoverBox fallbackTone={matTone} imageUrl={album.imageUrl} size={172} />
-                <span
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 700,
-                    letterSpacing: '-0.01em',
-                    lineHeight: 1.15,
-                    marginTop: 8,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {album.albumName}
-                </span>
-                <span
-                  style={{
-                    fontSize: 14,
-                    opacity: 0.84,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {album.artistNames}
-                </span>
-                <div
-                  style={{
-                    background: PAPER_PALETTE.cream,
-                    borderRadius: 10,
-                    boxShadow: PAPER_SHADOW,
-                    color: PAPER_PALETTE.ink,
-                    display: 'flex',
-                    fontSize: 14,
-                    fontWeight: 700,
-                    padding: '4px 10px',
-                    position: 'absolute',
-                    right: -8,
-                    top: -10,
-                    transform: `rotate(${index % 2 === 0 ? 7 : -7}deg)`,
-                  }}
-                >
-                  {`${album.trackCount} ${album.trackCount === 1 ? 'play' : 'plays'}`}
-                </div>
+                {`${album.trackCount} ${album.trackCount === 1 ? 'play' : 'plays'}`}
               </div>
-            );
-          })}
-        </div>
-      </div>
+            ),
+            imageUrl: album.imageUrl,
+            title: album.albumName,
+          }))}
+          tints={SLEEVE_TINTS}
+        />
+      </SocialCardSplit>
     </SocialCardFrame>
   );
 }
@@ -220,24 +241,14 @@ export function FavoriteAlbumsSocialCard({
     .join(' · ');
   return (
     <SocialCardFrame borderTone="ochre" cutOuts={ALBUMS_CUT_OUTS} grainUrl={grainUrl}>
-      <div
-        style={{
-          alignItems: 'center',
-          display: 'flex',
-          height: '100%',
-          justifyContent: 'space-between',
-          position: 'relative',
-          width: '100%',
-        }}
-      >
+      <SocialCardSplit>
         <div style={{ display: 'flex', flexDirection: 'column', width: 470 }}>
-          <div style={{ alignItems: 'center', display: 'flex', gap: 16, marginBottom: 18 }}>
-            <SocialCardStamp rotationDeg={-4} width={116} />
+          <SocialCardStampRow stampWidth={116}>
             <SocialCardScallop kind="sticker" size={112} tiltDeg={8} tone="viridian">
               <span style={{ fontSize: 28, fontWeight: 700, lineHeight: 1 }}>{totalCount}</span>
               <span style={{ fontSize: 13, fontWeight: 700, opacity: 0.9 }}>on the shelf</span>
             </SocialCardScallop>
-          </div>
+          </SocialCardStampRow>
           <SocialCardHeadline fontSize={98} headline="Favorite albums" indentEm={0.42} />
           {artistPreview ? (
             <SocialCardMattedCard
@@ -262,62 +273,15 @@ export function FavoriteAlbumsSocialCard({
             </SocialCardMattedCard>
           ) : null}
         </div>
-        <div style={{ display: 'flex', height: 500, position: 'relative', width: 520 }}>
-          {GALLERY_SLOTS.map((slot, index) => {
-            const album = albums[index];
-            if (!album) {
-              return null;
-            }
-            const matTone = FAVORITE_TINTS[index % FAVORITE_TINTS.length] ?? 'ochre';
-            return (
-              <div
-                key={`${album.name}-${slot.left}-${slot.top}`}
-                style={{
-                  background: PAPER_PALETTE[matTone],
-                  borderRadius: QUAD_A,
-                  boxShadow: PAPER_SHADOW,
-                  color: inkForTone(matTone),
-                  display: 'flex',
-                  flexDirection: 'column',
-                  left: slot.left,
-                  padding: 10,
-                  position: 'absolute',
-                  top: slot.top,
-                  transform: `rotate(${slot.tiltDeg}deg)`,
-                  width: 232,
-                }}
-              >
-                <AlbumCoverBox fallbackTone={matTone} imageUrl={album.imageUrl} size={172} />
-                <span
-                  style={{
-                    fontSize: 17,
-                    fontWeight: 700,
-                    letterSpacing: '-0.01em',
-                    lineHeight: 1.15,
-                    marginTop: 8,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {album.name}
-                </span>
-                <span
-                  style={{
-                    fontSize: 14,
-                    opacity: 0.84,
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {album.artistNames}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+        <SocialCardAlbumGallery
+          items={albums.map((album) => ({
+            artistNames: album.artistNames,
+            imageUrl: album.imageUrl,
+            title: album.name,
+          }))}
+          tints={FAVORITE_TINTS}
+        />
+      </SocialCardSplit>
     </SocialCardFrame>
   );
 }

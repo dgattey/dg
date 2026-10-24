@@ -1,6 +1,7 @@
 import 'server-only';
 
-import type { ListeningStats, StatsRange } from './fetchListeningStats';
+import type { StatsRange } from '@dg/shared-core/dates/statsRange';
+import type { ListeningStats } from './fetchListeningStats';
 import type { StatsNow } from './listeningStatsPhase';
 import {
   rollingDaysPlayFilter,

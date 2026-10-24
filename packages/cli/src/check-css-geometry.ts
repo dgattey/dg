@@ -1,3 +1,4 @@
+import { lineAt, stripCssComments } from './check-page-titles.js';
 import type { StructureViolation } from './check-structure.js';
 
 /** Narrowest box a page grid gets: a 320px phone minus the 16px page gutters. */
@@ -12,7 +13,7 @@ type CssRule = {
 
 /** Flat list of style rules, each tagged with the `@media` prelude it sits in. */
 function cssRules(content: string): Array<CssRule> {
-  const source = content.replace(/\/\*[\s\S]*?\*\//g, (match) => match.replace(/[^\n]/g, ' '));
+  const source = stripCssComments(content);
   const rules: Array<CssRule> = [];
   const media: Array<string | null> = [];
   let start = 0;
@@ -46,10 +47,6 @@ function cssRules(content: string): Array<CssRule> {
 
 function declaration(body: string, property: string): string | undefined {
   return new RegExp(`(?:^|[;\\s])${property}\\s*:([^;]+)`).exec(body)?.[1]?.trim();
-}
-
-function lineAt(content: string, index: number): number {
-  return content.slice(0, index).split('\n').length;
 }
 
 function columnGapPx(body: string): number | null | undefined {

@@ -15,7 +15,7 @@ import type {
   StatsTrack,
 } from './fetchListeningStats';
 import type { selectTopGenres } from './listeningStatsQueries';
-import { spotifyUrl } from './spotifyLinks';
+import { spotifyUrl, toOrderedArtistLinks } from './spotifyLinks';
 import type { TrackDisplay } from './trackDisplays';
 import { spotifyGet } from './trackMetadataShared';
 
@@ -37,6 +37,15 @@ export type ResolvedArtist = {
   name: string;
   url: string;
 };
+
+function toFetchedArtist(item: v.InferOutput<typeof artistSchema>) {
+  return {
+    genres: item.genres ?? [],
+    id: item.id,
+    name: item.name,
+    url: item.external_urls.spotify,
+  };
+}
 
 export async function resolveArtists(
   artistIds: Array<string>,
@@ -66,12 +75,7 @@ export async function resolveArtists(
     try {
       const result = await spotifyGet(`artists/${id}`, artistSchema, 'stats artist');
       if (result.success) {
-        fetched.push({
-          genres: result.data.genres ?? [],
-          id,
-          name: result.data.name,
-          url: result.data.external_urls.spotify,
-        });
+        fetched.push(toFetchedArtist(result.data));
       }
     } catch (error) {
       log.warn('Failed to fetch artist for listening stats', { error, id });
@@ -93,12 +97,7 @@ export async function resolveArtists(
       if (batchResult.success) {
         for (const item of batchResult.data.artists) {
           if (item) {
-            fetched.push({
-              genres: item.genres ?? [],
-              id: item.id,
-              name: item.name,
-              url: item.external_urls.spotify,
-            });
+            fetched.push(toFetchedArtist(item));
           }
         }
       }
@@ -111,23 +110,13 @@ export async function resolveArtists(
     await MusicArtist.bulkCreate(fetched, {
       updateOnDuplicate: ['genres', 'name', 'url'],
     });
-    for (const artist of fetched) {
-      artists.set(artist.id, {
-        genres: artist.genres,
-        name: artist.name,
-        url: artist.url,
-      });
+    for (const { genres, id, name, url } of fetched) {
+      artists.set(id, { genres, name, url });
     }
   }
   return artists;
 }
 
-type CachedAlbumArtist = MusicArtist & { MusicAlbumArtist: { position: number } };
-
-/**
- * Albums with linked artists: the Music* cache when it knows the album's artists,
- * otherwise `fetchAlbumDetail`, which writes the full album through for next time.
- */
 /**
  * Albums from the catalog cache, then Spotify, then the favorite albums snapshot. The
  * snapshot keeps artist names only, so those artists link to a Spotify search.
@@ -143,16 +132,10 @@ export async function resolveAlbums(
     where: { id: { [Op.in]: albumIds } },
   });
   for (const album of cached) {
-    const artists = [...(album.artists as Array<CachedAlbumArtist>)].sort(
-      (a, b) => a.MusicAlbumArtist.position - b.MusicAlbumArtist.position,
-    );
+    const artists = toOrderedArtistLinks(album.artists);
     if (album.name && album.imageUrl && artists.length > 0) {
       albums.set(album.id, {
-        artists: artists.map((artist) => ({
-          id: artist.id,
-          name: artist.name,
-          url: spotifyUrl('artist', artist.id, artist.url),
-        })),
+        artists,
         id: album.id,
         imageUrl: album.imageUrl,
         isFavorite: favoriteIds.has(album.id),

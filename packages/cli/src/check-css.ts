@@ -1,4 +1,5 @@
 import path from 'node:path';
+import { isTestFile, lineAt, stripCssComments } from './check-page-titles.js';
 import type { StructureViolation } from './check-structure.js';
 
 const CSS_IMPORT_PATTERN =
@@ -57,15 +58,8 @@ const IDENTIFIER_TOKEN = /[a-zA-Z_][a-zA-Z0-9_-]*/g;
 const TEMPLATE_CLASS_PREFIX = /([a-zA-Z_][a-zA-Z0-9_-]*)\$\{/g;
 const STATIC_JSX_CLASS_ATTR = /\b(?:className|innerClassName)\s*=\s*"([^"]+)"/g;
 
-function lineAt(content: string, index: number): number {
-  return content.slice(0, index).split('\n').length;
-}
-
 function maskCssCommentsAndDeclarations(content: string): string {
-  const withoutComments = content.replace(/\/\*[\s\S]*?\*\//g, (match) =>
-    match.replace(/[^\n]/g, ' '),
-  );
-  return withoutComments
+  return stripCssComments(content)
     .replace(/"[^"\n]*"|'[^'\n]*'/g, (match) => ' '.repeat(match.length))
     .replace(/(?<=[{;\s])[a-zA-Z-]+\s*:[^;{}]+/g, (match) => match.replace(/[^\n]/g, ' '));
 }
@@ -83,11 +77,7 @@ export function checkUnusedCssRules(
   const dynamicPrefixes: Array<string> = [];
 
   for (const [file, content] of sourceFiles) {
-    if (
-      file.includes('__tests__/') ||
-      /\.test\.(ts|tsx)$/.test(file) ||
-      file.endsWith('cutOutShapes.ts')
-    ) {
+    if (isTestFile(file) || file.endsWith('cutOutShapes.ts')) {
       continue;
     }
     corpusParts.push(content);
@@ -153,7 +143,7 @@ export function checkUnusedCssRules(
   }
 
   for (const [file, content] of sourceFiles) {
-    if (!file.endsWith('.tsx') || file.includes('__tests__/') || file.endsWith('.test.tsx')) {
+    if (!file.endsWith('.tsx') || isTestFile(file)) {
       continue;
     }
     for (const match of content.matchAll(STATIC_JSX_CLASS_ATTR)) {

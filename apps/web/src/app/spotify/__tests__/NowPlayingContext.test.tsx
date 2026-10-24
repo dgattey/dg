@@ -25,15 +25,13 @@ jest.mock('../TrackListing', () => ({
 
 const makeTrack = (id: string, overrides: Partial<Track> = {}): Track => {
   const core = {
-    externalUrls: { spotify: `https://open.spotify.com/${id}` },
-    href: `https://api.spotify.com/${id}`,
     id,
     name: `Track ${id}`,
-    uri: `spotify:track:${id}`,
+    url: `https://open.spotify.com/${id}`,
   };
   return {
     ...core,
-    album: { ...core, images: [], name: `Album ${id}`, releaseDate: '2026-01-01' },
+    album: { ...core, name: `Album ${id}`, releaseDate: '2026-01-01' },
     albumImage: { height: 640, url: `https://i.scdn.co/image/${id}.jpg`, width: 640 },
     artists: [{ ...core, id: `artist-${id}`, name: `Artist ${id}` }],
     isPlaying: true,

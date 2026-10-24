@@ -10,6 +10,7 @@ import {
   type CoverageCity,
   type StreetCoverage,
 } from '@dg/content-models/strava/StreetCoverage';
+import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
 import { formattedDistance } from '@dg/shared-core/formatting/formattedDistance';
 import { activitiesRoute } from '@dg/shared-core/routes/app';
 import { getStravaHistory } from '../../services/strava';
@@ -40,7 +41,7 @@ const SPORT_LABELS: Record<StravaSport, string> = {
 
 const dayFormatter = new Intl.DateTimeFormat('en-US', {
   dateStyle: 'medium',
-  timeZone: 'America/Los_Angeles',
+  timeZone: SITE_TIME_ZONE,
 });
 
 const miles = (meters: number) => formattedDistance({ distanceInMeters: meters }) ?? '0 miles';

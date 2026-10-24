@@ -9,7 +9,8 @@ import {
   SocialCardFrame,
   SocialCardHeadline,
   SocialCardMattedCard,
-  SocialCardStamp,
+  SocialCardSplit,
+  SocialCardStampRow,
   SocialCardTag,
 } from './SocialCardParts';
 
@@ -55,23 +56,13 @@ export function SiteMapSocialCard({
 }: SiteMapCardVariant & { grainUrl: string }) {
   return (
     <SocialCardFrame borderTone="viridian" cutOuts={SITE_MAP_CUT_OUTS} grainUrl={grainUrl}>
-      <div
-        style={{
-          alignItems: 'center',
-          display: 'flex',
-          height: '100%',
-          justifyContent: 'space-between',
-          position: 'relative',
-          width: '100%',
-        }}
-      >
+      <SocialCardSplit>
         <div style={{ display: 'flex', flexDirection: 'column', width: 455 }}>
-          <div style={{ alignItems: 'center', display: 'flex', gap: 14, marginBottom: 18 }}>
-            <SocialCardStamp rotationDeg={-4} width={114} />
+          <SocialCardStampRow gap={14}>
             <SocialCardTag tiltDeg={2.2} tone="cobalt">
               <span>{`${pageCount} pages · ${agentSurfaceCount} agent endpoints`}</span>
             </SocialCardTag>
-          </div>
+          </SocialCardStampRow>
           <SocialCardHeadline fontSize={104} headline="Site map" singleLine />
           {sideProjects.length > 0 ? (
             <SocialCardMattedCard
@@ -183,7 +174,7 @@ export function SiteMapSocialCard({
             </div>
           ))}
         </div>
-      </div>
+      </SocialCardSplit>
     </SocialCardFrame>
   );
 }

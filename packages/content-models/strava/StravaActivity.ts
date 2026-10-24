@@ -12,127 +12,149 @@ const latLngSchema = v.optional(
   ),
 );
 
+const optBool = v.optional(v.nullable(v.boolean()));
+const optNum = v.optional(v.nullable(v.number()));
+const optStr = v.optional(v.nullable(v.string()));
+
+const FIELD_SCHEMA_BY_KIND = {
+  boolean: optBool,
+  latlng: latLngSchema,
+  number: optNum,
+  'number-required': v.number(),
+  string: optStr,
+  'string-required': v.string(),
+} as const;
+
+export const STRAVA_ACTIVITY_FIELD_KINDS = {
+  achievement_count: 'number',
+  average_speed: 'number',
+  calories: 'number',
+  comment_count: 'number',
+  commute: 'boolean',
+  description: 'string',
+  distance: 'number',
+  elapsed_time: 'number',
+  elev_high: 'number',
+  elev_low: 'number',
+  end_latlng: 'latlng',
+  gear_id: 'string',
+  id: 'number-required',
+  kudos_count: 'number',
+  location_city: 'string',
+  location_country: 'string',
+  location_state: 'string',
+  max_speed: 'number',
+  moving_time: 'number',
+  name: 'string',
+  perceived_exertion: 'number',
+  photo_count: 'number',
+  pr_count: 'number',
+  private: 'boolean',
+  sport_type: 'string',
+  start_date: 'string',
+  start_date_local: 'string',
+  start_latlng: 'latlng',
+  total_elevation_gain: 'number',
+  type: 'string-required',
+  visibility: 'string',
+} as const satisfies Record<string, keyof typeof FIELD_SCHEMA_BY_KIND>;
+
+type FieldKindMap = typeof STRAVA_ACTIVITY_FIELD_KINDS;
+
+type CamelCase<S extends string> = S extends `${infer Head}_${infer Tail}`
+  ? `${Head}${Capitalize<CamelCase<Tail>>}`
+  : S;
+
+export function toCamelCaseKey(snakeKey: string): string {
+  return snakeKey.replace(/_([a-z])/g, (_, char: string) => char.toUpperCase());
+}
+
 const gearSchema = v.object({
-  distance: v.optional(v.nullable(v.number())),
+  distance: optNum,
   id: v.string(),
   name: v.string(),
-  primary: v.optional(v.nullable(v.boolean())),
-  resource_state: v.optional(v.nullable(v.number())),
+  primary: optBool,
+  resource_state: optNum,
 });
 
 const mapSchema = v.object({
-  id: v.optional(v.nullable(v.string())),
-  polyline: v.optional(v.nullable(v.string())),
-  summary_polyline: v.optional(v.nullable(v.string())),
+  id: optStr,
+  polyline: optStr,
+  summary_polyline: optStr,
 });
 
 const photosPrimarySchema = v.object({
-  unique_id: v.optional(v.nullable(v.string())),
+  unique_id: optStr,
   urls: v.optional(v.nullable(v.record(v.string(), v.string()))),
 });
 
 const photosSchema = v.object({
-  count: v.optional(v.nullable(v.number())),
+  count: optNum,
   primary: v.optional(v.nullable(photosPrimarySchema)),
 });
 
-const apiSchemaEntries = {
-  achievement_count: v.optional(v.nullable(v.number())),
-  average_speed: v.optional(v.nullable(v.number())),
-  calories: v.optional(v.nullable(v.number())),
-  comment_count: v.optional(v.nullable(v.number())),
-  commute: v.optional(v.nullable(v.boolean())),
-  description: v.optional(v.nullable(v.string())),
-  distance: v.optional(v.nullable(v.number())),
-  elapsed_time: v.optional(v.nullable(v.number())),
-  elev_high: v.optional(v.nullable(v.number())),
-  elev_low: v.optional(v.nullable(v.number())),
-  end_latlng: latLngSchema,
-  gear: v.optional(v.nullable(gearSchema)),
-  gear_id: v.optional(v.nullable(v.string())),
-  id: v.number(),
-  kudos_count: v.optional(v.nullable(v.number())),
-  location_city: v.optional(v.nullable(v.string())),
-  location_country: v.optional(v.nullable(v.string())),
-  location_state: v.optional(v.nullable(v.string())),
-  map: v.optional(v.nullable(mapSchema)),
-  max_speed: v.optional(v.nullable(v.number())),
-  moving_time: v.optional(v.nullable(v.number())),
-  name: v.optional(v.nullable(v.string())),
-  perceived_exertion: v.optional(v.nullable(v.number())),
-  photo_count: v.optional(v.nullable(v.number())),
-  photos: v.optional(v.nullable(photosSchema)),
-  pr_count: v.optional(v.nullable(v.number())),
-  private: v.optional(v.nullable(v.boolean())),
-  sport_type: v.optional(v.nullable(v.string())),
-  start_date: v.optional(v.nullable(v.string())),
-  start_date_local: v.optional(v.nullable(v.string())),
-  start_latlng: latLngSchema,
-  total_elevation_gain: v.optional(v.nullable(v.number())),
-  type: v.string(),
-  visibility: v.optional(v.nullable(v.string())),
-};
-
 const gearStoredSchema = v.object({
-  distance: v.optional(v.nullable(v.number())),
+  distance: optNum,
   id: v.string(),
   name: v.string(),
-  primary: v.optional(v.nullable(v.boolean())),
-  resourceState: v.optional(v.nullable(v.number())),
+  primary: optBool,
+  resourceState: optNum,
 });
 
 const mapStoredSchema = v.object({
-  id: v.optional(v.nullable(v.string())),
-  polyline: v.optional(v.nullable(v.string())),
-  summaryPolyline: v.optional(v.nullable(v.string())),
+  id: optStr,
+  polyline: optStr,
+  summaryPolyline: optStr,
 });
 
 const photosPrimaryStoredSchema = v.object({
-  uniqueId: v.optional(v.nullable(v.string())),
+  uniqueId: optStr,
   urls: v.optional(v.nullable(v.record(v.string(), v.string()))),
 });
 
 const photosStoredSchema = v.object({
-  count: v.optional(v.nullable(v.number())),
+  count: optNum,
   primary: v.optional(v.nullable(photosPrimaryStoredSchema)),
 });
 
+type ApiScalarEntries = {
+  [K in keyof FieldKindMap]: (typeof FIELD_SCHEMA_BY_KIND)[FieldKindMap[K]];
+};
+
+type StoredScalarEntries = {
+  [K in keyof FieldKindMap as Exclude<
+    CamelCase<K & string>,
+    'startDate'
+  >]: (typeof FIELD_SCHEMA_BY_KIND)[FieldKindMap[K]];
+};
+
+const apiScalarEntries = Object.fromEntries(
+  Object.entries(STRAVA_ACTIVITY_FIELD_KINDS).map(([key, kind]) => [
+    key,
+    FIELD_SCHEMA_BY_KIND[kind],
+  ]),
+) as ApiScalarEntries;
+
+const storedScalarEntries = Object.fromEntries(
+  Object.entries(STRAVA_ACTIVITY_FIELD_KINDS)
+    .filter(([key]) => key !== 'start_date')
+    .map(([key, kind]) => [toCamelCaseKey(key), FIELD_SCHEMA_BY_KIND[kind]]),
+) as StoredScalarEntries;
+
+const apiSchemaEntries = {
+  ...apiScalarEntries,
+  gear: v.optional(v.nullable(gearSchema)),
+  map: v.optional(v.nullable(mapSchema)),
+  photos: v.optional(v.nullable(photosSchema)),
+};
+
 const storedSchemaEntries = {
-  achievementCount: v.optional(v.nullable(v.number())),
-  averageSpeed: v.optional(v.nullable(v.number())),
-  calories: v.optional(v.nullable(v.number())),
-  commentCount: v.optional(v.nullable(v.number())),
-  commute: v.optional(v.nullable(v.boolean())),
-  description: v.optional(v.nullable(v.string())),
-  distance: v.optional(v.nullable(v.number())),
-  elapsedTime: v.optional(v.nullable(v.number())),
-  elevHigh: v.optional(v.nullable(v.number())),
-  elevLow: v.optional(v.nullable(v.number())),
-  endLatlng: latLngSchema,
+  ...storedScalarEntries,
   gear: v.optional(v.nullable(gearStoredSchema)),
-  gearId: v.optional(v.nullable(v.string())),
-  id: v.number(),
-  kudosCount: v.optional(v.nullable(v.number())),
-  locationCity: v.optional(v.nullable(v.string())),
-  locationCountry: v.optional(v.nullable(v.string())),
-  locationState: v.optional(v.nullable(v.string())),
   map: v.optional(v.nullable(mapStoredSchema)),
-  maxSpeed: v.optional(v.nullable(v.number())),
-  movingTime: v.optional(v.nullable(v.number())),
-  name: v.optional(v.nullable(v.string())),
-  perceivedExertion: v.optional(v.nullable(v.number())),
-  photoCount: v.optional(v.nullable(v.number())),
   photos: v.optional(v.nullable(photosStoredSchema)),
-  prCount: v.optional(v.nullable(v.number())),
-  private: v.optional(v.nullable(v.boolean())),
-  sportType: v.optional(v.nullable(v.string())),
   startDate: v.pipe(v.string(), v.nonEmpty()),
-  startDateLocal: v.optional(v.nullable(v.string())),
-  startLatlng: latLngSchema,
-  totalElevationGain: v.optional(v.nullable(v.number())),
-  type: v.string(),
-  url: v.optional(v.nullable(v.string())),
-  visibility: v.optional(v.nullable(v.string())),
+  url: optStr,
 };
 
 export const stravaActivityApiSchema = v.looseObject(apiSchemaEntries);
@@ -154,64 +176,42 @@ export const normalizeStravaActivity = (activity: StravaActivityStored): StravaA
   url: activity.url ?? `https://www.strava.com/activities/${activity.id}`,
 });
 
-export const mapStravaActivityFromApi = (activity: StravaActivityApi): StravaActivity => ({
-  achievementCount: activity.achievement_count,
-  averageSpeed: activity.average_speed,
-  calories: activity.calories,
-  commentCount: activity.comment_count,
-  commute: activity.commute,
-  description: activity.description,
-  distance: activity.distance,
-  elapsedTime: activity.elapsed_time,
-  elevHigh: activity.elev_high,
-  elevLow: activity.elev_low,
-  endLatlng: activity.end_latlng,
-  gear: activity.gear
-    ? {
-        distance: activity.gear.distance,
-        id: activity.gear.id,
-        name: activity.gear.name,
-        primary: activity.gear.primary,
-        resourceState: activity.gear.resource_state,
-      }
-    : null,
-  gearId: activity.gear_id,
-  id: activity.id,
-  kudosCount: activity.kudos_count,
-  locationCity: activity.location_city,
-  locationCountry: activity.location_country,
-  locationState: activity.location_state,
-  map: activity.map
-    ? {
-        id: activity.map.id,
-        polyline: activity.map.polyline,
-        summaryPolyline: activity.map.summary_polyline,
-      }
-    : null,
-  maxSpeed: activity.max_speed,
-  movingTime: activity.moving_time,
-  name: activity.name ?? 'Strava Activity',
-  perceivedExertion: activity.perceived_exertion,
-  photoCount: activity.photo_count,
-  photos: activity.photos
-    ? {
-        count: activity.photos.count,
-        primary: activity.photos.primary
-          ? {
-              uniqueId: activity.photos.primary.unique_id,
-              urls: activity.photos.primary.urls,
-            }
-          : null,
-      }
-    : null,
-  prCount: activity.pr_count,
-  private: activity.private,
-  sportType: activity.sport_type,
-  startDate: activity.start_date ?? '',
-  startDateLocal: activity.start_date_local,
-  startLatlng: activity.start_latlng,
-  totalElevationGain: activity.total_elevation_gain,
-  type: activity.type,
-  url: `https://www.strava.com/activities/${activity.id}`,
-  visibility: activity.visibility,
-});
+export const mapStravaActivityFromApi = (activity: StravaActivityApi): StravaActivity => {
+  const scalars: Record<string, unknown> = {};
+  for (const snakeKey of Object.keys(STRAVA_ACTIVITY_FIELD_KINDS)) {
+    scalars[toCamelCaseKey(snakeKey)] = activity[snakeKey as keyof StravaActivityApi];
+  }
+  return {
+    ...(scalars as Omit<StravaActivity, 'gear' | 'map' | 'name' | 'photos' | 'startDate' | 'url'>),
+    gear: activity.gear
+      ? {
+          distance: activity.gear.distance,
+          id: activity.gear.id,
+          name: activity.gear.name,
+          primary: activity.gear.primary,
+          resourceState: activity.gear.resource_state,
+        }
+      : null,
+    map: activity.map
+      ? {
+          id: activity.map.id,
+          polyline: activity.map.polyline,
+          summaryPolyline: activity.map.summary_polyline,
+        }
+      : null,
+    name: activity.name ?? 'Strava Activity',
+    photos: activity.photos
+      ? {
+          count: activity.photos.count,
+          primary: activity.photos.primary
+            ? {
+                uniqueId: activity.photos.primary.unique_id,
+                urls: activity.photos.primary.urls,
+              }
+            : null,
+        }
+      : null,
+    startDate: activity.start_date ?? '',
+    url: `https://www.strava.com/activities/${activity.id}`,
+  };
+};

@@ -1,12 +1,5 @@
+import { isTestFile, lineAt } from './check-page-titles.js';
 import type { StructureViolation } from './check-structure.js';
-
-function isTestPath(relPath: string): boolean {
-  return (
-    relPath.includes('__tests__/') ||
-    /\.test\.(ts|tsx)$/.test(relPath) ||
-    relPath.endsWith('jest.config.ts')
-  );
-}
 
 function resolveStaticTagArg(rawArg: string, constMap: ReadonlyMap<string, string>): string | null {
   const trimmed = rawArg.trim();
@@ -25,12 +18,29 @@ export function checkCacheTagParity(
   const revalidatedTags = new Set<string>();
   const maxCacheTagRefs: Array<{ file: string; line: number; tag: string }> = [];
   const revalidateTagRefs: Array<{ file: string; line: number; tag: string }> = [];
+  const sharedConstMap = new Map<string, string>();
 
   for (const [relPath, content] of sourceFiles) {
-    if (isTestPath(relPath)) {
+    if (isTestFile(relPath)) {
       continue;
     }
-    const constMap = new Map<string, string>();
+    const cacheTagsMatch = /\bCACHE_TAGS\s*=\s*\{([\s\S]*?)\}\s*as\s*const/.exec(content);
+    if (cacheTagsMatch?.[1]) {
+      for (const entry of cacheTagsMatch[1].matchAll(
+        /\b([A-Za-z_$][\w$]*)\s*:\s*['"]([^'"]+)['"]/g,
+      )) {
+        if (entry[1] && entry[2]) {
+          sharedConstMap.set(`CACHE_TAGS.${entry[1]}`, entry[2]);
+        }
+      }
+    }
+  }
+
+  for (const [relPath, content] of sourceFiles) {
+    if (isTestFile(relPath)) {
+      continue;
+    }
+    const constMap = new Map<string, string>(sharedConstMap);
     for (const match of content.matchAll(/\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*['"]([^'"]+)['"]/g)) {
       if (match[1] && match[2]) {
         constMap.set(match[1], match[2]);
@@ -159,7 +169,7 @@ export function checkContentfulFallbacks(
   content: string,
   lines?: ReadonlyArray<string>,
 ): Array<StructureViolation> {
-  if (isTestPath(relPath)) {
+  if (isTestFile(relPath)) {
     return [];
   }
   const sourceLines = lines ?? content.split('\n');
@@ -223,8 +233,7 @@ export function checkMigrationTransactions(
       const argsText = match[1] ?? '';
       if (!/\btransaction\b/.test(argsText)) {
         const offsetInContent = content.indexOf(match[0]);
-        const line =
-          offsetInContent >= 0 ? content.slice(0, offsetInContent).split('\n').length : 1;
+        const line = offsetInContent >= 0 ? lineAt(content, offsetInContent) : 1;
         violations.push({
           file: relPath,
           line,

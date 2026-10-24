@@ -1,20 +1,14 @@
 'use client';
 
-import type { StatsRangeKey } from '@dg/services/spotify/fetchListeningStats';
+import type { StatsRangeKey } from '@dg/shared-core/dates/statsRange';
 import { musicStatsRoute } from '@dg/shared-core/routes/app';
-import { jsOnlyProps } from '@dg/ui/core/JsOnlyStyle';
-import { PaperTag } from '../../collage/PaperTag';
-import { cx } from '../../collage/paperVars';
+import { type PaperPillOption, PaperPills } from '../../collage/PaperPills';
 import { YearMenu } from '../../collage/YearMenu';
 import { MusicNav } from '../MusicNav';
 
 type QuickRangeKey = 'all' | 'month' | 'week';
 
-const QUICK_RANGE_OPTIONS: ReadonlyArray<{
-  key: QuickRangeKey;
-  label: string;
-  tiltDeg: number;
-}> = [
+const QUICK_RANGE_OPTIONS: ReadonlyArray<PaperPillOption<QuickRangeKey>> = [
   { key: 'all', label: 'All time', tiltDeg: -1.4 },
   { key: 'week', label: 'This week', tiltDeg: 1.2 },
   { key: 'month', label: 'This month', tiltDeg: -0.9 },
@@ -42,28 +36,14 @@ export function StatsToolbar({
   return (
     <div className="stats__toolbar">
       <MusicNav current={musicStatsRoute} />
-      <fieldset aria-label="Time range" className="paperPills stats__rangePills" {...jsOnlyProps}>
-        {QUICK_RANGE_OPTIONS.map((option) => {
-          const current = option.key === selectedKey;
-          return (
-            <PaperTag
-              className={cx('paperPill', current && 'paperButtonCurrent')}
-              edge="quad-a"
-              key={option.key}
-              tiltDeg={option.tiltDeg}
-            >
-              <button
-                aria-pressed={current}
-                className="paperPillButton"
-                onClick={() => onSelectRange(option.key)}
-                onMouseEnter={() => onPrefetchRange?.(option.key)}
-                type="button"
-              >
-                {option.label}
-              </button>
-            </PaperTag>
-          );
-        })}
+      <PaperPills
+        className="stats__rangePills"
+        label="Time range"
+        onPrefetch={onPrefetchRange}
+        onSelect={onSelectRange}
+        options={QUICK_RANGE_OPTIONS}
+        selected={isYearSelected ? null : selectedKey}
+      >
         {availableYears.length > 0 ? (
           <YearMenu
             onPick={(year) => onSelectRange(`${year}`)}
@@ -73,7 +53,7 @@ export function StatsToolbar({
             years={availableYears}
           />
         ) : null}
-      </fieldset>
+      </PaperPills>
     </div>
   );
 }

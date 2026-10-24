@@ -7,7 +7,7 @@ import { MusicTrack } from '@dg/db/models/MusicTrack';
 import { MusicTrackArtist } from '@dg/db/models/MusicTrackArtist';
 import * as v from 'valibot';
 import type { AlbumDetail, AlbumDetailArtist, AlbumDetailTrack } from './albumDetailTypes';
-import { spotifyUrl } from './spotifyLinks';
+import { spotifyUrl, toOrderedArtistLinks } from './spotifyLinks';
 import { bestSpotifyImage, spotifyGet } from './trackMetadataShared';
 
 const albumArtistSchema = v.looseObject({
@@ -56,13 +56,10 @@ const albumTracksPageSchema = v.looseObject({
   next: v.optional(v.nullable(v.string())),
 });
 
-type ArtistRow = { id: string; name: string; url: string; position: number };
-
-function mapArtist(artist: v.InferOutput<typeof albumArtistSchema>, position: number): ArtistRow {
+function toArtistLink(artist: v.InferOutput<typeof albumArtistSchema>): AlbumDetailArtist {
   return {
     id: artist.id,
     name: artist.name,
-    position,
     url: artist.external_urls.spotify,
   };
 }
@@ -111,47 +108,22 @@ async function readAlbumFromDb(albumId: string): Promise<AlbumDetail | null> {
     return null;
   }
 
-  const albumArtists = [...(album.artists ?? [])].sort((a, b) => {
-    const aPos = (a as MusicArtist & { MusicAlbumArtist?: { position: number } }).MusicAlbumArtist
-      ?.position;
-    const bPos = (b as MusicArtist & { MusicAlbumArtist?: { position: number } }).MusicAlbumArtist
-      ?.position;
-    return (aPos ?? 0) - (bPos ?? 0);
-  });
+  const albumArtists = toOrderedArtistLinks(album.artists);
 
   const mappedTracks = sortTracks(
-    tracks.map((track) => {
-      const artists = [...(track.artists ?? [])].sort((a, b) => {
-        const aPos = (a as MusicArtist & { MusicTrackArtist?: { position: number } })
-          .MusicTrackArtist?.position;
-        const bPos = (b as MusicArtist & { MusicTrackArtist?: { position: number } })
-          .MusicTrackArtist?.position;
-        return (aPos ?? 0) - (bPos ?? 0);
-      });
-      return {
-        artists: artists.map((artist) => ({
-          id: artist.id,
-          name: artist.name,
-          url: spotifyUrl('artist', artist.id, artist.url),
-        })),
-        discNumber: track.discNumber ?? 1,
-        durationMs: track.durationMs,
-        id: track.id,
-        name: track.name,
-        trackNumber: track.trackNumber ?? 0,
-        url: spotifyUrl('track', track.id, track.url),
-      };
-    }),
+    tracks.map((track) => ({
+      artists: toOrderedArtistLinks(track.artists),
+      discNumber: track.discNumber ?? 1,
+      durationMs: track.durationMs,
+      id: track.id,
+      name: track.name,
+      trackNumber: track.trackNumber ?? 0,
+      url: spotifyUrl('track', track.id, track.url),
+    })),
   );
 
   const artists: Array<AlbumDetailArtist> =
-    albumArtists.length > 0
-      ? albumArtists.map((artist) => ({
-          id: artist.id,
-          name: artist.name,
-          url: spotifyUrl('artist', artist.id, artist.url),
-        }))
-      : (mappedTracks[0]?.artists ?? []);
+    albumArtists.length > 0 ? albumArtists : (mappedTracks[0]?.artists ?? []);
 
   const durationMs = mappedTracks.reduce((sum, track) => sum + (track.durationMs ?? 0), 0);
 
@@ -206,16 +178,10 @@ async function fetchAlbumFromSpotify(albumId: string): Promise<AlbumDetail | nul
 
   const album = result.data;
   const trackItems = await fetchAllAlbumTracks(albumId, album.tracks);
-  const artists: Array<AlbumDetailArtist> = album.artists.map((artist, position) => {
-    const mapped = mapArtist(artist, position);
-    return { id: mapped.id, name: mapped.name, url: mapped.url };
-  });
+  const artists = album.artists.map(toArtistLink);
   const tracks = sortTracks(
     trackItems.map((track, index) => ({
-      artists: track.artists.map((artist, position) => {
-        const mapped = mapArtist(artist, position);
-        return { id: mapped.id, name: mapped.name, url: mapped.url };
-      }),
+      artists: track.artists.map(toArtistLink),
       discNumber: track.disc_number ?? 1,
       durationMs: track.duration_ms ?? null,
       id: track.id,

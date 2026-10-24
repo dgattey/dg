@@ -3,9 +3,9 @@ import { GITHUB_REPOSITORY_URL, upsertRelease } from '@dg/services/github/fetchR
 import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
+import { CACHE_TAGS } from '../../../services/cacheTags';
 
 const BEARER_PREFIX = 'Bearer ';
-const CHANGELOG_TAG = 'changelog';
 
 function isAuthorized(request: NextRequest): boolean {
   const secret = process.env.CRON_SECRET?.trim();
@@ -80,7 +80,7 @@ export async function handleReleaseSync(request: NextRequest): Promise<ReleaseSy
     return { body: { error: `Invalid semver version: ${version}`, ok: false }, status: 400 };
   }
 
-  revalidateTag(CHANGELOG_TAG, 'max');
+  revalidateTag(CACHE_TAGS.changelog, 'max');
   return {
     body: { ok: true, version: saved.tag },
     status: 200,

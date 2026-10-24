@@ -1,24 +1,7 @@
-import type { CSSProperties } from 'react';
 import { getTimingCssVars } from '../helpers/timing';
 import { BRAND, onCanvas } from './color';
 import { COLOR_SCHEME_ATTRIBUTE } from './colorScheme';
 import { getTypography } from './typography';
-
-export type ResponsiveValue<T> = T | { xs?: T; sm?: T; md?: T; lg?: T; xl?: T };
-
-type SxProperties = {
-  [K in keyof CSSProperties]?: ResponsiveValue<CSSProperties[K]>;
-};
-
-/**
- * Single style object supporting CSS properties, CSS custom properties,
- * responsive breakpoint values (`{ xs, sm, md, lg, xl }`), and nested selectors.
- */
-export type SxObject = SxProperties & {
-  [key: string]: unknown;
-};
-
-export type SxProps = SxObject | boolean | null | undefined | ReadonlyArray<SxProps>;
 
 const CARD_SHADOW_MAIN = '0 1.5px 0 rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04)';
 const CARD_SHADOW_HOVERED = '0 3px 0 rgba(0, 0, 0, 0.22), 0 0 0 1.5px rgba(0, 0, 0, 0.06)';
@@ -107,6 +90,113 @@ code, kbd, pre, samp {
 @media (min-width: 992px) { body { font-size: 1.0625rem; } }
 h1, h2, h3, h4 {
   text-wrap: balance;
+}
+[data-typography] {
+  font-family: var(--font-sans);
+  margin: 0;
+  text-rendering: optimizeLegibility;
+}
+[data-typography="body1"] {
+  color: var(--dg-palette-text-primary);
+  font-size: 1.03125rem;
+  font-weight: 400;
+  line-height: 1.5;
+}
+[data-typography="body2"] {
+  color: var(--dg-palette-text-secondary);
+  font-size: 1.03125rem;
+  font-weight: 400;
+  line-height: 1.43;
+}
+[data-typography="button"] {
+  font-size: ${typography.button.fontSize};
+  font-weight: ${typography.button.fontWeight};
+  letter-spacing: ${typography.button.letterSpacing};
+  line-height: 1.75;
+  text-transform: ${typography.button.textTransform};
+}
+[data-typography="caption"] {
+  font-size: ${typography.caption.fontSize};
+  font-weight: ${typography.caption.fontWeight};
+  line-height: 1.66;
+}
+[data-typography="code"] {
+  background: var(--dg-palette-background-paper);
+  border-radius: ${typography.code.borderRadius};
+  color: var(--dg-palette-text-secondary);
+  font-family: var(--font-mono);
+  font-size: ${typography.code.fontSize};
+  font-weight: ${typography.code.fontWeight};
+  padding: ${typography.code.padding};
+}
+[data-typography="h1"] {
+  color: var(--dg-palette-text-h1);
+  font-size: ${typography.h1.fontSize};
+  font-weight: ${typography.h1.fontWeight};
+  letter-spacing: ${typography.h1.letterSpacing};
+  line-height: 1.167;
+}
+[data-typography="h2"] {
+  color: var(--dg-palette-text-h2);
+  font-size: ${typography.h2.fontSize};
+  font-weight: ${typography.h2.fontWeight};
+  letter-spacing: ${typography.h2.letterSpacing};
+  line-height: 1.2;
+}
+[data-typography="h3"] {
+  color: var(--dg-palette-text-h3);
+  font-size: ${typography.h3.fontSize};
+  font-weight: ${typography.h3.fontWeight};
+  line-height: 1.167;
+}
+[data-typography="h4"] {
+  color: var(--dg-palette-text-h4);
+  font-size: 1.140625rem;
+  font-weight: ${typography.h4.fontWeight};
+  line-height: 1.235;
+}
+[data-typography="h5"] {
+  color: var(--dg-palette-text-h5);
+  font-size: 1.015625rem;
+  font-weight: ${typography.h5.fontWeight};
+  line-height: 1.334;
+}
+[data-typography="h6"] {
+  color: var(--dg-palette-text-h6);
+  font-size: ${typography.h6.fontSize};
+  font-weight: ${typography.h6.fontWeight};
+  line-height: 1.6;
+}
+[data-typography="overline"] {
+  font-size: ${typography.overline.fontSize};
+  font-variant-caps: ${typography.overline.fontVariantCaps};
+  font-weight: ${typography.overline.fontWeight};
+  letter-spacing: ${typography.overline.letterSpacing};
+  line-height: 1.25;
+}
+@media (min-width: 576px) {
+  [data-typography="body1"] { font-size: 1rem; }
+  [data-typography="body2"] { font-size: 1.049rem; }
+  [data-typography="h4"] { font-size: 1.2146rem; }
+  [data-typography="h5"] { font-size: 0.937rem; }
+}
+@media (min-width: 992px) {
+  [data-typography="body1"], [data-typography="body2"] { font-size: 1.0625rem; }
+  [data-typography="h4"] { font-size: 1.2813rem; }
+  [data-typography="h5"] { font-size: 1.0313rem; }
+}
+[data-ui-link] {
+  color: inherit;
+  cursor: pointer;
+  text-decoration: none;
+}
+[data-ui-link]:hover {
+  text-decoration: underline;
+}
+[data-skeleton] {
+  animation: dg-pulse 2s ease-in-out 0.5s infinite;
+  background-color: var(--dg-skeleton-bg, rgba(128, 128, 128, 0.12));
+  display: block;
 }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

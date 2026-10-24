@@ -12,6 +12,7 @@ import { fetchMusicHistoryPage } from '@dg/services/spotify/fetchMusicHistoryPag
 import { fetchStravaHistoryFromDb } from '@dg/services/strava/fetchStravaHistoryFromDb';
 import { cacheLife, cacheTag } from 'next/cache';
 import { ImageResponse } from 'next/og';
+import { CACHE_TAGS } from '../services/cacheTags';
 import { getChangelogReleases } from '../services/github';
 import { getAppVersionInfo } from '../services/version';
 import { SocialCard, type SocialCardVariant } from './collage/SocialCard';
@@ -50,7 +51,7 @@ export const SOCIAL_IMAGE_SIZE = {
   width: 1200,
 };
 
-export const SOCIAL_IMAGE_TAG = 'social-image';
+export const SOCIAL_IMAGE_TAG = CACHE_TAGS.socialImage;
 
 export const SOCIAL_IMAGE_ALTS: Record<SocialImagePage, string> = {
   changelog: `Version history and release notes on a paper-cut collage from ${SITE_NAME}`,
@@ -164,7 +165,7 @@ async function loadSocialCardVariant(page: SocialImagePage): Promise<SocialCardV
 async function renderSocialImagePng(page: SocialImagePage) {
   'use cache';
   cacheLife('days');
-  cacheTag(SOCIAL_IMAGE_TAG);
+  cacheTag(CACHE_TAGS.socialImage);
   const [regularFont, boldFont, grainUrl, variant] = await Promise.all([
     readFontData(REGULAR_FONT_URL),
     readFontData(BOLD_FONT_URL),

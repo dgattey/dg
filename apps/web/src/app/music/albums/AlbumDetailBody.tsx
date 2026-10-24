@@ -1,9 +1,7 @@
-import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
+import type { AlbumDetail, AlbumDetailArtist } from '@dg/services/spotify/albumDetailTypes';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Link } from '@dg/ui/dependent/Link';
 import type { ReactNode } from 'react';
-
-type LinkedArtist = { id: string; name: string; url: string };
 
 function formatDuration(totalMs: number): string {
   const totalSeconds = Math.round(totalMs / 1000);
@@ -37,11 +35,11 @@ function albumFacts(album: AlbumDetail): Array<string> {
   ].filter((fact): fact is string => fact != null);
 }
 
-function artistNames(artists: ReadonlyArray<LinkedArtist>): string {
+function artistNames(artists: ReadonlyArray<AlbumDetailArtist>): string {
   return artists.map((artist) => artist.name).join(', ');
 }
 
-function LinkedArtists({ artists }: { artists: ReadonlyArray<LinkedArtist> }): ReactNode {
+function LinkedArtists({ artists }: { artists: ReadonlyArray<AlbumDetailArtist> }): ReactNode {
   return artists.map((artist, index) => (
     <span key={artist.id}>
       {index > 0 ? ', ' : null}
@@ -93,7 +91,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
             >
               {track.trackNumber}
             </span>
-            <span style={{ display: 'grid', minWidth: 0, rowGap: 2 }}>
+            <span className="music__wellTrackBody">
               <Tooltip title={track.name} whenTruncated>
                 <span className="music__wellTrackTitle">
                   <Link href={track.url} isExternal={true} title={`Open ${track.name} on Spotify`}>

@@ -1,4 +1,3 @@
-import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
 import type { CSSProperties, ReactNode } from 'react';
 import {
   type CollageCardTreatment,
@@ -116,7 +115,7 @@ export function CollageHistorySkeleton() {
         ] as const
       ).map((section, sectionIndex) => (
         <section aria-hidden="true" className="music__section" key={section.label}>
-          <StickyFadeBar className="music__dateBar">
+          <div className="music__dateBar">
             <PaperTag
               className="music__dateTag"
               edge="soft-b"
@@ -125,7 +124,7 @@ export function CollageHistorySkeleton() {
             >
               <SkeletonLine width={120} />
             </PaperTag>
-          </StickyFadeBar>
+          </div>
           <div className="music__historySkeletonGrid">
             {Array.from({ length: section.tiles }, (_, cardIndex) => ({
               key: `${section.label}-${cardIndex}`,

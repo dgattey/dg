@@ -1,13 +1,11 @@
+import type { SpotifyLink } from './spotifyLinks';
+
 /**
  * Display-ready album detail shared by the Spotify service and album well UI.
  * Kept free of `server-only` so client components can import the type.
  */
 
-export type AlbumDetailArtist = {
-  id: string;
-  name: string;
-  url: string;
-};
+export type AlbumDetailArtist = SpotifyLink;
 
 export type AlbumDetailTrack = {
   id: string;

@@ -2,6 +2,7 @@
 
 import type { Track } from '@dg/content-models/spotify/Track';
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
+import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
 import { formattedDistance } from '@dg/shared-core/formatting/formattedDistance';
 import { useServerTime } from '@dg/ui/core/ServerTimeContext';
 import { Tooltip } from '@dg/ui/core/Tooltip';
@@ -13,7 +14,7 @@ import { useNowPlaying } from '../spotify/NowPlayingContext';
 const sfTimeFormatter = new Intl.DateTimeFormat('en-US', {
   hour: 'numeric',
   minute: '2-digit',
-  timeZone: 'America/Los_Angeles',
+  timeZone: SITE_TIME_ZONE,
 });
 
 function formatSfTime(timestamp: number): string {
@@ -62,7 +63,7 @@ export function FooterNowStrip({ initialTrack, latestActivity }: FooterNowStripP
           <Tooltip className="chrome__nowTip" placement="top" title={trackSummary} whenTruncated>
             <a
               className="chrome__nowCell chrome__nowCellLink"
-              href={track.externalUrls.spotify}
+              href={track.url}
               rel="noopener noreferrer"
               target="_blank"
             >

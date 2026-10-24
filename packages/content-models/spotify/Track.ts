@@ -91,30 +91,19 @@ type ArtistApi = v.InferOutput<typeof referenceApiSchema>;
 type AlbumApi = v.InferOutput<typeof albumApiSchema>;
 type TrackApi = v.InferOutput<typeof trackApiSchema>;
 
-type Core = {
-  externalUrls: {
-    spotify: string;
-  };
-  href: string;
+/**
+ * Domain artist type (camelCase), aligned with `SpotifyLink`.
+ */
+export type Artist = {
   id: string;
   name: string;
-  uri: string;
+  url: string;
 };
-
-/**
- * Domain artist type (camelCase).
- */
-export type Artist = Core;
 
 /**
  * Domain album type (camelCase).
  */
-type Album = Artist & {
-  images: Array<{
-    height: number;
-    width: number;
-    url: string;
-  }>;
+export type Album = Artist & {
   releaseDate: string;
 };
 
@@ -140,16 +129,13 @@ export type Track = Artist & {
 };
 
 const mapArtistFromApi = (artist: ArtistApi): Artist => ({
-  externalUrls: artist.external_urls,
-  href: artist.href,
   id: artist.id,
   name: artist.name,
-  uri: artist.uri,
+  url: artist.external_urls.spotify,
 });
 
 const mapAlbumFromApi = (album: AlbumApi): Album => ({
   ...mapArtistFromApi(album),
-  images: album.images,
   releaseDate: album.release_date,
 });
 

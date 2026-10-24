@@ -1,12 +1,10 @@
 'use client';
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
-import { Box } from '@dg/ui/core/Box';
 import { albumArtViewTransitionName } from '@dg/ui/core/transitions/pageTransitions';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_DEFAULT, TIMING_MEDIUM } from '@dg/ui/helpers/timing';
-import type { SxObject } from '@dg/ui/theme';
 import type { ReactNode, TransitionEvent } from 'react';
 import { useLayoutEffect, useRef, useState, ViewTransition } from 'react';
 import { ALBUM_DETAIL_BACKDROP } from '../../collage/backdrops';
@@ -19,55 +17,6 @@ const WELL_ART_SIZE = 220;
 
 /** The well art is 220px through its 820px stack and up to 300px beside the tracklist. */
 const COLLAGE_WELL_ART_SIZES = { extraLarge: 300, large: 300, medium: 300, small: 220, tiny: 220 };
-
-const REDUCED_MOTION = '@media (prefers-reduced-motion: reduce)';
-
-/**
- * Floor the card at the height the outgoing album's detail measured, for exactly
- * as long as a placeholder is standing in for detail that has not landed.
- *
- * Switching straight from one album to another swaps a tracklist of dozens of
- * rows for a placeholder of six, so without a floor the card — and every grid row
- * under it — drops by the difference (~3300px at 1280) in the frame the click
- * commits, then climbs back as the real tracklist arrives. Holding the floor
- * turns that shrink-then-grow into a single eased step.
- *
- * `:has()` is what releases it: the moment real detail replaces the placeholder
- * the floor stops applying, the card falls to its natural height, and the resize
- * observer below tweens that one change. Nothing has to decide when detail has
- * "really" arrived — the URL lands well before the streamed tracklist does, so
- * every signal short of the placeholder's own absence releases too early.
- */
-function reserveSx(reservePx: number | null): SxObject {
-  return reservePx == null
-    ? {}
-    : { '&:has([data-role="album-detail-placeholder"])': { minHeight: reservePx } };
-}
-
-/**
- * Outer shell height. Locked to a pixel value only while a content resize is
- * tweening, then released to `auto`.
- *
- * `clip` rather than `hidden`: `hidden` makes this a scroll container, which
- * re-parents the well's sticky art and name band to it. Their `top` offsets then
- * apply against a box scrolled to 0, so both slid ~100px down the card the frame
- * the height locked and snapped back when it released. `clip` hides the same
- * overflow without a scrollport, leaving sticky anchored to the page.
- */
-const shellUnlockedSx: SxObject = {
-  height: 'auto',
-  overflow: 'visible',
-};
-
-const shellLockedSx: SxObject = {
-  [REDUCED_MOTION]: {
-    height: 'auto',
-    overflow: 'visible',
-    transition: 'none',
-  },
-  overflow: 'clip',
-  transition: createTransition('height', TIMING_MEDIUM, EASING_DEFAULT),
-};
 
 type Props = {
   /** Header data the grid already holds, so art is up before detail streams. */
@@ -90,7 +39,7 @@ type Props = {
  *
  * Switching straight from one album to another goes further and floors the card
  * at the outgoing height until the arriving tracklist replaces the placeholder,
- * so that swap costs the page no layout at all. See `reserveSx`.
+ * so that swap costs the page no layout at all.
  */
 export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
   const measureRef = useRef<HTMLDivElement>(null);
@@ -156,7 +105,7 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
         name={albumArtViewTransitionName(album.id)}
         share="vt-album-art"
       >
-        <Box className="music__wellArtCard">
+        <div className="music__wellArtCard">
           <Image
             alt={album.name}
             fetchPriority="high"
@@ -166,7 +115,7 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
             url={album.imageUrl}
             width={WELL_ART_SIZE}
           />
-        </Box>
+        </div>
       </ViewTransition>
       <PaperTag className="collagePin music__wellAlbumTag" edge="quad-c" tiltDeg={-5} tone="ochre">
         <span>Album</span>
@@ -187,25 +136,30 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
   );
 
   const well = (
-    <Box
-      aria-label={`${album.name} details`}
-      className="music__wellShell"
-      component="section"
-      sx={reserveSx(reservePx)}
-    >
+    <section aria-label={`${album.name} details`} className="music__wellShell">
+      {reservePx != null ? (
+        <style>{`.music__wellShell:has([data-role="album-detail-placeholder"]) { min-height: ${reservePx}px; }`}</style>
+      ) : null}
       {art}
       {title}
       {children}
-    </Box>
+    </section>
   );
 
   return (
-    <Box
+    <div
       onTransitionEnd={handleTransitionEnd}
-      style={heightPx != null ? { height: heightPx } : undefined}
-      sx={heightPx != null ? shellLockedSx : shellUnlockedSx}
+      style={
+        heightPx != null
+          ? {
+              height: heightPx,
+              overflow: 'clip',
+              transition: createTransition('height', TIMING_MEDIUM, EASING_DEFAULT),
+            }
+          : { height: 'auto', overflow: 'visible' }
+      }
     >
-      <Box className="collageBackdropHost" ref={measureRef}>
+      <div className="collageBackdropHost" ref={measureRef}>
         <CollageBackdrop backdrop={ALBUM_DETAIL_BACKDROP} />
         <PaperCard
           className="music__wellCard"
@@ -216,7 +170,7 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
         >
           {well}
         </PaperCard>
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }

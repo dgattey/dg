@@ -1,16 +1,14 @@
 'use client';
 
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
-import { Box } from '@dg/ui/core/Box';
-import type { SxObject } from '@dg/ui/theme';
 import { Overlay, Map as PigeonMapCore } from 'pigeon-maps';
-import { useState } from 'react';
+import { type CSSProperties, useState } from 'react';
 import { Marker } from './Marker';
 import { stadiaTileUrl, type TileSource } from './tileSource';
 import { WatercolorTile } from './WatercolorTile';
 import { ZoomControls } from './ZoomControls';
 
-const containerSx: SxObject = {
+const containerStyle: CSSProperties = {
   backgroundColor: 'var(--ultramarine)',
   height: '100%',
   isolation: 'isolate',
@@ -57,7 +55,7 @@ export function PigeonMap({ location, tileSource }: PigeonMapProps) {
   };
 
   return (
-    <Box sx={containerSx}>
+    <div style={containerStyle}>
       <PigeonMapCore
         attribution={false}
         center={center}
@@ -85,6 +83,6 @@ export function PigeonMap({ location, tileSource }: PigeonMapProps) {
         </Overlay>
       </PigeonMapCore>
       <ZoomControls onZoomIn={handleZoomIn} onZoomOut={handleZoomOut} />
-    </Box>
+    </div>
   );
 }

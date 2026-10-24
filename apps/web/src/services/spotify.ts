@@ -2,12 +2,22 @@ import 'server-only';
 
 import type { Track } from '@dg/content-models/spotify/Track';
 import { fetchRecentlyPlayed } from '@dg/services/spotify/fetchRecentlyPlayed';
+import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { cacheLife, cacheTag } from 'next/cache';
-import './oauthTokenCache';
-import { withMissingTokenFallback } from './withMissingTokenFallback';
+import { CACHE_TAGS } from './cacheTags';
 
-const LATEST_SONG_TAG = 'latest-song';
 const LATEST_SONG_FRESH_MS = 1_500;
+
+async function withMissingTokenFallback<T>(promise: Promise<T>): Promise<T | null> {
+  try {
+    return await promise;
+  } catch (error) {
+    if (isMissingTokenError(error)) {
+      return null;
+    }
+    throw error;
+  }
+}
 
 let cachedLatestSong: { expiresAt: number; track: Track | null } | null = null;
 let inFlightLatestSong: Promise<Track | null> | null = null;
@@ -44,7 +54,7 @@ export const getLatestSong = async (): Promise<Track | null> => {
 export const getLastKnownSong = async () => {
   'use cache';
   cacheLife('max');
-  cacheTag(LATEST_SONG_TAG);
+  cacheTag(CACHE_TAGS.latestSong);
   if (process.env.NODE_ENV !== 'test' && !process.env.SPOTIFY_CLIENT_ID) {
     return null;
   }

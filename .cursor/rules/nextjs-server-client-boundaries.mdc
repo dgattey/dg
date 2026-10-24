@@ -19,18 +19,18 @@ alwaysApply: false
 const HeavyComponent = lazy(() => import('./HeavyComponent'));
 ```
 
-## Theme styling (`sx` and CSS variables)
+## Theme styling (CSS variables and `style`)
 
-- `sx` must be plain serializable objects; use CSS variables (`--dg-palette-*`, `--dg-shadow-*`, or collage tokens) and static spacing.
+- Use static CSS classes, CSS variables (`--dg-palette-*`, `--dg-shadow-*`, or collage tokens), and plain serializable `style` objects.
 
 ```tsx
-// good: CSS vars + plain object
-<Box sx={{ color: 'var(--dg-palette-text-primary)', padding: '8px' }} />
+// good: CSS vars + plain style object
+<div style={{ color: 'var(--dg-palette-text-primary)', padding: 8 }} />
 ```
 
 ## Avoid `component={Function}`
 
-- Do not pass a function/component to `Box` or `Typography`'s `component` prop across a server-client boundary; use wrapper components (`Link`, `PageTransitionLink`) or HTML tag strings instead.
+- Do not pass a function/component to `Typography`'s `component` prop across a server-client boundary; use wrapper components (`Link`, `PageTransitionLink`) or HTML tag strings instead.
 
 ```tsx
 // good

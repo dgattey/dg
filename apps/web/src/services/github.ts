@@ -2,14 +2,13 @@ import 'server-only';
 
 import { type ChangelogRelease, fetchReleases } from '@dg/services/github/fetchReleases';
 import { cacheLife, cacheTag } from 'next/cache';
+import { CACHE_TAGS } from './cacheTags';
 import { getAppVersionInfo } from './version';
-
-const CHANGELOG_TAG = 'changelog';
 
 async function fetchCachedChangelogReleases(appVersion: string): Promise<Array<ChangelogRelease>> {
   'use cache';
   cacheLife('max');
-  cacheTag(CHANGELOG_TAG);
+  cacheTag(CACHE_TAGS.changelog);
   return await fetchReleases({ fallbackVersion: appVersion });
 }
 

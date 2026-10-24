@@ -1,3 +1,6 @@
+/** Pacific time zone used across the site for calendar days, hours, and streaks. */
+export const SITE_TIME_ZONE = 'America/Los_Angeles';
+
 /** Where a calendar bucket sits relative to now: done, still filling in, or not started. */
 export type PeriodStatus = 'past' | 'current' | 'future';
 

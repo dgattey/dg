@@ -1,6 +1,5 @@
 import 'server-only';
 
-import { dbClient } from '@dg/db';
 import { MusicPlaylist } from '@dg/db/models/MusicPlaylist';
 import { log } from '@dg/shared-core/logging/log';
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
@@ -9,7 +8,7 @@ import type { StatsPlaylist, StatsTrack } from './fetchListeningStats';
 import { ALL_TIME_FILTER, type SqlPlayFilter, select, whereClause } from './listeningStatsQueries';
 import { FAVORITE_ALBUMS_PLAYLIST_ID } from './refreshFavoriteAlbumsSnapshot';
 import { spotifyUrl } from './spotifyLinks';
-import { bestSpotifyImage, sleep, spotifyGet } from './trackMetadataShared';
+import { bestSpotifyImage, mapInBatches, spotifyGet } from './trackMetadataShared';
 
 const PLAYLIST_PAGE_SIZE = 50;
 const MAX_PLAYLIST_LIST_PAGES = 2;
@@ -19,8 +18,6 @@ const FETCH_CONCURRENCY = 8;
 const FETCH_THROTTLE_MS = 25;
 const TOP_PLAYLISTS_LIMIT = 6;
 const MEMORY_CACHE_TTL_MS = 60 * 60 * 1000;
-const PLAYLIST_SYNC_LOCK_ID = 20261024;
-const SPOTIFY_TRACK_URI_PREFIX = 'spotify:track:';
 
 const playlistImageSchema = v.looseObject({
   height: v.optional(v.nullable(v.number())),
@@ -51,20 +48,6 @@ const playlistTracksPageSchema = v.looseObject({
     ),
   ),
   next: v.optional(v.nullable(v.string())),
-});
-
-const embedDataSchema = v.looseObject({
-  props: v.looseObject({
-    pageProps: v.looseObject({
-      state: v.looseObject({
-        data: v.looseObject({
-          entity: v.looseObject({
-            trackList: v.optional(v.array(v.looseObject({ uri: v.optional(v.string()) }))),
-          }),
-        }),
-      }),
-    }),
-  }),
 });
 
 export type PlaylistCatalogEntry = {
@@ -116,15 +99,9 @@ async function fetchEmbedPlaylistTrackIds(playlistId: string): Promise<Array<str
     const html = await res.text();
     const nextDataJson = /<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/.exec(html)?.[1];
     if (!nextDataJson) return [];
-    const parsed = v.safeParse(embedDataSchema, JSON.parse(nextDataJson));
-    if (!parsed.success) return [];
-    const trackList = parsed.output.props.pageProps.state.data.entity.trackList ?? [];
     const trackIds = new Set<string>();
-    for (const { uri } of trackList) {
-      if (uri?.startsWith(SPOTIFY_TRACK_URI_PREFIX)) {
-        const id = uri.slice(SPOTIFY_TRACK_URI_PREFIX.length).trim();
-        if (id) trackIds.add(id);
-      }
+    for (const match of nextDataJson.matchAll(/spotify:track:([0-9A-Za-z]{22})/g)) {
+      if (match[1]) trackIds.add(match[1]);
     }
     return [...trackIds];
   } catch {
@@ -188,28 +165,22 @@ async function fetchPlaylistsFromSpotify(): Promise<Array<PlaylistCatalogEntry>>
     return [];
   }
 
-  const fetched: Array<PlaylistCatalogEntry> = [];
-  for (let i = 0; i < summaries.length; i += FETCH_CONCURRENCY) {
-    const batch = summaries.slice(i, i + FETCH_CONCURRENCY);
-    const results = await Promise.allSettled(
-      batch.map(async (item) => {
-        const trackIds = await fetchPlaylistTrackIds(item.id, state);
-        if (trackIds.length === 0) return null;
-        return {
-          id: item.id,
-          imageUrl: bestSpotifyImage(item.images ?? []),
-          name: item.name,
-          totalTracks: Math.max(item.tracks?.total ?? 0, trackIds.length),
-          trackIds,
-          url: spotifyUrl('playlist', item.id, item.external_urls?.spotify),
-        };
-      }),
-    );
-    for (const res of results) {
-      if (res.status === 'fulfilled' && res.value) fetched.push(res.value);
-    }
-    if (i + FETCH_CONCURRENCY < summaries.length) await sleep(FETCH_THROTTLE_MS);
-  }
+  const fetched = await mapInBatches(
+    summaries,
+    async (item) => {
+      const trackIds = await fetchPlaylistTrackIds(item.id, state);
+      if (trackIds.length === 0) return null;
+      return {
+        id: item.id,
+        imageUrl: bestSpotifyImage(item.images ?? []),
+        name: item.name,
+        totalTracks: Math.max(item.tracks?.total ?? 0, trackIds.length),
+        trackIds,
+        url: spotifyUrl('playlist', item.id, item.external_urls?.spotify),
+      };
+    },
+    { concurrency: FETCH_CONCURRENCY, throttleMs: FETCH_THROTTLE_MS },
+  );
 
   if (fetched.length > 0) {
     try {
@@ -224,24 +195,6 @@ async function fetchPlaylistsFromSpotify(): Promise<Array<PlaylistCatalogEntry>>
   return fetched;
 }
 
-async function syncPlaylistsWithLock(): Promise<Array<PlaylistCatalogEntry>> {
-  if (process.env.NODE_ENV === 'test') return await fetchPlaylistsFromSpotify();
-  try {
-    let synced: Array<PlaylistCatalogEntry> = [];
-    await dbClient.transaction(async (transaction) => {
-      await dbClient.query(`SELECT pg_advisory_xact_lock(${PLAYLIST_SYNC_LOCK_ID})`, {
-        transaction,
-      });
-      const existing = await MusicPlaylist.count({ transaction });
-      if (existing === 0) synced = await fetchPlaylistsFromSpotify();
-    });
-    if (synced.length > 0) return synced;
-  } catch {
-    return await fetchPlaylistsFromSpotify();
-  }
-  return await readCachedPlaylists();
-}
-
 export async function resolvePlaylists(): Promise<Array<PlaylistCatalogEntry>> {
   const cached = await readCachedPlaylists();
   if (cached.length > 0) return cached;
@@ -250,7 +203,7 @@ export async function resolvePlaylists(): Promise<Array<PlaylistCatalogEntry>> {
     return memoryCachedPlaylists.entries;
   }
   if (useMemoryCache && inFlightPlaylists) return await inFlightPlaylists;
-  const promise = syncPlaylistsWithLock().then((entries) => {
+  const promise = fetchPlaylistsFromSpotify().then((entries) => {
     if (useMemoryCache && entries.length > 0) {
       memoryCachedPlaylists = { entries, expiresAt: Date.now() + MEMORY_CACHE_TTL_MS };
     }

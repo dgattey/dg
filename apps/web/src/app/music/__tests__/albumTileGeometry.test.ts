@@ -1,7 +1,7 @@
-import { albumCoverSx, MAX_ALBUM_SLEEVES } from '../albumTileGeometry';
+import { albumCoverStyle, MAX_ALBUM_SLEEVES } from '../albumTileGeometry';
 
 const coverStyle = (depth: number, sleeveCount: number) =>
-  albumCoverSx(depth, sleeveCount) as { inset: string; transform: string };
+  albumCoverStyle(depth, sleeveCount) as { inset: string; transform: string };
 
 const fanOffset = (depth: number, sleeveCount: number) =>
   Number(
@@ -9,7 +9,7 @@ const fanOffset = (depth: number, sleeveCount: number) =>
       ?.shift,
   );
 
-describe('albumCoverSx', () => {
+describe('albumCoverStyle', () => {
   it('gives every cover the same box, stacked or not', () => {
     const boxes = [
       coverStyle(0, 0),

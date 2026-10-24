@@ -100,19 +100,10 @@ const SAMPLE_LINKS: FooterContent['links'] = [
 
 const SAMPLE_TRACK: Track = {
   album: {
-    externalUrls: { spotify: 'https://open.spotify.com/album/solace' },
-    href: 'https://api.spotify.com/v1/albums/solace',
     id: 'solace',
-    images: [
-      {
-        height: 300,
-        url: 'https://i.scdn.co/image/sample-album',
-        width: 300,
-      },
-    ],
     name: 'Solace',
     releaseDate: '2018-10-19',
-    uri: 'spotify:album:solace',
+    url: 'https://open.spotify.com/album/solace',
   },
   albumImage: {
     height: 300,
@@ -121,21 +112,17 @@ const SAMPLE_TRACK: Track = {
   },
   artists: [
     {
-      externalUrls: { spotify: 'https://open.spotify.com/artist/1' },
-      href: 'https://api.spotify.com/v1/artists/1',
       id: '1',
       name: 'RÜFÜS DU SOL',
-      uri: 'spotify:artist:1',
+      url: 'https://open.spotify.com/artist/1',
     },
   ],
   durationMs: 578000,
-  externalUrls: { spotify: 'https://open.spotify.com/track/innerbloom' },
-  href: 'https://api.spotify.com/v1/tracks/innerbloom',
   id: 'innerbloom',
   isPlaying: true,
   name: 'Innerbloom',
   progressMs: 120000,
-  uri: 'spotify:track:innerbloom',
+  url: 'https://open.spotify.com/track/innerbloom',
 };
 
 const SAMPLE_ACTIVITY: StravaActivity = {

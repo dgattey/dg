@@ -4,7 +4,6 @@ import type { WebhookSubscriptionMetadata } from '@dg/services/strava/webhooks/g
 import { getWebhookSubscriptions } from '@dg/services/strava/webhooks/getWebhookSubscriptions';
 import { RelativeTime } from '@dg/ui/core/RelativeTime';
 import { Skeleton } from '@dg/ui/core/Skeleton';
-import { Stack } from '@dg/ui/core/Stack';
 import { Typography } from '@dg/ui/core/Typography';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
@@ -19,14 +18,14 @@ import { ErrorMessage, StatusChip } from '../StatusIndicators';
 
 function SubscriptionDetails({ details }: { details: WebhookSubscriptionMetadata }) {
   return (
-    <Stack sx={{ gap: 0.5 }}>
-      <Typography sx={{ color: 'text.secondary' }} variant="body2">
+    <div className="devConsole__stack devConsole__stack--tight">
+      <Typography color="var(--dg-palette-text-secondary)" variant="body2">
         <strong>Callback URL:</strong> {details.callbackUrl}
       </Typography>
-      <Typography sx={{ color: 'text.secondary' }} variant="body2">
+      <Typography color="var(--dg-palette-text-secondary)" variant="body2">
         <strong>Created:</strong> <RelativeTime date={details.createdAt} />
       </Typography>
-    </Stack>
+    </div>
   );
 }
 
@@ -50,14 +49,14 @@ function SubscriptionActions({
 
   return (
     <>
-      <Stack sx={{ gap: 1 }}>
+      <div className="devConsole__stack devConsole__stack--compact">
         {subscriptions.map((subscription) => (
           <SubscriptionDetails
             details={subscription}
             key={`${subscription.callbackUrl}-${subscription.createdAt}`}
           />
         ))}
-      </Stack>
+      </div>
       <ServerActionButton
         action={deleteWebhookSubscription}
         label="Delete subscription"
@@ -83,16 +82,10 @@ export async function WebhookCardContent() {
 
   return (
     <>
-      <Stack
-        direction="row"
-        sx={{
-          alignItems: 'center',
-          gap: 1,
-        }}
-      >
+      <div className="devConsole__row">
         <Typography variant="h3">Strava webhooks</Typography>
         <StatusChip isConnected={subscriptions.length > 0} />
-      </Stack>
+      </div>
       <ErrorMessage message={error} />
       {error ? null : <SubscriptionActions subscriptions={subscriptions} />}
     </>
@@ -106,21 +99,15 @@ export async function WebhookCardContent() {
 function WebhookCardContentSkeleton() {
   return (
     <>
-      <Stack
-        direction="row"
-        sx={{
-          alignItems: 'center',
-          gap: 1.5,
-        }}
-      >
+      <div className="devConsole__row devConsole__row--wide">
         <Skeleton height={36} variant="text" width={240} />
         <Skeleton height={24} variant="rounded" width={120} />
-      </Stack>
-      <Stack>
+      </div>
+      <div className="devConsole__stack">
         <Skeleton variant="text" width="80%" />
         <Skeleton variant="text" width="60%" />
-      </Stack>
-      <Skeleton height={42} sx={{ alignSelf: 'flex-start' }} variant="rounded" width={260} />
+      </div>
+      <Skeleton className="devConsole__skeletonButton" height={42} variant="rounded" width={260} />
     </>
   );
 }
