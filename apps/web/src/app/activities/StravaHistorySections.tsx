@@ -1,5 +1,5 @@
 import type { StravaHistory } from '@dg/content-models/strava/StravaHistory';
-import { atlasBounds, atlasRegions, simplifyPolyline } from '@dg/maps/atlasGeometry';
+import { atlasBounds, atlasRegions } from '@dg/maps/atlasGeometry';
 import { getTileSource } from '@dg/maps/src/getTileSource';
 import type { ReactNode } from 'react';
 import { PaperCard } from '../collage/PaperCard';
@@ -24,18 +24,13 @@ export function AtlasSheet({ children }: { children: ReactNode }) {
 /**
  * Everything after the title on `/activities`, as items of the page's grid so the
  * filters can sit beside the title: the filterable atlas beside the field
- * notes, then the scrapbook bands. Routes are simplified once here and shared
- * by the atlas, the logbook loops, and the longest outing's print.
+ * notes, then the scrapbook bands.
  */
 export function StravaHistorySections({ history }: { history: StravaHistory }) {
   const tileSource = getTileSource();
-  const outings = history.outings.map((outing) => ({
-    ...outing,
-    polyline: outing.polyline ? simplifyPolyline(outing.polyline) || null : null,
-  }));
-  const routes = toMapRoutes(outings);
+  const routes = toMapRoutes(history.outings);
   return (
-    <StravaFilters outings={outings}>
+    <StravaFilters outings={history.outings}>
       <div className="strava__atlas">
         <FieldNotes history={history} tileSource={tileSource} />
         <AtlasSheet>

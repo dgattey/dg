@@ -4,6 +4,7 @@ import type { StravaWebhookEvent } from '@dg/content-models/strava/StravaWebhook
 import { db } from '@dg/db';
 import { log } from '@dg/shared-core/logging/log';
 import { fetchStravaActivityFromApi } from './fetchStravaActivityFromApi';
+import { refreshStravaHistorySummary } from './fetchStravaHistoryFromDb';
 
 const UPDATE_THRESHOLD_IN_MS = 60000;
 
@@ -35,11 +36,18 @@ const fetchFromApiAndSaveToDb = async (id: number) => {
     id,
     lastUpdate: new Date(),
   });
+  await refreshStravaHistorySummary();
   log.info('Upserted Strava activity', { updatedActivity });
   return updatedActivity[0];
 };
 
-const deleteActivityFromDb = async (id: number) => db.StravaActivity.destroy({ where: { id } });
+const deleteActivityFromDb = async (id: number) => {
+  const deletedCount = await db.StravaActivity.destroy({ where: { id } });
+  if (deletedCount > 0) {
+    await refreshStravaHistorySummary();
+  }
+  return deletedCount;
+};
 
 export const syncStravaWebhookUpdateWithDb = async (event: StravaWebhookEvent) => {
   switch (event.aspect_type) {

@@ -4,6 +4,7 @@ import {
   OUTLINE_UNIT_METERS,
   outlineProjection,
   projectToGrid,
+  simplifySummaryPolyline,
 } from '../streetGridGeometry';
 
 describe('encodePolyline', () => {
@@ -50,5 +51,24 @@ describe('outlineProjection', () => {
     const [x, y] = projectToGrid(origin, lat, lng);
     expect((lng - origin.lng) * perDegree.lng).toBeCloseTo(x / OUTLINE_UNIT_METERS, 6);
     expect((lat - origin.lat) * perDegree.lat).toBeCloseTo(-y / OUTLINE_UNIT_METERS, 6);
+  });
+});
+
+describe('simplifySummaryPolyline', () => {
+  it('simplifies collinear points, quantizes to 1e4, and stays idempotent', () => {
+    const collinear = encodePolyline([
+      [3_776_000, -12_244_000],
+      [3_776_500, -12_244_000],
+      [3_777_000, -12_244_000],
+      [3_777_500, -12_244_000],
+      [3_778_000, -12_244_000],
+    ]);
+    const simplified = simplifySummaryPolyline(collinear);
+    expect(decodePolyline(simplified, 1e5)).toEqual([
+      [37.76, -122.44],
+      [37.78, -122.44],
+    ]);
+    expect(simplifySummaryPolyline(simplified)).toBe(simplified);
+    expect(simplifySummaryPolyline('camel')).toBe('camel');
   });
 });

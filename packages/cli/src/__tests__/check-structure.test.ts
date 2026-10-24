@@ -131,6 +131,13 @@ describe('check-structure', () => {
     assert.equal(unprojectedDbViolation.length, 1);
     assert.equal(unprojectedDbViolation[0]?.rule, 'unprojected-db-query');
 
+    const uncachedStravaHistoryViolation = checkFileStructure(
+      'packages/services/strava/fetchStravaHistoryFromDb.ts',
+      "import 'server-only';\nexport const fetchStravaHistoryFromDb = () => null;\n",
+    );
+    assert.equal(uncachedStravaHistoryViolation.length, 1);
+    assert.equal(uncachedStravaHistoryViolation[0]?.rule, 'strava-history-summary-cache');
+
     const orphanCss = checkOrphanCssFiles(
       ['apps/web/src/app/music/music.css', 'apps/web/src/app/dev-console/devConsole.css'],
       new Map([['apps/web/src/app/music/page.tsx', "import './music.css';\n"]]),
