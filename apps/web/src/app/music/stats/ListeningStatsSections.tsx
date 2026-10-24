@@ -65,6 +65,7 @@ export function ListeningStatsSections({
     buildInitialCache(initialStats, initialSnapshots),
   );
   const inFlightRef = useRef<Map<StatsRangeKey, Promise<ListeningStats | null>>>(new Map());
+  const prefetchTimerRef = useRef<number | undefined>(undefined);
   const requestSeq = useRef(0);
   const onLoadRangeRef = useRef(onLoadRange);
   onLoadRangeRef.current = onLoadRange;
@@ -99,10 +100,22 @@ export function ListeningStatsSections({
     if (cacheRef.current.has(nextKey) || inFlightRef.current.has(nextKey)) {
       return;
     }
-    void loadRangeWithCache(nextKey);
+    if (prefetchTimerRef.current !== undefined) {
+      window.clearTimeout(prefetchTimerRef.current);
+    }
+    prefetchTimerRef.current = window.setTimeout(() => {
+      prefetchTimerRef.current = undefined;
+      if (!cacheRef.current.has(nextKey) && !inFlightRef.current.has(nextKey)) {
+        void loadRangeWithCache(nextKey);
+      }
+    }, 180);
   };
 
   const applyRange = (nextKey: StatsRangeKey, updateHistory = true) => {
+    if (prefetchTimerRef.current !== undefined) {
+      window.clearTimeout(prefetchTimerRef.current);
+      prefetchTimerRef.current = undefined;
+    }
     setSelectedKey(nextKey);
     if (updateHistory && typeof window !== 'undefined') {
       const url = new URL(window.location.href);
@@ -133,8 +146,8 @@ export function ListeningStatsSections({
 
   const applyRangeRef = useRef(applyRange);
   applyRangeRef.current = applyRange;
-  const prefetchRangeRef = useRef(prefetchRange);
-  prefetchRangeRef.current = prefetchRange;
+  const loadRangeRef = useRef(loadRangeWithCache);
+  loadRangeRef.current = loadRangeWithCache;
 
   useEffect(() => {
     if (typeof window === 'undefined') {
@@ -151,12 +164,15 @@ export function ListeningStatsSections({
       applyRangeRef.current(initialUrlKey, false);
     }
     const warmupTimer = window.setTimeout(() => {
-      prefetchRangeRef.current('week');
-      prefetchRangeRef.current('month');
+      void loadRangeRef.current('week');
+      void loadRangeRef.current('month');
     }, 120);
     window.addEventListener('popstate', syncFromUrl);
     return () => {
       window.clearTimeout(warmupTimer);
+      if (prefetchTimerRef.current !== undefined) {
+        window.clearTimeout(prefetchTimerRef.current);
+      }
       window.removeEventListener('popstate', syncFromUrl);
     };
   }, [initialStats]);

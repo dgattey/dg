@@ -1,4 +1,12 @@
-import { decodeRoutes, frameAround, framePaths, type GeoBounds, type MapRoute } from './routeFrame';
+import { useRef } from 'react';
+import {
+  decodeRoutes,
+  type FramedPath,
+  frameAround,
+  framePaths,
+  type GeoBounds,
+  type MapRoute,
+} from './routeFrame';
 
 const FRAME = { height: 600, padding: 24, width: 800 };
 
@@ -13,14 +21,31 @@ export function RouteAtlasSketch({
   bounds: GeoBounds;
   routes: ReadonlyArray<MapRoute>;
 }) {
+  const boundsKey = `${bounds[0][0]},${bounds[0][1]}:${bounds[1][0]},${bounds[1][1]}`;
   const frame = frameAround(bounds, FRAME);
+  const cacheRef = useRef<{
+    boundsKey: string;
+    paths: Array<FramedPath>;
+    routes: ReadonlyArray<MapRoute>;
+  } | null>(null);
+  if (
+    !cacheRef.current ||
+    cacheRef.current.boundsKey !== boundsKey ||
+    cacheRef.current.routes !== routes
+  ) {
+    cacheRef.current = {
+      boundsKey,
+      paths: framePaths(frame, decodeRoutes(routes)),
+      routes,
+    };
+  }
   return (
     <svg
       aria-hidden="true"
       preserveAspectRatio="xMidYMid slice"
       viewBox={`0 0 ${frame.width} ${frame.height}`}
     >
-      {framePaths(frame, decodeRoutes(routes)).map(({ d, tone }) => (
+      {cacheRef.current.paths.map(({ d, tone }) => (
         <path
           d={d}
           data-tone={tone}

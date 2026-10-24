@@ -79,6 +79,10 @@
     align-items: start;
   }
 }
+.changelog__yearSection:nth-child(n + 3) {
+  contain-intrinsic-size: auto 900px;
+  content-visibility: auto;
+}
 .changelog__yearRail {
   @media (min-width: 960px) {
     position: sticky;

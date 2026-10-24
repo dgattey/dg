@@ -228,6 +228,8 @@
   grid-template-columns: repeat(12, minmax(0, 1fr));
   gap: 48px 40px;
   align-items: start;
+  contain-intrinsic-size: auto 620px;
+  content-visibility: auto;
 }
 .strava__flowerCard,
 .strava__climbs,
@@ -352,9 +354,7 @@
   transition: opacity 160ms ease;
 }
 .strava__petal {
-  transition:
-    filter 160ms ease,
-    stroke 160ms ease;
+  transition: stroke 160ms ease;
 }
 .strava__petal--current .strava__petal {
   stroke: var(--ink-on-cream);
@@ -555,9 +555,7 @@
   cursor: default;
   background: none;
   border: 0;
-  transition:
-    opacity 160ms ease,
-    translate 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: translate 200ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .strava__yearButton:focus-visible {
   outline: 2px solid var(--on);

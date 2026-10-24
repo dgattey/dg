@@ -103,6 +103,8 @@ export function useFloatingTooltip({
 }: FloatingTooltipOptions) {
   const floatingRef = useRef<HTMLSpanElement>(null);
   const openReasons = useRef(new Set<OpenReason>());
+  const isMutedRef = useRef(isMuted);
+  isMutedRef.current = isMuted;
   const [host, setHost] = useState<Element | null>(null);
   const isFloating = useSyncExternalStore(
     subscribeToNothing,
@@ -112,7 +114,7 @@ export function useFloatingTooltip({
 
   const open = (reason: OpenReason) => {
     const anchor = anchorRef.current;
-    if (!anchor || isMuted(anchor)) {
+    if (!anchor || isMutedRef.current(anchor)) {
       return;
     }
     openReasons.current.add(reason);
@@ -120,6 +122,9 @@ export function useFloatingTooltip({
   };
 
   const close = (reason: OpenReason) => {
+    if (!openReasons.current.has(reason)) {
+      return;
+    }
     openReasons.current.delete(reason);
     if (openReasons.current.size === 0) {
       setHost(null);
@@ -132,20 +137,24 @@ export function useFloatingTooltip({
     }
   };
 
+  const handlersRef = useRef({ close, openOnKeyboardFocus });
+  handlersRef.current = { close, openOnKeyboardFocus };
+
   // Mirrors the CSS reveal for an anchor that sits inside its focused trigger.
   useEffect(() => {
     const trigger = anchorRef.current?.parentElement;
     if (!isFloating || !trigger) {
       return;
     }
-    const onBlur = () => close('focus');
-    trigger.addEventListener('focus', openOnKeyboardFocus);
+    const onFocus = (event: FocusEvent) => handlersRef.current.openOnKeyboardFocus(event);
+    const onBlur = () => handlersRef.current.close('focus');
+    trigger.addEventListener('focus', onFocus);
     trigger.addEventListener('blur', onBlur);
     return () => {
-      trigger.removeEventListener('focus', openOnKeyboardFocus);
+      trigger.removeEventListener('focus', onFocus);
       trigger.removeEventListener('blur', onBlur);
     };
-  });
+  }, [anchorRef, isFloating]);
 
   useLayoutEffect(() => {
     const anchor = anchorRef.current;

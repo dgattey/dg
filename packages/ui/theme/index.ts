@@ -20,9 +20,8 @@ export type SxObject = SxProperties & {
 
 export type SxProps = SxObject | boolean | null | undefined | ReadonlyArray<SxProps>;
 
-const CARD_SHADOW_MAIN =
-  '0 1px 2px rgba(0, 0, 0, 0.14), 0 3px 6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.04)';
-const CARD_SHADOW_HOVERED = '0 4px 12px rgba(0, 0, 0, 0.16), 0 0 0 1.5px rgba(0, 0, 0, 0.06)';
+const CARD_SHADOW_MAIN = '0 1.5px 0 rgba(0, 0, 0, 0.18), 0 0 0 1px rgba(0, 0, 0, 0.04)';
+const CARD_SHADOW_HOVERED = '0 3px 0 rgba(0, 0, 0, 0.22), 0 0 0 1.5px rgba(0, 0, 0, 0.06)';
 
 export function getGlobalThemeCss(): string {
   const typography = getTypography();
