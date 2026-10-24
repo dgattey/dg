@@ -61,7 +61,8 @@
   z-index: 4;
   display: grid;
   grid-area: intro;
-  width: min(100%, 648px);
+  /* The inset keeps the offset mat clear of the portrait now that the card spans the gap column. */
+  width: min(100% - 32px, 700px);
   padding: 30px 38px 32px;
   margin-top: 26px;
   font-size: var(--type-body-lg);
@@ -100,7 +101,7 @@
   margin: 0;
   font-size: inherit;
   line-height: inherit;
-  text-wrap: pretty;
+  text-wrap: balance;
 }
 /* Links render through Typography, which sets its own size and drops the underline. */
 .home__intro p :is(a, [data-typography]) {
