@@ -25,10 +25,6 @@ jest.mock('../albums', () => ({
   getFavoriteAlbums: jest.fn(async () => []),
 }));
 
-jest.mock('../spotify', () => ({
-  getLastKnownSong: jest.fn(async () => null),
-}));
-
 import type { Track } from '@dg/content-models/spotify/Track';
 import { refreshFavoriteAlbumsSnapshotWithLogging } from '@dg/services/spotify/refreshFavoriteAlbumsSnapshot';
 import {

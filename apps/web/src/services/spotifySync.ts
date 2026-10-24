@@ -10,7 +10,6 @@ import { cacheLife, cacheTag, revalidateTag } from 'next/cache';
 import { after } from 'next/server';
 import { getFavoriteAlbums } from './albums';
 import { CACHE_TAGS } from './cacheTags';
-import { getLastKnownSong } from './spotify';
 
 export const STALE_SPOTIFY_SYNC_INTERVAL_MS = 20 * 60 * 1000;
 export const FAVORITE_ALBUMS_CHECK_INTERVAL_MS = 60 * 60 * 1000;
@@ -41,17 +40,9 @@ async function readCachedLatestPlayedAtIso(): Promise<string | null> {
 }
 
 export async function getCachedLatestPlayedAt(): Promise<Date | null> {
-  const [dbLatestIso, lastKnownSong] = await Promise.all([
-    readCachedLatestPlayedAtIso().catch(() => null),
-    getLastKnownSong().catch(() => null),
-  ]);
+  const dbLatestIso = await readCachedLatestPlayedAtIso().catch(() => null);
   const dbMs = dbLatestIso ? Date.parse(dbLatestIso) : Number.NaN;
-  const songMs = lastKnownSong?.playedAt ? new Date(lastKnownSong.playedAt).getTime() : Number.NaN;
-  const newestMs = Math.max(
-    Number.isNaN(dbMs) ? 0 : dbMs,
-    Number.isNaN(songMs) ? 0 : songMs,
-    lastKnownLatestPlayedAtMs,
-  );
+  const newestMs = Math.max(Number.isNaN(dbMs) ? 0 : dbMs, lastKnownLatestPlayedAtMs);
   if (newestMs > 0) {
     lastKnownLatestPlayedAtMs = newestMs;
     return new Date(newestMs);
