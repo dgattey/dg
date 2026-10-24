@@ -41,7 +41,7 @@ const QUERY = gql`
           json
         }
         coverImage {
-          url(transform: { quality: 90, format: WEBP })
+          url(transform: { width: 480, quality: 85, format: WEBP })
           width
           height
         }
@@ -50,10 +50,6 @@ const QUERY = gql`
   }
 `;
 
-/**
- * Fetches all read and currently-reading books from Contentful, paginating across
- * 200-book pages if needed.
- */
 export async function fetchBooks(): Promise<Array<RenderableBook>> {
   const client = getContentfulClient();
   const books: Array<RenderableBook> = [];

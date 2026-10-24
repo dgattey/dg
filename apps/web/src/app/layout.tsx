@@ -12,6 +12,7 @@ import { SpeedInsights } from '@vercel/speed-insights/react';
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { getServerTime } from '../services/getServerTime';
+import { CutOutSymbols } from './collage/CutOutSymbols';
 import { familjen } from './collage/familjen';
 import { Footer } from './layouts/Footer';
 import { Header } from './layouts/Header';
@@ -40,6 +41,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
           <ColorSchemeSync />
           <WebMcpTools />
           <div className="collageRoot" data-tooltip-root>
+            <CutOutSymbols />
             <NowPlayingProvider>
               <div className="collageSheet">
                 <Header />

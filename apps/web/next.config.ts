@@ -127,7 +127,9 @@ const nextConfig: NextConfig = {
     turbopackFileSystemCacheForDev: true,
   },
   images: {
+    deviceSizes: [640, 828, 1080, 1536],
     formats: ['image/avif', 'image/webp'],
+    imageSizes: [48, 96, 200, 300, 440],
     qualities: [60, 65, 75],
     remotePatterns: [
       {
@@ -203,7 +205,6 @@ const nextConfig: NextConfig = {
   },
   // Disables the Sequelize warning about the `sequelize` package not being found
   serverExternalPackages: ['sequelize'],
-  // Have to do this for each of the packages we import
   transpilePackages: [
     '@dg/shared-core',
     '@dg/content-models',

@@ -10,7 +10,6 @@ import { getLastKnownSong } from '../../services/spotify';
 import { getStravaHistory } from '../../services/strava';
 import { CollageProjectFrame } from '../collage/CollageProjectFrame';
 import { CutOut } from '../collage/CutOut';
-import { CutOutSymbols } from '../collage/CutOutSymbols';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
 import { MoreWorkSheet } from '../collage/MoreWorkSheet';
 import {
@@ -56,7 +55,6 @@ export async function Homepage() {
 
   return (
     <>
-      <CutOutSymbols />
       <section aria-label="Hello" className="collageBleed home__hello">
         {CUT_OUT_PLACEMENTS.helloSheet.map((placement) => (
           <CutOut key={placement.id} placement={placement} />

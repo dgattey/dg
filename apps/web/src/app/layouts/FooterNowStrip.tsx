@@ -20,9 +20,11 @@ function formatSfTime(timestamp: number): string {
   return sfTimeFormatter.format(new Date(timestamp));
 }
 
+type FooterActivitySummary = Pick<StravaActivity, 'distance' | 'name' | 'url'>;
+
 type FooterNowStripProps = {
   initialTrack: Track | null;
-  latestActivity: StravaActivity | null;
+  latestActivity: FooterActivitySummary | null;
 };
 
 export function FooterNowStrip({ initialTrack, latestActivity }: FooterNowStripProps) {

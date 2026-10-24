@@ -80,10 +80,18 @@ export async function Footer() {
   );
   const { version } = versionInfo;
 
+  const footerActivity = latestActivity
+    ? {
+        distance: latestActivity.distance,
+        name: latestActivity.name,
+        url: latestActivity.url,
+      }
+    : null;
+
   return (
     <footer className="chrome__footer">
       <FooterRevealScroll />
-      <FooterNowStrip initialTrack={lastKnownSong} latestActivity={latestActivity} />
+      <FooterNowStrip initialTrack={lastKnownSong} latestActivity={footerActivity} />
       <div className="collageMeasure chrome__footerBody">
         <div className="chrome__footerGrid">
           <div className="chrome__helloCol">

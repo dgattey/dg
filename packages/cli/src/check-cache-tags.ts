@@ -152,34 +152,56 @@ export function checkCacheTagParity(
 
 const BANNED_CONTENTFUL_FALLBACK_PATTERN =
   /\b(?:FALLBACK_|NORMALIZED_|DEFAULT_DESCRIPTION|DEFAULT_ENCODED_EMAIL|normalizeFooterDescription|cleanBookTitle)\w*|\bprocess\.env\.CONTENTFUL_/;
+const MAPLIBRE_TOKEN = ['maplibre', 'gl'].join('-');
 
 export function checkContentfulFallbacks(
   relPath: string,
   content: string,
   lines?: ReadonlyArray<string>,
 ): Array<StructureViolation> {
+  if (isTestPath(relPath)) {
+    return [];
+  }
+  const sourceLines = lines ?? content.split('\n');
+  const maplibreViolations =
+    !relPath.startsWith('packages/cli/') && content.includes(MAPLIBRE_TOKEN)
+      ? sourceLines.flatMap((lineText, i) =>
+          lineText.includes(MAPLIBRE_TOKEN)
+            ? [
+                {
+                  file: relPath,
+                  line: i + 1,
+                  message: 'Use pigeon-maps instead of maplibre',
+                  rule: 'no-maplibre-gl',
+                },
+              ]
+            : [],
+        )
+      : [];
   if (
-    isTestPath(relPath) ||
     (!/^packages\/services\/contentful\/fetch.*\.ts$/.test(relPath) &&
       !/^packages\/content-models\/contentful\/renderables\/.*\.ts$/.test(relPath) &&
       relPath !== 'apps/web/src/app/layouts/Footer.tsx') ||
     !BANNED_CONTENTFUL_FALLBACK_PATTERN.test(content)
   ) {
-    return [];
+    return maplibreViolations;
   }
-  return (lines ?? content.split('\n')).flatMap((lineText, i) =>
-    BANNED_CONTENTFUL_FALLBACK_PATTERN.test(lineText)
-      ? [
-          {
-            file: relPath,
-            line: i + 1,
-            message:
-              'Read Contentful entries directly without hardcoded fallback constants, env-var bypasses, or runtime copy rewrites',
-            rule: 'no-contentful-fallbacks',
-          },
-        ]
-      : [],
-  );
+  return [
+    ...maplibreViolations,
+    ...sourceLines.flatMap((lineText, i) =>
+      BANNED_CONTENTFUL_FALLBACK_PATTERN.test(lineText)
+        ? [
+            {
+              file: relPath,
+              line: i + 1,
+              message:
+                'Read Contentful entries directly without hardcoded fallback constants, env-var bypasses, or runtime copy rewrites',
+              rule: 'no-contentful-fallbacks',
+            },
+          ]
+        : [],
+    ),
+  ];
 }
 
 export function checkMigrationTransactions(

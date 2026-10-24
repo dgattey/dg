@@ -117,6 +117,13 @@ describe('check-structure', () => {
     assert.equal(contentfulFallbackViolation.length, 2);
     assert.equal(contentfulFallbackViolation[0]?.rule, 'no-contentful-fallbacks');
 
+    const maplibreViolation = checkFileStructure(
+      'packages/maps/src/RouteAtlasMap.tsx',
+      `import '${['maplibre', 'gl'].join('-')}/dist/style.css';\nexport const x = 1;\n`,
+    );
+    assert.equal(maplibreViolation.length, 1);
+    assert.equal(maplibreViolation[0]?.rule, 'no-maplibre-gl');
+
     const orphanCss = checkOrphanCssFiles(
       ['apps/web/src/app/music/music.css', 'apps/web/src/app/dev-console/devConsole.css'],
       new Map([['apps/web/src/app/music/page.tsx', "import './music.css';\n"]]),

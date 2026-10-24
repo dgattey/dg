@@ -6,18 +6,14 @@ import {
   simplifyLine,
 } from './routeGeometry';
 
-/** One route to ink, colored by a paper tone (`vermilion` reads `var(--vermilion)`). */
 export type MapRoute = { id: number; polyline: string; tone: string };
 
 type DecodedRoute = { id: number; points: Array<Point>; tone: string };
 
-/** Southwest and northeast corners. */
-export type GeoBounds = [Point, Point];
+export type GeoBounds = [southWest: Point, northEast: Point];
 
-/** A fixed-size Web Mercator viewport that server-projected paths are drawn in. */
 export type RouteFrame = { center: Point; height: number; width: number; zoom: number };
 
-/** Every framed route in one tone, joined into a single SVG path. */
 export type FramedPath = { d: string; tone: string };
 
 const CELL_DEGREES = 0.5;
@@ -27,7 +23,6 @@ const FRAME_MARGIN = 24;
 const GAP_KM = 5;
 const KM_PER_DEGREE = 111.32;
 
-/** Decodes routes for drawing, dropping any whose polyline is corrupt or a single point. */
 export function decodeRoutes(routes: ReadonlyArray<MapRoute>): Array<DecodedRoute> {
   return routes.flatMap(({ id, polyline, tone }) => {
     try {
@@ -44,11 +39,6 @@ const kmBetween = ([latA, lngA]: Point, [latB, lngB]: Point) => {
   return Math.hypot(latB - latA, east) * KM_PER_DEGREE;
 };
 
-/**
- * A route split wherever it jumps more than 5 km between points, which only a
- * paused recording does (a train ride home, a drive to the trailhead), so the
- * jump isn't drawn as a straight line. Drops legs of a single point.
- */
 export function routeLegs(points: ReadonlyArray<Point>): Array<Array<Point>> {
   const legs: Array<Array<Point>> = [];
   let leg: Array<Point> = [];
@@ -73,12 +63,6 @@ const trimmedRange = (values: Array<number>): [number, number] => {
   return [sorted[trim] ?? 0, sorted[sorted.length - 1 - trim] ?? 0];
 };
 
-/**
- * Where most routes go: every point of the routes that start in or beside the
- * busiest half-degree cell, trimmed of the outer 2% each way so a few long rides
- * out of town don't stretch it. Null when there are no routes.
- */
-/** The trimmed extent of every route that starts inside `box`, or null when none do. */
 export function boundsWithin(
   routes: ReadonlyArray<DecodedRoute>,
   [[south, west], [north, east]]: GeoBounds,
@@ -131,7 +115,6 @@ export function homeBounds(routes: ReadonlyArray<DecodedRoute>): GeoBounds | nul
   ];
 }
 
-/** The frame of `width` by `height` that fits `points` with `padding` pixels to spare. */
 export function frameAround(
   points: Array<Point>,
   { height, padding, width }: { height: number; padding: number; width: number },
@@ -142,96 +125,85 @@ export function frameAround(
 const isNearFrame = ({ x, y }: { x: number; y: number }, { height, width }: RouteFrame) =>
   x > -FRAME_MARGIN && x < width + FRAME_MARGIN && y > -FRAME_MARGIN && y < height + FRAME_MARGIN;
 
-const segmentCellKey = (a: readonly [number, number], b: readonly [number, number]) => {
-  const ax = Math.round(a[0] / 15);
-  const ay = Math.round(a[1] / 15);
-  const bx = Math.round(b[0] / 15);
-  const by = Math.round(b[1] / 15);
-  return ax < bx || (ax === bx && ay < by) ? `${ax},${ay}:${bx},${by}` : `${bx},${by}:${ax},${ay}`;
-};
-
-/**
- * Projects routes into the frame's pixels, skipping any that never come near
- * it, and joins each tone's routes into one relative SVG path. Paths keep the
- * order their tone first appears in, so later tones ink over earlier ones.
- */
 export function framePaths(
   frame: RouteFrame,
   routes: ReadonlyArray<DecodedRoute>,
 ): Array<FramedPath> {
-  const byTone = new Map<string, string>();
+  const byTone = new Map<string, Array<string>>();
   const seenByTone = new Map<string, Set<string>>();
-  const minX = -FRAME_MARGIN * 10;
-  const maxX = (frame.width + FRAME_MARGIN) * 10;
-  const minY = -FRAME_MARGIN * 10;
-  const maxY = (frame.height + FRAME_MARGIN) * 10;
-  const inBox = ([x, y]: readonly [number, number]) => x > minX && x < maxX && y > minY && y < maxY;
-
   for (const { points, tone } of routes) {
     let seen = seenByTone.get(tone);
     if (!seen) {
       seen = new Set<string>();
       seenByTone.set(tone, seen);
     }
+    let runs = byTone.get(tone);
+    if (!runs) {
+      runs = [];
+      byTone.set(tone, runs);
+    }
     for (const leg of routeLegs(points)) {
       const pixels = projectRouteToPixels({ ...frame, points: leg });
       if (!pixels.some((pixel) => isNearFrame(pixel, frame))) {
         continue;
       }
-      const simplified = simplifyLine(pixels, PIXEL_TOLERANCE, ({ x, y }) => [x, y]).map(
-        ({ x, y }) => [Math.round(x * 10), Math.round(y * 10)] as const,
-      );
-      let run: Array<readonly [number, number]> = [];
-      const flushRun = () => {
-        const [first, ...rest] = run;
-        run = [];
-        if (!first || rest.length === 0) {
-          return;
-        }
-        let hasNewCell = routes.length <= 1;
-        const keys: Array<string> = [];
-        let prev = first;
-        for (const pt of rest) {
-          const key = segmentCellKey(prev, pt);
-          keys.push(key);
-          if (!seen.has(key)) {
-            hasNewCell = true;
-          }
-          prev = pt;
-        }
-        if (!hasNewCell) {
-          return;
-        }
-        for (const key of keys) {
-          seen.add(key);
-        }
-        let d = `M${first[0] / 10} ${first[1] / 10}`;
-        let previous = first;
-        for (const pixel of rest) {
-          d += `l${(pixel[0] - previous[0]) / 10} ${(pixel[1] - previous[1]) / 10}`;
-          previous = pixel;
-        }
-        byTone.set(tone, (byTone.get(tone) ?? '') + d);
-      };
-      for (const pt of simplified) {
-        const prev = run.at(-1);
-        if (!prev) {
-          if (inBox(pt)) {
-            run.push(pt);
-          }
-        } else if (inBox(prev) || inBox(pt)) {
-          run.push(pt);
-        } else {
-          flushRun();
+      const simplified = simplifyLine(pixels, PIXEL_TOLERANCE, ({ x, y }) => [x, y]);
+      const rounded: Array<readonly [number, number]> = [];
+      for (const { x, y } of simplified) {
+        const point = [Math.round(x), Math.round(y)] as const;
+        const prev = rounded.at(-1);
+        if (!prev || prev[0] !== point[0] || prev[1] !== point[1]) {
+          rounded.push(point);
         }
       }
-      flushRun();
+      let start: readonly [number, number] | null = null;
+      let prev: readonly [number, number] | null = null;
+      let steps: Array<string> = [];
+      const flush = () => {
+        if (start && steps.length > 0) {
+          runs.push(`M${start[0]} ${start[1]}l${steps.join(' ')}`);
+        }
+        start = null;
+        steps = [];
+      };
+      for (let i = 1; i < rounded.length; i += 1) {
+        const a = rounded[i - 1];
+        const b = rounded[i];
+        if (!a || !b) {
+          continue;
+        }
+        const nearA = isNearFrame({ x: a[0], y: a[1] }, frame);
+        const nearB = isNearFrame({ x: b[0], y: b[1] }, frame);
+        if (!nearA && !nearB) {
+          flush();
+          prev = null;
+          continue;
+        }
+        const edgeKey =
+          a[0] < b[0] || (a[0] === b[0] && a[1] < b[1])
+            ? `${a[0]},${a[1]}:${b[0]},${b[1]}`
+            : `${b[0]},${b[1]}:${a[0]},${a[1]}`;
+        if (seen.has(edgeKey)) {
+          flush();
+          prev = null;
+          continue;
+        }
+        seen.add(edgeKey);
+        if (!prev) {
+          start = a;
+          prev = a;
+        }
+        steps.push(`${b[0] - prev[0]} ${b[1] - prev[1]}`);
+        prev = b;
+      }
+      flush();
     }
   }
-  return [...byTone].map(([tone, d]) => ({ d, tone }));
+  return [...byTone].flatMap(([tone, runs]) =>
+    runs.length > 0 ? [{ d: runs.join(''), tone }] : [],
+  );
 }
 
-/** A route's shape alone, fitted into a `size` square, or null when the polyline has no route. */
 export function routeSilhouette(polyline: string, size: number, padding: number) {
   const routes = decodeRoutes([{ id: 0, polyline, tone: 'ink' }]);
   const [route] = routes;

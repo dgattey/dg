@@ -2,7 +2,6 @@ import { OFFLINE_TILES } from './offlineTile';
 
 const STADIA_ORIGIN = 'https://tiles.stadiamaps.com';
 
-/** Where map tiles come from. Serializable so server wrappers can pass it to client maps. */
 export type TileSource = { mode: 'offline' } | { apiKey: string | null; mode: 'stadia' };
 
 type TileEnv = {
@@ -36,7 +35,6 @@ type TileRequest = {
   zoom: number;
 };
 
-/** Adds the API key, when there is one, to any request bound for Stadia. */
 export function withStadiaKey(source: TileSource, url: string) {
   if (source.mode !== 'stadia' || !source.apiKey || !url.startsWith(STADIA_ORIGIN)) {
     return url;
@@ -45,10 +43,6 @@ export function withStadiaKey(source: TileSource, url: string) {
   keyed.searchParams.set('api_key', source.apiKey);
   return keyed.toString();
 }
-
-/** The vector style the interactive map draws, matching the card maps' raster styles. */
-export const stadiaStyleUrl = (dark: boolean) =>
-  `${STADIA_ORIGIN}/styles/${dark ? 'alidade_smooth_dark' : 'outdoors'}.json`;
 
 export function stadiaTileUrl(
   source: TileSource,
