@@ -4,8 +4,6 @@ import type { StravaHistory } from '@dg/content-models/strava/StravaHistory';
 import { fetchLatestStravaActivityFromDb } from '@dg/services/strava/fetchLatestStravaActivityFromDb';
 import { fetchStravaHistoryFromDb } from '@dg/services/strava/fetchStravaHistoryFromDb';
 import { cacheLife, cacheTag } from 'next/cache';
-import './oauthTokenCache';
-import { withMissingTokenFallback } from './withMissingTokenFallback';
 
 const LATEST_ACTIVITY_TAG = 'latest-activity';
 
@@ -15,12 +13,12 @@ export const getLatestActivity = async () => {
   'use cache';
   cacheLife('max');
   cacheTag(LATEST_ACTIVITY_TAG);
-  return await withMissingTokenFallback(fetchLatestStravaActivityFromDb());
+  return await fetchLatestStravaActivityFromDb();
 };
 
 export const getStravaHistory = async (): Promise<StravaHistory | null> => {
   'use cache';
   cacheLife('max');
   cacheTag(STRAVA_HISTORY_TAG);
-  return await withMissingTokenFallback(fetchStravaHistoryFromDb());
+  return await fetchStravaHistoryFromDb();
 };

@@ -16,7 +16,6 @@ jest.mock('@dg/services/strava/fetchStravaHistoryFromDb', () => ({
 
 import { fetchLatestStravaActivityFromDb } from '@dg/services/strava/fetchLatestStravaActivityFromDb';
 import { fetchStravaHistoryFromDb } from '@dg/services/strava/fetchStravaHistoryFromDb';
-import { MissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { getLatestActivity, getStravaHistory } from '../strava';
 
 const activity: StravaActivity = {
@@ -72,8 +71,8 @@ describe('getLatestActivity', () => {
     expect(result).not.toHaveProperty('relativeStartDate');
   });
 
-  it('returns null when tokens are missing', async () => {
-    jest.mocked(fetchLatestStravaActivityFromDb).mockRejectedValue(new MissingTokenError('strava'));
+  it('returns null when no activity is stored', async () => {
+    jest.mocked(fetchLatestStravaActivityFromDb).mockResolvedValue(null);
     await expect(getLatestActivity()).resolves.toBeNull();
   });
 });
@@ -84,10 +83,8 @@ describe('getStravaHistory', () => {
     await expect(getStravaHistory()).resolves.toEqual(history);
   });
 
-  it('returns null when there is no history or tokens are missing', async () => {
+  it('returns null when there is no history', async () => {
     jest.mocked(fetchStravaHistoryFromDb).mockResolvedValueOnce(null);
-    await expect(getStravaHistory()).resolves.toBeNull();
-    jest.mocked(fetchStravaHistoryFromDb).mockRejectedValueOnce(new MissingTokenError('strava'));
     await expect(getStravaHistory()).resolves.toBeNull();
   });
 });

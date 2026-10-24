@@ -1,7 +1,7 @@
 'use server';
 
 import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
-import { getAlbumDetail } from './albumDetail';
+import { getAlbumDetail } from './albums';
 
 /**
  * Server action for loading cached album details inside the favorite-albums well.

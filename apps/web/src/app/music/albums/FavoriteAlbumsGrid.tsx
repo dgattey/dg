@@ -99,11 +99,6 @@ type AlbumCard = {
   treatment: CollageCardTreatment;
 };
 
-type SelectedAlbumWellProps = {
-  albumCards: Array<AlbumCard>;
-  selectedAlbumId: string | null;
-};
-
 type AlbumDetailState =
   | { albumId: string; status: 'loading' }
   | { albumId: string; detail: AlbumDetail | null | undefined; status: 'loaded' };
@@ -145,16 +140,21 @@ function ClientSelectedAlbumDetail({ albumId }: { albumId: string }) {
   return <AlbumDetailBody album={state.detail} />;
 }
 
-function SelectedAlbumWell({ albumCards, selectedAlbumId }: SelectedAlbumWellProps) {
-  const selectedIndex = albumCards.findIndex(({ album }) => album.id === selectedAlbumId);
-  const selectedCard = albumCards[selectedIndex];
-
+function SelectedAlbumWell({
+  albumCount,
+  selectedCard,
+  selectedIndex,
+}: {
+  albumCount: number;
+  selectedCard: AlbumCard | undefined;
+  selectedIndex: number;
+}) {
   if (!selectedCard) {
     return null;
   }
 
   return (
-    <Box sx={wellPlacementSx(selectedIndex, albumCards.length)}>
+    <Box sx={wellPlacementSx(selectedIndex, albumCount)}>
       <AlbumWell album={selectedCard.album} tone={selectedCard.treatment.tone}>
         <Fragment key={selectedCard.album.id}>
           <ClientSelectedAlbumDetail albumId={selectedCard.album.id} />
@@ -264,9 +264,10 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
     : -1;
   const wellSlot = (
     <SelectedAlbumWell
-      albumCards={sortedAlbumCards}
+      albumCount={sortedAlbumCards.length}
       key="album-well"
-      selectedAlbumId={selectedAlbumId}
+      selectedCard={sortedAlbumCards[selectedIndex]}
+      selectedIndex={selectedIndex}
     />
   );
 
