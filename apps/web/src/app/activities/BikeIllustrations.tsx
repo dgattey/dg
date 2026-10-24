@@ -71,7 +71,7 @@ export function PrinceBike() {
         d="M27 50L57 52L84 27M57 52L49 20L83 18L84 27M49 21C44 28 37 34 41 40C43 44 33 46 27 50M84 27C90 32 85 38 90 43C92 45 94 47 95 50"
       />
       <path className="strava__bikeStem" d="M83 18L83 14L91 12" />
-      <path
+      <Frame
         className="strava__bikeTape strava__bikeTape--pink"
         d="M91 12C97 11 100 13 99 18C98 23 95 25 91 24"
       />
