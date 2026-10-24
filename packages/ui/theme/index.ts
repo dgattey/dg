@@ -36,22 +36,22 @@ export function getGlobalThemeCss(): string {
   return `
 :root {
   ${timingDeclarations}
-  --mui-palette-common-black: #000;
-  --mui-palette-common-white: #fff;
-  --mui-palette-background-default: ${BRAND.defaultBackground};
-  --mui-palette-background-paper: ${BRAND.paperBackground};
-  --mui-palette-text-primary: ${BRAND.text};
-  --mui-palette-text-secondary: ${BRAND.mutedText};
-  --mui-palette-text-h1: ${BRAND.h1};
-  --mui-palette-text-h2: ${BRAND.h2};
-  --mui-palette-text-h3: ${BRAND.h3};
-  --mui-palette-text-h4: ${BRAND.h4};
-  --mui-palette-text-h5: ${BRAND.h5};
-  --mui-palette-text-h6: ${BRAND.h6};
-  --mui-palette-card-border: ${BRAND.cardBorder};
-  --mui-palette-divider: ${onCanvas(12)};
-  --mui-extraShadows-card-main: ${CARD_SHADOW_MAIN};
-  --mui-extraShadows-card-hovered: ${CARD_SHADOW_HOVERED};
+  --dg-palette-common-black: #000;
+  --dg-palette-common-white: #fff;
+  --dg-palette-background-default: ${BRAND.defaultBackground};
+  --dg-palette-background-paper: ${BRAND.paperBackground};
+  --dg-palette-text-primary: ${BRAND.text};
+  --dg-palette-text-secondary: ${BRAND.mutedText};
+  --dg-palette-text-h1: ${BRAND.h1};
+  --dg-palette-text-h2: ${BRAND.h2};
+  --dg-palette-text-h3: ${BRAND.h3};
+  --dg-palette-text-h4: ${BRAND.h4};
+  --dg-palette-text-h5: ${BRAND.h5};
+  --dg-palette-text-h6: ${BRAND.h6};
+  --dg-palette-card-border: ${BRAND.cardBorder};
+  --dg-palette-divider: ${onCanvas(12)};
+  --dg-shadow-card-main: ${CARD_SHADOW_MAIN};
+  --dg-shadow-card-hovered: ${CARD_SHADOW_HOVERED};
   --dg-skeleton-bg: ${onCanvas(12)};
   --font-sans: ${typography.fontFamily};
   font-size: 15px;
@@ -85,8 +85,8 @@ html, body {
   width: 100%;
 }
 body {
-  background-color: var(--mui-palette-background-default);
-  color: var(--mui-palette-text-primary);
+  background-color: var(--dg-palette-background-default);
+  color: var(--dg-palette-text-primary);
   font-family: ${typography.fontFamily};
   font-size: 1.03125rem;
   font-weight: 400;

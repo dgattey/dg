@@ -30,7 +30,7 @@ export function PlaybackProgressBar({
   );
   const startTimeRef = useRef<number>(0);
   const startProgressRef = useRef<number>(progressMs ?? 0);
-  const resolvedColor = color ?? 'var(--mui-palette-text-primary)';
+  const resolvedColor = color ?? 'var(--dg-palette-text-primary)';
   const trackSx: SxObject = {
     backgroundColor: `color-mix(in srgb, ${resolvedColor} 20%, transparent)`,
     borderRadius: 999,
@@ -50,7 +50,6 @@ export function PlaybackProgressBar({
     width: '100%',
   };
 
-  // When the server sends fresh timing data, reset our baseline and snap the bar.
   useEffect(() => {
     if (durationMs === undefined || durationMs <= 0 || progressMs === undefined) {
       return;
@@ -60,8 +59,6 @@ export function PlaybackProgressBar({
     setProgress(getProgressPercent(progressMs, durationMs));
   }, [durationMs, progressMs]);
 
-  // While playing, advance locally on an interval so the bar moves smoothly
-  // without forcing a router refresh each tick.
   useEffect(() => {
     if (durationMs === undefined || durationMs <= 0 || progressMs === undefined || !isPlaying) {
       return;

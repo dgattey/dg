@@ -3,7 +3,7 @@ import userEvent from '@testing-library/user-event';
 import { Tooltip } from '../Tooltip';
 
 /**
- * Rules emotion has emitted for the tooltip surface. jsdom can't simulate
+ * Rules emitted for the tooltip surface. jsdom can't simulate
  * `:hover` or `:focus-visible`, so the stylesheet is where the reveal has to be
  * checked — and checking it there is the point: a rule in the stylesheet is a
  * rule the browser applies with no script running.
@@ -13,9 +13,8 @@ const surfaceRules = () => {
     name.startsWith('css-'),
   );
   if (!surfaceClass) {
-    throw new Error('Tooltip surface has no emotion class');
+    throw new Error('Tooltip surface has no compiled CSS class');
   }
-  // Emotion inserts through the CSSOM here, so the tags themselves have no text
   return [...document.querySelectorAll('style')]
     .flatMap((tag) => [...(tag.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
     .filter((rule) => rule.includes(surfaceClass));
@@ -55,10 +54,6 @@ describe('Tooltip', () => {
     expect(button).not.toHaveAttribute('aria-describedby');
   });
 
-  /**
-   * The whole point of the rewrite: hovering must not need a script. A tooltip
-   * that called `showPopover()` was invisible with scripting off.
-   */
   it('reveals from CSS rather than the popover API', async () => {
     const user = userEvent.setup();
     const showPopover = jest.fn();
@@ -84,11 +79,6 @@ describe('Tooltip', () => {
     expect(rulesMatching(/\[data-tooltip-anchor\]:hover/)).not.toHaveLength(0);
   });
 
-  /**
-   * A mouse click focuses its target, so plain `:focus` would pop a tooltip open
-   * on click and leave it there. Keyboard users still get the hint because
-   * `:focus-visible` is the browser's own answer to "was this focus keyboard-driven".
-   */
   it('reveals on keyboard focus only, from either side of the anchor', () => {
     render(
       <Tooltip title="Hint">
@@ -97,9 +87,8 @@ describe('Tooltip', () => {
     );
 
     expect(rulesMatching(/:focus(?!-visible)/)).toHaveLength(0);
-    // Trigger inside the anchor, and an anchor that has to sit inside its trigger
     expect(rulesMatching(/\[data-tooltip-anchor\]:has\(:focus-visible\)/)).not.toHaveLength(0);
-    expect(rulesMatching(/\*:focus-visible>\[data-tooltip-anchor\]/)).not.toHaveLength(0);
+    expect(rulesMatching(/:focus-visible>\[data-tooltip-anchor\]/)).not.toHaveLength(0);
   });
 
   it('keeps a closed tooltip out of the accessibility tree and the tab order', () => {
@@ -109,7 +98,6 @@ describe('Tooltip', () => {
       </Tooltip>,
     );
 
-    // `visibility: hidden` is what does this, in place of the old `popover` attribute
     expect(screen.queryByRole('tooltip')).toBeNull();
     expect(screen.getByRole('tooltip', { hidden: true })).toBeInTheDocument();
   });
@@ -128,7 +116,6 @@ describe('Tooltip', () => {
     if (!anchor) {
       throw new Error('Tooltip anchor not found');
     }
-    // Overhangs the right edge by 12px, so it needs a 20px shift for an 8px gap
     jest.spyOn(tooltip, 'getBoundingClientRect').mockReturnValue({
       left: window.innerWidth - 108,
       right: window.innerWidth + 12,

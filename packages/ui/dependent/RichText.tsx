@@ -17,28 +17,19 @@ import { Image } from './Image';
 import { Link } from './Link';
 
 const PROJECT_MAX_IMAGE_DIMENSION = 330;
+const STICKY_HEADER_SCROLL_MARGIN_PX = 136;
 
-/**
- * Defines a Node's Data with actual data
- */
 type DataWithId = {
   target: {
     sys: {
-      /**
-       * UUID for the value
-       */
       id: string;
     };
   };
 };
 
-/**
- * Clears the sticky header when jumping to heading anchors.
- */
 const HEADING_SX: SxObject = {
   marginBottom: 3,
-  // Sticky header is ~123px; keep a small gap below it for anchor jumps.
-  scrollMarginTop: 136,
+  scrollMarginTop: STICKY_HEADER_SCROLL_MARGIN_PX,
 };
 
 const paragraphSx: SxObject = {
@@ -47,31 +38,22 @@ const paragraphSx: SxObject = {
 
 const dividerSx: SxObject = {
   borderBottomWidth: 'thin',
-  borderColor: 'var(--mui-palette-divider)',
+  borderColor: 'var(--dg-palette-divider)',
   borderStyle: 'solid',
   borderWidth: 0,
   flexShrink: 0,
   margin: 0,
 };
 
-/**
- * Typeguard for converting the `any` to a structured object
- */
 const isDataWithId = (data: NodeData): data is DataWithId =>
   isRecord(data) &&
   isRecord(data.target) &&
   isRecord(data.target.sys) &&
   typeof data.target.sys.id === 'string';
 
-/**
- * Typeguard for converting the `any` to a structured link
- */
 const isDataWithLink = (data: NodeData): data is { uri: string } =>
   isRecord(data) && typeof data.uri === 'string';
 
-/**
- * Creates an element for a single entry in our rich text
- */
 function EntryElement({
   data,
   entryMap,
@@ -89,9 +71,6 @@ function EntryElement({
   return <Link href={entry.url} title={entry.title} />;
 }
 
-/**
- * Renders a singular asset element from data in the rich text
- */
 function AssetElement({
   data,
   assetMap,
@@ -111,7 +90,6 @@ function AssetElement({
       alt={asset.title ?? 'Image title'}
       height={asset.height}
       sizes={{
-        // We don't have any images to test this with, but it should be big enough for most cases...
         extraLarge: PROJECT_MAX_IMAGE_DIMENSION,
       }}
       url={asset.url}
@@ -120,9 +98,6 @@ function AssetElement({
   );
 }
 
-/**
- * Converts children to an id for use with anchor links
- */
 function HeadingWithId({
   children,
   variant,
@@ -149,17 +124,12 @@ function HeadingWithId({
   );
 }
 
-/**
- * Takes links and converts them into rich text through rendering specific types of content.
- */
 const renderOptions = (links: RenderableRichTextContent['links']): Options => {
-  // Map the assets - we only need the sys.id for mapping, and we'll cast as Asset for rendering
   const assetMap = new Map<string, RenderableAssetWithSys>();
   links.assets.block.forEach((asset) => {
     assetMap.set(asset.sys.id, asset);
   });
 
-  // Map the inline and block entries
   const entryMap = new Map<string, RenderableEntry>();
   [...links.entries.block, ...links.entries.inline].forEach((entry) => {
     entryMap.set(entry.sys.id, entry);

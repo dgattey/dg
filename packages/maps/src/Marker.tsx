@@ -8,14 +8,14 @@ const DIMENSION = 100;
 const IMAGE_DIMENSION = 85;
 
 const GLASS_SHADOW = `
-  inset 0 1px 0 color-mix(in srgb, var(--mui-palette-common-white) 15%, transparent),
-  0px 1px 5px color-mix(in srgb, var(--mui-palette-common-black) 12%, transparent),
-  0px 6px 16px color-mix(in srgb, var(--mui-palette-common-black) 8%, transparent)`;
+  inset 0 1px 0 color-mix(in srgb, var(--dg-palette-common-white) 15%, transparent),
+  0px 1px 5px color-mix(in srgb, var(--dg-palette-common-black) 12%, transparent),
+  0px 6px 16px color-mix(in srgb, var(--dg-palette-common-black) 8%, transparent)`;
 
 const containerSx: SxObject = {
   backdropFilter: 'blur(12px) saturate(150%)',
-  backgroundColor: 'color-mix(in srgb, var(--mui-palette-background-default) 70%, transparent)',
-  border: '2px solid color-mix(in srgb, var(--mui-palette-background-default) 60%, transparent)',
+  backgroundColor: 'color-mix(in srgb, var(--dg-palette-background-default) 70%, transparent)',
+  border: '2px solid color-mix(in srgb, var(--dg-palette-background-default) 60%, transparent)',
   borderRadius: '50%',
   boxShadow: GLASS_SHADOW,
   cursor: 'grab',

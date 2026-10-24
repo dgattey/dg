@@ -1,8 +1,6 @@
 export type ColorSchemePreference = 'light' | 'dark' | 'system';
 
 export const COLOR_SCHEME_STORAGE_KEY = 'color-scheme';
-/** Key MUI's own toggle used before this app owned the preference. */
-export const COLOR_SCHEME_LEGACY_STORAGE_KEY = 'mui-mode';
 export const COLOR_SCHEME_ATTRIBUTE = 'data-color-scheme';
 export const DEFAULT_COLOR_SCHEME_PREFERENCE = 'system' satisfies ColorSchemePreference;
 
@@ -11,7 +9,7 @@ export const DEFAULT_COLOR_SCHEME_PREFERENCE = 'system' satisfies ColorSchemePre
  * the first paint. Built from the constants above so the two can never drift,
  * and inlined rather than fetched so no round trip gates the first paint.
  */
-export const COLOR_SCHEME_INIT_SCRIPT = `(function(){try{var p=localStorage.getItem(${JSON.stringify(COLOR_SCHEME_STORAGE_KEY)})||localStorage.getItem(${JSON.stringify(COLOR_SCHEME_LEGACY_STORAGE_KEY)});if(p!=="light"&&p!=="dark"){return}document.documentElement.setAttribute(${JSON.stringify(COLOR_SCHEME_ATTRIBUTE)},p)}catch(e){}})()`;
+export const COLOR_SCHEME_INIT_SCRIPT = `(function(){try{var p=localStorage.getItem(${JSON.stringify(COLOR_SCHEME_STORAGE_KEY)});if(p!=="light"&&p!=="dark"){return}document.documentElement.setAttribute(${JSON.stringify(COLOR_SCHEME_ATTRIBUTE)},p)}catch(e){}})()`;
 
 export function parseColorSchemePreference(raw: string | null | undefined): ColorSchemePreference {
   switch (raw) {
@@ -33,10 +31,7 @@ export function parseColorSchemePreference(raw: string | null | undefined): Colo
  */
 export function readStoredColorSchemePreference(): ColorSchemePreference {
   try {
-    return parseColorSchemePreference(
-      localStorage.getItem(COLOR_SCHEME_STORAGE_KEY) ??
-        localStorage.getItem(COLOR_SCHEME_LEGACY_STORAGE_KEY),
-    );
+    return parseColorSchemePreference(localStorage.getItem(COLOR_SCHEME_STORAGE_KEY));
   } catch {
     return DEFAULT_COLOR_SCHEME_PREFERENCE;
   }

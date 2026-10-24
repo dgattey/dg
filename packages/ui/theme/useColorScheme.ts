@@ -3,7 +3,6 @@
 import { useSyncExternalStore } from 'react';
 import {
   applyColorSchemePreference,
-  COLOR_SCHEME_LEGACY_STORAGE_KEY,
   COLOR_SCHEME_STORAGE_KEY,
   type ColorSchemePreference,
   DEFAULT_COLOR_SCHEME_PREFERENCE,
@@ -46,7 +45,6 @@ function setPreference(preference: ColorSchemePreference) {
     } else {
       localStorage.setItem(COLOR_SCHEME_STORAGE_KEY, preference);
     }
-    localStorage.removeItem(COLOR_SCHEME_LEGACY_STORAGE_KEY);
   } catch {}
   applyColorSchemePreference(preference);
   notifySubscribers();

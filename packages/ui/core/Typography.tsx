@@ -37,14 +37,14 @@ const DEFAULT_ELEMENT: Record<TypographyVariant, ElementType> = {
 const VARIANT_STYLES: Record<TypographyVariant, SxObject> = {
   body1: {
     ...TYPOGRAPHY.body1,
-    color: 'var(--mui-palette-text-primary)',
+    color: 'var(--dg-palette-text-primary)',
     fontSize: { lg: '1.0625rem', sm: '1rem', xs: '1.03125rem' },
     fontWeight: 400,
     lineHeight: 1.5,
   },
   body2: {
     ...TYPOGRAPHY.body2,
-    color: 'var(--mui-palette-text-secondary)',
+    color: 'var(--dg-palette-text-secondary)',
     fontSize: { lg: '1.0625rem', sm: '1.049rem', xs: '1.03125rem' },
     fontWeight: 400,
     lineHeight: 1.43,
@@ -59,39 +59,39 @@ const VARIANT_STYLES: Record<TypographyVariant, SxObject> = {
   },
   code: {
     ...TYPOGRAPHY.code,
-    background: 'var(--mui-palette-background-paper)',
-    color: 'var(--mui-palette-text-secondary)',
+    background: 'var(--dg-palette-background-paper)',
+    color: 'var(--dg-palette-text-secondary)',
   },
   h1: {
     ...TYPOGRAPHY.h1,
-    color: 'var(--mui-palette-text-h1)',
+    color: 'var(--dg-palette-text-h1)',
     lineHeight: 1.167,
   },
   h2: {
     ...TYPOGRAPHY.h2,
-    color: 'var(--mui-palette-text-h2)',
+    color: 'var(--dg-palette-text-h2)',
     lineHeight: 1.2,
   },
   h3: {
     ...TYPOGRAPHY.h3,
-    color: 'var(--mui-palette-text-h3)',
+    color: 'var(--dg-palette-text-h3)',
     lineHeight: 1.167,
   },
   h4: {
     ...TYPOGRAPHY.h4,
-    color: 'var(--mui-palette-text-h4)',
+    color: 'var(--dg-palette-text-h4)',
     fontSize: { lg: '1.2813rem', sm: '1.2146rem', xs: '1.140625rem' },
     lineHeight: 1.235,
   },
   h5: {
     ...TYPOGRAPHY.h5,
-    color: 'var(--mui-palette-text-h5)',
+    color: 'var(--dg-palette-text-h5)',
     fontSize: { lg: '1.0313rem', sm: '0.937rem', xs: '1.015625rem' },
     lineHeight: 1.334,
   },
   h6: {
     ...TYPOGRAPHY.h6,
-    color: 'var(--mui-palette-text-h6)',
+    color: 'var(--dg-palette-text-h6)',
     lineHeight: 1.6,
   },
   overline: {

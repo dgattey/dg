@@ -1,15 +1,10 @@
 # UI
 
-Shared UI components and MUI theming. Organized into three categories:
+Shared UI primitives, theme tokens, and Next.js link/image wrappers.
 
 ## Structure
 
-- **core/** - MUI-dependent components (buttons, layouts, navigation)
-- **dependent/** - Components requiring Next.js or API dependencies (images, links, content cards)
-- **icons/** - Icon components (goal: centralize all icon imports here)
-
-## Key Exports
-
-- `theme` - MUI theme configuration with color palette, typography, and component overrides
-- Common components: buttons, cards, layouts, navigation, rich text rendering
-- Next.js-specific: optimized images, client-side routing links, content wrappers
+- **core/** - Layout, typography, tooltip, relative time, and view-transition primitives
+- **dependent/** - Components requiring Next.js or Contentful types (`Image`, `Link`, `RichText`)
+- **icons/** - Brand SVG icon primitives (`FaIcon`)
+- **theme/** - Global CSS custom properties (`--dg-palette-*`, `--dg-shadow-*`), `sx` compiler (`compileSx`), and color scheme persistence
