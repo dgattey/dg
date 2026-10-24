@@ -33,9 +33,9 @@ export function sleep(ms: number): Promise<void> {
 /**
  * Result of a Spotify API request.
  */
-type SpotifyRequestResult<T> =
+export type SpotifyRequestResult<T> =
   | { success: true; data: T; status: 200 }
-  | { success: false; status: number; error: string };
+  | { error: string; retryAfterSeconds?: number; status: number; success: false };
 
 let cachedAppToken: { expiresAt: number; token: string } | null = null;
 
@@ -88,7 +88,16 @@ async function fetchPublicCatalogResource<T>(
     headers: { Authorization: `Bearer ${token}` },
   });
   if (res.status !== 200) {
-    return { error: `HTTP ${res.status}`, status: res.status, success: false };
+    const rawRetryAfter = res.headers?.get?.('retry-after');
+    const parsedRetryAfter = rawRetryAfter ? Number.parseInt(rawRetryAfter, 10) : Number.NaN;
+    const retryAfterSeconds =
+      Number.isFinite(parsedRetryAfter) && parsedRetryAfter >= 0 ? parsedRetryAfter : undefined;
+    return {
+      error: `HTTP ${res.status}`,
+      ...(retryAfterSeconds !== undefined ? { retryAfterSeconds } : {}),
+      status: res.status,
+      success: false,
+    };
   }
   const data = v.parse(schema, await res.json());
   return { data, status: 200, success: true };
@@ -115,7 +124,12 @@ export async function spotifyGet<T>(
       if (status === 429) {
         log.warn(`Spotify rate limited (${context})`, { resource, retryAfterSeconds });
       }
-      return { error: `HTTP ${status}`, status, success: false };
+      return {
+        error: `HTTP ${status}`,
+        ...(retryAfterSeconds !== undefined ? { retryAfterSeconds } : {}),
+        status,
+        success: false,
+      };
     }
 
     const data = v.parse(schema, await response.json());

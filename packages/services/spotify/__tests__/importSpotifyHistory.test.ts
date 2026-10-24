@@ -313,4 +313,26 @@ describe('importSpotifyHistory', () => {
     const count = await db.SpotifyPlay.count({ where: { trackId: TRACK_3 } });
     expect(count).toBe(0);
   });
+
+  it('retries 429 rate limits using Retry-After when resolving track metadata', async () => {
+    mockSpotifyGet
+      .mockResolvedValueOnce({
+        response: { json: async () => ({}) },
+        retryAfterSeconds: 0,
+        status: 429,
+      })
+      .mockResolvedValueOnce({
+        response: { json: async () => buildSingleTrackResponse(TRACK_3) },
+        status: 200,
+      });
+
+    const fileText = createExtendedJson([
+      { trackUri: `spotify:track:${TRACK_3}`, ts: '2026-06-01T20:00:00Z' },
+    ]);
+
+    const result = await importSpotifyHistory(fileText);
+    expect(result.imported).toBe(1);
+    expect(result.failedTrackIds).toEqual([]);
+    expect(mockSpotifyGet).toHaveBeenCalledTimes(2);
+  });
 });

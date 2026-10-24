@@ -117,6 +117,7 @@ describe('spotifyGet', () => {
     expect(Date.now() - started).toBeLessThan(1000);
     expect(result).toEqual({
       error: 'HTTP 429',
+      retryAfterSeconds: 30,
       status: 429,
       success: false,
     });
