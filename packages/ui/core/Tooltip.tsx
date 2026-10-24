@@ -9,13 +9,8 @@ import { Typography } from './Typography';
 
 export type TooltipPlacement = 'top' | 'bottom';
 
-/** Gap kept between a tooltip and the viewport edge, matching theme spacing(1). */
 const VIEWPORT_EDGE_PADDING = 8;
-
-/** Marks the wrapper that owns a tooltip, so the surface can select on its state. */
 const ANCHOR_ATTRIBUTE = 'data-tooltip-anchor';
-
-/** Set on a `whenTruncated` anchor whose text fits, so its tooltip stays shut. */
 const MUTED_ATTRIBUTE = 'data-tooltip-muted';
 
 /**
@@ -32,16 +27,6 @@ const hasTruncatedText = (trigger: Element) =>
     );
   });
 
-/**
- * Nudges a tooltip inline so it stays inset from the viewport edges.
- *
- * Anchor positioning centers the tooltip on its trigger, so triggers near a
- * screen edge push the tooltip flush against it (or off screen entirely).
- *
- * Purely an enhancement: the tooltip reveals itself in CSS, and this only
- * refines where an already-positioned surface sits. Measuring needs a layout
- * box, which a `visibility: hidden` surface still has.
- */
 const insetFromViewportEdges = (tooltip: HTMLElement) => {
   tooltip.style.translate = '0';
   const { left, right, width } = tooltip.getBoundingClientRect();
@@ -89,12 +74,6 @@ interface TooltipProps {
 type TooltipAnchorSx = SxObject & { anchorName?: string };
 type TooltipPopoverSx = SxObject & { positionAnchor?: string };
 
-/**
- * Opening is immediate; closing waits a beat so a cursor travelling the gap
- * between trigger and surface doesn't blink the tooltip out. `visibility` is
- * what keeps a closed tooltip from swallowing pointer events, so it flips only
- * once the fade it trails has finished.
- */
 const createTransition = (isRevealed: boolean) => ({
   transition: [
     `opacity ${TIMING_FAST}ms ${EASING_EASE_OUT} ${isRevealed ? 0 : TIMING_FAST}ms`,
@@ -102,13 +81,6 @@ const createTransition = (isRevealed: boolean) => ({
   ].join(', '),
 });
 
-/**
- * Reveal state, shared by every selector that can open a tooltip.
- *
- * `pointerEvents` turns on with the tooltip so the pointer can cross the gap
- * into the surface without unhovering the anchor it descends from, which is
- * what stops a tooltip flickering out from under the cursor.
- */
 const revealedSx: SxObject = {
   opacity: 1,
   pointerEvents: 'auto',
@@ -116,28 +88,11 @@ const revealedSx: SxObject = {
   ...createTransition(true),
 };
 
-/**
- * Every way a tooltip opens, expressed as CSS so it needs no scripting.
- *
- * Hover is the anchor's own. Keyboard focus can land on either side of it: a
- * wrapped trigger (a `<button>` inside the anchor) takes focus underneath,
- * while a trigger the anchor has to sit *inside* — a `<summary>`, which must be
- * its `<details>`' first child and so cannot be wrapped — takes it one level up.
- *
- * `:focus-visible` rather than `:focus` because a mouse click focuses its
- * target, so plain focus would pop a tooltip open on click and leave it there.
- */
 const HOVERED_SELECTOR = `[${ANCHOR_ATTRIBUTE}]:hover > &`;
 const TRIGGER_INSIDE_FOCUSED_SELECTOR = `[${ANCHOR_ATTRIBUTE}]:has(:focus-visible) > &`;
-/*
- * Leading `*` on purpose: a nested selector that starts with a pseudo-class is
- * read as attaching to the element being styled, so `:focus-visible > …` would
- * compile to the surface focusing itself rather than an ancestor doing so.
- */
-const TRIGGER_AROUND_FOCUSED_SELECTOR = `*:focus-visible>[${ANCHOR_ATTRIBUTE}]>&`;
+const TRIGGER_AROUND_FOCUSED_SELECTOR = `:focus-visible>[${ANCHOR_ATTRIBUTE}]>&`;
 const MUTED_SELECTOR = `[${MUTED_ATTRIBUTE}] > &`;
 
-/** Lets a truncating trigger shrink to its container instead of pushing past it. */
 const shrinkableAnchorSx: SxObject = {
   '& > :not([role="tooltip"])': {
     minWidth: 0,
@@ -147,7 +102,6 @@ const shrinkableAnchorSx: SxObject = {
   minWidth: 0,
 };
 
-/** Anchor for the tooltip's positioning, named per instance so surfaces can't cross. */
 function createAnchorSx(anchorName: string): TooltipAnchorSx {
   return {
     '@supports not (position-area: block-end)': {
@@ -172,7 +126,6 @@ function createSurfaceSx(
 ): TooltipPopoverSx {
   const isAbove = placement === 'top';
   return {
-    /* Browsers without anchor positioning fall back to centring on the anchor. */
     '@supports not (position-area: block-end)': {
       left: '50%',
       position: 'absolute',
@@ -184,11 +137,11 @@ function createSurfaceSx(
     [TRIGGER_INSIDE_FOCUSED_SELECTOR]: revealedSx,
     [MUTED_SELECTOR]: { display: 'none' },
     alignSelf: isAbove ? 'unsafe end' : 'unsafe start',
-    background: 'var(--mui-palette-background-paper)',
-    border: 'thin solid var(--mui-palette-card-border)',
+    background: 'var(--dg-palette-background-paper)',
+    border: 'thin solid var(--dg-palette-card-border)',
     borderRadius: '12px',
-    boxShadow: 'var(--mui-extraShadows-card-main)',
-    color: 'var(--mui-palette-text-primary)',
+    boxShadow: 'var(--dg-shadow-card-main)',
+    color: 'var(--dg-palette-text-primary)',
     fontVariantCaps: 'normal',
     fontWeight: 600,
     justifySelf: 'unsafe anchor-center',
@@ -244,11 +197,6 @@ export function Tooltip({
   const anchorName = `--anchor-${tooltipId.replace(/:/g, '-')}`;
   const surfaceRef = useRef<HTMLSpanElement>(null);
 
-  /**
-   * Runs before the hover or focus restyles, so a tooltip that should stay shut
-   * never paints. Text can start or stop fitting on any resize, hence measuring
-   * each time rather than once.
-   */
   const refinePlacement = (event: SyntheticEvent<HTMLElement>) => {
     const anchor = event.currentTarget;
     if (whenTruncated) {
@@ -265,7 +213,6 @@ export function Tooltip({
     }
   };
 
-  // Don't render wrapper if no title
   if (!title) {
     return <>{children}</>;
   }

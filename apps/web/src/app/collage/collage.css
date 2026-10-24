@@ -83,8 +83,7 @@ html:has(.collageRoot) body {
   color: var(--ink);
   background-color: var(--viridian);
 }
-.collageRoot > .collageSheet,
-.collageSheet:not(.collageBackdrop .collageSheet) {
+.collageSheet {
   --footer-progress: 0;
   --sheet-max-inset: clamp(10px, 1.8vw, 24px);
   --sheet-max-radius: 24px;
@@ -475,8 +474,7 @@ html[data-color-scheme="dark"] .cutNightOnly {
 }
 
 @media (max-width: 820px) {
-  .collageRoot > .collageSheet,
-  .collageSheet:not(.collageBackdrop .collageSheet) {
+  .collageSheet {
     --sheet-max-radius: 18px;
   }
   .collagePageTitle {

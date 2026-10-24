@@ -95,11 +95,11 @@ const UNITLESS_PROPERTIES = new Set([
 ]);
 
 const PALETTE_TOKENS: Record<string, string> = {
-  'background.default': 'var(--mui-palette-background-default)',
-  'background.paper': 'var(--mui-palette-background-paper)',
-  divider: 'var(--mui-palette-divider)',
-  'text.primary': 'var(--mui-palette-text-primary)',
-  'text.secondary': 'var(--mui-palette-text-secondary)',
+  'background.default': 'var(--dg-palette-background-default)',
+  'background.paper': 'var(--dg-palette-background-paper)',
+  divider: 'var(--dg-palette-divider)',
+  'text.primary': 'var(--dg-palette-text-primary)',
+  'text.secondary': 'var(--dg-palette-text-secondary)',
 };
 
 function toKebabCase(prop: string): string {

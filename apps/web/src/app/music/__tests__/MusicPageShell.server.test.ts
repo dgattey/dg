@@ -1,5 +1,5 @@
 import { isValidElement } from 'react';
-import FavoriteAlbumsLayout from '../albums/layout';
+import FavoriteAlbumsPage from '../albums/page';
 import { MusicPageShell } from '../MusicPageShell';
 import MusicPage from '../page';
 import MusicStatsPage from '../stats/page';
@@ -7,7 +7,7 @@ import MusicStatsPage from '../stats/page';
 describe('music routes', () => {
   it.each([
     ['/music', () => MusicPage(), 'Listening history'],
-    ['/music/albums', () => FavoriteAlbumsLayout({ children: null }), 'Favorite albums'],
+    ['/music/albums', () => FavoriteAlbumsPage(), 'Favorite albums'],
     ['/music/stats', () => MusicStatsPage(), 'Listening stats'],
   ])('frames %s synchronously so its title can morph', (_route, renderRoute, title) => {
     const element = renderRoute();

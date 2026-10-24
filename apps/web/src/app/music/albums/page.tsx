@@ -1,14 +1,54 @@
 import 'server-only';
+import '../music.css';
+import '../../collage/pills.css';
 
-/**
- * The favorite-albums grid and well live in the layout so opening an album
- * swaps only the well's contents without unmounting the grid.
- *
- * Keeping the page synchronous and free of `searchParams` allows `/music/albums`
- * to prerender 100% statically at the CDN edge with no dynamic Suspense hole;
- * `?album=<id>` is read on the client and resolved via the cached `loadAlbumDetail`
- * server action (`cacheLife('hours')`).
- */
+import { favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
+import type { Metadata } from 'next';
+import { Suspense } from 'react';
+import { getFavoriteAlbums } from '../../../services/albums';
+import { ALBUMS_BACKDROP } from '../../collage/backdrops';
+import { markdownAlternates } from '../../layouts/markdownAlternates';
+import { musicDestinationTitle } from '../../layouts/musicHeaderDestinations';
+import { CollageMusicStatus } from '../MusicHistorySections';
+import { MusicPageShell } from '../MusicPageShell';
+import { FavoriteAlbumsGrid } from './FavoriteAlbumsGrid';
+import { FavoriteAlbumsSkeleton } from './FavoriteAlbumsSkeleton';
+
+const TITLE = musicDestinationTitle(favoriteAlbumsRoute);
+
+export const metadata: Metadata = {
+  alternates: markdownAlternates(favoriteAlbumsRoute),
+  description: 'All-time favorite albums on Spotify.',
+  title: TITLE,
+};
+
+async function AlbumsGrid() {
+  const albums = await getFavoriteAlbums();
+
+  if (albums === null) {
+    return (
+      <CollageMusicStatus>
+        <p>Favorite albums are temporarily unavailable. Please try again soon.</p>
+      </CollageMusicStatus>
+    );
+  }
+  if (albums.length === 0) {
+    return (
+      <CollageMusicStatus>
+        <p>No favorite albums yet.</p>
+      </CollageMusicStatus>
+    );
+  }
+
+  return <FavoriteAlbumsGrid albums={albums} />;
+}
+
 export default function FavoriteAlbumsPage() {
-  return null;
+  return (
+    <MusicPageShell backdrop={ALBUMS_BACKDROP} className="music__albumsLayout" title={TITLE}>
+      <Suspense fallback={<FavoriteAlbumsSkeleton />}>
+        <AlbumsGrid />
+      </Suspense>
+    </MusicPageShell>
+  );
 }

@@ -50,7 +50,7 @@
   height: calc(100% - var(--backdrop-bleed));
 }
 
-.collageBackdrop .collageSheet {
+.collageBackdrop .collageBackdropSheet {
   inset: auto;
   top: var(--sheet-y);
   left: var(--sheet-x);

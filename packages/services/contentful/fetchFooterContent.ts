@@ -144,7 +144,7 @@ export async function fetchFooterContent(): Promise<FooterContent> {
     await getContentfulClient().request(QUERY),
     {
       kind: 'graphql',
-      source: 'contentful.fetchFooterLinks',
+      source: 'contentful.fetchFooterContent',
     },
   );
   const items =

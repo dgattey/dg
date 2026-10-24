@@ -25,11 +25,11 @@ describe('adaptive colors', () => {
     expect(onCanvas(12)).toBe('color-mix(in srgb, CanvasText 12%, transparent)');
   });
 
-  it('does not feed mui palette vars into relative color syntax', () => {
+  it('does not feed palette vars into relative color syntax', () => {
     const workspaceRoot = join(__dirname, '../../../..');
     const offenders = ['apps', 'packages']
       .flatMap((root) => collectSourceFiles(join(workspaceRoot, root)))
-      .filter((file) => /hsl\(\s*from\s+var\(--mui-palette/.test(readFileSync(file, 'utf8')));
+      .filter((file) => /hsl\(\s*from\s+var\(--dg-palette/.test(readFileSync(file, 'utf8')));
     expect(offenders).toEqual([]);
   });
 });

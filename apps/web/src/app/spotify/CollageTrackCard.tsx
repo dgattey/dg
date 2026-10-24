@@ -43,8 +43,8 @@ const gradientSurfaceSx: SxObject = {
 };
 
 const CARD_PAPER: CSSProperties & Record<`--${string}`, string> = {
-  '--on': 'var(--mui-palette-text-primary)',
-  '--pc': 'var(--mui-palette-background-paper)',
+  '--on': 'var(--dg-palette-text-primary)',
+  '--pc': 'var(--dg-palette-background-paper)',
 };
 
 function AlbumSleeve({ track }: { track: Track }) {

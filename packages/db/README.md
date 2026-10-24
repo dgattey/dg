@@ -5,14 +5,13 @@ Neon PostgreSQL database with Sequelize ORM for migrations and models.
 ## Structure
 
 - `migrations/` - Sequelize migration files
-- `models/` - Database models (Token, StravaActivity, SpotifyPlay)
+- `models/` - Database models (`FavoriteAlbum`, `FavoriteAlbumSnapshot`, `MusicAlbum`, `MusicAlbumArtist`, `MusicArtist`, `MusicTrack`, `MusicTrackArtist`, `OauthState`, `SpotifyPlay`, `StravaActivity`, `Token`)
 
 ## Key Exports
 
-- `db` - Object with all models (StravaActivity, Token, etc)
-- `dbClient` - Sequelize client instance
-- `connectToDatabase()` - Verify connection (called automatically in non-test environments)
-- `closeDbConnection()` - Close connection (used by test cleanup)
+- `db` - Object with all models (`StravaActivity`, `Token`, etc.)
+- `dbClient` - Sequelize client instance (connects lazily on the first query)
+- `closeDbConnection()` - Close connection (used by test and script cleanup)
 
 ## Commands
 
@@ -44,14 +43,9 @@ it('creates an activity', async () => {
 });
 ```
 
-`setupTestDatabase()` wraps each test in a transaction (BEGIN/ROLLBACK). Use
-`resetTestDatabase()` when you need a full truncate. Jest shared config is
-`@dg/db/testing/jest.config.base`. Mocks and other non-DB test utilities live in
-`@dg/testing` (see `packages/testing/README.md`).
+`setupTestDatabase()` wraps each test in a transaction (`BEGIN` and `ROLLBACK`), while `jest.globalSetup.ts` runs pending migrations and truncates tables once before the test run. Jest shared config is `@dg/db/testing/jest.config.base`. Mocks and other non-DB test utilities live in `@dg/testing`.
 
 ## Gotchas
 
-- `NODE_ENV` must be `development`, `production`, or `test` or the client throws on import.
-- `DATABASE_URL` / `DATABASE_URL_TEST` are required; missing values fail fast.
-- In non-test environments, `connectToDatabase()` is called automatically on import.
+- `DATABASE_URL` or `DATABASE_URL_TEST` is validated on first connection; missing values fail fast when a query runs.
 

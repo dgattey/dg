@@ -36,6 +36,11 @@ describe('compileSx', () => {
 
   it('distributes comma-separated parent selectors across nested descendant attribute selectors', () => {
     const compiled = compileSx({
+      ':focus-visible &, &:has(:focus-visible)': {
+        '[data-album-art]': {
+          transform: 'scale(1.9)',
+        },
+      },
       '@media (hover: hover)': {
         '&:hover': {
           '[data-album-art]': {
@@ -43,15 +48,10 @@ describe('compileSx', () => {
           },
         },
       },
-      '*:focus-visible &, &:has(:focus-visible)': {
-        '[data-album-art]': {
-          transform: 'scale(1.9)',
-        },
-      },
     });
 
     expect(compiled?.css).toContain(
-      `*:focus-visible .${compiled?.className} [data-album-art], .${compiled?.className}:has(:focus-visible) [data-album-art]`,
+      `:focus-visible .${compiled?.className} [data-album-art], .${compiled?.className}:has(:focus-visible) [data-album-art]`,
     );
     expect(compiled?.css).toContain(`.${compiled?.className}:hover [data-album-art]`);
   });

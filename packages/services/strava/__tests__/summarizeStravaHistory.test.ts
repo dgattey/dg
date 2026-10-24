@@ -10,6 +10,7 @@ const activity = ({
 }: Partial<StravaActivity> & Pick<StravaActivity, 'id'>): StravaActivity => ({
   id,
   name: `Outing ${id}`,
+  startDate: '2026-01-01T00:00:00Z',
   type: 'Ride',
   url: `https://www.strava.com/activities/${id}`,
   ...overrides,
@@ -59,7 +60,7 @@ const history = [
     startDate: '2025-12-31T23:30:00Z',
     type: 'Swim',
   }),
-  activity({ id: 6, startDate: null }),
+  activity({ id: 6, startDate: 'invalid-date' }),
 ];
 
 describe('summarizeStravaHistory', () => {

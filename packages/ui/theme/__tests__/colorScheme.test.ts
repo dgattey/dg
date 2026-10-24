@@ -2,7 +2,6 @@ import {
   applyColorSchemePreference,
   COLOR_SCHEME_ATTRIBUTE,
   COLOR_SCHEME_INIT_SCRIPT,
-  COLOR_SCHEME_LEGACY_STORAGE_KEY,
   COLOR_SCHEME_STORAGE_KEY,
   parseColorSchemePreference,
   readStoredColorSchemePreference,
@@ -34,12 +33,6 @@ describe('color scheme preference', () => {
     localStorage.setItem(COLOR_SCHEME_STORAGE_KEY, 'dark');
 
     expect(readStoredColorSchemePreference()).toBe('dark');
-  });
-
-  it('falls back to the legacy MUI key', () => {
-    localStorage.setItem(COLOR_SCHEME_LEGACY_STORAGE_KEY, 'light');
-
-    expect(readStoredColorSchemePreference()).toBe('light');
   });
 
   it('defaults to system when storage throws', () => {
@@ -79,14 +72,6 @@ describe('color scheme init script', () => {
     runInitScript();
 
     expect(document.documentElement).toHaveAttribute(COLOR_SCHEME_ATTRIBUTE, preference);
-  });
-
-  it('honors the legacy MUI key', () => {
-    localStorage.setItem(COLOR_SCHEME_LEGACY_STORAGE_KEY, 'dark');
-
-    runInitScript();
-
-    expect(document.documentElement).toHaveAttribute(COLOR_SCHEME_ATTRIBUTE, 'dark');
   });
 
   it.each(['system', 'nonsense', ''])('leaves the root alone for %s', (stored) => {

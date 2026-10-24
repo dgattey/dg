@@ -18,7 +18,6 @@ describe('syncStravaWebhookUpdateWithDb', () => {
   const db = setupTestDatabase();
   setupMockLifecycle();
 
-  // Real Strava API response format (snake_case) - this flows through real mapping code
   const stravaApiResponse = {
     achievement_count: 1,
     average_speed: 5.944,
@@ -45,6 +44,7 @@ describe('syncStravaWebhookUpdateWithDb', () => {
   const existingActivityData = {
     id: 17234236452,
     name: 'Existing Activity',
+    startDate: '2026-01-31T02:36:33Z',
     type: 'Ride',
     url: 'https://www.strava.com/activities/17234236452',
   };
@@ -74,17 +74,14 @@ describe('syncStravaWebhookUpdateWithDb', () => {
       expect(savedActivity).not.toBeNull();
       const savedData = savedActivity?.activityData;
       expect(savedData).not.toBeNull();
-      // Verify snake_case was converted to camelCase
       expect(savedData?.startDate).toBe('2026-01-31T02:36:33Z');
       expect(savedData?.sportType).toBe('Ride');
       expect(savedData?.movingTime).toBe(1610);
       expect(savedData?.gear?.resourceState).toBe(2);
       expect(savedData?.map?.summaryPolyline).toBe('xyz');
       expect(savedData?.url).toBe('https://www.strava.com/activities/17234236452');
-      // Verify no snake_case keys leaked through
       expect(savedData).not.toHaveProperty('start_date');
       expect(savedData).not.toHaveProperty('sport_type');
-      // Verify Date conversion
       expect(savedActivity?.activityStartDate).toEqual(new Date('2026-01-31T02:36:33Z'));
     });
 

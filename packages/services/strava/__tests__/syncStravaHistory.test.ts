@@ -55,7 +55,7 @@ describe('syncStravaHistory', () => {
   const readRow = async (n: number) => {
     const row = await db.StravaActivity.findOne({ where: { id: BASE_ID + n } });
     return {
-      activity: parseStoredStravaActivity(row?.activityData, row?.activityStartDate),
+      activity: parseStoredStravaActivity(row?.activityData),
       lastUpdate: row?.lastUpdate ?? null,
     };
   };
@@ -119,8 +119,8 @@ describe('syncStravaHistory', () => {
       {
         activityData: {
           id: BASE_ID + 3,
-          name: 'Legacy row',
-          start_date: summary(3).start_date,
+          name: 'Sparse row',
+          startDate: summary(3).start_date,
           type: 'Ride',
         },
         activityStartDate: new Date(summary(3).start_date),
@@ -153,14 +153,19 @@ describe('syncStravaHistory', () => {
     });
     expect((await readRow(3)).activity).toMatchObject({
       map: { summaryPolyline: 'summary-3' },
-      name: 'Legacy row',
+      name: 'Sparse row',
       sportType: 'GravelRide',
     });
   });
 
   it('changes nothing on a second run', async () => {
     await db.StravaActivity.create({
-      activityData: { id: BASE_ID + 1, name: 'Sparse', type: 'Ride' },
+      activityData: {
+        id: BASE_ID + 1,
+        name: 'Sparse',
+        startDate: summary(1).start_date,
+        type: 'Ride',
+      },
       activityStartDate: new Date(summary(1).start_date),
       id: BASE_ID + 1,
     });

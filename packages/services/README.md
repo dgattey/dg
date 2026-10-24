@@ -30,14 +30,12 @@ services/
 Low-level HTTP client utilities used by service integrations:
 
 
-| File                            | Description                             |
-| ------------------------------- | --------------------------------------- |
-| `authenticatedGraphQLClient.ts` | GraphQL client with OAuth token refresh |
-| `authenticatedRestClient.ts`    | REST client with OAuth token refresh    |
-| `unauthenticatedRestClient.ts`  | Simple REST client without auth         |
-| `refreshedAccessToken.ts`       | Token refresh logic for OAuth flows     |
-| `RefreshTokenConfig.ts`         | Configuration type for token refresh    |
-| `getStatus.ts`                  | HTTP status code helpers                |
+| File                            | Description                                         |
+| ------------------------------- | --------------------------------------------------- |
+| `authenticatedRestClient.ts`    | REST client with OAuth token refresh                |
+| `parseResponse.ts`              | Valibot schema parsing for REST and GraphQL payloads |
+| `refreshedAccessToken.ts`       | Token refresh logic for OAuth flows                 |
+| `RefreshTokenConfig.ts`         | Configuration type for token refresh                |
 
 
 ## OAuth
@@ -65,19 +63,13 @@ CMS integration for site content. Uses GraphQL with Valibot-validated responses.
 | `fetchIntroContent()`    | Homepage intro text block and image  |
 | `fetchProjects()`        | Project cards for homepage (excludes side projects) |
 | `fetchSideProjects()`    | Flagged projects for the side-projects card          |
-| `fetchFooterLinks()`     | Footer navigation links              |
+| `fetchFooterContent()`   | Footer description and social links  |
 | `fetchLinkByName(name)`  | Single link by title (partial match) |
 | `fetchCurrentLocation()` | Current map location marker          |
 | `contentfulClient`       | Configured GraphQL client            |
 
 
-**Schema**: `@dg/content-models/contentful/schema.graphql` is checked in for editor tooling and refreshed via `pnpm graphql:schema`.
-
-**Type imports from `ui` package** (type-only, no runtime dependency):
-
-- `ui/dependent/Image.tsx` → `Asset`
-- `ui/dependent/ContentCard.tsx` → `Link`
-- `ui/dependent/ContentWrappingLink.tsx` → `Link`
+**Schema**: `@dg/content-models/contentful/schema.graphql` is checked in for editor tooling and refreshed via `pnpm exec turbo graphql:schema`.
 
 ## Spotify
 
@@ -108,9 +100,8 @@ Strava API integration for activity data and webhooks.
 | `fetchStravaActivityFromApi()`      | Fetches activity directly from Strava API              |
 | `syncStravaWebhookUpdateWithDb()`   | Syncs webhook updates to database                      |
 | `echoStravaChallengeIfValid()`      | Handles Strava webhook verification                    |
-| `mapActivityFromApi()`              | Converts API response (snake_case) to domain format    |
+| `parseStoredStravaActivity()`       | Parses stored Strava activity rows into domain format  |
 | `stravaClient`                      | Configured REST client with token refresh              |
-| `stravaTokenExchangeClient`         | Client for OAuth token exchange                        |
 | `StravaWebhookEvent`                | Type in `@dg/content-models/strava/StravaWebhookEvent` |
 
 

@@ -49,7 +49,7 @@ const fillSummaryGaps = (
 
 const savePage = async (summaries: ReadonlyArray<StravaActivity>) => {
   const existingRows = await db.StravaActivity.findAll({
-    attributes: ['id', 'activityData', 'activityStartDate'],
+    attributes: ['id', 'activityData'],
     where: { id: summaries.map((summary) => summary.id) },
   });
   // pg returns BIGINT columns as strings
@@ -71,7 +71,7 @@ const savePage = async (summaries: ReadonlyArray<StravaActivity>) => {
   let updated = 0;
   for (const summary of summaries) {
     const row = existingById.get(summary.id);
-    const stored = row && parseStoredStravaActivity(row.activityData, row.activityStartDate);
+    const stored = row && parseStoredStravaActivity(row.activityData);
     const filled = stored && fillSummaryGaps(stored, summary);
     if (filled) {
       await db.StravaActivity.update({ activityData: filled }, { where: { id: summary.id } });

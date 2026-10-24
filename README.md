@@ -69,7 +69,7 @@ Secrets stay on 1Password via `turbo env` / `config/env.secrets.keys`. Flags sta
 
 Feature branches squash onto main, and Linear is used for ticket tracking.
 
-1. PR creation triggers CI checks and auto-bumps the version (see Versioning below).
+1. PR creation triggers CI checks and posts the target version preview comment (see Versioning below).
 2. Use the Vercel deploy preview to verify functionality.
 3. Merges automatically create a GitHub release with the "What changed?" content as notes 🎉
 
@@ -101,10 +101,10 @@ routes and components, `/src/types` has global types, `/src/hooks` has shared ho
 - [Cloudflare](https://cloudflare.com) manages DNS/security. Cloudflare's MX records redirect email to Gmail.
 - [Contentful](https://www.contentful.com) supplies most content via GraphQL. New content triggers builds via webhook.
 - Next.js App Router caching with Cache Components (`use cache`) and tag-based revalidation keeps data fresh.
-- [Pigeon Maps](https://pigeon-maps.js.org/) powers the homepage map with Stamen Watercolor tiles and terrain labels (via [Stadia Maps](https://stadiamaps.com/)).
-- [MUI](https://mui.com/material/) for UI and styling (`sx`, via `emotion`).
+- [Pigeon Maps](https://pigeon-maps.js.org/) and [MapLibre GL](https://maplibre.org/) power the homepage location map and `/strava` route atlas (via [Stadia Maps](https://stadiamaps.com/)).
+- `@dg/ui` provides shared zero-runtime UI primitives, theme tokens (`--dg-palette-*`, `--dg-shadow-*`), and `compileSx` React 19 `<style href precedence>` emission.
 - Contentful schema lives in `packages/content-models/contentful/schema.graphql` and is refreshed via `turbo graphql:schema` for editor tooling. Responses are validated with Valibot.
-- [Neon](https://neon.tech) is the Postgres DB for auth tokens + more.
+- [Neon](https://neon.tech) is the Postgres DB for auth tokens, Strava activities, and Spotify history/favorites.
 - [Sequelize](https://sequelize.org) runs migrations + shapes the DB.
 
 ### API
@@ -115,16 +115,17 @@ routes and components, `/src/types` has global types, `/src/hooks` has shared ho
 
 ### DB
 
-Spotify + Strava use OAuth, so I use Neon + Sequelize to store and refresh tokens.
+Spotify + Strava use OAuth, so I use Neon + Sequelize to store and refresh tokens and persist synced activity and listening history.
 
-There are two tables:
+Core tables include:
 
-1. **Token**: I grab the latest token, see if it's expired, and if so, fetch new data via Spotify/Strava + the saved refresh token. Once it's persisted, I can call the APIs with the auth tokens. Nice defaults built in so anything missing gives back the right info as possible.
-2. **StravaActivity**: I create a row on new activity webhooks, fetch the full activity from Strava, and re-fetch/update JSON when data changes. I track last update time so multiple updates in a window don't hammer Strava's servers.
+1. **Token** and **OauthState**: Store OAuth access/refresh tokens and PKCE state across Spotify and Strava.
+2. **StravaActivity**: Persists webhook-synced Strava activities so routes read from Postgres instead of hitting Strava on page loads.
+3. **SpotifyPlay**, **MusicAlbum**, **MusicArtist**, **MusicTrack**, **FavoriteAlbum**, and **FavoriteAlbumSnapshot**: Store incremental Spotify listening history, catalog metadata, and favorite album snapshots.
 
 #### Spotify History
 
-- Spotify only exposes the 50 most recent plays. Sync runs every 30 minutes via GitHub Actions calling `/api/spotify/sync`.
+- Spotify only exposes the 50 most recent plays. Sync runs every 15 minutes via GitHub Actions calling `/api/spotify/sync`.
 - An empty DB is seeded by the first cron sync from that recent-plays window; later runs fetch only plays after the latest stored timestamp.
 - Historical gaps older than 50 plays can be backfilled from a Spotify Extended Streaming History `.zip` or `.json` export via `turbo spotify:import -- <path.zip | dir | file.json ...> [--dry-run] [--from=YYYY-MM-DD] [--to=YYYY-MM-DD]`.
 - Track metadata for history uses individual `GET /tracks/{id}` requests.
@@ -134,13 +135,13 @@ There are two tables:
 
 DO NOT hit Strava directly unless you must. Webhooks persist activity data so we read from DB instead.
 
-Each Strava app supports a single subscription, so I keep two apps: one for local testing, one for prod. `/api/webhooks` handles webhook events, and `/console` handles OAuth setup and webhook subscription management (dev/test only).
+Each Strava app supports a single subscription, so I keep two apps: one for local testing, one for prod. `/api/webhooks` handles webhook events, and `/dev-console` handles OAuth setup and webhook subscription management.
 
 Each app uses its own Neon database, tokens, and callback URLs. `OAUTH_CALLBACK_URL` should point at `/api/oauth` (shared by Strava and Spotify), and `STRAVA_WEBHOOK_CALLBACK_URL` should point at `/api/webhooks`.
 
-Cloudflare Tunnels (automatic with turbo dev)
+Cloudflare Tunnels (`turbo tunnel`)
 
-The tunnel starts automatically with `turbo dev` when `CLOUDFLARE_TUNNEL_TOKEN` is set.
+Run `turbo tunnel` alongside `turbo dev` when testing OAuth callbacks or webhooks locally.
 This routes `https://dev.dylangattey.com` to your local Next.js server for OAuth and webhook testing.
 
 To set up:
@@ -153,7 +154,7 @@ The tunnel will fail if `CLOUDFLARE_TUNNEL_TOKEN` isn't configured in your `.env
 
 #### Webhooks
 
-1. Start `turbo dev`, then visit `/console` in the browser to view webhook status and manage subscriptions. Delete subscriptions when done so Strava doesn't ping a dead endpoint.
+1. Start `turbo dev` and `turbo tunnel`, then visit `/dev-console` in the browser to view webhook status and manage subscriptions. Delete subscriptions when done so Strava doesn't ping a dead endpoint.
 2. Add a `console.log` in `apps/web/src/app/api/webhooks/route.ts` and rename an activity to trigger events. [Docs](https://developers.strava.com/docs/webhooks/)
 
 ### Versioning

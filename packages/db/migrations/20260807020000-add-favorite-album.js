@@ -33,6 +33,13 @@ module.exports = {
   },
 
   async down(queryInterface) {
-    await queryInterface.dropTable('FavoriteAlbum');
+    const transaction = await queryInterface.sequelize.transaction();
+    try {
+      await queryInterface.dropTable('FavoriteAlbum', { transaction });
+      await transaction.commit();
+    } catch (error) {
+      await transaction.rollback();
+      throw error;
+    }
   },
 };

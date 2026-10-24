@@ -25,7 +25,7 @@ const COMPACT_HOVER_SCALE = COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE;
 
 const compactZoomSx: SxObject = {
   '[data-album-art]': {
-    boxShadow: 'var(--mui-extraShadows-card-hovered)',
+    boxShadow: 'var(--dg-shadow-card-hovered)',
     transform: `scale(${COMPACT_HOVER_SCALE})`,
     zIndex: 1,
   },
@@ -35,10 +35,10 @@ const compactZoomSx: SxObject = {
 };
 
 const compactContainerSx: SxObject = {
+  ':focus-visible &, &:has(:focus-visible)': compactZoomSx,
   '@media (hover: hover)': {
     '&:hover': compactZoomSx,
   },
-  '*:focus-visible &, &:has(:focus-visible)': compactZoomSx,
   alignItems: 'center',
   display: 'flex',
   gap: 1,
@@ -58,7 +58,7 @@ const compactThumbnailOuterSx: SxObject = {
 
 const compactAlbumCardSx: SxObject = {
   borderRadius: 'var(--nested-radius)',
-  boxShadow: 'var(--mui-extraShadows-card-main)',
+  boxShadow: 'var(--dg-shadow-card-main)',
   height: COMPACT_THUMBNAIL_SIZE,
   overflow: 'hidden',
   position: 'relative',

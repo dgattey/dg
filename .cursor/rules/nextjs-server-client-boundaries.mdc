@@ -1,5 +1,5 @@
 ---
-description: RSC boundaries, MUI theming, and component prop usage
+description: RSC boundaries, theme CSS variables, and component prop usage
 globs: "**/*.tsx"
 alwaysApply: false
 ---
@@ -19,35 +19,21 @@ alwaysApply: false
 const HeavyComponent = lazy(() => import('./HeavyComponent'));
 ```
 
-## MUI theming (no `useTheme`)
+## Theme styling (`sx` and CSS variables)
 
-- Avoid `useTheme()` or importing `Theme` from `@mui/material/styles`.
-- `sx` must be plain objects; use CSS vars and static spacing.
+- `sx` must be plain serializable objects; use CSS variables (`--dg-palette-*`, `--dg-shadow-*`, or collage tokens) and static spacing.
 
 ```tsx
-// bad: theme + function sx
-const theme = useTheme();
-<Card sx={(theme) => ({ color: theme.vars.palette.text.primary })} />
-
 // good: CSS vars + plain object
-<Card sx={{ color: 'var(--mui-palette-text-primary)', padding: '8px' }} />
+<Box sx={{ color: 'var(--dg-palette-text-primary)', padding: '8px' }} />
 ```
 
 ## Avoid `component={Function}`
 
-- Do not pass a function/component to MUI's `component` prop; it breaks RSC serialization.
-- Use wrapper components (e.g., `Link`) or string components instead.
+- Do not pass a function/component to `Box` or `Typography`'s `component` prop across a server-client boundary; use wrapper components (`Link`, `PageTransitionLink`) or HTML tag strings instead.
 
 ```tsx
-// bad
-import NextLink from 'next/link';
-
-<MuiLink component={NextLink} href="/about">About</MuiLink>
-
 // good
-<NextLink href="/about" legacyBehavior passHref>
-  <MuiLink>About</MuiLink>
-</NextLink>
-<Button component="a" href="/about">About</Button>
+<Link href="/music">Music</Link>
 <Typography component="h1">Heading</Typography>
 ```
