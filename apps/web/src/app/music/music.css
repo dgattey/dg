@@ -489,6 +489,13 @@
 .music__wellTrackSkeleton {
   grid-template-columns: 1.5rem minmax(0, 1fr);
 }
+@media (prefers-reduced-motion: reduce) {
+  .music__wellOuter--locked {
+    height: auto !important;
+    overflow: visible !important;
+    transition: none !important;
+  }
+}
 .music__wellPlaceholder {
   display: contents;
 }

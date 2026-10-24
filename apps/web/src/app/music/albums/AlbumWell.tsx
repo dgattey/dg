@@ -148,6 +148,9 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
 
   return (
     <div
+      className={
+        heightPx != null ? 'music__wellOuter music__wellOuter--locked' : 'music__wellOuter'
+      }
       onTransitionEnd={handleTransitionEnd}
       style={
         heightPx != null

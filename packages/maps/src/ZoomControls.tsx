@@ -35,7 +35,7 @@ const ZOOM_CONTROLS_CSS = `
 [data-zoom-button]:hover {
   background-color: color-mix(in srgb, var(--cream) 86%, var(--ochre));
 }
-[data-zoom-button]:focus-visible {
+[data-zoom-button][data-zoom-button]:focus-visible {
   border-radius: 9px 13px 10px 12px;
   outline: 2px solid currentColor;
   outline-offset: -3px;
