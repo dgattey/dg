@@ -104,6 +104,7 @@
       margin-inline: calc(-1 * var(--pad));
       overflow-x: auto;
       overscroll-behavior-x: contain;
+      scroll-padding-inline: var(--pad);
       scrollbar-width: none;
     }
     .collageRoot .pillStrip :is(.paperPills, .music__nav) {
@@ -123,7 +124,7 @@
       position: fixed;
       position-anchor: --year-menu;
       top: calc(anchor(bottom) + var(--hover-gap));
-      right: anchor(right);
+      right: max(var(--pad), anchor(right));
       left: auto;
       transform-origin: top right;
     }
