@@ -8,14 +8,10 @@ import { gql } from 'graphql-request';
 import { parseResponse } from '../clients/parseResponse';
 import { getContentfulClient } from './contentfulClient';
 
-/**
- * Grabs the contentful sections with the title of header. Should
- * be only one.
- */
 const QUERY = gql`
   query IntroBlock {
     asset(id: "1P5peDFKfzDHjWd6mcytc8") {
-      url(transform: { quality: 90, format: WEBP })
+      url(transform: { width: 1032, quality: 85, format: WEBP })
       width
       height
       title
@@ -65,10 +61,6 @@ const QUERY = gql`
   }
 `;
 
-/**
- * Fetches the text block corresponding to the introduction rich text
- * for the home page.
- */
 export async function fetchIntroContent(): Promise<IntroContent | null> {
   const data = parseResponse(introBlockResponseSchema, await getContentfulClient().request(QUERY), {
     kind: 'graphql',

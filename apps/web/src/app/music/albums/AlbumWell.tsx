@@ -10,7 +10,7 @@ import type { SxObject } from '@dg/ui/theme';
 import type { ReactNode, TransitionEvent } from 'react';
 import { useLayoutEffect, useRef, useState, ViewTransition } from 'react';
 import { ALBUM_DETAIL_BACKDROP } from '../../collage/backdrops';
-import { BackdropLayer } from '../../collage/CollageBackdrop';
+import { CollageBackdrop } from '../../collage/CollageBackdrop';
 import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
 import type { PaperTone } from '../../collage/types';
@@ -206,7 +206,7 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
       sx={heightPx != null ? shellLockedSx : shellUnlockedSx}
     >
       <Box className="collageBackdropHost" ref={measureRef}>
-        <BackdropLayer backdrop={ALBUM_DETAIL_BACKDROP} />
+        <CollageBackdrop backdrop={ALBUM_DETAIL_BACKDROP} />
         <PaperCard
           className="music__wellCard"
           edge="soft-a"

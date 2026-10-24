@@ -11,34 +11,11 @@ const BREAKPOINT_MAX_SIZES = {
 };
 
 type ImageSizes = {
-  /**
-   * Under 340px wide
-   */
   extraTiny?: number;
-
-  /**
-   * Under 576px wide
-   */
   tiny?: number;
-
-  /**
-   * Under 768px wide
-   */
   small?: number;
-
-  /**
-   * Under 992px wide
-   */
   medium?: number;
-
-  /**
-   * Under 1200px wide
-   */
   large?: number;
-
-  /**
-   * 1200px+ wide - always required as a fallback!
-   */
   extraLarge: number;
 };
 
@@ -47,51 +24,18 @@ type ImageProps = {
   width: number;
   height: number;
   fill?: NextImageProps['fill'];
-
-  /**
-   * When true, image fills its container and uses object-fit: cover.
-   * Unlike `fill`, this keeps the image in normal document flow.
-   */
   cover?: boolean;
-
-  /**
-   * Alt text, required, but defaults to title.
-   */
   alt: NextImageProps['alt'];
-
   className?: string;
-
-  /**
-   * For the image that should be the LCP.
-   */
   preload?: NextImageProps['preload'];
-
-  /**
-   * Also lands on the preload link when `preload` is set.
-   */
   fetchPriority?: NextImageProps['fetchPriority'];
-
-  /**
-   * Overrides Next's lazy default, e.g. for an LCP candidate that isn't preloaded.
-   */
   loading?: NextImageProps['loading'];
-
-  /**
-   * Must match an allowlisted quality from the consuming Next.js app.
-   */
   quality?: NextImageProps['quality'];
-
-  /**
-   * Optional title, used as alt text when present.
-   */
   title?: string | null;
-
-  /**
-   * Sizes are required and map from breakpoint to image width so
-   * Next can automatically generate us some well-sized images!
-   */
   sizes: ImageSizes;
 };
+
+const COMPACT_DENSITY_MAX_WIDTH = 300;
 
 /**
  * All images need to be max width'd for our layouts. The declared ratio wins
@@ -107,9 +51,6 @@ const createMaxWidthImageStyle = (width: number, height: number): CSSProperties 
   objectFit: 'cover',
 });
 
-/**
- * Cover mode: fills container and crops to fit, staying in document flow
- */
 const coverImageStyle: CSSProperties = {
   borderStyle: 'none',
   height: '100%',
@@ -118,11 +59,12 @@ const coverImageStyle: CSSProperties = {
   width: '100%',
 };
 
-/**
- * Turns the breakpoint to width map into a sizes string. Browsers take the
- * first entry whose media condition matches, so conditions run narrowest
- * first and the unconditioned fallback goes last.
- */
+const fillCompactImageStyle: CSSProperties = {
+  ...coverImageStyle,
+  inset: 0,
+  position: 'absolute',
+};
+
 export const generateSizesString = (sizes: ImageSizes): string => {
   const sizesString = Object.entries(sizes)
     .map(([breakpoint, width]) => ({
@@ -142,10 +84,6 @@ export const generateSizesString = (sizes: ImageSizes): string => {
   return sizesString;
 };
 
-/**
- * Shows a Next Image with the contents of the Asset and custom
- * sizes as needed.
- */
 export function Image({
   url,
   title,
@@ -157,6 +95,32 @@ export function Image({
   cover,
   ...props
 }: ImageProps) {
+  const sizeValues = Object.values(sizes).filter((v): v is number => typeof v === 'number');
+  const maxDisplayWidth = Math.max(...sizeValues, sizes.extraLarge);
+
+  if (maxDisplayWidth <= COMPACT_DENSITY_MAX_WIDTH) {
+    const targetWidth = Math.round(maxDisplayWidth);
+    const targetHeight =
+      width > 0 && height > 0
+        ? Math.max(1, Math.round(height * (targetWidth / width)))
+        : targetWidth;
+    const compactStyle = fill
+      ? fillCompactImageStyle
+      : cover
+        ? coverImageStyle
+        : createMaxWidthImageStyle(width, height);
+    return (
+      <NextImage
+        alt={title ?? alt}
+        height={targetHeight}
+        src={url}
+        style={compactStyle}
+        width={targetWidth}
+        {...props}
+      />
+    );
+  }
+
   const sharedProps = {
     alt: title ?? alt,
     sizes: generateSizesString(sizes),

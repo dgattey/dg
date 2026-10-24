@@ -10,10 +10,6 @@ import { gql } from 'graphql-request';
 import { parseResponse } from '../clients/parseResponse';
 import { getContentfulClient } from './contentfulClient';
 
-/**
- * Homepage grid projects. Excludes flagged side projects.
- * Missing/unset isSideProject is treated as a regular project via isSideProject_not: true.
- */
 const QUERY = gql`
   query Projects {
     projectCollection(where: { isSideProject_not: true }, order: creationDate_DESC) {
@@ -27,7 +23,7 @@ const QUERY = gql`
         }
         layout
         thumbnail {
-          url(transform: { quality: 90, format: WEBP })
+          url(transform: { width: 1520, quality: 85, format: WEBP })
           width
           height
         }
@@ -36,9 +32,6 @@ const QUERY = gql`
   }
 `;
 
-/**
- * Fetches all non-side projects sorted by newest first.
- */
 export async function fetchProjects(): Promise<Array<RenderableProject>> {
   const data = parseResponse(projectsResponseSchema, await getContentfulClient().request(QUERY), {
     kind: 'graphql',

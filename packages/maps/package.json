@@ -3,7 +3,6 @@
     "@dg/content-models": "workspace:*",
     "@dg/ui": "workspace:*",
     "lucide-react": "catalog:",
-    "maplibre-gl": "6.15.0",
     "pigeon-maps": "0.22.1",
     "react": "catalog:",
     "server-only": "catalog:"

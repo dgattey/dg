@@ -1,7 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Backdrop, SheetPlacement } from './backdrops';
 import { CutOut } from './CutOut';
-import { CutOutSymbols } from './CutOutSymbols';
 
 type SheetStyle = CSSProperties & {
   '--sheet-a': string;
@@ -35,21 +34,7 @@ function Sheet({ sheet }: { sheet: SheetPlacement }) {
   );
 }
 
-/**
- * Paper sheets and cut-outs behind a page. Tall pages repeat fixed-height bands
- * so pieces keep their spot while the content below them grows.
- */
 export function CollageBackdrop({ backdrop }: { backdrop: Backdrop }) {
-  return (
-    <>
-      <CutOutSymbols />
-      <BackdropLayer backdrop={backdrop} />
-    </>
-  );
-}
-
-/** A backdrop nested inside a page that already renders `CollageBackdrop`. */
-export function BackdropLayer({ backdrop }: { backdrop: Backdrop }) {
   const fill = backdrop.bandHeightPx === 'fill';
   const style = fill ? undefined : ({ '--band-h': `${backdrop.bandHeightPx}px` } as CSSProperties);
   const bands = Array.from({ length: backdrop.repeat }, (_, slot) => ({

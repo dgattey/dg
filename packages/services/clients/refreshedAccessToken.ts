@@ -133,13 +133,17 @@ async function fetchRefreshedTokenFromApi(
   });
   const data: unknown = await rawData.json();
   if (!rawData.ok) {
+    if ([400, 401, 403].includes(rawData.status)) {
+      log.warn('Failed to fetch refreshed token', {
+        name,
+        status: rawData.status,
+      });
+      throw new MissingTokenError(name);
+    }
     log.error('Failed to fetch refreshed token', {
       name,
       status: rawData.status,
     });
-    if ([400, 401, 403].includes(rawData.status)) {
-      throw new MissingTokenError(name);
-    }
     throw new TypeError('Token was not fetched properly');
   }
   log.info('Successfully refreshed token!', {

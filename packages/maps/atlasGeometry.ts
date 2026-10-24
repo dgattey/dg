@@ -9,28 +9,30 @@ import {
 } from './src/routeFrame';
 import { decodePolyline, encodePolyline, simplifyLine } from './src/routeGeometry';
 
-/** About 20 m: invisible at city zoom, and it halves what the page ships for every route. */
-const SIMPLIFY_DEGREES = 2e-4;
+const SIMPLIFY_DEGREES = 5e-4;
+const COORDINATE_PRECISION = 1e4;
 
 const BAY_AREA: GeoBounds = [
   [37.35, -122.8],
   [38.12, -121.85],
 ];
 
-/** A route re-encoded with fewer points, so the browser receives and decodes less. */
+const quantizePoint = ([latitude, longitude]: [number, number]): [number, number] => [
+  Math.round(latitude * COORDINATE_PRECISION) / COORDINATE_PRECISION,
+  Math.round(longitude * COORDINATE_PRECISION) / COORDINATE_PRECISION,
+];
+
 export const simplifyPolyline = (polyline: string): string =>
   encodePolyline(
     simplifyLine(decodePolyline(polyline), SIMPLIFY_DEGREES, ([latitude, longitude]) => [
       longitude,
       latitude,
-    ]),
+    ]).map(quantizePoint),
   );
 
-/** Where most routes start, for the atlas to open on, or the Bay Area without any. */
 export const atlasBounds = (routes: ReadonlyArray<MapRoute>): GeoBounds =>
   homeBounds(decodeRoutes(routes)) ?? BAY_AREA;
 
-/** Generous boxes around each home region; routes starting inside one frame its button. */
 const ATLAS_REGIONS = [
   {
     box: [
@@ -52,7 +54,6 @@ const ATLAS_REGIONS = [
 
 export type AtlasRegion = { bounds: GeoBounds; key: string; label: string };
 
-/** Each home region framed around the routes that start in it, skipping regions without any. */
 export const atlasRegions = (routes: ReadonlyArray<MapRoute>): Array<AtlasRegion> => {
   const decoded = decodeRoutes(routes);
   return ATLAS_REGIONS.flatMap(({ box, key, label }) => {
