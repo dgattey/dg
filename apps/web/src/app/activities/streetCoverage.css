@@ -22,12 +22,14 @@
 }
 
 .streets__eyebrow {
-  grid-column: 1 / 7;
-  align-self: center;
+  display: flex;
+  flex-wrap: wrap;
+  grid-column: 1 / -1;
+  gap: 12px 16px;
+  align-items: center;
 }
 .streets__cities {
-  grid-column: 7 / -1;
-  align-self: center;
+  justify-content: flex-start;
 }
 .streets__callouts {
   grid-column: 1 / -1;
@@ -231,8 +233,6 @@
   .streets {
     grid-template-columns: minmax(0, 1fr);
   }
-  .streets__eyebrow,
-  .streets__cities,
   .streets__mapCard,
   .streets__board {
     grid-column: 1 / -1;

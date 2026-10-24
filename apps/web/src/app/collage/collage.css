@@ -158,6 +158,8 @@ html:has(.collageRoot) body {
   margin-inline: auto;
 }
 .collageMain {
+  position: relative;
+  z-index: 1;
   padding-block: 8px 72px;
 }
 .collageField {
