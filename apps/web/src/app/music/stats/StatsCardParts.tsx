@@ -1,11 +1,14 @@
-import type { ListeningStats, StatsAlbum } from '@dg/services/spotify/fetchListeningStats';
+import type { ListeningStats, StatsAlbumRef } from '@dg/services/spotify/fetchListeningStats';
+import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
 import { Tooltip } from '@dg/ui/core/Tooltip';
+import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { Image } from '@dg/ui/dependent/Image';
 import type { CSSProperties, ReactNode } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { cx } from '../../collage/paperVars';
 import type { PaperTone } from '../../collage/types';
-import { formatCompact, formatCount, formatDay, formatPercent } from './listeningStatsFormat';
+import { formatCount, formatDay, formatPercent } from './listeningStatsFormat';
+import { AlbumLink, ArtistLinks, SpotifyAnchor } from './StatsLinks';
 import { Scallop, Stub } from './StatsShapes';
 
 const CRATE_TILTS = [-3, 2.4, -1.6, 3] as const;
@@ -22,7 +25,7 @@ export function Cover({
   matTone,
   size,
 }: {
-  album: StatsAlbum;
+  album: StatsAlbumRef;
   /** For the cover that is often the largest paint, so it never waits on lazy loading. */
   eager?: boolean;
   matTone?: PaperTone;
@@ -34,7 +37,7 @@ export function Cover({
       style={matTone ? ({ '--mat-bg': `var(--${matTone})` } as CSSProperties) : undefined}
     >
       <Image
-        alt={`${album.name} by ${album.artistNames}`}
+        alt={`${album.name} cover`}
         height={size}
         loading={eager ? 'eager' : undefined}
         sizes={{ extraLarge: size }}
@@ -65,8 +68,10 @@ export function OnRepeatCard({ stats }: { stats: ListeningStats }) {
       tag={
         top > 0 ? (
           <Stub className="stats__cardStamp" kind="ticket" tiltDeg={3.8} tone="ochre">
-            <span className="stats__cardStampKicker">Peak binge</span>
-            <span className="stats__cardStampValue">{top}×</span>
+            <span className="stats__cardStampKicker">
+              {isDailyRepeat ? 'Most in a day' : 'Most in a week'}
+            </span>
+            <span className="stats__cardStampValue">{top} plays</span>
           </Stub>
         ) : undefined
       }
@@ -83,13 +88,16 @@ export function OnRepeatCard({ stats }: { stats: ListeningStats }) {
         {stats.onRepeat.map(({ plays, track, week }, i) => (
           <li className={cx('stats__repeatRow', i === 0 && 'stats__repeatRow--top')} key={track.id}>
             <span className="stats__rank">{String(i + 1).padStart(2, '0')}</span>
+            <AlbumLink album={track.album} label={track.album.name}>
+              <Cover album={track.album} size={40} />
+            </AlbumLink>
             <span className="stats__repeatName">
               <Tooltip title={track.name} whenTruncated>
-                <span className="stats__label">{track.name}</span>
+                <SpotifyAnchor className="stats__label" href={track.url}>
+                  {track.name}
+                </SpotifyAnchor>
               </Tooltip>
-              <Tooltip title={track.artistNames} whenTruncated>
-                <span className="stats__meta">{track.artistNames}</span>
-              </Tooltip>
+              <ArtistLinks artists={track.artists} newArtists={stats.newArtists} />
             </span>
             <span aria-hidden="true" className="stats__meter" style={bar(plays, top)} />
             <span className="stats__count">{plays}</span>
@@ -115,8 +123,8 @@ export function FrontToBackCard({ stats }: { stats: ListeningStats }) {
       innerClassName="stats__ritualsInner"
       tag={
         <Scallop className="stats__cardSeal" tiltDeg={-7.5} tone="rose">
-          <span className="stats__cardSealTop">{formatCompact(stats.sessions)}</span>
-          <span className="stats__cardSealSub">runs</span>
+          <span className="stats__cardSealTop">5+</span>
+          <span className="stats__cardSealSub">in a row</span>
         </Scallop>
       }
       tiltDeg={0.9}
@@ -124,7 +132,9 @@ export function FrontToBackCard({ stats }: { stats: ListeningStats }) {
     >
       <div className="stats__ritualsLead">
         <h2 className="stats__heading">Front to back</h2>
-        <p className="stats__meta">Share of each album heard in runs of 5 or more tracks.</p>
+        <p className="stats__meta">
+          How much of each album I heard while playing 5 or more of its songs in a row.
+        </p>
       </div>
       <ul className="stats__ritualList">
         {albums.map(({ album, plays, sessionPlays, sessions }, i) => (
@@ -133,7 +143,9 @@ export function FrontToBackCard({ stats }: { stats: ListeningStats }) {
               className="stats__ritualArt"
               style={{ '--r': `${CRATE_TILTS[i % CRATE_TILTS.length] ?? 0}deg` } as CSSProperties}
             >
-              <Cover album={album} size={96} />
+              <AlbumLink album={album} label={album.name}>
+                <Cover album={album} size={96} />
+              </AlbumLink>
               <Scallop
                 className="stats__ritualSticker"
                 size="sticker"
@@ -144,13 +156,15 @@ export function FrontToBackCard({ stats }: { stats: ListeningStats }) {
               </Scallop>
             </span>
             <div>
-              <span className="stats__label">{album.name}</span>
-              <span className="stats__meta">{album.artistNames}</span>
+              <AlbumLink album={album} className="stats__label">
+                {album.name}
+              </AlbumLink>
+              <ArtistLinks artists={album.artists} newArtists={stats.newArtists} />
             </div>
             <span aria-hidden="true" className="stats__meter" style={bar(sessionPlays, plays)} />
             <span className="stats__meta">
-              {formatCount(sessionPlays)} of {formatCount(plays)} plays, {formatCount(sessions)}{' '}
-              sessions
+              {formatCount(sessions)} {sessions === 1 ? 'time' : 'times'} through,{' '}
+              {formatCount(sessionPlays)} of {formatCount(plays)} plays
             </span>
           </li>
         ))}
@@ -160,9 +174,9 @@ export function FrontToBackCard({ stats }: { stats: ListeningStats }) {
 }
 
 export function DepthCard({ stats }: { stats: ListeningStats }) {
-  const perTrack = (artist: ListeningStats['depth'][number]) => artist.plays / artist.tracks;
-  const most = (pick: (artist: ListeningStats['depth'][number]) => number) =>
-    Math.max(...stats.depth.map(pick));
+  const perTrack = (artist: ListeningStats['topArtists'][number]) => artist.plays / artist.tracks;
+  const most = (pick: (artist: ListeningStats['topArtists'][number]) => number) =>
+    Math.max(...stats.topArtists.map(pick));
   const highlight = (value: number, max: number) =>
     cx('stats__cell', value === max && 'stats__cell--max');
   const topMonths = most((a) => a.months);
@@ -173,7 +187,7 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
       innerClassName="stats__pad"
       tag={
         <Stub className="stats__cardStamp" kind="stamp" tiltDeg={-4.2} tone="viridian">
-          <span className="stats__cardStampKicker">Loyal</span>
+          <span className="stats__cardStampKicker">Loyal for</span>
           <span className="stats__cardStampValue">{topMonths} mo</span>
         </Stub>
       }
@@ -205,11 +219,11 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
           </tr>
         </thead>
         <tbody>
-          {stats.depth.map((artist, i) => (
-            <tr key={artist.name}>
+          {stats.topArtists.map((artist, i) => (
+            <tr key={artist.id}>
               <td className="stats__rank">{String(i + 1).padStart(2, '0')}</td>
               <th className="stats__artist" scope="row">
-                {artist.name}
+                <ArtistLinks artists={[artist]} newArtists={stats.newArtists} />
               </th>
               <td className="stats__cell">{formatCount(artist.plays)}</td>
               <td
@@ -240,30 +254,44 @@ export function DepthCard({ stats }: { stats: ListeningStats }) {
 }
 
 /**
- * Collage stickers and stamps tucked into the open pocket beneath `Depth and loyalty`
- * beside the taller `Front to back` album rituals card.
+ * Collage stickers tucked into the open pocket beneath `Depth and loyalty`, beside the
+ * taller `Front to back` card. Each one says its fact in a plain sentence or opens a page.
  */
 export function DepthPocketStickers({ stats }: { stats: ListeningStats }) {
-  const playsPerArtist = (stats.plays / Math.max(stats.artists, 1)).toFixed(1);
+  const topArtist = stats.topArtists[0];
   return (
     <div className="stats__pocketCluster">
-      <Stub className="stats__pocketStub" kind="stamp" tiltDeg={3.8} tone="cobalt">
-        <span className="stats__meta stats__totalLabel">Full-album spins</span>
-        <span className="stats__pocketNumber">{formatCount(stats.sessionPlays)}</span>
-        <span className="stats__meta stats__totalSub">
-          across {formatCount(stats.sessions)} album runs
-        </span>
-      </Stub>
-      <Scallop className="stats__pocketSeal" tiltDeg={-5.8} tone="ochre">
-        <span className="stats__meta stats__totalLabel">Top 10 shelf</span>
-        <span className="stats__pocketSealVal">{stats.shelf.topTenOnShelf}/10</span>
-        <span className="stats__meta stats__totalSub">favorites</span>
-      </Scallop>
-      <Stub className="stats__pocketStub" kind="ticket" tiltDeg={2.9} tone="vermilion">
-        <span className="stats__meta stats__totalLabel">Artist depth</span>
-        <span className="stats__pocketNumber">{playsPerArtist}×</span>
-        <span className="stats__meta stats__totalSub">avg plays per artist</span>
-      </Stub>
+      <PageTransitionLink
+        className="stats__pocketLink collageLift"
+        href={favoriteAlbumsRoute}
+        title="Favorite albums"
+      >
+        <Stub className="stats__pocketStub" kind="stamp" tiltDeg={3.8} tone="cobalt">
+          <span className="stats__meta stats__totalLabel">My favorite albums</span>
+          <span className="stats__pocketNumber">{formatCount(stats.shelf.albums)}</span>
+          <span className="stats__meta stats__totalSub">See them all →</span>
+        </Stub>
+      </PageTransitionLink>
+      {topArtist ? (
+        <Scallop className="stats__pocketSeal" tiltDeg={-5.8} tone="ochre">
+          <span className="stats__meta stats__totalLabel">Top artist</span>
+          <span className="stats__pocketSealVal">
+            {formatPercent(topArtist.plays, stats.plays, 0)}
+          </span>
+          <span className="stats__meta stats__totalSub">of plays were {topArtist.name}</span>
+        </Scallop>
+      ) : null}
+      <PageTransitionLink
+        className="stats__pocketLink collageLift"
+        href={musicRoute}
+        title="Listening history"
+      >
+        <Stub className="stats__pocketStub" kind="ticket" tiltDeg={2.9} tone="vermilion">
+          <span className="stats__meta stats__totalLabel">Every play, newest first</span>
+          <span className="stats__pocketNumber">{formatCount(stats.plays)}</span>
+          <span className="stats__meta stats__totalSub">Full listening history →</span>
+        </Stub>
+      </PageTransitionLink>
     </div>
   );
 }

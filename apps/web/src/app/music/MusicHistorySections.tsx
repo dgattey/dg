@@ -1,4 +1,6 @@
+import { musicStatsRangeRoute } from '@dg/shared-core/routes/app';
 import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
+import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import type { ReactNode } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
@@ -36,6 +38,10 @@ export function NoListeningHistory() {
   );
 }
 
+function statsRangeLabel(range: TrackSection['statsRange']) {
+  return typeof range === 'number' ? String(range) : `this ${range}`;
+}
+
 /** Renders date-grouped sections of listening history. */
 export function MusicHistorySections({ sections }: { sections: Array<TrackSection> }) {
   return (
@@ -43,16 +49,25 @@ export function MusicHistorySections({ sections }: { sections: Array<TrackSectio
       {sections.map((section, sectionIndex) => (
         <section aria-label={section.label} className="music__section" key={section.label}>
           <StickyFadeBar className="music__dateBar">
-            <h2 className="music__dateHeading">
-              <PaperTag
-                className="music__dateTag"
-                edge="soft-b"
-                tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
-                tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
+            <div className="music__dateRow">
+              <h2 className="music__dateHeading">
+                <PaperTag
+                  className="music__dateTag"
+                  edge="soft-b"
+                  tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
+                  tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
+                >
+                  {section.label}
+                </PaperTag>
+              </h2>
+              <PageTransitionLink
+                className="music__dateStats"
+                href={musicStatsRangeRoute(section.statsRange)}
+                title={`Listening stats, ${statsRangeLabel(section.statsRange)}`}
               >
-                {section.label}
-              </PaperTag>
-            </h2>
+                Stats →
+              </PageTransitionLink>
+            </div>
           </StickyFadeBar>
           <MusicGrid hasLcpCandidate={sectionIndex === 0} tracks={section.tracks} />
         </section>

@@ -7,6 +7,7 @@ import { MusicTrack } from '@dg/db/models/MusicTrack';
 import { MusicTrackArtist } from '@dg/db/models/MusicTrackArtist';
 import * as v from 'valibot';
 import type { AlbumDetail, AlbumDetailArtist, AlbumDetailTrack } from './albumDetailTypes';
+import { spotifyUrl } from './spotifyLinks';
 import { bestSpotifyImage, spotifyGet } from './trackMetadataShared';
 
 const albumArtistSchema = v.looseObject({
@@ -131,14 +132,14 @@ async function readAlbumFromDb(albumId: string): Promise<AlbumDetail | null> {
         artists: artists.map((artist) => ({
           id: artist.id,
           name: artist.name,
-          url: artist.url ?? `https://open.spotify.com/artist/${artist.id}`,
+          url: spotifyUrl('artist', artist.id, artist.url),
         })),
         discNumber: track.discNumber ?? 1,
         durationMs: track.durationMs,
         id: track.id,
         name: track.name,
         trackNumber: track.trackNumber ?? 0,
-        url: track.url ?? `https://open.spotify.com/track/${track.id}`,
+        url: spotifyUrl('track', track.id, track.url),
       };
     }),
   );
@@ -148,7 +149,7 @@ async function readAlbumFromDb(albumId: string): Promise<AlbumDetail | null> {
       ? albumArtists.map((artist) => ({
           id: artist.id,
           name: artist.name,
-          url: artist.url ?? `https://open.spotify.com/artist/${artist.id}`,
+          url: spotifyUrl('artist', artist.id, artist.url),
         }))
       : (mappedTracks[0]?.artists ?? []);
 
@@ -165,7 +166,7 @@ async function readAlbumFromDb(albumId: string): Promise<AlbumDetail | null> {
     releaseDate: album.releaseDate,
     totalTracks: album.totalTracks ?? mappedTracks.length,
     tracks: mappedTracks,
-    url: album.url ?? `https://open.spotify.com/album/${album.id}`,
+    url: spotifyUrl('album', album.id, album.url),
   };
 }
 

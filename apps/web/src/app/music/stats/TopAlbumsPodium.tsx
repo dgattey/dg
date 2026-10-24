@@ -5,6 +5,7 @@ import { cx, paperSurfaceVars } from '../../collage/paperVars';
 import type { PaperTone } from '../../collage/types';
 import { formatCount, formatRangeSuffix } from './listeningStatsFormat';
 import { Cover } from './StatsCardParts';
+import { AlbumLink, ArtistLinks } from './StatsLinks';
 import { Scallop, Stub, Vinyl } from './StatsShapes';
 
 type RunnerUpCut = {
@@ -67,9 +68,9 @@ export function TopAlbumsPodium({ stats }: { stats: ListeningStats }) {
         <div className="stats__heroArt">
           <span aria-hidden="true" className="stats__heroBlob" />
           <Vinyl className="stats__heroVinyl" />
-          <span className="stats__heroSleeve">
+          <AlbumLink album={first.album} className="stats__heroSleeve" label={first.album.name}>
             <Cover album={first.album} eager={true} size={280} />
-          </span>
+          </AlbumLink>
           <Scallop className="stats__heroStamp" tiltDeg={-12} tone="ochre">
             <span className="stats__heroRank">#1</span>
             <span className="stats__meta">{suffix}</span>
@@ -77,14 +78,18 @@ export function TopAlbumsPodium({ stats }: { stats: ListeningStats }) {
         </div>
         <PaperCard edge="soft-b" innerClassName="stats__heroInner" tiltDeg={1.2}>
           <span className="stats__meta">Most played album</span>
-          <span className="stats__heroTitle">{first.album.name}</span>
-          <span className="stats__meta">{first.album.artistNames}</span>
+          <AlbumLink album={first.album} className="stats__heroTitle">
+            {first.album.name}
+          </AlbumLink>
+          <ArtistLinks artists={first.album.artists} newArtists={stats.newArtists} />
           <span className="stats__heroPlays">
             {formatCount(first.plays)} <span className="stats__meta">plays</span>
           </span>
-          <p className="stats__note">
-            <strong>{stats.shelf.topTenOnShelf} of the top 10</strong> are on my shelf
-          </p>
+          {first.album.isFavorite ? (
+            <p className="stats__note">
+              <AlbumLink album={first.album}>In Favorite albums →</AlbumLink>
+            </p>
+          ) : null}
         </PaperCard>
       </div>
       {rest.length > 0 ? (
@@ -101,12 +106,16 @@ export function TopAlbumsPodium({ stats }: { stats: ListeningStats }) {
                 style={{ '--r': `${cut.tiltDeg}deg` } as CSSProperties}
               >
                 <span className="stats__runnerArt">
-                  <Cover album={album} matTone={cut.matTone} size={150} />
+                  <AlbumLink album={album} label={album.name}>
+                    <Cover album={album} matTone={cut.matTone} size={150} />
+                  </AlbumLink>
                   <RankSticker cut={cut} rank={i + 2} />
                 </span>
                 <span className="stats__runnerCaption">
-                  <span className="stats__label">{album.name}</span>
-                  <span className="stats__meta">{album.artistNames}</span>
+                  <AlbumLink album={album} className="stats__label">
+                    {album.name}
+                  </AlbumLink>
+                  <ArtistLinks artists={album.artists} newArtists={stats.newArtists} />
                   <span className="stats__count">{formatCount(plays)}</span>
                 </span>
               </li>

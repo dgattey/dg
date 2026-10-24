@@ -3,6 +3,8 @@ import { groupAdjacentAlbumPlays } from './groupAdjacentAlbumPlays';
 
 export type TrackSection = {
   label: string;
+  /** The listening stats range that covers the section, so its heading can open it. */
+  statsRange: 'week' | 'month' | number;
   tracks: Array<HistoryTrack>;
 };
 
@@ -74,6 +76,7 @@ function foldSparseRecentSections(sections: Array<TrackSection>): Array<TrackSec
     ) {
       folded[folded.length - 1] = {
         label: section.label,
+        statsRange: section.statsRange,
         tracks: [...previous.tracks, ...section.tracks],
       };
     } else {
@@ -84,20 +87,27 @@ function foldSparseRecentSections(sections: Array<TrackSection>): Array<TrackSec
 }
 
 /**
- * Gets the section label for a track based on when it was played.
+ * Gets the section label for a track based on when it was played, and the stats range
+ * that holds it: `Today` and `This week` open the week, a past month opens its year.
  */
-function getSectionLabel(playedAt: Date, now: CalendarPosition): string {
+function getSection(
+  playedAt: Date,
+  now: CalendarPosition,
+): Pick<TrackSection, 'label' | 'statsRange'> {
   const played = calendarPosition(playedAt);
   if (played.day === now.day) {
-    return 'Today';
+    return { label: 'Today', statsRange: 'week' };
   }
   if (played.week === now.week) {
-    return 'This week';
+    return { label: 'This week', statsRange: 'week' };
   }
   if (played.month === now.month) {
-    return 'This month';
+    return { label: 'This month', statsRange: 'month' };
   }
-  return monthYearFormat.format(playedAt);
+  return {
+    label: monthYearFormat.format(playedAt),
+    statsRange: Math.floor((played.month - 1) / 12),
+  };
 }
 
 /**
@@ -130,10 +140,10 @@ export function groupTracksByDate(
 
   for (const track of tracks) {
     const playedAt = new Date(track.playedAt);
-    const label = getSectionLabel(playedAt, now);
+    const section = getSection(playedAt, now);
 
-    if (!currentSection || currentSection.label !== label) {
-      currentSection = { label, tracks: [] };
+    if (!currentSection || currentSection.label !== section.label) {
+      currentSection = { ...section, tracks: [] };
       sections.push(currentSection);
     }
 

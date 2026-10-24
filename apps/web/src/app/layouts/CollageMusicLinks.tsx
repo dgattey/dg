@@ -1,9 +1,7 @@
 'use client';
 
-import { favoriteAlbumsRoute, musicRoute, musicStatsRoute } from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
-import type { LucideIcon } from 'lucide-react';
-import { ChartColumn, ChevronDown, DiscAlbum, History } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { PaperButton, PaperButtonFace } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
@@ -14,12 +12,6 @@ import {
   READING_DESTINATION,
   STRAVA_DESTINATION,
 } from './musicHeaderDestinations';
-
-const DESTINATION_ICONS: Record<string, LucideIcon> = {
-  [favoriteAlbumsRoute]: DiscAlbum,
-  [musicRoute]: History,
-  [musicStatsRoute]: ChartColumn,
-};
 
 /**
  * Opens the menu on mouse hover. A ref callback, so the listeners live exactly as long
@@ -113,7 +105,7 @@ export function CollageMusicLinks() {
         >
           <ul className="chrome__musicList">
             {MUSIC_DESTINATIONS.map((destination) => {
-              const Icon = DESTINATION_ICONS[destination.href];
+              const Icon = destination.icon;
               const current = pathname === destination.href;
               return (
                 <li key={destination.href}>
@@ -123,7 +115,7 @@ export function CollageMusicLinks() {
                     href={destination.href}
                     title={destination.label}
                   >
-                    {Icon ? <Icon aria-hidden={true} size={20} /> : null}
+                    <Icon aria-hidden={true} size={20} />
                     {destination.label}
                   </PageTransitionLink>
                 </li>

@@ -186,7 +186,7 @@ describe('SfStreetCoverageSection', () => {
     const user = userEvent.setup();
     const { callouts, header } = renderSection();
 
-    await user.click(screen.getByRole('button', { name: 'Last week' }));
+    await user.click(screen.getByRole('button', { name: 'This week' }));
     expect(header()).toBe('San Francisco0.0%0.0 of 24.0 mi');
     expect(callouts().queryByText(/Most ridden/)).not.toBeInTheDocument();
     expect(callouts().getByText('0')).toBeInTheDocument();

@@ -29,10 +29,15 @@ type Span =
 
 type SpanKey = 'all' | StravaWindow;
 
+const WINDOW_LABELS = {
+  month: 'This month',
+  week: 'This week',
+} as const satisfies Record<StravaWindow, string>;
+
 const SPAN_OPTIONS = [
   { key: 'all', label: 'All time', tiltDeg: 0.8 },
-  { key: 'week', label: 'Last week', tiltDeg: -1.2 },
-  { key: 'month', label: 'Last month', tiltDeg: 0.6 },
+  { key: 'week', label: WINDOW_LABELS.week, tiltDeg: -1.2 },
+  { key: 'month', label: WINDOW_LABELS.month, tiltDeg: 0.6 },
 ] as const satisfies ReadonlyArray<PaperPillOption<SpanKey>>;
 
 const SPORT_TILTS = [-1, 1.2, -0.6, 0.9] as const;
@@ -45,7 +50,7 @@ type Filtered = {
   /** Outings in the picked sport across every year, for views that are already per year. */
   sportOutings: ReadonlyArray<StravaLogEntry>;
   sport: SportFilter;
-  /** The span in words, `All time`, `Last 7 days`, or a year. */
+  /** The span in words, `All time`, `This week`, or a year. */
   spanLabel: string;
   span: SfCoverageSpan;
 };
@@ -99,7 +104,7 @@ function spanLabel(span: Span) {
     case 'all':
       return SPAN_OPTIONS[0].label;
     case 'window':
-      return `Last ${STRAVA_WINDOW_DAYS[span.key]} days`;
+      return WINDOW_LABELS[span.key];
     case 'year':
       return String(span.year);
     default: {

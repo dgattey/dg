@@ -172,4 +172,42 @@ describe('fetchMusicHistoryPage', () => {
     expect(result.tracks).toHaveLength(3);
     expect(result.nextCursor).not.toBeNull();
   });
+
+  it('labels plays by artists first played this week, but not artists heard years ago', async () => {
+    const now = Date.now();
+    await db.SpotifyPlay.bulkCreate([
+      {
+        albumId: `${PREFIX}-album-new`,
+        artistIds: [`${PREFIX}-artist-new`],
+        playedAt: new Date(now - 1000),
+        trackId: `${PREFIX}-track-new`,
+      },
+      {
+        albumId: `${PREFIX}-album-old`,
+        artistIds: [`${PREFIX}-artist-old`],
+        playedAt: new Date(now - 2000),
+        trackId: `${PREFIX}-track-old`,
+      },
+      {
+        albumId: `${PREFIX}-album-old`,
+        artistIds: [`${PREFIX}-artist-old`],
+        playedAt: new Date('2020-06-01T12:00:00.000Z'),
+        trackId: `${PREFIX}-track-old`,
+      },
+    ]);
+    mockSpotifyGetWithRetry.mockImplementation((resource: string) =>
+      Promise.resolve({
+        data: buildApiResponse(resource.replace(`tracks/${PREFIX}-track-`, '')),
+        status: 200,
+        success: true,
+      }),
+    );
+
+    const result = await fetchMusicHistoryPage({ pageSize: 2 });
+
+    expect(result.tracks.map((track) => [track.trackId, track.newArtist])).toEqual([
+      [`${PREFIX}-track-new`, 'New artist this week'],
+      [`${PREFIX}-track-old`, null],
+    ]);
+  });
 });

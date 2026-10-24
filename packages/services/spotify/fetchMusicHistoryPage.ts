@@ -3,6 +3,7 @@ import 'server-only';
 import { db, Op } from '@dg/db';
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import * as v from 'valibot';
+import { selectArtistFirstPlays, TIME_ZONE } from './listeningStatsQueries';
 import { resolveTrackDisplays } from './trackDisplays';
 
 /**
@@ -16,6 +17,8 @@ const historyTrackSchema = v.object({
   /** Spotify album page, empty when we never captured one. */
   albumUrl: v.string(),
   artistNames: v.string(),
+  /** `New artist this week|month|year` when one of the track's artists was first played then. */
+  newArtist: v.nullable(v.string()),
   playedAt: v.string(),
   trackId: v.string(),
   trackName: v.string(),
@@ -40,6 +43,27 @@ type SpotifyHistoryRow = {
 };
 
 const DEFAULT_PAGE_SIZE = 24;
+
+const pacificDayFormat = new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE });
+
+/** The Pacific calendar day as `YYYY-MM-DD`, then the Monday that starts its week. */
+function pacificCalendar(date: Date) {
+  const day = pacificDayFormat.format(date);
+  const noon = new Date(`${day}T12:00:00Z`);
+  const mondayOffset = (noon.getUTCDay() + 6) % 7;
+  const monday = new Date(noon.getTime() - mondayOffset * 86_400_000).toISOString().slice(0, 10);
+  return { day, monday };
+}
+
+/** Matches the history's own `This week` and `This month` sections, so the badge reads with them. */
+function newArtistLabel(firstPlayedAt: Date, now: Date): string | null {
+  const first = pacificCalendar(firstPlayedAt);
+  const today = pacificCalendar(now);
+  if (first.monday === today.monday) return 'New artist this week';
+  if (first.day.slice(0, 7) === today.day.slice(0, 7)) return 'New artist this month';
+  if (first.day.slice(0, 4) === today.day.slice(0, 4)) return 'New artist this year';
+  return null;
+}
 
 /**
  * Fetches SpotifyPlay rows from the database.
@@ -79,6 +103,16 @@ export async function fetchMusicHistoryPage({
   }
 
   const displays = await resolveTrackDisplays(pageItems.map((play) => play.trackId));
+  const now = new Date();
+  const artistIds = [...displays.values()].flatMap((display) =>
+    display.artists.map((artist) => artist.id),
+  );
+  const firstPlays = new Map(
+    (await selectArtistFirstPlays([...new Set(artistIds)])).map((row) => [
+      row.artistId,
+      row.playedAt,
+    ]),
+  );
 
   const tracks = pageItems
     .map((play) => {
@@ -86,12 +120,16 @@ export async function fetchMusicHistoryPage({
       if (!display) {
         return null;
       }
+      const newestFirstPlay = Math.max(
+        ...display.artists.map((artist) => firstPlays.get(artist.id)?.getTime() ?? 0),
+      );
       return v.parse(historyTrackSchema, {
-        albumId: display.albumId,
-        albumImageUrl: display.albumImageUrl,
-        albumName: display.albumName,
-        albumUrl: display.albumUrl,
-        artistNames: display.artistNames,
+        albumId: display.album.id,
+        albumImageUrl: display.album.imageUrl,
+        albumName: display.album.name,
+        albumUrl: display.album.url,
+        artistNames: display.artists.map((artist) => artist.name).join(', '),
+        newArtist: newestFirstPlay > 0 ? newArtistLabel(new Date(newestFirstPlay), now) : null,
         playedAt: play.playedAt.toISOString(),
         trackId: display.id,
         trackName: display.name,

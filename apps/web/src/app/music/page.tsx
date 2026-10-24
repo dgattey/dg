@@ -42,7 +42,7 @@ async function MusicHistory() {
 
 export default function MusicPage() {
   return (
-    <MusicPageShell backdrop={HISTORY_BACKDROP} title={TITLE}>
+    <MusicPageShell backdrop={HISTORY_BACKDROP} navFrom={musicRoute} title={TITLE}>
       <Suspense fallback={<CollageHistorySkeleton />}>
         <MusicHistory />
       </Suspense>

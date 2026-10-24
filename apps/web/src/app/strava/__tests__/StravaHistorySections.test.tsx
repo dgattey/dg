@@ -254,13 +254,13 @@ describe('StravaHistorySections', () => {
     expect(screen.getByText('1 route')).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: 'All routes' }));
-    await user.click(screen.getByRole('button', { name: 'Last week' }));
-    expect(screen.getAllByText('Last 7 days')).not.toHaveLength(0);
+    await user.click(screen.getByRole('button', { name: 'This week' }));
+    expect(screen.getAllByText('This week')).not.toHaveLength(0);
     expect(listNames('Recent outings')).toEqual(['Presidio loop', 'Lake Merritt run']);
     expect(listNames('Biggest climbs')).toEqual(['Presidio loop', 'Lake Merritt run']);
 
     await user.selectOptions(screen.getByRole('combobox', { name: 'Year' }), '2025');
-    expect(screen.getByRole('button', { name: 'Last week' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'This week' })).toHaveAttribute(
       'aria-pressed',
       'false',
     );

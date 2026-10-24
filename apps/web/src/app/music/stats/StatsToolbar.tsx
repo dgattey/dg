@@ -1,14 +1,14 @@
 'use client';
 
 import type { StatsRangeKey } from '@dg/services/spotify/fetchListeningStats';
-import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
+import { musicStatsRoute } from '@dg/shared-core/routes/app';
 import { jsOnlyProps } from '@dg/ui/core/JsOnlyStyle';
-import { ChevronDown, DiscAlbum, History } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import { useRef } from 'react';
-import { PaperButton } from '../../collage/PaperButton';
 import { PaperCard } from '../../collage/PaperCard';
 import { PaperTag } from '../../collage/PaperTag';
 import { cx } from '../../collage/paperVars';
+import { MusicNav } from '../MusicNav';
 
 type QuickRangeKey = 'all' | 'month' | 'week';
 
@@ -18,8 +18,8 @@ const QUICK_RANGE_OPTIONS: ReadonlyArray<{
   tiltDeg: number;
 }> = [
   { key: 'all', label: 'All time', tiltDeg: -1.4 },
-  { key: 'week', label: 'Last week', tiltDeg: 1.2 },
-  { key: 'month', label: 'Last month', tiltDeg: -0.9 },
+  { key: 'week', label: 'This week', tiltDeg: 1.2 },
+  { key: 'month', label: 'This month', tiltDeg: -0.9 },
 ];
 
 /**
@@ -137,20 +137,7 @@ export function StatsToolbar({
 
   return (
     <div className="stats__toolbar">
-      <nav aria-label="Explore music" className="stats__musicNav">
-        <div className="collageLift">
-          <PaperButton href={musicRoute} tiltDeg={-1.6} title="Plays" tone="ochre">
-            <History aria-hidden={true} size={18} />
-            Plays
-          </PaperButton>
-        </div>
-        <div className="collageLift">
-          <PaperButton href={favoriteAlbumsRoute} tiltDeg={1.5} title="Favorite albums" tone="rose">
-            <DiscAlbum aria-hidden={true} size={18} />
-            Favorite albums
-          </PaperButton>
-        </div>
-      </nav>
+      <MusicNav current={musicStatsRoute} />
       <fieldset aria-label="Time range" className="paperPills stats__rangePills" {...jsOnlyProps}>
         {QUICK_RANGE_OPTIONS.map((option) => {
           const current = option.key === selectedKey;

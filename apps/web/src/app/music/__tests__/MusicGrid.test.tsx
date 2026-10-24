@@ -12,6 +12,7 @@ function play(album: string, track: string): HistoryTrack {
     albumName: album,
     albumUrl: `https://open.spotify.com/album/${album}`,
     artistNames: `${album} artist`,
+    newArtist: null,
     playedAt: `2026-08-04T12:${String(playCounter).padStart(2, '0')}:00.000Z`,
     trackId: `track-${track}`,
     trackName: track,

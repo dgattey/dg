@@ -1,16 +1,27 @@
 'use client';
 
 import type { ListeningStats, StatsMatrixCell } from '@dg/services/spotify/fetchListeningStats';
+import { musicRoute } from '@dg/shared-core/routes/app';
 import { Tooltip } from '@dg/ui/core/Tooltip';
+import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { Image } from '@dg/ui/dependent/Image';
 import { type CSSProperties, useState } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { cx } from '../../collage/paperVars';
 import { formatCount, formatDay, formatHours } from './listeningStatsFormat';
 import { CardHead } from './StatsCardParts';
+import { AlbumLink, ArtistLinks, SpotifyAnchor } from './StatsLinks';
 import { Scallop, Stub } from './StatsShapes';
 
 const CHAMPION_TILTS = [-2.2, 1.8, -1.5, 2.3, -1.9, 1.6] as const;
+
+/** What one matrix cell counts, by range, for the stamp's `Active …` kicker. */
+const ACTIVE_UNITS = {
+  all: 'months',
+  month: 'days',
+  week: 'day parts',
+  year: 'weeks',
+} as const satisfies Record<ListeningStats['range']['kind'], string>;
 
 function matrixTier(plays: number, maxPlays: number): 0 | 1 | 2 | 3 | 4 {
   if (plays <= 0 || maxPlays <= 0) return 0;
@@ -43,6 +54,7 @@ export function ActivityMatrixCard({
     0,
   );
   const activeEntry = hoveredCell ?? peakCell;
+  const activeUnit = ACTIVE_UNITS[stats.range.kind];
 
   return (
     <PaperCard
@@ -51,7 +63,7 @@ export function ActivityMatrixCard({
       innerClassName="stats__pad"
       tag={
         <Stub className="stats__cardStamp" kind="ticket" tiltDeg={-3.5} tone="cobalt">
-          <span className="stats__cardStampKicker">Active</span>
+          <span className="stats__cardStampKicker">Active {activeUnit}</span>
           <span className="stats__cardStampValue">{formatCount(activeCellsCount)}</span>
         </Stub>
       }
@@ -107,11 +119,17 @@ export function ActivityMatrixCard({
                 const tier = matrixTier(cell.plays, maxPlays);
                 const isPeak = peakCell?.key === cell.key && cell.plays > 0;
                 const isHovered = hoveredCell?.key === cell.key;
-                if (cell.plays <= 0) {
+                if (cell.phase === 'future' || cell.plays <= 0) {
                   return (
                     <span
                       aria-hidden="true"
-                      className="stats__monthCell stats__monthCell--t0"
+                      className={cx(
+                        'stats__monthCell',
+                        cell.phase === 'future'
+                          ? 'stats__monthCell--future'
+                          : 'stats__monthCell--t0',
+                        cell.phase === 'current' && 'stats__monthCell--current',
+                      )}
                       key={cell.key}
                     />
                   );
@@ -124,6 +142,7 @@ export function ActivityMatrixCard({
                       'stats__monthCell',
                       `stats__monthCell--t${tier}`,
                       isPeak && 'stats__monthCell--peak',
+                      cell.phase === 'current' && 'stats__monthCell--current',
                       isHovered && 'stats__monthCell--active',
                     )}
                     key={cell.key}
@@ -150,8 +169,8 @@ export function ActivityMatrixCard({
 }
 
 /**
- * Playful collage stickers and stamps tucked into the open pocket beneath `Every month`
- * while `Soundtrack by year` extends down the right column.
+ * Collage stickers tucked into the open pocket beneath the activity matrix while the
+ * soundtrack card extends down the right column.
  */
 export function MatrixPocketStickers({ stats }: { stats: ListeningStats }) {
   const dailyPace = Math.max(1, Math.round(stats.plays / Math.max(stats.activeDays, 1)));
@@ -160,27 +179,33 @@ export function MatrixPocketStickers({ stats }: { stats: ListeningStats }) {
       ? stats.dayStreak.start === stats.dayStreak.end
         ? formatDay(stats.dayStreak.start)
         : `${formatDay(stats.dayStreak.start)} to ${formatDay(stats.dayStreak.end)}`
-      : 'consecutive days';
+      : 'in a row';
 
   return (
     <div className="stats__pocketCluster">
       <Stub className="stats__pocketStub" kind="ticket" tiltDeg={-4.6} tone="ochre">
-        <span className="stats__meta stats__totalLabel">Longest daily streak</span>
+        <span className="stats__meta stats__totalLabel">Longest listening streak</span>
         <span className="stats__pocketNumber">{formatCount(stats.dayStreak.days)} days</span>
         <span className="stats__meta stats__totalSub">{streakRange}</span>
       </Stub>
       <Scallop className="stats__pocketSeal" tiltDeg={6.4} tone="viridian">
-        <span className="stats__meta stats__totalLabel">Daily pace</span>
+        <span className="stats__meta stats__totalLabel">On a listening day</span>
         <span className="stats__pocketSealVal">{formatCount(dailyPace)}</span>
-        <span className="stats__meta stats__totalSub">plays / day</span>
+        <span className="stats__meta stats__totalSub">plays on average</span>
       </Scallop>
-      <Stub className="stats__pocketStub" kind="stamp" tiltDeg={-3.2} tone="rose">
-        <span className="stats__meta stats__totalLabel">Distinct tracks</span>
-        <span className="stats__pocketNumber">{formatCount(stats.tracks)}</span>
-        <span className="stats__meta stats__totalSub">
-          across {formatCount(stats.artists)} artists
-        </span>
-      </Stub>
+      <PageTransitionLink
+        className="stats__pocketLink collageLift"
+        href={musicRoute}
+        title="Listening history"
+      >
+        <Stub className="stats__pocketStub" kind="stamp" tiltDeg={-3.2} tone="rose">
+          <span className="stats__meta stats__totalLabel">Different songs</span>
+          <span className="stats__pocketNumber">{formatCount(stats.tracks)}</span>
+          <span className="stats__meta stats__totalSub">
+            by {formatCount(stats.artists)} artists →
+          </span>
+        </Stub>
+      </PageTransitionLink>
     </div>
   );
 }
@@ -209,7 +234,7 @@ export function SoundtrackCard({
       tag={
         <Scallop className="stats__cardSeal" tiltDeg={8} tone="vermilion">
           <span className="stats__cardSealTop">#1</span>
-          <span className="stats__cardSealSub">spins</span>
+          <span className="stats__cardSealSub">song</span>
         </Scallop>
       }
       tiltDeg={0.8}
@@ -217,10 +242,23 @@ export function SoundtrackCard({
     >
       <CardHead aside={aside} title={title} />
       <ol className={cx('stats__championList', isCompact && 'stats__championList--compact')}>
-        {entries.map(({ badge, key, track, yearFilter }, i) => {
-          const trackBody = (
-            <>
-              {track.albumImageUrl ? (
+        {entries.map(({ badge, key, track, yearFilter }, i) => (
+          <li className="stats__championRow" key={key}>
+            {yearFilter ? (
+              <button
+                className="stats__championYear"
+                onClick={() => onSelectYear?.(yearFilter)}
+                onMouseEnter={() => onPrefetchYear?.(yearFilter)}
+                title={`Filter by ${yearFilter}`}
+                type="button"
+              >
+                {badge}
+              </button>
+            ) : (
+              <span className="stats__championYear stats__championYear--static">{badge}</span>
+            )}
+            <span className="stats__championEntry">
+              <AlbumLink album={track.album} label={track.album.name}>
                 <span
                   className="stats__mat stats__championMat"
                   style={
@@ -230,59 +268,32 @@ export function SoundtrackCard({
                   }
                 >
                   <Image
-                    alt={`${track.albumName || track.name} by ${track.artistNames}`}
+                    alt={`${track.album.name} cover`}
                     height={artSize}
                     sizes={{ extraLarge: artSize }}
-                    url={track.albumImageUrl}
+                    url={track.album.imageUrl}
                     width={artSize}
                   />
                 </span>
-              ) : (
-                <span aria-hidden="true" className="stats__championArtEmpty" />
-              )}
+              </AlbumLink>
               <span className="stats__championMain">
                 <Tooltip title={track.name} whenTruncated>
-                  <span className="stats__championTrack">{track.name}</span>
+                  <SpotifyAnchor className="stats__championTrack" href={track.url}>
+                    {track.name}
+                  </SpotifyAnchor>
                 </Tooltip>
-                <Tooltip title={track.artistNames} whenTruncated>
-                  <span className="stats__meta stats__championArtist">{track.artistNames}</span>
-                </Tooltip>
+                <ArtistLinks
+                  artists={track.artists}
+                  className="stats__meta stats__championArtist"
+                  newArtists={stats.newArtists}
+                />
               </span>
               <span className="stats__championPlays">
                 {formatCount(track.plays)} {track.plays === 1 ? 'play' : 'plays'}
               </span>
-            </>
-          );
-          return (
-            <li className="stats__championRow" key={key}>
-              {yearFilter ? (
-                <button
-                  className="stats__championYear"
-                  onClick={() => onSelectYear?.(yearFilter)}
-                  onMouseEnter={() => onPrefetchYear?.(yearFilter)}
-                  title={`Filter by ${yearFilter}`}
-                  type="button"
-                >
-                  {badge}
-                </button>
-              ) : (
-                <span className="stats__championYear stats__championYear--static">{badge}</span>
-              )}
-              {track.url ? (
-                <a
-                  className="stats__championLink"
-                  href={track.url}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  {trackBody}
-                </a>
-              ) : (
-                <span className="stats__championLink">{trackBody}</span>
-              )}
-            </li>
-          );
-        })}
+            </span>
+          </li>
+        ))}
       </ol>
     </PaperCard>
   );

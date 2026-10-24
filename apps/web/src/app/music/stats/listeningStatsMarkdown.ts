@@ -1,5 +1,6 @@
 import 'server-only';
 
+import type { SpotifyLink } from '@dg/services/spotify/spotifyLinks';
 import { musicStatsRoute } from '@dg/shared-core/routes/app';
 import { getListeningStats } from '../../../services/musicStats';
 import { relatedPageLinksMarkdown } from '../../llm-markdown/relatedPageLinksMarkdown';
@@ -16,6 +17,9 @@ import {
   peakHours,
   playsInDayPart,
 } from './listeningStatsFormat';
+
+const artistLinks = (artists: ReadonlyArray<SpotifyLink>) =>
+  artists.map((artist) => `[${artist.name}](${artist.url})`).join(', ');
 
 /**
  * Markdown representation of listening stats — kept next to the stats page.
@@ -48,21 +52,21 @@ export async function getListeningStatsMarkdown(): Promise<string> {
         stats.genres
           .map(
             (item, i) =>
-              `${i + 1}. ${item.genre}: ${formatCount(item.plays)} plays (${item.artists.join(', ')})`,
+              `${i + 1}. ${item.genre}: ${formatCount(item.plays)} plays (${artistLinks(item.artists)})`,
           )
           .join('\n'),
         '## Top albums, all time',
         stats.topAlbums
           .map(
             ({ album, plays }, i) =>
-              `${i + 1}. [${album.name}](${album.url}) — ${album.artistNames}, ${formatCount(plays)} plays`,
+              `${i + 1}. [${album.name}](${album.url}) — ${artistLinks(album.artists)}, ${formatCount(plays)} plays`,
           )
           .join('\n'),
         '## Top songs, all time',
         stats.topTracks
           .map(
             (track, i) =>
-              `${i + 1}. [${track.name}](${track.url}) — ${track.artistNames}, ${formatCount(track.plays)} plays`,
+              `${i + 1}. [${track.name}](${track.url}) — ${artistLinks(track.artists)}, ${formatCount(track.plays)} plays`,
           )
           .join('\n'),
         '## Top artists, all time',
@@ -76,7 +80,7 @@ export async function getListeningStatsMarkdown(): Promise<string> {
         stats.onRepeat
           .map(
             ({ plays, track, week }) =>
-              `- [${track.name}](${track.url}) — ${track.artistNames}, ${plays} plays the week of ${formatDay(week)}`,
+              `- [${track.name}](${track.url}) — ${artistLinks(track.artists)}, ${plays} plays the week of ${formatDay(week)}`,
           )
           .join('\n'),
         '## When',
@@ -91,14 +95,14 @@ export async function getListeningStatsMarkdown(): Promise<string> {
         stats.frontToBack
           .map(
             ({ album, plays, sessionPlays, sessions }) =>
-              `- [${album.name}](${album.url}) — ${album.artistNames}: ${formatPercent(sessionPlays, plays, 0)} of ${formatCount(plays)} plays in ${sessions} full-album sessions`,
+              `- [${album.name}](${album.url}) — ${artistLinks(album.artists)}: ${formatPercent(sessionPlays, plays, 0)} of ${formatCount(plays)} plays came while playing 5 or more of its songs in a row, ${sessions} times through`,
           )
           .join('\n'),
         '## Depth and loyalty',
-        stats.depth
+        stats.topArtists
           .map(
             (artist, i) =>
-              `${i + 1}. ${artist.name}: ${formatCount(artist.plays)} plays across ${artist.tracks} tracks, in ${artist.months} of ${stats.activeMonths} active months`,
+              `${i + 1}. [${artist.name}](${artist.url}): ${formatCount(artist.plays)} plays across ${artist.tracks} tracks, in ${artist.months} of ${stats.activeMonths} active months`,
           )
           .join('\n'),
       );

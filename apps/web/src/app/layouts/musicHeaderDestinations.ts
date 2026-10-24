@@ -6,6 +6,8 @@ import {
   readingRoute,
   stravaRoute,
 } from '@dg/shared-core/routes/app';
+import type { LucideIcon } from 'lucide-react';
+import { ChartColumn, DiscAlbum, History } from 'lucide-react';
 
 type MusicDestination = {
   href: string;
@@ -13,12 +15,22 @@ type MusicDestination = {
 };
 
 /** A Music menu page: its short menu `label` and the fuller `title` its page carries. */
-type MusicPageDestination = MusicDestination & { title: string };
+type MusicPageDestination = MusicDestination & { icon: LucideIcon; title: string };
 
 export const MUSIC_DESTINATIONS: ReadonlyArray<MusicPageDestination> = [
-  { href: musicStatsRoute, label: 'Listening stats', title: 'Listening stats' },
-  { href: musicRoute, label: 'Plays', title: 'Listening history' },
-  { href: favoriteAlbumsRoute, label: 'Favorite albums', title: 'Favorite albums' },
+  {
+    href: musicStatsRoute,
+    icon: ChartColumn,
+    label: 'Listening stats',
+    title: 'Listening stats',
+  },
+  { href: musicRoute, icon: History, label: 'Plays', title: 'Listening history' },
+  {
+    href: favoriteAlbumsRoute,
+    icon: DiscAlbum,
+    label: 'Favorite albums',
+    title: 'Favorite albums',
+  },
 ];
 
 export const READING_DESTINATION: MusicDestination = { href: readingRoute, label: 'Reads' };

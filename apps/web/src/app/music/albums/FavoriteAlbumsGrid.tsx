@@ -31,6 +31,7 @@ import {
   type AlbumSortKey,
   COLLAGE_ALBUM_GRID_COLUMNS,
   CollageSortControls,
+  DEFAULT_ALBUM_SORT,
 } from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
 
@@ -173,7 +174,7 @@ type Props = {
 
 export function FavoriteAlbumsGrid({ albums }: Props) {
   const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
-  const [sortKey, setSortKey] = useState<AlbumSortKey>('added');
+  const [sortKey, setSortKey] = useState<AlbumSortKey>(DEFAULT_ALBUM_SORT);
   const itemRefs = useRef(new Map<string, HTMLElement>());
   const previousRects = useRef<Map<string, DOMRect> | null>(null);
 

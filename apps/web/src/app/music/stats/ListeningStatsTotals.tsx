@@ -82,15 +82,15 @@ export function ListeningStatsTotals({ stats }: { stats: ListeningStats }) {
       cut: TOTAL_CUTS.wholeAlbums,
       id: 'wholeAlbums',
       label: 'Whole albums',
-      sub: `of plays, in ${formatCount(stats.sessions)} sessions`,
+      sub: 'of plays came 5+ songs in a row from one album',
       value: formatPercent(stats.sessionPlays, stats.plays),
     },
     {
       cut: TOTAL_CUTS.shelf,
       href: favoriteAlbumsRoute,
       id: 'shelf',
-      label: 'From the shelf',
-      sub: `${formatCount(stats.shelf.plays)} plays, ${formatCount(stats.shelf.albums)} albums`,
+      label: 'Favorite albums',
+      sub: `of plays, from ${formatCount(stats.shelf.albums)} albums`,
       value: formatPercent(stats.shelf.plays, stats.plays),
     },
   ];

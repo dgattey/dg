@@ -28,6 +28,7 @@ export function MusicGrid({ hasLcpCandidate = false, tracks }: Props) {
             isLcpCandidate={hasLcpCandidate && cardIndex === 0}
             key={run.key}
             linkUrl={run.tracks.length > 1 ? run.linkUrl : firstTrack.url}
+            newArtist={run.tracks.find((track) => track.newArtist)?.newArtist ?? null}
             trackCount={run.tracks.length}
             trackName={firstTrack.trackName}
           />

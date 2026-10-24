@@ -10,9 +10,12 @@ import { fetchAlbumDetail } from './fetchAlbumDetail';
 import type {
   ListeningStats,
   StatsAlbum,
-  StatsTopArtist,
+  StatsGenre,
   StatsTopTrack,
+  StatsTrack,
 } from './fetchListeningStats';
+import type { selectTopGenres } from './listeningStatsQueries';
+import { spotifyUrl } from './spotifyLinks';
 import type { TrackDisplay } from './trackDisplays';
 import { spotifyGet } from './trackMetadataShared';
 
@@ -46,7 +49,11 @@ export async function resolveArtists(
   const artists = new Map<string, ResolvedArtist>(
     cached.map((artist) => [
       artist.id,
-      { genres: artist.genres ?? [], name: artist.name, url: artist.url ?? '' },
+      {
+        genres: artist.genres ?? [],
+        name: artist.name,
+        url: spotifyUrl('artist', artist.id, artist.url),
+      },
     ]),
   );
 
@@ -117,10 +124,19 @@ export async function resolveArtists(
 
 type CachedAlbumArtist = MusicArtist & { MusicAlbumArtist: { position: number } };
 
+/**
+ * Albums with linked artists: the Music* cache when it knows the album's artists,
+ * otherwise `fetchAlbumDetail`, which writes the full album through for next time.
+ */
+/**
+ * Albums from the catalog cache, then Spotify, then the favorite albums snapshot. The
+ * snapshot keeps artist names only, so those artists link to a Spotify search.
+ */
 export async function resolveAlbums(
   albumIds: Array<string>,
   favoriteAlbums: ReadonlyArray<InstanceType<typeof db.FavoriteAlbum>>,
 ): Promise<Map<string, StatsAlbum>> {
+  const favoriteIds = new Set(favoriteAlbums.map((album) => album.id));
   const albums = new Map<string, StatsAlbum>();
   const cached = await MusicAlbum.findAll({
     include: [{ model: MusicArtist, through: { attributes: ['position'] } }],
@@ -132,26 +148,16 @@ export async function resolveAlbums(
     );
     if (album.name && album.imageUrl && artists.length > 0) {
       albums.set(album.id, {
-        artistNames: artists.map((artist) => artist.name).join(', '),
+        artists: artists.map((artist) => ({
+          id: artist.id,
+          name: artist.name,
+          url: spotifyUrl('artist', artist.id, artist.url),
+        })),
         id: album.id,
         imageUrl: album.imageUrl,
+        isFavorite: favoriteIds.has(album.id),
         name: album.name,
-        url: album.url ?? '',
-      });
-    }
-  }
-
-  const shelvedById = new Map(favoriteAlbums.map((album) => [album.id, album]));
-  for (const id of albumIds) {
-    if (albums.has(id)) continue;
-    const album = shelvedById.get(id);
-    if (album) {
-      albums.set(album.id, {
-        artistNames: album.artistNames,
-        id: album.id,
-        imageUrl: album.imageUrl,
-        name: album.name,
-        url: album.url,
+        url: spotifyUrl('album', album.id, album.url),
       });
     }
   }
@@ -161,9 +167,10 @@ export async function resolveAlbums(
       const detail = await fetchAlbumDetail(id);
       if (detail) {
         albums.set(id, {
-          artistNames: detail.artists.map((artist) => artist.name).join(', '),
+          artists: detail.artists,
           id,
           imageUrl: detail.imageUrl,
+          isFavorite: favoriteIds.has(id),
           name: detail.name,
           url: detail.url,
         });
@@ -172,26 +179,45 @@ export async function resolveAlbums(
       log.warn('Failed to fetch album for listening stats', { error, id });
     }
   }
+
+  for (const album of favoriteAlbums) {
+    if (albums.has(album.id) || !albumIds.includes(album.id)) continue;
+    albums.set(album.id, {
+      artists: album.artistNames.split(', ').map((name) => ({
+        id: name,
+        name,
+        url: `https://open.spotify.com/search/${encodeURIComponent(name)}`,
+      })),
+      id: album.id,
+      imageUrl: album.imageUrl,
+      isFavorite: true,
+      name: album.name,
+      url: spotifyUrl('album', album.id, album.url),
+    });
+  }
   return albums;
 }
 
+/** Each resolved track, with its album flagged when it is one of the favorite albums. */
+export function toStatsTracks(
+  displays: ReadonlyMap<string, TrackDisplay>,
+  favoriteIds: ReadonlySet<string>,
+): Map<string, StatsTrack> {
+  return new Map(
+    [...displays].map(([id, track]) => [
+      id,
+      { ...track, album: { ...track.album, isFavorite: favoriteIds.has(track.album.id) } },
+    ]),
+  );
+}
+
 export function toStatsTopTrack(
-  tracks: ReadonlyMap<string, TrackDisplay>,
+  tracks: ReadonlyMap<string, StatsTrack>,
   trackId: string,
   plays: number,
 ): StatsTopTrack | null {
   const track = tracks.get(trackId);
-  return track
-    ? {
-        albumImageUrl: track.albumImageUrl,
-        albumName: track.albumName,
-        artistNames: track.artistNames,
-        id: track.id,
-        name: track.name,
-        plays,
-        url: track.url,
-      }
-    : null;
+  return track ? { ...track, plays } : null;
 }
 
 export function mapCatalogSlices({
@@ -216,27 +242,9 @@ export function mapCatalogSlices({
   shownAlbums: ReadonlyArray<{ albumId: string; plays: number }>;
   shownTracks: ReadonlyArray<{ plays: number; trackId: string }>;
   topDepthRows: ReadonlyArray<{ artistId: string; months: number; plays: number; tracks: number }>;
-  tracks: ReadonlyMap<string, TrackDisplay>;
-}): Pick<
-  ListeningStats,
-  'depth' | 'frontToBack' | 'onRepeat' | 'topAlbums' | 'topArtists' | 'topTracks'
-> {
-  const topArtists: Array<StatsTopArtist> = topDepthRows
-    .map(({ artistId, months, plays, tracks: artistTracks }) => {
-      const artist = artistMap.get(artistId);
-      return artist
-        ? { id: artistId, months, name: artist.name, plays, tracks: artistTracks, url: artist.url }
-        : null;
-    })
-    .filter(isNotNullish);
-
+  tracks: ReadonlyMap<string, StatsTrack>;
+}): Pick<ListeningStats, 'frontToBack' | 'onRepeat' | 'topAlbums' | 'topArtists' | 'topTracks'> {
   return {
-    depth: topArtists.map(({ months, name, plays, tracks: artistTracks }) => ({
-      months,
-      name,
-      plays,
-      tracks: artistTracks,
-    })),
     frontToBack: sessions
       .map(({ albumId, plays, sessionPlays, sessions: count }) => {
         const album = albums.get(albumId);
@@ -246,18 +254,7 @@ export function mapCatalogSlices({
     onRepeat: onRepeat
       .map(({ period, plays, trackId }) => {
         const track = tracks.get(trackId);
-        return track
-          ? {
-              plays,
-              track: {
-                artistNames: track.artistNames,
-                id: track.id,
-                name: track.name,
-                url: track.url,
-              },
-              week: period,
-            }
-          : null;
+        return track ? { plays, track, week: period } : null;
       })
       .filter(isNotNullish),
     topAlbums: shownAlbums
@@ -266,9 +263,37 @@ export function mapCatalogSlices({
         return album ? { album, plays } : null;
       })
       .filter(isNotNullish),
-    topArtists,
+    topArtists: topDepthRows
+      .map(({ artistId, months, plays, tracks: artistTracks }) => {
+        const artist = artistMap.get(artistId);
+        return artist
+          ? {
+              id: artistId,
+              months,
+              name: artist.name,
+              plays,
+              tracks: artistTracks,
+              url: artist.url,
+            }
+          : null;
+      })
+      .filter(isNotNullish),
     topTracks: shownTracks
       .map(({ plays, trackId }) => toStatsTopTrack(tracks, trackId, plays))
       .filter(isNotNullish),
   };
+}
+
+/** Genre rows with each of their top artists linked to its Spotify page. */
+export function toStatsGenres(
+  rows: Awaited<ReturnType<typeof selectTopGenres>>,
+): Array<StatsGenre> {
+  return rows.map((row) => ({
+    ...row,
+    artists: row.artists.map((artist) => ({
+      id: artist.id,
+      name: artist.name,
+      url: spotifyUrl('artist', artist.id, artist.url),
+    })),
+  }));
 }

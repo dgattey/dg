@@ -101,7 +101,8 @@
   grid-template-columns: minmax(0, 1fr);
   justify-items: stretch;
 }
-.stats__totalLink {
+.stats__totalLink,
+.stats__pocketLink {
   display: grid;
   width: 100%;
   color: inherit;

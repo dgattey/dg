@@ -95,11 +95,11 @@ describe('StravaFilters', () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const { inkedTones } = renderFilters(outings);
 
-    await user.click(screen.getByRole('button', { name: 'Last week' }));
+    await user.click(screen.getByRole('button', { name: 'This week' }));
     expect(inkedTones()).toEqual(['cobalt']);
     expect(screen.getByText('8 routes')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Last month' }));
+    await user.click(screen.getByRole('button', { name: 'This month' }));
     expect(inkedTones()).toEqual(['cobalt', 'ochre']);
     expect(screen.getByText('10 routes')).toBeInTheDocument();
 
@@ -108,7 +108,7 @@ describe('StravaFilters', () => {
     expect(screen.getByText('No routes')).toBeInTheDocument();
 
     await user.selectOptions(screen.getByRole('combobox', { name: 'Year' }), '2025');
-    expect(screen.getByRole('button', { name: 'Last month' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'This month' })).toHaveAttribute(
       'aria-pressed',
       'false',
     );
