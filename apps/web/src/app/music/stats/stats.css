@@ -740,7 +740,6 @@
   display: grid;
   gap: 8px;
   align-content: start;
-  padding-right: 76px;
 }
 .stats__ritualList {
   display: grid;
@@ -820,9 +819,6 @@
   .stats__pad,
   .stats__ritualsInner {
     padding: var(--collage-card-pad-mobile);
-  }
-  .stats__ritualsLead {
-    padding-right: 0;
   }
   .stats__columns {
     column-gap: 4px;
