@@ -47,8 +47,8 @@ describe('SiteMapPage', () => {
 
     expect(screen.getByRole('heading', { level: 1, name: 'Site map' })).toBeInTheDocument();
     expect(
-      screen.getByText('All pages, side projects, and machine-readable endpoints.'),
-    ).toBeInTheDocument();
+      screen.queryByText('All pages, side projects, and machine-readable endpoints.'),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: 'Pages' })).toBeInTheDocument();
     expect(screen.getByRole('heading', { level: 2, name: 'Side projects' })).toBeInTheDocument();
     expect(

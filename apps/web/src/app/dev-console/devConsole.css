@@ -5,7 +5,7 @@
   padding: 0.45em 0.75em 0.5em;
   font-size: var(--type-meta);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: var(--leading-title);
   letter-spacing: 0;
 }
 
@@ -16,39 +16,6 @@
 .devConsole__grid {
   display: grid;
   gap: 40px;
-}
-.devConsole__header {
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  gap: var(--gap);
-  align-items: center;
-}
-.devConsole__title {
-  grid-column: 1 / span 7;
-}
-.devConsole__lede {
-  grid-column: 8 / -1;
-  margin-top: 30px;
-}
-.devConsole__ledeInner {
-  padding: 24px 28px 26px;
-}
-.devConsole__ledeInner p {
-  margin: 0;
-  font-size: var(--type-body-lg);
-  line-height: 1.45;
-}
-.devConsole__protectedTag {
-  top: -14px;
-  left: -12px;
-  font-size: var(--type-meta);
-  font-weight: 600;
-  line-height: 1.25;
-  letter-spacing: 0;
-}
-.devConsole__protectedTag small {
-  font-size: inherit;
-  font-weight: 500;
 }
 .devConsole__console {
   display: grid;
@@ -98,16 +65,6 @@
   .devConsole__sheet {
     padding-block-start: 24px;
   }
-  .devConsole__header {
-    grid-template-columns: minmax(0, 1fr);
-  }
-  .devConsole__title,
-  .devConsole__lede {
-    grid-column: auto;
-  }
-  .devConsole__lede {
-    margin-top: 18px;
-  }
   .devConsole__cards {
     grid-template-columns: minmax(0, 1fr);
   }
@@ -115,9 +72,6 @@
 @media (max-width: 600px) {
   .devConsole__sheet {
     padding-block-end: 64px;
-  }
-  .devConsole__ledeInner {
-    padding: 22px 20px 24px;
   }
   .devConsole__cardInner {
     padding: 24px 22px 26px;

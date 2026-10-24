@@ -65,7 +65,7 @@
   padding: 30px 38px 32px;
   margin-top: 26px;
   font-size: var(--type-body-lg);
-  line-height: 1.6;
+  line-height: var(--leading-body);
   color: var(--ink-on-cream);
   isolation: isolate;
   filter: var(--dshadow);
@@ -102,11 +102,6 @@
   line-height: inherit;
   text-wrap: pretty;
 }
-.home__intro p:first-of-type {
-  font-size: var(--type-lead);
-  line-height: 1.45;
-  text-wrap: balance;
-}
 /* Links render through Typography, which sets its own size and drops the underline. */
 .home__intro p :is(a, [data-typography]) {
   font: inherit;
@@ -119,7 +114,7 @@
 .home__intro :is(h1, h2, h3, h4, h5, h6) {
   margin: 0;
   font-family: var(--display);
-  line-height: 1.1;
+  line-height: var(--leading-tight);
 }
 .home__map {
   position: relative;
@@ -517,13 +512,13 @@
   font-family: var(--display);
   font-size: var(--type-h3);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: var(--leading-title);
 }
 .home__sideDescription {
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: var(--type-caption);
-  line-height: 1.5;
+  line-height: var(--leading-body);
   color: var(--soft);
   white-space: nowrap;
 }
@@ -550,7 +545,7 @@
     font-size: var(--type-meta);
   }
   .home__sideDescription {
-    line-height: 1.4;
+    line-height: var(--leading-meta);
   }
 }
 

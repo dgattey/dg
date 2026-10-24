@@ -29,7 +29,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const serverTime = await getServerTime();
 
   return (
-    <html lang="en" suppressHydrationWarning={true}>
+    <html className={familjen.variable} lang="en" suppressHydrationWarning={true}>
       <head>
         <ColorSchemeScript />
         <JsOnlyStyle />
@@ -39,7 +39,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <ServerTimeProvider serverTime={serverTime}>
           <ColorSchemeSync />
           <WebMcpTools />
-          <div className={`collageRoot ${familjen.variable}`}>
+          <div className="collageRoot">
             <NowPlayingProvider>
               <div className="collageSheet">
                 <Header />

@@ -54,6 +54,7 @@ export function getGlobalThemeCss(): string {
   --dg-shadow-card-hovered: ${CARD_SHADOW_HOVERED};
   --dg-skeleton-bg: ${onCanvas(12)};
   --font-sans: ${typography.fontFamily};
+  --font-mono: ${typography.code.fontFamily};
   font-size: 15px;
   font-variant: tabular-nums;
   word-break: break-word;
@@ -87,12 +88,22 @@ html, body {
 body {
   background-color: var(--dg-palette-background-default);
   color: var(--dg-palette-text-primary);
-  font-family: ${typography.fontFamily};
+  font-family: var(--font-sans);
   font-size: 1.03125rem;
   font-weight: 400;
   line-height: 1.5;
   margin: 0;
   overscroll-behavior-x: none;
+}
+button, input, select, textarea {
+  font: inherit;
+  letter-spacing: inherit;
+}
+b, strong {
+  font-weight: 700;
+}
+code, kbd, pre, samp {
+  font-family: var(--font-mono);
 }
 @media (min-width: 576px) { body { font-size: 1rem; } }
 @media (min-width: 992px) { body { font-size: 1.0625rem; } }

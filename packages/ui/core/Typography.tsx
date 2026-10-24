@@ -129,7 +129,6 @@ export function Typography<T extends ElementType = 'p'>({
     fontFamily: 'var(--font-sans)',
     margin: 0,
     textRendering: 'optimizeLegibility',
-    WebkitFontSmoothing: 'auto',
     ...VARIANT_STYLES[variant],
     ...(color ? { color } : {}),
   };

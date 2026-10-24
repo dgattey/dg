@@ -14,6 +14,7 @@ import {
   checkUnusedCssRules,
 } from './check-css.js';
 import { checkGridGapsFit, checkScallopPadding } from './check-css-geometry.js';
+import { checkNoPageSubtitles } from './check-page-titles.js';
 
 export const MAX_SOURCE_FILE_LINES = 350;
 const MAX_TEST_FILE_LINES = 500;
@@ -324,6 +325,7 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
   violations.push(...checkOrphanCssFiles(webCssPaths, webImporters));
   violations.push(...checkRouteCssImports(webCssPaths, webSources));
   violations.push(...checkSocialImageRouteParity(webSources));
+  violations.push(...checkNoPageSubtitles(webSources));
   violations.push(...checkCacheTagParity(webSources));
   violations.push(...checkTypeScale(webCss));
   violations.push(...checkScallopPadding(webCss));

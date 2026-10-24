@@ -100,7 +100,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   font-family: var(--display);
   font-size: var(--type-label);
   font-weight: 700;
-  line-height: 1.1;
+  line-height: var(--leading-tight);
   color: var(--on);
   text-decoration: none;
   border-radius: var(--nested-radius);
@@ -213,7 +213,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   flex: none;
   font-size: var(--type-meta);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: var(--leading-title);
   color: var(--now-dim);
 }
 .chrome__nowValue {
@@ -223,7 +223,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   font-size: var(--type-body);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  line-height: 1.2;
+  line-height: var(--leading-title);
 }
 .chrome__nowCellLead {
   flex: none;
@@ -340,9 +340,9 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   font-family: var(--display);
   font-size: var(--type-title-lg);
   font-weight: 700;
-  line-height: 1.12;
+  line-height: var(--leading-tight);
   color: var(--cream);
-  letter-spacing: -0.02em;
+  letter-spacing: var(--tracking-title);
 }
 .chrome__helloDescription > * {
   display: grid;
@@ -378,7 +378,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   font-family: var(--display);
   font-size: var(--type-label);
   font-weight: 700;
-  line-height: 1.1;
+  line-height: var(--leading-tight);
   color: var(--cream);
   text-decoration: none;
   background: color-mix(in oklab, var(--cream) 10%, var(--viridian));
@@ -486,7 +486,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   font-family: var(--display);
   font-size: var(--type-meta);
   font-weight: 700;
-  line-height: 1.25;
+  line-height: var(--leading-title);
   color: color-mix(in oklab, var(--cream) 78%, transparent);
   border-top: var(--collage-border-width) solid color-mix(in oklab, var(--cream) 16%, transparent);
 }
@@ -567,7 +567,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   }
   .chrome__nowCellLink .chrome__nowValue {
     font-size: var(--type-body);
-    line-height: 1.25;
+    line-height: var(--leading-title);
   }
   .chrome__nowArtImg,
   .chrome__nowArtFallback,

@@ -5,7 +5,6 @@ import type { ReactNode } from 'react';
 import { DEV_CONSOLE_BACKDROP } from '../collage/backdrops';
 import { CollageBackdrop } from '../collage/CollageBackdrop';
 import { CutLetters } from '../collage/CutLetters';
-import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import type { PaperTone } from '../collage/types';
 import { OauthCard } from './oauth/OauthCard';
@@ -51,22 +50,7 @@ export default function ConsolePage({ searchParams }: ConsolePageProps) {
     >
       <CollageBackdrop backdrop={DEV_CONSOLE_BACKDROP} />
       <div className="collageMeasure devConsole__grid">
-        <div className="devConsole__header">
-          <CutLetters className="collagePageTitle devConsole__title" text="Dev console" />
-          <PaperCard
-            className="devConsole__lede"
-            edge="quad-c"
-            innerClassName="devConsole__ledeInner"
-            tag={
-              <PaperTag className="collagePin devConsole__protectedTag" tiltDeg={-3} tone="rose">
-                Protected <small>basic auth</small>
-              </PaperTag>
-            }
-            tiltDeg={1}
-          >
-            <p>This page is protected and intended for developer access.</p>
-          </PaperCard>
-        </div>
+        <CutLetters className="collagePageTitle" text="Dev console" />
         <div className="devConsole__console">
           <Section
             sectionId="OAuth-connections"

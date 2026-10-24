@@ -163,10 +163,7 @@ export default function SiteMapPage() {
   return (
     <section aria-label={TITLE} className="collageBackdropHost siteMap__layout">
       <CollageBackdrop backdrop={SITE_MAP_BACKDROP} />
-      <div className="siteMap__intro">
-        <CutLetters className="collagePageTitle" text={TITLE} />
-        <p className="siteMap__lede">{DESCRIPTION}</p>
-      </div>
+      <CutLetters className="collagePageTitle" text={TITLE} />
       <Suspense fallback={null}>
         <SiteMapDirectory />
       </Suspense>
