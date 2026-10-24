@@ -8,6 +8,36 @@
   padding-top: 20px;
   pointer-events: none;
 }
+/*
+ * Cards scrolling up soften into the paper before they pass behind the header. The
+ * tint and the mask both ease out over the tail, so the fade never shows an edge.
+ */
+.chrome__header::before {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: -1;
+  width: 100vw;
+  height: calc(100% + 48px);
+  content: "";
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--paper) 56%, transparent) 0%,
+    color-mix(in srgb, var(--paper) 36%, transparent) 25%,
+    color-mix(in srgb, var(--paper) 18%, transparent) 50%,
+    color-mix(in srgb, var(--paper) 6%, transparent) 75%,
+    transparent 100%
+  );
+  backdrop-filter: blur(2.5px);
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0%,
+    rgb(0 0 0 / 0.65) 35%,
+    rgb(0 0 0 / 0.25) 68%,
+    transparent 100%
+  );
+  translate: -50%;
+}
 html:active-view-transition-type(page-open, page-close) .chrome__header {
   view-transition-name: site-header;
 }
