@@ -1,7 +1,5 @@
 'use client';
 
-import { Box } from '@dg/ui/core/Box';
-import type { SxObject } from '@dg/ui/theme';
 import type { Point } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
 import { type CSSProperties, use, useRef, useState } from 'react';
@@ -112,7 +110,7 @@ function pixelSeparation(a: Point, b: Point, zoom: number): number {
   return Math.hypot(dx, dy);
 }
 
-const containerSx: SxObject = {
+const containerStyle: CSSProperties = {
   height: '100%',
   isolation: 'isolate',
   overflow: 'hidden',
@@ -121,11 +119,16 @@ const containerSx: SxObject = {
   willChange: 'transform',
 };
 
-const canvasSx: SxObject = {
-  '& > svg': { display: 'block', height: '100%', width: '100%' },
-  inset: 0,
-  position: 'absolute',
-};
+const ROUTE_ATLAS_CSS = `
+[data-atlas-canvas] > svg {
+  display: block;
+  height: 100%;
+  width: 100%;
+}
+[data-atlas-tiles] > div {
+  background-color: transparent !important;
+}
+`;
 
 type ViewportSnapshot = {
   boundsKey: string;
@@ -148,7 +151,7 @@ export function RouteAtlasMap({
   tileSource,
   view = null,
 }: RouteAtlasMapProps) {
-  const hostRef = useRef<HTMLDivElement>(null);
+  const hostRef = useRef<HTMLElement>(null);
   const visible = use(VisibleRoutes);
   const dark = useDarkMap();
   const offline = tileSource.mode === 'offline';
@@ -182,30 +185,34 @@ export function RouteAtlasMap({
   const paths = offline ? [] : framePaths(baseFrame, decodeRoutes(filteredRoutes), frameMargin);
 
   const tokens = dark ? ROUTE_MAP_TOKENS.dark : ROUTE_MAP_TOKENS.light;
-  const tileLayerSx: SxObject = {
-    '& > div': {
-      backgroundColor: 'transparent !important',
-    },
-    backgroundColor: tokens.background,
-    inset: 0,
-    position: 'absolute',
-    zIndex: 1,
-  };
 
   return (
-    <Box aria-label={label} ref={hostRef} role="region" sx={containerSx}>
+    <section aria-label={label} ref={hostRef} style={containerStyle}>
+      <style href="dg-route-atlas" precedence="default">
+        {ROUTE_ATLAS_CSS}
+      </style>
       {offline ? (
-        <Box
-          sx={{
-            ...canvasSx,
+        <div
+          data-atlas-canvas=""
+          style={{
             backgroundImage: `url("${dark ? OFFLINE_TILES.dark : OFFLINE_TILES.light}")`,
+            inset: 0,
+            position: 'absolute',
           }}
         >
           <RouteAtlasSketch bounds={activeBounds} routes={filteredRoutes} />
-        </Box>
+        </div>
       ) : (
         <>
-          <Box sx={tileLayerSx}>
+          <div
+            data-atlas-tiles=""
+            style={{
+              backgroundColor: tokens.background,
+              inset: 0,
+              position: 'absolute',
+              zIndex: 1,
+            }}
+          >
             <PigeonMapCore
               attribution={false}
               center={activeCenter}
@@ -245,7 +252,7 @@ export function RouteAtlasMap({
                 paths={paths}
               />
             </PigeonMapCore>
-          </Box>
+          </div>
           <ZoomControls
             onReset={() => {
               setViewportState(null);
@@ -268,6 +275,6 @@ export function RouteAtlasMap({
           />
         </>
       )}
-    </Box>
+    </section>
   );
 }

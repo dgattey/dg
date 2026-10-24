@@ -1,9 +1,7 @@
 'use client';
 
-import { Box } from '@dg/ui/core/Box';
-import type { SxObject } from '@dg/ui/theme';
 import { Music, Music2, Music3, Music4 } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { type CSSProperties, useEffect, useRef } from 'react';
 import { pauseAnimationsOnScroll } from './useWaveformBounce';
 
 type NotesVariant = 'collage' | 'collageCompact';
@@ -64,7 +62,7 @@ const NOTES_CONFIG: Record<NotesVariant, NotesConfig> = {
   },
 };
 
-const notesContainerSx: SxObject = {
+const notesContainerStyle: CSSProperties = {
   backfaceVisibility: 'hidden',
   height: 0,
   left: 0,
@@ -75,7 +73,7 @@ const notesContainerSx: SxObject = {
   width: 0,
 };
 
-const noteItemSx: SxObject = {
+const noteItemStyle: CSSProperties = {
   backfaceVisibility: 'hidden',
   left: 0,
   opacity: 0.01,
@@ -152,12 +150,11 @@ export function MusicNotes({ isPlaying, noteColor, variant = 'collage' }: MusicN
   }
 
   return (
-    <Box
+    <div
       aria-hidden="true"
       data-ambient-notes="true"
       ref={containerRef}
-      style={{ color: noteColor ?? 'currentColor' }}
-      sx={notesContainerSx}
+      style={{ ...notesContainerStyle, color: noteColor ?? 'currentColor' }}
     >
       {config.slots.map((slot) => {
         const IconComponent = MUSIC_ICONS[slot.iconIndex];
@@ -165,15 +162,14 @@ export function MusicNotes({ isPlaying, noteColor, variant = 'collage' }: MusicN
           return null;
         }
         return (
-          <Box
+          <div
             key={`${slot.angle}-${slot.delayMs}`}
-            style={{ marginLeft: halfIcon, marginTop: halfIcon }}
-            sx={noteItemSx}
+            style={{ ...noteItemStyle, marginLeft: halfIcon, marginTop: halfIcon }}
           >
             <IconComponent size={config.iconSize} strokeWidth={config.strokeWidth} />
-          </Box>
+          </div>
         );
       })}
-    </Box>
+    </div>
   );
 }

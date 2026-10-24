@@ -229,6 +229,9 @@
   gap: 22px;
 }
 .music__dateBar {
+  position: sticky;
+  top: var(--site-header-height, 5.5rem);
+  z-index: 5;
   justify-self: stretch;
 }
 .music__dateTag {
@@ -318,6 +321,25 @@
 .music__wellCard {
   width: calc(100% + 20px);
   margin: 28px -10px 14px;
+}
+.music__wellSlot {
+  grid-column: 1 / -1;
+  order: var(--well-order-xs);
+}
+@media (min-width: 576px) {
+  .music__wellSlot {
+    order: var(--well-order-sm);
+  }
+}
+@media (min-width: 768px) {
+  .music__wellSlot {
+    order: var(--well-order-md);
+  }
+}
+@media (min-width: 992px) {
+  .music__wellSlot {
+    order: var(--well-order-lg);
+  }
 }
 @supports not (-moz-appearance: none) {
   html:active-view-transition-type(album-close) .music__wellCard,

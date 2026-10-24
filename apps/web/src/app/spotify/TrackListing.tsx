@@ -1,17 +1,14 @@
 'use client';
 
 import type { Track } from '@dg/content-models/spotify/Track';
-import { Box } from '@dg/ui/core/Box';
-import { Stack } from '@dg/ui/core/Stack';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Typography } from '@dg/ui/core/Typography';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
-import type { SxObject } from '@dg/ui/theme';
 import { type ComponentProps, type CSSProperties, Fragment, type ReactNode } from 'react';
 import { PaperCard } from '../collage/PaperCard';
-import { ALBUM_GRADIENT_GLOW_SX, AlbumGradientBackdrop } from './AlbumGradientBackdrop';
+import { ALBUM_GRADIENT_GLOW_STYLE, AlbumGradientBackdrop } from './AlbumGradientBackdrop';
 import { MusicNotes } from './MusicNotes';
 import { PlaybackProgressBar } from './PlaybackProgressBar';
 import { PlaybackStatus } from './PlaybackStatus';
@@ -38,14 +35,40 @@ const CONTRASTING_COLORS = {
   },
 } as const;
 
-const truncatedSx: SxObject = {
+const TRACK_LISTING_CSS = `
+[data-track-artists] a {
+  color: inherit;
+}
+:focus-visible [data-compact-track] [data-album-art],
+[data-compact-track]:has(:focus-visible) [data-album-art] {
+  box-shadow: var(--dg-shadow-card-hovered);
+  transform: scale(${COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE});
+  z-index: 1;
+}
+:focus-visible [data-compact-track] [data-thumbnail-outer],
+[data-compact-track]:has(:focus-visible) [data-thumbnail-outer] {
+  width: ${COMPACT_HOVER_SIZE}px !important;
+}
+@media (hover: hover) {
+  [data-compact-track]:hover [data-album-art] {
+    box-shadow: var(--dg-shadow-card-hovered);
+    transform: scale(${COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE});
+    z-index: 1;
+  }
+  [data-compact-track]:hover [data-thumbnail-outer] {
+    width: ${COMPACT_HOVER_SIZE}px !important;
+  }
+}
+`;
+
+const truncatedStyle: CSSProperties = {
   display: 'block',
   overflow: 'hidden',
   textOverflow: 'ellipsis',
   whiteSpace: 'nowrap',
 };
 
-const notesCenterSx: SxObject = {
+const notesCenterStyle: CSSProperties = {
   left: '50%',
   pointerEvents: 'none',
   position: 'absolute',
@@ -54,7 +77,7 @@ const notesCenterSx: SxObject = {
   zIndex: 0,
 };
 
-const bounceBoxSx: SxObject = {
+const bounceBoxStyle: CSSProperties = {
   backfaceVisibility: 'hidden',
   height: '100%',
   overflow: 'visible',
@@ -69,25 +92,27 @@ function AlbumArtWithNotes({
   isPlaying,
   noteColor,
   notesVariant = 'collage',
-  wrapperSx,
+  wrapperStyle,
 }: {
   bounceIntensity?: number;
   children: ReactNode;
   isPlaying: boolean;
   noteColor?: string;
   notesVariant?: ComponentProps<typeof MusicNotes>['variant'];
-  wrapperSx: SxObject;
+  wrapperStyle: CSSProperties;
 }) {
   const bounceRef = useWaveformBounce<HTMLDivElement>({ intensity: bounceIntensity, isPlaying });
   return (
-    <Box sx={{ isolation: 'isolate', overflow: 'visible', position: 'relative', ...wrapperSx }}>
-      <Box aria-hidden="true" sx={notesCenterSx}>
+    <div
+      style={{ isolation: 'isolate', overflow: 'visible', position: 'relative', ...wrapperStyle }}
+    >
+      <div aria-hidden="true" style={notesCenterStyle}>
         <MusicNotes isPlaying={isPlaying} noteColor={noteColor} variant={notesVariant} />
-      </Box>
-      <Box ref={bounceRef} sx={bounceBoxSx}>
+      </div>
+      <div ref={bounceRef} style={bounceBoxStyle}>
         {children}
-      </Box>
-    </Box>
+      </div>
+    </div>
   );
 }
 
@@ -117,16 +142,16 @@ function TrackMeta({
   const isCard = variant === 'card';
   const titleVariant = isCard ? 'h5' : 'caption';
   const artistVariant = isCard ? 'body2' : 'caption';
-  const titleSx: SxObject = {
-    ...truncatedSx,
-    ...(isCard ? { marginBottom: 1 } : { lineHeight: 1.2 }),
+  const titleStyle: CSSProperties = {
+    ...truncatedStyle,
+    ...(isCard ? { marginBottom: 8 } : { lineHeight: 1.2 }),
     ...(color ? { color } : {}),
     ...(textShadow ? { textShadow } : {}),
   };
-  const artistSx: SxObject = {
-    ...truncatedSx,
+  const artistStyle: CSSProperties = {
+    ...truncatedStyle,
     ...(isCard ? {} : { lineHeight: 1.2, opacity: 0.6 }),
-    ...(secondaryColor ? { '& a': { color: 'inherit' }, color: secondaryColor, opacity: 1 } : {}),
+    ...(secondaryColor ? { color: secondaryColor, opacity: 1 } : {}),
     ...(secondaryShadow ? { textShadow: secondaryShadow } : {}),
   };
   const fullArtists = track.artists
@@ -137,17 +162,22 @@ function TrackMeta({
     <>
       <Tooltip title={track.name} whenTruncated>
         {disableLinks ? (
-          <Typography sx={titleSx} variant={titleVariant}>
+          <Typography style={titleStyle} variant={titleVariant}>
             {track.name}
           </Typography>
         ) : (
-          <Link href={track.url} isExternal={true} sx={titleSx} variant={titleVariant}>
+          <Link href={track.url} isExternal={true} style={titleStyle} variant={titleVariant}>
             {track.name}
           </Link>
         )}
       </Tooltip>
       <Tooltip title={fullArtists} whenTruncated>
-        <Typography component="span" sx={artistSx} variant={artistVariant}>
+        <Typography
+          component="span"
+          data-track-artists=""
+          style={artistStyle}
+          variant={artistVariant}
+        >
           {track.artists.map((artist, index) => (
             <Fragment key={artist.id}>
               {isCard ? (
@@ -171,26 +201,15 @@ function TrackMeta({
   );
 }
 
-const compactZoomSx: SxObject = {
-  '[data-album-art]': {
-    boxShadow: 'var(--dg-shadow-card-hovered)',
-    transform: `scale(${COMPACT_HOVER_SIZE / COMPACT_THUMBNAIL_SIZE})`,
-    zIndex: 1,
-  },
-  '[data-thumbnail-outer]': { width: COMPACT_HOVER_SIZE },
-};
-
-const compactOuterSx: SxObject = {
-  ':focus-visible &, &:has(:focus-visible)': compactZoomSx,
-  '@media (hover: hover)': { '&:hover': compactZoomSx },
+const compactOuterStyle: CSSProperties = {
   alignItems: 'center',
   display: 'flex',
-  gap: 1,
+  gap: 8,
   minWidth: 0,
   overflow: 'visible',
 };
 
-const compactThumbWrapSx: SxObject = {
+const compactThumbWrapStyle: CSSProperties = {
   flexShrink: 0,
   height: COMPACT_THUMBNAIL_SIZE,
   minWidth: 0,
@@ -200,7 +219,7 @@ const compactThumbWrapSx: SxObject = {
   width: COMPACT_THUMBNAIL_SIZE,
 };
 
-const compactArtCardSx: SxObject = {
+const compactArtCardStyle: CSSProperties = {
   borderRadius: 'var(--nested-radius)',
   boxShadow: 'var(--dg-shadow-card-main)',
   height: COMPACT_THUMBNAIL_SIZE,
@@ -212,7 +231,7 @@ const compactArtCardSx: SxObject = {
   willChange: 'transform',
 };
 
-const compactTextClipSx: SxObject = {
+const compactTextClipStyle: CSSProperties = {
   flexShrink: 1,
   maxWidth: '100%',
   minWidth: 0,
@@ -237,7 +256,7 @@ export function TrackListing({
   if (variant === 'compact') {
     const albumTitle = track.album.name;
     const albumArtCard = (
-      <Box data-album-art sx={compactArtCardSx}>
+      <div data-album-art style={compactArtCardStyle}>
         <Image
           alt={albumTitle}
           fill={true}
@@ -246,32 +265,41 @@ export function TrackListing({
           url={track.albumImage.url}
           width={COMPACT_THUMBNAIL_SIZE}
         />
-      </Box>
+      </div>
     );
 
     return (
-      <Box sx={compactOuterSx}>
-        <Box data-thumbnail-outer sx={compactThumbWrapSx}>
+      <div data-compact-track="" style={compactOuterStyle}>
+        <style href="dg-track-listing" precedence="default">
+          {TRACK_LISTING_CSS}
+        </style>
+        <div data-thumbnail-outer style={compactThumbWrapStyle}>
           <AlbumArtWithNotes
             bounceIntensity={COLLAGE_COMPACT_BOUNCE}
             isPlaying={track.isPlaying ?? false}
             noteColor="var(--ink)"
             notesVariant="collageCompact"
-            wrapperSx={{ height: COMPACT_THUMBNAIL_SIZE, width: COMPACT_THUMBNAIL_SIZE }}
+            wrapperStyle={{ height: COMPACT_THUMBNAIL_SIZE, width: COMPACT_THUMBNAIL_SIZE }}
           >
             {disableLinks ? (
-              <Box component="span" sx={{ display: 'block' }}>
-                {albumArtCard}
-              </Box>
+              <span style={{ display: 'block' }}>{albumArtCard}</span>
             ) : (
               <Link href={track.album.url} isExternal={true} title={albumTitle}>
                 {albumArtCard}
               </Link>
             )}
           </AlbumArtWithNotes>
-        </Box>
-        <Box sx={compactTextClipSx}>
-          <Stack sx={{ color: 'var(--on)', minWidth: 0, width: '100%' }}>
+        </div>
+        <div style={compactTextClipStyle}>
+          <div
+            style={{
+              color: 'var(--on)',
+              display: 'flex',
+              flexDirection: 'column',
+              minWidth: 0,
+              width: '100%',
+            }}
+          >
             <PlaybackStatus
               color="var(--on)"
               isPlaying={track.isPlaying}
@@ -285,9 +313,9 @@ export function TrackListing({
               track={track}
               variant="compact"
             />
-          </Stack>
-        </Box>
-      </Box>
+          </div>
+        </div>
+      </div>
     );
   }
 
@@ -299,11 +327,14 @@ export function TrackListing({
 
   return (
     <div className="home__spotify" data-slot="sp">
+      <style href="dg-track-listing" precedence="default">
+        {TRACK_LISTING_CSS}
+      </style>
       <AlbumArtWithNotes
         isPlaying={Boolean(track.isPlaying)}
         noteColor="var(--cream)"
         notesVariant="collage"
-        wrapperSx={{
+        wrapperStyle={{
           aspectRatio: '1',
           overflow: 'visible',
           position: 'relative',
@@ -336,14 +367,14 @@ export function TrackListing({
         </div>
       </AlbumArtWithNotes>
       <div className="home__spotifyCard">
-        <AlbumGradientBackdrop containerSx={ALBUM_GRADIENT_GLOW_SX} gradient={gradient} />
+        <AlbumGradientBackdrop containerStyle={ALBUM_GRADIENT_GLOW_STYLE} gradient={gradient} />
         <PaperCard
           className="home__spotifyMeta"
           edge="quad-b"
           innerClassName="home__spotifyMetaPaper"
           style={CARD_PAPER}
         >
-          <AlbumGradientBackdrop containerSx={{ inset: 0, zIndex: -1 }} gradient={gradient} />
+          <AlbumGradientBackdrop containerStyle={{ inset: 0, zIndex: -1 }} gradient={gradient} />
           <div className="home__spotifyMetaInner">
             <PlaybackStatus
               color={primary}

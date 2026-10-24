@@ -1,7 +1,6 @@
 import 'server-only';
 
 import { vercelAuthRoute } from '@dg/shared-core/routes/api';
-import { Stack } from '@dg/ui/core/Stack';
 import { Typography } from '@dg/ui/core/Typography';
 import { Suspense } from 'react';
 import { getVercelSession } from '../../../auth/vercel/getVercelSession';
@@ -34,18 +33,12 @@ export async function VercelSignInCardContent({ searchParams }: VercelSignInCard
 
   return (
     <>
-      <Stack
-        direction="row"
-        sx={{
-          alignItems: 'center',
-          gap: 1.5,
-        }}
-      >
+      <div className="devConsole__row devConsole__row--wide">
         <Typography variant="h3">Vercel identity</Typography>
         <StatusChip isConnected={isSignedIn} />
-      </Stack>
+      </div>
 
-      <Typography color="text.secondary" variant="body2">
+      <Typography color="var(--dg-palette-text-secondary)" variant="body2">
         Optional Sign in with Vercel for Flags user targeting. Any Vercel account can complete
         OAuth; segment rules decide whether you match.
       </Typography>
@@ -55,17 +48,17 @@ export async function VercelSignInCardContent({ searchParams }: VercelSignInCard
       />
 
       {session ? (
-        <Stack sx={{ gap: 0.5 }}>
+        <div className="devConsole__stack devConsole__stack--tight">
           <Typography variant="body2">Email: {session.email}</Typography>
-          <Typography color="text.secondary" variant="caption">
+          <Typography color="var(--dg-palette-text-secondary)" variant="caption">
             id: {session.id}
           </Typography>
           {session.name ? (
-            <Typography color="text.secondary" variant="caption">
+            <Typography color="var(--dg-palette-text-secondary)" variant="caption">
               name: {session.name}
             </Typography>
           ) : null}
-        </Stack>
+        </div>
       ) : null}
 
       {session ? (

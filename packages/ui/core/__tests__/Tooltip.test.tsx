@@ -8,17 +8,10 @@ import { Tooltip } from '../Tooltip';
  * checked — and checking it there is the point: a rule in the stylesheet is a
  * rule the browser applies with no script running.
  */
-const surfaceRules = () => {
-  const surfaceClass = [...screen.getByRole('tooltip', { hidden: true }).classList].find((name) =>
-    name.startsWith('css-'),
-  );
-  if (!surfaceClass) {
-    throw new Error('Tooltip surface has no compiled CSS class');
-  }
-  return [...document.querySelectorAll('style')]
+const surfaceRules = () =>
+  [...document.querySelectorAll('style')]
     .flatMap((tag) => [...(tag.sheet?.cssRules ?? [])].map((rule) => rule.cssText))
-    .filter((rule) => rule.includes(surfaceClass));
-};
+    .filter((rule) => rule.includes('[data-tooltip-surface]'));
 
 const rulesMatching = (pattern: RegExp) => surfaceRules().filter((rule) => pattern.test(rule));
 

@@ -1,30 +1,31 @@
 'use client';
 
-import { Box } from '@dg/ui/core/Box';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
-import type { SxObject } from '@dg/ui/theme';
-import { useState } from 'react';
+import { type CSSProperties, useState } from 'react';
 
 const GRADIENT_CROSSFADE_MS = TIMING_SLOW;
 
-const containerBaseSx: SxObject = {
-  '@keyframes albumGradientFadeIn': {
-    from: { opacity: 0 },
-    to: { opacity: 1 },
-  },
+const ALBUM_GRADIENT_CSS = `
+@keyframes albumGradientFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+`;
+
+const containerBaseStyle: CSSProperties = {
   pointerEvents: 'none',
   position: 'absolute',
 };
 
-const layerSx: SxObject = {
+const layerStyle: CSSProperties = {
   animation: `albumGradientFadeIn ${GRADIENT_CROSSFADE_MS}ms ${EASING_DEFAULT}`,
   borderRadius: 'inherit',
   inset: 0,
   position: 'absolute',
 };
 
-export const ALBUM_GRADIENT_GLOW_SX: SxObject = {
-  borderRadius: 6,
+export const ALBUM_GRADIENT_GLOW_STYLE: CSSProperties = {
+  borderRadius: 24,
   inset: -4,
   opacity: 0.36,
   zIndex: 0,
@@ -37,7 +38,7 @@ type GradientLayer = {
 
 type AlbumGradientBackdropProps = {
   gradient?: string;
-  containerSx: SxObject;
+  containerStyle: CSSProperties;
 };
 
 /**
@@ -46,7 +47,7 @@ type AlbumGradientBackdropProps = {
  * gradient fades in on its own layer above the one it replaces, and spent
  * layers are dropped once the incoming one is fully opaque.
  */
-export function AlbumGradientBackdrop({ gradient, containerSx }: AlbumGradientBackdropProps) {
+export function AlbumGradientBackdrop({ gradient, containerStyle }: AlbumGradientBackdropProps) {
   const [layers, setLayers] = useState<Array<GradientLayer>>([]);
   const newest = layers.at(-1);
 
@@ -59,16 +60,18 @@ export function AlbumGradientBackdrop({ gradient, containerSx }: AlbumGradientBa
   };
 
   return (
-    <Box aria-hidden="true" sx={{ ...containerBaseSx, ...containerSx }}>
+    <div aria-hidden="true" style={{ ...containerBaseStyle, ...containerStyle }}>
+      <style href="dg-album-gradient" precedence="default">
+        {ALBUM_GRADIENT_CSS}
+      </style>
       {layers.map((layer) => (
-        <Box
+        <div
           data-gradient-layer
           key={layer.id}
           onAnimationEnd={() => dropSpentLayers(layer.id)}
-          style={{ backgroundImage: layer.gradient }}
-          sx={layerSx}
+          style={{ ...layerStyle, backgroundImage: layer.gradient }}
         />
       ))}
-    </Box>
+    </div>
   );
 }

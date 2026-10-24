@@ -1,5 +1,4 @@
 import { musicStatsRangeRoute } from '@dg/shared-core/routes/app';
-import { StickyFadeBar } from '@dg/ui/core/StickyFadeBar';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import type { ReactNode } from 'react';
 import { PaperCard } from '../collage/PaperCard';
@@ -48,7 +47,7 @@ export function MusicHistorySections({ sections }: { sections: Array<TrackSectio
     <>
       {sections.map((section, sectionIndex) => (
         <section aria-label={section.label} className="music__section" key={section.label}>
-          <StickyFadeBar className="music__dateBar">
+          <div className="music__dateBar">
             <div className="music__dateRow">
               <h2 className="music__dateHeading">
                 <PaperTag
@@ -68,7 +67,7 @@ export function MusicHistorySections({ sections }: { sections: Array<TrackSectio
                 Stats →
               </PageTransitionLink>
             </div>
-          </StickyFadeBar>
+          </div>
           <MusicGrid hasLcpCandidate={sectionIndex === 0} tracks={section.tracks} />
         </section>
       ))}

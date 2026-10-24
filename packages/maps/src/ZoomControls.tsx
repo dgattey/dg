@@ -1,7 +1,5 @@
-import { Box } from '@dg/ui/core/Box';
-import type { SxObject } from '@dg/ui/theme';
 import { Minus, Plus, Shrink } from 'lucide-react';
-import type { MouseEvent } from 'react';
+import type { CSSProperties, MouseEvent } from 'react';
 
 type ZoomControlsProps = {
   onReset?: () => void;
@@ -9,7 +7,7 @@ type ZoomControlsProps = {
   onZoomOut: () => void;
 };
 
-const containerSx: SxObject = {
+const containerStyle: CSSProperties = {
   display: 'grid',
   gap: '5px',
   position: 'absolute',
@@ -18,55 +16,60 @@ const containerSx: SxObject = {
   zIndex: 2,
 };
 
-const buttonSx: SxObject = {
-  ':hover': {
-    backgroundColor: 'color-mix(in srgb, var(--cream) 86%, var(--ochre))',
-  },
-  // The quad clip-path cuts anything drawn outside the button, so the ring sits inside.
-  '&&:focus-visible': {
-    borderRadius: '9px 13px 10px 12px',
-    outline: '2px solid currentColor',
-    outlineOffset: '-3px',
-  },
-  alignItems: 'center',
-  backgroundColor: 'var(--cream)',
-  border: 0,
-  clipPath: 'var(--quad-b)',
-  color: 'var(--ink-on-cream)',
-  cursor: 'pointer',
-  display: 'flex',
-  fontSize: 17,
-  fontWeight: 700,
-  height: 28,
-  justifyContent: 'center',
-  padding: 0,
-  width: 28,
-};
+const ZOOM_CONTROLS_CSS = `
+[data-zoom-button] {
+  align-items: center;
+  background-color: var(--cream);
+  border: 0;
+  clip-path: var(--quad-b);
+  color: var(--ink-on-cream);
+  cursor: pointer;
+  display: flex;
+  font-size: 17px;
+  font-weight: 700;
+  height: 28px;
+  justify-content: center;
+  padding: 0;
+  width: 28px;
+}
+[data-zoom-button]:hover {
+  background-color: color-mix(in srgb, var(--cream) 86%, var(--ochre));
+}
+[data-zoom-button]:focus-visible {
+  border-radius: 9px 13px 10px 12px;
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+}
+`;
 
 const stopPropagation = (e: MouseEvent) => {
   e.stopPropagation();
 };
 
+const buttonInteractionProps = {
+  'data-zoom-button': '',
+  onMouseDown: stopPropagation,
+  onMouseUp: stopPropagation,
+  type: 'button' as const,
+};
+
 export function ZoomControls({ onReset, onZoomIn, onZoomOut }: ZoomControlsProps) {
   return (
-    <Box onMouseDown={stopPropagation} onMouseUp={stopPropagation} sx={containerSx}>
-      <Box aria-label="Zoom in" component="button" onClick={onZoomIn} sx={buttonSx} type="button">
+    <div style={containerStyle}>
+      <style href="dg-zoom-controls" precedence="default">
+        {ZOOM_CONTROLS_CSS}
+      </style>
+      <button {...buttonInteractionProps} aria-label="Zoom in" onClick={onZoomIn}>
         <Plus aria-hidden="true" size="1em" />
-      </Box>
-      <Box aria-label="Zoom out" component="button" onClick={onZoomOut} sx={buttonSx} type="button">
+      </button>
+      <button {...buttonInteractionProps} aria-label="Zoom out" onClick={onZoomOut}>
         <Minus aria-hidden="true" size="1em" />
-      </Box>
+      </button>
       {onReset ? (
-        <Box
-          aria-label="Reset view"
-          component="button"
-          onClick={onReset}
-          sx={buttonSx}
-          type="button"
-        >
+        <button {...buttonInteractionProps} aria-label="Reset view" onClick={onReset}>
           <Shrink aria-hidden="true" size="0.8em" />
-        </Box>
+        </button>
       ) : null}
-    </Box>
+    </div>
   );
 }

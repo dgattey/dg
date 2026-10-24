@@ -3,10 +3,8 @@
 import type { CSSProperties, ReactNode, SyntheticEvent } from 'react';
 import React, { useId, useRef } from 'react';
 import { EASING_EASE_OUT, TIMING_FAST } from '../helpers/timing';
-import type { SxObject } from '../theme';
-import { Box } from './Box';
 import { Typography } from './Typography';
-import { surfaceLookSx, useFloatingTooltip } from './useFloatingTooltip';
+import { SURFACE_LOOK_CSS_DECLS, useFloatingTooltip } from './useFloatingTooltip';
 
 export type TooltipPlacement = 'top' | 'bottom';
 
@@ -41,11 +39,6 @@ interface TooltipProps {
    * - 'top': Shows above trigger, flips to bottom if no room
    */
   placement?: TooltipPlacement;
-  /**
-   * Merged into the anchor, for triggers that need it to fill their box so the
-   * whole tap target reveals the hint rather than just the glyph inside it.
-   */
-  sx?: SxObject;
   /** Class for the anchor, so a layout can size it like the trigger it wraps. */
   className?: string;
   /**
@@ -58,71 +51,83 @@ interface TooltipProps {
   whenTruncated?: boolean;
 }
 
-const createTransition = (isRevealed: boolean) => ({
-  transition: [
+const createTransitionDecl = (isRevealed: boolean) =>
+  [
     `opacity ${TIMING_FAST}ms ${EASING_EASE_OUT} ${isRevealed ? 0 : TIMING_FAST}ms`,
     `visibility 0s linear ${isRevealed ? 0 : TIMING_FAST * 2}ms`,
-  ].join(', '),
-});
+  ].join(', ');
 
-const revealedSx: SxObject = {
-  opacity: 1,
-  pointerEvents: 'auto',
-  visibility: 'visible',
-  ...createTransition(true),
-};
-
-const HOVERED_SELECTOR = `[${ANCHOR_ATTRIBUTE}]:hover > &`;
-const TRIGGER_INSIDE_FOCUSED_SELECTOR = `[${ANCHOR_ATTRIBUTE}]:has(:focus-visible) > &`;
-const TRIGGER_AROUND_FOCUSED_SELECTOR = `:focus-visible>[${ANCHOR_ATTRIBUTE}]>&`;
-const MUTED_SELECTOR = `[${MUTED_ATTRIBUTE}] > &`;
-const FLOATING_SELECTOR = `[${FLOATING_ATTRIBUTE}] > &`;
-
-const shrinkableAnchorSx: SxObject = {
-  '& > :not([role="tooltip"])': {
-    minWidth: 0,
-  },
-  display: 'flex',
-  maxWidth: '100%',
-  minWidth: 0,
-};
-
-const baseAnchorSx: SxObject = {
-  '@supports not (position-area: block-end)': {
-    position: 'relative',
-  },
-  display: 'inline-flex',
-};
-
-function createSurfaceSx(placement: TooltipPlacement, canFlip: boolean): SxObject {
-  const isAbove = placement === 'top';
-  return {
-    '@supports not (position-area: block-end)': {
-      left: '50%',
-      position: 'absolute',
-      transform: 'translateX(-50%)',
-      ...(isAbove ? { bottom: '100%', top: 'auto' } : { bottom: 'auto', top: '100%' }),
-    },
-    [HOVERED_SELECTOR]: revealedSx,
-    [TRIGGER_AROUND_FOCUSED_SELECTOR]: revealedSx,
-    [TRIGGER_INSIDE_FOCUSED_SELECTOR]: revealedSx,
-    [MUTED_SELECTOR]: { display: 'none' },
-    [FLOATING_SELECTOR]: { display: 'none' },
-    ...surfaceLookSx,
-    alignSelf: isAbove ? 'unsafe end' : 'unsafe start',
-    justifySelf: 'unsafe anchor-center',
-    marginBlockEnd: isAbove ? '8px' : 0,
-    marginBlockStart: isAbove ? 0 : '8px',
-    opacity: 0,
-    position: 'fixed',
-    positionArea: isAbove ? 'block-start' : 'block-end',
-    positionTryFallbacks: canFlip ? 'flip-block' : 'none',
-    visibility: 'hidden',
-    whiteSpace: 'nowrap',
-    zIndex: 1500,
-    ...createTransition(false),
-  };
+const TOOLTIP_CSS = `
+[${ANCHOR_ATTRIBUTE}] {
+  display: inline-flex;
 }
+@supports not (position-area: block-end) {
+  [${ANCHOR_ATTRIBUTE}] {
+    position: relative;
+  }
+}
+[${ANCHOR_ATTRIBUTE}][data-tooltip-truncated] {
+  display: flex;
+  max-width: 100%;
+  min-width: 0;
+}
+[${ANCHOR_ATTRIBUTE}][data-tooltip-truncated] > :not([role="tooltip"]) {
+  min-width: 0;
+}
+[data-tooltip-surface] {
+  ${SURFACE_LOOK_CSS_DECLS}
+  justify-self: unsafe anchor-center;
+  opacity: 0;
+  position: fixed;
+  position-try-fallbacks: flip-block;
+  transition: ${createTransitionDecl(false)};
+  visibility: hidden;
+  white-space: nowrap;
+  z-index: 1500;
+}
+[data-tooltip-surface][data-tooltip-no-flip] {
+  position-try-fallbacks: none;
+}
+[data-tooltip-surface][data-placement="bottom"] {
+  align-self: unsafe start;
+  margin-block-end: 0;
+  margin-block-start: 8px;
+  position-area: block-end;
+}
+[data-tooltip-surface][data-placement="top"] {
+  align-self: unsafe end;
+  margin-block-end: 8px;
+  margin-block-start: 0;
+  position-area: block-start;
+}
+@supports not (position-area: block-end) {
+  [data-tooltip-surface] {
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%);
+  }
+  [data-tooltip-surface][data-placement="bottom"] {
+    bottom: auto;
+    top: 100%;
+  }
+  [data-tooltip-surface][data-placement="top"] {
+    bottom: 100%;
+    top: auto;
+  }
+}
+[${ANCHOR_ATTRIBUTE}]:hover > [data-tooltip-surface],
+:focus-visible>[${ANCHOR_ATTRIBUTE}]>[data-tooltip-surface],
+[${ANCHOR_ATTRIBUTE}]:has(:focus-visible) > [data-tooltip-surface] {
+  opacity: 1;
+  pointer-events: auto;
+  transition: ${createTransitionDecl(true)};
+  visibility: visible;
+}
+[${MUTED_ATTRIBUTE}] > [data-tooltip-surface],
+[${FLOATING_ATTRIBUTE}] > [data-tooltip-surface] {
+  display: none;
+}
+`;
 
 /**
  * Tooltip with adaptive bottom/top placement.
@@ -132,29 +137,19 @@ function createSurfaceSx(placement: TooltipPlacement, canFlip: boolean): SxObjec
  * the floating copy from `useFloatingTooltip` instead. Because the tooltip is a
  * hint rather than the only home for its text, every trigger that uses one also
  * names itself — `aria-label` on icon-only controls, visible text otherwise.
- *
- * @example
- * ```tsx
- * <Tooltip title="Send email">
- *   <button aria-label="Send email">
- *     <MailIcon />
- *   </button>
- * </Tooltip>
- * ```
  */
 export function Tooltip({
   title,
   children,
   id: providedId,
   placement = 'bottom',
-  sx,
   className,
   whenTruncated = false,
 }: TooltipProps) {
   const generatedId = useId();
   const tooltipId = providedId ?? `tooltip-${generatedId}`;
   const anchorName = `--anchor-${tooltipId.replace(/:/g, '-')}`;
-  const anchorRef = useRef<HTMLElement>(null);
+  const anchorRef = useRef<HTMLSpanElement>(null);
   const surfaceRef = useRef<HTMLSpanElement>(null);
 
   /**
@@ -191,39 +186,43 @@ export function Tooltip({
     return <>{children}</>;
   }
 
+  const anchorProps = {
+    [ANCHOR_ATTRIBUTE]: true,
+    [FLOATING_ATTRIBUTE]: isFloating || undefined,
+    'data-tooltip-truncated': whenTruncated || undefined,
+    onBlur: () => close('focus'),
+    onFocus: isFloating ? openOnKeyboardFocus : muteInlineSurface,
+    onMouseEnter: isFloating ? () => open('hover') : muteInlineSurface,
+    onMouseLeave: () => close('hover'),
+  };
+
   return (
-    <Box
-      {...{ [ANCHOR_ATTRIBUTE]: true, [FLOATING_ATTRIBUTE]: isFloating || undefined }}
+    <span
+      {...anchorProps}
       className={className}
-      component="span"
-      onBlur={() => close('focus')}
-      onFocus={isFloating ? openOnKeyboardFocus : muteInlineSurface}
-      onMouseEnter={isFloating ? () => open('hover') : muteInlineSurface}
-      onMouseLeave={() => close('hover')}
       ref={anchorRef}
       style={{ anchorName } as CSSProperties}
-      sx={{
-        ...baseAnchorSx,
-        ...(whenTruncated ? shrinkableAnchorSx : undefined),
-        ...sx,
-      }}
     >
+      <style href="dg-tooltip" precedence="default">
+        {TOOLTIP_CSS}
+      </style>
       {!whenTruncated && React.isValidElement<{ 'aria-describedby'?: string }>(children)
         ? React.cloneElement(children, { 'aria-describedby': tooltipId })
         : children}
       <Typography
         component="span"
         data-placement={placement}
+        data-tooltip-no-flip={whenTruncated || undefined}
+        data-tooltip-surface=""
         id={tooltipId}
         ref={surfaceRef}
         role="tooltip"
         style={{ positionAnchor: anchorName } as CSSProperties}
-        sx={createSurfaceSx(placement, !whenTruncated)}
         variant="caption"
       >
         {title}
       </Typography>
       {surface}
-    </Box>
+    </span>
   );
 }

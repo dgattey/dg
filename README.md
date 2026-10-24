@@ -102,7 +102,7 @@ routes and components, `/src/types` has global types, `/src/hooks` has shared ho
 - [Contentful](https://www.contentful.com) supplies most content via GraphQL. New content triggers builds via webhook.
 - Next.js App Router caching with Cache Components (`use cache`) and tag-based revalidation keeps data fresh.
 - [Pigeon Maps](https://pigeon-maps.js.org/) powers the homepage location map and `/activities` route atlas (via [Stadia Maps](https://stadiamaps.com/)).
-- `@dg/ui` provides shared zero-runtime UI primitives, theme tokens (`--dg-palette-*`, `--dg-shadow-*`), and `compileSx` React 19 `<style href precedence>` emission.
+- `@dg/ui` provides shared zero-runtime UI primitives, theme tokens (`--dg-palette-*`, `--dg-shadow-*`), and global CSS rules (`getGlobalThemeCss`).
 - Contentful schema lives in `packages/content-models/contentful/schema.graphql` and is refreshed via `turbo graphql:schema` for editor tooling. Responses are validated with Valibot.
 - [Neon](https://neon.tech) is the Postgres DB for auth tokens, Strava activities, and Spotify history/favorites.
 - [Sequelize](https://sequelize.org) runs migrations + shapes the DB.

@@ -1,10 +1,9 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
-import { Box } from '@dg/ui/core/Box';
-import type { SxObject } from '@dg/ui/theme';
+import type { CSSProperties } from 'react';
 import { getTileSource } from './src/getTileSource';
 import { PigeonMap } from './src/PigeonMap';
 
-const collageMapSx: SxObject = {
+const collageMapStyle: CSSProperties = {
   height: '100%',
   minHeight: 0,
   width: '100%',
@@ -16,8 +15,8 @@ const collageMapSx: SxObject = {
  */
 export function MapCard({ location }: { location: MapLocation }) {
   return (
-    <Box aria-label="Current location map" role="region" sx={collageMapSx}>
+    <section aria-label="Current location map" style={collageMapStyle}>
       <PigeonMap location={location} tileSource={getTileSource()} />
-    </Box>
+    </section>
   );
 }

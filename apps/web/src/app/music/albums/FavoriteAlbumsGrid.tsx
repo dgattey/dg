@@ -3,12 +3,10 @@
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
 import { ALBUM_PARAM, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
-import { Box } from '@dg/ui/core/Box';
 import { Typography } from '@dg/ui/core/Typography';
 import { albumTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
-import type { SxObject } from '@dg/ui/theme';
-import type { MouseEvent } from 'react';
+import type { CSSProperties, MouseEvent } from 'react';
 import {
   addTransitionType,
   Fragment,
@@ -47,20 +45,17 @@ const comparators: Record<AlbumSortKey, (a: PlaylistAlbum, b: PlaylistAlbum) => 
  * Albums claim odd visual slots (`2i + 1`), leaving even slots for the well at
  * the end of the selected album's row across each breakpoint.
  */
-function wellPlacementSx(selectedIndex: number, albumCount: number): SxObject {
+function wellPlacementStyle(selectedIndex: number, albumCount: number): CSSProperties {
   const slotFor = (columns: number) =>
     2 * Math.min(albumCount, (Math.floor(selectedIndex / columns) + 1) * columns);
   const columns = COLLAGE_ALBUM_GRID_COLUMNS;
 
   return {
-    gridColumn: '1 / -1',
-    order: {
-      lg: slotFor(columns.lg),
-      md: slotFor(columns.md),
-      sm: slotFor(columns.sm),
-      xs: slotFor(columns.xs),
-    },
-  };
+    '--well-order-lg': slotFor(columns.lg),
+    '--well-order-md': slotFor(columns.md),
+    '--well-order-sm': slotFor(columns.sm),
+    '--well-order-xs': slotFor(columns.xs),
+  } as CSSProperties;
 }
 
 function readUrlAlbumId(): string | null {
@@ -130,7 +125,7 @@ function ClientSelectedAlbumDetail({ albumId }: { albumId: string }) {
 
   if (!state.detail) {
     return (
-      <Typography color="text.secondary">
+      <Typography color="var(--dg-palette-text-secondary)">
         Album details are temporarily unavailable. Please try again soon.
       </Typography>
     );
@@ -153,13 +148,13 @@ function SelectedAlbumWell({
   }
 
   return (
-    <Box sx={wellPlacementSx(selectedIndex, albumCount)}>
+    <div className="music__wellSlot" style={wellPlacementStyle(selectedIndex, albumCount)}>
       <AlbumWell album={selectedCard.album} tone={selectedCard.treatment.tone}>
         <Fragment key={selectedCard.album.id}>
           <ClientSelectedAlbumDetail albumId={selectedCard.album.id} />
         </Fragment>
       </AlbumWell>
-    </Box>
+    </div>
   );
 }
 
@@ -305,9 +300,9 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
   return (
     <>
       <CollageSortControls onSortChange={handleSortChange} sortKey={sortKey} />
-      <Box className="music__albumGrid" onClickCapture={onAlbumNavigationCapture}>
+      <div className="music__albumGrid" onClickCapture={onAlbumNavigationCapture}>
         {cells}
-      </Box>
+      </div>
     </>
   );
 }

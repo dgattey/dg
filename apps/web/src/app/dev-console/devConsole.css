@@ -42,10 +42,33 @@
   padding: 28px 30px 30px;
 }
 .devConsole__cardContent {
+  display: flex;
+  flex-direction: column;
   gap: 16px;
 }
 .devConsole__cardContent [data-typography] {
   color: inherit;
+}
+.devConsole__row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.devConsole__row--wide {
+  gap: 12px;
+}
+.devConsole__stack {
+  display: flex;
+  flex-direction: column;
+}
+.devConsole__stack--tight {
+  gap: 4px;
+}
+.devConsole__stack--compact {
+  gap: 8px;
+}
+.devConsole__skeletonButton {
+  align-self: flex-start;
 }
 .devConsole__actions {
   display: flex;

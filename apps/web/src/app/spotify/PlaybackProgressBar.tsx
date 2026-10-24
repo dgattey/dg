@@ -1,7 +1,5 @@
 'use client';
 
-import { Box } from '@dg/ui/core/Box';
-import type { SxObject } from '@dg/ui/theme';
 import { type CSSProperties, useEffect, useRef } from 'react';
 
 const PROGRESS_UPDATE_INTERVAL_MS = 2000;
@@ -18,17 +16,17 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 const getProgressPercent = (progressMs: number, durationMs: number) =>
   durationMs > 0 ? clamp(progressMs / durationMs, 0, 1) : 0;
 
-const trackSx: SxObject = {
+const trackStyle: CSSProperties = {
   backgroundColor: 'color-mix(in srgb, var(--progress-color) 20%, transparent)',
   borderRadius: 999,
   height: 6,
-  marginTop: 2,
+  marginTop: 16,
   overflow: 'hidden',
   pointerEvents: 'none',
   width: '100%',
 };
 
-const progressSx: SxObject = {
+const progressStyle: CSSProperties = {
   backgroundColor: 'var(--progress-color)',
   borderRadius: 'inherit',
   height: '100%',
@@ -75,16 +73,14 @@ export function PlaybackProgressBar({
   }
 
   return (
-    <Box
+    <div
       aria-hidden={true}
-      style={{ '--progress-color': resolvedColor } as CSSProperties}
-      sx={trackSx}
+      style={{ ...trackStyle, '--progress-color': resolvedColor } as CSSProperties}
     >
-      <Box
+      <div
         ref={barRef}
-        style={{ transform: `scaleX(${initialProgress.toFixed(4)})` }}
-        sx={progressSx}
+        style={{ ...progressStyle, transform: `scaleX(${initialProgress.toFixed(4)})` }}
       />
-    </Box>
+    </div>
   );
 }

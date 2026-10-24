@@ -5,7 +5,6 @@ import { capitalize } from '@dg/shared-core/formatting/capitalize';
 import type { OauthProviderKey } from '@dg/shared-core/routes/api';
 import { oauthConnectRoute } from '@dg/shared-core/routes/api';
 import { Skeleton } from '@dg/ui/core/Skeleton';
-import { Stack } from '@dg/ui/core/Stack';
 import { Typography } from '@dg/ui/core/Typography';
 import { connection } from 'next/server';
 import { Suspense } from 'react';
@@ -30,16 +29,10 @@ export async function OauthCardContent({ provider }: OauthCardProps) {
 
   return (
     <>
-      <Stack
-        direction="row"
-        sx={{
-          alignItems: 'center',
-          gap: 1.5,
-        }}
-      >
+      <div className="devConsole__row devConsole__row--wide">
         <Typography variant="h3">{capitalize(provider)}</Typography>
         <StatusChip isConnected={status.isConnected} />
-      </Stack>
+      </div>
       <ErrorMessage message={status.error} />
       <div className="devConsole__actions">
         <PaperButton
@@ -62,7 +55,7 @@ export async function OauthCardContent({ provider }: OauthCardProps) {
         ) : null}
       </div>
       {status.expiresAt ? (
-        <Typography sx={{ color: 'text.secondary' }} variant="body2">
+        <Typography color="var(--dg-palette-text-secondary)" variant="body2">
           Access token expires at {status.expiresAt.toLocaleString()}
         </Typography>
       ) : null}
@@ -77,16 +70,10 @@ export async function OauthCardContent({ provider }: OauthCardProps) {
 function OauthCardContentSkeleton() {
   return (
     <>
-      <Stack
-        direction="row"
-        sx={{
-          alignItems: 'center',
-          gap: 1,
-        }}
-      >
+      <div className="devConsole__row">
         <Skeleton height={36} variant="text" width={100} />
         <Skeleton height={24} variant="rounded" width={120} />
-      </Stack>
+      </div>
       <div className="devConsole__actions">
         <Skeleton height={42} variant="rounded" width="100%" />
         <Skeleton height={42} variant="rounded" width="100%" />

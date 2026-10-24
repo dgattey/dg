@@ -1,8 +1,7 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
-import { Box } from '@dg/ui/core/Box';
 import { Image } from '@dg/ui/dependent/Image';
 import { createTransition, EASING_BOUNCY } from '@dg/ui/helpers/timing';
-import type { SxObject } from '@dg/ui/theme';
+import type { CSSProperties } from 'react';
 
 const DIMENSION = 100;
 const IMAGE_DIMENSION = 85;
@@ -12,7 +11,7 @@ const GLASS_SHADOW = `
   0px 1px 5px color-mix(in srgb, var(--dg-palette-common-black) 12%, transparent),
   0px 6px 16px color-mix(in srgb, var(--dg-palette-common-black) 8%, transparent)`;
 
-const containerSx: SxObject = {
+const containerStyle: CSSProperties = {
   backgroundColor: 'color-mix(in srgb, var(--dg-palette-background-default) 84%, transparent)',
   border: '2px solid color-mix(in srgb, var(--dg-palette-background-default) 72%, transparent)',
   borderRadius: '50%',
@@ -30,10 +29,10 @@ const containerSx: SxObject = {
   width: DIMENSION,
 };
 
-const imageSx: SxObject = {
-  left: `${(DIMENSION - IMAGE_DIMENSION) / 2}px`,
+const imageStyle: CSSProperties = {
+  left: (DIMENSION - IMAGE_DIMENSION) / 2,
   position: 'absolute',
-  top: `${(DIMENSION - IMAGE_DIMENSION) / 2}px`,
+  top: (DIMENSION - IMAGE_DIMENSION) / 2,
 };
 
 type MarkerProps = {
@@ -45,9 +44,9 @@ type MarkerProps = {
  */
 export function Marker({ image }: MarkerProps) {
   return (
-    <Box sx={containerSx}>
+    <div style={containerStyle}>
       {image ? (
-        <Box component="span" sx={imageSx}>
+        <span style={imageStyle}>
           <Image
             alt="Location marker"
             height={IMAGE_DIMENSION}
@@ -55,8 +54,8 @@ export function Marker({ image }: MarkerProps) {
             url={image.url}
             width={IMAGE_DIMENSION}
           />
-        </Box>
+        </span>
       ) : null}
-    </Box>
+    </div>
   );
 }

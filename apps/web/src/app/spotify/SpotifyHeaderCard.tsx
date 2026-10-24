@@ -2,21 +2,21 @@
 
 import type { Track } from '@dg/content-models/spotify/Track';
 import { homeRoute, musicRoute } from '@dg/shared-core/routes/app';
-import { Box } from '@dg/ui/core/Box';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
-import type { SxObject } from '@dg/ui/theme';
 import { usePathname } from 'next/navigation';
-import type { MouseEvent } from 'react';
+import type { CSSProperties, MouseEvent } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { musicDestinationTitle } from '../layouts/musicHeaderDestinations';
 import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
 
-const containerSx: SxObject = {
-  // A single-line title's min-content is its full text, so the paper must opt into shrinking.
-  '& > .paperWrap': {
-    minWidth: 0,
-  },
+const HEADER_CARD_CSS = `
+[data-spotify-header-container] > .paperWrap {
+  min-width: 0;
+}
+`;
+
+const containerStyle: CSSProperties = {
   alignItems: 'center',
   cursor: 'pointer',
   display: 'flex',
@@ -27,14 +27,14 @@ const containerSx: SxObject = {
   transformOrigin: 'left center',
 };
 
-const slotSx: SxObject = {
+const slotStyle: CSSProperties = {
   alignItems: 'center',
   display: 'grid',
   gridTemplateColumns: '1fr',
   justifyItems: 'start',
+  marginLeft: 8,
   maxWidth: '100%',
   minWidth: 0,
-  ml: 1,
 };
 
 type SpotifyHeaderCardProps = {
@@ -64,14 +64,17 @@ function DockedHeaderCard({ track }: { track: Track }) {
   };
 
   return (
-    <Box sx={slotSx}>
+    <div style={slotStyle}>
+      <style href="dg-spotify-header" precedence="default">
+        {HEADER_CARD_CSS}
+      </style>
       <PageTransitionLink
         className="chrome__nowPlayingLink"
         href={musicRoute}
         onClick={handleClick}
         title={musicDestinationTitle(musicRoute)}
       >
-        <Box sx={containerSx}>
+        <div data-spotify-header-container="" style={containerStyle}>
           <PaperCard
             edge="quad-a"
             innerClassName="chrome__nowPlayingInner paperInnerUnclipped"
@@ -80,8 +83,8 @@ function DockedHeaderCard({ track }: { track: Track }) {
           >
             <TrackListing disableLinks={true} track={track} variant="compact" />
           </PaperCard>
-        </Box>
+        </div>
       </PageTransitionLink>
-    </Box>
+    </div>
   );
 }

@@ -1,12 +1,11 @@
 'use client';
 
 import type { Track } from '@dg/content-models/spotify/Track';
-import { Box } from '@dg/ui/core/Box';
 import { RelativeTime } from '@dg/ui/core/RelativeTime';
 import type { TooltipPlacement } from '@dg/ui/core/Tooltip';
 import { Typography } from '@dg/ui/core/Typography';
-import type { SxObject } from '@dg/ui/theme';
 import { Music } from 'lucide-react';
+import type { CSSProperties } from 'react';
 import { useWaveformBounce } from './useWaveformBounce';
 
 type ListingVariant = 'card' | 'compact';
@@ -21,29 +20,29 @@ type PlaybackStatusProps = {
   service?: string;
 };
 
-function getStatusSx(
+function getStatusStyle(
   listingVariant: ListingVariant,
   color?: string,
   textShadow?: string,
-): SxObject {
+): CSSProperties {
   const isCompact = listingVariant === 'compact';
   return {
     alignItems: 'center',
     color,
     display: 'flex',
-    gap: isCompact ? 0.5 : 1,
+    gap: isCompact ? 4 : 8,
     textShadow,
     ...(isCompact ? { lineHeight: 1.2, minWidth: 0, width: '100%' } : {}),
   };
 }
 
-const iconWrapperSx: SxObject = {
+const iconWrapperStyle: CSSProperties = {
   backfaceVisibility: 'hidden',
   display: 'inline-flex',
   flexShrink: 0,
 };
 
-const compactTextSx: SxObject = {
+const compactTextStyle: CSSProperties = {
   flexShrink: 1,
   minWidth: 0,
   overflow: 'hidden',
@@ -110,20 +109,18 @@ export function PlaybackStatus({
   return (
     <Typography
       component="div"
-      sx={getStatusSx(listingVariant, color, textShadow)}
+      style={getStatusStyle(listingVariant, color, textShadow)}
       variant="overline"
     >
       {isCompact ? (
-        <Box component="span" sx={compactTextSx}>
-          {statusContent}
-        </Box>
+        <span style={compactTextStyle}>{statusContent}</span>
       ) : (
         <span>{statusContent}</span>
       )}
       {isNowPlaying ? (
-        <Box component="span" ref={bounceRef} sx={iconWrapperSx}>
+        <span ref={bounceRef} style={iconWrapperStyle}>
           <Music size={iconSize} />
-        </Box>
+        </span>
       ) : null}
     </Typography>
   );

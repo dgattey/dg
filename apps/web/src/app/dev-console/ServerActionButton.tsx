@@ -1,6 +1,5 @@
 'use client';
 
-import { Stack } from '@dg/ui/core/Stack';
 import { Typography } from '@dg/ui/core/Typography';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
@@ -57,7 +56,7 @@ export function ServerActionButton({
   };
 
   return (
-    <Stack sx={{ gap: 1 }}>
+    <div className="devConsole__stack devConsole__stack--compact">
       <ErrorMessage message={error} />
       <PaperButton
         className="devConsole__actionButton"
@@ -69,6 +68,6 @@ export function ServerActionButton({
         {isLoading ? loadingLabel : label}
       </PaperButton>
       {message ? <Typography variant="body2">{message}</Typography> : null}
-    </Stack>
+    </div>
   );
 }
