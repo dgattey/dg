@@ -110,15 +110,33 @@ const richTextContentSchema = v.looseObject({
 });
 
 /**
- * Text block wrapper used by the intro query.
+ * Text block wrapper used by the intro and footer queries.
  */
 export const textBlockSchema = v.looseObject({
   content: v.nullable(richTextContentSchema),
+  slug: v.optional(v.nullable(v.string())),
+  title: v.optional(v.nullable(v.string())),
+});
+
+/**
+ * Nested Section ("Link collection") block used in header and footer sections.
+ */
+export const linkSectionSchema = v.looseObject({
+  blocksCollection: v.optional(
+    v.nullable(
+      v.looseObject({
+        items: v.optional(v.nullable(v.array(v.nullable(linkSchema)))),
+      }),
+    ),
+  ),
+  slug: v.optional(v.nullable(v.string())),
+  title: v.optional(v.nullable(v.string())),
 });
 
 export type Asset = v.InferOutput<typeof assetSchema>;
 export type AssetWithSys = v.InferOutput<typeof assetWithSysSchema>;
 export type Link = v.InferOutput<typeof linkSchema>;
+export type LinkSection = v.InferOutput<typeof linkSectionSchema>;
 export type LinkWithSys = v.InferOutput<typeof linkWithSysSchema>;
 export type Project = v.InferOutput<typeof projectSchema>;
 export type RichTextContent = v.InferOutput<typeof richTextContentSchema>;

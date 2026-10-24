@@ -3,6 +3,7 @@ import 'server-only';
 import { fetchBooks } from '@dg/services/contentful/fetchBooks';
 import { fetchCurrentLocation } from '@dg/services/contentful/fetchCurrentLocation';
 import { fetchFooterContent } from '@dg/services/contentful/fetchFooterContent';
+import { fetchHeaderContent } from '@dg/services/contentful/fetchHeaderContent';
 import { fetchIntroContent } from '@dg/services/contentful/fetchIntroContent';
 import { fetchLinkByName } from '@dg/services/contentful/fetchLinkByName';
 import { fetchProjects } from '@dg/services/contentful/fetchProjects';
@@ -17,7 +18,7 @@ const CONTENTFUL_TAG = 'contentful';
  * when the fetcher callback is not serializable).
  */
 async function cachedContentful<T>(fn: () => Promise<T>): Promise<T> {
-  cacheLife('hours');
+  cacheLife('max');
   cacheTag(CONTENTFUL_TAG);
   return await fn();
 }
@@ -40,6 +41,11 @@ export const getIntroContent = async () => {
 export const getFooterContent = async () => {
   'use cache';
   return await cachedContentful(fetchFooterContent);
+};
+
+export const getHeaderContent = async () => {
+  'use cache';
+  return await cachedContentful(fetchHeaderContent);
 };
 
 /**

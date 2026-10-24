@@ -227,7 +227,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   position: sticky;
   bottom: 0;
   z-index: 1;
-  padding: 24px 0 36px;
+  padding: 64px 0 36px;
   color: var(--cream);
 }
 .chrome__footer[data-occluded="true"] {
@@ -235,7 +235,10 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 }
 .chrome__nowWrap {
   position: relative;
-  z-index: 5;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  height: 0;
   rotate: 0deg;
 }
 .chrome__nowStrip {
@@ -254,6 +257,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   display: flex;
   gap: 8px 20px;
   align-items: stretch;
+  width: 100%;
   padding: var(--strip-inset);
   color: var(--ink);
   background: light-dark(var(--cream), var(--paper-2));
@@ -289,9 +293,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 }
 .chrome__nowCellLead {
   flex: none;
-  padding: var(--cell-inset) 12px var(--cell-inset) 10px;
-  background: color-mix(in oklab, var(--ink) 7%, transparent);
-  border-radius: var(--cell-radius);
+  padding-inline: 10px 4px;
 }
 .chrome__nowCellLead .chrome__nowKey {
   font-family: var(--display);
@@ -312,11 +314,12 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   background: color-mix(in oklab, var(--ink) 11%, transparent);
 }
 /*
- * Only the track and ride shrink, and their full text lives in a tooltip. The ride
- * keeps its width up to a cap, so a long track gives way before a short ride does.
+ * Both the track and ride cap their width so long titles and artist lists truncate
+ * cleanly, while their full text remains available in a tooltip.
  */
 .chrome__nowTip {
   flex: 0 1 auto;
+  max-width: min(320px, 32%);
 }
 .chrome__nowTipRide {
   flex-shrink: 0;
@@ -374,7 +377,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   color: var(--vermilion);
 }
 .chrome__footerBody {
-  padding-top: 28px;
+  padding-top: 24px;
 }
 .chrome__footerGrid {
   display: grid;
@@ -498,6 +501,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   font-weight: 700;
   line-height: 1;
   white-space: nowrap;
+  translate: 0 -0.75px;
   transition: color 0.18s ease;
 }
 .chrome__elsewhereHandle {
@@ -587,7 +591,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 
 @media (max-width: 820px) {
   .chrome__footer {
-    padding: 18px 0 24px;
+    padding: 64px 0 24px;
   }
   .chrome__nowStrip {
     display: grid;
@@ -617,6 +621,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   }
   .chrome__nowTip {
     grid-column: 1 / -1;
+    max-width: none;
   }
   .chrome__nowTipRide {
     max-width: none;
@@ -638,7 +643,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
     height: 22px;
   }
   .chrome__footerBody {
-    padding-top: 22px;
+    padding-top: 20px;
   }
   .chrome__footerGrid {
     grid-template-columns: minmax(0, 1fr);

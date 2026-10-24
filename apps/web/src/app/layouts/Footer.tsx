@@ -1,3 +1,4 @@
+import type { FooterSectionKey } from '@dg/content-models/contentful/renderables/footer';
 import { changelogRoute, siteMapRoute } from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { CursorIcon } from '@dg/ui/dependent/Link';
@@ -12,7 +13,7 @@ import {
   faXTwitter,
 } from '@dg/ui/icons/FaIcon';
 import type { ReactNode } from 'react';
-import { getFooterContent } from '../../services/contentful';
+import { getFooterContent, getHeaderContent } from '../../services/contentful';
 import { getServerTime } from '../../services/getServerTime';
 import { getLastKnownSong } from '../../services/spotify';
 import { getLatestActivity } from '../../services/strava';
@@ -21,7 +22,7 @@ import { PaperTag } from '../collage/PaperTag';
 import { FooterEmailAction } from './FooterEmailAction';
 import { FooterNowStrip } from './FooterNowStrip';
 import { FooterRevealScroll } from './FooterRevealScroll';
-import { FOOTER_DESTINATIONS } from './musicHeaderDestinations';
+import { FOOTER_DESTINATIONS, flattenHeaderNavDestinations } from './musicHeaderDestinations';
 
 const CHAR_CODE_SHIFT = 7;
 
@@ -57,16 +58,18 @@ export function formatElsewhereHandle(url: string): string {
     .replace(/\/$/, '');
 }
 
+const DEFAULT_SECTION_ORDER: ReadonlyArray<FooterSectionKey> = ['hello', 'elsewhere'];
+
 export async function Footer() {
-  const [footerContent, versionInfo, serverTime, lastKnownSong, latestActivity] = await Promise.all(
-    [
+  const [footerContent, headerContent, versionInfo, serverTime, lastKnownSong, latestActivity] =
+    await Promise.all([
       getFooterContent(),
+      typeof getHeaderContent === 'function' ? getHeaderContent() : Promise.resolve({ items: [] }),
       getAppVersionInfo(),
       getServerTime(),
       getLastKnownSong(),
       getLatestActivity(),
-    ],
-  );
+    ]);
 
   const emailLink = footerContent.links.find(
     (link) => link.icon === 'email' || link.url.startsWith('mailto:'),
@@ -78,6 +81,15 @@ export async function Footer() {
   const elsewhereLinks = footerContent.links.filter(
     (link) => link.icon !== 'email' && !link.url.startsWith('mailto:'),
   );
+  const helloTitle = footerContent.helloTitle?.trim() || 'Say hello';
+  const elsewhereTitle = footerContent.elsewhereTitle?.trim() || 'Elsewhere';
+  const sectionOrder =
+    footerContent.sectionOrder && footerContent.sectionOrder.length > 0
+      ? footerContent.sectionOrder
+      : DEFAULT_SECTION_ORDER;
+  const footerDestinations = headerContent?.items?.length
+    ? flattenHeaderNavDestinations(headerContent.items)
+    : FOOTER_DESTINATIONS;
   const { version } = versionInfo;
 
   const footerActivity = latestActivity
@@ -88,100 +100,109 @@ export async function Footer() {
       }
     : null;
 
-  return (
-    <footer className="chrome__footer">
-      <FooterRevealScroll />
-      <FooterNowStrip initialTrack={lastKnownSong} latestActivity={footerActivity} />
-      <div className="collageMeasure chrome__footerBody">
-        <div className="chrome__footerGrid">
-          <div className="chrome__helloCol">
-            <PaperTag className="chrome__footerTag" edge="quad-c" tiltDeg={-1} tone="ochre">
-              Say hello
-            </PaperTag>
-            {footerContent.description ? (
-              <div className="chrome__helloDescription">
-                <RichText {...footerContent.description} />
-              </div>
-            ) : null}
-            {encodedEmail ? <FooterEmailAction encodedEmail={encodedEmail} /> : null}
-          </div>
-          <div className="chrome__elsewhereCol">
-            <PaperTag className="chrome__footerTag" edge="quad-b" tiltDeg={1} tone="cream">
-              Elsewhere
-            </PaperTag>
-            {elsewhereLinks.length > 0 ? (
-              <div className="chrome__elsewhereLedger">
-                {elsewhereLinks.map((link) => {
-                  const handle = formatElsewhereHandle(link.url);
-                  return (
-                    <a
-                      aria-label={link.title}
-                      className="chrome__elsewhereRow"
-                      href={link.url}
-                      key={link.url}
-                      rel="noopener noreferrer"
-                      target="_blank"
-                    >
-                      <span aria-hidden="true" className="chrome__elsewhereIcon">
-                        {renderElsewhereIcon(link.icon)}
-                      </span>
-                      <span className="chrome__elsewhereTitle">{link.title}</span>
-                      <span className="chrome__elsewhereHandle">{handle}</span>
-                      <svg
-                        aria-hidden="true"
-                        className="chrome__elsewhereArrow"
-                        fill="none"
-                        height={16}
-                        stroke="currentColor"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2.2}
-                        viewBox="0 0 24 24"
-                        width={16}
-                      >
-                        <path d="M7 17 17 7M8 7h9v9" />
-                      </svg>
-                    </a>
-                  );
-                })}
-              </div>
-            ) : null}
-          </div>
+  const helloColumn = (
+    <div className="chrome__helloCol" key="hello">
+      <PaperTag className="chrome__footerTag" edge="quad-c" tiltDeg={-1} tone="ochre">
+        {helloTitle}
+      </PaperTag>
+      {footerContent.description ? (
+        <div className="chrome__helloDescription">
+          <RichText {...footerContent.description} />
         </div>
-        <div className="chrome__colophon">
-          <div className="chrome__colophonGroup">
-            <span>© {new Date(serverTime).getFullYear()} Dylan Gattey</span>
-            {version ? (
+      ) : null}
+      {encodedEmail ? <FooterEmailAction encodedEmail={encodedEmail} /> : null}
+    </div>
+  );
+
+  const elsewhereColumn = (
+    <div className="chrome__elsewhereCol" key="elsewhere">
+      <PaperTag className="chrome__footerTag" edge="quad-b" tiltDeg={1} tone="cream">
+        {elsewhereTitle}
+      </PaperTag>
+      {elsewhereLinks.length > 0 ? (
+        <div className="chrome__elsewhereLedger">
+          {elsewhereLinks.map((link) => {
+            const handle = formatElsewhereHandle(link.url);
+            return (
+              <a
+                aria-label={link.title}
+                className="chrome__elsewhereRow"
+                href={link.url}
+                key={link.url}
+                rel="noopener noreferrer"
+                target="_blank"
+              >
+                <span aria-hidden="true" className="chrome__elsewhereIcon">
+                  {renderElsewhereIcon(link.icon)}
+                </span>
+                <span className="chrome__elsewhereTitle">{link.title}</span>
+                <span className="chrome__elsewhereHandle">{handle}</span>
+                <svg
+                  aria-hidden="true"
+                  className="chrome__elsewhereArrow"
+                  fill="none"
+                  height={16}
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2.2}
+                  viewBox="0 0 24 24"
+                  width={16}
+                >
+                  <path d="M7 17 17 7M8 7h9v9" />
+                </svg>
+              </a>
+            );
+          })}
+        </div>
+      ) : null}
+    </div>
+  );
+
+  return (
+    <>
+      <FooterNowStrip initialTrack={lastKnownSong} latestActivity={footerActivity} />
+      <footer className="chrome__footer">
+        <FooterRevealScroll />
+        <div className="collageMeasure chrome__footerBody">
+          <div className="chrome__footerGrid">
+            {sectionOrder.map((key) => (key === 'hello' ? helloColumn : elsewhereColumn))}
+          </div>
+          <div className="chrome__colophon">
+            <div className="chrome__colophonGroup">
+              <span>© {new Date(serverTime).getFullYear()} Dylan Gattey</span>
+              {version ? (
+                <PageTransitionLink
+                  className="chrome__colophonVersion"
+                  href={changelogRoute}
+                  title={version}
+                >
+                  {version}
+                </PageTransitionLink>
+              ) : null}
               <PageTransitionLink
                 className="chrome__colophonVersion"
-                href={changelogRoute}
-                title={version}
+                href={siteMapRoute}
+                title="Site map"
               >
-                {version}
+                Site map
               </PageTransitionLink>
-            ) : null}
-            <PageTransitionLink
-              className="chrome__colophonVersion"
-              href={siteMapRoute}
-              title="Site map"
-            >
-              Site map
-            </PageTransitionLink>
+            </div>
+            <nav aria-label="Footer navigation" className="chrome__colophonGroup">
+              {footerDestinations.map((destination) => (
+                <PageTransitionLink
+                  className="chrome__colophonLink"
+                  href={destination.href}
+                  key={destination.href}
+                  title={destination.label}
+                >
+                  {destination.label}
+                </PageTransitionLink>
+              ))}
+            </nav>
           </div>
-          <nav aria-label="Footer navigation" className="chrome__colophonGroup">
-            {FOOTER_DESTINATIONS.map((destination) => (
-              <PageTransitionLink
-                className="chrome__colophonLink"
-                href={destination.href}
-                key={destination.href}
-                title={destination.label}
-              >
-                {destination.label}
-              </PageTransitionLink>
-            ))}
-          </nav>
         </div>
-      </div>
-    </footer>
+      </footer>
+    </>
   );
 }

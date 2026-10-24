@@ -1,3 +1,4 @@
+import { getHeaderContent } from '../../services/contentful';
 import { getLastKnownSong } from '../../services/spotify';
 import { CollageColorSchemeFieldset } from '../collage/CollageColorSchemeFieldset';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
@@ -9,7 +10,9 @@ async function LastKnownSpotifyHeaderCard() {
   return <SpotifyHeaderCard track={await getLastKnownSong()} />;
 }
 
-export function Header() {
+export async function Header() {
+  const { items } = await getHeaderContent();
+
   return (
     <>
       <SiteHeaderHeight />
@@ -20,7 +23,7 @@ export function Header() {
         </div>
         <div className="chrome__spacer" />
         <nav className="chrome__nav">
-          <CollageMusicLinks />
+          <CollageMusicLinks items={items} />
           <CollageColorSchemeFieldset />
         </nav>
       </header>
