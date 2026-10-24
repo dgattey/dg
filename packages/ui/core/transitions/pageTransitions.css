@@ -24,6 +24,46 @@
 }
 
 /*
+ * During route navigations (`page-open` and `page-close`), `root` snapshots the
+ * active 100vw × 100vh viewport — including `.collageBleed` full-bleed backgrounds,
+ * `.collageSheet`'s paper surface, and `.chrome__footer` when scrolled to the
+ * bottom — so navigating from any scroll offset animates the visible viewport
+ * without allocating multi-thousand-pixel offscreen DOM textures.
+ */
+html:active-view-transition-type(page-open, page-close)::view-transition {
+  background: light-dark(#ede3cb, #152238);
+}
+
+html:active-view-transition-type(page-open, page-close)::view-transition-old(root),
+html:active-view-transition-type(page-open, page-close)::view-transition-new(root) {
+  mix-blend-mode: normal;
+}
+
+html:active-view-transition-type(page-open)::view-transition-old(root) {
+  z-index: 10;
+  opacity: 1;
+  animation: var(--timing-medium) var(--easing-snappy) both vt-page-recede;
+}
+
+html:active-view-transition-type(page-open)::view-transition-new(root) {
+  z-index: 20;
+  opacity: 1;
+  animation: var(--timing-medium) var(--easing-snappy) both vt-page-rise;
+}
+
+html:active-view-transition-type(page-close)::view-transition-old(root) {
+  z-index: 20;
+  opacity: 1;
+  animation: var(--timing-medium) var(--easing-snappy) both vt-page-fall;
+}
+
+html:active-view-transition-type(page-close)::view-transition-new(root) {
+  z-index: 10;
+  opacity: 1;
+  animation: var(--timing-medium) var(--easing-snappy) both vt-page-reveal;
+}
+
+/*
  * The sticky header lives in the root layout, so both sides of a navigation
  * hold the same chrome. Lifting it above the page groups keeps page backdrops
  * from sweeping over the nav controls during the transition.

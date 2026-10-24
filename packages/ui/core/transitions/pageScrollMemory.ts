@@ -12,6 +12,35 @@ type PageOrigin = {
 
 let origin: PageOrigin | null = null;
 
+type ReactViewTransitionDocument = Document & {
+  __reactViewTransition?: { finished: Promise<unknown> };
+};
+
+export function enableRootPageViewTransition() {
+  if (typeof document === 'undefined') {
+    return;
+  }
+  const root = document.documentElement;
+  root.style.viewTransitionName = 'root';
+  const clearWhenDone = () => {
+    const active = (document as ReactViewTransitionDocument).__reactViewTransition;
+    if (active) {
+      void active.finished.finally(() => {
+        if (root.style.viewTransitionName === 'root') {
+          root.style.viewTransitionName = '';
+        }
+      });
+      return;
+    }
+    if (root.style.viewTransitionName === 'root') {
+      root.style.viewTransitionName = '';
+    }
+  };
+  if (typeof requestAnimationFrame === 'function') {
+    requestAnimationFrame(clearWhenDone);
+  }
+}
+
 export function setViewTransitionScrollOffset(scrollY = window.scrollY) {
   if (typeof document !== 'undefined') {
     document.documentElement.style.setProperty(
@@ -22,6 +51,7 @@ export function setViewTransitionScrollOffset(scrollY = window.scrollY) {
 }
 
 export function rememberPageOrigin(pathname: string) {
+  enableRootPageViewTransition();
   setViewTransitionScrollOffset(window.scrollY);
   origin = { pathname, scrollY: window.scrollY };
 }
