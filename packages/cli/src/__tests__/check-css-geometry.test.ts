@@ -4,6 +4,7 @@ import {
   checkCardHeadStable,
   checkCornerTagRoom,
   checkGridGapsFit,
+  checkHeaderAboveSticky,
   checkScallopPadding,
 } from '../check-css-geometry.js';
 
@@ -150,6 +151,32 @@ describe('check-css-geometry', () => {
           message:
             'Corner tag `.stats__pin` needs a `.paperWrap:has(> .stats__pin)` rule padding the card head so card text keeps clear of it',
         },
+      ],
+    );
+  });
+
+  it('requires .chrome__header to have a higher z-index than any sticky filter or section bar', () => {
+    const violations = checkHeaderAboveSticky(
+      new Map([
+        [
+          'apps/web/src/app/collage/chrome.css',
+          '.chrome__header { position: sticky; top: 0; z-index: 20; }',
+        ],
+        [
+          FILE,
+          [
+            '.reading__filters { position: sticky; top: 90px; z-index: 30; }',
+            '.stats__toolbar { position: sticky; top: 90px; z-index: 20; }',
+            '.reading__sectionHeading { position: sticky; top: 96px; z-index: 5; }',
+          ].join('\n'),
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      violations.map(({ line, rule }) => ({ line, rule })),
+      [
+        { line: 1, rule: 'css-header-above-sticky' },
+        { line: 2, rule: 'css-header-above-sticky' },
       ],
     );
   });
