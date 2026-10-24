@@ -60,7 +60,11 @@ function Illustration({ children, label }: { children: ReactNode; label: string 
   );
 }
 
-/** Pinarello Prince: white aero frame, wavy Onda fork and stays, deep wheels, pink tape. */
+/**
+ * Pinarello Prince: white aero frame with a near-level top tube, a down tube
+ * bowed to follow the front wheel, and one smooth Onda wave on both the fork
+ * and the dropped wishbone seatstays. Deep wheels, pink tape.
+ */
 export function PrinceBike() {
   return (
     <Illustration label="White Pinarello Prince road bike">
@@ -68,22 +72,28 @@ export function PrinceBike() {
       <AeroWheel cx={FRONT.x} cy={FRONT.y} />
       <Frame
         className="strava__bikePaint strava__bikePaint--white"
-        d="M27 50L57 52L84 27M57 52L49 20L83 18L84 27M49 21C44 28 37 34 41 40C43 44 33 46 27 50M84 27C90 32 85 38 90 43C92 45 94 47 95 50"
+        d="M27 50L54.6 54.9M54.6 54.9Q67.6 39.2 83.5 26.3M54.6 54.9L44.3 19.5L80.9 17.8L83.5 26.3M46.5 27.3C37 32.2 36.5 45.1 27 50M83.5 26.3C90.5 32.6 88.1 43.7 95 50"
       />
-      <path className="strava__bikeStem" d="M83 18L83 14L91 12" />
+      <path className="strava__bikeStem" d="M80.9 17.8L80 14.9L87.5 13.8" />
       <Frame
         className="strava__bikeTape strava__bikeTape--pink"
-        d="M91 12C97 11 100 13 99 18C98 23 95 25 91 24"
+        d="M87.5 13.8C93.5 12.8 96.5 14.8 95.5 19.8C94.5 24.8 91.5 26.8 87.5 25.8"
       />
-      <path className="strava__bikeStem" d="M49 20L47 13" />
-      <path className="strava__bikeSaddle" d="M39 12.5C43 11 50 11 55 12.5C51 14 44 14 39 12.5Z" />
-      <circle className="strava__bikeChainring" cx={57} cy={52} r={5.5} />
-      <path className="strava__bikeStem" d="M57 52L61 59" />
+      <path className="strava__bikeStem" d="M44.3 19.5L42 11.8" />
+      <path
+        className="strava__bikeSaddle"
+        d="M35 11.3C39 9.8 46 9.8 50 11.3C46 12.8 39 12.8 35 11.3Z"
+      />
+      <circle className="strava__bikeChainring" cx={54.6} cy={54.9} r={5.5} />
+      <path className="strava__bikeStem" d="M54.6 54.9L58.6 61.9" />
     </Illustration>
   );
 }
 
-/** Santa Cruz Stigmata: black gravel frame, straight fork, knobby tires, black tape. */
+/**
+ * Santa Cruz Stigmata: black gravel frame with a sloping top tube, tall head
+ * tube, slim dropped seatstays, and a straight fork. Knobby tires, black tape.
+ */
 export function CruzBike() {
   return (
     <Illustration label="Black Santa Cruz Stigmata gravel bike">
@@ -91,19 +101,22 @@ export function CruzBike() {
       <GravelWheel cx={FRONT.x} cy={FRONT.y} />
       <Frame
         className="strava__bikePaint strava__bikePaint--black"
-        d="M27 50L57 52L84 26M57 52L50 21L83 20L84 26M50 23L27 50M84 26L95 50"
+        d="M27 50L54.1 54.9L82.7 25.2M54.1 54.9L45.6 25.1L80 18L82.7 25.2M47.3 31.1L27 50M82.7 25.2L95 50"
       />
-      <path className="strava__bikeShine" d="M54 21.5L80 20.6M60 47L80 29.5" />
-      <path className="strava__bikeStem" d="M83 20L83 15L91 13" />
+      <path className="strava__bikeShine" d="M48.9 23.7L76.4 18M59.3 48.5L77.9 29.2" />
+      <path className="strava__bikeStem" d="M80 18L79 15.2L83.4 14.5" />
       <path
         className="strava__bikeTape strava__bikeTape--black"
-        d="M91 13C97 12 100 14 99 19C98 24 95 26 91 25"
+        d="M83.4 14.5C89.4 13.5 92.4 15.5 91.4 20.5C90.4 25.5 87.4 27.5 83.4 26.5"
       />
-      <path className="strava__bikeShine" d="M95.5 14.5C97.5 16 97.6 19.5 96 22" />
-      <path className="strava__bikeStem" d="M50 21L48 14" />
-      <path className="strava__bikeSaddle" d="M40 13.5C44 12 51 12 56 13.5C52 15 45 15 40 13.5Z" />
-      <circle className="strava__bikeChainring" cx={57} cy={52} r={5.5} />
-      <path className="strava__bikeStem" d="M57 52L61 59" />
+      <path className="strava__bikeShine" d="M87.9 16C89.9 17.5 90 21 88.4 23.5" />
+      <path className="strava__bikeStem" d="M45.6 25.1L41.6 11.4" />
+      <path
+        className="strava__bikeSaddle"
+        d="M34.5 10.8C38.5 9.3 45.5 9.3 49.5 10.8C45.5 12.3 38.5 12.3 34.5 10.8Z"
+      />
+      <circle className="strava__bikeChainring" cx={54.1} cy={54.9} r={5.5} />
+      <path className="strava__bikeStem" d="M54.1 54.9L58.1 61.9" />
     </Illustration>
   );
 }
