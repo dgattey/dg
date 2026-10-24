@@ -1,7 +1,15 @@
 import 'server-only';
 
 import * as v from 'valibot';
-import { bestSpotifyImage, spotifyGet } from './trackMetadataShared';
+import {
+  bestSpotifyImage,
+  type SpotifyRequestResult,
+  sleep,
+  spotifyGet,
+} from './trackMetadataShared';
+
+const MAX_RATE_LIMIT_RETRIES = 3;
+const MAX_RETRY_AFTER_SECONDS = 30;
 
 /**
  * Extended track schema for fetching display-ready data.
@@ -85,12 +93,39 @@ function toTrackDisplayData(track: v.InferOutput<typeof trackDisplaySchema>): Tr
   };
 }
 
+async function spotifyGetWithRateLimitRetry<T>(
+  resource: string,
+  schema: v.GenericSchema<unknown, T>,
+  context: string,
+): Promise<SpotifyRequestResult<T>> {
+  let attempt = 0;
+  while (true) {
+    const result = await spotifyGet(resource, schema, context);
+    if (result.success || result.status !== 429 || attempt >= MAX_RATE_LIMIT_RETRIES) {
+      return result;
+    }
+    if (
+      result.retryAfterSeconds !== undefined &&
+      result.retryAfterSeconds > MAX_RETRY_AFTER_SECONDS
+    ) {
+      return result;
+    }
+    const waitSeconds = result.retryAfterSeconds ?? 2 ** attempt;
+    attempt += 1;
+    await sleep(waitSeconds * 1000);
+  }
+}
+
 /**
  * Fetches full display-ready track data from Spotify API.
  * Returns structured data ready for Music* table inserts.
  */
 export async function fetchTrackDisplayData(trackId: string): Promise<TrackDisplayData | null> {
-  const result = await spotifyGet(`tracks/${trackId}`, trackDisplaySchema, 'track display');
+  const result = await spotifyGetWithRateLimitRetry(
+    `tracks/${trackId}`,
+    trackDisplaySchema,
+    'track display',
+  );
   return result.success ? toTrackDisplayData(result.data) : null;
 }
 
@@ -102,7 +137,7 @@ export async function searchTrackDisplayData(
   artistName: string,
 ): Promise<TrackDisplayData | null> {
   const query = encodeURIComponent(`track:${trackName} artist:${artistName}`);
-  const result = await spotifyGet(
+  const result = await spotifyGetWithRateLimitRetry(
     `search?type=track&limit=5&q=${query}`,
     searchTracksResponseSchema,
     'track search',
