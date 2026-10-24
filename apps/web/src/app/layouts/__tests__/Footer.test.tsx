@@ -67,7 +67,7 @@ const SAMPLE_DESCRIPTION: FooterContent['description'] = {
             marks: [],
             nodeType: 'text',
             value:
-              'Building from San Francisco. Always happy to connect about product, craft, and the outdoors.',
+              'Building from San Francisco. Always happy to connect about product, craft, and the outdoors!',
           },
         ],
         data: {},
@@ -85,7 +85,7 @@ const SAMPLE_DESCRIPTION: FooterContent['description'] = {
 
 const SAMPLE_LINKS: FooterContent['links'] = [
   { icon: 'cursor', title: 'Cursor', url: 'https://cursor.com/@dyl' },
-  { icon: 'github', title: 'Github', url: 'https://github.com/dgattey' },
+  { icon: 'github', title: 'GitHub', url: 'https://github.com/dgattey' },
   { icon: 'strava', title: 'Strava', url: 'https://www.strava.com/athletes/17469310' },
   {
     icon: 'spotify',
@@ -184,7 +184,7 @@ describe('Footer', () => {
     expect(screen.getByText('Elsewhere')).toBeInTheDocument();
     expect(
       screen.getByText(
-        'Building from San Francisco. Always happy to connect about product, craft, and the outdoors.',
+        'Building from San Francisco. Always happy to connect about product, craft, and the outdoors!',
       ),
     ).toBeInTheDocument();
 
@@ -215,6 +215,19 @@ describe('Footer', () => {
       ['Reads', readingRoute],
       ['Big map', stravaRoute],
     ]);
+  });
+
+  it('omits the description paragraph and email action when Contentful returns neither', async () => {
+    mockGetFooterContent.mockResolvedValue({
+      description: null,
+      links: [],
+    });
+
+    const ui = await Footer();
+    render(<ServerTimeProvider serverTime={1_760_000_000_000}>{ui}</ServerTimeProvider>);
+
+    expect(screen.queryByText(/Building from San Francisco/i)).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Copy email address' })).not.toBeInTheDocument();
   });
 
   it('shows the full track in a tooltip only when the strip cuts it off', async () => {

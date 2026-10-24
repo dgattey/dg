@@ -80,65 +80,7 @@ const QUERY = gql`
 const isTextBlock = (item: unknown): item is TextBlock =>
   typeof item === 'object' && item !== null && 'content' in item;
 
-const NORMALIZED_FOOTER_DESCRIPTION =
-  'Building from San Francisco. Always happy to connect about product, craft, and the outdoors.';
-
-const FALLBACK_FOOTER_LINKS: Array<RenderableLink> = [
-  { icon: 'cursor', title: 'Cursor', url: 'https://cursor.com/@dyl' },
-  { icon: 'github', title: 'GitHub', url: 'https://github.com/dgattey' },
-  { icon: 'strava', title: 'Strava', url: 'https://www.strava.com/athletes/17469310' },
-  {
-    icon: 'spotify',
-    title: 'Spotify',
-    url: 'https://open.spotify.com/user/dylangattey?si=yXvHMsSLR9au8bTjdjJsUA',
-  },
-  { icon: 'instagram', title: 'Instagram', url: 'https://www.instagram.com/dylangattey' },
-  { icon: 'x', title: 'X', url: 'https://x.com/dyl_gat' },
-  { icon: 'linkedin', title: 'LinkedIn', url: 'https://www.linkedin.com/in/dgattey' },
-  { icon: 'email', title: 'Email me', url: 'mailto:dylan@gattey.com' },
-];
-
-function normalizeFooterDescription(
-  description: FooterContent['description'],
-): FooterContent['description'] {
-  if (!description) {
-    return null;
-  }
-  const normalizeNode = (node: Record<string, unknown>): Record<string, unknown> => {
-    if (
-      typeof node.value === 'string' &&
-      (node.value.startsWith('Building from San Francisco') ||
-        node.value.startsWith('Making software in San Francisco'))
-    ) {
-      return { ...node, value: NORMALIZED_FOOTER_DESCRIPTION };
-    }
-    if (Array.isArray(node.content)) {
-      return {
-        ...node,
-        content: node.content.map((child) =>
-          typeof child === 'object' && child !== null
-            ? normalizeNode(child as Record<string, unknown>)
-            : child,
-        ),
-      };
-    }
-    return node;
-  };
-  return {
-    ...description,
-    json: normalizeNode(
-      description.json as unknown as Record<string, unknown>,
-    ) as unknown as typeof description.json,
-  };
-}
-
-/**
- * Fetches the footer description (TextBlock) and social/contact links from Contentful.
- */
 export async function fetchFooterContent(): Promise<FooterContent> {
-  if (!process.env.CONTENTFUL_SPACE_ID || !process.env.CONTENTFUL_ACCESS_TOKEN) {
-    return { description: null, links: FALLBACK_FOOTER_LINKS };
-  }
   const data = parseResponse(
     footerLinksResponseSchema,
     await getContentfulClient().request(QUERY),
@@ -159,7 +101,7 @@ export async function fetchFooterContent(): Promise<FooterContent> {
     }
     if (isTextBlock(item)) {
       if (item.content) {
-        description ??= normalizeFooterDescription(toRenderableRichTextContent(item.content));
+        description ??= toRenderableRichTextContent(item.content);
       }
       continue;
     }

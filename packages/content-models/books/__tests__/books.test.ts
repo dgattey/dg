@@ -197,7 +197,7 @@ describe('bookDomain & bookSchema', () => {
 describe('goodreadsRss & contentfulBook', () => {
   it('parses Goodreads RSS XML, merges shelves, and computes Contentful diffs', () => {
     const xml = `<rss><channel><item>
-      <book_id>42</book_id><title><![CDATA[Dune]]></title><author_name>Frank Herbert</author_name>
+      <book_id>42</book_id><title><![CDATA[Dune (Dune, #1)]]></title><author_name>Frank Herbert</author_name>
       <isbn>0441172717</isbn><user_rating>5</user_rating>
       <user_read_at>2025/03/10</user_read_at><user_date_started>2025/03/01</user_date_started>
       <user_review><![CDATA[Masterpiece.]]></user_review>
@@ -206,6 +206,7 @@ describe('goodreadsRss & contentfulBook', () => {
     const parsed = parseGoodreadsRssXml(xml, 'read');
     const firstItem = parsed[0];
     if (!firstItem) throw new Error('expected parsed item');
+    expect(firstItem.title).toBe('Dune');
     expect(firstItem.goodreadsCoverUrl).toBe('https://i.gr-assets.com/images/42.jpg');
     expect(firstItem.isbn).toBe(9780441172719);
     expect(mergeShelfBooks([{ ...firstItem, status: 'reading' }, firstItem])[0]?.status).toBe(

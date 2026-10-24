@@ -246,11 +246,6 @@ export async function fetchReleases(options?: {
     Accept: 'application/vnd.github+json',
     'User-Agent': 'dylangattey-web',
   };
-  const token =
-    process.env.GITHUB_TOKEN ?? process.env.GH_TOKEN ?? process.env.GITHUB_AUTHENTICATION_TOKEN;
-  if (token) {
-    headers.Authorization = `Bearer ${token}`;
-  }
 
   try {
     for (let page = 1; page <= MAX_RELEASE_PAGES; page += 1) {

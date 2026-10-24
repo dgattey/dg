@@ -109,6 +109,13 @@ describe('check-structure', () => {
     assert.equal(uncachedServiceFetch.length, 1);
     assert.equal(uncachedServiceFetch[0]?.rule, 'service-fetch-no-store');
 
+    const contentfulFallbackViolation = checkFileStructure(
+      'packages/services/contentful/fetchFooterContent.ts',
+      "import 'server-only';\nconst FALLBACK_FOOTER_LINKS = [];\nexport const f = () => FALLBACK_FOOTER_LINKS;\n",
+    );
+    assert.equal(contentfulFallbackViolation.length, 2);
+    assert.equal(contentfulFallbackViolation[0]?.rule, 'no-contentful-fallbacks');
+
     const orphanCss = checkOrphanCssFiles(
       ['apps/web/src/app/music/music.css', 'apps/web/src/app/dev-console/devConsole.css'],
       new Map([['apps/web/src/app/music/page.tsx', "import './music.css';\n"]]),
@@ -161,11 +168,20 @@ describe('check-structure', () => {
           'apps/web/src/app/api/sync/route.ts',
           "import { revalidateTag } from 'next/cache';\nexport function POST() {\n  revalidateTag('typo-tag', 'max');\n}\n",
         ],
+        [
+          'apps/web/src/services/github.ts',
+          "import { version } from '../../../../package.json';\nexport const v = version;\n",
+        ],
       ]),
     );
     assert.deepEqual(
       cacheTagViolations.map(({ file, line, rule }) => ({ file, line, rule })),
       [
+        {
+          file: 'apps/web/src/services/github.ts',
+          line: 1,
+          rule: 'no-package-json-version-import',
+        },
         { file: 'apps/web/src/services/orphanMax.ts', line: 6, rule: 'cache-tag-parity' },
         { file: 'apps/web/src/app/api/sync/route.ts', line: 3, rule: 'cache-tag-parity' },
       ],

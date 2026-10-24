@@ -16,28 +16,11 @@ const SCHEMA_PATH = path.resolve(__dirname, '../../../content-models/contentful/
 const CONTENTFUL_SERVICES_DIR = path.resolve(__dirname, '..');
 
 describe('fetchBooks', () => {
-  const originalSpaceId = process.env.CONTENTFUL_SPACE_ID;
-  const originalAccessToken = process.env.CONTENTFUL_ACCESS_TOKEN;
-
   afterEach(() => {
-    process.env.CONTENTFUL_SPACE_ID = originalSpaceId;
-    process.env.CONTENTFUL_ACCESS_TOKEN = originalAccessToken;
     jest.clearAllMocks();
   });
 
-  it('returns an empty list when Contentful credentials are not configured', async () => {
-    delete process.env.CONTENTFUL_SPACE_ID;
-    delete process.env.CONTENTFUL_ACCESS_TOKEN;
-
-    const books = await fetchBooks();
-    expect(books).toEqual([]);
-    expect(mockGetContentfulClient).not.toHaveBeenCalled();
-  });
-
   it('queries coverImage and read dates, derives readingStatus, filters notStarted, and paginates across pages', async () => {
-    process.env.CONTENTFUL_SPACE_ID = 'space-123';
-    process.env.CONTENTFUL_ACCESS_TOKEN = 'token-123';
-
     const request = jest
       .fn()
       .mockResolvedValueOnce({
@@ -67,7 +50,7 @@ describe('fetchBooks', () => {
                 },
               },
               sys: { id: 'dune-1' },
-              title: 'Dune (Dune, #1)',
+              title: 'Dune',
             },
             {
               author: 'Neal Stephenson',
@@ -144,9 +127,6 @@ describe('fetchBooks', () => {
   });
 
   it('propagates GraphQL errors instead of silently masking them with fallback data', async () => {
-    process.env.CONTENTFUL_SPACE_ID = 'space-123';
-    process.env.CONTENTFUL_ACCESS_TOKEN = 'token-123';
-
     mockGetContentfulClient.mockReturnValue({
       request: jest.fn().mockRejectedValue(new Error('GraphQL validation error (400)')),
     } as unknown as ReturnType<typeof getContentfulClient>);

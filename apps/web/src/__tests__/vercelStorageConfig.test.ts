@@ -6,6 +6,11 @@ import nextConfig, { resolveVersionFromTagRefs } from '../../next.config';
 import vercelConfig from '../../vercel.json' with { type: 'json' };
 import { getAppVersionInfo } from '../services/version';
 
+jest.mock('next/cache', () => ({
+  cacheLife: jest.fn(),
+  cacheTag: jest.fn(),
+}));
+
 const WEB_ROOT = resolve(__dirname, '../..');
 
 function createTempRepo({ botHead }: { botHead: boolean }) {
@@ -161,6 +166,27 @@ describe('Vercel Function Storage and deployment configuration', () => {
       } else {
         process.env.NEXT_PUBLIC_APP_VERSION = previous;
       }
+    }
+  });
+
+  it('passes NEXT_PUBLIC_APP_VERSION through getChangelogReleases instead of package.json version', async () => {
+    const prevVersion = process.env.NEXT_PUBLIC_APP_VERSION;
+    const originalFetch = global.fetch;
+
+    process.env.NEXT_PUBLIC_APP_VERSION = '2.85.1';
+    global.fetch = jest.fn().mockRejectedValue(new Error('offline')) as unknown as typeof fetch;
+
+    try {
+      const { getChangelogReleases } = await import('../services/github');
+      const releases = await getChangelogReleases();
+      expect(releases[0]).toMatchObject({
+        tag: 'v2.85.1',
+        version: '2.85.1',
+      });
+    } finally {
+      global.fetch = originalFetch;
+      if (prevVersion === undefined) delete process.env.NEXT_PUBLIC_APP_VERSION;
+      else process.env.NEXT_PUBLIC_APP_VERSION = prevVersion;
     }
   });
 });

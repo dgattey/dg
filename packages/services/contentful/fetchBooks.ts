@@ -52,14 +52,9 @@ const QUERY = gql`
 
 /**
  * Fetches all read and currently-reading books from Contentful, paginating across
- * 200-book pages if needed. Returns an empty array only when Contentful credentials
- * are absent; GraphQL and schema errors propagate directly.
+ * 200-book pages if needed.
  */
 export async function fetchBooks(): Promise<Array<RenderableBook>> {
-  if (!process.env.CONTENTFUL_SPACE_ID || !process.env.CONTENTFUL_ACCESS_TOKEN) {
-    return [];
-  }
-
   const client = getContentfulClient();
   const books: Array<RenderableBook> = [];
   let skip = 0;

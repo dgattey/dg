@@ -145,6 +145,40 @@ describe('fetchReleases', () => {
     expect(releases.at(-1)?.tag).toBe('v1.0.0');
   });
 
+  it('does not attach an Authorization header even when GITHUB_TOKEN is set in the environment', async () => {
+    const previousToken = process.env.GITHUB_TOKEN;
+    process.env.GITHUB_TOKEN = 'ghp_expired_token';
+
+    const fetchMock = jest.fn().mockResolvedValueOnce({
+      json: async () => [
+        {
+          body: '- Latest shipped feature (#686)',
+          html_url: 'https://github.com/dgattey/dg/releases/tag/v2.85.1',
+          name: 'v2.85.1',
+          published_at: '2026-10-24T04:27:34Z',
+          tag_name: 'v2.85.1',
+        },
+      ],
+      ok: true,
+    });
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    try {
+      const releases = await fetchReleases({ fallbackVersion: 'v2.85.1' });
+      expect(
+        (fetchMock.mock.calls[0]?.[1] as { headers?: Record<string, string> })?.headers
+          ?.Authorization,
+      ).toBeUndefined();
+      expect(releases[0]?.tag).toBe('v2.85.1');
+    } finally {
+      if (previousToken === undefined) {
+        delete process.env.GITHUB_TOKEN;
+      } else {
+        process.env.GITHUB_TOKEN = previousToken;
+      }
+    }
+  });
+
   it('returns the fallback release when the GitHub API fails', async () => {
     global.fetch = jest
       .fn()
