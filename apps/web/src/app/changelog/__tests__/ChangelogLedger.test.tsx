@@ -70,11 +70,19 @@ describe('ChangelogLedger', () => {
     render(<ChangelogLedger releases={SAMPLE_RELEASES} />);
 
     expect(screen.getByText('Latest')).toBeInTheDocument();
-    expect(screen.getByText('Minor & major')).toBeInTheDocument();
+    expect(screen.getByText('Major & minor')).toBeInTheDocument();
+    expect(screen.getByText('First release')).toBeInTheDocument();
+    expect(screen.getAllByText('Apr 27, 2021').length).toBeGreaterThanOrEqual(2);
     expect(screen.getAllByText('v2.80.1').length).toBeGreaterThanOrEqual(2);
     expect(screen.getByText('v2.80.0')).toBeInTheDocument();
     expect(screen.getByText('v2.46.23')).toBeInTheDocument();
-    expect(screen.getAllByText('v2.0.0').length).toBeGreaterThanOrEqual(2);
+    expect(screen.getAllByText('v2.0.0').length).toBeGreaterThanOrEqual(1);
+
+    const filterGroup = screen.getByRole('group', { name: 'Filter releases by type' });
+    const pillButtons = Array.from(
+      filterGroup.querySelectorAll<HTMLButtonElement>(':scope > .paperPill > button'),
+    ).map((btn) => btn.textContent?.trim());
+    expect(pillButtons).toEqual(['All 4', 'Major 1', 'Minor 1', 'Patch 2']);
 
     const prLinks = screen.getAllByRole('link', { name: '#660' });
     expect(prLinks[0]).toHaveAttribute('href', 'https://github.com/dgattey/dg/pull/660');
@@ -82,5 +90,9 @@ describe('ChangelogLedger', () => {
     await user.click(screen.getByRole('button', { name: /Minor/i }));
     expect(screen.getByText('v2.80.0')).toBeInTheDocument();
     expect(screen.queryByRole('link', { name: 'v2.0.0 on GitHub' })).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '2021' }));
+    expect(screen.getByText('v2.0.0')).toBeInTheDocument();
+    expect(screen.queryByText('v2.80.0')).not.toBeInTheDocument();
   });
 });
