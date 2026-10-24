@@ -12,7 +12,7 @@ type SportDetails = {
 };
 
 export const SPORT_DETAILS = {
-  hike: { filter: 'Walks & hikes', label: 'Hike', tone: 'viridian' },
+  hike: { filter: 'Hikes', label: 'Hike', tone: 'viridian' },
   other: { filter: null, label: 'Activity', tone: 'ochre' },
   ride: { filter: 'Rides', label: 'Ride', tone: 'cobalt' },
   run: { filter: 'Runs', label: 'Run', tone: 'vermilion' },

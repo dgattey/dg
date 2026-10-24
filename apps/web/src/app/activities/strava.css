@@ -35,22 +35,26 @@
   z-index: 2;
 }
 
+/* Sports over time spans, each held to one line. */
 .strava__filters {
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column;
   grid-row: 1;
-  grid-column: 7 / -1;
+  grid-column: 6 / -1;
   gap: 10px;
+  align-items: flex-end;
   align-self: center;
-  justify-content: flex-end;
 }
 .strava__filters > .paperPills {
+  flex-wrap: nowrap;
   justify-content: flex-end;
 }
+/* Sat on the baseline, a 0.55em dot centers between the label's x-height and cap height. */
 .strava__filterDot {
-  align-self: center;
+  display: inline-block;
   width: 0.55em;
   height: 0.55em;
+  margin-inline-end: 0.45em;
   border-radius: 50%;
 }
 
@@ -206,14 +210,6 @@
   right: -16px;
   z-index: 4;
   width: 96px;
-}
-
-.strava__spans {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  align-items: center;
-  justify-content: flex-end;
 }
 
 .strava__band {
@@ -856,7 +852,19 @@
   text-underline-offset: 3px;
 }
 
+/* The title and a full row of sport pills stop sharing a line here, so the filters drop below it. */
 @media (max-width: 1180px) {
+  .strava__intro,
+  .strava__filters {
+    grid-column: 1 / -1;
+  }
+  .strava__filters {
+    grid-row: 2;
+    align-items: flex-start;
+  }
+  .strava__filters > .paperPills {
+    justify-content: flex-start;
+  }
   .strava__atlas {
     grid-template-columns: minmax(0, 1fr);
     row-gap: 56px;
@@ -922,17 +930,45 @@
   .strava__layout {
     grid-template-columns: minmax(0, 1fr);
   }
-  .strava__intro,
+}
+
+/*
+ * Phones fill each row edge to edge on six tracks: thirds by default, halves
+ * when there are two or four pills, and a 3 + 2 split for five. No pill is
+ * ever left on a row of its own.
+ */
+@media (max-width: 680px) {
   .strava__filters {
-    grid-column: 1 / -1;
+    gap: 8px;
   }
-  .strava__filters {
-    grid-row: 2;
+  .strava__filters > .paperPills {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
   }
-  .strava__filters,
-  .strava__filters .paperPills,
-  .strava__spans {
-    justify-content: flex-start;
+  .strava__filters > .paperPills > * {
+    grid-column: span 2;
+  }
+  .strava__filters > .paperPills > :first-child:nth-last-child(-n + 2),
+  .strava__filters > .paperPills > :first-child:nth-last-child(-n + 2) ~ *,
+  .strava__filters > .paperPills > :first-child:nth-last-child(4),
+  .strava__filters > .paperPills > :first-child:nth-last-child(4) ~ *,
+  .strava__filters > .paperPills > :nth-child(4):nth-last-child(2),
+  .strava__filters > .paperPills > :nth-child(5):last-child {
+    grid-column: span 3;
+  }
+  .strava__filters .paperPill {
+    display: flex;
+    justify-content: center;
+  }
+  .strava__filters .paperPillButton {
+    padding: 10px 12px 11px;
+  }
+  .strava__spans .yearMenu__panel {
+    right: 0;
+    left: auto;
+    transform-origin: top right;
   }
 }
 

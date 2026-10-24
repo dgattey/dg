@@ -19,7 +19,7 @@
   all: unset;
   display: inline-flex;
   gap: 0.45em;
-  align-items: baseline;
+  align-items: center;
   padding: 13px 20px 14px;
   cursor: pointer;
 }

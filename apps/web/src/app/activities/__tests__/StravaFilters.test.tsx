@@ -1,3 +1,5 @@
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import type { StravaLogEntry, StravaSport } from '@dg/content-models/strava/StravaHistory';
 import type { AtlasRegion } from '@dg/maps/atlasGeometry';
 import type { GeoBounds } from '@dg/maps/src/routeFrame';
@@ -5,6 +7,8 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StravaAtlas } from '../FilteredSections';
 import { RouteCountTag, StravaFilters } from '../StravaFilters';
+
+const stravaCss = readFileSync(join(__dirname, '..', 'strava.css'), 'utf8');
 
 const NOW = Date.parse('2026-10-22T15:00:00Z');
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -83,7 +87,7 @@ describe('StravaFilters', () => {
       'aria-pressed',
       'true',
     );
-    expect(screen.queryByRole('button', { name: 'Walks & hikes' })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Hikes' })).not.toBeInTheDocument();
     expect(screen.getByRole('group', { name: 'Sport' }).textContent).toBe(
       'RidesRunsSkiingAll sports',
     );
@@ -168,5 +172,22 @@ describe('StravaFilters', () => {
     expect(screen.queryByText('Year')).not.toBeInTheDocument();
     expect(inkedTones()).toEqual(['cobalt']);
     expect(screen.getByText('1 route')).toBeInTheDocument();
+  });
+
+  it('holds each pill set to one line, then splits phone rows so no pill sits alone', () => {
+    const phone = stravaCss.match(/@media \(max-width: 680px\) \{([\s\S]*?)\n\}/)?.[1] ?? '';
+
+    expect(stravaCss).toMatch(/\.strava__filters > \.paperPills \{\s*flex-wrap: nowrap;/);
+    expect(phone).toContain('grid-template-columns: repeat(6, minmax(0, 1fr));');
+    expect(phone).toContain('.strava__filters > .paperPills > :nth-child(4):nth-last-child(2)');
+    expect(phone).toContain('.strava__filters > .paperPills > :first-child:nth-last-child(4) ~ *');
+  });
+
+  it('keeps the year menu in the time span group', () => {
+    renderFilters(outings);
+
+    expect(
+      within(screen.getByRole('group', { name: 'Time span' })).getByText('Year'),
+    ).toBeInTheDocument();
   });
 });

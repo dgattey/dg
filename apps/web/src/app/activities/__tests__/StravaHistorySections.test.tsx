@@ -253,9 +253,11 @@ describe('StravaHistorySections', () => {
     ).toBeVisible();
     expect(screen.getByText('1 route')).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Runs' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Walks & hikes' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Hikes' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Rides' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByText('Year')).toBeInTheDocument();
+    expect(
+      within(screen.getByRole('group', { name: 'Time span' })).getByText('Year'),
+    ).toBeInTheDocument();
   });
 
   it('measures San Francisco street coverage for whatever the filters pick', async () => {

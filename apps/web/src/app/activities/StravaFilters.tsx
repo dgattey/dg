@@ -72,14 +72,14 @@ const sportOption = (key: SportFilter, index: number): PaperPillOption<SportFilt
     key === 'all' ? (
       'All sports'
     ) : (
-      <>
+      <span>
         <span
           aria-hidden="true"
           className="strava__filterDot"
           style={{ backgroundColor: `var(--${SPORT_DETAILS[key].tone})` }}
         />
         {SPORT_DETAILS[key].filter}
-      </>
+      </span>
     ),
   tiltDeg: SPORT_TILTS[index % SPORT_TILTS.length] ?? 0,
 });
@@ -156,15 +156,15 @@ export function StravaFilters({
             selected={sport}
           />
         ) : null}
-        <div className="strava__spans">
-          <PaperPills
-            label="Time span"
-            onSelect={(key) =>
-              pickSpan(key === 'all' ? { kind: 'all' } : { key, kind: 'window', since: Date.now() })
-            }
-            options={SPAN_OPTIONS}
-            selected={span.kind === 'window' ? span.key : span.kind === 'all' ? 'all' : null}
-          />
+        <PaperPills
+          className="strava__spans"
+          label="Time span"
+          onSelect={(key) =>
+            pickSpan(key === 'all' ? { kind: 'all' } : { key, kind: 'window', since: Date.now() })
+          }
+          options={SPAN_OPTIONS}
+          selected={span.kind === 'window' ? span.key : span.kind === 'all' ? 'all' : null}
+        >
           {years.length > 1 ? (
             <YearMenu
               onPick={(year) => pickSpan({ kind: 'year', year })}
@@ -173,7 +173,7 @@ export function StravaFilters({
               years={years}
             />
           ) : null}
-        </div>
+        </PaperPills>
       </div>
       <VisibleRoutes value={filtered ? new Set(visible.map(({ id }) => id)) : null}>
         {children}
