@@ -6,14 +6,14 @@ import { stadiaTileUrl } from '@dg/maps/src/tileSource';
 import { fetchBooks } from '@dg/services/contentful/fetchBooks';
 import { fetchIntroContent } from '@dg/services/contentful/fetchIntroContent';
 import { fetchSideProjects } from '@dg/services/contentful/fetchSideProjects';
-import { fetchReleases } from '@dg/services/github/fetchReleases';
 import { readFavoriteAlbumsSnapshot } from '@dg/services/spotify/favoriteAlbumsSnapshot';
 import { fetchListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import { fetchMusicHistoryPage } from '@dg/services/spotify/fetchMusicHistoryPage';
 import { fetchStravaHistoryFromDb } from '@dg/services/strava/fetchStravaHistoryFromDb';
 import { cacheLife, cacheTag } from 'next/cache';
 import { ImageResponse } from 'next/og';
-import { version } from '../../../../package.json';
+import { getChangelogReleases } from '../services/github';
+import { getAppVersionInfo } from '../services/version';
 import { SocialCard, type SocialCardVariant } from './collage/SocialCard';
 import { SOCIAL_CARD_FONT } from './collage/SocialCardParts';
 import type { StravaMapTile } from './collage/StravaSocialCard';
@@ -147,8 +147,8 @@ async function loadSocialCardVariant(page: SocialImagePage): Promise<SocialCardV
       return buildStravaCardVariant(history, mapTiles);
     }
     case 'changelog': {
-      const releases = await safeLoad(() => fetchReleases({ fallbackVersion: version }), []);
-      return buildChangelogCardVariant(releases, `v${version}`);
+      const releases = await safeLoad(getChangelogReleases, []);
+      return buildChangelogCardVariant(releases, getAppVersionInfo().version);
     }
     case 'site-map': {
       const sideProjects = await safeLoad(fetchSideProjects, []);

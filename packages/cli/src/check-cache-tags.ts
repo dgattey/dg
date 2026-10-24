@@ -46,6 +46,19 @@ export function checkCacheTagParity(
       const lineText = lines[i] ?? '';
       const lineNum = i + 1;
 
+      if (
+        relPath !== 'apps/web/src/services/version.ts' &&
+        /\bfrom\s+['"][^'"]*package\.json['"]/.test(lineText)
+      ) {
+        violations.push({
+          file: relPath,
+          line: lineNum,
+          message:
+            'Import getAppVersionInfo from apps/web/src/services/version.ts instead of reading version from package.json directly',
+          rule: 'no-package-json-version-import',
+        });
+      }
+
       if (/\bcacheLife\(\s*['"]max['"]\s*\)/.test(lineText)) {
         inMaxCacheScope = true;
         maxCacheLine = lineNum;
@@ -135,6 +148,38 @@ export function checkCacheTagParity(
   }
 
   return violations;
+}
+
+const BANNED_CONTENTFUL_FALLBACK_PATTERN =
+  /\b(?:FALLBACK_|NORMALIZED_|DEFAULT_DESCRIPTION|DEFAULT_ENCODED_EMAIL|normalizeFooterDescription|cleanBookTitle)\w*|\bprocess\.env\.CONTENTFUL_/;
+
+export function checkContentfulFallbacks(
+  relPath: string,
+  content: string,
+  lines?: ReadonlyArray<string>,
+): Array<StructureViolation> {
+  if (
+    isTestPath(relPath) ||
+    (!/^packages\/services\/contentful\/fetch.*\.ts$/.test(relPath) &&
+      !/^packages\/content-models\/contentful\/renderables\/.*\.ts$/.test(relPath) &&
+      relPath !== 'apps/web/src/app/layouts/Footer.tsx') ||
+    !BANNED_CONTENTFUL_FALLBACK_PATTERN.test(content)
+  ) {
+    return [];
+  }
+  return (lines ?? content.split('\n')).flatMap((lineText, i) =>
+    BANNED_CONTENTFUL_FALLBACK_PATTERN.test(lineText)
+      ? [
+          {
+            file: relPath,
+            line: i + 1,
+            message:
+              'Read Contentful entries directly without hardcoded fallback constants, env-var bypasses, or runtime copy rewrites',
+            rule: 'no-contentful-fallbacks',
+          },
+        ]
+      : [],
+  );
 }
 
 export function checkMigrationTransactions(

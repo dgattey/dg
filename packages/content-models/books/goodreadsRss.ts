@@ -91,6 +91,12 @@ function resolveReadDates({
   return { readDateFinished, readDateStarted, status };
 }
 
+const GOODREADS_SERIES_SUFFIX_PATTERN = /\s*\([^)]*#\d+[^)]*\)\s*$/;
+
+function stripGoodreadsSeriesSuffix(rawTitle: string): string {
+  return cleanWhitespace(rawTitle).replace(GOODREADS_SERIES_SUFFIX_PATTERN, '').trim();
+}
+
 export function parseGoodreadsRssXml(xml: string, shelf = 'read'): Array<GoodreadsBookItem> {
   if (!xml) return [];
   const items: Array<GoodreadsBookItem> = [];
@@ -133,7 +139,7 @@ export function parseGoodreadsRssXml(xml: string, shelf = 'read'): Array<Goodrea
       reviewText: normalizeReviewText(rawReview) || null,
       shelf,
       status: dates.status,
-      title: cleanWhitespace(rawTitle),
+      title: stripGoodreadsSeriesSuffix(rawTitle),
       userShelves: userShelves ?? shelf,
     });
   }

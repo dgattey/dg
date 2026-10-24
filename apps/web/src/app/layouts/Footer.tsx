@@ -25,13 +25,6 @@ import { FOOTER_DESTINATIONS } from './musicHeaderDestinations';
 
 const CHAR_CODE_SHIFT = 7;
 
-const DEFAULT_DESCRIPTION =
-  'Building from San Francisco. Always happy to connect about product, craft, and the outdoors.';
-
-const DEFAULT_ENCODED_EMAIL: ReadonlyArray<number> = [
-  107, 128, 115, 104, 117, 71, 110, 104, 123, 123, 108, 128, 53, 106, 118, 116,
-];
-
 function encodeEmailToShiftedCodes(email: string): Array<number> {
   return Array.from(email, (ch) => ch.charCodeAt(0) + CHAR_CODE_SHIFT);
 }
@@ -80,7 +73,7 @@ export async function Footer() {
   );
   const encodedEmail = emailLink
     ? encodeEmailToShiftedCodes(emailLink.url.replace(/^mailto:/i, ''))
-    : DEFAULT_ENCODED_EMAIL;
+    : null;
 
   const elsewhereLinks = footerContent.links.filter(
     (link) => link.icon !== 'email' && !link.url.startsWith('mailto:'),
@@ -97,14 +90,12 @@ export async function Footer() {
             <PaperTag className="chrome__footerTag" edge="quad-c" tiltDeg={-1} tone="ochre">
               Say hello
             </PaperTag>
-            <div className="chrome__helloDescription">
-              {footerContent.description ? (
+            {footerContent.description ? (
+              <div className="chrome__helloDescription">
                 <RichText {...footerContent.description} />
-              ) : (
-                <p>{DEFAULT_DESCRIPTION}</p>
-              )}
-            </div>
-            <FooterEmailAction encodedEmail={encodedEmail} />
+              </div>
+            ) : null}
+            {encodedEmail ? <FooterEmailAction encodedEmail={encodedEmail} /> : null}
           </div>
           <div className="chrome__elsewhereCol">
             <PaperTag className="chrome__footerTag" edge="quad-b" tiltDeg={1} tone="cream">
@@ -113,11 +104,10 @@ export async function Footer() {
             {elsewhereLinks.length > 0 ? (
               <div className="chrome__elsewhereLedger">
                 {elsewhereLinks.map((link) => {
-                  const displayTitle = link.title === 'Github' ? 'GitHub' : link.title;
                   const handle = formatElsewhereHandle(link.url);
                   return (
                     <a
-                      aria-label={displayTitle}
+                      aria-label={link.title}
                       className="chrome__elsewhereRow"
                       href={link.url}
                       key={link.url}
@@ -127,7 +117,7 @@ export async function Footer() {
                       <span aria-hidden="true" className="chrome__elsewhereIcon">
                         {renderElsewhereIcon(link.icon)}
                       </span>
-                      <span className="chrome__elsewhereTitle">{displayTitle}</span>
+                      <span className="chrome__elsewhereTitle">{link.title}</span>
                       <span className="chrome__elsewhereHandle">{handle}</span>
                       <svg
                         aria-hidden="true"

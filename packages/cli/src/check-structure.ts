@@ -2,7 +2,11 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkCacheTagParity, checkMigrationTransactions } from './check-cache-tags.js';
+import {
+  checkCacheTagParity,
+  checkContentfulFallbacks,
+  checkMigrationTransactions,
+} from './check-cache-tags.js';
 import {
   checkOrphanCssFiles,
   checkRouteCssImports,
@@ -25,13 +29,10 @@ const BANNED_GENERIC_COMPONENT_FILENAMES: ReadonlySet<string> = new Set([
   'shared.tsx',
   'utils.tsx',
 ]);
-
 const NON_PUBLIC_PAGE_ROUTES: ReadonlySet<string> = new Set([
   'apps/web/src/app/dev-console/page.tsx',
 ]);
-
 const SOCIAL_IMAGE_FILENAMES = ['opengraph-image.tsx', 'twitter-image.tsx'] as const;
-
 const INLINE_TYPEOF_IMPORT_TOKEN = `${'typeof'} ${'import('}`;
 const BIOME_SUPPRESSION_TOKEN = `${'biome'}-${'ignore'}`;
 const DB_PACKAGE_TOKEN = `@dg/${'db'}`;
@@ -64,9 +65,7 @@ function checkNoBiomeSuppressions(
   content: string,
   lines?: Array<string>,
 ): Array<StructureViolation> {
-  if (!content.includes(BIOME_SUPPRESSION_TOKEN)) {
-    return [];
-  }
+  if (!content.includes(BIOME_SUPPRESSION_TOKEN)) return [];
   return (lines ?? content.split('\n')).flatMap((lineText, i) =>
     lineText.includes(BIOME_SUPPRESSION_TOKEN)
       ? [
@@ -92,7 +91,10 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
     return checkNoBiomeSuppressions(relPath, content);
   }
   const lines = content.split('\n');
-  const violations = checkNoBiomeSuppressions(relPath, content, lines);
+  const violations = [
+    ...checkNoBiomeSuppressions(relPath, content, lines),
+    ...checkContentfulFallbacks(relPath, content, lines),
+  ];
 
   const lineCount = lines.length;
   const baseName = path.posix.basename(relPath);

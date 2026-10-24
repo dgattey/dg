@@ -6,15 +6,6 @@ import {
 } from '../../books/bookDomain';
 import type { Book } from '../schema/books';
 
-const SERIES_SUFFIX_PATTERN = /\s*\([^)]*#\d+[^)]*\)\s*$/;
-
-/**
- * Strips Goodreads series suffixes such as `(Dune, #1)` from display titles.
- */
-export function cleanBookTitle(raw: string | null | undefined): string {
-  return cleanWhitespace(raw).replace(SERIES_SUFFIX_PATTERN, '').trim();
-}
-
 export type RenderableBook = {
   id: string;
   title: string;
@@ -50,7 +41,7 @@ export function deriveReadingStatus({
 }
 
 export function toRenderableBook(book: Book | null | undefined): RenderableBook | null {
-  const title = cleanBookTitle(book?.title);
+  const title = cleanWhitespace(book?.title);
   const author = cleanWhitespace(book?.author);
   const readDateFinished = cleanWhitespace(book?.readDateFinished) || null;
   const readDateStarted = cleanWhitespace(book?.readDateStarted) || null;

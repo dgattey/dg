@@ -1,5 +1,5 @@
 import { safeParse } from 'valibot';
-import { cleanBookTitle, deriveReadingStatus, toRenderableBook } from '../renderables/books';
+import { deriveReadingStatus, toRenderableBook } from '../renderables/books';
 import { booksResponseSchema } from '../schema/books';
 import { footerLinksResponseSchema } from '../schema/footer';
 import { introBlockResponseSchema } from '../schema/intro';
@@ -149,7 +149,7 @@ describe('contentful schemas', () => {
               },
             },
             sys: { id: 'book-dune' },
-            title: 'Dune (Dune, #1)',
+            title: 'Dune',
           },
           {
             __typename: 'Book',
@@ -218,11 +218,5 @@ describe('contentful schemas', () => {
     });
 
     expect(toRenderableBook(input.bookCollection.items[2])).toBeNull();
-
-    expect(
-      cleanBookTitle(
-        "The Hitchhiker's Guide to the Galaxy (The Hitchhiker's Guide to the Galaxy, #1)",
-      ),
-    ).toBe("The Hitchhiker's Guide to the Galaxy");
   });
 });
