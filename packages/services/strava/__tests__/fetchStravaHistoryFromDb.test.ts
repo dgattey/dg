@@ -1,6 +1,9 @@
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 import { fetchLatestStravaActivityFromDb } from '../fetchLatestStravaActivityFromDb';
-import { fetchStravaHistoryFromDb } from '../fetchStravaHistoryFromDb';
+import {
+  fetchStravaHistoryFromDb,
+  STRAVA_HISTORY_SUMMARY_SCHEMA_VERSION,
+} from '../fetchStravaHistoryFromDb';
 
 const NOW = new Date('2026-10-22T12:00:00Z');
 
@@ -118,5 +121,65 @@ describe('fetchStravaHistoryFromDb', () => {
         ],
       },
     ]);
+
+    const cachedSummary = await db.StravaHistorySummary.findOne({ where: { singleton: true } });
+    expect(cachedSummary?.activityCount).toBe(4);
+    expect(Number(cachedSummary?.latestActivityId)).toBe(104);
+    expect(cachedSummary?.schemaVersion).toBe(STRAVA_HISTORY_SUMMARY_SCHEMA_VERSION);
+    expect(cachedSummary?.payload?.polylines).toEqual(['camel', 'trail']);
+
+    const findAllSpy = jest.spyOn(db.StravaActivity, 'findAll');
+    try {
+      const warmHistory = await fetchStravaHistoryFromDb(NOW);
+      expect(findAllSpy).not.toHaveBeenCalled();
+      expect(warmHistory).toEqual(history);
+    } finally {
+      findAllSpy.mockRestore();
+    }
+  });
+
+  it('rebuilds the cached summary when schemaVersion or stored activities change', async () => {
+    await db.StravaActivity.create({
+      activityData: {
+        distance: 12_000,
+        id: 201,
+        map: { summaryPolyline: 'loop-a' },
+        name: 'First loop',
+        startDate: '2026-10-10T15:00:00Z',
+        type: 'Ride',
+        url: 'https://www.strava.com/activities/201',
+      },
+      activityStartDate: new Date('2026-10-10T15:00:00Z'),
+      id: 201,
+    });
+
+    const first = await fetchStravaHistoryFromDb(NOW);
+    expect(first?.totals.outings).toBe(1);
+
+    await db.StravaHistorySummary.update({ schemaVersion: 0 }, { where: { singleton: true } });
+    const afterSchemaBump = await fetchStravaHistoryFromDb(NOW);
+    expect(afterSchemaBump).toEqual(first);
+    const refreshedRow = await db.StravaHistorySummary.findOne({ where: { singleton: true } });
+    expect(refreshedRow?.schemaVersion).toBe(STRAVA_HISTORY_SUMMARY_SCHEMA_VERSION);
+
+    await db.StravaActivity.create({
+      activityData: {
+        distance: 8_000,
+        id: 202,
+        map: { summaryPolyline: 'loop-a' },
+        name: 'Second loop',
+        startDate: '2026-10-12T15:00:00Z',
+        type: 'Ride',
+        url: 'https://www.strava.com/activities/202',
+      },
+      activityStartDate: new Date('2026-10-12T15:00:00Z'),
+      id: 202,
+    });
+
+    const afterInsert = await fetchStravaHistoryFromDb(NOW);
+    expect(afterInsert?.totals.outings).toBe(2);
+    expect(afterInsert?.totals.distanceMeters).toBe(20_000);
+    const dedupedRow = await db.StravaHistorySummary.findOne({ where: { singleton: true } });
+    expect(dedupedRow?.payload?.polylines).toEqual(['loop-a']);
   });
 });

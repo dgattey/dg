@@ -13,6 +13,7 @@ import { OauthState } from './models/OauthState';
 import { Release } from './models/Release';
 import { SpotifyPlay } from './models/SpotifyPlay';
 import { StravaActivity } from './models/StravaActivity';
+import { StravaHistorySummary } from './models/StravaHistorySummary';
 import { Token } from './models/Token';
 
 export const db = {
@@ -28,6 +29,7 @@ export const db = {
   Release,
   SpotifyPlay,
   StravaActivity,
+  StravaHistorySummary,
   Token,
 } as const;
 
