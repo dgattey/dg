@@ -106,6 +106,17 @@ describe('fetchListeningStats', () => {
     await expect(fetchListeningStats()).resolves.toBeNull();
   });
 
+  it('degrades to null when the database rejects queries', async () => {
+    const querySpy = jest
+      .spyOn(dbClient, 'query')
+      .mockRejectedValueOnce(new Error('Neon network transfer limit exceeded'));
+    try {
+      await expect(fetchListeningStats()).resolves.toBeNull();
+    } finally {
+      querySpy.mockRestore();
+    }
+  });
+
   it('aggregates plays in Pacific time with sessions, repeats, genres, top tracks, top artists, and depth', async () => {
     await seedCatalog();
     await db.SpotifyPlay.bulkCreate(

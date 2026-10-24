@@ -157,19 +157,24 @@ export function ListeningStatsSections({
     if (initialUrlKey !== statsRangeKey(initialStats.range)) {
       applyRangeRef.current(initialUrlKey, false);
     }
-    const warmupTimer = window.setTimeout(() => {
-      void loadRangeRef.current('week');
-      void loadRangeRef.current('month');
-    }, 120);
+    const warmupTimer =
+      initialSnapshots === undefined
+        ? window.setTimeout(() => {
+            void loadRangeRef.current('week');
+            void loadRangeRef.current('month');
+          }, 120)
+        : undefined;
     window.addEventListener('popstate', syncFromUrl);
     return () => {
-      window.clearTimeout(warmupTimer);
+      if (warmupTimer !== undefined) {
+        window.clearTimeout(warmupTimer);
+      }
       if (prefetchTimerRef.current !== undefined) {
         window.clearTimeout(prefetchTimerRef.current);
       }
       window.removeEventListener('popstate', syncFromUrl);
     };
-  }, [initialStats]);
+  }, [initialStats, initialSnapshots]);
 
   const selectYear = (year: number) => applyRange(`${year}`);
   const prefetchYear = (year: number) => prefetchRange(`${year}`);
@@ -197,7 +202,7 @@ export function ListeningStatsSections({
           </div>
         ) : null}
         <div className="stats__band">
-          <TimelineBarsCard onPrefetchYear={prefetchYear} onSelectYear={selectYear} stats={stats} />
+          <TimelineBarsCard onSelectYear={selectYear} stats={stats} />
           <GenresCard stats={stats} />
         </div>
         {stats.matrix.rows.length > 0 || stats.champions.entries.length > 0 ? (

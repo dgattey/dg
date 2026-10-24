@@ -1,8 +1,8 @@
 import 'server-only';
 
-import { db } from '@dg/db';
 import type { PeriodStatus } from '@dg/shared-core/dates/periodStatus';
 import type { StatsRange } from '@dg/shared-core/dates/statsRange';
+import { log } from '@dg/shared-core/logging/log';
 import { buildRangeBreakdowns } from './listeningStatsBreakdowns';
 import {
   mapCatalogSlices,
@@ -17,19 +17,16 @@ import { fetchTopPlaylistRows, toStatsPlaylists } from './listeningStatsPlaylist
 import {
   rollingDaysPlayFilter,
   type SqlPlayFilter,
-  selectActiveMonths,
   selectAlbumSessions,
-  selectArtistCount,
   selectArtistDepth,
   selectBucketTopTracks,
   selectDailyPlays,
   selectDayHourPlays,
-  selectKnownDurations,
+  selectDayStreak,
   selectLatestPlayedAt,
   selectLocalBuckets,
   selectMonthlyPlays,
   selectRepeats,
-  selectShelf,
   selectSummary,
   selectTopAlbumIds,
   selectTopGenres,
@@ -172,6 +169,16 @@ function fillBuckets(rows: Array<{ bucket: number; plays: number }>, size: numbe
   return buckets;
 }
 
+function sumYearsFromMonths(
+  monthlyPlays: ReadonlyArray<{ month: number; plays: number; year: number }>,
+): Array<{ plays: number; year: number }> {
+  const byYear = new Map<number, number>();
+  for (const row of monthlyPlays) {
+    byYear.set(row.year, (byYear.get(row.year) ?? 0) + row.plays);
+  }
+  return [...byYear.entries()].sort(([a], [b]) => a - b).map(([year, plays]) => ({ plays, year }));
+}
+
 function resolvePlayFilter(range: StatsRange, latest: Date): SqlPlayFilter | undefined {
   switch (range.kind) {
     case 'all':
@@ -192,142 +199,151 @@ export async function fetchListeningStats(
   range: StatsRange = { kind: 'all' },
   options?: { knownYears?: Array<{ plays: number; year: number }> },
 ): Promise<ListeningStats | null> {
-  const latestPlayedAt = await selectLatestPlayedAt();
-  if (!latestPlayedAt) return null;
-  const filter = resolvePlayFilter(range, latestPlayedAt);
-  const now = statsNow(latestPlayedAt);
+  if (process.env.NODE_ENV !== 'test' && !process.env.DATABASE_URL) return null;
+  try {
+    const latestPlayedAt = await selectLatestPlayedAt();
+    if (!latestPlayedAt) return null;
+    const filter = resolvePlayFilter(range, latestPlayedAt);
+    const now = statsNow(latestPlayedAt);
+    const championUnit =
+      range.kind === 'all'
+        ? 'year'
+        : range.kind === 'year'
+          ? 'month'
+          : range.kind === 'month'
+            ? 'week'
+            : 'day';
+    const repeatUnit = range.kind === 'week' ? 'day' : 'week';
 
-  const championUnit =
-    range.kind === 'all'
-      ? 'year'
-      : range.kind === 'year'
-        ? 'month'
-        : range.kind === 'month'
-          ? 'week'
-          : 'day';
-  const repeatUnit = range.kind === 'week' ? 'day' : 'week';
+    const [
+      [summary],
+      rawYears,
+      monthlyPlays,
+      hours,
+      dailyPlays,
+      [allTimeDayStreak],
+      dayHourPlays,
+      topAlbumIds,
+      topTrackIds,
+      bucketTopTracks,
+      sessions,
+      onRepeat,
+      depth,
+      playlistRows,
+    ] = await Promise.all([
+      selectSummary(filter),
+      options?.knownYears || range.kind === 'all'
+        ? Promise.resolve(null)
+        : selectLocalBuckets('year'),
+      range.kind === 'all' ? selectMonthlyPlays() : Promise.resolve([]),
+      selectLocalBuckets('hour', filter),
+      range.kind === 'all' ? Promise.resolve([]) : selectDailyPlays(filter),
+      range.kind === 'all' ? selectDayStreak(filter) : Promise.resolve([]),
+      range.kind === 'week' ? selectDayHourPlays(filter) : Promise.resolve([]),
+      selectTopAlbumIds(filter),
+      selectTopTrackIds(filter),
+      selectBucketTopTracks(championUnit, filter),
+      selectAlbumSessions(filter),
+      selectRepeats(repeatUnit, ON_REPEAT_TRACKS, filter),
+      selectArtistDepth(filter),
+      fetchTopPlaylistRows(filter),
+    ]);
 
-  const [
-    [summary],
-    [artistCount],
-    [durations],
-    rawYears,
-    monthlyPlays,
-    hours,
-    months,
-    dailyPlays,
-    dayHourPlays,
-    topAlbumIds,
-    topTrackIds,
-    bucketTopTracks,
-    [shelf],
-    sessions,
-    onRepeat,
-    depth,
-    favoriteAlbums,
-    playlistResult,
-  ] = await Promise.all([
-    selectSummary(filter),
-    selectArtistCount(filter),
-    selectKnownDurations(filter),
-    options?.knownYears ? Promise.resolve(null) : selectLocalBuckets('year'),
-    range.kind === 'all' ? selectMonthlyPlays() : Promise.resolve([]),
-    selectLocalBuckets('hour', filter),
-    selectActiveMonths(filter),
-    selectDailyPlays(filter),
-    range.kind === 'week' ? selectDayHourPlays(filter) : Promise.resolve([]),
-    selectTopAlbumIds(filter),
-    selectTopTrackIds(filter),
-    selectBucketTopTracks(championUnit, filter),
-    selectShelf(filter),
-    selectAlbumSessions(filter),
-    selectRepeats(repeatUnit, ON_REPEAT_TRACKS, filter),
-    selectArtistDepth(filter),
-    db.FavoriteAlbum.findAll(),
-    fetchTopPlaylistRows(filter),
-  ]);
+    if (!summary?.firstPlayedAt || !summary.lastPlayedAt || summary.plays === 0) return null;
 
-  if (!summary?.firstPlayedAt || !summary.lastPlayedAt || summary.plays === 0) return null;
+    const years =
+      options?.knownYears ??
+      (range.kind === 'all'
+        ? sumYearsFromMonths(monthlyPlays)
+        : (rawYears ?? []).map((row) => ({ plays: row.plays, year: row.bucket })));
+    const activeMonthKeys =
+      range.kind === 'all'
+        ? monthlyPlays.map((row) => `${row.year}-${String(row.month).padStart(2, '0')}`)
+        : [...new Set(dailyPlays.map((row) => row.day.slice(0, 7)))];
 
-  const years =
-    options?.knownYears ?? (rawYears ?? []).map((row) => ({ plays: row.plays, year: row.bucket }));
-  const favoriteIds = new Set(favoriteAlbums.map((album) => album.id));
-  const shownAlbums = topAlbumIds.slice(0, TOP_ALBUMS);
-  const shownTracks = topTrackIds.slice(0, TOP_TRACKS);
-  const [albums, trackDisplays, artistMap] = await Promise.all([
-    resolveAlbums(
-      [...new Set([...shownAlbums, ...sessions].map((row) => row.albumId))],
-      favoriteAlbums,
-    ),
-    resolveTrackDisplays([
-      ...[...shownTracks, ...onRepeat, ...bucketTopTracks].map((row) => row.trackId),
-      ...playlistResult.rows.map((row) => row.topTrackId),
-    ]),
-    resolveArtists(depth.map((row) => row.artistId)),
-  ]);
-  const tracks = toStatsTracks(trackDisplays, favoriteIds);
-  const topPlaylists = toStatsPlaylists(playlistResult.rows, playlistResult.catalog, tracks);
-  const genres = toStatsGenres(await selectTopGenres(filter));
+    const shownAlbums = topAlbumIds.slice(0, TOP_ALBUMS);
+    const shownTracks = topTrackIds.slice(0, TOP_TRACKS);
+    const directAlbumIds = [...new Set([...shownAlbums, ...sessions].map((row) => row.albumId))];
+    const [trackDisplays, artistMap] = await Promise.all([
+      resolveTrackDisplays([
+        ...[...shownTracks, ...onRepeat, ...bucketTopTracks].map((row) => row.trackId),
+        ...playlistRows.map((row) => row.topTrackId),
+      ]),
+      resolveArtists(depth.map((row) => row.artistId)),
+    ]);
 
-  const minutesPerPlay =
-    durations && durations.knownPlays > 0
-      ? durations.knownMs / durations.knownPlays / 60_000
-      : FALLBACK_MINUTES_PER_PLAY;
+    const { albums, favoriteIds } = await resolveAlbums(
+      directAlbumIds,
+      [...trackDisplays.values()].map((track) => track.album.id),
+    );
+    const tracks = toStatsTracks(trackDisplays, favoriteIds);
+    const topPlaylists = toStatsPlaylists(playlistRows, tracks);
+    const genres = toStatsGenres(await selectTopGenres(filter));
 
-  const { champions, matrix, timeline } = buildRangeBreakdowns({
-    bucketTopTracks,
-    dailyPlays,
-    dayHourPlays,
-    monthlyPlays,
-    now,
-    range,
-    tracks,
-    years,
-  });
+    const minutesPerPlay =
+      summary.knownPlays > 0
+        ? summary.knownMs / summary.knownPlays / 60_000
+        : FALLBACK_MINUTES_PER_PLAY;
 
-  const slices = mapCatalogSlices({
-    albums,
-    artistMap,
-    onRepeat,
-    sessions,
-    shownAlbums,
-    shownTracks,
-    topDepthRows: depth.slice(0, TOP_DEPTH_ARTISTS),
-    tracks,
-  });
+    const { champions, matrix, timeline } = buildRangeBreakdowns({
+      bucketTopTracks,
+      dailyPlays,
+      dayHourPlays,
+      monthlyPlays,
+      now,
+      range,
+      tracks,
+      years,
+    });
+    const slices = mapCatalogSlices({
+      albums,
+      artistMap,
+      onRepeat,
+      sessions,
+      shownAlbums,
+      shownTracks,
+      topDepthRows: depth.slice(0, TOP_DEPTH_ARTISTS),
+      tracks,
+    });
+    const shownArtistIds = new Set([
+      ...slices.topArtists.map((artist) => artist.id),
+      ...[...albums.values()].flatMap((album) => album.artists.map((artist) => artist.id)),
+      ...[...tracks.values()].flatMap((track) => track.artists.map((artist) => artist.id)),
+      ...genres.flatMap((genre) => genre.artists.map((artist) => artist.id)),
+    ]);
+    const newArtists = await findNewArtists(shownArtistIds, range, latestPlayedAt, now);
 
-  const shownArtistIds = new Set([
-    ...slices.topArtists.map((artist) => artist.id),
-    ...[...albums.values()].flatMap((album) => album.artists.map((artist) => artist.id)),
-    ...[...tracks.values()].flatMap((track) => track.artists.map((artist) => artist.id)),
-    ...genres.flatMap((genre) => genre.artists.map((artist) => artist.id)),
-  ]);
-  const newArtists = await findNewArtists(shownArtistIds, range, latestPlayedAt, now);
-
-  return {
-    activeDays: summary.activeDays,
-    activeMonths: months.length,
-    artists: artistCount?.artists ?? 0,
-    champions,
-    dayStreak: longestDayStreak(dailyPlays.map((row) => row.day)),
-    ...slices,
-    firstPlayedAt: summary.firstPlayedAt.toISOString(),
-    genres,
-    hours: fillBuckets(hours, 24, 0),
-    lastPlayedAt: summary.lastPlayedAt.toISOString(),
-    matrix,
-    minutesPerPlay,
-    monthStreak: longestMonthStreak(months.map((row) => row.month)),
-    newArtists,
-    plays: summary.plays,
-    range,
-    sessionPlays: sessions[0]?.totalSessionPlays ?? 0,
-    sessions: sessions[0]?.totalSessions ?? 0,
-    shelf: { albums: shelf?.albums ?? 0, plays: shelf?.plays ?? 0 },
-    spanDays: range.kind === 'week' ? 7 : range.kind === 'month' ? 30 : (summary.spanDays ?? 1),
-    timeline,
-    topPlaylists,
-    tracks: summary.tracks,
-    years,
-  };
+    return {
+      activeDays: summary.activeDays,
+      activeMonths: activeMonthKeys.length,
+      artists: summary.artists,
+      champions,
+      dayStreak:
+        range.kind === 'all'
+          ? (allTimeDayStreak ?? { days: 0, end: '', start: '' })
+          : longestDayStreak(dailyPlays.map((row) => row.day)),
+      ...slices,
+      firstPlayedAt: summary.firstPlayedAt.toISOString(),
+      genres,
+      hours: fillBuckets(hours, 24, 0),
+      lastPlayedAt: summary.lastPlayedAt.toISOString(),
+      matrix,
+      minutesPerPlay,
+      monthStreak: longestMonthStreak(activeMonthKeys),
+      newArtists,
+      plays: summary.plays,
+      range,
+      sessionPlays: sessions[0]?.totalSessionPlays ?? 0,
+      sessions: sessions[0]?.totalSessions ?? 0,
+      shelf: { albums: summary.shelfAlbums, plays: summary.shelfPlays },
+      spanDays: range.kind === 'week' ? 7 : range.kind === 'month' ? 30 : (summary.spanDays ?? 1),
+      timeline,
+      topPlaylists,
+      tracks: summary.tracks,
+      years,
+    };
+  } catch (error) {
+    log.warn('Could not fetch listening stats from database', { error, range });
+    return null;
+  }
 }

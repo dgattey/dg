@@ -2,6 +2,7 @@ import 'server-only';
 
 import { db, Op } from '@dg/db';
 import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
+import { log } from '@dg/shared-core/logging/log';
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import { selectArtistFirstPlays } from './listeningStatsQueries';
 import { resolveTrackDisplays } from './trackDisplays';
@@ -62,17 +63,25 @@ function newArtistLabel(firstPlayedAt: Date, now: Date): string | null {
 /**
  * Fetches SpotifyPlay rows from the database.
  */
-function fetchSpotifyPlayRows({
+async function fetchSpotifyPlayRows({
   before,
   pageSize = DEFAULT_PAGE_SIZE,
 }: MusicHistoryPageOptions): Promise<Array<SpotifyHistoryRow>> {
+  if (process.env.NODE_ENV !== 'test' && !process.env.DATABASE_URL) {
+    return [];
+  }
   const whereClause = before ? { playedAt: { [Op.lt]: before } } : {};
-  return db.SpotifyPlay.findAll({
-    attributes: ['playedAt', 'trackId'],
-    limit: pageSize + 1,
-    order: [['playedAt', 'DESC']],
-    where: whereClause,
-  });
+  try {
+    return await db.SpotifyPlay.findAll({
+      attributes: ['playedAt', 'trackId'],
+      limit: pageSize + 1,
+      order: [['playedAt', 'DESC']],
+      where: whereClause,
+    });
+  } catch (error) {
+    log.warn('Could not read music history plays from database', { error });
+    return [];
+  }
 }
 
 /**
@@ -101,12 +110,11 @@ export async function fetchMusicHistoryPage({
   const artistIds = [...displays.values()].flatMap((display) =>
     display.artists.map((artist) => artist.id),
   );
-  const firstPlays = new Map(
-    (await selectArtistFirstPlays([...new Set(artistIds)])).map((row) => [
-      row.artistId,
-      row.playedAt,
-    ]),
-  );
+  const firstPlayRows = await selectArtistFirstPlays([...new Set(artistIds)]).catch((error) => {
+    log.warn('Could not read artist first plays from database', { error });
+    return [];
+  });
+  const firstPlays = new Map(firstPlayRows.map((row) => [row.artistId, row.playedAt]));
 
   const tracks = pageItems
     .map((play) => {

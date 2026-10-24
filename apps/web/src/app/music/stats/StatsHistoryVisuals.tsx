@@ -151,9 +151,6 @@ export function ActivityMatrixCard({
                     onFocus={() => setHoveredCell(cell)}
                     onMouseEnter={() => {
                       setHoveredCell(cell);
-                      if (cellYearFilter) {
-                        onPrefetchYear?.(cellYearFilter);
-                      }
                     }}
                     onMouseLeave={() => setHoveredCell(null)}
                     type="button"

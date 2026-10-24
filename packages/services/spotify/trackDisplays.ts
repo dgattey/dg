@@ -5,6 +5,7 @@ import { MusicAlbum } from '@dg/db/models/MusicAlbum';
 import { MusicArtist } from '@dg/db/models/MusicArtist';
 import { MusicTrack } from '@dg/db/models/MusicTrack';
 import { MusicTrackArtist } from '@dg/db/models/MusicTrackArtist';
+import { log } from '@dg/shared-core/logging/log';
 import { type SpotifyLink, spotifyUrl, toOrderedArtistLinks } from './spotifyLinks';
 import { mapInBatches } from './trackMetadataShared';
 import { fetchTrackDisplayData, type TrackDisplayData } from './trackMetadataSingle';
@@ -22,34 +23,44 @@ async function readCachedTracks(trackIds: Array<string>): Promise<Map<string, Tr
     return new Map();
   }
 
-  const cachedTracks = await MusicTrack.findAll({
-    include: [
-      MusicAlbum,
-      {
-        model: MusicArtist,
-        through: { attributes: ['position'] },
-      },
-    ],
-    where: { id: { [Op.in]: trackIds } },
-  });
-
-  return new Map(
-    cachedTracks.map((track) => [
-      track.id,
-      {
-        album: {
-          id: track.album.id,
-          imageUrl: track.album.imageUrl,
-          name: track.album.name,
-          url: spotifyUrl('album', track.album.id, track.album.url),
+  try {
+    const cachedTracks = await MusicTrack.findAll({
+      attributes: ['id', 'name', 'url', 'albumId'],
+      include: [
+        {
+          attributes: ['id', 'name', 'imageUrl', 'url'],
+          model: MusicAlbum,
         },
-        artists: toOrderedArtistLinks(track.artists),
-        id: track.id,
-        name: track.name,
-        url: spotifyUrl('track', track.id, track.url),
-      },
-    ]),
-  );
+        {
+          attributes: ['id', 'name', 'url'],
+          model: MusicArtist,
+          through: { attributes: ['position'] },
+        },
+      ],
+      where: { id: { [Op.in]: trackIds } },
+    });
+
+    return new Map(
+      cachedTracks.map((track) => [
+        track.id,
+        {
+          album: {
+            id: track.album.id,
+            imageUrl: track.album.imageUrl,
+            name: track.album.name,
+            url: spotifyUrl('album', track.album.id, track.album.url),
+          },
+          artists: toOrderedArtistLinks(track.artists),
+          id: track.id,
+          name: track.name,
+          url: spotifyUrl('track', track.id, track.url),
+        },
+      ]),
+    );
+  } catch (error) {
+    log.warn('Could not read cached tracks from database', { error });
+    return new Map();
+  }
 }
 
 export async function cacheTrackData(displayData: Array<TrackDisplayData>): Promise<void> {
@@ -75,11 +86,14 @@ export async function cacheTrackData(displayData: Array<TrackDisplayData>): Prom
     }
   }
 
-  // Artists and albums first, then tracks, then the junction rows that reference them.
-  await MusicArtist.bulkCreate([...artists.values()], { ignoreDuplicates: true });
-  await MusicAlbum.bulkCreate([...albums.values()], { ignoreDuplicates: true });
-  await MusicTrack.bulkCreate(tracks, { ignoreDuplicates: true });
-  await MusicTrackArtist.bulkCreate(trackArtists, { ignoreDuplicates: true });
+  try {
+    await MusicArtist.bulkCreate([...artists.values()], { ignoreDuplicates: true });
+    await MusicAlbum.bulkCreate([...albums.values()], { ignoreDuplicates: true });
+    await MusicTrack.bulkCreate(tracks, { ignoreDuplicates: true });
+    await MusicTrackArtist.bulkCreate(trackArtists, { ignoreDuplicates: true });
+  } catch (error) {
+    log.warn('Could not persist track display cache to database', { error });
+  }
 }
 
 function toTrackDisplay(data: TrackDisplayData): TrackDisplay {

@@ -18,11 +18,9 @@ import { ArtistLinks } from './StatsLinks';
 import { Stub } from './StatsShapes';
 
 export function TimelineBarsCard({
-  onPrefetchYear,
   onSelectYear,
   stats,
 }: {
-  onPrefetchYear?: (year: number) => void;
   onSelectYear?: (year: number) => void;
   stats: ListeningStats;
 }) {
@@ -120,9 +118,6 @@ export function TimelineBarsCard({
               }
               onMouseEnter={() => {
                 setHoveredKey(point.key);
-                if (yearFilter) {
-                  onPrefetchYear?.(yearFilter);
-                }
               }}
               onMouseLeave={() => setHoveredKey(null)}
             >

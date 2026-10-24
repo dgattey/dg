@@ -5,6 +5,7 @@ import { MusicAlbumArtist } from '@dg/db/models/MusicAlbumArtist';
 import { MusicArtist } from '@dg/db/models/MusicArtist';
 import { MusicTrack } from '@dg/db/models/MusicTrack';
 import { MusicTrackArtist } from '@dg/db/models/MusicTrackArtist';
+import { log } from '@dg/shared-core/logging/log';
 import * as v from 'valibot';
 import type { AlbumDetail, AlbumDetailArtist, AlbumDetailTrack } from './albumDetailTypes';
 import { spotifyUrl, toOrderedArtistLinks } from './spotifyLinks';
@@ -82,64 +83,74 @@ function isCompleteAlbumCache(album: MusicAlbum, tracks: Array<MusicTrack>): boo
 }
 
 async function readAlbumFromDb(albumId: string): Promise<AlbumDetail | null> {
-  const album = await MusicAlbum.findByPk(albumId, {
-    include: [
-      {
-        model: MusicArtist,
-        through: { attributes: ['position'] },
-      },
-    ],
-  });
-  if (!album) {
+  if (process.env.NODE_ENV !== 'test' && !process.env.DATABASE_URL) {
     return null;
   }
+  try {
+    const album = await MusicAlbum.findByPk(albumId, {
+      include: [
+        {
+          attributes: ['id', 'name', 'url'],
+          model: MusicArtist,
+          through: { attributes: ['position'] },
+        },
+      ],
+    });
+    if (!album) {
+      return null;
+    }
 
-  const tracks = await MusicTrack.findAll({
-    include: [
-      {
-        model: MusicArtist,
-        through: { attributes: ['position'] },
-      },
-    ],
-    where: { albumId },
-  });
+    const tracks = await MusicTrack.findAll({
+      include: [
+        {
+          attributes: ['id', 'name', 'url'],
+          model: MusicArtist,
+          through: { attributes: ['position'] },
+        },
+      ],
+      where: { albumId },
+    });
 
-  if (!isCompleteAlbumCache(album, tracks)) {
+    if (!isCompleteAlbumCache(album, tracks)) {
+      return null;
+    }
+
+    const albumArtists = toOrderedArtistLinks(album.artists);
+
+    const mappedTracks = sortTracks(
+      tracks.map((track) => ({
+        artists: toOrderedArtistLinks(track.artists),
+        discNumber: track.discNumber ?? 1,
+        durationMs: track.durationMs,
+        id: track.id,
+        name: track.name,
+        trackNumber: track.trackNumber ?? 0,
+        url: spotifyUrl('track', track.id, track.url),
+      })),
+    );
+
+    const artists: Array<AlbumDetailArtist> =
+      albumArtists.length > 0 ? albumArtists : (mappedTracks[0]?.artists ?? []);
+
+    const durationMs = mappedTracks.reduce((sum, track) => sum + (track.durationMs ?? 0), 0);
+
+    return {
+      artists,
+      durationMs,
+      id: album.id,
+      imageUrl: album.imageUrl,
+      label: album.label,
+      name: album.name,
+      popularity: album.popularity,
+      releaseDate: album.releaseDate,
+      totalTracks: album.totalTracks ?? mappedTracks.length,
+      tracks: mappedTracks,
+      url: spotifyUrl('album', album.id, album.url),
+    };
+  } catch (error) {
+    log.warn('Could not read cached album detail from database', { albumId, error });
     return null;
   }
-
-  const albumArtists = toOrderedArtistLinks(album.artists);
-
-  const mappedTracks = sortTracks(
-    tracks.map((track) => ({
-      artists: toOrderedArtistLinks(track.artists),
-      discNumber: track.discNumber ?? 1,
-      durationMs: track.durationMs,
-      id: track.id,
-      name: track.name,
-      trackNumber: track.trackNumber ?? 0,
-      url: spotifyUrl('track', track.id, track.url),
-    })),
-  );
-
-  const artists: Array<AlbumDetailArtist> =
-    albumArtists.length > 0 ? albumArtists : (mappedTracks[0]?.artists ?? []);
-
-  const durationMs = mappedTracks.reduce((sum, track) => sum + (track.durationMs ?? 0), 0);
-
-  return {
-    artists,
-    durationMs,
-    id: album.id,
-    imageUrl: album.imageUrl,
-    label: album.label,
-    name: album.name,
-    popularity: album.popularity,
-    releaseDate: album.releaseDate,
-    totalTracks: album.totalTracks ?? mappedTracks.length,
-    tracks: mappedTracks,
-    url: spotifyUrl('album', album.id, album.url),
-  };
 }
 
 async function fetchAllAlbumTracks(
@@ -241,26 +252,30 @@ async function writeAlbumThrough(detail: AlbumDetail): Promise<void> {
     }
   }
 
-  await MusicArtist.bulkCreate([...artists.values()], { ignoreDuplicates: true });
-  await MusicAlbum.upsert({
-    id: detail.id,
-    imageUrl: detail.imageUrl,
-    label: detail.label,
-    name: detail.name,
-    popularity: detail.popularity,
-    releaseDate: detail.releaseDate,
-    totalTracks: detail.totalTracks,
-    url: detail.url,
-  });
+  try {
+    await MusicArtist.bulkCreate([...artists.values()], { ignoreDuplicates: true });
+    await MusicAlbum.upsert({
+      id: detail.id,
+      imageUrl: detail.imageUrl,
+      label: detail.label,
+      name: detail.name,
+      popularity: detail.popularity,
+      releaseDate: detail.releaseDate,
+      totalTracks: detail.totalTracks,
+      url: detail.url,
+    });
 
-  // Replace album-artist + track rows so a partial history cache becomes a full album.
-  await MusicAlbumArtist.destroy({ where: { albumId: detail.id } });
-  await MusicAlbumArtist.bulkCreate(albumArtists, { ignoreDuplicates: true });
+    // Replace album-artist + track rows so a partial history cache becomes a full album.
+    await MusicAlbumArtist.destroy({ where: { albumId: detail.id } });
+    await MusicAlbumArtist.bulkCreate(albumArtists, { ignoreDuplicates: true });
 
-  await MusicTrack.bulkCreate(tracks, {
-    updateOnDuplicate: ['albumId', 'discNumber', 'durationMs', 'name', 'trackNumber', 'url'],
-  });
-  await MusicTrackArtist.bulkCreate(trackArtists, { ignoreDuplicates: true });
+    await MusicTrack.bulkCreate(tracks, {
+      updateOnDuplicate: ['albumId', 'discNumber', 'durationMs', 'name', 'trackNumber', 'url'],
+    });
+    await MusicTrackArtist.bulkCreate(trackArtists, { ignoreDuplicates: true });
+  } catch (error) {
+    log.warn('Could not persist album detail cache to database', { albumId: detail.id, error });
+  }
 }
 
 const SPOTIFY_ID_PATTERN = /^[0-9A-Za-z]{1,64}$/;

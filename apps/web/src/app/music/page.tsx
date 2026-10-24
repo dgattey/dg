@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
+import { log } from '@dg/shared-core/logging/log';
 import { devConsoleRoute, musicRoute } from '@dg/shared-core/routes/app';
 import './music.css';
 import type { Metadata } from 'next';
@@ -23,8 +24,8 @@ export const metadata: Metadata = {
 };
 
 async function MusicHistory() {
-  let tracks: Awaited<ReturnType<typeof getMusicHistory>>['tracks'];
-  let nextCursor: Awaited<ReturnType<typeof getMusicHistory>>['nextCursor'];
+  let tracks: Awaited<ReturnType<typeof getMusicHistory>>['tracks'] = [];
+  let nextCursor: Awaited<ReturnType<typeof getMusicHistory>>['nextCursor'] = null;
 
   try {
     const result = await getMusicHistory({});
@@ -34,7 +35,7 @@ async function MusicHistory() {
     if (isMissingTokenError(error) && process.env.NODE_ENV === 'development') {
       redirect(devConsoleRoute);
     }
-    throw error;
+    log.warn('Music history unavailable; degrading to empty state', { error });
   }
 
   return <MusicInfiniteScroll initialCursor={nextCursor} initialTracks={tracks} />;

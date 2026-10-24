@@ -1,4 +1,5 @@
 import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
+import { fetchLatestStravaActivityFromDb } from '../fetchLatestStravaActivityFromDb';
 import { fetchStravaHistoryFromDb } from '../fetchStravaHistoryFromDb';
 
 const NOW = new Date('2026-10-22T12:00:00Z');
@@ -8,6 +9,22 @@ describe('fetchStravaHistoryFromDb', () => {
 
   it('returns null when no activities are stored', async () => {
     await expect(fetchStravaHistoryFromDb(NOW)).resolves.toBeNull();
+  });
+
+  it('degrades to null when the database query fails', async () => {
+    const spy = jest
+      .spyOn(db.StravaActivity, 'findAll')
+      .mockRejectedValueOnce(new Error('Neon network transfer limit exceeded'));
+    const oneSpy = jest
+      .spyOn(db.StravaActivity, 'findOne')
+      .mockRejectedValueOnce(new Error('Neon network transfer limit exceeded'));
+    try {
+      await expect(fetchStravaHistoryFromDb(NOW)).resolves.toBeNull();
+      await expect(fetchLatestStravaActivityFromDb()).resolves.toBeNull();
+    } finally {
+      spy.mockRestore();
+      oneSpy.mockRestore();
+    }
   });
 
   it('summarizes canonical camelCase rows and skips unreadable ones', async () => {
