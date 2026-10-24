@@ -10,10 +10,9 @@ jest.mock('../contentfulClient', () => ({
 
 function asset(overrides: Record<string, unknown>) {
   return {
-    description: 'Homepage collage',
     fileName: 'changelog-v2.0.0.png',
     height: 800,
-    title: 'Version two',
+    title: 'v2.0.0',
     url: 'https://images.ctfassets.net/example/changelog-v2.0.0.webp',
     width: 1200,
     ...overrides,
@@ -31,9 +30,8 @@ describe('fetchChangelogSnapshots', () => {
         items: [
           asset({}),
           asset({
-            description: '   ',
             fileName: 'changelog-V1.4.2.JPEG',
-            title: ' Earlier ',
+            title: ' Angular 2 prototype ',
             url: 'https://images.ctfassets.net/example/v1.webp',
           }),
           asset({
@@ -56,21 +54,26 @@ describe('fetchChangelogSnapshots', () => {
 
     const snapshots = await fetchChangelogSnapshots();
 
-    expect([...snapshots.keys()]).toEqual(['v2.0.0', 'v1.4.2']);
+    expect([...snapshots.keys()]).toEqual(['v2.0.0', 'v1.4.2', 'v3.0.0']);
     expect(snapshots.get('v2.0.0')).toEqual({
-      caption: 'Homepage collage',
       height: 800,
       tag: 'v2.0.0',
-      title: 'Version two',
+      title: null,
       url: 'https://images.ctfassets.net/example/changelog-v2.0.0.webp',
       width: 1200,
     });
     expect(snapshots.get('v1.4.2')).toEqual({
-      caption: null,
       height: 800,
       tag: 'v1.4.2',
-      title: 'Earlier',
+      title: 'Angular 2 prototype',
       url: 'https://images.ctfassets.net/example/v1.webp',
+      width: 1200,
+    });
+    expect(snapshots.get('v3.0.0')).toEqual({
+      height: 800,
+      tag: 'v3.0.0',
+      title: null,
+      url: 'https://images.ctfassets.net/example/changelog-v2.0.0.webp',
       width: 1200,
     });
   });

@@ -3,10 +3,9 @@ import type { Asset } from '../schema/shared';
 const CHANGELOG_SNAPSHOT_FILE = /^changelog-(v\d+\.\d+\.\d+)\.(?:png|jpe?g|webp)$/i;
 
 export type RenderableChangelogSnapshot = {
-  caption: string | null;
   height: number;
   tag: string;
-  title: string;
+  title: string | null;
   url: string;
   width: number;
 };
@@ -27,17 +26,16 @@ export function toRenderableChangelogSnapshot(
     return null;
   }
   const tag = parseChangelogSnapshotTag(asset.fileName);
-  const title = asset.title?.trim() ?? '';
   const url = asset.url?.trim() ?? '';
   const { height, width } = asset;
-  if (!tag || !title || !url || !isPositiveDimension(width) || !isPositiveDimension(height)) {
+  if (!tag || !url || !isPositiveDimension(width) || !isPositiveDimension(height)) {
     return null;
   }
+  const rawTitle = asset.title?.trim() ?? '';
   return {
-    caption: asset.description?.trim() || null,
     height,
     tag,
-    title,
+    title: rawTitle && rawTitle.toLowerCase() !== tag ? rawTitle : null,
     url,
     width,
   };

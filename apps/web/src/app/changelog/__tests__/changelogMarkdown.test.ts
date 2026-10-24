@@ -26,15 +26,14 @@ const release = (
 });
 
 describe('getChangelogMarkdown', () => {
-  it('lists a snapshot url under the release that has one', async () => {
+  it('does not emit snapshot commentary', async () => {
     mockGetChangelogReleases.mockResolvedValue([
       release({
         notes: ['Starts using Gatsby as source of truth.'],
         snapshot: {
-          caption: 'Launch day.',
           height: 800,
           tag: 'v2.0.0',
-          title: 'Version two',
+          title: 'Angular 2 prototype',
           url: 'https://images.ctfassets.net/example/changelog-v2.0.0.webp',
           width: 1200,
         },
@@ -45,11 +44,9 @@ describe('getChangelogMarkdown', () => {
 
     const markdown = await getChangelogMarkdown();
 
-    expect(markdown).toContain(
-      '  - Snapshot (Version two): https://images.ctfassets.net/example/changelog-v2.0.0.webp',
-    );
-    const unpictured = markdown.split('\n').find((line) => line.includes('v1.4.2'));
-    expect(unpictured).toBeDefined();
-    expect(unpictured).not.toContain('Snapshot');
+    expect(markdown).toContain('Starts using Gatsby as source of truth.');
+    expect(markdown).not.toContain('Snapshot');
+    expect(markdown).not.toContain('https://images.ctfassets.net/example/changelog-v2.0.0.webp');
+    expect(markdown).toContain('v1.4.2');
   });
 });

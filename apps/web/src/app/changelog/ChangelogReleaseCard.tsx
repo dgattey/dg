@@ -4,6 +4,7 @@ import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import {
   formatReleaseDate,
+  formatReleaseNote,
   githubPullRequestUrl,
   RELEASE_KIND_LABELS,
   RELEASE_KIND_TONES,
@@ -96,7 +97,7 @@ export function ChangelogReleaseCard({
               <ul className="changelog__notes">
                 {release.notes.map((note) => (
                   <li className="changelog__noteItem" key={note}>
-                    {note}
+                    {formatReleaseNote(note)}
                   </li>
                 ))}
               </ul>
@@ -112,7 +113,11 @@ export function ChangelogReleaseCard({
             <figure className="changelog__polaroid" style={{ rotate: `${polaroidTilt}deg` }}>
               <div className="changelog__polaroidFrame">
                 <Image
-                  alt={`${release.tag} — ${snapshot.title}`}
+                  alt={
+                    snapshot.title
+                      ? `${release.tag} — ${snapshot.title}`
+                      : `${release.tag} snapshot`
+                  }
                   className="changelog__polaroidImg"
                   height={snapshot.height}
                   sizes="(max-width: 760px) 100vw, 340px"
@@ -120,12 +125,11 @@ export function ChangelogReleaseCard({
                   width={snapshot.width}
                 />
               </div>
-              <figcaption className="changelog__polaroidCaption">
-                <span className="changelog__polaroidTitle">{snapshot.title}</span>
-                {snapshot.caption ? (
-                  <span className="changelog__polaroidSub">{snapshot.caption}</span>
-                ) : null}
-              </figcaption>
+              {snapshot.title ? (
+                <figcaption className="changelog__polaroidCaption">
+                  <span className="changelog__polaroidTitle">{snapshot.title}</span>
+                </figcaption>
+              ) : null}
             </figure>
           ) : null}
         </div>

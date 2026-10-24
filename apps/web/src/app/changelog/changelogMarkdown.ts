@@ -32,10 +32,7 @@ export async function getChangelogMarkdown(): Promise<string> {
           const kind = RELEASE_KIND_LABELS[release.kind];
           const notes =
             release.notes.length > 0 ? `\n${release.notes.map((n) => `  - ${n}`).join('\n')}` : '';
-          const snapshot = release.snapshot
-            ? `\n  - Snapshot (${release.snapshot.title}): ${release.snapshot.url}`
-            : '';
-          return `- **[${release.tag}](${release.htmlUrl})** (${kind})${dateSuffix}${notes}${snapshot}`;
+          return `- **[${release.tag}](${release.htmlUrl})** (${kind})${dateSuffix}${notes}`;
         });
         sections.push(`## ${year}`, lines.join('\n'));
       }

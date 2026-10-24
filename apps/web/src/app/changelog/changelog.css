@@ -143,7 +143,7 @@
   min-width: 0;
 }
 .changelog__polaroid {
-  padding: 10px 10px 12px;
+  padding: 10px;
   margin: 0;
   background: var(--cream);
   border: 1px solid color-mix(in oklab, var(--ink-on-cream) 10%, transparent);
@@ -171,13 +171,6 @@
   font-weight: 700;
   line-height: var(--leading-title);
   color: var(--ink-on-cream);
-}
-.changelog__polaroidSub {
-  font-family: var(--body);
-  font-size: var(--type-caption);
-  font-weight: 400;
-  line-height: var(--leading-meta);
-  color: var(--soft);
 }
 .changelog__cardHeader {
   display: flex;

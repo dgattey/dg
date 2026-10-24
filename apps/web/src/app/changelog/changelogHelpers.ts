@@ -152,3 +152,7 @@ export function groupReleasesByYear(
 export function githubPullRequestUrl(prNumber: number): string {
   return `${GITHUB_REPOSITORY_URL}/pull/${prNumber}`;
 }
+
+export function formatReleaseNote(note: string): string {
+  return note.replace(/\s*\(#\d+\)(?=[.!?]?$)/g, '').trim();
+}

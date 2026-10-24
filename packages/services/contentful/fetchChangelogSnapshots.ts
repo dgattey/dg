@@ -15,7 +15,6 @@ const QUERY = gql`
       items {
         fileName
         title
-        description
         url(transform: { quality: 90, format: WEBP, width: 1200 })
         width
         height

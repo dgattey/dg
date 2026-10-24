@@ -14,9 +14,9 @@ const SAMPLE_RELEASES: ReadonlyArray<ChangelogRelease> = [
     major: 2,
     minor: 80,
     name: 'v2.80.1',
-    notes: ['Extended page cache lifetimes to reduce background revalidation overhead (#661).'],
+    notes: ['Added a Top playlists card with the #1 song from each playlist (#702).'],
     patch: 1,
-    prNumbers: [661],
+    prNumbers: [702],
     publishedAt: '2026-10-22T17:08:39Z',
     tag: 'v2.80.1',
     version: '2.80.1',
@@ -47,7 +47,6 @@ const SAMPLE_RELEASES: ReadonlyArray<ChangelogRelease> = [
     prNumbers: [],
     publishedAt: '2023-12-30T10:04:33Z',
     snapshot: {
-      caption: 'The collage before the rewrite.',
       height: 900,
       tag: 'v2.46.23',
       title: 'December collage',
@@ -94,6 +93,13 @@ describe('ChangelogLedger', () => {
 
     const prLinks = screen.getAllByRole('link', { name: '#660' });
     expect(prLinks[0]).toHaveAttribute('href', 'https://github.com/dgattey/dg/pull/660');
+    expect(screen.getByRole('link', { name: '#702' })).toHaveAttribute(
+      'href',
+      'https://github.com/dgattey/dg/pull/702',
+    );
+    expect(
+      screen.getByText('Added a Top playlists card with the #1 song from each playlist.'),
+    ).toBeInTheDocument();
 
     await user.click(screen.getByRole('button', { name: /Minor/i }));
     expect(screen.getByText('v2.80.0')).toBeInTheDocument();
@@ -110,8 +116,35 @@ describe('ChangelogLedger', () => {
     const photo = screen.getByRole('img', { name: 'v2.46.23 — December collage' });
     expect(photo).toHaveAttribute('src', expect.stringContaining('changelog-v2.46.23.webp'));
     expect(screen.getByText('December collage')).toBeInTheDocument();
-    expect(screen.getByText('The collage before the rewrite.')).toBeInTheDocument();
+    expect(screen.queryByText('The collage before the rewrite.')).not.toBeInTheDocument();
     expect(screen.queryByText('Tagged builds in 2023')).not.toBeInTheDocument();
     expect(photo.closest('figure')).toHaveStyle({ rotate: '-2.1deg' });
+  });
+
+  it('renders a snapshot without a caption when the asset title is only the version tag', () => {
+    const pictured = SAMPLE_RELEASES[2];
+    if (!pictured) {
+      throw new Error('missing sample release');
+    }
+    render(
+      <ChangelogLedger
+        releases={[
+          {
+            ...pictured,
+            notes: [],
+            snapshot: {
+              height: 900,
+              tag: 'v2.46.23',
+              title: null,
+              url: 'https://images.ctfassets.net/example/changelog-v2.46.23.webp',
+              width: 1200,
+            },
+          },
+        ]}
+      />,
+    );
+
+    expect(screen.getByRole('img', { name: 'v2.46.23 snapshot' })).toBeInTheDocument();
+    expect(screen.queryByText('December collage')).not.toBeInTheDocument();
   });
 });
