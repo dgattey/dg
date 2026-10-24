@@ -6,6 +6,7 @@ import type { FooterContent } from '@dg/content-models/contentful/renderables/fo
 import type { Track } from '@dg/content-models/spotify/Track';
 import type { StravaActivity } from '@dg/content-models/strava/StravaActivity';
 import {
+  activitiesRoute,
   changelogRoute,
   favoriteAlbumsRoute,
   homeRoute,
@@ -13,7 +14,6 @@ import {
   musicStatsRoute,
   readingRoute,
   siteMapRoute,
-  stravaRoute,
 } from '@dg/shared-core/routes/app';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { render, screen, within } from '@testing-library/react';
@@ -213,7 +213,7 @@ describe('Footer', () => {
       ['Plays', musicRoute],
       ['Favorite albums', favoriteAlbumsRoute],
       ['Reads', readingRoute],
-      ['Big map', stravaRoute],
+      ['Big map', activitiesRoute],
     ]);
   });
 

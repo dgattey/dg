@@ -9,16 +9,22 @@ import type {
   StravaSport,
   StravaYearTotals,
 } from '@dg/content-models/strava/StravaHistory';
-import { measureSfStreetCoverage } from './measureSfStreetCoverage';
+import { measureCityCoverage } from './measureStreetCoverage';
 
 const SPORT_BY_STRAVA_TYPE: Partial<Record<string, StravaSport>> = {
+  AlpineSki: 'ski',
+  BackcountrySki: 'ski',
   EBikeRide: 'ride',
   GravelRide: 'ride',
   Handcycle: 'ride',
   Hike: 'hike',
   MountainBikeRide: 'ride',
+  NordicSki: 'ski',
   Ride: 'ride',
+  RollerSki: 'ski',
   Run: 'run',
+  Ski: 'ski',
+  Snowboard: 'ski',
   TrailRun: 'run',
   Velomobile: 'ride',
   VirtualRide: 'ride',
@@ -76,17 +82,18 @@ const bikeIdOf = ({ gear, gearId }: StravaActivity) => {
   return id?.startsWith('b') ? id : null;
 };
 
-/** Distance per UTC year across the rides' span, so quiet years show up as gaps. */
-const yearlyDistance = (rides: ReadonlyArray<StravaLogEntry>): StravaBike['years'] => {
+/** Totals per UTC year across the rides' span, so quiet years show up as gaps. */
+const yearlyRides = (rides: ReadonlyArray<StravaLogEntry>): StravaBike['years'] => {
   const years = rides.map(yearOf);
   const first = Math.min(...years);
   return Array.from({ length: Math.max(...years) - first + 1 }, (_, index) => {
     const year = first + index;
+    const inYear = rides.filter((ride) => yearOf(ride) === year);
     return {
-      distanceMeters: sumOf(
-        rides.filter((ride) => yearOf(ride) === year),
-        (ride) => ride.distanceMeters,
-      ),
+      distanceMeters: sumOf(inYear, (ride) => ride.distanceMeters),
+      elevationGainMeters: sumOf(inYear, (ride) => ride.elevationGainMeters),
+      movingTimeSeconds: sumOf(inYear, (ride) => ride.movingTimeSeconds),
+      rides: inYear.length,
       year,
     };
   });
@@ -130,7 +137,7 @@ const findBikes = (dated: ReadonlyArray<DatedActivity>): Array<StravaBike> => {
               name,
               odometerMeters,
               rides: rides.length,
-              years: yearlyDistance(rides),
+              years: yearlyRides(rides),
             },
           ]
         : [];
@@ -158,7 +165,7 @@ export const summarizeStravaHistory = (
     bikes: findBikes(dated),
     latest: toOuting(newest),
     outings,
-    sfCoverage: measureSfStreetCoverage(outings, now),
+    streetCoverage: measureCityCoverage(outings, now),
     thisYear: yearTotals(
       currentYear,
       outings.filter((outing) => yearOf(outing) === currentYear),

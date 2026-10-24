@@ -14,7 +14,7 @@ export const musicStatsRoute = '/music/stats' as const;
 
 export const readingRoute = '/reading' as const;
 
-export const stravaRoute = '/strava' as const;
+export const activitiesRoute = '/activities' as const;
 
 export const changelogRoute = '/changelog' as const;
 
@@ -99,9 +99,9 @@ export const markdownPages = [
   },
   {
     changeFrequency: 'daily',
-    path: stravaRoute,
+    path: activitiesRoute,
     priority: 0.6,
-    summary: 'Routes, yearly miles, and recent outings from my Strava history',
+    summary: 'Routes, yearly miles, and recent activities from my Strava history',
     title: 'Big map',
   },
   {

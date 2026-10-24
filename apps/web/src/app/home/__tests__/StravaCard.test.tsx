@@ -65,11 +65,19 @@ const history: StravaHistory = {
     route(103, TAHOE, 'hike'),
     { ...route(104, '', 'ride'), polyline: null },
   ],
-  sfCoverage: {
-    neighborhoods: [],
-    projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
-    ridden: {},
-    viewBox: '0 0 10 10',
+  streetCoverage: {
+    sd: {
+      neighborhoods: [],
+      projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
+      ridden: {},
+      viewBox: '0 0 10 10',
+    },
+    sf: {
+      neighborhoods: [],
+      projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
+      ridden: {},
+      viewBox: '0 0 10 10',
+    },
   },
   thisYear: {
     distanceMeters: 1_420 * METERS_PER_MILE,
@@ -127,7 +135,7 @@ describe('StravaCard', () => {
 
     expect(screen.getByRole('heading', { name: 'Exercise stats' })).toBeInTheDocument();
     const atlas = screen.getByRole('link', { name: 'Big map' });
-    expect(atlas).toHaveAttribute('href', '/strava');
+    expect(atlas).toHaveAttribute('href', '/activities');
     expect(inkedTones(atlas)).toEqual(['cobalt', 'vermilion']);
     expect(within(atlas).getByText('3 routes')).toBeInTheDocument();
   });

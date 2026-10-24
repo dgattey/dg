@@ -60,10 +60,14 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   display: none;
 }
 .chrome__musicChevron {
-  transition: rotate 0.2s ease;
+  transition: rotate 160ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .chrome__music[open] .chrome__musicChevron {
   rotate: 180deg;
+}
+/* Keeps the closed panel rendered long enough to animate out where browsers allow it. */
+.chrome__music::details-content {
+  transition: content-visibility 160ms allow-discrete;
 }
 .chrome__musicPanel {
   --hover-gap: 10px;
@@ -71,8 +75,36 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   top: calc(100% + var(--hover-gap));
   right: 0;
   z-index: 30;
+  visibility: hidden;
   width: max-content;
   min-width: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transform: translateY(-5px) scale(0.97) rotate(-0.8deg);
+  transform-origin: top right;
+  transition:
+    opacity 160ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 160ms allow-discrete;
+}
+.chrome__music[open] .chrome__musicPanel {
+  visibility: visible;
+  pointer-events: auto;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+@starting-style {
+  .chrome__music[open] .chrome__musicPanel {
+    opacity: 0;
+    transform: translateY(-5px) scale(0.97) rotate(-0.8deg);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chrome__musicChevron,
+  .chrome__music::details-content,
+  .chrome__musicPanel {
+    transition: none;
+  }
 }
 /* Bridges the gap under the trigger, so a diagonal path into the menu never leaves hover. */
 .chrome__musicPanel::before {

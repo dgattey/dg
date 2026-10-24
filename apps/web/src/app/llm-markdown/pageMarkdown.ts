@@ -1,6 +1,7 @@
 import 'server-only';
 
 import {
+  activitiesRoute,
   changelogRoute,
   favoriteAlbumsRoute,
   homeRoute,
@@ -9,7 +10,6 @@ import {
   musicStatsRoute,
   readingRoute,
   siteMapRoute,
-  stravaRoute,
 } from '@dg/shared-core/routes/app';
 import { cacheLife } from 'next/cache';
 export const pageMarkdownGenerators: {
@@ -43,8 +43,8 @@ export const pageMarkdownGenerators: {
     const { getSiteMapMarkdown } = await import('../site-map/siteMapMarkdown');
     return await getSiteMapMarkdown();
   },
-  [stravaRoute]: async () => {
-    const { getStravaMarkdown } = await import('../strava/stravaMarkdown');
+  [activitiesRoute]: async () => {
+    const { getStravaMarkdown } = await import('../activities/stravaMarkdown');
     return await getStravaMarkdown();
   },
 };

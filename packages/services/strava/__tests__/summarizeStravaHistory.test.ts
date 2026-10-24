@@ -145,8 +145,11 @@ describe('summarizeStravaHistory', () => {
         { type: 'Hike' },
         { type: 'Walk' },
         { sportType: 'AlpineSki', type: 'AlpineSki' },
+        { sportType: 'Snowboard', type: 'Snowboard' },
+        { sportType: 'NordicSki', type: 'NordicSki' },
+        { sportType: 'Workout', type: 'Workout' },
       ]),
-    ).toEqual(['run', 'run', 'run', 'hike', 'hike', 'other']);
+    ).toEqual(['run', 'run', 'run', 'hike', 'hike', 'ski', 'ski', 'ski', 'other']);
   });
 
   it('totals lifetime and this year', () => {
@@ -215,10 +218,22 @@ describe('summarizeStravaHistory', () => {
         odometerMeters: 9_000_000,
         rides: 2,
         years: [
-          { distanceMeters: 190_000, year: 2023 },
-          { distanceMeters: 0, year: 2024 },
-          { distanceMeters: 0, year: 2025 },
-          { distanceMeters: 40_000, year: 2026 },
+          {
+            distanceMeters: 190_000,
+            elevationGainMeters: 2400,
+            movingTimeSeconds: 27_000,
+            rides: 1,
+            year: 2023,
+          },
+          { distanceMeters: 0, elevationGainMeters: 0, movingTimeSeconds: 0, rides: 0, year: 2024 },
+          { distanceMeters: 0, elevationGainMeters: 0, movingTimeSeconds: 0, rides: 0, year: 2025 },
+          {
+            distanceMeters: 40_000,
+            elevationGainMeters: 600,
+            movingTimeSeconds: 5400,
+            rides: 1,
+            year: 2026,
+          },
         ],
       },
       {
@@ -235,9 +250,27 @@ describe('summarizeStravaHistory', () => {
         odometerMeters: 5_300_000,
         rides: 3,
         years: [
-          { distanceMeters: 60_000, year: 2024 },
-          { distanceMeters: 30_000, year: 2025 },
-          { distanceMeters: 20_000, year: 2026 },
+          {
+            distanceMeters: 60_000,
+            elevationGainMeters: 0,
+            movingTimeSeconds: 0,
+            rides: 1,
+            year: 2024,
+          },
+          {
+            distanceMeters: 30_000,
+            elevationGainMeters: 0,
+            movingTimeSeconds: 0,
+            rides: 1,
+            year: 2025,
+          },
+          {
+            distanceMeters: 20_000,
+            elevationGainMeters: 0,
+            movingTimeSeconds: 0,
+            rides: 1,
+            year: 2026,
+          },
         ],
       },
     ]);
@@ -258,7 +291,15 @@ describe('summarizeStravaHistory', () => {
         name: 'Cruz',
         odometerMeters: 7_828_686,
         rides: 1,
-        years: [{ distanceMeters: 30_000, year: 2026 }],
+        years: [
+          {
+            distanceMeters: 30_000,
+            elevationGainMeters: 400,
+            movingTimeSeconds: 3600,
+            rides: 1,
+            year: 2026,
+          },
+        ],
       },
     ]);
   });
@@ -273,7 +314,10 @@ describe('summarizeStravaHistory', () => {
       bikes: [],
       latest: expect.objectContaining({ distanceMeters: 0, id: 7, polyline: null, sport: 'hike' }),
       outings: [expect.objectContaining({ id: 7 })],
-      sfCoverage: expect.objectContaining({ ridden: {} }),
+      streetCoverage: {
+        sd: expect.objectContaining({ ridden: {} }),
+        sf: expect.objectContaining({ ridden: {} }),
+      },
       thisYear: { distanceMeters: 0, elevationGainMeters: 0, outings: 0, year: 2026 },
       totals: { distanceMeters: 0, elevationGainMeters: 0, firstYear: 2023, outings: 1 },
     });
@@ -284,7 +328,7 @@ describe('summarizeStravaHistory', () => {
       [3_776_510, -12_242_183],
       [3_775_235, -12_242_040],
     ]);
-    const { sfCoverage } =
+    const { streetCoverage } =
       summarizeStravaHistory(
         [
           activity({
@@ -295,12 +339,36 @@ describe('summarizeStravaHistory', () => {
         ],
         NOW,
       ) ?? {};
-    const names = sfCoverage?.neighborhoods.map(({ name }) => name) ?? [];
+    const names = streetCoverage?.sf.neighborhoods.map(({ name }) => name) ?? [];
     expect(names).toHaveLength(41);
-    const ridden = sfCoverage?.ridden['ride week'] ?? [];
+    const ridden = streetCoverage?.sf.ridden['ride week'] ?? [];
     const mission = ridden[names.indexOf('Mission')] ?? 0;
     expect(mission).toBeGreaterThan(900);
     expect(mission).toBeLessThan(1700);
     expect(ridden.reduce((sum, meters) => sum + meters, 0)).toBe(mission);
+    expect(streetCoverage?.sd.ridden['ride week']).toBeUndefined();
+  });
+
+  it('measures San Diego street coverage by community planning area', () => {
+    const universityAvenue = encodePolyline([
+      [3_274_862, -11_713_000],
+      [3_274_862, -11_712_000],
+    ]);
+    const { streetCoverage } =
+      summarizeStravaHistory(
+        [
+          activity({
+            id: 31,
+            map: { summaryPolyline: universityAvenue },
+            startDate: '2026-10-21T12:00:00Z',
+          }),
+        ],
+        NOW,
+      ) ?? {};
+    const names = streetCoverage?.sd.neighborhoods.map(({ name }) => name) ?? [];
+    expect(names).toEqual(expect.arrayContaining(['North Park', 'Uptown', 'Pacific Beach']));
+    const ridden = streetCoverage?.sd.ridden['ride week'] ?? [];
+    expect(ridden[names.indexOf('North Park')]).toBeGreaterThan(500);
+    expect(streetCoverage?.sf.ridden['ride week']).toBeUndefined();
   });
 });

@@ -7,15 +7,15 @@ import {
   type RouteFrame,
 } from '@dg/maps/src/routeFrame';
 import { projectRouteToPixels, toSvgPath } from '@dg/maps/src/routeGeometry';
-import { formatCount } from '../music/stats/listeningStatsFormat';
 import {
   formatCompactFeet,
   formatFeet,
   formatMiles,
   formatOutingDate,
   formatRouteCount,
-} from '../strava/stravaFormat';
-import { SPORT_DETAILS, toMapRoutes } from '../strava/stravaSports';
+} from '../activities/stravaFormat';
+import { SPORT_DETAILS, toMapRoutes } from '../activities/stravaSports';
+import { formatCount } from '../music/stats/listeningStatsFormat';
 import type { PaperColor } from './SocialCardParts';
 import {
   STRAVA_CARD_MAP_FRAME,

@@ -3,11 +3,11 @@
  */
 
 import {
+  activitiesRoute,
   favoriteAlbumsRoute,
   musicRoute,
   musicStatsRoute,
   readingRoute,
-  stravaRoute,
 } from '@dg/shared-core/routes/app';
 import { render, screen, within } from '@testing-library/react';
 import { usePathname } from 'next/navigation';
@@ -41,6 +41,6 @@ describe('Header navigation (CollageMusicLinks)', () => {
     ]);
 
     expect(screen.getByRole('link', { name: 'Reads' })).toHaveAttribute('href', readingRoute);
-    expect(screen.getByRole('link', { name: 'Big map' })).toHaveAttribute('href', stravaRoute);
+    expect(screen.getByRole('link', { name: 'Big map' })).toHaveAttribute('href', activitiesRoute);
   });
 });

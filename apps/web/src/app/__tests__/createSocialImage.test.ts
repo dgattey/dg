@@ -52,6 +52,8 @@ import { fetchStravaHistoryFromDb } from '@dg/services/strava/fetchStravaHistory
 import { cacheLife, cacheTag } from 'next/cache';
 import { ImageResponse } from 'next/og';
 import { isValidElement } from 'react';
+import * as stravaOg from '../activities/opengraph-image';
+import * as stravaTwitter from '../activities/twitter-image';
 import * as changelogOg from '../changelog/opengraph-image';
 import * as changelogTwitter from '../changelog/twitter-image';
 import { currentPacificYear } from '../collage/socialCardVariants';
@@ -74,8 +76,6 @@ import * as readingOg from '../reading/opengraph-image';
 import * as readingTwitter from '../reading/twitter-image';
 import * as siteMapOg from '../site-map/opengraph-image';
 import * as siteMapTwitter from '../site-map/twitter-image';
-import * as stravaOg from '../strava/opengraph-image';
-import * as stravaTwitter from '../strava/twitter-image';
 import * as homeTwitter from '../twitter-image';
 
 const TRUETYPE_SFNT_VERSION = 0x00010000;
@@ -352,6 +352,12 @@ describe('createSocialImage', () => {
   });
 
   it('builds the Strava social card with projected route paths, recent stat, and lifetime seals', async () => {
+    const emptyCoverage = {
+      neighborhoods: [],
+      projection: { origin: { lat: 37.8, lng: -122.5 }, perDegree: { lat: -100, lng: 100 } },
+      ridden: {},
+      viewBox: '0 0 100 100',
+    };
     jest.mocked(fetchStravaHistoryFromDb).mockResolvedValue({
       bikes: [],
       latest: {
@@ -379,12 +385,7 @@ describe('createSocialImage', () => {
           url: 'https://www.strava.com/activities/1',
         },
       ],
-      sfCoverage: {
-        neighborhoods: [],
-        projection: { origin: { lat: 37.8, lng: -122.5 }, perDegree: { lat: -100, lng: 100 } },
-        ridden: {},
-        viewBox: '0 0 100 100',
-      },
+      streetCoverage: { sd: emptyCoverage, sf: emptyCoverage },
       thisYear: { distanceMeters: 1000, elevationGainMeters: 100, outings: 1, year: 2026 },
       totals: {
         distanceMeters: 44510425,

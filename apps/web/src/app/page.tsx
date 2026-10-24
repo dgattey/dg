@@ -1,7 +1,7 @@
 import './collage/home.css';
 import './collage/print.css';
 import './music/stats/statsShapes.css';
-import './strava/stravaPieces.css';
+import './activities/stravaPieces.css';
 
 import { homeRoute } from '@dg/shared-core/routes/app';
 import type { Metadata, ResolvingMetadata } from 'next';

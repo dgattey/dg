@@ -34,6 +34,12 @@
   grid-area: sort;
   justify-self: end;
 }
+/* Outranks the backdrop host's `position: relative` on its children, so the sort rides along. */
+.music__layout.music__albumsLayout > .music__sort {
+  position: sticky;
+  top: calc(var(--site-header-height, 88px) + 10px);
+  z-index: 30;
+}
 .music__albumsLayout :is(.music__albumGrid, .music__gridSkeleton) {
   grid-area: albums;
 }

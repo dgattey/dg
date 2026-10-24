@@ -3,6 +3,7 @@
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { ChevronDown } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { bindHoverMenu } from '../collage/hoverMenu';
 import { PaperButton, PaperButtonFace } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
 import {
@@ -12,71 +13,6 @@ import {
   READING_DESTINATION,
   STRAVA_DESTINATION,
 } from './musicHeaderDestinations';
-
-/**
- * Opens the menu on mouse hover. A ref callback, so the listeners live exactly as long
- * as each keyed `<details>` does.
- */
-function bindMusicMenu(details: HTMLDetailsElement | null) {
-  const summary = details?.querySelector('summary');
-  if (!details || !summary) {
-    return;
-  }
-  /** Hover only closes what hover opened, and a mouse click can't toggle that shut. */
-  let openedByHover = false;
-
-  const setOpen = (open: boolean) => {
-    details.open = open;
-    openedByHover = false;
-  };
-  const hover = (open: boolean) => (event: PointerEvent) => {
-    if (event.pointerType !== 'mouse' || details.open === open) {
-      return;
-    }
-    if (open || openedByHover) {
-      details.open = open;
-      openedByHover = open;
-    }
-  };
-  const enter = hover(true);
-  const leave = hover(false);
-  const keepHoverOpen = (event: MouseEvent) => {
-    if (openedByHover) {
-      event.preventDefault();
-    }
-  };
-  const closeOnEscape = (event: KeyboardEvent) => {
-    if (details.open && event.key === 'Escape') {
-      setOpen(false);
-      summary.focus();
-    }
-  };
-  const closeOnOutsidePress = (event: PointerEvent) => {
-    if (details.open && event.target instanceof Node && !details.contains(event.target)) {
-      setOpen(false);
-    }
-  };
-  const closeOnLinkClick = (event: MouseEvent) => {
-    if (event.target instanceof Element && event.target.closest('a[href]')) {
-      setOpen(false);
-    }
-  };
-
-  details.addEventListener('pointerenter', enter);
-  details.addEventListener('pointerleave', leave);
-  details.addEventListener('click', closeOnLinkClick);
-  summary.addEventListener('click', keepHoverOpen);
-  document.addEventListener('keydown', closeOnEscape);
-  document.addEventListener('pointerdown', closeOnOutsidePress);
-  return () => {
-    details.removeEventListener('pointerenter', enter);
-    details.removeEventListener('pointerleave', leave);
-    details.removeEventListener('click', closeOnLinkClick);
-    summary.removeEventListener('click', keepHoverOpen);
-    document.removeEventListener('keydown', closeOnEscape);
-    document.removeEventListener('pointerdown', closeOnOutsidePress);
-  };
-}
 
 /**
  * Music → destinations submenu. `<details>` owns the open state so the menu opens and
@@ -90,7 +26,7 @@ export function CollageMusicLinks() {
 
   return (
     <>
-      <details className="chrome__music" ref={bindMusicMenu}>
+      <details className="chrome__music" ref={(node) => bindHoverMenu(node, 'a[href]')}>
         <summary className="chrome__musicSummary collageLift">
           <PaperButtonFace current={onMusicPage} tiltDeg={-2}>
             Music

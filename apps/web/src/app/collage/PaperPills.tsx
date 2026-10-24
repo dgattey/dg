@@ -14,12 +14,15 @@ export type PaperPillOption<Key extends string> = {
  * render inert, as a loading placeholder that holds the same footprint.
  */
 export function PaperPills<Key extends string>({
+  children,
   className,
   label,
   onSelect,
   options,
   selected,
 }: {
+  /** Trailing controls in the same group, such as a menu of further picks. */
+  children?: ReactNode;
   className?: string;
   label: string;
   onSelect?: (key: Key) => void;
@@ -53,6 +56,7 @@ export function PaperPills<Key extends string>({
           </PaperTag>
         );
       })}
+      {children}
     </fieldset>
   );
 }

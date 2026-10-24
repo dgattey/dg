@@ -19,7 +19,7 @@
   all: unset;
   display: inline-flex;
   gap: 0.45em;
-  align-items: baseline;
+  align-items: center;
   padding: 13px 20px 14px;
   cursor: pointer;
 }
@@ -31,5 +31,53 @@
 @media (max-width: 820px) {
   .paperPills {
     justify-content: flex-start;
+  }
+}
+
+/* Year ▾: a paper pill over a grid of years. */
+.yearMenu {
+  position: relative;
+}
+.yearMenu__summary:focus-visible {
+  outline: none;
+}
+.yearMenu__summary:focus-visible .paperPill {
+  outline: 2px solid var(--ink);
+  outline-offset: 4px;
+}
+.yearMenu__face {
+  align-items: center;
+}
+.yearMenu__panel {
+  right: 0;
+  z-index: 40;
+  min-width: 244px;
+}
+.yearMenu__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 4px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.yearMenu__option {
+  justify-content: center;
+  width: 100%;
+  padding: 8px 12px;
+  font-variant-numeric: tabular-nums;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+}
+.yearMenu__option--current {
+  color: light-dark(var(--cream), var(--ink-on-cream));
+  background: light-dark(var(--black), var(--ochre));
+}
+@media (max-width: 820px) {
+  .yearMenu__panel {
+    right: auto;
+    left: 0;
+    transform-origin: top left;
   }
 }

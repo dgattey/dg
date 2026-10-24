@@ -1,0 +1,238 @@
+.streets {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 28px 40px;
+  align-items: start;
+}
+.streets [data-tier="0"] {
+  --tier: color-mix(in oklab, var(--ink-on-cream) 9%, var(--cream));
+}
+.streets [data-tier="1"] {
+  --tier: color-mix(in oklab, var(--ochre) 45%, var(--cream));
+}
+.streets [data-tier="2"] {
+  --tier: var(--ochre);
+}
+.streets [data-tier="3"] {
+  --tier: var(--cobalt);
+}
+.streets [data-tier="4"] {
+  --tier: var(--viridian);
+}
+
+.streets__eyebrow {
+  grid-column: 1 / 7;
+  align-self: center;
+}
+.streets__cities {
+  grid-column: 7 / -1;
+  align-self: center;
+}
+.streets__callouts {
+  grid-column: 1 / -1;
+}
+.streets__callouts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 36px;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.streets__seal {
+  width: 220px;
+}
+.streets__seal .stats__cut {
+  width: 100%;
+}
+.streets__seal .strava__totalNumber {
+  white-space: nowrap;
+}
+.streets__callouts .stats__ticket > .stats__face {
+  min-height: 0;
+  padding: 16px 28px 18px 40px;
+}
+.streets__calloutLine {
+  font-family: var(--display);
+  font-size: var(--type-title-md);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-title);
+}
+
+.streets__mapCard {
+  grid-column: span 7;
+}
+.streets__board {
+  grid-column: span 5;
+  margin-top: 18px;
+}
+.streets__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.streets__head .strava__heading {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.streets__figures {
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+  align-items: baseline;
+}
+.streets__focusShare {
+  font-family: var(--display);
+  font-size: var(--type-title-md);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--on);
+}
+
+.streets__map {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 640px;
+  margin-top: 14px;
+}
+.streets__hoods {
+  filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
+}
+.streets__hood {
+  cursor: pointer;
+  fill: var(--tier);
+  transition: filter 120ms ease;
+}
+.streets__hood:hover {
+  filter: brightness(1.08);
+}
+/* Fixed ink, since the fills it crosses are the same cream through viridian in either scheme. */
+.streets__routes {
+  pointer-events: none;
+  fill: none;
+  stroke: var(--ink-on-cream);
+  stroke-width: 1px;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0.34;
+  vector-effect: non-scaling-stroke;
+}
+.streets__cuts {
+  pointer-events: none;
+  fill: none;
+  stroke: var(--cream);
+  stroke-width: 1.5px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.streets__focus {
+  pointer-events: none;
+  fill: none;
+  stroke: var(--vermilion);
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.streets__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px 14px;
+  padding: 0;
+  margin: 12px 0 0;
+  list-style: none;
+}
+.streets__key {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  font-family: var(--display);
+  font-size: var(--type-caption);
+  font-weight: 700;
+  color: var(--soft);
+}
+.streets__key::before {
+  width: 14px;
+  height: 14px;
+  content: "";
+  background: var(--tier);
+  border: 1px solid color-mix(in oklab, var(--on) 30%, transparent);
+  border-radius: 2px;
+}
+
+.streets__rows {
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  margin: 12px 0 0;
+  list-style: none;
+}
+.streets__row {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  gap: 4px 10px;
+  align-items: baseline;
+  width: 100%;
+  padding: 8px 10px;
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 700;
+  line-height: var(--leading-title);
+  color: var(--on);
+  text-align: left;
+  cursor: pointer;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+}
+.streets__row[data-focused="true"] {
+  background: color-mix(in oklab, var(--on) 8%, transparent);
+}
+.streets__row[aria-pressed="true"] {
+  box-shadow: inset 3px 0 0 var(--vermilion);
+}
+.streets__rank {
+  font-variant-numeric: tabular-nums;
+  color: var(--soft);
+}
+.streets__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.streets__share {
+  font-variant-numeric: tabular-nums;
+}
+.streets__bar {
+  grid-column: 2 / -1;
+  height: 6px;
+  background:
+    linear-gradient(var(--tier), var(--tier)) 0 0 / calc(var(--share) * 100%) 100% no-repeat,
+    color-mix(in oklab, var(--on) 10%, transparent);
+  border-radius: 3px;
+}
+.streets__more {
+  margin-top: 16px;
+}
+
+@media (max-width: 900px) {
+  .streets {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .streets__eyebrow,
+  .streets__cities,
+  .streets__mapCard,
+  .streets__board {
+    grid-column: 1 / -1;
+  }
+  .streets__board {
+    margin-top: 0;
+  }
+}

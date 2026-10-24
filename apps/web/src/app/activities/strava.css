@@ -1,0 +1,1019 @@
+/* The big map: title beside its filters, the atlas beside its field notes, then the scrapbook bands. */
+
+.strava__layout {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 56px 32px;
+  width: 100%;
+  padding-block: 40px 72px;
+}
+.strava__layout > * {
+  grid-column: 1 / -1;
+}
+.strava__intro {
+  display: grid;
+  grid-row: 1;
+  grid-column: 1 / 7;
+  justify-items: start;
+}
+.strava__title {
+  padding-bottom: 0.16em;
+}
+.strava__empty {
+  justify-self: start;
+}
+.strava__emptyInner {
+  padding: 14px 18px 15px;
+  font-family: var(--body);
+  font-size: var(--type-body);
+  line-height: var(--leading-body);
+}
+
+.strava__sections,
+.strava__atlas {
+  position: relative;
+  z-index: 2;
+}
+
+/* Sports over time spans, each held to one line. */
+.strava__filters {
+  display: flex;
+  flex-direction: column;
+  grid-row: 1;
+  grid-column: 6 / -1;
+  gap: 10px;
+  align-items: flex-end;
+  align-self: center;
+}
+.strava__filters > .paperPills {
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+/* Sat on the baseline, a 0.55em dot centers between the label's x-height and cap height. */
+.strava__filterDot {
+  display: inline-block;
+  width: 0.55em;
+  height: 0.55em;
+  margin-inline-end: 0.45em;
+  border-radius: 50%;
+}
+
+.strava__atlas {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: 40px;
+  align-items: start;
+}
+.strava__field {
+  position: relative;
+  z-index: 3;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  grid-column: 1 / span 4;
+  gap: 28px;
+  align-content: start;
+}
+.strava__atlasPrint {
+  position: relative;
+  grid-column: 5 / -1;
+  margin-top: 14px;
+}
+.strava__atlas .strava__atlasBacking {
+  position: absolute;
+  inset: 26px -22px -20px 22px;
+  z-index: 0;
+}
+.strava__atlasBacking > .paperInner {
+  height: 100%;
+}
+.strava__atlasMat {
+  position: relative;
+  padding: var(--mat-feature);
+}
+.strava__atlasMap {
+  position: relative;
+}
+.strava__atlasMap,
+.strava__atlasBlank {
+  aspect-ratio: 780 / 940;
+  overflow: clip;
+  border-radius: var(--print-radius);
+}
+.strava__atlasBlank,
+.strava__printBlank {
+  background: color-mix(in oklab, var(--cerulean) 34%, var(--cream));
+}
+.strava__routeCount {
+  right: 36px;
+  bottom: 36px;
+}
+.strava__regions {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  gap: 8px;
+}
+
+.strava__totals {
+  display: grid;
+  grid-template-areas:
+    "miles miles"
+    "climb outings";
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 6px 14px;
+  align-items: center;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.strava__totals--blank {
+  min-height: 320px;
+}
+.strava__totals .stats__cut {
+  width: 100%;
+}
+.strava__totalMiles {
+  grid-area: miles;
+}
+.strava__totalMiles .stats__ticket > .stats__face {
+  min-height: 0;
+  padding: 16px 24px 18px 40px;
+}
+.strava__totalClimb {
+  grid-area: climb;
+  justify-self: center;
+  width: min(100%, 188px);
+}
+.strava__totalOutings {
+  grid-area: outings;
+  translate: 0 14px;
+}
+.strava__totalOutings .stats__stamp > .stats__face {
+  justify-items: start;
+  padding: 14px 14px 16px;
+}
+.strava__totalScope,
+.strava__totalAside {
+  font-family: var(--display);
+  font-size: var(--type-caption);
+  font-weight: 700;
+  line-height: var(--leading-title);
+  color: var(--soft);
+}
+.strava__totalFigure {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0 8px;
+  align-items: baseline;
+}
+.strava__totalNumber,
+.strava__bikeMiles {
+  font-family: var(--display);
+  font-size: var(--type-title-lg);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  letter-spacing: var(--tracking-title);
+}
+.strava__totalMiles .strava__totalNumber {
+  font-size: var(--type-display-md);
+}
+.strava__totalUnit {
+  font-family: var(--display);
+  font-size: var(--type-label);
+  font-weight: 700;
+  line-height: var(--leading-title);
+}
+
+.strava__recentRoutes {
+  position: relative;
+  display: grid;
+  gap: 18px;
+  justify-items: start;
+}
+.strava__recentPrint {
+  width: 100%;
+}
+.strava__recentPair {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+  width: 100%;
+}
+.strava__recentPair .strava__polaroidName {
+  font-size: var(--type-label);
+}
+.stats__cut.strava__latestSeal {
+  position: absolute;
+  top: -26px;
+  right: -16px;
+  z-index: 4;
+  width: 96px;
+}
+
+.strava__band {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 48px 40px;
+  align-items: start;
+}
+.strava__flowerCard,
+.strava__climbs,
+.strava__longest {
+  grid-column: span 4;
+}
+.strava__log,
+.strava__distance {
+  grid-column: span 8;
+}
+.strava__years,
+.strava__bikes {
+  grid-column: span 4;
+}
+.strava__longest {
+  justify-self: center;
+  width: min(100%, 340px);
+  margin-top: 26px;
+}
+.strava__climbs {
+  margin-top: 22px;
+}
+.strava__band > :only-child {
+  grid-column: 1 / -1;
+}
+
+.strava__pad {
+  padding: 22px 22px 24px;
+}
+.strava__head {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.strava__heading {
+  margin: 0;
+  font-family: var(--display);
+  font-size: var(--type-h2);
+  font-weight: 700;
+  line-height: 32px;
+  color: var(--on);
+  letter-spacing: var(--tracking-label);
+}
+.strava__aside {
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--soft);
+}
+
+.strava__flowerCard .strava__aside {
+  white-space: nowrap;
+}
+.strava__flowerWrap {
+  position: relative;
+  width: min(100%, 350px);
+  margin: 10px auto 0;
+  container-type: inline-size;
+}
+.strava__flower {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+.strava__petalHits {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  margin: 0;
+  pointer-events: none;
+  list-style: none;
+}
+.strava__petalHits > li {
+  position: absolute;
+  top: calc(50% - 7cqw);
+  left: 50%;
+  width: var(--length);
+  height: 14cqw;
+  transform: rotate(var(--angle));
+  transform-origin: 0 50%;
+}
+.strava__petalHit {
+  display: block;
+  width: calc(100% - 13cqw);
+  height: 100%;
+  padding: 0;
+  margin-left: 13cqw;
+  pointer-events: auto;
+  cursor: default;
+  background: none;
+  border: 0;
+  border-radius: 999px;
+}
+.strava__petalHit:focus-visible {
+  outline: 2px solid var(--ink-on-cream);
+  outline-offset: 0;
+}
+.strava__petal {
+  filter: var(--dshadow);
+  fill: color-mix(in oklab, var(--ink-on-cream) 14%, transparent);
+}
+.strava__vein {
+  fill: none;
+  stroke: rgb(255 255 255 / 0.45);
+  stroke-width: 1.5;
+}
+.strava__month {
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 700;
+  dominant-baseline: middle;
+  opacity: 0.86;
+  text-anchor: middle;
+  fill: var(--ink-on-cream);
+}
+.strava__petal--none .strava__month {
+  opacity: 0.4;
+}
+.strava__petalGroup {
+  transition: opacity 160ms ease;
+}
+.strava__petal {
+  transition:
+    filter 160ms ease,
+    stroke 160ms ease;
+}
+.strava__petal--current .strava__petal {
+  stroke: var(--ink-on-cream);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+.strava__petal--future {
+  pointer-events: none;
+}
+.strava__petal--future .strava__petal {
+  filter: none;
+  fill: none;
+  stroke: color-mix(in oklab, var(--ink-on-cream) 45%, transparent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 1.5 3.5;
+}
+.strava__flower--engaged .strava__petalGroup:not(.strava__petal--active) {
+  opacity: 0.5;
+}
+.strava__petal--active .strava__month {
+  opacity: 1;
+}
+
+.strava__flowerHeart {
+  filter: var(--dshadow);
+  fill: var(--viridian);
+}
+.strava__flowerTotal,
+.strava__flowerUnit {
+  font-family: var(--display);
+  text-anchor: middle;
+  fill: var(--cream);
+}
+.strava__flowerTotal {
+  font-size: var(--type-h2);
+  font-weight: 700;
+  letter-spacing: var(--tracking-label);
+}
+.strava__flowerUnit {
+  font-size: var(--type-body);
+  font-weight: 600;
+  opacity: 0.8;
+}
+
+/* Ruled slips with a folded corner. */
+.strava__slip > .paperInner {
+  clip-path: polygon(0 0, calc(100% - 34px) 0, 100% 34px, 100% 100%, 0 100%);
+}
+.strava__fold {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 3;
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(
+    225deg,
+    transparent 50%,
+    color-mix(in oklab, var(--pc) 70%, #000) 50%
+  );
+  filter: drop-shadow(-1px 2px 1px rgb(0 0 0 / 0.18));
+}
+.strava__slip .strava__slipInner {
+  padding: 22px 26px 24px;
+  background:
+    repeating-linear-gradient(
+      transparent 0 43px,
+      color-mix(in oklab, var(--cerulean) 32%, transparent) 43px 44.5px
+    )
+    0 66px / 100% calc(100% - 66px) no-repeat,
+    var(--pc);
+}
+.strava__slip .strava__slipInner--margin {
+  padding-left: 58px;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 38px,
+      color-mix(in oklab, var(--vermilion) 60%, transparent) 38px 40px,
+      transparent 40px
+    ),
+    repeating-linear-gradient(
+      transparent 0 27px,
+      color-mix(in oklab, var(--cerulean) 34%, transparent) 27px 28.5px
+    )
+    0 66px / 100% calc(100% - 66px) no-repeat,
+    var(--pc);
+}
+.strava__rows {
+  display: grid;
+  padding: 0;
+  margin: 12px 0 0;
+  list-style: none;
+}
+.strava__logRow,
+.strava__climbRow {
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 700;
+  color: var(--on);
+}
+.strava__logRow {
+  display: grid;
+  grid-template-columns: 34px 62px minmax(0, 1fr) auto 76px 76px;
+  gap: 10px;
+  align-items: center;
+  min-height: 44.5px;
+  line-height: var(--leading-tight);
+}
+.strava__climbRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: start;
+  line-height: 28.5px;
+}
+.strava__climbName {
+  display: grid;
+  min-width: 0;
+}
+.strava__loop svg {
+  display: block;
+  width: 30px;
+  height: 30px;
+  overflow: visible;
+  fill: none;
+  stroke: var(--pc);
+  stroke-width: 2.4;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.strava__date,
+.strava__number {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.strava__number {
+  text-align: right;
+}
+.strava__soft {
+  font-weight: 600;
+  color: var(--soft);
+}
+.strava__rowName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: inherit;
+  white-space: nowrap;
+  text-decoration: none;
+}
+.strava__rowName:hover {
+  text-decoration: underline;
+}
+.strava__climbName .strava__date {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Yearly tickets, each as long as that year's miles. */
+.strava__years {
+  position: relative;
+  display: grid;
+  gap: 16px;
+  justify-items: start;
+}
+.strava__tagHeading {
+  margin: 0;
+  font-size: inherit;
+  font-weight: inherit;
+}
+.strava__yearList {
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.strava__year {
+  width: calc(44% + 26% * var(--share));
+  margin-left: var(--nudge);
+}
+.strava__yearTicket {
+  width: 100%;
+}
+.strava__yearButton {
+  display: block;
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: default;
+  background: none;
+  border: 0;
+  transition:
+    opacity 160ms ease,
+    translate 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.strava__yearButton:focus-visible {
+  outline: 2px solid var(--on);
+  outline-offset: 3px;
+}
+.strava__year--active .strava__yearButton {
+  translate: 4px 0;
+}
+.strava__yearList--engaged .strava__year:not(.strava__year--active) .strava__yearButton {
+  opacity: 0.55;
+}
+.strava__yearTicket .stats__ticket {
+  mask:
+    radial-gradient(circle 7px at 0 50%, #0000 96%, #000) left / 51% 100% no-repeat,
+    radial-gradient(circle 7px at 100% 50%, #0000 96%, #000) right / 51% 100% no-repeat;
+}
+.strava__yearTicket .stats__ticket > .stats__face {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+  min-height: 0;
+  padding: 9px 20px 10px 32px;
+}
+.strava__yearTicket .stats__ticket > .stats__face::before {
+  inset-block: 6px;
+  left: 16px;
+}
+.strava__yearLabel {
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--soft);
+}
+.strava__yearMiles {
+  font-family: var(--display);
+  font-size: var(--type-label);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.stats__cut.strava__bestYear {
+  position: absolute;
+  top: 62px;
+  right: 0;
+  z-index: 3;
+  width: 124px;
+}
+
+.strava__longestTag {
+  top: -14px;
+  left: -12px;
+  z-index: 3;
+}
+.stats__cut.strava__longestSeal {
+  position: absolute;
+  top: -22px;
+  right: -14px;
+  z-index: 4;
+  width: 116px;
+}
+.strava__longestSeal .strava__sealKey {
+  font-size: var(--type-label);
+  line-height: var(--leading-tight);
+}
+
+.strava__distanceRow {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr) 70px 64px 70px;
+  gap: 10px;
+  align-items: start;
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 700;
+  line-height: 28.5px;
+  color: var(--on);
+}
+.strava__rank {
+  font-variant-numeric: tabular-nums;
+}
+.strava__emptyRow {
+  font-family: var(--display);
+  font-size: var(--type-body);
+  line-height: 44.5px;
+}
+
+.strava__bikes {
+  display: grid;
+  gap: 16px;
+  justify-items: start;
+}
+.strava__bikeList {
+  display: grid;
+  gap: 22px;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.strava__bikeTicket {
+  width: 100%;
+}
+.strava__bikeTicket .stats__ticket > .stats__face {
+  display: grid;
+  gap: 10px;
+  min-height: 0;
+  padding: 16px 24px 18px 40px;
+}
+.strava__year--current .strava__yearTicket .stats__ticket > .stats__face {
+  outline: 2px dashed color-mix(in oklab, var(--on) 55%, transparent);
+  outline-offset: -6px;
+}
+.strava__bikeHead {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.strava__bikeTitle {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+.strava__bikeArt {
+  flex: none;
+  width: 72px;
+  height: 43px;
+  overflow: visible;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.strava__bikeContour {
+  stroke: #17171a;
+  stroke-width: 6.4;
+}
+.strava__bikePaint {
+  stroke-width: 3.6;
+}
+.strava__bikePaint--white {
+  stroke: #fbfaf6;
+}
+.strava__bikePaint--black {
+  stroke: #2a2a2e;
+}
+.strava__bikeShine {
+  stroke: rgb(255 255 255 / 55%);
+  stroke-width: 1;
+}
+.strava__bikeTire {
+  stroke: #17171a;
+  stroke-width: 3;
+}
+.strava__bikeTire--knobby {
+  stroke-width: 2.4;
+  stroke-dasharray: 1.6 1.4;
+}
+.strava__bikeDeepRim {
+  stroke: #26262b;
+  stroke-width: 6.5;
+}
+.strava__bikeRim {
+  stroke: #3a3a40;
+  stroke-width: 1.6;
+}
+.strava__bikeSpokes {
+  stroke: color-mix(in oklab, #17171a 70%, transparent);
+  stroke-width: 0.7;
+}
+.strava__bikeHub,
+.strava__bikeSaddle {
+  fill: #17171a;
+  stroke: #17171a;
+  stroke-width: 1.4;
+}
+.strava__bikeStem {
+  stroke: #17171a;
+  stroke-width: 2.6;
+}
+.strava__bikeTape {
+  stroke-width: 3.4;
+}
+.strava__bikeTape--pink {
+  stroke: #f08fb4;
+}
+.strava__bikeTape--black {
+  stroke: #17171a;
+}
+.strava__bikeChainring {
+  fill: #fbfaf6;
+  stroke: #17171a;
+  stroke-width: 2;
+}
+.strava__bikeName {
+  font-family: var(--display);
+  font-size: var(--type-title-md);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-title);
+}
+.strava__bikeSpan,
+.strava__bikeStatLabel,
+.strava__bikeYearLabel,
+.strava__bikeLongestKey {
+  font-family: var(--display);
+  font-size: var(--type-caption);
+  font-weight: 700;
+  line-height: var(--leading-title);
+  color: var(--soft);
+}
+.strava__bikeSpan,
+.strava__bikeMiles,
+.strava__bikeStatValue {
+  white-space: nowrap;
+}
+.strava__bikeStats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  padding-top: 10px;
+  border-top: 2px dashed color-mix(in oklab, var(--on) 30%, transparent);
+}
+.strava__bikeStat {
+  display: grid;
+  gap: 2px;
+}
+.strava__bikeStatValue {
+  font-family: var(--display);
+  font-size: var(--type-label);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: var(--leading-tight);
+}
+.strava__bikeYears {
+  display: flex;
+  align-items: flex-end;
+  height: 64px;
+  margin-inline: -4px;
+}
+.strava__bikeYear {
+  display: grid;
+  flex: 1 1 0;
+  grid-template-rows: minmax(0, 1fr) auto;
+  gap: 4px;
+  justify-items: center;
+  height: 100%;
+  padding: 0 4px;
+  font: inherit;
+  color: inherit;
+  cursor: default;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+}
+.strava__bikeYear:focus-visible {
+  outline: 2px solid var(--on);
+  outline-offset: 1px;
+}
+.strava__bikeBar {
+  align-self: end;
+  width: 100%;
+  height: max(3px, calc(var(--bar) * 100%));
+  background: color-mix(in oklab, var(--on) 78%, var(--pc));
+  border-radius: 3px 3px 1px 1px;
+  transition:
+    background-color 160ms ease,
+    opacity 160ms ease;
+}
+.strava__bikeYear--current .strava__bikeBar {
+  outline: 2px dashed color-mix(in oklab, var(--on) 78%, var(--pc));
+  outline-offset: -2px;
+  background: color-mix(in oklab, var(--on) 30%, var(--pc));
+}
+.strava__bikeYear--active .strava__bikeBar {
+  background: var(--on);
+}
+.strava__bikeYears--engaged .strava__bikeYear:not(.strava__bikeYear--active) .strava__bikeBar {
+  opacity: 0.45;
+}
+.strava__bikeYear--active .strava__bikeYearLabel {
+  color: var(--on);
+}
+.strava__bikeLongest {
+  display: grid;
+  gap: 2px;
+  color: inherit;
+  text-decoration: none;
+}
+.strava__bikeLongestName {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 700;
+  line-height: var(--leading-title);
+}
+.strava__bikeLongest:hover .strava__bikeLongestName,
+.strava__bikeLongest:focus-visible .strava__bikeLongestName {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* The title and a full row of sport pills stop sharing a line here, so the filters drop below it. */
+@media (max-width: 1180px) {
+  .strava__intro,
+  .strava__filters {
+    grid-column: 1 / -1;
+  }
+  .strava__filters {
+    grid-row: 2;
+    align-items: flex-start;
+  }
+  .strava__filters > .paperPills {
+    justify-content: flex-start;
+  }
+  .strava__atlas {
+    grid-template-columns: minmax(0, 1fr);
+    row-gap: 56px;
+  }
+  .strava__atlasPrint {
+    grid-column: 1;
+    justify-self: center;
+    order: -1;
+    width: min(100%, 760px);
+  }
+  .strava__field {
+    display: contents;
+  }
+  .strava__totals,
+  .strava__recentRoutes {
+    position: relative;
+    z-index: 3;
+    grid-column: 1;
+    justify-self: center;
+    width: min(100%, 640px);
+  }
+  .strava__totals {
+    order: -2;
+  }
+  .strava__flowerCard,
+  .strava__longest {
+    grid-column: span 5;
+  }
+  .strava__log,
+  .strava__distance {
+    grid-column: span 7;
+  }
+  .strava__years,
+  .strava__climbs {
+    grid-column: span 6;
+  }
+  .strava__bikes {
+    grid-column: 1 / -1;
+  }
+  .strava__bikeList {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .strava__band {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .strava__band > * {
+    grid-column: 1 / -1;
+  }
+  .strava__flowerCard {
+    justify-self: center;
+    width: min(100%, 420px);
+  }
+  .strava__climbs,
+  .strava__longest {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 820px) {
+  .strava__layout {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/*
+ * Phones fill each row edge to edge on six tracks: thirds by default, halves
+ * when there are two or four pills, and a 3 + 2 split for five. No pill is
+ * ever left on a row of its own.
+ */
+@media (max-width: 680px) {
+  .strava__filters {
+    gap: 8px;
+  }
+  .strava__filters > .paperPills {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+  }
+  .strava__filters > .paperPills > * {
+    grid-column: span 2;
+  }
+  .strava__filters > .paperPills > :first-child:nth-last-child(-n + 2),
+  .strava__filters > .paperPills > :first-child:nth-last-child(-n + 2) ~ *,
+  .strava__filters > .paperPills > :first-child:nth-last-child(4),
+  .strava__filters > .paperPills > :first-child:nth-last-child(4) ~ *,
+  .strava__filters > .paperPills > :nth-child(4):nth-last-child(2),
+  .strava__filters > .paperPills > :nth-child(5):last-child {
+    grid-column: span 3;
+  }
+  .strava__filters .paperPill {
+    display: flex;
+    justify-content: center;
+  }
+  .strava__filters .paperPillButton {
+    padding: 10px 12px 11px;
+  }
+  .strava__spans .yearMenu__panel {
+    right: 0;
+    left: auto;
+    transform-origin: top right;
+  }
+}
+
+@media (max-width: 600px) {
+  .strava__layout {
+    row-gap: 40px;
+    padding-block-start: 16px;
+  }
+  .strava__band {
+    row-gap: 40px;
+  }
+  .strava__distanceRow {
+    grid-template-columns: 18px minmax(0, 1fr) auto auto;
+  }
+  .strava__distanceRow > :nth-child(4) {
+    display: none;
+  }
+  .strava__atlas .strava__atlasBacking {
+    inset: 18px -10px -12px 10px;
+  }
+  .strava__routeCount {
+    right: 24px;
+    bottom: 24px;
+  }
+  .strava__logRow {
+    grid-template-columns: 30px minmax(0, 1fr) auto auto;
+  }
+  .strava__logRow > :nth-child(2),
+  .strava__logRow > :nth-child(6) {
+    display: none;
+  }
+  .strava__year {
+    width: calc(56% + 30% * var(--share));
+  }
+  .stats__cut.strava__bestYear {
+    position: static;
+    justify-self: end;
+    width: 116px;
+    margin-top: -12px;
+  }
+}
+
+/* Outranks the backdrop host's `position: relative` on its children, so the filters ride along. */
+.collageBackdropHost.strava__layout > .strava__filters {
+  position: sticky;
+  top: calc(var(--site-header-height, 88px) + 10px);
+  z-index: 30;
+}

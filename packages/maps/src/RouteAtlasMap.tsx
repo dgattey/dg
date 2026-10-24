@@ -4,20 +4,18 @@ import 'maplibre-gl/dist/maplibre-gl.css';
 import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
 import type { Map as MapLibreMap } from 'maplibre-gl';
-import type { Point } from 'pigeon-maps';
 import { use, useEffect, useRef, useState } from 'react';
 import { VisibleRoutes } from '../VisibleRoutes';
+import { drawRoutes, showOnly, toLngLat } from './atlasRouteLayers';
 import { OFFLINE_TILES } from './offlineTile';
 import { RouteAtlasSketch } from './RouteAtlasSketch';
-import { decodeRoutes, type GeoBounds, type MapRoute, routeLegs } from './routeFrame';
+import type { GeoBounds, MapRoute } from './routeFrame';
 import { stadiaStyleUrl, type TileSource, withStadiaKey } from './tileSource';
 import { useDarkMap } from './useDarkMap';
 import { ZoomControls } from './ZoomControls';
 
 const FIT_PADDING = 36;
-const SOURCE = 'routes';
-const CASING_LAYER = 'route-casing';
-const LINE_LAYER = 'route-line';
+const FLY_MS = 900;
 
 const containerSx: SxObject = {
   height: '100%',
@@ -63,8 +61,6 @@ let kept: KeptAtlas | null = null;
 let creating: Promise<KeptAtlas> | null = null;
 let wanted: Wanted | null = null;
 
-const toLngLat = ([latitude, longitude]: Point): [number, number] => [longitude, latitude];
-
 const lngLatBounds = ([southwest, northeast]: GeoBounds): [[number, number], [number, number]] => [
   toLngLat(southwest),
   toLngLat(northeast),
@@ -81,74 +77,6 @@ const sameRoutes = (a: ReadonlyArray<MapRoute> | null, b: ReadonlyArray<MapRoute
       route.tone === b[index]?.tone &&
       route.polyline === b[index]?.polyline,
   );
-
-/**
- * Paper tones are `light-dark()` pairs, which only resolve to a color on an
- * element. Each tone gets a fresh probe: restyling one probe can report the
- * previous tone's color.
- */
-function resolveTones(host: HTMLElement, tones: Iterable<string>) {
-  const colors = new Map<string, string>();
-  for (const tone of tones) {
-    const probe = document.createElement('span');
-    probe.style.color = `var(--${tone})`;
-    host.append(probe);
-    colors.set(tone, getComputedStyle(probe).color);
-    probe.remove();
-  }
-  return colors;
-}
-
-function showOnly(map: MapLibreMap, visible: Visible) {
-  for (const layer of [CASING_LAYER, LINE_LAYER]) {
-    map.setFilter(layer, visible ? ['in', ['get', 'id'], ['literal', [...visible]]] : null);
-  }
-}
-
-/** A paper casing under each line: cream on the light basemap, black on the dark one. */
-function drawRoutes(map: MapLibreMap, host: HTMLElement, { dark, routes }: Wanted) {
-  const casing = dark ? 'black' : 'cream';
-  const colors = resolveTones(host, [casing, ...new Set(routes.map(({ tone }) => tone))]);
-  const data = {
-    features: decodeRoutes(routes).map(({ id, points, tone }) => ({
-      geometry: {
-        coordinates: routeLegs(points).map((leg) => leg.map(toLngLat)),
-        type: 'MultiLineString' as const,
-      },
-      properties: { color: colors.get(tone), id },
-      type: 'Feature' as const,
-    })),
-    type: 'FeatureCollection' as const,
-  };
-  const source = map.getSource(SOURCE);
-  if (source?.type === 'geojson' && 'setData' in source) {
-    (source as { setData: (next: typeof data) => void }).setData(data);
-    return;
-  }
-  map.addSource(SOURCE, { data, type: 'geojson' });
-  const layout = { 'line-cap': 'round', 'line-join': 'round' } as const;
-  map.addLayer({
-    id: CASING_LAYER,
-    layout,
-    paint: {
-      'line-color': colors.get(casing) ?? 'white',
-      'line-opacity': 0.8,
-      'line-width': ['interpolate', ['linear'], ['zoom'], 4, 2, 15, 7],
-    },
-    source: SOURCE,
-    type: 'line',
-  });
-  map.addLayer({
-    id: LINE_LAYER,
-    layout,
-    paint: {
-      'line-color': ['get', 'color'],
-      'line-width': ['interpolate', ['linear'], ['zoom'], 4, 1, 15, 3.5],
-    },
-    source: SOURCE,
-    type: 'line',
-  });
-}
 
 /** Brings the kept map in line with what's wanted, changing only what differs. */
 function apply(atlas: KeptAtlas) {
@@ -168,7 +96,7 @@ function apply(atlas: KeptAtlas) {
     return;
   }
   if (!sameRoutes(atlas.drawn, wanted.routes)) {
-    drawRoutes(map, element, wanted);
+    drawRoutes(map, element, wanted.routes, wanted.dark);
     atlas.drawn = wanted.routes;
   }
   showOnly(map, wanted.visible);
@@ -217,6 +145,8 @@ type RouteAtlasMapProps = {
   label: string;
   routes: ReadonlyArray<MapRoute>;
   tileSource: TileSource;
+  /** Where to fly once mounted, such as a region picked beside the map; `bounds` when null. */
+  view?: GeoBounds | null;
 };
 
 /**
@@ -224,9 +154,16 @@ type RouteAtlasMapProps = {
  * MapLibre loads only in the browser and only for real tiles; offline it falls
  * back to a static sketch. `VisibleRoutes` above it picks which routes to ink.
  */
-export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasMapProps) {
+export function RouteAtlasMap({
+  bounds,
+  label,
+  routes,
+  tileSource,
+  view = null,
+}: RouteAtlasMapProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const boundsRef = useRef(bounds);
+  const flownRef = useRef(view);
   const visible = use(VisibleRoutes);
   const dark = useDarkMap();
   const offline = tileSource.mode === 'offline';
@@ -238,6 +175,14 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
       apply(kept);
     }
   }, [dark, routes, tileSource, visible]);
+
+  useEffect(() => {
+    if (flownRef.current === view) {
+      return;
+    }
+    flownRef.current = view;
+    kept?.map.fitBounds(lngLatBounds(view ?? bounds), { duration: FLY_MS, padding: FIT_PADDING });
+  }, [bounds, view]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -314,7 +259,7 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
           }}
         >
           <RouteAtlasSketch
-            bounds={bounds}
+            bounds={view ?? bounds}
             routes={visible ? routes.filter(({ id }) => visible.has(id)) : routes}
           />
         </Box>
@@ -323,7 +268,9 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
         <>
           <Box ref={hostRef} sx={hostSx} />
           <ZoomControls
-            onReset={() => kept?.map.fitBounds(lngLatBounds(bounds), { padding: FIT_PADDING })}
+            onReset={() =>
+              kept?.map.fitBounds(lngLatBounds(view ?? bounds), { padding: FIT_PADDING })
+            }
             onZoomIn={() => kept?.map.zoomIn()}
             onZoomOut={() => kept?.map.zoomOut()}
           />

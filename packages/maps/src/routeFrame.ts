@@ -78,6 +78,28 @@ const trimmedRange = (values: Array<number>): [number, number] => {
  * busiest half-degree cell, trimmed of the outer 2% each way so a few long rides
  * out of town don't stretch it. Null when there are no routes.
  */
+/** The trimmed extent of every route that starts inside `box`, or null when none do. */
+export function boundsWithin(
+  routes: ReadonlyArray<DecodedRoute>,
+  [[south, west], [north, east]]: GeoBounds,
+): GeoBounds | null {
+  const inside = routes.flatMap(({ points }) => {
+    const [latitude, longitude] = points[0] ?? [0, 0];
+    return latitude >= south && latitude <= north && longitude >= west && longitude <= east
+      ? points
+      : [];
+  });
+  if (inside.length === 0) {
+    return null;
+  }
+  const [low, high] = trimmedRange(inside.map(([latitude]) => latitude));
+  const [left, right] = trimmedRange(inside.map(([, longitude]) => longitude));
+  return [
+    [low, left],
+    [high, right],
+  ];
+}
+
 export function homeBounds(routes: ReadonlyArray<DecodedRoute>): GeoBounds | null {
   const starts = routes.flatMap(({ points: [start] }) => (start ? [start] : []));
   const counts = new Map<string, number>();

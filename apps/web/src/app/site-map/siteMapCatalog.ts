@@ -1,4 +1,5 @@
 import {
+  activitiesRoute,
   apiCatalogRoute,
   apiStatusRoute,
   changelogRoute,
@@ -12,7 +13,6 @@ import {
   musicStatsRoute,
   readingRoute,
   siteMapRoute,
-  stravaRoute,
 } from '@dg/shared-core/routes/app';
 import { defineBackdrop } from '../collage/backdrops';
 import type { PaperEdge, PaperTone } from '../collage/types';
@@ -123,8 +123,8 @@ export const SITE_MAP_PAGES: ReadonlyArray<SiteMapPageEntry> = [
     description: 'Interactive route map, yearly miles, and biggest climbs.',
     edge: 'quad-b',
     label: 'Big map',
-    markdownPath: htmlPathToMarkdownPath(stravaRoute),
-    path: stravaRoute,
+    markdownPath: htmlPathToMarkdownPath(activitiesRoute),
+    path: activitiesRoute,
     tiltDeg: 0.6,
     tone: 'ultramarine',
   },

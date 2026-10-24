@@ -1,10 +1,10 @@
 import {
+  activitiesRoute,
   favoriteAlbumsRoute,
   homeRoute,
   musicRoute,
   musicStatsRoute,
   readingRoute,
-  stravaRoute,
 } from '@dg/shared-core/routes/app';
 import type { LucideIcon } from 'lucide-react';
 import { ChartColumn, DiscAlbum, History } from 'lucide-react';
@@ -35,7 +35,7 @@ export const MUSIC_DESTINATIONS: ReadonlyArray<MusicPageDestination> = [
 
 export const READING_DESTINATION: MusicDestination = { href: readingRoute, label: 'Reads' };
 
-export const STRAVA_DESTINATION: MusicDestination = { href: stravaRoute, label: 'Big map' };
+export const STRAVA_DESTINATION: MusicDestination = { href: activitiesRoute, label: 'Big map' };
 
 /** The header's pages in header order, with its Music menu flattened. */
 export const FOOTER_DESTINATIONS: ReadonlyArray<MusicDestination> = [
