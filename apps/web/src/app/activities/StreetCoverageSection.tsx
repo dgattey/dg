@@ -218,24 +218,26 @@ export function StreetCoverageSection({
   }
   return (
     <section aria-labelledby={headingId} className="streets">
-      <h2 className="strava__tagHeading streets__eyebrow" id={headingId}>
-        <PaperTag tiltDeg={-2} tone="black">
-          {cityName} streets
-        </PaperTag>
-      </h2>
-      {cities.length > 1 ? (
-        <PaperPills
-          className="streets__cities"
-          label="Street coverage city"
-          onSelect={chooseCity}
-          options={cities.map((key) => ({
-            key,
-            label: CITIES[key].name,
-            tiltDeg: CITIES[key].tiltDeg,
-          }))}
-          selected={city}
-        />
-      ) : null}
+      <div className="streets__eyebrow">
+        <h2 className="strava__tagHeading" id={headingId}>
+          <PaperTag tiltDeg={-2} tone="black">
+            {cityName} streets
+          </PaperTag>
+        </h2>
+        {cities.length > 1 ? (
+          <PaperPills
+            className="streets__cities"
+            label="Street coverage city"
+            onSelect={chooseCity}
+            options={cities.map((key) => ({
+              key,
+              label: CITIES[key].name,
+              tiltDeg: CITIES[key].tiltDeg,
+            }))}
+            selected={city}
+          />
+        ) : null}
+      </div>
       <ul className="streets__callouts">
         <li className="streets__seal">
           <Scallop tiltDeg={-5} tone="cobalt">

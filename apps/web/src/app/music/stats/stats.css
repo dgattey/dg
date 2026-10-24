@@ -10,9 +10,6 @@
 }
 
 .stats__toolbar {
-  position: sticky;
-  top: calc(var(--site-header-height, 88px) + 10px);
-  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   gap: 16px 24px;
