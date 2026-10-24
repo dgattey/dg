@@ -34,7 +34,7 @@ export function StatsToolbar({
   };
 
   return (
-    <div className="stats__toolbar">
+    <div className="stats__toolbar pillStrip">
       <MusicNav current={musicStatsRoute} />
       <PaperPills
         className="stats__rangePills"

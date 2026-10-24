@@ -80,7 +80,7 @@ export function CollageSortControls({
 }) {
   return (
     <PaperPills
-      className="music__sort"
+      className="music__sort pillStrip"
       label={onSortChange ? 'Sort albums' : 'Loading album sort controls'}
       onSelect={onSortChange}
       options={COLLAGE_ALBUM_SORT_OPTIONS}

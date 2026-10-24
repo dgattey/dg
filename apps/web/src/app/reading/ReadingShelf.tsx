@@ -91,7 +91,7 @@ export function ReadingShelf({ books }: { books: ReadonlyArray<RenderableBook> }
 
   return (
     <>
-      <div className="reading__filters" ref={shareFiltersHeight}>
+      <div className="reading__filters pillStrip" ref={shareFiltersHeight}>
         <PaperPills
           label="Filter books"
           onSelect={(key) => startTransition(() => setFilterKey(key))}
