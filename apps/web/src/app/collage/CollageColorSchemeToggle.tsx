@@ -20,7 +20,7 @@ export function CollageColorSchemeToggle() {
       : `Switch to ${next} theme`;
 
   return (
-    <Tooltip className="chrome__schemeAnchor collageLift" title={label}>
+    <Tooltip className="chrome__schemeAnchor" title={label}>
       <button
         {...jsOnlyProps}
         aria-label={label}

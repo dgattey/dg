@@ -68,34 +68,22 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   flex: 1;
 }
 .chrome__nav {
-  /* A segment's line box plus its block padding, plus the strip's own padding. */
-  --strip-height: calc(var(--type-label) * (var(--leading-tight) + 1.05) + 8px);
   display: flex;
-  gap: 12px;
-  align-items: center;
   justify-content: flex-end;
   margin-top: 8px;
 }
-/* One paper strip holds every link, so the right side reads as a single piece. */
+/* One paper strip holds every link and the theme toggle, so the right side is one piece. */
 .chrome__strip {
   position: relative;
   display: flex;
+  gap: 4px;
   align-items: stretch;
-  padding: 4px;
+  padding: 6px;
   color: var(--ink-on-cream);
   background: var(--cream);
-  border-radius: 14px;
+  border-radius: 16px;
   box-shadow: var(--pshadow);
-  rotate: -0.8deg;
-}
-.chrome__stripRule {
-  flex: none;
-  align-self: center;
-  width: 1.5px;
-  height: 55%;
-  margin-inline: 1px;
-  background: color-mix(in oklab, var(--ink-on-cream) 16%, transparent);
-  border-radius: 1px;
+  rotate: -0.6deg;
 }
 .chrome__segment {
   display: flex;
@@ -174,9 +162,9 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   display: flex;
 }
 .chrome__strip .chrome__musicPanel {
-  --hover-gap: 14px;
+  --hover-gap: 16px;
   right: auto;
-  left: -4px;
+  left: -6px;
   max-width: calc(100vw - 2 * var(--pad));
   transform-origin: top left;
 }
@@ -244,22 +232,28 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 }
 .chrome__schemeAnchor {
   display: flex;
+  margin-left: 6px;
 }
+/* An ink well sunk into the end of the strip, square to a segment's height. */
 .chrome__schemeToggle {
+  --well-size: calc(var(--type-label) * (var(--leading-tight) + 1.05));
   position: relative;
   display: grid;
   place-items: center;
-  width: var(--strip-height);
-  height: var(--strip-height);
+  width: var(--well-size);
+  height: var(--well-size);
   padding: 0;
   color: var(--cream);
   cursor: pointer;
   background: var(--black);
   border: 0;
-  border-radius: 14px;
-  box-shadow: var(--pshadow);
-  rotate: 1.5deg;
+  border-radius: 11px;
+  box-shadow: inset 0 1.5px 3px rgb(0 0 0 / 0.45);
   transition: color 0.2s ease;
+}
+.collageRoot .chrome__schemeToggle:focus-visible {
+  outline-color: var(--ink-on-cream);
+  outline-offset: 2px;
 }
 .chrome__schemeToggle:hover {
   color: var(--ochre);
@@ -304,7 +298,7 @@ html[data-color-scheme="dark"] .chrome__schemeMoon {
   width: 13px;
   height: 13px;
   background: var(--vermilion);
-  border: 2.5px solid var(--paper);
+  border: 2.5px solid var(--cream);
   border-radius: 50%;
 }
 .chrome__srOnly {
@@ -771,7 +765,6 @@ html[data-color-scheme="dark"] .chrome__schemeMoon {
     display: none;
   }
   .chrome__nav {
-    gap: 10px;
     width: 100%;
   }
   .chrome__segment {

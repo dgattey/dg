@@ -44,12 +44,10 @@ describe('Header navigation (CollageMusicLinks)', () => {
     expect(screen.getByRole('link', { name: 'Big map' })).toHaveAttribute('href', activitiesRoute);
   });
 
-  it('puts every link in one strip, highlighting the Music segment on a music page', () => {
+  it('renders every link as a strip segment, highlighting Music on a music page', () => {
     const { container } = render(<CollageMusicLinks />);
 
-    const strip = container.querySelector('.chrome__strip');
-    expect(strip).not.toBeNull();
-    expect(strip?.querySelectorAll('.chrome__segment')).toHaveLength(3);
+    expect(container.querySelectorAll('.chrome__segment')).toHaveLength(3);
     expect(screen.getByText('Music').closest('summary')).toHaveClass('chrome__segmentCurrent');
     expect(screen.getByRole('link', { name: 'Reads' })).not.toHaveAttribute('aria-current');
   });
