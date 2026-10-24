@@ -4,9 +4,17 @@ import type { SequelizeOptions } from 'sequelize-typescript';
 
 type DbEnv = 'development' | 'production' | 'test';
 
+const defaultServerlessPool = {
+  pool: {
+    evict: 1_000,
+    idle: 1_000,
+    max: 3,
+    min: 0,
+  },
+};
+
 const singleConnectionTestIsolationPool = { pool: { max: 1 } };
 
-// Shared options for all environments - unified SSL
 export const sequelizeOptions = {
   dialect: 'postgres',
   dialectModule: postgres,
@@ -14,28 +22,41 @@ export const sequelizeOptions = {
     ssl: { rejectUnauthorized: true },
   },
   logging: false,
-  ...(process.env.NODE_ENV === 'test' && singleConnectionTestIsolationPool),
+  ...(process.env.NODE_ENV === 'test' ? singleConnectionTestIsolationPool : defaultServerlessPool),
   ssl: true,
 } satisfies SequelizeOptions;
 
-// CLI options - adds use_env_variable for Sequelize CLI
 export const cliOptionsByEnv = {
   development: { ...sequelizeOptions, use_env_variable: 'DATABASE_URL' },
   production: { ...sequelizeOptions, use_env_variable: 'DATABASE_URL' },
   test: { ...sequelizeOptions, use_env_variable: 'DATABASE_URL_TEST' },
 };
 
-// Database URLs by environment
 const databaseUrls = {
   development: process.env.DATABASE_URL,
   production: process.env.DATABASE_URL,
   test: process.env.DATABASE_URL_TEST,
 };
 
-// Get database URL - fails loudly if not configured
+export function normalizeDatabaseUrl(rawUrl: string): string {
+  if (rawUrl.includes('uselibpqcompat=')) {
+    return rawUrl;
+  }
+  return rawUrl.replace(
+    /([?&])sslmode=(?:prefer|require|verify-ca)(?=&|$)/,
+    '$1sslmode=verify-full',
+  );
+}
+
 export function getDatabaseUrl(): string {
   const nodeEnv = process.env.NODE_ENV ?? '';
   const url = databaseUrls[nodeEnv as DbEnv];
   invariant(url, `Database URL not set for NODE_ENV="${nodeEnv}"`);
-  return url;
+  return normalizeDatabaseUrl(url);
+}
+
+export function getDatabaseUrlOrPlaceholder(): string {
+  const nodeEnv = process.env.NODE_ENV ?? '';
+  const url = databaseUrls[nodeEnv as DbEnv];
+  return url ? normalizeDatabaseUrl(url) : 'postgresql://unconfigured.invalid:5432/dg';
 }

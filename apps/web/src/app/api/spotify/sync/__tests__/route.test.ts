@@ -1,86 +1,58 @@
-import { Op } from '@dg/db';
-import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 import { NextRequest } from 'next/server';
 
-// Mock all the service functions before importing the route
-jest.mock('@dg/services/spotify/spotifyClient', () => ({
-  getSpotifyClient: jest.fn(),
+jest.mock('@dg/services/spotify/syncSpotifyHistory', () => ({
+  getLatestPlayedAt: jest.fn(),
+  syncSpotifyHistoryWithLogging: jest.fn(),
 }));
 
 jest.mock('@dg/services/spotify/refreshFavoriteAlbumsSnapshot', () => ({
   refreshFavoriteAlbumsSnapshotWithLogging: jest.fn(),
 }));
 
+jest.mock('../../../../../services/albums', () => ({
+  getFavoriteAlbums: jest.fn(async () => []),
+}));
+
+jest.mock('../../../../../services/spotify', () => ({
+  getLastKnownSong: jest.fn(async () => null),
+}));
+
 jest.mock('next/cache', () => ({
+  cacheLife: jest.fn(),
+  cacheTag: jest.fn(),
   revalidateTag: jest.fn(),
 }));
 
 import { refreshFavoriteAlbumsSnapshotWithLogging } from '@dg/services/spotify/refreshFavoriteAlbumsSnapshot';
-// Get typed references to the mocked functions
-import * as spotifyClient from '@dg/services/spotify/spotifyClient';
+import {
+  getLatestPlayedAt,
+  syncSpotifyHistoryWithLogging,
+} from '@dg/services/spotify/syncSpotifyHistory';
 import { revalidateTag } from 'next/cache';
+import { resetSpotifySyncStateForTests } from '../../../../../services/spotifySync';
 import { handleSpotifySync } from '../route';
 
-const mockSpotifyGet = jest.fn();
-const mockGetSpotifyClient = jest.mocked(spotifyClient.getSpotifyClient);
+const mockGetLatestPlayedAt = jest.mocked(getLatestPlayedAt);
+const mockSyncHistory = jest.mocked(syncSpotifyHistoryWithLogging);
 const mockRefreshFavoriteAlbums = jest.mocked(refreshFavoriteAlbumsSnapshotWithLogging);
 const mockRevalidateTag = jest.mocked(revalidateTag);
 
-// Use unique prefix for this test file to avoid conflicts with parallel tests
-const PREFIX = 'sync-api';
-
-const buildTrackApi = (suffix = '') => {
-  const id = suffix ? `${PREFIX}-${suffix}` : PREFIX;
-  return {
-    album: {
-      external_urls: { spotify: `https://open.spotify.com/album/${id}-album-id` },
-      href: `https://api.spotify.com/v1/albums/${id}-album-id`,
-      id: `${id}-album-id`,
-      images: [{ height: 640, url: 'https://image.test/cover.jpg', width: 640 }],
-      name: 'Album Name',
-      release_date: '2024-01-01',
-      uri: `spotify:album:${id}-album-id`,
-    },
-    artists: [
-      {
-        external_urls: { spotify: `https://open.spotify.com/artist/${id}-artist-id` },
-        href: `https://api.spotify.com/v1/artists/${id}-artist-id`,
-        id: `${id}-artist-id`,
-        name: 'Artist Name',
-        uri: `spotify:artist:${id}-artist-id`,
-      },
-    ],
-    external_urls: { spotify: `https://open.spotify.com/track/${id}-track-id` },
-    href: `https://api.spotify.com/v1/tracks/${id}-track-id`,
-    id: `${id}-track-id`,
-    name: 'Track Name',
-    uri: `spotify:track:${id}-track-id`,
-  };
-};
-
-const createRequest = (authorization?: string) =>
-  new NextRequest('http://localhost/api/spotify/sync', {
+const createRequest = (authorization?: string, query = '') =>
+  new NextRequest(`http://localhost/api/spotify/sync${query}`, {
     headers: authorization ? { authorization } : {},
   });
-
-// Single shared db instance for all tests in this file
-const db = setupTestDatabase();
 
 const originalCronSecret = process.env.CRON_SECRET;
 
 beforeAll(() => {
   process.env.CRON_SECRET = 'test-secret';
-  mockGetSpotifyClient.mockReturnValue({ get: mockSpotifyGet } as ReturnType<
-    typeof spotifyClient.getSpotifyClient
-  >);
 });
 
 beforeEach(() => {
   jest.clearAllMocks();
+  resetSpotifySyncStateForTests();
+  mockGetLatestPlayedAt.mockResolvedValue(new Date('2026-10-23T08:57:42.890Z'));
   mockRefreshFavoriteAlbums.mockResolvedValue({ changed: true, count: 3 });
-  mockGetSpotifyClient.mockReturnValue({ get: mockSpotifyGet } as ReturnType<
-    typeof spotifyClient.getSpotifyClient
-  >);
 });
 
 afterAll(() => {
@@ -93,7 +65,7 @@ describe('Spotify sync route', () => {
 
     expect(response.status).toBe(401);
     expect(response.body).toEqual({ error: 'Unauthorized' });
-    expect(mockSpotifyGet).not.toHaveBeenCalled();
+    expect(mockSyncHistory).not.toHaveBeenCalled();
   });
 
   it('fails closed when CRON_SECRET is missing', async () => {
@@ -103,45 +75,23 @@ describe('Spotify sync route', () => {
 
       expect(response.status).toBe(401);
       expect(response.body).toEqual({ error: 'Unauthorized' });
-      expect(mockSpotifyGet).not.toHaveBeenCalled();
+      expect(mockSyncHistory).not.toHaveBeenCalled();
     } finally {
       process.env.CRON_SECRET = 'test-secret';
     }
   });
 
-  it('seeds history when the database is empty', async () => {
-    // Sync reads the whole SpotifyPlay table and derives `after` from the newest
-    // row, so one row from another suite changes the request it makes. Suites in
-    // other packages share DATABASE_URL_TEST and can insert between this check
-    // and sync's own read, so the precondition is confirmed on both sides of the
-    // call rather than only before it.
-    const foreignPlayCount = () =>
-      db.SpotifyPlay.count({ where: { trackId: { [Op.notLike]: `${PREFIX}-%` } } });
-
-    if ((await foreignPlayCount()) > 0) {
-      return;
-    }
-
-    mockSpotifyGet.mockResolvedValue({
-      response: {
-        json: async () => ({
-          items: [
-            {
-              played_at: '2025-01-02T00:00:00.000Z',
-              track: buildTrackApi('seed'),
-            },
-          ],
-          next: null,
-        }),
-      },
-      status: 200,
+  it('revalidates music-history, latest-song, and favorite-albums when new plays and album changes arrive', async () => {
+    const knownLatestPlayedAt = new Date('2026-10-23T08:57:42.890Z');
+    mockGetLatestPlayedAt.mockResolvedValue(knownLatestPlayedAt);
+    mockSyncHistory.mockResolvedValue({
+      gapDetected: false,
+      inserted: 1,
+      status: 'ok',
+      total: 1,
     });
 
     const response = await handleSpotifySync(createRequest('Bearer test-secret'));
-
-    if ((await foreignPlayCount()) > 0) {
-      return;
-    }
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -152,74 +102,26 @@ describe('Spotify sync route', () => {
       success: true,
       total: 1,
     });
-    expect(mockSpotifyGet).toHaveBeenCalledWith(
-      expect.stringMatching(/^me\/player\/recently-played\?limit=50$/),
-    );
+    expect(mockSyncHistory).toHaveBeenCalledWith({
+      context: 'cron',
+      failureLogLevel: 'error',
+      knownLatestPlayedAt,
+    });
     expect(mockRevalidateTag).toHaveBeenCalledWith('music-history', 'max');
+    expect(mockRevalidateTag).toHaveBeenCalledWith('music-stats', 'max');
+    expect(mockRevalidateTag).toHaveBeenCalledWith('latest-song', 'max');
     expect(mockRevalidateTag).toHaveBeenCalledWith('favorite-albums', 'max');
   });
 
-  it('syncs when history already exists', async () => {
-    await db.SpotifyPlay.create({
-      albumId: `${PREFIX}-album-seed`,
-      artistIds: [`${PREFIX}-artist-seed`],
-      playedAt: new Date('2025-01-01T00:00:00.000Z'),
-      trackId: `${PREFIX}-track-seed`,
-    });
-    mockSpotifyGet.mockResolvedValue({
-      response: {
-        json: async () => ({
-          items: [
-            {
-              played_at: '2025-01-02T00:00:00.000Z',
-              track: buildTrackApi('sync'),
-            },
-          ],
-          next: null,
-        }),
-      },
-      status: 200,
-    });
-
-    const response = await handleSpotifySync(createRequest('Bearer test-secret'));
-
-    expect(response.status).toBe(200);
-    expect(mockSpotifyGet).toHaveBeenCalledTimes(1);
-    // Check total (tracks returned from API) and that new row was added
-    expect(response.body.total).toBe(1);
-    expect(response.body.gapDetected).toBe(false);
-    expect(response.body.success).toBe(true);
-    expect(response.body.favoriteAlbums).toBe(3);
-    expect(response.body.favoriteAlbumsRefreshed).toBe(true);
-    // Count only rows with our test prefix to avoid conflicts with parallel tests
-    const rowCount = await db.SpotifyPlay.count({
-      where: { trackId: { [Op.like]: `${PREFIX}-%` } },
-    });
-    expect(rowCount).toBe(2);
-
-    // Verify revalidateTag was called when tracks were inserted
-    expect(mockRevalidateTag).toHaveBeenCalledWith('music-history', 'max');
-    expect(mockRevalidateTag).toHaveBeenCalledWith('favorite-albums', 'max');
-  });
-
-  // The scheduled workflow only knows a run failed if the status is non-2xx, so
-  // these are the cases that used to report a green "inserted 0" run forever.
   it.each([
     ['a rate limit', 429, 19_572],
     ['an auth failure', 401, undefined],
     ['an aborted request', 500, undefined],
   ])('fails the run on %s rather than reporting success', async (_label, status, retryAfter) => {
-    await db.SpotifyPlay.create({
-      albumId: `${PREFIX}-album-fail`,
-      artistIds: [`${PREFIX}-artist-fail`],
-      playedAt: new Date('2025-01-01T00:00:00.000Z'),
-      // Spotify ids are VARCHAR(22), so keep seeded ids short.
-      trackId: `${PREFIX}-f-${status}`,
-    });
-    mockSpotifyGet.mockResolvedValue({
-      response: { json: async () => ({}) },
+    mockSyncHistory.mockResolvedValue({
+      reason: `Spotify recently-played read failed with status ${status}`,
       retryAfterSeconds: retryAfter,
-      status,
+      status: 'failed',
     });
 
     const response = await handleSpotifySync(createRequest('Bearer test-secret'));
@@ -229,26 +131,34 @@ describe('Spotify sync route', () => {
     expect(response.body.error).toContain(String(status));
     expect(response.body.retryAfterSeconds).toBe(retryAfter);
     expect(mockRevalidateTag).not.toHaveBeenCalledWith('music-history', 'max');
+    expect(mockRevalidateTag).not.toHaveBeenCalledWith('latest-song', 'max');
   });
 
-  it('stays quiet and successful when there is genuinely nothing new', async () => {
-    await db.SpotifyPlay.create({
-      albumId: `${PREFIX}-album-quiet`,
-      artistIds: [`${PREFIX}-artist-quiet`],
-      playedAt: new Date('2025-01-01T00:00:00.000Z'),
-      trackId: `${PREFIX}-track-quiet`,
-    });
+  it('stays quiet when nothing new played and skips repeat favorite-albums playlist fetches within the hour unless forced', async () => {
     mockRefreshFavoriteAlbums.mockResolvedValue({ changed: false, count: 3 });
-    mockSpotifyGet.mockResolvedValue({
-      response: { json: async () => ({ items: [], next: null }) },
-      status: 200,
+    mockSyncHistory.mockResolvedValue({
+      gapDetected: false,
+      inserted: 0,
+      status: 'ok',
+      total: 0,
     });
 
-    const response = await handleSpotifySync(createRequest('Bearer test-secret'));
-
-    expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
-    expect(response.body.inserted).toBe(0);
+    const first = await handleSpotifySync(createRequest('Bearer test-secret'));
+    expect(first.status).toBe(200);
+    expect(first.body.success).toBe(true);
+    expect(first.body.inserted).toBe(0);
+    expect(first.body.favoriteAlbumsRefreshed).toBe(true);
+    expect(mockRefreshFavoriteAlbums).toHaveBeenCalledTimes(1);
     expect(mockRevalidateTag).not.toHaveBeenCalled();
+
+    const second = await handleSpotifySync(createRequest('Bearer test-secret'));
+    expect(second.status).toBe(200);
+    expect(second.body.favoriteAlbumsRefreshed).toBe(false);
+    expect(mockRefreshFavoriteAlbums).toHaveBeenCalledTimes(1);
+
+    const forced = await handleSpotifySync(createRequest('Bearer test-secret', '?force=true'));
+    expect(forced.status).toBe(200);
+    expect(forced.body.favoriteAlbumsRefreshed).toBe(true);
+    expect(mockRefreshFavoriteAlbums).toHaveBeenCalledTimes(2);
   });
 });

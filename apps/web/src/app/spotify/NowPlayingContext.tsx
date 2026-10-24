@@ -13,11 +13,11 @@ import {
 } from 'react';
 import { loadLatestSong } from '../../services/spotify.actions';
 
-/** The page's now playing card, which the home header pill scrolls to. */
 export const NOW_PLAYING_CARD_ID = 'now-playing-card';
 
 const POLL_INTERVAL_MS = 30_000;
 const MIN_TRACK_END_DELAY_MS = 5_000;
+const MIN_FOCUS_REFRESH_GAP_MS = 5_000;
 const TRACK_END_BUFFER_MS = 1_500;
 const SESSION_STORAGE_KEY = 'dg:now-playing';
 const MAX_SESSION_CACHE_AGE_MS = 10 * 60 * 1000;
@@ -79,8 +79,14 @@ function isSameTrack(a: Track | null, b: Track): boolean {
 
 async function refreshLatestSong(
   requestIdRef: { current: number },
+  inFlightRef: { current: boolean },
+  lastCompletedAtRef: { current: number },
   setTrack: (updater: (prev: Track | null) => Track | null) => void,
 ) {
+  if (inFlightRef.current) {
+    return;
+  }
+  inFlightRef.current = true;
   const requestId = ++requestIdRef.current;
   try {
     const latest = await loadLatestSong();
@@ -90,6 +96,9 @@ async function refreshLatestSong(
     }
   } catch {
     return;
+  } finally {
+    inFlightRef.current = false;
+    lastCompletedAtRef.current = Date.now();
   }
 }
 
@@ -98,6 +107,8 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const lastPathnameRef = useRef<string | null>(null);
   const requestIdRef = useRef(0);
+  const inFlightRef = useRef(false);
+  const lastCompletedAtRef = useRef(0);
 
   useLayoutEffect(() => {
     const cached = readSessionTrack();
@@ -111,16 +122,28 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
       return;
     }
     lastPathnameRef.current = pathname;
-    void refreshLatestSong(requestIdRef, setTrack);
+    if (
+      lastCompletedAtRef.current > 0 &&
+      Date.now() - lastCompletedAtRef.current < MIN_FOCUS_REFRESH_GAP_MS
+    ) {
+      return;
+    }
+    void refreshLatestSong(requestIdRef, inFlightRef, lastCompletedAtRef, setTrack);
   }, [pathname]);
 
   useEffect(() => {
+    const refreshIfCooledDown = () => {
+      if (Date.now() - lastCompletedAtRef.current < MIN_FOCUS_REFRESH_GAP_MS) {
+        return;
+      }
+      void refreshLatestSong(requestIdRef, inFlightRef, lastCompletedAtRef, setTrack);
+    };
     const onFocus = () => {
-      void refreshLatestSong(requestIdRef, setTrack);
+      refreshIfCooledDown();
     };
     const onVisibilityChange = () => {
       if (document.visibilityState === 'visible') {
-        void refreshLatestSong(requestIdRef, setTrack);
+        refreshIfCooledDown();
       }
     };
     window.addEventListener('focus', onFocus);
@@ -141,7 +164,7 @@ export function NowPlayingProvider({ children }: { children: ReactNode }) {
           return;
         }
         if (document.visibilityState !== 'hidden') {
-          await refreshLatestSong(requestIdRef, setTrack);
+          await refreshLatestSong(requestIdRef, inFlightRef, lastCompletedAtRef, setTrack);
         }
         if (!cancelled) {
           schedule(POLL_INTERVAL_MS);

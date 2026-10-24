@@ -1,0 +1,138 @@
+import type { StructureViolation } from './check-structure.js';
+
+function isTestPath(relPath: string): boolean {
+  return (
+    relPath.includes('__tests__/') ||
+    /\.test\.(ts|tsx)$/.test(relPath) ||
+    relPath.endsWith('jest.config.ts')
+  );
+}
+
+function resolveStaticTagArg(rawArg: string, constMap: ReadonlyMap<string, string>): string | null {
+  const trimmed = rawArg.trim();
+  const literalMatch = /^['"]([^'"]+)['"]$/.exec(trimmed);
+  if (literalMatch?.[1]) {
+    return literalMatch[1];
+  }
+  return constMap.get(trimmed) ?? null;
+}
+
+export function checkCacheTagParity(
+  sourceFiles: ReadonlyMap<string, string>,
+): Array<StructureViolation> {
+  const violations: Array<StructureViolation> = [];
+  const declaredCacheTags = new Set<string>();
+  const revalidatedTags = new Set<string>();
+  const maxCacheTagRefs: Array<{ file: string; line: number; tag: string }> = [];
+  const revalidateTagRefs: Array<{ file: string; line: number; tag: string }> = [];
+
+  for (const [relPath, content] of sourceFiles) {
+    if (isTestPath(relPath)) {
+      continue;
+    }
+    const constMap = new Map<string, string>();
+    for (const match of content.matchAll(/\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*['"]([^'"]+)['"]/g)) {
+      if (match[1] && match[2]) {
+        constMap.set(match[1], match[2]);
+      }
+    }
+
+    const lines = content.split('\n');
+    let inMaxCacheScope = false;
+    let maxCacheLine = 0;
+    let maxCacheTagsInScope = 0;
+
+    for (let i = 0; i < lines.length; i += 1) {
+      const lineText = lines[i] ?? '';
+      const lineNum = i + 1;
+
+      if (/\bcacheLife\(\s*['"]max['"]\s*\)/.test(lineText)) {
+        inMaxCacheScope = true;
+        maxCacheLine = lineNum;
+        maxCacheTagsInScope = 0;
+      }
+
+      for (const match of lineText.matchAll(/\bcacheTag\(\s*([^)]+?)\s*\)/g)) {
+        const resolved = resolveStaticTagArg(match[1] ?? '', constMap);
+        if (!resolved) {
+          violations.push({
+            file: relPath,
+            line: lineNum,
+            message: 'cacheTag(...) must use a string literal or local string constant',
+            rule: 'cache-tag-parity',
+          });
+          continue;
+        }
+        declaredCacheTags.add(resolved);
+        if (inMaxCacheScope) {
+          maxCacheTagsInScope += 1;
+          maxCacheTagRefs.push({ file: relPath, line: lineNum, tag: resolved });
+        }
+      }
+
+      if (inMaxCacheScope && lineText.includes('}')) {
+        if (maxCacheTagsInScope === 0) {
+          violations.push({
+            file: relPath,
+            line: maxCacheLine,
+            message:
+              "cacheLife('max') function must attach at least one cacheTag(...) so on-demand revalidation can update it",
+            rule: 'cache-tag-parity',
+          });
+        }
+        inMaxCacheScope = false;
+      }
+
+      for (const match of lineText.matchAll(
+        /\brevalidateTag\(\s*([^,)]+?)\s*(?:,\s*([^)]+?)\s*)?\)/g,
+      )) {
+        const tagArg = match[1] ?? '';
+        const profileArg = (match[2] ?? '').trim();
+        if (profileArg !== "'max'" && profileArg !== '"max"') {
+          violations.push({
+            file: relPath,
+            line: lineNum,
+            message: "revalidateTag(...) must pass 'max' as its second argument",
+            rule: 'cache-tag-parity',
+          });
+        }
+        const resolved = resolveStaticTagArg(tagArg, constMap);
+        if (!resolved) {
+          violations.push({
+            file: relPath,
+            line: lineNum,
+            message: 'revalidateTag(...) must use a string literal or local string constant',
+            rule: 'cache-tag-parity',
+          });
+          continue;
+        }
+        revalidatedTags.add(resolved);
+        revalidateTagRefs.push({ file: relPath, line: lineNum, tag: resolved });
+      }
+    }
+  }
+
+  for (const ref of maxCacheTagRefs) {
+    if (!revalidatedTags.has(ref.tag)) {
+      violations.push({
+        file: ref.file,
+        line: ref.line,
+        message: `cacheTag("${ref.tag}") on a cacheLife('max') function has no matching revalidateTag("${ref.tag}", 'max') call in apps/web/src`,
+        rule: 'cache-tag-parity',
+      });
+    }
+  }
+
+  for (const ref of revalidateTagRefs) {
+    if (!declaredCacheTags.has(ref.tag)) {
+      violations.push({
+        file: ref.file,
+        line: ref.line,
+        message: `revalidateTag("${ref.tag}", 'max') does not match any cacheTag("${ref.tag}") in apps/web/src`,
+        rule: 'cache-tag-parity',
+      });
+    }
+  }
+
+  return violations;
+}

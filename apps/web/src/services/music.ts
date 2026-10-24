@@ -2,6 +2,7 @@ import 'server-only';
 
 import { fetchMusicHistoryPage } from '@dg/services/spotify/fetchMusicHistoryPage';
 import { cacheLife, cacheTag } from 'next/cache';
+import './oauthTokenCache';
 
 const MUSIC_HISTORY_TAG = 'music-history';
 const MUSIC_HISTORY_PAGE_SIZE = 24;
@@ -15,9 +16,6 @@ type MusicHistoryResult = {
   nextCursor: string | null;
 };
 
-/**
- * Parses a cursor string into a Date for pagination.
- */
 export function parseMusicHistoryCursor(before?: string): Date | undefined {
   if (!before) {
     return undefined;
@@ -30,7 +28,7 @@ export async function getMusicHistory({
   before,
 }: MusicHistoryOptions): Promise<MusicHistoryResult> {
   'use cache';
-  cacheLife('hours');
+  cacheLife('max');
   cacheTag(MUSIC_HISTORY_TAG);
 
   return await fetchMusicHistoryPage({

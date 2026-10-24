@@ -57,5 +57,7 @@ export const getCurrentLocation = async () => {
 
 export const getBooks = async () => {
   'use cache';
-  return await cachedContentful(fetchBooks);
+  cacheLife('max');
+  cacheTag(CONTENTFUL_TAG);
+  return await fetchBooks();
 };

@@ -174,12 +174,14 @@ describe('NowPlayingProvider', () => {
     expect(screen.queryByTestId('compact')).not.toBeInTheDocument();
   });
 
-  it('refreshes all three surfaces on client route navigation and window focus', async () => {
+  it('throttles rapid route changes within 5s and refreshes on route navigation or focus after cooldown', async () => {
+    const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(1_760_000_000_000);
+    const THIRD = makeTrack('third');
     jest
       .mocked(loadLatestSong)
-      .mockResolvedValueOnce(null)
       .mockResolvedValueOnce(FRESH)
-      .mockResolvedValueOnce(NEXT_PLAYING);
+      .mockResolvedValueOnce(NEXT_PLAYING)
+      .mockResolvedValueOnce(THIRD);
 
     const { rerender } = render(
       <ServerTimeProvider serverTime={1_760_000_000_000}>
@@ -191,6 +193,24 @@ describe('NowPlayingProvider', () => {
       </ServerTimeProvider>,
     );
 
+    await waitFor(() => {
+      expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
+    });
+    expect(loadLatestSong).toHaveBeenCalledTimes(1);
+
+    mockPathname = '/reading';
+    rerender(
+      <ServerTimeProvider serverTime={1_760_000_000_000}>
+        <NowPlayingProvider>
+          <SpotifyHeaderCard track={STALE} />
+          <SpotifyCollageCard track={STALE} />
+          <FooterNowStrip initialTrack={STALE} latestActivity={null} />
+        </NowPlayingProvider>
+      </ServerTimeProvider>,
+    );
+    expect(loadLatestSong).toHaveBeenCalledTimes(1);
+
+    nowSpy.mockReturnValue(1_760_000_006_000);
     mockPathname = '/music';
     rerender(
       <ServerTimeProvider serverTime={1_760_000_000_000}>
@@ -201,18 +221,7 @@ describe('NowPlayingProvider', () => {
         </NowPlayingProvider>
       </ServerTimeProvider>,
     );
-
-    await waitFor(() => {
-      expect(screen.getByTestId('compact')).toHaveTextContent('Track fresh');
-      expect(screen.getByTestId('card')).toHaveTextContent('Track fresh');
-      expect(
-        screen.getByRole('link', { name: 'Playing Track fresh · Artist fresh' }),
-      ).toBeInTheDocument();
-    });
-
-    act(() => {
-      window.dispatchEvent(new Event('focus'));
-    });
+    expect(loadLatestSong).toHaveBeenCalledTimes(2);
 
     await waitFor(() => {
       expect(screen.getByTestId('compact')).toHaveTextContent('Track next');
@@ -221,5 +230,27 @@ describe('NowPlayingProvider', () => {
         screen.getByRole('link', { name: 'Playing Track next · Artist next' }),
       ).toBeInTheDocument();
     });
+
+    act(() => {
+      window.dispatchEvent(new Event('focus'));
+    });
+    expect(loadLatestSong).toHaveBeenCalledTimes(2);
+
+    nowSpy.mockReturnValue(1_760_000_015_000);
+    act(() => {
+      window.dispatchEvent(new Event('focus'));
+      document.dispatchEvent(new Event('visibilitychange'));
+    });
+    expect(loadLatestSong).toHaveBeenCalledTimes(3);
+
+    await waitFor(() => {
+      expect(screen.getByTestId('compact')).toHaveTextContent('Track third');
+      expect(screen.getByTestId('card')).toHaveTextContent('Track third');
+      expect(
+        screen.getByRole('link', { name: 'Playing Track third · Artist third' }),
+      ).toBeInTheDocument();
+    });
+
+    nowSpy.mockRestore();
   });
 });

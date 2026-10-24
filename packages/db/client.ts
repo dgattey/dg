@@ -1,7 +1,6 @@
-import { log } from '@dg/shared-core/logging/log';
 import { Op, QueryTypes } from 'sequelize';
 import { Sequelize } from 'sequelize-typescript';
-import { getDatabaseUrl, sequelizeOptions } from './dbConfig';
+import { getDatabaseUrl, getDatabaseUrlOrPlaceholder, sequelizeOptions } from './dbConfig';
 import { FavoriteAlbum } from './models/FavoriteAlbum';
 import { FavoriteAlbumSnapshot } from './models/FavoriteAlbumSnapshot';
 import { MusicAlbum } from './models/MusicAlbum';
@@ -14,7 +13,6 @@ import { SpotifyPlay } from './models/SpotifyPlay';
 import { StravaActivity } from './models/StravaActivity';
 import { Token } from './models/Token';
 
-// Models
 export const db = {
   FavoriteAlbum,
   FavoriteAlbumSnapshot,
@@ -29,35 +27,21 @@ export const db = {
   Token,
 } as const;
 
-// Client
-export const dbClient = new Sequelize(getDatabaseUrl(), {
+export const dbClient = new Sequelize(getDatabaseUrlOrPlaceholder(), {
   define: { freezeTableName: true },
+  hooks: {
+    beforeConnect: () => {
+      getDatabaseUrl();
+    },
+  },
   models: Object.values(db),
   ...sequelizeOptions,
 });
 
 export { Op, QueryTypes };
 
-/**
- * Verify database connection. Call on app startup.
- */
-async function connectToDatabase(): Promise<void> {
-  await dbClient.authenticate();
-  log.info('Database connected');
-}
-
-/**
- * Close database connection. Safe to call multiple times.
- */
 export async function closeDbConnection(): Promise<void> {
   try {
     await dbClient.close();
-  } catch {
-    // Ignore - may already be closed
-  }
-}
-
-// Auto-connect in non-test environments
-if (process.env.NODE_ENV !== 'test') {
-  connectToDatabase();
+  } catch {}
 }

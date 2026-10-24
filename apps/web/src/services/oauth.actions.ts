@@ -3,6 +3,7 @@
 import { forceRefreshToken as forceRefreshTokenImpl } from '@dg/services/oauth/forceRefreshToken';
 import type { ForceRefreshResult } from '@dg/services/oauth/types';
 import type { OauthProviderKey } from '@dg/shared-core/routes/api';
+import './oauthTokenCache';
 import { withDevConsoleAuth } from './devConsoleAuth';
 
 /**

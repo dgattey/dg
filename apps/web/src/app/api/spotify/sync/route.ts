@@ -4,6 +4,11 @@ import { syncSpotifyHistoryWithLogging } from '@dg/services/spotify/syncSpotifyH
 import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
+import { getFavoriteAlbums } from '../../../../services/albums';
+import {
+  getCachedLatestPlayedAt,
+  shouldRefreshFavoriteAlbums,
+} from '../../../../services/spotifySync';
 
 const BEARER_PREFIX = 'Bearer ';
 
@@ -44,19 +49,31 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
     return { body: { error: 'Unauthorized' }, status: 401 };
   }
 
+  const forceFavoriteAlbums = request.nextUrl.searchParams.get('force') === 'true';
+  const knownLatestPlayedAt = await getCachedLatestPlayedAt();
+
   const result = await syncSpotifyHistoryWithLogging({
     context: 'cron',
     failureLogLevel: 'error',
+    knownLatestPlayedAt,
   });
-  const favoriteAlbums = await refreshFavoriteAlbumsSnapshotWithLogging();
 
-  if (favoriteAlbums?.changed) {
+  const refreshAlbums =
+    forceFavoriteAlbums ||
+    (result.status === 'ok' && result.inserted > 0) ||
+    (await shouldRefreshFavoriteAlbums());
+
+  const favoriteAlbums = refreshAlbums
+    ? await refreshFavoriteAlbumsSnapshotWithLogging({
+        storedAlbums: await getFavoriteAlbums(),
+      })
+    : null;
+
+  if (forceFavoriteAlbums || favoriteAlbums?.changed) {
     revalidateTag('favorite-albums', 'max');
+    revalidateTag('music-stats', 'max');
   }
 
-  // A run that could not read Spotify must not answer 2xx. The scheduled
-  // workflow uses `curl -f`, so a success status is the only thing standing
-  // between a broken sync and a green check.
   if (result.status === 'failed') {
     return {
       body: {
@@ -69,8 +86,10 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
     };
   }
 
-  if (result.inserted > 0) {
+  if (forceFavoriteAlbums || result.inserted > 0 || result.total > 0) {
     revalidateTag('music-history', 'max');
+    revalidateTag('music-stats', 'max');
+    revalidateTag('latest-song', 'max');
   }
 
   return {

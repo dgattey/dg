@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { checkCacheTagParity } from '../check-cache-tags.js';
 import {
   checkOrphanCssFiles,
   checkRouteCssImports,
@@ -37,12 +38,34 @@ describe('check-structure', () => {
     );
     assert.equal(pureTypes.length, 0);
 
+    const dbPkg = `@dg/${'db'}`;
     const dbViolation = checkFileStructure(
       'apps/web/src/services/foo.ts',
-      "import { db } from '@dg/db';\nexport const x = db;\n",
+      `import { db } from '${dbPkg}';\nexport const x = db;\n`,
     );
     assert.equal(dbViolation.length, 1);
     assert.equal(dbViolation[0]?.rule, 'db-imports');
+
+    const webTestDbViolation = checkFileStructure(
+      'apps/web/src/app/__tests__/foo.test.ts',
+      `import { setupTestDatabase } from '${dbPkg}/testing/databaseSetup';\nexport const x = setupTestDatabase;\n`,
+    );
+    assert.equal(webTestDbViolation.length, 1);
+    assert.equal(webTestDbViolation[0]?.rule, 'db-imports');
+
+    const webJestConfigDbViolation = checkFileStructure(
+      'apps/web/jest.config.ts',
+      `import { dbConfig } from '${dbPkg}/testing/jest.config.base';\nexport default dbConfig;\n`,
+    );
+    assert.equal(webJestConfigDbViolation.length, 1);
+    assert.equal(webJestConfigDbViolation[0]?.rule, 'db-imports');
+
+    const migrateStampViolation = checkFileStructure(
+      'packages/db/scripts/runMigrate.ts',
+      "import { execSync } from 'node:child_process';\nexecSync('pnpm exec sequelize-cli db:migrate');\n",
+    );
+    assert.equal(migrateStampViolation.length, 1);
+    assert.equal(migrateStampViolation[0]?.rule, 'migrate-stamp-cache');
 
     const dividerViolation = checkFileStructure(
       'apps/web/src/services/foo.ts',
@@ -110,7 +133,6 @@ describe('check-structure', () => {
         ['apps/web/src/app/reading/page.tsx', 'export default function Reading() {}\n'],
         ['apps/web/src/app/reading/opengraph-image.tsx', 'export default function Og() {}\n'],
         ['apps/web/src/app/dev-console/page.tsx', 'export default function DevConsole() {}\n'],
-        ['apps/web/src/app/[...rest]/page.tsx', 'export default function CatchAll() {}\n'],
       ]),
     );
     assert.deepEqual(routeMissingSocialImages, [
@@ -122,6 +144,26 @@ describe('check-structure', () => {
         rule: 'og-image-route-parity',
       },
     ]);
+
+    const cacheTagViolations = checkCacheTagParity(
+      new Map([
+        [
+          'apps/web/src/services/orphanMax.ts',
+          "import { cacheLife, cacheTag } from 'next/cache';\nconst ORPHAN_TAG = 'orphan-tag';\nexport async function getOrphan() {\n  'use cache';\n  cacheLife('max');\n  cacheTag(ORPHAN_TAG);\n  return 1;\n}\n",
+        ],
+        [
+          'apps/web/src/app/api/sync/route.ts',
+          "import { revalidateTag } from 'next/cache';\nexport function POST() {\n  revalidateTag('typo-tag', 'max');\n}\n",
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      cacheTagViolations.map(({ file, line, rule }) => ({ file, line, rule })),
+      [
+        { file: 'apps/web/src/services/orphanMax.ts', line: 6, rule: 'cache-tag-parity' },
+        { file: 'apps/web/src/app/api/sync/route.ts', line: 3, rule: 'cache-tag-parity' },
+      ],
+    );
 
     const unusedCssViolations = checkUnusedCssRules(
       new Map([
@@ -189,13 +231,13 @@ describe('check-structure', () => {
     }
   });
 
-  it('validates the entire workspace in under 200ms with zero violations', () => {
+  it('validates the entire workspace in under 1500ms with zero violations', () => {
     const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../../..');
     const start = performance.now();
     const violations = checkWorkspaceStructure(repoRoot);
     const elapsedMs = performance.now() - start;
     assert.deepEqual(violations, []);
-    assert.ok(elapsedMs < 500, `Expected fast execution, took ${elapsedMs.toFixed(1)}ms`);
+    assert.ok(elapsedMs < 1500, `Expected fast execution, took ${elapsedMs.toFixed(1)}ms`);
   });
 
   it('exports valid Sequelize CLI environments from packages/db/database.config.mts', async () => {

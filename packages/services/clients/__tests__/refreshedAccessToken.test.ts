@@ -73,7 +73,7 @@ describe('refreshedAccessToken', () => {
   it('returns existing valid access token without refreshing', async () => {
     await db.Token.upsert({
       accessToken: 'valid-access-token',
-      expiryAt: new Date(Date.now() + 3600 * 1000), // 1 hour from now
+      expiryAt: new Date(Date.now() + 3600 * 1000),
       name: 'test-token',
       refreshToken: 'test-refresh',
     });
@@ -87,7 +87,7 @@ describe('refreshedAccessToken', () => {
   it('refreshes expired token and returns new access token', async () => {
     await db.Token.upsert({
       accessToken: 'expired-access-token',
-      expiryAt: new Date(0), // Expired
+      expiryAt: new Date(0),
       name: 'test-token',
       refreshToken: 'test-refresh',
     });
@@ -120,15 +120,48 @@ describe('refreshedAccessToken', () => {
     expect(updatedToken?.refreshToken).toBe('new-refresh-token');
   });
 
+  it('caches refreshed access token in memory without writing to DB when refresh_token is unchanged', async () => {
+    await db.Token.upsert({
+      accessToken: 'expired-access-token',
+      expiryAt: new Date(0),
+      name: 'unchanged-refresh-token',
+      refreshToken: 'stable-refresh-token',
+    });
+
+    (global.fetch as jest.Mock).mockResolvedValue({
+      json: async () => ({
+        access_token: 'fresh-access-token',
+        expires_in: 3600,
+      }),
+      ok: true,
+      status: 200,
+    });
+
+    const upsertSpy = jest.spyOn(db.Token, 'upsert');
+    const findOneSpy = jest.spyOn(db.Token, 'findOne');
+    try {
+      const first = await refreshedAccessToken('unchanged-refresh-token', mockRefreshConfig);
+      const second = await refreshedAccessToken('unchanged-refresh-token', mockRefreshConfig);
+
+      expect(first).toBe('fresh-access-token');
+      expect(second).toBe('fresh-access-token');
+      expect(global.fetch).toHaveBeenCalledTimes(1);
+      expect(findOneSpy).toHaveBeenCalledTimes(1);
+      expect(upsertSpy).not.toHaveBeenCalled();
+    } finally {
+      upsertSpy.mockRestore();
+      findOneSpy.mockRestore();
+    }
+  });
+
   it('deduplicates concurrent refresh requests - only one API call is made', async () => {
     await db.Token.upsert({
       accessToken: 'expired-access-token',
-      expiryAt: new Date(0), // Expired
+      expiryAt: new Date(0),
       name: 'concurrent-test',
       refreshToken: 'test-refresh',
     });
 
-    // Create a delayed mock that we can control
     let resolveRefresh: ((value: unknown) => void) | undefined;
     const refreshPromise = new Promise((resolve) => {
       resolveRefresh = resolve;
@@ -150,22 +183,18 @@ describe('refreshedAccessToken', () => {
       throw new Error(`Unexpected fetch URL: ${url}`);
     });
 
-    // Start 3 concurrent refresh requests
     const request1 = refreshedAccessToken('concurrent-test', mockRefreshConfig);
     const request2 = refreshedAccessToken('concurrent-test', mockRefreshConfig);
     const request3 = refreshedAccessToken('concurrent-test', mockRefreshConfig);
 
-    // Resolve the fetch after all requests have started
     resolveRefresh?.(undefined);
 
-    // All requests should return the same result
     const [result1, result2, result3] = await Promise.all([request1, request2, request3]);
 
     expect(result1).toBe('concurrent-new-access');
     expect(result2).toBe('concurrent-new-access');
     expect(result3).toBe('concurrent-new-access');
 
-    // Only ONE API call should have been made despite 3 concurrent requests
     expect(global.fetch).toHaveBeenCalledTimes(1);
   });
 
@@ -185,7 +214,7 @@ describe('refreshedAccessToken', () => {
         return Promise.resolve({
           json: async () => ({
             access_token: `access-${callCount}`,
-            expires_in: 0, // Immediately expired so next call will also refresh
+            expires_in: 0,
             refresh_token: `refresh-${callCount}`,
           }),
           ok: true,
@@ -195,15 +224,12 @@ describe('refreshedAccessToken', () => {
       throw new Error(`Unexpected fetch URL: ${url}`);
     });
 
-    // First refresh
     const result1 = await refreshedAccessToken('sequential-test', mockRefreshConfig);
     expect(result1).toBe('access-1');
 
-    // Second refresh (should make another API call since first completed)
     const result2 = await refreshedAccessToken('sequential-test', mockRefreshConfig);
     expect(result2).toBe('access-2');
 
-    // Two sequential refreshes = two API calls
     expect(global.fetch).toHaveBeenCalledTimes(2);
   });
 });

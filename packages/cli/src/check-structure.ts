@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkCacheTagParity } from './check-cache-tags.js';
 import {
   checkOrphanCssFiles,
   checkRouteCssImports,
@@ -26,7 +27,6 @@ const BANNED_GENERIC_COMPONENT_FILENAMES: ReadonlySet<string> = new Set([
 ]);
 
 const NON_PUBLIC_PAGE_ROUTES: ReadonlySet<string> = new Set([
-  'apps/web/src/app/[...rest]/page.tsx',
   'apps/web/src/app/dev-console/page.tsx',
 ]);
 
@@ -34,6 +34,7 @@ const SOCIAL_IMAGE_FILENAMES = ['opengraph-image.tsx', 'twitter-image.tsx'] as c
 
 const INLINE_TYPEOF_IMPORT_TOKEN = `${'typeof'} ${'import('}`;
 const BIOME_SUPPRESSION_TOKEN = `${'biome'}-${'ignore'}`;
+const DB_PACKAGE_TOKEN = `@dg/${'db'}`;
 const BIOME_CHECKED_FILE = /\.(?:c?js|mjs|tsx?|css|jsonc?)$/;
 
 export type StructureViolation = {
@@ -58,7 +59,6 @@ function isPureTypeModule(content: string): boolean {
   );
 }
 
-/** Lint findings get fixed, never suppressed: no suppression comment in any file Biome checks. */
 function checkNoBiomeSuppressions(
   relPath: string,
   content: string,
@@ -130,9 +130,26 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
     }
   }
 
+  if (
+    relPath === 'packages/db/scripts/runMigrate.ts' &&
+    (!content.includes('computeMigrationStamp') || !content.includes('migrate-stamp.txt'))
+  ) {
+    violations.push({
+      file: relPath,
+      line: 1,
+      message:
+        'runMigrate.ts must cache migration stamps in .turbo/migrate-stamp.txt so local turbo dev starts do not wake Neon when migrations are unchanged',
+      rule: 'migrate-stamp-cache',
+    });
+  }
+
   const canImportDb =
-    relPath.startsWith('packages/services/') || relPath.startsWith('packages/db/') || isTest;
-  const checkDbImport = !canImportDb && content.includes('@dg/db');
+    relPath.startsWith('packages/services/') || relPath.startsWith('packages/db/');
+  const isAppFile = relPath.startsWith('apps/');
+  const checkDbImport =
+    !canImportDb &&
+    (content.includes(DB_PACKAGE_TOKEN) ||
+      (isAppFile && (content.includes('setupTestDatabase') || content.includes('dbConfig'))));
   const checkInlineTypeof = content.includes(INLINE_TYPEOF_IMPORT_TOKEN);
   const checkShortCacheLife =
     relPath.startsWith('apps/web/src/') && !isTest && content.includes('cacheLife(');
@@ -163,13 +180,14 @@ export function checkFileStructure(relPath: string, content: string): Array<Stru
 
     if (
       checkDbImport &&
-      /\bfrom\s+['"]@dg\/db(?:['"]|\/)/.test(lineText) &&
-      !lineText.includes('@dg/db/testing')
+      (/\bfrom\s+['"]@dg\/db(?:['"]|\/)/.test(lineText) ||
+        /\b(?:import|require)\(\s*['"]@dg\/db(?:['"]|\/)/.test(lineText) ||
+        (isAppFile && /\bsetupTestDatabase\s*\(/.test(lineText)))
     ) {
       violations.push({
         file: relPath,
         line: lineNum,
-        message: 'Only packages/services may import @dg/db in runtime code',
+        message: 'Only packages/services and packages/db may import @dg/db',
         rule: 'db-imports',
       });
     }
@@ -301,6 +319,7 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
   violations.push(...checkOrphanCssFiles(webCssPaths, webImporters));
   violations.push(...checkRouteCssImports(webCssPaths, webSources));
   violations.push(...checkSocialImageRouteParity(webSources));
+  violations.push(...checkCacheTagParity(webSources));
   violations.push(...checkTypeScale(webCss));
   violations.push(...checkScallopPadding(webCss));
   violations.push(...checkGridGapsFit(webCss));

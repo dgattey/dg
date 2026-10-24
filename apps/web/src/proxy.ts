@@ -43,16 +43,6 @@ export function proxy(request: NextRequest): NextResponse {
 
 export const config = {
   matcher: [
-    /*
-     * Run only on page paths and `.md` twins, and skip Flight/prefetch
-     * requests outside `/dev-console`. Every match is a billed function
-     * invocation, even when the page itself is a CDN hit, so skip
-     * Next/Vercel internals, route handlers, social images, client link
-     * prefetches, and any path with a file extension other than `.md`
-     * (assets and bot probes like `.php`). Registered Markdown pages are
-     * filtered again in negotiateMarkdown, so new public pages only need
-     * the shared registry — not this list.
-     */
     {
       missing: [
         { key: 'rsc', type: 'header' },
