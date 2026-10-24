@@ -134,6 +134,28 @@ const stats: ListeningStats = {
       url: 'https://open.spotify.com/artist/odesza',
     },
   ],
+  topPlaylists: [
+    {
+      id: 'playlist-pumped',
+      imageUrl: 'https://image-cdn-fa.spotifycdn.com/image/pumped',
+      name: '#pumped',
+      playedTracks: 84,
+      plays: 1_420,
+      topTrack: track('line-of-sight', 'Line Of Sight', artist('odesza', 'ODESZA')),
+      totalTracks: 100,
+      url: 'https://open.spotify.com/playlist/playlist-pumped',
+    },
+    {
+      id: 'playlist-glue',
+      imageUrl: 'https://mosaic.scdn.co/640/glue',
+      name: 'Glue',
+      playedTracks: 62,
+      plays: 980,
+      topTrack: track('breathe-deeper', 'Breathe Deeper', artist('tame', 'Tame Impala')),
+      totalTracks: 148,
+      url: 'https://open.spotify.com/playlist/playlist-glue',
+    },
+  ],
   topTracks: [
     { ...track('line-of-sight', 'Line Of Sight', artist('odesza', 'ODESZA')), plays: 94 },
     { ...track('breathe-deeper', 'Breathe Deeper', artist('tame', 'Tame Impala')), plays: 78 },
@@ -321,6 +343,11 @@ describe('ListeningStatsSections', () => {
     for (const link of screen.getAllByRole('link', { name: 'Burna Boy' })) {
       expect(link).toHaveAttribute('href', 'https://open.spotify.com/artist/burna');
     }
+    for (const link of screen.getAllByRole('link', { name: '#pumped' })) {
+      expect(link).toHaveAttribute('href', 'https://open.spotify.com/playlist/playlist-pumped');
+    }
+    expect(screen.getByAltText('#pumped cover')).toHaveAttribute('width', '64');
+    expect(screen.getByAltText('#pumped cover')).toHaveAttribute('height', '64');
   });
 
   it('updates Plays per year, Every month, and Genres readouts on hover with zero instructional copy', async () => {
@@ -365,6 +392,7 @@ describe('ListeningStatsSections', () => {
         'Top albums, all time',
         'Top songs, all time',
         'Top artists, all time',
+        'Top playlists, all time',
         'On repeat',
         'Front to back',
       ]),

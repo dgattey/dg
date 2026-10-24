@@ -24,9 +24,9 @@ export type SqlPlayFilter = {
   predicate: (alias?: string) => string;
 };
 
-const ALL_TIME_FILTER: SqlPlayFilter = { predicate: () => '' };
+export const ALL_TIME_FILTER: SqlPlayFilter = { predicate: () => '' };
 const columnRef = (alias?: string): string => (alias ? `${alias}."playedAt"` : '"playedAt"');
-const whereClause = (filter: SqlPlayFilter, alias?: string): string => {
+export const whereClause = (filter: SqlPlayFilter, alias?: string): string => {
   const cond = filter.predicate(alias);
   return cond ? `WHERE ${cond}` : '';
 };
@@ -60,7 +60,7 @@ export function rollingDaysPlayFilter(anchor: Date, days: number): SqlPlayFilter
   };
 }
 
-async function select<Schema extends v.GenericSchema>(
+export async function select<Schema extends v.GenericSchema>(
   sql: string,
   row: Schema,
   replacements?: Record<string, unknown>,

@@ -21,6 +21,7 @@ const SINGLES = 'ls-album-singles';
 const ARTIST = 'ls-artist-cached';
 const GUEST = 'ls-artist-guest';
 const REPEAT_TRACK = 'ls-track-repeat';
+const PLAYLIST_ID = '0h6rMwAevgcAKLASUoeuU8';
 
 type Play = { albumId: string; artistIds: Array<string>; playedAt: string; trackId: string };
 
@@ -57,9 +58,12 @@ const plays: Array<Play> = [
  * aggregate to exactly what the test seeds.
  */
 async function isolateTables() {
-  await dbClient.query('LOCK TABLE "SpotifyPlay", "FavoriteAlbum" IN ACCESS EXCLUSIVE MODE');
+  await dbClient.query(
+    'LOCK TABLE "SpotifyPlay", "FavoriteAlbum", "MusicPlaylist" IN ACCESS EXCLUSIVE MODE',
+  );
   await dbClient.query('DELETE FROM "SpotifyPlay"');
   await dbClient.query('DELETE FROM "FavoriteAlbum"');
+  await dbClient.query('DELETE FROM "MusicPlaylist"');
 }
 
 async function seedCatalog() {
@@ -111,22 +115,50 @@ describe('fetchListeningStats', () => {
     await db.SpotifyPlay.bulkCreate(
       plays.map((row) => ({ ...row, playedAt: new Date(row.playedAt) })),
     );
-    mockSpotifyGet.mockImplementation((resource: string) =>
-      Promise.resolve(
-        resource === `artists/${GUEST}`
-          ? {
-              data: {
-                external_urls: { spotify: 'https://open.spotify.com/artist/guest' },
-                genres: ['afrobeats'],
-                id: GUEST,
-                name: 'Burna Boy',
+    mockSpotifyGet.mockImplementation((resource: string) => {
+      if (resource === `artists/${GUEST}`) {
+        return Promise.resolve({
+          data: {
+            external_urls: { spotify: 'https://open.spotify.com/artist/guest' },
+            genres: ['afrobeats'],
+            id: GUEST,
+            name: 'Burna Boy',
+          },
+          status: 200,
+          success: true,
+        });
+      }
+      if (resource.startsWith('me/playlists?')) {
+        return Promise.resolve({
+          data: {
+            items: [
+              {
+                external_urls: { spotify: `https://open.spotify.com/playlist/${PLAYLIST_ID}` },
+                id: PLAYLIST_ID,
+                images: [{ height: 640, url: 'https://mosaic.scdn.co/640/pumped', width: 640 }],
+                name: '#pumped',
+                owner: { id: 'dylangattey' },
+                tracks: { total: 10 },
               },
-              status: 200,
-              success: true,
-            }
-          : { error: 'HTTP 404', status: 404, success: false },
-      ),
-    );
+            ],
+            next: null,
+          },
+          status: 200,
+          success: true,
+        });
+      }
+      if (resource.startsWith(`playlists/${PLAYLIST_ID}/tracks?`)) {
+        return Promise.resolve({
+          data: {
+            items: [{ track: { id: REPEAT_TRACK } }],
+            next: null,
+          },
+          status: 200,
+          success: true,
+        });
+      }
+      return Promise.resolve({ error: 'HTTP 404', status: 404, success: false });
+    });
 
     const stats = await fetchListeningStats();
 
@@ -175,6 +207,22 @@ describe('fetchListeningStats', () => {
       sessions: 1,
       shelf: { albums: 1, plays: 10 },
       spanDays: 172,
+      topPlaylists: [
+        {
+          id: PLAYLIST_ID,
+          imageUrl: 'https://mosaic.scdn.co/640/pumped',
+          name: '#pumped',
+          playedTracks: 1,
+          plays: 4,
+          topTrack: {
+            id: REPEAT_TRACK,
+            name: 'Repeat me',
+            url: 'https://open.spotify.com/track/repeat',
+          },
+          totalTracks: 10,
+          url: `https://open.spotify.com/playlist/${PLAYLIST_ID}`,
+        },
+      ],
       tracks: 7,
       years: [
         { plays: 1, year: 2023 },
@@ -259,6 +307,11 @@ describe('fetchListeningStats', () => {
     expect(stats?.hours[15]).toBe(6);
     expect(stats?.hours[19]).toBe(4);
     await expect(db.MusicArtist.findByPk(GUEST)).resolves.toMatchObject({ name: 'Burna Boy' });
+    await expect(db.MusicPlaylist.findByPk(PLAYLIST_ID)).resolves.toMatchObject({
+      name: '#pumped',
+      totalTracks: 10,
+      trackIds: [REPEAT_TRACK],
+    });
   });
 
   it('filters stats by specific year and adapts timeline, matrix, and champions to monthly/weekly granularity', async () => {

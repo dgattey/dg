@@ -7,12 +7,6 @@ import { log } from '@dg/shared-core/logging/log';
 import 'dotenv-mono/load';
 
 const vercelEnv = process.env.VERCEL_ENV;
-
-if (vercelEnv === 'preview') {
-  log.info('Skipping migrations on Vercel preview build');
-  process.exit(0);
-}
-
 const packageRoot = join(dirname(fileURLToPath(import.meta.url)), '..');
 const migrationsDir = join(packageRoot, 'migrations');
 const stampPath = join(packageRoot, '.turbo', 'migrate-stamp.txt');

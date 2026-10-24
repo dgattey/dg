@@ -6,6 +6,7 @@ import { FavoriteAlbumSnapshot } from './models/FavoriteAlbumSnapshot';
 import { MusicAlbum } from './models/MusicAlbum';
 import { MusicAlbumArtist } from './models/MusicAlbumArtist';
 import { MusicArtist } from './models/MusicArtist';
+import { MusicPlaylist } from './models/MusicPlaylist';
 import { MusicTrack } from './models/MusicTrack';
 import { MusicTrackArtist } from './models/MusicTrackArtist';
 import { OauthState } from './models/OauthState';
@@ -20,6 +21,7 @@ export const db = {
   MusicAlbum,
   MusicAlbumArtist,
   MusicArtist,
+  MusicPlaylist,
   MusicTrack,
   MusicTrackArtist,
   OauthState,

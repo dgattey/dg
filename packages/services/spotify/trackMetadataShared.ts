@@ -17,7 +17,7 @@ export type TrackMetadata = {
  * Selects the best album image (prefers 640px width, falls back to first).
  */
 export function bestSpotifyImage(
-  images: ReadonlyArray<{ height: number; url: string; width: number }>,
+  images: ReadonlyArray<{ height?: number | null; url: string; width?: number | null }>,
 ): string {
   const preferred = images.find((img) => img.width === 640) ?? images[0];
   return preferred?.url ?? '';
@@ -38,6 +38,7 @@ export type SpotifyRequestResult<T> =
   | { error: string; retryAfterSeconds?: number; status: number; success: false };
 
 let cachedAppToken: { expiresAt: number; token: string } | null = null;
+let userTokenUnavailable = false;
 
 async function getClientCredentialsToken(): Promise<string | null> {
   if (cachedAppToken && cachedAppToken.expiresAt > Date.now()) {
@@ -76,14 +77,18 @@ async function fetchPublicCatalogResource<T>(
   resource: string,
   schema: v.GenericSchema<unknown, T>,
 ): Promise<SpotifyRequestResult<T> | null> {
-  if (!/^(?:(?:tracks|albums|artists)(?:\/|\?)|search\?)/.test(resource)) {
+  const publicResource = resource.replace(
+    /^me\/playlists(?=\/|\?|$)/,
+    'users/dylangattey/playlists',
+  );
+  if (!/^(?:(?:tracks|albums|artists|playlists|users)(?:\/|\?)|search\?)/.test(publicResource)) {
     return null;
   }
   const token = await getClientCredentialsToken();
   if (!token) {
     return null;
   }
-  const res = await fetch(`https://api.spotify.com/v1/${resource}`, {
+  const res = await fetch(`https://api.spotify.com/v1/${publicResource}`, {
     cache: 'no-store',
     headers: { Authorization: `Bearer ${token}` },
   });
@@ -117,6 +122,12 @@ export async function spotifyGet<T>(
   schema: v.GenericSchema<unknown, T>,
   context: string,
 ): Promise<SpotifyRequestResult<T>> {
+  if (process.env.NODE_ENV !== 'test' && userTokenUnavailable) {
+    const fallback = await fetchPublicCatalogResource(resource, schema);
+    if (fallback) {
+      return fallback;
+    }
+  }
   try {
     const { response, retryAfterSeconds, status } = await getSpotifyClient().get(resource);
 
@@ -136,6 +147,9 @@ export async function spotifyGet<T>(
     return { data, status: 200, success: true };
   } catch (error) {
     if (isMissingTokenError(error)) {
+      if (process.env.NODE_ENV !== 'test') {
+        userTokenUnavailable = true;
+      }
       const fallback = await fetchPublicCatalogResource(resource, schema);
       if (fallback) {
         return fallback;

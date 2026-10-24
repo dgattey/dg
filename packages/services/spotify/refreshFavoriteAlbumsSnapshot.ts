@@ -6,7 +6,7 @@ import { serializeError } from '@dg/shared-core/logging/maskSecrets';
 import { writeFavoriteAlbumsSnapshot } from './favoriteAlbumsSnapshot';
 import { fetchPlaylistAlbums } from './fetchPlaylistAlbums';
 
-const FAVORITE_ALBUMS_PLAYLIST_ID = '1bbwGrz6rSq5APjRfZp63U';
+export const FAVORITE_ALBUMS_PLAYLIST_ID = '1bbwGrz6rSq5APjRfZp63U';
 
 type RefreshFavoriteAlbumsOptions = {
   storedAlbums?: Array<PlaylistAlbum> | null;
