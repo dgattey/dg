@@ -5,8 +5,8 @@ import { MusicAlbum } from '@dg/db/models/MusicAlbum';
 import { MusicArtist } from '@dg/db/models/MusicArtist';
 import { MusicTrack } from '@dg/db/models/MusicTrack';
 import { MusicTrackArtist } from '@dg/db/models/MusicTrackArtist';
-import { type SpotifyLink, spotifyUrl } from './spotifyLinks';
-import { sleep } from './trackMetadataShared';
+import { type SpotifyLink, spotifyUrl, toOrderedArtistLinks } from './spotifyLinks';
+import { mapInBatches } from './trackMetadataShared';
 import { fetchTrackDisplayData, type TrackDisplayData } from './trackMetadataSingle';
 
 /**
@@ -16,11 +16,6 @@ export type TrackDisplay = SpotifyLink & {
   album: SpotifyLink & { imageUrl: string };
   artists: Array<SpotifyLink>;
 };
-
-type CachedArtist = MusicArtist & { MusicTrackArtist: { position: number } };
-
-const FETCH_CONCURRENCY = 5;
-const FETCH_THROTTLE_MS = 100;
 
 async function readCachedTracks(trackIds: Array<string>): Promise<Map<string, TrackDisplay>> {
   if (trackIds.length === 0) {
@@ -39,57 +34,22 @@ async function readCachedTracks(trackIds: Array<string>): Promise<Map<string, Tr
   });
 
   return new Map(
-    cachedTracks.map((track) => {
-      // Sequelize types the through-attributes loosely; the include above selects `position`.
-      const artists = [...(track.artists as Array<CachedArtist>)].sort(
-        (a, b) => a.MusicTrackArtist.position - b.MusicTrackArtist.position,
-      );
-      return [
-        track.id,
-        {
-          album: {
-            id: track.album.id,
-            imageUrl: track.album.imageUrl,
-            name: track.album.name,
-            url: spotifyUrl('album', track.album.id, track.album.url),
-          },
-          artists: artists.map((artist) => ({
-            id: artist.id,
-            name: artist.name,
-            url: spotifyUrl('artist', artist.id, artist.url),
-          })),
-          id: track.id,
-          name: track.name,
-          url: spotifyUrl('track', track.id, track.url),
+    cachedTracks.map((track) => [
+      track.id,
+      {
+        album: {
+          id: track.album.id,
+          imageUrl: track.album.imageUrl,
+          name: track.album.name,
+          url: spotifyUrl('album', track.album.id, track.album.url),
         },
-      ];
-    }),
+        artists: toOrderedArtistLinks(track.artists),
+        id: track.id,
+        name: track.name,
+        url: spotifyUrl('track', track.id, track.url),
+      },
+    ]),
   );
-}
-
-/**
- * Fetches missing tracks from Spotify with controlled concurrency. Failures are
- * dropped so one bad track never blanks a whole page.
- */
-async function fetchMissingTracks(trackIds: Array<string>): Promise<Array<TrackDisplayData>> {
-  const results: Array<TrackDisplayData> = [];
-
-  for (let i = 0; i < trackIds.length; i += FETCH_CONCURRENCY) {
-    const batch = trackIds.slice(i, i + FETCH_CONCURRENCY);
-    const batchResults = await Promise.allSettled(batch.map((id) => fetchTrackDisplayData(id)));
-
-    for (const result of batchResults) {
-      if (result.status === 'fulfilled' && result.value) {
-        results.push(result.value);
-      }
-    }
-
-    if (i + FETCH_CONCURRENCY < trackIds.length) {
-      await sleep(FETCH_THROTTLE_MS);
-    }
-  }
-
-  return results;
 }
 
 export async function cacheTrackData(displayData: Array<TrackDisplayData>): Promise<void> {
@@ -153,7 +113,10 @@ export async function resolveTrackDisplays(
 ): Promise<Map<string, TrackDisplay>> {
   const uniqueIds = [...new Set(trackIds)];
   const displays = await readCachedTracks(uniqueIds);
-  const fetched = await fetchMissingTracks(uniqueIds.filter((id) => !displays.has(id)));
+  const fetched = await mapInBatches(
+    uniqueIds.filter((id) => !displays.has(id)),
+    fetchTrackDisplayData,
+  );
   await cacheTrackData(fetched);
   for (const data of fetched) {
     displays.set(data.track.id, toTrackDisplay(data));

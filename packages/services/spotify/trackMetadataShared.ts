@@ -2,8 +2,12 @@ import 'server-only';
 
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { log } from '@dg/shared-core/logging/log';
-import * as v from 'valibot';
+import type * as v from 'valibot';
+import { parseResponse } from '../clients/parseResponse';
 import { getSpotifyClient } from './spotifyClient';
+
+const FETCH_CONCURRENCY = 5;
+const FETCH_THROTTLE_MS = 100;
 
 /**
  * Metadata needed to create a SpotifyPlay row.
@@ -28,6 +32,29 @@ export function bestSpotifyImage(
  */
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Runs an async lookup across items in throttled batches, dropping rejected or null results.
+ */
+export async function mapInBatches<T, R>(
+  items: ReadonlyArray<T>,
+  fn: (item: T) => Promise<R | null>,
+): Promise<Array<R>> {
+  const results: Array<R> = [];
+  for (let i = 0; i < items.length; i += FETCH_CONCURRENCY) {
+    const batch = items.slice(i, i + FETCH_CONCURRENCY);
+    const settled = await Promise.allSettled(batch.map(fn));
+    for (const item of settled) {
+      if (item.status === 'fulfilled' && item.value !== null) {
+        results.push(item.value);
+      }
+    }
+    if (i + FETCH_CONCURRENCY < items.length) {
+      await sleep(FETCH_THROTTLE_MS);
+    }
+  }
+  return results;
 }
 
 /**
@@ -75,7 +102,8 @@ async function getClientCredentialsToken(): Promise<string | null> {
 
 async function fetchPublicCatalogResource<T>(
   resource: string,
-  schema: v.GenericSchema<unknown, T>,
+  schema: v.BaseSchema<unknown, T, v.BaseIssue<unknown>>,
+  context: string,
 ): Promise<SpotifyRequestResult<T> | null> {
   const publicResource = resource.replace(
     /^me\/playlists(?=\/|\?|$)/,
@@ -104,7 +132,10 @@ async function fetchPublicCatalogResource<T>(
       success: false,
     };
   }
-  const data = v.parse(schema, await res.json());
+  const data = parseResponse(schema, await res.json(), {
+    kind: 'rest',
+    source: `spotify.${context}`,
+  });
   return { data, status: 200, success: true };
 }
 
@@ -119,11 +150,11 @@ async function fetchPublicCatalogResource<T>(
  */
 export async function spotifyGet<T>(
   resource: string,
-  schema: v.GenericSchema<unknown, T>,
+  schema: v.BaseSchema<unknown, T, v.BaseIssue<unknown>>,
   context: string,
 ): Promise<SpotifyRequestResult<T>> {
   if (process.env.NODE_ENV !== 'test' && userTokenUnavailable) {
-    const fallback = await fetchPublicCatalogResource(resource, schema);
+    const fallback = await fetchPublicCatalogResource(resource, schema, context);
     if (fallback) {
       return fallback;
     }
@@ -143,14 +174,17 @@ export async function spotifyGet<T>(
       };
     }
 
-    const data = v.parse(schema, await response.json());
+    const data = parseResponse(schema, await response.json(), {
+      kind: 'rest',
+      source: `spotify.${context}`,
+    });
     return { data, status: 200, success: true };
   } catch (error) {
     if (isMissingTokenError(error)) {
       if (process.env.NODE_ENV !== 'test') {
         userTokenUnavailable = true;
       }
-      const fallback = await fetchPublicCatalogResource(resource, schema);
+      const fallback = await fetchPublicCatalogResource(resource, schema, context);
       if (fallback) {
         return fallback;
       }
