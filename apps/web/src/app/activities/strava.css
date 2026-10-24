@@ -55,6 +55,7 @@
   width: 0.55em;
   height: 0.55em;
   margin-inline-end: 0.45em;
+  background-color: var(--dot-bg);
   border-radius: 50%;
 }
 /* Phone pills drop the dot so two sports, a picked one in More, and the span share one row; the menu keeps them. */
@@ -336,7 +337,7 @@
   outline-offset: 0;
 }
 .strava__petal {
-  fill: color-mix(in oklab, var(--ink-on-cream) 14%, transparent);
+  fill: var(--petal-fill, color-mix(in oklab, var(--ink-on-cream) 14%, transparent));
 }
 .strava__vein {
   fill: none;

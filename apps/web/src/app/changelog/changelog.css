@@ -146,6 +146,7 @@
   border: 1px solid color-mix(in oklab, var(--ink-on-cream) 10%, transparent);
   border-radius: 12px 10px 13px 11px;
   box-shadow: var(--pshadow);
+  rotate: var(--polaroid-tilt, 0deg);
 }
 .changelog__polaroidFrame {
   overflow: hidden;

@@ -1,12 +1,12 @@
 import { albumCoverStyle, MAX_ALBUM_SLEEVES } from '../albumTileGeometry';
 
-const coverStyle = (depth: number, sleeveCount: number) =>
-  albumCoverStyle(depth, sleeveCount) as { inset: string; transform: string };
+const coverStyle = (depth: number, sleeveCount: number) => albumCoverStyle(depth, sleeveCount);
 
 const fanOffset = (depth: number, sleeveCount: number) =>
   Number(
-    /translate\(calc\((?<shift>-?[\d.]+)%/.exec(coverStyle(depth, sleeveCount).transform)?.groups
-      ?.shift,
+    /translate\(calc\((?<shift>-?[\d.]+)%/.exec(
+      coverStyle(depth, sleeveCount)['--cover-transform'] ?? '',
+    )?.groups?.shift,
   );
 
 describe('albumCoverStyle', () => {
@@ -16,7 +16,7 @@ describe('albumCoverStyle', () => {
       coverStyle(0, 1),
       coverStyle(0, MAX_ALBUM_SLEEVES),
       coverStyle(MAX_ALBUM_SLEEVES, MAX_ALBUM_SLEEVES),
-    ].map((style) => style.inset);
+    ].map((style) => style['--cover-inset']);
 
     expect(new Set(boxes).size).toBe(1);
   });
@@ -27,7 +27,7 @@ describe('albumCoverStyle', () => {
   });
 
   it('never tilts a front cover, which is what morphs into the album well', () => {
-    expect(coverStyle(0, MAX_ALBUM_SLEEVES).transform).toContain('rotate(0deg)');
-    expect(coverStyle(1, MAX_ALBUM_SLEEVES).transform).not.toContain('rotate(0deg)');
+    expect(coverStyle(0, MAX_ALBUM_SLEEVES)['--cover-transform']).toContain('rotate(0deg)');
+    expect(coverStyle(1, MAX_ALBUM_SLEEVES)['--cover-transform']).not.toContain('rotate(0deg)');
   });
 });

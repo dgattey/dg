@@ -7,6 +7,7 @@ import {
   checkHeaderAboveSticky,
   checkScallopPadding,
 } from '../check-css-geometry.js';
+import { checkFooterCurtainReveal } from '../check-page-titles.js';
 
 const FILE = 'apps/web/src/app/music/stats/statsShapes.css';
 
@@ -177,6 +178,32 @@ describe('check-css-geometry', () => {
       [
         { line: 1, rule: 'css-header-above-sticky' },
         { line: 2, rule: 'css-header-above-sticky' },
+      ],
+    );
+  });
+
+  it('enforces the footer curtain reveal and symmetric padding-block on .chrome__footerGrid', () => {
+    const violations = checkFooterCurtainReveal(
+      new Map([
+        [
+          'apps/web/src/app/collage/collage.css',
+          '.collageSheet { position: relative; z-index: 2; }',
+        ],
+        [
+          'apps/web/src/app/collage/chrome.css',
+          [
+            '.chrome__footer { position: sticky; bottom: 0; z-index: 2; }',
+            '.chrome__nowWrap { position: relative; z-index: 1; height: 0; }',
+            '.chrome__footerGrid { display: grid; }',
+          ].join('\n'),
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      violations.map(({ line, rule }) => ({ line, rule })),
+      [
+        { line: 1, rule: 'css-footer-curtain' },
+        { line: 3, rule: 'css-footer-curtain' },
       ],
     );
   });

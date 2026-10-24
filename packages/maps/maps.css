@@ -1,0 +1,234 @@
+[data-map-card] {
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+[data-pigeon-map] {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: var(--ultramarine);
+  isolation: isolate;
+  will-change: transform;
+}
+
+[data-map-marker] {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  overflow: hidden;
+  cursor: grab;
+  background-color: color-mix(in srgb, var(--dg-palette-background-default) 84%, transparent);
+  border: 2px solid color-mix(in srgb, var(--dg-palette-background-default) 72%, transparent);
+  border-radius: 50%;
+  box-shadow:
+    inset 0 1px 0 color-mix(in srgb, var(--dg-palette-common-white) 15%, transparent),
+    0px 1px 5px color-mix(in srgb, var(--dg-palette-common-black) 12%, transparent),
+    0px 6px 16px color-mix(in srgb, var(--dg-palette-common-black) 8%, transparent);
+  transform: translate(-50%, -50%);
+  transition:
+    background-color 375ms var(--easing-bouncy),
+    border-color 375ms var(--easing-bouncy),
+    box-shadow 375ms var(--easing-bouncy);
+}
+
+[data-map-marker-image] {
+  position: absolute;
+  top: 7.5px;
+  left: 7.5px;
+}
+
+[data-map-tile] {
+  position: absolute;
+  top: var(--tile-top);
+  left: var(--tile-left);
+  width: var(--tile-w);
+  height: var(--tile-h);
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+[data-map-tile][data-active="true"] {
+  opacity: 1;
+}
+
+[data-map-tile-img] {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+[data-watercolor-tile-img] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+[data-atlas-map] {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  isolation: isolate;
+  will-change: transform;
+}
+
+[data-atlas-overlay] {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+[data-atlas-canvas] {
+  position: absolute;
+  inset: 0;
+  background-image: var(--atlas-offline-bg);
+}
+
+[data-atlas-canvas] > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+[data-atlas-tiles] {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background-color: var(--cream);
+}
+
+[data-atlas-tiles][data-dark="true"] {
+  background-color: #2a2a2a;
+}
+
+[data-atlas-tiles] > div {
+  background-color: transparent;
+}
+
+[data-route-map] {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  pointer-events: none;
+  isolation: isolate;
+  will-change: transform;
+}
+
+[data-route-map-svg] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 3;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+[data-map-scheme] {
+  position: absolute;
+  inset: 0;
+}
+
+[data-map-scheme="light"] {
+  display: block;
+  background-color: var(--cream);
+}
+
+[data-map-scheme="dark"] {
+  display: none;
+  background-color: #2a2a2a;
+}
+
+html[data-color-scheme="dark"] [data-map-scheme="light"] {
+  display: none;
+}
+
+html[data-color-scheme="dark"] [data-map-scheme="dark"] {
+  display: block;
+}
+
+@media (prefers-color-scheme: dark) {
+  html:not([data-color-scheme="light"]) [data-map-scheme="light"] {
+    display: none;
+  }
+  html:not([data-color-scheme="light"]) [data-map-scheme="dark"] {
+    display: block;
+  }
+}
+
+[data-map-tile-layer] {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+[data-map-tile-layer] > div {
+  width: 100%;
+  height: 100%;
+  background-color: transparent;
+}
+
+[data-route-map-scrim] {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+}
+
+[data-map-scheme="light"] > [data-route-map-scrim] {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--cream) 6%, transparent) 0%,
+    color-mix(in srgb, var(--cream) 14%, transparent) 100%
+  );
+}
+
+[data-map-scheme="dark"] > [data-route-map-scrim] {
+  background: linear-gradient(180deg, rgb(0 0 0 / 0.04) 0%, rgb(0 0 0 / 0.12) 100%);
+}
+
+[data-zoom-controls] {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  display: grid;
+  gap: 5px;
+}
+
+[data-zoom-button] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 17px;
+  font-weight: 700;
+  color: var(--ink-on-cream);
+  cursor: pointer;
+  background-color: var(--cream);
+  border: 0;
+  clip-path: var(--quad-b);
+}
+
+[data-zoom-button]:hover {
+  background-color: color-mix(in srgb, var(--cream) 86%, var(--ochre));
+}
+
+[data-zoom-button][data-zoom-button]:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -3px;
+  border-radius: 9px 13px 10px 12px;
+}

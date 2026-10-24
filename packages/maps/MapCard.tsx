@@ -1,13 +1,6 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
-import type { CSSProperties } from 'react';
 import { getTileSource } from './src/getTileSource';
 import { PigeonMap } from './src/PigeonMap';
-
-const collageMapStyle: CSSProperties = {
-  height: '100%',
-  minHeight: 0,
-  width: '100%',
-};
 
 /**
  * Server component wrapper for the map. Resolves the tile source
@@ -15,7 +8,7 @@ const collageMapStyle: CSSProperties = {
  */
 export function MapCard({ location }: { location: MapLocation }) {
   return (
-    <section aria-label="Current location map" style={collageMapStyle}>
+    <section aria-label="Current location map" data-map-card="">
       <PigeonMap location={location} tileSource={getTileSource()} />
     </section>
   );

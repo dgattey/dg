@@ -9,13 +9,11 @@ import {
   type RenderableRichTextContent,
 } from '@dg/content-models/contentful/renderables/richText';
 import { isRecord } from '@dg/shared-core/types/typeguards';
-import type { CSSProperties } from 'react';
 import { Typography } from '../core/Typography';
 import { Image } from './Image';
 import { Link } from './Link';
 
 const PROJECT_MAX_IMAGE_DIMENSION = 330;
-const STICKY_HEADER_SCROLL_MARGIN_PX = 136;
 
 type DataWithId = {
   target: {
@@ -23,24 +21,6 @@ type DataWithId = {
       id: string;
     };
   };
-};
-
-const headingStyle: CSSProperties = {
-  marginBottom: 24,
-  scrollMarginTop: STICKY_HEADER_SCROLL_MARGIN_PX,
-};
-
-const paragraphStyle: CSSProperties = {
-  marginBottom: 28,
-};
-
-const dividerStyle: CSSProperties = {
-  borderBottomWidth: 'thin',
-  borderColor: 'var(--dg-palette-divider)',
-  borderStyle: 'solid',
-  borderWidth: 0,
-  flexShrink: 0,
-  margin: 0,
 };
 
 const isDataWithId = (data: NodeData): data is DataWithId =>
@@ -116,7 +96,7 @@ function HeadingWithId({
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
   return (
-    <Typography id={id} style={headingStyle} variant={variant}>
+    <Typography data-rich-heading="" id={id} variant={variant}>
       {children}
     </Typography>
   );
@@ -142,11 +122,11 @@ const renderOptions = (links: RenderableRichTextContent['links']): Options => {
       [BLOCKS.HEADING_5]: (_, children) => <HeadingWithId variant="h5">{children}</HeadingWithId>,
       [BLOCKS.HEADING_6]: (_, children) => <HeadingWithId variant="h6">{children}</HeadingWithId>,
       [BLOCKS.PARAGRAPH]: (_, children) => (
-        <Typography style={paragraphStyle} variant="body1">
+        <Typography data-rich-paragraph="" variant="body1">
           {children}
         </Typography>
       ),
-      [BLOCKS.HR]: () => <hr style={dividerStyle} />,
+      [BLOCKS.HR]: () => <hr data-rich-divider="" />,
       [INLINES.HYPERLINK]: ({ data }, children) => {
         if (!isDataWithLink(data)) {
           return children;
@@ -168,9 +148,5 @@ export function RichText({ json, links }: RenderableRichTextContent) {
   if (!isRichTextDocument(json)) {
     return null;
   }
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column' }}>
-      {documentToReactComponents(json, renderOptions(links))}
-    </div>
-  );
+  return <div data-rich-text="">{documentToReactComponents(json, renderOptions(links))}</div>;
 }

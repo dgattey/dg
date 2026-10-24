@@ -469,6 +469,8 @@ html[data-color-scheme="dark"] .cutNightOnly {
 .cutLetter {
   display: inline-block;
   margin-inline: 0.012em;
+  rotate: var(--letter-r, 0deg);
+  translate: 0 var(--letter-y, 0);
 }
 
 @media (max-width: 820px) {

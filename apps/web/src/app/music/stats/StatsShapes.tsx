@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 import { cx, paperToneVars } from '../../collage/paperVars';
 import type { PaperTone } from '../../collage/types';
 
@@ -38,7 +38,7 @@ export function Scallop({
     <span className={cx('stats__cut', className)} style={paperToneVars(tone, tiltDeg)}>
       <span
         className={cx('stats__scallop', `stats__scallop--${size}`)}
-        style={{ clipPath: SCALLOPS[size] }}
+        style={{ '--scallop-clip': SCALLOPS[size] } as CSSProperties}
       >
         {children}
       </span>

@@ -2,21 +2,11 @@
 
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import { Overlay, Map as PigeonMapCore } from 'pigeon-maps';
-import { type CSSProperties, useState } from 'react';
+import { useState } from 'react';
 import { Marker } from './Marker';
 import { stadiaTileUrl, type TileSource } from './tileSource';
 import { WatercolorTile } from './WatercolorTile';
 import { ZoomControls } from './ZoomControls';
-
-const containerStyle: CSSProperties = {
-  backgroundColor: 'var(--ultramarine)',
-  height: '100%',
-  isolation: 'isolate',
-  overflow: 'hidden',
-  position: 'relative',
-  width: '100%',
-  willChange: 'transform',
-};
 
 const DEFAULT_MIN_ZOOM = 3;
 const DEFAULT_MAX_ZOOM = 18;
@@ -55,7 +45,7 @@ export function PigeonMap({ location, tileSource }: PigeonMapProps) {
   };
 
   return (
-    <div style={containerStyle}>
+    <div data-pigeon-map="">
       <PigeonMapCore
         attribution={false}
         center={center}

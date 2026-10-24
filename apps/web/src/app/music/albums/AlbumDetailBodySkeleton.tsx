@@ -2,13 +2,25 @@ import type { CSSProperties } from 'react';
 
 const PLACEHOLDER_TRACKS = Array.from({ length: 6 }, (_, track) => `track-${track}`);
 
-function SkeletonLine({ style }: { style?: CSSProperties }) {
+function SkeletonLine({
+  height,
+  maxWidth,
+  width,
+}: {
+  height?: string;
+  maxWidth?: string;
+  width?: string;
+}) {
+  const vars: CSSProperties & Record<`--${string}`, string> = {};
+  if (height) vars['--skeleton-h'] = height;
+  if (maxWidth) vars['--skeleton-max-w'] = maxWidth;
+  if (width) vars['--skeleton-w'] = width;
   return (
     <span
       aria-hidden="true"
       className="music__skeleton music__skeletonText"
       data-skeleton=""
-      style={style}
+      style={Object.keys(vars).length > 0 ? vars : undefined}
     />
   );
 }
@@ -25,8 +37,8 @@ export function AlbumDetailBodySkeleton() {
   return (
     <div className="music__wellPlaceholder" data-role="album-detail-placeholder">
       <div className="music__wellMeta">
-        <SkeletonLine style={{ maxWidth: 320, width: '55%' }} />
-        <SkeletonLine style={{ height: 28, maxWidth: 380, width: '65%' }} />
+        <SkeletonLine maxWidth="320px" width="55%" />
+        <SkeletonLine height="28px" maxWidth="380px" width="65%" />
       </div>
       <div className="music__wellTracks">
         {PLACEHOLDER_TRACKS.map((track) => (
@@ -37,8 +49,8 @@ export function AlbumDetailBodySkeleton() {
           >
             <SkeletonLine />
             <div className="music__wellTrackBody">
-              <SkeletonLine style={{ width: '70%' }} />
-              <SkeletonLine style={{ height: 16, width: '45%' }} />
+              <SkeletonLine width="70%" />
+              <SkeletonLine height="16px" width="45%" />
             </div>
           </div>
         ))}

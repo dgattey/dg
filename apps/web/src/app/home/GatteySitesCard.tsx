@@ -17,7 +17,7 @@ export function GatteySitesCard({ projects }: GatteySitesCardProps) {
   }
 
   return (
-    <div className="home__sideRoot" data-slot="sd" style={{ gridArea: 'sd', marginTop: 6 }}>
+    <div className="home__sideRoot" data-slot="sd">
       <h2 className="home__sideHeadingWrap">
         <PaperTag className="collageEyebrow" edge="quad-c" tiltDeg={-3} tone="vermilion">
           Side projects

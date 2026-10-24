@@ -138,6 +138,26 @@ describe('check-structure', () => {
     assert.equal(uncachedStravaHistoryViolation.length, 1);
     assert.equal(uncachedStravaHistoryViolation[0]?.rule, 'strava-history-summary-cache');
 
+    const inlineStyleTagViolation = checkFileStructure(
+      'apps/web/src/app/spotify/TrackListing.tsx',
+      'export const X = () => <style>{".a{color:red}"}</style>;\n',
+    );
+    assert.equal(inlineStyleTagViolation.length, 1);
+    assert.equal(inlineStyleTagViolation[0]?.rule, 'no-inline-style-tag');
+
+    const staticInlineStyleViolation = checkFileStructure(
+      'apps/web/src/app/spotify/TrackListing.tsx',
+      'export const X = () => <div style={{ display: "block" }} />;\n',
+    );
+    assert.equal(staticInlineStyleViolation.length, 1);
+    assert.equal(staticInlineStyleViolation[0]?.rule, 'no-static-inline-style');
+
+    const cssVarInlineStyleAllowed = checkFileStructure(
+      'apps/web/src/app/spotify/TrackListing.tsx',
+      'export const X = () => <div style={{ "--bar": "50%" }} />;\n',
+    );
+    assert.equal(cssVarInlineStyleAllowed.length, 0);
+
     const orphanCss = checkOrphanCssFiles(
       ['apps/web/src/app/music/music.css', 'apps/web/src/app/dev-console/devConsole.css'],
       new Map([['apps/web/src/app/music/page.tsx', "import './music.css';\n"]]),

@@ -1,6 +1,9 @@
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { getGlobalThemeCss } from '../../theme';
 import { Tooltip } from '../Tooltip';
+
+const globalCss = getGlobalThemeCss();
 
 /**
  * Rules emitted for the tooltip surface. jsdom can't simulate
@@ -16,6 +19,9 @@ const surfaceRules = () =>
 const rulesMatching = (pattern: RegExp) => surfaceRules().filter((rule) => pattern.test(rule));
 
 describe('Tooltip', () => {
+  beforeEach(() => {
+    document.head.innerHTML = `<style>${globalCss}</style>`;
+  });
   it('adds aria-describedby and respects placement', () => {
     render(
       <Tooltip placement="top" title="Tip content">

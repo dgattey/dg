@@ -8,7 +8,14 @@ import {
   type StravaWindow,
 } from '@dg/content-models/strava/StreetCoverage';
 import { VisibleRoutes } from '@dg/maps/VisibleRoutes';
-import { createContext, type ReactNode, startTransition, use, useState } from 'react';
+import {
+  type CSSProperties,
+  createContext,
+  type ReactNode,
+  startTransition,
+  use,
+  useState,
+} from 'react';
 import { type PaperPillOption, PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
 import { PillMenu, PillMenuList, PillMenuOption } from '../collage/PillMenu';
@@ -88,7 +95,7 @@ const sportLabel = (key: SportFilter) =>
       <span
         aria-hidden="true"
         className="strava__filterDot"
-        style={{ backgroundColor: `var(--${SPORT_DETAILS[key].tone})` }}
+        style={{ '--dot-bg': `var(--${SPORT_DETAILS[key].tone})` } as CSSProperties}
       />
       {SPORT_DETAILS[key].filter}
     </span>

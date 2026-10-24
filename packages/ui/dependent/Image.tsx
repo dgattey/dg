@@ -37,34 +37,6 @@ type ImageProps = {
 
 const COMPACT_DENSITY_MAX_WIDTH = 300;
 
-/**
- * All images need to be max width'd for our layouts. The declared ratio wins
- * over the file's own, so a 16:9 upload in a square album slot crops instead of
- * collapsing into a short strip.
- */
-const createMaxWidthImageStyle = (width: number, height: number): CSSProperties => ({
-  aspectRatio: `${width} / ${height}`,
-  borderStyle: 'none',
-  display: 'flex',
-  height: 'auto',
-  maxWidth: '100%',
-  objectFit: 'cover',
-});
-
-const coverImageStyle: CSSProperties = {
-  borderStyle: 'none',
-  height: '100%',
-  objectFit: 'cover',
-  objectPosition: 'center',
-  width: '100%',
-};
-
-const fillCompactImageStyle: CSSProperties = {
-  ...coverImageStyle,
-  inset: 0,
-  position: 'absolute',
-};
-
 export const generateSizesString = (sizes: ImageSizes): string => {
   const sizesString = Object.entries(sizes)
     .map(([breakpoint, width]) => ({
@@ -97,6 +69,10 @@ export function Image({
 }: ImageProps) {
   const sizeValues = Object.values(sizes).filter((v): v is number => typeof v === 'number');
   const maxDisplayWidth = Math.max(...sizeValues, sizes.extraLarge);
+  const aspectStyle =
+    !fill && !cover
+      ? ({ '--img-aspect-ratio': `${width} / ${height}` } as CSSProperties)
+      : undefined;
 
   if (maxDisplayWidth <= COMPACT_DENSITY_MAX_WIDTH) {
     const targetWidth = Math.round(maxDisplayWidth);
@@ -104,17 +80,14 @@ export function Image({
       width > 0 && height > 0
         ? Math.max(1, Math.round(height * (targetWidth / width)))
         : targetWidth;
-    const compactStyle = fill
-      ? fillCompactImageStyle
-      : cover
-        ? coverImageStyle
-        : createMaxWidthImageStyle(width, height);
+    const compactMode = fill ? 'fill-compact' : cover ? 'cover' : 'aspect';
     return (
       <NextImage
         alt={title ?? alt}
+        data-ui-image={compactMode}
         height={targetHeight}
         src={url}
-        style={compactStyle}
+        style={aspectStyle}
         width={targetWidth}
         {...props}
       />
@@ -132,6 +105,13 @@ export function Image({
     return <NextImage {...sharedProps} fill={true} />;
   }
 
-  const style = cover ? coverImageStyle : createMaxWidthImageStyle(width, height);
-  return <NextImage {...sharedProps} height={height} style={style} width={width} />;
+  return (
+    <NextImage
+      {...sharedProps}
+      data-ui-image={cover ? 'cover' : 'aspect'}
+      height={height}
+      style={aspectStyle}
+      width={width}
+    />
+  );
 }

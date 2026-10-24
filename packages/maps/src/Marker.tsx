@@ -1,39 +1,7 @@
 import type { MapLocation } from '@dg/content-models/contentful/MapLocation';
 import { Image } from '@dg/ui/dependent/Image';
-import { createTransition, EASING_BOUNCY } from '@dg/ui/helpers/timing';
-import type { CSSProperties } from 'react';
 
-const DIMENSION = 100;
 const IMAGE_DIMENSION = 85;
-
-const GLASS_SHADOW = `
-  inset 0 1px 0 color-mix(in srgb, var(--dg-palette-common-white) 15%, transparent),
-  0px 1px 5px color-mix(in srgb, var(--dg-palette-common-black) 12%, transparent),
-  0px 6px 16px color-mix(in srgb, var(--dg-palette-common-black) 8%, transparent)`;
-
-const containerStyle: CSSProperties = {
-  backgroundColor: 'color-mix(in srgb, var(--dg-palette-background-default) 84%, transparent)',
-  border: '2px solid color-mix(in srgb, var(--dg-palette-background-default) 72%, transparent)',
-  borderRadius: '50%',
-  boxShadow: GLASS_SHADOW,
-  cursor: 'grab',
-  height: DIMENSION,
-  overflow: 'hidden',
-  position: 'relative',
-  transform: 'translate(-50%, -50%)',
-  transition: createTransition(
-    ['background-color', 'border-color', 'box-shadow'],
-    375,
-    EASING_BOUNCY,
-  ),
-  width: DIMENSION,
-};
-
-const imageStyle: CSSProperties = {
-  left: (DIMENSION - IMAGE_DIMENSION) / 2,
-  position: 'absolute',
-  top: (DIMENSION - IMAGE_DIMENSION) / 2,
-};
 
 type MarkerProps = {
   image?: MapLocation['image'];
@@ -44,9 +12,9 @@ type MarkerProps = {
  */
 export function Marker({ image }: MarkerProps) {
   return (
-    <div style={containerStyle}>
+    <div data-map-marker="">
       {image ? (
-        <span style={imageStyle}>
+        <span data-map-marker-image="">
           <Image
             alt="Location marker"
             height={IMAGE_DIMENSION}

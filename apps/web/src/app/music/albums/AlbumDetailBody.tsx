@@ -1,7 +1,7 @@
 import type { AlbumDetail, AlbumDetailArtist } from '@dg/services/spotify/albumDetailTypes';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Link } from '@dg/ui/dependent/Link';
-import type { ReactNode } from 'react';
+import type { CSSProperties, ReactNode } from 'react';
 
 function formatDuration(totalMs: number): string {
   const totalSeconds = Math.round(totalMs / 1000);
@@ -66,7 +66,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
           </Tooltip>
         </h3>
         <div className="music__wellFacts">
-          <p style={{ fontVariantNumeric: 'tabular-nums' }}>{albumFacts(album).join(' · ')}</p>
+          <p>{albumFacts(album).join(' · ')}</p>
           {album.popularity == null ? null : (
             <div
               aria-label={`Popularity ${album.popularity} out of 100`}
@@ -76,7 +76,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
               <div className="music__wellPopularityTrack">
                 <div
                   className="music__wellPopularityFill"
-                  style={{ width: `${album.popularity}%` }}
+                  style={{ '--popularity': `${album.popularity}%` } as CSSProperties}
                 />
               </div>
             </div>
@@ -86,11 +86,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
       <ol className="music__wellTracks">
         {album.tracks.map((track) => (
           <li className="music__wellTrack" key={track.id}>
-            <span
-              style={{ alignSelf: 'start', fontVariantNumeric: 'tabular-nums', textAlign: 'end' }}
-            >
-              {track.trackNumber}
-            </span>
+            <span className="music__wellTrackNumber">{track.trackNumber}</span>
             <span className="music__wellTrackBody">
               <Tooltip title={track.name} whenTruncated>
                 <span className="music__wellTrackTitle">
@@ -105,7 +101,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
                 </span>
               </Tooltip>
             </span>
-            <span style={{ fontVariantNumeric: 'tabular-nums', whiteSpace: 'nowrap' }}>
+            <span className="music__wellTrackDuration">
               {formatTrackDuration(track.durationMs)}
             </span>
           </li>

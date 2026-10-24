@@ -41,20 +41,17 @@ type FaIconProps = {
 };
 
 export function FaIcon({ icon, size = '1em' }: FaIconProps) {
+  const sizeVar =
+    size !== '1em'
+      ? ({ '--fa-icon-size': typeof size === 'number' ? `${size}px` : size } as CSSProperties)
+      : undefined;
   return (
-    <span style={{ display: 'inline-flex', height: size, width: size }}>
+    <span data-fa-icon="" style={sizeVar}>
       <svg
         aria-hidden="true"
         focusable="false"
         height={size}
         role="img"
-        style={{
-          display: 'inline-block',
-          height: size,
-          overflow: 'visible',
-          verticalAlign: '-0.125em',
-          width: size,
-        }}
         viewBox={icon.viewBox}
         width={size}
         xmlns="http://www.w3.org/2000/svg"

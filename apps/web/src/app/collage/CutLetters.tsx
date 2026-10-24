@@ -57,9 +57,9 @@ export function CutLetters({
                 LETTER_TREATMENTS[treatmentIndex % LETTER_TREATMENTS.length] ??
                 LETTER_TREATMENTS[0];
               treatmentIndex += 1;
-              const style: CSSProperties = {
-                rotate: `${treatment.rotationDeg}deg`,
-                translate: `0 ${treatment.offsetEm}em`,
+              const style: CSSProperties & Record<`--${string}`, string> = {
+                '--letter-r': `${treatment.rotationDeg}deg`,
+                '--letter-y': `${treatment.offsetEm}em`,
               };
               return (
                 <span

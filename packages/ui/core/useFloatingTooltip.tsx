@@ -1,6 +1,6 @@
 'use client';
 
-import type { CSSProperties, ReactNode, RefObject } from 'react';
+import type { ReactNode, RefObject } from 'react';
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import type { TooltipPlacement } from './Tooltip';
@@ -18,44 +18,6 @@ const PORTAL_ATTRIBUTE = 'data-tooltip-portal';
 const ROOT_ATTRIBUTE = 'data-tooltip-root';
 
 type OpenReason = 'focus' | 'hover';
-
-export const SURFACE_LOOK_CSS_DECLS = `
-  background: var(--dg-palette-background-paper);
-  border: thin solid var(--dg-palette-card-border);
-  border-radius: 12px;
-  box-shadow: var(--dg-shadow-card-main);
-  color: var(--dg-palette-text-primary);
-  font-variant-caps: normal;
-  font-weight: 600;
-  letter-spacing: normal;
-  line-height: 1.3;
-  padding: 6px 12px;
-  pointer-events: none;
-  text-transform: none;
-`;
-
-const floatingSurfaceStyle: CSSProperties = {
-  background: 'var(--dg-palette-background-paper)',
-  border: 'thin solid var(--dg-palette-card-border)',
-  borderRadius: '12px',
-  boxShadow: 'var(--dg-shadow-card-main)',
-  color: 'var(--dg-palette-text-primary)',
-  fontVariantCaps: 'normal',
-  fontWeight: 600,
-  left: 0,
-  letterSpacing: 'normal',
-  lineHeight: 1.3,
-  maxWidth: 'min(420px, calc(100vw - 24px))',
-  overflowWrap: 'break-word',
-  padding: '6px 12px',
-  pointerEvents: 'none',
-  position: 'fixed',
-  textTransform: 'none',
-  top: 0,
-  whiteSpace: 'normal',
-  width: 'max-content',
-  zIndex: 9999,
-};
 
 const subscribeToNothing = () => () => {};
 
@@ -189,7 +151,6 @@ export function useFloatingTooltip({
           component="span"
           data-placement={placement}
           ref={floatingRef}
-          style={floatingSurfaceStyle}
           variant="caption"
           {...{ [PORTAL_ATTRIBUTE]: true }}
         >

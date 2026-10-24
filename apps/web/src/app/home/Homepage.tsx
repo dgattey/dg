@@ -12,12 +12,7 @@ import { CollageProjectFrame } from '../collage/CollageProjectFrame';
 import { CutOut } from '../collage/CutOut';
 import { CUT_OUT_PLACEMENTS } from '../collage/cutOutPlacements';
 import { MoreWorkSheet } from '../collage/MoreWorkSheet';
-import {
-  assignProjectSlots,
-  CODA_FRAME_STYLE,
-  CODA_GRID_AREAS,
-  HELLO_GRID_AREAS,
-} from '../collage/projectSlots';
+import { assignProjectSlots, CODA_FRAME_STYLE } from '../collage/projectSlots';
 import { WorkSheet } from '../collage/WorkSheet';
 import { SpotifyCollageCard } from '../spotify/SpotifyCollageCard';
 import { GatteySitesCard } from './GatteySitesCard';
@@ -59,10 +54,7 @@ export async function Homepage() {
         {CUT_OUT_PLACEMENTS.helloSheet.map((placement) => (
           <CutOut key={placement.id} placement={placement} />
         ))}
-        <div
-          className="collageMeasure collageMeasureGrid collageGridStack home__helloGrid"
-          style={{ gridTemplateAreas: HELLO_GRID_AREAS }}
-        >
+        <div className="collageMeasure collageMeasureGrid collageGridStack home__helloGrid">
           <IntroCardSlot />
           <MapCardSlot />
         </div>
@@ -78,10 +70,7 @@ export async function Homepage() {
           {CUT_OUT_PLACEMENTS.coda.map((placement) => (
             <CutOut key={placement.id} placement={placement} />
           ))}
-          <div
-            className="collageMeasure collageMeasureGrid collageGridStack home__codaGrid"
-            style={{ gridTemplateAreas: CODA_GRID_AREAS }}
-          >
+          <div className="collageMeasure collageMeasureGrid collageGridStack home__codaGrid">
             <CollageProjectFrame
               data-slot="li"
               key={slots.coda.key}

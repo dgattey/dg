@@ -20,9 +20,9 @@ export function WorkSheet({
     c1: projectOne !== undefined,
     ws: projectTwo !== undefined,
   });
-  const gridStyle: CSSProperties = {
-    gridTemplateAreas: grid.areas,
-    rowGap: grid.rowGapPx,
+  const gridStyle: CSSProperties & Record<`--${string}`, string> = {
+    '--grid-areas': grid.areas,
+    '--grid-row-gap': `${grid.rowGapPx}px`,
   };
 
   return (

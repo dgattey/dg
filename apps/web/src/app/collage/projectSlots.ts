@@ -213,11 +213,3 @@ export function moreWorkGridAreas(slots: { cn: boolean; gn: boolean; js: boolean
 
 export const MORE_WORK_OVERFLOW_GRID_AREAS =
   '"mg mg mg mg mg mg cn cn cn cn cn cn" "js js js js gn gn gn gn gn gn gn gn"';
-
-export const HELLO_GRID_AREAS = `
-  "headline headline headline headline headline headline headline portrait portrait portrait portrait portrait"
-  "intro intro intro intro intro intro intro portrait portrait portrait portrait portrait"
-  "map map map map map map map portrait portrait portrait portrait portrait"
-`;
-
-export const CODA_GRID_AREAS = '". . . . . . . . li li li li"';

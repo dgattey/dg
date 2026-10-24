@@ -36,6 +36,11 @@ const DEFAULT_ELEMENT: Record<TypographyVariant, ElementType> = {
   overline: 'span',
 };
 
+const PALETTE_COLOR_TOKENS: Record<string, string> = {
+  'text.primary': 'var(--dg-palette-text-primary)',
+  'text.secondary': 'var(--dg-palette-text-secondary)',
+};
+
 type TypographyProps<T extends ElementType = 'p'> = {
   children?: ReactNode;
   className?: string;
@@ -61,13 +66,18 @@ export function Typography<T extends ElementType = 'p'>({
   ...rest
 }: TypographyProps<T>) {
   const Component = (component ?? DEFAULT_ELEMENT[variant]) as ElementType;
+  const resolvedColor = color ? (PALETTE_COLOR_TOKENS[color] ?? color) : undefined;
+  const mergedStyle = resolvedColor
+    ? ({ '--typography-color': resolvedColor, ...style } as CSSProperties)
+    : style;
 
   return (
     <Component
       className={className}
+      data-has-color={resolvedColor ? '' : undefined}
       data-typography={variant}
       ref={ref}
-      style={color ? { color, ...style } : style}
+      style={mergedStyle}
       {...rest}
     >
       {children}
