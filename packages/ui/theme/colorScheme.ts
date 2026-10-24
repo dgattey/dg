@@ -1,4 +1,5 @@
 export type ColorSchemePreference = 'light' | 'dark' | 'system';
+export type ColorScheme = Exclude<ColorSchemePreference, 'system'>;
 
 export const COLOR_SCHEME_STORAGE_KEY = 'color-scheme';
 export const COLOR_SCHEME_ATTRIBUTE = 'data-color-scheme';

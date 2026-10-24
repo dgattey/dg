@@ -1,6 +1,6 @@
 import { getHeaderContent } from '../../services/contentful';
 import { getLastKnownSong } from '../../services/spotify';
-import { CollageColorSchemeFieldset } from '../collage/CollageColorSchemeFieldset';
+import { CollageColorSchemeToggle } from '../collage/CollageColorSchemeToggle';
 import { SpotifyHeaderCard } from '../spotify/SpotifyHeaderCard';
 import { CollageMusicLinks } from './CollageMusicLinks';
 import { Logo } from './Logo';
@@ -24,7 +24,7 @@ export async function Header() {
         <div className="chrome__spacer" />
         <nav className="chrome__nav">
           <CollageMusicLinks items={items} />
-          <CollageColorSchemeFieldset />
+          <CollageColorSchemeToggle />
         </nav>
       </header>
     </>
