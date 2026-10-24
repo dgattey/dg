@@ -23,8 +23,10 @@ export async function Header() {
         </div>
         <div className="chrome__spacer" />
         <nav className="chrome__nav">
-          <CollageMusicLinks items={items} />
-          <CollageColorSchemeFieldset />
+          <div className="chrome__strip collageLift">
+            <CollageMusicLinks items={items} />
+            <CollageColorSchemeFieldset />
+          </div>
         </nav>
       </header>
     </>

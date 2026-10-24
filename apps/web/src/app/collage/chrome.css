@@ -69,10 +69,50 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 }
 .chrome__nav {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
   justify-content: flex-end;
   margin-top: 8px;
+}
+/* One paper strip holds every link and the theme toggle, so the right side is one piece. */
+.chrome__strip {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  align-items: stretch;
+  justify-content: flex-end;
+  padding: 6px;
+  color: var(--ink-on-cream);
+  background: var(--cream);
+  border-radius: 16px;
+  box-shadow: var(--pshadow);
+  rotate: -0.6deg;
+}
+.chrome__segment {
+  display: flex;
+  gap: 0.4em;
+  align-items: center;
+  padding: 0.5em 0.85em 0.55em;
+  font-family: var(--display);
+  font-size: var(--type-label);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  color: inherit;
+  letter-spacing: var(--tracking-label);
+  white-space: nowrap;
+  text-decoration: none;
+  border-radius: 10px;
+  transition: background-color 0.2s ease;
+}
+.chrome__segment:not(.chrome__segmentCurrent):hover,
+.chrome__music[open] > .chrome__segment:not(.chrome__segmentCurrent) {
+  background: color-mix(in oklab, var(--ink-on-cream) 9%, transparent);
+}
+.collageRoot .chrome__segment:focus-visible {
+  outline-color: var(--ink-on-cream);
+  outline-offset: -2px;
+}
+.chrome__segmentCurrent {
+  background: var(--ochre);
 }
 .chrome__music {
   position: relative;
@@ -112,6 +152,23 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
     opacity 160ms cubic-bezier(0.22, 1, 0.36, 1),
     transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
     visibility 160ms allow-discrete;
+}
+/*
+ * In the strip a menu drops from the left edge of its segment rather than the right, so
+ * the menu at the start of the strip stays on screen however far right the strip sits.
+ */
+.chrome__strip .chrome__music {
+  display: flex;
+}
+.chrome__strip .chrome__musicSummary {
+  display: flex;
+}
+.chrome__strip .chrome__musicPanel {
+  --hover-gap: 16px;
+  right: auto;
+  left: -6px;
+  max-width: calc(100vw - 2 * var(--pad));
+  transform-origin: top left;
 }
 .chrome__music[open] .chrome__musicPanel {
   visibility: visible;
@@ -177,40 +234,45 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 }
 .chrome__scheme {
   display: flex;
-  gap: 8px;
   min-width: 0;
   padding: 0;
-  margin: 0;
+  margin: 0 0 0 6px;
   border: 0;
 }
+/* An ink well sunk into the end of the strip, as tall as a segment. */
 .chrome__schemeTrack {
-  --inset: 4px;
+  --inset: 3px;
   display: flex;
   gap: 2px;
+  align-items: center;
+  height: calc(var(--type-label) * (var(--leading-tight) + 1.05));
   padding: var(--inset);
+  background: var(--black);
+  border-radius: 11px;
+  box-shadow: inset 0 1.5px 3px rgb(0 0 0 / 0.45);
 }
 .chrome__schemeOption {
   display: grid;
   place-items: center;
-  width: 38px;
-  height: 34px;
-  color: var(--on);
+  width: 36px;
+  height: 100%;
+  color: var(--cream);
   cursor: pointer;
-  border-radius: var(--nested-radius);
+  border-radius: 8px;
   transition:
     background-color 0.2s ease,
     color 0.2s ease;
 }
 .chrome__schemeOption:hover {
-  background: color-mix(in oklab, var(--on) 16%, transparent);
+  background: color-mix(in oklab, var(--cream) 16%, transparent);
 }
 .chrome__schemeOption:has(:checked) {
   color: var(--ink-on-cream);
   background: var(--ochre);
 }
 .chrome__schemeOption:has(:focus-visible) {
-  outline: 2px solid var(--on);
-  outline-offset: 1px;
+  outline: 2px solid var(--cream);
+  outline-offset: -2px;
 }
 .chrome__srOnly {
   position: absolute;
@@ -677,6 +739,17 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   }
   .chrome__nav {
     width: 100%;
+  }
+  /* Shrinks the labels with the viewport so the strip and its switcher share one row down to 360px. */
+  .chrome__segment {
+    padding-inline: 0.4em;
+    font-size: clamp(var(--type-body), 4.4vw, var(--type-label));
+  }
+  .chrome__scheme {
+    margin-left: 2px;
+  }
+  .chrome__schemeOption {
+    width: 28px;
   }
 }
 @media (max-width: 320px) {

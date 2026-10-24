@@ -7,8 +7,8 @@ import type { LucideIcon } from 'lucide-react';
 import { ChartColumn, ChevronDown, DiscAlbum, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { bindHoverMenu } from '../collage/hoverMenu';
-import { PaperButton, PaperButtonFace } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
+import { cx } from '../collage/paperVars';
 import {
   DEFAULT_HEADER_NAV_ITEMS,
   isMusicDestinationPath,
@@ -24,12 +24,11 @@ const DESTINATION_ICONS: Record<string, LucideIcon> = {
   stats: ChartColumn,
 };
 
-const NAV_TILTS = [-2, 1.5, -1, 1.2] as const;
-
 /**
- * Header navigation links and dropdown submenus driven from Contentful (`header` section).
- * `<details>` owns the open state so each menu opens and its links work without script;
- * script opens it on mouse hover, and closes it on link click, outside press, and Escape.
+ * Header navigation links and dropdown submenus driven from Contentful (`header` section),
+ * as segments of the header's paper strip. `<details>` owns the open state so each menu
+ * opens and its links work without script; script opens it on mouse hover, and closes it
+ * on link click, outside press, and Escape.
  */
 export function CollageMusicLinks({ items }: { items?: ReadonlyArray<HeaderNavItem> } = {}) {
   const pathname = normalizeMusicPath(usePathname() ?? '/');
@@ -38,8 +37,7 @@ export function CollageMusicLinks({ items }: { items?: ReadonlyArray<HeaderNavIt
 
   return (
     <>
-      {navItems.map((item, index) => {
-        const tiltDeg = NAV_TILTS[index % NAV_TILTS.length] ?? -1;
+      {navItems.map((item) => {
         if (item.kind === 'menu') {
           const onMenuPage =
             item.links.some((link) => normalizeMusicPath(link.url) === pathname) ||
@@ -50,17 +48,20 @@ export function CollageMusicLinks({ items }: { items?: ReadonlyArray<HeaderNavIt
               key={item.slug ?? item.title}
               ref={(node) => bindHoverMenu(node, 'a[href]')}
             >
-              <summary className="chrome__musicSummary collageLift">
-                <PaperButtonFace current={onMenuPage} tiltDeg={tiltDeg}>
-                  {item.title}
-                  <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />
-                </PaperButtonFace>
+              <summary
+                className={cx(
+                  'chrome__segment',
+                  'chrome__musicSummary',
+                  onMenuPage && 'chrome__segmentCurrent',
+                )}
+              >
+                {item.title}
+                <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />
               </summary>
               <PaperCard
                 className="chrome__musicPanel"
                 edge="quad-a"
                 innerClassName="chrome__musicPanelInner"
-                tiltDeg={-1}
               >
                 <ul className="chrome__musicList">
                   {item.links.map((link) => {
@@ -89,17 +90,17 @@ export function CollageMusicLinks({ items }: { items?: ReadonlyArray<HeaderNavIt
           );
         }
 
+        const current = isAt(normalizeMusicPath(item.link.url));
         return (
-          <div className="collageLift" key={item.link.url}>
-            <PaperButton
-              current={isAt(normalizeMusicPath(item.link.url))}
-              href={item.link.url}
-              tiltDeg={tiltDeg}
-              title={item.link.title}
-            >
-              {item.link.title}
-            </PaperButton>
-          </div>
+          <PageTransitionLink
+            aria-current={current ? 'page' : undefined}
+            className={cx('chrome__segment', current && 'chrome__segmentCurrent')}
+            href={item.link.url}
+            key={item.link.url}
+            title={item.link.title}
+          >
+            {item.link.title}
+          </PageTransitionLink>
         );
       })}
     </>

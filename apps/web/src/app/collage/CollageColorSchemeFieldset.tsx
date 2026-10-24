@@ -5,7 +5,6 @@ import { type ColorSchemePreference, parseColorSchemePreference } from '@dg/ui/t
 import { useColorScheme } from '@dg/ui/theme/useColorScheme';
 import type { LucideIcon } from 'lucide-react';
 import { Monitor, Moon, Sun } from 'lucide-react';
-import { PaperCard } from './PaperCard';
 
 const OPTIONS = [
   { Icon: Sun, label: 'Light', value: 'light' },
@@ -17,14 +16,14 @@ const OPTIONS = [
   value: ColorSchemePreference;
 }>;
 
-/** Segmented sun / moon / system switch on one paper strip, backed by native radios. */
+/** Segmented sun / moon / system switch in an ink well at the end of the header strip, backed by native radios. */
 export function CollageColorSchemeFieldset() {
   const { preference, setPreference } = useColorScheme();
 
   return (
     <fieldset className="chrome__scheme" {...jsOnlyProps}>
       <legend className="chrome__srOnly">Color scheme</legend>
-      <PaperCard edge="quad-c" innerClassName="chrome__schemeTrack" tiltDeg={1.5} tone="black">
+      <div className="chrome__schemeTrack">
         {OPTIONS.map(({ Icon, label, value }) => (
           <label className="chrome__schemeOption" key={value} title={label}>
             <input
@@ -39,7 +38,7 @@ export function CollageColorSchemeFieldset() {
             <Icon aria-hidden={true} size={18} strokeWidth={2.25} />
           </label>
         ))}
-      </PaperCard>
+      </div>
     </fieldset>
   );
 }

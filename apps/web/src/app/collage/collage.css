@@ -310,16 +310,11 @@ html:has(.collageRoot) body {
   outline: 2px solid currentColor;
   outline-offset: 3px;
 }
-.collageRoot
-  :is(.paperButton, .chrome__musicSummary, .chrome__nowPlaying :has(.paperWrap)):focus-visible {
+.collageRoot :is(.paperButton, .chrome__nowPlaying :has(.paperWrap)):focus-visible {
   outline: none;
 }
 .collageRoot
-  :is(
-    .paperWrap:has(> .paperButton:focus-visible),
-    .chrome__musicSummary:focus-visible > .paperWrap,
-    .chrome__nowPlaying :focus-visible .paperWrap
-  ) {
+  :is(.paperWrap:has(> .paperButton:focus-visible), .chrome__nowPlaying :focus-visible .paperWrap) {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
   border-radius: var(--edge-radius);

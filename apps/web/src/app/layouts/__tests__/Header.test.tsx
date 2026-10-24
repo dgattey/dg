@@ -44,6 +44,24 @@ describe('Header navigation (CollageMusicLinks)', () => {
     expect(screen.getByRole('link', { name: 'Big map' })).toHaveAttribute('href', activitiesRoute);
   });
 
+  it('renders every link as a strip segment, highlighting Music on a music page', () => {
+    const { container } = render(<CollageMusicLinks />);
+
+    expect(container.querySelectorAll('.chrome__segment')).toHaveLength(3);
+    expect(screen.getByText('Music').closest('summary')).toHaveClass('chrome__segmentCurrent');
+    expect(screen.getByRole('link', { name: 'Reads' })).not.toHaveAttribute('aria-current');
+  });
+
+  it('highlights a link segment on its own page', () => {
+    jest.mocked(usePathname).mockReturnValue(readingRoute);
+    render(<CollageMusicLinks />);
+
+    const reads = screen.getByRole('link', { name: 'Reads' });
+    expect(reads).toHaveAttribute('aria-current', 'page');
+    expect(reads).toHaveClass('chrome__segmentCurrent');
+    expect(screen.getByText('Music').closest('summary')).not.toHaveClass('chrome__segmentCurrent');
+  });
+
   it('renders custom Contentful menu and link items in Contentful order', () => {
     render(
       <CollageMusicLinks
