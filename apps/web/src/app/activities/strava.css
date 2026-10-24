@@ -609,7 +609,7 @@
 }
 .strava__longestSeal .strava__sealKey {
   font-size: var(--type-label);
-  line-height: 1.1;
+  line-height: var(--leading-tight);
 }
 
 .strava__distanceRow {
