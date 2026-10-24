@@ -14,8 +14,8 @@ import {
   formatMiles,
   formatOutingDate,
   formatRouteCount,
-} from '../strava/stravaFormat';
-import { SPORT_DETAILS, toMapRoutes } from '../strava/stravaSports';
+} from '../activities/stravaFormat';
+import { SPORT_DETAILS, toMapRoutes } from '../activities/stravaSports';
 import type { PaperColor } from './SocialCardParts';
 import {
   STRAVA_CARD_MAP_FRAME,

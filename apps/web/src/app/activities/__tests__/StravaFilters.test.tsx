@@ -1,4 +1,6 @@
 import type { StravaLogEntry, StravaSport } from '@dg/content-models/strava/StravaHistory';
+import type { AtlasRegion } from '@dg/maps/atlasGeometry';
+import type { GeoBounds } from '@dg/maps/src/routeFrame';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StravaAtlas } from '../FilteredSections';
@@ -27,16 +29,23 @@ const outingsOf = (sport: StravaSport, daysAgo: number, count: number): Array<St
     };
   });
 
-const renderFilters = (outings: ReadonlyArray<StravaLogEntry>) => {
+const BAY_AREA: GeoBounds = [
+  [37.75, -122.5],
+  [37.82, -122.24],
+];
+
+const SAN_DIEGO: GeoBounds = [
+  [32.7, -117.25],
+  [32.8, -117.1],
+];
+
+const renderFilters = (
+  outings: ReadonlyArray<StravaLogEntry>,
+  regions: ReadonlyArray<AtlasRegion> = [],
+) => {
   const { container } = render(
     <StravaFilters outings={outings}>
-      <StravaAtlas
-        bounds={[
-          [37.75, -122.5],
-          [37.82, -122.24],
-        ]}
-        tileSource={{ mode: 'offline' }}
-      />
+      <StravaAtlas bounds={BAY_AREA} regions={regions} tileSource={{ mode: 'offline' }} />
       <RouteCountTag />
     </StravaFilters>,
   );
@@ -44,7 +53,9 @@ const renderFilters = (outings: ReadonlyArray<StravaLogEntry>) => {
     [...container.querySelectorAll('path[data-tone]')].map((path) =>
       path.getAttribute('data-tone'),
     );
-  return { inkedTones };
+  const inkedPaths = () =>
+    [...container.querySelectorAll('path[data-tone]')].map((path) => path.getAttribute('d'));
+  return { inkedPaths, inkedTones };
 };
 
 const outings = [
@@ -52,6 +63,7 @@ const outings = [
   ...outingsOf('other', 20, 2),
   ...outingsOf('run', 400, 12),
   ...outingsOf('ride', 400, 30),
+  ...outingsOf('ski', 300, 2),
 ];
 
 beforeEach(() => {
@@ -63,43 +75,65 @@ afterEach(() => {
 });
 
 describe('StravaFilters', () => {
-  it('starts on every route with only the sports that have routes', () => {
+  it('starts on rides, with only the sports that have routes and all types last', () => {
     const { inkedTones } = renderFilters(outings);
 
-    expect(screen.getByRole('button', { name: 'All routes' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    expect(screen.getByRole('button', { name: 'Rides' })).toHaveAttribute('aria-pressed', 'true');
     expect(screen.getByRole('button', { name: 'All time' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
-    expect(screen.getByRole('button', { name: 'Runs' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Hikes' })).not.toBeInTheDocument();
-    expect(inkedTones()).toEqual(['cobalt', 'ochre', 'vermilion']);
-    expect(screen.getByText('52 routes')).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Walks & hikes' })).not.toBeInTheDocument();
+    expect(screen.getByRole('group', { name: 'Sport' }).textContent).toBe(
+      'RidesRunsSkiingAll types',
+    );
+    expect(inkedTones()).toEqual(['cobalt']);
+    expect(screen.getByText('38 routes')).toBeInTheDocument();
   });
 
-  it('inks one sport when its pill is pressed', async () => {
+  it('inks every type, or skiing alone in its own color', async () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const { inkedTones } = renderFilters(outings);
 
-    await user.click(screen.getByRole('button', { name: 'Rides' }));
+    await user.click(screen.getByRole('button', { name: 'All types' }));
+    expect(inkedTones()).toEqual(['cobalt', 'ochre', 'vermilion', 'rose']);
+    expect(screen.getByText('54 routes')).toBeInTheDocument();
 
-    expect(screen.getByRole('button', { name: 'Rides' })).toHaveAttribute('aria-pressed', 'true');
-    expect(inkedTones()).toEqual(['cobalt']);
-    expect(screen.getByText('38 routes')).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Skiing' }));
+    expect(screen.getByRole('button', { name: 'Skiing' })).toHaveAttribute('aria-pressed', 'true');
+    expect(inkedTones()).toEqual(['rose']);
+    expect(screen.getByText('2 routes')).toBeInTheDocument();
+  });
+
+  it('flies to a home region and back when its pill is pressed again', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const { inkedPaths } = renderFilters(outings, [
+      { bounds: BAY_AREA, key: 'bay-area', label: 'Bay Area' },
+      { bounds: SAN_DIEGO, key: 'san-diego', label: 'San Diego' },
+    ]);
+    const overview = inkedPaths();
+    const sanDiego = screen.getByRole('button', { name: 'San Diego' });
+    expect(screen.getByRole('group', { name: 'Zoom to region' })).toBeInTheDocument();
+
+    await user.click(sanDiego);
+    expect(sanDiego).toHaveAttribute('aria-pressed', 'true');
+    expect(inkedPaths()).not.toEqual(overview);
+
+    await user.click(sanDiego);
+    expect(sanDiego).toHaveAttribute('aria-pressed', 'false');
+    expect(inkedPaths()).toEqual(overview);
   });
 
   it('narrows to a rolling window or a year on top of the sport', async () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const { inkedTones } = renderFilters(outings);
 
-    await user.click(screen.getByRole('button', { name: 'This week' }));
+    await user.click(screen.getByRole('button', { name: 'All types' }));
+    await user.click(screen.getByRole('button', { name: 'Last week' }));
     expect(inkedTones()).toEqual(['cobalt']);
     expect(screen.getByText('8 routes')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'This month' }));
+    await user.click(screen.getByRole('button', { name: 'Last month' }));
     expect(inkedTones()).toEqual(['cobalt', 'ochre']);
     expect(screen.getByText('10 routes')).toBeInTheDocument();
 
@@ -108,7 +142,7 @@ describe('StravaFilters', () => {
     expect(screen.getByText('No routes')).toBeInTheDocument();
 
     await user.selectOptions(screen.getByRole('combobox', { name: 'Year' }), '2025');
-    expect(screen.getByRole('button', { name: 'This month' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Last month' })).toHaveAttribute(
       'aria-pressed',
       'false',
     );

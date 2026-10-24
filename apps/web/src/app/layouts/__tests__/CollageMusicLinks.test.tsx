@@ -7,7 +7,7 @@ import {
   musicRoute,
   musicStatsRoute,
   readingRoute,
-  stravaRoute,
+  activitiesRoute,
 } from '@dg/shared-core/routes/app';
 import { render, screen, within } from '@testing-library/react';
 import { usePathname } from 'next/navigation';
@@ -24,7 +24,7 @@ describe('CollageMusicLinks', () => {
     render(<CollageMusicLinks />);
 
     expect(screen.getByRole('link', { name: 'Reads' })).toHaveAttribute('href', readingRoute);
-    expect(screen.getByRole('link', { name: 'Big map' })).toHaveAttribute('href', stravaRoute);
+    expect(screen.getByRole('link', { name: 'Big map' })).toHaveAttribute('href', activitiesRoute);
   });
 
   it('leads the Music menu with listening stats', () => {
@@ -44,7 +44,7 @@ describe('CollageMusicLinks', () => {
 
   it.each([
     [readingRoute, 'Reads'],
-    [stravaRoute, 'Big map'],
+    [activitiesRoute, 'Big map'],
   ])('marks only the pill for %s as the current page', (pathname, label) => {
     jest.mocked(usePathname).mockReturnValue(pathname);
     render(<CollageMusicLinks />);

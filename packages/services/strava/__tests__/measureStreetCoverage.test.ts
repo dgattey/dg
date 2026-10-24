@@ -1,5 +1,5 @@
 import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
-import { measureStreetCoverage } from '../measureSfStreetCoverage';
+import { measureStreetCoverage } from '../measureStreetCoverage';
 import { encodePolyline, type StreetGrid } from '../streetGridGeometry';
 
 const NOW = new Date('2026-10-22T12:00:00Z');

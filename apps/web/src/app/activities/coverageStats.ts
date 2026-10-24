@@ -1,12 +1,12 @@
 import {
-  type SfCoverageSpan,
-  type SfCoverageSport,
-  type SfStreetCoverage,
-  sfCoverageKey,
-} from '@dg/content-models/strava/SfStreetCoverage';
+  type CoverageSpan,
+  type CoverageSport,
+  type StreetCoverage,
+  coverageKey,
+} from '@dg/content-models/strava/StreetCoverage';
 
-export type SfNeighborhoodCoverage = {
-  /** Position in `SfStreetCoverage.neighborhoods`, stable across filters. */
+export type NeighborhoodCoverage = {
+  /** Position in `StreetCoverage.neighborhoods`, stable across filters. */
   index: number;
   name: string;
   outline: string;
@@ -16,12 +16,12 @@ export type SfNeighborhoodCoverage = {
   share: number;
 };
 
-type SfCoverageSummary = {
-  /** Alphabetical, matching `SfStreetCoverage.neighborhoods`. */
-  neighborhoods: ReadonlyArray<SfNeighborhoodCoverage>;
+type CoverageSummary = {
+  /** Alphabetical, matching `StreetCoverage.neighborhoods`. */
+  neighborhoods: ReadonlyArray<NeighborhoodCoverage>;
   /** Most covered first, ties alphabetical. */
-  ranked: ReadonlyArray<SfNeighborhoodCoverage>;
-  city: Pick<SfNeighborhoodCoverage, 'riddenMeters' | 'share' | 'streetMeters'>;
+  ranked: ReadonlyArray<NeighborhoodCoverage>;
+  city: Pick<NeighborhoodCoverage, 'riddenMeters' | 'share' | 'streetMeters'>;
   /** Neighborhoods with any street ridden. */
   explored: number;
 };
@@ -29,14 +29,14 @@ type SfCoverageSummary = {
 const shareOf = (ridden: number, street: number) => (street > 0 ? ridden / street : 0);
 
 /** Coverage for one sport and span, per neighborhood and for the whole city. */
-export function summarizeSfCoverage(
-  coverage: SfStreetCoverage,
-  sport: SfCoverageSport,
-  span: SfCoverageSpan,
-): SfCoverageSummary {
-  const ridden = coverage.ridden[sfCoverageKey(sport, span)] ?? [];
+export function summarizeCoverage(
+  coverage: StreetCoverage,
+  sport: CoverageSport,
+  span: CoverageSpan,
+): CoverageSummary {
+  const ridden = coverage.ridden[coverageKey(sport, span)] ?? [];
   const neighborhoods = coverage.neighborhoods.map(
-    ({ name, outline, streetMeters }, index): SfNeighborhoodCoverage => {
+    ({ name, outline, streetMeters }, index): NeighborhoodCoverage => {
       const riddenMeters = ridden[index] ?? 0;
       return {
         index,

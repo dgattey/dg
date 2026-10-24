@@ -255,7 +255,7 @@
   overflow: clip;
   border-radius: var(--nested-radius);
 }
-.home__stravaRoutes {
+.home__activitiesRoutes {
   right: 26px;
   bottom: -12px;
 }
@@ -608,7 +608,7 @@
   .stats__cut.home__stravaTotal {
     right: -6px;
   }
-  .home__stravaRoutes {
+  .home__activitiesRoutes {
     right: -4px;
   }
   .stats__cut.home__stravaWhen {

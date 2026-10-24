@@ -1,8 +1,9 @@
 /**
- * Regenerates `strava/sfStreetGrid.ts`, the street grid the SF coverage figures
- * are measured against: DataSF's 41 analysis neighborhoods and every rideable
- * OSM street inside them, cut into ~10 m pieces. Run with `turbo strava:sf-grid`.
- * Pass `--neighborhoods <geojson>` or `--osm <overpass json>` to reuse downloads.
+ * Regenerates a city's street grid under `strava/`, the grid its coverage
+ * figures are measured against: the city's neighborhoods and every rideable OSM
+ * street inside them, cut into ~10 m pieces. Run with
+ * `turbo strava:street-grid -- --city sf` (or `sd`). Pass
+ * `--neighborhoods <geojson>` or `--osm <overpass json>` to reuse downloads.
  */
 import 'server-only';
 
@@ -16,17 +17,15 @@ import {
   projectToGrid,
   STREET_PIECE_METERS,
 } from '../strava/streetGridGeometry';
+import { STREET_GRID_CITIES, type StreetGridCityKey } from './streetGridCities';
 
-const NEIGHBORHOODS_URL = 'https://data.sfgov.org/resource/j2bu-swwd.geojson?$limit=100';
 const OVERPASS_MIRRORS = [
   'https://overpass-api.de/api/interpreter',
   'https://maps.mail.ru/osm/tools/overpass/api/interpreter',
   'https://overpass.kumi.systems/api/interpreter',
 ];
-const SF_BBOX = '37.703,-122.519,37.835,-122.355';
-const OVERPASS_QUERY = `[out:json][timeout:600];way["highway"](${SF_BBOX});out tags geom;`;
-const ORIGIN: GridOrigin = { lat: 37.76, lng: -122.44 };
-const OUTPUT = new URL('../strava/sfStreetGrid.ts', import.meta.url);
+/** Overpass turns away requests without a descriptive agent. */
+const USER_AGENT = 'dg-street-grid/1.0 (https://dylangattey.com)';
 /** Outlines are simplified to within this many meters. */
 const OUTLINE_TOLERANCE_METERS = 8;
 const BIOME_LINE_WIDTH = 100;
@@ -53,7 +52,7 @@ type OsmWay = {
   geometry?: Array<{ lat: number; lon: number }>;
 };
 type GeoFeature = {
-  properties: { nhood: string };
+  properties: Record<string, string>;
   geometry:
     | { type: 'Polygon'; coordinates: Array<Array<Point>> }
     | { type: 'MultiPolygon'; coordinates: Array<Array<Array<Point>>> };
@@ -74,19 +73,25 @@ const isRideable = (tags: Record<string, string>) => {
 };
 
 const fetchJson = async (url: string, init?: RequestInit) => {
-  const response = await fetch(url, { ...init, cache: 'no-store', redirect: 'follow' });
+  const response = await fetch(url, {
+    ...init,
+    cache: 'no-store',
+    headers: { 'User-Agent': USER_AGENT },
+    redirect: 'follow',
+  });
   if (!response.ok) {
     throw new Error(`${url} answered ${response.status}`);
   }
   return response.json();
 };
 
-const fetchOverpass = async () => {
+const fetchOverpass = async (bbox: string) => {
+  const query = `[out:json][timeout:600];way["highway"](${bbox});out tags geom;`;
   for (const mirror of OVERPASS_MIRRORS) {
     try {
       log.info('Fetching OSM streets', { mirror });
       return await fetchJson(mirror, {
-        body: new URLSearchParams({ data: OVERPASS_QUERY }),
+        body: new URLSearchParams({ data: query }),
         method: 'POST',
       });
     } catch (error) {
@@ -99,7 +104,6 @@ const fetchOverpass = async () => {
 const load = async (path: string | undefined, fallback: () => Promise<unknown>) =>
   path ? JSON.parse(await readFile(path, 'utf8')) : fallback();
 
-const toGrid = ([lng, lat]: Point): Point => projectToGrid(ORIGIN, lat, lng);
 
 const boxOf = (rings: ReadonlyArray<Ring>): Neighborhood['box'] => {
   const points = rings.flat();
@@ -213,18 +217,39 @@ const resample = (points: ReadonlyArray<Point>): Array<Point> => {
 };
 
 const { values } = parseArgs({
-  options: { neighborhoods: { type: 'string' }, osm: { type: 'string' } },
+  options: {
+    city: { default: 'sf', type: 'string' },
+    neighborhoods: { type: 'string' },
+    osm: { type: 'string' },
+  },
 });
-const geojson: { features: Array<GeoFeature> } = await load(values.neighborhoods, () =>
-  fetchJson(NEIGHBORHOODS_URL),
-);
-const osm: { elements: Array<OsmWay> } = await load(values.osm, fetchOverpass);
+if (!(values.city in STREET_GRID_CITIES)) {
+  throw new Error(`Unknown city ${values.city}; pick one of ${Object.keys(STREET_GRID_CITIES)}`);
+}
+const city = STREET_GRID_CITIES[values.city as StreetGridCityKey];
+const ORIGIN: GridOrigin = city.origin;
+const OUTPUT = new URL(`../strava/${city.output.file}`, import.meta.url);
+const toGrid = ([lng, lat]: Point): Point => projectToGrid(ORIGIN, lat, lng);
 
-const neighborhoods: Array<Neighborhood> = geojson.features
-  .map(({ geometry, properties }) => {
-    const polygons = geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates;
+const geojson: { features: Array<GeoFeature> } = await load(values.neighborhoods, () =>
+  fetchJson(city.neighborhoodsUrl),
+);
+const kept = geojson.features.flatMap((feature) => {
+  const name = city.rename(feature.properties[city.nameProperty] ?? '');
+  const { geometry } = feature;
+  return name
+    ? [{ name, polygons: geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates }]
+    : [];
+});
+const [west, south, east, north] = boxOf(kept.flatMap(({ polygons }) => polygons.flat()));
+const osm: { elements: Array<OsmWay> } = await load(values.osm, () =>
+  fetchOverpass([south, west, north, east].map((degrees) => degrees.toFixed(3)).join(',')),
+);
+
+const neighborhoods: Array<Neighborhood> = kept
+  .map(({ name, polygons }) => {
     const rings = polygons.flat().map((ring) => ring.map(toGrid));
-    return { box: boxOf(rings), name: properties.nhood, rings };
+    return { box: boxOf(rings), name, rings };
   })
   .sort((a, b) => a.name.localeCompare(b.name));
 
@@ -296,12 +321,12 @@ const entries = neighborhoods.map(({ name }, index) =>
 );
 await writeFile(
   OUTPUT,
-  `// Generated by \`turbo strava:sf-grid\` (packages/services/scripts/generateSfStreetGrid.ts). Do not edit.
+  `// Generated by \`turbo strava:street-grid -- --city ${values.city}\` (packages/services/scripts/generateStreetGrid.ts). Do not edit.
 import 'server-only';
 
 import type { StreetGrid } from './streetGridGeometry';
 
-export const SF_STREET_GRID: StreetGrid = {
+export const ${city.output.constant}: StreetGrid = {
   neighborhoods: [
 ${entries.join('\n')}
   ],
@@ -310,7 +335,8 @@ ${entries.join('\n')}
 };
 `,
 );
-log.info('Wrote SF street grid', {
+log.info('Wrote street grid', {
+  city: values.city,
   neighborhoods: neighborhoods.length,
   runs: runs.flat().length,
 });

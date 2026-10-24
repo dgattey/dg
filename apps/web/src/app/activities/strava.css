@@ -36,8 +36,9 @@
 }
 
 .strava__filters {
-  position: relative;
-  z-index: 2;
+  position: sticky;
+  top: calc(var(--site-header-height, 88px) + 10px);
+  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   grid-row: 1;
@@ -88,6 +89,9 @@
   position: relative;
   padding: var(--mat-feature);
 }
+.strava__atlasMap {
+  position: relative;
+}
 .strava__atlasMap,
 .strava__atlasBlank {
   aspect-ratio: 780 / 940;
@@ -101,6 +105,13 @@
 .strava__routeCount {
   right: 36px;
   bottom: 36px;
+}
+.strava__regions {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  z-index: 3;
+  gap: 8px;
 }
 
 .strava__totals {

@@ -1,10 +1,10 @@
 'use client';
 
 import {
-  type SfCoverageSpan,
+  type CoverageSpan,
   STRAVA_WINDOW_DAYS,
   type StravaWindow,
-} from '@dg/content-models/strava/SfStreetCoverage';
+} from '@dg/content-models/strava/StreetCoverage';
 import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 import { VisibleRoutes } from '@dg/maps/VisibleRoutes';
 import { createContext, type ReactNode, startTransition, use, useState } from 'react';
@@ -15,7 +15,7 @@ import { formatRouteCount } from './stravaFormat';
 import { SPORT_DETAILS } from './stravaSports';
 import { yearOf } from './stravaStats';
 
-const FILTER_SPORTS = ['ride', 'run', 'hike'] as const;
+const FILTER_SPORTS = ['ride', 'run', 'hike', 'ski'] as const;
 
 type SportFilter = 'all' | (typeof FILTER_SPORTS)[number];
 
@@ -52,7 +52,7 @@ type Filtered = {
   sport: SportFilter;
   /** The span in words, `All time`, `This week`, or a year. */
   spanLabel: string;
-  span: SfCoverageSpan;
+  span: CoverageSpan;
 };
 
 const FilteredOutings = createContext<Filtered>({
@@ -60,7 +60,7 @@ const FilteredOutings = createContext<Filtered>({
   outings: [],
   span: 'all',
   spanLabel: SPAN_OPTIONS[0].label,
-  sport: 'all',
+  sport: 'ride',
   sportOutings: [],
 });
 
@@ -70,7 +70,7 @@ const sportOption = (key: SportFilter, index: number): PaperPillOption<SportFilt
   key,
   label:
     key === 'all' ? (
-      'All routes'
+      'All types'
     ) : (
       <>
         <span
@@ -161,9 +161,9 @@ export function StravaFilters({
   children: ReactNode;
   outings: ReadonlyArray<StravaLogEntry>;
 }) {
-  const [sport, setSport] = useState<SportFilter>('all');
-  const [span, setSpan] = useState<Span>({ kind: 'all' });
   const sports = FILTER_SPORTS.filter((key) => outings.some((outing) => outing.sport === key));
+  const [sport, setSport] = useState<SportFilter>(() => (sports.includes('ride') ? 'ride' : 'all'));
+  const [span, setSpan] = useState<Span>({ kind: 'all' });
   const years = [...new Set(outings.map(yearOf))].toSorted((a, b) => b - a);
   const sportOutings =
     sport === 'all' ? outings : outings.filter((outing) => outing.sport === sport);
@@ -187,7 +187,7 @@ export function StravaFilters({
           <PaperPills
             label="Sport"
             onSelect={(key) => startTransition(() => setSport(key))}
-            options={(['all', ...sports] as const).map(sportOption)}
+            options={([...sports, 'all'] as const).map(sportOption)}
             selected={sport}
           />
         ) : null}

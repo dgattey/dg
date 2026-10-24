@@ -9,16 +9,22 @@ import type {
   StravaSport,
   StravaYearTotals,
 } from '@dg/content-models/strava/StravaHistory';
-import { measureSfStreetCoverage } from './measureSfStreetCoverage';
+import { measureCityCoverage } from './measureStreetCoverage';
 
 const SPORT_BY_STRAVA_TYPE: Partial<Record<string, StravaSport>> = {
+  AlpineSki: 'ski',
+  BackcountrySki: 'ski',
   EBikeRide: 'ride',
   GravelRide: 'ride',
   Handcycle: 'ride',
   Hike: 'hike',
   MountainBikeRide: 'ride',
+  NordicSki: 'ski',
   Ride: 'ride',
+  RollerSki: 'ski',
   Run: 'run',
+  Ski: 'ski',
+  Snowboard: 'ski',
   TrailRun: 'run',
   Velomobile: 'ride',
   VirtualRide: 'ride',
@@ -158,7 +164,7 @@ export const summarizeStravaHistory = (
     bikes: findBikes(dated),
     latest: toOuting(newest),
     outings,
-    sfCoverage: measureSfStreetCoverage(outings, now),
+    streetCoverage: measureCityCoverage(outings, now),
     thisYear: yearTotals(
       currentYear,
       outings.filter((outing) => yearOf(outing) === currentYear),

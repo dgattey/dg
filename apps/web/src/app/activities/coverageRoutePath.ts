@@ -1,4 +1,4 @@
-import type { SfStreetCoverage } from '@dg/content-models/strava/SfStreetCoverage';
+import type { StreetCoverage } from '@dg/content-models/strava/StreetCoverage';
 import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 import { decodePolyline } from '@dg/maps/src/routeGeometry';
 
@@ -11,9 +11,9 @@ type Point = [number, number];
  * Every outing's route as one SVG path in `viewBox` units, in whole units.
  * Only segments touching the view box are drawn, so routes elsewhere add nothing.
  */
-export function sfRoutePath(
+export function coverageRoutePath(
   outings: ReadonlyArray<Pick<StravaLogEntry, 'polyline'>>,
-  { projection: { origin, perDegree }, viewBox }: Pick<SfStreetCoverage, 'projection' | 'viewBox'>,
+  { projection: { origin, perDegree }, viewBox }: Pick<StreetCoverage, 'projection' | 'viewBox'>,
 ) {
   const [left = 0, top = 0, width = 0, height = 0] = viewBox.split(' ').map(Number);
   const inBox = ([x, y]: Point) => x >= left && x <= left + width && y >= top && y <= top + height;

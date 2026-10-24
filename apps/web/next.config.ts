@@ -181,6 +181,16 @@ const nextConfig: NextConfig = {
         permanent: false,
         source: '/sitemap',
       },
+      {
+        destination: '/activities',
+        permanent: true,
+        source: '/strava',
+      },
+      {
+        destination: '/activities.md',
+        permanent: true,
+        source: '/strava.md',
+      },
     ]);
   },
   rewrites() {

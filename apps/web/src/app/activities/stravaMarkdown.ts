@@ -1,17 +1,21 @@
 import 'server-only';
 
-import type { SfStreetCoverage } from '@dg/content-models/strava/SfStreetCoverage';
+import {
+  COVERAGE_CITIES,
+  type CoverageCity,
+  type StreetCoverage,
+} from '@dg/content-models/strava/StreetCoverage';
 import type {
   StravaBike,
   StravaLogEntry,
   StravaSport,
 } from '@dg/content-models/strava/StravaHistory';
 import { formattedDistance } from '@dg/shared-core/formatting/formattedDistance';
-import { stravaRoute } from '@dg/shared-core/routes/app';
+import { activitiesRoute } from '@dg/shared-core/routes/app';
 import { getStravaHistory } from '../../services/strava';
 import { relatedPageLinksMarkdown } from '../llm-markdown/relatedPageLinksMarkdown';
 import { SITE_NAME } from '../metadata';
-import { formatShare, summarizeSfCoverage } from './sfCoverageStats';
+import { formatShare, summarizeCoverage } from './coverageStats';
 import { formatMiles } from './stravaFormat';
 import { biggestClimbs, longestOutings, yearlyTotals } from './stravaStats';
 
@@ -19,15 +23,18 @@ const LISTED_OUTINGS = 6;
 
 const LISTED_NEIGHBORHOODS = 5;
 
+const CITY_NAMES: Record<CoverageCity, string> = { sd: 'San Diego', sf: 'San Francisco' };
+
 const UNAVAILABLE_MARKDOWN = '# Big map\n\n> Strava history is unavailable right now.\n';
 
 const FEET_PER_METER = 3.28084;
 
 const SPORT_LABELS: Record<StravaSport, string> = {
   hike: 'Hike',
-  other: 'Outing',
+  other: 'Activity',
   ride: 'Ride',
   run: 'Run',
+  ski: 'Ski',
 };
 
 const dayFormatter = new Intl.DateTimeFormat('en-US', {
@@ -41,7 +48,7 @@ const feet = (meters: number) =>
   `${Math.round(meters * FEET_PER_METER).toLocaleString('en-US')} feet`;
 
 const outingCount = (outings: number) =>
-  `${outings.toLocaleString('en-US')} ${outings === 1 ? 'outing' : 'outings'}`;
+  `${outings.toLocaleString('en-US')} ${outings === 1 ? 'activity' : 'activities'}`;
 
 const outingLink = (outing: StravaLogEntry) => `[${outing.name}](${outing.url})`;
 
@@ -62,8 +69,8 @@ const bikeLine = (bike: StravaBike) =>
     `longest ride ${miles(bike.longest.distanceMeters)}, [${bike.longest.name}](${bike.longest.url}) on ${dayFormatter.format(new Date(bike.longest.startDate))}`,
   ].join(', ');
 
-const sfCoverageLines = (coverage: SfStreetCoverage) => {
-  const { city, explored, neighborhoods, ranked } = summarizeSfCoverage(coverage, 'all', 'all');
+const coverageLines = (coverage: StreetCoverage) => {
+  const { city, explored, neighborhoods, ranked } = summarizeCoverage(coverage, 'all', 'all');
   return [
     `- City: ${formatShare(city.share)} of rideable streets, ${formatMiles(city.riddenMeters)} of ${formatMiles(city.streetMeters)} miles, ${explored} of ${neighborhoods.length} neighborhoods explored`,
     ...ranked
@@ -85,7 +92,7 @@ export async function getStravaMarkdown(): Promise<string> {
     if (!history) {
       return UNAVAILABLE_MARKDOWN;
     }
-    const { bikes, outings, sfCoverage, thisYear, totals } = history;
+    const { bikes, outings, streetCoverage, thisYear, totals } = history;
     const climbs = biggestClimbs(outings, LISTED_OUTINGS);
     const longestRides = longestOutings(
       outings.filter((outing) => outing.sport === 'ride'),
@@ -93,7 +100,7 @@ export async function getStravaMarkdown(): Promise<string> {
     );
     const sections: Array<string> = [
       '# Big map',
-      `> Routes, yearly miles, and recent outings from ${SITE_NAME}'s Strava history`,
+      `> Routes, yearly miles, and recent activities from ${SITE_NAME}'s Strava history`,
       '## Totals',
       [
         `- ${miles(totals.distanceMeters)} over ${outingCount(totals.outings)} since ${totals.firstYear}`,
@@ -102,14 +109,14 @@ export async function getStravaMarkdown(): Promise<string> {
       '## This year',
       thisYear.outings > 0
         ? `- ${thisYear.year}: ${miles(thisYear.distanceMeters)}, ${feet(thisYear.elevationGainMeters)} climbed, ${outingCount(thisYear.outings)}`
-        : `- No outings yet in ${thisYear.year}`,
+        : `- No activities yet in ${thisYear.year}`,
       '## Yearly miles',
       yearlyTotals(outings)
         .map(
           (year) => `- ${year.year}: ${miles(year.distanceMeters)} (${outingCount(year.outings)})`,
         )
         .join('\n'),
-      '## Recent outings',
+      '## Recent activities',
       outings
         .slice(0, LISTED_OUTINGS)
         .map(
@@ -147,11 +154,14 @@ export async function getStravaMarkdown(): Promise<string> {
       sections.push('## Bike odometers', bikes.map(bikeLine).join('\n'));
     }
 
-    if (sfCoverage.neighborhoods.some((hood) => hood.streetMeters > 0)) {
-      sections.push('## San Francisco street coverage', sfCoverageLines(sfCoverage));
+    for (const city of COVERAGE_CITIES) {
+      const coverage = streetCoverage[city];
+      if (coverage.neighborhoods.some((hood) => hood.streetMeters > 0)) {
+        sections.push(`## ${CITY_NAMES[city]} street coverage`, coverageLines(coverage));
+      }
     }
 
-    sections.push(relatedPageLinksMarkdown(stravaRoute));
+    sections.push(relatedPageLinksMarkdown(activitiesRoute));
     return `${sections.join('\n\n')}\n`;
   } catch {
     return UNAVAILABLE_MARKDOWN;

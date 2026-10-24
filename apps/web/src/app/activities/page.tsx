@@ -1,11 +1,11 @@
 import 'server-only';
 import '../collage/pills.css';
 import '../music/stats/statsShapes.css';
-import './sfStreetCoverage.css';
+import './streetCoverage.css';
 import './strava.css';
 import './stravaPieces.css';
 
-import { stravaRoute } from '@dg/shared-core/routes/app';
+import { activitiesRoute } from '@dg/shared-core/routes/app';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getStravaHistory } from '../../services/strava';
@@ -20,8 +20,8 @@ import { StravaHistorySkeleton } from './StravaHistorySkeleton';
 const TITLE = 'Big map';
 
 export const metadata: Metadata = {
-  alternates: markdownAlternates(stravaRoute),
-  description: "Every outing I've tracked over the years.",
+  alternates: markdownAlternates(activitiesRoute),
+  description: "Every activity I've tracked over the years.",
   title: TITLE,
 };
 
@@ -35,7 +35,7 @@ async function StravaHistoryView() {
         innerClassName="strava__emptyInner"
         tiltDeg={-1}
       >
-        No outings yet.
+        No activities yet.
       </PaperCard>
     );
   }

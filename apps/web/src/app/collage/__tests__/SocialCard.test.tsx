@@ -195,7 +195,7 @@ describe('SocialCard', () => {
             dateLabel: 'Oct 22, 2026',
             kindLabel: 'Minor',
             kindTone: 'cobalt',
-            notes: ['Big map filterable /strava'],
+            notes: ['Big map filterable /activities'],
             tag: 'v2.81.0',
           },
         ]}

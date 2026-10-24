@@ -15,6 +15,7 @@ import { useDarkMap } from './useDarkMap';
 import { ZoomControls } from './ZoomControls';
 
 const FIT_PADDING = 36;
+const FLY_MS = 900;
 const SOURCE = 'routes';
 const CASING_LAYER = 'route-casing';
 const LINE_LAYER = 'route-line';
@@ -217,6 +218,8 @@ type RouteAtlasMapProps = {
   label: string;
   routes: ReadonlyArray<MapRoute>;
   tileSource: TileSource;
+  /** Where to fly once mounted, such as a region picked beside the map; `bounds` when null. */
+  view?: GeoBounds | null;
 };
 
 /**
@@ -224,9 +227,16 @@ type RouteAtlasMapProps = {
  * MapLibre loads only in the browser and only for real tiles; offline it falls
  * back to a static sketch. `VisibleRoutes` above it picks which routes to ink.
  */
-export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasMapProps) {
+export function RouteAtlasMap({
+  bounds,
+  label,
+  routes,
+  tileSource,
+  view = null,
+}: RouteAtlasMapProps) {
   const hostRef = useRef<HTMLDivElement>(null);
   const boundsRef = useRef(bounds);
+  const flownRef = useRef(view);
   const visible = use(VisibleRoutes);
   const dark = useDarkMap();
   const offline = tileSource.mode === 'offline';
@@ -238,6 +248,14 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
       apply(kept);
     }
   }, [dark, routes, tileSource, visible]);
+
+  useEffect(() => {
+    if (flownRef.current === view) {
+      return;
+    }
+    flownRef.current = view;
+    kept?.map.fitBounds(lngLatBounds(view ?? bounds), { duration: FLY_MS, padding: FIT_PADDING });
+  }, [bounds, view]);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -314,7 +332,7 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
           }}
         >
           <RouteAtlasSketch
-            bounds={bounds}
+            bounds={view ?? bounds}
             routes={visible ? routes.filter(({ id }) => visible.has(id)) : routes}
           />
         </Box>
@@ -323,7 +341,9 @@ export function RouteAtlasMap({ bounds, label, routes, tileSource }: RouteAtlasM
         <>
           <Box ref={hostRef} sx={hostSx} />
           <ZoomControls
-            onReset={() => kept?.map.fitBounds(lngLatBounds(bounds), { padding: FIT_PADDING })}
+            onReset={() =>
+              kept?.map.fitBounds(lngLatBounds(view ?? bounds), { padding: FIT_PADDING })
+            }
             onZoomIn={() => kept?.map.zoomIn()}
             onZoomOut={() => kept?.map.zoomOut()}
           />

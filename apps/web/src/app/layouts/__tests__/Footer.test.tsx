@@ -13,7 +13,7 @@ import {
   musicStatsRoute,
   readingRoute,
   siteMapRoute,
-  stravaRoute,
+  activitiesRoute,
 } from '@dg/shared-core/routes/app';
 import { ServerTimeProvider } from '@dg/ui/core/ServerTimeContext';
 import { render, screen, within } from '@testing-library/react';
@@ -213,7 +213,7 @@ describe('Footer', () => {
       ['Plays', musicRoute],
       ['Favorite albums', favoriteAlbumsRoute],
       ['Reads', readingRoute],
-      ['Big map', stravaRoute],
+      ['Big map', activitiesRoute],
     ]);
   });
 

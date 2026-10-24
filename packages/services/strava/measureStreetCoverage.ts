@@ -1,13 +1,15 @@
 import 'server-only';
 
 import {
-  type SfCoverageSpan,
-  type SfCoverageSport,
-  type SfStreetCoverage,
+  type CoverageSpan,
+  type CoverageSport,
+  type CoverageCity,
+  type StreetCoverage,
   STRAVA_WINDOW_DAYS,
-  sfCoverageKey,
-} from '@dg/content-models/strava/SfStreetCoverage';
+  coverageKey,
+} from '@dg/content-models/strava/StreetCoverage';
 import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
+import { SD_STREET_GRID } from './sdStreetGrid';
 import { SF_STREET_GRID } from './sfStreetGrid';
 import {
   decodePolyline,
@@ -195,7 +197,7 @@ function piecesRidden(
   });
 }
 
-const spansOf = (outing: StravaLogEntry, now: number): Array<SfCoverageSpan> => {
+const spansOf = (outing: StravaLogEntry, now: number): Array<CoverageSpan> => {
   const start = Date.parse(outing.startDate);
   const windows = (
     Object.keys(STRAVA_WINDOW_DAYS) as Array<keyof typeof STRAVA_WINDOW_DAYS>
@@ -203,18 +205,18 @@ const spansOf = (outing: StravaLogEntry, now: number): Array<SfCoverageSpan> => 
   return ['all', new Date(start).getUTCFullYear(), ...windows];
 };
 
-const sportsOf = ({ sport }: StravaLogEntry): Array<SfCoverageSport> =>
+const sportsOf = ({ sport }: StravaLogEntry): Array<CoverageSport> =>
   sport === 'other' ? ['all'] : ['all', sport];
 
 /**
  * Street coverage measured against `grid` for every sport and span the
- * `/strava` filters offer. A piece ridden by several outings counts once.
+ * `/activities` filters offer. A piece ridden by several outings counts once.
  */
 export function measureStreetCoverage(
   grid: StreetGrid,
   outings: ReadonlyArray<StravaLogEntry>,
   now: Date,
-): SfStreetCoverage {
+): StreetCoverage {
   const pieces = piecesOf(grid);
   const ridden = piecesRidden(grid, pieces, outings);
   const groups = new Map<string, Array<number>>();
@@ -222,7 +224,7 @@ export function measureStreetCoverage(
     if (ridden[index]?.length) {
       for (const sport of sportsOf(outing)) {
         for (const span of spansOf(outing, now.getTime())) {
-          const key = sfCoverageKey(sport, span);
+          const key = coverageKey(sport, span);
           const group = groups.get(key);
           if (group) {
             group.push(index);
@@ -265,5 +267,16 @@ export function measureStreetCoverage(
   };
 }
 
-export const measureSfStreetCoverage = (outings: ReadonlyArray<StravaLogEntry>, now: Date) =>
-  measureStreetCoverage(SF_STREET_GRID, outings, now);
+const CITY_GRIDS = { sd: SD_STREET_GRID, sf: SF_STREET_GRID } as const satisfies Record<
+  CoverageCity,
+  StreetGrid
+>;
+
+/** Street coverage in every city with a measured grid. */
+export const measureCityCoverage = (
+  outings: ReadonlyArray<StravaLogEntry>,
+  now: Date,
+): Record<CoverageCity, StreetCoverage> => ({
+  sd: measureStreetCoverage(CITY_GRIDS.sd, outings, now),
+  sf: measureStreetCoverage(CITY_GRIDS.sf, outings, now),
+});

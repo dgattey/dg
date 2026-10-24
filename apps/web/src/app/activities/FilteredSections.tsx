@@ -1,9 +1,12 @@
 'use client';
 
 import type { StravaBike } from '@dg/content-models/strava/StravaHistory';
+import type { AtlasRegion } from '@dg/maps/atlasGeometry';
 import { RouteAtlasMap } from '@dg/maps/src/RouteAtlasMap';
 import type { GeoBounds } from '@dg/maps/src/routeFrame';
 import type { TileSource } from '@dg/maps/src/tileSource';
+import { useState } from 'react';
+import { PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
 import { Scallop, Stub } from '../music/stats/StatsShapes';
 import { BikeOdometers } from './BikeOdometers';
@@ -62,7 +65,7 @@ export function HeadlineTotals() {
       <li className="strava__totalOutings">
         <Stub kind="stamp" tiltDeg={1.2} tone="vermilion">
           <span className="strava__totalNumber">{formatCount(totals.outings)}</span>
-          <span className="strava__totalUnit">{totals.outings === 1 ? 'outing' : 'outings'}</span>
+          <span className="strava__totalUnit">{totals.outings === 1 ? 'activity' : 'activities'}</span>
           <span className="strava__totalAside">{formatHours(totals.movingTimeSeconds)} moving</span>
         </Stub>
       </li>
@@ -70,16 +73,47 @@ export function HeadlineTotals() {
   );
 }
 
-/** Every route on the atlas; the filters hide the rest in place instead of redrawing. */
-export function StravaAtlas({ bounds, tileSource }: { bounds: GeoBounds; tileSource: TileSource }) {
+const REGION_TILTS = [-1.4, 1.1] as const;
+
+/**
+ * Every route on the atlas; the filters hide the rest in place instead of
+ * redrawing. Region pills fly the map to each home region and back again.
+ */
+export function StravaAtlas({
+  bounds,
+  regions,
+  tileSource,
+}: {
+  bounds: GeoBounds;
+  regions: ReadonlyArray<AtlasRegion>;
+  tileSource: TileSource;
+}) {
   const { all } = useFilteredOutings();
+  const [regionKey, setRegionKey] = useState<string | null>(null);
+  const region = regions.find(({ key }) => key === regionKey) ?? null;
   return (
-    <RouteAtlasMap
-      bounds={bounds}
-      label="Map of every route I've tracked on Strava"
-      routes={toMapRoutes(all)}
-      tileSource={tileSource}
-    />
+    <>
+      <RouteAtlasMap
+        bounds={bounds}
+        label="Map of every route I've tracked on Strava"
+        routes={toMapRoutes(all)}
+        tileSource={tileSource}
+        view={region?.bounds ?? null}
+      />
+      {regions.length > 1 ? (
+        <PaperPills
+          className="strava__regions"
+          label="Zoom to region"
+          onSelect={(key) => setRegionKey(key === regionKey ? null : key)}
+          options={regions.map(({ key, label }, index) => ({
+            key,
+            label,
+            tiltDeg: REGION_TILTS[index % REGION_TILTS.length] ?? 0,
+          }))}
+          selected={regionKey}
+        />
+      ) : null}
+    </>
   );
 }
 
@@ -123,7 +157,7 @@ export function StravaBands({
             tiltDeg={3.2}
           >
             <PaperTag className="collagePin strava__longestTag" tiltDeg={-7} tone="rose">
-              Longest outing
+              Longest activity
             </PaperTag>
           </RoutePolaroid>
         ) : null}

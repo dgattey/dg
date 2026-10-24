@@ -135,7 +135,7 @@ export function StravaSocialCard({
               >
                 {outings}
               </span>
-              <span style={{ fontSize: 12, opacity: 0.88 }}>outings</span>
+              <span style={{ fontSize: 12, opacity: 0.88 }}>activities</span>
             </SocialCardScallop>
           </div>
         </div>

@@ -1,6 +1,6 @@
-import type { SfStreetCoverage } from './SfStreetCoverage';
+import type { CoverageCity, StreetCoverage } from './StreetCoverage';
 
-const STRAVA_SPORTS = ['ride', 'run', 'hike', 'other'] as const;
+const STRAVA_SPORTS = ['ride', 'run', 'hike', 'ski', 'other'] as const;
 
 export type StravaSport = (typeof STRAVA_SPORTS)[number];
 
@@ -57,5 +57,6 @@ export type StravaHistory = {
   thisYear: StravaYearTotals;
   /** Bikes Strava has named, most miles first. */
   bikes: ReadonlyArray<StravaBike>;
-  sfCoverage: SfStreetCoverage;
+  /** Street coverage for each city with a measured grid. */
+  streetCoverage: Readonly<Record<CoverageCity, StreetCoverage>>;
 };

@@ -74,8 +74,8 @@ import * as readingOg from '../reading/opengraph-image';
 import * as readingTwitter from '../reading/twitter-image';
 import * as siteMapOg from '../site-map/opengraph-image';
 import * as siteMapTwitter from '../site-map/twitter-image';
-import * as stravaOg from '../strava/opengraph-image';
-import * as stravaTwitter from '../strava/twitter-image';
+import * as stravaOg from '../activities/opengraph-image';
+import * as stravaTwitter from '../activities/twitter-image';
 import * as homeTwitter from '../twitter-image';
 
 const TRUETYPE_SFNT_VERSION = 0x00010000;
@@ -379,12 +379,17 @@ describe('createSocialImage', () => {
           url: 'https://www.strava.com/activities/1',
         },
       ],
-      sfCoverage: {
+      streetCoverage: { sd: {
         neighborhoods: [],
         projection: { origin: { lat: 37.8, lng: -122.5 }, perDegree: { lat: -100, lng: 100 } },
         ridden: {},
         viewBox: '0 0 100 100',
-      },
+      }, sf: {
+        neighborhoods: [],
+        projection: { origin: { lat: 37.8, lng: -122.5 }, perDegree: { lat: -100, lng: 100 } },
+        ridden: {},
+        viewBox: '0 0 100 100',
+      } },
       thisYear: { distanceMeters: 1000, elevationGainMeters: 100, outings: 1, year: 2026 },
       totals: {
         distanceMeters: 44510425,

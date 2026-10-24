@@ -1,19 +1,19 @@
 import type { StravaHistory } from '@dg/content-models/strava/StravaHistory';
 import { RoutePeek } from '@dg/maps/RoutePeek';
 import { getTileSource } from '@dg/maps/src/getTileSource';
-import { stravaRoute } from '@dg/shared-core/routes/app';
+import { activitiesRoute } from '@dg/shared-core/routes/app';
 import { RelativeTime } from '@dg/ui/core/RelativeTime';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import { Scallop, Stub } from '../music/stats/StatsShapes';
-import { RoutePolaroid } from '../strava/RoutePolaroid';
-import { formatMiles, formatRouteCount } from '../strava/stravaFormat';
-import { toMapRoutes } from '../strava/stravaSports';
+import { RoutePolaroid } from '../activities/RoutePolaroid';
+import { formatMiles, formatRouteCount } from '../activities/stravaFormat';
+import { toMapRoutes } from '../activities/stravaSports';
 
 /**
  * The homepage's Strava gatefold: every route around home up top, linking to
- * `/strava` with the lifetime total sealed on its corner, the latest outing's
+ * `/activities` with the lifetime total sealed on its corner, the latest outing's
  * print stepped down beside this year's miles.
  */
 export function StravaCard({ history }: { history: StravaHistory | null }) {
@@ -30,13 +30,13 @@ export function StravaCard({ history }: { history: StravaHistory | null }) {
             Exercise stats
           </PaperTag>
         </h2>
-        <PageTransitionLink className="home__stravaAtlasLink" href={stravaRoute} title="Big map">
+        <PageTransitionLink className="home__stravaAtlasLink" href={activitiesRoute} title="Big map">
           <PaperCard edge="quad-c" innerClassName="home__stravaAtlasMat" tiltDeg={3}>
             <span aria-hidden="true" className="home__stravaMap">
               <RoutePeek routes={routes} />
             </span>
           </PaperCard>
-          <PaperTag className="collagePin home__stravaRoutes" tiltDeg={5} tone="ochre">
+          <PaperTag className="collagePin home__activitiesRoutes" tiltDeg={5} tone="ochre">
             {formatRouteCount(routes.length)}
           </PaperTag>
         </PageTransitionLink>

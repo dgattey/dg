@@ -56,7 +56,7 @@ export function RecentOutings({ outings }: { outings: ReadonlyArray<StravaLogEnt
       tag={fold}
       tiltDeg={1.2}
     >
-      <h2 className="strava__heading">Recent outings</h2>
+      <h2 className="strava__heading">Recent activities</h2>
       <ol className="strava__rows">
         {outings.length === 0 ? nothingYet : null}
         {outings.map((outing) => (

@@ -1,19 +1,24 @@
 import type { StravaSport } from './StravaHistory';
 
-/** The rolling windows the `/strava` time filter offers, in days. */
+/** The rolling windows the `/activities` time filter offers, in days. */
 export const STRAVA_WINDOW_DAYS = { month: 30, week: 7 } as const;
 
 export type StravaWindow = keyof typeof STRAVA_WINDOW_DAYS;
 
-export type SfCoverageSport = 'all' | Exclude<StravaSport, 'other'>;
+export type CoverageSport = 'all' | Exclude<StravaSport, 'other'>;
 
 /** All time, a rolling window, or a UTC calendar year. */
-export type SfCoverageSpan = 'all' | StravaWindow | number;
+export type CoverageSpan = 'all' | StravaWindow | number;
 
-export const sfCoverageKey = (sport: SfCoverageSport, span: SfCoverageSpan) => `${sport} ${span}`;
+export const coverageKey = (sport: CoverageSport, span: CoverageSpan) => `${sport} ${span}`;
 
-/** How much of San Francisco's rideable street grid the outings have covered. */
-export type SfStreetCoverage = {
+/** Cities with a measured street grid. */
+export const COVERAGE_CITIES = ['sf', 'sd'] as const;
+
+export type CoverageCity = (typeof COVERAGE_CITIES)[number];
+
+/** How much of one city's rideable street grid the outings have covered. */
+export type StreetCoverage = {
   /** SVG view box for every neighborhood `outline`. */
   viewBox: string;
   /**
@@ -24,7 +29,7 @@ export type SfStreetCoverage = {
     origin: { lat: number; lng: number };
     perDegree: { lat: number; lng: number };
   };
-  /** DataSF's analysis neighborhoods, alphabetical. */
+  /** The city's neighborhoods (or community planning areas), alphabetical. */
   neighborhoods: ReadonlyArray<{
     name: string;
     /** SVG path data in `viewBox` units, north up. */
@@ -34,7 +39,7 @@ export type SfStreetCoverage = {
   }>;
   /**
    * Ridden street meters per neighborhood, in `neighborhoods` order, keyed by
-   * `sfCoverageKey`. Rolling windows end when the history was summarized.
+   * `coverageKey`. Rolling windows end when the history was summarized.
    * Filters that cover nothing are left out.
    */
   ridden: Readonly<Record<string, ReadonlyArray<number>>>;
