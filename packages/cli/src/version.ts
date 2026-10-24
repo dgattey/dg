@@ -84,13 +84,33 @@ export function resolveTargetVersion({
   };
 }
 
-export function extractNotes(body: string, fallback = ''): string {
-  const cleaned = body
+function cleanPrBody(body: string): string {
+  return body
     .replace(/\r\n/g, '\n')
     .replace(/<!--[\s\S]*?-->/g, '')
     .replace(/\n---+\s*(?:\n[\s\S]*)?$/, '')
     .trim();
+}
 
+export function extractReleaseNotesSection(body: string): string | null {
+  const cleaned = cleanPrBody(body);
+  const match = /(?:^|\n)#{1,6}[ \t]+Release notes\b[^\n]*\n([\s\S]*?)(?=\n#{1,6}[ \t]|$)/i.exec(
+    cleaned,
+  );
+  if (!match) {
+    return null;
+  }
+  const section = (match[1] ?? '').trim();
+  return section && !/^[-*]\s*$/.test(section) ? section : '';
+}
+
+export function extractNotes(body: string, fallback = ''): string {
+  const releaseNotesSection = extractReleaseNotesSection(body);
+  if (releaseNotesSection) {
+    return releaseNotesSection;
+  }
+
+  const cleaned = cleanPrBody(body);
   const whatChangedMatch =
     /(?:^|\n)#{1,6}[ \t]+What changed\b[^\n]*\n([\s\S]*?)(?=\n#{1,6}[ \t]|$)/i.exec(cleaned);
   if (whatChangedMatch) {
@@ -99,7 +119,7 @@ export function extractNotes(body: string, fallback = ''): string {
   }
 
   const withoutReleaseInfo = cleaned
-    .replace(/(?:^|\n)#{1,6}[ \t]+Release info\b[\s\S]*$/i, '')
+    .replace(/(?:^|\n)#{1,6}[ \t]+Release (?:notes|info)\b[\s\S]*$/i, '')
     .trim();
   if (withoutReleaseInfo && !/^[-*]\s*$/.test(withoutReleaseInfo)) {
     return withoutReleaseInfo;

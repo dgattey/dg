@@ -9,6 +9,7 @@ import { MusicArtist } from './models/MusicArtist';
 import { MusicTrack } from './models/MusicTrack';
 import { MusicTrackArtist } from './models/MusicTrackArtist';
 import { OauthState } from './models/OauthState';
+import { Release } from './models/Release';
 import { SpotifyPlay } from './models/SpotifyPlay';
 import { StravaActivity } from './models/StravaActivity';
 import { Token } from './models/Token';
@@ -22,6 +23,7 @@ export const db = {
   MusicTrack,
   MusicTrackArtist,
   OauthState,
+  Release,
   SpotifyPlay,
   StravaActivity,
   Token,

@@ -234,23 +234,6 @@
   line-height: var(--leading-body);
   color: var(--on);
 }
-.changelog__noteItem strong {
-  font-family: var(--display);
-  font-weight: 700;
-}
-.changelog__code {
-  padding: 1px 6px 2px;
-  font-size: var(--type-caption);
-  background: color-mix(in oklab, var(--ink-on-cream) 9%, var(--cream));
-  border-radius: 5px;
-}
-.changelog__prInline {
-  font-family: var(--display);
-  font-weight: 700;
-  color: var(--cobalt);
-  text-decoration: underline;
-  text-underline-offset: 3px;
-}
 .changelog__emptyNote {
   margin: 0;
   font-size: var(--type-body);

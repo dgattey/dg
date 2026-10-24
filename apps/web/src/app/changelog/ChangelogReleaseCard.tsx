@@ -7,47 +7,7 @@ import {
   RELEASE_KIND_LABELS,
   RELEASE_KIND_TONES,
   releaseCardTreatment,
-  tokenizeNoteLine,
 } from './changelogHelpers';
-
-function NoteLine({ line }: { line: string }) {
-  const tokens = tokenizeNoteLine(line);
-  return (
-    <>
-      {tokens.map((token, idx) => {
-        const key = `${idx}-${token.kind}`;
-        switch (token.kind) {
-          case 'bold':
-            return <strong key={key}>{token.value}</strong>;
-          case 'code':
-            return (
-              <code className="changelog__code" key={key}>
-                {token.value}
-              </code>
-            );
-          case 'pr':
-            return (
-              <a
-                className="changelog__prInline"
-                href={token.href}
-                key={key}
-                rel="noopener noreferrer"
-                target="_blank"
-              >
-                {token.label}
-              </a>
-            );
-          case 'text':
-            return <span key={key}>{token.value}</span>;
-          default: {
-            const exhaustive: never = token;
-            return exhaustive;
-          }
-        }
-      })}
-    </>
-  );
-}
 
 export function ChangelogReleaseCard({
   index,
@@ -130,7 +90,7 @@ export function ChangelogReleaseCard({
           <ul className="changelog__notes">
             {release.notes.map((note) => (
               <li className="changelog__noteItem" key={note}>
-                <NoteLine line={note} />
+                {note}
               </li>
             ))}
           </ul>

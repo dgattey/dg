@@ -131,6 +131,32 @@ jobs:
 
             core.info(`Created release ${tag}`);
             core.setOutput('release_url', createdRelease.html_url);
+            core.setOutput('published_at', createdRelease.published_at || new Date().toISOString());
+
+      - name: Dual-write release to database and revalidate changelog
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+          NOTES: ${{ steps.info.outputs.NOTES }}
+          PUBLISHED_AT: ${{ steps.release.outputs.published_at }}
+          RELEASE_URL: ${{ steps.release.outputs.release_url }}
+          SITE_URL: ${{ secrets.SITE_URL }}
+          VERSION: ${{ steps.info.outputs.VERSION }}
+        run: |
+          set -euo pipefail
+          if [ -z "${SITE_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+            echo "Skipping release dual-write (SITE_URL or CRON_SECRET not configured)"
+            exit 0
+          fi
+          PAYLOAD=$(node -e 'process.stdout.write(JSON.stringify({
+            version: `v${process.env.VERSION}`,
+            url: process.env.RELEASE_URL,
+            publishedAt: process.env.PUBLISHED_AT,
+            body: process.env.NOTES || "",
+          }))')
+          curl -fsS --max-time 30 -X POST "${SITE_URL%/}/api/releases" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "Content-Type: application/json" \
+            -d "$PAYLOAD"
 
       - name: Update PR version comment
         env:
