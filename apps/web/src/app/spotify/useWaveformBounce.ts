@@ -11,90 +11,109 @@ type WaveformBounceOptions = {
   intensity?: number;
 };
 
-const SCROLL_RESUME_DELAY_MS = 120;
+/** Skip DOM transform update when change is below these (reduces redundant style/layout work). */
+const THRESHOLD_SCALE = 0.00015;
+const THRESHOLD_Y_PX = 0.025;
+const THRESHOLD_ROT_DEG = 0.03;
 
 /**
- * Pauses Web Animations while the page scrolls and resumes them after scrolling settles.
- */
-export function pauseAnimationsOnScroll(animations: ReadonlyArray<Animation>): () => void {
-  let scrollTimer: number | undefined;
-  let pausedForScroll = false;
-  const onScroll = () => {
-    if (!pausedForScroll) {
-      pausedForScroll = true;
-      for (const anim of animations) {
-        anim.pause();
-      }
-    }
-    if (scrollTimer !== undefined) {
-      window.clearTimeout(scrollTimer);
-    }
-    scrollTimer = window.setTimeout(() => {
-      pausedForScroll = false;
-      for (const anim of animations) {
-        anim.play();
-      }
-    }, SCROLL_RESUME_DELAY_MS);
-  };
-
-  window.addEventListener('scroll', onScroll, { passive: true });
-  return () => {
-    window.removeEventListener('scroll', onScroll);
-    if (scrollTimer !== undefined) {
-      window.clearTimeout(scrollTimer);
-    }
-    for (const anim of animations) {
-      anim.cancel();
-    }
-  };
-}
-
-/**
- * Applies a compositor-driven beat bounce via the Web Animations API when music
- * is playing so Gecko/WebRender animates the transform on the compositor thread
- * without main-thread style invalidation or display-list rebuilds every frame.
+ * Hook that applies a beat-led bounce to a ref when music is playing.
+ * Clear rhythmic pulses with subtle organic variation between beats.
+ * requestAnimationFrame already caps at display refresh rate; we only write
+ * the transform when the change is significant to avoid constant tiny updates.
  */
 export function useWaveformBounce<T extends HTMLElement>({
   isPlaying,
   intensity = 1,
 }: WaveformBounceOptions) {
   const ref = useRef<T>(null);
+  const timeRef = useRef(0);
+  const rafRef = useRef<number | null>(null);
+  const jitterRef = useRef(0);
+  const rotationRef = useRef(0);
+  const nudgedThisBeatRef = useRef(false);
+  const lastScaleRef = useRef(1);
+  const lastYRef = useRef(0);
+  const lastRotRef = useRef(0);
 
   useEffect(() => {
-    const element = ref.current;
-    if (!element) {
-      return;
-    }
     if (!isPlaying || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
-      element.style.transform = '';
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+      if (ref.current) {
+        ref.current.style.transform = 'rotate(0deg) scale3d(1, 1, 1) translate3d(0, 0, 0)';
+      }
       return;
     }
-    if (typeof element.animate !== 'function') {
-      return;
-    }
 
-    const clamped = Math.min(Math.max(intensity, 0.5), 1.6);
-    const liftPx = -(1.8 * clamped).toFixed(2);
-    const dipPx = (0.5 * clamped).toFixed(2);
-    const tiltA = (1.1 * clamped).toFixed(2);
-    const tiltB = (-0.9 * clamped).toFixed(2);
+    timeRef.current = 0;
+    jitterRef.current = 0;
+    rotationRef.current = 0;
+    nudgedThisBeatRef.current = false;
+    lastScaleRef.current = 1;
+    lastYRef.current = 0;
+    lastRotRef.current = 0;
 
-    const animation = element.animate(
-      [
-        { transform: 'rotate(0deg) translate3d(0, 0px, 0)' },
-        { offset: 0.16, transform: `rotate(${tiltA}deg) translate3d(0, ${liftPx}px, 0)` },
-        { offset: 0.42, transform: `rotate(-0.3deg) translate3d(0, ${dipPx}px, 0)` },
-        { offset: 0.68, transform: `rotate(${tiltB}deg) translate3d(0, ${liftPx}px, 0)` },
-        { transform: 'rotate(0deg) translate3d(0, 0px, 0)' },
-      ],
-      {
-        duration: 1350,
-        easing: 'ease-in-out',
-        iterations: Number.POSITIVE_INFINITY,
-      },
-    );
+    const animate = () => {
+      if (!ref.current) {
+        return;
+      }
 
-    return pauseAnimationsOnScroll([animation]);
+      const time = timeRef.current;
+      const scale = intensity;
+
+      // Primary: clear beat pulse (snappy bump on each "downbeat") – exaggerated up
+      const beatPhase = Math.sin(time * 0.6);
+      const beat = beatPhase > 0.88 ? 0.026 * ((beatPhase - 0.88) * 8.3) ** 1.3 * scale : 0;
+
+      // Sub-beats: layered breath (different frequencies so no fixed 2-beat cycle) + drift
+      const breath1 = Math.sin(time * 0.35 + 0.5) * 0.005 * scale;
+      const breath2 = Math.sin(time * 0.27 + 1.1) * 0.004 * scale;
+      jitterRef.current = jitterRef.current * 0.86 + (Math.random() - 0.5) * 0.0035 * scale;
+      const variation = breath1 + breath2 + jitterRef.current;
+
+      const scaleDelta = (beat + variation) * 0.95;
+      // Vertical bounce: lift on beat + breath wobble, in px (negative = up)
+      const yOffset = (beat * 0.8 + variation * 1.3) * -14;
+
+      if (beatPhase > 0.88) {
+        if (!nudgedThisBeatRef.current) {
+          nudgedThisBeatRef.current = true;
+          const nudgeMag = 0.4 + Math.random() * 1.8;
+          rotationRef.current += (Math.random() - 0.5) * 2 * nudgeMag * 0.9;
+        }
+        rotationRef.current += beat * 10.8 * (Math.random() - 0.5) * scale;
+      } else if (beatPhase < 0.5) {
+        nudgedThisBeatRef.current = false;
+      }
+      rotationRef.current *= 0.96 + Math.random() * 0.025;
+      const finalScale = 1 + scaleDelta;
+      const rotDeg = rotationRef.current;
+
+      const scaleChanged = Math.abs(finalScale - lastScaleRef.current) >= THRESHOLD_SCALE;
+      const yChanged = Math.abs(yOffset - lastYRef.current) >= THRESHOLD_Y_PX;
+      const rotChanged = Math.abs(rotDeg - lastRotRef.current) >= THRESHOLD_ROT_DEG;
+      if (scaleChanged || yChanged || rotChanged) {
+        lastScaleRef.current = finalScale;
+        lastYRef.current = yOffset;
+        lastRotRef.current = rotDeg;
+        ref.current.style.transform = `rotate(${rotDeg}deg) scale3d(${finalScale}, ${finalScale}, 1) translate3d(0, ${yOffset}px, 0)`;
+      }
+
+      timeRef.current += 0.16;
+
+      rafRef.current = requestAnimationFrame(animate);
+    };
+
+    animate();
+
+    return () => {
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+      }
+    };
   }, [isPlaying, intensity]);
 
   return ref;

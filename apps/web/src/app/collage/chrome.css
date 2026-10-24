@@ -59,8 +59,26 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   flex-shrink: 0;
 }
 .chrome__logo {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  font-size: 2.25em;
+  line-height: 1;
+  color: var(--ink);
+  text-decoration: none;
   filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
   rotate: -4deg;
+  transition: transform var(--timing-bouncy) var(--easing-bouncy);
+  will-change: transform;
+}
+.chrome__logo:hover {
+  text-decoration: none;
+  transform: scale(1.05);
+}
+.chrome__logo:focus-visible {
+  outline: -webkit-focus-ring-color auto 1px;
 }
 .chrome__nowPlaying {
   min-width: 0;

@@ -6,7 +6,7 @@ import { Typography } from '@dg/ui/core/Typography';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
 import { createTransition, EASING_BOUNCE, TIMING_SLOW } from '@dg/ui/helpers/timing';
-import { type ComponentProps, type CSSProperties, Fragment, type ReactNode } from 'react';
+import { type CSSProperties, Fragment, type ReactNode } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { ALBUM_GRADIENT_GLOW_STYLE, AlbumGradientBackdrop } from './AlbumGradientBackdrop';
 import { MusicNotes } from './MusicNotes';
@@ -72,22 +72,24 @@ function AlbumArtWithNotes({
   children,
   isPlaying,
   noteColor,
-  notesVariant = 'collage',
+  showNotes = true,
   wrapperStyle,
 }: {
   bounceIntensity?: number;
   children: ReactNode;
   isPlaying: boolean;
   noteColor?: string;
-  notesVariant?: ComponentProps<typeof MusicNotes>['variant'];
+  showNotes?: boolean;
   wrapperStyle: CSSProperties;
 }) {
   const bounceRef = useWaveformBounce<HTMLDivElement>({ intensity: bounceIntensity, isPlaying });
   return (
     <div data-art-notes="" style={wrapperStyle}>
-      <div aria-hidden="true" data-art-notes-center="">
-        <MusicNotes isPlaying={isPlaying} noteColor={noteColor} variant={notesVariant} />
-      </div>
+      {showNotes ? (
+        <div aria-hidden="true" data-art-notes-center="">
+          <MusicNotes isPlaying={isPlaying} noteColor={noteColor} />
+        </div>
+      ) : null}
       <div data-art-notes-bounce="" ref={bounceRef}>
         {children}
       </div>
@@ -123,12 +125,11 @@ function TrackMeta({
   const artistVariant = isCard ? 'body2' : 'caption';
   const titleStyle: CSSProperties = {
     ...(isCard ? { marginBottom: 8 } : { lineHeight: 1.2 }),
-    ...(color ? { color } : {}),
     ...(textShadow ? { textShadow } : {}),
   };
   const artistStyle: CSSProperties = {
     ...(isCard ? {} : { lineHeight: 1.2, opacity: 0.6 }),
-    ...(secondaryColor ? { color: secondaryColor, opacity: 1 } : {}),
+    ...(secondaryColor ? { opacity: 1 } : {}),
     ...(secondaryShadow ? { textShadow: secondaryShadow } : {}),
   };
   const fullArtists = track.artists
@@ -139,11 +140,12 @@ function TrackMeta({
     <>
       <Tooltip title={track.name} whenTruncated>
         {disableLinks ? (
-          <Typography data-track-title="" style={titleStyle} variant={titleVariant}>
+          <Typography color={color} data-track-title="" style={titleStyle} variant={titleVariant}>
             {track.name}
           </Typography>
         ) : (
           <Link
+            color={color}
             data-track-title=""
             href={track.url}
             isExternal={true}
@@ -156,6 +158,7 @@ function TrackMeta({
       </Tooltip>
       <Tooltip title={fullArtists} whenTruncated>
         <Typography
+          color={secondaryColor}
           component="span"
           data-track-artists=""
           style={artistStyle}
@@ -222,8 +225,7 @@ export function TrackListing({
           <AlbumArtWithNotes
             bounceIntensity={COLLAGE_COMPACT_BOUNCE}
             isPlaying={track.isPlaying ?? false}
-            noteColor="var(--ink)"
-            notesVariant="collageCompact"
+            showNotes={false}
             wrapperStyle={{ height: COMPACT_THUMBNAIL_SIZE, width: COMPACT_THUMBNAIL_SIZE }}
           >
             {disableLinks ? (
@@ -268,7 +270,6 @@ export function TrackListing({
       <AlbumArtWithNotes
         isPlaying={Boolean(track.isPlaying)}
         noteColor="var(--cream)"
-        notesVariant="collage"
         wrapperStyle={{ aspectRatio: '1', width: 'min(100%, 300px)' }}
       >
         <div className="print__sleeve">

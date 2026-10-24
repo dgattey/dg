@@ -1,3 +1,4 @@
+import { getGlobalThemeCss } from '../index';
 import { getTypography } from '../typography';
 
 describe('getTypography', () => {
@@ -16,5 +17,27 @@ describe('getTypography', () => {
       fontSize: 15,
       fontWeight: 400,
     });
+  });
+
+  it('emits valid CSS units, no undefined tokens, and zero-specificity :where() defaults in getGlobalThemeCss', () => {
+    const css = getGlobalThemeCss();
+
+    expect(css).not.toContain('undefined');
+    expect(css).not.toContain('NaN');
+
+    const fontSizes = [...css.matchAll(/font-size:\s*([^;}\n]+)/g)].map((m) => m[1]?.trim() ?? '');
+    expect(fontSizes.length).toBeGreaterThan(0);
+    for (const size of fontSizes) {
+      expect(size).toMatch(/^(?:\d+(?:\.\d+)?(?:px|rem|em)|clamp\(.+\)|inherit)$/);
+    }
+
+    expect(css).toContain(':where([data-typography="caption"]) {\n  font-size: 15px;');
+    expect(css).toContain(':where([data-typography="overline"]) {\n  font-size: 16px;');
+    expect(css).toContain(
+      ':where([data-typography="h6"]) {\n  color: var(--dg-palette-text-h6);\n  font-size: 16px;',
+    );
+    expect(css.indexOf(':where([data-typography][data-has-color])')).toBeGreaterThan(
+      css.indexOf(':where([data-ui-link])'),
+    );
   });
 });

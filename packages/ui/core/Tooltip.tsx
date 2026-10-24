@@ -197,32 +197,34 @@ export function Tooltip({
   };
 
   return (
-    <span
-      {...anchorProps}
-      className={className}
-      ref={anchorRef}
-      style={{ anchorName } as CSSProperties}
-    >
+    <>
       <style href="dg-tooltip" precedence="default">
         {TOOLTIP_CSS}
       </style>
-      {!whenTruncated && React.isValidElement<{ 'aria-describedby'?: string }>(children)
-        ? React.cloneElement(children, { 'aria-describedby': tooltipId })
-        : children}
-      <Typography
-        component="span"
-        data-placement={placement}
-        data-tooltip-no-flip={whenTruncated || undefined}
-        data-tooltip-surface=""
-        id={tooltipId}
-        ref={surfaceRef}
-        role="tooltip"
-        style={{ positionAnchor: anchorName } as CSSProperties}
-        variant="caption"
+      <span
+        {...anchorProps}
+        className={className}
+        ref={anchorRef}
+        style={{ anchorName } as CSSProperties}
       >
-        {title}
-      </Typography>
-      {surface}
-    </span>
+        {!whenTruncated && React.isValidElement<{ 'aria-describedby'?: string }>(children)
+          ? React.cloneElement(children, { 'aria-describedby': tooltipId })
+          : children}
+        <Typography
+          component="span"
+          data-placement={placement}
+          data-tooltip-no-flip={whenTruncated || undefined}
+          data-tooltip-surface=""
+          id={tooltipId}
+          ref={surfaceRef}
+          role="tooltip"
+          style={{ positionAnchor: anchorName } as CSSProperties}
+          variant="caption"
+        >
+          {title}
+        </Typography>
+        {surface}
+      </span>
+    </>
   );
 }

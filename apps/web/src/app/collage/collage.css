@@ -227,7 +227,7 @@ html:has(.collageRoot) body {
   clip-path: var(--clip);
   rotate: none;
 }
-.paperInner [data-typography]:not(.home__spotifyMetaInner *) {
+.paperInner [data-typography]:not(.home__spotifyMetaInner *, [data-track-artists]) {
   color: inherit;
 }
 /* Lets zoomed art pass the paper's edge. Tooltips escape either way, being fixed. */

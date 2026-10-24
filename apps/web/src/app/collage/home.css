@@ -66,7 +66,7 @@
   grid-area: intro;
   /* The inset keeps the offset mat clear of the portrait now that the card spans the gap column. */
   width: min(100% - 32px, 700px);
-  padding: 30px 38px 32px;
+  padding: 32px;
   margin-top: 26px;
   font-size: var(--type-body-lg);
   line-height: var(--leading-body);
@@ -347,7 +347,7 @@
 .home__spotifyMetaInner > :first-child {
   margin-bottom: 6px;
 }
-.home__spotifyMetaInner > :last-child {
+.home__spotifyMetaInner > :nth-child(4) {
   margin-top: 12px;
 }
 /*
@@ -590,7 +590,7 @@
   .home__intro {
     --mat-offset: 9px;
     width: calc(100% - var(--mat-offset));
-    padding: 22px 24px 24px;
+    padding: 22px;
     margin: 8px 0 0;
   }
   .home__portraitSlot {

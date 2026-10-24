@@ -1,8 +1,8 @@
 import NextLink from 'next/link';
-import React, { type CSSProperties } from 'react';
+import React, { type AnchorHTMLAttributes, type CSSProperties } from 'react';
 import { Typography, type TypographyVariant } from '../core/Typography';
 
-type LinkProps = {
+type LinkProps = Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href' | 'style' | 'title'> & {
   children?: React.ReactNode;
   className?: string;
   href: string | undefined;
@@ -20,7 +20,7 @@ type LinkProps = {
  */
 export function CursorIcon({ size = '1em' }: { size?: string }) {
   return (
-    <span aria-hidden style={{ display: 'inline-flex', height: size, width: size }}>
+    <span aria-hidden data-cursor-icon="" style={{ '--cursor-icon-size': size } as CSSProperties}>
       <svg aria-hidden="true" fill="currentColor" height={size} viewBox="0 0 24 24" width={size}>
         <path d="M11.503.131 1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23" />
       </svg>
@@ -42,6 +42,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
     title,
     transitionTypes,
     variant = 'body1',
+    ...rest
   },
   ref,
 ) {
@@ -59,6 +60,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
   if (isExternal) {
     return (
       <Typography
+        {...rest}
         {...anchorProps}
         className={className}
         component="a"
@@ -82,6 +84,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
       transitionTypes={transitionTypes ? [...transitionTypes] : undefined}
     >
       <Typography
+        {...rest}
         className={className}
         component="span"
         data-ui-link=""

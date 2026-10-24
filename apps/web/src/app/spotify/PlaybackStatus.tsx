@@ -20,15 +20,10 @@ type PlaybackStatusProps = {
   service?: string;
 };
 
-function getStatusStyle(
-  listingVariant: ListingVariant,
-  color?: string,
-  textShadow?: string,
-): CSSProperties {
+function getStatusStyle(listingVariant: ListingVariant, textShadow?: string): CSSProperties {
   const isCompact = listingVariant === 'compact';
   return {
     alignItems: 'center',
-    color,
     display: 'flex',
     gap: isCompact ? 4 : 8,
     textShadow,
@@ -108,8 +103,9 @@ export function PlaybackStatus({
 
   return (
     <Typography
+      color={color}
       component="div"
-      style={getStatusStyle(listingVariant, color, textShadow)}
+      style={getStatusStyle(listingVariant, textShadow)}
       variant="overline"
     >
       {isCompact ? (

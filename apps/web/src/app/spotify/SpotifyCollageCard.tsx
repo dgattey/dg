@@ -17,7 +17,7 @@ function useAlbumGradient(track: Track): Track {
   useEffect(() => {
     let cancelled = false;
     extractAlbumGradientFromUrl(track.albumImage.url).then((info) => {
-      if (!cancelled) {
+      if (!cancelled && info.backgroundGradient) {
         setGradientInformation(info);
       }
     });
@@ -28,8 +28,9 @@ function useAlbumGradient(track: Track): Track {
 
   return {
     ...track,
-    albumGradient: gradientInformation.backgroundGradient ?? undefined,
-    albumGradientContrastSetting: gradientInformation.contrastSetting ?? undefined,
+    albumGradient: gradientInformation.backgroundGradient ?? track.albumGradient,
+    albumGradientContrastSetting:
+      gradientInformation.contrastSetting ?? track.albumGradientContrastSetting,
   };
 }
 

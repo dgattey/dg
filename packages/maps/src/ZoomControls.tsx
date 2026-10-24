@@ -46,27 +46,25 @@ const stopPropagation = (e: MouseEvent) => {
   e.stopPropagation();
 };
 
-const buttonInteractionProps = {
-  'data-zoom-button': '',
+const containerInteractionProps = {
   onMouseDown: stopPropagation,
   onMouseUp: stopPropagation,
-  type: 'button' as const,
 };
 
 export function ZoomControls({ onReset, onZoomIn, onZoomOut }: ZoomControlsProps) {
   return (
-    <div style={containerStyle}>
+    <div {...containerInteractionProps} style={containerStyle}>
       <style href="dg-zoom-controls" precedence="default">
         {ZOOM_CONTROLS_CSS}
       </style>
-      <button {...buttonInteractionProps} aria-label="Zoom in" onClick={onZoomIn}>
+      <button aria-label="Zoom in" data-zoom-button="" onClick={onZoomIn} type="button">
         <Plus aria-hidden="true" size="1em" />
       </button>
-      <button {...buttonInteractionProps} aria-label="Zoom out" onClick={onZoomOut}>
+      <button aria-label="Zoom out" data-zoom-button="" onClick={onZoomOut} type="button">
         <Minus aria-hidden="true" size="1em" />
       </button>
       {onReset ? (
-        <button {...buttonInteractionProps} aria-label="Reset view" onClick={onReset}>
+        <button aria-label="Reset view" data-zoom-button="" onClick={onReset} type="button">
           <Shrink aria-hidden="true" size="0.8em" />
         </button>
       ) : null}
