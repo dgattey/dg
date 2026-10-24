@@ -109,7 +109,7 @@ describe('peakHours', () => {
 describe('formatHour', () => {
   it('reads midnight and noon as 12 on a 12-hour clock', () => {
     expect([0, 6, 12, 18].map(formatHour)).toEqual(['12 AM', '6 AM', '12 PM', '6 PM']);
-    expect([0, 6, 12, 18].map(formatHourTick)).toEqual(['12a', '6a', '12p', '6p']);
+    expect([0, 6, 12, 18, 24].map(formatHourTick)).toEqual(['12a', '6a', '12p', '6p', '12a']);
   });
 });
 

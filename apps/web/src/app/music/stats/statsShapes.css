@@ -428,12 +428,28 @@
   top: -16px;
   right: 26px;
   z-index: 3;
+  max-width: 180px;
 }
 .stats__cardStamp {
   position: absolute;
   top: -18px;
   right: 22px;
   z-index: 3;
+  max-width: 120px;
+}
+.stats__cardStamp .stats__stamp,
+.stats__cardStamp .stats__ticket,
+.stats__cardStamp .stats__face {
+  min-width: 0;
+}
+.paperWrap:has(> .stats__pin) .stats__heading {
+  padding-right: 120px;
+}
+.paperWrap:has(> .stats__cardStamp) .stats__heading {
+  padding-right: 120px;
+}
+.paperWrap:has(> .stats__cardSeal) .stats__head {
+  padding-right: 108px;
 }
 .stats__cardStamp .stats__stamp {
   --bite: 4px;
@@ -464,6 +480,9 @@
   white-space: nowrap;
 }
 .stats__cardStampValue {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font: 700 var(--type-caption) / var(--leading-title) var(--display);
   font-variant-numeric: tabular-nums;
   text-transform: capitalize;
@@ -699,5 +718,9 @@
   .stats__cardStamp,
   .stats__cardSeal {
     display: none;
+  }
+  .paperWrap:has(> .stats__cardStamp) .stats__heading,
+  .paperWrap:has(> .stats__cardSeal) .stats__head {
+    padding-right: 0;
   }
 }

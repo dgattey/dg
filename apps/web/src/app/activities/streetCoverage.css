@@ -71,12 +71,12 @@
 }
 .streets__head {
   display: flex;
-  flex-wrap: wrap;
   gap: 4px 16px;
   align-items: baseline;
   justify-content: space-between;
 }
 .streets__head .strava__heading {
+  min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -234,5 +234,11 @@
   }
   .streets__board {
     margin-top: 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .streets__head {
+    flex-direction: column;
   }
 }

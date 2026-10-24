@@ -1,6 +1,11 @@
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { checkGridGapsFit, checkScallopPadding } from '../check-css-geometry.js';
+import {
+  checkCardHeadStable,
+  checkCornerTagRoom,
+  checkGridGapsFit,
+  checkScallopPadding,
+} from '../check-css-geometry.js';
 
 const FILE = 'apps/web/src/app/music/stats/statsShapes.css';
 
@@ -66,6 +71,76 @@ describe('check-css-geometry', () => {
           line: 4,
           message:
             '12 columns with 40px gaps need 440px, wider than a 288px phone box; collapse the columns in a max-width media query',
+        },
+      ],
+    );
+  });
+
+  it('keeps card heads stacked and their subtitle on one line', () => {
+    const stable = checkCardHeadStable(
+      new Map([
+        [
+          FILE,
+          [
+            '.stats__head { display: grid; gap: 4px; }',
+            '.stats__aside { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }',
+          ].join('\n'),
+        ],
+      ]),
+    );
+    assert.deepEqual(stable, []);
+
+    const violations = checkCardHeadStable(
+      new Map([
+        [
+          FILE,
+          [
+            '.stats__head { display: flex; flex-wrap: wrap; }',
+            '.stats__aside { color: red; }',
+            '.stats__genres .stats__aside { white-space: normal; }',
+          ].join('\n'),
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      violations.map(({ line, rule }) => ({ line, rule })),
+      [
+        { line: 1, rule: 'css-card-head-wrap' },
+        { line: 3, rule: 'css-card-head-wrap' },
+        { line: 2, rule: 'css-card-head-wrap' },
+      ],
+    );
+  });
+
+  it('makes every tag hung over a card face bounded and padded out of the head', () => {
+    const violations = checkCornerTagRoom(
+      new Map([
+        [
+          FILE,
+          [
+            '.stats__cardSeal { position: absolute; top: -28px; right: 16px; width: 108px; }',
+            '.stats__cardStamp { position: absolute; top: -18px; right: 22px; }',
+            '.stats__pin { position: absolute; top: -16px; right: 26px; max-width: 120px; }',
+            '.stats__sticker { position: absolute; top: -16px; right: -30px; }',
+            '.stats__ribbon { position: absolute; top: -22px; right: 30px; z-index: -1; }',
+            '.paperWrap:has(> .stats__cardSeal) .stats__head { padding-right: 96px; }',
+            '.paperWrap:has(> .stats__cardStamp) .stats__heading { padding-right: 140px; }',
+          ].join('\n'),
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      violations.map(({ line, message }) => ({ line, message })),
+      [
+        {
+          line: 2,
+          message:
+            'Corner tag `.stats__cardStamp` needs a `width` or `max-width` so card text keeps clear of it',
+        },
+        {
+          line: 3,
+          message:
+            'Corner tag `.stats__pin` needs a `.paperWrap:has(> .stats__pin)` rule padding the card head so card text keeps clear of it',
         },
       ],
     );
