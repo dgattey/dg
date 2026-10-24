@@ -30,6 +30,7 @@
 }
 .streets__cities {
   justify-content: flex-start;
+  rotate: 0.8deg;
 }
 .streets__callouts {
   grid-column: 1 / -1;

@@ -8,7 +8,7 @@ import {
 import { type CSSProperties, useId, useRef, useState } from 'react';
 import { PaperButton } from '../collage/PaperButton';
 import { PaperCard } from '../collage/PaperCard';
-import { PaperPills } from '../collage/PaperPills';
+import { PaperStrip } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
 import { Scallop, Stub } from '../music/stats/StatsShapes';
 import { coverageRoutePath } from './coverageRoutePath';
@@ -19,9 +19,9 @@ import { formatMiles } from './stravaFormat';
 const COLLAPSED_ROWS = 10;
 
 const CITIES = {
-  sd: { name: 'San Diego', short: 'SD', tiltDeg: 1.6 },
-  sf: { name: 'San Francisco', short: 'SF', tiltDeg: -1.8 },
-} as const satisfies Record<CoverageCity, { name: string; short: string; tiltDeg: number }>;
+  sd: { name: 'San Diego', short: 'SD' },
+  sf: { name: 'San Francisco', short: 'SF' },
+} as const satisfies Record<CoverageCity, { name: string; short: string }>;
 /** Lower bounds of each fill tier, cream through viridian. */
 const TIER_FLOORS = [0, 0.1, 0.25, 0.5, 0.75] as const;
 
@@ -157,25 +157,16 @@ function Leaderboard({
   );
 }
 
-/**
- * How much of a city's rideable street grid the filtered outings cover: the
- * city total, the most covered neighborhood, and a map and leaderboard of all
- * of them. Hovering or picking a neighborhood on either shows its figures, and
- * the city pills switch between San Francisco and San Diego.
- */
 export function StreetCoverageSection({
   coverage: byCity,
 }: {
   coverage: Readonly<Record<CoverageCity, StreetCoverage>>;
 }) {
-  const { outings, span, sport } = useFilteredOutings();
+  const { city: chosenCity, outings, setCity, span, sport } = useFilteredOutings();
   const headingId = useId();
   const cities = COVERAGE_CITIES.filter((key) =>
     byCity[key].neighborhoods.some((hood) => hood.streetMeters > 0),
   );
-  const [chosenCity, setCity] = useState<CoverageCity>('sf');
-  const [hovered, setHovered] = useState<number | null>(null);
-  const [picked, setPicked] = useState<number | null>(null);
   const city = cities.includes(chosenCity) ? chosenCity : (cities[0] ?? chosenCity);
   const coverage = byCity[city];
   const { name: cityName, short: cityShort } = CITIES[city];
@@ -204,18 +195,10 @@ export function StreetCoverageSection({
     };
   }
   const { routes, summary } = cacheRef.current;
-  const chooseCity = (key: CoverageCity) => {
-    setCity(key);
-    setHovered(null);
-    setPicked(null);
-  };
-  const focusedIndex = hovered ?? picked;
-  const focused = focusedIndex === null ? null : (summary.neighborhoods[focusedIndex] ?? null);
-  const [top] = summary.ranked;
-  const pick = (index: number) => setPicked(picked === index ? null : index);
   if (summary.city.streetMeters === 0) {
     return null;
   }
+  const [top] = summary.ranked;
   return (
     <section aria-labelledby={headingId} className="streets">
       <div className="streets__eyebrow">
@@ -225,15 +208,11 @@ export function StreetCoverageSection({
           </PaperTag>
         </h2>
         {cities.length > 1 ? (
-          <PaperPills
+          <PaperStrip
             className="streets__cities"
             label="Street coverage city"
-            onSelect={chooseCity}
-            options={cities.map((key) => ({
-              key,
-              label: CITIES[key].name,
-              tiltDeg: CITIES[key].tiltDeg,
-            }))}
+            onSelect={setCity}
+            options={cities.map((key) => ({ key, label: CITIES[key].name }))}
             selected={city}
           />
         ) : null}
@@ -264,6 +243,35 @@ export function StreetCoverageSection({
           </Stub>
         </li>
       </ul>
+      <CityCoverageCards
+        cityName={cityName}
+        key={city}
+        routes={routes}
+        summary={summary}
+        viewBox={coverage.viewBox}
+      />
+    </section>
+  );
+}
+
+function CityCoverageCards({
+  cityName,
+  routes,
+  summary,
+  viewBox,
+}: {
+  cityName: string;
+  routes: string;
+  summary: ReturnType<typeof summarizeCoverage>;
+  viewBox: string;
+}) {
+  const [hovered, setHovered] = useState<number | null>(null);
+  const [picked, setPicked] = useState<number | null>(null);
+  const focusedIndex = hovered ?? picked;
+  const focused = focusedIndex === null ? null : (summary.neighborhoods[focusedIndex] ?? null);
+  const pick = (index: number) => setPicked(picked === index ? null : index);
+  return (
+    <>
       <PaperCard className="streets__mapCard" innerClassName="strava__pad" tiltDeg={-0.6}>
         <div className="streets__head">
           <h3 className="strava__heading">{focused?.name ?? cityName}</h3>
@@ -280,7 +288,7 @@ export function StreetCoverageSection({
           onHover={setHovered}
           onPick={pick}
           routes={routes}
-          viewBox={coverage.viewBox}
+          viewBox={viewBox}
         />
         <ol aria-label="Share of streets ridden" className="streets__legend">
           {TIER_FLOORS.map((floor, tier) => (
@@ -300,6 +308,6 @@ export function StreetCoverageSection({
           ranked={summary.ranked}
         />
       </PaperCard>
-    </section>
+    </>
   );
 }

@@ -109,23 +109,33 @@ describe('StravaFilters', () => {
     expect(screen.getByText('2 routes')).toBeInTheDocument();
   });
 
-  it('flies to a home region and back when its pill is pressed again', async () => {
+  it('zooms from Bay Area to San Diego and back from the region strip', async () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const { inkedPaths } = renderFilters(outings, [
-      { bounds: BAY_AREA, key: 'bay-area', label: 'Bay Area' },
-      { bounds: SAN_DIEGO, key: 'san-diego', label: 'San Diego' },
+      { bounds: BAY_AREA, key: 'sf', label: 'Bay Area' },
+      { bounds: SAN_DIEGO, key: 'sd', label: 'San Diego' },
     ]);
-    const overview = inkedPaths();
-    const sanDiego = screen.getByRole('button', { name: 'San Diego' });
-    expect(screen.getByRole('group', { name: 'Zoom to region' })).toBeInTheDocument();
+    const strip = screen.getByRole('group', { name: 'Zoom to region' });
+    const bayArea = within(strip).getByRole('button', { name: 'Bay Area' });
+    const sanDiego = within(strip).getByRole('button', { name: 'San Diego' });
+    const bayAreaPaths = inkedPaths();
+
+    expect(strip).toHaveClass('chrome__strip');
+    expect(bayArea).toHaveAttribute('aria-pressed', 'true');
+    expect(bayArea).toHaveClass('chrome__segmentCurrent');
 
     await user.click(sanDiego);
     expect(sanDiego).toHaveAttribute('aria-pressed', 'true');
-    expect(inkedPaths()).not.toEqual(overview);
+    expect(sanDiego).toHaveClass('chrome__segmentCurrent');
+    expect(bayArea).toHaveAttribute('aria-pressed', 'false');
+    expect(bayArea).not.toHaveClass('chrome__segmentCurrent');
+    expect(inkedPaths()).not.toEqual(bayAreaPaths);
 
-    await user.click(sanDiego);
+    await user.click(bayArea);
+    expect(bayArea).toHaveAttribute('aria-pressed', 'true');
+    expect(bayArea).toHaveClass('chrome__segmentCurrent');
     expect(sanDiego).toHaveAttribute('aria-pressed', 'false');
-    expect(inkedPaths()).toEqual(overview);
+    expect(inkedPaths()).toEqual(bayAreaPaths);
   });
 
   it('narrows to a rolling window or a year on top of the sport', async () => {

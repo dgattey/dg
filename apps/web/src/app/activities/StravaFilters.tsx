@@ -2,6 +2,7 @@
 
 import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 import {
+  type CoverageCity,
   type CoverageSpan,
   STRAVA_WINDOW_DAYS,
   type StravaWindow,
@@ -45,8 +46,10 @@ const SPORT_TILTS = [-1, 1.2, -0.6, 0.9] as const;
 type Filtered = {
   /** Every outing, newest first, whatever is picked. */
   all: ReadonlyArray<StravaLogEntry>;
+  city: CoverageCity;
   /** Outings in the picked sport and span, newest first. */
   outings: ReadonlyArray<StravaLogEntry>;
+  setCity: (city: CoverageCity) => void;
   /** Outings in the picked sport across every year, for views that are already per year. */
   sportOutings: ReadonlyArray<StravaLogEntry>;
   sport: SportFilter;
@@ -57,7 +60,9 @@ type Filtered = {
 
 const FilteredOutings = createContext<Filtered>({
   all: [],
+  city: 'sf',
   outings: [],
+  setCity: () => {},
   span: 'all',
   spanLabel: SPAN_OPTIONS[0].label,
   sport: 'ride',
@@ -129,6 +134,7 @@ export function StravaFilters({
   const sports = FILTER_SPORTS.filter((key) => outings.some((outing) => outing.sport === key));
   const [sport, setSport] = useState<SportFilter>(() => (sports.includes('ride') ? 'ride' : 'all'));
   const [span, setSpan] = useState<Span>({ kind: 'all' });
+  const [city, setCity] = useState<CoverageCity>('sf');
   const years = [...new Set(outings.map(yearOf))].toSorted((a, b) => b - a);
   const sportOutings =
     sport === 'all' ? outings : outings.filter((outing) => outing.sport === sport);
@@ -140,7 +146,9 @@ export function StravaFilters({
     <FilteredOutings
       value={{
         all: outings,
+        city,
         outings: visible,
+        setCity,
         span: span.kind === 'all' ? 'all' : span.kind === 'year' ? span.year : span.key,
         spanLabel: spanLabel(span),
         sport,

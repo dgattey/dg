@@ -5,8 +5,8 @@ import type { AtlasRegion } from '@dg/maps/atlasGeometry';
 import { RouteAtlasMap } from '@dg/maps/src/RouteAtlasMap';
 import type { GeoBounds } from '@dg/maps/src/routeFrame';
 import type { TileSource } from '@dg/maps/src/tileSource';
-import { useRef, useState } from 'react';
-import { PaperPills } from '../collage/PaperPills';
+import { useRef } from 'react';
+import { PaperStrip } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
 import { Scallop, Stub } from '../music/stats/StatsShapes';
 import { BikeOdometers } from './BikeOdometers';
@@ -92,12 +92,6 @@ function LongestSeal({ meters }: { meters: number }) {
   );
 }
 
-const REGION_TILTS = [-1.4, 1.1] as const;
-
-/**
- * Every route on the atlas; the filters hide the rest in place instead of
- * redrawing. Region pills fly the map to each home region and back again.
- */
 export function StravaAtlas({
   bounds,
   regions,
@@ -107,8 +101,7 @@ export function StravaAtlas({
   regions: ReadonlyArray<AtlasRegion>;
   tileSource: TileSource;
 }) {
-  const { all } = useFilteredOutings();
-  const [regionKey, setRegionKey] = useState<string | null>(null);
+  const { all, city, setCity } = useFilteredOutings();
   const routesCacheRef = useRef<{
     all: typeof all;
     routes: ReturnType<typeof toMapRoutes>;
@@ -116,7 +109,7 @@ export function StravaAtlas({
   if (!routesCacheRef.current || routesCacheRef.current.all !== all) {
     routesCacheRef.current = { all, routes: toMapRoutes(all) };
   }
-  const region = regions.find(({ key }) => key === regionKey) ?? null;
+  const region = regions.find(({ key }) => key === city) ?? regions[0] ?? null;
   return (
     <>
       <RouteAtlasMap
@@ -127,16 +120,12 @@ export function StravaAtlas({
         view={region?.bounds ?? null}
       />
       {regions.length > 1 ? (
-        <PaperPills
+        <PaperStrip
           className="strava__regions"
           label="Zoom to region"
-          onSelect={(key) => setRegionKey(key === regionKey ? null : key)}
-          options={regions.map(({ key, label }, index) => ({
-            key,
-            label,
-            tiltDeg: REGION_TILTS[index % REGION_TILTS.length] ?? 0,
-          }))}
-          selected={regionKey}
+          onSelect={setCity}
+          options={regions}
+          selected={region?.key ?? city}
         />
       ) : null}
     </>

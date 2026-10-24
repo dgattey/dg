@@ -1,8 +1,10 @@
 import type { StravaLogEntry, StravaSport } from '@dg/content-models/strava/StravaHistory';
 import type { StreetCoverage } from '@dg/content-models/strava/StreetCoverage';
+import type { GeoBounds } from '@dg/maps/src/routeFrame';
 import { encodePolyline } from '@dg/maps/src/routeGeometry';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { StravaAtlas } from '../FilteredSections';
 import { StravaFilters } from '../StravaFilters';
 import { StreetCoverageSection } from '../StreetCoverageSection';
 
@@ -223,5 +225,66 @@ describe('StreetCoverageSection', () => {
 
     await user.click(sf);
     expect(header()).toBe('San Francisco40.0%9.6 of 24.0 mi');
+  });
+
+  it('keeps the region strip and the street strip on the same city', async () => {
+    const user = userEvent.setup();
+    const bayArea: GeoBounds = [
+      [37.75, -122.5],
+      [37.82, -122.24],
+    ];
+    const sanDiegoBounds: GeoBounds = [
+      [32.7, -117.25],
+      [32.8, -117.1],
+    ];
+    render(
+      <StravaFilters outings={[outing(1, 'ride', eastward(5, 0, 40))]}>
+        <StravaAtlas
+          bounds={bayArea}
+          regions={[
+            { bounds: bayArea, key: 'sf', label: 'Bay Area' },
+            { bounds: sanDiegoBounds, key: 'sd', label: 'San Diego' },
+          ]}
+          tileSource={{ mode: 'offline' }}
+        />
+        <StreetCoverageSection coverage={{ sd: sanDiego, sf: coverage }} />
+      </StravaFilters>,
+    );
+
+    const regionStrip = screen.getByRole('group', { name: 'Zoom to region' });
+    const cityStrip = screen.getByRole('group', { name: 'Street coverage city' });
+    expect(cityStrip).toHaveClass('chrome__strip');
+
+    const bayview = screen.getByRole('button', { name: /Bayview/ });
+    await user.click(bayview);
+    expect(bayview).toHaveAttribute('aria-pressed', 'true');
+
+    await user.click(within(regionStrip).getByRole('button', { name: 'San Diego' }));
+    const sanDiegoSection = screen.getByRole('region', { name: 'San Diego streets' });
+    expect(within(cityStrip).getByRole('button', { name: 'San Diego' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(within(sanDiegoSection).getByRole('button', { name: /North Park/ })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    expect(sanDiegoSection.querySelector('.streets__head')?.textContent).toBe(
+      'San Diego25.0%1.0 of 4.0 mi',
+    );
+
+    await user.click(within(cityStrip).getByRole('button', { name: 'San Francisco' }));
+    const sanFranciscoSection = screen.getByRole('region', { name: 'San Francisco streets' });
+    expect(within(regionStrip).getByRole('button', { name: 'Bay Area' })).toHaveAttribute(
+      'aria-pressed',
+      'true',
+    );
+    expect(within(sanFranciscoSection).getByRole('button', { name: /Bayview/ })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    );
+    expect(sanFranciscoSection.querySelector('.streets__head')?.textContent).toBe(
+      'San Francisco40.0%9.6 of 24.0 mi',
+    );
   });
 });
