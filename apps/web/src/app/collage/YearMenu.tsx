@@ -1,78 +1,56 @@
 'use client';
 
-import { ChevronDown } from 'lucide-react';
-import { bindHoverMenu } from './hoverMenu';
-import { PaperCard } from './PaperCard';
-import { PaperTag } from './PaperTag';
+import { PillMenu, PillMenuOption } from './PillMenu';
 import { cx } from './paperVars';
 
-const bindYearMenu = (node: HTMLDetailsElement | null) =>
-  bindHoverMenu(node, 'button[data-year-option]');
-
-/**
- * A `Year ▾` paper pill that opens a grid of years on hover or click. The pill
- * reads the picked year once there is one.
- */
-export function YearMenu({
-  onPick,
-  onPrefetch,
-  onWarmup,
-  selected,
-  tiltDeg = 1.5,
-  years,
-}: {
+type YearPicks = {
   onPick: (year: number) => void;
   onPrefetch?: (year: number) => void;
-  /** Called when the pointer first reaches the menu, before any year is hovered. */
-  onWarmup?: () => void;
   selected: number | null;
-  tiltDeg?: number;
   years: ReadonlyArray<number>;
+};
+
+/** Years as a three-across grid of picks inside a `PillMenu` panel. */
+export function YearGrid({ onPick, onPrefetch, selected, years }: YearPicks) {
+  return (
+    <ul aria-label="Select year" className="yearMenu__grid">
+      {years.map((year) => (
+        <li key={year}>
+          <PillMenuOption
+            className="yearMenu__option"
+            current={selected === year}
+            onPick={() => onPick(year)}
+            onPrefetch={onPrefetch ? () => onPrefetch(year) : undefined}
+          >
+            {year}
+          </PillMenuOption>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** A `Year ▾` paper pill over a grid of years. The pill reads the picked year once there is one. */
+export function YearMenu({
+  className,
+  onWarmup,
+  tiltDeg,
+  ...picks
+}: YearPicks & {
+  className?: string;
+  onWarmup?: () => void;
+  tiltDeg?: number;
 }) {
   return (
-    <details className="chrome__music yearMenu" onPointerEnter={onWarmup} ref={bindYearMenu}>
-      <summary className="chrome__musicSummary yearMenu__summary collageLift">
-        <PaperTag
-          className={cx('paperPill', selected !== null && 'paperButtonCurrent')}
-          edge="quad-a"
-          tiltDeg={tiltDeg}
-        >
-          <span className="paperPillButton yearMenu__face">
-            {selected ?? 'Year'}
-            <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />
-          </span>
-        </PaperTag>
-      </summary>
-      <PaperCard
-        className="chrome__musicPanel yearMenu__panel"
-        edge="quad-a"
-        innerClassName="chrome__musicPanelInner"
-        tiltDeg={-1}
-      >
-        <ul aria-label="Select year" className="yearMenu__grid">
-          {years.map((year) => {
-            const current = selected === year;
-            return (
-              <li key={year}>
-                <button
-                  aria-pressed={current}
-                  className={cx(
-                    'chrome__musicLink yearMenu__option',
-                    current && 'yearMenu__option--current',
-                  )}
-                  data-year-option={year}
-                  onClick={() => onPick(year)}
-                  onFocus={() => onPrefetch?.(year)}
-                  onMouseEnter={() => onPrefetch?.(year)}
-                  type="button"
-                >
-                  {year}
-                </button>
-              </li>
-            );
-          })}
-        </ul>
-      </PaperCard>
-    </details>
+    <PillMenu
+      className={cx('yearMenu', className)}
+      current={picks.selected !== null}
+      face={picks.selected ?? 'Year'}
+      onWarmup={onWarmup}
+      panelClassName="yearMenu__panel"
+      tiltDeg={tiltDeg}
+    >
+      <YearGrid {...picks} />
+    </PillMenu>
   );
 }
