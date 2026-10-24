@@ -1,5 +1,6 @@
 import 'server-only';
 
+import type { RenderableChangelogSnapshot } from '@dg/content-models/contentful/renderables/changelogSnapshots';
 import { db } from '@dg/db';
 import { log } from '@dg/shared-core/logging/log';
 
@@ -20,6 +21,7 @@ export type ChangelogRelease = {
   patch: number;
   prNumbers: ReadonlyArray<number>;
   publishedAt: string | null;
+  snapshot?: RenderableChangelogSnapshot | null;
   tag: string;
   version: string;
 };
