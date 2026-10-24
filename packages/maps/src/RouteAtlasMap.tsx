@@ -8,7 +8,15 @@ import { type CSSProperties, use, useEffect, useRef, useState } from 'react';
 import { VisibleRoutes } from '../VisibleRoutes';
 import { OFFLINE_TILES } from './offlineTile';
 import { RouteAtlasSketch } from './RouteAtlasSketch';
-import { decodeRoutes, frameAround, framePaths, type GeoBounds, type MapRoute } from './routeFrame';
+import {
+  decodeRoutes,
+  type FramedPath,
+  frameAround,
+  framePaths,
+  type GeoBounds,
+  type MapRoute,
+  type RouteFrame,
+} from './routeFrame';
 import { ROUTE_MAP_TOKENS } from './routeMapTokens';
 import { stadiaTileUrl, type TileSource } from './tileSource';
 import { useDarkMap } from './useDarkMap';
@@ -17,13 +25,24 @@ import { ZoomControls } from './ZoomControls';
 const FIT_PADDING = 36;
 const MIN_ZOOM = 3;
 const MAX_ZOOM = 18;
-const MAX_MERCATOR_LATITUDE = 85.051_128_78;
 const TILE_SIZE = 256;
 const DEFAULT_SIZE = { height: 600, width: 800 };
+const REPROJECT_ZOOM_DELTA = 0.75;
+const REPROJECT_PAN_FRACTION = 0.5;
 
 const tileImageStyle: CSSProperties = {
   display: 'block',
   height: '100%',
+  width: '100%',
+};
+
+const overlaySvgStyle: CSSProperties = {
+  display: 'block',
+  height: '100%',
+  inset: 0,
+  overflow: 'visible',
+  pointerEvents: 'none',
+  position: 'absolute',
   width: '100%',
 };
 
@@ -53,6 +72,77 @@ function AtlasTile({ tile, tileLoaded }: TileComponentProps) {
   );
 }
 
+type AtlasRoutesOverlayProps = {
+  anchor: Point;
+  baseFrame: RouteFrame;
+  dark: boolean;
+  left?: number;
+  mapState?: { center: Point; height: number; width: number; zoom: number };
+  paths: ReadonlyArray<FramedPath>;
+  top?: number;
+};
+
+function AtlasRoutesOverlay({
+  baseFrame,
+  dark,
+  left,
+  mapState,
+  paths,
+  top,
+}: AtlasRoutesOverlayProps) {
+  const liveZoom = mapState?.zoom ?? baseFrame.zoom;
+  const cx = left ?? baseFrame.width / 2;
+  const cy = top ?? baseFrame.height / 2;
+  const scale = 2 ** (liveZoom - baseFrame.zoom);
+  const translateX = cx - (baseFrame.width / 2) * scale;
+  const translateY = cy - (baseFrame.height / 2) * scale;
+  const zoomFactor = Math.max(0, Math.min(1, (liveZoom - 4) / (15 - 4)));
+  const casingWidth = 2 + zoomFactor * 5;
+  const lineWidth = 1 + zoomFactor * 2.5;
+
+  return (
+    <svg aria-hidden="true" style={overlaySvgStyle}>
+      <g
+        transform={`translate(${translateX.toFixed(2)} ${translateY.toFixed(2)}) scale(${scale.toFixed(6)})`}
+      >
+        {paths.map(({ d, tone }) => (
+          <path
+            d={d}
+            fill="none"
+            key={`casing-${tone}`}
+            stroke={dark ? 'var(--black)' : 'var(--cream)'}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeOpacity={0.8}
+            strokeWidth={casingWidth}
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
+        {paths.map(({ d, tone }) => (
+          <path
+            d={d}
+            data-tone={tone}
+            fill="none"
+            key={tone}
+            stroke={`var(--${tone})`}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={lineWidth}
+            vectorEffect="non-scaling-stroke"
+          />
+        ))}
+      </g>
+    </svg>
+  );
+}
+
+function pixelSeparation(a: Point, b: Point, zoom: number): number {
+  const worldScale = TILE_SIZE * 2 ** zoom;
+  const dx = ((a[1] - b[1]) / 360) * worldScale;
+  const dy = ((b[0] - a[0]) / 360) * worldScale;
+  return Math.hypot(dx, dy);
+}
+
 const containerSx: SxObject = {
   height: '100%',
   isolation: 'isolate',
@@ -68,25 +158,11 @@ const canvasSx: SxObject = {
   position: 'absolute',
 };
 
-const overlaySvgSx: SxObject = {
-  display: 'block',
-  height: '100%',
-  inset: 0,
-  overflow: 'hidden',
-  pointerEvents: 'none',
-  position: 'absolute',
-  width: '100%',
-  zIndex: 2,
+type ViewportSnapshot = {
+  boundsKey: string;
+  center: Point;
+  zoom: number;
 };
-
-function projectMercator([latitude, longitude]: Point) {
-  const clamped = Math.max(-MAX_MERCATOR_LATITUDE, Math.min(MAX_MERCATOR_LATITUDE, latitude));
-  const radians = (clamped * Math.PI) / 180;
-  return {
-    x: (longitude + 180) / 360,
-    y: (1 - Math.log(Math.tan(radians) + 1 / Math.cos(radians)) / Math.PI) / 2,
-  };
-}
 
 type RouteAtlasMapProps = {
   bounds: GeoBounds;
@@ -111,11 +187,8 @@ export function RouteAtlasMap({
   const boundsKey = `${activeBounds[0][0]},${activeBounds[0][1]}:${activeBounds[1][0]},${activeBounds[1][1]}`;
 
   const [size, setSize] = useState(DEFAULT_SIZE);
-  const [viewportState, setViewportState] = useState<{
-    boundsKey: string;
-    center: Point;
-    zoom: number;
-  } | null>(null);
+  const [viewportState, setViewportState] = useState<ViewportSnapshot | null>(null);
+  const [projectedViewport, setProjectedViewport] = useState<ViewportSnapshot | null>(null);
 
   useEffect(() => {
     const host = hostRef.current;
@@ -133,38 +206,31 @@ export function RouteAtlasMap({
   }, [offline]);
 
   const filteredRoutes = visible ? routes.filter(({ id }) => visible.has(id)) : routes;
-  const baseFrame = frameAround(activeBounds, {
+  const defaultFrame = frameAround(activeBounds, {
     height: size.height,
     padding: FIT_PADDING,
     width: size.width,
   });
   const customViewport = viewportState?.boundsKey === boundsKey ? viewportState : null;
-  const activeCenter = customViewport?.center ?? baseFrame.center;
-  const activeZoom = customViewport?.zoom ?? baseFrame.zoom;
-  const paths = offline ? [] : framePaths(baseFrame, decodeRoutes(filteredRoutes));
+  const activeCenter = customViewport?.center ?? defaultFrame.center;
+  const activeZoom = customViewport?.zoom ?? defaultFrame.zoom;
 
-  const scale = 2 ** (activeZoom - baseFrame.zoom);
-  const worldScale = TILE_SIZE * 2 ** activeZoom;
-  const baseMerc = projectMercator(baseFrame.center);
-  const activeMerc = projectMercator(activeCenter);
-  const translateX =
-    size.width / 2 - (baseFrame.width / 2) * scale + (baseMerc.x - activeMerc.x) * worldScale;
-  const translateY =
-    size.height / 2 - (baseFrame.height / 2) * scale + (baseMerc.y - activeMerc.y) * worldScale;
-  const groupTransform =
-    customViewport === null
-      ? undefined
-      : `translate(${translateX.toFixed(2)} ${translateY.toFixed(2)}) scale(${scale.toFixed(5)})`;
+  const settledProjection = projectedViewport?.boundsKey === boundsKey ? projectedViewport : null;
+  const baseFrame: RouteFrame = settledProjection
+    ? {
+        center: settledProjection.center,
+        height: size.height,
+        width: size.width,
+        zoom: settledProjection.zoom,
+      }
+    : defaultFrame;
+  const frameMargin = Math.max(size.width, size.height);
+  const paths = offline ? [] : framePaths(baseFrame, decodeRoutes(filteredRoutes), frameMargin);
 
-  const zoomFactor = Math.max(0, Math.min(1, (activeZoom - 4) / (15 - 4)));
-  const casingWidth = 2 + zoomFactor * 5;
-  const lineWidth = 1 + zoomFactor * 2.5;
   const tokens = dark ? ROUTE_MAP_TOKENS.dark : ROUTE_MAP_TOKENS.light;
   const tileLayerSx: SxObject = {
     '& > div': {
       backgroundColor: 'transparent !important',
-      height: '100% !important',
-      width: '100% !important',
     },
     backgroundColor: tokens.background,
     inset: 0,
@@ -189,14 +255,26 @@ export function RouteAtlasMap({
             <PigeonMapCore
               attribution={false}
               center={activeCenter}
+              defaultCenter={defaultFrame.center}
+              defaultHeight={DEFAULT_SIZE.height}
+              defaultWidth={DEFAULT_SIZE.width}
+              defaultZoom={defaultFrame.zoom}
               dprs={[1, 2]}
-              height={size.height}
               maxZoom={MAX_ZOOM}
               metaWheelZoom={false}
               metaWheelZoomWarning=""
               minZoom={MIN_ZOOM}
-              onBoundsChanged={({ center: nextCenter, zoom: nextZoom }) => {
+              onBoundsChanged={({ center: nextCenter, initial, zoom: nextZoom }) => {
+                if (initial) {
+                  return;
+                }
                 setViewportState({ boundsKey, center: nextCenter, zoom: nextZoom });
+                const zoomShift = Math.abs(nextZoom - baseFrame.zoom);
+                const panPixels = pixelSeparation(nextCenter, baseFrame.center, nextZoom);
+                const panThreshold = Math.min(size.width, size.height) * REPROJECT_PAN_FRACTION;
+                if (zoomShift >= REPROJECT_ZOOM_DELTA || panPixels >= panThreshold) {
+                  setProjectedViewport({ boundsKey, center: nextCenter, zoom: nextZoom });
+                }
               }}
               provider={(x, y, tileZoom, dpr) =>
                 stadiaTileUrl(tileSource, {
@@ -211,49 +289,22 @@ export function RouteAtlasMap({
               }
               tileComponent={AtlasTile}
               twoFingerDrag={true}
-              width={size.width}
               zoom={activeZoom}
               zoomSnap={false}
-            />
-          </Box>
-          <Box
-            aria-hidden="true"
-            component="svg"
-            preserveAspectRatio="xMidYMid slice"
-            sx={overlaySvgSx}
-            viewBox={`0 0 ${baseFrame.width} ${baseFrame.height}`}
-          >
-            <g transform={groupTransform}>
-              {paths.map(({ d, tone }) => (
-                <path
-                  d={d}
-                  fill="none"
-                  key={`casing-${tone}`}
-                  stroke={dark ? 'var(--black)' : 'var(--cream)'}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeOpacity={0.8}
-                  strokeWidth={casingWidth}
-                  vectorEffect="non-scaling-stroke"
-                />
-              ))}
-              {paths.map(({ d, tone }) => (
-                <path
-                  d={d}
-                  data-tone={tone}
-                  fill="none"
-                  key={tone}
-                  stroke={`var(--${tone})`}
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={lineWidth}
-                  vectorEffect="non-scaling-stroke"
-                />
-              ))}
-            </g>
+            >
+              <AtlasRoutesOverlay
+                anchor={baseFrame.center}
+                baseFrame={baseFrame}
+                dark={dark}
+                paths={paths}
+              />
+            </PigeonMapCore>
           </Box>
           <ZoomControls
-            onReset={() => setViewportState(null)}
+            onReset={() => {
+              setViewportState(null);
+              setProjectedViewport(null);
+            }}
             onZoomIn={() =>
               setViewportState({
                 boundsKey,

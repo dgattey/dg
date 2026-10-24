@@ -11,10 +11,6 @@ import { WatercolorTile } from './WatercolorTile';
 import { ZoomControls } from './ZoomControls';
 
 const containerSx: SxObject = {
-  '& > div': {
-    height: '100% !important',
-    width: '100% !important',
-  },
   backgroundColor: 'var(--ultramarine)',
   height: '100%',
   isolation: 'isolate',

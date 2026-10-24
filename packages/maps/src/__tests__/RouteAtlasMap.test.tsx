@@ -62,6 +62,8 @@ describe('RouteAtlasMap', () => {
     expect(html).toContain('aria-label="Zoom out"');
     expect(html).toContain('aria-label="Reset view"');
     expect(html).toContain('tiles/outdoors/');
+    expect(html).toContain('class="pigeon-overlays"');
+    expect(html).toContain('pointer-events:none');
     expect(html).toContain('data-tone="cobalt"');
     expect(html).not.toContain('data-tone="vermilion"');
   });

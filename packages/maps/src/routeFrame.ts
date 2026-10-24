@@ -122,12 +122,16 @@ export function frameAround(
   return { ...fitRouteViewport({ height, padding, points, width }), height, width };
 }
 
-const isNearFrame = ({ x, y }: { x: number; y: number }, { height, width }: RouteFrame) =>
-  x > -FRAME_MARGIN && x < width + FRAME_MARGIN && y > -FRAME_MARGIN && y < height + FRAME_MARGIN;
+const isNearFrame = (
+  { x, y }: { x: number; y: number },
+  { height, width }: RouteFrame,
+  margin: number,
+) => x > -margin && x < width + margin && y > -margin && y < height + margin;
 
 export function framePaths(
   frame: RouteFrame,
   routes: ReadonlyArray<DecodedRoute>,
+  margin = FRAME_MARGIN,
 ): Array<FramedPath> {
   const byTone = new Map<string, Array<string>>();
   const seenByTone = new Map<string, Set<string>>();
@@ -144,7 +148,7 @@ export function framePaths(
     }
     for (const leg of routeLegs(points)) {
       const pixels = projectRouteToPixels({ ...frame, points: leg });
-      if (!pixels.some((pixel) => isNearFrame(pixel, frame))) {
+      if (!pixels.some((pixel) => isNearFrame(pixel, frame, margin))) {
         continue;
       }
       const simplified = simplifyLine(pixels, PIXEL_TOLERANCE, ({ x, y }) => [x, y]);
@@ -172,8 +176,8 @@ export function framePaths(
         if (!a || !b) {
           continue;
         }
-        const nearA = isNearFrame({ x: a[0], y: a[1] }, frame);
-        const nearB = isNearFrame({ x: b[0], y: b[1] }, frame);
+        const nearA = isNearFrame({ x: a[0], y: a[1] }, frame, margin);
+        const nearB = isNearFrame({ x: b[0], y: b[1] }, frame, margin);
         if (!nearA && !nearB) {
           flush();
           prev = null;
