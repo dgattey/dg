@@ -299,13 +299,7 @@ describe('ListeningStatsSections', () => {
       throw new Error('Expected Year dropdown menu');
     }
     yearDetails.open = true;
-    const year2012Btn = container.querySelector<HTMLButtonElement>(
-      'button[data-year-option="2012"]',
-    );
-    if (!year2012Btn) {
-      throw new Error('Expected 2012 option button');
-    }
-    await user.click(year2012Btn);
+    await user.click(within(yearDetails).getByRole('button', { name: '2012' }));
     await waitFor(() => {
       expect(screen.getByText('Plays in 2012')).toBeInTheDocument();
     });
