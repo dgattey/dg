@@ -40,8 +40,8 @@
   translate: -50%;
 }
 /*
- * The header paints above sticky filter bars so its dropdown wins, so a fade past its
- * bottom would blur the pinned pills. Their own scrim covers the seam instead.
+ * The header paints above sticky filter bars so its dropdown wins; clamping its backdrop
+ * scrim to the header box keeps the blur from spilling over pinned filter pills below it.
  */
 .collageRoot:has(
   :is(.reading__filters, .stats__toolbar, .music__sort, .strava__filters, .changelog__toolbar)
@@ -64,7 +64,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   align-items: center;
   justify-content: center;
   padding: 4px;
-  font-size: 2.25em;
+  font-size: 2.75em;
   line-height: 1;
   color: var(--ink);
   text-decoration: none;
@@ -83,7 +83,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 .chrome__logo > svg {
   display: block;
   width: auto;
-  height: 1.15em;
+  height: 1.25em;
 }
 .chrome__nowPlaying {
   min-width: 0;
@@ -791,6 +791,10 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   .chrome__brand {
     margin-inline-start: -4px;
   }
+  .chrome__logo {
+    padding: 2px;
+    font-size: 1.85em;
+  }
   .chrome__nav {
     margin: 0 0 0 auto;
   }
@@ -800,14 +804,15 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
     padding: 4px;
   }
   .chrome__segment {
-    padding-inline: 0.35em;
+    gap: 0.25em;
+    padding-inline: 0.3em;
     font-size: clamp(var(--type-caption), 4vw, var(--type-meta));
   }
   .chrome__scheme {
     margin-left: 2px;
   }
   .chrome__schemeOption {
-    width: 26px;
+    width: 24px;
   }
 }
 @media (max-width: 320px) {
