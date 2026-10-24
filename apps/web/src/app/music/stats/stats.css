@@ -105,12 +105,12 @@
 }
 .stats__itemLink {
   color: inherit;
-  text-decoration: underline;
-  text-decoration-color: color-mix(in oklab, var(--on) 35%, transparent);
+  text-decoration: none;
   text-underline-offset: 3px;
 }
 .stats__itemLink:hover,
 .stats__itemLink:focus-visible {
+  text-decoration: underline;
   text-decoration-color: var(--on);
 }
 .stats__count {
@@ -194,8 +194,8 @@
 }
 .stats__topArtistRow {
   display: grid;
-  grid-template-columns: 30px minmax(0, 1fr) 80px auto;
-  column-gap: 12px;
+  grid-template-columns: 28px minmax(0, 1fr) 56px auto;
+  column-gap: 10px;
   align-items: center;
 }
 .stats__topRow--lead {
@@ -470,8 +470,8 @@
 }
 .stats__genreRow {
   display: grid;
-  grid-template-columns: 14px minmax(0, 1fr) 68px auto;
-  column-gap: 12px;
+  grid-template-columns: 14px minmax(0, 1fr) 52px auto;
+  column-gap: 10px;
   align-items: center;
   padding: 3px 8px;
   margin-inline: -8px;
@@ -708,9 +708,6 @@
 }
 
 /* On repeat */
-.stats__repeat {
-  --meter: var(--soft);
-}
 .stats__repeatList {
   display: grid;
   gap: 10px;
@@ -720,7 +717,7 @@
 }
 .stats__repeatRow {
   display: grid;
-  grid-template-columns: 24px auto minmax(0, 1fr) 72px 34px 96px;
+  grid-template-columns: 24px auto minmax(0, 1fr) auto;
   column-gap: 12px;
   align-items: center;
 }
@@ -736,9 +733,6 @@
 .stats__repeatRow .stats__mat img {
   width: 40px;
   height: 40px;
-}
-.stats__repeatRow--top {
-  --meter: var(--on);
 }
 
 /* A day of listening (interactive) */
@@ -931,16 +925,10 @@
   .stats__genreRow {
     grid-template-columns: 14px minmax(0, 1fr) auto;
   }
-  .stats__repeatRow {
-    grid-template-columns: 24px auto minmax(0, 1fr) 34px;
-    row-gap: 6px;
-  }
-  .stats__repeatRow .stats__meter {
-    grid-row: 2;
-    grid-column: 3 / -1;
-  }
-  .stats__repeatRow .stats__date {
-    display: none;
+  .stats__playlistMetaRow {
+    flex-direction: column;
+    gap: 2px;
+    align-items: flex-start;
   }
   .stats__table th:nth-child(4),
   .stats__table td:nth-child(4),

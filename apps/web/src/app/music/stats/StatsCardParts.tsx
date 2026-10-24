@@ -86,7 +86,7 @@ export function OnRepeatCard({ stats }: { stats: ListeningStats }) {
       />
       <ol className="stats__repeatList">
         {stats.onRepeat.map(({ plays, track, week }, i) => (
-          <li className={cx('stats__repeatRow', i === 0 && 'stats__repeatRow--top')} key={track.id}>
+          <li className="stats__repeatRow" key={track.id}>
             <span className="stats__rank">{String(i + 1).padStart(2, '0')}</span>
             <AlbumLink album={track.album} label={track.album.name}>
               <Cover album={track.album} size={40} />
@@ -99,11 +99,12 @@ export function OnRepeatCard({ stats }: { stats: ListeningStats }) {
               </Tooltip>
               <ArtistLinks artists={track.artists} newArtists={stats.newArtists} />
             </span>
-            <span aria-hidden="true" className="stats__meter" style={bar(plays, top)} />
-            <span className="stats__count">{plays}</span>
-            <span className="stats__meta stats__date">
-              <span className="chrome__srOnly">{isDailyRepeat ? 'On ' : 'Week of '}</span>
-              {formatDay(week)}
+            <span className="stats__topCountGroup">
+              <span className="stats__count">{plays}</span>
+              <span className="stats__meta stats__date">
+                <span className="chrome__srOnly">{isDailyRepeat ? 'On ' : 'Week of '}</span>
+                {formatDay(week)}
+              </span>
             </span>
           </li>
         ))}
