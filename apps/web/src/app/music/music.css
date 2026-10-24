@@ -119,12 +119,14 @@
   display: grid;
   gap: 4px;
   min-width: 0;
-  line-height: 1.35;
+  line-height: var(--leading-meta);
 }
 .music__albumName {
-  font-size: var(--type-label);
-  font-weight: 800;
-  line-height: 1.3;
+  font-family: var(--display);
+  font-size: var(--type-h3);
+  font-weight: 700;
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-label);
 }
 .music__artist {
   font-size: var(--type-meta);
@@ -146,7 +148,7 @@
   font-family: var(--display);
   font-size: var(--type-h3);
   font-style: normal;
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
   color: var(--cream);
   background: var(--vermilion);
@@ -170,7 +172,7 @@
 .music__dateTag {
   padding: 11px 20px 13px;
   font-size: var(--type-label);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-label);
 }
 .music__dateHeading {
   margin: 0;
@@ -200,13 +202,13 @@
   align-content: start;
   padding: 24px 28px 26px;
   font-size: var(--type-body-lg);
-  line-height: 1.45;
+  line-height: var(--leading-body);
 }
 .music__stateInner h2 {
   margin: 0;
   font-family: var(--display);
   font-size: var(--type-h2);
-  line-height: 1.15;
+  line-height: var(--leading-title);
 }
 .music__stateInner p {
   margin: 0;
@@ -248,7 +250,7 @@ html:active-view-transition-type(album-open) .music__wellCard {
 .music__wellAlbumTag {
   bottom: 10px;
   left: 10px;
-  line-height: 1.1;
+  line-height: var(--leading-tight);
 }
 .music__wellAlbumTag small {
   font-size: var(--type-meta);
@@ -299,9 +301,9 @@ html:active-view-transition-type(album-open) .music__wellCard {
   min-width: 0;
   font-family: var(--display);
   font-size: var(--type-h1);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 0.94;
-  letter-spacing: -0.035em;
+  letter-spacing: var(--tracking-display);
   text-wrap: balance;
 }
 /* The shared Link sets body1 type, which would shrink the title back to body size. */
@@ -321,10 +323,12 @@ html:active-view-transition-type(album-open) .music__wellCard {
 }
 .music__wellArtists {
   min-width: 0;
+  font-family: var(--display);
   font-size: var(--type-h2);
-  font-weight: 800;
-  line-height: 1.15;
+  font-weight: 700;
+  line-height: var(--leading-title);
   color: inherit;
+  letter-spacing: var(--tracking-label);
   white-space: nowrap;
 }
 .music__wellArtistsText {
@@ -340,7 +344,7 @@ html:active-view-transition-type(album-open) .music__wellCard {
 .music__wellFacts p {
   font-size: var(--type-meta);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: var(--leading-title);
 }
 .music__wellPopularity {
   position: relative;
@@ -366,7 +370,7 @@ html:active-view-transition-type(album-open) .music__wellCard {
   display: block;
   font-size: var(--type-body);
   grid-area: tracks;
-  line-height: 1.55;
+  line-height: var(--leading-body);
   list-style: none;
   margin: 22px 0 0;
   padding: 0;

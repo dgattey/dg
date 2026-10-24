@@ -50,9 +50,9 @@
 .sfStreets__calloutLine {
   font-family: var(--display);
   font-size: var(--type-title-md);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-title);
 }
 
 .sfStreets__mapCard {
@@ -83,7 +83,7 @@
 .sfStreets__focusShare {
   font-family: var(--display);
   font-size: var(--type-title-md);
-  font-weight: 800;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
   color: var(--on);
 }
@@ -177,7 +177,7 @@
   font-family: var(--display);
   font-size: var(--type-body);
   font-weight: 700;
-  line-height: 1.15;
+  line-height: var(--leading-title);
   color: var(--on);
   text-align: left;
   cursor: pointer;

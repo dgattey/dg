@@ -39,11 +39,11 @@
 .error__messageCardInner h2 {
   font-family: var(--display);
   font-size: var(--type-h2);
-  line-height: 1.15;
+  line-height: var(--leading-title);
 }
 .error__messageCardInner p {
   font-size: var(--type-body-lg);
-  line-height: 1.45;
+  line-height: var(--leading-body);
 }
 
 @media (max-width: 600px) {

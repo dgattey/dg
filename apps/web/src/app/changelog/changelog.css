@@ -6,22 +6,6 @@
   padding-block: 40px 56px;
   margin-inline: auto;
 }
-.changelog__intro {
-  display: grid;
-  gap: 0;
-  justify-items: start;
-}
-.changelog__intro .collagePageTitle {
-  padding-bottom: 0.3em;
-}
-.changelog__lede {
-  max-width: 38em;
-  margin: 28px 0 0;
-  font-family: var(--body);
-  font-size: var(--type-body-lg);
-  line-height: 1.45;
-  text-wrap: pretty;
-}
 .changelog__status {
   justify-self: start;
 }
@@ -44,7 +28,7 @@
   font-family: var(--display);
   font-size: var(--type-meta);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: var(--leading-title);
   color: var(--soft);
 }
 .changelog__statValue {
@@ -52,15 +36,15 @@
   font-size: var(--type-title-lg);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-title);
 }
 .changelog__statSub {
   font-family: var(--display);
   font-size: var(--type-caption);
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  line-height: 1.2;
+  line-height: var(--leading-title);
   color: var(--soft);
 }
 
@@ -89,7 +73,7 @@
   font-size: var(--type-meta);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  line-height: 1.1;
+  line-height: var(--leading-tight);
   color: var(--ink-on-cream);
   text-decoration: none;
   background: var(--cream);
@@ -187,7 +171,7 @@
   font-family: var(--display);
   font-size: var(--type-caption);
   font-weight: 700;
-  line-height: 1.1;
+  line-height: var(--leading-tight);
   color: var(--ink-on-cream);
   background: color-mix(in oklab, var(--ink-on-cream) 9%, var(--cream));
   border-radius: 7px 9px 6px 8px;
@@ -224,7 +208,7 @@
   font-size: var(--type-caption);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  line-height: 1.15;
+  line-height: var(--leading-title);
   color: var(--ink-on-cream);
   text-decoration: none;
   background: color-mix(in oklab, var(--ink-on-cream) 8%, var(--cream));
@@ -247,7 +231,7 @@
 .changelog__noteItem {
   font-family: var(--body);
   font-size: var(--type-body);
-  line-height: 1.5;
+  line-height: var(--leading-body);
   color: var(--on);
 }
 .changelog__noteItem strong {
@@ -290,7 +274,7 @@
   font-family: var(--display);
   font-size: var(--type-label);
   font-weight: 700;
-  line-height: 1.15;
+  line-height: var(--leading-title);
 }
 .changelog__compactCount {
   font-family: var(--display);
@@ -316,7 +300,7 @@
   font-size: var(--type-caption);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  line-height: 1.15;
+  line-height: var(--leading-title);
   color: var(--ink-on-cream);
   text-decoration: none;
   background: color-mix(in oklab, var(--ink-on-cream) 7%, var(--cream));

@@ -14,8 +14,7 @@ describe('getTypography', () => {
     });
     expect(typography.caption).toEqual({
       fontSize: 15,
-      fontStretch: 'semi-expanded',
-      fontWeight: 500,
+      fontWeight: 400,
     });
   });
 });

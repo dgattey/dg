@@ -22,9 +22,9 @@
   padding-inline: 4px;
   font-family: var(--display);
   font-size: var(--type-h3);
-  font-weight: 800;
-  line-height: 1.1;
-  letter-spacing: -0.015em;
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-label);
 }
 .strava__polaroidMeta {
   display: flex;
@@ -35,14 +35,14 @@
   font-family: var(--display);
   font-size: var(--type-body);
   font-weight: 700;
-  line-height: 1.2;
+  line-height: var(--leading-title);
   color: var(--soft);
 }
 .strava__polaroidNote {
   padding: 4px 4px 0;
   font-family: var(--body);
   font-size: var(--type-body);
-  line-height: 1.45;
+  line-height: var(--leading-body);
 }
 .strava__stats {
   display: flex;
@@ -52,7 +52,7 @@
   font-size: var(--type-body);
   font-weight: 700;
   font-variant-numeric: tabular-nums;
-  line-height: 1.25;
+  line-height: var(--leading-title);
   color: var(--soft);
 }
 .strava__polaroid .strava__stats {
@@ -63,7 +63,7 @@
   padding: 3px 8px 4px;
   font-family: var(--display);
   font-size: var(--type-body);
-  font-weight: 800;
+  font-weight: 700;
   line-height: 1;
   color: var(--on);
   white-space: nowrap;
@@ -75,21 +75,21 @@
   font-family: var(--display);
   font-size: var(--type-body);
   font-weight: 600;
-  line-height: 1.2;
+  line-height: var(--leading-title);
   color: var(--soft);
 }
 .strava__sealValue {
   font-family: var(--display);
   font-size: var(--type-h2);
-  font-weight: 800;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
-  line-height: 1.05;
-  letter-spacing: -0.02em;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-label);
 }
 .strava__sealWhen {
   font-family: var(--display);
   font-size: var(--type-label);
-  font-weight: 800;
-  line-height: 1.05;
-  letter-spacing: -0.01em;
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-label);
 }

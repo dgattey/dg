@@ -43,10 +43,7 @@ export default function ChangelogPage() {
   return (
     <section aria-label={TITLE} className="collageBackdropHost changelog__layout">
       <CollageBackdrop backdrop={HISTORY_BACKDROP} />
-      <div className="changelog__intro">
-        <CutLetters className="collagePageTitle" text={TITLE} />
-        <p className="changelog__lede">{DESCRIPTION}</p>
-      </div>
+      <CutLetters className="collagePageTitle" text={TITLE} />
       <Suspense fallback={<ChangelogStatus>Loading releases…</ChangelogStatus>}>
         <ChangelogContent />
       </Suspense>

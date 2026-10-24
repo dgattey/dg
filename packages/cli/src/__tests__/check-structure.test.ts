@@ -9,6 +9,7 @@ import {
   checkTypeScale,
   checkUnusedCssRules,
 } from '../check-css.js';
+import { checkNoPageSubtitles } from '../check-page-titles.js';
 import {
   checkFileStructure,
   checkSocialImageRouteParity,
@@ -223,6 +224,9 @@ describe('check-structure', () => {
             '.c {\n  font:\n    700 1.2rem / 1 var(--display);\n}',
             '.d { font: italic 600 var(--type-missing) / 1.2 serif; }',
             '.e { font: inherit; --x-font-size: 9px; }',
+            '.f { font-family: Georgia, serif; font-weight: 800; }',
+            '.g { font: 500 var(--type-body) / 1.2 var(--body); font-weight: 600; }',
+            '@font-face { font-family: fallback; font-weight: 300; }',
           ].join('\n'),
         ],
       ]),
@@ -230,10 +234,37 @@ describe('check-structure', () => {
     assert.deepEqual(
       violations.map(({ line, message }) => ({ line, message })),
       [
+        { line: 9, message: 'Set font-family to var(--display) or var(--body)' },
+        { line: 7, message: 'End the font shorthand with var(--display) or var(--body)' },
+        { line: 10, message: 'Font weight 500 is off the 400/600/700 palette' },
+        { line: 9, message: 'Font weight 800 is off the 400/600/700 palette' },
         { line: 2, message: 'Set font sizes with a --type-* token, not a literal length' },
         { line: 4, message: 'Set font sizes with a --type-* token, not a literal length' },
         { line: 7, message: '--type-missing is not declared in any stylesheet' },
       ],
+    );
+  });
+
+  it('flags a paragraph set directly under a CutLetters page title', () => {
+    const violations = checkNoPageSubtitles(
+      new Map([
+        [
+          'apps/web/src/app/a/page.tsx',
+          '<div>\n  <CutLetters className="collagePageTitle" text={TITLE} />\n  <p className="a__lede">Hi</p>\n</div>',
+        ],
+        [
+          'apps/web/src/app/b/page.tsx',
+          '<CutLetters className="collagePageTitle" text="B" />\n<Suspense><p>Body</p></Suspense>',
+        ],
+        [
+          'apps/web/src/app/c/IntroCard.tsx',
+          '<CutLetters className="home__headline" text={headline} />\n<p>Intro</p>',
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      violations.map(({ file, line, rule }) => ({ file, line, rule })),
+      [{ file: 'apps/web/src/app/a/page.tsx', line: 2, rule: 'no-page-subtitle' }],
     );
   });
 

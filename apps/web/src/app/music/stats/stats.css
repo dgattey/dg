@@ -127,13 +127,13 @@
 }
 .stats__heading {
   margin: 0;
-  font: 700 var(--type-h2) / 1.2 var(--display);
+  font: 700 var(--type-h2) / var(--leading-title) var(--display);
 }
 .stats__aside,
 .stats__note,
 .stats__meta {
   margin: 0;
-  font: 600 var(--type-meta) / 1.35 var(--body);
+  font: 600 var(--type-meta) / var(--leading-meta) var(--body);
   color: var(--soft);
 }
 .stats__note {
@@ -144,7 +144,7 @@
   color: var(--on);
 }
 .stats__label {
-  font: 700 var(--type-label) / 1.2 var(--display);
+  font: 700 var(--type-label) / var(--leading-title) var(--display);
 }
 .stats__itemLink {
   color: inherit;
@@ -157,12 +157,12 @@
   text-decoration-color: var(--on);
 }
 .stats__count {
-  font: 700 var(--type-h2) / 1.2 var(--display);
+  font: 700 var(--type-h2) / var(--leading-title) var(--display);
   font-variant-numeric: tabular-nums;
   text-align: right;
 }
 .stats__rank {
-  font: 600 var(--type-meta) / 1.35 var(--body);
+  font: 600 var(--type-meta) / var(--leading-meta) var(--body);
   font-variant-numeric: tabular-nums;
   color: var(--soft);
 }
@@ -305,7 +305,7 @@
 }
 .stats__columnValue,
 .stats__columnTick {
-  font: 600 var(--type-meta) / 1.35 var(--body);
+  font: 600 var(--type-meta) / var(--leading-meta) var(--body);
   font-variant-numeric: tabular-nums;
   color: var(--soft);
   white-space: nowrap;
@@ -459,7 +459,7 @@
   border-radius: 8px;
 }
 .stats__monthColHead {
-  font: 700 var(--type-micro) / 1.1 var(--display);
+  font: 700 var(--type-micro) / var(--leading-tight) var(--display);
   color: var(--soft);
   text-align: center;
 }
@@ -469,7 +469,7 @@
 .stats__monthYearBtn,
 .stats__monthRowLabel {
   padding: 2px 4px 2px 0;
-  font: 700 var(--type-caption) / 1.1 var(--display);
+  font: 700 var(--type-caption) / var(--leading-tight) var(--display);
   font-variant-numeric: tabular-nums;
   color: var(--soft);
   text-align: left;
@@ -549,7 +549,7 @@
 }
 .stats__championYear {
   padding: 4px 6px;
-  font: 700 var(--type-caption) / 1.1 var(--display);
+  font: 700 var(--type-caption) / var(--leading-tight) var(--display);
   font-variant-numeric: tabular-nums;
   color: var(--ink-on-cream);
   text-align: center;
@@ -599,13 +599,13 @@
   white-space: nowrap;
 }
 .stats__championTrack {
-  font: 700 var(--type-body) / 1.25 var(--display);
+  font: 700 var(--type-body) / var(--leading-title) var(--display);
 }
 .stats__championArtist {
   font-size: var(--type-caption);
 }
 .stats__championPlays {
-  font: 700 var(--type-caption) / 1.2 var(--display);
+  font: 700 var(--type-caption) / var(--leading-title) var(--display);
   font-variant-numeric: tabular-nums;
   color: var(--ochre);
   text-align: right;
@@ -636,11 +636,11 @@
 }
 .stats__championList--compact .stats__championTrack {
   font-size: var(--type-caption);
-  line-height: 1.2;
+  line-height: var(--leading-title);
 }
 .stats__championList--compact .stats__championArtist {
   font-size: var(--type-micro);
-  line-height: 1.15;
+  line-height: var(--leading-title);
 }
 .stats__championLink:hover .stats__championTrack,
 .stats__championLink:focus-visible .stats__championTrack {
@@ -727,7 +727,7 @@
   border-radius: 50%;
 }
 .stats__shiftShare {
-  font: 700 var(--type-h3) / 1.25 var(--display);
+  font: 700 var(--type-h3) / var(--leading-title) var(--display);
   font-variant-numeric: tabular-nums;
 }
 .stats__clockReadout {
@@ -776,7 +776,7 @@
 .stats__table {
   width: 100%;
   margin-top: 14px;
-  font: 400 var(--type-body) / 1.5 var(--body);
+  font: 400 var(--type-body) / var(--leading-body) var(--body);
   border-collapse: collapse;
 }
 .stats__table th,
@@ -786,7 +786,7 @@
   text-align: left;
 }
 .stats__table thead th {
-  font: 600 var(--type-meta) / 1.35 var(--body);
+  font: 600 var(--type-meta) / var(--leading-meta) var(--body);
   color: var(--soft);
 }
 .stats__table .stats__cell,

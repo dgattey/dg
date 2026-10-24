@@ -45,6 +45,12 @@ const FONT_SIZE_DECLARATION = /(?<![-\w])(?:font-size|font)\s*:([^;{}]+)/g;
 const LITERAL_FONT_SIZE = /\d(?:px|rem)\b/;
 const TYPE_TOKEN_DECLARATION = /(--type-[a-z0-9-]+)\s*:/g;
 const TYPE_TOKEN_USE = /var\(\s*(--type-[a-z0-9-]+)/g;
+const FONT_FACE_BLOCK = /@font-face\s*\{[^}]*\}/g;
+const FONT_FAMILY_DECLARATION = /(?<![-\w])font-family\s*:([^;{}]+)/g;
+const FONT_SHORTHAND_DECLARATION = /(?<![-\w])font\s*:([^;{}]+)/g;
+const FONT_WEIGHT_DECLARATION = /(?<![-\w])font-weight\s*:([^;{}]+)/g;
+const CANONICAL_FAMILY = /^(?:var\(--(?:display|body)\)|inherit)$/;
+const CANONICAL_WEIGHT = /^(?:400|600|700|inherit)$/;
 const CLASS_SELECTOR_TOKEN = /\.([a-zA-Z_][a-zA-Z0-9_-]*)/g;
 const KEYFRAMES_DECLARATION = /@keyframes\s+([a-zA-Z0-9_-]+)/g;
 const IDENTIFIER_TOKEN = /[a-zA-Z_][a-zA-Z0-9_-]*/g;
@@ -169,6 +175,47 @@ export function checkUnusedCssRules(
 }
 
 /**
+ * Families are `var(--display)` or `var(--body)` and weights are 400, 600, or 700, so no
+ * stylesheet can introduce a third stack or a weight the two fonts render differently.
+ */
+function checkFontSystem(file: string, raw: string): Array<StructureViolation> {
+  const content = raw.replace(FONT_FACE_BLOCK, (block) => block.replace(/[^\n]/g, ' '));
+  const violations: Array<StructureViolation> = [];
+  const flag = (index: number, message: string, rule: string) =>
+    violations.push({ file, line: lineAt(content, index), message, rule });
+
+  for (const match of content.matchAll(FONT_FAMILY_DECLARATION)) {
+    if (!CANONICAL_FAMILY.test((match[1] ?? '').trim())) {
+      flag(match.index, 'Set font-family to var(--display) or var(--body)', 'css-font-family');
+    }
+  }
+  for (const match of content.matchAll(FONT_SHORTHAND_DECLARATION)) {
+    const value = (match[1] ?? '').trim();
+    if (value === 'inherit') {
+      continue;
+    }
+    if (!/var\(--(?:display|body)\)$/.test(value)) {
+      flag(
+        match.index,
+        'End the font shorthand with var(--display) or var(--body)',
+        'css-font-family',
+      );
+    }
+    const weight = value.match(/^(?:italic\s+)?(\d{3})\b/)?.[1];
+    if (weight && !CANONICAL_WEIGHT.test(weight)) {
+      flag(match.index, `Font weight ${weight} is off the 400/600/700 palette`, 'css-font-weight');
+    }
+  }
+  for (const match of content.matchAll(FONT_WEIGHT_DECLARATION)) {
+    const weight = (match[1] ?? '').trim();
+    if (!CANONICAL_WEIGHT.test(weight)) {
+      flag(match.index, `Font weight ${weight} is off the 400/600/700 palette`, 'css-font-weight');
+    }
+  }
+  return violations;
+}
+
+/**
  * Type sizes come from the `--type-*` scale on `.collageRoot`, so a literal size or a
  * token nobody declares fails here instead of rendering at a stray or inherited size.
  */
@@ -182,6 +229,7 @@ export function checkTypeScale(cssFiles: ReadonlyMap<string, string>): Array<Str
 
   const violations: Array<StructureViolation> = [];
   for (const [file, content] of cssFiles) {
+    violations.push(...checkFontSystem(file, content));
     for (const match of content.matchAll(FONT_SIZE_DECLARATION)) {
       if (LITERAL_FONT_SIZE.test(match[1] ?? '')) {
         violations.push({

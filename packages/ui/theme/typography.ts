@@ -34,8 +34,7 @@ export function getTypography(): TypographyVariants {
     },
     caption: {
       fontSize: 15,
-      fontStretch: 'semi-expanded',
-      fontWeight: 500,
+      fontWeight: 400,
     },
     code: {
       borderRadius: '16px',
@@ -54,8 +53,6 @@ export function getTypography(): TypographyVariants {
       'Ubuntu',
       'Cantarell',
       '"Noto Sans"',
-      '"Helvetica Neue"',
-      'Arial',
       'sans-serif',
       '"Apple Color Emoji"',
       '"Segoe UI Emoji"',
@@ -65,7 +62,6 @@ export function getTypography(): TypographyVariants {
     fontSize: 20,
     h1: {
       fontSize: 'clamp(1.75rem, 1.2rem + 2.5vw, 2.125rem)',
-      fontStretch: 'expanded',
       fontVariant: 'all-small-caps',
       fontWeight: 700,
     },
@@ -83,7 +79,6 @@ export function getTypography(): TypographyVariants {
     },
     h5: {
       fontSize: 16.5,
-      fontStretch: 'semi-expanded',
       fontWeight: 600,
     },
     h6: {

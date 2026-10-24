@@ -26,6 +26,12 @@ html:has(.collageRoot) body {
   background: transparent;
 }
 
+/* On :root, not .collageRoot, so tooltips and dialogs portaled to <body> get the same fonts. */
+:root {
+  --display: var(--font-familjen), var(--font-sans);
+  --body: var(--font-sans);
+}
+
 .collageRoot {
   --paper: light-dark(#ede3cb, #152238);
   --paper-2: #1c2d48;
@@ -58,21 +64,24 @@ html:has(.collageRoot) body {
   --type-title-lg: clamp(26px, 2.6vw, 36px);
   --type-title-md: clamp(22px, 2.3vw, 28px);
   --type-h2: clamp(20px, 2.2vw, 24px);
-  --type-h3: 20px;
+  --type-h3: 18px;
   --type-label: clamp(18px, 1.6vw, 20px);
   --type-body-lg: clamp(17px, 1.5vw, 20px);
   --type-body: 16px;
-  --type-meta: 16px;
+  --type-meta: 15px;
   --type-caption: 14px;
   --type-micro: 12px;
+  --leading-tight: 1.1;
+  --leading-title: 1.2;
+  --leading-meta: 1.35;
+  --leading-body: 1.6;
+  --tracking-display: -0.035em;
+  --tracking-title: -0.02em;
+  --tracking-label: -0.01em;
   --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.2)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.12));
   /* Same two shadows as --dshadow, so the filter interpolates between them. */
   --dshadow-lift: drop-shadow(0 2px 0 light-dark(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.36)))
     drop-shadow(0 7px 10px light-dark(rgb(0 0 0 / 0.18), rgb(0 0 0 / 0.34)));
-  --display: var(--font-familjen), "Avenir Next", "Helvetica Neue", system-ui, sans-serif;
-  --body:
-    system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Ubuntu, Cantarell,
-    "Noto Sans", "Helvetica Neue", Arial, sans-serif;
   --collage-card-pad: 28px 34px 30px;
   --collage-card-pad-mobile: 24px 22px 26px;
   position: relative;
@@ -181,7 +190,7 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   padding-top: 20px;
   font-size: var(--type-h1);
   line-height: 0.94;
-  letter-spacing: -0.035em;
+  letter-spacing: var(--tracking-display);
 }
 .collagePin {
   position: absolute;
@@ -196,9 +205,9 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   font-family: var(--display);
   font-size: var(--type-label);
   font-weight: 700;
-  line-height: 1.1;
+  line-height: var(--leading-tight);
   color: var(--on, var(--ink));
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-label);
 }
 
 .paperWrap {
@@ -238,7 +247,7 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   font-family: var(--display);
   font-size: var(--type-meta);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: var(--leading-title);
   color: var(--cream);
   background: var(--black);
   border: 1.5px solid color-mix(in oklab, var(--cream) 22%, transparent);
@@ -254,9 +263,9 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   font-family: var(--display);
   font-size: var(--type-label);
   font-weight: 700;
-  line-height: 1.1;
+  line-height: var(--leading-tight);
   color: var(--on);
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tracking-label);
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
@@ -274,7 +283,7 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
 .paperTag small {
   font-size: var(--type-meta);
   font-weight: 600;
-  line-height: 1.25;
+  line-height: var(--leading-title);
   letter-spacing: 0;
   opacity: 0.78;
 }
@@ -438,17 +447,19 @@ html[data-color-scheme="dark"] .cutNightOnly {
     translate: 0 calc(-1 * var(--drift));
   }
 }
+/* Words are flex items, so the space between them has to come from the gap. */
 .cutHeading {
-  display: grid;
-  row-gap: 0.02em;
-  justify-items: start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.02em 0.26em;
+  align-items: baseline;
   margin: 0;
   font-family: var(--display);
   font-size: var(--type-display);
   font-weight: 700;
   line-height: 0.9;
   color: var(--title);
-  letter-spacing: -0.04em;
+  letter-spacing: var(--tracking-display);
   filter: var(--dshadow);
 }
 .cutHeadingCut {
@@ -458,9 +469,6 @@ html[data-color-scheme="dark"] .cutNightOnly {
 .cutWord {
   display: flex;
   white-space: nowrap;
-}
-.cutIndentedWord {
-  margin-left: 0.62em;
 }
 .cutLetter {
   display: inline-block;
@@ -473,9 +481,6 @@ html[data-color-scheme="dark"] .cutNightOnly {
   }
   .collagePageTitle {
     padding-top: 16px;
-  }
-  .cutIndentedWord {
-    margin-left: 0.5em;
   }
 }
 @media (max-width: 600px) {

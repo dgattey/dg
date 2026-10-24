@@ -45,7 +45,7 @@
   aspect-ratio: 1;
   font-family: var(--display);
   font-size: var(--type-meta);
-  font-weight: 800;
+  font-weight: 700;
   color: var(--ink-on-cream);
   background: var(--vermilion);
   clip-path: polygon(
@@ -93,22 +93,32 @@
 .reading__featureTitle {
   margin: 0;
   font-family: var(--display);
-  font-weight: 800;
-  line-height: 1.15;
+  font-weight: 700;
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-label);
   text-wrap: balance;
 }
 .reading__bookTitle {
-  font-size: var(--type-label);
+  font-size: var(--type-h3);
 }
-.reading__featureTitle,
 .reading__card--feature .reading__bookTitle {
   font-size: var(--type-h2);
+}
+.reading__featureTitle {
+  font-size: var(--type-title-md);
+  letter-spacing: var(--tracking-title);
 }
 .reading__author,
 .reading__meta {
   margin: 0;
   font-size: var(--type-meta);
-  line-height: 1.3;
+  line-height: var(--leading-meta);
+}
+.reading__author {
+  color: color-mix(in oklab, currentColor 78%, transparent);
+}
+.reading__meta {
+  margin-top: 4px;
 }
 .reading__meta,
 .reading__stamp {
@@ -125,7 +135,7 @@
   color: color-mix(in oklab, var(--on) 30%, var(--pc));
 }
 .reading__stamp {
-  margin-top: 6px;
+  margin-top: 8px;
   font-size: var(--type-meta);
 }
 
@@ -136,7 +146,7 @@
 .reading__slipInner p {
   margin: 0;
   font-size: var(--type-body);
-  line-height: 1.5;
+  line-height: var(--leading-body);
 }
 
 .reading__hero {
@@ -246,7 +256,7 @@
   }
 }
 .reading__card {
-  overflow-wrap: anywhere;
+  overflow-wrap: break-word;
 }
 .reading__card--review,
 .reading__card--feature {
@@ -304,7 +314,7 @@
 .reading__head {
   display: grid;
   grid-area: head;
-  gap: 6px;
+  gap: 4px;
   justify-items: start;
   padding: 10px 8px 0;
 }
@@ -313,11 +323,11 @@
 }
 .reading__coverInner {
   display: grid;
-  gap: 6px;
+  gap: 4px;
   padding: var(--mat) var(--mat) 14px;
 }
 .reading__coverInner > .reading__print {
-  margin: 4px 4px 8px;
+  margin: 4px 4px 10px;
 }
 
 ::view-transition-group(.reading-shelf) {

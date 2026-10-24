@@ -35,10 +35,7 @@ export function CutLetters({
     return (
       <h1 className={cx('cutHeading', className)}>
         {words.map((wordMatch, wordIndex) => (
-          <span
-            className={cx('cutWord', wordIndex > 0 && 'cutIndentedWord')}
-            key={`${wordMatch.index}-${wordMatch[0]}`}
-          >
+          <span className="cutWord" key={`${wordMatch.index}-${wordMatch[0]}`}>
             {wordMatch[0]}
             {wordIndex < words.length - 1 ? ' ' : null}
           </span>
@@ -53,11 +50,7 @@ export function CutLetters({
         const word = wordMatch[0];
         const wordOffset = wordMatch.index;
         return (
-          <span
-            aria-hidden="true"
-            className={cx('cutWord', wordIndex > 0 && 'cutIndentedWord')}
-            key={`${wordOffset}-${word}`}
-          >
+          <span aria-hidden="true" className="cutWord" key={`${wordOffset}-${word}`}>
             {Array.from(word.matchAll(/./gu)).map((letterMatch) => {
               const letter = letterMatch[0];
               const treatment =

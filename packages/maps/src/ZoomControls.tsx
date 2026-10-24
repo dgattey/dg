@@ -36,7 +36,7 @@ const buttonSx: SxObject = {
   cursor: 'pointer',
   display: 'flex',
   fontSize: 17,
-  fontWeight: 800,
+  fontWeight: 700,
   height: 28,
   justifyContent: 'center',
   padding: 0,
