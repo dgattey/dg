@@ -14,6 +14,53 @@
 .collageBackdropHost > .paperPills {
   z-index: 3;
 }
+/* Sticky filter and sort bars sit under the header (z-index: 50) and above page cards. */
+.collageBackdropHost
+:is(.reading__filters, .stats__toolbar, .music__sort, .strava__filters, .changelog__toolbar) {
+  position: sticky;
+  top: calc(var(--site-header-height, 88px) + 10px);
+  z-index: 20;
+}
+.collageBackdropHost
+  :is(
+    .reading__filters,
+    .stats__toolbar,
+    .music__sort,
+    .strava__filters,
+    .changelog__toolbar
+  )::before {
+  position: absolute;
+  top: -18px;
+  left: 50%;
+  z-index: -1;
+  width: 200vw;
+  height: calc(100% + 44px);
+  pointer-events: none;
+  content: "";
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--paper) 68%, transparent) 0%,
+    color-mix(in srgb, var(--paper) 58%, transparent) 44%,
+    color-mix(in srgb, var(--paper) 28%, transparent) 74%,
+    color-mix(in srgb, var(--paper) 8%, transparent) 90%,
+    transparent 100%
+  );
+  backdrop-filter: blur(3.5px);
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 22%,
+    #000 54%,
+    rgb(0 0 0 / 0.45) 78%,
+    transparent 100%
+  );
+  translate: -50%;
+}
+@media (min-width: 821px) {
+  .collageBackdropHost > :is(.collagePageTitle, .strava__intro) {
+    z-index: 21;
+  }
+}
 .paperPill {
   padding: 0;
   font-size: var(--type-label);

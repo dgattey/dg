@@ -3,12 +3,7 @@ import type { StructureViolation } from './check-structure.js';
 /** Narrowest box a page grid gets: a 320px phone minus the 16px page gutters. */
 export const NARROWEST_GRID_PX = 288;
 
-type CssRule = {
-  body: string;
-  index: number;
-  media: string | null;
-  selectors: Array<string>;
-};
+type CssRule = { body: string; index: number; media: string | null; selectors: Array<string> };
 
 /** Flat list of style rules, each tagged with the `@media` prelude it sits in. */
 function cssRules(content: string): Array<CssRule> {
@@ -44,19 +39,15 @@ function cssRules(content: string): Array<CssRule> {
   return rules;
 }
 
-function declaration(body: string, property: string): string | undefined {
-  return new RegExp(`(?:^|[;\\s])${property}\\s*:([^;]+)`).exec(body)?.[1]?.trim();
-}
+const declaration = (body: string, property: string): string | undefined =>
+  new RegExp(`(?:^|[;\\s])${property}\\s*:([^;]+)`).exec(body)?.[1]?.trim();
 
-function lineAt(content: string, index: number): number {
-  return content.slice(0, index).split('\n').length;
-}
+const lineAt = (content: string, index: number): number =>
+  content.slice(0, index).split('\n').length;
 
 function columnGapPx(body: string): number | null | undefined {
   const gap = declaration(body, 'column-gap') ?? declaration(body, 'gap')?.split(/\s+/).at(-1);
-  if (gap === undefined) {
-    return undefined;
-  }
+  if (gap === undefined) return undefined;
   const px = /^(\d+(?:\.\d+)?)px$/.exec(gap);
   return px ? Number(px[1]) : null;
 }
@@ -79,12 +70,8 @@ function trackCount(columns: string): number {
 type GridOverride = { columns?: string; display?: string; gap: number | null | undefined };
 
 function overrideFits(override: GridOverride, baseColumns: string, baseGap: number): boolean {
-  if (override.display && !override.display.includes('grid')) {
-    return true;
-  }
-  if (!override.columns && override.gap === undefined) {
-    return false;
-  }
+  if (override.display && !override.display.includes('grid')) return true;
+  if (!override.columns && override.gap === undefined) return false;
   const gap = override.gap === undefined ? baseGap : override.gap;
   const columns = override.columns ?? baseColumns;
   return gap !== null && (trackCount(columns) - 1) * gap <= NARROWEST_GRID_PX;
@@ -170,14 +157,15 @@ const lastCompound = (selector: string): string => selector.split(/[\s>+~]+/).at
 /**
  * Card heads swap their subtitle for a hover readout. A wrapping head moves that
  * subtitle onto a new line once the readout outgrows the space beside the title, which
- * drags the rows under the pointer away and makes the hover flicker. The head stacks
- * title over subtitle, and the subtitle stays one line.
+ * drags the rows under the pointer away and makes the hover flicker.
  */
 export function checkCardHeadStable(
   cssFiles: ReadonlyMap<string, string>,
 ): Array<StructureViolation> {
   const violations: Array<StructureViolation> = [];
   for (const [file, content] of cssFiles) {
+    const flag = (index: number, message: string) =>
+      violations.push({ file, line: lineAt(content, index), message, rule: 'css-card-head-wrap' });
     let asideBase: CssRule | undefined;
     let asideFirst: CssRule | undefined;
     for (const rule of cssRules(content)) {
@@ -186,17 +174,12 @@ export function checkCardHeadStable(
         compounds.includes('.stats__head') &&
         declaration(rule.body, 'flex-wrap')?.startsWith('wrap')
       ) {
-        violations.push({
-          file,
-          line: lineAt(content, rule.index),
-          message:
-            'Stack the card title over its subtitle instead of wrapping, so a hover readout never changes the head height',
-          rule: 'css-card-head-wrap',
-        });
+        flag(
+          rule.index,
+          'Stack the card title over its subtitle instead of wrapping, so a hover readout never changes the head height',
+        );
       }
-      if (!compounds.includes('.stats__aside')) {
-        continue;
-      }
+      if (!compounds.includes('.stats__aside')) continue;
       asideFirst ??= rule;
       const whiteSpace = declaration(rule.body, 'white-space');
       if (
@@ -207,22 +190,14 @@ export function checkCardHeadStable(
       ) {
         asideBase = rule;
       } else if (whiteSpace && whiteSpace !== 'nowrap') {
-        violations.push({
-          file,
-          line: lineAt(content, rule.index),
-          message: 'Keep the card subtitle on one line, since it doubles as a hover readout',
-          rule: 'css-card-head-wrap',
-        });
+        flag(rule.index, 'Keep the card subtitle on one line, since it doubles as a hover readout');
       }
     }
     if (asideFirst && !asideBase) {
-      violations.push({
-        file,
-        line: lineAt(content, asideFirst.index),
-        message:
-          '`.stats__aside` needs `white-space: nowrap` and `text-overflow: ellipsis` so a hover readout stays one line',
-        rule: 'css-card-head-wrap',
-      });
+      flag(
+        asideFirst.index,
+        '`.stats__aside` needs `white-space: nowrap` and `text-overflow: ellipsis` so a hover readout stays one line',
+      );
     }
   }
   return violations;
@@ -230,8 +205,7 @@ export function checkCardHeadStable(
 
 /**
  * A tag hung over a card's top edge and inside its right edge covers the end of the
- * card head. Each one needs a bounded width and a `:has(> tag)` rule that pads the head
- * clear of it, or a long title or readout runs underneath.
+ * card head. Each one needs a bounded width and a `:has(> tag)` rule that pads the head.
  */
 export function checkCornerTagRoom(
   cssFiles: ReadonlyMap<string, string>,
@@ -240,14 +214,10 @@ export function checkCornerTagRoom(
   const roomFor = new Set<string>();
   for (const rules of rulesByFile.values()) {
     for (const rule of rules) {
-      if (!/(?:^|[;\s])padding(?:-right|-inline-end|-inline)?\s*:/.test(rule.body)) {
-        continue;
-      }
+      if (!/(?:^|[;\s])padding(?:-right|-inline-end|-inline)?\s*:/.test(rule.body)) continue;
       for (const selector of rule.selectors) {
         for (const match of selector.matchAll(/:has\(>\s*(\.[\w-]+)\)/g)) {
-          if (match[1] && /\.stats__head|\.stats__heading/.test(selector)) {
-            roomFor.add(match[1]);
-          }
+          if (match[1] && /\.stats__head|\.stats__heading/.test(selector)) roomFor.add(match[1]);
         }
       }
     }
@@ -256,18 +226,14 @@ export function checkCornerTagRoom(
   for (const [file, rules] of rulesByFile) {
     for (const rule of rules) {
       const tag = rule.selectors.length === 1 ? rule.selectors[0] : undefined;
-      if (!tag || !/^\.[\w-]+$/.test(tag) || rule.media) {
-        continue;
-      }
+      if (!tag || !/^\.[\w-]+$/.test(tag) || rule.media) continue;
       const hangs =
         declaration(rule.body, 'position') === 'absolute' &&
         declaration(rule.body, 'top')?.startsWith('-') &&
         declaration(rule.body, 'right') !== undefined &&
         !declaration(rule.body, 'right')?.startsWith('-') &&
         !declaration(rule.body, 'z-index')?.startsWith('-');
-      if (!hangs) {
-        continue;
-      }
+      if (!hangs) continue;
       const problems = [
         declaration(rule.body, 'width') || declaration(rule.body, 'max-width')
           ? null
@@ -289,17 +255,14 @@ export function checkCornerTagRoom(
 
 /**
  * A `repeat(n, …)` grid whose column gaps alone are wider than a phone collapses every
- * track to zero and pushes full-width children past the page edge. It must switch to
- * fewer columns in a `max-width` media query.
+ * track to zero and pushes full-width children past the page edge.
  */
 export function checkGridGapsFit(cssFiles: ReadonlyMap<string, string>): Array<StructureViolation> {
   const rulesByFile = new Map([...cssFiles].map(([file, content]) => [file, cssRules(content)]));
   const overrides = new Map<string, Array<GridOverride>>();
   for (const rules of rulesByFile.values()) {
     for (const rule of rules) {
-      if (!rule.media?.includes('max-width')) {
-        continue;
-      }
+      if (!rule.media?.includes('max-width')) continue;
       const override = {
         columns: declaration(rule.body, 'grid-template-columns'),
         display: declaration(rule.body, 'display'),
@@ -310,15 +273,12 @@ export function checkGridGapsFit(cssFiles: ReadonlyMap<string, string>): Array<S
       }
     }
   }
-
   const violations: Array<StructureViolation> = [];
   for (const [file, rules] of rulesByFile) {
     for (const rule of rules) {
       const columns = declaration(rule.body, 'grid-template-columns');
       const gap = columnGapPx(rule.body);
-      if (!columns || gap === null || gap === undefined) {
-        continue;
-      }
+      if (!columns || gap === null || gap === undefined) continue;
       const gapsPx = (trackCount(columns) - 1) * gap;
       const collapses = rule.selectors.every((selector) =>
         (overrides.get(selector) ?? []).some((override) => overrideFits(override, columns, gap)),
@@ -336,11 +296,49 @@ export function checkGridGapsFit(cssFiles: ReadonlyMap<string, string>): Array<S
   return violations;
 }
 
+/** The sticky header must stay above every page-level sticky filter or section bar. */
+export function checkHeaderAboveSticky(
+  cssFiles: ReadonlyMap<string, string>,
+): Array<StructureViolation> {
+  const rulesByFile = new Map([...cssFiles].map(([file, content]) => [file, cssRules(content)]));
+  let headerZ: number | undefined;
+  for (const rules of rulesByFile.values()) {
+    for (const rule of rules) {
+      if (!rule.media && rule.selectors.includes('.chrome__header')) {
+        const z = Number(declaration(rule.body, 'z-index'));
+        if (Number.isFinite(z)) headerZ = z;
+      }
+    }
+  }
+  if (headerZ === undefined) return [];
+  const violations: Array<StructureViolation> = [];
+  for (const [file, rules] of rulesByFile) {
+    for (const rule of rules) {
+      const z = Number(declaration(rule.body, 'z-index'));
+      if (
+        !rule.selectors.includes('.chrome__header') &&
+        declaration(rule.body, 'position') === 'sticky' &&
+        Number.isFinite(z) &&
+        z >= headerZ
+      ) {
+        violations.push({
+          file,
+          line: lineAt(cssFiles.get(file) ?? '', rule.index),
+          message: `Sticky rule \`${rule.selectors.join(', ')}\` has z-index ${z}, which must be below \`.chrome__header\` (z-index ${headerZ}) so the header dropdown paints on top`,
+          rule: 'css-header-above-sticky',
+        });
+      }
+    }
+  }
+  return violations;
+}
+
 export function checkCssGeometry(cssFiles: ReadonlyMap<string, string>): Array<StructureViolation> {
   return [
     ...checkScallopPadding(cssFiles),
     ...checkGridGapsFit(cssFiles),
     ...checkCardHeadStable(cssFiles),
     ...checkCornerTagRoom(cssFiles),
+    ...checkHeaderAboveSticky(cssFiles),
   ];
 }

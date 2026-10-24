@@ -1023,10 +1023,3 @@
     margin-top: -12px;
   }
 }
-
-/* Outranks the backdrop host's `position: relative` on its children, so the filters ride along. */
-.collageBackdropHost.strava__layout > .strava__filters {
-  position: sticky;
-  top: calc(var(--site-header-height, 88px) + 10px);
-  z-index: 30;
-}
