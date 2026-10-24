@@ -76,6 +76,17 @@ export async function getListeningStatsMarkdown(): Promise<string> {
               `${i + 1}. [${artist.name}](${artist.url}) — ${formatCount(artist.plays)} plays across ${artist.tracks} tracks`,
           )
           .join('\n'),
+        ...(stats.topPlaylists.length > 0
+          ? [
+              '## Top playlists, all time',
+              stats.topPlaylists
+                .map(
+                  (playlist, i) =>
+                    `${i + 1}. [${playlist.name}](${playlist.url}) — ${formatCount(playlist.plays)} plays (${formatCount(playlist.playedTracks)} of ${formatCount(playlist.totalTracks)} tracks)`,
+                )
+                .join('\n'),
+            ]
+          : []),
         '## On repeat',
         stats.onRepeat
           .map(

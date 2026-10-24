@@ -11,6 +11,7 @@ import {
 } from './listeningStatsCatalog';
 import { findNewArtists } from './listeningStatsNewArtists';
 import { statsNow } from './listeningStatsPhase';
+import { fetchTopPlaylistRows, toStatsPlaylists } from './listeningStatsPlaylists';
 import {
   rollingDaysPlayFilter,
   type SqlPlayFilter,
@@ -63,16 +64,20 @@ export type StatsAlbum = StatsAlbumRef & { artists: Array<SpotifyLink> };
 export type StatsTrack = SpotifyLink & { album: StatsAlbumRef; artists: Array<SpotifyLink> };
 export type StatsTopTrack = StatsTrack & { plays: number };
 export type StatsTopArtist = SpotifyLink & { months: number; plays: number; tracks: number };
+export type StatsPlaylist = SpotifyLink & {
+  imageUrl: string;
+  playedTracks: number;
+  plays: number;
+  topTrack?: StatsTrack;
+  totalTracks: number;
+};
 export type StatsGenre = {
   artists: Array<SpotifyLink>;
   genre: string;
   plays: number;
   tracks: number;
 };
-/**
- * Where a calendar slot sits against the latest play: over, still in progress, or not
- * yet happened. Future slots hold the calendar's shape but carry no data to inspect.
- */
+/** Where a calendar slot sits against the latest play: over, still in progress, or not yet happened. */
 export type StatsPhase = 'current' | 'future' | 'past';
 export type StatsTimelinePoint = {
   key: string;
@@ -124,7 +129,6 @@ export type ListeningStats = {
   matrix: StatsMatrix;
   minutesPerPlay: number;
   monthStreak: { end: string; months: number; start: string };
-  /** Artists on this snapshot first ever played inside its window, and how to say so. */
   newArtists: { ids: Array<string>; label: string };
   onRepeat: Array<{ plays: number; track: StatsTrack; week: string }>;
   plays: number;
@@ -136,50 +140,41 @@ export type ListeningStats = {
   timeline: StatsTimeline;
   topAlbums: Array<{ album: StatsAlbum; plays: number }>;
   topArtists: Array<StatsTopArtist>;
+  topPlaylists: Array<StatsPlaylist>;
   topTracks: Array<StatsTopTrack>;
   tracks: number;
   years: Array<{ plays: number; year: number }>;
 };
 
-function monthIndex(month: string): number {
-  const [year = 0, monthOfYear = 1] = month.split('-').map(Number);
-  return year * 12 + monthOfYear - 1;
+function longestRun(items: ReadonlyArray<string>, toIndex: (item: string) => number) {
+  let best = { end: '', length: 0, start: '' };
+  let runStart = 0;
+  items.forEach((item, i) => {
+    const previous = items[i - 1];
+    if (previous === undefined || toIndex(item) - toIndex(previous) !== 1) {
+      runStart = i;
+    }
+    const length = i - runStart + 1;
+    if (length > best.length) {
+      best = { end: item, length, start: items[runStart] ?? item };
+    }
+  });
+  return best;
 }
 
 export function longestMonthStreak(months: ReadonlyArray<string>): ListeningStats['monthStreak'] {
-  let best = { end: '', months: 0, start: '' };
-  let runStart = 0;
-  months.forEach((month, i) => {
-    const previous = months[i - 1];
-    if (previous === undefined || monthIndex(month) - monthIndex(previous) !== 1) {
-      runStart = i;
-    }
-    const length = i - runStart + 1;
-    if (length > best.months) {
-      best = { end: month, months: length, start: months[runStart] ?? month };
-    }
+  const { end, length, start } = longestRun(months, (month) => {
+    const [year = 0, monthOfYear = 1] = month.split('-').map(Number);
+    return year * 12 + monthOfYear - 1;
   });
-  return best;
-}
-
-function dayIndex(day: string): number {
-  return Math.round(Date.parse(`${day}T00:00:00Z`) / 86_400_000);
+  return { end, months: length, start };
 }
 
 export function longestDayStreak(days: ReadonlyArray<string>): ListeningStats['dayStreak'] {
-  let best = { days: 0, end: '', start: '' };
-  let runStart = 0;
-  days.forEach((day, i) => {
-    const previous = days[i - 1];
-    if (previous === undefined || dayIndex(day) - dayIndex(previous) !== 1) {
-      runStart = i;
-    }
-    const length = i - runStart + 1;
-    if (length > best.days) {
-      best = { days: length, end: day, start: days[runStart] ?? day };
-    }
-  });
-  return best;
+  const { end, length, start } = longestRun(days, (day) =>
+    Math.round(Date.parse(`${day}T00:00:00Z`) / 86_400_000),
+  );
+  return { days: length, end, start };
 }
 
 function fillBuckets(rows: Array<{ bucket: number; plays: number }>, size: number, first: number) {
@@ -243,6 +238,7 @@ export async function fetchListeningStats(
     onRepeat,
     depth,
     favoriteAlbums,
+    playlistResult,
   ] = await Promise.all([
     selectSummary(filter),
     selectArtistCount(filter),
@@ -261,6 +257,7 @@ export async function fetchListeningStats(
     selectRepeats(repeatUnit, ON_REPEAT_TRACKS, filter),
     selectArtistDepth(filter),
     db.FavoriteAlbum.findAll(),
+    fetchTopPlaylistRows(filter),
   ]);
 
   if (!summary?.firstPlayedAt || !summary.lastPlayedAt || summary.plays === 0) return null;
@@ -275,13 +272,14 @@ export async function fetchListeningStats(
       [...new Set([...shownAlbums, ...sessions].map((row) => row.albumId))],
       favoriteAlbums,
     ),
-    resolveTrackDisplays(
-      [...shownTracks, ...onRepeat, ...bucketTopTracks].map((row) => row.trackId),
-    ),
+    resolveTrackDisplays([
+      ...[...shownTracks, ...onRepeat, ...bucketTopTracks].map((row) => row.trackId),
+      ...playlistResult.rows.map((row) => row.topTrackId),
+    ]),
     resolveArtists(depth.map((row) => row.artistId)),
   ]);
   const tracks = toStatsTracks(trackDisplays, favoriteIds);
-  // Waits on resolveArtists, which backfills the genres this reads.
+  const topPlaylists = toStatsPlaylists(playlistResult.rows, playlistResult.catalog, tracks);
   const genres = toStatsGenres(await selectTopGenres(filter));
 
   const minutesPerPlay =
@@ -341,6 +339,7 @@ export async function fetchListeningStats(
     shelf: { albums: shelf?.albums ?? 0, plays: shelf?.plays ?? 0 },
     spanDays: range.kind === 'week' ? 7 : range.kind === 'month' ? 30 : (summary.spanDays ?? 1),
     timeline,
+    topPlaylists,
     tracks: summary.tracks,
     years,
   };

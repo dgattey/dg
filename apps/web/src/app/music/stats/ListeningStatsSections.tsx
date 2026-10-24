@@ -10,6 +10,7 @@ import { DepthCard, DepthPocketStickers, FrontToBackCard, OnRepeatCard } from '.
 import { ActivityMatrixCard, MatrixPocketStickers, SoundtrackCard } from './StatsHistoryVisuals';
 import { StatsToolbar } from './StatsToolbar';
 import { TopAlbumsPodium } from './TopAlbumsPodium';
+import { TopPlaylistsCard } from './TopPlaylistsCard';
 import { TopArtistsCard, TopSongsCard } from './TopSongsAndArtists';
 
 function parseClientRangeKey(raw: string | null): StatsRangeKey {
@@ -178,6 +179,11 @@ export function ListeningStatsSections({
           <div className="stats__band">
             <TopSongsCard stats={stats} />
             <TopArtistsCard stats={stats} />
+          </div>
+        ) : null}
+        {stats.topPlaylists.length > 0 ? (
+          <div className="stats__band">
+            <TopPlaylistsCard stats={stats} />
           </div>
         ) : null}
         <div className="stats__band">

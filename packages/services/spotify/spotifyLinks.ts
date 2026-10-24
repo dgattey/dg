@@ -1,9 +1,9 @@
 import 'server-only';
 
-/** A Spotify artist, album, or track named somewhere on the site, with the page it opens. */
+/** A Spotify artist, album, playlist, or track named somewhere on the site, with the page it opens. */
 export type SpotifyLink = { id: string; name: string; url: string };
 
-type SpotifyKind = 'album' | 'artist' | 'track';
+type SpotifyKind = 'album' | 'artist' | 'playlist' | 'track';
 
 /** The stored Spotify page, or the canonical one built from the id when none was stored. */
 export function spotifyUrl(kind: SpotifyKind, id: string, url?: string | null): string {

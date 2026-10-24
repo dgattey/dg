@@ -238,6 +238,80 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* Top playlists */
+.stats__topPlaylists {
+  --meter: var(--ochre);
+}
+.stats__playlistGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 32px;
+  padding: 0;
+  margin: 20px 0 0;
+  list-style: none;
+}
+.stats__playlistItem {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  column-gap: 16px;
+  align-items: center;
+}
+.stats__playlistArtLink {
+  display: block;
+}
+.stats__playlistMat {
+  padding: 5px;
+  border-radius: 10px;
+  rotate: var(--r, 0deg);
+}
+.stats__playlistMat img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: cover;
+  border-radius: 6px;
+}
+.stats__playlistBody {
+  display: grid;
+  row-gap: 7px;
+  min-width: 0;
+}
+.stats__playlistHeader {
+  display: grid;
+  grid-template-columns: 28px minmax(0, 1fr) auto;
+  column-gap: 10px;
+  align-items: center;
+}
+.stats__playlistTitle {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.stats__playlistPlays {
+  font-size: var(--type-h3);
+}
+.stats__playlistMetaRow {
+  display: flex;
+  gap: 12px;
+  align-items: baseline;
+  justify-content: space-between;
+  min-width: 0;
+}
+.stats__playlistSub {
+  flex-shrink: 0;
+  font-size: var(--type-caption);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.stats__playlistTopTrack {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: var(--type-caption);
+  white-space: nowrap;
+}
+
 /* Timeline bars (Plays per year / month / day) */
 .stats__peak {
   font-weight: 700;
@@ -797,10 +871,12 @@
 }
 
 @media (max-width: 1000px) {
-  .stats__band {
+  .stats__band,
+  .stats__playlistGrid {
     grid-template-columns: minmax(0, 1fr);
   }
-  .stats__band > * {
+  .stats__band > *,
+  .stats__card:only-child {
     grid-column: auto;
   }
   .stats__band > :nth-child(2) {

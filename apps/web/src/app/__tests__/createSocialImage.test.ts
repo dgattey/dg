@@ -207,6 +207,7 @@ describe('createSocialImage', () => {
         },
       ],
       topArtists: [{ ...burna, months: 7, plays: 457, tracks: 161 }],
+      topPlaylists: [],
       topTracks: [],
       tracks: 4818,
       years: [
@@ -452,7 +453,6 @@ describe('createSocialImage', () => {
         url: 'https://saga.gattey.com',
       },
     ]);
-
     const { card } = await renderCard('site-map');
     expect(card.props).toMatchObject({
       agentSurfaceCount: 8,
@@ -465,11 +465,7 @@ describe('createSocialImage', () => {
   it('degrades gracefully when upstream loaders throw', async () => {
     jest.mocked(fetchListeningStats).mockRejectedValue(new Error('db down'));
     const { card } = await renderCard('music-stats');
-
-    expect(card.props).toMatchObject({
-      playsCompact: '0',
-      variant: 'music-stats',
-    });
+    expect(card.props).toMatchObject({ playsCompact: '0', variant: 'music-stats' });
   });
 
   it.each([
