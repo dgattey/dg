@@ -1,4 +1,5 @@
-import { generateSizesString } from '../Image';
+import { render, screen } from '@testing-library/react';
+import { generateSizesString, Image } from '../Image';
 
 describe('generateSizesString', () => {
   it('puts media conditions narrowest first and the fallback last, whatever the key order', () => {
@@ -26,5 +27,23 @@ describe('generateSizesString', () => {
 
   it('emits just the fallback when only extraLarge is given', () => {
     expect(generateSizesString({ extraLarge: 220 })).toBe('220px');
+  });
+});
+
+describe('Image', () => {
+  it('holds the declared ratio and crops, so non-square art still fills a square slot', () => {
+    render(
+      <Image
+        alt="Still Blessed"
+        height={34}
+        sizes={{ extraLarge: 34 }}
+        url="https://i.scdn.co/image/still-blessed"
+        width={34}
+      />,
+    );
+
+    const image = screen.getByRole('img', { name: 'Still Blessed' });
+    expect(image.style.aspectRatio).toBe('34 / 34');
+    expect(image.style.objectFit).toBe('cover');
   });
 });

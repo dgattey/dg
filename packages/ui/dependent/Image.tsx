@@ -94,14 +94,18 @@ type ImageProps = {
 };
 
 /**
- * All images need to be max width'd for our layouts
+ * All images need to be max width'd for our layouts. The declared ratio wins
+ * over the file's own, so a 16:9 upload in a square album slot crops instead of
+ * collapsing into a short strip.
  */
-const maxWidthImageStyle: CSSProperties = {
+const createMaxWidthImageStyle = (width: number, height: number): CSSProperties => ({
+  aspectRatio: `${width} / ${height}`,
   borderStyle: 'none',
   display: 'flex',
   height: 'auto',
   maxWidth: '100%',
-};
+  objectFit: 'cover',
+});
 
 /**
  * Cover mode: fills container and crops to fit, staying in document flow
@@ -164,6 +168,6 @@ export function Image({
     return <NextImage {...sharedProps} fill={true} />;
   }
 
-  const style = cover ? coverImageStyle : maxWidthImageStyle;
+  const style = cover ? coverImageStyle : createMaxWidthImageStyle(width, height);
   return <NextImage {...sharedProps} height={height} style={style} width={width} />;
 }

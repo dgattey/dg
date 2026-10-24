@@ -242,7 +242,7 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
  * Tooltips are ink chips on the collage. Paper sets its text to inherit, so the
  * surface names its own colors, inverted from the page in either scheme.
  */
-.collageRoot [data-tooltip-anchor] > [role="tooltip"] {
+.collageRoot :is([data-tooltip-anchor] > [role="tooltip"], [data-tooltip-portal]) {
   padding: 7px 12px 8px;
   font-family: var(--display);
   font-size: var(--type-meta);

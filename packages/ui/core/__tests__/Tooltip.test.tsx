@@ -102,29 +102,80 @@ describe('Tooltip', () => {
     expect(screen.getByRole('tooltip', { hidden: true })).toBeInTheDocument();
   });
 
-  it('shifts inline to stay inset from the viewport edge', async () => {
-    const user = userEvent.setup();
+  describe('once hydrated', () => {
+    const floatingSurface = () => document.querySelector<HTMLElement>('[data-tooltip-portal]');
 
-    render(
-      <Tooltip title="Near the edge">
-        <button type="button">Trigger</button>
-      </Tooltip>,
-    );
+    /** Trigger rect for the anchor, and a 120×30 floating surface. */
+    const mockRects = (anchor: HTMLElement, trigger: Partial<DOMRect>) => {
+      const measure = HTMLElement.prototype.getBoundingClientRect;
+      jest.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (
+        this: HTMLElement,
+      ) {
+        if (this === anchor) {
+          return trigger as DOMRect;
+        }
+        if (this.hasAttribute('data-tooltip-portal')) {
+          return { height: 30, width: 120 } as DOMRect;
+        }
+        return measure.call(this);
+      });
+    };
 
-    const tooltip = screen.getByRole('tooltip', { hidden: true });
-    const anchor = screen.getByRole('button', { name: 'Trigger' }).parentElement;
-    if (!anchor) {
-      throw new Error('Tooltip anchor not found');
-    }
-    jest.spyOn(tooltip, 'getBoundingClientRect').mockReturnValue({
-      left: window.innerWidth - 108,
-      right: window.innerWidth + 12,
-      width: 120,
-    } as DOMRect);
+    afterEach(() => jest.restoreAllMocks());
 
-    await user.hover(anchor);
+    it('floats in the tooltip root, outside every card, clamped inside the viewport', async () => {
+      const user = userEvent.setup();
+      render(
+        <div data-testid="root" data-tooltip-root>
+          <div style={{ filter: 'drop-shadow(0 0 1px black)', rotate: '2deg' }}>
+            <Tooltip title="Near the edge">
+              <button type="button">Trigger</button>
+            </Tooltip>
+          </div>
+        </div>,
+      );
+      const anchor = screen.getByRole('button', { name: 'Trigger' }).parentElement;
+      if (!anchor) {
+        throw new Error('Tooltip anchor not found');
+      }
+      mockRects(anchor, { bottom: 40, left: window.innerWidth - 30, top: 20, width: 20 });
 
-    expect(tooltip.style.translate).toBe('-20px');
+      await user.hover(anchor);
+
+      const surface = floatingSurface();
+      expect(surface).toHaveTextContent('Near the edge');
+      expect(surface?.parentElement).toBe(screen.getByTestId('root'));
+      expect(surface).toHaveAttribute('aria-hidden', 'true');
+      expect(surface?.style.left).toBe(`${window.innerWidth - 12 - 120}px`);
+      expect(surface?.style.top).toBe('48px');
+      expect(anchor).toHaveAttribute('data-tooltip-floating');
+
+      await user.unhover(anchor);
+      expect(floatingSurface()).toBeNull();
+    });
+
+    it('falls back to the body and flips above a trigger at the bottom of the viewport', async () => {
+      const user = userEvent.setup();
+      render(
+        <Tooltip title="Hint">
+          <button type="button">Trigger</button>
+        </Tooltip>,
+      );
+      const anchor = screen.getByRole('button', { name: 'Trigger' }).parentElement;
+      if (!anchor) {
+        throw new Error('Tooltip anchor not found');
+      }
+      const bottom = window.innerHeight - 4;
+      mockRects(anchor, { bottom, left: 0, top: bottom - 20, width: 40 });
+
+      await user.hover(anchor);
+
+      const surface = floatingSurface();
+      expect(surface?.parentElement).toBe(document.body);
+      expect(surface).toHaveAttribute('data-placement', 'top');
+      expect(surface?.style.top).toBe(`${bottom - 20 - 8 - 30}px`);
+      expect(surface?.style.left).toBe('12px');
+    });
   });
 
   describe('whenTruncated', () => {
@@ -183,6 +234,7 @@ describe('Tooltip', () => {
 
       expect(link).toHaveFocus();
       expect(anchor).not.toHaveAttribute('data-tooltip-muted');
+      expect(document.querySelector('[data-tooltip-portal]')).toHaveTextContent('Together');
     });
 
     it('leaves the trigger undescribed, since it already holds the full text', () => {
