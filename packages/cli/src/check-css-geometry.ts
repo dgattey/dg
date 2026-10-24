@@ -90,31 +90,75 @@ function overrideFits(override: GridOverride, baseColumns: string, baseGap: numb
   return gap !== null && (trackCount(columns) - 1) * gap <= NARROWEST_GRID_PX;
 }
 
+function sealPaddingClearsRing(pad: string): boolean {
+  const pct = /^(\d+(?:\.\d+)?)%$/.exec(pad);
+  if (pct) return Number(pct[1]) >= 20;
+  const [a, b] = [...pad.matchAll(/\*\s*(0\.\d+)/g)].map((m) => Number(m[1]));
+  return (
+    pad.includes('--ring-inset') &&
+    a !== undefined &&
+    a <= 0.8 &&
+    (b === undefined ? a <= 0.71 : b <= 0.8 && Math.hypot(a, b) <= 1.001)
+  );
+}
+
 /**
- * Seal text clears the dashed ring only because `.stats__scallop--seal` derives its
- * padding from the ring inset, and sticker text clears the teeth through the sticker's
- * padding. A per-instance padding on a scallop silently undoes that geometry.
+ * Seal text clears the dashed ring only when `.stats__scallop--seal` pads to the box
+ * inscribed in the ring, 3-part stat seals stay at least 184px wide so wrapped lines do not
+ * spill vertically into narrow polar chords, and no per-instance rule overrides scallop padding.
  */
 export function checkScallopPadding(
   cssFiles: ReadonlyMap<string, string>,
 ): Array<StructureViolation> {
   const owners = new Set(['.stats__scallop--seal', '.stats__scallop--sticker']);
+  const statSeals = new Set(['.stats__pocketSeal', '.strava__totalClimb', '.streets__seal']);
   const violations: Array<StructureViolation> = [];
   for (const [file, content] of cssFiles) {
     for (const rule of cssRules(content)) {
+      const line = lineAt(content, rule.index);
+      const flag = (message: string) =>
+        violations.push({ file, line, message, rule: 'css-scallop-padding' });
+      const pad = declaration(rule.body, 'padding');
+      if (rule.selectors.includes('.stats__scallop--seal') && pad && !sealPaddingClearsRing(pad)) {
+        flag(
+          'Seal padding must clear the inscribed square of the circular ring (use the 0.7071 ring-inset projection or >= 20%), not cardinal ring-inset + 2px',
+        );
+      }
+      const stickerPct = /^(\d+(?:\.\d+)?)%$/.exec(pad ?? '');
+      if (
+        rule.selectors.includes('.stats__scallop--sticker') &&
+        pad &&
+        (!stickerPct || Number(stickerPct[1]) < 14)
+      ) {
+        flag('Sticker padding must be at least 14% to clear the scallop valleys');
+      }
+      if (!rule.media) {
+        for (const selector of rule.selectors.filter((s) => statSeals.has(s))) {
+          const px = /(\d+(?:\.\d+)?)px/.exec(declaration(rule.body, 'width') ?? '');
+          if (px && Number(px[1]) < 184) {
+            flag(
+              `Stat seal \`${selector}\` needs at least 184px width (${px[1]}px given) so wrapped lines stay inside the circular ring chord`,
+            );
+          }
+        }
+      }
+      if (
+        rule.selectors.some((s) => /\.stats__scallop/.test(s)) &&
+        /--type-(?:title-lg|display|h1)\b/.test(rule.body)
+      ) {
+        flag(
+          'Seal and sticker text must use --type-title-md or smaller so multi-line stacks stay inside the circular ring chord',
+        );
+      }
       const scallop = rule.selectors.some(
         (selector) =>
           !owners.has(selector) &&
           /\.stats__scallop(?![\w-]*::?)/.test(selector.split(/[\s>+~]+/).at(-1) ?? ''),
       );
       if (scallop && /(?:^|[;\s])padding(?:-[a-z]+)?\s*:/.test(rule.body)) {
-        violations.push({
-          file,
-          line: lineAt(content, rule.index),
-          message:
-            'Size the seal or sticker instead of overriding scallop padding, which keeps text inside the ring',
-          rule: 'css-scallop-padding',
-        });
+        flag(
+          'Size the seal or sticker instead of overriding scallop padding, which keeps text inside the ring',
+        );
       }
     }
   }

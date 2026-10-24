@@ -60,7 +60,7 @@
 }
 .strava__sport {
   display: inline-flex;
-  padding: 3px 8px 4px;
+  padding: 4px 9px 5px;
   font-family: var(--display);
   font-size: var(--type-body);
   font-weight: 700;

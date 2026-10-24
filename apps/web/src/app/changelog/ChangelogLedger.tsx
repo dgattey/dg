@@ -5,25 +5,35 @@ import { startTransition, useState } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { type PaperPillOption, PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
+import { YearMenu } from '../collage/YearMenu';
 import { Scallop, Stub } from '../music/stats/StatsShapes';
 import { ChangelogReleaseCard } from './ChangelogReleaseCard';
 import {
+  extractReleaseYear,
   filterReleases,
   formatReleaseDate,
   groupReleasesByYear,
   RELEASE_KIND_LABELS,
+  type ReleaseFilter,
   type ReleaseFilterKey,
   yearTagTreatment,
 } from './changelogHelpers';
 
 export function ChangelogLedger({ releases }: { releases: ReadonlyArray<ChangelogRelease> }) {
-  const [selectedFilter, setSelectedFilter] = useState<ReleaseFilterKey>('all');
+  const [selectedFilter, setSelectedFilter] = useState<ReleaseFilter>('all');
 
   const latestRelease = releases[0];
   const oldestRelease = releases.at(-1);
   const majorCount = releases.filter((r) => r.kind === 'major').length;
   const minorCount = releases.filter((r) => r.kind === 'minor').length;
   const patchCount = releases.filter((r) => r.kind === 'patch').length;
+  const availableYears = [
+    ...new Set(
+      releases
+        .map((release) => Number(extractReleaseYear(release)))
+        .filter((year) => Number.isFinite(year)),
+    ),
+  ].sort((a, b) => b - a);
 
   const filterOptions: Array<PaperPillOption<ReleaseFilterKey>> = [
     {
@@ -35,6 +45,19 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
       ),
       tiltDeg: -1.5,
     },
+    ...(majorCount > 0
+      ? [
+          {
+            key: 'major' as const,
+            label: (
+              <>
+                Major <small>{majorCount}</small>
+              </>
+            ),
+            tiltDeg: 1.8,
+          },
+        ]
+      : []),
     {
       key: 'minor',
       label: (
@@ -53,19 +76,6 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
       ),
       tiltDeg: -1,
     },
-    ...(majorCount > 0
-      ? [
-          {
-            key: 'major' as const,
-            label: (
-              <>
-                Major <small>{majorCount}</small>
-              </>
-            ),
-            tiltDeg: 1.8,
-          },
-        ]
-      : []),
   ];
 
   const filtered = filterReleases(releases, selectedFilter);
@@ -92,7 +102,7 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
         </li>
         <li>
           <Stub className="stats__total" kind="stamp" tiltDeg={2.2} tone="cream">
-            <span className="changelog__statKey">Minor &amp; major</span>
+            <span className="changelog__statKey">Major &amp; minor</span>
             <span className="changelog__statValue">{majorCount + minorCount}</span>
             <span className="changelog__statSub">
               {majorCount} major · {minorCount} minor
@@ -101,9 +111,8 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
         </li>
         <li>
           <Stub className="stats__total" kind="ticket" tiltDeg={-1.6} tone="viridian">
-            <span className="changelog__statKey">First tagged</span>
-            <span className="changelog__statValue">{oldestRelease?.tag ?? 'v1.21.5'}</span>
-            <span className="changelog__statSub">
+            <span className="changelog__statKey">First release</span>
+            <span className="changelog__statValue">
               {formatReleaseDate(oldestRelease?.publishedAt ?? null) ?? 'Earliest release'}
             </span>
           </Stub>
@@ -120,22 +129,20 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
             });
           }}
           options={filterOptions}
-          selected={selectedFilter}
-        />
-        {yearGroups.length > 1 ? (
-          <nav aria-label="Jump to release year" className="changelog__yearNav">
-            {yearGroups.map((group, idx) => (
-              <a
-                className="changelog__yearJump"
-                href={`#year-${group.year}`}
-                key={group.year}
-                style={{ rotate: `${idx % 2 === 0 ? -1.5 : 1.5}deg` }}
-              >
-                {group.year} <small>{group.totalCount}</small>
-              </a>
-            ))}
-          </nav>
-        ) : null}
+          selected={typeof selectedFilter === 'number' ? null : selectedFilter}
+        >
+          {availableYears.length > 1 ? (
+            <YearMenu
+              onPick={(year) => {
+                startTransition(() => {
+                  setSelectedFilter(year);
+                });
+              }}
+              selected={typeof selectedFilter === 'number' ? selectedFilter : null}
+              years={availableYears}
+            />
+          ) : null}
+        </PaperPills>
       </div>
 
       <div className="changelog__years">
