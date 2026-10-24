@@ -2,6 +2,7 @@ import 'server-only';
 
 import { fetchMusicHistoryPage } from '@dg/services/spotify/fetchMusicHistoryPage';
 import { cacheLife, cacheTag } from 'next/cache';
+import './oauthTokenCache';
 
 const MUSIC_HISTORY_TAG = 'music-history';
 const MUSIC_HISTORY_PAGE_SIZE = 24;
@@ -27,7 +28,7 @@ export async function getMusicHistory({
   before,
 }: MusicHistoryOptions): Promise<MusicHistoryResult> {
   'use cache';
-  cacheLife('weeks');
+  cacheLife('max');
   cacheTag(MUSIC_HISTORY_TAG);
 
   return await fetchMusicHistoryPage({

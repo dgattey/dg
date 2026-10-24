@@ -2,6 +2,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { checkCacheTagParity } from './check-cache-tags.js';
 import {
   checkOrphanCssFiles,
   checkRouteCssImports,
@@ -26,7 +27,6 @@ const BANNED_GENERIC_COMPONENT_FILENAMES: ReadonlySet<string> = new Set([
 ]);
 
 const NON_PUBLIC_PAGE_ROUTES: ReadonlySet<string> = new Set([
-  'apps/web/src/app/[...rest]/page.tsx',
   'apps/web/src/app/dev-console/page.tsx',
 ]);
 
@@ -319,6 +319,7 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
   violations.push(...checkOrphanCssFiles(webCssPaths, webImporters));
   violations.push(...checkRouteCssImports(webCssPaths, webSources));
   violations.push(...checkSocialImageRouteParity(webSources));
+  violations.push(...checkCacheTagParity(webSources));
   violations.push(...checkTypeScale(webCss));
   violations.push(...checkScallopPadding(webCss));
   violations.push(...checkGridGapsFit(webCss));

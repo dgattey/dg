@@ -3,16 +3,12 @@ import 'server-only';
 import { fetchAlbumDetail } from '@dg/services/spotify/fetchAlbumDetail';
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { log } from '@dg/shared-core/logging/log';
-import { cacheLife, cacheTag } from 'next/cache';
+import { cacheLife } from 'next/cache';
 import './oauthTokenCache';
-
-const ALBUM_DETAIL_TAG = 'album-detail';
 
 async function getAlbumDetailCached(albumId: string) {
   'use cache';
   cacheLife('weeks');
-  cacheTag(ALBUM_DETAIL_TAG);
-  cacheTag(`${ALBUM_DETAIL_TAG}-${albumId}`);
   return await fetchAlbumDetail(albumId);
 }
 

@@ -43,7 +43,7 @@ export const getLatestSong = async (): Promise<Track | null> => {
 
 export const getLastKnownSong = async () => {
   'use cache';
-  cacheLife('weeks');
+  cacheLife('max');
   cacheTag(LATEST_SONG_TAG);
   if (process.env.NODE_ENV !== 'test' && !process.env.SPOTIFY_CLIENT_ID) {
     return null;

@@ -211,8 +211,8 @@ export function checkRouteCssImports(
   cssPaths: ReadonlyArray<string>,
   sourceFiles: ReadonlyMap<string, string>,
 ): Array<StructureViolation> {
-  const pageEntries = [...sourceFiles.keys()].filter(
-    (file) => /^apps\/web\/src\/app\/(?:.*\/)?page\.tsx$/.test(file) && !file.includes('[...rest]'),
+  const pageEntries = [...sourceFiles.keys()].filter((file) =>
+    /^apps\/web\/src\/app\/(?:.*\/)?page\.tsx$/.test(file),
   );
   const importsByFile = new Map<string, ReadonlySet<string>>();
   for (const [file, content] of sourceFiles) {

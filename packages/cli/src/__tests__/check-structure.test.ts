@@ -2,6 +2,7 @@ import assert from 'node:assert/strict';
 import path from 'node:path';
 import { describe, it } from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { checkCacheTagParity } from '../check-cache-tags.js';
 import {
   checkOrphanCssFiles,
   checkRouteCssImports,
@@ -132,7 +133,6 @@ describe('check-structure', () => {
         ['apps/web/src/app/reading/page.tsx', 'export default function Reading() {}\n'],
         ['apps/web/src/app/reading/opengraph-image.tsx', 'export default function Og() {}\n'],
         ['apps/web/src/app/dev-console/page.tsx', 'export default function DevConsole() {}\n'],
-        ['apps/web/src/app/[...rest]/page.tsx', 'export default function CatchAll() {}\n'],
       ]),
     );
     assert.deepEqual(routeMissingSocialImages, [
@@ -144,6 +144,26 @@ describe('check-structure', () => {
         rule: 'og-image-route-parity',
       },
     ]);
+
+    const cacheTagViolations = checkCacheTagParity(
+      new Map([
+        [
+          'apps/web/src/services/orphanMax.ts',
+          "import { cacheLife, cacheTag } from 'next/cache';\nconst ORPHAN_TAG = 'orphan-tag';\nexport async function getOrphan() {\n  'use cache';\n  cacheLife('max');\n  cacheTag(ORPHAN_TAG);\n  return 1;\n}\n",
+        ],
+        [
+          'apps/web/src/app/api/sync/route.ts',
+          "import { revalidateTag } from 'next/cache';\nexport function POST() {\n  revalidateTag('typo-tag', 'max');\n}\n",
+        ],
+      ]),
+    );
+    assert.deepEqual(
+      cacheTagViolations.map(({ file, line, rule }) => ({ file, line, rule })),
+      [
+        { file: 'apps/web/src/services/orphanMax.ts', line: 6, rule: 'cache-tag-parity' },
+        { file: 'apps/web/src/app/api/sync/route.ts', line: 3, rule: 'cache-tag-parity' },
+      ],
+    );
 
     const unusedCssViolations = checkUnusedCssRules(
       new Map([

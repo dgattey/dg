@@ -69,7 +69,7 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
       })
     : null;
 
-  if (favoriteAlbums?.changed) {
+  if (forceFavoriteAlbums || favoriteAlbums?.changed) {
     revalidateTag('favorite-albums', 'max');
     revalidateTag('music-stats', 'max');
   }
@@ -86,7 +86,7 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
     };
   }
 
-  if (result.inserted > 0 || result.total > 0) {
+  if (forceFavoriteAlbums || result.inserted > 0 || result.total > 0) {
     revalidateTag('music-history', 'max');
     revalidateTag('music-stats', 'max');
     revalidateTag('latest-song', 'max');

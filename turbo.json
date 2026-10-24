@@ -132,7 +132,13 @@
     "spotify:import": {
       "cache": false,
       "dependsOn": ["env", "^migrate"],
-      "env": ["DATABASE_URL", "SPOTIFY_CLIENT_ID", "SPOTIFY_CLIENT_SECRET"]
+      "env": [
+        "CRON_SECRET",
+        "DATABASE_URL",
+        "SITE_URL",
+        "SPOTIFY_CLIENT_ID",
+        "SPOTIFY_CLIENT_SECRET"
+      ]
     },
     "strava:backfill": {
       "cache": false,

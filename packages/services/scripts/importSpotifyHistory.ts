@@ -144,6 +144,25 @@ const merged = mergeParsedHistories(parsedFiles);
 const outcome = await importSpotifyHistoryEntries(merged, options);
 await closeDbConnection();
 
+const cronSecret = process.env.CRON_SECRET?.trim();
+if (outcome.imported > 0 && !options.dryRun && cronSecret) {
+  const siteOrigin = process.env.SITE_URL?.trim() || 'https://dylangattey.com';
+  try {
+    const syncResponse = await fetch(
+      `${siteOrigin.replace(/\/$/, '')}/api/spotify/sync?force=true`,
+      {
+        cache: 'no-store',
+        headers: { Authorization: `Bearer ${cronSecret}` },
+      },
+    );
+    log.info('Triggered remote Spotify cache revalidation after import', {
+      status: syncResponse.status,
+    });
+  } catch (error) {
+    log.warn('Could not trigger remote Spotify cache revalidation after import', { error });
+  }
+}
+
 log.info('Spotify history import finished', {
   ...outcome,
   dryRun: Boolean(options.dryRun),

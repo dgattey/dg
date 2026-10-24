@@ -8,7 +8,6 @@ import {
 import { cacheLife, cacheTag, revalidateTag } from 'next/cache';
 
 const OAUTH_TOKEN_TAG = 'oauth-token';
-const oauthProviderTokenTag = (name: string) => `oauth-token-${name}`;
 
 type SerializedTokenRecord = {
   accessToken: string | null;
@@ -18,9 +17,8 @@ type SerializedTokenRecord = {
 
 async function readRemoteCachedTokenRecord(name: string): Promise<SerializedTokenRecord> {
   'use cache: remote';
-  cacheLife('weeks');
+  cacheLife('max');
   cacheTag(OAUTH_TOKEN_TAG);
-  cacheTag(oauthProviderTokenTag(name));
   const record = await readStoredTokenFromDb(name);
   return {
     accessToken: record.accessToken,
@@ -39,10 +37,9 @@ export async function getCachedTokenRecord(name: string): Promise<StoredTokenRec
 }
 
 registerTokenCacheHooks({
-  onTokenUpdated: (name) => {
+  onTokenUpdated: () => {
     try {
       revalidateTag(OAUTH_TOKEN_TAG, 'max');
-      revalidateTag(oauthProviderTokenTag(name), 'max');
     } catch {}
   },
   readToken: getCachedTokenRecord,

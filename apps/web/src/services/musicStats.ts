@@ -7,12 +7,13 @@ import {
   type StatsRangeKey,
 } from '@dg/services/spotify/fetchListeningStats';
 import { cacheLife, cacheTag } from 'next/cache';
+import './oauthTokenCache';
 
 const MUSIC_STATS_TAG = 'music-stats';
 
 async function getCachedAllTimeStats(): Promise<ListeningStats | null> {
   'use cache';
-  cacheLife('weeks');
+  cacheLife('max');
   cacheTag(MUSIC_STATS_TAG);
   return await fetchListeningStats({ kind: 'all' });
 }
@@ -22,7 +23,7 @@ async function getCachedRangeStats(
   knownYears?: Array<{ plays: number; year: number }>,
 ): Promise<ListeningStats | null> {
   'use cache';
-  cacheLife('weeks');
+  cacheLife('max');
   cacheTag(MUSIC_STATS_TAG);
   return await fetchListeningStats(parseStatsRange(rangeKey), { knownYears });
 }

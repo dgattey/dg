@@ -1,6 +1,7 @@
 import { completeOauthFlow } from '@dg/services/oauth/completeOauthFlow';
 import { initiateOauthFlow } from '@dg/services/oauth/initiateOauthFlow';
 import { type NextRequest, NextResponse } from 'next/server';
+import '../../../services/oauthTokenCache';
 import { jsonError, redirectToConsole, requireDevConsoleBasicAuth } from '../apiResponses';
 
 async function handleOauthInit(request: NextRequest): Promise<NextResponse> {

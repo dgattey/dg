@@ -2,18 +2,11 @@ import {
   hasDevConsoleCredentials,
   isDevConsoleAccessAllowed,
 } from '@dg/services/auth/devConsoleBasicAuth';
-import {
-  devConsoleRoute,
-  homeRoute,
-  isMarkdownPagePath,
-  markdownPathToHtmlPath,
-} from '@dg/shared-core/routes/app';
+import { devConsoleRoute, homeRoute } from '@dg/shared-core/routes/app';
 import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { isNextFlightRequest } from './services/isNextFlightRequest';
 import { negotiateMarkdown } from './services/markdown/contentNegotiation';
-
-const NOT_FOUND_PATH = '/not-found';
 
 function protectDevConsole(request: NextRequest): NextResponse | null {
   if (!request.nextUrl.pathname.startsWith(devConsoleRoute)) {
@@ -44,28 +37,8 @@ function protectDevConsole(request: NextRequest): NextResponse | null {
   });
 }
 
-function rewriteUnknownPathToNotFound(request: NextRequest): NextResponse | null {
-  const { pathname } = request.nextUrl;
-  if (
-    pathname === NOT_FOUND_PATH ||
-    pathname.startsWith(devConsoleRoute) ||
-    isMarkdownPagePath(pathname) ||
-    markdownPathToHtmlPath(pathname) !== null
-  ) {
-    return null;
-  }
-  const notFoundUrl = request.nextUrl.clone();
-  notFoundUrl.pathname = NOT_FOUND_PATH;
-  return NextResponse.rewrite(notFoundUrl);
-}
-
 export function proxy(request: NextRequest): NextResponse {
-  return (
-    protectDevConsole(request) ??
-    negotiateMarkdown(request) ??
-    rewriteUnknownPathToNotFound(request) ??
-    NextResponse.next()
-  );
+  return protectDevConsole(request) ?? negotiateMarkdown(request) ?? NextResponse.next();
 }
 
 export const config = {

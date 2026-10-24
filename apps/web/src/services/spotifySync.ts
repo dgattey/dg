@@ -39,7 +39,7 @@ export function resetSpotifySyncStateForTests(): void {
 
 async function readCachedLatestPlayedAtIso(): Promise<string | null> {
   'use cache: remote';
-  cacheLife('weeks');
+  cacheLife('max');
   cacheTag(MUSIC_HISTORY_TAG);
   cacheTag(LATEST_SONG_TAG);
   const latest = await getLatestPlayedAt();

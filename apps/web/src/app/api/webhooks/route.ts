@@ -3,6 +3,7 @@ import { processStravaWebhookEvent } from '@dg/services/strava/webhooks/processS
 import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
+import '../../../services/oauthTokenCache';
 import { jsonError } from '../apiResponses';
 
 const isStravaChallengeRequest = (query: URLSearchParams) =>
