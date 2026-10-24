@@ -562,25 +562,22 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   gap: 8px 18px;
   align-items: center;
 }
-.chrome__colophonVersion {
+.chrome__colophonVersion,
+.chrome__colophonLink {
   color: inherit;
-  text-decoration: underline;
-  text-decoration-color: color-mix(in oklab, var(--cream) 42%, transparent);
+  text-decoration: none;
   text-underline-offset: 4px;
   transition: color 0.18s ease;
 }
 .chrome__colophonVersion:hover,
 .chrome__colophonVersion:focus-visible {
   color: var(--ochre);
-}
-.chrome__colophonLink {
-  color: inherit;
-  text-decoration: none;
-  transition: color 0.18s ease;
+  text-decoration: underline;
 }
 .chrome__colophonLink:hover,
 .chrome__colophonLink:focus-visible {
   color: var(--cream);
+  text-decoration: underline;
 }
 
 @media (max-width: 1024px) {
