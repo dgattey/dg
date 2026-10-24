@@ -46,6 +46,14 @@ const SAMPLE_RELEASES: ReadonlyArray<ChangelogRelease> = [
     patch: 23,
     prNumbers: [],
     publishedAt: '2023-12-30T10:04:33Z',
+    snapshot: {
+      caption: 'The collage before the rewrite.',
+      height: 900,
+      tag: 'v2.46.23',
+      title: 'December collage',
+      url: 'https://images.ctfassets.net/example/changelog-v2.46.23.webp',
+      width: 1200,
+    },
     tag: 'v2.46.23',
     version: '2.46.23',
   },
@@ -94,5 +102,16 @@ describe('ChangelogLedger', () => {
     await user.click(screen.getByRole('button', { name: '2021' }));
     expect(screen.getByText('v2.0.0')).toBeInTheDocument();
     expect(screen.queryByText('v2.80.0')).not.toBeInTheDocument();
+  });
+
+  it('renders a snapshot polaroid and keeps that release out of the compact ledger', () => {
+    render(<ChangelogLedger releases={SAMPLE_RELEASES} />);
+
+    const photo = screen.getByRole('img', { name: 'v2.46.23 — December collage' });
+    expect(photo).toHaveAttribute('src', expect.stringContaining('changelog-v2.46.23.webp'));
+    expect(screen.getByText('December collage')).toBeInTheDocument();
+    expect(screen.getByText('The collage before the rewrite.')).toBeInTheDocument();
+    expect(screen.queryByText('Tagged builds in 2023')).not.toBeInTheDocument();
+    expect(photo.closest('figure')).toHaveStyle({ rotate: '-2.1deg' });
   });
 });
