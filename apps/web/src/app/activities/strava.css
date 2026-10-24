@@ -57,6 +57,12 @@
   margin-inline-end: 0.45em;
   border-radius: 50%;
 }
+/* Phone pills drop the dot so two sports, a picked one in More, and the span share one row; the menu keeps them. */
+@media (max-width: 680px) {
+  .strava__filters .paperPill .strava__filterDot {
+    display: none;
+  }
+}
 
 .strava__atlas {
   display: grid;
@@ -946,46 +952,6 @@
 @media (max-width: 820px) {
   .strava__layout {
     grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-/*
- * Phones fill each row edge to edge on six tracks: thirds by default, halves
- * when there are two or four pills, and a 3 + 2 split for five. No pill is
- * ever left on a row of its own.
- */
-@media (max-width: 680px) {
-  .strava__filters {
-    gap: 8px;
-  }
-  .strava__filters > .paperPills {
-    display: grid;
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 8px;
-    width: 100%;
-  }
-  .strava__filters > .paperPills > * {
-    grid-column: span 2;
-  }
-  .strava__filters > .paperPills > :first-child:nth-last-child(-n + 2),
-  .strava__filters > .paperPills > :first-child:nth-last-child(-n + 2) ~ *,
-  .strava__filters > .paperPills > :first-child:nth-last-child(4),
-  .strava__filters > .paperPills > :first-child:nth-last-child(4) ~ *,
-  .strava__filters > .paperPills > :nth-child(4):nth-last-child(2),
-  .strava__filters > .paperPills > :nth-child(5):last-child {
-    grid-column: span 3;
-  }
-  .strava__filters .paperPill {
-    display: flex;
-    justify-content: center;
-  }
-  .strava__filters .paperPillButton {
-    padding: 10px 12px 11px;
-  }
-  .strava__spans .yearMenu__panel {
-    right: 0;
-    left: auto;
-    transform-origin: top right;
   }
 }
 

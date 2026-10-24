@@ -1,5 +1,3 @@
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import type { StravaLogEntry, StravaSport } from '@dg/content-models/strava/StravaHistory';
 import type { AtlasRegion } from '@dg/maps/atlasGeometry';
 import type { GeoBounds } from '@dg/maps/src/routeFrame';
@@ -7,8 +5,13 @@ import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StravaAtlas } from '../FilteredSections';
 import { RouteCountTag, StravaFilters } from '../StravaFilters';
+import { getDesktopButton } from './stravaFilterQueries';
 
-const stravaCss = readFileSync(join(__dirname, '..', 'strava.css'), 'utf8');
+/** The pills in a group, leaving out the phone menu that repeats the ones that fold away. */
+const pillsIn = (group: HTMLElement) =>
+  within(group)
+    .getAllByRole('button')
+    .filter((button) => !button.closest('.pillMenu'));
 
 const NOW = Date.parse('2026-10-22T15:00:00Z');
 const DAY_MS = 24 * 60 * 60 * 1000;
@@ -79,32 +82,57 @@ afterEach(() => {
 });
 
 describe('StravaFilters', () => {
-  it('starts on rides, with only the sports that have routes and all sports last', () => {
+  it('starts on rides, with only the sports that have routes in ride, ski, hike, run order and all sports last', () => {
     const { inkedTones } = renderFilters(outings);
 
-    expect(screen.getByRole('button', { name: 'Rides' })).toHaveAttribute('aria-pressed', 'true');
-    expect(screen.getByRole('button', { name: 'All time' })).toHaveAttribute(
-      'aria-pressed',
-      'true',
-    );
+    expect(getDesktopButton('Rides')).toHaveAttribute('aria-pressed', 'true');
+    expect(getDesktopButton('All time')).toHaveAttribute('aria-pressed', 'true');
     expect(screen.queryByRole('button', { name: 'Hikes' })).not.toBeInTheDocument();
-    expect(screen.getByRole('group', { name: 'Sport' }).textContent).toBe(
-      'RidesRunsSkiingAll sports',
-    );
+    expect(
+      pillsIn(screen.getByRole('group', { name: 'Sport' })).map((button) => button.textContent),
+    ).toEqual(['Rides', 'Skiing', 'Runs', 'All sports']);
     expect(inkedTones()).toEqual(['cobalt']);
     expect(screen.getByText('38 routes')).toBeInTheDocument();
+  });
+
+  it('folds the sports past the first two into a More menu that names the one picked from it', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const { inkedTones } = renderFilters(outings);
+    const moreSports = screen.getByRole('list', { name: 'More sports' });
+
+    expect(
+      within(moreSports)
+        .getAllByRole('button')
+        .map((option) => option.textContent),
+    ).toEqual(['Runs', 'All sports']);
+    expect(screen.getByText('More')).toBeInTheDocument();
+
+    await user.click(within(moreSports).getByRole('button', { name: 'Runs' }));
+    expect(screen.queryByText('More')).not.toBeInTheDocument();
+    expect(getDesktopButton('Runs')).toHaveAttribute('aria-pressed', 'true');
+    expect(inkedTones()).toEqual(['vermilion']);
+  });
+
+  it('names the picked span on the phone time menu', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    renderFilters(outings);
+    const spanMenu = screen.getByRole('list', { name: 'Time span' });
+
+    await user.click(within(spanMenu).getByRole('button', { name: 'This week' }));
+    expect(getDesktopButton('This week')).toHaveAttribute('aria-pressed', 'true');
+    expect(screen.getByText('Week')).toBeInTheDocument();
   });
 
   it('inks every type, or skiing alone in its own color', async () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const { inkedTones } = renderFilters(outings);
 
-    await user.click(screen.getByRole('button', { name: 'All sports' }));
+    await user.click(getDesktopButton('All sports'));
     expect(inkedTones()).toEqual(['cobalt', 'ochre', 'vermilion', 'rose']);
     expect(screen.getByText('54 routes')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Skiing' }));
-    expect(screen.getByRole('button', { name: 'Skiing' })).toHaveAttribute('aria-pressed', 'true');
+    await user.click(getDesktopButton('Skiing'));
+    expect(getDesktopButton('Skiing')).toHaveAttribute('aria-pressed', 'true');
     expect(inkedTones()).toEqual(['rose']);
     expect(screen.getByText('2 routes')).toBeInTheDocument();
   });
@@ -142,25 +170,22 @@ describe('StravaFilters', () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const { inkedTones } = renderFilters(outings);
 
-    await user.click(screen.getByRole('button', { name: 'All sports' }));
-    await user.click(screen.getByRole('button', { name: 'This week' }));
+    await user.click(getDesktopButton('All sports'));
+    await user.click(getDesktopButton('This week'));
     expect(inkedTones()).toEqual(['cobalt']);
     expect(screen.getByText('8 routes')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'This month' }));
+    await user.click(getDesktopButton('This month'));
     expect(inkedTones()).toEqual(['cobalt', 'ochre']);
     expect(screen.getByText('10 routes')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Runs' }));
+    await user.click(getDesktopButton('Runs'));
     expect(inkedTones()).toEqual([]);
     expect(screen.getByText('No routes')).toBeInTheDocument();
 
     await user.click(screen.getByText('Year'));
-    await user.click(screen.getByRole('button', { name: '2025', pressed: false }));
-    expect(screen.getByRole('button', { name: 'This month' })).toHaveAttribute(
-      'aria-pressed',
-      'false',
-    );
+    await user.click(getDesktopButton('2025', false));
+    expect(getDesktopButton('This month')).toHaveAttribute('aria-pressed', 'false');
     expect(inkedTones()).toEqual(['vermilion']);
     expect(screen.getByText('12 routes')).toBeInTheDocument();
   });
@@ -168,11 +193,13 @@ describe('StravaFilters', () => {
   it('offers every year with an outing, newest first', () => {
     renderFilters(outings);
 
-    expect(
-      within(screen.getByRole('list', { name: 'Select year' }))
-        .getAllByRole('button')
-        .map((option) => option.textContent),
-    ).toEqual(['2026', '2025']);
+    for (const yearGrid of screen.getAllByRole('list', { name: 'Select year' })) {
+      expect(
+        within(yearGrid)
+          .getAllByRole('button')
+          .map((option) => option.textContent),
+      ).toEqual(['2026', '2025']);
+    }
   });
 
   it('shows no sport pills or year picker when there is nothing to choose between', () => {
@@ -182,15 +209,6 @@ describe('StravaFilters', () => {
     expect(screen.queryByText('Year')).not.toBeInTheDocument();
     expect(inkedTones()).toEqual(['cobalt']);
     expect(screen.getByText('1 route')).toBeInTheDocument();
-  });
-
-  it('holds each pill set to one line, then splits phone rows so no pill sits alone', () => {
-    const phone = stravaCss.match(/@media \(max-width: 680px\) \{([\s\S]*?)\n\}/)?.[1] ?? '';
-
-    expect(stravaCss).toMatch(/\.strava__filters > \.paperPills \{\s*flex-wrap: nowrap;/);
-    expect(phone).toContain('grid-template-columns: repeat(6, minmax(0, 1fr));');
-    expect(phone).toContain('.strava__filters > .paperPills > :nth-child(4):nth-last-child(2)');
-    expect(phone).toContain('.strava__filters > .paperPills > :first-child:nth-last-child(4) ~ *');
   });
 
   it('keeps the year menu in the time span group', () => {

@@ -7,6 +7,7 @@ import userEvent from '@testing-library/user-event';
 import { StravaAtlas } from '../FilteredSections';
 import { StravaFilters } from '../StravaFilters';
 import { StreetCoverageSection } from '../StreetCoverageSection';
+import { getDesktopButton } from './stravaFilterQueries';
 
 const TWO_MILES = 2 * 1609.344;
 
@@ -172,7 +173,7 @@ describe('StreetCoverageSection', () => {
     const user = userEvent.setup();
     const { callouts, header } = renderSection();
 
-    await user.click(screen.getByRole('button', { name: 'Runs' }));
+    await user.click(getDesktopButton('Runs'));
     expect(header()).toBe('San Francisco2.1%0.5 of 24.0 mi');
     expect(callouts().getByText('Mission · 25.0%')).toBeInTheDocument();
     expect(callouts().getByText('1')).toBeInTheDocument();
@@ -190,9 +191,9 @@ describe('StreetCoverageSection', () => {
     );
     expect(land?.tagName).toBe('clipPath');
 
-    await user.click(screen.getByRole('button', { name: 'All sports' }));
+    await user.click(getDesktopButton('All sports'));
     expect(routes()).toHaveAttribute('d', 'M0 5l40 0M70 5l10 0');
-    await user.click(screen.getByRole('button', { name: 'Runs' }));
+    await user.click(getDesktopButton('Runs'));
     expect(routes()).toHaveAttribute('d', 'M70 5l10 0');
   });
 
@@ -200,7 +201,7 @@ describe('StreetCoverageSection', () => {
     const user = userEvent.setup();
     const { callouts, header } = renderSection();
 
-    await user.click(screen.getByRole('button', { name: 'This week' }));
+    await user.click(getDesktopButton('This week'));
     expect(header()).toBe('San Francisco0.0%0.0 of 24.0 mi');
     expect(callouts().queryByText(/Most ridden/)).not.toBeInTheDocument();
     expect(callouts().getByText('0')).toBeInTheDocument();
