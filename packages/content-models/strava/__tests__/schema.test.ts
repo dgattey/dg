@@ -1,5 +1,11 @@
 import { parse, safeParse } from 'valibot';
-import { mapStravaActivityFromApi, stravaActivityApiSchema } from '../StravaActivity';
+import {
+  mapStravaActivityFromApi,
+  STRAVA_ACTIVITY_FIELD_KINDS,
+  stravaActivityApiSchema,
+  stravaActivitySchema,
+  toCamelCaseKey,
+} from '../StravaActivity';
 import { stravaWebhookEventSchema, validateStravaWebhookEvent } from '../StravaWebhookEvent';
 
 describe('stravaActivityApiSchema', () => {
@@ -82,6 +88,29 @@ describe('stravaActivityApiSchema', () => {
 
     expect(parsed.success && parsed.output.end_latlng).toBeNull();
     expect(parsed.success && parsed.output.start_latlng).toEqual([37.77, -122.41]);
+  });
+
+  it('round-trips every field in STRAVA_ACTIVITY_FIELD_KINDS through mapStravaActivityFromApi and stravaActivitySchema', () => {
+    const sampleByKind = {
+      boolean: true,
+      latlng: [37.77, -122.41],
+      number: 42,
+      'number-required': 999,
+      string: '2026-10-24T00:00:00Z',
+      'string-required': 'Ride',
+    } as const;
+    const rawPayload = Object.fromEntries(
+      Object.entries(STRAVA_ACTIVITY_FIELD_KINDS).map(([key, kind]) => [key, sampleByKind[kind]]),
+    );
+
+    const apiParsed = parse(stravaActivityApiSchema, rawPayload);
+    const mapped = mapStravaActivityFromApi(apiParsed);
+    const storedParsed = parse(stravaActivitySchema, mapped);
+
+    for (const [snakeKey, kind] of Object.entries(STRAVA_ACTIVITY_FIELD_KINDS)) {
+      const camelKey = toCamelCaseKey(snakeKey);
+      expect(storedParsed[camelKey as keyof typeof storedParsed]).toEqual(sampleByKind[kind]);
+    }
   });
 });
 

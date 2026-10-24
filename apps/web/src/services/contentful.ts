@@ -9,8 +9,7 @@ import { fetchLinkByName } from '@dg/services/contentful/fetchLinkByName';
 import { fetchProjects } from '@dg/services/contentful/fetchProjects';
 import { fetchSideProjects } from '@dg/services/contentful/fetchSideProjects';
 import { cacheLife, cacheTag } from 'next/cache';
-
-const CONTENTFUL_TAG = 'contentful';
+import { CACHE_TAGS } from './cacheTags';
 
 /**
  * Shared Contentful cache life/tag. Each caller still owns its own `'use cache'`
@@ -19,7 +18,7 @@ const CONTENTFUL_TAG = 'contentful';
  */
 async function cachedContentful<T>(fn: () => Promise<T>): Promise<T> {
   cacheLife('max');
-  cacheTag(CONTENTFUL_TAG);
+  cacheTag(CACHE_TAGS.contentful);
   return await fn();
 }
 
@@ -63,7 +62,5 @@ export const getCurrentLocation = async () => {
 
 export const getBooks = async () => {
   'use cache';
-  cacheLife('max');
-  cacheTag(CONTENTFUL_TAG);
-  return await fetchBooks();
+  return await cachedContentful(fetchBooks);
 };

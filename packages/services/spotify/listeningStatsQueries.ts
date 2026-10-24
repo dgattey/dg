@@ -1,11 +1,11 @@
 import 'server-only';
 
 import { dbClient, QueryTypes } from '@dg/db';
+import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
 import * as v from 'valibot';
 
 /** Days, hours, and weeks are bucketed where the listening happened. */
-export const TIME_ZONE = 'America/Los_Angeles';
-const LOCAL_PLAYED_AT = `("playedAt" AT TIME ZONE '${TIME_ZONE}')`;
+const LOCAL_PLAYED_AT = `("playedAt" AT TIME ZONE '${SITE_TIME_ZONE}')`;
 
 /** A run of this many consecutive plays from one album counts as hearing it front to back. */
 export const ALBUM_SESSION_MIN_PLAYS = 5;
@@ -37,8 +37,8 @@ const andClause = (filter: SqlPlayFilter, alias?: string): string => {
 
 export function yearPlayFilter(year: number): SqlPlayFilter {
   const safeYear = Math.trunc(year);
-  const startExpr = `('${safeYear}-01-01 00:00:00'::timestamp AT TIME ZONE '${TIME_ZONE}')`;
-  const endExpr = `('${safeYear + 1}-01-01 00:00:00'::timestamp AT TIME ZONE '${TIME_ZONE}')`;
+  const startExpr = `('${safeYear}-01-01 00:00:00'::timestamp AT TIME ZONE '${SITE_TIME_ZONE}')`;
+  const endExpr = `('${safeYear + 1}-01-01 00:00:00'::timestamp AT TIME ZONE '${SITE_TIME_ZONE}')`;
   return {
     predicate: (alias) => {
       const col = columnRef(alias);
@@ -50,7 +50,7 @@ export function yearPlayFilter(year: number): SqlPlayFilter {
 export function rollingDaysPlayFilter(anchor: Date, days: number): SqlPlayFilter {
   const safeDays = Math.max(1, Math.trunc(days));
   const iso = anchor.toISOString();
-  const startExpr = `((('${iso}'::timestamptz AT TIME ZONE '${TIME_ZONE}')::date - ${safeDays - 1})::timestamp AT TIME ZONE '${TIME_ZONE}')`;
+  const startExpr = `((('${iso}'::timestamptz AT TIME ZONE '${SITE_TIME_ZONE}')::date - ${safeDays - 1})::timestamp AT TIME ZONE '${SITE_TIME_ZONE}')`;
   const endExpr = `'${iso}'::timestamptz`;
   return {
     predicate: (alias) => {
@@ -86,7 +86,7 @@ export function selectSummary(filter: SqlPlayFilter = ALL_TIME_FILTER) {
        bounds."firstPlayedAt",
        bounds."lastPlayedAt",
        (SELECT count(*)::int FROM (SELECT DISTINCT ${LOCAL_PLAYED_AT}::date FROM "SpotifyPlay" ${where}) d) AS "activeDays",
-       ((bounds."lastPlayedAt" AT TIME ZONE '${TIME_ZONE}')::date - (bounds."firstPlayedAt" AT TIME ZONE '${TIME_ZONE}')::date + 1)::int AS "spanDays"
+       ((bounds."lastPlayedAt" AT TIME ZONE '${SITE_TIME_ZONE}')::date - (bounds."firstPlayedAt" AT TIME ZONE '${SITE_TIME_ZONE}')::date + 1)::int AS "spanDays"
      FROM (
        SELECT min("playedAt") AS "firstPlayedAt", max("playedAt") AS "lastPlayedAt"
        FROM "SpotifyPlay" ${where}
@@ -283,7 +283,7 @@ export function selectArtistDepth(filter: SqlPlayFilter = ALL_TIME_FILTER) {
      )
      SELECT ta."artistId", ta.plays,
        count(DISTINCT p."trackId")::int AS tracks,
-       count(DISTINCT date_trunc('month', (p."playedAt" AT TIME ZONE '${TIME_ZONE}'))::date)::int AS months
+       count(DISTINCT date_trunc('month', (p."playedAt" AT TIME ZONE '${SITE_TIME_ZONE}'))::date)::int AS months
      FROM top_artists ta
      JOIN "SpotifyPlay" p ON p."artistIds" @> ARRAY[ta."artistId"]::varchar(64)[] ${andClause(filter, 'p')}
      GROUP BY ta."artistId", ta.plays

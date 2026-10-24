@@ -18,12 +18,29 @@ export function checkCacheTagParity(
   const revalidatedTags = new Set<string>();
   const maxCacheTagRefs: Array<{ file: string; line: number; tag: string }> = [];
   const revalidateTagRefs: Array<{ file: string; line: number; tag: string }> = [];
+  const sharedConstMap = new Map<string, string>();
 
   for (const [relPath, content] of sourceFiles) {
     if (isTestFile(relPath)) {
       continue;
     }
-    const constMap = new Map<string, string>();
+    const cacheTagsMatch = /\bCACHE_TAGS\s*=\s*\{([\s\S]*?)\}\s*as\s*const/.exec(content);
+    if (cacheTagsMatch?.[1]) {
+      for (const entry of cacheTagsMatch[1].matchAll(
+        /\b([A-Za-z_$][\w$]*)\s*:\s*['"]([^'"]+)['"]/g,
+      )) {
+        if (entry[1] && entry[2]) {
+          sharedConstMap.set(`CACHE_TAGS.${entry[1]}`, entry[2]);
+        }
+      }
+    }
+  }
+
+  for (const [relPath, content] of sourceFiles) {
+    if (isTestFile(relPath)) {
+      continue;
+    }
+    const constMap = new Map<string, string>(sharedConstMap);
     for (const match of content.matchAll(/\bconst\s+([A-Za-z_$][\w$]*)\s*=\s*['"]([^'"]+)['"]/g)) {
       if (match[1] && match[2]) {
         constMap.set(match[1], match[2]);

@@ -1,4 +1,5 @@
 import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
+import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
 import { groupAdjacentAlbumPlays } from './groupAdjacentAlbumPlays';
 
 export type TrackSection = {
@@ -8,25 +9,18 @@ export type TrackSection = {
   tracks: Array<HistoryTrack>;
 };
 
-/**
- * Sections follow Dylan's calendar, not the runtime's: the server renders in
- * UTC and the browser hydrates in the visitor's zone, and both must agree on
- * where "Today" ends.
- */
-const TIME_ZONE = 'America/Los_Angeles';
-
 const DAY_MS = 86_400_000;
 
 const calendarDateFormat = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
   month: 'numeric',
-  timeZone: TIME_ZONE,
+  timeZone: SITE_TIME_ZONE,
   year: 'numeric',
 });
 
 const monthYearFormat = new Intl.DateTimeFormat('en-US', {
   month: 'long',
-  timeZone: TIME_ZONE,
+  timeZone: SITE_TIME_ZONE,
   year: 'numeric',
 });
 

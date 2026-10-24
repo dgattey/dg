@@ -4,21 +4,18 @@ import type { StravaHistory } from '@dg/content-models/strava/StravaHistory';
 import { fetchLatestStravaActivityFromDb } from '@dg/services/strava/fetchLatestStravaActivityFromDb';
 import { fetchStravaHistoryFromDb } from '@dg/services/strava/fetchStravaHistoryFromDb';
 import { cacheLife, cacheTag } from 'next/cache';
-
-const LATEST_ACTIVITY_TAG = 'latest-activity';
-
-const STRAVA_HISTORY_TAG = 'strava-history';
+import { CACHE_TAGS } from './cacheTags';
 
 export const getLatestActivity = async () => {
   'use cache';
   cacheLife('max');
-  cacheTag(LATEST_ACTIVITY_TAG);
+  cacheTag(CACHE_TAGS.latestActivity);
   return await fetchLatestStravaActivityFromDb();
 };
 
 export const getStravaHistory = async (): Promise<StravaHistory | null> => {
   'use cache';
   cacheLife('max');
-  cacheTag(STRAVA_HISTORY_TAG);
+  cacheTag(CACHE_TAGS.stravaHistory);
   return await fetchStravaHistoryFromDb();
 };

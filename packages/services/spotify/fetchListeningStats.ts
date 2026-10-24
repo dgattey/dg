@@ -2,6 +2,7 @@ import 'server-only';
 
 import { db } from '@dg/db';
 import type { PeriodStatus } from '@dg/shared-core/dates/periodStatus';
+import type { StatsRange } from '@dg/shared-core/dates/statsRange';
 import { buildRangeBreakdowns } from './listeningStatsBreakdowns';
 import {
   mapCatalogSlices,
@@ -43,21 +44,6 @@ const TOP_ALBUMS = 3;
 const TOP_TRACKS = 6;
 const TOP_DEPTH_ARTISTS = 8;
 const ON_REPEAT_TRACKS = 6;
-
-export type StatsRange =
-  | { kind: 'all' }
-  | { kind: 'month' }
-  | { kind: 'week' }
-  | { kind: 'year'; year: number };
-
-export type StatsRangeKey = 'all' | 'month' | 'week' | `${number}`;
-
-export function parseStatsRange(raw?: string | null): StatsRange {
-  if (raw === 'week') return { kind: 'week' };
-  if (raw === 'month') return { kind: 'month' };
-  if (raw && /^(?:19|20)\d{2}$/.test(raw)) return { kind: 'year', year: Number(raw) };
-  return { kind: 'all' };
-}
 
 /** An album with its cover, flagged when it is one of the favorite albums so links open it there. */
 export type StatsAlbumRef = SpotifyLink & { imageUrl: string; isFavorite: boolean };

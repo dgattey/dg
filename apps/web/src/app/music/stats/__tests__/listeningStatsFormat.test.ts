@@ -1,3 +1,4 @@
+import { statsRangeKey } from '@dg/shared-core/dates/statsRange';
 import {
   DAY_PARTS,
   dayPartOf,
@@ -11,7 +12,6 @@ import {
   formatPercent,
   formatPlaysHeading,
   formatRangeSuffix,
-  formatStatsRangeKey,
   formatStreakTotal,
   formatYearTick,
   peakHours,
@@ -36,10 +36,10 @@ describe('formatPercent', () => {
 
 describe('range formatting', () => {
   it('formats range keys, suffixes, play headings, and streak labels', () => {
-    expect(formatStatsRangeKey({ kind: 'all' })).toBe('all');
-    expect(formatStatsRangeKey({ kind: 'week' })).toBe('week');
-    expect(formatStatsRangeKey({ kind: 'month' })).toBe('month');
-    expect(formatStatsRangeKey({ kind: 'year', year: 2024 })).toBe('2024');
+    expect(statsRangeKey({ kind: 'all' })).toBe('all');
+    expect(statsRangeKey({ kind: 'week' })).toBe('week');
+    expect(statsRangeKey({ kind: 'month' })).toBe('month');
+    expect(statsRangeKey({ kind: 'year', year: 2024 })).toBe('2024');
 
     expect(formatRangeSuffix({ kind: 'all' })).toBe('all time');
     expect(formatRangeSuffix({ kind: 'week' })).toBe('this week');

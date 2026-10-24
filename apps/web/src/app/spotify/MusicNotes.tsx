@@ -4,6 +4,7 @@ import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
 import { Music, Music2, Music3, Music4 } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import { pauseAnimationsOnScroll } from './useWaveformBounce';
 
 type NotesVariant = 'collage' | 'collageCompact';
 
@@ -31,7 +32,6 @@ type NotesConfig = {
 };
 
 const MUSIC_ICONS = [Music, Music2, Music3, Music4];
-const SCROLL_RESUME_DELAY_MS = 120;
 
 const NOTES_CONFIG: Record<NotesVariant, NotesConfig> = {
   collage: {
@@ -144,36 +144,7 @@ export function MusicNotes({ isPlaying, noteColor, variant = 'collage' }: MusicN
       animations.push(anim);
     }
 
-    let scrollTimer: number | undefined;
-    let pausedForScroll = false;
-    const onScroll = () => {
-      if (!pausedForScroll) {
-        pausedForScroll = true;
-        for (const anim of animations) {
-          anim.pause();
-        }
-      }
-      if (scrollTimer !== undefined) {
-        window.clearTimeout(scrollTimer);
-      }
-      scrollTimer = window.setTimeout(() => {
-        pausedForScroll = false;
-        for (const anim of animations) {
-          anim.play();
-        }
-      }, SCROLL_RESUME_DELAY_MS);
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (scrollTimer !== undefined) {
-        window.clearTimeout(scrollTimer);
-      }
-      for (const anim of animations) {
-        anim.cancel();
-      }
-    };
+    return pauseAnimationsOnScroll(animations);
   }, [isPlaying, config]);
 
   if (!isPlaying) {

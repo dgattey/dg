@@ -1,7 +1,10 @@
 import 'server-only';
 
-import { type PeriodStatus, periodStatus } from '@dg/shared-core/dates/periodStatus';
-import { TIME_ZONE } from './listeningStatsQueries';
+import {
+  type PeriodStatus,
+  periodStatus,
+  SITE_TIME_ZONE,
+} from '@dg/shared-core/dates/periodStatus';
 
 /** Hours in one of the day-and-shift matrix's shifts. */
 export const SHIFT_HOURS = 6;
@@ -14,7 +17,7 @@ const nowFormat = new Intl.DateTimeFormat('en-CA', {
   hour: '2-digit',
   hourCycle: 'h23',
   month: '2-digit',
-  timeZone: TIME_ZONE,
+  timeZone: SITE_TIME_ZONE,
   year: 'numeric',
 });
 
@@ -28,7 +31,7 @@ export function statsNow(latestPlayedAt: Date): StatsNow {
 }
 
 export function phaseOf(key: string, now: StatsNow): PeriodStatus {
-  return periodStatus(key, now.timestamp, TIME_ZONE);
+  return periodStatus(key, now.timestamp, SITE_TIME_ZONE);
 }
 
 export function shiftPhase(dayIso: string, startHour: number, now: StatsNow): PeriodStatus {

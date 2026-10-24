@@ -1,5 +1,5 @@
 import path from 'node:path';
-import { isTestFile, lineAt } from './check-page-titles.js';
+import { isTestFile, lineAt, stripCssComments } from './check-page-titles.js';
 import type { StructureViolation } from './check-structure.js';
 
 const CSS_IMPORT_PATTERN =
@@ -59,10 +59,7 @@ const TEMPLATE_CLASS_PREFIX = /([a-zA-Z_][a-zA-Z0-9_-]*)\$\{/g;
 const STATIC_JSX_CLASS_ATTR = /\b(?:className|innerClassName)\s*=\s*"([^"]+)"/g;
 
 function maskCssCommentsAndDeclarations(content: string): string {
-  const withoutComments = content.replace(/\/\*[\s\S]*?\*\//g, (match) =>
-    match.replace(/[^\n]/g, ' '),
-  );
-  return withoutComments
+  return stripCssComments(content)
     .replace(/"[^"\n]*"|'[^'\n]*'/g, (match) => ' '.repeat(match.length))
     .replace(/(?<=[{;\s])[a-zA-Z-]+\s*:[^;{}]+/g, (match) => match.replace(/[^\n]/g, ' '));
 }

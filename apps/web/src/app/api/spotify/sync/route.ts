@@ -5,6 +5,7 @@ import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 import { getFavoriteAlbums } from '../../../../services/albums';
+import { CACHE_TAGS } from '../../../../services/cacheTags';
 import {
   getCachedLatestPlayedAt,
   shouldRefreshFavoriteAlbums,
@@ -70,8 +71,8 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
     : null;
 
   if (forceFavoriteAlbums || favoriteAlbums?.changed) {
-    revalidateTag('favorite-albums', 'max');
-    revalidateTag('music-stats', 'max');
+    revalidateTag(CACHE_TAGS.favoriteAlbums, 'max');
+    revalidateTag(CACHE_TAGS.musicStats, 'max');
   }
 
   if (result.status === 'failed') {
@@ -87,9 +88,9 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
   }
 
   if (forceFavoriteAlbums || result.inserted > 0 || result.total > 0) {
-    revalidateTag('music-history', 'max');
-    revalidateTag('music-stats', 'max');
-    revalidateTag('latest-song', 'max');
+    revalidateTag(CACHE_TAGS.musicHistory, 'max');
+    revalidateTag(CACHE_TAGS.musicStats, 'max');
+    revalidateTag(CACHE_TAGS.latestSong, 'max');
   }
 
   return {

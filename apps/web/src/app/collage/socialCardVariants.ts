@@ -7,6 +7,7 @@ import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import type { ChangelogRelease } from '@dg/services/github/fetchReleases';
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import type { HistoryTrack } from '@dg/services/spotify/fetchMusicHistoryPage';
+import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
 import {
   formatReleaseDate,
   RELEASE_KIND_LABELS,
@@ -26,7 +27,7 @@ import { type HomeCardVariant, PORTRAIT } from './SocialCard';
 import { splitIntroDocument } from './splitIntroDocument';
 
 const PACIFIC_YEAR_FORMAT = new Intl.DateTimeFormat('en-US', {
-  timeZone: 'America/Los_Angeles',
+  timeZone: SITE_TIME_ZONE,
   year: 'numeric',
 });
 

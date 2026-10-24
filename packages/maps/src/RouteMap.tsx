@@ -3,45 +3,12 @@
 import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
 import { COLOR_SCHEME_ATTRIBUTE } from '@dg/ui/theme/colorScheme';
-import type { TileComponentProps } from 'pigeon-maps';
 import { Map as PigeonMapCore } from 'pigeon-maps';
-import { type CSSProperties, useEffect, useRef, useState } from 'react';
+import { useRef } from 'react';
 import type { FramedPath, RouteFrame } from './routeFrame';
 import { ROUTE_MAP_TOKENS } from './routeMapTokens';
-import { stadiaTileUrl, type TileSource } from './tileSource';
-
-const tileImageStyle: CSSProperties = {
-  display: 'block',
-  height: '100%',
-  width: '100%',
-};
-
-/** Lazy, so the hidden scheme's tiles never load until that scheme shows. */
-function SmoothTile({ tile, tileLoaded }: TileComponentProps) {
-  return (
-    <div
-      style={{
-        height: tile.height,
-        left: tile.left,
-        opacity: tile.active ? 1 : 0,
-        overflow: 'hidden',
-        position: 'absolute',
-        top: tile.top,
-        transition: 'opacity 0.2s',
-        width: tile.width,
-      }}
-    >
-      <img
-        alt=""
-        loading="lazy"
-        onLoad={tileLoaded}
-        src={tile.url}
-        srcSet={tile.srcSet}
-        style={tileImageStyle}
-      />
-    </div>
-  );
-}
+import { SmoothTile, useHostSize } from './SmoothTile';
+import { outdoorsTileUrl, type TileSource } from './tileSource';
 
 const routeSvgSx: SxObject = {
   height: '100%',
@@ -69,34 +36,6 @@ const schemeLayerSx = (scheme: (typeof SCHEMES)[number]): SxObject => {
   };
 };
 
-function tileUrl({
-  dark,
-  dpr,
-  tileSource,
-  x,
-  y,
-  zoom,
-}: {
-  dark: boolean;
-  dpr?: number;
-  tileSource: TileSource;
-  x: number;
-  y: number;
-  zoom: number;
-}) {
-  return stadiaTileUrl(tileSource, {
-    dark,
-    extension: 'png',
-    retina: Boolean(dpr && dpr > 1),
-    // Outdoors carries trails, contours and greenery, so it still reads as a map
-    // under a scrim. Alidade Smooth Dark is the closest dark counterpart.
-    style: dark ? 'alidade_smooth_dark' : 'outdoors',
-    x,
-    y,
-    zoom,
-  });
-}
-
 type RouteMapProps = {
   frame: RouteFrame;
   paths: ReadonlyArray<FramedPath>;
@@ -112,27 +51,9 @@ type RouteMapProps = {
  */
 export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProps) {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ height: frame.height, width: frame.width });
+  const size = useHostSize(containerRef, { height: frame.height, width: frame.width });
   const zoom =
     frame.zoom + Math.log2(Math.max(size.width / frame.width, size.height / frame.height));
-
-  useEffect(() => {
-    const element = containerRef.current;
-    if (!element) {
-      return;
-    }
-
-    // borderBoxSize ignores ancestor transforms (rotated collage cards) but keeps
-    // fractional pixels, unlike getBoundingClientRect or offsetWidth.
-    const observer = new ResizeObserver(([entry]) => {
-      const box = entry?.borderBoxSize[0];
-      if (box && box.blockSize > 0 && box.inlineSize > 0) {
-        setSize({ height: box.blockSize, width: box.inlineSize });
-      }
-    });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, []);
 
   const containerSx: SxObject = {
     height: '100%',
@@ -177,7 +98,7 @@ export function RouteMap({ frame, paths, strokeWidth, tileSource }: RouteMapProp
                 key={`${Math.round(size.width)}x${Math.round(size.height)}`}
                 mouseEvents={false}
                 provider={(x, y, tileZoom, dpr) =>
-                  tileUrl({ dark, dpr, tileSource, x, y, zoom: tileZoom })
+                  outdoorsTileUrl(tileSource, { dark, dpr, x, y, zoom: tileZoom })
                 }
                 tileComponent={SmoothTile}
                 touchEvents={false}

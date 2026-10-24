@@ -14,6 +14,7 @@ import {
 import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
+import { CACHE_TAGS } from '../../../../services/cacheTags';
 
 type GoodreadsSyncRouteResponse = {
   body: GoodreadsSyncSummary | { error: string; ok: false };
@@ -90,7 +91,7 @@ export async function handleGoodreadsSync(
     });
 
     if (result.createdCount > 0 || result.updatedCount > 0) {
-      revalidateTag('contentful', 'max');
+      revalidateTag(CACHE_TAGS.contentful, 'max');
     }
 
     return {

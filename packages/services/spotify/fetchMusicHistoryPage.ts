@@ -1,8 +1,9 @@
 import 'server-only';
 
 import { db, Op } from '@dg/db';
+import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
-import { selectArtistFirstPlays, TIME_ZONE } from './listeningStatsQueries';
+import { selectArtistFirstPlays } from './listeningStatsQueries';
 import { resolveTrackDisplays } from './trackDisplays';
 
 export type HistoryTrack = {
@@ -37,7 +38,7 @@ type SpotifyHistoryRow = {
 
 const DEFAULT_PAGE_SIZE = 24;
 
-const pacificDayFormat = new Intl.DateTimeFormat('en-CA', { timeZone: TIME_ZONE });
+const pacificDayFormat = new Intl.DateTimeFormat('en-CA', { timeZone: SITE_TIME_ZONE });
 
 /** The Pacific calendar day as `YYYY-MM-DD`, then the Monday that starts its week. */
 function pacificCalendar(date: Date) {

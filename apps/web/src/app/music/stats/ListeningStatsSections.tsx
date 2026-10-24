@@ -1,27 +1,21 @@
 'use client';
 
-import type { ListeningStats, StatsRangeKey } from '@dg/services/spotify/fetchListeningStats';
+import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
+import {
+  parseStatsRangeKey,
+  type StatsRangeKey,
+  statsRangeKey,
+} from '@dg/shared-core/dates/statsRange';
 import { useEffect, useRef, useState } from 'react';
 import { ListeningClock } from './ListeningClock';
 import { GenresCard, TimelineBarsCard } from './ListeningStatsCharts';
 import { ListeningStatsTotals } from './ListeningStatsTotals';
-import { formatStatsRangeKey } from './listeningStatsFormat';
 import { DepthCard, DepthPocketStickers, FrontToBackCard, OnRepeatCard } from './StatsCardParts';
 import { ActivityMatrixCard, MatrixPocketStickers, SoundtrackCard } from './StatsHistoryVisuals';
 import { StatsToolbar } from './StatsToolbar';
 import { TopAlbumsPodium } from './TopAlbumsPodium';
 import { TopPlaylistsCard } from './TopPlaylistsCard';
 import { TopArtistsCard, TopSongsCard } from './TopSongsAndArtists';
-
-function parseClientRangeKey(raw: string | null): StatsRangeKey {
-  if (raw === 'week' || raw === 'month') {
-    return raw;
-  }
-  if (raw && /^(?:19|20)\d{2}$/.test(raw)) {
-    return `${Number(raw)}`;
-  }
-  return 'all';
-}
 
 export type InitialStatsSnapshots = {
   all: ListeningStats;
@@ -34,7 +28,7 @@ function buildInitialCache(
   snapshots?: InitialStatsSnapshots,
 ): Map<StatsRangeKey, ListeningStats> {
   const map = new Map<StatsRangeKey, ListeningStats>([
-    [formatStatsRangeKey(initialStats.range), initialStats],
+    [statsRangeKey(initialStats.range), initialStats],
   ]);
   if (snapshots?.all) {
     map.set('all', snapshots.all);
@@ -59,7 +53,7 @@ export function ListeningStatsSections({
 }) {
   const [stats, setStats] = useState<ListeningStats>(initialStats);
   const [selectedKey, setSelectedKey] = useState<StatsRangeKey>(() =>
-    formatStatsRangeKey(initialStats.range),
+    statsRangeKey(initialStats.range),
   );
   const cacheRef = useRef<Map<StatsRangeKey, ListeningStats>>(
     buildInitialCache(initialStats, initialSnapshots),
@@ -154,13 +148,13 @@ export function ListeningStatsSections({
       return;
     }
     const syncFromUrl = () => {
-      const urlKey = parseClientRangeKey(new URLSearchParams(window.location.search).get('range'));
+      const urlKey = parseStatsRangeKey(new URLSearchParams(window.location.search).get('range'));
       applyRangeRef.current(urlKey, false);
     };
-    const initialUrlKey = parseClientRangeKey(
+    const initialUrlKey = parseStatsRangeKey(
       new URLSearchParams(window.location.search).get('range'),
     );
-    if (initialUrlKey !== formatStatsRangeKey(initialStats.range)) {
+    if (initialUrlKey !== statsRangeKey(initialStats.range)) {
       applyRangeRef.current(initialUrlKey, false);
     }
     const warmupTimer = window.setTimeout(() => {

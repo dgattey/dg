@@ -1,4 +1,5 @@
-const TIME_ZONE = 'America/Los_Angeles';
+import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
+
 const METERS_PER_MILE = 1609.344;
 const FEET_PER_METER = 3.280_84;
 const SECONDS_PER_HOUR = 3600;
@@ -15,12 +16,12 @@ const compactFormat = new Intl.NumberFormat('en-US', {
 const dayFormat = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
   month: 'short',
-  timeZone: TIME_ZONE,
+  timeZone: SITE_TIME_ZONE,
 });
 const dateFormat = new Intl.DateTimeFormat('en-US', {
   day: 'numeric',
   month: 'short',
-  timeZone: TIME_ZONE,
+  timeZone: SITE_TIME_ZONE,
   year: 'numeric',
 });
 

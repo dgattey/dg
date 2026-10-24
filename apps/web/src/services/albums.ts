@@ -5,14 +5,12 @@ import { fetchAlbumDetail } from '@dg/services/spotify/fetchAlbumDetail';
 import { isMissingTokenError } from '@dg/shared-core/errors/MissingTokenError';
 import { log } from '@dg/shared-core/logging/log';
 import { cacheLife, cacheTag } from 'next/cache';
-import './oauthTokenCache';
-
-const FAVORITE_ALBUMS_TAG = 'favorite-albums';
+import { CACHE_TAGS } from './cacheTags';
 
 export async function getFavoriteAlbums() {
   'use cache: remote';
   cacheLife('max');
-  cacheTag(FAVORITE_ALBUMS_TAG);
+  cacheTag(CACHE_TAGS.favoriteAlbums);
   return await readFavoriteAlbumsSnapshot();
 }
 

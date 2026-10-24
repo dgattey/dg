@@ -9,14 +9,8 @@ import {
 import { cacheLife, cacheTag, revalidateTag } from 'next/cache';
 import { after } from 'next/server';
 import { getFavoriteAlbums } from './albums';
-import './oauthTokenCache';
+import { CACHE_TAGS } from './cacheTags';
 import { getLastKnownSong } from './spotify';
-
-const MUSIC_HISTORY_TAG = 'music-history';
-const MUSIC_STATS_TAG = 'music-stats';
-const LATEST_SONG_TAG = 'latest-song';
-const FAVORITE_ALBUMS_TAG = 'favorite-albums';
-const FAVORITE_ALBUMS_CHECK_TAG = 'favorite-albums-check';
 
 export const STALE_SPOTIFY_SYNC_INTERVAL_MS = 20 * 60 * 1000;
 export const FAVORITE_ALBUMS_CHECK_INTERVAL_MS = 60 * 60 * 1000;
@@ -40,8 +34,8 @@ export function resetSpotifySyncStateForTests(): void {
 async function readCachedLatestPlayedAtIso(): Promise<string | null> {
   'use cache: remote';
   cacheLife('max');
-  cacheTag(MUSIC_HISTORY_TAG);
-  cacheTag(LATEST_SONG_TAG);
+  cacheTag(CACHE_TAGS.musicHistory);
+  cacheTag(CACHE_TAGS.latestSong);
   const latest = await getLatestPlayedAt();
   return latest ? latest.toISOString() : null;
 }
@@ -68,7 +62,7 @@ export async function getCachedLatestPlayedAt(): Promise<Date | null> {
 async function getFavoriteAlbumsWindowStartMs(): Promise<number> {
   'use cache: remote';
   cacheLife('hours');
-  cacheTag(FAVORITE_ALBUMS_CHECK_TAG);
+  cacheTag(CACHE_TAGS.favoriteAlbumsCheck);
   return await Promise.resolve(Date.now());
 }
 
@@ -87,7 +81,7 @@ export async function shouldRefreshFavoriteAlbums(nowMs = Date.now()): Promise<b
       return false;
     }
     if (ageMs >= FAVORITE_ALBUMS_CHECK_INTERVAL_MS) {
-      revalidateTag(FAVORITE_ALBUMS_CHECK_TAG, 'max');
+      revalidateTag(CACHE_TAGS.favoriteAlbumsCheck, 'max');
     }
   } catch {}
   lastFavoriteAlbumsCheckedAtMs = nowMs;
@@ -145,16 +139,16 @@ export async function syncSpotifyIfStale(
       : null;
 
     if (favoriteAlbums?.changed) {
-      revalidateTag(FAVORITE_ALBUMS_TAG, 'max');
-      revalidateTag(MUSIC_STATS_TAG, 'max');
+      revalidateTag(CACHE_TAGS.favoriteAlbums, 'max');
+      revalidateTag(CACHE_TAGS.musicStats, 'max');
     }
     if (result.status === 'ok' && (result.inserted > 0 || result.total > 0)) {
       if (!Number.isNaN(trackPlayedAtMs)) {
         lastKnownLatestPlayedAtMs = Math.max(lastKnownLatestPlayedAtMs, trackPlayedAtMs);
       }
-      revalidateTag(MUSIC_HISTORY_TAG, 'max');
-      revalidateTag(MUSIC_STATS_TAG, 'max');
-      revalidateTag(LATEST_SONG_TAG, 'max');
+      revalidateTag(CACHE_TAGS.musicHistory, 'max');
+      revalidateTag(CACHE_TAGS.musicStats, 'max');
+      revalidateTag(CACHE_TAGS.latestSong, 'max');
     }
     return true;
   } finally {

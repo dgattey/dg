@@ -1,10 +1,6 @@
-import type {
-  ListeningStats,
-  StatsRange,
-  StatsRangeKey,
-} from '@dg/services/spotify/fetchListeningStats';
-
-const TIME_ZONE = 'America/Los_Angeles';
+import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
+import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
+import type { StatsRange } from '@dg/shared-core/dates/statsRange';
 
 const countFormat = new Intl.NumberFormat('en-US');
 const dayFormat = new Intl.DateTimeFormat('en-GB', {
@@ -16,7 +12,7 @@ const dayFormat = new Intl.DateTimeFormat('en-GB', {
 const pacificDayFormat = new Intl.DateTimeFormat('en-GB', {
   day: 'numeric',
   month: 'short',
-  timeZone: TIME_ZONE,
+  timeZone: SITE_TIME_ZONE,
   year: 'numeric',
 });
 const monthFormat = new Intl.DateTimeFormat('en-GB', {
@@ -26,7 +22,7 @@ const monthFormat = new Intl.DateTimeFormat('en-GB', {
 });
 const pacificMonthFormat = new Intl.DateTimeFormat('en-GB', {
   month: 'short',
-  timeZone: TIME_ZONE,
+  timeZone: SITE_TIME_ZONE,
   year: 'numeric',
 });
 
@@ -73,23 +69,6 @@ export function formatPacificMonth(timestamp: string): string {
 /** `2017` → `’17`. */
 export function formatYearTick(year: number): string {
   return `\u2019${String(year).slice(-2)}`;
-}
-
-export function formatStatsRangeKey(range: StatsRange): StatsRangeKey {
-  switch (range.kind) {
-    case 'all':
-      return 'all';
-    case 'week':
-      return 'week';
-    case 'month':
-      return 'month';
-    case 'year':
-      return `${range.year}`;
-    default: {
-      const unhandled: never = range;
-      return unhandled;
-    }
-  }
 }
 
 export function formatRangeSuffix(range: StatsRange): string {

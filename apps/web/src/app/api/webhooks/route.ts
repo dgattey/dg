@@ -3,7 +3,7 @@ import { processStravaWebhookEvent } from '@dg/services/strava/webhooks/processS
 import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
-import '../../../services/oauthTokenCache';
+import { CACHE_TAGS } from '../../../services/cacheTags';
 import { jsonError } from '../apiResponses';
 
 const isStravaChallengeRequest = (query: URLSearchParams) =>
@@ -69,8 +69,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         return jsonError('Forbidden', 403);
       case 'ok':
         if (result.shouldRevalidate) {
-          revalidateTag('latest-activity', 'max');
-          revalidateTag('strava-history', 'max');
+          revalidateTag(CACHE_TAGS.latestActivity, 'max');
+          revalidateTag(CACHE_TAGS.stravaHistory, 'max');
         }
         return new NextResponse(null, { status: 200 });
     }

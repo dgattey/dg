@@ -12,6 +12,10 @@ export function lineAt(content: string, index: number): number {
   return content.slice(0, index).split('\n').length;
 }
 
+export function stripCssComments(content: string): string {
+  return content.replace(/\/\*[\s\S]*?\*\//g, (match) => match.replace(/[^\n]/g, ' '));
+}
+
 const PAGE_TITLE_THEN_PARAGRAPH =
   /<CutLetters\b[^>]*\bclassName="[^"]*\bcollagePageTitle\b[^"]*"[^>]*\/>\s*(?:\{[^}]*\}\s*)?<p\b/g;
 

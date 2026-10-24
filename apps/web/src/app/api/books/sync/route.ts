@@ -16,6 +16,7 @@ import {
 import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
+import { CACHE_TAGS } from '../../../../services/cacheTags';
 
 type BooksSyncRouteResponse = {
   body:
@@ -144,7 +145,7 @@ export async function handleBooksSync(request: NextRequest): Promise<BooksSyncRo
 
   const revalidated = entries.length > 0 || deleted > 0;
   if (revalidated) {
-    revalidateTag('contentful', 'max');
+    revalidateTag(CACHE_TAGS.contentful, 'max');
   }
 
   const ok = errors.length === 0;

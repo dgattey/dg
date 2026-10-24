@@ -1,12 +1,12 @@
 import 'server-only';
 
+import type { StatsRange } from '@dg/shared-core/dates/statsRange';
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import type {
   StatsChampions,
   StatsMatrix,
   StatsMatrixCell,
   StatsMatrixRow,
-  StatsRange,
   StatsTimeline,
   StatsTrack,
 } from './fetchListeningStats';

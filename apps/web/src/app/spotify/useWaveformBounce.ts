@@ -14,6 +14,42 @@ type WaveformBounceOptions = {
 const SCROLL_RESUME_DELAY_MS = 120;
 
 /**
+ * Pauses Web Animations while the page scrolls and resumes them after scrolling settles.
+ */
+export function pauseAnimationsOnScroll(animations: ReadonlyArray<Animation>): () => void {
+  let scrollTimer: number | undefined;
+  let pausedForScroll = false;
+  const onScroll = () => {
+    if (!pausedForScroll) {
+      pausedForScroll = true;
+      for (const anim of animations) {
+        anim.pause();
+      }
+    }
+    if (scrollTimer !== undefined) {
+      window.clearTimeout(scrollTimer);
+    }
+    scrollTimer = window.setTimeout(() => {
+      pausedForScroll = false;
+      for (const anim of animations) {
+        anim.play();
+      }
+    }, SCROLL_RESUME_DELAY_MS);
+  };
+
+  window.addEventListener('scroll', onScroll, { passive: true });
+  return () => {
+    window.removeEventListener('scroll', onScroll);
+    if (scrollTimer !== undefined) {
+      window.clearTimeout(scrollTimer);
+    }
+    for (const anim of animations) {
+      anim.cancel();
+    }
+  };
+}
+
+/**
  * Applies a compositor-driven beat bounce via the Web Animations API when music
  * is playing so Gecko/WebRender animates the transform on the compositor thread
  * without main-thread style invalidation or display-list rebuilds every frame.
@@ -58,30 +94,7 @@ export function useWaveformBounce<T extends HTMLElement>({
       },
     );
 
-    let scrollTimer: number | undefined;
-    let pausedForScroll = false;
-    const onScroll = () => {
-      if (!pausedForScroll) {
-        pausedForScroll = true;
-        animation.pause();
-      }
-      if (scrollTimer !== undefined) {
-        window.clearTimeout(scrollTimer);
-      }
-      scrollTimer = window.setTimeout(() => {
-        pausedForScroll = false;
-        animation.play();
-      }, SCROLL_RESUME_DELAY_MS);
-    };
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => {
-      window.removeEventListener('scroll', onScroll);
-      if (scrollTimer !== undefined) {
-        window.clearTimeout(scrollTimer);
-      }
-      animation.cancel();
-    };
+    return pauseAnimationsOnScroll([animation]);
   }, [isPlaying, intensity]);
 
   return ref;

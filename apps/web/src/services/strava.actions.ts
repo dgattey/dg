@@ -10,7 +10,7 @@ import { listSubscriptions } from '@dg/services/strava/webhooks/listSubscription
 import { log } from '@dg/shared-core/logging/log';
 import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import { revalidatePath, revalidateTag } from 'next/cache';
-import './oauthTokenCache';
+import { CACHE_TAGS } from './cacheTags';
 import { withDevConsoleAuth } from './devConsoleAuth';
 
 type WebhookActionResult = {
@@ -92,8 +92,8 @@ export async function backfillStravaHistory(): Promise<BackfillActionResult> {
   return await withDevConsoleAuth(async () => {
     try {
       const outcome = await syncStravaHistory();
-      revalidateTag('strava-history', 'max');
-      revalidateTag('latest-activity', 'max');
+      revalidateTag(CACHE_TAGS.stravaHistory, 'max');
+      revalidateTag(CACHE_TAGS.latestActivity, 'max');
       return describeOutcome(outcome);
     } catch (error) {
       log.error('Failed to backfill Strava history', { error });

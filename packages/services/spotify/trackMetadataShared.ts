@@ -40,18 +40,21 @@ export function sleep(ms: number): Promise<void> {
 export async function mapInBatches<T, R>(
   items: ReadonlyArray<T>,
   fn: (item: T) => Promise<R | null>,
+  options?: { concurrency?: number; throttleMs?: number },
 ): Promise<Array<R>> {
+  const concurrency = options?.concurrency ?? FETCH_CONCURRENCY;
+  const throttleMs = options?.throttleMs ?? FETCH_THROTTLE_MS;
   const results: Array<R> = [];
-  for (let i = 0; i < items.length; i += FETCH_CONCURRENCY) {
-    const batch = items.slice(i, i + FETCH_CONCURRENCY);
+  for (let i = 0; i < items.length; i += concurrency) {
+    const batch = items.slice(i, i + concurrency);
     const settled = await Promise.allSettled(batch.map(fn));
     for (const item of settled) {
       if (item.status === 'fulfilled' && item.value !== null) {
         results.push(item.value);
       }
     }
-    if (i + FETCH_CONCURRENCY < items.length) {
-      await sleep(FETCH_THROTTLE_MS);
+    if (i + concurrency < items.length) {
+      await sleep(throttleMs);
     }
   }
   return results;

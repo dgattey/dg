@@ -20,22 +20,17 @@ jest.mock('../MusicNotes', () => ({
 
 const TRACK: Track = {
   album: {
-    externalUrls: { spotify: 'https://open.spotify.com/album' },
-    href: 'https://api.spotify.com/album',
     id: 'album',
-    images: [],
     name: 'Album',
     releaseDate: '2026-01-01',
-    uri: 'spotify:album:album',
+    url: 'https://open.spotify.com/album',
   },
   albumImage: { height: 640, url: 'https://images.test/album.jpg', width: 640 },
   artists: [],
-  externalUrls: { spotify: 'https://open.spotify.com/track' },
-  href: 'https://api.spotify.com/track',
   id: 'track',
   isPlaying: true,
   name: 'Perfect Light',
-  uri: 'spotify:track:track',
+  url: 'https://open.spotify.com/track',
 };
 
 describe('SpotifyHeaderCard', () => {

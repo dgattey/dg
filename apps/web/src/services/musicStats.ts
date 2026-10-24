@@ -1,20 +1,18 @@
 import 'server-only';
 
+import { fetchListeningStats, type ListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import {
-  fetchListeningStats,
-  type ListeningStats,
   parseStatsRange,
+  parseStatsRangeKey,
   type StatsRangeKey,
-} from '@dg/services/spotify/fetchListeningStats';
+} from '@dg/shared-core/dates/statsRange';
 import { cacheLife, cacheTag } from 'next/cache';
-import './oauthTokenCache';
-
-const MUSIC_STATS_TAG = 'music-stats';
+import { CACHE_TAGS } from './cacheTags';
 
 async function getCachedAllTimeStats(): Promise<ListeningStats | null> {
   'use cache';
   cacheLife('max');
-  cacheTag(MUSIC_STATS_TAG);
+  cacheTag(CACHE_TAGS.musicStats);
   return await fetchListeningStats({ kind: 'all' });
 }
 
@@ -24,30 +22,12 @@ async function getCachedRangeStats(
 ): Promise<ListeningStats | null> {
   'use cache';
   cacheLife('max');
-  cacheTag(MUSIC_STATS_TAG);
+  cacheTag(CACHE_TAGS.musicStats);
   return await fetchListeningStats(parseStatsRange(rangeKey), { knownYears });
 }
 
-export function normalizeStatsRangeKey(raw?: string | null): StatsRangeKey {
-  const parsed = parseStatsRange(raw);
-  switch (parsed.kind) {
-    case 'all':
-      return 'all';
-    case 'week':
-      return 'week';
-    case 'month':
-      return 'month';
-    case 'year':
-      return `${parsed.year}`;
-    default: {
-      const unhandled: never = parsed;
-      return unhandled;
-    }
-  }
-}
-
 export async function getListeningStats(rawRange?: string | null): Promise<ListeningStats | null> {
-  const rangeKey = normalizeStatsRangeKey(rawRange);
+  const rangeKey = parseStatsRangeKey(rawRange);
   if (rangeKey === 'all') {
     return await getCachedAllTimeStats();
   }

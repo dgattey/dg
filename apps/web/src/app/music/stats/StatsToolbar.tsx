@@ -1,6 +1,6 @@
 'use client';
 
-import type { StatsRangeKey } from '@dg/services/spotify/fetchListeningStats';
+import type { StatsRangeKey } from '@dg/shared-core/dates/statsRange';
 import { musicStatsRoute } from '@dg/shared-core/routes/app';
 import { type PaperPillOption, PaperPills } from '../../collage/PaperPills';
 import { YearMenu } from '../../collage/YearMenu';

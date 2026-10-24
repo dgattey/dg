@@ -1,13 +1,22 @@
-import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
+import type { StravaLogEntry, StravaSport } from '@dg/content-models/strava/StravaHistory';
 import { RoutePrint } from '@dg/maps/RoutePrint';
 import type { TileSource } from '@dg/maps/src/tileSource';
 import { RelativeTime } from '@dg/ui/core/RelativeTime';
 import type { ReactNode } from 'react';
 import { PaperCard } from '../collage/PaperCard';
-import { cx } from '../collage/paperVars';
-import { OutingStats, SportChip } from './OutingMeta';
-import { formatOutingDay } from './stravaFormat';
+import { cx, paperToneVars } from '../collage/paperVars';
+import { formatDuration, formatFeet, formatMiles, formatOutingDay } from './stravaFormat';
 import { SPORT_DETAILS } from './stravaSports';
+
+/** A small chip in the sport's paper, matching its ink on the maps. */
+export function SportChip({ sport }: { sport: StravaSport }) {
+  const { label, tone } = SPORT_DETAILS[sport];
+  return (
+    <span className="strava__sport" style={paperToneVars(tone)}>
+      {label}
+    </span>
+  );
+}
 
 /**
  * A polaroid of one outing linking to the activity on Strava, its route inked
@@ -59,7 +68,11 @@ export function RoutePolaroid({
           </span>
         ) : null}
         <span className="strava__polaroidName">{outing.name}</span>
-        <OutingStats outing={outing} />
+        <span className="strava__stats">
+          <span>{formatMiles(outing.distanceMeters)} mi</span>
+          <span>{formatDuration(outing.movingTimeSeconds)}</span>
+          <span>{formatFeet(outing.elevationGainMeters)} ft</span>
+        </span>
         {note ? <span className="strava__polaroidNote">{note}</span> : null}
       </PaperCard>
       {children}

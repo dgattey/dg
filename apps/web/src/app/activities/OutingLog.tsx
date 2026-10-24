@@ -2,7 +2,7 @@ import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 import { routeSilhouette } from '@dg/maps/src/routeFrame';
 import { PaperCard } from '../collage/PaperCard';
 import { paperToneVars } from '../collage/paperVars';
-import { SportChip } from './OutingMeta';
+import { SportChip } from './RoutePolaroid';
 import {
   formatDuration,
   formatFeet,

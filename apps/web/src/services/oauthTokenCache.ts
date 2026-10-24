@@ -6,8 +6,7 @@ import {
   type StoredTokenRecord,
 } from '@dg/services/clients/refreshedAccessToken';
 import { cacheLife, cacheTag, revalidateTag } from 'next/cache';
-
-const OAUTH_TOKEN_TAG = 'oauth-token';
+import { CACHE_TAGS } from './cacheTags';
 
 type SerializedTokenRecord = {
   accessToken: string | null;
@@ -18,7 +17,7 @@ type SerializedTokenRecord = {
 async function readRemoteCachedTokenRecord(name: string): Promise<SerializedTokenRecord> {
   'use cache: remote';
   cacheLife('max');
-  cacheTag(OAUTH_TOKEN_TAG);
+  cacheTag(CACHE_TAGS.oauthToken);
   const record = await readStoredTokenFromDb(name);
   return {
     accessToken: record.accessToken,
@@ -36,11 +35,13 @@ export async function getCachedTokenRecord(name: string): Promise<StoredTokenRec
   };
 }
 
-registerTokenCacheHooks({
-  onTokenUpdated: () => {
-    try {
-      revalidateTag(OAUTH_TOKEN_TAG, 'max');
-    } catch {}
-  },
-  readToken: getCachedTokenRecord,
-});
+export function registerOauthTokenCache(): void {
+  registerTokenCacheHooks({
+    onTokenUpdated: () => {
+      try {
+        revalidateTag(CACHE_TAGS.oauthToken, 'max');
+      } catch {}
+    },
+    readToken: getCachedTokenRecord,
+  });
+}
