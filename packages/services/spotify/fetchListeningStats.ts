@@ -1,13 +1,16 @@
 import 'server-only';
 
 import { db } from '@dg/db';
-import { buildRangeBreakdowns, type StatsNow, statsNow } from './listeningStatsBreakdowns';
+import { buildRangeBreakdowns } from './listeningStatsBreakdowns';
 import {
   mapCatalogSlices,
   resolveAlbums,
   resolveArtists,
+  toStatsGenres,
   toStatsTracks,
 } from './listeningStatsCatalog';
+import { findNewArtists } from './listeningStatsNewArtists';
+import { statsNow } from './listeningStatsPhase';
 import {
   rollingDaysPlayFilter,
   type SqlPlayFilter,
@@ -15,7 +18,6 @@ import {
   selectAlbumSessions,
   selectArtistCount,
   selectArtistDepth,
-  selectArtistFirstPlays,
   selectBucketTopTracks,
   selectDailyPlays,
   selectDayHourPlays,
@@ -31,7 +33,7 @@ import {
   selectTopTrackIds,
   yearPlayFilter,
 } from './listeningStatsQueries';
-import { type SpotifyLink, spotifyUrl } from './spotifyLinks';
+import type { SpotifyLink } from './spotifyLinks';
 import { resolveTrackDisplays } from './trackDisplays';
 
 const FALLBACK_MINUTES_PER_PLAY = 3.81;
@@ -204,33 +206,6 @@ function resolvePlayFilter(range: StatsRange, latest: Date): SqlPlayFilter | und
   }
 }
 
-/**
- * The window an artist's first play must fall in to count as new: the range itself, or
- * this year for all time, where every artist was new once.
- */
-function newArtistWindow(range: StatsRange, latestPlayedAt: Date, now: StatsNow) {
-  const thisYear = Number(now.day.slice(0, 4));
-  switch (range.kind) {
-    case 'all':
-      return { filter: yearPlayFilter(thisYear), label: 'New artist this year' };
-    case 'year':
-      return {
-        filter: yearPlayFilter(range.year),
-        label: range.year === thisYear ? 'New artist this year' : `New artist in ${range.year}`,
-      };
-    case 'week':
-    case 'month':
-      return {
-        filter: rollingDaysPlayFilter(latestPlayedAt, range.kind === 'week' ? 7 : 30),
-        label: `New artist this ${range.kind}`,
-      };
-    default: {
-      const unhandled: never = range;
-      return unhandled;
-    }
-  }
-}
-
 export async function fetchListeningStats(
   range: StatsRange = { kind: 'all' },
   options?: { knownYears?: Array<{ plays: number; year: number }> },
@@ -307,15 +282,7 @@ export async function fetchListeningStats(
   ]);
   const tracks = toStatsTracks(trackDisplays, favoriteIds);
   // Waits on resolveArtists, which backfills the genres this reads.
-  const genreRows = await selectTopGenres(filter);
-  const genres: Array<StatsGenre> = genreRows.map((row) => ({
-    ...row,
-    artists: row.artists.map((artist) => ({
-      id: artist.id,
-      name: artist.name,
-      url: spotifyUrl('artist', artist.id, artist.url),
-    })),
-  }));
+  const genres = toStatsGenres(await selectTopGenres(filter));
 
   const minutesPerPlay =
     durations && durations.knownPlays > 0
@@ -350,8 +317,7 @@ export async function fetchListeningStats(
     ...[...tracks.values()].flatMap((track) => track.artists.map((artist) => artist.id)),
     ...genres.flatMap((genre) => genre.artists.map((artist) => artist.id)),
   ]);
-  const newWindow = newArtistWindow(range, latestPlayedAt, now);
-  const newArtists = await selectArtistFirstPlays([...shownArtistIds], newWindow.filter);
+  const newArtists = await findNewArtists(shownArtistIds, range, latestPlayedAt, now);
 
   return {
     activeDays: summary.activeDays,
@@ -367,7 +333,7 @@ export async function fetchListeningStats(
     matrix,
     minutesPerPlay,
     monthStreak: longestMonthStreak(months.map((row) => row.month)),
-    newArtists: { ids: newArtists.map((row) => row.artistId), label: newWindow.label },
+    newArtists,
     plays: summary.plays,
     range,
     sessionPlays: sessions[0]?.totalSessionPlays ?? 0,

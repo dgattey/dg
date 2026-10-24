@@ -17,6 +17,7 @@ const DEPTH_ARTISTS = 25;
 const TOP_GENRES_LIMIT = 8;
 
 const int = v.number();
+const artistRef = v.object({ id: v.string(), name: v.string(), url: v.nullable(v.string()) });
 
 export type SqlPlayFilter = {
   /** SQL predicate over `{alias}."playedAt"` using only index-friendly timestamp bounds. */
@@ -320,12 +321,7 @@ export function selectTopGenres(filter: SqlPlayFilter = ALL_TIME_FILTER) {
      FROM ranked
      GROUP BY genre, total_plays, total_tracks
      ORDER BY total_plays DESC, genre LIMIT ${TOP_GENRES_LIMIT}`,
-    v.object({
-      artists: v.array(v.object({ id: v.string(), name: v.string(), url: v.nullable(v.string()) })),
-      genre: v.string(),
-      plays: int,
-      tracks: int,
-    }),
+    v.object({ artists: v.array(artistRef), genre: v.string(), plays: int, tracks: int }),
   );
 }
 

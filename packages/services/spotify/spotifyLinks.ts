@@ -1,7 +1,6 @@
-/**
- * A Spotify artist, album, or track named somewhere on the site, with the page it opens.
- * Kept free of `server-only` so client components can import the type.
- */
+import 'server-only';
+
+/** A Spotify artist, album, or track named somewhere on the site, with the page it opens. */
 export type SpotifyLink = { id: string; name: string; url: string };
 
 type SpotifyKind = 'album' | 'artist' | 'track';

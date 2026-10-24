@@ -6,13 +6,12 @@ import type {
   StatsMatrix,
   StatsMatrixCell,
   StatsMatrixRow,
-  StatsPhase,
   StatsRange,
   StatsTimeline,
   StatsTrack,
 } from './fetchListeningStats';
 import { toStatsTopTrack } from './listeningStatsCatalog';
-import { TIME_ZONE } from './listeningStatsQueries';
+import { phaseOf, type StatsNow, shiftPhase, spanPhase } from './listeningStatsPhase';
 
 const MONTH_ABBR = [
   'Jan',
@@ -29,51 +28,12 @@ const MONTH_ABBR = [
   'Dec',
 ] as const;
 const WEEKDAY_ABBR = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
-const SHIFT_HOURS = 6;
 const SHIFT_COLUMNS = [
   { full: 'Morning', key: 'morning', short: '6a', startHour: 6 },
   { full: 'Afternoon', key: 'afternoon', short: '12p', startHour: 12 },
   { full: 'Evening', key: 'evening', short: '6p', startHour: 18 },
   { full: 'Late night', key: 'lateNight', short: '12a', startHour: 0 },
 ] as const;
-
-/** The latest play's Pacific day and hour: the edge between slots that happened and ones that haven't. */
-export type StatsNow = { day: string; hour: number };
-
-const nowFormat = new Intl.DateTimeFormat('en-CA', {
-  day: '2-digit',
-  hour: '2-digit',
-  hourCycle: 'h23',
-  month: '2-digit',
-  timeZone: TIME_ZONE,
-  year: 'numeric',
-});
-
-export function statsNow(latestPlayedAt: Date): StatsNow {
-  const parts = new Map(nowFormat.formatToParts(latestPlayedAt).map((p) => [p.type, p.value]));
-  return {
-    day: `${parts.get('year')}-${parts.get('month')}-${parts.get('day')}`,
-    hour: Number(parts.get('hour')),
-  };
-}
-
-/** A `YYYY`, `YYYY-MM`, or `YYYY-MM-DD` key against the latest play's day at the same precision. */
-function phaseOf(key: string, now: StatsNow): StatsPhase {
-  const nowKey = now.day.slice(0, key.length);
-  return key === nowKey ? 'current' : key > nowKey ? 'future' : 'past';
-}
-
-/** Days `start` through `end`, both `YYYY-MM-DD`. */
-function spanPhase(start: string, end: string, now: StatsNow): StatsPhase {
-  return now.day < start ? 'future' : now.day <= end ? 'current' : 'past';
-}
-
-function shiftPhase(dayIso: string, startHour: number, now: StatsNow): StatsPhase {
-  const dayPhase = phaseOf(dayIso, now);
-  if (dayPhase !== 'current') return dayPhase;
-  if (now.hour < startHour) return 'future';
-  return now.hour < startHour + SHIFT_HOURS ? 'current' : 'past';
-}
 
 const yearTick = (year: number): string => `\u2019${String(year).slice(-2)}`;
 

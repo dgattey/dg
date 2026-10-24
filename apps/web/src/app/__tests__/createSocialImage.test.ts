@@ -169,6 +169,7 @@ describe('createSocialImage', () => {
 
   it('builds the listening stats social card for the current year', async () => {
     const year = currentPacificYear();
+    const burna = { id: 'burna', name: 'Burna Boy', url: 'https://open.spotify.com/artist/burna' };
     jest.mocked(fetchListeningStats).mockResolvedValue({
       activeDays: 137,
       activeMonths: 10,
@@ -177,16 +178,7 @@ describe('createSocialImage', () => {
       dayStreak: { days: 14, end: '2026-02-14', start: '2026-02-01' },
       firstPlayedAt: '2026-01-01T00:00:00.000Z',
       frontToBack: [],
-      genres: [
-        {
-          artists: [
-            { id: 'burna', name: 'Burna Boy', url: 'https://open.spotify.com/artist/burna' },
-          ],
-          genre: 'afrobeats',
-          plays: 457,
-          tracks: 161,
-        },
-      ],
+      genres: [{ artists: [burna], genre: 'afrobeats', plays: 457, tracks: 161 }],
       hours: Array.from({ length: 24 }, () => 0),
       lastPlayedAt: '2026-10-22T00:00:00.000Z',
       matrix: { columns: [], rows: [], title: 'Every week of 2026' },
@@ -204,10 +196,7 @@ describe('createSocialImage', () => {
       topAlbums: [
         {
           album: {
-            artists: [
-              { id: 'jg', name: 'James Grant', url: 'https://open.spotify.com/artist/jg' },
-              { id: 'ad', name: 'Anjunadeep', url: 'https://open.spotify.com/artist/ad' },
-            ],
+            artists: [{ id: 'jg', name: 'James Grant', url: 'https://open.spotify.com/artist/jg' }],
             id: 'a1',
             imageUrl: 'https://i.scdn.co/image/anjuna.jpg',
             isFavorite: true,
@@ -217,16 +206,7 @@ describe('createSocialImage', () => {
           plays: 344,
         },
       ],
-      topArtists: [
-        {
-          id: 'burna',
-          months: 7,
-          name: 'Burna Boy',
-          plays: 457,
-          tracks: 161,
-          url: 'https://open.spotify.com/artist/burna',
-        },
-      ],
+      topArtists: [{ ...burna, months: 7, plays: 457, tracks: 161 }],
       topTracks: [],
       tracks: 4818,
       years: [

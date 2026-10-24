@@ -612,10 +612,6 @@
   object-fit: cover;
   border-radius: 4px;
 }
-.stats__championArtEmpty {
-  width: 40px;
-  height: 40px;
-}
 .stats__championMain {
   display: grid;
   gap: 1px;
@@ -658,10 +654,6 @@
   width: 28px;
   height: 28px;
   border-radius: 3px;
-}
-.stats__championList--compact .stats__championArtEmpty {
-  width: 33px;
-  height: 33px;
 }
 .stats__championList--compact .stats__championTrack {
   font-size: var(--type-caption);

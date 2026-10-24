@@ -7,7 +7,14 @@ import { log } from '@dg/shared-core/logging/log';
 import { isNotNullish } from '@dg/shared-core/types/typeguards';
 import * as v from 'valibot';
 import { fetchAlbumDetail } from './fetchAlbumDetail';
-import type { ListeningStats, StatsAlbum, StatsTopTrack, StatsTrack } from './fetchListeningStats';
+import type {
+  ListeningStats,
+  StatsAlbum,
+  StatsGenre,
+  StatsTopTrack,
+  StatsTrack,
+} from './fetchListeningStats';
+import type { selectTopGenres } from './listeningStatsQueries';
 import { spotifyUrl } from './spotifyLinks';
 import type { TrackDisplay } from './trackDisplays';
 import { spotifyGet } from './trackMetadataShared';
@@ -275,4 +282,18 @@ export function mapCatalogSlices({
       .map(({ plays, trackId }) => toStatsTopTrack(tracks, trackId, plays))
       .filter(isNotNullish),
   };
+}
+
+/** Genre rows with each of their top artists linked to its Spotify page. */
+export function toStatsGenres(
+  rows: Awaited<ReturnType<typeof selectTopGenres>>,
+): Array<StatsGenre> {
+  return rows.map((row) => ({
+    ...row,
+    artists: row.artists.map((artist) => ({
+      id: artist.id,
+      name: artist.name,
+      url: spotifyUrl('artist', artist.id, artist.url),
+    })),
+  }));
 }
