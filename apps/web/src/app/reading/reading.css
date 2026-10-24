@@ -13,6 +13,12 @@
 .reading__status {
   justify-self: start;
 }
+/* Outranks the backdrop host's `position: relative` on its children, so the filters ride along. */
+.collageBackdropHost.reading__layout > .reading__filters {
+  position: sticky;
+  top: calc(var(--site-header-height, 80px) + 10px);
+  z-index: 30;
+}
 .reading__status p {
   padding: 24px 28px 26px;
   margin: 0;
@@ -227,6 +233,10 @@
   @media (min-width: 1100px) {
     width: 100%;
     min-width: 200px;
+  }
+  /* Narrower, the placards share the filters' column, so they stop under the sticky filters. */
+  @media (max-width: 1099px) {
+    top: calc(var(--site-header-height, 80px) + 22px + var(--reading-filters-height, 0px));
   }
 }
 .reading__sectionTag {

@@ -11,9 +11,9 @@ import { PaperCard } from '../collage/PaperCard';
 import { PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
 import { Scallop, Stub } from '../music/stats/StatsShapes';
-import { useFilteredOutings } from './StravaFilters';
-import { formatShare, type NeighborhoodCoverage, summarizeCoverage } from './coverageStats';
 import { coverageRoutePath } from './coverageRoutePath';
+import { formatShare, type NeighborhoodCoverage, summarizeCoverage } from './coverageStats';
+import { useFilteredOutings } from './StravaFilters';
 import { formatMiles } from './stravaFormat';
 
 const COLLAPSED_ROWS = 10;

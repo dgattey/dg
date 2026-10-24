@@ -1,7 +1,7 @@
 import type { StravaLogEntry, StravaSport } from '@dg/content-models/strava/StravaHistory';
 import type { AtlasRegion } from '@dg/maps/atlasGeometry';
 import type { GeoBounds } from '@dg/maps/src/routeFrame';
-import { render, screen } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StravaAtlas } from '../FilteredSections';
 import { RouteCountTag, StravaFilters } from '../StravaFilters';
@@ -75,7 +75,7 @@ afterEach(() => {
 });
 
 describe('StravaFilters', () => {
-  it('starts on rides, with only the sports that have routes and all types last', () => {
+  it('starts on rides, with only the sports that have routes and all sports last', () => {
     const { inkedTones } = renderFilters(outings);
 
     expect(screen.getByRole('button', { name: 'Rides' })).toHaveAttribute('aria-pressed', 'true');
@@ -85,7 +85,7 @@ describe('StravaFilters', () => {
     );
     expect(screen.queryByRole('button', { name: 'Walks & hikes' })).not.toBeInTheDocument();
     expect(screen.getByRole('group', { name: 'Sport' }).textContent).toBe(
-      'RidesRunsSkiingAll types',
+      'RidesRunsSkiingAll sports',
     );
     expect(inkedTones()).toEqual(['cobalt']);
     expect(screen.getByText('38 routes')).toBeInTheDocument();
@@ -95,7 +95,7 @@ describe('StravaFilters', () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const { inkedTones } = renderFilters(outings);
 
-    await user.click(screen.getByRole('button', { name: 'All types' }));
+    await user.click(screen.getByRole('button', { name: 'All sports' }));
     expect(inkedTones()).toEqual(['cobalt', 'ochre', 'vermilion', 'rose']);
     expect(screen.getByText('54 routes')).toBeInTheDocument();
 
@@ -128,12 +128,12 @@ describe('StravaFilters', () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     const { inkedTones } = renderFilters(outings);
 
-    await user.click(screen.getByRole('button', { name: 'All types' }));
-    await user.click(screen.getByRole('button', { name: 'Last week' }));
+    await user.click(screen.getByRole('button', { name: 'All sports' }));
+    await user.click(screen.getByRole('button', { name: 'This week' }));
     expect(inkedTones()).toEqual(['cobalt']);
     expect(screen.getByText('8 routes')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Last month' }));
+    await user.click(screen.getByRole('button', { name: 'This month' }));
     expect(inkedTones()).toEqual(['cobalt', 'ochre']);
     expect(screen.getByText('10 routes')).toBeInTheDocument();
 
@@ -141,8 +141,9 @@ describe('StravaFilters', () => {
     expect(inkedTones()).toEqual([]);
     expect(screen.getByText('No routes')).toBeInTheDocument();
 
-    await user.selectOptions(screen.getByRole('combobox', { name: 'Year' }), '2025');
-    expect(screen.getByRole('button', { name: 'Last month' })).toHaveAttribute(
+    await user.click(screen.getByText('Year'));
+    await user.click(screen.getByRole('button', { name: '2025', pressed: false }));
+    expect(screen.getByRole('button', { name: 'This month' })).toHaveAttribute(
       'aria-pressed',
       'false',
     );
@@ -153,18 +154,18 @@ describe('StravaFilters', () => {
   it('offers every year with an outing, newest first', () => {
     renderFilters(outings);
 
-    expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual([
-      'Year',
-      '2026',
-      '2025',
-    ]);
+    expect(
+      within(screen.getByRole('list', { name: 'Select year' }))
+        .getAllByRole('button')
+        .map((option) => option.textContent),
+    ).toEqual(['2026', '2025']);
   });
 
   it('shows no sport pills or year picker when there is nothing to choose between', () => {
     const { inkedTones } = renderFilters(outingsOf('ride', 1, 1));
 
     expect(screen.queryByRole('group', { name: 'Sport' })).not.toBeInTheDocument();
-    expect(screen.queryByRole('combobox', { name: 'Year' })).not.toBeInTheDocument();
+    expect(screen.queryByText('Year')).not.toBeInTheDocument();
     expect(inkedTones()).toEqual(['cobalt']);
     expect(screen.getByText('1 route')).toBeInTheDocument();
   });

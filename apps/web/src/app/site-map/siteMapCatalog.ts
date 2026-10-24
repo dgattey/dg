@@ -1,4 +1,5 @@
 import {
+  activitiesRoute,
   apiCatalogRoute,
   apiStatusRoute,
   changelogRoute,
@@ -12,7 +13,6 @@ import {
   musicStatsRoute,
   readingRoute,
   siteMapRoute,
-  activitiesRoute,
 } from '@dg/shared-core/routes/app';
 import { defineBackdrop } from '../collage/backdrops';
 import type { PaperEdge, PaperTone } from '../collage/types';

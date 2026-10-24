@@ -1,7 +1,7 @@
 'use client';
 import { invariant } from '@dg/shared-core/assertions/invariant';
 
-import { createContext, type ReactNode, useContext } from 'react';
+import { createContext, type ReactNode, useContext, useEffect, useState } from 'react';
 
 const ServerTimeContext = createContext<number | null>(null);
 
@@ -29,4 +29,12 @@ export function useServerTime(): number {
   const serverTime = useContext(ServerTimeContext);
   invariant(serverTime, 'ServerTimeContext not found');
   return serverTime;
+}
+
+/** The server time through hydration, then the client's clock as of mount. */
+export function useNow(): number {
+  const serverTime = useServerTime();
+  const [now, setNow] = useState(serverTime);
+  useEffect(() => setNow(Date.now()), []);
+  return now;
 }

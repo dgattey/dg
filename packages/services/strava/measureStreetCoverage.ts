@@ -1,14 +1,14 @@
 import 'server-only';
 
+import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 import {
+  type CoverageCity,
   type CoverageSpan,
   type CoverageSport,
-  type CoverageCity,
-  type StreetCoverage,
-  STRAVA_WINDOW_DAYS,
   coverageKey,
+  STRAVA_WINDOW_DAYS,
+  type StreetCoverage,
 } from '@dg/content-models/strava/StreetCoverage';
-import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 import { SD_STREET_GRID } from './sdStreetGrid';
 import { SF_STREET_GRID } from './sfStreetGrid';
 import {

@@ -104,7 +104,6 @@ const fetchOverpass = async (bbox: string) => {
 const load = async (path: string | undefined, fallback: () => Promise<unknown>) =>
   path ? JSON.parse(await readFile(path, 'utf8')) : fallback();
 
-
 const boxOf = (rings: ReadonlyArray<Ring>): Neighborhood['box'] => {
   const points = rings.flat();
   const xs = points.map(([x]) => x);
@@ -238,7 +237,12 @@ const kept = geojson.features.flatMap((feature) => {
   const name = city.rename(feature.properties[city.nameProperty] ?? '');
   const { geometry } = feature;
   return name
-    ? [{ name, polygons: geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates }]
+    ? [
+        {
+          name,
+          polygons: geometry.type === 'Polygon' ? [geometry.coordinates] : geometry.coordinates,
+        },
+      ]
     : [];
 });
 const [west, south, east, north] = boxOf(kept.flatMap(({ polygons }) => polygons.flat()));

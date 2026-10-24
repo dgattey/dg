@@ -218,10 +218,22 @@ describe('summarizeStravaHistory', () => {
         odometerMeters: 9_000_000,
         rides: 2,
         years: [
-          { distanceMeters: 190_000, year: 2023 },
-          { distanceMeters: 0, year: 2024 },
-          { distanceMeters: 0, year: 2025 },
-          { distanceMeters: 40_000, year: 2026 },
+          {
+            distanceMeters: 190_000,
+            elevationGainMeters: 2400,
+            movingTimeSeconds: 27_000,
+            rides: 1,
+            year: 2023,
+          },
+          { distanceMeters: 0, elevationGainMeters: 0, movingTimeSeconds: 0, rides: 0, year: 2024 },
+          { distanceMeters: 0, elevationGainMeters: 0, movingTimeSeconds: 0, rides: 0, year: 2025 },
+          {
+            distanceMeters: 40_000,
+            elevationGainMeters: 600,
+            movingTimeSeconds: 5400,
+            rides: 1,
+            year: 2026,
+          },
         ],
       },
       {
@@ -238,9 +250,27 @@ describe('summarizeStravaHistory', () => {
         odometerMeters: 5_300_000,
         rides: 3,
         years: [
-          { distanceMeters: 60_000, year: 2024 },
-          { distanceMeters: 30_000, year: 2025 },
-          { distanceMeters: 20_000, year: 2026 },
+          {
+            distanceMeters: 60_000,
+            elevationGainMeters: 0,
+            movingTimeSeconds: 0,
+            rides: 1,
+            year: 2024,
+          },
+          {
+            distanceMeters: 30_000,
+            elevationGainMeters: 0,
+            movingTimeSeconds: 0,
+            rides: 1,
+            year: 2025,
+          },
+          {
+            distanceMeters: 20_000,
+            elevationGainMeters: 0,
+            movingTimeSeconds: 0,
+            rides: 1,
+            year: 2026,
+          },
         ],
       },
     ]);
@@ -261,7 +291,15 @@ describe('summarizeStravaHistory', () => {
         name: 'Cruz',
         odometerMeters: 7_828_686,
         rides: 1,
-        years: [{ distanceMeters: 30_000, year: 2026 }],
+        years: [
+          {
+            distanceMeters: 30_000,
+            elevationGainMeters: 400,
+            movingTimeSeconds: 3600,
+            rides: 1,
+            year: 2026,
+          },
+        ],
       },
     ]);
   });

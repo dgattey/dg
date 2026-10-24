@@ -46,17 +46,20 @@ const history: StravaHistory = {
   bikes: [],
   latest: outing,
   outings: [entry],
-  streetCoverage: { sd: {
-    neighborhoods: [],
-    projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
-    ridden: {},
-    viewBox: '0 0 10 10',
-  }, sf: {
-    neighborhoods: [],
-    projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
-    ridden: {},
-    viewBox: '0 0 10 10',
-  } },
+  streetCoverage: {
+    sd: {
+      neighborhoods: [],
+      projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
+      ridden: {},
+      viewBox: '0 0 10 10',
+    },
+    sf: {
+      neighborhoods: [],
+      projection: { origin: { lat: 0, lng: 0 }, perDegree: { lat: -1, lng: 1 } },
+      ridden: {},
+      viewBox: '0 0 10 10',
+    },
+  },
   thisYear: { distanceMeters: 1000, elevationGainMeters: 10, outings: 1, year: 2026 },
   totals: { distanceMeters: 1000, elevationGainMeters: 10, firstYear: 2026, outings: 1 },
 };

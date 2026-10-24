@@ -90,7 +90,15 @@ describe('fetchStravaHistoryFromDb', () => {
         name: 'Cruz',
         odometerMeters: 9_000_000,
         rides: 1,
-        years: [{ distanceMeters: 40_000, year: 2026 }],
+        years: [
+          {
+            distanceMeters: 40_000,
+            elevationGainMeters: 300,
+            movingTimeSeconds: 0,
+            rides: 1,
+            year: 2026,
+          },
+        ],
       },
     ]);
   });

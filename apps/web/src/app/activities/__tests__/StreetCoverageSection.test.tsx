@@ -1,10 +1,10 @@
-import type { StreetCoverage } from '@dg/content-models/strava/StreetCoverage';
 import type { StravaLogEntry, StravaSport } from '@dg/content-models/strava/StravaHistory';
+import type { StreetCoverage } from '@dg/content-models/strava/StreetCoverage';
 import { encodePolyline } from '@dg/maps/src/routeGeometry';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { StreetCoverageSection } from '../StreetCoverageSection';
 import { StravaFilters } from '../StravaFilters';
+import { StreetCoverageSection } from '../StreetCoverageSection';
 
 const TWO_MILES = 2 * 1609.344;
 
@@ -188,7 +188,7 @@ describe('StreetCoverageSection', () => {
     );
     expect(land?.tagName).toBe('clipPath');
 
-    await user.click(screen.getByRole('button', { name: 'All types' }));
+    await user.click(screen.getByRole('button', { name: 'All sports' }));
     expect(routes()).toHaveAttribute('d', 'M0 5l40 0M70 5l10 0');
     await user.click(screen.getByRole('button', { name: 'Runs' }));
     expect(routes()).toHaveAttribute('d', 'M70 5l10 0');

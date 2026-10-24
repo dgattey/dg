@@ -151,7 +151,36 @@ describe('readingHelpers', () => {
   });
 });
 
+class MeasuredResizeObserver {
+  constructor(private readonly callback: ResizeObserverCallback) {}
+  disconnect() {}
+  observe() {
+    this.callback(
+      [{ borderBoxSize: [{ blockSize: 57.4 }] } as unknown as ResizeObserverEntry],
+      this as unknown as ResizeObserver,
+    );
+  }
+}
+
 describe('ReadingShelf', () => {
+  beforeEach(() => {
+    Object.defineProperty(globalThis, 'ResizeObserver', {
+      configurable: true,
+      value: MeasuredResizeObserver,
+    });
+  });
+
+  afterEach(() => {
+    Reflect.deleteProperty(globalThis, 'ResizeObserver');
+  });
+
+  it('publishes the sticky filter bar height so year placards stop below it', () => {
+    render(<ReadingShelf books={SHELF_BOOKS} />);
+
+    const filters = screen.getByRole('button', { name: /^5 stars/ }).closest('.reading__filters');
+    expect(filters?.parentElement).toHaveStyle({ '--reading-filters-height': '58px' });
+  });
+
   it('features the latest review and shelves the rest by year', () => {
     render(<ReadingShelf books={SHELF_BOOKS} />);
 

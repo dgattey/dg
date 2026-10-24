@@ -2,7 +2,6 @@ const TIME_ZONE = 'America/Los_Angeles';
 const METERS_PER_MILE = 1609.344;
 const FEET_PER_METER = 3.280_84;
 const SECONDS_PER_HOUR = 3600;
-const EVEREST_METERS = 8849;
 
 const countFormat = new Intl.NumberFormat('en-US');
 const tenthFormat = new Intl.NumberFormat('en-US', {
@@ -48,17 +47,6 @@ export function formatCompactFeet(meters: number): string {
 export function formatHours(seconds: number): string {
   const hours = Math.round(seconds / SECONDS_PER_HOUR);
   return `${formatCount(hours)} ${hours === 1 ? 'hr' : 'hrs'}`;
-}
-
-/** A climb as Everests from sea level: `≈ 56 Everests`, `≈ 1.4 Everests`, or `≈ 30% of Everest`. */
-export function formatEverests(meters: number): string {
-  const everests = meters / EVEREST_METERS;
-  if (everests < 0.95) {
-    return `≈ ${Math.round(everests * 100)}% of Everest`;
-  }
-  const count =
-    everests < 10 ? tenthFormat.format(everests).replace(/\.0$/, '') : formatCount(everests);
-  return `≈ ${count} ${count === '1' ? 'Everest' : 'Everests'}`;
 }
 
 /** `4,320` seconds → `1h 12m`. */

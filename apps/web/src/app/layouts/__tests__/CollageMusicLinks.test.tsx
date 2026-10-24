@@ -3,11 +3,11 @@
  */
 
 import {
+  activitiesRoute,
   favoriteAlbumsRoute,
   musicRoute,
   musicStatsRoute,
   readingRoute,
-  activitiesRoute,
 } from '@dg/shared-core/routes/app';
 import { render, screen, within } from '@testing-library/react';
 import { usePathname } from 'next/navigation';

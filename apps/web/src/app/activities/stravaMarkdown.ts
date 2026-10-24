@@ -1,21 +1,22 @@
 import 'server-only';
 
-import {
-  COVERAGE_CITIES,
-  type CoverageCity,
-  type StreetCoverage,
-} from '@dg/content-models/strava/StreetCoverage';
 import type {
   StravaBike,
   StravaLogEntry,
   StravaSport,
 } from '@dg/content-models/strava/StravaHistory';
+import {
+  COVERAGE_CITIES,
+  type CoverageCity,
+  type StreetCoverage,
+} from '@dg/content-models/strava/StreetCoverage';
 import { formattedDistance } from '@dg/shared-core/formatting/formattedDistance';
 import { activitiesRoute } from '@dg/shared-core/routes/app';
 import { getStravaHistory } from '../../services/strava';
 import { relatedPageLinksMarkdown } from '../llm-markdown/relatedPageLinksMarkdown';
 import { SITE_NAME } from '../metadata';
 import { formatShare, summarizeCoverage } from './coverageStats';
+import { type Comparison, distanceComparison, everestComparison } from './stravaComparisons';
 import { formatMiles } from './stravaFormat';
 import { biggestClimbs, longestOutings, yearlyTotals } from './stravaStats';
 
@@ -49,6 +50,13 @@ const feet = (meters: number) =>
 
 const outingCount = (outings: number) =>
   `${outings.toLocaleString('en-US')} ${outings === 1 ? 'activity' : 'activities'}`;
+
+const sportCount = (outings: ReadonlyArray<StravaLogEntry>) => {
+  const sports = new Set(outings.map((outing) => outing.sport)).size;
+  return `${sports} ${sports === 1 ? 'sport' : 'sports'}`;
+};
+
+const said = ({ figure, unit }: Comparison) => `≈ ${figure} ${unit}`;
 
 const outingLink = (outing: StravaLogEntry) => `[${outing.name}](${outing.url})`;
 
@@ -103,8 +111,8 @@ export async function getStravaMarkdown(): Promise<string> {
       `> Routes, yearly miles, and recent activities from ${SITE_NAME}'s Strava history`,
       '## Totals',
       [
-        `- ${miles(totals.distanceMeters)} over ${outingCount(totals.outings)} since ${totals.firstYear}`,
-        `- ${feet(totals.elevationGainMeters)} climbed`,
+        `- ${miles(totals.distanceMeters)} (${said(distanceComparison(totals.distanceMeters))}) over ${outingCount(totals.outings)} in ${sportCount(outings)} since ${totals.firstYear}`,
+        `- ${feet(totals.elevationGainMeters)} climbed (${said(everestComparison(totals.elevationGainMeters))})`,
       ].join('\n'),
       '## This year',
       thisYear.outings > 0

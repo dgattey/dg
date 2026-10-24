@@ -1,8 +1,8 @@
 import {
   type CoverageSpan,
   type CoverageSport,
-  type StreetCoverage,
   coverageKey,
+  type StreetCoverage,
 } from '@dg/content-models/strava/StreetCoverage';
 
 export type NeighborhoodCoverage = {

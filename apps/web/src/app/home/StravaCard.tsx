@@ -4,12 +4,12 @@ import { getTileSource } from '@dg/maps/src/getTileSource';
 import { activitiesRoute } from '@dg/shared-core/routes/app';
 import { RelativeTime } from '@dg/ui/core/RelativeTime';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
-import { PaperCard } from '../collage/PaperCard';
-import { PaperTag } from '../collage/PaperTag';
-import { Scallop, Stub } from '../music/stats/StatsShapes';
 import { RoutePolaroid } from '../activities/RoutePolaroid';
 import { formatMiles, formatRouteCount } from '../activities/stravaFormat';
 import { toMapRoutes } from '../activities/stravaSports';
+import { PaperCard } from '../collage/PaperCard';
+import { PaperTag } from '../collage/PaperTag';
+import { Scallop, Stub } from '../music/stats/StatsShapes';
 
 /**
  * The homepage's Strava gatefold: every route around home up top, linking to
@@ -30,7 +30,11 @@ export function StravaCard({ history }: { history: StravaHistory | null }) {
             Exercise stats
           </PaperTag>
         </h2>
-        <PageTransitionLink className="home__stravaAtlasLink" href={activitiesRoute} title="Big map">
+        <PageTransitionLink
+          className="home__stravaAtlasLink"
+          href={activitiesRoute}
+          title="Big map"
+        >
           <PaperCard edge="quad-c" innerClassName="home__stravaAtlasMat" tiltDeg={3}>
             <span aria-hidden="true" className="home__stravaMap">
               <RoutePeek routes={routes} />

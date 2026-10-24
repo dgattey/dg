@@ -30,6 +30,26 @@ const YEAR_TAGS = [
   { tiltDeg: 3, tone: 'rose' },
 ] as const satisfies ReadonlyArray<{ tiltDeg: number; tone: PaperTone }>;
 
+/**
+ * Publishes the sticky filter bar's height on the shelf, so the sticky year
+ * placards can stop just under it wherever the two share a column.
+ */
+function shareFiltersHeight(filters: HTMLDivElement | null) {
+  const shelf = filters?.parentElement;
+  if (!filters || !shelf) {
+    return;
+  }
+  const observer = new ResizeObserver(([entry]) => {
+    const height = entry?.borderBoxSize[0]?.blockSize ?? filters.offsetHeight;
+    shelf.style.setProperty('--reading-filters-height', `${Math.ceil(height)}px`);
+  });
+  observer.observe(filters);
+  return () => {
+    observer.disconnect();
+    shelf.style.removeProperty('--reading-filters-height');
+  };
+}
+
 /** Paper comes from the unfiltered shelf position, so a card keeps its look as it moves. */
 function ShelfCard({ book, shelfIndex }: { book: RenderableBook; shelfIndex: number }) {
   const treatment = collageCardTreatment(shelfIndex);
@@ -69,12 +89,14 @@ export function ReadingShelf({ books }: { books: ReadonlyArray<RenderableBook> }
 
   return (
     <>
-      <PaperPills
-        label="Filter books"
-        onSelect={(key) => startTransition(() => setFilterKey(key))}
-        options={filterOptions}
-        selected={filterKey}
-      />
+      <div className="reading__filters" ref={shareFiltersHeight}>
+        <PaperPills
+          label="Filter books"
+          onSelect={(key) => startTransition(() => setFilterKey(key))}
+          options={filterOptions}
+          selected={filterKey}
+        />
+      </div>
       {featured ? (
         <ViewTransition default={SHELF_TRANSITION} key={featured.book.id}>
           <ReadingHero featured={featured} stats={shelfStats(shelf)} />

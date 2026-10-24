@@ -272,7 +272,7 @@ describe('ListeningStatsSections', () => {
     expect(screen.getByText('Soundtrack by day')).toBeInTheDocument();
     expect(onLoadRange).not.toHaveBeenCalledWith('week');
 
-    const yearDetails = container.querySelector<HTMLDetailsElement>('.stats__yearMenu');
+    const yearDetails = container.querySelector<HTMLDetailsElement>('.yearMenu');
     if (!yearDetails) {
       throw new Error('Expected Year dropdown menu');
     }

@@ -1,10 +1,10 @@
 import {
+  activitiesRoute,
   favoriteAlbumsRoute,
   homeRoute,
   musicRoute,
   musicStatsRoute,
   readingRoute,
-  activitiesRoute,
 } from '@dg/shared-core/routes/app';
 import type { LucideIcon } from 'lucide-react';
 import { ChartColumn, DiscAlbum, History } from 'lucide-react';

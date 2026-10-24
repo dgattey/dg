@@ -5,8 +5,8 @@ import type { ReactNode } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { FieldNotes } from './FieldNotes';
 import { StravaAtlas, StravaBands } from './FilteredSections';
-import { StreetCoverageSection } from './StreetCoverageSection';
 import { RouteCountTag, StravaFilters } from './StravaFilters';
+import { StreetCoverageSection } from './StreetCoverageSection';
 import { toMapRoutes } from './stravaSports';
 
 /** The cerulean backing and cream print the atlas sits on, shared with the skeleton. */

@@ -5,7 +5,7 @@ import type { PaperTone } from '../collage/types';
 type SportDetails = {
   /** Chip text on a single outing. */
   label: string;
-  /** Filter pill text, or null when the sport only shows under all types. */
+  /** Filter pill text, or null when the sport only shows under all sports. */
   filter: string | null;
   /** Paper matching the sport's ink on the map. */
   tone: PaperTone;

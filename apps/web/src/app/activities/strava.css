@@ -36,9 +36,6 @@
 }
 
 .strava__filters {
-  position: sticky;
-  top: calc(var(--site-header-height, 88px) + 10px);
-  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   grid-row: 1;
@@ -218,26 +215,6 @@
   align-items: center;
   justify-content: flex-end;
 }
-.strava__yearSelect {
-  padding-right: 40px;
-  appearance: none;
-}
-.strava__yearPill {
-  position: relative;
-}
-.strava__yearPill::after {
-  position: absolute;
-  top: 50%;
-  right: 16px;
-  width: 7px;
-  height: 7px;
-  pointer-events: none;
-  content: "";
-  border-right: 2px solid currentColor;
-  border-bottom: 2px solid currentColor;
-  rotate: 45deg;
-  translate: 0 -70%;
-}
 
 .strava__band {
   position: relative;
@@ -297,12 +274,53 @@
   color: var(--soft);
 }
 
+.strava__flowerCard .strava__aside {
+  white-space: nowrap;
+}
+.strava__flowerWrap {
+  position: relative;
+  width: min(100%, 350px);
+  margin: 10px auto 0;
+  container-type: inline-size;
+}
 .strava__flower {
   display: block;
-  width: min(100%, 350px);
+  width: 100%;
   height: auto;
-  margin: 10px auto 0;
   overflow: visible;
+}
+.strava__petalHits {
+  position: absolute;
+  inset: 0;
+  padding: 0;
+  margin: 0;
+  pointer-events: none;
+  list-style: none;
+}
+.strava__petalHits > li {
+  position: absolute;
+  top: calc(50% - 7cqw);
+  left: 50%;
+  width: var(--length);
+  height: 14cqw;
+  transform: rotate(var(--angle));
+  transform-origin: 0 50%;
+}
+.strava__petalHit {
+  display: block;
+  width: calc(100% - 13cqw);
+  height: 100%;
+  padding: 0;
+  margin-left: 13cqw;
+  pointer-events: auto;
+  cursor: default;
+  background: none;
+  border: 0;
+  border-radius: 999px;
+}
+.strava__petalHit:focus-visible {
+  outline: 2px solid var(--ink-on-cream);
+  outline-offset: 0;
 }
 .strava__petal {
   filter: var(--dshadow);
@@ -325,6 +343,37 @@
 .strava__petal--none .strava__month {
   opacity: 0.4;
 }
+.strava__petalGroup {
+  transition: opacity 160ms ease;
+}
+.strava__petal {
+  transition:
+    filter 160ms ease,
+    stroke 160ms ease;
+}
+.strava__petal--current .strava__petal {
+  stroke: var(--ink-on-cream);
+  stroke-width: 2;
+  stroke-dasharray: 5 4;
+}
+.strava__petal--future {
+  pointer-events: none;
+}
+.strava__petal--future .strava__petal {
+  filter: none;
+  fill: none;
+  stroke: color-mix(in oklab, var(--ink-on-cream) 45%, transparent);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-dasharray: 1.5 3.5;
+}
+.strava__flower--engaged .strava__petalGroup:not(.strava__petal--active) {
+  opacity: 0.5;
+}
+.strava__petal--active .strava__month {
+  opacity: 1;
+}
+
 .strava__flowerHeart {
   filter: var(--dshadow);
   fill: var(--viridian);
@@ -488,6 +537,30 @@
 .strava__yearTicket {
   width: 100%;
 }
+.strava__yearButton {
+  display: block;
+  width: 100%;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  text-align: inherit;
+  cursor: default;
+  background: none;
+  border: 0;
+  transition:
+    opacity 160ms ease,
+    translate 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.strava__yearButton:focus-visible {
+  outline: 2px solid var(--on);
+  outline-offset: 3px;
+}
+.strava__year--active .strava__yearButton {
+  translate: 4px 0;
+}
+.strava__yearList--engaged .strava__year:not(.strava__year--active) .strava__yearButton {
+  opacity: 0.55;
+}
 .strava__yearTicket .stats__ticket {
   mask:
     radial-gradient(circle 7px at 0 50%, #0000 96%, #000) left / 51% 100% no-repeat,
@@ -530,6 +603,17 @@
   top: -14px;
   left: -12px;
   z-index: 3;
+}
+.stats__cut.strava__longestSeal {
+  position: absolute;
+  top: -22px;
+  right: -14px;
+  z-index: 4;
+  width: 116px;
+}
+.strava__longestSeal .strava__sealKey {
+  font-size: var(--type-label);
+  line-height: 1.1;
 }
 
 .strava__distanceRow {
@@ -574,11 +658,91 @@
   min-height: 0;
   padding: 16px 24px 18px 40px;
 }
+.strava__year--current .strava__yearTicket .stats__ticket > .stats__face {
+  outline: 2px dashed color-mix(in oklab, var(--on) 55%, transparent);
+  outline-offset: -6px;
+}
 .strava__bikeHead {
   display: flex;
   gap: 12px;
   align-items: baseline;
   justify-content: space-between;
+}
+.strava__bikeTitle {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  min-width: 0;
+}
+.strava__bikeArt {
+  flex: none;
+  width: 72px;
+  height: 43px;
+  overflow: visible;
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.strava__bikeContour {
+  stroke: #17171a;
+  stroke-width: 6.4;
+}
+.strava__bikePaint {
+  stroke-width: 3.6;
+}
+.strava__bikePaint--white {
+  stroke: #fbfaf6;
+}
+.strava__bikePaint--black {
+  stroke: #2a2a2e;
+}
+.strava__bikeShine {
+  stroke: rgb(255 255 255 / 55%);
+  stroke-width: 1;
+}
+.strava__bikeTire {
+  stroke: #17171a;
+  stroke-width: 3;
+}
+.strava__bikeTire--knobby {
+  stroke-width: 2.4;
+  stroke-dasharray: 1.6 1.4;
+}
+.strava__bikeDeepRim {
+  stroke: #26262b;
+  stroke-width: 6.5;
+}
+.strava__bikeRim {
+  stroke: #3a3a40;
+  stroke-width: 1.6;
+}
+.strava__bikeSpokes {
+  stroke: color-mix(in oklab, #17171a 70%, transparent);
+  stroke-width: 0.7;
+}
+.strava__bikeHub,
+.strava__bikeSaddle {
+  fill: #17171a;
+  stroke: #17171a;
+  stroke-width: 1.4;
+}
+.strava__bikeStem {
+  stroke: #17171a;
+  stroke-width: 2.6;
+}
+.strava__bikeTape {
+  stroke-width: 3.4;
+}
+.strava__bikeTape--pink {
+  stroke: #f08fb4;
+}
+.strava__bikeTape--black {
+  stroke: #17171a;
+}
+.strava__bikeChainring {
+  fill: #fbfaf6;
+  stroke: #17171a;
+  stroke-width: 2;
 }
 .strava__bikeName {
   font-family: var(--display);
@@ -597,11 +761,15 @@
   line-height: var(--leading-title);
   color: var(--soft);
 }
+.strava__bikeSpan,
+.strava__bikeMiles,
+.strava__bikeStatValue {
+  white-space: nowrap;
+}
 .strava__bikeStats {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, auto));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
-  justify-content: space-between;
   padding-top: 10px;
   border-top: 2px dashed color-mix(in oklab, var(--on) 30%, transparent);
 }
@@ -618,9 +786,9 @@
 }
 .strava__bikeYears {
   display: flex;
-  gap: 8px;
   align-items: flex-end;
   height: 64px;
+  margin-inline: -4px;
 }
 .strava__bikeYear {
   display: grid;
@@ -629,6 +797,17 @@
   gap: 4px;
   justify-items: center;
   height: 100%;
+  padding: 0 4px;
+  font: inherit;
+  color: inherit;
+  cursor: default;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+}
+.strava__bikeYear:focus-visible {
+  outline: 2px solid var(--on);
+  outline-offset: 1px;
 }
 .strava__bikeBar {
   align-self: end;
@@ -636,6 +815,23 @@
   height: max(3px, calc(var(--bar) * 100%));
   background: color-mix(in oklab, var(--on) 78%, var(--pc));
   border-radius: 3px 3px 1px 1px;
+  transition:
+    background-color 160ms ease,
+    opacity 160ms ease;
+}
+.strava__bikeYear--current .strava__bikeBar {
+  outline: 2px dashed color-mix(in oklab, var(--on) 78%, var(--pc));
+  outline-offset: -2px;
+  background: color-mix(in oklab, var(--on) 30%, var(--pc));
+}
+.strava__bikeYear--active .strava__bikeBar {
+  background: var(--on);
+}
+.strava__bikeYears--engaged .strava__bikeYear:not(.strava__bikeYear--active) .strava__bikeBar {
+  opacity: 0.45;
+}
+.strava__bikeYear--active .strava__bikeYearLabel {
+  color: var(--on);
 }
 .strava__bikeLongest {
   display: grid;
@@ -777,4 +973,11 @@
     width: 116px;
     margin-top: -12px;
   }
+}
+
+/* Outranks the backdrop host's `position: relative` on its children, so the filters ride along. */
+.collageBackdropHost.strava__layout > .strava__filters {
+  position: sticky;
+  top: calc(var(--site-header-height, 88px) + 10px);
+  z-index: 30;
 }

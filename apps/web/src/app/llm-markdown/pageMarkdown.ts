@@ -1,6 +1,7 @@
 import 'server-only';
 
 import {
+  activitiesRoute,
   changelogRoute,
   favoriteAlbumsRoute,
   homeRoute,
@@ -9,7 +10,6 @@ import {
   musicStatsRoute,
   readingRoute,
   siteMapRoute,
-  activitiesRoute,
 } from '@dg/shared-core/routes/app';
 import { cacheLife } from 'next/cache';
 export const pageMarkdownGenerators: {

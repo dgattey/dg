@@ -1,5 +1,5 @@
-import type { StreetCoverage } from '@dg/content-models/strava/StreetCoverage';
 import type { StravaHistory, StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
+import type { StreetCoverage } from '@dg/content-models/strava/StreetCoverage';
 
 jest.mock('../../../services/strava', () => ({
   getStravaHistory: jest.fn(),
@@ -61,8 +61,20 @@ const history: StravaHistory = {
       odometerMeters: 7_828_686,
       rides: 399,
       years: [
-        { distanceMeters: 2_000_000, year: 2023 },
-        { distanceMeters: 5_828_686, year: 2026 },
+        {
+          distanceMeters: 2_000_000,
+          elevationGainMeters: 30_000,
+          movingTimeSeconds: 360_000,
+          rides: 100,
+          year: 2023,
+        },
+        {
+          distanceMeters: 5_828_686,
+          elevationGainMeters: 95_578,
+          movingTimeSeconds: 1_008_000,
+          rides: 299,
+          year: 2026,
+        },
       ],
     },
   ],
@@ -85,7 +97,9 @@ describe('getStravaMarkdown', () => {
     const markdown = await getStravaMarkdown();
 
     expect(markdown).toContain('# Big map');
-    expect(markdown).toContain('- 15 miles over 2 activities since 2025\n- 3,000 feet climbed');
+    expect(markdown).toContain(
+      '- 15 miles (≈ 8.8× across the Golden Gate) over 2 activities in 2 sports since 2025\n- 3,000 feet climbed (≈ 10% of an Everest)',
+    );
     expect(markdown).toContain('## This year\n\n- 2026: 10 miles, 1,000 feet climbed, 1 activity');
     expect(markdown).toContain(
       '## Yearly miles\n\n- 2025: 5 miles (1 activity)\n- 2026: 10 miles (1 activity)',

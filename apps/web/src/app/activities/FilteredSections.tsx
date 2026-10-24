@@ -14,13 +14,8 @@ import { ClimbingFlower } from './ClimbingFlower';
 import { BiggestClimbs, LongestOutings, RecentOutings } from './OutingLog';
 import { RoutePolaroid } from './RoutePolaroid';
 import { useFilteredOutings } from './StravaFilters';
-import {
-  formatCompactFeet,
-  formatCount,
-  formatEverests,
-  formatHours,
-  formatMiles,
-} from './stravaFormat';
+import { distanceComparison, everestComparison, movingTimeComparison } from './stravaComparisons';
+import { formatCompactFeet, formatCount, formatHours, formatMiles } from './stravaFormat';
 import { SPORT_DETAILS, toMapRoutes } from './stravaSports';
 import {
   biggestClimbs,
@@ -35,41 +30,65 @@ const LISTED_OUTINGS = 6;
 const LONGEST_ROWS = 8;
 
 /**
- * Miles, feet, and outings for whatever the filters pick, cut as a ticket, a
- * seal, and a stamp at the top of the field notes.
+ * Miles, feet, and time for whatever the filters pick, cut as a ticket, a seal,
+ * and a stamp at the top of the field notes. Each leads with something you can
+ * picture, with the raw figure underneath.
  */
 export function HeadlineTotals() {
   const { outings, sport, spanLabel } = useFilteredOutings();
   const totals = totalsOf(outings);
-  const scope = `${sport === 'all' ? 'Every sport' : SPORT_DETAILS[sport].filter} · ${spanLabel}`;
+  const scope = `${sport === 'all' ? 'All sports' : SPORT_DETAILS[sport].filter} · ${spanLabel}`;
+  const distance =
+    totals.distanceMeters > 0
+      ? distanceComparison(totals.distanceMeters)
+      : { figure: '0', unit: 'miles' };
+  const climb = everestComparison(totals.elevationGainMeters);
+  const time = movingTimeComparison(totals.movingTimeSeconds, sport);
   return (
     <ul aria-label={`Totals, ${scope}`} className="strava__totals">
       <li className="strava__totalMiles">
         <Stub kind="ticket" tiltDeg={-1.5} tone="ochre">
           <span className="strava__totalScope">{scope}</span>
           <span className="strava__totalFigure">
-            <span className="strava__totalNumber">{formatMiles(totals.distanceMeters)}</span>
-            <span className="strava__totalUnit">miles</span>
+            <span className="strava__totalNumber">{distance.figure}</span>
+            <span className="strava__totalUnit">{distance.unit}</span>
           </span>
+          {totals.distanceMeters > 0 ? (
+            <span className="strava__totalAside">{formatMiles(totals.distanceMeters)} mi</span>
+          ) : null}
         </Stub>
       </li>
       <li className="strava__totalClimb">
         <Scallop tiltDeg={-4} tone="cobalt">
-          <span className="strava__totalNumber">
-            {formatCompactFeet(totals.elevationGainMeters)}
+          <span className="strava__totalNumber">{climb.figure}</span>
+          <span className="strava__totalUnit">{climb.unit}</span>
+          <span className="strava__totalAside">
+            {formatCompactFeet(totals.elevationGainMeters)} ft climbed
           </span>
-          <span className="strava__totalUnit">ft climbed</span>
-          <span className="strava__totalAside">{formatEverests(totals.elevationGainMeters)}</span>
         </Scallop>
       </li>
       <li className="strava__totalOutings">
         <Stub kind="stamp" tiltDeg={1.2} tone="vermilion">
-          <span className="strava__totalNumber">{formatCount(totals.outings)}</span>
-          <span className="strava__totalUnit">{totals.outings === 1 ? 'activity' : 'activities'}</span>
-          <span className="strava__totalAside">{formatHours(totals.movingTimeSeconds)} moving</span>
+          <span className="strava__totalNumber">{time.figure}</span>
+          <span className="strava__totalUnit">{time.unit}</span>
+          <span className="strava__totalAside">
+            {formatHours(totals.movingTimeSeconds)} · {formatCount(totals.outings)}{' '}
+            {totals.outings === 1 ? 'activity' : 'activities'}
+          </span>
         </Stub>
       </li>
     </ul>
+  );
+}
+
+/** The longest route's distance as a trip you can picture, stuck to its print. */
+function LongestSeal({ meters }: { meters: number }) {
+  const { figure, unit } = distanceComparison(meters);
+  return (
+    <Scallop className="strava__longestSeal" size="sticker" tiltDeg={9} tone="ochre">
+      <span className="strava__sealValue">{figure}</span>
+      <span className="strava__sealKey">{unit}</span>
+    </Scallop>
   );
 }
 
@@ -129,7 +148,7 @@ export function StravaBands({
   bikes: ReadonlyArray<StravaBike>;
   tileSource: TileSource;
 }) {
-  const { outings, sport, spanLabel, sportOutings } = useFilteredOutings();
+  const { outings, span, sport, spanLabel, sportOutings } = useFilteredOutings();
   const distanceSport = sport === 'all' ? 'ride' : sport;
   const [longest] = longestOutings(
     outings.filter((outing) => outing.polyline),
@@ -138,7 +157,11 @@ export function StravaBands({
   return (
     <>
       <div className="strava__band">
-        <ClimbingFlower months={monthlyClimbing(outings)} span={spanLabel} />
+        <ClimbingFlower
+          months={monthlyClimbing(outings)}
+          span={spanLabel}
+          year={typeof span === 'number' ? span : null}
+        />
         <RecentOutings outings={outings.slice(0, LISTED_OUTINGS)} />
       </div>
       <div className="strava__band">
@@ -159,6 +182,7 @@ export function StravaBands({
             <PaperTag className="collagePin strava__longestTag" tiltDeg={-7} tone="rose">
               Longest activity
             </PaperTag>
+            <LongestSeal meters={longest.distanceMeters} />
           </RoutePolaroid>
         ) : null}
       </div>

@@ -1,16 +1,16 @@
 'use client';
 
+import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 import {
   type CoverageSpan,
   STRAVA_WINDOW_DAYS,
   type StravaWindow,
 } from '@dg/content-models/strava/StreetCoverage';
-import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
 import { VisibleRoutes } from '@dg/maps/VisibleRoutes';
 import { createContext, type ReactNode, startTransition, use, useState } from 'react';
 import { type PaperPillOption, PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
-import { cx } from '../collage/paperVars';
+import { YearMenu } from '../collage/YearMenu';
 import { formatRouteCount } from './stravaFormat';
 import { SPORT_DETAILS } from './stravaSports';
 import { yearOf } from './stravaStats';
@@ -70,7 +70,7 @@ const sportOption = (key: SportFilter, index: number): PaperPillOption<SportFilt
   key,
   label:
     key === 'all' ? (
-      'All types'
+      'All sports'
     ) : (
       <>
         <span
@@ -112,41 +112,6 @@ function spanLabel(span: Span) {
       return unhandled;
     }
   }
-}
-
-/** A paper pill holding a native select of every year with an outing. */
-function YearPill({
-  onPick,
-  selected,
-  years,
-}: {
-  onPick: (year: number) => void;
-  selected: number | null;
-  years: ReadonlyArray<number>;
-}) {
-  return (
-    <PaperTag
-      className={cx('paperPill strava__yearPill', selected !== null && 'paperButtonCurrent')}
-      edge="quad-a"
-      tiltDeg={-0.9}
-    >
-      <select
-        aria-label="Year"
-        className="paperPillButton strava__yearSelect"
-        onChange={(event) => onPick(Number(event.target.value))}
-        value={selected ?? ''}
-      >
-        <option disabled value="">
-          Year
-        </option>
-        {years.map((year) => (
-          <option key={year} value={year}>
-            {year}
-          </option>
-        ))}
-      </select>
-    </PaperTag>
-  );
 }
 
 /**
@@ -201,9 +166,10 @@ export function StravaFilters({
             selected={span.kind === 'window' ? span.key : span.kind === 'all' ? 'all' : null}
           />
           {years.length > 1 ? (
-            <YearPill
+            <YearMenu
               onPick={(year) => pickSpan({ kind: 'year', year })}
               selected={span.kind === 'year' ? span.year : null}
+              tiltDeg={-0.9}
               years={years}
             />
           ) : null}

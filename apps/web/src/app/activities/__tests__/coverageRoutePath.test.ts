@@ -24,12 +24,14 @@ describe('coverageRoutePath', () => {
   });
 
   it('keeps the segments that cross the edge and breaks the run while outside', () => {
-    expect(coverageRoutePath([route([90, 50], [150, 50], [200, 50], [150, 60], [80, 60])], frame)).toBe(
-      'M90 50l60 0M150 60l-70 0',
-    );
+    expect(
+      coverageRoutePath([route([90, 50], [150, 50], [200, 50], [150, 60], [80, 60])], frame),
+    ).toBe('M90 50l60 0M150 60l-70 0');
   });
 
   it('thins points closer together than the map can show', () => {
-    expect(coverageRoutePath([route([10, 10], [11, 10], [12, 10], [12, 11])], frame)).toBe('M10 10l2 0');
+    expect(coverageRoutePath([route([10, 10], [11, 10], [12, 10], [12, 11])], frame)).toBe(
+      'M10 10l2 0',
+    );
   });
 });

@@ -1,5 +1,5 @@
-import type { StreetCoverage } from '@dg/content-models/strava/StreetCoverage';
 import type { StravaLogEntry } from '@dg/content-models/strava/StravaHistory';
+import type { StreetCoverage } from '@dg/content-models/strava/StreetCoverage';
 import { decodePolyline } from '@dg/maps/src/routeGeometry';
 
 /** A point this close to the last one drawn, in `viewBox` units, adds nothing at map scale. */
