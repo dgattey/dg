@@ -3,7 +3,7 @@
 import { Box } from '@dg/ui/core/Box';
 import type { SxObject } from '@dg/ui/theme';
 import { Music, Music2, Music3, Music4 } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 
 type NotesVariant = 'collage' | 'collageCompact';
 
@@ -13,93 +13,58 @@ type MusicNotesProps = {
   variant?: NotesVariant;
 };
 
-type MusicNote = {
-  id: number;
+type NoteSlot = {
   angle: number;
-  scale: number;
-  duration: number;
-  icon: number;
+  delayMs: number;
   distance: number;
-  delay: number;
+  durationMs: number;
+  iconIndex: number;
 };
 
 type NotesConfig = {
-  delayMaxMs: number;
-  distanceMin: number;
-  distanceRange: number;
-  durationMs: number;
-  durationRandomMs: number;
-  filter: string;
   iconSize: number;
-  maxNotes: number;
-  opacity: readonly [number, number, number];
-  scaleMin: number;
-  scaleRange: number;
+  opacityMid: number;
+  opacityStart: number;
+  slots: ReadonlyArray<NoteSlot>;
   startDistance: number;
   strokeWidth: number;
 };
 
 const MUSIC_ICONS = [Music, Music2, Music3, Music4];
-const NOTE_SPAWN_INTERVAL_MS = 280;
+const SCROLL_RESUME_DELAY_MS = 120;
 
 const NOTES_CONFIG: Record<NotesVariant, NotesConfig> = {
   collage: {
-    delayMaxMs: 80,
-    distanceMin: 168,
-    distanceRange: 64,
-    durationMs: 3000,
-    durationRandomMs: 600,
-    filter: 'drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.55)) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35))',
     iconSize: 17,
-    maxNotes: 18,
-    opacity: [1, 0.95, 0.6],
-    scaleMin: 0.85,
-    scaleRange: 0.3,
+    opacityMid: 0.9,
+    opacityStart: 1,
+    slots: [
+      { angle: 28, delayMs: 0, distance: 178, durationMs: 2800, iconIndex: 0 },
+      { angle: 82, delayMs: 420, distance: 196, durationMs: 3100, iconIndex: 1 },
+      { angle: 142, delayMs: 840, distance: 172, durationMs: 2900, iconIndex: 2 },
+      { angle: 204, delayMs: 1260, distance: 192, durationMs: 3200, iconIndex: 3 },
+      { angle: 266, delayMs: 1680, distance: 184, durationMs: 3000, iconIndex: 0 },
+      { angle: 324, delayMs: 2100, distance: 176, durationMs: 2950, iconIndex: 2 },
+    ],
     startDistance: 98,
     strokeWidth: 2.25,
   },
   collageCompact: {
-    delayMaxMs: 60,
-    distanceMin: 36,
-    distanceRange: 24,
-    durationMs: 2200,
-    durationRandomMs: 400,
-    filter:
-      'drop-shadow(0 0 1.5px light-dark(rgba(247, 241, 226, 0.95), rgba(0, 0, 0, 0.7))) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3))',
     iconSize: 14,
-    maxNotes: 12,
-    opacity: [1, 0.9, 0.5],
-    scaleMin: 0.78,
-    scaleRange: 0.24,
+    opacityMid: 0.85,
+    opacityStart: 0.95,
+    slots: [
+      { angle: 35, delayMs: 0, distance: 42, durationMs: 2100, iconIndex: 0 },
+      { angle: 135, delayMs: 520, distance: 46, durationMs: 2300, iconIndex: 1 },
+      { angle: 225, delayMs: 1040, distance: 40, durationMs: 2200, iconIndex: 2 },
+      { angle: 315, delayMs: 1560, distance: 44, durationMs: 2250, iconIndex: 3 },
+    ],
     startDistance: 16,
     strokeWidth: 2,
   },
 };
 
 const notesContainerSx: SxObject = {
-  '@keyframes musicNoteFloatAndFade': {
-    '0%': {
-      opacity: 0,
-      transform:
-        'translate3d(calc(-50% + var(--note-x0)), calc(-50% + var(--note-y0)), 0) scale3d(var(--note-scale), var(--note-scale), 1) rotate(0deg)',
-    },
-    '8%': {
-      opacity: 'var(--note-opacity-start)',
-      transform:
-        'translate3d(calc(-50% + var(--note-x0) + (var(--note-x) - var(--note-x0)) * 0.08), calc(-50% + var(--note-y0) + (var(--note-y) - var(--note-y0)) * 0.08), 0) scale3d(var(--note-scale), var(--note-scale), 1) rotate(calc(var(--note-rotation) * 0.08))',
-    },
-    '50%': {
-      opacity: 'var(--note-opacity-mid)',
-    },
-    '80%': {
-      opacity: 'var(--note-opacity-end)',
-    },
-    '100%': {
-      opacity: 0,
-      transform:
-        'translate3d(calc(-50% + var(--note-x)), calc(-50% + var(--note-y)), 0) scale3d(calc(var(--note-scale) * 0.7), calc(var(--note-scale) * 0.7), 1) rotate(var(--note-rotation))',
-    },
-  },
   backfaceVisibility: 'hidden',
   height: 0,
   left: 0,
@@ -110,74 +75,105 @@ const notesContainerSx: SxObject = {
   width: 0,
 };
 
-const getContainerSx = ({ filter, opacity }: NotesConfig): SxObject => ({
-  ...notesContainerSx,
-  '--note-opacity-end': opacity[2],
-  '--note-opacity-mid': opacity[1],
-  '--note-opacity-start': opacity[0],
-  '--note-shadow': filter,
-});
-
-const getNoteSx = (note: MusicNote, startDistance: number, noteColor?: string): SxObject => {
-  const x = Math.cos((note.angle * Math.PI) / 180);
-  const y = Math.sin((note.angle * Math.PI) / 180);
-  return {
-    '--note-rotation': `${note.angle > 180 ? -25 : 25}deg`,
-    '--note-scale': note.scale,
-    '--note-x': `${x * note.distance}px`,
-    '--note-x0': `${x * startDistance}px`,
-    '--note-y': `${y * note.distance}px`,
-    '--note-y0': `${y * startDistance}px`,
-    animation: `musicNoteFloatAndFade ${note.duration}ms ease-out forwards`,
-    animationDelay: `${note.delay}ms`,
-    backfaceVisibility: 'hidden',
-    color: noteColor ?? 'currentColor',
-    filter: 'var(--note-shadow)',
-    left: 0,
-    opacity: 0,
-    position: 'absolute',
-    top: 0,
-    willChange: 'transform, opacity',
-  };
+const noteItemSx: SxObject = {
+  backfaceVisibility: 'hidden',
+  left: 0,
+  opacity: 0.01,
+  position: 'absolute',
+  top: 0,
+  willChange: 'transform, opacity',
 };
 
 export function MusicNotes({ isPlaying, noteColor, variant = 'collage' }: MusicNotesProps) {
-  const [notes, setNotes] = useState<Array<MusicNote>>([]);
-  const noteIdRef = useRef(0);
+  const containerRef = useRef<HTMLDivElement>(null);
   const config = NOTES_CONFIG[variant];
+  const halfIcon = -Math.round(config.iconSize / 2);
 
   useEffect(() => {
-    if (!isPlaying) {
-      setNotes([]);
+    const container = containerRef.current;
+    if (!container || !isPlaying) {
       return;
     }
+    if (window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
+      return;
+    }
+    const children = [...container.children] as Array<HTMLElement>;
+    const animations: Array<Animation> = [];
 
-    const spawnNote = () => {
-      const id = noteIdRef.current++;
-      const newNote: MusicNote = {
-        angle: Math.random() * 360,
-        delay: Math.random() * config.delayMaxMs,
-        distance: config.distanceMin + Math.random() * config.distanceRange,
-        duration: config.durationMs + Math.random() * config.durationRandomMs,
-        icon: Math.floor(Math.random() * MUSIC_ICONS.length),
-        id,
-        scale: config.scaleMin + Math.random() * config.scaleRange,
-      };
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i];
+      const slot = config.slots[i];
+      if (!child || !slot || typeof child.animate !== 'function') {
+        continue;
+      }
+      const rad = (slot.angle * Math.PI) / 180;
+      const x0 = Math.round(Math.cos(rad) * config.startDistance);
+      const y0 = Math.round(Math.sin(rad) * config.startDistance);
+      const x1 = Math.round(Math.cos(rad) * slot.distance);
+      const y1 = Math.round(Math.sin(rad) * slot.distance);
+      const rot = slot.angle > 180 ? -24 : 24;
 
-      setNotes((prev) => [...prev, newNote].slice(-config.maxNotes));
+      const anim = child.animate(
+        [
+          {
+            opacity: 0.01,
+            transform: `translate3d(${x0}px, ${y0}px, 0) rotate(0deg)`,
+          },
+          {
+            offset: 0.12,
+            opacity: config.opacityStart,
+            transform: `translate3d(${Math.round(x0 + (x1 - x0) * 0.12)}px, ${Math.round(y0 + (y1 - y0) * 0.12)}px, 0) rotate(${Math.round(rot * 0.12)}deg)`,
+          },
+          {
+            offset: 0.55,
+            opacity: config.opacityMid,
+            transform: `translate3d(${Math.round(x0 + (x1 - x0) * 0.55)}px, ${Math.round(y0 + (y1 - y0) * 0.55)}px, 0) rotate(${Math.round(rot * 0.55)}deg)`,
+          },
+          {
+            opacity: 0.01,
+            transform: `translate3d(${x1}px, ${y1}px, 0) rotate(${rot}deg)`,
+          },
+        ],
+        {
+          delay: -slot.delayMs,
+          duration: slot.durationMs,
+          easing: 'ease-out',
+          iterations: Number.POSITIVE_INFINITY,
+        },
+      );
+      animations.push(anim);
+    }
 
-      setTimeout(() => {
-        setNotes((prev) => prev.filter((n) => n.id !== id));
-      }, newNote.duration + newNote.delay);
+    let scrollTimer: number | undefined;
+    let pausedForScroll = false;
+    const onScroll = () => {
+      if (!pausedForScroll) {
+        pausedForScroll = true;
+        for (const anim of animations) {
+          anim.pause();
+        }
+      }
+      if (scrollTimer !== undefined) {
+        window.clearTimeout(scrollTimer);
+      }
+      scrollTimer = window.setTimeout(() => {
+        pausedForScroll = false;
+        for (const anim of animations) {
+          anim.play();
+        }
+      }, SCROLL_RESUME_DELAY_MS);
     };
 
-    spawnNote();
-    setTimeout(spawnNote, 60);
-    setTimeout(spawnNote, 120);
-    setTimeout(spawnNote, 180);
-
-    const intervalId = setInterval(spawnNote, NOTE_SPAWN_INTERVAL_MS);
-    return () => clearInterval(intervalId);
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      if (scrollTimer !== undefined) {
+        window.clearTimeout(scrollTimer);
+      }
+      for (const anim of animations) {
+        anim.cancel();
+      }
+    };
   }, [isPlaying, config]);
 
   if (!isPlaying) {
@@ -185,14 +181,24 @@ export function MusicNotes({ isPlaying, noteColor, variant = 'collage' }: MusicN
   }
 
   return (
-    <Box aria-hidden="true" sx={getContainerSx(config)}>
-      {notes.map((note) => {
-        const IconComponent = MUSIC_ICONS[note.icon];
+    <Box
+      aria-hidden="true"
+      data-ambient-notes="true"
+      ref={containerRef}
+      style={{ color: noteColor ?? 'currentColor' }}
+      sx={notesContainerSx}
+    >
+      {config.slots.map((slot) => {
+        const IconComponent = MUSIC_ICONS[slot.iconIndex];
         if (!IconComponent) {
           return null;
         }
         return (
-          <Box key={note.id} sx={getNoteSx(note, config.startDistance, noteColor)}>
+          <Box
+            key={`${slot.angle}-${slot.delayMs}`}
+            style={{ marginLeft: halfIcon, marginTop: halfIcon }}
+            sx={noteItemSx}
+          >
             <IconComponent size={config.iconSize} strokeWidth={config.strokeWidth} />
           </Box>
         );

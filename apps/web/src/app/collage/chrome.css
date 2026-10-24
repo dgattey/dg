@@ -45,12 +45,8 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   pointer-events: auto;
 }
 .chrome__logo {
-  filter: var(--dshadow);
+  filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
   rotate: -4deg;
-}
-.chrome__logo:hover,
-.chrome__logo:focus-visible {
-  filter: var(--dshadow-lift);
 }
 .chrome__nowPlaying {
   min-width: 0;
@@ -234,10 +230,13 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   padding: 24px 0 36px;
   color: var(--cream);
 }
+.chrome__footer[data-occluded="true"] {
+  visibility: hidden;
+}
 .chrome__nowWrap {
   position: relative;
   z-index: 5;
-  filter: var(--dshadow-lift);
+  rotate: 0deg;
 }
 .chrome__nowStrip {
   --now-dim: color-mix(in oklab, var(--ink) 68%, transparent);
@@ -261,6 +260,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   border: var(--collage-border-width) solid
     light-dark(color-mix(in oklab, var(--ink) 18%, transparent), rgb(243 236 220 / 0.18));
   border-radius: var(--soft-b);
+  box-shadow: var(--pshadow-lift);
 }
 .chrome__nowCell {
   display: flex;

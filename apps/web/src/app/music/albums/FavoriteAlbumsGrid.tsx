@@ -44,10 +44,6 @@ const comparators: Record<AlbumSortKey, (a: PlaylistAlbum, b: PlaylistAlbum) => 
   released: (a, b) => b.releaseDate.localeCompare(a.releaseDate),
 };
 
-function albumSlotSx(index: number): SxObject {
-  return { ...albumTileSlotSx, order: 2 * index + 1 };
-}
-
 /**
  * Albums claim odd visual slots (`2i + 1`), leaving even slots for the well at
  * the end of the selected album's row across each breakpoint.
@@ -229,17 +225,26 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
     if (!previous || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches) {
       return;
     }
+    const maxVisibleTop = (window.innerHeight || 900) + 240;
+    const moves: Array<{ deltaX: number; deltaY: number; element: HTMLElement }> = [];
     for (const [id, element] of itemRefs.current) {
       const before = previous.get(id);
       if (!before || typeof element.animate !== 'function') {
         continue;
       }
       const after = element.getBoundingClientRect();
+      if (before.top > maxVisibleTop && after.top > maxVisibleTop) {
+        continue;
+      }
       const deltaX = before.left - after.left;
-      const deltaY = before.top - after.top;
+      const rawDeltaY = before.top - after.top;
+      const deltaY = Math.max(-maxVisibleTop, Math.min(maxVisibleTop, rawDeltaY));
       if (deltaX === 0 && deltaY === 0) {
         continue;
       }
+      moves.push({ deltaX, deltaY, element });
+    }
+    for (const { deltaX, deltaY, element } of moves) {
       element.animate(
         [{ transform: `translate(${deltaX}px, ${deltaY}px)` }, { transform: 'translate(0, 0)' }],
         { duration: TIMING_SLOW, easing: EASING_DEFAULT },
@@ -275,7 +280,8 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
           itemRefs.current.delete(album.id);
         }
       }}
-      sx={albumSlotSx(index)}
+      style={{ order: 2 * index + 1 }}
+      sx={albumTileSlotSx}
     >
       <FavoriteAlbumCell
         albumId={album.id}

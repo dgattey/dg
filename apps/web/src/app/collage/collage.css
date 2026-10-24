@@ -32,6 +32,18 @@ html:has(.collageRoot) body {
   --body: var(--font-sans);
 }
 
+@property --footer-progress {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 0;
+}
+
+@property --vt-scroll-offset {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+
 .collageRoot {
   --paper: light-dark(#ede3cb, #152238);
   --paper-2: #1c2d48;
@@ -78,6 +90,10 @@ html:has(.collageRoot) body {
   --tracking-display: -0.035em;
   --tracking-title: -0.02em;
   --tracking-label: -0.01em;
+  --pshadow: 0 1.5px 0 rgb(0 0 0 / 0.2), 0 2px 3px rgb(0 0 0 / 0.12);
+  --pshadow-lift:
+    0 2px 0 light-dark(rgb(0 0 0 / 0.22), rgb(0 0 0 / 0.36)),
+    0 7px 10px light-dark(rgb(0 0 0 / 0.18), rgb(0 0 0 / 0.34));
   --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.2)) drop-shadow(0 2px 3px rgb(0 0 0 / 0.12));
   /* Same two shadows as --dshadow, so the filter interpolates between them. */
   --dshadow-lift: drop-shadow(0 2px 0 light-dark(rgb(0 0 0 / 0.2), rgb(0 0 0 / 0.36)))
@@ -91,6 +107,8 @@ html:has(.collageRoot) body {
   font-family: var(--body);
   color: var(--ink);
   background-color: var(--viridian);
+  background-image: url("./img/grain.png");
+  background-size: 256px 256px;
 }
 .collageSheet {
   --footer-progress: 0;
@@ -106,37 +124,12 @@ html:has(.collageRoot) body {
   overflow: clip;
   color: var(--ink);
   background-color: var(--paper);
+  background-image: url("./img/grain.png");
+  background-size: 256px 256px;
   border-radius: 0 0 var(--sheet-radius) var(--sheet-radius);
   box-shadow:
     0 2px 0 rgb(0 0 0 / calc(0.2 * var(--footer-progress))),
     0 18px 32px rgb(8 12 30 / calc(0.32 * var(--footer-progress)));
-}
-/*
- * Grain belongs to the surface it sits on. The sheet's travels with the sheet. The
- * root's is pinned to the viewport above the footer, which holds still while the
- * sheet scrolls off it, so the green and its grain stay put through the reveal.
- */
-.collageRoot::after,
-.collageRoot > .collageSheet::after {
-  position: absolute;
-  inset: 0;
-  z-index: 60;
-  pointer-events: none;
-  content: "";
-  background-image: url("./img/grain.png");
-  background-size: 256px 256px;
-}
-.collageRoot::after {
-  position: fixed;
-  z-index: 1;
-}
-html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::after {
-  opacity: 0.6;
-}
-@media (prefers-color-scheme: dark) {
-  html:not([data-color-scheme="light"]) :is(.collageRoot, .collageRoot > .collageSheet)::after {
-    opacity: 0.6;
-  }
 }
 
 @supports not (color: light-dark(#000, #fff)) {
@@ -217,7 +210,6 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   --r: 0deg;
   position: relative;
   z-index: 2;
-  filter: var(--dshadow);
   rotate: var(--r);
 }
 .paperInner {
@@ -228,6 +220,7 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   color: var(--on);
   background: var(--pc);
   border-radius: var(--edge-radius);
+  box-shadow: var(--pshadow);
   clip-path: var(--clip);
   rotate: none;
 }
@@ -254,6 +247,12 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   border-radius: 10px;
   box-shadow: 0 6px 16px rgb(0 0 0 / 28%);
 }
+.collageRoot [data-tooltip-anchor]:not(:hover, :focus-within) > [role="tooltip"] {
+  position: absolute;
+  position-anchor: auto;
+  position-area: none;
+  position-try-fallbacks: none;
+}
 .paperTag,
 .paperButton {
   display: inline-flex;
@@ -272,7 +271,7 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   background: var(--pc);
   border: 0;
   border-radius: var(--edge-radius);
-  filter: var(--dshadow);
+  box-shadow: var(--pshadow);
   clip-path: var(--clip);
   rotate: var(--r, 0deg);
 }
@@ -296,6 +295,9 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   color: var(--on);
   filter: none;
   rotate: none;
+}
+.paperWrap:not(.paperButtonWrap) .paperButton {
+  box-shadow: none;
 }
 /*
  * One focus ring across the collage: 2px in the control's own text colour,
@@ -330,19 +332,19 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   :focus-visible,
   :has(:focus-visible)
 ) {
+  --pshadow: var(--pshadow-lift);
   --dshadow: var(--dshadow-lift);
 }
 @media (hover: hover) {
   .collageLift:is(:any-link, summary, :has(:any-link, button, [role="button"])):hover {
+    --pshadow: var(--pshadow-lift);
     --dshadow: var(--dshadow-lift);
   }
 }
 @media (prefers-reduced-motion: no-preference) {
   .collageLift,
   .collageLift :is(.paperWrap, .paperTag, .print__frame) {
-    transition:
-      translate 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-      filter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: translate 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   .collageLift:is(:any-link, summary, :has(:any-link, button, [role="button"])):is(
     :focus-visible,
@@ -379,7 +381,6 @@ html[data-color-scheme="dark"] :is(.collageRoot, .collageRoot > .collageSheet)::
   overflow: visible;
   color: var(--cut-color);
   pointer-events: none;
-  filter: var(--dshadow);
   fill: currentColor;
   rotate: var(--cut-rotation);
   scale: var(--cut-scale-x, 1) 1;
@@ -409,18 +410,13 @@ html[data-color-scheme="dark"] .cutNightOnly {
   pointer-events: none;
 }
 
-@supports (animation-timeline: view()) {
+@supports (animation-timeline: view()) and (not (-moz-appearance: none)) {
   @media (prefers-reduced-motion: no-preference) {
-    .collageField,
     .cutOut.cutDepthMedium,
     .cutOut.cutDepthFast {
       animation: collageDrift linear both;
       animation-timeline: view();
       animation-range: entry 0% exit 100%;
-    }
-    .collageField {
-      --drift: 20px;
-      scale: 1 1.1;
     }
     .cutOut.cutDepthMedium {
       --drift: 37.5px;
@@ -431,7 +427,6 @@ html[data-color-scheme="dark"] .cutNightOnly {
   }
 
   @media (max-width: 820px) {
-    .collageField,
     .cutOut.cutDepthMedium,
     .cutOut.cutDepthFast {
       animation: none;
@@ -460,10 +455,13 @@ html[data-color-scheme="dark"] .cutNightOnly {
   line-height: 0.9;
   color: var(--title);
   letter-spacing: var(--tracking-display);
-  filter: var(--dshadow);
+  text-shadow:
+    0 1px 0 rgb(0 0 0 / 0.2),
+    0 2px 3px rgb(0 0 0 / 0.12);
 }
 .cutHeadingCut {
   letter-spacing: 0.01em;
+  text-shadow: none;
   filter: url("#collage-rough") var(--dshadow);
 }
 .cutWord {

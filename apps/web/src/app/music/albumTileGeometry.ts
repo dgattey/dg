@@ -45,14 +45,14 @@ export function albumCoverSx(depth: number, sleeveCount: number): SxObject {
   const offset = `calc(${shift}% * ${spread})`;
 
   return {
+    border: 'thin solid var(--dg-palette-card-border)',
     borderRadius: ALBUM_TILE_BORDER_RADIUS,
-    boxShadow: 'var(--dg-shadow-card-main)',
+    ...(depth === 0 ? { boxShadow: '0 1.5px 0 rgb(0 0 0 / 0.18)' } : {}),
     inset: `${COVER_INSET_PERCENT}%`,
     lineHeight: 0,
     overflow: 'hidden',
     position: 'absolute',
     transform: `translate(${offset}, calc(-1 * ${offset})) rotate(${depth * LAYER_TILT_DEG}deg)`,
-    ...(depth > 0 ? { border: 'thin solid var(--dg-palette-card-border)' } : {}),
     ...albumArtHoverTransitionSx,
   };
 }

@@ -25,9 +25,8 @@ const layerSx: SxObject = {
 
 export const ALBUM_GRADIENT_GLOW_SX: SxObject = {
   borderRadius: 6,
-  filter: 'blur(16px)',
-  inset: -2,
-  opacity: 0.5,
+  inset: -4,
+  opacity: 0.36,
   zIndex: 0,
 };
 
@@ -66,7 +65,8 @@ export function AlbumGradientBackdrop({ gradient, containerSx }: AlbumGradientBa
           data-gradient-layer
           key={layer.id}
           onAnimationEnd={() => dropSpentLayers(layer.id)}
-          sx={{ ...layerSx, backgroundImage: layer.gradient }}
+          style={{ backgroundImage: layer.gradient }}
+          sx={layerSx}
         />
       ))}
     </Box>

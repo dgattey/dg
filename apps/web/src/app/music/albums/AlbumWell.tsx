@@ -54,19 +54,20 @@ function reserveSx(reservePx: number | null): SxObject {
  * the height locked and snapped back when it released. `clip` hides the same
  * overflow without a scrollport, leaving sticky anchored to the page.
  */
-function shellSx(heightPx: number | null): SxObject {
-  const locking = heightPx != null;
-  return {
-    [REDUCED_MOTION]: {
-      height: 'auto',
-      overflow: 'visible',
-      transition: 'none',
-    },
-    height: locking ? heightPx : 'auto',
-    overflow: locking ? 'clip' : 'visible',
-    transition: locking ? createTransition('height', TIMING_MEDIUM, EASING_DEFAULT) : undefined,
-  };
-}
+const shellUnlockedSx: SxObject = {
+  height: 'auto',
+  overflow: 'visible',
+};
+
+const shellLockedSx: SxObject = {
+  [REDUCED_MOTION]: {
+    height: 'auto',
+    overflow: 'visible',
+    transition: 'none',
+  },
+  overflow: 'clip',
+  transition: createTransition('height', TIMING_MEDIUM, EASING_DEFAULT),
+};
 
 type Props = {
   /** Header data the grid already holds, so art is up before detail streams. */
@@ -199,7 +200,11 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
   );
 
   return (
-    <Box onTransitionEnd={handleTransitionEnd} sx={shellSx(heightPx)}>
+    <Box
+      onTransitionEnd={handleTransitionEnd}
+      style={heightPx != null ? { height: heightPx } : undefined}
+      sx={heightPx != null ? shellLockedSx : shellUnlockedSx}
+    >
       <Box className="collageBackdropHost" ref={measureRef}>
         <BackdropLayer backdrop={ALBUM_DETAIL_BACKDROP} />
         <PaperCard

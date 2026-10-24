@@ -5,7 +5,7 @@
   position: relative;
   display: inline-grid;
   color: var(--on);
-  filter: var(--dshadow);
+  filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
   rotate: var(--r, 0deg);
 }
 .stats__face {
@@ -306,7 +306,8 @@
   left: 44%;
   z-index: 1;
   width: 92%;
-  filter: var(--dshadow);
+  border-radius: 50%;
+  box-shadow: var(--pshadow);
   rotate: 24deg;
 }
 .stats__heroSleeve {
@@ -401,7 +402,7 @@
   color: var(--on);
   background: var(--pc);
   border-radius: 50%;
-  filter: var(--dshadow);
+  box-shadow: var(--pshadow);
   rotate: var(--r);
 }
 .stats__runnerCaption {
@@ -412,7 +413,7 @@
   color: var(--ink-on-cream);
   background: var(--cream);
   border-radius: var(--quad-b);
-  filter: var(--dshadow);
+  box-shadow: var(--pshadow);
 }
 .stats__runnerCaption .stats__meta {
   color: color-mix(in oklab, var(--ink-on-cream) 66%, var(--cream));

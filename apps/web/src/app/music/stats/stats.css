@@ -146,7 +146,7 @@
   padding: var(--mat);
   background: var(--mat-bg, var(--cream));
   border-radius: calc(var(--print-radius) + var(--mat));
-  filter: var(--dshadow);
+  box-shadow: var(--pshadow);
 }
 .stats__mat img {
   flex-shrink: 0;

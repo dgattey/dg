@@ -82,9 +82,11 @@
   position: absolute;
   inset: 26px -22px -20px 22px;
   z-index: 0;
+  filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
 }
 .strava__atlasBacking > .paperInner {
   height: 100%;
+  box-shadow: none;
 }
 .strava__atlasMat {
   position: relative;
@@ -98,6 +100,7 @@
   aspect-ratio: 780 / 940;
   overflow: clip;
   border-radius: var(--print-radius);
+  will-change: transform;
 }
 .strava__atlasBlank,
 .strava__printBlank {
@@ -319,7 +322,6 @@
   outline-offset: 0;
 }
 .strava__petal {
-  filter: var(--dshadow);
   fill: color-mix(in oklab, var(--ink-on-cream) 14%, transparent);
 }
 .strava__vein {
@@ -371,7 +373,6 @@
 }
 
 .strava__flowerHeart {
-  filter: var(--dshadow);
   fill: var(--viridian);
 }
 .strava__flowerTotal,
@@ -392,7 +393,11 @@
 }
 
 /* Ruled slips with a folded corner. */
+.strava__slip {
+  filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
+}
 .strava__slip > .paperInner {
+  box-shadow: none;
   clip-path: polygon(0 0, calc(100% - 34px) 0, 100% 34px, 100% 100%, 0 100%);
 }
 .strava__fold {

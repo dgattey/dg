@@ -142,6 +142,14 @@ export function frameAround(
 const isNearFrame = ({ x, y }: { x: number; y: number }, { height, width }: RouteFrame) =>
   x > -FRAME_MARGIN && x < width + FRAME_MARGIN && y > -FRAME_MARGIN && y < height + FRAME_MARGIN;
 
+const segmentCellKey = (a: readonly [number, number], b: readonly [number, number]) => {
+  const ax = Math.round(a[0] / 15);
+  const ay = Math.round(a[1] / 15);
+  const bx = Math.round(b[0] / 15);
+  const by = Math.round(b[1] / 15);
+  return ax < bx || (ax === bx && ay < by) ? `${ax},${ay}:${bx},${by}` : `${bx},${by}:${ax},${ay}`;
+};
+
 /**
  * Projects routes into the frame's pixels, skipping any that never come near
  * it, and joins each tone's routes into one relative SVG path. Paths keep the
@@ -152,25 +160,72 @@ export function framePaths(
   routes: ReadonlyArray<DecodedRoute>,
 ): Array<FramedPath> {
   const byTone = new Map<string, string>();
+  const seenByTone = new Map<string, Set<string>>();
+  const minX = -FRAME_MARGIN * 10;
+  const maxX = (frame.width + FRAME_MARGIN) * 10;
+  const minY = -FRAME_MARGIN * 10;
+  const maxY = (frame.height + FRAME_MARGIN) * 10;
+  const inBox = ([x, y]: readonly [number, number]) => x > minX && x < maxX && y > minY && y < maxY;
+
   for (const { points, tone } of routes) {
+    let seen = seenByTone.get(tone);
+    if (!seen) {
+      seen = new Set<string>();
+      seenByTone.set(tone, seen);
+    }
     for (const leg of routeLegs(points)) {
       const pixels = projectRouteToPixels({ ...frame, points: leg });
       if (!pixels.some((pixel) => isNearFrame(pixel, frame))) {
         continue;
       }
-      const [first, ...rest] = simplifyLine(pixels, PIXEL_TOLERANCE, ({ x, y }) => [x, y]).map(
+      const simplified = simplifyLine(pixels, PIXEL_TOLERANCE, ({ x, y }) => [x, y]).map(
         ({ x, y }) => [Math.round(x * 10), Math.round(y * 10)] as const,
       );
-      if (!first) {
-        continue;
+      let run: Array<readonly [number, number]> = [];
+      const flushRun = () => {
+        const [first, ...rest] = run;
+        run = [];
+        if (!first || rest.length === 0) {
+          return;
+        }
+        let hasNewCell = routes.length <= 1;
+        const keys: Array<string> = [];
+        let prev = first;
+        for (const pt of rest) {
+          const key = segmentCellKey(prev, pt);
+          keys.push(key);
+          if (!seen.has(key)) {
+            hasNewCell = true;
+          }
+          prev = pt;
+        }
+        if (!hasNewCell) {
+          return;
+        }
+        for (const key of keys) {
+          seen.add(key);
+        }
+        let d = `M${first[0] / 10} ${first[1] / 10}`;
+        let previous = first;
+        for (const pixel of rest) {
+          d += `l${(pixel[0] - previous[0]) / 10} ${(pixel[1] - previous[1]) / 10}`;
+          previous = pixel;
+        }
+        byTone.set(tone, (byTone.get(tone) ?? '') + d);
+      };
+      for (const pt of simplified) {
+        const prev = run.at(-1);
+        if (!prev) {
+          if (inBox(pt)) {
+            run.push(pt);
+          }
+        } else if (inBox(prev) || inBox(pt)) {
+          run.push(pt);
+        } else {
+          flushRun();
+        }
       }
-      let d = `M${first[0] / 10} ${first[1] / 10}`;
-      let previous = first;
-      for (const pixel of rest) {
-        d += `l${(pixel[0] - previous[0]) / 10} ${(pixel[1] - previous[1]) / 10}`;
-        previous = pixel;
-      }
-      byTone.set(tone, (byTone.get(tone) ?? '') + d);
+      flushRun();
     }
   }
   return [...byTone].map(([tone, d]) => ({ d, tone }));

@@ -21,9 +21,8 @@ export type SxObject = SxProperties & {
 export type SxProps = SxObject | boolean | null | undefined | ReadonlyArray<SxProps>;
 
 const CARD_SHADOW_MAIN =
-  '0.0145rem 0.029rem 0.174rem rgba(0,0,0,.017),0.0335rem 0.067rem 0.402rem rgba(0,0,0,.024),0.0625rem 0.125rem 0.75rem rgba(0,0,0,.03),0.1125rem 0.225rem 1.35rem rgba(0,0,0,.036),0.2085rem 0.417rem 2.502rem rgba(0,0,0,.043),0.5rem 1rem 6rem rgba(0,0,0,.06),0 0 0 0.0625rem rgba(0,0,0,.015)';
-const CARD_SHADOW_HOVERED =
-  '0 0.125rem 2rem rgba(0, 0, 0, 0.06),0 0.125rem 4rem rgba(0, 0, 0, 0.12),0 0 0 0.125rem rgba(0, 0, 0, 0.036)';
+  '0 1px 2px rgba(0, 0, 0, 0.14), 0 3px 6px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.04)';
+const CARD_SHADOW_HOVERED = '0 4px 12px rgba(0, 0, 0, 0.16), 0 0 0 1.5px rgba(0, 0, 0, 0.06)';
 
 export function getGlobalThemeCss(): string {
   const typography = getTypography();

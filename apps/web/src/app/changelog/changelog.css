@@ -78,7 +78,7 @@
   text-decoration: none;
   background: var(--cream);
   border-radius: 10px 8px 11px 9px;
-  filter: var(--dshadow);
+  box-shadow: var(--pshadow);
   transition: translate 0.18s ease;
 }
 .changelog__yearJump small {

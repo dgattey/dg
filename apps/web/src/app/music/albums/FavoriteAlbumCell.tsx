@@ -13,6 +13,10 @@ import { CollageAlbumPaper } from './collageAlbumCardTreatments';
 
 /** Every favorite is a whole album, so every cell wears the full fan. */
 const SLEEVE_COUNT = MAX_ALBUM_SLEEVES;
+const IS_GECKO =
+  typeof CSS !== 'undefined' &&
+  typeof CSS.supports === 'function' &&
+  CSS.supports('-moz-appearance', 'none');
 
 type Props = {
   albumId: string;
@@ -39,10 +43,10 @@ function AlbumArtCover({
   imageUrl: string;
   isLcpCandidate?: boolean;
 }) {
-  if (collapsed) {
+  if (collapsed || IS_GECKO) {
     return (
       <AlbumCover
-        alt=""
+        alt={collapsed ? '' : albumName}
         depth={0}
         imageUrl={imageUrl}
         isLcpCandidate={isLcpCandidate}

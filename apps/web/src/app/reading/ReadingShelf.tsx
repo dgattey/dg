@@ -22,6 +22,8 @@ import {
 
 /** Shared view-transition class, so every moving piece of the shelf runs on one clock. */
 const SHELF_TRANSITION = inPageViewTransitionProps('reading-shelf');
+const MAX_ANIMATED_SHELF_BOOKS = 8;
+const MAX_ANIMATED_SHELF_SECTIONS = 2;
 
 const YEAR_TAGS = [
   { tiltDeg: -3, tone: 'cream' },
@@ -106,7 +108,9 @@ export function ReadingShelf({ books }: { books: ReadonlyArray<RenderableBook> }
         const yearTag = YEAR_TAGS[sectionIndex % YEAR_TAGS.length] ?? YEAR_TAGS[0];
         return (
           <section aria-label={section.label} className="reading__section" key={section.label}>
-            <ViewTransition default={SHELF_TRANSITION}>
+            <ViewTransition
+              default={sectionIndex < MAX_ANIMATED_SHELF_SECTIONS ? SHELF_TRANSITION : 'none'}
+            >
               <h2 className="reading__sectionHeading">
                 <PaperTag
                   className="reading__sectionTag"
@@ -122,8 +126,15 @@ export function ReadingShelf({ books }: { books: ReadonlyArray<RenderableBook> }
               </h2>
             </ViewTransition>
             <div className="reading__grid">
-              {section.books.map((book) => (
-                <ViewTransition default={SHELF_TRANSITION} key={book.id}>
+              {section.books.map((book, bookIndex) => (
+                <ViewTransition
+                  default={
+                    sectionIndex === 0 && bookIndex < MAX_ANIMATED_SHELF_BOOKS
+                      ? SHELF_TRANSITION
+                      : 'none'
+                  }
+                  key={book.id}
+                >
                   <ShelfCard book={book} shelfIndex={shelf.indexOf(book)} />
                 </ViewTransition>
               ))}

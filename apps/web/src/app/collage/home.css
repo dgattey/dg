@@ -31,11 +31,14 @@
 .home__work,
 .home__moreWork,
 .home__coda {
+  position: relative;
   padding-block: var(--sp-top) var(--sp-bottom);
+  isolation: isolate;
 }
 .home__hello {
   --sp-top: 14px;
   --sp-bottom: 70px;
+  z-index: 1;
 }
 .home__helloGrid {
   grid-template-rows: auto auto 1fr;
@@ -69,7 +72,6 @@
   line-height: var(--leading-body);
   color: var(--ink-on-cream);
   isolation: isolate;
-  filter: var(--dshadow);
   rotate: -1deg;
 }
 .home__intro::before,
@@ -77,6 +79,7 @@
   position: absolute;
   inset: 0;
   content: "";
+  box-shadow: var(--pshadow);
 }
 .home__intro::before {
   z-index: -2;
@@ -149,6 +152,7 @@
   --sp-bottom: 92px;
   --cw: 372px;
   --ch: 290px;
+  z-index: 2;
   margin-top: -30px;
   color: var(--cream);
 }
@@ -162,14 +166,10 @@
   inset: 0;
   content: "";
   background:
-    conic-gradient(
-      from 90deg at 50% 50%,
-      transparent 25%,
-      var(--checker-cobalt) 0 50%,
-      transparent 0 75%,
-      var(--checker-cobalt) 0
-    )
-    -150px -70px / calc(var(--cw) * 2) calc(var(--ch) * 2);
+    linear-gradient(90deg, transparent 50%, var(--checker-cobalt) 0) -150px -70px /
+    calc(var(--cw) * 2) var(--ch),
+    linear-gradient(90deg, var(--checker-cobalt) 50%, transparent 0) -150px calc(-70px + var(--ch))
+    / calc(var(--cw) * 2) var(--ch);
 }
 .home__workGrid,
 .home__codaGrid {
@@ -180,14 +180,14 @@
   position: relative;
   z-index: 1;
   margin-top: calc(-1 * var(--sp-top) - 168px);
+  isolation: isolate;
+  will-change: transform;
 }
 /*
  * Album colors can match any sheet, so the sleeve and card sit on cream rims,
  * matted like the portrait print, and cast a deeper shadow than flat paper.
  */
 .home__spotify {
-  --dshadow: drop-shadow(0 1px 0 rgb(0 0 0 / 0.24))
-    drop-shadow(0 6px 12px light-dark(rgb(0 0 0 / 0.22), rgb(0 0 0 / 0.42)));
   --rim: var(--mat);
   position: relative;
   display: grid;
@@ -201,6 +201,9 @@
   z-index: -1;
   content: "";
   background: var(--cream);
+  box-shadow:
+    0 1.5px 0 rgb(0 0 0 / 0.24),
+    0 6px 12px light-dark(rgb(0 0 0 / 0.22), rgb(0 0 0 / 0.42));
 }
 /* Each rim corner is its paper's corner plus the rim, so the cream band stays even. */
 .home__spotify .print__sleeve::before {
@@ -304,8 +307,7 @@
   :is(.home__stravaAtlas, .home__stravaLatest, .home__frameWin, .home__sideRowWrap).collageLift {
     transition:
       translate 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-      scale 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
-      filter 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+      scale 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
   }
   :is(.home__stravaAtlas, .home__stravaLatest, .home__frameWin, .home__sideRowWrap).collageLift:is(
     :focus-visible,
@@ -365,6 +367,7 @@
 .home__moreWork {
   --sp-top: 50px;
   --sp-bottom: 56px;
+  z-index: 3;
   color: var(--ink);
 }
 .home__moreWorkField {
@@ -383,6 +386,7 @@
 .home__coda {
   --sp-top: 30px;
   --sp-bottom: 90px;
+  z-index: 4;
   color: var(--ink);
 }
 
