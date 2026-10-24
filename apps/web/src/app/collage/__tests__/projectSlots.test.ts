@@ -52,14 +52,68 @@ describe('projectSlots', () => {
     expect(projectFrameAspectRatio('tall')).toBe(0.8);
     expect(projectFrameAspectRatio('square')).toBe(1);
     expect(projectTagMeta({ creationDate: '2026-03-01', type: ['Website', 'App'] })).toBe(
-      'Website · 2026',
+      'Website, App · 2026',
     );
-    expect(projectTagMeta({ creationDate: '2022-01-01', type: 'Web App' })).toBe('Web app · 2022');
-    expect(projectTagMeta({ creationDate: '2020-05-01', type: 'macOS App' })).toBe(
+    expect(
+      projectTagMeta({
+        creationDate: '2026-03-03',
+        type: ['Desktop app', 'Website', 'iOS app'],
+      }),
+    ).toBe('Desktop app, Website, iOS app · 2026');
+    expect(projectTagMeta({ creationDate: '2026-03-01', type: ['Desktop app'] })).toBe(
+      'Desktop app · 2026',
+    );
+    expect(projectTagMeta({ creationDate: '2020-05-01', type: 'macOS app' })).toBe(
       'macOS app · 2020',
     );
-    expect(projectTagMeta({ creationDate: '2021-08-01', type: 'iOS App' })).toBe('iOS app · 2021');
+    expect(projectTagMeta({ creationDate: '2021-08-01', type: 'iOS app' })).toBe('iOS app · 2021');
     expect(projectTagMeta({ creationDate: null, type: 'Website' })).toBeNull();
+  });
+
+  it('pairs a wide third project with gn and a regular fourth project with js in More work', () => {
+    const moreWork = [
+      {
+        key: 'p-2',
+        project: {
+          layout: 'regular',
+          thumbnail: { height: 640, url: 'https://images.test/merge.webp', width: 640 },
+          title: 'Merge',
+        },
+      },
+      {
+        key: 'p-3',
+        project: {
+          layout: 'regular',
+          thumbnail: { height: 1000, url: 'https://images.test/canal.png', width: 1000 },
+          title: 'Canal',
+        },
+      },
+      {
+        key: 'p-4',
+        project: {
+          layout: 'wide',
+          thumbnail: { height: 1302, url: 'https://images.test/genera.png', width: 2874 },
+          title: 'Genera',
+        },
+      },
+      {
+        key: 'p-5',
+        project: {
+          layout: 'regular',
+          thumbnail: { height: 1001, url: 'https://images.test/jumpstart.png', width: 1000 },
+          title: 'Jumpstart',
+        },
+      },
+    ];
+
+    expect(
+      moreWorkFrames(moreWork).map(({ gridArea, project }) => [gridArea, project.title]),
+    ).toEqual([
+      ['mg', 'Merge'],
+      ['cn', 'Canal'],
+      ['js', 'Jumpstart'],
+      ['gn', 'Genera'],
+    ]);
   });
 
   it('derives a contrasting tab tone for every paper tone and project slot', () => {
