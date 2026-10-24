@@ -1,6 +1,6 @@
 .chrome__header {
   position: sticky;
-  top: 0;
+  top: calc(-1 * var(--site-header-tuck, 0px));
   z-index: 50;
   display: flex;
   gap: 14px;
@@ -44,6 +44,10 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 }
 .chrome__header > * {
   pointer-events: auto;
+}
+.chrome__brand {
+  display: flex;
+  flex-shrink: 0;
 }
 .chrome__logo {
   filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
@@ -734,33 +738,53 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   }
 }
 
+/*
+ * Now playing takes the first row alone and the spacer breaks the line under it, so the
+ * logo and the strip share the pinned row from one page edge to the other, and only now
+ * playing tucks away on scroll. The two row gaps add up to the top padding, so a tucked
+ * now playing ends right at the top of the screen.
+ */
 @media (max-width: 480px) {
   .chrome__header {
     flex-wrap: wrap;
-    gap: 10px;
-    row-gap: 8px;
+    gap: 7px 8px;
+    align-items: center;
     padding-top: 14px;
   }
+  .chrome__nowPlaying {
+    order: -2;
+    max-width: 100%;
+    margin-top: 0;
+  }
   .chrome__spacer {
-    display: none;
+    flex-basis: 100%;
+    order: -1;
+  }
+  .chrome__brand {
+    margin-inline-start: -4px;
   }
   .chrome__nav {
-    width: 100%;
+    margin: 0 0 0 auto;
   }
-  /* Shrinks the labels with the viewport so the strip and its switcher share one row down to 360px. */
+  /* Shrinks the labels with the viewport so the logo, the strip, and its switcher share one row down to 360px. */
+  .chrome__strip {
+    gap: 2px;
+    padding: 4px;
+  }
   .chrome__segment {
-    padding-inline: 0.4em;
-    font-size: clamp(var(--type-body), 4.4vw, var(--type-label));
+    padding-inline: 0.35em;
+    font-size: clamp(var(--type-caption), 4vw, var(--type-meta));
   }
   .chrome__scheme {
     margin-left: 2px;
   }
   .chrome__schemeOption {
-    width: 28px;
+    width: 26px;
   }
 }
 @media (max-width: 320px) {
   .chrome__header {
+    row-gap: 6px;
     padding-top: 12px;
   }
 }
