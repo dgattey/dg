@@ -1,5 +1,6 @@
 import 'server-only';
 
+import { db } from '@dg/db';
 import { log } from '@dg/shared-core/logging/log';
 
 const GITHUB_REPOSITORY = 'dgattey/dg';
@@ -43,7 +44,8 @@ export function parseSemverTag(
   const major = Number(match[1]);
   const minor = Number(match[2]);
   const patch = Number(match[3]);
-  const kind: ReleaseKind = minor === 0 && patch === 0 ? 'major' : patch === 0 ? 'minor' : 'patch';
+  const kind: ReleaseKind =
+    minor === 0 && patch === 0 && major > 0 ? 'major' : patch === 0 ? 'minor' : 'patch';
   return {
     kind,
     major,
@@ -65,7 +67,9 @@ function cleanNoteLine(line: string): string {
     .replace(/\s*\(\[[0-9a-f]{7,40}\]\(https:\/\/github\.com\/[^)]+\)\)/gi, '')
     .replace(/\s+by\s+@[a-z0-9-]+\s+in\s+(?=#\d+\b)/gi, ' ')
     .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '$1')
+    .replace(/\*\*|`/g, '')
     .replace(/\s+/g, ' ')
+    .replace(/:$/, '')
     .trim();
 }
 
@@ -84,9 +88,7 @@ export function extractPrNumbers(text: string): Array<number> {
 }
 
 /**
- * Cleans GitHub release Markdown into plain note items and linked PR numbers.
- * Strips semantic-release version headers, verification sections, HTML tags,
- * image embeds, and Linear ticket footers.
+ * Extracts plain-text bullet items and linked PR numbers from a release body.
  */
 export function parseReleaseBody(body: string | null | undefined): {
   notes: Array<string>;
@@ -99,72 +101,26 @@ export function parseReleaseBody(body: string | null | undefined): {
   const withoutComments = body
     .replace(/\r\n/g, '\n')
     .replace(/<!--[\s\S]*?-->/g, '')
-    .replace(/<img\b[^>]*>/gi, '')
-    .replace(/<\/?[a-z][^>]*>/gi, '');
+    .replace(/<img\b[^>]*>/gi, '');
 
   const prNumbers = extractPrNumbers(withoutComments);
   const notes: Array<string> = [];
-  let inCodeBlock = false;
-  let inDroppedSection = false;
 
   for (const rawLine of withoutComments.split('\n')) {
     const trimmed = rawLine.trim();
-    if (trimmed.startsWith('```')) {
-      inCodeBlock = !inCodeBlock;
-      continue;
-    }
-    if (inCodeBlock || !trimmed) {
-      continue;
-    }
-
-    if (/^#{1,6}\s+/.test(trimmed)) {
-      const heading = trimmed.replace(/^#{1,6}\s+/, '').trim();
-      if (
-        /^(?:verification|measured|screenshots|manual follow-ups|human dashboard checklist|how to verify|not in this pr|unrelated|also fixed in passing|held back|transition evidence|at-rest invariants|supersedes|not the cause|live evidence)\b/i.test(
-          heading,
-        )
-      ) {
-        inDroppedSection = true;
-        continue;
-      }
-      inDroppedSection = false;
-      if (
-        /^\[?\d+\.\d+\.\d+\]?/.test(heading) ||
-        /^(?:what's changed|what changed\??|features|bug fixes|breaking changes|release info)\b/i.test(
-          heading,
-        )
-      ) {
-        continue;
-      }
-      const cleanHeading = cleanNoteLine(heading);
-      if (cleanHeading) {
-        notes.push(cleanHeading);
-      }
-      continue;
-    }
-
-    if (inDroppedSection) {
-      continue;
-    }
-
     if (
-      /^!\[[^\]]*\]\([^)]+\)$/.test(trimmed) ||
-      /^\[[^\]]+\]\(https:\/\/cursor\.com\/[^)]+\)$/.test(trimmed) ||
-      /^\*\*Full Changelog\*\*:/i.test(trimmed) ||
+      !trimmed ||
+      trimmed.startsWith('#') ||
+      trimmed.startsWith('![') ||
+      trimmed.startsWith('|') ||
+      trimmed.startsWith('**Full Changelog**') ||
       /^(?:Closes|Fixes|Resolves)\s+[A-Z]+-\d+/i.test(trimmed) ||
-      /^\|.*\|$/.test(trimmed) ||
-      /^[-:|\s]+$/.test(trimmed)
+      /^\s{2,}[-*]\s+/.test(rawLine)
     ) {
       continue;
     }
 
-    const isTopBullet = /^[-*]\s+/.test(rawLine);
-    const isIndentedBullet = /^\s{2,}[-*]\s+/.test(rawLine);
-    if (isIndentedBullet && notes.length > 0) {
-      continue;
-    }
-
-    if (isTopBullet || notes.length < 4) {
+    if (/^[-*]\s+/.test(rawLine) || notes.length === 0) {
       const cleaned = cleanNoteLine(trimmed);
       if (cleaned && !notes.includes(cleaned)) {
         notes.push(cleaned);
@@ -230,10 +186,68 @@ export function compareReleasesDesc(a: ChangelogRelease, b: ChangelogRelease): n
   return b.patch - a.patch;
 }
 
+export async function upsertRelease(input: {
+  body: string;
+  publishedAt: Date | string;
+  url: string;
+  version: string;
+}): Promise<ChangelogRelease | null> {
+  const semver = parseSemverTag(input.version);
+  if (!semver) {
+    return null;
+  }
+  const tag = `v${semver.version}`;
+  const publishedDate =
+    input.publishedAt instanceof Date ? input.publishedAt : new Date(input.publishedAt);
+  const validPublishedDate = Number.isNaN(publishedDate.getTime()) ? new Date() : publishedDate;
+  const url = input.url.trim() || `${GITHUB_REPOSITORY_URL}/releases/tag/${tag}`;
+  const body = input.body.trim();
+
+  await db.Release.upsert({
+    body,
+    publishedAt: validPublishedDate,
+    url,
+    version: tag,
+  });
+
+  return normalizeGitHubRelease({
+    body,
+    html_url: url,
+    name: tag,
+    published_at: validPublishedDate.toISOString(),
+    tag_name: tag,
+  });
+}
+
+async function fetchReleasesFromDatabase(): Promise<Array<ChangelogRelease>> {
+  try {
+    const rows = await db.Release.findAll({
+      order: [['publishedAt', 'DESC']],
+    });
+    const parsed: Array<ChangelogRelease> = [];
+    for (const row of rows) {
+      const release = normalizeGitHubRelease({
+        body: row.body,
+        html_url: row.url,
+        name: row.version,
+        published_at:
+          row.publishedAt instanceof Date ? row.publishedAt.toISOString() : String(row.publishedAt),
+        tag_name: row.version,
+      });
+      if (release) {
+        parsed.push(release);
+      }
+    }
+    return parsed;
+  } catch (error) {
+    log.warn('Database releases read failed, falling back to GitHub API', { error });
+    return [];
+  }
+}
+
 /**
- * Fetches all published GitHub releases for `dgattey/dg`, paging until
- * exhausted. Falls back to the current version if the GitHub API is
- * unreachable.
+ * Reads published releases from Postgres (`"Release"` table), falling back to
+ * the GitHub Releases API only when the table is empty or unreachable.
  */
 export async function fetchReleases(options?: {
   fallbackVersion?: string;
@@ -242,45 +256,55 @@ export async function fetchReleases(options?: {
   const collected: Array<ChangelogRelease> = [];
   const seenTags = new Set<string>();
 
-  const headers: Record<string, string> = {
-    Accept: 'application/vnd.github+json',
-    'User-Agent': 'dylangattey-web',
-  };
+  const dbReleases = await fetchReleasesFromDatabase();
+  for (const release of dbReleases) {
+    if (!seenTags.has(release.tag)) {
+      seenTags.add(release.tag);
+      collected.push(release);
+    }
+  }
 
-  try {
-    for (let page = 1; page <= MAX_RELEASE_PAGES; page += 1) {
-      const url = `https://api.github.com/repos/${GITHUB_REPOSITORY}/releases?per_page=${RELEASES_PER_PAGE}&page=${page}`;
-      const response = await fetch(url, {
-        cache: 'no-store',
-        headers,
-        signal: AbortSignal.timeout(8000),
-      });
-      if (!response.ok) {
-        log.warn('GitHub releases fetch returned non-OK status', {
-          page,
-          status: response.status,
+  if (collected.length === 0) {
+    const headers: Record<string, string> = {
+      Accept: 'application/vnd.github+json',
+      'User-Agent': 'dylangattey-web',
+    };
+
+    try {
+      for (let page = 1; page <= MAX_RELEASE_PAGES; page += 1) {
+        const url = `https://api.github.com/repos/${GITHUB_REPOSITORY}/releases?per_page=${RELEASES_PER_PAGE}&page=${page}`;
+        const response = await fetch(url, {
+          cache: 'no-store',
+          headers,
+          signal: AbortSignal.timeout(8000),
         });
-        break;
-      }
-      const payload = (await response.json()) as unknown;
-      if (!Array.isArray(payload) || payload.length === 0) {
-        break;
-      }
-      for (const item of payload) {
-        if (item && typeof item === 'object') {
-          const parsed = normalizeGitHubRelease(item as RawGitHubRelease);
-          if (parsed && !seenTags.has(parsed.tag)) {
-            seenTags.add(parsed.tag);
-            collected.push(parsed);
+        if (!response.ok) {
+          log.warn('GitHub releases fetch returned non-OK status', {
+            page,
+            status: response.status,
+          });
+          break;
+        }
+        const payload = (await response.json()) as unknown;
+        if (!Array.isArray(payload) || payload.length === 0) {
+          break;
+        }
+        for (const item of payload) {
+          if (item && typeof item === 'object') {
+            const parsed = normalizeGitHubRelease(item as RawGitHubRelease);
+            if (parsed && !seenTags.has(parsed.tag)) {
+              seenTags.add(parsed.tag);
+              collected.push(parsed);
+            }
           }
         }
+        if (payload.length < RELEASES_PER_PAGE) {
+          break;
+        }
       }
-      if (payload.length < RELEASES_PER_PAGE) {
-        break;
-      }
+    } catch (error) {
+      log.warn('GitHub releases fetch failed, using fallback version', { error });
     }
-  } catch (error) {
-    log.warn('GitHub releases fetch failed, using fallback version', { error });
   }
 
   const fallback = createFallbackRelease(fallbackVersion);

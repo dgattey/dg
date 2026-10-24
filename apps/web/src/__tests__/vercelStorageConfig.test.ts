@@ -6,6 +6,24 @@ import nextConfig, { resolveVersionFromTagRefs } from '../../next.config';
 import vercelConfig from '../../vercel.json' with { type: 'json' };
 import { getAppVersionInfo } from '../services/version';
 
+jest.mock('@dg/services/github/fetchReleases', () => ({
+  fetchReleases: jest.fn(async (options?: { fallbackVersion?: string }) => [
+    {
+      htmlUrl: `https://github.com/dgattey/dg/releases/tag/${options?.fallbackVersion ?? 'v2.80.0'}`,
+      kind: 'patch',
+      major: 2,
+      minor: 85,
+      name: options?.fallbackVersion ?? 'v2.80.0',
+      notes: [],
+      patch: 1,
+      prNumbers: [],
+      publishedAt: null,
+      tag: options?.fallbackVersion ?? 'v2.80.0',
+      version: (options?.fallbackVersion ?? 'v2.80.0').replace(/^v/, ''),
+    },
+  ]),
+}));
+
 jest.mock('next/cache', () => ({
   cacheLife: jest.fn(),
   cacheTag: jest.fn(),

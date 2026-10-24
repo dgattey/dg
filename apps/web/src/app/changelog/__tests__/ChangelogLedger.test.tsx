@@ -6,7 +6,6 @@ import type { ChangelogRelease } from '@dg/services/github/fetchReleases';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ChangelogLedger } from '../ChangelogLedger';
-import { tokenizeNoteLine } from '../changelogHelpers';
 
 const SAMPLE_RELEASES: ReadonlyArray<ChangelogRelease> = [
   {
@@ -15,9 +14,9 @@ const SAMPLE_RELEASES: ReadonlyArray<ChangelogRelease> = [
     major: 2,
     minor: 80,
     name: 'v2.80.1',
-    notes: ['Cut ISR writes in `apps/web` for #662.'],
+    notes: ['Extended page cache lifetimes to reduce background revalidation overhead (#661).'],
     patch: 1,
-    prNumbers: [662],
+    prNumbers: [661],
     publishedAt: '2026-10-22T17:08:39Z',
     tag: 'v2.80.1',
     version: '2.80.1',
@@ -28,7 +27,9 @@ const SAMPLE_RELEASES: ReadonlyArray<ChangelogRelease> = [
     major: 2,
     minor: 80,
     name: 'v2.80.0',
-    notes: ['**Live icons for DylKit apps.** Added `/icon.png` probe in #660.'],
+    notes: [
+      'Side projects on the homepage now display live app icons from Sconeos, Saga, and Gattey Photos (#660).',
+    ],
     patch: 0,
     prNumbers: [660],
     publishedAt: '2026-10-22T16:26:48Z',
@@ -64,21 +65,6 @@ const SAMPLE_RELEASES: ReadonlyArray<ChangelogRelease> = [
 ];
 
 describe('ChangelogLedger', () => {
-  it('tokenizes bold segments, inline code, and PR links', () => {
-    expect(tokenizeNoteLine('**Live icons.** Probe `/icon.png` in #660.')).toEqual([
-      { kind: 'bold', value: 'Live icons.' },
-      { kind: 'text', value: ' Probe ' },
-      { kind: 'code', value: '/icon.png' },
-      { kind: 'text', value: ' in ' },
-      {
-        href: 'https://github.com/dgattey/dg/pull/660',
-        kind: 'pr',
-        label: '#660',
-      },
-      { kind: 'text', value: '.' },
-    ]);
-  });
-
   it('renders release totals, featured slips, compact build tags, and filters by kind', async () => {
     const user = userEvent.setup();
     render(<ChangelogLedger releases={SAMPLE_RELEASES} />);

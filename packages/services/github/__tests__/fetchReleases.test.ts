@@ -1,3 +1,4 @@
+import { setupTestDatabase } from '@dg/db/testing/databaseSetup';
 import {
   compareReleasesDesc,
   createFallbackRelease,
@@ -6,10 +7,16 @@ import {
   normalizeGitHubRelease,
   parseReleaseBody,
   parseSemverTag,
+  upsertRelease,
 } from '../fetchReleases';
 
 describe('fetchReleases', () => {
+  const db = setupTestDatabase();
   const originalFetch = global.fetch;
+
+  beforeEach(async () => {
+    await db.Release.destroy({ where: {} });
+  });
 
   afterEach(() => {
     global.fetch = originalFetch;
@@ -23,6 +30,13 @@ describe('fetchReleases', () => {
       minor: 0,
       patch: 0,
       version: '2.0.0',
+    });
+    expect(parseSemverTag('v0.0.0')).toEqual({
+      kind: 'minor',
+      major: 0,
+      minor: 0,
+      patch: 0,
+      version: '0.0.0',
     });
     expect(parseSemverTag('v2.80.0')).toEqual({
       kind: 'minor',
@@ -48,15 +62,12 @@ describe('fetchReleases', () => {
       '  - Indented detail that stays out of top-level bullets.',
       '- Second bullet with [PR link](https://github.com/dgattey/dg/pull/661).',
       '',
-      '## Verification',
-      '- `turbo check` passes.',
-      '',
       'Closes DG-282',
     ].join('\n');
 
     expect(parseReleaseBody(modernBody)).toEqual({
       notes: [
-        '**Live icons for DylKit apps.** Reads the first 24 bytes from `/icon.png` in #660.',
+        'Live icons for DylKit apps. Reads the first 24 bytes from /icon.png in #660.',
         'Second bullet with PR link (#661).',
       ],
       prNumbers: [660, 661],
@@ -108,7 +119,31 @@ describe('fetchReleases', () => {
     });
   });
 
-  it('paginates through all GitHub release pages and sorts descending by semver', async () => {
+  it('reads releases directly from the Release table without calling GitHub when populated', async () => {
+    const fetchMock = jest.fn();
+    global.fetch = fetchMock as unknown as typeof fetch;
+
+    await upsertRelease({
+      body: '- Initial AngularJS and WordPress JSON prototype.',
+      publishedAt: '2016-03-18T03:01:27.000Z',
+      url: 'https://github.com/dgattey/dg/commit/f6e39c594ca757f4a80da1801f4b8541db7bc9a3',
+      version: 'v0.0.0',
+    });
+    await upsertRelease({
+      body: '- Standardized the site-wide typography scale (#690).',
+      publishedAt: '2026-10-24T07:24:11.000Z',
+      url: 'https://github.com/dgattey/dg/releases/tag/v2.85.7',
+      version: '2.85.7',
+    });
+
+    const releases = await fetchReleases({ fallbackVersion: '2.85.7' });
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(releases.map((r) => r.tag)).toEqual(['v2.85.7', 'v0.0.0']);
+    expect(releases[0]?.notes).toEqual(['Standardized the site-wide typography scale (#690).']);
+    expect(releases[0]?.prNumbers).toEqual([690]);
+  });
+
+  it('paginates through GitHub release pages when the Release table is empty', async () => {
     const page1 = Array.from({ length: 100 }, (_, i) => ({
       body: `- Release ${i + 1}`,
       html_url: `https://github.com/dgattey/dg/releases/tag/v2.${i}.0`,
@@ -145,41 +180,7 @@ describe('fetchReleases', () => {
     expect(releases.at(-1)?.tag).toBe('v1.0.0');
   });
 
-  it('does not attach an Authorization header even when GITHUB_TOKEN is set in the environment', async () => {
-    const previousToken = process.env.GITHUB_TOKEN;
-    process.env.GITHUB_TOKEN = 'ghp_expired_token';
-
-    const fetchMock = jest.fn().mockResolvedValueOnce({
-      json: async () => [
-        {
-          body: '- Latest shipped feature (#686)',
-          html_url: 'https://github.com/dgattey/dg/releases/tag/v2.85.1',
-          name: 'v2.85.1',
-          published_at: '2026-10-24T04:27:34Z',
-          tag_name: 'v2.85.1',
-        },
-      ],
-      ok: true,
-    });
-    global.fetch = fetchMock as unknown as typeof fetch;
-
-    try {
-      const releases = await fetchReleases({ fallbackVersion: 'v2.85.1' });
-      expect(
-        (fetchMock.mock.calls[0]?.[1] as { headers?: Record<string, string> })?.headers
-          ?.Authorization,
-      ).toBeUndefined();
-      expect(releases[0]?.tag).toBe('v2.85.1');
-    } finally {
-      if (previousToken === undefined) {
-        delete process.env.GITHUB_TOKEN;
-      } else {
-        process.env.GITHUB_TOKEN = previousToken;
-      }
-    }
-  });
-
-  it('returns the fallback release when the GitHub API fails', async () => {
+  it('returns the fallback release when the Release table is empty and the GitHub API fails', async () => {
     global.fetch = jest
       .fn()
       .mockRejectedValue(new Error('network down')) as unknown as typeof fetch;

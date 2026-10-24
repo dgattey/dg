@@ -1,0 +1,42 @@
+---
+description: Require plain-English, visitor-facing # Release notes in PR bodies for /changelog
+alwaysApply: true
+---
+
+# Changelog release notes
+
+Every pull request must include a `# Release notes` (or `## Release notes`) section above `# Release info`. `.github/workflows/release.yml` (`version:release-info`) extracts `# Release notes` as the GitHub Release body rendered on `https://dylangattey.com/changelog`.
+
+## Rules
+
+1. **Write for a visitor reading `/changelog`, not a code reviewer.** Lead with what changed on the site and what a visitor can see or do.
+2. **Keep it to 1-3 short bullets (or 1 short sentence for internal plumbing).**
+3. **No file paths, package names, function/type/constant names, CSS selectors, or backtick code dumps.** Put technical details, file paths, and symbol names in `## What changed`, never in `# Release notes`.
+4. **PR references (`(#689)`) and plain route mentions in prose are fine, but never backticked code identifiers.**
+
+## Examples
+
+### Bad (code dump)
+
+```markdown
+# Release notes
+
+- Pass `{ transaction }` to `createTable` in `packages/db/migrations/20221203092250-init.js` and delete `useOptimisticAlbumSelection.ts` in `apps/web/src/app/music/albums/FavoriteAlbumsGrid.tsx`.
+- Remove `RefreshOnFocusProvider.tsx` and rename `--mui-palette-*` to `--dg-palette-*`.
+```
+
+### Good (user-facing change)
+
+```markdown
+# Release notes
+
+- Opening an album on Favorite albums now updates the URL immediately without a page reload, and background tab switches no longer re-fetch the page (#688).
+```
+
+### Good (internal plumbing)
+
+```markdown
+# Release notes
+
+- Internal database migration, Strava schema, and theme token cleanup (#688).
+```

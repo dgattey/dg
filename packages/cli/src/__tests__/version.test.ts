@@ -4,18 +4,51 @@ import {
   compareSemver,
   computeNext,
   extractNotes,
+  extractReleaseNotesSection,
   parseReleaseType,
   pickHighestSemverTag,
   resolveTargetVersion,
 } from '../version.js';
 
 describe('extractNotes', () => {
-  it('extracts notes from standard # What changed? template section', () => {
+  it('prefers # Release notes over ## What changed when both are present', () => {
+    const body = [
+      '## What changed',
+      '',
+      '- Updated `packages/cli/src/version.ts` and `PULL_REQUEST_TEMPLATE.md`.',
+      '',
+      '# Release notes',
+      '',
+      '<!-- comment -->',
+      '- Release notes on the changelog now read as plain-English summaries instead of raw code diffs (#693).',
+      '',
+      '# Release info',
+      '',
+      '- [ ] Major',
+      '- [ ] Minor',
+      '- [x] Patch',
+    ].join('\n');
+
+    assert.equal(
+      extractReleaseNotesSection(body),
+      '- Release notes on the changelog now read as plain-English summaries instead of raw code diffs (#693).',
+    );
+    assert.equal(
+      extractNotes(body),
+      '- Release notes on the changelog now read as plain-English summaries instead of raw code diffs (#693).',
+    );
+  });
+
+  it('extracts notes from standard # What changed? template section when # Release notes is absent or empty', () => {
     const body = [
       '# What changed?',
       '',
       '- Added binary cover uploads to `/api/books/sync`.',
       '- Returned normalized `coverImageUrl`.',
+      '',
+      '# Release notes',
+      '',
+      '- ',
       '',
       '# Release info',
       '',

@@ -212,16 +212,12 @@ export function buildReadingCardVariant(books: ReadonlyArray<RenderableBook>): R
   };
 }
 
-function stripReleaseMarkdown(line: string): string {
-  return stripUnsupportedGlyphs(line).replace(/\*\*|`/g, '');
-}
-
 function toChangelogCardRelease(release: ChangelogRelease): ChangelogCardRelease {
   return {
     dateLabel: formatReleaseDate(release.publishedAt),
     kindLabel: RELEASE_KIND_LABELS[release.kind],
     kindTone: RELEASE_KIND_TONES[release.kind],
-    notes: release.notes.map(stripReleaseMarkdown).filter(Boolean),
+    notes: release.notes.map(stripUnsupportedGlyphs).filter(Boolean),
     tag: release.tag,
   };
 }
