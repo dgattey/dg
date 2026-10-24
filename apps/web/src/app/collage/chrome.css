@@ -8,6 +8,28 @@
   padding-top: 20px;
   pointer-events: none;
 }
+/*
+ * Cards scrolling up blur and fade into the paper before they pass behind the header.
+ * The mask feathers the blur to nothing along the tail, so it never shows an edge.
+ */
+.chrome__header::before {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  z-index: -1;
+  width: 100vw;
+  height: calc(100% + 40px);
+  content: "";
+  background: linear-gradient(
+    to bottom,
+    color-mix(in srgb, var(--paper) 88%, transparent) 0%,
+    color-mix(in srgb, var(--paper) 55%, transparent) 55%,
+    transparent 100%
+  );
+  backdrop-filter: blur(6px);
+  mask-image: linear-gradient(to bottom, #000 0%, #000 50%, transparent 100%);
+  translate: -50%;
+}
 html:active-view-transition-type(page-open, page-close) .chrome__header {
   view-transition-name: site-header;
 }
@@ -44,9 +66,19 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 .chrome__nav {
   display: flex;
   flex-wrap: wrap;
-  gap: 10px;
+  gap: 8px;
+  align-items: center;
   justify-content: flex-end;
-  margin-top: 8px;
+  padding: 6px;
+  margin-top: 2px;
+  background: light-dark(color-mix(in oklab, var(--paper), var(--ink) 6%), var(--paper-2));
+  border: var(--collage-border-width) solid
+    light-dark(color-mix(in oklab, var(--ink) 14%, transparent), rgb(243 236 220 / 0.14));
+  border-radius: var(--soft-b);
+  box-shadow:
+    0 1px 0 rgb(0 0 0 / 0.1),
+    0 8px 18px -8px light-dark(rgb(0 0 0 / 0.3), rgb(0 0 0 / 0.55));
+  rotate: -0.6deg;
 }
 .chrome__music {
   position: relative;
@@ -643,8 +675,15 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   .chrome__spacer {
     display: none;
   }
+  /* A wrapped flex row stretches to the full width, so a grid keeps the dock hugging its pills. */
   .chrome__nav {
-    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(3, auto);
+    margin-left: auto;
+  }
+  .chrome__nav > .chrome__scheme {
+    grid-column: 1 / -1;
+    justify-self: end;
   }
 }
 @media (max-width: 320px) {
