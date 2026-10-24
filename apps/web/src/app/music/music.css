@@ -156,10 +156,10 @@
   display: inline-block;
   padding: 1px 6px 2px;
   font: 800 var(--type-micro) / 1.2 var(--display);
-  color: var(--ink-on-cream);
+  color: var(--cream);
   letter-spacing: 0.02em;
   white-space: nowrap;
-  background: var(--ochre);
+  background: var(--ink-on-cream);
   border-radius: 4px;
   rotate: -3deg;
 }
