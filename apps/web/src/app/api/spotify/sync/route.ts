@@ -51,7 +51,7 @@ export async function handleSpotifySync(request: NextRequest): Promise<SyncRespo
   }
 
   const forceFavoriteAlbums = request.nextUrl.searchParams.get('force') === 'true';
-  const knownLatestPlayedAt = await getCachedLatestPlayedAt();
+  const knownLatestPlayedAt = forceFavoriteAlbums ? null : await getCachedLatestPlayedAt();
 
   const result = await syncSpotifyHistoryWithLogging({
     context: 'cron',

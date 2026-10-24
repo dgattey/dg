@@ -13,10 +13,6 @@ jest.mock('../../../../../services/albums', () => ({
   getFavoriteAlbums: jest.fn(async () => []),
 }));
 
-jest.mock('../../../../../services/spotify', () => ({
-  getLastKnownSong: jest.fn(async () => null),
-}));
-
 jest.mock('next/cache', () => ({
   cacheLife: jest.fn(),
   cacheTag: jest.fn(),
