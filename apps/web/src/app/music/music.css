@@ -155,7 +155,7 @@
 .music__newArtist {
   display: inline-block;
   padding: 1px 6px 2px;
-  font: 800 var(--type-micro) / 1.2 var(--display);
+  font: 700 var(--type-micro) / 1.2 var(--display);
   color: var(--cream);
   letter-spacing: 0.02em;
   white-space: nowrap;
