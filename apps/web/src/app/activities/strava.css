@@ -673,20 +673,25 @@
 }
 .strava__bikeHead {
   display: flex;
-  gap: 12px;
-  align-items: baseline;
+  gap: 16px;
+  align-items: center;
   justify-content: space-between;
+}
+.strava__bikeLead {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
 }
 .strava__bikeTitle {
   display: flex;
-  gap: 10px;
-  align-items: center;
+  gap: 2px 8px;
+  align-items: baseline;
   min-width: 0;
 }
 .strava__bikeArt {
   flex: none;
-  width: 72px;
-  height: 43px;
+  width: 104px;
+  height: 62px;
   overflow: visible;
   fill: none;
   stroke-linecap: round;
