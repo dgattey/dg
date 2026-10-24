@@ -4,8 +4,7 @@ import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import { albumArtViewTransitionName } from '@dg/ui/core/transitions/pageTransitions';
 import { Image } from '@dg/ui/dependent/Image';
 import { Link } from '@dg/ui/dependent/Link';
-import { createTransition, EASING_DEFAULT, TIMING_MEDIUM } from '@dg/ui/helpers/timing';
-import type { ReactNode, TransitionEvent } from 'react';
+import type { CSSProperties, ReactNode, TransitionEvent } from 'react';
 import { useLayoutEffect, useRef, useState, ViewTransition } from 'react';
 import { ALBUM_DETAIL_BACKDROP } from '../../collage/backdrops';
 import { CollageBackdrop } from '../../collage/CollageBackdrop';
@@ -136,10 +135,13 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
   );
 
   const well = (
-    <section aria-label={`${album.name} details`} className="music__wellShell">
-      {reservePx != null ? (
-        <style>{`.music__wellShell:has([data-role="album-detail-placeholder"]) { min-height: ${reservePx}px; }`}</style>
-      ) : null}
+    <section
+      aria-label={`${album.name} details`}
+      className="music__wellShell"
+      style={
+        reservePx != null ? ({ '--well-reserve-h': `${reservePx}px` } as CSSProperties) : undefined
+      }
+    >
       {art}
       {title}
       {children}
@@ -153,13 +155,7 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
       }
       onTransitionEnd={handleTransitionEnd}
       style={
-        heightPx != null
-          ? {
-              height: heightPx,
-              overflow: 'clip',
-              transition: createTransition('height', TIMING_MEDIUM, EASING_DEFAULT),
-            }
-          : { height: 'auto', overflow: 'visible' }
+        heightPx != null ? ({ '--well-locked-h': `${heightPx}px` } as CSSProperties) : undefined
       }
     >
       <div className="collageBackdropHost" ref={measureRef}>

@@ -7,18 +7,9 @@ import {
 } from '@dg/ui/core/transitions/pageScrollMemory';
 import { pageViewTransitionProps } from '@dg/ui/core/transitions/pageTransitions';
 import { usePathname } from 'next/navigation';
-import type { CSSProperties, ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import { useLayoutEffect, ViewTransition } from 'react';
 import { syncFooterRevealProgress } from './FooterRevealScroll';
-
-const sentinelStyle: CSSProperties = {
-  height: 0,
-  left: 0,
-  pointerEvents: 'none',
-  position: 'fixed',
-  top: 0,
-  width: 0,
-};
 
 /**
  * Triggers a React `<ViewTransition>` on each route change while keeping page
@@ -41,7 +32,7 @@ export function PageViewTransition({ children }: { children: ReactNode }) {
   return (
     <>
       <ViewTransition key={pathname} {...pageViewTransitionProps}>
-        <div aria-hidden={true} style={sentinelStyle} />
+        <div aria-hidden={true} data-vt-sentinel="" />
       </ViewTransition>
       <div>{children}</div>
     </>

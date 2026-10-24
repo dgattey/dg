@@ -80,6 +80,11 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 .chrome__logo:focus-visible {
   outline: -webkit-focus-ring-color auto 1px;
 }
+.chrome__logo > svg {
+  display: block;
+  width: auto;
+  height: 1.15em;
+}
 .chrome__nowPlaying {
   min-width: 0;
   max-width: min(420px, 52vw);
@@ -327,7 +332,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   position: sticky;
   bottom: 0;
   z-index: 1;
-  padding: 52px 0 28px;
+  padding: 64px 0 36px;
   color: var(--cream);
 }
 .chrome__footer[data-occluded="true"] {
@@ -477,7 +482,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   color: var(--vermilion);
 }
 .chrome__footerBody {
-  padding-top: 12px;
+  padding-top: 24px;
 }
 .chrome__footerGrid {
   display: grid;
@@ -647,7 +652,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   align-items: center;
   justify-content: space-between;
   padding-top: 16px;
-  margin-top: 24px;
+  margin-top: 52px;
   font-family: var(--display);
   font-size: var(--type-meta);
   font-weight: 700;
@@ -687,7 +692,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 
 @media (max-width: 820px) {
   .chrome__footer {
-    padding: 56px 0 20px;
+    padding: 64px 0 24px;
   }
   .chrome__nowStrip {
     display: grid;
@@ -739,7 +744,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
     height: 22px;
   }
   .chrome__footerBody {
-    padding-top: 12px;
+    padding-top: 20px;
   }
   .chrome__footerGrid {
     grid-template-columns: minmax(0, 1fr);
@@ -760,7 +765,7 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   .chrome__colophon {
     gap: 8px 16px;
     padding-top: 12px;
-    margin-top: 16px;
+    margin-top: 36px;
   }
 }
 

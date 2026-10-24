@@ -136,7 +136,9 @@ export function ClimbingFlower({
                   d={d}
                   style={
                     meters > 0 && !future
-                      ? { fill: `var(--${PETAL_TONES[index % PETAL_TONES.length]})` }
+                      ? ({
+                          '--petal-fill': `var(--${PETAL_TONES[index % PETAL_TONES.length]})`,
+                        } as CSSProperties)
                       : undefined
                   }
                   transform={placed}

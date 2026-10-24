@@ -31,10 +31,10 @@ describe('getTypography', () => {
       expect(size).toMatch(/^(?:\d+(?:\.\d+)?(?:px|rem|em)|clamp\(.+\)|inherit)$/);
     }
 
-    expect(css).toContain(':where([data-typography="caption"]) {\n  font-size: 15px;');
-    expect(css).toContain(':where([data-typography="overline"]) {\n  font-size: 16px;');
+    expect(css).toContain(':where([data-typography="caption"]) { font-size: 15px;');
+    expect(css).toContain(':where([data-typography="overline"]) { font-size: 16px;');
     expect(css).toContain(
-      ':where([data-typography="h6"]) {\n  color: var(--dg-palette-text-h6);\n  font-size: 16px;',
+      ':where([data-typography="h6"]) { color: var(--dg-palette-text-h6); font-size: 16px;',
     );
     expect(css.indexOf(':where([data-typography][data-has-color])')).toBeGreaterThan(
       css.indexOf(':where([data-ui-link])'),

@@ -118,7 +118,7 @@ describe('ChangelogLedger', () => {
     expect(screen.getByText('December collage')).toBeInTheDocument();
     expect(screen.queryByText('The collage before the rewrite.')).not.toBeInTheDocument();
     expect(screen.queryByText('Tagged builds in 2023')).not.toBeInTheDocument();
-    expect(photo.closest('figure')).toHaveStyle({ rotate: '-2.1deg' });
+    expect(photo.closest('figure')?.style.getPropertyValue('--polaroid-tilt')).toBe('-2.1deg');
   });
 
   it('renders a snapshot without a caption when the asset title is only the version tag', () => {

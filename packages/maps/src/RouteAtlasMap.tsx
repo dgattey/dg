@@ -15,7 +15,6 @@ import {
   type MapRoute,
   type RouteFrame,
 } from './routeFrame';
-import { ROUTE_MAP_TOKENS } from './routeMapTokens';
 import { SmoothTile, useHostSize } from './SmoothTile';
 import { outdoorsTileUrl, type TileSource } from './tileSource';
 import { useDarkMap } from './useDarkMap';
@@ -28,16 +27,6 @@ const TILE_SIZE = 256;
 const DEFAULT_SIZE = { height: 600, width: 800 };
 const REPROJECT_ZOOM_DELTA = 0.75;
 const REPROJECT_PAN_FRACTION = 0.5;
-
-const overlaySvgStyle: CSSProperties = {
-  display: 'block',
-  height: '100%',
-  inset: 0,
-  overflow: 'visible',
-  pointerEvents: 'none',
-  position: 'absolute',
-  width: '100%',
-};
 
 type AtlasRoutesOverlayProps = {
   anchor: Point;
@@ -68,7 +57,7 @@ function AtlasRoutesOverlay({
   const lineWidth = 1 + zoomFactor * 2.5;
 
   return (
-    <svg aria-hidden="true" style={overlaySvgStyle}>
+    <svg aria-hidden="true" data-atlas-overlay="">
       <g
         transform={`translate(${translateX.toFixed(2)} ${translateY.toFixed(2)}) scale(${scale.toFixed(6)})`}
       >
@@ -109,26 +98,6 @@ function pixelSeparation(a: Point, b: Point, zoom: number): number {
   const dy = ((b[0] - a[0]) / 360) * worldScale;
   return Math.hypot(dx, dy);
 }
-
-const containerStyle: CSSProperties = {
-  height: '100%',
-  isolation: 'isolate',
-  overflow: 'hidden',
-  position: 'relative',
-  width: '100%',
-  willChange: 'transform',
-};
-
-const ROUTE_ATLAS_CSS = `
-[data-atlas-canvas] > svg {
-  display: block;
-  height: 100%;
-  width: 100%;
-}
-[data-atlas-tiles] > div {
-  background-color: transparent !important;
-}
-`;
 
 type ViewportSnapshot = {
   boundsKey: string;
@@ -184,35 +153,22 @@ export function RouteAtlasMap({
   const frameMargin = Math.max(size.width, size.height);
   const paths = offline ? [] : framePaths(baseFrame, decodeRoutes(filteredRoutes), frameMargin);
 
-  const tokens = dark ? ROUTE_MAP_TOKENS.dark : ROUTE_MAP_TOKENS.light;
-
   return (
-    <section aria-label={label} ref={hostRef} style={containerStyle}>
-      <style href="dg-route-atlas" precedence="default">
-        {ROUTE_ATLAS_CSS}
-      </style>
+    <section aria-label={label} data-atlas-map="" ref={hostRef}>
       {offline ? (
         <div
           data-atlas-canvas=""
-          style={{
-            backgroundImage: `url("${dark ? OFFLINE_TILES.dark : OFFLINE_TILES.light}")`,
-            inset: 0,
-            position: 'absolute',
-          }}
+          style={
+            {
+              '--atlas-offline-bg': `url("${dark ? OFFLINE_TILES.dark : OFFLINE_TILES.light}")`,
+            } as CSSProperties
+          }
         >
           <RouteAtlasSketch bounds={activeBounds} routes={filteredRoutes} />
         </div>
       ) : (
         <>
-          <div
-            data-atlas-tiles=""
-            style={{
-              backgroundColor: tokens.background,
-              inset: 0,
-              position: 'absolute',
-              zIndex: 1,
-            }}
-          >
+          <div data-atlas-tiles="" data-dark={dark ? 'true' : undefined}>
             <PigeonMapCore
               attribution={false}
               center={activeCenter}

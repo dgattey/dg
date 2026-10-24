@@ -53,8 +53,14 @@ export function CollageAlbumPaper({
   );
 }
 
-function SkeletonLine({ width }: { width: CSSProperties['width'] }) {
-  return <span className="music__skeleton music__skeletonText" style={{ width }} />;
+function SkeletonLine({ width }: { width: number | string }) {
+  const w = typeof width === 'number' ? `${width}px` : width;
+  return (
+    <span
+      className="music__skeleton music__skeletonText"
+      style={{ '--skeleton-w': w } as CSSProperties}
+    />
+  );
 }
 
 function SkeletonFace() {

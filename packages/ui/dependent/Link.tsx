@@ -79,8 +79,8 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link
   return (
     <NextLink
       {...anchorProps}
+      data-ui-link-wrapper=""
       href={href}
-      style={{ color: 'inherit', textDecoration: 'none' }}
       transitionTypes={transitionTypes ? [...transitionTypes] : undefined}
     >
       <Typography

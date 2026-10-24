@@ -2,32 +2,30 @@ import type { CSSProperties, HTMLAttributes } from 'react';
 
 type SkeletonVariant = 'text' | 'rounded';
 
-type SkeletonProps = HTMLAttributes<HTMLSpanElement> & {
+type SkeletonProps = Omit<HTMLAttributes<HTMLSpanElement>, 'style'> & {
   height?: number | string;
-  style?: CSSProperties;
   variant?: SkeletonVariant;
   width?: number | string;
 };
 
-export function Skeleton({
-  className,
-  height,
-  style,
-  variant = 'text',
-  width,
-  ...rest
-}: SkeletonProps) {
+function toCssLength(val: number | string | undefined): string | undefined {
+  if (val === undefined) return undefined;
+  return typeof val === 'number' ? `${val}px` : val;
+}
+
+export function Skeleton({ className, height, variant = 'text', width, ...rest }: SkeletonProps) {
+  const h = toCssLength(height);
+  const w = toCssLength(width);
+  const vars: CSSProperties & Record<`--${string}`, string> = {};
+  if (h) vars['--skeleton-h'] = h;
+  if (w) vars['--skeleton-w'] = w;
+
   return (
     <span
       aria-hidden="true"
       className={className}
-      data-skeleton=""
-      style={{
-        borderRadius: variant === 'rounded' ? '8px' : '4px',
-        height: height ?? (variant === 'text' ? '1.2em' : 'auto'),
-        ...(width !== undefined ? { width } : {}),
-        ...style,
-      }}
+      data-skeleton={variant === 'rounded' ? 'rounded' : ''}
+      style={Object.keys(vars).length > 0 ? vars : undefined}
       {...rest}
     />
   );

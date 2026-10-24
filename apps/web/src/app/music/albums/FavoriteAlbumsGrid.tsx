@@ -276,7 +276,7 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
           itemRefs.current.delete(album.id);
         }
       }}
-      style={{ order: 2 * index + 1 }}
+      style={{ '--slot-order': 2 * index + 1 } as CSSProperties}
     >
       <FavoriteAlbumCell
         albumId={album.id}

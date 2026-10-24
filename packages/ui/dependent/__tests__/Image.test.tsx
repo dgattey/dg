@@ -43,7 +43,7 @@ describe('Image', () => {
     );
 
     const image = screen.getByRole('img', { name: 'Still Blessed' });
-    expect(image.style.aspectRatio).toBe('34 / 34');
-    expect(image.style.objectFit).toBe('cover');
+    expect(image).toHaveAttribute('data-ui-image', 'aspect');
+    expect(image.style.getPropertyValue('--img-aspect-ratio')).toBe('34 / 34');
   });
 });

@@ -2,9 +2,8 @@
 
 import type { CSSProperties, ReactNode, SyntheticEvent } from 'react';
 import React, { useId, useRef } from 'react';
-import { EASING_EASE_OUT, TIMING_FAST } from '../helpers/timing';
 import { Typography } from './Typography';
-import { SURFACE_LOOK_CSS_DECLS, useFloatingTooltip } from './useFloatingTooltip';
+import { useFloatingTooltip } from './useFloatingTooltip';
 
 export type TooltipPlacement = 'top' | 'bottom';
 
@@ -50,84 +49,6 @@ interface TooltipProps {
    */
   whenTruncated?: boolean;
 }
-
-const createTransitionDecl = (isRevealed: boolean) =>
-  [
-    `opacity ${TIMING_FAST}ms ${EASING_EASE_OUT} ${isRevealed ? 0 : TIMING_FAST}ms`,
-    `visibility 0s linear ${isRevealed ? 0 : TIMING_FAST * 2}ms`,
-  ].join(', ');
-
-const TOOLTIP_CSS = `
-[${ANCHOR_ATTRIBUTE}] {
-  display: inline-flex;
-}
-@supports not (position-area: block-end) {
-  [${ANCHOR_ATTRIBUTE}] {
-    position: relative;
-  }
-}
-[${ANCHOR_ATTRIBUTE}][data-tooltip-truncated] {
-  display: flex;
-  max-width: 100%;
-  min-width: 0;
-}
-[${ANCHOR_ATTRIBUTE}][data-tooltip-truncated] > :not([role="tooltip"]) {
-  min-width: 0;
-}
-[data-tooltip-surface] {
-  ${SURFACE_LOOK_CSS_DECLS}
-  justify-self: unsafe anchor-center;
-  opacity: 0;
-  position: fixed;
-  position-try-fallbacks: flip-block;
-  transition: ${createTransitionDecl(false)};
-  visibility: hidden;
-  white-space: nowrap;
-  z-index: 1500;
-}
-[data-tooltip-surface][data-tooltip-no-flip] {
-  position-try-fallbacks: none;
-}
-[data-tooltip-surface][data-placement="bottom"] {
-  align-self: unsafe start;
-  margin-block-end: 0;
-  margin-block-start: 8px;
-  position-area: block-end;
-}
-[data-tooltip-surface][data-placement="top"] {
-  align-self: unsafe end;
-  margin-block-end: 8px;
-  margin-block-start: 0;
-  position-area: block-start;
-}
-@supports not (position-area: block-end) {
-  [data-tooltip-surface] {
-    left: 50%;
-    position: absolute;
-    transform: translateX(-50%);
-  }
-  [data-tooltip-surface][data-placement="bottom"] {
-    bottom: auto;
-    top: 100%;
-  }
-  [data-tooltip-surface][data-placement="top"] {
-    bottom: 100%;
-    top: auto;
-  }
-}
-[${ANCHOR_ATTRIBUTE}]:hover > [data-tooltip-surface],
-:focus-visible>[${ANCHOR_ATTRIBUTE}]>[data-tooltip-surface],
-[${ANCHOR_ATTRIBUTE}]:has(:focus-visible) > [data-tooltip-surface] {
-  opacity: 1;
-  pointer-events: auto;
-  transition: ${createTransitionDecl(true)};
-  visibility: visible;
-}
-[${MUTED_ATTRIBUTE}] > [data-tooltip-surface],
-[${FLOATING_ATTRIBUTE}] > [data-tooltip-surface] {
-  display: none;
-}
-`;
 
 /**
  * Tooltip with adaptive bottom/top placement.
@@ -196,35 +117,26 @@ export function Tooltip({
     onMouseLeave: () => close('hover'),
   };
 
+  const anchorVarStyle = { '--tooltip-anchor': anchorName } as CSSProperties;
+
   return (
-    <>
-      <style href="dg-tooltip" precedence="default">
-        {TOOLTIP_CSS}
-      </style>
-      <span
-        {...anchorProps}
-        className={className}
-        ref={anchorRef}
-        style={{ anchorName } as CSSProperties}
+    <span {...anchorProps} className={className} ref={anchorRef} style={anchorVarStyle}>
+      {!whenTruncated && React.isValidElement<{ 'aria-describedby'?: string }>(children)
+        ? React.cloneElement(children, { 'aria-describedby': tooltipId })
+        : children}
+      <Typography
+        component="span"
+        data-placement={placement}
+        data-tooltip-no-flip={whenTruncated || undefined}
+        data-tooltip-surface=""
+        id={tooltipId}
+        ref={surfaceRef}
+        role="tooltip"
+        variant="caption"
       >
-        {!whenTruncated && React.isValidElement<{ 'aria-describedby'?: string }>(children)
-          ? React.cloneElement(children, { 'aria-describedby': tooltipId })
-          : children}
-        <Typography
-          component="span"
-          data-placement={placement}
-          data-tooltip-no-flip={whenTruncated || undefined}
-          data-tooltip-surface=""
-          id={tooltipId}
-          ref={surfaceRef}
-          role="tooltip"
-          style={{ positionAnchor: anchorName } as CSSProperties}
-          variant="caption"
-        >
-          {title}
-        </Typography>
-        {surface}
-      </span>
-    </>
+        {title}
+      </Typography>
+      {surface}
+    </span>
   );
 }

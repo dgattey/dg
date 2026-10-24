@@ -23,7 +23,7 @@ export function StravaCard({ history }: { history: StravaHistory | null }) {
   const { latest, outings, thisYear, totals } = history;
   const routes = toMapRoutes(outings);
   return (
-    <div className="home__strava" data-slot="st" style={{ gridArea: 'st' }}>
+    <div className="home__strava" data-slot="st">
       <div className="home__stravaAtlas collageLift">
         <h2 className="home__stravaHeading">
           <PaperTag className="collageEyebrow" tiltDeg={-4} tone="viridian">

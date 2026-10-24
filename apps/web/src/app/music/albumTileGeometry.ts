@@ -22,19 +22,24 @@ const FAN_TILT_GROWTH = (() => {
 
 const COVER_INSET_PERCENT = Math.ceil(2 * (50 - (50 - MAX_FAN_SHIFT) / FAN_TILT_GROWTH)) / 2;
 
-export function albumCoverStyle(depth: number, sleeveCount: number): CSSProperties {
+export function albumCoverStyle(
+  depth: number,
+  sleeveCount: number,
+): CSSProperties & Record<`--${string}`, string> {
   const shift = (depth - sleeveCount / 2) * LAYER_SHIFT_PERCENT;
   const spread = 'var(--album-fan-spread, 1)';
   const offset = `calc(${shift}% * ${spread})`;
 
   return {
-    inset: `${COVER_INSET_PERCENT}%`,
-    transform: `translate(${offset}, calc(-1 * ${offset})) rotate(${depth * LAYER_TILT_DEG}deg)`,
+    '--cover-inset': `${COVER_INSET_PERCENT}%`,
+    '--cover-transform': `translate(${offset}, calc(-1 * ${offset})) rotate(${depth * LAYER_TILT_DEG}deg)`,
   };
 }
 
-export function albumSleeveScrimStyle(depth: number): CSSProperties {
+export function albumSleeveScrimStyle(
+  depth: number,
+): CSSProperties & Record<`--${string}`, string> {
   return {
-    backgroundColor: `color-mix(in srgb, var(--dg-palette-background-default) ${depth * SLEEVE_RECESSION_PERCENT}%, transparent)`,
+    '--scrim-bg': `color-mix(in srgb, var(--dg-palette-background-default) ${depth * SLEEVE_RECESSION_PERCENT}%, transparent)`,
   };
 }

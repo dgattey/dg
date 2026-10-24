@@ -1,12 +1,10 @@
 'use client';
 
 import type { Track } from '@dg/content-models/spotify/Track';
-import { type CSSProperties, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { type AlbumGradientInformation, extractAlbumGradientFromUrl } from './extractAlbumGradient';
 import { NOW_PLAYING_CARD_ID, useNowPlaying } from './NowPlayingContext';
 import { TrackListing } from './TrackListing';
-
-const collageCardStyle: CSSProperties = { gridArea: 'sp', scrollMarginTop: 120 };
 
 function useAlbumGradient(track: Track): Track {
   const [gradientInformation, setGradientInformation] = useState<AlbumGradientInformation>({
@@ -42,7 +40,7 @@ export function SpotifyCollageCard({ track: serverTrack }: { track: Track | null
 function CollageCardWithGradient({ track }: { track: Track }) {
   const trackWithGradient = useAlbumGradient(track);
   return (
-    <div className="home__spotifySlot" id={NOW_PLAYING_CARD_ID} style={collageCardStyle}>
+    <div className="home__spotifySlot" id={NOW_PLAYING_CARD_ID}>
       <TrackListing track={trackWithGradient} />
     </div>
   );

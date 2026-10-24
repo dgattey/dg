@@ -1,0 +1,300 @@
+.home__spotifySlot {
+  grid-area: sp;
+  scroll-margin-top: 120px;
+}
+
+.spotify__headerSlot {
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  justify-items: start;
+  min-width: 0;
+  max-width: 100%;
+  margin-left: 8px;
+}
+
+[data-spotify-header-container] {
+  display: flex;
+  flex-shrink: 1;
+  align-items: center;
+  min-width: 0;
+  max-width: max(25vw, 16rem);
+  overflow: visible;
+  cursor: pointer;
+  transform-origin: left center;
+}
+
+[data-spotify-header-container] > .paperWrap {
+  min-width: 0;
+}
+
+[data-track-title],
+[data-track-artists] {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: var(--track-shadow, none);
+}
+
+[data-track-title][data-variant="card"] {
+  margin-bottom: 8px;
+}
+
+[data-track-title][data-variant="compact"] {
+  line-height: 1.2;
+}
+
+[data-track-artists][data-variant="compact"] {
+  line-height: 1.2;
+  opacity: 0.6;
+}
+
+[data-track-artists][data-has-color] {
+  opacity: 1;
+}
+
+[data-track-artists] a {
+  color: inherit;
+}
+
+[data-art-notes] {
+  position: relative;
+  overflow: visible;
+  isolation: isolate;
+}
+
+[data-art-notes="card"] {
+  width: min(100%, 300px);
+  aspect-ratio: 1;
+}
+
+[data-art-notes="compact"] {
+  width: 44px;
+  height: 44px;
+}
+
+[data-art-notes-center] {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 0;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
+
+[data-art-notes-bounce] {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  backface-visibility: hidden;
+}
+
+[data-compact-art-disabled] {
+  display: block;
+}
+
+[data-compact-track] {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+  overflow: visible;
+}
+
+[data-compact-text] {
+  display: flex;
+  flex: 0 1 auto;
+  flex-direction: column;
+  width: fit-content;
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+  color: var(--on);
+}
+
+[data-thumbnail-outer] {
+  position: relative;
+  flex-shrink: 0;
+  width: 44px;
+  min-width: 0;
+  height: 44px;
+  overflow: visible;
+  transition: width var(--timing-slow) var(--easing-bounce);
+}
+
+[data-album-art] {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  overflow: hidden;
+  border-radius: var(--nested-radius);
+  box-shadow: var(--dg-shadow-card-main);
+  transform-origin: left center;
+  transition: transform var(--timing-slow) var(--easing-bounce);
+  will-change: transform;
+}
+
+:focus-visible [data-compact-track] [data-album-art],
+[data-compact-track]:has(:focus-visible) [data-album-art] {
+  z-index: 1;
+  box-shadow: var(--dg-shadow-card-hovered);
+  transform: scale(1.9090909090909092);
+}
+
+:focus-visible [data-compact-track] [data-thumbnail-outer],
+[data-compact-track]:has(:focus-visible) [data-thumbnail-outer] {
+  width: 84px;
+}
+
+@media (hover: hover) {
+  [data-compact-track]:hover [data-album-art] {
+    z-index: 1;
+    box-shadow: var(--dg-shadow-card-hovered);
+    transform: scale(1.9090909090909092);
+  }
+  [data-compact-track]:hover [data-thumbnail-outer] {
+    width: 84px;
+  }
+}
+
+[data-playback-status] {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  text-shadow: var(--status-shadow, none);
+}
+
+[data-playback-status="compact"] {
+  gap: 4px;
+  width: 100%;
+  min-width: 0;
+  line-height: 1.2;
+}
+
+[data-playback-status-compact-text] {
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+[data-playback-status-icon] {
+  display: inline-flex;
+  flex-shrink: 0;
+  backface-visibility: hidden;
+}
+
+[data-playback-progress-track] {
+  width: 100%;
+  height: 6px;
+  margin-top: 16px;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: color-mix(in srgb, var(--progress-color) 20%, transparent);
+  border-radius: 999px;
+}
+
+[data-playback-progress-bar] {
+  width: 100%;
+  height: 100%;
+  background-color: var(--progress-color);
+  border-radius: inherit;
+  transform: scaleX(var(--progress-scale, 0));
+  transform-origin: left;
+}
+
+@keyframes albumGradientFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+[data-gradient-backdrop] {
+  position: absolute;
+  pointer-events: none;
+}
+
+[data-gradient-backdrop="glow"] {
+  inset: -4px;
+  z-index: 0;
+  border-radius: 24px;
+  opacity: 0.36;
+}
+
+[data-gradient-backdrop="surface"] {
+  inset: 0;
+  z-index: -1;
+}
+
+[data-gradient-layer] {
+  position: absolute;
+  inset: 0;
+  background-image: var(--album-gradient);
+  border-radius: inherit;
+  animation: albumGradientFadeIn var(--timing-slow) var(--easing-default);
+}
+
+@keyframes musicNoteFloatAndFade {
+  0% {
+    opacity: 0;
+    transform: translate3d(calc(-50% + var(--note-x0)), calc(-50% + var(--note-y0)), 0)
+      scale3d(var(--note-scale), var(--note-scale), 1) rotate(0deg);
+  }
+  8% {
+    opacity: var(--note-opacity-start);
+    transform: translate3d(
+        calc(-50% + var(--note-x0) + (var(--note-x) - var(--note-x0)) * 0.08),
+        calc(-50% + var(--note-y0) + (var(--note-y) - var(--note-y0)) * 0.08),
+        0
+      )
+      scale3d(var(--note-scale), var(--note-scale), 1) rotate(calc(var(--note-rotation) * 0.08));
+  }
+  50% {
+    opacity: var(--note-opacity-mid);
+  }
+  80% {
+    opacity: var(--note-opacity-end);
+  }
+  100% {
+    opacity: 0;
+    transform: translate3d(calc(-50% + var(--note-x)), calc(-50% + var(--note-y)), 0)
+      scale3d(calc(var(--note-scale) * 0.7), calc(var(--note-scale) * 0.7), 1)
+      rotate(var(--note-rotation));
+  }
+}
+
+[data-ambient-notes] {
+  --note-opacity-start: 1;
+  --note-opacity-mid: 0.95;
+  --note-opacity-end: 0.6;
+  --note-shadow: drop-shadow(0 1.5px 0 rgba(0, 0, 0, 0.55))
+    drop-shadow(0 2px 4px rgba(0, 0, 0, 0.35));
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  overflow: visible;
+  pointer-events: none;
+  backface-visibility: hidden;
+}
+
+[data-music-note] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  color: var(--note-color, currentColor);
+  opacity: 0;
+  filter: var(--note-shadow);
+  backface-visibility: hidden;
+  animation: musicNoteFloatAndFade var(--note-duration) ease-out forwards;
+  animation-delay: var(--note-delay);
+  will-change: transform, opacity;
+}

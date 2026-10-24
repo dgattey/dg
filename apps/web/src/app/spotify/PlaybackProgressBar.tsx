@@ -16,24 +16,6 @@ const clamp = (value: number, min: number, max: number) => Math.min(Math.max(val
 const getProgressPercent = (progressMs: number, durationMs: number) =>
   durationMs > 0 ? clamp(progressMs / durationMs, 0, 1) : 0;
 
-const trackStyle: CSSProperties = {
-  backgroundColor: 'color-mix(in srgb, var(--progress-color) 20%, transparent)',
-  borderRadius: 999,
-  height: 6,
-  marginTop: 16,
-  overflow: 'hidden',
-  pointerEvents: 'none',
-  width: '100%',
-};
-
-const progressStyle: CSSProperties = {
-  backgroundColor: 'var(--progress-color)',
-  borderRadius: 'inherit',
-  height: '100%',
-  transformOrigin: 'left',
-  width: '100%',
-};
-
 export function PlaybackProgressBar({
   durationMs,
   progressMs,
@@ -58,7 +40,7 @@ export function PlaybackProgressBar({
       const elapsedMs = isPlaying ? Date.now() - startTimeRef.current : 0;
       const nextMs = clamp(startProgressRef.current + elapsedMs, 0, durationMs);
       const ratio = getProgressPercent(nextMs, durationMs);
-      bar.style.transform = `scaleX(${ratio.toFixed(4)})`;
+      bar.style.setProperty('--progress-scale', ratio.toFixed(4));
     };
     apply();
     if (!isPlaying) {
@@ -75,11 +57,13 @@ export function PlaybackProgressBar({
   return (
     <div
       aria-hidden={true}
-      style={{ ...trackStyle, '--progress-color': resolvedColor } as CSSProperties}
+      data-playback-progress-track=""
+      style={{ '--progress-color': resolvedColor } as CSSProperties}
     >
       <div
+        data-playback-progress-bar=""
         ref={barRef}
-        style={{ ...progressStyle, transform: `scaleX(${initialProgress.toFixed(4)})` }}
+        style={{ '--progress-scale': initialProgress.toFixed(4) } as CSSProperties}
       />
     </div>
   );

@@ -28,9 +28,9 @@ export function CollageProjectFrame({
   const printStyle: CSSProperties & Record<`--${string}`, string> = {
     '--ar': String(projectFrameAspectRatio(project.layout)),
   };
-  const placementStyle: CSSProperties = {
-    ...(dataSlot ? { gridArea: dataSlot } : {}),
-    ...(style.marginTop != null ? { marginTop: style.marginTop } : {}),
+  const placementStyle: CSSProperties & Record<`--${string}`, string> = {
+    ...(dataSlot ? { '--slot-area': dataSlot } : {}),
+    ...(style.marginTop != null ? { '--slot-mt': `${style.marginTop}px` } : {}),
   };
   const tag = (
     <PaperTag

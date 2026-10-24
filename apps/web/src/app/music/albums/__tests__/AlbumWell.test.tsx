@@ -3,22 +3,10 @@ import { act, render, screen } from '@testing-library/react';
 import { AlbumDetailBodySkeleton } from '../AlbumDetailBodySkeleton';
 import { AlbumWell } from '../AlbumWell';
 
-function rulesFor(element: Element | null) {
-  const classes = [...(element?.classList ?? [])];
-  const rules = [...document.styleSheets].flatMap((sheet) => {
-    try {
-      return [...sheet.cssRules].map((rule) => rule.cssText);
-    } catch {
-      return [];
-    }
-  });
-  return rules
-    .filter((rule) => classes.some((className) => rule.includes(`.${className}`)))
-    .join('\n');
-}
-
-function wellRules() {
-  return rulesFor(document.querySelector('section'));
+function wellReserveHeight() {
+  return (
+    document.querySelector<HTMLElement>('section')?.style.getPropertyValue('--well-reserve-h') ?? ''
+  );
 }
 
 const album: PlaylistAlbum = {
@@ -102,13 +90,14 @@ describe('AlbumWell', () => {
       observerCallback?.([] as unknown as Array<ResizeObserverEntry>, {} as ResizeObserver);
     });
 
-    expect(shell).toHaveStyle({ height: '80px', overflow: 'clip' });
+    expect(shell).toHaveClass('music__wellOuter--locked');
+    expect(shell.style.getPropertyValue('--well-locked-h')).toBe('80px');
 
     act(() => {
       rafCallback?.(0);
     });
 
-    expect(shell).toHaveStyle({ height: '240px' });
+    expect(shell.style.getPropertyValue('--well-locked-h')).toBe('240px');
 
     act(() => {
       const end = new Event('transitionend', { bubbles: true });
@@ -118,8 +107,8 @@ describe('AlbumWell', () => {
       shell.dispatchEvent(end);
     });
 
-    expect(shell).not.toHaveStyle({ height: '240px' });
-    expect(getComputedStyle(shell).overflow).toBe('visible');
+    expect(shell).not.toHaveClass('music__wellOuter--locked');
+    expect(shell.style.getPropertyValue('--well-locked-h')).toBe('');
 
     rafSpy.mockRestore();
     global.ResizeObserver = OriginalResizeObserver;
@@ -157,7 +146,7 @@ describe('AlbumWell', () => {
       observerCallback?.([] as unknown as Array<ResizeObserverEntry>, {} as ResizeObserver);
     });
 
-    expect(wellRules()).not.toMatch(/min-height/);
+    expect(wellReserveHeight()).toBe('');
 
     act(() => {
       rerender(
@@ -167,11 +156,7 @@ describe('AlbumWell', () => {
       );
     });
 
-    const floored = wellRules();
-
-    expect(floored).toMatch(
-      /:has\(\[data-role="album-detail-placeholder"\]\)\s*\{\s*min-height:\s*900px/,
-    );
+    expect(wellReserveHeight()).toBe('900px');
     expect(screen.getByRole('region', { name: 'Other Album details' })).toBeInTheDocument();
 
     global.ResizeObserver = OriginalResizeObserver;
@@ -184,7 +169,7 @@ describe('AlbumWell', () => {
       </AlbumWell>,
     );
 
-    expect(wellRules()).not.toMatch(/min-height/);
+    expect(wellReserveHeight()).toBe('');
   });
 
   it('skips height tweening when the user prefers reduced motion', () => {

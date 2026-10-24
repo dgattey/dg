@@ -165,6 +165,53 @@ const BANNED_CONTENTFUL_FALLBACK_PATTERN =
 const MAPLIBRE_TOKEN = ['maplibre', 'gl'].join('-');
 const UNPROJECTED_DB_QUERY_PATTERN =
   /\bMusicPlaylist\.findAll\s*\(|\b(?:SpotifyPlay|StravaActivity|FavoriteAlbum|Release)\.findAll\s*\(\s*\)|attributes:\s*\[\s*['"]activityData['"]\s*\]/;
+const ALLOWED_STYLE_TAG_FILES = new Set([
+  'apps/web/src/app/layout.tsx',
+  'packages/ui/core/JsOnlyStyle.tsx',
+]);
+const INLINE_STYLE_OBJECT_PATTERN =
+  /\bstyle=\{\{([^{}]*)\}\}|\b:\s*CSSProperties\s*=\s*\{([^{}]*)\}/g;
+
+function checkNoInlineStyles(
+  relPath: string,
+  content: string,
+  sourceLines: ReadonlyArray<string>,
+): Array<StructureViolation> {
+  if (relPath.startsWith('packages/cli/') || /SocialCard\w*\.tsx$/.test(relPath)) {
+    return [];
+  }
+  const violations: Array<StructureViolation> = [];
+  if (
+    relPath.endsWith('.tsx') &&
+    !ALLOWED_STYLE_TAG_FILES.has(relPath) &&
+    content.includes('<style')
+  ) {
+    for (let i = 0; i < sourceLines.length; i += 1) {
+      if (/<style\b/.test(sourceLines[i] ?? '')) {
+        violations.push({
+          file: relPath,
+          line: i + 1,
+          message: 'Move CSS rules into a .css stylesheet instead of rendering inline <style> tags',
+          rule: 'no-inline-style-tag',
+        });
+      }
+    }
+  }
+  const sanitized = content.replace(/\$\{[^}]*\}/g, '0');
+  for (const match of sanitized.matchAll(INLINE_STYLE_OBJECT_PATTERN)) {
+    const body = match[1] ?? match[2] ?? '';
+    if (/(?:^|[,{\s])([a-z][a-zA-Z0-9]*)\s*:/.test(body)) {
+      violations.push({
+        file: relPath,
+        line: lineAt(sanitized, match.index),
+        message:
+          'Move static CSS properties into a .css stylesheet and reserve style={{ ... }} for dynamic --* custom properties',
+        rule: 'no-static-inline-style',
+      });
+    }
+  }
+  return violations;
+}
 
 export function checkContentfulFallbacks(
   relPath: string,
@@ -223,17 +270,19 @@ export function checkContentfulFallbacks(
             : [],
         )
       : [];
+  const inlineStyleViolations = checkNoInlineStyles(relPath, content, sourceLines);
   if (
     (!/^packages\/services\/contentful\/fetch.*\.ts$/.test(relPath) &&
       !/^packages\/content-models\/contentful\/renderables\/.*\.ts$/.test(relPath) &&
       relPath !== 'apps/web/src/app/layouts/Footer.tsx') ||
     !BANNED_CONTENTFUL_FALLBACK_PATTERN.test(content)
   ) {
-    return [...dbQueryViolations, ...maplibreViolations];
+    return [...dbQueryViolations, ...maplibreViolations, ...inlineStyleViolations];
   }
   return [
     ...dbQueryViolations,
     ...maplibreViolations,
+    ...inlineStyleViolations,
     ...sourceLines.flatMap((lineText, i) =>
       BANNED_CONTENTFUL_FALLBACK_PATTERN.test(lineText)
         ? [

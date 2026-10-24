@@ -1,47 +1,14 @@
-import { lineAt, stripCssComments } from './check-page-titles.js';
+import {
+  type CssRule,
+  checkFooterCurtainReveal,
+  cssRules,
+  declaration,
+  lineAt,
+} from './check-page-titles.js';
 import type { StructureViolation } from './check-structure.js';
 
 /** Narrowest box a page grid gets: a 320px phone minus the 16px page gutters. */
 export const NARROWEST_GRID_PX = 288;
-
-type CssRule = { body: string; index: number; media: string | null; selectors: Array<string> };
-
-/** Flat list of style rules, each tagged with the `@media` prelude it sits in. */
-function cssRules(content: string): Array<CssRule> {
-  const source = stripCssComments(content);
-  const rules: Array<CssRule> = [];
-  const media: Array<string | null> = [];
-  let start = 0;
-  for (let i = 0; i < source.length; i++) {
-    const char = source[i];
-    if (char === '{') {
-      const prelude = source.slice(start, i).trim();
-      const close = prelude.startsWith('@') ? -1 : source.indexOf('}', i);
-      if (close === -1) {
-        media.push(prelude.startsWith('@media') ? prelude : (media.at(-1) ?? null));
-      } else {
-        rules.push({
-          body: source.slice(i + 1, close),
-          index:
-            start + (source.slice(start, i).length - source.slice(start, i).trimStart().length),
-          media: media.at(-1) ?? null,
-          selectors: prelude.split(',').map((selector) => selector.trim().replace(/\s+/g, ' ')),
-        });
-        i = close;
-      }
-      start = i + 1;
-    } else if (char === '}') {
-      media.pop();
-      start = i + 1;
-    } else if (char === ';' && source.slice(start, i).trim().startsWith('@')) {
-      start = i + 1;
-    }
-  }
-  return rules;
-}
-
-const declaration = (body: string, property: string): string | undefined =>
-  new RegExp(`(?:^|[;\\s])${property}\\s*:([^;]+)`).exec(body)?.[1]?.trim();
 
 function columnGapPx(body: string): number | null | undefined {
   const gap = declaration(body, 'column-gap') ?? declaration(body, 'gap')?.split(/\s+/).at(-1);
@@ -338,5 +305,6 @@ export function checkCssGeometry(cssFiles: ReadonlyMap<string, string>): Array<S
     ...checkCardHeadStable(cssFiles),
     ...checkCornerTagRoom(cssFiles),
     ...checkHeaderAboveSticky(cssFiles),
+    ...checkFooterCurtainReveal(cssFiles),
   ];
 }

@@ -20,31 +20,6 @@ type PlaybackStatusProps = {
   service?: string;
 };
 
-function getStatusStyle(listingVariant: ListingVariant, textShadow?: string): CSSProperties {
-  const isCompact = listingVariant === 'compact';
-  return {
-    alignItems: 'center',
-    display: 'flex',
-    gap: isCompact ? 4 : 8,
-    textShadow,
-    ...(isCompact ? { lineHeight: 1.2, minWidth: 0, width: '100%' } : {}),
-  };
-}
-
-const iconWrapperStyle: CSSProperties = {
-  backfaceVisibility: 'hidden',
-  display: 'inline-flex',
-  flexShrink: 0,
-};
-
-const compactTextStyle: CSSProperties = {
-  flexShrink: 1,
-  minWidth: 0,
-  overflow: 'hidden',
-  textOverflow: 'ellipsis',
-  whiteSpace: 'nowrap',
-};
-
 /**
  * The actual text/relative time to display for the status.
  */
@@ -100,21 +75,23 @@ export function PlaybackStatus({
     />
   );
   const iconSize = isCompact ? '1em' : '1.25em';
+  const statusVars = textShadow ? ({ '--status-shadow': textShadow } as CSSProperties) : undefined;
 
   return (
     <Typography
       color={color}
       component="div"
-      style={getStatusStyle(listingVariant, textShadow)}
+      data-playback-status={listingVariant}
+      style={statusVars}
       variant="overline"
     >
       {isCompact ? (
-        <span style={compactTextStyle}>{statusContent}</span>
+        <span data-playback-status-compact-text="">{statusContent}</span>
       ) : (
         <span>{statusContent}</span>
       )}
       {isNowPlaying ? (
-        <span ref={bounceRef} style={iconWrapperStyle}>
+        <span data-playback-status-icon="" ref={bounceRef}>
           <Music size={iconSize} />
         </span>
       ) : null}

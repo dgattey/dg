@@ -65,6 +65,7 @@
   aspect-ratio: 1;
   text-align: center;
   background: var(--pc);
+  clip-path: var(--scallop-clip);
 }
 /* Text fills the wide rectangle (0.75 × 0.66, hypot < 1) inscribed in the ring, 4px clear of its stroke. */
 .stats__scallop--seal {

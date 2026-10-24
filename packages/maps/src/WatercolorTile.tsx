@@ -15,15 +15,6 @@ type TileComponentProps = {
   tileLoaded: () => void;
 };
 
-const tileImgStyle: CSSProperties = {
-  display: 'block',
-  height: '100%',
-  left: 0,
-  position: 'absolute',
-  top: 0,
-  width: '100%',
-};
-
 /**
  * Derives the terrain labels URL from the watercolor URL by swapping the
  * tile layer path and format. Labels use PNG for transparency and @2x
@@ -53,21 +44,19 @@ export function WatercolorTile({ tile, tileLoaded }: TileComponentProps) {
     }
   };
 
-  const containerStyle: CSSProperties = {
-    height: tile.height,
-    left: tile.left,
-    opacity: tile.active ? 1 : 0,
-    overflow: 'hidden',
-    position: 'absolute',
-    top: tile.top,
-    transition: 'opacity 0.2s',
-    width: tile.width,
-  };
+  const tileVars = {
+    '--tile-h': `${tile.height}px`,
+    '--tile-left': `${tile.left}px`,
+    '--tile-top': `${tile.top}px`,
+    '--tile-w': `${tile.width}px`,
+  } as CSSProperties;
 
   return (
-    <div style={containerStyle}>
-      <img alt="" onLoad={handleImageLoad} src={tile.url} style={tileImgStyle} />
-      {hasLabels && <img alt="" onLoad={handleImageLoad} src={labelsUrl} style={tileImgStyle} />}
+    <div data-active={tile.active ? 'true' : undefined} data-map-tile="" style={tileVars}>
+      <img alt="" data-watercolor-tile-img="" onLoad={handleImageLoad} src={tile.url} />
+      {hasLabels && (
+        <img alt="" data-watercolor-tile-img="" onLoad={handleImageLoad} src={labelsUrl} />
+      )}
     </div>
   );
 }

@@ -21,4 +21,8 @@ const matchMediaMock = (query: string) => ({
 });
 if (typeof window !== 'undefined') {
   window.matchMedia = matchMediaMock as unknown as typeof window.matchMedia;
+  const style = document.createElement('style');
+  style.textContent =
+    '[data-tooltip-surface]{visibility:hidden}[data-tooltip-anchor]:hover>[data-tooltip-surface],:focus-visible>[data-tooltip-anchor]>[data-tooltip-surface],[data-tooltip-anchor]:has(:focus-visible)>[data-tooltip-surface]{visibility:visible}[data-tooltip-muted]>[data-tooltip-surface],[data-tooltip-floating]>[data-tooltip-surface]{display:none}';
+  document.head.appendChild(style);
 }

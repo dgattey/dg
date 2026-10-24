@@ -1,5 +1,6 @@
 import type { ChangelogRelease } from '@dg/services/github/fetchReleases';
 import Image from 'next/image';
+import type { CSSProperties } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import {
@@ -110,7 +111,10 @@ export function ChangelogReleaseCard({
             )}
           </div>
           {snapshot ? (
-            <figure className="changelog__polaroid" style={{ rotate: `${polaroidTilt}deg` }}>
+            <figure
+              className="changelog__polaroid"
+              style={{ '--polaroid-tilt': `${polaroidTilt}deg` } as CSSProperties}
+            >
               <div className="changelog__polaroidFrame">
                 <Image
                   alt={

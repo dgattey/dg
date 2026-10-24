@@ -95,6 +95,9 @@
   border-radius: 8px;
   rotate: 1.5deg;
 }
+.music__albumSlot {
+  order: var(--slot-order);
+}
 .music__albumSlot > *,
 .music__albumSlot a {
   display: block;
@@ -107,10 +110,12 @@
 }
 .music__cover {
   position: absolute;
+  inset: var(--cover-inset);
   overflow: hidden;
   line-height: 0;
   border: thin solid var(--dg-palette-card-border);
   border-radius: 6px;
+  transform: var(--cover-transform);
   transition: transform var(--timing-fast) var(--easing-default);
 }
 .music__cover--front {
@@ -119,9 +124,13 @@
 .music__sleeveScrim {
   position: absolute;
   inset: 0;
+  background-color: var(--scrim-bg);
 }
 .music__skeleton {
   display: block;
+  width: var(--skeleton-w, auto);
+  max-width: var(--skeleton-max-w, none);
+  height: var(--skeleton-h, 1.2em);
   background-color: color-mix(in srgb, CanvasText 12%, transparent);
   animation: music__skeletonPulse 2s ease-in-out 0.5s infinite;
 }
@@ -446,6 +455,7 @@
 .music__wellFacts p {
   font-size: var(--type-meta);
   font-weight: 600;
+  font-variant-numeric: tabular-nums;
   line-height: var(--leading-title);
 }
 .music__wellPopularity {
@@ -463,6 +473,7 @@
   border-radius: var(--quad-c);
 }
 .music__wellPopularityFill {
+  width: var(--popularity, 0%);
   height: 100%;
   background-color: var(--on);
 }
@@ -486,14 +497,35 @@
   border-bottom: 1px solid color-mix(in oklab, var(--on) 28%, var(--pc));
   break-inside: avoid;
 }
+.music__wellTrackNumber {
+  align-self: start;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+.music__wellTrackDuration {
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
 .music__wellTrackSkeleton {
   grid-template-columns: 1.5rem minmax(0, 1fr);
 }
+.music__wellOuter {
+  height: auto;
+  overflow: visible;
+}
+.music__wellOuter--locked {
+  height: var(--well-locked-h, auto);
+  overflow: clip;
+  transition: height var(--timing-medium) var(--easing-default);
+}
+.music__wellShell:has([data-role="album-detail-placeholder"]) {
+  min-height: var(--well-reserve-h, 0px);
+}
 @media (prefers-reduced-motion: reduce) {
   .music__wellOuter--locked {
-    height: auto !important;
-    overflow: visible !important;
-    transition: none !important;
+    height: auto;
+    overflow: visible;
+    transition: none;
   }
 }
 .music__wellPlaceholder {

@@ -8,15 +8,9 @@ import {
 import { pageTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { Link } from '@dg/ui/dependent/Link';
 import { usePathname } from 'next/navigation';
-import type { CSSProperties, MouseEvent } from 'react';
+import type { MouseEvent } from 'react';
 import type { StickerInks } from './logoMark';
 import { StickerMark } from './StickerMark';
-
-const markStyle: CSSProperties = {
-  display: 'block',
-  height: '1.15em',
-  width: 'auto',
-};
 
 const markInks: StickerInks = {
   dot: 'var(--vermilion)',
@@ -44,7 +38,7 @@ export function Logo() {
       onClick={handleClick}
       transitionTypes={pageTransitionTypes('close')}
     >
-      <StickerMark inks={markInks} label="dg." style={markStyle} />
+      <StickerMark inks={markInks} label="dg." />
     </Link>
   );
 }
