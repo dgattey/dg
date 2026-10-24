@@ -1,6 +1,7 @@
 import 'server-only';
 
 import { db } from '@dg/db';
+import type { PeriodStatus } from '@dg/shared-core/dates/periodStatus';
 import { buildRangeBreakdowns } from './listeningStatsBreakdowns';
 import {
   mapCatalogSlices,
@@ -78,7 +79,7 @@ export type StatsGenre = {
   tracks: number;
 };
 /** Where a calendar slot sits against the latest play: over, still in progress, or not yet happened. */
-export type StatsPhase = 'current' | 'future' | 'past';
+export type StatsPhase = PeriodStatus;
 export type StatsTimelinePoint = {
   key: string;
   label: string;

@@ -101,6 +101,31 @@
   border-radius: 8px;
   rotate: 1.5deg;
 }
+.music__albumSlot > *,
+.music__albumSlot a {
+  display: block;
+  width: 100%;
+}
+.music__stackFrame {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+}
+.music__cover {
+  position: absolute;
+  overflow: hidden;
+  line-height: 0;
+  border: thin solid var(--dg-palette-card-border);
+  border-radius: 6px;
+  transition: transform var(--timing-fast) var(--easing-default);
+}
+.music__cover--front {
+  box-shadow: 0 1.5px 0 rgb(0 0 0 / 0.18);
+}
+.music__sleeveScrim {
+  position: absolute;
+  inset: 0;
+}
 .music__skeleton {
   display: block;
   background-color: color-mix(in srgb, CanvasText 12%, transparent);
@@ -444,6 +469,17 @@
   padding-block: 6px;
   border-bottom: 1px solid color-mix(in oklab, var(--on) 28%, var(--pc));
   break-inside: avoid;
+}
+.music__wellTrackSkeleton {
+  grid-template-columns: 1.5rem minmax(0, 1fr);
+}
+.music__wellPlaceholder {
+  display: contents;
+}
+.music__wellTrackBody {
+  display: grid;
+  row-gap: 2px;
+  min-width: 0;
 }
 .music__wellTrackTitle {
   display: block;

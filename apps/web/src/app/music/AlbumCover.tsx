@@ -1,10 +1,9 @@
-import { Box } from '@dg/ui/core/Box';
 import { Image } from '@dg/ui/dependent/Image';
 import {
   ALBUM_TILE_ART_SIZE,
   ALBUM_TILE_ART_SIZES,
-  albumCoverSx,
-  albumSleeveScrimSx,
+  albumCoverStyle,
+  albumSleeveScrimStyle,
 } from './albumTileGeometry';
 
 type Props = {
@@ -27,7 +26,11 @@ type Props = {
 export function AlbumCover({ imageUrl, alt, depth, sleeveCount, isLcpCandidate = false }: Props) {
   const isEagerFrontCover = isLcpCandidate && depth === 0;
   return (
-    <Box aria-hidden={depth > 0 || undefined} sx={albumCoverSx(depth, sleeveCount)}>
+    <div
+      aria-hidden={depth > 0 || undefined}
+      className={depth === 0 ? 'music__cover music__cover--front' : 'music__cover'}
+      style={albumCoverStyle(depth, sleeveCount)}
+    >
       <Image
         alt={alt}
         fetchPriority={isEagerFrontCover ? 'high' : undefined}
@@ -38,7 +41,9 @@ export function AlbumCover({ imageUrl, alt, depth, sleeveCount, isLcpCandidate =
         url={imageUrl}
         width={ALBUM_TILE_ART_SIZE}
       />
-      {depth > 0 ? <Box sx={albumSleeveScrimSx(depth)} /> : null}
-    </Box>
+      {depth > 0 ? (
+        <span className="music__sleeveScrim" style={albumSleeveScrimStyle(depth)} />
+      ) : null}
+    </div>
   );
 }

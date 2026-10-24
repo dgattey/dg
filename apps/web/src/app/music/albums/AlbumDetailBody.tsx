@@ -91,7 +91,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
             >
               {track.trackNumber}
             </span>
-            <span style={{ display: 'grid', minWidth: 0, rowGap: 2 }}>
+            <span className="music__wellTrackBody">
               <Tooltip title={track.name} whenTruncated>
                 <span className="music__wellTrackTitle">
                   <Link href={track.url} isExternal={true} title={`Open ${track.name} on Spotify`}>

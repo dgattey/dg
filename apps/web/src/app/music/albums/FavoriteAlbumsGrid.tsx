@@ -23,7 +23,6 @@ import {
   type CollageCardTreatment,
   collageCardTreatment,
 } from '../../collage/collageCardTreatment';
-import { albumTileSlotSx } from '../albumTileGeometry';
 import { AlbumDetailBody } from './AlbumDetailBody';
 import { AlbumDetailBodySkeleton } from './AlbumDetailBodySkeleton';
 import { AlbumWell } from './AlbumWell';
@@ -272,7 +271,8 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
   );
 
   const renderAlbum = ({ album, treatment }: AlbumCard, index: number) => (
-    <Box
+    <div
+      className="music__albumSlot"
       key={album.id}
       ref={(element: HTMLElement | null) => {
         if (element) {
@@ -282,7 +282,6 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
         }
       }}
       style={{ order: 2 * index + 1 }}
-      sx={albumTileSlotSx}
     >
       <FavoriteAlbumCell
         albumId={album.id}
@@ -293,7 +292,7 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
         imageUrl={album.imageUrl}
         isLcpCandidate={index < COLLAGE_FIRST_SCREEN_CELLS}
       />
-    </Box>
+    </div>
   );
 
   const wellIndex = selectedIndex >= 0 ? selectedIndex : sortedAlbumCards.length - 1;

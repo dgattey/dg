@@ -1,7 +1,5 @@
-import { Box } from '@dg/ui/core/Box';
 import type { ReactNode } from 'react';
 import { AlbumCover } from './AlbumCover';
-import { albumTileFrameSx } from './albumTileGeometry';
 
 type Props = {
   /** Album art URL, repeated by every sleeve behind the front cover. */
@@ -28,7 +26,7 @@ export function AlbumStack({ imageUrl, sleeveCount, children, isLcpCandidate = f
   const sleeveDepths = Array.from({ length: sleeveCount }, (_, index) => sleeveCount - index);
 
   return (
-    <Box sx={albumTileFrameSx}>
+    <div className="music__stackFrame">
       {sleeveDepths.map((depth) => (
         <AlbumCover
           alt=""
@@ -40,6 +38,6 @@ export function AlbumStack({ imageUrl, sleeveCount, children, isLcpCandidate = f
         />
       ))}
       {children}
-    </Box>
+    </div>
   );
 }

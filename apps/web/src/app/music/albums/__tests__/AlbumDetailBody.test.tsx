@@ -67,8 +67,6 @@ function byRole(container: HTMLElement, role: string): HTMLElement {
   return element;
 }
 
-const templateOf = (element: HTMLElement) => getComputedStyle(element).gridTemplateColumns;
-
 describe('AlbumDetailBody', () => {
   it('renders numbered tracks and Spotify links for artists and tracks', () => {
     render(<AlbumDetailBody album={album} />);
@@ -125,6 +123,9 @@ describe('AlbumDetailBody', () => {
   it('keeps the skeleton on the loaded column structure', () => {
     const { container } = render(<AlbumDetailBodySkeleton />);
 
-    expect(templateOf(byRole(container, 'track-row-skeleton'))).toBe('1.5rem minmax(0, 1fr)');
+    expect(byRole(container, 'track-row-skeleton')).toHaveClass(
+      'music__wellTrack',
+      'music__wellTrackSkeleton',
+    );
   });
 });
