@@ -250,6 +250,10 @@
   padding: 16px 22px 18px;
   font-size: var(--type-title-md);
 }
+.reading__section:nth-of-type(n + 3) {
+  contain-intrinsic-size: auto 720px;
+  content-visibility: auto;
+}
 
 .reading__grid {
   display: grid;

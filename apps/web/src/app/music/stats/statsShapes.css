@@ -7,6 +7,7 @@
   color: var(--on);
   filter: drop-shadow(0 1.5px 0 rgb(0 0 0 / 0.22));
   rotate: var(--r, 0deg);
+  will-change: transform;
 }
 .stats__face {
   position: relative;

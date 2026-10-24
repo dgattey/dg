@@ -5,7 +5,7 @@ import type { AtlasRegion } from '@dg/maps/atlasGeometry';
 import { RouteAtlasMap } from '@dg/maps/src/RouteAtlasMap';
 import type { GeoBounds } from '@dg/maps/src/routeFrame';
 import type { TileSource } from '@dg/maps/src/tileSource';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
 import { Scallop, Stub } from '../music/stats/StatsShapes';
@@ -109,13 +109,20 @@ export function StravaAtlas({
 }) {
   const { all } = useFilteredOutings();
   const [regionKey, setRegionKey] = useState<string | null>(null);
+  const routesCacheRef = useRef<{
+    all: typeof all;
+    routes: ReturnType<typeof toMapRoutes>;
+  } | null>(null);
+  if (!routesCacheRef.current || routesCacheRef.current.all !== all) {
+    routesCacheRef.current = { all, routes: toMapRoutes(all) };
+  }
   const region = regions.find(({ key }) => key === regionKey) ?? null;
   return (
     <>
       <RouteAtlasMap
         bounds={bounds}
         label="Map of every route I've tracked on Strava"
-        routes={toMapRoutes(all)}
+        routes={routesCacheRef.current.routes}
         tileSource={tileSource}
         view={region?.bounds ?? null}
       />
