@@ -2,11 +2,22 @@
 
 import type { PlaylistAlbum } from '@dg/content-models/spotify/PlaylistAlbums';
 import type { AlbumDetail } from '@dg/services/spotify/albumDetailTypes';
+import { ALBUM_PARAM, favoriteAlbumsRoute } from '@dg/shared-core/routes/app';
 import { Box } from '@dg/ui/core/Box';
 import { Typography } from '@dg/ui/core/Typography';
+import { albumTransitionTypes } from '@dg/ui/core/transitions/pageTransitions';
 import { EASING_DEFAULT, TIMING_SLOW } from '@dg/ui/helpers/timing';
 import type { SxObject } from '@dg/ui/theme';
-import { Fragment, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import type { MouseEvent } from 'react';
+import {
+  addTransitionType,
+  Fragment,
+  startTransition,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 import { loadAlbumDetail } from '../../../services/albumDetail.actions';
 import {
   type CollageCardTreatment,
@@ -22,12 +33,6 @@ import {
   CollageSortControls,
 } from './collageAlbumCardTreatments';
 import { FavoriteAlbumCell } from './FavoriteAlbumCell';
-import {
-  type PendingSelection,
-  resolveAlbumSelection,
-  useOptimisticAlbumSelection,
-  useUrlAlbumId,
-} from './useOptimisticAlbumSelection';
 
 const COLLAGE_FIRST_SCREEN_CELLS = COLLAGE_ALBUM_GRID_COLUMNS.xs * 2;
 
@@ -62,6 +67,36 @@ function wellPlacementSx(selectedIndex: number, albumCount: number): SxObject {
   };
 }
 
+function readUrlAlbumId(): string | null {
+  if (typeof window === 'undefined') {
+    return null;
+  }
+  return new URLSearchParams(window.location.search).get(ALBUM_PARAM);
+}
+
+function isPlainNavigationClick(event: MouseEvent<HTMLElement>) {
+  return (
+    !event.defaultPrevented &&
+    event.button === 0 &&
+    !event.metaKey &&
+    !event.ctrlKey &&
+    !event.shiftKey &&
+    !event.altKey
+  );
+}
+
+function albumsRouteAnchor(event: MouseEvent<HTMLElement>) {
+  const anchor = event.target instanceof Element ? event.target.closest('a') : null;
+  if (!anchor || anchor.target === '_blank' || anchor.hasAttribute('download')) {
+    return null;
+  }
+  const destination = new URL(anchor.href, window.location.href);
+  return destination.origin === window.location.origin &&
+    destination.pathname === favoriteAlbumsRoute
+    ? destination
+    : null;
+}
+
 type AlbumCard = {
   album: PlaylistAlbum;
   treatment: CollageCardTreatment;
@@ -69,7 +104,7 @@ type AlbumCard = {
 
 type SelectedAlbumWellProps = {
   albumCards: Array<AlbumCard>;
-  pending: PendingSelection | null;
+  selectedAlbumId: string | null;
 };
 
 type AlbumDetailState =
@@ -113,8 +148,7 @@ function ClientSelectedAlbumDetail({ albumId }: { albumId: string }) {
   return <AlbumDetailBody album={state.detail} />;
 }
 
-function SelectedAlbumWell({ albumCards, pending }: SelectedAlbumWellProps) {
-  const { isAwaitingDetail, selectedAlbumId } = resolveAlbumSelection(pending, useUrlAlbumId());
+function SelectedAlbumWell({ albumCards, selectedAlbumId }: SelectedAlbumWellProps) {
   const selectedIndex = albumCards.findIndex(({ album }) => album.id === selectedAlbumId);
   const selectedCard = albumCards[selectedIndex];
 
@@ -126,11 +160,7 @@ function SelectedAlbumWell({ albumCards, pending }: SelectedAlbumWellProps) {
     <Box sx={wellPlacementSx(selectedIndex, albumCards.length)}>
       <AlbumWell album={selectedCard.album} tone={selectedCard.treatment.tone}>
         <Fragment key={selectedCard.album.id}>
-          {isAwaitingDetail ? (
-            <AlbumDetailBodySkeleton />
-          ) : (
-            <ClientSelectedAlbumDetail albumId={selectedCard.album.id} />
-          )}
+          <ClientSelectedAlbumDetail albumId={selectedCard.album.id} />
         </Fragment>
       </AlbumWell>
     </Box>
@@ -142,10 +172,45 @@ type Props = {
 };
 
 export function FavoriteAlbumsGrid({ albums }: Props) {
-  const { onAlbumNavigationCapture, pending, selectedAlbumId } = useOptimisticAlbumSelection();
+  const [selectedAlbumId, setSelectedAlbumId] = useState<string | null>(null);
   const [sortKey, setSortKey] = useState<AlbumSortKey>('added');
   const itemRefs = useRef(new Map<string, HTMLElement>());
   const previousRects = useRef<Map<string, DOMRect> | null>(null);
+
+  useEffect(() => {
+    const syncFromUrl = () => {
+      setSelectedAlbumId(readUrlAlbumId());
+    };
+    syncFromUrl();
+    window.addEventListener('popstate', syncFromUrl);
+    return () => {
+      window.removeEventListener('popstate', syncFromUrl);
+    };
+  }, []);
+
+  const onAlbumNavigationCapture = (event: MouseEvent<HTMLElement>) => {
+    if (!isPlainNavigationClick(event)) {
+      return;
+    }
+    const destination = albumsRouteAnchor(event);
+    if (!destination) {
+      return;
+    }
+    const nextAlbumId = destination.searchParams.get(ALBUM_PARAM);
+    if (nextAlbumId === selectedAlbumId) {
+      return;
+    }
+    event.preventDefault();
+    const types = albumTransitionTypes(nextAlbumId ? 'open' : 'close');
+    const href = `${destination.pathname}${destination.search}`;
+    window.history.pushState(null, '', href);
+    startTransition(() => {
+      for (const type of types) {
+        addTransitionType(type);
+      }
+      setSelectedAlbumId(nextAlbumId);
+    });
+  };
 
   const handleSortChange = (next: AlbumSortKey) => {
     if (next === sortKey) {
@@ -192,9 +257,11 @@ export function FavoriteAlbumsGrid({ albums }: Props) {
     ? sortedAlbumCards.findIndex(({ album }) => album.id === selectedAlbumId)
     : -1;
   const wellSlot = (
-    <Suspense fallback={null} key="album-well">
-      <SelectedAlbumWell albumCards={sortedAlbumCards} pending={pending} />
-    </Suspense>
+    <SelectedAlbumWell
+      albumCards={sortedAlbumCards}
+      key="album-well"
+      selectedAlbumId={selectedAlbumId}
+    />
   );
 
   const renderAlbum = ({ album, treatment }: AlbumCard, index: number) => (

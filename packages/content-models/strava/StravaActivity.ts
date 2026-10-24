@@ -12,7 +12,6 @@ const latLngSchema = v.optional(
   ),
 );
 
-// Nested object schemas for API response
 const gearSchema = v.object({
   distance: v.optional(v.nullable(v.number())),
   id: v.string(),
@@ -37,11 +36,6 @@ const photosSchema = v.object({
   primary: v.optional(v.nullable(photosPrimarySchema)),
 });
 
-/**
- * API schema entries (snake_case). Defined once, used for both validation and type inference.
- * Field names and types match the Strava API v3 DetailedActivity model.
- * @see https://developers.strava.com/docs/reference/#api-models-DetailedActivity
- */
 const apiSchemaEntries = {
   achievement_count: v.optional(v.nullable(v.number())),
   average_speed: v.optional(v.nullable(v.number())),
@@ -79,7 +73,6 @@ const apiSchemaEntries = {
   visibility: v.optional(v.nullable(v.string())),
 };
 
-// Nested object schemas for stored data (camelCase)
 const gearStoredSchema = v.object({
   distance: v.optional(v.nullable(v.number())),
   id: v.string(),
@@ -104,9 +97,6 @@ const photosStoredSchema = v.object({
   primary: v.optional(v.nullable(photosPrimaryStoredSchema)),
 });
 
-/**
- * Stored schema entries (camelCase). Defined once, used for both validation and type inference.
- */
 const storedSchemaEntries = {
   achievementCount: v.optional(v.nullable(v.number())),
   averageSpeed: v.optional(v.nullable(v.number())),
@@ -145,19 +135,14 @@ const storedSchemaEntries = {
   visibility: v.optional(v.nullable(v.string())),
 };
 
-/** API validation schema - uses looseObject to allow extra API fields */
 export const stravaActivityApiSchema = v.looseObject(apiSchemaEntries);
 
-/** Stored validation schema - uses looseObject to allow extra fields */
 export const stravaActivitySchema = v.looseObject(storedSchemaEntries);
 
-/** API response type - inferred from strict v.object (no index signature) */
 type StravaActivityApi = v.InferOutput<ReturnType<typeof v.object<typeof apiSchemaEntries>>>;
 
-/** Stored activity type - inferred from strict v.object (no index signature) */
 type StravaActivityStored = v.InferOutput<ReturnType<typeof v.object<typeof storedSchemaEntries>>>;
 
-/** Domain activity type with required name/url */
 export type StravaActivity = Omit<StravaActivityStored, 'name' | 'url'> & {
   name: string;
   url: string;
@@ -169,7 +154,6 @@ export const normalizeStravaActivity = (activity: StravaActivityStored): StravaA
   url: activity.url ?? `https://www.strava.com/activities/${activity.id}`,
 });
 
-/** Converts API response (snake_case) to domain type (camelCase) */
 export const mapStravaActivityFromApi = (activity: StravaActivityApi): StravaActivity => ({
   achievementCount: activity.achievement_count,
   averageSpeed: activity.average_speed,
