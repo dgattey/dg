@@ -5,59 +5,67 @@ module.exports = {
   async up(queryInterface, Sequelize) {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.createTable('Token', {
-        name: {
-          allowNull: false,
-          primaryKey: true,
-          unique: true,
-          type: Sequelize.STRING,
+      await queryInterface.createTable(
+        'Token',
+        {
+          name: {
+            allowNull: false,
+            primaryKey: true,
+            unique: true,
+            type: Sequelize.STRING,
+          },
+          accessToken: {
+            type: Sequelize.STRING(768),
+          },
+          refreshToken: {
+            type: Sequelize.STRING(768),
+          },
+          expiryAt: {
+            type: Sequelize.DATE,
+          },
+          createdAt: {
+            allowNull: false,
+            type: Sequelize.DATE,
+          },
+          updatedAt: {
+            allowNull: false,
+            type: Sequelize.DATE,
+          },
         },
-        accessToken: {
-          type: Sequelize.STRING(768),
-        },
-        refreshToken: {
-          type: Sequelize.STRING(768),
-        },
-        expiryAt: {
-          type: Sequelize.DATE,
-        },
-        createdAt: {
-          allowNull: false,
-          type: Sequelize.DATE,
-        },
-        updatedAt: {
-          allowNull: false,
-          type: Sequelize.DATE,
-        },
-      });
+        { transaction },
+      );
 
-      await queryInterface.createTable('StravaActivity', {
-        id: {
-          allowNull: false,
-          primaryKey: true,
-          unique: true,
-          type: Sequelize.BIGINT,
+      await queryInterface.createTable(
+        'StravaActivity',
+        {
+          id: {
+            allowNull: false,
+            primaryKey: true,
+            unique: true,
+            type: Sequelize.BIGINT,
+          },
+          activityStartDate: {
+            allowNull: false,
+            type: Sequelize.DATE,
+          },
+          activityData: {
+            allowNull: false,
+            type: Sequelize.JSON,
+          },
+          lastUpdate: {
+            type: Sequelize.DATE,
+          },
+          createdAt: {
+            allowNull: false,
+            type: Sequelize.DATE,
+          },
+          updatedAt: {
+            allowNull: false,
+            type: Sequelize.DATE,
+          },
         },
-        activityStartDate: {
-          allowNull: false,
-          type: Sequelize.DATE,
-        },
-        activityData: {
-          allowNull: false,
-          type: Sequelize.JSON,
-        },
-        lastUpdate: {
-          type: Sequelize.DATE,
-        },
-        createdAt: {
-          allowNull: false,
-          type: Sequelize.DATE,
-        },
-        updatedAt: {
-          allowNull: false,
-          type: Sequelize.DATE,
-        },
-      });
+        { transaction },
+      );
 
       await transaction.commit();
     } catch (error) {
@@ -65,11 +73,11 @@ module.exports = {
       throw error;
     }
   },
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface) {
     const transaction = await queryInterface.sequelize.transaction();
     try {
-      await queryInterface.dropTable('Token');
-      await queryInterface.dropTable('StravaActivity');
+      await queryInterface.dropTable('Token', { transaction });
+      await queryInterface.dropTable('StravaActivity', { transaction });
       await transaction.commit();
     } catch (error) {
       await transaction.rollback();

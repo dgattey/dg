@@ -136,3 +136,37 @@ export function checkCacheTagParity(
 
   return violations;
 }
+
+export function checkMigrationTransactions(
+  relPath: string,
+  content: string,
+): Array<StructureViolation> {
+  if (!content.includes('sequelize.transaction(')) {
+    return [];
+  }
+  const violations: Array<StructureViolation> = [];
+  const methodBlocks = content.split(/\basync\s+(?:up|down)\s*\(/).slice(1);
+  for (const block of methodBlocks) {
+    if (!block.includes('sequelize.transaction(')) {
+      continue;
+    }
+    const callPattern =
+      /await\s+queryInterface\.(?:createTable|dropTable|addColumn|removeColumn|addIndex|removeIndex|sequelize\.query)\s*\(([\s\S]*?)\)\s*;/g;
+    for (const match of block.matchAll(callPattern)) {
+      const argsText = match[1] ?? '';
+      if (!/\btransaction\b/.test(argsText)) {
+        const offsetInContent = content.indexOf(match[0]);
+        const line =
+          offsetInContent >= 0 ? content.slice(0, offsetInContent).split('\n').length : 1;
+        violations.push({
+          file: relPath,
+          line,
+          message:
+            'queryInterface calls inside a queryInterface.sequelize.transaction() block must pass { transaction } so single-connection pools do not deadlock',
+          rule: 'migration-transaction',
+        });
+      }
+    }
+  }
+  return violations;
+}

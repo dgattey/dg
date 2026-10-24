@@ -67,6 +67,13 @@ describe('check-structure', () => {
     assert.equal(migrateStampViolation.length, 1);
     assert.equal(migrateStampViolation[0]?.rule, 'migrate-stamp-cache');
 
+    const migrationTxViolation = checkFileStructure(
+      'packages/db/migrations/20260101000000-bad.js',
+      "module.exports = {\n  async up(queryInterface) {\n    const transaction = await queryInterface.sequelize.transaction();\n    await queryInterface.createTable('Foo', {});\n    await transaction.commit();\n  },\n};\n",
+    );
+    assert.equal(migrationTxViolation.length, 1);
+    assert.equal(migrationTxViolation[0]?.rule, 'migration-transaction');
+
     const dividerViolation = checkFileStructure(
       'apps/web/src/services/foo.ts',
       '// --- Helpers ---\nexport const x = 1;\n',

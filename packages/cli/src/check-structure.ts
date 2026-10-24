@@ -2,7 +2,7 @@ import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { checkCacheTagParity } from './check-cache-tags.js';
+import { checkCacheTagParity, checkMigrationTransactions } from './check-cache-tags.js';
 import {
   checkOrphanCssFiles,
   checkRouteCssImports,
@@ -82,6 +82,12 @@ function checkNoBiomeSuppressions(
 }
 
 export function checkFileStructure(relPath: string, content: string): Array<StructureViolation> {
+  if (relPath.startsWith('packages/db/migrations/') && relPath.endsWith('.js')) {
+    return [
+      ...checkNoBiomeSuppressions(relPath, content),
+      ...checkMigrationTransactions(relPath, content),
+    ];
+  }
   if (!/^(?:apps|packages)\/.*\.(ts|tsx)$/.test(relPath)) {
     return checkNoBiomeSuppressions(relPath, content);
   }
@@ -274,10 +280,7 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
         .map((line) => line.trim())
         .filter(
           (relPath) =>
-            Boolean(relPath) &&
-            !relPath.includes('/migrations/') &&
-            !relPath.includes('/dist/') &&
-            !relPath.includes('/.next/'),
+            Boolean(relPath) && !relPath.includes('/dist/') && !relPath.includes('/.next/'),
         ),
     ),
   ].sort();

@@ -28,10 +28,9 @@ This is `dg`, a single Next.js 16 app (`@dg/web`) in a pnpm + Turbo monorepo. Se
 - WebMCP: `apps/web/src/app/layouts/WebMcpTools.tsx`
 - Page list for markdown negotiation is centralized in `packages/shared-core/routes` (`markdownPages`)
 
-### Database (Postgres / Neon) — important gotchas
+### Database (Postgres / Neon)
 - The app needs `DATABASE_URL` (dev) and `DATABASE_URL_TEST` (tests). If `turbo migrate` or app startup fails with `password authentication failed`, the injected DB credentials are stale and need to be refreshed; any reachable Postgres (e.g. a fresh Neon branch) works if you override those two env vars for the process.
-- Test-DB migration deadlock: the initial migration opens a transaction but calls `createTable` on a fresh connection, and the test env forces `pool.max = 1`. Running *pending* migrations against the test DB therefore deadlocks (`SequelizeConnectionAcquireTimeoutError`). `turbo test`'s global setup only runs *pending* migrations, so make sure `DATABASE_URL_TEST` already has every migration applied before running tests — the reliable way is to migrate it once through the dev pool (point `DATABASE_URL` at the test DB and run `turbo migrate`, which uses the default multi-connection pool and does not deadlock).
-- `turbo test` runs the two DB-backed packages (`@dg/services`, `@dg/web`) in parallel; both connect to `DATABASE_URL_TEST`. This is fine once the test DB is already migrated.
+- Only `@dg/services` connects to `DATABASE_URL_TEST` during `turbo test` (`@dg/web` tests mock service boundaries and do not touch the database). `packages/db/testing/jest.globalSetup.ts` runs any pending migrations inside their transactions on the single-connection test pool and truncates tables before the suite starts.
 
 ## Side projects
 
