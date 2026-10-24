@@ -22,7 +22,7 @@ export async function Header() {
           <LastKnownSpotifyHeaderCard />
         </div>
         <div className="chrome__spacer" />
-        <nav className="chrome__nav">
+        <nav className="chrome__nav" data-sticky-header-row={true}>
           <div className="chrome__strip collageLift">
             <CollageMusicLinks items={items} />
             <CollageColorSchemeFieldset />

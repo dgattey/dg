@@ -85,3 +85,48 @@
     transform-origin: top left;
   }
 }
+/*
+ * On phones a sticky filter bar is one row that scrolls sideways edge to edge, so pills
+ * never stack over the page. The scroller would clip a Year menu, so the menu anchors to
+ * its pill from a fixed position; browsers without anchor positioning keep wrapping.
+ */
+@media (max-width: 680px) {
+  @supports (anchor-name: --year-menu) {
+    .collageRoot .pillStrip {
+      display: flex;
+      flex-flow: row nowrap;
+      gap: 10px;
+      align-items: center;
+      justify-content: flex-start;
+      justify-self: stretch;
+      padding: 8px var(--pad);
+      margin-block: -8px;
+      margin-inline: calc(-1 * var(--pad));
+      overflow-x: auto;
+      overscroll-behavior-x: contain;
+      scroll-padding-inline: var(--pad);
+      scrollbar-width: none;
+    }
+    .collageRoot .pillStrip :is(.paperPills, .music__nav) {
+      display: flex;
+      flex-wrap: nowrap;
+      gap: 10px;
+      width: auto;
+    }
+    .collageRoot .pillStrip > *,
+    .collageRoot .pillStrip :is(.paperPills, .music__nav) > * {
+      flex: none;
+    }
+    .collageRoot .pillStrip .yearMenu__summary {
+      anchor-name: --year-menu;
+    }
+    .collageRoot .pillStrip .yearMenu__panel {
+      position: fixed;
+      position-anchor: --year-menu;
+      top: calc(anchor(bottom) + var(--hover-gap));
+      right: max(var(--pad), anchor(right));
+      left: auto;
+      transform-origin: top right;
+    }
+  }
+}

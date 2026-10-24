@@ -119,7 +119,7 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
         </li>
       </ul>
 
-      <div className="changelog__toolbar">
+      <div className="changelog__toolbar pillStrip">
         <PaperPills
           className="changelog__pills"
           label="Filter releases by type"

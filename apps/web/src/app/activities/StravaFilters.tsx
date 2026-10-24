@@ -147,7 +147,7 @@ export function StravaFilters({
         sportOutings,
       }}
     >
-      <div className="strava__filters">
+      <div className="strava__filters pillStrip">
         {sports.length > 1 ? (
           <PaperPills
             label="Sport"

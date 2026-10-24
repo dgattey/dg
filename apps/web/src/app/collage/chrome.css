@@ -1,6 +1,6 @@
 .chrome__header {
   position: sticky;
-  top: 0;
+  top: calc(-1 * var(--site-header-tuck, 0px));
   z-index: 20;
   display: flex;
   gap: 14px;
