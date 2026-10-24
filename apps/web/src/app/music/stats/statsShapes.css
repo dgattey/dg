@@ -65,11 +65,12 @@
   text-align: center;
   background: var(--pc);
 }
-/* Text fills the square inscribed in the ring, 2px clear of its 2px stroke, so no corner reaches it. */
+/* Text fills the wide rectangle (0.75 × 0.66, hypot < 1) inscribed in the ring, 4px clear of its stroke. */
 .stats__scallop--seal {
   --ring-inset: 9.5%;
-  gap: 3px;
-  padding: calc(50% - (50% - var(--ring-inset) - 4px) * 0.7071);
+  gap: 2px;
+  padding: calc(50% - (50% - var(--ring-inset) - 4px) * 0.66)
+    calc(50% - (50% - var(--ring-inset) - 4px) * 0.75);
 }
 .stats__scallop--seal::before {
   position: absolute;
@@ -202,6 +203,11 @@
 .stats__scallop--seal .stats__number {
   font-size: var(--type-title-md);
 }
+.stats__scallop--seal :is(.stats__totalLabel, .stats__totalSub) {
+  font-family: var(--display);
+  font-size: var(--type-caption);
+  line-height: var(--leading-tight);
+}
 
 /* Collage sticker clusters in the open pockets beneath Every month and Depth and loyalty */
 .stats__pocketCluster {
@@ -234,7 +240,7 @@
 }
 .stats__pocketSeal {
   justify-self: center;
-  width: 184px;
+  width: 200px;
 }
 .stats__pocketSealVal {
   font: 700 var(--type-h2) / 1 var(--display);
@@ -436,9 +442,6 @@
   top: -22px;
   right: 22px;
   z-index: 3;
-  max-width: 120px;
-}
-.stats__cardStamp:has(> .stats__ticket) {
   max-width: 144px;
 }
 .stats__cardStamp .stats__stamp,
@@ -692,7 +695,7 @@
   .stats__heroStamp {
     top: -32px;
     left: -30px;
-    width: 108px;
+    width: 120px;
   }
   .stats__runnersUp {
     gap: 28px 18px;

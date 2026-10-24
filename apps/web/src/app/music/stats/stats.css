@@ -204,9 +204,9 @@
 .stats__rankBadge {
   display: grid;
   place-items: center;
-  width: 28px;
-  height: 28px;
-  font: 700 var(--type-caption) / 1 var(--display);
+  width: 30px;
+  height: 30px;
+  font: 700 var(--type-micro) / 1 var(--display);
   font-variant-numeric: tabular-nums;
   color: var(--soft);
   background: color-mix(in oklab, var(--on) 12%, transparent);

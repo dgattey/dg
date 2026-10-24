@@ -47,48 +47,22 @@
   line-height: var(--leading-title);
   color: var(--soft);
 }
+.changelog__totals > :last-child .changelog__statValue {
+  font-size: var(--type-title-md);
+}
 
 .changelog__toolbar {
+  position: sticky;
+  top: calc(var(--site-header-height, 88px) + 10px);
+  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   gap: 16px 24px;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
 }
 .changelog__pills {
   justify-content: flex-start;
-}
-.changelog__yearNav {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  align-items: center;
-}
-.changelog__yearJump {
-  display: inline-flex;
-  gap: 0.35em;
-  align-items: baseline;
-  padding: 7px 13px 8px;
-  font-family: var(--display);
-  font-size: var(--type-meta);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: var(--leading-tight);
-  color: var(--ink-on-cream);
-  text-decoration: none;
-  background: var(--cream);
-  border-radius: 10px 8px 11px 9px;
-  box-shadow: var(--pshadow);
-  transition: translate 0.18s ease;
-}
-.changelog__yearJump small {
-  font-size: var(--type-caption);
-  font-weight: 600;
-  opacity: 0.72;
-}
-.changelog__yearJump:hover,
-.changelog__yearJump:focus-visible {
-  translate: 0 -2px;
 }
 
 .changelog__years {
@@ -108,7 +82,7 @@
 .changelog__yearRail {
   @media (min-width: 960px) {
     position: sticky;
-    top: 108px;
+    top: calc(var(--site-header-height, 88px) + 74px);
   }
 }
 .changelog__yearHeading {

@@ -10,13 +10,13 @@ import {
 const FILE = 'apps/web/src/app/music/stats/statsShapes.css';
 
 describe('check-css-geometry', () => {
-  it('lets only the seal and sticker rules pad a scallop', () => {
+  it('lets only the seal and sticker rules pad a scallop and enforces inscribed circular clearance', () => {
     const violations = checkScallopPadding(
       new Map([
         [
           FILE,
           [
-            '.stats__scallop--seal { padding: 20%; }',
+            '.stats__scallop--seal { padding: calc(50% - (50% - var(--ring-inset) - 4px) * 0.7071); }',
             '.stats__scallop--sticker { padding: 14%; }',
             '.stats__scallop--seal::before { inset: 9.5%; }',
             '.stats__heroStamp .stats__scallop { padding: 18%; }',
@@ -25,6 +25,10 @@ describe('check-css-geometry', () => {
             '  .x > .stats__scallop--seal { padding-inline: 4px; }',
             '}',
             '.stats__scallop--seal .stats__number { padding: 2px; }',
+            '.stats__scallop--seal { padding: calc(var(--ring-inset) + 2px); }',
+            '.stats__scallop--sticker { padding: 10%; }',
+            '.stats__pocketSeal { width: 152px; }',
+            '.stats__scallop--seal .stats__number { font-size: var(--type-title-lg); }',
           ].join('\n'),
         ],
       ]),
@@ -34,6 +38,10 @@ describe('check-css-geometry', () => {
       [
         { line: 4, rule: 'css-scallop-padding' },
         { line: 7, rule: 'css-scallop-padding' },
+        { line: 10, rule: 'css-scallop-padding' },
+        { line: 11, rule: 'css-scallop-padding' },
+        { line: 12, rule: 'css-scallop-padding' },
+        { line: 13, rule: 'css-scallop-padding' },
       ],
     );
   });

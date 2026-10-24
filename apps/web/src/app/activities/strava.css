@@ -146,7 +146,7 @@
 .strava__totalClimb {
   grid-area: climb;
   justify-self: center;
-  width: min(100%, 188px);
+  width: min(100%, 192px);
 }
 .strava__totalOutings {
   grid-area: outings;
@@ -182,11 +182,18 @@
 .strava__totalMiles .strava__totalNumber {
   font-size: var(--type-display-md);
 }
+.strava__totalClimb .strava__totalNumber {
+  font-size: var(--type-title-md);
+}
 .strava__totalUnit {
   font-family: var(--display);
   font-size: var(--type-label);
   font-weight: 700;
   line-height: var(--leading-title);
+}
+.strava__totalClimb :is(.strava__totalUnit, .strava__totalAside) {
+  font-size: var(--type-caption);
+  line-height: var(--leading-tight);
 }
 
 .strava__recentRoutes {
@@ -610,10 +617,13 @@
   top: -22px;
   right: -14px;
   z-index: 4;
-  width: 116px;
+  width: 128px;
+}
+.strava__longestSeal .strava__sealValue {
+  font-size: var(--type-h2);
 }
 .strava__longestSeal .strava__sealKey {
-  font-size: var(--type-label);
+  font-size: var(--type-caption);
   line-height: var(--leading-tight);
 }
 

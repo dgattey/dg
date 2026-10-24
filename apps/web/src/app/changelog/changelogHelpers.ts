@@ -4,6 +4,7 @@ import type { PaperEdge, PaperTone } from '../collage/types';
 const GITHUB_REPOSITORY_URL = 'https://github.com/dgattey/dg';
 
 export type ReleaseFilterKey = 'all' | ReleaseKind;
+export type ReleaseFilter = ReleaseFilterKey | number;
 
 type ChangelogYearGroup = {
   compactReleases: Array<ChangelogRelease>;
@@ -90,10 +91,13 @@ export function extractReleaseYear(release: ChangelogRelease): string {
 
 export function filterReleases(
   releases: ReadonlyArray<ChangelogRelease>,
-  filter: ReleaseFilterKey,
+  filter: ReleaseFilter,
 ): Array<ChangelogRelease> {
   if (filter === 'all') {
     return [...releases];
+  }
+  if (typeof filter === 'number') {
+    return releases.filter((release) => extractReleaseYear(release) === String(filter));
   }
   return releases.filter((release) => release.kind === filter);
 }
