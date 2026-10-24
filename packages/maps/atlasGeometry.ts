@@ -1,5 +1,6 @@
 import 'server-only';
 
+import type { CoverageCity } from '@dg/content-models/strava/StreetCoverage';
 import {
   boundsWithin,
   decodeRoutes,
@@ -22,7 +23,7 @@ const ATLAS_REGIONS = [
       [36.9, -123.1],
       [38.5, -121.4],
     ],
-    key: 'bay-area',
+    key: 'sf',
     label: 'Bay Area',
   },
   {
@@ -30,12 +31,12 @@ const ATLAS_REGIONS = [
       [32.5, -117.6],
       [33.5, -116.6],
     ],
-    key: 'san-diego',
+    key: 'sd',
     label: 'San Diego',
   },
-] as const satisfies ReadonlyArray<{ box: GeoBounds; key: string; label: string }>;
+] as const satisfies ReadonlyArray<{ box: GeoBounds; key: CoverageCity; label: string }>;
 
-export type AtlasRegion = { bounds: GeoBounds; key: string; label: string };
+export type AtlasRegion = { bounds: GeoBounds; key: CoverageCity; label: string };
 
 export const atlasRegions = (routes: ReadonlyArray<MapRoute>): Array<AtlasRegion> => {
   const decoded = decodeRoutes(routes);

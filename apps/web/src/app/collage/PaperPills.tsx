@@ -64,3 +64,45 @@ export function PaperPills<Key extends string>({
     </fieldset>
   );
 }
+
+export type PaperStripOption<Key extends string> = {
+  key: Key;
+  label: ReactNode;
+};
+
+export function PaperStrip<Key extends string>({
+  className,
+  label,
+  onSelect,
+  options,
+  selected,
+}: {
+  className?: string;
+  label: string;
+  onSelect: (key: Key) => void;
+  options: ReadonlyArray<PaperStripOption<Key>>;
+  selected: Key;
+}) {
+  return (
+    <fieldset
+      aria-label={label}
+      className={cx('chrome__strip', 'collageLift', className)}
+      {...jsOnlyProps}
+    >
+      {options.map((option) => {
+        const current = option.key === selected;
+        return (
+          <button
+            aria-pressed={current}
+            className={cx('chrome__segment', current && 'chrome__segmentCurrent')}
+            key={option.key}
+            onClick={() => onSelect(option.key)}
+            type="button"
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </fieldset>
+  );
+}
