@@ -28,6 +28,7 @@ const STRAVA_POLYLINE_SCALE = 1e5;
 type Segment = { x: number; y: number; headX: number; headY: number; length: number };
 
 type Pieces = {
+  baseCoverage: Omit<StreetCoverage, 'ridden'>;
   count: number;
   hood: Uint8Array;
   length: Float64Array;
@@ -98,7 +99,21 @@ function cutIntoPieces(grid: StreetGrid): Pieces {
     cellPieces[filled[cell] ?? 0] = piece;
     filled[cell] = (filled[cell] ?? 0) + 1;
   }
+  const streetMeters = grid.neighborhoods.map(() => 0);
+  for (let piece = 0; piece < count; piece++) {
+    const hoodIndex = hood[piece] ?? 0;
+    streetMeters[hoodIndex] = (streetMeters[hoodIndex] ?? 0) + (length[piece] ?? 0);
+  }
   return {
+    baseCoverage: {
+      neighborhoods: grid.neighborhoods.map(({ name, outline }, hoodIndex) => ({
+        name,
+        outline,
+        streetMeters: Math.round(streetMeters[hoodIndex] ?? 0),
+      })),
+      projection: outlineProjection(grid.origin),
+      viewBox: grid.viewBox,
+    },
     cellPieces,
     cellStart,
     cells: { columns, originX, originY, rows },
@@ -250,20 +265,9 @@ export function measureStreetCoverage(
     }
     return meters.map(Math.round);
   };
-  const streetMeters = grid.neighborhoods.map(() => 0);
-  for (let piece = 0; piece < pieces.count; piece++) {
-    const hood = pieces.hood[piece] ?? 0;
-    streetMeters[hood] = (streetMeters[hood] ?? 0) + (pieces.length[piece] ?? 0);
-  }
   return {
-    neighborhoods: grid.neighborhoods.map(({ name, outline }, index) => ({
-      name,
-      outline,
-      streetMeters: Math.round(streetMeters[index] ?? 0),
-    })),
-    projection: outlineProjection(grid.origin),
+    ...pieces.baseCoverage,
     ridden: Object.fromEntries([...groups].map(([key, members]) => [key, metersPerHood(members)])),
-    viewBox: grid.viewBox,
   };
 }
 
@@ -280,3 +284,41 @@ export const measureCityCoverage = (
   sd: measureStreetCoverage(CITY_GRIDS.sd, outings, now),
   sf: measureStreetCoverage(CITY_GRIDS.sf, outings, now),
 });
+
+/** Reconstructs full `StreetCoverage` objects from stored per-city `ridden` maps and static grids. */
+export const hydrateCityCoverage = (
+  riddenByCity: Readonly<Record<CoverageCity, Readonly<Record<string, ReadonlyArray<number>>>>>,
+): Record<CoverageCity, StreetCoverage> => ({
+  sd: { ...piecesOf(CITY_GRIDS.sd).baseCoverage, ridden: riddenByCity.sd },
+  sf: { ...piecesOf(CITY_GRIDS.sf).baseCoverage, ridden: riddenByCity.sf },
+});
+
+/**
+ * Checks whether the rolling windows (`week`, `month`) include the exact same
+ * outings at `now` as they did at `computedAt`. Outings are sorted newest first.
+ */
+export function rollingWindowsMatch(
+  outings: ReadonlyArray<Pick<StravaLogEntry, 'startDate'>>,
+  computedAt: Date,
+  now: Date,
+): boolean {
+  const computedMs = computedAt.getTime();
+  const nowMs = now.getTime();
+  if (computedMs === nowMs) {
+    return true;
+  }
+  const windowLengthsMs = Object.values(STRAVA_WINDOW_DAYS).map((days) => days * DAY_MS);
+  const earliestCutoff = Math.min(computedMs, nowMs) - Math.max(...windowLengthsMs);
+  for (const outing of outings) {
+    const start = Date.parse(outing.startDate);
+    if (start < earliestCutoff) {
+      break;
+    }
+    for (const windowMs of windowLengthsMs) {
+      if (start >= computedMs - windowMs !== start >= nowMs - windowMs) {
+        return false;
+      }
+    }
+  }
+  return true;
+}

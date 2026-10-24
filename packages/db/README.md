@@ -5,7 +5,7 @@ Neon PostgreSQL database with Sequelize ORM for migrations and models.
 ## Structure
 
 - `migrations/` - Sequelize migration files
-- `models/` - Database models (`FavoriteAlbum`, `FavoriteAlbumSnapshot`, `MusicAlbum`, `MusicAlbumArtist`, `MusicArtist`, `MusicTrack`, `MusicTrackArtist`, `OauthState`, `SpotifyPlay`, `StravaActivity`, `Token`)
+- `models/` - Database models (`FavoriteAlbum`, `FavoriteAlbumSnapshot`, `MusicAlbum`, `MusicAlbumArtist`, `MusicArtist`, `MusicPlaylist`, `MusicTrack`, `MusicTrackArtist`, `OauthState`, `Release`, `SpotifyPlay`, `StravaActivity`, `StravaHistorySummary`, `Token`)
 
 ## Key Exports
 

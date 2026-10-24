@@ -94,3 +94,69 @@ export function decodePolyline(encoded: string, scale = 1): Array<[number, numbe
   }
   return points;
 }
+
+const SIMPLIFY_DEGREES = 5e-4;
+const COORDINATE_PRECISION = 1e4;
+const STRAVA_POLYLINE_SCALE = 1e5;
+
+function distanceToSegment(
+  [px, py]: [number, number],
+  [ax, ay]: [number, number],
+  [bx, by]: [number, number],
+) {
+  const dx = bx - ax;
+  const dy = by - ay;
+  const lengthSquared = dx * dx + dy * dy;
+  const t =
+    lengthSquared === 0
+      ? 0
+      : Math.max(0, Math.min(1, ((px - ax) * dx + (py - ay) * dy) / lengthSquared));
+  return Math.hypot(ax + t * dx - px, ay + t * dy - py);
+}
+
+/**
+ * Simplifies a Strava degree polyline (`1e5` scale) with Douglas-Peucker at
+ * `5e-4` degrees and `1e4` coordinate precision. Short or synthetic strings
+ * with fewer than three points are returned unchanged.
+ */
+export function simplifySummaryPolyline(encoded: string): string {
+  const points = decodePolyline(encoded, STRAVA_POLYLINE_SCALE).map(
+    ([lat, lng]): [number, number] => [
+      Math.round(lat * COORDINATE_PRECISION) / COORDINATE_PRECISION,
+      Math.round(lng * COORDINATE_PRECISION) / COORDINATE_PRECISION,
+    ],
+  );
+  if (points.length < 3) {
+    return encoded;
+  }
+  const coordinates = points.map(([lat, lng]): [number, number] => [lng, lat]);
+  const at = (index: number): [number, number] => coordinates[index] ?? [0, 0];
+  const keep = new Uint8Array(points.length);
+  keep[0] = 1;
+  keep[points.length - 1] = 1;
+  const spans: Array<[number, number]> = [[0, points.length - 1]];
+  for (let span = spans.pop(); span; span = spans.pop()) {
+    const [start, end] = span;
+    let farthest = -1;
+    let farthestDistance = SIMPLIFY_DEGREES;
+    for (let index = start + 1; index < end; index += 1) {
+      const distance = distanceToSegment(at(index), at(start), at(end));
+      if (distance > farthestDistance) {
+        farthest = index;
+        farthestDistance = distance;
+      }
+    }
+    if (farthest !== -1) {
+      keep[farthest] = 1;
+      spans.push([start, farthest], [farthest, end]);
+    }
+  }
+  return encodePolyline(
+    points
+      .filter((_, index) => keep[index] === 1)
+      .map(([lat, lng]) => [
+        Math.round(lat * STRAVA_POLYLINE_SCALE),
+        Math.round(lng * STRAVA_POLYLINE_SCALE),
+      ]),
+  );
+}

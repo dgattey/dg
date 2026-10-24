@@ -175,22 +175,39 @@ export function checkContentfulFallbacks(
     return [];
   }
   const sourceLines = lines ?? content.split('\n');
+  const stravaSummaryCacheViolations =
+    relPath === 'packages/services/strava/fetchStravaHistoryFromDb.ts' &&
+    content.includes('fetchStravaHistoryFromDb') &&
+    !content.includes('StravaHistorySummary')
+      ? [
+          {
+            file: relPath,
+            line: 1,
+            message:
+              'fetchStravaHistoryFromDb must read through StravaHistorySummary before scanning StravaActivity',
+            rule: 'strava-history-summary-cache',
+          },
+        ]
+      : [];
   const dbQueryViolations =
     relPath.startsWith('packages/services/') && UNPROJECTED_DB_QUERY_PATTERN.test(content)
-      ? sourceLines.flatMap((lineText, i) =>
-          UNPROJECTED_DB_QUERY_PATTERN.test(lineText)
-            ? [
-                {
-                  file: relPath,
-                  line: i + 1,
-                  message:
-                    'Project only required columns (and strip raw Strava map.polyline / MusicPlaylist.trackIds in SQL) instead of pulling full rows over the wire',
-                  rule: 'unprojected-db-query',
-                },
-              ]
-            : [],
-        )
-      : [];
+      ? [
+          ...stravaSummaryCacheViolations,
+          ...sourceLines.flatMap((lineText, i) =>
+            UNPROJECTED_DB_QUERY_PATTERN.test(lineText)
+              ? [
+                  {
+                    file: relPath,
+                    line: i + 1,
+                    message:
+                      'Project only required columns (and strip raw Strava map.polyline / MusicPlaylist.trackIds in SQL) instead of pulling full rows over the wire',
+                    rule: 'unprojected-db-query',
+                  },
+                ]
+              : [],
+          ),
+        ]
+      : stravaSummaryCacheViolations;
   const maplibreViolations =
     !relPath.startsWith('packages/cli/') && content.includes(MAPLIBRE_TOKEN)
       ? sourceLines.flatMap((lineText, i) =>

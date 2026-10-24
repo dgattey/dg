@@ -10,6 +10,7 @@ import type {
   StravaYearTotals,
 } from '@dg/content-models/strava/StravaHistory';
 import { measureCityCoverage } from './measureStreetCoverage';
+import { simplifySummaryPolyline } from './streetGridGeometry';
 
 const SPORT_BY_STRAVA_TYPE: Partial<Record<string, StravaSport>> = {
   AlpineSki: 'ski',
@@ -67,12 +68,18 @@ const yearOf = (outing: StravaLogEntry) => new Date(outing.startDate).getUTCFull
 const sumOf = (outings: ReadonlyArray<StravaLogEntry>, pick: (outing: StravaLogEntry) => number) =>
   outings.reduce((total, outing) => total + pick(outing), 0);
 
-const yearTotals = (year: number, outings: ReadonlyArray<StravaLogEntry>): StravaYearTotals => ({
-  distanceMeters: sumOf(outings, (outing) => outing.distanceMeters),
-  elevationGainMeters: sumOf(outings, (outing) => outing.elevationGainMeters),
-  outings: outings.length,
-  year,
-});
+export const yearTotalsForOutings = (
+  year: number,
+  outings: ReadonlyArray<StravaLogEntry>,
+): StravaYearTotals => {
+  const inYear = outings.filter((outing) => yearOf(outing) === year);
+  return {
+    distanceMeters: sumOf(inYear, (outing) => outing.distanceMeters),
+    elevationGainMeters: sumOf(inYear, (outing) => outing.elevationGainMeters),
+    outings: inYear.length,
+    year,
+  };
+};
 
 const toLogEntry = ({ description: _, ...entry }: StravaOuting): StravaLogEntry => entry;
 
@@ -159,17 +166,19 @@ export const summarizeStravaHistory = (
   if (!newest) {
     return null;
   }
-  const outings = dated.map((entry) => toLogEntry(toOuting(entry)));
+  const rawOutings = dated.map((entry) => toLogEntry(toOuting(entry)));
+  const streetCoverage = measureCityCoverage(rawOutings, now);
+  const outings = rawOutings.map((outing) => ({
+    ...outing,
+    polyline: outing.polyline ? simplifySummaryPolyline(outing.polyline) || null : null,
+  }));
   const currentYear = now.getUTCFullYear();
   return {
     bikes: findBikes(dated),
     latest: toOuting(newest),
     outings,
-    streetCoverage: measureCityCoverage(outings, now),
-    thisYear: yearTotals(
-      currentYear,
-      outings.filter((outing) => yearOf(outing) === currentYear),
-    ),
+    streetCoverage,
+    thisYear: yearTotalsForOutings(currentYear, outings),
     totals: {
       distanceMeters: sumOf(outings, (outing) => outing.distanceMeters),
       elevationGainMeters: sumOf(outings, (outing) => outing.elevationGainMeters),
