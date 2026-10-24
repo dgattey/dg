@@ -13,12 +13,6 @@
 .reading__status {
   justify-self: start;
 }
-/* Outranks the backdrop host's `position: relative` on its children, so the filters ride along. */
-.collageBackdropHost.reading__layout > .reading__filters {
-  position: sticky;
-  top: calc(var(--site-header-height, 80px) + 10px);
-  z-index: 30;
-}
 .reading__status p {
   padding: 24px 28px 26px;
   margin: 0;

@@ -1,7 +1,7 @@
 .chrome__header {
   position: sticky;
   top: 0;
-  z-index: 20;
+  z-index: 50;
   display: flex;
   gap: 14px;
   align-items: flex-start;
@@ -22,18 +22,19 @@
   content: "";
   background: linear-gradient(
     to bottom,
-    color-mix(in srgb, var(--paper) 56%, transparent) 0%,
-    color-mix(in srgb, var(--paper) 36%, transparent) 25%,
-    color-mix(in srgb, var(--paper) 18%, transparent) 50%,
-    color-mix(in srgb, var(--paper) 6%, transparent) 75%,
+    color-mix(in srgb, var(--paper) 72%, transparent) 0%,
+    color-mix(in srgb, var(--paper) 58%, transparent) 38%,
+    color-mix(in srgb, var(--paper) 28%, transparent) 66%,
+    color-mix(in srgb, var(--paper) 8%, transparent) 86%,
     transparent 100%
   );
-  backdrop-filter: blur(2.5px);
+  backdrop-filter: blur(3.5px);
   mask-image: linear-gradient(
     to bottom,
     #000 0%,
-    rgb(0 0 0 / 0.65) 35%,
-    rgb(0 0 0 / 0.25) 68%,
+    #000 38%,
+    rgb(0 0 0 / 0.65) 64%,
+    rgb(0 0 0 / 0.22) 84%,
     transparent 100%
   );
   translate: -50%;
