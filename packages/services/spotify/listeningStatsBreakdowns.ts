@@ -6,11 +6,13 @@ import type {
   StatsMatrix,
   StatsMatrixCell,
   StatsMatrixRow,
+  StatsPhase,
   StatsRange,
   StatsTimeline,
+  StatsTrack,
 } from './fetchListeningStats';
 import { toStatsTopTrack } from './listeningStatsCatalog';
-import type { TrackDisplay } from './trackDisplays';
+import { TIME_ZONE } from './listeningStatsQueries';
 
 const MONTH_ABBR = [
   'Jan',
@@ -27,12 +29,51 @@ const MONTH_ABBR = [
   'Dec',
 ] as const;
 const WEEKDAY_ABBR = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const;
+const SHIFT_HOURS = 6;
 const SHIFT_COLUMNS = [
-  { full: 'Morning', key: 'morning', short: '6a' },
-  { full: 'Afternoon', key: 'afternoon', short: '12p' },
-  { full: 'Evening', key: 'evening', short: '6p' },
-  { full: 'Late night', key: 'lateNight', short: '12a' },
+  { full: 'Morning', key: 'morning', short: '6a', startHour: 6 },
+  { full: 'Afternoon', key: 'afternoon', short: '12p', startHour: 12 },
+  { full: 'Evening', key: 'evening', short: '6p', startHour: 18 },
+  { full: 'Late night', key: 'lateNight', short: '12a', startHour: 0 },
 ] as const;
+
+/** The latest play's Pacific day and hour: the edge between slots that happened and ones that haven't. */
+export type StatsNow = { day: string; hour: number };
+
+const nowFormat = new Intl.DateTimeFormat('en-CA', {
+  day: '2-digit',
+  hour: '2-digit',
+  hourCycle: 'h23',
+  month: '2-digit',
+  timeZone: TIME_ZONE,
+  year: 'numeric',
+});
+
+export function statsNow(latestPlayedAt: Date): StatsNow {
+  const parts = new Map(nowFormat.formatToParts(latestPlayedAt).map((p) => [p.type, p.value]));
+  return {
+    day: `${parts.get('year')}-${parts.get('month')}-${parts.get('day')}`,
+    hour: Number(parts.get('hour')),
+  };
+}
+
+/** A `YYYY`, `YYYY-MM`, or `YYYY-MM-DD` key against the latest play's day at the same precision. */
+function phaseOf(key: string, now: StatsNow): StatsPhase {
+  const nowKey = now.day.slice(0, key.length);
+  return key === nowKey ? 'current' : key > nowKey ? 'future' : 'past';
+}
+
+/** Days `start` through `end`, both `YYYY-MM-DD`. */
+function spanPhase(start: string, end: string, now: StatsNow): StatsPhase {
+  return now.day < start ? 'future' : now.day <= end ? 'current' : 'past';
+}
+
+function shiftPhase(dayIso: string, startHour: number, now: StatsNow): StatsPhase {
+  const dayPhase = phaseOf(dayIso, now);
+  if (dayPhase !== 'current') return dayPhase;
+  if (now.hour < startHour) return 'future';
+  return now.hour < startHour + SHIFT_HOURS ? 'current' : 'past';
+}
 
 const yearTick = (year: number): string => `\u2019${String(year).slice(-2)}`;
 
@@ -78,7 +119,7 @@ function findPeakCell(rows: ReadonlyArray<StatsMatrixRow>): StatsMatrix['peakCel
 
 function mapChampionEntries(
   bucketTopTracks: ReadonlyArray<{ bucket: string; plays: number; trackId: string }>,
-  tracks: ReadonlyMap<string, TrackDisplay>,
+  tracks: ReadonlyMap<string, StatsTrack>,
   formatBadge: (bucket: string) => string,
 ) {
   return bucketTopTracks
@@ -94,6 +135,7 @@ export function buildRangeBreakdowns({
   dailyPlays,
   dayHourPlays,
   monthlyPlays,
+  now,
   range,
   tracks,
   years,
@@ -102,17 +144,18 @@ export function buildRangeBreakdowns({
   dailyPlays: ReadonlyArray<{ day: string; plays: number }>;
   dayHourPlays: ReadonlyArray<{ day: string; hour: number; plays: number }>;
   monthlyPlays: ReadonlyArray<{ month: number; plays: number; year: number }>;
+  now: StatsNow;
   range: StatsRange;
-  tracks: ReadonlyMap<string, TrackDisplay>;
+  tracks: ReadonlyMap<string, StatsTrack>;
   years: ReadonlyArray<{ plays: number; year: number }>;
 }): { champions: StatsChampions; matrix: StatsMatrix; timeline: StatsTimeline } {
   if (range.kind === 'all') {
     const sortedYears = [...years].sort((a, b) => a.year - b.year);
     const timeline: StatsTimeline = {
-      points: sortedYears.map((entry, idx) => ({
+      points: sortedYears.map((entry) => ({
         key: `${entry.year}`,
         label: `${entry.year}`,
-        partial: idx === 0 || idx === sortedYears.length - 1,
+        phase: phaseOf(`${entry.year}`, now),
         plays: entry.plays,
         tick: yearTick(entry.year),
         yearFilter: entry.year,
@@ -128,6 +171,7 @@ export function buildRangeBreakdowns({
         return {
           key,
           label: `${monthName} ${year}`,
+          phase: phaseOf(key, now),
           plays: playsByMonth.get(key) ?? 0,
           yearFilter: year,
         };
@@ -172,15 +216,23 @@ export function buildRangeBreakdowns({
       }
     }
     const weekRanges = ['1–7', '8–14', '15–21', '22–28', '29+'] as const;
-    const matrixRows: Array<StatsMatrixRow> = MONTH_ABBR.map((monthName, mIdx) => ({
-      cells: weekRanges.map((span, wIdx) => ({
-        key: `${year}-${String(mIdx + 1).padStart(2, '0')}-w${wIdx + 1}`,
-        label: `${monthName} ${span}, ${year}`,
-        plays: monthWeekTotals[mIdx]?.[wIdx] ?? 0,
-      })),
-      key: `${year}-${String(mIdx + 1).padStart(2, '0')}`,
-      label: monthName,
-    }));
+    const matrixRows: Array<StatsMatrixRow> = MONTH_ABBR.map((monthName, mIdx) => {
+      const month = `${year}-${String(mIdx + 1).padStart(2, '0')}`;
+      return {
+        cells: weekRanges.map((span, wIdx) => ({
+          key: `${month}-w${wIdx + 1}`,
+          label: `${monthName} ${span}, ${year}`,
+          phase: spanPhase(
+            `${month}-${String(wIdx * 7 + 1).padStart(2, '0')}`,
+            `${month}-${wIdx === weekRanges.length - 1 ? '31' : String(wIdx * 7 + 7).padStart(2, '0')}`,
+            now,
+          ),
+          plays: monthWeekTotals[mIdx]?.[wIdx] ?? 0,
+        })),
+        key: month,
+        label: monthName,
+      };
+    });
     return {
       champions: {
         aside: `#1 song each month in ${year}`,
@@ -201,6 +253,7 @@ export function buildRangeBreakdowns({
         points: MONTH_ABBR.map((monthName, idx) => ({
           key: `${year}-${String(idx + 1).padStart(2, '0')}`,
           label: `${monthName} ${year}`,
+          phase: phaseOf(`${year}-${String(idx + 1).padStart(2, '0')}`, now),
           plays: monthTotals[idx] ?? 0,
           tick: monthName,
         })),
@@ -228,6 +281,7 @@ export function buildRangeBreakdowns({
         return {
           key: cellDay,
           label: fullDateLabel(cellDay),
+          phase: phaseOf(cellDay, now),
           plays: inWindow.has(cellDay) ? (playsByDay.get(cellDay) ?? 0) : 0,
         };
       }),
@@ -244,7 +298,7 @@ export function buildRangeBreakdowns({
         columns: WEEKDAY_ABBR.map((label) => ({ full: label, key: label, short: label.charAt(0) })),
         peakCell: findPeakCell(matrixRows),
         rows: matrixRows,
-        title: 'Every day, last month',
+        title: 'Every day, this month',
       },
       timeline: {
         points: days.map((dayIso, idx) => {
@@ -252,11 +306,12 @@ export function buildRangeBreakdowns({
           return {
             key: dayIso,
             label: fullDateLabel(dayIso),
+            phase: phaseOf(dayIso, now),
             plays: playsByDay.get(dayIso) ?? 0,
             tick: dayNum === 1 || idx === 0 ? shortDateBadge(dayIso) : `${dayNum}`,
           };
         }),
-        title: 'Plays per day, last month',
+        title: 'Plays per day, this month',
       },
     };
   }
@@ -273,6 +328,7 @@ export function buildRangeBreakdowns({
       cells: SHIFT_COLUMNS.map((col) => ({
         key: `${dayIso}-${col.key}`,
         label: `${fullDateLabel(dayIso)} · ${col.full}`,
+        phase: shiftPhase(dayIso, col.startHour, now),
         plays: shiftTotals.get(`${dayIso}-${col.key}`) ?? 0,
       })),
       key: dayIso,
@@ -290,7 +346,7 @@ export function buildRangeBreakdowns({
       title: 'Soundtrack by day',
     },
     matrix: {
-      columns: SHIFT_COLUMNS.map((col) => ({ ...col })),
+      columns: SHIFT_COLUMNS.map(({ full, key, short }) => ({ full, key, short })),
       peakCell: findPeakCell(matrixRows),
       rows: matrixRows,
       title: 'Every day & shift',
@@ -301,11 +357,12 @@ export function buildRangeBreakdowns({
         return {
           key: dayIso,
           label: fullDateLabel(dayIso),
+          phase: phaseOf(dayIso, now),
           plays: playsByDay.get(dayIso) ?? 0,
           tick: `${dow} ${Number(dayIso.slice(8, 10))}`,
         };
       }),
-      title: 'Plays per day, last week',
+      title: 'Plays per day, this week',
     },
   };
 }

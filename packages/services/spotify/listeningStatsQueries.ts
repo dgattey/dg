@@ -4,7 +4,7 @@ import { dbClient, QueryTypes } from '@dg/db';
 import * as v from 'valibot';
 
 /** Days, hours, and weeks are bucketed where the listening happened. */
-const TIME_ZONE = 'America/Los_Angeles';
+export const TIME_ZONE = 'America/Los_Angeles';
 const LOCAL_PLAYED_AT = `("playedAt" AT TIME ZONE '${TIME_ZONE}')`;
 
 /** A run of this many consecutive plays from one album counts as hearing it front to back. */
@@ -62,8 +62,9 @@ export function rollingDaysPlayFilter(anchor: Date, days: number): SqlPlayFilter
 async function select<Schema extends v.GenericSchema>(
   sql: string,
   row: Schema,
+  replacements?: Record<string, unknown>,
 ): Promise<Array<v.InferOutput<Schema>>> {
-  const rows = await dbClient.query(sql, { type: QueryTypes.SELECT });
+  const rows = await dbClient.query(sql, { replacements, type: QueryTypes.SELECT });
   return v.parse(v.array(row), rows);
 }
 
@@ -298,23 +299,54 @@ export function selectTopGenres(filter: SqlPlayFilter = ALL_TIME_FILTER) {
        ${whereClause(filter)} GROUP BY artist
      ),
      artist_genres AS (
-       SELECT ma.name, ap.plays, ap.tracks, ma.genres[1] AS genre
+       SELECT ma.id, ma.name, ma.url, ap.plays, ap.tracks, ma.genres[1] AS genre
        FROM artist_plays ap
        JOIN "MusicArtist" ma ON ma.id = ap."artistId"
        WHERE coalesce(array_length(ma.genres, 1), 0) > 0
      ),
      ranked AS (
-       SELECT genre, name, plays, tracks,
+       SELECT genre, id, name, url, plays, tracks,
          row_number() OVER (PARTITION BY genre ORDER BY plays DESC, name) AS rn,
          sum(plays) OVER (PARTITION BY genre)::int AS total_plays,
          sum(tracks) OVER (PARTITION BY genre)::int AS total_tracks
        FROM artist_genres
      )
      SELECT genre, total_plays AS plays, total_tracks AS tracks,
-       coalesce(array_agg(name ORDER BY rn) FILTER (WHERE rn <= 3), ARRAY[]::varchar[]) AS artists
+       coalesce(
+         json_agg(json_build_object('id', id, 'name', name, 'url', url) ORDER BY rn)
+           FILTER (WHERE rn <= 3),
+         '[]'::json
+       ) AS artists
      FROM ranked
      GROUP BY genre, total_plays, total_tracks
      ORDER BY total_plays DESC, genre LIMIT ${TOP_GENRES_LIMIT}`,
-    v.object({ artists: v.array(v.string()), genre: v.string(), plays: int, tracks: int }),
+    v.object({
+      artists: v.array(v.object({ id: v.string(), name: v.string(), url: v.nullable(v.string()) })),
+      genre: v.string(),
+      plays: int,
+      tracks: int,
+    }),
+  );
+}
+
+/**
+ * Each artist's first ever play, for those whose first play falls inside `filter`. Only
+ * plays naming one of `artistIds` are read, through the `artistIds` GIN index.
+ */
+export async function selectArtistFirstPlays(
+  artistIds: ReadonlyArray<string>,
+  filter: SqlPlayFilter = ALL_TIME_FILTER,
+): Promise<Array<{ artistId: string; playedAt: Date }>> {
+  if (artistIds.length === 0) return [];
+  return await select(
+    `WITH firsts AS (
+       SELECT artist AS "artistId", min("playedAt") AS "playedAt"
+       FROM "SpotifyPlay", unnest("artistIds") AS artist
+       WHERE "artistIds" && ARRAY[:artistIds]::varchar(64)[] AND artist IN (:artistIds)
+       GROUP BY artist
+     )
+     SELECT "artistId", "playedAt" FROM firsts ${whereClause(filter)}`,
+    v.object({ artistId: v.string(), playedAt: v.date() }),
+    { artistIds: [...artistIds] },
   );
 }

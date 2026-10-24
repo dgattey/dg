@@ -14,6 +14,7 @@ import {
   formatRangeSuffix,
 } from './listeningStatsFormat';
 import { bar, CardHead } from './StatsCardParts';
+import { ArtistLinks } from './StatsLinks';
 import { Stub } from './StatsShapes';
 
 export function TimelineBarsCard({
@@ -81,13 +82,28 @@ export function TimelineBarsCard({
           const showTick =
             !isDense || idx === 0 || idx === points.length - 1 || idx % 5 === 0 || isActive;
           const yearFilter = point.yearFilter;
+          if (point.phase === 'future') {
+            return (
+              <li
+                aria-label={`${point.label}: not here yet`}
+                className="stats__column stats__column--future"
+                key={point.key}
+              >
+                <span className="stats__columnValue" />
+                <span aria-hidden="true" className="stats__columnBar" />
+                <span aria-hidden="true" className="stats__columnTick">
+                  {showTick ? point.tick : ''}
+                </span>
+              </li>
+            );
+          }
           return (
             <li
               aria-label={`${point.label}: ${formatCount(point.plays)} plays`}
               className={cx(
                 'stats__column',
                 isPeak && 'stats__column--peak',
-                !isPeak && point.partial && 'stats__column--partial',
+                point.phase === 'current' && 'stats__column--current',
                 isActive && 'stats__column--active',
               )}
               key={point.key}
@@ -207,7 +223,6 @@ export function GenresCard({ stats }: { stats: ListeningStats }) {
         {genres.map((item, idx) => {
           const toneClass = GENRE_TONE_CLASSES[idx % GENRE_TONE_CLASSES.length] ?? '';
           const isActive = hoveredGenre === item.genre;
-          const artistsLabel = item.artists.join(' · ');
           return (
             <li
               className={cx(
@@ -224,9 +239,7 @@ export function GenresCard({ stats }: { stats: ListeningStats }) {
                 <Tooltip title={item.genre} whenTruncated>
                   <span className="stats__label stats__genreName">{item.genre}</span>
                 </Tooltip>
-                <Tooltip title={artistsLabel} whenTruncated>
-                  <span className="stats__meta">{artistsLabel}</span>
-                </Tooltip>
+                <ArtistLinks artists={item.artists} newArtists={stats.newArtists} />
               </span>
               <span
                 aria-hidden="true"

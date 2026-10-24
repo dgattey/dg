@@ -16,11 +16,13 @@ type CardOffsetStyle = CSSProperties & {
 export const COLLAGE_ALBUM_GRID_COLUMNS = { lg: 5, md: 4, sm: 3, xs: 2 } as const;
 
 const COLLAGE_ALBUM_SORT_OPTIONS = [
-  { key: 'added', label: 'Recently added', tiltDeg: -3 },
+  { key: 'released', label: 'Release date', tiltDeg: -3 },
+  { key: 'added', label: 'Recently added', tiltDeg: 2.5 },
   { key: 'album', label: 'Album', tiltDeg: 2 },
   { key: 'artist', label: 'Artist', tiltDeg: -1.5 },
-  { key: 'released', label: 'Release date', tiltDeg: 2.5 },
 ] as const satisfies ReadonlyArray<PaperPillOption<string>>;
+
+export const DEFAULT_ALBUM_SORT = COLLAGE_ALBUM_SORT_OPTIONS[0].key;
 
 function offsetStyle(treatment: CollageCardTreatment): CardOffsetStyle {
   return {

@@ -5,6 +5,7 @@ import { AlbumCover } from './AlbumCover';
 import { AlbumStack } from './AlbumStack';
 import { CollageAlbumPaper } from './albums/collageAlbumCardTreatments';
 import { MAX_ALBUM_SLEEVES } from './albumTileGeometry';
+import { NewArtistBadge } from './NewArtistBadge';
 
 type Props = {
   imageUrl: string;
@@ -12,6 +13,8 @@ type Props = {
   artistNames: string;
   /** The album for a run of plays, the track itself for a single play. */
   linkUrl: string;
+  /** `New artist this …` when one of the artists was first played recently. */
+  newArtist?: string | null;
   /** Plays collapsed into this cell. */
   trackCount: number;
   /** Names a single play, which a lone cover is labelled with. */
@@ -33,6 +36,7 @@ export function AlbumPlayTile({
   imageUrl,
   isLcpCandidate = false,
   linkUrl,
+  newArtist = null,
   trackCount,
   trackName,
 }: Props) {
@@ -70,7 +74,10 @@ export function AlbumPlayTile({
         </span>
         <span className="music__caption">
           <strong className="music__albumName">{title}</strong>
-          <span className="music__artist">{artistNames}</span>
+          <span className="music__artist">
+            {artistNames}
+            {newArtist ? <NewArtistBadge label={newArtist} /> : null}
+          </span>
         </span>
       </Link>
     </CollageAlbumPaper>

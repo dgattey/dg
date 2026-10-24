@@ -17,6 +17,7 @@ function play(name: string, playedAt = '2026-08-04T12:00:00.000Z'): HistoryTrack
     albumName: name,
     albumUrl: `https://open.spotify.com/album/${name}`,
     artistNames: `${name} artist`,
+    newArtist: null,
     playedAt,
     trackId: `track-${name}`,
     trackName: name,

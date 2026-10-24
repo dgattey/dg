@@ -113,6 +113,14 @@
     opacity: 0.4;
   }
 }
+.music__nav {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+}
 .music__caption {
   position: relative;
   z-index: 4;
@@ -120,6 +128,14 @@
   gap: 4px;
   min-width: 0;
   line-height: var(--leading-meta);
+}
+.music__albumName,
+.music__artist {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
 }
 .music__albumName {
   font-family: var(--display);
@@ -131,6 +147,21 @@
 .music__artist {
   font-size: var(--type-meta);
   opacity: 0.92;
+}
+.music__newArtistAnchor {
+  margin-left: 6px;
+  vertical-align: 0.1em;
+}
+.music__newArtist {
+  display: inline-block;
+  padding: 1px 6px 2px;
+  font: 800 var(--type-micro) / 1.2 var(--display);
+  color: var(--ink-on-cream);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  background: var(--ochre);
+  border-radius: 4px;
+  rotate: -3deg;
 }
 .music__selected .music__cardInner {
   outline: 3px solid var(--vermilion);
@@ -174,9 +205,31 @@
   font-size: var(--type-label);
   letter-spacing: var(--tracking-label);
 }
+.music__dateRow {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
 .music__dateHeading {
   margin: 0;
   font: inherit;
+}
+.music__dateStats {
+  padding: 4px 10px 5px;
+  font: 700 var(--type-meta) / 1.2 var(--display);
+  color: var(--ink-on-cream);
+  text-decoration: none;
+  background: color-mix(in oklab, var(--cream) 82%, transparent);
+  border: 1.5px dashed color-mix(in oklab, var(--ink-on-cream) 40%, transparent);
+  border-radius: 999px;
+  transition:
+    border-color 160ms ease,
+    translate 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.music__dateStats:hover,
+.music__dateStats:focus-visible {
+  border-color: var(--ink-on-cream);
+  translate: 0 -1px;
 }
 .music__countTag {
   position: absolute;

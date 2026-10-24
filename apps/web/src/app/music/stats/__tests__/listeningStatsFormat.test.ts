@@ -42,18 +42,18 @@ describe('range formatting', () => {
     expect(formatStatsRangeKey({ kind: 'year', year: 2024 })).toBe('2024');
 
     expect(formatRangeSuffix({ kind: 'all' })).toBe('all time');
-    expect(formatRangeSuffix({ kind: 'week' })).toBe('last week');
-    expect(formatRangeSuffix({ kind: 'month' })).toBe('last month');
+    expect(formatRangeSuffix({ kind: 'week' })).toBe('this week');
+    expect(formatRangeSuffix({ kind: 'month' })).toBe('this month');
     expect(formatRangeSuffix({ kind: 'year', year: 2024 })).toBe('2024');
 
     expect(formatPlaysHeading({ kind: 'all' }, '2011-07-29T19:00:00.000Z')).toBe(
       'Plays since Jul 2011',
     );
     expect(formatPlaysHeading({ kind: 'week' }, '2011-07-29T19:00:00.000Z')).toBe(
-      'Plays last week',
+      'Plays this week',
     );
     expect(formatPlaysHeading({ kind: 'month' }, '2011-07-29T19:00:00.000Z')).toBe(
-      'Plays last month',
+      'Plays this month',
     );
     expect(formatPlaysHeading({ kind: 'year', year: 2024 }, '2011-07-29T19:00:00.000Z')).toBe(
       'Plays in 2024',

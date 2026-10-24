@@ -57,7 +57,7 @@ export async function getListeningStats(rawRange?: string | null): Promise<Liste
 
 /**
  * Preloads the three quick-filter snapshots (`all`, `week`, `month`) from `'use cache'`
- * so switching between `All time`, `Last week`, and `Last month` is 0ms on the client.
+ * so switching between `All time`, `This week`, and `This month` is 0ms on the client.
  */
 export async function getInitialListeningStatsSnapshots(): Promise<{
   all: ListeningStats;

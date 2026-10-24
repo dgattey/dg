@@ -6,6 +6,7 @@ import { PaperCard } from '../../collage/PaperCard';
 import { cx } from '../../collage/paperVars';
 import { formatCount, formatHours, formatPercent, formatRangeSuffix } from './listeningStatsFormat';
 import { bar, CardHead } from './StatsCardParts';
+import { AlbumLink, ArtistLinks, SpotifyAnchor } from './StatsLinks';
 
 const SONG_ART_TILTS = [-2.5, 2.2, -1.8, 2.6, -2.1, 1.9] as const;
 
@@ -32,7 +33,7 @@ export function TopSongsCard({ stats }: { stats: ListeningStats }) {
         {tracks.map((track, i) => (
           <li className={cx('stats__topSongRow', i === 0 && 'stats__topRow--lead')} key={track.id}>
             <span className="stats__rankBadge">{String(i + 1).padStart(2, '0')}</span>
-            {track.albumImageUrl ? (
+            <AlbumLink album={track.album} label={track.album.name}>
               <span
                 className="stats__mat stats__songMat"
                 style={
@@ -42,32 +43,21 @@ export function TopSongsCard({ stats }: { stats: ListeningStats }) {
                 }
               >
                 <Image
-                  alt={`${track.albumName || track.name} by ${track.artistNames}`}
+                  alt={`${track.album.name} cover`}
                   height={44}
                   sizes={{ extraLarge: 44 }}
-                  url={track.albumImageUrl}
+                  url={track.album.imageUrl}
                   width={44}
                 />
               </span>
-            ) : null}
+            </AlbumLink>
             <span className="stats__repeatName">
               <Tooltip title={track.name} whenTruncated>
-                {track.url ? (
-                  <a
-                    className="stats__label stats__itemLink"
-                    href={track.url}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    {track.name}
-                  </a>
-                ) : (
-                  <span className="stats__label">{track.name}</span>
-                )}
+                <SpotifyAnchor className="stats__label" href={track.url}>
+                  {track.name}
+                </SpotifyAnchor>
               </Tooltip>
-              <Tooltip title={track.artistNames} whenTruncated>
-                <span className="stats__meta">{track.artistNames}</span>
-              </Tooltip>
+              <ArtistLinks artists={track.artists} newArtists={stats.newArtists} />
             </span>
             <span aria-hidden="true" className="stats__meter" style={bar(track.plays, top)} />
             <span className="stats__topCountGroup">
@@ -110,20 +100,11 @@ export function TopArtistsCard({ stats }: { stats: ListeningStats }) {
           >
             <span className="stats__rankBadge">{String(i + 1).padStart(2, '0')}</span>
             <span className="stats__repeatName">
-              <Tooltip title={artist.name} whenTruncated>
-                {artist.url ? (
-                  <a
-                    className="stats__label stats__itemLink"
-                    href={artist.url}
-                    rel="noopener noreferrer"
-                    target="_blank"
-                  >
-                    {artist.name}
-                  </a>
-                ) : (
-                  <span className="stats__label">{artist.name}</span>
-                )}
-              </Tooltip>
+              <ArtistLinks
+                artists={[artist]}
+                className="stats__label"
+                newArtists={stats.newArtists}
+              />
               <span className="stats__meta">
                 {formatCount(artist.tracks)} {artist.tracks === 1 ? 'track' : 'tracks'} ·{' '}
                 {formatHours((artist.plays * stats.minutesPerPlay) / 60)}

@@ -5,22 +5,16 @@ import { MusicAlbum } from '@dg/db/models/MusicAlbum';
 import { MusicArtist } from '@dg/db/models/MusicArtist';
 import { MusicTrack } from '@dg/db/models/MusicTrack';
 import { MusicTrackArtist } from '@dg/db/models/MusicTrackArtist';
+import { type SpotifyLink, spotifyUrl } from './spotifyLinks';
 import { sleep } from './trackMetadataShared';
 import { fetchTrackDisplayData, type TrackDisplayData } from './trackMetadataSingle';
 
 /**
- * Display-ready track with its album, flattened for rendering.
+ * Display-ready track with its album and artists, each linked to its Spotify page.
  */
-export type TrackDisplay = {
-  albumId: string;
-  albumImageUrl: string;
-  albumName: string;
-  /** Spotify album page, empty when we never captured one. */
-  albumUrl: string;
-  artistNames: string;
-  id: string;
-  name: string;
-  url: string;
+export type TrackDisplay = SpotifyLink & {
+  album: SpotifyLink & { imageUrl: string };
+  artists: Array<SpotifyLink>;
 };
 
 type CachedArtist = MusicArtist & { MusicTrackArtist: { position: number } };
@@ -53,14 +47,20 @@ async function readCachedTracks(trackIds: Array<string>): Promise<Map<string, Tr
       return [
         track.id,
         {
-          albumId: track.album.id,
-          albumImageUrl: track.album.imageUrl,
-          albumName: track.album.name,
-          albumUrl: track.album.url ?? '',
-          artistNames: artists.map((artist) => artist.name).join(', '),
+          album: {
+            id: track.album.id,
+            imageUrl: track.album.imageUrl,
+            name: track.album.name,
+            url: spotifyUrl('album', track.album.id, track.album.url),
+          },
+          artists: artists.map((artist) => ({
+            id: artist.id,
+            name: artist.name,
+            url: spotifyUrl('artist', artist.id, artist.url),
+          })),
           id: track.id,
           name: track.name,
-          url: track.url ?? '',
+          url: spotifyUrl('track', track.id, track.url),
         },
       ];
     }),
@@ -124,17 +124,22 @@ export async function cacheTrackData(displayData: Array<TrackDisplayData>): Prom
 
 function toTrackDisplay(data: TrackDisplayData): TrackDisplay {
   return {
-    albumId: data.album.id,
-    albumImageUrl: data.album.imageUrl,
-    albumName: data.album.name,
-    albumUrl: data.album.url,
-    artistNames: [...data.artists]
+    album: {
+      id: data.album.id,
+      imageUrl: data.album.imageUrl,
+      name: data.album.name,
+      url: spotifyUrl('album', data.album.id, data.album.url),
+    },
+    artists: [...data.artists]
       .sort((a, b) => a.position - b.position)
-      .map((artist) => artist.name)
-      .join(', '),
+      .map((artist) => ({
+        id: artist.id,
+        name: artist.name,
+        url: spotifyUrl('artist', artist.id, artist.url),
+      })),
     id: data.track.id,
     name: data.track.name,
-    url: data.track.url,
+    url: spotifyUrl('track', data.track.id, data.track.url),
   };
 }
 

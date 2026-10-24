@@ -45,7 +45,12 @@ async function AlbumsGrid() {
 
 export default function FavoriteAlbumsPage() {
   return (
-    <MusicPageShell backdrop={ALBUMS_BACKDROP} className="music__albumsLayout" title={TITLE}>
+    <MusicPageShell
+      backdrop={ALBUMS_BACKDROP}
+      className="music__albumsLayout"
+      navFrom={favoriteAlbumsRoute}
+      title={TITLE}
+    >
       <Suspense fallback={<FavoriteAlbumsSkeleton />}>
         <AlbumsGrid />
       </Suspense>

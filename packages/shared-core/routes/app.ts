@@ -33,6 +33,10 @@ export const ALBUM_PARAM = 'album' as const;
  */
 export const albumRoute = (id: string) => `${favoriteAlbumsRoute}?${ALBUM_PARAM}=${id}`;
 
+/** Listening stats for `week`, `month`, or a year, the ranges its toolbar offers. */
+export const musicStatsRangeRoute = (range: 'week' | 'month' | number) =>
+  `${musicStatsRoute}?range=${range}`;
+
 export const devConsoleRoute = '/dev-console' as const;
 
 export const llmsTxtRoute = '/llms.txt' as const;

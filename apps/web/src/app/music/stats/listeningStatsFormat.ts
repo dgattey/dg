@@ -97,9 +97,9 @@ export function formatRangeSuffix(range: StatsRange): string {
     case 'all':
       return 'all time';
     case 'week':
-      return 'last week';
+      return 'this week';
     case 'month':
-      return 'last month';
+      return 'this month';
     case 'year':
       return String(range.year);
     default: {
@@ -114,9 +114,9 @@ export function formatPlaysHeading(range: StatsRange, firstPlayedAt: string): st
     case 'all':
       return `Plays since ${formatPacificMonth(firstPlayedAt)}`;
     case 'week':
-      return 'Plays last week';
+      return 'Plays this week';
     case 'month':
-      return 'Plays last month';
+      return 'Plays this month';
     case 'year':
       return `Plays in ${range.year}`;
     default: {

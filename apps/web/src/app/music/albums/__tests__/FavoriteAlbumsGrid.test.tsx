@@ -109,19 +109,19 @@ describe('FavoriteAlbumsGrid', () => {
     render(<FavoriteAlbumsGrid albums={albums} />);
 
     expect(screen.getByRole('link', { name: /Zebra/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Recently added' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Release date' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
+    expect(screen.getByRole('button', { name: 'Recently added' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Album' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Artist' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Release date' })).toBeInTheDocument();
   });
 
-  it('renders linked, sleeved albums newest first', () => {
+  it('renders linked, sleeved albums newest release first', () => {
     const { container } = render(<FavoriteAlbumsGrid albums={albums} />);
 
-    expect(renderedAlbumNames()).toEqual(['Zebra', 'Mango', 'Apple']);
+    expect(renderedAlbumNames()).toEqual(['Apple', 'Mango', 'Zebra']);
     const link = screen.getByRole('link', { name: /Zebra/ });
     expect(link).toHaveAttribute('href', '/music/albums?album=album-zebra');
     expect(link).not.toHaveAttribute('target', '_blank');
@@ -266,7 +266,7 @@ describe('FavoriteAlbumsGrid', () => {
     const user = userEvent.setup();
     render(<FavoriteAlbumsGrid albums={albums} />);
 
-    await clickSort(user, 'Album');
+    await clickSort(user, 'Recently added');
 
     expect(animate).toHaveBeenCalledTimes(2);
     expect(animate).toHaveBeenCalledWith(

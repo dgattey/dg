@@ -202,7 +202,7 @@ export function ListeningStatsSections({
           <ListeningClock stats={stats} />
         </div>
         <div className="stats__band">
-          {stats.depth.length > 0 ? (
+          {stats.topArtists.length > 0 ? (
             <div className="stats__slotStack stats__depthSlot">
               <DepthCard stats={stats} />
               {stats.frontToBack.length > 0 ? <DepthPocketStickers stats={stats} /> : null}

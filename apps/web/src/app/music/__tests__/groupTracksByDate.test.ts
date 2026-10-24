@@ -12,6 +12,7 @@ function playAt(album: string, playedAt: string, index = 0): HistoryTrack {
     albumName: album,
     albumUrl: `https://open.spotify.com/album/${album}`,
     artistNames: `${album} artist`,
+    newArtist: null,
     playedAt,
     trackId: `track-${album}-${playedAt}-${index}`,
     trackName: `${album} ${index}`,

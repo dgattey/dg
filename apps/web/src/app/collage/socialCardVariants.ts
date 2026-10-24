@@ -115,12 +115,12 @@ export function buildMusicStatsCardVariant(
     playsCompact,
     playsFull: formatCount(stats.plays),
     topAlbums: stats.topAlbums.slice(0, 3).map(({ album, plays }) => ({
-      artistNames: album.artistNames,
+      artistNames: album.artists.map((artist) => artist.name).join(', '),
       imageUrl: album.imageUrl || null,
       name: album.name,
       plays: formatCount(plays),
     })),
-    topArtists: stats.depth.slice(0, 3).map(({ months, name, plays }) => ({
+    topArtists: stats.topArtists.slice(0, 3).map(({ months, name, plays }) => ({
       months,
       name,
       plays: formatCount(plays),
