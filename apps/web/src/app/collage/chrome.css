@@ -68,9 +68,11 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   flex: 1;
 }
 .chrome__nav {
+  /* A segment's line box plus its block padding, plus the strip's own padding. */
+  --strip-height: calc(var(--type-label) * (var(--leading-tight) + 1.05) + 8px);
   display: flex;
   gap: 12px;
-  align-items: stretch;
+  align-items: center;
   justify-content: flex-end;
   margin-top: 8px;
 }
@@ -111,15 +113,15 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   border-radius: 10px;
   transition: background-color 0.2s ease;
 }
-.chrome__segment:hover,
-.chrome__music[open] > .chrome__segment {
+.chrome__segment:not(.chrome__segmentCurrent):hover,
+.chrome__music[open] > .chrome__segment:not(.chrome__segmentCurrent) {
   background: color-mix(in oklab, var(--ink-on-cream) 9%, transparent);
 }
 .collageRoot .chrome__segment:focus-visible {
   outline-color: var(--ink-on-cream);
   outline-offset: -2px;
 }
-.chrome__segment.chrome__segmentCurrent {
+.chrome__segmentCurrent {
   background: var(--ochre);
 }
 .chrome__music {
@@ -247,7 +249,8 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   position: relative;
   display: grid;
   place-items: center;
-  aspect-ratio: 1;
+  width: var(--strip-height);
+  height: var(--strip-height);
   padding: 0;
   color: var(--cream);
   cursor: pointer;
