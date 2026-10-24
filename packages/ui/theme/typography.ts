@@ -53,8 +53,6 @@ export function getTypography(): TypographyVariants {
       'Ubuntu',
       'Cantarell',
       '"Noto Sans"',
-      '"Helvetica Neue"',
-      'Arial',
       'sans-serif',
       '"Apple Color Emoji"',
       '"Segoe UI Emoji"',

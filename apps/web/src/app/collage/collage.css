@@ -28,7 +28,7 @@ html:has(.collageRoot) body {
 
 /* On :root, not .collageRoot, so tooltips and dialogs portaled to <body> get the same fonts. */
 :root {
-  --display: var(--font-familjen), "Avenir Next", "Helvetica Neue", system-ui, sans-serif;
+  --display: var(--font-familjen), var(--font-sans);
   --body: var(--font-sans);
 }
 
