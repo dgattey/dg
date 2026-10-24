@@ -60,6 +60,7 @@ html:has(.collageRoot) body {
   --type-h2: clamp(20px, 2.2vw, 24px);
   --type-h3: 20px;
   --type-label: clamp(18px, 1.6vw, 20px);
+  --type-lead: clamp(20px, 1.8vw, 24px);
   --type-body-lg: clamp(17px, 1.5vw, 20px);
   --type-body: 16px;
   --type-meta: 16px;
