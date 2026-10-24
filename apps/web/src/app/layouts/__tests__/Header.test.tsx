@@ -43,4 +43,45 @@ describe('Header navigation (CollageMusicLinks)', () => {
     expect(screen.getByRole('link', { name: 'Reads' })).toHaveAttribute('href', readingRoute);
     expect(screen.getByRole('link', { name: 'Big map' })).toHaveAttribute('href', activitiesRoute);
   });
+
+  it('renders custom Contentful menu and link items in Contentful order', () => {
+    render(
+      <CollageMusicLinks
+        items={[
+          {
+            kind: 'link',
+            link: { icon: 'reading', title: 'Shelf', url: readingRoute },
+          },
+          {
+            kind: 'menu',
+            links: [
+              { icon: 'albums', title: 'Favorite albums', url: favoriteAlbumsRoute },
+              { icon: 'stats', title: 'Listening stats', url: musicStatsRoute },
+            ],
+            slug: 'header-music',
+            title: 'Tunes',
+          },
+        ]}
+      />,
+    );
+
+    const shelfLink = screen.getByRole('link', { name: 'Shelf' });
+    const tunesSummary = screen.getByText('Tunes');
+    expect(
+      shelfLink.compareDocumentPosition(tunesSummary) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy();
+
+    const musicList = document.querySelector('.chrome__musicList');
+    if (!musicList) {
+      throw new Error('Music dropdown list not found');
+    }
+    expect(
+      within(musicList as HTMLElement)
+        .getAllByRole('link', { hidden: true })
+        .map((link) => [link.textContent, link.getAttribute('href')]),
+    ).toEqual([
+      ['Favorite albums', favoriteAlbumsRoute],
+      ['Listening stats', musicStatsRoute],
+    ]);
+  });
 });
