@@ -317,7 +317,7 @@ describe('StravaHistorySections', () => {
 
     await user.click(screen.getByRole('button', { name: 'All sports' }));
     await user.click(screen.getByRole('button', { name: 'This week' }));
-    expect(screen.getAllByText('Last 7 days')).not.toHaveLength(0);
+    expect(screen.getAllByText('This week')).not.toHaveLength(0);
     expect(listNames('Recent activities')).toEqual(['Presidio loop', 'Lake Merritt run']);
     expect(listNames('Biggest climbs')).toEqual(['Presidio loop', 'Lake Merritt run']);
 
