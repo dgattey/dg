@@ -875,6 +875,13 @@
   }
 }
 
+/* The header's Music menu already links the other music pages, so phones keep the bar to ranges. */
+@media (max-width: 680px) {
+  .stats__toolbar .music__nav {
+    display: none;
+  }
+}
+
 @media (max-width: 600px) {
   .stats__sections,
   .stats__body {

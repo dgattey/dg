@@ -85,24 +85,41 @@
   }
 }
 
-/* Year ▾: a paper pill over a grid of years. */
-.yearMenu {
+/* A paper pill with a `▾` over a panel of picks, such as `Year ▾` over a grid of years. */
+.pillMenu {
   position: relative;
 }
-.yearMenu__summary:focus-visible {
+.pillMenu__summary:focus-visible {
   outline: none;
 }
-.yearMenu__summary:focus-visible .paperPill {
+.pillMenu__summary:focus-visible .paperPill {
   outline: 2px solid var(--ink);
   outline-offset: 4px;
 }
-.yearMenu__face {
+.pillMenu__face {
   align-items: center;
 }
-.yearMenu__panel {
+.pillMenu__panel {
   right: 0;
   z-index: 40;
+}
+.yearMenu__panel {
   min-width: 244px;
+}
+.pillMenu__list {
+  display: grid;
+  gap: 2px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+.pillMenu__option {
+  width: 100%;
+  padding: 8px 12px;
+  white-space: nowrap;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
 }
 .yearMenu__grid {
   display: grid;
@@ -112,23 +129,82 @@
   margin: 0;
   list-style: none;
 }
+.pillMenu__list + .yearMenu__grid {
+  padding-top: 6px;
+  margin-top: 6px;
+  border-top: 1px solid color-mix(in oklab, var(--ink-on-cream) 16%, transparent);
+}
 .yearMenu__option {
   justify-content: center;
-  width: 100%;
-  padding: 8px 12px;
   font-variant-numeric: tabular-nums;
-  cursor: pointer;
-  background: transparent;
-  border: 0;
 }
-.yearMenu__option--current {
+.pillMenu__option--current {
   color: light-dark(var(--cream), var(--ink-on-cream));
   background: light-dark(var(--black), var(--ochre));
 }
 @media (max-width: 820px) {
-  .yearMenu__panel {
+  .pillMenu__panel {
     right: auto;
     left: 0;
     transform-origin: top left;
+  }
+}
+.pillLabelShort {
+  display: none;
+}
+@media (min-width: 681px) {
+  .collageRoot .pillPhoneOnly {
+    display: none;
+  }
+}
+/*
+ * On phones each sticky filter bar is one row of compact pills. Picks that would not fit
+ * fold into a menu pill whose face names the applied pick, so no filter sits offscreen.
+ * Every menu drops from its pill's right edge, which keeps the panel inside the page padding.
+ */
+@media (max-width: 680px) {
+  .collageRoot .pillPhoneHidden {
+    display: none;
+  }
+  .pillLabelFull {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    white-space: nowrap;
+    clip-path: inset(50%);
+  }
+  .pillLabelShort {
+    display: inline;
+  }
+  .collageRoot :is(.pillStrip, .pillStrip .paperPills) {
+    display: flex;
+    flex-flow: row wrap;
+    gap: 6px;
+    align-items: center;
+    justify-content: flex-start;
+  }
+  .collageRoot .pillStrip .paperPills {
+    width: auto;
+  }
+  .collageRoot :is(.pillStrip, .pillStrip .paperPills) > * {
+    flex: none;
+  }
+  .collageRoot .pillStrip .paperPill {
+    font-size: var(--type-meta);
+  }
+  .collageRoot .pillStrip .paperPillButton {
+    gap: 0.35em;
+    padding: 9px 11px 10px;
+  }
+  .collageRoot .pillStrip .chrome__musicChevron {
+    width: 16px;
+    height: 16px;
+  }
+  .collageRoot .pillStrip .pillMenu__panel {
+    right: 0;
+    left: auto;
+    max-width: calc(100vw - 2 * var(--pad));
+    transform-origin: top right;
   }
 }

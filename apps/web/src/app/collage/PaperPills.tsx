@@ -4,10 +4,28 @@ import { PaperTag } from './PaperTag';
 import { cx } from './paperVars';
 
 export type PaperPillOption<Key extends string> = {
+  className?: string;
   key: Key;
   label: ReactNode;
+  /** A tighter label for phones; screen readers keep hearing `label`. */
+  shortLabel?: ReactNode;
   tiltDeg: number;
 };
+
+/** A label that tightens to `short` on phones while its accessible name stays `full`. */
+export function PillLabel({ full, short }: { full: ReactNode; short?: ReactNode }) {
+  if (short === undefined) {
+    return full;
+  }
+  return (
+    <>
+      <span className="pillLabelFull">{full}</span>
+      <span aria-hidden={true} className="pillLabelShort">
+        {short}
+      </span>
+    </>
+  );
+}
 
 /**
  * Sort and filter pills on collage index pages. Without `onSelect` the pills
@@ -38,7 +56,7 @@ export function PaperPills<Key extends string>({
         const current = option.key === selected;
         return (
           <PaperTag
-            className={cx('paperPill', current && 'paperButtonCurrent')}
+            className={cx('paperPill', current && 'paperButtonCurrent', option.className)}
             edge="quad-a"
             key={option.key}
             tiltDeg={option.tiltDeg}
@@ -52,10 +70,12 @@ export function PaperPills<Key extends string>({
                 onMouseEnter={onPrefetch ? () => onPrefetch(option.key) : undefined}
                 type="button"
               >
-                {option.label}
+                <PillLabel full={option.label} short={option.shortLabel} />
               </button>
             ) : (
-              <span className="paperPillButton">{option.label}</span>
+              <span className="paperPillButton">
+                <PillLabel full={option.label} short={option.shortLabel} />
+              </span>
             )}
           </PaperTag>
         );

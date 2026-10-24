@@ -10,8 +10,8 @@ type QuickRangeKey = 'all' | 'month' | 'week';
 
 const QUICK_RANGE_OPTIONS: ReadonlyArray<PaperPillOption<QuickRangeKey>> = [
   { key: 'all', label: 'All time', tiltDeg: -1.4 },
-  { key: 'week', label: 'This week', tiltDeg: 1.2 },
-  { key: 'month', label: 'This month', tiltDeg: -0.9 },
+  { key: 'week', label: 'This week', shortLabel: 'Week', tiltDeg: 1.2 },
+  { key: 'month', label: 'This month', shortLabel: 'Month', tiltDeg: -0.9 },
 ];
 
 export function StatsToolbar({
@@ -34,7 +34,7 @@ export function StatsToolbar({
   };
 
   return (
-    <div className="stats__toolbar">
+    <div className="stats__toolbar pillStrip">
       <MusicNav current={musicStatsRoute} />
       <PaperPills
         className="stats__rangePills"

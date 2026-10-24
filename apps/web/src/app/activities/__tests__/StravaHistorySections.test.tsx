@@ -8,6 +8,7 @@ import { act, render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { PAPER_TONES } from '../../collage/types';
 import { StravaHistorySections } from '../StravaHistorySections';
+import { getDesktopButton } from './stravaFilterQueries';
 
 const NOW = Date.parse('2026-10-22T15:00:00Z');
 
@@ -252,9 +253,9 @@ describe('StravaHistorySections', () => {
       screen.getByRole('img', { name: '2,034 feet climbed, all time, by month' }),
     ).toBeVisible();
     expect(screen.getByText('1 route')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Runs' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Hikes' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Rides' })).toHaveAttribute('aria-pressed', 'true');
+    expect(getDesktopButton('Runs')).toBeInTheDocument();
+    expect(getDesktopButton('Hikes')).toBeInTheDocument();
+    expect(getDesktopButton('Rides')).toHaveAttribute('aria-pressed', 'true');
     expect(
       within(screen.getByRole('group', { name: 'Time span' })).getByText('Year'),
     ).toBeInTheDocument();
@@ -269,7 +270,7 @@ describe('StravaHistorySections', () => {
     expect(within(streets()).getByText('0.5 of 4.0 mi ridden')).toBeInTheDocument();
     expect(within(streets()).getByText('Presidio · 25.0%')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'All sports' }));
+    await user.click(getDesktopButton('All sports'));
     expect(within(streets()).getByText('2.0 of 4.0 mi ridden')).toBeInTheDocument();
     expect(within(streets()).getByText('Mission · 75.0%')).toBeInTheDocument();
   });
@@ -297,7 +298,7 @@ describe('StravaHistorySections', () => {
     const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
     renderSections(full);
 
-    await user.click(screen.getByRole('button', { name: 'All sports' }));
+    await user.click(getDesktopButton('All sports'));
     expect(headlineTotals()).toEqual([
       'All sports · All time4.1marathons107 mi',
       '24%of an Everest7.02k ft climbed',
@@ -305,7 +306,7 @@ describe('StravaHistorySections', () => {
     ]);
     expect(listNames('Longest rides')).toEqual(['Marin century', 'Presidio loop']);
 
-    await user.click(screen.getByRole('button', { name: 'Runs' }));
+    await user.click(getDesktopButton('Runs'));
     expect(headlineTotals()).toEqual([
       'Runs · All time5.9×across the Golden Gate10.0 mi',
       '1%of an Everest394 ft climbed',
@@ -315,18 +316,15 @@ describe('StravaHistorySections', () => {
     expect(listNames('Longest runs')).toEqual(['Lake Merritt run']);
     expect(screen.getByText('1 route')).toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'All sports' }));
-    await user.click(screen.getByRole('button', { name: 'This week' }));
+    await user.click(getDesktopButton('All sports'));
+    await user.click(getDesktopButton('This week'));
     expect(screen.getAllByText('This week')).not.toHaveLength(0);
     expect(listNames('Recent activities')).toEqual(['Presidio loop', 'Lake Merritt run']);
     expect(listNames('Biggest climbs')).toEqual(['Presidio loop', 'Lake Merritt run']);
 
     await user.click(screen.getByText('Year'));
-    await user.click(screen.getByRole('button', { name: '2025', pressed: false }));
-    expect(screen.getByRole('button', { name: 'This week' })).toHaveAttribute(
-      'aria-pressed',
-      'false',
-    );
+    await user.click(getDesktopButton('2025', false));
+    expect(getDesktopButton('This week')).toHaveAttribute('aria-pressed', 'false');
     expect(screen.getByRole('list', { name: 'Totals, All sports · 2025' })).toBeInTheDocument();
     expect(headlineTotals()).toEqual([
       'All sports · 20251.9marathons50.0 mi',
@@ -408,7 +406,7 @@ describe('StravaHistorySections', () => {
     expect(flower).toHaveTextContent(/May · [\d,]+ ft/);
 
     await user.click(screen.getByText('Year'));
-    await user.click(screen.getByRole('button', { name: '2026', pressed: false }));
+    await user.click(getDesktopButton('2026', false));
     const thisYear = within(flower)
       .getAllByRole('button')
       .map((month) => month.getAttribute('aria-label'));

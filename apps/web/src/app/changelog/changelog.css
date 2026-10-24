@@ -77,7 +77,7 @@
   }
 }
 .changelog__yearSection:nth-child(n + 3) {
-  contain-intrinsic-size: auto 900px;
+  contain-intrinsic-block-size: auto 900px;
   content-visibility: auto;
 }
 .changelog__yearRail {
@@ -335,6 +335,13 @@
 @media (max-width: 960px) {
   .changelog__totals {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Phones drop the counts so every release type and the Year menu share one row. */
+@media (max-width: 680px) {
+  .changelog__pills small {
+    display: none;
   }
 }
 

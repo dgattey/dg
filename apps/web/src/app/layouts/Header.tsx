@@ -17,12 +17,14 @@ export async function Header() {
     <>
       <SiteHeaderHeight />
       <header className="collageMeasure chrome__header" data-sticky-header={true}>
-        <Logo />
+        <div className="chrome__brand" data-sticky-header-row={true}>
+          <Logo />
+        </div>
         <div className="chrome__nowPlaying collageLift">
           <LastKnownSpotifyHeaderCard />
         </div>
         <div className="chrome__spacer" />
-        <nav className="chrome__nav">
+        <nav className="chrome__nav" data-sticky-header-row={true}>
           <div className="chrome__strip collageLift">
             <CollageMusicLinks items={items} />
             <CollageColorSchemeFieldset />

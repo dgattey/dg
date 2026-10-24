@@ -11,12 +11,16 @@ import { VisibleRoutes } from '@dg/maps/VisibleRoutes';
 import { createContext, type ReactNode, startTransition, use, useState } from 'react';
 import { type PaperPillOption, PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
-import { YearMenu } from '../collage/YearMenu';
+import { PillMenu, PillMenuList, PillMenuOption } from '../collage/PillMenu';
+import { YearGrid, YearMenu } from '../collage/YearMenu';
 import { formatRouteCount } from './stravaFormat';
 import { SPORT_DETAILS } from './stravaSports';
 import { yearOf } from './stravaStats';
 
-const FILTER_SPORTS = ['ride', 'run', 'hike', 'ski'] as const;
+const FILTER_SPORTS = ['ride', 'ski', 'hike', 'run'] as const;
+
+/** Phones show this many sport pills and fold the rest into `More ▾`, keeping the bar one row. */
+const PHONE_SPORT_PILLS = 2;
 
 type SportFilter = 'all' | (typeof FILTER_SPORTS)[number];
 
@@ -35,10 +39,15 @@ const WINDOW_LABELS = {
   week: 'This week',
 } as const satisfies Record<StravaWindow, string>;
 
+const WINDOW_SHORT_LABELS = {
+  month: 'Month',
+  week: 'Week',
+} as const satisfies Record<StravaWindow, string>;
+
 const SPAN_OPTIONS = [
-  { key: 'all', label: 'All time', tiltDeg: 0.8 },
-  { key: 'week', label: WINDOW_LABELS.week, tiltDeg: -1.2 },
-  { key: 'month', label: WINDOW_LABELS.month, tiltDeg: 0.6 },
+  { className: 'pillPhoneHidden', key: 'all', label: 'All time', tiltDeg: 0.8 },
+  { className: 'pillPhoneHidden', key: 'week', label: WINDOW_LABELS.week, tiltDeg: -1.2 },
+  { className: 'pillPhoneHidden', key: 'month', label: WINDOW_LABELS.month, tiltDeg: 0.6 },
 ] as const satisfies ReadonlyArray<PaperPillOption<SpanKey>>;
 
 const SPORT_TILTS = [-1, 1.2, -0.6, 0.9] as const;
@@ -71,23 +80,19 @@ const FilteredOutings = createContext<Filtered>({
 
 export const useFilteredOutings = () => use(FilteredOutings);
 
-const sportOption = (key: SportFilter, index: number): PaperPillOption<SportFilter> => ({
-  key,
-  label:
-    key === 'all' ? (
-      'All sports'
-    ) : (
-      <span>
-        <span
-          aria-hidden="true"
-          className="strava__filterDot"
-          style={{ backgroundColor: `var(--${SPORT_DETAILS[key].tone})` }}
-        />
-        {SPORT_DETAILS[key].filter}
-      </span>
-    ),
-  tiltDeg: SPORT_TILTS[index % SPORT_TILTS.length] ?? 0,
-});
+const sportLabel = (key: SportFilter) =>
+  key === 'all' ? (
+    'All sports'
+  ) : (
+    <span>
+      <span
+        aria-hidden="true"
+        className="strava__filterDot"
+        style={{ backgroundColor: `var(--${SPORT_DETAILS[key].tone})` }}
+      />
+      {SPORT_DETAILS[key].filter}
+    </span>
+  );
 
 function inSpan(span: Span, outing: StravaLogEntry) {
   switch (span.kind) {
@@ -104,12 +109,12 @@ function inSpan(span: Span, outing: StravaLogEntry) {
   }
 }
 
-function spanLabel(span: Span) {
+function spanLabel(span: Span, labels: Record<StravaWindow, string> = WINDOW_LABELS) {
   switch (span.kind) {
     case 'all':
       return SPAN_OPTIONS[0].label;
     case 'window':
-      return WINDOW_LABELS[span.key];
+      return labels[span.key];
     case 'year':
       return String(span.year);
     default: {
@@ -132,6 +137,9 @@ export function StravaFilters({
   outings: ReadonlyArray<StravaLogEntry>;
 }) {
   const sports = FILTER_SPORTS.filter((key) => outings.some((outing) => outing.sport === key));
+  const sportKeys: ReadonlyArray<SportFilter> = [...sports, 'all'];
+  const foldedSports =
+    sportKeys.length > PHONE_SPORT_PILLS + 1 ? sportKeys.slice(PHONE_SPORT_PILLS) : [];
   const [sport, setSport] = useState<SportFilter>(() => (sports.includes('ride') ? 'ride' : 'all'));
   const [span, setSpan] = useState<Span>({ kind: 'all' });
   const [city, setCity] = useState<CoverageCity>('sf');
@@ -141,7 +149,13 @@ export function StravaFilters({
   const visible =
     span.kind === 'all' ? sportOutings : sportOutings.filter((outing) => inSpan(span, outing));
   const filtered = sport !== 'all' || span.kind !== 'all';
+  const pickSport = (key: SportFilter) => startTransition(() => setSport(key));
   const pickSpan = (next: Span) => startTransition(() => setSpan(next));
+  const pickSpanKey = (key: SpanKey) =>
+    pickSpan(key === 'all' ? { kind: 'all' } : { key, kind: 'window', since: Date.now() });
+  const spanKey = span.kind === 'window' ? span.key : span.kind === 'all' ? 'all' : null;
+  const pickYear = (year: number) => pickSpan({ kind: 'year', year });
+  const selectedYear = span.kind === 'year' ? span.year : null;
   return (
     <FilteredOutings
       value={{
@@ -155,32 +169,77 @@ export function StravaFilters({
         sportOutings,
       }}
     >
-      <div className="strava__filters">
+      <div className="strava__filters pillStrip">
         {sports.length > 1 ? (
           <PaperPills
             label="Sport"
-            onSelect={(key) => startTransition(() => setSport(key))}
-            options={([...sports, 'all'] as const).map(sportOption)}
+            onSelect={pickSport}
+            options={sportKeys.map((key, index) => ({
+              className: foldedSports.includes(key) ? 'pillPhoneHidden' : undefined,
+              key,
+              label: sportLabel(key),
+              tiltDeg: SPORT_TILTS[index % SPORT_TILTS.length] ?? 0,
+            }))}
             selected={sport}
-          />
+          >
+            {foldedSports.length > 0 ? (
+              <PillMenu
+                className="pillPhoneOnly"
+                current={foldedSports.includes(sport)}
+                face={foldedSports.includes(sport) ? sportLabel(sport) : 'More'}
+                tiltDeg={0.9}
+              >
+                <PillMenuList label="More sports">
+                  {foldedSports.map((key) => (
+                    <li key={key}>
+                      <PillMenuOption current={sport === key} onPick={() => pickSport(key)}>
+                        {sportLabel(key)}
+                      </PillMenuOption>
+                    </li>
+                  ))}
+                </PillMenuList>
+              </PillMenu>
+            ) : null}
+          </PaperPills>
         ) : null}
         <PaperPills
-          className="strava__spans"
           label="Time span"
-          onSelect={(key) =>
-            pickSpan(key === 'all' ? { kind: 'all' } : { key, kind: 'window', since: Date.now() })
-          }
+          onSelect={pickSpanKey}
           options={SPAN_OPTIONS}
-          selected={span.kind === 'window' ? span.key : span.kind === 'all' ? 'all' : null}
+          selected={spanKey}
         >
           {years.length > 1 ? (
             <YearMenu
-              onPick={(year) => pickSpan({ kind: 'year', year })}
-              selected={span.kind === 'year' ? span.year : null}
+              className="pillPhoneHidden"
+              onPick={pickYear}
+              selected={selectedYear}
               tiltDeg={-0.9}
               years={years}
             />
           ) : null}
+          <PillMenu
+            className="pillPhoneOnly"
+            current={true}
+            face={spanLabel(span, WINDOW_SHORT_LABELS)}
+            panelClassName="yearMenu__panel"
+            tiltDeg={-0.9}
+          >
+            <PillMenuList label="Time span">
+              {SPAN_OPTIONS.map((option) => (
+                <li key={option.key}>
+                  <PillMenuOption
+                    current={spanKey === option.key}
+                    onPick={() => pickSpanKey(option.key)}
+                  >
+                    {option.label}
+                  </PillMenuOption>
+                </li>
+              ))}
+            </PillMenuList>
+            {years.length > 1 ? (
+              <YearGrid onPick={pickYear} selected={selectedYear} years={years} />
+            ) : null}
+          </PillMenu>
         </PaperPills>
       </div>
       <VisibleRoutes value={filtered ? new Set(visible.map(({ id }) => id)) : null}>
