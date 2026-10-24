@@ -76,8 +76,10 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
 .chrome__strip {
   position: relative;
   display: flex;
+  flex-wrap: wrap;
   gap: 4px;
   align-items: stretch;
+  justify-content: flex-end;
   padding: 6px;
   color: var(--ink-on-cream);
   background: var(--cream);
@@ -230,76 +232,47 @@ html:active-view-transition-type(page-open, page-close) .chrome__header {
   color: light-dark(var(--cream), var(--ink-on-cream));
   background: light-dark(var(--black), var(--ochre));
 }
-.chrome__schemeAnchor {
+.chrome__scheme {
   display: flex;
-  margin-left: 6px;
-}
-/* An ink well sunk into the end of the strip, square to a segment's height. */
-.chrome__schemeToggle {
-  --well-size: calc(var(--type-label) * (var(--leading-tight) + 1.05));
-  position: relative;
-  display: grid;
-  place-items: center;
-  width: var(--well-size);
-  height: var(--well-size);
+  min-width: 0;
   padding: 0;
-  color: var(--cream);
-  cursor: pointer;
-  background: var(--black);
+  margin: 0 0 0 6px;
   border: 0;
+}
+/* An ink well sunk into the end of the strip, as tall as a segment. */
+.chrome__schemeTrack {
+  --inset: 3px;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  height: calc(var(--type-label) * (var(--leading-tight) + 1.05));
+  padding: var(--inset);
+  background: var(--black);
   border-radius: 11px;
   box-shadow: inset 0 1.5px 3px rgb(0 0 0 / 0.45);
-  transition: color 0.2s ease;
 }
-.collageRoot .chrome__schemeToggle:focus-visible {
-  outline-color: var(--ink-on-cream);
-  outline-offset: 2px;
+.chrome__schemeOption {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 100%;
+  color: var(--cream);
+  cursor: pointer;
+  border-radius: 8px;
+  transition:
+    background-color 0.2s ease,
+    color 0.2s ease;
 }
-.chrome__schemeToggle:hover {
-  color: var(--ochre);
+.chrome__schemeOption:hover {
+  background: color-mix(in oklab, var(--cream) 16%, transparent);
 }
-.chrome__schemeToggle > svg {
-  grid-area: 1 / 1;
+.chrome__schemeOption:has(:checked) {
+  color: var(--ink-on-cream);
+  background: var(--ochre);
 }
-/*
- * Icon and badge follow the attribute and the OS query rather than React state, so they
- * are right on the first paint, before hydration knows the OS scheme.
- */
-.chrome__schemeMoon,
-.chrome__schemeBadge {
-  display: none;
-}
-html[data-color-scheme="dark"] .chrome__schemeSun {
-  display: none;
-}
-html[data-color-scheme="dark"] .chrome__schemeMoon {
-  display: block;
-}
-@media (prefers-color-scheme: dark) {
-  html:not([data-color-scheme="light"]) .chrome__schemeSun {
-    display: none;
-  }
-  html:not([data-color-scheme="light"]) .chrome__schemeMoon {
-    display: block;
-  }
-  html[data-color-scheme="light"] .chrome__schemeBadge {
-    display: block;
-  }
-}
-@media (prefers-color-scheme: light) {
-  html[data-color-scheme="dark"] .chrome__schemeBadge {
-    display: block;
-  }
-}
-.chrome__schemeBadge {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  width: 13px;
-  height: 13px;
-  background: var(--vermilion);
-  border: 2.5px solid var(--cream);
-  border-radius: 50%;
+.chrome__schemeOption:has(:focus-visible) {
+  outline: 2px solid var(--cream);
+  outline-offset: -2px;
 }
 .chrome__srOnly {
   position: absolute;
@@ -767,8 +740,16 @@ html[data-color-scheme="dark"] .chrome__schemeMoon {
   .chrome__nav {
     width: 100%;
   }
+  /* Shrinks the labels with the viewport so the strip and its switcher share one row down to 360px. */
   .chrome__segment {
-    padding-inline: 0.7em;
+    padding-inline: 0.4em;
+    font-size: clamp(var(--type-body), 4.4vw, var(--type-label));
+  }
+  .chrome__scheme {
+    margin-left: 2px;
+  }
+  .chrome__schemeOption {
+    width: 28px;
   }
 }
 @media (max-width: 320px) {
