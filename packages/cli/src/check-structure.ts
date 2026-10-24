@@ -325,12 +325,9 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
   violations.push(...checkOrphanCssFiles(webCssPaths, webImporters));
   violations.push(...checkRouteCssImports(webCssPaths, webSources));
   violations.push(...checkSocialImageRouteParity(webSources));
-  violations.push(...checkNoPageSubtitles(webSources));
-  violations.push(...checkCacheTagParity(webSources));
-  violations.push(...checkTypeScale(webCss));
-  violations.push(...checkScallopPadding(webCss));
-  violations.push(...checkGridGapsFit(webCss));
-  violations.push(...checkUnusedCssRules(webCss, cssCodeSources));
+  violations.push(...checkNoPageSubtitles(webSources), ...checkCacheTagParity(webSources));
+  violations.push(...checkTypeScale(webCss), ...checkScallopPadding(webCss));
+  violations.push(...checkGridGapsFit(webCss), ...checkUnusedCssRules(webCss, cssCodeSources));
   return violations;
 }
 
