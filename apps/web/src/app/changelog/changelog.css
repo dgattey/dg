@@ -6,14 +6,6 @@
   padding-block: 40px 56px;
   margin-inline: auto;
 }
-.changelog__status {
-  justify-self: start;
-}
-.changelog__status p {
-  padding: 20px 26px 22px;
-  margin: 0;
-  font-size: var(--type-body-lg);
-}
 
 .changelog__body {
   position: relative;
@@ -49,17 +41,6 @@
 }
 .changelog__totals > :last-child .changelog__statValue {
   font-size: var(--type-title-md);
-}
-
-.changelog__toolbar {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px 24px;
-  align-items: center;
-  justify-content: flex-start;
-}
-.changelog__pills {
-  justify-content: flex-start;
 }
 
 .changelog__years {
@@ -341,7 +322,7 @@
 
 /* Phones drop the counts so every release type and the Year menu share one row. */
 @media (max-width: 680px) {
-  .changelog__pills small {
+  .changelog__layout [data-filter-bar] small {
     display: none;
   }
 }

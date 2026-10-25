@@ -35,6 +35,7 @@ function RankSticker({ cut, rank }: { cut: RunnerUpCut; rank: number }) {
     <Stub
       className="stats__rankSticker"
       kind="ticket"
+      size="xs"
       tiltDeg={cut.stickerTiltDeg}
       tone={cut.stickerTone}
     >

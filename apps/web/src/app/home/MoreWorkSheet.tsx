@@ -1,14 +1,14 @@
 import { type CSSProperties, Fragment, type ReactNode } from 'react';
-import { CollageProjectFrame } from './CollageProjectFrame';
-import { CutOut } from './CutOut';
-import { CUT_OUT_PLACEMENTS, moreWorkOverflowPlacements } from './cutOutPlacements';
+import { CutOut } from '../collage/CutOut';
+import { CUT_OUT_PLACEMENTS, moreWorkOverflowPlacements } from '../collage/cutOutPlacements';
 import {
   MORE_WORK_OVERFLOW_GRID_AREAS,
   type MoreWorkOverflowUnit,
   moreWorkFrames,
   moreWorkGridAreas,
   type SlottedProject,
-} from './projectSlots';
+} from '../collage/projectSlots';
+import { CollageProjectFrame } from './CollageProjectFrame';
 
 function MoreWorkGrid({
   projects,

@@ -10,7 +10,7 @@ import { getChangelogReleases } from '../../services/github';
 import { HISTORY_BACKDROP } from '../collage/backdrops';
 import { CollageBackdrop } from '../collage/CollageBackdrop';
 import { CutLetters } from '../collage/CutLetters';
-import { PaperCard } from '../collage/PaperCard';
+import { PaperStatus } from '../collage/PaperCard';
 import { markdownAlternates } from '../layouts/markdownAlternates';
 import { ChangelogLedger } from './ChangelogLedger';
 
@@ -23,18 +23,10 @@ export const metadata: Metadata = {
   title: TITLE,
 };
 
-function ChangelogStatus({ children }: { children: string }) {
-  return (
-    <PaperCard className="changelog__status" tiltDeg={-1} tone="cream">
-      <p role="status">{children}</p>
-    </PaperCard>
-  );
-}
-
 async function ChangelogContent() {
   const releases = await getChangelogReleases();
   if (releases.length === 0) {
-    return <ChangelogStatus>No releases found.</ChangelogStatus>;
+    return <PaperStatus>No releases found.</PaperStatus>;
   }
   return <ChangelogLedger releases={releases} />;
 }
@@ -44,7 +36,7 @@ export default function ChangelogPage() {
     <section aria-label={TITLE} className="collageBackdropHost changelog__layout">
       <CollageBackdrop backdrop={HISTORY_BACKDROP} />
       <CutLetters className="collagePageTitle" text={TITLE} />
-      <Suspense fallback={<ChangelogStatus>Loading releases…</ChangelogStatus>}>
+      <Suspense fallback={<PaperStatus>Loading releases…</PaperStatus>}>
         <ChangelogContent />
       </Suspense>
     </section>

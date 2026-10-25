@@ -15,11 +15,42 @@
   z-index: 3;
 }
 /* Sticky filter and sort bars sit under the header (z-index: 50) and above page cards. */
-.collageBackdropHost
-:is(.reading__filters, .stats__toolbar, .music__sort, .strava__filters, .changelog__toolbar) {
+.collageBackdropHost [data-filter-bar] {
   position: sticky;
   top: calc(var(--site-header-height, 88px) + 10px);
   z-index: 20;
+}
+[data-filter-bar="spread"],
+[data-filter-bar="start"] {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px 24px;
+  align-items: center;
+  justify-content: space-between;
+}
+[data-filter-bar="start"] {
+  justify-content: flex-start;
+}
+[data-filter-bar="start"] > .paperPills {
+  justify-content: flex-start;
+}
+[data-filter-bar="stack"] {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-end;
+}
+[data-filter-bar="stack"] > .paperPills {
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+}
+@media (max-width: 1180px) {
+  [data-filter-bar="stack"] {
+    align-items: flex-start;
+  }
+  [data-filter-bar="stack"] > .paperPills {
+    justify-content: flex-start;
+  }
 }
 .paperPill {
   padding: 0;
@@ -66,13 +97,6 @@
 .yearMenu__panel {
   min-width: 244px;
 }
-.pillMenu__list {
-  display: grid;
-  gap: 2px;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
 .pillMenu__option {
   width: 100%;
   padding: 8px 12px;
@@ -89,7 +113,7 @@
   margin: 0;
   list-style: none;
 }
-.pillMenu__list + .yearMenu__grid {
+.chrome__musicList + .yearMenu__grid {
   padding-top: 6px;
   margin-top: 6px;
   border-top: 1px solid color-mix(in oklab, var(--ink-on-cream) 16%, transparent);

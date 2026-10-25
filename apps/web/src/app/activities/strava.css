@@ -19,15 +19,6 @@
 .strava__title {
   padding-bottom: 0.16em;
 }
-.strava__empty {
-  justify-self: start;
-}
-.strava__emptyInner {
-  padding: 14px 18px 15px;
-  font-family: var(--body);
-  font-size: var(--type-body);
-  line-height: var(--leading-body);
-}
 
 .strava__sections,
 .strava__atlas {
@@ -37,17 +28,9 @@
 
 /* Sports over time spans, each held to one line. */
 .strava__filters {
-  display: flex;
-  flex-direction: column;
   grid-row: 1;
   grid-column: 6 / -1;
-  gap: 10px;
-  align-items: flex-end;
   align-self: center;
-}
-.strava__filters > .paperPills {
-  flex-wrap: nowrap;
-  justify-content: flex-end;
 }
 /* Sat on the baseline, a 0.55em dot centers between the label's x-height and cap height. */
 .strava__filterDot {
@@ -145,10 +128,6 @@
 .strava__totalMiles {
   grid-area: miles;
 }
-.strava__totalMiles .stats__ticket > .stats__face {
-  min-height: 0;
-  padding: 16px 24px 18px 40px;
-}
 .strava__totalClimb {
   grid-area: climb;
   justify-self: center;
@@ -160,7 +139,7 @@
 }
 .strava__totalOutings .stats__stamp > .stats__face {
   justify-items: start;
-  padding: 14px 14px 16px;
+  padding-inline: 14px;
 }
 .strava__totalScope,
 .strava__totalAside {
@@ -220,7 +199,7 @@
 .strava__recentPair .strava__polaroidName {
   font-size: var(--type-label);
 }
-.stats__cut.strava__latestSeal {
+.strava__latestSeal {
   position: absolute;
   top: -26px;
   right: -16px;
@@ -573,22 +552,12 @@
 .strava__yearList--engaged .strava__year:not(.strava__year--active) .strava__yearButton {
   opacity: 0.55;
 }
-.strava__yearTicket .stats__ticket {
-  mask:
-    radial-gradient(circle 7px at 0 50%, #0000 96%, #000) left / 51% 100% no-repeat,
-    radial-gradient(circle 7px at 100% 50%, #0000 96%, #000) right / 51% 100% no-repeat;
-}
 .strava__yearTicket .stats__ticket > .stats__face {
   display: flex;
   gap: 12px;
   align-items: baseline;
   justify-content: space-between;
-  min-height: 0;
-  padding: 9px 20px 10px 32px;
-}
-.strava__yearTicket .stats__ticket > .stats__face::before {
-  inset-block: 6px;
-  left: 16px;
+  padding-inline-end: 20px;
 }
 .strava__yearLabel {
   font-family: var(--display);
@@ -603,7 +572,7 @@
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
-.stats__cut.strava__bestYear {
+.strava__bestYear {
   position: absolute;
   top: 62px;
   right: 0;
@@ -616,7 +585,7 @@
   left: -12px;
   z-index: 3;
 }
-.stats__cut.strava__longestSeal {
+.strava__longestSeal {
   position: absolute;
   top: -22px;
   right: -14px;
@@ -668,10 +637,7 @@
   width: 100%;
 }
 .strava__bikeTicket .stats__ticket > .stats__face {
-  display: grid;
   gap: 10px;
-  min-height: 0;
-  padding: 16px 24px 18px 40px;
 }
 .strava__year--current .strava__yearTicket .stats__ticket > .stats__face {
   outline: 2px dashed color-mix(in oklab, var(--on) 55%, transparent);
@@ -884,10 +850,6 @@
   }
   .strava__filters {
     grid-row: 2;
-    align-items: flex-start;
-  }
-  .strava__filters > .paperPills {
-    justify-content: flex-start;
   }
   .strava__atlas {
     grid-template-columns: minmax(0, 1fr);
@@ -987,7 +949,7 @@
   .strava__year {
     width: calc(56% + 30% * var(--share));
   }
-  .stats__cut.strava__bestYear {
+  .strava__bestYear {
     position: static;
     justify-self: end;
     width: 116px;

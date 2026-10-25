@@ -3,6 +3,7 @@
 import type { ChangelogRelease } from '@dg/services/github/fetchReleases';
 import { formatUtcShortDate } from '@dg/shared-core/dates/periodStatus';
 import { startTransition, useState } from 'react';
+import { FilterBar } from '../collage/FilterBar';
 import { PaperCard } from '../collage/PaperCard';
 import { type PaperPillOption, PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
@@ -119,9 +120,8 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
         </li>
       </ul>
 
-      <div className="changelog__toolbar pillStrip">
+      <FilterBar variant="start">
         <PaperPills
-          className="changelog__pills"
           label="Filter releases by type"
           onSelect={(next) => {
             startTransition(() => {
@@ -143,7 +143,7 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
             />
           ) : null}
         </PaperPills>
-      </div>
+      </FilterBar>
 
       <div className="changelog__years">
         {yearGroups.map((group, groupIndex) => {

@@ -103,6 +103,7 @@ function BikeTicket({ bike, index }: { bike: StravaBike; index: number }) {
     <Stub
       className={cx('strava__bikeTicket', picked && 'strava__bikeTicket--year')}
       kind="ticket"
+      size="compact"
       tiltDeg={BIKE_TILTS[index % BIKE_TILTS.length] ?? 0}
       tone={BIKE_TONES[index % BIKE_TONES.length] ?? 'cobalt'}
     >

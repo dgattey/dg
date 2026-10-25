@@ -227,7 +227,7 @@ export function StreetCoverageSection({
         </li>
         {top && top.riddenMeters > 0 ? (
           <li>
-            <Stub kind="ticket" tiltDeg={1.4} tone="ochre">
+            <Stub kind="ticket" size="compact" tiltDeg={1.4} tone="ochre">
               <span className="strava__totalScope">Most ridden</span>
               <span className="streets__calloutLine">
                 {top.name} · {formatShare(top.share)}

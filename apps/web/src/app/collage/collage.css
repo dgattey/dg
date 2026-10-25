@@ -181,6 +181,11 @@ html:has(.collageRoot) body {
   position: relative;
   z-index: 2;
 }
+.collageMeasureGrid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  align-items: start;
+}
 .collagePin {
   position: absolute;
   z-index: 4;
@@ -197,6 +202,15 @@ html:has(.collageRoot) body {
   line-height: var(--leading-tight);
   color: var(--on, var(--ink));
   letter-spacing: var(--tracking-label);
+}
+.collageStatus {
+  grid-column: 1 / -1;
+  justify-self: start;
+}
+.collageStatusText {
+  padding: 20px 26px 22px;
+  margin: 0;
+  font-size: var(--type-body-lg);
 }
 
 .paperWrap {
@@ -221,7 +235,7 @@ html:has(.collageRoot) body {
   clip-path: var(--clip);
   rotate: none;
 }
-.paperInner [data-typography]:not(.home__spotifyMetaInner *) {
+.paperInner [data-typography]:not([data-has-color]) {
   color: inherit;
 }
 /* Lets zoomed art pass the paper's edge. Tooltips escape either way, being fixed. */
@@ -306,11 +320,20 @@ html:has(.collageRoot) body {
   outline: 2px solid currentColor;
   outline-offset: 3px;
 }
-.collageRoot :is(.paperButton, .chrome__nowPlaying :has(.paperWrap)):focus-visible {
+.collageRoot
+  :is(
+    .paperButton,
+    .paperWrap.collageLift > .paperInner > a:only-child,
+    .chrome__nowPlaying :has(.paperWrap)
+  ):focus-visible {
   outline: none;
 }
 .collageRoot
-  :is(.paperWrap:has(> .paperButton:focus-visible), .chrome__nowPlaying :focus-visible .paperWrap) {
+  :is(
+    .paperWrap:has(> .paperButton:focus-visible),
+    .paperWrap.collageLift:has(> .paperInner > a:only-child:focus-visible),
+    .chrome__nowPlaying :focus-visible .paperWrap
+  ) {
   outline: 2px solid var(--ink);
   outline-offset: 3px;
   border-radius: var(--edge-radius);
@@ -479,6 +502,17 @@ html[data-color-scheme="dark"] .cutNightOnly {
   }
   .collagePageTitle {
     padding-top: 16px;
+  }
+  .collageRoot .collageGridStack {
+    display: flex;
+    flex-direction: column;
+    grid-template-areas: none;
+    gap: 36px;
+    align-items: stretch;
+  }
+  .collageRoot .collageGridStack > * {
+    grid-area: auto;
+    margin-top: 0;
   }
 }
 @media (max-width: 600px) {

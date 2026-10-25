@@ -12,7 +12,7 @@ import { getStravaHistory } from '../../services/strava';
 import { STRAVA_BACKDROP } from '../collage/backdrops';
 import { CollageBackdrop } from '../collage/CollageBackdrop';
 import { CutLetters } from '../collage/CutLetters';
-import { PaperCard } from '../collage/PaperCard';
+import { PaperStatus } from '../collage/PaperCard';
 import { markdownAlternates } from '../layouts/markdownAlternates';
 import { StravaHistorySections } from './StravaHistorySections';
 import { StravaHistorySkeleton } from './StravaHistorySkeleton';
@@ -28,16 +28,7 @@ export const metadata: Metadata = {
 async function StravaHistoryView() {
   const history = await getStravaHistory();
   if (!history) {
-    return (
-      <PaperCard
-        className="strava__empty"
-        edge="quad-c"
-        innerClassName="strava__emptyInner"
-        tiltDeg={-1}
-      >
-        No activities yet.
-      </PaperCard>
-    );
+    return <PaperStatus>No activities yet.</PaperStatus>;
   }
   return <StravaHistorySections history={history} />;
 }

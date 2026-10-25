@@ -62,3 +62,29 @@ export const PORTRAIT_OVAL_PATH =
 export function cutOutSymbolId(shape: CutOutShape): string {
   return `collage-cut-out-${shape}`;
 }
+
+export type ScallopSize = 'seal' | 'sticker';
+
+const SCALLOP_SPECS: Record<ScallopSize, { bumps: number; depthRatio: number }> = {
+  seal: { bumps: 18, depthRatio: 0.064 },
+  sticker: { bumps: 12, depthRatio: 0.1 },
+};
+
+export function scallopVertices(
+  size: ScallopSize,
+  center: number,
+  outerRadius: number,
+  samplesPerBump = 10,
+): Array<{ x: number; y: number }> {
+  const { bumps, depthRatio } = SCALLOP_SPECS[size];
+  const depth = outerRadius * depthRatio;
+  const samples = bumps * samplesPerBump;
+  return Array.from({ length: samples }, (_, i) => {
+    const angle = (i / samples) * Math.PI * 2;
+    const radius = outerRadius - depth + depth * Math.sqrt(Math.abs(Math.sin((bumps * angle) / 2)));
+    return {
+      x: center + radius * Math.cos(angle),
+      y: center + radius * Math.sin(angle),
+    };
+  });
+}

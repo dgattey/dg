@@ -4,6 +4,7 @@ import type { RenderableBook } from '@dg/content-models/contentful/renderables/b
 import { inPageViewTransitionProps } from '@dg/ui/core/transitions/pageTransitions';
 import { startTransition, useState, ViewTransition } from 'react';
 import { collageCardTreatment } from '../collage/collageCardTreatment';
+import { FilterBar } from '../collage/FilterBar';
 import { PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
 import type { PaperTone } from '../collage/types';
@@ -91,14 +92,14 @@ export function ReadingShelf({ books }: { books: ReadonlyArray<RenderableBook> }
 
   return (
     <>
-      <div className="reading__filters pillStrip" ref={shareFiltersHeight}>
+      <FilterBar ref={shareFiltersHeight}>
         <PaperPills
           label="Filter books"
           onSelect={(key) => startTransition(() => setFilterKey(key))}
           options={filterOptions}
           selected={filterKey}
         />
-      </div>
+      </FilterBar>
       {featured ? (
         <ViewTransition default={SHELF_TRANSITION} key={featured.book.id}>
           <ReadingHero featured={featured} stats={shelfStats(shelf)} />

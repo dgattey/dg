@@ -48,7 +48,7 @@ export function HeadlineTotals() {
   return (
     <ul aria-label={`Totals, ${scope}`} className="strava__totals">
       <li className="strava__totalMiles">
-        <Stub kind="ticket" tiltDeg={-1.5} tone="ochre">
+        <Stub kind="ticket" size="compact" tiltDeg={-1.5} tone="ochre">
           <span className="strava__totalScope">{scope}</span>
           <span className="strava__totalFigure">
             <span className="strava__totalNumber">{distance.figure}</span>
@@ -69,7 +69,7 @@ export function HeadlineTotals() {
         </Scallop>
       </li>
       <li className="strava__totalOutings">
-        <Stub kind="stamp" tiltDeg={1.2} tone="vermilion">
+        <Stub kind="stamp" size="compact" tiltDeg={1.2} tone="vermilion">
           <span className="strava__totalNumber">{time.figure}</span>
           <span className="strava__totalUnit">{time.unit}</span>
           <span className="strava__totalAside">

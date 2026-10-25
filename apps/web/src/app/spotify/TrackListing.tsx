@@ -278,7 +278,7 @@ export function TrackListing({
             />
             <TrackMeta
               color={primary}
-              secondaryColor={secondary}
+              secondaryColor={secondary ?? 'var(--dg-palette-text-secondary)'}
               secondaryShadow={secondaryShadow}
               textShadow={primaryShadow}
               track={track}

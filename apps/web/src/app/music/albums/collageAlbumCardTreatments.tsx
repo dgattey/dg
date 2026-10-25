@@ -4,6 +4,7 @@ import {
   type CollageCardTreatment,
   collageCardTreatment,
 } from '../../collage/collageCardTreatment';
+import { FilterBar } from '../../collage/FilterBar';
 import { PaperCard } from '../../collage/PaperCard';
 import { type PaperPillOption, PaperPills } from '../../collage/PaperPills';
 import { PaperTag } from '../../collage/PaperTag';
@@ -76,13 +77,14 @@ export function CollageSortControls({
   sortKey: AlbumSortKey;
 }) {
   return (
-    <PaperPills
-      className="music__sort pillStrip"
-      label={onSortChange ? 'Sort albums' : 'Loading album sort controls'}
-      onSelect={onSortChange}
-      options={COLLAGE_ALBUM_SORT_OPTIONS}
-      selected={sortKey}
-    />
+    <FilterBar className="music__sort">
+      <PaperPills
+        label={onSortChange ? 'Sort albums' : 'Loading album sort controls'}
+        onSelect={onSortChange}
+        options={COLLAGE_ALBUM_SORT_OPTIONS}
+        selected={sortKey}
+      />
+    </FilterBar>
   );
 }
 

@@ -1,32 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { type ScallopSize, scallopVertices } from '../../collage/cutOutShapes';
 import { cx, paperToneVars } from '../../collage/paperVars';
 import type { PaperTone } from '../../collage/types';
-
-export type ScallopSize = 'seal' | 'sticker';
-
-const SCALLOP_SPECS: Record<ScallopSize, { bumps: number; depthRatio: number }> = {
-  seal: { bumps: 18, depthRatio: 0.064 },
-  sticker: { bumps: 12, depthRatio: 0.1 },
-};
-
-export function scallopVertices(
-  size: ScallopSize,
-  center: number,
-  outerRadius: number,
-  samplesPerBump = 10,
-): Array<{ x: number; y: number }> {
-  const { bumps, depthRatio } = SCALLOP_SPECS[size];
-  const depth = outerRadius * depthRatio;
-  const samples = bumps * samplesPerBump;
-  return Array.from({ length: samples }, (_, i) => {
-    const angle = (i / samples) * Math.PI * 2;
-    const radius = outerRadius - depth + depth * Math.sqrt(Math.abs(Math.sin((bumps * angle) / 2)));
-    return {
-      x: center + radius * Math.cos(angle),
-      y: center + radius * Math.sin(angle),
-    };
-  });
-}
 
 function scallopPolygon(size: ScallopSize): string {
   const points = scallopVertices(size, 50, 50).map(
@@ -40,14 +15,18 @@ const SCALLOPS: Record<ScallopSize, string> = {
   sticker: scallopPolygon('sticker'),
 };
 
+export type StubSize = 'default' | 'compact' | 'sm' | 'xs';
+
 /** Paper cut in a scalloped round: totals seals and rank stickers. */
 export function Scallop({
+  'aria-hidden': ariaHidden,
   children,
   className,
   size = 'seal',
   tiltDeg = 0,
   tone,
 }: {
+  'aria-hidden'?: boolean;
   children: ReactNode;
   className?: string;
   size?: ScallopSize;
@@ -55,7 +34,11 @@ export function Scallop({
   tone: PaperTone;
 }) {
   return (
-    <span className={cx('stats__cut', className)} style={paperToneVars(tone, tiltDeg)}>
+    <span
+      aria-hidden={ariaHidden}
+      className={cx('stats__cut', className)}
+      style={paperToneVars(tone, tiltDeg)}
+    >
       <span
         className={cx('stats__scallop', `stats__scallop--${size}`)}
         style={{ '--scallop-clip': SCALLOPS[size] } as CSSProperties}
@@ -71,17 +54,23 @@ export function Stub({
   children,
   className,
   kind,
+  size = 'default',
   tiltDeg = 0,
   tone,
 }: {
   children: ReactNode;
   className?: string;
   kind: 'stamp' | 'ticket';
+  size?: StubSize;
   tiltDeg?: number;
   tone: PaperTone;
 }) {
   return (
-    <span className={cx('stats__cut', className)} style={paperToneVars(tone, tiltDeg)}>
+    <span
+      className={cx('stats__cut', className)}
+      data-stub-size={size !== 'default' ? size : undefined}
+      style={paperToneVars(tone, tiltDeg)}
+    >
       <span className={kind === 'ticket' ? 'stats__ticket' : 'stats__stamp'}>
         <span className="stats__face">{children}</span>
       </span>

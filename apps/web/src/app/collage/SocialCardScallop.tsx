@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { type ScallopSize, scallopVertices } from '../music/stats/StatsShapes';
+import { type ScallopSize, scallopVertices } from './cutOutShapes';
 import { PAPER_PALETTE } from './paperPalette';
 import { inkForTone, type PaperColor, PIECE_SHADOW } from './SocialCardParts';
 

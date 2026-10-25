@@ -6,6 +6,7 @@ import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import { cx } from '../collage/paperVars';
 import type { PaperEdge, PaperTone } from '../collage/types';
+import { Scallop } from '../music/stats/StatsShapes';
 import type { BookCardKind } from './readingHelpers';
 
 type CardLook = { coverWidth: number; edge: PaperEdge; tiltScale: number };
@@ -75,9 +76,15 @@ function CoverPrint({ book, width }: { book: RenderableBook; width: number }) {
     <div className="reading__print">
       <BookCover book={book} width={width} />
       {book.rating === 5 ? (
-        <span aria-hidden="true" className="reading__seal">
+        <Scallop
+          aria-hidden={true}
+          className="reading__seal"
+          size="sticker"
+          tiltDeg={14}
+          tone="vermilion"
+        >
           5★
-        </span>
+        </Scallop>
       ) : null}
     </div>
   );

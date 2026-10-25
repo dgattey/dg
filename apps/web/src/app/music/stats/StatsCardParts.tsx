@@ -68,7 +68,7 @@ export function OnRepeatCard({ stats }: { stats: ListeningStats }) {
       innerClassName="stats__pad"
       tag={
         top > 0 ? (
-          <Stub className="stats__cardStamp" kind="ticket" tiltDeg={3.8} tone="ochre">
+          <Stub className="stats__cardStamp" kind="ticket" size="sm" tiltDeg={3.8} tone="ochre">
             <span className="stats__cardStampKicker">
               {isDailyRepeat ? 'Most in a day' : 'Most in a week'}
             </span>
