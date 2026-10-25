@@ -1,3 +1,4 @@
+import { Skeleton } from '@dg/ui/core/Skeleton';
 import type { CSSProperties, ReactNode } from 'react';
 import {
   type CollageCardTreatment,
@@ -6,6 +7,8 @@ import {
 import { PaperCard } from '../../collage/PaperCard';
 import { type PaperPillOption, PaperPills } from '../../collage/PaperPills';
 import { PaperTag } from '../../collage/PaperTag';
+
+const SKELETON_TEXT_CLASS = 'music__skeleton music__skeletonText';
 
 type CardOffsetStyle = CSSProperties & {
   '--card-offset': string;
@@ -53,23 +56,13 @@ export function CollageAlbumPaper({
   );
 }
 
-function SkeletonLine({ width }: { width: number | string }) {
-  const w = typeof width === 'number' ? `${width}px` : width;
-  return (
-    <span
-      className="music__skeleton music__skeletonText"
-      style={{ '--skeleton-w': w } as CSSProperties}
-    />
-  );
-}
-
 function SkeletonFace() {
   return (
     <>
-      <span className="music__skeleton music__art" />
+      <Skeleton className="music__skeleton music__art" variant="rounded" />
       <div className="music__caption">
-        <SkeletonLine width="82%" />
-        <SkeletonLine width="58%" />
+        <Skeleton className={SKELETON_TEXT_CLASS} width="82%" />
+        <Skeleton className={SKELETON_TEXT_CLASS} width="58%" />
       </div>
     </>
   );
@@ -128,7 +121,7 @@ export function CollageHistorySkeleton() {
               tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
               tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
             >
-              <SkeletonLine width={120} />
+              <Skeleton className={SKELETON_TEXT_CLASS} width={120} />
             </PaperTag>
           </div>
           <div className="music__historySkeletonGrid">

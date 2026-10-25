@@ -7,8 +7,54 @@ import { PaperCard } from './PaperCard';
 import { PaperTag } from './PaperTag';
 import { cx } from './paperVars';
 
-const bindPillMenu = (node: HTMLDetailsElement | null) =>
-  bindHoverMenu(node, 'button[data-menu-option]');
+const bindPillMenu = (itemSelector: string) => (node: HTMLDetailsElement | null) =>
+  bindHoverMenu(node, itemSelector);
+
+export function MenuChevron() {
+  return <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />;
+}
+
+/**
+ * Shared `<details>` dropdown that opens on mouse hover or click, closes on
+ * Escape, outside press, or item pick, and wraps its panel in a `PaperCard`.
+ */
+export function HoverMenu({
+  children,
+  className,
+  itemSelector = 'a[href], button[data-menu-option]',
+  onWarmup,
+  panelClassName,
+  panelTiltDeg = 0,
+  summary,
+  summaryClassName,
+}: {
+  children: ReactNode;
+  className?: string;
+  itemSelector?: string;
+  onWarmup?: () => void;
+  panelClassName?: string;
+  panelTiltDeg?: number;
+  summary: ReactNode;
+  summaryClassName?: string;
+}) {
+  return (
+    <details
+      className={cx('chrome__music', className)}
+      onPointerEnter={onWarmup}
+      ref={bindPillMenu(itemSelector)}
+    >
+      <summary className={cx('chrome__musicSummary', summaryClassName)}>{summary}</summary>
+      <PaperCard
+        className={cx('chrome__musicPanel', panelClassName)}
+        edge="quad-a"
+        innerClassName="chrome__musicPanelInner"
+        tiltDeg={panelTiltDeg}
+      >
+        {children}
+      </PaperCard>
+    </details>
+  );
+}
 
 /**
  * A paper pill with a `▾` that opens a panel of picks on hover or click. The face
@@ -34,12 +80,13 @@ export function PillMenu({
   tiltDeg?: number;
 }) {
   return (
-    <details
-      className={cx('chrome__music pillMenu', className)}
-      onPointerEnter={onWarmup}
-      ref={bindPillMenu}
-    >
-      <summary className="chrome__musicSummary pillMenu__summary collageLift">
+    <HoverMenu
+      className={cx('pillMenu', className)}
+      itemSelector="button[data-menu-option]"
+      onWarmup={onWarmup}
+      panelClassName={cx('pillMenu__panel', panelClassName)}
+      panelTiltDeg={-1}
+      summary={
         <PaperTag
           className={cx('paperPill', current && 'paperButtonCurrent')}
           edge="quad-a"
@@ -47,19 +94,14 @@ export function PillMenu({
         >
           <span className="paperPillButton pillMenu__face">
             {face}
-            <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />
+            <MenuChevron />
           </span>
         </PaperTag>
-      </summary>
-      <PaperCard
-        className={cx('chrome__musicPanel pillMenu__panel', panelClassName)}
-        edge="quad-a"
-        innerClassName="chrome__musicPanelInner"
-        tiltDeg={-1}
-      >
-        {children}
-      </PaperCard>
-    </details>
+      }
+      summaryClassName="pillMenu__summary collageLift"
+    >
+      {children}
+    </HoverMenu>
   );
 }
 
@@ -96,10 +138,10 @@ export function PillMenuOption({
   );
 }
 
-/** Picks in a `PillMenu` panel, one per row. */
-export function PillMenuList({ children, label }: { children: ReactNode; label: string }) {
+/** Picks in a `HoverMenu` or `PillMenu` panel, one per row. */
+export function PillMenuList({ children, label }: { children: ReactNode; label?: string }) {
   return (
-    <ul aria-label={label} className="pillMenu__list">
+    <ul aria-label={label} className="chrome__musicList pillMenu__list">
       {children}
     </ul>
   );

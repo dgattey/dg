@@ -2,23 +2,47 @@ import type { CSSProperties, ReactNode } from 'react';
 import { cx, paperToneVars } from '../../collage/paperVars';
 import type { PaperTone } from '../../collage/types';
 
-/** A die-cut scalloped circle as a percentage polygon, so it scales with its box. */
-function scallopPolygon(bumps: number, depth: number): string {
-  const samples = bumps * 10;
-  const points = Array.from({ length: samples }, (_, i) => {
+export type ScallopSize = 'seal' | 'sticker';
+
+const SCALLOP_SPECS: Record<ScallopSize, { bumps: number; depthRatio: number }> = {
+  seal: { bumps: 18, depthRatio: 0.064 },
+  sticker: { bumps: 12, depthRatio: 0.1 },
+};
+
+/**
+ * Polar vertices for a scalloped circle around `(center, center)` with `outerRadius`,
+ * shared by CSS `polygon(...)` clip paths and Satori SVG `<path>` social cards.
+ */
+export function scallopVertices(
+  size: ScallopSize,
+  center: number,
+  outerRadius: number,
+  samplesPerBump = 10,
+): Array<{ x: number; y: number }> {
+  const { bumps, depthRatio } = SCALLOP_SPECS[size];
+  const depth = outerRadius * depthRatio;
+  const samples = bumps * samplesPerBump;
+  return Array.from({ length: samples }, (_, i) => {
     const angle = (i / samples) * Math.PI * 2;
-    const radius = 50 - depth + depth * Math.sqrt(Math.abs(Math.sin((bumps * angle) / 2)));
-    const x = 50 + radius * Math.cos(angle);
-    const y = 50 + radius * Math.sin(angle);
-    return `${x.toFixed(2)}% ${y.toFixed(2)}%`;
+    const radius = outerRadius - depth + depth * Math.sqrt(Math.abs(Math.sin((bumps * angle) / 2)));
+    return {
+      x: center + radius * Math.cos(angle),
+      y: center + radius * Math.sin(angle),
+    };
   });
+}
+
+function scallopPolygon(size: ScallopSize): string {
+  const points = scallopVertices(size, 50, 50).map(
+    ({ x, y }) => `${x.toFixed(2)}% ${y.toFixed(2)}%`,
+  );
   return `polygon(${points.join(', ')})`;
 }
 
-const SCALLOPS = {
-  seal: scallopPolygon(18, 3.2),
-  sticker: scallopPolygon(12, 5),
-} as const;
+const SCALLOPS: Record<ScallopSize, string> = {
+  seal: scallopPolygon('seal'),
+  sticker: scallopPolygon('sticker'),
+};
 
 /** Paper cut in a scalloped round: totals seals and rank stickers. */
 export function Scallop({
@@ -30,7 +54,7 @@ export function Scallop({
 }: {
   children: ReactNode;
   className?: string;
-  size?: keyof typeof SCALLOPS;
+  size?: ScallopSize;
   tiltDeg?: number;
   tone: PaperTone;
 }) {

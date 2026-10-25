@@ -1,20 +1,19 @@
 import type { CSSProperties, ReactNode } from 'react';
+import { type ScallopSize, scallopVertices } from '../music/stats/StatsShapes';
 import { PAPER_PALETTE } from './paperPalette';
 import { inkForTone, type PaperColor, PIECE_SHADOW } from './SocialCardParts';
 
-function scallopSvgPath(bumps: number, depth: number): string {
-  const samples = bumps * 8;
-  return `${Array.from({ length: samples }, (_, i) => {
-    const angle = (i / samples) * Math.PI * 2;
-    const radius = 98 - depth + depth * Math.sqrt(Math.abs(Math.sin((bumps * angle) / 2)));
-    return `${i === 0 ? 'M' : 'L'}${(100 + radius * Math.cos(angle)).toFixed(1)} ${(100 + radius * Math.sin(angle)).toFixed(1)}`;
-  }).join(' ')} Z`;
+function scallopSvgPath(size: ScallopSize): string {
+  const points = scallopVertices(size, 100, 98, 8).map(
+    ({ x, y }, i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)} ${y.toFixed(1)}`,
+  );
+  return `${points.join(' ')} Z`;
 }
 
-const SCALLOP_PATHS = {
-  seal: scallopSvgPath(18, 6.4),
-  sticker: scallopSvgPath(12, 9.5),
-} as const;
+const SCALLOP_PATHS: Record<ScallopSize, string> = {
+  seal: scallopSvgPath('seal'),
+  sticker: scallopSvgPath('sticker'),
+};
 
 export function SocialCardScallop({
   children,
@@ -25,7 +24,7 @@ export function SocialCardScallop({
   tone,
 }: {
   children: ReactNode;
-  kind?: keyof typeof SCALLOP_PATHS;
+  kind?: ScallopSize;
   size?: number;
   style?: CSSProperties;
   tiltDeg?: number;
