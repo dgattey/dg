@@ -263,8 +263,12 @@ export function checkRouteCssImports(
       continue;
     }
     const cssDir = path.posix.dirname(cssPath);
+    const routeDir = cssDir === 'apps/web/src/app/home' ? 'apps/web/src/app' : cssDir;
     for (const pageEntry of pageEntries) {
-      if (pageEntry !== `${cssDir}/page.tsx` && !pageEntry.startsWith(`${cssDir}/`)) {
+      if (
+        pageEntry !== `${routeDir}/page.tsx` &&
+        (routeDir === 'apps/web/src/app' || !pageEntry.startsWith(`${routeDir}/`))
+      ) {
         continue;
       }
       const covered = importsByFile.get(pageEntry)?.has(cssPath) ?? false;
@@ -276,6 +280,36 @@ export function checkRouteCssImports(
           rule: 'route-missing-css',
         });
       }
+    }
+  }
+  return violations;
+}
+
+const SHARED_CSS_PATH = /^(?:packages\/.*|apps\/web\/src\/app\/collage\/[^/]+)\.css$/;
+const CONSUMER_CLASS_SELECTOR =
+  /\.(?:stats|strava|streets|reading|changelog|music|home|siteMap|devConsole|error)__[a-zA-Z0-9_-]+/g;
+
+/**
+ * Shared stylesheets in `apps/web/src/app/collage/` and `packages/` must style
+ * shared component variants (`[data-filter-bar]`, `[data-typography]`, `.paper*`, `.cut*`,
+ * `.chrome*`, `[data-map-*]`) rather than hardcoding route-specific consumer classes.
+ */
+export function checkNoConsumerSelectorsInSharedCss(
+  cssFiles: ReadonlyMap<string, string>,
+): Array<StructureViolation> {
+  const violations: Array<StructureViolation> = [];
+  for (const [file, content] of cssFiles) {
+    if (!SHARED_CSS_PATH.test(file)) {
+      continue;
+    }
+    const selectorOnlyCss = maskCssCommentsAndDeclarations(content);
+    for (const match of selectorOnlyCss.matchAll(CONSUMER_CLASS_SELECTOR)) {
+      violations.push({
+        file,
+        line: lineAt(content, match.index),
+        message: `Shared stylesheet must not reference route-specific selector "${match[0]}"; expose a shared component or variant prop instead`,
+        rule: 'no-consumer-selectors-in-shared-css',
+      });
     }
   }
   return violations;

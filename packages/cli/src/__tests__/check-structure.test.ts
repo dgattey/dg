@@ -4,6 +4,7 @@ import { describe, it } from 'node:test';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { checkCacheTagParity } from '../check-cache-tags.js';
 import {
+  checkNoConsumerSelectorsInSharedCss,
   checkOrphanCssFiles,
   checkRouteCssImports,
   checkTypeScale,
@@ -364,6 +365,57 @@ describe('check-structure', () => {
         'const METERS_PER_MILE = 1609.344;\nconst f = new Intl.NumberFormat("en-US");\nexport { METERS_PER_MILE, f };\n',
       ).map(({ rule }) => rule),
       ['no-duplicate-unit-constants', 'no-duplicate-count-formatter'],
+    );
+
+    assert.deepEqual(
+      checkFileStructure(
+        'apps/web/src/app/reading/ReadingShelf.tsx',
+        'export const bar = <div className="reading__filters pillStrip" />;\n',
+      ).map(({ rule }) => rule),
+      ['no-duplicate-filter-bar'],
+    );
+
+    assert.deepEqual(
+      checkFileStructure(
+        'apps/web/src/app/collage/SocialCardScallop.tsx',
+        "import { scallopVertices } from '../music/stats/StatsShapes';\nexport const x = 'home__frameCard';\n",
+      ).map(({ rule }) => rule),
+      ['no-consumer-leakage-in-shared-component', 'no-consumer-leakage-in-shared-component'],
+    );
+
+    assert.deepEqual(
+      checkNoConsumerSelectorsInSharedCss(
+        new Map([
+          [
+            'apps/web/src/app/collage/pills.css',
+            '.collageBackdropHost :is(.reading__filters, .stats__toolbar) { position: sticky; }\n',
+          ],
+          [
+            'apps/web/src/app/collage/collage.css',
+            '.paperInner [data-typography]:not(.home__spotifyMetaInner *) { color: inherit; }\n',
+          ],
+          ['packages/maps/maps.css', '.strava__polaroidMap { width: 100%; }\n'],
+          ['apps/web/src/app/home/home.css', '.home__hello { padding-block: 14px; }\n'],
+        ]),
+      ).map(({ file, rule }) => ({ file, rule })),
+      [
+        {
+          file: 'apps/web/src/app/collage/pills.css',
+          rule: 'no-consumer-selectors-in-shared-css',
+        },
+        {
+          file: 'apps/web/src/app/collage/pills.css',
+          rule: 'no-consumer-selectors-in-shared-css',
+        },
+        {
+          file: 'apps/web/src/app/collage/collage.css',
+          rule: 'no-consumer-selectors-in-shared-css',
+        },
+        {
+          file: 'packages/maps/maps.css',
+          rule: 'no-consumer-selectors-in-shared-css',
+        },
+      ],
     );
   });
 

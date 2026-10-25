@@ -8,6 +8,7 @@ import {
   checkMigrationTransactions,
 } from './check-cache-tags.js';
 import {
+  checkNoConsumerSelectorsInSharedCss,
   checkOrphanCssFiles,
   checkRouteCssImports,
   checkTypeScale,
@@ -34,21 +35,14 @@ const BANNED_GENERIC_COMPONENT_FILENAMES: ReadonlySet<string> = new Set([
   'shared.tsx',
   'utils.tsx',
 ]);
-const NON_PUBLIC_PAGE_ROUTES: ReadonlySet<string> = new Set([
-  'apps/web/src/app/dev-console/page.tsx',
-]);
+const NON_PUBLIC_PAGE_ROUTES = new Set(['apps/web/src/app/dev-console/page.tsx']);
 const SOCIAL_IMAGE_FILENAMES = ['opengraph-image.tsx', 'twitter-image.tsx'] as const;
 const INLINE_TYPEOF_IMPORT_TOKEN = `${'typeof'} ${'import('}`;
 const BIOME_SUPPRESSION_TOKEN = `${'biome'}-${'ignore'}`;
 const DB_PACKAGE_TOKEN = `@dg/${'db'}`;
 const BIOME_CHECKED_FILE = /\.(?:c?js|mjs|tsx?|css|jsonc?)$/;
 
-export type StructureViolation = {
-  file: string;
-  line: number;
-  message: string;
-  rule: string;
-};
+export type StructureViolation = { file: string; line: number; message: string; rule: string };
 
 function isPureTypeModule(content: string): boolean {
   const withoutComments = content.replace(/\/\*[\s\S]*?\*\//g, '').replace(/^\s*\/\/.*$/gm, '');
@@ -63,16 +57,11 @@ function checkNoBiomeSuppressions(
   lines?: Array<string>,
 ): Array<StructureViolation> {
   if (!content.includes(BIOME_SUPPRESSION_TOKEN)) return [];
+  const rule = 'no-biome-suppressions';
+  const message = 'Fix the lint instead of suppressing it';
   return (lines ?? content.split('\n')).flatMap((lineText, i) =>
     lineText.includes(BIOME_SUPPRESSION_TOKEN)
-      ? [
-          {
-            file: relPath,
-            line: i + 1,
-            message: 'Fix the lint instead of suppressing it',
-            rule: 'no-biome-suppressions',
-          },
-        ]
+      ? [{ file: relPath, line: i + 1, message, rule }]
       : [],
   );
 }
@@ -273,35 +262,40 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
     cwd: repoRoot,
     encoding: 'utf8',
   });
-  const allTrackedPaths = [
+  const relPaths = [
     ...new Set(
       gitOutput
         .split('\n')
         .map((line) => line.trim())
         .filter(
-          (relPath) =>
-            Boolean(relPath) && !relPath.includes('/dist/') && !relPath.includes('/.next/'),
+          (p) =>
+            Boolean(p) &&
+            !p.includes('/dist/') &&
+            !p.includes('/.next/') &&
+            BIOME_CHECKED_FILE.test(p),
         ),
     ),
   ].sort();
 
-  const relPaths = allTrackedPaths.filter((relPath) => BIOME_CHECKED_FILE.test(relPath));
   const webCssPaths: Array<string> = [];
   const webSources = new Map<string, string>();
   const cssCodeSources = new Map<string, string>();
   const webImporters = new Map<string, string>();
   const webCss = new Map<string, string>();
+  const allCss = new Map<string, string>();
   const violations: Array<StructureViolation> = [];
 
   for (const relPath of relPaths) {
-    const fullPath = path.join(repoRoot, relPath);
     let content: string;
     try {
-      content = fs.readFileSync(fullPath, 'utf8');
+      content = fs.readFileSync(path.join(repoRoot, relPath), 'utf8');
     } catch {
       continue;
     }
     violations.push(...checkFileStructure(relPath, content));
+    if (relPath.endsWith('.css')) {
+      allCss.set(relPath, content);
+    }
     if (relPath.startsWith('apps/web/src/')) {
       if (relPath.endsWith('.css')) {
         webCssPaths.push(relPath);
@@ -312,25 +306,26 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
         cssCodeSources.set(relPath, content);
         webImporters.set(relPath, content);
       }
-    } else if (
-      (relPath.startsWith('packages/ui/') || relPath.startsWith('packages/maps/')) &&
-      /\.(ts|tsx)$/.test(relPath)
-    ) {
+    } else if (/^packages\/(?:ui|maps)\/.*\.(ts|tsx)$/.test(relPath)) {
       cssCodeSources.set(relPath, content);
     }
   }
-  violations.push(...checkOrphanCssFiles(webCssPaths, webImporters));
-  violations.push(...checkRouteCssImports(webCssPaths, webSources));
-  violations.push(...checkSocialImageRouteParity(webSources));
-  violations.push(...checkNoPageSubtitles(webSources), ...checkCacheTagParity(webSources));
-  violations.push(...checkTypeScale(webCss), ...checkCssGeometry(webCss));
-  violations.push(...checkUnusedCssRules(webCss, cssCodeSources));
-  return violations;
+  return [
+    ...violations,
+    ...checkOrphanCssFiles(webCssPaths, webImporters),
+    ...checkRouteCssImports(webCssPaths, webSources),
+    ...checkSocialImageRouteParity(webSources),
+    ...checkNoPageSubtitles(webSources),
+    ...checkCacheTagParity(webSources),
+    ...checkTypeScale(webCss),
+    ...checkCssGeometry(webCss),
+    ...checkNoConsumerSelectorsInSharedCss(allCss),
+    ...checkUnusedCssRules(webCss, cssCodeSources),
+  ];
 }
 
 function main() {
-  const scriptDir = path.dirname(fileURLToPath(import.meta.url));
-  const repoRoot = path.resolve(scriptDir, '../../..');
+  const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../../..');
   const violations = checkWorkspaceStructure(repoRoot);
   if (violations.length > 0) {
     for (const v of violations) {
