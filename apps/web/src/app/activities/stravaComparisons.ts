@@ -1,6 +1,6 @@
 import type { StravaSport } from '@dg/content-models/strava/StravaHistory';
+import { formatCount, METERS_PER_MILE } from '@dg/shared-core/formatting/formattedDistance';
 
-const METERS_PER_MILE = 1609.344;
 const EVEREST_METERS = 8849;
 const SECONDS_PER_DAY = 86_400;
 
@@ -26,12 +26,11 @@ const DISTANCE_YARDSTICKS: ReadonlyArray<{
   { from: 0, miles: 1.7, times: true, unit: 'across the Golden Gate' },
 ];
 
-const countFormat = new Intl.NumberFormat('en-US');
 const tenthFormat = new Intl.NumberFormat('en-US', { maximumFractionDigits: 1 });
 
 /** `0.84` → `0.8`, `6.8` → `6.8`, `1.02` → `1`, `56.4` → `56`. */
 function formatRatio(ratio: number): string {
-  return ratio < 10 ? tenthFormat.format(ratio) : countFormat.format(Math.round(ratio));
+  return ratio < 10 ? tenthFormat.format(ratio) : formatCount(ratio);
 }
 
 /** `0.8×` around Earth, `6.8×` across the US, down to `3.1` marathons or `2×` across the Golden Gate. */

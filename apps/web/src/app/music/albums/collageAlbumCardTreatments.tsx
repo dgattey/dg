@@ -1,3 +1,4 @@
+import { Skeleton } from '@dg/ui/core/Skeleton';
 import type { CSSProperties, ReactNode } from 'react';
 import {
   type CollageCardTreatment,
@@ -53,23 +54,13 @@ export function CollageAlbumPaper({
   );
 }
 
-function SkeletonLine({ width }: { width: number | string }) {
-  const w = typeof width === 'number' ? `${width}px` : width;
-  return (
-    <span
-      className="music__skeleton music__skeletonText"
-      style={{ '--skeleton-w': w } as CSSProperties}
-    />
-  );
-}
-
 function SkeletonFace() {
   return (
     <>
-      <span className="music__skeleton music__art" />
+      <Skeleton className="music__art" variant="rounded" />
       <div className="music__caption">
-        <SkeletonLine width="82%" />
-        <SkeletonLine width="58%" />
+        <Skeleton width="82%" />
+        <Skeleton width="58%" />
       </div>
     </>
   );
@@ -128,7 +119,7 @@ export function CollageHistorySkeleton() {
               tiltDeg={sectionIndex % 2 === 0 ? -1.2 : 0.8}
               tone={sectionIndex % 2 === 0 ? 'cream' : 'ochre'}
             >
-              <SkeletonLine width={120} />
+              <Skeleton width={120} />
             </PaperTag>
           </div>
           <div className="music__historySkeletonGrid">

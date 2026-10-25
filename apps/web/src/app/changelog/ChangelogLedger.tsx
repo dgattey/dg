@@ -1,6 +1,7 @@
 'use client';
 
 import type { ChangelogRelease } from '@dg/services/github/fetchReleases';
+import { formatUtcShortDate } from '@dg/shared-core/dates/periodStatus';
 import { startTransition, useState } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { type PaperPillOption, PaperPills } from '../collage/PaperPills';
@@ -11,7 +12,6 @@ import { ChangelogReleaseCard } from './ChangelogReleaseCard';
 import {
   extractReleaseYear,
   filterReleases,
-  formatReleaseDate,
   groupReleasesByYear,
   RELEASE_KIND_LABELS,
   type ReleaseFilter,
@@ -90,7 +90,7 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
             <span className="changelog__statKey">Current version</span>
             <span className="changelog__statValue">{latestRelease?.tag ?? 'v2.80.1'}</span>
             <span className="changelog__statSub">
-              {formatReleaseDate(latestRelease?.publishedAt ?? null) ?? 'Latest release'}
+              {formatUtcShortDate(latestRelease?.publishedAt) ?? 'Latest release'}
             </span>
           </Stub>
         </li>
@@ -113,7 +113,7 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
           <Stub className="stats__total" kind="ticket" tiltDeg={-1.6} tone="viridian">
             <span className="changelog__statKey">First release</span>
             <span className="changelog__statValue">
-              {formatReleaseDate(oldestRelease?.publishedAt ?? null) ?? 'Earliest release'}
+              {formatUtcShortDate(oldestRelease?.publishedAt) ?? 'Earliest release'}
             </span>
           </Stub>
         </li>
@@ -201,7 +201,9 @@ export function ChangelogLedger({ releases }: { releases: ReadonlyArray<Changelo
                     </div>
                     <ul className="changelog__compactList">
                       {group.compactReleases.map((release) => {
-                        const shortDate = formatReleaseDate(release.publishedAt, { short: true });
+                        const shortDate = formatUtcShortDate(release.publishedAt, {
+                          withYear: false,
+                        });
                         return (
                           <li id={release.tag} key={release.tag}>
                             <a

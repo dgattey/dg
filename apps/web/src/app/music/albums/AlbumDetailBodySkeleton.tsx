@@ -1,29 +1,6 @@
-import type { CSSProperties } from 'react';
+import { Skeleton } from '@dg/ui/core/Skeleton';
 
 const PLACEHOLDER_TRACKS = Array.from({ length: 6 }, (_, track) => `track-${track}`);
-
-function SkeletonLine({
-  height,
-  maxWidth,
-  width,
-}: {
-  height?: string;
-  maxWidth?: string;
-  width?: string;
-}) {
-  const vars: CSSProperties & Record<`--${string}`, string> = {};
-  if (height) vars['--skeleton-h'] = height;
-  if (maxWidth) vars['--skeleton-max-w'] = maxWidth;
-  if (width) vars['--skeleton-w'] = width;
-  return (
-    <span
-      aria-hidden="true"
-      className="music__skeleton music__skeletonText"
-      data-skeleton=""
-      style={Object.keys(vars).length > 0 ? vars : undefined}
-    />
-  );
-}
 
 /**
  * Holds the well open at roughly its loaded height while the tracklist streams
@@ -37,8 +14,8 @@ export function AlbumDetailBodySkeleton() {
   return (
     <div className="music__wellPlaceholder" data-role="album-detail-placeholder">
       <div className="music__wellMeta">
-        <SkeletonLine maxWidth="320px" width="55%" />
-        <SkeletonLine height="28px" maxWidth="380px" width="65%" />
+        <Skeleton maxWidth="320px" width="55%" />
+        <Skeleton height="28px" maxWidth="380px" width="65%" />
       </div>
       <div className="music__wellTracks">
         {PLACEHOLDER_TRACKS.map((track) => (
@@ -47,10 +24,10 @@ export function AlbumDetailBodySkeleton() {
             data-role="track-row-skeleton"
             key={track}
           >
-            <SkeletonLine />
+            <Skeleton />
             <div className="music__wellTrackBody">
-              <SkeletonLine width="70%" />
-              <SkeletonLine height="16px" width="45%" />
+              <Skeleton width="70%" />
+              <Skeleton height="16px" width="45%" />
             </div>
           </div>
         ))}

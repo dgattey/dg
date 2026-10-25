@@ -1,3 +1,4 @@
+import { formatYearTick } from '@dg/shared-core/dates/periodStatus';
 import { PAPER_PALETTE } from './paperPalette';
 import {
   type CutOutPiece,
@@ -323,7 +324,7 @@ export function MusicStatsSocialCard({
                         }}
                       />
                       <span style={{ fontSize: 12, opacity: isHighlighted ? 1 : 0.75 }}>
-                        ’{String(item.year).slice(-2)}
+                        {formatYearTick(item.year)}
                       </span>
                     </div>
                   );

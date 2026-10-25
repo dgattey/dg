@@ -4,10 +4,9 @@ import type { HeaderNavItem } from '@dg/content-models/contentful/renderables/fo
 import { favoriteAlbumsRoute, musicRoute, musicStatsRoute } from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import type { LucideIcon } from 'lucide-react';
-import { ChartColumn, ChevronDown, DiscAlbum, History } from 'lucide-react';
+import { ChartColumn, DiscAlbum, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { bindHoverMenu } from '../collage/hoverMenu';
-import { PaperCard } from '../collage/PaperCard';
+import { HoverMenu, MenuChevron, PillMenuList } from '../collage/PillMenu';
 import { cx } from '../collage/paperVars';
 import {
   DEFAULT_HEADER_NAV_ITEMS,
@@ -43,50 +42,40 @@ export function CollageMusicLinks({ items }: { items?: ReadonlyArray<HeaderNavIt
             item.links.some((link) => normalizeMusicPath(link.url) === pathname) ||
             (item.slug === 'header-music' && isMusicDestinationPath(pathname));
           return (
-            <details
-              className="chrome__music"
+            <HoverMenu
+              itemSelector="a[href]"
               key={item.slug ?? item.title}
-              ref={(node) => bindHoverMenu(node, 'a[href]')}
+              summary={
+                <>
+                  {item.title}
+                  <MenuChevron />
+                </>
+              }
+              summaryClassName={cx('chrome__segment', onMenuPage && 'chrome__segmentCurrent')}
             >
-              <summary
-                className={cx(
-                  'chrome__segment',
-                  'chrome__musicSummary',
-                  onMenuPage && 'chrome__segmentCurrent',
-                )}
-              >
-                {item.title}
-                <ChevronDown aria-hidden={true} className="chrome__musicChevron" size={18} />
-              </summary>
-              <PaperCard
-                className="chrome__musicPanel"
-                edge="quad-a"
-                innerClassName="chrome__musicPanelInner"
-              >
-                <ul className="chrome__musicList">
-                  {item.links.map((link) => {
-                    const normalizedUrl = normalizeMusicPath(link.url);
-                    const Icon =
-                      (link.icon ? DESTINATION_ICONS[link.icon] : undefined) ??
-                      DESTINATION_ICONS[normalizedUrl];
-                    const current = pathname === normalizedUrl;
-                    return (
-                      <li key={link.url}>
-                        <PageTransitionLink
-                          aria-current={current ? 'page' : undefined}
-                          className="chrome__musicLink"
-                          href={link.url}
-                          title={link.title}
-                        >
-                          {Icon ? <Icon aria-hidden={true} size={20} /> : null}
-                          {link.title}
-                        </PageTransitionLink>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </PaperCard>
-            </details>
+              <PillMenuList>
+                {item.links.map((link) => {
+                  const normalizedUrl = normalizeMusicPath(link.url);
+                  const Icon =
+                    (link.icon ? DESTINATION_ICONS[link.icon] : undefined) ??
+                    DESTINATION_ICONS[normalizedUrl];
+                  const current = pathname === normalizedUrl;
+                  return (
+                    <li key={link.url}>
+                      <PageTransitionLink
+                        aria-current={current ? 'page' : undefined}
+                        className="chrome__musicLink"
+                        href={link.url}
+                        title={link.title}
+                      >
+                        {Icon ? <Icon aria-hidden={true} size={20} /> : null}
+                        {link.title}
+                      </PageTransitionLink>
+                    </li>
+                  );
+                })}
+              </PillMenuList>
+            </HoverMenu>
           );
         }
 

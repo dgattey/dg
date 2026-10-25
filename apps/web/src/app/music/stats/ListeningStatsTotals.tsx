@@ -1,10 +1,10 @@
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
+import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
 import { favoriteAlbumsRoute, musicRoute } from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import type { ReactNode } from 'react';
 import type { PaperTone } from '../../collage/types';
 import {
-  formatCount,
   formatHours,
   formatPercent,
   formatPlaysHeading,

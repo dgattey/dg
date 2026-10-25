@@ -1,10 +1,11 @@
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
+import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
 import { Tooltip } from '@dg/ui/core/Tooltip';
 import { Image } from '@dg/ui/dependent/Image';
 import type { CSSProperties } from 'react';
 import { PaperCard } from '../../collage/PaperCard';
 import { cx } from '../../collage/paperVars';
-import { formatCount, formatHours, formatPercent, formatRangeSuffix } from './listeningStatsFormat';
+import { formatHours, formatPercent, formatRangeSuffix } from './listeningStatsFormat';
 import { bar, CardHead } from './StatsCardParts';
 import { AlbumLink, ArtistLinks, SpotifyAnchor } from './StatsLinks';
 

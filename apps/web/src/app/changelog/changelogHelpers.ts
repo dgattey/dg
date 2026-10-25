@@ -59,33 +59,6 @@ export function yearTagTreatment(index: number): { tiltDeg: number; tone: PaperT
   };
 }
 
-const RELEASE_DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
-  day: 'numeric',
-  month: 'short',
-  timeZone: 'UTC',
-  year: 'numeric',
-});
-
-const SHORT_DATE_FORMATTER = new Intl.DateTimeFormat('en-US', {
-  day: 'numeric',
-  month: 'short',
-  timeZone: 'UTC',
-});
-
-export function formatReleaseDate(
-  publishedAt: string | null,
-  options?: { short?: boolean },
-): string | null {
-  if (!publishedAt) {
-    return null;
-  }
-  const date = new Date(publishedAt);
-  if (Number.isNaN(date.getTime())) {
-    return null;
-  }
-  return options?.short ? SHORT_DATE_FORMATTER.format(date) : RELEASE_DATE_FORMATTER.format(date);
-}
-
 export function extractReleaseYear(release: ChangelogRelease): string {
   if (release.publishedAt) {
     const year = release.publishedAt.slice(0, 4);

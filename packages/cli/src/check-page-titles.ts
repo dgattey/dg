@@ -138,3 +138,113 @@ export function checkNoPageSubtitles(
   }
   return violations;
 }
+
+const HOVER_MENU_OWNERS = new Set([
+  'apps/web/src/app/collage/PillMenu.tsx',
+  'apps/web/src/app/collage/hoverMenu.ts',
+]);
+const SKELETON_OWNERS = new Set(['packages/ui/core/Skeleton.tsx', 'packages/ui/theme/index.ts']);
+const UNIT_CONSTANT_OWNERS = new Set([
+  'apps/web/src/app/activities/stravaFormat.ts',
+  'packages/shared-core/formatting/formattedDistance.ts',
+]);
+
+export function checkNoDuplicateImplementations(
+  relPath: string,
+  content: string,
+  lines?: ReadonlyArray<string>,
+): Array<StructureViolation> {
+  if (isTestFile(relPath) || relPath.startsWith('packages/cli/')) {
+    return [];
+  }
+  const checkHoverMenu = !HOVER_MENU_OWNERS.has(relPath) && content.includes('bindHoverMenu');
+  const checkSkeleton =
+    !SKELETON_OWNERS.has(relPath) &&
+    (content.includes('SkeletonLine') || content.includes('data-skeleton'));
+  const checkCronAuth =
+    relPath.startsWith('apps/web/src/app/api/') &&
+    relPath !== 'apps/web/src/app/api/apiResponses.ts' &&
+    content.includes('CRON_SECRET');
+  const checkTimingSafe =
+    relPath !== 'packages/services/auth/devConsoleBasicAuth.ts' &&
+    content.includes('timingSafeEqual');
+  const checkUnitConstants =
+    !UNIT_CONSTANT_OWNERS.has(relPath) &&
+    (content.includes('METERS_PER_MILE') || content.includes('FEET_PER_METER'));
+  const checkCountFormatter =
+    relPath !== 'packages/shared-core/formatting/formattedDistance.ts' &&
+    content.includes('Intl.NumberFormat');
+
+  if (
+    !checkHoverMenu &&
+    !checkSkeleton &&
+    !checkCronAuth &&
+    !checkTimingSafe &&
+    !checkUnitConstants &&
+    !checkCountFormatter
+  ) {
+    return [];
+  }
+
+  const sourceLines = lines ?? content.split('\n');
+  const violations: Array<StructureViolation> = [];
+  for (let i = 0; i < sourceLines.length; i += 1) {
+    const lineText = sourceLines[i] ?? '';
+    const line = i + 1;
+    if (checkHoverMenu && /\bbindHoverMenu\b/.test(lineText)) {
+      violations.push({
+        file: relPath,
+        line,
+        message:
+          'Use HoverMenu or PillMenu from apps/web/src/app/collage/PillMenu.tsx instead of wiring bindHoverMenu directly',
+        rule: 'no-duplicate-hover-menu',
+      });
+    }
+    if (checkSkeleton && /\bfunction\s+SkeletonLine\b|\bdata-skeleton\b/.test(lineText)) {
+      violations.push({
+        file: relPath,
+        line,
+        message:
+          'Use Skeleton from @dg/ui/core/Skeleton instead of defining a custom SkeletonLine or raw data-skeleton element',
+        rule: 'no-duplicate-skeleton',
+      });
+    }
+    if (checkCronAuth && /\bprocess\.env\.CRON_SECRET\b/.test(lineText)) {
+      violations.push({
+        file: relPath,
+        line,
+        message:
+          'Use isCronAuthorized from apps/web/src/app/api/apiResponses.ts instead of duplicating CRON_SECRET Bearer checks',
+        rule: 'no-duplicate-cron-auth',
+      });
+    }
+    if (checkTimingSafe && /\btimingSafeEqual\s*\(/.test(lineText)) {
+      violations.push({
+        file: relPath,
+        line,
+        message:
+          'Use timingSafeEqualStrings from @dg/services/auth/devConsoleBasicAuth instead of calling crypto.timingSafeEqual directly',
+        rule: 'no-duplicate-timing-safe-equal',
+      });
+    }
+    if (checkUnitConstants && /\b(?:METERS_PER_MILE|FEET_PER_METER)\s*=/.test(lineText)) {
+      violations.push({
+        file: relPath,
+        line,
+        message:
+          'Import METERS_PER_MILE from @dg/shared-core/formatting/formattedDistance and formatFeet/formatMiles from stravaFormat.ts instead of redeclaring conversion constants',
+        rule: 'no-duplicate-unit-constants',
+      });
+    }
+    if (checkCountFormatter && /new\s+Intl\.NumberFormat\(\s*['"]en-US['"]\s*\)/.test(lineText)) {
+      violations.push({
+        file: relPath,
+        line,
+        message:
+          'Use formatCount from @dg/shared-core/formatting/formattedDistance instead of instantiating a duplicate bare Intl.NumberFormat("en-US")',
+        rule: 'no-duplicate-count-formatter',
+      });
+    }
+  }
+  return violations;
+}

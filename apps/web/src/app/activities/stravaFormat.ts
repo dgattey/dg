@@ -1,10 +1,9 @@
 import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
+import { formatCount, METERS_PER_MILE } from '@dg/shared-core/formatting/formattedDistance';
 
-const METERS_PER_MILE = 1609.344;
 const FEET_PER_METER = 3.280_84;
 const SECONDS_PER_HOUR = 3600;
 
-const countFormat = new Intl.NumberFormat('en-US');
 const tenthFormat = new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 1,
   minimumFractionDigits: 1,
@@ -24,10 +23,6 @@ const dateFormat = new Intl.DateTimeFormat('en-US', {
   timeZone: SITE_TIME_ZONE,
   year: 'numeric',
 });
-
-export function formatCount(value: number): string {
-  return countFormat.format(Math.round(value));
-}
 
 /** Miles to a tenth under a hundred (`15.9`), whole miles above (`4,865`). */
 export function formatMiles(meters: number): string {

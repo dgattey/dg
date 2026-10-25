@@ -203,7 +203,16 @@ h1, h2, h3, h4 {
   border-radius: 4px;
   display: block;
   height: var(--skeleton-h, 1.2em);
+  max-width: var(--skeleton-max-w, none);
   width: var(--skeleton-w, auto);
+}
+:where([data-skeleton=""]) {
+  border-radius: 4px / 6.7px;
+  transform: scale(1, 0.6);
+  transform-origin: 0 55%;
+}
+:where([data-skeleton=""]:empty)::before {
+  content: "\\00a0";
 }
 :where([data-skeleton="rounded"]) {
   border-radius: 8px;

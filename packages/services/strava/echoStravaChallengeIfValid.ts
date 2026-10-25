@@ -1,7 +1,7 @@
 import 'server-only';
 
-import { timingSafeEqual } from 'node:crypto';
 import { log } from '@dg/shared-core/logging/log';
+import { timingSafeEqualStrings } from '../auth/devConsoleBasicAuth';
 
 type Query = Partial<Record<string, string | Array<string>>> | URLSearchParams;
 
@@ -16,21 +16,6 @@ const getQueryValue = (query: Query, key: string) => {
   }
   const value = query[key];
   return Array.isArray(value) ? value[0] : value;
-};
-
-const tokensMatchConstantTime = (
-  verifyToken: string | undefined,
-  expectedToken: string | undefined,
-): boolean => {
-  if (!verifyToken || !expectedToken) {
-    return false;
-  }
-  const receivedBuffer = Buffer.from(verifyToken, 'utf8');
-  const expectedBuffer = Buffer.from(expectedToken, 'utf8');
-  if (receivedBuffer.length !== expectedBuffer.length) {
-    return false;
-  }
-  return timingSafeEqual(receivedBuffer, expectedBuffer);
 };
 
 /**
@@ -48,7 +33,7 @@ const isSubscription = (query: Query) => {
   const expectedToken = process.env.STRAVA_VERIFY_TOKEN?.trim();
 
   const modeMatches = mode === VALID_MODE;
-  const tokenMatches = tokensMatchConstantTime(verifyToken, expectedToken);
+  const tokenMatches = timingSafeEqualStrings(verifyToken, expectedToken);
 
   if (!modeMatches || !tokenMatches) {
     log.info('Strava challenge validation details', {

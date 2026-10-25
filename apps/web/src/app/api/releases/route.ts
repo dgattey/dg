@@ -1,26 +1,9 @@
-import { timingSafeEqual } from 'node:crypto';
 import { GITHUB_REPOSITORY_URL, upsertRelease } from '@dg/services/github/fetchReleases';
 import { log } from '@dg/shared-core/logging/log';
 import { revalidateTag } from 'next/cache';
 import { type NextRequest, NextResponse } from 'next/server';
 import { CACHE_TAGS } from '../../../services/cacheTags';
-
-const BEARER_PREFIX = 'Bearer ';
-
-function isAuthorized(request: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET?.trim();
-  const authHeader = request.headers.get('authorization');
-  if (!secret || !authHeader?.startsWith(BEARER_PREFIX)) {
-    return false;
-  }
-  const provided = authHeader.slice(BEARER_PREFIX.length);
-  const providedBuffer = Buffer.from(provided, 'utf8');
-  const expectedBuffer = Buffer.from(secret, 'utf8');
-  if (providedBuffer.length !== expectedBuffer.length) {
-    return false;
-  }
-  return timingSafeEqual(providedBuffer, expectedBuffer);
-}
+import { isCronAuthorized } from '../apiResponses';
 
 type ReleasePayload = {
   body?: unknown;
@@ -39,7 +22,7 @@ type ReleaseSyncResponse = {
 };
 
 export async function handleReleaseSync(request: NextRequest): Promise<ReleaseSyncResponse> {
-  if (!isAuthorized(request)) {
+  if (!isCronAuthorized(request)) {
     log.warn('Unauthorized release sync request', {
       hasAuthHeader: request.headers.has('authorization'),
     });

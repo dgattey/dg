@@ -47,49 +47,25 @@ function isAppPage(href: string): boolean {
   );
 }
 
-function PaperButtonWrap({
-  children,
-  edge = 'quad-c',
-  tiltDeg = 0,
-  tone = 'cream',
-}: Pick<PaperButtonLook, 'children' | 'edge' | 'tiltDeg' | 'tone'>) {
-  return (
-    <span className="paperWrap paperButtonWrap" style={paperSurfaceVars(tone, edge, tiltDeg)}>
-      {children}
-    </span>
-  );
-}
-
-function paperButtonClassName(current: boolean | undefined, className: string | undefined) {
-  return cx('paperButton', current && 'paperButtonCurrent', className);
-}
-
-/** The paper button look on a plain span, for a control that owns its element, like `<summary>`. */
-export function PaperButtonFace({ children, className, current, ...look }: PaperButtonLook) {
-  return (
-    <PaperButtonWrap {...look}>
-      <span className={paperButtonClassName(current, className)}>{children}</span>
-    </PaperButtonWrap>
-  );
-}
-
 export function PaperButton({
   children,
   className,
   current,
   disabled = false,
+  edge = 'quad-c',
   expanded,
   href,
   onClick,
+  tiltDeg = 0,
   title,
+  tone = 'cream',
   type = 'button',
-  ...look
 }: PaperButtonProps) {
-  const classNames = paperButtonClassName(current, className);
+  const classNames = cx('paperButton', current && 'paperButtonCurrent', className);
   const ariaCurrent = current ? 'page' : undefined;
 
   return (
-    <PaperButtonWrap {...look}>
+    <span className="paperWrap paperButtonWrap" style={paperSurfaceVars(tone, edge, tiltDeg)}>
       {href === undefined ? (
         <button
           aria-expanded={expanded}
@@ -122,6 +98,6 @@ export function PaperButton({
           {children}
         </a>
       )}
-    </PaperButtonWrap>
+    </span>
   );
 }

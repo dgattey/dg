@@ -1,6 +1,12 @@
 const encoder = new TextEncoder();
 
-function timingSafeEqualStrings(left: string, right: string): boolean {
+export function timingSafeEqualStrings(
+  left: string | null | undefined,
+  right: string | null | undefined,
+): boolean {
+  if (!left || !right) {
+    return false;
+  }
   const leftBytes = encoder.encode(left);
   const rightBytes = encoder.encode(right);
   let mismatch = leftBytes.length ^ rightBytes.length;

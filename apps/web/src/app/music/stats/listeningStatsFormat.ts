@@ -1,8 +1,8 @@
 import type { ListeningStats } from '@dg/services/spotify/fetchListeningStats';
 import { SITE_TIME_ZONE } from '@dg/shared-core/dates/periodStatus';
 import type { StatsRange } from '@dg/shared-core/dates/statsRange';
+import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
 
-const countFormat = new Intl.NumberFormat('en-US');
 const dayFormat = new Intl.DateTimeFormat('en-GB', {
   day: 'numeric',
   month: 'short',
@@ -25,10 +25,6 @@ const pacificMonthFormat = new Intl.DateTimeFormat('en-GB', {
   timeZone: SITE_TIME_ZONE,
   year: 'numeric',
 });
-
-export function formatCount(value: number): string {
-  return countFormat.format(Math.round(value));
-}
 
 export function formatHours(hours: number): string {
   if (hours > 0 && hours < 10) {
@@ -64,11 +60,6 @@ export function formatMonth(month: string): string {
 /** A timestamp as the Pacific month it fell in, `Jul 2011`. */
 export function formatPacificMonth(timestamp: string): string {
   return pacificMonthFormat.format(new Date(timestamp));
-}
-
-/** `2017` → `’17`. */
-export function formatYearTick(year: number): string {
-  return `\u2019${String(year).slice(-2)}`;
 }
 
 export function formatRangeSuffix(range: StatsRange): string {

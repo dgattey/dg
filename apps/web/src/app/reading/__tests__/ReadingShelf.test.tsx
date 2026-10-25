@@ -1,13 +1,13 @@
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import type { RenderableBook } from '@dg/content-models/contentful/renderables/books';
+import { formatUtcShortDate } from '@dg/shared-core/dates/periodStatus';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ReadingShelf } from '../ReadingShelf';
 import {
   bookCardKind,
   featuredBook,
-  formatFinishedDate,
   readingFilterOptions,
   shelfSections,
   shelfStats,
@@ -94,9 +94,9 @@ const IN_PROGRESS: RenderableBook = {
 
 describe('readingHelpers', () => {
   it('formats finished dates with or without the year', () => {
-    expect(formatFinishedDate('2026-09-16T00:00:00Z', { withYear: true })).toBe('Sep 16, 2026');
-    expect(formatFinishedDate('2025-01-04T00:00:00Z', { withYear: false })).toBe('Jan 4');
-    expect(formatFinishedDate(null, { withYear: true })).toBeNull();
+    expect(formatUtcShortDate('2026-09-16T00:00:00Z', { withYear: true })).toBe('Sep 16, 2026');
+    expect(formatUtcShortDate('2025-01-04T00:00:00Z', { withYear: false })).toBe('Jan 4');
+    expect(formatUtcShortDate(null, { withYear: true })).toBeNull();
   });
 
   it('only offers filters that narrow the shelf', () => {

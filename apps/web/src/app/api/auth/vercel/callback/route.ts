@@ -1,4 +1,4 @@
-import { timingSafeEqual } from 'node:crypto';
+import { timingSafeEqualStrings } from '@dg/services/auth/devConsoleBasicAuth';
 import { vercelAuthCallbackRoute } from '@dg/shared-core/routes/api';
 import { cookies } from 'next/headers';
 import type { NextRequest } from 'next/server';
@@ -27,18 +27,6 @@ type UserInfoResponse = {
   name?: string;
   preferred_username?: string;
 };
-
-function valuesMatch(value: string | null, storedValue: string | undefined): boolean {
-  if (!value || !storedValue) {
-    return false;
-  }
-  const valueBuffer = Buffer.from(value, 'utf8');
-  const storedBuffer = Buffer.from(storedValue, 'utf8');
-  if (valueBuffer.length !== storedBuffer.length) {
-    return false;
-  }
-  return timingSafeEqual(valueBuffer, storedBuffer);
-}
 
 function decodeIdTokenNonce(idToken: string): string | null {
   const parts = idToken.split('.');
@@ -130,7 +118,7 @@ export async function GET(request: NextRequest) {
     const storedNonce = request.cookies.get(VERCEL_OAUTH_NONCE_COOKIE)?.value;
     const codeVerifier = request.cookies.get(VERCEL_OAUTH_CODE_VERIFIER_COOKIE)?.value;
 
-    if (!valuesMatch(state, storedState)) {
+    if (!timingSafeEqualStrings(state, storedState)) {
       return redirectToConsoleWithAuthError(request, 'state_mismatch');
     }
 
@@ -142,7 +130,7 @@ export async function GET(request: NextRequest) {
     const tokenData = await exchangeCodeForToken(code, codeVerifier, redirectUri);
     const idTokenNonce = decodeIdTokenNonce(tokenData.id_token);
 
-    if (!valuesMatch(idTokenNonce, storedNonce)) {
+    if (!timingSafeEqualStrings(idTokenNonce, storedNonce)) {
       return redirectToConsoleWithAuthError(request, 'nonce_mismatch');
     }
 

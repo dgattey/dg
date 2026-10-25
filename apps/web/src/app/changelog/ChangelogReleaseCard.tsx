@@ -1,10 +1,10 @@
 import type { ChangelogRelease } from '@dg/services/github/fetchReleases';
+import { formatUtcShortDate } from '@dg/shared-core/dates/periodStatus';
 import Image from 'next/image';
 import type { CSSProperties } from 'react';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
 import {
-  formatReleaseDate,
   formatReleaseNote,
   githubPullRequestUrl,
   RELEASE_KIND_LABELS,
@@ -23,7 +23,7 @@ export function ChangelogReleaseCard({
   release: ChangelogRelease;
 }) {
   const { edge, tiltDeg } = releaseCardTreatment(index);
-  const formattedDate = formatReleaseDate(release.publishedAt);
+  const formattedDate = formatUtcShortDate(release.publishedAt);
   const kindTone = RELEASE_KIND_TONES[release.kind];
   const kindLabel = RELEASE_KIND_LABELS[release.kind];
   const snapshot = release.snapshot;

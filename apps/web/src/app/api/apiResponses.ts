@@ -3,9 +3,21 @@ import 'server-only';
 import {
   hasDevConsoleCredentials,
   isDevConsoleAccessAllowed,
+  timingSafeEqualStrings,
 } from '@dg/services/auth/devConsoleBasicAuth';
 import { devConsoleRoute } from '@dg/shared-core/routes/app';
 import { type NextRequest, NextResponse } from 'next/server';
+
+const BEARER_PREFIX = 'Bearer ';
+
+export function isCronAuthorized(request: NextRequest): boolean {
+  const secret = process.env.CRON_SECRET?.trim();
+  const authHeader = request.headers.get('authorization');
+  if (!secret || !authHeader?.startsWith(BEARER_PREFIX)) {
+    return false;
+  }
+  return timingSafeEqualStrings(authHeader.slice(BEARER_PREFIX.length), secret);
+}
 
 export const jsonError = (message: string, status = 500) =>
   NextResponse.json({ error: message }, { status });

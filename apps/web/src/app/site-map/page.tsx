@@ -3,7 +3,6 @@ import './siteMap.css';
 
 import { siteMapRoute } from '@dg/shared-core/routes/app';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
-import { Image } from '@dg/ui/dependent/Image';
 import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import { getSideProjects } from '../../services/contentful';
@@ -11,6 +10,7 @@ import { CollageBackdrop } from '../collage/CollageBackdrop';
 import { CutLetters } from '../collage/CutLetters';
 import { PaperCard } from '../collage/PaperCard';
 import { PaperTag } from '../collage/PaperTag';
+import { SideProjectMark } from '../home/GatteySitesCard';
 import { formatElsewhereHandle } from '../layouts/Footer';
 import { markdownAlternates } from '../layouts/markdownAlternates';
 import { SITE_MAP_AGENT_SURFACES, SITE_MAP_BACKDROP, SITE_MAP_PAGES } from './siteMapCatalog';
@@ -100,19 +100,7 @@ export async function SiteMapDirectory() {
                       rel="noopener noreferrer"
                       target="_blank"
                     >
-                      <span
-                        aria-hidden="true"
-                        className="siteMap__appMark"
-                        data-role="side-project-mark"
-                      >
-                        <Image
-                          alt=""
-                          height={project.mark.height}
-                          sizes={{ extraLarge: 44 }}
-                          url={project.mark.url}
-                          width={project.mark.width}
-                        />
-                      </span>
+                      <SideProjectMark className="siteMap__appMark" mark={project.mark} />
                       <span className="siteMap__appBody">
                         <span className="siteMap__appHeader">
                           <b className="siteMap__appTitle">{project.title}</b>

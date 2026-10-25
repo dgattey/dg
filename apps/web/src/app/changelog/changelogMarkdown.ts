@@ -1,10 +1,11 @@
 import 'server-only';
 
+import { formatUtcShortDate } from '@dg/shared-core/dates/periodStatus';
 import { changelogRoute } from '@dg/shared-core/routes/app';
 import { getChangelogReleases } from '../../services/github';
 import { relatedPageLinksMarkdown } from '../llm-markdown/relatedPageLinksMarkdown';
 import { SITE_NAME } from '../metadata';
-import { extractReleaseYear, formatReleaseDate, RELEASE_KIND_LABELS } from './changelogHelpers';
+import { extractReleaseYear, RELEASE_KIND_LABELS } from './changelogHelpers';
 
 export async function getChangelogMarkdown(): Promise<string> {
   try {
@@ -27,7 +28,7 @@ export async function getChangelogMarkdown(): Promise<string> {
 
       for (const [year, yearReleases] of byYear) {
         const lines = yearReleases.map((release) => {
-          const date = formatReleaseDate(release.publishedAt);
+          const date = formatUtcShortDate(release.publishedAt);
           const dateSuffix = date ? ` — ${date}` : '';
           const kind = RELEASE_KIND_LABELS[release.kind];
           const notes =

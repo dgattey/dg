@@ -1,13 +1,13 @@
 import 'server-only';
 
 import type { SpotifyLink } from '@dg/services/spotify/spotifyLinks';
+import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
 import { musicStatsRoute } from '@dg/shared-core/routes/app';
 import { getListeningStats } from '../../../services/musicStats';
 import { relatedPageLinksMarkdown } from '../../llm-markdown/relatedPageLinksMarkdown';
 import { SITE_NAME } from '../../metadata';
 import {
   DAY_PARTS,
-  formatCount,
   formatDay,
   formatDayPartHours,
   formatHourRange,

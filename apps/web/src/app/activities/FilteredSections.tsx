@@ -5,6 +5,7 @@ import type { AtlasRegion } from '@dg/maps/atlasGeometry';
 import { RouteAtlasMap } from '@dg/maps/src/RouteAtlasMap';
 import type { GeoBounds } from '@dg/maps/src/routeFrame';
 import type { TileSource } from '@dg/maps/src/tileSource';
+import { formatCount } from '@dg/shared-core/formatting/formattedDistance';
 import { useRef } from 'react';
 import { PaperStrip } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
@@ -15,7 +16,7 @@ import { BiggestClimbs, LongestOutings, RecentOutings } from './OutingLog';
 import { RoutePolaroid } from './RoutePolaroid';
 import { useFilteredOutings } from './StravaFilters';
 import { distanceComparison, everestComparison, movingTimeComparison } from './stravaComparisons';
-import { formatCompactFeet, formatCount, formatHours, formatMiles } from './stravaFormat';
+import { formatCompactFeet, formatHours, formatMiles } from './stravaFormat';
 import { SPORT_DETAILS, toMapRoutes } from './stravaSports';
 import {
   biggestClimbs,
