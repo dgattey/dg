@@ -9,7 +9,7 @@ import {
   type RenderableRichTextContent,
 } from '@dg/content-models/contentful/renderables/richText';
 import { isRecord } from '@dg/shared-core/types/typeguards';
-import { Typography } from '../core/Typography';
+import { Typography, type TypographyVariant } from '../core/Typography';
 import { Image } from './Image';
 import { Link } from './Link';
 
@@ -77,11 +77,13 @@ function AssetElement({
 }
 
 function HeadingWithId({
+  as,
   children,
   variant,
 }: {
+  as: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
   children: React.ReactNode;
-  variant: 'h1' | 'h2' | 'h3' | 'h4' | 'h5' | 'h6';
+  variant: TypographyVariant;
 }) {
   let id = '';
   if (typeof children === 'string') {
@@ -96,13 +98,16 @@ function HeadingWithId({
     .replace(/-+/g, '-')
     .replace(/^-|-$/g, '');
   return (
-    <Typography data-rich-heading="" id={id} variant={variant}>
+    <Typography as={as} data-rich-heading="" id={id} variant={variant}>
       {children}
     </Typography>
   );
 }
 
-const renderOptions = (links: RenderableRichTextContent['links']): Options => {
+const renderOptions = (
+  links: RenderableRichTextContent['links'],
+  variant: TypographyVariant,
+): Options => {
   const assetMap = new Map<string, RenderableAssetWithSys>();
   links.assets.block.forEach((asset) => {
     assetMap.set(asset.sys.id, asset);
@@ -115,14 +120,38 @@ const renderOptions = (links: RenderableRichTextContent['links']): Options => {
 
   return {
     renderNode: {
-      [BLOCKS.HEADING_1]: (_, children) => <HeadingWithId variant="h1">{children}</HeadingWithId>,
-      [BLOCKS.HEADING_2]: (_, children) => <HeadingWithId variant="h2">{children}</HeadingWithId>,
-      [BLOCKS.HEADING_3]: (_, children) => <HeadingWithId variant="h3">{children}</HeadingWithId>,
-      [BLOCKS.HEADING_4]: (_, children) => <HeadingWithId variant="h4">{children}</HeadingWithId>,
-      [BLOCKS.HEADING_5]: (_, children) => <HeadingWithId variant="h5">{children}</HeadingWithId>,
-      [BLOCKS.HEADING_6]: (_, children) => <HeadingWithId variant="h6">{children}</HeadingWithId>,
+      [BLOCKS.HEADING_1]: (_, children) => (
+        <HeadingWithId as="h1" variant="display-page">
+          {children}
+        </HeadingWithId>
+      ),
+      [BLOCKS.HEADING_2]: (_, children) => (
+        <HeadingWithId as="h2" variant="stat-md">
+          {children}
+        </HeadingWithId>
+      ),
+      [BLOCKS.HEADING_3]: (_, children) => (
+        <HeadingWithId as="h3" variant="title-md">
+          {children}
+        </HeadingWithId>
+      ),
+      [BLOCKS.HEADING_4]: (_, children) => (
+        <HeadingWithId as="h4" variant="label">
+          {children}
+        </HeadingWithId>
+      ),
+      [BLOCKS.HEADING_5]: (_, children) => (
+        <HeadingWithId as="h5" variant="title-sm">
+          {children}
+        </HeadingWithId>
+      ),
+      [BLOCKS.HEADING_6]: (_, children) => (
+        <HeadingWithId as="h6" variant="row-title">
+          {children}
+        </HeadingWithId>
+      ),
       [BLOCKS.PARAGRAPH]: (_, children) => (
-        <Typography data-rich-paragraph="" variant="body1">
+        <Typography data-rich-paragraph="" variant={variant}>
           {children}
         </Typography>
       ),
@@ -140,13 +169,15 @@ const renderOptions = (links: RenderableRichTextContent['links']): Options => {
   };
 };
 
-/**
- * Complicated component to render rich text from Contentful's rich
- * text renderer, resolving all items to components
- */
-export function RichText({ json, links }: RenderableRichTextContent) {
+export function RichText({
+  json,
+  links,
+  variant = 'prose-lg',
+}: RenderableRichTextContent & { variant?: TypographyVariant }) {
   if (!isRichTextDocument(json)) {
     return null;
   }
-  return <div data-rich-text="">{documentToReactComponents(json, renderOptions(links))}</div>;
+  return (
+    <div data-rich-text="">{documentToReactComponents(json, renderOptions(links, variant))}</div>
+  );
 }

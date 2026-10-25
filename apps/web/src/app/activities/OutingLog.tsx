@@ -17,7 +17,9 @@ const LOOP_SIZE = 30;
 const fold = <span aria-hidden="true" className="strava__fold" />;
 
 const nothingYet = (
-  <li className="strava__emptyRow strava__soft">Nothing here for these filters</li>
+  <li className="strava__emptyRow strava__soft" data-typography="row-title">
+    Nothing here for these filters
+  </li>
 );
 
 function OutingLink({ className, outing }: { className: string; outing: StravaLogEntry }) {
@@ -56,17 +58,21 @@ export function RecentOutings({ outings }: { outings: ReadonlyArray<StravaLogEnt
       tag={fold}
       tiltDeg={1.2}
     >
-      <h2 className="strava__heading">Recent activities</h2>
+      <h2 className="strava__heading" data-typography="title-md">
+        Recent activities
+      </h2>
       <ol className="strava__rows">
         {outings.length === 0 ? nothingYet : null}
         {outings.map((outing) => (
-          <li className="strava__logRow" key={outing.id}>
+          <li className="strava__logRow" data-typography="row-title" key={outing.id}>
             <Loop outing={outing} />
-            <span className="strava__date strava__soft">{formatOutingDay(outing.startDate)}</span>
+            <span className="strava__date strava__soft" data-typography="meta">
+              {formatOutingDay(outing.startDate)}
+            </span>
             <OutingLink className="strava__rowName" outing={outing} />
             <SportChip sport={outing.sport} />
             <span className="strava__number">{formatMiles(outing.distanceMeters)} mi</span>
-            <span className="strava__number strava__soft">
+            <span className="strava__number strava__soft" data-typography="meta">
               {formatFeet(outing.elevationGainMeters)} ft
             </span>
           </li>
@@ -86,14 +92,16 @@ export function BiggestClimbs({ outings }: { outings: ReadonlyArray<StravaLogEnt
       tag={fold}
       tiltDeg={-1.4}
     >
-      <h2 className="strava__heading">Biggest climbs</h2>
+      <h2 className="strava__heading" data-typography="title-md">
+        Biggest climbs
+      </h2>
       <ol className="strava__rows">
         {outings.length === 0 ? nothingYet : null}
         {outings.map((outing) => (
-          <li className="strava__climbRow" key={outing.id}>
+          <li className="strava__climbRow" data-typography="row-title" key={outing.id}>
             <span className="strava__climbName">
               <OutingLink className="strava__rowName" outing={outing} />
-              <span className="strava__date strava__soft">
+              <span className="strava__date strava__soft" data-typography="meta">
                 {formatMiles(outing.distanceMeters)} mi · {formatOutingDate(outing.startDate)}
               </span>
             </span>
@@ -121,23 +129,27 @@ export function LongestOutings({
       tag={fold}
       tiltDeg={-0.8}
     >
-      <h2 className="strava__heading">{heading}</h2>
+      <h2 className="strava__heading" data-typography="title-md">
+        {heading}
+      </h2>
       <ol className="strava__rows">
         {outings.length === 0 ? nothingYet : null}
         {outings.map((outing, index) => (
-          <li className="strava__distanceRow" key={outing.id}>
-            <span className="strava__rank strava__soft">{index + 1}</span>
+          <li className="strava__distanceRow" data-typography="row-title" key={outing.id}>
+            <span className="strava__soft" data-typography="meta">
+              {index + 1}
+            </span>
             <span className="strava__climbName">
               <OutingLink className="strava__rowName" outing={outing} />
-              <span className="strava__date strava__soft">
+              <span className="strava__date strava__soft" data-typography="meta">
                 {formatOutingDate(outing.startDate)}
               </span>
             </span>
             <span className="strava__number">{formatMiles(outing.distanceMeters)} mi</span>
-            <span className="strava__number strava__soft">
+            <span className="strava__number strava__soft" data-typography="meta">
               {formatDuration(outing.movingTimeSeconds)}
             </span>
-            <span className="strava__number strava__soft">
+            <span className="strava__number strava__soft" data-typography="meta">
               {formatFeet(outing.elevationGainMeters)} ft
             </span>
           </li>

@@ -116,18 +116,30 @@ export function AlbumWell({ album, children, tone = 'viridian' }: Props) {
           />
         </div>
       </ViewTransition>
-      <PaperTag className="collagePin music__wellAlbumTag" edge="quad-c" tiltDeg={-5} tone="ochre">
+      <PaperTag
+        className="collagePin music__wellAlbumTag"
+        edge="quad-c"
+        tiltDeg={-5}
+        tone="ochre"
+        variant="meta"
+      >
         <span>Album</span>
         <small>{album.releaseDate.slice(0, 4)}</small>
       </PaperTag>
-      <PaperTag className="collagePin music__wellSpotifyTag" edge="quad-c" tiltDeg={3} tone="cream">
+      <PaperTag
+        className="collagePin music__wellSpotifyTag"
+        edge="quad-c"
+        tiltDeg={3}
+        tone="cream"
+        variant="meta"
+      >
         Spotify ↗
       </PaperTag>
     </Link>
   );
 
   const title = (
-    <h2 className="music__wellName">
+    <h2 className="music__wellName" data-typography="display-page">
       <Link href={album.url} isExternal={true} title={album.name}>
         {album.name}
       </Link>

@@ -60,12 +60,16 @@ export function GatteySitesCard({ projects }: GatteySitesCardProps) {
                 <a className="home__sideRow" href={project.url} rel="noreferrer" target="_blank">
                   <SideProjectMark className="home__sideMark" mark={project.mark} />
                   <span className="home__sideText">
-                    <b className="home__sideTitle">{project.title}</b>
+                    <b data-typography="title-sm" data-typography-lg="meta">
+                      {project.title}
+                    </b>
                     <Tooltip title={project.description} whenTruncated>
-                      <span className="home__sideDescription">{project.description}</span>
+                      <span className="home__sideDescription" data-typography="caption">
+                        {project.description}
+                      </span>
                     </Tooltip>
                   </span>
-                  <span aria-hidden="true" className="home__sideArrow">
+                  <span aria-hidden="true" data-typography="title-sm">
                     ↗
                   </span>
                 </a>

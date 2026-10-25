@@ -82,6 +82,7 @@ function CoverPrint({ book, width }: { book: RenderableBook; width: number }) {
           size="sticker"
           tiltDeg={14}
           tone="vermilion"
+          variant="row-title"
         >
           5★
         </Scallop>
@@ -113,14 +114,22 @@ export function ReviewCard({
     >
       <CoverPrint book={book} width={look.coverWidth} />
       <div className="reading__head">
-        <h3 className="reading__bookTitle">{book.title}</h3>
-        <p className="reading__author">{book.author}</p>
+        <h3
+          className="reading__bookTitle"
+          data-typography={kind === 'feature' ? 'title-md' : 'title-sm'}
+        >
+          {book.title}
+        </h3>
+        <p className="reading__author" data-typography="meta">
+          {book.author}
+        </p>
         {hasMeta(book) ? (
           <PaperTag
             className="reading__stamp"
             edge="quad-d"
             tiltDeg={flip ? 2.5 : -2.5}
             tone={stampTone(treatment.tone)}
+            variant="meta"
           >
             <BookMeta book={book} withYear={false} />
           </PaperTag>
@@ -133,7 +142,7 @@ export function ReviewCard({
         tiltDeg={flip ? -0.6 : 0.6}
         tone="cream"
       >
-        <p>{book.review}</p>
+        <p data-typography="prose">{book.review}</p>
       </PaperCard>
     </PaperCard>
   );
@@ -157,10 +166,14 @@ export function CoverCard({
       tone={treatment.tone}
     >
       <CoverPrint book={book} width={look.coverWidth} />
-      <h3 className="reading__bookTitle">{book.title}</h3>
-      <p className="reading__author">{book.author}</p>
+      <h3 className="reading__bookTitle" data-typography="title-sm">
+        {book.title}
+      </h3>
+      <p className="reading__author" data-typography="meta">
+        {book.author}
+      </p>
       {hasMeta(book) ? (
-        <p className="reading__meta">
+        <p className="reading__meta" data-typography="meta">
           <BookMeta book={book} withYear={false} />
         </p>
       ) : null}

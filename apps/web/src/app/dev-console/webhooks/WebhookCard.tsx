@@ -19,10 +19,10 @@ import { ErrorMessage, StatusChip } from '../StatusIndicators';
 function SubscriptionDetails({ details }: { details: WebhookSubscriptionMetadata }) {
   return (
     <div className="devConsole__stack devConsole__stack--tight">
-      <Typography color="var(--dg-palette-text-secondary)" variant="body2">
+      <Typography color="var(--dg-palette-text-secondary)" variant="meta">
         <strong>Callback URL:</strong> {details.callbackUrl}
       </Typography>
-      <Typography color="var(--dg-palette-text-secondary)" variant="body2">
+      <Typography color="var(--dg-palette-text-secondary)" variant="meta">
         <strong>Created:</strong> <RelativeTime date={details.createdAt} />
       </Typography>
     </div>
@@ -83,7 +83,9 @@ export async function WebhookCardContent() {
   return (
     <>
       <div className="devConsole__row">
-        <Typography variant="h3">Strava webhooks</Typography>
+        <Typography as="h3" variant="title-md">
+          Strava webhooks
+        </Typography>
         <StatusChip isConnected={subscriptions.length > 0} />
       </div>
       <ErrorMessage message={error} />

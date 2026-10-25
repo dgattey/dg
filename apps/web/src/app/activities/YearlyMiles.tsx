@@ -80,8 +80,10 @@ export function YearlyMiles({ years }: { years: ReadonlyArray<StravaYearTotals> 
                   tiltDeg={pick(YEAR_TILTS, index, 0)}
                   tone={pick(YEAR_TONES, index, 'ochre')}
                 >
-                  <span className="strava__yearLabel">{year.year}</span>
-                  <span className="strava__yearMiles">{formatMiles(year.distanceMeters)} mi</span>
+                  <span className="strava__yearLabel" data-typography="row-title">
+                    {year.year}
+                  </span>
+                  <span data-typography="label">{formatMiles(year.distanceMeters)} mi</span>
                 </Stub>
               </button>
             </li>
@@ -90,15 +92,17 @@ export function YearlyMiles({ years }: { years: ReadonlyArray<StravaYearTotals> 
       </ol>
       {years.length > 1 ? (
         <Scallop className="strava__bestYear" size="sticker" tiltDeg={-12} tone="cobalt">
-          <span className="strava__sealKey">
+          <span className="strava__sealKey" data-typography="meta">
             {shown === best
               ? 'Best year'
               : periodStatus(String(shown.year), now) === 'current'
                 ? 'So far'
                 : 'Year'}
           </span>
-          <span className="strava__sealValue">{shown.year}</span>
-          <span className="strava__sealKey">{formatMiles(shown.distanceMeters)} mi</span>
+          <span data-typography="title-md">{shown.year}</span>
+          <span className="strava__sealKey" data-typography="meta">
+            {formatMiles(shown.distanceMeters)} mi
+          </span>
         </Scallop>
       ) : null}
     </section>

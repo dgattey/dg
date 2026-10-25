@@ -20,9 +20,11 @@ export function IntroCard({ introBlock, linkedInLink }: IntroCardProps) {
         image={introBlock.image}
         linkedInLink={linkedInLink}
       />
-      {headline ? <CutLetters className="home__headline" text={headline} /> : null}
-      <div className="home__intro">
-        <RichText {...remainder} />
+      {headline ? (
+        <CutLetters className="home__headline" text={headline} variant="display-hero" />
+      ) : null}
+      <div className="home__intro" data-typography="prose-lg">
+        <RichText {...remainder} variant="prose-lg" />
       </div>
     </>
   );

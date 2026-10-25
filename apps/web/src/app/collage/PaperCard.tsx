@@ -36,7 +36,7 @@ export function PaperCard({
 export function PaperStatus({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <PaperCard className={cx('collageStatus', className)} edge="quad-c" tiltDeg={-1} tone="cream">
-      <p className="collageStatusText" role="status">
+      <p className="collageStatusText" data-typography="prose-lg" role="status">
         {children}
       </p>
     </PaperCard>

@@ -49,11 +49,11 @@ export function PlaybackStatus({
 
   return (
     <Typography
+      as="div"
       color={color}
-      component="div"
       data-playback-status={listingVariant}
       style={statusVars}
-      variant="overline"
+      variant={isCompact ? 'caption' : 'meta'}
     >
       {isCompact ? (
         <span data-playback-status-compact-text="">{statusContent}</span>

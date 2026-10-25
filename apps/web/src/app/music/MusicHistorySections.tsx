@@ -8,7 +8,7 @@ import { MusicGrid } from './MusicGrid';
 
 export function CollageMusicStatus({ children, tag }: { children: ReactNode; tag?: ReactNode }) {
   return (
-    <div className="music__state" role="status">
+    <div className="music__state" data-typography="prose-lg" role="status">
       <PaperCard
         edge="quad-c"
         innerClassName={`music__stateInner${tag ? '' : ` music__loadingInner`}`}
@@ -63,6 +63,7 @@ export function MusicHistorySections({ sections }: { sections: Array<TrackSectio
                 className="music__dateStats"
                 href={musicStatsRangeRoute(section.statsRange)}
                 title={`Listening stats, ${statsRangeLabel(section.statsRange)}`}
+                variant="row-title"
               >
                 Stats →
               </PageTransitionLink>

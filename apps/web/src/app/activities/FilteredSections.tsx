@@ -49,30 +49,34 @@ export function HeadlineTotals() {
     <ul aria-label={`Totals, ${scope}`} className="strava__totals">
       <li className="strava__totalMiles">
         <Stub kind="ticket" size="compact" tiltDeg={-1.5} tone="ochre">
-          <span className="strava__totalScope">{scope}</span>
+          <span className="strava__totalScope" data-typography="caption">
+            {scope}
+          </span>
           <span className="strava__totalFigure">
-            <span className="strava__totalNumber">{distance.figure}</span>
-            <span className="strava__totalUnit">{distance.unit}</span>
+            <span data-typography="stat-xl">{distance.figure}</span>
+            <span data-typography="label">{distance.unit}</span>
           </span>
           {totals.distanceMeters > 0 ? (
-            <span className="strava__totalAside">{formatMiles(totals.distanceMeters)} mi</span>
+            <span className="strava__totalAside" data-typography="caption">
+              {formatMiles(totals.distanceMeters)} mi
+            </span>
           ) : null}
         </Stub>
       </li>
       <li className="strava__totalClimb">
         <Scallop tiltDeg={-4} tone="cobalt">
-          <span className="strava__totalNumber">{climb.figure}</span>
-          <span className="strava__totalUnit">{climb.unit}</span>
-          <span className="strava__totalAside">
+          <span data-typography="stat-md">{climb.figure}</span>
+          <span data-typography="caption">{climb.unit}</span>
+          <span className="strava__totalAside" data-typography="caption">
             {formatCompactFeet(totals.elevationGainMeters)} ft climbed
           </span>
         </Scallop>
       </li>
       <li className="strava__totalOutings">
         <Stub kind="stamp" size="compact" tiltDeg={1.2} tone="vermilion">
-          <span className="strava__totalNumber">{time.figure}</span>
-          <span className="strava__totalUnit">{time.unit}</span>
-          <span className="strava__totalAside">
+          <span data-typography="stat-lg">{time.figure}</span>
+          <span data-typography="label">{time.unit}</span>
+          <span className="strava__totalAside" data-typography="caption">
             {formatHours(totals.movingTimeSeconds)} · {formatCount(totals.outings)}{' '}
             {totals.outings === 1 ? 'activity' : 'activities'}
           </span>
@@ -87,8 +91,10 @@ function LongestSeal({ meters }: { meters: number }) {
   const { figure, unit } = distanceComparison(meters);
   return (
     <Scallop className="strava__longestSeal" size="sticker" tiltDeg={9} tone="ochre">
-      <span className="strava__sealValue">{figure}</span>
-      <span className="strava__sealKey">{unit}</span>
+      <span data-typography="title-md">{figure}</span>
+      <span className="strava__sealKey" data-typography="caption">
+        {unit}
+      </span>
     </Scallop>
   );
 }

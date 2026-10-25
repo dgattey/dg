@@ -31,7 +31,7 @@ export async function SiteMapDirectory() {
     <div className="siteMap__sections">
       <section aria-label="Pages" className="siteMap__section">
         <h2 className="siteMap__sectionHeading">
-          <PaperTag className="siteMap__sectionTag" edge="quad-c" tiltDeg={-1.8} tone="vermilion">
+          <PaperTag edge="quad-c" tiltDeg={-1.8} tone="vermilion" variant="title-md">
             Pages
           </PaperTag>
         </h2>
@@ -51,20 +51,27 @@ export async function SiteMapDirectory() {
                   title={page.label}
                 >
                   <div className="siteMap__pageTitleRow">
-                    <span className="siteMap__pageTitle">{page.label}</span>
-                    <span className="siteMap__routeBadge">{page.path}</span>
+                    <span className="siteMap__pageTitle" data-typography="title-md">
+                      {page.label}
+                    </span>
+                    <span className="siteMap__routeBadge" data-typography="badge">
+                      {page.path}
+                    </span>
                   </div>
-                  <p className="siteMap__pageDesc">{page.description}</p>
+                  <p className="siteMap__pageDesc" data-typography="prose">
+                    {page.description}
+                  </p>
                 </PageTransitionLink>
                 <div className="siteMap__pageFooter">
                   <a
                     className="siteMap__mdLink"
+                    data-typography="badge"
                     href={page.markdownPath}
                     title={`${page.label} Markdown (${page.markdownPath})`}
                   >
                     {page.markdownPath}
                   </a>
-                  <span aria-hidden="true" className="siteMap__openHint">
+                  <span aria-hidden="true" className="siteMap__openHint" data-typography="badge">
                     Open page →
                   </span>
                 </div>
@@ -77,7 +84,7 @@ export async function SiteMapDirectory() {
       {sideProjects.length > 0 ? (
         <section aria-label="Side projects" className="siteMap__section">
           <h2 className="siteMap__sectionHeading">
-            <PaperTag className="siteMap__sectionTag" edge="quad-c" tiltDeg={-1.5} tone="ochre">
+            <PaperTag edge="quad-c" tiltDeg={-1.5} tone="ochre" variant="title-md">
               Side projects
             </PaperTag>
           </h2>
@@ -103,12 +110,22 @@ export async function SiteMapDirectory() {
                       <SideProjectMark className="siteMap__appMark" mark={project.mark} />
                       <span className="siteMap__appBody">
                         <span className="siteMap__appHeader">
-                          <b className="siteMap__appTitle">{project.title}</b>
-                          <span className="siteMap__appDomain">{domain}</span>
+                          <b className="siteMap__appTitle" data-typography="title-sm">
+                            {project.title}
+                          </b>
+                          <span className="siteMap__appDomain" data-typography="badge">
+                            {domain}
+                          </span>
                         </span>
-                        <p className="siteMap__appDesc">{project.description}</p>
+                        <p className="siteMap__appDesc" data-typography="prose">
+                          {project.description}
+                        </p>
                       </span>
-                      <span aria-hidden="true" className="siteMap__appArrow">
+                      <span
+                        aria-hidden="true"
+                        className="siteMap__appArrow"
+                        data-typography="title-sm"
+                      >
                         ↗
                       </span>
                     </a>
@@ -122,7 +139,7 @@ export async function SiteMapDirectory() {
 
       <section aria-label="Agent and API surfaces" className="siteMap__section">
         <h2 className="siteMap__sectionHeading">
-          <PaperTag className="siteMap__sectionTag" edge="quad-b" tiltDeg={1.5} tone="cobalt">
+          <PaperTag edge="quad-b" tiltDeg={1.5} tone="cobalt" variant="title-md">
             Agent and API surfaces
           </PaperTag>
         </h2>
@@ -132,11 +149,17 @@ export async function SiteMapDirectory() {
               <li key={surface.href}>
                 <a className="siteMap__ledgerRow" href={surface.href}>
                   <div className="siteMap__ledgerTop">
-                    <span className="siteMap__ledgerTitle">{surface.label}</span>
-                    <span className="siteMap__ledgerBadge">{surface.badge}</span>
+                    <span data-typography="label">{surface.label}</span>
+                    <span className="siteMap__ledgerBadge" data-typography="stamp">
+                      {surface.badge}
+                    </span>
                   </div>
-                  <span className="siteMap__ledgerPath">{surface.href}</span>
-                  <p className="siteMap__ledgerDesc">{surface.description}</p>
+                  <span className="siteMap__ledgerPath" data-typography="badge">
+                    {surface.href}
+                  </span>
+                  <p className="siteMap__ledgerDesc" data-typography="prose">
+                    {surface.description}
+                  </p>
                 </a>
               </li>
             ))}

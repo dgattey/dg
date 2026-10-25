@@ -58,7 +58,9 @@ export function FooterNowStrip({ initialTrack, latestActivity }: FooterNowStripP
       <section aria-label="Live status" className="chrome__nowStrip">
         <div className="chrome__nowCell chrome__nowCellLead">
           <span aria-hidden="true" className="chrome__nowLive" />
-          <span className="chrome__nowKey">Now</span>
+          <span className="chrome__nowKey" data-typography="row-title">
+            Now
+          </span>
         </div>
         {track ? (
           <Tooltip className="chrome__nowTip" placement="top" title={trackSummary} whenTruncated>
@@ -82,14 +84,16 @@ export function FooterNowStrip({ initialTrack, latestActivity }: FooterNowStripP
                   <span />
                 </span>
               )}
-              <span className="chrome__nowKey">
+              <span className="chrome__nowKey" data-typography="meta">
                 <PlaybackStatusText
                   hasTooltip={false}
                   isPlaying={track.isPlaying}
                   playedAt={track.playedAt}
                 />
               </span>
-              <span className="chrome__nowValue">{trackSummary}</span>
+              <span className="chrome__nowValue" data-typography="row-title">
+                {trackSummary}
+              </span>
             </a>
           </Tooltip>
         ) : null}
@@ -109,17 +113,29 @@ export function FooterNowStrip({ initialTrack, latestActivity }: FooterNowStripP
               <span aria-hidden="true" className="chrome__nowStrava">
                 <FaIcon icon={faStrava} size="16px" />
               </span>
-              <span className="chrome__nowKey">Last ride</span>
-              <span className="chrome__nowValue">{rideSummary}</span>
+              <span className="chrome__nowKey" data-typography="meta">
+                Last ride
+              </span>
+              <span className="chrome__nowValue" data-typography="row-title">
+                {rideSummary}
+              </span>
             </a>
           </Tooltip>
         ) : null}
         <div className="chrome__nowCell chrome__nowCellLast">
-          <span className="chrome__nowKey chrome__nowCityFull">San Francisco</span>
-          <span aria-hidden="true" className="chrome__nowKey chrome__nowCityShort">
+          <span className="chrome__nowKey chrome__nowCityFull" data-typography="meta">
+            San Francisco
+          </span>
+          <span
+            aria-hidden="true"
+            className="chrome__nowKey chrome__nowCityShort"
+            data-typography="meta"
+          >
             SF ·
           </span>
-          <span className="chrome__nowValue">{sfTime}</span>
+          <span className="chrome__nowValue" data-typography="row-title" data-typography-md="meta">
+            {sfTime}
+          </span>
         </div>
       </section>
     </div>

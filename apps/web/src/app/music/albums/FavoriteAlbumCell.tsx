@@ -107,14 +107,16 @@ export function FavoriteAlbumCell({
               isLcpCandidate={isLcpCandidate}
             />
             {collapsed ? (
-              <i aria-hidden="true" className="music__closeMark">
+              <i aria-hidden="true" className="music__closeMark" data-typography="title-sm">
                 ×
               </i>
             ) : null}
           </AlbumStack>
         </span>
-        <span className="music__caption">
-          <strong className="music__albumName">{albumName}</strong>
+        <span className="music__caption" data-typography="meta">
+          <strong className="music__albumName" data-typography="title-sm">
+            {albumName}
+          </strong>
           <span className="music__artist">{artistCaption}</span>
         </span>
       </Link>

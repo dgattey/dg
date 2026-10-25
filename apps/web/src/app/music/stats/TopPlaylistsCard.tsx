@@ -60,19 +60,25 @@ export function TopPlaylistsCard({ stats }: { stats: ListeningStats }) {
             </SpotifyAnchor>
             <div className="stats__playlistBody">
               <div className="stats__playlistHeader">
-                <span className="stats__rankBadge">{String(i + 1).padStart(2, '0')}</span>
+                <span className="stats__rankBadge" data-typography="stamp">
+                  {String(i + 1).padStart(2, '0')}
+                </span>
                 <Tooltip title={playlist.name} whenTruncated>
-                  <SpotifyAnchor className="stats__label stats__playlistTitle" href={playlist.url}>
+                  <SpotifyAnchor
+                    className="stats__label stats__playlistTitle"
+                    href={playlist.url}
+                    variant="label"
+                  >
                     {playlist.name}
                   </SpotifyAnchor>
                 </Tooltip>
-                <span className="stats__count stats__playlistPlays">
+                <span className="stats__count" data-typography="title-sm">
                   {formatCount(playlist.plays)}
                 </span>
               </div>
               <span aria-hidden="true" className="stats__meter" style={bar(playlist.plays, top)} />
               <div className="stats__playlistMetaRow">
-                <span className="stats__meta stats__playlistSub">
+                <span className="stats__meta stats__playlistSub" data-typography="caption">
                   {formatCount(playlist.playedTracks)} of {formatCount(playlist.totalTracks)}{' '}
                   {playlist.totalTracks === 1 ? 'track' : 'tracks'} ·{' '}
                   {formatHours((playlist.plays * stats.minutesPerPlay) / 60)}
@@ -82,6 +88,7 @@ export function TopPlaylistsCard({ stats }: { stats: ListeningStats }) {
                     <SpotifyAnchor
                       className="stats__meta stats__playlistTopTrack"
                       href={playlist.topTrack.url}
+                      variant="caption"
                     >
                       #1 {playlist.topTrack.name}
                     </SpotifyAnchor>

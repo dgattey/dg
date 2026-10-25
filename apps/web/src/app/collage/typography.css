@@ -1,0 +1,247 @@
+/* Arial sized to Familjen Grotesk's metrics, so the swap doesn't shift layout. */
+@font-face {
+  font-family: familjenFallback;
+  src: local(Arial);
+  ascent-override: 107.64%;
+  descent-override: 23.63%;
+  line-gap-override: 0%;
+  size-adjust: 95.22%;
+}
+
+/* On :root, not .collageRoot, so tooltips and dialogs portaled to <body> get the same fonts. */
+:root {
+  --display: var(--font-familjen), var(--font-sans);
+  --body: var(--font-sans);
+  --type-display: clamp(50px, 9.8vw, 124px);
+  --type-h1: clamp(44px, 8.2vw, 108px);
+  --type-display-md: clamp(40px, 6vw, 72px);
+  --type-title-lg: clamp(26px, 2.6vw, 36px);
+  --type-title-md: clamp(22px, 2.3vw, 28px);
+  --type-h2: clamp(20px, 2.2vw, 24px);
+  --type-label: clamp(18px, 1.6vw, 20px);
+  --type-h3: 18px;
+  --type-body-lg: clamp(17px, 1.5vw, 20px);
+  --type-body: 16px;
+  --type-meta: 15px;
+  --type-caption: 14px;
+  --type-micro: 12px;
+  --leading-tight: 1.1;
+  --leading-title: 1.2;
+  --leading-meta: 1.35;
+  --leading-body: 1.6;
+  --tracking-display: -0.035em;
+  --tracking-title: -0.02em;
+  --tracking-label: -0.01em;
+}
+
+body {
+  font-family: var(--body);
+  font-size: var(--type-body);
+  font-weight: 400;
+  line-height: var(--leading-body);
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+  letter-spacing: inherit;
+}
+
+b,
+strong {
+  font-weight: 700;
+}
+
+small {
+  font-family: var(--body);
+  font-size: var(--type-meta);
+  font-weight: 600;
+  line-height: var(--leading-meta);
+  letter-spacing: 0;
+}
+
+code,
+kbd,
+pre,
+samp {
+  font-family: var(--font-mono);
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font: inherit;
+  letter-spacing: inherit;
+  text-wrap: balance;
+}
+
+[data-typography="display-hero"] {
+  font-family: var(--display);
+  font-size: var(--type-display);
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: var(--tracking-display);
+}
+
+[data-typography="display-cut"] {
+  font-family: var(--display);
+  font-size: var(--type-display);
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: 0.01em;
+}
+
+[data-typography="display-page"] {
+  font-family: var(--display);
+  font-size: var(--type-h1);
+  font-weight: 700;
+  line-height: 0.96;
+  letter-spacing: var(--tracking-display);
+}
+
+[data-typography="stat-xl"] {
+  font-family: var(--display);
+  font-size: var(--type-display-md);
+  font-weight: 700;
+  line-height: 0.94;
+  letter-spacing: var(--tracking-display);
+}
+
+[data-typography="stat-lg"] {
+  font-family: var(--display);
+  font-size: var(--type-title-lg);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-title);
+}
+
+[data-typography="stat-md"] {
+  font-family: var(--display);
+  font-size: var(--type-title-md);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-title);
+}
+
+[data-typography="title-md"] {
+  font-family: var(--display);
+  font-size: var(--type-h2);
+  font-weight: 700;
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-label);
+}
+
+[data-typography="label"] {
+  font-family: var(--display);
+  font-size: var(--type-label);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-label);
+}
+
+[data-typography="title-sm"] {
+  font-family: var(--display);
+  font-size: var(--type-h3);
+  font-weight: 700;
+  line-height: var(--leading-title);
+  letter-spacing: var(--tracking-label);
+}
+
+[data-typography="row-title"] {
+  font-family: var(--display);
+  font-size: var(--type-body);
+  font-weight: 700;
+  line-height: var(--leading-title);
+  letter-spacing: 0;
+}
+
+[data-typography="badge"] {
+  font-family: var(--display);
+  font-size: var(--type-caption);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: 0;
+}
+
+[data-typography="stamp"] {
+  font-family: var(--display);
+  font-size: var(--type-micro);
+  font-weight: 700;
+  line-height: var(--leading-tight);
+  letter-spacing: 0.01em;
+}
+
+[data-typography="prose-lg"] {
+  font-family: var(--body);
+  font-size: var(--type-body-lg);
+  font-weight: 400;
+  line-height: var(--leading-body);
+  letter-spacing: 0;
+}
+
+[data-typography="prose"] {
+  font-family: var(--body);
+  font-size: var(--type-body);
+  font-weight: 400;
+  line-height: var(--leading-body);
+  letter-spacing: 0;
+}
+
+[data-typography="meta"] {
+  font-family: var(--body);
+  font-size: var(--type-meta);
+  font-weight: 600;
+  line-height: var(--leading-meta);
+  letter-spacing: 0;
+}
+
+[data-typography="caption"] {
+  font-family: var(--body);
+  font-size: var(--type-caption);
+  font-weight: 600;
+  line-height: var(--leading-meta);
+  letter-spacing: 0;
+}
+
+[data-typography="code"] {
+  padding: 6px 8px;
+  font-family: var(--font-mono);
+  font-size: var(--type-meta);
+  font-weight: 400;
+  line-height: var(--leading-body);
+  color: var(--dg-palette-text-secondary);
+  background: var(--dg-palette-background-paper);
+  border-radius: 16px;
+}
+
+@media (max-width: 1300px) {
+  [data-typography-lg="meta"] {
+    font-size: var(--type-meta);
+  }
+}
+
+@media (max-width: 820px) {
+  [data-typography-md="meta"] {
+    font-size: var(--type-meta);
+  }
+  [data-typography-md="caption"] {
+    font-size: var(--type-caption);
+  }
+}
+
+@media (max-width: 680px) {
+  [data-typography-sm="meta"] {
+    font-size: var(--type-meta);
+  }
+}
+
+@media (max-width: 480px) {
+  [data-typography-xs="caption"] {
+    font-size: clamp(var(--type-caption), 4vw, var(--type-meta));
+  }
+}

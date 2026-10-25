@@ -1,3 +1,4 @@
+import type { TypographyVariant } from '@dg/ui/core/Typography';
 import { PageTransitionLink } from '@dg/ui/core/transitions/PageTransitionLink';
 import type { ButtonHTMLAttributes, ReactNode } from 'react';
 import { cx, paperSurfaceVars } from './paperVars';
@@ -10,6 +11,7 @@ type PaperButtonLook = {
   edge?: PaperEdge;
   tiltDeg?: number;
   tone?: PaperTone;
+  variant?: TypographyVariant;
 };
 
 type PaperButtonProps = PaperButtonLook &
@@ -60,6 +62,7 @@ export function PaperButton({
   title,
   tone = 'cream',
   type = 'button',
+  variant = 'label',
 }: PaperButtonProps) {
   const classNames = cx('paperButton', current && 'paperButtonCurrent', className);
   const ariaCurrent = current ? 'page' : undefined;
@@ -71,6 +74,7 @@ export function PaperButton({
           aria-expanded={expanded}
           aria-pressed={current}
           className={classNames}
+          data-typography={variant}
           disabled={disabled}
           onClick={onClick}
           type={type}
@@ -84,6 +88,7 @@ export function PaperButton({
           href={href}
           onClick={onClick}
           title={title}
+          variant={variant}
         >
           {children}
         </PageTransitionLink>
@@ -92,6 +97,7 @@ export function PaperButton({
           aria-current={ariaCurrent}
           aria-label={title}
           className={classNames}
+          data-typography={variant}
           href={href}
           onClick={onClick}
         >

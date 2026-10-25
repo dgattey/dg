@@ -11,6 +11,7 @@ import {
   SERVER_ERROR_BACKDROP,
 } from '../backdrops';
 import { CollageBackdrop } from '../CollageBackdrop';
+import { CutLetters } from '../CutLetters';
 import { CutOut } from '../CutOut';
 import { CutOutSymbols } from '../CutOutSymbols';
 import { CUT_OUT_PLACEMENTS, moreWorkOverflowPlacements } from '../cutOutPlacements';
@@ -165,5 +166,20 @@ describe('collage cut-outs', () => {
     } finally {
       globalThis.ResizeObserver = OriginalResizeObserver;
     }
+  });
+
+  it('splits multi-word and newline CutLetters headings into staggered indented lines', () => {
+    const { container } = render(
+      <CutLetters className="home__headline" text={'Hey\nfriends!'} variant="display-hero" />,
+    );
+    const heading = container.querySelector('h1');
+    expect(heading).toHaveAttribute('data-typography', 'display-hero');
+    const words = container.querySelectorAll('.cutWord');
+    expect(words).toHaveLength(2);
+    expect(words[0]).toHaveTextContent('Hey');
+    expect(words[0]).not.toHaveClass('cutIndentedLine');
+    expect(words[1]).toHaveTextContent('friends!');
+    expect(words[1]).toHaveClass('cutIndentedLine');
+    expect(words[1]?.getAttribute('style')).toContain('--line-indent: 0.56em');
   });
 });

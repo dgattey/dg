@@ -3,6 +3,7 @@
 import NextLink from 'next/link';
 import { usePathname } from 'next/navigation';
 import type { MouseEvent, ReactNode } from 'react';
+import type { TypographyVariant } from '../Typography';
 import { rememberPageOrigin } from './pageScrollMemory';
 import { pageTransitionTypes } from './pageTransitions';
 
@@ -10,20 +11,22 @@ type PageTransitionLinkProps = {
   'aria-current'?: 'page';
   children?: ReactNode;
   className?: string;
+  'data-typography-xs'?: TypographyVariant;
   href: string;
   onClick?: (event: MouseEvent<HTMLAnchorElement>) => void;
   title: string;
+  variant?: TypographyVariant;
 };
 
 /**
- * A bare anchor, so the caller's class owns every type and color rule. Routing it
- * through `Typography` stamped the system sans and body size over paper buttons.
+ * A bare anchor that optionally carries a `data-typography` role when `variant` is set.
  */
 export function PageTransitionLink({
   children,
   href,
   onClick,
   title,
+  variant,
   ...rest
 }: PageTransitionLinkProps) {
   const pathname = usePathname();
@@ -32,6 +35,7 @@ export function PageTransitionLink({
     <NextLink
       {...rest}
       aria-label={title}
+      data-typography={variant}
       href={href}
       onClick={(event) => {
         onClick?.(event);

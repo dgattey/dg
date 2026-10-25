@@ -126,8 +126,6 @@
 /* The polygon's valleys sit at 45% of the box, so the padding keeps text off the teeth. */
 .stats__scallop--sticker {
   padding: 14%;
-  font: 700 var(--type-label) / var(--leading-title) var(--display);
-  font-variant-numeric: tabular-nums;
 }
 
 /* Totals collage mosaic: 2-row asymmetric 12-column composition */
@@ -156,17 +154,7 @@
 .stats__total {
   width: 100%;
 }
-.stats__number {
-  font: 700 var(--type-title-lg) / 1 var(--display);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: var(--tracking-title);
-}
 .stats__totalLabel {
-  font: 700 var(--type-meta) / var(--leading-title) var(--display);
-  color: var(--soft);
-}
-.stats__totalSub {
-  font: 600 var(--type-caption) / var(--leading-meta) var(--body);
   color: var(--soft);
 }
 
@@ -185,18 +173,9 @@
 .stats__totalSlot--plays .stats__ticket > .stats__face::before {
   left: 25px;
 }
-.stats__totalSlot--plays .stats__number {
-  font: 700 var(--type-display-md) / 0.94 var(--display);
-  letter-spacing: var(--tracking-display);
-}
 .stats__totalSlot--plays .stats__totalLabel {
-  font-size: var(--type-label);
   color: var(--on);
 }
-.stats__totalSlot--plays .stats__totalSub {
-  font-size: var(--type-meta);
-}
-
 /* Slot 2: Listening time postage stamp */
 .stats__totalSlot--listeningTime {
   z-index: 2;
@@ -244,15 +223,6 @@
 .stats__total.stats__cut:has(.stats__scallop) {
   width: min(100%, 204px);
 }
-.stats__scallop--seal .stats__number {
-  font-size: var(--type-title-md);
-}
-.stats__scallop--seal :is(.stats__totalLabel, .stats__totalSub) {
-  font-family: var(--display);
-  font-size: var(--type-caption);
-  line-height: var(--leading-tight);
-}
-
 /* Collage sticker clusters in the open pockets beneath Every month and Depth and loyalty */
 .stats__pocketCluster {
   display: grid;
@@ -277,20 +247,10 @@
   min-height: 106px;
   padding: 14px 16px;
 }
-.stats__pocketNumber {
-  font: 700 var(--type-title-md) / var(--leading-tight) var(--display);
-  font-variant-numeric: tabular-nums;
-  letter-spacing: var(--tracking-title);
-}
 .stats__pocketSeal {
   justify-self: center;
   width: 200px;
 }
-.stats__pocketSealVal {
-  font: 700 var(--type-h2) / 1 var(--display);
-  font-variant-numeric: tabular-nums;
-}
-
 /* The record */
 .stats__vinyl {
   display: block;
@@ -328,7 +288,6 @@
   grid-column: 1 / -1;
   justify-self: start;
   margin: 0;
-  font: 700 var(--type-h2) / var(--leading-title) var(--display);
 }
 .stats__hero {
   display: grid;
@@ -382,25 +341,13 @@
   z-index: 3;
   width: 132px;
 }
-.stats__heroRank {
-  font: 700 var(--type-h2) / 1 var(--display);
-}
-.stats__heroStamp .stats__meta {
-  font-size: var(--type-caption);
-  line-height: var(--leading-title);
-}
 .stats__heroInner {
   display: grid;
   gap: 6px;
   padding: 26px 28px 28px;
 }
-.stats__heroTitle {
-  font: 700 var(--type-h2) / var(--leading-title) var(--display);
-}
 .stats__heroPlays {
   margin-top: 8px;
-  font: 700 var(--type-h2) / var(--leading-title) var(--display);
-  font-variant-numeric: tabular-nums;
 }
 .stats__runnersUp {
   display: grid;
@@ -429,15 +376,11 @@
   left: -20px;
   z-index: 2;
 }
-.stats__rankSticker .stats__ticket > .stats__face {
-  font: 700 var(--type-label) / var(--leading-title) var(--display);
-}
 .stats__rankCircle {
   display: grid;
   place-content: center;
   width: 58px;
   height: 58px;
-  font: 700 var(--type-label) / var(--leading-title) var(--display);
   color: var(--on);
   background: var(--pc);
   border-radius: 50%;
@@ -499,7 +442,6 @@
   left: 12px;
 }
 .stats__cardStampKicker {
-  font: 700 var(--type-micro) / var(--leading-tight) var(--display);
   color: var(--soft);
   white-space: nowrap;
 }
@@ -507,8 +449,6 @@
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
-  font: 700 var(--type-caption) / var(--leading-title) var(--display);
-  font-variant-numeric: tabular-nums;
   text-transform: capitalize;
   white-space: nowrap;
 }
@@ -519,12 +459,7 @@
   z-index: 3;
   width: 108px;
 }
-.stats__cardSealTop {
-  font: 700 var(--type-caption) / var(--leading-tight) var(--display);
-  font-variant-numeric: tabular-nums;
-}
 .stats__cardSealSub {
-  font: 700 var(--type-micro) / var(--leading-tight) var(--display);
   color: var(--soft);
 }
 
@@ -573,8 +508,6 @@
 }
 .stats__clockTick,
 .stats__clockValue {
-  font: 600 var(--type-meta) / var(--leading-meta) var(--body);
-  font-variant-numeric: tabular-nums;
   dominant-baseline: central;
   text-anchor: middle;
 }
@@ -582,7 +515,6 @@
   fill: var(--soft);
 }
 .stats__clockValue {
-  font-weight: 700;
   fill: var(--vermilion);
 }
 
@@ -601,7 +533,6 @@
   width: 62px;
 }
 .stats__ritualSticker .stats__scallop {
-  font-size: var(--type-meta);
   white-space: nowrap;
 }
 

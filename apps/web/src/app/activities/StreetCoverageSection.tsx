@@ -126,6 +126,7 @@ function Leaderboard({
               className="streets__row"
               data-focused={focused?.index === hood.index}
               data-tier={tierOf(hood.share)}
+              data-typography="row-title"
               onBlur={() => onHover(null)}
               onClick={() => onPick(hood.index)}
               onFocus={() => onHover(hood.index)}
@@ -135,7 +136,7 @@ function Leaderboard({
             >
               <span className="streets__rank">{rank + 1}</span>
               <span className="streets__name">{hood.name}</span>
-              <span className="streets__share">{formatShare(hood.share)}</span>
+              <span>{formatShare(hood.share)}</span>
               <span aria-hidden="true" className="streets__bar" />
             </button>
           </li>
@@ -220,26 +221,36 @@ export function StreetCoverageSection({
       <ul className="streets__callouts">
         <li className="streets__seal">
           <Scallop tiltDeg={-5} tone="cobalt">
-            <span className="strava__totalNumber">{formatShare(summary.city.share)}</span>
-            <span className="strava__totalUnit">of {cityShort}</span>
-            <span className="strava__totalAside">{milesOf(summary.city)} ridden</span>
+            <span className="strava__totalNumber" data-typography="stat-lg">
+              {formatShare(summary.city.share)}
+            </span>
+            <span data-typography="label">of {cityShort}</span>
+            <span className="strava__totalAside" data-typography="caption">
+              {milesOf(summary.city)} ridden
+            </span>
           </Scallop>
         </li>
         {top && top.riddenMeters > 0 ? (
           <li>
             <Stub kind="ticket" size="compact" tiltDeg={1.4} tone="ochre">
-              <span className="strava__totalScope">Most ridden</span>
-              <span className="streets__calloutLine">
+              <span className="strava__totalScope" data-typography="caption">
+                Most ridden
+              </span>
+              <span data-typography="stat-md">
                 {top.name} · {formatShare(top.share)}
               </span>
             </Stub>
           </li>
         ) : null}
         <li>
-          <Stub kind="stamp" tiltDeg={-1} tone="vermilion">
-            <span className="strava__totalNumber">{summary.explored}</span>
-            <span className="strava__totalUnit">of {summary.neighborhoods.length}</span>
-            <span className="strava__totalAside">neighborhoods explored</span>
+          <Stub kind="stamp" size="compact" tiltDeg={-1} tone="vermilion">
+            <span className="strava__totalNumber" data-typography="stat-lg">
+              {summary.explored}
+            </span>
+            <span data-typography="label">of {summary.neighborhoods.length}</span>
+            <span className="strava__totalAside" data-typography="caption">
+              neighborhoods explored
+            </span>
           </Stub>
         </li>
       </ul>
@@ -274,12 +285,16 @@ function CityCoverageCards({
     <>
       <PaperCard className="streets__mapCard" innerClassName="strava__pad" tiltDeg={-0.6}>
         <div className="streets__head">
-          <h3 className="strava__heading">{focused?.name ?? cityName}</h3>
+          <h3 className="strava__heading" data-typography="title-md">
+            {focused?.name ?? cityName}
+          </h3>
           <span className="streets__figures">
-            <span className="streets__focusShare">
+            <span className="streets__focusShare" data-typography="stat-md">
               {formatShare((focused ?? summary.city).share)}
             </span>
-            <span className="strava__aside">{milesOf(focused ?? summary.city)}</span>
+            <span className="strava__aside" data-typography="row-title">
+              {milesOf(focused ?? summary.city)}
+            </span>
           </span>
         </div>
         <NeighborhoodMap
@@ -292,14 +307,16 @@ function CityCoverageCards({
         />
         <ol aria-label="Share of streets ridden" className="streets__legend">
           {TIER_FLOORS.map((floor, tier) => (
-            <li className="streets__key" data-tier={tier} key={floor}>
+            <li className="streets__key" data-tier={tier} data-typography="caption" key={floor}>
               {Math.round(floor * 100)}%
             </li>
           ))}
         </ol>
       </PaperCard>
       <PaperCard className="streets__board" innerClassName="strava__pad" tiltDeg={0.8}>
-        <h3 className="strava__heading">By neighborhood</h3>
+        <h3 className="strava__heading" data-typography="title-md">
+          By neighborhood
+        </h3>
         <Leaderboard
           focused={focused}
           onHover={setHovered}

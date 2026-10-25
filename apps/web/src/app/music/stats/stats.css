@@ -69,13 +69,11 @@
 }
 .stats__heading {
   margin: 0;
-  font: 700 var(--type-h2) / var(--leading-title) var(--display);
 }
 .stats__aside,
 .stats__note,
 .stats__meta {
   margin: 0;
-  font: 600 var(--type-meta) / var(--leading-meta) var(--body);
   color: var(--soft);
 }
 .stats__aside {
@@ -87,11 +85,7 @@
   margin-top: 14px;
 }
 .stats__note strong {
-  font-weight: 700;
   color: var(--on);
-}
-.stats__label {
-  font: 700 var(--type-label) / var(--leading-title) var(--display);
 }
 .stats__itemLink {
   color: inherit;
@@ -104,17 +98,12 @@
   text-decoration-color: var(--on);
 }
 .stats__count {
-  font: 700 var(--type-h2) / var(--leading-title) var(--display);
-  font-variant-numeric: tabular-nums;
   text-align: right;
 }
 .stats__rank {
-  font: 600 var(--type-meta) / var(--leading-meta) var(--body);
-  font-variant-numeric: tabular-nums;
   color: var(--soft);
 }
 .stats__date {
-  font-variant-numeric: tabular-nums;
   text-align: right;
   white-space: nowrap;
 }
@@ -196,8 +185,6 @@
   place-items: center;
   width: 30px;
   height: 30px;
-  font: 700 var(--type-micro) / 1 var(--display);
-  font-variant-numeric: tabular-nums;
   color: var(--soft);
   background: color-mix(in oklab, var(--on) 12%, transparent);
   border-radius: 50%;
@@ -223,11 +210,6 @@
   justify-items: end;
   min-width: 58px;
 }
-.stats__topCountGroup .stats__meta {
-  font-size: var(--type-caption);
-  font-variant-numeric: tabular-nums;
-}
-
 /* Top playlists */
 .stats__topPlaylists {
   --meter: var(--ochre);
@@ -278,9 +260,6 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.stats__playlistPlays {
-  font-size: var(--type-h3);
-}
 .stats__playlistMetaRow {
   display: flex;
   gap: 12px;
@@ -290,22 +269,17 @@
 }
 .stats__playlistSub {
   flex-shrink: 0;
-  font-size: var(--type-caption);
-  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
 .stats__playlistTopTrack {
   min-width: 0;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: var(--type-caption);
   white-space: nowrap;
 }
 
 /* Timeline bars (Plays per year / month / day) */
 .stats__peak {
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
   color: var(--ochre);
 }
 .stats__columns {
@@ -341,8 +315,6 @@
 }
 .stats__columnValue,
 .stats__columnTick {
-  font: 600 var(--type-meta) / var(--leading-meta) var(--body);
-  font-variant-numeric: tabular-nums;
   color: var(--soft);
   white-space: nowrap;
   transition:
@@ -390,7 +362,6 @@
 .stats__column--peak .stats__columnValue,
 .stats__column--active .stats__columnValue,
 .stats__column--active .stats__columnTick {
-  font-weight: 700;
   color: var(--ochre);
 }
 
@@ -428,7 +399,6 @@
   --meter: var(--cerulean);
 }
 .stats__genreReadout {
-  font-variant-numeric: tabular-nums;
   color: var(--on);
 }
 .stats__genreRibbon {
@@ -487,7 +457,6 @@
 
 /* Activity matrix (Every month / Every week / Every day / Every day & shift) */
 .stats__monthReadout {
-  font-variant-numeric: tabular-nums;
   color: var(--on);
 }
 .stats__monthMatrix {
@@ -508,7 +477,6 @@
   border-radius: 8px;
 }
 .stats__monthColHead {
-  font: 700 var(--type-micro) / var(--leading-tight) var(--display);
   color: var(--soft);
   text-align: center;
 }
@@ -518,8 +486,6 @@
 .stats__monthYearBtn,
 .stats__monthRowLabel {
   padding: 2px 4px 2px 0;
-  font: 700 var(--type-caption) / var(--leading-tight) var(--display);
-  font-variant-numeric: tabular-nums;
   color: var(--soft);
   text-align: left;
   white-space: nowrap;
@@ -610,8 +576,6 @@
 }
 .stats__championYear {
   padding: 4px 6px;
-  font: 700 var(--type-caption) / var(--leading-tight) var(--display);
-  font-variant-numeric: tabular-nums;
   color: var(--ink-on-cream);
   text-align: center;
   white-space: nowrap;
@@ -656,15 +620,7 @@
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.stats__championTrack {
-  font: 700 var(--type-body) / var(--leading-title) var(--display);
-}
-.stats__championArtist {
-  font-size: var(--type-caption);
-}
 .stats__championPlays {
-  font: 700 var(--type-caption) / var(--leading-title) var(--display);
-  font-variant-numeric: tabular-nums;
   color: var(--ochre);
   text-align: right;
   white-space: nowrap;
@@ -688,15 +644,6 @@
   height: 28px;
   border-radius: 3px;
 }
-.stats__championList--compact .stats__championTrack {
-  font-size: var(--type-caption);
-  line-height: var(--leading-title);
-}
-.stats__championList--compact .stats__championArtist {
-  font-size: var(--type-micro);
-  line-height: var(--leading-title);
-}
-
 /* On repeat */
 .stats__repeatList {
   display: grid;
@@ -765,10 +712,6 @@
 .stats__shift .stats__meta {
   grid-column: 2;
 }
-.stats__shiftCounts {
-  font-size: var(--type-caption);
-  font-variant-numeric: tabular-nums;
-}
 .stats__swatch {
   display: block;
   width: 12px;
@@ -776,12 +719,7 @@
   background: var(--shift);
   border-radius: 50%;
 }
-.stats__shiftShare {
-  font: 700 var(--type-h3) / var(--leading-title) var(--display);
-  font-variant-numeric: tabular-nums;
-}
 .stats__clockReadout {
-  font-variant-numeric: tabular-nums;
   color: var(--on);
 }
 
@@ -814,18 +752,12 @@
 }
 
 /* Depth and loyalty */
-.stats__cell {
-  font-family: var(--display);
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-}
 .stats__cell--max {
   color: var(--vermilion);
 }
 .stats__table {
   width: 100%;
   margin-top: 14px;
-  font: 400 var(--type-body) / var(--leading-body) var(--body);
   border-collapse: collapse;
 }
 .stats__table th,
@@ -835,15 +767,11 @@
   text-align: left;
 }
 .stats__table thead th {
-  font: 600 var(--type-meta) / var(--leading-meta) var(--body);
   color: var(--soft);
 }
 .stats__table .stats__cell,
 .stats__table .stats__monthsHead {
   text-align: right;
-}
-.stats__artist {
-  font-weight: 600;
 }
 .stats__months {
   display: grid;

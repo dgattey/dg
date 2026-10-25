@@ -59,15 +59,15 @@ export function ServerActionButton({
     <div className="devConsole__stack devConsole__stack--compact">
       <ErrorMessage message={error} />
       <PaperButton
-        className="devConsole__actionButton"
         disabled={isLoading}
         onClick={handleClick}
         tiltDeg={tiltDeg}
         tone={tone}
+        variant="meta"
       >
         {isLoading ? loadingLabel : label}
       </PaperButton>
-      {message ? <Typography variant="body2">{message}</Typography> : null}
+      {message ? <Typography variant="meta">{message}</Typography> : null}
     </div>
   );
 }

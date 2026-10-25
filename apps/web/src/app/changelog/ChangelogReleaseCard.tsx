@@ -41,6 +41,7 @@ export function ChangelogReleaseCard({
               edge="quad-b"
               tiltDeg={3}
               tone="ochre"
+              variant="meta"
             >
               Latest
             </PaperTag>
@@ -61,11 +62,19 @@ export function ChangelogReleaseCard({
                 >
                   {release.tag}
                 </PaperTag>
-                <span className="changelog__kindBadge" data-kind={release.kind}>
+                <span
+                  className="changelog__kindBadge"
+                  data-kind={release.kind}
+                  data-typography="badge"
+                >
                   {kindLabel}
                 </span>
                 {formattedDate ? (
-                  <time className="changelog__date" dateTime={release.publishedAt ?? undefined}>
+                  <time
+                    className="changelog__date"
+                    data-typography="meta"
+                    dateTime={release.publishedAt ?? undefined}
+                  >
                     {formattedDate}
                   </time>
                 ) : null}
@@ -74,6 +83,7 @@ export function ChangelogReleaseCard({
                 {release.prNumbers.map((prNum) => (
                   <a
                     className="changelog__prChip"
+                    data-typography="badge"
                     href={githubPullRequestUrl(prNum)}
                     key={prNum}
                     rel="noopener noreferrer"
@@ -86,6 +96,7 @@ export function ChangelogReleaseCard({
                 <a
                   aria-label={`${release.tag} on GitHub`}
                   className="changelog__githubLink"
+                  data-typography="badge"
                   href={release.htmlUrl}
                   rel="noopener noreferrer"
                   target="_blank"
@@ -97,13 +108,13 @@ export function ChangelogReleaseCard({
             {release.notes.length > 0 ? (
               <ul className="changelog__notes">
                 {release.notes.map((note) => (
-                  <li className="changelog__noteItem" key={note}>
+                  <li className="changelog__noteItem" data-typography="prose" key={note}>
                     {formatReleaseNote(note)}
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="changelog__emptyNote">
+              <p className="changelog__emptyNote" data-typography="prose">
                 {release.kind === 'major'
                   ? 'Major milestone release.'
                   : 'Maintenance and dependency updates.'}
@@ -131,7 +142,9 @@ export function ChangelogReleaseCard({
               </div>
               {snapshot.title ? (
                 <figcaption className="changelog__polaroidCaption">
-                  <span className="changelog__polaroidTitle">{snapshot.title}</span>
+                  <span className="changelog__polaroidTitle" data-typography="row-title">
+                    {snapshot.title}
+                  </span>
                 </figcaption>
               ) : null}
             </figure>

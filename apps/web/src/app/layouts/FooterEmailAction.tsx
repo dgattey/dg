@@ -57,6 +57,7 @@ export function FooterEmailAction({ encodedEmail }: FooterEmailActionProps) {
       <a
         aria-label={decodedEmail ? `Email ${decodedEmail}` : 'Email Dylan Gattey'}
         className="chrome__emailLink"
+        data-typography="label"
         href={decodedEmail ? `mailto:${decodedEmail}` : '#'}
         onClick={handleEmailClick}
       >

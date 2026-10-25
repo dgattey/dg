@@ -30,7 +30,9 @@ export async function OauthCardContent({ provider }: OauthCardProps) {
   return (
     <>
       <div className="devConsole__row devConsole__row--wide">
-        <Typography variant="h3">{capitalize(provider)}</Typography>
+        <Typography as="h3" variant="title-md">
+          {capitalize(provider)}
+        </Typography>
         <StatusChip isConnected={status.isConnected} />
       </div>
       <ErrorMessage message={status.error} />
@@ -55,7 +57,7 @@ export async function OauthCardContent({ provider }: OauthCardProps) {
         ) : null}
       </div>
       {status.expiresAt ? (
-        <Typography color="var(--dg-palette-text-secondary)" variant="body2">
+        <Typography color="var(--dg-palette-text-secondary)" variant="meta">
           Access token expires at {status.expiresAt.toLocaleString()}
         </Typography>
       ) : null}

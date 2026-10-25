@@ -57,6 +57,7 @@ export function PaperPills<Key extends string>({
         return (
           <PaperTag
             className={cx('paperPill', current && 'paperButtonCurrent', option.className)}
+            data-typography-sm="meta"
             edge="quad-a"
             key={option.key}
             tiltDeg={option.tiltDeg}
@@ -115,6 +116,8 @@ export function PaperStrip<Key extends string>({
           <button
             aria-pressed={current}
             className={cx('chrome__segment', current && 'chrome__segmentCurrent')}
+            data-typography="label"
+            data-typography-xs="caption"
             key={option.key}
             onClick={() => onSelect(option.key)}
             type="button"

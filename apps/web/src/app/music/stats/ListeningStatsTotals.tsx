@@ -97,11 +97,25 @@ export function ListeningStatsTotals({ stats }: { stats: ListeningStats }) {
   return (
     <ul aria-label="Totals" className="stats__totals">
       {totals.map(({ cut, href, id, label, sub, value }) => {
+        const isPlays = id === 'plays';
+        const isSeal = cut.kind === 'seal';
         const piece = (
           <TotalPaper cut={cut}>
-            <span className="stats__meta stats__totalLabel">{label}</span>
-            <span className="stats__number">{value}</span>
-            <span className="stats__meta stats__totalSub">{sub}</span>
+            <span
+              className="stats__meta stats__totalLabel"
+              data-typography={isPlays ? 'label' : isSeal ? 'badge' : 'meta'}
+            >
+              {label}
+            </span>
+            <span data-typography={isPlays ? 'stat-xl' : isSeal ? 'stat-md' : 'stat-lg'}>
+              {value}
+            </span>
+            <span
+              className="stats__meta"
+              data-typography={isPlays ? 'meta' : isSeal ? 'badge' : 'caption'}
+            >
+              {sub}
+            </span>
           </TotalPaper>
         );
         return (

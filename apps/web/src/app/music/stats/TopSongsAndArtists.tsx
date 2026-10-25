@@ -33,7 +33,9 @@ export function TopSongsCard({ stats }: { stats: ListeningStats }) {
       <ol className="stats__topList">
         {tracks.map((track, i) => (
           <li className={cx('stats__topSongRow', i === 0 && 'stats__topRow--lead')} key={track.id}>
-            <span className="stats__rankBadge">{String(i + 1).padStart(2, '0')}</span>
+            <span className="stats__rankBadge" data-typography="stamp">
+              {String(i + 1).padStart(2, '0')}
+            </span>
             <AlbumLink album={track.album} label={track.album.name}>
               <span
                 className="stats__mat stats__songMat"
@@ -54,7 +56,7 @@ export function TopSongsCard({ stats }: { stats: ListeningStats }) {
             </AlbumLink>
             <span className="stats__repeatName">
               <Tooltip title={track.name} whenTruncated>
-                <SpotifyAnchor className="stats__label" href={track.url}>
+                <SpotifyAnchor className="stats__label" href={track.url} variant="label">
                   {track.name}
                 </SpotifyAnchor>
               </Tooltip>
@@ -62,8 +64,10 @@ export function TopSongsCard({ stats }: { stats: ListeningStats }) {
             </span>
             <span aria-hidden="true" className="stats__meter" style={bar(track.plays, top)} />
             <span className="stats__topCountGroup">
-              <span className="stats__count">{formatCount(track.plays)}</span>
-              <span className="stats__meta">
+              <span className="stats__count" data-typography="title-md">
+                {formatCount(track.plays)}
+              </span>
+              <span className="stats__meta" data-typography="caption">
                 {formatHours((track.plays * stats.minutesPerPlay) / 60)}
               </span>
             </span>
@@ -99,22 +103,29 @@ export function TopArtistsCard({ stats }: { stats: ListeningStats }) {
             className={cx('stats__topArtistRow', i === 0 && 'stats__topRow--lead')}
             key={artist.id}
           >
-            <span className="stats__rankBadge">{String(i + 1).padStart(2, '0')}</span>
+            <span className="stats__rankBadge" data-typography="stamp">
+              {String(i + 1).padStart(2, '0')}
+            </span>
             <span className="stats__repeatName">
               <ArtistLinks
                 artists={[artist]}
                 className="stats__label"
                 newArtists={stats.newArtists}
+                variant="label"
               />
-              <span className="stats__meta">
+              <span className="stats__meta" data-typography="meta">
                 {formatCount(artist.tracks)} {artist.tracks === 1 ? 'track' : 'tracks'} ·{' '}
                 {formatHours((artist.plays * stats.minutesPerPlay) / 60)}
               </span>
             </span>
             <span aria-hidden="true" className="stats__meter" style={bar(artist.plays, top)} />
             <span className="stats__topCountGroup">
-              <span className="stats__count">{formatCount(artist.plays)}</span>
-              <span className="stats__meta">{formatPercent(artist.plays, stats.plays)}</span>
+              <span className="stats__count" data-typography="title-md">
+                {formatCount(artist.plays)}
+              </span>
+              <span className="stats__meta" data-typography="caption">
+                {formatPercent(artist.plays, stats.plays)}
+              </span>
             </span>
           </li>
         ))}

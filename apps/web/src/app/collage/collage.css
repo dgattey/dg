@@ -1,15 +1,6 @@
+@import "./typography.css";
 @import "./edges.css";
 @import "./backdrop.css";
-
-/* Arial sized to Familjen Grotesk's metrics, so the swap doesn't shift layout. */
-@font-face {
-  font-family: familjenFallback;
-  src: local(Arial);
-  ascent-override: 107.64%;
-  descent-override: 23.63%;
-  line-gap-override: 0%;
-  size-adjust: 95.22%;
-}
 
 html:has(.collageRoot) {
   scrollbar-gutter: auto;
@@ -24,12 +15,6 @@ html[data-color-scheme="dark"]:has(.collageRoot) {
 }
 html:has(.collageRoot) body {
   background: transparent;
-}
-
-/* On :root, not .collageRoot, so tooltips and dialogs portaled to <body> get the same fonts. */
-:root {
-  --display: var(--font-familjen), var(--font-sans);
-  --body: var(--font-sans);
 }
 
 @property --footer-progress {
@@ -70,26 +55,6 @@ html:has(.collageRoot) body {
   --mat: 10px;
   --mat-feature: 14px;
   --print-radius: 6px;
-  --type-display: clamp(50px, 9.8vw, 124px);
-  --type-h1: clamp(44px, 8.2vw, 108px);
-  --type-display-md: clamp(40px, 6vw, 72px);
-  --type-title-lg: clamp(26px, 2.6vw, 36px);
-  --type-title-md: clamp(22px, 2.3vw, 28px);
-  --type-h2: clamp(20px, 2.2vw, 24px);
-  --type-h3: 18px;
-  --type-label: clamp(18px, 1.6vw, 20px);
-  --type-body-lg: clamp(17px, 1.5vw, 20px);
-  --type-body: 16px;
-  --type-meta: 15px;
-  --type-caption: 14px;
-  --type-micro: 12px;
-  --leading-tight: 1.1;
-  --leading-title: 1.2;
-  --leading-meta: 1.35;
-  --leading-body: 1.6;
-  --tracking-display: -0.035em;
-  --tracking-title: -0.02em;
-  --tracking-label: -0.01em;
   --pshadow: 0 1.5px 0 rgb(0 0 0 / 0.2), 0 3px 0 rgb(0 0 0 / 0.08);
   --pshadow-lift:
     0 2px 0 light-dark(rgb(0 0 0 / 0.24), rgb(0 0 0 / 0.38)),
@@ -104,7 +69,6 @@ html:has(.collageRoot) body {
   min-height: 100dvh;
   /* Backdrops run behind the header and footer, so the page edge is their only clip. */
   overflow: clip;
-  font-family: var(--body);
   color: var(--ink);
   background-color: var(--viridian);
   background-image: url("./img/grain.png");
@@ -196,12 +160,7 @@ html:has(.collageRoot) body {
   max-width: calc(100% + 12px);
 }
 .collageEyebrow {
-  font-family: var(--display);
-  font-size: var(--type-label);
-  font-weight: 700;
-  line-height: var(--leading-tight);
   color: var(--on, var(--ink));
-  letter-spacing: var(--tracking-label);
 }
 .collageStatus {
   grid-column: 1 / -1;
@@ -210,7 +169,6 @@ html:has(.collageRoot) body {
 .collageStatusText {
   padding: 20px 26px 22px;
   margin: 0;
-  font-size: var(--type-body-lg);
 }
 
 .paperWrap {
@@ -248,10 +206,6 @@ html:has(.collageRoot) body {
  */
 .collageRoot :is([data-tooltip-anchor] > [role="tooltip"], [data-tooltip-portal]) {
   padding: 7px 12px 8px;
-  font-family: var(--display);
-  font-size: var(--type-meta);
-  font-weight: 600;
-  line-height: var(--leading-title);
   color: var(--cream);
   background: var(--black);
   border: 1.5px solid color-mix(in oklab, var(--cream) 22%, transparent);
@@ -270,12 +224,7 @@ html:has(.collageRoot) body {
   gap: 0.5em;
   align-items: center;
   padding: 0.65em 0.95em 0.7em;
-  font-family: var(--display);
-  font-size: var(--type-label);
-  font-weight: 700;
-  line-height: var(--leading-tight);
   color: var(--on);
-  letter-spacing: var(--tracking-label);
   white-space: nowrap;
   text-decoration: none;
   cursor: pointer;
@@ -291,10 +240,6 @@ html:has(.collageRoot) body {
   cursor: default;
 }
 .paperTag small {
-  font-size: var(--type-meta);
-  font-weight: 600;
-  line-height: var(--leading-title);
-  letter-spacing: 0;
   opacity: 0.78;
 }
 /* Inline-level so it can sit in a `<summary>`, but a box, since `rotate` skips inline boxes. */
@@ -457,37 +402,30 @@ html[data-color-scheme="dark"] .cutNightOnly {
     translate: 0 calc(-1 * var(--drift));
   }
 }
-/* Words are flex items, so the space between them has to come from the gap. */
+/* Each word or line sits on its own row with a staggered indent on subsequent lines. */
 .cutHeading {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.02em 0.26em;
-  align-items: baseline;
+  display: grid;
+  row-gap: 0.08em;
+  justify-items: start;
   margin: 0;
-  font-family: var(--display);
-  font-size: var(--type-display);
-  font-weight: 700;
-  line-height: 0.9;
   color: var(--title);
-  letter-spacing: var(--tracking-display);
   text-shadow:
     0 1px 0 rgb(0 0 0 / 0.2),
     0 2px 3px rgb(0 0 0 / 0.12);
 }
 .collagePageTitle {
   padding-top: 20px;
-  font-size: var(--type-h1);
-  line-height: 0.94;
-  letter-spacing: var(--tracking-display);
 }
 .cutHeadingCut {
-  letter-spacing: 0.01em;
   text-shadow: none;
   filter: url("#collage-rough") var(--dshadow);
 }
 .cutWord {
   display: flex;
   white-space: nowrap;
+}
+.cutIndentedLine {
+  margin-left: var(--line-indent, 0.56em);
 }
 .cutLetter {
   display: inline-block;
@@ -502,6 +440,9 @@ html[data-color-scheme="dark"] .cutNightOnly {
   }
   .collagePageTitle {
     padding-top: 16px;
+  }
+  .cutIndentedLine {
+    margin-left: calc(var(--line-indent, 0.56em) * 0.78);
   }
   .collageRoot .collageGridStack {
     display: flex;

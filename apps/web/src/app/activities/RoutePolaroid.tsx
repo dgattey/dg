@@ -12,7 +12,7 @@ import { SPORT_DETAILS } from './stravaSports';
 export function SportChip({ sport }: { sport: StravaSport }) {
   const { label, tone } = SPORT_DETAILS[sport];
   return (
-    <span className="strava__sport" style={paperToneVars(tone)}>
+    <span className="strava__sport" data-typography="row-title" style={paperToneVars(tone)}>
       {label}
     </span>
   );
@@ -59,7 +59,7 @@ export function RoutePolaroid({
           </span>
         ) : null}
         {dated ? (
-          <span className="strava__polaroidMeta">
+          <span className="strava__polaroidMeta" data-typography="row-title">
             <SportChip sport={outing.sport} />
             <span>
               <RelativeTime date={outing.startDate} hasTooltip={false} isCapitalized /> ·{' '}
@@ -67,13 +67,19 @@ export function RoutePolaroid({
             </span>
           </span>
         ) : null}
-        <span className="strava__polaroidName">{outing.name}</span>
-        <span className="strava__stats">
+        <span className="strava__polaroidName" data-typography="title-sm">
+          {outing.name}
+        </span>
+        <span className="strava__stats" data-typography="row-title">
           <span>{formatMiles(outing.distanceMeters)} mi</span>
           <span>{formatDuration(outing.movingTimeSeconds)}</span>
           <span>{formatFeet(outing.elevationGainMeters)} ft</span>
         </span>
-        {note ? <span className="strava__polaroidNote">{note}</span> : null}
+        {note ? (
+          <span className="strava__polaroidNote" data-typography="prose">
+            {note}
+          </span>
+        ) : null}
       </PaperCard>
       {children}
     </a>

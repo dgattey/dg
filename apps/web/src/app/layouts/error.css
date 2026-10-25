@@ -19,7 +19,6 @@
 .error__statusCode {
   justify-self: center;
   padding-top: 0;
-  font-size: var(--type-display);
 }
 .error__statusCode > span {
   margin: 0;
@@ -36,16 +35,6 @@
 .error__messageCardInner p {
   margin: 0;
 }
-.error__messageCardInner h2 {
-  font-family: var(--display);
-  font-size: var(--type-h2);
-  line-height: var(--leading-title);
-}
-.error__messageCardInner p {
-  font-size: var(--type-body-lg);
-  line-height: var(--leading-body);
-}
-
 @media (max-width: 600px) {
   .error__sheet {
     place-items: start center;

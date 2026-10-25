@@ -1,7 +1,17 @@
 import path from 'node:path';
-import { isTestFile, lineAt, stripCssComments } from './check-page-titles.js';
+import {
+  cssRules,
+  declaration,
+  isTestFile,
+  lineAt,
+  stripCssComments,
+} from './check-page-titles.js';
 import type { StructureViolation } from './check-structure.js';
 
+export const TYPOGRAPHY_CSS_FILE = 'apps/web/src/app/collage/typography.css';
+
+const ALLOWED_TYPOGRAPHY_CSS_SELECTOR =
+  /^(?::root|body|button|input|select|textarea|b|strong|small|code|kbd|pre|samp|h[1-6]|\[data-typography(?:-(?:lg|md|sm|xs))?(?:="[^"]+")?\])$/;
 const CSS_IMPORT_PATTERN =
   /(?:^\s*import\s+['"]([^'"]+\.css)['"]|^\s*@import\s+['"]([^'"]+\.css)['"])/gm;
 
@@ -27,19 +37,14 @@ export function checkOrphanCssFiles(
       importedCss.add(resolved);
     }
   }
-
-  const violations: Array<StructureViolation> = [];
-  for (const cssPath of cssPaths) {
-    if (!importedCss.has(cssPath)) {
-      violations.push({
-        file: cssPath,
-        line: 1,
-        message: 'Stylesheet is not imported by any source or CSS file',
-        rule: 'no-orphan-css',
-      });
-    }
-  }
-  return violations;
+  return cssPaths
+    .filter((cssPath) => !importedCss.has(cssPath))
+    .map((file) => ({
+      file,
+      line: 1,
+      message: 'Stylesheet is not imported by any source or CSS file',
+      rule: 'no-orphan-css',
+    }));
 }
 
 const FONT_SIZE_DECLARATION = /(?<![-\w])(?:font-size|font)\s*:([^;{}]+)/g;
@@ -50,7 +55,9 @@ const FONT_FACE_BLOCK = /@font-face\s*\{[^}]*\}/g;
 const FONT_FAMILY_DECLARATION = /(?<![-\w])font-family\s*:([^;{}]+)/g;
 const FONT_SHORTHAND_DECLARATION = /(?<![-\w])font\s*:([^;{}]+)/g;
 const FONT_WEIGHT_DECLARATION = /(?<![-\w])font-weight\s*:([^;{}]+)/g;
-const CANONICAL_FAMILY = /^(?:var\(--(?:display|body)\)|inherit)$/;
+const TYPOGRAPHY_PROPERTY_DECLARATION =
+  /(?<![-\w])(font|font-family|font-size|font-weight|font-style|font-variant-numeric|line-height|letter-spacing)\s*:([^;{}]+)/g;
+const CANONICAL_FAMILY = /^(?:var\(--(?:display|body|font-mono)\)|inherit)$/;
 const CANONICAL_WEIGHT = /^(?:400|600|700|inherit)$/;
 const CLASS_SELECTOR_TOKEN = /\.([a-zA-Z_][a-zA-Z0-9_-]*)/g;
 const KEYFRAMES_DECLARATION = /@keyframes\s+([a-zA-Z0-9_-]+)/g;
@@ -64,11 +71,6 @@ function maskCssCommentsAndDeclarations(content: string): string {
     .replace(/(?<=[{;\s])[a-zA-Z-]+\s*:[^;{}]+/g, (match) => match.replace(/[^\n]/g, ' '));
 }
 
-/**
- * Flags CSS class selectors and `@keyframes` in web stylesheets that have zero
- * references in source files, plus static JSX `className` tokens that have no
- * matching rule in any stylesheet.
- */
 export function checkUnusedCssRules(
   cssFiles: ReadonlyMap<string, string>,
   sourceFiles: ReadonlyMap<string, string>,
@@ -77,21 +79,16 @@ export function checkUnusedCssRules(
   const dynamicPrefixes: Array<string> = [];
 
   for (const [file, content] of sourceFiles) {
-    if (isTestFile(file) || file.endsWith('cutOutShapes.ts')) {
-      continue;
-    }
+    if (isTestFile(file) || file.endsWith('cutOutShapes.ts')) continue;
     corpusParts.push(content);
     if (content.includes('${')) {
       for (const match of content.matchAll(TEMPLATE_CLASS_PREFIX)) {
-        if (match[1]) {
-          dynamicPrefixes.push(match[1]);
-        }
+        if (match[1]) dynamicPrefixes.push(match[1]);
       }
     }
   }
 
   const usedTokens = new Set<string>(corpusParts.join('\n').match(IDENTIFIER_TOKEN) ?? []);
-
   const allCssWithoutComments = [...cssFiles.values()]
     .map((c) => c.replace(/\/\*[\s\S]*?\*\//g, ''))
     .join('\n');
@@ -104,13 +101,9 @@ export function checkUnusedCssRules(
 
     for (const match of selectorOnlyCss.matchAll(CLASS_SELECTOR_TOKEN)) {
       const className = match[1] ?? '';
-      if (!className) {
-        continue;
-      }
+      if (!className) continue;
       declaredClasses.add(className);
-      if (seenInFile.has(className)) {
-        continue;
-      }
+      if (seenInFile.has(className)) continue;
       seenInFile.add(className);
 
       const isUsed =
@@ -127,9 +120,7 @@ export function checkUnusedCssRules(
 
     for (const match of selectorOnlyCss.matchAll(KEYFRAMES_DECLARATION)) {
       const name = match[1] ?? '';
-      if (!name) {
-        continue;
-      }
+      if (!name) continue;
       const cssMatches = allCssWithoutComments.match(new RegExp(`\\b${name}\\b`, 'g')) ?? [];
       if (cssMatches.length <= 1 && !usedTokens.has(name)) {
         violations.push({
@@ -143,12 +134,9 @@ export function checkUnusedCssRules(
   }
 
   for (const [file, content] of sourceFiles) {
-    if (!file.endsWith('.tsx') || isTestFile(file)) {
-      continue;
-    }
+    if (!file.endsWith('.tsx') || isTestFile(file)) continue;
     for (const match of content.matchAll(STATIC_JSX_CLASS_ATTR)) {
-      const tokens = (match[1] ?? '').split(/\s+/).filter(Boolean);
-      for (const token of tokens) {
+      for (const token of (match[1] ?? '').split(/\s+/).filter(Boolean)) {
         if (!declaredClasses.has(token)) {
           violations.push({
             file,
@@ -164,12 +152,10 @@ export function checkUnusedCssRules(
   return violations;
 }
 
-/**
- * Families are `var(--display)` or `var(--body)` and weights are 400, 600, or 700, so no
- * stylesheet can introduce a third stack or a weight the two fonts render differently.
- */
 function checkFontSystem(file: string, raw: string): Array<StructureViolation> {
-  const content = raw.replace(FONT_FACE_BLOCK, (block) => block.replace(/[^\n]/g, ' '));
+  const content = stripCssComments(raw).replace(FONT_FACE_BLOCK, (block) =>
+    block.replace(/[^\n]/g, ' '),
+  );
   const violations: Array<StructureViolation> = [];
   const flag = (index: number, message: string, rule: string) =>
     violations.push({ file, line: lineAt(content, index), message, rule });
@@ -181,9 +167,7 @@ function checkFontSystem(file: string, raw: string): Array<StructureViolation> {
   }
   for (const match of content.matchAll(FONT_SHORTHAND_DECLARATION)) {
     const value = (match[1] ?? '').trim();
-    if (value === 'inherit') {
-      continue;
-    }
+    if (value === 'inherit') continue;
     if (!/var\(--(?:display|body)\)$/.test(value)) {
       flag(
         match.index,
@@ -202,16 +186,36 @@ function checkFontSystem(file: string, raw: string): Array<StructureViolation> {
       flag(match.index, `Font weight ${weight} is off the 400/600/700 palette`, 'css-font-weight');
     }
   }
+  if (file === TYPOGRAPHY_CSS_FILE) {
+    for (const rule of cssRules(content)) {
+      for (const selector of rule.selectors) {
+        if (!ALLOWED_TYPOGRAPHY_CSS_SELECTOR.test(selector)) {
+          flag(
+            rule.index,
+            `Use <Typography variant="..."> or data-typography="..." instead of consumer selector "${selector}" in ${TYPOGRAPHY_CSS_FILE}`,
+            'css-typography-no-consumer-selectors',
+          );
+        }
+      }
+      if (!rule.selectors.some((s) => s.startsWith('[data-typography='))) continue;
+      const family = declaration(rule.body, 'font-family');
+      const weight = declaration(rule.body, 'font-weight');
+      if (family === 'var(--display)' && weight !== '700') {
+        flag(rule.index, 'Display roles must use font-weight: 700', 'css-font-weight');
+      }
+      if (family === 'var(--body)' && weight !== '400' && weight !== '600') {
+        flag(rule.index, 'Body roles must use font-weight: 400 or 600', 'css-font-weight');
+      }
+    }
+  }
   return violations;
 }
 
-/**
- * Type sizes come from the `--type-*` scale on `.collageRoot`, so a literal size or a
- * token nobody declares fails here instead of rendering at a stray or inherited size.
- */
 export function checkTypeScale(cssFiles: ReadonlyMap<string, string>): Array<StructureViolation> {
   const declared = new Set<string>();
-  for (const content of cssFiles.values()) {
+  const enforceSingleOwner = cssFiles.has(TYPOGRAPHY_CSS_FILE);
+  for (const [file, content] of cssFiles) {
+    if (enforceSingleOwner && file !== TYPOGRAPHY_CSS_FILE) continue;
     for (const match of content.matchAll(TYPE_TOKEN_DECLARATION)) {
       declared.add(match[1] ?? '');
     }
@@ -219,23 +223,39 @@ export function checkTypeScale(cssFiles: ReadonlyMap<string, string>): Array<Str
 
   const violations: Array<StructureViolation> = [];
   for (const [file, content] of cssFiles) {
+    const clean = stripCssComments(content).replace(FONT_FACE_BLOCK, (block) =>
+      block.replace(/[^\n]/g, ' '),
+    );
+    if (enforceSingleOwner && file !== TYPOGRAPHY_CSS_FILE) {
+      for (const match of clean.matchAll(TYPOGRAPHY_PROPERTY_DECLARATION)) {
+        const prop = match[1] ?? 'font';
+        violations.push({
+          file,
+          line: lineAt(clean, match.index),
+          message: `Use <Typography variant="..."> or data-typography="..." from ${TYPOGRAPHY_CSS_FILE} instead of declaring \`${prop}\` in ${file}`,
+          rule: 'css-typography-single-source',
+        });
+      }
+      continue;
+    }
+
     violations.push(...checkFontSystem(file, content));
-    for (const match of content.matchAll(FONT_SIZE_DECLARATION)) {
+    for (const match of clean.matchAll(FONT_SIZE_DECLARATION)) {
       if (LITERAL_FONT_SIZE.test(match[1] ?? '')) {
         violations.push({
           file,
-          line: lineAt(content, match.index),
+          line: lineAt(clean, match.index),
           message: 'Set font sizes with a --type-* token, not a literal length',
           rule: 'css-type-scale',
         });
       }
     }
-    for (const match of content.matchAll(TYPE_TOKEN_USE)) {
+    for (const match of clean.matchAll(TYPE_TOKEN_USE)) {
       const token = match[1] ?? '';
       if (!declared.has(token)) {
         violations.push({
           file,
-          line: lineAt(content, match.index),
+          line: lineAt(clean, match.index),
           message: `${token} is not declared in any stylesheet`,
           rule: 'css-type-scale',
         });
@@ -259,9 +279,7 @@ export function checkRouteCssImports(
 
   const violations: Array<StructureViolation> = [];
   for (const cssPath of cssPaths) {
-    if (!cssPath.startsWith('apps/web/src/app/')) {
-      continue;
-    }
+    if (!cssPath.startsWith('apps/web/src/app/')) continue;
     const cssDir = path.posix.dirname(cssPath);
     const routeDir = cssDir === 'apps/web/src/app/home' ? 'apps/web/src/app' : cssDir;
     for (const pageEntry of pageEntries) {
@@ -271,8 +289,7 @@ export function checkRouteCssImports(
       ) {
         continue;
       }
-      const covered = importsByFile.get(pageEntry)?.has(cssPath) ?? false;
-      if (!covered) {
+      if (!(importsByFile.get(pageEntry)?.has(cssPath) ?? false)) {
         violations.push({
           file: pageEntry,
           line: 1,
@@ -289,19 +306,12 @@ const SHARED_CSS_PATH = /^(?:packages\/.*|apps\/web\/src\/app\/collage\/[^/]+)\.
 const CONSUMER_CLASS_SELECTOR =
   /\.(?:stats|strava|streets|reading|changelog|music|home|siteMap|devConsole|error)__[a-zA-Z0-9_-]+/g;
 
-/**
- * Shared stylesheets in `apps/web/src/app/collage/` and `packages/` must style
- * shared component variants (`[data-filter-bar]`, `[data-typography]`, `.paper*`, `.cut*`,
- * `.chrome*`, `[data-map-*]`) rather than hardcoding route-specific consumer classes.
- */
 export function checkNoConsumerSelectorsInSharedCss(
   cssFiles: ReadonlyMap<string, string>,
 ): Array<StructureViolation> {
   const violations: Array<StructureViolation> = [];
   for (const [file, content] of cssFiles) {
-    if (!SHARED_CSS_PATH.test(file)) {
-      continue;
-    }
+    if (!SHARED_CSS_PATH.test(file)) continue;
     const selectorOnlyCss = maskCssCommentsAndDeclarations(content);
     for (const match of selectorOnlyCss.matchAll(CONSUMER_CLASS_SELECTOR)) {
       violations.push({

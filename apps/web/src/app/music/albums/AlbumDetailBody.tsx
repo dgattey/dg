@@ -58,7 +58,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
   return (
     <>
       <div className="music__wellMeta">
-        <h3 className="music__wellArtists">
+        <h3 className="music__wellArtists" data-typography="title-md">
           <Tooltip title={artistNames(album.artists)} whenTruncated>
             <span className="music__wellArtistsText">
               <LinkedArtists artists={album.artists} />
@@ -66,7 +66,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
           </Tooltip>
         </h3>
         <div className="music__wellFacts">
-          <p>{albumFacts(album).join(' · ')}</p>
+          <p data-typography="meta">{albumFacts(album).join(' · ')}</p>
           {album.popularity == null ? null : (
             <div
               aria-label={`Popularity ${album.popularity} out of 100`}
@@ -83,7 +83,7 @@ export function AlbumDetailBody({ album }: { album: AlbumDetail }) {
           )}
         </div>
       </div>
-      <ol className="music__wellTracks">
+      <ol className="music__wellTracks" data-typography="prose">
         {album.tracks.map((track) => (
           <li className="music__wellTrack" key={track.id}>
             <span className="music__wellTrackNumber">{track.trackNumber}</span>

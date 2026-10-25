@@ -317,7 +317,7 @@ export function checkWorkspaceStructure(repoRoot: string): Array<StructureViolat
     ...checkSocialImageRouteParity(webSources),
     ...checkNoPageSubtitles(webSources),
     ...checkCacheTagParity(webSources),
-    ...checkTypeScale(webCss),
+    ...checkTypeScale(allCss),
     ...checkCssGeometry(webCss),
     ...checkNoConsumerSelectorsInSharedCss(allCss),
     ...checkUnusedCssRules(webCss, cssCodeSources),

@@ -33,34 +33,15 @@
   right: -16px;
   width: 54px;
 }
-.reading__seal .stats__scallop {
-  font-size: var(--type-meta);
-}
 
 .reading__bookTitle,
 .reading__featureTitle {
   margin: 0;
-  font-family: var(--display);
-  font-weight: 700;
-  line-height: var(--leading-title);
-  letter-spacing: var(--tracking-label);
   text-wrap: balance;
-}
-.reading__bookTitle {
-  font-size: var(--type-h3);
-}
-.reading__card--feature .reading__bookTitle {
-  font-size: var(--type-h2);
-}
-.reading__featureTitle {
-  font-size: var(--type-title-md);
-  letter-spacing: var(--tracking-title);
 }
 .reading__author,
 .reading__meta {
   margin: 0;
-  font-size: var(--type-meta);
-  line-height: var(--leading-meta);
 }
 .reading__author {
   color: color-mix(in oklab, currentColor 78%, transparent);
@@ -74,17 +55,12 @@
   flex-wrap: wrap;
   gap: 4px 10px;
   align-items: baseline;
-  font-weight: 600;
-}
-.reading__stars {
-  letter-spacing: 0.08em;
 }
 .reading__starsEmpty {
   color: color-mix(in oklab, var(--on) 30%, var(--pc));
 }
 .reading__stamp {
   margin-top: 8px;
-  font-size: var(--type-meta);
 }
 
 .reading__slipInner {
@@ -93,8 +69,6 @@
 }
 .reading__slipInner p {
   margin: 0;
-  font-size: var(--type-body);
-  line-height: var(--leading-body);
 }
 
 .reading__hero {
@@ -107,7 +81,6 @@
 .reading__heroCount {
   top: -16px;
   right: 36px;
-  font-size: var(--type-meta);
 }
 .reading__featureInner {
   display: grid;
@@ -136,9 +109,6 @@
   gap: 10px;
   justify-items: start;
 }
-.reading__featureBody .reading__author {
-  font-size: var(--type-body-lg);
-}
 .reading__featureBody .reading__stars {
   color: var(--ochre);
 }
@@ -148,10 +118,6 @@
 .reading__heroSlip {
   margin-top: 12px;
 }
-.reading__heroSlip .reading__slipInner p {
-  font-size: var(--type-body-lg);
-}
-
 .reading__section {
   display: flex;
   flex-direction: column;
@@ -171,7 +137,6 @@
   width: 220px;
   min-width: 220px;
   margin: 0;
-  font: inherit;
   @media (min-width: 1100px) {
     width: 100%;
     min-width: 200px;
@@ -190,7 +155,6 @@
   justify-content: space-between;
   width: 100%;
   padding: 16px 22px 18px;
-  font-size: var(--type-title-md);
 }
 .reading__section:nth-of-type(n + 3) {
   contain-intrinsic-size: auto 720px;

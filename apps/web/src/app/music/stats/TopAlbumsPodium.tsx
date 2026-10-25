@@ -39,11 +39,12 @@ function RankSticker({ cut, rank }: { cut: RunnerUpCut; rank: number }) {
       tiltDeg={cut.stickerTiltDeg}
       tone={cut.stickerTone}
     >
-      {label}
+      <span data-typography="label">{label}</span>
     </Stub>
   ) : (
     <span
       className="stats__rankSticker stats__rankCircle"
+      data-typography="label"
       style={paperSurfaceVars(cut.stickerTone, 'quad-a', cut.stickerTiltDeg)}
     >
       {label}
@@ -63,7 +64,11 @@ export function TopAlbumsPodium({ stats }: { stats: ListeningStats }) {
   const suffix = formatRangeSuffix(stats.range);
   return (
     <section className="stats__podium">
-      <h2 className="paperTag stats__sectionTag" style={paperSurfaceVars('black', 'quad-c', -2)}>
+      <h2
+        className="paperTag stats__sectionTag"
+        data-typography="title-md"
+        style={paperSurfaceVars('black', 'quad-c', -2)}
+      >
         Top albums, {suffix}
       </h2>
       <div className="stats__hero">
@@ -74,21 +79,28 @@ export function TopAlbumsPodium({ stats }: { stats: ListeningStats }) {
             <Cover album={first.album} eager={true} size={280} />
           </AlbumLink>
           <Scallop className="stats__heroStamp" tiltDeg={-12} tone="ochre">
-            <span className="stats__heroRank">#1</span>
-            <span className="stats__meta">{suffix}</span>
+            <span data-typography="title-md">#1</span>
+            <span className="stats__meta" data-typography="caption">
+              {suffix}
+            </span>
           </Scallop>
         </div>
         <PaperCard edge="soft-b" innerClassName="stats__heroInner" tiltDeg={1.2}>
-          <span className="stats__meta">Most played album</span>
-          <AlbumLink album={first.album} className="stats__heroTitle">
+          <span className="stats__meta" data-typography="meta">
+            Most played album
+          </span>
+          <AlbumLink album={first.album} className="stats__heroTitle" variant="title-md">
             {first.album.name}
           </AlbumLink>
           <ArtistLinks artists={first.album.artists} newArtists={stats.newArtists} />
-          <span className="stats__heroPlays">
-            {formatCount(first.plays)} <span className="stats__meta">plays</span>
+          <span className="stats__heroPlays" data-typography="title-md">
+            {formatCount(first.plays)}{' '}
+            <span className="stats__meta" data-typography="meta">
+              plays
+            </span>
           </span>
           {first.album.isFavorite ? (
-            <p className="stats__note">
+            <p className="stats__note" data-typography="meta">
               <AlbumLink album={first.album}>In Favorite albums →</AlbumLink>
             </p>
           ) : null}
@@ -114,11 +126,13 @@ export function TopAlbumsPodium({ stats }: { stats: ListeningStats }) {
                   <RankSticker cut={cut} rank={i + 2} />
                 </span>
                 <span className="stats__runnerCaption">
-                  <AlbumLink album={album} className="stats__label">
+                  <AlbumLink album={album} className="stats__label" variant="label">
                     {album.name}
                   </AlbumLink>
                   <ArtistLinks artists={album.artists} newArtists={stats.newArtists} />
-                  <span className="stats__count">{formatCount(plays)}</span>
+                  <span className="stats__count" data-typography="title-md">
+                    {formatCount(plays)}
+                  </span>
                 </span>
               </li>
             );

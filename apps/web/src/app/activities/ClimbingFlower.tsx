@@ -105,8 +105,10 @@ export function ClimbingFlower({
       tiltDeg={-2}
     >
       <div className="strava__head">
-        <h2 className="strava__heading">Climbing by month</h2>
-        <span className="strava__aside">
+        <h2 className="strava__heading" data-typography="title-md">
+          Climbing by month
+        </h2>
+        <span className="strava__aside" data-typography="row-title">
           {picked === null ? span : `${MONTHS[picked]} · ${formatFeet(pickedMeters ?? 0)} ft`}
         </span>
       </div>
@@ -148,6 +150,7 @@ export function ClimbingFlower({
                 ) : null}
                 <text
                   className="strava__month"
+                  data-typography="row-title"
                   x={round(CENTER + Math.cos(radians) * (length + LABEL_GAP))}
                   y={round(CENTER + Math.sin(radians) * (length + LABEL_GAP))}
                 >
@@ -157,10 +160,15 @@ export function ClimbingFlower({
             );
           })}
           <circle className="strava__flowerHeart" cx={CENTER} cy={CENTER} r={HEART} />
-          <text className="strava__flowerTotal" x={CENTER} y={CENTER - 4}>
+          <text
+            className="strava__flowerTotal"
+            data-typography="title-md"
+            x={CENTER}
+            y={CENTER - 4}
+          >
             {formatCompactFeet(pickedMeters ?? total)}
           </text>
-          <text className="strava__flowerUnit" x={CENTER} y={CENTER + 20}>
+          <text className="strava__flowerUnit" data-typography="meta" x={CENTER} y={CENTER + 20}>
             {picked === null ? 'feet' : `ft · ${MONTHS[picked]}`}
           </text>
         </svg>
