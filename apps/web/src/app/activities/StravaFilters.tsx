@@ -7,6 +7,8 @@ import {
   STRAVA_WINDOW_DAYS,
   type StravaWindow,
 } from '@dg/content-models/strava/StreetCoverage';
+import { regionForPoint } from '@dg/maps/atlasGeometry';
+import type { GeoBounds } from '@dg/maps/src/routeFrame';
 import { VisibleRoutes } from '@dg/maps/VisibleRoutes';
 import {
   type CSSProperties,
@@ -21,20 +23,18 @@ import { type PaperPillOption, PaperPills } from '../collage/PaperPills';
 import { PaperTag } from '../collage/PaperTag';
 import { PillMenu, PillMenuList, PillMenuOption } from '../collage/PillMenu';
 import { YearGrid, YearMenu } from '../collage/YearMenu';
+import { type AtlasFocus, atlasFocusFor } from './atlasFocus';
 import { formatRouteCount } from './stravaFormat';
 import { SPORT_DETAILS } from './stravaSports';
 import { yearOf } from './stravaStats';
 
 const FILTER_SPORTS = ['ride', 'ski', 'hike', 'run'] as const;
-
-/** Phones show this many sport pills and fold the rest into `More ▾`, keeping the bar one row. */
 const PHONE_SPORT_PILLS = 2;
 
 type SportFilter = 'all' | (typeof FILTER_SPORTS)[number];
 
 const DAY_MS = 24 * 60 * 60 * 1000;
 
-/** A rolling window keeps the moment it was picked, so rendering never reads the clock. */
 type Span =
   | { kind: 'all' }
   | { kind: 'window'; key: StravaWindow; since: number }
@@ -61,24 +61,32 @@ const SPAN_OPTIONS = [
 const SPORT_TILTS = [-1, 1.2, -0.6, 0.9] as const;
 
 type Filtered = {
-  /** Every outing, newest first, whatever is picked. */
   all: ReadonlyArray<StravaLogEntry>;
+  atlasCustomBounds: GeoBounds | null;
+  atlasRegion: CoverageCity | null;
   city: CoverageCity;
-  /** Outings in the picked sport and span, newest first. */
+  fitKey: number;
+  followAtlasCenter: (center: [number, number]) => void;
+  framedRegion: CoverageCity | null;
   outings: ReadonlyArray<StravaLogEntry>;
+  selectRegion: (city: CoverageCity) => void;
   setCity: (city: CoverageCity) => void;
-  /** Outings in the picked sport across every year, for views that are already per year. */
   sportOutings: ReadonlyArray<StravaLogEntry>;
   sport: SportFilter;
-  /** The span in words, `All time`, `This week`, or a year. */
   spanLabel: string;
   span: CoverageSpan;
 };
 
 const FilteredOutings = createContext<Filtered>({
   all: [],
+  atlasCustomBounds: null,
+  atlasRegion: 'sf',
   city: 'sf',
+  fitKey: 0,
+  followAtlasCenter: () => {},
+  framedRegion: 'sf',
   outings: [],
+  selectRegion: () => {},
   setCity: () => {},
   span: 'all',
   spanLabel: SPAN_OPTIONS[0].label,
@@ -132,11 +140,6 @@ function spanLabel(span: Span, labels: Record<StravaWindow, string> = WINDOW_LAB
   }
 }
 
-/**
- * Sport and time filters for everything on the page. The pills sit beside the
- * title; the outings they pick reach the sections through `useFilteredOutings`
- * and the atlas through `VisibleRoutes`, so the map filters in place.
- */
 export function StravaFilters({
   children,
   outings,
@@ -150,15 +153,71 @@ export function StravaFilters({
     sportKeys.length > PHONE_SPORT_PILLS + 1 ? sportKeys.slice(PHONE_SPORT_PILLS) : [];
   const [sport, setSport] = useState<SportFilter>(() => (sports.includes('ride') ? 'ride' : 'all'));
   const [span, setSpan] = useState<Span>({ kind: 'all' });
-  const [city, setCity] = useState<CoverageCity>('sf');
+  const [city, setCityState] = useState<CoverageCity>('sf');
+  const [atlasRegion, setAtlasRegion] = useState<CoverageCity | null>('sf');
+  const [atlasCustomBounds, setAtlasCustomBounds] = useState<GeoBounds | null>(null);
+  const [framedRegion, setFramedRegion] = useState<CoverageCity | null>('sf');
+  const [fitKey, setFitKey] = useState(0);
   const years = [...new Set(outings.map(yearOf))].toSorted((a, b) => b - a);
   const sportOutings =
     sport === 'all' ? outings : outings.filter((outing) => outing.sport === sport);
   const visible =
     span.kind === 'all' ? sportOutings : sportOutings.filter((outing) => inSpan(span, outing));
   const filtered = sport !== 'all' || span.kind !== 'all';
-  const pickSport = (key: SportFilter) => startTransition(() => setSport(key));
-  const pickSpan = (next: Span) => startTransition(() => setSpan(next));
+  const bumpFit = () => setFitKey((key) => key + 1);
+  const selectRegion = (nextCity: CoverageCity) => {
+    setCityState(nextCity);
+    setAtlasRegion(nextCity);
+    setFramedRegion(nextCity);
+    setAtlasCustomBounds(null);
+    bumpFit();
+  };
+  const followAtlasCenter = (center: [number, number]) => {
+    const region = regionForPoint(center);
+    if (region === atlasRegion) {
+      return;
+    }
+    setAtlasRegion(region);
+    if (region) {
+      setCityState(region);
+    }
+  };
+  const applyFocus = (focus: AtlasFocus | null) => {
+    switch (focus?.kind) {
+      case undefined:
+        return;
+      case 'region':
+        selectRegion(focus.city);
+        return;
+      case 'place':
+        setAtlasRegion(null);
+        setFramedRegion(null);
+        setAtlasCustomBounds(focus.bounds);
+        bumpFit();
+        return;
+      default: {
+        const unhandled: never = focus;
+        return unhandled;
+      }
+    }
+  };
+  const polylinesOf = (nextSport: SportFilter, nextSpan: Span) => {
+    const matched =
+      nextSport === 'all' ? outings : outings.filter((outing) => outing.sport === nextSport);
+    const nextVisible =
+      nextSpan.kind === 'all' ? matched : matched.filter((outing) => inSpan(nextSpan, outing));
+    return nextVisible.flatMap((outing) => (outing.polyline ? [outing.polyline] : []));
+  };
+  const pickSport = (key: SportFilter) =>
+    startTransition(() => {
+      setSport(key);
+      applyFocus(atlasFocusFor(key === 'all' && span.kind === 'all', polylinesOf(key, span)));
+    });
+  const pickSpan = (next: Span) =>
+    startTransition(() => {
+      setSpan(next);
+      applyFocus(atlasFocusFor(sport === 'all' && next.kind === 'all', polylinesOf(sport, next)));
+    });
   const pickSpanKey = (key: SpanKey) =>
     pickSpan(key === 'all' ? { kind: 'all' } : { key, kind: 'window', since: Date.now() });
   const spanKey = span.kind === 'window' ? span.key : span.kind === 'all' ? 'all' : null;
@@ -168,9 +227,15 @@ export function StravaFilters({
     <FilteredOutings
       value={{
         all: outings,
+        atlasCustomBounds,
+        atlasRegion,
         city,
+        fitKey,
+        followAtlasCenter,
+        framedRegion,
         outings: visible,
-        setCity,
+        selectRegion,
+        setCity: selectRegion,
         span: span.kind === 'all' ? 'all' : span.kind === 'year' ? span.year : span.key,
         spanLabel: spanLabel(span),
         sport,

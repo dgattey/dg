@@ -1,6 +1,7 @@
 import type { StravaLogEntry, StravaSport } from '@dg/content-models/strava/StravaHistory';
 import type { AtlasRegion } from '@dg/maps/atlasGeometry';
 import type { GeoBounds } from '@dg/maps/src/routeFrame';
+import { encodePolyline } from '@dg/maps/src/routeGeometry';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { StravaAtlas } from '../FilteredSections';
@@ -61,7 +62,9 @@ const renderFilters = (
       path.getAttribute('data-tone'),
     );
   const inkedPaths = () =>
-    [...container.querySelectorAll('path[data-tone]')].map((path) => path.getAttribute('d'));
+    [...container.querySelectorAll('[data-atlas-overlay] > g')].map((group) =>
+      group.getAttribute('transform'),
+    );
   return { inkedPaths, inkedTones };
 };
 
@@ -164,6 +167,48 @@ describe('StravaFilters', () => {
     expect(bayArea).toHaveClass('chrome__segmentCurrent');
     expect(sanDiego).toHaveAttribute('aria-pressed', 'false');
     expect(inkedPaths()).toEqual(bayAreaPaths);
+  });
+
+  it('frames skiing at a mountain and deselects both regions, then restores the bay for all sports', async () => {
+    const user = userEvent.setup({ advanceTimers: jest.advanceTimersByTime });
+    const tahoe = encodePolyline([
+      [39.2, -120.1],
+      [39.23, -120.08],
+      [39.21, -120.05],
+    ]);
+    const ski: StravaLogEntry = {
+      distanceMeters: 10_000,
+      elevationGainMeters: 100,
+      id: 900,
+      movingTimeSeconds: 1_800,
+      name: 'Palisades',
+      polyline: tahoe,
+      sport: 'ski',
+      startDate: new Date(NOW - DAY_MS).toISOString(),
+      url: 'https://www.strava.com/activities/900',
+    };
+    const { inkedPaths, inkedTones } = renderFilters(
+      [ski, ...outings],
+      [
+        { bounds: BAY_AREA, key: 'sf', label: 'Bay Area' },
+        { bounds: SAN_DIEGO, key: 'sd', label: 'San Diego' },
+      ],
+    );
+    const strip = screen.getByRole('group', { name: 'Zoom to region' });
+    const bayArea = within(strip).getByRole('button', { name: 'Bay Area' });
+    const sanDiego = within(strip).getByRole('button', { name: 'San Diego' });
+    const bayPaths = inkedPaths();
+
+    await user.click(getDesktopButton('Skiing'));
+    expect(bayArea).toHaveAttribute('aria-pressed', 'false');
+    expect(sanDiego).toHaveAttribute('aria-pressed', 'false');
+    expect(bayArea).not.toHaveClass('chrome__segmentCurrent');
+    expect(inkedPaths()).not.toEqual(bayPaths);
+    expect(inkedTones()).toEqual(['rose']);
+
+    await user.click(getDesktopButton('All sports'));
+    expect(bayArea).toHaveAttribute('aria-pressed', 'true');
+    expect(sanDiego).toHaveAttribute('aria-pressed', 'false');
   });
 
   it('narrows to a rolling window or a year on top of the sport', async () => {

@@ -89,18 +89,6 @@
   pointer-events: none;
 }
 
-[data-atlas-canvas] {
-  position: absolute;
-  inset: 0;
-  background-image: var(--atlas-offline-bg);
-}
-
-[data-atlas-canvas] > svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
 [data-atlas-tiles] {
   position: absolute;
   inset: 0;

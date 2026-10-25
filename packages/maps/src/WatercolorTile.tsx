@@ -53,9 +53,21 @@ export function WatercolorTile({ tile, tileLoaded }: TileComponentProps) {
 
   return (
     <div data-active={tile.active ? 'true' : undefined} data-map-tile="" style={tileVars}>
-      <img alt="" data-watercolor-tile-img="" onLoad={handleImageLoad} src={tile.url} />
+      <img
+        alt=""
+        data-watercolor-tile-img=""
+        decoding="async"
+        onLoad={handleImageLoad}
+        src={tile.url}
+      />
       {hasLabels && (
-        <img alt="" data-watercolor-tile-img="" onLoad={handleImageLoad} src={labelsUrl} />
+        <img
+          alt=""
+          data-watercolor-tile-img=""
+          decoding="async"
+          onLoad={handleImageLoad}
+          src={labelsUrl}
+        />
       )}
     </div>
   );

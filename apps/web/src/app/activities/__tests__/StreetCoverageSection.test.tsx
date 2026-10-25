@@ -102,7 +102,7 @@ describe('StreetCoverageSection', () => {
     expect(callouts().getByText('Mission · 90.0%')).toBeInTheDocument();
     expect(callouts().getByText('11')).toBeInTheDocument();
     expect(callouts().getByText('of 12')).toBeInTheDocument();
-    expect(header()).toBe('San Francisco40.0%9.6 of 24.0 mi');
+    expect(header()).toBe('San FranciscoSan Diego40.0%9.6 of 24.0 mi');
   });
 
   it('lets the interface speak for itself, with no instructions', () => {
@@ -137,12 +137,12 @@ describe('StreetCoverageSection', () => {
     const { header, hoods } = renderSection();
 
     await user.hover(screen.getByRole('button', { name: /Noe Valley/ }));
-    expect(header()).toBe('Noe Valley70.0%1.4 of 2.0 mi');
+    expect(header()).toBe('San FranciscoSan DiegoNoe Valley70.0%1.4 of 2.0 mi');
     await user.unhover(screen.getByRole('button', { name: /Noe Valley/ }));
-    expect(header()).toBe('San Francisco40.0%9.6 of 24.0 mi');
+    expect(header()).toBe('San FranciscoSan Diego40.0%9.6 of 24.0 mi');
 
     await user.hover(hoods()[3] as Element);
-    expect(header()).toBe('Excelsior30.0%0.6 of 2.0 mi');
+    expect(header()).toBe('San FranciscoSan DiegoExcelsior30.0%0.6 of 2.0 mi');
     expect(hoods()[3]).toHaveAttribute('data-tier', '2');
     expect(document.querySelector('.streets__focus')).toHaveAttribute('d', 'M30 0l10 0 0 10z');
   });
@@ -157,11 +157,11 @@ describe('StreetCoverageSection', () => {
     await user.click(mission);
     await user.unhover(mission);
     expect(mission).toHaveAttribute('aria-pressed', 'true');
-    expect(header()).toBe('Mission90.0%1.8 of 2.0 mi');
+    expect(header()).toBe('San FranciscoSan DiegoMission90.0%1.8 of 2.0 mi');
     await user.hover(noe);
-    expect(header()).toMatch(/^Noe Valley/);
+    expect(header()).toMatch(/Noe Valley70.0%/);
     await user.unhover(noe);
-    expect(header()).toBe('Mission90.0%1.8 of 2.0 mi');
+    expect(header()).toBe('San FranciscoSan DiegoMission90.0%1.8 of 2.0 mi');
 
     await user.click(hoods()[7] as Element);
     await user.unhover(hoods()[7] as Element);
@@ -174,7 +174,7 @@ describe('StreetCoverageSection', () => {
     const { callouts, header } = renderSection();
 
     await user.click(getDesktopButton('Runs'));
-    expect(header()).toBe('San Francisco2.1%0.5 of 24.0 mi');
+    expect(header()).toBe('San FranciscoSan Diego2.1%0.5 of 24.0 mi');
     expect(callouts().getByText('Mission · 25.0%')).toBeInTheDocument();
     expect(callouts().getByText('1')).toBeInTheDocument();
   });
@@ -202,7 +202,7 @@ describe('StreetCoverageSection', () => {
     const { callouts, header } = renderSection();
 
     await user.click(getDesktopButton('This week'));
-    expect(header()).toBe('San Francisco0.0%0.0 of 24.0 mi');
+    expect(header()).toBe('San FranciscoSan Diego0.0%0.0 of 24.0 mi');
     expect(callouts().queryByText(/Most ridden/)).not.toBeInTheDocument();
     expect(callouts().getByText('0')).toBeInTheDocument();
   });
@@ -210,22 +210,21 @@ describe('StreetCoverageSection', () => {
   it('switches between San Francisco and San Diego', async () => {
     const user = userEvent.setup();
     const { callouts, header, rows, section } = renderSection();
-    const sf = screen.getByRole('button', { name: 'San Francisco' });
-    const sd = screen.getByRole('button', { name: 'San Diego' });
-    expect(sf).toHaveAttribute('aria-pressed', 'true');
+    const cityButton = (name: string) => screen.getByRole('button', { name });
+    expect(cityButton('San Francisco')).toHaveAttribute('aria-pressed', 'true');
 
     await user.click(screen.getByRole('button', { name: /Mission/ }));
-    await user.click(sd);
-    expect(sd).toHaveAttribute('aria-pressed', 'true');
+    await user.click(cityButton('San Diego'));
+    expect(cityButton('San Diego')).toHaveAttribute('aria-pressed', 'true');
     expect(section).toHaveAccessibleName('San Diego streets');
-    expect(header()).toBe('San Diego25.0%1.0 of 4.0 mi');
+    expect(header()).toBe('San FranciscoSan Diego25.0%1.0 of 4.0 mi');
     expect(callouts().getByText('of SD')).toBeInTheDocument();
     expect(callouts().getByText('North Park · 50.0%')).toBeInTheDocument();
     expect(callouts().getByText('of 2')).toBeInTheDocument();
     expect(rows()).toEqual(['1North Park50.0%', '2Uptown0.0%']);
 
-    await user.click(sf);
-    expect(header()).toBe('San Francisco40.0%9.6 of 24.0 mi');
+    await user.click(cityButton('San Francisco'));
+    expect(header()).toBe('San FranciscoSan Diego40.0%9.6 of 24.0 mi');
   });
 
   it('keeps the region strip and the street strip on the same city', async () => {
@@ -253,8 +252,8 @@ describe('StreetCoverageSection', () => {
     );
 
     const regionStrip = screen.getByRole('group', { name: 'Zoom to region' });
-    const cityStrip = screen.getByRole('group', { name: 'Street coverage city' });
-    expect(cityStrip).toHaveClass('chrome__strip');
+    const cityStrip = () => screen.getByRole('group', { name: 'Street coverage city' });
+    expect(cityStrip()).toHaveClass('chrome__strip');
 
     const bayview = screen.getByRole('button', { name: /Bayview/ });
     await user.click(bayview);
@@ -262,7 +261,7 @@ describe('StreetCoverageSection', () => {
 
     await user.click(within(regionStrip).getByRole('button', { name: 'San Diego' }));
     const sanDiegoSection = screen.getByRole('region', { name: 'San Diego streets' });
-    expect(within(cityStrip).getByRole('button', { name: 'San Diego' })).toHaveAttribute(
+    expect(within(cityStrip()).getByRole('button', { name: 'San Diego' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
@@ -271,10 +270,10 @@ describe('StreetCoverageSection', () => {
       'false',
     );
     expect(sanDiegoSection.querySelector('.streets__head')?.textContent).toBe(
-      'San Diego25.0%1.0 of 4.0 mi',
+      'San FranciscoSan Diego25.0%1.0 of 4.0 mi',
     );
 
-    await user.click(within(cityStrip).getByRole('button', { name: 'San Francisco' }));
+    await user.click(within(cityStrip()).getByRole('button', { name: 'San Francisco' }));
     const sanFranciscoSection = screen.getByRole('region', { name: 'San Francisco streets' });
     expect(within(regionStrip).getByRole('button', { name: 'Bay Area' })).toHaveAttribute(
       'aria-pressed',
@@ -285,7 +284,7 @@ describe('StreetCoverageSection', () => {
       'false',
     );
     expect(sanFranciscoSection.querySelector('.streets__head')?.textContent).toBe(
-      'San Francisco40.0%9.6 of 24.0 mi',
+      'San FranciscoSan Diego40.0%9.6 of 24.0 mi',
     );
   });
 });

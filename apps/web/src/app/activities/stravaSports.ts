@@ -5,6 +5,8 @@ import type { PaperTone } from '../collage/types';
 type SportDetails = {
   /** Chip text on a single outing. */
   label: string;
+  /** Eyebrow on the homepage latest-outing sticker. */
+  latest: string;
   /** Filter pill text, or null when the sport only shows under all sports. */
   filter: string | null;
   /** Paper matching the sport's ink on the map. */
@@ -12,11 +14,11 @@ type SportDetails = {
 };
 
 export const SPORT_DETAILS = {
-  hike: { filter: 'Hikes', label: 'Hike', tone: 'viridian' },
-  other: { filter: null, label: 'Activity', tone: 'ochre' },
-  ride: { filter: 'Rides', label: 'Ride', tone: 'cobalt' },
-  run: { filter: 'Runs', label: 'Run', tone: 'vermilion' },
-  ski: { filter: 'Skiing', label: 'Ski', tone: 'rose' },
+  hike: { filter: 'Hikes', label: 'Hike', latest: 'Latest hike', tone: 'viridian' },
+  other: { filter: null, label: 'Activity', latest: 'Latest outing', tone: 'ochre' },
+  ride: { filter: 'Rides', label: 'Ride', latest: 'Latest ride', tone: 'cobalt' },
+  run: { filter: 'Runs', label: 'Run', latest: 'Latest run', tone: 'vermilion' },
+  ski: { filter: 'Skiing', label: 'Ski', latest: 'Latest ski', tone: 'rose' },
 } as const satisfies Record<StravaSport, SportDetails>;
 
 /**

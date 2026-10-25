@@ -4,7 +4,7 @@ import { getTileSource } from './src/getTileSource';
 import { RouteMap } from './src/RouteMap';
 import { decodeRoutes, frameAround, framePaths, homeBounds, type MapRoute } from './src/routeFrame';
 
-const FRAME = { height: 320, padding: 12, width: 420 };
+const FRAME = { height: 288, padding: 16, width: 378 };
 
 /**
  * A card-sized glimpse of every route around where most of them start. Paths
@@ -21,7 +21,7 @@ export function RoutePeek({ routes }: { routes: ReadonlyArray<MapRoute> }) {
     <RouteMap
       frame={frame}
       paths={framePaths(frame, decoded)}
-      strokeWidth={1.4}
+      strokeWidth={1.8}
       tileSource={getTileSource()}
     />
   );
