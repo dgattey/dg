@@ -154,6 +154,11 @@
       "linter": {
         "domains": {
           "next": "none"
+        },
+        "rules": {
+          "complexity": {
+            "noImportantStyles": "off"
+          }
         }
       }
     },

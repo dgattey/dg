@@ -70,8 +70,8 @@ html:has(.collageRoot) body {
   --mat: 10px;
   --mat-feature: 14px;
   --print-radius: 6px;
-  --type-display: clamp(56px, 11vw, 144px);
-  --type-h1: clamp(44px, 7vw, 88px);
+  --type-display: clamp(50px, 9.8vw, 124px);
+  --type-h1: clamp(44px, 8.2vw, 108px);
   --type-display-md: clamp(40px, 6vw, 72px);
   --type-title-lg: clamp(26px, 2.6vw, 36px);
   --type-title-md: clamp(22px, 2.3vw, 28px);
@@ -180,12 +180,6 @@ html:has(.collageRoot) body {
 .collageMeasure {
   position: relative;
   z-index: 2;
-}
-.collagePageTitle {
-  padding-top: 20px;
-  font-size: var(--type-h1);
-  line-height: 0.94;
-  letter-spacing: var(--tracking-display);
 }
 .collagePin {
   position: absolute;
@@ -456,6 +450,12 @@ html[data-color-scheme="dark"] .cutNightOnly {
   text-shadow:
     0 1px 0 rgb(0 0 0 / 0.2),
     0 2px 3px rgb(0 0 0 / 0.12);
+}
+.collagePageTitle {
+  padding-top: 20px;
+  font-size: var(--type-h1);
+  line-height: 0.94;
+  letter-spacing: var(--tracking-display);
 }
 .cutHeadingCut {
   letter-spacing: 0.01em;
